@@ -84,11 +84,19 @@ def _insert(article: dict, inlined: dict[int, str]) -> str:
     return post.get("url", "(URL 없음)")
 
 
+def _images_for_publish(record: dict, post_dir: Path) -> dict[int, str]:
+    """이미지가 공개 URL 로 올라가 있으면 URL 사용(가벼움+SEO), 아니면 base64 인라인."""
+    urls = record.get("image_urls")
+    if urls:
+        return {int(k): v for k, v in urls.items()}
+    return _inlined_images(record, post_dir)
+
+
 def publish(record: dict, post_dir: Path) -> str:
     """한국어 원문 발행."""
-    return _insert(record["article"], _inlined_images(record, post_dir))
+    return _insert(record["article"], _images_for_publish(record, post_dir))
 
 
 def publish_article(article: dict, record: dict, post_dir: Path) -> str:
     """임의 article(예: 영문 번역본)을 같은 이미지로 발행."""
-    return _insert(article, _inlined_images(record, post_dir))
+    return _insert(article, _images_for_publish(record, post_dir))
