@@ -1,0 +1,45 @@
+name: daily-autoblog
+
+# 매일 06:00 KST (= 21:00 UTC 전날) 자동 생성·발행·보고
+on:
+  schedule:
+    - cron: "0 21 * * *"
+  workflow_dispatch: {}   # 수동 실행 버튼(테스트용)
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: 의존성 설치
+        run: pip install -r requirements.txt
+
+      - name: 비밀 파일 생성
+        run: |
+          mkdir -p config
+          cat > config/client_secret.json <<'EOF'
+          ${{ secrets.BLOGGER_CLIENT_SECRET }}
+          EOF
+          cat > config/token.json <<'EOF'
+          ${{ secrets.BLOGGER_TOKEN }}
+          EOF
+          printf '%s' '${{ secrets.TELEGRAM_CHAT_IDS }}' > config/telegram_chats.json
+
+      - name: 자동 발행 실행
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          BLOGGER_BLOG_ID: ${{ secrets.BLOGGER_BLOG_ID }}
+          OPENAI_MODEL: gpt-4o
+          IMAGE_MODEL: gpt-image-1
+          TRANSLATE_TO_ENGLISH: "true"
+          TARGET_GEO: KR
+          TIMEZONE: Asia/Seoul
+          PYTHONPATH: src
+          PYTHONUNBUFFERED: "1"
+        run: python scripts/daily_publish.py

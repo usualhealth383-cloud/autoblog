@@ -1,0 +1,17 @@
+[Unit]
+Description=AutoBlog daily service (telegram approval + 6AM KST generation)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=ubuntu
+WorkingDirectory=/home/ubuntu/auto_blog
+ExecStart=/home/ubuntu/auto_blog/.venv/bin/python scripts/service.py
+Restart=always
+RestartSec=5
+Environment=PYTHONUNBUFFERED=1
+Environment=PYTHONPATH=/home/ubuntu/auto_blog/src
+
+[Install]
+WantedBy=multi-user.target

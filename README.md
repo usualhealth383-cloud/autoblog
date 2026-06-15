@@ -1,0 +1,56 @@
+# auto_blog — 트렌드 기반 자동 블로그 발행 시스템
+
+매일 새벽, 오늘 뜨는 이슈를 분석해 **클릭을 부르는 각도**로 응용·조합한 뒤,
+GPT·Gemini·Claude 3중 검수로 3000~3500자 글을 완성하고, 이미지까지 붙여
+**승인 대시보드**에 띄웁니다. 승인하면 구글 Blogger·워드프레스에 자동 발행하고,
+네이버용 HTML 초안도 따로 뽑아 줍니다.
+
+## 파이프라인
+
+```
+①트렌드 수집      trends.py        구글트렌드 RSS + 구글뉴스 + (선택)네이버데이터랩
+②주제 전략        strategist.py    트렌드를 클릭 잘 되는 각도로 응용·조합·점수화·선정
+③본문 생성        writer.py        GPT 초안 → Gemini+Claude 교차검수 → 최종 3000~3500자
+④서식화          formatter.py     제목 H1·소제목 강조·문단 정리 → 깔끔한 HTML
+⑤이미지          images.py        썸네일 + 문단별 이미지 (생성 또는 저작권프리 검색)
+⑥번역(선택)       translate.py     영문판 생성
+⑦승인 대시보드    dashboard/app.py 로컬 창 자동 팝업 → 미리보기·승인/반려/수정
+⑧발행            publishers/      Blogger API · WordPress REST · 네이버 HTML 초안
+⑨SEO            seo.py           메타·스키마·사이트맵 핑·색인 요청
+```
+
+## 확정된 설계 결정
+
+- **발행 플랫폼:** 구글 Blogger + 워드프레스 동시. 네이버는 자동발행 안 함(약관·정지 위험)
+  → HTML 초안 파일만 뽑아 수동 복붙.
+- **본문 검수:** GPT 초안 → Gemini + Claude 교차검수 → 3-way 통합.
+- **의학 주제:** 법적 리스크 회피. 단정 표현 금지, "의학적 조언 아님" 고지·출처 인용 필수.
+- **주제 비중:** 고정 비율 없이 트렌드에 따라 유동(금융/의학/이슈).
+- **승인:** 로컬 대시보드 창 자동 팝업. 승인 전엔 절대 발행하지 않음.
+- **SEO:** 순위 "보장"은 불가. 기술적으로 가능한 최적화는 전부 자동 적용.
+
+## 빌드 순서(로드맵)
+
+- [x] 0. 프로젝트 뼈대 + 설정 로더
+- [x] 1. 트렌드 수집 (trends.py) — 실동작
+- [x] 2. 주제 전략 (strategist.py) — 안전필터 포함, 실동작
+- [x] 3. 본문 생성 (writer.py, GPT) — 3000~3500자 실동작. Gemini/Claude 검수는 키 넣으면 자동 활성
+- [x] 4. 서식화(formatter.py) + 이미지(images.py, gpt-image-1) — 실동작
+- [x] 5. 승인 대시보드 (dashboard/app.py) — 후보선택→생성→미리보기→승인. `오토블로그_시작.bat`
+- [~] 6. 발행: 네이버 초안 ✅ / Blogger(코드 완성, OAuth 설정 필요) / 워드프레스(나중)
+- [ ] 7. 번역(영문) · SEO·색인 · 스케줄러(매일 06:00)
+
+## 실행 (대시보드)
+`오토블로그_시작.bat` 더블클릭 → 브라우저 자동 팝업 → 주제 선택 → 생성 → 승인.
+
+## 실행
+
+```powershell
+# 최초 1회
+python -m venv .venv
+.\.venv\Scripts\python.exe -m pip install -r requirements.txt
+copy .env.example .env   # 키 채우기
+
+# 트렌드만 테스트
+.\.venv\Scripts\python.exe -m auto_blog.trends
+```
