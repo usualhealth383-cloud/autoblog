@@ -140,7 +140,15 @@ def _build_candidate(item: trends.TrendItem) -> TopicCandidate | None:
     if category == "finance":
         score += 4.0
         reasons.append("금융=황금 키워드(+4)")
-        angle = FINANCE_ANGLES[0].format(kw=item.title)
+        # 실제 투자 신호가 있을 때만 '수혜주' 각도(아니면 무의미 주제 방지: 정보형 각도)
+        stock_signals = ["주가", "상장", "증시", "코스피", "코스닥", "수혜", "관련주",
+                         "실적", "반도체", "전기차", "2차전지", "배터리", "ipo", "공모",
+                         "엔비디아", "테슬라", "삼성전자", "주식", "종목"]
+        if _has(blob, stock_signals):
+            angle = FINANCE_ANGLES[0].format(kw=item.title)
+        else:
+            angle = f"{item.title}, 지금 왜 화제일까? 핵심만 콕 정리 📌"
+            reasons.append("투자신호 약함→정보형 각도")
     elif category == "medical":
         score += 3.0
         reasons.append("의학=고수익 키워드(+3, 단 법적 고지 필요)")
