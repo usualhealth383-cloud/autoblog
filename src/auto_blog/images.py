@@ -78,7 +78,7 @@ def _generate_one(client, prompt: str, dest: Path) -> str | None:
             model=config.get("IMAGE_MODEL", "gpt-image-1"),
             prompt=prompt + PROMPT_GUARD,
             size="1024x1024",
-            quality=config.get("IMAGE_QUALITY", "medium"),
+            quality=config.get("IMAGE_QUALITY", "high"),
             n=1,
         )
         item = resp.data[0]
