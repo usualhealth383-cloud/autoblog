@@ -35,12 +35,25 @@ def _host_images_on_github(rec: dict, post_dir):
             urls[str(idx)] = f"{base}/{name}"
 
     def run(*a):
-        subprocess.run(a, cwd=str(ROOT), check=False)
+        return subprocess.run(a, cwd=str(ROOT), check=False,
+                              capture_output=True, text=True)
     run("git", "config", "user.email", "actions@github.com")
     run("git", "config", "user.name", "github-actions")
     run("git", "add", "public")
     run("git", "commit", "-m", f"images: {rec['dir']}")
-    run("git", "push", "origin", "HEAD:main")
+    # 원격이 그새 바뀌어도(동시 커밋) 재시도: 최신으로 rebase 후 push
+    pushed = False
+    for _ in range(4):
+        pull = run("git", "pull", "--rebase", "origin", "main")
+        if pull.returncode != 0:
+            run("git", "rebase", "--abort")
+            continue
+        if run("git", "push", "origin", "HEAD:main").returncode == 0:
+            pushed = True
+            break
+    if not pushed:
+        print("  [경고] 이미지 푸시 실패 → base64 폴백(이미지 안 깨짐)")
+        return {}   # blogger 가 base64 인라인으로 폴백
     print(f"  이미지 {len(urls)}장 공개 URL 호스팅 완료")
     return urls
 

@@ -24,8 +24,44 @@ def _image_block(url: str | None, prompt: str) -> str:
             f'<span style="font-size:12px">{_esc(prompt)}</span></div>')
 
 
+def _affiliate_block(aff: dict) -> str:
+    """제휴 추천 상품/증권사 링크 박스 + 공정위 대가성 고지."""
+    products = aff.get("products") or []
+    securities = aff.get("securities")
+    if not products and not securities:
+        return ""
+    rows: list[str] = []
+    for p in products:
+        rows.append(
+            f'<a href="{_esc(p["url"])}" target="_blank" rel="nofollow sponsored noopener" '
+            f'style="display:block;margin:8px 0;padding:14px 18px;background:#fff;'
+            f'border:1px solid #ffd8a8;border-radius:10px;text-decoration:none;'
+            f'color:#e8590c;font-size:16px;font-weight:700">'
+            f'🔎 {_esc(p["name"])} 보러가기 →</a>'
+        )
+    if securities:
+        rows.append(
+            f'<a href="{_esc(securities["url"])}" target="_blank" '
+            f'rel="nofollow sponsored noopener" '
+            f'style="display:block;margin:8px 0;padding:14px 18px;background:#fff;'
+            f'border:1px solid #a5d8ff;border-radius:10px;text-decoration:none;'
+            f'color:#1971c2;font-size:16px;font-weight:700">{_esc(securities["text"])} →</a>'
+        )
+    disclosure = aff.get("disclosure", "")
+    disclosure_html = (
+        f'<p style="margin:10px 0 0;font-size:12px;color:#868e96;line-height:1.6">'
+        f'※ {_esc(disclosure)}</p>') if disclosure else ""
+    return (
+        f'<div style="margin:36px 0;padding:20px 22px;background:#fff9f0;'
+        f'border:1px solid #ffe8cc;border-radius:14px">'
+        f'<div style="font-size:18px;font-weight:800;color:#212529;margin-bottom:10px">'
+        f'{_esc(aff.get("heading", "추천"))}</div>'
+        f'{"".join(rows)}{disclosure_html}</div>'
+    )
+
+
 def render_body(article: dict, images: dict[int, str] | None = None) -> str:
-    """발행용 본문 HTML 조각(제목 제외 본문 + 고지 + 태그)."""
+    """발행용 본문 HTML 조각(제목 제외 본문 + 제휴 + 고지 + 태그)."""
     images = images or {}
     parts: list[str] = []
 
@@ -43,6 +79,10 @@ def render_body(article: dict, images: dict[int, str] | None = None) -> str:
                 f'<p style="font-size:17px;line-height:1.9;color:#343a40;'
                 f'margin:0 0 18px">{_esc(para)}</p>'
             )
+
+    # 제휴 추천 박스(구매의도 글에만 채워져 있음) — 본문 끝, 태그 앞
+    if article.get("affiliate"):
+        parts.append(_affiliate_block(article["affiliate"]))
 
     if article.get("disclaimer"):
         parts.append(

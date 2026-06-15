@@ -10,7 +10,7 @@ import json
 import re
 from datetime import datetime
 
-from . import config, formatter, strategist, trends, writer
+from . import affiliate, config, formatter, strategist, trends, writer
 
 
 def _slug(text: str) -> str:
@@ -46,6 +46,9 @@ def generate_for_topic(topic: strategist.TopicCandidate, *,
     print(f"③ 본문 생성 중… (GPT)  주제: {topic.angle}")
     article = writer.write_article(topic, grounding)
     print(f"  완성: '{article.get('title')}'  ({article.get('char_count')}자)")
+
+    print("③.5 제휴 링크 분석 중…")
+    affiliate.enrich(article, topic)
 
     stamp = datetime.now().strftime("%Y%m%d-%H%M")
     out_dir = config.DATA_DIR / "posts" / f"{stamp}-{_slug(topic.keyword)}"
@@ -151,6 +154,8 @@ def run_auto() -> dict:
         article, safe, issues = writer.write_article_safe(topic, "")
 
     print(f"  완성: '{article.get('title')}'  ({article.get('char_count')}자)")
+    print("③.5 제휴 링크 분석 중…")
+    affiliate.enrich(article, topic)
     record = _finalize(topic, article)
     return record
 
