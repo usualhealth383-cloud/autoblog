@@ -1,9 +1,10 @@
 name: daily-autoblog
 
-# 매일 06:00 KST (= 21:00 UTC 전날) 자동 생성·발행·보고
+# 매일 약 06:13 KST (= 21:13 UTC 전날) 자동 생성·발행·보고
+# 정각(:00)은 전 세계 작업이 몰려 잘 밀리므로 일부러 비정각으로 잡음(정시성↑).
 on:
   schedule:
-    - cron: "0 21 * * *"
+    - cron: "13 21 * * *"
   workflow_dispatch: {}   # 수동 실행 버튼(테스트용)
 
 jobs:
@@ -44,6 +45,11 @@ jobs:
           IMAGE_QUALITY: high
           PEXELS_API_KEY: ${{ secrets.PEXELS_API_KEY }}
           UNSPLASH_ACCESS_KEY: ${{ secrets.UNSPLASH_ACCESS_KEY }}
+          # 수익화: 제휴(없으면 빈 값 → 조용히 애드센스만)
+          COUPANG_ACCESS_KEY: ${{ secrets.COUPANG_ACCESS_KEY }}
+          COUPANG_SECRET_KEY: ${{ secrets.COUPANG_SECRET_KEY }}
+          SECURITIES_AFFILIATE_URL: ${{ secrets.SECURITIES_AFFILIATE_URL }}
+          SECURITIES_AFFILIATE_TEXT: ${{ secrets.SECURITIES_AFFILIATE_TEXT }}
           TRANSLATE_TO_ENGLISH: "true"
           TARGET_GEO: KR
           TIMEZONE: Asia/Seoul
