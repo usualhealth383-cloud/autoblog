@@ -57,15 +57,20 @@ def _target_indices(sections: list[dict]) -> list[int]:
 
 
 def generate_for_article(article: dict, out_dir: Path,
-                         max_images: int = 8) -> tuple[dict[int, str], str | None]:
-    """섹션마다 이미지 생성 → ({섹션인덱스: 상대경로}, 썸네일 상대경로)."""
+                         max_images: int = 4) -> tuple[dict[int, str], str | None]:
+    """이미지 생성 → ({섹션인덱스: 상대경로}, 썸네일 상대경로). 글 전체에 고르게 분산."""
     client = _client()
     sections = article.get("sections", [])
     img_dir = out_dir / "images"
     img_dir.mkdir(parents=True, exist_ok=True)
 
     images: dict[int, str] = {}
-    targets = _target_indices(sections)[:max_images]
+    all_idx = _target_indices(sections)
+    if len(all_idx) > max_images:  # 균등 분포로 선택(앞쏠림 방지)
+        step = len(all_idx) / max_images
+        targets = [all_idx[int(i * step)] for i in range(max_images)]
+    else:
+        targets = all_idx
     for i in targets:
         prompt = sections[i]["image_prompt"]
         print(f"    - 섹션 {i} 이미지 생성…")
