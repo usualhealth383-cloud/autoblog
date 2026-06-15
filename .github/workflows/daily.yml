@@ -29,6 +29,8 @@ jobs:
           ${{ secrets.BLOGGER_TOKEN }}
           EOF
           printf '%s' '${{ secrets.TELEGRAM_CHAT_IDS }}' > config/telegram_chats.json
+          # 혹시 모를 UTF-8 BOM 제거(JSON 파싱 오류 방지)
+          sed -i '1s/^\xEF\xBB\xBF//' config/client_secret.json config/token.json config/telegram_chats.json
 
       - name: 자동 발행 실행
         env:
