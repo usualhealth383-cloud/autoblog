@@ -1,11 +1,9 @@
 name: daily-autoblog
 
-# 매일 약 06:13 KST (= 21:13 UTC 전날) 자동 생성·발행·보고
-# 정각(:00)은 전 세계 작업이 몰려 잘 밀리므로 일부러 비정각으로 잡음(정시성↑).
+# 외부 스케줄러(cron-job.org)가 매일 06:00 KST 에 workflow_dispatch 로 실행시킨다.
+# (GitHub 자체 schedule 은 신뢰성이 낮아 제거함)
 on:
-  schedule:
-    - cron: "13 21 * * *"
-  workflow_dispatch: {}   # 수동 실행 버튼(테스트용)
+  workflow_dispatch: {}
 
 jobs:
   publish:
