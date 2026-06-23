@@ -114,9 +114,11 @@ def send_report(record: dict, results: dict, chat_ids: list[int] | None = None) 
             links.append(f"{label}: {str(v).split('발행됨')[-1].lstrip('(EN): ').lstrip(': ')}")
     fixed = record["article"].get("fact_issues_fixed", [])
     fb = "  (안전 상식글로 교체됨)" if record.get("used_fallback") else ""
+    naver_url = "https://usualhealth383-cloud.github.io/autoblog/naver.html"
     text = (f"✅ 오늘의 글 자동 발행 완료!{fb}\n\n"
             f"📌 {article.get('title','')}  ({article.get('char_count','?')}자)\n\n"
             + "\n".join(links)
+            + f"\n\n📋 네이버 복붙용: {naver_url}"
             + f"\n\n🛡 자동 사실검증으로 근거 없는 주장 {len(fixed)}건 제거함."
             + "\n혹시 내용이 이상하면 위 링크에서 바로 삭제/수정하세요.")
     thumb_rel = record.get("thumbnail")

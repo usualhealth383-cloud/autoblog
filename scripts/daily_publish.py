@@ -58,6 +58,51 @@ def _host_images_on_github(rec: dict, post_dir):
     return urls
 
 
+def _gh_put_file(repo: str, token: str, path: str, content: str, message: str) -> bool:
+    """GitHub Contents API 로 파일을 덮어쓴다(기존 파일이면 sha 조회 후 갱신)."""
+    h = {"Authorization": f"token {token}", "Accept": "application/vnd.github+json"}
+    url = f"https://api.github.com/repos/{repo}/contents/{path}"
+    sha = None
+    try:
+        g = requests.get(url, headers=h, timeout=30)
+        if g.status_code == 200:
+            sha = g.json().get("sha")
+    except requests.RequestException:
+        pass
+    body = {"message": message, "branch": "main",
+            "content": _b64.b64encode(content.encode("utf-8")).decode()}
+    if sha:
+        body["sha"] = sha
+    try:
+        r = requests.put(url, headers=h, json=body, timeout=60)
+        return r.status_code in (200, 201)
+    except requests.RequestException:
+        return False
+
+
+def _update_naver_page(rec: dict, results: dict):
+    """오늘 글을 '네이버 복붙' 페이지가 읽을 latest_naver.json 으로 올린다(고정 링크에서 보임)."""
+    repo = os.environ.get("GITHUB_REPOSITORY")
+    token = os.environ.get("GITHUB_TOKEN")
+    if not repo or not token:
+        return
+    import datetime
+    import json
+    from auto_blog import formatter
+    article = rec["article"]
+    imgs = {int(k): v for k, v in (rec.get("image_urls") or {}).items()}
+    body_html = formatter.render_body(article, imgs)
+    kr_url = ""
+    blog = str(results.get("blogger", ""))
+    if "발행됨:" in blog:
+        kr_url = blog.split("발행됨:")[-1].strip()
+    data = {"title": article.get("title", ""), "body_html": body_html,
+            "url": kr_url, "date": datetime.date.today().isoformat()}
+    ok = _gh_put_file(repo, token, "latest_naver.json",
+                      json.dumps(data, ensure_ascii=False), "naver: 최신 글 갱신")
+    print("  네이버 복붙 페이지 갱신:", "완료" if ok else "실패")
+
+
 def main():
     rec = pipeline.run_auto()
     post_dir = config.DATA_DIR / "posts" / rec["dir"]
@@ -74,6 +119,9 @@ def main():
         json.dumps(rec, ensure_ascii=False, indent=2), encoding="utf-8")
     for k, v in results.items():
         print(f"  {k}: {v}")
+
+    # 네이버 복붙 페이지 갱신(고정 링크)
+    _update_naver_page(rec, results)
 
     print("⑦ 텔레그램 보고…")
     telegram_bot.send_report(rec, results)

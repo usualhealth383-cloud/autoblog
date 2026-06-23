@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="ko"><head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>네이버 복붙 — 요즘 상식</title>
+<style>
+  body{font-family:-apple-system,'Segoe UI','Malgun Gothic',sans-serif;background:#f8f9fa;
+       margin:0;color:#212529}
+  .wrap{max-width:760px;margin:0 auto;padding:20px 16px 80px}
+  .bar{position:sticky;top:0;background:#f8f9fa;padding:12px 0;display:flex;gap:8px;flex-wrap:wrap;
+       border-bottom:1px solid #e9ecef;z-index:10}
+  button{font-size:15px;padding:10px 16px;border:none;border-radius:10px;cursor:pointer;font-weight:600}
+  .b1{background:#03c75a;color:#fff}      /* 네이버 그린 */
+  .b2{background:#1971c2;color:#fff}
+  .b3{background:#868e96;color:#fff}
+  h1{font-size:24px;margin:18px 0 6px}
+  .meta{color:#868e96;font-size:13px;margin-bottom:14px}
+  #body{background:#fff;border:1px solid #e9ecef;border-radius:12px;padding:22px}
+  #body img{max-width:100%;height:auto;border-radius:10px;margin:14px 0}
+  #body h2{font-size:20px;margin:28px 0 10px}
+  #body p{font-size:16px;line-height:1.9;margin:0 0 16px}
+  .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#212529;
+         color:#fff;padding:12px 20px;border-radius:10px;opacity:0;transition:opacity .2s;font-size:14px}
+  .toast.on{opacity:1}
+  .empty{color:#868e96;text-align:center;padding:60px 0}
+</style></head>
+<body><div class="wrap">
+  <div class="bar">
+    <button class="b1" onclick="copyTitle()">📋 제목 복사</button>
+    <button class="b2" onclick="copyBody()">📋 본문 복사</button>
+    <button class="b3" onclick="load()">🔄 새로고침</button>
+  </div>
+  <h1 id="title">불러오는 중…</h1>
+  <div class="meta" id="meta"></div>
+  <div id="body" class="empty">잠시만요…</div>
+</div>
+<div class="toast" id="toast"></div>
+<script>
+const RAW="https://raw.githubusercontent.com/usualhealth383-cloud/autoblog/main/latest_naver.json";
+let DATA={title:"",body_html:""};
+function toast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('on');
+  setTimeout(()=>t.classList.remove('on'),1500);}
+async function copyTitle(){try{await navigator.clipboard.writeText(DATA.title);toast('제목 복사됨! 네이버 제목에 붙여넣기');}catch(e){toast('복사 실패 — 직접 선택해주세요');}}
+async function copyBody(){
+  try{
+    const html=document.getElementById('body').innerHTML;
+    const plain=document.getElementById('body').innerText;
+    await navigator.clipboard.write([new ClipboardItem({
+      'text/html':new Blob([html],{type:'text/html'}),
+      'text/plain':new Blob([plain],{type:'text/plain'})})]);
+    toast('본문 복사됨! 네이버 본문에 붙여넣기');
+  }catch(e){
+    try{await navigator.clipboard.writeText(document.getElementById('body').innerText);toast('본문(텍스트) 복사됨');}
+    catch(e2){toast('복사 실패 — 직접 선택해주세요');}
+  }
+}
+async function load(){
+  try{
+    const r=await fetch(RAW+'?t='+Date.now());
+    DATA=await r.json();
+    document.getElementById('title').textContent=DATA.title||'(제목 없음)';
+    document.getElementById('meta').textContent=(DATA.date||'')+'  ·  원문: '+(DATA.url||'');
+    document.getElementById('body').className='';
+    document.getElementById('body').innerHTML=DATA.body_html||'<p class=empty>내용이 없습니다.</p>';
+  }catch(e){
+    document.getElementById('title').textContent='아직 글이 없어요';
+    document.getElementById('body').innerHTML='<p class=empty>첫 글이 발행되면 여기에 떠요.</p>';
+  }
+}
+load();
+</script>
+</body></html>
