@@ -13,6 +13,7 @@
   .b1{background:#03c75a;color:#fff}      /* 네이버 그린 */
   .b2{background:#1971c2;color:#fff}
   .b3{background:#868e96;color:#fff}
+  .b4{background:#7048e8;color:#fff}
   h1{font-size:24px;margin:18px 0 6px}
   .meta{color:#868e96;font-size:13px;margin-bottom:14px}
   #body{background:#fff;border:1px solid #e9ecef;border-radius:12px;padding:22px}
@@ -28,10 +29,12 @@
   <div class="bar">
     <button class="b1" onclick="copyTitle()">📋 제목 복사</button>
     <button class="b2" onclick="copyBody()">📋 본문 복사</button>
+    <button class="b4" onclick="copyTags()">🏷 태그 복사</button>
     <button class="b3" onclick="load()">🔄 새로고침</button>
   </div>
   <h1 id="title">불러오는 중…</h1>
   <div class="meta" id="meta"></div>
+  <div id="tags" style="margin:8px 0 14px;color:#1971c2;font-size:14px"></div>
   <div id="body" class="empty">잠시만요…</div>
 </div>
 <div class="toast" id="toast"></div>
@@ -41,6 +44,7 @@ let DATA={title:"",body_html:""};
 function toast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('on');
   setTimeout(()=>t.classList.remove('on'),1500);}
 async function copyTitle(){try{await navigator.clipboard.writeText(DATA.title);toast('제목 복사됨! 네이버 제목에 붙여넣기');}catch(e){toast('복사 실패 — 직접 선택해주세요');}}
+async function copyTags(){try{await navigator.clipboard.writeText(DATA.tags||'');toast('태그 복사됨! 네이버 태그 칸에 붙여넣기');}catch(e){toast('복사 실패 — 직접 선택해주세요');}}
 async function copyBody(){
   try{
     const html=document.getElementById('body').innerHTML;
@@ -60,6 +64,7 @@ async function load(){
     DATA=await r.json();
     document.getElementById('title').textContent=DATA.title||'(제목 없음)';
     document.getElementById('meta').textContent=(DATA.date||'')+'  ·  원문: '+(DATA.url||'');
+    document.getElementById('tags').textContent=DATA.tags||'';
     document.getElementById('body').className='';
     document.getElementById('body').innerHTML=DATA.body_html||'<p class=empty>내용이 없습니다.</p>';
   }catch(e){

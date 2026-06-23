@@ -116,10 +116,13 @@ def send_report(record: dict, results: dict, chat_ids: list[int] | None = None,
     fixed = record["article"].get("fact_issues_fixed", [])
     fb = "  (안전 상식글로 교체됨)" if record.get("used_fallback") else ""
     naver_url = "https://usualhealth383-cloud.github.io/autoblog/naver.html"
+    tags = article.get("tags", []) or []
+    tag_line = " ".join("#" + str(t).replace(" ", "") for t in tags)
     text = (f"✅ 오늘의 글 자동 발행 완료!{fb}\n\n"
             f"📌 {article.get('title','')}  ({article.get('char_count','?')}자)\n\n"
             + "\n".join(links)
             + f"\n\n📋 네이버 복붙용: {naver_url}"
+            + (f"\n🏷 태그(네이버 태그 칸에): {tag_line}" if tag_line else "")
             + (f"\n\n🧵 스레드용 (복사해서 올리세요):\n{threads_text}" if threads_text else "")
             + f"\n\n🛡 자동 사실검증으로 근거 없는 주장 {len(fixed)}건 제거함."
             + "\n혹시 내용이 이상하면 위 링크에서 바로 삭제/수정하세요.")

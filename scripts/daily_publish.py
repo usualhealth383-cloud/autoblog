@@ -102,7 +102,9 @@ def _update_naver_page(rec: dict, results: dict, naver_variant: dict):
     lead_html = (f'<p style="font-size:17px;line-height:1.9;margin:0 0 18px">'
                  f'{lead}</p>') if lead else ""
     body_html = lead_html + formatter.render_body(article, imgs)
-    data = {"title": title, "body_html": body_html,
+    tags = article.get("tags", []) or []
+    tag_line = " ".join("#" + str(t).replace(" ", "") for t in tags)
+    data = {"title": title, "body_html": body_html, "tags": tag_line,
             "url": _blog_url(results), "date": datetime.date.today().isoformat()}
     ok = _gh_put_file(repo, token, "latest_naver.json",
                       json.dumps(data, ensure_ascii=False), "naver: 최신 글 갱신")
