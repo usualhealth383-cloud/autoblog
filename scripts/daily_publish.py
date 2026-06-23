@@ -146,6 +146,11 @@ def main():
         print("  [경고] 스레드 변형 실패:", e)
         threads_text = ""
     rec["threads_text"] = threads_text
+    try:
+        summary = variants.make_summary(article)
+    except Exception as e:
+        print("  [경고] 요약 실패:", e)
+        summary = ""
 
     # 네이버 복붙 페이지 갱신(변형본 반영)
     _update_naver_page(rec, results, nv)
@@ -159,7 +164,7 @@ def main():
         results["threads"] = msg
 
     print("⑦ 텔레그램 보고…")
-    telegram_bot.send_report(rec, results, threads_text=threads_text)
+    telegram_bot.send_report(rec, results, threads_text=threads_text, summary=summary)
     print("완료 ✅")
 
 

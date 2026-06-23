@@ -100,43 +100,47 @@ def send_for_approval(record: dict, post_dir: Path,
 
 
 def send_report(record: dict, results: dict, chat_ids: list[int] | None = None,
-                threads_text: str = "") -> None:
-    """자동발행 후 결과 보고(승인 버튼 없음). 게시 링크 + 자동수정 내역 + 삭제 안내."""
+                threads_text: str = "", summary: str = "") -> None:
+    """자동발행 후 보고. ①사진+따뜻한 요약(캡션) ②상세(링크·태그·스레드)."""
     if not TOKEN:
         return
     chat_ids = chat_ids or _load_chats()
     if not chat_ids:
         return
     article = record["article"]
+    title = article.get("title", "")
     links = []
     for k, v in results.items():
         if "blogspot.com" in str(v):
             label = "🇺🇸 영문" if k.endswith("_en") else "🇰🇷 한글"
             links.append(f"{label}: {str(v).split('발행됨')[-1].lstrip('(EN): ').lstrip(': ')}")
-    fixed = record["article"].get("fact_issues_fixed", [])
+    fixed = article.get("fact_issues_fixed", [])
     fb = "  (안전 상식글로 교체됨)" if record.get("used_fallback") else ""
     naver_url = "https://usualhealth383-cloud.github.io/autoblog/naver.html"
     tags = article.get("tags", []) or []
     tag_line = " ".join("#" + str(t).replace(" ", "") for t in tags)
-    text = (f"✅ 오늘의 글 자동 발행 완료!{fb}\n\n"
-            f"📌 {article.get('title','')}  ({article.get('char_count','?')}자)\n\n"
-            + "\n".join(links)
-            + f"\n\n📋 네이버 복붙용: {naver_url}"
-            + (f"\n🏷 태그(네이버 태그 칸에): {tag_line}" if tag_line else "")
-            + (f"\n\n🧵 스레드용 (복사해서 올리세요):\n{threads_text}" if threads_text else "")
-            + f"\n\n🛡 자동 사실검증으로 근거 없는 주장 {len(fixed)}건 제거함."
-            + "\n혹시 내용이 이상하면 위 링크에서 바로 삭제/수정하세요.")
+
+    # ① 사진 캡션 = 따뜻한 짧은 요약
+    caption = (f"✅ 오늘의 글, 따뜻하게 올라갔어요!{fb}\n\n📌 {title}\n\n{summary}").strip()[:1024]
+    # ② 상세
+    details = ("\n".join(links)
+               + f"\n\n📋 네이버 복붙: {naver_url}"
+               + (f"\n🏷 태그(네이버 태그 칸에): {tag_line}" if tag_line else "")
+               + (f"\n\n🧵 스레드용 (복사해서 올리세요):\n{threads_text}" if threads_text else "")
+               + f"\n\n🛡 사실검증으로 근거 없는 주장 {len(fixed)}건 제거. 이상하면 위 링크에서 수정/삭제.")
+
     thumb_rel = record.get("thumbnail")
     post_dir = config.DATA_DIR / "posts" / record.get("dir", "")
     for cid in chat_ids:
         if thumb_rel and (post_dir / thumb_rel).exists():
             with open(post_dir / thumb_rel, "rb") as f:
-                requests.post(f"{API}/sendPhoto",
-                              data={"chat_id": cid, "caption": text},
+                requests.post(f"{API}/sendPhoto", data={"chat_id": cid, "caption": caption},
                               files={"photo": f}, timeout=30)
         else:
-            requests.post(f"{API}/sendMessage",
-                          data={"chat_id": cid, "text": text}, timeout=30)
+            requests.post(f"{API}/sendMessage", data={"chat_id": cid, "text": caption}, timeout=30)
+        requests.post(f"{API}/sendMessage",
+                      data={"chat_id": cid, "text": details,
+                            "disable_web_page_preview": "true"}, timeout=30)
 
 
 def _edit_done(chat_id: int, message_id: int, text: str) -> None:

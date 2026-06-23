@@ -44,6 +44,21 @@ def make_threads(article: dict) -> dict:
     return {"text": d.get("text", ""), "hashtags": d.get("hashtags", [])}
 
 
+def make_summary(article: dict) -> str:
+    """다정하고 따뜻하고 재밌게, 짧은 요약(3~4문장). 텔레그램 보고 사진 캡션용."""
+    client = _client()
+    r = client.chat.completions.create(
+        model=MODEL, temperature=0.85,
+        messages=[
+            {"role": "system", "content":
+                "너는 다정하고 따뜻한 친구처럼 글을 소개하는 한국어 에디터다."},
+            {"role": "user", "content":
+                "다음 블로그 글을 친한 친구에게 다정하게 알려주듯 3~4문장으로 짧게 정리하라. "
+                "따뜻하고 재밌게, 이모지 약간. 어려운 말 없이. 마지막에 살짝 읽고 싶게 만들기.\n\n"
+                f"[블로그 글]\n{_src(article)}"}])
+    return (r.choices[0].message.content or "").strip()
+
+
 def make_naver(article: dict) -> dict:
     """네이버용 변형(중복 회피): 새 제목 + 새 도입 문단. {title, lead}."""
     client = _client()
