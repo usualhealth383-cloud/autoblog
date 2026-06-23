@@ -135,8 +135,10 @@ def run_auto() -> dict:
 
     article = None
     topic = None
-    if chosen:
-        print(f"  후보: {chosen.angle}")
+    # 트렌드는 '금융·건강'일 때만 사용(브랜드 적합·고단가·검색 가치). 그 외(연예·스포츠·
+    # 막연한 일반 트렌드)는 검색량 큰 상식글로 간다 → 조회수·브랜드 일관성↑.
+    if chosen and chosen.category in ("finance", "medical"):
+        print(f"  후보(브랜드 적합 트렌드): {chosen.angle}")
         grounding, _t = research.fetch_grounding(chosen.keyword)
         print("③ 본문 생성 + 엄격 사실검증…")
         art, safe, issues = writer.write_article_safe(chosen, grounding)
@@ -145,6 +147,8 @@ def run_auto() -> dict:
             print(f"  ✅ 엄격검증 통과 (자동수정 {len(issues)}건)")
         else:
             print(f"  ⚠️ 엄격검증 미통과 → 안전 상식글로 교체 (수정 시도 {len(issues)}건)")
+    elif chosen:
+        print(f"  트렌드 '{chosen.keyword}'({chosen.category}) = 브랜드 부적합 → 상식글로")
 
     if article is None:
         idx = datetime.now().timetuple().tm_yday

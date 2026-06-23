@@ -99,7 +99,8 @@ def send_for_approval(record: dict, post_dir: Path,
                             "reply_markup": json.dumps(keyboard)}, timeout=30)
 
 
-def send_report(record: dict, results: dict, chat_ids: list[int] | None = None) -> None:
+def send_report(record: dict, results: dict, chat_ids: list[int] | None = None,
+                threads_text: str = "") -> None:
     """자동발행 후 결과 보고(승인 버튼 없음). 게시 링크 + 자동수정 내역 + 삭제 안내."""
     if not TOKEN:
         return
@@ -119,6 +120,7 @@ def send_report(record: dict, results: dict, chat_ids: list[int] | None = None) 
             f"📌 {article.get('title','')}  ({article.get('char_count','?')}자)\n\n"
             + "\n".join(links)
             + f"\n\n📋 네이버 복붙용: {naver_url}"
+            + (f"\n\n🧵 스레드용 (복사해서 올리세요):\n{threads_text}" if threads_text else "")
             + f"\n\n🛡 자동 사실검증으로 근거 없는 주장 {len(fixed)}건 제거함."
             + "\n혹시 내용이 이상하면 위 링크에서 바로 삭제/수정하세요.")
     thumb_rel = record.get("thumbnail")

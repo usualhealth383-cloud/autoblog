@@ -80,8 +80,13 @@ def _gh_put_file(repo: str, token: str, path: str, content: str, message: str) -
         return False
 
 
-def _update_naver_page(rec: dict, results: dict):
-    """오늘 글을 '네이버 복붙' 페이지가 읽을 latest_naver.json 으로 올린다(고정 링크에서 보임)."""
+def _blog_url(results: dict) -> str:
+    blog = str(results.get("blogger", ""))
+    return blog.split("발행됨:")[-1].strip() if "발행됨:" in blog else ""
+
+
+def _update_naver_page(rec: dict, results: dict, naver_variant: dict):
+    """오늘 글을 '네이버 복붙' 페이지가 읽을 latest_naver.json 으로 올린다(중복회피 변형본 반영)."""
     repo = os.environ.get("GITHUB_REPOSITORY")
     token = os.environ.get("GITHUB_TOKEN")
     if not repo or not token:
@@ -91,13 +96,14 @@ def _update_naver_page(rec: dict, results: dict):
     from auto_blog import formatter
     article = rec["article"]
     imgs = {int(k): v for k, v in (rec.get("image_urls") or {}).items()}
-    body_html = formatter.render_body(article, imgs)
-    kr_url = ""
-    blog = str(results.get("blogger", ""))
-    if "발행됨:" in blog:
-        kr_url = blog.split("발행됨:")[-1].strip()
-    data = {"title": article.get("title", ""), "body_html": body_html,
-            "url": kr_url, "date": datetime.date.today().isoformat()}
+    # 네이버용: 새 제목 + 새 도입문단 + 본문(중복 회피)
+    title = naver_variant.get("title") or article.get("title", "")
+    lead = naver_variant.get("lead", "")
+    lead_html = (f'<p style="font-size:17px;line-height:1.9;margin:0 0 18px">'
+                 f'{lead}</p>') if lead else ""
+    body_html = lead_html + formatter.render_body(article, imgs)
+    data = {"title": title, "body_html": body_html,
+            "url": _blog_url(results), "date": datetime.date.today().isoformat()}
     ok = _gh_put_file(repo, token, "latest_naver.json",
                       json.dumps(data, ensure_ascii=False), "naver: 최신 글 갱신")
     print("  네이버 복붙 페이지 갱신:", "완료" if ok else "실패")
@@ -120,11 +126,38 @@ def main():
     for k, v in results.items():
         print(f"  {k}: {v}")
 
-    # 네이버 복붙 페이지 갱신(고정 링크)
-    _update_naver_page(rec, results)
+    # 채널 변형본 생성(스레드·네이버)
+    from auto_blog import variants
+    from auto_blog.publishers import threads_upload
+    article = rec["article"]
+    blog_url = _blog_url(results)
+    try:
+        nv = variants.make_naver(article)
+    except Exception as e:
+        print("  [경고] 네이버 변형 실패:", e)
+        nv = {"title": article.get("title", ""), "lead": ""}
+    try:
+        tv = variants.make_threads(article)
+        threads_text = (tv["text"] + "\n\n" + blog_url
+                        + "\n" + " ".join(tv.get("hashtags", []))).strip()
+    except Exception as e:
+        print("  [경고] 스레드 변형 실패:", e)
+        threads_text = ""
+    rec["threads_text"] = threads_text
+
+    # 네이버 복붙 페이지 갱신(변형본 반영)
+    _update_naver_page(rec, results, nv)
+
+    # 스레드 자동 게시(토큰 있을 때만)
+    if threads_text and threads_upload.configured():
+        imgs = rec.get("image_urls") or {}
+        thumb = imgs.get("0") or (next(iter(imgs.values())) if imgs else None)
+        msg = threads_upload.post(threads_text, thumb)
+        print("  스레드:", msg)
+        results["threads"] = msg
 
     print("⑦ 텔레그램 보고…")
-    telegram_bot.send_report(rec, results)
+    telegram_bot.send_report(rec, results, threads_text=threads_text)
     print("완료 ✅")
 
 

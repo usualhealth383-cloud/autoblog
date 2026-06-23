@@ -1,0 +1,63 @@
+"""채널별 변형본 생성 — 같은 블로그 글을 스레드/네이버에 맞게 재가공.
+
+- 스레드: 스크롤 멈추는 후킹 + 핵심 1~2개 + 블로그 링크. 500자 제한, 유쾌·임팩트.
+- 네이버: 제목·도입을 새로 써서 중복(저품질) 회피. 유쾌한 말투 유지.
+둘 다 블로그 본문(딥리서치 기반)을 출처로 하므로 내용은 정확하다.
+"""
+from __future__ import annotations
+
+import json
+
+from . import config
+
+MODEL = config.get("OPENAI_MODEL", "gpt-4o")
+
+
+def _client():
+    from openai import OpenAI
+    return OpenAI(api_key=config.OPENAI_API_KEY)
+
+
+def _src(article: dict, n_sections: int = 3, limit: int = 1600) -> str:
+    body = " ".join(p for s in article.get("sections", [])[:n_sections]
+                    for p in s.get("paragraphs", []))
+    return (article.get("title", "") + "\n" + body)[:limit]
+
+
+def make_threads(article: dict) -> dict:
+    """블로그 글 → 스레드용 짧고 후킹 있는 글. {text, hashtags}. (링크는 호출측에서 덧붙임)"""
+    client = _client()
+    r = client.chat.completions.create(
+        model=MODEL, response_format={"type": "json_object"}, temperature=0.9,
+        messages=[
+            {"role": "system", "content":
+                "너는 스레드(Threads)에서 잘 터지는 한국어 카피라이터다. JSON 으로만 답한다."},
+            {"role": "user", "content":
+                "다음 블로그 글을 스레드용으로 재가공하라. 규칙:\n"
+                "- 첫 줄은 스크롤을 멈추게 하는 강한 후킹(의외의 사실/질문/숫자).\n"
+                "- 핵심 1~2개만 짧고 임팩트 있게. 유쾌·친근한 입말체 + 이모지 약간.\n"
+                "- 본문 280자 이내. 마지막 줄은 '자세한 건 블로그에서 👇'.\n"
+                "- 해시태그 3~4개(주제 관련).\n"
+                '형식: {"text": "후킹+핵심+CTA(줄바꿈 포함)", "hashtags": ["#태그", ...]}\n\n'
+                f"[블로그 글]\n{_src(article)}"}])
+    d = json.loads(r.choices[0].message.content)
+    return {"text": d.get("text", ""), "hashtags": d.get("hashtags", [])}
+
+
+def make_naver(article: dict) -> dict:
+    """네이버용 변형(중복 회피): 새 제목 + 새 도입 문단. {title, lead}."""
+    client = _client()
+    r = client.chat.completions.create(
+        model=MODEL, response_format={"type": "json_object"}, temperature=0.8,
+        messages=[
+            {"role": "system", "content":
+                "너는 네이버 블로그 작가다. 한국어. JSON 으로만 답한다."},
+            {"role": "user", "content":
+                "다음 글을 네이버 블로그용으로 살짝 다르게 만들어라(중복 콘텐츠 회피 목적). "
+                "원문과 표현이 다른 '새 제목' 1개와, 새로 쓴 '도입 문단' 1개(4~6문장)를 만들어라. "
+                "유쾌·친근한 입말체 + 이모지 약간. 사실은 원문과 동일하게 유지.\n"
+                '형식: {"title": "새 제목(이모지 가능)", "lead": "새 도입 문단"}\n\n'
+                f"[원문]\n{_src(article, n_sections=2, limit=900)}"}])
+    d = json.loads(r.choices[0].message.content)
+    return {"title": d.get("title", article.get("title", "")),
+            "lead": d.get("lead", "")}
