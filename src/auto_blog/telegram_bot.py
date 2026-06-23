@@ -14,6 +14,8 @@
 from __future__ import annotations
 
 import json
+import os
+import re
 from pathlib import Path
 
 import requests
@@ -99,6 +101,21 @@ def send_for_approval(record: dict, post_dir: Path,
                             "reply_markup": json.dumps(keyboard)}, timeout=30)
 
 
+def _thumb_url(record: dict, thumb_rel: str | None) -> str | None:
+    """로컬 썸네일 파일이 없을 때 쓸 공개 호스팅 URL(클라우드에서 GitHub raw 로 올린 이미지).
+
+    image_urls 는 섹션 인덱스(str) → raw URL 의 dict. 썸네일과 같은 섹션을 우선 쓰고,
+    못 찾으면 아무 이미지나 하나 쓴다."""
+    urls = record.get("image_urls") or {}
+    if not urls:
+        return None
+    if thumb_rel:
+        m = re.search(r"(\d+)", os.path.basename(thumb_rel))
+        if m and m.group(1) in urls:
+            return urls[m.group(1)]
+    return next(iter(urls.values()))
+
+
 def send_report(record: dict, results: dict, chat_ids: list[int] | None = None,
                 threads_text: str = "", summary: str = "") -> None:
     """자동발행 후 보고. ①사진+따뜻한 요약(캡션) ②상세(링크·태그·스레드)."""
@@ -120,8 +137,14 @@ def send_report(record: dict, results: dict, chat_ids: list[int] | None = None,
     tags = article.get("tags", []) or []
     tag_line = " ".join("#" + str(t).replace(" ", "") for t in tags)
 
-    # ① 사진 캡션 = 따뜻한 짧은 요약
-    caption = (f"✅ 오늘의 글, 따뜻하게 올라갔어요!{fb}\n\n📌 {title}\n\n{summary}").strip()[:1024]
+    # ① 사진 + 따뜻한 요약(1000자 내외). 사진 캡션은 1024자 한도라, 캡션에 다 안 들어가면
+    #    요약은 별도 메시지로 보내 잘리지 않게 한다.
+    header = f"✅ 오늘의 글, 따뜻하게 올라갔어요!{fb}\n\n📌 {title}"
+    full_caption = f"{header}\n\n{summary}".strip()
+    if len(full_caption) <= 1024:
+        caption, extra_summary = full_caption, ""
+    else:
+        caption, extra_summary = header[:1024], summary[:4000]
     # ② 상세
     details = ("\n".join(links)
                + f"\n\n📋 네이버 복붙: {naver_url}"
@@ -130,14 +153,23 @@ def send_report(record: dict, results: dict, chat_ids: list[int] | None = None,
                + f"\n\n🛡 사실검증으로 근거 없는 주장 {len(fixed)}건 제거. 이상하면 위 링크에서 수정/삭제.")
 
     thumb_rel = record.get("thumbnail")
+    thumb_url = _thumb_url(record, thumb_rel)  # 로컬 파일이 없을 때 쓸 공개 호스팅 URL
     post_dir = config.DATA_DIR / "posts" / record.get("dir", "")
     for cid in chat_ids:
+        sent_photo = False
         if thumb_rel and (post_dir / thumb_rel).exists():
             with open(post_dir / thumb_rel, "rb") as f:
-                requests.post(f"{API}/sendPhoto", data={"chat_id": cid, "caption": caption},
-                              files={"photo": f}, timeout=30)
-        else:
+                r = requests.post(f"{API}/sendPhoto", data={"chat_id": cid, "caption": caption},
+                                  files={"photo": f}, timeout=30)
+            sent_photo = r.ok
+        elif thumb_url:
+            r = requests.post(f"{API}/sendPhoto",
+                              data={"chat_id": cid, "caption": caption, "photo": thumb_url}, timeout=30)
+            sent_photo = r.ok
+        if not sent_photo:  # 사진을 못 붙이면 캡션을 그냥 텍스트로
             requests.post(f"{API}/sendMessage", data={"chat_id": cid, "text": caption}, timeout=30)
+        if extra_summary:  # 캡션에 다 못 담은 요약은 별도 메시지로
+            requests.post(f"{API}/sendMessage", data={"chat_id": cid, "text": extra_summary}, timeout=30)
         requests.post(f"{API}/sendMessage",
                       data={"chat_id": cid, "text": details,
                             "disable_web_page_preview": "true"}, timeout=30)

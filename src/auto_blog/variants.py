@@ -45,7 +45,7 @@ def make_threads(article: dict) -> dict:
 
 
 def make_summary(article: dict) -> str:
-    """다정하고 따뜻하고 재밌게, 짧은 요약(3~4문장). 텔레그램 보고 사진 캡션용."""
+    """다정하고 따뜻하고 재밌게, 1000자 내외 요약. 텔레그램 보고용."""
     client = _client()
     r = client.chat.completions.create(
         model=MODEL, temperature=0.85,
@@ -53,9 +53,12 @@ def make_summary(article: dict) -> str:
             {"role": "system", "content":
                 "너는 다정하고 따뜻한 친구처럼 글을 소개하는 한국어 에디터다."},
             {"role": "user", "content":
-                "다음 블로그 글을 친한 친구에게 다정하게 알려주듯 3~4문장으로 짧게 정리하라. "
-                "따뜻하고 재밌게, 이모지 약간. 어려운 말 없이. 마지막에 살짝 읽고 싶게 만들기.\n\n"
-                f"[블로그 글]\n{_src(article)}"}])
+                "다음 블로그 글을 친한 친구에게 다정하게 알려주듯 정리하라. 규칙:\n"
+                "- 분량은 공백 포함 900~1000자 정도(너무 길지 않게). 6~8문장.\n"
+                "- 핵심을 빠짐없이 담되, 따뜻하고 재밌게. 이모지 약간. 어려운 말 없이.\n"
+                "- 마지막에 살짝 더 읽고 싶게 만들기.\n"
+                "- 문장은 반드시 자연스럽게 끝맺어라(중간에 끊지 말 것).\n\n"
+                f"[블로그 글]\n{_src(article, n_sections=5, limit=2600)}"}])
     return (r.choices[0].message.content or "").strip()
 
 
