@@ -1,8 +1,8 @@
-"""사실 그라운딩: 주제 키워드로 실제 뉴스를 모아 글의 근거 자료로 제공.
+"""딥리서치: 주제에 대해 실제 자료(위키백과 본문 + 최신 뉴스)를 모아 글의 근거로 제공.
 
-구글 뉴스 RSS 검색으로 해당 키워드의 최신 기사 제목/요약을 수집한다. 본문 작성 시
-이 자료에 근거만 쓰게 하면, 모델이 스펙·가격·수치를 지어내는 환각을 크게 줄일 수 있다.
-RSS 라 안정적이고 키도 필요 없다.
+헤드라인만 보는 얕은 방식이 아니라, **위키백과 본문(정의·수치·사례·맥락)** 을 읽어
+진짜 정보를 확보하고, **최신 뉴스 헤드라인**으로 시의성을 더한다. 둘 다 무료·키 불필요·
+안정적이라 매일 무인 실행에도 안전하다. 작성 단계는 이 자료에 근거해 깊이 있게 쓴다.
 """
 from __future__ import annotations
 
@@ -13,8 +13,9 @@ from urllib.parse import quote
 
 import requests
 
+WIKI_API = "https://ko.wikipedia.org/w/api.php"
 NEWS_SEARCH = "https://news.google.com/rss/search?q={q}&hl=ko&gl=KR&ceid=KR:ko"
-HEADERS = {"User-Agent": "Mozilla/5.0 auto_blog/0.1"}
+HEADERS = {"User-Agent": "Mozilla/5.0 auto_blog-research/0.2"}
 _TAG = re.compile(r"<[^>]+>")
 
 
@@ -22,26 +23,64 @@ def _strip(s: str) -> str:
     return html.unescape(_TAG.sub(" ", s or "")).strip()
 
 
-def fetch_grounding(keyword: str, max_items: int = 10) -> tuple[str, list[str]]:
-    """키워드 관련 최신 뉴스 제목 모음 → (근거텍스트, 제목리스트)."""
-    url = NEWS_SEARCH.format(q=quote(keyword))
+def _wiki(keyword: str, max_chars: int = 3500) -> tuple[str, str]:
+    """위키백과에서 키워드와 가장 관련된 문서 본문(평문)을 가져온다 → (본문, 출처제목)."""
     try:
-        r = requests.get(url, headers=HEADERS, timeout=15)
-        r.raise_for_status()
+        # 1) 검색으로 가장 맞는 문서 제목 찾기
+        s = requests.get(WIKI_API, headers=HEADERS, timeout=15, params={
+            "action": "query", "list": "search", "srsearch": keyword,
+            "srlimit": 1, "format": "json"}).json()
+        hits = s.get("query", {}).get("search", [])
+        if not hits:
+            return "", ""
+        title = hits[0]["title"]
+        # 2) 본문 평문 추출
+        e = requests.get(WIKI_API, headers=HEADERS, timeout=15, params={
+            "action": "query", "prop": "extracts", "explaintext": 1,
+            "exsectionformat": "plain", "redirects": 1,
+            "titles": title, "format": "json"}).json()
+        pages = e.get("query", {}).get("pages", {})
+        text = ""
+        for p in pages.values():
+            text = p.get("extract", "") or ""
+        text = re.sub(r"\n{2,}", "\n", text).strip()
+        return text[:max_chars], title
+    except Exception as ex:
+        print(f"  [경고] 위키백과 수집 실패: {ex}")
+        return "", ""
+
+
+def _news(keyword: str, max_items: int = 8) -> list[str]:
+    """최신 뉴스 헤드라인(시의성)."""
+    try:
+        r = requests.get(NEWS_SEARCH.format(q=quote(keyword)), headers=HEADERS, timeout=15)
         root = ET.fromstring(r.text)
-    except (requests.RequestException, ET.ParseError) as e:
-        print(f"  [경고] 그라운딩 수집 실패: {e}")
-        return "", []
+        out = []
+        for item in root.iter("item"):
+            t = _strip(item.findtext("title") or "")
+            if t:
+                out.append(t)
+            if len(out) >= max_items:
+                break
+        return out
+    except Exception as ex:
+        print(f"  [경고] 뉴스 수집 실패: {ex}")
+        return []
 
-    titles: list[str] = []
-    for item in root.iter("item"):
-        t = _strip((item.findtext("title") or ""))
-        if t:
-            titles.append(t)
-        if len(titles) >= max_items:
-            break
 
-    if not titles:
-        return "", []
-    grounding = "최근 관련 뉴스 헤드라인(사실 근거):\n" + "\n".join(f"- {t}" for t in titles)
-    return grounding, titles
+def fetch_grounding(keyword: str, max_items: int = 10) -> tuple[str, list[str]]:
+    """딥리서치 자료를 모아 (근거텍스트, 출처리스트) 반환. (이름은 호환 위해 유지)"""
+    wiki_text, wiki_title = _wiki(keyword)
+    news = _news(keyword)
+
+    parts, sources = [], []
+    if wiki_text:
+        parts.append(f"[백과사전 자료: '{wiki_title}']\n{wiki_text}")
+        sources.append(f"위키백과:{wiki_title}")
+    if news:
+        parts.append("[최근 뉴스 헤드라인(시의성)]\n" + "\n".join(f"- {t}" for t in news))
+        sources += news
+    grounding = "\n\n".join(parts)
+    n = len(wiki_text)
+    print(f"  딥리서치: 위키백과 {n}자 + 뉴스 {len(news)}건 확보")
+    return grounding, sources
