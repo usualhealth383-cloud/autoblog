@@ -68,6 +68,22 @@ def _inlined_images(record: dict, post_dir: Path) -> dict[int, str]:
     return inlined
 
 
+def _safe_labels(tags) -> list[str]:
+    """Blogger 라벨 정리. 라벨이 많으면(이 블로그 기준 ~13개+) 400이 나서 8개로 제한.
+    (전체 태그는 네이버/텔레그램에서 그대로 활용)"""
+    out: list[str] = []
+    total = 0
+    for t in tags or []:
+        t = str(t).strip().lstrip("#")
+        if not t or t in out:
+            continue
+        if len(out) >= 8 or total + len(t) + 1 > 160:
+            break
+        out.append(t)
+        total += len(t) + 1
+    return out
+
+
 def _insert(article: dict, inlined: dict[int, str]) -> str:
     blog_id = config.get("BLOGGER_BLOG_ID")
     if not blog_id:
@@ -78,7 +94,7 @@ def _insert(article: dict, inlined: dict[int, str]) -> str:
         "blog": {"id": blog_id},
         "title": article.get("title", ""),
         "content": formatter.render_body(article, inlined),
-        "labels": article.get("tags", []),
+        "labels": _safe_labels(article.get("tags", [])),
     }
     post = svc.posts().insert(blogId=blog_id, body=body, isDraft=False).execute()
     return post.get("url", "(URL 없음)")
