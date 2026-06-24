@@ -1,94 +1,87 @@
-# HANDOFF — autoblog 세션 인수인계
+# HANDOFF — autoblog (글쓰기 자동화) 세션 인수인계
 
-> 작성: 2026-06-23 / 브랜치: `claude/happy-pasteur-pfnxjg`
-> 목적: 다음 **review 세션**이 이 파일만 읽고 바로 이어받을 수 있도록 이번 세션 전체 맥락을 정리.
+> 최종 갱신: 2026-06-25 / 브랜치: `main`
+> 목적: 다른 세션·다른 PC가 **이 파일만 읽고 글쓰기 자동화 전체를 이어받게** 한다.
+> ⚠️ 이 repo는 OneDrive(`C:\Users\parkh\OneDrive\capcut\auto_blog`) 안의 git clone이다 — **동기화 규칙(§6)을 먼저 읽을 것.**
 
 ---
 
 ## 0. 한 줄 요약
-
-OpenAI에서 반복 결제($11.01 등)가 발생 중. 원인은 **`autoblog` GitHub Action이 외부 cron(cron-job.org)에 의해 하루 여러 번 트리거**되어, 매 실행마다 `gpt-4o`(본문, 영어번역 포함 2배) + `gpt-image-1`(`high` 품질) 을 호출하기 때문. **아직 수정은 적용하지 않음** — 사용자 승인 대기 중.
-
----
-
-## 1. 세션에서 오간 맥락 (시간순)
-
-1. 사용자가 "다른 PC에서 하던 **heygen 자동화 세션**" 을 기억하냐고 물음.
-   - → 세션 간 메모리 없음(격리된 임시 컨테이너). 코드가 GitHub에 있어야만 확인 가능하다고 안내.
-2. "OneDrive에도 있을 것" / "다른 PC에서 바로 쓸 수 있게 해준다고 했다" 고 함.
-   - → OneDrive·로컬은 접근 불가. PC 간 연속성은 **GitHub push** 로만 가능하다고 설명.
-3. "다른 PC에 **HANDOFF.md** 해놨다, 잘됐는지 확인 가능하냐" 고 함.
-   - → 확인 결과 **GitHub에 HANDOFF.md 없음**:
-     - 로컬 작업트리 없음 / `main` 브랜치만 존재 / 계정 전체 `filename:HANDOFF.md` 검색 0건.
-     - 결론: 그 HANDOFF.md는 **그 PC 로컬/OneDrive에만 있고 push 안 됨.**
-   - **heygen 자동화는 사용자 GitHub 어디에도 없음.** 계정 `usualhealth383-cloud`는 2026-06-15 생성, 공개 repo는 `autoblog` **하나뿐**.
-4. 사용자가 "19:46에 OpenAI에서 또 $11.01 결제됐다, 이게 뭐냐" 고 물음 → 아래 **2. 결제 조사** 가 이번 세션의 핵심 산출물.
-
-> **heygen 관련 미해결 과제**: 사용자는 별도의 heygen 자동화 작업을 다른 PC/OneDrive에 갖고 있음. 그걸 이어가려면 그 PC에서 GitHub로 push 하거나, 내용을 채팅에 붙여넣어야 함. (이 repo와는 무관)
+트렌드 분석 → GPT 글 + 3중검수 + 이미지 → **블로거 자동발행 / 네이버 복붙페이지 / 스레드·인스타 자동게시 / 텔레그램 보고**. 전부 **클라우드(GitHub Actions)에서 매일 ~06:00 KST 자동 실행**, PC 무관.
 
 ---
 
-## 2. OpenAI 결제 조사 (핵심)
+## 1. 발행 채널별 상태
 
-### 증상
-- OpenAI에서 반복 결제. 사용자가 본 건 **19:46경 $11.01** (사용자 표현 "또" = 반복됨).
+| 채널 | 방식 | 상태 | 비고 |
+|---|---|---|---|
+| 🇰🇷 **Blogger** | 공식 API 완전자동 발행 | ✅ 가동 | `commonsense383.blogspot.com` |
+| 📗 **네이버** | 반자동(복붙) | ✅ 가동 | API 자동발행은 약관위반 → 아래 |
+| 🧵 **Threads** | 공식 API 완전자동 게시 | ✅ 가동(토큰 시 작동) | 계정 `usual_sense`(요즘상식) |
+| 📷 **Instagram** | 공식 API 자동 게시 | ⏸ 기본 OFF | `IG_ENABLED=true`일 때만 |
+| 💬 **Telegram** | 발행 후 보고 | ✅ 가동 | 사진+요약+링크 |
 
-### 원인 진단
-이 repo의 GitHub Action(`.github/workflows/daily.yml`)이 OpenAI를 호출함:
-- `OPENAI_MODEL: gpt-4o` — 본문 작성.
-- `TRANSLATE_TO_ENGLISH: "true"` — **영어 번역분까지 생성 → 글 작성 비용 사실상 2배.**
-- `IMAGE_MODEL: gpt-image-1`, `IMAGE_QUALITY: high` — 스톡(Pexels/Unsplash) 미스 섹션을 **high 품질**로 생성(가장 비쌈). `src/auto_blog/images.py` 기본 `max_images=4`.
+### 네이버(복붙) 구조
+- 자동발행 안 함(약관·저품질 위험). 대신 **사람이 복붙하기 쉬운 웹페이지**를 자동 갱신.
+- `daily_publish._update_naver_page` → `latest_naver.json`을 repo에 push → GitHub Pages
+  **복붙 페이지** `https://usualhealth383-cloud.github.io/autoblog/naver.html`에서 글+사진 전체 복사.
+- `variants.make_naver`가 **새 제목+새 도입문단**을 만들어 블로거와 중복(저품질) 회피.
+- 텔레그램 보고에도 사진을 묶음(sendMediaGroup)으로 보내 네이버에 바로 붙이기 쉽게 함.
 
-### 결정적 증거 — 워크플로우 실행 이력
-`daily.yml` 실행 12건이 **전부 `workflow_dispatch`** (schedule 아님 → 외부 cron-job.org가 dispatch로 때림). 6/17 저녁 1시간 내 군집 실행:
-
-| 실행(UTC) | KST | 결과 |
-|---|---|---|
-| 06-17 09:03 | 18:03 | success |
-| 06-17 09:12 | 18:12 | cancelled |
-| 06-17 09:42 | 18:42 | success |
-| 06-17 09:47 | 18:47 | success |
-| 06-17 21:54 | 06:54(6/18) | success |
-
-→ 사용자가 본 **19:46 결제**가 이 6/17 저녁 군집 실행(18:03~18:47, 3~4회 연속)과 시간대 일치. **$11.01은 단발 비용이 아니라 반복 실행으로 누적된 사용량/자동충전일 가능성** 높음.
-
-### 진짜 근본 원인
-**외부 cron-job.org가 워크플로우를 하루 1회가 아니라 여러 번 트리거.** 커밋 `e3e0946`("schedule: GitHub 자체예약 제거(외부 cron-job.org가 트리거)")에서 GitHub 자체 cron을 떼고 외부로 넘긴 뒤 과다 호출됨. **이 cron 설정은 GitHub 밖이라 Claude가 직접 못 봄 → 사용자 확인 필요.**
+### 스레드/인스타
+- `variants.make_threads` → 첫 줄 후킹 강한 **200자 내외** 짧은 글 + 해시태그 + 블로그 링크.
+- `publishers/threads_upload.py`(공식 Threads API: 컨테이너 생성→publish), `instagram` 동일 패턴.
+- **토큰 있을 때만 게시**(없으면 조용히 스킵). 시크릿: `THREADS_TOKEN`/`THREADS_USER_ID`, `IG_TOKEN`/`IG_USER_ID`.
 
 ---
 
-## 3. 권장 조치 (우선순위)
-
-1. **[사용자] cron-job.org 스케줄 확인** — 트리거가 하루 1회만 도는지. (가장 중요, GitHub 밖)
-2. **[사용자] OpenAI 대시보드 Usage 확인** — gpt-4o vs gpt-image-1 중 어디서 돈이 나가는지 확정. + 월 usage limit(상한) 설정해 폭주 방지.
-3. **[Claude가 적용 가능 — 아직 미적용]** `daily.yml` 비용 절감:
-   - `IMAGE_QUALITY: high` → `medium`(또는 `low`)
-   - `TRANSLATE_TO_ENGLISH: "true"` → `"false"`
-   - **concurrency 추가** — 중복 트리거 시 1개만 돌고 나머지 자동 취소:
-     ```yaml
-     concurrency:
-       group: daily-autoblog
-       cancel-in-progress: true
-     ```
-
-> **상태: 사용자 승인 대기.** 비용 절감 수정 적용 여부 / 먼저 OpenAI 대시보드 확인할지 결정 안 됨.
+## 2. 파이프라인·핵심 파일
+- 엔트리: `scripts/daily_publish.py`(run_auto→이미지 호스팅→publish→네이버페이지→스레드/인스타→텔레그램).
+- `src/auto_blog/`: `trends`·`strategist`(주제선정)·`research`(딥리서치)·`writer`(본문, gpt-4o + Gemini/Claude 3중검수 + 엄격 안전게이트)·`images`(Pexels/Unsplash 스톡→gpt-image-1 폴백)·`formatter`·`affiliate`(쿠팡·증권 제휴)·`variants`(스레드/네이버/요약 변형)·`translate`·`telegram_bot`.
+- 발행: `publishers/{blogger,naver_draft,threads_upload,instagram}.py`.
+- 이미지 호스팅: 생성 이미지를 GitHub Contents API로 `public/`에 올려 raw 공개 URL 사용(race 불가).
 
 ---
 
-## 4. 시스템 구조 메모 (autoblog)
-
-- 트렌드 기반 자동 블로그 발행 (한국어 글 + 이미지 자동 생성 → Blogger 발행, 텔레그램 보고).
-- 핵심 파일:
-  - `.github/workflows/daily.yml` — 발행 파이프라인(예약 cron `13 21 * * *`는 있으나 실제론 외부 dispatch가 구동), env로 모델/품질/번역 설정.
-  - `src/auto_blog/images.py` — 5단계 이미지 수급. **Pexels→Unsplash 무료 스톡 먼저, 미스 시 `gpt-image-1` 폴백.**
-  - `src/auto_blog/writer.py`, `translate.py`, `config.py` — 본문 작성/번역/설정.
-  - `scripts/daily_publish.py` — 엔트리포인트.
-- 이미지 호스팅: 생성 이미지를 repo `public/`에 푸시해 공개 URL로 사용(커밋 다수가 `image: public/...`).
+## 3. 현재 설정값(중요)
+- **글 길이**: `writer.MIN_CHARS,MAX_CHARS = 1500, 2100` (현재 1500~2000자). ⚠️ §5 미결정 참고.
+- **스레드**: 본문 200자 이내(`variants.make_threads`).
+- **텔레그램 요약**: 공백포함 900~1000자(`variants.make_summary`), 사진은 공개 URL 우선.
+- **이미지**: 섹션마다 1장(기본 4장), `IMAGE_QUALITY=medium`.
+- **번역**: `TRANSLATE_TO_ENGLISH=false`(비용절감, 영문판 OFF).
 
 ---
 
-## 5. 다음 세션이 할 일
+## 4. 비용/스케줄 (예전 폭주 → 해결됨)
+- 트리거: `daily.yml`은 `workflow_dispatch`만. **외부 cron-job.org**가 매일 ~06:00 KST 호출.
+  (Google Apps Script 트리거 방식도 과거 사용 — 현재는 cron-job.org. **하루 1회인지 사용자가 가끔 확인**.)
+- ✅ **결제 폭주(6월 중순 $11+ 반복) 대응 적용됨**: `concurrency: cancel-in-progress`(중복 트리거 1개만),
+  `IMAGE_QUALITY: high→medium`, `TRANSLATE_TO_ENGLISH: true→false`.
+- 가끔 손댈 것: **OpenAI 크레딧 충전**(429 quota 소진 시 발행 멈춤 → platform.openai.com billing).
+- 수동 실행: `gh workflow run daily.yml` (gh 없으면 GitHub 웹 Actions에서 Run).
 
-1. 사용자에게 **cron-job.org 트리거 빈도**와 **OpenAI Usage 내역** 확인 결과를 물어 근본 원인 확정.
-2. 승인 시 **3번 비용 절감 수정**을 `daily.yml`에 적용 → `claude/happy-pasteur-pfnxjg`에 커밋·푸시.
-3. (별건) heygen 자동화 이어가려면 그 PC/OneDrive 파일을 GitHub로 올리거나 내용 공유받기.
+---
+
+## 5. 미결정 / 사용자 확인 대기
+1. **블로그 본문 길이** — 사용자 기억 "블로거 3500 / 블로그 2000". 현재 코드는 `1500~2100`.
+   구글 Blogger 3500자·네이버 2000자로 **플랫폼별 분리**할지, 하나로 갈지 미정. (플랫폼별이면 신규 구현 필요)
+2. **텔레그램 "📄 글 전문(~3800자)" 메시지** — 네이버 복붙 편의용으로 들어가 있으나, 보고가 길어짐.
+   유지/제거 미정.
+
+---
+
+## 6. ⚠️ 동기화 규칙 (꼬임 방지 — 필독)
+- 이 폴더는 **OneDrive 안의 git clone**. OneDrive가 PC 간 `.git`까지 덮어써서 git 이력이 꼬일 수 있다(실제 발생함).
+- **여러 Claude 세션 + 여러 PC가 같은 `main`에 동시 push** 중. 따라서:
+  - **작업 시작 전: `git pull --ff-only origin main`**
+  - **작업 끝: `git add … && git commit && git pull --rebase && git push`**
+  - 충돌 시 GitHub(origin)이 기준. 로컬 임의 force-push 금지.
+- Python 실제 경로(이 PC): `C:\Users\parkh\AppData\Local\Programs\Python\Python312\python.exe`
+  (`python`은 MS Store 더미라 작동 안 함).
+
+---
+
+## 7. 비밀/시크릿
+- 로컬: `.env`(OpenAI·텔레그램·Pexels·Blogger 등), `config/client_secret.json`·`config/token.json`(Blogger OAuth), `config/telegram_chats.json`.
+- 클라우드(GitHub Secrets): 위 + `THREADS_*`·`IG_*`·`COUPANG_*`·`SECURITIES_*`·`UNSPLASH_ACCESS_KEY`.
+- 등록 함정: PowerShell 파이프가 JSON에 BOM/따옴표 깨뜨림 → `cmd /c "gh secret set X < file"`로 등록.
