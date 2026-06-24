@@ -101,9 +101,12 @@ def _update_naver_page(rec: dict, results: dict, naver_variant: dict):
     lead = naver_variant.get("lead", "")
     lead_html = (f'<p style="font-size:17px;line-height:1.9;margin:0 0 18px">'
                  f'{lead}</p>') if lead else ""
-    body_html = lead_html + formatter.render_body(article, imgs)
     tags = article.get("tags", []) or []
-    tag_line = " ".join("#" + str(t).replace(" ", "") for t in tags)
+    hashtags = " ".join("#" + str(t).replace(" ", "") for t in tags)
+    # 본문 맨 끝에 해시태그 → '본문 전체 복사' 한 번에 글+사진+태그가 같이 들어감
+    tag_html = (f'<p style="color:#1a73e8;margin-top:22px">{hashtags}</p>') if hashtags else ""
+    body_html = lead_html + formatter.render_body(article, imgs) + tag_html
+    tag_line = hashtags
     data = {"title": title, "body_html": body_html, "tags": tag_line,
             "url": _blog_url(results), "date": datetime.date.today().isoformat()}
     ok = _gh_put_file(repo, token, "latest_naver.json",

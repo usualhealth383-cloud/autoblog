@@ -63,19 +63,20 @@
 
       <h2>💛 마지막으로</h2>
       <p>결과가 어떻든, 그라운드에서 끝까지 뛰는 선수들에게 따뜻한 응원 한 번 보내요. 6월 25일 오전 10시, 다같이 <b>"대~한민국!"</b> 외쳐봐요! 🇰🇷✨</p>
+      <p class="tags" id="tags">#2026월드컵 #한국남아공 #월드컵중계 #한국축구 #16강진출 #치지직중계 #KBS중계 #JTBC #몬테레이스타디움 #월드컵일정 #축구중계 #대한민국축구</p>
     </div>
-    <p class="tags" id="tags">#2026월드컵 #한국남아공 #월드컵중계 #한국축구 #16강진출 #치지직중계 #KBS중계 #JTBC #몬테레이스타디움 #월드컵일정 #축구중계 #대한민국축구</p>
   </div>
 </div>
 
 <div id="toast"></div>
 <script>
 const TITLE=document.getElementById('title').textContent;
-const TAGS=document.getElementById('tags').textContent;
+// 태그칸용: # 제거 + 공백 한 칸으로 정리
+const TAGS=document.getElementById('tags').textContent.replace(/#/g,' ').replace(/\s+/g,' ').trim();
 function toast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('on');
   setTimeout(()=>t.classList.remove('on'),1600);}
 function copyTitle(){navigator.clipboard.writeText(TITLE).then(()=>toast('제목 복사됨!')).catch(()=>toast('복사 실패'));}
-function copyTags(){navigator.clipboard.writeText(TAGS).then(()=>toast('태그 복사됨!')).catch(()=>toast('복사 실패'));}
+function copyTags(){navigator.clipboard.writeText(TAGS).then(()=>toast('태그 복사됨!(# 없이)')).catch(()=>toast('복사 실패'));}
 function copyBody(){
   const body=document.getElementById('body');
   const sel=window.getSelection();const range=document.createRange();

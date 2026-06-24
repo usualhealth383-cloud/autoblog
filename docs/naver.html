@@ -44,7 +44,7 @@ let DATA={title:"",body_html:""};
 function toast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('on');
   setTimeout(()=>t.classList.remove('on'),1500);}
 async function copyTitle(){try{await navigator.clipboard.writeText(DATA.title);toast('제목 복사됨! 네이버 제목에 붙여넣기');}catch(e){toast('복사 실패 — 직접 선택해주세요');}}
-async function copyTags(){try{await navigator.clipboard.writeText(DATA.tags||'');toast('태그 복사됨! 네이버 태그 칸에 붙여넣기');}catch(e){toast('복사 실패 — 직접 선택해주세요');}}
+async function copyTags(){const t=(DATA.tags||'').replace(/#/g,' ').replace(/\s+/g,' ').trim();try{await navigator.clipboard.writeText(t);toast('태그 복사됨!(# 없이) 태그 칸에 붙여넣기');}catch(e){toast('복사 실패 — 직접 선택해주세요');}}
 function copyBody(){
   // 렌더된 본문(글+사진)을 통째로 선택해 복사 → 네이버에 붙이면 사진도 같이 들어감
   const body=document.getElementById('body');
