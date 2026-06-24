@@ -23,10 +23,29 @@ OpenAI에서 반복 결제($11.01 등)가 발생 중. 원인은 **`autoblog` Git
    - → 확인 결과 **GitHub에 HANDOFF.md 없음**:
      - 로컬 작업트리 없음 / `main` 브랜치만 존재 / 계정 전체 `filename:HANDOFF.md` 검색 0건.
      - 결론: 그 HANDOFF.md는 **그 PC 로컬/OneDrive에만 있고 push 안 됨.**
-   - **heygen 자동화는 사용자 GitHub 어디에도 없음.** 계정 `usualhealth383-cloud`는 2026-06-15 생성, 공개 repo는 `autoblog` **하나뿐**.
+   - ⚠️ **2026-06-24 정정:** 이 진술은 틀렸음. 실제로는 계정에 repo가 **4개**이고 영상 작업도 GitHub에 있음(아래 0-1 참고).
 4. 사용자가 "19:46에 OpenAI에서 또 $11.01 결제됐다, 이게 뭐냐" 고 물음 → 아래 **2. 결제 조사** 가 이번 세션의 핵심 산출물.
 
-> **heygen 관련 미해결 과제**: 사용자는 별도의 heygen 자동화 작업을 다른 PC/OneDrive에 갖고 있음. 그걸 이어가려면 그 PC에서 GitHub로 push 하거나, 내용을 채팅에 붙여넣어야 함. (이 repo와는 무관)
+> **heygen/영상 관련 정정**: 영상 자동화는 OneDrive에만 있는 게 아니라 **GitHub에 이미 있음**.
+> `yozm-health`(유튜브 자동제작 파이프라인) + `yozm-media`(영상 호스팅)가 그것. heygen 은 그
+> 파이프라인 안에서 쓰는 도구로 추정. (이 autoblog repo 와는 별개)
+
+---
+
+## 0-1. 사용자 GitHub repo 전체 지도 (2026-06-24 확인)
+
+계정 `usualhealth383-cloud` (2026-06-15 생성) — **repo 4개**:
+
+| repo | 공개 | 내용 | 비고 |
+|---|---|---|---|
+| `yozm-health` | 비공개 | **요즘건강 유튜브 자동제작 파이프라인** (영상 본체) | 활발히 푸시 중(~06-24) |
+| `yozm-media` | 공개 | 요즘OO 영상 호스팅(인스타·스레드 공개 URL용) | 영상 결과물 호스팅 |
+| `autoblog` | 공개 | 본 블로그 자동발행 시스템 | 이 세션 |
+| `auto-trader` | 비공개 | 자동매매 봇(Python) | 06-17 이후 멈춤 |
+
+> ⚠️ **세션 범위 주의:** 각 세션은 GitHub MCP 가 **한 repo 로만** 스코프됨(이 세션=autoblog).
+> 영상 파이프라인(`yozm-health`)을 작업하려면 **그 repo 로 스코프된 새 세션**을 열어야 함
+> (autoblog 세션에서는 `yozm-health` 읽기/쓰기 불가).
 
 ---
 
@@ -93,4 +112,5 @@ OpenAI에서 반복 결제($11.01 등)가 발생 중. 원인은 **`autoblog` Git
 
 1. 사용자에게 **cron-job.org 트리거 빈도**와 **OpenAI Usage 내역** 확인 결과를 물어 근본 원인 확정.
 2. ~~승인 시 **3번 비용 절감 수정**을 `daily.yml`에 적용~~ → **완료**(커밋 `6b8d37a`).
-3. (별건) heygen 자동화 이어가려면 그 PC/OneDrive 파일을 GitHub로 올리거나 내용 공유받기.
+3. (별건) **영상 자동화는 `yozm-health` repo 로 스코프된 새 세션에서** 이어갈 것
+   (OneDrive 안 거쳐도 됨 — 이미 GitHub 에 있음). heygen 도 거기서 검토.
