@@ -7,7 +7,9 @@
 
 ## 0. 한 줄 요약
 
-OpenAI에서 반복 결제($11.01 등)가 발생 중. 원인은 **`autoblog` GitHub Action이 외부 cron(cron-job.org)에 의해 하루 여러 번 트리거**되어, 매 실행마다 `gpt-4o`(본문, 영어번역 포함 2배) + `gpt-image-1`(`high` 품질) 을 호출하기 때문. **아직 수정은 적용하지 않음** — 사용자 승인 대기 중.
+OpenAI에서 반복 결제($11.01 등)가 발생 중. 원인은 **`autoblog` GitHub Action이 외부 cron(cron-job.org)에 의해 하루 여러 번 트리거**되어, 매 실행마다 `gpt-4o`(본문, 영어번역 포함 2배) + `gpt-image-1`(`high` 품질) 을 호출하기 때문.
+
+> **업데이트 (2026-06-24):** 아래 3번 비용 절감 수정은 **적용 완료**(커밋 `6b8d37a`). `IMAGE_QUALITY: medium`, `TRANSLATE_TO_ENGLISH: "false"`, `concurrency`(cancel-in-progress) 모두 `daily.yml`에 반영됨. 남은 건 **GitHub 밖 사용자 작업**(cron-job.org 빈도 확인, OpenAI Usage 상한 설정).
 
 ---
 
@@ -61,17 +63,17 @@ OpenAI에서 반복 결제($11.01 등)가 발생 중. 원인은 **`autoblog` Git
 
 1. **[사용자] cron-job.org 스케줄 확인** — 트리거가 하루 1회만 도는지. (가장 중요, GitHub 밖)
 2. **[사용자] OpenAI 대시보드 Usage 확인** — gpt-4o vs gpt-image-1 중 어디서 돈이 나가는지 확정. + 월 usage limit(상한) 설정해 폭주 방지.
-3. **[Claude가 적용 가능 — 아직 미적용]** `daily.yml` 비용 절감:
-   - `IMAGE_QUALITY: high` → `medium`(또는 `low`)
-   - `TRANSLATE_TO_ENGLISH: "true"` → `"false"`
-   - **concurrency 추가** — 중복 트리거 시 1개만 돌고 나머지 자동 취소:
+3. **[적용 완료 — 커밋 `6b8d37a`]** `daily.yml` 비용 절감:
+   - `IMAGE_QUALITY: high` → `medium` ✅
+   - `TRANSLATE_TO_ENGLISH: "true"` → `"false"` ✅
+   - **concurrency 추가** — 중복 트리거 시 1개만 돌고 나머지 자동 취소 ✅:
      ```yaml
      concurrency:
        group: daily-autoblog
        cancel-in-progress: true
      ```
 
-> **상태: 사용자 승인 대기.** 비용 절감 수정 적용 여부 / 먼저 OpenAI 대시보드 확인할지 결정 안 됨.
+> **상태: 코드 수정 적용·푸시 완료.** 남은 건 사용자 측 cron-job.org 빈도 점검 + OpenAI Usage 상한 설정.
 
 ---
 
@@ -90,5 +92,5 @@ OpenAI에서 반복 결제($11.01 등)가 발생 중. 원인은 **`autoblog` Git
 ## 5. 다음 세션이 할 일
 
 1. 사용자에게 **cron-job.org 트리거 빈도**와 **OpenAI Usage 내역** 확인 결과를 물어 근본 원인 확정.
-2. 승인 시 **3번 비용 절감 수정**을 `daily.yml`에 적용 → `claude/happy-pasteur-pfnxjg`에 커밋·푸시.
+2. ~~승인 시 **3번 비용 절감 수정**을 `daily.yml`에 적용~~ → **완료**(커밋 `6b8d37a`).
 3. (별건) heygen 자동화 이어가려면 그 PC/OneDrive 파일을 GitHub로 올리거나 내용 공유받기.
