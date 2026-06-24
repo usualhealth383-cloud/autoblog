@@ -29,7 +29,7 @@ def propose() -> dict:
 
 
 def generate_for_topic(topic: strategist.TopicCandidate, *,
-                       generate_images: bool = True, max_images: int = 4,
+                       generate_images: bool = True, max_images: int = 3,
                        ground: bool = True) -> dict:
     """선택된 주제 → 본문 + 이미지 + 서식화 → data/posts/ 에 저장하고 record 반환.
 
@@ -95,7 +95,7 @@ def run(generate_images: bool = True) -> dict | None:
 
 
 def _finalize(topic: strategist.TopicCandidate, article: dict,
-              max_images: int = 4) -> dict:
+              max_images: int = 3) -> dict:
     """본문(article) → 이미지 + 서식화 + 저장 → record 반환."""
     stamp = datetime.now().strftime("%Y%m%d-%H%M")
     out_dir = config.DATA_DIR / "posts" / f"{stamp}-{_slug(topic.keyword)}"

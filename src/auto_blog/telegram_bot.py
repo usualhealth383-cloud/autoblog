@@ -102,10 +102,10 @@ def send_for_approval(record: dict, post_dir: Path,
 
 
 def _thumb_url(record: dict, thumb_rel: str | None) -> str | None:
-    """로컬 썸네일 파일이 없을 때 쓸 공개 호스팅 URL(클라우드에서 GitHub raw 로 올린 이미지).
+    """텔레그램 사진으로 쓸 공개 호스팅 URL(클라우드에서 GitHub raw 로 올린 이미지).
 
     image_urls 는 섹션 인덱스(str) → raw URL 의 dict. 썸네일과 같은 섹션을 우선 쓰고,
-    못 찾으면 아무 이미지나 하나 쓴다."""
+    못 찾으면 아무 이미지나 하나 쓴다. 없으면 None(로컬 파일로 폴백)."""
     urls = record.get("image_urls") or {}
     if not urls:
         return None
@@ -149,22 +149,33 @@ def send_report(record: dict, results: dict, chat_ids: list[int] | None = None,
     details = ("\n".join(links)
                + f"\n\n📋 네이버 복붙: {naver_url}"
                + (f"\n🏷 태그(네이버 태그 칸에): {tag_line}" if tag_line else "")
+               + "\n📷 위 사진들은 길게 눌러 저장해 네이버 본문에 넣으세요."
                + (f"\n\n🧵 스레드용 (복사해서 올리세요):\n{threads_text}" if threads_text else "")
                + f"\n\n🛡 사실검증으로 근거 없는 주장 {len(fixed)}건 제거. 이상하면 위 링크에서 수정/삭제.")
 
+    image_urls = [u for u in (record.get("image_urls") or {}).values()][:10]
     thumb_rel = record.get("thumbnail")
-    thumb_url = _thumb_url(record, thumb_rel)  # 로컬 파일이 없을 때 쓸 공개 호스팅 URL
+    thumb_url = _thumb_url(record, thumb_rel)  # 클라우드에서 GitHub raw 로 올린 공개 이미지 URL
     post_dir = config.DATA_DIR / "posts" / record.get("dir", "")
+    local_thumb = (post_dir / thumb_rel) if thumb_rel else None
     for cid in chat_ids:
         sent_photo = False
-        if thumb_rel and (post_dir / thumb_rel).exists():
-            with open(post_dir / thumb_rel, "rb") as f:
-                r = requests.post(f"{API}/sendPhoto", data={"chat_id": cid, "caption": caption},
-                                  files={"photo": f}, timeout=30)
+        # 사진 여러 장이면 묶음(미디어그룹)으로 → 네이버에 그대로 추가하기 좋게
+        if len(image_urls) >= 2:
+            media = [{"type": "photo", "media": u} for u in image_urls]
+            media[0]["caption"] = caption
+            r = requests.post(f"{API}/sendMediaGroup",
+                              data={"chat_id": cid, "media": json.dumps(media)}, timeout=60)
             sent_photo = r.ok
-        elif thumb_url:
+        # 공개 URL 우선(동작 확실·가벼움), 없으면 로컬 파일로 업로드
+        if not sent_photo and thumb_url:
             r = requests.post(f"{API}/sendPhoto",
                               data={"chat_id": cid, "caption": caption, "photo": thumb_url}, timeout=30)
+            sent_photo = r.ok
+        if not sent_photo and local_thumb and local_thumb.exists():
+            with open(local_thumb, "rb") as f:
+                r = requests.post(f"{API}/sendPhoto", data={"chat_id": cid, "caption": caption},
+                                  files={"photo": f}, timeout=30)
             sent_photo = r.ok
         if not sent_photo:  # 사진을 못 붙이면 캡션을 그냥 텍스트로
             requests.post(f"{API}/sendMessage", data={"chat_id": cid, "text": caption}, timeout=30)

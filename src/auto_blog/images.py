@@ -105,7 +105,7 @@ def _target_indices(sections: list[dict]) -> list[int]:
 
 
 def generate_for_article(article: dict, out_dir: Path,
-                         max_images: int = 4) -> tuple[dict[int, str], str | None]:
+                         max_images: int = 3) -> tuple[dict[int, str], str | None]:
     """무료 스톡 먼저, 없으면 AI 생성 → ({섹션인덱스: 상대경로}, 썸네일). 글 전체에 고르게 분산."""
     sections = article.get("sections", [])
     img_dir = out_dir / "images"
