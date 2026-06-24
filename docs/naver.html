@@ -45,18 +45,25 @@ function toast(m){const t=document.getElementById('toast');t.textContent=m;t.cla
   setTimeout(()=>t.classList.remove('on'),1500);}
 async function copyTitle(){try{await navigator.clipboard.writeText(DATA.title);toast('제목 복사됨! 네이버 제목에 붙여넣기');}catch(e){toast('복사 실패 — 직접 선택해주세요');}}
 async function copyTags(){try{await navigator.clipboard.writeText(DATA.tags||'');toast('태그 복사됨! 네이버 태그 칸에 붙여넣기');}catch(e){toast('복사 실패 — 직접 선택해주세요');}}
-async function copyBody(){
+function copyBody(){
+  // 렌더된 본문(글+사진)을 통째로 선택해 복사 → 네이버에 붙이면 사진도 같이 들어감
+  const body=document.getElementById('body');
+  const sel=window.getSelection();
+  const range=document.createRange();
+  range.selectNodeContents(body);
+  sel.removeAllRanges();
+  sel.addRange(range);
+  let ok=false;
+  try{ ok=document.execCommand('copy'); }catch(e){ ok=false; }
+  sel.removeAllRanges();
+  if(ok){ toast('본문+사진 복사됨! 네이버에 Ctrl+V'); return; }
+  // 폴백: HTML 클립보드
   try{
-    const html=document.getElementById('body').innerHTML;
-    const plain=document.getElementById('body').innerText;
-    await navigator.clipboard.write([new ClipboardItem({
-      'text/html':new Blob([html],{type:'text/html'}),
-      'text/plain':new Blob([plain],{type:'text/plain'})})]);
-    toast('본문 복사됨! 네이버 본문에 붙여넣기');
-  }catch(e){
-    try{await navigator.clipboard.writeText(document.getElementById('body').innerText);toast('본문(텍스트) 복사됨');}
-    catch(e2){toast('복사 실패 — 직접 선택해주세요');}
-  }
+    navigator.clipboard.write([new ClipboardItem({
+      'text/html':new Blob([body.innerHTML],{type:'text/html'}),
+      'text/plain':new Blob([body.innerText],{type:'text/plain'})})])
+      .then(()=>toast('본문 복사됨!')).catch(()=>toast('복사 실패 — 직접 드래그 복사'));
+  }catch(e){ toast('복사 실패 — 직접 드래그 복사'); }
 }
 async function load(){
   try{
