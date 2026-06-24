@@ -30,6 +30,19 @@ except Exception as e:
     print("❌ KR 실패:", str(e)[:160])
     sys.exit(1)
 
+# 성공 → 텔레그램으로 링크 알림
+try:
+    import requests
+    from auto_blog import telegram_bot as tb
+    for cid in tb._load_chats():
+        requests.post(f"{tb.API}/sendMessage", data={
+            "chat_id": cid,
+            "text": f"⚽ 블로거 발행 완료! (한국 vs 남아공 4000자)\n{url}",
+            "disable_web_page_preview": "false"}, timeout=30)
+    print("텔레그램 알림 전송")
+except Exception as e:
+    print("텔레그램 알림 실패:", str(e)[:80])
+
 # 영문본
 try:
     from auto_blog import translator
