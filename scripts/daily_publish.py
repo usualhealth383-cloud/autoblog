@@ -166,11 +166,14 @@ def main():
         msg = threads_upload.post(threads_text, thumb)
         print("  스레드:", msg)
         results["threads"] = msg
-    # 인스타는 이미지 필수
-    if threads_text and thumb and instagram_upload.configured():
+    # 인스타는 이미지 필수 + 명시적 활성화(IG_ENABLED=true)일 때만. 현재 OFF(요청).
+    if (str(config.get("IG_ENABLED", "")).lower() == "true"
+            and threads_text and thumb and instagram_upload.configured()):
         msg = instagram_upload.post(threads_text, thumb)
         print("  인스타:", msg)
         results["instagram"] = msg
+    else:
+        print("  인스타: 건너뜀(IG_ENABLED 아님)")
 
     print("⑦ 텔레그램 보고…")
     telegram_bot.send_report(rec, results, threads_text=threads_text, summary=summary)
