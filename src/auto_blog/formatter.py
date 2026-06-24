@@ -24,6 +24,27 @@ def _image_block(url: str | None, prompt: str) -> str:
             f'<span style="font-size:12px">{_esc(prompt)}</span></div>')
 
 
+def _adsense_block() -> str:
+    """본문 중간 인-아티클 애드센스 광고 단위. ADSENSE_CLIENT/ADSENSE_SLOT 둘 다
+    있을 때만 렌더(없으면 빈 문자열 → 글에 아무 영향 없음). 블로거 발행본에만 넣는다
+    (네이버는 자체 광고 정책이라 구글 광고 코드 삽입 금지)."""
+    from . import config
+    client = config.get("ADSENSE_CLIENT")   # 예: ca-pub-XXXXXXXXXXXXXXXX
+    slot = config.get("ADSENSE_SLOT")        # 예: 1234567890
+    if not (client and slot):
+        return ""
+    return (
+        '<div style="margin:34px 0;text-align:center">'
+        f'<script async src="https://pagead2.googlesyndication.com/pagead/js/'
+        f'adsbygoogle.js?client={_esc(client)}" crossorigin="anonymous"></script>'
+        f'<ins class="adsbygoogle" style="display:block" '
+        f'data-ad-client="{_esc(client)}" data-ad-slot="{_esc(slot)}" '
+        f'data-ad-format="auto" data-full-width-responsive="true"></ins>'
+        '<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>'
+        '</div>'
+    )
+
+
 def _affiliate_block(aff: dict) -> str:
     """제휴 추천 상품/증권사 링크 박스 + 공정위 대가성 고지."""
     products = aff.get("products") or []
@@ -60,12 +81,17 @@ def _affiliate_block(aff: dict) -> str:
     )
 
 
-def render_body(article: dict, images: dict[int, str] | None = None) -> str:
-    """발행용 본문 HTML 조각(제목 제외 본문 + 제휴 + 고지 + 태그)."""
+def render_body(article: dict, images: dict[int, str] | None = None,
+                ads: bool = True) -> str:
+    """발행용 본문 HTML 조각(제목 제외 본문 + 제휴 + 고지 + 태그).
+
+    ads=True(블로거 등 자체 발행본)면 본문 중간에 인-아티클 애드센스를 넣는다.
+    ads=False(네이버 복붙본)면 구글 광고 코드를 넣지 않는다(네이버 정책)."""
     images = images or {}
+    sections = article.get("sections", [])
     parts: list[str] = []
 
-    for i, sec in enumerate(article.get("sections", [])):
+    for i, sec in enumerate(sections):
         parts.append(
             f'<h2 style="font-size:24px;font-weight:800;color:#212529;'
             f'margin:36px 0 14px;line-height:1.4">{_esc(sec.get("heading",""))}</h2>'
@@ -79,6 +105,11 @@ def render_body(article: dict, images: dict[int, str] | None = None) -> str:
                 f'<p style="font-size:17px;line-height:1.9;color:#343a40;'
                 f'margin:0 0 18px">{_esc(para)}</p>'
             )
+        # 2번째 섹션 뒤(글이 충분히 길 때)에 인-아티클 광고 1개 → 가독성·viewability 균형
+        if ads and i == 1 and len(sections) > 3:
+            ad = _adsense_block()
+            if ad:
+                parts.append(ad)
 
     # 제휴 추천 박스(구매의도 글에만 채워져 있음) — 본문 끝, 태그 앞
     if article.get("affiliate"):

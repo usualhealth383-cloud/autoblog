@@ -15,7 +15,7 @@ def generate(record: dict, post_dir: Path) -> Path:
     article = record["article"]
     images = {int(k): v for k, v in (record.get("images") or {}).items()}
     title = article.get("title", "")
-    body = formatter.render_body(article, images)
+    body = formatter.render_body(article, images, ads=False)  # 네이버엔 구글 광고 코드 금지
 
     html = f"""<!doctype html><html lang="ko"><head><meta charset="utf-8"/>
 <title>{title}</title></head>

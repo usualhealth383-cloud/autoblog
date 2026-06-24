@@ -112,9 +112,9 @@ def _update_naver_page(rec: dict, results: dict, naver_variant: dict):
         nv_imgs = {i: url_list[i] for i in range(min(len(url_list), len(nv_sections)))}
         naver_article = {"title": title, "sections": nv_sections,
                          "tags": tags, "disclaimer": article.get("disclaimer", "")}
-        body_core = formatter.render_body(naver_article, nv_imgs)
+        body_core = formatter.render_body(naver_article, nv_imgs, ads=False)
     else:  # 변형 실패 시 원문 본문으로 폴백
-        body_core = formatter.render_body(article, imgs)
+        body_core = formatter.render_body(article, imgs, ads=False)
     body_html = lead_html + body_core + tag_html
     tag_line = hashtags
     data = {"title": title, "body_html": body_html, "tags": tag_line,
