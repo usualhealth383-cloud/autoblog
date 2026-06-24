@@ -24,6 +24,15 @@ def _src(article: dict, n_sections: int = 3, limit: int = 1600) -> str:
     return (article.get("title", "") + "\n" + body)[:limit]
 
 
+def _full_text(article: dict, limit: int = 6000) -> str:
+    """제목 + 모든 소제목/문단을 합친 전체 본문(네이버 압축본 생성용)."""
+    parts = [article.get("title", "")]
+    for s in article.get("sections", []):
+        parts.append(s.get("heading", ""))
+        parts.extend(s.get("paragraphs", []))
+    return "\n".join(p for p in parts if p)[:limit]
+
+
 def make_threads(article: dict) -> dict:
     """블로그 글 → 스레드용 짧고 후킹 있는 글. {text, hashtags}. (링크는 호출측에서 덧붙임)"""
     client = _client()
@@ -63,19 +72,31 @@ def make_summary(article: dict) -> str:
 
 
 def make_naver(article: dict) -> dict:
-    """네이버용 변형(중복 회피): 새 제목 + 새 도입 문단. {title, lead}."""
+    """네이버용 변형 — 블로거 원문(~3500자)을 ~2000자로 새로 압축·재서술한다.
+
+    원문과 문장 표현을 충분히 다르게 써서 '중복(저품질) 콘텐츠' 페널티를 피한다.
+    {title, lead, sections} 를 돌려준다(sections 는 재서술된 압축 본문)."""
     client = _client()
     r = client.chat.completions.create(
         model=MODEL, response_format={"type": "json_object"}, temperature=0.8,
+        max_tokens=6000,
         messages=[
             {"role": "system", "content":
                 "너는 네이버 블로그 작가다. 한국어. JSON 으로만 답한다."},
             {"role": "user", "content":
-                "다음 글을 네이버 블로그용으로 살짝 다르게 만들어라(중복 콘텐츠 회피 목적). "
-                "원문과 표현이 다른 '새 제목' 1개와, 새로 쓴 '도입 문단' 1개(4~6문장)를 만들어라. "
-                "유쾌·친근한 입말체 + 이모지 약간. 사실은 원문과 동일하게 유지.\n"
-                '형식: {"title": "새 제목(이모지 가능)", "lead": "새 도입 문단"}\n\n'
-                f"[원문]\n{_src(article, n_sections=2, limit=900)}"}])
+                "다음 블로그 원문을 네이버 블로그용으로 **새로 써라**(원문과 표현을 충분히 다르게 "
+                "→ 중복 콘텐츠 회피). 규칙:\n"
+                "- 원문과 다른 '새 제목' 1개(어울리는 이모지 1개 가능).\n"
+                "- 새로 쓴 '도입 문단' 1개(4~6문장, 강한 후킹).\n"
+                "- 본문 섹션 3~4개. 각 섹션 heading(이모지 1개 가능) + paragraphs(1~2문단, "
+                "각 문단 3~5문장).\n"
+                "- 전체 본문(섹션 문단 합계) 글자 수가 공백 포함 **약 2000자(1700~2300자)**.\n"
+                "- 사실·수치는 원문과 동일하게 유지하되 **문장은 새로 써라(통째로 베끼지 말 것)**.\n"
+                "- 유쾌·친근한 입말체 + 이모지 약간.\n"
+                '형식: {"title": "새 제목", "lead": "새 도입 문단", '
+                '"sections": [{"heading": "소제목", "paragraphs": ["문단", "문단"]}]}\n\n'
+                f"[원문]\n{_full_text(article)}"}])
     d = json.loads(r.choices[0].message.content)
     return {"title": d.get("title", article.get("title", "")),
-            "lead": d.get("lead", "")}
+            "lead": d.get("lead", ""),
+            "sections": d.get("sections", [])}

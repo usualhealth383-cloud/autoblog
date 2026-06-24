@@ -17,7 +17,9 @@ from . import config
 from .strategist import TopicCandidate
 
 MODEL = config.get("OPENAI_MODEL", "gpt-4o")
-MIN_CHARS, MAX_CHARS = 900, 1300
+# 블로거(메인) 본문 목표 분량 — 약 3500자 내외(SEO·체류시간·애드센스 가치↑).
+# 네이버용은 variants.make_naver 가 ~2000자로 따로 압축, 스레드는 짧게 따로 생성.
+MIN_CHARS, MAX_CHARS = 2800, 3800
 
 SYSTEM = """너는 한국 블로그 글을 쓰는 인기 작가다. 정보가 정확하고, 읽기 쉽고,
 사람들이 끝까지 읽고 싶게 쓴다. 과장·낚시는 피하되 제목은 클릭하고 싶게 만든다.
@@ -82,10 +84,12 @@ JSON_SHAPE = """
   "disclaimer": "의학 주제면 고지문, 아니면 빈 문자열"
 }
 규칙:
-- 소제목(sections) 3~4개. 도입(강한 후킹) → 핵심 팁 2~3개 → 다정한 마무리 흐름.
-- 각 섹션은 문단(paragraph) 1개, 3~5문장으로 **군더더기 없이 알차게**(실전 정보·구체 팁만).
-- 모든 문단 글자 수 합계가 공백 포함 **약 1000자(900~1300자)**가 되게 짧고 임팩트 있게.
-  절대 1500자를 넘기지 마라. 재밌고 술술 읽히게.
+- 소제목(sections) 5~7개. 도입(강한 후킹) → 정의·배경 → 핵심 내용을 여러 각도로
+  (방법·비교·사례·자주 하는 실수·주의점 등) → 다정한 마무리 흐름.
+- 각 섹션은 문단(paragraph) 2~3개, 각 문단 4~6문장으로 **알맹이 있게**(실전 정보·구체
+  팁·예시·맥락). 매 문단이 새로운 포인트를 줘야 한다. 빈말·동어반복으로 늘리지 마라.
+- 모든 문단 글자 수 합계가 공백 포함 **약 3500자(2800~3800자)**가 되게 충분히 깊게 써라.
+  너무 짧으면 실패다. 술술 읽히되 알맹이가 꽉 차게.
 - image_prompt: 그 섹션의 **핵심 소재·상황을 구체적으로** 담은 영어 묘사(추상적·일반적 배경 금지,
   실제 피사체와 장면을 명시). 글 주제와 한눈에 연관되게. 저작권 안전한 생성용 묘사. 텍스트·로고 없이.
 """
@@ -112,7 +116,7 @@ def _chat_json(client, messages: list[dict]) -> dict:
         messages=messages,
         response_format={"type": "json_object"},
         temperature=0.7,
-        max_tokens=8000,
+        max_tokens=12000,
     )
     return json.loads(resp.choices[0].message.content)
 
@@ -339,6 +343,9 @@ def write_article_safe(topic: TopicCandidate, grounding: str = "") -> tuple[dict
     """자동발행용 — 본문 생성 + 강한 사실검증 + 엄격 게이트. (article, 발행안전여부, 수정내역)."""
     article = generate_draft(topic, grounding)
     article, issues1 = verify_and_fix(article, grounding)
+    # GPT+Gemini 교차검수(키 있을 때만) → 사실오류·가독성 보강. 안전게이트는 항상 그 뒤에
+    # 둬서 마지막 발언권을 갖게 한다(검수가 위험표현을 되살릴 여지 차단).
+    article = cross_review(article, topic)
     article, safe, issues2 = final_safety_gate(article, grounding)
     article["char_count"] = _char_count(article)
     article["fact_issues_fixed"] = issues1 + issues2

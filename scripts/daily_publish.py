@@ -105,7 +105,17 @@ def _update_naver_page(rec: dict, results: dict, naver_variant: dict):
     hashtags = " ".join("#" + str(t).replace(" ", "") for t in tags)
     # 본문 맨 끝에 해시태그 → '본문 전체 복사' 한 번에 글+사진+태그가 같이 들어감
     tag_html = (f'<p style="color:#1a73e8;margin-top:22px">{hashtags}</p>') if hashtags else ""
-    body_html = lead_html + formatter.render_body(article, imgs) + tag_html
+    # 네이버는 블로거(~3500자)와 다른 ~2000자 압축·재서술본을 쓴다(중복 콘텐츠 회피).
+    nv_sections = naver_variant.get("sections") or []
+    if nv_sections:
+        url_list = [v for _, v in sorted(imgs.items())]   # 이미지 순서대로 재배치
+        nv_imgs = {i: url_list[i] for i in range(min(len(url_list), len(nv_sections)))}
+        naver_article = {"title": title, "sections": nv_sections,
+                         "tags": tags, "disclaimer": article.get("disclaimer", "")}
+        body_core = formatter.render_body(naver_article, nv_imgs)
+    else:  # 변형 실패 시 원문 본문으로 폴백
+        body_core = formatter.render_body(article, imgs)
+    body_html = lead_html + body_core + tag_html
     tag_line = hashtags
     data = {"title": title, "body_html": body_html, "tags": tag_line,
             "url": _blog_url(results), "date": datetime.date.today().isoformat()}

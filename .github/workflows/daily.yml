@@ -42,11 +42,13 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}   # 이미지 API 업로드용
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}   # GPT+Gemini 교차검수(없으면 자동 건너뜀)
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           BLOGGER_BLOG_ID: ${{ secrets.BLOGGER_BLOG_ID }}
           OPENAI_MODEL: gpt-4o
           IMAGE_MODEL: gpt-image-1
           IMAGE_QUALITY: medium
+          MAX_IMAGES: "5"   # 본문 길이↑(~3500자) → 섹션마다 사진. 무료 스톡 우선이라 대부분 무료
           PEXELS_API_KEY: ${{ secrets.PEXELS_API_KEY }}
           UNSPLASH_ACCESS_KEY: ${{ secrets.UNSPLASH_ACCESS_KEY }}
           # 수익화: 제휴(없으면 빈 값 → 조용히 애드센스만)
