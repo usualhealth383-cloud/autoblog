@@ -134,6 +134,7 @@ def main():
     # 채널 변형본 생성(스레드·네이버)
     from auto_blog import variants
     from auto_blog.publishers import threads_upload
+    from auto_blog.publishers import instagram_upload
     article = rec["article"]
     blog_url = _blog_url(results)
     try:
@@ -158,13 +159,18 @@ def main():
     # 네이버 복붙 페이지 갱신(변형본 반영)
     _update_naver_page(rec, results, nv)
 
-    # 스레드 자동 게시(토큰 있을 때만)
+    # 스레드·인스타 자동 게시(토큰 있을 때만)
+    imgs = rec.get("image_urls") or {}
+    thumb = imgs.get("0") or (next(iter(imgs.values())) if imgs else None)
     if threads_text and threads_upload.configured():
-        imgs = rec.get("image_urls") or {}
-        thumb = imgs.get("0") or (next(iter(imgs.values())) if imgs else None)
         msg = threads_upload.post(threads_text, thumb)
         print("  스레드:", msg)
         results["threads"] = msg
+    # 인스타는 이미지 필수
+    if threads_text and thumb and instagram_upload.configured():
+        msg = instagram_upload.post(threads_text, thumb)
+        print("  인스타:", msg)
+        results["instagram"] = msg
 
     print("⑦ 텔레그램 보고…")
     telegram_bot.send_report(rec, results, threads_text=threads_text, summary=summary)
