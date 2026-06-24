@@ -181,6 +181,10 @@ def send_report(record: dict, results: dict, chat_ids: list[int] | None = None,
             requests.post(f"{API}/sendMessage", data={"chat_id": cid, "text": caption}, timeout=30)
         if extra_summary:  # 캡션에 다 못 담은 요약은 별도 메시지로
             requests.post(f"{API}/sendMessage", data={"chat_id": cid, "text": extra_summary}, timeout=30)
+        # 글 전문(폰에서 바로 읽고 복사) — 네이버에 붙여넣기 좋게
+        requests.post(f"{API}/sendMessage",
+                      data={"chat_id": cid, "text": "📄 오늘의 글 전문\n\n" + _body_text(article),
+                            "disable_web_page_preview": "true"}, timeout=30)
         requests.post(f"{API}/sendMessage",
                       data={"chat_id": cid, "text": details,
                             "disable_web_page_preview": "true"}, timeout=30)
