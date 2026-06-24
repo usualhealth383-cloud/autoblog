@@ -97,7 +97,7 @@ def run(generate_images: bool = True) -> dict | None:
 def _finalize(topic: strategist.TopicCandidate, article: dict,
               max_images: int | None = None) -> dict:
     """본문(article) → 이미지 + 서식화 + 저장 → record 반환."""
-    # 본문이 길어졌으므로(~3500자) 섹션마다 사진. 무료 스톡 우선이라 대부분 무료.
+    # 섹션마다 사진(본문 ~2000자, 섹션 4~6개). 무료 스톡 우선이라 대부분 무료.
     if max_images is None:
         max_images = config.get_int("MAX_IMAGES", 5)
     stamp = datetime.now().strftime("%Y%m%d-%H%M")

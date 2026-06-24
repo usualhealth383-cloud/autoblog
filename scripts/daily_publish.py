@@ -105,7 +105,7 @@ def _update_naver_page(rec: dict, results: dict, naver_variant: dict):
     hashtags = " ".join("#" + str(t).replace(" ", "") for t in tags)
     # 본문 맨 끝에 해시태그 → '본문 전체 복사' 한 번에 글+사진+태그가 같이 들어감
     tag_html = (f'<p style="color:#1a73e8;margin-top:22px">{hashtags}</p>') if hashtags else ""
-    # 네이버는 블로거(~3500자)와 다른 ~2000자 압축·재서술본을 쓴다(중복 콘텐츠 회피).
+    # 네이버는 블로거 원문과 다른 ~2000자 재서술본을 쓴다(중복 콘텐츠 회피).
     nv_sections = naver_variant.get("sections") or []
     if nv_sections:
         url_list = [v for _, v in sorted(imgs.items())]   # 이미지 순서대로 재배치
@@ -144,6 +144,7 @@ def main():
     # 채널 변형본 생성(스레드·네이버)
     from auto_blog import variants
     from auto_blog.publishers import threads_upload
+    from auto_blog.publishers import instagram_upload
     article = rec["article"]
     blog_url = _blog_url(results)
     try:
@@ -168,13 +169,21 @@ def main():
     # 네이버 복붙 페이지 갱신(변형본 반영)
     _update_naver_page(rec, results, nv)
 
-    # 스레드 자동 게시(토큰 있을 때만)
+    # 스레드·인스타 자동 게시(토큰 있을 때만)
+    imgs = rec.get("image_urls") or {}
+    thumb = imgs.get("0") or (next(iter(imgs.values())) if imgs else None)
     if threads_text and threads_upload.configured():
-        imgs = rec.get("image_urls") or {}
-        thumb = imgs.get("0") or (next(iter(imgs.values())) if imgs else None)
         msg = threads_upload.post(threads_text, thumb)
         print("  스레드:", msg)
         results["threads"] = msg
+    # 인스타는 이미지 필수 + 명시적 활성화(IG_ENABLED=true)일 때만. 현재 OFF(요청).
+    if (str(config.get("IG_ENABLED", "")).lower() == "true"
+            and threads_text and thumb and instagram_upload.configured()):
+        msg = instagram_upload.post(threads_text, thumb)
+        print("  인스타:", msg)
+        results["instagram"] = msg
+    else:
+        print("  인스타: 건너뜀(IG_ENABLED 아님)")
 
     print("⑦ 텔레그램 보고…")
     telegram_bot.send_report(rec, results, threads_text=threads_text, summary=summary)
