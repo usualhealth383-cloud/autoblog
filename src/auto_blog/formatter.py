@@ -13,12 +13,15 @@ def _esc(s: str) -> str:
     return html.escape(s or "", quote=True)
 
 
-def _image_block(url: str | None, prompt: str) -> str:
-    """이미지가 있으면 <img>, 없으면 프롬프트가 보이는 회색 자리표시."""
+def _image_block(url: str | None, prompt: str, link: str | None = None) -> str:
+    """이미지가 있으면 <img>(링크 있으면 클릭 시 블로그로), 없으면 회색 자리표시."""
     if url:
-        return (f'<figure style="margin:24px 0;text-align:center">'
-                f'<img src="{_esc(url)}" alt="{_esc(prompt)}" '
-                f'style="max-width:100%;height:auto;border-radius:12px"/></figure>')
+        img = (f'<img src="{_esc(url)}" alt="{_esc(prompt)}" '
+               f'style="max-width:100%;height:auto;border-radius:12px"/>')
+        if link:  # 이미지에 블로그(자기글) 링크 → 이미지검색·클릭 유입을 블로그로
+            img = (f'<a href="{_esc(link)}" target="_blank" rel="noopener" '
+                   f'title="{_esc(prompt)}">{img}</a>')
+        return f'<figure style="margin:24px 0;text-align:center">{img}</figure>'
     return (f'<div style="margin:24px 0;padding:40px;background:#f1f3f5;border-radius:12px;'
             f'text-align:center;color:#868e96;font-size:14px">🖼️ 이미지 생성 예정<br>'
             f'<span style="font-size:12px">{_esc(prompt)}</span></div>')
@@ -82,12 +85,16 @@ def _affiliate_block(aff: dict) -> str:
 
 
 def render_body(article: dict, images: dict[int, str] | None = None,
-                ads: bool = True) -> str:
+                ads: bool = True, link: str | None = None) -> str:
     """발행용 본문 HTML 조각(제목 제외 본문 + 제휴 + 고지 + 태그).
 
-    ads=True(블로거 등 자체 발행본)면 본문 중간에 인-아티클 애드센스를 넣는다.
-    ads=False(네이버 복붙본)면 구글 광고 코드를 넣지 않는다(네이버 정책)."""
+    ads=True(블로거 등 자체 발행본)면 본문 중간에 인-아티클 애드센스를 넣고,
+    이미지에 블로그 링크(BLOG_URL)를 걸어 조회수 유입을 돕는다.
+    ads=False(네이버 복붙본)면 구글 광고·외부링크를 넣지 않는다(네이버 정책·저품질 회피)."""
     images = images or {}
+    if link is None and ads:
+        from . import config
+        link = config.get("BLOG_URL") or None
     sections = article.get("sections", [])
     parts: list[str] = []
 
@@ -99,7 +106,7 @@ def render_body(article: dict, images: dict[int, str] | None = None,
         # 실제 생성된 이미지가 있는 섹션에만 표시(빈 자리표시 안 띄움)
         url = images.get(i)
         if url:
-            parts.append(_image_block(url, sec.get("image_prompt", "")))
+            parts.append(_image_block(url, sec.get("image_prompt", ""), link=link))
         for para in sec.get("paragraphs", []):
             parts.append(
                 f'<p style="font-size:17px;line-height:1.9;color:#343a40;'
