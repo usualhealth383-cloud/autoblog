@@ -84,16 +84,32 @@ def _safe_labels(tags) -> list[str]:
     return out
 
 
+def _fetch_related(svc, blog_id: str, exclude_title: str = "", n: int = 3) -> list[dict]:
+    """블로그의 다른 글 중 최근 글 n개(가능하면 한국어 글)를 '관련 글' 링크로. READ라 한도와 무관."""
+    import re
+    try:
+        items = svc.posts().list(blogId=blog_id, maxResults=15, fetchBodies=False,
+                                 status="LIVE").execute().get("items", [])
+    except Exception:
+        return []
+    posts = [{"title": p.get("title", ""), "url": p.get("url", "")}
+             for p in items if p.get("url") and p.get("title") != exclude_title]
+    kor = [p for p in posts if re.search(r"[가-힣]", p["title"])]
+    pool = kor if len(kor) >= n else posts
+    return pool[:n]
+
+
 def _insert(article: dict, inlined: dict[int, str]) -> str:
     blog_id = config.get("BLOGGER_BLOG_ID")
     if not blog_id:
         raise RuntimeError("BLOGGER_BLOG_ID 미설정")
     svc = _service()
+    related = _fetch_related(svc, blog_id, article.get("title", ""))
     body = {
         "kind": "blogger#post",
         "blog": {"id": blog_id},
         "title": article.get("title", ""),
-        "content": formatter.render_body(article, inlined),
+        "content": formatter.render_body(article, inlined, related=related),
         "labels": _safe_labels(article.get("tags", [])),
     }
     post = svc.posts().insert(blogId=blog_id, body=body, isDraft=False).execute()

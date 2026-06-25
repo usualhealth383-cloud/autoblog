@@ -84,8 +84,26 @@ def _affiliate_block(aff: dict) -> str:
     )
 
 
+def _related_block(related: list[dict] | None) -> str:
+    """글 하단 '함께 보면 좋은 글' 내부 링크(블로그 다른 글). 체류·페이지뷰↑ → 조회수 도움."""
+    if not related:
+        return ""
+    items = "".join(
+        f'<li style="margin:7px 0"><a href="{_esc(r.get("url",""))}" '
+        f'style="color:#1971c2;text-decoration:none;font-weight:600">👉 {_esc(r.get("title",""))}</a></li>'
+        for r in related if r.get("url"))
+    if not items:
+        return ""
+    return (f'<div style="margin:34px 0;padding:18px 22px;background:#f8f9fa;'
+            f'border:1px solid #e9ecef;border-radius:12px">'
+            f'<div style="font-size:18px;font-weight:800;color:#212529;margin-bottom:8px">'
+            f'🔗 함께 보면 좋은 글</div>'
+            f'<ul style="margin:0;padding-left:20px;font-size:16px;line-height:1.8">{items}</ul></div>')
+
+
 def render_body(article: dict, images: dict[int, str] | None = None,
-                ads: bool = True, link: str | None = None) -> str:
+                ads: bool = True, link: str | None = None,
+                related: list[dict] | None = None) -> str:
     """발행용 본문 HTML 조각(제목 제외 본문 + 제휴 + 고지 + 태그).
 
     ads=True(블로거 등 자체 발행본)면 본문 중간에 인-아티클 애드센스를 넣고,
@@ -128,6 +146,11 @@ def render_body(article: dict, images: dict[int, str] | None = None,
             f'border-left:4px solid #f59f00;border-radius:8px;font-size:14px;color:#664d03">'
             f'⚠️ {_esc(article["disclaimer"])}</div>'
         )
+
+    # 함께 보면 좋은 글(내부 링크) — 블로거 발행본에만(네이버는 외부링크 저품질 회피)
+    rel = _related_block(related)
+    if rel:
+        parts.append(rel)
 
     tags = article.get("tags", [])
     if tags:
