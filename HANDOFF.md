@@ -30,13 +30,21 @@
 
 | 채널 | 방식 | 상태 | 비고 |
 |---|---|---|---|
-| 🇰🇷 **Blogger** | 공식 API 완전자동 발행 | ✅ 가동 | `commonsense383.blogspot.com` |
+| 🇰🇷 **Blogger** | 공식 API 완전자동 발행 | 🔴 **중단(2026-06-25~)** | 403 forbidden — 계정 작성자권한 문제. ⚠아래 참고 |
 | 📗 **네이버** | 반자동(복붙) | ✅ 가동 | API 자동발행은 약관위반 → 아래 |
 | 🧵 **Threads** | 공식 API 완전자동 게시 | ✅ 가동(토큰 시 작동) | 계정 `usual_sense`(요즘상식) |
 | 📷 **Instagram** | 공식 API 자동 게시 | ⏸ 기본 OFF | `IG_ENABLED=true`일 때만 |
 | 💬 **Telegram** | 발행 후 보고 | ✅ 가동 | 사진+요약+링크 |
 
-### 네이버(복붙) 구조
+### 🔴 Blogger 발행 중단 (2026-06-25~, 최우선 이슈)
+- **증상**: 블로그 `요즘 상식`(commonsense383) **최신 글이 2026-06-25**가 마지막. 그 이후 매일 run은
+  글·이미지·네이버페이지까지 만들지만 **Blogger `posts.insert` 만 403 forbidden** 으로 조용히 실패.
+- **범위**: 로컬 수동발행 + **클라우드 자동발행 둘 다** 실패(같은 계정 토큰). 텔레그램 보고엔 `blogger: 실패`로 찍힘.
+- **원인**: 인증 계정이 블로그를 **읽기는 되는데(blogs.get·posts.list OK) 글쓰기(작성자) 권한이 없음**.
+  토큰 재발급(re-auth)으로 안 고쳐짐 = 토큰 문제 아니라 **작성자 권한 문제**. 6/25경 작성자에서 빠졌거나 소유 변경 추정.
+- **해결(사용자 필요)**: blogger.com → `요즘 상식` → **설정→권한→블로그 관리자 및 작성자** 확인.
+  발행에 쓰는 구글계정(브랜드=usualhealth383 계열)이 **관리자/작성자로 들어있는지** 확인, 빠졌으면 재추가.
+  권한 복구되면 **기존 토큰 그대로 다시 발행됨**(cloud 포함). 계정을 바꾸면 로컬 re-auth + `BLOGGER_TOKEN` 시크릿도 갱신 필요.
 - 자동발행 안 함(약관·저품질 위험). 대신 **사람이 복붙하기 쉬운 웹페이지**를 자동 갱신.
 - `daily_publish._update_naver_page` → `latest_naver.json`을 repo에 push → GitHub Pages
   **복붙 페이지** `https://usualhealth383-cloud.github.io/autoblog/naver.html`에서 글+사진 전체 복사.
