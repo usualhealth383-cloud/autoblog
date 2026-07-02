@@ -23,7 +23,8 @@ from auto_blog.publishers import blogger  # noqa: E402
 
 REPO = "usualhealth383-cloud/autoblog"
 RAW = f"https://raw.githubusercontent.com/{REPO}/main/public"
-TOPICS = ["korea-round32", "health-water", "health-sleep", "health-egg"]
+TOPICS = ["korea-round32", "health-water", "health-sleep", "health-egg",
+          "thailand-3n4d", "chiangmai-3n4d"]
 posts = config.DATA_DIR / "posts"
 
 
