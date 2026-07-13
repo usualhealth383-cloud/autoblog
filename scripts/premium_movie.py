@@ -39,7 +39,7 @@ ART = {
         ["장르·배경", "시대극 드라마 · 1948년 제주"]]},
     "sections": [
         {"heading": "🎬 조용하지만 오래 남는 영화 한 편",
-         "image_prompt": "a quiet cinema screen glowing softly in a dark empty theater, cinematic mood, no text, no logos",
+         "image_prompt": "cinematic period film still mood, a lone woman in 1940s Korean hanbok standing in a misty Hallasan mountain forest in Jeju, melancholic soft light, historical drama, no text, no logos",
          "paragraphs": [
             "어떤 영화는 요란한 홍보 없이도 마음 깊은 곳에 오래 머뭅니다. 2025년 11월에 개봉한 '한란'이 바로 그런 작품입니다. 극장에서 크게 화제가 되지는 않았지만, 본 사람들의 입에서 입으로 '먹먹하다', '여운이 가시지 않는다'는 말이 번지며 조용히 존재감을 키워 온 영화이지요.",
             "이 글은 아직 이 작품을 만나지 못한 분들을 위한 안내이자, 이미 보신 분들과 나누고 싶은 감상이기도 합니다. 큰 줄거리는 담되, 영화의 깊은 감정을 직접 느끼실 수 있도록 결정적인 장면은 아껴 두었습니다."]},
@@ -49,23 +49,23 @@ ART = {
             "'한란'은 하명미 감독이 연출하고 배우 김향기가 주연을 맡은 시대극 드라마입니다. 2025년 11월 26일에 개봉했으며, 러닝타임은 118분, 12세 이상 관람가입니다.",
             "배경은 1948년의 제주입니다. 아역 시절부터 사랑받아 온 김향기가 이번에는 한 아이의 엄마 '아진'으로 분해, 한층 깊어진 얼굴을 보여 줍니다. 엄마를 애타게 찾는 딸 '해생' 역은 김민채가 맡아, 두 사람의 이야기가 영화의 심장을 이룹니다."]},
         {"heading": "🌸 '한란'이라는 제목에 담긴 뜻",
-         "image_prompt": "a single delicate wild orchid blooming among cold rocks in winter, soft light, resilient and beautiful, no text",
+         "image_prompt": "a single wild Korean orchid (hanran) blooming among snowy rocks on a cold winter mountain, delicate yet resilient, symbolic soft light, cinematic, no text",
          "paragraphs": [
             "영화를 이해하는 첫 번째 열쇠는 제목에 있습니다. '한란'은 한라산에서만 자생하는 난초로, 겨울의 추위 속에서도 꽃을 피워내는 강인한 식물입니다. 천연기념물 제191호로 지정될 만큼 귀하게 여겨지지요.",
             "돌과 바람, 척박한 환경을 견디며 끝내 꽃을 피우는 한란의 모습은 이 영화가 그리려는 '생존'과 '희망'의 상징 그 자체입니다. 가장 혹독한 계절에 피어나는 꽃처럼, 가장 어두운 시대를 건너는 모녀의 이야기라는 뜻을 제목 하나에 오롯이 담아낸 셈입니다."]},
         {"heading": "📖 산으로 간 엄마, 마을에 남은 딸",
-         "image_prompt": "a misty forest trail on a mountain in Jeju Korea, moody and cinematic, foggy atmosphere, no text, no people",
+         "image_prompt": "a Korean mother in 1940s hanbok walking up a foggy mountain trail, looking back with worry, misty Jeju forest, emotional cinematic period drama, no text",
          "paragraphs": [
             "1948년 제주, 토벌대를 피해 사람들은 한라산으로 몸을 숨깁니다. 엄마 '아진' 역시 산으로 피신하지만, 그 혼란 속에서 마을에 두고 온 딸 '해생'과 뜻하지 않게 생이별을 하게 됩니다.",
             "산을 오르던 아진은 군인들이 마을을 모두 불태웠다는 소식을 듣습니다. 딸이 홀로 남겨졌다는 생각에, 그녀는 모든 위험을 무릅쓰고 다시 산을 내려가기로 결심합니다. 딸을 찾아 하산하는 엄마와, 엄마를 찾아 산을 오르는 딸. 서로를 향해 걷는 두 사람의 절박한 여정이 영화의 큰 줄기를 이룹니다.",
             "산과 바다를 넘나드는 이 여정은 단순한 추격이나 재난의 이야기가 아닙니다. '어떻게든 살아서 다시 만나겠다'는, 사랑의 또 다른 이름에 가깝습니다."]},
         {"heading": "🏔️ 1948년 제주, 그 시대를 마주하는 법",
-         "image_prompt": "dramatic Jeju coastal cliffs and sea under a grey winter sky, wild nature, solemn mood, no text, no people",
+         "image_prompt": "a humble 1948 Korean mountain village with thatched-roof houses at dusk, quiet somber historical atmosphere, misty hills, no people, no text",
          "paragraphs": [
             "'한란'의 배경이 되는 1948년의 제주는 우리 현대사에 깊은 상처로 남은 시기입니다. 영화는 그 아픈 역사를 큰 목소리로 주장하기보다, 그 시대를 살아 낸 한 사람 한 사람의 얼굴과 마음으로 조용히 담아냅니다.",
             "김향기는 한 인터뷰에서 당시의 증언집을 읽으며 마음이 많이 괴로웠다고, 실제로 고통을 겪은 분들의 이야기라 더욱 조심스러웠다고 밝히기도 했습니다. 그 진심 어린 태도가 화면 곳곳에 스며 있어, 관객은 '역사'라는 거대한 단어 대신 한 엄마의 떨리는 손끝을 통해 그 시대를 마주하게 됩니다."]},
         {"heading": "🎭 이 영화를 특별하게 만드는 것들",
-         "image_prompt": "misty Hallasan mountain forest in winter, atmospheric Jeju landscape, cinematic wide view, no text, no people",
+         "image_prompt": "a young Korean girl in old 1940s period clothing walking alone through a misty forest searching, emotional cinematic period film mood, soft light, no text",
          "paragraphs": [
             "첫째는 단연 김향기의 연기입니다. 제주 아낙의 투박함 속에 숨은 섬세한 모성애를, 그녀는 과장 없이 완숙하게 그려냅니다. 산을 넘고 바다에 몸을 던지는 고된 장면까지 직접 소화하며, '김향기라는 배우에겐 정말 향기가 있다'는 관객평이 나올 만큼 깊은 인상을 남깁니다.",
             "둘째는 '진짜'에 대한 집요함입니다. 제작진은 배우들의 자연스러운 제주 방언을 위해 현지인 중심의 '대사 닥터'를 열 명 남짓 두고 거의 일대일로 리허설을 진행했고, 촬영은 100퍼센트 동시 녹음으로 이뤄졌다고 합니다. 김향기는 촬영 약 3개월 전부터 인물을 연구하고 제주를 직접 답사하며 제주어를 익혔습니다.",
@@ -76,7 +76,7 @@ ART = {
             "'한란'을 본 관객들의 반응은 한결같이 따뜻하고, 또 먹먹합니다. '처음부터 끝까지 손을 꼭 쥐고 보게 된다', '영화가 끝나고도 여운이 오래 남는다'는 감상이 이어졌습니다.",
             "흥미로운 점은, 극장 관객 수는 크지 않았음에도 입소문을 타고 온라인에서 뜨거운 호평을 얻었다는 사실입니다. 화려한 볼거리 대신 진심과 정성으로 승부한 작품이 어떻게 관객의 마음을 움직이는지 보여 주는 좋은 예이지요. 김향기의 연기는 해외에서도 호평을 받았다고 전해집니다."]},
         {"heading": "🤍 마무리 — 가장 추운 곳에서 피는 꽃",
-         "image_prompt": "a warm hopeful winter sunrise over a snowy mountain, gentle light breaking through, serene and moving, no text",
+         "image_prompt": "silhouettes of a mother and child in period clothing reaching toward each other across a misty mountain at sunrise, hopeful emotional period drama, warm light, no text",
          "paragraphs": [
             "'한란'은 편하게 즐기는 오락 영화는 아닙니다. 무거운 시대와 아픈 이별을 정면으로 마주해야 하니까요. 하지만 그 무게를 견디고 나면, 어떤 상황에서도 '살아서 다시 만나자'는 마음이 얼마나 강한지를 오래 곱씹게 됩니다.",
             "가장 추운 겨울에 꽃을 피우는 한란처럼, 이 영화는 가장 어두운 시대에도 꺾이지 않은 사랑과 생명을 이야기합니다. 조용한 영화 한 편에서 깊은 울림을 얻고 싶은 분이라면, 그리고 김향기라는 배우의 새로운 얼굴을 만나고 싶은 분이라면, '한란'은 충분히 시간을 내어 볼 가치가 있는 작품입니다."]},
@@ -182,7 +182,18 @@ stamp = datetime.now().strftime("%Y%m%d-%H%M%S")
 out_dir = config.DATA_DIR / "posts" / f"{stamp}-{SLUG}"
 out_dir.mkdir(parents=True, exist_ok=True)
 (out_dir / "blog.json").write_text(json.dumps(ART, ensure_ascii=False, indent=2), encoding="utf-8")
-imgs, _ = imgmod.generate_for_article(ART, out_dir, max_images=MAX_IMAGES)
+# 영화 분위기 이미지는 스톡 대신 AI로 강제 생성(1948 제주·모녀·한란 느낌)
+_client = imgmod._client()
+_img_dir = out_dir / "images"
+_img_dir.mkdir(parents=True, exist_ok=True)
+imgs = {}
+_targets = [i for i, s in enumerate(ART["sections"]) if s.get("image_prompt")][:MAX_IMAGES]
+for i in _targets:
+    dest = _img_dir / f"sec{i}.jpg"
+    print(f"  AI 생성 sec{i}…")
+    name = imgmod._generate_one(_client, ART["sections"][i]["image_prompt"], dest)
+    if name:
+        imgs[i] = f"images/{name}"
 urls = host_upsert(imgs, out_dir.name, out_dir)
 print("사진:", len(urls))
 (ROOT / "docs" / f"{SLUG}.html").write_text(render_page(ART, urls), encoding="utf-8")
