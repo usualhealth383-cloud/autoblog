@@ -32,6 +32,17 @@ def check() -> dict:
     return {"ok": False, "msg": f"{r.status_code}: {r.text[:120]}"}
 
 
+def delete(media_id: str) -> str:
+    """게시된 스레드를 삭제한다. threads_delete 스코프 필요."""
+    token = config.get("THREADS_TOKEN")
+    if not token:
+        return "건너뜀: THREADS 미설정"
+    r = requests.delete(f"{BASE}/{media_id}", params={"access_token": token}, timeout=40)
+    if r.status_code in (200, 204):
+        return f"삭제됨: {media_id}"
+    return f"실패(삭제): {r.status_code} {r.text[:150]}"
+
+
 def post(text: str, image_url: str | None = None) -> str:
     """스레드에 게시하고 결과 메시지를 반환."""
     token = config.get("THREADS_TOKEN")
