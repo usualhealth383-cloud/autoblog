@@ -1,0 +1,56 @@
+<!doctype html><html lang="ko"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1"><title>요즘 블로그 — 복붙 페이지</title>
+<style>
+:root{--navy:#13294b}
+*{box-sizing:border-box}
+body{margin:0;font-family:-apple-system,'Malgun Gothic',sans-serif;background:#f4f5f7;color:#1f2430;line-height:1.8;padding:24px 16px}
+.wrap{max-width:720px;margin:0 auto}
+h1{font-size:22px;color:var(--navy)}
+.card{background:#fff;border-radius:14px;padding:22px;margin-top:14px;box-shadow:0 2px 10px rgba(0,0,0,.05)}
+.code{font-family:Consolas,monospace;font-size:14px;word-break:break-all;background:#f8f9fa;border:1px solid #e3e6ea;border-radius:10px;padding:14px;margin:12px 0}
+button{border:0;border-radius:10px;padding:12px 16px;font-size:15px;font-weight:700;cursor:pointer;background:var(--navy);color:#fff}
+.ok{background:#e8f5e9;border:1px solid #a5d6a7;border-radius:10px;padding:14px;color:#1b5e20;font-weight:600}
+ul{padding-left:18px}a{color:var(--navy)}
+.hint{font-size:14px;color:#7a8190}
+#toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%);background:#1f2430;color:#fff;padding:11px 18px;border-radius:22px;opacity:0;transition:.25s;font-weight:600}
+#toast.on{opacity:1}
+</style></head>
+<body><div class="wrap">
+<div id="auth" style="display:none">
+  <h1>✅ 인증 코드가 발급됐어요</h1>
+  <div class="card">
+    <p class="ok">아래 코드를 복사해서 채팅에 붙여넣으세요.</p>
+    <div class="code" id="codebox"></div>
+    <button onclick="copyCode()">📋 인증 코드 복사</button>
+    <p class="hint">이 코드는 한 번만 사용할 수 있고 곧 만료됩니다.</p>
+  </div>
+</div>
+
+<div id="home">
+  <h1>📝 요즘 블로그 — 복붙 페이지 모음</h1>
+  <div class="card">
+    <p class="hint">각 페이지에서 <b>본문 전체 복사</b>를 누르면 글·사진·표가 한 번에 복사됩니다.</p>
+    <ul>
+      <li><a href="drama-kimbujang-ep7.html">🔥 '김부장' 7화 예상 — 트럭 납치가 온다</a></li>
+      <li><a href="movie-hanran.html">🎬 영화 '한란' 리뷰</a></li>
+      <li><a href="health-water.html">💧 물 마시기</a> · <a href="health-sleep.html">😴 수면</a> · <a href="health-walking.html">🚶 걷기</a></li>
+      <li><a href="health-bloodpressure.html">🩺 혈압</a> · <a href="health-bloodsugar.html">🍬 혈당</a> · <a href="health-gut.html">🦠 장 건강</a></li>
+      <li><a href="health-coffee.html">☕ 커피</a> · <a href="health-egg.html">🥚 달걀</a> · <a href="health-protein.html">🍗 단백질</a> · <a href="health-eye.html">👁 눈 건강</a></li>
+      <li><a href="health-smoking-drinking.html">🚬 흡연과 음주</a></li>
+    </ul>
+  </div>
+</div>
+</div>
+<div id="toast"></div>
+<script>
+const p = new URLSearchParams(location.search);
+const code = p.get('code');
+if (code) {
+  document.getElementById('auth').style.display = 'block';
+  document.getElementById('home').style.display = 'none';
+  document.getElementById('codebox').textContent = code;
+}
+function toast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('on');setTimeout(()=>t.classList.remove('on'),1600)}
+function copyCode(){navigator.clipboard.writeText(code).then(()=>toast('복사됨! 채팅에 붙여넣으세요')).catch(()=>toast('실패 — 직접 드래그'))}
+</script>
+</body></html>
