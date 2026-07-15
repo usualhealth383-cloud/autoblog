@@ -158,7 +158,15 @@ def run_auto() -> dict:
         topic = strategist.evergreen_topic(idx)
         topic._fallback = True
         print(f"③(대체) 안전 상식글 생성: {topic.angle}")
-        article, safe, issues = writer.write_article_safe(topic, "")
+        # ★상식글도 반드시 근거를 붙인다(2026-07-16). 예전엔 grounding=""로 LLM 기억만
+        #   갖고 써서 어디에나 있는 일반론이 나왔고, 애드센스가 '가치 없는 콘텐츠'로 반려했다.
+        #   근거 기반 = 이 블로그의 유일한 차별점이므로 대체 경로에서도 포기하지 않는다.
+        grounding, _srcs = research.fetch_grounding(topic.keyword)
+        if grounding:
+            print(f"  근거 확보: {len(grounding)}자 / 출처 {len(_srcs)}건")
+        else:
+            print("  ⚠️ 근거 미확보 → 모델 안정지식으로 생성(개념글)")
+        article, safe, issues = writer.write_article_safe(topic, grounding)
 
     print(f"  완성: '{article.get('title')}'  ({article.get('char_count')}자)")
     print("③.5 제휴 링크 분석 중…")
