@@ -111,8 +111,11 @@ def chars(a):
     return sum(len(p) for s in a["sections"] for p in s.get("paragraphs", []))
 
 
+only = {a for a in sys.argv[1:] if not a.startswith("--")}  # 특정 slug만 처리
 done = []
 for jf in sorted(SRC.glob("*.json")):
+    if only and jf.stem not in only:
+        continue
     try:
         a = json.loads(jf.read_text(encoding="utf-8"))
     except Exception as e:
