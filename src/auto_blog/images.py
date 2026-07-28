@@ -32,15 +32,33 @@ def _save_jpeg(data: bytes, dest: Path) -> str:
     return dest.name
 
 
-# 영어 stock 검색어로 변환(설명형 프롬프트 → 핵심 키워드 몇 개)
-_STOP = {"a", "an", "the", "of", "for", "with", "and", "in", "on", "at", "photo",
-         "photograph", "high", "quality", "editorial", "no", "text", "image", "shot"}
+# 영어 stock 검색어로 변환(설명형 프롬프트 → 핵심 사물 키워드 몇 개)
+# 지역어·인물·수식어는 제거해야 스톡 매칭이 정확해진다(예: "korean"으로 검색하면 결과 빈약).
+_STOP = {
+    "a", "an", "the", "of", "for", "with", "and", "in", "on", "at", "to", "by",
+    "photo", "photograph", "high", "quality", "editorial", "no", "text", "image", "shot", "closeup",
+    # 지역·국적
+    "korean", "korea", "asian", "asia", "western",
+    # 인물 일반어
+    "person", "people", "man", "woman", "men", "women", "male", "female", "guy", "lady",
+    "his", "her", "their", "its", "s", "someone",
+    # 연령·수식
+    "middle", "aged", "senior", "elderly", "older", "old", "young", "adult",
+    "fifties", "sixties", "seventies", "thirties", "forties", "year",
+    # 촬영·분위기 형용사
+    "close", "up", "wide", "overhead", "portrait", "warm", "cozy", "soft", "natural",
+    "bright", "dark", "gentle", "peaceful", "calm", "tired", "happy", "smiling", "relaxed",
+    "beautiful", "cute", "fresh", "healthy", "clean", "minimal", "rustic", "backlit",
+    "morning", "evening", "night", "day", "light", "lighting", "sunlight", "background",
+    "scene", "view", "mood", "atmosphere", "concept", "style", "indoor", "outdoor",
+    "sitting", "standing", "looking", "holding", "wearing", "showing", "doing",
+}
 
 
 def _stock_query(prompt: str) -> str:
     words = re.findall(r"[a-zA-Z]+", prompt.lower())
-    keep = [w for w in words if w not in _STOP]
-    return " ".join(keep[:5]) or "background"
+    keep = [w for w in words if w not in _STOP and len(w) > 2]
+    return " ".join(keep[:4]) or "background"
 
 
 def _fetch_stock(query: str, dest: Path) -> str | None:

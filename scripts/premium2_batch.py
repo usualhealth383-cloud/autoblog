@@ -80,7 +80,8 @@ def fetch_stock_only(article, slug):
             print(f"    섹션{i}: 기존 사진 재사용")
             continue
         try:
-            name = imgmod._fetch_stock(imgmod._stock_query(secs[i]["image_prompt"]), dest)
+            q = secs[i].get("stock_query") or imgmod._stock_query(secs[i]["image_prompt"])
+            name = imgmod._fetch_stock(q, dest)
         except Exception as e:
             print(f"    섹션{i} 스톡 실패: {type(e).__name__}")
             name = None
