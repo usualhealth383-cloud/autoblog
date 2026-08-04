@@ -44,13 +44,16 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}   # 이미지 API 업로드용
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}   # GPT+Gemini 교차검수(없으면 자동 건너뜀)
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}   # GPT+Gemini 교차검수 + 이미지 생성(나노바나나)
+          GEMINI_IMAGE_MODEL: gemini-2.5-flash-image   # 이미지 생성 = 나노바나나(gpt-image-1 대신, 비용↓)
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           BLOGGER_BLOG_ID: ${{ secrets.BLOGGER_BLOG_ID }}
           BLOG_URL: ${{ secrets.BLOG_URL }}   # 발행 사진에 거는 블로그 링크(조회수 유입)
           OPENAI_MODEL: gpt-4o
-          IMAGE_MODEL: gpt-image-1
-          IMAGE_QUALITY: medium
+          # 이미지: 무료 스톡(Pexels/Unsplash) 우선 → 없으면 나노바나나(제미나이).
+          # gpt-image-1(OpenAI)은 IMAGE_FALLBACK_OPENAI=true 로 켤 때만 최후 폴백(비용 폭주 방지).
+          IMAGE_MODEL: gpt-image-1        # (IMAGE_FALLBACK_OPENAI=true 일 때만 사용)
+          IMAGE_QUALITY: medium           # (동상)
           MAX_IMAGES: "5"   # 섹션마다 사진(본문 ~2000자). 무료 스톡 우선이라 대부분 무료
           PEXELS_API_KEY: ${{ secrets.PEXELS_API_KEY }}
           UNSPLASH_ACCESS_KEY: ${{ secrets.UNSPLASH_ACCESS_KEY }}

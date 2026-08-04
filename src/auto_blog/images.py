@@ -1,8 +1,12 @@
 """5단계: 이미지 수급.
 
 비용·화질을 위해 **무료·저작권 안전 스톡 사진(Pexels→Unsplash)을 먼저** 쓰고,
-딱 맞는 게 없을 때만 AI(gpt-image-1)로 생성한다. 이미지는 글 폴더의 images/ 아래
-JPEG 로 저장하고 상대경로를 돌려준다(발행 시 GitHub URL 호스팅은 publishers/daily_publish 처리).
+딱 맞는 게 없을 때만 AI 로 생성한다.
+- AI 생성은 **나노바나나(제미나이 이미지, GEMINI_API_KEY)** 를 쓴다. gpt-image-1 대비 대폭 저렴.
+- gpt-image-1(OpenAI)은 기본적으로 **쓰지 않는다.** IMAGE_FALLBACK_OPENAI=true 로 명시할 때만
+  최후 폴백으로 동작(비용 폭주 방지 — 2026-06 이미지 비용의 원인이 gpt-image-1 이었음).
+이미지는 글 폴더의 images/ 아래 JPEG 로 저장하고 상대경로를 돌려준다
+(발행 시 GitHub URL 호스팅은 publishers/daily_publish 처리).
 """
 from __future__ import annotations
 
@@ -117,6 +121,33 @@ def _generate_one(client, prompt: str, dest: Path) -> str | None:
         return None
 
 
+def _generate_one_gemini(prompt: str, dest: Path) -> str | None:
+    """나노바나나(제미나이 이미지)로 1장 생성. GEMINI_API_KEY 필요.
+
+    google-genai SDK 사용(writer.py 교차검수와 동일 패키지). 모델은 GEMINI_IMAGE_MODEL
+    (기본 'gemini-2.5-flash-image'). 응답 parts 안의 inline_data(이미지 바이트)를 꺼내 저장."""
+    try:
+        from google import genai
+        client = genai.Client(api_key=config.GEMINI_API_KEY)
+        model = config.get("GEMINI_IMAGE_MODEL", "gemini-2.5-flash-image")
+        resp = client.models.generate_content(
+            model=model, contents=[prompt + PROMPT_GUARD])
+        for cand in (getattr(resp, "candidates", None) or []):
+            content = getattr(cand, "content", None)
+            for part in (getattr(content, "parts", None) or []):
+                inline = getattr(part, "inline_data", None)
+                data = getattr(inline, "data", None) if inline else None
+                if data:
+                    if isinstance(data, str):  # 일부 버전은 base64 문자열
+                        data = base64.b64decode(data)
+                    return _save_jpeg(data, dest)
+        print("    [경고] 제미나이 응답에 이미지가 없음")
+        return None
+    except Exception as e:
+        print(f"    [경고] 제미나이(나노바나나) 이미지 생성 실패: {e}")
+        return None
+
+
 def _target_indices(sections: list[dict]) -> list[int]:
     """모든 섹션에 이미지(섹션=약 2단락 → 2단락당 1개)."""
     return [i for i, s in enumerate(sections) if s.get("image_prompt")]
@@ -137,8 +168,10 @@ def generate_for_article(article: dict, out_dir: Path,
         targets = all_idx
 
     use_stock = bool(config.get("PEXELS_API_KEY") or config.get("UNSPLASH_ACCESS_KEY"))
+    use_gemini = bool(config.GEMINI_API_KEY)                       # 나노바나나(기본 AI 생성)
+    allow_openai = str(config.get("IMAGE_FALLBACK_OPENAI", "")).lower() == "true"  # gpt-image-1은 명시 시만
     images: dict[int, str] = {}
-    client = None
+    oai_client = None
     for i in targets:
         prompt = sections[i]["image_prompt"]
         dest = img_dir / f"sec{i}.jpg"
@@ -147,11 +180,14 @@ def generate_for_article(article: dict, out_dir: Path,
             name = _fetch_stock(_stock_query(prompt), dest)
             if name:
                 print(f"    - 섹션 {i}: 무료 스톡 사진 ✓")
-        if not name:  # 스톡 없으면 AI 생성
-            if client is None:
-                client = _client()
-            print(f"    - 섹션 {i}: AI 생성")
-            name = _generate_one(client, prompt, dest)
+        if not name and use_gemini:  # 스톡 없으면 나노바나나(제미나이)로 생성
+            print(f"    - 섹션 {i}: 나노바나나(제미나이) 생성")
+            name = _generate_one_gemini(prompt, dest)
+        if not name and allow_openai:  # 최후 폴백 — 명시적으로 켰을 때만 gpt-image-1
+            if oai_client is None:
+                oai_client = _client()
+            print(f"    - 섹션 {i}: OpenAI(gpt-image-1) 폴백")
+            name = _generate_one(oai_client, prompt, dest)
         if name:
             images[i] = f"images/{name}"
 
