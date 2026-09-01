@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<title>박찬 과학 통합과학1 — 앞부속</title>
+<style>
+  @font-face { font-family:'PC Sans'; src:url('file:///root/.fonts/NotoSansKR.ttf'); font-weight:100 900; }
+  @font-face { font-family:'PC Serif'; src:url('file:///root/.fonts/NotoSerifKR.ttf'); font-weight:100 900; }
+  @font-face { font-family:'PC Pen'; src:url('file:///root/.fonts/YeonSung-Regular.ttf'); font-weight:400; }
+
+  :root{
+    --brand:#0E5A6B; --brand-lt:#E3F0F3;
+    --unit:#2E5BDA; --unit-lt:#ECF1FC; --unit-md:#BCCDF3;
+    --accent:#E8940A; --accent-lt:#FDF3E0;
+    --point:#D6455D; --point-lt:#FBEBEE;
+    --ink:#22303A; --sub:#5B6B77; --line:#D8E0E5;
+    --u1:#3E9C6E;   /* I. 과학의 기초 = 그린 */
+    --u3:#8A5CE8;   /* III. 시스템과 상호작용 = 퍼플 */
+  }
+  *{ box-sizing:border-box; margin:0; padding:0; -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+  @page{ size:210mm 275mm; margin:0; }
+  html,body{ font-family:'PC Sans',sans-serif; color:var(--ink); }
+  .page{ width:210mm; height:275mm; position:relative; overflow:hidden; background:#fff; page-break-after:always; padding:14mm 13mm 19mm 15mm; display:flex; flex-direction:column; }
+  .folio{ position:absolute; bottom:7mm; left:0; right:0; display:flex; justify-content:space-between; padding:0 14mm; font-size:8pt; color:var(--sub); }
+  .folio .num{ font-weight:800; color:var(--brand); font-size:10pt; }
+
+  /* ── 공통 타이포 ── */
+  .kicker{ display:flex; align-items:center; gap:4mm; }
+  .kicker .kt{ font-size:9.5pt; font-weight:800; color:var(--brand); letter-spacing:0.24em; white-space:nowrap; }
+  .kicker::after{ content:""; flex:1; border-top:0.3mm solid var(--line); }
+  h1.fm{ font-size:26pt; font-weight:900; letter-spacing:-0.015em; margin:5mm 0 0; }
+  h1.fm .tick{ display:block; width:14mm; border-top:1.4mm solid var(--accent); margin-bottom:3.4mm; }
+  p.lead{ font-family:'PC Serif'; font-size:10pt; font-weight:600; line-height:1.95; color:#3D4C58; margin-top:4mm; }
+  p.body{ font-family:'PC Serif'; font-size:9.8pt; line-height:1.95; margin-bottom:3.8mm; text-align:justify; }
+  p.body b{ font-weight:800; }
+  .kw{ font-weight:800; color:var(--brand); }
+  .u-amber{ background:#F8E9C6; font-weight:700; padding:0.15mm 0.6mm; border-radius:0.6mm; box-decoration-break:clone; -webkit-box-decoration-break:clone; }
+  .pen{ font-family:'PC Pen'; font-size:12.5pt; color:#B4560E; line-height:1.5; }
+
+  /* ── p.1 표제지 ── */
+  .cover{ padding:0 0 19mm; }
+  .cover-inner{ flex:1; display:flex; flex-direction:column; padding:22mm 24mm 16mm; }
+  .brandmark{ display:flex; align-items:center; gap:3mm; }
+  .brandmark .bm-sq{ width:7mm; height:7mm; background:var(--brand); border-radius:1.6mm; position:relative; }
+  .brandmark .bm-sq::after{ content:""; position:absolute; right:-1.6mm; bottom:-1.6mm; width:3.4mm; height:3.4mm; background:var(--accent); border-radius:0.9mm; }
+  .brandmark .bm-t{ font-size:13pt; font-weight:900; letter-spacing:0.06em; color:var(--brand); }
+  .cover-mid{ flex:1; display:flex; flex-direction:column; justify-content:center; }
+  .cover-edition{ font-size:10pt; font-weight:800; color:var(--unit); letter-spacing:0.3em; margin-bottom:6mm; }
+  .cover-title{ font-size:58pt; font-weight:900; letter-spacing:-0.02em; line-height:1.12; }
+  .cover-title .num{ color:var(--unit); }
+  .cover-tick{ width:22mm; border-top:2mm solid var(--accent); margin:8mm 0 7mm; }
+  .cover-sub{ font-family:'PC Serif'; font-size:12pt; font-weight:700; color:#3D4C58; line-height:1.9; }
+  .cover-tags{ display:flex; gap:2.5mm; margin-top:9mm; }
+  .cover-tag{ font-size:8.4pt; font-weight:700; color:var(--brand); border:0.35mm solid #9CC5CE; border-radius:5mm; padding:1.2mm 4mm; }
+  .cover-author{ font-size:13pt; font-weight:800; margin-top:12mm; }
+  .cover-author .role{ font-size:9pt; color:var(--sub); font-weight:600; margin-right:2.5mm; }
+  .cover-foot{ display:flex; justify-content:space-between; align-items:flex-end; border-top:0.35mm solid var(--line); padding-top:4mm; }
+  .cover-foot .cf-l{ font-size:8.5pt; color:var(--sub); line-height:1.6; }
+  .cover-foot .cf-r{ font-size:9.5pt; font-weight:900; color:var(--brand); letter-spacing:0.08em; }
+
+  /* ── p.2 머리말 ── */
+  .preface-quote{ font-family:'PC Serif'; font-size:13pt; font-weight:800; line-height:1.85; color:var(--ink); margin:7mm 0 6mm; padding-left:5mm; border-left:1mm solid var(--accent); }
+  .sign{ text-align:right; margin-top:8mm; }
+  .sign .s-date{ font-size:9pt; color:var(--sub); margin-bottom:1.5mm; }
+  .sign .s-name{ font-family:'PC Pen'; font-size:20pt; color:var(--ink); }
+  .sign .s-name small{ font-family:'PC Sans'; font-size:9pt; color:var(--sub); font-weight:600; margin-right:2.5mm; }
+
+  /* ── p.3 수능 안내 ── */
+  .fact-table{ width:100%; border-collapse:collapse; border-top:0.45mm solid var(--brand); margin:6mm 0 2mm; }
+  .fact-table th, .fact-table td{ border-bottom:0.3mm solid var(--line); padding:3.2mm 2mm; font-size:9.5pt; text-align:left; vertical-align:top; }
+  .fact-table th{ width:34mm; color:var(--brand); font-weight:900; }
+  .fact-table td{ font-family:'PC Serif'; }
+  .fact-table td b{ font-weight:800; }
+  .fact-src{ font-size:7.6pt; color:var(--sub); margin-bottom:8mm; }
+  .strategy{ border-top:0.5mm solid var(--accent); border-bottom:0.5mm solid var(--accent); padding:3.6mm 2mm; margin-top:2mm; }
+  .strategy .st-t{ font-weight:900; color:#9C6503; font-size:10.5pt; margin-bottom:2.2mm; }
+  .strategy ul{ list-style:none; font-family:'PC Serif'; font-size:9.5pt; line-height:1.85; }
+  .strategy li{ padding-left:4.2mm; position:relative; margin-bottom:1.4mm; }
+  .strategy li::before{ content:"✓"; position:absolute; left:0; color:var(--accent); font-weight:900; }
+  .bignum-row{ display:flex; gap:4mm; margin:7mm 0 2mm; }
+  .bignum{ flex:1; text-align:center; border:0.35mm solid var(--unit-md); border-radius:2.5mm; padding:4mm 2mm 3.4mm; }
+  .bignum .bn-v{ font-size:19pt; font-weight:900; color:var(--unit); }
+  .bignum .bn-v small{ font-size:10pt; }
+  .bignum .bn-l{ font-size:8.2pt; color:var(--sub); margin-top:1mm; }
+
+  /* ── p.4~5 구성 소개 ── */
+  .guide-grid{ display:grid; grid-template-columns:1fr 1fr; gap:5mm 6mm; margin-top:6mm; }
+  .gcard{ border:0.35mm solid var(--line); border-radius:2.5mm; padding:4mm 4.5mm 3.6mm; }
+  .gcard .gc-head{ display:flex; align-items:center; gap:2.4mm; margin-bottom:2mm; }
+  .gcard .gc-no{ font-family:'PC Serif'; font-size:13pt; font-weight:900; color:var(--unit); }
+  .gcard .gc-t{ font-size:10.5pt; font-weight:900; }
+  .gcard .gc-tag{ margin-left:auto; font-size:7pt; font-weight:800; color:var(--brand); background:var(--brand-lt); border-radius:3mm; padding:0.6mm 2.4mm; }
+  .gcard p.gc-d{ font-family:'PC Serif'; font-size:8.8pt; line-height:1.75; color:#3D4C58; margin-bottom:2.6mm; }
+  .demo{ border-radius:1.5mm; background:#FAFBFC; border:0.3mm dashed var(--line); padding:2.8mm 3.2mm; }
+  .demo .d-gist{ border-top:0.5mm solid var(--accent); border-bottom:0.5mm solid var(--accent); padding:2mm 1.5mm; font-family:'PC Serif'; font-size:8.6pt; }
+  .demo .d-gist .bt{ font-weight:900; color:#9C6503; font-size:8.4pt; font-family:'PC Sans'; margin-bottom:1mm; }
+  .demo .d-ex{ border-left:0.5mm solid #D998A4; padding:1mm 0 1mm 3mm; font-family:'PC Serif'; font-size:8.6pt; }
+  .demo .d-ex .bt{ color:#A9556A; font-weight:900; font-size:8pt; font-family:'PC Sans'; margin-bottom:0.8mm; }
+  .demo .d-saem{ display:flex; gap:2.4mm; align-items:flex-start; }
+  .demo .d-saem .avatar{ flex:0 0 auto; width:8.5mm; height:8.5mm; border-radius:50%; background:var(--brand); color:#fff; font-size:5.8pt; font-weight:800; display:flex; align-items:center; justify-content:center; line-height:1.3; text-align:center; border:0.4mm solid var(--accent); }
+  .demo .d-saem .bubble{ background:#FFFBF0; border:0.35mm solid #EBCB9C; border-radius:2.4mm; padding:1.8mm 2.8mm; font-family:'PC Pen'; font-size:10.5pt; color:#B4560E; line-height:1.4; }
+  .demo .d-wing{ font-size:7.8pt; color:var(--sub); line-height:1.65; border-left:0.3mm solid var(--line); padding-left:3mm; }
+  .demo .d-wing b{ color:var(--ink); display:block; font-size:8.2pt; }
+  .demo .d-qc{ border-top:0.35mm dashed #C8B98F; padding-top:2mm; font-family:'PC Serif'; font-size:8.4pt; }
+  .demo .d-qc .bt{ color:#9C6503; font-weight:900; font-size:8pt; font-family:'PC Sans'; margin-bottom:0.8mm; }
+  .demo .d-body{ font-family:'PC Serif'; font-size:8.8pt; line-height:1.8; }
+  .demo .d-step{ display:flex; align-items:center; gap:2.2mm; margin-bottom:1.6mm; }
+  .demo .d-step:last-child{ margin-bottom:0; }
+  .demo .d-step .sn{ color:#fff; font-weight:900; font-size:7.6pt; padding:1mm 2.6mm; border-radius:1.2mm; letter-spacing:0.03em; flex:0 0 auto; }
+  .demo .d-step .sd{ font-size:8.2pt; color:#3D4C58; font-family:'PC Serif'; }
+  .demo .d-sol{ font-family:'PC Serif'; font-size:8.4pt; line-height:1.7; }
+  .demo .d-sol .sno{ background:var(--unit); color:#fff; font-size:7.6pt; font-weight:900; border-radius:1mm; padding:0.4mm 1.8mm; margin-right:1.6mm; }
+  .demo .d-sol .wrong{ border-left:0.6mm solid #E3A0AC; padding-left:2.4mm; margin-top:1.4mm; font-size:8pt; }
+  .demo .d-sol .wrong .wt{ color:var(--point); font-weight:900; font-size:7.6pt; font-family:'PC Sans'; }
+  .demo .d-lab{ border:0.4mm solid var(--brand); border-radius:1.8mm; overflow:hidden; }
+  .demo .d-lab .lh{ background:var(--brand); color:#fff; font-size:8pt; font-weight:900; padding:1.4mm 2.6mm; }
+  .demo .d-lab .lb{ padding:1.8mm 2.6mm; font-family:'PC Serif'; font-size:8.2pt; line-height:1.7; }
+  .routine{ margin-top:7mm; border-top:0.5mm solid var(--brand); padding-top:4mm; }
+  .routine .r-t{ font-size:11.5pt; font-weight:900; color:var(--brand); margin-bottom:3.5mm; }
+  .r-flow{ display:flex; align-items:stretch; gap:2mm; }
+  .r-step{ flex:1; background:var(--unit-lt); border:0.35mm solid var(--unit-md); border-radius:2mm; padding:2.8mm 2.6mm; }
+  .r-step .rs-n{ font-family:'PC Serif'; font-size:12pt; font-weight:900; color:var(--unit); }
+  .r-step .rs-t{ font-size:9pt; font-weight:900; margin:0.8mm 0 1mm; }
+  .r-step .rs-d{ font-size:7.8pt; color:var(--sub); line-height:1.55; }
+  .r-arrow{ align-self:center; color:#8FA8EC; font-weight:900; font-size:10pt; flex:0 0 auto; }
+
+  /* ── p.6~7 대목차 ── */
+  .toc-note{ font-size:8pt; color:var(--sub); margin-top:2.5mm; }
+  .toc-note b{ color:#9C6503; }
+  .unit-block{ margin-top:6.5mm; }
+  .unit-head{ display:flex; align-items:baseline; gap:3.5mm; padding-bottom:2.2mm; border-bottom:0.6mm solid var(--uc,var(--unit)); }
+  .unit-head .uh-no{ font-family:'PC Serif'; font-size:16pt; font-weight:900; color:var(--uc,var(--unit)); }
+  .unit-head .uh-t{ font-size:14pt; font-weight:900; letter-spacing:-0.01em; }
+  .unit-head .uh-d{ font-family:'PC Serif'; font-size:8.6pt; color:var(--sub); margin-left:auto; }
+  .toc-row{ display:flex; align-items:baseline; gap:3.5mm; padding:3mm 1mm 2.8mm; border-bottom:0.3mm solid var(--line); }
+  .toc-row .tr-no{ font-family:'PC Serif'; font-size:11.5pt; font-weight:900; color:var(--uc,var(--unit)); width:8mm; flex:0 0 auto; }
+  .toc-row .tr-t{ font-size:10.5pt; font-weight:800; }
+  .toc-row .tr-done{ font-size:7pt; font-weight:900; color:#3E9C6E; border:0.3mm solid #A8D5BE; border-radius:3mm; padding:0.5mm 2mm; margin-left:2.5mm; vertical-align:1.5pt; }
+  .toc-row .tr-now{ font-size:7pt; font-weight:900; color:#fff; background:var(--accent); border-radius:3mm; padding:0.6mm 2.2mm; margin-left:2.5mm; vertical-align:1.5pt; }
+  .toc-row .tr-desc{ font-family:'PC Serif'; font-size:8.4pt; color:#4A5964; display:block; margin-top:0.9mm; }
+  .toc-row .tr-mid{ flex:1; min-width:0; }
+  .toc-row .tr-std{ font-size:7pt; color:var(--sub); flex:0 0 auto; }
+  .toc-row .tr-dots{ flex:0 0 14mm; border-bottom:0.35mm dotted #B8C2CA; align-self:flex-end; margin-bottom:1.4mm; margin-left:2mm; }
+  .toc-row .tr-pg{ font-family:'PC Serif'; font-size:10.5pt; font-weight:900; color:var(--uc,var(--unit)); width:9mm; text-align:right; flex:0 0 auto; }
+  .vol2{ margin-top:7mm; background:#F6F8FB; border:0.35mm solid var(--line); border-radius:2.5mm; padding:4mm 5mm; }
+  .vol2 .v2-t{ font-size:10.5pt; font-weight:900; color:var(--brand); margin-bottom:2.4mm; }
+  .vol2 .v2-grid{ display:grid; grid-template-columns:1fr 1fr 1fr; gap:4mm; }
+  .vol2 .v2-u{ font-size:8.8pt; font-weight:900; margin-bottom:1.4mm; }
+  .vol2 li{ list-style:none; font-family:'PC Serif'; font-size:8.2pt; color:#3D4C58; line-height:1.7; padding-left:3mm; position:relative; }
+  .vol2 li::before{ content:""; position:absolute; left:0; top:2.6mm; width:1.3mm; height:1.3mm; background:var(--unit-md); border-radius:50%; }
+
+  /* ── p.8 일러두기 ── */
+  .notice{ margin-top:6mm; }
+  .notice .n-item{ display:flex; gap:3.5mm; margin-bottom:4.5mm; }
+  .notice .n-no{ flex:0 0 auto; width:6.5mm; height:6.5mm; border-radius:50%; border:0.45mm solid var(--brand); color:var(--brand); font-weight:900; font-size:9pt; display:flex; align-items:center; justify-content:center; }
+  .notice .n-t{ font-weight:900; font-size:10pt; margin-bottom:1mm; }
+  .notice .n-d{ font-family:'PC Serif'; font-size:9.2pt; line-height:1.85; color:#3D4C58; }
+  .app-box{ margin-top:3mm; border:0.5mm solid var(--brand); border-radius:2.5mm; overflow:hidden; }
+  .app-box .ab-h{ background:var(--brand); color:#fff; font-weight:900; font-size:10.5pt; padding:2.4mm 4mm; }
+  .app-box .ab-b{ padding:3.4mm 4mm; font-family:'PC Serif'; font-size:9.2pt; line-height:1.85; }
+</style>
+</head>
+<body>
+
+<!-- ═════════════ p.1 표제지 ═════════════ -->
+<div class="page cover">
+  <div class="cover-inner">
+    <div class="brandmark"><span class="bm-sq"></span><span class="bm-t">박찬 과학</span></div>
+    <div class="cover-mid">
+      <div class="cover-edition">2022 개정 교육과정 · 2028 수능 체제</div>
+      <div class="cover-title">통합과학 <span class="num">1</span></div>
+      <div class="cover-tick"></div>
+      <div class="cover-sub">읽으면 강의가 되는 개념서.<br>개념의 흐름부터 수능 규격 문항까지, 이 한 권으로 완결.</div>
+      <div class="cover-tags">
+        <span class="cover-tag">과학의 기초</span>
+        <span class="cover-tag">물질과 규칙성</span>
+        <span class="cover-tag">시스템과 상호작용</span>
+      </div>
+      <div class="cover-author"><span class="role">지음</span>박찬</div>
+    </div>
+    <div class="cover-foot">
+      <div class="cf-l">교육부 고시 제2022-33호 [별책 9] 과학과 교육과정 준거<br>성취기준 16개 완전 커버리지 · 문항 전량 자체 제작</div>
+      <div class="cf-r">PARKCHAN SCIENCE</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═════════════ p.2 머리말 ═════════════ -->
+<div class="page">
+  <div class="kicker"><span class="kt">머리말</span></div>
+  <h1 class="fm"><span class="tick"></span>수업을, 그대로 책으로 옮겼습니다</h1>
+
+  <div class="preface-quote">"선생님, 외웠는데 시험만 보면 모르겠어요."<br>이 책은 그 한마디에서 시작되었습니다.</div>
+
+  <p class="body">오랫동안 강의실에서 학생들을 만나며 확인한 사실이 하나 있습니다. 학생들이 막히는 것은 개념이 어려워서가 아니라, 개념이 <b>이야기로 이어지지 않아서</b>라는 것입니다. 빅뱅과 스펙트럼과 주기율표를 따로따로 외운 학생은 시험장에서 무너지지만, "우주가 식으면서 원소가 생겼고, 그 원소의 규칙이 주기율표"라는 <b>흐름을 가진 학생은 처음 보는 문제 앞에서도 길을 찾습니다</b>.</p>
+  <p class="body">그래서 이 책의 본문은 개조식 요약이 아니라 <span class="kw">강의하듯 흐르는 문장</span>으로 썼습니다. 제가 칠판에 그리던 그림, 수업 중에 던지던 질문(바로바로 체크), 첨삭하며 건네던 말(박찬쌤 한마디), 시험 직전에 짚어 주던 포인트(시험엔 이렇게)까지 — 수업의 장면들을 지면 위에 그대로 옮겼습니다. 요약이 필요한 순간에는 <b>알짜 정리</b>가, 실전이 필요한 순간에는 <b>2028 수능 규격의 STEP 3</b>가 기다립니다.</p>
+  <p class="body">2028학년도 수능부터 통합과학은 <b>모든 수험생이 응시하는 공통 과목</b>이 됩니다. 고등학교에서 처음 만나는 과학이 두려움이 아니라 즐거움이 되도록, 그리고 이 책 한 권이면 다른 교재를 뒤적이지 않아도 되도록 — <b>정보의 누락 없이, 교육과정의 범위를 벗어나지 않게</b> 만들었습니다. 모든 문항의 정답 근거는 반드시 본문 안에 있습니다.</p>
+  <p class="body">과학은 세상을 읽는 가장 정직한 언어입니다. 이 책이 여러분의 첫 문장이 되기를 바랍니다.</p>
+
+  <div class="sign">
+    <div class="s-date">2026년 봄</div>
+    <div class="s-name"><small>지은이</small>박 찬</div>
+  </div>
+  <div class="folio"><span>박찬 과학 | 통합과학 1</span><span class="num">2</span></div>
+</div>
+
+<!-- ═════════════ p.3 2028 수능 안내 ═════════════ -->
+<div class="page">
+  <div class="kicker"><span class="kt">왜 지금, 통합과학인가</span></div>
+  <h1 class="fm"><span class="tick"></span>2028 수능, 통합과학은 전원 필수가 됩니다</h1>
+  <p class="lead">선택과목이 폐지되고, 문·이과 구분 없이 <b>모든 수험생이 통합과학에 응시</b>합니다.<br>범위는 통합과학1·2 — 바로 이 책이 다루는 내용입니다.</p>
+
+  <div class="bignum-row">
+    <div class="bignum"><div class="bn-v">100<small> %</small></div><div class="bn-l">전 수험생 공통 응시</div></div>
+    <div class="bignum"><div class="bn-v">25<small>문항</small></div><div class="bn-l">기존 과탐 20문항에서 확대</div></div>
+    <div class="bignum"><div class="bn-v">40<small>분</small></div><div class="bn-l">기존 30분에서 확대</div></div>
+    <div class="bignum"><div class="bn-v">3<small>단계</small></div><div class="bn-l">배점 1.5 / 2 / 2.5점</div></div>
+  </div>
+
+  <table class="fact-table">
+    <tr><th>응시 방식</th><td>선택과목 폐지 — <b>통합사회·통합과학을 전 수험생이 공통(필수) 응시</b></td></tr>
+    <tr><th>출제 범위</th><td>통합과학1·2 (고1 공통과목)</td></tr>
+    <tr><th>문항 유형</th><td>5지선다형, <b>ㄱ·ㄴ·ㄷ 합답형</b>이 핵심 유형 (평가원 예시문항 기준). 탐구 설계·자료 해석 문항 포함</td></tr>
+    <tr><th>평가</th><td>상대평가 9등급, 통합사회·통합과학 점수 별도 산출</td></tr>
+    <tr><th>첫 적용</th><td><b>2028학년도 수능</b> (2027년 11월 시행) — 이후 매년 동일 체제</td></tr>
+  </table>
+  <div class="fact-src">근거: 교육부 2028 대입 개편 확정안(2023.12.27), 문항 수·시간·배점 확정 발표(2025.1.20, 교육부·한국교육과정평가원)</div>
+
+  <div class="strategy">
+    <div class="st-t">이 책은 이렇게 대비합니다</div>
+    <ul>
+      <li><b>개념 완결</b> — 성취기준 전체를 서술형 본문으로 빠짐없이. 시험에 나오는데 본문에 없는 내용은 '결함'으로 취급해 만들었다.</li>
+      <li><b>실전 규격</b> — STEP 3는 수능 규격 그대로: ㄱㄴㄷ 합답형 + 자료 해석 + 배점(2 / 2.5점) 표기.</li>
+      <li><b>역추적 학습</b> — 모든 문항에 근거 개념 번호를 달아, 틀리면 곧바로 해당 개념으로 돌아가게 했다.</li>
+    </ul>
+  </div>
+  <div class="folio"><span>박찬 과학 | 통합과학 1</span><span class="num">3</span></div>
+</div>
+
+<!-- ═════════════ p.4 구성 소개 1 ═════════════ -->
+<div class="page">
+  <div class="kicker"><span class="kt">이 책의 구성 ①</span></div>
+  <h1 class="fm"><span class="tick"></span>개념을 읽는 시간</h1>
+  <p class="lead">소단원마다 도입 → 개념 → 자료 → 문제 → 해설 → MEMO의 리듬이 반복됩니다. 먼저 개념부의 장치들.</p>
+
+  <div class="guide-grid">
+    <div class="gcard">
+      <div class="gc-head"><span class="gc-no">1</span><span class="gc-t">강의체 본문</span><span class="gc-tag">읽는 개념</span></div>
+      <p class="gc-d">끊어 치는 요약이 아니라, 수업처럼 흐르는 문장. 새 용어는 처음 나올 때 반드시 풀어 설명합니다.</p>
+      <div class="demo"><div class="d-body">원시별이 계속 수축하여 중심부 온도가 <span class="u-amber">약 1000만 K</span>에 이르면, 드디어 <b>수소 핵융합 반응</b>이 시작된다…</div></div>
+    </div>
+    <div class="gcard">
+      <div class="gc-head"><span class="gc-no">2</span><span class="gc-t">날개 노트 · 중학 다시보기</span><span class="gc-tag">본문 옆</span></div>
+      <p class="gc-d">용어 풀이와 선수 개념 복습을 본문 바로 옆에. 페이지를 떠나지 않고 해결됩니다.</p>
+      <div class="demo"><div class="d-wing"><b>성운</b>우주 공간에 기체와 티끌이 구름처럼 모여 있는 것. 별이 태어나는 재료 창고다.</div></div>
+    </div>
+    <div class="gcard">
+      <div class="gc-head"><span class="gc-no">3</span><span class="gc-t">박찬쌤 한마디</span><span class="gc-tag">수업 멘트</span></div>
+      <p class="gc-d">수업 중 첨삭하듯 건네는 말. 어려운 고비마다 비유와 암기 포인트를 짚어 줍니다.</p>
+      <div class="demo"><div class="d-saem"><div class="avatar">박찬<br>쌤</div><div class="bubble">"족보 세 줄만 외워 — 수소는 빅뱅, 철까지는 별, 철 너머는 초신성."</div></div></div>
+    </div>
+    <div class="gcard">
+      <div class="gc-head"><span class="gc-no">4</span><span class="gc-t">알짜 정리</span><span class="gc-tag">요약</span></div>
+      <p class="gc-d">개념 두세 개마다 한 번, 시험에 나오는 뼈대만 3줄로. 별책 요약본과 앱의 원천 데이터이기도 합니다.</p>
+      <div class="demo"><div class="d-gist"><div class="bt">알 알짜 정리 ①</div>✓ 성운 수축 → 원시별 → 중심 약 1000만 K → 수소 핵융합 = 별</div></div>
+    </div>
+    <div class="gcard">
+      <div class="gc-head"><span class="gc-no">5</span><span class="gc-t">시험엔 이렇게</span><span class="gc-tag">출제 포인트</span></div>
+      <p class="gc-d">이 개념이 시험지에서 어떤 함정으로 변신하는지, 출제자의 눈으로 미리 경고합니다.</p>
+      <div class="demo"><div class="d-ex"><div class="bt">! 시험엔 이렇게</div>원소의 '출생지 바꿔치기'가 최다 빈출 — 핵융합은 철까지, 철보다 무거우면 초신성 폭발.</div></div>
+    </div>
+    <div class="gcard">
+      <div class="gc-head"><span class="gc-no">6</span><span class="gc-t">바로바로 체크</span><span class="gc-tag">즉석 OX</span></div>
+      <p class="gc-d">개념 페이지 하단의 3문항 OX. 읽은 자리에서 바로 확인 — 정답은 뒤집힌 글자로 살짝 숨겨 두었습니다.</p>
+      <div class="demo"><div class="d-qc"><div class="bt">✓ 바로바로 체크</div>1 별 내부의 핵융합으로 만들어질 수 있는 가장 무거운 원소는 철이다. ( O , X )</div></div>
+    </div>
+  </div>
+  <div class="folio"><span>박찬 과학 | 통합과학 1</span><span class="num">4</span></div>
+</div>
+
+<!-- ═════════════ p.5 구성 소개 2 ═════════════ -->
+<div class="page">
+  <div class="kicker"><span class="kt">이 책의 구성 ②</span></div>
+  <h1 class="fm"><span class="tick"></span>다루고, 풀고, 다시 보는 시간</h1>
+  <p class="lead">개념을 읽었다면 자료로 훈련하고, 3단계 문제로 완성하고, 해설로 한 번 더 배웁니다.</p>
+
+  <div class="guide-grid">
+    <div class="gcard">
+      <div class="gc-head"><span class="gc-no">7</span><span class="gc-t">자료 파헤치기</span><span class="gc-tag">탐구·자료</span></div>
+      <p class="gc-d">시험의 절반은 자료 해석. 대표 자료 하나를 '해석의 3단계'로 분해하고, 직접 해보기 활동으로 마무리합니다.</p>
+      <div class="demo"><div class="d-lab"><div class="lh">자료 파헤치기 — 별의 질량이 원소의 족보를 결정한다</div><div class="lb">① 질량부터 확인 → ② 만드는 원소 대조 → ③ 원소를 내보내는 방법</div></div></div>
+    </div>
+    <div class="gcard">
+      <div class="gc-head"><span class="gc-no">8</span><span class="gc-t">STEP 1 · 2 · 3</span><span class="gc-tag">3단계 문제</span></div>
+      <p class="gc-d">개념 확인(OX·빈칸) → 내신 완성(선다·서술형) → 수능 도전(ㄱㄴㄷ 합답형·배점 표기). 모든 문항에 근거 개념 번호가 달려 있습니다.</p>
+      <div class="demo">
+        <div class="d-step"><span class="sn" style="background:var(--unit);">STEP 1</span><span class="sd">개념 확인 — OX와 빈칸으로 점검</span></div>
+        <div class="d-step"><span class="sn" style="background:var(--brand);">STEP 2</span><span class="sd">내신 완성 — 학교 시험 유형 그대로</span></div>
+        <div class="d-step"><span class="sn" style="background:var(--point);">STEP 3</span><span class="sd">수능 도전 — 2028 수능 규격</span></div>
+      </div>
+    </div>
+    <div class="gcard">
+      <div class="gc-head"><span class="gc-no">9</span><span class="gc-t">알짜 해설</span><span class="gc-tag">오답 분석</span></div>
+      <p class="gc-d">정답 해설로 끝내지 않습니다. 오답 선지가 '왜' 틀렸는지, 어떤 함정이었는지까지 — 맞힌 문제도 해설로 한 번 더.</p>
+      <div class="demo"><div class="d-sol"><span class="sno">7</span><b>②</b> 핵융합은 가벼운 원자핵이 융합해 무거운 원자핵이 되는 반응이다.<div class="wrong"><span class="wt">오답 왜 틀렸나</span> ① 철은 핵융합의 종착점 — 탄소보다 먼저일 수 없다.</div></div></div>
+    </div>
+    <div class="gcard">
+      <div class="gc-head"><span class="gc-no">10</span><span class="gc-t">MEMO</span><span class="gc-tag">기록</span></div>
+      <p class="gc-d">소단원 끝의 기록 페이지. 헷갈린 개념, 다시 틀린 문제 번호, 나만의 암기법을 남기는 자리입니다.</p>
+      <div class="demo"><div class="d-body" style="font-family:'PC Pen'; font-size:11pt; color:#B4560E;">"틀린 문제를 적어 두는 사람과 그냥 넘기는 사람의 차이가, 시험장에서의 차이가 된다."</div></div>
+    </div>
+  </div>
+
+  <div class="routine">
+    <div class="r-t">추천 학습 루틴 — 한 소단원, 네 번의 만남</div>
+    <div class="r-flow">
+      <div class="r-step"><div class="rs-n">1</div><div class="rs-t">읽는다</div><div class="rs-d">본문을 강의 듣듯 통독, 바로바로 체크로 즉석 확인</div></div>
+      <span class="r-arrow">→</span>
+      <div class="r-step"><div class="rs-n">2</div><div class="rs-t">정리한다</div><div class="rs-d">알짜 정리·시험엔 이렇게만 다시 훑기 (10분)</div></div>
+      <span class="r-arrow">→</span>
+      <div class="r-step"><div class="rs-n">3</div><div class="rs-t">푼다</div><div class="rs-d">STEP 1→3 순서로. 막히면 개념 번호 따라 복귀</div></div>
+      <span class="r-arrow">→</span>
+      <div class="r-step"><div class="rs-n">4</div><div class="rs-t">다시 본다</div><div class="rs-d">해설의 오답 분석 정독, MEMO에 흔적 남기기</div></div>
+    </div>
+  </div>
+  <div class="folio"><span>박찬 과학 | 통합과학 1</span><span class="num">5</span></div>
+</div>
+
+<!-- ═════════════ p.6 대목차 1 ═════════════ -->
+<div class="page">
+  <div class="kicker"><span class="kt">차례</span></div>
+  <h1 class="fm"><span class="tick"></span>통합과학 1</h1>
+  <div class="toc-note">쪽수는 조판 가안입니다 — 전 단원 집필 완료 후 확정됩니다. <b>✓ 집필 완료</b> 표시는 현재 진행 상황.</div>
+
+  <div class="unit-block" style="--uc:var(--u1);">
+    <div class="unit-head"><span class="uh-no">I</span><span class="uh-t">과학의 기초</span><span class="uh-d">자연을 재고, 기록하고, 소통하는 법</span></div>
+    <div class="toc-row"><span class="tr-no">01</span><span class="tr-mid"><span class="tr-t">자연을 재는 눈 — 시간과 공간</span><span class="tr-desc">시공간의 규모, 길이와 시간을 재는 현대적 방법</span></span><span class="tr-std">10통과1-01-01</span><span class="tr-dots"></span><span class="tr-pg">9</span></div>
+    <div class="toc-row"><span class="tr-no">02</span><span class="tr-mid"><span class="tr-t">기본량과 단위</span><span class="tr-desc">7가지 기본량(SI), 단위가 자연을 기술하는 방식</span></span><span class="tr-std">10통과1-01-02</span><span class="tr-dots"></span><span class="tr-pg">22</span></div>
+    <div class="toc-row"><span class="tr-no">03</span><span class="tr-mid"><span class="tr-t">측정과 어림, 측정 표준</span><span class="tr-desc">측정·어림의 의미, 측정 표준은 왜 필요한가</span></span><span class="tr-std">10통과1-01-03</span><span class="tr-dots"></span><span class="tr-pg">35</span></div>
+    <div class="toc-row"><span class="tr-no">04</span><span class="tr-mid"><span class="tr-t">정보와 신호, 디지털 문명</span><span class="tr-desc">측정에서 정보로, 아날로그에서 디지털로</span></span><span class="tr-std">10통과1-01-04</span><span class="tr-dots"></span><span class="tr-pg">48</span></div>
+  </div>
+
+  <div class="unit-block" style="--uc:var(--unit);">
+    <div class="unit-head"><span class="uh-no">II</span><span class="uh-t">물질과 규칙성</span><span class="uh-d">우주의 시작에서 첨단 신소재까지, 원소의 여정</span></div>
+    <div class="toc-row"><span class="tr-no">01</span><span class="tr-mid"><span class="tr-t">우주의 시작과 원소의 탄생<span class="tr-done">✓ 집필 완료</span></span><span class="tr-desc">빅뱅에서 수소·헬륨의 탄생까지 — 별빛의 지문으로 확인한다</span></span><span class="tr-std">10통과1-02-01</span><span class="tr-dots"></span><span class="tr-pg">61</span></div>
+    <div class="toc-row"><span class="tr-no">02</span><span class="tr-mid"><span class="tr-t">별에서 만들어지는 원소<span class="tr-done">✓ 집필 완료</span></span><span class="tr-desc">탄소부터 철, 금까지 — 무거운 원소의 고향인 별의 일생</span></span><span class="tr-std">10통과1-02-02</span><span class="tr-dots"></span><span class="tr-pg">73</span></div>
+    <div class="toc-row"><span class="tr-no">03</span><span class="tr-mid"><span class="tr-t">원소의 주기성과 화학 결합<span class="tr-done">✓ 집필 완료</span></span><span class="tr-desc">주기율표의 규칙, 원자들이 손잡는 두 가지 방식</span></span><span class="tr-std">10통과1-02-03 · 04</span><span class="tr-dots"></span><span class="tr-pg">86</span></div>
+    <div class="toc-row"><span class="tr-no">04</span><span class="tr-mid"><span class="tr-t">지각과 생명체를 이루는 물질의 규칙성</span><span class="tr-desc">광물도 단백질도 DNA도 — 단위체 결합이라는 같은 원리</span></span><span class="tr-std">10통과1-02-05</span><span class="tr-dots"></span><span class="tr-pg">100</span></div>
+    <div class="toc-row"><span class="tr-no">05</span><span class="tr-mid"><span class="tr-t">물질의 전기적 성질과 신소재</span><span class="tr-desc">반도체는 왜 특별할까 — 전기적 성질이 만든 첨단 기술</span></span><span class="tr-std">10통과1-02-06</span><span class="tr-dots"></span><span class="tr-pg">113</span></div>
+  </div>
+
+  <div class="folio"><span>박찬 과학 | 통합과학 1</span><span class="num">6</span></div>
+</div>
+
+<!-- ═════════════ p.7 대목차 2 ═════════════ -->
+<div class="page">
+  <div class="unit-block" style="--uc:var(--u3); margin-top:0;">
+    <div class="unit-head"><span class="uh-no">III</span><span class="uh-t">시스템과 상호작용</span><span class="uh-d">지구, 운동, 생명 — 시스템으로 읽는 자연</span></div>
+    <div class="toc-row"><span class="tr-no">01</span><span class="tr-mid"><span class="tr-t">지구시스템과 에너지·물질 순환</span><span class="tr-desc">기권·수권·지권·생물권·외권, 권역들의 상호작용</span></span><span class="tr-std">10통과1-03-01</span><span class="tr-dots"></span><span class="tr-pg">126</span></div>
+    <div class="toc-row"><span class="tr-no">02</span><span class="tr-mid"><span class="tr-t">판구조론과 지권의 변화</span><span class="tr-desc">판 경계 3종, 지진과 화산은 왜 그곳에서 일어나는가</span></span><span class="tr-std">10통과1-03-02</span><span class="tr-dots"></span><span class="tr-pg">139</span></div>
+    <div class="toc-row"><span class="tr-no">03</span><span class="tr-mid"><span class="tr-t">중력과 운동</span><span class="tr-desc">자유 낙하에서 인공위성까지, 중력이 만드는 운동</span></span><span class="tr-std">10통과1-03-03</span><span class="tr-dots"></span><span class="tr-pg">152</span></div>
+    <div class="toc-row"><span class="tr-no">04</span><span class="tr-mid"><span class="tr-t">운동량과 충격량</span><span class="tr-desc">에어백과 안전모의 과학 — 충돌을 다스리는 법</span></span><span class="tr-std">10통과1-03-04</span><span class="tr-dots"></span><span class="tr-pg">165</span></div>
+    <div class="toc-row"><span class="tr-no">05</span><span class="tr-mid"><span class="tr-t">생명 시스템과 화학 반응</span><span class="tr-desc">세포 속 물질대사, 효소가 일하는 방식</span></span><span class="tr-std">10통과1-03-05</span><span class="tr-dots"></span><span class="tr-pg">178</span></div>
+    <div class="toc-row"><span class="tr-no">06</span><span class="tr-mid"><span class="tr-t">유전자에서 단백질까지</span><span class="tr-desc">세포 내 정보의 흐름 — DNA에서 형질이 되기까지</span></span><span class="tr-std">10통과1-03-06</span><span class="tr-dots"></span><span class="tr-pg">191</span></div>
+  </div>
+
+  <div class="vol2">
+    <div class="v2-t">통합과학 2에서 이어집니다 (별권)</div>
+    <div class="v2-grid">
+      <div>
+        <div class="v2-u">I. 변화와 다양성</div>
+        <ul><li>지질시대와 생물의 변천</li><li>진화와 생물다양성</li><li>산화와 환원</li><li>산·염기와 중화 반응</li><li>화학 변화와 에너지 출입</li></ul>
+      </div>
+      <div>
+        <div class="v2-u">II. 환경과 에너지</div>
+        <ul><li>생태계의 구성과 상호 관계</li><li>생태계 평형</li><li>지구온난화와 기후변화</li><li>태양 에너지와 에너지 전환</li><li>발전과 에너지의 효율적 이용</li></ul>
+      </div>
+      <div>
+        <div class="v2-u">III. 과학과 미래 사회</div>
+        <ul><li>감염병과 과학의 유용성</li><li>빅데이터와 인공지능·로봇</li><li>과학기술과 윤리</li></ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="folio"><span>박찬 과학 | 통합과학 1</span><span class="num">7</span></div>
+</div>
+
+<!-- ═════════════ p.8 일러두기 ═════════════ -->
+<div class="page">
+  <div class="kicker"><span class="kt">일러두기</span></div>
+  <h1 class="fm"><span class="tick"></span>이 책의 약속</h1>
+
+  <div class="notice">
+    <div class="n-item"><span class="n-no">1</span><div><div class="n-t">교육과정이 기준입니다</div><div class="n-d">교육부 고시 제2022-33호 [별책 9] 과학과 교육과정의 성취기준 순서와 범위를 그대로 따랐습니다. 교육과정이 "다루지 않는다"고 정한 내용은 이 책에도 없습니다 — 시험에 나오지 않는 과잉 학습으로 시간을 뺏지 않기 위해서입니다.</div></div></div>
+    <div class="n-item"><span class="n-no">2</span><div><div class="n-t">정답의 근거는 반드시 본문에 있습니다</div><div class="n-d">모든 문항은 집필 시 '정답 근거 역추적 검사'를 거칩니다. 문제를 풀다 근거를 찾고 싶으면 문항에 달린 개념 번호를 따라가면 됩니다.</div></div></div>
+    <div class="n-item"><span class="n-no">3</span><div><div class="n-t">문항은 전량 자체 제작입니다</div><div class="n-d">기출 문제의 무단 수록·변형 없이, 기출 분석을 바탕으로 출제 경향을 겨냥해 새로 만들었습니다. STEP 3는 2028 수능 규격(ㄱㄴㄷ 합답형, 배점 1.5/2/2.5점)을 따릅니다.</div></div></div>
+    <div class="n-item"><span class="n-no">4</span><div><div class="n-t">그림은 칠판에 옮길 수 있게</div><div class="n-d">모든 그림에는 읽는 순서(좌→우, 번호, 화살표)가 있고, 직접 따라 그릴 수 있는 단순한 구조로 그렸습니다. 그려 본 그림은 잊히지 않습니다.</div></div></div>
+  </div>
+
+  <div class="app-box">
+    <div class="ab-h">박찬 과학 앱과 함께 쓰면</div>
+    <div class="ab-b">책의 모든 알짜 정리와 문항이 앱에 들어 있습니다. <b>1일 1문제</b>로 매일 감을 유지하고, 소단원을 선택하면 <b>알짜 요약</b>을 언제든 다시 볼 수 있으며, 틀린 문제는 해당 개념으로 자동 연결됩니다. 모의고사 모드는 2028 수능 규격(25문항·40분)으로 실전을 재현합니다.</div>
+  </div>
+
+  <div class="pen" style="text-align:right; margin-top:5mm;">"책은 뼈대, 앱은 근육. 같이 쓰면 완성이다. — 박찬쌤"</div>
+  <div class="folio"><span>박찬 과학 | 통합과학 1</span><span class="num">8</span></div>
+</div>
+
+</body>
+</html>
