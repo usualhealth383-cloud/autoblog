@@ -1,0 +1,1092 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<title>박찬 과학 통합과학1 — III-01 지구시스템과 에너지·물질 순환</title>
+<style>
+  @font-face { font-family:'PC Sans'; src:url('file:///root/.fonts/NotoSansKR.ttf'); font-weight:100 900; }
+  @font-face { font-family:'PC Serif'; src:url('file:///root/.fonts/NotoSerifKR.ttf'); font-weight:100 900; }
+  @font-face { font-family:'PC Pen'; src:url('file:///root/.fonts/YeonSung-Regular.ttf'); font-weight:400; }
+
+  :root{
+    --brand:#0E5A6B;        /* 박찬 과학 브랜드 딥틸 */
+    --brand-lt:#E3F0F3;
+    --unit:#6B46C8;         /* II. 물질과 규칙성 단원 컬러 */
+    --unit-lt:#F2EDFB;
+    --unit-md:#CFC0EE;
+    --accent:#E8940A;       /* 알짜 앰버 */
+    --accent-lt:#FDF3E0;
+    --point:#D6455D;        /* 시험 포인트 */
+    --point-lt:#FBEBEE;
+    --ink:#22303A;
+    --sub:#5B6B77;
+    --line:#D8E0E5;
+  }
+  *{ box-sizing:border-box; margin:0; padding:0; -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+  @page{ size:210mm 275mm; margin:0; }
+  html,body{ font-family:'PC Sans',sans-serif; color:var(--ink); }
+
+  .page{ width:210mm; height:275mm; position:relative; overflow:hidden; background:#fff; page-break-after:always; padding:14mm 13mm 19mm 15mm; display:flex; flex-direction:column; }
+
+  /* ── 러닝 헤드 / 풋 ── */
+  .runhead{ display:flex; align-items:center; justify-content:space-between; border-bottom:0.35mm solid var(--unit); padding-bottom:2mm; margin-bottom:6.5mm; }
+  .runhead .unit-tag{ font-size:8.5pt; font-weight:700; color:var(--unit); letter-spacing:0.02em; }
+  .runhead .lesson-tag{ font-size:8.5pt; color:var(--sub); }
+  .folio{ position:absolute; bottom:7mm; left:0; right:0; display:flex; justify-content:space-between; padding:0 14mm 0 14mm; font-size:8pt; color:var(--sub); }
+  .folio .num{ font-weight:800; color:var(--unit); font-size:10pt; }
+
+  /* ── 본문 그리드: 본문 + 날개단 ── */
+  .cols{ display:grid; grid-template-columns:1fr 43mm; gap:8mm; flex:1; min-height:0; margin-bottom:4mm; }
+  .main{ min-width:0; }
+  .wing{ border-left:0.3mm solid var(--line); padding-left:5mm; font-size:8.2pt; color:var(--sub); line-height:1.7; }
+
+  /* ── 타이포 ── */
+  h2.lesson-title{ display:flex; align-items:baseline; gap:3.5mm; margin-bottom:2mm; }
+  h2.lesson-title .no{ background:var(--unit); color:#fff; font-size:13pt; font-weight:900; padding:1.2mm 3.2mm; border-radius:1.5mm; }
+  h2.lesson-title .tt{ font-size:16.5pt; font-weight:900; letter-spacing:-0.01em; }
+  .std-badges{ display:flex; gap:2mm; margin:2mm 0 6.5mm; }
+  .std{ font-size:7.4pt; color:var(--unit); background:none; border:0.3mm solid var(--unit-md); border-radius:5mm; padding:0.6mm 2.8mm; font-weight:600; }
+
+  h3.sec{ display:flex; align-items:baseline; gap:3mm; font-size:12.5pt; font-weight:800; margin:9mm 0 3.6mm; letter-spacing:-0.01em; }
+  h3.sec .n{ font-family:'PC Serif'; font-size:15.5pt; font-weight:900; color:var(--unit); border-bottom:0.7mm solid var(--accent); padding:0 0.8mm 0.2mm; flex:0 0 auto; line-height:1; }
+  h3.sec::after{ content:""; flex:1; border-top:0.25mm solid var(--line); align-self:center; margin-left:2mm; }
+  h3.sec:first-child{ margin-top:0; }
+
+  p.body{ font-family:'PC Serif'; font-size:9.6pt; line-height:1.92; margin-bottom:3.6mm; text-align:justify; }
+  p.body b{ font-weight:800; }
+  .kw{ font-weight:800; color:var(--unit); }
+  .u-amber{ background:#F8E9C6; font-weight:700; padding:0.15mm 0.6mm; border-radius:0.6mm; box-decoration-break:clone; -webkit-box-decoration-break:clone; }
+
+  ul.pts{ font-family:'PC Serif'; font-size:9.6pt; line-height:1.84; margin:1.5mm 0 3.5mm 1mm; list-style:none; }
+  ul.pts li{ padding-left:4.5mm; position:relative; margin-bottom:1.8mm; }
+  ul.pts li::before{ content:""; position:absolute; left:0.5mm; top:2.9mm; width:1.7mm; height:1.7mm; background:var(--accent); border-radius:50%; }
+
+  /* ── 코너 박스 ── */
+  .boxtitle{ display:inline-flex; align-items:center; gap:1.8mm; font-weight:900; font-size:9.5pt; margin-bottom:1.6mm; }
+  .boxtitle .ico{ width:5.2mm; height:5.2mm; border-radius:1.2mm; display:flex; align-items:center; justify-content:center; color:#fff; font-size:7.5pt; font-weight:900; }
+
+  .gist{ background:none; border:none; border-top:0.5mm solid var(--accent); border-bottom:0.5mm solid var(--accent); border-radius:0; padding:3.2mm 1.8mm 3mm; margin:6mm 0 5mm; }
+  .gist .boxtitle{ color:#9C6503; } .gist .ico{ background:var(--accent); }
+  .gist ul{ list-style:none; font-family:'PC Serif'; font-size:9.3pt; line-height:1.78; }
+  .gist li{ padding-left:4.2mm; position:relative; margin-bottom:1.2mm;}
+  .gist li::before{ content:"✓"; position:absolute; left:0; color:var(--accent); font-weight:900; }
+
+  .expoint{ background:none; border-left:0.5mm solid #D998A4; border-left-color:#D998A4; border-radius:0; padding:1.4mm 0 1.4mm 3.6mm; margin:4.5mm 0; }
+  .expoint .boxtitle{ color:#A9556A; font-size:8.6pt; margin-bottom:1mm;}
+  .expoint .ico{ background:none; color:#A9556A; border:0.35mm solid #D998A4; width:4.4mm; height:4.4mm; border-radius:50%; font-size:7pt; }
+  .expoint p{ font-family:'PC Serif'; font-size:8.9pt; line-height:1.7; }
+
+  .pen{ font-family:'PC Pen'; font-size:12pt; color:#B4560E; line-height:1.45; }
+  .saem{ display:flex; gap:3mm; align-items:flex-start; margin:4.5mm 0; }
+  .saem .avatar{ flex:0 0 auto; width:10.5mm; height:10.5mm; border-radius:50%; background:var(--brand); color:#fff; font-size:7pt; font-weight:800; display:flex; align-items:center; justify-content:center; line-height:1.35; letter-spacing:0.04em; text-align:center; border:0.5mm solid var(--accent); box-sizing:border-box;}
+  .saem .bubble{ background:#FFFBF0; border:0.4mm solid #EBCB9C; border-radius:3mm; padding:2.2mm 3.6mm 2mm; position:relative; }
+  .saem .bubble::before{ content:""; position:absolute; left:-1.8mm; top:3.2mm; width:3mm; height:3mm; background:#FFFBF0; border-left:0.4mm solid #EBCB9C; border-bottom:0.4mm solid #EBCB9C; transform:rotate(45deg); }
+
+  .wing .wtitle{ font-size:8pt; font-weight:900; color:var(--brand); display:flex; align-items:center; gap:1.5mm; margin:0 0 2.4mm; letter-spacing:0.05em; }
+  .wing .wtitle::before{ content:""; width:2.4mm; height:2.4mm; background:var(--accent); border-radius:50%; }
+  .wing .term{ margin-bottom:3.6mm; }
+  .wing .term b{ color:var(--ink); font-weight:800; display:block; font-size:8.5pt; margin-bottom:0.7mm;}
+  .wing .wsep{ border-top:0.3mm dashed var(--line); margin:4.5mm 0; }
+  .wing .wing-pen{ font-family:'PC Pen'; font-size:11pt; color:#B4560E; line-height:1.45; }
+
+  figure{ margin:5mm 0; }
+  figure figcaption{ font-size:8pt; color:var(--sub); text-align:center; margin-top:2mm; }
+  figure svg{ display:block; margin:0 auto; }
+
+  /* ── 비교형 그림 (2패널 + 범례) ── */
+  .fig-duo{ display:flex; align-items:stretch; gap:2.5mm; justify-content:center; }
+  .fig-duo .panel{ flex:0 0 auto; text-align:center; }
+  .fig-duo .p-title{ font-size:9pt; font-weight:900; color:var(--ink); margin-top:1.6mm; }
+  .fig-duo .p-sub{ font-size:7.8pt; color:var(--sub); line-height:1.45; margin-top:0.5mm; }
+  .fig-duo .mid{ display:flex; flex-direction:column; align-items:center; justify-content:center; gap:1mm; padding:0 1mm; }
+  .fig-duo .mid .mlab{ font-size:7.6pt; font-weight:800; color:var(--unit); text-align:center; line-height:1.3; }
+  .fig-legend{ display:flex; justify-content:center; gap:5mm; font-size:7.8pt; color:var(--ink); margin-top:1.2mm; align-items:center; }
+  .fig-legend span{ display:inline-flex; align-items:center; gap:1.4mm; }
+
+  /* ── 탐구 (자료 파헤치기) ── */
+  .lab{ border:0.5mm solid var(--brand); border-radius:2.5mm; overflow:hidden; margin-top:1mm;}
+  .lab .lab-head{ background:var(--brand); color:#fff; padding:2.2mm 4mm; font-weight:900; font-size:11pt; display:flex; align-items:center; gap:2.5mm;}
+  .lab .lab-head .tag{ font-size:7.5pt; background:rgba(255,255,255,.22); padding:0.6mm 2.4mm; border-radius:4mm; font-weight:700;}
+  .lab .lab-body{ padding:3.5mm 4mm; }
+  .lab h4{ font-size:9.6pt; font-weight:900; color:var(--brand); margin:2.5mm 0 1.4mm; }
+  .lab h4:first-child{ margin-top:0; }
+  .lab p, .lab li{ font-family:'PC Serif'; font-size:9.3pt; line-height:1.8; }
+  .lab ol{ margin-left:5mm; }
+
+  /* ── 문제부 ── */
+  .step-head{ display:flex; align-items:center; gap:3mm; margin:0 0 5mm; }
+  .step-head .stepno{ background:var(--unit); color:#fff; font-weight:900; font-size:9.5pt; padding:1.4mm 3.4mm; border-radius:1.5mm; letter-spacing:0.04em;}
+  .step-head .steptt{ font-size:12.5pt; font-weight:900; }
+  .step-head .stepdesc{ font-size:8.2pt; color:var(--sub); margin-left:auto; }
+  .step-head.s2 .stepno{ background:var(--brand); }
+  .step-head.s3 .stepno{ background:var(--point); }
+
+  .q{ margin-bottom:7.5mm; break-inside:avoid; }
+  .q .qhead{ display:flex; gap:2.4mm; align-items:flex-start; }
+  .q .qno{ flex:0 0 auto; min-width:6.2mm; height:6.2mm; border:0.45mm solid var(--unit); color:var(--unit); border-radius:50%; font-size:8.6pt; font-weight:900; line-height:1; display:flex; align-items:center; justify-content:center; padding-top:0.55mm; margin-top:0.4mm;}
+  .q .stem{ font-family:'PC Serif'; font-size:9.5pt; line-height:1.74; font-weight:500; }
+  .q .stem .difficulty{ color:#C9A227; font-size:8pt; letter-spacing:0.06em; margin-left:1.5mm;}
+  .q .tags{ margin-top:0.8mm; font-size:7pt; color:var(--sub); font-family:'PC Sans';}
+  .choices{ list-style:none; margin:2.2mm 0 0 8.6mm; font-family:'PC Serif'; font-size:9.3pt; line-height:1.85; }
+  .choices.inline{ display:flex; flex-wrap:wrap; gap:0 6mm; }
+  .bogi-box{ border:0.35mm solid #B8C2CA; border-radius:0; margin:2.5mm 0 0 8.6mm; padding:2.4mm 3.2mm; font-family:'PC Serif'; font-size:9.2pt; line-height:1.8; background:none;}
+  .bogi-box .bt{ text-align:center; font-weight:800; color:var(--sub); font-size:8.4pt; margin-bottom:0.8mm; letter-spacing:0.3em;}
+  .ox-answer{ margin-left:2mm; color:var(--sub); font-size:9pt; }
+  .blankline{ display:inline-block; min-width:14mm; border-bottom:0.4mm solid var(--ink); }
+  .qgrid{ display:grid; grid-template-columns:1fr 1fr; gap:0 9mm; }
+  .essay-lines{ margin:2mm 0 0 8.4mm; }
+  .essay-lines div{ border-bottom:0.3mm solid var(--line); height:6.2mm; }
+  .badge-essay{ display:inline-block; background:var(--point); color:#fff; font-size:7pt; font-weight:800; padding:0.4mm 2mm; border-radius:1mm; vertical-align:1pt; margin-right:1.2mm;}
+  .badge-data{ display:inline-block; background:var(--brand); color:#fff; font-size:7pt; font-weight:800; padding:0.4mm 2mm; border-radius:1mm; vertical-align:1pt; margin-right:1.2mm;}
+
+  /* ── 해설부 ── */
+  .sol-head{ display:flex; align-items:center; gap:3mm; margin-bottom:4mm;}
+  .sol-head .stt{ font-size:14.5pt; font-weight:900; color:var(--brand);}
+  .sol-head .sub{ font-size:8.5pt; color:var(--sub);}
+  .anstable{ width:100%; border-collapse:collapse; margin-bottom:4.5mm; }
+  .anstable th,.anstable td{ border:0.3mm solid var(--line); font-size:8.8pt; padding:1.4mm 0; text-align:center; }
+  .anstable th{ background:var(--brand-lt); color:var(--brand); font-weight:800; }
+  .anstable td.a{ font-weight:900; color:var(--unit); }
+  .sol{ margin-bottom:5mm; break-inside:avoid; }
+  .sol .shead{ display:flex; align-items:center; gap:2mm; margin-bottom:1.4mm;}
+  .sol .sno{ background:var(--unit); color:#fff; min-width:6mm; height:5.4mm; border-radius:1.2mm; font-size:8.6pt; font-weight:900; line-height:1; display:flex; align-items:center; justify-content:center; padding:0.5mm 1.5mm 0;}
+  .sol .sans{ font-weight:900; color:var(--unit); font-size:9.6pt;}
+  .sol .slink{ font-size:7.2pt; color:var(--sub); margin-left:auto;}
+  .sol p{ font-family:'PC Serif'; font-size:9.1pt; line-height:1.76; margin-bottom:0.8mm; }
+  .wrongbox{ background:none; border:none; border-left:0.7mm solid #E3A0AC; border-radius:0; padding:1mm 0 1mm 3mm; margin-top:2mm;}
+  .wrongbox .wt{ font-size:8pt; font-weight:900; color:var(--point); margin-bottom:0.8mm; font-family:'PC Sans';}
+  .wrongbox p{ font-family:'PC Serif'; font-size:8.6pt; line-height:1.68; margin-bottom:0.9mm;}
+  .wrongbox p:last-child{ margin-bottom:0; }
+  .solcols{ display:grid; grid-template-columns:1fr 1fr; gap:0 9mm; }
+
+  /* ── 단원 도입 (타이포그래피 중심) ── */
+  .opener{ padding:0 0 19mm; }
+  .opener-hero{ position:relative; padding:7mm 20mm 4.5mm; overflow:hidden; flex-shrink:0; }
+  .ghost-txt{ position:absolute; top:-10mm; right:6mm; font-size:118pt; font-weight:900; color:#EDF1FC; line-height:1; letter-spacing:-0.04em; }
+  .kicker{ display:flex; align-items:center; gap:4mm; position:relative; }
+  .kicker .kt{ font-size:9.5pt; font-weight:800; color:var(--unit); letter-spacing:0.24em; white-space:nowrap; }
+  .kicker::after{ content:""; flex:1; border-top:0.3mm solid var(--line); }
+  .opener-hero h1{ position:relative; font-size:36pt; font-weight:900; letter-spacing:-0.015em; margin:4mm 0 0; }
+  .opener-hero h1 .tick{ display:block; width:14mm; border-top:1.4mm solid var(--accent); margin-bottom:3.6mm; }
+  .opener-lede{ position:relative; font-family:'PC Serif'; font-size:10.2pt; font-weight:600; line-height:2.0; color:#3D4C58; max-width:138mm; margin-top:4mm; padding-left:5mm; border-left:0.8mm solid var(--accent); }
+  .opener-inner{ padding:0 20mm; }
+
+  /* ── 원소의 여정 스트립 ── */
+  .journey{ margin-top:3.5mm; }
+  .journey .j-label{ font-size:8pt; font-weight:800; color:var(--sub); letter-spacing:0.08em; margin-bottom:2.4mm; display:flex; align-items:center; gap:1.6mm;}
+  .journey .j-label::before{ content:""; width:2.4mm; height:2.4mm; background:var(--unit); border-radius:50%; }
+  .j-bar{ display:flex; align-items:center; gap:2mm; }
+  .j-chip{ flex:1; text-align:center; background:#F5F1FC; border:0.35mm solid #CFC0EE; color:#6B46C8; border-radius:1.6mm; padding:2.4mm 1mm 2mm; }
+  .j-chip .jc-t{ font-size:8.8pt; font-weight:800; display:block; }
+  .j-chip .jc-s{ font-size:6.8pt; color:var(--sub); display:block; margin-top:0.5mm; }
+  .j-chip.on{ background:var(--unit); border-color:var(--unit); }
+  .j-chip.on .jc-t{ color:#fff; }
+  .j-chip.on .jc-s{ color:#D9E2F8; }
+  .j-arrow{ flex:0 0 auto; color:#AB93E6; font-size:10pt; font-weight:900; }
+  .toc{ margin-top:5mm; }
+  .toc .toc-title{ font-size:11pt; font-weight:900; color:var(--ink); margin-bottom:3mm; display:flex; align-items:center; gap:2.5mm;}
+  .toc .toc-title::before{ content:""; width:3.4mm; height:3.4mm; background:var(--accent); border-radius:0.8mm; }
+  .toc-item{ display:flex; align-items:flex-start; gap:5mm; padding:2.8mm 6mm; border-bottom:0.3mm solid var(--line); }
+  .toc-item:first-of-type{ border-top:0.3mm solid var(--line); }
+  .toc-item.active{ background:#F5F1FC; border-left:1.2mm solid #9E85E0; }
+  .toc-item .tno{ font-family:'PC Serif'; font-weight:900; color:#9E85E0; font-size:14pt; width:10mm; line-height:1.1; flex:0 0 auto;}
+  .toc-item .tbody{ flex:1; min-width:0; }
+  .toc-item .ttt{ font-weight:800; font-size:10.5pt; letter-spacing:0.01em; display:flex; align-items:center;}
+  .toc-item .tdesc{ font-family:'PC Serif'; font-size:8.6pt; font-weight:600; color:#4A5964; margin-top:0.7mm; line-height:1.55;}
+  .toc-item .tstd{ font-size:7.2pt; color:var(--sub); flex:0 0 auto; padding-top:1.2mm;}
+  .toc-item.active .tag-now{ background:var(--accent); color:#fff; font-size:7pt; font-weight:900; border-radius:4mm; padding:0.7mm 2.6mm; margin-left:3.5mm;}
+  .toc-item .tag-done{ font-size:7.2pt; font-weight:800; color:#3E9C6E; margin-left:3.5mm; }
+  .opener-quote{ margin-top:4mm; text-align:center; font-family:'PC Serif'; font-size:9.8pt; font-weight:600; color:#4A5964; letter-spacing:0.01em; }
+  .opener-quote .who{ font-size:8pt; color:var(--sub); font-weight:400; margin-left:2.5mm; }
+  .qa-lead li .qgo{ font-family:'PC Sans'; font-size:7.4pt; font-weight:800; color:var(--unit); background:var(--unit-lt); border-radius:3mm; padding:0.5mm 2.2mm; margin-left:2mm; white-space:nowrap; vertical-align:1pt;}
+  .qa-lead{ margin-top:3.5mm; border:none; border-top:0.45mm solid var(--brand); border-bottom:0.45mm solid var(--brand); background:none; border-radius:0; padding:3mm 2mm 2.8mm; }
+  .qa-lead .qt{ font-weight:900; color:var(--brand); font-size:10.5pt; margin-bottom:2mm;}
+  .qa-lead li{ font-family:'PC Serif'; font-size:9.5pt; line-height:1.8; margin-left:5mm; }
+
+  /* ── 바로바로 체크 (개념 페이지 하단 즉석 OX) ── */
+  .quickcheck{ margin-top:auto; border-top:0.35mm dashed #C8B98F; padding-top:3mm; width:calc(100% - 51mm); }
+  .quickcheck .qc-title{ display:inline-flex; align-items:center; gap:1.6mm; font-size:8.2pt; font-weight:900; color:#9C6503; margin-bottom:1.4mm; }
+  .quickcheck .qc-title::before{ content:"✓"; color:var(--accent); font-weight:900; }
+  .quickcheck ol{ list-style:none; font-family:'PC Serif'; font-size:8.8pt; line-height:1.75; }
+  .quickcheck li{ display:flex; gap:2mm; align-items:baseline; }
+  .quickcheck li .no{ font-weight:800; color:var(--accent); flex:0 0 auto; }
+  .quickcheck .qc-ans{ margin-top:1mm; font-size:7.2pt; color:var(--sub); transform:rotate(180deg); text-align:left; }
+
+  /* ── 중학 과학 다시보기 (날개단) ── */
+  .wing .review{ background:#F6F3EC; border-radius:1.8mm; padding:2.8mm 3mm; margin-top:1mm; }
+  .wing .review .rv-title{ font-size:7.8pt; font-weight:900; color:#7A6A45; margin-bottom:1.4mm; display:flex; align-items:center; gap:1.4mm;}
+  .wing .review .rv-title::before{ content:"↺"; font-weight:900; color:#A08A55; }
+
+  /* ── MEMO 페이지 ── */
+  .memo-head{ display:flex; align-items:baseline; gap:3.5mm; margin-bottom:5mm; }
+  .memo-head .mt{ font-size:17pt; font-weight:900; color:var(--brand); letter-spacing:0.22em; }
+  .memo-head .ms{ font-size:8.6pt; color:var(--sub); }
+  .memo-area{ flex:1; border:0.4mm solid var(--line); border-radius:2.5mm;
+    background-image:linear-gradient(to bottom, transparent calc(100% - 0.3mm), #DCE4E9 0);
+    background-size:100% 9mm; background-position:0 4mm; padding:0 5mm; margin-bottom:4mm; }
+  .memo-pen{ font-family:'PC Pen'; font-size:12.5pt; color:#B4560E; text-align:right; }
+</style>
+</head>
+<body>
+
+<!-- ═════════════ p.76 대단원 III + 소단원 도입 ═════════════ -->
+<div class="page opener">
+  <div class="opener-hero">
+    <div class="ghost-txt">III</div>
+    <div class="kicker"><span class="kt">통합과학 1 · 대단원</span></div>
+    <h1><span class="tick"></span>시스템과 상호작용</h1>
+    <p class="opener-lede">지구도, 날아가는 공도, 세포 하나도 — 홀로 있는 것은 없다.<br>
+    연결과 상호작용의 눈으로 보면, 따로 놀던 현상들이 하나의 이야기가 된다.</p>
+  </div>
+
+  <div class="opener-inner">
+    <div class="journey">
+      <div class="j-label">시스템의 연결 — 이 단원의 큰 그림</div>
+      <div class="j-bar">
+        <div class="j-chip on"><span class="jc-t">지구시스템</span><span class="jc-s">다섯 권역의 교환</span></div>
+        <span class="j-arrow">→</span>
+        <div class="j-chip"><span class="jc-t">판구조론</span><span class="jc-s">움직이는 지권</span></div>
+        <span class="j-arrow">→</span>
+        <div class="j-chip"><span class="jc-t">중력과 운동</span><span class="jc-s">낙하에서 위성까지</span></div>
+        <span class="j-arrow">→</span>
+        <div class="j-chip"><span class="jc-t">운동량·충격량</span><span class="jc-s">충돌의 과학</span></div>
+        <span class="j-arrow">→</span>
+        <div class="j-chip"><span class="jc-t">생명 시스템</span><span class="jc-s">세포와 물질대사</span></div>
+        <span class="j-arrow">→</span>
+        <div class="j-chip"><span class="jc-t">유전자</span><span class="jc-s">정보의 흐름</span></div>
+      </div>
+    </div>
+    <div class="toc">
+      <div class="toc-title">이 단원의 학습 지도</div>
+      <div class="toc-item active">
+        <span class="tno">01</span>
+        <span class="tbody"><span class="ttt">지구시스템과 에너지·물질 순환<span class="tag-now">NOW</span></span>
+        <span class="tdesc">기권·수권·지권·생물권·외권 — 다섯 권역이 주고받는 지구</span></span>
+        <span class="tstd">10통과1-03-01</span>
+      </div>
+      <div class="toc-item">
+        <span class="tno">02</span>
+        <span class="tbody"><span class="ttt">판구조론과 지권의 변화</span>
+        <span class="tdesc">판 경계 3종 — 지진과 화산은 왜 그곳에서 일어나는가</span></span>
+        <span class="tstd">10통과1-03-02</span>
+      </div>
+      <div class="toc-item">
+        <span class="tno">03</span>
+        <span class="tbody"><span class="ttt">중력과 운동</span>
+        <span class="tdesc">자유 낙하에서 인공위성까지, 중력이 만드는 운동</span></span>
+        <span class="tstd">10통과1-03-03</span>
+      </div>
+      <div class="toc-item">
+        <span class="tno">04</span>
+        <span class="tbody"><span class="ttt">운동량과 충격량</span>
+        <span class="tdesc">에어백과 안전모의 과학 — 충돌을 다스리는 법</span></span>
+        <span class="tstd">10통과1-03-04</span>
+      </div>
+      <div class="toc-item">
+        <span class="tno">05</span>
+        <span class="tbody"><span class="ttt">생명 시스템과 화학 반응</span>
+        <span class="tdesc">세포 속 물질대사, 효소가 일하는 방식</span></span>
+        <span class="tstd">10통과1-03-05</span>
+      </div>
+      <div class="toc-item">
+        <span class="tno">06</span>
+        <span class="tbody"><span class="ttt">유전자에서 단백질까지</span>
+        <span class="tdesc">세포 내 정보의 흐름 — DNA에서 형질이 되기까지</span></span>
+        <span class="tstd">10통과1-03-06</span>
+      </div>
+    </div>
+
+    <div class="qa-lead">
+      <div class="qt">이 소단원을 끝내면 답할 수 있는 질문</div>
+      <ul>
+        <li>지구를 왜 '시스템'이라고 부를까? 태양계와는 무슨 관계일까? <span class="qgo">개념 1</span></li>
+        <li>하늘·바다·땅·생명·우주 — 다섯 권역은 각각 어떻게 생겼을까? <span class="qgo">개념 2·3</span></li>
+        <li>태풍·화산·밀물을 일으키는 에너지는 각각 어디서 올까? <span class="qgo">개념 4</span></li>
+        <li>내가 마신 물 한 잔은 어제 어디에 있었을까? 힌트: 물은 돌고 돈다. <span class="qgo">개념 5·6</span></li>
+      </ul>
+    </div>
+
+    <div class="opener-quote">"우리는 달을 탐사하러 갔지만, 정작 발견한 것은 지구였다."<span class="who">— 윌리엄 앤더스, 아폴로 8호 우주비행사</span></div>
+  </div>
+
+  <div class="folio"><span>박찬 과학 | 통합과학 1</span><span class="num">76</span></div>
+</div>
+
+<!-- ═════════════ p.77 개념 01 시스템으로 보는 지구 ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag">III. 시스템과 상호작용</span><span class="lesson-tag">01. 지구시스템과 에너지·물질 순환</span></div>
+  <h2 class="lesson-title"><span class="no">01</span><span class="tt">지구시스템과 에너지·물질 순환</span></h2>
+  <div class="std-badges"><span class="std">성취기준 10통과1-03-01</span><span class="std">권역 간 물질 순환·에너지 흐름 논증</span></div>
+
+  <div class="cols">
+    <div class="main">
+      <h3 class="sec"><span class="n">1</span>시스템으로 보는 지구 — 태양계 속 지구</h3>
+      <p class="body">여러 구성 요소가 <b>서로 영향을 주고받으며 하나로 작동하는 집합</b>을 <span class="kw">시스템(계)</span>이라고 한다. 태양과 행성들이 중력으로 묶여 도는 <b>태양계</b>도 시스템이고, 지구는 그 <b>구성 요소</b>다. 그리고 시야를 지구로 좁히면, 지구 자체가 다시 여러 권역으로 이루어진 정교한 시스템 — <span class="kw">지구시스템</span>이다.</p>
+      <p class="body">지구가 생명이 넘치는 시스템이 될 수 있었던 데는 태양계 안에서의 <b>위치</b>가 결정적이었다. 태양에서 <span class="u-amber">적당히 떨어져 있어 물이 액체로 존재</span>하고, <b>적당한 크기와 중력</b> 덕분에 대기를 붙잡아 둘 수 있었다. 너무 가까워 끓어 버린 금성, 너무 작아 대기를 놓친 화성 사이 — 지구는 딱 좋은 자리에 있다.</p>
+      <p class="body">지구시스템은 다섯 권역으로 나눈다. 대기의 <span class="kw">기권</span>, 물의 <span class="kw">수권</span>, 땅의 <span class="kw">지권</span>, 모든 생명의 <span class="kw">생물권</span>, 그리고 기권 바깥 우주 공간의 <span class="kw">외권</span>. 중요한 것은 다섯 권역이 <b>따로 놀지 않는다</b>는 사실이다 — 이번 소단원의 진짜 주제는 권역들 '사이'에서 벌어지는 일이다.</p>
+
+      <figure>
+        <svg width="470" height="152" viewBox="0 0 470 152" font-family="PC Sans">
+          <defs>
+            <marker id="arrP" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="#6B46C8"/></marker>
+            <radialGradient id="gSun6" cx="35%" cy="32%" r="72%">
+              <stop offset="0" stop-color="#FDEEC9"/><stop offset="0.45" stop-color="#F6B23B"/><stop offset="1" stop-color="#D97A0C"/>
+            </radialGradient>
+            <radialGradient id="gEarth" cx="35%" cy="30%" r="75%">
+              <stop offset="0" stop-color="#BFE3F5"/><stop offset="0.55" stop-color="#4A8FD0"/><stop offset="1" stop-color="#1E4E8C"/>
+            </radialGradient>
+          </defs>
+          <!-- 태양계 -->
+          <g transform="translate(104,72)">
+            <circle r="13" fill="url(#gSun6)"/>
+            <g fill="none" stroke="#CFC0EE" stroke-width="0.9">
+              <ellipse rx="28" ry="12"/><ellipse rx="48" ry="21"/><ellipse rx="68" ry="30"/><ellipse rx="88" ry="39"/>
+            </g>
+            <circle cx="-28" cy="0" r="2.2" fill="#B8C2CA"/>
+            <circle cx="34" cy="-14.5" r="2.6" fill="#E8B25A"/>
+            <circle cx="48" cy="21" r="4" fill="url(#gEarth)"/>
+            <circle cx="48" cy="21" r="7.5" fill="none" stroke="#E8940A" stroke-width="1" stroke-dasharray="2 1.5"/>
+            <circle cx="-68" cy="-14" r="2.4" fill="#D6455D"/>
+            <text x="0" y="56" text-anchor="middle" font-size="8.6" font-weight="800">태양계 — 하나의 시스템</text>
+            <text x="0" y="68" text-anchor="middle" font-size="7.2" fill="#5B6B77">지구는 그 구성 요소 (물이 액체인 자리!)</text>
+          </g>
+          <line x1="212" y1="72" x2="246" y2="72" stroke="#9E85E0" stroke-width="2" marker-end="url(#arrP)"/>
+          <text x="229" y="60" text-anchor="middle" font-size="7" fill="#5B6B77">확대</text>
+          <!-- 지구시스템 5권역 -->
+          <g transform="translate(354,72)">
+            <circle r="34" fill="url(#gEarth)"/>
+            <circle r="44" fill="none" stroke="#AB93E6" stroke-width="1.2" stroke-dasharray="3 2"/>
+            <path d="M-16,-10 q8,-12 22,-6 q12,-8 16,4 q-4,10 -18,8 q-14,4 -20,-6 Z" fill="#5FA86A" opacity="0.9"/>
+            <path d="M-24,14 q10,-4 18,2 q-6,8 -18,4 Z" fill="#5FA86A" opacity="0.9"/>
+            <g font-size="7.4" font-weight="800">
+              <text x="0" y="-50" text-anchor="middle" fill="#6B46C8">외권 (우주 공간·자기권)</text>
+              <text x="-58" y="-22" text-anchor="end" fill="#3D7EC0">기권 — 대기</text>
+              <text x="-58" y="6" text-anchor="end" fill="#1E4E8C">수권 — 물</text>
+              <text x="58" y="-16" fill="#8A6B3A">지권 — 땅</text>
+              <text x="58" y="10" fill="#3E7C4A">생물권 — 생명</text>
+            </g>
+            <g stroke="#9AA7B1" stroke-width="0.7">
+              <line x1="-40" y1="-24" x2="-24" y2="-16"/><line x1="-40" y1="4" x2="-26" y2="10"/>
+              <line x1="42" y1="-18" x2="20" y2="-8"/><line x1="42" y1="8" x2="10" y2="14"/>
+            </g>
+            <text x="0" y="62" text-anchor="middle" font-size="8.6" font-weight="800">지구시스템 — 다섯 권역</text>
+          </g>
+        </svg>
+        <figcaption>그림 1 | 시스템 속의 시스템 — 태양계의 구성 요소인 지구가, 다시 다섯 권역의 시스템이 된다</figcaption>
+      </figure>
+
+      <div class="saem">
+        <div class="avatar">박찬<br>쌤</div>
+        <div class="bubble"><span class="pen">"'시스템'이 어렵게 들리면 학교를 떠올려 — 교실·급식실·운동장이 따로 있어도 종소리 하나에 다 같이 움직이지? 서로 연결돼 하나로 굴러가면 그게 시스템이야."</span></div>
+      </div>
+    </div>
+
+    <div class="wing">
+      <div class="wtitle">날개 노트</div>
+      <div class="term"><b>시스템(계)</b>서로 영향을 주고받는 구성 요소들의 집합. 태양계·지구시스템·생명 시스템(이 단원 후반!) 모두 같은 눈으로 본다.</div>
+      <div class="term"><b>외권</b>기권 바깥의 우주 공간. 지구 자기장이 만드는 자기권이 태양에서 오는 해로운 입자를 막아 준다.</div>
+      <div class="wsep"></div>
+      <div class="wtitle">한눈에 암기</div>
+      <div class="wing-pen">기·수·지·생·외 —<br>다섯 권역!<br>핵심은 '사이'의 교환</div>
+      <div class="wsep"></div>
+      <div class="review">
+        <div class="rv-title">중학 과학 다시보기</div>
+        <div class="term" style="margin-bottom:0;"><b>수권과 해수 (중2)</b>지구 물의 대부분은 바닷물. 이 소단원에서는 물이 '권역 사이를 어떻게 오가는지'로 시야를 넓힌다.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="folio"><span>III. 시스템과 상호작용</span><span class="num">77</span></div>
+</div>
+
+<!-- ═════════════ p.78 개념 02 기권과 수권 ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag">III. 시스템과 상호작용</span><span class="lesson-tag">01. 지구시스템과 에너지·물질 순환</span></div>
+  <div class="cols">
+    <div class="main">
+      <h3 class="sec"><span class="n">2</span>하늘과 물 — 기권과 수권</h3>
+      <p class="body"><span class="kw">기권</span>은 지구를 둘러싼 대기의 층으로, <span class="u-amber">높이에 따른 기온 변화</span>를 기준으로 네 층으로 나눈다. 지표에 붙은 <span class="kw">대류권</span>은 위로 갈수록 기온이 낮아져 공기가 활발히 뒤섞이고(대류), 수증기가 많아 <b>구름·비·눈 같은 기상 현상</b>이 모두 여기서 일어난다. 그 위 <span class="kw">성층권</span>에는 <b>오존층</b>이 있어 태양의 자외선을 흡수한다 — 그 열 때문에 위로 갈수록 오히려 따뜻해진다.</p>
+      <p class="body">더 올라가면 다시 추워지는 <span class="kw">중간권</span>(유성이 타는 층), 그리고 태양 에너지를 직접 받아 위로 갈수록 뜨거워지는 <span class="kw">열권</span>(오로라의 무대)이 이어진다. 기온이 <b>내려가고-올라가고-내려가고-올라가는</b> 지그재그가 네 층의 경계다.</p>
+      <p class="body"><span class="kw">수권</span>은 지구의 모든 물이다. 대부분(약 97 %)은 <b>해수</b>이고, 나머지 담수도 대부분은 <b>빙하</b>로 얼어 있으며, 그다음이 지하수, 강과 호수의 물은 아주 조금이다. 우리가 쓸 수 있는 물이 생각보다 훨씬 귀한 이유다.</p>
+
+      <figure>
+        <svg width="470" height="178" viewBox="0 0 470 178" font-family="PC Sans">
+          <!-- 기권 기온 그래프 -->
+          <g transform="translate(30,10)">
+            <g fill="#F2EDFB"><rect x="0" y="104" width="180" height="34"/><rect x="0" y="70" width="180" height="34" fill="#E9F2FA"/><rect x="0" y="36" width="180" height="34" fill="#F2EDFB"/><rect x="0" y="2" width="180" height="34" fill="#E9F2FA"/></g>
+            <line x1="0" y1="138" x2="188" y2="138" stroke="#5B6B77" stroke-width="1.1" marker-end="url(#arrP)"/>
+            <line x1="0" y1="138" x2="0" y2="-4" stroke="#5B6B77" stroke-width="1.1" marker-end="url(#arrP)"/>
+            <text x="188" y="150" text-anchor="end" font-size="6.8" fill="#5B6B77">기온 →</text>
+            <text x="6" y="-8" font-size="6.8" fill="#5B6B77">높이</text>
+            <path d="M128,138 L52,104 L118,70 L60,36 L150,2" fill="none" stroke="#D6455D" stroke-width="2.2"/>
+            <g font-size="7.4" font-weight="800" fill="#22303A">
+              <text x="140" y="124">대류권</text><text x="128" y="90">성층권</text><text x="128" y="56">중간권</text><text x="158" y="22">열권</text>
+            </g>
+            <g font-size="6.4" fill="#5B6B77">
+              <text x="140" y="133">기상 현상</text><text x="128" y="99">오존층 (자외선 흡수)</text><text x="128" y="65">유성</text><text x="158" y="31">오로라</text>
+            </g>
+            <text x="90" y="163" text-anchor="middle" font-size="8.2" font-weight="800">기권 — 기온 변화로 나눈 네 층</text>
+          </g>
+          <!-- 수권 구성 -->
+          <g transform="translate(272,10)">
+            <text x="90" y="6" text-anchor="middle" font-size="8.2" font-weight="800">수권의 구성 (부피비)</text>
+            <rect x="0" y="16" width="180" height="26" rx="3" fill="#1E4E8C"/>
+            <text x="87" y="33" text-anchor="middle" font-size="9" font-weight="900" fill="#fff">해수 약 97 %</text>
+            <rect x="174" y="16" width="6" height="26" fill="#7FB8E8"/>
+            <text x="0" y="60" font-size="7.6" fill="#3D4C58">담수(약 3 %)를 다시 나누면 —</text>
+            <rect x="0" y="68" width="122" height="20" rx="2.5" fill="#7FB8E8"/>
+            <rect x="122" y="68" width="40" height="20" rx="2.5" fill="#4A8FD0"/>
+            <rect x="162" y="68" width="18" height="20" rx="2.5" fill="#9AA7B1"/>
+            <text x="61" y="81" text-anchor="middle" font-size="7.6" font-weight="800" fill="#1E3FA0">빙하</text>
+            <text x="142" y="81" text-anchor="middle" font-size="7" font-weight="800" fill="#fff">지하수</text>
+            <text x="171" y="64" text-anchor="middle" font-size="6.2" fill="#5B6B77">강·호수 등</text>
+            <text x="90" y="106" text-anchor="middle" font-size="7.4" fill="#5B6B77">마실 수 있는 물은 아주 일부 —</text>
+            <text x="90" y="117" text-anchor="middle" font-size="7.4" fill="#5B6B77">그마저 대부분 얼음과 땅속에 있다</text>
+            <text x="90" y="140" text-anchor="middle" font-size="8.2" font-weight="800" fill="#E8940A">"물은 많지만, 쓸 물은 귀하다"</text>
+          </g>
+        </svg>
+        <figcaption>그림 2 | 기권의 지그재그 기온 구조와 수권의 구성 — 층의 간판(기상 현상·오존층)을 붙여 두자</figcaption>
+      </figure>
+
+      <div class="expoint">
+        <div class="boxtitle"><span class="ico">!</span>시험엔 이렇게</div>
+        <p>층별 '간판' 바꿔치기가 단골 — <b>기상 현상 = 대류권, 오존층 = 성층권, 유성 = 중간권, 오로라 = 열권.</b> 그리고 구분 기준은 기압이 아니라 <b>기온 변화</b>다.</p>
+      </div>
+    </div>
+
+    <div class="wing">
+      <div class="wtitle">날개 노트</div>
+      <div class="term"><b>대류</b>따뜻한 것이 위로, 찬 것이 아래로 움직이며 뒤섞이는 현상. 대류권은 아래가 따뜻해 대류가 활발하다.</div>
+      <div class="term"><b>오존층</b>성층권의 오존 밀집 구역. 자외선을 흡수해 지상의 생명을 보호한다.</div>
+      <div class="wsep"></div>
+      <div class="wtitle">한눈에 암기</div>
+      <div class="wing-pen">대-성-중-열,<br>기온은 ↓↑↓↑ 지그재그!<br>날씨는 맨 아래층에서만</div>
+    </div>
+  </div>
+  <div class="quickcheck">
+    <span class="qc-title">바로바로 체크</span>
+    <ol>
+      <li><span class="no">1</span>기권의 네 층은 높이에 따른 기온 변화로 구분한다. ( O , X )</li>
+      <li><span class="no">2</span>구름과 비는 주로 성층권에서 만들어진다. ( O , X )</li>
+      <li><span class="no">3</span>수권에서 가장 많은 것은 해수이고, 담수의 대부분은 빙하이다. ( O , X )</li>
+    </ol>
+    <div class="qc-ans">정답 1 O 2 X (대류권) 3 O</div>
+  </div>
+  <div class="folio"><span>III. 시스템과 상호작용</span><span class="num">78</span></div>
+</div>
+
+<!-- ═════════════ p.79 개념 03 지권·생물권·외권 ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag">III. 시스템과 상호작용</span><span class="lesson-tag">01. 지구시스템과 에너지·물질 순환</span></div>
+  <div class="cols">
+    <div class="main">
+      <h3 class="sec"><span class="n">3</span>땅과 생명과 우주 — 지권·생물권·외권</h3>
+      <p class="body"><span class="kw">지권</span>은 지구의 땅 전체 — 겉의 얇은 <span class="kw">지각</span>부터 중심까지다. 지각 아래에는 지권 부피의 약 80 %를 차지하는 <span class="kw">맨틀</span>이 있는데, 고체이지만 오랜 시간에 걸쳐 <span class="u-amber">서서히 대류</span>한다(이 움직임이 다음 소단원의 주인공, 판을 움직인다). 그 아래로 액체 상태의 <span class="kw">외핵</span>과 고체인 <span class="kw">내핵</span>이 있다 — 철이 많은 외핵의 흐름이 지구 자기장을 만든다.</p>
+      <p class="body"><span class="kw">생물권</span>은 지구의 <b>모든 생명체</b>다. 땅 위와 땅속, 바다와 하늘까지 — 생물이 사는 곳이면 어디든 생물권이며, 기권·수권·지권에 걸쳐 있다는 점이 특징이다. <span class="kw">외권</span>은 기권 바깥의 우주 공간으로, 지구 자기장이 만드는 <b>자기권</b>이 태양에서 날아오는 해로운 입자들을 막아 생물권의 방패가 되어 준다.</p>
+
+      <figure>
+        <svg width="460" height="170" viewBox="0 0 460 170" font-family="PC Sans">
+          <defs>
+            <radialGradient id="gCore" cx="50%" cy="50%" r="65%">
+              <stop offset="0" stop-color="#FDEEC9"/><stop offset="0.5" stop-color="#F6B23B"/><stop offset="1" stop-color="#E87A2A"/>
+            </radialGradient>
+          </defs>
+          <!-- 지권 단면 (반원) -->
+          <g transform="translate(128,150)">
+            <path d="M-116,0 A116,116 0 0 1 116,0 Z" fill="#C9A97A"/>
+            <path d="M-112,0 A112,112 0 0 1 112,0 Z" fill="#E8B25A"/>
+            <path d="M-74,0 A74,74 0 0 1 74,0 Z" fill="url(#gCore)"/>
+            <path d="M-38,0 A38,38 0 0 1 38,0 Z" fill="#FDEEC9"/>
+            <path d="M-116,0 A116,116 0 0 1 116,0" fill="none" stroke="#8A6B3A" stroke-width="1.4"/>
+            <g font-size="7.6" font-weight="800" text-anchor="middle">
+              <text x="0" y="-118">지각 (얇은 겉껍질)</text>
+              <text x="0" y="-90" fill="#7A4E12">맨틀 — 부피 약 80 %, 서서히 대류</text>
+              <text x="0" y="-52" fill="#8A4A10">외핵 (액체) → 자기장 생성</text>
+              <text x="0" y="-14" fill="#8A6B3A">내핵 (고체)</text>
+            </g>
+            <text x="0" y="16" text-anchor="middle" font-size="8.4" font-weight="800">지권 — 네 층의 땅</text>
+          </g>
+          <!-- 생물권/외권 카드 -->
+          <g transform="translate(348,12)">
+            <rect x="-88" y="0" width="176" height="60" rx="5" fill="#EAF6EC" stroke="#5FA86A" stroke-width="0.9"/>
+            <text x="0" y="16" text-anchor="middle" font-size="8.6" font-weight="800" fill="#2E6B3A">생물권 — 모든 생명체</text>
+            <text x="0" y="31" text-anchor="middle" font-size="7.4" fill="#3D4C58">숲·바다·땅속·하늘의 생물 전부</text>
+            <text x="0" y="44" text-anchor="middle" font-size="7.4" font-weight="700" fill="#2E6B3A">기권·수권·지권에 걸쳐 산다는 게 특징!</text>
+            <rect x="-88" y="72" width="176" height="60" rx="5" fill="#F2EDFB" stroke="#9E85E0" stroke-width="0.9"/>
+            <text x="0" y="88" text-anchor="middle" font-size="8.6" font-weight="800" fill="#6B46C8">외권 — 기권 바깥 우주</text>
+            <text x="0" y="103" text-anchor="middle" font-size="7.4" fill="#3D4C58">자기권이 태양의 해로운 입자를 차단</text>
+            <text x="0" y="116" text-anchor="middle" font-size="7.4" font-weight="700" fill="#6B46C8">보이지 않는 방패 (오로라는 그 흔적)</text>
+          </g>
+          <text x="348" y="156" text-anchor="middle" font-size="8.4" font-weight="800" fill="#E8940A">다섯 권역의 명단 완성 — 이제 '사이'를 볼 차례</text>
+        </svg>
+        <figcaption>그림 3 | 지권의 층상 구조와 생물권·외권 — 외핵의 흐름이 만든 자기장이 외권에서 방패가 된다</figcaption>
+      </figure>
+
+      <div class="saem">
+        <div class="avatar">박찬<br>쌤</div>
+        <div class="bubble"><span class="pen">"지권 네 층은 '지-맨-외-내'로 리듬 타면 끝. 단, 액체는 외핵 하나뿐이라는 것, 부피 1등은 맨틀이라는 것 — 이 둘이 시험 포인트야."</span></div>
+      </div>
+    </div>
+
+    <div class="wing">
+      <div class="wtitle">날개 노트</div>
+      <div class="term"><b>맨틀의 대류</b>고체인 맨틀이 아주 느리게(1년에 수 cm) 흐르는 현상. 판을 움직이는 원동력이다.</div>
+      <div class="term"><b>자기권</b>지구 자기장이 미치는 공간. 태양풍 입자를 막고, 일부가 극지방으로 들어와 오로라가 된다.</div>
+      <div class="wsep"></div>
+      <div class="wtitle">한눈에 암기</div>
+      <div class="wing-pen">지각-맨틀-외핵-내핵<br>액체는 외핵 하나!<br>부피 1등은 맨틀</div>
+    </div>
+  </div>
+  <div class="quickcheck">
+    <span class="qc-title">바로바로 체크</span>
+    <ol>
+      <li><span class="no">1</span>지권에서 부피가 가장 큰 층은 맨틀이다. ( O , X )</li>
+      <li><span class="no">2</span>내핵은 액체 상태이다. ( O , X )</li>
+      <li><span class="no">3</span>생물권은 기권·수권·지권에 걸쳐 분포한다. ( O , X )</li>
+    </ol>
+    <div class="qc-ans">정답 1 O 2 X (액체는 외핵, 내핵은 고체) 3 O</div>
+  </div>
+  <div class="folio"><span>III. 시스템과 상호작용</span><span class="num">79</span></div>
+</div>
+
+<!-- ═════════════ p.80 개념 04 에너지원 ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag">III. 시스템과 상호작용</span><span class="lesson-tag">01. 지구시스템과 에너지·물질 순환</span></div>
+  <div class="cols">
+    <div class="main">
+      <h3 class="sec"><span class="n">4</span>지구시스템을 움직이는 세 에너지원</h3>
+      <p class="body">권역들을 움직이게 하는 에너지는 어디서 올까? 출처는 딱 셋이다. 압도적 1위는 <span class="kw">태양 에너지</span> — 바닷물을 증발시켜 <b>구름과 비를 만들고</b>, 바람을 일으키고, 광합성으로 생물권을 먹여 살린다. 지표에서 일어나는 <span class="u-amber">자연 현상 대부분의 동력</span>이다.</p>
+      <p class="body">2위는 <span class="kw">지구 내부 에너지</span>다. 지구 내부의 방사성 원소가 붕괴하며 내는 열로, <b>맨틀을 대류시켜 판을 움직이고</b> 지진과 화산을 일으킨다. 땅의 사건은 전부 이 에너지의 작품이다. 3위는 달과 태양의 인력이 만드는 <span class="kw">조력 에너지</span> — 양은 가장 적지만 <b>밀물과 썰물</b>을 일으켜 갯벌 생태계를 부양한다.</p>
+      <p class="body">셋의 담당 구역을 정확히 나누는 것이 이 개념의 전부다. <b>하늘·물·생명의 일은 태양이, 땅속의 일은 지구 내부가, 바닷가의 하루 두 번 드나듦은 조력이</b> 맡는다.</p>
+
+      <figure>
+        <svg width="470" height="150" viewBox="0 0 470 150" font-family="PC Sans">
+          <!-- 태양 -->
+          <g transform="translate(82,10)">
+            <rect x="-64" y="0" width="128" height="92" rx="6" fill="#FDF9F0" stroke="#EBCB9C" stroke-width="1"/>
+            <circle cx="0" cy="26" r="15" fill="url(#gSun6)"/>
+            <g stroke="#F4A62A" stroke-width="1.4"><line x1="0" y1="4" x2="0" y2="9"/><line x1="0" y1="43" x2="0" y2="48"/><line x1="-22" y1="26" x2="-17" y2="26"/><line x1="17" y1="26" x2="22" y2="26"/><line x1="-16" y1="10" x2="-12" y2="14"/><line x1="12" y1="38" x2="16" y2="42"/><line x1="-16" y1="42" x2="-12" y2="38"/><line x1="12" y1="14" x2="16" y2="10"/></g>
+            <text x="0" y="60" text-anchor="middle" font-size="8.6" font-weight="800">태양 에너지</text>
+            <text x="0" y="72" text-anchor="middle" font-size="6.8" fill="#5B6B77">기상 현상 · 물의 순환 · 광합성</text>
+            <text x="0" y="83" text-anchor="middle" font-size="6.8" font-weight="800" fill="#B4560E">지표 현상 거의 전부!</text>
+          </g>
+          <!-- 지구 내부 -->
+          <g transform="translate(236,10)">
+            <rect x="-64" y="0" width="128" height="92" rx="6" fill="#FBF0EC" stroke="#E3A08A" stroke-width="1"/>
+            <path d="M-26,44 A26,26 0 0 1 26,44 Z" fill="url(#gCore)"/>
+            <path d="M-8,20 q-3,-7 2,-12 q6,5 3,12 Z" fill="#E87A2A"/>
+            <path d="M6,22 q0,-6 5,-9 q3,6 -1,10 Z" fill="#F6B23B"/>
+            <text x="0" y="60" text-anchor="middle" font-size="8.6" font-weight="800">지구 내부 에너지</text>
+            <text x="0" y="72" text-anchor="middle" font-size="6.8" fill="#5B6B77">맨틀 대류 · 판 이동 · 지진 · 화산</text>
+            <text x="0" y="83" text-anchor="middle" font-size="6.8" font-weight="800" fill="#B4560E">땅속 사건 전담!</text>
+          </g>
+          <!-- 조력 -->
+          <g transform="translate(390,10)">
+            <rect x="-64" y="0" width="128" height="92" rx="6" fill="#ECF6FA" stroke="#9CC5CE" stroke-width="1"/>
+            <circle cx="30" cy="16" r="8" fill="#D8DEE4" stroke="#9AA7B1" stroke-width="0.8"/>
+            <path d="M-52,40 q14,-8 28,0 q14,8 28,0 q14,-8 28,0 L32,50 L-52,50 Z" fill="#7FB8E8" opacity="0.85"/>
+            <path d="M-52,34 q14,-8 28,0 q14,8 28,0" fill="none" stroke="#4A8FD0" stroke-width="1.4"/>
+            <g stroke="#5B6B77" stroke-width="1" ><line x1="-40" y1="28" x2="-40" y2="22"/><line x1="-12" y1="28" x2="-12" y2="22"/></g>
+            <text x="0" y="60" text-anchor="middle" font-size="8.6" font-weight="800">조력 에너지</text>
+            <text x="0" y="72" text-anchor="middle" font-size="6.8" fill="#5B6B77">달·태양의 인력 → 밀물·썰물</text>
+            <text x="0" y="83" text-anchor="middle" font-size="6.8" font-weight="800" fill="#B4560E">양은 가장 적다</text>
+          </g>
+          <!-- 크기 비교 -->
+          <g transform="translate(70,116)">
+            <text x="-42" y="10" font-size="7.4" font-weight="800" fill="#5B6B77">에너지양</text>
+            <rect x="0" y="0" width="270" height="12" rx="2" fill="url(#gSun6)"/>
+            <rect x="276" y="0" width="34" height="12" rx="2" fill="#E87A2A"/>
+            <rect x="316" y="0" width="10" height="12" rx="2" fill="#4A8FD0"/>
+            <text x="135" y="26" text-anchor="middle" font-size="6.8" fill="#5B6B77">태양 ≫</text>
+            <text x="293" y="26" text-anchor="middle" font-size="6.8" fill="#5B6B77">내부 &gt;</text>
+            <text x="321" y="26" text-anchor="middle" font-size="6.8" fill="#5B6B77">조력</text>
+          </g>
+        </svg>
+        <figcaption>그림 4 | 세 에너지원의 담당 구역과 크기 — 태양 ≫ 지구 내부 &gt; 조력</figcaption>
+      </figure>
+
+      <div class="expoint">
+        <div class="boxtitle"><span class="ico">!</span>시험엔 이렇게</div>
+        <p>담당 바꿔치기가 단골 — "화산은 태양 에너지로"(X), "물의 순환은 지구 내부 에너지로"(X). <b>현상을 보면 에너지원이 나온다: 하늘·물·생명=태양 / 땅속=내부 / 밀물·썰물=조력.</b></p>
+      </div>
+    </div>
+
+    <div class="wing">
+      <div class="wtitle">날개 노트</div>
+      <div class="term"><b>지구 내부 에너지의 출처</b>주로 지구 내부 방사성 원소가 붕괴하며 내는 열. 지구 탄생 때의 열도 일부 남아 있다.</div>
+      <div class="term"><b>조석</b>밀물과 썰물로 해수면이 하루 약 두 번 오르내리는 현상. 서해 갯벌이 그 무대다.</div>
+      <div class="wsep"></div>
+      <div class="wtitle">궁금해?</div>
+      <div class="term"><b>태양이 멈춘다면</b>바람도 비도 광합성도 멈춘다. 그러나 화산과 지진은 계속된다 — 에너지원이 다르기 때문이다.</div>
+    </div>
+  </div>
+  <div class="quickcheck">
+    <span class="qc-title">바로바로 체크</span>
+    <ol>
+      <li><span class="no">1</span>지구시스템의 에너지원 중 양이 가장 많은 것은 태양 에너지이다. ( O , X )</li>
+      <li><span class="no">2</span>지진과 화산 활동의 에너지원은 태양 에너지이다. ( O , X )</li>
+      <li><span class="no">3</span>밀물과 썰물은 조력 에너지가 일으킨다. ( O , X )</li>
+    </ol>
+    <div class="qc-ans">정답 1 O 2 X (지구 내부 에너지) 3 O</div>
+  </div>
+  <div class="folio"><span>III. 시스템과 상호작용</span><span class="num">80</span></div>
+</div>
+
+<!-- ═════════════ p.81 개념 05 상호작용 ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag">III. 시스템과 상호작용</span><span class="lesson-tag">01. 지구시스템과 에너지·물질 순환</span></div>
+  <div class="cols">
+    <div class="main">
+      <h3 class="sec"><span class="n">5</span>권역들은 끊임없이 주고받는다</h3>
+      <p class="body">다섯 권역은 국경이 닫힌 나라들이 아니다. <b>물질과 에너지가 쉼 없이 국경을 넘는다</b> — 이것이 <span class="kw">지구시스템의 상호작용</span>이다. 바닷물이 증발해 구름이 되는 것은 <b>수권→기권</b>, 그 비가 땅을 깎아 계곡을 만드는 것은 <b>수권→지권</b>, 화산이 화산재와 기체를 내뿜는 것은 <b>지권→기권</b>의 상호작용이다.</p>
+      <p class="body">생물권은 그중에서도 가장 부지런한 교환원이다. 식물은 기권의 이산화 탄소를 마시고 산소를 내놓으며(광합성), 뿌리로 지권의 물과 양분을 빨아들이고, 잎으로 수증기를 내보낸다(증산). <b>한 그루 나무가 네 권역과 동시에 거래하는 셈</b>이다. 하나의 권역에서 생긴 변화는 이 연결망을 타고 다른 권역으로 번진다 — 그래서 지구를 '시스템'으로 봐야 하는 것이다.</p>
+
+      <figure>
+        <svg width="450" height="172" viewBox="0 0 450 172" font-family="PC Sans">
+          <!-- 오각 상호작용 -->
+          <g transform="translate(120,88)">
+            <g stroke="#CFC0EE" stroke-width="1.4">
+              <line x1="0" y1="-64" x2="61" y2="-20"/><line x1="0" y1="-64" x2="-61" y2="-20"/><line x1="0" y1="-64" x2="38" y2="52"/><line x1="0" y1="-64" x2="-38" y2="52"/>
+              <line x1="61" y1="-20" x2="-61" y2="-20"/><line x1="61" y1="-20" x2="38" y2="52"/><line x1="61" y1="-20" x2="-38" y2="52"/>
+              <line x1="-61" y1="-20" x2="38" y2="52"/><line x1="-61" y1="-20" x2="-38" y2="52"/>
+              <line x1="38" y1="52" x2="-38" y2="52"/>
+            </g>
+            <g text-anchor="middle" font-size="7.8" font-weight="900">
+              <circle cx="0" cy="-64" r="17" fill="#E9F2FA" stroke="#4A8FD0" stroke-width="1"/><text y="-61" fill="#1E4E8C">기권</text>
+              <circle cx="61" cy="-20" r="17" fill="#EAF6EC" stroke="#5FA86A" stroke-width="1"/><text x="61" y="-17" fill="#2E6B3A">생물권</text>
+              <circle cx="-61" cy="-20" r="17" fill="#E4F0FA" stroke="#1E4E8C" stroke-width="1"/><text x="-61" y="-17" fill="#1E4E8C">수권</text>
+              <circle cx="38" cy="52" r="17" fill="#F8F0E4" stroke="#8A6B3A" stroke-width="1"/><text x="38" y="55" fill="#8A6B3A">지권</text>
+              <circle cx="-38" cy="52" r="17" fill="#F2EDFB" stroke="#6B46C8" stroke-width="1"/><text x="-38" y="55" fill="#6B46C8">외권</text>
+            </g>
+            <text x="0" y="86" text-anchor="middle" font-size="7.4" fill="#5B6B77">모든 권역 쌍이 연결되어 있다</text>
+          </g>
+          <!-- 예시 리스트 -->
+          <g transform="translate(268,26)" font-size="7.8">
+            <text y="0" font-weight="800" fill="#22303A">상호작용 읽는 법 — "무엇이 어디로?"</text>
+            <text y="20" fill="#3D4C58">· 증발 (바닷물→수증기) : <tspan font-weight="800" fill="#1E4E8C">수권 → 기권</tspan></text>
+            <text y="36" fill="#3D4C58">· 강물의 침식 (땅을 깎음) : <tspan font-weight="800" fill="#1E4E8C">수권 → 지권</tspan></text>
+            <text y="52" fill="#3D4C58">· 화산 분출 (재·기체) : <tspan font-weight="800" fill="#8A6B3A">지권 → 기권</tspan></text>
+            <text y="68" fill="#3D4C58">· 광합성 (CO₂ 흡수) : <tspan font-weight="800" fill="#2E6B3A">기권 → 생물권</tspan></text>
+            <text y="84" fill="#3D4C58">· 오로라 (태양 입자 유입) : <tspan font-weight="800" fill="#6B46C8">외권 → 기권</tspan></text>
+            <text y="112" font-size="8.4" font-weight="800" fill="#E8940A">이동한 '물질(또는 에너지)'을 따라가면</text>
+            <text y="126" font-size="8.4" font-weight="800" fill="#E8940A">권역 쌍이 저절로 나온다</text>
+          </g>
+        </svg>
+        <figcaption>그림 5 | 다섯 권역의 연결망 — 상호작용 문제는 '이동한 것'을 추적하면 풀린다</figcaption>
+      </figure>
+
+      <div class="saem">
+        <div class="avatar">박찬<br>쌤</div>
+        <div class="bubble"><span class="pen">"상호작용 문제에서 권역 이름부터 고르지 마. '뭐가 움직였지?'를 먼저 물어 — 물이면 수권이 끼고, 화산재면 지권이 낀다. 이동 물질 추적, 그게 공식이야."</span></div>
+      </div>
+    </div>
+
+    <div class="wing">
+      <div class="wtitle">날개 노트</div>
+      <div class="term"><b>증산 작용</b>식물이 뿌리로 흡수한 물을 잎의 기공으로 수증기 형태로 내보내는 것. 생물권→기권의 물 이동이다.</div>
+      <div class="term"><b>석회동굴</b>지하수가 석회암(지권)을 오랜 세월 녹여 만든다 — 수권과 지권의 합작품.</div>
+      <div class="wsep"></div>
+      <div class="wtitle">한눈에 암기</div>
+      <div class="wing-pen">권역 쌍 찾기 =<br>"이동한 물질을 따라가라!"</div>
+    </div>
+  </div>
+  <div class="quickcheck">
+    <span class="qc-title">바로바로 체크</span>
+    <ol>
+      <li><span class="no">1</span>바닷물의 증발은 수권과 기권의 상호작용이다. ( O , X )</li>
+      <li><span class="no">2</span>화산 분출로 화산재가 대기로 퍼지는 것은 지권과 기권의 상호작용이다. ( O , X )</li>
+      <li><span class="no">3</span>한 권역의 변화는 그 권역 안에서만 영향을 미친다. ( O , X )</li>
+    </ol>
+    <div class="qc-ans">정답 1 O 2 O 3 X (연결망을 타고 다른 권역으로 번진다)</div>
+  </div>
+  <div class="folio"><span>III. 시스템과 상호작용</span><span class="num">81</span></div>
+</div>
+
+<!-- ═════════════ p.82 개념 06 물질 순환·에너지 흐름 ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag">III. 시스템과 상호작용</span><span class="lesson-tag">01. 지구시스템과 에너지·물질 순환</span></div>
+  <div class="cols">
+    <div class="main">
+      <h3 class="sec"><span class="n">6</span>물질은 돌고, 에너지는 흐른다</h3>
+      <p class="body">권역 사이의 교환을 길게 이어 붙이면 <b>순환</b>이 보인다. 대표가 <span class="kw">물의 순환</span>이다. 태양 에너지가 바닷물을 증발시키면(수권→기권), 수증기는 구름이 되어 비와 눈으로 내리고(기권→수권·지권), 강과 지하수로 흘러 다시 바다로 돌아간다. 물은 권역을 옮겨 다닐 뿐 <span class="u-amber">지구 전체의 양은 거의 일정</span>하다.</p>
+      <p class="body"><span class="kw">탄소의 순환</span>도 같다. 기권의 이산화 탄소는 광합성으로 생물권에 들어왔다가 호흡으로 돌아가고, 바다에 녹아들고(수권), 오랜 세월 석회암과 화석 연료로 지권에 저장된다. 인간이 화석 연료를 태우는 것은 <b>지권의 오래된 탄소 창고를 기권으로 여는 일</b>이다(그 결과는 통합과학2에서 만난다).</p>
+      <p class="body">한편 <b>에너지는 순환하지 않고 흐른다</b>. 태양 에너지는 저위도(적도 쪽)에 남고 고위도(극 쪽)에 모자라는데, 이 불균형을 <span class="kw">대기와 해수의 순환</span>이 실어 날라 지구 전체의 균형을 지킨다.</p>
+
+      <figure>
+        <svg width="470" height="158" viewBox="0 0 470 158" font-family="PC Sans">
+          <!-- 물 순환 -->
+          <g transform="translate(10,8)">
+            <circle cx="24" cy="16" r="11" fill="url(#gSun6)"/>
+            <path d="M0,118 h210 v14 h-210 Z" fill="#7FB8E8"/>
+            <path d="M120,118 L154,74 L188,118 Z" fill="#C9A97A"/>
+            <path d="M154,74 L172,98 L136,98 Z" fill="#E8F0E4"/>
+            <g fill="#F3F6FA" stroke="#9AA7B1" stroke-width="0.8">
+              <ellipse cx="64" cy="38" rx="16" ry="8"/><ellipse cx="80" cy="34" rx="12" ry="7"/>
+              <ellipse cx="140" cy="30" rx="16" ry="8"/><ellipse cx="156" cy="26" rx="12" ry="7"/>
+            </g>
+            <g stroke="#4A8FD0" stroke-width="1.6">
+              <line x1="40" y1="112" x2="52" y2="52" marker-end="url(#arrP)"/>
+            </g>
+            <text x="24" y="86" font-size="6.6" fill="#1E4E8C">증발↑</text>
+            <line x1="96" y1="36" x2="126" y2="30" stroke="#9AA7B1" stroke-width="1.4" marker-end="url(#arrP)"/>
+            <g stroke="#4A8FD0" stroke-width="1.2"><line x1="136" y1="42" x2="132" y2="56"/><line x1="146" y1="42" x2="142" y2="56"/><line x1="156" y1="42" x2="152" y2="56"/></g>
+            <text x="168" y="54" font-size="6.6" fill="#1E4E8C">강수↓</text>
+            <path d="M150,100 q-30,10 -60,14" fill="none" stroke="#4A8FD0" stroke-width="1.6" marker-end="url(#arrP)"/>
+            <text x="118" y="112" font-size="6.6" fill="#1E4E8C">유수→바다</text>
+            <text x="105" y="150" text-anchor="middle" font-size="8.2" font-weight="800">물의 순환 — 동력은 태양, 총량은 일정</text>
+          </g>
+          <!-- 탄소 순환 -->
+          <g transform="translate(258,8)">
+            <rect x="0" y="0" width="200" height="34" rx="4" fill="#E9F2FA"/>
+            <text x="100" y="21" text-anchor="middle" font-size="7.8" font-weight="800" fill="#1E4E8C">기권의 이산화 탄소(CO₂)</text>
+            <rect x="0" y="76" width="94" height="34" rx="4" fill="#EAF6EC"/>
+            <text x="47" y="93" text-anchor="middle" font-size="7.6" font-weight="800" fill="#2E6B3A">생물권</text>
+            <text x="47" y="104" text-anchor="middle" font-size="6.4" fill="#5B6B77">(광합성으로 저장)</text>
+            <rect x="106" y="76" width="94" height="34" rx="4" fill="#F8F0E4"/>
+            <text x="153" y="93" text-anchor="middle" font-size="7.6" font-weight="800" fill="#8A6B3A">지권</text>
+            <text x="153" y="104" text-anchor="middle" font-size="6.4" fill="#5B6B77">(석회암·화석 연료)</text>
+            <line x1="30" y1="40" x2="30" y2="70" stroke="#2E6B3A" stroke-width="1.6" marker-end="url(#arrP)"/>
+            <text x="24" y="58" text-anchor="end" font-size="6.4" fill="#2E6B3A">광합성</text>
+            <line x1="64" y1="70" x2="64" y2="40" stroke="#9AA7B1" stroke-width="1.6" marker-end="url(#arrP)"/>
+            <text x="70" y="58" font-size="6.4" fill="#5B6B77">호흡</text>
+            <line x1="170" y1="70" x2="170" y2="40" stroke="#D6455D" stroke-width="1.8" marker-end="url(#arrP)"/>
+            <text x="176" y="58" font-size="6.4" fill="#D6455D">연소!</text>
+            <line x1="134" y1="40" x2="134" y2="70" stroke="#9AA7B1" stroke-width="1.2" stroke-dasharray="2.5 2" marker-end="url(#arrP)"/>
+            <text x="128" y="58" text-anchor="end" font-size="6.2" fill="#5B6B77">아주 느리게 저장</text>
+            <text x="100" y="132" text-anchor="middle" font-size="8.2" font-weight="800">탄소의 순환 — 창고를 옮겨 다니는 탄소</text>
+            <text x="100" y="146" text-anchor="middle" font-size="7" fill="#E8940A" font-weight="800">연소는 지권의 옛 창고를 기권으로 여는 일</text>
+          </g>
+        </svg>
+        <figcaption>그림 6 | 물과 탄소의 순환 — 물질은 권역 사이를 돌고, 그 동력은 태양 에너지다</figcaption>
+      </figure>
+
+      <div class="gist">
+        <div class="boxtitle"><span class="ico">알</span>알짜 정리 ① — 지구시스템 한 장 요약</div>
+        <ul>
+          <li>다섯 권역: <b>기권</b>(대류·성층·중간·열권) / <b>수권</b>(해수 97 %) / <b>지권</b>(지각·맨틀·외핵·내핵) / <b>생물권</b> / <b>외권</b></li>
+          <li>에너지원: <b>태양</b>(지표 현상 대부분) ≫ <b>지구 내부</b>(지진·화산) &gt; <b>조력</b>(밀물·썰물)</li>
+          <li><b>물질은 순환</b>(총량 일정), <b>에너지는 흐른다</b> (저위도→고위도, 대기·해수 운반)</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="wing">
+      <div class="wtitle">날개 노트</div>
+      <div class="term"><b>에너지 불균형</b>둥근 지구는 적도가 햇빛을 수직으로, 극은 비스듬히 받는다. 그래서 저위도는 남고 고위도는 모자란다.</div>
+      <div class="term"><b>해류</b>바닷물의 큰 흐름. 바람과 함께 저위도의 열을 고위도로 나르는 지구의 난방 배관이다.</div>
+      <div class="wsep"></div>
+      <div class="wtitle">앱 연동</div>
+      <div class="term"><b>앱에서 이어서!</b>박찬 과학 앱에서 소단원 III-01을 선택하면 알짜 요약과 추가 문제를 볼 수 있다.</div>
+    </div>
+  </div>
+  <div class="quickcheck">
+    <span class="qc-title">바로바로 체크</span>
+    <ol>
+      <li><span class="no">1</span>물의 순환을 일으키는 근본 에너지원은 태양 에너지이다. ( O , X )</li>
+      <li><span class="no">2</span>화석 연료의 연소는 지권의 탄소를 기권으로 이동시킨다. ( O , X )</li>
+      <li><span class="no">3</span>대기와 해수의 순환은 고위도의 남는 열을 저위도로 옮긴다. ( O , X )</li>
+    </ol>
+    <div class="qc-ans">정답 1 O 2 O 3 X (저위도의 남는 열을 고위도로)</div>
+  </div>
+  <div class="folio"><span>III. 시스템과 상호작용</span><span class="num">82</span></div>
+</div>
+
+<!-- ═════════════ p.83 자료 파헤치기 ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag">III. 시스템과 상호작용</span><span class="lesson-tag">01. 지구시스템과 에너지·물질 순환</span></div>
+  <div class="lab">
+    <div class="lab-head">자료 파헤치기 <span class="tag">탐구·자료 분석</span> <span style="font-weight:600; font-size:9.5pt; margin-left:auto;">태풍 — 지구시스템 상호작용의 종합 무대</span></div>
+    <div class="lab-body">
+      <h4>자료</h4>
+      <p>다음은 태풍의 일생을 지구시스템의 눈으로 정리한 것이다.</p>
+      <table class="anstable" style="margin:2mm 0 3mm;">
+        <tr><th style="width:34mm;">단계</th><th>무슨 일이 일어나나</th><th>상호작용하는 권역</th></tr>
+        <tr><td><b>발생</b></td><td>따뜻한 바다에서 수증기가 대량 증발하며 에너지를 공급한다</td><td class="a">수권 → 기권</td></tr>
+        <tr><td><b>발달·이동</b></td><td>강한 바람과 폭우가 만들어진다</td><td class="a">기권 → 수권·지권</td></tr>
+        <tr><td><b>상륙</b></td><td>산사태와 침식이 일어나고, 생태계와 사람이 피해를 입는다</td><td class="a">지권·생물권</td></tr>
+        <tr><td><b>소멸 후</b></td><td>바닷물이 뒤섞여 표층과 심층의 열이 교환되고, 강수가 물 부족을 해소하기도 한다</td><td>수권 내부·전 권역</td></tr>
+      </table>
+      <h4>해석의 3단계</h4>
+      <ol>
+        <li><b>에너지의 출처부터</b> — 태풍의 연료는 따뜻한 바닷물이 증발하며 내놓는 열이고, 그 바닷물을 데운 것은 <b>태양 에너지</b>다. 근본 에너지원 질문의 답은 언제나 출처의 출처까지 거슬러 간다.</li>
+        <li><b>단계마다 '이동한 것' 추적</b> — 수증기(수권→기권), 비(기권→수권·지권), 무너진 흙(지권 내 이동). 이동 물질을 짚으면 권역 쌍이 저절로 나온다.</li>
+        <li><b>영향의 양면 읽기</b> — 태풍은 재해이지만, 지구 전체로는 <b>저위도의 남는 열을 고위도로 나르는 에너지 수송</b>의 한 방법이기도 하다. '피해/역할'을 나눠 서술하면 논증형 문항의 답이 된다.</li>
+      </ol>
+      <h4>결론</h4>
+      <p>태풍 하나에 다섯 권역의 상호작용과 에너지 흐름이 모두 들어 있다. 지구시스템 문항의 자료가 무엇이든 — 화산이든 장마든 — <b>에너지의 출처, 이동한 물질, 영향받는 권역</b> 세 가지를 차례로 짚으면 풀린다.</p>
+      <div class="expoint">
+        <div class="boxtitle"><span class="ico">!</span>시험엔 이렇게</div>
+        <p>"태풍의 에너지원은 지구 내부 에너지다"(X — 태양), "태풍은 지구 에너지 불균형을 심화시킨다"(X — 해소를 돕는다). <b>재해 = 시스템의 열 운반 장치</b>라는 이중성이 최고난도 포인트다.</p>
+      </div>
+      <h4>직접 해보기 — 오늘 하루 상호작용 사냥</h4>
+      <p>오늘 하루에서 권역 상호작용 세 가지를 찾아 "무엇이 어디에서 어디로"의 형식으로 적어 보자. 아침 이슬(기권→지권), 화분에 준 물이 마르는 것(지권→기권), 내가 마신 물(수권→생물권)… 지구시스템 수업은 사실 창밖에서 매일 열리고 있다.</p>
+    </div>
+  </div>
+  <div class="folio"><span>III. 시스템과 상호작용</span><span class="num">83</span></div>
+</div>
+
+<!-- ═════════════ p.84 STEP 1 + STEP 2 시작 ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag">III. 시스템과 상호작용</span><span class="lesson-tag">01. 지구시스템과 에너지·물질 순환 | 문제</span></div>
+
+  <div class="step-head"><span class="stepno">STEP 1</span><span class="steptt">개념 확인</span><span class="stepdesc">OX와 빈칸으로 개념 점검 — 막히면 알짜 정리로!</span></div>
+  <div class="qgrid">
+    <div>
+      <div class="q"><div class="qhead"><span class="qno">1</span><div class="stem">지구시스템은 태양계라는 더 큰 시스템의 구성 요소이다. <span class="ox-answer">( O , X )</span></div></div></div>
+      <div class="q"><div class="qhead"><span class="qno">2</span><div class="stem">지구시스템의 에너지원 중 가장 많은 양을 차지하는 것은 지구 내부 에너지이다. <span class="ox-answer">( O , X )</span></div></div></div>
+      <div class="q"><div class="qhead"><span class="qno">3</span><div class="stem">물의 순환 과정에서 지구 전체의 물의 양은 거의 일정하게 유지된다. <span class="ox-answer">( O , X )</span></div></div></div>
+    </div>
+    <div>
+      <div class="q"><div class="qhead"><span class="qno">4</span><div class="stem">지구를 둘러싼 대기의 층인 <span class="blankline" style="min-width:12mm;"></span>은 높이에 따른 기온 변화를 기준으로 네 층으로 구분한다.</div></div></div>
+      <div class="q"><div class="qhead"><span class="qno">5</span><div class="stem">지권에서 부피가 가장 큰 층은 <span class="blankline" style="min-width:12mm;"></span>이다.</div></div></div>
+      <div class="q"><div class="qhead"><span class="qno">6</span><div class="stem">맨틀 대류와 지진·화산 활동을 일으키는 에너지원은 <span class="blankline" style="min-width:26mm;"></span>이다.</div></div></div>
+    </div>
+  </div>
+
+  <div style="border-top:0.5mm solid var(--line); margin:2mm 0 4mm;"></div>
+
+  <div class="step-head s2"><span class="stepno">STEP 2</span><span class="steptt">내신 완성</span><span class="stepdesc">학교 시험 유형 그대로 — 서술형까지 한 번에</span></div>
+
+  <div class="q">
+    <div class="qhead"><span class="qno">7</span><div class="stem">기권의 층상 구조에 대한 설명으로 옳은 것은? <span class="difficulty">●●○</span>
+    <div class="tags">10통과1-03-01 | 개념 2</div></div></div>
+    <ul class="choices">
+      <li>① 대류권에서는 높이 올라갈수록 기온이 높아진다.</li>
+      <li>② 성층권에는 오존층이 있어 태양의 자외선을 흡수한다.</li>
+      <li>③ 구름·비 같은 기상 현상은 주로 열권에서 일어난다.</li>
+      <li>④ 중간권은 지표에 가장 가까운 층이다.</li>
+      <li>⑤ 기권의 층은 높이에 따른 공기의 색으로 구분한다.</li>
+    </ul>
+  </div>
+
+  <div class="q">
+    <div class="qhead"><span class="qno">8</span><div class="stem">바다에서 증발한 수증기가 태풍으로 발달하여 큰 비를 내리는 현상에서, 가장 활발하게 상호작용하는 두 권역은? <span class="difficulty">●●●</span>
+    <div class="tags">10통과1-03-01 | 개념 5</div></div></div>
+    <ul class="choices inline">
+      <li>① 지권과 생물권</li>
+      <li>② 기권과 수권</li>
+      <li>③ 외권과 지권</li>
+      <li>④ 지권과 외권</li>
+      <li>⑤ 생물권과 외권</li>
+    </ul>
+  </div>
+
+  <div class="folio"><span>III. 시스템과 상호작용</span><span class="num">84</span></div>
+</div>
+
+<!-- ═════════════ p.85 STEP 2 계속 ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag">III. 시스템과 상호작용</span><span class="lesson-tag">01. 지구시스템과 에너지·물질 순환 | 문제</span></div>
+
+  <div class="q">
+    <div class="qhead"><span class="qno">9</span><div class="stem"><span class="badge-data">자료</span>그림은 물의 순환을 나타낸 것이다. 이에 대한 설명으로 옳은 것은? <span class="difficulty">●●●</span>
+    <div class="tags">10통과1-03-01 | 개념 6</div></div></div>
+    <figure style="margin:2mm 0 1mm 8.4mm;">
+      <svg width="260" height="88" viewBox="0 0 260 88" font-family="PC Sans">
+        <circle cx="26" cy="14" r="9" fill="url(#gSun6)"/>
+        <path d="M6,66 h248 v12 h-248 Z" fill="#7FB8E8"/>
+        <path d="M150,66 L182,34 L214,66 Z" fill="#C9A97A"/>
+        <ellipse cx="92" cy="22" rx="16" ry="8" fill="#F3F6FA" stroke="#9AA7B1" stroke-width="0.8"/>
+        <ellipse cx="170" cy="16" rx="16" ry="8" fill="#F3F6FA" stroke="#9AA7B1" stroke-width="0.8"/>
+        <line x1="50" y1="62" x2="66" y2="32" stroke="#4A8FD0" stroke-width="1.4" marker-end="url(#arrP)"/>
+        <line x1="108" y1="20" x2="150" y2="16" stroke="#9AA7B1" stroke-width="1.2" marker-end="url(#arrP)"/>
+        <g stroke="#4A8FD0" stroke-width="1.1"><line x1="166" y1="28" x2="162" y2="40"/><line x1="176" y1="28" x2="172" y2="40"/></g>
+        <path d="M196,56 q-40,8 -80,8" fill="none" stroke="#4A8FD0" stroke-width="1.4" marker-end="url(#arrP)"/>
+        <text x="40" y="50" font-size="6.6" fill="#1E4E8C">증발</text>
+        <text x="186" y="47" font-size="6.6" fill="#1E4E8C">강수</text>
+        <text x="150" y="62" text-anchor="middle" font-size="6.6" fill="#1E4E8C">유수</text>
+      </svg>
+    </figure>
+    <ul class="choices">
+      <li>① 물의 순환을 일으키는 근본 에너지원은 지구 내부 에너지이다.</li>
+      <li>② 순환 과정에서 지구 전체 물의 양은 점점 줄어든다.</li>
+      <li>③ 물의 순환을 일으키는 근본 에너지원은 태양 에너지이다.</li>
+      <li>④ 증발은 물이 수권에서 지권으로 이동하는 과정이다.</li>
+      <li>⑤ 생물권은 물의 순환에 관여하지 않는다.</li>
+    </ul>
+  </div>
+
+  <div class="q">
+    <div class="qhead"><span class="qno">10</span><div class="stem">지구시스템의 에너지원에 대한 설명으로 옳은 것만을 고른 것은? <span class="difficulty">●●●</span>
+    <div class="tags">10통과1-03-01 | 개념 4</div></div></div>
+    <div class="bogi-box" style="background:#fff;">
+      (가) 태양 에너지는 기상 현상과 물의 순환 등 지표의 자연 현상 대부분을 일으킨다.<br>
+      (나) 지구 내부 에너지는 맨틀을 대류시켜 지진과 화산 활동을 일으킨다.<br>
+      (다) 조력 에너지는 세 에너지원 중 가장 양이 많다.
+    </div>
+    <ul class="choices inline">
+      <li>① (가)</li><li>② (나)</li><li>③ (가), (나)</li><li>④ (나), (다)</li><li>⑤ (가), (나), (다)</li>
+    </ul>
+  </div>
+
+  <div class="q">
+    <div class="qhead"><span class="qno">11</span><div class="stem"><span class="badge-essay">서술형</span>지구를 하나의 '시스템'으로 보는 까닭을 <b>'구성 요소'와 '상호작용'</b>이라는 말을 포함하여 서술하시오. <span class="difficulty">●●●●</span>
+    <div class="tags">10통과1-03-01 | 개념 1·5</div></div></div>
+    <div class="essay-lines"><div></div><div></div><div></div></div>
+  </div>
+
+  <div class="folio"><span>III. 시스템과 상호작용</span><span class="num">85</span></div>
+</div>
+
+<!-- ═════════════ p.86 STEP 3 ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag">III. 시스템과 상호작용</span><span class="lesson-tag">01. 지구시스템과 에너지·물질 순환 | 문제</span></div>
+  <div class="step-head s3"><span class="stepno">STEP 3</span><span class="steptt">수능 도전</span><span class="stepdesc">2028 수능 규격 — ㄱㄴㄷ 합답형·자료 해석</span></div>
+
+  <div class="q">
+    <div class="qhead"><span class="qno">12</span><div class="stem"><span class="badge-data">자료</span>그림은 기권에서 높이에 따른 기온 분포를 나타낸 것이다. A~D는 기권의 네 층이다. 옳은 것만을 &lt;보기&gt;에서 있는 대로 고른 것은? <span class="difficulty">[2점]</span>
+    <div class="tags">10통과1-03-01</div></div></div>
+    <figure style="margin:2mm 0 1mm 8.6mm;">
+      <svg width="250" height="120" viewBox="0 0 250 120" font-family="PC Sans">
+        <line x1="46" y1="104" x2="240" y2="104" stroke="#5B6B77" stroke-width="1.1" marker-end="url(#arrP)"/>
+        <line x1="46" y1="104" x2="46" y2="8" stroke="#5B6B77" stroke-width="1.1" marker-end="url(#arrP)"/>
+        <text x="240" y="116" text-anchor="end" font-size="6.8" fill="#5B6B77">기온 →</text>
+        <text x="42" y="6" text-anchor="end" font-size="6.8" fill="#5B6B77">높이</text>
+        <path d="M170,104 L96,80 L160,56 L104,32 L196,10" fill="none" stroke="#D6455D" stroke-width="2"/>
+        <g font-size="7.6" font-weight="900" fill="#22303A">
+          <text x="184" y="98">A</text><text x="174" y="72">B</text><text x="174" y="48">C</text><text x="208" y="20">D</text>
+        </g>
+        <g stroke="#B8C2CA" stroke-width="0.7" stroke-dasharray="2 2">
+          <line x1="46" y1="80" x2="240" y2="80"/><line x1="46" y1="56" x2="240" y2="56"/><line x1="46" y1="32" x2="240" y2="32"/>
+        </g>
+      </svg>
+    </figure>
+    <div class="bogi-box">
+      <div class="bt">보기</div>
+      ㄱ. A에서는 높이 올라갈수록 기온이 낮아진다.<br>
+      ㄴ. B에는 자외선을 흡수하는 오존층이 있다.<br>
+      ㄷ. 구름과 비 같은 기상 현상은 주로 B에서 일어난다.
+    </div>
+    <ul class="choices inline">
+      <li>① ㄱ</li><li>② ㄷ</li><li>③ ㄱ, ㄴ</li><li>④ ㄴ, ㄷ</li><li>⑤ ㄱ, ㄴ, ㄷ</li>
+    </ul>
+  </div>
+
+  <div class="q">
+    <div class="qhead"><span class="qno">13</span><div class="stem"><span class="badge-data">자료</span>그림은 지구시스템에서 탄소가 이동하는 과정의 일부를 나타낸 것이다. 옳은 것만을 &lt;보기&gt;에서 있는 대로 고른 것은? <span class="difficulty">[2.5점]</span>
+    <div class="tags">10통과1-03-01</div></div></div>
+    <figure style="margin:2mm 0 1mm 8.6mm;">
+      <svg width="300" height="100" viewBox="0 0 300 100" font-family="PC Sans">
+        <rect x="30" y="6" width="240" height="26" rx="4" fill="#E9F2FA"/>
+        <text x="150" y="22" text-anchor="middle" font-size="7.6" font-weight="800" fill="#1E4E8C">기권 (이산화 탄소)</text>
+        <rect x="30" y="64" width="110" height="28" rx="4" fill="#EAF6EC"/>
+        <text x="85" y="81" text-anchor="middle" font-size="7.4" font-weight="800" fill="#2E6B3A">생물권</text>
+        <rect x="160" y="64" width="110" height="28" rx="4" fill="#F8F0E4"/>
+        <text x="215" y="81" text-anchor="middle" font-size="7.4" font-weight="800" fill="#8A6B3A">지권 (화석 연료)</text>
+        <line x1="60" y1="36" x2="60" y2="60" stroke="#2E6B3A" stroke-width="1.6" marker-end="url(#arrP)"/>
+        <text x="54" y="52" text-anchor="end" font-size="6.4" fill="#2E6B3A">광합성</text>
+        <line x1="110" y1="60" x2="110" y2="36" stroke="#9AA7B1" stroke-width="1.6" marker-end="url(#arrP)"/>
+        <text x="116" y="52" font-size="6.4" fill="#5B6B77">호흡</text>
+        <line x1="230" y1="60" x2="230" y2="36" stroke="#D6455D" stroke-width="1.8" marker-end="url(#arrP)"/>
+        <text x="236" y="52" font-size="6.4" fill="#D6455D">연소</text>
+      </svg>
+    </figure>
+    <div class="bogi-box">
+      <div class="bt">보기</div>
+      ㄱ. 광합성은 기권의 이산화 탄소를 생물권으로 이동시킨다.<br>
+      ㄴ. 화석 연료의 연소는 지권에 저장된 탄소를 기권으로 이동시킨다.<br>
+      ㄷ. 탄소는 순환하므로 대기 중 이산화 탄소 농도는 인간 활동과 관계없이 일정하다.
+    </div>
+    <ul class="choices inline">
+      <li>① ㄱ</li><li>② ㄴ</li><li>③ ㄷ</li><li>④ ㄱ, ㄴ</li><li>⑤ ㄱ, ㄴ, ㄷ</li>
+    </ul>
+  </div>
+
+  <div class="folio"><span>III. 시스템과 상호작용</span><span class="num">86</span></div>
+</div>
+
+<!-- ═════════════ p.87 해설 1 ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag" style="color:var(--brand);">알짜 해설</span><span class="lesson-tag">01. 지구시스템과 에너지·물질 순환</span></div>
+  <div class="sol-head"><span class="stt">알짜 해설</span><span class="sub">전 문항 해설 + 오답 선지 분석 — 맞힌 문제도 해설로 한 번 더!</span></div>
+
+  <table class="anstable">
+    <tr><th>문항</th><td>1</td><td>2</td><td>3</td><td>4</td><td>5</td><td>6</td><td>7</td><td>8</td><td>9</td><td>10</td><td>11</td><td>12</td><td>13</td></tr>
+    <tr><th>정답</th><td class="a">O</td><td class="a">X</td><td class="a">O</td><td class="a">기권</td><td class="a">맨틀</td><td class="a">지구 내부 에너지</td><td class="a">②</td><td class="a">②</td><td class="a">③</td><td class="a">③</td><td class="a">서술형</td><td class="a">③</td><td class="a">④</td></tr>
+  </table>
+
+  <div class="solcols">
+    <div>
+      <div class="sol"><div class="shead"><span class="sno">1</span><span class="sans">O</span><span class="slink">개념 1</span></div>
+        <p>태양계도 시스템, 지구도 시스템 — 시스템 속의 시스템이다.</p></div>
+      <div class="sol"><div class="shead"><span class="sno">2</span><span class="sans">X</span><span class="slink">개념 4</span></div>
+        <p>압도적 1위는 태양 에너지. 지구 내부 에너지는 땅속 사건 담당이다.</p></div>
+      <div class="sol"><div class="shead"><span class="sno">3</span><span class="sans">O</span><span class="slink">개념 6</span></div>
+        <p>물은 권역 사이를 옮겨 다닐 뿐, 지구 전체 총량은 거의 일정하다.</p></div>
+      <div class="sol"><div class="shead"><span class="sno">4</span><span class="sans">기권</span><span class="slink">개념 2</span></div>
+        <p>구분 기준은 '높이에 따른 기온 변화' — 지그재그의 꺾이는 곳이 층 경계다.</p></div>
+      <div class="sol"><div class="shead"><span class="sno">5</span><span class="sans">맨틀</span><span class="slink">개념 3</span></div>
+        <p>맨틀은 지권 부피의 약 80 %. 서서히 대류하며 판을 움직인다.</p></div>
+      <div class="sol"><div class="shead"><span class="sno">6</span><span class="sans">지구 내부 에너지</span><span class="slink">개념 4</span></div>
+        <p>방사성 원소 붕괴열이 맨틀을 데워 대류시킨다 — 지진·화산의 뿌리.</p></div>
+    </div>
+    <div>
+      <div class="sol"><div class="shead"><span class="sno">7</span><span class="sans">②</span><span class="slink">개념 2</span></div>
+        <p>성층권의 오존층이 자외선을 흡수한다 — 그래서 위로 갈수록 따뜻하다.</p>
+        <div class="wrongbox"><div class="wt">오답 왜 틀렸나</div>
+          <p><b>①</b> 대류권은 위로 갈수록 기온이 낮아진다.</p>
+          <p><b>③</b> 기상 현상 = 대류권(수증기·대류).</p>
+          <p><b>④</b> 지표에 가장 가까운 층은 대류권.</p>
+          <p><b>⑤</b> 구분 기준은 기온 변화다.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">8</span><span class="sans">②</span><span class="slink">개념 5</span></div>
+        <p>물이 바다(수권)와 대기(기권)를 오가는 현상 — 이동 물질을 따라가면 권역 쌍이 나온다.</p>
+        <div class="wrongbox"><div class="wt">오답 왜 틀렸나</div>
+          <p><b>나머지</b> 태풍의 주 무대는 물(수증기)의 이동이다. 지권·생물권 피해는 상륙 이후의 2차 상호작용.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">9</span><span class="sans">③</span><span class="slink">개념 6</span></div>
+        <p>바닷물을 증발시키는 동력 = 태양 에너지. 총량은 일정하고, 증산 작용으로 생물권도 참여한다.</p>
+        <div class="wrongbox"><div class="wt">오답 왜 틀렸나</div>
+          <p><b>①</b> 내부 에너지는 지권 변동 담당. <b>②</b> 총량은 보존. <b>④</b> 증발은 수권→기권. <b>⑤</b> 증산 작용이 있다.</p></div></div>
+    </div>
+  </div>
+
+  <div class="folio"><span>알짜 해설</span><span class="num">87</span></div>
+</div>
+
+<!-- ═════════════ p.88 해설 2 ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag" style="color:var(--brand);">알짜 해설</span><span class="lesson-tag">01. 지구시스템과 에너지·물질 순환</span></div>
+  <div class="solcols">
+    <div>
+      <div class="sol"><div class="shead"><span class="sno">10</span><span class="sans">③</span><span class="slink">개념 4</span></div>
+        <p>(가) 태양 = 지표 현상 대부분. (옳음) (나) 내부 에너지 = 맨틀 대류 → 지진·화산. (옳음)</p>
+        <div class="wrongbox"><div class="wt">오답 왜 틀렸나</div>
+          <p><b>(다)</b> 조력 에너지는 셋 중 가장 적다. 크기 순서: 태양 ≫ 내부 &gt; 조력.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">11</span><span class="sans">모범 답안</span><span class="slink">개념 1·5</span></div>
+        <p>지구는 기권·수권·지권·생물권·외권이라는 <b>구성 요소(권역)</b>로 이루어져 있고, 권역들이 <b>물질과 에너지를 주고받는 상호작용</b>을 하며 서로 영향을 미치기 때문에 하나의 시스템으로 본다.</p>
+        <div class="wrongbox"><div class="wt">채점 기준 (감점 포인트)</div>
+          <p>① 여러 권역(구성 요소)으로 구성 ② 물질·에너지 교환(상호작용) ③ 전체가 하나로 연결 — 세 요소 모두 서술해야 만점. 권역 이름 예시가 없으면 감점 여지.</p></div></div>
+    </div>
+    <div>
+      <div class="sol"><div class="shead"><span class="sno">12</span><span class="sans">③</span><span class="slink">개념 2 | 2점</span></div>
+        <p><b>ㄱ (옳음)</b> A(대류권)는 위로 갈수록 기온 하강. <b>ㄴ (옳음)</b> B(성층권)의 오존층이 자외선 흡수. <b>ㄷ (틀림)</b> 기상 현상은 A(대류권)에서.</p>
+        <div class="wrongbox"><div class="wt">함정 체크</div>
+          <p>그래프 문제는 꺾임의 방향부터: ↓↑↓↑ = 대·성·중·열. 층별 간판(기상 현상·오존층·유성·오로라)을 붙이면 끝.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">13</span><span class="sans">④</span><span class="slink">개념 5·6 | 2.5점</span></div>
+        <p><b>ㄱ (옳음)</b> 광합성 = 기권 CO₂ → 생물권. <b>ㄴ (옳음)</b> 연소 = 지권의 탄소 창고 → 기권. <b>ㄷ (틀림)</b> 순환한다고 농도가 저절로 일정해지는 것은 아니다 — 화석 연료 사용으로 대기 중 CO₂는 실제로 늘고 있다.</p>
+        <div class="wrongbox"><div class="wt">함정 체크</div>
+          <p>'총량 보존'과 '각 창고의 저장량 불변'을 구별하라. 창고 사이의 이동이 바뀌면 농도는 변한다 — 이 논리는 통합과학2 지구온난화로 직결된다.</p></div></div>
+
+      <div class="gist" style="margin-top:5mm;">
+        <div class="boxtitle"><span class="ico">알</span>이 소단원, 이것만은!</div>
+        <ul>
+          <li>다섯 권역(기·수·지·생·외)의 구조와 간판 — <b>기상 현상=대류권, 오존층=성층권, 액체는 외핵, 부피 1등 맨틀</b></li>
+          <li>에너지원 셋의 담당 구역: <b>하늘·물·생명=태양 / 땅속=지구 내부 / 밀물·썰물=조력</b> (크기: 태양 ≫ 내부 &gt; 조력)</li>
+          <li><b>물질은 순환, 에너지는 흐른다</b> — 상호작용 문제는 "이동한 것"을 추적하면 풀린다</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div class="folio"><span>알짜 해설</span><span class="num">88</span></div>
+</div>
+
+<!-- ═════════════ p.89 MEMO ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag">III. 시스템과 상호작용</span><span class="lesson-tag">01 ▸ 02 넘어가기 전에</span></div>
+  <div class="memo-head"><span class="mt">MEMO</span><span class="ms">헷갈린 개념, 다시 틀린 문제 번호, 나만의 암기법을 남겨 두는 자리</span></div>
+  <div class="memo-area"></div>
+  <div class="memo-pen">"오늘 창밖에서 권역 상호작용 하나만 찾아 말해 보자. 못 찾겠으면 81쪽으로! — 박찬쌤"</div>
+  <div class="folio"><span>박찬 과학 | 통합과학 1</span><span class="num">89</span></div>
+</div>
+
+</body>
+</html>

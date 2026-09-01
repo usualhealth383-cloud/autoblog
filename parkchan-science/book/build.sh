@@ -28,6 +28,9 @@ render sample-chapter/chapter.html sample-chapter/chapter.pdf
 render chapter-02/chapter.html    chapter-02/chapter.pdf
 render chapter-03/chapter.html    chapter-03/chapter.pdf
 render chapter-04/chapter.html    chapter-04/chapter.pdf
+render chapter-05/chapter.html    chapter-05/chapter.pdf
+render chapter-06/chapter.html    chapter-06/chapter.pdf
+render chapter-07/chapter.html    chapter-07/chapter.pdf
 render mock-exam/exam.html        mock-exam/exam.pdf
 
 # 3) 조판 기하 검증 (위반 시 빌드 실패)
@@ -36,6 +39,9 @@ python3 ../tools/qa_check.py sample-chapter/chapter.html
 python3 ../tools/qa_check.py chapter-02/chapter.html
 python3 ../tools/qa_check.py chapter-03/chapter.html
 python3 ../tools/qa_check.py chapter-04/chapter.html
+python3 ../tools/qa_check.py chapter-05/chapter.html
+python3 ../tools/qa_check.py chapter-06/chapter.html
+python3 ../tools/qa_check.py chapter-07/chapter.html
 python3 ../tools/qa_check.py mock-exam/exam.html --floor-mm 285
 
 # 4) 인쇄 텍스트 무결성 검증 (HTML 문장이 PDF에 전부 찍혔는지 — 클리핑 유실 방지)
@@ -45,6 +51,9 @@ python3 ../tools/pdf_text_check.py sample-chapter/chapter.html sample-chapter/ch
 python3 ../tools/pdf_text_check.py chapter-02/chapter.html    chapter-02/chapter.pdf
 python3 ../tools/pdf_text_check.py chapter-03/chapter.html    chapter-03/chapter.pdf
 python3 ../tools/pdf_text_check.py chapter-04/chapter.html    chapter-04/chapter.pdf
+python3 ../tools/pdf_text_check.py chapter-05/chapter.html    chapter-05/chapter.pdf
+python3 ../tools/pdf_text_check.py chapter-06/chapter.html    chapter-06/chapter.pdf
+python3 ../tools/pdf_text_check.py chapter-07/chapter.html    chapter-07/chapter.pdf
 python3 ../tools/pdf_text_check.py mock-exam/exam.html        mock-exam/exam.pdf
 
 # 5) 합본 PDF (앞부속 + 소단원 01~04 — 현재까지 집필분)
@@ -52,7 +61,8 @@ python3 - <<'PYEOF'
 import pymupdf
 out = pymupdf.open()
 for f in ["front-matter/front.pdf", "sample-chapter/chapter.pdf",
-          "chapter-02/chapter.pdf", "chapter-03/chapter.pdf", "chapter-04/chapter.pdf"]:
+          "chapter-02/chapter.pdf", "chapter-03/chapter.pdf", "chapter-04/chapter.pdf",
+          "chapter-05/chapter.pdf", "chapter-06/chapter.pdf", "chapter-07/chapter.pdf"]:
     with pymupdf.open(f) as d:
         out.insert_pdf(d)
 try:
