@@ -322,6 +322,21 @@
           <defs>
             <marker id="arrC" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="#2E5BDA"/></marker>
             <marker id="arrIn" markerWidth="7" markerHeight="7" refX="5" refY="2.5" orient="auto"><path d="M0,0 L6,2.5 L0,5 Z" fill="#7A97E8"/></marker>
+            <radialGradient id="gStar" cx="35%" cy="32%" r="72%">
+              <stop offset="0" stop-color="#FDEEC9"/><stop offset="0.45" stop-color="#F6B23B"/><stop offset="1" stop-color="#D97A0C"/>
+            </radialGradient>
+            <radialGradient id="gProto" cx="35%" cy="32%" r="72%">
+              <stop offset="0" stop-color="#FAD9A8"/><stop offset="0.5" stop-color="#EE9A3E"/><stop offset="1" stop-color="#C96A18"/>
+            </radialGradient>
+            <radialGradient id="gRG" cx="35%" cy="32%" r="75%">
+              <stop offset="0" stop-color="#F8C0A6"/><stop offset="0.5" stop-color="#E87A5A"/><stop offset="1" stop-color="#A93E22"/>
+            </radialGradient>
+            <radialGradient id="gWD" cx="35%" cy="32%" r="72%">
+              <stop offset="0" stop-color="#FFFFFF"/><stop offset="0.6" stop-color="#CFE3F2"/><stop offset="1" stop-color="#8FB4D8"/>
+            </radialGradient>
+            <radialGradient id="gGlow" cx="50%" cy="50%" r="50%">
+              <stop offset="0" stop-color="#FDE9C8" stop-opacity="0.9"/><stop offset="0.65" stop-color="#F4A62A" stop-opacity="0.35"/><stop offset="1" stop-color="#F4A62A" stop-opacity="0"/>
+            </radialGradient>
           </defs>
           <line x1="18" y1="62" x2="482" y2="62" stroke="#7A97E8" stroke-width="3" marker-end="url(#arrC)"/>
           <!-- 성운 -->
@@ -345,7 +360,7 @@
           </g>
           <!-- 원시별 -->
           <g transform="translate(312,62)">
-            <circle r="11" fill="#F6C98E"/><circle r="6.5" fill="#E8940A"/>
+            <circle r="15" fill="url(#gGlow)" opacity="0.55"/><circle r="11" fill="url(#gProto)"/>
             <text y="32" text-anchor="middle" font-size="10.5" font-weight="800" fill="#22303A">원시별</text>
             <text y="44" text-anchor="middle" font-size="8" fill="#5B6B77">수축하며 가열</text>
           </g>
@@ -357,7 +372,7 @@
               <line x1="-12" y1="-12" x2="-8.5" y2="-8.5"/><line x1="8.5" y1="8.5" x2="12" y2="12"/>
               <line x1="-12" y1="12" x2="-8.5" y2="8.5"/><line x1="8.5" y1="-8.5" x2="12" y2="-12"/>
             </g>
-            <circle r="9.5" fill="#F4A62A"/><circle r="5" fill="#FDE9C8"/>
+            <circle r="14" fill="url(#gGlow)"/><circle r="9.5" fill="url(#gStar)"/>
             <text y="32" text-anchor="middle" font-size="10.5" font-weight="800" fill="#22303A">별</text>
             <text y="44" text-anchor="middle" font-size="8" fill="#E8940A" font-weight="800">중심 약 1000만 K, 수소 핵융합</text>
           </g>
@@ -406,13 +421,13 @@
           <line x1="18" y1="50" x2="472" y2="50" stroke="#7A97E8" stroke-width="3" marker-end="url(#arrC)"/>
           <!-- 주계열성 -->
           <g transform="translate(62,50)">
-            <circle r="10" fill="#F4A62A"/><circle r="5" fill="#FDE9C8"/>
+            <circle r="14" fill="url(#gGlow)" opacity="0.7"/><circle r="10" fill="url(#gStar)"/>
             <text y="30" text-anchor="middle" font-size="10.5" font-weight="800" fill="#22303A">주계열성</text>
             <text y="42" text-anchor="middle" font-size="8" fill="#5B6B77">수소 → 헬륨</text>
           </g>
           <!-- 적색 거성 -->
           <g transform="translate(216,50)">
-            <circle r="26" fill="#F0A08A"/><circle r="17" fill="#E87A5A"/><circle r="6.5" fill="#C94F35"/>
+            <circle r="30" fill="url(#gGlow)" opacity="0.4"/><circle r="26" fill="url(#gRG)"/>
             <text y="46" text-anchor="middle" font-size="10.5" font-weight="800" fill="#22303A">적색 거성</text>
             <text y="58" text-anchor="middle" font-size="8" fill="#E8940A" font-weight="800">헬륨 → 탄소 (이어서 질소·산소)</text>
           </g>
@@ -420,7 +435,7 @@
           <g transform="translate(396,50)">
             <circle r="24" fill="none" stroke="#B9CBF2" stroke-width="7" opacity="0.9"/>
             <circle r="24" fill="none" stroke="#8FA8EC" stroke-width="1.2"/>
-            <circle r="4.2" fill="#DCEBF5" stroke="#7A97E8" stroke-width="1.2"/>
+            <circle r="4.2" fill="url(#gWD)" stroke="#7A97E8" stroke-width="0.8"/>
             <text y="44" text-anchor="middle" font-size="10.5" font-weight="800" fill="#22303A">행성상 성운 + 백색 왜성</text>
             <text y="56" text-anchor="middle" font-size="8" fill="#5B6B77">만든 원소를 우주로 방출</text>
           </g>
@@ -515,7 +530,8 @@
                 <line x1="62" y1="77" x2="40" y2="99" marker-end="url(#arrO2)"/>
                 <line x1="88" y1="77" x2="110" y2="99" marker-end="url(#arrO2)"/>
               </g>
-              <path d="M75,44 L81,57 L95,52 L88,64 L95,76 L81,71 L75,84 L69,71 L55,76 L62,64 L55,52 L69,57 Z" fill="#F4A62A"/>
+              <circle cx="75" cy="64" r="30" fill="url(#gGlow)"/>
+              <path d="M75,44 L81,57 L95,52 L88,64 L95,76 L81,71 L75,84 L69,71 L55,76 L62,64 L55,52 L69,57 Z" fill="url(#gStar)"/>
               <circle cx="75" cy="64" r="9" fill="#FDE9C8"/>
               <circle cx="34" cy="46" r="2.6" fill="#C9A227"/><circle cx="116" cy="44" r="2.6" fill="#C9A227"/>
               <circle cx="38" cy="88" r="2.6" fill="#9AA7B1"/><circle cx="114" cy="90" r="2.6" fill="#9AA7B1"/>
@@ -582,13 +598,13 @@
           <!-- 2 원반 + 원시 태양 -->
           <g transform="translate(180,52)">
             <ellipse cx="0" cy="0" rx="26" ry="8" fill="#ECF1FC" stroke="#BCCDF3" stroke-width="1"/>
-            <circle r="6.5" fill="#F4A62A"/>
+            <circle r="9" fill="url(#gGlow)" opacity="0.7"/><circle r="6.5" fill="url(#gStar)"/>
             <text y="32" text-anchor="middle" font-size="10" font-weight="800" fill="#22303A">회전 원반·원시 태양</text>
             <text y="44" text-anchor="middle" font-size="7.8" fill="#5B6B77">중심에 물질 집중</text>
           </g>
           <!-- 3 미행성체 -->
           <g transform="translate(310,52)">
-            <circle r="5.5" fill="#F4A62A"/>
+            <circle r="5.5" fill="url(#gStar)"/>
             <circle cx="-20" cy="-4" r="2.2" fill="#8FA8EC"/><circle cx="-13" cy="6" r="1.8" fill="#8FA8EC"/>
             <circle cx="14" cy="-6" r="2.2" fill="#8FA8EC"/><circle cx="22" cy="4" r="1.8" fill="#8FA8EC"/><circle cx="18" cy="-1" r="1.4" fill="#8FA8EC"/>
             <text y="32" text-anchor="middle" font-size="10" font-weight="800" fill="#22303A">미행성체 충돌·성장</text>
@@ -596,9 +612,9 @@
           </g>
           <!-- 4 태양계 -->
           <g transform="translate(432,52)">
-            <circle cx="-28" cy="0" r="6.5" fill="#F4A62A"/>
+            <circle cx="-28" cy="0" r="6.5" fill="url(#gStar)"/>
             <circle cx="-15" cy="0" r="1.6" fill="#8FA8EC"/><circle cx="-9" cy="0" r="1.9" fill="#2E5BDA"/><circle cx="-3" cy="0" r="1.6" fill="#D6455D"/>
-            <circle cx="12" cy="0" r="4.6" fill="#E8B25A"/><circle cx="26" cy="0" r="3.8" fill="#9CC5CE"/>
+            <circle cx="12" cy="0" r="4.6" fill="url(#gProto)"/><circle cx="26" cy="0" r="3.8" fill="#9CC5CE"/>
             <text y="32" text-anchor="middle" font-size="10" font-weight="800" fill="#22303A">태양계 완성</text>
             <text y="44" text-anchor="middle" font-size="7.8" fill="#5B6B77">안쪽 지구형 · 바깥 목성형</text>
           </g>
@@ -715,8 +731,8 @@
           <text x="8" y="30" font-size="9.5" font-weight="800" fill="#22303A">별 A</text>
           <text x="8" y="42" font-size="7.6" fill="#5B6B77">태양 정도 질량</text>
           <line x1="52" y1="34" x2="440" y2="34" stroke="#BCCDF3" stroke-width="2" marker-end="url(#arrC)"/>
-          <circle cx="86" cy="34" r="7" fill="#F4A62A"/><text x="86" y="56" text-anchor="middle" font-size="8.4" font-weight="700" fill="#3D4C58">주계열성</text>
-          <circle cx="216" cy="34" r="13" fill="#E87A5A"/><text x="216" y="62" text-anchor="middle" font-size="8.4" font-weight="700" fill="#3D4C58">적색 거성</text>
+          <circle cx="86" cy="34" r="7" fill="url(#gStar)"/><text x="86" y="56" text-anchor="middle" font-size="8.4" font-weight="700" fill="#3D4C58">주계열성</text>
+          <circle cx="216" cy="34" r="13" fill="url(#gRG)"/><text x="216" y="62" text-anchor="middle" font-size="8.4" font-weight="700" fill="#3D4C58">적색 거성</text>
           <text x="216" y="14" text-anchor="middle" font-size="7.8" font-weight="800" fill="#E8940A">헬륨 → 탄소 (질소·산소)</text>
           <g transform="translate(366,34)"><circle r="11" fill="none" stroke="#B9CBF2" stroke-width="4"/><circle r="2.6" fill="#DCEBF5" stroke="#7A97E8" stroke-width="1"/></g>
           <text x="366" y="62" text-anchor="middle" font-size="8.4" font-weight="700" fill="#3D4C58">행성상 성운 + 백색 왜성</text>
@@ -724,8 +740,8 @@
           <text x="8" y="102" font-size="9.5" font-weight="800" fill="#22303A">별 B</text>
           <text x="8" y="114" font-size="7.6" fill="#5B6B77">태양의 10배 이상</text>
           <line x1="52" y1="106" x2="440" y2="106" stroke="#BCCDF3" stroke-width="2" marker-end="url(#arrC)"/>
-          <circle cx="86" cy="106" r="8.5" fill="#F4A62A"/><text x="86" y="130" text-anchor="middle" font-size="8.4" font-weight="700" fill="#3D4C58">주계열성</text>
-          <circle cx="216" cy="106" r="17" fill="#C94F35"/><text x="216" y="136" text-anchor="middle" font-size="8.4" font-weight="700" fill="#3D4C58">초거성</text>
+          <circle cx="86" cy="106" r="8.5" fill="url(#gStar)"/><text x="86" y="130" text-anchor="middle" font-size="8.4" font-weight="700" fill="#3D4C58">주계열성</text>
+          <circle cx="216" cy="106" r="17" fill="url(#gRG)"/><text x="216" y="136" text-anchor="middle" font-size="8.4" font-weight="700" fill="#3D4C58">초거성</text>
           <text x="216" y="82" text-anchor="middle" font-size="7.8" font-weight="800" fill="#E8940A">탄소 → … → 철 (양파 구조)</text>
           <g transform="translate(366,106)">
             <path d="M0,-14 L4,-5 L14,-8 L7,0 L14,8 L4,5 L0,14 L-4,5 L-14,8 L-7,0 L-14,-8 L-4,-5 Z" fill="#F4A62A"/>
@@ -867,14 +883,14 @@
       <svg width="380" height="104" viewBox="0 0 380 104" font-family="PC Sans">
         <text x="0" y="24" font-size="8.5" font-weight="800">별 A</text>
         <line x1="34" y1="20" x2="368" y2="20" stroke="#BCCDF3" stroke-width="1.8" marker-end="url(#arrC)"/>
-        <circle cx="62" cy="20" r="5.5" fill="#F4A62A"/><text x="62" y="40" text-anchor="middle" font-size="7.8" fill="#3D4C58">주계열성</text>
-        <circle cx="180" cy="20" r="10" fill="#E87A5A"/><text x="180" y="44" text-anchor="middle" font-size="7.8" fill="#3D4C58">적색 거성</text>
+        <circle cx="62" cy="20" r="5.5" fill="url(#gStar)"/><text x="62" y="40" text-anchor="middle" font-size="7.8" fill="#3D4C58">주계열성</text>
+        <circle cx="180" cy="20" r="10" fill="url(#gRG)"/><text x="180" y="44" text-anchor="middle" font-size="7.8" fill="#3D4C58">적색 거성</text>
         <g transform="translate(302,20)"><circle r="8.5" fill="none" stroke="#B9CBF2" stroke-width="3"/><circle r="2" fill="#DCEBF5" stroke="#7A97E8" stroke-width="0.8"/></g>
         <text x="302" y="44" text-anchor="middle" font-size="7.8" fill="#3D4C58">행성상 성운 + 백색 왜성</text>
         <text x="0" y="82" font-size="8.5" font-weight="800">별 B</text>
         <line x1="34" y1="78" x2="368" y2="78" stroke="#BCCDF3" stroke-width="1.8" marker-end="url(#arrC)"/>
-        <circle cx="62" cy="78" r="6.5" fill="#F4A62A"/><text x="62" y="99" text-anchor="middle" font-size="7.8" fill="#3D4C58">주계열성</text>
-        <circle cx="180" cy="78" r="13" fill="#C94F35"/><text x="180" y="101" text-anchor="middle" font-size="7.8" fill="#3D4C58">초거성</text>
+        <circle cx="62" cy="78" r="6.5" fill="url(#gStar)"/><text x="62" y="99" text-anchor="middle" font-size="7.8" fill="#3D4C58">주계열성</text>
+        <circle cx="180" cy="78" r="13" fill="url(#gRG)"/><text x="180" y="101" text-anchor="middle" font-size="7.8" fill="#3D4C58">초거성</text>
         <g transform="translate(302,78)"><path d="M0,-11 L3,-4 L11,-6 L5.5,0 L11,6 L3,4 L0,11 L-3,4 L-11,6 L-5.5,0 L-11,-6 L-3,-4 Z" fill="#F4A62A"/><circle r="3.5" fill="#FDE9C8"/></g>
         <text x="302" y="99" text-anchor="middle" font-size="7.8" fill="#3D4C58">초신성 폭발</text>
       </svg>

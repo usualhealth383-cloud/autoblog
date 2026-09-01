@@ -82,6 +82,14 @@ def main():
     floor = "258"; gap = "2.5"
     if "--floor-mm" in sys.argv: floor = sys.argv[sys.argv.index("--floor-mm")+1]
     html = src.read_text(encoding="utf-8")
+    # R5 미정의 SVG 참조: url(#id)가 가리키는 marker/gradient가 문서에 없으면 화살촉·음영이
+    # 조용히 사라진다 (2026-09-01 챕터03·04 화살촉 전멸 사고). 렌더링 전에 잡는다.
+    used = set(re.findall(r"url\(#([\w-]+)\)", html))
+    defined = set(re.findall(r'id="([\w-]+)"', html))
+    if used - defined:
+        for ref in sorted(used - defined):
+            print(f"  ✗ R5 미정의 SVG 참조: url(#{ref}) — marker/gradient 정의 누락")
+        print("QA FAIL"); sys.exit(1)
     js = JS.replace("%FLOOR%", floor).replace("%GAP%", gap)
     tmp = src.parent / "_qa_tmp.html"
     tmp.write_text(html.replace("</body>", js + "</body>"), encoding="utf-8")

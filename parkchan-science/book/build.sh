@@ -46,3 +46,19 @@ python3 ../tools/pdf_text_check.py chapter-02/chapter.html    chapter-02/chapter
 python3 ../tools/pdf_text_check.py chapter-03/chapter.html    chapter-03/chapter.pdf
 python3 ../tools/pdf_text_check.py chapter-04/chapter.html    chapter-04/chapter.pdf
 python3 ../tools/pdf_text_check.py mock-exam/exam.html        mock-exam/exam.pdf
+
+# 5) 합본 PDF (앞부속 + 소단원 01~04 — 현재까지 집필분)
+python3 - <<'PYEOF'
+import pymupdf
+out = pymupdf.open()
+for f in ["front-matter/front.pdf", "sample-chapter/chapter.pdf",
+          "chapter-02/chapter.pdf", "chapter-03/chapter.pdf", "chapter-04/chapter.pdf"]:
+    with pymupdf.open(f) as d:
+        out.insert_pdf(d)
+try:
+    out.subset_fonts()   # 문서별 중복 폰트 정리 (35MB → 14MB)
+except Exception:
+    pass
+out.save("통합과학1_합본.pdf", garbage=4, deflate=True)
+print(f"OK: 통합과학1_합본.pdf ({out.page_count}쪽)")
+PYEOF
