@@ -1,0 +1,226 @@
+<!doctype html><html lang="ko"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>요즘 건강 — 의학적인 내용을 나누는 채널</title>
+<meta name="description" content="궁금했던 건강 상식을 근거와 함께 정리하는 채널. 질환·영양·생활습관 아티클 32편.">
+<meta property="og:title" content="요즘 건강 — 의학적인 내용을 나누는 채널">
+<meta property="og:description" content="질환·영양·생활습관, 궁금했던 건강 상식을 근거와 함께 정리합니다.">
+<meta property="og:type" content="website">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --primary:#1E6E60; --primary-deep:#175349;
+  --surface:#F3F7F5; --card:#FFFFFF; --tint:#E7F0EC;
+  --line:#D9E4DF; --text:#1C2A26; --muted:#5B6C66;
+  --shadow:0 4px 18px rgba(30,110,96,.07);
+}
+@media (prefers-color-scheme:dark){
+  :root{
+    --primary:#5CB79A; --primary-deep:#7ACCB2;
+    --surface:#141C19; --card:#1C2723; --tint:#22302B;
+    --line:#2C3B35; --text:#E7EEEA; --muted:#9FB2AA;
+    --shadow:0 4px 18px rgba(0,0,0,.28);
+  }
+}
+*{box-sizing:border-box}
+html{color-scheme:light dark}
+body{margin:0;background:var(--surface);color:var(--text);
+  font-family:Pretendard,"Noto Sans KR",system-ui,-apple-system,sans-serif;
+  font-size:16px;line-height:1.65;word-break:keep-all;padding:0 16px 48px}
+.wrap{max-width:680px;margin:0 auto}
+a{color:inherit;text-decoration:none}
+
+/* ── hero ── */
+.hero{padding:48px 0 24px;text-align:left}
+.mark{display:inline-flex;align-items:center;gap:10px;margin-bottom:16px}
+.mark svg{display:block}
+.mark .name{font-size:15px;font-weight:700;color:var(--primary);letter-spacing:.02em}
+.hero h1{margin:0;font-size:30px;line-height:1.3;font-weight:800;letter-spacing:-.5px;text-wrap:pretty}
+.hero p.lead{margin:12px 0 0;font-size:16px;color:var(--muted);max-width:32em}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:24px}
+.chip{font-size:13px;font-weight:600;color:var(--primary);background:var(--tint);
+  border-radius:999px;padding:6px 12px}
+
+/* ── tools ── */
+.tools{position:sticky;top:0;z-index:5;background:var(--surface);padding:12px 0;margin-top:8px}
+.search{display:flex;align-items:center;gap:10px;background:var(--card);
+  border:1px solid var(--line);border-radius:12px;padding:12px 14px;box-shadow:var(--shadow)}
+.search svg{flex:none;color:var(--muted)}
+.search input{border:0;outline:0;background:transparent;font:inherit;color:var(--text);width:100%}
+.search input::placeholder{color:var(--muted)}
+.cats{display:flex;gap:8px;margin-top:12px;overflow-x:auto;padding-bottom:4px;scrollbar-width:none}
+.cats::-webkit-scrollbar{display:none}
+.cat{flex:none;font-size:14px;font-weight:600;color:var(--muted);background:var(--card);
+  border:1px solid var(--line);border-radius:999px;padding:9px 16px;cursor:pointer;font-family:inherit}
+.cat[aria-pressed="true"]{background:var(--primary);border-color:var(--primary);color:#fff}
+@media (prefers-color-scheme:dark){.cat[aria-pressed="true"]{color:#10201B}}
+
+/* ── featured ── */
+.feat{display:grid;gap:12px;margin-top:20px}
+@media(min-width:560px){.feat{grid-template-columns:repeat(3,1fr)}}
+.feat a{background:var(--card);border:1px solid var(--line);border-radius:16px;
+  padding:18px;box-shadow:var(--shadow);display:flex;flex-direction:column;gap:10px;
+  transition:transform .15s ease}
+.feat a:hover{transform:translateY(-2px)}
+.feat .tag{font-size:12px;font-weight:700;color:var(--primary)}
+.feat .t{font-size:15px;font-weight:700;line-height:1.45;text-wrap:pretty}
+
+/* ── sections ── */
+section{margin-top:36px}
+.sec-head{display:flex;align-items:baseline;gap:10px;margin-bottom:12px}
+.sec-head h2{margin:0;font-size:19px;font-weight:700;letter-spacing:-.3px}
+.sec-head .n{font-size:13px;font-weight:600;color:var(--muted)}
+.list{background:var(--card);border:1px solid var(--line);border-radius:16px;
+  box-shadow:var(--shadow);overflow:hidden}
+.item{display:flex;align-items:center;gap:12px;padding:15px 18px;min-height:44px;
+  border-top:1px solid var(--line)}
+.item:first-child{border-top:0}
+.item .t{flex:1;font-size:15px;font-weight:500;line-height:1.5;text-wrap:pretty}
+.item svg{flex:none;color:var(--muted)}
+.item:hover{background:var(--tint)}
+.empty{display:none;text-align:center;color:var(--muted);padding:40px 16px}
+.empty.on{display:block}
+
+/* ── footer ── */
+footer{margin-top:48px}
+.disc{display:flex;gap:10px;align-items:flex-start;font-size:13px;color:var(--muted);
+  background:var(--tint);border-radius:12px;padding:14px 16px;line-height:1.6}
+.disc svg{flex:none;margin-top:2px;color:var(--primary)}
+.links{display:flex;flex-wrap:wrap;gap:16px;margin-top:20px;font-size:14px;color:var(--muted)}
+.links a{font-weight:600;color:var(--primary)}
+@media (prefers-reduced-motion:reduce){.feat a{transition:none}}
+</style></head>
+<body><div class="wrap">
+
+<header class="hero">
+  <div class="mark" aria-hidden="true">
+    <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+      <rect width="28" height="28" rx="8" fill="var(--primary)"/>
+      <path d="M14 21c0-5 1.5-8.5 7-10-0.5 6-3 9.5-7 10Zm0 0c0-4-1.2-6.8-5.6-8 0.4 4.8 2.4 7.6 5.6 8Z" fill="#fff" opacity=".95"/>
+      <path d="M14 21v-6" stroke="#fff" stroke-width="1.6" stroke-linecap="round"/>
+    </svg>
+    <span class="name">요즘 건강</span>
+  </div>
+  <h1>의학적인 내용을<br>나누는 채널</h1>
+  <p class="lead">궁금했던 건강 상식을 최신 연구와 공신력 있는 출처로 확인해, 읽기 쉬운 글로 정리합니다.</p>
+  <div class="chips">
+    <span class="chip">건강 아티클 32편</span>
+    <span class="chip">질환 · 영양 · 생활습관</span>
+    <span class="chip">근거 중심</span>
+  </div>
+</header>
+
+<div class="tools">
+  <div class="search">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+    <input id="q" type="search" placeholder="증상·주제 검색 (예: 혈압, 수면, 비타민)" aria-label="글 검색">
+  </div>
+  <div class="cats" role="group" aria-label="카테고리 필터">
+    <button class="cat" data-cat="all" aria-pressed="true">전체</button>
+    <button class="cat" data-cat="disease" aria-pressed="false">질환 · 증상</button>
+    <button class="cat" data-cat="nutrition" aria-pressed="false">영양 · 식습관</button>
+    <button class="cat" data-cat="lifestyle" aria-pressed="false">생활습관 · 운동</button>
+  </div>
+</div>
+
+<div class="feat" id="feat">
+  <a href="sarcopenia.html"><span class="tag">생활습관 · 운동</span><span class="t">💪 종아리 둘레 33cm, 지금 딱 한 번만 재보세요</span></a>
+  <a href="vitamind.html"><span class="tag">영양 · 식습관</span><span class="t">☀️ 한국인 10명 중 8명이 부족한 비타민D, 하루 몇 IU면 될까요?</span></a>
+  <a href="fattyliver.html"><span class="tag">질환 · 증상</span><span class="t">🫁 술 한 방울 안 마셨는데 지방간? 성인 3명 중 1명이 몰래 앓는 병</span></a>
+</div>
+
+<section data-cat="disease">
+  <div class="sec-head"><h2>질환 · 증상</h2><span class="n">16편</span></div>
+  <div class="list">
+    <a class="item" href="fattyliver.html"><span class="t">🫁 술 한 방울 안 마셨는데 지방간? 성인 3명 중 1명이 몰래 앓는 병</span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 6 6 6-6 6"/></svg></a>
+    <a class="item" href="cholesterol.html"><span class="t">🩸 콜레스테롤, 무조건 나쁜 게 아닙니다: 수치·음식·약까지 총정리</span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 6 6 6-6 6"/></svg></a>
+    <a class="item" href="reflux.html"><span class="t">🔥 자꾸 신물이 올라온다면? 역류성 식도염 신호와 오늘부터 할 일</span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 6 6 6-6 6"/></svg></a>
+    <a class="item" href="osteoporosis.html"><span class="t">🦴 소리 없이 뼈를 갉아먹는 골다공증, 부러지기 전에 아셔야 합니다</span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 6 6 6-6 6"/></svg></a>
+    <a class="item" href="thyroid.html"><span class="t">🦋 자도 자도 피곤한 이유, 갑상선 기능 이상 완전정리</span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 6 6 6-6 6"/></svg></a>
+    <a class="item" href="gout.html"><span class="t">🦶 바람만 스쳐도 아픈 통풍, 요산 수치부터 잡으세요</span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 6 6 6-6 6"/></svg></a>
+    <a class="item" href="shingles.html"><span class="t">🔥 옷깃만 스쳐도 아픈 대상포진, 72시간이 평생을 가릅니다</span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 6 6 6-6 6"/></svg></a>
+    <a class="item" href="anemia.html"><span class="t">🩸 자꾸 어지럽고 피곤하다면? 철결핍성 빈혈 완벽 정리</span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 6 6 6-6 6"/></svg></a>
+    <a class="item" href="frozenshoulder.html"><span class="t">💪 팔이 안 올라가요, 오십견일까 회전근개 파열일까? 자가진단부터 스트레칭까지</span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 6 6 6-6 6"/></svg></a>
+    <a class="item" href="prostate.html"><span class="t">🚽 밤에 자꾸 깨는 그 소변, 전립선 신호일까요?</span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 6 6 6-6 6"/></svg></a>
+    <a class="item" href="cataract.html"><span class="t">👁️ 시야가 뿌옇다면? 백내장, 방치하면 안 되는 이유</span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 6 6 6-6 6"/></svg></a>
+    <a class="item" href="gums.html"><span class="t">🦷 양치할 때 나온 그 피, 심장과 뇌까지 갑니다</span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 6 6 6-6 6"/></svg></a>
+    <a class="item" href="knee.html"><span class="t">🦵 무릎 연골은 재생될까? 65세 이후를 결정하는 건 연골이 아니었습니다</span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 6 6 6-6 6"/></svg></a>
+    <a class="item" href="health-bloodpressure.html"><span class="t">🌿 약 없이 혈압 낮추는 생활습관</span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 6 6 6-6 6"/></svg></a>
+    <a class="item" href="health-bloodsugar.html"><span class="t">🩸 혈당 스파이크, 조용한 건강 도둑</span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 6 6 6-6 6"/></svg></a>
+    <a class="item" href="health-eye.html"><span class="t">👀 눈이 보내는 신호, 오늘부터 지키는 눈 건강</span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 6 6 6-6 6"/></svg></a>
+  </div>
+</section>
+
+<section data-cat="nutrition">
+  <div class="sec-head"><h2>영양 · 식습관</h2><span class="n">8편</span></div>
+  <div class="list">
+    <a class="item" href="vitamind.html"><span class="t">☀️ 한국인 10명 중 8명이 부족한 비타민D, 하루 몇 IU면 될까요?</span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 6 6 6-6 6"/></svg></a>
+    <a class="item" href="magnesium.html"><span class="t">👁️ 눈 떨림은 마그네슘 부족? 병원 연구가 밝힌 진짜 원인</span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 6 6 6-6 6"/></svg></a>
+    <a class="item" href="omega3.html"><span class="t">🐟 오메가3의 진실, 2만5천 명 연구가 밝힌 뜻밖의 결론</span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 6 6 6-6 6"/></svg></a>
+    <a class="item" href="sodium.html"><span class="t">🧂 한국인 나트륨 3,136mg의 진실, 무조건 싱겁게가 답이 아니었습니다</span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 6 6 6-6 6"/></svg></a>
+    <a class="item" href="health-protein.html"><span class="t">🍳 단백질, 얼마나 어떻게 먹어야 할까</span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 6 6 6-6 6"/></svg></a>
+    <a class="item" href="health-egg.html"><span class="t">🥚 계란 하루 몇 개까지? 콜레스테롤의 진실</span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 6 6 6-6 6"/></svg></a>
+    <a class="item" href="health-coffee.html"><span class="t">☕ 커피 하루 몇 잔까지 괜찮을까</span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 6 6 6-6 6"/></svg></a>
+    <a class="item" href="health-water.html"><span class="t">💧 하루 물, 정말 2리터 마셔야 할까?</span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 6 6 6-6 6"/></svg></a>
+  </div>
+</section>
+
+<section data-cat="lifestyle">
+  <div class="sec-head"><h2>생활습관 · 운동</h2><span class="n">8편</span></div>
+  <div class="list">
+    <a class="item" href="stairs.html"><span class="t">🔥 하루 6층, 48만 명이 증명한 가장 짧은 장수 운동</span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 6 6 6-6 6"/></svg></a>
+    <a class="item" href="sarcopenia.html"><span class="t">💪 종아리 둘레 33cm, 지금 딱 한 번만 재보세요</span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 6 6 6-6 6"/></svg></a>
+    <a class="item" href="nap.html"><span class="t">😴 낮잠 30분 넘기면 왜 더 피곤할까, 심장과 뇌가 보내는 신호</span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 6 6 6-6 6"/></svg></a>
+    <a class="item" href="health-sleep.html"><span class="t">😴 잠 잘 자는 과학적인 방법: 불면 끝, 꿀잠 시작</span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 6 6 6-6 6"/></svg></a>
+    <a class="item" href="health-walking.html"><span class="t">🚶 하루 걷기의 놀라운 힘, 몇 걸음이 답일까</span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 6 6 6-6 6"/></svg></a>
+    <a class="item" href="cortisol.html"><span class="t">😰 뱃살은 코르티솔 탓? 2,527명 연구가 밝힌 뜻밖의 진실</span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 6 6 6-6 6"/></svg></a>
+    <a class="item" href="health-gut.html"><span class="t">🦠 장이 편해야 면역이 산다, 장 건강의 비밀</span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 6 6 6-6 6"/></svg></a>
+    <a class="item" href="health-smoking-drinking.html"><span class="t">🚬 술자리에서 담배가 유독 당기는 이유 (알고 나면 섬뜩합니다)</span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 6 6 6-6 6"/></svg></a>
+  </div>
+</section>
+
+<p class="empty" id="empty">검색 결과가 없습니다. 다른 단어로 찾아보세요.</p>
+
+<footer>
+  <div class="disc">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 8v5"/><path d="M12 16.5h.01"/></svg>
+    <span>이 채널의 글은 일반적인 건강 정보이며, 의료인의 진단·치료를 대신하지 않습니다. 증상이 있거나 걱정되는 부분이 있다면 가까운 의료기관에서 상담하세요.</span>
+  </div>
+  <div class="links">
+    <a href="https://www.threads.com/@usual.health" rel="noopener">Threads @usual.health</a>
+    <a href="index.html">전체 콘텐츠 목록</a>
+  </div>
+</footer>
+
+</div>
+<script>
+const q=document.getElementById('q'),cats=[...document.querySelectorAll('.cat')],
+secs=[...document.querySelectorAll('section[data-cat]')],feat=document.getElementById('feat'),
+empty=document.getElementById('empty');
+let cat='all';
+function apply(){
+  const kw=q.value.trim().toLowerCase();
+  feat.style.display=(cat==='all'&&!kw)?'':'none';
+  let any=false;
+  secs.forEach(s=>{
+    const inCat=(cat==='all'||s.dataset.cat===cat);
+    let shown=0;
+    s.querySelectorAll('.item').forEach(it=>{
+      const hit=inCat&&(!kw||it.textContent.toLowerCase().includes(kw));
+      it.style.display=hit?'':'none';
+      if(hit)shown++;
+    });
+    s.style.display=shown?'':'none';
+    if(shown)any=true;
+  });
+  empty.classList.toggle('on',!any);
+}
+cats.forEach(b=>b.addEventListener('click',()=>{
+  cat=b.dataset.cat;
+  cats.forEach(x=>x.setAttribute('aria-pressed',String(x===b)));
+  apply();
+}));
+q.addEventListener('input',apply);
+</script>
+</body></html>
