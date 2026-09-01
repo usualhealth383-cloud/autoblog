@@ -9,7 +9,7 @@ if ! fc-list | grep -q "Noto Sans KR"; then
   curl -sSL -o NotoSansKR.ttf  "https://raw.githubusercontent.com/google/fonts/main/ofl/notosanskr/NotoSansKR%5Bwght%5D.ttf"
   curl -sSL -o NotoSerifKR.ttf "https://raw.githubusercontent.com/google/fonts/main/ofl/notoserifkr/NotoSerifKR%5Bwght%5D.ttf"
   curl -sSL -o NanumPenScript.ttf "https://raw.githubusercontent.com/google/fonts/main/ofl/nanumpenscript/NanumPenScript-Regular.ttf"
-  curl -sSL -o SingleDay-Regular.ttf "https://raw.githubusercontent.com/google/fonts/main/ofl/singleday/SingleDay-Regular.ttf"
+  curl -sSL -o YeonSung-Regular.ttf "https://raw.githubusercontent.com/google/fonts/main/ofl/yeonsung/YeonSung-Regular.ttf"
   fc-cache -f ~/.fonts; cd -
 fi
 
