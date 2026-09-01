@@ -157,19 +157,21 @@
   .wrongbox p:last-child{ margin-bottom:0; }
   .solcols{ display:grid; grid-template-columns:1fr 1fr; gap:0 9mm; }
 
-  /* ── 단원 도입 ── */
+  /* ── 단원 도입 (타이포그래피 중심) ── */
   .opener{ padding:0; }
-  .opener-band{ background:linear-gradient(150deg, #F6F4FD 0%, #EDF0FB 55%, #E9F3F5 100%); color:var(--ink); padding:21mm 20mm 17mm; position:relative; overflow:hidden; border-bottom:0.5mm solid var(--unit-md); }
-  .opener-band .unit-big{ font-size:10pt; font-weight:800; color:var(--unit); letter-spacing:0.22em; }
-  .opener-band h1{ font-size:31pt; font-weight:900; letter-spacing:-0.01em; margin:4.5mm 0 6.5mm; }
-  .opener-band h1 .roman{ color:var(--accent); margin-right:4mm; }
-  .opener-band p{ font-family:'PC Serif'; font-size:10pt; line-height:2.0; color:var(--sub); max-width:132mm;}
-  .opener-band .stars{ position:absolute; inset:0; pointer-events:none; }
+  .opener-hero{ position:relative; padding:20mm 20mm 10mm; overflow:hidden; }
+  .ghost-num{ position:absolute; top:-9mm; right:3mm; width:62mm; }
+  .kicker{ display:flex; align-items:center; gap:4mm; position:relative; }
+  .kicker .kt{ font-size:9.5pt; font-weight:800; color:var(--unit); letter-spacing:0.24em; white-space:nowrap; }
+  .kicker::after{ content:""; flex:1; border-top:0.3mm solid var(--line); }
+  .opener-hero h1{ position:relative; font-size:36pt; font-weight:900; letter-spacing:-0.015em; margin:6.5mm 0 0; }
+  .opener-hero h1 .tick{ display:block; width:14mm; border-top:1.4mm solid var(--accent); margin-bottom:3.6mm; }
+  .opener-lede{ position:relative; font-family:'PC Serif'; font-size:10pt; line-height:2.0; color:var(--sub); max-width:138mm; margin-top:6.5mm; padding-left:5mm; border-left:0.8mm solid var(--accent); }
   .opener-inner{ padding:0 20mm; }
-  .toc{ margin-top:13mm; }
+  .toc{ margin-top:8mm; }
   .toc .toc-title{ font-size:11pt; font-weight:900; color:var(--ink); margin-bottom:5.5mm; display:flex; align-items:center; gap:2.5mm;}
   .toc .toc-title::before{ content:""; width:3.4mm; height:3.4mm; background:var(--accent); border-radius:0.8mm; }
-  .toc-item{ display:flex; align-items:flex-start; gap:5mm; padding:4.6mm 6mm; border-bottom:0.3mm solid var(--line); }
+  .toc-item{ display:flex; align-items:flex-start; gap:5mm; padding:4.2mm 6mm; border-bottom:0.3mm solid var(--line); }
   .toc-item:first-of-type{ border-top:0.3mm solid var(--line); }
   .toc-item.active{ background:#F0F4FD; border-left:1.2mm solid #7A97E8; }
   .toc-item .tno{ font-family:'PC Serif'; font-weight:900; color:#7A97E8; font-size:14pt; width:10mm; line-height:1.1; flex:0 0 auto;}
@@ -179,9 +181,9 @@
   .toc-item .tstd{ font-size:7.2pt; color:var(--sub); flex:0 0 auto; padding-top:1.2mm;}
   .toc-item.active .tag-now{ background:var(--accent); color:#fff; font-size:7pt; font-weight:900; border-radius:4mm; padding:0.7mm 2.6mm; margin-left:3.5mm;}
   .qa-lead li .qgo{ font-family:'PC Sans'; font-size:7.4pt; font-weight:800; color:var(--unit); background:var(--unit-lt); border-radius:3mm; padding:0.5mm 2.2mm; margin-left:2mm; white-space:nowrap; vertical-align:1pt;}
-  .qa-lead{ margin-top:9mm; border:none; border-top:0.75mm solid var(--brand); border-bottom:0.25mm solid var(--brand); background:none; border-radius:0; padding:4.2mm 2mm; }
-  .qa-lead .qt{ font-weight:900; color:var(--brand); font-size:10.5pt; margin-bottom:2.4mm;}
-  .qa-lead li{ font-family:'PC Serif'; font-size:9.5pt; line-height:1.92; margin-left:5mm; }
+  .qa-lead{ margin-top:6mm; border:none; border-top:0.75mm solid var(--brand); border-bottom:0.25mm solid var(--brand); background:none; border-radius:0; padding:3.4mm 2mm 3mm; }
+  .qa-lead .qt{ font-weight:900; color:var(--brand); font-size:10.5pt; margin-bottom:2mm;}
+  .qa-lead li{ font-family:'PC Serif'; font-size:9.5pt; line-height:1.85; margin-left:5mm; }
 
   /* ── 바로바로 체크 (개념 페이지 하단 즉석 OX) ── */
   .quickcheck{ margin-top:auto; border-top:0.35mm dashed #C8B98F; padding-top:2.4mm; }
@@ -211,25 +213,17 @@
 
 <!-- ═════════════ p.1 단원 도입 ═════════════ -->
 <div class="page opener">
-  <div class="opener-band">
-    <svg class="stars" width="100%" height="100%" viewBox="0 0 800 340" preserveAspectRatio="xMidYMid slice">
-      <g fill="#A9BFF0">
-        <circle cx="640" cy="46" r="2" opacity="0.9"/><circle cx="705" cy="120" r="1.4" opacity="0.6"/>
-        <circle cx="560" cy="200" r="1.6" opacity="0.5"/><circle cx="748" cy="228" r="2.2" opacity="0.8"/>
-        <circle cx="608" cy="286" r="1.3" opacity="0.5"/><circle cx="678" cy="180" r="1.2" opacity="0.7"/>
-        <circle cx="520" cy="70" r="1.3" opacity="0.5"/><circle cx="760" cy="60" r="1.5" opacity="0.6"/>
-        <circle cx="90" cy="290" r="1.4" opacity="0.4"/><circle cx="200" cy="310" r="1.7" opacity="0.5"/>
+  <div class="opener-hero">
+    <svg class="ghost-num" viewBox="0 0 110 130" xmlns="http://www.w3.org/2000/svg">
+      <g fill="#EDF1FC">
+        <path d="M4 4 h40 v10 h-13 v102 h13 v10 H4 v-10 h13 V14 H4 Z"/>
+        <path d="M62 4 h40 v10 h-13 v102 h13 v10 H62 v-10 h13 V14 H62 Z"/>
       </g>
-      <g stroke="#F4A62A" stroke-width="1.1" opacity="0.85" fill="none">
-        <circle cx="700" cy="88" r="14"/>
-        <ellipse cx="700" cy="88" rx="26" ry="8" transform="rotate(-18 700 88)"/>
-      </g>
-      <circle cx="700" cy="88" r="9" fill="#F4A62A" opacity="0.9"/>
     </svg>
-    <div class="unit-big">통합과학 1 · 대단원 II</div>
-    <h1><span class="roman">II</span>물질과 규칙성</h1>
-    <p>우리 몸을 이루는 탄소, 스마트폰 속 규소, 반지의 금 — 이 모든 원소는 어디에서 왔을까?
-    138억 년 전 우주의 탄생에서 시작해, 세상 모든 물질이 만들어진 규칙을 추적한다.</p>
+    <div class="kicker"><span class="kt">통합과학 1 · 대단원</span></div>
+    <h1><span class="tick"></span>물질과 규칙성</h1>
+    <p class="opener-lede">우리 몸의 탄소, 스마트폰 속 규소, 반지의 금 — 이 모든 원소는 어디에서 왔을까?<br>
+    138억 년 전 우주의 탄생에서 시작해, 물질이 만들어진 규칙을 추적한다.</p>
   </div>
 
   <div class="opener-inner">
