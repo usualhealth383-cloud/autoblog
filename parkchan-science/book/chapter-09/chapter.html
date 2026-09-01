@@ -1,0 +1,972 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<title>박찬 과학 통합과학1 — III-04 운동량과 충격량</title>
+<style>
+  @font-face { font-family:'PC Sans'; src:url('file:///root/.fonts/NotoSansKR.ttf'); font-weight:100 900; }
+  @font-face { font-family:'PC Serif'; src:url('file:///root/.fonts/NotoSerifKR.ttf'); font-weight:100 900; }
+  @font-face { font-family:'PC Pen'; src:url('file:///root/.fonts/YeonSung-Regular.ttf'); font-weight:400; }
+
+  :root{
+    --brand:#0E5A6B;        /* 박찬 과학 브랜드 딥틸 */
+    --brand-lt:#E3F0F3;
+    --unit:#6B46C8;         /* II. 물질과 규칙성 단원 컬러 */
+    --unit-lt:#F2EDFB;
+    --unit-md:#CFC0EE;
+    --accent:#E8940A;       /* 알짜 앰버 */
+    --accent-lt:#FDF3E0;
+    --point:#D6455D;        /* 시험 포인트 */
+    --point-lt:#FBEBEE;
+    --ink:#22303A;
+    --sub:#5B6B77;
+    --line:#D8E0E5;
+  }
+  *{ box-sizing:border-box; margin:0; padding:0; -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+  @page{ size:210mm 275mm; margin:0; }
+  html,body{ font-family:'PC Sans',sans-serif; color:var(--ink); }
+
+  .page{ width:210mm; height:275mm; position:relative; overflow:hidden; background:#fff; page-break-after:always; padding:14mm 13mm 19mm 15mm; display:flex; flex-direction:column; }
+
+  /* ── 러닝 헤드 / 풋 ── */
+  .runhead{ display:flex; align-items:center; justify-content:space-between; border-bottom:0.35mm solid var(--unit); padding-bottom:2mm; margin-bottom:6.5mm; }
+  .runhead .unit-tag{ font-size:8.5pt; font-weight:700; color:var(--unit); letter-spacing:0.02em; }
+  .runhead .lesson-tag{ font-size:8.5pt; color:var(--sub); }
+  .folio{ position:absolute; bottom:7mm; left:0; right:0; display:flex; justify-content:space-between; padding:0 14mm 0 14mm; font-size:8pt; color:var(--sub); }
+  .folio .num{ font-weight:800; color:var(--unit); font-size:10pt; }
+
+  /* ── 본문 그리드: 본문 + 날개단 ── */
+  .cols{ display:grid; grid-template-columns:1fr 43mm; gap:8mm; flex:1; min-height:0; margin-bottom:4mm; }
+  .main{ min-width:0; }
+  .wing{ border-left:0.3mm solid var(--line); padding-left:5mm; font-size:8.2pt; color:var(--sub); line-height:1.7; }
+
+  /* ── 타이포 ── */
+  h2.lesson-title{ display:flex; align-items:baseline; gap:3.5mm; margin-bottom:2mm; }
+  h2.lesson-title .no{ background:var(--unit); color:#fff; font-size:13pt; font-weight:900; padding:1.2mm 3.2mm; border-radius:1.5mm; }
+  h2.lesson-title .tt{ font-size:16.5pt; font-weight:900; letter-spacing:-0.01em; }
+  .std-badges{ display:flex; gap:2mm; margin:2mm 0 6.5mm; }
+  .std{ font-size:7.4pt; color:var(--unit); background:none; border:0.3mm solid var(--unit-md); border-radius:5mm; padding:0.6mm 2.8mm; font-weight:600; }
+
+  h3.sec{ display:flex; align-items:baseline; gap:3mm; font-size:12.5pt; font-weight:800; margin:9mm 0 3.6mm; letter-spacing:-0.01em; }
+  h3.sec .n{ font-family:'PC Serif'; font-size:15.5pt; font-weight:900; color:var(--unit); border-bottom:0.7mm solid var(--accent); padding:0 0.8mm 0.2mm; flex:0 0 auto; line-height:1; }
+  h3.sec::after{ content:""; flex:1; border-top:0.25mm solid var(--line); align-self:center; margin-left:2mm; }
+  h3.sec:first-child{ margin-top:0; }
+
+  p.body{ font-family:'PC Serif'; font-size:9.6pt; line-height:1.92; margin-bottom:3.6mm; text-align:justify; }
+  p.body b{ font-weight:800; }
+  .kw{ font-weight:800; color:var(--unit); }
+  .u-amber{ background:#F8E9C6; font-weight:700; padding:0.15mm 0.6mm; border-radius:0.6mm; box-decoration-break:clone; -webkit-box-decoration-break:clone; }
+
+  ul.pts{ font-family:'PC Serif'; font-size:9.6pt; line-height:1.84; margin:1.5mm 0 3.5mm 1mm; list-style:none; }
+  ul.pts li{ padding-left:4.5mm; position:relative; margin-bottom:1.8mm; }
+  ul.pts li::before{ content:""; position:absolute; left:0.5mm; top:2.9mm; width:1.7mm; height:1.7mm; background:var(--accent); border-radius:50%; }
+
+  /* ── 코너 박스 ── */
+  .boxtitle{ display:inline-flex; align-items:center; gap:1.8mm; font-weight:900; font-size:9.5pt; margin-bottom:1.6mm; }
+  .boxtitle .ico{ width:5.2mm; height:5.2mm; border-radius:1.2mm; display:flex; align-items:center; justify-content:center; color:#fff; font-size:7.5pt; font-weight:900; }
+
+  .gist{ background:none; border:none; border-top:0.5mm solid var(--accent); border-bottom:0.5mm solid var(--accent); border-radius:0; padding:3.2mm 1.8mm 3mm; margin:6mm 0 5mm; }
+  .gist .boxtitle{ color:#9C6503; } .gist .ico{ background:var(--accent); }
+  .gist ul{ list-style:none; font-family:'PC Serif'; font-size:9.3pt; line-height:1.78; }
+  .gist li{ padding-left:4.2mm; position:relative; margin-bottom:1.2mm;}
+  .gist li::before{ content:"✓"; position:absolute; left:0; color:var(--accent); font-weight:900; }
+
+  .expoint{ background:none; border-left:0.5mm solid #D998A4; border-left-color:#D998A4; border-radius:0; padding:1.4mm 0 1.4mm 3.6mm; margin:4.5mm 0; }
+  .expoint .boxtitle{ color:#A9556A; font-size:8.6pt; margin-bottom:1mm;}
+  .expoint .ico{ background:none; color:#A9556A; border:0.35mm solid #D998A4; width:4.4mm; height:4.4mm; border-radius:50%; font-size:7pt; }
+  .expoint p{ font-family:'PC Serif'; font-size:8.9pt; line-height:1.7; }
+
+  .pen{ font-family:'PC Pen'; font-size:12pt; color:#B4560E; line-height:1.45; }
+  .saem{ display:flex; gap:3mm; align-items:flex-start; margin:4.5mm 0; }
+  .saem .avatar{ flex:0 0 auto; width:10.5mm; height:10.5mm; border-radius:50%; background:var(--brand); color:#fff; font-size:7pt; font-weight:800; display:flex; align-items:center; justify-content:center; line-height:1.35; letter-spacing:0.04em; text-align:center; border:0.5mm solid var(--accent); box-sizing:border-box;}
+  .saem .bubble{ background:#FFFBF0; border:0.4mm solid #EBCB9C; border-radius:3mm; padding:2.2mm 3.6mm 2mm; position:relative; }
+  .saem .bubble::before{ content:""; position:absolute; left:-1.8mm; top:3.2mm; width:3mm; height:3mm; background:#FFFBF0; border-left:0.4mm solid #EBCB9C; border-bottom:0.4mm solid #EBCB9C; transform:rotate(45deg); }
+
+  .wing .wtitle{ font-size:8pt; font-weight:900; color:var(--brand); display:flex; align-items:center; gap:1.5mm; margin:0 0 2.4mm; letter-spacing:0.05em; }
+  .wing .wtitle::before{ content:""; width:2.4mm; height:2.4mm; background:var(--accent); border-radius:50%; }
+  .wing .term{ margin-bottom:3.6mm; }
+  .wing .term b{ color:var(--ink); font-weight:800; display:block; font-size:8.5pt; margin-bottom:0.7mm;}
+  .wing .wsep{ border-top:0.3mm dashed var(--line); margin:4.5mm 0; }
+  .wing .wing-pen{ font-family:'PC Pen'; font-size:11pt; color:#B4560E; line-height:1.45; }
+
+  figure{ margin:5mm 0; }
+  figure figcaption{ font-size:8pt; color:var(--sub); text-align:center; margin-top:2mm; }
+  figure svg{ display:block; margin:0 auto; }
+
+  /* ── 비교형 그림 (2패널 + 범례) ── */
+  .fig-duo{ display:flex; align-items:stretch; gap:2.5mm; justify-content:center; }
+  .fig-duo .panel{ flex:0 0 auto; text-align:center; }
+  .fig-duo .p-title{ font-size:9pt; font-weight:900; color:var(--ink); margin-top:1.6mm; }
+  .fig-duo .p-sub{ font-size:7.8pt; color:var(--sub); line-height:1.45; margin-top:0.5mm; }
+  .fig-duo .mid{ display:flex; flex-direction:column; align-items:center; justify-content:center; gap:1mm; padding:0 1mm; }
+  .fig-duo .mid .mlab{ font-size:7.6pt; font-weight:800; color:var(--unit); text-align:center; line-height:1.3; }
+  .fig-legend{ display:flex; justify-content:center; gap:5mm; font-size:7.8pt; color:var(--ink); margin-top:1.2mm; align-items:center; }
+  .fig-legend span{ display:inline-flex; align-items:center; gap:1.4mm; }
+
+  /* ── 탐구 (자료 파헤치기) ── */
+  .lab{ border:0.5mm solid var(--brand); border-radius:2.5mm; overflow:hidden; margin-top:1mm;}
+  .lab .lab-head{ background:var(--brand); color:#fff; padding:2.2mm 4mm; font-weight:900; font-size:11pt; display:flex; align-items:center; gap:2.5mm;}
+  .lab .lab-head .tag{ font-size:7.5pt; background:rgba(255,255,255,.22); padding:0.6mm 2.4mm; border-radius:4mm; font-weight:700;}
+  .lab .lab-body{ padding:3.5mm 4mm; }
+  .lab h4{ font-size:9.6pt; font-weight:900; color:var(--brand); margin:2.5mm 0 1.4mm; }
+  .lab h4:first-child{ margin-top:0; }
+  .lab p, .lab li{ font-family:'PC Serif'; font-size:9.3pt; line-height:1.8; }
+  .lab ol{ margin-left:5mm; }
+
+  /* ── 문제부 ── */
+  .step-head{ display:flex; align-items:center; gap:3mm; margin:0 0 5mm; }
+  .step-head .stepno{ background:var(--unit); color:#fff; font-weight:900; font-size:9.5pt; padding:1.4mm 3.4mm; border-radius:1.5mm; letter-spacing:0.04em;}
+  .step-head .steptt{ font-size:12.5pt; font-weight:900; }
+  .step-head .stepdesc{ font-size:8.2pt; color:var(--sub); margin-left:auto; }
+  .step-head.s2 .stepno{ background:var(--brand); }
+  .step-head.s3 .stepno{ background:var(--point); }
+
+  .q{ margin-bottom:7.5mm; break-inside:avoid; }
+  .q .qhead{ display:flex; gap:2.4mm; align-items:flex-start; }
+  .q .qno{ flex:0 0 auto; min-width:6.2mm; height:6.2mm; border:0.45mm solid var(--unit); color:var(--unit); border-radius:50%; font-size:8.6pt; font-weight:900; line-height:1; display:flex; align-items:center; justify-content:center; padding-top:0.55mm; margin-top:0.4mm;}
+  .q .stem{ font-family:'PC Serif'; font-size:9.5pt; line-height:1.74; font-weight:500; }
+  .q .stem .difficulty{ color:#C9A227; font-size:8pt; letter-spacing:0.06em; margin-left:1.5mm;}
+  .q .tags{ margin-top:0.8mm; font-size:7pt; color:var(--sub); font-family:'PC Sans';}
+  .choices{ list-style:none; margin:2.2mm 0 0 8.6mm; font-family:'PC Serif'; font-size:9.3pt; line-height:1.85; }
+  .choices.inline{ display:flex; flex-wrap:wrap; gap:0 6mm; }
+  .bogi-box{ border:0.35mm solid #B8C2CA; border-radius:0; margin:2.5mm 0 0 8.6mm; padding:2.4mm 3.2mm; font-family:'PC Serif'; font-size:9.2pt; line-height:1.8; background:none;}
+  .bogi-box .bt{ text-align:center; font-weight:800; color:var(--sub); font-size:8.4pt; margin-bottom:0.8mm; letter-spacing:0.3em;}
+  .ox-answer{ margin-left:2mm; color:var(--sub); font-size:9pt; }
+  .blankline{ display:inline-block; min-width:14mm; border-bottom:0.4mm solid var(--ink); }
+  .qgrid{ display:grid; grid-template-columns:1fr 1fr; gap:0 9mm; }
+  .essay-lines{ margin:2mm 0 0 8.4mm; }
+  .essay-lines div{ border-bottom:0.3mm solid var(--line); height:6.2mm; }
+  .badge-essay{ display:inline-block; background:var(--point); color:#fff; font-size:7pt; font-weight:800; padding:0.4mm 2mm; border-radius:1mm; vertical-align:1pt; margin-right:1.2mm;}
+  .badge-data{ display:inline-block; background:var(--brand); color:#fff; font-size:7pt; font-weight:800; padding:0.4mm 2mm; border-radius:1mm; vertical-align:1pt; margin-right:1.2mm;}
+
+  /* ── 해설부 ── */
+  .sol-head{ display:flex; align-items:center; gap:3mm; margin-bottom:4mm;}
+  .sol-head .stt{ font-size:14.5pt; font-weight:900; color:var(--brand);}
+  .sol-head .sub{ font-size:8.5pt; color:var(--sub);}
+  .anstable{ width:100%; border-collapse:collapse; margin-bottom:4.5mm; }
+  .anstable th,.anstable td{ border:0.3mm solid var(--line); font-size:8.8pt; padding:1.4mm 0; text-align:center; }
+  .anstable th{ background:var(--brand-lt); color:var(--brand); font-weight:800; }
+  .anstable td.a{ font-weight:900; color:var(--unit); }
+  .sol{ margin-bottom:5mm; break-inside:avoid; }
+  .sol .shead{ display:flex; align-items:center; gap:2mm; margin-bottom:1.4mm;}
+  .sol .sno{ background:var(--unit); color:#fff; min-width:6mm; height:5.4mm; border-radius:1.2mm; font-size:8.6pt; font-weight:900; line-height:1; display:flex; align-items:center; justify-content:center; padding:0.5mm 1.5mm 0;}
+  .sol .sans{ font-weight:900; color:var(--unit); font-size:9.6pt;}
+  .sol .slink{ font-size:7.2pt; color:var(--sub); margin-left:auto;}
+  .sol p{ font-family:'PC Serif'; font-size:9.1pt; line-height:1.76; margin-bottom:0.8mm; }
+  .wrongbox{ background:none; border:none; border-left:0.7mm solid #E3A0AC; border-radius:0; padding:1mm 0 1mm 3mm; margin-top:2mm;}
+  .wrongbox .wt{ font-size:8pt; font-weight:900; color:var(--point); margin-bottom:0.8mm; font-family:'PC Sans';}
+  .wrongbox p{ font-family:'PC Serif'; font-size:8.6pt; line-height:1.68; margin-bottom:0.9mm;}
+  .wrongbox p:last-child{ margin-bottom:0; }
+  .solcols{ display:grid; grid-template-columns:1fr 1fr; gap:0 9mm; }
+
+  /* ── 단원 도입 (타이포그래피 중심) ── */
+  .opener{ padding:0 0 19mm; }
+  .opener-hero{ position:relative; padding:7mm 20mm 4.5mm; overflow:hidden; flex-shrink:0; }
+  .ghost-txt{ position:absolute; top:-10mm; right:6mm; font-size:118pt; font-weight:900; color:#EDF1FC; line-height:1; letter-spacing:-0.04em; }
+  .kicker{ display:flex; align-items:center; gap:4mm; position:relative; }
+  .kicker .kt{ font-size:9.5pt; font-weight:800; color:var(--unit); letter-spacing:0.24em; white-space:nowrap; }
+  .kicker::after{ content:""; flex:1; border-top:0.3mm solid var(--line); }
+  .opener-hero h1{ position:relative; font-size:36pt; font-weight:900; letter-spacing:-0.015em; margin:4mm 0 0; }
+  .opener-hero h1 .tick{ display:block; width:14mm; border-top:1.4mm solid var(--accent); margin-bottom:3.6mm; }
+  .opener-lede{ position:relative; font-family:'PC Serif'; font-size:10.2pt; font-weight:600; line-height:2.0; color:#3D4C58; max-width:138mm; margin-top:4mm; padding-left:5mm; border-left:0.8mm solid var(--accent); }
+  .opener-inner{ padding:0 20mm; }
+
+  /* ── 원소의 여정 스트립 ── */
+  .journey{ margin-top:3.5mm; }
+  .journey .j-label{ font-size:8pt; font-weight:800; color:var(--sub); letter-spacing:0.08em; margin-bottom:2.4mm; display:flex; align-items:center; gap:1.6mm;}
+  .journey .j-label::before{ content:""; width:2.4mm; height:2.4mm; background:var(--unit); border-radius:50%; }
+  .j-bar{ display:flex; align-items:center; gap:2mm; }
+  .j-chip{ flex:1; text-align:center; background:#F5F1FC; border:0.35mm solid #CFC0EE; color:#6B46C8; border-radius:1.6mm; padding:2.4mm 1mm 2mm; }
+  .j-chip .jc-t{ font-size:8.8pt; font-weight:800; display:block; }
+  .j-chip .jc-s{ font-size:6.8pt; color:var(--sub); display:block; margin-top:0.5mm; }
+  .j-chip.on{ background:var(--unit); border-color:var(--unit); }
+  .j-chip.on .jc-t{ color:#fff; }
+  .j-chip.on .jc-s{ color:#D9E2F8; }
+  .j-arrow{ flex:0 0 auto; color:#AB93E6; font-size:10pt; font-weight:900; }
+  .toc{ margin-top:5mm; }
+  .toc .toc-title{ font-size:11pt; font-weight:900; color:var(--ink); margin-bottom:3mm; display:flex; align-items:center; gap:2.5mm;}
+  .toc .toc-title::before{ content:""; width:3.4mm; height:3.4mm; background:var(--accent); border-radius:0.8mm; }
+  .toc-item{ display:flex; align-items:flex-start; gap:5mm; padding:2.8mm 6mm; border-bottom:0.3mm solid var(--line); }
+  .toc-item:first-of-type{ border-top:0.3mm solid var(--line); }
+  .toc-item.active{ background:#F5F1FC; border-left:1.2mm solid #9E85E0; }
+  .toc-item .tno{ font-family:'PC Serif'; font-weight:900; color:#9E85E0; font-size:14pt; width:10mm; line-height:1.1; flex:0 0 auto;}
+  .toc-item .tbody{ flex:1; min-width:0; }
+  .toc-item .ttt{ font-weight:800; font-size:10.5pt; letter-spacing:0.01em; display:flex; align-items:center;}
+  .toc-item .tdesc{ font-family:'PC Serif'; font-size:8.6pt; font-weight:600; color:#4A5964; margin-top:0.7mm; line-height:1.55;}
+  .toc-item .tstd{ font-size:7.2pt; color:var(--sub); flex:0 0 auto; padding-top:1.2mm;}
+  .toc-item.active .tag-now{ background:var(--accent); color:#fff; font-size:7pt; font-weight:900; border-radius:4mm; padding:0.7mm 2.6mm; margin-left:3.5mm;}
+  .toc-item .tag-done{ font-size:7.2pt; font-weight:800; color:#3E9C6E; margin-left:3.5mm; }
+  .opener-quote{ margin-top:4mm; text-align:center; font-family:'PC Serif'; font-size:9.8pt; font-weight:600; color:#4A5964; letter-spacing:0.01em; }
+  .opener-quote .who{ font-size:8pt; color:var(--sub); font-weight:400; margin-left:2.5mm; }
+  .qa-lead li .qgo{ font-family:'PC Sans'; font-size:7.4pt; font-weight:800; color:var(--unit); background:var(--unit-lt); border-radius:3mm; padding:0.5mm 2.2mm; margin-left:2mm; white-space:nowrap; vertical-align:1pt;}
+  .qa-lead{ margin-top:3.5mm; border:none; border-top:0.45mm solid var(--brand); border-bottom:0.45mm solid var(--brand); background:none; border-radius:0; padding:3mm 2mm 2.8mm; }
+  .qa-lead .qt{ font-weight:900; color:var(--brand); font-size:10.5pt; margin-bottom:2mm;}
+  .qa-lead li{ font-family:'PC Serif'; font-size:9.5pt; line-height:1.8; margin-left:5mm; }
+
+  /* ── 바로바로 체크 (개념 페이지 하단 즉석 OX) ── */
+  .quickcheck{ margin-top:auto; border-top:0.35mm dashed #C8B98F; padding-top:3mm; width:calc(100% - 51mm); }
+  .quickcheck .qc-title{ display:inline-flex; align-items:center; gap:1.6mm; font-size:8.2pt; font-weight:900; color:#9C6503; margin-bottom:1.4mm; }
+  .quickcheck .qc-title::before{ content:"✓"; color:var(--accent); font-weight:900; }
+  .quickcheck ol{ list-style:none; font-family:'PC Serif'; font-size:8.8pt; line-height:1.75; }
+  .quickcheck li{ display:flex; gap:2mm; align-items:baseline; }
+  .quickcheck li .no{ font-weight:800; color:var(--accent); flex:0 0 auto; }
+  .quickcheck .qc-ans{ margin-top:1mm; font-size:7.2pt; color:var(--sub); transform:rotate(180deg); text-align:left; }
+
+  /* ── 중학 과학 다시보기 (날개단) ── */
+  .wing .review{ background:#F6F3EC; border-radius:1.8mm; padding:2.8mm 3mm; margin-top:1mm; }
+  .wing .review .rv-title{ font-size:7.8pt; font-weight:900; color:#7A6A45; margin-bottom:1.4mm; display:flex; align-items:center; gap:1.4mm;}
+  .wing .review .rv-title::before{ content:"↺"; font-weight:900; color:#A08A55; }
+
+  /* ── MEMO 페이지 ── */
+  .memo-head{ display:flex; align-items:baseline; gap:3.5mm; margin-bottom:5mm; }
+  .memo-head .mt{ font-size:17pt; font-weight:900; color:var(--brand); letter-spacing:0.22em; }
+  .memo-head .ms{ font-size:8.6pt; color:var(--sub); }
+  .memo-area{ flex:1; border:0.4mm solid var(--line); border-radius:2.5mm;
+    background-image:linear-gradient(to bottom, transparent calc(100% - 0.3mm), #DCE4E9 0);
+    background-size:100% 9mm; background-position:0 4mm; padding:0 5mm; margin-bottom:4mm; }
+  .memo-pen{ font-family:'PC Pen'; font-size:12.5pt; color:#B4560E; text-align:right; }
+</style>
+</head>
+<body>
+
+<!-- ═════════════ p.116 소단원 도입 ═════════════ -->
+<div class="page opener">
+  <div class="opener-hero">
+    <div class="ghost-txt">04</div>
+    <div class="kicker"><span class="kt">통합과학 1 · III. 시스템과 상호작용</span></div>
+    <h1><span class="tick"></span>운동량과 충격량</h1>
+    <p class="opener-lede">충돌은 피할 수 없을 때가 있다 — 그러나 다치는 정도는 물리학이 바꾼다.<br>
+    에어백과 야구 글러브가 쓰는 공식은 단 하나다.</p>
+  </div>
+
+  <div class="opener-inner">
+    <div class="journey">
+      <div class="j-label">시스템의 연결 — 지금 여기</div>
+      <div class="j-bar">
+        <div class="j-chip"><span class="jc-t">지구시스템</span><span class="jc-s">다섯 권역의 교환</span></div>
+        <span class="j-arrow">→</span>
+        <div class="j-chip"><span class="jc-t">판구조론</span><span class="jc-s">움직이는 지권</span></div>
+        <span class="j-arrow">→</span>
+        <div class="j-chip"><span class="jc-t">중력과 운동</span><span class="jc-s">낙하에서 위성까지</span></div>
+        <span class="j-arrow">→</span>
+        <div class="j-chip on"><span class="jc-t">운동량·충격량</span><span class="jc-s">충돌의 과학</span></div>
+        <span class="j-arrow">→</span>
+        <div class="j-chip"><span class="jc-t">생명 시스템</span><span class="jc-s">세포와 물질대사</span></div>
+        <span class="j-arrow">→</span>
+        <div class="j-chip"><span class="jc-t">유전자</span><span class="jc-s">정보의 흐름</span></div>
+      </div>
+    </div>
+    <div class="toc">
+      <div class="toc-title">이 단원의 학습 지도</div>
+      <div class="toc-item">
+        <span class="tno">01</span>
+        <span class="tbody"><span class="ttt">지구시스템과 에너지·물질 순환<span class="tag-done">완료 ✓</span></span>
+        <span class="tdesc">기권·수권·지권·생물권·외권 — 다섯 권역이 주고받는 지구</span></span>
+        <span class="tstd">10통과1-03-01</span>
+      </div>
+      <div class="toc-item">
+        <span class="tno">02</span>
+        <span class="tbody"><span class="ttt">판구조론과 지권의 변화<span class="tag-done">완료 ✓</span></span>
+        <span class="tdesc">판 경계 3종 — 지진과 화산은 왜 그곳에서 일어나는가</span></span>
+        <span class="tstd">10통과1-03-02</span>
+      </div>
+      <div class="toc-item">
+        <span class="tno">03</span>
+        <span class="tbody"><span class="ttt">중력과 운동<span class="tag-done">완료 ✓</span></span>
+        <span class="tdesc">자유 낙하에서 인공위성까지, 중력이 만드는 운동</span></span>
+        <span class="tstd">10통과1-03-03</span>
+      </div>
+      <div class="toc-item active">
+        <span class="tno">04</span>
+        <span class="tbody"><span class="ttt">운동량과 충격량<span class="tag-now">NOW</span></span>
+        <span class="tdesc">에어백과 안전모의 과학 — 충돌을 다스리는 법</span></span>
+        <span class="tstd">10통과1-03-04</span>
+      </div>
+      <div class="toc-item">
+        <span class="tno">05</span>
+        <span class="tbody"><span class="ttt">생명 시스템과 화학 반응</span>
+        <span class="tdesc">세포 속 물질대사, 효소가 일하는 방식</span></span>
+        <span class="tstd">10통과1-03-05</span>
+      </div>
+      <div class="toc-item">
+        <span class="tno">06</span>
+        <span class="tbody"><span class="ttt">유전자에서 단백질까지</span>
+        <span class="tdesc">세포 내 정보의 흐름 — DNA에서 형질이 되기까지</span></span>
+        <span class="tstd">10통과1-03-06</span>
+      </div>
+    </div>
+
+    <div class="qa-lead">
+      <div class="qt">이 소단원을 끝내면 답할 수 있는 질문</div>
+      <ul>
+        <li>급정거하면 몸이 앞으로 쏠린다 — 힘을 받아서일까, 안 받아서일까? <span class="qgo">개념 1</span></li>
+        <li>느린 트럭과 빠른 자전거, '운동의 양'은 누가 더 클까? <span class="qgo">개념 2</span></li>
+        <li>에어백은 어떻게 같은 충돌을 덜 아프게 만들까? <span class="qgo">개념 3·4</span></li>
+        <li>야구 선수는 왜 공을 '끝까지 밀어' 치라고 배울까? <span class="qgo">개념 5</span></li>
+      </ul>
+    </div>
+
+    <div class="opener-quote">"모든 물체는 외력이 없는 한 정지 또는 등속 직선 운동 상태를 유지한다."<span class="who">— 아이작 뉴턴, '프린키피아' 운동 제1법칙</span></div>
+  </div>
+
+  <div class="folio"><span>박찬 과학 | 통합과학 1</span><span class="num">116</span></div>
+</div>
+
+<!-- ═════════════ p.117 개념 01 관성 ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag">III. 시스템과 상호작용</span><span class="lesson-tag">04. 운동량과 충격량</span></div>
+  <h2 class="lesson-title"><span class="no">04</span><span class="tt">운동량과 충격량</span></h2>
+  <div class="std-badges"><span class="std">성취기준 10통과1-03-04</span><span class="std">충격량·운동량 관계 → 안전장치·스포츠 적용</span></div>
+
+  <div class="cols">
+    <div class="main">
+      <h3 class="sec"><span class="n">1</span>관성 — 힘이 없으면 하던 대로</h3>
+      <p class="body">앞 소단원에서 힘(중력)이 운동을 어떻게 '바꾸는지' 보았다. 이번엔 거꾸로 묻자 — <b>힘이 없으면?</b> 답: <span class="u-amber">아무것도 바뀌지 않는다.</span> 상호작용이 없으면 정지한 물체는 계속 정지해 있고, 움직이던 물체는 <b>같은 속도로 계속 움직인다</b>(가속되지 않는다). 물체가 이렇게 운동 상태를 유지하려는 성질이 <span class="kw">관성</span>이며, <b>질량이 클수록 관성도 크다</b>.</p>
+      <p class="body">일상은 관성 사례로 가득하다. 버스가 <b>급정거</b>하면 몸은 <b>앞으로</b> 쏠린다 — 몸이 힘을 받아서가 아니라, 버스는 멈췄는데 몸은 <b>하던 운동을 계속하려 하기 때문</b>이다. <b>급출발</b>하면 반대로 뒤로 쏠린다(몸은 '하던 대로' 정지해 있으려 하니까). 이불을 두드려 먼지를 터는 것도, 망치 자루를 내리쳐 머리를 박는 것도 모두 관성의 작품이다.</p>
+
+      <figure>
+        <svg width="470" height="150" viewBox="0 0 470 150" font-family="PC Sans">
+          <defs>
+            <marker id="arrP" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="#6B46C8"/></marker>
+            <marker id="arrR" markerWidth="7" markerHeight="7" refX="5" refY="2.5" orient="auto"><path d="M0,0 L6,2.5 L0,5 Z" fill="#D6455D"/></marker>
+          </defs>
+          <!-- 급정거 -->
+          <g transform="translate(122,14)">
+            <rect x="-96" y="0" width="192" height="100" rx="6" fill="#F5F1FC" stroke="#CFC0EE" stroke-width="1"/>
+            <text x="0" y="18" text-anchor="middle" font-size="8.6" font-weight="800" fill="#6B46C8">급정거 — 몸은 앞으로</text>
+            <rect x="-66" y="34" width="120" height="40" rx="6" fill="#fff" stroke="#9AA7B1" stroke-width="1"/>
+            <circle cx="-46" cy="82" r="8" fill="#3D4C58"/><circle cx="34" cy="82" r="8" fill="#3D4C58"/>
+            <g transform="translate(-6,52)">
+              <circle cx="6" cy="-8" r="5.5" fill="#F6C98E" stroke="#E8940A"/>
+              <path d="M4,-2 q8,6 14,14 M6,-2 L2,14" stroke="#B4560E" stroke-width="2" fill="none"/>
+            </g>
+            <line x1="20" y1="42" x2="46" y2="42" stroke="#D6455D" stroke-width="2" marker-end="url(#arrR)"/>
+            <text x="34" y="34" text-anchor="middle" font-size="6.4" fill="#D6455D">몸은 계속 전진!</text>
+            <text x="-74" y="60" text-anchor="end" font-size="6.6" fill="#5B6B77">버스는</text>
+            <text x="-74" y="70" text-anchor="end" font-size="6.6" fill="#5B6B77">급제동</text>
+            <g stroke="#5B6B77" stroke-width="1.6"><line x1="-90" y1="88" x2="-72" y2="88"/><line x1="-88" y1="94" x2="-70" y2="94"/></g>
+            <text x="0" y="118" text-anchor="middle" font-size="7" fill="#5B6B77">몸이 힘을 받아서가 아니라, '하던 대로' 가려 해서</text>
+          </g>
+          <!-- 급출발 -->
+          <g transform="translate(348,14)">
+            <rect x="-96" y="0" width="192" height="100" rx="6" fill="#FDF9F0" stroke="#EBCB9C" stroke-width="1"/>
+            <text x="0" y="18" text-anchor="middle" font-size="8.6" font-weight="800" fill="#B4560E">급출발 — 몸은 뒤로</text>
+            <rect x="-54" y="34" width="120" height="40" rx="6" fill="#fff" stroke="#9AA7B1" stroke-width="1"/>
+            <circle cx="-34" cy="82" r="8" fill="#3D4C58"/><circle cx="46" cy="82" r="8" fill="#3D4C58"/>
+            <g transform="translate(-4,52)">
+              <circle cx="-8" cy="-8" r="5.5" fill="#F6C98E" stroke="#E8940A"/>
+              <path d="M-6,-2 q-8,6 -14,14 M-8,-2 L-4,14" stroke="#B4560E" stroke-width="2" fill="none"/>
+            </g>
+            <line x1="-30" y1="42" x2="-56" y2="42" stroke="#D6455D" stroke-width="2" marker-end="url(#arrR)"/>
+            <text x="-44" y="34" text-anchor="middle" font-size="6.4" fill="#D6455D">몸은 그대로!</text>
+            <line x1="70" y1="90" x2="92" y2="90" stroke="#5B6B77" stroke-width="1.8" marker-end="url(#arrP)"/>
+            <text x="80" y="84" text-anchor="middle" font-size="6.6" fill="#5B6B77">버스 출발</text>
+            <text x="0" y="118" text-anchor="middle" font-size="7" fill="#5B6B77">몸은 '하던 대로' 정지해 있으려 한다</text>
+          </g>
+          <text x="235" y="146" text-anchor="middle" font-size="8.8" font-weight="800" fill="#E8940A">관성 = 운동 상태를 유지하려는 성질. 질량이 클수록 크다</text>
+        </svg>
+        <figcaption>그림 1 | 급정거와 급출발 — 쏠림의 방향은 '몸이 하던 운동'이 결정한다</figcaption>
+      </figure>
+
+      <div class="saem">
+        <div class="avatar">박찬<br>쌤</div>
+        <div class="bubble"><span class="pen">"쏠림 방향이 헷갈리면 이렇게 — '버스가 한 일의 반대'가 아니라 '내 몸이 하던 일 그대로'야. 달리던 몸은 계속 달리고, 서 있던 몸은 계속 서 있으려 한다."</span></div>
+      </div>
+    </div>
+
+    <div class="wing">
+      <div class="wtitle">날개 노트</div>
+      <div class="term"><b>관성과 질량</b>질량이 클수록 운동 상태를 바꾸기 어렵다. 볼링공이 탁구공보다 멈추기 힘든 이유.</div>
+      <div class="term"><b>안전띠</b>급정거 때 '하던 대로' 앞으로 가려는 몸을 붙잡아 주는 장치 — 관성 대비책이다.</div>
+      <div class="wsep"></div>
+      <div class="wtitle">한눈에 암기</div>
+      <div class="wing-pen">힘 없음 = 변화 없음!<br>급정거 → 앞으로<br>급출발 → 뒤로</div>
+      <div class="wsep"></div>
+      <div class="review">
+        <div class="rv-title">중학 과학 다시보기</div>
+        <div class="term" style="margin-bottom:0;"><b>힘과 운동 (중3)</b>힘은 물체의 모양이나 운동 상태를 바꾼다 — 뒤집으면, 힘이 없으면 운동 상태는 그대로라는 것이 이 개념이다.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="folio"><span>III. 시스템과 상호작용</span><span class="num">117</span></div>
+</div>
+
+<!-- ═════════════ p.118 개념 02 운동량 ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag">III. 시스템과 상호작용</span><span class="lesson-tag">04. 운동량과 충격량</span></div>
+  <div class="cols">
+    <div class="main">
+      <h3 class="sec"><span class="n">2</span>운동량 — 운동의 양을 재는 법</h3>
+      <p class="body">천천히 구르는 트럭과 쌩쌩 달리는 자전거 — 어느 쪽을 멈추기가 더 어려울까? 빠르기만으로도, 무게만으로도 답할 수 없다. 그래서 물리학은 '운동의 양'을 재는 자를 만들었다. <span class="kw">운동량</span> = <span class="u-amber">질량 × 속도</span>. 단위는 kg·m/s이고, 속도처럼 <b>방향을 가진다</b>.</p>
+      <p class="body">같은 속도라면 <b>질량이 큰</b> 트럭의 운동량이 크고, 같은 질량이라면 <b>빠른</b> 쪽이 크다. 질량 2 kg인 공이 3 m/s로 구르면 운동량은 2 × 3 = <b>6 kg·m/s</b> — 계산은 곱셈 한 번이면 끝이다. 운동량이 큰 물체일수록 <b>멈추거나 방향을 바꾸기 위해 더 큰 '노력'</b>이 필요하다. 그 노력의 정체가 다음 개념, 충격량이다.</p>
+
+      <figure>
+        <svg width="470" height="140" viewBox="0 0 470 140" font-family="PC Sans">
+          <text x="235" y="14" text-anchor="middle" font-size="8.6" font-weight="800" fill="#22303A">운동량 = 질량 × 속도 — 곱으로 비교하라</text>
+          <!-- A -->
+          <g transform="translate(90,30)">
+            <rect x="-56" y="0" width="112" height="76" rx="6" fill="#F5F1FC" stroke="#CFC0EE" stroke-width="0.9"/>
+            <rect x="-34" y="18" width="42" height="24" rx="4" fill="#6B46C8"/>
+            <circle cx="-24" cy="46" r="6" fill="#3D4C58"/><circle cx="-2" cy="46" r="6" fill="#3D4C58"/>
+            <line x1="14" y1="30" x2="44" y2="30" stroke="#D6455D" stroke-width="2.6" marker-end="url(#arrR)"/>
+            <text x="0" y="66" text-anchor="middle" font-size="7.4" font-weight="800">트럭 2000 kg × 1 m/s</text>
+            <text x="0" y="90" text-anchor="middle" font-size="8.6" font-weight="900" fill="#6B46C8">= 2000 kg·m/s</text>
+          </g>
+          <!-- B -->
+          <g transform="translate(235,30)">
+            <rect x="-56" y="0" width="112" height="76" rx="6" fill="#FDF9F0" stroke="#EBCB9C" stroke-width="0.9"/>
+            <circle cx="-18" cy="40" r="9" fill="none" stroke="#3D4C58" stroke-width="2"/>
+            <circle cx="6" cy="40" r="9" fill="none" stroke="#3D4C58" stroke-width="2"/>
+            <path d="M-18,40 L-8,24 L6,40 M-8,24 L2,24" stroke="#3D4C58" stroke-width="2" fill="none"/>
+            <circle cx="-6" cy="18" r="4.5" fill="#F6C98E" stroke="#E8940A"/>
+            <line x1="18" y1="26" x2="48" y2="26" stroke="#D6455D" stroke-width="2.6" marker-end="url(#arrR)"/>
+            <text x="0" y="66" text-anchor="middle" font-size="7.4" font-weight="800">자전거+사람 80 kg × 10 m/s</text>
+            <text x="0" y="90" text-anchor="middle" font-size="8.6" font-weight="900" fill="#B4560E">= 800 kg·m/s</text>
+          </g>
+          <!-- C -->
+          <g transform="translate(380,30)">
+            <rect x="-56" y="0" width="112" height="76" rx="6" fill="#EAF6EC" stroke="#5FA86A" stroke-width="0.9"/>
+            <circle cx="-10" cy="34" r="10" fill="#E8940A"/>
+            <line x1="4" y1="34" x2="40" y2="34" stroke="#D6455D" stroke-width="2.6" marker-end="url(#arrR)"/>
+            <text x="0" y="66" text-anchor="middle" font-size="7.4" font-weight="800">공 2 kg × 3 m/s</text>
+            <text x="0" y="90" text-anchor="middle" font-size="8.6" font-weight="900" fill="#2E6B3A">= 6 kg·m/s</text>
+          </g>
+          <text x="235" y="132" text-anchor="middle" font-size="8.8" font-weight="800" fill="#E8940A">느려도 무거우면 크다 — 트럭이 자전거보다 '운동의 양'이 큰 이유</text>
+        </svg>
+        <figcaption>그림 2 | 운동량 비교 — 질량과 속도, 반드시 둘의 곱으로 판단한다</figcaption>
+      </figure>
+
+      <div class="expoint">
+        <div class="boxtitle"><span class="ico">!</span>시험엔 이렇게</div>
+        <p>운동량 비교 문제는 <b>반드시 곱셈 검산</b> — 질량만 보게 하거나 속력만 보게 하는 선지가 단골. 그리고 운동량에는 <b>방향이 있다</b>는 것도 O·X 단골이다.</p>
+      </div>
+    </div>
+
+    <div class="wing">
+      <div class="wtitle">날개 노트</div>
+      <div class="term"><b>운동량의 단위</b>kg·m/s — 질량(kg)과 속도(m/s)를 곱했으니 단위도 곱이 된다.</div>
+      <div class="term"><b>방향이 있는 양</b>운동량은 속도의 방향을 그대로 물려받는다. 반대로 달리는 두 공의 운동량은 부호가 다르다.</div>
+      <div class="wsep"></div>
+      <div class="wtitle">한눈에 암기</div>
+      <div class="wing-pen">운동량 = m × v<br>무겁거나 빠르면 크다<br>비교는 반드시 곱셈!</div>
+    </div>
+  </div>
+  <div class="quickcheck">
+    <span class="qc-title">바로바로 체크</span>
+    <ol>
+      <li><span class="no">1</span>운동량은 질량과 속도의 곱이다. ( O , X )</li>
+      <li><span class="no">2</span>질량 2 kg인 공이 3 m/s로 구를 때 운동량은 6 kg·m/s이다. ( O , X )</li>
+      <li><span class="no">3</span>속력이 같다면 질량과 관계없이 운동량은 같다. ( O , X )</li>
+    </ol>
+    <div class="qc-ans">정답 1 O 2 O 3 X (질량이 클수록 크다)</div>
+  </div>
+  <div class="folio"><span>III. 시스템과 상호작용</span><span class="num">118</span></div>
+</div>
+
+<!-- ═════════════ p.119 개념 03 충격량 ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag">III. 시스템과 상호작용</span><span class="lesson-tag">04. 운동량과 충격량</span></div>
+  <div class="cols">
+    <div class="main">
+      <h3 class="sec"><span class="n">3</span>충격량 — 힘 × 시간 = 운동량의 변화</h3>
+      <p class="body">운동량을 바꾸려면 힘이 필요하다. 그런데 얼마나 바뀌는지는 힘의 크기만으로 정해지지 않는다 — <b>얼마나 오래 작용했는가</b>도 똑같이 중요하다. 그래서 <span class="kw">충격량</span> = <span class="u-amber">힘 × 시간</span>으로 정의한다. 그리고 이 소단원의 심장인 등식이 나온다. <span class="u-amber">충격량 = 운동량의 변화량.</span></p>
+      <p class="body">이 등식을 그림으로 보는 방법이 <b>힘-시간 그래프</b>다. 그래프 아래의 <span class="kw">넓이가 곧 충격량</span>이다. 같은 공이 같은 속도에서 멈춘다면 운동량 변화량 — 즉 넓이 — 는 정해져 있다. 그렇다면 남는 선택지는 하나뿐이다. <b>그 넓이를 '높고 좁게' 받을 것인가, '낮고 넓게' 받을 것인가.</b> 짧은 시간에 받으면 힘이 크고(아프다), 긴 시간에 나눠 받으면 힘이 작다(덜 아프다). 이 선택이 다음 두 개념 — 안전장치와 스포츠 — 의 갈림길이다.</p>
+
+      <figure>
+        <svg width="470" height="158" viewBox="0 0 470 158" font-family="PC Sans">
+          <!-- (가) 딱딱한 바닥 -->
+          <g transform="translate(96,14)">
+            <line x1="-60" y1="100" x2="66" y2="100" stroke="#5B6B77" stroke-width="1.2" marker-end="url(#arrP)"/>
+            <line x1="-60" y1="100" x2="-60" y2="4" stroke="#5B6B77" stroke-width="1.2" marker-end="url(#arrP)"/>
+            <text x="70" y="110" text-anchor="end" font-size="6.8" fill="#5B6B77">시간</text>
+            <text x="-56" y="2" font-size="6.8" fill="#5B6B77">힘</text>
+            <path d="M-52,100 L-40,14 L-28,100 Z" fill="#FBEBEE" stroke="#D6455D" stroke-width="1.8"/>
+            <text x="-40" y="122" text-anchor="middle" font-size="8.2" font-weight="800">(가) 딱딱한 바닥</text>
+            <text x="32" y="122" text-anchor="middle" font-size="6.8" fill="#D6455D">짧은 시간 · 큰 힘</text>
+          </g>
+          <!-- (나) 푹신한 매트 -->
+          <g transform="translate(330,14)">
+            <line x1="-60" y1="100" x2="120" y2="100" stroke="#5B6B77" stroke-width="1.2" marker-end="url(#arrP)"/>
+            <line x1="-60" y1="100" x2="-60" y2="4" stroke="#5B6B77" stroke-width="1.2" marker-end="url(#arrP)"/>
+            <text x="124" y="110" text-anchor="end" font-size="6.8" fill="#5B6B77">시간</text>
+            <text x="-56" y="2" font-size="6.8" fill="#5B6B77">힘</text>
+            <path d="M-52,100 Q-10,52 20,54 Q60,56 96,100 Z" fill="#EAF6EC" stroke="#2E6B3A" stroke-width="1.8"/>
+            <text x="22" y="122" text-anchor="middle" font-size="8.2" font-weight="800">(나) 푹신한 매트</text>
+            <text x="92" y="122" text-anchor="middle" font-size="6.8" fill="#2E6B3A">긴 시간 · 작은 힘</text>
+          </g>
+          <text x="222" y="80" text-anchor="middle" font-size="8.4" font-weight="900" fill="#E8940A">넓이는</text>
+          <text x="222" y="93" text-anchor="middle" font-size="8.4" font-weight="900" fill="#E8940A">같다!</text>
+          <text x="235" y="152" text-anchor="middle" font-size="8.8" font-weight="800" fill="#E8940A">그래프 아래 넓이 = 충격량 = 운동량 변화량 — 같은 넓이를 어떻게 받을지가 선택이다</text>
+        </svg>
+        <figcaption>그림 3 | 힘-시간 그래프 — 같은 충격량이라도 '높고 좁게' 또는 '낮고 넓게' 받을 수 있다</figcaption>
+      </figure>
+
+      <div class="gist">
+        <div class="boxtitle"><span class="ico">알</span>알짜 정리 ① — 세 가지 양의 관계</div>
+        <ul>
+          <li><b>관성</b>: 힘(상호작용)이 없으면 운동 상태 불변 — 질량이 클수록 관성 큼</li>
+          <li><b>운동량 = 질량 × 속도</b> (kg·m/s, 방향 있음) / <b>충격량 = 힘 × 시간</b> (그래프 아래 넓이)</li>
+          <li>핵심 등식: <b>충격량 = 운동량의 변화량</b> — 같은 변화라면 시간과 힘은 반비례</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="wing">
+      <div class="wtitle">날개 노트</div>
+      <div class="term"><b>힘-시간 그래프</b>충돌하는 동안 힘이 어떻게 변했는지 보여 준다. 넓이가 충격량, 봉우리가 최대 힘이다.</div>
+      <div class="term"><b>평균 힘</b>충돌 동안 힘은 계속 변하므로, 문제에서는 보통 평균 힘으로 따진다.</div>
+      <div class="wsep"></div>
+      <div class="wtitle">한눈에 암기</div>
+      <div class="wing-pen">충격량 = F × t<br>= 운동량의 변화!<br>넓이 같으면 t↑ ⇒ F↓</div>
+    </div>
+  </div>
+  <div class="quickcheck">
+    <span class="qc-title">바로바로 체크</span>
+    <ol>
+      <li><span class="no">1</span>충격량은 힘과 시간의 곱이다. ( O , X )</li>
+      <li><span class="no">2</span>물체가 받은 충격량은 운동량의 변화량과 같다. ( O , X )</li>
+      <li><span class="no">3</span>충격량이 같을 때 충돌 시간이 길수록 받는 힘이 커진다. ( O , X )</li>
+    </ol>
+    <div class="qc-ans">정답 1 O 2 O 3 X (시간이 길수록 힘은 작아진다)</div>
+  </div>
+  <div class="folio"><span>III. 시스템과 상호작용</span><span class="num">119</span></div>
+</div>
+
+<!-- ═════════════ p.120 개념 04 안전장치 ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag">III. 시스템과 상호작용</span><span class="lesson-tag">04. 운동량과 충격량</span></div>
+  <div class="cols">
+    <div class="main">
+      <h3 class="sec"><span class="n">4</span>시간을 늘려 힘을 줄이다 — 안전장치</h3>
+      <p class="body">충돌에서 멈춰야 할 운동량 변화량은 이미 정해져 있다 — 달리던 속도에서 0까지. 안전장치가 할 수 있는 일은 그 변화를 <span class="u-amber">최대한 천천히 일어나게 하는 것</span>뿐이다. 시간이 길어지면, 같은 충격량이라도 <b>매 순간 받는 힘이 작아진다</b>. 이 한 줄이 모든 안전 설계의 원리다.</p>
+      <p class="body">자동차의 <span class="kw">에어백</span>은 몸이 푹 꺼지며 멈추는 시간을 늘리고, 범퍼와 차체 앞부분은 <b>구겨지면서</b> 충돌 시간을 번다. 놀이터의 <b>푹신한 바닥</b>, 야구 선수가 <b>글러브를 뒤로 빼며</b> 공을 받는 것, 높은 데서 내릴 때 <b>무릎을 굽히는 것</b>, 번지점프의 <b>잘 늘어나는 줄</b> — 전부 같은 공식의 다른 얼굴이다. 헬멧 속 완충재도 머리가 멈추는 시간을 몇 배로 늘려 힘을 줄인다.</p>
+
+      <figure>
+        <svg width="470" height="132" viewBox="0 0 470 132" font-family="PC Sans">
+          <g font-size="7.2">
+            <g transform="translate(66,8)">
+              <rect x="-56" y="0" width="112" height="92" rx="6" fill="#FBEBEE" stroke="#E3A0AC" stroke-width="0.9"/>
+              <path d="M-36,58 q0,-26 22,-26 h6 q-2,-12 10,-12" fill="none" stroke="#9AA7B1" stroke-width="2"/>
+              <circle cx="8" cy="16" r="6" fill="#F6C98E" stroke="#E8940A"/>
+              <ellipse cx="24" cy="38" rx="17" ry="14" fill="#fff" stroke="#D6455D" stroke-width="1.6"/>
+              <text x="24" y="42" text-anchor="middle" font-size="6" fill="#D6455D">에어백</text>
+              <text x="0" y="74" text-anchor="middle" font-weight="800">에어백·안전띠</text>
+              <text x="0" y="85" text-anchor="middle" font-size="6.4" fill="#5B6B77">몸이 멈추는 시간을 늘린다</text>
+            </g>
+            <g transform="translate(180,8)">
+              <rect x="-52" y="0" width="104" height="92" rx="6" fill="#F5F1FC" stroke="#CFC0EE" stroke-width="0.9"/>
+              <rect x="-34" y="26" width="46" height="22" rx="4" fill="#6B46C8"/>
+              <path d="M12,26 l10,4 l-6,5 l8,4 l-12,9" fill="none" stroke="#9E85E0" stroke-width="2"/>
+              <text x="0" y="74" text-anchor="middle" font-weight="800">구겨지는 범퍼</text>
+              <text x="0" y="85" text-anchor="middle" font-size="6.4" fill="#5B6B77">찌그러지며 시간을 번다</text>
+            </g>
+            <g transform="translate(290,8)">
+              <rect x="-52" y="0" width="104" height="92" rx="6" fill="#EAF6EC" stroke="#5FA86A" stroke-width="0.9"/>
+              <circle cx="-16" cy="24" r="7" fill="#E8940A"/>
+              <path d="M-2,34 q16,-4 22,10 q2,10 -10,12 q-14,2 -12,-22" fill="#C9A97A" stroke="#8A6B3A" stroke-width="1.2"/>
+              <line x1="10" y1="52" x2="26" y2="60" stroke="#5B6B77" stroke-width="1.4" marker-end="url(#arrP)"/>
+              <text x="0" y="74" text-anchor="middle" font-weight="800">글러브 빼며 받기</text>
+              <text x="0" y="85" text-anchor="middle" font-size="6.4" fill="#5B6B77">손이 아프지 않은 이유</text>
+            </g>
+            <g transform="translate(400,8)">
+              <rect x="-52" y="0" width="104" height="92" rx="6" fill="#FDF9F0" stroke="#EBCB9C" stroke-width="0.9"/>
+              <circle cx="0" cy="16" r="6" fill="#F6C98E" stroke="#E8940A"/>
+              <path d="M0,22 L0,38 M0,26 L-9,34 M0,26 L9,34 M0,38 q-8,6 -10,16 M0,38 q8,6 10,16" stroke="#3D4C58" stroke-width="2" fill="none"/>
+              <rect x="-30" y="58" width="60" height="8" rx="3" fill="#7FB8E8"/>
+              <text x="0" y="74" text-anchor="middle" font-weight="800">무릎 굽혀 착지</text>
+              <text x="0" y="85" text-anchor="middle" font-size="6.4" fill="#5B6B77">몸 자체가 완충 장치</text>
+            </g>
+          </g>
+          <text x="235" y="122" text-anchor="middle" font-size="8.8" font-weight="800" fill="#E8940A">넷 다 같은 공식 — 운동량 변화는 그대로, 시간 ↑ ⇒ 힘 ↓</text>
+        </svg>
+        <figcaption>그림 4 | 안전장치의 4가지 얼굴 — 모두 '충돌 시간 늘리기'라는 한 가지 일을 한다</figcaption>
+      </figure>
+
+      <div class="expoint">
+        <div class="boxtitle"><span class="ico">!</span>시험엔 이렇게</div>
+        <p><b>"에어백은 운동량 변화량(충격량)을 줄여 준다"(X)</b> — 최다 빈출 함정. 변화량은 정해져 있고, 에어백이 바꾸는 것은 <b>시간과 힘의 배분</b>이다.</p>
+      </div>
+    </div>
+
+    <div class="wing">
+      <div class="wtitle">날개 노트</div>
+      <div class="term"><b>크럼플 존</b>충돌 때 일부러 구겨지도록 설계한 자동차 앞뒤 구역. 찌그러짐이 곧 안전이다.</div>
+      <div class="term"><b>안전모의 속</b>딱딱한 겉껍질 안의 스티로폼이 눌리며 시간을 번다. 한 번 충격을 받은 헬멧을 교체하는 이유다.</div>
+      <div class="wsep"></div>
+      <div class="wtitle">한눈에 암기</div>
+      <div class="wing-pen">안전장치의 일 =<br>딱 하나, '시간 벌기'!<br>변화량은 못 줄인다</div>
+    </div>
+  </div>
+  <div class="quickcheck">
+    <span class="qc-title">바로바로 체크</span>
+    <ol>
+      <li><span class="no">1</span>에어백은 충돌 시간을 길게 하여 사람이 받는 힘을 줄인다. ( O , X )</li>
+      <li><span class="no">2</span>에어백은 사람의 운동량 변화량 자체를 줄여 준다. ( O , X )</li>
+      <li><span class="no">3</span>무릎을 굽히며 착지하는 것도 충돌 시간을 늘리는 방법이다. ( O , X )</li>
+    </ol>
+    <div class="qc-ans">정답 1 O 2 X (변화량은 같고 힘만 줄어든다) 3 O</div>
+  </div>
+  <div class="folio"><span>III. 시스템과 상호작용</span><span class="num">120</span></div>
+</div>
+
+<!-- ═════════════ p.121 개념 05 스포츠 ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag">III. 시스템과 상호작용</span><span class="lesson-tag">04. 운동량과 충격량</span></div>
+  <div class="cols">
+    <div class="main">
+      <h3 class="sec"><span class="n">5</span>힘과 시간을 키워 멀리 — 스포츠</h3>
+      <p class="body">같은 공식을 반대로 쓰면 공격의 기술이 된다. 공을 <b>더 빠르게</b> 날리고 싶다면 공의 <b>운동량 변화량 — 곧 충격량 — 을 키워야</b> 한다. 충격량 = 힘 × 시간이니 방법은 둘이다. <b>더 큰 힘으로 치거나, 더 오래 밀어 주거나.</b></p>
+      <p class="body">골프와 야구의 <span class="kw">팔로스루</span>(공을 친 뒤에도 끝까지 휘두르기)는 채와 공의 <span class="u-amber">접촉 시간을 늘려 충격량을 키우는</span> 기술이다. 힘을 빼려는 동작이 아니라 <b>더 멀리 보내려는</b> 동작인 것이다. 반대로 태권도 격파는 <b>아주 짧은 시간에 힘을 집중</b>시켜 순간의 힘을 키운다 — 같은 등식의 양 끝을 오가며, 스포츠는 물리학을 몸으로 쓴다.</p>
+      <p class="body">정리하면 이 소단원의 등식 하나가 <b>두 방향</b>으로 일한다. <b>지킬 때는 시간을 늘려 힘을 줄이고(안전), 보낼 때는 힘·시간을 키워 충격량을 늘린다(스포츠).</b> 문제를 만나면 먼저 물어라 — "지금 목적이 보호인가, 발사인가?"</p>
+
+      <figure>
+        <svg width="460" height="128" viewBox="0 0 460 128" font-family="PC Sans">
+          <!-- 팔로스루 -->
+          <g transform="translate(128,8)">
+            <rect x="-104" y="0" width="208" height="88" rx="6" fill="#EAF6EC" stroke="#5FA86A" stroke-width="0.9"/>
+            <text x="0" y="16" text-anchor="middle" font-size="8.4" font-weight="800" fill="#2E6B3A">팔로스루 — 오래 밀어서 멀리</text>
+            <path d="M-70,66 q30,-40 66,-44" fill="none" stroke="#9AA7B1" stroke-width="1.4" stroke-dasharray="3 2"/>
+            <path d="M-4,22 q36,4 62,28" fill="none" stroke="#2E6B3A" stroke-width="2"/>
+            <circle cx="-6" cy="24" r="6" fill="#E8940A"/>
+            <circle cx="30" cy="30" r="4" fill="#F6C98E" stroke="#E8940A" stroke-width="0.8"/>
+            <circle cx="58" cy="42" r="4" fill="#F6C98E" stroke="#E8940A" stroke-width="0.8"/>
+            <line x1="66" y1="46" x2="92" y2="58" stroke="#D6455D" stroke-width="2" marker-end="url(#arrR)"/>
+            <text x="10" y="52" font-size="6.4" fill="#2E6B3A">접촉 구간이 길다 = 시간 ↑</text>
+            <text x="0" y="80" text-anchor="middle" font-size="6.8" fill="#5B6B77">충격량 ↑ → 운동량 변화 ↑ → 더 빠르게 날아간다</text>
+          </g>
+          <!-- 격파 -->
+          <g transform="translate(342,8)">
+            <rect x="-104" y="0" width="208" height="88" rx="6" fill="#FBEBEE" stroke="#E3A0AC" stroke-width="0.9"/>
+            <text x="0" y="16" text-anchor="middle" font-size="8.4" font-weight="800" fill="#D6455D">격파 — 짧게 집중해서 세게</text>
+            <rect x="-30" y="46" width="60" height="7" rx="2" fill="#C9A97A"/>
+            <path d="M-2,50 l4,-4 M2,50 l-4,4" stroke="#8A6B3A" stroke-width="1.4"/>
+            <path d="M-6,20 q6,8 6,20" fill="none" stroke="#3D4C58" stroke-width="3"/>
+            <line x1="0" y1="40" x2="0" y2="46" stroke="#D6455D" stroke-width="2.4" marker-end="url(#arrR)"/>
+            <text x="42" y="34" font-size="6.4" fill="#D6455D">아주 짧은 시간에</text>
+            <text x="42" y="44" font-size="6.4" fill="#D6455D">힘을 집중!</text>
+            <text x="0" y="80" text-anchor="middle" font-size="6.8" fill="#5B6B77">같은 등식의 반대쪽 끝 — 시간 ↓ 이면 순간의 힘 ↑</text>
+          </g>
+          <text x="230" y="120" text-anchor="middle" font-size="8.8" font-weight="800" fill="#E8940A">목적을 물어라 — 보호라면 시간을 늘리고, 발사라면 충격량을 키운다</text>
+        </svg>
+        <figcaption>그림 5 | 스포츠 속 충격량 — 팔로스루는 충격량 키우기, 격파는 힘 집중하기</figcaption>
+      </figure>
+
+      <div class="saem">
+        <div class="avatar">박찬<br>쌤</div>
+        <div class="bubble"><span class="pen">"안전장치와 스포츠는 같은 식의 앞뒤 면이야. '무엇이 정해져 있는가'만 봐 — 멈출 충돌이면 변화량이 정해져 있고(시간 승부), 보낼 공이면 변화량을 키우는 게 목표다."</span></div>
+      </div>
+    </div>
+
+    <div class="wing">
+      <div class="wtitle">날개 노트</div>
+      <div class="term"><b>팔로스루</b>타격 후에도 스윙을 끝까지 이어 가는 동작. 접촉 시간과 함께 힘의 방향도 안정시켜 준다.</div>
+      <div class="term"><b>번지점프의 줄</b>잘 늘어나는 줄이 멈추는 시간을 길게 늘여, 몸이 받는 힘을 안전한 수준으로 낮춘다.</div>
+      <div class="wsep"></div>
+      <div class="wtitle">앱 연동</div>
+      <div class="term"><b>앱에서 이어서!</b>박찬 과학 앱에서 소단원 III-04를 선택하면 알짜 요약과 추가 문제를 볼 수 있다.</div>
+    </div>
+  </div>
+  <div class="quickcheck">
+    <span class="qc-title">바로바로 체크</span>
+    <ol>
+      <li><span class="no">1</span>같은 힘이라면 접촉 시간이 길수록 충격량이 크다. ( O , X )</li>
+      <li><span class="no">2</span>충격량이 클수록 공의 운동량 변화량이 크다. ( O , X )</li>
+      <li><span class="no">3</span>팔로스루는 공이 받는 힘을 줄이기 위한 동작이다. ( O , X )</li>
+    </ol>
+    <div class="qc-ans">정답 1 O 2 O 3 X (충격량을 키워 멀리 보내려는 동작)</div>
+  </div>
+  <div class="folio"><span>III. 시스템과 상호작용</span><span class="num">121</span></div>
+</div>
+
+<!-- ═════════════ p.122 자료 파헤치기 ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag">III. 시스템과 상호작용</span><span class="lesson-tag">04. 운동량과 충격량</span></div>
+  <div class="lab">
+    <div class="lab-head">자료 파헤치기 <span class="tag">탐구·자료 분석</span> <span style="font-weight:600; font-size:9.5pt; margin-left:auto;">힘-시간 그래프를 읽는 세 가지 눈</span></div>
+    <div class="lab-body">
+      <h4>자료</h4>
+      <p>동일한 유리컵을 같은 높이에서 (가) 시멘트 바닥과 (나) 푹신한 방석 위에 떨어뜨렸다. 그래프는 충돌하는 동안 컵이 받는 힘을 시간에 따라 나타낸 것이며, 두 그래프 아래의 넓이는 같다. (가)에서 컵은 깨졌고 (나)에서는 깨지지 않았다.</p>
+      <figure>
+        <svg width="430" height="128" viewBox="0 0 430 128" font-family="PC Sans">
+          <line x1="46" y1="104" x2="410" y2="104" stroke="#5B6B77" stroke-width="1.2" marker-end="url(#arrP)"/>
+          <line x1="46" y1="104" x2="46" y2="8" stroke="#5B6B77" stroke-width="1.2" marker-end="url(#arrP)"/>
+          <text x="410" y="116" text-anchor="end" font-size="7" fill="#5B6B77">시간</text>
+          <text x="42" y="6" text-anchor="end" font-size="7" fill="#5B6B77">힘</text>
+          <path d="M66,104 L88,16 L110,104 Z" fill="#FBEBEE" stroke="#D6455D" stroke-width="1.8"/>
+          <text x="88" y="120" text-anchor="middle" font-size="7.6" font-weight="800" fill="#D6455D">(가) 시멘트 — 깨짐</text>
+          <path d="M150,104 Q230,54 270,56 Q330,58 390,104 Z" fill="#EAF6EC" stroke="#2E6B3A" stroke-width="1.8"/>
+          <text x="270" y="120" text-anchor="middle" font-size="7.6" font-weight="800" fill="#2E6B3A">(나) 방석 — 안 깨짐</text>
+          <line x1="46" y1="16" x2="88" y2="16" stroke="#B8C2CA" stroke-width="0.8" stroke-dasharray="2.5 2"/>
+          <line x1="46" y1="56" x2="230" y2="56" stroke="#B8C2CA" stroke-width="0.8" stroke-dasharray="2.5 2"/>
+          <text x="52" y="13" font-size="6.4" fill="#D6455D">최대 힘 큼</text>
+          <text x="52" y="53" font-size="6.4" fill="#2E6B3A">최대 힘 작음</text>
+        </svg>
+      </figure>
+      <h4>해석의 3단계</h4>
+      <ol>
+        <li><b>넓이부터(충격량)</b> — 같은 높이에서 같은 속도로 닿아 정지하므로 운동량 변화량이 같다 → 충격량(넓이)도 같다. "넓이가 같다"는 조건은 문제의 절반을 미리 풀어 준 것이다.</li>
+        <li><b>가로 폭(시간)</b> — (나)의 봉우리는 옆으로 넓다 = 방석이 눌리며 충돌 시간을 벌었다.</li>
+        <li><b>봉우리 높이(최대 힘)</b> — 같은 넓이가 긴 시간에 퍼지면 봉우리가 낮아진다. 컵이 깨지고 안 깨지고는 <b>충격량이 아니라 최대 힘</b>이 갈랐다.</li>
+      </ol>
+      <h4>결론</h4>
+      <p>충돌의 피해를 결정하는 것은 '얼마나 큰 변화였나(충격량)'가 아니라 <b>'그 변화가 얼마나 짧은 시간에 몰렸나(힘의 크기)'</b>다. 그래서 안전의 기술은 언제나 시간을 버는 기술이다.</p>
+      <div class="expoint">
+        <div class="boxtitle"><span class="ico">!</span>시험엔 이렇게</div>
+        <p>F-t 그래프는 <b>① 넓이(충격량) 비교 → ② 폭(시간) → ③ 봉우리(최대 힘)</b> 순서로 3연속 체크. "(나)의 충격량이 더 작다"처럼 넓이와 봉우리를 바꿔치기하는 선지가 최다 빈출.</p>
+      </div>
+      <h4>직접 해보기 — 달걀 받기 챌린지</h4>
+      <p>친구가 1 m 높이에서 떨어뜨린 달걀(또는 물풍선)을 손으로 받아 보자. 손을 고정하고 받으면 깨질 확률이 높지만, <b>공이 닿는 순간부터 손을 아래로 길게 빼면서</b> 받으면 놀랄 만큼 부드럽게 멈춘다. 방금 그 손동작이 에어백·글러브·번지 줄이 하는 일의 전부다. (주의: 실외에서, 바닥에 신문지를 깔고 할 것)</p>
+    </div>
+  </div>
+  <div class="folio"><span>III. 시스템과 상호작용</span><span class="num">122</span></div>
+</div>
+
+<!-- ═════════════ p.123 STEP 1 + STEP 2 시작 ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag">III. 시스템과 상호작용</span><span class="lesson-tag">04. 운동량과 충격량 | 문제</span></div>
+
+  <div class="step-head"><span class="stepno">STEP 1</span><span class="steptt">개념 확인</span><span class="stepdesc">OX와 빈칸으로 개념 점검 — 막히면 알짜 정리로!</span></div>
+  <div class="qgrid">
+    <div>
+      <div class="q"><div class="qhead"><span class="qno">1</span><div class="stem">물체에 작용하는 힘(상호작용)이 없으면 물체의 운동 상태는 변하지 않는다. <span class="ox-answer">( O , X )</span></div></div></div>
+      <div class="q"><div class="qhead"><span class="qno">2</span><div class="stem">달리던 버스가 갑자기 멈추면 승객의 몸은 뒤로 쏠린다. <span class="ox-answer">( O , X )</span></div></div></div>
+      <div class="q"><div class="qhead"><span class="qno">3</span><div class="stem">물체가 받은 충격량은 그 물체의 운동량의 변화량과 같다. <span class="ox-answer">( O , X )</span></div></div></div>
+    </div>
+    <div>
+      <div class="q"><div class="qhead"><span class="qno">4</span><div class="stem">물체의 운동량은 물체의 <span class="blankline" style="min-width:10mm;"></span>과 <span class="blankline" style="min-width:10mm;"></span>의 곱으로 나타낸다.</div></div></div>
+      <div class="q"><div class="qhead"><span class="qno">5</span><div class="stem">질량 2 kg인 공이 3 m/s의 속도로 굴러갈 때, 이 공의 운동량의 크기는 <span class="blankline" style="min-width:8mm;"></span> kg·m/s이다.</div></div></div>
+      <div class="q"><div class="qhead"><span class="qno">6</span><div class="stem">충격량이 같을 때, 힘을 받는 시간이 길어지면 물체가 받는 평균 힘의 크기는 <span class="blankline" style="min-width:14mm;"></span>.</div></div></div>
+    </div>
+  </div>
+
+  <div style="border-top:0.5mm solid var(--line); margin:2mm 0 4mm;"></div>
+
+  <div class="step-head s2"><span class="stepno">STEP 2</span><span class="steptt">내신 완성</span><span class="stepdesc">학교 시험 유형 그대로 — 서술형까지 한 번에</span></div>
+
+  <div class="q">
+    <div class="qhead"><span class="qno">7</span><div class="stem">관성에 대한 설명으로 옳은 것은? <span class="difficulty">●●○</span>
+    <div class="tags">10통과1-03-04 | 개념 1</div></div></div>
+    <ul class="choices">
+      <li>① 힘을 받지 않는 물체는 결국 저절로 멈춘다.</li>
+      <li>② 질량이 클수록 관성은 작다.</li>
+      <li>③ 버스가 급출발하면 승객의 몸은 앞으로 쏠린다.</li>
+      <li>④ 망치 자루를 바닥에 내리치면 망치 머리가 단단히 박히는 것은 관성 때문이다.</li>
+      <li>⑤ 등속 직선 운동을 유지하려면 계속 힘을 주어야 한다.</li>
+    </ul>
+  </div>
+
+  <div class="q">
+    <div class="qhead"><span class="qno">8</span><div class="stem">물체 A(질량 2 kg, 속력 4 m/s), B(질량 4 kg, 속력 1 m/s), C(질량 1 kg, 속력 6 m/s)의 운동량의 크기를 옳게 비교한 것은? <span class="difficulty">●●●</span>
+    <div class="tags">10통과1-03-04 | 개념 2</div></div></div>
+    <ul class="choices inline">
+      <li>① A &gt; B &gt; C</li>
+      <li>② A &gt; C &gt; B</li>
+      <li>③ B &gt; A &gt; C</li>
+      <li>④ C &gt; A &gt; B</li>
+      <li>⑤ C &gt; B &gt; A</li>
+    </ul>
+  </div>
+
+  <div class="folio"><span>III. 시스템과 상호작용</span><span class="num">123</span></div>
+</div>
+
+<!-- ═════════════ p.124 STEP 2 계속 ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag">III. 시스템과 상호작용</span><span class="lesson-tag">04. 운동량과 충격량 | 문제</span></div>
+
+  <div class="q">
+    <div class="qhead"><span class="qno">9</span><div class="stem"><span class="badge-data">자료</span>그림은 같은 높이에서 떨어진 같은 공이 (가) 딱딱한 바닥, (나) 푹신한 매트에 충돌할 때 받는 힘을 시간에 따라 나타낸 것이다. 두 그래프 아래의 넓이는 같다. 이에 대한 설명으로 옳은 것은? <span class="difficulty">●●●</span>
+    <div class="tags">10통과1-03-04 | 개념 3·4</div></div></div>
+    <figure style="margin:2mm 0 1mm 8.4mm;">
+      <svg width="270" height="92" viewBox="0 0 270 92" font-family="PC Sans">
+        <line x1="30" y1="76" x2="260" y2="76" stroke="#5B6B77" stroke-width="1.1" marker-end="url(#arrP)"/>
+        <line x1="30" y1="76" x2="30" y2="6" stroke="#5B6B77" stroke-width="1.1" marker-end="url(#arrP)"/>
+        <text x="258" y="88" text-anchor="end" font-size="6.6" fill="#5B6B77">시간</text>
+        <text x="26" y="5" text-anchor="end" font-size="6.6" fill="#5B6B77">힘</text>
+        <path d="M44,76 L60,12 L76,76 Z" fill="#FBEBEE" stroke="#D6455D" stroke-width="1.5"/>
+        <text x="60" y="88" text-anchor="middle" font-size="6.8" font-weight="800" fill="#D6455D">(가)</text>
+        <path d="M104,76 Q160,42 186,44 Q222,46 250,76 Z" fill="#EAF6EC" stroke="#2E6B3A" stroke-width="1.5"/>
+        <text x="180" y="88" text-anchor="middle" font-size="6.8" font-weight="800" fill="#2E6B3A">(나)</text>
+      </svg>
+    </figure>
+    <ul class="choices">
+      <li>① 공이 받은 충격량은 (가)가 (나)보다 크다.</li>
+      <li>② 공의 운동량 변화량은 (나)가 (가)보다 크다.</li>
+      <li>③ 충격량은 같고, 충돌 시간이 긴 (나)에서 공이 받는 최대 힘이 작다.</li>
+      <li>④ 충돌 시간은 (가)가 (나)보다 길다.</li>
+      <li>⑤ 그래프 아래의 넓이는 충돌 시간을 나타낸다.</li>
+    </ul>
+  </div>
+
+  <div class="q">
+    <div class="qhead"><span class="qno">10</span><div class="stem">충돌 안전장치의 원리에 대한 설명으로 옳은 것만을 고른 것은? <span class="difficulty">●●●</span>
+    <div class="tags">10통과1-03-04 | 개념 4</div></div></div>
+    <div class="bogi-box" style="background:#fff;">
+      (가) 에어백은 충돌 시간을 길게 하여 사람이 받는 힘을 줄인다.<br>
+      (나) 야구 글러브를 뒤로 빼면서 공을 받는 것도 같은 원리이다.<br>
+      (다) 에어백은 사람의 운동량 변화량 자체를 줄여 준다.
+    </div>
+    <ul class="choices inline">
+      <li>① (가)</li><li>② (나)</li><li>③ (가), (나)</li><li>④ (나), (다)</li><li>⑤ (가), (나), (다)</li>
+    </ul>
+  </div>
+
+  <div class="q">
+    <div class="qhead"><span class="qno">11</span><div class="stem"><span class="badge-essay">서술형</span>높은 곳에서 뛰어내려 착지할 때 무릎을 굽히면 덜 다치는 까닭을 <b>'충돌 시간'과 '힘'</b>이라는 말을 포함하여 서술하시오. <span class="difficulty">●●●●</span>
+    <div class="tags">10통과1-03-04 | 개념 4</div></div></div>
+    <div class="essay-lines"><div></div><div></div><div></div></div>
+  </div>
+
+  <div class="folio"><span>III. 시스템과 상호작용</span><span class="num">124</span></div>
+</div>
+
+<!-- ═════════════ p.125 STEP 3 ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag">III. 시스템과 상호작용</span><span class="lesson-tag">04. 운동량과 충격량 | 문제</span></div>
+  <div class="step-head s3"><span class="stepno">STEP 3</span><span class="steptt">수능 도전</span><span class="stepdesc">2028 수능 규격 — ㄱㄴㄷ 합답형·자료 해석</span></div>
+
+  <div class="q">
+    <div class="qhead"><span class="qno">12</span><div class="stem"><span class="badge-data">자료</span>그림은 동일한 유리컵이 같은 높이에서 (가) 시멘트 바닥, (나) 푹신한 방석에 떨어질 때 받는 힘을 시간에 따라 나타낸 것이다. 옳은 것만을 &lt;보기&gt;에서 있는 대로 고른 것은? <span class="difficulty">[2점]</span>
+    <div class="tags">10통과1-03-04</div></div></div>
+    <figure style="margin:2mm 0 1mm 8.6mm;">
+      <svg width="270" height="88" viewBox="0 0 270 88" font-family="PC Sans">
+        <line x1="30" y1="72" x2="260" y2="72" stroke="#5B6B77" stroke-width="1.1" marker-end="url(#arrP)"/>
+        <line x1="30" y1="72" x2="30" y2="6" stroke="#5B6B77" stroke-width="1.1" marker-end="url(#arrP)"/>
+        <path d="M44,72 L58,10 L72,72 Z" fill="#FBEBEE" stroke="#D6455D" stroke-width="1.5"/>
+        <text x="58" y="84" text-anchor="middle" font-size="6.8" font-weight="800" fill="#D6455D">(가)</text>
+        <path d="M100,72 Q152,40 178,42 Q214,44 246,72 Z" fill="#EAF6EC" stroke="#2E6B3A" stroke-width="1.5"/>
+        <text x="174" y="84" text-anchor="middle" font-size="6.8" font-weight="800" fill="#2E6B3A">(나)</text>
+      </svg>
+    </figure>
+    <div class="bogi-box">
+      <div class="bt">보기</div>
+      ㄱ. 두 경우 그래프 아래의 넓이(충격량)는 같다.<br>
+      ㄴ. (나)에서는 힘을 받는 시간이 길어 최대 힘이 작다.<br>
+      ㄷ. (나)에서 컵의 운동량 변화량이 더 작다.
+    </div>
+    <ul class="choices inline">
+      <li>① ㄱ</li><li>② ㄷ</li><li>③ ㄱ, ㄴ</li><li>④ ㄴ, ㄷ</li><li>⑤ ㄱ, ㄴ, ㄷ</li>
+    </ul>
+  </div>
+
+  <div class="q">
+    <div class="qhead"><span class="qno">13</span><div class="stem"><span class="badge-data">자료</span>골프 선수는 공을 친 뒤에도 채를 끝까지 휘두르는 팔로스루로 공과 채의 접촉 시간을 길게 한다. 옳은 것만을 &lt;보기&gt;에서 있는 대로 고른 것은? <span class="difficulty">[2.5점]</span>
+    <div class="tags">10통과1-03-04</div></div></div>
+    <figure style="margin:2mm 0 1mm 8.6mm;">
+      <svg width="250" height="80" viewBox="0 0 250 80" font-family="PC Sans">
+        <path d="M20,64 q50,-52 120,-52 q50,0 90,24" fill="none" stroke="#9AA7B1" stroke-width="1.4" stroke-dasharray="3 2"/>
+        <path d="M84,20 q50,-8 96,16" fill="none" stroke="#2E6B3A" stroke-width="2.2"/>
+        <circle cx="86" cy="20" r="5.5" fill="#E8940A"/>
+        <circle cx="130" cy="16" r="3.6" fill="#fff" stroke="#5B6B77"/>
+        <circle cx="162" cy="22" r="3.6" fill="#fff" stroke="#5B6B77"/>
+        <line x1="182" y1="30" x2="216" y2="42" stroke="#D6455D" stroke-width="2" marker-end="url(#arrR)"/>
+        <text x="120" y="60" text-anchor="middle" font-size="6.6" fill="#2E6B3A">접촉 구간(초록)이 길다 = 시간 ↑</text>
+      </svg>
+    </figure>
+    <div class="bogi-box">
+      <div class="bt">보기</div>
+      ㄱ. 같은 크기의 힘이라면, 접촉 시간이 길수록 공이 받는 충격량이 크다.<br>
+      ㄴ. 충격량이 클수록 공의 운동량 변화량이 커져 공이 더 빠르게 날아간다.<br>
+      ㄷ. 팔로스루는 공이 받는 힘을 줄이기 위한 동작이다.
+    </div>
+    <ul class="choices inline">
+      <li>① ㄱ</li><li>② ㄴ</li><li>③ ㄷ</li><li>④ ㄱ, ㄴ</li><li>⑤ ㄱ, ㄴ, ㄷ</li>
+    </ul>
+  </div>
+
+  <div class="folio"><span>III. 시스템과 상호작용</span><span class="num">125</span></div>
+</div>
+
+<!-- ═════════════ p.126 해설 1 ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag" style="color:var(--brand);">알짜 해설</span><span class="lesson-tag">04. 운동량과 충격량</span></div>
+  <div class="sol-head"><span class="stt">알짜 해설</span><span class="sub">전 문항 해설 + 오답 선지 분석 — 맞힌 문제도 해설로 한 번 더!</span></div>
+
+  <table class="anstable">
+    <tr><th>문항</th><td>1</td><td>2</td><td>3</td><td>4</td><td>5</td><td>6</td><td>7</td><td>8</td><td>9</td><td>10</td><td>11</td><td>12</td><td>13</td></tr>
+    <tr><th>정답</th><td class="a">O</td><td class="a">X</td><td class="a">O</td><td class="a">질량, 속도</td><td class="a">6</td><td class="a">작아진다</td><td class="a">④</td><td class="a">②</td><td class="a">③</td><td class="a">③</td><td class="a">서술형</td><td class="a">③</td><td class="a">④</td></tr>
+  </table>
+
+  <div class="solcols">
+    <div>
+      <div class="sol"><div class="shead"><span class="sno">1</span><span class="sans">O</span><span class="slink">개념 1</span></div>
+        <p>힘이 없으면 정지는 정지대로, 운동은 운동대로 — 관성이다.</p></div>
+      <div class="sol"><div class="shead"><span class="sno">2</span><span class="sans">X</span><span class="slink">개념 1</span></div>
+        <p>급정거 → 몸은 하던 대로 전진하려 해서 '앞으로' 쏠린다. 뒤로는 급출발 때.</p></div>
+      <div class="sol"><div class="shead"><span class="sno">3</span><span class="sans">O</span><span class="slink">개념 3</span></div>
+        <p>충격량 = 운동량의 변화량. 이 소단원의 심장 등식이다.</p></div>
+      <div class="sol"><div class="shead"><span class="sno">4</span><span class="sans">질량, 속도</span><span class="slink">개념 2</span></div>
+        <p>운동량 = m × v. 단위는 kg·m/s, 방향도 있다.</p></div>
+      <div class="sol"><div class="shead"><span class="sno">5</span><span class="sans">6</span><span class="slink">개념 2</span></div>
+        <p>2 kg × 3 m/s = 6 kg·m/s. 곱셈 한 번이면 끝.</p></div>
+      <div class="sol"><div class="shead"><span class="sno">6</span><span class="sans">작아진다</span><span class="slink">개념 4</span></div>
+        <p>충격량 = 힘 × 시간 — 같은 충격량에서 시간과 힘은 반비례.</p></div>
+    </div>
+    <div>
+      <div class="sol"><div class="shead"><span class="sno">7</span><span class="sans">④</span><span class="slink">개념 1</span></div>
+        <p>자루가 멈춰도 머리는 하던 운동을 계속하려 해서 더 깊이 박힌다.</p>
+        <div class="wrongbox"><div class="wt">오답 왜 틀렸나</div>
+          <p><b>①</b> 멈추는 건 마찰력 때문. <b>②</b> 질량 클수록 관성 크다. <b>③</b> 급출발은 뒤로. <b>⑤</b> 등속 유지에는 힘이 필요 없다.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">8</span><span class="sans">②</span><span class="slink">개념 2</span></div>
+        <p>A = 2×4 = 8, B = 4×1 = 4, C = 1×6 = 6 → A &gt; C &gt; B.</p>
+        <div class="wrongbox"><div class="wt">오답 왜 틀렸나</div>
+          <p><b>③·⑤</b> 질량만 보거나 속력만 보면 틀린다 — 반드시 곱으로.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">9</span><span class="sans">③</span><span class="slink">개념 3·4</span></div>
+        <p>넓이 같음 = 충격량·운동량 변화량 같음. (나)는 시간이 긴 만큼 봉우리(최대 힘)가 낮다.</p>
+        <div class="wrongbox"><div class="wt">오답 왜 틀렸나</div>
+          <p><b>①·②</b> 넓이가 같으니 둘 다 같다. <b>④</b> 폭이 넓은 (나)가 시간이 길다. <b>⑤</b> 넓이는 충격량이다.</p></div></div>
+    </div>
+  </div>
+
+  <div class="folio"><span>알짜 해설</span><span class="num">126</span></div>
+</div>
+
+<!-- ═════════════ p.127 해설 2 ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag" style="color:var(--brand);">알짜 해설</span><span class="lesson-tag">04. 운동량과 충격량</span></div>
+  <div class="solcols">
+    <div>
+      <div class="sol"><div class="shead"><span class="sno">10</span><span class="sans">③</span><span class="slink">개념 4</span></div>
+        <p>(가)·(나) 모두 '시간을 늘려 힘을 줄이는' 같은 공식의 사례다.</p>
+        <div class="wrongbox"><div class="wt">오답 왜 틀렸나</div>
+          <p><b>(다)</b> 멈춰야 할 운동량 변화량은 에어백이 있든 없든 같다. 에어백이 바꾸는 것은 시간과 힘의 배분 — 이 구별이 최고 빈출 포인트.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">11</span><span class="sans">모범 답안</span><span class="slink">개념 4</span></div>
+        <p>착지할 때 몸의 운동량 변화량(충격량)은 정해져 있는데, 무릎을 굽히면 멈추는 데 걸리는 <b>충돌 시간이 길어진다.</b> 충격량이 같을 때 시간이 길어지면 몸이 받는 <b>평균 힘이 작아지므로</b> 덜 다친다.</p>
+        <div class="wrongbox"><div class="wt">채점 기준 (감점 포인트)</div>
+          <p>① 충격량(운동량 변화량)은 같다는 전제 ② 충돌 시간이 길어짐 ③ 받는 힘이 작아짐 — 세 요소 모두 서술해야 만점. "충격이 흡수되어 사라진다"는 표현은 감점(충격량은 사라지지 않는다).</p></div></div>
+    </div>
+    <div>
+      <div class="sol"><div class="shead"><span class="sno">12</span><span class="sans">③</span><span class="slink">개념 3·4 | 2점</span></div>
+        <p><b>ㄱ (옳음)</b> 같은 속도에서 정지 → 변화량 = 넓이 같음. <b>ㄴ (옳음)</b> 넓이가 같으니 시간이 길면 봉우리가 낮다 — 컵이 산 이유. <b>ㄷ (틀림)</b> 운동량 변화량은 두 경우 같다.</p>
+        <div class="wrongbox"><div class="wt">함정 체크</div>
+          <p>'덜 깨짐 = 변화량이 작음'이 아니다. 변화량은 같고, 긴 시간에 나눠 받았을 뿐.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">13</span><span class="sans">④</span><span class="slink">개념 5 | 2.5점</span></div>
+        <p><b>ㄱ (옳음)</b> 충격량 = 힘 × 시간 → 시간이 길수록 크다. <b>ㄴ (옳음)</b> 충격량 = 운동량 변화량 → 공의 속도가 커진다. <b>ㄷ (틀림)</b> 팔로스루의 목적은 힘 줄이기가 아니라 충격량 키우기다.</p>
+        <div class="wrongbox"><div class="wt">함정 체크</div>
+          <p>같은 식의 두 용법 — <b>보호는 '시간↑ → 힘↓', 발사는 '시간·힘↑ → 충격량↑'.</b> 목적부터 판정하라.</p></div></div>
+
+      <div class="gist" style="margin-top:5mm;">
+        <div class="boxtitle"><span class="ico">알</span>이 소단원, 이것만은!</div>
+        <ul>
+          <li><b>관성</b>: 힘 없으면 변화 없음 (급정거 → 앞, 급출발 → 뒤, 질량 클수록 큼)</li>
+          <li><b>운동량 = m × v / 충격량 = F × t = 운동량의 변화량</b> (F-t 그래프의 넓이)</li>
+          <li>한 등식, 두 용법 — <b>안전장치: 시간 늘려 힘 줄이기 / 스포츠: 힘·시간 키워 충격량 늘리기</b></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div class="folio"><span>알짜 해설</span><span class="num">127</span></div>
+</div>
+
+<!-- ═════════════ p.128 MEMO ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag">III. 시스템과 상호작용</span><span class="lesson-tag">04 ▸ 05 넘어가기 전에</span></div>
+  <div class="memo-head"><span class="mt">MEMO</span><span class="ms">헷갈린 개념, 다시 틀린 문제 번호, 나만의 암기법을 남겨 두는 자리</span></div>
+  <div class="memo-area"></div>
+  <div class="memo-pen">"에어백과 팔로스루를 한 식으로 설명해 보자. '충격량 = 힘 × 시간'으로 시작 못 하면 119쪽으로! — 박찬쌤"</div>
+  <div class="folio"><span>박찬 과학 | 통합과학 1</span><span class="num">128</span></div>
+</div>
+
+</body>
+</html>
