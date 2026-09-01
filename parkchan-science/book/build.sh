@@ -25,3 +25,7 @@ render() {  # render <html> <pdf>
 
 render sample-chapter/chapter.html sample-chapter/chapter.pdf
 render mock-exam/exam.html        mock-exam/exam.pdf
+
+# 3) 조판 기하 검증 (위반 시 빌드 실패)
+python3 ../tools/qa_check.py sample-chapter/chapter.html
+python3 ../tools/qa_check.py mock-exam/exam.html --floor-mm 285
