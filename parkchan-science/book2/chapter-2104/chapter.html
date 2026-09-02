@@ -1,0 +1,924 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<title>박찬 과학 통합과학2 — I-04 산·염기와 중화 반응</title>
+<style>
+  @font-face { font-family:'PC Sans'; src:url('file:///root/.fonts/NotoSansKR.ttf'); font-weight:100 900; }
+  @font-face { font-family:'PC Serif'; src:url('file:///root/.fonts/NotoSerifKR.ttf'); font-weight:100 900; }
+  @font-face { font-family:'PC Pen'; src:url('file:///root/.fonts/YeonSung-Regular.ttf'); font-weight:400; }
+
+  :root{
+    --brand:#0E5A6B;        /* 박찬 과학 브랜드 딥틸 */
+    --brand-lt:#E3F0F3;
+    --unit:#C1521E;         /* I. 과학의 기초 단원 컬러(그린) */
+    --unit-lt:#FBEFE7;
+    --unit-md:#EBC4AB;
+    --accent:#E8940A;       /* 알짜 앰버 */
+    --accent-lt:#FDF3E0;
+    --point:#D6455D;        /* 시험 포인트 */
+    --point-lt:#FBEBEE;
+    --ink:#22303A;
+    --sub:#5B6B77;
+    --line:#D8E0E5;
+  }
+  *{ box-sizing:border-box; margin:0; padding:0; -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+  @page{ size:210mm 275mm; margin:0; }
+  html,body{ font-family:'PC Sans',sans-serif; color:var(--ink); word-break:keep-all; overflow-wrap:anywhere; }
+
+  .page{ width:210mm; height:275mm; position:relative; overflow:hidden; background:#fff; page-break-after:always; padding:14mm 13mm 19mm 15mm; display:flex; flex-direction:column; }
+
+  /* ── 러닝 헤드 / 풋 ── */
+  .runhead{ display:flex; align-items:center; justify-content:space-between; border-bottom:0.35mm solid var(--unit); padding-bottom:2mm; margin-bottom:6.5mm; }
+  .runhead .unit-tag{ font-size:8.5pt; font-weight:700; color:var(--unit); letter-spacing:0.02em; }
+  .runhead .lesson-tag{ font-size:8.5pt; color:var(--sub); }
+  .folio{ position:absolute; bottom:7mm; left:0; right:0; display:flex; justify-content:space-between; padding:0 14mm 0 14mm; font-size:8pt; color:var(--sub); }
+  .folio .num{ font-weight:800; color:var(--unit); font-size:10pt; }
+
+  /* ── 본문 그리드: 본문 + 날개단 ── */
+  .cols{ display:grid; grid-template-columns:1fr 43mm; gap:8mm; flex:1; min-height:0; margin-bottom:4mm; }
+  .main{ min-width:0; }
+  .wing{ border-left:0.3mm solid var(--line); padding-left:5mm; font-size:8.2pt; color:var(--sub); line-height:1.7; }
+
+  /* ── 타이포 ── */
+  h2.lesson-title{ display:flex; align-items:baseline; gap:3.5mm; margin-bottom:2mm; }
+  h2.lesson-title .no{ background:var(--unit); color:#fff; font-size:13pt; font-weight:900; padding:1.2mm 3.2mm; border-radius:1.5mm; }
+  h2.lesson-title .tt{ font-size:16.5pt; font-weight:900; letter-spacing:-0.01em; }
+  .std-badges{ display:flex; gap:2mm; margin:2mm 0 6.5mm; }
+  .std{ font-size:7.4pt; color:var(--unit); background:none; border:0.3mm solid var(--unit-md); border-radius:5mm; padding:0.6mm 2.8mm; font-weight:600; }
+
+  h3.sec{ display:flex; align-items:baseline; gap:3mm; font-size:12.5pt; font-weight:800; margin:9mm 0 3.6mm; letter-spacing:-0.01em; }
+  h3.sec .n{ font-family:'PC Serif'; font-size:15.5pt; font-weight:900; color:var(--unit); border-bottom:0.7mm solid var(--accent); padding:0 0.8mm 0.2mm; flex:0 0 auto; line-height:1; }
+  h3.sec::after{ content:""; flex:1; border-top:0.25mm solid var(--line); align-self:center; margin-left:2mm; }
+  h3.sec:first-child{ margin-top:0; }
+
+  p.body{ font-family:'PC Serif'; font-size:9.6pt; line-height:1.92; margin-bottom:3.6mm; text-align:justify; }
+  p.body b{ font-weight:800; }
+  .kw{ font-weight:800; color:var(--unit); }
+  .u-amber{ background:#F8E9C6; font-weight:700; padding:0.15mm 0.6mm; border-radius:0.6mm; box-decoration-break:clone; -webkit-box-decoration-break:clone; }
+
+  ul.pts{ font-family:'PC Serif'; font-size:9.6pt; line-height:1.84; margin:1.5mm 0 3.5mm 1mm; list-style:none; }
+  ul.pts li{ padding-left:4.5mm; position:relative; margin-bottom:1.8mm; }
+  ul.pts li::before{ content:""; position:absolute; left:0.5mm; top:2.9mm; width:1.7mm; height:1.7mm; background:var(--accent); border-radius:50%; }
+
+  /* ── 코너 박스 ── */
+  .boxtitle{ display:inline-flex; align-items:center; gap:1.8mm; font-weight:900; font-size:9.5pt; margin-bottom:1.6mm; }
+  .boxtitle .ico{ width:5.2mm; height:5.2mm; border-radius:1.2mm; display:flex; align-items:center; justify-content:center; color:#fff; font-size:7.5pt; font-weight:900; }
+
+  .gist{ background:none; border:none; border-top:0.5mm solid var(--accent); border-bottom:0.5mm solid var(--accent); border-radius:0; padding:3.2mm 1.8mm 3mm; margin:6mm 0 5mm; }
+  .gist .boxtitle{ color:#9C6503; } .gist .ico{ background:var(--accent); }
+  .gist ul{ list-style:none; font-family:'PC Serif'; font-size:9.3pt; line-height:1.78; }
+  .gist li{ padding-left:4.2mm; position:relative; margin-bottom:1.2mm;}
+  .gist li::before{ content:"✓"; position:absolute; left:0; color:var(--accent); font-weight:900; }
+
+  .expoint{ background:none; border-left:0.5mm solid #D998A4; border-left-color:#D998A4; border-radius:0; padding:1.4mm 0 1.4mm 3.6mm; margin:4.5mm 0; }
+  .expoint .boxtitle{ color:#A9556A; font-size:8.6pt; margin-bottom:1mm;}
+  .expoint .ico{ background:none; color:#A9556A; border:0.35mm solid #D998A4; width:4.4mm; height:4.4mm; border-radius:50%; font-size:7pt; }
+  .expoint p{ font-family:'PC Serif'; font-size:8.9pt; line-height:1.7; }
+
+  .pen{ font-family:'PC Pen'; font-size:12pt; color:#B4560E; line-height:1.45; }
+  .saem{ display:flex; gap:3mm; align-items:flex-start; margin:4.5mm 0; }
+  .saem .avatar{ flex:0 0 auto; width:10.5mm; height:10.5mm; border-radius:50%; background:var(--brand); color:#fff; font-size:7pt; font-weight:800; display:flex; align-items:center; justify-content:center; line-height:1.35; letter-spacing:0.04em; text-align:center; border:0.5mm solid var(--accent); box-sizing:border-box;}
+  .saem .bubble{ background:#FFFBF0; border:0.4mm solid #EBCB9C; border-radius:3mm; padding:2.2mm 3.6mm 2mm; position:relative; }
+  .saem .bubble::before{ content:""; position:absolute; left:-1.8mm; top:3.2mm; width:3mm; height:3mm; background:#FFFBF0; border-left:0.4mm solid #EBCB9C; border-bottom:0.4mm solid #EBCB9C; transform:rotate(45deg); }
+
+  .wing .wtitle{ font-size:8pt; font-weight:900; color:var(--brand); display:flex; align-items:center; gap:1.5mm; margin:0 0 2.4mm; letter-spacing:0.05em; }
+  .wing .wtitle::before{ content:""; width:2.4mm; height:2.4mm; background:var(--accent); border-radius:50%; }
+  .wing .term{ margin-bottom:3.6mm; }
+  .wing .term b{ color:var(--ink); font-weight:800; display:block; font-size:8.5pt; margin-bottom:0.7mm;}
+  .wing .wsep{ border-top:0.3mm dashed var(--line); margin:4.5mm 0; }
+  .wing .wing-pen{ font-family:'PC Pen'; font-size:11pt; color:#B4560E; line-height:1.45; }
+
+  figure{ margin:5mm 0; }
+  figure figcaption{ font-size:8pt; color:var(--sub); text-align:center; margin-top:2mm; }
+  figure svg{ display:block; margin:0 auto; }
+
+  /* ── 비교형 그림 (2패널 + 범례) ── */
+  .fig-duo{ display:flex; align-items:stretch; gap:2.5mm; justify-content:center; }
+  .fig-duo .panel{ flex:0 0 auto; text-align:center; }
+  .fig-duo .p-title{ font-size:9pt; font-weight:900; color:var(--ink); margin-top:1.6mm; }
+  .fig-duo .p-sub{ font-size:7.8pt; color:var(--sub); line-height:1.45; margin-top:0.5mm; }
+  .fig-duo .mid{ display:flex; flex-direction:column; align-items:center; justify-content:center; gap:1mm; padding:0 1mm; }
+  .fig-duo .mid .mlab{ font-size:7.6pt; font-weight:800; color:var(--unit); text-align:center; line-height:1.3; }
+  .fig-legend{ display:flex; justify-content:center; gap:5mm; font-size:7.8pt; color:var(--ink); margin-top:1.2mm; align-items:center; }
+  .fig-legend span{ display:inline-flex; align-items:center; gap:1.4mm; }
+
+  /* ── 탐구 (자료 파헤치기) ── */
+  .lab{ border:0.5mm solid var(--brand); border-radius:2.5mm; overflow:hidden; margin-top:1mm;}
+  .lab .lab-head{ background:var(--brand); color:#fff; padding:2.2mm 4mm; font-weight:900; font-size:11pt; display:flex; align-items:center; gap:2.5mm;}
+  .lab .lab-head .tag{ font-size:7.5pt; background:rgba(255,255,255,.22); padding:0.6mm 2.4mm; border-radius:4mm; font-weight:700;}
+  .lab .lab-body{ padding:3.5mm 4mm; }
+  .lab h4{ font-size:9.6pt; font-weight:900; color:var(--brand); margin:2.5mm 0 1.4mm; }
+  .lab h4:first-child{ margin-top:0; }
+  .lab p, .lab li{ font-family:'PC Serif'; font-size:9.3pt; line-height:1.8; }
+  .lab ol{ margin-left:5mm; }
+
+  /* ── 문제부 ── */
+  .step-head{ display:flex; align-items:center; gap:3mm; margin:0 0 5mm; }
+  .step-head .stepno{ background:var(--unit); color:#fff; font-weight:900; font-size:9.5pt; padding:1.4mm 3.4mm; border-radius:1.5mm; letter-spacing:0.04em;}
+  .step-head .steptt{ font-size:12.5pt; font-weight:900; }
+  .step-head .stepdesc{ font-size:8.2pt; color:var(--sub); margin-left:auto; }
+  .step-head.s2 .stepno{ background:var(--brand); }
+  .step-head.s3 .stepno{ background:var(--point); }
+
+  .q{ margin-bottom:7.5mm; break-inside:avoid; }
+  .q .qhead{ display:flex; gap:2.4mm; align-items:flex-start; }
+  .q .qno{ flex:0 0 auto; min-width:6.2mm; height:6.2mm; border:0.45mm solid var(--unit); color:var(--unit); border-radius:50%; font-size:8.6pt; font-weight:900; line-height:1; display:flex; align-items:center; justify-content:center; padding-top:0.55mm; margin-top:0.4mm;}
+  .q .stem{ font-family:'PC Serif'; font-size:9.5pt; line-height:1.74; font-weight:500; }
+  .q .stem .difficulty{ color:#C9A227; font-size:8pt; letter-spacing:0.06em; margin-left:1.5mm;}
+  .q .tags{ margin-top:0.8mm; font-size:7pt; color:var(--sub); font-family:'PC Sans';}
+  .choices{ list-style:none; margin:2.2mm 0 0 8.6mm; font-family:'PC Serif'; font-size:9.3pt; line-height:1.85; }
+  .choices.inline{ display:flex; flex-wrap:wrap; gap:0 6mm; }
+  .bogi-box{ border:0.35mm solid #B8C2CA; border-radius:0; margin:2.5mm 0 0 8.6mm; padding:2.4mm 3.2mm; font-family:'PC Serif'; font-size:9.2pt; line-height:1.8; background:none;}
+  .bogi-box .bt{ text-align:center; font-weight:800; color:var(--sub); font-size:8.4pt; margin-bottom:0.8mm; letter-spacing:0.3em;}
+  .ox-answer{ margin-left:2mm; color:var(--sub); font-size:9pt; }
+  .blankline{ display:inline-block; min-width:14mm; border-bottom:0.4mm solid var(--ink); }
+  .qgrid{ display:grid; grid-template-columns:1fr 1fr; gap:0 9mm; }
+  .essay-lines{ margin:2mm 0 0 8.4mm; }
+  .essay-lines div{ border-bottom:0.3mm solid var(--line); height:6.2mm; }
+  .badge-essay{ display:inline-block; background:var(--point); color:#fff; font-size:7pt; font-weight:800; padding:0.4mm 2mm; border-radius:1mm; vertical-align:1pt; margin-right:1.2mm;}
+  .badge-data{ display:inline-block; background:var(--brand); color:#fff; font-size:7pt; font-weight:800; padding:0.4mm 2mm; border-radius:1mm; vertical-align:1pt; margin-right:1.2mm;}
+
+  /* ── 해설부 ── */
+  .sol-head{ display:flex; align-items:center; gap:3mm; margin-bottom:4mm;}
+  .sol-head .stt{ font-size:14.5pt; font-weight:900; color:var(--brand);}
+  .sol-head .sub{ font-size:8.5pt; color:var(--sub);}
+  .anstable{ width:100%; border-collapse:collapse; margin-bottom:4.5mm; }
+  .anstable th,.anstable td{ border:0.3mm solid var(--line); font-size:8.8pt; padding:1.4mm 0; text-align:center; }
+  .anstable th{ background:var(--brand-lt); color:var(--brand); font-weight:800; }
+  .anstable td.a{ font-weight:900; color:var(--unit); }
+  .sol{ margin-bottom:5mm; break-inside:avoid; }
+  .sol .shead{ display:flex; align-items:center; gap:2mm; margin-bottom:1.4mm;}
+  .sol .sno{ background:var(--unit); color:#fff; min-width:6mm; height:5.4mm; border-radius:1.2mm; font-size:8.6pt; font-weight:900; line-height:1; display:flex; align-items:center; justify-content:center; padding:0.5mm 1.5mm 0;}
+  .sol .sans{ font-weight:900; color:var(--unit); font-size:9.6pt;}
+  .sol .slink{ font-size:7.2pt; color:var(--sub); margin-left:auto;}
+  .sol p{ font-family:'PC Serif'; font-size:9.1pt; line-height:1.76; margin-bottom:0.8mm; }
+  .wrongbox{ background:none; border:none; border-left:0.7mm solid #E3A0AC; border-radius:0; padding:1mm 0 1mm 3mm; margin-top:2mm;}
+  .wrongbox .wt{ font-size:8pt; font-weight:900; color:var(--point); margin-bottom:0.8mm; font-family:'PC Sans';}
+  .wrongbox p{ font-family:'PC Serif'; font-size:8.6pt; line-height:1.68; margin-bottom:0.9mm;}
+  .wrongbox p:last-child{ margin-bottom:0; }
+  .solcols{ display:grid; grid-template-columns:1fr 1fr; gap:0 9mm; }
+
+  /* ── 단원 도입 (타이포그래피 중심) ── */
+  .opener{ padding:0 0 19mm; }
+  .opener-hero{ position:relative; padding:7mm 20mm 4.5mm; overflow:hidden; flex-shrink:0; }
+  .ghost-txt{ position:absolute; top:-10mm; right:6mm; font-size:118pt; font-weight:900; color:#FAEFE8; line-height:1; letter-spacing:-0.04em; }
+  .kicker{ display:flex; align-items:center; gap:4mm; position:relative; }
+  .kicker .kt{ font-size:9.5pt; font-weight:800; color:var(--unit); letter-spacing:0.24em; white-space:nowrap; }
+  .kicker::after{ content:""; flex:1; border-top:0.3mm solid var(--line); }
+  .opener-hero h1{ position:relative; font-size:36pt; font-weight:900; letter-spacing:-0.015em; margin:4mm 0 0; }
+  .opener-hero h1 .tick{ display:block; width:14mm; border-top:1.4mm solid var(--accent); margin-bottom:3.6mm; }
+  .opener-lede{ position:relative; font-family:'PC Serif'; font-size:10.2pt; font-weight:600; line-height:2.0; color:#3D4C58; max-width:138mm; margin-top:4mm; padding-left:5mm; border-left:0.8mm solid var(--accent); }
+  .opener-inner{ padding:0 20mm; }
+
+  /* ── 원소의 여정 스트립 ── */
+  .journey{ margin-top:3.5mm; }
+  .journey .j-label{ font-size:8pt; font-weight:800; color:var(--sub); letter-spacing:0.08em; margin-bottom:2.4mm; display:flex; align-items:center; gap:1.6mm;}
+  .journey .j-label::before{ content:""; width:2.4mm; height:2.4mm; background:var(--unit); border-radius:50%; }
+  .j-bar{ display:flex; align-items:center; gap:2mm; }
+  .j-chip{ flex:1; text-align:center; background:#FBF3ED; border:0.35mm solid #EBC4AB; color:#C1521E; border-radius:1.6mm; padding:3mm 1mm 2.6mm; }
+  .j-chip .jc-t{ font-size:8.8pt; font-weight:800; display:block; }
+  .j-chip .jc-s{ font-size:6.8pt; color:var(--sub); display:block; margin-top:0.5mm; }
+  .j-chip.on{ background:var(--unit); border-color:var(--unit); }
+  .j-chip.on .jc-t{ color:#fff; }
+  .j-chip.on .jc-s{ color:#F6DFCE; }
+  .j-arrow{ flex:0 0 auto; color:#E0A57E; font-size:10pt; font-weight:900; }
+  .toc{ margin-top:6.5mm; }
+  .toc .toc-title{ font-size:11pt; font-weight:900; color:var(--ink); margin-bottom:3mm; display:flex; align-items:center; gap:2.5mm;}
+  .toc .toc-title::before{ content:""; width:3.4mm; height:3.4mm; background:var(--accent); border-radius:0.8mm; }
+  .toc-item{ display:flex; align-items:flex-start; gap:5mm; padding:4.4mm 6mm; border-bottom:0.3mm solid var(--line); }
+  .toc-item:first-of-type{ border-top:0.3mm solid var(--line); }
+  .toc-item.active{ background:#FBF3ED; border-left:1.2mm solid #D98A5B; }
+  .toc-item .tno{ font-family:'PC Serif'; font-weight:900; color:#D98A5B; font-size:14pt; width:10mm; line-height:1.1; flex:0 0 auto;}
+  .toc-item .tbody{ flex:1; min-width:0; }
+  .toc-item .ttt{ font-weight:800; font-size:10.5pt; letter-spacing:0.01em; display:flex; align-items:center;}
+  .toc-item .tdesc{ font-family:'PC Serif'; font-size:8.6pt; font-weight:600; color:#4A5964; margin-top:0.7mm; line-height:1.55;}
+  .toc-item .tstd{ font-size:7.2pt; color:var(--sub); flex:0 0 auto; padding-top:1.2mm;}
+  .toc-item.active .tag-now{ background:var(--accent); color:#fff; font-size:7pt; font-weight:900; border-radius:4mm; padding:0.7mm 2.6mm; margin-left:3.5mm;}
+  .toc-item .tag-done{ font-size:7.2pt; font-weight:800; color:#C1521E; margin-left:3.5mm; }
+  .opener-quote{ margin-top:7mm; text-align:center; font-family:'PC Serif'; font-size:9.8pt; font-weight:600; color:#4A5964; letter-spacing:0.01em; }
+  .opener-quote .who{ font-size:8pt; color:var(--sub); font-weight:400; margin-left:2.5mm; }
+  .qa-lead li .qgo{ font-family:'PC Sans'; font-size:7.4pt; font-weight:800; color:var(--unit); background:var(--unit-lt); border-radius:3mm; padding:0.5mm 2.2mm; margin-left:2mm; white-space:nowrap; vertical-align:1pt;}
+  .qa-lead{ margin-top:5mm; border:none; border-top:0.45mm solid var(--brand); border-bottom:0.45mm solid var(--brand); background:none; border-radius:0; padding:3mm 2mm 2.8mm; }
+  .qa-lead .qt{ font-weight:900; color:var(--brand); font-size:10.5pt; margin-bottom:2mm;}
+  .qa-lead li{ font-family:'PC Serif'; font-size:9.5pt; line-height:1.8; margin-left:5mm; }
+
+  /* ── 바로바로 체크 (개념 페이지 하단 즉석 OX) ── */
+  .quickcheck{ margin-top:auto; border-top:0.35mm dashed #C8B98F; padding-top:3mm; width:calc(100% - 51mm); }
+  .quickcheck .qc-title{ display:inline-flex; align-items:center; gap:1.6mm; font-size:8.2pt; font-weight:900; color:#9C6503; margin-bottom:1.4mm; }
+  .quickcheck .qc-title::before{ content:"✓"; color:var(--accent); font-weight:900; }
+  .quickcheck ol{ list-style:none; font-family:'PC Serif'; font-size:8.8pt; line-height:1.75; }
+  .quickcheck li{ display:flex; gap:2mm; align-items:baseline; }
+  .quickcheck li .no{ font-weight:800; color:var(--accent); flex:0 0 auto; }
+  .quickcheck .qc-ans{ margin-top:1mm; font-size:7.2pt; color:var(--sub); transform:rotate(180deg); text-align:left; }
+
+  /* ── 중학 과학 다시보기 (날개단) ── */
+  .wing .review{ background:#F6F3EC; border-radius:1.8mm; padding:2.8mm 3mm; margin-top:1mm; }
+  .wing .review .rv-title{ font-size:7.8pt; font-weight:900; color:#7A6A45; margin-bottom:1.4mm; display:flex; align-items:center; gap:1.4mm;}
+  .wing .review .rv-title::before{ content:"↺"; font-weight:900; color:#A08A55; }
+
+  /* ── MEMO 페이지 ── */
+  .memo-head{ display:flex; align-items:baseline; gap:3.5mm; margin-bottom:5mm; }
+  .memo-head .mt{ font-size:17pt; font-weight:900; color:var(--brand); letter-spacing:0.22em; }
+  .memo-head .ms{ font-size:8.6pt; color:var(--sub); }
+  .memo-area{ flex:1; border:0.4mm solid var(--line); border-radius:2.5mm;
+    background-image:linear-gradient(to bottom, transparent calc(100% - 0.3mm), #DCE4E9 0);
+    background-size:100% 9mm; background-position:0 4mm; padding:0 5mm; margin-bottom:4mm; }
+  .memo-pen{ font-family:'PC Pen'; font-size:12.5pt; color:#B4560E; text-align:right; }
+</style>
+</head>
+<body>
+<!-- ═════════════ p.48 소단원 도입 ═════════════ -->
+<div class="page opener">
+  <div class="opener-hero">
+    <div class="ghost-txt">04</div>
+    <div class="kicker"><span class="kt">통합과학 2 · I. 변화와 다양성</span></div>
+    <h1><span class="tick"></span>산·염기와 중화 반응</h1>
+    <p class="opener-lede">식초의 신맛, 비누의 미끈거림, 속쓰림에 삼키는 제산제 —<br>
+    부엌과 약상자 속에 화학의 두 얼굴이 살고 있다.</p>
+  </div>
+
+  <div class="opener-inner">
+    <div class="journey">
+      <div class="j-label">변화와 다양성 — 지금 여기</div>
+      <div class="j-bar">
+        <div class="j-chip"><span class="jc-t">지질시대</span><span class="jc-s">돌에 남은 일기장</span></div>
+        <span class="j-arrow">→</span>
+        <div class="j-chip"><span class="jc-t">진화</span><span class="jc-s">다양성의 기원</span></div>
+        <span class="j-arrow">→</span>
+        <div class="j-chip"><span class="jc-t">산화와 환원</span><span class="jc-s">문명을 바꾼 반응</span></div>
+        <span class="j-arrow">→</span>
+        <div class="j-chip on"><span class="jc-t">산·염기와 중화</span><span class="jc-s">생활 속 화학</span></div>
+        <span class="j-arrow">→</span>
+        <div class="j-chip"><span class="jc-t">에너지 출입</span><span class="jc-s">발열과 흡열</span></div>
+      </div>
+    </div>
+    <div class="toc">
+      <div class="toc-title">이 단원의 학습 지도</div>
+      <div class="toc-item">
+        <span class="tno">01</span>
+        <span class="tbody"><span class="ttt">지질시대와 생물의 변천</span>
+        <span class="tdesc">지질시대 구분, 화석 읽는 법, 대멸종과 생물다양성</span></span>
+        <span class="tstd">10통과2-01-01</span>
+      </div>
+      <div class="toc-item">
+        <span class="tno">02</span>
+        <span class="tbody"><span class="ttt">진화와 생물다양성</span>
+        <span class="tdesc">변이와 자연선택 — 다양한 생물은 어떻게 생겨났나</span></span>
+        <span class="tstd">10통과2-01-02</span>
+      </div>
+      <div class="toc-item">
+        <span class="tno">03</span>
+        <span class="tbody"><span class="ttt">산화와 환원</span>
+        <span class="tdesc">광합성·화석 연료·철의 제련 — 산소와 전자의 이동</span></span>
+        <span class="tstd">10통과2-01-03</span>
+      </div>
+      <div class="toc-item active">
+        <span class="tno">04</span>
+        <span class="tbody"><span class="ttt">산·염기와 중화 반응<span class="tag-now">NOW</span></span>
+        <span class="tdesc">산과 염기의 성질, 생활 속 중화의 기술</span></span>
+        <span class="tstd">10통과2-01-04</span>
+      </div>
+      <div class="toc-item">
+        <span class="tno">05</span>
+        <span class="tbody"><span class="ttt">화학 변화와 에너지 출입</span>
+        <span class="tdesc">발열·흡열 반응 — 손난로와 냉각 팩의 과학</span></span>
+        <span class="tstd">10통과2-01-05</span>
+      </div>
+    </div>
+
+    <div class="qa-lead">
+      <div class="qt">이 소단원을 끝내면 답할 수 있는 질문</div>
+      <ul>
+        <li>레몬과 식초 — 신맛의 정체는 무엇일까? <span class="qgo">개념 1</span></li>
+        <li>비누는 왜 만지면 미끈거릴까? <span class="qgo">개념 2</span></li>
+        <li>보라색 양배추로 어떻게 산·염기를 구별할까? <span class="qgo">개념 3</span></li>
+        <li>속쓰림에 제산제를 먹으면 무슨 일이 일어날까? <span class="qgo">개념 4·5</span></li>
+      </ul>
+    </div>
+
+    <div class="opener-quote" style="margin-top:2.4mm;">"모든 물질은 그 자체로 독도 약도 아니다 — 용량이 결정할 뿐."<span class="who">— 의화학의 선구자 파라켈수스</span></div>
+  </div>
+
+  <div class="folio"><span>박찬 과학 | 통합과학 2</span><span class="num">48</span></div>
+</div>
+
+<!-- ═════════════ p.49 개념 01 산 ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag">I. 변화와 다양성</span><span class="lesson-tag">04. 산·염기와 중화 반응</span></div>
+  <h2 class="lesson-title"><span class="no">04</span><span class="tt">산·염기와 중화 반응</span></h2>
+  <div class="std-badges"><span class="std">성취기준 10통과2-01-04</span><span class="std">산의 성질 → 염기의 성질 → 지시약 → 중화와 생활</span></div>
+
+  <div class="cols">
+    <div class="main">
+      <h3 class="sec"><span class="n">1</span>산 — 신맛의 정체는 수소 이온</h3>
+      <p class="body">레몬·식초·탄산음료의 공통점은 <b>신맛</b>이다. 이 신맛의 주인공들이 <span class="kw">산</span> — 염산·황산·아세트산(식초의 산)·탄산(탄산음료) 같은 물질이다. 산 수용액은 신맛 말고도 뚜렷한 공통 성질을 보인다. <b>마그네슘·아연 같은 금속</b>을 넣으면 <b>수소 기체</b>가 보글보글 발생하고, <b>달걀 껍데기·대리석(탄산 칼슘)</b>과 반응해 이산화 탄소 기체를 내놓으며, 수용액에 <b>전류가 흐른다</b>.</p>
+      <p class="body">종류가 달라도 성질이 같다면, 공통의 범인이 있다는 뜻이다. 아레니우스의 정의가 그 범인을 지목한다 — 산은 <span class="u-amber">물에 녹아 수소 이온(H⁺)을 내놓는 물질</span>이다. 신맛도, 금속과의 반응도, 전류가 흐르는 것도 모두 이 <b>H⁺</b>의 작품이다. 수용액에 이온이 떠다니기에 전류가 흐른다는 것까지 한 번에 설명된다.</p>
+
+      <figure>
+        <svg width="470" height="148" viewBox="0 0 470 148" font-family="PC Sans">
+          <defs>
+            <marker id="arrP" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="#C1521E"/></marker>
+            <marker id="arrR" markerWidth="7" markerHeight="7" refX="5" refY="2.5" orient="auto"><path d="M0,0 L6,2.5 L0,5 Z" fill="#D6455D"/></marker>
+          </defs>
+          <g font-size="6.8">
+            <text x="235" y="13" text-anchor="middle" font-size="8.4" font-weight="800" fill="#C1521E">산의 공통 성질 — 범인은 모두 H⁺</text>
+            <g transform="translate(0,22)" text-anchor="middle">
+              <g transform="translate(75,0)">
+                <rect x="-60" y="0" width="120" height="90" rx="6" fill="#FBEFE7" stroke="#EBC4AB" stroke-width="1"/>
+                <text y="15" font-size="7.2" font-weight="800" fill="#C1521E">신맛</text>
+                <g transform="translate(0,46)">
+                  <circle r="15" fill="#F3C24E"/><path d="M-15,0 a15,15 0 0,1 30,0 z" fill="#F8E19B"/>
+                  <line x1="-15" y1="0" x2="15" y2="0" stroke="#E8940A" stroke-width="1"/>
+                </g>
+                <text y="80" fill="#5B6B77" font-size="6.2">레몬·식초·탄산음료</text>
+              </g>
+              <g transform="translate(200,0)">
+                <rect x="-60" y="0" width="120" height="90" rx="6" fill="#FBEFE7" stroke="#EBC4AB" stroke-width="1"/>
+                <text y="15" font-size="7.2" font-weight="800" fill="#C1521E">금속과 반응</text>
+                <g transform="translate(0,46)">
+                  <path d="M-20,18 v-30 q0-6 6-6 h28 q6,0 6,6 v30" fill="#EAF3F8" stroke="#8FB2C9" stroke-width="1.2"/>
+                  <rect x="-10" y="4" width="20" height="12" rx="2" fill="#8A8F98"/>
+                  <g fill="#fff" stroke="#9AB8CC" stroke-width="0.8">
+                    <circle cx="-8" cy="-6" r="2.5"/><circle cx="2" cy="-12" r="2.2"/><circle cx="10" cy="-4" r="2.8"/>
+                  </g>
+                </g>
+                <text y="80" fill="#5B6B77" font-size="6.2">마그네슘 → 수소 기체 발생</text>
+              </g>
+              <g transform="translate(325,0)">
+                <rect x="-60" y="0" width="120" height="90" rx="6" fill="#FBEFE7" stroke="#EBC4AB" stroke-width="1"/>
+                <text y="15" font-size="7.2" font-weight="800" fill="#C1521E">전류가 흐른다</text>
+                <g transform="translate(0,46)">
+                  <path d="M-18,18 v-26 h36 v26" fill="#EAF3F8" stroke="#8FB2C9" stroke-width="1.2"/>
+                  <path d="M-2,-20 l-6,12 h7 l-6,12" stroke="#E8940A" stroke-width="1.8" fill="none"/>
+                </g>
+                <text y="80" fill="#5B6B77" font-size="6.2">이온이 있다는 증거</text>
+              </g>
+              <g transform="translate(427,26)">
+                <circle r="21" fill="#C1521E"/>
+                <text y="-1" fill="#fff" font-weight="800" font-size="8.4">H⁺</text>
+                <text y="10" fill="#FBEFE7" font-size="5.8">공통 원인</text>
+                <text y="38" fill="#B4560E" font-size="6.2" font-weight="800">아레니우스:</text>
+                <text y="47" fill="#5B6B77" font-size="5.8">물에 녹아 H⁺를</text>
+                <text y="55" fill="#5B6B77" font-size="5.8">내놓는 물질 = 산</text>
+              </g>
+            </g>
+          </g>
+          <text x="235" y="142" text-anchor="middle" font-size="8.8" font-weight="800" fill="#E8940A">산의 세 가지 얼굴, 범인은 하나 — 물에 녹아 내놓는 수소 이온(H⁺)</text>
+        </svg>
+        <figcaption>그림 1 | 산의 공통 성질 — 서로 다른 산이 같은 성질을 보이는 이유</figcaption>
+      </figure>
+
+      <div class="saem">
+        <div class="avatar">박찬<br>쌤</div>
+        <div class="bubble"><span class="pen">"'산(酸)'은 실 산 — 신맛이라는 한자다. 이름부터 맛이다. 단, 실험실에서 맛보기는 절대 금지 — 신맛 확인은 지시약(개념 3)에게 맡기자."</span></div>
+      </div>
+    </div>
+
+    <div class="wing">
+      <div class="wtitle">날개 노트</div>
+      <div class="term"><b>산의 예</b>염산(위산·청소), 황산(배터리), 아세트산(식초), 탄산(탄산음료), 시트르산(레몬).</div>
+      <div class="term"><b>이온과 전류</b>수용액 속을 떠다니는 이온이 전하를 나르기에 전류가 흐른다.</div>
+      <div class="wsep"></div>
+      <div class="wtitle">한눈에 암기</div>
+      <div class="wing-pen">산 = H⁺를 내놓는 물질<br>신맛 · 금속→수소 기체<br>대리석→CO₂ · 전류 O</div>
+      <div class="wsep"></div>
+      <div class="review">
+        <div class="rv-title">중학 과학 다시보기</div>
+        <div class="term" style="margin-bottom:0;"><b>이온 (중3)</b>전하를 띤 입자. 산·염기의 성질은 결국 이온 이야기다 — 03의 전자에 이어 주인공이 이온으로.</div>
+      </div>
+    </div>
+  </div>
+  <div class="quickcheck">
+    <span class="qc-title">바로바로 체크</span>
+    <ol>
+      <li><span class="no">1</span>산 수용액에 마그네슘을 넣으면 수소 기체가 발생한다. ( O , X )</li>
+      <li><span class="no">2</span>산의 공통 성질은 수산화 이온 때문이다. ( O , X )</li>
+      <li><span class="no">3</span>산 수용액에는 전류가 흐른다. ( O , X )</li>
+    </ol>
+    <div class="qc-ans">정답 1 O 2 X (수소 이온 H⁺) 3 O</div>
+  </div>
+  <div class="folio"><span>I. 변화와 다양성</span><span class="num">49</span></div>
+</div>
+
+<!-- ═════════════ p.50 개념 02 염기 ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag">I. 변화와 다양성</span><span class="lesson-tag">04. 산·염기와 중화 반응</span></div>
+  <div class="cols">
+    <div class="main">
+      <h3 class="sec"><span class="n">2</span>염기 — 미끈거림의 정체는 수산화 이온</h3>
+      <p class="body">이번엔 반대편이다. 비누·하수구 세정제·제산제의 주역인 <span class="kw">염기</span> — 수산화 나트륨·수산화 칼슘·암모니아 같은 물질이다. 염기 수용액은 <b>쓴맛</b>이 나고, 만지면 <b>미끈거린다</b> — 피부 표면의 단백질을 녹이기 때문인데, 그래서 진한 염기는 산 못지않게 위험하다. 산과 마찬가지로 수용액에 <b>전류가 흐르지만</b>, 금속이나 대리석과는 반응하지 않는다 — 산과 뚜렷이 갈리는 지점이다.</p>
+      <p class="body">염기의 공통 범인은 <span class="u-amber">물에 녹아 내놓는 수산화 이온(OH⁻)</span>이다(아레니우스의 정의). 정리하면 산의 얼굴은 H⁺, 염기의 얼굴은 OH⁻ — 두 이온이 이 소단원 전체의 두 주인공이다. 그리고 눈치챘겠지만, 이름부터 물(H₂O)을 반씩 나눠 가진 듯한 이 두 이온이 만나면 무슨 일이 벌어질지 — 그것이 개념 4의 중화 반응이다.</p>
+
+      <figure>
+        <svg width="470" height="150" viewBox="0 0 470 150" font-family="PC Sans">
+          <g font-size="6.8">
+            <text x="235" y="13" text-anchor="middle" font-size="8.4" font-weight="800" fill="#C1521E">산 vs 염기 — 두 주인공의 프로필</text>
+            <g transform="translate(0,22)" text-anchor="middle">
+              <g transform="translate(120,0)">
+                <rect x="-100" y="0" width="200" height="94" rx="6" fill="#FBEFE7" stroke="#EBC4AB" stroke-width="1"/>
+                <circle cx="0" cy="26" r="15" fill="#C1521E"/><text y="30" fill="#fff" font-weight="800" font-size="7.6">H⁺</text>
+                <text y="52" font-size="7.4" font-weight="800" fill="#C1521E">산 — 수소 이온</text>
+                <text y="64" fill="#5B6B77" font-size="6.2">신맛 · 금속과 반응(수소 기체)</text>
+                <text y="74" fill="#5B6B77" font-size="6.2">대리석과 반응(CO₂) · 전류 O</text>
+                <text y="86" fill="#7A3E14" font-size="6.2" font-weight="800">염산 · 황산 · 아세트산 · 탄산</text>
+              </g>
+              <g transform="translate(235,42)">
+                <text font-size="9" font-weight="900" fill="#5B6B77">VS</text>
+                <text y="14" font-size="6" fill="#5B6B77">공통점: 이온 →</text>
+                <text y="22" font-size="6" fill="#5B6B77">수용액에 전류</text>
+              </g>
+              <g transform="translate(350,0)">
+                <rect x="-100" y="0" width="200" height="94" rx="6" fill="#F3F7F5" stroke="#A8D5BE" stroke-width="1"/>
+                <circle cx="0" cy="26" r="15" fill="#2E7A54"/><text y="30" fill="#fff" font-weight="800" font-size="7.2">OH⁻</text>
+                <text y="52" font-size="7.4" font-weight="800" fill="#2E7A54">염기 — 수산화 이온</text>
+                <text y="64" fill="#5B6B77" font-size="6.2">쓴맛 · 미끈거림(단백질 녹임)</text>
+                <text y="74" fill="#5B6B77" font-size="6.2">금속·대리석과 반응 X · 전류 O</text>
+                <text y="86" fill="#245B40" font-size="6.2" font-weight="800">수산화 나트륨 · 수산화 칼슘 · 암모니아</text>
+              </g>
+            </g>
+          </g>
+          <text x="235" y="144" text-anchor="middle" font-size="8.8" font-weight="800" fill="#E8940A">산의 얼굴은 H⁺, 염기의 얼굴은 OH⁻ — 물을 반씩 나눠 가진 두 이온</text>
+        </svg>
+        <figcaption>그림 2 | 산과 염기의 프로필 — 갈리는 성질과 공통점(전류)을 한 판에</figcaption>
+      </figure>
+
+      <div class="expoint">
+        <div class="boxtitle"><span class="ico">!</span>시험엔 이렇게</div>
+        <p>성질 바꿔치기가 단골 — "염기는 금속과 반응해 수소 기체를 낸다"(X — 그건 산), "산이 미끈거린다"(X — 염기). <b>전류는 둘 다 흐른다</b>는 공통점도 함정 소재다(이온이 있으니까).</p>
+      </div>
+    </div>
+
+    <div class="wing">
+      <div class="wtitle">날개 노트</div>
+      <div class="term"><b>염기의 예</b>수산화 나트륨(비누·세정제), 수산화 칼슘(석회수), 암모니아(청소·비료), 제산제 성분.</div>
+      <div class="term"><b>미끈거림</b>염기가 피부 단백질을 녹이는 느낌 — 진한 염기가 위험한 이유이기도 하다.</div>
+      <div class="wsep"></div>
+      <div class="wtitle">한눈에 암기</div>
+      <div class="wing-pen">염기 = OH⁻를 내놓는 물질<br>쓴맛 · 미끈 · 전류 O<br>금속·대리석 반응은 X!</div>
+    </div>
+  </div>
+  <div class="quickcheck">
+    <span class="qc-title">바로바로 체크</span>
+    <ol>
+      <li><span class="no">1</span>염기 수용액이 미끈거리는 것은 단백질을 녹이기 때문이다. ( O , X )</li>
+      <li><span class="no">2</span>염기 수용액은 대리석과 반응해 기체를 발생시킨다. ( O , X )</li>
+      <li><span class="no">3</span>산과 염기 수용액 모두 전류가 흐른다. ( O , X )</li>
+    </ol>
+    <div class="qc-ans">정답 1 O 2 X (그것은 산의 성질) 3 O</div>
+  </div>
+  <div class="folio"><span>I. 변화와 다양성</span><span class="num">50</span></div>
+</div>
+
+<!-- ═════════════ p.51 개념 03 지시약 ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag">I. 변화와 다양성</span><span class="lesson-tag">04. 산·염기와 중화 반응</span></div>
+  <div class="cols">
+    <div class="main">
+      <h3 class="sec"><span class="n">3</span>지시약 — 맛보지 않고 알아내는 법</h3>
+      <p class="body">산·염기를 맛으로 확인할 수는 없다 — 위험하니까. 대신 <span class="kw">지시약</span>을 쓴다. 산성·염기성에 따라 <b>색이 변하는 물질</b>이다. 3대 지시약의 색 변화는 통째로 외워 둘 가치가 있다. <b>리트머스 종이</b>: 산성은 푸른 종이를 <b>붉게</b>, 염기성은 붉은 종이를 <b>푸르게</b>. <b>페놀프탈레인</b>: 산성에선 <b>무색</b>, 염기성에서만 <b>붉은색</b>. <b>BTB 용액</b>: 산성 <b>노란색</b> — 중성 <b>초록색</b> — 염기성 <b>파란색</b>.</p>
+      <p class="body">지시약은 실험실에만 있지 않다. <b>자주색 양배추</b>를 우린 물은 산성에서 붉은 계열, 염기성에서 푸른·노란 계열로 변하는 <b>천연 지시약</b>이다 — 포도 껍질·검은콩 물도 마찬가지다. 부엌이 실험실이 되는 순간이다.</p>
+
+      <figure>
+        <svg width="470" height="150" viewBox="0 0 470 150" font-family="PC Sans">
+          <g font-size="6.8">
+            <text x="235" y="13" text-anchor="middle" font-size="8.4" font-weight="800" fill="#C1521E">3대 지시약 색 지도 — 이 판은 통암기</text>
+            <g transform="translate(0,24)">
+              <g font-weight="800" text-anchor="middle">
+                <text x="88" y="10" fill="#5B6B77">구분</text>
+                <text x="205" y="10" fill="#B0483A">산성</text>
+                <text x="305" y="10" fill="#5B7A50">중성</text>
+                <text x="405" y="10" fill="#2E5BAA">염기성</text>
+              </g>
+              <g transform="translate(0,18)">
+                <rect x="28" y="0" width="414" height="26" rx="4" fill="#FBF3ED" stroke="#EBC4AB" stroke-width="0.8"/>
+                <text x="88" y="16" text-anchor="middle" font-weight="800" fill="#3D4C58">리트머스 종이</text>
+                <rect x="180" y="5" width="50" height="16" rx="3" fill="#D6455D"/><text x="205" y="16" text-anchor="middle" fill="#fff" font-size="6.2">푸른 → 붉게</text>
+                <text x="305" y="16" text-anchor="middle" fill="#8A949E" font-size="6.2">변화 없음</text>
+                <rect x="380" y="5" width="50" height="16" rx="3" fill="#3E6DBF"/><text x="405" y="16" text-anchor="middle" fill="#fff" font-size="6.2">붉은 → 푸르게</text>
+              </g>
+              <g transform="translate(0,50)">
+                <rect x="28" y="0" width="414" height="26" rx="4" fill="#FBF3ED" stroke="#EBC4AB" stroke-width="0.8"/>
+                <text x="88" y="16" text-anchor="middle" font-weight="800" fill="#3D4C58">페놀프탈레인</text>
+                <rect x="180" y="5" width="50" height="16" rx="3" fill="#F4F0EA" stroke="#C9BA9B" stroke-width="0.8"/><text x="205" y="16" text-anchor="middle" fill="#8A949E" font-size="6.2">무색</text>
+                <rect x="280" y="5" width="50" height="16" rx="3" fill="#F4F0EA" stroke="#C9BA9B" stroke-width="0.8"/><text x="305" y="16" text-anchor="middle" fill="#8A949E" font-size="6.2">무색</text>
+                <rect x="380" y="5" width="50" height="16" rx="3" fill="#D6456F"/><text x="405" y="16" text-anchor="middle" fill="#fff" font-size="6.2">붉은색</text>
+              </g>
+              <g transform="translate(0,82)">
+                <rect x="28" y="0" width="414" height="26" rx="4" fill="#FBF3ED" stroke="#EBC4AB" stroke-width="0.8"/>
+                <text x="88" y="16" text-anchor="middle" font-weight="800" fill="#3D4C58">BTB 용액</text>
+                <rect x="180" y="5" width="50" height="16" rx="3" fill="#E8B90A"/><text x="205" y="16" text-anchor="middle" fill="#fff" font-size="6.2">노란색</text>
+                <rect x="280" y="5" width="50" height="16" rx="3" fill="#4E9A50"/><text x="305" y="16" text-anchor="middle" fill="#fff" font-size="6.2">초록색</text>
+                <rect x="380" y="5" width="50" height="16" rx="3" fill="#2E7ACC"/><text x="405" y="16" text-anchor="middle" fill="#fff" font-size="6.2">파란색</text>
+              </g>
+            </g>
+          </g>
+          <text x="235" y="144" text-anchor="middle" font-size="8.8" font-weight="800" fill="#E8940A">페놀프탈레인의 붉은색 = "염기 있음" 신호 — 산성에선 아무 말도 하지 않는다</text>
+        </svg>
+        <figcaption>그림 3 | 3대 지시약 색 지도 — 자주색 양배추 물은 부엌의 천연 지시약</figcaption>
+      </figure>
+
+      <div class="expoint">
+        <div class="boxtitle"><span class="ico">!</span>시험엔 이렇게</div>
+        <p>색 조합 역추적이 단골 — "BTB가 노랗다" → 산성 → H⁺ 있음 → 마그네슘 넣으면 수소 기체까지 연결하라. <b>페놀프탈레인 무색 = 산성 또는 중성</b>이라는 것(무색이라고 산성 확정이 아니다!)도 함정 포인트.</p>
+      </div>
+    </div>
+
+    <div class="wing">
+      <div class="wtitle">날개 노트</div>
+      <div class="term"><b>지시약</b>용액의 액성(산성·중성·염기성)에 따라 색이 변하는 물질.</div>
+      <div class="term"><b>천연 지시약</b>자주색 양배추·포도 껍질·검은콩 물 — 색소가 액성 따라 변한다.</div>
+      <div class="wsep"></div>
+      <div class="wtitle">한눈에 암기</div>
+      <div class="wing-pen">리트머스: 산붉 염푸<br>페놀프탈레인: 염기만 붉게<br>BTB: 노 초 파 (산중염)</div>
+    </div>
+  </div>
+  <div class="quickcheck">
+    <span class="qc-title">바로바로 체크</span>
+    <ol>
+      <li><span class="no">1</span>페놀프탈레인 용액은 염기성에서 붉게 변한다. ( O , X )</li>
+      <li><span class="no">2</span>BTB 용액은 산성에서 파란색을 띤다. ( O , X )</li>
+      <li><span class="no">3</span>자주색 양배추 물은 천연 지시약으로 쓸 수 있다. ( O , X )</li>
+    </ol>
+    <div class="qc-ans">정답 1 O 2 X (노란색 — 파랑은 염기성) 3 O</div>
+  </div>
+  <div class="folio"><span>I. 변화와 다양성</span><span class="num">51</span></div>
+</div>
+
+<!-- ═════════════ p.52 개념 04 중화 반응 ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag">I. 변화와 다양성</span><span class="lesson-tag">04. 산·염기와 중화 반응</span></div>
+  <div class="cols">
+    <div class="main">
+      <h3 class="sec"><span class="n">4</span>중화 반응 — 두 주인공이 만나 물이 되다</h3>
+      <p class="body">산과 염기를 섞으면 어떻게 될까. 산의 H⁺와 염기의 OH⁻가 만나 <b>물(H₂O)</b>이 된다 — 서로의 성질을 지워 버리는 이 반응이 <span class="kw">중화 반응</span>이다. 이때 물과 함께 남은 이온들이 만드는 물질을 <b>염</b>이라 한다(염산+수산화 나트륨이면 염화 나트륨 — 소금이다). 한 줄로 쓰면: <b>산 + 염기 → 물 + 염</b>.</p>
+      <p class="body">중화가 일어났는지는 두 가지 신호로 확인한다. 첫째, <span class="u-amber">온도가 올라간다</span> — 중화 반응은 열(중화열)을 내놓기 때문에, 산과 염기가 꼭 맞게 반응하는 지점에서 온도가 가장 높다. 둘째, <span class="u-amber">지시약의 색이 변한다</span> — BTB를 넣고 염산에 수산화 나트륨을 조금씩 부으면 노랑 → 초록(완전 중화) → 파랑으로, 용액의 액성 변화가 그대로 보인다.</p>
+
+      <figure>
+        <svg width="470" height="150" viewBox="0 0 470 150" font-family="PC Sans">
+          <g font-size="6.8">
+            <text x="235" y="13" text-anchor="middle" font-size="8.4" font-weight="800" fill="#C1521E">중화 반응 — H⁺와 OH⁻가 만나 물이 된다</text>
+            <g transform="translate(0,30)" text-anchor="middle">
+              <g transform="translate(105,20)">
+                <circle cx="-28" cy="0" r="16" fill="#C1521E"/><text x="-28" y="4" fill="#fff" font-weight="800" font-size="7.6">H⁺</text>
+                <text x="0" y="4" font-size="10" font-weight="900" fill="#5B6B77">+</text>
+                <circle cx="30" cy="0" r="16" fill="#2E7A54"/><text x="30" y="4" fill="#fff" font-weight="800" font-size="7.2">OH⁻</text>
+                <text y="34" font-size="6.4" fill="#5B6B77">산의 얼굴 + 염기의 얼굴</text>
+              </g>
+              <line x1="165" y1="20" x2="195" y2="20" stroke="#C1521E" stroke-width="1.6" marker-end="url(#arrP)"/>
+              <g transform="translate(240,20)">
+                <circle r="18" fill="#4C86B0"/><text y="4" fill="#fff" font-weight="800" font-size="7.6">H₂O</text>
+                <text y="36" font-size="6.4" fill="#5B6B77">물 — 서로를 지운다</text>
+              </g>
+              <g transform="translate(365,20)">
+                <rect x="-72" y="-24" width="144" height="52" rx="6" fill="#FBEFE7" stroke="#EBC4AB" stroke-width="1"/>
+                <text y="-8" font-size="7.2" font-weight="800" fill="#C1521E">확인 신호 두 가지</text>
+                <text y="4" fill="#5B6B77" font-size="6.2">① 온도 상승 (중화열)</text>
+                <text y="14" fill="#5B6B77" font-size="6.2">② 지시약 색 변화 (BTB: 노→초→파)</text>
+                <text y="40" font-size="6.6" font-weight="800" fill="#B4560E">산 + 염기 → 물 + 염</text>
+              </g>
+            </g>
+          </g>
+          <text x="235" y="144" text-anchor="middle" font-size="8.8" font-weight="800" fill="#E8940A">꼭 맞게 만난 지점이 완전 중화 — 온도는 최고, BTB는 초록</text>
+        </svg>
+        <figcaption>그림 4 | 중화 반응의 핵심 — 물이 생기고, 열이 나고, 색이 변한다</figcaption>
+      </figure>
+
+      <div class="expoint">
+        <div class="boxtitle"><span class="ico">!</span>시험엔 이렇게</div>
+        <p>"산을 계속 넣으면 온도가 계속 올라간다"(X — <b>완전 중화점에서 최고</b>, 그 뒤엔 반응할 상대가 없어 내려간다). 염기를 넣는 동안 <b>H⁺ 수는 줄어든다</b>는 이온 개수 추적도 단골이다.</p>
+      </div>
+    </div>
+
+    <div class="wing">
+      <div class="wtitle">날개 노트</div>
+      <div class="term"><b>염</b>중화 반응에서 물과 함께 생기는 물질 — 염화 나트륨(소금)이 대표.</div>
+      <div class="term"><b>중화열</b>중화 반응에서 나오는 열. 다음 소단원(05)의 발열 반응과 이어진다.</div>
+      <div class="wsep"></div>
+      <div class="wtitle">한눈에 암기</div>
+      <div class="wing-pen">H⁺ + OH⁻ → 물!<br>산+염기 → 물+염<br>신호: 온도↑ · 색 변화</div>
+    </div>
+  </div>
+  <div class="quickcheck">
+    <span class="qc-title">바로바로 체크</span>
+    <ol>
+      <li><span class="no">1</span>중화 반응에서는 물이 생성된다. ( O , X )</li>
+      <li><span class="no">2</span>중화 반응이 일어나면 온도가 내려간다. ( O , X )</li>
+      <li><span class="no">3</span>염산과 수산화 나트륨이 중화하면 염으로 소금이 생긴다. ( O , X )</li>
+    </ol>
+    <div class="qc-ans">정답 1 O 2 X (중화열 — 올라간다) 3 O</div>
+  </div>
+  <div class="folio"><span>I. 변화와 다양성</span><span class="num">52</span></div>
+</div>
+
+<!-- ═════════════ p.53 개념 05 생활 속 중화 ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag">I. 변화와 다양성</span><span class="lesson-tag">04. 산·염기와 중화 반응</span></div>
+  <div class="cols">
+    <div class="main">
+      <h3 class="sec"><span class="n">5</span>생활 속 중화 — 지우개처럼 쓰는 화학</h3>
+      <p class="body">중화 반응은 '넘친 쪽을 지우는 지우개'로 일상 곳곳에서 일한다. 속이 쓰릴 때 먹는 <b>제산제</b>는 염기성 물질로 과다한 <b>위산(염산)</b>을 중화하고, 생선 비린내(염기성 물질)엔 <b>레몬즙(산)</b>을 뿌리며, 산성화된 토양·호수에는 <b>석회 가루(염기)</b>를 뿌려 되살린다. 벌레 물린 곳에 바르는 암모니아수, 신 김치찌개에 넣는 소다 한 꼬집도 같은 원리다.</p>
+      <p class="body">공장 굴뚝의 산성 배기가스를 염기성 물질로 걸러 내고, 치약이 입안의 산을 중화해 충치를 예방하는 것까지 — 원리는 전부 하나다. <span class="u-amber">넘친 H⁺(또는 OH⁻)를 반대 이온으로 지운다</span>. 산이 강한 곳엔 염기를, 염기가 강한 곳엔 산을. 이 단순한 규칙 하나가 약국·부엌·농장·공장을 관통한다.</p>
+
+      <div class="gist" style="margin:2.8mm 0 4mm; padding:2.2mm 1.8mm 2mm;">
+        <div class="boxtitle"><span class="ico">알</span>알짜 정리 — 산·염기와 중화 반응 한 장 요약</div>
+        <ul>
+          <li><b>산</b> = H⁺를 내놓음(신맛·금속→수소·전류 O) / <b>염기</b> = OH⁻를 내놓음(쓴맛·미끈·전류 O)</li>
+          <li>지시약: 리트머스(산붉·염푸) · 페놀프탈레인(염기만 붉게) · BTB(노·초·파)</li>
+          <li><b>중화</b>: H⁺ + OH⁻ → 물 (산+염기 → 물+염) — 신호는 <b>온도 상승 + 색 변화</b></li>
+          <li>생활 속: 제산제·레몬즙·석회·치약 — <b>넘친 쪽을 반대 이온으로 지운다</b></li>
+        </ul>
+      </div>
+
+      <div class="saem">
+        <div class="avatar">박찬<br>쌤</div>
+        <div class="bubble"><span class="pen">"진료실에서도 중화는 현역이다 — 제산제 처방은 '위 속 H⁺가 넘쳤으니 OH⁻ 쪽 물질로 지우자'는 화학 한 줄이다. 통합과학이 약국까지 온 것."</span></div>
+      </div>
+    </div>
+
+    <div class="wing">
+      <div class="wtitle">날개 노트</div>
+      <div class="term"><b>위산</b>위에서 분비되는 묽은 염산 — 소화·살균 담당. 과하면 속쓰림, 그래서 제산제.</div>
+      <div class="term"><b>산성비와 석회</b>산성화된 호수·토양에 석회(염기)를 뿌려 중화하는 것은 실제 환경 복원 기술이다.</div>
+      <div class="wsep"></div>
+      <div class="wtitle">한눈에 암기</div>
+      <div class="wing-pen">제산제 = 위산 중화<br>비린내 + 레몬 = 중화<br>산성 토양 + 석회 = 중화</div>
+      <div class="wsep"></div>
+      <div class="review">
+        <div class="rv-title">앞 소단원과 연결</div>
+        <div class="term" style="margin-bottom:0;"><b>산화·환원 (03)</b>전자를 주고받으면 산화·환원, H⁺와 OH⁻가 만나면 중화 — '주고받기'의 화학이 이어진다.</div>
+      </div>
+    </div>
+  </div>
+  <div class="quickcheck">
+    <span class="qc-title">바로바로 체크</span>
+    <ol>
+      <li><span class="no">1</span>제산제는 위산을 중화하는 염기성 물질이다. ( O , X )</li>
+      <li><span class="no">2</span>산성화된 토양에는 석회 가루를 뿌려 중화한다. ( O , X )</li>
+      <li><span class="no">3</span>생선 비린내에 레몬즙을 뿌리는 것은 산화·환원 반응이다. ( O , X )</li>
+    </ol>
+    <div class="qc-ans">정답 1 O 2 O 3 X (중화 반응)</div>
+  </div>
+  <div class="folio"><span>I. 변화와 다양성</span><span class="num">53</span></div>
+</div>
+
+<!-- ═════════════ p.54 자료 파헤치기 ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag">I. 변화와 다양성</span><span class="lesson-tag">04. 산·염기와 중화 반응</span></div>
+  <div class="lab">
+    <div class="lab-head">자료 파헤치기 <span class="tag">탐구·자료 분석</span> <span style="font-weight:600; font-size:9.5pt; margin-left:auto;">온도와 색으로 찾는 완전 중화점</span></div>
+    <div class="lab-body">
+      <h4>자료</h4>
+      <p>일정량의 묽은 염산(BTB 넣음, 노란색)에 같은 농도의 수산화 나트륨 수용액을 조금씩 넣으면서 온도와 색을 기록했다.</p>
+      <figure>
+        <svg width="430" height="122" viewBox="0 0 430 122" font-family="PC Sans">
+          <g font-size="6.8">
+            <line x1="46" y1="92" x2="400" y2="92" stroke="#5B6B77" stroke-width="1.1" marker-end="url(#arrP)"/>
+            <line x1="46" y1="92" x2="46" y2="14" stroke="#5B6B77" stroke-width="1.1" marker-end="url(#arrP)"/>
+            <text x="398" y="104" text-anchor="end" fill="#5B6B77">넣어 준 수산화 나트륨 수용액의 부피</text>
+            <text x="52" y="14" fill="#5B6B77">혼합 용액의 온도</text>
+            <path d="M60,80 L220,32 L370,58" fill="none" stroke="#C1521E" stroke-width="2"/>
+            <line x1="220" y1="32" x2="220" y2="92" stroke="#D6455D" stroke-width="1" stroke-dasharray="2.5 2"/>
+            <circle cx="220" cy="32" r="3.4" fill="#D6455D"/>
+            <text x="220" y="24" text-anchor="middle" font-weight="800" fill="#D6455D">완전 중화 — 온도 최고</text>
+            <g transform="translate(0,104)" text-anchor="middle" font-weight="800">
+              <rect x="98" y="-6" width="46" height="13" rx="3" fill="#E8B90A"/><text x="121" y="4" fill="#fff" font-size="6.2">노란색</text>
+              <rect x="197" y="-6" width="46" height="13" rx="3" fill="#4E9A50"/><text x="220" y="4" fill="#fff" font-size="6.2">초록색</text>
+              <rect x="296" y="-6" width="46" height="13" rx="3" fill="#2E7ACC"/><text x="319" y="4" fill="#fff" font-size="6.2">파란색</text>
+            </g>
+          </g>
+        </svg>
+      </figure>
+      <h4>해석의 3단계</h4>
+      <ol>
+        <li><b>올라가는 구간</b> — 수산화 나트륨을 넣을수록 H⁺ + OH⁻ → 물 반응이 계속 일어나 중화열이 쌓인다. 용액 속 H⁺는 점점 <b>줄고</b>, BTB는 아직 노란색(산성).</li>
+        <li><b>꼭짓점</b> — H⁺와 OH⁻가 꼭 맞게 만난 <b>완전 중화점</b>. 반응이 가장 많이 일어난 순간이라 온도가 가장 높고, 용액은 중성 — BTB가 초록색이 된다.</li>
+        <li><b>내려가는 구간</b> — 더 넣은 수산화 나트륨은 반응할 H⁺가 없다. 열은 더 나오지 않고 상온의 용액만 섞이니 온도는 내려가며, 남는 OH⁻ 때문에 액성은 염기성 — BTB 파란색.</li>
+      </ol>
+      <h4>결론</h4>
+      <p>온도 그래프의 꼭짓점과 BTB의 초록색은 같은 사건의 두 신호다 — <b>완전 중화</b>. 그래프 한 장에서 온도·이온 수·액성·색을 모두 읽어 내는 것이 이 소단원의 완성이다.</p>
+      <div class="expoint">
+        <div class="boxtitle"><span class="ico">!</span>시험엔 이렇게</div>
+        <p>꼭짓점 왼쪽 = 산성(H⁺ 남음), 꼭짓점 = 중성, 오른쪽 = 염기성(OH⁻ 남음). "넣을수록 온도가 계속 오른다"는 선지는 <b>꼭짓점 이후 하강</b>으로 반박하라.</p>
+      </div>
+    </div>
+  </div>
+  <div class="folio"><span>I. 변화와 다양성</span><span class="num">54</span></div>
+</div>
+
+<!-- ═════════════ p.55 STEP 1 + STEP 2 시작 ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag">I. 변화와 다양성</span><span class="lesson-tag">04. 산·염기와 중화 반응 | 문제</span></div>
+  <div class="step-head"><span class="stepno">STEP 1</span><span class="steptt">개념 확인</span><span class="stepdesc">OX와 빈칸으로 개념 점검 — 막히면 알짜 정리로!</span></div>
+  <div class="qgrid">
+    <div>
+      <div class="q"><div class="qhead"><span class="qno">1</span><div class="stem">산 수용액에 마그네슘을 넣으면 수소 기체가 발생한다. <span class="ox-answer">( O , X )</span></div></div></div>
+      <div class="q"><div class="qhead"><span class="qno">2</span><div class="stem">산의 공통 성질은 수산화 이온(OH⁻) 때문이다. <span class="ox-answer">( O , X )</span></div></div></div>
+      <div class="q"><div class="qhead"><span class="qno">3</span><div class="stem">산과 염기를 섞으면 혼합 용액의 온도가 내려간다. <span class="ox-answer">( O , X )</span></div></div></div>
+    </div>
+    <div>
+      <div class="q"><div class="qhead"><span class="qno">4</span><div class="stem">아레니우스 정의에서 산은 물에 녹아 <span class="blankline" style="min-width:16mm;"></span>을 내놓는 물질이다.</div></div></div>
+      <div class="q"><div class="qhead"><span class="qno">5</span><div class="stem">중화 반응을 한 줄로 쓰면 "산 + 염기 → <span class="blankline" style="min-width:10mm;"></span> + 염"이다.</div></div></div>
+      <div class="q"><div class="qhead"><span class="qno">6</span><div class="stem">페놀프탈레인 용액은 <span class="blankline" style="min-width:10mm;"></span>성 용액에서 붉게 변한다.</div></div></div>
+    </div>
+  </div>
+  <div style="border-top:0.5mm solid var(--line); margin:2mm 0 4mm;"></div>
+  <div class="step-head s2"><span class="stepno">STEP 2</span><span class="steptt">내신 완성</span><span class="stepdesc">학교 시험 유형 그대로 — 서술형까지 한 번에</span></div>
+  <div class="q">
+    <div class="qhead"><span class="qno">7</span><div class="stem">산의 성질에 대한 설명으로 옳은 것은? <span class="difficulty">●●○</span>
+    <div class="tags">10통과2-01-04 | 개념 1</div></div></div>
+    <ul class="choices">
+      <li>① 산 수용액은 만지면 미끈거린다.</li>
+      <li>② 산의 신맛은 수산화 이온 때문이다.</li>
+      <li>③ 묽은 염산에 마그네슘 조각을 넣으면 수소 기체가 발생한다.</li>
+      <li>④ 산 수용액에는 전류가 흐르지 않는다.</li>
+      <li>⑤ 아세트산은 물에 녹아 수산화 이온을 내놓는다.</li>
+    </ul>
+  </div>
+  <div class="q">
+    <div class="qhead"><span class="qno">8</span><div class="stem">염기의 성질에 대한 설명으로 옳은 것은? <span class="difficulty">●●○</span>
+    <div class="tags">10통과2-01-04 | 개념 2</div></div></div>
+    <ul class="choices">
+      <li>① 염기 수용액은 신맛이 난다.</li>
+      <li>② 염기의 공통 성질은 수소 이온 때문이다.</li>
+      <li>③ 수산화 나트륨 수용액은 푸른 리트머스 종이를 붉게 만든다.</li>
+      <li>④ 염기 수용액은 대리석과 반응해 이산화 탄소를 발생시킨다.</li>
+      <li>⑤ 염기 수용액이 미끈거리는 것은 단백질을 녹이기 때문이다.</li>
+    </ul>
+  </div>
+  <div class="folio"><span>I. 변화와 다양성</span><span class="num">55</span></div>
+</div>
+
+<!-- ═════════════ p.56 STEP 2 계속 ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag">I. 변화와 다양성</span><span class="lesson-tag">04. 산·염기와 중화 반응 | 문제</span></div>
+  <div class="q">
+    <div class="qhead"><span class="qno">9</span><div class="stem"><span class="badge-data">자료</span>용액 A는 푸른 리트머스 종이를 붉게 만들고 BTB 용액에서 노란색을 띠었다. 용액 B는 페놀프탈레인 용액을 붉게 만들었다. 이에 대한 설명으로 옳은 것은? <span class="difficulty">●●●</span>
+    <div class="tags">10통과2-01-04 | 개념 1·2·3</div></div></div>
+    <ul class="choices">
+      <li>① A는 염기성 용액이다.</li>
+      <li>② A에는 수소 이온(H⁺)이 들어 있다.</li>
+      <li>③ B는 산성 용액이다.</li>
+      <li>④ B에 마그네슘을 넣으면 수소 기체가 발생한다.</li>
+      <li>⑤ A와 B를 섞으면 아무 반응도 일어나지 않는다.</li>
+    </ul>
+  </div>
+  <div class="q">
+    <div class="qhead"><span class="qno">10</span><div class="stem">생활 속에서 중화 반응을 이용한 예로 옳은 것만을 고른 것은? <span class="difficulty">●●●</span>
+    <div class="tags">10통과2-01-04 | 개념 5</div></div></div>
+    <div class="bogi-box" style="background:#fff;">
+      (가) 위산 과다에 제산제를 복용한다.<br>
+      (나) 산성화된 토양에 석회 가루를 뿌린다.<br>
+      (다) 생선 비린내를 없애려 레몬즙을 뿌린다.
+    </div>
+    <ul class="choices inline">
+      <li>① (가)</li><li>② (나)</li><li>③ (가), (다)</li><li>④ (나), (다)</li><li>⑤ (가), (나), (다)</li>
+    </ul>
+  </div>
+  <div class="q">
+    <div class="qhead"><span class="qno">11</span><div class="stem"><span class="badge-essay">서술형</span>속이 쓰릴 때 염기성 물질이 든 제산제를 먹으면 증상이 나아지는 까닭을 <b>'위산'과 '중화'</b>라는 말을 포함하여 서술하시오. <span class="difficulty">●●●●</span>
+    <div class="tags">10통과2-01-04 | 개념 4·5</div></div></div>
+    <div class="essay-lines"><div></div><div></div><div></div></div>
+  </div>
+  <div class="folio"><span>I. 변화와 다양성</span><span class="num">56</span></div>
+</div>
+
+<!-- ═════════════ p.57 STEP 3 ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag">I. 변화와 다양성</span><span class="lesson-tag">04. 산·염기와 중화 반응 | 문제</span></div>
+  <div class="step-head s3"><span class="stepno">STEP 3</span><span class="steptt">수능 도전</span><span class="stepdesc">2028 수능 규격 — ㄱㄴㄷ 합답형·자료 해석</span></div>
+  <div class="q">
+    <div class="qhead"><span class="qno">12</span><div class="stem"><span class="badge-data">자료</span>그림은 BTB 용액을 넣은 일정량의 묽은 염산에 수산화 나트륨 수용액을 조금씩 넣을 때 혼합 용액의 온도를 나타낸 것이다. 옳은 것만을 &lt;보기&gt;에서 있는 대로 고른 것은? <span class="difficulty">[2점]</span>
+    <div class="tags">10통과2-01-04</div></div></div>
+    <figure style="margin:2mm 0 1mm 8.6mm;">
+      <svg width="280" height="92" viewBox="0 0 280 92" font-family="PC Sans">
+        <line x1="26" y1="76" x2="270" y2="76" stroke="#5B6B77" stroke-width="1.1" marker-end="url(#arrP)"/>
+        <line x1="26" y1="76" x2="26" y2="8" stroke="#5B6B77" stroke-width="1.1" marker-end="url(#arrP)"/>
+        <text x="268" y="88" text-anchor="end" font-size="6.6" fill="#5B6B77">넣어 준 수산화 나트륨 수용액의 부피</text>
+        <text x="30" y="8" font-size="6.6" fill="#5B6B77">온도</text>
+        <path d="M40,66 L142,24 L240,46" fill="none" stroke="#C1521E" stroke-width="2"/>
+        <line x1="142" y1="24" x2="142" y2="76" stroke="#D6455D" stroke-width="1" stroke-dasharray="2.5 2"/>
+        <circle cx="142" cy="24" r="3" fill="#D6455D"/>
+        <text x="142" y="86" text-anchor="middle" font-size="7" font-weight="800" fill="#D6455D">P</text>
+      </svg>
+    </figure>
+    <div class="bogi-box">
+      <div class="bt">보기</div>
+      ㄱ. P에서 혼합 용액은 중성이고 BTB는 초록색이다.<br>
+      ㄴ. P 이전 구간에서 수산화 나트륨을 넣을수록 용액 속 H⁺ 수는 증가한다.<br>
+      ㄷ. P 이후 더 넣으면 용액은 염기성이 되고 BTB는 파란색이 된다.
+    </div>
+    <ul class="choices inline">
+      <li>① ㄱ</li><li>② ㄴ</li><li>③ ㄱ, ㄴ</li><li>④ ㄱ, ㄷ</li><li>⑤ ㄴ, ㄷ</li>
+    </ul>
+  </div>
+  <div class="q">
+    <div class="qhead"><span class="qno">13</span><div class="stem"><span class="badge-data">자료</span>다음은 생활 속 산·염기 이용 사례다. 옳은 것만을 &lt;보기&gt;에서 있는 대로 고른 것은? <span class="difficulty">[2.5점]</span>
+    <div class="tags">10통과2-01-04</div></div></div>
+    <div class="bogi-box" style="background:#fff;">
+      ○ 속이 쓰릴 때 제산제를 복용한다.<br>
+      ○ 생선회에 레몬즙을 뿌려 비린내를 줄인다.<br>
+      ○ 산성비로 산성화된 호수에 석회를 뿌린다.
+    </div>
+    <div class="bogi-box">
+      <div class="bt">보기</div>
+      ㄱ. 제산제는 위산(염산)을 중화하는 염기성 물질이다.<br>
+      ㄴ. 비린내의 원인 물질은 염기성이므로 산인 레몬즙으로 중화된다.<br>
+      ㄷ. 호수에 석회를 뿌리는 것은 산화·환원 반응을 이용한 것이다.
+    </div>
+    <ul class="choices inline">
+      <li>① ㄱ, ㄴ</li><li>② ㄴ</li><li>③ ㄱ, ㄷ</li><li>④ ㄴ, ㄷ</li><li>⑤ ㄱ, ㄴ, ㄷ</li>
+    </ul>
+  </div>
+  <div class="folio"><span>I. 변화와 다양성</span><span class="num">57</span></div>
+</div>
+
+<!-- ═════════════ p.58 해설 1 ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag" style="color:var(--brand);">알짜 해설</span><span class="lesson-tag">04. 산·염기와 중화 반응</span></div>
+  <div class="sol-head"><span class="stt">알짜 해설</span><span class="sub">전 문항 해설 + 오답 선지 분석 — 맞힌 문제도 해설로 한 번 더!</span></div>
+  <table class="anstable">
+    <tr><th>문항</th><td>1</td><td>2</td><td>3</td><td>4</td><td>5</td><td>6</td><td>7</td><td>8</td><td>9</td><td>10</td><td>11</td><td>12</td><td>13</td></tr>
+    <tr><th>정답</th><td class="a">O</td><td class="a">X</td><td class="a">X</td><td class="a">수소 이온</td><td class="a">물</td><td class="a">염기</td><td class="a">③</td><td class="a">⑤</td><td class="a">②</td><td class="a">⑤</td><td class="a">서술형</td><td class="a">④</td><td class="a">①</td></tr>
+  </table>
+  <div class="solcols">
+    <div>
+      <div class="sol"><div class="shead"><span class="sno">1</span><span class="sans">O</span><span class="slink">개념 1</span></div>
+        <p>산 + 금속(마그네슘·아연) → 수소 기체. 산의 대표 성질이다.</p></div>
+      <div class="sol"><div class="shead"><span class="sno">2</span><span class="sans">X</span><span class="slink">개념 1</span></div>
+        <p>산의 범인은 수소 이온(H⁺) — OH⁻는 염기의 얼굴이다.</p></div>
+      <div class="sol"><div class="shead"><span class="sno">3</span><span class="sans">X</span><span class="slink">개념 4</span></div>
+        <p>중화열이 나와 온도가 올라간다.</p></div>
+      <div class="sol"><div class="shead"><span class="sno">4</span><span class="sans">수소 이온</span><span class="slink">개념 1</span></div>
+        <p>아레니우스: 산 = 물에 녹아 H⁺를 내놓는 물질.</p></div>
+      <div class="sol"><div class="shead"><span class="sno">5</span><span class="sans">물</span><span class="slink">개념 4</span></div>
+        <p>H⁺ + OH⁻ → H₂O. 물과 함께 염이 남는다.</p></div>
+      <div class="sol"><div class="shead"><span class="sno">6</span><span class="sans">염기</span><span class="slink">개념 3</span></div>
+        <p>페놀프탈레인은 염기성에서만 붉다 — '염기 탐지기'.</p></div>
+    </div>
+    <div>
+      <div class="sol"><div class="shead"><span class="sno">7</span><span class="sans">③</span><span class="slink">개념 1</span></div>
+        <p>산 + 마그네슘 → 수소 기체. 정의 그대로다.</p>
+        <div class="wrongbox"><div class="wt">오답 왜 틀렸나</div>
+          <p><b>①</b> 미끈거림은 염기. <b>②·⑤</b> 산의 이온은 H⁺다. <b>④</b> 이온이 있으니 전류가 흐른다.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">8</span><span class="sans">⑤</span><span class="slink">개념 2</span></div>
+        <p>미끈거림 = 단백질을 녹이는 염기의 성질.</p>
+        <div class="wrongbox"><div class="wt">오답 왜 틀렸나</div>
+          <p><b>①</b> 쓴맛. <b>②</b> 염기는 OH⁻. <b>③</b> 붉은 종이를 푸르게가 맞다. <b>④</b> 대리석 반응은 산의 성질.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">9</span><span class="sans">②</span><span class="slink">개념 1·2·3</span></div>
+        <p>A: 리트머스 붉게 + BTB 노랑 = 산성 → H⁺ 있음. B: 페놀프탈레인 붉게 = 염기성.</p>
+        <div class="wrongbox"><div class="wt">오답 왜 틀렸나</div>
+          <p><b>①</b> A는 산성. <b>③</b> B는 염기성. <b>④</b> 수소 기체는 산(A)의 몫. <b>⑤</b> 산+염기 = 중화 반응이 일어난다.</p></div></div>
+    </div>
+  </div>
+  <div class="folio"><span>알짜 해설</span><span class="num">58</span></div>
+</div>
+
+<!-- ═════════════ p.59 해설 2 ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag" style="color:var(--brand);">알짜 해설</span><span class="lesson-tag">04. 산·염기와 중화 반응</span></div>
+  <div class="solcols">
+    <div>
+      <div class="sol"><div class="shead"><span class="sno">10</span><span class="sans">⑤</span><span class="slink">개념 5</span></div>
+        <p>(가) 염기(제산제)로 위산 중화. (나) 염기(석회)로 산성 토양 중화. (다) 산(레몬즙)으로 염기성 비린내 물질 중화 — 셋 다 중화의 기술이다.</p>
+        <div class="wrongbox"><div class="wt">함정 체크</div>
+          <p>방향이 반대일 뿐 원리는 하나 — <b>넘친 쪽을 반대 이온으로 지운다</b>.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">11</span><span class="sans">모범 답안</span><span class="slink">개념 4·5</span></div>
+        <p>속쓰림은 <b>위산</b>(염산)이 과다하게 분비된 상태다. 염기성 물질인 제산제가 위산과 <b>중화</b> 반응을 일으켜 과다한 위산을 없애 주므로 증상이 나아진다.</p>
+        <div class="wrongbox"><div class="wt">채점 기준 (감점 포인트)</div>
+          <p>① 위산 = 산(염산) ② 제산제 = 염기성 ③ 둘의 중화로 위산 감소 — 세 요소를 모두 서술해야 만점.</p></div></div>
+    </div>
+    <div>
+      <div class="sol"><div class="shead"><span class="sno">12</span><span class="sans">④</span><span class="slink">개념 4·자료 | 2점</span></div>
+        <p><b>ㄱ (옳음)</b> 온도 최고점 P = 완전 중화 = 중성, BTB 초록. <b>ㄴ (틀림)</b> OH⁻가 H⁺를 지우므로 H⁺ 수는 <b>감소</b>한다. <b>ㄷ (옳음)</b> P 이후 남는 OH⁻ — 염기성, 파란색.</p>
+        <div class="wrongbox"><div class="wt">함정 체크</div>
+          <p>꼭짓점 왼쪽 = 산성 / 꼭짓점 = 중성 / 오른쪽 = 염기성 — 그래프에 세 구역을 그려 두고 시작하라.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">13</span><span class="sans">①</span><span class="slink">개념 5 | 2.5점</span></div>
+        <p><b>ㄱ (옳음)</b> 제산제 = 염기, 위산 = 염산. <b>ㄴ (옳음)</b> 염기성 비린내 물질 + 산 = 중화. <b>ㄷ (틀림)</b> 석회 뿌리기는 산화·환원이 아니라 <b>중화</b> 반응이다.</p>
+        <div class="wrongbox"><div class="wt">함정 체크</div>
+          <p>03(산화·환원)과 04(중화)를 섞는 선지가 단골 — <b>전자 이동이면 산화·환원, H⁺·OH⁻ 만남이면 중화</b>.</p></div></div>
+
+      <div class="gist" style="margin-top:5mm;">
+        <div class="boxtitle"><span class="ico">알</span>이 소단원, 이것만은!</div>
+        <ul>
+          <li>산 = <b>H⁺</b>(신맛·금속→수소 기체) / 염기 = <b>OH⁻</b>(쓴맛·미끈) — 전류는 둘 다 O</li>
+          <li>지시약 3종 세트: 리트머스 <b>산붉·염푸</b> · 페놀프탈레인 <b>염기만 붉게</b> · BTB <b>노초파</b></li>
+          <li>중화: H⁺+OH⁻→물, 신호는 <b>온도 상승 + 색 변화</b> — 제산제·석회·레몬즙이 그 기술</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div class="folio"><span>알짜 해설</span><span class="num">59</span></div>
+</div>
+
+<!-- ═════════════ p.60 MEMO ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag">I. 변화와 다양성</span><span class="lesson-tag">04 ▸ 05 넘어가기 전에</span></div>
+  <div class="memo-head"><span class="mt">MEMO</span><span class="ms">헷갈린 개념, 다시 틀린 문제 번호, 나만의 암기법을 남겨 두는 자리</span></div>
+  <div class="memo-area"></div>
+  <div class="memo-pen">"지시약 3종의 색 지도(51쪽)를 안 보고 그려 보자. BTB '노초파'가 3초 안에 나오면 통과! — 박찬쌤"</div>
+  <div class="folio"><span>박찬 과학 | 통합과학 2</span><span class="num">60</span></div>
+</div>
+
+</body>
+</html>

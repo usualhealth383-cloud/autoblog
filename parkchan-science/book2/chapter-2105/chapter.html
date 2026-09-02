@@ -1,0 +1,931 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<title>박찬 과학 통합과학2 — I-05 화학 변화와 에너지 출입</title>
+<style>
+  @font-face { font-family:'PC Sans'; src:url('file:///root/.fonts/NotoSansKR.ttf'); font-weight:100 900; }
+  @font-face { font-family:'PC Serif'; src:url('file:///root/.fonts/NotoSerifKR.ttf'); font-weight:100 900; }
+  @font-face { font-family:'PC Pen'; src:url('file:///root/.fonts/YeonSung-Regular.ttf'); font-weight:400; }
+
+  :root{
+    --brand:#0E5A6B;        /* 박찬 과학 브랜드 딥틸 */
+    --brand-lt:#E3F0F3;
+    --unit:#C1521E;         /* I. 과학의 기초 단원 컬러(그린) */
+    --unit-lt:#FBEFE7;
+    --unit-md:#EBC4AB;
+    --accent:#E8940A;       /* 알짜 앰버 */
+    --accent-lt:#FDF3E0;
+    --point:#D6455D;        /* 시험 포인트 */
+    --point-lt:#FBEBEE;
+    --ink:#22303A;
+    --sub:#5B6B77;
+    --line:#D8E0E5;
+  }
+  *{ box-sizing:border-box; margin:0; padding:0; -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+  @page{ size:210mm 275mm; margin:0; }
+  html,body{ font-family:'PC Sans',sans-serif; color:var(--ink); word-break:keep-all; overflow-wrap:anywhere; }
+
+  .page{ width:210mm; height:275mm; position:relative; overflow:hidden; background:#fff; page-break-after:always; padding:14mm 13mm 19mm 15mm; display:flex; flex-direction:column; }
+
+  /* ── 러닝 헤드 / 풋 ── */
+  .runhead{ display:flex; align-items:center; justify-content:space-between; border-bottom:0.35mm solid var(--unit); padding-bottom:2mm; margin-bottom:6.5mm; }
+  .runhead .unit-tag{ font-size:8.5pt; font-weight:700; color:var(--unit); letter-spacing:0.02em; }
+  .runhead .lesson-tag{ font-size:8.5pt; color:var(--sub); }
+  .folio{ position:absolute; bottom:7mm; left:0; right:0; display:flex; justify-content:space-between; padding:0 14mm 0 14mm; font-size:8pt; color:var(--sub); }
+  .folio .num{ font-weight:800; color:var(--unit); font-size:10pt; }
+
+  /* ── 본문 그리드: 본문 + 날개단 ── */
+  .cols{ display:grid; grid-template-columns:1fr 43mm; gap:8mm; flex:1; min-height:0; margin-bottom:4mm; }
+  .main{ min-width:0; }
+  .wing{ border-left:0.3mm solid var(--line); padding-left:5mm; font-size:8.2pt; color:var(--sub); line-height:1.7; }
+
+  /* ── 타이포 ── */
+  h2.lesson-title{ display:flex; align-items:baseline; gap:3.5mm; margin-bottom:2mm; }
+  h2.lesson-title .no{ background:var(--unit); color:#fff; font-size:13pt; font-weight:900; padding:1.2mm 3.2mm; border-radius:1.5mm; }
+  h2.lesson-title .tt{ font-size:16.5pt; font-weight:900; letter-spacing:-0.01em; }
+  .std-badges{ display:flex; gap:2mm; margin:2mm 0 6.5mm; }
+  .std{ font-size:7.4pt; color:var(--unit); background:none; border:0.3mm solid var(--unit-md); border-radius:5mm; padding:0.6mm 2.8mm; font-weight:600; }
+
+  h3.sec{ display:flex; align-items:baseline; gap:3mm; font-size:12.5pt; font-weight:800; margin:9mm 0 3.6mm; letter-spacing:-0.01em; }
+  h3.sec .n{ font-family:'PC Serif'; font-size:15.5pt; font-weight:900; color:var(--unit); border-bottom:0.7mm solid var(--accent); padding:0 0.8mm 0.2mm; flex:0 0 auto; line-height:1; }
+  h3.sec::after{ content:""; flex:1; border-top:0.25mm solid var(--line); align-self:center; margin-left:2mm; }
+  h3.sec:first-child{ margin-top:0; }
+
+  p.body{ font-family:'PC Serif'; font-size:9.6pt; line-height:1.92; margin-bottom:3.6mm; text-align:justify; }
+  p.body b{ font-weight:800; }
+  .kw{ font-weight:800; color:var(--unit); }
+  .u-amber{ background:#F8E9C6; font-weight:700; padding:0.15mm 0.6mm; border-radius:0.6mm; box-decoration-break:clone; -webkit-box-decoration-break:clone; }
+
+  ul.pts{ font-family:'PC Serif'; font-size:9.6pt; line-height:1.84; margin:1.5mm 0 3.5mm 1mm; list-style:none; }
+  ul.pts li{ padding-left:4.5mm; position:relative; margin-bottom:1.8mm; }
+  ul.pts li::before{ content:""; position:absolute; left:0.5mm; top:2.9mm; width:1.7mm; height:1.7mm; background:var(--accent); border-radius:50%; }
+
+  /* ── 코너 박스 ── */
+  .boxtitle{ display:inline-flex; align-items:center; gap:1.8mm; font-weight:900; font-size:9.5pt; margin-bottom:1.6mm; }
+  .boxtitle .ico{ width:5.2mm; height:5.2mm; border-radius:1.2mm; display:flex; align-items:center; justify-content:center; color:#fff; font-size:7.5pt; font-weight:900; }
+
+  .gist{ background:none; border:none; border-top:0.5mm solid var(--accent); border-bottom:0.5mm solid var(--accent); border-radius:0; padding:3.2mm 1.8mm 3mm; margin:6mm 0 5mm; }
+  .gist .boxtitle{ color:#9C6503; } .gist .ico{ background:var(--accent); }
+  .gist ul{ list-style:none; font-family:'PC Serif'; font-size:9.3pt; line-height:1.78; }
+  .gist li{ padding-left:4.2mm; position:relative; margin-bottom:1.2mm;}
+  .gist li::before{ content:"✓"; position:absolute; left:0; color:var(--accent); font-weight:900; }
+
+  .expoint{ background:none; border-left:0.5mm solid #D998A4; border-left-color:#D998A4; border-radius:0; padding:1.4mm 0 1.4mm 3.6mm; margin:4.5mm 0; }
+  .expoint .boxtitle{ color:#A9556A; font-size:8.6pt; margin-bottom:1mm;}
+  .expoint .ico{ background:none; color:#A9556A; border:0.35mm solid #D998A4; width:4.4mm; height:4.4mm; border-radius:50%; font-size:7pt; }
+  .expoint p{ font-family:'PC Serif'; font-size:8.9pt; line-height:1.7; }
+
+  .pen{ font-family:'PC Pen'; font-size:12pt; color:#B4560E; line-height:1.45; }
+  .saem{ display:flex; gap:3mm; align-items:flex-start; margin:4.5mm 0; }
+  .saem .avatar{ flex:0 0 auto; width:10.5mm; height:10.5mm; border-radius:50%; background:var(--brand); color:#fff; font-size:7pt; font-weight:800; display:flex; align-items:center; justify-content:center; line-height:1.35; letter-spacing:0.04em; text-align:center; border:0.5mm solid var(--accent); box-sizing:border-box;}
+  .saem .bubble{ background:#FFFBF0; border:0.4mm solid #EBCB9C; border-radius:3mm; padding:2.2mm 3.6mm 2mm; position:relative; }
+  .saem .bubble::before{ content:""; position:absolute; left:-1.8mm; top:3.2mm; width:3mm; height:3mm; background:#FFFBF0; border-left:0.4mm solid #EBCB9C; border-bottom:0.4mm solid #EBCB9C; transform:rotate(45deg); }
+
+  .wing .wtitle{ font-size:8pt; font-weight:900; color:var(--brand); display:flex; align-items:center; gap:1.5mm; margin:0 0 2.4mm; letter-spacing:0.05em; }
+  .wing .wtitle::before{ content:""; width:2.4mm; height:2.4mm; background:var(--accent); border-radius:50%; }
+  .wing .term{ margin-bottom:3.6mm; }
+  .wing .term b{ color:var(--ink); font-weight:800; display:block; font-size:8.5pt; margin-bottom:0.7mm;}
+  .wing .wsep{ border-top:0.3mm dashed var(--line); margin:4.5mm 0; }
+  .wing .wing-pen{ font-family:'PC Pen'; font-size:11pt; color:#B4560E; line-height:1.45; }
+
+  figure{ margin:5mm 0; }
+  figure figcaption{ font-size:8pt; color:var(--sub); text-align:center; margin-top:2mm; }
+  figure svg{ display:block; margin:0 auto; }
+
+  /* ── 비교형 그림 (2패널 + 범례) ── */
+  .fig-duo{ display:flex; align-items:stretch; gap:2.5mm; justify-content:center; }
+  .fig-duo .panel{ flex:0 0 auto; text-align:center; }
+  .fig-duo .p-title{ font-size:9pt; font-weight:900; color:var(--ink); margin-top:1.6mm; }
+  .fig-duo .p-sub{ font-size:7.8pt; color:var(--sub); line-height:1.45; margin-top:0.5mm; }
+  .fig-duo .mid{ display:flex; flex-direction:column; align-items:center; justify-content:center; gap:1mm; padding:0 1mm; }
+  .fig-duo .mid .mlab{ font-size:7.6pt; font-weight:800; color:var(--unit); text-align:center; line-height:1.3; }
+  .fig-legend{ display:flex; justify-content:center; gap:5mm; font-size:7.8pt; color:var(--ink); margin-top:1.2mm; align-items:center; }
+  .fig-legend span{ display:inline-flex; align-items:center; gap:1.4mm; }
+
+  /* ── 탐구 (자료 파헤치기) ── */
+  .lab{ border:0.5mm solid var(--brand); border-radius:2.5mm; overflow:hidden; margin-top:1mm;}
+  .lab .lab-head{ background:var(--brand); color:#fff; padding:2.2mm 4mm; font-weight:900; font-size:11pt; display:flex; align-items:center; gap:2.5mm;}
+  .lab .lab-head .tag{ font-size:7.5pt; background:rgba(255,255,255,.22); padding:0.6mm 2.4mm; border-radius:4mm; font-weight:700;}
+  .lab .lab-body{ padding:3.5mm 4mm; }
+  .lab h4{ font-size:9.6pt; font-weight:900; color:var(--brand); margin:2.5mm 0 1.4mm; }
+  .lab h4:first-child{ margin-top:0; }
+  .lab p, .lab li{ font-family:'PC Serif'; font-size:9.3pt; line-height:1.8; }
+  .lab ol{ margin-left:5mm; }
+
+  /* ── 문제부 ── */
+  .step-head{ display:flex; align-items:center; gap:3mm; margin:0 0 5mm; }
+  .step-head .stepno{ background:var(--unit); color:#fff; font-weight:900; font-size:9.5pt; padding:1.4mm 3.4mm; border-radius:1.5mm; letter-spacing:0.04em;}
+  .step-head .steptt{ font-size:12.5pt; font-weight:900; }
+  .step-head .stepdesc{ font-size:8.2pt; color:var(--sub); margin-left:auto; }
+  .step-head.s2 .stepno{ background:var(--brand); }
+  .step-head.s3 .stepno{ background:var(--point); }
+
+  .q{ margin-bottom:7.5mm; break-inside:avoid; }
+  .q .qhead{ display:flex; gap:2.4mm; align-items:flex-start; }
+  .q .qno{ flex:0 0 auto; min-width:6.2mm; height:6.2mm; border:0.45mm solid var(--unit); color:var(--unit); border-radius:50%; font-size:8.6pt; font-weight:900; line-height:1; display:flex; align-items:center; justify-content:center; padding-top:0.55mm; margin-top:0.4mm;}
+  .q .stem{ font-family:'PC Serif'; font-size:9.5pt; line-height:1.74; font-weight:500; }
+  .q .stem .difficulty{ color:#C9A227; font-size:8pt; letter-spacing:0.06em; margin-left:1.5mm;}
+  .q .tags{ margin-top:0.8mm; font-size:7pt; color:var(--sub); font-family:'PC Sans';}
+  .choices{ list-style:none; margin:2.2mm 0 0 8.6mm; font-family:'PC Serif'; font-size:9.3pt; line-height:1.85; }
+  .choices.inline{ display:flex; flex-wrap:wrap; gap:0 6mm; }
+  .bogi-box{ border:0.35mm solid #B8C2CA; border-radius:0; margin:2.5mm 0 0 8.6mm; padding:2.4mm 3.2mm; font-family:'PC Serif'; font-size:9.2pt; line-height:1.8; background:none;}
+  .bogi-box .bt{ text-align:center; font-weight:800; color:var(--sub); font-size:8.4pt; margin-bottom:0.8mm; letter-spacing:0.3em;}
+  .ox-answer{ margin-left:2mm; color:var(--sub); font-size:9pt; }
+  .blankline{ display:inline-block; min-width:14mm; border-bottom:0.4mm solid var(--ink); }
+  .qgrid{ display:grid; grid-template-columns:1fr 1fr; gap:0 9mm; }
+  .essay-lines{ margin:2mm 0 0 8.4mm; }
+  .essay-lines div{ border-bottom:0.3mm solid var(--line); height:6.2mm; }
+  .badge-essay{ display:inline-block; background:var(--point); color:#fff; font-size:7pt; font-weight:800; padding:0.4mm 2mm; border-radius:1mm; vertical-align:1pt; margin-right:1.2mm;}
+  .badge-data{ display:inline-block; background:var(--brand); color:#fff; font-size:7pt; font-weight:800; padding:0.4mm 2mm; border-radius:1mm; vertical-align:1pt; margin-right:1.2mm;}
+
+  /* ── 해설부 ── */
+  .sol-head{ display:flex; align-items:center; gap:3mm; margin-bottom:4mm;}
+  .sol-head .stt{ font-size:14.5pt; font-weight:900; color:var(--brand);}
+  .sol-head .sub{ font-size:8.5pt; color:var(--sub);}
+  .anstable{ width:100%; border-collapse:collapse; margin-bottom:4.5mm; }
+  .anstable th,.anstable td{ border:0.3mm solid var(--line); font-size:8.8pt; padding:1.4mm 0; text-align:center; }
+  .anstable th{ background:var(--brand-lt); color:var(--brand); font-weight:800; }
+  .anstable td.a{ font-weight:900; color:var(--unit); }
+  .sol{ margin-bottom:5mm; break-inside:avoid; }
+  .sol .shead{ display:flex; align-items:center; gap:2mm; margin-bottom:1.4mm;}
+  .sol .sno{ background:var(--unit); color:#fff; min-width:6mm; height:5.4mm; border-radius:1.2mm; font-size:8.6pt; font-weight:900; line-height:1; display:flex; align-items:center; justify-content:center; padding:0.5mm 1.5mm 0;}
+  .sol .sans{ font-weight:900; color:var(--unit); font-size:9.6pt;}
+  .sol .slink{ font-size:7.2pt; color:var(--sub); margin-left:auto;}
+  .sol p{ font-family:'PC Serif'; font-size:9.1pt; line-height:1.76; margin-bottom:0.8mm; }
+  .wrongbox{ background:none; border:none; border-left:0.7mm solid #E3A0AC; border-radius:0; padding:1mm 0 1mm 3mm; margin-top:2mm;}
+  .wrongbox .wt{ font-size:8pt; font-weight:900; color:var(--point); margin-bottom:0.8mm; font-family:'PC Sans';}
+  .wrongbox p{ font-family:'PC Serif'; font-size:8.6pt; line-height:1.68; margin-bottom:0.9mm;}
+  .wrongbox p:last-child{ margin-bottom:0; }
+  .solcols{ display:grid; grid-template-columns:1fr 1fr; gap:0 9mm; }
+
+  /* ── 단원 도입 (타이포그래피 중심) ── */
+  .opener{ padding:0 0 19mm; }
+  .opener-hero{ position:relative; padding:7mm 20mm 4.5mm; overflow:hidden; flex-shrink:0; }
+  .ghost-txt{ position:absolute; top:-10mm; right:6mm; font-size:118pt; font-weight:900; color:#FAEFE8; line-height:1; letter-spacing:-0.04em; }
+  .kicker{ display:flex; align-items:center; gap:4mm; position:relative; }
+  .kicker .kt{ font-size:9.5pt; font-weight:800; color:var(--unit); letter-spacing:0.24em; white-space:nowrap; }
+  .kicker::after{ content:""; flex:1; border-top:0.3mm solid var(--line); }
+  .opener-hero h1{ position:relative; font-size:36pt; font-weight:900; letter-spacing:-0.015em; margin:4mm 0 0; }
+  .opener-hero h1 .tick{ display:block; width:14mm; border-top:1.4mm solid var(--accent); margin-bottom:3.6mm; }
+  .opener-lede{ position:relative; font-family:'PC Serif'; font-size:10.2pt; font-weight:600; line-height:2.0; color:#3D4C58; max-width:138mm; margin-top:4mm; padding-left:5mm; border-left:0.8mm solid var(--accent); }
+  .opener-inner{ padding:0 20mm; }
+
+  /* ── 원소의 여정 스트립 ── */
+  .journey{ margin-top:3.5mm; }
+  .journey .j-label{ font-size:8pt; font-weight:800; color:var(--sub); letter-spacing:0.08em; margin-bottom:2.4mm; display:flex; align-items:center; gap:1.6mm;}
+  .journey .j-label::before{ content:""; width:2.4mm; height:2.4mm; background:var(--unit); border-radius:50%; }
+  .j-bar{ display:flex; align-items:center; gap:2mm; }
+  .j-chip{ flex:1; text-align:center; background:#FBF3ED; border:0.35mm solid #EBC4AB; color:#C1521E; border-radius:1.6mm; padding:3mm 1mm 2.6mm; }
+  .j-chip .jc-t{ font-size:8.8pt; font-weight:800; display:block; }
+  .j-chip .jc-s{ font-size:6.8pt; color:var(--sub); display:block; margin-top:0.5mm; }
+  .j-chip.on{ background:var(--unit); border-color:var(--unit); }
+  .j-chip.on .jc-t{ color:#fff; }
+  .j-chip.on .jc-s{ color:#F6DFCE; }
+  .j-arrow{ flex:0 0 auto; color:#E0A57E; font-size:10pt; font-weight:900; }
+  .toc{ margin-top:6.5mm; }
+  .toc .toc-title{ font-size:11pt; font-weight:900; color:var(--ink); margin-bottom:3mm; display:flex; align-items:center; gap:2.5mm;}
+  .toc .toc-title::before{ content:""; width:3.4mm; height:3.4mm; background:var(--accent); border-radius:0.8mm; }
+  .toc-item{ display:flex; align-items:flex-start; gap:5mm; padding:4.4mm 6mm; border-bottom:0.3mm solid var(--line); }
+  .toc-item:first-of-type{ border-top:0.3mm solid var(--line); }
+  .toc-item.active{ background:#FBF3ED; border-left:1.2mm solid #D98A5B; }
+  .toc-item .tno{ font-family:'PC Serif'; font-weight:900; color:#D98A5B; font-size:14pt; width:10mm; line-height:1.1; flex:0 0 auto;}
+  .toc-item .tbody{ flex:1; min-width:0; }
+  .toc-item .ttt{ font-weight:800; font-size:10.5pt; letter-spacing:0.01em; display:flex; align-items:center;}
+  .toc-item .tdesc{ font-family:'PC Serif'; font-size:8.6pt; font-weight:600; color:#4A5964; margin-top:0.7mm; line-height:1.55;}
+  .toc-item .tstd{ font-size:7.2pt; color:var(--sub); flex:0 0 auto; padding-top:1.2mm;}
+  .toc-item.active .tag-now{ background:var(--accent); color:#fff; font-size:7pt; font-weight:900; border-radius:4mm; padding:0.7mm 2.6mm; margin-left:3.5mm;}
+  .toc-item .tag-done{ font-size:7.2pt; font-weight:800; color:#C1521E; margin-left:3.5mm; }
+  .opener-quote{ margin-top:7mm; text-align:center; font-family:'PC Serif'; font-size:9.8pt; font-weight:600; color:#4A5964; letter-spacing:0.01em; }
+  .opener-quote .who{ font-size:8pt; color:var(--sub); font-weight:400; margin-left:2.5mm; }
+  .qa-lead li .qgo{ font-family:'PC Sans'; font-size:7.4pt; font-weight:800; color:var(--unit); background:var(--unit-lt); border-radius:3mm; padding:0.5mm 2.2mm; margin-left:2mm; white-space:nowrap; vertical-align:1pt;}
+  .qa-lead{ margin-top:5mm; border:none; border-top:0.45mm solid var(--brand); border-bottom:0.45mm solid var(--brand); background:none; border-radius:0; padding:3mm 2mm 2.8mm; }
+  .qa-lead .qt{ font-weight:900; color:var(--brand); font-size:10.5pt; margin-bottom:2mm;}
+  .qa-lead li{ font-family:'PC Serif'; font-size:9.5pt; line-height:1.8; margin-left:5mm; }
+
+  /* ── 바로바로 체크 (개념 페이지 하단 즉석 OX) ── */
+  .quickcheck{ margin-top:auto; border-top:0.35mm dashed #C8B98F; padding-top:3mm; width:calc(100% - 51mm); }
+  .quickcheck .qc-title{ display:inline-flex; align-items:center; gap:1.6mm; font-size:8.2pt; font-weight:900; color:#9C6503; margin-bottom:1.4mm; }
+  .quickcheck .qc-title::before{ content:"✓"; color:var(--accent); font-weight:900; }
+  .quickcheck ol{ list-style:none; font-family:'PC Serif'; font-size:8.8pt; line-height:1.75; }
+  .quickcheck li{ display:flex; gap:2mm; align-items:baseline; }
+  .quickcheck li .no{ font-weight:800; color:var(--accent); flex:0 0 auto; }
+  .quickcheck .qc-ans{ margin-top:1mm; font-size:7.2pt; color:var(--sub); transform:rotate(180deg); text-align:left; }
+
+  /* ── 중학 과학 다시보기 (날개단) ── */
+  .wing .review{ background:#F6F3EC; border-radius:1.8mm; padding:2.8mm 3mm; margin-top:1mm; }
+  .wing .review .rv-title{ font-size:7.8pt; font-weight:900; color:#7A6A45; margin-bottom:1.4mm; display:flex; align-items:center; gap:1.4mm;}
+  .wing .review .rv-title::before{ content:"↺"; font-weight:900; color:#A08A55; }
+
+  /* ── MEMO 페이지 ── */
+  .memo-head{ display:flex; align-items:baseline; gap:3.5mm; margin-bottom:5mm; }
+  .memo-head .mt{ font-size:17pt; font-weight:900; color:var(--brand); letter-spacing:0.22em; }
+  .memo-head .ms{ font-size:8.6pt; color:var(--sub); }
+  .memo-area{ flex:1; border:0.4mm solid var(--line); border-radius:2.5mm;
+    background-image:linear-gradient(to bottom, transparent calc(100% - 0.3mm), #DCE4E9 0);
+    background-size:100% 9mm; background-position:0 4mm; padding:0 5mm; margin-bottom:4mm; }
+  .memo-pen{ font-family:'PC Pen'; font-size:12.5pt; color:#B4560E; text-align:right; }
+</style>
+</head>
+<body>
+<!-- ═════════════ p.61 소단원 도입 ═════════════ -->
+<div class="page opener">
+  <div class="opener-hero">
+    <div class="ghost-txt">05</div>
+    <div class="kicker"><span class="kt">통합과학 2 · I. 변화와 다양성</span></div>
+    <h1><span class="tick"></span>화학 변화와 에너지 출입</h1>
+    <p class="opener-lede">주머니 속 손난로는 뜨겁고, 구급 가방의 냉각 팩은 차갑다 —<br>
+    모든 화학 변화에는 에너지의 드나듦이 함께 있다.</p>
+  </div>
+
+  <div class="opener-inner">
+    <div class="journey">
+      <div class="j-label">변화와 다양성 — 지금 여기</div>
+      <div class="j-bar">
+        <div class="j-chip"><span class="jc-t">지질시대</span><span class="jc-s">돌에 남은 일기장</span></div>
+        <span class="j-arrow">→</span>
+        <div class="j-chip"><span class="jc-t">진화</span><span class="jc-s">다양성의 기원</span></div>
+        <span class="j-arrow">→</span>
+        <div class="j-chip"><span class="jc-t">산화와 환원</span><span class="jc-s">문명을 바꾼 반응</span></div>
+        <span class="j-arrow">→</span>
+        <div class="j-chip"><span class="jc-t">산·염기와 중화</span><span class="jc-s">생활 속 화학</span></div>
+        <span class="j-arrow">→</span>
+        <div class="j-chip on"><span class="jc-t">에너지 출입</span><span class="jc-s">발열과 흡열</span></div>
+      </div>
+    </div>
+    <div class="toc">
+      <div class="toc-title">이 단원의 학습 지도</div>
+      <div class="toc-item">
+        <span class="tno">01</span>
+        <span class="tbody"><span class="ttt">지질시대와 생물의 변천</span>
+        <span class="tdesc">지질시대 구분, 화석 읽는 법, 대멸종과 생물다양성</span></span>
+        <span class="tstd">10통과2-01-01</span>
+      </div>
+      <div class="toc-item">
+        <span class="tno">02</span>
+        <span class="tbody"><span class="ttt">진화와 생물다양성</span>
+        <span class="tdesc">변이와 자연선택 — 다양한 생물은 어떻게 생겨났나</span></span>
+        <span class="tstd">10통과2-01-02</span>
+      </div>
+      <div class="toc-item">
+        <span class="tno">03</span>
+        <span class="tbody"><span class="ttt">산화와 환원</span>
+        <span class="tdesc">광합성·화석 연료·철의 제련 — 산소와 전자의 이동</span></span>
+        <span class="tstd">10통과2-01-03</span>
+      </div>
+      <div class="toc-item">
+        <span class="tno">04</span>
+        <span class="tbody"><span class="ttt">산·염기와 중화 반응</span>
+        <span class="tdesc">산과 염기의 성질, 생활 속 중화의 기술</span></span>
+        <span class="tstd">10통과2-01-04</span>
+      </div>
+      <div class="toc-item active">
+        <span class="tno">05</span>
+        <span class="tbody"><span class="ttt">화학 변화와 에너지 출입<span class="tag-now">NOW</span></span>
+        <span class="tdesc">발열·흡열 반응 — 손난로와 냉각 팩의 과학</span></span>
+        <span class="tstd">10통과2-01-05</span>
+      </div>
+    </div>
+
+    <div class="qa-lead">
+      <div class="qt">이 소단원을 끝내면 답할 수 있는 질문</div>
+      <ul>
+        <li>손난로는 배터리도 없이 어떻게 뜨거워질까? <span class="qgo">개념 3</span></li>
+        <li>냉각 팩을 '똑' 꺾으면 왜 차가워질까? <span class="qgo">개념 4</span></li>
+        <li>발열인지 흡열인지, 온도계 하나로 판정하는 법은? <span class="qgo">개념 5</span></li>
+        <li>광합성과 호흡 — 에너지의 눈으로 보면 무엇이 다를까? <span class="qgo">개념 2</span></li>
+      </ul>
+    </div>
+
+    <div class="opener-quote" style="margin-top:2.4mm;">"자연에서 에너지는 사라지지 않는다 — 모습을 바꿔 옮겨 갈 뿐이다."<span class="who">— 에너지 보존 법칙, 이 단원을 읽는 열쇠</span></div>
+  </div>
+
+  <div class="folio"><span>박찬 과학 | 통합과학 2</span><span class="num">61</span></div>
+</div>
+
+<!-- ═════════════ p.62 개념 01 발열 반응 ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag">I. 변화와 다양성</span><span class="lesson-tag">05. 화학 변화와 에너지 출입</span></div>
+  <h2 class="lesson-title"><span class="no">05</span><span class="tt">화학 변화와 에너지 출입</span></h2>
+  <div class="std-badges"><span class="std">성취기준 10통과2-01-05</span><span class="std">발열 반응 → 흡열 반응 → 생활 속 이용</span></div>
+
+  <div class="cols">
+    <div class="main">
+      <h3 class="sec"><span class="n">1</span>발열 반응 — 열을 내놓는 변화</h3>
+      <p class="body">화학 변화가 일어날 때는 물질만 바뀌는 것이 아니다 — <b>에너지가 함께 드나든다</b>. 장작이 타면 뜨겁고, 산에 금속을 넣으면 시험관이 따뜻해진다. 이렇게 <span class="u-amber">반응하면서 열을 방출해 주위의 온도를 높이는 반응</span>이 <span class="kw">발열 반응</span>이다. 반응물이 품고 있던 에너지의 일부가 열의 모습으로 주위에 나오는 것이다.</p>
+      <p class="body">앞 소단원들의 주인공이 여기 다 모인다. <b>연소</b>(03의 격렬한 산화), 산과 염기의 <b>중화 반응</b>(04의 중화열), <b>금속과 산의 반응</b>, 그리고 우리 몸의 <b>세포 호흡</b> — 포도당을 천천히 태워 체온을 지키는 것도 발열 반응이다. 우리가 36.5 ℃로 사는 것 자체가 발열 반응의 덕이다.</p>
+
+      <figure>
+        <svg width="470" height="148" viewBox="0 0 470 148" font-family="PC Sans">
+          <defs>
+            <marker id="arrP" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="#C1521E"/></marker>
+            <marker id="arrR" markerWidth="7" markerHeight="7" refX="5" refY="2.5" orient="auto"><path d="M0,0 L6,2.5 L0,5 Z" fill="#D6455D"/></marker>
+          </defs>
+          <g font-size="6.8">
+            <text x="235" y="13" text-anchor="middle" font-size="8.4" font-weight="800" fill="#C1521E">발열 반응 — 열이 반응에서 주위로</text>
+            <g transform="translate(0,24)" text-anchor="middle">
+              <g transform="translate(110,0)">
+                <rect x="-88" y="0" width="176" height="90" rx="6" fill="#FBEFE7" stroke="#EBC4AB" stroke-width="1"/>
+                <circle cx="0" cy="38" r="21" fill="#E8940A"/>
+                <text y="42" fill="#fff" font-weight="800" font-size="7">반응</text>
+                <g stroke="#D6455D" stroke-width="1.5" fill="none">
+                  <path d="M26,26 q8,-4 14,-10" marker-end="url(#arrR)"/>
+                  <path d="M28,42 q10,0 18,0" marker-end="url(#arrR)"/>
+                  <path d="M26,54 q8,4 14,10" marker-end="url(#arrR)"/>
+                </g>
+                <text x="58" y="24" font-size="6.2" fill="#D6455D" font-weight="800">열 방출</text>
+                <text y="80" fill="#5B6B77" font-size="6.2">주위의 온도가 올라간다</text>
+              </g>
+              <g transform="translate(330,0)">
+                <rect x="-124" y="0" width="248" height="90" rx="6" fill="#FBF3ED" stroke="#EBC4AB" stroke-width="1"/>
+                <text y="16" font-size="7.4" font-weight="800" fill="#C1521E">발열 반응의 명단</text>
+                <g font-size="6.4" fill="#5B6B77" text-anchor="start">
+                  <text x="-108" y="34">🔥 연소 — 03의 격렬한 산화</text>
+                  <text x="-108" y="48">💧 중화 반응 — 04의 중화열</text>
+                  <text x="-108" y="62">⚙ 금속 + 산 — 시험관이 따뜻해진다</text>
+                  <text x="-108" y="76">🫁 세포 호흡 — 체온 36.5 ℃의 비밀</text>
+                </g>
+              </g>
+            </g>
+          </g>
+          <text x="235" y="142" text-anchor="middle" font-size="8.8" font-weight="800" fill="#E8940A">발열 반응 = 열을 내놓는 변화 — 주위가 따뜻해지면 발열이다</text>
+        </svg>
+        <figcaption>그림 1 | 발열 반응의 구조 — 반응이 열을 내놓고, 주위의 온도가 올라간다</figcaption>
+      </figure>
+
+      <div class="saem">
+        <div class="avatar">박찬<br>쌤</div>
+        <div class="bubble"><span class="pen">"'발(發)열' — 열을 내보낸다는 뜻 그대로다. 기준은 언제나 '주위' — 내 손이 따뜻해졌으면 반응이 열을 내놓은 것."</span></div>
+      </div>
+    </div>
+
+    <div class="wing">
+      <div class="wtitle">날개 노트</div>
+      <div class="term"><b>발열 반응</b>열을 방출하며 일어나는 화학 반응 — 주위의 온도가 올라간다.</div>
+      <div class="term"><b>연소와 호흡</b>둘 다 산화·발열이지만 연소는 빠르고 격렬하게, 호흡은 느리고 조용하게.</div>
+      <div class="wsep"></div>
+      <div class="wtitle">한눈에 암기</div>
+      <div class="wing-pen">발열 = 열 방출<br>주위 온도 올라감!<br>연소·중화·금속+산·호흡</div>
+      <div class="wsep"></div>
+      <div class="review">
+        <div class="rv-title">중학 과학 다시보기</div>
+        <div class="term" style="margin-bottom:0;"><b>온도와 열 (중1)</b>열은 높은 곳에서 낮은 곳으로 흐른다 — 이 단원은 그 열이 '반응'에서 나오고 들어가는 이야기다.</div>
+      </div>
+    </div>
+  </div>
+  <div class="quickcheck">
+    <span class="qc-title">바로바로 체크</span>
+    <ol>
+      <li><span class="no">1</span>연소는 열을 방출하는 발열 반응이다. ( O , X )</li>
+      <li><span class="no">2</span>발열 반응이 일어나면 주위의 온도가 올라간다. ( O , X )</li>
+      <li><span class="no">3</span>세포 호흡은 흡열 반응이다. ( O , X )</li>
+    </ol>
+    <div class="qc-ans">정답 1 O 2 O 3 X (발열 — 체온의 근원)</div>
+  </div>
+  <div class="folio"><span>I. 변화와 다양성</span><span class="num">62</span></div>
+</div>
+
+<!-- ═════════════ p.63 개념 02 흡열 반응 ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag">I. 변화와 다양성</span><span class="lesson-tag">05. 화학 변화와 에너지 출입</span></div>
+  <div class="cols">
+    <div class="main">
+      <h3 class="sec"><span class="n">2</span>흡열 반응 — 열을 빨아들이는 변화</h3>
+      <p class="body">반대편도 있다. <span class="u-amber">주위에서 열을 흡수하며 일어나 주위의 온도를 낮추는 반응</span> — <span class="kw">흡열 반응</span>이다. 유명한 시범 실험 하나. 수산화 바륨과 염화 암모늄을 삼각 플라스크에서 섞으면 온도가 뚝 떨어져, 물 몇 방울을 얹어 둔 <b>나무판이 플라스크에 얼어붙는다</b>. 반응이 주위의 열을 빨아들였다는 가장 극적인 증거다.</p>
+      <p class="body">흡열 반응의 명단에는 <b>광합성</b>(빛에너지를 흡수해 포도당에 저장 — 03에서 본 환원 반응), 탄산수소 나트륨의 <b>열분해</b>(열을 계속 줘야 진행 — 빵 반죽이 부푸는 원리), <b>질산 암모늄과 물의 반응</b>(냉각 팩의 심장), 탄산수소 나트륨과 시트르산의 반응이 있다. 에너지의 눈으로 보면 광합성(흡열·저장)과 호흡(발열·꺼내 쓰기)이 정확한 한 쌍이라는 것도 보인다.</p>
+
+      <figure>
+        <svg width="470" height="148" viewBox="0 0 470 148" font-family="PC Sans">
+          <g font-size="6.8">
+            <text x="235" y="13" text-anchor="middle" font-size="8.4" font-weight="800" fill="#C1521E">흡열 반응 — 열이 주위에서 반응으로</text>
+            <g transform="translate(0,24)" text-anchor="middle">
+              <g transform="translate(110,0)">
+                <rect x="-88" y="0" width="176" height="90" rx="6" fill="#EAF3F8" stroke="#A9C9DE" stroke-width="1"/>
+                <circle cx="0" cy="38" r="21" fill="#4C86B0"/>
+                <text y="42" fill="#fff" font-weight="800" font-size="7">반응</text>
+                <g stroke="#4C86B0" stroke-width="1.5" fill="none">
+                  <path d="M40,16 q-8,4 -14,10" marker-end="url(#arrP)"/>
+                  <path d="M46,38 q-10,0 -18,0" marker-end="url(#arrP)"/>
+                  <path d="M40,60 q-8,-4 -14,-10" marker-end="url(#arrP)"/>
+                </g>
+                <text x="62" y="20" font-size="6.2" fill="#4C86B0" font-weight="800">열 흡수</text>
+                <text y="80" fill="#5B6B77" font-size="6.2">주위의 온도가 내려간다</text>
+              </g>
+              <g transform="translate(330,0)">
+                <rect x="-124" y="0" width="248" height="90" rx="6" fill="#F4F8FB" stroke="#A9C9DE" stroke-width="1"/>
+                <text y="16" font-size="7.4" font-weight="800" fill="#2E6690">흡열 반응의 명단</text>
+                <g font-size="6.4" fill="#5B6B77" text-anchor="start">
+                  <text x="-108" y="34">🌿 광합성 — 빛에너지를 흡수해 저장</text>
+                  <text x="-108" y="48">🍞 탄산수소 나트륨 열분해 — 빵이 부푼다</text>
+                  <text x="-108" y="62">🧊 질산 암모늄 + 물 — 냉각 팩의 심장</text>
+                  <text x="-108" y="76">❄ 수산화 바륨 + 염화 암모늄 — 나무판이 언다</text>
+                </g>
+              </g>
+            </g>
+          </g>
+          <text x="235" y="142" text-anchor="middle" font-size="8.8" font-weight="800" fill="#E8940A">흡열 반응 = 열을 빨아들이는 변화 — 주위가 차가워지면 흡열이다</text>
+        </svg>
+        <figcaption>그림 2 | 흡열 반응의 구조 — 광합성(흡열·저장)과 호흡(발열·사용)은 에너지의 한 쌍</figcaption>
+      </figure>
+
+      <div class="expoint">
+        <div class="boxtitle"><span class="ico">!</span>시험엔 이렇게</div>
+        <p>"광합성은 발열 반응이다"(X — 빛에너지를 <b>흡수</b>하는 흡열)가 단골. 나무판 실험은 "왜 얼어붙는가?" 서술형으로 나온다 — <b>반응이 주위(물)의 열을 흡수해 온도가 내려가기 때문</b>, 한 줄이면 된다.</p>
+      </div>
+    </div>
+
+    <div class="wing">
+      <div class="wtitle">날개 노트</div>
+      <div class="term"><b>흡열 반응</b>주위에서 열을 흡수하며 일어나는 화학 반응 — 주위의 온도가 내려간다.</div>
+      <div class="term"><b>열분해</b>열을 가해 물질을 분해하는 반응 — 열 공급을 멈추면 반응도 멈춘다.</div>
+      <div class="wsep"></div>
+      <div class="wtitle">한눈에 암기</div>
+      <div class="wing-pen">흡열 = 열 흡수<br>주위 온도 내려감!<br>광합성·열분해·질산 암모늄</div>
+    </div>
+  </div>
+  <div class="quickcheck">
+    <span class="qc-title">바로바로 체크</span>
+    <ol>
+      <li><span class="no">1</span>흡열 반응이 일어나면 주위의 온도가 내려간다. ( O , X )</li>
+      <li><span class="no">2</span>광합성은 빛에너지를 흡수하는 흡열 반응이다. ( O , X )</li>
+      <li><span class="no">3</span>수산화 바륨과 염화 암모늄의 반응은 발열 반응이다. ( O , X )</li>
+    </ol>
+    <div class="qc-ans">정답 1 O 2 O 3 X (흡열 — 나무판이 얼어붙는다)</div>
+  </div>
+  <div class="folio"><span>I. 변화와 다양성</span><span class="num">63</span></div>
+</div>
+
+<!-- ═════════════ p.64 개념 03 발열의 기술 ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag">I. 변화와 다양성</span><span class="lesson-tag">05. 화학 변화와 에너지 출입</span></div>
+  <div class="cols">
+    <div class="main">
+      <h3 class="sec"><span class="n">3</span>발열의 기술 — 반응을 난로로 쓰다</h3>
+      <p class="body">발열 반응을 도구로 바꾼 발명품들을 보자. <b>손난로</b>는 부직포 주머니 속 <b>철가루가 공기 중 산소와 천천히 결합(산화)</b>하며 열을 내는 것이다 — 03에서 본 '녹슬기'를 난방으로 바꿨다. 흔들면 공기와 닿는 면이 넓어져 더 빨리 따뜻해지고, 소금물과 활성탄은 반응을 도와주는 조연들이다.</p>
+      <p class="body">끈을 당기면 데워지는 <b>발열 도시락</b>은 <b>산화 칼슘(생석회)과 물의 발열 반응</b>을 쓴다 — 불도 전기도 없이 김이 오른다. 그리고 가장 오래된 발열의 기술은 <b>연료의 연소</b>다. 가스레인지·보일러·자동차 엔진까지, 인류는 발열 반응에서 열과 동력을 꺼내 문명을 데워 왔다. 우리 몸의 세포 호흡까지 합치면 — 생명도 문명도 발열 반응 위에서 돌아간다.</p>
+
+      <figure>
+        <svg width="470" height="150" viewBox="0 0 470 150" font-family="PC Sans">
+          <g font-size="6.8">
+            <text x="235" y="13" text-anchor="middle" font-size="8.4" font-weight="800" fill="#C1521E">발열 반응의 3대 발명품</text>
+            <g transform="translate(0,22)" text-anchor="middle">
+              <g transform="translate(85,0)">
+                <rect x="-70" y="0" width="140" height="96" rx="6" fill="#FBEFE7" stroke="#EBC4AB" stroke-width="1"/>
+                <text y="15" font-size="7.4" font-weight="800" fill="#C1521E">손난로</text>
+                <g transform="translate(0,48)">
+                  <rect x="-22" y="-16" width="44" height="32" rx="9" fill="#E0A57E"/>
+                  <path d="M-6,-26 q-3,6 0,10 M6,-26 q-3,6 0,10" stroke="#D6455D" stroke-width="1.4" fill="none"/>
+                </g>
+                <text y="82" fill="#5B6B77" font-size="6.2">철가루 + 산소 → 천천히 산화</text>
+                <text y="91" fill="#B4560E" font-size="6" font-weight="800">녹슬기를 난방으로</text>
+              </g>
+              <g transform="translate(235,0)">
+                <rect x="-70" y="0" width="140" height="96" rx="6" fill="#FBEFE7" stroke="#EBC4AB" stroke-width="1"/>
+                <text y="15" font-size="7.4" font-weight="800" fill="#C1521E">발열 도시락</text>
+                <g transform="translate(0,48)">
+                  <rect x="-26" y="-6" width="52" height="20" rx="3" fill="#C9BA9B"/>
+                  <rect x="-26" y="-14" width="52" height="8" rx="3" fill="#EDE4D3"/>
+                  <path d="M-10,-24 q-2,5 0,8 M0,-27 q-2,6 0,10 M10,-24 q-2,5 0,8" stroke="#8FB2C9" stroke-width="1.3" fill="none"/>
+                </g>
+                <text y="82" fill="#5B6B77" font-size="6.2">산화 칼슘 + 물 → 발열</text>
+                <text y="91" fill="#B4560E" font-size="6" font-weight="800">불 없이 데우는 한 끼</text>
+              </g>
+              <g transform="translate(385,0)">
+                <rect x="-70" y="0" width="140" height="96" rx="6" fill="#FBEFE7" stroke="#EBC4AB" stroke-width="1"/>
+                <text y="15" font-size="7.4" font-weight="800" fill="#C1521E">연료의 연소</text>
+                <g transform="translate(0,48)">
+                  <path d="M-6,16 q-16,-8 -8,-26 q7,5 9,12 q2,-14 12,-19 q12,12 5,28 q-5,8 -18,5 z" fill="#E8940A"/>
+                  <path d="M-2,14 q-7,-5 -3,-14 q8,5 6,14 z" fill="#F3C24E"/>
+                </g>
+                <text y="82" fill="#5B6B77" font-size="6.2">가스레인지 · 보일러 · 엔진</text>
+                <text y="91" fill="#B4560E" font-size="6" font-weight="800">문명을 데운 반응</text>
+              </g>
+            </g>
+          </g>
+          <text x="235" y="144" text-anchor="middle" font-size="8.8" font-weight="800" fill="#E8940A">같은 원리, 다른 속도 — 반응의 열을 골라 꺼내 쓰는 것이 기술이다</text>
+        </svg>
+        <figcaption>그림 3 | 발열의 기술 — 손난로·발열 도시락·연소, 모두 '열을 내놓는 반응'의 활용</figcaption>
+      </figure>
+
+      <div class="expoint">
+        <div class="boxtitle"><span class="ico">!</span>시험엔 이렇게</div>
+        <p>손난로 문제는 03과의 연계로 나온다 — "철가루는 산소와 결합해 <b>산화</b>되며(○), 이는 <b>발열</b> 반응(○)". "손난로 속 철가루는 환원된다"(X)에 속지 말 것. 발열 도시락 = <b>산화 칼슘 + 물</b> 짝도 암기.</p>
+      </div>
+    </div>
+
+    <div class="wing">
+      <div class="wtitle">날개 노트</div>
+      <div class="term"><b>생석회(산화 칼슘)</b>물과 만나면 많은 열을 내는 흰 고체 — 발열 도시락·습기 제거제에 쓰인다.</div>
+      <div class="term"><b>흔들면 빨라지는 이유</b>공기(산소)와 닿는 면적이 넓어져 산화가 빨라진다.</div>
+      <div class="wsep"></div>
+      <div class="wtitle">한눈에 암기</div>
+      <div class="wing-pen">손난로 = 철 + 산소<br>도시락 = 산화 칼슘 + 물<br>모두 발열 반응!</div>
+    </div>
+  </div>
+  <div class="quickcheck">
+    <span class="qc-title">바로바로 체크</span>
+    <ol>
+      <li><span class="no">1</span>손난로는 철가루의 산화 반응에서 나오는 열을 이용한다. ( O , X )</li>
+      <li><span class="no">2</span>발열 도시락은 산화 칼슘과 물의 반응을 이용한다. ( O , X )</li>
+      <li><span class="no">3</span>손난로 속 철가루는 반응하면서 환원된다. ( O , X )</li>
+    </ol>
+    <div class="qc-ans">정답 1 O 2 O 3 X (산소와 결합 — 산화)</div>
+  </div>
+  <div class="folio"><span>I. 변화와 다양성</span><span class="num">64</span></div>
+</div>
+
+<!-- ═════════════ p.65 개념 04 흡열의 기술 ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag">I. 변화와 다양성</span><span class="lesson-tag">05. 화학 변화와 에너지 출입</span></div>
+  <div class="cols">
+    <div class="main">
+      <h3 class="sec"><span class="n">4</span>흡열의 기술 — 반응을 냉장고로 쓰다</h3>
+      <p class="body">흡열 반응도 도구가 된다. 운동장 구급 가방의 <b>순간 냉각 팩</b> — 겉주머니를 '똑' 꺾으면 안쪽의 물주머니가 터지면서 <b>질산 암모늄이 물과 만나 열을 흡수</b>하고, 팩은 몇 초 만에 차가워진다. 얼음 없이 만드는 얼음주머니로, 삔 발목의 부기를 가라앉히는 <b>냉찜질</b>에 바로 쓸 수 있다.</p>
+      <p class="body">부엌에도 흡열이 있다. 빵 반죽 속 <b>베이킹 소다(탄산수소 나트륨)</b>는 오븐의 열을 <b>흡수하며 분해</b>되어 이산화 탄소를 내놓고, 그 기체 방울이 빵을 부풀린다 — 열을 계속 줘야 진행되는 흡열 반응의 성질 그대로다. 그리고 지구 전체로 보면 최대의 흡열 장치는 <b>숲</b>이다. 광합성이 태양의 빛에너지를 흡수해 포도당에 저장하고, 우리는 그 저장분을 음식과 연료로 꺼내 쓴다 — 흡열(저장)과 발열(사용)의 거대한 순환이다.</p>
+
+      <figure>
+        <svg width="470" height="150" viewBox="0 0 470 150" font-family="PC Sans">
+          <g font-size="6.8">
+            <text x="235" y="13" text-anchor="middle" font-size="8.4" font-weight="800" fill="#C1521E">흡열 반응의 3대 활용</text>
+            <g transform="translate(0,22)" text-anchor="middle">
+              <g transform="translate(85,0)">
+                <rect x="-70" y="0" width="140" height="96" rx="6" fill="#EAF3F8" stroke="#A9C9DE" stroke-width="1"/>
+                <text y="15" font-size="7.4" font-weight="800" fill="#2E6690">순간 냉각 팩</text>
+                <g transform="translate(0,48)">
+                  <rect x="-24" y="-16" width="48" height="32" rx="7" fill="#BFDCEE"/>
+                  <ellipse cx="0" cy="-2" rx="12" ry="8" fill="#EAF5FC" stroke="#8FB2C9" stroke-width="0.9"/>
+                  <text y="2" font-size="5.6" fill="#2E6690">물주머니</text>
+                  <path d="M-30,-22 l6,6 M30,-22 l-6,6" stroke="#4C86B0" stroke-width="1.3"/>
+                </g>
+                <text y="82" fill="#5B6B77" font-size="6.2">질산 암모늄 + 물 → 열 흡수</text>
+                <text y="91" fill="#2E6690" font-size="6" font-weight="800">얼음 없는 얼음주머니</text>
+              </g>
+              <g transform="translate(235,0)">
+                <rect x="-70" y="0" width="140" height="96" rx="6" fill="#EAF3F8" stroke="#A9C9DE" stroke-width="1"/>
+                <text y="15" font-size="7.4" font-weight="800" fill="#2E6690">빵 굽기</text>
+                <g transform="translate(0,48)">
+                  <path d="M-24,14 q-4,-22 24,-22 q28,0 24,22 z" fill="#E0B478"/>
+                  <path d="M-16,-2 q4,-8 10,-2 M4,-6 q4,-8 10,-2" stroke="#C9955C" stroke-width="1.2" fill="none"/>
+                  <g fill="#fff" stroke="#C9955C" stroke-width="0.7">
+                    <circle cx="-8" cy="4" r="2.4"/><circle cx="6" cy="7" r="2"/><circle cx="14" cy="2" r="1.7"/>
+                  </g>
+                </g>
+                <text y="82" fill="#5B6B77" font-size="6.2">베이킹 소다가 열을 흡수·분해</text>
+                <text y="91" fill="#2E6690" font-size="6" font-weight="800">CO₂ 방울이 빵을 부풀린다</text>
+              </g>
+              <g transform="translate(385,0)">
+                <rect x="-70" y="0" width="140" height="96" rx="6" fill="#F3F7F5" stroke="#A8D5BE" stroke-width="1"/>
+                <text y="15" font-size="7.4" font-weight="800" fill="#2E7A54">숲의 광합성</text>
+                <g transform="translate(0,48)">
+                  <path d="M0,18 v-14" stroke="#7A5C3E" stroke-width="2.4"/>
+                  <circle cx="0" cy="-6" r="13" fill="#7FA86B"/>
+                  <circle cx="-11" cy="0" r="9" fill="#8FB87A"/>
+                  <circle cx="11" cy="0" r="9" fill="#8FB87A"/>
+                  <path d="M-22,-22 l5,5 M0,-28 v7 M22,-22 l-5,5" stroke="#E8940A" stroke-width="1.4"/>
+                </g>
+                <text y="82" fill="#5B6B77" font-size="6.2">빛에너지 흡수 → 포도당 저장</text>
+                <text y="91" fill="#2E7A54" font-size="6" font-weight="800">지구 최대의 흡열 장치</text>
+              </g>
+            </g>
+          </g>
+          <text x="235" y="144" text-anchor="middle" font-size="8.8" font-weight="800" fill="#E8940A">차갑게 · 부풀게 · 저장하게 — 열을 빨아들이는 반응도 훌륭한 도구다</text>
+        </svg>
+        <figcaption>그림 4 | 흡열의 기술 — 냉각 팩·빵 굽기·광합성, '열을 흡수하는 반응'의 활용</figcaption>
+      </figure>
+
+      <div class="expoint">
+        <div class="boxtitle"><span class="ico">!</span>시험엔 이렇게</div>
+        <p>냉각 팩 서술형의 뼈대 — <b>"질산 암모늄이 물과 반응(용해)하며 주위의 열을 흡수하므로 온도가 내려간다"</b>. '흡수'와 '온도 하강' 두 단어가 채점 포인트다.</p>
+      </div>
+    </div>
+
+    <div class="wing">
+      <div class="wtitle">날개 노트</div>
+      <div class="term"><b>냉찜질의 의학</b>다친 직후의 냉찜질은 혈관을 수축시켜 부기와 통증을 줄인다 — 흡열 반응이 응급 처치가 되는 순간.</div>
+      <div class="term"><b>베이킹 소다</b>탄산수소 나트륨. 열을 흡수하며 분해되어 이산화 탄소를 내놓는다.</div>
+      <div class="wsep"></div>
+      <div class="wtitle">한눈에 암기</div>
+      <div class="wing-pen">냉각 팩 = 질산 암모늄+물<br>빵 = 베이킹 소다 열분해<br>광합성 = 빛에너지 저장</div>
+    </div>
+  </div>
+  <div class="quickcheck">
+    <span class="qc-title">바로바로 체크</span>
+    <ol>
+      <li><span class="no">1</span>냉각 팩은 질산 암모늄이 물과 만나는 흡열 반응을 이용한다. ( O , X )</li>
+      <li><span class="no">2</span>탄산수소 나트륨은 열을 흡수하며 분해된다. ( O , X )</li>
+      <li><span class="no">3</span>광합성은 에너지를 방출하는 반응이다. ( O , X )</li>
+    </ol>
+    <div class="qc-ans">정답 1 O 2 O 3 X (빛에너지를 흡수·저장)</div>
+  </div>
+  <div class="folio"><span>I. 변화와 다양성</span><span class="num">65</span></div>
+</div>
+
+<!-- ═════════════ p.66 개념 05 판정법과 단원 마무리 ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag">I. 변화와 다양성</span><span class="lesson-tag">05. 화학 변화와 에너지 출입</span></div>
+  <div class="cols">
+    <div class="main">
+      <h3 class="sec"><span class="n">5</span>온도계 하나면 된다 — 판정법과 단원의 완성</h3>
+      <p class="body">발열인지 흡열인지 판정하는 도구는 결국 <b>온도계 하나</b>다. 반응 전후 <span class="u-amber">주위의 온도가 올라가면 발열, 내려가면 흡열</span>. 헷갈리면 기준을 다시 잡자 — 온도를 재는 것은 반응 자신이 아니라 <b>주위</b>(용액·손·공기)다. 손이 따뜻해졌으면 반응이 열을 내놓은 것이고, 플라스크가 차가워졌으면 반응이 열을 가져간 것이다.</p>
+      <p class="body">이것으로 I단원의 여정이 완성된다. 지질시대의 격변(01)이 생물을 골랐고(02), 그 생물과 문명을 움직인 화학 — 산소와 전자의 이동(03), H⁺와 OH⁻의 만남(04), 그리고 열의 드나듦(05)까지. <b>변화에는 물질의 얼굴과 에너지의 얼굴이 언제나 함께 있다</b> — 이 한 문장을 들고 대단원 마무리로 가자.</p>
+
+      <div class="gist" style="margin:2.8mm 0 4mm; padding:2.2mm 1.8mm 2mm;">
+        <div class="boxtitle"><span class="ico">알</span>알짜 정리 — 화학 변화와 에너지 출입 한 장 요약</div>
+        <ul>
+          <li><b>발열 반응</b>: 열 방출 → 주위 온도 <b>상승</b> — 연소·중화·금속+산·세포 호흡</li>
+          <li><b>흡열 반응</b>: 열 흡수 → 주위 온도 <b>하강</b> — 광합성·열분해·질산 암모늄+물</li>
+          <li>기술: 손난로(철 산화)·발열 도시락(산화 칼슘+물) / 냉각 팩(질산 암모늄)·빵(베이킹 소다)</li>
+          <li>판정: <b>주위의 온도 변화</b> 하나로 — 올라가면 발열, 내려가면 흡열</li>
+        </ul>
+      </div>
+
+      <div class="saem">
+        <div class="avatar">박찬<br>쌤</div>
+        <div class="bubble"><span class="pen">"시험장에서 길을 잃으면 '주위가 따뜻해졌나, 차가워졌나' 한 질문으로 돌아오자. 발열·흡열의 모든 문제는 결국 그 온도계 하나로 풀린다."</span></div>
+      </div>
+    </div>
+
+    <div class="wing">
+      <div class="wtitle">날개 노트</div>
+      <div class="term"><b>판정 기준은 '주위'</b>반응 용기 속 용액, 그것을 쥔 손, 둘레의 공기 — 온도계가 놓이는 곳이다.</div>
+      <div class="term"><b>에너지의 두 얼굴</b>화학 변화 = 물질의 변화 + 에너지의 출입. 둘은 늘 세트다.</div>
+      <div class="wsep"></div>
+      <div class="wtitle">한눈에 암기</div>
+      <div class="wing-pen">주위 온도 ↑ = 발열<br>주위 온도 ↓ = 흡열<br>온도계 하나면 판정 끝!</div>
+      <div class="wsep"></div>
+      <div class="review">
+        <div class="rv-title">앞 소단원과 연결</div>
+        <div class="term" style="margin-bottom:0;"><b>03·04와 만나기</b>연소(03의 산화)와 중화(04)가 발열 명단에, 광합성(03의 환원)이 흡열 명단에 — I단원의 화학이 여기서 합류한다.</div>
+      </div>
+    </div>
+  </div>
+  <div class="quickcheck">
+    <span class="qc-title">바로바로 체크</span>
+    <ol>
+      <li><span class="no">1</span>주위의 온도가 올라가면 발열 반응이다. ( O , X )</li>
+      <li><span class="no">2</span>에너지 출입의 판정 기준은 반응 자신의 온도다. ( O , X )</li>
+      <li><span class="no">3</span>중화 반응은 발열 반응에 속한다. ( O , X )</li>
+    </ol>
+    <div class="qc-ans">정답 1 O 2 X (주위의 온도) 3 O</div>
+  </div>
+  <div class="folio"><span>I. 변화와 다양성</span><span class="num">66</span></div>
+</div>
+
+<!-- ═════════════ p.67 자료 파헤치기 ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag">I. 변화와 다양성</span><span class="lesson-tag">05. 화학 변화와 에너지 출입</span></div>
+  <div class="lab">
+    <div class="lab-head">자료 파헤치기 <span class="tag">탐구·자료 분석</span> <span style="font-weight:600; font-size:9.5pt; margin-left:auto;">두 개의 컵 — 온도 곡선으로 읽는 에너지</span></div>
+    <div class="lab-body">
+      <h4>자료</h4>
+      <p>컵 A에는 물에 <b>산화 칼슘</b>을, 컵 B에는 물에 <b>질산 암모늄</b>을 같은 시각에 넣고, 두 컵의 온도를 시간에 따라 기록했다. 실험 전 두 컵의 물은 모두 20 ℃였다.</p>
+      <figure>
+        <svg width="430" height="120" viewBox="0 0 430 120" font-family="PC Sans">
+          <g font-size="6.8">
+            <line x1="46" y1="94" x2="400" y2="94" stroke="#5B6B77" stroke-width="1.1" marker-end="url(#arrP)"/>
+            <line x1="46" y1="94" x2="46" y2="12" stroke="#5B6B77" stroke-width="1.1" marker-end="url(#arrP)"/>
+            <text x="398" y="106" text-anchor="end" fill="#5B6B77">시간</text>
+            <text x="52" y="12" fill="#5B6B77">온도 (℃)</text>
+            <line x1="46" y1="56" x2="392" y2="56" stroke="#C9BA9B" stroke-width="0.8" stroke-dasharray="3 2.5"/>
+            <text x="40" y="59" text-anchor="end" fill="#7A6A45">20</text>
+            <path d="M60,56 q50,-34 110,-38 q60,-4 120,0 q40,3 90,10" fill="none" stroke="#C1521E" stroke-width="2"/>
+            <text x="220" y="26" text-anchor="middle" font-weight="800" fill="#C1521E">컵 A — 산화 칼슘 + 물 (온도 상승)</text>
+            <path d="M60,56 q50,26 110,29 q60,3 120,0 q40,-2 90,-7" fill="none" stroke="#4C86B0" stroke-width="2"/>
+            <text x="220" y="102" text-anchor="middle" font-weight="800" fill="#4C86B0">컵 B — 질산 암모늄 + 물 (온도 하강)</text>
+          </g>
+        </svg>
+      </figure>
+      <h4>해석의 3단계</h4>
+      <ol>
+        <li><b>기준선을 긋는다</b> — 출발점 20 ℃가 판정의 기준선이다. A는 기준선 위로(발열), B는 아래로(흡열) — 곡선의 <b>방향</b>이 첫 번째 답이다.</li>
+        <li><b>곡선의 모양을 읽는다</b> — 반응 초반에 온도 변화가 가장 가파르다(반응이 활발). 시간이 지나면 반응이 끝나고, 두 컵 모두 주위와 열을 주고받으며 서서히 20 ℃로 되돌아간다.</li>
+        <li><b>도구로 연결한다</b> — A의 원리는 발열 도시락, B의 원리는 순간 냉각 팩. 같은 그래프에서 난로와 냉장고가 함께 읽힌다.</li>
+      </ol>
+      <h4>결론</h4>
+      <p>에너지 출입은 눈에 보이지 않지만 <b>온도 곡선에는 그대로 드러난다</b>. 기준선(처음 온도) 위로 가면 발열, 아래로 가면 흡열 — 그래프 문제의 판정은 이 한 줄로 끝난다.</p>
+      <div class="expoint">
+        <div class="boxtitle"><span class="ico">!</span>시험엔 이렇게</div>
+        <p>"시간이 지나면 온도가 처음으로 되돌아오는 이유"도 출제된다 — <b>반응이 끝난 뒤 주위와 열이 오가며 온도가 같아지기 때문</b>. 반응이 계속되는 것이 아니다.</p>
+      </div>
+    </div>
+  </div>
+  <div class="folio"><span>I. 변화와 다양성</span><span class="num">67</span></div>
+</div>
+
+<!-- ═════════════ p.68 STEP 1 + STEP 2 시작 ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag">I. 변화와 다양성</span><span class="lesson-tag">05. 화학 변화와 에너지 출입 | 문제</span></div>
+  <div class="step-head"><span class="stepno">STEP 1</span><span class="steptt">개념 확인</span><span class="stepdesc">OX와 빈칸으로 개념 점검 — 막히면 알짜 정리로!</span></div>
+  <div class="qgrid">
+    <div>
+      <div class="q"><div class="qhead"><span class="qno">1</span><div class="stem">연소는 열을 방출하는 발열 반응이다. <span class="ox-answer">( O , X )</span></div></div></div>
+      <div class="q"><div class="qhead"><span class="qno">2</span><div class="stem">산과 염기의 중화 반응은 발열 반응이다. <span class="ox-answer">( O , X )</span></div></div></div>
+      <div class="q"><div class="qhead"><span class="qno">3</span><div class="stem">흡열 반응이 일어나면 주위의 온도가 올라간다. <span class="ox-answer">( O , X )</span></div></div></div>
+    </div>
+    <div>
+      <div class="q"><div class="qhead"><span class="qno">4</span><div class="stem">열을 방출해 주위의 온도를 높이는 반응을 <span class="blankline" style="min-width:12mm;"></span> 반응이라 한다.</div></div></div>
+      <div class="q"><div class="qhead"><span class="qno">5</span><div class="stem">열을 흡수해 주위의 온도를 낮추는 반응을 <span class="blankline" style="min-width:12mm;"></span> 반응이라 한다.</div></div></div>
+      <div class="q"><div class="qhead"><span class="qno">6</span><div class="stem">반응의 에너지 출입은 주위의 <span class="blankline" style="min-width:10mm;"></span> 변화로 판정한다.</div></div></div>
+    </div>
+  </div>
+  <div style="border-top:0.5mm solid var(--line); margin:2mm 0 4mm;"></div>
+  <div class="step-head s2"><span class="stepno">STEP 2</span><span class="steptt">내신 완성</span><span class="stepdesc">학교 시험 유형 그대로 — 서술형까지 한 번에</span></div>
+  <div class="q">
+    <div class="qhead"><span class="qno">7</span><div class="stem">발열 반응과 흡열 반응에 대한 설명으로 옳은 것은? <span class="difficulty">●●○</span>
+    <div class="tags">10통과2-01-05 | 개념 1·2</div></div></div>
+    <ul class="choices">
+      <li>① 연소, 중화 반응, 금속과 산의 반응은 모두 발열 반응이다.</li>
+      <li>② 발열 반응이 일어나면 주위의 온도가 내려간다.</li>
+      <li>③ 광합성은 발열 반응이다.</li>
+      <li>④ 흡열 반응은 주위로 열을 방출한다.</li>
+      <li>⑤ 화학 변화에서는 에너지 출입이 일어나지 않는다.</li>
+    </ul>
+  </div>
+  <div class="q">
+    <div class="qhead"><span class="qno">8</span><div class="stem">생활 속 발열 반응의 이용에 대한 설명으로 옳은 것은? <span class="difficulty">●●●</span>
+    <div class="tags">10통과2-01-05 | 개념 3</div></div></div>
+    <ul class="choices">
+      <li>① 손난로는 흡열 반응을 이용한 도구다.</li>
+      <li>② 발열 도시락의 산화 칼슘과 물의 반응은 흡열 반응이다.</li>
+      <li>③ 손난로 속 철가루는 반응하면서 환원된다.</li>
+      <li>④ 발열 도시락은 산화 칼슘과 물의 발열 반응으로 음식을 데운다.</li>
+      <li>⑤ 손난로는 전기 에너지를 열로 바꾸는 장치다.</li>
+    </ul>
+  </div>
+  <div class="folio"><span>I. 변화와 다양성</span><span class="num">68</span></div>
+</div>
+
+<!-- ═════════════ p.69 STEP 2 계속 ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag">I. 변화와 다양성</span><span class="lesson-tag">05. 화학 변화와 에너지 출입 | 문제</span></div>
+  <div class="q">
+    <div class="qhead"><span class="qno">9</span><div class="stem">흡열 반응에 대한 설명으로 옳은 것은? <span class="difficulty">●●●</span>
+    <div class="tags">10통과2-01-05 | 개념 2·4</div></div></div>
+    <ul class="choices">
+      <li>① 세포 호흡은 흡열 반응이다.</li>
+      <li>② 중화 반응은 흡열 반응이다.</li>
+      <li>③ 냉각 팩 속 질산 암모늄이 물에 녹으면 열을 흡수해 차가워진다.</li>
+      <li>④ 흡열 반응이 일어나면 주위의 온도가 올라간다.</li>
+      <li>⑤ 연료의 연소는 흡열 반응이다.</li>
+    </ul>
+  </div>
+  <div class="q">
+    <div class="qhead"><span class="qno">10</span><div class="stem">화학 변화에서의 에너지 출입에 대한 설명으로 옳은 것만을 고른 것은? <span class="difficulty">●●●</span>
+    <div class="tags">10통과2-01-05 | 개념 1·2</div></div></div>
+    <div class="bogi-box" style="background:#fff;">
+      (가) 손난로 속 철가루의 산화는 발열 반응이다.<br>
+      (나) 빵 반죽 속 탄산수소 나트륨은 열을 흡수하며 분해된다.<br>
+      (다) 산과 염기의 중화 반응은 흡열 반응이다.
+    </div>
+    <ul class="choices inline">
+      <li>① (가)</li><li>② (가), (나)</li><li>③ (나)</li><li>④ (가), (다)</li><li>⑤ (가), (나), (다)</li>
+    </ul>
+  </div>
+  <div class="q">
+    <div class="qhead"><span class="qno">11</span><div class="stem"><span class="badge-essay">서술형</span>순간 냉각 팩을 꺾으면 차가워지는 까닭을 <b>'흡수'와 '온도'</b>라는 말을 포함하여 서술하시오. <span class="difficulty">●●●●</span>
+    <div class="tags">10통과2-01-05 | 개념 4</div></div></div>
+    <div class="essay-lines"><div></div><div></div><div></div></div>
+  </div>
+  <div class="folio"><span>I. 변화와 다양성</span><span class="num">69</span></div>
+</div>
+
+<!-- ═════════════ p.70 STEP 3 ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag">I. 변화와 다양성</span><span class="lesson-tag">05. 화학 변화와 에너지 출입 | 문제</span></div>
+  <div class="step-head s3"><span class="stepno">STEP 3</span><span class="steptt">수능 도전</span><span class="stepdesc">2028 수능 규격 — ㄱㄴㄷ 합답형·자료 해석</span></div>
+  <div class="q">
+    <div class="qhead"><span class="qno">12</span><div class="stem"><span class="badge-data">자료</span>그림은 20 ℃의 물이 담긴 두 컵에 물질 X와 Y를 각각 넣었을 때의 온도 변화를 나타낸 것이다. X는 산화 칼슘, Y는 질산 암모늄이다. 옳은 것만을 &lt;보기&gt;에서 있는 대로 고른 것은? <span class="difficulty">[2점]</span>
+    <div class="tags">10통과2-01-05</div></div></div>
+    <figure style="margin:2mm 0 1mm 8.6mm;">
+      <svg width="280" height="92" viewBox="0 0 280 92" font-family="PC Sans">
+        <line x1="26" y1="76" x2="270" y2="76" stroke="#5B6B77" stroke-width="1.1" marker-end="url(#arrP)"/>
+        <line x1="26" y1="76" x2="26" y2="8" stroke="#5B6B77" stroke-width="1.1" marker-end="url(#arrP)"/>
+        <text x="268" y="88" text-anchor="end" font-size="6.6" fill="#5B6B77">시간</text>
+        <text x="30" y="8" font-size="6.6" fill="#5B6B77">온도</text>
+        <line x1="26" y1="44" x2="264" y2="44" stroke="#C9BA9B" stroke-width="0.7" stroke-dasharray="2.5 2"/>
+        <text x="22" y="47" text-anchor="end" font-size="6.2" fill="#7A6A45">20℃</text>
+        <path d="M38,44 q40,-26 90,-28 q60,-2 120,6" fill="none" stroke="#C1521E" stroke-width="1.9"/>
+        <text x="150" y="16" text-anchor="middle" font-size="6.6" font-weight="800" fill="#C1521E">X (산화 칼슘)</text>
+        <path d="M38,44 q40,20 90,22 q60,2 120,-4" fill="none" stroke="#4C86B0" stroke-width="1.9"/>
+        <text x="150" y="80" text-anchor="middle" font-size="6.6" font-weight="800" fill="#4C86B0">Y (질산 암모늄)</text>
+      </svg>
+    </figure>
+    <div class="bogi-box">
+      <div class="bt">보기</div>
+      ㄱ. X와 물의 반응은 발열 반응이다.<br>
+      ㄴ. Y와 물의 반응은 주위에서 열을 흡수한다.<br>
+      ㄷ. Y와 같은 반응은 발열 도시락에 이용된다.
+    </div>
+    <ul class="choices inline">
+      <li>① ㄱ</li><li>② ㄷ</li><li>③ ㄱ, ㄴ</li><li>④ ㄴ, ㄷ</li><li>⑤ ㄱ, ㄴ, ㄷ</li>
+    </ul>
+  </div>
+  <div class="q">
+    <div class="qhead"><span class="qno">13</span><div class="stem"><span class="badge-data">자료</span>다음은 에너지의 눈으로 본 두 생명 반응이다. 옳은 것만을 &lt;보기&gt;에서 있는 대로 고른 것은? <span class="difficulty">[2.5점]</span>
+    <div class="tags">10통과2-01-05</div></div></div>
+    <div class="bogi-box" style="background:#fff;">
+      (가) 광합성: 이산화 탄소 + 물 <b>→(빛에너지 흡수)→</b> 포도당 + 산소<br>
+      (나) 세포 호흡: 포도당 + 산소 → 이산화 탄소 + 물 <b>+ 에너지</b>
+    </div>
+    <div class="bogi-box">
+      <div class="bt">보기</div>
+      ㄱ. (가)는 빛에너지를 흡수하는 흡열 반응이다.<br>
+      ㄴ. (나)는 에너지를 방출하는 발열 반응이다.<br>
+      ㄷ. 순간 냉각 팩은 (나)와 같은 발열 반응을 이용한 도구다.
+    </div>
+    <ul class="choices inline">
+      <li>① ㄱ</li><li>② ㄴ</li><li>③ ㄱ, ㄷ</li><li>④ ㄱ, ㄴ</li><li>⑤ ㄱ, ㄴ, ㄷ</li>
+    </ul>
+  </div>
+  <div class="folio"><span>I. 변화와 다양성</span><span class="num">70</span></div>
+</div>
+
+<!-- ═════════════ p.71 해설 1 ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag" style="color:var(--brand);">알짜 해설</span><span class="lesson-tag">05. 화학 변화와 에너지 출입</span></div>
+  <div class="sol-head"><span class="stt">알짜 해설</span><span class="sub">전 문항 해설 + 오답 선지 분석 — 맞힌 문제도 해설로 한 번 더!</span></div>
+  <table class="anstable">
+    <tr><th>문항</th><td>1</td><td>2</td><td>3</td><td>4</td><td>5</td><td>6</td><td>7</td><td>8</td><td>9</td><td>10</td><td>11</td><td>12</td><td>13</td></tr>
+    <tr><th>정답</th><td class="a">O</td><td class="a">O</td><td class="a">X</td><td class="a">발열</td><td class="a">흡열</td><td class="a">온도</td><td class="a">①</td><td class="a">④</td><td class="a">③</td><td class="a">②</td><td class="a">서술형</td><td class="a">③</td><td class="a">④</td></tr>
+  </table>
+  <div class="solcols">
+    <div>
+      <div class="sol"><div class="shead"><span class="sno">1</span><span class="sans">O</span><span class="slink">개념 1</span></div>
+        <p>연소 = 격렬한 산화 = 대표적 발열 반응.</p></div>
+      <div class="sol"><div class="shead"><span class="sno">2</span><span class="sans">O</span><span class="slink">개념 1</span></div>
+        <p>중화열 — 04에서 온도 꼭짓점의 원인이었다.</p></div>
+      <div class="sol"><div class="shead"><span class="sno">3</span><span class="sans">X</span><span class="slink">개념 2</span></div>
+        <p>흡열은 주위의 열을 가져간다 — 온도 하강.</p></div>
+      <div class="sol"><div class="shead"><span class="sno">4</span><span class="sans">발열</span><span class="slink">개념 1</span></div>
+        <p>發熱 — 열을 내보내는 반응.</p></div>
+      <div class="sol"><div class="shead"><span class="sno">5</span><span class="sans">흡열</span><span class="slink">개념 2</span></div>
+        <p>吸熱 — 열을 빨아들이는 반응.</p></div>
+      <div class="sol"><div class="shead"><span class="sno">6</span><span class="sans">온도</span><span class="slink">개념 5</span></div>
+        <p>주위의 온도 변화 — 판정 도구는 온도계 하나.</p></div>
+    </div>
+    <div>
+      <div class="sol"><div class="shead"><span class="sno">7</span><span class="sans">①</span><span class="slink">개념 1·2</span></div>
+        <p>연소·중화·금속+산 — 발열 3인방 그대로.</p>
+        <div class="wrongbox"><div class="wt">오답 왜 틀렸나</div>
+          <p><b>②</b> 발열은 온도 상승. <b>③</b> 광합성은 흡열. <b>④</b> 흡열은 열 흡수. <b>⑤</b> 화학 변화엔 에너지 출입이 늘 함께다.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">8</span><span class="sans">④</span><span class="slink">개념 3</span></div>
+        <p>산화 칼슘 + 물 → 발열 — 불 없이 데우는 한 끼.</p>
+        <div class="wrongbox"><div class="wt">오답 왜 틀렸나</div>
+          <p><b>①</b> 손난로는 발열. <b>②</b> 발열 반응이다. <b>③</b> 철가루는 산소와 결합 — <b>산화</b>. <b>⑤</b> 전기가 아니라 화학 반응의 열이다.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">9</span><span class="sans">③</span><span class="slink">개념 2·4</span></div>
+        <p>질산 암모늄 + 물 = 열 흡수 — 냉각 팩의 심장.</p>
+        <div class="wrongbox"><div class="wt">오답 왜 틀렸나</div>
+          <p><b>①·②·⑤</b> 호흡·중화·연소는 발열. <b>④</b> 흡열은 주위 온도를 낮춘다.</p></div></div>
+    </div>
+  </div>
+  <div class="folio"><span>알짜 해설</span><span class="num">71</span></div>
+</div>
+
+<!-- ═════════════ p.72 해설 2 ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag" style="color:var(--brand);">알짜 해설</span><span class="lesson-tag">05. 화학 변화와 에너지 출입</span></div>
+  <div class="solcols">
+    <div>
+      <div class="sol"><div class="shead"><span class="sno">10</span><span class="sans">②</span><span class="slink">개념 1·2</span></div>
+        <p>(가) 철의 산화 = 발열 — 손난로. (나) 탄산수소 나트륨 열분해 = 흡열 — 빵 굽기. 둘 다 옳다.</p>
+        <div class="wrongbox"><div class="wt">오답 왜 틀렸나</div>
+          <p><b>(다)</b> 중화 반응은 중화열을 내는 <b>발열</b> 반응이다 — 04와의 연결 고리.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">11</span><span class="sans">모범 답안</span><span class="slink">개념 4</span></div>
+        <p>냉각 팩을 꺾으면 질산 암모늄이 물과 만나 반응하면서 주위의 열을 <b>흡수</b>하므로, 팩의 <b>온도</b>가 내려가 차가워진다.</p>
+        <div class="wrongbox"><div class="wt">채점 기준 (감점 포인트)</div>
+          <p>① 질산 암모늄 + 물의 반응 ② 주위의 열 흡수 ③ 온도 하강 — 세 요소를 모두 서술해야 만점.</p></div></div>
+    </div>
+    <div>
+      <div class="sol"><div class="shead"><span class="sno">12</span><span class="sans">③</span><span class="slink">개념 3·4·자료 | 2점</span></div>
+        <p><b>ㄱ (옳음)</b> X 곡선이 기준선(20 ℃) 위로 — 발열. <b>ㄴ (옳음)</b> Y 곡선이 아래로 — 흡열. <b>ㄷ (틀림)</b> Y(흡열)는 냉각 팩, 발열 도시락은 X 쪽이다.</p>
+        <div class="wrongbox"><div class="wt">함정 체크</div>
+          <p>기준선(처음 온도)을 먼저 긋고 시작 — <b>위 = 발열, 아래 = 흡열</b>, 도구 연결까지 한 번에.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">13</span><span class="sans">④</span><span class="slink">개념 1·2 | 2.5점</span></div>
+        <p><b>ㄱ (옳음)</b> 광합성 = 빛에너지 흡수 = 흡열. <b>ㄴ (옳음)</b> 호흡 = 에너지 방출 = 발열. <b>ㄷ (틀림)</b> 냉각 팩은 <b>흡열</b> 반응 이용 — 발열과 반대다.</p>
+        <div class="wrongbox"><div class="wt">함정 체크</div>
+          <p>광합성·호흡 한 쌍은 03(산화·환원)과 05(에너지)에서 두 번 출제된다 — <b>흡열·저장 vs 발열·사용</b>으로 정리해 두자.</p></div></div>
+
+      <div class="gist" style="margin-top:5mm;">
+        <div class="boxtitle"><span class="ico">알</span>이 소단원, 이것만은!</div>
+        <ul>
+          <li><b>발열</b>(주위 온도↑): 연소·중화·금속+산·호흡 — 손난로·발열 도시락</li>
+          <li><b>흡열</b>(주위 온도↓): 광합성·열분해·질산 암모늄+물 — 냉각 팩·빵 굽기</li>
+          <li>판정은 <b>주위의 온도 변화</b> 하나 — 기준선 위면 발열, 아래면 흡열</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div class="folio"><span>알짜 해설</span><span class="num">72</span></div>
+</div>
+
+<!-- ═════════════ p.73 MEMO ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag">I. 변화와 다양성</span><span class="lesson-tag">05 ▸ 대단원 마무리 전에</span></div>
+  <div class="memo-head"><span class="mt">MEMO</span><span class="ms">헷갈린 개념, 다시 틀린 문제 번호, 나만의 암기법을 남겨 두는 자리</span></div>
+  <div class="memo-area"></div>
+  <div class="memo-pen">"발열 넷(연소·중화·금속+산·호흡)과 흡열 셋(광합성·열분해·질산 암모늄)을 소리 내어 말해 보자. 막히면 62·63쪽으로! — 박찬쌤"</div>
+  <div class="folio"><span>박찬 과학 | 통합과학 2</span><span class="num">73</span></div>
+</div>
+
+</body>
+</html>
