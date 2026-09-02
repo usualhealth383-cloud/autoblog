@@ -1,0 +1,976 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<title>박찬 과학 통합과학1 — III-06 유전자에서 단백질까지</title>
+<style>
+  @font-face { font-family:'PC Sans'; src:url('file:///root/.fonts/NotoSansKR.ttf'); font-weight:100 900; }
+  @font-face { font-family:'PC Serif'; src:url('file:///root/.fonts/NotoSerifKR.ttf'); font-weight:100 900; }
+  @font-face { font-family:'PC Pen'; src:url('file:///root/.fonts/YeonSung-Regular.ttf'); font-weight:400; }
+
+  :root{
+    --brand:#0E5A6B;        /* 박찬 과학 브랜드 딥틸 */
+    --brand-lt:#E3F0F3;
+    --unit:#6B46C8;         /* II. 물질과 규칙성 단원 컬러 */
+    --unit-lt:#F2EDFB;
+    --unit-md:#CFC0EE;
+    --accent:#E8940A;       /* 알짜 앰버 */
+    --accent-lt:#FDF3E0;
+    --point:#D6455D;        /* 시험 포인트 */
+    --point-lt:#FBEBEE;
+    --ink:#22303A;
+    --sub:#5B6B77;
+    --line:#D8E0E5;
+  }
+  *{ box-sizing:border-box; margin:0; padding:0; -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+  @page{ size:210mm 275mm; margin:0; }
+  html,body{ font-family:'PC Sans',sans-serif; color:var(--ink); }
+
+  .page{ width:210mm; height:275mm; position:relative; overflow:hidden; background:#fff; page-break-after:always; padding:14mm 13mm 19mm 15mm; display:flex; flex-direction:column; }
+
+  /* ── 러닝 헤드 / 풋 ── */
+  .runhead{ display:flex; align-items:center; justify-content:space-between; border-bottom:0.35mm solid var(--unit); padding-bottom:2mm; margin-bottom:6.5mm; }
+  .runhead .unit-tag{ font-size:8.5pt; font-weight:700; color:var(--unit); letter-spacing:0.02em; }
+  .runhead .lesson-tag{ font-size:8.5pt; color:var(--sub); }
+  .folio{ position:absolute; bottom:7mm; left:0; right:0; display:flex; justify-content:space-between; padding:0 14mm 0 14mm; font-size:8pt; color:var(--sub); }
+  .folio .num{ font-weight:800; color:var(--unit); font-size:10pt; }
+
+  /* ── 본문 그리드: 본문 + 날개단 ── */
+  .cols{ display:grid; grid-template-columns:1fr 43mm; gap:8mm; flex:1; min-height:0; margin-bottom:4mm; }
+  .main{ min-width:0; }
+  .wing{ border-left:0.3mm solid var(--line); padding-left:5mm; font-size:8.2pt; color:var(--sub); line-height:1.7; }
+
+  /* ── 타이포 ── */
+  h2.lesson-title{ display:flex; align-items:baseline; gap:3.5mm; margin-bottom:2mm; }
+  h2.lesson-title .no{ background:var(--unit); color:#fff; font-size:13pt; font-weight:900; padding:1.2mm 3.2mm; border-radius:1.5mm; }
+  h2.lesson-title .tt{ font-size:16.5pt; font-weight:900; letter-spacing:-0.01em; }
+  .std-badges{ display:flex; gap:2mm; margin:2mm 0 6.5mm; }
+  .std{ font-size:7.4pt; color:var(--unit); background:none; border:0.3mm solid var(--unit-md); border-radius:5mm; padding:0.6mm 2.8mm; font-weight:600; }
+
+  h3.sec{ display:flex; align-items:baseline; gap:3mm; font-size:12.5pt; font-weight:800; margin:9mm 0 3.6mm; letter-spacing:-0.01em; }
+  h3.sec .n{ font-family:'PC Serif'; font-size:15.5pt; font-weight:900; color:var(--unit); border-bottom:0.7mm solid var(--accent); padding:0 0.8mm 0.2mm; flex:0 0 auto; line-height:1; }
+  h3.sec::after{ content:""; flex:1; border-top:0.25mm solid var(--line); align-self:center; margin-left:2mm; }
+  h3.sec:first-child{ margin-top:0; }
+
+  p.body{ font-family:'PC Serif'; font-size:9.6pt; line-height:1.92; margin-bottom:3.6mm; text-align:justify; }
+  p.body b{ font-weight:800; }
+  .kw{ font-weight:800; color:var(--unit); }
+  .u-amber{ background:#F8E9C6; font-weight:700; padding:0.15mm 0.6mm; border-radius:0.6mm; box-decoration-break:clone; -webkit-box-decoration-break:clone; }
+
+  ul.pts{ font-family:'PC Serif'; font-size:9.6pt; line-height:1.84; margin:1.5mm 0 3.5mm 1mm; list-style:none; }
+  ul.pts li{ padding-left:4.5mm; position:relative; margin-bottom:1.8mm; }
+  ul.pts li::before{ content:""; position:absolute; left:0.5mm; top:2.9mm; width:1.7mm; height:1.7mm; background:var(--accent); border-radius:50%; }
+
+  /* ── 코너 박스 ── */
+  .boxtitle{ display:inline-flex; align-items:center; gap:1.8mm; font-weight:900; font-size:9.5pt; margin-bottom:1.6mm; }
+  .boxtitle .ico{ width:5.2mm; height:5.2mm; border-radius:1.2mm; display:flex; align-items:center; justify-content:center; color:#fff; font-size:7.5pt; font-weight:900; }
+
+  .gist{ background:none; border:none; border-top:0.5mm solid var(--accent); border-bottom:0.5mm solid var(--accent); border-radius:0; padding:3.2mm 1.8mm 3mm; margin:6mm 0 5mm; }
+  .gist .boxtitle{ color:#9C6503; } .gist .ico{ background:var(--accent); }
+  .gist ul{ list-style:none; font-family:'PC Serif'; font-size:9.3pt; line-height:1.78; }
+  .gist li{ padding-left:4.2mm; position:relative; margin-bottom:1.2mm;}
+  .gist li::before{ content:"✓"; position:absolute; left:0; color:var(--accent); font-weight:900; }
+
+  .expoint{ background:none; border-left:0.5mm solid #D998A4; border-left-color:#D998A4; border-radius:0; padding:1.4mm 0 1.4mm 3.6mm; margin:4.5mm 0; }
+  .expoint .boxtitle{ color:#A9556A; font-size:8.6pt; margin-bottom:1mm;}
+  .expoint .ico{ background:none; color:#A9556A; border:0.35mm solid #D998A4; width:4.4mm; height:4.4mm; border-radius:50%; font-size:7pt; }
+  .expoint p{ font-family:'PC Serif'; font-size:8.9pt; line-height:1.7; }
+
+  .pen{ font-family:'PC Pen'; font-size:12pt; color:#B4560E; line-height:1.45; }
+  .saem{ display:flex; gap:3mm; align-items:flex-start; margin:4.5mm 0; }
+  .saem .avatar{ flex:0 0 auto; width:10.5mm; height:10.5mm; border-radius:50%; background:var(--brand); color:#fff; font-size:7pt; font-weight:800; display:flex; align-items:center; justify-content:center; line-height:1.35; letter-spacing:0.04em; text-align:center; border:0.5mm solid var(--accent); box-sizing:border-box;}
+  .saem .bubble{ background:#FFFBF0; border:0.4mm solid #EBCB9C; border-radius:3mm; padding:2.2mm 3.6mm 2mm; position:relative; }
+  .saem .bubble::before{ content:""; position:absolute; left:-1.8mm; top:3.2mm; width:3mm; height:3mm; background:#FFFBF0; border-left:0.4mm solid #EBCB9C; border-bottom:0.4mm solid #EBCB9C; transform:rotate(45deg); }
+
+  .wing .wtitle{ font-size:8pt; font-weight:900; color:var(--brand); display:flex; align-items:center; gap:1.5mm; margin:0 0 2.4mm; letter-spacing:0.05em; }
+  .wing .wtitle::before{ content:""; width:2.4mm; height:2.4mm; background:var(--accent); border-radius:50%; }
+  .wing .term{ margin-bottom:3.6mm; }
+  .wing .term b{ color:var(--ink); font-weight:800; display:block; font-size:8.5pt; margin-bottom:0.7mm;}
+  .wing .wsep{ border-top:0.3mm dashed var(--line); margin:4.5mm 0; }
+  .wing .wing-pen{ font-family:'PC Pen'; font-size:11pt; color:#B4560E; line-height:1.45; }
+
+  figure{ margin:5mm 0; }
+  figure figcaption{ font-size:8pt; color:var(--sub); text-align:center; margin-top:2mm; }
+  figure svg{ display:block; margin:0 auto; }
+
+  /* ── 비교형 그림 (2패널 + 범례) ── */
+  .fig-duo{ display:flex; align-items:stretch; gap:2.5mm; justify-content:center; }
+  .fig-duo .panel{ flex:0 0 auto; text-align:center; }
+  .fig-duo .p-title{ font-size:9pt; font-weight:900; color:var(--ink); margin-top:1.6mm; }
+  .fig-duo .p-sub{ font-size:7.8pt; color:var(--sub); line-height:1.45; margin-top:0.5mm; }
+  .fig-duo .mid{ display:flex; flex-direction:column; align-items:center; justify-content:center; gap:1mm; padding:0 1mm; }
+  .fig-duo .mid .mlab{ font-size:7.6pt; font-weight:800; color:var(--unit); text-align:center; line-height:1.3; }
+  .fig-legend{ display:flex; justify-content:center; gap:5mm; font-size:7.8pt; color:var(--ink); margin-top:1.2mm; align-items:center; }
+  .fig-legend span{ display:inline-flex; align-items:center; gap:1.4mm; }
+
+  /* ── 탐구 (자료 파헤치기) ── */
+  .lab{ border:0.5mm solid var(--brand); border-radius:2.5mm; overflow:hidden; margin-top:1mm;}
+  .lab .lab-head{ background:var(--brand); color:#fff; padding:2.2mm 4mm; font-weight:900; font-size:11pt; display:flex; align-items:center; gap:2.5mm;}
+  .lab .lab-head .tag{ font-size:7.5pt; background:rgba(255,255,255,.22); padding:0.6mm 2.4mm; border-radius:4mm; font-weight:700;}
+  .lab .lab-body{ padding:3.5mm 4mm; }
+  .lab h4{ font-size:9.6pt; font-weight:900; color:var(--brand); margin:2.5mm 0 1.4mm; }
+  .lab h4:first-child{ margin-top:0; }
+  .lab p, .lab li{ font-family:'PC Serif'; font-size:9.3pt; line-height:1.8; }
+  .lab ol{ margin-left:5mm; }
+
+  /* ── 문제부 ── */
+  .step-head{ display:flex; align-items:center; gap:3mm; margin:0 0 5mm; }
+  .step-head .stepno{ background:var(--unit); color:#fff; font-weight:900; font-size:9.5pt; padding:1.4mm 3.4mm; border-radius:1.5mm; letter-spacing:0.04em;}
+  .step-head .steptt{ font-size:12.5pt; font-weight:900; }
+  .step-head .stepdesc{ font-size:8.2pt; color:var(--sub); margin-left:auto; }
+  .step-head.s2 .stepno{ background:var(--brand); }
+  .step-head.s3 .stepno{ background:var(--point); }
+
+  .q{ margin-bottom:7.5mm; break-inside:avoid; }
+  .q .qhead{ display:flex; gap:2.4mm; align-items:flex-start; }
+  .q .qno{ flex:0 0 auto; min-width:6.2mm; height:6.2mm; border:0.45mm solid var(--unit); color:var(--unit); border-radius:50%; font-size:8.6pt; font-weight:900; line-height:1; display:flex; align-items:center; justify-content:center; padding-top:0.55mm; margin-top:0.4mm;}
+  .q .stem{ font-family:'PC Serif'; font-size:9.5pt; line-height:1.74; font-weight:500; }
+  .q .stem .difficulty{ color:#C9A227; font-size:8pt; letter-spacing:0.06em; margin-left:1.5mm;}
+  .q .tags{ margin-top:0.8mm; font-size:7pt; color:var(--sub); font-family:'PC Sans';}
+  .choices{ list-style:none; margin:2.2mm 0 0 8.6mm; font-family:'PC Serif'; font-size:9.3pt; line-height:1.85; }
+  .choices.inline{ display:flex; flex-wrap:wrap; gap:0 6mm; }
+  .bogi-box{ border:0.35mm solid #B8C2CA; border-radius:0; margin:2.5mm 0 0 8.6mm; padding:2.4mm 3.2mm; font-family:'PC Serif'; font-size:9.2pt; line-height:1.8; background:none;}
+  .bogi-box .bt{ text-align:center; font-weight:800; color:var(--sub); font-size:8.4pt; margin-bottom:0.8mm; letter-spacing:0.3em;}
+  .ox-answer{ margin-left:2mm; color:var(--sub); font-size:9pt; }
+  .blankline{ display:inline-block; min-width:14mm; border-bottom:0.4mm solid var(--ink); }
+  .qgrid{ display:grid; grid-template-columns:1fr 1fr; gap:0 9mm; }
+  .essay-lines{ margin:2mm 0 0 8.4mm; }
+  .essay-lines div{ border-bottom:0.3mm solid var(--line); height:6.2mm; }
+  .badge-essay{ display:inline-block; background:var(--point); color:#fff; font-size:7pt; font-weight:800; padding:0.4mm 2mm; border-radius:1mm; vertical-align:1pt; margin-right:1.2mm;}
+  .badge-data{ display:inline-block; background:var(--brand); color:#fff; font-size:7pt; font-weight:800; padding:0.4mm 2mm; border-radius:1mm; vertical-align:1pt; margin-right:1.2mm;}
+
+  /* ── 해설부 ── */
+  .sol-head{ display:flex; align-items:center; gap:3mm; margin-bottom:4mm;}
+  .sol-head .stt{ font-size:14.5pt; font-weight:900; color:var(--brand);}
+  .sol-head .sub{ font-size:8.5pt; color:var(--sub);}
+  .anstable{ width:100%; border-collapse:collapse; margin-bottom:4.5mm; }
+  .anstable th,.anstable td{ border:0.3mm solid var(--line); font-size:8.8pt; padding:1.4mm 0; text-align:center; }
+  .anstable th{ background:var(--brand-lt); color:var(--brand); font-weight:800; }
+  .anstable td.a{ font-weight:900; color:var(--unit); }
+  .sol{ margin-bottom:5mm; break-inside:avoid; }
+  .sol .shead{ display:flex; align-items:center; gap:2mm; margin-bottom:1.4mm;}
+  .sol .sno{ background:var(--unit); color:#fff; min-width:6mm; height:5.4mm; border-radius:1.2mm; font-size:8.6pt; font-weight:900; line-height:1; display:flex; align-items:center; justify-content:center; padding:0.5mm 1.5mm 0;}
+  .sol .sans{ font-weight:900; color:var(--unit); font-size:9.6pt;}
+  .sol .slink{ font-size:7.2pt; color:var(--sub); margin-left:auto;}
+  .sol p{ font-family:'PC Serif'; font-size:9.1pt; line-height:1.76; margin-bottom:0.8mm; }
+  .wrongbox{ background:none; border:none; border-left:0.7mm solid #E3A0AC; border-radius:0; padding:1mm 0 1mm 3mm; margin-top:2mm;}
+  .wrongbox .wt{ font-size:8pt; font-weight:900; color:var(--point); margin-bottom:0.8mm; font-family:'PC Sans';}
+  .wrongbox p{ font-family:'PC Serif'; font-size:8.6pt; line-height:1.68; margin-bottom:0.9mm;}
+  .wrongbox p:last-child{ margin-bottom:0; }
+  .solcols{ display:grid; grid-template-columns:1fr 1fr; gap:0 9mm; }
+
+  /* ── 단원 도입 (타이포그래피 중심) ── */
+  .opener{ padding:0 0 19mm; }
+  .opener-hero{ position:relative; padding:7mm 20mm 4.5mm; overflow:hidden; flex-shrink:0; }
+  .ghost-txt{ position:absolute; top:-10mm; right:6mm; font-size:118pt; font-weight:900; color:#EDF1FC; line-height:1; letter-spacing:-0.04em; }
+  .kicker{ display:flex; align-items:center; gap:4mm; position:relative; }
+  .kicker .kt{ font-size:9.5pt; font-weight:800; color:var(--unit); letter-spacing:0.24em; white-space:nowrap; }
+  .kicker::after{ content:""; flex:1; border-top:0.3mm solid var(--line); }
+  .opener-hero h1{ position:relative; font-size:36pt; font-weight:900; letter-spacing:-0.015em; margin:4mm 0 0; }
+  .opener-hero h1 .tick{ display:block; width:14mm; border-top:1.4mm solid var(--accent); margin-bottom:3.6mm; }
+  .opener-lede{ position:relative; font-family:'PC Serif'; font-size:10.2pt; font-weight:600; line-height:2.0; color:#3D4C58; max-width:138mm; margin-top:4mm; padding-left:5mm; border-left:0.8mm solid var(--accent); }
+  .opener-inner{ padding:0 20mm; }
+
+  /* ── 원소의 여정 스트립 ── */
+  .journey{ margin-top:3.5mm; }
+  .journey .j-label{ font-size:8pt; font-weight:800; color:var(--sub); letter-spacing:0.08em; margin-bottom:2.4mm; display:flex; align-items:center; gap:1.6mm;}
+  .journey .j-label::before{ content:""; width:2.4mm; height:2.4mm; background:var(--unit); border-radius:50%; }
+  .j-bar{ display:flex; align-items:center; gap:2mm; }
+  .j-chip{ flex:1; text-align:center; background:#F5F1FC; border:0.35mm solid #CFC0EE; color:#6B46C8; border-radius:1.6mm; padding:2.4mm 1mm 2mm; }
+  .j-chip .jc-t{ font-size:8.8pt; font-weight:800; display:block; }
+  .j-chip .jc-s{ font-size:6.8pt; color:var(--sub); display:block; margin-top:0.5mm; }
+  .j-chip.on{ background:var(--unit); border-color:var(--unit); }
+  .j-chip.on .jc-t{ color:#fff; }
+  .j-chip.on .jc-s{ color:#D9E2F8; }
+  .j-arrow{ flex:0 0 auto; color:#AB93E6; font-size:10pt; font-weight:900; }
+  .toc{ margin-top:5mm; }
+  .toc .toc-title{ font-size:11pt; font-weight:900; color:var(--ink); margin-bottom:3mm; display:flex; align-items:center; gap:2.5mm;}
+  .toc .toc-title::before{ content:""; width:3.4mm; height:3.4mm; background:var(--accent); border-radius:0.8mm; }
+  .toc-item{ display:flex; align-items:flex-start; gap:5mm; padding:2.8mm 6mm; border-bottom:0.3mm solid var(--line); }
+  .toc-item:first-of-type{ border-top:0.3mm solid var(--line); }
+  .toc-item.active{ background:#F5F1FC; border-left:1.2mm solid #9E85E0; }
+  .toc-item .tno{ font-family:'PC Serif'; font-weight:900; color:#9E85E0; font-size:14pt; width:10mm; line-height:1.1; flex:0 0 auto;}
+  .toc-item .tbody{ flex:1; min-width:0; }
+  .toc-item .ttt{ font-weight:800; font-size:10.5pt; letter-spacing:0.01em; display:flex; align-items:center;}
+  .toc-item .tdesc{ font-family:'PC Serif'; font-size:8.6pt; font-weight:600; color:#4A5964; margin-top:0.7mm; line-height:1.55;}
+  .toc-item .tstd{ font-size:7.2pt; color:var(--sub); flex:0 0 auto; padding-top:1.2mm;}
+  .toc-item.active .tag-now{ background:var(--accent); color:#fff; font-size:7pt; font-weight:900; border-radius:4mm; padding:0.7mm 2.6mm; margin-left:3.5mm;}
+  .toc-item .tag-done{ font-size:7.2pt; font-weight:800; color:#3E9C6E; margin-left:3.5mm; }
+  .opener-quote{ margin-top:4mm; text-align:center; font-family:'PC Serif'; font-size:9.8pt; font-weight:600; color:#4A5964; letter-spacing:0.01em; }
+  .opener-quote .who{ font-size:8pt; color:var(--sub); font-weight:400; margin-left:2.5mm; }
+  .qa-lead li .qgo{ font-family:'PC Sans'; font-size:7.4pt; font-weight:800; color:var(--unit); background:var(--unit-lt); border-radius:3mm; padding:0.5mm 2.2mm; margin-left:2mm; white-space:nowrap; vertical-align:1pt;}
+  .qa-lead{ margin-top:3.5mm; border:none; border-top:0.45mm solid var(--brand); border-bottom:0.45mm solid var(--brand); background:none; border-radius:0; padding:3mm 2mm 2.8mm; }
+  .qa-lead .qt{ font-weight:900; color:var(--brand); font-size:10.5pt; margin-bottom:2mm;}
+  .qa-lead li{ font-family:'PC Serif'; font-size:9.5pt; line-height:1.8; margin-left:5mm; }
+
+  /* ── 바로바로 체크 (개념 페이지 하단 즉석 OX) ── */
+  .quickcheck{ margin-top:auto; border-top:0.35mm dashed #C8B98F; padding-top:3mm; width:calc(100% - 51mm); }
+  .quickcheck .qc-title{ display:inline-flex; align-items:center; gap:1.6mm; font-size:8.2pt; font-weight:900; color:#9C6503; margin-bottom:1.4mm; }
+  .quickcheck .qc-title::before{ content:"✓"; color:var(--accent); font-weight:900; }
+  .quickcheck ol{ list-style:none; font-family:'PC Serif'; font-size:8.8pt; line-height:1.75; }
+  .quickcheck li{ display:flex; gap:2mm; align-items:baseline; }
+  .quickcheck li .no{ font-weight:800; color:var(--accent); flex:0 0 auto; }
+  .quickcheck .qc-ans{ margin-top:1mm; font-size:7.2pt; color:var(--sub); transform:rotate(180deg); text-align:left; }
+
+  /* ── 중학 과학 다시보기 (날개단) ── */
+  .wing .review{ background:#F6F3EC; border-radius:1.8mm; padding:2.8mm 3mm; margin-top:1mm; }
+  .wing .review .rv-title{ font-size:7.8pt; font-weight:900; color:#7A6A45; margin-bottom:1.4mm; display:flex; align-items:center; gap:1.4mm;}
+  .wing .review .rv-title::before{ content:"↺"; font-weight:900; color:#A08A55; }
+
+  /* ── MEMO 페이지 ── */
+  .memo-head{ display:flex; align-items:baseline; gap:3.5mm; margin-bottom:5mm; }
+  .memo-head .mt{ font-size:17pt; font-weight:900; color:var(--brand); letter-spacing:0.22em; }
+  .memo-head .ms{ font-size:8.6pt; color:var(--sub); }
+  .memo-area{ flex:1; border:0.4mm solid var(--line); border-radius:2.5mm;
+    background-image:linear-gradient(to bottom, transparent calc(100% - 0.3mm), #DCE4E9 0);
+    background-size:100% 9mm; background-position:0 4mm; padding:0 5mm; margin-bottom:4mm; }
+  .memo-pen{ font-family:'PC Pen'; font-size:12.5pt; color:#B4560E; text-align:right; }
+</style>
+</head>
+<body>
+
+<!-- ═════════════ p.142 소단원 도입 ═════════════ -->
+<div class="page opener">
+  <div class="opener-hero">
+    <div class="ghost-txt">06</div>
+    <div class="kicker"><span class="kt">통합과학 1 · III. 시스템과 상호작용</span></div>
+    <h1><span class="tick"></span>유전자에서 단백질까지</h1>
+    <p class="opener-lede">키, 눈동자 색, 혈액형 — 나를 나로 만드는 설계도는 세포핵 속에 있다.<br>
+    그 설계도가 '읽히고, 번역되어, 몸이 되는' 과정을 따라가 보자.</p>
+  </div>
+
+  <div class="opener-inner">
+    <div class="journey">
+      <div class="j-label">시스템의 연결 — 지금 여기</div>
+      <div class="j-bar">
+        <div class="j-chip"><span class="jc-t">지구시스템</span><span class="jc-s">다섯 권역의 교환</span></div>
+        <span class="j-arrow">→</span>
+        <div class="j-chip"><span class="jc-t">판구조론</span><span class="jc-s">움직이는 지권</span></div>
+        <span class="j-arrow">→</span>
+        <div class="j-chip"><span class="jc-t">중력과 운동</span><span class="jc-s">낙하에서 위성까지</span></div>
+        <span class="j-arrow">→</span>
+        <div class="j-chip"><span class="jc-t">운동량·충격량</span><span class="jc-s">충돌의 과학</span></div>
+        <span class="j-arrow">→</span>
+        <div class="j-chip"><span class="jc-t">생명 시스템</span><span class="jc-s">세포와 물질대사</span></div>
+        <span class="j-arrow">→</span>
+        <div class="j-chip on"><span class="jc-t">유전자</span><span class="jc-s">정보의 흐름</span></div>
+      </div>
+    </div>
+    <div class="toc">
+      <div class="toc-title">이 단원의 학습 지도</div>
+      <div class="toc-item">
+        <span class="tno">01</span>
+        <span class="tbody"><span class="ttt">지구시스템과 에너지·물질 순환<span class="tag-done">완료 ✓</span></span>
+        <span class="tdesc">기권·수권·지권·생물권·외권 — 다섯 권역이 주고받는 지구</span></span>
+        <span class="tstd">10통과1-03-01</span>
+      </div>
+      <div class="toc-item">
+        <span class="tno">02</span>
+        <span class="tbody"><span class="ttt">판구조론과 지권의 변화<span class="tag-done">완료 ✓</span></span>
+        <span class="tdesc">판 경계 3종 — 지진과 화산은 왜 그곳에서 일어나는가</span></span>
+        <span class="tstd">10통과1-03-02</span>
+      </div>
+      <div class="toc-item">
+        <span class="tno">03</span>
+        <span class="tbody"><span class="ttt">중력과 운동<span class="tag-done">완료 ✓</span></span>
+        <span class="tdesc">자유 낙하에서 인공위성까지, 중력이 만드는 운동</span></span>
+        <span class="tstd">10통과1-03-03</span>
+      </div>
+      <div class="toc-item">
+        <span class="tno">04</span>
+        <span class="tbody"><span class="ttt">운동량과 충격량<span class="tag-done">완료 ✓</span></span>
+        <span class="tdesc">에어백과 안전모의 과학 — 충돌을 다스리는 법</span></span>
+        <span class="tstd">10통과1-03-04</span>
+      </div>
+      <div class="toc-item">
+        <span class="tno">05</span>
+        <span class="tbody"><span class="ttt">생명 시스템과 화학 반응<span class="tag-done">완료 ✓</span></span>
+        <span class="tdesc">세포 속 물질대사, 효소가 일하는 방식</span></span>
+        <span class="tstd">10통과1-03-05</span>
+      </div>
+      <div class="toc-item active">
+        <span class="tno">06</span>
+        <span class="tbody"><span class="ttt">유전자에서 단백질까지<span class="tag-now">NOW</span></span>
+        <span class="tdesc">세포 내 정보의 흐름 — DNA에서 형질이 되기까지</span></span>
+        <span class="tstd">10통과1-03-06</span>
+      </div>
+    </div>
+
+    <div class="qa-lead">
+      <div class="qt">이 소단원을 끝내면 답할 수 있는 질문</div>
+      <ul>
+        <li>유전자, DNA, 염색체 — 셋은 어떻게 다를까? <span class="qgo">개념 1</span></li>
+        <li>설계도(DNA)는 핵 밖으로 못 나가는데, 단백질은 어떻게 만들어질까? <span class="qgo">개념 2·3</span></li>
+        <li>염기 네 글자로 어떻게 아미노산 스무 가지를 지정할까? <span class="qgo">개념 4</span></li>
+        <li>염기 '한 글자'가 바뀌면 몸에는 무슨 일이 생길까? <span class="qgo">개념 5</span></li>
+      </ul>
+    </div>
+
+    <div class="opener-quote">"우리가 생명의 비밀을 찾아냈다."<span class="who">— 프랜시스 크릭, 1953년 이중나선을 발견한 날의 선언</span></div>
+  </div>
+
+  <div class="folio"><span>박찬 과학 | 통합과학 1</span><span class="num">142</span></div>
+</div>
+
+<!-- ═════════════ p.143 개념 01 형질·유전자·DNA·염색체 ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag">III. 시스템과 상호작용</span><span class="lesson-tag">06. 유전자에서 단백질까지</span></div>
+  <h2 class="lesson-title"><span class="no">06</span><span class="tt">유전자에서 단백질까지</span></h2>
+  <div class="std-badges"><span class="std">성취기준 10통과1-03-06</span><span class="std">세포 내 정보의 흐름 — DNA → RNA → 단백질</span></div>
+
+  <div class="cols">
+    <div class="main">
+      <h3 class="sec"><span class="n">1</span>설계도의 주소 — 염색체, DNA, 유전자</h3>
+      <p class="body">눈동자 색, 혈액형, 귓불 모양처럼 생물이 가진 고유한 특징을 <span class="kw">형질</span>이라 한다. 형질의 정보는 세포핵 속 <span class="kw">DNA</span>에 담겨 있다. DNA는 두 가닥이 꼬인 <b>이중나선</b> 구조이고, 그 안쪽에 <span class="u-amber">아데닌(A)·구아닌(G)·사이토신(C)·타이민(T) 네 종류의 염기</span>가 줄지어 있다 — 이 <b>염기의 순서(서열)</b>가 곧 유전 정보다. 네 글자로 쓰인 생명의 문장인 셈이다.</p>
+      <p class="body">이때 주소를 정확히 잡자. DNA 전체가 하나의 설계도 책이라면, <span class="kw">유전자</span>는 그중 <b>특정 단백질 하나에 대한 정보가 담긴 부분</b> — 책 속의 한 단원이다. 하나의 DNA에는 수많은 유전자가 들어 있다. 그리고 <span class="kw">염색체</span>는 긴 DNA가 단백질과 함께 촘촘히 감겨 뭉쳐진 덩어리다. 크기로 줄 세우면 <b>염색체 ⊃ DNA ⊃ 유전자</b>가 된다.</p>
+
+      <figure>
+        <svg width="470" height="150" viewBox="0 0 470 150" font-family="PC Sans">
+          <defs>
+            <marker id="arrP" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="#6B46C8"/></marker>
+            <marker id="arrR" markerWidth="7" markerHeight="7" refX="5" refY="2.5" orient="auto"><path d="M0,0 L6,2.5 L0,5 Z" fill="#D6455D"/></marker>
+          </defs>
+          <g font-size="7.2">
+            <!-- ① 세포/핵 -->
+            <g transform="translate(64,12)">
+              <rect x="-54" y="0" width="108" height="96" rx="6" fill="#F5F1FC" stroke="#CFC0EE" stroke-width="0.9"/>
+              <ellipse cx="0" cy="38" rx="34" ry="26" fill="#fff" stroke="#9E85E0" stroke-width="1.2"/>
+              <circle cx="0" cy="38" r="14" fill="#E6DCF8" stroke="#6B46C8" stroke-width="1.2"/>
+              <text x="0" y="41" text-anchor="middle" font-size="6.4" fill="#6B46C8" font-weight="800">핵</text>
+              <text x="0" y="82" text-anchor="middle" font-weight="800">① 세포 — 핵 속에</text>
+            </g>
+            <line x1="124" y1="60" x2="140" y2="60" stroke="#9E85E0" stroke-width="1.8" marker-end="url(#arrP)"/>
+            <!-- ② 염색체 -->
+            <g transform="translate(198,12)">
+              <rect x="-54" y="0" width="108" height="96" rx="6" fill="#F5F1FC" stroke="#CFC0EE" stroke-width="0.9"/>
+              <path d="M-10,16 q-14,10 -2,24 q10,10 -2,24 q-8,10 2,18 M10,16 q14,10 2,24 q-10,10 2,24 q8,10 -2,18" stroke="#6B46C8" stroke-width="5" fill="none" stroke-linecap="round"/>
+              <text x="0" y="82" text-anchor="middle" font-weight="800">② 염색체 — DNA 뭉치</text>
+            </g>
+            <line x1="258" y1="60" x2="274" y2="60" stroke="#9E85E0" stroke-width="1.8" marker-end="url(#arrP)"/>
+            <!-- ③ DNA와 유전자 -->
+            <g transform="translate(370,12)">
+              <rect x="-92" y="0" width="184" height="96" rx="6" fill="#FDF9F0" stroke="#EBCB9C" stroke-width="0.9"/>
+              <path d="M-76,24 q20,16 40,0 q20,-16 40,0 q20,16 40,0 q10,-8 20,-4" stroke="#9E85E0" stroke-width="2.4" fill="none"/>
+              <path d="M-76,40 q20,-16 40,0 q20,16 40,0 q20,-16 40,0 q10,8 20,4" stroke="#CFC0EE" stroke-width="2.4" fill="none"/>
+              <g stroke="#B8C2CA" stroke-width="1.2">
+                <line x1="-64" y1="26" x2="-64" y2="38"/><line x1="-48" y1="30" x2="-48" y2="34"/><line x1="-20" y1="26" x2="-20" y2="38"/><line x1="4" y1="30" x2="4" y2="34"/><line x1="28" y1="26" x2="28" y2="38"/><line x1="52" y1="30" x2="52" y2="34"/>
+              </g>
+              <rect x="-30" y="18" width="60" height="30" rx="4" fill="none" stroke="#D6455D" stroke-width="1.6" stroke-dasharray="4 2.5"/>
+              <text x="0" y="62" text-anchor="middle" font-size="6.6" fill="#D6455D" font-weight="800">유전자 — 단백질 하나의 정보 구간</text>
+              <text x="0" y="82" text-anchor="middle" font-weight="800">③ DNA 이중나선 (염기 A·G·C·T)</text>
+            </g>
+          </g>
+          <text x="235" y="138" text-anchor="middle" font-size="8.8" font-weight="800" fill="#E8940A">염색체 ⊃ DNA ⊃ 유전자 — 유전 정보의 실체는 '염기의 순서'다</text>
+        </svg>
+        <figcaption>그림 1 | 설계도의 주소 체계 — 핵에서 염색체, DNA, 유전자로 확대해 들어간다</figcaption>
+      </figure>
+
+      <div class="saem">
+        <div class="avatar">박찬<br>쌤</div>
+        <div class="bubble"><span class="pen">"도서관으로 외워라 — 핵은 도서관, 염색체는 책장, DNA는 책, 유전자는 그 책의 한 단원. 시험은 늘 '누가 누구를 포함하나'를 묻는다."</span></div>
+      </div>
+    </div>
+
+    <div class="wing">
+      <div class="wtitle">날개 노트</div>
+      <div class="term"><b>염기 서열</b>DNA에서 A·G·C·T가 늘어선 순서. 이 순서가 바로 유전 정보다.</div>
+      <div class="term"><b>사람의 유전자</b>사람의 DNA에는 약 2만 개의 유전자가 들어 있다 — 단원이 2만 개인 설계도 책이다.</div>
+      <div class="wsep"></div>
+      <div class="wtitle">한눈에 암기</div>
+      <div class="wing-pen">염색체 ⊃ DNA ⊃ 유전자<br>정보 = 염기의 순서!</div>
+      <div class="wsep"></div>
+      <div class="review">
+        <div class="rv-title">중학 과학 다시보기</div>
+        <div class="term" style="margin-bottom:0;"><b>유전 (중3)</b>부모의 형질이 자손에게 전해지는 것을 배웠다 — 이제 그 정보가 '무엇으로, 어떻게' 형질이 되는지를 본다.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="folio"><span>III. 시스템과 상호작용</span><span class="num">143</span></div>
+</div>
+
+<!-- ═════════════ p.144 개념 02 생명 중심 원리 ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag">III. 시스템과 상호작용</span><span class="lesson-tag">06. 유전자에서 단백질까지</span></div>
+  <div class="cols">
+    <div class="main">
+      <h3 class="sec"><span class="n">2</span>정보의 흐름 — DNA에서 단백질까지</h3>
+      <p class="body">형질을 실제로 만들어 내는 일꾼은 <span class="kw">단백질</span>이다. 앞 소단원의 효소도, 머리카락의 케라틴도, 산소를 나르는 헤모글로빈도 전부 단백질이다. 그런데 문제가 하나 있다 — 단백질 조립 공장인 <b>리보솜은 핵 밖(세포질)에 있고, 설계도 원본인 DNA는 핵 밖으로 나가지 않는다.</b> 귀중한 원본을 공장에 들고 다닐 수는 없는 노릇이다.</p>
+      <p class="body">세포의 해법은 <b>복사본</b>이다. 핵 안에서 DNA의 유전 정보를 <span class="kw">RNA</span>라는 물질에 옮겨 적고(<span class="kw">전사</span>), 이 복사본이 핵 밖 리보솜으로 나가면 리보솜이 그 정보대로 아미노산을 연결해 단백질을 만든다(<span class="kw">번역</span>). 즉 세포 내 정보는 <span class="u-amber">DNA → (전사) → RNA → (번역) → 단백질</span> 한 방향으로 흐른다 — 이것이 생명의 중심 원리다. 그리고 만들어진 단백질이 형질을 나타낸다.</p>
+
+      <figure>
+        <svg width="470" height="152" viewBox="0 0 470 152" font-family="PC Sans">
+          <g font-size="7">
+            <!-- 핵 -->
+            <g transform="translate(110,14)">
+              <ellipse cx="0" cy="48" rx="96" ry="56" fill="#F5F1FC" stroke="#9E85E0" stroke-width="1.4"/>
+              <text x="0" y="14" text-anchor="middle" font-size="7.6" font-weight="800" fill="#6B46C8">핵 — 원본 보관소</text>
+              <path d="M-64,42 q10,8 20,0 q10,-8 20,0 M-64,58 q10,-8 20,0 q10,8 20,0" stroke="#6B46C8" stroke-width="2" fill="none"/>
+              <text x="-44" y="76" text-anchor="middle" font-size="6.6" fill="#5B6B77">DNA (이중나선)</text>
+              <g transform="translate(34,0)">
+                <rect x="-6" y="34" width="6" height="4" rx="1" fill="#D6455D"/>
+                <path d="M6,44 q12,4 24,2" stroke="#D6455D" stroke-width="2.2" fill="none"/>
+                <text x="18" y="62" text-anchor="middle" font-size="6.6" fill="#D6455D">RNA (복사본)</text>
+              </g>
+              <rect x="-38" y="88" width="76" height="14" rx="7" fill="#E8940A"/>
+              <text x="0" y="98" text-anchor="middle" fill="#fff" font-weight="900">① 전사</text>
+            </g>
+            <!-- 이동 -->
+            <line x1="212" y1="62" x2="252" y2="62" stroke="#D6455D" stroke-width="2" stroke-dasharray="4 2.5" marker-end="url(#arrR)"/>
+            <text x="232" y="52" text-anchor="middle" font-size="6.6" fill="#D6455D">RNA가 핵 밖으로</text>
+            <!-- 리보솜/세포질 -->
+            <g transform="translate(342,14)">
+              <rect x="-84" y="0" width="196" height="104" rx="8" fill="#FDF9F0" stroke="#EBCB9C" stroke-width="1.2"/>
+              <text x="14" y="16" text-anchor="middle" font-size="7.6" font-weight="800" fill="#B4560E">세포질 — 조립 공장</text>
+              <path d="M-64,58 q30,4 60,2" stroke="#D6455D" stroke-width="2.2" fill="none"/>
+              <ellipse cx="-18" cy="50" rx="16" ry="11" fill="#9E85E0"/>
+              <ellipse cx="-18" cy="62" rx="20" ry="8" fill="#6B46C8"/>
+              <text x="-18" y="82" text-anchor="middle" font-size="6.6" fill="#6B46C8">리보솜</text>
+              <g transform="translate(48,36)">
+                <circle cx="0" cy="0" r="5.5" fill="#E8940A"/><circle cx="13" cy="-4" r="5.5" fill="#5FA86A"/><circle cx="26" cy="0" r="5.5" fill="#D6455D"/><circle cx="37" cy="8" r="5.5" fill="#4A8FD0"/>
+                <path d="M0,0 L13,-4 L26,0 L37,8" stroke="#8A6B3A" stroke-width="1.4" fill="none"/>
+                <text x="18" y="26" text-anchor="middle" font-size="6.6" fill="#5B6B77">아미노산 사슬 → 단백질</text>
+              </g>
+              <rect x="-24" y="88" width="76" height="14" rx="7" fill="#E8940A"/>
+              <text x="14" y="98" text-anchor="middle" fill="#fff" font-weight="900">② 번역</text>
+            </g>
+          </g>
+          <text x="235" y="140" text-anchor="middle" font-size="8.8" font-weight="800" fill="#E8940A">DNA → (전사) → RNA → (번역) → 단백질 → 형질 — 정보는 한 방향으로 흐른다</text>
+        </svg>
+        <figcaption>그림 2 | 생명 중심 원리 — 원본(DNA)은 핵에, 복사본(RNA)이 공장(리보솜)으로 간다</figcaption>
+      </figure>
+
+      <div class="expoint">
+        <div class="boxtitle"><span class="ico">!</span>시험엔 이렇게</div>
+        <p><b>장소 바꿔치기</b>가 최다 빈출 — 전사는 <b>핵 안</b>, 번역은 <b>세포질의 리보솜</b>. "DNA가 직접 리보솜으로 간다"(X), "번역이 핵 안에서 일어난다"(X)를 반사적으로 거를 것.</p>
+      </div>
+    </div>
+
+    <div class="wing">
+      <div class="wtitle">날개 노트</div>
+      <div class="term"><b>RNA</b>DNA와 비슷하지만 한 가닥이고, 타이민(T) 대신 유라실(U)을 쓴다. 정보의 전달자다.</div>
+      <div class="term"><b>단백질이 형질을</b>멜라닌 합성 효소(단백질)가 많이 일하면 눈동자가 진해진다 — 형질의 실행자는 단백질이다.</div>
+      <div class="wsep"></div>
+      <div class="wtitle">한눈에 암기</div>
+      <div class="wing-pen">전사 = 핵 안, DNA→RNA<br>번역 = 리보솜, RNA→단백질<br>원본은 안 나간다!</div>
+    </div>
+  </div>
+  <div class="quickcheck">
+    <span class="qc-title">바로바로 체크</span>
+    <ol>
+      <li><span class="no">1</span>세포 내 유전 정보는 DNA → RNA → 단백질 순으로 전달된다. ( O , X )</li>
+      <li><span class="no">2</span>전사는 리보솜에서, 번역은 핵 안에서 일어난다. ( O , X )</li>
+      <li><span class="no">3</span>형질을 실제로 나타내는 일꾼은 단백질이다. ( O , X )</li>
+    </ol>
+    <div class="qc-ans">정답 1 O 2 X (전사는 핵, 번역은 리보솜) 3 O</div>
+  </div>
+  <div class="folio"><span>III. 시스템과 상호작용</span><span class="num">144</span></div>
+</div>
+
+<!-- ═════════════ p.145 개념 03 전사 ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag">III. 시스템과 상호작용</span><span class="lesson-tag">06. 유전자에서 단백질까지</span></div>
+  <div class="cols">
+    <div class="main">
+      <h3 class="sec"><span class="n">3</span>전사 — 원본을 옮겨 적다</h3>
+      <p class="body">DNA 이중나선의 두 가닥은 염기끼리 정해진 짝으로만 마주 본다 — <span class="u-amber">A는 T와, G는 C와</span> 결합한다(상보결합). 덕분에 한 가닥의 서열만 알면 반대 가닥은 자동으로 정해진다. <span class="kw">전사</span>는 이 성질을 이용한다. 유전자 부분의 이중나선이 살짝 풀리면, 두 가닥 중 <b>한 가닥을 틀(거푸집)로 삼아</b> 짝이 맞는 염기를 하나씩 붙여 RNA 가닥을 만들어 간다.</p>
+      <p class="body">단, RNA의 세계에는 타이민(T)이 없다. T가 설 자리에는 <span class="kw">유라실(U)</span>이 대신 들어간다 — DNA의 A를 만나면 RNA에는 U가 붙는 것이다. 예컨대 DNA 틀 가닥이 <b>T A C</b>라면 RNA에는 <b>A U G</b>가 새겨진다. 완성된 RNA는 <b>한 가닥짜리 짧은 복사본</b>이 되어 핵막의 작은 구멍을 통해 세포질로 빠져나간다 — 다음 무대는 리보솜이다.</p>
+
+      <figure>
+        <svg width="470" height="158" viewBox="0 0 470 158" font-family="PC Sans">
+          <g font-size="7.4" font-weight="800">
+            <text x="235" y="14" text-anchor="middle" font-size="8" fill="#6B46C8">DNA가 풀리고, 틀 가닥 위에 RNA가 지어진다</text>
+            <!-- 위 가닥 (풀린) -->
+            <path d="M60,44 q60,-18 120,-6" stroke="#CFC0EE" stroke-width="3" fill="none"/>
+            <text x="64" y="32" fill="#9E85E0" font-size="6.6">풀린 반대 가닥</text>
+            <!-- 틀 가닥 -->
+            <path d="M60,96 h350" stroke="#6B46C8" stroke-width="3"/>
+            <text x="60" y="116" fill="#6B46C8" font-size="6.6">DNA 틀 가닥</text>
+            <!-- 틀 염기 -->
+            <g text-anchor="middle">
+              <g fill="#6B46C8">
+                <text x="150" y="90">T</text><text x="186" y="90">A</text><text x="222" y="90">C</text><text x="258" y="90">C</text><text x="294" y="90">A</text><text x="330" y="90">T</text>
+              </g>
+              <g stroke="#B8C2CA" stroke-width="1.1">
+                <line x1="150" y1="76" x2="150" y2="62"/><line x1="186" y1="76" x2="186" y2="62"/><line x1="222" y1="76" x2="222" y2="62"/><line x1="258" y1="76" x2="258" y2="62"/><line x1="294" y1="76" x2="294" y2="62"/>
+              </g>
+              <!-- RNA -->
+              <path d="M132,52 h180" stroke="#D6455D" stroke-width="2.6"/>
+              <g fill="#D6455D">
+                <text x="150" y="46">A</text><text x="186" y="46">U</text><text x="222" y="46">G</text><text x="258" y="46">G</text><text x="294" y="46">U</text>
+              </g>
+              <text x="336" y="46" fill="#D6455D" font-size="6.8">← 만들어지는 RNA</text>
+            </g>
+            <!-- A-U 강조 -->
+            <rect x="278" y="30" width="32" height="68" rx="4" fill="none" stroke="#E8940A" stroke-width="1.4" stroke-dasharray="4 2.5"/>
+            <text x="294" y="126" text-anchor="middle" fill="#B4560E" font-size="6.8">DNA의 A ↔ RNA의 U (T 대신 U!)</text>
+            <text x="150" y="126" text-anchor="middle" fill="#5B6B77" font-size="6.8" font-weight="400">T↔A, C↔G — 짝은 자동으로 정해진다</text>
+          </g>
+          <text x="235" y="150" text-anchor="middle" font-size="8.8" font-weight="800" fill="#E8940A">전사 = 핵 안에서, DNA 한 가닥을 틀로, 한 가닥짜리 RNA 복사본을 만드는 일</text>
+        </svg>
+        <figcaption>그림 3 | 전사 — 틀 가닥 TAC···에서 RNA AUG···가 태어난다</figcaption>
+      </figure>
+
+      <div class="saem">
+        <div class="avatar">박찬<br>쌤</div>
+        <div class="bubble"><span class="pen">"전사 문제에서 실수의 9할은 U다. 'DNA의 A를 만나면 RNA엔 U' — 이 한 줄만 붙잡으면 서열 변환은 기계적으로 풀린다."</span></div>
+      </div>
+    </div>
+
+    <div class="wing">
+      <div class="wtitle">날개 노트</div>
+      <div class="term"><b>상보결합</b>A↔T(RNA에서는 U), G↔C — 정해진 짝으로만 결합하는 성질. 복사의 정확성이 여기서 나온다.</div>
+      <div class="term"><b>핵공</b>핵막에 뚫린 작은 구멍. RNA는 이 문으로 세포질에 나간다 — DNA는 커서 못 나간다.</div>
+      <div class="wsep"></div>
+      <div class="wtitle">한눈에 암기</div>
+      <div class="wing-pen">DNA: A-T, G-C<br>전사되면 A → U!<br>RNA는 한 가닥</div>
+    </div>
+  </div>
+  <div class="quickcheck">
+    <span class="qc-title">바로바로 체크</span>
+    <ol>
+      <li><span class="no">1</span>DNA에서 A는 T와, G는 C와 짝을 이룬다. ( O , X )</li>
+      <li><span class="no">2</span>RNA에는 타이민(T) 대신 유라실(U)이 들어간다. ( O , X )</li>
+      <li><span class="no">3</span>DNA 틀 가닥의 염기가 A이면 전사된 RNA의 염기는 T이다. ( O , X )</li>
+    </ol>
+    <div class="qc-ans">정답 1 O 2 O 3 X (RNA에는 U가 붙는다)</div>
+  </div>
+  <div class="folio"><span>III. 시스템과 상호작용</span><span class="num">145</span></div>
+</div>
+
+<!-- ═════════════ p.146 개념 04 번역 ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag">III. 시스템과 상호작용</span><span class="lesson-tag">06. 유전자에서 단백질까지</span></div>
+  <div class="cols">
+    <div class="main">
+      <h3 class="sec"><span class="n">4</span>번역 — 세 글자가 아미노산 하나</h3>
+      <p class="body">리보솜에 도착한 RNA의 정보는 염기 네 종류(A·G·C·U)뿐인데, 단백질의 재료인 아미노산은 <b>스무 가지</b>다. 글자 하나로 하나씩 지정하면 4가지, 두 글자씩 묶어도 4 × 4 = 16가지 — 모자란다. 그래서 생명은 <span class="u-amber">세 글자를 한 묶음</span>으로 읽는다. 4 × 4 × 4 = <b>64가지</b> 조합이면 스무 가지 아미노산을 지정하고도 남는다. 이 세 염기 묶음이 유전 암호의 단위, <span class="kw">코돈</span>이다.</p>
+      <p class="body"><span class="kw">번역</span>은 리보솜이 RNA를 붙잡고 코돈을 <b>한 칸씩 읽으며 대응하는 아미노산을 차례로 연결</b>하는 과정이다. 예를 들어 RNA 서열 AUG-GUG-CAU는 '메싸이오닌-발린-히스티딘' 세 아미노산이 된다. 이렇게 이어진 아미노산 사슬이 II단원에서 본 것처럼 <b>고유한 입체 구조로 접히면</b> 비로소 일하는 단백질이 완성된다. 염기 서열이 아미노산 서열을, 아미노산 서열이 단백질의 모양과 기능을 결정하는 것이다.</p>
+
+      <figure>
+        <svg width="470" height="150" viewBox="0 0 470 150" font-family="PC Sans">
+          <g font-size="7.2">
+            <!-- RNA 리본 -->
+            <path d="M40,96 h390" stroke="#D6455D" stroke-width="2.6"/>
+            <text x="40" y="112" fill="#D6455D" font-size="6.8" font-weight="800">RNA</text>
+            <!-- 코돈 묶음 -->
+            <g text-anchor="middle" font-weight="800" fill="#D6455D">
+              <text x="105" y="90">A U G</text><text x="205" y="90">G U G</text><text x="305" y="90">C A U</text>
+            </g>
+            <g>
+              <rect x="72" y="74" width="66" height="26" rx="4" fill="none" stroke="#E8940A" stroke-width="1.3"/>
+              <rect x="172" y="74" width="66" height="26" rx="4" fill="none" stroke="#E8940A" stroke-width="1.3"/>
+              <rect x="272" y="74" width="66" height="26" rx="4" fill="none" stroke="#E8940A" stroke-width="1.3"/>
+            </g>
+            <text x="380" y="90" font-size="6.6" fill="#B4560E" font-weight="800">← 3글자 = 코돈 1개</text>
+            <!-- 리보솜 -->
+            <g transform="translate(105,60)">
+              <ellipse cx="0" cy="-14" rx="26" ry="13" fill="#9E85E0" opacity="0.9"/>
+              <text x="0" y="-34" text-anchor="middle" font-size="6.6" fill="#6B46C8" font-weight="800">리보솜이 한 칸씩 읽는다 →</text>
+            </g>
+            <!-- 아미노산 -->
+            <g text-anchor="middle" font-weight="800">
+              <line x1="105" y1="74" x2="105" y2="40" stroke="#8A6B3A" stroke-width="1.2" stroke-dasharray="2.5 2"/>
+              <line x1="205" y1="74" x2="205" y2="40" stroke="#8A6B3A" stroke-width="1.2" stroke-dasharray="2.5 2"/>
+              <line x1="305" y1="74" x2="305" y2="40" stroke="#8A6B3A" stroke-width="1.2" stroke-dasharray="2.5 2"/>
+              <circle cx="105" cy="28" r="9" fill="#E8940A"/><text x="105" y="14" font-size="6.4" fill="#B4560E">메싸이오닌</text>
+              <circle cx="205" cy="28" r="9" fill="#5FA86A"/><text x="205" y="14" font-size="6.4" fill="#2E6B3A">발린</text>
+              <circle cx="305" cy="28" r="9" fill="#4A8FD0"/><text x="305" y="14" font-size="6.4" fill="#1E4E8C">히스티딘</text>
+              <path d="M114,28 h82 M214,28 h82" stroke="#8A6B3A" stroke-width="1.6"/>
+              <text x="392" y="32" font-size="6.6" fill="#5B6B77" font-weight="400">→ 사슬이 접혀 단백질</text>
+            </g>
+          </g>
+          <text x="235" y="140" text-anchor="middle" font-size="8.8" font-weight="800" fill="#E8940A">코돈(3염기) 1개 = 아미노산 1개 — 4³ = 64가지 조합으로 아미노산 20종을 지정한다</text>
+        </svg>
+        <figcaption>그림 4 | 번역 — 리보솜이 코돈을 읽어 아미노산을 줄줄이 잇는다</figcaption>
+      </figure>
+
+      <div class="expoint">
+        <div class="boxtitle"><span class="ico">!</span>시험엔 이렇게</div>
+        <p>계산 단골: <b>염기 수 ÷ 3 = 아미노산 수</b>. RNA 염기 12개면 아미노산 4개다. 그리고 "두 글자씩 읽으면 16가지뿐이라 부족하다"는 논리(4² &lt; 20 ≤ 4³)는 서술형으로도 나온다.</p>
+      </div>
+    </div>
+
+    <div class="wing">
+      <div class="wtitle">날개 노트</div>
+      <div class="term"><b>코돈</b>RNA에서 아미노산 하나를 지정하는 연속된 염기 3개. 유전 암호의 최소 단위다.</div>
+      <div class="term"><b>20종으로 수만 가지</b>아미노산은 20종뿐이지만 잇는 순서와 길이가 다르면 전혀 다른 단백질이 된다 — 알파벳 26자로 모든 책을 쓰듯.</div>
+      <div class="wsep"></div>
+      <div class="wtitle">한눈에 암기</div>
+      <div class="wing-pen">3염기 = 코돈 = 아미노산 1<br>4³ = 64 ≥ 20 OK!<br>염기 수 ÷ 3 = 아미노산 수</div>
+    </div>
+  </div>
+  <div class="quickcheck">
+    <span class="qc-title">바로바로 체크</span>
+    <ol>
+      <li><span class="no">1</span>RNA에서 연속된 염기 3개가 아미노산 1개를 지정한다. ( O , X )</li>
+      <li><span class="no">2</span>번역은 세포질의 리보솜에서 일어난다. ( O , X )</li>
+      <li><span class="no">3</span>RNA의 염기가 12개이면 지정되는 아미노산은 6개이다. ( O , X )</li>
+    </ol>
+    <div class="qc-ans">정답 1 O 2 O 3 X (12 ÷ 3 = 4개)</div>
+  </div>
+  <div class="folio"><span>III. 시스템과 상호작용</span><span class="num">146</span></div>
+</div>
+
+<!-- ═════════════ p.147 개념 05 유전자 이상과 형질 ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag">III. 시스템과 상호작용</span><span class="lesson-tag">06. 유전자에서 단백질까지</span></div>
+  <div class="cols">
+    <div class="main">
+      <h3 class="sec"><span class="n">5</span>한 글자의 무게 — 유전자 이상과 형질</h3>
+      <p class="body">'DNA → RNA → 단백질 → 형질'의 사슬이 정말 이어져 있다면, <b>첫 고리(염기 서열)가 바뀌면 마지막 고리(형질)도 바뀌어야</b> 한다. 실제 사례가 <span class="kw">낫 모양 적혈구 빈혈증</span>이다. 헤모글로빈 유전자의 염기 <b>단 하나</b>가 바뀌면, 그 코돈이 지정하는 아미노산이 글루탐산에서 발린으로 <b>하나</b> 바뀌고, 아미노산 서열이 달라진 헤모글로빈은 <b>다른 모양으로 접힌다</b>.</p>
+      <p class="body">변형된 헤모글로빈은 서로 엉겨 붙어 긴 막대처럼 굳고, 둥글넓적하던 적혈구를 <b>낫 모양</b>으로 찌그러뜨린다. 낫 모양 적혈구는 산소를 잘 나르지 못하고 좁은 모세혈관을 막아 빈혈과 통증을 일으킨다. 염기 한 글자의 변화가 단백질을 거쳐 몸 전체의 형질로 증폭된 것이다 — <span class="u-amber">유전자가 단백질을 통해 형질을 결정한다</span>는 사실을 이보다 선명하게 보여 주는 증거는 없다.</p>
+
+      <figure>
+        <svg width="470" height="150" viewBox="0 0 470 150" font-family="PC Sans">
+          <g font-size="6.8" font-weight="800">
+            <!-- 정상 행 -->
+            <g transform="translate(10,20)">
+              <text x="-2" y="16" font-size="7.2" fill="#2E6B3A">정상</text>
+              <rect x="34" y="0" width="70" height="24" rx="4" fill="#EAF6EC" stroke="#5FA86A"/>
+              <text x="69" y="15" text-anchor="middle" fill="#2E6B3A">··· G A G ···</text>
+              <line x1="110" y1="12" x2="130" y2="12" stroke="#5FA86A" stroke-width="1.8" marker-end="url(#arrR)"/>
+              <circle cx="152" cy="12" r="10" fill="#5FA86A"/>
+              <text x="152" y="34" text-anchor="middle" fill="#2E6B3A">글루탐산</text>
+              <line x1="172" y1="12" x2="192" y2="12" stroke="#5FA86A" stroke-width="1.8" marker-end="url(#arrR)"/>
+              <path d="M214,2 q16,0 16,10 q0,10 -16,10 q-16,0 -16,-10 q0,-10 16,-10 Z" fill="#F6C98E" stroke="#E8940A" stroke-width="1.2"/>
+              <text x="214" y="34" text-anchor="middle" fill="#B4560E">정상 헤모글로빈</text>
+              <line x1="240" y1="12" x2="260" y2="12" stroke="#5FA86A" stroke-width="1.8" marker-end="url(#arrR)"/>
+              <g transform="translate(292,12)">
+                <circle r="15" fill="#FBEBEE" stroke="#D6455D" stroke-width="1.4"/>
+                <circle r="7" fill="#fff" stroke="#E3A0AC" stroke-width="1"/>
+              </g>
+              <text x="292" y="40" text-anchor="middle" fill="#5B6B77">둥근 적혈구</text>
+              <text x="372" y="16" fill="#2E6B3A">산소 운반 원활</text>
+            </g>
+            <!-- 돌연변이 행 -->
+            <g transform="translate(10,86)">
+              <text x="-2" y="16" font-size="7.2" fill="#A9556A">이상</text>
+              <rect x="34" y="0" width="70" height="24" rx="4" fill="#FBEBEE" stroke="#D6455D"/>
+              <text x="69" y="15" text-anchor="middle" fill="#D6455D">··· G <tspan fill="#E8940A">U</tspan> G ···</text>
+              <line x1="110" y1="12" x2="130" y2="12" stroke="#D6455D" stroke-width="1.8" marker-end="url(#arrR)"/>
+              <circle cx="152" cy="12" r="10" fill="#D6455D"/>
+              <text x="152" y="34" text-anchor="middle" fill="#A9556A">발린</text>
+              <line x1="172" y1="12" x2="192" y2="12" stroke="#D6455D" stroke-width="1.8" marker-end="url(#arrR)"/>
+              <path d="M200,4 l30,4 l-4,10 l-28,2 Z" fill="#D9BE93" stroke="#A08A55" stroke-width="1.2"/>
+              <text x="214" y="34" text-anchor="middle" fill="#7A6A45">모양이 다른 헤모글로빈</text>
+              <line x1="240" y1="12" x2="260" y2="12" stroke="#D6455D" stroke-width="1.8" marker-end="url(#arrR)"/>
+              <path d="M280,24 q-4,-16 10,-22 q20,-8 26,4 q-16,2 -22,10 q-6,6 -14,8 Z" fill="#FBEBEE" stroke="#D6455D" stroke-width="1.4"/>
+              <text x="292" y="40" text-anchor="middle" fill="#A9556A">낫 모양 적혈구</text>
+              <text x="372" y="16" fill="#A9556A">빈혈·혈관 막힘</text>
+            </g>
+            <text x="235" y="66" text-anchor="middle" font-size="7.4" fill="#B4560E">염기 1개 차이 (A → U 자리) ↓ 아미노산 1개 차이 ↓ 단백질 모양 차이 ↓ 형질 차이</text>
+          </g>
+          <text x="235" y="142" text-anchor="middle" font-size="8.8" font-weight="800" fill="#E8940A">한 글자 → 한 아미노산 → 단백질 모양 → 형질 — 사슬은 정말 이어져 있다</text>
+        </svg>
+        <figcaption>그림 5 | 낫 모양 적혈구 빈혈증 — 염기 하나가 형질까지 바꾸는 전 과정</figcaption>
+      </figure>
+
+      <div class="gist">
+        <div class="boxtitle"><span class="ico">알</span>알짜 정리 — 유전자에서 단백질까지 한 장 요약</div>
+        <ul>
+          <li><b>염색체 ⊃ DNA ⊃ 유전자</b> — 정보의 실체는 염기(A·G·C·T)의 순서</li>
+          <li><b>전사</b>(핵 안, DNA→RNA, T 대신 U) → <b>번역</b>(리보솜, 코돈 3염기 = 아미노산 1개)</li>
+          <li>단백질이 형질을 만든다 — 염기 하나만 바뀌어도 형질이 달라질 수 있다 (낫 모양 적혈구)</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="wing">
+      <div class="wtitle">날개 노트</div>
+      <div class="term"><b>돌연변이</b>DNA 염기 서열에 생긴 변화. 형질에 영향이 없을 수도, 이 사례처럼 클 수도 있다.</div>
+      <div class="term"><b>단백질 접힘의 복습</b>II단원 04에서 본 대로 — 아미노산 순서가 접히는 모양을, 모양이 기능을 결정한다.</div>
+      <div class="wsep"></div>
+      <div class="wtitle">한눈에 암기</div>
+      <div class="wing-pen">염기 1개 → 아미노산 1개<br>→ 단백질 모양 → 형질!<br>낫 모양 적혈구로 기억</div>
+    </div>
+  </div>
+  <div class="quickcheck">
+    <span class="qc-title">바로바로 체크</span>
+    <ol>
+      <li><span class="no">1</span>낫 모양 적혈구 빈혈증은 염기 하나의 변화에서 비롯된다. ( O , X )</li>
+      <li><span class="no">2</span>이때 헤모글로빈의 아미노산 서열은 정상과 같다. ( O , X )</li>
+      <li><span class="no">3</span>유전자는 단백질을 통해 형질을 결정한다. ( O , X )</li>
+    </ol>
+    <div class="qc-ans">정답 1 O 2 X (글루탐산 → 발린으로 다르다) 3 O</div>
+  </div>
+  <div class="folio"><span>III. 시스템과 상호작용</span><span class="num">147</span></div>
+</div>
+
+<!-- ═════════════ p.148 자료 파헤치기 ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag">III. 시스템과 상호작용</span><span class="lesson-tag">06. 유전자에서 단백질까지</span></div>
+  <div class="lab">
+    <div class="lab-head">자료 파헤치기 <span class="tag">탐구·자료 분석</span> <span style="font-weight:600; font-size:9.5pt; margin-left:auto;">유전 암호 직접 해독하기</span></div>
+    <div class="lab-body">
+      <h4>자료</h4>
+      <p>어떤 유전자의 DNA 틀 가닥 일부가 <b>T A C – C A C – G T A</b>이다. 표는 몇 가지 코돈이 지정하는 아미노산을 나타낸 것이다.</p>
+      <figure>
+        <svg width="430" height="88" viewBox="0 0 430 88" font-family="PC Sans">
+          <g font-size="7.4">
+            <g transform="translate(10,10)" font-weight="800">
+              <rect width="196" height="64" rx="5" fill="#F5F1FC" stroke="#CFC0EE"/>
+              <text x="98" y="16" text-anchor="middle" fill="#6B46C8">DNA 틀 가닥</text>
+              <text x="98" y="36" text-anchor="middle" font-size="9.6" fill="#22303A" letter-spacing="2">TAC – CAC – GTA</text>
+              <text x="98" y="54" text-anchor="middle" font-size="6.6" fill="#5B6B77" font-weight="400">↓ 전사하면? (A↔U 주의!)</text>
+            </g>
+            <g transform="translate(224,10)">
+              <rect width="196" height="64" rx="5" fill="#FDF9F0" stroke="#EBCB9C"/>
+              <text x="98" y="15" text-anchor="middle" font-weight="800" fill="#B4560E">미니 코돈표</text>
+              <g font-size="6.8" fill="#22303A">
+                <text x="14" y="30">AUG = 메싸이오닌</text><text x="110" y="30">GUG = 발린</text>
+                <text x="14" y="43">CAU = 히스티딘</text><text x="110" y="43">GAA = 글루탐산</text>
+                <text x="14" y="56">UAC = 타이로신</text><text x="110" y="56">CAC = 히스티딘</text>
+              </g>
+            </g>
+          </g>
+        </svg>
+      </figure>
+      <h4>해석의 3단계</h4>
+      <ol>
+        <li><b>전사부터</b> — 틀 가닥의 짝을 하나씩 적는다. T→A, A→<b>U</b>(T가 아니다!), C→G. 그래서 TAC → AUG, CAC → GUG, GTA → CAU. RNA 서열은 <b>AUG – GUG – CAU</b>.</li>
+        <li><b>세 글자씩 끊는다</b> — 염기 9개 ÷ 3 = 코돈 3개 = 아미노산 3개. 끊는 위치가 밀리면 전혀 다른 답이 나오므로 처음부터 세 칸씩 반듯하게.</li>
+        <li><b>표에서 찾는다</b> — AUG = 메싸이오닌, GUG = 발린, CAU = 히스티딘. 완성된 아미노산 서열은 <b>메싸이오닌 – 발린 – 히스티딘</b>이다.</li>
+      </ol>
+      <h4>결론</h4>
+      <p>염기 서열만 주어지면 전사 규칙과 코돈표로 <b>아미노산 서열을 기계적으로 결정</b>할 수 있다 — 유전 정보가 '암호'라 불리는 이유이고, 서열이 바뀌면 답(단백질)이 바뀌는 이유다.</p>
+      <div class="expoint">
+        <div class="boxtitle"><span class="ico">!</span>시험엔 이렇게</div>
+        <p>함정은 두 곳뿐 — <b>① A의 짝을 T로 쓰는 실수(RNA는 U!) ② 코돈표를 DNA 서열로 찾는 실수(표는 RNA 기준!)</b>. 전사 먼저, 그다음 표 — 순서를 지키면 틀릴 수 없다.</p>
+      </div>
+      <h4>직접 해보기 — 나만의 암호 만들기</h4>
+      <p>세 글자 코돈처럼, 자음·모음 세 개 묶음으로 친구 이름을 암호화해 보자. 그리고 한 글자만 바꿔 친구에게 해독을 부탁해 보라 — 이름이 어떻게 '변이'되는지, 낫 모양 적혈구에서 일어난 일이 몸으로 이해된다.</p>
+    </div>
+  </div>
+  <div class="folio"><span>III. 시스템과 상호작용</span><span class="num">148</span></div>
+</div>
+
+<!-- ═════════════ p.149 STEP 1 + STEP 2 시작 ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag">III. 시스템과 상호작용</span><span class="lesson-tag">06. 유전자에서 단백질까지 | 문제</span></div>
+
+  <div class="step-head"><span class="stepno">STEP 1</span><span class="steptt">개념 확인</span><span class="stepdesc">OX와 빈칸으로 개념 점검 — 막히면 알짜 정리로!</span></div>
+  <div class="qgrid">
+    <div>
+      <div class="q"><div class="qhead"><span class="qno">1</span><div class="stem">유전자는 DNA에서 특정 단백질에 대한 정보를 담은 부분이다. <span class="ox-answer">( O , X )</span></div></div></div>
+      <div class="q"><div class="qhead"><span class="qno">2</span><div class="stem">전사는 리보솜에서, 번역은 핵 안에서 일어난다. <span class="ox-answer">( O , X )</span></div></div></div>
+      <div class="q"><div class="qhead"><span class="qno">3</span><div class="stem">유전자의 염기 서열이 바뀌어도 만들어지는 단백질은 항상 같다. <span class="ox-answer">( O , X )</span></div></div></div>
+    </div>
+    <div>
+      <div class="q"><div class="qhead"><span class="qno">4</span><div class="stem">핵 안에서 DNA의 유전 정보가 RNA로 옮겨지는 과정을 <span class="blankline" style="min-width:10mm;"></span>라고 한다.</div></div></div>
+      <div class="q"><div class="qhead"><span class="qno">5</span><div class="stem">RNA에서 연속된 염기 <span class="blankline" style="min-width:8mm;"></span>개가 아미노산 하나를 지정한다.</div></div></div>
+      <div class="q"><div class="qhead"><span class="qno">6</span><div class="stem">염기 서열이 바뀌어 단백질의 <span class="blankline" style="min-width:14mm;"></span> 서열이 달라지면 형질이 달라질 수 있다.</div></div></div>
+    </div>
+  </div>
+
+  <div style="border-top:0.5mm solid var(--line); margin:2mm 0 4mm;"></div>
+
+  <div class="step-head s2"><span class="stepno">STEP 2</span><span class="steptt">내신 완성</span><span class="stepdesc">학교 시험 유형 그대로 — 서술형까지 한 번에</span></div>
+
+  <div class="q">
+    <div class="qhead"><span class="qno">7</span><div class="stem">염색체, DNA, 유전자에 대한 설명으로 옳은 것은? <span class="difficulty">●●○</span>
+    <div class="tags">10통과1-03-06 | 개념 1</div></div></div>
+    <ul class="choices">
+      <li>① 유전자는 DNA보다 큰 단위이다.</li>
+      <li>② 염색체는 유전자보다 작은 단위이다.</li>
+      <li>③ 하나의 DNA에는 많은 수의 유전자가 들어 있다.</li>
+      <li>④ DNA의 염기는 다섯 종류이다.</li>
+      <li>⑤ 형질은 유전자와 관계없이 결정된다.</li>
+    </ul>
+  </div>
+
+  <div class="q">
+    <div class="qhead"><span class="qno">8</span><div class="stem">전사와 번역에 대한 설명으로 옳은 것은? <span class="difficulty">●●●</span>
+    <div class="tags">10통과1-03-06 | 개념 2·3</div></div></div>
+    <ul class="choices">
+      <li>① DNA는 핵 밖으로 나가 리보솜과 직접 결합한다.</li>
+      <li>② 전사는 핵 안에서 DNA를 틀로 RNA를 만드는 과정이다.</li>
+      <li>③ 번역은 핵 안에서 일어난다.</li>
+      <li>④ RNA는 DNA처럼 두 가닥의 이중나선 구조이다.</li>
+      <li>⑤ 단백질의 정보가 RNA로 옮겨지는 과정이 번역이다.</li>
+    </ul>
+  </div>
+
+  <div class="folio"><span>III. 시스템과 상호작용</span><span class="num">149</span></div>
+</div>
+
+<!-- ═════════════ p.150 STEP 2 계속 ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag">III. 시스템과 상호작용</span><span class="lesson-tag">06. 유전자에서 단백질까지 | 문제</span></div>
+
+  <div class="q">
+    <div class="qhead"><span class="qno">9</span><div class="stem"><span class="badge-data">자료</span>어떤 RNA의 염기 서열이 AUG – GUG – CAU이다. 코돈표에서 AUG는 메싸이오닌, GUG는 발린, CAU는 히스티딘을 지정할 때, 번역으로 만들어지는 아미노산 서열은? <span class="difficulty">●●●</span>
+    <div class="tags">10통과1-03-06 | 개념 4</div></div></div>
+    <ul class="choices">
+      <li>① 메싸이오닌 – 히스티딘 – 발린</li>
+      <li>② 발린 – 메싸이오닌 – 히스티딘</li>
+      <li>③ 히스티딘 – 발린 – 메싸이오닌</li>
+      <li>④ 메싸이오닌 – 발린 – 히스티딘</li>
+      <li>⑤ 발린 – 히스티딘 – 메싸이오닌</li>
+    </ul>
+  </div>
+
+  <div class="q">
+    <div class="qhead"><span class="qno">10</span><div class="stem">낫 모양 적혈구 빈혈증에 대한 설명으로 옳은 것만을 고른 것은? <span class="difficulty">●●●</span>
+    <div class="tags">10통과1-03-06 | 개념 5</div></div></div>
+    <div class="bogi-box" style="background:#fff;">
+      (가) 헤모글로빈 유전자의 염기 하나가 바뀐 것이 원인이다.<br>
+      (나) 헤모글로빈의 아미노산 서열이 정상과 다르다.<br>
+      (다) 낫 모양 적혈구는 정상 적혈구보다 산소를 더 잘 운반한다.
+    </div>
+    <ul class="choices inline">
+      <li>① (가)</li><li>② (나)</li><li>③ (가), (나)</li><li>④ (나), (다)</li><li>⑤ (가), (나), (다)</li>
+    </ul>
+  </div>
+
+  <div class="q">
+    <div class="qhead"><span class="qno">11</span><div class="stem"><span class="badge-essay">서술형</span>DNA는 핵 밖으로 나가지 않는데도 핵 밖의 리보솜에서 단백질이 만들어질 수 있다. 그 까닭을 <b>'전사'와 'RNA'</b>라는 말을 포함하여 서술하시오. <span class="difficulty">●●●●</span>
+    <div class="tags">10통과1-03-06 | 개념 2·3</div></div></div>
+    <div class="essay-lines"><div></div><div></div><div></div></div>
+  </div>
+
+  <div class="folio"><span>III. 시스템과 상호작용</span><span class="num">150</span></div>
+</div>
+
+<!-- ═════════════ p.151 STEP 3 ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag">III. 시스템과 상호작용</span><span class="lesson-tag">06. 유전자에서 단백질까지 | 문제</span></div>
+  <div class="step-head s3"><span class="stepno">STEP 3</span><span class="steptt">수능 도전</span><span class="stepdesc">2028 수능 규격 — ㄱㄴㄷ 합답형·자료 해석</span></div>
+
+  <div class="q">
+    <div class="qhead"><span class="qno">12</span><div class="stem"><span class="badge-data">자료</span>그림은 세포 내 유전 정보의 흐름을 나타낸 것이다. ㉠, ㉡은 각각 전사와 번역 중 하나이다. 옳은 것만을 &lt;보기&gt;에서 있는 대로 고른 것은? <span class="difficulty">[2점]</span>
+    <div class="tags">10통과1-03-06</div></div></div>
+    <figure style="margin:2mm 0 1mm 8.6mm;">
+      <svg width="300" height="56" viewBox="0 0 300 56" font-family="PC Sans">
+        <g font-size="8" font-weight="800" text-anchor="middle">
+          <rect x="10" y="14" width="64" height="26" rx="5" fill="#F5F1FC" stroke="#9E85E0"/><text x="42" y="31" fill="#6B46C8">DNA</text>
+          <line x1="80" y1="27" x2="112" y2="27" stroke="#5B6B77" stroke-width="1.6" marker-end="url(#arrP)"/><text x="96" y="18" font-size="6.8" fill="#E8940A">㉠</text>
+          <rect x="118" y="14" width="64" height="26" rx="5" fill="#FBEBEE" stroke="#D6455D"/><text x="150" y="31" fill="#D6455D">RNA</text>
+          <line x1="188" y1="27" x2="220" y2="27" stroke="#5B6B77" stroke-width="1.6" marker-end="url(#arrP)"/><text x="204" y="18" font-size="6.8" fill="#E8940A">㉡</text>
+          <rect x="226" y="14" width="64" height="26" rx="5" fill="#EAF6EC" stroke="#5FA86A"/><text x="258" y="31" fill="#2E6B3A">단백질</text>
+        </g>
+      </svg>
+    </figure>
+    <div class="bogi-box">
+      <div class="bt">보기</div>
+      ㄱ. ㉠은 전사이며, 핵 안에서 일어난다.<br>
+      ㄴ. ㉡은 번역이며, 리보솜에서 일어난다.<br>
+      ㄷ. 유전 정보는 단백질에서 DNA 방향으로도 일상적으로 전달된다.
+    </div>
+    <ul class="choices inline">
+      <li>① ㄱ</li><li>② ㄴ</li><li>③ ㄷ</li><li>④ ㄱ, ㄴ</li><li>⑤ ㄱ, ㄴ, ㄷ</li>
+    </ul>
+  </div>
+
+  <div class="q">
+    <div class="qhead"><span class="qno">13</span><div class="stem"><span class="badge-data">자료</span>표는 정상 헤모글로빈과 낫 모양 적혈구 빈혈증 환자의 헤모글로빈 RNA 일부와 그 위치의 아미노산을 비교한 것이다. 옳은 것만을 &lt;보기&gt;에서 있는 대로 고른 것은? <span class="difficulty">[2.5점]</span>
+    <div class="tags">10통과1-03-06</div></div></div>
+    <div class="bogi-box" style="background:#fff; margin-bottom:2mm;">
+      정상: ··· G A A ··· → 글루탐산 / 환자: ··· G <b>U</b> A ··· → 발린
+    </div>
+    <div class="bogi-box">
+      <div class="bt">보기</div>
+      ㄱ. 두 RNA 서열은 염기 하나만 다르다.<br>
+      ㄴ. 염기 하나의 차이가 아미노산 하나의 차이를 만들었다.<br>
+      ㄷ. 아미노산이 하나 바뀌어도 단백질의 모양과 기능은 변하지 않는다.
+    </div>
+    <ul class="choices inline">
+      <li>① ㄱ</li><li>② ㄷ</li><li>③ ㄱ, ㄴ</li><li>④ ㄴ, ㄷ</li><li>⑤ ㄱ, ㄴ, ㄷ</li>
+    </ul>
+  </div>
+
+  <div class="folio"><span>III. 시스템과 상호작용</span><span class="num">151</span></div>
+</div>
+
+<!-- ═════════════ p.152 해설 1 ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag" style="color:var(--brand);">알짜 해설</span><span class="lesson-tag">06. 유전자에서 단백질까지</span></div>
+  <div class="sol-head"><span class="stt">알짜 해설</span><span class="sub">전 문항 해설 + 오답 선지 분석 — 맞힌 문제도 해설로 한 번 더!</span></div>
+
+  <table class="anstable">
+    <tr><th>문항</th><td>1</td><td>2</td><td>3</td><td>4</td><td>5</td><td>6</td><td>7</td><td>8</td><td>9</td><td>10</td><td>11</td><td>12</td><td>13</td></tr>
+    <tr><th>정답</th><td class="a">O</td><td class="a">X</td><td class="a">X</td><td class="a">전사</td><td class="a">3</td><td class="a">아미노산</td><td class="a">③</td><td class="a">②</td><td class="a">④</td><td class="a">③</td><td class="a">서술형</td><td class="a">④</td><td class="a">③</td></tr>
+  </table>
+
+  <div class="solcols">
+    <div>
+      <div class="sol"><div class="shead"><span class="sno">1</span><span class="sans">O</span><span class="slink">개념 1</span></div>
+        <p>유전자 = DNA 속 '단백질 하나에 대한 정보 구간'. 책 속 한 단원이다.</p></div>
+      <div class="sol"><div class="shead"><span class="sno">2</span><span class="sans">X</span><span class="slink">개념 2</span></div>
+        <p>반대로 적었다 — 전사는 핵 안, 번역은 세포질의 리보솜에서.</p></div>
+      <div class="sol"><div class="shead"><span class="sno">3</span><span class="sans">X</span><span class="slink">개념 5</span></div>
+        <p>염기 서열이 바뀌면 아미노산 서열이 바뀌어 다른 단백질이 될 수 있다.</p></div>
+      <div class="sol"><div class="shead"><span class="sno">4</span><span class="sans">전사</span><span class="slink">개념 3</span></div>
+        <p>DNA → RNA 복사가 전사, RNA → 단백질 조립이 번역.</p></div>
+      <div class="sol"><div class="shead"><span class="sno">5</span><span class="sans">3</span><span class="slink">개념 4</span></div>
+        <p>3염기 = 코돈 1개 = 아미노산 1개. 4³ = 64가지로 20종을 지정한다.</p></div>
+      <div class="sol"><div class="shead"><span class="sno">6</span><span class="sans">아미노산</span><span class="slink">개념 5</span></div>
+        <p>염기 → 아미노산 → 단백질 모양 → 형질의 사슬을 기억하라.</p></div>
+    </div>
+    <div>
+      <div class="sol"><div class="shead"><span class="sno">7</span><span class="sans">③</span><span class="slink">개념 1</span></div>
+        <p>하나의 DNA에는 유전자가 수없이 많다 — 사람은 약 2만 개다.</p>
+        <div class="wrongbox"><div class="wt">오답 왜 틀렸나</div>
+          <p><b>①·②</b> 크기 순서는 염색체 ⊃ DNA ⊃ 유전자. <b>④</b> 염기는 A·G·C·T 네 종류. <b>⑤</b> 형질은 유전자가 단백질을 통해 결정한다.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">8</span><span class="sans">②</span><span class="slink">개념 2·3</span></div>
+        <p>전사의 정의 그대로 — 핵 안에서, DNA 한 가닥을 틀로, RNA를 만든다.</p>
+        <div class="wrongbox"><div class="wt">오답 왜 틀렸나</div>
+          <p><b>①</b> DNA는 핵 밖으로 나가지 않는다(RNA가 나간다). <b>③</b> 번역은 리보솜에서. <b>④</b> RNA는 한 가닥. <b>⑤</b> 번역은 RNA → 단백질 방향이다.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">9</span><span class="sans">④</span><span class="slink">개념 4</span></div>
+        <p>코돈 순서대로 AUG(메싸이오닌) → GUG(발린) → CAU(히스티딘).</p>
+        <div class="wrongbox"><div class="wt">오답 왜 틀렸나</div>
+          <p>나머지는 순서를 섞은 것 — 번역은 코돈이 <b>놓인 순서 그대로</b> 아미노산을 잇는다. 순서가 곧 정보다.</p></div></div>
+    </div>
+  </div>
+
+  <div class="folio"><span>알짜 해설</span><span class="num">152</span></div>
+</div>
+
+<!-- ═════════════ p.153 해설 2 ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag" style="color:var(--brand);">알짜 해설</span><span class="lesson-tag">06. 유전자에서 단백질까지</span></div>
+  <div class="solcols">
+    <div>
+      <div class="sol"><div class="shead"><span class="sno">10</span><span class="sans">③</span><span class="slink">개념 5</span></div>
+        <p>(가) 염기 하나의 변화가 원인, (나) 글루탐산이 발린으로 바뀌어 서열이 다르다 — 둘 다 옳다.</p>
+        <div class="wrongbox"><div class="wt">오답 왜 틀렸나</div>
+          <p><b>(다)</b> 낫 모양 적혈구는 산소 운반 능력이 떨어지고 모세혈관을 막는다 — '다르다'가 '낫다'는 아니다.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">11</span><span class="sans">모범 답안</span><span class="slink">개념 2·3</span></div>
+        <p>핵 안에서 DNA의 유전 정보를 <b>전사</b>하여 <b>RNA</b>라는 복사본을 만들고, 이 RNA가 핵 밖으로 나가 리보솜에 유전 정보를 전달하기 때문이다. 따라서 DNA 원본이 나가지 않아도 리보솜은 RNA의 정보대로 단백질을 만들 수 있다.</p>
+        <div class="wrongbox"><div class="wt">채점 기준 (감점 포인트)</div>
+          <p>① 핵 안에서 전사가 일어남 ② RNA가 정보의 복사본으로 핵 밖으로 나감 ③ 리보솜이 RNA의 정보로 단백질을 합성함 — 세 요소 모두 서술해야 만점.</p></div></div>
+    </div>
+    <div>
+      <div class="sol"><div class="shead"><span class="sno">12</span><span class="sans">④</span><span class="slink">개념 2 | 2점</span></div>
+        <p><b>ㄱ (옳음)</b> DNA → RNA가 전사, 핵 안의 일. <b>ㄴ (옳음)</b> RNA → 단백질이 번역, 리보솜의 일. <b>ㄷ (틀림)</b> 세포 내 정보는 DNA → RNA → 단백질 한 방향으로 흐른다.</p>
+        <div class="wrongbox"><div class="wt">함정 체크</div>
+          <p>㉠·㉡ 이름은 맞히고 '장소'에서 틀리는 경우가 많다 — 이름과 장소를 한 세트로 외워라.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">13</span><span class="sans">③</span><span class="slink">개념 5 | 2.5점</span></div>
+        <p><b>ㄱ (옳음)</b> GAA와 GUA — 가운데 염기 하나(A→U 자리)만 다르다. <b>ㄴ (옳음)</b> 그 결과 글루탐산이 발린으로 — 코돈 하나가 아미노산 하나를 지정하니까. <b>ㄷ (틀림)</b> 아미노산 하나로도 접히는 모양이 달라져 기능이 크게 변한다 — 그것이 이 병의 전부다.</p>
+        <div class="wrongbox"><div class="wt">함정 체크</div>
+          <p>'겨우 하나쯤'이라는 직관을 버려라 — 서열의 세계에서는 <b>한 글자가 형질을 바꾼다.</b></p></div></div>
+
+      <div class="gist" style="margin-top:5mm;">
+        <div class="boxtitle"><span class="ico">알</span>이 소단원, 이것만은!</div>
+        <ul>
+          <li><b>염색체 ⊃ DNA ⊃ 유전자</b> — 정보 = 염기 서열 (A·G·C·T)</li>
+          <li><b>전사</b>(핵, T 대신 U) → <b>번역</b>(리보솜, 코돈 3염기 = 아미노산 1개)</li>
+          <li>염기 하나 → 아미노산 하나 → 단백질 모양 → <b>형질</b> (낫 모양 적혈구가 증거)</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div class="folio"><span>알짜 해설</span><span class="num">153</span></div>
+</div>
+
+<!-- ═════════════ p.154 MEMO ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag">III. 시스템과 상호작용</span><span class="lesson-tag">III단원 완주 — 통합과학 1 마무리</span></div>
+  <div class="memo-head"><span class="mt">MEMO</span><span class="ms">헷갈린 개념, 다시 틀린 문제 번호, 나만의 암기법을 남겨 두는 자리</span></div>
+  <div class="memo-area"></div>
+  <div class="memo-pen">"III단원 완주! 지구시스템부터 유전자까지 — '시스템'이라는 한 단어로 여섯 소단원을 이어서 설명해 보자. 막히는 고리가 네 약점이다. — 박찬쌤"</div>
+  <div class="folio"><span>박찬 과학 | 통합과학 1</span><span class="num">154</span></div>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,1001 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<title>박찬 과학 통합과학1 — III-05 생명 시스템과 화학 반응</title>
+<style>
+  @font-face { font-family:'PC Sans'; src:url('file:///root/.fonts/NotoSansKR.ttf'); font-weight:100 900; }
+  @font-face { font-family:'PC Serif'; src:url('file:///root/.fonts/NotoSerifKR.ttf'); font-weight:100 900; }
+  @font-face { font-family:'PC Pen'; src:url('file:///root/.fonts/YeonSung-Regular.ttf'); font-weight:400; }
+
+  :root{
+    --brand:#0E5A6B;        /* 박찬 과학 브랜드 딥틸 */
+    --brand-lt:#E3F0F3;
+    --unit:#6B46C8;         /* II. 물질과 규칙성 단원 컬러 */
+    --unit-lt:#F2EDFB;
+    --unit-md:#CFC0EE;
+    --accent:#E8940A;       /* 알짜 앰버 */
+    --accent-lt:#FDF3E0;
+    --point:#D6455D;        /* 시험 포인트 */
+    --point-lt:#FBEBEE;
+    --ink:#22303A;
+    --sub:#5B6B77;
+    --line:#D8E0E5;
+  }
+  *{ box-sizing:border-box; margin:0; padding:0; -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+  @page{ size:210mm 275mm; margin:0; }
+  html,body{ font-family:'PC Sans',sans-serif; color:var(--ink); }
+
+  .page{ width:210mm; height:275mm; position:relative; overflow:hidden; background:#fff; page-break-after:always; padding:14mm 13mm 19mm 15mm; display:flex; flex-direction:column; }
+
+  /* ── 러닝 헤드 / 풋 ── */
+  .runhead{ display:flex; align-items:center; justify-content:space-between; border-bottom:0.35mm solid var(--unit); padding-bottom:2mm; margin-bottom:6.5mm; }
+  .runhead .unit-tag{ font-size:8.5pt; font-weight:700; color:var(--unit); letter-spacing:0.02em; }
+  .runhead .lesson-tag{ font-size:8.5pt; color:var(--sub); }
+  .folio{ position:absolute; bottom:7mm; left:0; right:0; display:flex; justify-content:space-between; padding:0 14mm 0 14mm; font-size:8pt; color:var(--sub); }
+  .folio .num{ font-weight:800; color:var(--unit); font-size:10pt; }
+
+  /* ── 본문 그리드: 본문 + 날개단 ── */
+  .cols{ display:grid; grid-template-columns:1fr 43mm; gap:8mm; flex:1; min-height:0; margin-bottom:4mm; }
+  .main{ min-width:0; }
+  .wing{ border-left:0.3mm solid var(--line); padding-left:5mm; font-size:8.2pt; color:var(--sub); line-height:1.7; }
+
+  /* ── 타이포 ── */
+  h2.lesson-title{ display:flex; align-items:baseline; gap:3.5mm; margin-bottom:2mm; }
+  h2.lesson-title .no{ background:var(--unit); color:#fff; font-size:13pt; font-weight:900; padding:1.2mm 3.2mm; border-radius:1.5mm; }
+  h2.lesson-title .tt{ font-size:16.5pt; font-weight:900; letter-spacing:-0.01em; }
+  .std-badges{ display:flex; gap:2mm; margin:2mm 0 6.5mm; }
+  .std{ font-size:7.4pt; color:var(--unit); background:none; border:0.3mm solid var(--unit-md); border-radius:5mm; padding:0.6mm 2.8mm; font-weight:600; }
+
+  h3.sec{ display:flex; align-items:baseline; gap:3mm; font-size:12.5pt; font-weight:800; margin:9mm 0 3.6mm; letter-spacing:-0.01em; }
+  h3.sec .n{ font-family:'PC Serif'; font-size:15.5pt; font-weight:900; color:var(--unit); border-bottom:0.7mm solid var(--accent); padding:0 0.8mm 0.2mm; flex:0 0 auto; line-height:1; }
+  h3.sec::after{ content:""; flex:1; border-top:0.25mm solid var(--line); align-self:center; margin-left:2mm; }
+  h3.sec:first-child{ margin-top:0; }
+
+  p.body{ font-family:'PC Serif'; font-size:9.6pt; line-height:1.92; margin-bottom:3.6mm; text-align:justify; }
+  p.body b{ font-weight:800; }
+  .kw{ font-weight:800; color:var(--unit); }
+  .u-amber{ background:#F8E9C6; font-weight:700; padding:0.15mm 0.6mm; border-radius:0.6mm; box-decoration-break:clone; -webkit-box-decoration-break:clone; }
+
+  ul.pts{ font-family:'PC Serif'; font-size:9.6pt; line-height:1.84; margin:1.5mm 0 3.5mm 1mm; list-style:none; }
+  ul.pts li{ padding-left:4.5mm; position:relative; margin-bottom:1.8mm; }
+  ul.pts li::before{ content:""; position:absolute; left:0.5mm; top:2.9mm; width:1.7mm; height:1.7mm; background:var(--accent); border-radius:50%; }
+
+  /* ── 코너 박스 ── */
+  .boxtitle{ display:inline-flex; align-items:center; gap:1.8mm; font-weight:900; font-size:9.5pt; margin-bottom:1.6mm; }
+  .boxtitle .ico{ width:5.2mm; height:5.2mm; border-radius:1.2mm; display:flex; align-items:center; justify-content:center; color:#fff; font-size:7.5pt; font-weight:900; }
+
+  .gist{ background:none; border:none; border-top:0.5mm solid var(--accent); border-bottom:0.5mm solid var(--accent); border-radius:0; padding:3.2mm 1.8mm 3mm; margin:6mm 0 5mm; }
+  .gist .boxtitle{ color:#9C6503; } .gist .ico{ background:var(--accent); }
+  .gist ul{ list-style:none; font-family:'PC Serif'; font-size:9.3pt; line-height:1.78; }
+  .gist li{ padding-left:4.2mm; position:relative; margin-bottom:1.2mm;}
+  .gist li::before{ content:"✓"; position:absolute; left:0; color:var(--accent); font-weight:900; }
+
+  .expoint{ background:none; border-left:0.5mm solid #D998A4; border-left-color:#D998A4; border-radius:0; padding:1.4mm 0 1.4mm 3.6mm; margin:4.5mm 0; }
+  .expoint .boxtitle{ color:#A9556A; font-size:8.6pt; margin-bottom:1mm;}
+  .expoint .ico{ background:none; color:#A9556A; border:0.35mm solid #D998A4; width:4.4mm; height:4.4mm; border-radius:50%; font-size:7pt; }
+  .expoint p{ font-family:'PC Serif'; font-size:8.9pt; line-height:1.7; }
+
+  .pen{ font-family:'PC Pen'; font-size:12pt; color:#B4560E; line-height:1.45; }
+  .saem{ display:flex; gap:3mm; align-items:flex-start; margin:4.5mm 0; }
+  .saem .avatar{ flex:0 0 auto; width:10.5mm; height:10.5mm; border-radius:50%; background:var(--brand); color:#fff; font-size:7pt; font-weight:800; display:flex; align-items:center; justify-content:center; line-height:1.35; letter-spacing:0.04em; text-align:center; border:0.5mm solid var(--accent); box-sizing:border-box;}
+  .saem .bubble{ background:#FFFBF0; border:0.4mm solid #EBCB9C; border-radius:3mm; padding:2.2mm 3.6mm 2mm; position:relative; }
+  .saem .bubble::before{ content:""; position:absolute; left:-1.8mm; top:3.2mm; width:3mm; height:3mm; background:#FFFBF0; border-left:0.4mm solid #EBCB9C; border-bottom:0.4mm solid #EBCB9C; transform:rotate(45deg); }
+
+  .wing .wtitle{ font-size:8pt; font-weight:900; color:var(--brand); display:flex; align-items:center; gap:1.5mm; margin:0 0 2.4mm; letter-spacing:0.05em; }
+  .wing .wtitle::before{ content:""; width:2.4mm; height:2.4mm; background:var(--accent); border-radius:50%; }
+  .wing .term{ margin-bottom:3.6mm; }
+  .wing .term b{ color:var(--ink); font-weight:800; display:block; font-size:8.5pt; margin-bottom:0.7mm;}
+  .wing .wsep{ border-top:0.3mm dashed var(--line); margin:4.5mm 0; }
+  .wing .wing-pen{ font-family:'PC Pen'; font-size:11pt; color:#B4560E; line-height:1.45; }
+
+  figure{ margin:5mm 0; }
+  figure figcaption{ font-size:8pt; color:var(--sub); text-align:center; margin-top:2mm; }
+  figure svg{ display:block; margin:0 auto; }
+
+  /* ── 비교형 그림 (2패널 + 범례) ── */
+  .fig-duo{ display:flex; align-items:stretch; gap:2.5mm; justify-content:center; }
+  .fig-duo .panel{ flex:0 0 auto; text-align:center; }
+  .fig-duo .p-title{ font-size:9pt; font-weight:900; color:var(--ink); margin-top:1.6mm; }
+  .fig-duo .p-sub{ font-size:7.8pt; color:var(--sub); line-height:1.45; margin-top:0.5mm; }
+  .fig-duo .mid{ display:flex; flex-direction:column; align-items:center; justify-content:center; gap:1mm; padding:0 1mm; }
+  .fig-duo .mid .mlab{ font-size:7.6pt; font-weight:800; color:var(--unit); text-align:center; line-height:1.3; }
+  .fig-legend{ display:flex; justify-content:center; gap:5mm; font-size:7.8pt; color:var(--ink); margin-top:1.2mm; align-items:center; }
+  .fig-legend span{ display:inline-flex; align-items:center; gap:1.4mm; }
+
+  /* ── 탐구 (자료 파헤치기) ── */
+  .lab{ border:0.5mm solid var(--brand); border-radius:2.5mm; overflow:hidden; margin-top:1mm;}
+  .lab .lab-head{ background:var(--brand); color:#fff; padding:2.2mm 4mm; font-weight:900; font-size:11pt; display:flex; align-items:center; gap:2.5mm;}
+  .lab .lab-head .tag{ font-size:7.5pt; background:rgba(255,255,255,.22); padding:0.6mm 2.4mm; border-radius:4mm; font-weight:700;}
+  .lab .lab-body{ padding:3.5mm 4mm; }
+  .lab h4{ font-size:9.6pt; font-weight:900; color:var(--brand); margin:2.5mm 0 1.4mm; }
+  .lab h4:first-child{ margin-top:0; }
+  .lab p, .lab li{ font-family:'PC Serif'; font-size:9.3pt; line-height:1.8; }
+  .lab ol{ margin-left:5mm; }
+
+  /* ── 문제부 ── */
+  .step-head{ display:flex; align-items:center; gap:3mm; margin:0 0 5mm; }
+  .step-head .stepno{ background:var(--unit); color:#fff; font-weight:900; font-size:9.5pt; padding:1.4mm 3.4mm; border-radius:1.5mm; letter-spacing:0.04em;}
+  .step-head .steptt{ font-size:12.5pt; font-weight:900; }
+  .step-head .stepdesc{ font-size:8.2pt; color:var(--sub); margin-left:auto; }
+  .step-head.s2 .stepno{ background:var(--brand); }
+  .step-head.s3 .stepno{ background:var(--point); }
+
+  .q{ margin-bottom:7.5mm; break-inside:avoid; }
+  .q .qhead{ display:flex; gap:2.4mm; align-items:flex-start; }
+  .q .qno{ flex:0 0 auto; min-width:6.2mm; height:6.2mm; border:0.45mm solid var(--unit); color:var(--unit); border-radius:50%; font-size:8.6pt; font-weight:900; line-height:1; display:flex; align-items:center; justify-content:center; padding-top:0.55mm; margin-top:0.4mm;}
+  .q .stem{ font-family:'PC Serif'; font-size:9.5pt; line-height:1.74; font-weight:500; }
+  .q .stem .difficulty{ color:#C9A227; font-size:8pt; letter-spacing:0.06em; margin-left:1.5mm;}
+  .q .tags{ margin-top:0.8mm; font-size:7pt; color:var(--sub); font-family:'PC Sans';}
+  .choices{ list-style:none; margin:2.2mm 0 0 8.6mm; font-family:'PC Serif'; font-size:9.3pt; line-height:1.85; }
+  .choices.inline{ display:flex; flex-wrap:wrap; gap:0 6mm; }
+  .bogi-box{ border:0.35mm solid #B8C2CA; border-radius:0; margin:2.5mm 0 0 8.6mm; padding:2.4mm 3.2mm; font-family:'PC Serif'; font-size:9.2pt; line-height:1.8; background:none;}
+  .bogi-box .bt{ text-align:center; font-weight:800; color:var(--sub); font-size:8.4pt; margin-bottom:0.8mm; letter-spacing:0.3em;}
+  .ox-answer{ margin-left:2mm; color:var(--sub); font-size:9pt; }
+  .blankline{ display:inline-block; min-width:14mm; border-bottom:0.4mm solid var(--ink); }
+  .qgrid{ display:grid; grid-template-columns:1fr 1fr; gap:0 9mm; }
+  .essay-lines{ margin:2mm 0 0 8.4mm; }
+  .essay-lines div{ border-bottom:0.3mm solid var(--line); height:6.2mm; }
+  .badge-essay{ display:inline-block; background:var(--point); color:#fff; font-size:7pt; font-weight:800; padding:0.4mm 2mm; border-radius:1mm; vertical-align:1pt; margin-right:1.2mm;}
+  .badge-data{ display:inline-block; background:var(--brand); color:#fff; font-size:7pt; font-weight:800; padding:0.4mm 2mm; border-radius:1mm; vertical-align:1pt; margin-right:1.2mm;}
+
+  /* ── 해설부 ── */
+  .sol-head{ display:flex; align-items:center; gap:3mm; margin-bottom:4mm;}
+  .sol-head .stt{ font-size:14.5pt; font-weight:900; color:var(--brand);}
+  .sol-head .sub{ font-size:8.5pt; color:var(--sub);}
+  .anstable{ width:100%; border-collapse:collapse; margin-bottom:4.5mm; }
+  .anstable th,.anstable td{ border:0.3mm solid var(--line); font-size:8.8pt; padding:1.4mm 0; text-align:center; }
+  .anstable th{ background:var(--brand-lt); color:var(--brand); font-weight:800; }
+  .anstable td.a{ font-weight:900; color:var(--unit); }
+  .sol{ margin-bottom:5mm; break-inside:avoid; }
+  .sol .shead{ display:flex; align-items:center; gap:2mm; margin-bottom:1.4mm;}
+  .sol .sno{ background:var(--unit); color:#fff; min-width:6mm; height:5.4mm; border-radius:1.2mm; font-size:8.6pt; font-weight:900; line-height:1; display:flex; align-items:center; justify-content:center; padding:0.5mm 1.5mm 0;}
+  .sol .sans{ font-weight:900; color:var(--unit); font-size:9.6pt;}
+  .sol .slink{ font-size:7.2pt; color:var(--sub); margin-left:auto;}
+  .sol p{ font-family:'PC Serif'; font-size:9.1pt; line-height:1.76; margin-bottom:0.8mm; }
+  .wrongbox{ background:none; border:none; border-left:0.7mm solid #E3A0AC; border-radius:0; padding:1mm 0 1mm 3mm; margin-top:2mm;}
+  .wrongbox .wt{ font-size:8pt; font-weight:900; color:var(--point); margin-bottom:0.8mm; font-family:'PC Sans';}
+  .wrongbox p{ font-family:'PC Serif'; font-size:8.6pt; line-height:1.68; margin-bottom:0.9mm;}
+  .wrongbox p:last-child{ margin-bottom:0; }
+  .solcols{ display:grid; grid-template-columns:1fr 1fr; gap:0 9mm; }
+
+  /* ── 단원 도입 (타이포그래피 중심) ── */
+  .opener{ padding:0 0 19mm; }
+  .opener-hero{ position:relative; padding:7mm 20mm 4.5mm; overflow:hidden; flex-shrink:0; }
+  .ghost-txt{ position:absolute; top:-10mm; right:6mm; font-size:118pt; font-weight:900; color:#EDF1FC; line-height:1; letter-spacing:-0.04em; }
+  .kicker{ display:flex; align-items:center; gap:4mm; position:relative; }
+  .kicker .kt{ font-size:9.5pt; font-weight:800; color:var(--unit); letter-spacing:0.24em; white-space:nowrap; }
+  .kicker::after{ content:""; flex:1; border-top:0.3mm solid var(--line); }
+  .opener-hero h1{ position:relative; font-size:36pt; font-weight:900; letter-spacing:-0.015em; margin:4mm 0 0; }
+  .opener-hero h1 .tick{ display:block; width:14mm; border-top:1.4mm solid var(--accent); margin-bottom:3.6mm; }
+  .opener-lede{ position:relative; font-family:'PC Serif'; font-size:10.2pt; font-weight:600; line-height:2.0; color:#3D4C58; max-width:138mm; margin-top:4mm; padding-left:5mm; border-left:0.8mm solid var(--accent); }
+  .opener-inner{ padding:0 20mm; }
+
+  /* ── 원소의 여정 스트립 ── */
+  .journey{ margin-top:3.5mm; }
+  .journey .j-label{ font-size:8pt; font-weight:800; color:var(--sub); letter-spacing:0.08em; margin-bottom:2.4mm; display:flex; align-items:center; gap:1.6mm;}
+  .journey .j-label::before{ content:""; width:2.4mm; height:2.4mm; background:var(--unit); border-radius:50%; }
+  .j-bar{ display:flex; align-items:center; gap:2mm; }
+  .j-chip{ flex:1; text-align:center; background:#F5F1FC; border:0.35mm solid #CFC0EE; color:#6B46C8; border-radius:1.6mm; padding:2.4mm 1mm 2mm; }
+  .j-chip .jc-t{ font-size:8.8pt; font-weight:800; display:block; }
+  .j-chip .jc-s{ font-size:6.8pt; color:var(--sub); display:block; margin-top:0.5mm; }
+  .j-chip.on{ background:var(--unit); border-color:var(--unit); }
+  .j-chip.on .jc-t{ color:#fff; }
+  .j-chip.on .jc-s{ color:#D9E2F8; }
+  .j-arrow{ flex:0 0 auto; color:#AB93E6; font-size:10pt; font-weight:900; }
+  .toc{ margin-top:5mm; }
+  .toc .toc-title{ font-size:11pt; font-weight:900; color:var(--ink); margin-bottom:3mm; display:flex; align-items:center; gap:2.5mm;}
+  .toc .toc-title::before{ content:""; width:3.4mm; height:3.4mm; background:var(--accent); border-radius:0.8mm; }
+  .toc-item{ display:flex; align-items:flex-start; gap:5mm; padding:2.8mm 6mm; border-bottom:0.3mm solid var(--line); }
+  .toc-item:first-of-type{ border-top:0.3mm solid var(--line); }
+  .toc-item.active{ background:#F5F1FC; border-left:1.2mm solid #9E85E0; }
+  .toc-item .tno{ font-family:'PC Serif'; font-weight:900; color:#9E85E0; font-size:14pt; width:10mm; line-height:1.1; flex:0 0 auto;}
+  .toc-item .tbody{ flex:1; min-width:0; }
+  .toc-item .ttt{ font-weight:800; font-size:10.5pt; letter-spacing:0.01em; display:flex; align-items:center;}
+  .toc-item .tdesc{ font-family:'PC Serif'; font-size:8.6pt; font-weight:600; color:#4A5964; margin-top:0.7mm; line-height:1.55;}
+  .toc-item .tstd{ font-size:7.2pt; color:var(--sub); flex:0 0 auto; padding-top:1.2mm;}
+  .toc-item.active .tag-now{ background:var(--accent); color:#fff; font-size:7pt; font-weight:900; border-radius:4mm; padding:0.7mm 2.6mm; margin-left:3.5mm;}
+  .toc-item .tag-done{ font-size:7.2pt; font-weight:800; color:#3E9C6E; margin-left:3.5mm; }
+  .opener-quote{ margin-top:4mm; text-align:center; font-family:'PC Serif'; font-size:9.8pt; font-weight:600; color:#4A5964; letter-spacing:0.01em; }
+  .opener-quote .who{ font-size:8pt; color:var(--sub); font-weight:400; margin-left:2.5mm; }
+  .qa-lead li .qgo{ font-family:'PC Sans'; font-size:7.4pt; font-weight:800; color:var(--unit); background:var(--unit-lt); border-radius:3mm; padding:0.5mm 2.2mm; margin-left:2mm; white-space:nowrap; vertical-align:1pt;}
+  .qa-lead{ margin-top:3.5mm; border:none; border-top:0.45mm solid var(--brand); border-bottom:0.45mm solid var(--brand); background:none; border-radius:0; padding:3mm 2mm 2.8mm; }
+  .qa-lead .qt{ font-weight:900; color:var(--brand); font-size:10.5pt; margin-bottom:2mm;}
+  .qa-lead li{ font-family:'PC Serif'; font-size:9.5pt; line-height:1.8; margin-left:5mm; }
+
+  /* ── 바로바로 체크 (개념 페이지 하단 즉석 OX) ── */
+  .quickcheck{ margin-top:auto; border-top:0.35mm dashed #C8B98F; padding-top:3mm; width:calc(100% - 51mm); }
+  .quickcheck .qc-title{ display:inline-flex; align-items:center; gap:1.6mm; font-size:8.2pt; font-weight:900; color:#9C6503; margin-bottom:1.4mm; }
+  .quickcheck .qc-title::before{ content:"✓"; color:var(--accent); font-weight:900; }
+  .quickcheck ol{ list-style:none; font-family:'PC Serif'; font-size:8.8pt; line-height:1.75; }
+  .quickcheck li{ display:flex; gap:2mm; align-items:baseline; }
+  .quickcheck li .no{ font-weight:800; color:var(--accent); flex:0 0 auto; }
+  .quickcheck .qc-ans{ margin-top:1mm; font-size:7.2pt; color:var(--sub); transform:rotate(180deg); text-align:left; }
+
+  /* ── 중학 과학 다시보기 (날개단) ── */
+  .wing .review{ background:#F6F3EC; border-radius:1.8mm; padding:2.8mm 3mm; margin-top:1mm; }
+  .wing .review .rv-title{ font-size:7.8pt; font-weight:900; color:#7A6A45; margin-bottom:1.4mm; display:flex; align-items:center; gap:1.4mm;}
+  .wing .review .rv-title::before{ content:"↺"; font-weight:900; color:#A08A55; }
+
+  /* ── MEMO 페이지 ── */
+  .memo-head{ display:flex; align-items:baseline; gap:3.5mm; margin-bottom:5mm; }
+  .memo-head .mt{ font-size:17pt; font-weight:900; color:var(--brand); letter-spacing:0.22em; }
+  .memo-head .ms{ font-size:8.6pt; color:var(--sub); }
+  .memo-area{ flex:1; border:0.4mm solid var(--line); border-radius:2.5mm;
+    background-image:linear-gradient(to bottom, transparent calc(100% - 0.3mm), #DCE4E9 0);
+    background-size:100% 9mm; background-position:0 4mm; padding:0 5mm; margin-bottom:4mm; }
+  .memo-pen{ font-family:'PC Pen'; font-size:12.5pt; color:#B4560E; text-align:right; }
+</style>
+</head>
+<body>
+
+<!-- ═════════════ p.129 소단원 도입 ═════════════ -->
+<div class="page opener">
+  <div class="opener-hero">
+    <div class="ghost-txt">05</div>
+    <div class="kicker"><span class="kt">통합과학 1 · III. 시스템과 상호작용</span></div>
+    <h1><span class="tick"></span>생명 시스템과 화학 반응</h1>
+    <p class="opener-lede">지금 이 순간에도 몸속 세포들에서는 수천 가지 화학 반응이 벌어진다.<br>
+    가장 정교한 화학 공장은 실험실이 아니라 몸속에 있다.</p>
+  </div>
+
+  <div class="opener-inner">
+    <div class="journey">
+      <div class="j-label">시스템의 연결 — 지금 여기</div>
+      <div class="j-bar">
+        <div class="j-chip"><span class="jc-t">지구시스템</span><span class="jc-s">다섯 권역의 교환</span></div>
+        <span class="j-arrow">→</span>
+        <div class="j-chip"><span class="jc-t">판구조론</span><span class="jc-s">움직이는 지권</span></div>
+        <span class="j-arrow">→</span>
+        <div class="j-chip"><span class="jc-t">중력과 운동</span><span class="jc-s">낙하에서 위성까지</span></div>
+        <span class="j-arrow">→</span>
+        <div class="j-chip"><span class="jc-t">운동량·충격량</span><span class="jc-s">충돌의 과학</span></div>
+        <span class="j-arrow">→</span>
+        <div class="j-chip on"><span class="jc-t">생명 시스템</span><span class="jc-s">세포와 물질대사</span></div>
+        <span class="j-arrow">→</span>
+        <div class="j-chip"><span class="jc-t">유전자</span><span class="jc-s">정보의 흐름</span></div>
+      </div>
+    </div>
+    <div class="toc">
+      <div class="toc-title">이 단원의 학습 지도</div>
+      <div class="toc-item">
+        <span class="tno">01</span>
+        <span class="tbody"><span class="ttt">지구시스템과 에너지·물질 순환<span class="tag-done">완료 ✓</span></span>
+        <span class="tdesc">기권·수권·지권·생물권·외권 — 다섯 권역이 주고받는 지구</span></span>
+        <span class="tstd">10통과1-03-01</span>
+      </div>
+      <div class="toc-item">
+        <span class="tno">02</span>
+        <span class="tbody"><span class="ttt">판구조론과 지권의 변화<span class="tag-done">완료 ✓</span></span>
+        <span class="tdesc">판 경계 3종 — 지진과 화산은 왜 그곳에서 일어나는가</span></span>
+        <span class="tstd">10통과1-03-02</span>
+      </div>
+      <div class="toc-item">
+        <span class="tno">03</span>
+        <span class="tbody"><span class="ttt">중력과 운동<span class="tag-done">완료 ✓</span></span>
+        <span class="tdesc">자유 낙하에서 인공위성까지, 중력이 만드는 운동</span></span>
+        <span class="tstd">10통과1-03-03</span>
+      </div>
+      <div class="toc-item">
+        <span class="tno">04</span>
+        <span class="tbody"><span class="ttt">운동량과 충격량<span class="tag-done">완료 ✓</span></span>
+        <span class="tdesc">에어백과 안전모의 과학 — 충돌을 다스리는 법</span></span>
+        <span class="tstd">10통과1-03-04</span>
+      </div>
+      <div class="toc-item active">
+        <span class="tno">05</span>
+        <span class="tbody"><span class="ttt">생명 시스템과 화학 반응<span class="tag-now">NOW</span></span>
+        <span class="tdesc">세포 속 물질대사, 효소가 일하는 방식</span></span>
+        <span class="tstd">10통과1-03-05</span>
+      </div>
+      <div class="toc-item">
+        <span class="tno">06</span>
+        <span class="tbody"><span class="ttt">유전자에서 단백질까지</span>
+        <span class="tdesc">세포 내 정보의 흐름 — DNA에서 형질이 되기까지</span></span>
+        <span class="tstd">10통과1-03-06</span>
+      </div>
+    </div>
+
+    <div class="qa-lead">
+      <div class="qt">이 소단원을 끝내면 답할 수 있는 질문</div>
+      <ul>
+        <li>몸속에서 밥은 태워지는 걸까, 분해되는 걸까? <span class="qgo">개념 2</span></li>
+        <li>몸속 반응은 왜 37 ℃에서도 빠르게 일어날까? <span class="qgo">개념 3</span></li>
+        <li>세포막은 '들여보낼 것'과 '막을 것'을 어떻게 구별할까? <span class="qgo">개념 4</span></li>
+        <li>김치, 빵, 소화제 — 어디까지가 효소의 작품일까? <span class="qgo">개념 5</span></li>
+      </ul>
+    </div>
+
+    <div class="opener-quote">"포도주 한 병 속에는 세상 어떤 책보다 많은 철학이 담겨 있다."<span class="who">— 루이 파스퇴르, 발효 연구의 아버지</span></div>
+  </div>
+
+  <div class="folio"><span>박찬 과학 | 통합과학 1</span><span class="num">129</span></div>
+</div>
+
+<!-- ═════════════ p.130 개념 01 세포 ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag">III. 시스템과 상호작용</span><span class="lesson-tag">05. 생명 시스템과 화학 반응</span></div>
+  <h2 class="lesson-title"><span class="no">05</span><span class="tt">생명 시스템과 화학 반응</span></h2>
+  <div class="std-badges"><span class="std">성취기준 10통과1-03-05</span><span class="std">물질대사·효소·물질 출입 → 생활 속 화학 반응</span></div>
+
+  <div class="cols">
+    <div class="main">
+      <h3 class="sec"><span class="n">1</span>세포 — 생명 시스템의 기본 단위</h3>
+      <p class="body">지구시스템이 다섯 권역의 상호작용으로 굴러가듯, 생명체도 하나의 <span class="kw">시스템</span>이다. 그 기본 단위가 <span class="kw">세포</span>다. 비슷한 세포가 모여 <b>조직</b>을, 여러 조직이 모여 <b>기관</b>을, 기관들이 모여 하나의 <b>개체</b>를 이룬다 — <span class="u-amber">세포 → 조직 → 기관 → 개체</span>의 층층 구조다. 그리고 이 시스템이 유지되려면 세포 하나하나가 쉼 없이 일해야 한다.</p>
+      <p class="body">세포 속을 들여다보면 분업이 정교하다. <span class="kw">핵</span>은 유전 정보(설계도)를 보관하고, <span class="kw">미토콘드리아</span>는 양분을 분해해 세포가 쓸 에너지를 만들며, <span class="kw">리보솜</span>은 단백질을 조립한다. 그리고 이 모든 것을 감싸는 <span class="kw">세포막</span>이 물질의 출입을 관리한다. 공장에 비유하면 설계실·발전소·조립 라인·정문 경비실이 한 건물 안에 다 있는 셈이다.</p>
+
+      <figure>
+        <svg width="470" height="150" viewBox="0 0 470 150" font-family="PC Sans">
+          <defs>
+            <marker id="arrP" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="#6B46C8"/></marker>
+            <marker id="arrR" markerWidth="7" markerHeight="7" refX="5" refY="2.5" orient="auto"><path d="M0,0 L6,2.5 L0,5 Z" fill="#D6455D"/></marker>
+          </defs>
+          <!-- 구성 단계 -->
+          <g transform="translate(10,10)" font-size="7.2">
+            <g transform="translate(0,0)">
+              <rect width="92" height="66" rx="6" fill="#F5F1FC" stroke="#CFC0EE" stroke-width="0.9"/>
+              <ellipse cx="46" cy="28" rx="16" ry="11" fill="#E6DCF8" stroke="#9E85E0" stroke-width="1.2"/>
+              <circle cx="46" cy="28" r="4" fill="#6B46C8"/>
+              <text x="46" y="56" text-anchor="middle" font-weight="800">① 세포</text>
+            </g>
+            <line x1="98" y1="33" x2="112" y2="33" stroke="#9E85E0" stroke-width="1.8" marker-end="url(#arrP)"/>
+            <g transform="translate(118,0)">
+              <rect width="92" height="66" rx="6" fill="#F5F1FC" stroke="#CFC0EE" stroke-width="0.9"/>
+              <g fill="#E6DCF8" stroke="#9E85E0" stroke-width="1">
+                <ellipse cx="32" cy="24" rx="11" ry="8"/><ellipse cx="56" cy="24" rx="11" ry="8"/>
+                <ellipse cx="44" cy="36" rx="11" ry="8"/>
+              </g>
+              <text x="46" y="56" text-anchor="middle" font-weight="800">② 조직</text>
+            </g>
+            <line x1="216" y1="33" x2="230" y2="33" stroke="#9E85E0" stroke-width="1.8" marker-end="url(#arrP)"/>
+            <g transform="translate(236,0)">
+              <rect width="92" height="66" rx="6" fill="#F5F1FC" stroke="#CFC0EE" stroke-width="0.9"/>
+              <path d="M46,14 q-16,2 -16,16 q0,14 16,20 q16,-6 16,-20 q0,-14 -16,-16 Z" fill="#FBEBEE" stroke="#D6455D" stroke-width="1.4"/>
+              <text x="46" y="56" text-anchor="middle" font-weight="800">③ 기관 (심장 등)</text>
+            </g>
+            <line x1="334" y1="33" x2="348" y2="33" stroke="#9E85E0" stroke-width="1.8" marker-end="url(#arrP)"/>
+            <g transform="translate(354,0)">
+              <rect width="92" height="66" rx="6" fill="#FDF9F0" stroke="#EBCB9C" stroke-width="0.9"/>
+              <circle cx="46" cy="20" r="6" fill="#F6C98E" stroke="#E8940A"/>
+              <path d="M46,26 L46,44 M46,32 L36,40 M46,32 L56,40 M46,44 L39,56 M46,44 L53,56" stroke="#B4560E" stroke-width="2" fill="none"/>
+              <text x="46" y="63" text-anchor="middle" font-weight="800" font-size="7">④ 개체</text>
+            </g>
+          </g>
+          <!-- 세포 확대 -->
+          <g transform="translate(235,112)" font-size="6.6">
+            <text x="0" y="-12" text-anchor="middle" font-size="7.4" font-weight="800" fill="#6B46C8">세포 속 분업 — 핵(설계실) · 미토콘드리아(발전소) · 리보솜(조립 라인) · 세포막(정문)</text>
+            <text x="0" y="26" text-anchor="middle" font-size="8.8" font-weight="800" fill="#E8940A">생명 시스템 = 세포에서 시작해 층층이 쌓인 조직화된 시스템</text>
+          </g>
+        </svg>
+        <figcaption>그림 1 | 생명 시스템의 구성 단계 — 세포가 모든 층의 출발점이다</figcaption>
+      </figure>
+
+      <div class="saem">
+        <div class="avatar">박찬<br>쌤</div>
+        <div class="bubble"><span class="pen">"'세포는 작다'가 아니라 '세포는 바쁘다'로 기억해라. 지금 이 순간에도 네 몸의 세포 하나에서 초당 수천 건의 화학 반응이 처리되고 있다 — 그 반응들의 총칭이 곧 물질대사다."</span></div>
+      </div>
+    </div>
+
+    <div class="wing">
+      <div class="wtitle">날개 노트</div>
+      <div class="term"><b>생명 시스템</b>구성 요소(세포·조직·기관)들이 상호작용하며 생명 활동을 유지하는 시스템.</div>
+      <div class="term"><b>미토콘드리아</b>양분을 분해해 에너지를 만드는 세포 소기관 — 세포 호흡의 현장이다.</div>
+      <div class="wsep"></div>
+      <div class="wtitle">한눈에 암기</div>
+      <div class="wing-pen">세포 → 조직 → 기관 → 개체<br>세포 = 생명의 기본 단위!</div>
+      <div class="wsep"></div>
+      <div class="review">
+        <div class="rv-title">중학 과학 다시보기</div>
+        <div class="term" style="margin-bottom:0;"><b>생물의 구성 (중1)</b>모든 생물은 세포로 이루어져 있다 — 여기에 '세포 안에서 무슨 일이 일어나는가'를 더하는 것이 이 소단원이다.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="folio"><span>III. 시스템과 상호작용</span><span class="num">130</span></div>
+</div>
+
+<!-- ═════════════ p.131 개념 02 물질대사 ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag">III. 시스템과 상호작용</span><span class="lesson-tag">05. 생명 시스템과 화학 반응</span></div>
+  <div class="cols">
+    <div class="main">
+      <h3 class="sec"><span class="n">2</span>물질대사 — 세포 안의 화학 반응</h3>
+      <p class="body">생명체 안에서 일어나는 모든 화학 반응을 <span class="kw">물질대사</span>라고 한다. 방향은 두 가지뿐이다. 작고 간단한 물질로 크고 복잡한 물질을 <b>합성</b>하면 <span class="kw">동화 작용</span>(에너지 흡수), 크고 복잡한 물질을 작고 간단한 물질로 <b>분해</b>하면 <span class="kw">이화 작용</span>(에너지 방출)이다. 식물이 이산화 탄소와 물로 포도당을 만드는 <b>광합성</b>이 동화의 대표라면, 세포가 포도당을 분해해 에너지를 꺼내 쓰는 <b>세포 호흡</b>은 이화의 대표다.</p>
+      <p class="body">세포 호흡은 연소와 닮았다 — 포도당과 산소가 반응해 이산화 탄소와 물이 되니까. 그러나 결정적 차이가 있다. 연소는 한꺼번에 높은 온도로 타오르지만, 물질대사는 <span class="u-amber">체온 정도의 낮은 온도에서, 여러 단계로 나뉘어 조금씩</span> 진행된다. 그래서 세포는 타 버리지 않고 에너지를 차곡차곡 꺼내 쓴다. 이 '저온의 마법'을 가능하게 하는 주인공이 다음 개념, 효소다.</p>
+
+      <figure>
+        <svg width="470" height="148" viewBox="0 0 470 148" font-family="PC Sans">
+          <!-- 동화 -->
+          <g transform="translate(122,12)" font-size="7">
+            <rect x="-104" y="0" width="208" height="102" rx="6" fill="#EAF6EC" stroke="#5FA86A" stroke-width="1"/>
+            <text x="0" y="16" text-anchor="middle" font-size="8.6" font-weight="800" fill="#2E6B3A">동화 작용 — 합성 (에너지 흡수)</text>
+            <g fill="#9E85E0"><circle cx="-72" cy="42" r="6"/><circle cx="-54" cy="52" r="6"/><circle cx="-70" cy="62" r="6"/></g>
+            <line x1="-40" y1="52" x2="-12" y2="52" stroke="#2E6B3A" stroke-width="2" marker-end="url(#arrR)"/>
+            <path d="M8,36 h44 v10 h-14 v10 h14 v10 h-44 Z" fill="#6B46C8" opacity="0.85"/>
+            <text x="30" y="72" text-anchor="middle" fill="#5B6B77" font-size="6.4">크고 복잡한 물질</text>
+            <text x="-64" y="78" text-anchor="middle" fill="#5B6B77" font-size="6.4">작은 물질들</text>
+            <text x="0" y="94" text-anchor="middle" font-weight="800" fill="#2E6B3A">예) 광합성: 이산화 탄소 + 물 → 포도당</text>
+          </g>
+          <!-- 이화 -->
+          <g transform="translate(348,12)" font-size="7">
+            <rect x="-104" y="0" width="208" height="102" rx="6" fill="#FBEBEE" stroke="#E3A0AC" stroke-width="1"/>
+            <text x="0" y="16" text-anchor="middle" font-size="8.6" font-weight="800" fill="#A9556A">이화 작용 — 분해 (에너지 방출)</text>
+            <path d="M-76,36 h44 v10 h-14 v10 h14 v10 h-44 Z" fill="#6B46C8" opacity="0.85"/>
+            <line x1="-22" y1="52" x2="6" y2="52" stroke="#A9556A" stroke-width="2" marker-end="url(#arrR)"/>
+            <g fill="#9E85E0"><circle cx="26" cy="42" r="6"/><circle cx="44" cy="52" r="6"/><circle cx="28" cy="62" r="6"/></g>
+            <path d="M60,40 l4,8 l8,2 l-6,6 l2,9 l-8,-5 l-8,5 l2,-9 l-6,-6 l8,-2 Z" fill="#E8940A"/>
+            <text x="64" y="76" text-anchor="middle" fill="#B4560E" font-size="6.2">에너지!</text>
+            <text x="-54" y="78" text-anchor="middle" fill="#5B6B77" font-size="6.4">크고 복잡한 물질</text>
+            <text x="0" y="94" text-anchor="middle" font-weight="800" fill="#A9556A">예) 세포 호흡: 포도당 + 산소 → 에너지</text>
+          </g>
+          <text x="235" y="132" text-anchor="middle" font-size="8.8" font-weight="800" fill="#E8940A">물질대사 = 생명체 속 화학 반응 — 합성이면 동화, 분해면 이화. 반드시 효소가 관여한다</text>
+        </svg>
+        <figcaption>그림 2 | 동화 작용과 이화 작용 — 만들 때는 에너지를 넣고, 부술 때는 에너지가 나온다</figcaption>
+      </figure>
+
+      <div class="expoint">
+        <div class="boxtitle"><span class="ico">!</span>시험엔 이렇게</div>
+        <p>"세포 호흡은 동화 작용이다"(X)가 최다 빈출 — <b>합성이냐 분해냐</b>부터 판정하라. 그리고 연소와 세포 호흡의 차이(한꺼번에 고온 vs 단계적으로 저온)도 단골 O·X다.</p>
+      </div>
+    </div>
+
+    <div class="wing">
+      <div class="wtitle">날개 노트</div>
+      <div class="term"><b>물질대사의 조건</b>물질대사는 세포 안에서, 효소의 도움으로, 체온 수준에서 일어난다.</div>
+      <div class="term"><b>광합성도 물질대사</b>식물 세포의 엽록체에서 일어나는 동화 작용 — 생명체 안의 반응이면 모두 물질대사다.</div>
+      <div class="wsep"></div>
+      <div class="wtitle">한눈에 암기</div>
+      <div class="wing-pen">합성 = 동화 = 에너지 흡수<br>분해 = 이화 = 에너지 방출<br>연소와 달리 저온·단계적!</div>
+    </div>
+  </div>
+  <div class="quickcheck">
+    <span class="qc-title">바로바로 체크</span>
+    <ol>
+      <li><span class="no">1</span>생명체 안에서 일어나는 모든 화학 반응을 물질대사라 한다. ( O , X )</li>
+      <li><span class="no">2</span>세포 호흡은 포도당을 합성하는 동화 작용이다. ( O , X )</li>
+      <li><span class="no">3</span>물질대사는 연소처럼 높은 온도에서 한꺼번에 일어난다. ( O , X )</li>
+    </ol>
+    <div class="qc-ans">정답 1 O 2 X (분해하는 이화 작용) 3 X (체온에서 단계적으로)</div>
+  </div>
+  <div class="folio"><span>III. 시스템과 상호작용</span><span class="num">131</span></div>
+</div>
+
+<!-- ═════════════ p.132 개념 03 효소 ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag">III. 시스템과 상호작용</span><span class="lesson-tag">05. 생명 시스템과 화학 반응</span></div>
+  <div class="cols">
+    <div class="main">
+      <h3 class="sec"><span class="n">3</span>효소 — 37 ℃의 마법사</h3>
+      <p class="body">화학 반응이 일어나려면 반응물이 넘어야 할 에너지 언덕이 있다 — 이 언덕의 높이가 <span class="kw">활성화 에너지</span>다. 언덕이 높으면 반응은 느리거나 거의 일어나지 않는다. <span class="kw">효소</span>는 반응물과 결합해 <span class="u-amber">활성화 에너지를 낮추어 반응이 빠르게 일어나게 하는 생체 촉매</span>다. 언덕을 깎아 지름길을 내는 것이다. 덕분에 실험실에서라면 고온·고압이 필요할 반응이 몸속에서는 37 ℃에서 순식간에 끝난다.</p>
+      <p class="body">효소에게는 두 가지 성격이 더 있다. 첫째, <b>가리는 것이 확실하다</b> — 효소는 입체 구조가 맞는 특정 반응물(기질)하고만 결합한다. 열쇠 하나가 자물쇠 하나만 여는 것과 같다(<span class="kw">기질 특이성</span>). 둘째, <b>반응 후에도 소모되지 않는다</b> — 반응을 도운 효소는 그대로 빠져나와 다음 반응물을 붙잡는다. 소량으로도 계속 일할 수 있는 이유다.</p>
+
+      <figure>
+        <svg width="470" height="150" viewBox="0 0 470 150" font-family="PC Sans">
+          <!-- 에너지 언덕 그래프 -->
+          <g transform="translate(30,12)">
+            <line x1="0" y1="104" x2="200" y2="104" stroke="#5B6B77" stroke-width="1.2" marker-end="url(#arrP)"/>
+            <line x1="0" y1="104" x2="0" y2="4" stroke="#5B6B77" stroke-width="1.2" marker-end="url(#arrP)"/>
+            <text x="196" y="115" text-anchor="end" font-size="6.8" fill="#5B6B77">반응 진행</text>
+            <text x="4" y="4" font-size="6.8" fill="#5B6B77">에너지</text>
+            <path d="M10,64 Q70,-14 116,50 Q150,88 190,84" fill="none" stroke="#D6455D" stroke-width="2"/>
+            <path d="M10,64 Q76,26 116,58 Q150,88 190,84" fill="none" stroke="#2E6B3A" stroke-width="2" stroke-dasharray="4 2.5"/>
+            <line x1="66" y1="24" x2="66" y2="8" stroke="#D6455D" stroke-width="1.2" marker-end="url(#arrR)"/>
+            <text x="72" y="14" font-size="6.6" fill="#D6455D">효소 없음 — 언덕 높다</text>
+            <text x="96" y="42" font-size="6.6" fill="#2E6B3A">효소 있음 — 언덕 낮다</text>
+            <text x="8" y="58" font-size="6.4" fill="#5B6B77">반응물</text>
+            <text x="188" y="78" text-anchor="end" font-size="6.4" fill="#5B6B77">생성물</text>
+          </g>
+          <!-- 기질 특이성 -->
+          <g transform="translate(340,12)" font-size="6.8">
+            <rect x="-92" y="0" width="196" height="104" rx="6" fill="#F5F1FC" stroke="#CFC0EE" stroke-width="0.9"/>
+            <text x="6" y="16" text-anchor="middle" font-size="8.2" font-weight="800" fill="#6B46C8">기질 특이성 — 열쇠와 자물쇠</text>
+            <path d="M-70,42 h40 v12 l-10,0 v10 h-30 Z M-30,48 l10,-6 v12 Z" fill="#6B46C8" opacity="0.85"/>
+            <text x="-50" y="80" text-anchor="middle" fill="#5B6B77">효소 (홈 모양이 정해져 있다)</text>
+            <path d="M12,40 l10,6 l-10,6 l-4,-2 v-8 Z" fill="#E8940A"/>
+            <text x="16" y="64" text-anchor="middle" fill="#B4560E">맞는 기질 ○</text>
+            <circle cx="66" cy="46" r="8" fill="none" stroke="#9AA7B1" stroke-width="1.6" stroke-dasharray="2.5 2"/>
+            <text x="66" y="70" text-anchor="middle" fill="#5B6B77">안 맞는 기질 ×</text>
+            <text x="6" y="96" text-anchor="middle" font-weight="800" fill="#6B46C8">효소 하나 = 정해진 반응 하나</text>
+          </g>
+          <text x="235" y="140" text-anchor="middle" font-size="8.8" font-weight="800" fill="#E8940A">효소 = 활성화 에너지를 낮추는 생체 촉매 — 소모되지 않고 반복해서 일한다</text>
+        </svg>
+        <figcaption>그림 3 | 효소의 작동 원리 — 언덕을 낮추고, 짝이 맞는 기질만 골라 돕는다</figcaption>
+      </figure>
+
+      <div class="gist">
+        <div class="boxtitle"><span class="ico">알</span>알짜 정리 ① — 물질대사와 효소</div>
+        <ul>
+          <li><b>물질대사</b>: 생명체 안의 화학 반응 — 동화(합성·에너지 흡수) / 이화(분해·에너지 방출)</li>
+          <li>연소와 달리 <b>체온에서, 여러 단계로, 효소와 함께</b> 진행된다</li>
+          <li><b>효소</b>: 활성화 에너지 ↓ → 반응 속도 ↑ / 기질 특이성 / 반응 후에도 소모되지 않음</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="wing">
+      <div class="wtitle">날개 노트</div>
+      <div class="term"><b>촉매</b>자신은 변하지 않으면서 반응 속도를 바꾸는 물질. 효소는 생명체가 만든 촉매다.</div>
+      <div class="term"><b>효소는 단백질</b>효소의 주성분은 단백질 — 그래서 높은 온도에서는 구조가 변해 기능을 잃는다.</div>
+      <div class="wsep"></div>
+      <div class="wtitle">한눈에 암기</div>
+      <div class="wing-pen">효소 = 생체 촉매<br>활성화 에너지 ↓<br>짝 맞는 기질만, 소모 없이!</div>
+    </div>
+  </div>
+  <div class="quickcheck">
+    <span class="qc-title">바로바로 체크</span>
+    <ol>
+      <li><span class="no">1</span>효소는 반응에 필요한 활성화 에너지를 낮춘다. ( O , X )</li>
+      <li><span class="no">2</span>효소는 반응이 끝나면 소모되어 없어진다. ( O , X )</li>
+      <li><span class="no">3</span>하나의 효소는 입체 구조가 맞는 특정 기질에만 작용한다. ( O , X )</li>
+    </ol>
+    <div class="qc-ans">정답 1 O 2 X (소모되지 않고 재사용) 3 O</div>
+  </div>
+  <div class="folio"><span>III. 시스템과 상호작용</span><span class="num">132</span></div>
+</div>
+
+<!-- ═════════════ p.133 개념 04 세포막과 물질 출입 ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag">III. 시스템과 상호작용</span><span class="lesson-tag">05. 생명 시스템과 화학 반응</span></div>
+  <div class="cols">
+    <div class="main">
+      <h3 class="sec"><span class="n">4</span>세포막 — 드나듦을 관리하는 똑똑한 경계</h3>
+      <p class="body">물질대사가 돌아가려면 재료(산소·양분)는 들어오고 폐기물(이산화 탄소 등)은 나가야 한다. 이 출입을 관리하는 것이 <span class="kw">세포막</span>이다. 세포막은 <span class="u-amber">인지질 2중층에 단백질이 곳곳에 박힌 구조</span>다. 인지질 분자는 물과 친한 머리를 바깥쪽으로, 물을 피하는 꼬리를 안쪽으로 향한 채 두 겹으로 늘어서 있고, 그 사이사이에 <b>막단백질</b>이 통로와 검문소 역할을 한다.</p>
+      <p class="body">출입 방식은 물질마다 다르다. 산소나 이산화 탄소처럼 <b>작은 분자</b>는 인지질 2중층 사이를 직접 빠져나가며, 농도가 높은 쪽에서 낮은 쪽으로 저절로 퍼진다(<span class="kw">확산</span>). 반면 포도당이나 이온처럼 <b>크거나 전하를 띤 물질</b>은 막단백질이 만든 통로를 통해서만 드나든다. 아무나 통과시키지 않고 물질을 가려 받는 이 성질을 <span class="kw">선택적 투과성</span>이라 한다 — 세포가 안정된 화학 공장으로 유지되는 비결이다.</p>
+
+      <figure>
+        <svg width="470" height="152" viewBox="0 0 470 152" font-family="PC Sans">
+          <g transform="translate(235,10)" font-size="6.8">
+            <text x="-160" y="6" text-anchor="middle" font-size="7" fill="#5B6B77">세포 밖</text>
+            <!-- 인지질 위층 -->
+            <g id="pl-top">
+              <g fill="#9E85E0" stroke="#6B46C8" stroke-width="0.6">
+                <circle cx="-210" cy="26" r="6"/><circle cx="-192" cy="26" r="6"/><circle cx="-174" cy="26" r="6"/><circle cx="-156" cy="26" r="6"/><circle cx="-138" cy="26" r="6"/><circle cx="-120" cy="26" r="6"/>
+                <circle cx="-30" cy="26" r="6"/><circle cx="-12" cy="26" r="6"/><circle cx="6" cy="26" r="6"/><circle cx="24" cy="26" r="6"/>
+                <circle cx="114" cy="26" r="6"/><circle cx="132" cy="26" r="6"/><circle cx="150" cy="26" r="6"/><circle cx="168" cy="26" r="6"/><circle cx="186" cy="26" r="6"/><circle cx="204" cy="26" r="6"/>
+              </g>
+              <g stroke="#CFC0EE" stroke-width="1.6">
+                <path d="M-212,32 l-2,12 M-208,32 l2,12 M-194,32 l-2,12 M-190,32 l2,12 M-176,32 l-2,12 M-172,32 l2,12 M-158,32 l-2,12 M-154,32 l2,12 M-140,32 l-2,12 M-136,32 l2,12 M-122,32 l-2,12 M-118,32 l2,12"/>
+                <path d="M-32,32 l-2,12 M-28,32 l2,12 M-14,32 l-2,12 M-10,32 l2,12 M4,32 l-2,12 M8,32 l2,12 M22,32 l-2,12 M26,32 l2,12"/>
+                <path d="M112,32 l-2,12 M116,32 l2,12 M130,32 l-2,12 M134,32 l2,12 M148,32 l-2,12 M152,32 l2,12 M166,32 l-2,12 M170,32 l2,12 M184,32 l-2,12 M188,32 l2,12 M202,32 l-2,12 M206,32 l2,12"/>
+              </g>
+            </g>
+            <!-- 인지질 아래층 -->
+            <g>
+              <g stroke="#CFC0EE" stroke-width="1.6">
+                <path d="M-212,62 l-2,-12 M-208,62 l2,-12 M-194,62 l-2,-12 M-190,62 l2,-12 M-176,62 l-2,-12 M-172,62 l2,-12 M-158,62 l-2,-12 M-154,62 l2,-12 M-140,62 l-2,-12 M-136,62 l2,-12 M-122,62 l-2,-12 M-118,62 l2,-12"/>
+                <path d="M-32,62 l-2,-12 M-28,62 l2,-12 M-14,62 l-2,-12 M-10,62 l2,-12 M4,62 l-2,-12 M8,62 l2,-12 M22,62 l-2,-12 M26,62 l2,-12"/>
+                <path d="M112,62 l-2,-12 M116,62 l2,-12 M130,62 l-2,-12 M134,62 l2,-12 M148,62 l-2,-12 M152,62 l2,-12 M166,62 l-2,-12 M170,62 l2,-12 M184,62 l-2,-12 M188,62 l2,-12 M202,62 l-2,-12 M206,62 l2,-12"/>
+              </g>
+              <g fill="#9E85E0" stroke="#6B46C8" stroke-width="0.6">
+                <circle cx="-210" cy="68" r="6"/><circle cx="-192" cy="68" r="6"/><circle cx="-174" cy="68" r="6"/><circle cx="-156" cy="68" r="6"/><circle cx="-138" cy="68" r="6"/><circle cx="-120" cy="68" r="6"/>
+                <circle cx="-30" cy="68" r="6"/><circle cx="-12" cy="68" r="6"/><circle cx="6" cy="68" r="6"/><circle cx="24" cy="68" r="6"/>
+                <circle cx="114" cy="68" r="6"/><circle cx="132" cy="68" r="6"/><circle cx="150" cy="68" r="6"/><circle cx="168" cy="68" r="6"/><circle cx="186" cy="68" r="6"/><circle cx="204" cy="68" r="6"/>
+              </g>
+            </g>
+            <!-- 막단백질 2개 -->
+            <path d="M-108,18 q22,0 22,10 v38 q0,10 -22,10 q-22,0 -22,-10 v-38 q0,-10 22,-10 Z" fill="#E8940A" opacity="0.85"/>
+            <rect x="-114" y="30" width="12" height="34" rx="5" fill="#FDF3E0"/>
+            <path d="M64,18 q22,0 22,10 v38 q0,10 -22,10 q-22,0 -22,-10 v-38 q0,-10 22,-10 Z" fill="#E8940A" opacity="0.85"/>
+            <rect x="58" y="30" width="12" height="34" rx="5" fill="#FDF3E0"/>
+            <!-- 물질 이동 -->
+            <circle cx="-160" cy="4" r="4" fill="#2E6B3A"/>
+            <line x1="-160" y1="10" x2="-160" y2="84" stroke="#2E6B3A" stroke-width="1.6" stroke-dasharray="3 2" marker-end="url(#arrR)"/>
+            <text x="-186" y="96" font-size="6.4" fill="#2E6B3A">산소 — 직접 통과(확산)</text>
+            <rect x="-114" y="-2" width="11" height="11" rx="2" fill="#D6455D"/>
+            <line x1="-108" y1="12" x2="-108" y2="84" stroke="#D6455D" stroke-width="1.6" marker-end="url(#arrR)"/>
+            <text x="-108" y="96" text-anchor="middle" font-size="6.4" fill="#D6455D">포도당·이온 — 단백질 통로로</text>
+            <text x="150" y="96" text-anchor="middle" font-size="6.4" fill="#5B6B77">머리(물과 친함) 밖 · 꼬리(물 기피) 안</text>
+            <text x="-160" y="112" text-anchor="middle" font-size="7" fill="#5B6B77">세포 안</text>
+            <text x="0" y="134" text-anchor="middle" font-size="8.8" font-weight="800" fill="#E8940A">인지질 2중층 + 막단백질 = 물질을 가려 받는 '선택적 투과성'의 경계</text>
+          </g>
+        </svg>
+        <figcaption>그림 4 | 세포막의 구조와 물질 출입 — 작은 분자는 직접, 큰 분자는 단백질 통로로</figcaption>
+      </figure>
+
+      <div class="expoint">
+        <div class="boxtitle"><span class="ico">!</span>시험엔 이렇게</div>
+        <p>"세포막은 모든 물질을 통과시킨다"(X) — <b>선택적 투과성</b>이 핵심어다. 산소·이산화 탄소는 <b>인지질 사이 직접</b>, 포도당·이온은 <b>막단백질 통로</b> — 짝을 바꿔치기하는 선지를 조심하라.</p>
+      </div>
+    </div>
+
+    <div class="wing">
+      <div class="wtitle">날개 노트</div>
+      <div class="term"><b>확산</b>분자가 스스로 운동해 농도가 높은 쪽에서 낮은 쪽으로 퍼지는 현상. 에너지가 들지 않는다.</div>
+      <div class="term"><b>폐포의 기체 교환</b>허파꽈리에서 산소와 이산화 탄소가 오가는 것도 세포막을 사이에 둔 확산이다.</div>
+      <div class="wsep"></div>
+      <div class="wtitle">한눈에 암기</div>
+      <div class="wing-pen">인지질 2중층 + 막단백질<br>작은 것 = 직접 확산<br>큰 것 = 단백질 통로!</div>
+    </div>
+  </div>
+  <div class="quickcheck">
+    <span class="qc-title">바로바로 체크</span>
+    <ol>
+      <li><span class="no">1</span>세포막의 주성분은 인지질과 단백질이다. ( O , X )</li>
+      <li><span class="no">2</span>산소는 인지질 2중층을 직접 통과해 확산한다. ( O , X )</li>
+      <li><span class="no">3</span>세포막은 물질의 종류와 관계없이 모두 통과시킨다. ( O , X )</li>
+    </ol>
+    <div class="qc-ans">정답 1 O 2 O 3 X (선택적 투과성)</div>
+  </div>
+  <div class="folio"><span>III. 시스템과 상호작용</span><span class="num">133</span></div>
+</div>
+
+<!-- ═════════════ p.134 개념 05 생활 속 화학 반응 ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag">III. 시스템과 상호작용</span><span class="lesson-tag">05. 생명 시스템과 화학 반응</span></div>
+  <div class="cols">
+    <div class="main">
+      <h3 class="sec"><span class="n">5</span>식탁 위의 화학 — 생활 속 효소와 발효</h3>
+      <p class="body">효소의 무대는 몸속만이 아니다. 김치가 익는 것은 젖산균이라는 미생물이 자신의 물질대사(<span class="kw">발효</span>)로 배추 속 양분을 분해해 신맛 물질을 만들기 때문이고, 빵 반죽이 부푸는 것은 효모가 당을 분해하며 내놓는 이산화 탄소 기체 때문이다. 요구르트·된장·식초 — 인류는 효소의 정체를 알기 수천 년 전부터 <span class="u-amber">미생물의 물질대사를 빌려 음식을 만들어</span> 왔다.</p>
+      <p class="body">효소를 직접 꺼내 쓰기도 한다. <b>소화제</b>에는 녹말·단백질·지방을 분해하는 효소가 들어 있어 소화를 돕고, 질긴 고기를 <b>파인애플이나 키위즙</b>에 재우면 과일 속 단백질 분해 효소가 고기의 단백질을 끊어 연하게 만든다. 때가 잘 빠지는 <b>효소 세제</b>, 혈당을 재는 <b>혈당 측정기</b>의 감지 원리에도 효소가 들어 있다. 생명의 화학은 이렇게 식탁과 약국, 세탁실까지 이어진다.</p>
+
+      <figure>
+        <svg width="470" height="128" viewBox="0 0 470 128" font-family="PC Sans">
+          <g font-size="7">
+            <g transform="translate(64,8)">
+              <rect x="-54" y="0" width="108" height="88" rx="6" fill="#FBEBEE" stroke="#E3A0AC" stroke-width="0.9"/>
+              <path d="M-26,30 q0,-8 10,-8 h32 q10,0 10,8 l-4,26 q-1,6 -8,6 h-28 q-7,0 -8,-6 Z" fill="#fff" stroke="#D6455D" stroke-width="1.3"/>
+              <path d="M-18,30 q8,-10 18,0 q8,-10 18,0" stroke="#D6455D" stroke-width="1.6" fill="none"/>
+              <circle cx="-8" cy="44" r="2.4" fill="#D6455D"/><circle cx="6" cy="50" r="2.4" fill="#D6455D"/><circle cx="16" cy="42" r="2.4" fill="#D6455D"/>
+              <text x="0" y="74" text-anchor="middle" font-weight="800">김치 — 젖산 발효</text>
+            </g>
+            <g transform="translate(178,8)">
+              <rect x="-54" y="0" width="108" height="88" rx="6" fill="#FDF9F0" stroke="#EBCB9C" stroke-width="0.9"/>
+              <path d="M-28,52 q-4,-24 12,-30 q6,-12 18,-8 q14,-4 16,10 q10,8 2,20 q2,10 -10,10 h-28 q-8,0 -10,-2 Z" fill="#F6C98E" stroke="#E8940A" stroke-width="1.2"/>
+              <g fill="#fff" opacity="0.9"><circle cx="-8" cy="36" r="3"/><circle cx="6" cy="30" r="2.4"/><circle cx="14" cy="40" r="2.6"/></g>
+              <text x="0" y="74" text-anchor="middle" font-weight="800">빵 — 효모의 이산화 탄소</text>
+            </g>
+            <g transform="translate(292,8)">
+              <rect x="-54" y="0" width="108" height="88" rx="6" fill="#EAF6EC" stroke="#5FA86A" stroke-width="0.9"/>
+              <rect x="-22" y="18" width="44" height="14" rx="7" fill="#2E6B3A"/>
+              <rect x="-22" y="18" width="22" height="14" rx="7" fill="#5FA86A"/>
+              <path d="M-14,44 h28 l-3,16 h-22 Z" fill="#fff" stroke="#5FA86A" stroke-width="1.2"/>
+              <text x="0" y="74" text-anchor="middle" font-weight="800">소화제 — 분해 효소</text>
+            </g>
+            <g transform="translate(406,8)">
+              <rect x="-54" y="0" width="108" height="88" rx="6" fill="#F5F1FC" stroke="#CFC0EE" stroke-width="0.9"/>
+              <ellipse cx="-16" cy="38" rx="16" ry="22" fill="#F6C98E" stroke="#E8940A" stroke-width="1.2"/>
+              <path d="M-24,18 l8,-8 l8,8" stroke="#2E6B3A" stroke-width="2" fill="none"/>
+              <rect x="10" y="28" width="30" height="20" rx="3" fill="#D6455D" opacity="0.75"/>
+              <line x1="-16" y1="38" x2="8" y2="38" stroke="#6B46C8" stroke-width="1.6" marker-end="url(#arrP)"/>
+              <text x="0" y="74" text-anchor="middle" font-weight="800">파인애플 — 고기 연육</text>
+            </g>
+          </g>
+          <text x="235" y="118" text-anchor="middle" font-size="8.8" font-weight="800" fill="#E8940A">발효 식품도, 소화제도, 연육도 — 원리는 하나: 효소가 물질을 분해한다</text>
+        </svg>
+        <figcaption>그림 5 | 생활 속 효소와 발효 — 수천 년 된 기술과 최신 기술이 같은 원리를 쓴다</figcaption>
+      </figure>
+
+      <div class="gist">
+        <div class="boxtitle"><span class="ico">알</span>알짜 정리 ② — 생명 시스템과 화학 반응 한 장 요약</div>
+        <ul>
+          <li><b>세포</b> = 생명 시스템의 기본 단위 (세포 → 조직 → 기관 → 개체)</li>
+          <li><b>물질대사</b> = 동화(합성·흡수) / 이화(분해·방출) — 체온에서 단계적으로, 효소와 함께</li>
+          <li><b>효소</b> 활성화 에너지 ↓ / <b>세포막</b> 인지질 2중층 + 막단백질, 선택적 투과성</li>
+          <li>생활 응용: <b>발효 식품·소화제·연육·효소 세제</b> — 모두 효소의 분해 작용</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="wing">
+      <div class="wtitle">날개 노트</div>
+      <div class="term"><b>발효</b>미생물이 효소로 양분을 분해하는 물질대사 — 사람에게 이로우면 발효, 해로우면 부패라 부른다.</div>
+      <div class="term"><b>연육의 원리</b>파인애플의 브로멜라인 등 단백질 분해 효소가 고기의 단백질 사슬을 끊는다 — 합성이 아니라 분해다.</div>
+      <div class="wsep"></div>
+      <div class="wtitle">한눈에 암기</div>
+      <div class="wing-pen">김치·빵·요구르트 = 발효<br>소화제·연육·세제 = 효소<br>전부 '분해'가 열쇠!</div>
+    </div>
+  </div>
+  <div class="quickcheck">
+    <span class="qc-title">바로바로 체크</span>
+    <ol>
+      <li><span class="no">1</span>김치가 익는 것은 미생물의 물질대사 때문이다. ( O , X )</li>
+      <li><span class="no">2</span>소화제에는 영양소의 분해를 돕는 효소가 들어 있다. ( O , X )</li>
+      <li><span class="no">3</span>파인애플즙은 고기의 단백질 합성을 촉진해 고기를 연하게 한다. ( O , X )</li>
+    </ol>
+    <div class="qc-ans">정답 1 O 2 O 3 X (단백질을 분해한다)</div>
+  </div>
+  <div class="folio"><span>III. 시스템과 상호작용</span><span class="num">134</span></div>
+</div>
+
+<!-- ═════════════ p.135 자료 파헤치기 ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag">III. 시스템과 상호작용</span><span class="lesson-tag">05. 생명 시스템과 화학 반응</span></div>
+  <div class="lab">
+    <div class="lab-head">자료 파헤치기 <span class="tag">탐구·자료 분석</span> <span style="font-weight:600; font-size:9.5pt; margin-left:auto;">감자 속 효소, 카탈레이스 실험</span></div>
+    <div class="lab-body">
+      <h4>자료</h4>
+      <p>묽은 과산화수소수를 담은 시험관 세 개에 각각 (가) 생감자 조각, (나) 삶은 감자 조각을 넣고, (다)에는 아무것도 넣지 않았다. 결과: <b>(가)에서만 거품이 활발하게</b> 발생했고, (나)와 (다)에서는 거품이 거의 없었다. (감자에는 과산화수소를 물과 산소로 분해하는 효소 <b>카탈레이스</b>가 들어 있다.)</p>
+      <figure>
+        <svg width="430" height="120" viewBox="0 0 430 120" font-family="PC Sans">
+          <g font-size="7">
+            <g transform="translate(90,6)">
+              <path d="M-20,4 v66 q0,12 20,12 q20,0 20,-12 v-66" fill="#F0F7FA" stroke="#5B6B77" stroke-width="1.4"/>
+              <rect x="-13" y="52" width="26" height="22" rx="4" fill="#F6C98E" stroke="#E8940A"/>
+              <g fill="#fff" stroke="#2E6B3A" stroke-width="0.8">
+                <circle cx="-8" cy="40" r="3.4"/><circle cx="4" cy="30" r="2.8"/><circle cx="10" cy="44" r="3"/><circle cx="-2" cy="18" r="2.6"/><circle cx="8" cy="12" r="2.2"/><circle cx="-10" cy="26" r="2.4"/>
+              </g>
+              <text x="0" y="98" text-anchor="middle" font-weight="800" fill="#2E6B3A">(가) 생감자 — 거품 활발</text>
+            </g>
+            <g transform="translate(215,6)">
+              <path d="M-20,4 v66 q0,12 20,12 q20,0 20,-12 v-66" fill="#F0F7FA" stroke="#5B6B77" stroke-width="1.4"/>
+              <rect x="-13" y="52" width="26" height="22" rx="4" fill="#D9BE93" stroke="#A08A55"/>
+              <text x="0" y="98" text-anchor="middle" font-weight="800" fill="#A9556A">(나) 삶은 감자 — 거의 없음</text>
+            </g>
+            <g transform="translate(340,6)">
+              <path d="M-20,4 v66 q0,12 20,12 q20,0 20,-12 v-66" fill="#F0F7FA" stroke="#5B6B77" stroke-width="1.4"/>
+              <text x="0" y="98" text-anchor="middle" font-weight="800" fill="#5B6B77">(다) 과산화수소수만</text>
+            </g>
+            <text x="215" y="114" text-anchor="middle" font-size="8.4" font-weight="800" fill="#E8940A">거품의 정체 = 과산화수소가 분해되며 나온 산소 기체</text>
+          </g>
+        </svg>
+      </figure>
+      <h4>해석의 3단계</h4>
+      <ol>
+        <li><b>왜 (가)에서만 빠른가</b> — (다)를 보면 과산화수소는 혼자서도 분해되지만 매우 느리다. 생감자 속 <b>카탈레이스가 활성화 에너지를 낮추어</b> 분해를 극적으로 빠르게 한 것이다.</li>
+        <li><b>삶으면 왜 안 되는가</b> — 효소의 주성분은 <b>단백질</b>이다. 높은 온도에서 단백질의 입체 구조가 변하면(변성) 기질과 결합할 수 없어 촉매 기능을 잃는다. 감자 속 물질이 사라진 게 아니라 <b>모양이 무너진 것</b>이다.</li>
+        <li><b>대조군의 역할</b> — (다)는 '효소가 없으면 어떻게 되는가'를 보여 주는 비교 기준(대조군)이다. (가)와 (다)의 차이가 곧 효소의 효과다.</li>
+      </ol>
+      <h4>결론</h4>
+      <p>효소는 반응을 빠르게 하는 생체 촉매이며, 단백질로 되어 있어 열에 약하다. '무엇이 반응을 도왔고, 무엇이 그 능력을 없앴는가'를 구조로 설명할 수 있어야 이 실험을 다 읽은 것이다.</p>
+      <div class="expoint">
+        <div class="boxtitle"><span class="ico">!</span>시험엔 이렇게</div>
+        <p>이 실험은 <b>① 촉매 작용(거품 = 산소) ② 단백질 변성(삶으면 기능 상실) ③ 대조군 설정</b> 세 포인트가 전부다. "삶은 감자에는 카탈레이스가 없다"(X — 있지만 변성됨) 선지를 조심하라.</p>
+      </div>
+      <h4>직접 해보기 — 주방 실험실</h4>
+      <p>상처 소독용 과산화수소수를 두 컵에 나누고, 한쪽에는 생감자 조각을, 다른 쪽에는 전자레인지에 익힌 감자 조각을 넣어 보자. 거품 차이가 한눈에 보인다. 간의 카탈레이스는 감자보다 훨씬 강력해서 닭 간으로 하면 극적이다. (주의: 눈에 튀지 않게, 실험 후 손 씻기)</p>
+    </div>
+  </div>
+  <div class="folio"><span>III. 시스템과 상호작용</span><span class="num">135</span></div>
+</div>
+
+<!-- ═════════════ p.136 STEP 1 + STEP 2 시작 ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag">III. 시스템과 상호작용</span><span class="lesson-tag">05. 생명 시스템과 화학 반응 | 문제</span></div>
+
+  <div class="step-head"><span class="stepno">STEP 1</span><span class="steptt">개념 확인</span><span class="stepdesc">OX와 빈칸으로 개념 점검 — 막히면 알짜 정리로!</span></div>
+  <div class="qgrid">
+    <div>
+      <div class="q"><div class="qhead"><span class="qno">1</span><div class="stem">세포에서 일어나는 물질대사에는 효소가 관여한다. <span class="ox-answer">( O , X )</span></div></div></div>
+      <div class="q"><div class="qhead"><span class="qno">2</span><div class="stem">세포 호흡은 포도당을 합성하는 동화 작용이다. <span class="ox-answer">( O , X )</span></div></div></div>
+      <div class="q"><div class="qhead"><span class="qno">3</span><div class="stem">세포막의 주성분은 인지질과 단백질이다. <span class="ox-answer">( O , X )</span></div></div></div>
+    </div>
+    <div>
+      <div class="q"><div class="qhead"><span class="qno">4</span><div class="stem">크고 복잡한 물질을 작고 간단한 물질로 분해하는 물질대사를 <span class="blankline" style="min-width:10mm;"></span> 작용이라 한다.</div></div></div>
+      <div class="q"><div class="qhead"><span class="qno">5</span><div class="stem">효소는 반응에 필요한 <span class="blankline" style="min-width:12mm;"></span> 에너지를 낮추어 반응 속도를 빠르게 한다.</div></div></div>
+      <div class="q"><div class="qhead"><span class="qno">6</span><div class="stem">세포막은 인지질 <span class="blankline" style="min-width:10mm;"></span>에 막단백질이 박혀 있는 구조다.</div></div></div>
+    </div>
+  </div>
+
+  <div style="border-top:0.5mm solid var(--line); margin:2mm 0 4mm;"></div>
+
+  <div class="step-head s2"><span class="stepno">STEP 2</span><span class="steptt">내신 완성</span><span class="stepdesc">학교 시험 유형 그대로 — 서술형까지 한 번에</span></div>
+
+  <div class="q">
+    <div class="qhead"><span class="qno">7</span><div class="stem">물질대사에 대한 설명으로 옳은 것은? <span class="difficulty">●●○</span>
+    <div class="tags">10통과1-03-05 | 개념 2</div></div></div>
+    <ul class="choices">
+      <li>① 물질대사는 효소 없이도 체온에서 빠르게 일어난다.</li>
+      <li>② 세포 호흡은 에너지를 흡수하는 동화 작용이다.</li>
+      <li>③ 광합성은 포도당을 분해하는 이화 작용이다.</li>
+      <li>④ 물질대사는 여러 단계로 나뉘어 에너지를 조금씩 주고받는다.</li>
+      <li>⑤ 연소와 세포 호흡은 일어나는 온도가 같다.</li>
+    </ul>
+  </div>
+
+  <div class="q">
+    <div class="qhead"><span class="qno">8</span><div class="stem">효소에 대한 설명으로 옳은 것은? <span class="difficulty">●●●</span>
+    <div class="tags">10통과1-03-05 | 개념 3</div></div></div>
+    <ul class="choices">
+      <li>① 효소는 반응이 끝나면 소모되어 없어진다.</li>
+      <li>② 하나의 효소는 어떤 반응이든 가리지 않고 도울 수 있다.</li>
+      <li>③ 효소는 활성화 에너지를 낮추어 반응이 빠르게 일어나게 한다.</li>
+      <li>④ 효소는 온도가 아무리 높아도 기능을 유지한다.</li>
+      <li>⑤ 효소의 주성분은 탄수화물이다.</li>
+    </ul>
+  </div>
+
+  <div class="folio"><span>III. 시스템과 상호작용</span><span class="num">136</span></div>
+</div>
+
+<!-- ═════════════ p.137 STEP 2 계속 ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag">III. 시스템과 상호작용</span><span class="lesson-tag">05. 생명 시스템과 화학 반응 | 문제</span></div>
+
+  <div class="q">
+    <div class="qhead"><span class="qno">9</span><div class="stem"><span class="badge-data">자료</span>그림은 어떤 화학 반응에서 효소가 있을 때와 없을 때의 에너지 변화를 나타낸 것이다. 이에 대한 설명으로 옳은 것은? <span class="difficulty">●●●</span>
+    <div class="tags">10통과1-03-05 | 개념 3</div></div></div>
+    <figure style="margin:2mm 0 1mm 8.4mm;">
+      <svg width="270" height="100" viewBox="0 0 270 100" font-family="PC Sans">
+        <line x1="30" y1="84" x2="260" y2="84" stroke="#5B6B77" stroke-width="1.1" marker-end="url(#arrP)"/>
+        <line x1="30" y1="84" x2="30" y2="6" stroke="#5B6B77" stroke-width="1.1" marker-end="url(#arrP)"/>
+        <text x="258" y="96" text-anchor="end" font-size="6.6" fill="#5B6B77">반응 진행</text>
+        <text x="34" y="8" font-size="6.6" fill="#5B6B77">에너지</text>
+        <path d="M42,54 Q110,-12 160,42 Q200,74 246,68" fill="none" stroke="#D6455D" stroke-width="1.8"/>
+        <path d="M42,54 Q116,18 160,48 Q200,74 246,68" fill="none" stroke="#2E6B3A" stroke-width="1.8" stroke-dasharray="4 2.5"/>
+        <text x="106" y="14" font-size="6.4" fill="#D6455D">효소 없음</text>
+        <text x="138" y="38" font-size="6.4" fill="#2E6B3A">효소 있음</text>
+        <text x="44" y="48" font-size="6.2" fill="#5B6B77">반응물</text>
+        <text x="244" y="62" text-anchor="end" font-size="6.2" fill="#5B6B77">생성물</text>
+      </svg>
+    </figure>
+    <ul class="choices">
+      <li>① 효소는 반응물과 생성물의 에너지 차이를 바꾼다.</li>
+      <li>② 효소가 있으면 넘어야 할 에너지 언덕이 높아진다.</li>
+      <li>③ 효소는 반응에 참여하면서 소모된다.</li>
+      <li>④ 효소가 있으면 만들어지는 생성물의 종류가 달라진다.</li>
+      <li>⑤ 효소는 활성화 에너지를 낮추어 반응이 빨리 일어나게 한다.</li>
+    </ul>
+  </div>
+
+  <div class="q">
+    <div class="qhead"><span class="qno">10</span><div class="stem">생활 속 화학 반응에 대한 설명으로 옳은 것만을 고른 것은? <span class="difficulty">●●●</span>
+    <div class="tags">10통과1-03-05 | 개념 5</div></div></div>
+    <div class="bogi-box" style="background:#fff;">
+      (가) 김치가 익는 것은 미생물의 물질대사(발효) 때문이다.<br>
+      (나) 소화제에는 영양소의 분해를 돕는 효소가 들어 있다.<br>
+      (다) 고기를 파인애플즙에 재우면 단백질 합성이 활발해져 고기가 연해진다.
+    </div>
+    <ul class="choices inline">
+      <li>① (가)</li><li>② (나)</li><li>③ (가), (나)</li><li>④ (나), (다)</li><li>⑤ (가), (나), (다)</li>
+    </ul>
+  </div>
+
+  <div class="q">
+    <div class="qhead"><span class="qno">11</span><div class="stem"><span class="badge-essay">서술형</span>과산화수소수에 생감자를 넣으면 거품이 활발히 생기지만, 삶은 감자를 넣으면 거품이 거의 생기지 않는다. 그 까닭을 <b>'단백질'과 '구조'</b>라는 말을 포함하여 서술하시오. <span class="difficulty">●●●●</span>
+    <div class="tags">10통과1-03-05 | 개념 3·자료</div></div></div>
+    <div class="essay-lines"><div></div><div></div><div></div></div>
+  </div>
+
+  <div class="folio"><span>III. 시스템과 상호작용</span><span class="num">137</span></div>
+</div>
+
+<!-- ═════════════ p.138 STEP 3 ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag">III. 시스템과 상호작용</span><span class="lesson-tag">05. 생명 시스템과 화학 반응 | 문제</span></div>
+  <div class="step-head s3"><span class="stepno">STEP 3</span><span class="steptt">수능 도전</span><span class="stepdesc">2028 수능 규격 — ㄱㄴㄷ 합답형·자료 해석</span></div>
+
+  <div class="q">
+    <div class="qhead"><span class="qno">12</span><div class="stem"><span class="badge-data">자료</span>표는 생명체에서 일어나는 두 물질대사 (가)와 (나)를 나타낸 것이다. 옳은 것만을 &lt;보기&gt;에서 있는 대로 고른 것은? <span class="difficulty">[2점]</span>
+    <div class="tags">10통과1-03-05</div></div></div>
+    <div class="bogi-box" style="background:#fff; margin-bottom:2mm;">
+      (가) 이산화 탄소 + 물 → 포도당 + 산소 (에너지 흡수)<br>
+      (나) 포도당 + 산소 → 이산화 탄소 + 물 (에너지 방출)
+    </div>
+    <div class="bogi-box">
+      <div class="bt">보기</div>
+      ㄱ. (가)는 동화 작용, (나)는 이화 작용이다.<br>
+      ㄴ. (가)와 (나)에는 모두 효소가 관여한다.<br>
+      ㄷ. (나)는 우리 몸의 세포에서는 일어나지 않는다.
+    </div>
+    <ul class="choices inline">
+      <li>① ㄱ</li><li>② ㄷ</li><li>③ ㄱ, ㄴ</li><li>④ ㄴ, ㄷ</li><li>⑤ ㄱ, ㄴ, ㄷ</li>
+    </ul>
+  </div>
+
+  <div class="q">
+    <div class="qhead"><span class="qno">13</span><div class="stem"><span class="badge-data">자료</span>그림은 세포막을 통한 물질 A, B의 이동을 나타낸 것이다. A는 인지질 2중층 사이를 직접 통과하고, B는 막단백질을 통해 이동한다. 옳은 것만을 &lt;보기&gt;에서 있는 대로 고른 것은? <span class="difficulty">[2.5점]</span>
+    <div class="tags">10통과1-03-05</div></div></div>
+    <figure style="margin:2mm 0 1mm 8.6mm;">
+      <svg width="270" height="96" viewBox="0 0 270 96" font-family="PC Sans">
+        <g transform="translate(135,6)" font-size="6.4">
+          <g fill="#9E85E0"><circle cx="-110" cy="22" r="5"/><circle cx="-95" cy="22" r="5"/><circle cx="-80" cy="22" r="5"/><circle cx="-65" cy="22" r="5"/><circle cx="-20" cy="22" r="5"/><circle cx="-5" cy="22" r="5"/><circle cx="10" cy="22" r="5"/><circle cx="55" cy="22" r="5"/><circle cx="70" cy="22" r="5"/><circle cx="85" cy="22" r="5"/><circle cx="100" cy="22" r="5"/></g>
+          <g fill="#9E85E0"><circle cx="-110" cy="52" r="5"/><circle cx="-95" cy="52" r="5"/><circle cx="-80" cy="52" r="5"/><circle cx="-65" cy="52" r="5"/><circle cx="-20" cy="52" r="5"/><circle cx="-5" cy="52" r="5"/><circle cx="10" cy="52" r="5"/><circle cx="55" cy="52" r="5"/><circle cx="70" cy="52" r="5"/><circle cx="85" cy="52" r="5"/><circle cx="100" cy="52" r="5"/></g>
+          <path d="M28,14 q14,0 14,8 v30 q0,8 -14,8 q-14,0 -14,-8 v-30 q0,-8 14,-8 Z" fill="#E8940A" opacity="0.85"/>
+          <rect x="24" y="24" width="8" height="26" rx="3.5" fill="#FDF3E0"/>
+          <circle cx="-88" cy="2" r="3.6" fill="#2E6B3A"/>
+          <text x="-98" y="6" text-anchor="end" fill="#2E6B3A">A</text>
+          <line x1="-88" y1="8" x2="-88" y2="68" stroke="#2E6B3A" stroke-width="1.4" stroke-dasharray="3 2" marker-end="url(#arrR)"/>
+          <rect x="24" y="-4" width="9" height="9" rx="2" fill="#D6455D"/>
+          <text x="18" y="3" text-anchor="end" fill="#D6455D">B</text>
+          <line x1="28" y1="8" x2="28" y2="68" stroke="#D6455D" stroke-width="1.4" marker-end="url(#arrR)"/>
+          <text x="-124" y="10" text-anchor="middle" fill="#5B6B77">세포 밖</text>
+          <text x="-124" y="72" text-anchor="middle" fill="#5B6B77">세포 안</text>
+        </g>
+      </svg>
+    </figure>
+    <div class="bogi-box">
+      <div class="bt">보기</div>
+      ㄱ. 세포막은 인지질 2중층과 막단백질로 이루어져 있다.<br>
+      ㄴ. A로는 산소, B로는 포도당이 적절하다.<br>
+      ㄷ. 세포막은 물질의 종류와 관계없이 같은 방식으로 물질을 통과시킨다.
+    </div>
+    <ul class="choices inline">
+      <li>① ㄱ</li><li>② ㄷ</li><li>③ ㄱ, ㄷ</li><li>④ ㄱ, ㄴ</li><li>⑤ ㄱ, ㄴ, ㄷ</li>
+    </ul>
+  </div>
+
+  <div class="folio"><span>III. 시스템과 상호작용</span><span class="num">138</span></div>
+</div>
+
+<!-- ═════════════ p.139 해설 1 ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag" style="color:var(--brand);">알짜 해설</span><span class="lesson-tag">05. 생명 시스템과 화학 반응</span></div>
+  <div class="sol-head"><span class="stt">알짜 해설</span><span class="sub">전 문항 해설 + 오답 선지 분석 — 맞힌 문제도 해설로 한 번 더!</span></div>
+
+  <table class="anstable">
+    <tr><th>문항</th><td>1</td><td>2</td><td>3</td><td>4</td><td>5</td><td>6</td><td>7</td><td>8</td><td>9</td><td>10</td><td>11</td><td>12</td><td>13</td></tr>
+    <tr><th>정답</th><td class="a">O</td><td class="a">X</td><td class="a">O</td><td class="a">이화</td><td class="a">활성화</td><td class="a">2중층</td><td class="a">④</td><td class="a">③</td><td class="a">⑤</td><td class="a">③</td><td class="a">서술형</td><td class="a">③</td><td class="a">④</td></tr>
+  </table>
+
+  <div class="solcols">
+    <div>
+      <div class="sol"><div class="shead"><span class="sno">1</span><span class="sans">O</span><span class="slink">개념 2·3</span></div>
+        <p>물질대사는 반드시 효소의 도움으로 진행된다 — 그래서 저온에서도 빠르다.</p></div>
+      <div class="sol"><div class="shead"><span class="sno">2</span><span class="sans">X</span><span class="slink">개념 2</span></div>
+        <p>세포 호흡은 포도당을 '분해'해 에너지를 꺼내는 이화 작용이다.</p></div>
+      <div class="sol"><div class="shead"><span class="sno">3</span><span class="sans">O</span><span class="slink">개념 4</span></div>
+        <p>세포막 = 인지질 2중층 + 막단백질.</p></div>
+      <div class="sol"><div class="shead"><span class="sno">4</span><span class="sans">이화</span><span class="slink">개념 2</span></div>
+        <p>분해 = 이화(에너지 방출), 합성 = 동화(에너지 흡수).</p></div>
+      <div class="sol"><div class="shead"><span class="sno">5</span><span class="sans">활성화</span><span class="slink">개념 3</span></div>
+        <p>효소는 에너지 언덕(활성화 에너지)을 낮추는 생체 촉매다.</p></div>
+      <div class="sol"><div class="shead"><span class="sno">6</span><span class="sans">2중층</span><span class="slink">개념 4</span></div>
+        <p>인지질이 머리를 밖으로, 꼬리를 안으로 두 겹 — 2중층이다.</p></div>
+    </div>
+    <div>
+      <div class="sol"><div class="shead"><span class="sno">7</span><span class="sans">④</span><span class="slink">개념 2</span></div>
+        <p>물질대사는 단계적으로 조금씩 — 연소처럼 한 번에 타지 않는다.</p>
+        <div class="wrongbox"><div class="wt">오답 왜 틀렸나</div>
+          <p><b>①</b> 효소가 반드시 필요하다. <b>②</b> 세포 호흡은 이화. <b>③</b> 광합성은 동화(합성). <b>⑤</b> 연소는 고온, 물질대사는 체온.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">8</span><span class="sans">③</span><span class="slink">개념 3</span></div>
+        <p>활성화 에너지를 낮춘다 — 효소 정의 그 자체.</p>
+        <div class="wrongbox"><div class="wt">오답 왜 틀렸나</div>
+          <p><b>①</b> 소모되지 않고 재사용. <b>②</b> 기질 특이성 — 짝이 정해져 있다. <b>④</b> 고온에서 변성되어 기능 상실. <b>⑤</b> 주성분은 단백질.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">9</span><span class="sans">⑤</span><span class="slink">개념 3</span></div>
+        <p>두 곡선의 차이는 오직 언덕 높이 — 효소는 활성화 에너지만 낮춘다.</p>
+        <div class="wrongbox"><div class="wt">오답 왜 틀렸나</div>
+          <p><b>①</b> 반응물·생성물의 에너지는 그대로다(출발점·도착점 동일). <b>②</b> 반대 — 낮아진다. <b>③·④</b> 효소는 소모되지 않고, 생성물도 바꾸지 않는다.</p></div></div>
+    </div>
+  </div>
+
+  <div class="folio"><span>알짜 해설</span><span class="num">139</span></div>
+</div>
+
+<!-- ═════════════ p.140 해설 2 ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag" style="color:var(--brand);">알짜 해설</span><span class="lesson-tag">05. 생명 시스템과 화학 반응</span></div>
+  <div class="solcols">
+    <div>
+      <div class="sol"><div class="shead"><span class="sno">10</span><span class="sans">③</span><span class="slink">개념 5</span></div>
+        <p>(가) 발효 = 미생물의 물질대사, (나) 소화제 = 분해 효소 — 둘 다 옳다.</p>
+        <div class="wrongbox"><div class="wt">오답 왜 틀렸나</div>
+          <p><b>(다)</b> 연육은 단백질 '분해'다 — 파인애플의 효소가 고기 단백질 사슬을 끊어 연해진다. 합성으로 쓴 선지는 무조건 틀린다.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">11</span><span class="sans">모범 답안</span><span class="slink">개념 3·자료</span></div>
+        <p>감자 속 효소 카탈레이스는 <b>단백질</b>로 되어 있다. 감자를 삶으면 높은 온도에 의해 단백질의 <b>입체 구조가 변해(변성)</b> 기질인 과산화수소와 결합하지 못하므로, 분해 반응이 빨라지지 않아 거품(산소)이 거의 생기지 않는다.</p>
+        <div class="wrongbox"><div class="wt">채점 기준 (감점 포인트)</div>
+          <p>① 효소의 주성분이 단백질임 ② 가열로 구조가 변함(변성) ③ 그래서 촉매 기능을 잃음 — 세 요소 모두 서술해야 만점. "효소가 다 빠져나갔다"는 오답이다.</p></div></div>
+    </div>
+    <div>
+      <div class="sol"><div class="shead"><span class="sno">12</span><span class="sans">③</span><span class="slink">개념 2 | 2점</span></div>
+        <p><b>ㄱ (옳음)</b> (가)는 합성(광합성) = 동화, (나)는 분해(세포 호흡) = 이화. <b>ㄴ (옳음)</b> 모든 물질대사에는 효소가 관여한다. <b>ㄷ (틀림)</b> 세포 호흡은 우리 몸의 모든 세포에서 일어난다.</p>
+        <div class="wrongbox"><div class="wt">함정 체크</div>
+          <p>'호흡 = 허파'로만 알면 ㄷ에 속는다 — 숨쉬기는 기체 교환이고, 세포 호흡은 세포 하나하나의 일이다.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">13</span><span class="sans">④</span><span class="slink">개념 4 | 2.5점</span></div>
+        <p><b>ㄱ (옳음)</b> 세포막의 기본 구조 그대로. <b>ㄴ (옳음)</b> 작은 분자(산소)는 직접, 크거나 전하 띤 물질(포도당·이온)은 단백질 통로 — A·B 배정이 맞다. <b>ㄷ (틀림)</b> 물질을 가려 받는 선택적 투과성이 핵심이다.</p>
+        <div class="wrongbox"><div class="wt">함정 체크</div>
+          <p>A·B를 서로 바꾼 선지가 단골 — <b>'작으면 직접, 크면 통로'</b> 여섯 글자로 판정하라.</p></div></div>
+
+      <div class="gist" style="margin-top:5mm;">
+        <div class="boxtitle"><span class="ico">알</span>이 소단원, 이것만은!</div>
+        <ul>
+          <li><b>물질대사</b> = 생명체 속 화학 반응: 동화(합성·흡수) / 이화(분해·방출), 저온·단계적</li>
+          <li><b>효소</b> = 활성화 에너지 ↓ 생체 촉매 — 기질 특이성, 소모 없음, 단백질이라 열에 약함</li>
+          <li><b>세포막</b> = 인지질 2중층 + 막단백질, 선택적 투과성 / 생활 응용은 전부 '분해'</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div class="folio"><span>알짜 해설</span><span class="num">140</span></div>
+</div>
+
+<!-- ═════════════ p.141 MEMO ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag">III. 시스템과 상호작용</span><span class="lesson-tag">05 ▸ 06 넘어가기 전에</span></div>
+  <div class="memo-head"><span class="mt">MEMO</span><span class="ms">헷갈린 개념, 다시 틀린 문제 번호, 나만의 암기법을 남겨 두는 자리</span></div>
+  <div class="memo-area"></div>
+  <div class="memo-pen">"'밥은 왜 태우지 않고 소화시킬까?' — 효소와 활성화 에너지로 답하지 못하면 132쪽으로! — 박찬쌤"</div>
+  <div class="folio"><span>박찬 과학 | 통합과학 1</span><span class="num">141</span></div>
+</div>
+
+</body>
+</html>
