@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<title>박찬 과학 강의 판본 시안 A — 칠판 강의록 (가로형)</title>
+<style>
+  @font-face { font-family:'PC Sans'; src:url('file:///root/.fonts/NotoSansKR.ttf'); font-weight:100 900; }
+  @font-face { font-family:'PC Serif'; src:url('file:///root/.fonts/NotoSerifKR.ttf'); font-weight:100 900; }
+  @font-face { font-family:'PC Pen'; src:url('file:///root/.fonts/YeonSung-Regular.ttf'); font-weight:400; }
+  :root{
+    --board:#1C2B4A;      /* 정적 네이비 칠판 */
+    --board-lt:#EEF2F9;
+    --chalk:#F7F4EC;
+    --unit:#2E5BDA;
+    --accent:#E8940A;
+    --accent-lt:#FDF3E0;
+    --ink:#22303A; --sub:#5B6B77; --line:#D8E0E5;
+  }
+  *{ box-sizing:border-box; margin:0; padding:0; -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+  @page{ size:297mm 210mm; margin:0; }
+  html,body{ font-family:'PC Sans',sans-serif; color:var(--ink); word-break:keep-all; overflow-wrap:anywhere; }
+  .slide{ width:297mm; height:210mm; position:relative; overflow:hidden; background:#FDFCF9; page-break-after:always; padding:12mm 16mm 20mm; display:flex; flex-direction:column; }
+  .top{ display:flex; align-items:baseline; gap:5mm; border-bottom:0.6mm solid var(--board); padding-bottom:2.5mm; margin-bottom:7mm; }
+  .top .lesson{ font-size:12pt; font-weight:900; color:var(--board); letter-spacing:0.03em; }
+  .top .path{ font-size:10.5pt; color:var(--sub); }
+  .top .pageno{ margin-left:auto; font-size:12pt; font-weight:900; color:var(--unit); }
+  .foot{ position:absolute; bottom:6mm; left:16mm; right:16mm; display:flex; justify-content:space-between; font-size:9pt; color:var(--sub); }
+
+  h1.big{ font-size:34pt; font-weight:900; letter-spacing:-0.01em; line-height:1.25; }
+  .keyline{ font-family:'PC Serif'; font-size:19pt; font-weight:800; line-height:1.6; }
+  .keyline .hl{ background:#F8E9C6; padding:0 1.5mm; border-radius:1mm; box-decoration-break:clone; -webkit-box-decoration-break:clone; }
+  p.talk{ font-family:'PC Serif'; font-size:13.5pt; line-height:1.95; color:#33404C; }
+
+  .cols2{ display:grid; grid-template-columns:1fr 1fr; gap:10mm; flex:1; min-height:0; }
+  .board{ background:var(--board); border-radius:4mm; color:var(--chalk); padding:8mm 9mm; }
+  .board .btitle{ font-size:12pt; font-weight:900; color:#F6C98E; letter-spacing:0.08em; margin-bottom:4mm; display:flex; gap:2.5mm; align-items:center; }
+  .board .btitle::before{ content:"✎"; }
+  .board .bl{ font-size:15.5pt; font-weight:700; line-height:1.85; }
+  .board .bl b{ color:#FFD98A; }
+  .mention{ margin-top:auto; background:var(--accent-lt); border-left:1.6mm solid var(--accent); border-radius:0 3mm 3mm 0; padding:4.5mm 7mm; }
+  .mention .mt{ font-size:10pt; font-weight:900; color:#9C6503; letter-spacing:0.1em; margin-bottom:1.5mm; }
+  .mention .pen{ font-family:'PC Pen'; font-size:17pt; color:#B4560E; line-height:1.5; }
+  figure{ text-align:center; }
+  figcaption{ font-size:10pt; color:var(--sub); margin-top:3mm; }
+  .stepstrip{ display:flex; gap:4mm; margin-top:8mm; }
+  .stepchip{ flex:1; background:var(--board-lt); border:0.4mm solid #BCCDF3; border-radius:3mm; padding:5mm 4mm; text-align:center; }
+  .stepchip .n{ font-size:13pt; font-weight:900; color:var(--unit); }
+  .stepchip .t{ font-size:12.5pt; font-weight:800; margin-top:1mm; }
+  .stepchip .d{ font-size:9.5pt; color:var(--sub); margin-top:1mm; }
+  .qbox{ margin-top:9mm; border-top:0.6mm solid var(--accent); border-bottom:0.6mm solid var(--accent); padding:6mm 4mm; }
+  .qbox .q{ font-family:'PC Serif'; font-size:17pt; font-weight:800; line-height:1.7; }
+  .evi{ display:grid; grid-template-columns:1fr 1fr; gap:8mm; flex:1; }
+  .ecard{ border:0.5mm solid #BCCDF3; border-radius:4mm; padding:7mm 8mm; background:#fff; }
+  .ecard .en{ font-size:12pt; font-weight:900; color:#fff; background:var(--unit); border-radius:2mm; display:inline-block; padding:1mm 4mm; margin-bottom:3.5mm; }
+  .ecard .et{ font-size:17pt; font-weight:900; margin-bottom:3mm; }
+  .ecard p{ font-family:'PC Serif'; font-size:12.5pt; line-height:1.8; color:#33404C; }
+</style>
+</head>
+<body>
+
+<!-- ── 1. 강의 표지 ── -->
+<div class="slide">
+  <div class="top"><span class="lesson">박찬 과학 · 강의록</span><span class="path">통합과학 1 › II. 물질과 규칙성</span><span class="pageno">II-01</span></div>
+  <div style="margin-top:10mm;">
+    <div style="font-size:13pt; font-weight:800; color:var(--unit); letter-spacing:0.2em; margin-bottom:5mm;">첫 번째 시간</div>
+    <h1 class="big">우주의 시작과<br>원소의 탄생</h1>
+  </div>
+  <div class="qbox">
+    <div class="q">"여러분 몸속의 수소는 <span style="color:#B4560E;">138억 년 전</span>에 만들어졌습니다.<br>오늘은 그 증거를 두 가지 보여 드리죠."</div>
+  </div>
+  <div class="stepstrip">
+    <div class="stepchip"><div class="n">1</div><div class="t">빅뱅과 팽창</div><div class="d">우주는 한 점에서</div></div>
+    <div class="stepchip"><div class="n">2</div><div class="t">입자의 탄생</div><div class="d">식으면서 차례대로</div></div>
+    <div class="stepchip"><div class="n">3</div><div class="t">스펙트럼</div><div class="d">원소의 지문 읽기</div></div>
+    <div class="stepchip"><div class="n">4</div><div class="t">빅뱅의 증거</div><div class="d">배경 복사 · 3:1</div></div>
+  </div>
+  <div class="foot"><span>박찬 과학 | 강의 판본</span><span>1 / 5</span></div>
+</div>
+
+<!-- ── 2. 빅뱅과 팽창 ── -->
+<div class="slide">
+  <div class="top"><span class="lesson">1 · 빅뱅과 팽창</span><span class="path">II-01 우주의 시작과 원소의 탄생</span><span class="pageno">교재 63쪽</span></div>
+  <div class="keyline">약 138억 년 전, 우주는 매우 뜨겁고 밀도가 큰 한 점에서 시작되었다 — <span class="hl">빅뱅.</span><br>그 뒤로 지금까지 <span class="hl">팽창하며 식어 가는 중</span>이다.</div>
+  <div class="cols2" style="margin-top:8mm;">
+    <div>
+      <p class="talk">팽창의 증거는 먼 은하들입니다. 어느 방향을 보아도 은하들이 우리에게서 멀어지고, <b>멀리 있는 은하일수록 더 빨리</b> 멀어집니다. 시간을 거꾸로 돌리면? — 우주 전체가 한 점에 모입니다.</p>
+      <p class="talk" style="margin-top:5mm;">팽창하는 우주에는 <b>'중심'이 따로 없다</b>는 것이 오늘 첫 번째 함정 포인트입니다.</p>
+    </div>
+    <div class="board">
+      <div class="btitle">판서 포인트</div>
+      <div class="bl">
+        · 빅뱅 = 138억 년 전, 한 점의 대폭발<br>
+        · 팽창 → 온도·밀도 <b>감소</b><br>
+        · 풍선 비유: 어느 스티커에서 봐도<br>&nbsp;&nbsp;서로 멀어진다 → <b>중심 없음!</b>
+      </div>
+    </div>
+  </div>
+  <div class="mention">
+    <div class="mt">강의 멘트</div>
+    <span class="pen">"풍선에 스티커 붙이고 불어 보세요 — 어느 스티커가 '중심'입니까? 없죠. 우주 팽창이 딱 그렇습니다."</span>
+  </div>
+  <div class="foot"><span>박찬 과학 | 강의 판본</span><span>2 / 5</span></div>
+</div>
+
+<!-- ── 3. 입자의 탄생 ── -->
+<div class="slide">
+  <div class="top"><span class="lesson">2 · 식으면서 태어난 입자들</span><span class="path">II-01 우주의 시작과 원소의 탄생</span><span class="pageno">교재 64쪽</span></div>
+  <div class="keyline">우주가 <span class="hl">식어 가는 순서대로</span>, 작은 입자부터 차례로 결합했다 — 핵은 <span class="hl">약 3분</span>, 원자는 <span class="hl">약 38만 년.</span></div>
+  <figure style="margin-top:7mm;">
+    <svg width="960" height="265" viewBox="0 0 500 138" font-family="PC Sans">
+      <defs>
+        <linearGradient id="tl" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0" stop-color="#F4A62A"/><stop offset="0.5" stop-color="#5B7FE4"/><stop offset="1" stop-color="#2E5BDA"/>
+        </linearGradient>
+        <marker id="arr" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="#2E5BDA"/></marker>
+      </defs>
+      <rect x="18" y="6" width="464" height="10" rx="5" fill="url(#tl)"/>
+      <text x="26" y="14" font-size="6.6" font-weight="800" fill="#fff">매우 뜨겁다</text>
+      <text x="250" y="14" text-anchor="middle" font-size="6.6" font-weight="800" fill="#fff">팽창하며 식는다 →</text>
+      <text x="474" y="14" text-anchor="end" font-size="6.6" font-weight="800" fill="#DCE6FB">차갑다</text>
+      <g text-anchor="middle" font-size="8.5" font-weight="900" fill="#2E5BDA">
+        <text x="30" y="38">①</text><text x="118" y="38">②</text><text x="212" y="38">③</text><text x="318" y="38">④</text><text x="422" y="38">⑤</text>
+      </g>
+      <line x1="18" y1="74" x2="482" y2="74" stroke="#7A97E8" stroke-width="3" marker-end="url(#arr)"/>
+      <g transform="translate(30,74)">
+        <circle r="11" fill="#F4A62A"/><path d="M0,-11 L2.5,-4 L10,-4 L4,1 L6,9 L0,4.5 L-6,9 L-4,1 L-10,-4 L-2.5,-4 Z" fill="#FDE9C8" transform="scale(0.9)"/>
+        <circle r="4" fill="#E8940A"/>
+        <text y="30" text-anchor="middle" font-size="10.5" font-weight="800" fill="#22303A">빅뱅</text><text y="42" text-anchor="middle" font-size="8" fill="#5B6B77">138억 년 전</text>
+      </g>
+      <g transform="translate(118,74)">
+        <circle cx="-6" cy="-3" r="4" fill="#2E5BDA"/><circle cx="5" cy="4" r="4" fill="#7A97E8"/><circle cx="6" cy="-7" r="2.6" fill="#D6455D"/>
+        <text y="30" text-anchor="middle" font-size="10.5" font-weight="800" fill="#22303A">기본 입자</text><text y="42" text-anchor="middle" font-size="8" fill="#5B6B77">쿼크·전자</text>
+      </g>
+      <g transform="translate(212,74)">
+        <circle cx="-7" cy="0" r="8" fill="#2E5BDA"/>
+        <g fill="#DCE6FB"><circle cx="-9.5" cy="-2" r="1.9"/><circle cx="-4.5" cy="-2" r="1.9"/><circle cx="-7" cy="3" r="1.9"/></g>
+        <circle cx="8" cy="0" r="8" fill="#B9CBF2"/>
+        <g fill="#fff"><circle cx="5.5" cy="-2" r="1.9"/><circle cx="10.5" cy="-2" r="1.9"/><circle cx="8" cy="3" r="1.9"/></g>
+        <text y="30" text-anchor="middle" font-size="10.5" font-weight="800" fill="#22303A">양성자·중성자</text><text y="42" text-anchor="middle" font-size="8" fill="#5B6B77">쿼크 3개씩 결합</text>
+      </g>
+      <g transform="translate(318,74)">
+        <circle cx="-4" cy="-3.5" r="4.6" fill="#2E5BDA"/><circle cx="4" cy="-3.5" r="4.6" fill="#B9CBF2"/><circle cx="-4" cy="4.5" r="4.6" fill="#B9CBF2"/><circle cx="4" cy="4.5" r="4.6" fill="#2E5BDA"/>
+        <text y="30" text-anchor="middle" font-size="10.5" font-weight="800" fill="#22303A">헬륨 원자핵</text><text y="42" text-anchor="middle" font-size="8" fill="#E8940A" font-weight="800">약 3분 후</text>
+      </g>
+      <g transform="translate(422,74)">
+        <circle r="10.5" fill="none" stroke="#7A97E8" stroke-width="1.2" stroke-dasharray="2.5 2"/>
+        <circle r="4.6" fill="#2E5BDA"/><circle cx="10.5" cy="0" r="2.3" fill="#D6455D"/>
+        <text y="30" text-anchor="middle" font-size="10.5" font-weight="800" fill="#22303A">원자</text><text y="42" text-anchor="middle" font-size="8" fill="#E8940A" font-weight="800">약 38만 년 후</text>
+      </g>
+      <g font-size="7" fill="#5B6B77">
+        <circle cx="150" cy="131" r="3" fill="#2E5BDA"/><text x="157" y="134">양성자</text>
+        <circle cx="205" cy="131" r="3" fill="#B9CBF2"/><text x="212" y="134">중성자</text>
+        <circle cx="260" cy="131" r="2.4" fill="#D6455D"/><text x="266" y="134">전자</text>
+        <text x="310" y="134" font-weight="800" fill="#2E5BDA">식을수록 ① → ⑤ 순서로 결합!</text>
+      </g>
+    </svg>
+    <figcaption>판서 대신 이 그림 하나 — ①에서 ⑤까지 손끝으로 짚으며 설명한다</figcaption>
+  </figure>
+  <div class="mention">
+    <div class="mt">강의 멘트</div>
+    <span class="pen">"두 숫자만 기억합시다 — 핵은 3분, 원자는 38만 년. 시험은 이 둘을 바꿔치기해서 나옵니다."</span>
+  </div>
+  <div class="foot"><span>박찬 과학 | 강의 판본</span><span>3 / 5</span></div>
+</div>
+
+<!-- ── 4. 스펙트럼 ── -->
+<div class="slide">
+  <div class="top"><span class="lesson">3 · 스펙트럼 — 원소의 지문</span><span class="path">II-01 우주의 시작과 원소의 탄생</span><span class="pageno">교재 66쪽</span></div>
+  <div class="keyline">별에 갈 수 없어도 별을 안다 — 빛을 파장별로 나누면 <span class="hl">원소마다 정해진 위치에 선</span>이 나타난다.</div>
+  <div class="cols2" style="margin-top:7mm;">
+    <figure>
+      <svg width="620" height="212" viewBox="0 0 490 168" font-family="PC Sans">
+        <defs>
+          <linearGradient id="rb" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0" stop-color="#7B2FBE"/><stop offset="0.18" stop-color="#2C58C9"/><stop offset="0.38" stop-color="#1FA34A"/>
+            <stop offset="0.56" stop-color="#E8D02A"/><stop offset="0.75" stop-color="#E8792A"/><stop offset="1" stop-color="#D6303B"/>
+          </linearGradient>
+        </defs>
+        <text x="8" y="26" font-size="9.5" font-weight="800" fill="#22303A">연속 스펙트럼</text>
+        <text x="8" y="38" font-size="7.6" fill="#5B6B77">고온의 광원</text>
+        <rect x="120" y="12" width="355" height="28" rx="3" fill="url(#rb)"/>
+        <text x="8" y="80" font-size="9.5" font-weight="800" fill="#22303A">방출 스펙트럼</text>
+        <text x="8" y="92" font-size="7.6" fill="#5B6B77">고온·저밀도 기체</text>
+        <rect x="120" y="66" width="355" height="28" rx="3" fill="#14181F"/>
+        <rect x="188" y="66" width="4.5" height="28" fill="#4A6FE8"/>
+        <rect x="268" y="66" width="4.5" height="28" fill="#35C46A"/>
+        <rect x="392" y="66" width="4.5" height="28" fill="#E85B4A"/>
+        <text x="8" y="134" font-size="9.5" font-weight="800" fill="#22303A">흡수 스펙트럼</text>
+        <text x="8" y="146" font-size="7.6" fill="#5B6B77">광원 + 저온 기체 통과</text>
+        <rect x="120" y="120" width="355" height="28" rx="3" fill="url(#rb)"/>
+        <rect x="188" y="120" width="4.5" height="28" fill="#14181F"/>
+        <rect x="268" y="120" width="4.5" height="28" fill="#14181F"/>
+        <rect x="392" y="120" width="4.5" height="28" fill="#14181F"/>
+        <line x1="190" y1="94" x2="190" y2="120" stroke="#E8940A" stroke-width="1.4" stroke-dasharray="3 2"/>
+        <line x1="270" y1="94" x2="270" y2="120" stroke="#E8940A" stroke-width="1.4" stroke-dasharray="3 2"/>
+        <line x1="394" y1="94" x2="394" y2="120" stroke="#E8940A" stroke-width="1.4" stroke-dasharray="3 2"/>
+        <text x="299" y="162" font-size="8.6" font-weight="800" fill="#E8940A" text-anchor="middle">같은 원소 → 방출선과 흡수선의 위치(파장)가 같다!</text>
+      </svg>
+      <figcaption>세 줄만 판서: 연속 / 밝은 선 = 방출 / 검은 선 = 흡수</figcaption>
+    </figure>
+    <div class="board">
+      <div class="btitle">판서 포인트</div>
+      <div class="bl">
+        · 바탕이 무엇인지부터 보라<br>
+        · 어두운 바탕 + 밝은 선 = <b>방출</b><br>
+        · 무지개 바탕 + 검은 선 = <b>흡수</b><br>
+        · 선의 위치 = <b>원소의 지문</b><br>&nbsp;&nbsp;→ 별빛으로 별의 성분을 안다
+      </div>
+    </div>
+  </div>
+  <div class="mention">
+    <div class="mt">강의 멘트</div>
+    <span class="pen">"별빛 스펙트럼은 별이 보낸 바코드입니다 — 찍어서 대조만 하면 성분이 나오죠. 마트 계산대와 똑같습니다."</span>
+  </div>
+  <div class="foot"><span>박찬 과학 | 강의 판본</span><span>4 / 5</span></div>
+</div>
+
+<!-- ── 5. 마무리 ── -->
+<div class="slide">
+  <div class="top"><span class="lesson">4 · 오늘의 결론 — 빅뱅의 두 증거</span><span class="path">II-01 우주의 시작과 원소의 탄생</span><span class="pageno">교재 67쪽</span></div>
+  <div class="keyline">이론은 예측하고, 관측은 확인했다 — 빅뱅 우주론의 <span class="hl">결정적 증거 두 가지.</span></div>
+  <div class="evi" style="margin-top:8mm;">
+    <div class="ecard">
+      <div class="en">증거 ①</div>
+      <div class="et">우주 배경 복사</div>
+      <p>원자가 생기던 무렵(38만 년) 퍼져 나간 빛의 흔적. 오늘날 우주의 <b>모든 방향에서</b> 희미한 전파로 관측된다 — 1965년 우연히 발견, 노벨상.</p>
+    </div>
+    <div class="ecard">
+      <div class="en">증거 ②</div>
+      <div class="et">수소 : 헬륨 = 약 3 : 1</div>
+      <p>빅뱅 이론이 <b>계산으로 예측</b>한 질량비가, 별빛 스펙트럼 <b>관측 결과와 일치</b>한다. 우주 어디를 보아도 3:1 — 이론과 관측의 악수.</p>
+    </div>
+  </div>
+  <div class="board" style="margin-top:7mm;">
+    <div class="btitle">시험 직결 — 마지막 판서</div>
+    <div class="bl">핵 생성 <b>3분</b> / 원자 생성 <b>38만 년</b> · 배경 복사 = 빅뱅의 잔광 · 어디서나 <b>H:He = 3:1</b></div>
+  </div>
+  <div class="mention">
+    <div class="mt">다음 시간 예고</div>
+    <span class="pen">"오늘 만든 수소와 헬륨이 다음 시간엔 별 속으로 들어갑니다 — 탄소, 산소, 그리고 철이 태어나는 곳으로."</span>
+  </div>
+  <div class="foot"><span>박찬 과학 | 강의 판본</span><span>5 / 5</span></div>
+</div>
+
+</body>
+</html>
