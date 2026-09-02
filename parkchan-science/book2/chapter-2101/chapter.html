@@ -1,0 +1,989 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<title>박찬 과학 통합과학2 — I-01 지질시대와 생물의 변천</title>
+<style>
+  @font-face { font-family:'PC Sans'; src:url('file:///root/.fonts/NotoSansKR.ttf'); font-weight:100 900; }
+  @font-face { font-family:'PC Serif'; src:url('file:///root/.fonts/NotoSerifKR.ttf'); font-weight:100 900; }
+  @font-face { font-family:'PC Pen'; src:url('file:///root/.fonts/YeonSung-Regular.ttf'); font-weight:400; }
+
+  :root{
+    --brand:#0E5A6B;        /* 박찬 과학 브랜드 딥틸 */
+    --brand-lt:#E3F0F3;
+    --unit:#C1521E;         /* I. 과학의 기초 단원 컬러(그린) */
+    --unit-lt:#FBEFE7;
+    --unit-md:#EBC4AB;
+    --accent:#E8940A;       /* 알짜 앰버 */
+    --accent-lt:#FDF3E0;
+    --point:#D6455D;        /* 시험 포인트 */
+    --point-lt:#FBEBEE;
+    --ink:#22303A;
+    --sub:#5B6B77;
+    --line:#D8E0E5;
+  }
+  *{ box-sizing:border-box; margin:0; padding:0; -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+  @page{ size:210mm 275mm; margin:0; }
+  html,body{ font-family:'PC Sans',sans-serif; color:var(--ink); word-break:keep-all; overflow-wrap:anywhere; }
+
+  .page{ width:210mm; height:275mm; position:relative; overflow:hidden; background:#fff; page-break-after:always; padding:14mm 13mm 19mm 15mm; display:flex; flex-direction:column; }
+
+  /* ── 러닝 헤드 / 풋 ── */
+  .runhead{ display:flex; align-items:center; justify-content:space-between; border-bottom:0.35mm solid var(--unit); padding-bottom:2mm; margin-bottom:6.5mm; }
+  .runhead .unit-tag{ font-size:8.5pt; font-weight:700; color:var(--unit); letter-spacing:0.02em; }
+  .runhead .lesson-tag{ font-size:8.5pt; color:var(--sub); }
+  .folio{ position:absolute; bottom:7mm; left:0; right:0; display:flex; justify-content:space-between; padding:0 14mm 0 14mm; font-size:8pt; color:var(--sub); }
+  .folio .num{ font-weight:800; color:var(--unit); font-size:10pt; }
+
+  /* ── 본문 그리드: 본문 + 날개단 ── */
+  .cols{ display:grid; grid-template-columns:1fr 43mm; gap:8mm; flex:1; min-height:0; margin-bottom:4mm; }
+  .main{ min-width:0; }
+  .wing{ border-left:0.3mm solid var(--line); padding-left:5mm; font-size:8.2pt; color:var(--sub); line-height:1.7; }
+
+  /* ── 타이포 ── */
+  h2.lesson-title{ display:flex; align-items:baseline; gap:3.5mm; margin-bottom:2mm; }
+  h2.lesson-title .no{ background:var(--unit); color:#fff; font-size:13pt; font-weight:900; padding:1.2mm 3.2mm; border-radius:1.5mm; }
+  h2.lesson-title .tt{ font-size:16.5pt; font-weight:900; letter-spacing:-0.01em; }
+  .std-badges{ display:flex; gap:2mm; margin:2mm 0 6.5mm; }
+  .std{ font-size:7.4pt; color:var(--unit); background:none; border:0.3mm solid var(--unit-md); border-radius:5mm; padding:0.6mm 2.8mm; font-weight:600; }
+
+  h3.sec{ display:flex; align-items:baseline; gap:3mm; font-size:12.5pt; font-weight:800; margin:9mm 0 3.6mm; letter-spacing:-0.01em; }
+  h3.sec .n{ font-family:'PC Serif'; font-size:15.5pt; font-weight:900; color:var(--unit); border-bottom:0.7mm solid var(--accent); padding:0 0.8mm 0.2mm; flex:0 0 auto; line-height:1; }
+  h3.sec::after{ content:""; flex:1; border-top:0.25mm solid var(--line); align-self:center; margin-left:2mm; }
+  h3.sec:first-child{ margin-top:0; }
+
+  p.body{ font-family:'PC Serif'; font-size:9.6pt; line-height:1.92; margin-bottom:3.6mm; text-align:justify; }
+  p.body b{ font-weight:800; }
+  .kw{ font-weight:800; color:var(--unit); }
+  .u-amber{ background:#F8E9C6; font-weight:700; padding:0.15mm 0.6mm; border-radius:0.6mm; box-decoration-break:clone; -webkit-box-decoration-break:clone; }
+
+  ul.pts{ font-family:'PC Serif'; font-size:9.6pt; line-height:1.84; margin:1.5mm 0 3.5mm 1mm; list-style:none; }
+  ul.pts li{ padding-left:4.5mm; position:relative; margin-bottom:1.8mm; }
+  ul.pts li::before{ content:""; position:absolute; left:0.5mm; top:2.9mm; width:1.7mm; height:1.7mm; background:var(--accent); border-radius:50%; }
+
+  /* ── 코너 박스 ── */
+  .boxtitle{ display:inline-flex; align-items:center; gap:1.8mm; font-weight:900; font-size:9.5pt; margin-bottom:1.6mm; }
+  .boxtitle .ico{ width:5.2mm; height:5.2mm; border-radius:1.2mm; display:flex; align-items:center; justify-content:center; color:#fff; font-size:7.5pt; font-weight:900; }
+
+  .gist{ background:none; border:none; border-top:0.5mm solid var(--accent); border-bottom:0.5mm solid var(--accent); border-radius:0; padding:3.2mm 1.8mm 3mm; margin:6mm 0 5mm; }
+  .gist .boxtitle{ color:#9C6503; } .gist .ico{ background:var(--accent); }
+  .gist ul{ list-style:none; font-family:'PC Serif'; font-size:9.3pt; line-height:1.78; }
+  .gist li{ padding-left:4.2mm; position:relative; margin-bottom:1.2mm;}
+  .gist li::before{ content:"✓"; position:absolute; left:0; color:var(--accent); font-weight:900; }
+
+  .expoint{ background:none; border-left:0.5mm solid #D998A4; border-left-color:#D998A4; border-radius:0; padding:1.4mm 0 1.4mm 3.6mm; margin:4.5mm 0; }
+  .expoint .boxtitle{ color:#A9556A; font-size:8.6pt; margin-bottom:1mm;}
+  .expoint .ico{ background:none; color:#A9556A; border:0.35mm solid #D998A4; width:4.4mm; height:4.4mm; border-radius:50%; font-size:7pt; }
+  .expoint p{ font-family:'PC Serif'; font-size:8.9pt; line-height:1.7; }
+
+  .pen{ font-family:'PC Pen'; font-size:12pt; color:#B4560E; line-height:1.45; }
+  .saem{ display:flex; gap:3mm; align-items:flex-start; margin:4.5mm 0; }
+  .saem .avatar{ flex:0 0 auto; width:10.5mm; height:10.5mm; border-radius:50%; background:var(--brand); color:#fff; font-size:7pt; font-weight:800; display:flex; align-items:center; justify-content:center; line-height:1.35; letter-spacing:0.04em; text-align:center; border:0.5mm solid var(--accent); box-sizing:border-box;}
+  .saem .bubble{ background:#FFFBF0; border:0.4mm solid #EBCB9C; border-radius:3mm; padding:2.2mm 3.6mm 2mm; position:relative; }
+  .saem .bubble::before{ content:""; position:absolute; left:-1.8mm; top:3.2mm; width:3mm; height:3mm; background:#FFFBF0; border-left:0.4mm solid #EBCB9C; border-bottom:0.4mm solid #EBCB9C; transform:rotate(45deg); }
+
+  .wing .wtitle{ font-size:8pt; font-weight:900; color:var(--brand); display:flex; align-items:center; gap:1.5mm; margin:0 0 2.4mm; letter-spacing:0.05em; }
+  .wing .wtitle::before{ content:""; width:2.4mm; height:2.4mm; background:var(--accent); border-radius:50%; }
+  .wing .term{ margin-bottom:3.6mm; }
+  .wing .term b{ color:var(--ink); font-weight:800; display:block; font-size:8.5pt; margin-bottom:0.7mm;}
+  .wing .wsep{ border-top:0.3mm dashed var(--line); margin:4.5mm 0; }
+  .wing .wing-pen{ font-family:'PC Pen'; font-size:11pt; color:#B4560E; line-height:1.45; }
+
+  figure{ margin:5mm 0; }
+  figure figcaption{ font-size:8pt; color:var(--sub); text-align:center; margin-top:2mm; }
+  figure svg{ display:block; margin:0 auto; }
+
+  /* ── 비교형 그림 (2패널 + 범례) ── */
+  .fig-duo{ display:flex; align-items:stretch; gap:2.5mm; justify-content:center; }
+  .fig-duo .panel{ flex:0 0 auto; text-align:center; }
+  .fig-duo .p-title{ font-size:9pt; font-weight:900; color:var(--ink); margin-top:1.6mm; }
+  .fig-duo .p-sub{ font-size:7.8pt; color:var(--sub); line-height:1.45; margin-top:0.5mm; }
+  .fig-duo .mid{ display:flex; flex-direction:column; align-items:center; justify-content:center; gap:1mm; padding:0 1mm; }
+  .fig-duo .mid .mlab{ font-size:7.6pt; font-weight:800; color:var(--unit); text-align:center; line-height:1.3; }
+  .fig-legend{ display:flex; justify-content:center; gap:5mm; font-size:7.8pt; color:var(--ink); margin-top:1.2mm; align-items:center; }
+  .fig-legend span{ display:inline-flex; align-items:center; gap:1.4mm; }
+
+  /* ── 탐구 (자료 파헤치기) ── */
+  .lab{ border:0.5mm solid var(--brand); border-radius:2.5mm; overflow:hidden; margin-top:1mm;}
+  .lab .lab-head{ background:var(--brand); color:#fff; padding:2.2mm 4mm; font-weight:900; font-size:11pt; display:flex; align-items:center; gap:2.5mm;}
+  .lab .lab-head .tag{ font-size:7.5pt; background:rgba(255,255,255,.22); padding:0.6mm 2.4mm; border-radius:4mm; font-weight:700;}
+  .lab .lab-body{ padding:3.5mm 4mm; }
+  .lab h4{ font-size:9.6pt; font-weight:900; color:var(--brand); margin:2.5mm 0 1.4mm; }
+  .lab h4:first-child{ margin-top:0; }
+  .lab p, .lab li{ font-family:'PC Serif'; font-size:9.3pt; line-height:1.8; }
+  .lab ol{ margin-left:5mm; }
+
+  /* ── 문제부 ── */
+  .step-head{ display:flex; align-items:center; gap:3mm; margin:0 0 5mm; }
+  .step-head .stepno{ background:var(--unit); color:#fff; font-weight:900; font-size:9.5pt; padding:1.4mm 3.4mm; border-radius:1.5mm; letter-spacing:0.04em;}
+  .step-head .steptt{ font-size:12.5pt; font-weight:900; }
+  .step-head .stepdesc{ font-size:8.2pt; color:var(--sub); margin-left:auto; }
+  .step-head.s2 .stepno{ background:var(--brand); }
+  .step-head.s3 .stepno{ background:var(--point); }
+
+  .q{ margin-bottom:7.5mm; break-inside:avoid; }
+  .q .qhead{ display:flex; gap:2.4mm; align-items:flex-start; }
+  .q .qno{ flex:0 0 auto; min-width:6.2mm; height:6.2mm; border:0.45mm solid var(--unit); color:var(--unit); border-radius:50%; font-size:8.6pt; font-weight:900; line-height:1; display:flex; align-items:center; justify-content:center; padding-top:0.55mm; margin-top:0.4mm;}
+  .q .stem{ font-family:'PC Serif'; font-size:9.5pt; line-height:1.74; font-weight:500; }
+  .q .stem .difficulty{ color:#C9A227; font-size:8pt; letter-spacing:0.06em; margin-left:1.5mm;}
+  .q .tags{ margin-top:0.8mm; font-size:7pt; color:var(--sub); font-family:'PC Sans';}
+  .choices{ list-style:none; margin:2.2mm 0 0 8.6mm; font-family:'PC Serif'; font-size:9.3pt; line-height:1.85; }
+  .choices.inline{ display:flex; flex-wrap:wrap; gap:0 6mm; }
+  .bogi-box{ border:0.35mm solid #B8C2CA; border-radius:0; margin:2.5mm 0 0 8.6mm; padding:2.4mm 3.2mm; font-family:'PC Serif'; font-size:9.2pt; line-height:1.8; background:none;}
+  .bogi-box .bt{ text-align:center; font-weight:800; color:var(--sub); font-size:8.4pt; margin-bottom:0.8mm; letter-spacing:0.3em;}
+  .ox-answer{ margin-left:2mm; color:var(--sub); font-size:9pt; }
+  .blankline{ display:inline-block; min-width:14mm; border-bottom:0.4mm solid var(--ink); }
+  .qgrid{ display:grid; grid-template-columns:1fr 1fr; gap:0 9mm; }
+  .essay-lines{ margin:2mm 0 0 8.4mm; }
+  .essay-lines div{ border-bottom:0.3mm solid var(--line); height:6.2mm; }
+  .badge-essay{ display:inline-block; background:var(--point); color:#fff; font-size:7pt; font-weight:800; padding:0.4mm 2mm; border-radius:1mm; vertical-align:1pt; margin-right:1.2mm;}
+  .badge-data{ display:inline-block; background:var(--brand); color:#fff; font-size:7pt; font-weight:800; padding:0.4mm 2mm; border-radius:1mm; vertical-align:1pt; margin-right:1.2mm;}
+
+  /* ── 해설부 ── */
+  .sol-head{ display:flex; align-items:center; gap:3mm; margin-bottom:4mm;}
+  .sol-head .stt{ font-size:14.5pt; font-weight:900; color:var(--brand);}
+  .sol-head .sub{ font-size:8.5pt; color:var(--sub);}
+  .anstable{ width:100%; border-collapse:collapse; margin-bottom:4.5mm; }
+  .anstable th,.anstable td{ border:0.3mm solid var(--line); font-size:8.8pt; padding:1.4mm 0; text-align:center; }
+  .anstable th{ background:var(--brand-lt); color:var(--brand); font-weight:800; }
+  .anstable td.a{ font-weight:900; color:var(--unit); }
+  .sol{ margin-bottom:5mm; break-inside:avoid; }
+  .sol .shead{ display:flex; align-items:center; gap:2mm; margin-bottom:1.4mm;}
+  .sol .sno{ background:var(--unit); color:#fff; min-width:6mm; height:5.4mm; border-radius:1.2mm; font-size:8.6pt; font-weight:900; line-height:1; display:flex; align-items:center; justify-content:center; padding:0.5mm 1.5mm 0;}
+  .sol .sans{ font-weight:900; color:var(--unit); font-size:9.6pt;}
+  .sol .slink{ font-size:7.2pt; color:var(--sub); margin-left:auto;}
+  .sol p{ font-family:'PC Serif'; font-size:9.1pt; line-height:1.76; margin-bottom:0.8mm; }
+  .wrongbox{ background:none; border:none; border-left:0.7mm solid #E3A0AC; border-radius:0; padding:1mm 0 1mm 3mm; margin-top:2mm;}
+  .wrongbox .wt{ font-size:8pt; font-weight:900; color:var(--point); margin-bottom:0.8mm; font-family:'PC Sans';}
+  .wrongbox p{ font-family:'PC Serif'; font-size:8.6pt; line-height:1.68; margin-bottom:0.9mm;}
+  .wrongbox p:last-child{ margin-bottom:0; }
+  .solcols{ display:grid; grid-template-columns:1fr 1fr; gap:0 9mm; }
+
+  /* ── 단원 도입 (타이포그래피 중심) ── */
+  .opener{ padding:0 0 19mm; }
+  .opener-hero{ position:relative; padding:7mm 20mm 4.5mm; overflow:hidden; flex-shrink:0; }
+  .ghost-txt{ position:absolute; top:-10mm; right:6mm; font-size:118pt; font-weight:900; color:#FAEFE8; line-height:1; letter-spacing:-0.04em; }
+  .kicker{ display:flex; align-items:center; gap:4mm; position:relative; }
+  .kicker .kt{ font-size:9.5pt; font-weight:800; color:var(--unit); letter-spacing:0.24em; white-space:nowrap; }
+  .kicker::after{ content:""; flex:1; border-top:0.3mm solid var(--line); }
+  .opener-hero h1{ position:relative; font-size:36pt; font-weight:900; letter-spacing:-0.015em; margin:4mm 0 0; }
+  .opener-hero h1 .tick{ display:block; width:14mm; border-top:1.4mm solid var(--accent); margin-bottom:3.6mm; }
+  .opener-lede{ position:relative; font-family:'PC Serif'; font-size:10.2pt; font-weight:600; line-height:2.0; color:#3D4C58; max-width:138mm; margin-top:4mm; padding-left:5mm; border-left:0.8mm solid var(--accent); }
+  .opener-inner{ padding:0 20mm; }
+
+  /* ── 원소의 여정 스트립 ── */
+  .journey{ margin-top:3.5mm; }
+  .journey .j-label{ font-size:8pt; font-weight:800; color:var(--sub); letter-spacing:0.08em; margin-bottom:2.4mm; display:flex; align-items:center; gap:1.6mm;}
+  .journey .j-label::before{ content:""; width:2.4mm; height:2.4mm; background:var(--unit); border-radius:50%; }
+  .j-bar{ display:flex; align-items:center; gap:2mm; }
+  .j-chip{ flex:1; text-align:center; background:#FBF3ED; border:0.35mm solid #EBC4AB; color:#C1521E; border-radius:1.6mm; padding:3mm 1mm 2.6mm; }
+  .j-chip .jc-t{ font-size:8.8pt; font-weight:800; display:block; }
+  .j-chip .jc-s{ font-size:6.8pt; color:var(--sub); display:block; margin-top:0.5mm; }
+  .j-chip.on{ background:var(--unit); border-color:var(--unit); }
+  .j-chip.on .jc-t{ color:#fff; }
+  .j-chip.on .jc-s{ color:#F6DFCE; }
+  .j-arrow{ flex:0 0 auto; color:#E0A57E; font-size:10pt; font-weight:900; }
+  .toc{ margin-top:6.5mm; }
+  .toc .toc-title{ font-size:11pt; font-weight:900; color:var(--ink); margin-bottom:3mm; display:flex; align-items:center; gap:2.5mm;}
+  .toc .toc-title::before{ content:""; width:3.4mm; height:3.4mm; background:var(--accent); border-radius:0.8mm; }
+  .toc-item{ display:flex; align-items:flex-start; gap:5mm; padding:4.4mm 6mm; border-bottom:0.3mm solid var(--line); }
+  .toc-item:first-of-type{ border-top:0.3mm solid var(--line); }
+  .toc-item.active{ background:#FBF3ED; border-left:1.2mm solid #D98A5B; }
+  .toc-item .tno{ font-family:'PC Serif'; font-weight:900; color:#D98A5B; font-size:14pt; width:10mm; line-height:1.1; flex:0 0 auto;}
+  .toc-item .tbody{ flex:1; min-width:0; }
+  .toc-item .ttt{ font-weight:800; font-size:10.5pt; letter-spacing:0.01em; display:flex; align-items:center;}
+  .toc-item .tdesc{ font-family:'PC Serif'; font-size:8.6pt; font-weight:600; color:#4A5964; margin-top:0.7mm; line-height:1.55;}
+  .toc-item .tstd{ font-size:7.2pt; color:var(--sub); flex:0 0 auto; padding-top:1.2mm;}
+  .toc-item.active .tag-now{ background:var(--accent); color:#fff; font-size:7pt; font-weight:900; border-radius:4mm; padding:0.7mm 2.6mm; margin-left:3.5mm;}
+  .toc-item .tag-done{ font-size:7.2pt; font-weight:800; color:#C1521E; margin-left:3.5mm; }
+  .opener-quote{ margin-top:7mm; text-align:center; font-family:'PC Serif'; font-size:9.8pt; font-weight:600; color:#4A5964; letter-spacing:0.01em; }
+  .opener-quote .who{ font-size:8pt; color:var(--sub); font-weight:400; margin-left:2.5mm; }
+  .qa-lead li .qgo{ font-family:'PC Sans'; font-size:7.4pt; font-weight:800; color:var(--unit); background:var(--unit-lt); border-radius:3mm; padding:0.5mm 2.2mm; margin-left:2mm; white-space:nowrap; vertical-align:1pt;}
+  .qa-lead{ margin-top:5mm; border:none; border-top:0.45mm solid var(--brand); border-bottom:0.45mm solid var(--brand); background:none; border-radius:0; padding:3mm 2mm 2.8mm; }
+  .qa-lead .qt{ font-weight:900; color:var(--brand); font-size:10.5pt; margin-bottom:2mm;}
+  .qa-lead li{ font-family:'PC Serif'; font-size:9.5pt; line-height:1.8; margin-left:5mm; }
+
+  /* ── 바로바로 체크 (개념 페이지 하단 즉석 OX) ── */
+  .quickcheck{ margin-top:auto; border-top:0.35mm dashed #C8B98F; padding-top:3mm; width:calc(100% - 51mm); }
+  .quickcheck .qc-title{ display:inline-flex; align-items:center; gap:1.6mm; font-size:8.2pt; font-weight:900; color:#9C6503; margin-bottom:1.4mm; }
+  .quickcheck .qc-title::before{ content:"✓"; color:var(--accent); font-weight:900; }
+  .quickcheck ol{ list-style:none; font-family:'PC Serif'; font-size:8.8pt; line-height:1.75; }
+  .quickcheck li{ display:flex; gap:2mm; align-items:baseline; }
+  .quickcheck li .no{ font-weight:800; color:var(--accent); flex:0 0 auto; }
+  .quickcheck .qc-ans{ margin-top:1mm; font-size:7.2pt; color:var(--sub); transform:rotate(180deg); text-align:left; }
+
+  /* ── 중학 과학 다시보기 (날개단) ── */
+  .wing .review{ background:#F6F3EC; border-radius:1.8mm; padding:2.8mm 3mm; margin-top:1mm; }
+  .wing .review .rv-title{ font-size:7.8pt; font-weight:900; color:#7A6A45; margin-bottom:1.4mm; display:flex; align-items:center; gap:1.4mm;}
+  .wing .review .rv-title::before{ content:"↺"; font-weight:900; color:#A08A55; }
+
+  /* ── MEMO 페이지 ── */
+  .memo-head{ display:flex; align-items:baseline; gap:3.5mm; margin-bottom:5mm; }
+  .memo-head .mt{ font-size:17pt; font-weight:900; color:var(--brand); letter-spacing:0.22em; }
+  .memo-head .ms{ font-size:8.6pt; color:var(--sub); }
+  .memo-area{ flex:1; border:0.4mm solid var(--line); border-radius:2.5mm;
+    background-image:linear-gradient(to bottom, transparent calc(100% - 0.3mm), #DCE4E9 0);
+    background-size:100% 9mm; background-position:0 4mm; padding:0 5mm; margin-bottom:4mm; }
+  .memo-pen{ font-family:'PC Pen'; font-size:12.5pt; color:#B4560E; text-align:right; }
+</style>
+</head>
+<body>
+<!-- ═════════════ p.9 소단원 도입 ═════════════ -->
+<div class="page opener">
+  <div class="opener-hero">
+    <div class="ghost-txt">01</div>
+    <div class="kicker"><span class="kt">통합과학 2 · I. 변화와 다양성</span></div>
+    <h1><span class="tick"></span>지질시대와 생물의 변천</h1>
+    <p class="opener-lede">지구는 46억 년짜리 일기장을 돌 속에 남겨 두었다.<br>
+    그 페이지를 넘길 때마다 — 생물의 주인공이 바뀐다.</p>
+  </div>
+
+  <div class="opener-inner">
+    <div class="journey">
+      <div class="j-label">변화와 다양성 — 지금 여기</div>
+      <div class="j-bar">
+        <div class="j-chip on"><span class="jc-t">지질시대</span><span class="jc-s">돌에 남은 일기장</span></div>
+        <span class="j-arrow">→</span>
+        <div class="j-chip"><span class="jc-t">진화</span><span class="jc-s">다양성의 기원</span></div>
+        <span class="j-arrow">→</span>
+        <div class="j-chip"><span class="jc-t">산화와 환원</span><span class="jc-s">문명을 바꾼 반응</span></div>
+        <span class="j-arrow">→</span>
+        <div class="j-chip"><span class="jc-t">산·염기와 중화</span><span class="jc-s">생활 속 화학</span></div>
+        <span class="j-arrow">→</span>
+        <div class="j-chip"><span class="jc-t">에너지 출입</span><span class="jc-s">발열과 흡열</span></div>
+      </div>
+    </div>
+    <div class="toc">
+      <div class="toc-title">이 단원의 학습 지도</div>
+      <div class="toc-item active">
+        <span class="tno">01</span>
+        <span class="tbody"><span class="ttt">지질시대와 생물의 변천<span class="tag-now">NOW</span></span>
+        <span class="tdesc">지질시대 구분, 화석 읽는 법, 대멸종과 생물다양성</span></span>
+        <span class="tstd">10통과2-01-01</span>
+      </div>
+      <div class="toc-item">
+        <span class="tno">02</span>
+        <span class="tbody"><span class="ttt">진화와 생물다양성</span>
+        <span class="tdesc">변이와 자연선택 — 다양한 생물은 어떻게 생겨났나</span></span>
+        <span class="tstd">10통과2-01-02</span>
+      </div>
+      <div class="toc-item">
+        <span class="tno">03</span>
+        <span class="tbody"><span class="ttt">산화와 환원</span>
+        <span class="tdesc">광합성·화석 연료·철의 제련 — 산소와 전자의 이동</span></span>
+        <span class="tstd">10통과2-01-03</span>
+      </div>
+      <div class="toc-item">
+        <span class="tno">04</span>
+        <span class="tbody"><span class="ttt">산·염기와 중화 반응</span>
+        <span class="tdesc">산과 염기의 성질, 생활 속 중화의 기술</span></span>
+        <span class="tstd">10통과2-01-04</span>
+      </div>
+      <div class="toc-item">
+        <span class="tno">05</span>
+        <span class="tbody"><span class="ttt">화학 변화와 에너지 출입</span>
+        <span class="tdesc">발열·흡열 반응 — 손난로와 냉각 팩의 과학</span></span>
+        <span class="tstd">10통과2-01-05</span>
+      </div>
+    </div>
+
+    <div class="qa-lead">
+      <div class="qt">이 소단원을 끝내면 답할 수 있는 질문</div>
+      <ul>
+        <li>지질시대는 무엇을 기준으로 나눌까 — 시간? 생물? <span class="qgo">개념 1</span></li>
+        <li>삼엽충 화석 하나로 지층의 나이를 아는 원리는? <span class="qgo">개념 2</span></li>
+        <li>공룡의 시대는 어떻게 끝났을까? <span class="qgo">개념 4</span></li>
+        <li>대멸종 뒤에 생물은 오히려 왜 더 다양해졌을까? <span class="qgo">개념 5</span></li>
+      </ul>
+    </div>
+
+    <div class="opener-quote" style="margin-top:2.4mm;">"현재는 과거를 여는 열쇠다."<span class="who">— 지질학의 아버지 제임스 허턴의 원리, 찰스 라이엘이 정립</span></div>
+  </div>
+
+  <div class="folio"><span>박찬 과학 | 통합과학 2</span><span class="num">9</span></div>
+</div>
+
+<!-- ═════════════ p.10 개념 01 지질시대 ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag">I. 변화와 다양성</span><span class="lesson-tag">01. 지질시대와 생물의 변천</span></div>
+  <h2 class="lesson-title"><span class="no">01</span><span class="tt">지질시대와 생물의 변천</span></h2>
+  <div class="std-badges"><span class="std">성취기준 10통과2-01-01</span><span class="std">지질시대 구분 → 화석 → 대멸종과 생물다양성</span></div>
+
+  <div class="cols">
+    <div class="main">
+      <h3 class="sec"><span class="n">1</span>지구의 달력 — 지질시대</h3>
+      <p class="body">지구의 나이는 약 <b>46억 년</b>. 이 긴 역사를 다루기 위해 과학은 지구의 시간을 몇 개의 큰 단위로 나눈다 — 이것이 <span class="kw">지질시대</span>다. 그런데 나누는 기준이 뜻밖이다. 시계도 달력도 아닌, <span class="u-amber">생물계의 급격한 변화</span> — 곧 지층 속 <b>화석의 변화</b>가 기준이다. 어느 지층을 경계로 화석의 얼굴들이 확 바뀌면, 거기서 시대를 끊는 것이다.</p>
+      <p class="body">이렇게 나눈 큰 단위가 <b>선캄브리아 시대 · 고생대 · 중생대 · 신생대</b>다. 놀라운 것은 비율이다. 생물의 흔적이 드문 선캄브리아 시대가 지구 역사의 <b>약 88 %</b>를 차지하고, 우리에게 익숙한 삼엽충·공룡·매머드의 시대는 마지막 12 % — 약 5억 4천만 년 전부터의 이야기일 뿐이다. 지구의 달력에서 생물의 전성기는 의외로 '최근'이다.</p>
+
+      <figure>
+        <svg width="470" height="150" viewBox="0 0 470 150" font-family="PC Sans">
+          <defs>
+            <marker id="arrP" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="#C1521E"/></marker>
+            <marker id="arrR" markerWidth="7" markerHeight="7" refX="5" refY="2.5" orient="auto"><path d="M0,0 L6,2.5 L0,5 Z" fill="#D6455D"/></marker>
+          </defs>
+          <g font-size="6.8">
+            <!-- 시대 막대 (길이 비례) -->
+            <text x="235" y="14" text-anchor="middle" font-size="8.4" font-weight="800" fill="#C1521E">지질시대 — 길이는 실제 비율대로 (총 46억 년)</text>
+            <g transform="translate(20,24)">
+              <rect x="0" y="0" width="378" height="30" fill="#E8D5C4" stroke="#C9A227" stroke-width="0" rx="3"/>
+              <rect x="378" y="0" width="27" height="30" fill="#E0A57E"/>
+              <rect x="405" y="0" width="17" height="30" fill="#D98A5B"/>
+              <rect x="422" y="0" width="8" height="30" fill="#C1521E"/>
+              <text x="189" y="19" text-anchor="middle" font-size="8" font-weight="800" fill="#7A6A45">선캄브리아 시대 (약 88 %)</text>
+              <text x="391" y="12" text-anchor="middle" font-size="6" font-weight="800" fill="#7A3E14">고</text>
+              <text x="413" y="12" text-anchor="middle" font-size="6" font-weight="800" fill="#fff">중</text>
+              <text x="426" y="12" text-anchor="middle" font-size="6" font-weight="800" fill="#fff">신</text>
+              <g fill="#5B6B77" font-size="6.2">
+                <text x="0" y="42">46억 년 전</text>
+                <text x="378" y="42" text-anchor="middle">5.41억</text>
+                <text x="405" y="52" text-anchor="middle">2.52억</text>
+                <text x="425" y="42" text-anchor="middle">6600만</text>
+              </g>
+            </g>
+            <!-- 구분 기준 -->
+            <g transform="translate(235,86)" text-anchor="middle">
+              <rect x="-160" y="0" width="320" height="34" rx="17" fill="#FBEFE7" stroke="#C1521E" stroke-width="1"/>
+              <text y="15" font-size="8.2" font-weight="800" fill="#C1521E">구분 기준 = 생물계의 급격한 변화 (화석이 확 바뀌는 곳)</text>
+              <text y="27" font-size="7" fill="#5B6B77">시대의 경계는 대부분 '대멸종'의 자리다 — 개념 4에서 확인</text>
+            </g>
+          </g>
+          <text x="235" y="142" text-anchor="middle" font-size="8.8" font-weight="800" fill="#E8940A">지질시대 = 화석으로 나눈 지구의 달력 — 선캄브리아가 88 %, 나머지가 생물의 전성기</text>
+        </svg>
+        <figcaption>그림 1 | 지질시대의 구분 — 자로 잰 시간이 아니라, 생물이 바뀐 순간으로 나눈다</figcaption>
+      </figure>
+
+      <div class="saem">
+        <div class="avatar">박찬<br>쌤</div>
+        <div class="bubble"><span class="pen">"'고·중·신' 순서 헷갈리면 — 옛 고(古), 가운데 중(中), 새 신(新). 한자 그대로다. 선캄브리아는 그 앞의 '이름 없는 긴 밤'이고."</span></div>
+      </div>
+    </div>
+
+    <div class="wing">
+      <div class="wtitle">날개 노트</div>
+      <div class="term"><b>지질시대</b>지구 탄생(46억 년 전)부터 현재까지를 생물계의 변화 기준으로 나눈 시대 구분.</div>
+      <div class="term"><b>대(代)와 기(紀)</b>고생대·중생대처럼 큰 단위가 '대', 그 속의 쥐라기·백악기 같은 작은 단위가 '기'다.</div>
+      <div class="wsep"></div>
+      <div class="wtitle">한눈에 암기</div>
+      <div class="wing-pen">지구 나이 46억 년<br>구분 기준 = 생물(화석)!<br>선캄브리아 → 고 → 중 → 신</div>
+      <div class="wsep"></div>
+      <div class="review">
+        <div class="rv-title">중학 과학 다시보기</div>
+        <div class="term" style="margin-bottom:0;"><b>지층과 화석 (중1)</b>지층은 아래가 먼저 쌓였다 — 이 순서에 화석을 얹으면 '시간표'가 된다는 것이 이 소단원이다.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="folio"><span>I. 변화와 다양성</span><span class="num">10</span></div>
+</div>
+
+<!-- ═════════════ p.11 개념 02 화석 ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag">I. 변화와 다양성</span><span class="lesson-tag">01. 지질시대와 생물의 변천</span></div>
+  <div class="cols">
+    <div class="main">
+      <h3 class="sec"><span class="n">2</span>화석 — 돌이 된 페이지를 읽는 법</h3>
+      <p class="body"><span class="kw">화석</span>은 지질시대 생물의 유해나 흔적(발자국·알·배설물까지)이 지층 속에 남은 것이다. 화석을 읽는 눈은 두 가지다. 첫째, <span class="kw">표준 화석</span> — <span class="u-amber">짧은 기간에만 살았고 넓은 지역에 퍼져 있던 생물</span>의 화석이다. 이런 화석이 나오면 그 지층의 <b>시대</b>를 짚을 수 있다. 삼엽충이면 고생대, 암모나이트·공룡이면 중생대, 매머드·화폐석이면 신생대다.</p>
+      <p class="body">둘째, <span class="kw">시상 화석</span> — 특정 환경에서만 살아 <b>당시의 환경</b>을 알려 주는 화석이다. 산호 화석이 나오면 그곳은 따뜻하고 얕은 바다였고, 고사리 화석이 나오면 따뜻하고 습한 육지였다는 뜻이다. 표준 화석은 <b>'언제'</b>를, 시상 화석은 <b>'어디서·어떤 환경'</b>을 말해 준다 — 두 질문이 다르니, 좋은 화석의 조건도 정반대다.</p>
+
+      <figure>
+        <svg width="470" height="158" viewBox="0 0 470 158" font-family="PC Sans">
+          <g font-size="6.8">
+            <!-- 표준 화석 -->
+            <g transform="translate(122,10)">
+              <rect x="-104" y="0" width="208" height="112" rx="6" fill="#FBEFE7" stroke="#EBC4AB" stroke-width="1"/>
+              <text x="0" y="16" text-anchor="middle" font-size="8.4" font-weight="800" fill="#C1521E">표준 화석 — "언제"를 말한다</text>
+              <g text-anchor="middle">
+                <g transform="translate(-62,32)">
+                  <ellipse cx="0" cy="16" rx="15" ry="19" fill="#D8CDBE" stroke="#8A7A63" stroke-width="1.2"/>
+                  <path d="M-10,4 h20 M-12,11 h24 M-13,18 h26 M-12,25 h24 M-9,31 h18" stroke="#8A7A63" stroke-width="1" fill="none"/>
+                  <line x1="0" y1="-2" x2="0" y2="34" stroke="#8A7A63" stroke-width="1.4"/>
+                  <text y="48" font-weight="800" font-size="6.8">삼엽충</text><text y="58" fill="#7A3E14" font-size="6.4">고생대</text>
+                </g>
+                <g transform="translate(0,32)">
+                  <path d="M0,30 a14,14 0 1,1 14,-14 a10,10 0 1,1 -10,10 a6,6 0 1,1 6,-6" fill="none" stroke="#8A7A63" stroke-width="2"/>
+                  <text y="48" font-weight="800" font-size="6.8">암모나이트</text><text y="58" fill="#7A3E14" font-size="6.4">중생대</text>
+                </g>
+                <g transform="translate(62,32)">
+                  <path d="M-12,30 q-4,-20 8,-24 q12,-4 14,8 q10,0 8,10 M-4,6 q-2,-8 -8,-10 M0,30 v-8 M8,30 v-10" stroke="#8A7A63" stroke-width="1.6" fill="none"/>
+                  <text y="48" font-weight="800" font-size="6.8">매머드</text><text y="58" fill="#7A3E14" font-size="6.4">신생대</text>
+                </g>
+              </g>
+              <text x="0" y="104" text-anchor="middle" fill="#5B6B77">조건: 생존 기간 짧고 + 분포 넓게</text>
+            </g>
+            <!-- 시상 화석 -->
+            <g transform="translate(352,10)">
+              <rect x="-104" y="0" width="208" height="112" rx="6" fill="#F3F7F5" stroke="#A8D5BE" stroke-width="1"/>
+              <text x="0" y="16" text-anchor="middle" font-size="8.4" font-weight="800" fill="#2E7A54">시상 화석 — "어떤 환경"을 말한다</text>
+              <g text-anchor="middle">
+                <g transform="translate(-48,34)">
+                  <path d="M0,28 v-16 M0,12 q-10,2 -14,12 M0,12 q10,2 14,12 M0,20 q-7,1 -10,8 M0,20 q7,1 10,8" stroke="#D6455D" stroke-width="2" fill="none"/>
+                  <text y="46" font-weight="800" font-size="6.8">산호</text><text y="56" fill="#2E7A54" font-size="6.4">따뜻하고 얕은 바다</text>
+                </g>
+                <g transform="translate(48,34)">
+                  <path d="M0,28 v-22 M0,10 q-8,-2 -12,4 M0,14 q-9,-1 -13,6 M0,18 q-8,0 -11,6 M0,10 q8,-2 12,4 M0,14 q9,-1 13,6 M0,18 q8,0 11,6" stroke="#2E7A54" stroke-width="1.4" fill="none"/>
+                  <text y="46" font-weight="800" font-size="6.8">고사리</text><text y="56" fill="#2E7A54" font-size="6.4">따뜻하고 습한 육지</text>
+                </g>
+              </g>
+              <text x="0" y="104" text-anchor="middle" fill="#5B6B77">조건: 특정 환경에서만 + 오래 살수록 좋다</text>
+            </g>
+          </g>
+          <text x="235" y="148" text-anchor="middle" font-size="8.8" font-weight="800" fill="#E8940A">표준 화석 = 시대의 도장 / 시상 화석 = 환경의 도장 — 묻는 질문이 다르다</text>
+        </svg>
+        <figcaption>그림 2 | 표준 화석과 시상 화석 — 좋은 화석의 조건이 정반대인 이유</figcaption>
+      </figure>
+
+      <div class="expoint">
+        <div class="boxtitle"><span class="ico">!</span>시험엔 이렇게</div>
+        <p>조건 바꿔치기가 단골 — "표준 화석은 <b>오래 산</b> 생물일수록 좋다"(X — 짧게 살아야 시대가 좁혀진다). 짝짓기도 필수 암기: <b>삼엽충-고생대 · 암모나이트/공룡-중생대 · 매머드/화폐석-신생대</b>.</p>
+      </div>
+    </div>
+
+    <div class="wing">
+      <div class="wtitle">날개 노트</div>
+      <div class="term"><b>화석이 되려면</b>단단한 부분(뼈·껍데기)이 있고, 죽은 뒤 빠르게 퇴적물에 묻힐수록 화석이 되기 쉽다.</div>
+      <div class="term"><b>화폐석</b>동전 모양의 신생대 표준 화석 — 이름 그대로 '돈 돌'이다.</div>
+      <div class="wsep"></div>
+      <div class="wtitle">한눈에 암기</div>
+      <div class="wing-pen">표준 = 언제 (짧고 넓게)<br>시상 = 환경 (좁고 길게)<br>삼엽충-고 · 공룡-중 · 매머드-신</div>
+    </div>
+  </div>
+  <div class="quickcheck">
+    <span class="qc-title">바로바로 체크</span>
+    <ol>
+      <li><span class="no">1</span>지층의 시대를 판단하는 데 쓰이는 것은 표준 화석이다. ( O , X )</li>
+      <li><span class="no">2</span>산호 화석이 나온 지층은 당시 따뜻하고 얕은 바다였다. ( O , X )</li>
+      <li><span class="no">3</span>표준 화석은 오랜 기간 생존한 생물일수록 좋다. ( O , X )</li>
+    </ol>
+    <div class="qc-ans">정답 1 O 2 O 3 X (짧게 살아야 시대를 좁힌다)</div>
+  </div>
+  <div class="folio"><span>I. 변화와 다양성</span><span class="num">11</span></div>
+</div>
+
+<!-- ═════════════ p.12 개념 03 시대별 생물 ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag">I. 변화와 다양성</span><span class="lesson-tag">01. 지질시대와 생물의 변천</span></div>
+  <div class="cols">
+    <div class="main">
+      <h3 class="sec"><span class="n">3</span>시대마다 주인공이 바뀐다 — 생물의 변천</h3>
+      <p class="body"><b>선캄브리아 시대</b>의 바다에서 최초의 생명과 광합성 생물(남세균)이 나타났다 — 이들이 쌓아 올린 층상 구조가 <span class="kw">스트로마톨라이트</span>다. 남세균이 내뿜은 산소는 대기를 바꾸었고, 시대 말에는 부드러운 몸의 다세포 생물들이 등장했다. <b>고생대</b>에는 생물이 폭발적으로 다양해졌다. 바다엔 <b>삼엽충</b>과 어류가 번성했고, <span class="u-amber">오존층이 자외선을 막아 주면서 생물이 처음으로 육지에 올라왔다</span> — 양치식물의 숲과 양서류의 시대다.</p>
+      <p class="body"><b>중생대</b>는 파충류의 전성기 — 육지의 <b>공룡</b>, 바다의 <b>암모나이트</b>, 그리고 겉씨식물(소철·은행)의 시대였다. <b>신생대</b>에는 공룡이 사라진 빈자리를 <b>포유류</b>가 채웠고, 속씨식물이 번성했으며, 매머드가 초원을 걸었고 — 시대의 끝자락에 <b>인류</b>가 등장했다. 시대의 주인공 교체는 우연이 아니라, 그 사이사이에 있었던 <b>환경의 격변</b>(다음 개념)의 결과다.</p>
+
+      <figure>
+        <svg width="470" height="150" viewBox="0 0 470 150" font-family="PC Sans">
+          <g font-size="6.6" text-anchor="middle">
+            <g transform="translate(64,8)">
+              <rect x="-54" y="0" width="108" height="106" rx="6" fill="#F6F3EC" stroke="#C9BA9B" stroke-width="1"/>
+              <text y="15" font-size="7.8" font-weight="800" fill="#7A6A45">선캄브리아</text>
+              <path d="M-30,64 q0,-26 14,-26 q-8,-14 8,-16 q16,-2 12,14 q14,2 10,16 q10,4 4,12 Z" fill="#C9BA9B" opacity="0.6"/>
+              <path d="M-26,64 h52 M-24,56 h48 M-20,48 h40 M-18,40 h36" stroke="#8A7A63" stroke-width="1.2" fill="none"/>
+              <text y="82" font-weight="800">최초 생명 · 남세균</text>
+              <text y="93" fill="#5B6B77">스트로마톨라이트</text>
+              <text y="103" fill="#5B6B77">말기: 다세포 생물</text>
+            </g>
+            <g transform="translate(178,8)">
+              <rect x="-54" y="0" width="108" height="106" rx="6" fill="#FBEFE7" stroke="#EBC4AB" stroke-width="1"/>
+              <text y="15" font-size="7.8" font-weight="800" fill="#C1521E">고생대</text>
+              <ellipse cx="0" cy="42" rx="13" ry="17" fill="#D8CDBE" stroke="#8A7A63" stroke-width="1.1"/>
+              <path d="M-9,32 h18 M-11,39 h22 M-11,46 h22 M-8,52 h16" stroke="#8A7A63" stroke-width="0.9" fill="none"/>
+              <line x1="0" y1="26" x2="0" y2="58" stroke="#8A7A63" stroke-width="1.2"/>
+              <text y="82" font-weight="800">삼엽충 · 어류 · 양치식물</text>
+              <text y="93" fill="#5B6B77">오존층 형성</text>
+              <text y="103" fill="#C1521E" font-weight="800">→ 생물의 육상 진출!</text>
+            </g>
+            <g transform="translate(292,8)">
+              <rect x="-54" y="0" width="108" height="106" rx="6" fill="#EDF3EE" stroke="#A8C9AE" stroke-width="1"/>
+              <text y="15" font-size="7.8" font-weight="800" fill="#2E6B3A">중생대</text>
+              <path d="M-26,58 q-2,-18 10,-22 q2,-10 12,-8 q10,2 8,10 q12,2 14,12 M-8,36 q-4,10 2,22 M6,40 q2,10 8,18 M12,58 l6,-6 M-16,58 l-4,-8" stroke="#2E6B3A" stroke-width="1.6" fill="none"/>
+              <text y="82" font-weight="800">공룡 · 암모나이트</text>
+              <text y="93" fill="#5B6B77">겉씨식물(소철·은행)</text>
+              <text y="103" fill="#5B6B77">파충류의 전성기</text>
+            </g>
+            <g transform="translate(406,8)">
+              <rect x="-54" y="0" width="108" height="106" rx="6" fill="#FDF9F0" stroke="#EBCB9C" stroke-width="1"/>
+              <text y="15" font-size="7.8" font-weight="800" fill="#B4560E">신생대</text>
+              <path d="M-20,58 q-4,-18 8,-22 q0,-8 8,-8 q8,0 8,8 q10,2 8,12 q6,2 4,10 M-14,36 q-4,-6 -10,-6 M-16,58 v-6 M6,58 v-8" stroke="#B4560E" stroke-width="1.6" fill="none"/>
+              <text y="82" font-weight="800">포유류 · 매머드</text>
+              <text y="93" fill="#5B6B77">속씨식물 번성</text>
+              <text y="103" fill="#B4560E" font-weight="800">말기: 인류 등장</text>
+            </g>
+          </g>
+          <text x="235" y="140" text-anchor="middle" font-size="8.8" font-weight="800" fill="#E8940A">남세균 → 삼엽충 → 공룡 → 포유류·인류 — 주인공 교체의 무대 뒤엔 환경 변화가 있다</text>
+        </svg>
+        <figcaption>그림 3 | 지질시대별 대표 생물 — 시대의 얼굴들</figcaption>
+      </figure>
+
+      <div class="expoint">
+        <div class="boxtitle"><span class="ico">!</span>시험엔 이렇게</div>
+        <p>육상 진출의 열쇠는 <b>오존층</b> — "생물이 육지로 올라올 수 있었던 까닭"을 묻는 문항의 정답 키워드다(자외선 차단). 식물 짝짓기도 단골: <b>양치-고생대 · 겉씨-중생대 · 속씨-신생대</b>.</p>
+      </div>
+    </div>
+
+    <div class="wing">
+      <div class="wtitle">날개 노트</div>
+      <div class="term"><b>스트로마톨라이트</b>남세균이 켜켜이 쌓아 만든 암석 — 지구 최초의 생명 활동 증거 중 하나.</div>
+      <div class="term"><b>산소와 오존층</b>광합성이 만든 산소(O₂) 일부가 상공에서 오존(O₃)이 되어 자외선을 막았다 — 육상 생물의 방패.</div>
+      <div class="wsep"></div>
+      <div class="wtitle">한눈에 암기</div>
+      <div class="wing-pen">고생대: 삼엽충·육상 진출<br>중생대: 공룡·겉씨<br>신생대: 포유류·속씨·인류</div>
+    </div>
+  </div>
+  <div class="quickcheck">
+    <span class="qc-title">바로바로 체크</span>
+    <ol>
+      <li><span class="no">1</span>생물의 육상 진출은 오존층이 자외선을 막아 준 뒤에 가능해졌다. ( O , X )</li>
+      <li><span class="no">2</span>공룡과 암모나이트는 신생대의 표준 화석이다. ( O , X )</li>
+      <li><span class="no">3</span>스트로마톨라이트는 남세균의 활동으로 만들어졌다. ( O , X )</li>
+    </ol>
+    <div class="qc-ans">정답 1 O 2 X (중생대) 3 O</div>
+  </div>
+  <div class="folio"><span>I. 변화와 다양성</span><span class="num">12</span></div>
+</div>
+
+<!-- ═════════════ p.13 개념 04 대멸종 ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag">I. 변화와 다양성</span><span class="lesson-tag">01. 지질시대와 생물의 변천</span></div>
+  <div class="cols">
+    <div class="main">
+      <h3 class="sec"><span class="n">4</span>대멸종 — 환경이 흔들리면 생물이 지워진다</h3>
+      <p class="body">지질시대의 경계에서는 어김없이 <span class="kw">대멸종</span> — 수많은 생물 종이 짧은 기간에 한꺼번에 사라진 사건 — 이 발견된다. 가장 컸던 것은 <b>고생대 말</b>의 대멸종이다. 거대한 화산 분출로 기후가 급변하고 바다의 산소가 부족해지면서, <span class="u-amber">바다 생물 종의 약 90 %가 사라졌다</span>. 삼엽충의 3억 년 역사가 여기서 끝났다.</p>
+      <p class="body">가장 유명한 것은 <b>중생대 말</b>의 대멸종이다. 지름 약 10 km의 <b>소행성 충돌</b>이 유력한 원인으로, 충돌 먼지가 햇빛을 가려 기온이 떨어지고 광합성이 멎으면서 먹이 사슬이 무너졌다 — 공룡과 암모나이트가 무대에서 내려온 사건이다. 공통 구조를 보라. <b>급격한 환경 변화(원인) → 대규모 멸종(결과)</b>. 환경과 생물다양성이 한 몸으로 묶여 있다는 것, 이것이 이 성취기준의 심장이다.</p>
+
+      <figure>
+        <svg width="470" height="152" viewBox="0 0 470 152" font-family="PC Sans">
+          <g font-size="6.8">
+            <g transform="translate(122,10)">
+              <rect x="-104" y="0" width="208" height="106" rx="6" fill="#FBEBEE" stroke="#E3A0AC" stroke-width="1"/>
+              <text x="0" y="16" text-anchor="middle" font-size="8.4" font-weight="800" fill="#A9556A">고생대 말 — 최대 규모의 대멸종</text>
+              <path d="M-60,76 l10,-26 l8,10 l8,-18 l10,20 l8,-8 l8,14" fill="none" stroke="#8A7A63" stroke-width="1.4"/>
+              <path d="M-36,50 q-2,-14 6,-18 M-30,58 q0,-10 4,-14" stroke="#D6455D" stroke-width="2" fill="none"/>
+              <circle cx="-30" cy="30" r="3" fill="#E8940A"/><circle cx="-24" cy="24" r="2.2" fill="#E8940A"/>
+              <text x="42" y="40" text-anchor="middle" font-weight="800" fill="#A9556A">거대 화산 분출</text>
+              <text x="42" y="52" text-anchor="middle" fill="#5B6B77">기후 급변 · 바다 산소 부족</text>
+              <text x="0" y="96" text-anchor="middle" font-weight="800" fill="#D6455D">바다 생물 종의 약 90 % 소멸 — 삼엽충 퇴장</text>
+            </g>
+            <g transform="translate(352,10)">
+              <rect x="-104" y="0" width="208" height="106" rx="6" fill="#FBEFE7" stroke="#EBC4AB" stroke-width="1"/>
+              <text x="0" y="16" text-anchor="middle" font-size="8.4" font-weight="800" fill="#C1521E">중생대 말 — 소행성 충돌</text>
+              <circle cx="-58" cy="34" r="7" fill="#8A7A63"/>
+              <path d="M-52,28 q20,10 36,30" stroke="#E8940A" stroke-width="2" fill="none" marker-end="url(#arrR)"/>
+              <path d="M-70,24 l6,6 M-66,20 l5,7 M-74,32 l8,4" stroke="#E8940A" stroke-width="1" fill="none"/>
+              <path d="M-30,70 q10,-10 22,-6 q8,-8 18,-2 q10,-6 16,2" fill="none" stroke="#9AA7B1" stroke-width="1.6"/>
+              <text x="34" y="40" text-anchor="middle" font-weight="800" fill="#C1521E">먼지가 햇빛을 가림</text>
+              <text x="34" y="52" text-anchor="middle" fill="#5B6B77">기온 하강 · 광합성 정지</text>
+              <text x="0" y="96" text-anchor="middle" font-weight="800" fill="#D6455D">먹이 사슬 붕괴 — 공룡·암모나이트 퇴장</text>
+            </g>
+          </g>
+          <text x="235" y="132" text-anchor="middle" font-size="8.8" font-weight="800" fill="#E8940A">공통 구조: 급격한 환경 변화 → 대규모 멸종 — 시대의 경계는 대멸종의 자리다</text>
+          <text x="235" y="145" text-anchor="middle" font-size="7" fill="#5B6B77">원인은 '유력한 설명'이다 — 과학은 증거가 쌓일수록 설명을 다듬는다</text>
+        </svg>
+        <figcaption>그림 4 | 두 번의 대멸종 — 화산의 시대, 소행성의 하루</figcaption>
+      </figure>
+
+      <div class="saem">
+        <div class="avatar">박찬<br>쌤</div>
+        <div class="bubble"><span class="pen">"대멸종 문제의 판정 기준은 하나 — '환경 변화가 먼저냐'다. 생물이 그냥 사라지는 법은 없다. 원인(환경) 없이 결과(멸종)를 말하는 선지는 다 함정이야."</span></div>
+      </div>
+    </div>
+
+    <div class="wing">
+      <div class="wtitle">날개 노트</div>
+      <div class="term"><b>대멸종</b>짧은 지질학적 시간에 수많은 종이 함께 사라지는 사건. 지질시대 동안 다섯 차례의 큰 멸종이 있었다.</div>
+      <div class="term"><b>충돌구의 증거</b>멕시코 유카탄반도에는 중생대 말 충돌의 흔적(지름 약 180 km의 충돌구)이 남아 있다.</div>
+      <div class="wsep"></div>
+      <div class="wtitle">한눈에 암기</div>
+      <div class="wing-pen">고생대 말 = 화산·최대<br>중생대 말 = 소행성·공룡<br>환경 변화 → 멸종!</div>
+    </div>
+  </div>
+  <div class="quickcheck">
+    <span class="qc-title">바로바로 체크</span>
+    <ol>
+      <li><span class="no">1</span>규모가 가장 컸던 대멸종은 고생대 말에 일어났다. ( O , X )</li>
+      <li><span class="no">2</span>중생대 말 대멸종의 유력한 원인은 소행성 충돌이다. ( O , X )</li>
+      <li><span class="no">3</span>대멸종은 환경 변화와 무관하게 일어난다. ( O , X )</li>
+    </ol>
+    <div class="qc-ans">정답 1 O 2 O 3 X (급격한 환경 변화가 원인이다)</div>
+  </div>
+  <div class="folio"><span>I. 변화와 다양성</span><span class="num">13</span></div>
+</div>
+
+<!-- ═════════════ p.14 개념 05 멸종과 다양성 ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag">I. 변화와 다양성</span><span class="lesson-tag">01. 지질시대와 생물의 변천</span></div>
+  <div class="cols">
+    <div class="main">
+      <h3 class="sec"><span class="n">5</span>멸종은 끝이 아니었다 — 빈자리와 다양성</h3>
+      <p class="body">역설적이게도, 대멸종은 생물다양성 이야기의 '끝'이 아니라 <b>'재편'</b>이었다. 지배자가 사라진 생태계에는 거대한 <span class="u-amber">빈자리</span>가 생기고, 살아남은 생물들이 그 자리로 퍼져 나가며 <b>새로운 종으로 다양해진다</b>. 공룡이 사라진 뒤에야 구석에서 숨죽이던 작은 포유류가 하늘(박쥐)·바다(고래)·초원(말)으로 퍼져 나갔다 — 우리 인류도 그 수혜자의 후손이다.</p>
+      <p class="body">그래서 지질시대 전체로 보면 생물다양성은 <b>멸종으로 꺾이고, 회복하며 더 높이 오르는 계단</b>을 그린다. 단, 회복에는 수백만 년이 걸렸다는 것을 잊지 말자. 오늘날 과학자들은 인간 활동으로 인한 서식지 파괴와 기후변화가 <b>'여섯 번째 대멸종'</b>급의 속도로 종을 지우고 있다고 경고한다 — 이번 격변의 원인은 화산도 소행성도 아닌, 우리 자신이다.</p>
+
+      <figure>
+        <svg width="470" height="148" viewBox="0 0 470 148" font-family="PC Sans">
+          <g font-size="6.8">
+            <line x1="36" y1="112" x2="446" y2="112" stroke="#5B6B77" stroke-width="1.2" marker-end="url(#arrP)"/>
+            <line x1="36" y1="112" x2="36" y2="14" stroke="#5B6B77" stroke-width="1.2" marker-end="url(#arrP)"/>
+            <text x="444" y="124" text-anchor="end" fill="#5B6B77">시간 →</text>
+            <text x="42" y="12" fill="#5B6B77">생물다양성(종 수)</text>
+            <!-- 다양성 곡선: 상승-급락-회복 반복 -->
+            <path d="M40,104 q60,-30 108,-38 l16,30 q50,-26 96,-34 l14,26 q60,-30 116,-44" fill="none" stroke="#C1521E" stroke-width="2.4"/>
+            <g stroke="#D6455D" stroke-width="1.2" stroke-dasharray="3 2">
+              <line x1="164" y1="66" x2="164" y2="112"/>
+              <line x1="274" y1="58" x2="274" y2="112"/>
+            </g>
+            <text x="164" y="132" text-anchor="middle" font-weight="800" fill="#A9556A">고생대 말 대멸종</text>
+            <text x="274" y="124" text-anchor="middle" font-weight="800" fill="#C1521E">중생대 말 대멸종</text>
+            <g fill="#2E7A54" font-weight="800">
+              <text x="110" y="52" text-anchor="middle">번성</text>
+              <text x="228" y="46" text-anchor="middle">회복 · 재편</text>
+              <text x="386" y="30" text-anchor="middle">더 높은 다양성</text>
+            </g>
+            <text x="330" y="88" font-size="6.4" fill="#5B6B77">멸종의 빈자리를 생존자가 채우며 다양해진다</text>
+          </g>
+          <text x="235" y="142" text-anchor="middle" font-size="8.8" font-weight="800" fill="#E8940A">생물다양성 = 꺾이고, 회복하며, 더 높이 — 다만 회복에는 수백만 년이 걸린다</text>
+        </svg>
+        <figcaption>그림 5 | 대멸종과 생물다양성의 계단 — 위기 뒤의 재편</figcaption>
+      </figure>
+
+      <div class="gist">
+        <div class="boxtitle"><span class="ico">알</span>알짜 정리 — 지질시대와 생물의 변천 한 장 요약</div>
+        <ul>
+          <li><b>지질시대</b>(46억 년): 화석의 급변으로 구분 — 선캄브리아(88 %) → 고 → 중 → 신</li>
+          <li><b>표준 화석</b>(언제: 삼엽충·공룡·매머드) vs <b>시상 화석</b>(환경: 산호·고사리)</li>
+          <li>대멸종: <b>고생대 말</b>(화산, 최대·바다 종 90 %) · <b>중생대 말</b>(소행성, 공룡 퇴장)</li>
+          <li>멸종 → 빈자리 → 생존자의 다양화 — <b>환경 변화가 생물다양성을 조각한다</b></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="wing">
+      <div class="wtitle">날개 노트</div>
+      <div class="term"><b>적응 방산</b>생존자들이 빈 서식지로 퍼져 나가며 여러 종으로 갈라지는 것 — 02(진화)에서 원리를 배운다.</div>
+      <div class="term"><b>여섯 번째 대멸종?</b>현재의 멸종 속도가 과거 대멸종에 비견된다는 경고 — 원인은 인간 활동이다.</div>
+      <div class="wsep"></div>
+      <div class="wtitle">한눈에 암기</div>
+      <div class="wing-pen">멸종 → 빈자리 → 재편<br>공룡 퇴장 → 포유류 무대<br>회복엔 수백만 년!</div>
+    </div>
+  </div>
+  <div class="quickcheck">
+    <span class="qc-title">바로바로 체크</span>
+    <ol>
+      <li><span class="no">1</span>대멸종 후 살아남은 생물은 빈자리를 채우며 다양해졌다. ( O , X )</li>
+      <li><span class="no">2</span>포유류가 크게 번성한 것은 공룡 멸종 이후이다. ( O , X )</li>
+      <li><span class="no">3</span>대멸종으로 꺾인 생물다양성은 곧바로 회복된다. ( O , X )</li>
+    </ol>
+    <div class="qc-ans">정답 1 O 2 O 3 X (회복에 수백만 년)</div>
+  </div>
+  <div class="folio"><span>I. 변화와 다양성</span><span class="num">14</span></div>
+</div>
+
+<!-- ═════════════ p.15 자료 파헤치기 ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag">I. 변화와 다양성</span><span class="lesson-tag">01. 지질시대와 생물의 변천</span></div>
+  <div class="lab">
+    <div class="lab-head">자료 파헤치기 <span class="tag">탐구·자료 분석</span> <span style="font-weight:600; font-size:9.5pt; margin-left:auto;">지구 46억 년을 1년 달력으로</span></div>
+    <div class="lab-body">
+      <h4>자료</h4>
+      <p>지구의 역사 46억 년을 <b>1년(365일) 달력</b>에 눌러 담아 보자. 1월 1일 0시에 지구가 태어났다면, 하루는 약 1260만 년, 1시간은 약 53만 년에 해당한다.</p>
+      <figure>
+        <svg width="430" height="112" viewBox="0 0 430 112" font-family="PC Sans">
+          <g font-size="6.8">
+            <rect x="20" y="26" width="390" height="20" rx="4" fill="#F6F3EC" stroke="#C9BA9B" stroke-width="1"/>
+            <rect x="342" y="26" width="27" height="20" fill="#E0A57E"/>
+            <rect x="369" y="26" width="26" height="20" fill="#D98A5B"/>
+            <rect x="395" y="26" width="15" height="20" fill="#C1521E"/>
+            <g text-anchor="middle" font-weight="800">
+              <text x="30" y="20" fill="#7A6A45">1/1 지구 탄생</text>
+              <text x="356" y="20" fill="#7A3E14">11/19 고생대</text>
+              <text x="382" y="60" fill="#B4560E">12/12 중생대</text>
+              <text x="402" y="20" fill="#C1521E">12/26 공룡 퇴장</text>
+            </g>
+            <g fill="#5B6B77" text-anchor="middle">
+              <text x="120" y="60">3월쯤 — 최초의 생명(바다)</text>
+              <text x="120" y="72" font-size="6.2">이후 8개월은 미생물의 시간</text>
+            </g>
+            <line x1="408" y1="46" x2="408" y2="74" stroke="#D6455D" stroke-width="1.2" stroke-dasharray="2.5 2"/>
+            <text x="356" y="86" text-anchor="middle" font-weight="800" fill="#D6455D">12/31 23시 26분 — 인류(호모 사피엔스) 등장</text>
+            <text x="356" y="100" text-anchor="middle" fill="#5B6B77">자정 34분 전. 인류 문명(1만 년)은 마지막 1분 남짓이다</text>
+          </g>
+        </svg>
+      </figure>
+      <h4>해석의 3단계</h4>
+      <ol>
+        <li><b>환산의 원리</b> — 46억 년 ÷ 365일 ≈ 하루 1260만 년. 비율로 옮기는 것뿐이다: 어떤 사건의 달력 날짜 = 365 × (지금부터의 시간 ÷ 46억)만큼 연말에서 거슬러 센다.</li>
+        <li><b>검산해 보기(어림 복습!)</b> — 공룡 멸종 6600만 년 전 → 6600만 ÷ 1260만 ≈ 5.2일 → 12월 26일경 ✓. 고생대 시작 5.41억 년 전 → 43일 → 11월 19일경 ✓. 통합과학 1에서 배운 어림이 여기서 일한다.</li>
+        <li><b>규모를 느끼기</b> — 삼엽충·공룡·인류의 '생물 전성기' 전체가 11월 중순 이후, 인류는 마지막 34분. 지질시대 구분이 왜 '생물 변화' 기준인지, 그리고 선캄브리아가 왜 88 %인지가 몸으로 느껴진다.</li>
+      </ol>
+      <h4>결론</h4>
+      <p>지질학적 시간은 숫자로는 실감이 나지 않는다 — <b>비율로 바꿔야 보인다</b>. 그리고 이 달력에서 인류가 '자정 34분 전의 신입'이라는 사실은, 마지막 1분 사이에 일어나고 있는 여섯 번째 대멸종 경고를 다시 보게 만든다.</p>
+      <div class="expoint">
+        <div class="boxtitle"><span class="ico">!</span>시험엔 이렇게</div>
+        <p>달력 환산 자료는 <b>비례식 계산</b>과 <b>순서 배열</b>로 출제된다. "중생대는 12월에 시작되었다"(O), "인류는 12월 초에 등장했다"(X — 12월 31일 밤) 식의 판정 연습을 해 두자.</p>
+      </div>
+      <h4>직접 해보기 — 복도에 지구 역사 걸기</h4>
+      <p>복도 4.6 m를 지구 역사로 삼아 보자(1 cm = 1000만 년). 지구 탄생에서 출발해 고생대 시작은 끝에서 54 cm, 공룡 멸종은 6.6 cm, 인류는 0.03 cm — 종이 한 장 두께다. 줄자 하나로 46억 년이 손에 잡힌다.</p>
+    </div>
+  </div>
+  <div class="folio"><span>I. 변화와 다양성</span><span class="num">15</span></div>
+</div>
+
+<!-- ═════════════ p.16 STEP 1 + STEP 2 시작 ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag">I. 변화와 다양성</span><span class="lesson-tag">01. 지질시대와 생물의 변천 | 문제</span></div>
+
+  <div class="step-head"><span class="stepno">STEP 1</span><span class="steptt">개념 확인</span><span class="stepdesc">OX와 빈칸으로 개념 점검 — 막히면 알짜 정리로!</span></div>
+  <div class="qgrid">
+    <div>
+      <div class="q"><div class="qhead"><span class="qno">1</span><div class="stem">지질시대는 생물계의 급격한 변화(화석)를 기준으로 구분한다. <span class="ox-answer">( O , X )</span></div></div></div>
+      <div class="q"><div class="qhead"><span class="qno">2</span><div class="stem">고사리 화석은 지층의 시대를 판단하는 표준 화석이다. <span class="ox-answer">( O , X )</span></div></div></div>
+      <div class="q"><div class="qhead"><span class="qno">3</span><div class="stem">생물의 육상 진출은 오존층 형성 이후에 이루어졌다. <span class="ox-answer">( O , X )</span></div></div></div>
+    </div>
+    <div>
+      <div class="q"><div class="qhead"><span class="qno">4</span><div class="stem">지질시대에서 가장 긴 기간을 차지하는 시대는 <span class="blankline" style="min-width:16mm;"></span> 시대이다.</div></div></div>
+      <div class="q"><div class="qhead"><span class="qno">5</span><div class="stem">삼엽충은 <span class="blankline" style="min-width:10mm;"></span>대, 암모나이트는 <span class="blankline" style="min-width:10mm;"></span>대의 표준 화석이다.</div></div></div>
+      <div class="q"><div class="qhead"><span class="qno">6</span><div class="stem">중생대 말 대멸종의 유력한 원인은 <span class="blankline" style="min-width:14mm;"></span> 충돌이다.</div></div></div>
+    </div>
+  </div>
+
+  <div style="border-top:0.5mm solid var(--line); margin:2mm 0 4mm;"></div>
+
+  <div class="step-head s2"><span class="stepno">STEP 2</span><span class="steptt">내신 완성</span><span class="stepdesc">학교 시험 유형 그대로 — 서술형까지 한 번에</span></div>
+
+  <div class="q">
+    <div class="qhead"><span class="qno">7</span><div class="stem">지질시대에 대한 설명으로 옳은 것은? <span class="difficulty">●●○</span>
+    <div class="tags">10통과2-01-01 | 개념 1</div></div></div>
+    <ul class="choices">
+      <li>① 지질시대는 같은 시간 간격으로 나눈 것이다.</li>
+      <li>② 구분 기준은 지층 속 생물계(화석)의 급격한 변화다.</li>
+      <li>③ 고생대가 지구 역사의 대부분을 차지한다.</li>
+      <li>④ 시대 순서는 신생대 → 중생대 → 고생대이다.</li>
+      <li>⑤ 선캄브리아 시대에는 생물이 전혀 없었다.</li>
+    </ul>
+  </div>
+
+  <div class="q">
+    <div class="qhead"><span class="qno">8</span><div class="stem">표준 화석과 시상 화석에 대한 설명으로 옳은 것은? <span class="difficulty">●●●</span>
+    <div class="tags">10통과2-01-01 | 개념 2</div></div></div>
+    <ul class="choices">
+      <li>① 표준 화석은 오랜 기간 생존한 생물일수록 좋다.</li>
+      <li>② 시상 화석은 지층의 생성 시대를 알려 준다.</li>
+      <li>③ 산호 화석은 당시 그곳이 따뜻하고 얕은 바다였음을 알려 준다.</li>
+      <li>④ 매머드는 중생대의 표준 화석이다.</li>
+      <li>⑤ 표준 화석은 좁은 지역에만 분포할수록 좋다.</li>
+    </ul>
+  </div>
+
+  <div class="folio"><span>I. 변화와 다양성</span><span class="num">16</span></div>
+</div>
+
+<!-- ═════════════ p.17 STEP 2 계속 ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag">I. 변화와 다양성</span><span class="lesson-tag">01. 지질시대와 생물의 변천 | 문제</span></div>
+
+  <div class="q">
+    <div class="qhead"><span class="qno">9</span><div class="stem"><span class="badge-data">자료</span>지구의 역사 46억 년을 1년 달력으로 환산하면 하루는 약 1260만 년이 된다. 약 6600만 년 전에 일어난 중생대 말 대멸종은 달력에서 언제쯤인가? <span class="difficulty">●●●</span>
+    <div class="tags">10통과2-01-01 | 개념 4·자료</div></div></div>
+    <ul class="choices inline">
+      <li>① 11월 초</li>
+      <li>② 12월 26일경</li>
+      <li>③ 12월 1일경</li>
+      <li>④ 12월 31일 자정 직전</li>
+      <li>⑤ 10월 중순</li>
+    </ul>
+  </div>
+
+  <div class="q">
+    <div class="qhead"><span class="qno">10</span><div class="stem">지질시대 생물의 변천에 대한 설명으로 옳은 것만을 고른 것은? <span class="difficulty">●●●</span>
+    <div class="tags">10통과2-01-01 | 개념 3·5</div></div></div>
+    <div class="bogi-box" style="background:#fff;">
+      (가) 고생대에는 삼엽충이 번성했고 생물의 육상 진출이 일어났다.<br>
+      (나) 포유류가 크게 번성한 것은 공룡이 멸종한 신생대부터이다.<br>
+      (다) 속씨식물은 고생대를 대표하는 식물이다.
+    </div>
+    <ul class="choices inline">
+      <li>① (가)</li><li>② (가), (나)</li><li>③ (나)</li><li>④ (나), (다)</li><li>⑤ (가), (나), (다)</li>
+    </ul>
+  </div>
+
+  <div class="q">
+    <div class="qhead"><span class="qno">11</span><div class="stem"><span class="badge-essay">서술형</span>고생대에 생물이 육지로 진출할 수 있었던 까닭을 <b>'광합성'과 '오존층'</b>이라는 말을 포함하여 서술하시오. <span class="difficulty">●●●●</span>
+    <div class="tags">10통과2-01-01 | 개념 3</div></div></div>
+    <div class="essay-lines"><div></div><div></div><div></div></div>
+  </div>
+
+  <div class="folio"><span>I. 변화와 다양성</span><span class="num">17</span></div>
+</div>
+
+<!-- ═════════════ p.18 STEP 3 ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag">I. 변화와 다양성</span><span class="lesson-tag">01. 지질시대와 생물의 변천 | 문제</span></div>
+  <div class="step-head s3"><span class="stepno">STEP 3</span><span class="steptt">수능 도전</span><span class="stepdesc">2028 수능 규격 — ㄱㄴㄷ 합답형·자료 해석</span></div>
+
+  <div class="q">
+    <div class="qhead"><span class="qno">12</span><div class="stem"><span class="badge-data">자료</span>그림은 서로 다른 지역의 지층 (가)와 (나)에서 발견된 화석을 나타낸 것이다. (가)에서는 삼엽충 화석이, (나)에서는 공룡 알 화석과 고사리 화석이 발견되었다. 옳은 것만을 &lt;보기&gt;에서 있는 대로 고른 것은? <span class="difficulty">[2점]</span>
+    <div class="tags">10통과2-01-01</div></div></div>
+    <figure style="margin:2mm 0 1.5mm 8.6mm;">
+      <svg width="280" height="86" viewBox="0 0 280 86" font-family="PC Sans">
+        <!-- (가) 지층 -->
+        <g>
+          <rect x="14" y="16" width="110" height="18" fill="#EBE3D8" stroke="#B9AC99" stroke-width="0.8"/>
+          <rect x="14" y="34" width="110" height="20" fill="#DFD4C4" stroke="#B9AC99" stroke-width="0.8"/>
+          <rect x="14" y="54" width="110" height="16" fill="#D2C4AE" stroke="#B9AC99" stroke-width="0.8"/>
+          <!-- 삼엽충 -->
+          <g transform="translate(69,44)">
+            <ellipse cx="0" cy="0" rx="9" ry="6.5" fill="#8A7A63"/>
+            <line x1="-9" y1="-2" x2="9" y2="-2" stroke="#EFE8DC" stroke-width="0.9"/>
+            <line x1="-9" y1="1" x2="9" y2="1" stroke="#EFE8DC" stroke-width="0.9"/>
+            <line x1="0" y1="-6.5" x2="0" y2="6.5" stroke="#EFE8DC" stroke-width="0.9"/>
+          </g>
+          <text x="69" y="80" text-anchor="middle" font-size="7.4" font-weight="800" fill="#4A5964">(가) 삼엽충 화석</text>
+        </g>
+        <!-- (나) 지층 -->
+        <g>
+          <rect x="156" y="16" width="110" height="18" fill="#EAE0E0" stroke="#B9A4A4" stroke-width="0.8"/>
+          <rect x="156" y="34" width="110" height="20" fill="#E0D0CC" stroke="#B9A4A4" stroke-width="0.8"/>
+          <rect x="156" y="54" width="110" height="16" fill="#D4BFB8" stroke="#B9A4A4" stroke-width="0.8"/>
+          <!-- 공룡 알 -->
+          <ellipse cx="192" cy="44" rx="7" ry="9" fill="#CFC5B4" stroke="#8A7A63" stroke-width="1"/>
+          <ellipse cx="203" cy="46" rx="6" ry="8" fill="#DED5C6" stroke="#8A7A63" stroke-width="1"/>
+          <!-- 고사리 잎 -->
+          <g stroke="#5E7D57" stroke-width="1.1" fill="none">
+            <path d="M238,54 q2,-14 4,-22"/>
+            <path d="M240,40 q-6,-2 -9,-6"/><path d="M240,40 q6,-2 9,-6"/>
+            <path d="M239,47 q-6,-1 -10,-4"/><path d="M239,47 q7,-1 10,-4"/>
+          </g>
+          <text x="211" y="80" text-anchor="middle" font-size="7.4" font-weight="800" fill="#4A5964">(나) 공룡 알 화석 + 고사리 화석</text>
+        </g>
+      </svg>
+    </figure>
+    <div class="bogi-box">
+      <div class="bt">보기</div>
+      ㄱ. (가)는 고생대, (나)는 중생대에 쌓인 지층이다.<br>
+      ㄴ. (나)의 고사리 화석으로 당시 그곳이 따뜻하고 습했음을 알 수 있다.<br>
+      ㄷ. (가)의 지층이 (나)의 지층보다 나중에 쌓였다.
+    </div>
+    <ul class="choices inline">
+      <li>① ㄱ</li><li>② ㄷ</li><li>③ ㄱ, ㄴ</li><li>④ ㄴ, ㄷ</li><li>⑤ ㄱ, ㄴ, ㄷ</li>
+    </ul>
+  </div>
+
+  <div class="q">
+    <div class="qhead"><span class="qno">13</span><div class="stem"><span class="badge-data">자료</span>그림은 지질시대 동안 생물다양성(과의 수)의 변화를 나타낸 것으로, A와 B는 각각 고생대 말과 중생대 말의 대멸종 시기이다. 옳은 것만을 &lt;보기&gt;에서 있는 대로 고른 것은? <span class="difficulty">[2.5점]</span>
+    <div class="tags">10통과2-01-01</div></div></div>
+    <figure style="margin:2mm 0 1mm 8.6mm;">
+      <svg width="280" height="92" viewBox="0 0 280 92" font-family="PC Sans">
+        <line x1="26" y1="76" x2="270" y2="76" stroke="#5B6B77" stroke-width="1.1" marker-end="url(#arrP)"/>
+        <line x1="26" y1="76" x2="26" y2="8" stroke="#5B6B77" stroke-width="1.1" marker-end="url(#arrP)"/>
+        <text x="268" y="88" text-anchor="end" font-size="6.6" fill="#5B6B77">시간</text>
+        <text x="30" y="8" font-size="6.6" fill="#5B6B77">다양성</text>
+        <path d="M30,70 q34,-20 62,-24 l10,20 q30,-16 56,-20 l9,17 q38,-20 70,-30" fill="none" stroke="#C1521E" stroke-width="2"/>
+        <g stroke="#D6455D" stroke-width="1.1" stroke-dasharray="2.5 2">
+          <line x1="102" y1="46" x2="102" y2="76"/><line x1="167" y1="42" x2="167" y2="76"/>
+        </g>
+        <text x="102" y="86" text-anchor="middle" font-size="7" font-weight="800" fill="#A9556A">A</text>
+        <text x="167" y="86" text-anchor="middle" font-size="7" font-weight="800" fill="#C1521E">B</text>
+      </svg>
+    </figure>
+    <div class="bogi-box">
+      <div class="bt">보기</div>
+      ㄱ. A 이후 삼엽충 화석은 더 이상 발견되지 않는다.<br>
+      ㄴ. B의 유력한 원인은 소행성 충돌에 따른 급격한 환경 변화다.<br>
+      ㄷ. 대멸종 이후 생물다양성은 회복되지 못하고 계속 감소했다.
+    </div>
+    <ul class="choices inline">
+      <li>① ㄱ</li><li>② ㄷ</li><li>③ ㄴ, ㄷ</li><li>④ ㄱ, ㄴ</li><li>⑤ ㄱ, ㄴ, ㄷ</li>
+    </ul>
+  </div>
+
+  <div class="folio"><span>I. 변화와 다양성</span><span class="num">18</span></div>
+</div>
+
+<!-- ═════════════ p.19 해설 1 ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag" style="color:var(--brand);">알짜 해설</span><span class="lesson-tag">01. 지질시대와 생물의 변천</span></div>
+  <div class="sol-head"><span class="stt">알짜 해설</span><span class="sub">전 문항 해설 + 오답 선지 분석 — 맞힌 문제도 해설로 한 번 더!</span></div>
+
+  <table class="anstable">
+    <tr><th>문항</th><td>1</td><td>2</td><td>3</td><td>4</td><td>5</td><td>6</td><td>7</td><td>8</td><td>9</td><td>10</td><td>11</td><td>12</td><td>13</td></tr>
+    <tr><th>정답</th><td class="a">O</td><td class="a">X</td><td class="a">O</td><td class="a">선캄브리아</td><td class="a">고, 중</td><td class="a">소행성</td><td class="a">②</td><td class="a">③</td><td class="a">②</td><td class="a">②</td><td class="a">서술형</td><td class="a">③</td><td class="a">④</td></tr>
+  </table>
+
+  <div class="solcols">
+    <div>
+      <div class="sol"><div class="shead"><span class="sno">1</span><span class="sans">O</span><span class="slink">개념 1</span></div>
+        <p>시간 간격이 아니라 생물계의 급변(화석)이 기준이다.</p></div>
+      <div class="sol"><div class="shead"><span class="sno">2</span><span class="sans">X</span><span class="slink">개념 2</span></div>
+        <p>고사리는 환경(따뜻하고 습한 육지)을 알려 주는 시상 화석이다.</p></div>
+      <div class="sol"><div class="shead"><span class="sno">3</span><span class="sans">O</span><span class="slink">개념 3</span></div>
+        <p>오존층이 자외선을 막아 준 뒤에야 육상 진출이 가능했다.</p></div>
+      <div class="sol"><div class="shead"><span class="sno">4</span><span class="sans">선캄브리아</span><span class="slink">개념 1</span></div>
+        <p>지구 역사의 약 88 % — 이름 없는 긴 밤.</p></div>
+      <div class="sol"><div class="shead"><span class="sno">5</span><span class="sans">고, 중</span><span class="slink">개념 2</span></div>
+        <p>삼엽충-고생대, 암모나이트-중생대. 매머드·화폐석은 신생대.</p></div>
+      <div class="sol"><div class="shead"><span class="sno">6</span><span class="sans">소행성</span><span class="slink">개념 4</span></div>
+        <p>먼지 → 햇빛 차단 → 광합성 정지 → 먹이 사슬 붕괴.</p></div>
+    </div>
+    <div>
+      <div class="sol"><div class="shead"><span class="sno">7</span><span class="sans">②</span><span class="slink">개념 1</span></div>
+        <p>구분 기준 = 화석의 급격한 변화. 정의 그대로다.</p>
+        <div class="wrongbox"><div class="wt">오답 왜 틀렸나</div>
+          <p><b>①</b> 균등 분할이 아니다. <b>③</b> 대부분은 선캄브리아. <b>④</b> 순서 반대. <b>⑤</b> 최초 생명·남세균·다세포 생물이 있었다.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">8</span><span class="sans">③</span><span class="slink">개념 2</span></div>
+        <p>산호 = 따뜻하고 얕은 바다의 시상 화석.</p>
+        <div class="wrongbox"><div class="wt">오답 왜 틀렸나</div>
+          <p><b>①·⑤</b> 표준 화석은 짧게 살고 넓게 퍼질수록 좋다. <b>②</b> 시대는 표준 화석의 몫. <b>④</b> 매머드는 신생대.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">9</span><span class="sans">②</span><span class="slink">개념 4·자료</span></div>
+        <p>6600만 ÷ 1260만 ≈ 5.2일 → 연말에서 5일쯤 앞 = 12월 26일경.</p>
+        <div class="wrongbox"><div class="wt">오답 왜 틀렸나</div>
+          <p><b>④</b> 자정 직전은 인류의 자리다. 비례식 검산 습관이 답을 지킨다.</p></div></div>
+    </div>
+  </div>
+
+  <div class="folio"><span>알짜 해설</span><span class="num">19</span></div>
+</div>
+
+<!-- ═════════════ p.20 해설 2 ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag" style="color:var(--brand);">알짜 해설</span><span class="lesson-tag">01. 지질시대와 생물의 변천</span></div>
+  <div class="solcols">
+    <div>
+      <div class="sol"><div class="shead"><span class="sno">10</span><span class="sans">②</span><span class="slink">개념 3·5</span></div>
+        <p>(가) 고생대의 두 사건 — 삼엽충 번성과 육상 진출. (나) 공룡의 빈자리를 포유류가 채웠다 — 둘 다 옳다.</p>
+        <div class="wrongbox"><div class="wt">오답 왜 틀렸나</div>
+          <p><b>(다)</b> 속씨식물은 신생대의 대표 — 고생대는 양치식물이다.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">11</span><span class="sans">모범 답안</span><span class="slink">개념 3</span></div>
+        <p>바다 생물의 <b>광합성</b>으로 대기 중 산소가 많아졌고, 그 일부가 상공에서 오존이 되어 <b>오존층</b>을 이루었다. 오존층이 생물에게 해로운 자외선을 막아 주면서 생물이 육지로 진출할 수 있게 되었다.</p>
+        <div class="wrongbox"><div class="wt">채점 기준 (감점 포인트)</div>
+          <p>① 광합성으로 산소 증가 ② 산소로부터 오존층 형성 ③ 자외선 차단으로 육상 진출 가능 — 세 요소 모두 서술해야 만점.</p></div></div>
+    </div>
+    <div>
+      <div class="sol"><div class="shead"><span class="sno">12</span><span class="sans">③</span><span class="slink">개념 2 | 2점</span></div>
+        <p><b>ㄱ (옳음)</b> 삼엽충 = 고생대, 공룡 알 = 중생대의 표준 화석. <b>ㄴ (옳음)</b> 고사리는 시상 화석 — 따뜻하고 습한 환경. <b>ㄷ (틀림)</b> 고생대 지층인 (가)가 먼저 쌓였다.</p>
+        <div class="wrongbox"><div class="wt">함정 체크</div>
+          <p>한 지층에서 표준 화석과 시상 화석이 함께 나오면 — <b>시대와 환경을 동시에</b> 읽어 낼 수 있다.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">13</span><span class="sans">④</span><span class="slink">개념 4·5 | 2.5점</span></div>
+        <p><b>ㄱ (옳음)</b> 삼엽충은 고생대 말(A) 대멸종으로 사라졌다. <b>ㄴ (옳음)</b> B = 중생대 말, 소행성 충돌이 유력한 원인. <b>ㄷ (틀림)</b> 그래프가 보여 주듯 다양성은 회복하며 더 높이 올라갔다.</p>
+        <div class="wrongbox"><div class="wt">함정 체크</div>
+          <p>대멸종 그래프의 포인트는 '꺾임'이 아니라 <b>'꺾인 뒤의 회복'</b>이다 — 빈자리 재편까지 읽어야 만점.</p></div></div>
+
+      <div class="gist" style="margin-top:5mm;">
+        <div class="boxtitle"><span class="ico">알</span>이 소단원, 이것만은!</div>
+        <ul>
+          <li>지질시대 구분 기준 = <b>생물(화석)의 급변</b> — 선캄브리아(88 %) → 고 → 중 → 신</li>
+          <li><b>표준 화석</b>(짧고 넓게 — 언제) vs <b>시상 화석</b>(좁고 길게 — 어떤 환경)</li>
+          <li>대멸종의 공통 구조: <b>급격한 환경 변화 → 멸종 → 빈자리 재편</b> — 다양성의 계단</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div class="folio"><span>알짜 해설</span><span class="num">20</span></div>
+</div>
+
+<!-- ═════════════ p.21 MEMO ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag">I. 변화와 다양성</span><span class="lesson-tag">01 ▸ 02 넘어가기 전에</span></div>
+  <div class="memo-head"><span class="mt">MEMO</span><span class="ms">헷갈린 개념, 다시 틀린 문제 번호, 나만의 암기법을 남겨 두는 자리</span></div>
+  <div class="memo-area"></div>
+  <div class="memo-pen">"'삼엽충-공룡-매머드'를 시대 순서로, 각 시대의 식물과 짝지어 말해 보자. 막히면 12쪽으로! — 박찬쌤"</div>
+  <div class="folio"><span>박찬 과학 | 통합과학 2</span><span class="num">21</span></div>
+</div>
+
+</body>
+</html>
