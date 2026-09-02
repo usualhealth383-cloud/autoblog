@@ -24,6 +24,7 @@ render() {  # render <html> <pdf>
   echo "OK: $2"
 }
 
+render front-matter/front.html front-matter/front.pdf
 render chapter-2101/chapter.html chapter-2101/chapter.pdf
 render chapter-2102/chapter.html chapter-2102/chapter.pdf
 render chapter-2103/chapter.html chapter-2103/chapter.pdf
@@ -36,8 +37,14 @@ render chapter-2203/chapter.html chapter-2203/chapter.pdf
 render chapter-2204/chapter.html chapter-2204/chapter.pdf
 render chapter-2205/chapter.html chapter-2205/chapter.pdf
 render summary-2/summary.html summary-2/summary.pdf
+render chapter-2301/chapter.html chapter-2301/chapter.pdf
+render chapter-2302/chapter.html chapter-2302/chapter.pdf
+render chapter-2303/chapter.html chapter-2303/chapter.pdf
+render summary-3/summary.html summary-3/summary.pdf
+render back-matter/back.html back-matter/back.pdf
 
 # 3) 조판 QA
+python3 ../tools/qa_check.py front-matter/front.html
 python3 ../tools/qa_check.py chapter-2101/chapter.html
 python3 ../tools/qa_check.py chapter-2102/chapter.html
 python3 ../tools/qa_check.py chapter-2103/chapter.html
@@ -50,8 +57,14 @@ python3 ../tools/qa_check.py chapter-2203/chapter.html
 python3 ../tools/qa_check.py chapter-2204/chapter.html
 python3 ../tools/qa_check.py chapter-2205/chapter.html
 python3 ../tools/qa_check.py summary-2/summary.html
+python3 ../tools/qa_check.py chapter-2301/chapter.html
+python3 ../tools/qa_check.py chapter-2302/chapter.html
+python3 ../tools/qa_check.py chapter-2303/chapter.html
+python3 ../tools/qa_check.py summary-3/summary.html
+python3 ../tools/qa_check.py back-matter/back.html
 
 # 4) 텍스트 무결성 (HTML 가시 텍스트 vs PDF 텍스트 레이어)
+python3 ../tools/pdf_text_check.py front-matter/front.html front-matter/front.pdf
 python3 ../tools/pdf_text_check.py chapter-2101/chapter.html chapter-2101/chapter.pdf
 python3 ../tools/pdf_text_check.py chapter-2102/chapter.html chapter-2102/chapter.pdf
 python3 ../tools/pdf_text_check.py chapter-2103/chapter.html chapter-2103/chapter.pdf
@@ -64,12 +77,23 @@ python3 ../tools/pdf_text_check.py chapter-2203/chapter.html chapter-2203/chapte
 python3 ../tools/pdf_text_check.py chapter-2204/chapter.html chapter-2204/chapter.pdf
 python3 ../tools/pdf_text_check.py chapter-2205/chapter.html chapter-2205/chapter.pdf
 python3 ../tools/pdf_text_check.py summary-2/summary.html summary-2/summary.pdf
+python3 ../tools/pdf_text_check.py chapter-2301/chapter.html chapter-2301/chapter.pdf
+python3 ../tools/pdf_text_check.py chapter-2302/chapter.html chapter-2302/chapter.pdf
+python3 ../tools/pdf_text_check.py chapter-2303/chapter.html chapter-2303/chapter.pdf
+python3 ../tools/pdf_text_check.py summary-3/summary.html summary-3/summary.pdf
+python3 ../tools/pdf_text_check.py back-matter/back.html back-matter/back.pdf
 
 # 5) 합본 PDF (지금까지 완성된 챕터 축적분)
 python3 - <<'PYEOF'
 import pymupdf
 out = pymupdf.open()
-for f in ["chapter-2101/chapter.pdf", "chapter-2102/chapter.pdf", "chapter-2103/chapter.pdf", "chapter-2104/chapter.pdf", "chapter-2105/chapter.pdf", "summary-1/summary.pdf", "chapter-2201/chapter.pdf", "chapter-2202/chapter.pdf", "chapter-2203/chapter.pdf", "chapter-2204/chapter.pdf", "chapter-2205/chapter.pdf", "summary-2/summary.pdf"]:
+for f in ["front-matter/front.pdf",
+          "chapter-2101/chapter.pdf", "chapter-2102/chapter.pdf", "chapter-2103/chapter.pdf",
+          "chapter-2104/chapter.pdf", "chapter-2105/chapter.pdf", "summary-1/summary.pdf",
+          "chapter-2201/chapter.pdf", "chapter-2202/chapter.pdf", "chapter-2203/chapter.pdf",
+          "chapter-2204/chapter.pdf", "chapter-2205/chapter.pdf", "summary-2/summary.pdf",
+          "chapter-2301/chapter.pdf", "chapter-2302/chapter.pdf", "chapter-2303/chapter.pdf",
+          "summary-3/summary.pdf", "back-matter/back.pdf"]:
     with pymupdf.open(f) as d:
         out.insert_pdf(d)
 try:

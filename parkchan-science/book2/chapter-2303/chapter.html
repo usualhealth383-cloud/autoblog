@@ -1,0 +1,882 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<title>박찬 과학 통합과학2 — III-03 과학기술과 윤리</title>
+<style>
+  @font-face { font-family:'PC Sans'; src:url('file:///root/.fonts/NotoSansKR.ttf'); font-weight:100 900; }
+  @font-face { font-family:'PC Serif'; src:url('file:///root/.fonts/NotoSerifKR.ttf'); font-weight:100 900; }
+  @font-face { font-family:'PC Pen'; src:url('file:///root/.fonts/YeonSung-Regular.ttf'); font-weight:400; }
+
+  :root{
+    --brand:#0E5A6B;        /* 박찬 과학 브랜드 딥틸 */
+    --brand-lt:#E3F0F3;
+    --unit:#4053B8;         /* I. 과학의 기초 단원 컬러(그린) */
+    --unit-lt:#ECEFFA;
+    --unit-md:#C0C9EE;
+    --accent:#E8940A;       /* 알짜 앰버 */
+    --accent-lt:#FDF3E0;
+    --point:#D6455D;        /* 시험 포인트 */
+    --point-lt:#FBEBEE;
+    --ink:#22303A;
+    --sub:#5B6B77;
+    --line:#D8E0E5;
+  }
+  *{ box-sizing:border-box; margin:0; padding:0; -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+  @page{ size:210mm 275mm; margin:0; }
+  html,body{ font-family:'PC Sans',sans-serif; color:var(--ink); word-break:keep-all; overflow-wrap:anywhere; }
+
+  .page{ width:210mm; height:275mm; position:relative; overflow:hidden; background:#fff; page-break-after:always; padding:14mm 13mm 19mm 15mm; display:flex; flex-direction:column; }
+
+  /* ── 러닝 헤드 / 풋 ── */
+  .runhead{ display:flex; align-items:center; justify-content:space-between; border-bottom:0.35mm solid var(--unit); padding-bottom:2mm; margin-bottom:6.5mm; }
+  .runhead .unit-tag{ font-size:8.5pt; font-weight:700; color:var(--unit); letter-spacing:0.02em; }
+  .runhead .lesson-tag{ font-size:8.5pt; color:var(--sub); }
+  .folio{ position:absolute; bottom:7mm; left:0; right:0; display:flex; justify-content:space-between; padding:0 14mm 0 14mm; font-size:8pt; color:var(--sub); }
+  .folio .num{ font-weight:800; color:var(--unit); font-size:10pt; }
+
+  /* ── 본문 그리드: 본문 + 날개단 ── */
+  .cols{ display:grid; grid-template-columns:1fr 43mm; gap:8mm; flex:1; min-height:0; margin-bottom:4mm; }
+  .main{ min-width:0; }
+  .wing{ border-left:0.3mm solid var(--line); padding-left:5mm; font-size:8.2pt; color:var(--sub); line-height:1.7; }
+
+  /* ── 타이포 ── */
+  h2.lesson-title{ display:flex; align-items:baseline; gap:3.5mm; margin-bottom:2mm; }
+  h2.lesson-title .no{ background:var(--unit); color:#fff; font-size:13pt; font-weight:900; padding:1.2mm 3.2mm; border-radius:1.5mm; }
+  h2.lesson-title .tt{ font-size:16.5pt; font-weight:900; letter-spacing:-0.01em; }
+  .std-badges{ display:flex; gap:2mm; margin:2mm 0 6.5mm; }
+  .std{ font-size:7.4pt; color:var(--unit); background:none; border:0.3mm solid var(--unit-md); border-radius:5mm; padding:0.6mm 2.8mm; font-weight:600; }
+
+  h3.sec{ display:flex; align-items:baseline; gap:3mm; font-size:12.5pt; font-weight:800; margin:9mm 0 3.6mm; letter-spacing:-0.01em; }
+  h3.sec .n{ font-family:'PC Serif'; font-size:15.5pt; font-weight:900; color:var(--unit); border-bottom:0.7mm solid var(--accent); padding:0 0.8mm 0.2mm; flex:0 0 auto; line-height:1; }
+  h3.sec::after{ content:""; flex:1; border-top:0.25mm solid var(--line); align-self:center; margin-left:2mm; }
+  h3.sec:first-child{ margin-top:0; }
+
+  p.body{ font-family:'PC Serif'; font-size:9.6pt; line-height:1.92; margin-bottom:3.6mm; text-align:justify; }
+  p.body b{ font-weight:800; }
+  .kw{ font-weight:800; color:var(--unit); }
+  .u-amber{ background:#F8E9C6; font-weight:700; padding:0.15mm 0.6mm; border-radius:0.6mm; box-decoration-break:clone; -webkit-box-decoration-break:clone; }
+
+  ul.pts{ font-family:'PC Serif'; font-size:9.6pt; line-height:1.84; margin:1.5mm 0 3.5mm 1mm; list-style:none; }
+  ul.pts li{ padding-left:4.5mm; position:relative; margin-bottom:1.8mm; }
+  ul.pts li::before{ content:""; position:absolute; left:0.5mm; top:2.9mm; width:1.7mm; height:1.7mm; background:var(--accent); border-radius:50%; }
+
+  /* ── 코너 박스 ── */
+  .boxtitle{ display:inline-flex; align-items:center; gap:1.8mm; font-weight:900; font-size:9.5pt; margin-bottom:1.6mm; }
+  .boxtitle .ico{ width:5.2mm; height:5.2mm; border-radius:1.2mm; display:flex; align-items:center; justify-content:center; color:#fff; font-size:7.5pt; font-weight:900; }
+
+  .gist{ background:none; border:none; border-top:0.5mm solid var(--accent); border-bottom:0.5mm solid var(--accent); border-radius:0; padding:3.2mm 1.8mm 3mm; margin:6mm 0 5mm; }
+  .gist .boxtitle{ color:#9C6503; } .gist .ico{ background:var(--accent); }
+  .gist ul{ list-style:none; font-family:'PC Serif'; font-size:9.3pt; line-height:1.78; }
+  .gist li{ padding-left:4.2mm; position:relative; margin-bottom:1.2mm;}
+  .gist li::before{ content:"✓"; position:absolute; left:0; color:var(--accent); font-weight:900; }
+
+  .expoint{ background:none; border-left:0.5mm solid #D998A4; border-left-color:#D998A4; border-radius:0; padding:1.4mm 0 1.4mm 3.6mm; margin:4.5mm 0; }
+  .expoint .boxtitle{ color:#A9556A; font-size:8.6pt; margin-bottom:1mm;}
+  .expoint .ico{ background:none; color:#A9556A; border:0.35mm solid #D998A4; width:4.4mm; height:4.4mm; border-radius:50%; font-size:7pt; }
+  .expoint p{ font-family:'PC Serif'; font-size:8.9pt; line-height:1.7; }
+
+  .pen{ font-family:'PC Pen'; font-size:12pt; color:#2E3E96; line-height:1.45; }
+  .saem{ display:flex; gap:3mm; align-items:flex-start; margin:4.5mm 0; }
+  .saem .avatar{ flex:0 0 auto; width:10.5mm; height:10.5mm; border-radius:50%; background:var(--brand); color:#fff; font-size:7pt; font-weight:800; display:flex; align-items:center; justify-content:center; line-height:1.35; letter-spacing:0.04em; text-align:center; border:0.5mm solid var(--accent); box-sizing:border-box;}
+  .saem .bubble{ background:#FFFBF0; border:0.4mm solid #EBCB9C; border-radius:3mm; padding:2.2mm 3.6mm 2mm; position:relative; }
+  .saem .bubble::before{ content:""; position:absolute; left:-1.8mm; top:3.2mm; width:3mm; height:3mm; background:#FFFBF0; border-left:0.4mm solid #EBCB9C; border-bottom:0.4mm solid #EBCB9C; transform:rotate(45deg); }
+
+  .wing .wtitle{ font-size:8pt; font-weight:900; color:var(--brand); display:flex; align-items:center; gap:1.5mm; margin:0 0 2.4mm; letter-spacing:0.05em; }
+  .wing .wtitle::before{ content:""; width:2.4mm; height:2.4mm; background:var(--accent); border-radius:50%; }
+  .wing .term{ margin-bottom:3.6mm; }
+  .wing .term b{ color:var(--ink); font-weight:800; display:block; font-size:8.5pt; margin-bottom:0.7mm;}
+  .wing .wsep{ border-top:0.3mm dashed var(--line); margin:4.5mm 0; }
+  .wing .wing-pen{ font-family:'PC Pen'; font-size:11pt; color:#2E3E96; line-height:1.45; }
+
+  figure{ margin:5mm 0; }
+  figure figcaption{ font-size:8pt; color:var(--sub); text-align:center; margin-top:2mm; }
+  figure svg{ display:block; margin:0 auto; }
+
+  /* ── 비교형 그림 (2패널 + 범례) ── */
+  .fig-duo{ display:flex; align-items:stretch; gap:2.5mm; justify-content:center; }
+  .fig-duo .panel{ flex:0 0 auto; text-align:center; }
+  .fig-duo .p-title{ font-size:9pt; font-weight:900; color:var(--ink); margin-top:1.6mm; }
+  .fig-duo .p-sub{ font-size:7.8pt; color:var(--sub); line-height:1.45; margin-top:0.5mm; }
+  .fig-duo .mid{ display:flex; flex-direction:column; align-items:center; justify-content:center; gap:1mm; padding:0 1mm; }
+  .fig-duo .mid .mlab{ font-size:7.6pt; font-weight:800; color:var(--unit); text-align:center; line-height:1.3; }
+  .fig-legend{ display:flex; justify-content:center; gap:5mm; font-size:7.8pt; color:var(--ink); margin-top:1.2mm; align-items:center; }
+  .fig-legend span{ display:inline-flex; align-items:center; gap:1.4mm; }
+
+  /* ── 탐구 (자료 파헤치기) ── */
+  .lab{ border:0.5mm solid var(--brand); border-radius:2.5mm; overflow:hidden; margin-top:1mm;}
+  .lab .lab-head{ background:var(--brand); color:#fff; padding:2.2mm 4mm; font-weight:900; font-size:11pt; display:flex; align-items:center; gap:2.5mm;}
+  .lab .lab-head .tag{ font-size:7.5pt; background:rgba(255,255,255,.22); padding:0.6mm 2.4mm; border-radius:4mm; font-weight:700;}
+  .lab .lab-body{ padding:3.5mm 4mm; }
+  .lab h4{ font-size:9.6pt; font-weight:900; color:var(--brand); margin:2.5mm 0 1.4mm; }
+  .lab h4:first-child{ margin-top:0; }
+  .lab p, .lab li{ font-family:'PC Serif'; font-size:9.3pt; line-height:1.8; }
+  .lab ol{ margin-left:5mm; }
+
+  /* ── 문제부 ── */
+  .step-head{ display:flex; align-items:center; gap:3mm; margin:0 0 5mm; }
+  .step-head .stepno{ background:var(--unit); color:#fff; font-weight:900; font-size:9.5pt; padding:1.4mm 3.4mm; border-radius:1.5mm; letter-spacing:0.04em;}
+  .step-head .steptt{ font-size:12.5pt; font-weight:900; }
+  .step-head .stepdesc{ font-size:8.2pt; color:var(--sub); margin-left:auto; }
+  .step-head.s2 .stepno{ background:var(--brand); }
+  .step-head.s3 .stepno{ background:var(--point); }
+
+  .q{ margin-bottom:7.5mm; break-inside:avoid; }
+  .q .qhead{ display:flex; gap:2.4mm; align-items:flex-start; }
+  .q .qno{ flex:0 0 auto; min-width:6.2mm; height:6.2mm; border:0.45mm solid var(--unit); color:var(--unit); border-radius:50%; font-size:8.6pt; font-weight:900; line-height:1; display:flex; align-items:center; justify-content:center; padding-top:0.55mm; margin-top:0.4mm;}
+  .q .stem{ font-family:'PC Serif'; font-size:9.5pt; line-height:1.74; font-weight:500; }
+  .q .stem .difficulty{ color:#C9A227; font-size:8pt; letter-spacing:0.06em; margin-left:1.5mm;}
+  .q .tags{ margin-top:0.8mm; font-size:7pt; color:var(--sub); font-family:'PC Sans';}
+  .choices{ list-style:none; margin:2.2mm 0 0 8.6mm; font-family:'PC Serif'; font-size:9.3pt; line-height:1.85; }
+  .choices.inline{ display:flex; flex-wrap:wrap; gap:0 6mm; }
+  .bogi-box{ border:0.35mm solid #B8C2CA; border-radius:0; margin:2.5mm 0 0 8.6mm; padding:2.4mm 3.2mm; font-family:'PC Serif'; font-size:9.2pt; line-height:1.8; background:none;}
+  .bogi-box .bt{ text-align:center; font-weight:800; color:var(--sub); font-size:8.4pt; margin-bottom:0.8mm; letter-spacing:0.3em;}
+  .ox-answer{ margin-left:2mm; color:var(--sub); font-size:9pt; }
+  .blankline{ display:inline-block; min-width:14mm; border-bottom:0.4mm solid var(--ink); }
+  .qgrid{ display:grid; grid-template-columns:1fr 1fr; gap:0 9mm; }
+  .essay-lines{ margin:2mm 0 0 8.4mm; }
+  .essay-lines div{ border-bottom:0.3mm solid var(--line); height:6.2mm; }
+  .badge-essay{ display:inline-block; background:var(--point); color:#fff; font-size:7pt; font-weight:800; padding:0.4mm 2mm; border-radius:1mm; vertical-align:1pt; margin-right:1.2mm;}
+  .badge-data{ display:inline-block; background:var(--brand); color:#fff; font-size:7pt; font-weight:800; padding:0.4mm 2mm; border-radius:1mm; vertical-align:1pt; margin-right:1.2mm;}
+
+  /* ── 해설부 ── */
+  .sol-head{ display:flex; align-items:center; gap:3mm; margin-bottom:4mm;}
+  .sol-head .stt{ font-size:14.5pt; font-weight:900; color:var(--brand);}
+  .sol-head .sub{ font-size:8.5pt; color:var(--sub);}
+  .anstable{ width:100%; border-collapse:collapse; margin-bottom:4.5mm; }
+  .anstable th,.anstable td{ border:0.3mm solid var(--line); font-size:8.8pt; padding:1.4mm 0; text-align:center; }
+  .anstable th{ background:var(--brand-lt); color:var(--brand); font-weight:800; }
+  .anstable td.a{ font-weight:900; color:var(--unit); }
+  .sol{ margin-bottom:5mm; break-inside:avoid; }
+  .sol .shead{ display:flex; align-items:center; gap:2mm; margin-bottom:1.4mm;}
+  .sol .sno{ background:var(--unit); color:#fff; min-width:6mm; height:5.4mm; border-radius:1.2mm; font-size:8.6pt; font-weight:900; line-height:1; display:flex; align-items:center; justify-content:center; padding:0.5mm 1.5mm 0;}
+  .sol .sans{ font-weight:900; color:var(--unit); font-size:9.6pt;}
+  .sol .slink{ font-size:7.2pt; color:var(--sub); margin-left:auto;}
+  .sol p{ font-family:'PC Serif'; font-size:9.1pt; line-height:1.76; margin-bottom:0.8mm; }
+  .wrongbox{ background:none; border:none; border-left:0.7mm solid #E3A0AC; border-radius:0; padding:1mm 0 1mm 3mm; margin-top:2mm;}
+  .wrongbox .wt{ font-size:8pt; font-weight:900; color:var(--point); margin-bottom:0.8mm; font-family:'PC Sans';}
+  .wrongbox p{ font-family:'PC Serif'; font-size:8.6pt; line-height:1.68; margin-bottom:0.9mm;}
+  .wrongbox p:last-child{ margin-bottom:0; }
+  .solcols{ display:grid; grid-template-columns:1fr 1fr; gap:0 9mm; }
+
+  /* ── 단원 도입 (타이포그래피 중심) ── */
+  .opener{ padding:0 0 19mm; }
+  .opener-hero{ position:relative; padding:7mm 20mm 4.5mm; overflow:hidden; flex-shrink:0; }
+  .ghost-txt{ position:absolute; top:-10mm; right:6mm; font-size:118pt; font-weight:900; color:#EEF1FA; line-height:1; letter-spacing:-0.04em; }
+  .kicker{ display:flex; align-items:center; gap:4mm; position:relative; }
+  .kicker .kt{ font-size:9.5pt; font-weight:800; color:var(--unit); letter-spacing:0.24em; white-space:nowrap; }
+  .kicker::after{ content:""; flex:1; border-top:0.3mm solid var(--line); }
+  .opener-hero h1{ position:relative; font-size:36pt; font-weight:900; letter-spacing:-0.015em; margin:4mm 0 0; }
+  .opener-hero h1 .tick{ display:block; width:14mm; border-top:1.4mm solid var(--accent); margin-bottom:3.6mm; }
+  .opener-lede{ position:relative; font-family:'PC Serif'; font-size:10.2pt; font-weight:600; line-height:2.0; color:#3D4C58; max-width:138mm; margin-top:4mm; padding-left:5mm; border-left:0.8mm solid var(--accent); }
+  .opener-inner{ padding:0 20mm; }
+
+  /* ── 원소의 여정 스트립 ── */
+  .journey{ margin-top:3.5mm; }
+  .journey .j-label{ font-size:8pt; font-weight:800; color:var(--sub); letter-spacing:0.08em; margin-bottom:2.4mm; display:flex; align-items:center; gap:1.6mm;}
+  .journey .j-label::before{ content:""; width:2.4mm; height:2.4mm; background:var(--unit); border-radius:50%; }
+  .j-bar{ display:flex; align-items:center; gap:2mm; }
+  .j-chip{ flex:1; text-align:center; background:#F2F4FC; border:0.35mm solid #C0C9EE; color:#4053B8; border-radius:1.6mm; padding:3mm 1mm 2.6mm; }
+  .j-chip .jc-t{ font-size:8.8pt; font-weight:800; display:block; }
+  .j-chip .jc-s{ font-size:6.8pt; color:var(--sub); display:block; margin-top:0.5mm; }
+  .j-chip.on{ background:var(--unit); border-color:var(--unit); }
+  .j-chip.on .jc-t{ color:#fff; }
+  .j-chip.on .jc-s{ color:#D9DFF5; }
+  .j-arrow{ flex:0 0 auto; color:#8E9ADF; font-size:10pt; font-weight:900; }
+  .toc{ margin-top:6.5mm; }
+  .toc .toc-title{ font-size:11pt; font-weight:900; color:var(--ink); margin-bottom:3mm; display:flex; align-items:center; gap:2.5mm;}
+  .toc .toc-title::before{ content:""; width:3.4mm; height:3.4mm; background:var(--accent); border-radius:0.8mm; }
+  .toc-item{ display:flex; align-items:flex-start; gap:5mm; padding:4.4mm 6mm; border-bottom:0.3mm solid var(--line); }
+  .toc-item:first-of-type{ border-top:0.3mm solid var(--line); }
+  .toc-item.active{ background:#F2F4FC; border-left:1.2mm solid #7280D4; }
+  .toc-item .tno{ font-family:'PC Serif'; font-weight:900; color:#7280D4; font-size:14pt; width:10mm; line-height:1.1; flex:0 0 auto;}
+  .toc-item .tbody{ flex:1; min-width:0; }
+  .toc-item .ttt{ font-weight:800; font-size:10.5pt; letter-spacing:0.01em; display:flex; align-items:center;}
+  .toc-item .tdesc{ font-family:'PC Serif'; font-size:8.6pt; font-weight:600; color:#4A5964; margin-top:0.7mm; line-height:1.55;}
+  .toc-item .tstd{ font-size:7.2pt; color:var(--sub); flex:0 0 auto; padding-top:1.2mm;}
+  .toc-item.active .tag-now{ background:var(--accent); color:#fff; font-size:7pt; font-weight:900; border-radius:4mm; padding:0.7mm 2.6mm; margin-left:3.5mm;}
+  .toc-item .tag-done{ font-size:7.2pt; font-weight:800; color:#4053B8; margin-left:3.5mm; }
+  .opener-quote{ margin-top:7mm; text-align:center; font-family:'PC Serif'; font-size:9.8pt; font-weight:600; color:#4A5964; letter-spacing:0.01em; }
+  .opener-quote .who{ font-size:8pt; color:var(--sub); font-weight:400; margin-left:2.5mm; }
+  .qa-lead li .qgo{ font-family:'PC Sans'; font-size:7.4pt; font-weight:800; color:var(--unit); background:var(--unit-lt); border-radius:3mm; padding:0.5mm 2.2mm; margin-left:2mm; white-space:nowrap; vertical-align:1pt;}
+  .qa-lead{ margin-top:5mm; border:none; border-top:0.45mm solid var(--brand); border-bottom:0.45mm solid var(--brand); background:none; border-radius:0; padding:3mm 2mm 2.8mm; }
+  .qa-lead .qt{ font-weight:900; color:var(--brand); font-size:10.5pt; margin-bottom:2mm;}
+  .qa-lead li{ font-family:'PC Serif'; font-size:9.5pt; line-height:1.8; margin-left:5mm; }
+
+  /* ── 바로바로 체크 (개념 페이지 하단 즉석 OX) ── */
+  .quickcheck{ margin-top:auto; border-top:0.35mm dashed #C8B98F; padding-top:3mm; width:calc(100% - 51mm); }
+  .quickcheck .qc-title{ display:inline-flex; align-items:center; gap:1.6mm; font-size:8.2pt; font-weight:900; color:#9C6503; margin-bottom:1.4mm; }
+  .quickcheck .qc-title::before{ content:"✓"; color:var(--accent); font-weight:900; }
+  .quickcheck ol{ list-style:none; font-family:'PC Serif'; font-size:8.8pt; line-height:1.75; }
+  .quickcheck li{ display:flex; gap:2mm; align-items:baseline; }
+  .quickcheck li .no{ font-weight:800; color:var(--accent); flex:0 0 auto; }
+  .quickcheck .qc-ans{ margin-top:1mm; font-size:7.2pt; color:var(--sub); transform:rotate(180deg); text-align:left; }
+
+  /* ── 중학 과학 다시보기 (날개단) ── */
+  .wing .review{ background:#F6F3EC; border-radius:1.8mm; padding:2.8mm 3mm; margin-top:1mm; }
+  .wing .review .rv-title{ font-size:7.8pt; font-weight:900; color:#7A6A45; margin-bottom:1.4mm; display:flex; align-items:center; gap:1.4mm;}
+  .wing .review .rv-title::before{ content:"↺"; font-weight:900; color:#A08A55; }
+
+  /* ── MEMO 페이지 ── */
+  .memo-head{ display:flex; align-items:baseline; gap:3.5mm; margin-bottom:5mm; }
+  .memo-head .mt{ font-size:17pt; font-weight:900; color:var(--brand); letter-spacing:0.22em; }
+  .memo-head .ms{ font-size:8.6pt; color:var(--sub); }
+  .memo-area{ flex:1; border:0.4mm solid var(--line); border-radius:2.5mm;
+    background-image:linear-gradient(to bottom, transparent calc(100% - 0.3mm), #DCE4E9 0);
+    background-size:100% 9mm; background-position:0 4mm; padding:0 5mm; margin-bottom:4mm; }
+  .memo-pen{ font-family:'PC Pen'; font-size:12.5pt; color:#2E3E96; text-align:right; }
+</style>
+</head>
+<body>
+<!-- ═════════════ p.169 소단원 도입 ═════════════ -->
+<div class="page opener">
+  <div class="opener-hero">
+    <div class="ghost-txt">03</div>
+    <div class="kicker"><span class="kt">통합과학 2 · III. 과학과 미래 사회</span></div>
+    <h1><span class="tick"></span>과학기술과 윤리</h1>
+    <p class="opener-lede">"할 수 있다"가 "해도 되는가"를 앞지르는 시대 —<br>
+    과학의 마지막 페이지는 지식이 아니라 질문이다.</p>
+  </div>
+
+  <div class="opener-inner">
+    <div class="journey">
+      <div class="j-label">과학과 미래 사회 — 지금 여기</div>
+      <div class="j-bar">
+        <div class="j-chip"><span class="jc-t">감염병</span><span class="jc-s">진단과 추적의 과학</span></div>
+        <span class="j-arrow">→</span>
+        <div class="j-chip"><span class="jc-t">빅데이터 · AI · 로봇</span><span class="jc-s">데이터가 여는 미래</span></div>
+        <span class="j-arrow">→</span>
+        <div class="j-chip on"><span class="jc-t">과학기술과 윤리</span><span class="jc-s">질문하는 과학</span></div>
+      </div>
+    </div>
+    <div class="toc">
+      <div class="toc-title">이 단원의 학습 지도</div>
+      <div class="toc-item">
+        <span class="tno">01</span>
+        <span class="tbody"><span class="ttt">감염병과 과학의 유용성</span>
+        <span class="tdesc">병원체, 진단 키트와 역학 조사 — 과학이 만든 방패</span></span>
+        <span class="tstd">10통과2-03-01</span>
+      </div>
+      <div class="toc-item">
+        <span class="tno">02</span>
+        <span class="tbody"><span class="ttt">빅데이터와 인공지능·로봇</span>
+        <span class="tdesc">데이터·AI·사물인터넷의 활용, 그 유용성과 한계</span></span>
+        <span class="tstd">10통과2-03-02 · 03</span>
+      </div>
+      <div class="toc-item active">
+        <span class="tno">03</span>
+        <span class="tbody"><span class="ttt">과학기술과 윤리<span class="tag-now">NOW</span></span>
+        <span class="tdesc">사회적 쟁점(SSI) 앞에서 — 과학 윤리의 나침반</span></span>
+        <span class="tstd">10통과2-03-04</span>
+      </div>
+    </div>
+
+    <div class="qa-lead">
+      <div class="qt">이 소단원을 끝내면 답할 수 있는 질문</div>
+      <ul>
+        <li>같은 과학자가 노벨상과 비극을 함께 만든 이야기는? <span class="qgo">개념 1</span></li>
+        <li>과학 지식만으로 답이 안 나오는 문제는 어떤 것일까? <span class="qgo">개념 2</span></li>
+        <li>연구 데이터를 '조금만' 고치면 왜 안 될까? <span class="qgo">개념 3</span></li>
+        <li>의견이 갈리는 문제 앞에서 과학적으로 말하는 법은? <span class="qgo">개념 5</span></li>
+      </ul>
+    </div>
+
+    <div class="opener-quote" style="margin-top:2.4mm;">"과학은 우리에게 힘을 주지만, 어디로 갈지는 말해 주지 않는다."<span class="who">— 이 소단원이 다루는 단 하나의 문장</span></div>
+  </div>
+
+  <div class="folio"><span>박찬 과학 | 통합과학 2</span><span class="num">169</span></div>
+</div>
+
+<!-- ═════════════ p.170 개념 01 양면성 ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag">III. 과학과 미래 사회</span><span class="lesson-tag">03. 과학기술과 윤리</span></div>
+  <h2 class="lesson-title"><span class="no">03</span><span class="tt">과학기술과 윤리</span></h2>
+  <div class="std-badges"><span class="std">성취기준 10통과2-03-04</span><span class="std">양면성 → 사회적 쟁점(SSI) → 연구 윤리 → 이용 윤리 → 논증</span></div>
+
+  <div class="cols">
+    <div class="main">
+      <h3 class="sec"><span class="n">1</span>같은 손, 두 개의 결과 — 과학기술의 양면성</h3>
+      <p class="body">화학자 <b>프리츠 하버</b>는 공기 중 질소로 암모니아를 합성하는 법을 찾아냈다(1918년 노벨 화학상). 이 기술로 만든 <b>질소 비료</b>는 식량 생산을 폭발적으로 늘려 수십억 인구를 먹여 살렸다 — 그러나 같은 화학 지식은 제1차 세계대전의 <b>독가스 개발</b>에도 쓰였다. 다이너마이트를 만든 노벨이 평화상을 남긴 이야기까지 — 역사는 반복해서 말한다. <span class="u-amber">과학기술 자체는 방향이 없고, 쓰임이 방향을 만든다</span>.</p>
+      <p class="body">우리가 이 책에서 배운 것들도 마찬가지다. 원자핵의 과학은 전기(II-05)와 무기를 함께 낳았고, 데이터의 과학(III-02)은 감염병 추적과 감시 사회의 가능성을 함께 품는다. 그래서 과학의 마지막 수업은 <span class="kw">양면성</span>을 직시하는 것 — "할 수 있는가"를 넘어 <b>"해도 되는가, 어떻게 써야 하는가"</b>를 함께 묻는 일이다.</p>
+
+      <figure>
+        <svg width="470" height="148" viewBox="0 0 470 148" font-family="PC Sans">
+          <defs>
+            <marker id="arrP" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="#4053B8"/></marker>
+            <marker id="arrR" markerWidth="7" markerHeight="7" refX="5" refY="2.5" orient="auto"><path d="M0,0 L6,2.5 L0,5 Z" fill="#D6455D"/></marker>
+          </defs>
+          <g font-size="6.8">
+            <text x="235" y="13" text-anchor="middle" font-size="8.4" font-weight="800" fill="#4053B8">하버의 두 얼굴 — 같은 화학, 다른 쓰임</text>
+            <g transform="translate(235,52)" text-anchor="middle">
+              <rect x="-52" y="-22" width="104" height="44" rx="6" fill="#ECEFFA" stroke="#4053B8" stroke-width="1.2"/>
+              <text y="-4" font-size="7.4" font-weight="800" fill="#2E3E96">암모니아 합성법</text>
+              <text y="9" font-size="6" fill="#5B6B77">공기의 질소 → 화합물</text>
+            </g>
+            <line x1="176" y1="52" x2="128" y2="52" stroke="#147D6F" stroke-width="1.6" marker-end="url(#arrP)"/>
+            <line x1="294" y1="52" x2="342" y2="52" stroke="#D6455D" stroke-width="1.6" marker-end="url(#arrR)"/>
+            <g transform="translate(78,52)" text-anchor="middle">
+              <rect x="-50" y="-30" width="100" height="60" rx="6" fill="#E7F5F1" stroke="#4BA394" stroke-width="1.1"/>
+              <text y="-14" font-size="7.2" font-weight="800" fill="#147D6F">비료</text>
+              <g transform="translate(0,4)">
+                <path d="M-10,10 q-2,-14 6,-18 q7,5 4,18 z" fill="#5E9C57"/>
+                <path d="M4,10 q0,-10 7,-13 q5,4 2,13 z" fill="#7FB56E"/>
+              </g>
+              <text y="24" font-size="6" fill="#5B6B77">식량 증산 — 수십억을 먹이다</text>
+            </g>
+            <g transform="translate(392,52)" text-anchor="middle">
+              <rect x="-50" y="-30" width="100" height="60" rx="6" fill="#FDF3F0" stroke="#E5B8AC" stroke-width="1.1"/>
+              <text y="-14" font-size="7.2" font-weight="800" fill="#B0483A">독가스</text>
+              <g transform="translate(0,4)" fill="#B8C2CA">
+                <circle cx="-8" cy="4" r="6"/><circle cx="2" cy="-2" r="7"/><circle cx="12" cy="4" r="5"/>
+              </g>
+              <text y="24" font-size="6" fill="#5B6B77">전쟁의 무기 — 같은 지식의 비극</text>
+            </g>
+            <g transform="translate(235,116)" text-anchor="middle">
+              <rect x="-150" y="-12" width="300" height="26" rx="13" fill="#FDF3E0" stroke="#E8940A" stroke-width="1"/>
+              <text y="0" font-size="7.2" font-weight="800" fill="#B4830A">기술은 방향이 없다 — 방향은 사람이 정한다</text>
+              <text y="10" font-size="5.8" fill="#7A6A45">그래서 '어떻게 쓸 것인가'가 과학의 일부가 된다</text>
+            </g>
+          </g>
+          <text x="235" y="144" text-anchor="middle" font-size="0" fill="#E8940A">.</text>
+        </svg>
+        <figcaption>그림 1 | 과학기술의 양면성 — 하버의 암모니아가 남긴 두 갈래 길</figcaption>
+      </figure>
+
+      <div class="saem">
+        <div class="avatar">박찬<br>쌤</div>
+        <div class="bubble"><span class="pen">"칼은 수술도 하고 상처도 낸다 — 칼을 탓하는 대신 쥐는 법을 배우는 것, 그게 이 소단원이다."</span></div>
+      </div>
+    </div>
+
+    <div class="wing">
+      <div class="wtitle">날개 노트</div>
+      <div class="term"><b>하버의 암모니아 합성</b>공기 중 질소를 화합물로 바꾼 기술 — 비료 혁명과 무기 개발이 같은 뿌리에서 나왔다.</div>
+      <div class="term"><b>노벨상의 기원</b>다이너마이트로 부를 쌓은 노벨이 유산으로 만든 상 — 양면성에 대한 성찰의 상징.</div>
+      <div class="wsep"></div>
+      <div class="wtitle">한눈에 암기</div>
+      <div class="wing-pen">기술 = 방향 없음<br>쓰임이 방향을 만든다<br>'해도 되는가'를 묻자!</div>
+      <div class="wsep"></div>
+      <div class="review">
+        <div class="rv-title">앞 소단원과 연결</div>
+        <div class="term" style="margin-bottom:0;"><b>데이터의 저울 (02)</b>추적의 과학은 방역도 감시도 될 수 있었다 — 양면성의 최신 사례.</div>
+      </div>
+    </div>
+  </div>
+  <div class="quickcheck">
+    <span class="qc-title">바로바로 체크</span>
+    <ol>
+      <li><span class="no">1</span>과학기술은 쓰임에 따라 이로움도 해로움도 낳을 수 있다. ( O , X )</li>
+      <li><span class="no">2</span>암모니아 합성 기술은 비료에만 쓰였다. ( O , X )</li>
+      <li><span class="no">3</span>기술의 방향은 결국 사람의 선택이 정한다. ( O , X )</li>
+    </ol>
+    <div class="qc-ans">정답 1 O 2 X (독가스 개발에도 — 양면성) 3 O</div>
+  </div>
+  <div class="folio"><span>III. 과학과 미래 사회</span><span class="num">170</span></div>
+</div>
+
+<!-- ═════════════ p.171 개념 02 SSI ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag">III. 과학과 미래 사회</span><span class="lesson-tag">03. 과학기술과 윤리</span></div>
+  <div class="cols">
+    <div class="main">
+      <h3 class="sec"><span class="n">2</span>SSI — 과학만으로도, 가치만으로도 풀리지 않는 문제</h3>
+      <p class="body"><span class="kw">과학 관련 사회적 쟁점(SSI)</span>은 과학기술과 얽혀 있으면서 <span class="u-amber">사회 구성원 사이에 의견이 갈리는 문제</span>다. 특징이 있다 — 과학 지식만으로는 답이 안 나온다(가치와 이해관계가 얽혀 있으므로), 그렇다고 가치 판단만으로도 안 된다(과학적 사실을 무시하면 허공의 논쟁이 되므로). <b>둘 다 필요한 문제</b>, 그것이 SSI다.</p>
+      <p class="body">우리 곁의 SSI들 — 에너지 믹스에서 <b>핵발전의 비중</b>(II-05의 저울), <b>유전자 편집 기술</b>의 허용 범위(자료 파헤치기), AI <b>안면 인식</b>과 사생활(III-02), 신약 개발과 <b>동물 실험</b>, 개발과 <b>생태계 보전</b>(II-02의 협력적 소통). 눈치챘겠지만, 이 책의 거의 모든 단원이 SSI 하나씩을 품고 있었다 — 과학을 배운 시민이 이 논의의 당사자가 되기 때문이다.</p>
+
+      <figure>
+        <svg width="470" height="148" viewBox="0 0 470 148" font-family="PC Sans">
+          <g font-size="6.8">
+            <text x="235" y="13" text-anchor="middle" font-size="8.4" font-weight="800" fill="#4053B8">SSI의 자리 — 과학과 가치가 겹치는 곳</text>
+            <g transform="translate(235,72)" text-anchor="middle">
+              <circle cx="-62" cy="0" r="52" fill="#ECEFFA" opacity="0.85" stroke="#4053B8" stroke-width="1.2"/>
+              <circle cx="62" cy="0" r="52" fill="#FDF3E0" opacity="0.85" stroke="#E8940A" stroke-width="1.2"/>
+              <text x="-88" y="-8" font-size="7.4" font-weight="800" fill="#2E3E96">과학적 사실</text>
+              <text x="-88" y="4" font-size="6" fill="#5B6B77">측정 · 데이터</text>
+              <text x="-88" y="14" font-size="6" fill="#5B6B77">검증된 지식</text>
+              <text x="88" y="-8" font-size="7.4" font-weight="800" fill="#B4830A">가치 판단</text>
+              <text x="88" y="4" font-size="6" fill="#7A6A45">안전 · 공정 · 생명</text>
+              <text x="88" y="14" font-size="6" fill="#7A6A45">이해관계</text>
+              <text x="0" y="-10" font-size="7.6" font-weight="900" fill="#B0483A">SSI</text>
+              <text x="0" y="2" font-size="5.8" fill="#3D4C58">핵발전 · 유전자 편집</text>
+              <text x="0" y="11" font-size="5.8" fill="#3D4C58">안면 인식 · 동물 실험</text>
+              <text x="0" y="20" font-size="5.8" fill="#3D4C58">개발 vs 보전</text>
+            </g>
+          </g>
+          <text x="235" y="142" text-anchor="middle" font-size="8.8" font-weight="800" fill="#E8940A">과학만으로도, 가치만으로도 못 푼다 — 겹침의 문제이기에 함께 논의한다</text>
+        </svg>
+        <figcaption>그림 2 | SSI의 지형 — 과학적 사실과 가치 판단이 겹치는 자리의 문제들</figcaption>
+      </figure>
+
+      <div class="expoint">
+        <div class="boxtitle"><span class="ico">!</span>시험엔 이렇게</div>
+        <p>SSI 판별 기준 — <b>① 과학기술과 관련 + ② 사회적 의견 대립</b>. "과학 지식만 있으면 SSI는 저절로 해결된다"(X — 가치와 이해가 얽혀 있다)가 대표 함정이다.</p>
+      </div>
+    </div>
+
+    <div class="wing">
+      <div class="wtitle">날개 노트</div>
+      <div class="term"><b>SSI</b>Socio-Scientific Issues — 과학 관련 사회적 쟁점. 과학과 사회가 겹치는 곳의 열린 문제.</div>
+      <div class="term"><b>이해관계자</b>그 결정에 영향을 받는 모든 사람들 — 주민·환자·기업·미래 세대까지.</div>
+      <div class="wsep"></div>
+      <div class="wtitle">한눈에 암기</div>
+      <div class="wing-pen">SSI = 과학 + 의견 대립<br>지식만으로 안 풀림<br>가치만으로도 안 풀림!</div>
+    </div>
+  </div>
+  <div class="quickcheck">
+    <span class="qc-title">바로바로 체크</span>
+    <ol>
+      <li><span class="no">1</span>SSI는 과학기술과 관련해 사회적 의견이 갈리는 문제다. ( O , X )</li>
+      <li><span class="no">2</span>SSI는 과학 지식만 충분하면 저절로 해결된다. ( O , X )</li>
+      <li><span class="no">3</span>핵발전 비중과 유전자 편집의 허용 범위는 SSI의 예다. ( O , X )</li>
+    </ol>
+    <div class="qc-ans">정답 1 O 2 X (가치·이해관계가 얽혀 있다) 3 O</div>
+  </div>
+  <div class="folio"><span>III. 과학과 미래 사회</span><span class="num">171</span></div>
+</div>
+
+<!-- ═════════════ p.172 개념 03 연구 윤리 ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag">III. 과학과 미래 사회</span><span class="lesson-tag">03. 과학기술과 윤리</span></div>
+  <div class="cols">
+    <div class="main">
+      <h3 class="sec"><span class="n">3</span>연구 윤리 — 과학이라는 건물의 기초 공사</h3>
+      <p class="body">과학은 <b>서로의 결과를 믿을 수 있다</b>는 약속 위에 서 있다. 그 약속이 <span class="kw">연구 윤리</span>다. 첫째 기둥, <b>정직</b> — 데이터를 지어내거나(위조) 고치는(변조) 것은 '조금'이라도 건물 전체를 무너뜨린다. 잘못된 결과 위에 다른 연구들이 쌓이기 때문이다. 둘째 기둥, <b>존중</b> — 남의 아이디어와 문장을 출처 없이 가져오는 <b>표절</b>은 도둑질이며, 기여한 사람의 이름을 빼는 것도 위반이다.</p>
+      <p class="body">셋째 기둥, <b>보호</b> — 사람을 대상으로 하는 연구는 충분한 설명과 <span class="u-amber">자발적 동의</span>가 원칙이고(연구 참여자의 권리), 동물 실험은 고통을 최소화하며 꼭 필요한 경우로 제한한다. 이 기둥들은 규칙집이기 전에 과학의 생존 조건이다 — <b>신뢰가 무너진 과학은 아무것도 예측하지 못한다</b>.</p>
+
+      <figure>
+        <svg width="470" height="146" viewBox="0 0 470 146" font-family="PC Sans">
+          <g font-size="6.8">
+            <text x="235" y="13" text-anchor="middle" font-size="8.4" font-weight="800" fill="#4053B8">연구 윤리의 세 기둥 — 신뢰라는 지붕을 받친다</text>
+            <g transform="translate(0,24)" text-anchor="middle">
+              <path d="M100,22 h270 l14,-16 h-298 z" fill="#4053B8"/>
+              <text x="235" y="15" fill="#fff" font-weight="800" font-size="7.4">과학에 대한 신뢰</text>
+              <g transform="translate(120,30)">
+                <rect x="-34" y="0" width="68" height="64" rx="4" fill="#ECEFFA" stroke="#C0C9EE" stroke-width="1"/>
+                <text y="16" font-size="7" font-weight="800" fill="#2E3E96">정직</text>
+                <text y="30" font-size="5.8" fill="#5B6B77">위조 X · 변조 X</text>
+                <text y="40" font-size="5.8" fill="#5B6B77">있는 그대로 기록</text>
+                <text y="56" font-size="5.4" fill="#8A949E">데이터는 성역</text>
+              </g>
+              <g transform="translate(235,30)">
+                <rect x="-34" y="0" width="68" height="64" rx="4" fill="#ECEFFA" stroke="#C0C9EE" stroke-width="1"/>
+                <text y="16" font-size="7" font-weight="800" fill="#2E3E96">존중</text>
+                <text y="30" font-size="5.8" fill="#5B6B77">표절 X · 출처 표기</text>
+                <text y="40" font-size="5.8" fill="#5B6B77">기여자 이름 기재</text>
+                <text y="56" font-size="5.4" fill="#8A949E">아이디어의 주인</text>
+              </g>
+              <g transform="translate(350,30)">
+                <rect x="-34" y="0" width="68" height="64" rx="4" fill="#ECEFFA" stroke="#C0C9EE" stroke-width="1"/>
+                <text y="16" font-size="7" font-weight="800" fill="#2E3E96">보호</text>
+                <text y="30" font-size="5.8" fill="#5B6B77">참여자의 동의</text>
+                <text y="40" font-size="5.8" fill="#5B6B77">동물 실험 최소화</text>
+                <text y="56" font-size="5.4" fill="#8A949E">생명에 대한 예의</text>
+              </g>
+            </g>
+          </g>
+          <text x="235" y="140" text-anchor="middle" font-size="8.8" font-weight="800" fill="#E8940A">기둥 하나만 부러져도 지붕(신뢰)이 내려앉는다 — 그래서 '조금'은 없다</text>
+        </svg>
+        <figcaption>그림 3 | 연구 윤리의 세 기둥 — 정직·존중·보호가 신뢰를 받친다</figcaption>
+      </figure>
+
+      <div class="expoint">
+        <div class="boxtitle"><span class="ico">!</span>시험엔 이렇게</div>
+        <p>용어 구별 — <b>위조</b>(없는 데이터를 지어냄) · <b>변조</b>(있는 데이터를 고침) · <b>표절</b>(남의 것을 출처 없이). "결론에 안 맞는 데이터는 빼도 된다"(X — 변조의 일종)가 함정.</p>
+      </div>
+    </div>
+
+    <div class="wing">
+      <div class="wtitle">날개 노트</div>
+      <div class="term"><b>연구 참여자의 동의</b>연구 내용·위험을 충분히 설명받고 자발적으로 참여를 결정하는 것 — 의학 연구의 대원칙.</div>
+      <div class="term"><b>동물 실험의 원칙</b>대체하고(다른 방법으로), 줄이고(수를), 고통을 덜어 주는 방향으로.</div>
+      <div class="wsep"></div>
+      <div class="wtitle">한눈에 암기</div>
+      <div class="wing-pen">세 기둥: 정직·존중·보호<br>위조·변조·표절 금지<br>신뢰 = 과학의 기초!</div>
+    </div>
+  </div>
+  <div class="quickcheck">
+    <span class="qc-title">바로바로 체크</span>
+    <ol>
+      <li><span class="no">1</span>연구 데이터를 결론에 맞게 고치는 것은 연구 윤리 위반이다. ( O , X )</li>
+      <li><span class="no">2</span>남의 연구를 출처 없이 가져다 쓰는 것을 표절이라 한다. ( O , X )</li>
+      <li><span class="no">3</span>사람 대상 연구에는 참여자의 자발적 동의가 필요하다. ( O , X )</li>
+    </ol>
+    <div class="qc-ans">정답 1 O (변조) 2 O 3 O — 셋 다 기둥이다</div>
+  </div>
+  <div class="folio"><span>III. 과학과 미래 사회</span><span class="num">172</span></div>
+</div>
+
+<!-- ═════════════ p.173 개념 04 이용의 윤리 ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag">III. 과학과 미래 사회</span><span class="lesson-tag">03. 과학기술과 윤리</span></div>
+  <div class="cols">
+    <div class="main">
+      <h3 class="sec"><span class="n">4</span>이용의 윤리 — 만든 뒤의 책임, 쓰는 자의 책임</h3>
+      <p class="body">윤리는 실험실 문을 나선 뒤에도 계속된다. <b>개발자의 책임</b> — 기술이 어떻게 오용될 수 있는지 미리 내다보고 안전장치를 설계하는 일이다. AI의 편향을 점검하고(III-02), 해킹에 대비하고, 위험이 큰 기술은 충분히 검증될 때까지 신중하게 접근한다 — 돌이키기 어려운 피해가 예상되면 확실한 증거가 모이기 전에도 조심하는 <span class="kw">사전 예방의 자세</span>가 그 핵심이다.</p>
+      <p class="body"><b>사용자의 책임</b>도 같다. 얼굴을 바꿔치기하는 <b>딥페이크</b>로 가짜 영상을 만들어 퍼뜨리는 것, 남의 개인 정보를 몰래 수집하는 것, 자율주행의 한계를 무시한 운전 — 기술은 같아도 쓰는 손이 결과를 가른다(개념 1의 양면성이 일상의 크기로 돌아온 것이다). <span class="u-amber">기술의 힘이 커질수록, 만든 자와 쓰는 자의 책임도 함께 커진다</span> — 이것이 이용 윤리의 한 줄 요약이다.</p>
+
+      <figure>
+        <svg width="470" height="146" viewBox="0 0 470 146" font-family="PC Sans">
+          <g font-size="6.8">
+            <text x="235" y="13" text-anchor="middle" font-size="8.4" font-weight="800" fill="#4053B8">두 개의 책임 — 만드는 손과 쓰는 손</text>
+            <g transform="translate(0,24)" text-anchor="middle">
+              <g transform="translate(120,0)">
+                <rect x="-100" y="0" width="200" height="92" rx="6" fill="#ECEFFA" stroke="#C0C9EE" stroke-width="1"/>
+                <text y="16" font-size="7.4" font-weight="800" fill="#2E3E96">개발자의 책임</text>
+                <g text-anchor="start" font-size="6.2" fill="#3D4C58">
+                  <text x="-88" y="34">· 오용 가능성을 미리 내다본다</text>
+                  <text x="-88" y="47">· 안전장치·검증을 설계에 넣는다</text>
+                  <text x="-88" y="60">· AI 편향 점검 · 해킹 대비</text>
+                  <text x="-88" y="73" font-weight="800" fill="#2E3E96">· 위험이 크면 — 사전 예방의 자세</text>
+                </g>
+                <text y="88" font-size="5.8" fill="#8A949E">"만들 수 있는가" 다음에 "안전한가"</text>
+              </g>
+              <g transform="translate(350,0)">
+                <rect x="-100" y="0" width="200" height="92" rx="6" fill="#ECEFFA" stroke="#C0C9EE" stroke-width="1"/>
+                <text y="16" font-size="7.4" font-weight="800" fill="#2E3E96">사용자의 책임</text>
+                <g text-anchor="start" font-size="6.2" fill="#3D4C58">
+                  <text x="-88" y="34">· 딥페이크·가짜 정보 만들지 않기</text>
+                  <text x="-88" y="47">· 타인의 개인 정보 존중</text>
+                  <text x="-88" y="60">· 기술의 한계를 알고 쓰기</text>
+                  <text x="-88" y="73" font-weight="800" fill="#2E3E96">· 같은 기술, 결과는 손이 가른다</text>
+                </g>
+                <text y="88" font-size="5.8" fill="#8A949E">"쓸 수 있는가" 다음에 "옳은가"</text>
+              </g>
+            </g>
+          </g>
+          <text x="235" y="140" text-anchor="middle" font-size="8.8" font-weight="800" fill="#E8940A">기술의 힘 ∝ 책임의 크기 — 만든 자에게도, 쓰는 자에게도</text>
+        </svg>
+        <figcaption>그림 4 | 이용 윤리의 두 축 — 개발자와 사용자, 각자의 몫이 있다</figcaption>
+      </figure>
+
+      <div class="expoint">
+        <div class="boxtitle"><span class="ico">!</span>시험엔 이렇게</div>
+        <p>"윤리는 연구자만의 문제다"(X — <b>개발자와 사용자 모두의 책임</b>). 딥페이크·개인 정보 무단 수집은 <b>사용자 쪽 위반 사례</b>로 분류하는 문제가 나온다.</p>
+      </div>
+    </div>
+
+    <div class="wing">
+      <div class="wtitle">날개 노트</div>
+      <div class="term"><b>딥페이크</b>AI로 얼굴·목소리를 합성한 가짜 영상 — 기술 오용의 대표 사례.</div>
+      <div class="term"><b>사전 예방의 자세</b>돌이키기 어려운 위험이 예상되면, 증거가 완전하기 전에도 신중하게 접근하는 태도.</div>
+      <div class="wsep"></div>
+      <div class="wtitle">한눈에 암기</div>
+      <div class="wing-pen">개발자: 내다보고 설계<br>사용자: 알고 바르게<br>힘 클수록 책임도 크다!</div>
+    </div>
+  </div>
+  <div class="quickcheck">
+    <span class="qc-title">바로바로 체크</span>
+    <ol>
+      <li><span class="no">1</span>기술 오용의 가능성을 미리 살피는 것은 개발자의 책임에 속한다. ( O , X )</li>
+      <li><span class="no">2</span>딥페이크로 가짜 영상을 만들어 퍼뜨리는 것은 기술 오용이다. ( O , X )</li>
+      <li><span class="no">3</span>과학기술의 윤리는 연구자에게만 해당하는 문제다. ( O , X )</li>
+    </ol>
+    <div class="qc-ans">정답 1 O 2 O 3 X (개발자·사용자 모두의 몫)</div>
+  </div>
+  <div class="folio"><span>III. 과학과 미래 사회</span><span class="num">173</span></div>
+</div>
+
+<!-- ═════════════ p.174 개념 05 논증 ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag">III. 과학과 미래 사회</span><span class="lesson-tag">03. 과학기술과 윤리</span></div>
+  <div class="cols">
+    <div class="main">
+      <h3 class="sec"><span class="n">5</span>논증 — 의견이 갈릴 때 과학적으로 말하는 법</h3>
+      <p class="body">SSI 앞에서 필요한 마지막 기술은 <span class="kw">논증</span> — <span class="u-amber">주장을 근거로 받치고, 반론까지 살펴 답하는 말하기</span>다. 문법은 세 칸이다. ① <b>주장</b>: 나는 무엇을 지지하는가. ② <b>근거</b>: 어떤 과학적 사실·데이터가 이를 받치는가(이때 <b>사실과 가치 판단을 구별</b>하는 것이 핵심 — "발전 비용이 얼마다"는 사실, "안전이 비용보다 중요하다"는 가치다). ③ <b>반론 고려</b>: 반대편의 가장 강한 논리는 무엇이고, 나는 어떻게 답하는가.</p>
+      <p class="body">목소리가 큰 쪽이 아니라 <b>근거가 튼튼한 쪽</b>이 설득하는 것 — 그것이 과학이 사회에 주는 마지막 선물이다. 그리고 여기서 통합과학의 긴 여정이 완성된다. 측정에서 시작해(통과1 I), 물질·시스템·변화·환경을 지나, <b>질문하고 논증하는 시민</b>에 이른 것. 이 책의 마지막 문장은 그래서 지식이 아니라 자세다 — <b>정확하게 알고, 따뜻하게 묻자</b>.</p>
+
+      <div class="gist" style="margin:2.8mm 0 4mm; padding:2.2mm 1.8mm 2mm;">
+        <div class="boxtitle"><span class="ico">알</span>알짜 정리 — 과학기술과 윤리 한 장 요약</div>
+        <ul>
+          <li><b>양면성</b>: 기술은 방향이 없다(하버의 비료와 독가스) — 쓰임이 방향을 만든다</li>
+          <li><b>SSI</b> = 과학 관련 + 의견 대립 — 지식만으로도, 가치만으로도 풀리지 않는다</li>
+          <li>연구 윤리 3기둥: <b>정직(위조·변조 X)·존중(표절 X)·보호(동의)</b> / 이용 윤리: 개발자+사용자</li>
+          <li><b>논증</b> = 주장 + 근거 + 반론 고려 — 사실과 가치 판단을 구별하라</li>
+        </ul>
+      </div>
+
+      <div class="saem">
+        <div class="avatar">박찬<br>쌤</div>
+        <div class="bubble"><span class="pen">"31개 성취기준의 마지막 동사가 '논증할 수 있다'인 건 우연이 아니다 — 과학의 완성은 시험지가 아니라, 세상 앞에서 근거를 들고 말하는 너의 목소리다."</span></div>
+      </div>
+    </div>
+
+    <div class="wing">
+      <div class="wtitle">날개 노트</div>
+      <div class="term"><b>사실과 가치</b>사실 = 검증 가능한 진술("~이다") / 가치 = 판단·선호("~해야 한다") — 논증의 첫 구별.</div>
+      <div class="term"><b>반론 고려</b>반대편의 가장 강한 논리에 답할 때 논증은 완성된다 — 약한 반론만 상대하는 건 반칙.</div>
+      <div class="wsep"></div>
+      <div class="wtitle">한눈에 암기</div>
+      <div class="wing-pen">논증 3칸:<br>주장 + 근거 + 반론 고려<br>사실 ≠ 가치 판단!</div>
+      <div class="wsep"></div>
+      <div class="review">
+        <div class="rv-title">대단원 마무리 예고</div>
+        <div class="term" style="margin-bottom:0;"><b>III단원의 Kick</b>감염병 — 데이터 — 윤리, 미래 사회 3부작을 한 장의 지도로 접는다.</div>
+      </div>
+    </div>
+  </div>
+  <div class="quickcheck">
+    <span class="qc-title">바로바로 체크</span>
+    <ol>
+      <li><span class="no">1</span>논증은 주장을 근거로 받치고 반론까지 고려하는 말하기다. ( O , X )</li>
+      <li><span class="no">2</span>"안전이 비용보다 중요하다"는 과학적 사실 진술이다. ( O , X )</li>
+      <li><span class="no">3</span>SSI 논의에서는 근거가 튼튼한 쪽이 설득력을 가진다. ( O , X )</li>
+    </ol>
+    <div class="qc-ans">정답 1 O 2 X (가치 판단이다) 3 O</div>
+  </div>
+  <div class="folio"><span>III. 과학과 미래 사회</span><span class="num">174</span></div>
+</div>
+
+<!-- ═════════════ p.175 자료 파헤치기 ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag">III. 과학과 미래 사회</span><span class="lesson-tag">03. 과학기술과 윤리</span></div>
+  <div class="lab">
+    <div class="lab-head">자료 파헤치기 <span class="tag">탐구·자료 분석</span> <span style="font-weight:600; font-size:9.5pt; margin-left:auto;">유전자 편집 — 치료와 우려 사이의 SSI</span></div>
+    <div class="lab-body">
+      <h4>자료</h4>
+      <p>유전자 편집 기술(유전자 가위)은 DNA의 특정 부위를 잘라 내거나 고칠 수 있는 기술이다. 유전병 치료의 길을 열 수 있다는 기대와 함께, 어디까지 허용할 것인가를 둘러싼 논쟁이 세계적으로 진행 중이다.</p>
+      <figure>
+        <svg width="430" height="104" viewBox="0 0 430 104" font-family="PC Sans">
+          <g font-size="6.6" text-anchor="middle">
+            <g transform="translate(110,52)">
+              <rect x="-92" y="-40" width="184" height="80" rx="6" fill="#E7F5F1" stroke="#4BA394" stroke-width="1"/>
+              <text y="-24" font-size="7.2" font-weight="800" fill="#147D6F">기대 — 찬성 쪽 근거</text>
+              <g text-anchor="start" font-size="6" fill="#3D4C58">
+                <text x="-80" y="-8">· 유전병의 원인을 뿌리에서 고칠 가능성</text>
+                <text x="-80" y="6">· 난치병 환자에게 새로운 치료의 길</text>
+                <text x="-80" y="20">· 식량 작물 개량 등 넓은 응용</text>
+              </g>
+              <text y="34" font-size="5.6" fill="#8A949E">"기술은 고통을 줄이기 위해 있다"</text>
+            </g>
+            <g transform="translate(320,52)">
+              <rect x="-92" y="-40" width="184" height="80" rx="6" fill="#FDF3F0" stroke="#E5B8AC" stroke-width="1"/>
+              <text y="-24" font-size="7.2" font-weight="800" fill="#B0483A">우려 — 신중론의 근거</text>
+              <g text-anchor="start" font-size="6" fill="#3D4C58">
+                <text x="-80" y="-8">· 예상 밖의 유전적 영향(안전성 미검증)</text>
+                <text x="-80" y="6">· 치료를 넘어 '맞춤 인간'으로 갈 우려</text>
+                <text x="-80" y="20">· 비용에 따른 새로운 불평등 가능성</text>
+              </g>
+              <text y="34" font-size="5.6" fill="#8A949E">"돌이킬 수 없는 일은 신중해야 한다"</text>
+            </g>
+            <text x="215" y="52" font-size="8" font-weight="900" fill="#4053B8">VS</text>
+          </g>
+        </svg>
+      </figure>
+      <h4>해석의 3단계</h4>
+      <ol>
+        <li><b>사실과 가치를 나눈다</b> — "특정 유전자를 자를 수 있다"는 검증된 <b>사실</b>이다. "치료 목적이라면 허용해야 한다"와 "안전이 확실해질 때까지 미뤄야 한다"는 <b>가치 판단</b>이다. 논쟁의 정체를 알면 싸움이 아니라 논의가 된다.</li>
+        <li><b>양쪽의 가장 강한 근거를 본다</b> — 찬성의 심장은 '환자의 고통 감소', 신중론의 심장은 '되돌릴 수 없는 위험'이다. 어느 쪽도 무시할 수 없기에 SSI다 — 상대의 강한 논리를 요약할 수 있어야 논증의 자격이 생긴다.</li>
+        <li><b>경계선을 논의한다</b> — 많은 나라가 '몸의 세포 치료'와 '다음 세대로 유전되는 변경'을 구별해 후자를 엄격히 제한한다. 전부 허용도, 전부 금지도 아닌 <b>선 긋기</b> — 사회적 합의가 하는 일이다.</li>
+      </ol>
+      <h4>결론</h4>
+      <p>유전자 편집은 이 소단원의 모든 개념이 모이는 자리다 — 양면성(개념 1), SSI(개념 2), 연구 윤리(개념 3), 그리고 논증(개념 5). 정답을 외우는 문제가 아니라, <b>근거를 들고 참여하는 문제</b>다.</p>
+      <div class="expoint">
+        <div class="boxtitle"><span class="ico">!</span>시험엔 이렇게</div>
+        <p>서술형은 "찬성 근거 1 + 우려 근거 1 + 자신의 논증"의 3단 구성으로 — <b>한쪽 근거만 쓰면 감점</b>이다. '사실/가치 구별' 문장을 넣으면 최상위권 답안이 된다.</p>
+      </div>
+    </div>
+  </div>
+  <div class="folio"><span>III. 과학과 미래 사회</span><span class="num">175</span></div>
+</div>
+
+<!-- ═════════════ p.176 STEP 1 + STEP 2 시작 ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag">III. 과학과 미래 사회</span><span class="lesson-tag">03. 과학기술과 윤리 | 문제</span></div>
+  <div class="step-head"><span class="stepno">STEP 1</span><span class="steptt">개념 확인</span><span class="stepdesc">OX와 빈칸으로 개념 점검 — 막히면 알짜 정리로!</span></div>
+  <div class="qgrid">
+    <div>
+      <div class="q"><div class="qhead"><span class="qno">1</span><div class="stem">과학기술은 쓰임에 따라 이로움도 해로움도 낳을 수 있다. <span class="ox-answer">( O , X )</span></div></div></div>
+      <div class="q"><div class="qhead"><span class="qno">2</span><div class="stem">연구 데이터가 결론과 맞지 않으면 일부를 고쳐도 된다. <span class="ox-answer">( O , X )</span></div></div></div>
+      <div class="q"><div class="qhead"><span class="qno">3</span><div class="stem">SSI 논의에는 과학적 사실과 가치 판단이 모두 관련된다. <span class="ox-answer">( O , X )</span></div></div></div>
+    </div>
+    <div>
+      <div class="q"><div class="qhead"><span class="qno">4</span><div class="stem">과학기술과 관련해 사회 구성원 사이에 의견이 갈리는 문제를 과학 관련 사회적 <span class="blankline" style="min-width:10mm;"></span>(SSI)이라 한다.</div></div></div>
+      <div class="q"><div class="qhead"><span class="qno">5</span><div class="stem">남의 연구 성과를 출처 없이 가져다 쓰는 것을 <span class="blankline" style="min-width:10mm;"></span>이라 한다.</div></div></div>
+      <div class="q"><div class="qhead"><span class="qno">6</span><div class="stem">논증은 주장을 <span class="blankline" style="min-width:10mm;"></span>로 받치고 반론까지 고려하는 말하기다.</div></div></div>
+    </div>
+  </div>
+  <div style="border-top:0.5mm solid var(--line); margin:2mm 0 4mm;"></div>
+  <div class="step-head s2"><span class="stepno">STEP 2</span><span class="steptt">내신 완성</span><span class="stepdesc">학교 시험 유형 그대로 — 서술형까지 한 번에</span></div>
+  <div class="q">
+    <div class="qhead"><span class="qno">7</span><div class="stem">과학기술의 양면성에 대한 설명으로 옳은 것은? <span class="difficulty">●●○</span>
+    <div class="tags">10통과2-03-04 | 개념 1</div></div></div>
+    <ul class="choices">
+      <li>① 과학기술은 언제나 이로운 결과만 낳는다.</li>
+      <li>② 암모니아 합성 기술은 비료 생산에만 사용되었다.</li>
+      <li>③ 해로운 결과를 낳은 기술은 처음부터 나쁜 기술이었다.</li>
+      <li>④ 기술의 결과는 기술 자체가 아니라 운에 달려 있다.</li>
+      <li>⑤ 같은 과학 지식이 쓰임에 따라 이로움도 해로움도 낳을 수 있다.</li>
+    </ul>
+  </div>
+  <div class="q">
+    <div class="qhead"><span class="qno">8</span><div class="stem">과학 관련 사회적 쟁점(SSI)에 대한 설명으로 옳은 것은? <span class="difficulty">●●●</span>
+    <div class="tags">10통과2-03-04 | 개념 2</div></div></div>
+    <ul class="choices">
+      <li>① SSI는 과학 지식과 가치 판단이 함께 필요한 문제다.</li>
+      <li>② SSI는 과학 지식만 충분하면 저절로 해결된다.</li>
+      <li>③ SSI는 과학과 무관한 순수한 가치 논쟁이다.</li>
+      <li>④ 핵발전 비중 문제는 SSI가 아니다.</li>
+      <li>⑤ SSI에는 정해진 하나의 정답이 있다.</li>
+    </ul>
+  </div>
+  <div class="folio"><span>III. 과학과 미래 사회</span><span class="num">176</span></div>
+</div>
+
+<!-- ═════════════ p.177 STEP 2 계속 ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag">III. 과학과 미래 사회</span><span class="lesson-tag">03. 과학기술과 윤리 | 문제</span></div>
+  <div class="q">
+    <div class="qhead"><span class="qno">9</span><div class="stem">연구 윤리에 대한 설명으로 옳은 것은? <span class="difficulty">●●●</span>
+    <div class="tags">10통과2-03-04 | 개념 3</div></div></div>
+    <ul class="choices">
+      <li>① 결론에 맞지 않는 데이터는 제외해도 된다.</li>
+      <li>② 출처를 밝히면 표절이 아니지만, 밝히지 않아도 큰 문제는 없다.</li>
+      <li>③ 동물 실험에는 아무런 제한이 없다.</li>
+      <li>④ 사람 대상 연구에는 충분한 설명과 자발적 동의가 필요하다.</li>
+      <li>⑤ 연구 윤리는 연구 결과의 신뢰와는 무관하다.</li>
+    </ul>
+  </div>
+  <div class="q">
+    <div class="qhead"><span class="qno">10</span><div class="stem">과학기술 이용의 윤리에 대한 설명으로 옳은 것만을 고른 것은? <span class="difficulty">●●●</span>
+    <div class="tags">10통과2-03-04 | 개념 4</div></div></div>
+    <div class="bogi-box" style="background:#fff;">
+      (가) 개발자는 기술의 오용 가능성을 미리 살피고 안전장치를 설계해야 한다.<br>
+      (나) 딥페이크로 가짜 영상을 만들어 퍼뜨리는 것은 기술 오용이다.<br>
+      (다) 기술 이용의 윤리는 개발자에게만 해당한다.
+    </div>
+    <ul class="choices inline">
+      <li>① (가)</li><li>② (다)</li><li>③ (가), (나)</li><li>④ (나), (다)</li><li>⑤ (가), (나), (다)</li>
+    </ul>
+  </div>
+  <div class="q">
+    <div class="qhead"><span class="qno">11</span><div class="stem"><span class="badge-essay">서술형</span>연구자가 실험 데이터를 결론에 맞게 고쳐서는 안 되는 까닭을 <b>'신뢰'</b>라는 말을 포함하여 서술하시오. <span class="difficulty">●●●●</span>
+    <div class="tags">10통과2-03-04 | 개념 3</div></div></div>
+    <div class="essay-lines"><div></div><div></div><div></div></div>
+  </div>
+  <div class="folio"><span>III. 과학과 미래 사회</span><span class="num">177</span></div>
+</div>
+
+<!-- ═════════════ p.178 STEP 3 ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag">III. 과학과 미래 사회</span><span class="lesson-tag">03. 과학기술과 윤리 | 문제</span></div>
+  <div class="step-head s3"><span class="stepno">STEP 3</span><span class="steptt">수능 도전</span><span class="stepdesc">2028 수능 규격 — ㄱㄴㄷ 합답형·자료 해석</span></div>
+  <div class="q">
+    <div class="qhead"><span class="qno">12</span><div class="stem"><span class="badge-data">자료</span>다음은 유전자 편집 기술을 둘러싼 논의다. 옳은 것만을 &lt;보기&gt;에서 있는 대로 고른 것은? <span class="difficulty">[2점]</span>
+    <div class="tags">10통과2-03-04</div></div></div>
+    <div class="bogi-box" style="background:#fff;">
+      찬성 쪽은 유전병 치료의 가능성을, 신중론은 안전성 미검증과 '맞춤 인간'으로의 확장 우려를 근거로 든다. 여러 나라가 허용 범위를 두고 사회적 논의를 진행하고 있다.
+    </div>
+    <div class="bogi-box">
+      <div class="bt">보기</div>
+      ㄱ. 유전자 편집 기술은 난치병 치료의 가능성을 품고 있다.<br>
+      ㄴ. 이 기술의 허용 범위는 사회적 합의가 필요한 SSI다.<br>
+      ㄷ. 기술적으로 가능해졌으므로 윤리적 검토는 더 이상 필요 없다.
+    </div>
+    <ul class="choices inline">
+      <li>① ㄱ</li><li>② ㄷ</li><li>③ ㄱ, ㄴ</li><li>④ ㄴ, ㄷ</li><li>⑤ ㄱ, ㄴ, ㄷ</li>
+    </ul>
+  </div>
+  <div class="q">
+    <div class="qhead"><span class="qno">13</span><div class="stem">SSI에 대해 논증하는 자세로 옳은 것만을 &lt;보기&gt;에서 있는 대로 고른 것은? <span class="difficulty">[2.5점]</span>
+    <div class="tags">10통과2-03-04</div></div></div>
+    <div class="bogi-box">
+      <div class="bt">보기</div>
+      ㄱ. 과학적 사실("~이다")과 가치 판단("~해야 한다")을 구별한다.<br>
+      ㄴ. 반대편의 가장 강한 근거를 살펴보고 그에 답한다.<br>
+      ㄷ. 논의에는 과학적 근거와 다양한 이해관계자의 참여가 필요하다.
+    </div>
+    <ul class="choices inline">
+      <li>① ㄱ</li><li>② ㄴ</li><li>③ ㄱ, ㄷ</li><li>④ ㄴ, ㄷ</li><li>⑤ ㄱ, ㄴ, ㄷ</li>
+    </ul>
+  </div>
+  <div class="folio"><span>III. 과학과 미래 사회</span><span class="num">178</span></div>
+</div>
+
+<!-- ═════════════ p.179 해설 1 ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag" style="color:var(--brand);">알짜 해설</span><span class="lesson-tag">03. 과학기술과 윤리</span></div>
+  <div class="sol-head"><span class="stt">알짜 해설</span><span class="sub">전 문항 해설 + 오답 선지 분석 — 맞힌 문제도 해설로 한 번 더!</span></div>
+  <table class="anstable">
+    <tr><th>문항</th><td>1</td><td>2</td><td>3</td><td>4</td><td>5</td><td>6</td><td>7</td><td>8</td><td>9</td><td>10</td><td>11</td><td>12</td><td>13</td></tr>
+    <tr><th>정답</th><td class="a">O</td><td class="a">X</td><td class="a">O</td><td class="a">쟁점</td><td class="a">표절</td><td class="a">근거</td><td class="a">⑤</td><td class="a">①</td><td class="a">④</td><td class="a">③</td><td class="a">서술형</td><td class="a">③</td><td class="a">⑤</td></tr>
+  </table>
+  <div class="solcols">
+    <div>
+      <div class="sol"><div class="shead"><span class="sno">1</span><span class="sans">O</span><span class="slink">개념 1</span></div>
+        <p>하버의 비료와 독가스 — 양면성의 정의 그대로.</p></div>
+      <div class="sol"><div class="shead"><span class="sno">2</span><span class="sans">X</span><span class="slink">개념 3</span></div>
+        <p>변조 — '조금'이라도 건물 전체가 흔들린다.</p></div>
+      <div class="sol"><div class="shead"><span class="sno">3</span><span class="sans">O</span><span class="slink">개념 2</span></div>
+        <p>겹침의 문제 — 그래서 함께 논의한다.</p></div>
+      <div class="sol"><div class="shead"><span class="sno">4</span><span class="sans">쟁점</span><span class="slink">개념 2</span></div>
+        <p>과학 관련 + 의견 대립 = SSI.</p></div>
+      <div class="sol"><div class="shead"><span class="sno">5</span><span class="sans">표절</span><span class="slink">개념 3</span></div>
+        <p>아이디어의 주인을 지우는 일 — 존중 기둥의 위반.</p></div>
+      <div class="sol"><div class="shead"><span class="sno">6</span><span class="sans">근거</span><span class="slink">개념 5</span></div>
+        <p>주장 + 근거 + 반론 고려 — 논증의 3칸.</p></div>
+    </div>
+    <div>
+      <div class="sol"><div class="shead"><span class="sno">7</span><span class="sans">⑤</span><span class="slink">개념 1</span></div>
+        <p>기술은 방향이 없다 — 쓰임이 방향을 만든다.</p>
+        <div class="wrongbox"><div class="wt">오답 왜 틀렸나</div>
+          <p><b>②</b> 독가스 개발에도 쓰였다. <b>③·④</b> 기술 자체의 선악이나 운이 아니라 <b>사람의 선택</b>이 가른다.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">8</span><span class="sans">①</span><span class="slink">개념 2</span></div>
+        <p>과학과 가치가 겹치는 자리의 문제.</p>
+        <div class="wrongbox"><div class="wt">오답 왜 틀렸나</div>
+          <p><b>②·③</b> 지식만으로도, 가치만으로도 안 풀린다. <b>⑤</b> 정답이 아니라 합의를 만들어 가는 문제다.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">9</span><span class="sans">④</span><span class="slink">개념 3</span></div>
+        <p>설명 + 자발적 동의 — 사람 대상 연구의 대원칙.</p>
+        <div class="wrongbox"><div class="wt">오답 왜 틀렸나</div>
+          <p><b>①</b> 선택적 제외도 변조다. <b>③</b> 대체·감소·고통 완화의 원칙. <b>⑤</b> 윤리가 곧 신뢰의 기초다.</p></div></div>
+    </div>
+  </div>
+  <div class="folio"><span>알짜 해설</span><span class="num">179</span></div>
+</div>
+
+<!-- ═════════════ p.180 해설 2 ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag" style="color:var(--brand);">알짜 해설</span><span class="lesson-tag">03. 과학기술과 윤리</span></div>
+  <div class="solcols">
+    <div>
+      <div class="sol"><div class="shead"><span class="sno">10</span><span class="sans">③</span><span class="slink">개념 4</span></div>
+        <p>(가) 개발자의 책임 — 내다보고 설계. (나) 사용자 쪽 오용의 대표 사례. 둘 다 옳다.</p>
+        <div class="wrongbox"><div class="wt">오답 왜 틀렸나</div>
+          <p><b>(다)</b> 만든 자와 쓰는 자 — 두 손 모두의 책임이다.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">11</span><span class="sans">모범 답안</span><span class="slink">개념 3</span></div>
+        <p>과학은 서로의 연구 결과를 믿을 수 있다는 <b>신뢰</b> 위에서 발전한다. 데이터를 고치면 잘못된 결과 위에 다른 연구들이 쌓여 과학 전체의 신뢰가 무너지고, 그 결과를 이용하는 사회에도 피해를 주기 때문에 데이터는 있는 그대로 기록·보고해야 한다.</p>
+        <div class="wrongbox"><div class="wt">채점 기준 (감점 포인트)</div>
+          <p>① 과학 = 신뢰 기반 ② 조작 시 후속 연구·사회로 피해 확산 — 두 요소를 모두 서술해야 만점.</p></div></div>
+    </div>
+    <div>
+      <div class="sol"><div class="shead"><span class="sno">12</span><span class="sans">③</span><span class="slink">개념 2·자료 | 2점</span></div>
+        <p><b>ㄱ (옳음)</b> 찬성 쪽의 심장 — 치료 가능성. <b>ㄴ (옳음)</b> 허용 범위는 사회가 함께 긋는 선. <b>ㄷ (틀림)</b> 가능해질수록 윤리 검토는 더 필요해진다.</p>
+        <div class="wrongbox"><div class="wt">함정 체크</div>
+          <p>'기술이 되면 윤리는 끝'형 선지는 언제나 X — 03-02의 13번과 같은 문법이다.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">13</span><span class="sans">⑤</span><span class="slink">개념 5 | 2.5점</span></div>
+        <p><b>ㄱ·ㄴ·ㄷ 모두 옳다</b> — 사실/가치 구별, 강한 반론에 답하기, 근거와 참여. 논증하는 시민의 3종 세트다.</p>
+        <div class="wrongbox"><div class="wt">함정 체크</div>
+          <p>목소리·다수결·권위로 정하자는 선지가 끼면 그것만 골라내면 된다 — 기준은 언제나 <b>근거</b>다.</p></div></div>
+
+      <div class="gist" style="margin-top:5mm;">
+        <div class="boxtitle"><span class="ico">알</span>이 소단원, 이것만은!</div>
+        <ul>
+          <li>양면성: 기술은 방향이 없다 — <b>쓰임이 방향</b>(하버의 두 얼굴)</li>
+          <li>SSI = 과학 + 의견 대립 / 연구 윤리 3기둥: <b>정직·존중·보호</b></li>
+          <li>논증 = <b>주장 + 근거 + 반론 고려</b> — 사실과 가치 판단을 구별하라</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div class="folio"><span>알짜 해설</span><span class="num">180</span></div>
+</div>
+
+<!-- ═════════════ p.181 MEMO ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag">III. 과학과 미래 사회</span><span class="lesson-tag">03 ▸ 대단원 마무리 전에</span></div>
+  <div class="memo-head"><span class="mt">MEMO</span><span class="ms">헷갈린 개념, 다시 틀린 문제 번호, 나만의 암기법을 남겨 두는 자리</span></div>
+  <div class="memo-area"></div>
+  <div class="memo-pen">"관심 있는 SSI 하나를 골라 '주장 + 근거 + 반론 고려' 세 칸을 채워 보자 — 그게 이 책의 마지막 문제다. — 박찬쌤"</div>
+  <div class="folio"><span>박찬 과학 | 통합과학 2</span><span class="num">181</span></div>
+</div>
+
+</body>
+</html>

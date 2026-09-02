@@ -1,0 +1,949 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<title>박찬 과학 통합과학2 — III-01 감염병과 과학의 유용성</title>
+<style>
+  @font-face { font-family:'PC Sans'; src:url('file:///root/.fonts/NotoSansKR.ttf'); font-weight:100 900; }
+  @font-face { font-family:'PC Serif'; src:url('file:///root/.fonts/NotoSerifKR.ttf'); font-weight:100 900; }
+  @font-face { font-family:'PC Pen'; src:url('file:///root/.fonts/YeonSung-Regular.ttf'); font-weight:400; }
+
+  :root{
+    --brand:#0E5A6B;        /* 박찬 과학 브랜드 딥틸 */
+    --brand-lt:#E3F0F3;
+    --unit:#4053B8;         /* I. 과학의 기초 단원 컬러(그린) */
+    --unit-lt:#ECEFFA;
+    --unit-md:#C0C9EE;
+    --accent:#E8940A;       /* 알짜 앰버 */
+    --accent-lt:#FDF3E0;
+    --point:#D6455D;        /* 시험 포인트 */
+    --point-lt:#FBEBEE;
+    --ink:#22303A;
+    --sub:#5B6B77;
+    --line:#D8E0E5;
+  }
+  *{ box-sizing:border-box; margin:0; padding:0; -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+  @page{ size:210mm 275mm; margin:0; }
+  html,body{ font-family:'PC Sans',sans-serif; color:var(--ink); word-break:keep-all; overflow-wrap:anywhere; }
+
+  .page{ width:210mm; height:275mm; position:relative; overflow:hidden; background:#fff; page-break-after:always; padding:14mm 13mm 19mm 15mm; display:flex; flex-direction:column; }
+
+  /* ── 러닝 헤드 / 풋 ── */
+  .runhead{ display:flex; align-items:center; justify-content:space-between; border-bottom:0.35mm solid var(--unit); padding-bottom:2mm; margin-bottom:6.5mm; }
+  .runhead .unit-tag{ font-size:8.5pt; font-weight:700; color:var(--unit); letter-spacing:0.02em; }
+  .runhead .lesson-tag{ font-size:8.5pt; color:var(--sub); }
+  .folio{ position:absolute; bottom:7mm; left:0; right:0; display:flex; justify-content:space-between; padding:0 14mm 0 14mm; font-size:8pt; color:var(--sub); }
+  .folio .num{ font-weight:800; color:var(--unit); font-size:10pt; }
+
+  /* ── 본문 그리드: 본문 + 날개단 ── */
+  .cols{ display:grid; grid-template-columns:1fr 43mm; gap:8mm; flex:1; min-height:0; margin-bottom:4mm; }
+  .main{ min-width:0; }
+  .wing{ border-left:0.3mm solid var(--line); padding-left:5mm; font-size:8.2pt; color:var(--sub); line-height:1.7; }
+
+  /* ── 타이포 ── */
+  h2.lesson-title{ display:flex; align-items:baseline; gap:3.5mm; margin-bottom:2mm; }
+  h2.lesson-title .no{ background:var(--unit); color:#fff; font-size:13pt; font-weight:900; padding:1.2mm 3.2mm; border-radius:1.5mm; }
+  h2.lesson-title .tt{ font-size:16.5pt; font-weight:900; letter-spacing:-0.01em; }
+  .std-badges{ display:flex; gap:2mm; margin:2mm 0 6.5mm; }
+  .std{ font-size:7.4pt; color:var(--unit); background:none; border:0.3mm solid var(--unit-md); border-radius:5mm; padding:0.6mm 2.8mm; font-weight:600; }
+
+  h3.sec{ display:flex; align-items:baseline; gap:3mm; font-size:12.5pt; font-weight:800; margin:9mm 0 3.6mm; letter-spacing:-0.01em; }
+  h3.sec .n{ font-family:'PC Serif'; font-size:15.5pt; font-weight:900; color:var(--unit); border-bottom:0.7mm solid var(--accent); padding:0 0.8mm 0.2mm; flex:0 0 auto; line-height:1; }
+  h3.sec::after{ content:""; flex:1; border-top:0.25mm solid var(--line); align-self:center; margin-left:2mm; }
+  h3.sec:first-child{ margin-top:0; }
+
+  p.body{ font-family:'PC Serif'; font-size:9.6pt; line-height:1.92; margin-bottom:3.6mm; text-align:justify; }
+  p.body b{ font-weight:800; }
+  .kw{ font-weight:800; color:var(--unit); }
+  .u-amber{ background:#F8E9C6; font-weight:700; padding:0.15mm 0.6mm; border-radius:0.6mm; box-decoration-break:clone; -webkit-box-decoration-break:clone; }
+
+  ul.pts{ font-family:'PC Serif'; font-size:9.6pt; line-height:1.84; margin:1.5mm 0 3.5mm 1mm; list-style:none; }
+  ul.pts li{ padding-left:4.5mm; position:relative; margin-bottom:1.8mm; }
+  ul.pts li::before{ content:""; position:absolute; left:0.5mm; top:2.9mm; width:1.7mm; height:1.7mm; background:var(--accent); border-radius:50%; }
+
+  /* ── 코너 박스 ── */
+  .boxtitle{ display:inline-flex; align-items:center; gap:1.8mm; font-weight:900; font-size:9.5pt; margin-bottom:1.6mm; }
+  .boxtitle .ico{ width:5.2mm; height:5.2mm; border-radius:1.2mm; display:flex; align-items:center; justify-content:center; color:#fff; font-size:7.5pt; font-weight:900; }
+
+  .gist{ background:none; border:none; border-top:0.5mm solid var(--accent); border-bottom:0.5mm solid var(--accent); border-radius:0; padding:3.2mm 1.8mm 3mm; margin:6mm 0 5mm; }
+  .gist .boxtitle{ color:#9C6503; } .gist .ico{ background:var(--accent); }
+  .gist ul{ list-style:none; font-family:'PC Serif'; font-size:9.3pt; line-height:1.78; }
+  .gist li{ padding-left:4.2mm; position:relative; margin-bottom:1.2mm;}
+  .gist li::before{ content:"✓"; position:absolute; left:0; color:var(--accent); font-weight:900; }
+
+  .expoint{ background:none; border-left:0.5mm solid #D998A4; border-left-color:#D998A4; border-radius:0; padding:1.4mm 0 1.4mm 3.6mm; margin:4.5mm 0; }
+  .expoint .boxtitle{ color:#A9556A; font-size:8.6pt; margin-bottom:1mm;}
+  .expoint .ico{ background:none; color:#A9556A; border:0.35mm solid #D998A4; width:4.4mm; height:4.4mm; border-radius:50%; font-size:7pt; }
+  .expoint p{ font-family:'PC Serif'; font-size:8.9pt; line-height:1.7; }
+
+  .pen{ font-family:'PC Pen'; font-size:12pt; color:#2E3E96; line-height:1.45; }
+  .saem{ display:flex; gap:3mm; align-items:flex-start; margin:4.5mm 0; }
+  .saem .avatar{ flex:0 0 auto; width:10.5mm; height:10.5mm; border-radius:50%; background:var(--brand); color:#fff; font-size:7pt; font-weight:800; display:flex; align-items:center; justify-content:center; line-height:1.35; letter-spacing:0.04em; text-align:center; border:0.5mm solid var(--accent); box-sizing:border-box;}
+  .saem .bubble{ background:#FFFBF0; border:0.4mm solid #EBCB9C; border-radius:3mm; padding:2.2mm 3.6mm 2mm; position:relative; }
+  .saem .bubble::before{ content:""; position:absolute; left:-1.8mm; top:3.2mm; width:3mm; height:3mm; background:#FFFBF0; border-left:0.4mm solid #EBCB9C; border-bottom:0.4mm solid #EBCB9C; transform:rotate(45deg); }
+
+  .wing .wtitle{ font-size:8pt; font-weight:900; color:var(--brand); display:flex; align-items:center; gap:1.5mm; margin:0 0 2.4mm; letter-spacing:0.05em; }
+  .wing .wtitle::before{ content:""; width:2.4mm; height:2.4mm; background:var(--accent); border-radius:50%; }
+  .wing .term{ margin-bottom:3.6mm; }
+  .wing .term b{ color:var(--ink); font-weight:800; display:block; font-size:8.5pt; margin-bottom:0.7mm;}
+  .wing .wsep{ border-top:0.3mm dashed var(--line); margin:4.5mm 0; }
+  .wing .wing-pen{ font-family:'PC Pen'; font-size:11pt; color:#2E3E96; line-height:1.45; }
+
+  figure{ margin:5mm 0; }
+  figure figcaption{ font-size:8pt; color:var(--sub); text-align:center; margin-top:2mm; }
+  figure svg{ display:block; margin:0 auto; }
+
+  /* ── 비교형 그림 (2패널 + 범례) ── */
+  .fig-duo{ display:flex; align-items:stretch; gap:2.5mm; justify-content:center; }
+  .fig-duo .panel{ flex:0 0 auto; text-align:center; }
+  .fig-duo .p-title{ font-size:9pt; font-weight:900; color:var(--ink); margin-top:1.6mm; }
+  .fig-duo .p-sub{ font-size:7.8pt; color:var(--sub); line-height:1.45; margin-top:0.5mm; }
+  .fig-duo .mid{ display:flex; flex-direction:column; align-items:center; justify-content:center; gap:1mm; padding:0 1mm; }
+  .fig-duo .mid .mlab{ font-size:7.6pt; font-weight:800; color:var(--unit); text-align:center; line-height:1.3; }
+  .fig-legend{ display:flex; justify-content:center; gap:5mm; font-size:7.8pt; color:var(--ink); margin-top:1.2mm; align-items:center; }
+  .fig-legend span{ display:inline-flex; align-items:center; gap:1.4mm; }
+
+  /* ── 탐구 (자료 파헤치기) ── */
+  .lab{ border:0.5mm solid var(--brand); border-radius:2.5mm; overflow:hidden; margin-top:1mm;}
+  .lab .lab-head{ background:var(--brand); color:#fff; padding:2.2mm 4mm; font-weight:900; font-size:11pt; display:flex; align-items:center; gap:2.5mm;}
+  .lab .lab-head .tag{ font-size:7.5pt; background:rgba(255,255,255,.22); padding:0.6mm 2.4mm; border-radius:4mm; font-weight:700;}
+  .lab .lab-body{ padding:3.5mm 4mm; }
+  .lab h4{ font-size:9.6pt; font-weight:900; color:var(--brand); margin:2.5mm 0 1.4mm; }
+  .lab h4:first-child{ margin-top:0; }
+  .lab p, .lab li{ font-family:'PC Serif'; font-size:9.3pt; line-height:1.8; }
+  .lab ol{ margin-left:5mm; }
+
+  /* ── 문제부 ── */
+  .step-head{ display:flex; align-items:center; gap:3mm; margin:0 0 5mm; }
+  .step-head .stepno{ background:var(--unit); color:#fff; font-weight:900; font-size:9.5pt; padding:1.4mm 3.4mm; border-radius:1.5mm; letter-spacing:0.04em;}
+  .step-head .steptt{ font-size:12.5pt; font-weight:900; }
+  .step-head .stepdesc{ font-size:8.2pt; color:var(--sub); margin-left:auto; }
+  .step-head.s2 .stepno{ background:var(--brand); }
+  .step-head.s3 .stepno{ background:var(--point); }
+
+  .q{ margin-bottom:7.5mm; break-inside:avoid; }
+  .q .qhead{ display:flex; gap:2.4mm; align-items:flex-start; }
+  .q .qno{ flex:0 0 auto; min-width:6.2mm; height:6.2mm; border:0.45mm solid var(--unit); color:var(--unit); border-radius:50%; font-size:8.6pt; font-weight:900; line-height:1; display:flex; align-items:center; justify-content:center; padding-top:0.55mm; margin-top:0.4mm;}
+  .q .stem{ font-family:'PC Serif'; font-size:9.5pt; line-height:1.74; font-weight:500; }
+  .q .stem .difficulty{ color:#C9A227; font-size:8pt; letter-spacing:0.06em; margin-left:1.5mm;}
+  .q .tags{ margin-top:0.8mm; font-size:7pt; color:var(--sub); font-family:'PC Sans';}
+  .choices{ list-style:none; margin:2.2mm 0 0 8.6mm; font-family:'PC Serif'; font-size:9.3pt; line-height:1.85; }
+  .choices.inline{ display:flex; flex-wrap:wrap; gap:0 6mm; }
+  .bogi-box{ border:0.35mm solid #B8C2CA; border-radius:0; margin:2.5mm 0 0 8.6mm; padding:2.4mm 3.2mm; font-family:'PC Serif'; font-size:9.2pt; line-height:1.8; background:none;}
+  .bogi-box .bt{ text-align:center; font-weight:800; color:var(--sub); font-size:8.4pt; margin-bottom:0.8mm; letter-spacing:0.3em;}
+  .ox-answer{ margin-left:2mm; color:var(--sub); font-size:9pt; }
+  .blankline{ display:inline-block; min-width:14mm; border-bottom:0.4mm solid var(--ink); }
+  .qgrid{ display:grid; grid-template-columns:1fr 1fr; gap:0 9mm; }
+  .essay-lines{ margin:2mm 0 0 8.4mm; }
+  .essay-lines div{ border-bottom:0.3mm solid var(--line); height:6.2mm; }
+  .badge-essay{ display:inline-block; background:var(--point); color:#fff; font-size:7pt; font-weight:800; padding:0.4mm 2mm; border-radius:1mm; vertical-align:1pt; margin-right:1.2mm;}
+  .badge-data{ display:inline-block; background:var(--brand); color:#fff; font-size:7pt; font-weight:800; padding:0.4mm 2mm; border-radius:1mm; vertical-align:1pt; margin-right:1.2mm;}
+
+  /* ── 해설부 ── */
+  .sol-head{ display:flex; align-items:center; gap:3mm; margin-bottom:4mm;}
+  .sol-head .stt{ font-size:14.5pt; font-weight:900; color:var(--brand);}
+  .sol-head .sub{ font-size:8.5pt; color:var(--sub);}
+  .anstable{ width:100%; border-collapse:collapse; margin-bottom:4.5mm; }
+  .anstable th,.anstable td{ border:0.3mm solid var(--line); font-size:8.8pt; padding:1.4mm 0; text-align:center; }
+  .anstable th{ background:var(--brand-lt); color:var(--brand); font-weight:800; }
+  .anstable td.a{ font-weight:900; color:var(--unit); }
+  .sol{ margin-bottom:5mm; break-inside:avoid; }
+  .sol .shead{ display:flex; align-items:center; gap:2mm; margin-bottom:1.4mm;}
+  .sol .sno{ background:var(--unit); color:#fff; min-width:6mm; height:5.4mm; border-radius:1.2mm; font-size:8.6pt; font-weight:900; line-height:1; display:flex; align-items:center; justify-content:center; padding:0.5mm 1.5mm 0;}
+  .sol .sans{ font-weight:900; color:var(--unit); font-size:9.6pt;}
+  .sol .slink{ font-size:7.2pt; color:var(--sub); margin-left:auto;}
+  .sol p{ font-family:'PC Serif'; font-size:9.1pt; line-height:1.76; margin-bottom:0.8mm; }
+  .wrongbox{ background:none; border:none; border-left:0.7mm solid #E3A0AC; border-radius:0; padding:1mm 0 1mm 3mm; margin-top:2mm;}
+  .wrongbox .wt{ font-size:8pt; font-weight:900; color:var(--point); margin-bottom:0.8mm; font-family:'PC Sans';}
+  .wrongbox p{ font-family:'PC Serif'; font-size:8.6pt; line-height:1.68; margin-bottom:0.9mm;}
+  .wrongbox p:last-child{ margin-bottom:0; }
+  .solcols{ display:grid; grid-template-columns:1fr 1fr; gap:0 9mm; }
+
+  /* ── 단원 도입 (타이포그래피 중심) ── */
+  .opener{ padding:0 0 19mm; }
+  .opener-hero{ position:relative; padding:7mm 20mm 4.5mm; overflow:hidden; flex-shrink:0; }
+  .ghost-txt{ position:absolute; top:-10mm; right:6mm; font-size:118pt; font-weight:900; color:#EEF1FA; line-height:1; letter-spacing:-0.04em; }
+  .kicker{ display:flex; align-items:center; gap:4mm; position:relative; }
+  .kicker .kt{ font-size:9.5pt; font-weight:800; color:var(--unit); letter-spacing:0.24em; white-space:nowrap; }
+  .kicker::after{ content:""; flex:1; border-top:0.3mm solid var(--line); }
+  .opener-hero h1{ position:relative; font-size:36pt; font-weight:900; letter-spacing:-0.015em; margin:4mm 0 0; }
+  .opener-hero h1 .tick{ display:block; width:14mm; border-top:1.4mm solid var(--accent); margin-bottom:3.6mm; }
+  .opener-lede{ position:relative; font-family:'PC Serif'; font-size:10.2pt; font-weight:600; line-height:2.0; color:#3D4C58; max-width:138mm; margin-top:4mm; padding-left:5mm; border-left:0.8mm solid var(--accent); }
+  .opener-inner{ padding:0 20mm; }
+
+  /* ── 원소의 여정 스트립 ── */
+  .journey{ margin-top:3.5mm; }
+  .journey .j-label{ font-size:8pt; font-weight:800; color:var(--sub); letter-spacing:0.08em; margin-bottom:2.4mm; display:flex; align-items:center; gap:1.6mm;}
+  .journey .j-label::before{ content:""; width:2.4mm; height:2.4mm; background:var(--unit); border-radius:50%; }
+  .j-bar{ display:flex; align-items:center; gap:2mm; }
+  .j-chip{ flex:1; text-align:center; background:#F2F4FC; border:0.35mm solid #C0C9EE; color:#4053B8; border-radius:1.6mm; padding:3mm 1mm 2.6mm; }
+  .j-chip .jc-t{ font-size:8.8pt; font-weight:800; display:block; }
+  .j-chip .jc-s{ font-size:6.8pt; color:var(--sub); display:block; margin-top:0.5mm; }
+  .j-chip.on{ background:var(--unit); border-color:var(--unit); }
+  .j-chip.on .jc-t{ color:#fff; }
+  .j-chip.on .jc-s{ color:#D9DFF5; }
+  .j-arrow{ flex:0 0 auto; color:#8E9ADF; font-size:10pt; font-weight:900; }
+  .toc{ margin-top:6.5mm; }
+  .toc .toc-title{ font-size:11pt; font-weight:900; color:var(--ink); margin-bottom:3mm; display:flex; align-items:center; gap:2.5mm;}
+  .toc .toc-title::before{ content:""; width:3.4mm; height:3.4mm; background:var(--accent); border-radius:0.8mm; }
+  .toc-item{ display:flex; align-items:flex-start; gap:5mm; padding:4.4mm 6mm; border-bottom:0.3mm solid var(--line); }
+  .toc-item:first-of-type{ border-top:0.3mm solid var(--line); }
+  .toc-item.active{ background:#F2F4FC; border-left:1.2mm solid #7280D4; }
+  .toc-item .tno{ font-family:'PC Serif'; font-weight:900; color:#7280D4; font-size:14pt; width:10mm; line-height:1.1; flex:0 0 auto;}
+  .toc-item .tbody{ flex:1; min-width:0; }
+  .toc-item .ttt{ font-weight:800; font-size:10.5pt; letter-spacing:0.01em; display:flex; align-items:center;}
+  .toc-item .tdesc{ font-family:'PC Serif'; font-size:8.6pt; font-weight:600; color:#4A5964; margin-top:0.7mm; line-height:1.55;}
+  .toc-item .tstd{ font-size:7.2pt; color:var(--sub); flex:0 0 auto; padding-top:1.2mm;}
+  .toc-item.active .tag-now{ background:var(--accent); color:#fff; font-size:7pt; font-weight:900; border-radius:4mm; padding:0.7mm 2.6mm; margin-left:3.5mm;}
+  .toc-item .tag-done{ font-size:7.2pt; font-weight:800; color:#4053B8; margin-left:3.5mm; }
+  .opener-quote{ margin-top:7mm; text-align:center; font-family:'PC Serif'; font-size:9.8pt; font-weight:600; color:#4A5964; letter-spacing:0.01em; }
+  .opener-quote .who{ font-size:8pt; color:var(--sub); font-weight:400; margin-left:2.5mm; }
+  .qa-lead li .qgo{ font-family:'PC Sans'; font-size:7.4pt; font-weight:800; color:var(--unit); background:var(--unit-lt); border-radius:3mm; padding:0.5mm 2.2mm; margin-left:2mm; white-space:nowrap; vertical-align:1pt;}
+  .qa-lead{ margin-top:5mm; border:none; border-top:0.45mm solid var(--brand); border-bottom:0.45mm solid var(--brand); background:none; border-radius:0; padding:3mm 2mm 2.8mm; }
+  .qa-lead .qt{ font-weight:900; color:var(--brand); font-size:10.5pt; margin-bottom:2mm;}
+  .qa-lead li{ font-family:'PC Serif'; font-size:9.5pt; line-height:1.8; margin-left:5mm; }
+
+  /* ── 바로바로 체크 (개념 페이지 하단 즉석 OX) ── */
+  .quickcheck{ margin-top:auto; border-top:0.35mm dashed #C8B98F; padding-top:3mm; width:calc(100% - 51mm); }
+  .quickcheck .qc-title{ display:inline-flex; align-items:center; gap:1.6mm; font-size:8.2pt; font-weight:900; color:#9C6503; margin-bottom:1.4mm; }
+  .quickcheck .qc-title::before{ content:"✓"; color:var(--accent); font-weight:900; }
+  .quickcheck ol{ list-style:none; font-family:'PC Serif'; font-size:8.8pt; line-height:1.75; }
+  .quickcheck li{ display:flex; gap:2mm; align-items:baseline; }
+  .quickcheck li .no{ font-weight:800; color:var(--accent); flex:0 0 auto; }
+  .quickcheck .qc-ans{ margin-top:1mm; font-size:7.2pt; color:var(--sub); transform:rotate(180deg); text-align:left; }
+
+  /* ── 중학 과학 다시보기 (날개단) ── */
+  .wing .review{ background:#F6F3EC; border-radius:1.8mm; padding:2.8mm 3mm; margin-top:1mm; }
+  .wing .review .rv-title{ font-size:7.8pt; font-weight:900; color:#7A6A45; margin-bottom:1.4mm; display:flex; align-items:center; gap:1.4mm;}
+  .wing .review .rv-title::before{ content:"↺"; font-weight:900; color:#A08A55; }
+
+  /* ── MEMO 페이지 ── */
+  .memo-head{ display:flex; align-items:baseline; gap:3.5mm; margin-bottom:5mm; }
+  .memo-head .mt{ font-size:17pt; font-weight:900; color:var(--brand); letter-spacing:0.22em; }
+  .memo-head .ms{ font-size:8.6pt; color:var(--sub); }
+  .memo-area{ flex:1; border:0.4mm solid var(--line); border-radius:2.5mm;
+    background-image:linear-gradient(to bottom, transparent calc(100% - 0.3mm), #DCE4E9 0);
+    background-size:100% 9mm; background-position:0 4mm; padding:0 5mm; margin-bottom:4mm; }
+  .memo-pen{ font-family:'PC Pen'; font-size:12.5pt; color:#2E3E96; text-align:right; }
+</style>
+</head>
+<body>
+<!-- ═════════════ p.143 소단원 도입 ═════════════ -->
+<div class="page opener">
+  <div class="opener-hero">
+    <div class="ghost-txt">01</div>
+    <div class="kicker"><span class="kt">통합과학 2 · III. 과학과 미래 사회</span></div>
+    <h1><span class="tick"></span>감염병과 과학의 유용성</h1>
+    <p class="opener-lede">보이지 않는 적과 싸우려면 눈이 필요하다 —<br>
+    진단 키트와 데이터 지도가 과학이 만든 눈이다.</p>
+  </div>
+
+  <div class="opener-inner">
+    <div class="journey">
+      <div class="j-label">과학과 미래 사회 — 지금 여기</div>
+      <div class="j-bar">
+        <div class="j-chip on"><span class="jc-t">감염병</span><span class="jc-s">진단과 추적의 과학</span></div>
+        <span class="j-arrow">→</span>
+        <div class="j-chip"><span class="jc-t">빅데이터 · AI · 로봇</span><span class="jc-s">데이터가 여는 미래</span></div>
+        <span class="j-arrow">→</span>
+        <div class="j-chip"><span class="jc-t">과학기술과 윤리</span><span class="jc-s">질문하는 과학</span></div>
+      </div>
+    </div>
+    <div class="toc">
+      <div class="toc-title">이 단원의 학습 지도</div>
+      <div class="toc-item active">
+        <span class="tno">01</span>
+        <span class="tbody"><span class="ttt">감염병과 과학의 유용성<span class="tag-now">NOW</span></span>
+        <span class="tdesc">병원체, 진단 키트와 역학 조사 — 과학이 만든 방패</span></span>
+        <span class="tstd">10통과2-03-01</span>
+      </div>
+      <div class="toc-item">
+        <span class="tno">02</span>
+        <span class="tbody"><span class="ttt">빅데이터와 인공지능·로봇</span>
+        <span class="tdesc">데이터·AI·사물인터넷의 활용, 그 유용성과 한계</span></span>
+        <span class="tstd">10통과2-03-02 · 03</span>
+      </div>
+      <div class="toc-item">
+        <span class="tno">03</span>
+        <span class="tbody"><span class="ttt">과학기술과 윤리</span>
+        <span class="tdesc">사회적 쟁점(SSI) 앞에서 — 과학 윤리의 나침반</span></span>
+        <span class="tstd">10통과2-03-04</span>
+      </div>
+    </div>
+
+    <div class="qa-lead">
+      <div class="qt">이 소단원을 끝내면 답할 수 있는 질문</div>
+      <ul>
+        <li>감기에 항생제가 듣지 않는 이유는? <span class="qgo">개념 1</span></li>
+        <li>검사 키트의 두 줄은 각각 무슨 뜻일까? <span class="qgo">개념 2</span></li>
+        <li>170년 전 의사는 지도로 어떻게 감염병을 잡았을까? <span class="qgo">자료</span></li>
+        <li>백신은 몸에게 무엇을 '연습'시키는 걸까? <span class="qgo">개념 4</span></li>
+      </ul>
+    </div>
+
+    <div class="opener-quote" style="margin-top:2.4mm;">"행운은 준비된 마음을 돕는다."<span class="who">— 백신의 개척자 루이 파스퇴르</span></div>
+  </div>
+
+  <div class="folio"><span>박찬 과학 | 통합과학 2</span><span class="num">143</span></div>
+</div>
+
+<!-- ═════════════ p.144 개념 01 병원체 ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag">III. 과학과 미래 사회</span><span class="lesson-tag">01. 감염병과 과학의 유용성</span></div>
+  <h2 class="lesson-title"><span class="no">01</span><span class="tt">감염병과 과학의 유용성</span></h2>
+  <div class="std-badges"><span class="std">성취기준 10통과2-03-01</span><span class="std">병원체 → 진단 → 추적 → 방어 → 과학의 필요성</span></div>
+
+  <div class="cols">
+    <div class="main">
+      <h3 class="sec"><span class="n">1</span>보이지 않는 적 — 병원체를 알아야 이긴다</h3>
+      <p class="body"><span class="kw">감염병</span>은 <span class="kw">병원체</span>가 몸에 들어와 일으키는 병이다. 주요 병원체는 둘 — <b>세균</b>은 스스로 증식하는 어엿한 생물이고(결핵·콜레라·식중독), <b>바이러스</b>는 훨씬 작아서 <span class="u-amber">숙주 세포 안에 들어가야만 증식</span>할 수 있다(감기·독감·코로나19). 이 차이가 치료의 갈림길이다 — <b>항생제는 세균에만 듣고, 바이러스에는 듣지 않는다</b>. 감기에 항생제를 함부로 쓰면 안 되는 과학적 이유다.</p>
+      <p class="body">병원체는 기침·재채기의 <b>비말</b>, 오염된 손과 물건의 <b>접촉</b>, 음식과 물, 모기 같은 매개 동물을 타고 퍼진다. 적의 정체(무엇이)와 경로(어떻게)를 알아내는 것 — 감염병과의 싸움은 언제나 이 두 질문에서 시작하고, 그 답을 찾는 도구가 이 소단원의 주인공인 <b>진단</b>과 <b>추적</b>이다.</p>
+
+      <figure>
+        <svg width="470" height="150" viewBox="0 0 470 150" font-family="PC Sans">
+          <defs>
+            <marker id="arrP" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="#4053B8"/></marker>
+            <marker id="arrR" markerWidth="7" markerHeight="7" refX="5" refY="2.5" orient="auto"><path d="M0,0 L6,2.5 L0,5 Z" fill="#D6455D"/></marker>
+          </defs>
+          <g font-size="6.8">
+            <text x="235" y="13" text-anchor="middle" font-size="8.4" font-weight="800" fill="#4053B8">두 병원체의 프로필 — 치료가 갈리는 이유</text>
+            <g transform="translate(0,22)" text-anchor="middle">
+              <g transform="translate(120,0)">
+                <rect x="-100" y="0" width="200" height="96" rx="6" fill="#ECEFFA" stroke="#C0C9EE" stroke-width="1"/>
+                <text y="16" font-size="7.6" font-weight="800" fill="#2E3E96">세균 — 스스로 사는 생물</text>
+                <g transform="translate(-40,50)">
+                  <ellipse rx="17" ry="10" fill="#8E9ADF"/>
+                  <path d="M17,0 q8,-3 12,-8 M17,3 q9,1 13,6" stroke="#5B6B77" stroke-width="1.1" fill="none"/>
+                  <circle cx="-5" cy="0" r="3" fill="#4053B8"/>
+                </g>
+                <g text-anchor="start" font-size="6.2" fill="#3D4C58">
+                  <text x="-8" y="42">· 혼자서도 증식한다</text>
+                  <text x="-8" y="54">· 결핵 · 콜레라 · 식중독</text>
+                  <text x="-8" y="66" font-weight="800" fill="#2E7A54">· 항생제가 듣는다</text>
+                </g>
+                <text y="88" fill="#5B6B77" font-size="6.2">크기: 마이크로미터(μm) 수준</text>
+              </g>
+              <g transform="translate(350,0)">
+                <rect x="-100" y="0" width="200" height="96" rx="6" fill="#FDF3F0" stroke="#E5B8AC" stroke-width="1"/>
+                <text y="16" font-size="7.6" font-weight="800" fill="#B0483A">바이러스 — 세포를 빌리는 입자</text>
+                <g transform="translate(-40,50)">
+                  <circle r="11" fill="#E5949E"/>
+                  <g stroke="#B0483A" stroke-width="1.3">
+                    <line x1="0" y1="-11" x2="0" y2="-17"/><line x1="11" y1="0" x2="17" y2="0"/><line x1="0" y1="11" x2="0" y2="17"/><line x1="-11" y1="0" x2="-17" y2="0"/>
+                    <line x1="8" y1="-8" x2="12" y2="-12"/><line x1="8" y1="8" x2="12" y2="12"/><line x1="-8" y1="8" x2="-12" y2="12"/><line x1="-8" y1="-8" x2="-12" y2="-12"/>
+                  </g>
+                </g>
+                <g text-anchor="start" font-size="6.2" fill="#3D4C58">
+                  <text x="-8" y="42">· 숙주 세포 안에서만 증식</text>
+                  <text x="-8" y="54">· 감기 · 독감 · 코로나19</text>
+                  <text x="-8" y="66" font-weight="800" fill="#B0483A">· 항생제가 안 듣는다</text>
+                </g>
+                <text y="88" fill="#5B6B77" font-size="6.2">크기: 세균의 수십분의 1 수준</text>
+              </g>
+            </g>
+          </g>
+          <text x="235" y="146" text-anchor="middle" font-size="8.8" font-weight="800" fill="#E8940A">적의 정체가 다르면 무기도 다르다 — 항생제는 세균 전용이다</text>
+        </svg>
+        <figcaption>그림 1 | 세균과 바이러스 — 증식 방식의 차이가 치료의 차이를 만든다</figcaption>
+      </figure>
+
+      <div class="saem">
+        <div class="avatar">박찬<br>쌤</div>
+        <div class="bubble"><span class="pen">"진료실에서 매일 하는 설명이다 — '감기는 바이러스라 항생제가 소용없어요.' 이 한 문장 뒤에 이 페이지 전체가 들어 있다."</span></div>
+      </div>
+    </div>
+
+    <div class="wing">
+      <div class="wtitle">날개 노트</div>
+      <div class="term"><b>병원체</b>감염병을 일으키는 미생물 — 세균·바이러스 외에 곰팡이·기생충도 있다.</div>
+      <div class="term"><b>비말</b>기침·재채기 때 튀는 작은 침방울 — 호흡기 감염병의 주요 통로.</div>
+      <div class="wsep"></div>
+      <div class="wtitle">한눈에 암기</div>
+      <div class="wing-pen">세균 = 혼자 증식<br>바이러스 = 세포 빌려 증식<br>항생제는 세균 전용!</div>
+      <div class="wsep"></div>
+      <div class="review">
+        <div class="rv-title">앞 단원과 연결</div>
+        <div class="term" style="margin-bottom:0;"><b>내성균 (I-02)</b>항생제 오남용 → 내성균 선택 — 자연선택이 병원에서 일어나는 이야기였다.</div>
+      </div>
+    </div>
+  </div>
+  <div class="quickcheck">
+    <span class="qc-title">바로바로 체크</span>
+    <ol>
+      <li><span class="no">1</span>바이러스는 숙주 세포 안에서만 증식할 수 있다. ( O , X )</li>
+      <li><span class="no">2</span>감기와 독감의 병원체는 세균이다. ( O , X )</li>
+      <li><span class="no">3</span>항생제는 세균에 의한 감염병에 쓰는 약이다. ( O , X )</li>
+    </ol>
+    <div class="qc-ans">정답 1 O 2 X (바이러스) 3 O</div>
+  </div>
+  <div class="folio"><span>III. 과학과 미래 사회</span><span class="num">144</span></div>
+</div>
+
+<!-- ═════════════ p.145 개념 02 진단 ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag">III. 과학과 미래 사회</span><span class="lesson-tag">01. 감염병과 과학의 유용성</span></div>
+  <div class="cols">
+    <div class="main">
+      <h3 class="sec"><span class="n">2</span>진단 — 15분 만에 적을 찾아내는 법</h3>
+      <p class="body">코로나19 때 누구나 손에 쥐어 본 <b>신속 항원 검사 키트</b> — 원리는 자물쇠와 열쇠다. 키트 속에는 특정 병원체의 <span class="kw">항원</span>(병원체 표면의 단백질)에만 달라붙는 <span class="kw">항체</span>가 발라져 있다. 검체를 떨어뜨리면 액체가 종이 띠를 타고 이동하다가, <span class="u-amber">검체 속에 항원이 있으면 항체와 특이적으로 결합해 T선(시험선)에 색 줄</span>을 만든다. C선(대조선)은 액체가 끝까지 제대로 흘렀는지 알려 주는 '검사의 검사'다.</p>
+      <p class="body">더 정밀한 무기는 <b>유전자 증폭 검사</b>(PCR)다. 검체에 든 병원체의 <span class="u-amber">유전 물질을 수백만 배로 복사해 불려서</span>, 극미량이라도 있는지 없는지를 가려낸다. 빠르고 간편한 항원 검사와 정밀한 유전자 검사 — 두 도구의 조합이 감염병 대응의 첫 단추, <b>'누가 감염되었는가'</b>를 과학의 언어로 바꿔 놓았다.</p>
+
+      <figure>
+        <svg width="470" height="150" viewBox="0 0 470 150" font-family="PC Sans">
+          <g font-size="6.8">
+            <text x="235" y="13" text-anchor="middle" font-size="8.4" font-weight="800" fill="#4053B8">신속 항원 검사 키트 — 자물쇠(항체)와 열쇠(항원)</text>
+            <g transform="translate(30,26)">
+              <!-- 키트 본체 -->
+              <rect x="0" y="20" width="260" height="52" rx="8" fill="#F4F6FC" stroke="#8E9ADF" stroke-width="1.2"/>
+              <circle cx="34" cy="46" r="13" fill="#fff" stroke="#8E9ADF" stroke-width="1"/>
+              <text x="34" y="49" text-anchor="middle" font-size="5.8" fill="#5B6B77">검체</text>
+              <rect x="60" y="30" width="180" height="32" rx="3" fill="#FDFDFB" stroke="#C0C9EE" stroke-width="0.8"/>
+              <rect x="142" y="30" width="7" height="32" fill="#D6456F"/>
+              <rect x="196" y="30" width="7" height="32" fill="#D6456F"/>
+              <text x="145" y="26" text-anchor="middle" font-size="6.2" font-weight="800" fill="#B0483A">T선</text>
+              <text x="199" y="26" text-anchor="middle" font-size="6.2" font-weight="800" fill="#B0483A">C선</text>
+              <line x1="52" y1="46" x2="66" y2="46" stroke="#4053B8" stroke-width="1.4" marker-end="url(#arrP)"/>
+              <text x="145" y="72" text-anchor="middle" font-size="6" fill="#B0483A" font-weight="800">항원이 항체와 결합 → 색 줄</text>
+              <text x="199" y="81" text-anchor="middle" font-size="6" fill="#5B6B77">액체가 끝까지 왔다는 확인</text>
+            </g>
+            <!-- 결합 확대 -->
+            <g transform="translate(360,30)" text-anchor="middle">
+              <rect x="-56" y="0" width="112" height="88" rx="6" fill="#ECEFFA" stroke="#C0C9EE" stroke-width="1"/>
+              <text y="14" font-size="6.8" font-weight="800" fill="#2E3E96">특이적 결합의 확대</text>
+              <g transform="translate(0,46)">
+                <path d="M-22,-6 a10,10 0 1,0 0,12 z" fill="#4053B8"/>
+                <text x="-30" y="24" font-size="5.8" fill="#2E3E96" font-weight="800">항체 (자물쇠)</text>
+                <circle cx="12" cy="0" r="9" fill="#E5949E"/>
+                <path d="M3,0 a4,4 0 0,1 0,0 M3,-3 l-6,3 l6,3 z" fill="#B0483A"/>
+                <text x="18" y="24" font-size="5.8" fill="#B0483A" font-weight="800">항원 (열쇠)</text>
+              </g>
+              <text y="82" font-size="5.8" fill="#5B6B77">꼭 맞는 짝에게만 달라붙는다</text>
+            </g>
+          </g>
+          <text x="235" y="146" text-anchor="middle" font-size="8.8" font-weight="800" fill="#E8940A">T선 = 항원 검출 신호, C선 = 검사의 검사 — 두 줄의 과학</text>
+        </svg>
+        <figcaption>그림 2 | 신속 항원 검사 키트의 구조 — 항원-항체의 특이적 결합이 색 줄이 된다</figcaption>
+      </figure>
+
+      <div class="expoint">
+        <div class="boxtitle"><span class="ico">!</span>시험엔 이렇게</div>
+        <p>두 검사의 원리를 짝짓기 — <b>신속 항원 검사 = 항원-항체 결합</b>, <b>유전자 증폭 검사 = 유전 물질을 불려 검출</b>. "C선이 안 나오면?"(검사 무효 — 다시 해야 한다)까지 물으면 심화형이다.</p>
+      </div>
+    </div>
+
+    <div class="wing">
+      <div class="wtitle">날개 노트</div>
+      <div class="term"><b>항원과 항체</b>항원 = 병원체 쪽 표지 물질, 항체 = 그 짝에만 결합하는 우리 몸(키트)의 단백질.</div>
+      <div class="term"><b>유전자 증폭 검사</b>극미량의 유전 물질을 수백만 배로 복사해 검출 — 민감도가 높아 확진에 쓰인다.</div>
+      <div class="wsep"></div>
+      <div class="wtitle">한눈에 암기</div>
+      <div class="wing-pen">항원 검사 = 자물쇠·열쇠<br>T선 = 검출 · C선 = 확인<br>유전자 검사 = 불려서 찾기</div>
+    </div>
+  </div>
+  <div class="quickcheck">
+    <span class="qc-title">바로바로 체크</span>
+    <ol>
+      <li><span class="no">1</span>신속 항원 검사는 항원-항체의 특이적 결합을 이용한다. ( O , X )</li>
+      <li><span class="no">2</span>C선은 검체 속 항원의 존재를 알려 주는 선이다. ( O , X )</li>
+      <li><span class="no">3</span>유전자 증폭 검사는 병원체의 유전 물질을 불려서 검출한다. ( O , X )</li>
+    </ol>
+    <div class="qc-ans">정답 1 O 2 X (검사가 유효한지 확인 — 검출은 T선) 3 O</div>
+  </div>
+  <div class="folio"><span>III. 과학과 미래 사회</span><span class="num">145</span></div>
+</div>
+
+<!-- ═════════════ p.146 개념 03 추적 ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag">III. 과학과 미래 사회</span><span class="lesson-tag">01. 감염병과 과학의 유용성</span></div>
+  <div class="cols">
+    <div class="main">
+      <h3 class="sec"><span class="n">3</span>추적 — 데이터로 그리는 전파의 지도</h3>
+      <p class="body">감염자를 찾았다면 다음 질문은 '어디서, 누구에게로'다. <span class="kw">역학 조사</span>는 <span class="u-amber">감염자의 동선과 접촉자를 데이터로 추적해 전파 경로를 밝히는 과학 수사</span>다. 언제 증상이 시작됐는지(발병일), 그 전 <b>잠복기</b> 동안 어디를 다녔는지, 누구와 만났는지를 재구성하면 — 감염의 지도가 그려지고, 접촉자를 미리 검사·관리해 <b>다음 전파를 끊을 수 있다</b>.</p>
+      <p class="body">이 방법의 원형은 170년 전에 있었다. 1854년 런던에 콜레라가 돌자 의사 <b>존 스노우</b>는 현미경 대신 <b>지도</b>를 들었다 — 사망자가 나온 집마다 점을 찍자, 점들이 한 <b>공용 펌프</b> 주변에 몰려 있었다. 물이 범인이었다(자세한 이야기는 자료 파헤치기에서). 오늘날의 역학 조사는 카드 사용 내역·기지국·CCTV 같은 디지털 데이터로 같은 일을 훨씬 빠르게 해낸다 — 다음 소단원(빅데이터)의 예고편이기도 하다.</p>
+
+      <figure>
+        <svg width="470" height="148" viewBox="0 0 470 148" font-family="PC Sans">
+          <g font-size="6.8">
+            <text x="235" y="13" text-anchor="middle" font-size="8.4" font-weight="800" fill="#4053B8">역학 조사의 4단계 — 과학 수사의 순서</text>
+            <g transform="translate(0,26)" text-anchor="middle">
+              <g transform="translate(64,0)">
+                <rect x="-50" y="0" width="100" height="84" rx="6" fill="#ECEFFA" stroke="#C0C9EE" stroke-width="1"/>
+                <text y="15" font-size="7" font-weight="800" fill="#2E3E96">① 확인</text>
+                <g transform="translate(0,44)">
+                  <circle r="12" fill="#8E9ADF"/><circle cx="-4" cy="-3" r="1.6" fill="#22303A"/><circle cx="4" cy="-3" r="1.6" fill="#22303A"/>
+                  <rect x="-9" y="6" width="18" height="5" rx="2.5" fill="#D6456F"/>
+                </g>
+                <text y="76" fill="#5B6B77" font-size="6">감염자 진단 · 발병일 파악</text>
+              </g>
+              <line x1="118" y1="42" x2="130" y2="42" stroke="#4053B8" stroke-width="1.3" marker-end="url(#arrP)"/>
+              <g transform="translate(178,0)">
+                <rect x="-50" y="0" width="100" height="84" rx="6" fill="#ECEFFA" stroke="#C0C9EE" stroke-width="1"/>
+                <text y="15" font-size="7" font-weight="800" fill="#2E3E96">② 동선 추적</text>
+                <g transform="translate(0,44)" stroke="#4053B8" stroke-width="1.4" fill="none">
+                  <path d="M-28,14 l14,-12 l12,8 l16,-18" marker-end="url(#arrP)"/>
+                  <circle cx="-28" cy="14" r="2.6" fill="#4053B8"/>
+                </g>
+                <text y="76" fill="#5B6B77" font-size="6">잠복기 동안 어디를 갔나</text>
+              </g>
+              <line x1="232" y1="42" x2="244" y2="42" stroke="#4053B8" stroke-width="1.3" marker-end="url(#arrP)"/>
+              <g transform="translate(292,0)">
+                <rect x="-50" y="0" width="100" height="84" rx="6" fill="#ECEFFA" stroke="#C0C9EE" stroke-width="1"/>
+                <text y="15" font-size="7" font-weight="800" fill="#2E3E96">③ 접촉자 파악</text>
+                <g transform="translate(0,44)">
+                  <circle cx="-16" cy="0" r="8" fill="#8E9ADF"/>
+                  <g stroke="#8E9ADF" stroke-width="1.1" fill="#D9DFF5">
+                    <circle cx="8" cy="-10" r="6"/><circle cx="14" cy="6" r="6"/><circle cx="-4" cy="14" r="6"/>
+                  </g>
+                </g>
+                <text y="76" fill="#5B6B77" font-size="6">만난 사람을 검사·관리</text>
+              </g>
+              <line x1="346" y1="42" x2="358" y2="42" stroke="#4053B8" stroke-width="1.3" marker-end="url(#arrP)"/>
+              <g transform="translate(406,0)">
+                <rect x="-50" y="0" width="100" height="84" rx="6" fill="#E7F5F1" stroke="#4BA394" stroke-width="1.1"/>
+                <text y="15" font-size="7" font-weight="800" fill="#147D6F">④ 차단</text>
+                <g transform="translate(0,44)">
+                  <path d="M-14,-12 q14,-6 28,0 v10 q0,12 -14,16 q-14,-4 -14,-16 z" fill="#4BA394"/>
+                  <path d="M-7,0 l5,6 l10,-12" stroke="#fff" stroke-width="2" fill="none"/>
+                </g>
+                <text y="76" fill="#5B6B77" font-size="6">전파의 고리를 끊는다</text>
+              </g>
+            </g>
+          </g>
+          <text x="235" y="144" text-anchor="middle" font-size="8.8" font-weight="800" fill="#E8940A">치료가 '한 사람'을 구할 때, 역학 조사는 '다음 사람들'을 구한다</text>
+        </svg>
+        <figcaption>그림 3 | 역학 조사의 흐름 — 확인 → 동선 → 접촉자 → 차단</figcaption>
+      </figure>
+
+      <div class="expoint">
+        <div class="boxtitle"><span class="ico">!</span>시험엔 이렇게</div>
+        <p>역학 조사의 목적을 정확히 — <b>치료법 개발(X)이 아니라 전파 경로 파악과 확산 차단(O)</b>. 잠복기를 고려해 '증상 전' 동선까지 추적한다는 것도 포인트다.</p>
+      </div>
+    </div>
+
+    <div class="wing">
+      <div class="wtitle">날개 노트</div>
+      <div class="term"><b>역학(疫學)</b>질병이 언제·어디서·누구에게 생기는지를 집단 수준에서 연구하는 학문.</div>
+      <div class="term"><b>잠복기</b>병원체가 몸에 들어온 뒤 증상이 나타나기까지의 기간 — 이 기간에도 전파될 수 있다.</div>
+      <div class="wsep"></div>
+      <div class="wtitle">한눈에 암기</div>
+      <div class="wing-pen">역학 조사 = 과학 수사<br>확인→동선→접촉자→차단<br>목적은 '다음 전파' 차단!</div>
+    </div>
+  </div>
+  <div class="quickcheck">
+    <span class="qc-title">바로바로 체크</span>
+    <ol>
+      <li><span class="no">1</span>역학 조사는 감염자의 동선과 접촉자를 추적하는 일이다. ( O , X )</li>
+      <li><span class="no">2</span>역학 조사의 주된 목적은 치료제를 개발하는 것이다. ( O , X )</li>
+      <li><span class="no">3</span>잠복기 동안의 동선도 조사 대상이 된다. ( O , X )</li>
+    </ol>
+    <div class="qc-ans">정답 1 O 2 X (전파 경로 파악·확산 차단) 3 O</div>
+  </div>
+  <div class="folio"><span>III. 과학과 미래 사회</span><span class="num">146</span></div>
+</div>
+
+<!-- ═════════════ p.147 개념 04 방어 ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag">III. 과학과 미래 사회</span><span class="lesson-tag">01. 감염병과 과학의 유용성</span></div>
+  <div class="cols">
+    <div class="main">
+      <h3 class="sec"><span class="n">4</span>방어 — 미리 연습하고, 길목을 막는다</h3>
+      <p class="body">가장 우아한 방어는 <span class="kw">백신</span>이다. 병원체의 <b>일부(항원)나 약화된 형태</b>를 미리 몸에 보여 주면, 면역계는 실전처럼 <span class="u-amber">항체 만드는 법을 연습하고 그 기억을 저장</span>해 둔다. 진짜 병원체가 들어왔을 때 몸은 이미 훈련된 군대로 맞선다 — 천연두를 지구에서 사라지게 만든 것이 바로 이 원리다.</p>
+      <p class="body">일상의 방어선도 과학이다. <b>손 씻기</b>는 접촉 전파를, <b>마스크</b>는 비말 전파를 길목에서 차단한다 — 병원체의 이동 경로(개념 1)를 알기에 설계할 수 있는 방어다. 그리고 <b>항생제의 올바른 사용</b> — 의사의 처방대로 끝까지 복용해야 하는 이유를 우리는 이미 배웠다(I-02). 어중간한 복용은 <b>내성균만 골라 살리는 자연선택</b>이 되기 때문이다. 이 책의 단원들이 진료실 한 장면에서 만나는 순간이다.</p>
+
+      <figure>
+        <svg width="470" height="146" viewBox="0 0 470 146" font-family="PC Sans">
+          <g font-size="6.8">
+            <text x="235" y="13" text-anchor="middle" font-size="8.4" font-weight="800" fill="#4053B8">백신 — 면역계의 모의고사</text>
+            <g transform="translate(0,24)" text-anchor="middle">
+              <g transform="translate(85,0)">
+                <rect x="-70" y="0" width="140" height="88" rx="6" fill="#ECEFFA" stroke="#C0C9EE" stroke-width="1"/>
+                <text y="15" font-size="7.2" font-weight="800" fill="#2E3E96">① 예방 접종</text>
+                <g transform="translate(0,48)">
+                  <rect x="-20" y="-5" width="30" height="10" rx="3" fill="#8E9ADF"/>
+                  <rect x="10" y="-2" width="14" height="4" fill="#5B6B77"/>
+                  <circle cx="-28" cy="0" r="6" fill="#E5949E"/>
+                </g>
+                <text y="80" fill="#5B6B77" font-size="6">약화된 병원체·항원 조각 투입</text>
+              </g>
+              <line x1="158" y1="44" x2="172" y2="44" stroke="#4053B8" stroke-width="1.4" marker-end="url(#arrP)"/>
+              <g transform="translate(235,0)">
+                <rect x="-70" y="0" width="140" height="88" rx="6" fill="#ECEFFA" stroke="#C0C9EE" stroke-width="1"/>
+                <text y="15" font-size="7.2" font-weight="800" fill="#2E3E96">② 연습과 기억</text>
+                <g transform="translate(0,48)">
+                  <path d="M-16,-8 a9,9 0 1,0 0,14 z" fill="#4053B8"/>
+                  <path d="M8,-8 a9,9 0 1,0 0,14 z" fill="#4053B8" transform="translate(8,4)"/>
+                  <text x="26" y="4" font-size="8" fill="#2E3E96" font-weight="900">+ 기억</text>
+                </g>
+                <text y="80" fill="#5B6B77" font-size="6">항체 생산 훈련 + 기억 세포 저장</text>
+              </g>
+              <line x1="308" y1="44" x2="322" y2="44" stroke="#4053B8" stroke-width="1.4" marker-end="url(#arrP)"/>
+              <g transform="translate(385,0)">
+                <rect x="-70" y="0" width="140" height="88" rx="6" fill="#E7F5F1" stroke="#4BA394" stroke-width="1.1"/>
+                <text y="15" font-size="7.2" font-weight="800" fill="#147D6F">③ 실전 방어</text>
+                <g transform="translate(0,48)">
+                  <circle cx="-22" cy="0" r="8" fill="#E5949E"/>
+                  <g stroke="#B0483A" stroke-width="1"><line x1="-22" y1="-8" x2="-22" y2="-12"/><line x1="-14" y1="0" x2="-10" y2="0"/><line x1="-22" y1="8" x2="-22" y2="12"/></g>
+                  <path d="M4,-10 q12,-4 22,2 v8 q0,10 -11,13 q-11,-3 -11,-13 z" fill="#4BA394"/>
+                  <path d="M9,0 l4,5 l8,-9" stroke="#fff" stroke-width="1.8" fill="none"/>
+                </g>
+                <text y="80" fill="#5B6B77" font-size="6">진짜가 와도 — 이미 훈련된 군대</text>
+              </g>
+            </g>
+          </g>
+          <text x="235" y="140" text-anchor="middle" font-size="8.8" font-weight="800" fill="#E8940A">백신 = 면역의 예행연습 — 천연두를 지구에서 지운 과학</text>
+        </svg>
+        <figcaption>그림 4 | 백신의 원리 — 접종 → 연습·기억 → 실전 방어의 3막</figcaption>
+      </figure>
+
+      <div class="expoint">
+        <div class="boxtitle"><span class="ico">!</span>시험엔 이렇게</div>
+        <p>백신과 치료제의 구별 — <b>백신은 '미리'(예방), 치료제는 '걸린 뒤'</b>. "백신은 병을 치료하는 약이다"(X)가 기본 함정. 손 씻기·마스크는 <b>전파 경로 차단</b>으로 묶어 서술하라.</p>
+      </div>
+    </div>
+
+    <div class="wing">
+      <div class="wtitle">날개 노트</div>
+      <div class="term"><b>면역 기억</b>한 번 만난 항원을 기억했다가 재침입 때 빠르게 항체를 만드는 능력 — 백신의 과학적 기반.</div>
+      <div class="term"><b>천연두 박멸</b>1980년 WHO가 공식 선언 — 백신으로 지구에서 사라진 첫 감염병.</div>
+      <div class="wsep"></div>
+      <div class="wtitle">한눈에 암기</div>
+      <div class="wing-pen">백신 = 예방 (연습·기억)<br>손 씻기·마스크 = 길목 차단<br>항생제는 처방대로 끝까지!</div>
+    </div>
+  </div>
+  <div class="quickcheck">
+    <span class="qc-title">바로바로 체크</span>
+    <ol>
+      <li><span class="no">1</span>백신은 병원체의 일부나 약화된 형태로 면역을 미리 연습시킨다. ( O , X )</li>
+      <li><span class="no">2</span>백신은 이미 걸린 병을 치료하는 약이다. ( O , X )</li>
+      <li><span class="no">3</span>손 씻기는 접촉을 통한 전파를 줄인다. ( O , X )</li>
+    </ol>
+    <div class="qc-ans">정답 1 O 2 X (예방 — 치료제와 구별) 3 O</div>
+  </div>
+  <div class="folio"><span>III. 과학과 미래 사회</span><span class="num">147</span></div>
+</div>
+
+<!-- ═════════════ p.148 개념 05 과학의 유용성 ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag">III. 과학과 미래 사회</span><span class="lesson-tag">01. 감염병과 과학의 유용성</span></div>
+  <div class="cols">
+    <div class="main">
+      <h3 class="sec"><span class="n">5</span>과학은 왜 필요한가 — 감염병이 준 답안지</h3>
+      <p class="body">코로나19의 몇 년을 되돌아보면, 이 소단원 전체가 실제 상황으로 상영되었다. 병원체의 정체를 밝히고(유전 정보 해독), 진단 키트를 몇 주 만에 만들고, 역학 조사로 전파를 추적하고, 유례없는 속도로 백신을 개발했다 — <span class="u-amber">과학이 없었다면 우리는 적이 누구인지도 모른 채 싸웠을 것</span>이다. '과학의 유용성'은 교과서의 표어가 아니라, 우리가 통과한 역사다.</p>
+      <p class="body">그리고 숙제가 남았다. 기후변화와 도시화로 <b>새로운 감염병</b>은 앞으로도 나타날 것이고(II단원과 이어지는 고리), 병원체는 국경을 모른다. 그래서 필요한 것이 <b>감시망</b>(새 병원체의 조기 탐지), <b>국제 협력</b>(정보와 백신의 공유), 그리고 <b>데이터를 다루는 능력</b>이다 — 마지막 항목이 바로 다음 소단원, 빅데이터와 인공지능으로 이어진다.</p>
+
+      <div class="gist" style="margin:2.8mm 0 4mm; padding:2.2mm 1.8mm 2mm;">
+        <div class="boxtitle"><span class="ico">알</span>알짜 정리 — 감염병과 과학의 유용성 한 장 요약</div>
+        <ul>
+          <li>병원체: <b>세균</b>(스스로 증식·항생제 O) vs <b>바이러스</b>(숙주 세포 필요·항생제 X)</li>
+          <li>진단: 항원 검사(<b>항원-항체 결합</b>, T선·C선) · 유전자 증폭 검사(<b>유전 물질을 불려서</b>)</li>
+          <li>추적: <b>역학 조사</b> — 확인 → 동선 → 접촉자 → 차단 (원형: 존 스노우의 지도)</li>
+          <li>방어: <b>백신</b>(면역의 예행연습) + 손 씻기·마스크(경로 차단) + 항생제 바른 사용</li>
+        </ul>
+      </div>
+
+      <div class="saem">
+        <div class="avatar">박찬<br>쌤</div>
+        <div class="bubble"><span class="pen">"의사의 눈으로 보증한다 — 이 소단원은 전부 진료 현장의 실화다. 키트의 두 줄부터 항생제 처방까지, 과학이 매일 사람을 살리고 있다."</span></div>
+      </div>
+    </div>
+
+    <div class="wing">
+      <div class="wtitle">날개 노트</div>
+      <div class="term"><b>감시망</b>병원·검역소·연구소가 새 병원체의 출현을 조기에 탐지하는 체계.</div>
+      <div class="term"><b>국제 협력</b>병원체 정보·백신을 나누는 일 — 병원체는 국경을 모르기 때문이다.</div>
+      <div class="wsep"></div>
+      <div class="wtitle">한눈에 암기</div>
+      <div class="wing-pen">진단·추적·방어 3종 세트<br>과학 없인 적도 못 본다<br>다음 무기 = 데이터!</div>
+      <div class="wsep"></div>
+      <div class="review">
+        <div class="rv-title">다음 소단원 예고</div>
+        <div class="term" style="margin-bottom:0;"><b>빅데이터·AI (02)</b>역학 조사를 움직인 데이터의 힘 — 그 빛과 그림자를 정면으로 다룬다.</div>
+      </div>
+    </div>
+  </div>
+  <div class="quickcheck">
+    <span class="qc-title">바로바로 체크</span>
+    <ol>
+      <li><span class="no">1</span>감염병 대응에는 진단·추적·방어의 과학이 함께 쓰인다. ( O , X )</li>
+      <li><span class="no">2</span>새로운 감염병 대비에는 감시망과 국제 협력이 필요하다. ( O , X )</li>
+      <li><span class="no">3</span>감염병 문제는 한 나라의 노력만으로 완결된다. ( O , X )</li>
+    </ol>
+    <div class="qc-ans">정답 1 O 2 O 3 X (병원체는 국경을 모른다)</div>
+  </div>
+  <div class="folio"><span>III. 과학과 미래 사회</span><span class="num">148</span></div>
+</div>
+
+<!-- ═════════════ p.149 자료 파헤치기 ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag">III. 과학과 미래 사회</span><span class="lesson-tag">01. 감염병과 과학의 유용성</span></div>
+  <div class="lab">
+    <div class="lab-head">자료 파헤치기 <span class="tag">탐구·자료 분석</span> <span style="font-weight:600; font-size:9.5pt; margin-left:auto;">1854년 런던 — 지도로 잡은 콜레라</span></div>
+    <div class="lab-body">
+      <h4>자료</h4>
+      <p>1854년 런던 소호 지역에 콜레라가 번졌다. 당시 사람들은 '나쁜 공기'가 원인이라 믿었지만, 의사 <b>존 스노우</b>는 사망자가 나온 집마다 지도에 점을 찍었다 — 점들은 브로드 스트리트의 <b>공용 물 펌프</b> 하나를 중심으로 몰려 있었다.</p>
+      <figure>
+        <svg width="430" height="112" viewBox="0 0 430 112" font-family="PC Sans">
+          <g font-size="6.8">
+            <g transform="translate(20,10)">
+              <rect x="0" y="0" width="230" height="92" rx="5" fill="#F6F3EC" stroke="#C9BA9B" stroke-width="1"/>
+              <g stroke="#D8D0BE" stroke-width="4">
+                <line x1="20" y1="0" x2="20" y2="92"/><line x1="90" y1="0" x2="90" y2="92"/><line x1="160" y1="0" x2="160" y2="92"/>
+                <line x1="0" y1="30" x2="230" y2="30"/><line x1="0" y1="64" x2="230" y2="64"/>
+              </g>
+              <circle cx="105" cy="46" r="7" fill="#4053B8"/>
+              <text x="105" y="49" text-anchor="middle" font-size="5" fill="#fff" font-weight="800">펌프</text>
+              <g fill="#D6455D">
+                <circle cx="98" cy="38" r="2"/><circle cx="112" cy="40" r="2"/><circle cx="104" cy="56" r="2"/><circle cx="94" cy="50" r="2"/>
+                <circle cx="118" cy="52" r="2"/><circle cx="110" cy="26" r="2"/><circle cx="86" cy="42" r="2"/><circle cx="122" cy="34" r="2"/>
+                <circle cx="100" cy="70" r="2"/><circle cx="126" cy="60" r="2"/><circle cx="74" cy="34" r="2"/><circle cx="134" cy="46" r="2"/>
+                <circle cx="40" cy="16" r="2"/><circle cx="196" cy="80" r="2"/>
+              </g>
+              <text x="115" y="14" font-size="6" fill="#B0483A" font-weight="800">● = 사망자가 나온 집</text>
+            </g>
+            <g transform="translate(280,20)">
+              <text font-size="7" font-weight="800" fill="#2E3E96">점이 말하는 것</text>
+              <text y="16" font-size="6.2" fill="#3D4C58">· 사망자는 펌프 가까이에 집중</text>
+              <text y="28" font-size="6.2" fill="#3D4C58">· 멀리 떨어진 사망자도 알고 보니</text>
+              <text y="38" font-size="6.2" fill="#3D4C58">  그 펌프의 물을 길어 마셨다</text>
+              <text y="56" font-size="6.6" fill="#B0483A" font-weight="800">→ 범인은 공기가 아니라 물!</text>
+              <text y="72" font-size="6.2" fill="#5B6B77">펌프 손잡이를 제거하자</text>
+              <text y="82" font-size="6.2" fill="#5B6B77">유행이 잦아들었다</text>
+            </g>
+          </g>
+        </svg>
+      </figure>
+      <h4>해석의 3단계</h4>
+      <ol>
+        <li><b>데이터가 먼저다</b> — 스노우는 콜레라균을 본 적이 없다(세균학은 수십 년 뒤의 일이다). 그런데도 <b>발생 위치라는 데이터</b>만으로 원인(오염된 물)을 지목했다 — 병원체를 몰라도 전파 경로는 찾을 수 있다는 것, 역학의 탄생이다.</li>
+        <li><b>반례를 확인한다</b> — 펌프에서 먼 사망자, 그리고 펌프 옆인데 멀쩡했던 양조장(자체 우물을 썼다) — 예외들이 오히려 '물 가설'을 강하게 만들었다. 데이터 해석은 예외 검증까지가 한 세트다.</li>
+        <li><b>오늘로 잇는다</b> — 점 찍기는 오늘날 확진자 동선 지도가 되었고, 손 지도는 GPS·카드 데이터가 되었다. 도구는 바뀌었지만 문법은 그대로다: <b>데이터 → 패턴 → 원인 → 차단</b>.</li>
+      </ol>
+      <h4>결론</h4>
+      <p>존 스노우의 지도는 '데이터로 생명을 구한' 첫 장면으로 꼽힌다. 진단 기술이 없던 시대에도 과학적 사고는 유행을 멈춰 세웠다 — 과학의 유용성을 이보다 잘 보여 주는 증거는 드물다.</p>
+      <div class="expoint">
+        <div class="boxtitle"><span class="ico">!</span>시험엔 이렇게</div>
+        <p>스노우 자료의 핵심 — <b>병원체 발견(X)이 아니라 데이터(분포)로 원인을 추론(O)</b>했다는 것. "현미경으로 균을 찾아냈다"는 선지는 시대착오 함정이다.</p>
+      </div>
+    </div>
+  </div>
+  <div class="folio"><span>III. 과학과 미래 사회</span><span class="num">149</span></div>
+</div>
+
+<!-- ═════════════ p.150 STEP 1 + STEP 2 시작 ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag">III. 과학과 미래 사회</span><span class="lesson-tag">01. 감염병과 과학의 유용성 | 문제</span></div>
+  <div class="step-head"><span class="stepno">STEP 1</span><span class="steptt">개념 확인</span><span class="stepdesc">OX와 빈칸으로 개념 점검 — 막히면 알짜 정리로!</span></div>
+  <div class="qgrid">
+    <div>
+      <div class="q"><div class="qhead"><span class="qno">1</span><div class="stem">모든 감염병은 항생제로 치료할 수 있다. <span class="ox-answer">( O , X )</span></div></div></div>
+      <div class="q"><div class="qhead"><span class="qno">2</span><div class="stem">신속 항원 검사는 항원-항체의 특이적 결합을 이용한다. <span class="ox-answer">( O , X )</span></div></div></div>
+      <div class="q"><div class="qhead"><span class="qno">3</span><div class="stem">역학 조사의 주된 목적은 치료제를 개발하는 것이다. <span class="ox-answer">( O , X )</span></div></div></div>
+    </div>
+    <div>
+      <div class="q"><div class="qhead"><span class="qno">4</span><div class="stem">세균에 의한 감염병 치료에 쓰이며 바이러스에는 듣지 않는 약을 <span class="blankline" style="min-width:12mm;"></span>라 한다.</div></div></div>
+      <div class="q"><div class="qhead"><span class="qno">5</span><div class="stem">병원체의 일부나 약화된 형태로 면역을 미리 연습시키는 것을 <span class="blankline" style="min-width:10mm;"></span>이라 한다.</div></div></div>
+      <div class="q"><div class="qhead"><span class="qno">6</span><div class="stem">감염자의 동선·접촉자를 추적해 전파 경로를 밝히는 일을 <span class="blankline" style="min-width:10mm;"></span> 조사라 한다.</div></div></div>
+    </div>
+  </div>
+  <div style="border-top:0.5mm solid var(--line); margin:2mm 0 4mm;"></div>
+  <div class="step-head s2"><span class="stepno">STEP 2</span><span class="steptt">내신 완성</span><span class="stepdesc">학교 시험 유형 그대로 — 서술형까지 한 번에</span></div>
+  <div class="q">
+    <div class="qhead"><span class="qno">7</span><div class="stem">병원체에 대한 설명으로 옳은 것은? <span class="difficulty">●●○</span>
+    <div class="tags">10통과2-03-01 | 개념 1</div></div></div>
+    <ul class="choices">
+      <li>① 항생제는 세균에 의한 감염병에 쓰인다.</li>
+      <li>② 바이러스는 숙주 세포 없이 스스로 증식할 수 있다.</li>
+      <li>③ 세균은 생물이 아니다.</li>
+      <li>④ 감기와 독감은 세균이 일으킨다.</li>
+      <li>⑤ 병원체의 종류와 관계없이 치료법은 같다.</li>
+    </ul>
+  </div>
+  <div class="q">
+    <div class="qhead"><span class="qno">8</span><div class="stem">감염병의 진단에 대한 설명으로 옳은 것은? <span class="difficulty">●●●</span>
+    <div class="tags">10통과2-03-01 | 개념 2</div></div></div>
+    <ul class="choices">
+      <li>① 신속 항원 검사는 병원체의 유전 물질을 증폭한다.</li>
+      <li>② 유전자 증폭 검사는 항원-항체 반응을 이용한다.</li>
+      <li>③ 유전자 증폭 검사는 적은 양의 유전 물질을 불려서 검출한다.</li>
+      <li>④ 신속 항원 검사의 C선은 항원의 존재를 알려 준다.</li>
+      <li>⑤ 감염병 진단은 과학 원리와 무관한 기술이다.</li>
+    </ul>
+  </div>
+  <div class="folio"><span>III. 과학과 미래 사회</span><span class="num">150</span></div>
+</div>
+
+<!-- ═════════════ p.151 STEP 2 계속 ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag">III. 과학과 미래 사회</span><span class="lesson-tag">01. 감염병과 과학의 유용성 | 문제</span></div>
+  <div class="q">
+    <div class="qhead"><span class="qno">9</span><div class="stem">역학 조사에 대한 설명으로 옳은 것은? <span class="difficulty">●●●</span>
+    <div class="tags">10통과2-03-01 | 개념 3</div></div></div>
+    <ul class="choices">
+      <li>① 역학 조사는 병원체의 세부 구조를 밝히는 실험이다.</li>
+      <li>② 감염자의 동선과 접촉자를 파악해 전파 경로를 추적한다.</li>
+      <li>③ 역학 조사에는 데이터가 필요하지 않다.</li>
+      <li>④ 잠복기 동안의 동선은 조사할 필요가 없다.</li>
+      <li>⑤ 역학 조사는 유행이 시작된 뒤에는 쓸모가 없다.</li>
+    </ul>
+  </div>
+  <div class="q">
+    <div class="qhead"><span class="qno">10</span><div class="stem">감염병에 대한 방어 수단으로 옳은 것만을 고른 것은? <span class="difficulty">●●○</span>
+    <div class="tags">10통과2-03-01 | 개념 4</div></div></div>
+    <div class="bogi-box" style="background:#fff;">
+      (가) 백신은 병원체의 일부나 약화된 형태로 면역을 미리 연습시킨다.<br>
+      (나) 손 씻기는 접촉을 통한 전파를 줄인다.<br>
+      (다) 항생제는 바이러스 감염에도 효과적이다.
+    </div>
+    <ul class="choices inline">
+      <li>① (가)</li><li>② (다)</li><li>③ (가), (다)</li><li>④ (가), (나)</li><li>⑤ (가), (나), (다)</li>
+    </ul>
+  </div>
+  <div class="q">
+    <div class="qhead"><span class="qno">11</span><div class="stem"><span class="badge-essay">서술형</span>항생제를 의사의 처방대로 끝까지 복용해야 하는 까닭을 <b>'내성'과 '자연선택'</b>이라는 말을 포함하여 서술하시오. <span class="difficulty">●●●●</span>
+    <div class="tags">10통과2-03-01 | 개념 4 · I-02 연계</div></div></div>
+    <div class="essay-lines"><div></div><div></div><div></div></div>
+  </div>
+  <div class="folio"><span>III. 과학과 미래 사회</span><span class="num">151</span></div>
+</div>
+
+<!-- ═════════════ p.152 STEP 3 ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag">III. 과학과 미래 사회</span><span class="lesson-tag">01. 감염병과 과학의 유용성 | 문제</span></div>
+  <div class="step-head s3"><span class="stepno">STEP 3</span><span class="steptt">수능 도전</span><span class="stepdesc">2028 수능 규격 — ㄱㄴㄷ 합답형·자료 해석</span></div>
+  <div class="q">
+    <div class="qhead"><span class="qno">12</span><div class="stem"><span class="badge-data">자료</span>그림은 신속 항원 검사 키트의 구조를 나타낸 것이다. 옳은 것만을 &lt;보기&gt;에서 있는 대로 고른 것은? <span class="difficulty">[2점]</span>
+    <div class="tags">10통과2-03-01</div></div></div>
+    <figure style="margin:2mm 0 1.5mm 8.6mm;">
+      <svg width="280" height="58" viewBox="0 0 280 58" font-family="PC Sans">
+        <g font-size="6.2">
+          <rect x="14" y="14" width="240" height="34" rx="7" fill="#F4F6FC" stroke="#8E9ADF" stroke-width="1.1"/>
+          <circle cx="44" cy="31" r="10" fill="#fff" stroke="#8E9ADF" stroke-width="0.9"/>
+          <text x="44" y="34" text-anchor="middle" font-size="5.2" fill="#5B6B77">검체</text>
+          <rect x="66" y="21" width="170" height="20" rx="2.5" fill="#FDFDFB" stroke="#C0C9EE" stroke-width="0.7"/>
+          <rect x="144" y="21" width="6" height="20" fill="#D6456F"/>
+          <rect x="196" y="21" width="6" height="20" fill="#D6456F"/>
+          <text x="147" y="16" text-anchor="middle" font-weight="800" fill="#B0483A">T선</text>
+          <text x="199" y="16" text-anchor="middle" font-weight="800" fill="#B0483A">C선</text>
+          <text x="147" y="54" text-anchor="middle" font-size="5.4" fill="#5B6B77">항원-항체 결합 시 색 줄</text>
+          <text x="199" y="54" text-anchor="middle" font-size="5.4" fill="#5B6B77">검사 유효 확인</text>
+        </g>
+      </svg>
+    </figure>
+    <div class="bogi-box">
+      <div class="bt">보기</div>
+      ㄱ. T선의 색 변화는 검체 속 항원이 항체와 결합했음을 뜻한다.<br>
+      ㄴ. C선은 검사가 제대로 작동했는지 알려 준다.<br>
+      ㄷ. T선이 나타나지 않으면 검사 자체가 실패한 것이다.
+    </div>
+    <ul class="choices inline">
+      <li>① ㄱ</li><li>② ㄷ</li><li>③ ㄱ, ㄷ</li><li>④ ㄱ, ㄴ</li><li>⑤ ㄱ, ㄴ, ㄷ</li>
+    </ul>
+  </div>
+  <div class="q">
+    <div class="qhead"><span class="qno">13</span><div class="stem"><span class="badge-data">자료</span>다음은 1854년 런던 콜레라 유행 때 의사 존 스노우가 한 일이다. 옳은 것만을 &lt;보기&gt;에서 있는 대로 고른 것은? <span class="difficulty">[2.5점]</span>
+    <div class="tags">10통과2-03-01</div></div></div>
+    <div class="bogi-box" style="background:#fff;">
+      스노우는 사망자가 나온 집마다 지도에 점을 찍었고, 점들이 한 공용 물 펌프 주변에 몰려 있음을 발견했다. 펌프 사용을 멈추자 유행이 잦아들었다.
+    </div>
+    <div class="bogi-box">
+      <div class="bt">보기</div>
+      ㄱ. 스노우는 현미경으로 콜레라균을 발견해 원인을 밝혔다.<br>
+      ㄴ. 사망자의 분포 데이터가 특정 펌프(오염된 물)를 지목했다.<br>
+      ㄷ. 이 조사는 오늘날 역학 조사의 원형이 되었다.
+    </div>
+    <ul class="choices inline">
+      <li>① ㄱ</li><li>② ㄴ, ㄷ</li><li>③ ㄱ, ㄴ</li><li>④ ㄱ, ㄷ</li><li>⑤ ㄱ, ㄴ, ㄷ</li>
+    </ul>
+  </div>
+  <div class="folio"><span>III. 과학과 미래 사회</span><span class="num">152</span></div>
+</div>
+
+<!-- ═════════════ p.153 해설 1 ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag" style="color:var(--brand);">알짜 해설</span><span class="lesson-tag">01. 감염병과 과학의 유용성</span></div>
+  <div class="sol-head"><span class="stt">알짜 해설</span><span class="sub">전 문항 해설 + 오답 선지 분석 — 맞힌 문제도 해설로 한 번 더!</span></div>
+  <table class="anstable">
+    <tr><th>문항</th><td>1</td><td>2</td><td>3</td><td>4</td><td>5</td><td>6</td><td>7</td><td>8</td><td>9</td><td>10</td><td>11</td><td>12</td><td>13</td></tr>
+    <tr><th>정답</th><td class="a">X</td><td class="a">O</td><td class="a">X</td><td class="a">항생제</td><td class="a">백신</td><td class="a">역학</td><td class="a">①</td><td class="a">③</td><td class="a">②</td><td class="a">④</td><td class="a">서술형</td><td class="a">④</td><td class="a">②</td></tr>
+  </table>
+  <div class="solcols">
+    <div>
+      <div class="sol"><div class="shead"><span class="sno">1</span><span class="sans">X</span><span class="slink">개념 1</span></div>
+        <p>항생제는 세균 전용 — 바이러스에는 듣지 않는다.</p></div>
+      <div class="sol"><div class="shead"><span class="sno">2</span><span class="sans">O</span><span class="slink">개념 2</span></div>
+        <p>자물쇠(항체)와 열쇠(항원)의 특이적 결합.</p></div>
+      <div class="sol"><div class="shead"><span class="sno">3</span><span class="sans">X</span><span class="slink">개념 3</span></div>
+        <p>목적은 전파 경로 파악과 확산 차단이다.</p></div>
+      <div class="sol"><div class="shead"><span class="sno">4</span><span class="sans">항생제</span><span class="slink">개념 1</span></div>
+        <p>감기에 항생제가 무의미한 과학적 이유.</p></div>
+      <div class="sol"><div class="shead"><span class="sno">5</span><span class="sans">백신</span><span class="slink">개념 4</span></div>
+        <p>면역의 예행연습 — 예방이지 치료가 아니다.</p></div>
+      <div class="sol"><div class="shead"><span class="sno">6</span><span class="sans">역학</span><span class="slink">개념 3</span></div>
+        <p>확인 → 동선 → 접촉자 → 차단의 과학 수사.</p></div>
+    </div>
+    <div>
+      <div class="sol"><div class="shead"><span class="sno">7</span><span class="sans">①</span><span class="slink">개념 1</span></div>
+        <p>항생제 = 세균 전용 무기.</p>
+        <div class="wrongbox"><div class="wt">오답 왜 틀렸나</div>
+          <p><b>②</b> 바이러스는 숙주 세포가 필요하다. <b>③</b> 세균은 생물이다. <b>④</b> 감기·독감은 바이러스. <b>⑤</b> 정체가 다르면 무기도 다르다.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">8</span><span class="sans">③</span><span class="slink">개념 2</span></div>
+        <p>유전자 증폭 검사 = 극미량을 불려서 검출.</p>
+        <div class="wrongbox"><div class="wt">오답 왜 틀렸나</div>
+          <p><b>①·②</b> 두 검사의 원리를 서로 바꿨다. <b>④</b> C선은 검사 유효 확인 — 검출은 T선.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">9</span><span class="sans">②</span><span class="slink">개념 3</span></div>
+        <p>동선 + 접촉자 = 전파의 지도.</p>
+        <div class="wrongbox"><div class="wt">오답 왜 틀렸나</div>
+          <p><b>③</b> 데이터가 곧 도구다. <b>④</b> 잠복기에도 전파된다 — 반드시 조사. <b>⑤</b> 유행 중일수록 차단 효과가 크다.</p></div></div>
+    </div>
+  </div>
+  <div class="folio"><span>알짜 해설</span><span class="num">153</span></div>
+</div>
+
+<!-- ═════════════ p.154 해설 2 ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag" style="color:var(--brand);">알짜 해설</span><span class="lesson-tag">01. 감염병과 과학의 유용성</span></div>
+  <div class="solcols">
+    <div>
+      <div class="sol"><div class="shead"><span class="sno">10</span><span class="sans">④</span><span class="slink">개념 4</span></div>
+        <p>(가) 백신 = 예행연습, (나) 손 씻기 = 접촉 전파 차단 — 둘 다 옳다.</p>
+        <div class="wrongbox"><div class="wt">오답 왜 틀렸나</div>
+          <p><b>(다)</b> 항생제는 바이러스에 무력하다 — 이 소단원 최대의 반복 포인트.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">11</span><span class="sans">모범 답안</span><span class="slink">개념 4</span></div>
+        <p>세균 집단에는 항생제에 견디는 <b>내성</b> 변이를 가진 개체가 섞여 있다. 복용을 중간에 멈추면 내성이 약한 세균만 죽고 내성균이 살아남아 번식하는 <b>자연선택</b>이 일어나, 항생제가 듣지 않는 세균 집단이 만들어질 수 있다. 따라서 처방된 기간을 지켜 세균을 충분히 제거해야 한다.</p>
+        <div class="wrongbox"><div class="wt">채점 기준 (감점 포인트)</div>
+          <p>① 내성 변이의 존재 ② 중단 시 내성균의 선택·번식 ③ 그래서 끝까지 복용 — I-02와 연결해 서술하면 만점.</p></div></div>
+    </div>
+    <div>
+      <div class="sol"><div class="shead"><span class="sno">12</span><span class="sans">④</span><span class="slink">개념 2 | 2점</span></div>
+        <p><b>ㄱ (옳음)</b> T선 = 항원-항체 결합의 신호. <b>ㄴ (옳음)</b> C선 = 검사의 검사. <b>ㄷ (틀림)</b> C선만 나오고 T선이 없으면 '음성' — 검사는 유효하다.</p>
+        <div class="wrongbox"><div class="wt">함정 체크</div>
+          <p>C선조차 없을 때가 '검사 무효'다 — T선 없음(음성)과 구별하라.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">13</span><span class="sans">②</span><span class="slink">개념 3·자료 | 2.5점</span></div>
+        <p><b>ㄱ (틀림)</b> 세균학 이전 시대 — 스노우는 균을 본 적이 없다. <b>ㄴ (옳음)</b> 분포 데이터가 펌프를 지목했다. <b>ㄷ (옳음)</b> 데이터 → 패턴 → 원인 → 차단, 역학 조사의 원형.</p>
+        <div class="wrongbox"><div class="wt">함정 체크</div>
+          <p>'현미경 발견'은 시대착오 함정 — <b>데이터로 추론</b>했다는 것이 이 자료의 심장이다.</p></div></div>
+
+      <div class="gist" style="margin-top:5mm;">
+        <div class="boxtitle"><span class="ico">알</span>이 소단원, 이것만은!</div>
+        <ul>
+          <li>세균(항생제 O) vs 바이러스(항생제 X) — <b>감기에 항생제는 무의미</b></li>
+          <li>진단 2종: 항원 검사(<b>항원-항체</b>, T·C선) / 유전자 증폭(<b>불려서 검출</b>)</li>
+          <li>역학 조사 = 데이터 과학 수사 (스노우의 지도) / 백신 = <b>면역의 예행연습</b></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div class="folio"><span>알짜 해설</span><span class="num">154</span></div>
+</div>
+
+<!-- ═════════════ p.155 MEMO ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag">III. 과학과 미래 사회</span><span class="lesson-tag">01 ▸ 02 넘어가기 전에</span></div>
+  <div class="memo-head"><span class="mt">MEMO</span><span class="ms">헷갈린 개념, 다시 틀린 문제 번호, 나만의 암기법을 남겨 두는 자리</span></div>
+  <div class="memo-area"></div>
+  <div class="memo-pen">"'감기엔 왜 항생제가 안 듣나'를 가족에게 설명해 보자 — 세균·바이러스·내성까지 이어지면 완벽! 막히면 144쪽으로 — 박찬쌤"</div>
+  <div class="folio"><span>박찬 과학 | 통합과학 2</span><span class="num">155</span></div>
+</div>
+
+</body>
+</html>
