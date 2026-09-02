@@ -323,6 +323,12 @@
             <marker id="arrY" markerWidth="7" markerHeight="7" refX="5" refY="2.5" orient="auto"><path d="M0,0 L6,2.5 L0,5 Z" fill="#E8940A"/></marker>
             <marker id="arrB" markerWidth="7" markerHeight="7" refX="5" refY="2.5" orient="auto"><path d="M0,0 L6,2.5 L0,5 Z" fill="#B4560E"/></marker>
             <marker id="arrGy" markerWidth="7" markerHeight="7" refX="5" refY="2.5" orient="auto"><path d="M0,0 L6,2.5 L0,5 Z" fill="#8A949E"/></marker>
+            <linearGradient id="beamS" x1="0" y1="0" x2="70" y2="0" gradientUnits="userSpaceOnUse">
+              <stop offset="0" stop-color="#F6D27A"/><stop offset="1" stop-color="#E8940A"/>
+            </linearGradient>
+            <linearGradient id="coneS" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" stop-color="#F3C24E" stop-opacity="0.32"/><stop offset="1" stop-color="#F3C24E" stop-opacity="0.05"/>
+            </linearGradient>
             <linearGradient id="skyG1" x1="0" y1="0" x2="0" y2="1">
               <stop offset="0" stop-color="#DCEEF7"/><stop offset="0.8" stop-color="#EAF5F1"/><stop offset="1" stop-color="#F2EFE4"/>
             </linearGradient>
@@ -345,6 +351,10 @@
                 <line x1="-11" y1="11" x2="-14" y2="14"/><line x1="11" y1="-11" x2="14" y2="-14"/>
               </g>
             </g>
+            <path d="M53,52 L72,111 L118,111 Z" fill="url(#coneS)"/>
+            <g transform="translate(56,50) rotate(55.4)">
+              <path d="M0,-1.8 C22,-2.4 44,-3 54,-3.8 L54,-8 L70,0 L54,8 L54,3.8 C44,3 22,2.4 0,1.8 Z" fill="url(#beamS)"/>
+            </g>
             <!-- 온실 기체 층 -->
             <rect x="20" y="60" width="430" height="17" rx="8.5" fill="#A9D9CE" opacity="0.92"/>
             <g font-size="5.8" font-weight="800" text-anchor="middle">
@@ -354,23 +364,27 @@
             </g>
             <text x="235" y="56" text-anchor="middle" font-size="6.6" font-weight="800" fill="#0F6357">온실 기체 층 — 지구의 담요</text>
             <!-- ① 가시광선 -->
-            <line x1="56" y1="49" x2="96" y2="108" stroke="#E8940A" stroke-width="2.2" stroke-linecap="round" marker-end="url(#arrY)"/>
             <g transform="translate(104,94)">
-              <circle r="5.6" fill="#E8940A"/><text y="2.2" text-anchor="middle" fill="#fff" font-size="6.2" font-weight="900">①</text>
+              <circle r="5.6" stroke="#fff" stroke-width="1.2" fill="#E8940A"/><text y="2.2" text-anchor="middle" fill="#fff" font-size="6.2" font-weight="900">①</text>
               <text x="9" y="2.2" font-size="6.2" fill="#B4830A" font-weight="800">가시광선 — 대부분 통과해 지표를 데움</text>
             </g>
             <!-- ② 적외선 -->
-            <line x1="290" y1="109" x2="290" y2="81" stroke="#D6455D" stroke-width="2" stroke-linecap="round" marker-end="url(#arrR)"/>
+            <path d="M290,110 C294,105.5 286,101.5 290,97 C294,92.5 286,88.5 290,84" fill="none" stroke="#D6455D" stroke-width="2" stroke-linecap="round"/>
+            <path d="M290,79 L284.5,90 Q290,87 295.5,90 Z" fill="#D6455D"/>
             <g transform="translate(290,98)">
-              <circle r="5.6" fill="#D6455D"/><text y="2.2" text-anchor="middle" fill="#fff" font-size="6.2" font-weight="900">②</text>
+              <circle r="5.6" stroke="#fff" stroke-width="1.2" fill="#D6455D"/><text y="2.2" text-anchor="middle" fill="#fff" font-size="6.2" font-weight="900">②</text>
               <text x="-9" y="2.2" text-anchor="end" font-size="6.2" fill="#D6455D" font-weight="800">적외선(지구 복사)</text>
             </g>
-            <line x1="298" y1="60" x2="322" y2="30" stroke="#8A949E" stroke-width="1.2" stroke-dasharray="3 2" marker-end="url(#arrGy)"/>
+            <g transform="translate(299,58) rotate(-51)">
+              <path d="M0,0 C6,-4 10,4 16,0 C22,-4 26,4 32,0" fill="none" stroke="#98A4AE" stroke-width="1.3" stroke-linecap="round"/>
+              <path d="M40,0 L31,-4.5 Q33.5,0 31,4.5 Z" fill="#98A4AE"/>
+            </g>
             <text x="326" y="27" font-size="5.8" fill="#8A949E">일부는 우주로</text>
             <!-- ③ 재방출 -->
-            <line x1="352" y1="80" x2="352" y2="108" stroke="#B4560E" stroke-width="2" stroke-linecap="round" marker-end="url(#arrB)"/>
+            <path d="M352,79 C356,83.5 348,87.5 352,92 C356,96.5 348,100.5 352,105" fill="none" stroke="#B4560E" stroke-width="2" stroke-linecap="round"/>
+            <path d="M352,110.5 L346.5,100 Q352,103 357.5,100 Z" fill="#B4560E"/>
             <g transform="translate(352,93)">
-              <circle r="5.6" fill="#B4560E"/><text y="2.2" text-anchor="middle" fill="#fff" font-size="6.2" font-weight="900">③</text>
+              <circle r="5.6" stroke="#fff" stroke-width="1.2" fill="#B4560E"/><text y="2.2" text-anchor="middle" fill="#fff" font-size="6.2" font-weight="900">③</text>
               <text x="9" y="2.2" font-size="6.2" fill="#B4560E" font-weight="800">흡수 후 재방출 — 일부가 지표로</text>
             </g>
           </g>

@@ -76,10 +76,12 @@
         <linearGradient id="gnd" x1="0" y1="0" x2="0" y2="1">
           <stop offset="0" stop-color="#B8946F"/><stop offset="1" stop-color="#9C7A57"/>
         </linearGradient>
-        <marker id="a2Y" markerWidth="9" markerHeight="9" refX="6" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6 Z" fill="#E8940A"/></marker>
-        <marker id="a2R" markerWidth="9" markerHeight="9" refX="6" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6 Z" fill="#D6455D"/></marker>
-        <marker id="a2B" markerWidth="9" markerHeight="9" refX="6" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6 Z" fill="#B4560E"/></marker>
-        <marker id="a2G" markerWidth="8" markerHeight="8" refX="5" refY="2.5" orient="auto"><path d="M0,0 L6,2.5 L0,5 Z" fill="#8A949E"/></marker>
+        <linearGradient id="beam" x1="0" y1="0" x2="158" y2="0" gradientUnits="userSpaceOnUse">
+          <stop offset="0" stop-color="#F6D27A"/><stop offset="1" stop-color="#E8940A"/>
+        </linearGradient>
+        <linearGradient id="cone" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#F3C24E" stop-opacity="0.32"/><stop offset="1" stop-color="#F3C24E" stop-opacity="0.05"/>
+        </linearGradient>
       </defs>
 
       <rect x="8" y="6" width="448" height="266" rx="10" fill="url(#sky)"/>
@@ -111,23 +113,31 @@
       </g>
       <text x="232" y="112" text-anchor="middle" font-size="10.5" font-weight="900" fill="#0F6357">온실 기체 층</text>
 
-      <line x1="86" y1="72" x2="150" y2="224" stroke="#E8940A" stroke-width="4" stroke-linecap="round" marker-end="url(#a2Y)"/>
+      <path d="M80,78 L108,230 L206,230 Z" fill="url(#cone)"/>
+      <g transform="translate(86,74) rotate(66.6)">
+        <path d="M0,-3 C50,-4.2 100,-5.6 124,-7 L124,-14 L156,0 L124,14 L124,7 C100,5.6 50,4.2 0,3 Z" fill="url(#beam)"/>
+      </g>
       <g transform="translate(96,178)">
-        <circle r="10" fill="#E8940A"/><text y="4" text-anchor="middle" fill="#fff" font-size="10.5" font-weight="900">①</text>
+        <circle r="10" stroke="#fff" stroke-width="2" fill="#E8940A"/><text y="4" text-anchor="middle" fill="#fff" font-size="10.5" font-weight="900">①</text>
         <text x="16" y="4" font-size="10.5" fill="#B4830A" font-weight="800">가시광선 — 대부분 통과</text>
       </g>
 
-      <line x1="290" y1="226" x2="290" y2="170" stroke="#D6455D" stroke-width="3.6" stroke-linecap="round" marker-end="url(#a2R)"/>
+      <path d="M290,226 C296,219 284,213 290,206 C296,199 284,193 290,186" fill="none" stroke="#D6455D" stroke-width="3.4" stroke-linecap="round"/>
+      <path d="M290,168 L281,186 Q290,181 299,186 Z" fill="#D6455D"/>
       <g transform="translate(290,202)">
-        <circle r="10" fill="#D6455D"/><text y="4" text-anchor="middle" fill="#fff" font-size="10.5" font-weight="900">②</text>
+        <circle r="10" stroke="#fff" stroke-width="2" fill="#D6455D"/><text y="4" text-anchor="middle" fill="#fff" font-size="10.5" font-weight="900">②</text>
         <text x="-15" y="4" text-anchor="end" font-size="10.5" fill="#D6455D" font-weight="800">적외선(지구 복사)</text>
       </g>
-      <line x1="300" y1="116" x2="338" y2="56" stroke="#8A949E" stroke-width="2" stroke-dasharray="5 3" marker-end="url(#a2G)"/>
+      <g transform="translate(302,112) rotate(-56)">
+        <path d="M0,0 C10,-6 16,6 26,0 C36,-6 42,6 52,0" fill="none" stroke="#98A4AE" stroke-width="2" stroke-linecap="round"/>
+        <path d="M67,0 L52,-7 Q56,0 52,7 Z" fill="#98A4AE"/>
+      </g>
       <text x="346" y="52" font-size="9" fill="#8A949E">일부는 우주로</text>
 
-      <line x1="350" y1="168" x2="350" y2="222" stroke="#B4560E" stroke-width="3.6" stroke-linecap="round" marker-end="url(#a2B)"/>
+      <path d="M350,166 C356,173 344,179 350,186 C356,193 344,199 350,206" fill="none" stroke="#B4560E" stroke-width="3.4" stroke-linecap="round"/>
+      <path d="M350,224 L341,206 Q350,211 359,206 Z" fill="#B4560E"/>
       <g transform="translate(350,192)">
-        <circle r="10" fill="#B4560E"/><text y="4" text-anchor="middle" fill="#fff" font-size="10.5" font-weight="900">③</text>
+        <circle r="10" stroke="#fff" stroke-width="2" fill="#B4560E"/><text y="4" text-anchor="middle" fill="#fff" font-size="10.5" font-weight="900">③</text>
         <text x="16" y="4" font-size="10.5" fill="#B4560E" font-weight="800">재방출</text>
       </g>
 
@@ -142,8 +152,15 @@
       <g transform="translate(468,144)">
         <rect width="144" height="128" rx="8" fill="#EEF1F4"/>
         <text x="72" y="22" text-anchor="middle" font-size="10" font-weight="900" fill="#5B6B77">온실효과가 없다면</text>
-        <circle cx="72" cy="62" r="26" fill="#B9C9D6"/>
-        <path d="M56,50 l10,8 -8,10 M84,48 l-8,10 10,8" stroke="#fff" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+        <circle cx="72" cy="62" r="26" fill="#C7D7E4"/>
+        <path d="M58,52 q6,-8 14,-5 q8,-3 10,4 q-3,8 -12,7 q-9,2 -12,-6 Z" fill="#EAF2F8"/>
+        <path d="M76,72 q5,-5 11,-3 q6,1 5,7 q-4,6 -11,4 q-6,-2 -5,-8 Z" fill="#EAF2F8"/>
+        <path d="M52,44 a26,26 0 0 1 40,0 q-10,-6 -20,-6 q-10,0 -20,6 Z" fill="#fff" opacity="0.9"/>
+        <path d="M54,82 a26,26 0 0 0 36,0 q-9,5 -18,5 q-9,0 -18,-5 Z" fill="#fff" opacity="0.85"/>
+        <g transform="translate(104,42)" stroke="#7FA8C9" stroke-width="1.7" stroke-linecap="round">
+          <line y1="-7" y2="7"/><line x1="-6" y1="-3.5" x2="6" y2="3.5"/><line x1="-6" y1="3.5" x2="6" y2="-3.5"/>
+          <line y1="-7" y2="-4.5" x1="-2.5" x2="0" transform="translate(0,0)"/>
+        </g>
         <text x="72" y="112" text-anchor="middle" font-size="15" font-weight="900" fill="#4C86B0">약 −18 ℃</text>
       </g>
     </svg>
