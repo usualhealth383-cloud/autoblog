@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<title>박찬 과학 강의 판본 — 디자인 시안 3종</title>
+<style>
+  @font-face { font-family:'PC Sans'; src:url('file:///root/.fonts/NotoSansKR.ttf'); font-weight:100 900; }
+  @font-face { font-family:'PC Serif'; src:url('file:///root/.fonts/NotoSerifKR.ttf'); font-weight:100 900; }
+  @font-face { font-family:'PC Pen'; src:url('file:///root/.fonts/NanumPenScript.ttf'); }
+  *{ box-sizing:border-box; margin:0; padding:0; -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+  @page{ size:210mm 275mm; margin:0; }
+  body{ font-family:'PC Sans',sans-serif; color:#2B2B2B; word-break:keep-all; }
+  .page{ width:210mm; height:275mm; overflow:hidden; page-break-after:always; padding:14mm 16mm; position:relative; background:#fff; }
+  .tagband{ position:absolute; top:0; left:0; right:0; height:9mm; background:#147D6F; color:#fff; display:flex; align-items:center; justify-content:space-between; padding:0 16mm; font-size:8.5pt; font-weight:800; letter-spacing:0.08em;}
+
+  /* ─────────── 안내 페이지 ─────────── */
+  .intro{ padding-top:16mm; }
+  .intro h1{ font-size:26pt; font-weight:900; color:#0F6357; margin-bottom:4mm; }
+  .intro .sub{ font-size:11.5pt; color:#5B6B77; line-height:1.7; margin-bottom:8mm; }
+  .pcard{ border:0.4mm solid #C9E7DF; border-radius:4mm; padding:5mm 6mm; margin-bottom:5mm; }
+  .pcard h2{ font-size:13.5pt; font-weight:900; color:#147D6F; margin-bottom:1.5mm;}
+  .pcard p{ font-size:10.5pt; line-height:1.65; color:#3A3A3A;}
+  .pcard .for{ display:inline-block; background:#E7F5F1; color:#0F6357; border-radius:3mm; padding:0.6mm 3mm; font-size:8.5pt; font-weight:800; margin-top:2mm;}
+
+  /* ─────────── 공통: 강의판 베이스 ─────────── */
+  .lect{ padding-top:18mm; }
+  .siahn{ position:absolute; top:11.5mm; right:16mm; background:#0F6357; color:#fff; font-weight:900; font-size:10pt; padding:1.2mm 4mm; border-radius:3mm; letter-spacing:0.1em;}
+
+  /* ─────────── 시안 A: 판서 흐름형 ─────────── */
+  .a-lesson{ font-size:9.5pt; font-weight:800; color:#147D6F; letter-spacing:0.12em; margin-bottom:1mm;}
+  .a-title{ font-size:23pt; font-weight:900; line-height:1.25; margin-bottom:6mm; }
+  .a-title .soft{ color:#147D6F; }
+  .a-flow{ display:flex; gap:5mm; margin-bottom:7mm; }
+  .a-step{ flex:1; border-top:1mm solid #147D6F; padding-top:2.5mm; }
+  .a-step .n{ font-family:'PC Serif'; font-size:16pt; font-weight:900; color:#147D6F; }
+  .a-step .t{ font-size:11.5pt; font-weight:800; margin:0.5mm 0 1mm; }
+  .a-step .d{ font-size:9.5pt; color:#5B6B77; line-height:1.5; }
+  .a-fig{ background:#F4FAF8; border-radius:4mm; padding:4mm 3mm 2.5mm; text-align:center; margin-bottom:7mm;}
+  .a-fig figcaption{ font-size:9.5pt; color:#0F6357; font-weight:700; margin-top:1.5mm; }
+  .a-script p{ font-size:12.5pt; line-height:1.85; margin-bottom:4mm; }
+  .a-script b{ color:#0F6357; }
+  .a-say{ font-family:'PC Pen'; font-size:15pt; color:#B4560E; margin-top:2mm; }
+
+  /* ─────────── 시안 B: 대본 낭독형 ─────────── */
+  .b-grid{ display:grid; grid-template-columns:26mm 1fr; column-gap:7mm; }
+  .b-rail{ border-right:0.4mm solid #C9E7DF; padding-right:4mm; }
+  .b-mark{ font-size:10.5pt; font-weight:900; color:#147D6F; margin-bottom:2mm; padding-top:1mm;}
+  .b-mark small{ display:block; font-size:8pt; color:#8A949E; font-weight:600; margin-top:0.5mm;}
+  .b-body{ font-family:'PC Serif',serif; }
+  .b-lesson{ font-size:9.5pt; font-weight:800; color:#147D6F; letter-spacing:0.12em; margin-bottom:1mm; font-family:'PC Sans';}
+  .b-title{ font-size:21pt; font-weight:900; line-height:1.3; margin-bottom:5mm; font-family:'PC Sans';}
+  .b-body p.line{ font-size:13pt; line-height:1.95; margin-bottom:4.5mm; }
+  .b-body p.line b{ font-weight:800; box-shadow:inset 0 -3.2mm #DFF2EC; }
+  .b-fig{ text-align:center; margin:2mm 0 5mm; }
+  .b-wrap{ border-top:0.7mm solid #147D6F; margin-top:2mm; padding-top:3mm; }
+  .b-wrap .t{ font-family:'PC Sans'; font-size:10.5pt; font-weight:900; color:#0F6357; margin-bottom:1.5mm;}
+  .b-wrap p{ font-size:12pt; line-height:1.8; font-weight:700; }
+
+  /* ─────────── 시안 C: 빅카드 3장형 ─────────── */
+  .c-card{ border-radius:5mm; padding:6mm 7mm; margin-bottom:5.5mm; }
+  .c-one{ background:#147D6F; color:#fff; }
+  .c-one .k{ font-size:9.5pt; font-weight:800; opacity:0.85; letter-spacing:0.15em; margin-bottom:2mm;}
+  .c-one .s{ font-size:19pt; font-weight:900; line-height:1.45; }
+  .c-two{ background:#F4FAF8; border:0.4mm solid #C9E7DF; text-align:center; }
+  .c-two .k{ font-size:9.5pt; font-weight:800; color:#147D6F; letter-spacing:0.15em; margin-bottom:2.5mm; text-align:left;}
+  .c-two .talk{ font-size:11.5pt; line-height:1.75; text-align:left; margin-top:3mm; }
+  .c-three{ background:#FFFDF6; border:0.4mm solid #EBDDB8; }
+  .c-three .k{ font-size:9.5pt; font-weight:800; color:#B4830A; letter-spacing:0.15em; margin-bottom:2mm;}
+  .c-three .board{ font-family:'PC Pen'; font-size:19pt; line-height:1.6; color:#3A3A3A; }
+  .c-three .board .hl{ color:#B4560E; }
+
+  .folio{ position:absolute; bottom:8mm; left:16mm; right:16mm; display:flex; justify-content:space-between; font-size:8.5pt; color:#8A949E; }
+</style>
+</head>
+<body>
+
+<!-- ═════════ p.0 안내 ═════════ -->
+<div class="page intro">
+  <div class="tagband"><span>박찬 과학 · 강의 판본</span><span>디자인 시안 3종 — 같은 내용(온실효과), 다른 옷</span></div>
+  <h1>강의 판본, 어떤 얼굴로 갈까요?</h1>
+  <p class="sub">설계 원칙은 세 시안 모두 같습니다 — <b>큰 글자(본책의 약 1.4배), 화면당 요소 최소화, 날개·배지·바로바로 체크 전부 제거, 그림은 한 장을 크게.</b><br>강의 대본이 책이 된 형태라, 원장님이 이 책을 그대로 읽으며 수업하실 수 있습니다. 다음 3쪽을 넘겨 보시고 골라 주세요.</p>
+  <div class="pcard">
+    <h2>시안 A — 판서 흐름형</h2>
+    <p>맨 위에 오늘 수업의 뼈대 3걸음(① → ② → ③)을 크게 박고, 큰 그림 한 장, 그 아래 말하기 대본. 수업의 지도가 페이지 위에 늘 보입니다.</p>
+    <span class="for">추천 — 흐름을 놓치지 않는 게 가장 중요할 때</span>
+  </div>
+  <div class="pcard">
+    <h2>시안 B — 대본 낭독형</h2>
+    <p>왼쪽 여백에 진행 표시(도입·핵심·그림·정리)만 두고, 본문은 명조체 큰 문장으로 낭독하듯 흘러갑니다. 형광펜 강조 = 힘줘 말할 단어. 가장 '대본'에 가깝습니다.</p>
+    <span class="for">추천 — 읽기만 하면 수업이 되게 하고 싶을 때</span>
+  </div>
+  <div class="pcard">
+    <h2>시안 C — 빅카드 3장형</h2>
+    <p>페이지가 큰 카드 3장: ① 오늘의 한 문장 ② 큰 그림+말할 거리 ③ 칠판에 쓸 것(손글씨 미리보기). 카드 한 장 = 말할 거리 한 덩이라 순서 부담이 없습니다.</p>
+    <span class="for">추천 — 자유롭게 카드 단위로 설명하고 싶을 때</span>
+  </div>
+  <p style="font-size:9.5pt; color:#8A949E; margin-top:4mm;">※ 셋 중 하나를 고르시면(또는 "A의 흐름 + C의 칠판 카드"처럼 조합도 가능) 그 규격으로 통합과학 1·2 전체 강의 판본을 제작합니다.</p>
+  <div class="folio"><span>박찬 과학 | 강의 판본 시안</span><span>0</span></div>
+</div>
+
+<!-- ═════════ 시안 A ═════════ -->
+<div class="page lect">
+  <div class="tagband"><span>II. 환경과 에너지 · 03 지구온난화와 기후변화</span><span>강의 판본</span></div>
+  <div class="siahn">시안 A</div>
+  <div class="a-lesson">첫 번째 이야기</div>
+  <div class="a-title">온실효과 —<br>지구의 <span class="soft">고마운 담요</span></div>
+
+  <div class="a-flow">
+    <div class="a-step"><span class="n">①</span><div class="t">빛은 들어온다</div><div class="d">태양 에너지는 가시광선으로 들어와 지표를 데운다.</div></div>
+    <div class="a-step"><span class="n">②</span><div class="t">열은 나가려 한다</div><div class="d">데워진 지표는 적외선으로 열을 내보낸다.</div></div>
+    <div class="a-step"><span class="n">③</span><div class="t">담요가 붙잡는다</div><div class="d">온실 기체가 적외선을 흡수했다가 되돌려 준다.</div></div>
+  </div>
+
+  <div class="a-fig">
+    <svg width="600" height="240" viewBox="0 0 600 240" font-family="PC Sans">
+      <defs>
+        <marker id="aY" markerWidth="9" markerHeight="9" refX="6" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6 Z" fill="#E8940A"/></marker>
+        <marker id="aR" markerWidth="9" markerHeight="9" refX="6" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6 Z" fill="#D6455D"/></marker>
+        <marker id="aG" markerWidth="9" markerHeight="9" refX="6" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6 Z" fill="#8A949E"/></marker>
+      </defs>
+      <rect x="20" y="196" width="560" height="24" rx="5" fill="#A8886B"/>
+      <text x="300" y="212" text-anchor="middle" fill="#fff" font-weight="800" font-size="12">지표 — 데워진 뒤 적외선으로 열을 내보낸다</text>
+      <rect x="20" y="80" width="560" height="22" rx="11" fill="#CBE8E1" opacity="0.9"/>
+      <text x="300" y="95" text-anchor="middle" fill="#0F6357" font-weight="800" font-size="12">온실 기체 층 — 수증기 · 이산화 탄소 · 메테인</text>
+      <circle cx="75" cy="30" r="20" fill="#F3C24E"/>
+      <line x1="92" y1="44" x2="160" y2="190" stroke="#E8940A" stroke-width="3.4" marker-end="url(#aY)"/>
+      <text x="105" y="140" font-size="11.5" fill="#B4830A" font-weight="800">① 가시광선</text>
+      <line x1="330" y1="192" x2="330" y2="110" stroke="#D6455D" stroke-width="3" marker-end="url(#aR)"/>
+      <text x="338" y="150" font-size="11.5" fill="#D6455D" font-weight="800">② 적외선</text>
+      <line x1="352" y1="86" x2="400" y2="30" stroke="#8A949E" stroke-width="2" stroke-dasharray="5 3" marker-end="url(#aG)"/>
+      <text x="404" y="24" font-size="10" fill="#8A949E">일부는 우주로</text>
+      <line x1="420" y1="106" x2="420" y2="188" stroke="#B4560E" stroke-width="3" marker-end="url(#aR)"/>
+      <text x="428" y="150" font-size="11.5" fill="#B4560E" font-weight="800">③ 되돌아오는 열</text>
+      <text x="300" y="236" text-anchor="middle" font-size="12.5" font-weight="900" fill="#0F6357">담요 덕분에 15 ℃ — 없다면 약 −18 ℃의 얼음 행성</text>
+    </svg>
+    <figcaption>이 그림 하나로 오늘 수업의 절반이 끝납니다</figcaption>
+  </div>
+
+  <div class="a-script">
+    <p>자, 오늘 첫 질문. <b>지구는 왜 얼음 행성이 아닐까요?</b> 태양 덕분이라고만 하면 절반짜리 답입니다. 달도 같은 태양을 받지만 밤이면 영하 백 몇십 도까지 떨어지거든요. 지구에는 달에 없는 것 — <b>담요</b>가 있습니다.</p>
+    <p>들어올 때는 가시광선, 나갈 때는 적외선. 그런데 대기 속 온실 기체가 <b>나가는 적외선만 붙잡았다가 되돌려 줍니다.</b> 이 담요가 지구를 15도로 지켜 줘요. 그러니 온실효과 자체는 죄가 없습니다 — 문제는 담요가 <b>두꺼워지는 것</b>. 그 이야기가 다음 페이지입니다.</p>
+    <div class="a-say">"담요와 담요 열 장은 다르다 — 이 구분이 오늘의 척추!"</div>
+  </div>
+  <div class="folio"><span>박찬 과학 강의 판본 | 통합과학 2</span><span>107</span></div>
+</div>
+
+<!-- ═════════ 시안 B ═════════ -->
+<div class="page lect">
+  <div class="tagband"><span>II. 환경과 에너지 · 03 지구온난화와 기후변화</span><span>강의 판본</span></div>
+  <div class="siahn">시안 B</div>
+  <div class="b-grid">
+    <div class="b-rail">
+      <div class="b-mark">도입<small>질문 던지기</small></div>
+      <div class="b-mark" style="margin-top:24mm;">핵심<small>담요의 원리</small></div>
+      <div class="b-mark" style="margin-top:30mm;">그림<small>구조 한 장</small></div>
+      <div class="b-mark" style="margin-top:44mm;">정리<small>한 문장으로</small></div>
+    </div>
+    <div class="b-body">
+      <div class="b-lesson">03 · 첫 번째 이야기</div>
+      <div class="b-title">온실효과 — 지구의 고마운 담요</div>
+      <p class="line">자, 오늘 첫 질문입니다. 지구는 왜 얼음 행성이 아닐까요? 달도 같은 태양을 받는데, 달의 밤은 영하 백 몇십 도입니다. 지구에는 달에 없는 것이 있어요.</p>
+      <p class="line">태양 에너지는 <b>가시광선</b>으로 들어와 지표를 데우고, 데워진 지표는 <b>적외선</b>으로 열을 내보냅니다. 그런데 수증기·이산화 탄소·메테인 — <b>온실 기체</b>가 나가려는 적외선을 붙잡았다가 사방으로 되돌려 줍니다.</p>
+      <div class="b-fig">
+        <svg width="470" height="150" viewBox="0 0 600 192" font-family="PC Sans">
+          <defs>
+            <marker id="bY" markerWidth="9" markerHeight="9" refX="6" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6 Z" fill="#E8940A"/></marker>
+            <marker id="bR" markerWidth="9" markerHeight="9" refX="6" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6 Z" fill="#D6455D"/></marker>
+          </defs>
+          <rect x="20" y="152" width="560" height="22" rx="5" fill="#A8886B"/>
+          <text x="300" y="167" text-anchor="middle" fill="#fff" font-weight="800" font-size="11.5">지표</text>
+          <rect x="20" y="58" width="560" height="20" rx="10" fill="#CBE8E1" opacity="0.9"/>
+          <text x="300" y="72" text-anchor="middle" fill="#0F6357" font-weight="800" font-size="11.5">온실 기체 층 (수증기 · 이산화 탄소 · 메테인)</text>
+          <circle cx="70" cy="24" r="16" fill="#F3C24E"/>
+          <line x1="84" y1="36" x2="150" y2="146" stroke="#E8940A" stroke-width="3" marker-end="url(#bY)"/>
+          <text x="96" y="110" font-size="11" fill="#B4830A" font-weight="800">가시광선 IN</text>
+          <line x1="330" y1="148" x2="330" y2="86" stroke="#D6455D" stroke-width="2.8" marker-end="url(#bR)"/>
+          <text x="338" y="120" font-size="11" fill="#D6455D" font-weight="800">적외선 OUT</text>
+          <line x1="410" y1="82" x2="410" y2="144" stroke="#B4560E" stroke-width="2.8" marker-end="url(#bR)"/>
+          <text x="418" y="116" font-size="11" fill="#B4560E" font-weight="800">되돌아오는 열</text>
+          <text x="300" y="188" text-anchor="middle" font-size="12" font-weight="900" fill="#0F6357">담요 덕분에 15 ℃ — 없다면 약 −18 ℃</text>
+        </svg>
+      </div>
+      <p class="line">이 담요 덕분에 지구 평균 기온은 <b>15도</b>. 담요가 아예 없다면 <b>영하 18도</b> — 바다가 얼어붙는 행성이 됐을 겁니다.</p>
+      <div class="b-wrap">
+        <div class="t">칠판에 이 한 줄</div>
+        <p>온실효과는 죄가 없다 — 문제는 담요가 '두꺼워지는 것'이다.</p>
+      </div>
+    </div>
+  </div>
+  <div class="folio"><span>박찬 과학 강의 판본 | 통합과학 2</span><span>107</span></div>
+</div>
+
+<!-- ═════════ 시안 C ═════════ -->
+<div class="page lect">
+  <div class="tagband"><span>II. 환경과 에너지 · 03 지구온난화와 기후변화</span><span>강의 판본</span></div>
+  <div class="siahn">시안 C</div>
+
+  <div class="c-card c-one">
+    <div class="k">CARD 1 · 오늘의 한 문장</div>
+    <div class="s">"온실효과는 죄가 없다 —<br>죄는 담요가 두꺼워지는 데 있다."</div>
+  </div>
+
+  <div class="c-card c-two">
+    <div class="k">CARD 2 · 큰 그림 + 말할 거리</div>
+    <svg width="560" height="176" viewBox="0 0 600 188" font-family="PC Sans">
+      <defs>
+        <marker id="cY" markerWidth="9" markerHeight="9" refX="6" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6 Z" fill="#E8940A"/></marker>
+        <marker id="cR" markerWidth="9" markerHeight="9" refX="6" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6 Z" fill="#D6455D"/></marker>
+      </defs>
+      <rect x="20" y="148" width="560" height="22" rx="5" fill="#A8886B"/>
+      <text x="300" y="163" text-anchor="middle" fill="#fff" font-weight="800" font-size="11.5">지표</text>
+      <rect x="20" y="54" width="560" height="20" rx="10" fill="#A9D9CE"/>
+      <text x="300" y="68" text-anchor="middle" fill="#0F6357" font-weight="800" font-size="11.5">온실 기체 층 (수증기 · 이산화 탄소 · 메테인)</text>
+      <circle cx="70" cy="22" r="15" fill="#F3C24E"/>
+      <line x1="84" y1="34" x2="150" y2="142" stroke="#E8940A" stroke-width="3" marker-end="url(#cY)"/>
+      <text x="95" y="106" font-size="11" fill="#B4830A" font-weight="800">가시광선 IN</text>
+      <line x1="330" y1="144" x2="330" y2="82" stroke="#D6455D" stroke-width="2.8" marker-end="url(#cR)"/>
+      <text x="338" y="116" font-size="11" fill="#D6455D" font-weight="800">적외선 OUT</text>
+      <line x1="410" y1="78" x2="410" y2="140" stroke="#B4560E" stroke-width="2.8" marker-end="url(#cR)"/>
+      <text x="418" y="112" font-size="11" fill="#B4560E" font-weight="800">되돌아오는 열</text>
+      <text x="300" y="184" text-anchor="middle" font-size="12" font-weight="900" fill="#0F6357">담요 덕분에 15 ℃ — 없다면 약 −18 ℃</text>
+    </svg>
+    <p class="talk">지구는 왜 얼음 행성이 아닐까 — 달과 비교로 시작하세요. 들어올 땐 <b>가시광선</b>, 나갈 땐 <b>적외선</b>, 그리고 담요(온실 기체)가 나가는 열만 붙잡아 되돌려 준다는 세 걸음이면 됩니다.</p>
+  </div>
+
+  <div class="c-card c-three">
+    <div class="k">CARD 3 · 칠판에 쓸 것</div>
+    <div class="board">들어올 땐 가시광선, 나갈 땐 적외선!<br>담요(수증기·CO₂·메테인)가 열을 붙잡는다<br><span class="hl">담요 없으면 −18℃ / 담요 덕분에 15℃</span></div>
+  </div>
+
+  <div class="folio"><span>박찬 과학 강의 판본 | 통합과학 2</span><span>107</span></div>
+</div>
+
+</body>
+</html>

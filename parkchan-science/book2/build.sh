@@ -42,6 +42,7 @@ render chapter-2302/chapter.html chapter-2302/chapter.pdf
 render chapter-2303/chapter.html chapter-2303/chapter.pdf
 render summary-3/summary.html summary-3/summary.pdf
 render back-matter/back.html back-matter/back.pdf
+render mock-exam/exam.html mock-exam/exam.pdf
 
 # 3) 조판 QA
 python3 ../tools/qa_check.py front-matter/front.html
@@ -82,6 +83,7 @@ python3 ../tools/pdf_text_check.py chapter-2302/chapter.html chapter-2302/chapte
 python3 ../tools/pdf_text_check.py chapter-2303/chapter.html chapter-2303/chapter.pdf
 python3 ../tools/pdf_text_check.py summary-3/summary.html summary-3/summary.pdf
 python3 ../tools/pdf_text_check.py back-matter/back.html back-matter/back.pdf
+python3 ../tools/pdf_text_check.py mock-exam/exam.html mock-exam/exam.pdf
 
 # 5) 합본 PDF (지금까지 완성된 챕터 축적분)
 python3 - <<'PYEOF'
@@ -93,7 +95,8 @@ for f in ["front-matter/front.pdf",
           "chapter-2201/chapter.pdf", "chapter-2202/chapter.pdf", "chapter-2203/chapter.pdf",
           "chapter-2204/chapter.pdf", "chapter-2205/chapter.pdf", "summary-2/summary.pdf",
           "chapter-2301/chapter.pdf", "chapter-2302/chapter.pdf", "chapter-2303/chapter.pdf",
-          "summary-3/summary.pdf", "back-matter/back.pdf"]:
+          "summary-3/summary.pdf", "back-matter/back.pdf",
+          "mock-exam/exam.pdf"]:
     with pymupdf.open(f) as d:
         out.insert_pdf(d)
 try:

@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<title>박찬 과학 실전 모의고사 — 통합과학 2</title>
+<style>
+  @font-face { font-family:'PC Serif'; src:url('file:///root/.fonts/NotoSerifKR.ttf'); font-weight:100 900; }
+  @font-face { font-family:'PC Sans'; src:url('file:///root/.fonts/NotoSansKR.ttf'); font-weight:100 900; }
+  *{ box-sizing:border-box; margin:0; padding:0; -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+  @page{ size:210mm 275mm; margin:0; }
+  body{ font-family:'PC Serif',serif; color:#000; word-break:keep-all; }
+  .sheet{ width:210mm; height:275mm; overflow:hidden; page-break-after:always; padding:9mm 11mm 10mm; position:relative; display:flex; flex-direction:column;}
+
+  /* ── 1면 헤더 ── */
+  .exam-top{ display:flex; justify-content:space-between; align-items:flex-end; font-size:9pt; }
+  .exam-top .lead{ font-weight:600; letter-spacing:0.04em; }
+  .gyosi{ border:0.5mm solid #000; padding:1.6mm 4mm; font-size:11pt; font-weight:800; letter-spacing:0.25em;}
+  h1.exam-title{ text-align:center; font-size:22pt; font-weight:900; letter-spacing:0.06em; margin:4mm 0 1.5mm; }
+  .subject-line{ display:flex; justify-content:center; align-items:baseline; gap:4mm; margin-bottom:3.5mm;}
+  .subject-line .subj{ font-size:14.5pt; font-weight:800; letter-spacing:0.12em;}
+  .idbox{ display:flex; justify-content:center; gap:6mm; font-size:9.5pt; margin-bottom:3mm;}
+  .idbox .cell{ display:flex; align-items:center; gap:2.5mm;}
+  .idbox .cell .lab{ font-weight:700; }
+  .idbox .cell .fill{ display:inline-block; width:34mm; border-bottom:0.35mm solid #000; height:5.5mm;}
+  .rule2{ border-top:0.75mm solid #000; border-bottom:0.25mm solid #000; height:1.6mm; margin-bottom:2mm;}
+  .notice{ font-size:8.4pt; line-height:1.6; padding:0.5mm 1mm 1.6mm; display:flex; justify-content:space-between;}
+
+  /* ── 2단 본문 ── */
+  .twocol{ flex:1; display:grid; grid-template-columns:1fr 1fr; column-gap:8mm; position:relative; min-height:0; padding-top:2mm;}
+  .twocol::before{ content:""; position:absolute; left:50%; top:0; bottom:0; width:0.25mm; background:#000; }
+  .col{ min-width:0; padding:0 1mm; }
+
+  .qq{ margin-bottom:6mm; }
+  .qq .stem{ font-size:9.4pt; line-height:1.64; text-align:justify; }
+  .qq .stem b.qn{ font-weight:900; font-size:10.3pt; margin-right:1.2mm;}
+  .qq .pts{ font-weight:700; }
+  .bogi{ border:0.35mm solid #000; margin:2.2mm 2mm; padding:1.8mm 3mm; font-size:9.2pt; line-height:1.68;}
+  .bogi .bt{ text-align:center; letter-spacing:0.5em; font-weight:700; font-size:8.8pt; margin-bottom:0.6mm;}
+  .dta{ border:0.35mm solid #000; margin:2.2mm 2mm; padding:1.8mm 3mm; font-size:9.2pt; line-height:1.66;}
+  .ch{ list-style:none; font-size:9.3pt; line-height:1.76; margin:1.4mm 0 0 1mm;}
+  .ch.row{ display:flex; flex-wrap:wrap; gap:0 5.5mm;}
+  figure{ margin:2.2mm auto; text-align:center;}
+  figure .cap{ font-size:8.4pt; margin-top:0.8mm; }
+
+  /* ── 풋 ── */
+  .exam-foot{ display:flex; justify-content:space-between; align-items:center; font-size:8.4pt; margin-top:2.5mm; }
+  .exam-foot .pg{ font-size:10.5pt; font-weight:800; }
+  .cont-note{ text-align:right; font-size:8.6pt; font-weight:700; margin-top:1mm;}
+  .runsubj{ display:flex; justify-content:space-between; align-items:center; border-bottom:0.5mm solid #000; padding-bottom:1.5mm; margin-bottom:3mm; font-size:10pt; }
+  .runsubj .s{ font-weight:800; letter-spacing:0.1em; }
+
+  /* ── 해설면 ── */
+  .sol-sheet{ font-family:'PC Sans',sans-serif; }
+  .sol-head{ background:#2B2B2B; color:#fff; border-radius:2.5mm; padding:3mm 5mm; display:flex; justify-content:space-between; align-items:center; margin-bottom:4mm;}
+  .sol-head .t{ font-size:13pt; font-weight:900; }
+  .sol-head .d{ font-size:8.5pt; }
+  table.anst{ width:100%; border-collapse:collapse; font-size:9pt; margin-bottom:4mm; }
+  table.anst th, table.anst td{ border:0.25mm solid #999; padding:1.6mm 1mm; text-align:center; }
+  table.anst th{ background:#EFEFEF; font-weight:800; }
+  table.anst td.a{ font-weight:800; font-size:10pt; }
+  .solcols{ column-count:2; column-gap:7mm; column-rule:0.25mm solid #CCC; }
+  .sol{ break-inside:avoid; margin-bottom:3.2mm; font-size:8.7pt; line-height:1.6; }
+  .sol b.n{ display:inline-block; background:#2B2B2B; color:#fff; border-radius:2mm; padding:0.2mm 2mm; font-size:8.2pt; margin-right:1.5mm; }
+  .sol .a{ font-weight:800; }
+</style>
+</head>
+<body>
+
+<!-- ════════ 1면 (Q1-4) ════════ -->
+<div class="sheet">
+  <div class="exam-top">
+    <span class="lead">2029학년도 대학수학능력시험 대비 · 제1회</span>
+    <span class="gyosi">제 4 교 시</span>
+  </div>
+  <h1 class="exam-title">박찬 과학 실전 모의고사 문제지</h1>
+  <div class="subject-line"><span class="subj">과학탐구 영역 ( 통합과학 2 전 범위 )</span></div>
+  <div class="idbox">
+    <span class="cell"><span class="lab">성명</span><span class="fill"></span></span>
+    <span class="cell"><span class="lab">수험 번호</span><span class="fill"></span></span>
+  </div>
+  <div class="rule2"></div>
+  <div class="notice">
+    <span>◦ 문제지의 해당란에 성명과 수험 번호를 정확히 쓰시오.<br>◦ 답안지의 해당란에 성명과 수험 번호를 쓰고, 또 수험 번호와 답을 정확히 표시하시오.</span>
+    <span style="text-align:right;">◦ 문항수 : 25문항 (총 50점)<br>◦ 시험 시간 : 40분</span>
+  </div>
+
+  <div class="twocol">
+    <div class="col">
+      <div class="qq">
+        <p class="stem"><b class="qn">1.</b>표준 화석과 그 화석이 대표하는 지질시대를 옳게 짝지은 것은? <span class="pts">[1.5점]</span></p>
+        <ul class="ch">
+          <li>① 삼엽충 — 중생대</li>
+          <li>② 삼엽충 — 고생대</li>
+          <li>③ 암모나이트 — 신생대</li>
+          <li>④ 매머드 — 고생대</li>
+          <li>⑤ 공룡 — 신생대</li>
+        </ul>
+      </div>
+
+      <div class="qq">
+        <p class="stem"><b class="qn">2.</b>지질시대 동안 일어난 대멸종에 대한 설명으로 옳은 것은? <span class="pts">[1.5점]</span></p>
+        <ul class="ch">
+          <li>① 대멸종 이후 생물다양성은 다시 회복되지 못하였다.</li>
+          <li>② 중생대 말의 대멸종이 규모가 가장 컸다.</li>
+          <li>③ 지질시대 동안 생물다양성은 항상 일정하게 유지되었다.</li>
+          <li>④ 고생대 말의 대멸종은 규모가 가장 컸다.</li>
+          <li>⑤ 지질시대 동안 대멸종은 단 한 번 일어났다.</li>
+        </ul>
+      </div>
+
+      <div class="qq">
+        <p class="stem"><b class="qn">3.</b>그림은 지질시대 동안 해양 생물 과(科)의 수 변화를 나타낸 것이다. A, B는 각각 고생대 말과 중생대 말의 대멸종 시기이다.</p>
+        <figure>
+          <svg width="260" height="86" viewBox="0 0 290 96" font-family="PC Serif">
+            <defs><marker id="axq3" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="#000"/></marker></defs>
+            <line x1="30" y1="76" x2="278" y2="76" stroke="#000" stroke-width="1.1" marker-end="url(#axq3)"/>
+            <line x1="30" y1="76" x2="30" y2="8" stroke="#000" stroke-width="1.1" marker-end="url(#axq3)"/>
+            <text x="34" y="12" font-size="7.6">과의 수</text>
+            <text x="272" y="88" text-anchor="end" font-size="7.6">시간</text>
+            <path d="M32,70 C55,64 90,48 118,42 L127,60 C150,55 180,44 204,40 L211,48 C235,43 258,26 274,15" fill="none" stroke="#000" stroke-width="1.6"/>
+            <line x1="122" y1="42" x2="122" y2="76" stroke="#555" stroke-width="0.7" stroke-dasharray="2.5 2"/>
+            <line x1="207" y1="40" x2="207" y2="76" stroke="#555" stroke-width="0.7" stroke-dasharray="2.5 2"/>
+            <text x="122" y="86" text-anchor="middle" font-size="8.4" font-weight="800">A</text>
+            <text x="207" y="86" text-anchor="middle" font-size="8.4" font-weight="800">B</text>
+          </svg>
+        </figure>
+        <p class="stem">이에 대한 설명으로 옳은 것만을 &lt;보기&gt;에서 있는 대로 고른 것은? <span class="pts">[2점]</span></p>
+        <div class="bogi">
+          <div class="bt">&lt; 보 기 &gt;</div>
+          ㄱ. 과의 수 감소 폭은 A 시기가 B 시기보다 크다.<br>
+          ㄴ. A 시기 이후 생물다양성은 회복되지 못하였다.<br>
+          ㄷ. 현재의 생물다양성은 고생대보다 낮다.
+        </div>
+        <ul class="ch row">
+          <li>① ㄱ</li><li>② ㄷ</li><li>③ ㄱ, ㄴ</li><li>④ ㄴ, ㄷ</li><li>⑤ ㄱ, ㄴ, ㄷ</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="col">
+      <div class="qq">
+        <p class="stem"><b class="qn">4.</b>다음은 항생제 내성 세균의 출현에 대한 세 학생의 대화이다. <span class="pts">[2점]</span></p>
+        <div class="bogi" style="letter-spacing:-0.01em;">
+          <span style="font-weight:700;">학생 A :</span> 세균 집단에는 항생제를 쓰기 전부터 내성 정도에 변이가 존재해.<br>
+          <span style="font-weight:700;">학생 B :</span> 항생제가 쓰이는 환경에서는 내성이 있는 세균이 살아남아 더 많이 번식하지.<br>
+          <span style="font-weight:700;">학생 C :</span> 살아남은 세균의 내성 형질은 자손에게 전달돼.
+        </div>
+        <p class="stem" style="margin-top:1.5mm;">제시한 내용이 옳은 학생만을 있는 대로 고른 것은?</p>
+        <ul class="ch row">
+          <li>① A</li><li>② C</li><li>③ A, B</li><li>④ B, C</li><li>⑤ A, B, C</li>
+        </ul>
+      </div>
+
+      <div class="qq">
+        <p class="stem"><b class="qn">5.</b>그림은 어느 섬에서 가뭄 전과 가뭄 후에 조사한 핀치 집단의 부리 깊이 분포를 나타낸 것이다. 가뭄 동안 부드러운 씨앗이 줄어 크고 단단한 씨앗이 주된 먹이가 되었고, 평균 부리 깊이는 약 9.4 mm에서 약 9.7 mm로 변하였다.</p>
+        <figure>
+          <svg width="264" height="84" viewBox="0 0 290 92" font-family="PC Serif">
+            <defs><marker id="axq5" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="#000"/></marker></defs>
+            <line x1="34" y1="70" x2="276" y2="70" stroke="#000" stroke-width="1.1" marker-end="url(#axq5)"/>
+            <line x1="34" y1="70" x2="34" y2="8" stroke="#000" stroke-width="1.1" marker-end="url(#axq5)"/>
+            <text x="38" y="12" font-size="7.6">개체 수</text>
+            <text x="268" y="82" text-anchor="end" font-size="7.6">부리 깊이(mm)</text>
+            <path d="M50,69 C85,66 100,26 138,24 C168,26 186,60 226,69" fill="none" stroke="#000" stroke-width="1.5"/>
+            <path d="M74,69 C110,65 128,32 162,29 C196,32 214,62 252,69" fill="none" stroke="#000" stroke-width="1.5" stroke-dasharray="4 2.4"/>
+            <line x1="138" y1="24" x2="138" y2="70" stroke="#888" stroke-width="0.6" stroke-dasharray="2 2"/>
+            <line x1="162" y1="29" x2="162" y2="70" stroke="#888" stroke-width="0.6" stroke-dasharray="2 2"/>
+            <text x="132" y="80" text-anchor="middle" font-size="7.4">9.4</text>
+            <text x="168" y="80" text-anchor="middle" font-size="7.4">9.7</text>
+            <text x="92" y="22" font-size="7.6" font-weight="700">가뭄 전(실선)</text>
+            <text x="196" y="22" font-size="7.6" font-weight="700">가뭄 후(점선)</text>
+          </svg>
+        </figure>
+        <p class="stem">이에 대한 설명으로 옳은 것만을 &lt;보기&gt;에서 있는 대로 고른 것은? <span class="pts">[2.5점]</span></p>
+        <div class="bogi">
+          <div class="bt">&lt; 보 기 &gt;</div>
+          ㄱ. 가뭄 후 집단의 평균 부리 깊이는 증가하였다.<br>
+          ㄴ. 가뭄이 부리 깊이의 변이를 새로 만들어 냈다.<br>
+          ㄷ. 가뭄 동안 부리가 큰 개체가 생존과 번식에 유리하였다.
+        </div>
+        <ul class="ch row">
+          <li>① ㄱ</li><li>② ㄴ</li><li>③ ㄱ, ㄷ</li><li>④ ㄴ, ㄷ</li><li>⑤ ㄱ, ㄴ, ㄷ</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="cont-note">▶ 다음 면에 계속</div>
+  <div class="exam-foot"><span>이 문제지의 저작권은 박찬 과학학원에 있습니다.</span><span class="pg">1</span><span>박찬 과학 앱에서 전 문항 해설 제공</span></div>
+</div>
+
+<!-- ════════ 2면 (Q6-10) ════════ -->
+<div class="sheet">
+  <div class="runsubj"><span class="s">과학탐구 영역 ( 통합과학 2 )</span><span style="font-size:8.6pt;">박찬 과학 실전 모의고사 · 제1회</span></div>
+  <div class="twocol">
+    <div class="col">
+      <div class="qq">
+        <p class="stem"><b class="qn">6.</b>다음은 용광로에서 일어나는 철의 제련 반응이다. <span class="pts">[1.5점]</span></p>
+        <div class="dta" style="text-align:center;">산화 철 + 탄소(코크스) → 철 + 이산화 탄소</div>
+        <p class="stem">이 반응에 대한 설명으로 옳은 것은?</p>
+        <ul class="ch">
+          <li>① 산화 철은 산소를 얻어 산화된다.</li>
+          <li>② 탄소는 산소를 잃고 환원된다.</li>
+          <li>③ 이 반응에서 산소의 이동은 일어나지 않는다.</li>
+          <li>④ 철은 산소를 얻는다.</li>
+          <li>⑤ 탄소는 산소를 얻어 산화된다.</li>
+        </ul>
+      </div>
+
+      <div class="qq">
+        <p class="stem"><b class="qn">7.</b>아연판을 푸른색 황산 구리(Ⅱ) 수용액에 담갔더니 아연판 표면에 붉은색 물질이 석출되고 용액의 푸른색이 점점 옅어졌다. 이에 대한 설명으로 옳은 것은? <span class="pts">[2점]</span></p>
+        <ul class="ch">
+          <li>① 아연은 전자를 얻어 환원된다.</li>
+          <li>② 구리 이온은 전자를 얻어 구리로 석출된다.</li>
+          <li>③ 반응이 진행될수록 용액의 푸른색은 진해진다.</li>
+          <li>④ 아연 이온은 전자를 잃고 아연이 된다.</li>
+          <li>⑤ 이 반응에서는 산소가 이동한다.</li>
+        </ul>
+      </div>
+
+      <div class="qq">
+        <p class="stem"><b class="qn">8.</b>그림은 일정량의 묽은 염산에 같은 농도의 수산화 나트륨 수용액을 조금씩 넣을 때, 혼합 용액 속 이온 A ~ C의 수 변화를 나타낸 것이다. P는 완전 중화 지점이다.</p>
+        <figure>
+          <svg width="290" height="96" viewBox="0 0 290 96" font-family="PC Serif">
+            <defs><marker id="axq8" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="#000"/></marker></defs>
+            <line x1="34" y1="76" x2="276" y2="76" stroke="#000" stroke-width="1.1" marker-end="url(#axq8)"/>
+            <line x1="34" y1="76" x2="34" y2="8" stroke="#000" stroke-width="1.1" marker-end="url(#axq8)"/>
+            <text x="38" y="12" font-size="7.6">이온 수</text>
+            <text x="268" y="88" text-anchor="end" font-size="7.6">넣은 수산화 나트륨 수용액의 부피</text>
+            <line x1="34" y1="30" x2="262" y2="30" stroke="#000" stroke-width="1.5"/>
+            <text x="268" y="33" font-size="8.2" font-weight="800">B</text>
+            <line x1="34" y1="30" x2="150" y2="74" stroke="#000" stroke-width="1.5" stroke-dasharray="4 2.4"/>
+            <text x="120" y="56" font-size="8.2" font-weight="800">A</text>
+            <line x1="34" y1="76" x2="262" y2="20" stroke="#000" stroke-width="1.2" stroke-dasharray="1.4 1.8"/>
+            <text x="240" y="18" font-size="8.2" font-weight="800">C</text>
+            <line x1="150" y1="76" x2="150" y2="70" stroke="#000" stroke-width="1"/>
+            <text x="150" y="88" text-anchor="middle" font-size="8" font-weight="700">P</text>
+          </svg>
+        </figure>
+        <p class="stem">이에 대한 설명으로 옳은 것만을 &lt;보기&gt;에서 있는 대로 고른 것은? <span class="pts">[2.5점]</span></p>
+        <div class="bogi">
+          <div class="bt">&lt; 보 기 &gt;</div>
+          ㄱ. B는 반응에 참여하지 않는 구경꾼 이온이다.<br>
+          ㄴ. P까지 혼합 용액 속 총 이온 수는 일정하다.<br>
+          ㄷ. A는 나트륨 이온(Na⁺)이다.
+        </div>
+        <ul class="ch row">
+          <li>① ㄱ</li><li>② ㄷ</li><li>③ ㄱ, ㄷ</li><li>④ ㄱ, ㄴ</li><li>⑤ ㄱ, ㄴ, ㄷ</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="col">
+      <div class="qq">
+        <p class="stem"><b class="qn">9.</b>화학 변화에서의 에너지 출입에 대한 설명으로 옳은 것은? <span class="pts">[2점]</span></p>
+        <ul class="ch">
+          <li>① 연소와 중화 반응은 모두 발열 반응이다.</li>
+          <li>② 광합성은 에너지를 방출하는 발열 반응이다.</li>
+          <li>③ 발열 반응이 일어나면 주위의 온도가 낮아진다.</li>
+          <li>④ 질산 암모늄이 물에 녹으면 주위의 온도가 높아진다.</li>
+          <li>⑤ 흡열 반응은 에너지를 방출하는 반응이다.</li>
+        </ul>
+      </div>
+
+      <div class="qq">
+        <p class="stem"><b class="qn">10.</b>생태계의 구성에 대한 설명으로 옳은 것은? <span class="pts">[1.5점]</span></p>
+        <ul class="ch">
+          <li>① 빛과 온도는 생물적 요인에 해당한다.</li>
+          <li>② 일정한 지역에 사는 같은 종의 무리를 군집이라 한다.</li>
+          <li>③ 분해자는 생물의 사체나 배설물을 분해하여 물질을 비생물 환경으로 되돌린다.</li>
+          <li>④ 생산자는 다른 생물을 먹이로 하여 양분을 얻는다.</li>
+          <li>⑤ 비생물적 환경 요인은 생물에 영향을 주지 않는다.</li>
+        </ul>
+      </div>
+
+      <div class="qq">
+        <p class="stem"><b class="qn">11.</b>다음은 어느 숲의 층상 구조에서 높이에 따라 도달하는 빛의 양을 조사한 자료이다. <span class="pts">[2점]</span></p>
+        <div class="dta">
+          숲의 꼭대기(교목층)에 도달하는 빛의 양을 100 %라 할 때, 관목층에는 약 10 %, 지표 부근의 초본층에는 수 % 만이 도달하였다. 지표 부근에는 그늘에서도 잘 자라는 식물이 주로 분포하였다.
+        </div>
+        <p class="stem">이 자료에 대한 해석으로 가장 적절한 것은?</p>
+        <ul class="ch">
+          <li>① 숲의 모든 높이에서 같은 양의 빛이 도달한다.</li>
+          <li>② 지표 부근의 식물은 빛과 무관하게 분포한다.</li>
+          <li>③ 아래층 식물은 위층 식물보다 강한 빛에 적응해 있다.</li>
+          <li>④ 아래층으로 갈수록 도달하는 빛이 줄어, 층마다 빛 환경에 적응한 식물이 분포한다.</li>
+          <li>⑤ 층상 구조는 온도에 대한 적응의 결과이다.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="cont-note">▶ 다음 면에 계속</div>
+  <div class="exam-foot"><span>이 문제지의 저작권은 박찬 과학학원에 있습니다.</span><span class="pg">2</span><span>박찬 과학 앱에서 전 문항 해설 제공</span></div>
+</div>
+
+<!-- ════════ 3면 (Q12-15) ════════ -->
+<div class="sheet">
+  <div class="runsubj"><span class="s">과학탐구 영역 ( 통합과학 2 )</span><span style="font-size:8.6pt;">박찬 과학 실전 모의고사 · 제1회</span></div>
+  <div class="twocol">
+    <div class="col">
+      <div class="qq">
+        <p class="stem"><b class="qn">12.</b>안정된 초원 생태계에서 1차 소비자인 메뚜기의 수가 일시적으로 크게 늘었다. 이후 일어나는 변화에 대한 설명으로 옳은 것만을 &lt;보기&gt;에서 있는 대로 고른 것은? <span class="pts">[2점]</span></p>
+        <div class="bogi">
+          <div class="bt">&lt; 보 기 &gt;</div>
+          ㄱ. 직후 생산자인 풀의 양은 감소한다.<br>
+          ㄴ. 메뚜기를 먹는 2차 소비자의 수는 감소한다.<br>
+          ㄷ. 먹이 그물이 복잡한 생태계일수록 평형이 회복되기 쉽다.
+        </div>
+        <ul class="ch row">
+          <li>① ㄱ</li><li>② ㄱ, ㄷ</li><li>③ ㄴ</li><li>④ ㄴ, ㄷ</li><li>⑤ ㄱ, ㄴ, ㄷ</li>
+        </ul>
+      </div>
+
+      <div class="qq">
+        <p class="stem"><b class="qn">13.</b>다음은 미국 옐로스톤 국립공원의 사례이다. <span class="pts">[2.5점]</span></p>
+        <div class="dta">
+          1995년 최상위 포식자인 늑대를 복원하자, 크게 늘어 있던 엘크(초식 동물)의 수가 줄고 행동이 조심스러워졌다. 그 결과 강가의 버드나무와 사시나무가 되살아났고, 이를 재료로 집을 짓는 비버가 돌아오는 등 생태계 전체가 달라졌다.
+        </div>
+        <p class="stem">이에 대한 설명으로 옳은 것만을 &lt;보기&gt;에서 있는 대로 고른 것은?</p>
+        <div class="bogi">
+          <div class="bt">&lt; 보 기 &gt;</div>
+          ㄱ. 늑대는 먹이 사슬을 통해 엘크의 수와 행동을 조절하였다.<br>
+          ㄴ. 강가 식생의 회복은 늑대 복원의 간접적인 효과다.<br>
+          ㄷ. 한 종의 복원이 생태계 전체의 평형에 영향을 줄 수 있다.
+        </div>
+        <ul class="ch row">
+          <li>① ㄱ</li><li>② ㄷ</li><li>③ ㄱ, ㄴ</li><li>④ ㄴ, ㄷ</li><li>⑤ ㄱ, ㄴ, ㄷ</li>
+        </ul>
+      </div>
+
+      <div class="qq">
+        <p class="stem"><b class="qn">14.</b>온실효과에 대한 설명으로 옳은 것은? <span class="pts">[1.5점]</span></p>
+        <ul class="ch">
+          <li>① 온실 기체는 지표가 내보내는 적외선을 흡수했다가 재방출한다.</li>
+          <li>② 온실 기체는 태양의 가시광선을 대부분 흡수한다.</li>
+          <li>③ 온실효과가 전혀 없다면 지구의 평균 기온은 지금보다 높을 것이다.</li>
+          <li>④ 수증기는 온실 기체에 해당하지 않는다.</li>
+          <li>⑤ 온실효과 자체가 지구온난화를 뜻한다.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="col">
+      <div class="qq">
+        <p class="stem"><b class="qn">15.</b>그림은 하와이 마우나로아 관측소에서 측정한 대기 중 이산화 탄소 농도 변화를 나타낸 것이다. 농도는 1958년 관측 시작 당시 약 315 ppm에서 최근 약 420 ppm까지 변하였다.</p>
+        <figure>
+          <svg width="290" height="96" viewBox="0 0 290 96" font-family="PC Serif">
+            <defs><marker id="axq15" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="#000"/></marker></defs>
+            <line x1="40" y1="76" x2="278" y2="76" stroke="#000" stroke-width="1.1" marker-end="url(#axq15)"/>
+            <line x1="40" y1="76" x2="40" y2="8" stroke="#000" stroke-width="1.1" marker-end="url(#axq15)"/>
+            <text x="44" y="12" font-size="7.6">CO₂ 농도(ppm)</text>
+            <text x="270" y="88" text-anchor="end" font-size="7.6">연도</text>
+            <text x="36" y="70" text-anchor="end" font-size="7.2">315</text>
+            <text x="36" y="24" text-anchor="end" font-size="7.2">420</text>
+            <path d="M44,66 L50,62 L56,65 L62,60 L68,63 L74,58 L80,61 L86,55 L92,58 L98,52 L104,55 L110,49 L116,52 L122,46 L128,49 L134,43 L140,46 L146,40 L152,43 L158,37 L164,40 L170,34 L176,37 L182,31 L188,34 L194,29 L200,32 L206,26 L212,29 L218,24 L224,27 L230,22 L236,25 L242,21 L248,23 L254,19 L260,21" fill="none" stroke="#000" stroke-width="1.3"/>
+            <line x1="44" y1="66" x2="44" y2="76" stroke="#888" stroke-width="0.6" stroke-dasharray="2 2"/>
+            <text x="48" y="86" text-anchor="middle" font-size="7.2">1958</text>
+          </svg>
+        </figure>
+        <p class="stem">이에 대한 설명으로 옳은 것만을 &lt;보기&gt;에서 있는 대로 고른 것은? <span class="pts">[2점]</span></p>
+        <div class="bogi">
+          <div class="bt">&lt; 보 기 &gt;</div>
+          ㄱ. 관측 기간 동안 이산화 탄소 농도는 장기적으로 증가하였다.<br>
+          ㄴ. 곡선의 톱니 모양은 계절에 따른 광합성량의 변화와 관련이 있다.<br>
+          ㄷ. 화석 연료의 사용은 이러한 농도 증가의 주요 원인으로 꼽힌다.
+        </div>
+        <ul class="ch row">
+          <li>① ㄱ</li><li>② ㄷ</li><li>③ ㄱ, ㄴ</li><li>④ ㄴ, ㄷ</li><li>⑤ ㄱ, ㄴ, ㄷ</li>
+        </ul>
+      </div>
+
+      <div class="qq">
+        <p class="stem"><b class="qn">16.</b>그림은 적도 부근 태평양의 평상시와 어느 시기 (가)의 대기와 해수의 흐름을 나타낸 것이다. (가) 시기에는 무역풍이 평상시보다 약하다.</p>
+        <figure>
+          <svg width="290" height="104" viewBox="0 0 290 104" font-family="PC Serif">
+            <defs><marker id="axq16" markerWidth="7" markerHeight="7" refX="5" refY="2.5" orient="auto"><path d="M0,0 L6,2.5 L0,5 Z" fill="#000"/></marker></defs>
+            <g>
+              <text x="70" y="12" text-anchor="middle" font-size="8" font-weight="700">평상시</text>
+              <rect x="10" y="40" width="120" height="34" fill="#E8E8E8"/>
+              <path d="M10,40 L60,40 L130,52 L130,74 L10,74 Z" fill="#BDBDBD"/>
+              <line x1="112" y1="26" x2="34" y2="26" stroke="#000" stroke-width="1.6" marker-end="url(#axq16)"/>
+              <text x="72" y="22" text-anchor="middle" font-size="7">무역풍</text>
+              <text x="16" y="86" font-size="7">서태평양</text>
+              <text x="94" y="86" font-size="7">동태평양</text>
+              <line x1="118" y1="48" x2="118" y2="64" stroke="#000" stroke-width="1.1" marker-end="url(#axq16)" transform="rotate(180 118 56)"/>
+              <text x="124" y="60" font-size="6.6">용승</text>
+            </g>
+            <g transform="translate(150,0)">
+              <text x="70" y="12" text-anchor="middle" font-size="8" font-weight="700">(가) 시기</text>
+              <rect x="10" y="40" width="120" height="34" fill="#E8E8E8"/>
+              <path d="M10,40 L110,40 L130,46 L130,74 L10,74 Z" fill="#BDBDBD"/>
+              <line x1="100" y1="26" x2="52" y2="26" stroke="#000" stroke-width="1" stroke-dasharray="3 2" marker-end="url(#axq16)"/>
+              <text x="76" y="22" text-anchor="middle" font-size="7">무역풍 약화</text>
+              <text x="16" y="86" font-size="7">서태평양</text>
+              <text x="94" y="86" font-size="7">동태평양</text>
+            </g>
+            <text x="145" y="100" text-anchor="middle" font-size="7.2">(회색 짙은 부분 : 따뜻한 해수층)</text>
+          </svg>
+        </figure>
+        <p class="stem">(가) 시기에 대한 설명으로 옳은 것은? <span class="pts">[2.5점]</span></p>
+        <ul class="ch">
+          <li>① 무역풍이 평상시보다 강해진 엘니뇨 시기이다.</li>
+          <li>② 동태평양에서 찬 해수의 용승이 강해진다.</li>
+          <li>③ 무역풍이 약해져 따뜻한 해수가 동태평양 쪽에 머무는 엘니뇨 시기이다.</li>
+          <li>④ 서태평양 지역의 강수량은 평상시보다 증가한다.</li>
+          <li>⑤ 이 시기의 변화는 전 지구의 기상에 영향을 주지 않는다.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="cont-note">▶ 다음 면에 계속</div>
+  <div class="exam-foot"><span>이 문제지의 저작권은 박찬 과학학원에 있습니다.</span><span class="pg">3</span><span>박찬 과학 앱에서 전 문항 해설 제공</span></div>
+</div>
+
+<!-- ════════ 4면 (Q17-21) ════════ -->
+<div class="sheet">
+  <div class="runsubj"><span class="s">과학탐구 영역 ( 통합과학 2 )</span><span style="font-size:8.6pt;">박찬 과학 실전 모의고사 · 제1회</span></div>
+  <div class="twocol">
+    <div class="col">
+      <div class="qq">
+        <p class="stem"><b class="qn">17.</b>태양이 에너지를 만드는 과정에 대한 설명으로 옳은 것은? <span class="pts">[1.5점]</span></p>
+        <ul class="ch">
+          <li>① 태양 중심에서는 헬륨이 수소로 분해된다.</li>
+          <li>② 수소 원자핵들이 융합해 헬륨 원자핵이 되면서 줄어든 질량이 에너지로 전환된다.</li>
+          <li>③ 태양 에너지는 석탄의 연소로 만들어진다.</li>
+          <li>④ 핵융합은 태양의 표면에서 가장 활발하다.</li>
+          <li>⑤ 핵융합 과정에서 질량은 변하지 않는다.</li>
+        </ul>
+      </div>
+
+      <div class="qq">
+        <p class="stem"><b class="qn">18.</b>화력 발전에서 연료의 에너지가 전기 에너지로 바뀌는 과정을 순서대로 옳게 나열한 것은? <span class="pts">[2점]</span></p>
+        <ul class="ch">
+          <li>① 열에너지 → 화학 에너지 → 운동 에너지 → 전기 에너지</li>
+          <li>② 화학 에너지 → 운동 에너지 → 열에너지 → 전기 에너지</li>
+          <li>③ 운동 에너지 → 열에너지 → 화학 에너지 → 전기 에너지</li>
+          <li>④ 화학 에너지 → 전기 에너지 → 열에너지 → 운동 에너지</li>
+          <li>⑤ 화학 에너지 → 열에너지 → 운동 에너지 → 전기 에너지</li>
+        </ul>
+      </div>
+
+      <div class="qq">
+        <p class="stem"><b class="qn">19.</b>다음은 두 전등의 에너지 전환을 비교한 자료이다. <span class="pts">[2점]</span></p>
+        <div class="dta">
+          백열등은 공급된 전기 에너지의 약 5 %만 빛으로 바꾸고 나머지 대부분을 열로 내보낸다. 같은 밝기의 LED 전등은 훨씬 적은 전기 에너지로 같은 양의 빛을 낸다.
+        </div>
+        <p class="stem">이에 대한 설명으로 가장 적절한 것은?</p>
+        <ul class="ch">
+          <li>① 백열등은 전기 에너지를 모두 빛으로 전환한다.</li>
+          <li>② 열로 빠져나간 에너지는 다시 모아 전기로 쓰기 쉽다.</li>
+          <li>③ 공급한 에너지 중 원하는 형태로 전환되는 비율, 곧 에너지 효율은 LED가 백열등보다 높다.</li>
+          <li>④ 두 전등의 에너지 효율은 같다.</li>
+          <li>⑤ 에너지가 열로 흩어져도 에너지의 총량은 줄어든다.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="col">
+      <div class="qq">
+        <p class="stem"><b class="qn">20.</b>감염병과 그 치료에 대한 설명으로 옳은 것은? <span class="pts">[2점]</span></p>
+        <ul class="ch">
+          <li>① 감염병은 모두 세균에 의해서만 일어난다.</li>
+          <li>② 바이러스는 스스로 물질대사를 하며 혼자 증식한다.</li>
+          <li>③ 백신은 감염병을 치료하는 약물이다.</li>
+          <li>④ 항생제는 세균에 작용하므로 바이러스 감염병에는 효과가 없다.</li>
+          <li>⑤ 항생제를 자주 쓸수록 내성 세균은 줄어든다.</li>
+        </ul>
+      </div>
+
+      <div class="qq">
+        <p class="stem"><b class="qn">21.</b>다음은 신속 항원 검사 키트의 원리에 대한 설명이다. <span class="pts">[2점]</span></p>
+        <div class="dta">
+          검체를 넣으면 용액이 이동하면서 시험선(T선)과 대조선(C선)을 지난다. T선에는 병원체의 항원과 결합하는 물질이, C선에는 용액이 정상적으로 이동했는지 확인하는 물질이 있다.
+        </div>
+        <p class="stem">검사 결과에 대한 해석으로 옳은 것은?</p>
+        <ul class="ch">
+          <li>① C선만 나타나면 음성, T선과 C선이 모두 나타나면 양성이다.</li>
+          <li>② T선만 나타나면 정상적인 양성이다.</li>
+          <li>③ C선은 병원체가 있을 때만 나타난다.</li>
+          <li>④ 아무 선도 나타나지 않으면 음성으로 판정한다.</li>
+          <li>⑤ C선이 나타나지 않아도 결과를 믿을 수 있다.</li>
+        </ul>
+      </div>
+
+      <div class="qq">
+        <p class="stem"><b class="qn">22.</b>빅데이터의 활용에 대한 설명으로 옳은 것은? <span class="pts">[2점]</span></p>
+        <ul class="ch">
+          <li>① 빅데이터는 종이 문서 형태의 자료만을 말한다.</li>
+          <li>② 데이터의 양이 충분히 많으면 분석은 필요 없다.</li>
+          <li>③ 내비게이션은 데이터 없이 경로를 안내한다.</li>
+          <li>④ 위치·소비 데이터의 분석은 생활을 편리하게 하지만 사생활 침해의 우려도 낳는다.</li>
+          <li>⑤ 개인 정보는 본인 동의 없이 자유롭게 활용해도 된다.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="cont-note">▶ 다음 면에 계속</div>
+  <div class="exam-foot"><span>이 문제지의 저작권은 박찬 과학학원에 있습니다.</span><span class="pg">4</span><span>박찬 과학 앱에서 전 문항 해설 제공</span></div>
+</div>
+
+<!-- ════════ 5면 (Q23-25) ════════ -->
+<div class="sheet">
+  <div class="runsubj"><span class="s">과학탐구 영역 ( 통합과학 2 )</span><span style="font-size:8.6pt;">박찬 과학 실전 모의고사 · 제1회</span></div>
+  <div class="twocol">
+    <div class="col">
+      <div class="qq">
+        <p class="stem"><b class="qn">23.</b>연구 윤리와 과학 관련 사회적 쟁점(SSI)에 대한 설명으로 옳은 것은? <span class="pts">[2점]</span></p>
+        <ul class="ch">
+          <li>① 결론에 맞지 않는 데이터는 제외해도 된다.</li>
+          <li>② 사람을 대상으로 하는 연구에는 충분한 설명에 근거한 자발적 동의가 필요하다.</li>
+          <li>③ 남의 연구를 출처 없이 인용해도 된다.</li>
+          <li>④ SSI는 과학 지식만 충분하면 저절로 해결된다.</li>
+          <li>⑤ 기술적으로 가능해진 일에는 윤리적 검토가 필요 없다.</li>
+        </ul>
+      </div>
+
+      <div class="qq">
+        <p class="stem"><b class="qn">24.</b>다음은 화석 연료와 관련된 자료이다. <span class="pts">[2.5점]</span></p>
+        <div class="dta">
+          (가) 메테인 + 산소 → 이산화 탄소 + 물<br>
+          (나) 대기 중 이산화 탄소 농도는 산업화 이전 약 280 ppm에서 최근 약 420 ppm으로 증가하였다.<br>
+          (다) 어느 가정이 백열등을 LED 전등으로 교체하였다.
+        </div>
+        <p class="stem">이에 대한 설명으로 옳은 것만을 &lt;보기&gt;에서 있는 대로 고른 것은?</p>
+        <div class="bogi">
+          <div class="bt">&lt; 보 기 &gt;</div>
+          ㄱ. (가)에서 메테인은 산소를 얻어 산화된다.<br>
+          ㄴ. (가)와 같은 연소는 (나)의 농도 증가에 기여한다.<br>
+          ㄷ. (다)의 교체 후에는 전기 에너지가 모두 빛 에너지로 전환된다.
+        </div>
+        <ul class="ch row">
+          <li>① ㄱ</li><li>② ㄷ</li><li>③ ㄱ, ㄴ</li><li>④ ㄴ, ㄷ</li><li>⑤ ㄱ, ㄴ, ㄷ</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="col">
+      <div class="qq">
+        <p class="stem"><b class="qn">25.</b>다음은 감염병 조사에 대한 과거와 오늘날의 자료이다. <span class="pts">[2.5점]</span></p>
+        <div class="dta">
+          (가) 1854년 런던에서 존 스노우는 콜레라 사망자가 발생한 위치를 지도에 표시하여, 사례가 특정 펌프 주변에 몰려 있음을 밝히고 그 펌프의 사용을 중단시켰다. 이는 콜레라균이 발견되기 전의 일이다.<br>
+          (나) 오늘날에는 사람들의 이동 기록·검색어 등 방대한 데이터를 분석하여 감염병의 확산을 예측하는 데 활용한다.
+        </div>
+        <p class="stem">이에 대한 설명으로 옳은 것만을 &lt;보기&gt;에서 있는 대로 고른 것은?</p>
+        <div class="bogi">
+          <div class="bt">&lt; 보 기 &gt;</div>
+          ㄱ. (가)는 발병 위치 데이터에서 유행의 원인을 추적한 역학 조사에 해당한다.<br>
+          ㄴ. (나)에서 데이터의 양이 충분히 많으면 개인 정보 보호는 고려하지 않아도 된다.<br>
+          ㄷ. 역학 조사는 병원체를 직접 관찰해야만 수행할 수 있다.
+        </div>
+        <ul class="ch row">
+          <li>① ㄱ</li><li>② ㄴ</li><li>③ ㄱ, ㄷ</li><li>④ ㄴ, ㄷ</li><li>⑤ ㄱ, ㄴ, ㄷ</li>
+        </ul>
+      </div>
+
+      <p style="text-align:center; font-size:9.5pt; margin-top:14mm; letter-spacing:0.3em; font-weight:700;">— 수고하셨습니다 —</p>
+    </div>
+  </div>
+
+  <div class="cont-note" style="font-weight:800;">◈ 확인 사항<span style="font-weight:400;"> — 답안지의 해당란에 필요한 내용을 정확히 기입(표기)했는지 확인하시오.</span></div>
+  <div class="exam-foot"><span>이 문제지의 저작권은 박찬 과학학원에 있습니다.</span><span class="pg">5</span><span>박찬 과학 앱에서 전 문항 해설 제공</span></div>
+</div>
+
+<!-- ════════ 6면 정답표 + 해설 1 ════════ -->
+<div class="sheet sol-sheet">
+  <div class="sol-head"><span class="t">정답과 알짜 해설 — 제1회</span><span class="d">틀린 문항은 해당 소단원으로 돌아가 개념부터 다시 — 쪽수는 각 해설 끝에</span></div>
+  <table class="anst">
+    <tr><th>문항</th><td>1</td><td>2</td><td>3</td><td>4</td><td>5</td><td>6</td><td>7</td><td>8</td><td>9</td><td>10</td><td>11</td><td>12</td><td>13</td></tr>
+    <tr><th>정답</th><td class="a">②</td><td class="a">④</td><td class="a">①</td><td class="a">⑤</td><td class="a">③</td><td class="a">⑤</td><td class="a">②</td><td class="a">④</td><td class="a">①</td><td class="a">③</td><td class="a">④</td><td class="a">②</td><td class="a">⑤</td></tr>
+    <tr><th>문항</th><td>14</td><td>15</td><td>16</td><td>17</td><td>18</td><td>19</td><td>20</td><td>21</td><td>22</td><td>23</td><td>24</td><td>25</td><td>—</td></tr>
+    <tr><th>정답</th><td class="a">①</td><td class="a">⑤</td><td class="a">③</td><td class="a">②</td><td class="a">⑤</td><td class="a">③</td><td class="a">④</td><td class="a">①</td><td class="a">④</td><td class="a">②</td><td class="a">③</td><td class="a">①</td><td>—</td></tr>
+  </table>
+  <div class="solcols">
+    <div class="sol"><b class="n">1</b><span class="a">② </span>삼엽충은 고생대의 표준 화석. 암모나이트·공룡은 중생대, 매머드는 신생대다. <i>(I-01, 11쪽)</i></div>
+    <div class="sol"><b class="n">2</b><span class="a">④ </span>다섯 번의 대멸종 중 고생대 말(페름기 말)이 최대 규모 — 해양 생물 과의 절반 가까이가 사라졌다. 다양성은 그 뒤 회복되었다. <i>(I-01, 14~15쪽)</i></div>
+    <div class="sol"><b class="n">3</b><span class="a">① </span>ㄱ만 옳다. A(고생대 말)의 낙폭이 최대. ㄴ. 회복되었고, ㄷ. 현재의 다양성은 역대 최고 수준이다. <i>(I-01, 15쪽)</i></div>
+    <div class="sol"><b class="n">4</b><span class="a">⑤ </span>변이의 존재(A) → 환경에 따른 선택(B) → 형질의 유전(C). 자연선택의 세 기둥이 모두 옳다. <i>(I-02, 25~27쪽)</i></div>
+    <div class="sol"><b class="n">5</b><span class="a">③ </span>ㄱ·ㄷ 옳다. ㄴ. 가뭄은 이미 있던 변이 중 유리한 쪽을 '선택'했을 뿐, 변이를 새로 만들지 않는다. <i>(I-02, 27쪽)</i></div>
+    <div class="sol"><b class="n">6</b><span class="a">⑤ </span>탄소는 산소를 얻어 산화(→ 이산화 탄소), 산화 철은 산소를 잃고 환원(→ 철)된다. <i>(I-03, 40·42쪽)</i></div>
+    <div class="sol"><b class="n">7</b><span class="a">② </span>아연은 전자를 잃고 산화(아연 이온), 구리 이온은 전자를 얻어 환원(구리 석출). 구리 이온이 줄어 푸른색은 옅어진다. <i>(I-03, 38·43쪽)</i></div>
+    <div class="sol"><b class="n">8</b><span class="a">④ </span>수평선 B는 구경꾼 이온(Cl⁻), 감소하는 A는 H⁺, 증가하는 C는 Na⁺. H⁺가 사라진 자리를 Na⁺가 1:1로 채우므로 P까지 총 이온 수는 일정하다(ㄱ·ㄴ 옳음, ㄷ 틀림). <i>(I-04, 57~58쪽)</i></div>
+    <div class="sol"><b class="n">9</b><span class="a">① </span>연소·중화는 발열(주위 온도 상승). 광합성은 흡열, 질산 암모늄 용해는 주위 온도를 낮춘다. <i>(I-05, 66~67쪽)</i></div>
+    <div class="sol"><b class="n">10</b><span class="a">③ </span>분해자는 물질을 비생물 환경으로 되돌리는 순환의 마무리 담당. 같은 종의 무리는 개체군, 빛·온도는 비생물적 요인이다. <i>(II-01, 81~82쪽)</i></div>
+    <div class="sol"><b class="n">11</b><span class="a">④ </span>아래층일수록 빛이 줄고, 각 층에는 그 빛 환경에 적응한 식물이 산다 — 층상 구조는 빛에 대한 적응이다. <i>(II-01, 84쪽)</i></div>
+    <div class="sol"><b class="n">12</b><span class="a">② </span>ㄱ·ㄷ 옳다. ㄴ. 2차 소비자는 먹이가 늘어 일시적으로 증가한다 — 이 증감의 되먹임이 평형을 회복시킨다. <i>(II-02, 95~96쪽)</i></div>
+    <div class="sol"><b class="n">13</b><span class="a">⑤ </span>최상위 포식자의 복원이 먹이 사슬을 타고 식생·다른 동물까지 바꿨다 — 셋 다 옳다. <i>(II-02, 97쪽)</i></div>
+  </div>
+  <div class="exam-foot"><span>이 문제지의 저작권은 박찬 과학학원에 있습니다.</span><span class="pg">6</span><span>박찬 과학 앱에서 전 문항 해설 제공</span></div>
+</div>
+
+<!-- ════════ 7면 해설 2 ════════ -->
+<div class="sheet sol-sheet">
+  <div class="sol-head"><span class="t">정답과 알짜 해설 — 제1회 (계속)</span><span class="d">배점 1.5점 6문항 · 2점 13문항 · 2.5점 6문항 = 총 50점</span></div>
+  <div class="solcols">
+    <div class="sol"><b class="n">14</b><span class="a">① </span>온실 기체가 흡수하는 것은 지표의 적외선이다(가시광선 아님). 온실효과가 없다면 지구는 약 −18 ℃, 온실효과와 온난화는 구별해야 한다. <i>(II-03, 107쪽)</i></div>
+    <div class="sol"><b class="n">15</b><span class="a">⑤ </span>장기 증가 추세(315→420 ppm), 계절 톱니(여름 광합성↑ → 농도↓), 화석 연료 원인 — 셋 다 킬링 곡선의 핵심이다. <i>(II-03, 108·112쪽)</i></div>
+    <div class="sol"><b class="n">16</b><span class="a">③ </span>무역풍 약화 → 따뜻한 해수가 동쪽에 머묾 → 동태평양 용승 약화 = 엘니뇨. 서태평양은 오히려 가물어진다. <i>(II-03, 110쪽)</i></div>
+    <div class="sol"><b class="n">17</b><span class="a">② </span>태양 중심핵의 수소 핵융합 — 줄어든 질량이 에너지가 된다(질량·에너지 동등성). 표면이 아니라 중심에서 일어난다. <i>(II-04, 122쪽)</i></div>
+    <div class="sol"><b class="n">18</b><span class="a">⑤ </span>연료의 화학 에너지 → (연소) 열 → (증기·터빈) 운동 → (발전기) 전기. 사슬의 순서가 곧 답이다. <i>(II-05, 136쪽)</i></div>
+    <div class="sol"><b class="n">19</b><span class="a">③ </span>같은 밝기를 더 적은 전기로 — LED의 에너지 효율이 높다. 열로 흩어진 에너지는 다시 쓰기 어렵지만 총량은 보존된다. <i>(II-05, 138쪽)</i></div>
+    <div class="sol"><b class="n">20</b><span class="a">④ </span>항생제는 세균의 생장·증식을 막는 약 — 바이러스에는 듣지 않는다. 백신은 치료가 아니라 예방이다. <i>(III-01, 153~154쪽)</i></div>
+    <div class="sol"><b class="n">21</b><span class="a">① </span>C선은 '검사가 제대로 됐다'는 확인용 — C선만 = 음성, T+C = 양성, C선이 없으면 판정 무효다. <i>(III-01, 151쪽)</i></div>
+    <div class="sol"><b class="n">22</b><span class="a">④ </span>편리함과 그림자는 한 몸 — 같은 데이터가 길 안내도 하고 사생활도 드러낼 수 있다. <i>(III-02, 164~166쪽)</i></div>
+    <div class="sol"><b class="n">23</b><span class="a">② </span>설명에 근거한 자발적 동의는 사람 대상 연구의 대원칙. 데이터 선택 제외는 변조, 출처 없는 인용은 표절이다. <i>(III-03, 178~179쪽)</i></div>
+    <div class="sol"><b class="n">24</b><span class="a">③ </span>[융합] ㄱ. 연소는 산화(I단원), ㄴ. 배출된 CO₂가 온실효과를 강화(II단원) — 옳다. ㄷ. 효율 100 % 전환은 없다 — LED도 일부는 열로 흩어진다. <i>(I-03 × II-03 × II-05)</i></div>
+    <div class="sol"><b class="n">25</b><span class="a">① </span>[융합] ㄱ. 위치 데이터의 패턴 읽기 — 역학 조사의 원형이다. ㄴ. 개인 정보 보호는 데이터가 많을수록 더 중요해진다. ㄷ. 스노우는 콜레라균 발견 전에 원인을 추적했다 — 병원체 관찰이 필수는 아니다. <i>(III-01 × III-02)</i></div>
+  </div>
+  <div style="margin-top:4mm; border:0.3mm solid #BBB; border-radius:2.5mm; padding:3mm 4mm; font-size:8.8pt; line-height:1.65;">
+    <b>박찬쌤의 채점 후 처방</b> — 45점 이상: 통합과학 2는 실전 준비 완료, 통합과학 1 회독으로. 35~44점: 틀린 문항의 소단원 '집중 훈련'과 STEP 3만 다시. 34점 이하: 해당 소단원 개념 페이지부터 정독 — 점수가 아니라 구멍의 위치가 이 시험의 수확이다.
+  </div>
+  <div class="exam-foot"><span>이 문제지의 저작권은 박찬 과학학원에 있습니다.</span><span class="pg">7</span><span>박찬 과학 앱에서 전 문항 해설 제공</span></div>
+</div>
+
+</body>
+</html>
