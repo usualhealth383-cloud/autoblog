@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<title>박찬 과학 통합과학2 — 강의용 보완 시안</title>
+<link rel="stylesheet" href="lecture.css">
+<style>
+/* ───── 메모 칸 (B면 하단 고정) ───── */
+.page.lect{ display:flex; flex-direction:column; padding-bottom:18mm; }
+.page.lect > *{ flex:0 0 auto; }
+.page.lect > .memo{ flex:1 1 auto; }
+.memo{ min-height:34mm; position:relative;
+       border-top:0.4mm dashed var(--lb-line); padding-top:2.6mm; margin-top:6mm; }
+.memo .mk{ position:absolute; top:2.2mm; left:0; font-size:8pt; font-weight:900;
+           color:var(--lb); letter-spacing:0.14em; background:#fff; padding-right:2.5mm; }
+.memo .mk .sub{ font-weight:600; color:#A8B2BA; letter-spacing:0; margin-left:1.5mm; }
+
+/* 안 1 — 밑줄형 */
+.memo-line .rules{ margin-top:5.5mm; height:calc(100% - 5.5mm);
+   background-image:linear-gradient(to bottom, transparent 0, transparent 8.7mm, var(--lb-line) 8.7mm, var(--lb-line) 9mm);
+   background-size:100% 9mm; background-repeat:repeat-y; }
+
+
+/* 안 2 — 코넬형 */
+.memo-cornell .grid{ margin-top:5.5mm; display:flex; height:calc(100% - 5.5mm); }
+.memo-cornell .cue{ width:34mm; flex:0 0 34mm; border-right:0.4mm solid var(--lb-soft); padding-right:3mm; }
+.memo-cornell .cue span{ font-size:7.6pt; color:#A8B2BA; font-weight:700; }
+.memo-cornell .note{ flex:1; margin-left:4mm;
+   background-image:linear-gradient(to bottom, transparent 0, transparent 8.7mm, var(--lb-line) 8.7mm, var(--lb-line) 9mm);
+   background-size:100% 9mm; background-repeat:repeat-y; }
+
+
+/* 안 3 — 점 격자형 */
+.memo-dot .grid{ margin-top:5.5mm; height:calc(100% - 5.5mm);
+  background-image:radial-gradient(var(--lb-soft) 0.3mm, transparent 0.31mm);
+  background-size:4.6mm 4.6mm; background-position:1mm 1.5mm; }
+
+/* ───── 확인 문제 쪽 ───── */
+.qs-head{ display:flex; align-items:baseline; gap:3mm; border-bottom:1mm solid var(--lb); padding-bottom:2.2mm; margin-bottom:5mm; }
+.qs-head .t{ font-size:16pt; font-weight:900; }
+.qs-head .s{ font-size:9.3pt; color:#5B6B77; }
+.qs-head .badge{ margin-left:auto; font-size:8.2pt; font-weight:800; color:var(--lb-dark); background:var(--lb-light); padding:1.2mm 3mm; border-radius:2mm; }
+.qq{ margin-bottom:6.5mm; }
+.qq .stem{ font-size:10.4pt; line-height:1.78; margin-bottom:2.4mm; padding-left:9mm; text-indent:-9mm; }
+.qq .stem .qn{ display:inline-block; width:6.4mm; height:6.4mm; line-height:6.4mm; text-align:center; border-radius:50%;
+               background:var(--lb); color:#fff; font-size:8.6pt; font-weight:900; margin-right:2.2mm; vertical-align:0.4mm; text-indent:0; }
+.qq .tag{ font-size:7.6pt; font-weight:800; color:var(--lb-dark); background:var(--lb-light); padding:0.8mm 2.2mm; border-radius:1.6mm; margin-left:2mm; vertical-align:1mm; }
+.qq .bogi{ border:0.35mm solid var(--lb-line); border-radius:2.5mm; background:var(--lb-pale); padding:2.8mm 4mm; margin:0 0 2.6mm 9mm; font-size:9.7pt; line-height:1.76; }
+.qq .bogi b{ color:var(--lb-dark); }
+.qq ol.ch{ list-style:none; margin-left:9mm; font-size:10pt; line-height:1.9; }
+.qq ol.ch li{ display:inline-block; margin-right:7mm; }
+.qq .write{ margin:1.5mm 0 0 9mm; }
+.qq .write i{ display:block; height:8.4mm; border-bottom:0.3mm solid var(--lb-line); }
+.qs-note{ background:var(--lb-light); border-left:1.4mm solid var(--lb); border-radius:0 3mm 3mm 0; padding:3mm 5mm; margin-top:1mm; }
+.qs-note .k{ font-size:8.6pt; font-weight:900; color:var(--lb-dark); letter-spacing:0.14em; display:block; margin-bottom:1mm; }
+.qs-note p{ font-size:9.8pt; line-height:1.7; }
+
+/* ───── 목차 ───── */
+.toc-h{ margin-bottom:7mm; }
+.toc-h .en{ font-size:8.6pt; font-weight:800; color:var(--lb); letter-spacing:0.28em; }
+.toc-h .t{ font-size:23pt; font-weight:900; margin-top:1mm; }
+.toc-unit{ display:flex; align-items:center; gap:3mm; margin:0 0 3.4mm; }
+.toc-unit .no{ font-family:'PC Serif','PC Sans',serif; font-size:17pt; font-weight:900; color:var(--lb); }
+.toc-unit .nm{ font-size:12.4pt; font-weight:900; }
+.toc-unit .line{ flex:1; height:0.7mm; background:var(--lb-soft); }
+.toc-l{ margin:0 0 4mm 0; }
+.toc-l .lh{ display:flex; align-items:baseline; gap:2.6mm; margin-bottom:1.2mm; }
+.toc-l .lno{ font-size:9pt; font-weight:900; color:var(--lb-dark); background:var(--lb-light); border-radius:1.6mm; padding:0.7mm 2.2mm; }
+.toc-l .lt{ font-size:11.2pt; font-weight:800; }
+.toc-l .dots{ flex:1; border-bottom:0.3mm dotted #C8D0D6; transform:translateY(-1mm); }
+.toc-l .lpg{ font-size:9.6pt; font-weight:800; color:#5B6B77; }
+.toc-l ul{ list-style:none; margin-left:12.5mm; }
+.toc-l li{ font-size:9.3pt; color:#5B6B77; line-height:1.62; display:flex; gap:2mm; }
+.toc-l li .ct{ flex:1; }
+.toc-l li span.cn{ color:var(--lb); font-weight:800; flex:0 0 4mm; }
+
+/* ───── 단원 마무리 ───── */
+.sm-h{ display:flex; align-items:flex-end; gap:3.4mm; border-bottom:1mm solid var(--lb); padding-bottom:2.4mm; margin-bottom:5.5mm; }
+.sm-h .no{ font-family:'PC Serif','PC Sans',serif; font-size:26pt; font-weight:900; color:var(--lb); line-height:0.9; }
+.sm-h .t{ font-size:16.5pt; font-weight:900; }
+.sm-h .s{ font-size:9pt; color:#5B6B77; margin-left:auto; }
+.smgrid{ display:flex; flex-wrap:wrap; gap:4mm; }
+.smc{ flex:1 1 calc(50% - 2mm); background:var(--lb-pale); border-radius:3mm; padding:3.2mm 4mm 3mm; }
+.smc .h{ display:flex; align-items:baseline; gap:2mm; margin-bottom:1.8mm; }
+.smc .h .n{ font-size:8.4pt; font-weight:900; color:#fff; background:var(--lb); border-radius:1.4mm; padding:0.5mm 1.8mm; }
+.smc .h .t{ font-size:10.6pt; font-weight:900; }
+.smc .h .pg{ margin-left:auto; font-size:8pt; color:#8A949E; }
+.smc p{ font-size:9.3pt; line-height:1.7; color:#3A3A3A; }
+.smc p b{ color:var(--lb-dark); }
+.chain{ display:flex; align-items:center; justify-content:space-between; gap:1.8mm; margin:5mm 0 4mm; }
+.chain .cw{ background:var(--lb-light); border:0.35mm solid var(--lb-soft); border-radius:2.2mm; padding:1.6mm 2.6mm; font-size:9pt; font-weight:800; color:var(--lb-dark); white-space:nowrap; }
+.chain .ar{ color:var(--lb); font-weight:900; font-size:11pt; }
+.sian{ position:absolute; top:11mm; right:19mm; font-size:8pt; font-weight:900; color:#fff; background:#2B2B2B; padding:1mm 3mm; border-radius:1.6mm; letter-spacing:0.06em; }
+</style>
+</head>
+<body data-unit="II" style="--pg-start:0;">
+<div class="page lect">
+  <div class="tagband"><span>II. 환경과 에너지 · 03 지구온난화와 기후변화</span><span>통합과학 2</span></div>
+
+  <div class="a-script" style="margin-top:2mm;">
+    <p>이처럼 대기가 지구 복사 에너지의 일부를 붙잡아 지표의 온도를 높게 유지하는 작용이 <span class="blank">㉡</span>다. 온실 기체가 흡수하는 것은 태양의 가시광선이 아니라 지표가 내보내는 <b>적외선</b>이라는 점에 주의한다. 온실효과 덕분에 지구의 평균 기온은 15 ℃로 유지되며, 온실효과가 전혀 없다면 약 <span class="blank">㉢</span> ℃까지 낮아져 바다가 얼어붙었을 것이다.</p>
+  </div>
+
+  <table class="terms">
+    <tr><th>온실효과</th><td>대기가 지구 복사 에너지의 일부를 흡수·재방출하여 지표의 온도를 높게 유지하는 작용.</td></tr>
+    <tr><th>온실 기체</th><td>적외선을 흡수·재방출하는 기체. 수증기(바다의 증발), 이산화 탄소(화석 연료의 연소), 메테인(농축산·폐기물) 등.</td></tr>
+    <tr><th>지구 복사</th><td>데워진 지표가 내보내는 적외선. 태양 복사(가시광선 중심)와 파장이 다르다.</td></tr>
+  </table>
+
+  <div class="myth">
+    <div class="m"><span class="x">✗ 오해</span> 온실효과가 곧 지구온난화다.<br><span class="o">✓ 진실</span> 온실효과는 정상적인 대기의 작용이며, 온난화는 그것의 <b>'강화'</b>다.</div>
+    <div class="m"><span class="x">✗ 오해</span> 온실 기체는 가시광선을 흡수한다.<br><span class="o">✓ 진실</span> 흡수하는 것은 지표가 내보내는 <b>적외선</b>이다.</div>
+  </div>
+
+  <div class="point">
+    <span class="k">포인트</span>
+    <p>온실효과는 지구 평균 기온을 15 ℃로 유지하는 정상적인 대기의 작용이다. 문제는 온실효과 자체가 아니라, 온실 기체 증가로 이 작용이 강해지는 것이다.</p>
+  </div>
+  <div class="sian">안 1 · 밑줄형</div>
+  <div class="memo memo-line"><span class="mk">메모<span class="sub">수업 중 필기</span></span><div class="rules"></div></div>
+<div class="ans-line">정답 ㉠ 적외선(지구 복사) ㉡ 온실효과 ㉢ −18 — ㉠을 '가시광선'으로 바꾼 선지가 최다 오답이다.</div>
+  <div class="folio"><span>박찬 과학 | 통합과학 2</span><span class="num"></span></div>
+</div>
+
+<div class="page lect">
+  <div class="tagband"><span>II. 환경과 에너지 · 03 지구온난화와 기후변화</span><span>통합과학 2</span></div>
+
+  <div class="a-script" style="margin-top:2mm;">
+    <p>이처럼 대기가 지구 복사 에너지의 일부를 붙잡아 지표의 온도를 높게 유지하는 작용이 <span class="blank">㉡</span>다. 온실 기체가 흡수하는 것은 태양의 가시광선이 아니라 지표가 내보내는 <b>적외선</b>이라는 점에 주의한다. 온실효과 덕분에 지구의 평균 기온은 15 ℃로 유지되며, 온실효과가 전혀 없다면 약 <span class="blank">㉢</span> ℃까지 낮아져 바다가 얼어붙었을 것이다.</p>
+  </div>
+
+  <table class="terms">
+    <tr><th>온실효과</th><td>대기가 지구 복사 에너지의 일부를 흡수·재방출하여 지표의 온도를 높게 유지하는 작용.</td></tr>
+    <tr><th>온실 기체</th><td>적외선을 흡수·재방출하는 기체. 수증기(바다의 증발), 이산화 탄소(화석 연료의 연소), 메테인(농축산·폐기물) 등.</td></tr>
+    <tr><th>지구 복사</th><td>데워진 지표가 내보내는 적외선. 태양 복사(가시광선 중심)와 파장이 다르다.</td></tr>
+  </table>
+
+  <div class="myth">
+    <div class="m"><span class="x">✗ 오해</span> 온실효과가 곧 지구온난화다.<br><span class="o">✓ 진실</span> 온실효과는 정상적인 대기의 작용이며, 온난화는 그것의 <b>'강화'</b>다.</div>
+    <div class="m"><span class="x">✗ 오해</span> 온실 기체는 가시광선을 흡수한다.<br><span class="o">✓ 진실</span> 흡수하는 것은 지표가 내보내는 <b>적외선</b>이다.</div>
+  </div>
+
+  <div class="point">
+    <span class="k">포인트</span>
+    <p>온실효과는 지구 평균 기온을 15 ℃로 유지하는 정상적인 대기의 작용이다. 문제는 온실효과 자체가 아니라, 온실 기체 증가로 이 작용이 강해지는 것이다.</p>
+  </div>
+  <div class="sian">안 2 · 코넬형</div>
+  <div class="memo memo-cornell"><span class="mk">메모<span class="sub">왼쪽에 질문, 오른쪽에 답</span></span><div class="grid"><div class="cue"><span>여기에 질문·키워드</span></div><div class="note"></div></div></div>
+<div class="ans-line">정답 ㉠ 적외선(지구 복사) ㉡ 온실효과 ㉢ −18 — ㉠을 '가시광선'으로 바꾼 선지가 최다 오답이다.</div>
+  <div class="folio"><span>박찬 과학 | 통합과학 2</span><span class="num"></span></div>
+</div>
+
+<div class="page lect">
+  <div class="tagband"><span>II. 환경과 에너지 · 03 지구온난화와 기후변화</span><span>통합과학 2</span></div>
+
+  <div class="a-script" style="margin-top:2mm;">
+    <p>이처럼 대기가 지구 복사 에너지의 일부를 붙잡아 지표의 온도를 높게 유지하는 작용이 <span class="blank">㉡</span>다. 온실 기체가 흡수하는 것은 태양의 가시광선이 아니라 지표가 내보내는 <b>적외선</b>이라는 점에 주의한다. 온실효과 덕분에 지구의 평균 기온은 15 ℃로 유지되며, 온실효과가 전혀 없다면 약 <span class="blank">㉢</span> ℃까지 낮아져 바다가 얼어붙었을 것이다.</p>
+  </div>
+
+  <table class="terms">
+    <tr><th>온실효과</th><td>대기가 지구 복사 에너지의 일부를 흡수·재방출하여 지표의 온도를 높게 유지하는 작용.</td></tr>
+    <tr><th>온실 기체</th><td>적외선을 흡수·재방출하는 기체. 수증기(바다의 증발), 이산화 탄소(화석 연료의 연소), 메테인(농축산·폐기물) 등.</td></tr>
+    <tr><th>지구 복사</th><td>데워진 지표가 내보내는 적외선. 태양 복사(가시광선 중심)와 파장이 다르다.</td></tr>
+  </table>
+
+  <div class="myth">
+    <div class="m"><span class="x">✗ 오해</span> 온실효과가 곧 지구온난화다.<br><span class="o">✓ 진실</span> 온실효과는 정상적인 대기의 작용이며, 온난화는 그것의 <b>'강화'</b>다.</div>
+    <div class="m"><span class="x">✗ 오해</span> 온실 기체는 가시광선을 흡수한다.<br><span class="o">✓ 진실</span> 흡수하는 것은 지표가 내보내는 <b>적외선</b>이다.</div>
+  </div>
+
+  <div class="point">
+    <span class="k">포인트</span>
+    <p>온실효과는 지구 평균 기온을 15 ℃로 유지하는 정상적인 대기의 작용이다. 문제는 온실효과 자체가 아니라, 온실 기체 증가로 이 작용이 강해지는 것이다.</p>
+  </div>
+  <div class="sian">안 3 · 점 격자형</div>
+  <div class="memo memo-dot"><span class="mk">메모<span class="sub">글·그림 모두</span></span><div class="grid"></div></div>
+<div class="ans-line">정답 ㉠ 적외선(지구 복사) ㉡ 온실효과 ㉢ −18 — ㉠을 '가시광선'으로 바꾼 선지가 최다 오답이다.</div>
+  <div class="folio"><span>박찬 과학 | 통합과학 2</span><span class="num"></span></div>
+</div>
+
+<div class="page lect">
+  <div class="tagband"><span>II. 환경과 에너지 · 03 지구온난화와 기후변화</span><span>통합과학 2</span></div>
+  <div class="sian">확인 문제 쪽 (소단원 끝 1쪽)</div>
+
+  <div class="qs-head">
+    <span class="t">배운 것 확인하기</span>
+    <span class="s">개념 01 ~ 05</span>
+    <span class="badge">3문항 · 10분</span>
+  </div>
+
+  <div class="qq">
+    <p class="stem"><span class="qn">1</span>온실효과에 대한 설명으로 <b>옳지 않은</b> 것은?<span class="tag">오개념</span></p>
+    <ol class="ch">
+      <li>① 대기가 지구 복사 에너지의 일부를 흡수한다.</li>
+      <li>② 온실 기체는 지표가 내보내는 적외선을 흡수·재방출한다.</li><br>
+      <li>③ 온실효과가 없다면 지구의 평균 기온은 약 −18 ℃가 된다.</li><br>
+      <li>④ 온실 기체는 태양에서 오는 가시광선을 대부분 흡수한다.</li><br>
+      <li>⑤ 지구의 평균 기온 15 ℃는 온실효과가 작동한 결과다.</li>
+    </ol>
+  </div>
+
+  <div class="qq">
+    <p class="stem"><span class="qn">2</span>다음은 하와이 마우나로아 관측소에서 측정한 대기 중 이산화 탄소 농도에 대한 자료다.<span class="tag">자료 해석</span></p>
+    <div class="bogi">
+      · 1958년 관측을 시작할 때의 농도는 약 <b>315 ppm</b>이었고, 현재는 <b>430 ppm</b>을 넘었다.<br>
+      · 곡선은 해마다 <b>봄에 내려갔다가 겨울에 올라가는</b> 작은 톱니 모양을 반복한다.<br>
+      · 그러면서도 곡선 전체는 <b>꾸준히 오른쪽 위로</b> 올라간다.
+    </div>
+    <p class="stem" style="margin-left:9mm; padding-left:0; text-indent:0; font-size:10pt;">이 자료에서 <b>톱니 모양</b>과 <b>전체 상승</b>은 각각 무엇 때문인가? 알맞게 짝지은 것은?</p>
+    <ol class="ch">
+      <li>① 톱니 — 화석 연료 / 상승 — 식물의 광합성</li><br>
+      <li>② 톱니 — 식물의 광합성 / 상승 — 화석 연료의 연소</li><br>
+      <li>③ 톱니 — 측정 오차 / 상승 — 화산 활동</li><br>
+      <li>④ 톱니 — 엘니뇨 / 상승 — 태양 활동</li><br>
+      <li>⑤ 톱니 — 화산 활동 / 상승 — 측정 방식의 변화</li>
+    </ol>
+  </div>
+
+  <div class="qq">
+    <p class="stem"><span class="qn">3</span>엘니뇨가 발생했을 때 <b>페루 연안</b>에서 일어나는 변화를, <b>무역풍</b>과 <b>용승</b>을 모두 사용하여 두 문장으로 서술하시오.<span class="tag">서술형</span></p>
+    <div class="write"><i></i><i></i><i></i></div>
+  </div>
+
+  <div class="qs-note">
+    <span class="k">채점 포인트</span>
+    <p>3번은 ① 무역풍이 약해진다 ② 따뜻한 물이 동쪽으로 밀려와 용승이 약해지고 수온이 올라간다 — 두 단계가 모두 들어가야 한다. '비가 많이 온다'만 쓰면 원인이 빠진 답이다.</p>
+  </div>
+
+  <div class="ans-line">정답 1 ④ (가시광선은 대부분 통과한다) 2 ② 3 무역풍이 약해져 따뜻한 표층수가 동쪽으로 밀려오고, 찬물의 용승이 약해져 페루 연안의 수온이 평소보다 높아진다.</div>
+  <div class="folio"><span>박찬 과학 | 통합과학 2</span><span class="num"></span></div>
+</div>
+
+<div class="page lect" style="--lb:#C1521E; --lb-dark:#B4560E; --lb-mid:#D98A5B; --lb-soft:#EBC4AB; --lb-light:#FBEFE7; --lb-pale:#FBF3ED; --lb-line:#F6DFCE;">
+  <div class="tagband"><span>차례</span><span>통합과학 2</span></div>
+  <div class="sian">목차 (앞부속)</div>
+
+  <div class="toc-h">
+    <div class="en">CONTENTS</div>
+    <div class="t">차례</div>
+  </div>
+
+  <div class="toc-unit"><span class="no">I</span><span class="nm">변화와 다양성</span><span class="line"></span></div>
+
+  <div class="toc-l">
+    <div class="lh"><span class="lno">01</span><span class="lt">지질시대와 생물의 변천</span><span class="dots"></span><span class="lpg">10</span></div>
+    <ul>
+      <li><span class="cn">01</span><span class="ct">지질시대 — 화석으로 나눈 지구의 역사</span></li>
+      <li><span class="cn">02</span><span class="ct">화석 — 표준 화석과 시상 화석</span></li>
+      <li><span class="cn">03</span><span class="ct">지질시대의 생물 — 시대별 대표 생물</span></li>
+      <li><span class="cn">04</span><span class="ct">대멸종 — 환경 변화와 생물의 소멸</span></li>
+      <li><span class="cn">05</span><span class="ct">대멸종 이후 — 빈자리와 다양성의 재편</span></li>
+    </ul>
+  </div>
+
+  <div class="toc-l">
+    <div class="lh"><span class="lno">02</span><span class="lt">진화와 생물다양성</span><span class="dots"></span><span class="lpg">22</span></div>
+    <ul>
+      <li><span class="cn">01</span><span class="ct">변이 — 진화의 재료</span></li>
+      <li><span class="cn">02</span><span class="ct">자연선택 — 환경이 고르고 세대가 쌓는다</span></li>
+      <li><span class="cn">03</span><span class="ct">자연선택의 현장 — 항생제 내성 세균</span></li>
+      <li><span class="cn">04</span><span class="ct">생물다양성 — 세 층으로 읽는다</span></li>
+      <li><span class="cn">05</span><span class="ct">생물다양성의 중요성과 보전 — 단일 품종의 위험</span></li>
+    </ul>
+  </div>
+
+  <div class="toc-l">
+    <div class="lh"><span class="lno">03</span><span class="lt">산화와 환원</span><span class="dots"></span><span class="lpg">34</span></div>
+    <ul>
+      <li><span class="cn">01</span><span class="ct">산소의 이동으로 본 산화와 환원</span></li>
+      <li><span class="cn">02</span><span class="ct">문명을 바꾼 세 가지 반응</span></li>
+      <li><span class="cn">03</span><span class="ct">전자의 이동으로 본 산화와 환원</span></li>
+      <li><span class="cn">04</span><span class="ct">생활 속의 산화와 환원</span></li>
+      <li><span class="cn">05</span><span class="ct">산화·환원 반응의 규칙</span></li>
+    </ul>
+  </div>
+
+  <div class="toc-l">
+    <div class="lh"><span class="lno">04</span><span class="lt">산·염기와 중화 반응</span><span class="dots"></span><span class="lpg">46</span></div>
+    <ul>
+      <li><span class="cn">01</span><span class="ct">산 — 수소 이온을 내놓는 물질</span></li>
+      <li><span class="cn">02</span><span class="ct">염기 — 수산화 이온을 내놓는 물질</span></li>
+      <li><span class="cn">03</span><span class="ct">지시약 — 색으로 확인하는 산과 염기</span></li>
+      <li><span class="cn">04</span><span class="ct">중화 반응 — H<sup>+</sup>와 OH<sup>−</sup>가 만나 물이 되는 반응</span></li>
+      <li><span class="cn">05</span><span class="ct">생활 속의 중화 반응</span></li>
+    </ul>
+  </div>
+
+  <div class="toc-l">
+    <div class="lh"><span class="lno">05</span><span class="lt">화학 변화와 에너지 출입</span><span class="dots"></span><span class="lpg">58</span></div>
+    <ul>
+      <li><span class="cn">01</span><span class="ct">발열 반응 — 열을 내놓는 화학 변화</span></li>
+      <li><span class="cn">02</span><span class="ct">흡열 반응 — 열을 흡수하는 화학 변화</span></li>
+      <li><span class="cn">03</span><span class="ct">발열 반응의 이용 — 손난로와 발열 도시락</span></li>
+      <li><span class="cn">04</span><span class="ct">흡열 반응의 이용 — 냉각 팩과 빵 굽기</span></li>
+      <li><span class="cn">05</span><span class="ct">발열·흡열의 판정 — 주위의 온도 변화</span></li>
+    </ul>
+  </div>
+
+  <div class="toc-l" style="margin-bottom:0;">
+    <div class="lh"><span class="lno">마무리</span><span class="lt">I단원 한눈에 정리</span><span class="dots"></span><span class="lpg">70</span></div>
+  </div>
+
+  <div class="folio"><span>박찬 과학 | 통합과학 2</span><span class="num"></span></div>
+</div>
+
+<div class="page lect">
+  <div class="tagband"><span>II. 환경과 에너지 · 한눈에 정리</span><span>통합과학 2</span></div>
+  <div class="sian">단원 마무리 (요약 정리)</div>
+
+  <div class="sm-h">
+    <span class="no">II</span>
+    <span class="t">환경과 에너지 — 한눈에 정리</span>
+    <span class="s">5개 소단원 · 25개 개념</span>
+  </div>
+
+  <div class="smgrid">
+    <div class="smc">
+      <div class="h"><span class="n">01</span><span class="t">생태계의 구성과 상호 관계</span><span class="pg">82</span></div>
+      <p>생태계는 <b>생물적 요인</b>(생산자·소비자·분해자)과 <b>비생물적 요인</b>(빛·온도·물·토양)으로 이루어진다. 환경은 생물에 <b>적응</b>을 일으키고, 생물도 환경을 바꾼다.</p>
+    </div>
+    <div class="smc">
+      <div class="h"><span class="n">02</span><span class="t">생태계 평형</span><span class="pg">94</span></div>
+      <p>먹이 그물이 <b>복잡할수록</b> 생태계는 안정하다. 개체 수는 <b>먹이 사슬을 통해 스스로 조절</b>되지만, 복원력의 한계를 넘는 충격을 받으면 평형이 깨진다.</p>
+    </div>
+    <div class="smc">
+      <div class="h"><span class="n">03</span><span class="t">지구온난화와 기후변화</span><span class="pg">106</span></div>
+      <p><b>온실효과</b>는 평균 기온 15 ℃를 유지하는 정상적인 작용이고, <b>지구온난화</b>는 그 작용의 강화다. 산업화 이후 CO<sub>2</sub>는 280 → 430 ppm, 기온은 +1.1~1.2 ℃.</p>
+    </div>
+    <div class="smc">
+      <div class="h"><span class="n">04</span><span class="t">태양 에너지와 에너지 전환</span><span class="pg">118</span></div>
+      <p>태양 에너지의 근원은 <b>수소 핵융합</b>이다. 이 에너지가 광합성·물의 순환·바람을 일으키며, 형태는 바뀌어도 <b>총량은 보존</b>된다.</p>
+    </div>
+    <div class="smc">
+      <div class="h"><span class="n">05</span><span class="t">발전과 에너지의 효율적 이용</span><span class="pg">130</span></div>
+      <p>모든 발전소는 <b>전자기 유도</b>로 전기를 만든다. 터빈을 무엇으로 돌리느냐만 다르다. <b>에너지 효율</b>은 유용하게 쓰인 에너지의 비율이다.</p>
+    </div>
+    <div class="smc" style="background:var(--lb-light);">
+      <div class="h"><span class="n">연결</span><span class="t">단원을 관통하는 한 줄</span></div>
+      <p>태양에서 온 에너지가 생태계를 돌리고, 그 에너지를 화석 연료로 꺼내 쓰면서 <b>기후가 흔들린다</b>. 그래서 발전 방식을 다시 묻게 된다.</p>
+    </div>
+  </div>
+
+  <div class="chain">
+    <span class="cw">태양 에너지</span><span class="ar">→</span>
+    <span class="cw">광합성 · 생태계</span><span class="ar">→</span>
+    <span class="cw">화석 연료 · CO<sub>2</sub> 증가</span><span class="ar">→</span>
+    <span class="cw">기후변화</span><span class="ar">→</span>
+    <span class="cw">신재생 에너지</span>
+  </div>
+
+  <div class="memo memo-line" style="height:42mm;">
+    <span class="mk">단원 메모<span class="sub">헷갈렸던 것 · 다시 볼 것</span></span>
+    <div class="rules"></div>
+  </div>
+
+  <div class="folio"><span>박찬 과학 | 통합과학 2</span><span class="num"></span></div>
+</div>
+
+</body>
+</html>
