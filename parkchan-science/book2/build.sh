@@ -29,6 +29,7 @@ render chapter-2102/chapter.html chapter-2102/chapter.pdf
 render chapter-2103/chapter.html chapter-2103/chapter.pdf
 render chapter-2104/chapter.html chapter-2104/chapter.pdf
 render chapter-2105/chapter.html chapter-2105/chapter.pdf
+render summary-1/summary.html summary-1/summary.pdf
 
 # 3) 조판 QA
 python3 ../tools/qa_check.py chapter-2101/chapter.html
@@ -36,6 +37,7 @@ python3 ../tools/qa_check.py chapter-2102/chapter.html
 python3 ../tools/qa_check.py chapter-2103/chapter.html
 python3 ../tools/qa_check.py chapter-2104/chapter.html
 python3 ../tools/qa_check.py chapter-2105/chapter.html
+python3 ../tools/qa_check.py summary-1/summary.html
 
 # 4) 텍스트 무결성 (HTML 가시 텍스트 vs PDF 텍스트 레이어)
 python3 ../tools/pdf_text_check.py chapter-2101/chapter.html chapter-2101/chapter.pdf
@@ -43,12 +45,13 @@ python3 ../tools/pdf_text_check.py chapter-2102/chapter.html chapter-2102/chapte
 python3 ../tools/pdf_text_check.py chapter-2103/chapter.html chapter-2103/chapter.pdf
 python3 ../tools/pdf_text_check.py chapter-2104/chapter.html chapter-2104/chapter.pdf
 python3 ../tools/pdf_text_check.py chapter-2105/chapter.html chapter-2105/chapter.pdf
+python3 ../tools/pdf_text_check.py summary-1/summary.html summary-1/summary.pdf
 
 # 5) 합본 PDF (지금까지 완성된 챕터 축적분)
 python3 - <<'PYEOF'
 import pymupdf
 out = pymupdf.open()
-for f in ["chapter-2101/chapter.pdf", "chapter-2102/chapter.pdf", "chapter-2103/chapter.pdf", "chapter-2104/chapter.pdf", "chapter-2105/chapter.pdf"]:
+for f in ["chapter-2101/chapter.pdf", "chapter-2102/chapter.pdf", "chapter-2103/chapter.pdf", "chapter-2104/chapter.pdf", "chapter-2105/chapter.pdf", "summary-1/summary.pdf"]:
     with pymupdf.open(f) as d:
         out.insert_pdf(d)
 try:
