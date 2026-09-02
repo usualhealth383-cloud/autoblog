@@ -1,0 +1,935 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<title>박찬 과학 통합과학1 — I-04 정보와 신호, 디지털 문명</title>
+<style>
+  @font-face { font-family:'PC Sans'; src:url('file:///root/.fonts/NotoSansKR.ttf'); font-weight:100 900; }
+  @font-face { font-family:'PC Serif'; src:url('file:///root/.fonts/NotoSerifKR.ttf'); font-weight:100 900; }
+  @font-face { font-family:'PC Pen'; src:url('file:///root/.fonts/YeonSung-Regular.ttf'); font-weight:400; }
+
+  :root{
+    --brand:#0E5A6B;        /* 박찬 과학 브랜드 딥틸 */
+    --brand-lt:#E3F0F3;
+    --unit:#3E9C6E;         /* I. 과학의 기초 단원 컬러(그린) */
+    --unit-lt:#EAF6EC;
+    --unit-md:#BFE0CD;
+    --accent:#E8940A;       /* 알짜 앰버 */
+    --accent-lt:#FDF3E0;
+    --point:#D6455D;        /* 시험 포인트 */
+    --point-lt:#FBEBEE;
+    --ink:#22303A;
+    --sub:#5B6B77;
+    --line:#D8E0E5;
+  }
+  *{ box-sizing:border-box; margin:0; padding:0; -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+  @page{ size:210mm 275mm; margin:0; }
+  html,body{ font-family:'PC Sans',sans-serif; color:var(--ink); }
+
+  .page{ width:210mm; height:275mm; position:relative; overflow:hidden; background:#fff; page-break-after:always; padding:14mm 13mm 19mm 15mm; display:flex; flex-direction:column; }
+
+  /* ── 러닝 헤드 / 풋 ── */
+  .runhead{ display:flex; align-items:center; justify-content:space-between; border-bottom:0.35mm solid var(--unit); padding-bottom:2mm; margin-bottom:6.5mm; }
+  .runhead .unit-tag{ font-size:8.5pt; font-weight:700; color:var(--unit); letter-spacing:0.02em; }
+  .runhead .lesson-tag{ font-size:8.5pt; color:var(--sub); }
+  .folio{ position:absolute; bottom:7mm; left:0; right:0; display:flex; justify-content:space-between; padding:0 14mm 0 14mm; font-size:8pt; color:var(--sub); }
+  .folio .num{ font-weight:800; color:var(--unit); font-size:10pt; }
+
+  /* ── 본문 그리드: 본문 + 날개단 ── */
+  .cols{ display:grid; grid-template-columns:1fr 43mm; gap:8mm; flex:1; min-height:0; margin-bottom:4mm; }
+  .main{ min-width:0; }
+  .wing{ border-left:0.3mm solid var(--line); padding-left:5mm; font-size:8.2pt; color:var(--sub); line-height:1.7; }
+
+  /* ── 타이포 ── */
+  h2.lesson-title{ display:flex; align-items:baseline; gap:3.5mm; margin-bottom:2mm; }
+  h2.lesson-title .no{ background:var(--unit); color:#fff; font-size:13pt; font-weight:900; padding:1.2mm 3.2mm; border-radius:1.5mm; }
+  h2.lesson-title .tt{ font-size:16.5pt; font-weight:900; letter-spacing:-0.01em; }
+  .std-badges{ display:flex; gap:2mm; margin:2mm 0 6.5mm; }
+  .std{ font-size:7.4pt; color:var(--unit); background:none; border:0.3mm solid var(--unit-md); border-radius:5mm; padding:0.6mm 2.8mm; font-weight:600; }
+
+  h3.sec{ display:flex; align-items:baseline; gap:3mm; font-size:12.5pt; font-weight:800; margin:9mm 0 3.6mm; letter-spacing:-0.01em; }
+  h3.sec .n{ font-family:'PC Serif'; font-size:15.5pt; font-weight:900; color:var(--unit); border-bottom:0.7mm solid var(--accent); padding:0 0.8mm 0.2mm; flex:0 0 auto; line-height:1; }
+  h3.sec::after{ content:""; flex:1; border-top:0.25mm solid var(--line); align-self:center; margin-left:2mm; }
+  h3.sec:first-child{ margin-top:0; }
+
+  p.body{ font-family:'PC Serif'; font-size:9.6pt; line-height:1.92; margin-bottom:3.6mm; text-align:justify; }
+  p.body b{ font-weight:800; }
+  .kw{ font-weight:800; color:var(--unit); }
+  .u-amber{ background:#F8E9C6; font-weight:700; padding:0.15mm 0.6mm; border-radius:0.6mm; box-decoration-break:clone; -webkit-box-decoration-break:clone; }
+
+  ul.pts{ font-family:'PC Serif'; font-size:9.6pt; line-height:1.84; margin:1.5mm 0 3.5mm 1mm; list-style:none; }
+  ul.pts li{ padding-left:4.5mm; position:relative; margin-bottom:1.8mm; }
+  ul.pts li::before{ content:""; position:absolute; left:0.5mm; top:2.9mm; width:1.7mm; height:1.7mm; background:var(--accent); border-radius:50%; }
+
+  /* ── 코너 박스 ── */
+  .boxtitle{ display:inline-flex; align-items:center; gap:1.8mm; font-weight:900; font-size:9.5pt; margin-bottom:1.6mm; }
+  .boxtitle .ico{ width:5.2mm; height:5.2mm; border-radius:1.2mm; display:flex; align-items:center; justify-content:center; color:#fff; font-size:7.5pt; font-weight:900; }
+
+  .gist{ background:none; border:none; border-top:0.5mm solid var(--accent); border-bottom:0.5mm solid var(--accent); border-radius:0; padding:3.2mm 1.8mm 3mm; margin:6mm 0 5mm; }
+  .gist .boxtitle{ color:#9C6503; } .gist .ico{ background:var(--accent); }
+  .gist ul{ list-style:none; font-family:'PC Serif'; font-size:9.3pt; line-height:1.78; }
+  .gist li{ padding-left:4.2mm; position:relative; margin-bottom:1.2mm;}
+  .gist li::before{ content:"✓"; position:absolute; left:0; color:var(--accent); font-weight:900; }
+
+  .expoint{ background:none; border-left:0.5mm solid #D998A4; border-left-color:#D998A4; border-radius:0; padding:1.4mm 0 1.4mm 3.6mm; margin:4.5mm 0; }
+  .expoint .boxtitle{ color:#A9556A; font-size:8.6pt; margin-bottom:1mm;}
+  .expoint .ico{ background:none; color:#A9556A; border:0.35mm solid #D998A4; width:4.4mm; height:4.4mm; border-radius:50%; font-size:7pt; }
+  .expoint p{ font-family:'PC Serif'; font-size:8.9pt; line-height:1.7; }
+
+  .pen{ font-family:'PC Pen'; font-size:12pt; color:#B4560E; line-height:1.45; }
+  .saem{ display:flex; gap:3mm; align-items:flex-start; margin:4.5mm 0; }
+  .saem .avatar{ flex:0 0 auto; width:10.5mm; height:10.5mm; border-radius:50%; background:var(--brand); color:#fff; font-size:7pt; font-weight:800; display:flex; align-items:center; justify-content:center; line-height:1.35; letter-spacing:0.04em; text-align:center; border:0.5mm solid var(--accent); box-sizing:border-box;}
+  .saem .bubble{ background:#FFFBF0; border:0.4mm solid #EBCB9C; border-radius:3mm; padding:2.2mm 3.6mm 2mm; position:relative; }
+  .saem .bubble::before{ content:""; position:absolute; left:-1.8mm; top:3.2mm; width:3mm; height:3mm; background:#FFFBF0; border-left:0.4mm solid #EBCB9C; border-bottom:0.4mm solid #EBCB9C; transform:rotate(45deg); }
+
+  .wing .wtitle{ font-size:8pt; font-weight:900; color:var(--brand); display:flex; align-items:center; gap:1.5mm; margin:0 0 2.4mm; letter-spacing:0.05em; }
+  .wing .wtitle::before{ content:""; width:2.4mm; height:2.4mm; background:var(--accent); border-radius:50%; }
+  .wing .term{ margin-bottom:3.6mm; }
+  .wing .term b{ color:var(--ink); font-weight:800; display:block; font-size:8.5pt; margin-bottom:0.7mm;}
+  .wing .wsep{ border-top:0.3mm dashed var(--line); margin:4.5mm 0; }
+  .wing .wing-pen{ font-family:'PC Pen'; font-size:11pt; color:#B4560E; line-height:1.45; }
+
+  figure{ margin:5mm 0; }
+  figure figcaption{ font-size:8pt; color:var(--sub); text-align:center; margin-top:2mm; }
+  figure svg{ display:block; margin:0 auto; }
+
+  /* ── 비교형 그림 (2패널 + 범례) ── */
+  .fig-duo{ display:flex; align-items:stretch; gap:2.5mm; justify-content:center; }
+  .fig-duo .panel{ flex:0 0 auto; text-align:center; }
+  .fig-duo .p-title{ font-size:9pt; font-weight:900; color:var(--ink); margin-top:1.6mm; }
+  .fig-duo .p-sub{ font-size:7.8pt; color:var(--sub); line-height:1.45; margin-top:0.5mm; }
+  .fig-duo .mid{ display:flex; flex-direction:column; align-items:center; justify-content:center; gap:1mm; padding:0 1mm; }
+  .fig-duo .mid .mlab{ font-size:7.6pt; font-weight:800; color:var(--unit); text-align:center; line-height:1.3; }
+  .fig-legend{ display:flex; justify-content:center; gap:5mm; font-size:7.8pt; color:var(--ink); margin-top:1.2mm; align-items:center; }
+  .fig-legend span{ display:inline-flex; align-items:center; gap:1.4mm; }
+
+  /* ── 탐구 (자료 파헤치기) ── */
+  .lab{ border:0.5mm solid var(--brand); border-radius:2.5mm; overflow:hidden; margin-top:1mm;}
+  .lab .lab-head{ background:var(--brand); color:#fff; padding:2.2mm 4mm; font-weight:900; font-size:11pt; display:flex; align-items:center; gap:2.5mm;}
+  .lab .lab-head .tag{ font-size:7.5pt; background:rgba(255,255,255,.22); padding:0.6mm 2.4mm; border-radius:4mm; font-weight:700;}
+  .lab .lab-body{ padding:3.5mm 4mm; }
+  .lab h4{ font-size:9.6pt; font-weight:900; color:var(--brand); margin:2.5mm 0 1.4mm; }
+  .lab h4:first-child{ margin-top:0; }
+  .lab p, .lab li{ font-family:'PC Serif'; font-size:9.3pt; line-height:1.8; }
+  .lab ol{ margin-left:5mm; }
+
+  /* ── 문제부 ── */
+  .step-head{ display:flex; align-items:center; gap:3mm; margin:0 0 5mm; }
+  .step-head .stepno{ background:var(--unit); color:#fff; font-weight:900; font-size:9.5pt; padding:1.4mm 3.4mm; border-radius:1.5mm; letter-spacing:0.04em;}
+  .step-head .steptt{ font-size:12.5pt; font-weight:900; }
+  .step-head .stepdesc{ font-size:8.2pt; color:var(--sub); margin-left:auto; }
+  .step-head.s2 .stepno{ background:var(--brand); }
+  .step-head.s3 .stepno{ background:var(--point); }
+
+  .q{ margin-bottom:7.5mm; break-inside:avoid; }
+  .q .qhead{ display:flex; gap:2.4mm; align-items:flex-start; }
+  .q .qno{ flex:0 0 auto; min-width:6.2mm; height:6.2mm; border:0.45mm solid var(--unit); color:var(--unit); border-radius:50%; font-size:8.6pt; font-weight:900; line-height:1; display:flex; align-items:center; justify-content:center; padding-top:0.55mm; margin-top:0.4mm;}
+  .q .stem{ font-family:'PC Serif'; font-size:9.5pt; line-height:1.74; font-weight:500; }
+  .q .stem .difficulty{ color:#C9A227; font-size:8pt; letter-spacing:0.06em; margin-left:1.5mm;}
+  .q .tags{ margin-top:0.8mm; font-size:7pt; color:var(--sub); font-family:'PC Sans';}
+  .choices{ list-style:none; margin:2.2mm 0 0 8.6mm; font-family:'PC Serif'; font-size:9.3pt; line-height:1.85; }
+  .choices.inline{ display:flex; flex-wrap:wrap; gap:0 6mm; }
+  .bogi-box{ border:0.35mm solid #B8C2CA; border-radius:0; margin:2.5mm 0 0 8.6mm; padding:2.4mm 3.2mm; font-family:'PC Serif'; font-size:9.2pt; line-height:1.8; background:none;}
+  .bogi-box .bt{ text-align:center; font-weight:800; color:var(--sub); font-size:8.4pt; margin-bottom:0.8mm; letter-spacing:0.3em;}
+  .ox-answer{ margin-left:2mm; color:var(--sub); font-size:9pt; }
+  .blankline{ display:inline-block; min-width:14mm; border-bottom:0.4mm solid var(--ink); }
+  .qgrid{ display:grid; grid-template-columns:1fr 1fr; gap:0 9mm; }
+  .essay-lines{ margin:2mm 0 0 8.4mm; }
+  .essay-lines div{ border-bottom:0.3mm solid var(--line); height:6.2mm; }
+  .badge-essay{ display:inline-block; background:var(--point); color:#fff; font-size:7pt; font-weight:800; padding:0.4mm 2mm; border-radius:1mm; vertical-align:1pt; margin-right:1.2mm;}
+  .badge-data{ display:inline-block; background:var(--brand); color:#fff; font-size:7pt; font-weight:800; padding:0.4mm 2mm; border-radius:1mm; vertical-align:1pt; margin-right:1.2mm;}
+
+  /* ── 해설부 ── */
+  .sol-head{ display:flex; align-items:center; gap:3mm; margin-bottom:4mm;}
+  .sol-head .stt{ font-size:14.5pt; font-weight:900; color:var(--brand);}
+  .sol-head .sub{ font-size:8.5pt; color:var(--sub);}
+  .anstable{ width:100%; border-collapse:collapse; margin-bottom:4.5mm; }
+  .anstable th,.anstable td{ border:0.3mm solid var(--line); font-size:8.8pt; padding:1.4mm 0; text-align:center; }
+  .anstable th{ background:var(--brand-lt); color:var(--brand); font-weight:800; }
+  .anstable td.a{ font-weight:900; color:var(--unit); }
+  .sol{ margin-bottom:5mm; break-inside:avoid; }
+  .sol .shead{ display:flex; align-items:center; gap:2mm; margin-bottom:1.4mm;}
+  .sol .sno{ background:var(--unit); color:#fff; min-width:6mm; height:5.4mm; border-radius:1.2mm; font-size:8.6pt; font-weight:900; line-height:1; display:flex; align-items:center; justify-content:center; padding:0.5mm 1.5mm 0;}
+  .sol .sans{ font-weight:900; color:var(--unit); font-size:9.6pt;}
+  .sol .slink{ font-size:7.2pt; color:var(--sub); margin-left:auto;}
+  .sol p{ font-family:'PC Serif'; font-size:9.1pt; line-height:1.76; margin-bottom:0.8mm; }
+  .wrongbox{ background:none; border:none; border-left:0.7mm solid #E3A0AC; border-radius:0; padding:1mm 0 1mm 3mm; margin-top:2mm;}
+  .wrongbox .wt{ font-size:8pt; font-weight:900; color:var(--point); margin-bottom:0.8mm; font-family:'PC Sans';}
+  .wrongbox p{ font-family:'PC Serif'; font-size:8.6pt; line-height:1.68; margin-bottom:0.9mm;}
+  .wrongbox p:last-child{ margin-bottom:0; }
+  .solcols{ display:grid; grid-template-columns:1fr 1fr; gap:0 9mm; }
+
+  /* ── 단원 도입 (타이포그래피 중심) ── */
+  .opener{ padding:0 0 19mm; }
+  .opener-hero{ position:relative; padding:7mm 20mm 4.5mm; overflow:hidden; flex-shrink:0; }
+  .ghost-txt{ position:absolute; top:-10mm; right:6mm; font-size:118pt; font-weight:900; color:#EBF5EF; line-height:1; letter-spacing:-0.04em; }
+  .kicker{ display:flex; align-items:center; gap:4mm; position:relative; }
+  .kicker .kt{ font-size:9.5pt; font-weight:800; color:var(--unit); letter-spacing:0.24em; white-space:nowrap; }
+  .kicker::after{ content:""; flex:1; border-top:0.3mm solid var(--line); }
+  .opener-hero h1{ position:relative; font-size:36pt; font-weight:900; letter-spacing:-0.015em; margin:4mm 0 0; }
+  .opener-hero h1 .tick{ display:block; width:14mm; border-top:1.4mm solid var(--accent); margin-bottom:3.6mm; }
+  .opener-lede{ position:relative; font-family:'PC Serif'; font-size:10.2pt; font-weight:600; line-height:2.0; color:#3D4C58; max-width:138mm; margin-top:4mm; padding-left:5mm; border-left:0.8mm solid var(--accent); }
+  .opener-inner{ padding:0 20mm; }
+
+  /* ── 원소의 여정 스트립 ── */
+  .journey{ margin-top:3.5mm; }
+  .journey .j-label{ font-size:8pt; font-weight:800; color:var(--sub); letter-spacing:0.08em; margin-bottom:2.4mm; display:flex; align-items:center; gap:1.6mm;}
+  .journey .j-label::before{ content:""; width:2.4mm; height:2.4mm; background:var(--unit); border-radius:50%; }
+  .j-bar{ display:flex; align-items:center; gap:2mm; }
+  .j-chip{ flex:1; text-align:center; background:#F0F8F3; border:0.35mm solid #BFE0CD; color:#3E9C6E; border-radius:1.6mm; padding:2.4mm 1mm 2mm; }
+  .j-chip .jc-t{ font-size:8.8pt; font-weight:800; display:block; }
+  .j-chip .jc-s{ font-size:6.8pt; color:var(--sub); display:block; margin-top:0.5mm; }
+  .j-chip.on{ background:var(--unit); border-color:var(--unit); }
+  .j-chip.on .jc-t{ color:#fff; }
+  .j-chip.on .jc-s{ color:#D6EEDF; }
+  .j-arrow{ flex:0 0 auto; color:#8CCBA8; font-size:10pt; font-weight:900; }
+  .toc{ margin-top:5mm; }
+  .toc .toc-title{ font-size:11pt; font-weight:900; color:var(--ink); margin-bottom:3mm; display:flex; align-items:center; gap:2.5mm;}
+  .toc .toc-title::before{ content:""; width:3.4mm; height:3.4mm; background:var(--accent); border-radius:0.8mm; }
+  .toc-item{ display:flex; align-items:flex-start; gap:5mm; padding:2.8mm 6mm; border-bottom:0.3mm solid var(--line); }
+  .toc-item:first-of-type{ border-top:0.3mm solid var(--line); }
+  .toc-item.active{ background:#F0F8F3; border-left:1.2mm solid #6FBE93; }
+  .toc-item .tno{ font-family:'PC Serif'; font-weight:900; color:#6FBE93; font-size:14pt; width:10mm; line-height:1.1; flex:0 0 auto;}
+  .toc-item .tbody{ flex:1; min-width:0; }
+  .toc-item .ttt{ font-weight:800; font-size:10.5pt; letter-spacing:0.01em; display:flex; align-items:center;}
+  .toc-item .tdesc{ font-family:'PC Serif'; font-size:8.6pt; font-weight:600; color:#4A5964; margin-top:0.7mm; line-height:1.55;}
+  .toc-item .tstd{ font-size:7.2pt; color:var(--sub); flex:0 0 auto; padding-top:1.2mm;}
+  .toc-item.active .tag-now{ background:var(--accent); color:#fff; font-size:7pt; font-weight:900; border-radius:4mm; padding:0.7mm 2.6mm; margin-left:3.5mm;}
+  .toc-item .tag-done{ font-size:7.2pt; font-weight:800; color:#3E9C6E; margin-left:3.5mm; }
+  .opener-quote{ margin-top:4mm; text-align:center; font-family:'PC Serif'; font-size:9.8pt; font-weight:600; color:#4A5964; letter-spacing:0.01em; }
+  .opener-quote .who{ font-size:8pt; color:var(--sub); font-weight:400; margin-left:2.5mm; }
+  .qa-lead li .qgo{ font-family:'PC Sans'; font-size:7.4pt; font-weight:800; color:var(--unit); background:var(--unit-lt); border-radius:3mm; padding:0.5mm 2.2mm; margin-left:2mm; white-space:nowrap; vertical-align:1pt;}
+  .qa-lead{ margin-top:3.5mm; border:none; border-top:0.45mm solid var(--brand); border-bottom:0.45mm solid var(--brand); background:none; border-radius:0; padding:3mm 2mm 2.8mm; }
+  .qa-lead .qt{ font-weight:900; color:var(--brand); font-size:10.5pt; margin-bottom:2mm;}
+  .qa-lead li{ font-family:'PC Serif'; font-size:9.5pt; line-height:1.8; margin-left:5mm; }
+
+  /* ── 바로바로 체크 (개념 페이지 하단 즉석 OX) ── */
+  .quickcheck{ margin-top:auto; border-top:0.35mm dashed #C8B98F; padding-top:3mm; width:calc(100% - 51mm); }
+  .quickcheck .qc-title{ display:inline-flex; align-items:center; gap:1.6mm; font-size:8.2pt; font-weight:900; color:#9C6503; margin-bottom:1.4mm; }
+  .quickcheck .qc-title::before{ content:"✓"; color:var(--accent); font-weight:900; }
+  .quickcheck ol{ list-style:none; font-family:'PC Serif'; font-size:8.8pt; line-height:1.75; }
+  .quickcheck li{ display:flex; gap:2mm; align-items:baseline; }
+  .quickcheck li .no{ font-weight:800; color:var(--accent); flex:0 0 auto; }
+  .quickcheck .qc-ans{ margin-top:1mm; font-size:7.2pt; color:var(--sub); transform:rotate(180deg); text-align:left; }
+
+  /* ── 중학 과학 다시보기 (날개단) ── */
+  .wing .review{ background:#F6F3EC; border-radius:1.8mm; padding:2.8mm 3mm; margin-top:1mm; }
+  .wing .review .rv-title{ font-size:7.8pt; font-weight:900; color:#7A6A45; margin-bottom:1.4mm; display:flex; align-items:center; gap:1.4mm;}
+  .wing .review .rv-title::before{ content:"↺"; font-weight:900; color:#A08A55; }
+
+  /* ── MEMO 페이지 ── */
+  .memo-head{ display:flex; align-items:baseline; gap:3.5mm; margin-bottom:5mm; }
+  .memo-head .mt{ font-size:17pt; font-weight:900; color:var(--brand); letter-spacing:0.22em; }
+  .memo-head .ms{ font-size:8.6pt; color:var(--sub); }
+  .memo-area{ flex:1; border:0.4mm solid var(--line); border-radius:2.5mm;
+    background-image:linear-gradient(to bottom, transparent calc(100% - 0.3mm), #DCE4E9 0);
+    background-size:100% 9mm; background-position:0 4mm; padding:0 5mm; margin-bottom:4mm; }
+  .memo-pen{ font-family:'PC Pen'; font-size:12.5pt; color:#B4560E; text-align:right; }
+</style>
+</head>
+<body>
+
+<!-- ═════════════ p.48 소단원 도입 ═════════════ -->
+<div class="page opener">
+  <div class="opener-hero">
+    <div class="ghost-txt">04</div>
+    <div class="kicker"><span class="kt">통합과학 1 · I. 과학의 기초</span></div>
+    <h1><span class="tick"></span>정보와 신호, 디지털 문명</h1>
+    <p class="opener-lede">자연을 재면 숫자가 되고, 숫자가 모이면 정보가 된다.<br>
+    그 정보가 0과 1로 옷을 갈아입는 순간, 문명의 속도가 바뀌었다.</p>
+  </div>
+
+  <div class="opener-inner">
+    <div class="journey">
+      <div class="j-label">과학의 기초 — 지금 여기</div>
+      <div class="j-bar">
+        <div class="j-chip"><span class="jc-t">시간과 공간</span><span class="jc-s">자연을 재는 눈</span></div>
+        <span class="j-arrow">→</span>
+        <div class="j-chip"><span class="jc-t">기본량과 단위</span><span class="jc-s">자연을 쓰는 언어</span></div>
+        <span class="j-arrow">→</span>
+        <div class="j-chip"><span class="jc-t">측정과 어림</span><span class="jc-s">모두의 자, 측정 표준</span></div>
+        <span class="j-arrow">→</span>
+        <div class="j-chip on"><span class="jc-t">정보와 디지털</span><span class="jc-s">측정이 문명이 되기까지</span></div>
+      </div>
+    </div>
+    <div class="toc">
+      <div class="toc-title">이 단원의 학습 지도</div>
+      <div class="toc-item">
+        <span class="tno">01</span>
+        <span class="tbody"><span class="ttt">자연을 재는 눈 — 시간과 공간<span class="tag-done">완료 ✓</span></span>
+        <span class="tdesc">시공간의 규모, 길이와 시간을 재는 현대적 방법</span></span>
+        <span class="tstd">10통과1-01-01</span>
+      </div>
+      <div class="toc-item">
+        <span class="tno">02</span>
+        <span class="tbody"><span class="ttt">기본량과 단위<span class="tag-done">완료 ✓</span></span>
+        <span class="tdesc">7가지 기본량(SI), 단위가 자연을 기술하는 방식</span></span>
+        <span class="tstd">10통과1-01-02</span>
+      </div>
+      <div class="toc-item">
+        <span class="tno">03</span>
+        <span class="tbody"><span class="ttt">측정과 어림, 측정 표준<span class="tag-done">완료 ✓</span></span>
+        <span class="tdesc">측정·어림의 의미, 측정 표준은 왜 필요한가</span></span>
+        <span class="tstd">10통과1-01-03</span>
+      </div>
+      <div class="toc-item active">
+        <span class="tno">04</span>
+        <span class="tbody"><span class="ttt">정보와 신호, 디지털 문명<span class="tag-now">NOW</span></span>
+        <span class="tdesc">측정에서 정보로, 아날로그에서 디지털로</span></span>
+        <span class="tstd">10통과1-01-04</span>
+      </div>
+    </div>
+
+    <div class="qa-lead">
+      <div class="qt">이 소단원을 끝내면 답할 수 있는 질문</div>
+      <ul>
+        <li>일기예보와 심전도의 공통점은 무엇일까? <span class="qgo">개념 1</span></li>
+        <li>아날로그와 디지털 — 무엇이 다를까? <span class="qgo">개념 2</span></li>
+        <li>매끈한 소리 곡선이 어떻게 0과 1이 될까? <span class="qgo">개념 3</span></li>
+        <li>디지털은 왜 아무리 복사해도 안 변할까? <span class="qgo">개념 4</span></li>
+      </ul>
+    </div>
+
+    <div class="opener-quote">"통신의 근본 문제는, 한 지점에서 선택된 메시지를 다른 지점에서 정확히 재현하는 것이다."<span class="who">— 클로드 섀넌, '통신의 수학적 이론'(1948)</span></div>
+  </div>
+
+  <div class="folio"><span>박찬 과학 | 통합과학 1</span><span class="num">48</span></div>
+</div>
+
+<!-- ═════════════ p.49 개념 01 측정에서 정보로 ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag">I. 과학의 기초</span><span class="lesson-tag">04. 정보와 신호, 디지털 문명</span></div>
+  <h2 class="lesson-title"><span class="no">04</span><span class="tt">정보와 신호, 디지털 문명</span></h2>
+  <div class="std-badges"><span class="std">성취기준 10통과1-01-04</span><span class="std">측정 → 정보 산출 → 디지털 변환 → 정보 통신과 문명</span></div>
+
+  <div class="cols">
+    <div class="main">
+      <h3 class="sec"><span class="n">1</span>변화를 재면 정보가 된다</h3>
+      <p class="body">자연은 끊임없이 변한다 — 기온이 오르내리고, 심장이 뛰고, 땅이 흔들린다. 이 <b>변화를 측정·분석해 쓸모 있는 형태로 정리한 것</b>이 <span class="kw">정보</span>다. 전국의 관측 장비가 잰 기온·기압·습도가 모여 <b>일기예보</b>가 되고, 심장이 뛸 때 생기는 전기 신호의 변화를 기록한 곡선이 <b>심전도</b>가 되어 심장병 진단의 근거가 된다. 지진계의 흔들림 기록이 지진 경보가 되는 것도 같다 — III단원의 지진 관측이 바로 이 이야기였다.</p>
+      <p class="body">측정값 하나는 숫자일 뿐이지만, <span class="u-amber">모으고 비교하고 분석하는 순간 판단의 근거</span>가 된다. 오늘 기온 25 ℃는 숫자다. 그런데 '어제보다 8도 급락'이라면 외투를 챙기게 하는 정보다. 과학이 측정을 쌓는 이유, 병원이 검사 기록을 쌓는 이유가 여기에 있다 — <b>측정이 쌓여야 변화가 보이고, 변화가 보여야 예측이 선다.</b></p>
+
+      <figure>
+        <svg width="470" height="146" viewBox="0 0 470 146" font-family="PC Sans">
+          <defs>
+            <marker id="arrP" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="#3E9C6E"/></marker>
+            <marker id="arrR" markerWidth="7" markerHeight="7" refX="5" refY="2.5" orient="auto"><path d="M0,0 L6,2.5 L0,5 Z" fill="#D6455D"/></marker>
+          </defs>
+          <g font-size="6.8" text-anchor="middle">
+            <g transform="translate(88,10)" font-weight="800">
+              <rect x="-62" y="0" width="124" height="98" rx="6" fill="#F0F8F3" stroke="#BFE0CD" stroke-width="1"/>
+              <text y="16" fill="#3E9C6E">① 자연의 변화</text>
+              <path d="M-42,54 q10,-18 20,-4 q10,14 20,-8 q10,-16 22,2" stroke="#3E9C6E" stroke-width="1.8" fill="none"/>
+              <text y="80" font-weight="400" fill="#5B6B77">기온·심장 전기 신호·지반 흔들림</text>
+            </g>
+            <line x1="156" y1="58" x2="176" y2="58" stroke="#3E9C6E" stroke-width="2" marker-end="url(#arrP)"/>
+            <g transform="translate(240,10)" font-weight="800">
+              <rect x="-58" y="0" width="116" height="98" rx="6" fill="#FDF9F0" stroke="#EBCB9C" stroke-width="1"/>
+              <text y="16" fill="#B4560E">② 측정·기록</text>
+              <g font-weight="400" fill="#5B6B77" font-size="6.4">
+                <text y="40">09시 21.3 ℃</text><text y="54">12시 24.8 ℃</text><text y="68">15시 25.1 ℃ …</text>
+              </g>
+              <text y="88" font-weight="400" fill="#5B6B77">수치 + 단위의 목록</text>
+            </g>
+            <line x1="304" y1="58" x2="324" y2="58" stroke="#3E9C6E" stroke-width="2" marker-end="url(#arrP)"/>
+            <g transform="translate(392,10)" font-weight="800">
+              <rect x="-66" y="0" width="132" height="98" rx="6" fill="#EAF6EC" stroke="#6FBE93" stroke-width="1"/>
+              <text y="16" fill="#3E9C6E">③ 분석 → 정보</text>
+              <text y="42" font-size="8" fill="#B4560E">"내일 아침 한파 주의"</text>
+              <text y="60" font-size="8" fill="#B4560E">"심장 박동 불규칙 — 진료 권고"</text>
+              <text y="86" font-weight="400" fill="#5B6B77">판단과 예측의 근거가 된다</text>
+            </g>
+          </g>
+          <text x="235" y="134" text-anchor="middle" font-size="8.8" font-weight="800" fill="#E8940A">변화 → 측정 → 분석 → 정보 — 일기예보도 심전도도 지진 경보도 같은 공정이다</text>
+        </svg>
+        <figcaption>그림 1 | 측정에서 정보로 — 숫자가 쌓여 판단이 되는 3단계</figcaption>
+      </figure>
+
+      <div class="saem">
+        <div class="avatar">박찬<br>쌤</div>
+        <div class="bubble"><span class="pen">"스마트워치가 하는 일이 정확히 이 세 단계다 — 맥박을 재고(측정), 기록을 쌓고, '심박이 평소보다 높아요'라고 알려 준다(정보). 손목 위의 I단원이지."</span></div>
+      </div>
+    </div>
+
+    <div class="wing">
+      <div class="wtitle">날개 노트</div>
+      <div class="term"><b>정보</b>측정·분석을 거쳐 판단에 쓸 수 있게 정리된 지식. 원료는 언제나 측정값이다.</div>
+      <div class="term"><b>심전도(ECG)</b>심장이 뛸 때 생기는 전기 신호의 변화를 시간에 따라 기록한 곡선.</div>
+      <div class="wsep"></div>
+      <div class="wtitle">한눈에 암기</div>
+      <div class="wing-pen">변화 → 측정 → 정보!<br>숫자가 쌓여야<br>예측이 선다</div>
+    </div>
+  </div>
+
+  <div class="folio"><span>I. 과학의 기초</span><span class="num">49</span></div>
+</div>
+
+<!-- ═════════════ p.50 개념 02 아날로그와 디지털 ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag">I. 과학의 기초</span><span class="lesson-tag">04. 정보와 신호, 디지털 문명</span></div>
+  <div class="cols">
+    <div class="main">
+      <h3 class="sec"><span class="n">2</span>두 가지 신호 — 아날로그와 디지털</h3>
+      <p class="body">측정된 변화를 담아 나르는 형식, 곧 <span class="kw">신호</span>에는 두 갈래가 있다. <span class="kw">아날로그 신호</span>는 자연의 변화를 <b>연속적인 값</b> 그대로 담는다 — 수은 온도계의 눈금, 바늘 시계의 부드러운 움직임, LP판의 소리 골. 반면 <span class="kw">디지털 신호</span>는 값을 <b>띄엄띄엄한(불연속적인) 숫자</b>, 최종적으로는 <span class="u-amber">0과 1의 나열</span>로 담는다 — 전자 체온계의 '36.5', 디지털시계의 숫자, 스마트폰 속 모든 파일.</p>
+      <p class="body">자연 자체는 아날로그다 — 기온은 25 ℃와 26 ℃ 사이의 모든 값을 지나며 변한다. 그런데 왜 문명은 굳이 그것을 0과 1로 바꿔 담을까? 답은 간단하다. <b>0과 1은 '있다/없다'만 구별하면 되는 가장 단순한 약속</b>이라, 잡음이 조금 끼어도 값이 흔들리지 않고, 기계끼리 주고받기 쉽기 때문이다. 그 강력함은 개념 4에서 확인하고, 먼저 '어떻게 바꾸는가'부터 보자.</p>
+
+      <figure>
+        <svg width="470" height="148" viewBox="0 0 470 148" font-family="PC Sans">
+          <g font-size="6.8" text-anchor="middle">
+            <g transform="translate(120,10)">
+              <rect x="-104" y="0" width="208" height="104" rx="6" fill="#F0F8F3" stroke="#BFE0CD" stroke-width="1"/>
+              <text y="16" font-size="8.4" font-weight="800" fill="#3E9C6E">아날로그 — 연속</text>
+              <line x1="-84" y1="82" x2="88" y2="82" stroke="#5B6B77" stroke-width="1.1" marker-end="url(#arrP)"/>
+              <line x1="-84" y1="82" x2="-84" y2="28" stroke="#5B6B77" stroke-width="1.1" marker-end="url(#arrP)"/>
+              <path d="M-80,66 q16,-30 34,-12 q18,18 34,-6 q16,-22 34,2 q12,16 24,8" stroke="#3E9C6E" stroke-width="2" fill="none"/>
+              <text y="98" font-weight="400" fill="#5B6B77">모든 순간, 모든 값을 지나며 변한다 (수은 온도계·바늘 시계·LP판)</text>
+            </g>
+            <g transform="translate(352,10)">
+              <rect x="-104" y="0" width="208" height="104" rx="6" fill="#FDF9F0" stroke="#EBCB9C" stroke-width="1"/>
+              <text y="16" font-size="8.4" font-weight="800" fill="#B4560E">디지털 — 불연속 (0과 1)</text>
+              <line x1="-84" y1="82" x2="88" y2="82" stroke="#5B6B77" stroke-width="1.1" marker-end="url(#arrP)"/>
+              <line x1="-84" y1="82" x2="-84" y2="28" stroke="#5B6B77" stroke-width="1.1" marker-end="url(#arrP)"/>
+              <path d="M-80,74 h18 v-34 h18 v34 h18 v-34 h18 v0 h0 M-8,40 h18 v34 h18 v-34 h18" stroke="#D6455D" stroke-width="2" fill="none"/>
+              <text y="98" font-weight="400" fill="#5B6B77">띄엄띄엄한 두 상태의 나열 — 1 0 1 1 0 (전자 체온계·디지털 파일)</text>
+            </g>
+          </g>
+          <text x="235" y="136" text-anchor="middle" font-size="8.8" font-weight="800" fill="#E8940A">아날로그 = 연속의 곡선 / 디지털 = 0과 1의 계단 — 자연은 아날로그, 문명은 디지털로 담는다</text>
+        </svg>
+        <figcaption>그림 2 | 아날로그 신호와 디지털 신호 — 곡선과 계단</figcaption>
+      </figure>
+
+      <div class="expoint">
+        <div class="boxtitle"><span class="ico">!</span>시험엔 이렇게</div>
+        <p>구분 기준은 딱 하나 — <b>연속이면 아날로그, 불연속이면 디지털</b>. 바늘 시계 vs 숫자 시계, 수은 체온계 vs 전자 체온계 짝으로 출제된다. "자연의 신호는 원래 디지털이다"(X)도 단골.</p>
+      </div>
+    </div>
+
+    <div class="wing">
+      <div class="wtitle">날개 노트</div>
+      <div class="term"><b>신호</b>측정된 변화를 담아 전달하는 형식. 연속(아날로그)과 불연속(디지털)으로 나뉜다.</div>
+      <div class="term"><b>비트(bit)</b>0 또는 1 하나 — 디지털 정보의 최소 단위. 8비트가 모이면 1바이트(B)다.</div>
+      <div class="wsep"></div>
+      <div class="wtitle">한눈에 암기</div>
+      <div class="wing-pen">연속 = 아날로그<br>불연속(0·1) = 디지털<br>자연은 아날로그!</div>
+    </div>
+  </div>
+  <div class="quickcheck">
+    <span class="qc-title">바로바로 체크</span>
+    <ol>
+      <li><span class="no">1</span>아날로그 신호는 연속적으로 변하는 값을 담는다. ( O , X )</li>
+      <li><span class="no">2</span>디지털 신호는 0과 1처럼 불연속적인 값으로 표현된다. ( O , X )</li>
+      <li><span class="no">3</span>수은 온도계의 눈금은 디지털 신호이다. ( O , X )</li>
+    </ol>
+    <div class="qc-ans">정답 1 O 2 O 3 X (연속적 — 아날로그다)</div>
+  </div>
+  <div class="folio"><span>I. 과학의 기초</span><span class="num">50</span></div>
+</div>
+
+<!-- ═════════════ p.51 개념 03 아날로그→디지털 변환 ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag">I. 과학의 기초</span><span class="lesson-tag">04. 정보와 신호, 디지털 문명</span></div>
+  <div class="cols">
+    <div class="main">
+      <h3 class="sec"><span class="n">3</span>곡선이 숫자가 되는 법 — 디지털 변환</h3>
+      <p class="body">아날로그를 디지털로 바꾸는 공정은 두 걸음이다. 첫째, <span class="kw">표본화</span> — 연속 신호를 <b>일정한 시간 간격으로 잘라 값을 뽑는다</b>. 둘째, <span class="kw">수치화</span> — 뽑은 각 값을 <b>정해진 단계의 가장 가까운 숫자로 반올림해 기록한다</b>. 이렇게 얻은 숫자들을 0과 1의 이진수로 적으면 변환 끝이다. 매끈한 소리 곡선이 '점찍기'와 '반올림'을 거쳐 숫자 목록이 되는 것이다.</p>
+      <p class="body">촘촘히 자를수록(표본을 많이 뽑을수록), 단계를 잘게 나눌수록 원래 곡선에 가까워진다 — 대신 데이터의 양은 커진다. 음악 파일의 음질과 용량이 함께 오르내리는 이유가 바로 이 <span class="u-amber">'정밀함 ↔ 용량'의 저울질</span>이다. 스마트폰의 통화 음성, 카메라의 사진, 병원의 디지털 심전도까지 — 우리 곁의 모든 디지털 데이터가 이 두 걸음을 거쳐 태어났다.</p>
+
+      <figure>
+        <svg width="470" height="152" viewBox="0 0 470 152" font-family="PC Sans">
+          <g font-size="6.6" text-anchor="middle">
+            <g transform="translate(86,10)">
+              <rect x="-70" y="0" width="140" height="106" rx="6" fill="#F0F8F3" stroke="#BFE0CD" stroke-width="1"/>
+              <text y="14" font-size="7.6" font-weight="800" fill="#3E9C6E">① 아날로그 원본</text>
+              <line x1="-56" y1="88" x2="58" y2="88" stroke="#5B6B77" stroke-width="1"/>
+              <path d="M-52,72 q12,-38 26,-16 q14,22 26,-8 q12,-28 26,4" stroke="#3E9C6E" stroke-width="2" fill="none"/>
+              <text y="102" font-weight="400" fill="#5B6B77">연속의 곡선</text>
+            </g>
+            <line x1="162" y1="60" x2="178" y2="60" stroke="#3E9C6E" stroke-width="1.8" marker-end="url(#arrP)"/>
+            <g transform="translate(250,10)">
+              <rect x="-70" y="0" width="140" height="106" rx="6" fill="#FDF9F0" stroke="#EBCB9C" stroke-width="1"/>
+              <text y="14" font-size="7.6" font-weight="800" fill="#B4560E">② 표본화 — 간격대로 점찍기</text>
+              <line x1="-56" y1="88" x2="58" y2="88" stroke="#5B6B77" stroke-width="1"/>
+              <path d="M-52,72 q12,-38 26,-16 q14,22 26,-8 q12,-28 26,4" stroke="#B8C2CA" stroke-width="1.2" fill="none"/>
+              <g fill="#D6455D">
+                <circle cx="-52" cy="72" r="2.6"/><circle cx="-38" cy="52" r="2.6"/><circle cx="-24" cy="55" r="2.6"/><circle cx="-10" cy="66" r="2.6"/><circle cx="4" cy="52" r="2.6"/><circle cx="18" cy="42" r="2.6"/><circle cx="32" cy="50" r="2.6"/>
+              </g>
+              <g stroke="#E3A0AC" stroke-width="0.8" stroke-dasharray="2 1.5">
+                <line x1="-52" y1="72" x2="-52" y2="88"/><line x1="-38" y1="52" x2="-38" y2="88"/><line x1="-24" y1="55" x2="-24" y2="88"/><line x1="-10" y1="66" x2="-10" y2="88"/><line x1="4" y1="52" x2="4" y2="88"/><line x1="18" y1="42" x2="18" y2="88"/><line x1="32" y1="50" x2="32" y2="88"/>
+              </g>
+              <text y="102" font-weight="400" fill="#5B6B77">일정한 시간 간격으로 값을 뽑는다</text>
+            </g>
+            <line x1="326" y1="60" x2="342" y2="60" stroke="#3E9C6E" stroke-width="1.8" marker-end="url(#arrP)"/>
+            <g transform="translate(406,10)">
+              <rect x="-62" y="0" width="124" height="106" rx="6" fill="#EAF6EC" stroke="#6FBE93" stroke-width="1"/>
+              <text y="14" font-size="7.6" font-weight="800" fill="#3E9C6E">③ 수치화 — 숫자로 기록</text>
+              <g font-weight="800" fill="#22303A" font-size="7.4">
+                <text y="38">3, 6, 6, 4, 6, 7, 6</text>
+              </g>
+              <line x1="0" y1="46" x2="0" y2="56" stroke="#3E9C6E" stroke-width="1.6" marker-end="url(#arrP)"/>
+              <g font-weight="800" fill="#B4560E" font-size="7.2">
+                <text y="72">011 110 110 100</text><text y="84">110 111 110 …</text>
+              </g>
+              <text y="100" font-weight="400" fill="#5B6B77">가까운 단계로 반올림 → 이진수</text>
+            </g>
+          </g>
+          <text x="235" y="140" text-anchor="middle" font-size="8.8" font-weight="800" fill="#E8940A">표본화(자르고) + 수치화(반올림하고) = 곡선이 0과 1이 된다 — 촘촘할수록 원본에 가깝다</text>
+        </svg>
+        <figcaption>그림 3 | 아날로그 → 디지털 변환 — 점찍기와 반올림의 두 걸음</figcaption>
+      </figure>
+
+      <div class="gist">
+        <div class="boxtitle"><span class="ico">알</span>알짜 정리 ① — 신호와 변환</div>
+        <ul>
+          <li><b>정보</b> = 자연의 변화를 측정·분석해 판단에 쓰게 정리한 것</li>
+          <li><b>아날로그</b> = 연속 / <b>디지털</b> = 불연속(0과 1) — 자연은 아날로그, 저장·전송은 디지털</li>
+          <li>변환 = <b>표본화</b>(일정 간격으로 값 뽑기) + <b>수치화</b>(가까운 단계 숫자로 기록) — 촘촘할수록 정밀, 대신 용량 증가</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="wing">
+      <div class="wtitle">날개 노트</div>
+      <div class="term"><b>표본화</b>연속 신호에서 일정 간격으로 값을 뽑는 일. 음악 CD는 1초에 44 100번 뽑는다.</div>
+      <div class="term"><b>이진수</b>0과 1 두 글자로 수를 적는 법 — 예: 5 = 101. 기계의 '있다/없다'와 딱 맞는 표기다.</div>
+      <div class="wsep"></div>
+      <div class="wtitle">한눈에 암기</div>
+      <div class="wing-pen">표본화 = 자르고<br>수치화 = 반올림<br>촘촘할수록 정밀·큰 용량</div>
+    </div>
+  </div>
+  <div class="quickcheck">
+    <span class="qc-title">바로바로 체크</span>
+    <ol>
+      <li><span class="no">1</span>표본화는 연속 신호에서 일정한 간격으로 값을 뽑는 과정이다. ( O , X )</li>
+      <li><span class="no">2</span>표본을 촘촘히 뽑을수록 원래 신호에 가까워진다. ( O , X )</li>
+      <li><span class="no">3</span>표본을 촘촘히 뽑으면 데이터의 용량은 작아진다. ( O , X )</li>
+    </ol>
+    <div class="qc-ans">정답 1 O 2 O 3 X (정밀해지는 대신 용량이 커진다)</div>
+  </div>
+  <div class="folio"><span>I. 과학의 기초</span><span class="num">51</span></div>
+</div>
+
+<!-- ═════════════ p.52 개념 04 디지털의 힘 ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag">I. 과학의 기초</span><span class="lesson-tag">04. 정보와 신호, 디지털 문명</span></div>
+  <div class="cols">
+    <div class="main">
+      <h3 class="sec"><span class="n">4</span>0과 1의 힘 — 디지털은 왜 강한가</h3>
+      <p class="body">아날로그의 약점은 <b>복사와 전송에서 드러난다</b>. 카세트테이프를 복사할 때마다 잡음이 쌓이고, 먼 곳으로 보낼수록 신호가 뭉개진다 — 연속적인 값은 조금만 흐트러져도 '다른 값'이 되어 버리기 때문이다. 디지털은 다르다. 0과 1은 <span class="u-amber">'있다/없다'만 구별하면 되므로, 잡음이 조금 끼어도 원래 값을 되살릴 수 있다</span>. 그래서 디지털 정보는 <b>아무리 복사해도, 지구 반대편으로 보내도 변하지 않는다.</b></p>
+      <p class="body">디지털의 장점은 세 단어로 정리된다. <b>저장</b> — 손톱만 한 메모리에 도서관 분량의 글이 들어간다. <b>전송</b> — 광섬유와 전파를 타고 빛의 속력으로 세계를 돈다. <b>가공</b> — 숫자이므로 컴퓨터로 검색·편집·분석·압축이 자유롭다. 사진 보정, 음악 스트리밍, 인공지능의 학습까지, 전부 '정보가 숫자라서' 가능한 일이다.</p>
+
+      <figure>
+        <svg width="470" height="140" viewBox="0 0 470 140" font-family="PC Sans">
+          <g font-size="6.8" text-anchor="middle">
+            <g transform="translate(120,10)">
+              <rect x="-104" y="0" width="208" height="96" rx="6" fill="#FBEBEE" stroke="#E3A0AC" stroke-width="1"/>
+              <text y="16" font-size="8.2" font-weight="800" fill="#A9556A">아날로그 복사 — 열화가 쌓인다</text>
+              <path d="M-84,58 q8,-18 16,0 q8,18 16,0" stroke="#3E9C6E" stroke-width="1.8" fill="none"/>
+              <line x1="-46" y1="52" x2="-34" y2="52" stroke="#5B6B77" stroke-width="1.4" marker-end="url(#arrP)"/>
+              <path d="M-28,58 q8,-16 16,2 q8,14 16,-2 M-24,50 l3,-4 M-6,62 l4,3" stroke="#A9556A" stroke-width="1.6" fill="none"/>
+              <line x1="10" y1="52" x2="22" y2="52" stroke="#5B6B77" stroke-width="1.4" marker-end="url(#arrP)"/>
+              <path d="M28,58 q8,-12 16,4 q8,10 16,-6 M32,48 l4,-5 M46,64 l5,4 M58,46 l4,-4" stroke="#D6455D" stroke-width="1.6" fill="none"/>
+              <text y="86" font-weight="400" fill="#5B6B77">복사할수록 잡음이 누적 — 원본과 멀어진다</text>
+            </g>
+            <g transform="translate(352,10)">
+              <rect x="-104" y="0" width="208" height="96" rx="6" fill="#F0F8F3" stroke="#BFE0CD" stroke-width="1"/>
+              <text y="16" font-size="8.2" font-weight="800" fill="#3E9C6E">디지털 복사 — 언제나 원본 그대로</text>
+              <g font-weight="800" font-size="7.6">
+                <text x="-64" y="56" fill="#22303A">1011</text>
+                <line x1="-44" y1="52" x2="-32" y2="52" stroke="#5B6B77" stroke-width="1.4" marker-end="url(#arrP)"/>
+                <text x="-12" y="56" fill="#22303A">1011</text>
+                <line x1="8" y1="52" x2="20" y2="52" stroke="#5B6B77" stroke-width="1.4" marker-end="url(#arrP)"/>
+                <text x="40" y="56" fill="#22303A">1011</text>
+              </g>
+              <text y="86" font-weight="400" fill="#5B6B77">'있다/없다'만 구별하면 되므로 잡음에 강하다</text>
+            </g>
+          </g>
+          <text x="235" y="128" text-anchor="middle" font-size="8.8" font-weight="800" fill="#E8940A">디지털의 3대 장점 — 저장(작게) · 전송(멀리) · 가공(자유롭게), 그리고 복사해도 안 변한다</text>
+        </svg>
+        <figcaption>그림 4 | 아날로그와 디지털의 복사 — 열화되는 곡선, 변하지 않는 숫자</figcaption>
+      </figure>
+
+      <div class="expoint">
+        <div class="boxtitle"><span class="ico">!</span>시험엔 이렇게</div>
+        <p>디지털의 장점 3종(저장·전송·가공)과 <b>"복사해도 변하지 않는다"</b>가 핵심 출제 포인트. 거꾸로 "디지털은 잡음의 영향을 아날로그보다 크게 받는다"(X) 선지로도 나온다.</p>
+      </div>
+    </div>
+
+    <div class="wing">
+      <div class="wtitle">날개 노트</div>
+      <div class="term"><b>열화</b>신호가 복사·전송을 거치며 품질이 나빠지는 것. 아날로그의 숙명, 디지털의 해방.</div>
+      <div class="term"><b>압축</b>숫자이기에 가능한 가공 — 반복되는 패턴을 줄여 용량을 확 줄인다(음악·영상 파일).</div>
+      <div class="wsep"></div>
+      <div class="wtitle">한눈에 암기</div>
+      <div class="wing-pen">디지털 = 잡음에 강함<br>저장·전송·가공 자유<br>복사해도 그대로!</div>
+    </div>
+  </div>
+  <div class="quickcheck">
+    <span class="qc-title">바로바로 체크</span>
+    <ol>
+      <li><span class="no">1</span>디지털 정보는 여러 번 복사해도 내용이 변하지 않는다. ( O , X )</li>
+      <li><span class="no">2</span>아날로그 신호는 복사를 거듭하면 잡음이 쌓인다. ( O , X )</li>
+      <li><span class="no">3</span>디지털 정보는 컴퓨터로 검색·편집·분석하기 어렵다. ( O , X )</li>
+    </ol>
+    <div class="qc-ans">정답 1 O 2 O 3 X (숫자라서 가공이 자유롭다)</div>
+  </div>
+  <div class="folio"><span>I. 과학의 기초</span><span class="num">52</span></div>
+</div>
+
+<!-- ═════════════ p.53 개념 05 정보 통신과 현대 문명 ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag">I. 과학의 기초</span><span class="lesson-tag">04. 정보와 신호, 디지털 문명</span></div>
+  <div class="cols">
+    <div class="main">
+      <h3 class="sec"><span class="n">5</span>디지털이 바꾼 세계 — 정보 통신과 현대 문명</h3>
+      <p class="body">측정 → 정보 → 디지털의 사슬이 <b>통신</b>과 만나자 문명의 속도가 바뀌었다. 손안의 스마트폰은 전화기이자 카메라, 지도(01의 GPS!), 은행, 진료 예약 창구다. 병원에서는 디지털화된 영상과 검사 기록이 <b>어디서든 열람·전송</b>되어 원격 판독과 협진을 가능하게 하고, 관측소의 데이터는 실시간으로 모여 태풍 경로 예측과 지진 조기 경보(III단원)가 된다. <span class="u-amber">측정이 데이터가 되고, 데이터가 연결되는 것</span> — 그것이 정보 통신 문명의 뼈대다.</p>
+      <p class="body">이제 데이터는 석유에 비유될 만큼 중요한 <b>자원</b>이 되었다. 검색 기록과 이동 경로가 서비스를 개선하고, 축적된 진료 데이터가 새 치료법 연구의 바탕이 된다. 물론 그림자도 있다 — 개인 정보 유출, 디지털 격차, 가짜 정보의 확산. 기술을 누리는 것만큼 <b>데이터를 다루는 책임</b>도 커졌다는 것, 그것이 디지털 문명이 우리 세대에게 남긴 숙제다.</p>
+
+      <figure>
+        <svg width="470" height="128" viewBox="0 0 470 128" font-family="PC Sans">
+          <g font-size="7" text-anchor="middle">
+            <g transform="translate(64,8)">
+              <rect x="-54" y="0" width="108" height="88" rx="6" fill="#F0F8F3" stroke="#BFE0CD" stroke-width="0.9"/>
+              <rect x="-16" y="14" width="32" height="48" rx="5" fill="#fff" stroke="#3E9C6E" stroke-width="1.4"/>
+              <rect x="-10" y="20" width="20" height="30" rx="2" fill="#EAF6EC"/>
+              <text y="74" font-weight="800">스마트폰 — 손안의 관측소</text>
+            </g>
+            <g transform="translate(178,8)">
+              <rect x="-54" y="0" width="108" height="88" rx="6" fill="#FBEBEE" stroke="#E3A0AC" stroke-width="0.9"/>
+              <path d="M-22,26 h44 v26 h-44 Z" fill="#fff" stroke="#D6455D" stroke-width="1.2"/>
+              <path d="M-14,39 h8 l4,-8 l5,14 l4,-6 h11" stroke="#D6455D" stroke-width="1.4" fill="none"/>
+              <text y="74" font-weight="800">원격 판독 — 의료 데이터</text>
+            </g>
+            <g transform="translate(292,8)">
+              <rect x="-54" y="0" width="108" height="88" rx="6" fill="#FDF9F0" stroke="#EBCB9C" stroke-width="0.9"/>
+              <circle cx="0" cy="36" r="16" fill="#BFE3F5" stroke="#4A8FD0" stroke-width="1.2"/>
+              <path d="M-24,48 q24,-22 48,-4" stroke="#E8940A" stroke-width="1.6" fill="none" marker-end="url(#arrR)"/>
+              <text y="74" font-weight="800">태풍 경로·지진 경보</text>
+            </g>
+            <g transform="translate(406,8)">
+              <rect x="-54" y="0" width="108" height="88" rx="6" fill="#EAF6EC" stroke="#5FA86A" stroke-width="0.9"/>
+              <g fill="#3E9C6E"><rect x="-26" y="42" width="10" height="16" rx="1"/><rect x="-10" y="32" width="10" height="26" rx="1"/><rect x="6" y="22" width="10" height="36" rx="1"/></g>
+              <text y="74" font-weight="800">데이터 = 새로운 자원</text>
+            </g>
+          </g>
+          <text x="235" y="118" text-anchor="middle" font-size="8.8" font-weight="800" fill="#E8940A">측정이 데이터가 되고 데이터가 연결될 때 — 통신·의료·재난 대응·산업이 함께 바뀐다</text>
+        </svg>
+        <figcaption>그림 5 | 정보 통신과 현대 문명 — 연결된 측정이 만드는 세계</figcaption>
+      </figure>
+
+      <div class="gist">
+        <div class="boxtitle"><span class="ico">알</span>알짜 정리 ② — 정보와 신호, 디지털 문명 한 장 요약</div>
+        <ul>
+          <li><b>변화 → 측정 → 분석 → 정보</b> (일기예보·심전도·지진 경보)</li>
+          <li><b>아날로그</b>(연속) vs <b>디지털</b>(0과 1) / 변환 = <b>표본화 + 수치화</b></li>
+          <li>디지털의 힘: 잡음에 강함 · <b>저장·전송·가공</b> 자유 · 복사해도 불변</li>
+          <li>정보 통신 문명: 스마트폰·원격 의료·재난 경보 — 데이터는 자원, 책임은 숙제</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="wing">
+      <div class="wtitle">날개 노트</div>
+      <div class="term"><b>사물인터넷(IoT)</b>측정 장치가 달린 사물들이 서로 데이터를 주고받는 연결망 — 통합과학2에서 다시 만난다.</div>
+      <div class="term"><b>디지털 격차</b>디지털 기술 접근성의 차이가 만드는 정보의 불평등 — 기술 문명의 그림자다.</div>
+      <div class="wsep"></div>
+      <div class="wtitle">한눈에 암기</div>
+      <div class="wing-pen">측정 → 데이터 → 연결<br>데이터 = 자원<br>책임까지가 문명!</div>
+    </div>
+  </div>
+  <div class="quickcheck">
+    <span class="qc-title">바로바로 체크</span>
+    <ol>
+      <li><span class="no">1</span>디지털화된 의료 영상은 멀리서도 열람·판독할 수 있다. ( O , X )</li>
+      <li><span class="no">2</span>일기예보는 수많은 관측 데이터를 모아 분석한 정보이다. ( O , X )</li>
+      <li><span class="no">3</span>디지털 문명에는 개인 정보 유출 같은 그림자가 없다. ( O , X )</li>
+    </ol>
+    <div class="qc-ans">정답 1 O 2 O 3 X (유출·격차·가짜 정보가 숙제다)</div>
+  </div>
+  <div class="folio"><span>I. 과학의 기초</span><span class="num">53</span></div>
+</div>
+
+<!-- ═════════════ p.54 자료 파헤치기 ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag">I. 과학의 기초</span><span class="lesson-tag">04. 정보와 신호, 디지털 문명</span></div>
+  <div class="lab">
+    <div class="lab-head">자료 파헤치기 <span class="tag">탐구·자료 분석</span> <span style="font-weight:600; font-size:9.5pt; margin-left:auto;">소리 곡선을 숫자로 — 변환 실습</span></div>
+    <div class="lab-body">
+      <h4>자료</h4>
+      <p>그림은 어떤 소리의 아날로그 신호를 0.001초 간격으로 표본화하고, 0~7의 8단계로 수치화한 결과다. 뽑힌 값은 차례로 <b>3, 5, 7, 6, 4, 2, 1, 3</b>이었다.</p>
+      <figure>
+        <svg width="430" height="110" viewBox="0 0 430 110" font-family="PC Sans">
+          <g font-size="6.6">
+            <line x1="40" y1="88" x2="410" y2="88" stroke="#5B6B77" stroke-width="1.1" marker-end="url(#arrP)"/>
+            <line x1="40" y1="88" x2="40" y2="10" stroke="#5B6B77" stroke-width="1.1" marker-end="url(#arrP)"/>
+            <text x="408" y="100" text-anchor="end" fill="#5B6B77">시간(0.001초 간격)</text>
+            <text x="36" y="9" text-anchor="end" fill="#5B6B77">단계</text>
+            <g stroke="#E1E8EC" stroke-width="0.7">
+              <line x1="40" y1="78" x2="400" y2="78"/><line x1="40" y1="68" x2="400" y2="68"/><line x1="40" y1="58" x2="400" y2="58"/><line x1="40" y1="48" x2="400" y2="48"/><line x1="40" y1="38" x2="400" y2="38"/><line x1="40" y1="28" x2="400" y2="28"/><line x1="40" y1="18" x2="400" y2="18"/>
+            </g>
+            <path d="M70,58 q40,-44 84,-26 q52,22 90,34 q50,16 96,-6" stroke="#B8C2CA" stroke-width="1.3" fill="none"/>
+            <g fill="#D6455D">
+              <circle cx="70" cy="58" r="3"/><circle cx="112" cy="38" r="3"/><circle cx="154" cy="18" r="3"/><circle cx="196" cy="28" r="3"/><circle cx="238" cy="48" r="3"/><circle cx="280" cy="68" r="3"/><circle cx="322" cy="78" r="3"/><circle cx="364" cy="58" r="3"/>
+            </g>
+            <g text-anchor="middle" font-weight="800" fill="#B4560E">
+              <text x="70" y="104">3</text><text x="112" y="104">5</text><text x="154" y="104">7</text><text x="196" y="104">6</text><text x="238" y="104">4</text><text x="280" y="104">2</text><text x="322" y="104">1</text><text x="364" y="104">3</text>
+            </g>
+          </g>
+        </svg>
+      </figure>
+      <h4>해석의 3단계</h4>
+      <ol>
+        <li><b>표본화를 읽는다</b> — 점은 0.001초마다 하나씩, 총 8개다. 곡선의 '사이사이'는 버려졌다 — 그 부분의 정보는 사라진 것이 아니라, 필요하면 더 촘촘히 뽑아 살리면 된다.</li>
+        <li><b>수치화를 읽는다</b> — 각 점의 높이를 0~7 중 가장 가까운 단계로 반올림했다. 8단계는 이진수 세 자리(000~111)로 적을 수 있으므로, 이 소리는 3, 5, 7… → 011, 101, 111…로 저장된다.</li>
+        <li><b>복원을 생각한다</b> — 재생기는 숫자 목록을 받아 점을 찍고 곡선으로 이어 소리를 되살린다. 표본이 촘촘하고 단계가 잘수록 복원 곡선은 원본에 다가간다 — 음질과 용량의 저울질이 여기서 결정된다.</li>
+      </ol>
+      <h4>결론</h4>
+      <p>디지털 음악·사진·영상의 정체는 '가까운 단계로 반올림해 적은 측정값 목록'이다. 변환의 핵심 두 단어 — <b>표본화(언제 뽑나) · 수치화(어느 단계로 적나)</b> — 만 붙잡으면 이 유형은 끝난다.</p>
+      <div class="expoint">
+        <div class="boxtitle"><span class="ico">!</span>시험엔 이렇게</div>
+        <p>그래프 자료에서 <b>① 표본 간격(가로) ② 단계 수(세로) ③ 뽑힌 숫자열</b>을 읽게 한다. "표본화를 촘촘히 하면 용량이 줄어든다"(X — 늘어난다) 함정을 조심하라.</p>
+      </div>
+      <h4>직접 해보기 — 8칸 픽셀 편지</h4>
+      <p>모눈종이 8 × 8칸에 간단한 그림을 그리고, 칠한 칸 = 1, 빈칸 = 0으로 한 줄씩 읽어 64자리 숫자로 바꿔 보자. 그 숫자만 친구에게 보내 그림을 복원하게 하면 — 방금 이미지의 디지털 전송을 몸으로 해낸 것이다.</p>
+    </div>
+  </div>
+  <div class="folio"><span>I. 과학의 기초</span><span class="num">54</span></div>
+</div>
+
+<!-- ═════════════ p.55 STEP 1 + STEP 2 시작 ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag">I. 과학의 기초</span><span class="lesson-tag">04. 정보와 신호, 디지털 문명 | 문제</span></div>
+
+  <div class="step-head"><span class="stepno">STEP 1</span><span class="steptt">개념 확인</span><span class="stepdesc">OX와 빈칸으로 개념 점검 — 막히면 알짜 정리로!</span></div>
+  <div class="qgrid">
+    <div>
+      <div class="q"><div class="qhead"><span class="qno">1</span><div class="stem">자연의 변화를 측정·분석해 정리한 것이 정보다. <span class="ox-answer">( O , X )</span></div></div></div>
+      <div class="q"><div class="qhead"><span class="qno">2</span><div class="stem">디지털 신호는 연속적인 값으로 표현된다. <span class="ox-answer">( O , X )</span></div></div></div>
+      <div class="q"><div class="qhead"><span class="qno">3</span><div class="stem">디지털 정보는 복사를 거듭해도 내용이 변하지 않는다. <span class="ox-answer">( O , X )</span></div></div></div>
+    </div>
+    <div>
+      <div class="q"><div class="qhead"><span class="qno">4</span><div class="stem">연속 신호에서 일정한 시간 간격으로 값을 뽑는 과정을 <span class="blankline" style="min-width:11mm;"></span>라 한다.</div></div></div>
+      <div class="q"><div class="qhead"><span class="qno">5</span><div class="stem">디지털 정보는 최종적으로 <span class="blankline" style="min-width:6mm;"></span>과 <span class="blankline" style="min-width:6mm;"></span>의 나열로 표현된다.</div></div></div>
+      <div class="q"><div class="qhead"><span class="qno">6</span><div class="stem">심장의 전기 신호 변화를 시간에 따라 기록한 곡선을 <span class="blankline" style="min-width:11mm;"></span>라 한다.</div></div></div>
+    </div>
+  </div>
+
+  <div style="border-top:0.5mm solid var(--line); margin:2mm 0 4mm;"></div>
+
+  <div class="step-head s2"><span class="stepno">STEP 2</span><span class="steptt">내신 완성</span><span class="stepdesc">학교 시험 유형 그대로 — 서술형까지 한 번에</span></div>
+
+  <div class="q">
+    <div class="qhead"><span class="qno">7</span><div class="stem">아날로그 신호와 디지털 신호에 대한 설명으로 옳은 것은? <span class="difficulty">●●○</span>
+    <div class="tags">10통과1-01-04 | 개념 2</div></div></div>
+    <ul class="choices">
+      <li>① 자연에서 일어나는 변화는 본래 디지털 신호이다.</li>
+      <li>② 바늘이 도는 시계의 움직임은 디지털 신호이다.</li>
+      <li>③ 디지털 신호는 잡음이 조금만 끼어도 복원할 수 없다.</li>
+      <li>④ 아날로그 신호는 연속적인 값으로 변화를 담는다.</li>
+      <li>⑤ 전자 체온계의 숫자 표시는 아날로그 신호이다.</li>
+    </ul>
+  </div>
+
+  <div class="q">
+    <div class="qhead"><span class="qno">8</span><div class="stem">아날로그 신호를 디지털로 변환하는 과정에 대한 설명으로 옳은 것은? <span class="difficulty">●●●</span>
+    <div class="tags">10통과1-01-04 | 개념 3</div></div></div>
+    <ul class="choices">
+      <li>① 수치화란 연속 신호에서 일정 간격으로 값을 뽑는 것이다.</li>
+      <li>② 표본을 촘촘히 뽑을수록 데이터 용량이 작아진다.</li>
+      <li>③ 변환된 숫자는 십진수 그대로만 저장할 수 있다.</li>
+      <li>④ 표본화 간격이 넓을수록 원래 신호에 가깝게 복원된다.</li>
+      <li>⑤ 표본화로 뽑은 값을 가까운 단계의 숫자로 기록하는 것이 수치화이다.</li>
+    </ul>
+  </div>
+
+  <div class="folio"><span>I. 과학의 기초</span><span class="num">55</span></div>
+</div>
+
+<!-- ═════════════ p.56 STEP 2 계속 ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag">I. 과학의 기초</span><span class="lesson-tag">04. 정보와 신호, 디지털 문명 | 문제</span></div>
+
+  <div class="q">
+    <div class="qhead"><span class="qno">9</span><div class="stem"><span class="badge-data">자료</span>다음은 어떤 신호를 표본화·수치화한 결과다. 이에 대한 설명으로 옳은 것은? <span class="difficulty">●●●</span>
+    <div class="tags">10통과1-01-04 | 개념 3·자료</div></div></div>
+    <div class="bogi-box" style="background:#fff; margin-bottom:1mm;">
+      0.001초 간격으로 8회 표본화, 0~7의 8단계로 수치화 → 3, 5, 7, 6, 4, 2, 1, 3
+    </div>
+    <ul class="choices">
+      <li>① 이 신호는 0.008초 동안 한 번만 측정되었다.</li>
+      <li>② 뽑힌 값들은 0과 1 사이의 연속적인 값이다.</li>
+      <li>③ 각 값은 이진수 세 자리로 저장할 수 있다.</li>
+      <li>④ 단계를 더 잘게 나누면 원본과의 차이가 커진다.</li>
+      <li>⑤ 이 숫자 목록으로는 소리를 복원할 수 없다.</li>
+    </ul>
+  </div>
+
+  <div class="q">
+    <div class="qhead"><span class="qno">10</span><div class="stem">디지털 정보 통신이 현대 문명에 미친 영향으로 옳은 것만을 고른 것은? <span class="difficulty">●●●</span>
+    <div class="tags">10통과1-01-04 | 개념 4·5</div></div></div>
+    <div class="bogi-box" style="background:#fff;">
+      (가) 디지털화된 의료 영상은 먼 곳에서도 판독할 수 있다.<br>
+      (나) 관측 데이터가 실시간으로 모여 재난 경보에 활용된다.<br>
+      (다) 디지털 정보는 복사할 때마다 품질이 나빠진다.
+    </div>
+    <ul class="choices inline">
+      <li>① (가)</li><li>② (나)</li><li>③ (가), (나)</li><li>④ (나), (다)</li><li>⑤ (가), (나), (다)</li>
+    </ul>
+  </div>
+
+  <div class="q">
+    <div class="qhead"><span class="qno">11</span><div class="stem"><span class="badge-essay">서술형</span>디지털 신호가 아날로그 신호보다 먼 거리 전송과 복사에 유리한 까닭을 <b>'0과 1'과 '잡음'</b>이라는 말을 포함하여 서술하시오. <span class="difficulty">●●●●</span>
+    <div class="tags">10통과1-01-04 | 개념 4</div></div></div>
+    <div class="essay-lines"><div></div><div></div><div></div></div>
+  </div>
+
+  <div class="folio"><span>I. 과학의 기초</span><span class="num">56</span></div>
+</div>
+
+<!-- ═════════════ p.57 STEP 3 ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag">I. 과학의 기초</span><span class="lesson-tag">04. 정보와 신호, 디지털 문명 | 문제</span></div>
+  <div class="step-head s3"><span class="stepno">STEP 3</span><span class="steptt">수능 도전</span><span class="stepdesc">2028 수능 규격 — ㄱㄴㄷ 합답형·자료 해석</span></div>
+
+  <div class="q">
+    <div class="qhead"><span class="qno">12</span><div class="stem"><span class="badge-data">자료</span>그림 (가)와 (나)는 같은 변화를 담은 두 신호를 나타낸 것이다. 옳은 것만을 &lt;보기&gt;에서 있는 대로 고른 것은? <span class="difficulty">[2점]</span>
+    <div class="tags">10통과1-01-04</div></div></div>
+    <figure style="margin:2mm 0 1mm 8.6mm;">
+      <svg width="300" height="76" viewBox="0 0 300 76" font-family="PC Sans">
+        <g font-size="6.6" text-anchor="middle">
+          <g transform="translate(76,6)">
+            <line x1="-56" y1="52" x2="58" y2="52" stroke="#5B6B77" stroke-width="1"/>
+            <path d="M-50,40 q12,-26 24,-8 q12,18 24,-4 q10,-16 22,4" stroke="#3E9C6E" stroke-width="1.8" fill="none"/>
+            <text y="68" font-weight="800">(가)</text>
+          </g>
+          <g transform="translate(220,6)">
+            <line x1="-56" y1="52" x2="58" y2="52" stroke="#5B6B77" stroke-width="1"/>
+            <path d="M-50,44 h14 v-22 h14 v10 h14 v-16 h14 v20 h14" stroke="#D6455D" stroke-width="1.8" fill="none"/>
+            <text y="68" font-weight="800">(나)</text>
+          </g>
+        </g>
+      </svg>
+    </figure>
+    <div class="bogi-box">
+      <div class="bt">보기</div>
+      ㄱ. (가)는 아날로그, (나)는 디지털 신호이다.<br>
+      ㄴ. (나)는 (가)를 표본화·수치화하여 얻을 수 있다.<br>
+      ㄷ. (나)는 복사를 거듭하면 (가)보다 품질이 빨리 나빠진다.
+    </div>
+    <ul class="choices inline">
+      <li>① ㄱ</li><li>② ㄷ</li><li>③ ㄴ, ㄷ</li><li>④ ㄱ, ㄴ</li><li>⑤ ㄱ, ㄴ, ㄷ</li>
+    </ul>
+  </div>
+
+  <div class="q">
+    <div class="qhead"><span class="qno">13</span><div class="stem"><span class="badge-data">자료</span>다음은 정보 통신 기술이 활용되는 사례들이다. 옳은 것만을 &lt;보기&gt;에서 있는 대로 고른 것은? <span class="difficulty">[2.5점]</span>
+    <div class="tags">10통과1-01-04</div></div></div>
+    <div class="bogi-box" style="background:#fff; margin-bottom:2mm;">
+      ○ 전국 관측소의 기상 데이터가 실시간으로 모여 태풍 경로 예측에 쓰인다.<br>
+      ○ 환자의 심전도가 디지털로 저장되어 다른 병원에서도 열람된다.<br>
+      ○ 스마트워치가 맥박 변화를 기록해 이상 신호를 알려 준다.
+    </div>
+    <div class="bogi-box">
+      <div class="bt">보기</div>
+      ㄱ. 세 사례 모두 '자연·몸의 변화를 측정해 정보를 산출'하는 공통 구조를 가진다.<br>
+      ㄴ. 디지털 변환 덕분에 측정 정보의 저장·전송·공유가 쉬워졌다.<br>
+      ㄷ. 이러한 기술에는 개인 정보 보호라는 과제가 따른다.
+    </div>
+    <ul class="choices inline">
+      <li>① ㄱ</li><li>② ㄴ</li><li>③ ㄱ, ㄴ</li><li>④ ㄴ, ㄷ</li><li>⑤ ㄱ, ㄴ, ㄷ</li>
+    </ul>
+  </div>
+
+  <div class="folio"><span>I. 과학의 기초</span><span class="num">57</span></div>
+</div>
+
+<!-- ═════════════ p.58 해설 1 ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag" style="color:var(--brand);">알짜 해설</span><span class="lesson-tag">04. 정보와 신호, 디지털 문명</span></div>
+  <div class="sol-head"><span class="stt">알짜 해설</span><span class="sub">전 문항 해설 + 오답 선지 분석 — 맞힌 문제도 해설로 한 번 더!</span></div>
+
+  <table class="anstable">
+    <tr><th>문항</th><td>1</td><td>2</td><td>3</td><td>4</td><td>5</td><td>6</td><td>7</td><td>8</td><td>9</td><td>10</td><td>11</td><td>12</td><td>13</td></tr>
+    <tr><th>정답</th><td class="a">O</td><td class="a">X</td><td class="a">O</td><td class="a">표본화</td><td class="a">0, 1</td><td class="a">심전도</td><td class="a">④</td><td class="a">⑤</td><td class="a">③</td><td class="a">③</td><td class="a">서술형</td><td class="a">④</td><td class="a">⑤</td></tr>
+  </table>
+
+  <div class="solcols">
+    <div>
+      <div class="sol"><div class="shead"><span class="sno">1</span><span class="sans">O</span><span class="slink">개념 1</span></div>
+        <p>변화 → 측정 → 분석 → 정보. 이 소단원의 등뼈다.</p></div>
+      <div class="sol"><div class="shead"><span class="sno">2</span><span class="sans">X</span><span class="slink">개념 2</span></div>
+        <p>디지털은 불연속 — 0과 1의 계단이다. 연속은 아날로그.</p></div>
+      <div class="sol"><div class="shead"><span class="sno">3</span><span class="sans">O</span><span class="slink">개념 4</span></div>
+        <p>'있다/없다'만 구별하면 되니 복사해도 그대로다.</p></div>
+      <div class="sol"><div class="shead"><span class="sno">4</span><span class="sans">표본화</span><span class="slink">개념 3</span></div>
+        <p>일정 간격 점찍기. 반올림해 적는 쪽은 수치화.</p></div>
+      <div class="sol"><div class="shead"><span class="sno">5</span><span class="sans">0, 1</span><span class="slink">개념 2</span></div>
+        <p>디지털의 최종 옷은 언제나 이진수다.</p></div>
+      <div class="sol"><div class="shead"><span class="sno">6</span><span class="sans">심전도</span><span class="slink">개념 1</span></div>
+        <p>심장의 전기 신호 변화 기록 — 측정이 진단 정보가 되는 대표 사례.</p></div>
+    </div>
+    <div>
+      <div class="sol"><div class="shead"><span class="sno">7</span><span class="sans">④</span><span class="slink">개념 2</span></div>
+        <p>아날로그 = 연속. 정의 그대로다.</p>
+        <div class="wrongbox"><div class="wt">오답 왜 틀렸나</div>
+          <p><b>①</b> 자연은 아날로그다. <b>②</b> 바늘의 연속 운동 — 아날로그. <b>③</b> 반대 — 디지털이 잡음에 강하다. <b>⑤</b> 숫자 표시는 디지털.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">8</span><span class="sans">⑤</span><span class="slink">개념 3</span></div>
+        <p>수치화의 정의 그대로 — 가까운 단계로 반올림해 기록.</p>
+        <div class="wrongbox"><div class="wt">오답 왜 틀렸나</div>
+          <p><b>①</b> 그것은 표본화다. <b>②</b> 촘촘할수록 용량 증가. <b>③</b> 이진수로 저장한다. <b>④</b> 간격이 좁을수록 원본에 가깝다.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">9</span><span class="sans">③</span><span class="slink">개념 3·자료</span></div>
+        <p>8단계(0~7)는 000~111 — 이진수 세 자리면 충분하다.</p>
+        <div class="wrongbox"><div class="wt">오답 왜 틀렸나</div>
+          <p><b>①</b> 8회 표본화했다. <b>②</b> 뽑힌 값은 불연속의 정수다. <b>④</b> 잘게 나눌수록 차이가 준다. <b>⑤</b> 복원이 디지털 재생의 원리다.</p></div></div>
+    </div>
+  </div>
+
+  <div class="folio"><span>알짜 해설</span><span class="num">58</span></div>
+</div>
+
+<!-- ═════════════ p.59 해설 2 ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag" style="color:var(--brand);">알짜 해설</span><span class="lesson-tag">04. 정보와 신호, 디지털 문명</span></div>
+  <div class="solcols">
+    <div>
+      <div class="sol"><div class="shead"><span class="sno">10</span><span class="sans">③</span><span class="slink">개념 4·5</span></div>
+        <p>(가) 원격 판독, (나) 실시간 재난 경보 — 디지털 통신의 대표 효용이다.</p>
+        <div class="wrongbox"><div class="wt">오답 왜 틀렸나</div>
+          <p><b>(다)</b> 품질이 나빠지는 쪽은 아날로그다. 디지털은 복사해도 원본 그대로.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">11</span><span class="sans">모범 답안</span><span class="slink">개념 4</span></div>
+        <p>디지털 신호는 정보를 <b>0과 1</b> 두 상태의 나열로 담는다. 전송·복사 중 <b>잡음</b>이 조금 끼어도 각 값이 0인지 1인지만 구별하면 원래 신호를 복원할 수 있으므로, 연속적인 값이 조금만 흐트러져도 달라지는 아날로그 신호보다 먼 거리 전송과 반복 복사에 유리하다.</p>
+        <div class="wrongbox"><div class="wt">채점 기준 (감점 포인트)</div>
+          <p>① 디지털 = 0과 1의 두 상태 ② 잡음이 있어도 구별·복원 가능 ③ 아날로그는 잡음이 그대로 왜곡이 됨 — 세 요소 모두 서술해야 만점.</p></div></div>
+    </div>
+    <div>
+      <div class="sol"><div class="shead"><span class="sno">12</span><span class="sans">④</span><span class="slink">개념 2·3 | 2점</span></div>
+        <p><b>ㄱ (옳음)</b> 곡선 = 아날로그, 계단 = 디지털. <b>ㄴ (옳음)</b> 표본화 + 수치화가 바로 그 다리다. <b>ㄷ (틀림)</b> 복사에 강한 쪽이 디지털이다.</p>
+        <div class="wrongbox"><div class="wt">함정 체크</div>
+          <p>그래프 모양만 보고 판단하라 — <b>이어져 있으면 아날로그, 계단이면 디지털.</b> 이름 외우기보다 빠르다.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">13</span><span class="sans">⑤</span><span class="slink">개념 1·5 | 2.5점</span></div>
+        <p><b>ㄱ (옳음)</b> 셋 다 '변화 → 측정 → 정보'의 구조다. <b>ㄴ (옳음)</b> 디지털이라 모이고, 옮겨지고, 공유된다. <b>ㄷ (옳음)</b> 기상·의료·생체 데이터일수록 보호의 책임이 무겁다.</p>
+        <div class="wrongbox"><div class="wt">함정 체크</div>
+          <p>기술의 효용과 그림자를 함께 묻는 것이 이 성취기준의 출제 정신이다 — 그림자 선지를 '틀린 말'로 착각하지 말 것.</p></div></div>
+
+      <div class="gist" style="margin-top:5mm;">
+        <div class="boxtitle"><span class="ico">알</span>이 소단원, 이것만은!</div>
+        <ul>
+          <li><b>변화 → 측정 → 분석 → 정보</b> — 일기예보·심전도·지진 경보의 공통 공정</li>
+          <li><b>아날로그(연속) → 표본화 + 수치화 → 디지털(0과 1)</b> — 촘촘할수록 정밀, 용량은 증가</li>
+          <li>디지털의 힘: 잡음에 강함·저장·전송·가공 — 데이터는 자원, <b>보호는 책임</b></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div class="folio"><span>알짜 해설</span><span class="num">59</span></div>
+</div>
+
+<!-- ═════════════ p.60 MEMO ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag">I. 과학의 기초</span><span class="lesson-tag">I단원 완주 — II단원으로</span></div>
+  <div class="memo-head"><span class="mt">MEMO</span><span class="ms">헷갈린 개념, 다시 틀린 문제 번호, 나만의 암기법을 남겨 두는 자리</span></div>
+  <div class="memo-area"></div>
+  <div class="memo-pen">"I단원 완주! '재고(측정) → 적고(단위) → 맞추고(표준) → 잇는다(디지털)' — 네 소단원을 한 문장으로 엮어 보자. 다음 장부터는 이 도구들로 우주의 시작을 파헤친다. — 박찬쌤"</div>
+  <div class="folio"><span>박찬 과학 | 통합과학 1</span><span class="num">60</span></div>
+</div>
+
+</body>
+</html>

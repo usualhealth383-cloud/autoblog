@@ -1,0 +1,928 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<title>박찬 과학 통합과학1 — I-02 기본량과 단위</title>
+<style>
+  @font-face { font-family:'PC Sans'; src:url('file:///root/.fonts/NotoSansKR.ttf'); font-weight:100 900; }
+  @font-face { font-family:'PC Serif'; src:url('file:///root/.fonts/NotoSerifKR.ttf'); font-weight:100 900; }
+  @font-face { font-family:'PC Pen'; src:url('file:///root/.fonts/YeonSung-Regular.ttf'); font-weight:400; }
+
+  :root{
+    --brand:#0E5A6B;        /* 박찬 과학 브랜드 딥틸 */
+    --brand-lt:#E3F0F3;
+    --unit:#3E9C6E;         /* I. 과학의 기초 단원 컬러(그린) */
+    --unit-lt:#EAF6EC;
+    --unit-md:#BFE0CD;
+    --accent:#E8940A;       /* 알짜 앰버 */
+    --accent-lt:#FDF3E0;
+    --point:#D6455D;        /* 시험 포인트 */
+    --point-lt:#FBEBEE;
+    --ink:#22303A;
+    --sub:#5B6B77;
+    --line:#D8E0E5;
+  }
+  *{ box-sizing:border-box; margin:0; padding:0; -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+  @page{ size:210mm 275mm; margin:0; }
+  html,body{ font-family:'PC Sans',sans-serif; color:var(--ink); }
+
+  .page{ width:210mm; height:275mm; position:relative; overflow:hidden; background:#fff; page-break-after:always; padding:14mm 13mm 19mm 15mm; display:flex; flex-direction:column; }
+
+  /* ── 러닝 헤드 / 풋 ── */
+  .runhead{ display:flex; align-items:center; justify-content:space-between; border-bottom:0.35mm solid var(--unit); padding-bottom:2mm; margin-bottom:6.5mm; }
+  .runhead .unit-tag{ font-size:8.5pt; font-weight:700; color:var(--unit); letter-spacing:0.02em; }
+  .runhead .lesson-tag{ font-size:8.5pt; color:var(--sub); }
+  .folio{ position:absolute; bottom:7mm; left:0; right:0; display:flex; justify-content:space-between; padding:0 14mm 0 14mm; font-size:8pt; color:var(--sub); }
+  .folio .num{ font-weight:800; color:var(--unit); font-size:10pt; }
+
+  /* ── 본문 그리드: 본문 + 날개단 ── */
+  .cols{ display:grid; grid-template-columns:1fr 43mm; gap:8mm; flex:1; min-height:0; margin-bottom:4mm; }
+  .main{ min-width:0; }
+  .wing{ border-left:0.3mm solid var(--line); padding-left:5mm; font-size:8.2pt; color:var(--sub); line-height:1.7; }
+
+  /* ── 타이포 ── */
+  h2.lesson-title{ display:flex; align-items:baseline; gap:3.5mm; margin-bottom:2mm; }
+  h2.lesson-title .no{ background:var(--unit); color:#fff; font-size:13pt; font-weight:900; padding:1.2mm 3.2mm; border-radius:1.5mm; }
+  h2.lesson-title .tt{ font-size:16.5pt; font-weight:900; letter-spacing:-0.01em; }
+  .std-badges{ display:flex; gap:2mm; margin:2mm 0 6.5mm; }
+  .std{ font-size:7.4pt; color:var(--unit); background:none; border:0.3mm solid var(--unit-md); border-radius:5mm; padding:0.6mm 2.8mm; font-weight:600; }
+
+  h3.sec{ display:flex; align-items:baseline; gap:3mm; font-size:12.5pt; font-weight:800; margin:9mm 0 3.6mm; letter-spacing:-0.01em; }
+  h3.sec .n{ font-family:'PC Serif'; font-size:15.5pt; font-weight:900; color:var(--unit); border-bottom:0.7mm solid var(--accent); padding:0 0.8mm 0.2mm; flex:0 0 auto; line-height:1; }
+  h3.sec::after{ content:""; flex:1; border-top:0.25mm solid var(--line); align-self:center; margin-left:2mm; }
+  h3.sec:first-child{ margin-top:0; }
+
+  p.body{ font-family:'PC Serif'; font-size:9.6pt; line-height:1.92; margin-bottom:3.6mm; text-align:justify; }
+  p.body b{ font-weight:800; }
+  .kw{ font-weight:800; color:var(--unit); }
+  .u-amber{ background:#F8E9C6; font-weight:700; padding:0.15mm 0.6mm; border-radius:0.6mm; box-decoration-break:clone; -webkit-box-decoration-break:clone; }
+
+  ul.pts{ font-family:'PC Serif'; font-size:9.6pt; line-height:1.84; margin:1.5mm 0 3.5mm 1mm; list-style:none; }
+  ul.pts li{ padding-left:4.5mm; position:relative; margin-bottom:1.8mm; }
+  ul.pts li::before{ content:""; position:absolute; left:0.5mm; top:2.9mm; width:1.7mm; height:1.7mm; background:var(--accent); border-radius:50%; }
+
+  /* ── 코너 박스 ── */
+  .boxtitle{ display:inline-flex; align-items:center; gap:1.8mm; font-weight:900; font-size:9.5pt; margin-bottom:1.6mm; }
+  .boxtitle .ico{ width:5.2mm; height:5.2mm; border-radius:1.2mm; display:flex; align-items:center; justify-content:center; color:#fff; font-size:7.5pt; font-weight:900; }
+
+  .gist{ background:none; border:none; border-top:0.5mm solid var(--accent); border-bottom:0.5mm solid var(--accent); border-radius:0; padding:3.2mm 1.8mm 3mm; margin:6mm 0 5mm; }
+  .gist .boxtitle{ color:#9C6503; } .gist .ico{ background:var(--accent); }
+  .gist ul{ list-style:none; font-family:'PC Serif'; font-size:9.3pt; line-height:1.78; }
+  .gist li{ padding-left:4.2mm; position:relative; margin-bottom:1.2mm;}
+  .gist li::before{ content:"✓"; position:absolute; left:0; color:var(--accent); font-weight:900; }
+
+  .expoint{ background:none; border-left:0.5mm solid #D998A4; border-left-color:#D998A4; border-radius:0; padding:1.4mm 0 1.4mm 3.6mm; margin:4.5mm 0; }
+  .expoint .boxtitle{ color:#A9556A; font-size:8.6pt; margin-bottom:1mm;}
+  .expoint .ico{ background:none; color:#A9556A; border:0.35mm solid #D998A4; width:4.4mm; height:4.4mm; border-radius:50%; font-size:7pt; }
+  .expoint p{ font-family:'PC Serif'; font-size:8.9pt; line-height:1.7; }
+
+  .pen{ font-family:'PC Pen'; font-size:12pt; color:#B4560E; line-height:1.45; }
+  .saem{ display:flex; gap:3mm; align-items:flex-start; margin:4.5mm 0; }
+  .saem .avatar{ flex:0 0 auto; width:10.5mm; height:10.5mm; border-radius:50%; background:var(--brand); color:#fff; font-size:7pt; font-weight:800; display:flex; align-items:center; justify-content:center; line-height:1.35; letter-spacing:0.04em; text-align:center; border:0.5mm solid var(--accent); box-sizing:border-box;}
+  .saem .bubble{ background:#FFFBF0; border:0.4mm solid #EBCB9C; border-radius:3mm; padding:2.2mm 3.6mm 2mm; position:relative; }
+  .saem .bubble::before{ content:""; position:absolute; left:-1.8mm; top:3.2mm; width:3mm; height:3mm; background:#FFFBF0; border-left:0.4mm solid #EBCB9C; border-bottom:0.4mm solid #EBCB9C; transform:rotate(45deg); }
+
+  .wing .wtitle{ font-size:8pt; font-weight:900; color:var(--brand); display:flex; align-items:center; gap:1.5mm; margin:0 0 2.4mm; letter-spacing:0.05em; }
+  .wing .wtitle::before{ content:""; width:2.4mm; height:2.4mm; background:var(--accent); border-radius:50%; }
+  .wing .term{ margin-bottom:3.6mm; }
+  .wing .term b{ color:var(--ink); font-weight:800; display:block; font-size:8.5pt; margin-bottom:0.7mm;}
+  .wing .wsep{ border-top:0.3mm dashed var(--line); margin:4.5mm 0; }
+  .wing .wing-pen{ font-family:'PC Pen'; font-size:11pt; color:#B4560E; line-height:1.45; }
+
+  figure{ margin:5mm 0; }
+  figure figcaption{ font-size:8pt; color:var(--sub); text-align:center; margin-top:2mm; }
+  figure svg{ display:block; margin:0 auto; }
+
+  /* ── 비교형 그림 (2패널 + 범례) ── */
+  .fig-duo{ display:flex; align-items:stretch; gap:2.5mm; justify-content:center; }
+  .fig-duo .panel{ flex:0 0 auto; text-align:center; }
+  .fig-duo .p-title{ font-size:9pt; font-weight:900; color:var(--ink); margin-top:1.6mm; }
+  .fig-duo .p-sub{ font-size:7.8pt; color:var(--sub); line-height:1.45; margin-top:0.5mm; }
+  .fig-duo .mid{ display:flex; flex-direction:column; align-items:center; justify-content:center; gap:1mm; padding:0 1mm; }
+  .fig-duo .mid .mlab{ font-size:7.6pt; font-weight:800; color:var(--unit); text-align:center; line-height:1.3; }
+  .fig-legend{ display:flex; justify-content:center; gap:5mm; font-size:7.8pt; color:var(--ink); margin-top:1.2mm; align-items:center; }
+  .fig-legend span{ display:inline-flex; align-items:center; gap:1.4mm; }
+
+  /* ── 탐구 (자료 파헤치기) ── */
+  .lab{ border:0.5mm solid var(--brand); border-radius:2.5mm; overflow:hidden; margin-top:1mm;}
+  .lab .lab-head{ background:var(--brand); color:#fff; padding:2.2mm 4mm; font-weight:900; font-size:11pt; display:flex; align-items:center; gap:2.5mm;}
+  .lab .lab-head .tag{ font-size:7.5pt; background:rgba(255,255,255,.22); padding:0.6mm 2.4mm; border-radius:4mm; font-weight:700;}
+  .lab .lab-body{ padding:3.5mm 4mm; }
+  .lab h4{ font-size:9.6pt; font-weight:900; color:var(--brand); margin:2.5mm 0 1.4mm; }
+  .lab h4:first-child{ margin-top:0; }
+  .lab p, .lab li{ font-family:'PC Serif'; font-size:9.3pt; line-height:1.8; }
+  .lab ol{ margin-left:5mm; }
+
+  /* ── 문제부 ── */
+  .step-head{ display:flex; align-items:center; gap:3mm; margin:0 0 5mm; }
+  .step-head .stepno{ background:var(--unit); color:#fff; font-weight:900; font-size:9.5pt; padding:1.4mm 3.4mm; border-radius:1.5mm; letter-spacing:0.04em;}
+  .step-head .steptt{ font-size:12.5pt; font-weight:900; }
+  .step-head .stepdesc{ font-size:8.2pt; color:var(--sub); margin-left:auto; }
+  .step-head.s2 .stepno{ background:var(--brand); }
+  .step-head.s3 .stepno{ background:var(--point); }
+
+  .q{ margin-bottom:7.5mm; break-inside:avoid; }
+  .q .qhead{ display:flex; gap:2.4mm; align-items:flex-start; }
+  .q .qno{ flex:0 0 auto; min-width:6.2mm; height:6.2mm; border:0.45mm solid var(--unit); color:var(--unit); border-radius:50%; font-size:8.6pt; font-weight:900; line-height:1; display:flex; align-items:center; justify-content:center; padding-top:0.55mm; margin-top:0.4mm;}
+  .q .stem{ font-family:'PC Serif'; font-size:9.5pt; line-height:1.74; font-weight:500; }
+  .q .stem .difficulty{ color:#C9A227; font-size:8pt; letter-spacing:0.06em; margin-left:1.5mm;}
+  .q .tags{ margin-top:0.8mm; font-size:7pt; color:var(--sub); font-family:'PC Sans';}
+  .choices{ list-style:none; margin:2.2mm 0 0 8.6mm; font-family:'PC Serif'; font-size:9.3pt; line-height:1.85; }
+  .choices.inline{ display:flex; flex-wrap:wrap; gap:0 6mm; }
+  .bogi-box{ border:0.35mm solid #B8C2CA; border-radius:0; margin:2.5mm 0 0 8.6mm; padding:2.4mm 3.2mm; font-family:'PC Serif'; font-size:9.2pt; line-height:1.8; background:none;}
+  .bogi-box .bt{ text-align:center; font-weight:800; color:var(--sub); font-size:8.4pt; margin-bottom:0.8mm; letter-spacing:0.3em;}
+  .ox-answer{ margin-left:2mm; color:var(--sub); font-size:9pt; }
+  .blankline{ display:inline-block; min-width:14mm; border-bottom:0.4mm solid var(--ink); }
+  .qgrid{ display:grid; grid-template-columns:1fr 1fr; gap:0 9mm; }
+  .essay-lines{ margin:2mm 0 0 8.4mm; }
+  .essay-lines div{ border-bottom:0.3mm solid var(--line); height:6.2mm; }
+  .badge-essay{ display:inline-block; background:var(--point); color:#fff; font-size:7pt; font-weight:800; padding:0.4mm 2mm; border-radius:1mm; vertical-align:1pt; margin-right:1.2mm;}
+  .badge-data{ display:inline-block; background:var(--brand); color:#fff; font-size:7pt; font-weight:800; padding:0.4mm 2mm; border-radius:1mm; vertical-align:1pt; margin-right:1.2mm;}
+
+  /* ── 해설부 ── */
+  .sol-head{ display:flex; align-items:center; gap:3mm; margin-bottom:4mm;}
+  .sol-head .stt{ font-size:14.5pt; font-weight:900; color:var(--brand);}
+  .sol-head .sub{ font-size:8.5pt; color:var(--sub);}
+  .anstable{ width:100%; border-collapse:collapse; margin-bottom:4.5mm; }
+  .anstable th,.anstable td{ border:0.3mm solid var(--line); font-size:8.8pt; padding:1.4mm 0; text-align:center; }
+  .anstable th{ background:var(--brand-lt); color:var(--brand); font-weight:800; }
+  .anstable td.a{ font-weight:900; color:var(--unit); }
+  .sol{ margin-bottom:5mm; break-inside:avoid; }
+  .sol .shead{ display:flex; align-items:center; gap:2mm; margin-bottom:1.4mm;}
+  .sol .sno{ background:var(--unit); color:#fff; min-width:6mm; height:5.4mm; border-radius:1.2mm; font-size:8.6pt; font-weight:900; line-height:1; display:flex; align-items:center; justify-content:center; padding:0.5mm 1.5mm 0;}
+  .sol .sans{ font-weight:900; color:var(--unit); font-size:9.6pt;}
+  .sol .slink{ font-size:7.2pt; color:var(--sub); margin-left:auto;}
+  .sol p{ font-family:'PC Serif'; font-size:9.1pt; line-height:1.76; margin-bottom:0.8mm; }
+  .wrongbox{ background:none; border:none; border-left:0.7mm solid #E3A0AC; border-radius:0; padding:1mm 0 1mm 3mm; margin-top:2mm;}
+  .wrongbox .wt{ font-size:8pt; font-weight:900; color:var(--point); margin-bottom:0.8mm; font-family:'PC Sans';}
+  .wrongbox p{ font-family:'PC Serif'; font-size:8.6pt; line-height:1.68; margin-bottom:0.9mm;}
+  .wrongbox p:last-child{ margin-bottom:0; }
+  .solcols{ display:grid; grid-template-columns:1fr 1fr; gap:0 9mm; }
+
+  /* ── 단원 도입 (타이포그래피 중심) ── */
+  .opener{ padding:0 0 19mm; }
+  .opener-hero{ position:relative; padding:7mm 20mm 4.5mm; overflow:hidden; flex-shrink:0; }
+  .ghost-txt{ position:absolute; top:-10mm; right:6mm; font-size:118pt; font-weight:900; color:#EBF5EF; line-height:1; letter-spacing:-0.04em; }
+  .kicker{ display:flex; align-items:center; gap:4mm; position:relative; }
+  .kicker .kt{ font-size:9.5pt; font-weight:800; color:var(--unit); letter-spacing:0.24em; white-space:nowrap; }
+  .kicker::after{ content:""; flex:1; border-top:0.3mm solid var(--line); }
+  .opener-hero h1{ position:relative; font-size:36pt; font-weight:900; letter-spacing:-0.015em; margin:4mm 0 0; }
+  .opener-hero h1 .tick{ display:block; width:14mm; border-top:1.4mm solid var(--accent); margin-bottom:3.6mm; }
+  .opener-lede{ position:relative; font-family:'PC Serif'; font-size:10.2pt; font-weight:600; line-height:2.0; color:#3D4C58; max-width:138mm; margin-top:4mm; padding-left:5mm; border-left:0.8mm solid var(--accent); }
+  .opener-inner{ padding:0 20mm; }
+
+  /* ── 원소의 여정 스트립 ── */
+  .journey{ margin-top:3.5mm; }
+  .journey .j-label{ font-size:8pt; font-weight:800; color:var(--sub); letter-spacing:0.08em; margin-bottom:2.4mm; display:flex; align-items:center; gap:1.6mm;}
+  .journey .j-label::before{ content:""; width:2.4mm; height:2.4mm; background:var(--unit); border-radius:50%; }
+  .j-bar{ display:flex; align-items:center; gap:2mm; }
+  .j-chip{ flex:1; text-align:center; background:#F0F8F3; border:0.35mm solid #BFE0CD; color:#3E9C6E; border-radius:1.6mm; padding:2.4mm 1mm 2mm; }
+  .j-chip .jc-t{ font-size:8.8pt; font-weight:800; display:block; }
+  .j-chip .jc-s{ font-size:6.8pt; color:var(--sub); display:block; margin-top:0.5mm; }
+  .j-chip.on{ background:var(--unit); border-color:var(--unit); }
+  .j-chip.on .jc-t{ color:#fff; }
+  .j-chip.on .jc-s{ color:#D6EEDF; }
+  .j-arrow{ flex:0 0 auto; color:#8CCBA8; font-size:10pt; font-weight:900; }
+  .toc{ margin-top:5mm; }
+  .toc .toc-title{ font-size:11pt; font-weight:900; color:var(--ink); margin-bottom:3mm; display:flex; align-items:center; gap:2.5mm;}
+  .toc .toc-title::before{ content:""; width:3.4mm; height:3.4mm; background:var(--accent); border-radius:0.8mm; }
+  .toc-item{ display:flex; align-items:flex-start; gap:5mm; padding:2.8mm 6mm; border-bottom:0.3mm solid var(--line); }
+  .toc-item:first-of-type{ border-top:0.3mm solid var(--line); }
+  .toc-item.active{ background:#F0F8F3; border-left:1.2mm solid #6FBE93; }
+  .toc-item .tno{ font-family:'PC Serif'; font-weight:900; color:#6FBE93; font-size:14pt; width:10mm; line-height:1.1; flex:0 0 auto;}
+  .toc-item .tbody{ flex:1; min-width:0; }
+  .toc-item .ttt{ font-weight:800; font-size:10.5pt; letter-spacing:0.01em; display:flex; align-items:center;}
+  .toc-item .tdesc{ font-family:'PC Serif'; font-size:8.6pt; font-weight:600; color:#4A5964; margin-top:0.7mm; line-height:1.55;}
+  .toc-item .tstd{ font-size:7.2pt; color:var(--sub); flex:0 0 auto; padding-top:1.2mm;}
+  .toc-item.active .tag-now{ background:var(--accent); color:#fff; font-size:7pt; font-weight:900; border-radius:4mm; padding:0.7mm 2.6mm; margin-left:3.5mm;}
+  .toc-item .tag-done{ font-size:7.2pt; font-weight:800; color:#3E9C6E; margin-left:3.5mm; }
+  .opener-quote{ margin-top:4mm; text-align:center; font-family:'PC Serif'; font-size:9.8pt; font-weight:600; color:#4A5964; letter-spacing:0.01em; }
+  .opener-quote .who{ font-size:8pt; color:var(--sub); font-weight:400; margin-left:2.5mm; }
+  .qa-lead li .qgo{ font-family:'PC Sans'; font-size:7.4pt; font-weight:800; color:var(--unit); background:var(--unit-lt); border-radius:3mm; padding:0.5mm 2.2mm; margin-left:2mm; white-space:nowrap; vertical-align:1pt;}
+  .qa-lead{ margin-top:3.5mm; border:none; border-top:0.45mm solid var(--brand); border-bottom:0.45mm solid var(--brand); background:none; border-radius:0; padding:3mm 2mm 2.8mm; }
+  .qa-lead .qt{ font-weight:900; color:var(--brand); font-size:10.5pt; margin-bottom:2mm;}
+  .qa-lead li{ font-family:'PC Serif'; font-size:9.5pt; line-height:1.8; margin-left:5mm; }
+
+  /* ── 바로바로 체크 (개념 페이지 하단 즉석 OX) ── */
+  .quickcheck{ margin-top:auto; border-top:0.35mm dashed #C8B98F; padding-top:3mm; width:calc(100% - 51mm); }
+  .quickcheck .qc-title{ display:inline-flex; align-items:center; gap:1.6mm; font-size:8.2pt; font-weight:900; color:#9C6503; margin-bottom:1.4mm; }
+  .quickcheck .qc-title::before{ content:"✓"; color:var(--accent); font-weight:900; }
+  .quickcheck ol{ list-style:none; font-family:'PC Serif'; font-size:8.8pt; line-height:1.75; }
+  .quickcheck li{ display:flex; gap:2mm; align-items:baseline; }
+  .quickcheck li .no{ font-weight:800; color:var(--accent); flex:0 0 auto; }
+  .quickcheck .qc-ans{ margin-top:1mm; font-size:7.2pt; color:var(--sub); transform:rotate(180deg); text-align:left; }
+
+  /* ── 중학 과학 다시보기 (날개단) ── */
+  .wing .review{ background:#F6F3EC; border-radius:1.8mm; padding:2.8mm 3mm; margin-top:1mm; }
+  .wing .review .rv-title{ font-size:7.8pt; font-weight:900; color:#7A6A45; margin-bottom:1.4mm; display:flex; align-items:center; gap:1.4mm;}
+  .wing .review .rv-title::before{ content:"↺"; font-weight:900; color:#A08A55; }
+
+  /* ── MEMO 페이지 ── */
+  .memo-head{ display:flex; align-items:baseline; gap:3.5mm; margin-bottom:5mm; }
+  .memo-head .mt{ font-size:17pt; font-weight:900; color:var(--brand); letter-spacing:0.22em; }
+  .memo-head .ms{ font-size:8.6pt; color:var(--sub); }
+  .memo-area{ flex:1; border:0.4mm solid var(--line); border-radius:2.5mm;
+    background-image:linear-gradient(to bottom, transparent calc(100% - 0.3mm), #DCE4E9 0);
+    background-size:100% 9mm; background-position:0 4mm; padding:0 5mm; margin-bottom:4mm; }
+  .memo-pen{ font-family:'PC Pen'; font-size:12.5pt; color:#B4560E; text-align:right; }
+</style>
+</head>
+<body>
+
+<!-- ═════════════ p.22 소단원 도입 ═════════════ -->
+<div class="page opener">
+  <div class="opener-hero">
+    <div class="ghost-txt">02</div>
+    <div class="kicker"><span class="kt">통합과학 1 · I. 과학의 기초</span></div>
+    <h1><span class="tick"></span>기본량과 단위</h1>
+    <p class="opener-lede">숫자 '5'만으로는 아무것도 말하지 못한다 — 5초인지, 5 m인지, 5 kg인지.<br>
+    단위는 자연을 기술하는 과학의 문법이다.</p>
+  </div>
+
+  <div class="opener-inner">
+    <div class="journey">
+      <div class="j-label">과학의 기초 — 지금 여기</div>
+      <div class="j-bar">
+        <div class="j-chip"><span class="jc-t">시간과 공간</span><span class="jc-s">자연을 재는 눈</span></div>
+        <span class="j-arrow">→</span>
+        <div class="j-chip on"><span class="jc-t">기본량과 단위</span><span class="jc-s">자연을 쓰는 언어</span></div>
+        <span class="j-arrow">→</span>
+        <div class="j-chip"><span class="jc-t">측정과 어림</span><span class="jc-s">모두의 자, 측정 표준</span></div>
+        <span class="j-arrow">→</span>
+        <div class="j-chip"><span class="jc-t">정보와 디지털</span><span class="jc-s">측정이 문명이 되기까지</span></div>
+      </div>
+    </div>
+    <div class="toc">
+      <div class="toc-title">이 단원의 학습 지도</div>
+      <div class="toc-item">
+        <span class="tno">01</span>
+        <span class="tbody"><span class="ttt">자연을 재는 눈 — 시간과 공간<span class="tag-done">완료 ✓</span></span>
+        <span class="tdesc">시공간의 규모, 길이와 시간을 재는 현대적 방법</span></span>
+        <span class="tstd">10통과1-01-01</span>
+      </div>
+      <div class="toc-item active">
+        <span class="tno">02</span>
+        <span class="tbody"><span class="ttt">기본량과 단위<span class="tag-now">NOW</span></span>
+        <span class="tdesc">7가지 기본량(SI), 단위가 자연을 기술하는 방식</span></span>
+        <span class="tstd">10통과1-01-02</span>
+      </div>
+      <div class="toc-item">
+        <span class="tno">03</span>
+        <span class="tbody"><span class="ttt">측정과 어림, 측정 표준</span>
+        <span class="tdesc">측정·어림의 의미, 측정 표준은 왜 필요한가</span></span>
+        <span class="tstd">10통과1-01-03</span>
+      </div>
+      <div class="toc-item">
+        <span class="tno">04</span>
+        <span class="tbody"><span class="ttt">정보와 신호, 디지털 문명</span>
+        <span class="tdesc">측정에서 정보로, 아날로그에서 디지털로</span></span>
+        <span class="tstd">10통과1-01-04</span>
+      </div>
+    </div>
+
+    <div class="qa-lead">
+      <div class="qt">이 소단원을 끝내면 답할 수 있는 질문</div>
+      <ul>
+        <li>단위 하나 헷갈렸다고 우주선이 정말 추락했을까? <span class="qgo">개념 1</span></li>
+        <li>세상 모든 물리량의 '기본 재료'는 몇 가지일까? <span class="qgo">개념 2</span></li>
+        <li>속도의 단위 m/s는 어디서 왔을까? <span class="qgo">개념 3</span></li>
+        <li>나노 기술의 '나노'는 얼마나 작은 걸까? <span class="qgo">개념 4</span></li>
+      </ul>
+    </div>
+
+    <div class="opener-quote">"자연 상수로 세운 단위는 모든 시대, 모든 문명에게 그 의미를 유지할 것이다."<span class="who">— 막스 플랑크, 자연 단위를 제안하며(1899)</span></div>
+  </div>
+
+  <div class="folio"><span>박찬 과학 | 통합과학 1</span><span class="num">22</span></div>
+</div>
+
+<!-- ═════════════ p.23 개념 01 단위가 없으면 ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag">I. 과학의 기초</span><span class="lesson-tag">02. 기본량과 단위</span></div>
+  <h2 class="lesson-title"><span class="no">02</span><span class="tt">기본량과 단위</span></h2>
+  <div class="std-badges"><span class="std">성취기준 10통과1-01-02</span><span class="std">기본량의 의미 → 단위의 의미와 적용 사례</span></div>
+
+  <div class="cols">
+    <div class="main">
+      <h3 class="sec"><span class="n">1</span>숫자만으로는 부족하다 — 단위의 힘</h3>
+      <p class="body">"3만큼 가서 5만큼 기다려."라는 지시는 실행할 수 없다. 3 <b>m</b>인지 3 <b>km</b>인지, 5<b>초</b>인지 5<b>분</b>인지가 빠졌기 때문이다. 측정값은 반드시 <span class="u-amber">수치 + 단위</span>의 짝으로 쓴다. <span class="kw">단위</span>는 '무엇을 기준으로 몇 배인가'를 알려 주는 약속이며, 이 약속이 있어야 측정이 소통이 된다.</p>
+      <p class="body">약속이 어긋나면 대가는 혹독하다. 1999년 미국 항공우주국(NASA)의 <b>화성 기후 궤도선</b>은 화성에 도착하자마자 실종됐다. 조사 결과, 한 팀은 힘의 크기를 <b>미터법 단위(뉴턴 기준)</b>로, 다른 팀은 <b>야드파운드법 단위(파운드힘 기준)</b>로 계산해 주고받은 것이 원인이었다 — 숫자는 맞았지만 단위가 달랐고, 탐사선은 예정보다 화성에 너무 가깝게 진입해 파괴된 것으로 추정된다. 수천억 원짜리 교훈: <b>단위는 과학의 문법이다.</b></p>
+
+      <figure>
+        <svg width="470" height="146" viewBox="0 0 470 146" font-family="PC Sans">
+          <defs>
+            <marker id="arrP" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="#3E9C6E"/></marker>
+            <marker id="arrR" markerWidth="7" markerHeight="7" refX="5" refY="2.5" orient="auto"><path d="M0,0 L6,2.5 L0,5 Z" fill="#D6455D"/></marker>
+          </defs>
+          <g font-size="6.8">
+            <g transform="translate(118,8)">
+              <rect x="-102" y="0" width="204" height="102" rx="6" fill="#FBEBEE" stroke="#E3A0AC" stroke-width="1"/>
+              <text x="0" y="16" text-anchor="middle" font-size="8.4" font-weight="800" fill="#A9556A">1999년, 화성 기후 궤도선</text>
+              <g transform="translate(-40,52)">
+                <rect x="-30" y="-12" width="60" height="24" rx="4" fill="#fff" stroke="#9AA7B1"/>
+                <text y="3" text-anchor="middle" font-weight="800" fill="#3E9C6E">뉴턴 기준</text>
+                <text y="26" text-anchor="middle" fill="#5B6B77">지상 관제팀</text>
+              </g>
+              <g transform="translate(46,52)">
+                <rect x="-30" y="-12" width="60" height="24" rx="4" fill="#fff" stroke="#9AA7B1"/>
+                <text y="3" text-anchor="middle" font-weight="800" fill="#D6455D">파운드힘 기준</text>
+                <text y="26" text-anchor="middle" fill="#5B6B77">소프트웨어팀</text>
+              </g>
+              <text x="3" y="55" text-anchor="middle" font-size="9" font-weight="900" fill="#A9556A">≠</text>
+              <text x="0" y="94" text-anchor="middle" font-weight="800" fill="#A9556A">숫자는 맞았다 — 단위가 달랐다</text>
+            </g>
+            <g transform="translate(352,8)">
+              <rect x="-104" y="0" width="208" height="102" rx="6" fill="#F0F8F3" stroke="#BFE0CD" stroke-width="1"/>
+              <text x="0" y="16" text-anchor="middle" font-size="8.4" font-weight="800" fill="#3E9C6E">측정값 = 수치 + 단위</text>
+              <g text-anchor="middle" font-weight="800">
+                <rect x="-84" y="30" width="76" height="26" rx="4" fill="#EAF6EC" stroke="#6FBE93"/><text x="-46" y="47" font-size="10" fill="#3E9C6E">5.0</text>
+                <text x="0" y="47" font-size="9" fill="#5B6B77">+</text>
+                <rect x="8" y="30" width="76" height="26" rx="4" fill="#FDF3E0" stroke="#E8940A"/><text x="46" y="47" font-size="10" fill="#B4560E">m/s</text>
+              </g>
+              <text x="0" y="74" text-anchor="middle" fill="#5B6B77">'기준(단위)의 몇 배(수치)인가'를 함께 말해야</text>
+              <text x="0" y="88" text-anchor="middle" fill="#5B6B77">측정이 비로소 소통이 된다</text>
+            </g>
+          </g>
+          <text x="235" y="134" text-anchor="middle" font-size="8.8" font-weight="800" fill="#E8940A">단위가 어긋나면 우주선도 떨어진다 — 단위는 선택이 아니라 문법이다</text>
+        </svg>
+        <figcaption>그림 1 | 단위의 힘 — 수치와 단위는 한 몸이다</figcaption>
+      </figure>
+
+      <div class="saem">
+        <div class="avatar">박찬<br>쌤</div>
+        <div class="bubble"><span class="pen">"시험 답안에 단위 빼먹고 감점당한 적 있지? NASA도 당했다. '수치 + 단위'는 붙여 다니는 한 단어라고 생각해라."</span></div>
+      </div>
+    </div>
+
+    <div class="wing">
+      <div class="wtitle">날개 노트</div>
+      <div class="term"><b>물리량</b>길이·질량·시간처럼 측정할 수 있는 자연의 양. 모든 물리량은 수치와 단위로 쓴다.</div>
+      <div class="term"><b>미터법과 야드파운드법</b>세계 대부분은 미터법(SI)을 쓰지만 일부 국가는 야드·파운드를 병용한다 — 혼용이 사고를 부른다.</div>
+      <div class="wsep"></div>
+      <div class="wtitle">한눈에 암기</div>
+      <div class="wing-pen">측정값 = 수치 + 단위<br>단위 없는 숫자는<br>과학이 아니다!</div>
+    </div>
+  </div>
+
+  <div class="folio"><span>I. 과학의 기초</span><span class="num">23</span></div>
+</div>
+
+<!-- ═════════════ p.24 개념 02 SI 기본량 7가지 ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag">I. 과학의 기초</span><span class="lesson-tag">02. 기본량과 단위</span></div>
+  <div class="cols">
+    <div class="main">
+      <h3 class="sec"><span class="n">2</span>자연의 알파벳 — 국제단위계의 기본량 7가지</h3>
+      <p class="body">수많은 물리량을 제각각 정의하면 끝이 없다. 그래서 과학은 물리량의 세계에서 <b>가장 기본이 되는 재료</b>를 골라냈다. <span class="kw">기본량</span> — 다른 양으로부터 유도되지 않고 그 자체로 정의되는 양이다. 국제단위계(<span class="kw">SI</span>)는 <span class="u-amber">길이(m) · 질량(kg) · 시간(s) · 전류(A) · 온도(K) · 물질량(mol) · 광도(cd)</span>의 <b>7가지</b>를 기본량으로 정하고, 각각에 기본단위를 부여했다.</p>
+      <p class="body">일곱 개의 낯익은 얼굴들을 보라. 길이와 시간은 01에서 만났고, 물질량(mol)은 화학에서, 온도(K)와 전류(A)는 물리에서 계속 만나게 된다. 이 일곱이 자연의 '알파벳'인 이유는 단순하다 — <b>세상의 모든 물리량이 이 일곱 가지의 조합으로 표현되기 때문</b>이다. 마치 자음과 모음 몇 개로 모든 단어를 쓰듯이.</p>
+
+      <figure>
+        <svg width="470" height="150" viewBox="0 0 470 150" font-family="PC Sans">
+          <g font-size="7" text-anchor="middle">
+            <text x="235" y="14" font-size="8.6" font-weight="800" fill="#3E9C6E">국제단위계(SI)의 기본량 7가지 — 자연을 쓰는 알파벳</text>
+            <g font-weight="800">
+              <g transform="translate(64,28)">
+                <rect x="-38" y="0" width="76" height="46" rx="5" fill="#F0F8F3" stroke="#6FBE93" stroke-width="1"/>
+                <text y="19" font-size="10" fill="#3E9C6E">m</text><text y="36" font-size="7.2" fill="#22303A">길이</text>
+              </g>
+              <g transform="translate(150,28)">
+                <rect x="-38" y="0" width="76" height="46" rx="5" fill="#F0F8F3" stroke="#6FBE93" stroke-width="1"/>
+                <text y="19" font-size="10" fill="#3E9C6E">kg</text><text y="36" font-size="7.2" fill="#22303A">질량</text>
+              </g>
+              <g transform="translate(236,28)">
+                <rect x="-38" y="0" width="76" height="46" rx="5" fill="#F0F8F3" stroke="#6FBE93" stroke-width="1"/>
+                <text y="19" font-size="10" fill="#3E9C6E">s</text><text y="36" font-size="7.2" fill="#22303A">시간</text>
+              </g>
+              <g transform="translate(322,28)">
+                <rect x="-38" y="0" width="76" height="46" rx="5" fill="#F0F8F3" stroke="#6FBE93" stroke-width="1"/>
+                <text y="19" font-size="10" fill="#3E9C6E">A</text><text y="36" font-size="7.2" fill="#22303A">전류</text>
+              </g>
+              <g transform="translate(408,28)">
+                <rect x="-38" y="0" width="76" height="46" rx="5" fill="#F0F8F3" stroke="#6FBE93" stroke-width="1"/>
+                <text y="19" font-size="10" fill="#3E9C6E">K</text><text y="36" font-size="7.2" fill="#22303A">온도</text>
+              </g>
+              <g transform="translate(150,84)">
+                <rect x="-38" y="0" width="76" height="46" rx="5" fill="#F0F8F3" stroke="#6FBE93" stroke-width="1"/>
+                <text y="19" font-size="10" fill="#3E9C6E">mol</text><text y="36" font-size="7.2" fill="#22303A">물질량</text>
+              </g>
+              <g transform="translate(236,84)">
+                <rect x="-38" y="0" width="76" height="46" rx="5" fill="#F0F8F3" stroke="#6FBE93" stroke-width="1"/>
+                <text y="19" font-size="10" fill="#3E9C6E">cd</text><text y="36" font-size="7.2" fill="#22303A">광도(빛의 세기)</text>
+              </g>
+              <g transform="translate(322,84)">
+                <rect x="-38" y="0" width="76" height="46" rx="5" fill="#FDF3E0" stroke="#E8940A" stroke-width="1"/>
+                <text y="19" font-size="8" fill="#B4560E">조합하면</text><text y="36" font-size="7.2" fill="#B4560E">모든 물리량!</text>
+              </g>
+            </g>
+          </g>
+          <text x="235" y="144" text-anchor="middle" font-size="8.8" font-weight="800" fill="#E8940A">기본량 7가지 = 길이 · 질량 · 시간 · 전류 · 온도 · 물질량 · 광도 — 나머지는 전부 이들의 조합</text>
+        </svg>
+        <figcaption>그림 2 | SI 기본량과 기본단위 — 일곱 개면 자연을 다 쓴다</figcaption>
+      </figure>
+
+      <div class="expoint">
+        <div class="boxtitle"><span class="ico">!</span>시험엔 이렇게</div>
+        <p>"다음 중 기본량이 아닌 것은?" 유형에서는 <b>속도·부피·밀도·힘</b>이 미끼로 나온다 — 전부 유도량이다. 그리고 질량의 기본단위는 g이 아니라 <b>kg</b>이라는 점도 단골 함정.</p>
+      </div>
+    </div>
+
+    <div class="wing">
+      <div class="wtitle">날개 노트</div>
+      <div class="term"><b>국제단위계(SI)</b>전 세계가 함께 쓰기로 약속한 단위 체계. 과학·산업·무역의 공용어다.</div>
+      <div class="term"><b>기본량의 정의</b>2019년부터 SI의 모든 기본단위는 빛의 속력·플랑크 상수 같은 '자연의 상수'에 붙들어 정의된다 — 03에서 다시 만난다.</div>
+      <div class="wsep"></div>
+      <div class="wtitle">한눈에 암기</div>
+      <div class="wing-pen">m·kg·s·A·K·mol·cd<br>기본량은 딱 7개!<br>질량은 g 아니고 kg!</div>
+    </div>
+  </div>
+  <div class="quickcheck">
+    <span class="qc-title">바로바로 체크</span>
+    <ol>
+      <li><span class="no">1</span>국제단위계의 기본량은 7가지이다. ( O , X )</li>
+      <li><span class="no">2</span>질량의 SI 기본단위는 g이다. ( O , X )</li>
+      <li><span class="no">3</span>속도는 SI 기본량 중 하나이다. ( O , X )</li>
+    </ol>
+    <div class="qc-ans">정답 1 O 2 X (kg이다) 3 X (길이와 시간에서 유도된다)</div>
+  </div>
+  <div class="folio"><span>I. 과학의 기초</span><span class="num">24</span></div>
+</div>
+
+<!-- ═════════════ p.25 개념 03 유도량 ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag">I. 과학의 기초</span><span class="lesson-tag">02. 기본량과 단위</span></div>
+  <div class="cols">
+    <div class="main">
+      <h3 class="sec"><span class="n">3</span>조합의 기술 — 유도량과 유도단위</h3>
+      <p class="body">기본량을 곱하고 나누면 새로운 물리량이 태어난다. 이렇게 <b>기본량의 조합으로 정의되는 양</b>이 <span class="kw">유도량</span>이다. 속도는 거리(길이)를 시간으로 나눈 것이니 단위도 그대로 <span class="u-amber">m/s</span>가 되고, 부피는 길이를 세 번 곱해 m³, 밀도는 질량을 부피로 나눠 kg/m³가 된다. <b>단위를 보면 그 양이 어떻게 만들어졌는지가 보인다</b> — 단위는 정의의 요약본이다.</p>
+      <p class="body">III단원에서 만난 양들을 다시 보자. 운동량의 단위 kg·m/s는 '질량 × 속도'라는 정의를 그대로 읽은 것이고, 힘의 단위 <span class="kw">뉴턴(N)</span>도 풀어 쓰면 kg·m/s²이다. 이렇게 자주 쓰는 유도단위에는 과학자의 이름을 붙인 별명(N, J, W 등)을 주기도 한다. 별명이 있어도 <b>정체는 언제나 기본단위의 조합</b>이다.</p>
+
+      <figure>
+        <svg width="470" height="144" viewBox="0 0 470 144" font-family="PC Sans">
+          <g font-size="7" text-anchor="middle">
+            <g transform="translate(90,12)">
+              <rect x="-72" y="0" width="144" height="100" rx="6" fill="#F0F8F3" stroke="#BFE0CD" stroke-width="1"/>
+              <text y="18" font-size="8.2" font-weight="800" fill="#3E9C6E">속도 = 거리 ÷ 시간</text>
+              <g font-weight="800">
+                <rect x="-56" y="30" width="42" height="22" rx="3" fill="#EAF6EC" stroke="#6FBE93"/><text x="-35" y="45" fill="#3E9C6E">m</text>
+                <text x="-6" y="45" font-size="9" fill="#5B6B77">÷</text>
+                <rect x="8" y="30" width="42" height="22" rx="3" fill="#EAF6EC" stroke="#6FBE93"/><text x="29" y="45" fill="#3E9C6E">s</text>
+              </g>
+              <line x1="0" y1="60" x2="0" y2="70" stroke="#3E9C6E" stroke-width="1.6" marker-end="url(#arrP)"/>
+              <text y="86" font-size="9" font-weight="900" fill="#B4560E">m/s</text>
+            </g>
+            <g transform="translate(240,12)">
+              <rect x="-64" y="0" width="128" height="100" rx="6" fill="#F0F8F3" stroke="#BFE0CD" stroke-width="1"/>
+              <text y="18" font-size="8.2" font-weight="800" fill="#3E9C6E">부피 = 길이³</text>
+              <g stroke="#6FBE93" stroke-width="1.2" fill="#EAF6EC">
+                <path d="M-20,38 h26 v26 h-26 Z"/><path d="M-20,38 l9,-8 h26 l-9,8 Z"/><path d="M6,38 l9,-8 v26 l-9,8 Z"/>
+              </g>
+              <line x1="0" y1="72" x2="0" y2="80" stroke="#3E9C6E" stroke-width="1.6" marker-end="url(#arrP)"/>
+              <text y="94" font-size="9" font-weight="900" fill="#B4560E">m³</text>
+            </g>
+            <g transform="translate(382,12)">
+              <rect x="-76" y="0" width="152" height="100" rx="6" fill="#FDF9F0" stroke="#EBCB9C" stroke-width="1"/>
+              <text y="18" font-size="8.2" font-weight="800" fill="#B4560E">밀도 = 질량 ÷ 부피</text>
+              <g font-weight="800">
+                <rect x="-58" y="30" width="44" height="22" rx="3" fill="#EAF6EC" stroke="#6FBE93"/><text x="-36" y="45" fill="#3E9C6E">kg</text>
+                <text x="-7" y="45" font-size="9" fill="#5B6B77">÷</text>
+                <rect x="8" y="30" width="44" height="22" rx="3" fill="#EAF6EC" stroke="#6FBE93"/><text x="30" y="45" fill="#3E9C6E">m³</text>
+              </g>
+              <line x1="0" y1="60" x2="0" y2="70" stroke="#3E9C6E" stroke-width="1.6" marker-end="url(#arrP)"/>
+              <text y="86" font-size="9" font-weight="900" fill="#B4560E">kg/m³</text>
+            </g>
+          </g>
+          <text x="235" y="132" text-anchor="middle" font-size="8.8" font-weight="800" fill="#E8940A">유도량의 단위는 정의의 요약본 — 단위를 읽으면 만든 방법이 보인다</text>
+        </svg>
+        <figcaption>그림 3 | 유도량 — 기본량을 곱하고 나누어 만드는 새 물리량</figcaption>
+      </figure>
+
+      <div class="gist">
+        <div class="boxtitle"><span class="ico">알</span>알짜 정리 ① — 기본량과 유도량</div>
+        <ul>
+          <li><b>측정값 = 수치 + 단위</b> — 단위가 어긋나면 우주선도 떨어진다 (화성 기후 궤도선)</li>
+          <li><b>기본량 7가지</b>: 길이 m · 질량 kg · 시간 s · 전류 A · 온도 K · 물질량 mol · 광도 cd</li>
+          <li><b>유도량</b> = 기본량의 조합: 속도 m/s, 부피 m³, 밀도 kg/m³, 힘 N(= kg·m/s²)</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="wing">
+      <div class="wtitle">날개 노트</div>
+      <div class="term"><b>이름 붙은 유도단위</b>힘 N(뉴턴), 에너지 J(줄), 일률 W(와트) — 편의상의 별명일 뿐, 정체는 기본단위의 조합이다.</div>
+      <div class="term"><b>단위 검산법</b>공식이 헷갈리면 단위를 계산해 보라 — 양변의 단위가 다르면 그 식은 무조건 틀렸다.</div>
+      <div class="wsep"></div>
+      <div class="wtitle">한눈에 암기</div>
+      <div class="wing-pen">유도량 = 기본량의 조합<br>속도 m/s, 밀도 kg/m³<br>단위가 곧 정의!</div>
+    </div>
+  </div>
+  <div class="quickcheck">
+    <span class="qc-title">바로바로 체크</span>
+    <ol>
+      <li><span class="no">1</span>속도의 단위 m/s는 길이와 시간의 단위에서 유도된 것이다. ( O , X )</li>
+      <li><span class="no">2</span>밀도는 기본량이다. ( O , X )</li>
+      <li><span class="no">3</span>힘의 단위 N은 기본단위의 조합으로 나타낼 수 있다. ( O , X )</li>
+    </ol>
+    <div class="qc-ans">정답 1 O 2 X (질량÷부피로 유도) 3 O (kg·m/s²)</div>
+  </div>
+  <div class="folio"><span>I. 과학의 기초</span><span class="num">25</span></div>
+</div>
+
+<!-- ═════════════ p.26 개념 04 접두어 ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag">I. 과학의 기초</span><span class="lesson-tag">02. 기본량과 단위</span></div>
+  <div class="cols">
+    <div class="main">
+      <h3 class="sec"><span class="n">4</span>크기의 옷 — 접두어</h3>
+      <p class="body">단위 앞에 붙어 크기를 조절하는 말이 <span class="kw">접두어</span>다. 킬로(k)는 10³배, 밀리(m)는 10⁻³배 — 그래서 1 km는 1000 m, 1 mm는 0.001 m다. 더 작은 쪽으로 마이크로(μ, 10⁻⁶)와 <span class="kw">나노</span>(n, 10⁻⁹)가, 더 큰 쪽으로 메가(M, 10⁶)와 기가(G, 10⁹)가 있다. 01에서 배운 10의 거듭제곱에 <span class="u-amber">이름을 붙인 것</span>이라 보면 정확하다.</p>
+      <p class="body">접두어는 규모에 맞는 옷이다. 세균의 크기는 0.000002 m라 쓰는 대신 2 μm로, 반도체 회로 선폭은 몇 nm로, 데이터 용량은 GB(기가바이트)로 쓴다. '나노 기술'이라는 이름 자체가 <b>10⁻⁹ m 규모 — 원자 몇십 개 크기의 세계를 다루는 기술</b>이라는 뜻이다. II단원의 그래핀처럼 나노 세계의 신소재가 첨단 기술의 앞줄에 선 이유도, 그 규모에서 물질이 새로운 성질을 드러내기 때문이다.</p>
+
+      <figure>
+        <svg width="470" height="140" viewBox="0 0 470 140" font-family="PC Sans">
+          <g font-size="6.8">
+            <line x1="30" y1="58" x2="446" y2="58" stroke="#3E9C6E" stroke-width="2" marker-end="url(#arrP)"/>
+            <g text-anchor="middle" font-weight="800">
+              <g transform="translate(66,58)">
+                <rect x="-30" y="-34" width="60" height="22" rx="4" fill="#EAF6EC" stroke="#6FBE93"/><text y="-19" fill="#3E9C6E">나노 n</text>
+                <text y="16">10⁻⁹</text><text y="28" font-weight="400" fill="#5B6B77">반도체 회로</text>
+              </g>
+              <g transform="translate(146,58)">
+                <rect x="-30" y="-34" width="60" height="22" rx="4" fill="#EAF6EC" stroke="#6FBE93"/><text y="-19" fill="#3E9C6E">마이크로 μ</text>
+                <text y="16">10⁻⁶</text><text y="28" font-weight="400" fill="#5B6B77">세균 크기</text>
+              </g>
+              <g transform="translate(226,58)">
+                <rect x="-30" y="-34" width="60" height="22" rx="4" fill="#EAF6EC" stroke="#6FBE93"/><text y="-19" fill="#3E9C6E">밀리 m</text>
+                <text y="16">10⁻³</text><text y="28" font-weight="400" fill="#5B6B77">약 용량 mg</text>
+              </g>
+              <g transform="translate(306,58)">
+                <rect x="-30" y="-34" width="60" height="22" rx="4" fill="#FDF3E0" stroke="#E8940A"/><text y="-19" fill="#B4560E">킬로 k</text>
+                <text y="16">10³</text><text y="28" font-weight="400" fill="#5B6B77">거리 km</text>
+              </g>
+              <g transform="translate(386,58)">
+                <rect x="-30" y="-34" width="60" height="22" rx="4" fill="#FDF3E0" stroke="#E8940A"/><text y="-19" fill="#B4560E">메가·기가</text>
+                <text y="16">10⁶ · 10⁹</text><text y="28" font-weight="400" fill="#5B6B77">데이터 MB·GB</text>
+              </g>
+            </g>
+            <text x="235" y="104" text-anchor="middle" font-size="7.2" fill="#5B6B77">기준(10⁰)에서 왼쪽은 작아지는 옷, 오른쪽은 커지는 옷 — 세 자리(10³)씩 갈아입는다</text>
+          </g>
+          <text x="235" y="130" text-anchor="middle" font-size="8.8" font-weight="800" fill="#E8940A">접두어 = 10의 거듭제곱에 붙인 이름 — n(10⁻⁹) μ(10⁻⁶) m(10⁻³) k(10³) M(10⁶) G(10⁹)</text>
+        </svg>
+        <figcaption>그림 4 | 접두어의 사다리 — 규모에 맞는 옷을 골라 입는다</figcaption>
+      </figure>
+
+      <div class="expoint">
+        <div class="boxtitle"><span class="ico">!</span>시험엔 이렇게</div>
+        <p>환산 문제의 급소는 <b>지수 부호</b> — 1 nm = 10⁻⁹ m이지, 10⁹ m가 아니다. "2 μm = 몇 m?"처럼 접두어 → 거듭제곱 변환은 기계적으로: 2 × 10⁻⁶ m. 끝.</p>
+      </div>
+    </div>
+
+    <div class="wing">
+      <div class="wtitle">날개 노트</div>
+      <div class="term"><b>나노 기술</b>10⁻⁹ m 규모에서 물질을 다루는 기술 — 그래핀, 반도체 미세 공정, 나노 약물 전달.</div>
+      <div class="term"><b>처방전의 mg</b>의약품 용량은 밀리그램(10⁻³ g) 단위 — 접두어 하나 착오가 1000배 차이를 만든다.</div>
+      <div class="wsep"></div>
+      <div class="wtitle">한눈에 암기</div>
+      <div class="wing-pen">n → μ → m → (기준) → k → M → G<br>한 칸 = 1000배!</div>
+    </div>
+  </div>
+  <div class="quickcheck">
+    <span class="qc-title">바로바로 체크</span>
+    <ol>
+      <li><span class="no">1</span>1 km는 1000 m이다. ( O , X )</li>
+      <li><span class="no">2</span>1 nm는 10⁹ m이다. ( O , X )</li>
+      <li><span class="no">3</span>세균의 크기는 마이크로미터(μm) 단위로 나타내면 편리하다. ( O , X )</li>
+    </ol>
+    <div class="qc-ans">정답 1 O 2 X (10⁻⁹ m) 3 O</div>
+  </div>
+  <div class="folio"><span>I. 과학의 기초</span><span class="num">26</span></div>
+</div>
+
+<!-- ═════════════ p.27 개념 05 생활 속의 단위 ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag">I. 과학의 기초</span><span class="lesson-tag">02. 기본량과 단위</span></div>
+  <div class="cols">
+    <div class="main">
+      <h3 class="sec"><span class="n">5</span>단위는 생활 속에서 일한다</h3>
+      <p class="body">단위는 교과서 밖에서 더 바쁘다. 도로 표지판의 <b>km/h</b>는 속도위반의 기준이 되고, 처방전의 <b>mg</b>은 약효와 부작용의 경계가 되며, 식품 포장의 <b>g과 kcal</b>는 영양 관리의 잣대가 된다. 병원의 혈압(mmHg), 날씨의 기온(℃)과 강수량(mm), 전기 요금 고지서의 kWh — <span class="u-amber">일상은 온통 단위로 기술되고, 단위로 관리된다.</span></p>
+      <p class="body">생활 단위 중에는 SI 기본단위가 아닌 것도 많다. ℃는 K에서, kcal는 J에서 환산되는 <b>관용 단위</b>다. 편리해서 남아 있지만, 과학·산업의 최종 기준은 언제나 SI다. 국가 간 무역에서 저울이, 병원 간 이송에서 검사 수치가, 나라마다 다르면 어떻게 되겠는가 — <b>같은 단위 체계를 쓴다는 것</b>은 전 세계가 같은 자로 재고 같은 언어로 말한다는 뜻이다. 그 '같은 자'를 지키는 장치가 다음 소단원의 주제, 측정 표준이다.</p>
+
+      <figure>
+        <svg width="470" height="128" viewBox="0 0 470 128" font-family="PC Sans">
+          <g font-size="7" text-anchor="middle">
+            <g transform="translate(64,8)">
+              <rect x="-54" y="0" width="108" height="88" rx="6" fill="#FBEBEE" stroke="#E3A0AC" stroke-width="0.9"/>
+              <circle cx="0" cy="34" r="20" fill="#fff" stroke="#D6455D" stroke-width="2"/>
+              <text y="39" font-size="9.5" font-weight="900" fill="#D6455D">60</text>
+              <text y="74" font-weight="800">도로 — km/h</text>
+            </g>
+            <g transform="translate(178,8)">
+              <rect x="-54" y="0" width="108" height="88" rx="6" fill="#EAF6EC" stroke="#5FA86A" stroke-width="0.9"/>
+              <rect x="-24" y="16" width="48" height="34" rx="4" fill="#fff" stroke="#5FA86A" stroke-width="1.2"/>
+              <text y="38" font-size="8.4" font-weight="900" fill="#2E6B3A">500 mg</text>
+              <text y="74" font-weight="800">처방전 — mg</text>
+            </g>
+            <g transform="translate(292,8)">
+              <rect x="-54" y="0" width="108" height="88" rx="6" fill="#FDF9F0" stroke="#EBCB9C" stroke-width="0.9"/>
+              <path d="M-14,20 q-10,0 -10,10 v14 q0,10 10,10 h28 q10,0 10,-10 v-14 q0,-10 -10,-10 Z" fill="#fff" stroke="#E8940A" stroke-width="1.2"/>
+              <text y="38" font-size="7.6" font-weight="900" fill="#B4560E">210 kcal</text>
+              <text y="74" font-weight="800">식품 표시 — g·kcal</text>
+            </g>
+            <g transform="translate(406,8)">
+              <rect x="-54" y="0" width="108" height="88" rx="6" fill="#F0F8F3" stroke="#BFE0CD" stroke-width="0.9"/>
+              <path d="M-18,48 q-6,-26 12,-30 q4,-8 12,-4 l-6,12 h10 l-16,24 l4,-14 Z" fill="#3E9C6E" opacity="0.85"/>
+              <text x="14" y="30" font-size="7.6" font-weight="900" fill="#3E9C6E">kWh</text>
+              <text y="74" font-weight="800">전기 요금 — kWh</text>
+            </g>
+          </g>
+          <text x="235" y="118" text-anchor="middle" font-size="8.8" font-weight="800" fill="#E8940A">속도위반도, 약효도, 영양도, 요금도 — 일상의 판정 기준은 전부 단위 위에 서 있다</text>
+        </svg>
+        <figcaption>그림 5 | 생활 속의 단위 — 단위는 매일 우리를 판정하고 보호한다</figcaption>
+      </figure>
+
+      <div class="gist">
+        <div class="boxtitle"><span class="ico">알</span>알짜 정리 ② — 기본량과 단위 한 장 요약</div>
+        <ul>
+          <li><b>측정값 = 수치 + 단위</b> / 기본량 7가지(m·kg·s·A·K·mol·cd)는 자연의 알파벳</li>
+          <li><b>유도량</b> = 기본량의 조합(m/s, m³, kg/m³, N) / <b>접두어</b> = 크기의 옷(n·μ·m·k·M·G)</li>
+          <li>생활 단위(℃, kcal)도 뿌리는 SI — 전 세계가 <b>같은 자</b>로 재기에 과학·무역·의료가 통한다</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="wing">
+      <div class="wtitle">날개 노트</div>
+      <div class="term"><b>관용 단위</b>℃(온도), kcal(에너지), L(부피)처럼 SI는 아니지만 널리 쓰이는 단위 — 모두 SI로 환산된다.</div>
+      <div class="term"><b>kWh</b>일률(kW)에 시간(h)을 곱한 에너지의 단위 — 전기 요금은 '에너지를 얼마나 썼나'로 매긴다.</div>
+      <div class="wsep"></div>
+      <div class="wtitle">한눈에 암기</div>
+      <div class="wing-pen">일상 = 단위의 세계<br>기준은 언제나 SI!<br>같은 자 = 통하는 세계</div>
+    </div>
+  </div>
+  <div class="quickcheck">
+    <span class="qc-title">바로바로 체크</span>
+    <ol>
+      <li><span class="no">1</span>도로 표지판의 속도 단위는 km/h이다. ( O , X )</li>
+      <li><span class="no">2</span>℃와 kcal는 SI 기본단위이다. ( O , X )</li>
+      <li><span class="no">3</span>전 세계가 같은 단위 체계를 쓰면 과학과 무역에 유리하다. ( O , X )</li>
+    </ol>
+    <div class="qc-ans">정답 1 O 2 X (관용 단위 — K·J에서 환산) 3 O</div>
+  </div>
+  <div class="folio"><span>I. 과학의 기초</span><span class="num">27</span></div>
+</div>
+
+<!-- ═════════════ p.28 자료 파헤치기 ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag">I. 과학의 기초</span><span class="lesson-tag">02. 기본량과 단위</span></div>
+  <div class="lab">
+    <div class="lab-head">자료 파헤치기 <span class="tag">탐구·자료 분석</span> <span style="font-weight:600; font-size:9.5pt; margin-left:auto;">단위가 다르면 우주선이 떨어진다</span></div>
+    <div class="lab-body">
+      <h4>자료</h4>
+      <p>1999년 9월, NASA의 화성 기후 궤도선이 화성 궤도 진입 중 실종되었다. 사고 조사 보고서의 요지: 탐사선의 궤도를 수정하는 추진력 데이터를 <b>소프트웨어팀은 야드파운드법 단위(파운드힘 기준)</b>로 산출했고, <b>항법팀은 이를 미터법 단위(뉴턴 기준)</b>로 받아 계산했다. 1 파운드힘 ≈ 4.45뉴턴 — 추진력이 약 4.45배 어긋난 채 항법 계산이 누적되었고, 탐사선은 계획보다 훨씬 낮은 고도로 화성 대기에 진입해 파괴된 것으로 추정된다.</p>
+      <h4>해석의 3단계</h4>
+      <ol>
+        <li><b>무엇이 틀렸는가</b> — 수치 계산은 양쪽 다 정확했다. 틀린 것은 딱 하나, <b>단위의 약속</b>이었다. '측정값 = 수치 + 단위'에서 단위 쪽이 무너지면 수치가 아무리 정확해도 소용없다.</li>
+        <li><b>왜 눈치채지 못했는가</b> — 두 단위의 비율이 4.45배로, 언뜻 보면 그럴듯한 크기의 숫자가 오간다. 0이 몇 개씩 차이 나는 실수와 달리, <b>단위 혼동은 티가 잘 나지 않는다</b> — 그래서 더 위험하다.</li>
+        <li><b>무엇이 재발을 막는가</b> — 계산서에 단위를 반드시 함께 쓰고, 주고받는 데이터의 단위를 계약처럼 명시하는 것. 국제단위계(SI)라는 공용어가 존재하는 이유가 이 사고 하나로 요약된다.</li>
+      </ol>
+      <h4>결론</h4>
+      <p>단위는 형식이 아니라 안전장치다. 숫자에 단위를 붙이는 습관은 시험 감점을 막는 기술이 아니라, <b>수천억 원짜리 실수를 막는 과학의 기본기</b>다.</p>
+      <div class="expoint">
+        <div class="boxtitle"><span class="ico">!</span>시험엔 이렇게</div>
+        <p>이 사례는 <b>"단위(측정 표준)가 왜 필요한가"</b>의 근거 자료로 출제된다 — 03의 측정 표준과 이어지는 징검다리. "계산 실수가 원인이다"(X — 단위 혼동이 원인) 선지를 조심하라.</p>
+      </div>
+      <h4>직접 해보기 — 단위 탐정</h4>
+      <p>오늘 하루 눈에 띄는 단위를 10개 수집해 보자(교통 표지판, 과자 봉지, 처방전, 일기예보, 충전기 표시…). 각각을 '기본단위의 조합'으로 풀어 보면 — 예: kWh = kW × h = 에너지 — 유도량 개념이 저절로 정리된다.</p>
+    </div>
+  </div>
+  <div class="folio"><span>I. 과학의 기초</span><span class="num">28</span></div>
+</div>
+
+<!-- ═════════════ p.29 STEP 1 + STEP 2 시작 ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag">I. 과학의 기초</span><span class="lesson-tag">02. 기본량과 단위 | 문제</span></div>
+
+  <div class="step-head"><span class="stepno">STEP 1</span><span class="steptt">개념 확인</span><span class="stepdesc">OX와 빈칸으로 개념 점검 — 막히면 알짜 정리로!</span></div>
+  <div class="qgrid">
+    <div>
+      <div class="q"><div class="qhead"><span class="qno">1</span><div class="stem">측정값은 수치와 단위를 함께 나타내야 한다. <span class="ox-answer">( O , X )</span></div></div></div>
+      <div class="q"><div class="qhead"><span class="qno">2</span><div class="stem">부피와 밀도는 국제단위계의 기본량이다. <span class="ox-answer">( O , X )</span></div></div></div>
+      <div class="q"><div class="qhead"><span class="qno">3</span><div class="stem">1 nm는 10⁻⁹ m이다. <span class="ox-answer">( O , X )</span></div></div></div>
+    </div>
+    <div>
+      <div class="q"><div class="qhead"><span class="qno">4</span><div class="stem">국제단위계(SI)의 기본량은 모두 <span class="blankline" style="min-width:7mm;"></span>가지이다.</div></div></div>
+      <div class="q"><div class="qhead"><span class="qno">5</span><div class="stem">기본량의 조합으로 정의되는 물리량을 <span class="blankline" style="min-width:11mm;"></span>이라 한다.</div></div></div>
+      <div class="q"><div class="qhead"><span class="qno">6</span><div class="stem">시간의 SI 기본단위는 <span class="blankline" style="min-width:7mm;"></span>이다.</div></div></div>
+    </div>
+  </div>
+
+  <div style="border-top:0.5mm solid var(--line); margin:2mm 0 4mm;"></div>
+
+  <div class="step-head s2"><span class="stepno">STEP 2</span><span class="steptt">내신 완성</span><span class="stepdesc">학교 시험 유형 그대로 — 서술형까지 한 번에</span></div>
+
+  <div class="q">
+    <div class="qhead"><span class="qno">7</span><div class="stem">국제단위계(SI)의 기본량과 기본단위를 옳게 짝 지은 것은? <span class="difficulty">●●○</span>
+    <div class="tags">10통과1-01-02 | 개념 2</div></div></div>
+    <ul class="choices">
+      <li>① 질량 — g</li>
+      <li>② 온도 — ℃</li>
+      <li>③ 속도 — m/s</li>
+      <li>④ 부피 — m³</li>
+      <li>⑤ 물질량 — mol</li>
+    </ul>
+  </div>
+
+  <div class="q">
+    <div class="qhead"><span class="qno">8</span><div class="stem">유도량과 그 단위에 대한 설명으로 옳은 것은? <span class="difficulty">●●●</span>
+    <div class="tags">10통과1-01-02 | 개념 3</div></div></div>
+    <ul class="choices">
+      <li>① 유도량은 기본량과 무관하게 새로 정의된다.</li>
+      <li>② 속도의 단위 m/s는 기본량인 속도의 고유 단위이다.</li>
+      <li>③ 밀도의 단위 kg/m³는 질량과 길이의 기본단위에서 유도된 것이다.</li>
+      <li>④ 힘의 단위 N은 기본단위로 풀어 쓸 수 없다.</li>
+      <li>⑤ 부피는 기본량이므로 단위도 기본단위이다.</li>
+    </ul>
+  </div>
+
+  <div class="folio"><span>I. 과학의 기초</span><span class="num">29</span></div>
+</div>
+
+<!-- ═════════════ p.30 STEP 2 계속 ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag">I. 과학의 기초</span><span class="lesson-tag">02. 기본량과 단위 | 문제</span></div>
+
+  <div class="q">
+    <div class="qhead"><span class="qno">9</span><div class="stem"><span class="badge-data">자료</span>어떤 세균의 크기가 2 μm이다. 이를 10의 거듭제곱을 사용해 m 단위로 옳게 나타낸 것은? <span class="difficulty">●●●</span>
+    <div class="tags">10통과1-01-02 | 개념 4</div></div></div>
+    <ul class="choices inline">
+      <li>① 2 × 10⁻³ m</li>
+      <li>② 2 × 10⁻⁶ m</li>
+      <li>③ 2 × 10⁻⁹ m</li>
+      <li>④ 2 × 10⁶ m</li>
+      <li>⑤ 2 × 10⁹ m</li>
+    </ul>
+  </div>
+
+  <div class="q">
+    <div class="qhead"><span class="qno">10</span><div class="stem">단위의 적용에 대한 설명으로 옳은 것만을 고른 것은? <span class="difficulty">●●●</span>
+    <div class="tags">10통과1-01-02 | 개념 1·5</div></div></div>
+    <div class="bogi-box" style="background:#fff;">
+      (가) 화성 기후 궤도선 사고의 원인은 두 팀이 서로 다른 단위 체계로 데이터를 주고받은 것이었다.<br>
+      (나) 처방전의 약 용량은 mg 단위로 표기된다.<br>
+      (다) ℃는 국제단위계의 기본단위이다.
+    </div>
+    <ul class="choices inline">
+      <li>① (가)</li><li>② (나)</li><li>③ (가), (나)</li><li>④ (나), (다)</li><li>⑤ (가), (나), (다)</li>
+    </ul>
+  </div>
+
+  <div class="q">
+    <div class="qhead"><span class="qno">11</span><div class="stem"><span class="badge-essay">서술형</span>측정값을 나타낼 때 수치와 함께 단위를 반드시 써야 하는 까닭을, 화성 기후 궤도선 사고를 예로 들어 <b>'약속'</b>이라는 말을 포함하여 서술하시오. <span class="difficulty">●●●●</span>
+    <div class="tags">10통과1-01-02 | 개념 1</div></div></div>
+    <div class="essay-lines"><div></div><div></div><div></div></div>
+  </div>
+
+  <div class="folio"><span>I. 과학의 기초</span><span class="num">30</span></div>
+</div>
+
+<!-- ═════════════ p.31 STEP 3 ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag">I. 과학의 기초</span><span class="lesson-tag">02. 기본량과 단위 | 문제</span></div>
+  <div class="step-head s3"><span class="stepno">STEP 3</span><span class="steptt">수능 도전</span><span class="stepdesc">2028 수능 규격 — ㄱㄴㄷ 합답형·자료 해석</span></div>
+
+  <div class="q">
+    <div class="qhead"><span class="qno">12</span><div class="stem"><span class="badge-data">자료</span>표는 여러 물리량을 두 무리 (가), (나)로 분류한 것이다. 옳은 것만을 &lt;보기&gt;에서 있는 대로 고른 것은? <span class="difficulty">[2점]</span>
+    <div class="tags">10통과1-01-02</div></div></div>
+    <div class="bogi-box" style="background:#fff; margin-bottom:2mm;">
+      (가) 길이, 질량, 시간, 온도 / (나) 속도, 부피, 밀도
+    </div>
+    <div class="bogi-box">
+      <div class="bt">보기</div>
+      ㄱ. (가)는 기본량, (나)는 유도량이다.<br>
+      ㄴ. (나)의 단위는 (가)의 단위를 조합해 만들 수 있다.<br>
+      ㄷ. 전류와 물질량은 (나)에 속한다.
+    </div>
+    <ul class="choices inline">
+      <li>① ㄱ</li><li>② ㄷ</li><li>③ ㄴ, ㄷ</li><li>④ ㄱ, ㄴ</li><li>⑤ ㄱ, ㄴ, ㄷ</li>
+    </ul>
+  </div>
+
+  <div class="q">
+    <div class="qhead"><span class="qno">13</span><div class="stem"><span class="badge-data">자료</span>그림은 접두어를 10의 거듭제곱 축 위에 나타낸 것이다. 옳은 것만을 &lt;보기&gt;에서 있는 대로 고른 것은? <span class="difficulty">[2.5점]</span>
+    <div class="tags">10통과1-01-02</div></div></div>
+    <figure style="margin:2mm 0 1mm 8.6mm;">
+      <svg width="300" height="56" viewBox="0 0 300 56" font-family="PC Sans">
+        <line x1="14" y1="32" x2="292" y2="32" stroke="#3E9C6E" stroke-width="1.6" marker-end="url(#arrP)"/>
+        <g font-size="6.8" text-anchor="middle" font-weight="800">
+          <circle cx="42" cy="32" r="3" fill="#3E9C6E"/><text x="42" y="18">n</text><text x="42" y="50" fill="#5B6B77">10⁻⁹</text>
+          <circle cx="94" cy="32" r="3" fill="#3E9C6E"/><text x="94" y="18">μ</text><text x="94" y="50" fill="#5B6B77">10⁻⁶</text>
+          <circle cx="146" cy="32" r="3" fill="#3E9C6E"/><text x="146" y="18">m</text><text x="146" y="50" fill="#5B6B77">10⁻³</text>
+          <circle cx="198" cy="32" r="3" fill="#E8940A"/><text x="198" y="18">k</text><text x="198" y="50" fill="#5B6B77">10³</text>
+          <circle cx="250" cy="32" r="3" fill="#E8940A"/><text x="250" y="18">G</text><text x="250" y="50" fill="#5B6B77">10⁹</text>
+        </g>
+      </svg>
+    </figure>
+    <div class="bogi-box">
+      <div class="bt">보기</div>
+      ㄱ. 1 km는 1 mm의 10⁶배이다.<br>
+      ㄴ. 나노 기술은 10⁻⁹ m 규모의 세계를 다루는 기술이다.<br>
+      ㄷ. 1 GB는 1 kB의 100배이다.
+    </div>
+    <ul class="choices inline">
+      <li>① ㄱ</li><li>② ㄷ</li><li>③ ㄱ, ㄴ</li><li>④ ㄴ, ㄷ</li><li>⑤ ㄱ, ㄴ, ㄷ</li>
+    </ul>
+  </div>
+
+  <div class="folio"><span>I. 과학의 기초</span><span class="num">31</span></div>
+</div>
+
+<!-- ═════════════ p.32 해설 1 ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag" style="color:var(--brand);">알짜 해설</span><span class="lesson-tag">02. 기본량과 단위</span></div>
+  <div class="sol-head"><span class="stt">알짜 해설</span><span class="sub">전 문항 해설 + 오답 선지 분석 — 맞힌 문제도 해설로 한 번 더!</span></div>
+
+  <table class="anstable">
+    <tr><th>문항</th><td>1</td><td>2</td><td>3</td><td>4</td><td>5</td><td>6</td><td>7</td><td>8</td><td>9</td><td>10</td><td>11</td><td>12</td><td>13</td></tr>
+    <tr><th>정답</th><td class="a">O</td><td class="a">X</td><td class="a">O</td><td class="a">7</td><td class="a">유도량</td><td class="a">s(초)</td><td class="a">⑤</td><td class="a">③</td><td class="a">②</td><td class="a">③</td><td class="a">서술형</td><td class="a">④</td><td class="a">③</td></tr>
+  </table>
+
+  <div class="solcols">
+    <div>
+      <div class="sol"><div class="shead"><span class="sno">1</span><span class="sans">O</span><span class="slink">개념 1</span></div>
+        <p>측정값 = 수치 + 단위. 단위 없는 숫자는 소통 불능이다.</p></div>
+      <div class="sol"><div class="shead"><span class="sno">2</span><span class="sans">X</span><span class="slink">개념 2·3</span></div>
+        <p>부피(m³)·밀도(kg/m³)는 기본량의 조합 — 유도량이다.</p></div>
+      <div class="sol"><div class="shead"><span class="sno">3</span><span class="sans">O</span><span class="slink">개념 4</span></div>
+        <p>나노(n) = 10⁻⁹. 지수 부호까지가 정답이다.</p></div>
+      <div class="sol"><div class="shead"><span class="sno">4</span><span class="sans">7</span><span class="slink">개념 2</span></div>
+        <p>m·kg·s·A·K·mol·cd — 딱 일곱.</p></div>
+      <div class="sol"><div class="shead"><span class="sno">5</span><span class="sans">유도량</span><span class="slink">개념 3</span></div>
+        <p>기본량을 곱하고 나눠 만드는 양. 단위가 정의를 보여 준다.</p></div>
+      <div class="sol"><div class="shead"><span class="sno">6</span><span class="sans">s(초)</span><span class="slink">개념 2</span></div>
+        <p>시간의 기본단위는 초 — 세슘 원자의 진동으로 정의된다(01 복습).</p></div>
+    </div>
+    <div>
+      <div class="sol"><div class="shead"><span class="sno">7</span><span class="sans">⑤</span><span class="slink">개념 2</span></div>
+        <p>물질량 — mol. 기본량·기본단위의 짝 그대로다.</p>
+        <div class="wrongbox"><div class="wt">오답 왜 틀렸나</div>
+          <p><b>①</b> 질량은 kg. <b>②</b> 온도의 기본단위는 K(℃는 관용 단위). <b>③·④</b> 속도·부피는 기본량이 아니라 유도량이다.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">8</span><span class="sans">③</span><span class="slink">개념 3</span></div>
+        <p>밀도 = 질량 ÷ 부피 → kg ÷ m³ = kg/m³ — 유도의 정석.</p>
+        <div class="wrongbox"><div class="wt">오답 왜 틀렸나</div>
+          <p><b>①</b> 유도량은 기본량의 조합이다. <b>②·⑤</b> 속도·부피는 유도량. <b>④</b> N = kg·m/s²로 풀어 쓸 수 있다.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">9</span><span class="sans">②</span><span class="slink">개념 4</span></div>
+        <p>μ = 10⁻⁶이므로 2 μm = 2 × 10⁻⁶ m.</p>
+        <div class="wrongbox"><div class="wt">오답 왜 틀렸나</div>
+          <p><b>③</b> 나노와 혼동. <b>④·⑤</b> 지수 부호 실수 — 작아지는 접두어는 음수 지수다.</p></div></div>
+    </div>
+  </div>
+
+  <div class="folio"><span>알짜 해설</span><span class="num">32</span></div>
+</div>
+
+<!-- ═════════════ p.33 해설 2 ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag" style="color:var(--brand);">알짜 해설</span><span class="lesson-tag">02. 기본량과 단위</span></div>
+  <div class="solcols">
+    <div>
+      <div class="sol"><div class="shead"><span class="sno">10</span><span class="sans">③</span><span class="slink">개념 1·5</span></div>
+        <p>(가) 단위 혼동이 사고의 원인 — 보고서의 결론 그대로. (나) 약 용량은 mg — 둘 다 옳다.</p>
+        <div class="wrongbox"><div class="wt">오답 왜 틀렸나</div>
+          <p><b>(다)</b> 온도의 SI 기본단위는 K이다. ℃는 널리 쓰이는 관용 단위일 뿐.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">11</span><span class="sans">모범 답안</span><span class="slink">개념 1</span></div>
+        <p>단위는 '무엇을 기준으로 몇 배인가'를 정한 <b>약속</b>이다. 화성 기후 궤도선 사고에서는 두 팀이 서로 다른 단위(뉴턴 기준과 파운드힘 기준)로 데이터를 주고받아, 수치가 정확했는데도 힘의 크기가 어긋나 탐사선을 잃었다. 이처럼 약속(단위)이 없거나 어긋나면 수치는 의미를 잃으므로, 측정값에는 반드시 단위를 함께 써야 한다.</p>
+        <div class="wrongbox"><div class="wt">채점 기준 (감점 포인트)</div>
+          <p>① 단위 = 기준에 대한 약속 ② 사고 원인이 단위 불일치임 ③ 그래서 수치+단위를 함께 써야 함 — 세 요소 모두 서술해야 만점. "계산 실수 때문"은 감점.</p></div></div>
+    </div>
+    <div>
+      <div class="sol"><div class="shead"><span class="sno">12</span><span class="sans">④</span><span class="slink">개념 2·3 | 2점</span></div>
+        <p><b>ㄱ (옳음)</b> (가)는 기본량 무리, (나)는 유도량 무리다. <b>ㄴ (옳음)</b> m/s, m³, kg/m³ — 전부 기본단위의 조합. <b>ㄷ (틀림)</b> 전류(A)와 물질량(mol)은 기본량 — (가)에 속한다.</p>
+        <div class="wrongbox"><div class="wt">함정 체크</div>
+          <p>기본량 판별은 외운 7개 목록과 대조하는 것이 가장 빠르다 — m·kg·s·A·K·mol·cd.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">13</span><span class="sans">③</span><span class="slink">개념 4 | 2.5점</span></div>
+        <p><b>ㄱ (옳음)</b> 10³ ÷ 10⁻³ = 10⁶배. <b>ㄴ (옳음)</b> 나노 = 10⁻⁹ — 이름이 곧 규모다. <b>ㄷ (틀림)</b> G(10⁹) ÷ k(10³) = 10⁶배, 100배가 아니다.</p>
+        <div class="wrongbox"><div class="wt">함정 체크</div>
+          <p>접두어 비교는 <b>지수의 뺄셈</b>이다 — 배수가 궁금하면 지수부터 빼라.</p></div></div>
+
+      <div class="gist" style="margin-top:5mm;">
+        <div class="boxtitle"><span class="ico">알</span>이 소단원, 이것만은!</div>
+        <ul>
+          <li><b>측정값 = 수치 + 단위</b> — 단위는 약속이자 안전장치 (화성 기후 궤도선)</li>
+          <li><b>기본량 7</b>: m·kg·s·A·K·mol·cd / <b>유도량</b> = 조합 (m/s, kg/m³, N = kg·m/s²)</li>
+          <li><b>접두어</b>: n(10⁻⁹) μ(10⁻⁶) m(10⁻³) k(10³) M(10⁶) G(10⁹) — 비교는 지수 뺄셈</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div class="folio"><span>알짜 해설</span><span class="num">33</span></div>
+</div>
+
+<!-- ═════════════ p.34 MEMO ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag">I. 과학의 기초</span><span class="lesson-tag">02 ▸ 03 넘어가기 전에</span></div>
+  <div class="memo-head"><span class="mt">MEMO</span><span class="ms">헷갈린 개념, 다시 틀린 문제 번호, 나만의 암기법을 남겨 두는 자리</span></div>
+  <div class="memo-area"></div>
+  <div class="memo-pen">"기본량 7가지를 단위와 짝지어 소리 내어 말해 보자. 하나라도 막히면 24쪽으로! — 박찬쌤"</div>
+  <div class="folio"><span>박찬 과학 | 통합과학 1</span><span class="num">34</span></div>
+</div>
+
+</body>
+</html>

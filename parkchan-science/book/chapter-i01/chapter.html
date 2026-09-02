@@ -1,0 +1,916 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<title>박찬 과학 통합과학1 — I-01 자연을 재는 눈 — 시간과 공간</title>
+<style>
+  @font-face { font-family:'PC Sans'; src:url('file:///root/.fonts/NotoSansKR.ttf'); font-weight:100 900; }
+  @font-face { font-family:'PC Serif'; src:url('file:///root/.fonts/NotoSerifKR.ttf'); font-weight:100 900; }
+  @font-face { font-family:'PC Pen'; src:url('file:///root/.fonts/YeonSung-Regular.ttf'); font-weight:400; }
+
+  :root{
+    --brand:#0E5A6B;        /* 박찬 과학 브랜드 딥틸 */
+    --brand-lt:#E3F0F3;
+    --unit:#3E9C6E;         /* I. 과학의 기초 단원 컬러(그린) */
+    --unit-lt:#EAF6EC;
+    --unit-md:#BFE0CD;
+    --accent:#E8940A;       /* 알짜 앰버 */
+    --accent-lt:#FDF3E0;
+    --point:#D6455D;        /* 시험 포인트 */
+    --point-lt:#FBEBEE;
+    --ink:#22303A;
+    --sub:#5B6B77;
+    --line:#D8E0E5;
+  }
+  *{ box-sizing:border-box; margin:0; padding:0; -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+  @page{ size:210mm 275mm; margin:0; }
+  html,body{ font-family:'PC Sans',sans-serif; color:var(--ink); }
+
+  .page{ width:210mm; height:275mm; position:relative; overflow:hidden; background:#fff; page-break-after:always; padding:14mm 13mm 19mm 15mm; display:flex; flex-direction:column; }
+
+  /* ── 러닝 헤드 / 풋 ── */
+  .runhead{ display:flex; align-items:center; justify-content:space-between; border-bottom:0.35mm solid var(--unit); padding-bottom:2mm; margin-bottom:6.5mm; }
+  .runhead .unit-tag{ font-size:8.5pt; font-weight:700; color:var(--unit); letter-spacing:0.02em; }
+  .runhead .lesson-tag{ font-size:8.5pt; color:var(--sub); }
+  .folio{ position:absolute; bottom:7mm; left:0; right:0; display:flex; justify-content:space-between; padding:0 14mm 0 14mm; font-size:8pt; color:var(--sub); }
+  .folio .num{ font-weight:800; color:var(--unit); font-size:10pt; }
+
+  /* ── 본문 그리드: 본문 + 날개단 ── */
+  .cols{ display:grid; grid-template-columns:1fr 43mm; gap:8mm; flex:1; min-height:0; margin-bottom:4mm; }
+  .main{ min-width:0; }
+  .wing{ border-left:0.3mm solid var(--line); padding-left:5mm; font-size:8.2pt; color:var(--sub); line-height:1.7; }
+
+  /* ── 타이포 ── */
+  h2.lesson-title{ display:flex; align-items:baseline; gap:3.5mm; margin-bottom:2mm; }
+  h2.lesson-title .no{ background:var(--unit); color:#fff; font-size:13pt; font-weight:900; padding:1.2mm 3.2mm; border-radius:1.5mm; }
+  h2.lesson-title .tt{ font-size:16.5pt; font-weight:900; letter-spacing:-0.01em; }
+  .std-badges{ display:flex; gap:2mm; margin:2mm 0 6.5mm; }
+  .std{ font-size:7.4pt; color:var(--unit); background:none; border:0.3mm solid var(--unit-md); border-radius:5mm; padding:0.6mm 2.8mm; font-weight:600; }
+
+  h3.sec{ display:flex; align-items:baseline; gap:3mm; font-size:12.5pt; font-weight:800; margin:9mm 0 3.6mm; letter-spacing:-0.01em; }
+  h3.sec .n{ font-family:'PC Serif'; font-size:15.5pt; font-weight:900; color:var(--unit); border-bottom:0.7mm solid var(--accent); padding:0 0.8mm 0.2mm; flex:0 0 auto; line-height:1; }
+  h3.sec::after{ content:""; flex:1; border-top:0.25mm solid var(--line); align-self:center; margin-left:2mm; }
+  h3.sec:first-child{ margin-top:0; }
+
+  p.body{ font-family:'PC Serif'; font-size:9.6pt; line-height:1.92; margin-bottom:3.6mm; text-align:justify; }
+  p.body b{ font-weight:800; }
+  .kw{ font-weight:800; color:var(--unit); }
+  .u-amber{ background:#F8E9C6; font-weight:700; padding:0.15mm 0.6mm; border-radius:0.6mm; box-decoration-break:clone; -webkit-box-decoration-break:clone; }
+
+  ul.pts{ font-family:'PC Serif'; font-size:9.6pt; line-height:1.84; margin:1.5mm 0 3.5mm 1mm; list-style:none; }
+  ul.pts li{ padding-left:4.5mm; position:relative; margin-bottom:1.8mm; }
+  ul.pts li::before{ content:""; position:absolute; left:0.5mm; top:2.9mm; width:1.7mm; height:1.7mm; background:var(--accent); border-radius:50%; }
+
+  /* ── 코너 박스 ── */
+  .boxtitle{ display:inline-flex; align-items:center; gap:1.8mm; font-weight:900; font-size:9.5pt; margin-bottom:1.6mm; }
+  .boxtitle .ico{ width:5.2mm; height:5.2mm; border-radius:1.2mm; display:flex; align-items:center; justify-content:center; color:#fff; font-size:7.5pt; font-weight:900; }
+
+  .gist{ background:none; border:none; border-top:0.5mm solid var(--accent); border-bottom:0.5mm solid var(--accent); border-radius:0; padding:3.2mm 1.8mm 3mm; margin:6mm 0 5mm; }
+  .gist .boxtitle{ color:#9C6503; } .gist .ico{ background:var(--accent); }
+  .gist ul{ list-style:none; font-family:'PC Serif'; font-size:9.3pt; line-height:1.78; }
+  .gist li{ padding-left:4.2mm; position:relative; margin-bottom:1.2mm;}
+  .gist li::before{ content:"✓"; position:absolute; left:0; color:var(--accent); font-weight:900; }
+
+  .expoint{ background:none; border-left:0.5mm solid #D998A4; border-left-color:#D998A4; border-radius:0; padding:1.4mm 0 1.4mm 3.6mm; margin:4.5mm 0; }
+  .expoint .boxtitle{ color:#A9556A; font-size:8.6pt; margin-bottom:1mm;}
+  .expoint .ico{ background:none; color:#A9556A; border:0.35mm solid #D998A4; width:4.4mm; height:4.4mm; border-radius:50%; font-size:7pt; }
+  .expoint p{ font-family:'PC Serif'; font-size:8.9pt; line-height:1.7; }
+
+  .pen{ font-family:'PC Pen'; font-size:12pt; color:#B4560E; line-height:1.45; }
+  .saem{ display:flex; gap:3mm; align-items:flex-start; margin:4.5mm 0; }
+  .saem .avatar{ flex:0 0 auto; width:10.5mm; height:10.5mm; border-radius:50%; background:var(--brand); color:#fff; font-size:7pt; font-weight:800; display:flex; align-items:center; justify-content:center; line-height:1.35; letter-spacing:0.04em; text-align:center; border:0.5mm solid var(--accent); box-sizing:border-box;}
+  .saem .bubble{ background:#FFFBF0; border:0.4mm solid #EBCB9C; border-radius:3mm; padding:2.2mm 3.6mm 2mm; position:relative; }
+  .saem .bubble::before{ content:""; position:absolute; left:-1.8mm; top:3.2mm; width:3mm; height:3mm; background:#FFFBF0; border-left:0.4mm solid #EBCB9C; border-bottom:0.4mm solid #EBCB9C; transform:rotate(45deg); }
+
+  .wing .wtitle{ font-size:8pt; font-weight:900; color:var(--brand); display:flex; align-items:center; gap:1.5mm; margin:0 0 2.4mm; letter-spacing:0.05em; }
+  .wing .wtitle::before{ content:""; width:2.4mm; height:2.4mm; background:var(--accent); border-radius:50%; }
+  .wing .term{ margin-bottom:3.6mm; }
+  .wing .term b{ color:var(--ink); font-weight:800; display:block; font-size:8.5pt; margin-bottom:0.7mm;}
+  .wing .wsep{ border-top:0.3mm dashed var(--line); margin:4.5mm 0; }
+  .wing .wing-pen{ font-family:'PC Pen'; font-size:11pt; color:#B4560E; line-height:1.45; }
+
+  figure{ margin:5mm 0; }
+  figure figcaption{ font-size:8pt; color:var(--sub); text-align:center; margin-top:2mm; }
+  figure svg{ display:block; margin:0 auto; }
+
+  /* ── 비교형 그림 (2패널 + 범례) ── */
+  .fig-duo{ display:flex; align-items:stretch; gap:2.5mm; justify-content:center; }
+  .fig-duo .panel{ flex:0 0 auto; text-align:center; }
+  .fig-duo .p-title{ font-size:9pt; font-weight:900; color:var(--ink); margin-top:1.6mm; }
+  .fig-duo .p-sub{ font-size:7.8pt; color:var(--sub); line-height:1.45; margin-top:0.5mm; }
+  .fig-duo .mid{ display:flex; flex-direction:column; align-items:center; justify-content:center; gap:1mm; padding:0 1mm; }
+  .fig-duo .mid .mlab{ font-size:7.6pt; font-weight:800; color:var(--unit); text-align:center; line-height:1.3; }
+  .fig-legend{ display:flex; justify-content:center; gap:5mm; font-size:7.8pt; color:var(--ink); margin-top:1.2mm; align-items:center; }
+  .fig-legend span{ display:inline-flex; align-items:center; gap:1.4mm; }
+
+  /* ── 탐구 (자료 파헤치기) ── */
+  .lab{ border:0.5mm solid var(--brand); border-radius:2.5mm; overflow:hidden; margin-top:1mm;}
+  .lab .lab-head{ background:var(--brand); color:#fff; padding:2.2mm 4mm; font-weight:900; font-size:11pt; display:flex; align-items:center; gap:2.5mm;}
+  .lab .lab-head .tag{ font-size:7.5pt; background:rgba(255,255,255,.22); padding:0.6mm 2.4mm; border-radius:4mm; font-weight:700;}
+  .lab .lab-body{ padding:3.5mm 4mm; }
+  .lab h4{ font-size:9.6pt; font-weight:900; color:var(--brand); margin:2.5mm 0 1.4mm; }
+  .lab h4:first-child{ margin-top:0; }
+  .lab p, .lab li{ font-family:'PC Serif'; font-size:9.3pt; line-height:1.8; }
+  .lab ol{ margin-left:5mm; }
+
+  /* ── 문제부 ── */
+  .step-head{ display:flex; align-items:center; gap:3mm; margin:0 0 5mm; }
+  .step-head .stepno{ background:var(--unit); color:#fff; font-weight:900; font-size:9.5pt; padding:1.4mm 3.4mm; border-radius:1.5mm; letter-spacing:0.04em;}
+  .step-head .steptt{ font-size:12.5pt; font-weight:900; }
+  .step-head .stepdesc{ font-size:8.2pt; color:var(--sub); margin-left:auto; }
+  .step-head.s2 .stepno{ background:var(--brand); }
+  .step-head.s3 .stepno{ background:var(--point); }
+
+  .q{ margin-bottom:7.5mm; break-inside:avoid; }
+  .q .qhead{ display:flex; gap:2.4mm; align-items:flex-start; }
+  .q .qno{ flex:0 0 auto; min-width:6.2mm; height:6.2mm; border:0.45mm solid var(--unit); color:var(--unit); border-radius:50%; font-size:8.6pt; font-weight:900; line-height:1; display:flex; align-items:center; justify-content:center; padding-top:0.55mm; margin-top:0.4mm;}
+  .q .stem{ font-family:'PC Serif'; font-size:9.5pt; line-height:1.74; font-weight:500; }
+  .q .stem .difficulty{ color:#C9A227; font-size:8pt; letter-spacing:0.06em; margin-left:1.5mm;}
+  .q .tags{ margin-top:0.8mm; font-size:7pt; color:var(--sub); font-family:'PC Sans';}
+  .choices{ list-style:none; margin:2.2mm 0 0 8.6mm; font-family:'PC Serif'; font-size:9.3pt; line-height:1.85; }
+  .choices.inline{ display:flex; flex-wrap:wrap; gap:0 6mm; }
+  .bogi-box{ border:0.35mm solid #B8C2CA; border-radius:0; margin:2.5mm 0 0 8.6mm; padding:2.4mm 3.2mm; font-family:'PC Serif'; font-size:9.2pt; line-height:1.8; background:none;}
+  .bogi-box .bt{ text-align:center; font-weight:800; color:var(--sub); font-size:8.4pt; margin-bottom:0.8mm; letter-spacing:0.3em;}
+  .ox-answer{ margin-left:2mm; color:var(--sub); font-size:9pt; }
+  .blankline{ display:inline-block; min-width:14mm; border-bottom:0.4mm solid var(--ink); }
+  .qgrid{ display:grid; grid-template-columns:1fr 1fr; gap:0 9mm; }
+  .essay-lines{ margin:2mm 0 0 8.4mm; }
+  .essay-lines div{ border-bottom:0.3mm solid var(--line); height:6.2mm; }
+  .badge-essay{ display:inline-block; background:var(--point); color:#fff; font-size:7pt; font-weight:800; padding:0.4mm 2mm; border-radius:1mm; vertical-align:1pt; margin-right:1.2mm;}
+  .badge-data{ display:inline-block; background:var(--brand); color:#fff; font-size:7pt; font-weight:800; padding:0.4mm 2mm; border-radius:1mm; vertical-align:1pt; margin-right:1.2mm;}
+
+  /* ── 해설부 ── */
+  .sol-head{ display:flex; align-items:center; gap:3mm; margin-bottom:4mm;}
+  .sol-head .stt{ font-size:14.5pt; font-weight:900; color:var(--brand);}
+  .sol-head .sub{ font-size:8.5pt; color:var(--sub);}
+  .anstable{ width:100%; border-collapse:collapse; margin-bottom:4.5mm; }
+  .anstable th,.anstable td{ border:0.3mm solid var(--line); font-size:8.8pt; padding:1.4mm 0; text-align:center; }
+  .anstable th{ background:var(--brand-lt); color:var(--brand); font-weight:800; }
+  .anstable td.a{ font-weight:900; color:var(--unit); }
+  .sol{ margin-bottom:5mm; break-inside:avoid; }
+  .sol .shead{ display:flex; align-items:center; gap:2mm; margin-bottom:1.4mm;}
+  .sol .sno{ background:var(--unit); color:#fff; min-width:6mm; height:5.4mm; border-radius:1.2mm; font-size:8.6pt; font-weight:900; line-height:1; display:flex; align-items:center; justify-content:center; padding:0.5mm 1.5mm 0;}
+  .sol .sans{ font-weight:900; color:var(--unit); font-size:9.6pt;}
+  .sol .slink{ font-size:7.2pt; color:var(--sub); margin-left:auto;}
+  .sol p{ font-family:'PC Serif'; font-size:9.1pt; line-height:1.76; margin-bottom:0.8mm; }
+  .wrongbox{ background:none; border:none; border-left:0.7mm solid #E3A0AC; border-radius:0; padding:1mm 0 1mm 3mm; margin-top:2mm;}
+  .wrongbox .wt{ font-size:8pt; font-weight:900; color:var(--point); margin-bottom:0.8mm; font-family:'PC Sans';}
+  .wrongbox p{ font-family:'PC Serif'; font-size:8.6pt; line-height:1.68; margin-bottom:0.9mm;}
+  .wrongbox p:last-child{ margin-bottom:0; }
+  .solcols{ display:grid; grid-template-columns:1fr 1fr; gap:0 9mm; }
+
+  /* ── 단원 도입 (타이포그래피 중심) ── */
+  .opener{ padding:0 0 19mm; }
+  .opener-hero{ position:relative; padding:7mm 20mm 4.5mm; overflow:hidden; flex-shrink:0; }
+  .ghost-txt{ position:absolute; top:-10mm; right:6mm; font-size:118pt; font-weight:900; color:#EBF5EF; line-height:1; letter-spacing:-0.04em; }
+  .kicker{ display:flex; align-items:center; gap:4mm; position:relative; }
+  .kicker .kt{ font-size:9.5pt; font-weight:800; color:var(--unit); letter-spacing:0.24em; white-space:nowrap; }
+  .kicker::after{ content:""; flex:1; border-top:0.3mm solid var(--line); }
+  .opener-hero h1{ position:relative; font-size:36pt; font-weight:900; letter-spacing:-0.015em; margin:4mm 0 0; }
+  .opener-hero h1 .tick{ display:block; width:14mm; border-top:1.4mm solid var(--accent); margin-bottom:3.6mm; }
+  .opener-lede{ position:relative; font-family:'PC Serif'; font-size:10.2pt; font-weight:600; line-height:2.0; color:#3D4C58; max-width:138mm; margin-top:4mm; padding-left:5mm; border-left:0.8mm solid var(--accent); }
+  .opener-inner{ padding:0 20mm; }
+
+  /* ── 원소의 여정 스트립 ── */
+  .journey{ margin-top:3.5mm; }
+  .journey .j-label{ font-size:8pt; font-weight:800; color:var(--sub); letter-spacing:0.08em; margin-bottom:2.4mm; display:flex; align-items:center; gap:1.6mm;}
+  .journey .j-label::before{ content:""; width:2.4mm; height:2.4mm; background:var(--unit); border-radius:50%; }
+  .j-bar{ display:flex; align-items:center; gap:2mm; }
+  .j-chip{ flex:1; text-align:center; background:#F0F8F3; border:0.35mm solid #BFE0CD; color:#3E9C6E; border-radius:1.6mm; padding:2.4mm 1mm 2mm; }
+  .j-chip .jc-t{ font-size:8.8pt; font-weight:800; display:block; }
+  .j-chip .jc-s{ font-size:6.8pt; color:var(--sub); display:block; margin-top:0.5mm; }
+  .j-chip.on{ background:var(--unit); border-color:var(--unit); }
+  .j-chip.on .jc-t{ color:#fff; }
+  .j-chip.on .jc-s{ color:#D6EEDF; }
+  .j-arrow{ flex:0 0 auto; color:#8CCBA8; font-size:10pt; font-weight:900; }
+  .toc{ margin-top:5mm; }
+  .toc .toc-title{ font-size:11pt; font-weight:900; color:var(--ink); margin-bottom:3mm; display:flex; align-items:center; gap:2.5mm;}
+  .toc .toc-title::before{ content:""; width:3.4mm; height:3.4mm; background:var(--accent); border-radius:0.8mm; }
+  .toc-item{ display:flex; align-items:flex-start; gap:5mm; padding:2.8mm 6mm; border-bottom:0.3mm solid var(--line); }
+  .toc-item:first-of-type{ border-top:0.3mm solid var(--line); }
+  .toc-item.active{ background:#F0F8F3; border-left:1.2mm solid #6FBE93; }
+  .toc-item .tno{ font-family:'PC Serif'; font-weight:900; color:#6FBE93; font-size:14pt; width:10mm; line-height:1.1; flex:0 0 auto;}
+  .toc-item .tbody{ flex:1; min-width:0; }
+  .toc-item .ttt{ font-weight:800; font-size:10.5pt; letter-spacing:0.01em; display:flex; align-items:center;}
+  .toc-item .tdesc{ font-family:'PC Serif'; font-size:8.6pt; font-weight:600; color:#4A5964; margin-top:0.7mm; line-height:1.55;}
+  .toc-item .tstd{ font-size:7.2pt; color:var(--sub); flex:0 0 auto; padding-top:1.2mm;}
+  .toc-item.active .tag-now{ background:var(--accent); color:#fff; font-size:7pt; font-weight:900; border-radius:4mm; padding:0.7mm 2.6mm; margin-left:3.5mm;}
+  .toc-item .tag-done{ font-size:7.2pt; font-weight:800; color:#3E9C6E; margin-left:3.5mm; }
+  .opener-quote{ margin-top:4mm; text-align:center; font-family:'PC Serif'; font-size:9.8pt; font-weight:600; color:#4A5964; letter-spacing:0.01em; }
+  .opener-quote .who{ font-size:8pt; color:var(--sub); font-weight:400; margin-left:2.5mm; }
+  .qa-lead li .qgo{ font-family:'PC Sans'; font-size:7.4pt; font-weight:800; color:var(--unit); background:var(--unit-lt); border-radius:3mm; padding:0.5mm 2.2mm; margin-left:2mm; white-space:nowrap; vertical-align:1pt;}
+  .qa-lead{ margin-top:3.5mm; border:none; border-top:0.45mm solid var(--brand); border-bottom:0.45mm solid var(--brand); background:none; border-radius:0; padding:3mm 2mm 2.8mm; }
+  .qa-lead .qt{ font-weight:900; color:var(--brand); font-size:10.5pt; margin-bottom:2mm;}
+  .qa-lead li{ font-family:'PC Serif'; font-size:9.5pt; line-height:1.8; margin-left:5mm; }
+
+  /* ── 바로바로 체크 (개념 페이지 하단 즉석 OX) ── */
+  .quickcheck{ margin-top:auto; border-top:0.35mm dashed #C8B98F; padding-top:3mm; width:calc(100% - 51mm); }
+  .quickcheck .qc-title{ display:inline-flex; align-items:center; gap:1.6mm; font-size:8.2pt; font-weight:900; color:#9C6503; margin-bottom:1.4mm; }
+  .quickcheck .qc-title::before{ content:"✓"; color:var(--accent); font-weight:900; }
+  .quickcheck ol{ list-style:none; font-family:'PC Serif'; font-size:8.8pt; line-height:1.75; }
+  .quickcheck li{ display:flex; gap:2mm; align-items:baseline; }
+  .quickcheck li .no{ font-weight:800; color:var(--accent); flex:0 0 auto; }
+  .quickcheck .qc-ans{ margin-top:1mm; font-size:7.2pt; color:var(--sub); transform:rotate(180deg); text-align:left; }
+
+  /* ── 중학 과학 다시보기 (날개단) ── */
+  .wing .review{ background:#F6F3EC; border-radius:1.8mm; padding:2.8mm 3mm; margin-top:1mm; }
+  .wing .review .rv-title{ font-size:7.8pt; font-weight:900; color:#7A6A45; margin-bottom:1.4mm; display:flex; align-items:center; gap:1.4mm;}
+  .wing .review .rv-title::before{ content:"↺"; font-weight:900; color:#A08A55; }
+
+  /* ── MEMO 페이지 ── */
+  .memo-head{ display:flex; align-items:baseline; gap:3.5mm; margin-bottom:5mm; }
+  .memo-head .mt{ font-size:17pt; font-weight:900; color:var(--brand); letter-spacing:0.22em; }
+  .memo-head .ms{ font-size:8.6pt; color:var(--sub); }
+  .memo-area{ flex:1; border:0.4mm solid var(--line); border-radius:2.5mm;
+    background-image:linear-gradient(to bottom, transparent calc(100% - 0.3mm), #DCE4E9 0);
+    background-size:100% 9mm; background-position:0 4mm; padding:0 5mm; margin-bottom:4mm; }
+  .memo-pen{ font-family:'PC Pen'; font-size:12.5pt; color:#B4560E; text-align:right; }
+</style>
+</head>
+<body>
+
+<!-- ═════════════ p.9 소단원 도입 ═════════════ -->
+<div class="page opener">
+  <div class="opener-hero">
+    <div class="ghost-txt">01</div>
+    <div class="kicker"><span class="kt">통합과학 1 · I. 과학의 기초</span></div>
+    <h1><span class="tick"></span>자연을 재는 눈 — 시간과 공간</h1>
+    <p class="opener-lede">과학의 첫걸음은 실험실이 아니라 질문 하나에서 시작된다 — "언제, 어디서, 얼마나?"<br>
+    원자에서 우주까지, 모든 것은 시간과 공간 위에서 측정된다.</p>
+  </div>
+
+  <div class="opener-inner">
+    <div class="journey">
+      <div class="j-label">과학의 기초 — 지금 여기</div>
+      <div class="j-bar">
+        <div class="j-chip on"><span class="jc-t">시간과 공간</span><span class="jc-s">자연을 재는 눈</span></div>
+        <span class="j-arrow">→</span>
+        <div class="j-chip"><span class="jc-t">기본량과 단위</span><span class="jc-s">자연을 쓰는 언어</span></div>
+        <span class="j-arrow">→</span>
+        <div class="j-chip"><span class="jc-t">측정과 어림</span><span class="jc-s">모두의 자, 측정 표준</span></div>
+        <span class="j-arrow">→</span>
+        <div class="j-chip"><span class="jc-t">정보와 디지털</span><span class="jc-s">측정이 문명이 되기까지</span></div>
+      </div>
+    </div>
+    <div class="toc">
+      <div class="toc-title">이 단원의 학습 지도</div>
+      <div class="toc-item active">
+        <span class="tno">01</span>
+        <span class="tbody"><span class="ttt">자연을 재는 눈 — 시간과 공간<span class="tag-now">NOW</span></span>
+        <span class="tdesc">시공간의 규모, 길이와 시간을 재는 현대적 방법</span></span>
+        <span class="tstd">10통과1-01-01</span>
+      </div>
+      <div class="toc-item">
+        <span class="tno">02</span>
+        <span class="tbody"><span class="ttt">기본량과 단위</span>
+        <span class="tdesc">7가지 기본량(SI), 단위가 자연을 기술하는 방식</span></span>
+        <span class="tstd">10통과1-01-02</span>
+      </div>
+      <div class="toc-item">
+        <span class="tno">03</span>
+        <span class="tbody"><span class="ttt">측정과 어림, 측정 표준</span>
+        <span class="tdesc">측정·어림의 의미, 측정 표준은 왜 필요한가</span></span>
+        <span class="tstd">10통과1-01-03</span>
+      </div>
+      <div class="toc-item">
+        <span class="tno">04</span>
+        <span class="tbody"><span class="ttt">정보와 신호, 디지털 문명</span>
+        <span class="tdesc">측정에서 정보로, 아날로그에서 디지털로</span></span>
+        <span class="tstd">10통과1-01-04</span>
+      </div>
+    </div>
+
+    <div class="qa-lead">
+      <div class="qt">이 소단원을 끝내면 답할 수 있는 질문</div>
+      <ul>
+        <li>원자와 우주 — 크기가 얼마나 다른 세계일까? <span class="qgo">개념 2</span></li>
+        <li>1 m는 왜 '빛'으로 정의할까? <span class="qgo">개념 4</span></li>
+        <li>1초의 기준은 어디에 있을까 — 시계탑? 원자? <span class="qgo">개념 5</span></li>
+        <li>내비게이션은 어떻게 내 위치를 알아낼까? <span class="qgo">개념 5</span></li>
+      </ul>
+    </div>
+
+    <div class="opener-quote">"우주라는 책은 수학의 언어로 쓰여 있다."<span class="who">— 갈릴레오 갈릴레이, '분석자'(1623)</span></div>
+  </div>
+
+  <div class="folio"><span>박찬 과학 | 통합과학 1</span><span class="num">9</span></div>
+</div>
+
+<!-- ═════════════ p.10 개념 01 시간과 공간 위의 자연 ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag">I. 과학의 기초</span><span class="lesson-tag">01. 자연을 재는 눈 — 시간과 공간</span></div>
+  <h2 class="lesson-title"><span class="no">01</span><span class="tt">자연을 재는 눈 — 시간과 공간</span></h2>
+  <div class="std-badges"><span class="std">성취기준 10통과1-01-01</span><span class="std">시공간의 규모 → 길이·시간의 현대적 측정</span></div>
+
+  <div class="cols">
+    <div class="main">
+      <h3 class="sec"><span class="n">1</span>모든 사건에는 주소가 있다 — 시간과 공간</h3>
+      <p class="body">"운동장에서 공이 날아갔다"는 말로는 과학이 시작되지 않는다. <b>언제</b>(오후 3시 12분), <b>어디서</b>(골대에서 20 m 지점), <b>얼마나</b>(초속 15 m로) — 이렇게 적는 순간 비로소 자연은 분석할 수 있는 대상이 된다. 자연에서 일어나는 모든 사건은 <span class="u-amber">시간과 공간이라는 두 축 위에서 기술된다</span>. 시간과 공간은 과학이 자연을 담는 좌표이자, 이 단원 전체의 출발점이다.</p>
+      <p class="body">그래서 과학의 역사는 곧 <b>측정의 역사</b>였다. 별의 위치를 재면서 달력이 나왔고, 진자의 흔들림을 재면서 정밀한 시계가 나왔다. 갈릴레이는 떨어지는 공의 <b>거리와 시간</b>을 재어 낙하 법칙을 찾았다 — III단원에서 배운 자유 낙하가 바로 그 유산이다. <span class="kw">측정</span> 없이는 법칙도, 예측도, 기술도 없다.</p>
+
+      <figure>
+        <svg width="470" height="148" viewBox="0 0 470 148" font-family="PC Sans">
+          <defs>
+            <marker id="arrP" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="#3E9C6E"/></marker>
+            <marker id="arrR" markerWidth="7" markerHeight="7" refX="5" refY="2.5" orient="auto"><path d="M0,0 L6,2.5 L0,5 Z" fill="#D6455D"/></marker>
+          </defs>
+          <g font-size="7">
+            <g transform="translate(120,10)">
+              <rect x="-104" y="0" width="208" height="104" rx="6" fill="#F0F8F3" stroke="#BFE0CD" stroke-width="1"/>
+              <text x="0" y="16" text-anchor="middle" font-size="8.6" font-weight="800" fill="#3E9C6E">"공이 날아갔다" — 과학 이전</text>
+              <circle cx="-40" cy="56" r="9" fill="#E8940A"/>
+              <path d="M-30,52 q28,-18 56,-6" fill="none" stroke="#9AA7B1" stroke-width="1.6" stroke-dasharray="4 3"/>
+              <text x="0" y="92" text-anchor="middle" fill="#5B6B77">언제? 어디서? 얼마나? — 알 수 없다</text>
+            </g>
+            <line x1="232" y1="62" x2="252" y2="62" stroke="#3E9C6E" stroke-width="2" marker-end="url(#arrP)"/>
+            <g transform="translate(356,10)">
+              <rect x="-100" y="0" width="200" height="104" rx="6" fill="#FDF9F0" stroke="#EBCB9C" stroke-width="1"/>
+              <text x="0" y="16" text-anchor="middle" font-size="8.6" font-weight="800" fill="#B4560E">시간·공간의 좌표를 붙이면 — 과학</text>
+              <line x1="-72" y1="86" x2="72" y2="86" stroke="#5B6B77" stroke-width="1.2" marker-end="url(#arrP)"/>
+              <line x1="-72" y1="86" x2="-72" y2="26" stroke="#5B6B77" stroke-width="1.2" marker-end="url(#arrP)"/>
+              <text x="72" y="97" text-anchor="end" font-size="6.4" fill="#5B6B77">공간(m)</text>
+              <text x="-66" y="28" font-size="6.4" fill="#5B6B77">시간(s)</text>
+              <circle cx="-40" cy="66" r="4" fill="#E8940A"/><circle cx="-8" cy="48" r="4" fill="#E8940A"/><circle cx="28" cy="38" r="4" fill="#E8940A"/>
+              <text x="0" y="97" text-anchor="middle" font-size="6.4" fill="#B4560E">오후 3시 12분, 20 m 지점, 15 m/s</text>
+            </g>
+          </g>
+          <text x="235" y="136" text-anchor="middle" font-size="8.8" font-weight="800" fill="#E8940A">자연의 모든 사건은 '언제(시간) + 어디서(공간)'라는 주소를 가진다</text>
+        </svg>
+        <figcaption>그림 1 | 시간과 공간 — 사건에 좌표가 붙는 순간 과학이 시작된다</figcaption>
+      </figure>
+
+      <div class="saem">
+        <div class="avatar">박찬<br>쌤</div>
+        <div class="bubble"><span class="pen">"통합과학 첫 단추가 왜 '측정'인지 궁금했지? II·III단원의 스펙트럼도, 지진계도, F-t 그래프도 전부 측정 이야기였다 — 이 단원은 그 모든 것의 문법이다."</span></div>
+      </div>
+    </div>
+
+    <div class="wing">
+      <div class="wtitle">날개 노트</div>
+      <div class="term"><b>시간과 공간</b>자연 현상을 기술하는 가장 기본적인 두 축. 물리량의 대부분이 이 둘에서 출발한다.</div>
+      <div class="term"><b>측정</b>도구를 사용해 양을 수치로 나타내는 활동 — 03에서 본격적으로 다룬다.</div>
+      <div class="wsep"></div>
+      <div class="wtitle">한눈에 암기</div>
+      <div class="wing-pen">사건 = 언제 + 어디서<br>과학의 역사 = 측정의 역사!</div>
+      <div class="wsep"></div>
+      <div class="review">
+        <div class="rv-title">중학 과학 다시보기</div>
+        <div class="term" style="margin-bottom:0;"><b>운동의 기록 (중3)</b>시간에 따른 위치 변화로 속력을 구했다 — 그것이 바로 시간·공간 좌표 위의 과학이었다.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="folio"><span>I. 과학의 기초</span><span class="num">10</span></div>
+</div>
+
+<!-- ═════════════ p.11 개념 02 공간의 규모 ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag">I. 과학의 기초</span><span class="lesson-tag">01. 자연을 재는 눈 — 시간과 공간</span></div>
+  <div class="cols">
+    <div class="main">
+      <h3 class="sec"><span class="n">2</span>공간의 규모 — 원자에서 우주까지</h3>
+      <p class="body">자연의 크기는 상상을 뛰어넘게 다양하다. 원자는 약 10<sup>-10</sup> m, 그 속의 원자핵은 10<sup>-15</sup> m — 원자가 잠실야구장이라면 핵은 그 가운데 놓인 콩알이다. 반대쪽 끝, 관측 가능한 우주의 크기는 약 10<sup>26</sup> m에 이른다. 이렇게 넓은 범위를 다루기 위해 과학은 <span class="kw">10의 거듭제곱</span>으로 크기를 표기한다 — 0을 스물여섯 개 쓰는 대신 지수 하나로 끝내는 것이다.</p>
+      <p class="body">거듭제곱 표기의 진짜 힘은 <b>비교</b>에 있다. 사람(10<sup>0</sup> m ≈ 1 m)은 원자보다 10<sup>10</sup>배 크고, 지구(10<sup>7</sup> m)보다 10<sup>7</sup>배 작다 — 우리는 <span class="u-amber">미시 세계와 거시 세계의 중간쯤에 서서</span> 양쪽을 관측하는 존재다. 각 규모마다 그 세계를 보는 도구도 다르다. 원자는 전자 현미경으로, 세포는 광학 현미경으로, 별과 은하는 망원경으로 — 도구의 역사가 곧 인류가 볼 수 있는 공간의 확장사였다.</p>
+
+      <figure>
+        <svg width="470" height="150" viewBox="0 0 470 150" font-family="PC Sans">
+          <g font-size="6.8">
+            <line x1="30" y1="66" x2="446" y2="66" stroke="#3E9C6E" stroke-width="2" marker-end="url(#arrP)"/>
+            <g text-anchor="middle">
+              <g transform="translate(60,66)">
+                <circle cy="-22" r="9" fill="none" stroke="#3E9C6E" stroke-width="1.4"/><circle cy="-22" r="2.4" fill="#D6455D"/>
+                <text y="14" font-weight="800">원자핵·원자</text><text y="25" fill="#5B6B77">10⁻¹⁵ ~ 10⁻¹⁰ m</text>
+              </g>
+              <g transform="translate(140,66)">
+                <ellipse cy="-22" rx="11" ry="8" fill="#EAF6EC" stroke="#3E9C6E" stroke-width="1.2"/><circle cy="-22" r="3" fill="#6FBE93"/>
+                <text y="14" font-weight="800">세포</text><text y="25" fill="#5B6B77">10⁻⁵ m</text>
+              </g>
+              <g transform="translate(220,66)">
+                <circle cy="-30" r="4.5" fill="#F6C98E" stroke="#E8940A"/>
+                <path d="M0,-25 L0,-12 M0,-21 L-6,-16 M0,-21 L6,-16 M0,-12 L-4,-4 M0,-12 L4,-4" stroke="#B4560E" stroke-width="1.6" fill="none"/>
+                <text y="14" font-weight="800">사람</text><text y="25" fill="#5B6B77">10⁰ m</text>
+              </g>
+              <g transform="translate(300,66)">
+                <circle cy="-22" r="11" fill="#BFE3F5" stroke="#4A8FD0" stroke-width="1.2"/>
+                <path d="M-5,-26 q5,-6 11,-2 q4,4 -2,7 q-8,3 -9,-5 Z" fill="#5FA86A"/>
+                <text y="14" font-weight="800">지구</text><text y="25" fill="#5B6B77">10⁷ m</text>
+              </g>
+              <g transform="translate(376,66)">
+                <circle cy="-22" r="9" fill="#F6C98E"/><circle cy="-22" r="13" fill="none" stroke="#E8940A" stroke-width="1" stroke-dasharray="2.5 2"/>
+                <text y="14" font-weight="800">태양계</text><text y="25" fill="#5B6B77">10¹³ m</text>
+              </g>
+              <g transform="translate(438,66)">
+                <path d="M-8,-22 q4,-9 8,0 q4,9 8,0" stroke="#6FBE93" stroke-width="1.6" fill="none"/>
+                <circle cy="-22" cx="-3" r="1.6" fill="#3E9C6E"/><circle cy="-27" cx="4" r="1.6" fill="#3E9C6E"/><circle cy="-17" cx="9" r="1.6" fill="#3E9C6E"/>
+                <text y="14" font-weight="800">우주</text><text y="25" fill="#5B6B77">10²⁶ m</text>
+              </g>
+            </g>
+            <text x="235" y="106" text-anchor="middle" font-size="7.2" fill="#5B6B77">한 칸 옆으로 갈 때마다 10배가 아니라 '10의 거듭제곱' 단위로 뛴다</text>
+          </g>
+          <text x="235" y="138" text-anchor="middle" font-size="8.8" font-weight="800" fill="#E8940A">공간의 규모 10⁻¹⁵ ~ 10²⁶ m — 10의 거듭제곱은 41칸의 사다리를 한눈에 담는다</text>
+        </svg>
+        <figcaption>그림 2 | 공간 규모의 사다리 — 원자핵에서 관측 가능한 우주까지</figcaption>
+      </figure>
+
+      <div class="expoint">
+        <div class="boxtitle"><span class="ico">!</span>시험엔 이렇게</div>
+        <p>규모 순서 배열이 단골 — <b>원자핵(10⁻¹⁵) &lt; 원자(10⁻¹⁰) &lt; 세포(10⁻⁵) &lt; 사람(10⁰) &lt; 지구(10⁷) &lt; 우주</b>. 지수가 클수록 크다 — 음수 지수의 대소에서 실수가 가장 많다.</p>
+      </div>
+    </div>
+
+    <div class="wing">
+      <div class="wtitle">날개 노트</div>
+      <div class="term"><b>10의 거듭제곱</b>10² = 100, 10⁻² = 0.01. 지수 하나 차이가 10배 차이다.</div>
+      <div class="term"><b>규모와 도구</b>전자 현미경(원자·분자) → 광학 현미경(세포) → 맨눈 → 망원경(천체). 규모가 도구를 정한다.</div>
+      <div class="wsep"></div>
+      <div class="wtitle">한눈에 암기</div>
+      <div class="wing-pen">원자 10⁻¹⁰ m<br>사람 10⁰ m, 지구 10⁷ m<br>우주 10²⁶ m!</div>
+    </div>
+  </div>
+  <div class="quickcheck">
+    <span class="qc-title">바로바로 체크</span>
+    <ol>
+      <li><span class="no">1</span>원자의 크기는 대략 10⁻¹⁰ m이다. ( O , X )</li>
+      <li><span class="no">2</span>10⁻⁵ m는 10⁻¹⁰ m보다 작다. ( O , X )</li>
+      <li><span class="no">3</span>매우 크거나 작은 수는 10의 거듭제곱으로 나타내면 편리하다. ( O , X )</li>
+    </ol>
+    <div class="qc-ans">정답 1 O 2 X (지수가 크면 크다) 3 O</div>
+  </div>
+  <div class="folio"><span>I. 과학의 기초</span><span class="num">11</span></div>
+</div>
+
+<!-- ═════════════ p.12 개념 03 시간의 규모 ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag">I. 과학의 기초</span><span class="lesson-tag">01. 자연을 재는 눈 — 시간과 공간</span></div>
+  <div class="cols">
+    <div class="main">
+      <h3 class="sec"><span class="n">3</span>시간의 규모 — 찰나에서 138억 년까지</h3>
+      <p class="body">시간의 사다리도 공간 못지않게 아찔하다. 화학 결합이 만들어지고 끊어지는 데는 약 10<sup>-15</sup>초(펨토초) — 눈 깜박임(약 0.1초)조차 이 세계에서는 영겁이다. 심장은 약 1초에 한 번 뛰고, 지구는 약 3 × 10<sup>7</sup>초(1년)에 태양을 한 바퀴 돈다. 그리고 가장 긴 끝에는 <span class="u-amber">우주의 나이, 약 138억 년(10<sup>17</sup>초)</span>이 있다 — II단원에서 만난 빅뱅이 바로 그 출발점이었다.</p>
+      <p class="body">규모가 다르면 재는 방법도 다르다. 짧은 쪽 끝의 초고속 현상은 초정밀 레이저를 극히 짧게 쏘아 순간순간을 사진 찍듯 포착하고, 긴 쪽 끝의 지질시대와 우주의 역사는 <b>방사성 동위 원소의 붕괴</b>나 <b>별빛</b>처럼 자연이 남긴 시계를 읽어 알아낸다. 인간이 직접 체감하는 시간은 초에서 년 사이의 좁은 창문뿐이지만, 측정 기술은 그 창문을 양쪽으로 10<sup>17</sup>배씩 넓혀 놓았다.</p>
+
+      <figure>
+        <svg width="470" height="142" viewBox="0 0 470 142" font-family="PC Sans">
+          <g font-size="6.8">
+            <line x1="30" y1="60" x2="446" y2="60" stroke="#3E9C6E" stroke-width="2" marker-end="url(#arrP)"/>
+            <g text-anchor="middle">
+              <g transform="translate(70,60)">
+                <path d="M-8,-24 q8,-8 16,0" stroke="#D6455D" stroke-width="1.6" fill="none"/><circle cx="-8" cy="-24" r="2.4" fill="#3E9C6E"/><circle cx="8" cy="-24" r="2.4" fill="#3E9C6E"/>
+                <text y="14" font-weight="800">화학 반응</text><text y="25" fill="#5B6B77">10⁻¹⁵ s</text>
+              </g>
+              <g transform="translate(160,60)">
+                <path d="M-7,-30 q7,10 0,14 q-7,-4 0,-14 M-7,-16 h14" stroke="#5B6B77" stroke-width="1.4" fill="none"/>
+                <text y="14" font-weight="800">눈 깜박임</text><text y="25" fill="#5B6B77">10⁻¹ s</text>
+              </g>
+              <g transform="translate(240,60)">
+                <path d="M0,-31 q-8,-8 -8,2 q0,8 8,12 q8,-4 8,-12 q0,-10 -8,-2 Z" fill="#FBEBEE" stroke="#D6455D" stroke-width="1.4"/>
+                <text y="14" font-weight="800">심장 박동</text><text y="25" fill="#5B6B77">10⁰ s</text>
+              </g>
+              <g transform="translate(320,60)">
+                <circle cy="-24" r="5" fill="#F6C98E"/><circle cy="-24" r="10" fill="none" stroke="#9AA7B1" stroke-width="1" stroke-dasharray="2.5 2"/><circle cx="10" cy="-24" r="2.4" fill="#4A8FD0"/>
+                <text y="14" font-weight="800">1년(공전)</text><text y="25" fill="#5B6B77">약 3×10⁷ s</text>
+              </g>
+              <g transform="translate(412,60)">
+                <path d="M-10,-18 l4,-12 l5,7 l5,-9 l4,14" stroke="#E8940A" stroke-width="1.6" fill="none"/><circle cx="-10" cy="-18" r="1.8" fill="#E8940A"/>
+                <text y="14" font-weight="800">우주의 나이</text><text y="25" fill="#5B6B77">138억 년 ≈ 10¹⁷ s</text>
+              </g>
+            </g>
+            <text x="235" y="100" text-anchor="middle" font-size="7.2" fill="#5B6B77">짧은 끝은 레이저로 '찰나'를 찍고, 긴 끝은 방사성 동위 원소·별빛이라는 자연의 시계를 읽는다</text>
+          </g>
+          <text x="235" y="130" text-anchor="middle" font-size="8.8" font-weight="800" fill="#E8940A">시간의 규모 10⁻¹⁵ ~ 10¹⁷ s — 인간의 체감은 그 한가운데의 좁은 창문이다</text>
+        </svg>
+        <figcaption>그림 3 | 시간 규모의 사다리 — 화학 반응의 찰나에서 우주의 나이까지</figcaption>
+      </figure>
+
+      <div class="saem">
+        <div class="avatar">박찬<br>쌤</div>
+        <div class="bubble"><span class="pen">"공간 사다리와 시간 사다리를 짝으로 외워 두면 I단원 절반이 끝난다. 시험은 늘 '다음 중 가장 짧은/작은 것'을 묻는다 — 지수부터 비교하는 습관!"</span></div>
+      </div>
+    </div>
+
+    <div class="wing">
+      <div class="wtitle">날개 노트</div>
+      <div class="term"><b>펨토초</b>10⁻¹⁵초. 빛조차 1펨토초에 0.0003 mm밖에 못 간다.</div>
+      <div class="term"><b>자연의 시계</b>방사성 동위 원소는 일정한 빠르기로 붕괴한다 — 암석의 나이는 이 '시계'로 잰다.</div>
+      <div class="wsep"></div>
+      <div class="wtitle">한눈에 암기</div>
+      <div class="wing-pen">화학 반응 10⁻¹⁵ s<br>1년 ≈ 3×10⁷ s<br>우주 나이 138억 년!</div>
+    </div>
+  </div>
+  <div class="quickcheck">
+    <span class="qc-title">바로바로 체크</span>
+    <ol>
+      <li><span class="no">1</span>우주의 나이는 약 138억 년이다. ( O , X )</li>
+      <li><span class="no">2</span>화학 반응이 일어나는 시간은 눈 깜박임보다 길다. ( O , X )</li>
+      <li><span class="no">3</span>암석의 나이는 방사성 동위 원소의 붕괴를 이용해 잰다. ( O , X )</li>
+    </ol>
+    <div class="qc-ans">정답 1 O 2 X (10⁻¹⁵초로 훨씬 짧다) 3 O</div>
+  </div>
+  <div class="folio"><span>I. 과학의 기초</span><span class="num">12</span></div>
+</div>
+
+<!-- ═════════════ p.13 개념 04 길이의 현대적 측정 ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag">I. 과학의 기초</span><span class="lesson-tag">01. 자연을 재는 눈 — 시간과 공간</span></div>
+  <div class="cols">
+    <div class="main">
+      <h3 class="sec"><span class="n">4</span>빛으로 길이를 재다 — 1 m의 현대적 정의</h3>
+      <p class="body">옛날의 길이 기준은 몸이었다 — 한 뼘, 한 발, 왕의 팔꿈치. 사람마다 달라 다툼이 끊이지 않자 인류는 백금 막대(미터원기)를 만들어 '이것이 1 m'라고 정했다. 그러나 막대는 닳고, 온도에 따라 늘어난다. 그래서 현대 과학은 우주 어디서나 절대 변하지 않는 것을 골랐다. <b>빛의 속력</b>이다. 오늘날 <span class="kw">1 m</span>는 <span class="u-amber">빛이 진공에서 1/299 792 458초 동안 나아간 거리</span>로 정의된다.</p>
+      <p class="body">빛은 기준일 뿐 아니라 <b>자(尺) 그 자체</b>이기도 하다. 레이저를 쏘아 반사되어 돌아오는 시간을 재면 '거리 = 빛의 속력 × 시간 ÷ 2'로 먼 곳까지의 거리가 나온다. 아폴로 우주인들이 달에 놓고 온 반사경에 레이저를 쏘면 약 2.6초 만에 돌아오고, 그로부터 달까지 거리 약 38만 km가 밀리미터 수준의 정밀도로 측정된다. 건설 현장의 레이저 거리계, 자율주행차의 라이다도 같은 원리다.</p>
+
+      <figure>
+        <svg width="470" height="146" viewBox="0 0 470 146" font-family="PC Sans">
+          <g font-size="6.8">
+            <g transform="translate(118,8)">
+              <rect x="-102" y="0" width="204" height="104" rx="6" fill="#F0F8F3" stroke="#BFE0CD" stroke-width="1"/>
+              <text x="0" y="16" text-anchor="middle" font-size="8.4" font-weight="800" fill="#3E9C6E">1 m의 정의 — 빛이 재는 기준</text>
+              <circle cx="-72" cy="52" r="8" fill="#FDF3E0" stroke="#E8940A" stroke-width="1.4"/>
+              <line x1="-62" y1="52" x2="66" y2="52" stroke="#E8940A" stroke-width="2.4" marker-end="url(#arrR)"/>
+              <g stroke="#F6C98E" stroke-width="1"><line x1="-52" y1="46" x2="-40" y2="46"/><line x1="-30" y1="58" x2="-18" y2="58"/><line x1="-8" y1="46" x2="4" y2="46"/></g>
+              <text x="0" y="74" text-anchor="middle" fill="#B4560E" font-weight="800">진공에서 1/299 792 458초 동안 간 거리</text>
+              <text x="0" y="94" text-anchor="middle" fill="#5B6B77">닳지도, 늘어나지도 않는 '우주 공통의 자'</text>
+            </g>
+            <g transform="translate(352,8)">
+              <rect x="-104" y="0" width="208" height="104" rx="6" fill="#FDF9F0" stroke="#EBCB9C" stroke-width="1"/>
+              <text x="0" y="16" text-anchor="middle" font-size="8.4" font-weight="800" fill="#B4560E">달까지 레이저를 쏘면</text>
+              <circle cx="-74" cy="56" r="11" fill="#BFE3F5" stroke="#4A8FD0" stroke-width="1.2"/>
+              <circle cx="74" cy="42" r="8" fill="#E6E3DC" stroke="#9AA7B1" stroke-width="1"/>
+              <path d="M-62,52 q68,-16 128,-10" fill="none" stroke="#D6455D" stroke-width="1.4" marker-end="url(#arrR)"/>
+              <path d="M64,48 q-64,18 -124,12" fill="none" stroke="#3E9C6E" stroke-width="1.4" stroke-dasharray="4 2.5" marker-end="url(#arrP)"/>
+              <text x="0" y="80" text-anchor="middle" fill="#5B6B77">왕복 약 2.6초 → 거리 = 빛의 속력 × 시간 ÷ 2</text>
+              <text x="0" y="94" text-anchor="middle" font-weight="800" fill="#D6455D">≈ 38만 km, 오차는 mm 수준</text>
+            </g>
+          </g>
+          <text x="235" y="134" text-anchor="middle" font-size="8.8" font-weight="800" fill="#E8940A">빛의 속력은 우주 불변 — 그래서 현대의 길이는 '빛'으로 정의하고, '빛'으로 잰다</text>
+        </svg>
+        <figcaption>그림 4 | 길이의 현대적 측정 — 정의도 빛, 측정 도구도 빛이다</figcaption>
+      </figure>
+
+      <div class="expoint">
+        <div class="boxtitle"><span class="ico">!</span>시험엔 이렇게</div>
+        <p>"1 m는 미터원기의 길이로 정의된다"(X — 과거의 방식) 선지가 단골. 현대 정의의 핵심어는 <b>빛 · 진공 · 1/299 792 458초</b> 세 가지다. 분수를 통째로 외우기보다 '빛의 속력이 기준'을 붙잡아라.</p>
+      </div>
+    </div>
+
+    <div class="wing">
+      <div class="wtitle">날개 노트</div>
+      <div class="term"><b>빛의 속력</b>진공에서 299 792 458 m/s — 자연의 최고 속력이자 불변의 기준.</div>
+      <div class="term"><b>라이다(LiDAR)</b>레이저를 쏘아 반사 시간으로 주변의 거리를 재는 장치. 자율주행차의 눈이다.</div>
+      <div class="wsep"></div>
+      <div class="wtitle">한눈에 암기</div>
+      <div class="wing-pen">1 m = 빛이 진공에서<br>1/299 792 458초 간 거리<br>거리 = 속력 × 시간 ÷ 2</div>
+    </div>
+  </div>
+  <div class="quickcheck">
+    <span class="qc-title">바로바로 체크</span>
+    <ol>
+      <li><span class="no">1</span>현재 1 m는 빛이 진공에서 일정 시간 동안 나아간 거리로 정의된다. ( O , X )</li>
+      <li><span class="no">2</span>레이저의 왕복 시간을 재면 거리를 알 수 있다. ( O , X )</li>
+      <li><span class="no">3</span>빛의 속력은 측정하는 장소에 따라 크게 달라진다. ( O , X )</li>
+    </ol>
+    <div class="qc-ans">정답 1 O 2 O 3 X (진공에서 불변 — 그래서 기준이 된다)</div>
+  </div>
+  <div class="folio"><span>I. 과학의 기초</span><span class="num">13</span></div>
+</div>
+
+<!-- ═════════════ p.14 개념 05 시간의 현대적 측정 ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag">I. 과학의 기초</span><span class="lesson-tag">01. 자연을 재는 눈 — 시간과 공간</span></div>
+  <div class="cols">
+    <div class="main">
+      <h3 class="sec"><span class="n">5</span>원자가 시계가 되다 — 1초의 현대적 정의</h3>
+      <p class="body">시간의 기준도 같은 길을 걸었다. 처음엔 지구의 자전(하루)을 쪼개 1초를 정했지만, 지구의 자전은 미세하게 흔들린다. 현대 과학이 찾아낸 가장 한결같은 진자는 <b>원자</b>였다. 세슘 원자는 특정한 빛을 흡수·방출하며 정확히 같은 진동을 반복한다. 오늘날 <span class="kw">1초</span>는 <span class="u-amber">세슘 원자가 내는 빛이 9 192 631 770번 진동하는 데 걸리는 시간</span>으로 정의된다. 이 <span class="kw">원자시계</span>는 수천만 년이 지나도 1초도 어긋나지 않는다.</p>
+      <p class="body">이 초정밀 시계가 일상을 바꾼 대표가 <b>내비게이션(GPS)</b>이다. 위성들은 저마다 원자시계를 싣고 시각 신호를 쏘는데, 수신기는 여러 위성 신호의 <b>도착 시간 차이</b>에 빛의 속력을 곱해 각 위성까지의 거리를 구하고, 그로부터 내 위치를 계산한다. 시간 오차가 100만분의 1초만 나도 위치는 300 m나 틀어진다 — <b>정확한 시간이 곧 정확한 공간</b>이 되는 것이다. 시간과 공간의 측정은 이렇게 하나로 만난다.</p>
+
+      <figure>
+        <svg width="470" height="146" viewBox="0 0 470 146" font-family="PC Sans">
+          <g font-size="6.8">
+            <g transform="translate(118,8)">
+              <rect x="-102" y="0" width="204" height="104" rx="6" fill="#F0F8F3" stroke="#BFE0CD" stroke-width="1"/>
+              <text x="0" y="16" text-anchor="middle" font-size="8.4" font-weight="800" fill="#3E9C6E">1초의 정의 — 세슘 원자의 진동</text>
+              <circle cx="-58" cy="52" r="10" fill="#EAF6EC" stroke="#3E9C6E" stroke-width="1.4"/><circle cx="-58" cy="52" r="3" fill="#3E9C6E"/>
+              <path d="M-40,52 q8,-10 16,0 q8,10 16,0 q8,-10 16,0 q8,10 16,0" stroke="#E8940A" stroke-width="1.8" fill="none"/>
+              <text x="0" y="76" text-anchor="middle" fill="#B4560E" font-weight="800">9 192 631 770번 진동 = 1초</text>
+              <text x="0" y="94" text-anchor="middle" fill="#5B6B77">수천만 년에 1초도 안 틀리는 진자</text>
+            </g>
+            <g transform="translate(352,8)">
+              <rect x="-104" y="0" width="208" height="104" rx="6" fill="#FDF9F0" stroke="#EBCB9C" stroke-width="1"/>
+              <text x="0" y="16" text-anchor="middle" font-size="8.4" font-weight="800" fill="#B4560E">GPS — 시간으로 위치를 찾다</text>
+              <g fill="#3E9C6E"><rect x="-84" y="26" width="16" height="9" rx="2"/><rect x="-12" y="22" width="16" height="9" rx="2"/><rect x="60" y="28" width="16" height="9" rx="2"/></g>
+              <circle cx="0" cy="84" r="6" fill="#F6C98E" stroke="#E8940A" stroke-width="1.2"/>
+              <g stroke="#9AA7B1" stroke-width="1" stroke-dasharray="3 2">
+                <line x1="-76" y1="37" x2="-2" y2="80"/><line x1="-4" y1="33" x2="0" y2="76"/><line x1="68" y1="39" x2="4" y2="80"/>
+              </g>
+              <text x="0" y="102" text-anchor="middle" fill="#5B6B77">신호 도착 시간 차 × 빛의 속력 = 위성까지의 거리 → 내 위치</text>
+            </g>
+          </g>
+          <text x="235" y="134" text-anchor="middle" font-size="8.8" font-weight="800" fill="#E8940A">정확한 시계가 정확한 지도를 만든다 — 시간 측정과 공간 측정은 한 몸이다</text>
+        </svg>
+        <figcaption>그림 5 | 시간의 현대적 측정 — 세슘 원자시계, 그리고 그 위에 세워진 GPS</figcaption>
+      </figure>
+
+      <div class="gist">
+        <div class="boxtitle"><span class="ico">알</span>알짜 정리 — 자연을 재는 눈 한 장 요약</div>
+        <ul>
+          <li>모든 사건은 <b>시간 + 공간</b>의 좌표로 기술된다 — 과학의 역사 = 측정의 역사</li>
+          <li>규모: 공간 <b>10⁻¹⁵~10²⁶ m</b>, 시간 <b>10⁻¹⁵~10¹⁷ s</b> — 10의 거듭제곱으로 표기</li>
+          <li><b>1 m</b> = 빛이 진공에서 1/299 792 458초 간 거리 / <b>1초</b> = 세슘 원자의 진동 9 192 631 770번</li>
+          <li>응용: 레이저 거리 측정(달까지 mm 정밀도), <b>GPS</b>(시간 차 → 거리 → 위치)</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="wing">
+      <div class="wtitle">날개 노트</div>
+      <div class="term"><b>세슘(Cs)</b>주기율표 1족의 알칼리 금속 — II단원에서 본 그 가족이다. 원자시계의 심장.</div>
+      <div class="term"><b>시간 오차와 위치 오차</b>빛은 100만분의 1초에 약 300 m를 간다 — GPS에 원자시계가 필요한 이유.</div>
+      <div class="wsep"></div>
+      <div class="wtitle">한눈에 암기</div>
+      <div class="wing-pen">1초 = 세슘 진동<br>9 192 631 770번<br>GPS = 시간 차 × 빛 속력</div>
+    </div>
+  </div>
+  <div class="quickcheck">
+    <span class="qc-title">바로바로 체크</span>
+    <ol>
+      <li><span class="no">1</span>현재 1초는 세슘 원자의 진동을 기준으로 정의된다. ( O , X )</li>
+      <li><span class="no">2</span>GPS는 위성 신호의 도착 시간 차이를 이용해 위치를 구한다. ( O , X )</li>
+      <li><span class="no">3</span>1초의 기준은 지금도 지구의 자전이다. ( O , X )</li>
+    </ol>
+    <div class="qc-ans">정답 1 O 2 O 3 X (자전은 흔들려서 원자로 바꿨다)</div>
+  </div>
+  <div class="folio"><span>I. 과학의 기초</span><span class="num">14</span></div>
+</div>
+
+<!-- ═════════════ p.15 자료 파헤치기 ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag">I. 과학의 기초</span><span class="lesson-tag">01. 자연을 재는 눈 — 시간과 공간</span></div>
+  <div class="lab">
+    <div class="lab-head">자료 파헤치기 <span class="tag">탐구·자료 분석</span> <span style="font-weight:600; font-size:9.5pt; margin-left:auto;">레이저로 달까지 거리를 재다</span></div>
+    <div class="lab-body">
+      <h4>자료</h4>
+      <p>아폴로 계획의 우주인들은 달 표면에 빛을 온 방향 그대로 되돌려 보내는 <b>반사경</b>을 설치해 두었다. 지구의 관측소에서 이 반사경을 향해 레이저를 쏘았더니, 빛이 되돌아오는 데 <b>약 2.56초</b>가 걸렸다. (빛의 속력: 약 3 × 10⁸ m/s)</p>
+      <figure>
+        <svg width="430" height="104" viewBox="0 0 430 104" font-family="PC Sans">
+          <g font-size="7">
+            <circle cx="60" cy="52" r="22" fill="#BFE3F5" stroke="#4A8FD0" stroke-width="1.4"/>
+            <path d="M50,42 q10,-10 22,-4 q8,6 -2,12 q-14,6 -20,-8 Z" fill="#5FA86A"/>
+            <text x="60" y="88" text-anchor="middle" font-weight="800">지구 관측소</text>
+            <circle cx="370" cy="42" r="14" fill="#E6E3DC" stroke="#9AA7B1" stroke-width="1.2"/>
+            <rect x="360" y="30" width="8" height="5" rx="1" fill="#D6455D"/>
+            <text x="370" y="78" text-anchor="middle" font-weight="800">달의 반사경</text>
+            <path d="M84,44 q140,-24 272,-6" fill="none" stroke="#D6455D" stroke-width="1.6" marker-end="url(#arrR)"/>
+            <path d="M354,50 q-136,26 -266,10" fill="none" stroke="#3E9C6E" stroke-width="1.6" stroke-dasharray="4 2.5" marker-end="url(#arrP)"/>
+            <text x="215" y="18" text-anchor="middle" fill="#D6455D" font-weight="800">레이저 발사</text>
+            <text x="215" y="72" text-anchor="middle" fill="#3E9C6E" font-weight="800">반사되어 돌아옴 — 왕복 2.56초</text>
+            <text x="215" y="98" text-anchor="middle" font-size="8.2" font-weight="800" fill="#E8940A">거리 = 빛의 속력 × 시간 ÷ 2</text>
+          </g>
+        </svg>
+      </figure>
+      <h4>해석의 3단계</h4>
+      <ol>
+        <li><b>왕복임을 확인한다</b> — 2.56초는 갔다가 돌아온 시간이다. 편도 시간은 절반인 1.28초. '÷2'를 빠뜨리는 것이 이 유형 최대의 함정이다.</li>
+        <li><b>거리 = 속력 × 시간</b> — 3 × 10⁸ m/s × 1.28 s = 3.84 × 10⁸ m. 곧 달까지 약 38만 4천 km다.</li>
+        <li><b>정밀도의 근거를 본다</b> — 빛의 속력은 정의된 불변의 값이므로, 시간만 정확히 재면 거리도 그만큼 정확해진다. 원자시계 덕분에 왕복 시간을 극도로 정밀하게 재어 달까지 거리를 mm 수준으로 안다.</li>
+      </ol>
+      <h4>결론</h4>
+      <p>길이 측정의 현대적 방법은 결국 <b>시간 측정</b>이다 — 빛의 속력이 불변이므로 '얼마나 걸렸나'가 '얼마나 머나'로 번역된다. GPS·라이다·레이저 거리계가 전부 이 한 줄 위에 서 있다.</p>
+      <div class="expoint">
+        <div class="boxtitle"><span class="ico">!</span>시험엔 이렇게</div>
+        <p>계산 문제의 채점 포인트는 <b>① ÷2 처리 ② 10의 거듭제곱 계산 ③ 단위(m ↔ km) 환산</b> 세 가지. 숫자가 복잡해 보여도 구조는 '속력 × 시간 ÷ 2' 하나다.</p>
+      </div>
+      <h4>직접 해보기 — 몸으로 재는 우주</h4>
+      <p>천둥소리로 번개까지 거리를 재 보자. 번개가 보인 순간부터 천둥이 들릴 때까지 초를 세고, 소리의 속력(약 340 m/s)을 곱하면 번개까지의 거리다(빛은 거의 즉시 도착하므로 왕복이 아니라 편도 — ÷2가 필요 없다!). 3초면 약 1 km. 같은 원리, 다른 파동이다.</p>
+    </div>
+  </div>
+  <div class="folio"><span>I. 과학의 기초</span><span class="num">15</span></div>
+</div>
+
+<!-- ═════════════ p.16 STEP 1 + STEP 2 시작 ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag">I. 과학의 기초</span><span class="lesson-tag">01. 자연을 재는 눈 | 문제</span></div>
+
+  <div class="step-head"><span class="stepno">STEP 1</span><span class="steptt">개념 확인</span><span class="stepdesc">OX와 빈칸으로 개념 점검 — 막히면 알짜 정리로!</span></div>
+  <div class="qgrid">
+    <div>
+      <div class="q"><div class="qhead"><span class="qno">1</span><div class="stem">자연의 사건은 시간과 공간의 좌표로 기술된다. <span class="ox-answer">( O , X )</span></div></div></div>
+      <div class="q"><div class="qhead"><span class="qno">2</span><div class="stem">10⁻¹⁵ m는 10⁻¹⁰ m보다 크다. <span class="ox-answer">( O , X )</span></div></div></div>
+      <div class="q"><div class="qhead"><span class="qno">3</span><div class="stem">현재 1초는 세슘 원자의 진동을 기준으로 정의된다. <span class="ox-answer">( O , X )</span></div></div></div>
+    </div>
+    <div>
+      <div class="q"><div class="qhead"><span class="qno">4</span><div class="stem">현재 1 m는 <span class="blankline" style="min-width:8mm;"></span>이 진공에서 1/299 792 458초 동안 나아간 거리로 정의된다.</div></div></div>
+      <div class="q"><div class="qhead"><span class="qno">5</span><div class="stem">매우 크거나 작은 수는 10의 <span class="blankline" style="min-width:12mm;"></span>을 사용해 간단히 나타낸다.</div></div></div>
+      <div class="q"><div class="qhead"><span class="qno">6</span><div class="stem">레이저의 왕복 시간이 t초일 때, 목표물까지의 거리는 빛의 속력 × t ÷ <span class="blankline" style="min-width:7mm;"></span>이다.</div></div></div>
+    </div>
+  </div>
+
+  <div style="border-top:0.5mm solid var(--line); margin:2mm 0 4mm;"></div>
+
+  <div class="step-head s2"><span class="stepno">STEP 2</span><span class="steptt">내신 완성</span><span class="stepdesc">학교 시험 유형 그대로 — 서술형까지 한 번에</span></div>
+
+  <div class="q">
+    <div class="qhead"><span class="qno">7</span><div class="stem">다음 중 크기가 작은 것부터 순서대로 옳게 나열한 것은? <span class="difficulty">●●○</span>
+    <div class="tags">10통과1-01-01 | 개념 2</div></div></div>
+    <ul class="choices">
+      <li>① 원자 &lt; 원자핵 &lt; 세포 &lt; 지구</li>
+      <li>② 원자핵 &lt; 원자 &lt; 세포 &lt; 지구</li>
+      <li>③ 세포 &lt; 원자 &lt; 원자핵 &lt; 지구</li>
+      <li>④ 원자핵 &lt; 세포 &lt; 원자 &lt; 지구</li>
+      <li>⑤ 원자 &lt; 세포 &lt; 원자핵 &lt; 지구</li>
+    </ul>
+  </div>
+
+  <div class="q">
+    <div class="qhead"><span class="qno">8</span><div class="stem">길이와 시간의 현대적 측정에 대한 설명으로 옳은 것은? <span class="difficulty">●●●</span>
+    <div class="tags">10통과1-01-01 | 개념 4·5</div></div></div>
+    <ul class="choices">
+      <li>① 1 m는 지금도 백금 미터원기의 길이로 정의된다.</li>
+      <li>② 1초는 지구의 자전 주기를 쪼개 정의된다.</li>
+      <li>③ 빛의 속력은 장소에 따라 달라지므로 기준이 될 수 없다.</li>
+      <li>④ 1 m는 빛이 진공에서 일정 시간 동안 나아간 거리로 정의된다.</li>
+      <li>⑤ 원자시계는 하루에 1초씩 오차가 쌓인다.</li>
+    </ul>
+  </div>
+
+  <div class="folio"><span>I. 과학의 기초</span><span class="num">16</span></div>
+</div>
+
+<!-- ═════════════ p.17 STEP 2 계속 ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag">I. 과학의 기초</span><span class="lesson-tag">01. 자연을 재는 눈 | 문제</span></div>
+
+  <div class="q">
+    <div class="qhead"><span class="qno">9</span><div class="stem"><span class="badge-data">자료</span>달을 향해 쏜 레이저가 반사되어 돌아오는 데 2.56초가 걸렸다. 빛의 속력을 3 × 10⁸ m/s라 할 때, 지구에서 달까지의 거리는? <span class="difficulty">●●●</span>
+    <div class="tags">10통과1-01-01 | 개념 4·자료</div></div></div>
+    <ul class="choices inline">
+      <li>① 1.92 × 10⁸ m</li>
+      <li>② 2.56 × 10⁸ m</li>
+      <li>③ 3.00 × 10⁸ m</li>
+      <li>④ 7.68 × 10⁸ m</li>
+      <li>⑤ 3.84 × 10⁸ m</li>
+    </ul>
+  </div>
+
+  <div class="q">
+    <div class="qhead"><span class="qno">10</span><div class="stem">시간·공간의 측정에 대한 설명으로 옳은 것만을 고른 것은? <span class="difficulty">●●●</span>
+    <div class="tags">10통과1-01-01 | 개념 3·5</div></div></div>
+    <div class="bogi-box" style="background:#fff;">
+      (가) 암석의 나이는 방사성 동위 원소의 붕괴를 이용해 알아낸다.<br>
+      (나) GPS는 위성 신호의 도착 시간 차이로 위치를 계산한다.<br>
+      (다) 우주의 나이는 약 138만 년이다.
+    </div>
+    <ul class="choices inline">
+      <li>① (가)</li><li>② (나)</li><li>③ (가), (나)</li><li>④ (나), (다)</li><li>⑤ (가), (나), (다)</li>
+    </ul>
+  </div>
+
+  <div class="q">
+    <div class="qhead"><span class="qno">11</span><div class="stem"><span class="badge-essay">서술형</span>길이의 기준이 백금 막대(미터원기)에서 빛으로 바뀐 까닭을 <b>'변하지 않는다'</b>는 말을 포함하여 서술하시오. <span class="difficulty">●●●●</span>
+    <div class="tags">10통과1-01-01 | 개념 4</div></div></div>
+    <div class="essay-lines"><div></div><div></div><div></div></div>
+  </div>
+
+  <div class="folio"><span>I. 과학의 기초</span><span class="num">17</span></div>
+</div>
+
+<!-- ═════════════ p.18 STEP 3 ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag">I. 과학의 기초</span><span class="lesson-tag">01. 자연을 재는 눈 | 문제</span></div>
+  <div class="step-head s3"><span class="stepno">STEP 3</span><span class="steptt">수능 도전</span><span class="stepdesc">2028 수능 규격 — ㄱㄴㄷ 합답형·자료 해석</span></div>
+
+  <div class="q">
+    <div class="qhead"><span class="qno">12</span><div class="stem"><span class="badge-data">자료</span>그림은 자연의 여러 대상을 공간 규모의 사다리 위에 나타낸 것이다. 옳은 것만을 &lt;보기&gt;에서 있는 대로 고른 것은? <span class="difficulty">[2점]</span>
+    <div class="tags">10통과1-01-01</div></div></div>
+    <figure style="margin:2mm 0 1mm 8.6mm;">
+      <svg width="300" height="64" viewBox="0 0 300 64" font-family="PC Sans">
+        <line x1="16" y1="34" x2="290" y2="34" stroke="#3E9C6E" stroke-width="1.6" marker-end="url(#arrP)"/>
+        <g font-size="6.6" text-anchor="middle" font-weight="800">
+          <circle cx="46" cy="34" r="3" fill="#D6455D"/><text x="46" y="18">원자핵</text><text x="46" y="52" fill="#5B6B77">10⁻¹⁵ m</text>
+          <circle cx="110" cy="34" r="3" fill="#3E9C6E"/><text x="110" y="18">원자</text><text x="110" y="52" fill="#5B6B77">10⁻¹⁰ m</text>
+          <circle cx="174" cy="34" r="3" fill="#E8940A"/><text x="174" y="18">사람</text><text x="174" y="52" fill="#5B6B77">10⁰ m</text>
+          <circle cx="238" cy="34" r="3" fill="#4A8FD0"/><text x="238" y="18">지구</text><text x="238" y="52" fill="#5B6B77">10⁷ m</text>
+        </g>
+      </svg>
+    </figure>
+    <div class="bogi-box">
+      <div class="bt">보기</div>
+      ㄱ. 원자는 원자핵보다 10⁵배 크다.<br>
+      ㄴ. 사람의 크기는 원자와 지구의 크기 사이에 있다.<br>
+      ㄷ. 지수가 작을수록 더 큰 대상이다.
+    </div>
+    <ul class="choices inline">
+      <li>① ㄱ</li><li>② ㄷ</li><li>③ ㄱ, ㄴ</li><li>④ ㄴ, ㄷ</li><li>⑤ ㄱ, ㄴ, ㄷ</li>
+    </ul>
+  </div>
+
+  <div class="q">
+    <div class="qhead"><span class="qno">13</span><div class="stem"><span class="badge-data">자료</span>표는 길이와 시간의 기준이 변해 온 과정을 나타낸 것이다. 옳은 것만을 &lt;보기&gt;에서 있는 대로 고른 것은? <span class="difficulty">[2.5점]</span>
+    <div class="tags">10통과1-01-01</div></div></div>
+    <div class="bogi-box" style="background:#fff; margin-bottom:2mm;">
+      길이: 몸(뼘·발) → 백금 미터원기 → <b>빛이 진공에서 나아간 거리</b><br>
+      시간: 지구의 자전 → <b>세슘 원자의 진동</b>
+    </div>
+    <div class="bogi-box">
+      <div class="bt">보기</div>
+      ㄱ. 기준은 점점 '변하지 않는 자연 현상' 쪽으로 옮겨 왔다.<br>
+      ㄴ. 미터원기는 닳거나 변형될 수 있다는 한계가 있었다.<br>
+      ㄷ. 세슘 원자의 진동수는 시계마다 달라서 표준이 될 수 없다.
+    </div>
+    <ul class="choices inline">
+      <li>① ㄱ</li><li>② ㄷ</li><li>③ ㄴ, ㄷ</li><li>④ ㄱ, ㄴ</li><li>⑤ ㄱ, ㄴ, ㄷ</li>
+    </ul>
+  </div>
+
+  <div class="folio"><span>I. 과학의 기초</span><span class="num">18</span></div>
+</div>
+
+<!-- ═════════════ p.19 해설 1 ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag" style="color:var(--brand);">알짜 해설</span><span class="lesson-tag">01. 자연을 재는 눈 — 시간과 공간</span></div>
+  <div class="sol-head"><span class="stt">알짜 해설</span><span class="sub">전 문항 해설 + 오답 선지 분석 — 맞힌 문제도 해설로 한 번 더!</span></div>
+
+  <table class="anstable">
+    <tr><th>문항</th><td>1</td><td>2</td><td>3</td><td>4</td><td>5</td><td>6</td><td>7</td><td>8</td><td>9</td><td>10</td><td>11</td><td>12</td><td>13</td></tr>
+    <tr><th>정답</th><td class="a">O</td><td class="a">X</td><td class="a">O</td><td class="a">빛</td><td class="a">거듭제곱</td><td class="a">2</td><td class="a">②</td><td class="a">④</td><td class="a">⑤</td><td class="a">③</td><td class="a">서술형</td><td class="a">③</td><td class="a">④</td></tr>
+  </table>
+
+  <div class="solcols">
+    <div>
+      <div class="sol"><div class="shead"><span class="sno">1</span><span class="sans">O</span><span class="slink">개념 1</span></div>
+        <p>사건 = 언제(시간) + 어디서(공간). 과학 기술의 출발 좌표다.</p></div>
+      <div class="sol"><div class="shead"><span class="sno">2</span><span class="sans">X</span><span class="slink">개념 2</span></div>
+        <p>-15 &lt; -10 — 지수가 작으니 10⁻¹⁵ m가 10만 배 작다.</p></div>
+      <div class="sol"><div class="shead"><span class="sno">3</span><span class="sans">O</span><span class="slink">개념 5</span></div>
+        <p>세슘 원자의 진동 9 192 631 770번 = 1초.</p></div>
+      <div class="sol"><div class="shead"><span class="sno">4</span><span class="sans">빛</span><span class="slink">개념 4</span></div>
+        <p>빛이 진공에서 1/299 792 458초 간 거리 = 1 m.</p></div>
+      <div class="sol"><div class="shead"><span class="sno">5</span><span class="sans">거듭제곱</span><span class="slink">개념 2</span></div>
+        <p>10²⁶처럼 지수로 표기 — 규모 비교가 한눈에 된다.</p></div>
+      <div class="sol"><div class="shead"><span class="sno">6</span><span class="sans">2</span><span class="slink">개념 4</span></div>
+        <p>왕복 시간이므로 반드시 2로 나눈다.</p></div>
+    </div>
+    <div>
+      <div class="sol"><div class="shead"><span class="sno">7</span><span class="sans">②</span><span class="slink">개념 2</span></div>
+        <p>원자핵(10⁻¹⁵) &lt; 원자(10⁻¹⁰) &lt; 세포(10⁻⁵) &lt; 지구(10⁷).</p>
+        <div class="wrongbox"><div class="wt">오답 왜 틀렸나</div>
+          <p><b>①</b> 원자핵이 원자 속에 있다 — 핵이 더 작다. <b>③·④·⑤</b> 음수 지수 비교 실수 — 지수가 작을수록 작다.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">8</span><span class="sans">④</span><span class="slink">개념 4·5</span></div>
+        <p>현대의 1 m = 빛 기준. 정의의 핵심어는 빛·진공·1/299 792 458초.</p>
+        <div class="wrongbox"><div class="wt">오답 왜 틀렸나</div>
+          <p><b>①·②</b> 과거의 방식이다. <b>③</b> 빛의 속력은 진공에서 불변이라 기준이 됐다. <b>⑤</b> 원자시계는 수천만 년에 1초도 안 틀린다.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">9</span><span class="sans">⑤</span><span class="slink">개념 4·자료</span></div>
+        <p>편도 시간 = 2.56 ÷ 2 = 1.28초. 거리 = 3 × 10⁸ × 1.28 = 3.84 × 10⁸ m.</p>
+        <div class="wrongbox"><div class="wt">오답 왜 틀렸나</div>
+          <p><b>④</b> ÷2를 빠뜨린 값(7.68 × 10⁸) — 이 유형 최대 함정. <b>①</b> ÷2를 두 번 한 값.</p></div></div>
+    </div>
+  </div>
+
+  <div class="folio"><span>알짜 해설</span><span class="num">19</span></div>
+</div>
+
+<!-- ═════════════ p.20 해설 2 ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag" style="color:var(--brand);">알짜 해설</span><span class="lesson-tag">01. 자연을 재는 눈 — 시간과 공간</span></div>
+  <div class="solcols">
+    <div>
+      <div class="sol"><div class="shead"><span class="sno">10</span><span class="sans">③</span><span class="slink">개념 3·5</span></div>
+        <p>(가) 방사성 동위 원소 = 자연의 시계, (나) GPS = 시간 차 × 빛의 속력 — 둘 다 옳다.</p>
+        <div class="wrongbox"><div class="wt">오답 왜 틀렸나</div>
+          <p><b>(다)</b> 우주의 나이는 약 138<b>억</b> 년이다 — '만'과 '억'을 바꿔치기하는 선지에 속지 말 것.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">11</span><span class="sans">모범 답안</span><span class="slink">개념 4</span></div>
+        <p>미터원기는 물체이므로 닳거나 온도에 따라 변형되어 기준이 흔들릴 수 있다. 반면 빛의 속력은 진공에서 <b>변하지 않는</b> 자연의 값이므로, 언제 어디서 재어도 같은 1 m를 얻을 수 있어 길이의 기준을 빛으로 바꾸었다.</p>
+        <div class="wrongbox"><div class="wt">채점 기준 (감점 포인트)</div>
+          <p>① 물체(원기)는 변할 수 있다는 한계 ② 빛의 속력은 불변 ③ 그래서 언제 어디서나 같은 기준이 됨 — 세 요소 모두 서술해야 만점.</p></div></div>
+    </div>
+    <div>
+      <div class="sol"><div class="shead"><span class="sno">12</span><span class="sans">③</span><span class="slink">개념 2 | 2점</span></div>
+        <p><b>ㄱ (옳음)</b> 10⁻¹⁰ ÷ 10⁻¹⁵ = 10⁵ — 10만 배. <b>ㄴ (옳음)</b> 10⁻¹⁰ &lt; 10⁰ &lt; 10⁷. <b>ㄷ (틀림)</b> 지수가 클수록 크다.</p>
+        <div class="wrongbox"><div class="wt">함정 체크</div>
+          <p>'배수'는 지수의 뺄셈이다 — (-10) - (-15) = 5, 곧 10⁵배.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">13</span><span class="sans">④</span><span class="slink">개념 4·5 | 2.5점</span></div>
+        <p><b>ㄱ (옳음)</b> 몸 → 물체 → 자연 상수(빛·원자)로, 더 변하지 않는 쪽으로 진화했다. <b>ㄴ (옳음)</b> 그것이 원기를 버린 이유다. <b>ㄷ (틀림)</b> 같은 종류의 원자는 어디서나 같은 진동수를 가진다 — 그래서 표준이 될 수 있었다.</p>
+        <div class="wrongbox"><div class="wt">함정 체크</div>
+          <p>기준의 조건은 단 하나 — <b>'누가 언제 재도 같을 것'</b>. 이 잣대로 ㄱ~ㄷ을 다시 읽어 보라.</p></div></div>
+
+      <div class="gist" style="margin-top:5mm;">
+        <div class="boxtitle"><span class="ico">알</span>이 소단원, 이것만은!</div>
+        <ul>
+          <li>사건의 주소 = <b>시간 + 공간</b> / 규모는 <b>10의 거듭제곱</b>으로 (원자 10⁻¹⁰ m, 우주 10²⁶ m)</li>
+          <li><b>1 m = 빛</b>(진공, 1/299 792 458초) / <b>1초 = 세슘 원자의 진동</b> 9 192 631 770번</li>
+          <li>레이저 거리 측정은 <b>속력 × 시간 ÷ 2</b> — GPS도 '시간으로 공간을 재는' 기술이다</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div class="folio"><span>알짜 해설</span><span class="num">20</span></div>
+</div>
+
+<!-- ═════════════ p.21 MEMO ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag">I. 과학의 기초</span><span class="lesson-tag">01 ▸ 02 넘어가기 전에</span></div>
+  <div class="memo-head"><span class="mt">MEMO</span><span class="ms">헷갈린 개념, 다시 틀린 문제 번호, 나만의 암기법을 남겨 두는 자리</span></div>
+  <div class="memo-area"></div>
+  <div class="memo-pen">"1 m와 1초의 현대적 정의를 한 문장씩 말해 보자. '빛'과 '세슘'이 바로 안 나오면 13쪽으로! — 박찬쌤"</div>
+  <div class="folio"><span>박찬 과학 | 통합과학 1</span><span class="num">21</span></div>
+</div>
+
+</body>
+</html>
