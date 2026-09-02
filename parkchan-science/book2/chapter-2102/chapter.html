@@ -1,0 +1,965 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<title>박찬 과학 통합과학2 — I-02 진화와 생물다양성</title>
+<style>
+  @font-face { font-family:'PC Sans'; src:url('file:///root/.fonts/NotoSansKR.ttf'); font-weight:100 900; }
+  @font-face { font-family:'PC Serif'; src:url('file:///root/.fonts/NotoSerifKR.ttf'); font-weight:100 900; }
+  @font-face { font-family:'PC Pen'; src:url('file:///root/.fonts/YeonSung-Regular.ttf'); font-weight:400; }
+
+  :root{
+    --brand:#0E5A6B;        /* 박찬 과학 브랜드 딥틸 */
+    --brand-lt:#E3F0F3;
+    --unit:#C1521E;         /* I. 과학의 기초 단원 컬러(그린) */
+    --unit-lt:#FBEFE7;
+    --unit-md:#EBC4AB;
+    --accent:#E8940A;       /* 알짜 앰버 */
+    --accent-lt:#FDF3E0;
+    --point:#D6455D;        /* 시험 포인트 */
+    --point-lt:#FBEBEE;
+    --ink:#22303A;
+    --sub:#5B6B77;
+    --line:#D8E0E5;
+  }
+  *{ box-sizing:border-box; margin:0; padding:0; -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+  @page{ size:210mm 275mm; margin:0; }
+  html,body{ font-family:'PC Sans',sans-serif; color:var(--ink); word-break:keep-all; overflow-wrap:anywhere; }
+
+  .page{ width:210mm; height:275mm; position:relative; overflow:hidden; background:#fff; page-break-after:always; padding:14mm 13mm 19mm 15mm; display:flex; flex-direction:column; }
+
+  /* ── 러닝 헤드 / 풋 ── */
+  .runhead{ display:flex; align-items:center; justify-content:space-between; border-bottom:0.35mm solid var(--unit); padding-bottom:2mm; margin-bottom:6.5mm; }
+  .runhead .unit-tag{ font-size:8.5pt; font-weight:700; color:var(--unit); letter-spacing:0.02em; }
+  .runhead .lesson-tag{ font-size:8.5pt; color:var(--sub); }
+  .folio{ position:absolute; bottom:7mm; left:0; right:0; display:flex; justify-content:space-between; padding:0 14mm 0 14mm; font-size:8pt; color:var(--sub); }
+  .folio .num{ font-weight:800; color:var(--unit); font-size:10pt; }
+
+  /* ── 본문 그리드: 본문 + 날개단 ── */
+  .cols{ display:grid; grid-template-columns:1fr 43mm; gap:8mm; flex:1; min-height:0; margin-bottom:4mm; }
+  .main{ min-width:0; }
+  .wing{ border-left:0.3mm solid var(--line); padding-left:5mm; font-size:8.2pt; color:var(--sub); line-height:1.7; }
+
+  /* ── 타이포 ── */
+  h2.lesson-title{ display:flex; align-items:baseline; gap:3.5mm; margin-bottom:2mm; }
+  h2.lesson-title .no{ background:var(--unit); color:#fff; font-size:13pt; font-weight:900; padding:1.2mm 3.2mm; border-radius:1.5mm; }
+  h2.lesson-title .tt{ font-size:16.5pt; font-weight:900; letter-spacing:-0.01em; }
+  .std-badges{ display:flex; gap:2mm; margin:2mm 0 6.5mm; }
+  .std{ font-size:7.4pt; color:var(--unit); background:none; border:0.3mm solid var(--unit-md); border-radius:5mm; padding:0.6mm 2.8mm; font-weight:600; }
+
+  h3.sec{ display:flex; align-items:baseline; gap:3mm; font-size:12.5pt; font-weight:800; margin:9mm 0 3.6mm; letter-spacing:-0.01em; }
+  h3.sec .n{ font-family:'PC Serif'; font-size:15.5pt; font-weight:900; color:var(--unit); border-bottom:0.7mm solid var(--accent); padding:0 0.8mm 0.2mm; flex:0 0 auto; line-height:1; }
+  h3.sec::after{ content:""; flex:1; border-top:0.25mm solid var(--line); align-self:center; margin-left:2mm; }
+  h3.sec:first-child{ margin-top:0; }
+
+  p.body{ font-family:'PC Serif'; font-size:9.6pt; line-height:1.92; margin-bottom:3.6mm; text-align:justify; }
+  p.body b{ font-weight:800; }
+  .kw{ font-weight:800; color:var(--unit); }
+  .u-amber{ background:#F8E9C6; font-weight:700; padding:0.15mm 0.6mm; border-radius:0.6mm; box-decoration-break:clone; -webkit-box-decoration-break:clone; }
+
+  ul.pts{ font-family:'PC Serif'; font-size:9.6pt; line-height:1.84; margin:1.5mm 0 3.5mm 1mm; list-style:none; }
+  ul.pts li{ padding-left:4.5mm; position:relative; margin-bottom:1.8mm; }
+  ul.pts li::before{ content:""; position:absolute; left:0.5mm; top:2.9mm; width:1.7mm; height:1.7mm; background:var(--accent); border-radius:50%; }
+
+  /* ── 코너 박스 ── */
+  .boxtitle{ display:inline-flex; align-items:center; gap:1.8mm; font-weight:900; font-size:9.5pt; margin-bottom:1.6mm; }
+  .boxtitle .ico{ width:5.2mm; height:5.2mm; border-radius:1.2mm; display:flex; align-items:center; justify-content:center; color:#fff; font-size:7.5pt; font-weight:900; }
+
+  .gist{ background:none; border:none; border-top:0.5mm solid var(--accent); border-bottom:0.5mm solid var(--accent); border-radius:0; padding:3.2mm 1.8mm 3mm; margin:6mm 0 5mm; }
+  .gist .boxtitle{ color:#9C6503; } .gist .ico{ background:var(--accent); }
+  .gist ul{ list-style:none; font-family:'PC Serif'; font-size:9.3pt; line-height:1.78; }
+  .gist li{ padding-left:4.2mm; position:relative; margin-bottom:1.2mm;}
+  .gist li::before{ content:"✓"; position:absolute; left:0; color:var(--accent); font-weight:900; }
+
+  .expoint{ background:none; border-left:0.5mm solid #D998A4; border-left-color:#D998A4; border-radius:0; padding:1.4mm 0 1.4mm 3.6mm; margin:4.5mm 0; }
+  .expoint .boxtitle{ color:#A9556A; font-size:8.6pt; margin-bottom:1mm;}
+  .expoint .ico{ background:none; color:#A9556A; border:0.35mm solid #D998A4; width:4.4mm; height:4.4mm; border-radius:50%; font-size:7pt; }
+  .expoint p{ font-family:'PC Serif'; font-size:8.9pt; line-height:1.7; }
+
+  .pen{ font-family:'PC Pen'; font-size:12pt; color:#B4560E; line-height:1.45; }
+  .saem{ display:flex; gap:3mm; align-items:flex-start; margin:4.5mm 0; }
+  .saem .avatar{ flex:0 0 auto; width:10.5mm; height:10.5mm; border-radius:50%; background:var(--brand); color:#fff; font-size:7pt; font-weight:800; display:flex; align-items:center; justify-content:center; line-height:1.35; letter-spacing:0.04em; text-align:center; border:0.5mm solid var(--accent); box-sizing:border-box;}
+  .saem .bubble{ background:#FFFBF0; border:0.4mm solid #EBCB9C; border-radius:3mm; padding:2.2mm 3.6mm 2mm; position:relative; }
+  .saem .bubble::before{ content:""; position:absolute; left:-1.8mm; top:3.2mm; width:3mm; height:3mm; background:#FFFBF0; border-left:0.4mm solid #EBCB9C; border-bottom:0.4mm solid #EBCB9C; transform:rotate(45deg); }
+
+  .wing .wtitle{ font-size:8pt; font-weight:900; color:var(--brand); display:flex; align-items:center; gap:1.5mm; margin:0 0 2.4mm; letter-spacing:0.05em; }
+  .wing .wtitle::before{ content:""; width:2.4mm; height:2.4mm; background:var(--accent); border-radius:50%; }
+  .wing .term{ margin-bottom:3.6mm; }
+  .wing .term b{ color:var(--ink); font-weight:800; display:block; font-size:8.5pt; margin-bottom:0.7mm;}
+  .wing .wsep{ border-top:0.3mm dashed var(--line); margin:4.5mm 0; }
+  .wing .wing-pen{ font-family:'PC Pen'; font-size:11pt; color:#B4560E; line-height:1.45; }
+
+  figure{ margin:5mm 0; }
+  figure figcaption{ font-size:8pt; color:var(--sub); text-align:center; margin-top:2mm; }
+  figure svg{ display:block; margin:0 auto; }
+
+  /* ── 비교형 그림 (2패널 + 범례) ── */
+  .fig-duo{ display:flex; align-items:stretch; gap:2.5mm; justify-content:center; }
+  .fig-duo .panel{ flex:0 0 auto; text-align:center; }
+  .fig-duo .p-title{ font-size:9pt; font-weight:900; color:var(--ink); margin-top:1.6mm; }
+  .fig-duo .p-sub{ font-size:7.8pt; color:var(--sub); line-height:1.45; margin-top:0.5mm; }
+  .fig-duo .mid{ display:flex; flex-direction:column; align-items:center; justify-content:center; gap:1mm; padding:0 1mm; }
+  .fig-duo .mid .mlab{ font-size:7.6pt; font-weight:800; color:var(--unit); text-align:center; line-height:1.3; }
+  .fig-legend{ display:flex; justify-content:center; gap:5mm; font-size:7.8pt; color:var(--ink); margin-top:1.2mm; align-items:center; }
+  .fig-legend span{ display:inline-flex; align-items:center; gap:1.4mm; }
+
+  /* ── 탐구 (자료 파헤치기) ── */
+  .lab{ border:0.5mm solid var(--brand); border-radius:2.5mm; overflow:hidden; margin-top:1mm;}
+  .lab .lab-head{ background:var(--brand); color:#fff; padding:2.2mm 4mm; font-weight:900; font-size:11pt; display:flex; align-items:center; gap:2.5mm;}
+  .lab .lab-head .tag{ font-size:7.5pt; background:rgba(255,255,255,.22); padding:0.6mm 2.4mm; border-radius:4mm; font-weight:700;}
+  .lab .lab-body{ padding:3.5mm 4mm; }
+  .lab h4{ font-size:9.6pt; font-weight:900; color:var(--brand); margin:2.5mm 0 1.4mm; }
+  .lab h4:first-child{ margin-top:0; }
+  .lab p, .lab li{ font-family:'PC Serif'; font-size:9.3pt; line-height:1.8; }
+  .lab ol{ margin-left:5mm; }
+
+  /* ── 문제부 ── */
+  .step-head{ display:flex; align-items:center; gap:3mm; margin:0 0 5mm; }
+  .step-head .stepno{ background:var(--unit); color:#fff; font-weight:900; font-size:9.5pt; padding:1.4mm 3.4mm; border-radius:1.5mm; letter-spacing:0.04em;}
+  .step-head .steptt{ font-size:12.5pt; font-weight:900; }
+  .step-head .stepdesc{ font-size:8.2pt; color:var(--sub); margin-left:auto; }
+  .step-head.s2 .stepno{ background:var(--brand); }
+  .step-head.s3 .stepno{ background:var(--point); }
+
+  .q{ margin-bottom:7.5mm; break-inside:avoid; }
+  .q .qhead{ display:flex; gap:2.4mm; align-items:flex-start; }
+  .q .qno{ flex:0 0 auto; min-width:6.2mm; height:6.2mm; border:0.45mm solid var(--unit); color:var(--unit); border-radius:50%; font-size:8.6pt; font-weight:900; line-height:1; display:flex; align-items:center; justify-content:center; padding-top:0.55mm; margin-top:0.4mm;}
+  .q .stem{ font-family:'PC Serif'; font-size:9.5pt; line-height:1.74; font-weight:500; }
+  .q .stem .difficulty{ color:#C9A227; font-size:8pt; letter-spacing:0.06em; margin-left:1.5mm;}
+  .q .tags{ margin-top:0.8mm; font-size:7pt; color:var(--sub); font-family:'PC Sans';}
+  .choices{ list-style:none; margin:2.2mm 0 0 8.6mm; font-family:'PC Serif'; font-size:9.3pt; line-height:1.85; }
+  .choices.inline{ display:flex; flex-wrap:wrap; gap:0 6mm; }
+  .bogi-box{ border:0.35mm solid #B8C2CA; border-radius:0; margin:2.5mm 0 0 8.6mm; padding:2.4mm 3.2mm; font-family:'PC Serif'; font-size:9.2pt; line-height:1.8; background:none;}
+  .bogi-box .bt{ text-align:center; font-weight:800; color:var(--sub); font-size:8.4pt; margin-bottom:0.8mm; letter-spacing:0.3em;}
+  .ox-answer{ margin-left:2mm; color:var(--sub); font-size:9pt; }
+  .blankline{ display:inline-block; min-width:14mm; border-bottom:0.4mm solid var(--ink); }
+  .qgrid{ display:grid; grid-template-columns:1fr 1fr; gap:0 9mm; }
+  .essay-lines{ margin:2mm 0 0 8.4mm; }
+  .essay-lines div{ border-bottom:0.3mm solid var(--line); height:6.2mm; }
+  .badge-essay{ display:inline-block; background:var(--point); color:#fff; font-size:7pt; font-weight:800; padding:0.4mm 2mm; border-radius:1mm; vertical-align:1pt; margin-right:1.2mm;}
+  .badge-data{ display:inline-block; background:var(--brand); color:#fff; font-size:7pt; font-weight:800; padding:0.4mm 2mm; border-radius:1mm; vertical-align:1pt; margin-right:1.2mm;}
+
+  /* ── 해설부 ── */
+  .sol-head{ display:flex; align-items:center; gap:3mm; margin-bottom:4mm;}
+  .sol-head .stt{ font-size:14.5pt; font-weight:900; color:var(--brand);}
+  .sol-head .sub{ font-size:8.5pt; color:var(--sub);}
+  .anstable{ width:100%; border-collapse:collapse; margin-bottom:4.5mm; }
+  .anstable th,.anstable td{ border:0.3mm solid var(--line); font-size:8.8pt; padding:1.4mm 0; text-align:center; }
+  .anstable th{ background:var(--brand-lt); color:var(--brand); font-weight:800; }
+  .anstable td.a{ font-weight:900; color:var(--unit); }
+  .sol{ margin-bottom:5mm; break-inside:avoid; }
+  .sol .shead{ display:flex; align-items:center; gap:2mm; margin-bottom:1.4mm;}
+  .sol .sno{ background:var(--unit); color:#fff; min-width:6mm; height:5.4mm; border-radius:1.2mm; font-size:8.6pt; font-weight:900; line-height:1; display:flex; align-items:center; justify-content:center; padding:0.5mm 1.5mm 0;}
+  .sol .sans{ font-weight:900; color:var(--unit); font-size:9.6pt;}
+  .sol .slink{ font-size:7.2pt; color:var(--sub); margin-left:auto;}
+  .sol p{ font-family:'PC Serif'; font-size:9.1pt; line-height:1.76; margin-bottom:0.8mm; }
+  .wrongbox{ background:none; border:none; border-left:0.7mm solid #E3A0AC; border-radius:0; padding:1mm 0 1mm 3mm; margin-top:2mm;}
+  .wrongbox .wt{ font-size:8pt; font-weight:900; color:var(--point); margin-bottom:0.8mm; font-family:'PC Sans';}
+  .wrongbox p{ font-family:'PC Serif'; font-size:8.6pt; line-height:1.68; margin-bottom:0.9mm;}
+  .wrongbox p:last-child{ margin-bottom:0; }
+  .solcols{ display:grid; grid-template-columns:1fr 1fr; gap:0 9mm; }
+
+  /* ── 단원 도입 (타이포그래피 중심) ── */
+  .opener{ padding:0 0 19mm; }
+  .opener-hero{ position:relative; padding:7mm 20mm 4.5mm; overflow:hidden; flex-shrink:0; }
+  .ghost-txt{ position:absolute; top:-10mm; right:6mm; font-size:118pt; font-weight:900; color:#FAEFE8; line-height:1; letter-spacing:-0.04em; }
+  .kicker{ display:flex; align-items:center; gap:4mm; position:relative; }
+  .kicker .kt{ font-size:9.5pt; font-weight:800; color:var(--unit); letter-spacing:0.24em; white-space:nowrap; }
+  .kicker::after{ content:""; flex:1; border-top:0.3mm solid var(--line); }
+  .opener-hero h1{ position:relative; font-size:36pt; font-weight:900; letter-spacing:-0.015em; margin:4mm 0 0; }
+  .opener-hero h1 .tick{ display:block; width:14mm; border-top:1.4mm solid var(--accent); margin-bottom:3.6mm; }
+  .opener-lede{ position:relative; font-family:'PC Serif'; font-size:10.2pt; font-weight:600; line-height:2.0; color:#3D4C58; max-width:138mm; margin-top:4mm; padding-left:5mm; border-left:0.8mm solid var(--accent); }
+  .opener-inner{ padding:0 20mm; }
+
+  /* ── 원소의 여정 스트립 ── */
+  .journey{ margin-top:3.5mm; }
+  .journey .j-label{ font-size:8pt; font-weight:800; color:var(--sub); letter-spacing:0.08em; margin-bottom:2.4mm; display:flex; align-items:center; gap:1.6mm;}
+  .journey .j-label::before{ content:""; width:2.4mm; height:2.4mm; background:var(--unit); border-radius:50%; }
+  .j-bar{ display:flex; align-items:center; gap:2mm; }
+  .j-chip{ flex:1; text-align:center; background:#FBF3ED; border:0.35mm solid #EBC4AB; color:#C1521E; border-radius:1.6mm; padding:3mm 1mm 2.6mm; }
+  .j-chip .jc-t{ font-size:8.8pt; font-weight:800; display:block; }
+  .j-chip .jc-s{ font-size:6.8pt; color:var(--sub); display:block; margin-top:0.5mm; }
+  .j-chip.on{ background:var(--unit); border-color:var(--unit); }
+  .j-chip.on .jc-t{ color:#fff; }
+  .j-chip.on .jc-s{ color:#F6DFCE; }
+  .j-arrow{ flex:0 0 auto; color:#E0A57E; font-size:10pt; font-weight:900; }
+  .toc{ margin-top:6.5mm; }
+  .toc .toc-title{ font-size:11pt; font-weight:900; color:var(--ink); margin-bottom:3mm; display:flex; align-items:center; gap:2.5mm;}
+  .toc .toc-title::before{ content:""; width:3.4mm; height:3.4mm; background:var(--accent); border-radius:0.8mm; }
+  .toc-item{ display:flex; align-items:flex-start; gap:5mm; padding:4.4mm 6mm; border-bottom:0.3mm solid var(--line); }
+  .toc-item:first-of-type{ border-top:0.3mm solid var(--line); }
+  .toc-item.active{ background:#FBF3ED; border-left:1.2mm solid #D98A5B; }
+  .toc-item .tno{ font-family:'PC Serif'; font-weight:900; color:#D98A5B; font-size:14pt; width:10mm; line-height:1.1; flex:0 0 auto;}
+  .toc-item .tbody{ flex:1; min-width:0; }
+  .toc-item .ttt{ font-weight:800; font-size:10.5pt; letter-spacing:0.01em; display:flex; align-items:center;}
+  .toc-item .tdesc{ font-family:'PC Serif'; font-size:8.6pt; font-weight:600; color:#4A5964; margin-top:0.7mm; line-height:1.55;}
+  .toc-item .tstd{ font-size:7.2pt; color:var(--sub); flex:0 0 auto; padding-top:1.2mm;}
+  .toc-item.active .tag-now{ background:var(--accent); color:#fff; font-size:7pt; font-weight:900; border-radius:4mm; padding:0.7mm 2.6mm; margin-left:3.5mm;}
+  .toc-item .tag-done{ font-size:7.2pt; font-weight:800; color:#C1521E; margin-left:3.5mm; }
+  .opener-quote{ margin-top:7mm; text-align:center; font-family:'PC Serif'; font-size:9.8pt; font-weight:600; color:#4A5964; letter-spacing:0.01em; }
+  .opener-quote .who{ font-size:8pt; color:var(--sub); font-weight:400; margin-left:2.5mm; }
+  .qa-lead li .qgo{ font-family:'PC Sans'; font-size:7.4pt; font-weight:800; color:var(--unit); background:var(--unit-lt); border-radius:3mm; padding:0.5mm 2.2mm; margin-left:2mm; white-space:nowrap; vertical-align:1pt;}
+  .qa-lead{ margin-top:5mm; border:none; border-top:0.45mm solid var(--brand); border-bottom:0.45mm solid var(--brand); background:none; border-radius:0; padding:3mm 2mm 2.8mm; }
+  .qa-lead .qt{ font-weight:900; color:var(--brand); font-size:10.5pt; margin-bottom:2mm;}
+  .qa-lead li{ font-family:'PC Serif'; font-size:9.5pt; line-height:1.8; margin-left:5mm; }
+
+  /* ── 바로바로 체크 (개념 페이지 하단 즉석 OX) ── */
+  .quickcheck{ margin-top:auto; border-top:0.35mm dashed #C8B98F; padding-top:3mm; width:calc(100% - 51mm); }
+  .quickcheck .qc-title{ display:inline-flex; align-items:center; gap:1.6mm; font-size:8.2pt; font-weight:900; color:#9C6503; margin-bottom:1.4mm; }
+  .quickcheck .qc-title::before{ content:"✓"; color:var(--accent); font-weight:900; }
+  .quickcheck ol{ list-style:none; font-family:'PC Serif'; font-size:8.8pt; line-height:1.75; }
+  .quickcheck li{ display:flex; gap:2mm; align-items:baseline; }
+  .quickcheck li .no{ font-weight:800; color:var(--accent); flex:0 0 auto; }
+  .quickcheck .qc-ans{ margin-top:1mm; font-size:7.2pt; color:var(--sub); transform:rotate(180deg); text-align:left; }
+
+  /* ── 중학 과학 다시보기 (날개단) ── */
+  .wing .review{ background:#F6F3EC; border-radius:1.8mm; padding:2.8mm 3mm; margin-top:1mm; }
+  .wing .review .rv-title{ font-size:7.8pt; font-weight:900; color:#7A6A45; margin-bottom:1.4mm; display:flex; align-items:center; gap:1.4mm;}
+  .wing .review .rv-title::before{ content:"↺"; font-weight:900; color:#A08A55; }
+
+  /* ── MEMO 페이지 ── */
+  .memo-head{ display:flex; align-items:baseline; gap:3.5mm; margin-bottom:5mm; }
+  .memo-head .mt{ font-size:17pt; font-weight:900; color:var(--brand); letter-spacing:0.22em; }
+  .memo-head .ms{ font-size:8.6pt; color:var(--sub); }
+  .memo-area{ flex:1; border:0.4mm solid var(--line); border-radius:2.5mm;
+    background-image:linear-gradient(to bottom, transparent calc(100% - 0.3mm), #DCE4E9 0);
+    background-size:100% 9mm; background-position:0 4mm; padding:0 5mm; margin-bottom:4mm; }
+  .memo-pen{ font-family:'PC Pen'; font-size:12.5pt; color:#B4560E; text-align:right; }
+</style>
+</head>
+<body>
+<!-- ═════════════ p.22 소단원 도입 ═════════════ -->
+<div class="page opener">
+  <div class="opener-hero">
+    <div class="ghost-txt">02</div>
+    <div class="kicker"><span class="kt">통합과학 2 · I. 변화와 다양성</span></div>
+    <h1><span class="tick"></span>진화와 생물다양성</h1>
+    <p class="opener-lede">핀치의 부리도, 기린의 목도, 당신의 눈동자 색도 —<br>
+    모두 '서로 다름'에서 시작된 이야기다.</p>
+  </div>
+
+  <div class="opener-inner">
+    <div class="journey">
+      <div class="j-label">변화와 다양성 — 지금 여기</div>
+      <div class="j-bar">
+        <div class="j-chip"><span class="jc-t">지질시대</span><span class="jc-s">돌에 남은 일기장</span></div>
+        <span class="j-arrow">→</span>
+        <div class="j-chip on"><span class="jc-t">진화</span><span class="jc-s">다양성의 기원</span></div>
+        <span class="j-arrow">→</span>
+        <div class="j-chip"><span class="jc-t">산화와 환원</span><span class="jc-s">문명을 바꾼 반응</span></div>
+        <span class="j-arrow">→</span>
+        <div class="j-chip"><span class="jc-t">산·염기와 중화</span><span class="jc-s">생활 속 화학</span></div>
+        <span class="j-arrow">→</span>
+        <div class="j-chip"><span class="jc-t">에너지 출입</span><span class="jc-s">발열과 흡열</span></div>
+      </div>
+    </div>
+    <div class="toc">
+      <div class="toc-title">이 단원의 학습 지도</div>
+      <div class="toc-item">
+        <span class="tno">01</span>
+        <span class="tbody"><span class="ttt">지질시대와 생물의 변천</span>
+        <span class="tdesc">지질시대 구분, 화석 읽는 법, 대멸종과 생물다양성</span></span>
+        <span class="tstd">10통과2-01-01</span>
+      </div>
+      <div class="toc-item active">
+        <span class="tno">02</span>
+        <span class="tbody"><span class="ttt">진화와 생물다양성<span class="tag-now">NOW</span></span>
+        <span class="tdesc">변이와 자연선택 — 다양한 생물은 어떻게 생겨났나</span></span>
+        <span class="tstd">10통과2-01-02</span>
+      </div>
+      <div class="toc-item">
+        <span class="tno">03</span>
+        <span class="tbody"><span class="ttt">산화와 환원</span>
+        <span class="tdesc">광합성·화석 연료·철의 제련 — 산소와 전자의 이동</span></span>
+        <span class="tstd">10통과2-01-03</span>
+      </div>
+      <div class="toc-item">
+        <span class="tno">04</span>
+        <span class="tbody"><span class="ttt">산·염기와 중화 반응</span>
+        <span class="tdesc">산과 염기의 성질, 생활 속 중화의 기술</span></span>
+        <span class="tstd">10통과2-01-04</span>
+      </div>
+      <div class="toc-item">
+        <span class="tno">05</span>
+        <span class="tbody"><span class="ttt">화학 변화와 에너지 출입</span>
+        <span class="tdesc">발열·흡열 반응 — 손난로와 냉각 팩의 과학</span></span>
+        <span class="tstd">10통과2-01-05</span>
+      </div>
+    </div>
+
+    <div class="qa-lead">
+      <div class="qt">이 소단원을 끝내면 답할 수 있는 질문</div>
+      <ul>
+        <li>같은 부모에게서 태어난 형제도 왜 서로 다를까? <span class="qgo">개념 1</span></li>
+        <li>기린의 목은 '늘이려는 노력'으로 길어졌을까? <span class="qgo">개념 2</span></li>
+        <li>항생제를 함부로 먹으면 왜 위험해질까? <span class="qgo">개념 3</span></li>
+        <li>바나나가 멸종 위기라는 말은 왜 나올까? <span class="qgo">개념 5</span></li>
+      </ul>
+    </div>
+
+    <div class="opener-quote" style="margin-top:2.4mm;">"생물학의 그 무엇도 진화의 빛 없이는 의미가 없다."<span class="who">— 유전학자 테오도시우스 도브잔스키 (1973)</span></div>
+  </div>
+
+  <div class="folio"><span>박찬 과학 | 통합과학 2</span><span class="num">22</span></div>
+</div>
+
+<!-- ═════════════ p.23 개념 01 변이 ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag">I. 변화와 다양성</span><span class="lesson-tag">02. 진화와 생물다양성</span></div>
+  <h2 class="lesson-title"><span class="no">02</span><span class="tt">진화와 생물다양성</span></h2>
+  <div class="std-badges"><span class="std">성취기준 10통과2-01-02</span><span class="std">변이 → 자연선택 → 진화 → 생물다양성</span></div>
+
+  <div class="cols">
+    <div class="main">
+      <h3 class="sec"><span class="n">1</span>변이 — 모든 이야기의 재료</h3>
+      <p class="body">무당벌레의 딱지날개 무늬는 한 종 안에서도 제각각이고, 달팽이의 껍데기 색도, 사람의 눈동자 색도 저마다 다르다. 이렇게 <span class="u-amber">같은 종의 개체 사이에서 나타나는 형질의 차이</span>를 <span class="kw">변이</span>라 한다. 변이는 결함이 아니다 — 뒤에서 보겠지만, <b>진화라는 드라마의 재료</b>가 바로 이 '서로 다름'이다.</p>
+      <p class="body">다만 구별할 것이 있다. 운동으로 커진 근육, 햇볕에 그을린 피부처럼 <b>환경 때문에 생긴 차이</b>는 자손에게 전달되지 않는다. 진화의 재료가 되는 것은 <span class="kw">유전적 변이</span> — 유전자의 차이에서 비롯되어 <b>자손에게 전달되는 변이</b>다. 유전적 변이는 두 경로로 생긴다. DNA에 변화가 생겨 새로운 유전자가 만들어지는 <b>돌연변이</b>, 그리고 부모의 유전자가 <b>유성 생식</b> 과정에서 새롭게 조합되는 것이다.</p>
+
+      <figure>
+        <svg width="470" height="150" viewBox="0 0 470 150" font-family="PC Sans">
+          <defs>
+            <marker id="arrP" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="#C1521E"/></marker>
+            <marker id="arrR" markerWidth="7" markerHeight="7" refX="5" refY="2.5" orient="auto"><path d="M0,0 L6,2.5 L0,5 Z" fill="#D6455D"/></marker>
+          </defs>
+          <g font-size="6.8">
+            <text x="235" y="13" text-anchor="middle" font-size="8.4" font-weight="800" fill="#C1521E">같은 종, 서로 다른 얼굴 — 무당벌레의 변이</text>
+            <!-- 무당벌레 4마리 -->
+            <g transform="translate(0,24)">
+              <g transform="translate(70,22)">
+                <circle r="16" fill="#E85D3A" stroke="#7A3E14" stroke-width="1.2"/><line x1="0" y1="-16" x2="0" y2="16" stroke="#7A3E14" stroke-width="1.2"/>
+                <circle cx="-8" cy="-4" r="3" fill="#3B3B3B"/><circle cx="8" cy="-4" r="3" fill="#3B3B3B"/><circle cx="-7" cy="7" r="2.6" fill="#3B3B3B"/><circle cx="7" cy="7" r="2.6" fill="#3B3B3B"/>
+                <circle cy="-16" r="5.5" fill="#3B3B3B"/>
+                <text y="34" text-anchor="middle">점 4개</text>
+              </g>
+              <g transform="translate(180,22)">
+                <circle r="16" fill="#E8940A" stroke="#7A3E14" stroke-width="1.2"/><line x1="0" y1="-16" x2="0" y2="16" stroke="#7A3E14" stroke-width="1.2"/>
+                <circle cx="-7" cy="-6" r="2.6" fill="#3B3B3B"/><circle cx="7" cy="-6" r="2.6" fill="#3B3B3B"/><circle cx="-9" cy="3" r="2.4" fill="#3B3B3B"/><circle cx="9" cy="3" r="2.4" fill="#3B3B3B"/><circle cx="-6" cy="10" r="2.2" fill="#3B3B3B"/><circle cx="6" cy="10" r="2.2" fill="#3B3B3B"/>
+                <circle cy="-16" r="5.5" fill="#3B3B3B"/>
+                <text y="34" text-anchor="middle">점 6개 · 주황</text>
+              </g>
+              <g transform="translate(290,22)">
+                <circle r="16" fill="#3B3B3B" stroke="#1F1F1F" stroke-width="1.2"/><line x1="0" y1="-16" x2="0" y2="16" stroke="#111" stroke-width="1.2"/>
+                <circle cx="-7" cy="-2" r="4" fill="#E85D3A"/><circle cx="7" cy="-2" r="4" fill="#E85D3A"/>
+                <circle cy="-16" r="5.5" fill="#1F1F1F"/>
+                <text y="34" text-anchor="middle">검은 바탕 붉은 점</text>
+              </g>
+              <g transform="translate(400,22)">
+                <circle r="16" fill="#E85D3A" stroke="#7A3E14" stroke-width="1.2"/><line x1="0" y1="-16" x2="0" y2="16" stroke="#7A3E14" stroke-width="1.2"/>
+                <circle cy="-16" r="5.5" fill="#3B3B3B"/>
+                <text y="34" text-anchor="middle">무늬 없음</text>
+              </g>
+            </g>
+            <!-- 발생 경로 -->
+            <g transform="translate(235,102)" text-anchor="middle">
+              <rect x="-210" y="0" width="200" height="34" rx="5" fill="#FBEFE7" stroke="#EBC4AB" stroke-width="1"/>
+              <text x="-110" y="14" font-size="7.6" font-weight="800" fill="#C1521E">경로 1 — 돌연변이</text>
+              <text x="-110" y="26" fill="#5B6B77">DNA 변화 → 없던 유전자가 새로 생긴다</text>
+              <rect x="10" y="0" width="200" height="34" rx="5" fill="#FBEFE7" stroke="#EBC4AB" stroke-width="1"/>
+              <text x="110" y="14" font-size="7.6" font-weight="800" fill="#C1521E">경로 2 — 유성 생식</text>
+              <text x="110" y="26" fill="#5B6B77">부모 유전자가 새로운 조합으로 섞인다</text>
+            </g>
+          </g>
+          <text x="235" y="146" text-anchor="middle" font-size="8.8" font-weight="800" fill="#E8940A">변이 = 같은 종 안의 '서로 다름' — 유전되는 변이만 진화의 재료가 된다</text>
+        </svg>
+        <figcaption>그림 1 | 변이와 그 발생 경로 — 돌연변이가 재료를 만들고, 유성 생식이 재료를 섞는다</figcaption>
+      </figure>
+
+      <div class="saem">
+        <div class="avatar">박찬<br>쌤</div>
+        <div class="bubble"><span class="pen">"'변이(變異)'의 이(異)는 '다를 이' — 병명이 아니라 '서로 다름' 그 자체다. 진화는 이 다름을 재료로 쓰는 조각가다."</span></div>
+      </div>
+    </div>
+
+    <div class="wing">
+      <div class="wtitle">날개 노트</div>
+      <div class="term"><b>변이</b>같은 종의 개체 사이에서 나타나는 형질(모양·색·크기 등)의 차이.</div>
+      <div class="term"><b>돌연변이</b>DNA에 생긴 변화. 대부분은 영향이 없거나 불리하지만, 드물게 유리한 변이가 되어 진화의 씨앗이 된다.</div>
+      <div class="wsep"></div>
+      <div class="wtitle">한눈에 암기</div>
+      <div class="wing-pen">변이 = 진화의 재료<br>유전되는 변이만 전달!<br>돌연변이 + 유성 생식</div>
+      <div class="wsep"></div>
+      <div class="review">
+        <div class="rv-title">중학 과학 다시보기</div>
+        <div class="term" style="margin-bottom:0;"><b>유전 (중3)</b>부모의 유전자가 생식세포를 통해 자손에게 전달된다 — 그 조합 과정이 변이의 공장이다.</div>
+      </div>
+    </div>
+  </div>
+  <div class="quickcheck">
+    <span class="qc-title">바로바로 체크</span>
+    <ol>
+      <li><span class="no">1</span>같은 종의 개체 사이에서 나타나는 형질의 차이를 변이라 한다. ( O , X )</li>
+      <li><span class="no">2</span>운동으로 커진 근육 같은 후천적 차이도 자손에게 유전된다. ( O , X )</li>
+      <li><span class="no">3</span>유성 생식은 부모 유전자의 새로운 조합을 만든다. ( O , X )</li>
+    </ol>
+    <div class="qc-ans">정답 1 O 2 X (유전적 변이만 전달) 3 O</div>
+  </div>
+  <div class="folio"><span>I. 변화와 다양성</span><span class="num">23</span></div>
+</div>
+
+<!-- ═════════════ p.24 개념 02 자연선택 ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag">I. 변화와 다양성</span><span class="lesson-tag">02. 진화와 생물다양성</span></div>
+  <div class="cols">
+    <div class="main">
+      <h3 class="sec"><span class="n">2</span>자연선택 — 환경이 고르고, 세대가 쌓는다</h3>
+      <p class="body">다윈의 통찰은 다섯 걸음의 논리 사슬이다. ① 생물은 살아남을 수 있는 수보다 <b>많은 자손을 낳는다</b>(과잉 생산). ② 그 자손들은 저마다 다르다(<b>변이</b>). ③ 먹이와 공간이 부족하니 <b>생존 경쟁</b>이 벌어진다. ④ 이때 <span class="u-amber">환경에 유리한 변이를 가진 개체가 더 많이 살아남아 더 많은 자손을 남긴다</span> — 이것이 <span class="kw">자연선택</span>이다. ⑤ 이 과정이 세대를 거듭하면 집단의 형질 구성이 달라진다 — 곧 <span class="kw">진화</span>다.</p>
+      <p class="body">기린의 목으로 두 설명을 비교해 보자. 라마르크의 <b>용불용설</b>은 "목을 자꾸 늘여 쓴 결과 길어졌고, 그 목이 유전되었다"고 했다 — 그러나 후천적으로 얻은 형질은 유전되지 않는다. 다윈의 설명은 다르다. <b>처음부터 목 길이가 다양했고</b>, 높은 잎을 먹을 수 있는 긴 목의 개체가 살아남아 번식했다는 것. 오늘날의 진화론은 다윈의 자연선택에 유전학이 결합해 완성되었다.</p>
+
+      <figure>
+        <svg width="470" height="152" viewBox="0 0 470 152" font-family="PC Sans">
+          <g font-size="6.8">
+            <text x="235" y="13" text-anchor="middle" font-size="8.4" font-weight="800" fill="#C1521E">자연선택의 논리 사슬 — 다섯 걸음</text>
+            <g transform="translate(0,24)" text-anchor="middle">
+              <g transform="translate(51,0)">
+                <rect x="-38" y="0" width="76" height="38" rx="5" fill="#FBEFE7" stroke="#EBC4AB" stroke-width="1"/>
+                <text y="15" font-weight="800" fill="#C1521E">① 과잉 생산</text><text y="27" fill="#5B6B77" font-size="6.2">다 살 수 없을 만큼</text>
+              </g>
+              <line x1="91" y1="19" x2="101" y2="19" stroke="#C1521E" stroke-width="1.2" marker-end="url(#arrP)"/>
+              <g transform="translate(143,0)">
+                <rect x="-38" y="0" width="76" height="38" rx="5" fill="#FBEFE7" stroke="#EBC4AB" stroke-width="1"/>
+                <text y="15" font-weight="800" fill="#C1521E">② 변이</text><text y="27" fill="#5B6B77" font-size="6.2">개체마다 다르다</text>
+              </g>
+              <line x1="183" y1="19" x2="193" y2="19" stroke="#C1521E" stroke-width="1.2" marker-end="url(#arrP)"/>
+              <g transform="translate(235,0)">
+                <rect x="-38" y="0" width="76" height="38" rx="5" fill="#FBEFE7" stroke="#EBC4AB" stroke-width="1"/>
+                <text y="15" font-weight="800" fill="#C1521E">③ 생존 경쟁</text><text y="27" fill="#5B6B77" font-size="6.2">먹이·공간의 다툼</text>
+              </g>
+              <line x1="275" y1="19" x2="285" y2="19" stroke="#C1521E" stroke-width="1.2" marker-end="url(#arrP)"/>
+              <g transform="translate(327,0)">
+                <rect x="-38" y="0" width="76" height="38" rx="5" fill="#F6DFCE" stroke="#D98A5B" stroke-width="1.2"/>
+                <text y="15" font-weight="800" fill="#B4560E">④ 자연선택</text><text y="27" fill="#5B6B77" font-size="6.2">유리한 변이가 생존·번식</text>
+              </g>
+              <line x1="367" y1="19" x2="377" y2="19" stroke="#C1521E" stroke-width="1.2" marker-end="url(#arrP)"/>
+              <g transform="translate(419,0)">
+                <rect x="-38" y="0" width="76" height="38" rx="5" fill="#C1521E"/>
+                <text y="15" font-weight="800" fill="#fff">⑤ 진화</text><text y="27" fill="#FBEFE7" font-size="6.2">집단의 형질 변화</text>
+              </g>
+            </g>
+            <!-- 두 가설 비교 -->
+            <g transform="translate(235,80)" text-anchor="middle">
+              <rect x="-215" y="0" width="205" height="42" rx="5" fill="#FDF3F0" stroke="#E5B8AC" stroke-width="1"/>
+              <text x="-112" y="14" font-size="7.4" font-weight="800" fill="#B0483A">라마르크 — 용불용설 (기각)</text>
+              <text x="-112" y="26" fill="#5B6B77" font-size="6.4">목을 늘여 쓴 결과가 유전된다?</text>
+              <text x="-112" y="36" fill="#B0483A" font-size="6.4" font-weight="800">→ 후천 형질은 유전되지 않는다</text>
+              <rect x="10" y="0" width="205" height="42" rx="5" fill="#FBEFE7" stroke="#C1521E" stroke-width="1.1"/>
+              <text x="112" y="14" font-size="7.4" font-weight="800" fill="#C1521E">다윈 — 자연선택</text>
+              <text x="112" y="26" fill="#5B6B77" font-size="6.4">목 길이는 원래 다양했다</text>
+              <text x="112" y="36" fill="#C1521E" font-size="6.4" font-weight="800">→ 긴 목 개체가 살아남아 번식했다</text>
+            </g>
+          </g>
+          <text x="235" y="146" text-anchor="middle" font-size="8.8" font-weight="800" fill="#E8940A">환경은 변이를 만들지 않는다 — 이미 있던 변이 중에서 '고를' 뿐이다</text>
+        </svg>
+        <figcaption>그림 2 | 자연선택의 다섯 걸음과 기린의 목 — 두 가설이 갈리는 지점</figcaption>
+      </figure>
+
+      <div class="expoint">
+        <div class="boxtitle"><span class="ico">!</span>시험엔 이렇게</div>
+        <p>단골 함정 두 개 — "노력으로 얻은 형질이 유전된다"(X, 라마르크식), "진화하면 <b>한 개체</b>의 몸이 변한다"(X — 변하는 것은 세대를 거친 <b>집단의 구성</b>이다). 순서도 출제된다: <b>과잉 생산 → 변이 → 경쟁 → 선택 → 진화</b>.</p>
+      </div>
+    </div>
+
+    <div class="wing">
+      <div class="wtitle">날개 노트</div>
+      <div class="term"><b>용불용설</b>자주 쓰는 기관은 발달하고 안 쓰면 퇴화하며, 그 결과가 유전된다는 라마르크의 가설 — 지금은 기각되었다.</div>
+      <div class="term"><b>적응</b>자연선택이 쌓여 생물이 환경에 알맞은 형질을 갖게 되는 것.</div>
+      <div class="wsep"></div>
+      <div class="wtitle">한눈에 암기</div>
+      <div class="wing-pen">과잉 생산 → 변이 → 경쟁<br>→ 자연선택 → 진화<br>선택받는 건 '집단'의 미래!</div>
+    </div>
+  </div>
+  <div class="quickcheck">
+    <span class="qc-title">바로바로 체크</span>
+    <ol>
+      <li><span class="no">1</span>생물은 살아남을 수 있는 수보다 많은 자손을 낳는다. ( O , X )</li>
+      <li><span class="no">2</span>자연선택설에 따르면 환경이 개체에게 필요한 변이를 새로 만들어 준다. ( O , X )</li>
+      <li><span class="no">3</span>진화는 세대를 거치며 집단의 형질 구성이 변하는 것이다. ( O , X )</li>
+    </ol>
+    <div class="qc-ans">정답 1 O 2 X (있던 변이를 고른다) 3 O</div>
+  </div>
+  <div class="folio"><span>I. 변화와 다양성</span><span class="num">24</span></div>
+</div>
+
+<!-- ═════════════ p.25 개념 03 자연선택의 현장 ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag">I. 변화와 다양성</span><span class="lesson-tag">02. 진화와 생물다양성</span></div>
+  <div class="cols">
+    <div class="main">
+      <h3 class="sec"><span class="n">3</span>자연선택의 현장 — 지금도 일어나고 있다</h3>
+      <p class="body">진화는 화석 속 옛날이야기가 아니다. 갈라파고스 제도의 <b>핀치</b>는 섬마다 먹이가 달라, 씨앗을 깨는 두툼한 부리부터 벌레를 집는 가는 부리까지 <b>부리 모양이 다르게 선택</b>되었다 — 다윈에게 결정적 영감을 준 새들이다. 그리고 병원에서는 지금 이 순간에도 자연선택이 진행 중이다. 바로 <span class="kw">항생제 내성 세균</span>이다.</p>
+      <p class="body">순서가 핵심이다. 세균 집단에는 <b>항생제를 만나기 전부터</b> 내성 변이를 가진 개체가 드물게 섞여 있다. 항생제가 투여되면 보통 세균은 죽고, <span class="u-amber">내성 변이를 가진 세균만 살아남아 번식</span>한다 — 항생제라는 환경이 '체'가 되어 집단을 거른 것이다. 항생제가 내성을 <b>만들어 준 것이 아니라</b>, 이미 있던 변이를 <b>골라낸 것</b>. 살충제에 저항성을 갖게 되는 곤충도 똑같은 구조다.</p>
+
+      <figure>
+        <svg width="470" height="150" viewBox="0 0 470 150" font-family="PC Sans">
+          <g font-size="6.8">
+            <text x="235" y="13" text-anchor="middle" font-size="8.4" font-weight="800" fill="#C1521E">항생제 내성 세균의 탄생 — 3막의 드라마</text>
+            <g transform="translate(0,22)" text-anchor="middle">
+              <!-- 1막 -->
+              <g transform="translate(85,0)">
+                <rect x="-70" y="0" width="140" height="92" rx="6" fill="#FBF3ED" stroke="#EBC4AB" stroke-width="1"/>
+                <text y="14" font-size="7.4" font-weight="800" fill="#C1521E">① 투여 전 — 변이가 있다</text>
+                <g transform="translate(0,42)">
+                  <circle cx="-42" cy="-8" r="6" fill="#9DB8CC"/><circle cx="-14" cy="-14" r="6" fill="#9DB8CC"/><circle cx="14" cy="-8" r="6" fill="#9DB8CC"/><circle cx="42" cy="-14" r="6" fill="#9DB8CC"/>
+                  <circle cx="-28" cy="12" r="6" fill="#9DB8CC"/><circle cx="28" cy="12" r="6" fill="#9DB8CC"/>
+                  <circle cx="0" cy="8" r="6" fill="#C1521E"/>
+                </g>
+                <text y="84" fill="#5B6B77" font-size="6.2">대부분 보통 세균, 내성 변이(주황)는 드물다</text>
+              </g>
+              <line x1="160" y1="46" x2="172" y2="46" stroke="#C1521E" stroke-width="1.3" marker-end="url(#arrP)"/>
+              <!-- 2막 -->
+              <g transform="translate(235,0)">
+                <rect x="-56" y="0" width="112" height="92" rx="6" fill="#FDF3F0" stroke="#E5B8AC" stroke-width="1"/>
+                <text y="14" font-size="7.4" font-weight="800" fill="#B0483A">② 항생제 투여</text>
+                <g transform="translate(0,42)">
+                  <g stroke="#B0483A" stroke-width="1.1">
+                    <line x1="-34" y1="-14" x2="-22" y2="-2"/><line x1="-22" y1="-14" x2="-34" y2="-2"/>
+                    <line x1="6" y1="-16" x2="18" y2="-4"/><line x1="18" y1="-16" x2="6" y2="-4"/>
+                    <line x1="-14" y1="8" x2="-2" y2="20"/><line x1="-2" y1="8" x2="-14" y2="20"/>
+                    <line x1="22" y1="6" x2="34" y2="18"/><line x1="34" y1="6" x2="22" y2="18"/>
+                  </g>
+                  <circle cx="0" cy="-10" r="6" fill="#C1521E"/>
+                </g>
+                <text y="84" fill="#5B6B77" font-size="6.2">보통 세균은 죽고 내성균만 남는다</text>
+              </g>
+              <line x1="298" y1="46" x2="310" y2="46" stroke="#C1521E" stroke-width="1.3" marker-end="url(#arrP)"/>
+              <!-- 3막 -->
+              <g transform="translate(385,0)">
+                <rect x="-70" y="0" width="140" height="92" rx="6" fill="#FBEFE7" stroke="#C1521E" stroke-width="1.1"/>
+                <text y="14" font-size="7.4" font-weight="800" fill="#C1521E">③ 살아남은 자의 번식</text>
+                <g transform="translate(0,42)" fill="#C1521E">
+                  <circle cx="-42" cy="-8" r="6"/><circle cx="-14" cy="-14" r="6"/><circle cx="14" cy="-8" r="6"/><circle cx="42" cy="-14" r="6"/>
+                  <circle cx="-28" cy="12" r="6"/><circle cx="0" cy="8" r="6"/><circle cx="28" cy="12" r="6"/>
+                </g>
+                <text y="84" fill="#5B6B77" font-size="6.2">내성균이 집단을 장악 — 약이 듣지 않는다</text>
+              </g>
+            </g>
+          </g>
+          <text x="235" y="144" text-anchor="middle" font-size="8.8" font-weight="800" fill="#E8940A">항생제는 내성을 만들지 않는다 — 이미 있던 내성 변이를 '선택'할 뿐이다</text>
+        </svg>
+        <figcaption>그림 3 | 항생제 내성 세균의 형성 — 변이(재료)에 선택(환경)이 작용한 결과</figcaption>
+      </figure>
+
+      <div class="expoint">
+        <div class="boxtitle"><span class="ico">!</span>시험엔 이렇게</div>
+        <p>"항생제 투여 <b>후</b> 내성이 처음 생겼다"(X — 변이는 투여 <b>전부터</b> 있었다)가 최고 빈출 함정. 의사가 항생제를 <b>처방대로 끝까지</b> 복용하라는 이유도 여기에 있다 — 어중간한 복용은 내성균만 골라 살리는 선택압이 된다.</p>
+      </div>
+    </div>
+
+    <div class="wing">
+      <div class="wtitle">날개 노트</div>
+      <div class="term"><b>핀치</b>갈라파고스 제도의 작은 새. 섬·먹이에 따라 부리 모양이 다르게 진화해 '다윈의 핀치'로 불린다.</div>
+      <div class="term"><b>내성</b>약물이 잘 듣지 않게 되는 성질. 세균 '집단'이 세대를 거치며 얻는다 — 사람 몸이 아니라.</div>
+      <div class="wsep"></div>
+      <div class="wtitle">한눈에 암기</div>
+      <div class="wing-pen">변이 먼저, 선택은 나중!<br>항생제 = 고르는 체<br>핀치 부리 = 먹이가 조각</div>
+    </div>
+  </div>
+  <div class="quickcheck">
+    <span class="qc-title">바로바로 체크</span>
+    <ol>
+      <li><span class="no">1</span>내성 변이를 가진 세균은 항생제 투여 전부터 집단에 있었다. ( O , X )</li>
+      <li><span class="no">2</span>핀치의 부리 모양 차이는 먹이 환경에 따른 자연선택의 결과다. ( O , X )</li>
+      <li><span class="no">3</span>항생제가 세균에게 내성 유전자를 새로 만들어 준다. ( O , X )</li>
+    </ol>
+    <div class="qc-ans">정답 1 O 2 O 3 X (있던 변이를 고른다)</div>
+  </div>
+  <div class="folio"><span>I. 변화와 다양성</span><span class="num">25</span></div>
+</div>
+
+<!-- ═════════════ p.26 개념 04 생물다양성 ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag">I. 변화와 다양성</span><span class="lesson-tag">02. 진화와 생물다양성</span></div>
+  <div class="cols">
+    <div class="main">
+      <h3 class="sec"><span class="n">4</span>생물다양성 — 세 개의 층으로 읽는다</h3>
+      <p class="body">변이가 생기고, 환경이 고르고, 세대가 쌓이는 일이 수십억 년 반복된 결과 — 지구는 지금의 다채로운 생명으로 채워졌다. 이 풍요로움을 <span class="kw">생물다양성</span>이라 하며, 세 개의 층으로 나누어 본다. 첫째 층은 <span class="kw">유전적 다양성</span> — <b>같은 종 안</b>에서 유전자(변이)가 얼마나 다양한가다. 무당벌레의 갖가지 무늬가 그 얼굴이다.</p>
+      <p class="body">둘째 층은 <span class="kw">종 다양성</span> — 한 생태계 안에 <b>종이 얼마나 많고, 고르게 분포하는가</b>다. 종 수가 같아도 한 종이 독차지한 숲보다 여러 종이 고루 사는 숲의 종 다양성이 높다. 셋째 층은 <span class="kw">생태계 다양성</span> — 숲·갯벌·사막·강처럼 <b>생태계 자체의 다양함</b>이다. 세 층은 연결되어 있다. <span class="u-amber">유전적 다양성이 높은 종일수록 환경이 급변해도 살아남는 개체가 있을 가능성이 크고</span>, 다양한 생태계가 다양한 종을 품는다.</p>
+
+      <figure>
+        <svg width="470" height="148" viewBox="0 0 470 148" font-family="PC Sans">
+          <g font-size="6.8">
+            <text x="235" y="13" text-anchor="middle" font-size="8.4" font-weight="800" fill="#C1521E">생물다양성의 세 층</text>
+            <g transform="translate(0,22)" text-anchor="middle">
+              <g transform="translate(85,0)">
+                <rect x="-70" y="0" width="140" height="96" rx="6" fill="#FBEFE7" stroke="#EBC4AB" stroke-width="1"/>
+                <text y="15" font-size="7.6" font-weight="800" fill="#C1521E">유전적 다양성</text>
+                <text y="26" fill="#5B6B77" font-size="6.2">같은 종 안의 유전자 차이</text>
+                <g transform="translate(0,52)">
+                  <circle cx="-34" cy="0" r="9" fill="#E85D3A"/><circle cx="-11" cy="0" r="9" fill="#E8940A"/><circle cx="12" cy="0" r="9" fill="#3B3B3B"/><circle cx="35" cy="0" r="9" fill="#D98A5B"/>
+                </g>
+                <text y="84" fill="#5B6B77" font-size="6.2">무당벌레 무늬 · 사람 눈동자 색</text>
+              </g>
+              <g transform="translate(235,0)">
+                <rect x="-70" y="0" width="140" height="96" rx="6" fill="#FBEFE7" stroke="#EBC4AB" stroke-width="1"/>
+                <text y="15" font-size="7.6" font-weight="800" fill="#C1521E">종 다양성</text>
+                <text y="26" fill="#5B6B77" font-size="6.2">종의 수 + 분포의 고름</text>
+                <g transform="translate(0,52)" stroke-width="1.2" fill="none">
+                  <circle cx="-32" cy="-6" r="7" fill="#D98A5B"/>
+                  <rect x="-10" y="-13" width="14" height="14" rx="2" fill="#7FA86B"/>
+                  <path d="M22,1 l8,-14 l8,14 z" fill="#9DB8CC"/>
+                  <circle cx="-14" cy="12" r="5" fill="#C9A227"/>
+                  <rect x="8" y="8" width="10" height="10" rx="2" fill="#B0483A"/>
+                </g>
+                <text y="84" fill="#5B6B77" font-size="6.2">여러 종이 '고르게' 살수록 높다</text>
+              </g>
+              <g transform="translate(385,0)">
+                <rect x="-70" y="0" width="140" height="96" rx="6" fill="#FBEFE7" stroke="#EBC4AB" stroke-width="1"/>
+                <text y="15" font-size="7.6" font-weight="800" fill="#C1521E">생태계 다양성</text>
+                <text y="26" fill="#5B6B77" font-size="6.2">생태계 자체의 다양함</text>
+                <g transform="translate(0,52)" text-anchor="middle" font-size="6.2">
+                  <path d="M-52,8 q10,-22 22,0 z" fill="#7FA86B"/><text x="-41" y="18" fill="#5B6B77">숲</text>
+                  <path d="M-18,8 h28 q-4,-8 -14,-8 q-10,0 -14,8 z" fill="#C9B48A"/><text x="-4" y="18" fill="#5B6B77">갯벌</text>
+                  <path d="M22,8 q7,-14 14,0 q7,-14 14,0 z" fill="#E0C068"/><text x="47" y="18" fill="#5B6B77">사막</text>
+                </g>
+                <text y="84" fill="#5B6B77" font-size="6.2">숲·갯벌·사막·강·바다…</text>
+              </g>
+            </g>
+          </g>
+          <text x="235" y="142" text-anchor="middle" font-size="8.8" font-weight="800" fill="#E8940A">유전자 → 종 → 생태계 — 세 층이 함께 높아야 진짜 '다양한' 지구다</text>
+        </svg>
+        <figcaption>그림 4 | 생물다양성의 세 층 — 층마다 '무엇의 다양함'인지가 다르다</figcaption>
+      </figure>
+
+      <div class="expoint">
+        <div class="boxtitle"><span class="ico">!</span>시험엔 이렇게</div>
+        <p>층 바꿔치기가 단골 — "생태계 다양성은 한 생태계 안의 <b>종의 수</b>"(X — 그건 종 다양성, 생태계 다양성은 <b>생태계 자체</b>의 다양함). "종 수만 많으면 종 다양성이 높다"(X — <b>분포의 고름</b>까지 봐야 한다).</p>
+      </div>
+    </div>
+
+    <div class="wing">
+      <div class="wtitle">날개 노트</div>
+      <div class="term"><b>생물다양성</b>일정한 생태계에 존재하는 생물의 다양한 정도 — 유전자·종·생태계의 세 수준을 아우른다.</div>
+      <div class="term"><b>분포의 고름</b>전체 개체 수에서 각 종이 차지하는 비율이 균등한 정도. 종 다양성의 숨은 조건.</div>
+      <div class="wsep"></div>
+      <div class="wtitle">한눈에 암기</div>
+      <div class="wing-pen">유전적 = 종 안의 다름<br>종 = 많고 + 고르게<br>생태계 = 서식지의 다양함</div>
+    </div>
+  </div>
+  <div class="quickcheck">
+    <span class="qc-title">바로바로 체크</span>
+    <ol>
+      <li><span class="no">1</span>무당벌레의 다양한 무늬는 유전적 다양성의 예다. ( O , X )</li>
+      <li><span class="no">2</span>종 수가 같다면 분포가 고를수록 종 다양성이 높다. ( O , X )</li>
+      <li><span class="no">3</span>생태계 다양성은 한 생태계 안의 종의 수를 뜻한다. ( O , X )</li>
+    </ol>
+    <div class="qc-ans">정답 1 O 2 O 3 X (생태계 자체의 다양함)</div>
+  </div>
+  <div class="folio"><span>I. 변화와 다양성</span><span class="num">26</span></div>
+</div>
+
+<!-- ═════════════ p.27 개념 05 중요성과 보전 ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag">I. 변화와 다양성</span><span class="lesson-tag">02. 진화와 생물다양성</span></div>
+  <div class="cols">
+    <div class="main">
+      <h3 class="sec"><span class="n">5</span>다양성이 무너지면 — 바나나의 경고</h3>
+      <p class="body">생물다양성은 왜 지켜야 할까. 첫째, <b>생태계의 안정</b> — 먹이 관계가 복잡하게 얽힌 생태계일수록 한 종이 사라져도 다른 경로가 버텨 준다. 둘째, <b>인류의 자원</b> — 식량·의약품·유전자원이 모두 생물에서 온다. 푸른곰팡이에서 페니실린이, 주목이라는 나무에서 항암제의 원료가 나왔다. 아직 연구되지 않은 종은 <b>아직 열어 보지 않은 서랍</b>이다.</p>
+      <p class="body">유전적 다양성이 무너지면 어떻게 되는지는 <b>바나나</b>가 보여 준다. 오늘날 수출용 바나나는 대부분 유전적으로 거의 동일한 <b>캐번디시 단일 품종</b> — 씨 없이 꺾꽂이로 번식시키기 때문이다. 변이가 없으니 <span class="u-amber">하나의 전염병이 뚫으면 집단 전체가 함께 무너진다</span>. 실제로 과거의 주력 품종 '그로 미셸'은 파나마병으로 몰락해 캐번디시로 교체되었고, 그 캐번디시도 지금 신종 파나마병의 위협을 받고 있다. 서식지 파괴·남획·외래종·오염·기후변화로 다양성이 줄어드는 지금, 보전은 감상이 아니라 <b>생존 전략</b>이다.</p>
+
+      <div class="gist" style="margin:2.8mm 0 4mm; padding:2.2mm 1.8mm 2mm;">
+        <div class="boxtitle"><span class="ico">알</span>알짜 정리 — 진화와 생물다양성 한 장 요약</div>
+        <ul>
+          <li><b>변이</b>(돌연변이+유성 생식) = 진화의 재료 — 유전되는 변이만 전달된다</li>
+          <li><b>자연선택</b>: 과잉 생산 → 변이 → 경쟁 → 유리한 변이의 생존·번식 → 집단이 변한다(진화)</li>
+          <li>현장: 핀치 부리·항생제 내성 — <b>변이가 먼저, 환경은 고를 뿐</b></li>
+          <li><b>생물다양성</b> 3층(유전자·종·생태계) — 유전적 다양성이 낮으면 전염병 하나에 무너진다(바나나)</li>
+        </ul>
+      </div>
+
+      <div class="saem">
+        <div class="avatar">박찬<br>쌤</div>
+        <div class="bubble"><span class="pen">"'다양성 보전'은 착한 일이라서가 아니라 — 미래의 약과 밥이 그 안에 들어 있어서다. 서랍을 태우면서 보물찾기를 할 수는 없다."</span></div>
+      </div>
+    </div>
+
+    <div class="wing">
+      <div class="wtitle">날개 노트</div>
+      <div class="term"><b>캐번디시 바나나</b>씨 없이 꺾꽂이(무성 생식)로 늘린 품종 — 전 세계 어디서나 유전자가 거의 같다.</div>
+      <div class="term"><b>파나마병</b>곰팡이가 일으키는 바나나 전염병. 1950년대 '그로 미셸' 품종을 몰락시킨 실제 사건.</div>
+      <div class="wsep"></div>
+      <div class="wtitle">한눈에 암기</div>
+      <div class="wing-pen">다양성 = 안정 + 자원<br>단일 품종 = 유리 성<br>감소 5적: 서식지·남획·외래종·오염·기후</div>
+      <div class="wsep"></div>
+      <div class="review">
+        <div class="rv-title">앞 소단원과 연결</div>
+        <div class="term" style="margin-bottom:0;"><b>대멸종 (01)</b>환경 급변 때 살아남는 것은 '다양한 변이를 품은' 집단이었다 — 여섯 번째 대멸종 경고와 이어진다.</div>
+      </div>
+    </div>
+  </div>
+  <div class="quickcheck">
+    <span class="qc-title">바로바로 체크</span>
+    <ol>
+      <li><span class="no">1</span>먹이 관계가 복잡한 생태계일수록 평형이 잘 유지된다. ( O , X )</li>
+      <li><span class="no">2</span>캐번디시 바나나 집단은 유전적 다양성이 높다. ( O , X )</li>
+      <li><span class="no">3</span>생물다양성은 의약품 등 인류의 자원이 된다. ( O , X )</li>
+    </ol>
+    <div class="qc-ans">정답 1 O 2 X (거의 동일 — 그래서 위험) 3 O</div>
+  </div>
+  <div class="folio"><span>I. 변화와 다양성</span><span class="num">27</span></div>
+</div>
+
+<!-- ═════════════ p.28 자료 파헤치기 ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag">I. 변화와 다양성</span><span class="lesson-tag">02. 진화와 생물다양성</span></div>
+  <div class="lab">
+    <div class="lab-head">자료 파헤치기 <span class="tag">탐구·자료 분석</span> <span style="font-weight:600; font-size:9.5pt; margin-left:auto;">가뭄이 고른 부리 — 갈라파고스 핀치</span></div>
+    <div class="lab-body">
+      <h4>자료</h4>
+      <p>그랜트 부부는 갈라파고스의 작은 섬 대프니 메이저에서 중형 땅핀치를 수십 년간 추적했다. <b>1977년 큰 가뭄</b>으로 작고 부드러운 씨앗이 바닥나고 크고 단단한 씨앗만 남자, 핀치의 다수가 굶어 죽었다 — 그런데 <b>살아남은 새들은 평균적으로 부리가 더 컸다</b>. 가뭄 전 집단의 평균 부리 깊이는 약 9.4 mm, 가뭄을 넘긴 생존자들의 다음 세대는 평균 약 9.7 mm였다.</p>
+      <figure>
+        <svg width="430" height="118" viewBox="0 0 430 118" font-family="PC Sans">
+          <g font-size="6.8">
+            <line x1="40" y1="92" x2="400" y2="92" stroke="#5B6B77" stroke-width="1.1" marker-end="url(#arrP)"/>
+            <line x1="40" y1="92" x2="40" y2="14" stroke="#5B6B77" stroke-width="1.1" marker-end="url(#arrP)"/>
+            <text x="398" y="104" text-anchor="end" fill="#5B6B77">부리 깊이 (mm)</text>
+            <text x="46" y="14" fill="#5B6B77">개체 수 비율</text>
+            <!-- 가뭄 전 분포 -->
+            <path d="M70,90 q60,-64 120,0" fill="none" stroke="#9DB8CC" stroke-width="2"/>
+            <line x1="130" y1="90" x2="130" y2="34" stroke="#9DB8CC" stroke-width="1" stroke-dasharray="2.5 2"/>
+            <text x="130" y="28" text-anchor="middle" font-weight="800" fill="#5B7A96">가뭄 전 평균 9.4</text>
+            <!-- 다음 세대 분포 -->
+            <path d="M150,90 q60,-64 120,0" fill="none" stroke="#C1521E" stroke-width="2.2"/>
+            <line x1="210" y1="90" x2="210" y2="34" stroke="#C1521E" stroke-width="1" stroke-dasharray="2.5 2"/>
+            <text x="216" y="28" text-anchor="middle" font-weight="800" fill="#C1521E">가뭄 후 세대 평균 9.7</text>
+            <line x1="136" y1="52" x2="204" y2="52" stroke="#D6455D" stroke-width="1.6" marker-end="url(#arrR)"/>
+            <text x="170" y="46" text-anchor="middle" font-weight="800" fill="#D6455D">평균의 이동</text>
+            <g fill="#5B6B77" text-anchor="middle">
+              <text x="130" y="102">9.4</text><text x="210" y="102">9.7</text>
+            </g>
+            <text x="330" y="52" text-anchor="middle" fill="#5B6B77" font-size="6.4">단단한 씨앗만 남은 환경에서</text>
+            <text x="330" y="62" text-anchor="middle" fill="#5B6B77" font-size="6.4">큰 부리 개체가 더 많이 생존·번식</text>
+          </g>
+        </svg>
+      </figure>
+      <h4>해석의 3단계</h4>
+      <ol>
+        <li><b>변이가 먼저 있었다</b> — 가뭄 전에도 부리 깊이는 개체마다 달랐다(분포 곡선의 '폭'이 그 증거다). 가뭄이 변이를 만든 것이 아니다.</li>
+        <li><b>환경이 골랐다</b> — 단단한 씨앗만 남은 환경에서는 큰 부리가 생존에 유리했다. 가뭄이 '체'의 역할을 했다.</li>
+        <li><b>집단의 평균이 이동했다</b> — 살아남은 큰 부리 개체들이 남긴 다음 세대의 평균이 9.4 → 9.7 mm로 커졌다. 개체의 부리가 자란 것이 아니라 <b>집단의 구성이 바뀐 것</b> — 이것이 진화다.</li>
+      </ol>
+      <h4>결론</h4>
+      <p>진화는 수백만 년짜리 과거형만이 아니라 <b>관찰 가능한 현재진행형</b>이다. 그리고 한 번의 가뭄으로도 측정될 만큼, 변이·선택·세대라는 세 부품만 있으면 어디서든 돌아간다.</p>
+      <div class="expoint">
+        <div class="boxtitle"><span class="ico">!</span>시험엔 이렇게</div>
+        <p>그래프 문제의 판정 기준: <b>곡선의 폭 = 변이</b>, <b>평균의 이동 = 자연선택의 결과</b>. "개체들의 부리가 자라서"라는 선지가 나오면 X — 변한 것은 개체가 아니라 <b>집단의 구성</b>이다.</p>
+      </div>
+    </div>
+  </div>
+  <div class="folio"><span>I. 변화와 다양성</span><span class="num">28</span></div>
+</div>
+
+<!-- ═════════════ p.29 STEP 1 + STEP 2 시작 ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag">I. 변화와 다양성</span><span class="lesson-tag">02. 진화와 생물다양성 | 문제</span></div>
+  <div class="step-head"><span class="stepno">STEP 1</span><span class="steptt">개념 확인</span><span class="stepdesc">OX와 빈칸으로 개념 점검 — 막히면 알짜 정리로!</span></div>
+  <div class="qgrid">
+    <div>
+      <div class="q"><div class="qhead"><span class="qno">1</span><div class="stem">진화는 개체가 노력으로 얻은 형질이 자손에게 전달되어 일어난다. <span class="ox-answer">( O , X )</span></div></div></div>
+      <div class="q"><div class="qhead"><span class="qno">2</span><div class="stem">유전적 변이는 돌연변이나 유성 생식 과정에서 만들어진다. <span class="ox-answer">( O , X )</span></div></div></div>
+      <div class="q"><div class="qhead"><span class="qno">3</span><div class="stem">생물다양성에는 유전적·종·생태계 다양성이 모두 포함된다. <span class="ox-answer">( O , X )</span></div></div></div>
+    </div>
+    <div>
+      <div class="q"><div class="qhead"><span class="qno">4</span><div class="stem">같은 종의 개체 사이에서 나타나는 형질의 차이를 <span class="blankline" style="min-width:12mm;"></span>라 한다.</div></div></div>
+      <div class="q"><div class="qhead"><span class="qno">5</span><div class="stem">환경에 유리한 변이를 가진 개체가 살아남아 자손을 남기는 과정을 <span class="blankline" style="min-width:16mm;"></span>이라 한다.</div></div></div>
+      <div class="q"><div class="qhead"><span class="qno">6</span><div class="stem">같은 종 안에서 유전자가 다양한 정도를 <span class="blankline" style="min-width:14mm;"></span> 다양성이라 한다.</div></div></div>
+    </div>
+  </div>
+  <div style="border-top:0.5mm solid var(--line); margin:2mm 0 4mm;"></div>
+  <div class="step-head s2"><span class="stepno">STEP 2</span><span class="steptt">내신 완성</span><span class="stepdesc">학교 시험 유형 그대로 — 서술형까지 한 번에</span></div>
+  <div class="q">
+    <div class="qhead"><span class="qno">7</span><div class="stem">자연선택에 의한 진화에 대한 설명으로 옳은 것은? <span class="difficulty">●●○</span>
+    <div class="tags">10통과2-01-02 | 개념 2</div></div></div>
+    <ul class="choices">
+      <li>① 생물은 살아가는 동안 얻은 형질을 자손에게 물려준다.</li>
+      <li>② 변이는 자연선택이 일어난 뒤에 새로 만들어진다.</li>
+      <li>③ 진화가 일어나면 한 개체의 형질이 일생 동안 변한다.</li>
+      <li>④ 환경에 유리한 변이를 가진 개체가 살아남아 더 많은 자손을 남긴다.</li>
+      <li>⑤ 한 종의 개체들은 모두 같은 형질을 갖고 태어난다.</li>
+    </ul>
+  </div>
+  <div class="q">
+    <div class="qhead"><span class="qno">8</span><div class="stem">변이에 대한 설명으로 옳은 것은? <span class="difficulty">●●○</span>
+    <div class="tags">10통과2-01-02 | 개념 1</div></div></div>
+    <ul class="choices">
+      <li>① 유전적 변이는 돌연변이나 유성 생식 과정에서 생긴다.</li>
+      <li>② 같은 종의 개체들 사이에는 형질의 차이가 없다.</li>
+      <li>③ 운동으로 커진 근육은 자손에게 유전되는 변이다.</li>
+      <li>④ 변이는 진화와 관계가 없다.</li>
+      <li>⑤ 변이는 서로 다른 종 사이의 형질 차이를 말한다.</li>
+    </ul>
+  </div>
+  <div class="folio"><span>I. 변화와 다양성</span><span class="num">29</span></div>
+</div>
+
+<!-- ═════════════ p.30 STEP 2 계속 ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag">I. 변화와 다양성</span><span class="lesson-tag">02. 진화와 생물다양성 | 문제</span></div>
+  <div class="q">
+    <div class="qhead"><span class="qno">9</span><div class="stem"><span class="badge-data">자료</span>다음은 항생제 내성 세균 집단이 형성되는 과정이다. 이에 대한 설명으로 옳은 것은?<br>
+    (세균 집단에 변이 존재 → 항생제 투여 → 내성 없는 세균 죽음 → 내성 세균이 번식하여 집단 장악) <span class="difficulty">●●●</span>
+    <div class="tags">10통과2-01-02 | 개념 3</div></div></div>
+    <ul class="choices">
+      <li>① 항생제가 세균에게 내성을 새로 만들어 주었다.</li>
+      <li>② 내성 세균은 항생제 투여 후에 처음 생겨났다.</li>
+      <li>③ 항생제 투여 전 세균 집단에는 변이가 없었다.</li>
+      <li>④ 내성 세균의 증가는 용불용설로 설명된다.</li>
+      <li>⑤ 항생제가 환경이 되어, 내성 변이를 가진 세균이 자연선택되었다.</li>
+    </ul>
+  </div>
+  <div class="q">
+    <div class="qhead"><span class="qno">10</span><div class="stem">생물다양성에 대한 설명으로 옳은 것만을 고른 것은? <span class="difficulty">●●●</span>
+    <div class="tags">10통과2-01-02 | 개념 4</div></div></div>
+    <div class="bogi-box" style="background:#fff;">
+      (가) 유전적 다양성이 높은 종은 환경이 급변해도 살아남을 가능성이 크다.<br>
+      (나) 종 다양성은 종의 수가 많고 분포가 고를수록 높다.<br>
+      (다) 생태계 다양성은 한 생태계 안에 사는 종의 수를 뜻한다.
+    </div>
+    <ul class="choices inline">
+      <li>① (가)</li><li>② (다)</li><li>③ (가), (나)</li><li>④ (나), (다)</li><li>⑤ (가), (나), (다)</li>
+    </ul>
+  </div>
+  <div class="q">
+    <div class="qhead"><span class="qno">11</span><div class="stem"><span class="badge-essay">서술형</span>항생제를 오·남용하면 항생제가 듣지 않는 세균 집단이 만들어질 수 있는 까닭을 <b>'변이'와 '자연선택'</b>이라는 말을 포함하여 서술하시오. <span class="difficulty">●●●●</span>
+    <div class="tags">10통과2-01-02 | 개념 3</div></div></div>
+    <div class="essay-lines"><div></div><div></div><div></div></div>
+  </div>
+  <div class="folio"><span>I. 변화와 다양성</span><span class="num">30</span></div>
+</div>
+
+<!-- ═════════════ p.31 STEP 3 ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag">I. 변화와 다양성</span><span class="lesson-tag">02. 진화와 생물다양성 | 문제</span></div>
+  <div class="step-head s3"><span class="stepno">STEP 3</span><span class="steptt">수능 도전</span><span class="stepdesc">2028 수능 규격 — ㄱㄴㄷ 합답형·자료 해석</span></div>
+  <div class="q">
+    <div class="qhead"><span class="qno">12</span><div class="stem"><span class="badge-data">자료</span>그림은 어느 섬의 핀치 집단에서 가뭄 전 집단과 가뭄 후 다음 세대의 부리 깊이 분포를 나타낸 것이다. 가뭄 동안 작고 부드러운 씨앗이 사라지고 크고 단단한 씨앗만 남았다. 옳은 것만을 &lt;보기&gt;에서 있는 대로 고른 것은? <span class="difficulty">[2점]</span>
+    <div class="tags">10통과2-01-02</div></div></div>
+    <figure style="margin:2mm 0 1mm 8.6mm;">
+      <svg width="280" height="96" viewBox="0 0 280 96" font-family="PC Sans">
+        <line x1="26" y1="76" x2="270" y2="76" stroke="#5B6B77" stroke-width="1.1" marker-end="url(#arrP)"/>
+        <line x1="26" y1="76" x2="26" y2="10" stroke="#5B6B77" stroke-width="1.1" marker-end="url(#arrP)"/>
+        <text x="268" y="88" text-anchor="end" font-size="6.6" fill="#5B6B77">부리 깊이</text>
+        <text x="30" y="10" font-size="6.6" fill="#5B6B77">개체 수 비율</text>
+        <path d="M46,74 q38,-52 76,0" fill="none" stroke="#9DB8CC" stroke-width="1.8"/>
+        <path d="M110,74 q38,-52 76,0" fill="none" stroke="#C1521E" stroke-width="2"/>
+        <text x="84" y="30" text-anchor="middle" font-size="6.6" font-weight="800" fill="#5B7A96">가뭄 전</text>
+        <text x="150" y="20" text-anchor="middle" font-size="6.6" font-weight="800" fill="#C1521E">가뭄 후 세대</text>
+        <line x1="90" y1="52" x2="140" y2="52" stroke="#D6455D" stroke-width="1.4" marker-end="url(#arrR)"/>
+      </svg>
+    </figure>
+    <div class="bogi-box">
+      <div class="bt">보기</div>
+      ㄱ. 가뭄 전 핀치 집단에는 부리 깊이의 변이가 있었다.<br>
+      ㄴ. 가뭄이라는 환경 변화가 부리가 큰 개체를 선택했다.<br>
+      ㄷ. 가뭄 동안 각 개체의 부리가 점점 자라나 커진 것이다.
+    </div>
+    <ul class="choices inline">
+      <li>① ㄱ</li><li>② ㄷ</li><li>③ ㄱ, ㄷ</li><li>④ ㄴ, ㄷ</li><li>⑤ ㄱ, ㄴ</li>
+    </ul>
+  </div>
+  <div class="q">
+    <div class="qhead"><span class="qno">13</span><div class="stem"><span class="badge-data">자료</span>다음은 바나나 재배에 대한 자료다. 옳은 것만을 &lt;보기&gt;에서 있는 대로 고른 것은? <span class="difficulty">[2.5점]</span>
+    <div class="tags">10통과2-01-02</div></div></div>
+    <div class="bogi-box" style="background:#fff;">
+      오늘날 수출용 바나나는 대부분 씨 없이 꺾꽂이로 번식시킨, 유전적으로 거의 동일한 캐번디시 단일 품종이다. 과거의 주력이던 '그로 미셸' 품종은 곰팡이 전염병(파나마병)으로 몰락하였다.
+    </div>
+    <div class="bogi-box">
+      <div class="bt">보기</div>
+      ㄱ. 캐번디시 바나나 집단은 유전적 다양성이 매우 낮다.<br>
+      ㄴ. 유전적으로 동일한 집단은 하나의 전염병에 집단 전체가 무너질 수 있다.<br>
+      ㄷ. 품종을 다양하게 재배하는 것은 생물다양성 보전과 무관하다.
+    </div>
+    <ul class="choices inline">
+      <li>① ㄱ</li><li>② ㄱ, ㄴ</li><li>③ ㄴ</li><li>④ ㄴ, ㄷ</li><li>⑤ ㄱ, ㄴ, ㄷ</li>
+    </ul>
+  </div>
+  <div class="folio"><span>I. 변화와 다양성</span><span class="num">31</span></div>
+</div>
+
+<!-- ═════════════ p.32 해설 1 ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag" style="color:var(--brand);">알짜 해설</span><span class="lesson-tag">02. 진화와 생물다양성</span></div>
+  <div class="sol-head"><span class="stt">알짜 해설</span><span class="sub">전 문항 해설 + 오답 선지 분석 — 맞힌 문제도 해설로 한 번 더!</span></div>
+  <table class="anstable">
+    <tr><th>문항</th><td>1</td><td>2</td><td>3</td><td>4</td><td>5</td><td>6</td><td>7</td><td>8</td><td>9</td><td>10</td><td>11</td><td>12</td><td>13</td></tr>
+    <tr><th>정답</th><td class="a">X</td><td class="a">O</td><td class="a">O</td><td class="a">변이</td><td class="a">자연선택</td><td class="a">유전적</td><td class="a">④</td><td class="a">①</td><td class="a">⑤</td><td class="a">③</td><td class="a">서술형</td><td class="a">⑤</td><td class="a">②</td></tr>
+  </table>
+  <div class="solcols">
+    <div>
+      <div class="sol"><div class="shead"><span class="sno">1</span><span class="sans">X</span><span class="slink">개념 2</span></div>
+        <p>노력으로 얻은 형질의 유전은 라마르크의 용불용설 — 기각된 설명이다.</p></div>
+      <div class="sol"><div class="shead"><span class="sno">2</span><span class="sans">O</span><span class="slink">개념 1</span></div>
+        <p>돌연변이가 재료를 만들고, 유성 생식이 재료를 섞는다.</p></div>
+      <div class="sol"><div class="shead"><span class="sno">3</span><span class="sans">O</span><span class="slink">개념 4</span></div>
+        <p>유전자 → 종 → 생태계, 세 층이 모두 생물다양성이다.</p></div>
+      <div class="sol"><div class="shead"><span class="sno">4</span><span class="sans">변이</span><span class="slink">개념 1</span></div>
+        <p>같은 종 안의 '서로 다름' — 진화의 재료.</p></div>
+      <div class="sol"><div class="shead"><span class="sno">5</span><span class="sans">자연선택</span><span class="slink">개념 2</span></div>
+        <p>환경에 유리한 변이의 생존·번식 — 다윈의 핵심 개념.</p></div>
+      <div class="sol"><div class="shead"><span class="sno">6</span><span class="sans">유전적</span><span class="slink">개념 4</span></div>
+        <p>같은 종 안의 유전자 다양함 = 유전적 다양성.</p></div>
+    </div>
+    <div>
+      <div class="sol"><div class="shead"><span class="sno">7</span><span class="sans">④</span><span class="slink">개념 2</span></div>
+        <p>자연선택의 정의 그대로 — 유리한 변이가 살아남아 더 많이 번식한다.</p>
+        <div class="wrongbox"><div class="wt">오답 왜 틀렸나</div>
+          <p><b>①</b> 후천 형질은 유전 안 됨(라마르크식). <b>②</b> 변이가 먼저, 선택이 나중. <b>③</b> 변하는 건 개체가 아니라 집단. <b>⑤</b> 변이가 있기에 선택이 가능하다.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">8</span><span class="sans">①</span><span class="slink">개념 1</span></div>
+        <p>유전적 변이의 두 경로 — 돌연변이와 유성 생식의 유전자 조합.</p>
+        <div class="wrongbox"><div class="wt">오답 왜 틀렸나</div>
+          <p><b>②</b> 개체마다 다르다. <b>③</b> 후천적 차이는 유전 안 됨. <b>④</b> 변이는 진화의 재료. <b>⑤</b> 변이는 '같은 종 안'의 차이다.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">9</span><span class="sans">⑤</span><span class="slink">개념 3</span></div>
+        <p>항생제 = 선택의 체. 이미 있던 내성 변이가 살아남아 번식했다.</p>
+        <div class="wrongbox"><div class="wt">오답 왜 틀렸나</div>
+          <p><b>①·②·③</b> 내성 변이는 투여 <b>전부터</b> 있었다 — 최고 빈출 함정. <b>④</b> 용불용설이 아니라 자연선택이다.</p></div></div>
+    </div>
+  </div>
+  <div class="folio"><span>알짜 해설</span><span class="num">32</span></div>
+</div>
+
+<!-- ═════════════ p.33 해설 2 ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag" style="color:var(--brand);">알짜 해설</span><span class="lesson-tag">02. 진화와 생물다양성</span></div>
+  <div class="solcols">
+    <div>
+      <div class="sol"><div class="shead"><span class="sno">10</span><span class="sans">③</span><span class="slink">개념 4</span></div>
+        <p>(가) 변이가 다양할수록 급변에도 살아남을 개체가 있다. (나) 종 다양성 = 종 수 + 분포의 고름 — 둘 다 옳다.</p>
+        <div class="wrongbox"><div class="wt">오답 왜 틀렸나</div>
+          <p><b>(다)</b> 한 생태계 안 종의 수는 종 다양성 — 생태계 다양성은 생태계 <b>자체</b>의 다양함이다.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">11</span><span class="sans">모범 답안</span><span class="slink">개념 3</span></div>
+        <p>세균 집단에는 항생제에 견디는 <b>변이</b>를 가진 개체가 이미 존재한다. 항생제를 오·남용하면 내성 없는 세균은 죽고 내성 변이를 가진 세균만 살아남아 번식하는 <b>자연선택</b>이 일어나므로, 세대를 거치며 항생제가 듣지 않는 세균 집단이 형성된다.</p>
+        <div class="wrongbox"><div class="wt">채점 기준 (감점 포인트)</div>
+          <p>① 내성 변이가 <b>미리</b> 존재 ② 항생제에 의한 선택(내성균만 생존·번식) ③ 세대 반복으로 집단 형성 — "항생제가 내성을 만들었다"고 쓰면 감점.</p></div></div>
+    </div>
+    <div>
+      <div class="sol"><div class="shead"><span class="sno">12</span><span class="sans">⑤</span><span class="slink">개념 3·자료 | 2점</span></div>
+        <p><b>ㄱ (옳음)</b> 가뭄 전 분포 곡선의 '폭'이 변이의 증거다. <b>ㄴ (옳음)</b> 단단한 씨앗만 남은 환경이 큰 부리를 골랐다. <b>ㄷ (틀림)</b> 개체의 부리가 자란 게 아니라 집단의 구성이 바뀌었다.</p>
+        <div class="wrongbox"><div class="wt">함정 체크</div>
+          <p>분포 그래프에서 <b>폭 = 변이, 평균 이동 = 선택의 결과</b> — 이 두 줄만 기억하면 끝.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">13</span><span class="sans">②</span><span class="slink">개념 5 | 2.5점</span></div>
+        <p><b>ㄱ (옳음)</b> 꺾꽂이(무성 생식)로 늘렸으니 유전자가 거의 같다. <b>ㄴ (옳음)</b> 그로 미셸의 몰락이 실제 사례다. <b>ㄷ (틀림)</b> 품종의 다양화는 유전적 다양성을 높이는 보전 활동이다.</p>
+        <div class="wrongbox"><div class="wt">함정 체크</div>
+          <p>바나나 자료는 <b>유전적 다양성</b> 층을 묻는 문제다 — 종 다양성과 헷갈리지 말 것.</p></div></div>
+
+      <div class="gist" style="margin-top:5mm;">
+        <div class="boxtitle"><span class="ico">알</span>이 소단원, 이것만은!</div>
+        <ul>
+          <li><b>변이</b>(돌연변이+유성 생식)가 먼저 — 환경은 만들지 않고 <b>고른다</b></li>
+          <li>자연선택 5단계: <b>과잉 생산 → 변이 → 경쟁 → 선택 → 진화</b> (변하는 건 집단!)</li>
+          <li>생물다양성 3층: <b>유전자·종·생태계</b> — 단일 품종(바나나)의 교훈을 기억하라</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div class="folio"><span>알짜 해설</span><span class="num">33</span></div>
+</div>
+
+<!-- ═════════════ p.34 MEMO ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag">I. 변화와 다양성</span><span class="lesson-tag">02 ▸ 03 넘어가기 전에</span></div>
+  <div class="memo-head"><span class="mt">MEMO</span><span class="ms">헷갈린 개념, 다시 틀린 문제 번호, 나만의 암기법을 남겨 두는 자리</span></div>
+  <div class="memo-area"></div>
+  <div class="memo-pen">"'과잉 생산 → 변이 → 경쟁 → 선택 → 진화' 다섯 걸음을 핀치와 세균으로 각각 말해 보자. 막히면 24쪽으로! — 박찬쌤"</div>
+  <div class="folio"><span>박찬 과학 | 통합과학 2</span><span class="num">34</span></div>
+</div>
+
+</body>
+</html>

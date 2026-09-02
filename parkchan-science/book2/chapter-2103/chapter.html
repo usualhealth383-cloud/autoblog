@@ -1,0 +1,963 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<title>박찬 과학 통합과학2 — I-03 산화와 환원</title>
+<style>
+  @font-face { font-family:'PC Sans'; src:url('file:///root/.fonts/NotoSansKR.ttf'); font-weight:100 900; }
+  @font-face { font-family:'PC Serif'; src:url('file:///root/.fonts/NotoSerifKR.ttf'); font-weight:100 900; }
+  @font-face { font-family:'PC Pen'; src:url('file:///root/.fonts/YeonSung-Regular.ttf'); font-weight:400; }
+
+  :root{
+    --brand:#0E5A6B;        /* 박찬 과학 브랜드 딥틸 */
+    --brand-lt:#E3F0F3;
+    --unit:#C1521E;         /* I. 과학의 기초 단원 컬러(그린) */
+    --unit-lt:#FBEFE7;
+    --unit-md:#EBC4AB;
+    --accent:#E8940A;       /* 알짜 앰버 */
+    --accent-lt:#FDF3E0;
+    --point:#D6455D;        /* 시험 포인트 */
+    --point-lt:#FBEBEE;
+    --ink:#22303A;
+    --sub:#5B6B77;
+    --line:#D8E0E5;
+  }
+  *{ box-sizing:border-box; margin:0; padding:0; -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+  @page{ size:210mm 275mm; margin:0; }
+  html,body{ font-family:'PC Sans',sans-serif; color:var(--ink); word-break:keep-all; overflow-wrap:anywhere; }
+
+  .page{ width:210mm; height:275mm; position:relative; overflow:hidden; background:#fff; page-break-after:always; padding:14mm 13mm 19mm 15mm; display:flex; flex-direction:column; }
+
+  /* ── 러닝 헤드 / 풋 ── */
+  .runhead{ display:flex; align-items:center; justify-content:space-between; border-bottom:0.35mm solid var(--unit); padding-bottom:2mm; margin-bottom:6.5mm; }
+  .runhead .unit-tag{ font-size:8.5pt; font-weight:700; color:var(--unit); letter-spacing:0.02em; }
+  .runhead .lesson-tag{ font-size:8.5pt; color:var(--sub); }
+  .folio{ position:absolute; bottom:7mm; left:0; right:0; display:flex; justify-content:space-between; padding:0 14mm 0 14mm; font-size:8pt; color:var(--sub); }
+  .folio .num{ font-weight:800; color:var(--unit); font-size:10pt; }
+
+  /* ── 본문 그리드: 본문 + 날개단 ── */
+  .cols{ display:grid; grid-template-columns:1fr 43mm; gap:8mm; flex:1; min-height:0; margin-bottom:4mm; }
+  .main{ min-width:0; }
+  .wing{ border-left:0.3mm solid var(--line); padding-left:5mm; font-size:8.2pt; color:var(--sub); line-height:1.7; }
+
+  /* ── 타이포 ── */
+  h2.lesson-title{ display:flex; align-items:baseline; gap:3.5mm; margin-bottom:2mm; }
+  h2.lesson-title .no{ background:var(--unit); color:#fff; font-size:13pt; font-weight:900; padding:1.2mm 3.2mm; border-radius:1.5mm; }
+  h2.lesson-title .tt{ font-size:16.5pt; font-weight:900; letter-spacing:-0.01em; }
+  .std-badges{ display:flex; gap:2mm; margin:2mm 0 6.5mm; }
+  .std{ font-size:7.4pt; color:var(--unit); background:none; border:0.3mm solid var(--unit-md); border-radius:5mm; padding:0.6mm 2.8mm; font-weight:600; }
+
+  h3.sec{ display:flex; align-items:baseline; gap:3mm; font-size:12.5pt; font-weight:800; margin:9mm 0 3.6mm; letter-spacing:-0.01em; }
+  h3.sec .n{ font-family:'PC Serif'; font-size:15.5pt; font-weight:900; color:var(--unit); border-bottom:0.7mm solid var(--accent); padding:0 0.8mm 0.2mm; flex:0 0 auto; line-height:1; }
+  h3.sec::after{ content:""; flex:1; border-top:0.25mm solid var(--line); align-self:center; margin-left:2mm; }
+  h3.sec:first-child{ margin-top:0; }
+
+  p.body{ font-family:'PC Serif'; font-size:9.6pt; line-height:1.92; margin-bottom:3.6mm; text-align:justify; }
+  p.body b{ font-weight:800; }
+  .kw{ font-weight:800; color:var(--unit); }
+  .u-amber{ background:#F8E9C6; font-weight:700; padding:0.15mm 0.6mm; border-radius:0.6mm; box-decoration-break:clone; -webkit-box-decoration-break:clone; }
+
+  ul.pts{ font-family:'PC Serif'; font-size:9.6pt; line-height:1.84; margin:1.5mm 0 3.5mm 1mm; list-style:none; }
+  ul.pts li{ padding-left:4.5mm; position:relative; margin-bottom:1.8mm; }
+  ul.pts li::before{ content:""; position:absolute; left:0.5mm; top:2.9mm; width:1.7mm; height:1.7mm; background:var(--accent); border-radius:50%; }
+
+  /* ── 코너 박스 ── */
+  .boxtitle{ display:inline-flex; align-items:center; gap:1.8mm; font-weight:900; font-size:9.5pt; margin-bottom:1.6mm; }
+  .boxtitle .ico{ width:5.2mm; height:5.2mm; border-radius:1.2mm; display:flex; align-items:center; justify-content:center; color:#fff; font-size:7.5pt; font-weight:900; }
+
+  .gist{ background:none; border:none; border-top:0.5mm solid var(--accent); border-bottom:0.5mm solid var(--accent); border-radius:0; padding:3.2mm 1.8mm 3mm; margin:6mm 0 5mm; }
+  .gist .boxtitle{ color:#9C6503; } .gist .ico{ background:var(--accent); }
+  .gist ul{ list-style:none; font-family:'PC Serif'; font-size:9.3pt; line-height:1.78; }
+  .gist li{ padding-left:4.2mm; position:relative; margin-bottom:1.2mm;}
+  .gist li::before{ content:"✓"; position:absolute; left:0; color:var(--accent); font-weight:900; }
+
+  .expoint{ background:none; border-left:0.5mm solid #D998A4; border-left-color:#D998A4; border-radius:0; padding:1.4mm 0 1.4mm 3.6mm; margin:4.5mm 0; }
+  .expoint .boxtitle{ color:#A9556A; font-size:8.6pt; margin-bottom:1mm;}
+  .expoint .ico{ background:none; color:#A9556A; border:0.35mm solid #D998A4; width:4.4mm; height:4.4mm; border-radius:50%; font-size:7pt; }
+  .expoint p{ font-family:'PC Serif'; font-size:8.9pt; line-height:1.7; }
+
+  .pen{ font-family:'PC Pen'; font-size:12pt; color:#B4560E; line-height:1.45; }
+  .saem{ display:flex; gap:3mm; align-items:flex-start; margin:4.5mm 0; }
+  .saem .avatar{ flex:0 0 auto; width:10.5mm; height:10.5mm; border-radius:50%; background:var(--brand); color:#fff; font-size:7pt; font-weight:800; display:flex; align-items:center; justify-content:center; line-height:1.35; letter-spacing:0.04em; text-align:center; border:0.5mm solid var(--accent); box-sizing:border-box;}
+  .saem .bubble{ background:#FFFBF0; border:0.4mm solid #EBCB9C; border-radius:3mm; padding:2.2mm 3.6mm 2mm; position:relative; }
+  .saem .bubble::before{ content:""; position:absolute; left:-1.8mm; top:3.2mm; width:3mm; height:3mm; background:#FFFBF0; border-left:0.4mm solid #EBCB9C; border-bottom:0.4mm solid #EBCB9C; transform:rotate(45deg); }
+
+  .wing .wtitle{ font-size:8pt; font-weight:900; color:var(--brand); display:flex; align-items:center; gap:1.5mm; margin:0 0 2.4mm; letter-spacing:0.05em; }
+  .wing .wtitle::before{ content:""; width:2.4mm; height:2.4mm; background:var(--accent); border-radius:50%; }
+  .wing .term{ margin-bottom:3.6mm; }
+  .wing .term b{ color:var(--ink); font-weight:800; display:block; font-size:8.5pt; margin-bottom:0.7mm;}
+  .wing .wsep{ border-top:0.3mm dashed var(--line); margin:4.5mm 0; }
+  .wing .wing-pen{ font-family:'PC Pen'; font-size:11pt; color:#B4560E; line-height:1.45; }
+
+  figure{ margin:5mm 0; }
+  figure figcaption{ font-size:8pt; color:var(--sub); text-align:center; margin-top:2mm; }
+  figure svg{ display:block; margin:0 auto; }
+
+  /* ── 비교형 그림 (2패널 + 범례) ── */
+  .fig-duo{ display:flex; align-items:stretch; gap:2.5mm; justify-content:center; }
+  .fig-duo .panel{ flex:0 0 auto; text-align:center; }
+  .fig-duo .p-title{ font-size:9pt; font-weight:900; color:var(--ink); margin-top:1.6mm; }
+  .fig-duo .p-sub{ font-size:7.8pt; color:var(--sub); line-height:1.45; margin-top:0.5mm; }
+  .fig-duo .mid{ display:flex; flex-direction:column; align-items:center; justify-content:center; gap:1mm; padding:0 1mm; }
+  .fig-duo .mid .mlab{ font-size:7.6pt; font-weight:800; color:var(--unit); text-align:center; line-height:1.3; }
+  .fig-legend{ display:flex; justify-content:center; gap:5mm; font-size:7.8pt; color:var(--ink); margin-top:1.2mm; align-items:center; }
+  .fig-legend span{ display:inline-flex; align-items:center; gap:1.4mm; }
+
+  /* ── 탐구 (자료 파헤치기) ── */
+  .lab{ border:0.5mm solid var(--brand); border-radius:2.5mm; overflow:hidden; margin-top:1mm;}
+  .lab .lab-head{ background:var(--brand); color:#fff; padding:2.2mm 4mm; font-weight:900; font-size:11pt; display:flex; align-items:center; gap:2.5mm;}
+  .lab .lab-head .tag{ font-size:7.5pt; background:rgba(255,255,255,.22); padding:0.6mm 2.4mm; border-radius:4mm; font-weight:700;}
+  .lab .lab-body{ padding:3.5mm 4mm; }
+  .lab h4{ font-size:9.6pt; font-weight:900; color:var(--brand); margin:2.5mm 0 1.4mm; }
+  .lab h4:first-child{ margin-top:0; }
+  .lab p, .lab li{ font-family:'PC Serif'; font-size:9.3pt; line-height:1.8; }
+  .lab ol{ margin-left:5mm; }
+
+  /* ── 문제부 ── */
+  .step-head{ display:flex; align-items:center; gap:3mm; margin:0 0 5mm; }
+  .step-head .stepno{ background:var(--unit); color:#fff; font-weight:900; font-size:9.5pt; padding:1.4mm 3.4mm; border-radius:1.5mm; letter-spacing:0.04em;}
+  .step-head .steptt{ font-size:12.5pt; font-weight:900; }
+  .step-head .stepdesc{ font-size:8.2pt; color:var(--sub); margin-left:auto; }
+  .step-head.s2 .stepno{ background:var(--brand); }
+  .step-head.s3 .stepno{ background:var(--point); }
+
+  .q{ margin-bottom:7.5mm; break-inside:avoid; }
+  .q .qhead{ display:flex; gap:2.4mm; align-items:flex-start; }
+  .q .qno{ flex:0 0 auto; min-width:6.2mm; height:6.2mm; border:0.45mm solid var(--unit); color:var(--unit); border-radius:50%; font-size:8.6pt; font-weight:900; line-height:1; display:flex; align-items:center; justify-content:center; padding-top:0.55mm; margin-top:0.4mm;}
+  .q .stem{ font-family:'PC Serif'; font-size:9.5pt; line-height:1.74; font-weight:500; }
+  .q .stem .difficulty{ color:#C9A227; font-size:8pt; letter-spacing:0.06em; margin-left:1.5mm;}
+  .q .tags{ margin-top:0.8mm; font-size:7pt; color:var(--sub); font-family:'PC Sans';}
+  .choices{ list-style:none; margin:2.2mm 0 0 8.6mm; font-family:'PC Serif'; font-size:9.3pt; line-height:1.85; }
+  .choices.inline{ display:flex; flex-wrap:wrap; gap:0 6mm; }
+  .bogi-box{ border:0.35mm solid #B8C2CA; border-radius:0; margin:2.5mm 0 0 8.6mm; padding:2.4mm 3.2mm; font-family:'PC Serif'; font-size:9.2pt; line-height:1.8; background:none;}
+  .bogi-box .bt{ text-align:center; font-weight:800; color:var(--sub); font-size:8.4pt; margin-bottom:0.8mm; letter-spacing:0.3em;}
+  .ox-answer{ margin-left:2mm; color:var(--sub); font-size:9pt; }
+  .blankline{ display:inline-block; min-width:14mm; border-bottom:0.4mm solid var(--ink); }
+  .qgrid{ display:grid; grid-template-columns:1fr 1fr; gap:0 9mm; }
+  .essay-lines{ margin:2mm 0 0 8.4mm; }
+  .essay-lines div{ border-bottom:0.3mm solid var(--line); height:6.2mm; }
+  .badge-essay{ display:inline-block; background:var(--point); color:#fff; font-size:7pt; font-weight:800; padding:0.4mm 2mm; border-radius:1mm; vertical-align:1pt; margin-right:1.2mm;}
+  .badge-data{ display:inline-block; background:var(--brand); color:#fff; font-size:7pt; font-weight:800; padding:0.4mm 2mm; border-radius:1mm; vertical-align:1pt; margin-right:1.2mm;}
+
+  /* ── 해설부 ── */
+  .sol-head{ display:flex; align-items:center; gap:3mm; margin-bottom:4mm;}
+  .sol-head .stt{ font-size:14.5pt; font-weight:900; color:var(--brand);}
+  .sol-head .sub{ font-size:8.5pt; color:var(--sub);}
+  .anstable{ width:100%; border-collapse:collapse; margin-bottom:4.5mm; }
+  .anstable th,.anstable td{ border:0.3mm solid var(--line); font-size:8.8pt; padding:1.4mm 0; text-align:center; }
+  .anstable th{ background:var(--brand-lt); color:var(--brand); font-weight:800; }
+  .anstable td.a{ font-weight:900; color:var(--unit); }
+  .sol{ margin-bottom:5mm; break-inside:avoid; }
+  .sol .shead{ display:flex; align-items:center; gap:2mm; margin-bottom:1.4mm;}
+  .sol .sno{ background:var(--unit); color:#fff; min-width:6mm; height:5.4mm; border-radius:1.2mm; font-size:8.6pt; font-weight:900; line-height:1; display:flex; align-items:center; justify-content:center; padding:0.5mm 1.5mm 0;}
+  .sol .sans{ font-weight:900; color:var(--unit); font-size:9.6pt;}
+  .sol .slink{ font-size:7.2pt; color:var(--sub); margin-left:auto;}
+  .sol p{ font-family:'PC Serif'; font-size:9.1pt; line-height:1.76; margin-bottom:0.8mm; }
+  .wrongbox{ background:none; border:none; border-left:0.7mm solid #E3A0AC; border-radius:0; padding:1mm 0 1mm 3mm; margin-top:2mm;}
+  .wrongbox .wt{ font-size:8pt; font-weight:900; color:var(--point); margin-bottom:0.8mm; font-family:'PC Sans';}
+  .wrongbox p{ font-family:'PC Serif'; font-size:8.6pt; line-height:1.68; margin-bottom:0.9mm;}
+  .wrongbox p:last-child{ margin-bottom:0; }
+  .solcols{ display:grid; grid-template-columns:1fr 1fr; gap:0 9mm; }
+
+  /* ── 단원 도입 (타이포그래피 중심) ── */
+  .opener{ padding:0 0 19mm; }
+  .opener-hero{ position:relative; padding:7mm 20mm 4.5mm; overflow:hidden; flex-shrink:0; }
+  .ghost-txt{ position:absolute; top:-10mm; right:6mm; font-size:118pt; font-weight:900; color:#FAEFE8; line-height:1; letter-spacing:-0.04em; }
+  .kicker{ display:flex; align-items:center; gap:4mm; position:relative; }
+  .kicker .kt{ font-size:9.5pt; font-weight:800; color:var(--unit); letter-spacing:0.24em; white-space:nowrap; }
+  .kicker::after{ content:""; flex:1; border-top:0.3mm solid var(--line); }
+  .opener-hero h1{ position:relative; font-size:36pt; font-weight:900; letter-spacing:-0.015em; margin:4mm 0 0; }
+  .opener-hero h1 .tick{ display:block; width:14mm; border-top:1.4mm solid var(--accent); margin-bottom:3.6mm; }
+  .opener-lede{ position:relative; font-family:'PC Serif'; font-size:10.2pt; font-weight:600; line-height:2.0; color:#3D4C58; max-width:138mm; margin-top:4mm; padding-left:5mm; border-left:0.8mm solid var(--accent); }
+  .opener-inner{ padding:0 20mm; }
+
+  /* ── 원소의 여정 스트립 ── */
+  .journey{ margin-top:3.5mm; }
+  .journey .j-label{ font-size:8pt; font-weight:800; color:var(--sub); letter-spacing:0.08em; margin-bottom:2.4mm; display:flex; align-items:center; gap:1.6mm;}
+  .journey .j-label::before{ content:""; width:2.4mm; height:2.4mm; background:var(--unit); border-radius:50%; }
+  .j-bar{ display:flex; align-items:center; gap:2mm; }
+  .j-chip{ flex:1; text-align:center; background:#FBF3ED; border:0.35mm solid #EBC4AB; color:#C1521E; border-radius:1.6mm; padding:3mm 1mm 2.6mm; }
+  .j-chip .jc-t{ font-size:8.8pt; font-weight:800; display:block; }
+  .j-chip .jc-s{ font-size:6.8pt; color:var(--sub); display:block; margin-top:0.5mm; }
+  .j-chip.on{ background:var(--unit); border-color:var(--unit); }
+  .j-chip.on .jc-t{ color:#fff; }
+  .j-chip.on .jc-s{ color:#F6DFCE; }
+  .j-arrow{ flex:0 0 auto; color:#E0A57E; font-size:10pt; font-weight:900; }
+  .toc{ margin-top:6.5mm; }
+  .toc .toc-title{ font-size:11pt; font-weight:900; color:var(--ink); margin-bottom:3mm; display:flex; align-items:center; gap:2.5mm;}
+  .toc .toc-title::before{ content:""; width:3.4mm; height:3.4mm; background:var(--accent); border-radius:0.8mm; }
+  .toc-item{ display:flex; align-items:flex-start; gap:5mm; padding:4.4mm 6mm; border-bottom:0.3mm solid var(--line); }
+  .toc-item:first-of-type{ border-top:0.3mm solid var(--line); }
+  .toc-item.active{ background:#FBF3ED; border-left:1.2mm solid #D98A5B; }
+  .toc-item .tno{ font-family:'PC Serif'; font-weight:900; color:#D98A5B; font-size:14pt; width:10mm; line-height:1.1; flex:0 0 auto;}
+  .toc-item .tbody{ flex:1; min-width:0; }
+  .toc-item .ttt{ font-weight:800; font-size:10.5pt; letter-spacing:0.01em; display:flex; align-items:center;}
+  .toc-item .tdesc{ font-family:'PC Serif'; font-size:8.6pt; font-weight:600; color:#4A5964; margin-top:0.7mm; line-height:1.55;}
+  .toc-item .tstd{ font-size:7.2pt; color:var(--sub); flex:0 0 auto; padding-top:1.2mm;}
+  .toc-item.active .tag-now{ background:var(--accent); color:#fff; font-size:7pt; font-weight:900; border-radius:4mm; padding:0.7mm 2.6mm; margin-left:3.5mm;}
+  .toc-item .tag-done{ font-size:7.2pt; font-weight:800; color:#C1521E; margin-left:3.5mm; }
+  .opener-quote{ margin-top:7mm; text-align:center; font-family:'PC Serif'; font-size:9.8pt; font-weight:600; color:#4A5964; letter-spacing:0.01em; }
+  .opener-quote .who{ font-size:8pt; color:var(--sub); font-weight:400; margin-left:2.5mm; }
+  .qa-lead li .qgo{ font-family:'PC Sans'; font-size:7.4pt; font-weight:800; color:var(--unit); background:var(--unit-lt); border-radius:3mm; padding:0.5mm 2.2mm; margin-left:2mm; white-space:nowrap; vertical-align:1pt;}
+  .qa-lead{ margin-top:5mm; border:none; border-top:0.45mm solid var(--brand); border-bottom:0.45mm solid var(--brand); background:none; border-radius:0; padding:3mm 2mm 2.8mm; }
+  .qa-lead .qt{ font-weight:900; color:var(--brand); font-size:10.5pt; margin-bottom:2mm;}
+  .qa-lead li{ font-family:'PC Serif'; font-size:9.5pt; line-height:1.8; margin-left:5mm; }
+
+  /* ── 바로바로 체크 (개념 페이지 하단 즉석 OX) ── */
+  .quickcheck{ margin-top:auto; border-top:0.35mm dashed #C8B98F; padding-top:3mm; width:calc(100% - 51mm); }
+  .quickcheck .qc-title{ display:inline-flex; align-items:center; gap:1.6mm; font-size:8.2pt; font-weight:900; color:#9C6503; margin-bottom:1.4mm; }
+  .quickcheck .qc-title::before{ content:"✓"; color:var(--accent); font-weight:900; }
+  .quickcheck ol{ list-style:none; font-family:'PC Serif'; font-size:8.8pt; line-height:1.75; }
+  .quickcheck li{ display:flex; gap:2mm; align-items:baseline; }
+  .quickcheck li .no{ font-weight:800; color:var(--accent); flex:0 0 auto; }
+  .quickcheck .qc-ans{ margin-top:1mm; font-size:7.2pt; color:var(--sub); transform:rotate(180deg); text-align:left; }
+
+  /* ── 중학 과학 다시보기 (날개단) ── */
+  .wing .review{ background:#F6F3EC; border-radius:1.8mm; padding:2.8mm 3mm; margin-top:1mm; }
+  .wing .review .rv-title{ font-size:7.8pt; font-weight:900; color:#7A6A45; margin-bottom:1.4mm; display:flex; align-items:center; gap:1.4mm;}
+  .wing .review .rv-title::before{ content:"↺"; font-weight:900; color:#A08A55; }
+
+  /* ── MEMO 페이지 ── */
+  .memo-head{ display:flex; align-items:baseline; gap:3.5mm; margin-bottom:5mm; }
+  .memo-head .mt{ font-size:17pt; font-weight:900; color:var(--brand); letter-spacing:0.22em; }
+  .memo-head .ms{ font-size:8.6pt; color:var(--sub); }
+  .memo-area{ flex:1; border:0.4mm solid var(--line); border-radius:2.5mm;
+    background-image:linear-gradient(to bottom, transparent calc(100% - 0.3mm), #DCE4E9 0);
+    background-size:100% 9mm; background-position:0 4mm; padding:0 5mm; margin-bottom:4mm; }
+  .memo-pen{ font-family:'PC Pen'; font-size:12.5pt; color:#B4560E; text-align:right; }
+</style>
+</head>
+<body>
+<!-- ═════════════ p.35 소단원 도입 ═════════════ -->
+<div class="page opener">
+  <div class="opener-hero">
+    <div class="ghost-txt">03</div>
+    <div class="kicker"><span class="kt">통합과학 2 · I. 변화와 다양성</span></div>
+    <h1><span class="tick"></span>산화와 환원</h1>
+    <p class="opener-lede">깎아 둔 사과의 갈변, 용광로의 쇳물, 잎사귀의 광합성 —<br>
+    모두 산소와 전자가 오가는 하나의 이야기다.</p>
+  </div>
+
+  <div class="opener-inner">
+    <div class="journey">
+      <div class="j-label">변화와 다양성 — 지금 여기</div>
+      <div class="j-bar">
+        <div class="j-chip"><span class="jc-t">지질시대</span><span class="jc-s">돌에 남은 일기장</span></div>
+        <span class="j-arrow">→</span>
+        <div class="j-chip"><span class="jc-t">진화</span><span class="jc-s">다양성의 기원</span></div>
+        <span class="j-arrow">→</span>
+        <div class="j-chip on"><span class="jc-t">산화와 환원</span><span class="jc-s">문명을 바꾼 반응</span></div>
+        <span class="j-arrow">→</span>
+        <div class="j-chip"><span class="jc-t">산·염기와 중화</span><span class="jc-s">생활 속 화학</span></div>
+        <span class="j-arrow">→</span>
+        <div class="j-chip"><span class="jc-t">에너지 출입</span><span class="jc-s">발열과 흡열</span></div>
+      </div>
+    </div>
+    <div class="toc">
+      <div class="toc-title">이 단원의 학습 지도</div>
+      <div class="toc-item">
+        <span class="tno">01</span>
+        <span class="tbody"><span class="ttt">지질시대와 생물의 변천</span>
+        <span class="tdesc">지질시대 구분, 화석 읽는 법, 대멸종과 생물다양성</span></span>
+        <span class="tstd">10통과2-01-01</span>
+      </div>
+      <div class="toc-item">
+        <span class="tno">02</span>
+        <span class="tbody"><span class="ttt">진화와 생물다양성</span>
+        <span class="tdesc">변이와 자연선택 — 다양한 생물은 어떻게 생겨났나</span></span>
+        <span class="tstd">10통과2-01-02</span>
+      </div>
+      <div class="toc-item active">
+        <span class="tno">03</span>
+        <span class="tbody"><span class="ttt">산화와 환원<span class="tag-now">NOW</span></span>
+        <span class="tdesc">광합성·화석 연료·철의 제련 — 산소와 전자의 이동</span></span>
+        <span class="tstd">10통과2-01-03</span>
+      </div>
+      <div class="toc-item">
+        <span class="tno">04</span>
+        <span class="tbody"><span class="ttt">산·염기와 중화 반응</span>
+        <span class="tdesc">산과 염기의 성질, 생활 속 중화의 기술</span></span>
+        <span class="tstd">10통과2-01-04</span>
+      </div>
+      <div class="toc-item">
+        <span class="tno">05</span>
+        <span class="tbody"><span class="ttt">화학 변화와 에너지 출입</span>
+        <span class="tdesc">발열·흡열 반응 — 손난로와 냉각 팩의 과학</span></span>
+        <span class="tstd">10통과2-01-05</span>
+      </div>
+    </div>
+
+    <div class="qa-lead">
+      <div class="qt">이 소단원을 끝내면 답할 수 있는 질문</div>
+      <ul>
+        <li>사과를 깎아 두면 왜 갈색이 될까? <span class="qgo">개념 4</span></li>
+        <li>잎사귀의 광합성과 용광로의 제련 — 무엇이 같을까? <span class="qgo">개념 2</span></li>
+        <li>구리선을 은 이온 용액에 넣으면 무슨 일이 벌어질까? <span class="qgo">개념 3</span></li>
+        <li>산화가 일어나면 왜 반드시 환원도 일어날까? <span class="qgo">개념 5</span></li>
+      </ul>
+    </div>
+
+    <div class="opener-quote" style="margin-top:2.4mm;">"아무것도 사라지지 않는다 — 모든 것은 변할 뿐이다."<span class="who">— 근대 화학의 아버지 앙투안 라부아지에</span></div>
+  </div>
+
+  <div class="folio"><span>박찬 과학 | 통합과학 2</span><span class="num">35</span></div>
+</div>
+
+<!-- ═════════════ p.36 개념 01 산소로 본 정의 ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag">I. 변화와 다양성</span><span class="lesson-tag">03. 산화와 환원</span></div>
+  <h2 class="lesson-title"><span class="no">03</span><span class="tt">산화와 환원</span></h2>
+  <div class="std-badges"><span class="std">성취기준 10통과2-01-03</span><span class="std">산소의 이동 → 전자의 이동 → 생활 속 분석</span></div>
+
+  <div class="cols">
+    <div class="main">
+      <h3 class="sec"><span class="n">1</span>산소를 얻으면 산화, 잃으면 환원</h3>
+      <p class="body">못이 붉게 녹슬고, 장작이 타오르고, 사과가 갈변한다 — 겉모습은 제각각이지만 화학의 눈으로 보면 한 가족이다. 모두 <b>산소와 결합하는 반응</b>이기 때문이다. 이렇게 <span class="u-amber">물질이 산소를 얻는 반응</span>을 <span class="kw">산화</span>라 한다. 철이 산소와 결합하면 산화 철(녹)이 되고, 메테인이 타면 탄소가 산소와 결합해 이산화 탄소가 된다.</p>
+      <p class="body">반대로 <span class="u-amber">물질이 산소를 잃는 반응</span>이 <span class="kw">환원</span>이다. 여기서 중요한 규칙 하나 — 산소는 허공에서 오지 않는다. <b>한쪽이 산소를 얻으면, 반드시 다른 쪽은 산소를 잃는다</b>. 그래서 산화와 환원은 언제나 짝으로, 동시에 일어난다. 공을 주고받는 두 사람처럼, 준 사람 없이 받은 사람이 있을 수 없다.</p>
+
+      <figure>
+        <svg width="470" height="148" viewBox="0 0 470 148" font-family="PC Sans">
+          <defs>
+            <marker id="arrP" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="#C1521E"/></marker>
+            <marker id="arrR" markerWidth="7" markerHeight="7" refX="5" refY="2.5" orient="auto"><path d="M0,0 L6,2.5 L0,5 Z" fill="#D6455D"/></marker>
+          </defs>
+          <g font-size="6.8">
+            <text x="235" y="13" text-anchor="middle" font-size="8.4" font-weight="800" fill="#C1521E">산소 주고받기 — 산화·환원의 첫 정의</text>
+            <g transform="translate(0,24)" text-anchor="middle">
+              <!-- 산화 쪽 -->
+              <g transform="translate(120,0)">
+                <rect x="-100" y="0" width="200" height="88" rx="6" fill="#FBEFE7" stroke="#EBC4AB" stroke-width="1"/>
+                <text y="16" font-size="7.8" font-weight="800" fill="#C1521E">산화 — 산소를 얻는다</text>
+                <g transform="translate(-45,48)">
+                  <rect x="-26" y="-14" width="52" height="28" rx="4" fill="#8A8F98"/>
+                  <text y="4" fill="#fff" font-weight="800">철 Fe</text>
+                </g>
+                <line x1="-12" y1="48" x2="8" y2="48" stroke="#C1521E" stroke-width="1.4" marker-end="url(#arrP)"/>
+                <g transform="translate(48,48)">
+                  <rect x="-34" y="-14" width="68" height="28" rx="4" fill="#B0483A"/>
+                  <text y="-1" fill="#fff" font-weight="800">산화 철</text>
+                  <text y="10" fill="#F6DFCE" font-size="6">붉은 녹</text>
+                </g>
+                <text y="80" fill="#5B6B77" font-size="6.2">연소·녹·갈변 — 모두 산화</text>
+              </g>
+              <!-- O2 -->
+              <g transform="translate(235,42)">
+                <circle cx="-7" cy="0" r="8" fill="#4C86B0"/><circle cx="9" cy="0" r="8" fill="#4C86B0"/>
+                <text y="3" x="1" text-anchor="middle" fill="#fff" font-size="6.6" font-weight="800">O₂</text>
+                <text y="24" text-anchor="middle" fill="#4C86B0" font-weight="800" font-size="6.4">산소가 이동한다</text>
+              </g>
+              <!-- 환원 쪽 -->
+              <g transform="translate(350,0)">
+                <rect x="-100" y="0" width="200" height="88" rx="6" fill="#F3F7F5" stroke="#A8D5BE" stroke-width="1"/>
+                <text y="16" font-size="7.8" font-weight="800" fill="#2E7A54">환원 — 산소를 잃는다</text>
+                <g transform="translate(-48,48)">
+                  <rect x="-34" y="-14" width="68" height="28" rx="4" fill="#B0483A"/>
+                  <text y="4" fill="#fff" font-weight="800">산화 철</text>
+                </g>
+                <line x1="-8" y1="48" x2="12" y2="48" stroke="#2E7A54" stroke-width="1.4" marker-end="url(#arrP)"/>
+                <g transform="translate(52,48)">
+                  <rect x="-26" y="-14" width="52" height="28" rx="4" fill="#8A8F98"/>
+                  <text y="4" fill="#fff" font-weight="800">철 Fe</text>
+                </g>
+                <text y="80" fill="#5B6B77" font-size="6.2">용광로의 제련이 바로 이 방향</text>
+              </g>
+            </g>
+          </g>
+          <text x="235" y="142" text-anchor="middle" font-size="8.8" font-weight="800" fill="#E8940A">산소를 얻으면 산화, 잃으면 환원 — 주는 쪽 없이 받는 쪽은 없다</text>
+        </svg>
+        <figcaption>그림 1 | 산소의 이동으로 본 산화와 환원 — 같은 물질도 방향에 따라 이름이 바뀐다</figcaption>
+      </figure>
+
+      <div class="saem">
+        <div class="avatar">박찬<br>쌤</div>
+        <div class="bubble"><span class="pen">"산화(酸化)의 산은 산소의 산 — '산소와 화합한다'는 뜻 그대로다. 환원(還元)은 '원래로 돌아간다' — 산소를 떼어 내 본모습을 되찾는 것."</span></div>
+      </div>
+    </div>
+
+    <div class="wing">
+      <div class="wtitle">날개 노트</div>
+      <div class="term"><b>연소</b>물질이 빛과 열을 내며 산소와 빠르게 결합하는 반응 — 격렬한 산화다.</div>
+      <div class="term"><b>녹(부식)</b>철이 공기 중 산소·물과 만나 천천히 산화되어 생기는 산화 철.</div>
+      <div class="wsep"></div>
+      <div class="wtitle">한눈에 암기</div>
+      <div class="wing-pen">산소 얻음 = 산화<br>산소 잃음 = 환원<br>둘은 언제나 동시!</div>
+      <div class="wsep"></div>
+      <div class="review">
+        <div class="rv-title">중학 과학 다시보기</div>
+        <div class="term" style="margin-bottom:0;"><b>화학 반응식 (중3)</b>반응 전후 원자의 종류와 수는 같다 — 산소가 '어디로 갔는지' 추적하는 것이 이 단원의 기술이다.</div>
+      </div>
+    </div>
+  </div>
+  <div class="quickcheck">
+    <span class="qc-title">바로바로 체크</span>
+    <ol>
+      <li><span class="no">1</span>물질이 산소를 얻는 반응을 산화라 한다. ( O , X )</li>
+      <li><span class="no">2</span>철이 녹스는 것은 환원의 예다. ( O , X )</li>
+      <li><span class="no">3</span>어떤 물질이 산소를 얻으면 다른 물질은 반드시 산소를 잃는다. ( O , X )</li>
+    </ol>
+    <div class="qc-ans">정답 1 O 2 X (산소를 얻는 산화) 3 O</div>
+  </div>
+  <div class="folio"><span>I. 변화와 다양성</span><span class="num">36</span></div>
+</div>
+
+<!-- ═════════════ p.37 개념 02 문명을 바꾼 세 반응 ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag">I. 변화와 다양성</span><span class="lesson-tag">03. 산화와 환원</span></div>
+  <div class="cols">
+    <div class="main">
+      <h3 class="sec"><span class="n">2</span>문명을 바꾼 세 반응 — 광합성·연료·제련</h3>
+      <p class="body">역사의 방향을 바꾼 세 개의 반응이 있다. 첫째, <span class="kw">광합성</span> — 이산화 탄소와 물이 빛에너지를 받아 포도당과 산소가 된다. 이때 <span class="u-amber">이산화 탄소는 산소를 잃고 포도당으로 환원</span>된다. 이 반응이 대기에 산소를 채웠고(01에서 본 오존층의 재료다), 지구 생명의 에너지 공장이 되었다.</p>
+      <p class="body">둘째, <span class="kw">화석 연료의 연소</span> — 석탄·석유 속 탄소가 산소를 얻어 이산화 탄소가 되는 <b>산화</b> 반응으로, 산업 혁명 이후 인류 문명의 동력이 되었다. 셋째, <span class="kw">철의 제련</span> — 용광로에서 산화 철(철광석)이 산소를 잃고 <b>철로 환원</b>되는 반응. 철기 시대부터 마천루까지, 도구 문명의 뼈대가 여기서 나왔다. 겉보기엔 전혀 다른 세 장면의 공통점 — <b>모두 산소가 이동하는 산화·환원 반응</b>이라는 것이다.</p>
+
+      <figure>
+        <svg width="470" height="150" viewBox="0 0 470 150" font-family="PC Sans">
+          <g font-size="6.8">
+            <text x="235" y="13" text-anchor="middle" font-size="8.4" font-weight="800" fill="#C1521E">역사를 바꾼 세 반응 — 공통점은 '산소의 이동'</text>
+            <g transform="translate(0,22)" text-anchor="middle">
+              <g transform="translate(85,0)">
+                <rect x="-70" y="0" width="140" height="96" rx="6" fill="#F3F7F5" stroke="#A8D5BE" stroke-width="1"/>
+                <text y="15" font-size="7.6" font-weight="800" fill="#2E7A54">광합성 — 생명의 시작</text>
+                <g transform="translate(0,44)">
+                  <path d="M-30,10 q-16,-4 -14,-20 q14,-6 22,4 q10,-2 14,8 q-2,10 -22,8 z" fill="#7FA86B"/>
+                  <line x1="-38" y1="22" x2="-30" y2="10" stroke="#5E7D57" stroke-width="1.4"/>
+                  <text x="26" y="-8" fill="#4C86B0" font-weight="800" font-size="6.2">CO₂ + 물</text>
+                  <text x="26" y="4" fill="#5B6B77" font-size="6">→ 포도당 + O₂</text>
+                  <text x="26" y="18" fill="#2E7A54" font-weight="800" font-size="6.2">CO₂가 환원된다</text>
+                </g>
+                <text y="88" fill="#5B6B77" font-size="6.2">대기에 산소를 채운 반응</text>
+              </g>
+              <g transform="translate(235,0)">
+                <rect x="-70" y="0" width="140" height="96" rx="6" fill="#FDF3F0" stroke="#E5B8AC" stroke-width="1"/>
+                <text y="15" font-size="7.6" font-weight="800" fill="#B0483A">화석 연료 — 문명의 동력</text>
+                <g transform="translate(0,44)">
+                  <path d="M-8,16 q-14,-6 -8,-22 q6,4 8,10 q2,-12 10,-16 q10,10 4,24 q-4,6 -14,4 z" fill="#E8940A"/>
+                  <path d="M-4,14 q-6,-4 -3,-12 q7,4 5,12 z" fill="#F3C24E"/>
+                  <text x="34" y="-6" fill="#5B6B77" font-size="6.2">탄소 + O₂</text>
+                  <text x="34" y="6" fill="#5B6B77" font-size="6">→ CO₂ + 에너지</text>
+                  <text x="34" y="20" fill="#B0483A" font-weight="800" font-size="6.2">연료가 산화된다</text>
+                </g>
+                <text y="88" fill="#5B6B77" font-size="6.2">산업 혁명을 일으킨 반응</text>
+              </g>
+              <g transform="translate(385,0)">
+                <rect x="-70" y="0" width="140" height="96" rx="6" fill="#FBEFE7" stroke="#C1521E" stroke-width="1.1"/>
+                <text y="15" font-size="7.6" font-weight="800" fill="#C1521E">철의 제련 — 도구의 탄생</text>
+                <g transform="translate(0,44)">
+                  <path d="M-40,18 l10,-26 h16 l10,26 z" fill="#8A6B52"/>
+                  <rect x="-32" y="-14" width="12" height="6" fill="#D6455D"/>
+                  <path d="M-30,18 q4,6 12,6" stroke="#E8940A" stroke-width="2" fill="none"/>
+                  <text x="28" y="-8" fill="#5B6B77" font-size="6.2">산화 철 + 탄소</text>
+                  <text x="28" y="4" fill="#5B6B77" font-size="6">→ 철 + CO₂</text>
+                  <text x="28" y="18" fill="#C1521E" font-weight="800" font-size="6.2">산화 철이 환원된다</text>
+                </g>
+                <text y="88" fill="#5B6B77" font-size="6.2">철기 시대를 연 반응</text>
+              </g>
+            </g>
+          </g>
+          <text x="235" y="144" text-anchor="middle" font-size="8.8" font-weight="800" fill="#E8940A">잎사귀·굴뚝·용광로 — 무대는 달라도 각본은 같다: 산소의 이동</text>
+        </svg>
+        <figcaption>그림 2 | 광합성·화석 연료·철의 제련 — 겉모습이 다른 세 반응의 같은 각본</figcaption>
+      </figure>
+
+      <div class="expoint">
+        <div class="boxtitle"><span class="ico">!</span>시험엔 이렇게</div>
+        <p>"광합성에서 이산화 탄소는 <b>산화</b>된다"(X — 산소를 <b>잃고</b> 포도당으로 <b>환원</b>). "제련에서 산화 철은 산소를 <b>얻는다</b>"(X — 잃는다). 각 반응에서 <b>누가 산소를 얻고 잃는지</b>부터 표시하고 시작하라.</p>
+      </div>
+    </div>
+
+    <div class="wing">
+      <div class="wtitle">날개 노트</div>
+      <div class="term"><b>제련</b>광석에서 금속을 뽑아내는 일. 용광로에서는 코크스(탄소)가 산화 철의 산소를 빼앗아 간다.</div>
+      <div class="term"><b>코크스</b>석탄을 가공해 만든 탄소 덩어리 — 제련의 '산소 도둑' 역할.</div>
+      <div class="wsep"></div>
+      <div class="wtitle">한눈에 암기</div>
+      <div class="wing-pen">광합성: CO₂ 환원<br>연소: 연료 산화<br>제련: 산화 철 환원</div>
+    </div>
+  </div>
+  <div class="quickcheck">
+    <span class="qc-title">바로바로 체크</span>
+    <ol>
+      <li><span class="no">1</span>광합성에서 이산화 탄소는 포도당으로 환원된다. ( O , X )</li>
+      <li><span class="no">2</span>화석 연료의 연소는 연료가 산화되는 반응이다. ( O , X )</li>
+      <li><span class="no">3</span>철의 제련에서 산화 철은 산소를 얻는다. ( O , X )</li>
+    </ol>
+    <div class="qc-ans">정답 1 O 2 O 3 X (산소를 잃는다 — 환원)</div>
+  </div>
+  <div class="folio"><span>I. 변화와 다양성</span><span class="num">37</span></div>
+</div>
+
+<!-- ═════════════ p.38 개념 03 전자로 넓힌 정의 ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag">I. 변화와 다양성</span><span class="lesson-tag">03. 산화와 환원</span></div>
+  <div class="cols">
+    <div class="main">
+      <h3 class="sec"><span class="n">3</span>전자까지 보면 완성 — 넓어진 정의</h3>
+      <p class="body">그런데 산소가 없는데도 산화·환원이라 부르는 반응이 있다. 구리선을 <b>질산 은 수용액</b>에 담가 보자. 구리선 표면에 반짝이는 <b>은</b>이 나무처럼 자라나고, 용액은 점점 <b>푸른색</b>으로 변한다. 산소는 등장하지 않았는데 무엇이 오간 걸까 — 바로 <span class="kw">전자</span>다. 구리는 전자를 잃고 구리 이온이 되어 용액을 푸르게 만들었고, 은 이온은 그 전자를 받아 은으로 석출되었다.</p>
+      <p class="body">그래서 정의가 넓어진다. <span class="u-amber">전자를 잃으면 산화, 전자를 얻으면 환원</span>. 산소 정의와 모순되지 않는다 — 산소는 전자를 끌어당기는 힘이 세서, 산소와 결합한 물질은 사실상 전자를 내준 셈이기 때문이다. 그리고 전자로 봐도 규칙은 같다. <b>전자를 준 쪽 없이 받은 쪽은 없다</b> — 산화와 환원은 여전히 한 몸이다.</p>
+
+      <figure>
+        <svg width="470" height="150" viewBox="0 0 470 150" font-family="PC Sans">
+          <g font-size="6.8">
+            <text x="235" y="13" text-anchor="middle" font-size="8.4" font-weight="800" fill="#C1521E">구리와 은 이온 — 전자가 오가는 현장</text>
+            <g transform="translate(0,22)">
+              <!-- 비커 -->
+              <g transform="translate(110,0)">
+                <path d="M-52,0 v78 q0,8 8,8 h88 q8,0 8,-8 v-78" fill="#EAF3F8" stroke="#8FB2C9" stroke-width="1.4"/>
+                <rect x="-6" y="-10" width="12" height="72" rx="2" fill="#C97B4A"/>
+                <g fill="#C4CDD6">
+                  <path d="M-2,30 l-8,7 l5,2 l-9,8" stroke="#9AA5B1" stroke-width="1.6" fill="none"/>
+                  <path d="M8,40 l9,6 l-5,3 l10,7" stroke="#9AA5B1" stroke-width="1.6" fill="none"/>
+                </g>
+                <text x="0" y="76" text-anchor="middle" font-size="6.2" fill="#4C86B0">용액이 푸르게 — 구리 이온 증가</text>
+                <text x="0" y="-16" text-anchor="middle" font-weight="800" fill="#7A3E14">구리선 + 은 결정</text>
+              </g>
+              <!-- 전자 이동 다이어그램 -->
+              <g transform="translate(320,10)" text-anchor="middle">
+                <rect x="-115" y="0" width="230" height="76" rx="6" fill="#FBEFE7" stroke="#EBC4AB" stroke-width="1"/>
+                <g transform="translate(-58,38)">
+                  <circle r="17" fill="#C97B4A"/><text y="3" fill="#fff" font-weight="800">Cu</text>
+                  <text y="30" font-size="6.2" fill="#B4560E" font-weight="800">전자 잃음 → 산화</text>
+                </g>
+                <g>
+                  <line x1="-36" y1="30" x2="34" y2="30" stroke="#C1521E" stroke-width="1.6" marker-end="url(#arrP)"/>
+                  <circle cx="-8" cy="22" r="4.5" fill="#F3C24E" stroke="#B4560E" stroke-width="0.8"/>
+                  <text x="-8" y="25" font-size="5.6" font-weight="800" fill="#7A3E14">e⁻</text>
+                  <circle cx="8" cy="38" r="4.5" fill="#F3C24E" stroke="#B4560E" stroke-width="0.8"/>
+                  <text x="8" y="41" font-size="5.6" font-weight="800" fill="#7A3E14">e⁻</text>
+                </g>
+                <g transform="translate(60,38)">
+                  <circle r="17" fill="#8A8F98"/><text y="3" fill="#fff" font-weight="800">Ag⁺</text>
+                  <text y="30" font-size="6.2" fill="#2E7A54" font-weight="800">전자 얻음 → 환원</text>
+                </g>
+              </g>
+            </g>
+          </g>
+          <text x="235" y="144" text-anchor="middle" font-size="8.8" font-weight="800" fill="#E8940A">전자 잃음 = 산화, 전자 얻음 = 환원 — 산소 없이도 성립하는 넓은 정의</text>
+        </svg>
+        <figcaption>그림 3 | 질산 은 수용액 속 구리선 — 은은 자라고 용액은 푸르러진다</figcaption>
+      </figure>
+
+      <div class="expoint">
+        <div class="boxtitle"><span class="ico">!</span>시험엔 이렇게</div>
+        <p>이 실험의 3종 세트를 통째로 — <b>① 구리: 전자 잃음(산화) ② 은 이온: 전자 얻어 은으로 석출(환원) ③ 용액의 푸른색: 구리 이온 때문</b>. "푸른색이 은 이온 때문"이라는 선지가 단골 함정이다.</p>
+      </div>
+    </div>
+
+    <div class="wing">
+      <div class="wtitle">날개 노트</div>
+      <div class="term"><b>이온</b>전자를 잃거나 얻어 전하를 띤 입자. 전자를 잃으면 (+), 얻으면 (−)를 띤다.</div>
+      <div class="term"><b>석출</b>용액 속 이온이 고체가 되어 나오는 것 — 은 이온이 은 결정으로.</div>
+      <div class="wsep"></div>
+      <div class="wtitle">한눈에 암기</div>
+      <div class="wing-pen">전자 잃음 = 산화<br>전자 얻음 = 환원<br>푸른색 = 구리 이온!</div>
+    </div>
+  </div>
+  <div class="quickcheck">
+    <span class="qc-title">바로바로 체크</span>
+    <ol>
+      <li><span class="no">1</span>전자를 잃는 반응을 산화라 한다. ( O , X )</li>
+      <li><span class="no">2</span>구리선을 질산 은 수용액에 넣으면 은 이온은 전자를 얻어 환원된다. ( O , X )</li>
+      <li><span class="no">3</span>이때 용액의 푸른색은 은 이온 때문이다. ( O , X )</li>
+    </ol>
+    <div class="qc-ans">정답 1 O 2 O 3 X (구리 이온 때문)</div>
+  </div>
+  <div class="folio"><span>I. 변화와 다양성</span><span class="num">38</span></div>
+</div>
+
+<!-- ═════════════ p.39 개념 04 생활 속 산화·환원 ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag">I. 변화와 다양성</span><span class="lesson-tag">03. 산화와 환원</span></div>
+  <div class="cols">
+    <div class="main">
+      <h3 class="sec"><span class="n">4</span>생활 속 산화·환원 — 우리 곁의 반응들</h3>
+      <p class="body">이제 같은 눈으로 일상을 둘러보자. 우리 몸속에서는 <span class="kw">세포 호흡</span>이 쉼 없이 돌아간다 — 포도당이 산소를 얻어 이산화 탄소와 물이 되며 에너지를 내놓는 <b>산화</b> 반응이다. 광합성의 정확한 반대 방향이라는 점을 눈여겨보라. 겨울 주머니 속 <b>손난로</b>는 철가루가 공기 중 산소와 천천히 결합(산화)하며 열을 내는 것 — 녹슬기를 난방으로 바꾼 발명품이다.</p>
+      <p class="body">깎아 둔 사과가 갈색이 되는 <b>갈변</b>도 과일 속 물질이 산소와 반응하는 산화이고, 반대로 이 반응을 늦추려 설탕물·레몬즙을 바르는 것은 산소와의 접촉을 줄이는 지혜다. 이렇게 <span class="u-amber">타고, 녹슬고, 숨 쉬고, 데우는 일상의 변화</span>가 전부 산소·전자의 이동이라는 <b>하나의 규칙</b>으로 읽힌다 — 이것이 성취기준이 말하는 '생활 주변의 변화 분석'이다.</p>
+
+      <figure>
+        <svg width="470" height="146" viewBox="0 0 470 146" font-family="PC Sans">
+          <g font-size="6.8">
+            <text x="235" y="13" text-anchor="middle" font-size="8.4" font-weight="800" fill="#C1521E">하루 안의 산화·환원 — 네 개의 장면</text>
+            <g transform="translate(0,22)" text-anchor="middle">
+              <g transform="translate(66,0)">
+                <rect x="-52" y="0" width="104" height="92" rx="6" fill="#FBEFE7" stroke="#EBC4AB" stroke-width="1"/>
+                <text y="14" font-size="7.2" font-weight="800" fill="#C1521E">세포 호흡</text>
+                <g transform="translate(0,44)">
+                  <circle r="15" fill="#E8B4B8"/><circle cx="-4" cy="-3" r="4" fill="#B0483A"/><circle cx="6" cy="4" r="3" fill="#B0483A"/>
+                </g>
+                <text y="76" fill="#5B6B77" font-size="6">포도당의 산화 — 몸의 연료</text>
+              </g>
+              <g transform="translate(178,0)">
+                <rect x="-52" y="0" width="104" height="92" rx="6" fill="#FBEFE7" stroke="#EBC4AB" stroke-width="1"/>
+                <text y="14" font-size="7.2" font-weight="800" fill="#C1521E">손난로</text>
+                <g transform="translate(0,44)">
+                  <rect x="-18" y="-13" width="36" height="26" rx="7" fill="#E0A57E"/>
+                  <path d="M-4,-22 q-3,5 0,9 M4,-22 q-3,5 0,9" stroke="#D6455D" stroke-width="1.3" fill="none"/>
+                </g>
+                <text y="76" fill="#5B6B77" font-size="6">철가루의 느린 산화 = 열</text>
+              </g>
+              <g transform="translate(290,0)">
+                <rect x="-52" y="0" width="104" height="92" rx="6" fill="#FBEFE7" stroke="#EBC4AB" stroke-width="1"/>
+                <text y="14" font-size="7.2" font-weight="800" fill="#C1521E">사과의 갈변</text>
+                <g transform="translate(0,44)">
+                  <circle r="15" fill="#E85D3A"/>
+                  <path d="M0,-15 a15,15 0 0,1 15,15 l-15,0 z" fill="#A8703D"/>
+                  <line x1="0" y1="-15" x2="2" y2="-21" stroke="#5E7D57" stroke-width="1.6"/>
+                </g>
+                <text y="76" fill="#5B6B77" font-size="6">과일 속 물질 + 산소</text>
+              </g>
+              <g transform="translate(402,0)">
+                <rect x="-52" y="0" width="104" height="92" rx="6" fill="#F3F7F5" stroke="#A8D5BE" stroke-width="1"/>
+                <text y="14" font-size="7.2" font-weight="800" fill="#2E7A54">광합성 (반대편)</text>
+                <g transform="translate(0,44)">
+                  <path d="M-14,10 q-12,-4 -10,-18 q12,-4 18,4 q8,-2 10,8 q-2,8 -18,6 z" fill="#7FA86B"/>
+                </g>
+                <text y="76" fill="#5B6B77" font-size="6">CO₂의 환원 — 호흡의 역방향</text>
+              </g>
+            </g>
+          </g>
+          <text x="235" y="140" text-anchor="middle" font-size="8.8" font-weight="800" fill="#E8940A">타고 · 녹슬고 · 숨 쉬고 · 데우고 — 전부 같은 규칙의 다른 얼굴</text>
+        </svg>
+        <figcaption>그림 4 | 생활 속 산화·환원 — 호흡과 광합성이 정확히 반대 방향임을 눈에 담아 두자</figcaption>
+      </figure>
+
+      <div class="expoint">
+        <div class="boxtitle"><span class="ico">!</span>시험엔 이렇게</div>
+        <p>짝 맞추기 단골 — <b>호흡 = 포도당 산화</b> / <b>광합성 = 이산화 탄소 환원</b>. "호흡에서 포도당이 환원된다"(X)로 방향을 뒤집는 함정이 반복 출제된다. 손난로·갈변·연소는 모두 <b>산화</b> 쪽 사례다.</p>
+      </div>
+    </div>
+
+    <div class="wing">
+      <div class="wtitle">날개 노트</div>
+      <div class="term"><b>세포 호흡</b>포도당 + 산소 → 이산화 탄소 + 물 + 에너지. 몸속에서 일어나는 조용한 연소다.</div>
+      <div class="term"><b>갈변 늦추기</b>레몬즙·설탕물은 산소와의 접촉을 줄여 산화를 늦춘다 — 부엌의 화학.</div>
+      <div class="wsep"></div>
+      <div class="wtitle">한눈에 암기</div>
+      <div class="wing-pen">호흡 = 포도당 산화<br>광합성 = CO₂ 환원<br>손난로·갈변 = 산화</div>
+    </div>
+  </div>
+  <div class="quickcheck">
+    <span class="qc-title">바로바로 체크</span>
+    <ol>
+      <li><span class="no">1</span>세포 호흡에서 포도당은 산화된다. ( O , X )</li>
+      <li><span class="no">2</span>손난로의 발열은 철가루의 산화 때문이다. ( O , X )</li>
+      <li><span class="no">3</span>사과의 갈변은 산소와 무관한 변화다. ( O , X )</li>
+    </ol>
+    <div class="qc-ans">정답 1 O 2 O 3 X (산소와의 반응 — 산화)</div>
+  </div>
+  <div class="folio"><span>I. 변화와 다양성</span><span class="num">39</span></div>
+</div>
+
+<!-- ═════════════ p.40 개념 05 규칙성 정리 ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag">I. 변화와 다양성</span><span class="lesson-tag">03. 산화와 환원</span></div>
+  <div class="cols">
+    <div class="main">
+      <h3 class="sec"><span class="n">5</span>규칙은 하나 — 주는 자와 받는 자</h3>
+      <p class="body">이 소단원의 모든 장면을 하나의 문장으로 접을 수 있다. <span class="u-amber">무언가(산소든 전자든)를 주고받을 때, 주는 쪽과 받는 쪽은 반드시 함께 있다</span>. 그래서 산화와 환원은 따로 일어날 수 없고, 한 반응 안에서 <b>언제나 동시에</b> 일어난다 — 이를 산화·환원 반응의 <b>동시성</b>이라 한다. 문제를 풀 때의 순서도 여기서 나온다. ① 무엇이 이동했나(산소? 전자?) → ② 누가 얻고 누가 잃었나 → ③ 잃은 쪽이 산화, 얻은 쪽이 환원.</p>
+      <p class="body">시야를 넓히면 이 규칙은 I단원 전체를 관통한다. 광합성이 채운 산소가 오존층이 되어 생물을 뭍으로 올렸고(01), 그 생물들의 호흡과 인류의 연료·제련이 다시 산소를 주고받으며 문명을 세웠다. <b>변화의 화학적 얼굴</b>이 산화·환원인 셈이다. 다음 소단원에서는 또 다른 짝 개념 — 산과 염기가 기다린다.</p>
+
+      <div class="gist" style="margin:2.8mm 0 4mm; padding:2.2mm 1.8mm 2mm;">
+        <div class="boxtitle"><span class="ico">알</span>알짜 정리 — 산화와 환원 한 장 요약</div>
+        <ul>
+          <li>산소 기준: <b>얻으면 산화, 잃으면 환원</b> / 전자 기준: <b>잃으면 산화, 얻으면 환원</b></li>
+          <li>세 반응: 광합성(CO₂ <b>환원</b>) · 화석 연료 연소(연료 <b>산화</b>) · 제련(산화 철 <b>환원</b>)</li>
+          <li>구리+은 이온: 구리 산화(용액 푸른색은 <b>구리 이온</b>) · 은 이온 환원(석출)</li>
+          <li>산화와 환원은 <b>언제나 동시</b> — 주는 자 없이 받는 자 없다</li>
+        </ul>
+      </div>
+
+      <div class="saem">
+        <div class="avatar">박찬<br>쌤</div>
+        <div class="bubble"><span class="pen">"헷갈릴 땐 '잃산얻환' 넉 자 — 전자를 잃으면 산화, 얻으면 환원. 산소는 반대로 얻으면 산화라는 것만 짝으로 묶어 두자."</span></div>
+      </div>
+    </div>
+
+    <div class="wing">
+      <div class="wtitle">날개 노트</div>
+      <div class="term"><b>동시성</b>한 반응 안에서 산화된 물질과 환원된 물질이 반드시 함께 존재한다는 규칙.</div>
+      <div class="term"><b>분석의 3단계</b>① 이동한 것 찾기 ② 얻은 자/잃은 자 표시 ③ 산화·환원 이름 붙이기.</div>
+      <div class="wsep"></div>
+      <div class="wtitle">한눈에 암기</div>
+      <div class="wing-pen">전자: 잃山 얻還<br>산소: 얻으면 산화!<br>둘은 한 몸, 언제나 동시</div>
+      <div class="wsep"></div>
+      <div class="review">
+        <div class="rv-title">앞 소단원과 연결</div>
+        <div class="term" style="margin-bottom:0;"><b>육상 진출 (01)</b>광합성(환원 반응)이 만든 산소와 오존층 — 지질시대의 대사건은 화학 반응에서 시작되었다.</div>
+      </div>
+    </div>
+  </div>
+  <div class="quickcheck">
+    <span class="qc-title">바로바로 체크</span>
+    <ol>
+      <li><span class="no">1</span>산화와 환원은 한 반응에서 항상 동시에 일어난다. ( O , X )</li>
+      <li><span class="no">2</span>전자를 얻는 반응은 산화다. ( O , X )</li>
+      <li><span class="no">3</span>산화·환원 분석의 시작은 '무엇이 이동했는지' 찾는 것이다. ( O , X )</li>
+    </ol>
+    <div class="qc-ans">정답 1 O 2 X (환원) 3 O</div>
+  </div>
+  <div class="folio"><span>I. 변화와 다양성</span><span class="num">40</span></div>
+</div>
+
+<!-- ═════════════ p.41 자료 파헤치기 ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag">I. 변화와 다양성</span><span class="lesson-tag">03. 산화와 환원</span></div>
+  <div class="lab">
+    <div class="lab-head">자료 파헤치기 <span class="tag">탐구·자료 분석</span> <span style="font-weight:600; font-size:9.5pt; margin-left:auto;">용광로 — 산소 도둑의 현장</span></div>
+    <div class="lab-body">
+      <h4>자료</h4>
+      <p>용광로에 철광석(주성분 산화 철)과 코크스(탄소)를 넣고 뜨거운 공기를 불어 넣으면, 노 아래쪽으로 쇳물이 흘러나오고 굴뚝으로는 이산화 탄소가 빠져나간다. 전체 반응을 단순화하면 다음과 같다.</p>
+      <figure>
+        <svg width="430" height="110" viewBox="0 0 430 110" font-family="PC Sans">
+          <g font-size="7">
+            <g transform="translate(75,52)" text-anchor="middle">
+              <path d="M-42,36 l12,-64 h60 l12,64 z" fill="#8A6B52" stroke="#6B5240" stroke-width="1.2"/>
+              <path d="M-20,-28 h40 l-6,-14 h-28 z" fill="#A8886B"/>
+              <path d="M-34,36 q10,8 24,8 q16,0 26,-8" fill="#E8940A"/>
+              <text x="0" y="52" font-weight="800" fill="#7A3E14">용광로</text>
+              <text x="2" y="-46" font-size="6.2" fill="#5B6B77">철광석+코크스 ↓</text>
+              <text x="58" y="30" font-size="6.2" fill="#B4560E">쇳물 →</text>
+            </g>
+            <g transform="translate(280,52)" text-anchor="middle">
+              <rect x="-120" y="-34" width="240" height="64" rx="6" fill="#FBEFE7" stroke="#EBC4AB" stroke-width="1"/>
+              <text y="-14" font-size="8.2" font-weight="800" fill="#3D4C58">산화 철 + 탄소 → 철 + 이산화 탄소</text>
+              <g font-size="6.4" font-weight="800">
+                <text x="-72" y="4" fill="#2E7A54">산소 잃음</text>
+                <text x="-72" y="14" fill="#2E7A54">= 환원</text>
+                <text x="-14" y="4" fill="#C1521E">산소 얻음</text>
+                <text x="-14" y="14" fill="#C1521E">= 산화</text>
+              </g>
+              <path d="M-46,20 q34,16 60,2" stroke="#C1521E" stroke-width="1.3" fill="none" marker-end="url(#arrP)"/>
+              <text y="40" font-size="6.2" fill="#5B6B77">산소가 철에서 탄소로 옮겨 간다</text>
+            </g>
+          </g>
+        </svg>
+      </figure>
+      <h4>해석의 3단계</h4>
+      <ol>
+        <li><b>이동한 것 찾기</b> — 반응 전 산소는 철에 붙어 있었고(산화 철), 반응 후에는 탄소에 붙어 있다(이산화 탄소). <b>산소가 철 → 탄소로 이동</b>했다.</li>
+        <li><b>이름 붙이기</b> — 산소를 잃은 산화 철은 <b>환원</b>되어 철이 되고, 산소를 얻은 코크스(탄소)는 <b>산화</b>되어 이산화 탄소가 된다. 한 반응 안에 산화와 환원이 <b>동시에</b> 있다.</li>
+        <li><b>문명으로 연결하기</b> — 이 '산소 도둑질' 기술을 손에 넣은 순간 인류는 철기 시대를 열었다. 더 단단한 농기구와 도구 — 반응식 하나가 역사의 방향을 바꿨다.</li>
+      </ol>
+      <h4>결론</h4>
+      <p>복잡해 보이는 공정도 <b>"산소가 어디서 어디로 갔는가"</b> 한 질문이면 뼈대가 드러난다. 잃은 자(환원)와 얻은 자(산화)를 표시하는 순간, 용광로는 거대한 산화·환원 실험 장치일 뿐이다.</p>
+      <div class="expoint">
+        <div class="boxtitle"><span class="ico">!</span>시험엔 이렇게</div>
+        <p>제련 문제의 답은 늘 같은 두 줄 — <b>산화 철: 산소 잃음 → 환원</b>, <b>탄소: 산소 얻음 → 산화</b>. "코크스가 환원된다"로 주어를 바꿔치는 선지에 속지 말 것.</p>
+      </div>
+    </div>
+  </div>
+  <div class="folio"><span>I. 변화와 다양성</span><span class="num">41</span></div>
+</div>
+
+<!-- ═════════════ p.42 STEP 1 + STEP 2 시작 ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag">I. 변화와 다양성</span><span class="lesson-tag">03. 산화와 환원 | 문제</span></div>
+  <div class="step-head"><span class="stepno">STEP 1</span><span class="steptt">개념 확인</span><span class="stepdesc">OX와 빈칸으로 개념 점검 — 막히면 알짜 정리로!</span></div>
+  <div class="qgrid">
+    <div>
+      <div class="q"><div class="qhead"><span class="qno">1</span><div class="stem">물질이 산소를 잃는 반응을 산화라 한다. <span class="ox-answer">( O , X )</span></div></div></div>
+      <div class="q"><div class="qhead"><span class="qno">2</span><div class="stem">산화와 환원은 한 반응 안에서 항상 동시에 일어난다. <span class="ox-answer">( O , X )</span></div></div></div>
+      <div class="q"><div class="qhead"><span class="qno">3</span><div class="stem">광합성에서 이산화 탄소는 산소를 얻어 산화된다. <span class="ox-answer">( O , X )</span></div></div></div>
+    </div>
+    <div>
+      <div class="q"><div class="qhead"><span class="qno">4</span><div class="stem">철이 녹스는 것처럼 물질이 산소를 얻는 반응을 <span class="blankline" style="min-width:12mm;"></span>라 한다.</div></div></div>
+      <div class="q"><div class="qhead"><span class="qno">5</span><div class="stem">철의 제련에서 산화 철은 산소를 잃고 <span class="blankline" style="min-width:12mm;"></span>되어 철이 된다.</div></div></div>
+      <div class="q"><div class="qhead"><span class="qno">6</span><div class="stem">구리선을 은 이온 용액에 넣으면 구리는 <span class="blankline" style="min-width:12mm;"></span>를 잃고 산화된다.</div></div></div>
+    </div>
+  </div>
+  <div style="border-top:0.5mm solid var(--line); margin:2mm 0 4mm;"></div>
+  <div class="step-head s2"><span class="stepno">STEP 2</span><span class="steptt">내신 완성</span><span class="stepdesc">학교 시험 유형 그대로 — 서술형까지 한 번에</span></div>
+  <div class="q">
+    <div class="qhead"><span class="qno">7</span><div class="stem">산화와 환원에 대한 설명으로 옳은 것은? <span class="difficulty">●●○</span>
+    <div class="tags">10통과2-01-03 | 개념 1·3</div></div></div>
+    <ul class="choices">
+      <li>① 산화는 물질이 산소를 잃는 반응이다.</li>
+      <li>② 환원은 물질이 전자를 잃는 반응이다.</li>
+      <li>③ 산화가 일어날 때 환원은 일어나지 않을 수 있다.</li>
+      <li>④ 연소는 환원의 대표적인 예다.</li>
+      <li>⑤ 물질이 산소를 얻거나 전자를 잃으면 산화되었다고 한다.</li>
+    </ul>
+  </div>
+  <div class="q">
+    <div class="qhead"><span class="qno">8</span><div class="stem">광합성, 화석 연료의 연소, 철의 제련에 대한 설명으로 옳은 것은? <span class="difficulty">●●●</span>
+    <div class="tags">10통과2-01-03 | 개념 2</div></div></div>
+    <ul class="choices">
+      <li>① 광합성에서 이산화 탄소는 산화된다.</li>
+      <li>② 철의 제련에서 코크스(탄소)는 산소를 얻어 산화된다.</li>
+      <li>③ 화석 연료의 연소에서 연료는 환원된다.</li>
+      <li>④ 철의 제련에서 산화 철은 산소를 얻는다.</li>
+      <li>⑤ 세 반응에는 산화·환원이 일어나지 않는다.</li>
+    </ul>
+  </div>
+  <div class="folio"><span>I. 변화와 다양성</span><span class="num">42</span></div>
+</div>
+
+<!-- ═════════════ p.43 STEP 2 계속 ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag">I. 변화와 다양성</span><span class="lesson-tag">03. 산화와 환원 | 문제</span></div>
+  <div class="q">
+    <div class="qhead"><span class="qno">9</span><div class="stem"><span class="badge-data">자료</span>구리선을 질산 은 수용액에 넣었더니 구리선 표면에 은이 석출되고 용액이 점점 푸르게 변하였다. 이에 대한 설명으로 옳은 것은? <span class="difficulty">●●●</span>
+    <div class="tags">10통과2-01-03 | 개념 3</div></div></div>
+    <ul class="choices">
+      <li>① 구리는 전자를 잃고 산화되었다.</li>
+      <li>② 은 이온은 전자를 잃고 환원되었다.</li>
+      <li>③ 용액의 푸른색은 은 이온 때문이다.</li>
+      <li>④ 이 반응에서는 산화만 일어났다.</li>
+      <li>⑤ 구리는 전자를 얻어 이온이 되었다.</li>
+    </ul>
+  </div>
+  <div class="q">
+    <div class="qhead"><span class="qno">10</span><div class="stem">생활 속 산화·환원에 대한 설명으로 옳은 것만을 고른 것은? <span class="difficulty">●●●</span>
+    <div class="tags">10통과2-01-03 | 개념 4</div></div></div>
+    <div class="bogi-box" style="background:#fff;">
+      (가) 손난로가 따뜻해지는 것은 철가루의 산화 때문이다.<br>
+      (나) 깎아 둔 사과의 갈변은 과일 속 물질과 산소의 반응이다.<br>
+      (다) 세포 호흡에서 포도당은 환원된다.
+    </div>
+    <ul class="choices inline">
+      <li>① (가)</li><li>② (다)</li><li>③ (가), (다)</li><li>④ (가), (나)</li><li>⑤ (가), (나), (다)</li>
+    </ul>
+  </div>
+  <div class="q">
+    <div class="qhead"><span class="qno">11</span><div class="stem"><span class="badge-essay">서술형</span>용광로에서 철이 만들어질 때 일어나는 산화와 환원을 <b>'산소'</b>라는 말을 포함하여 각각 서술하시오. <span class="difficulty">●●●●</span>
+    <div class="tags">10통과2-01-03 | 개념 2·자료</div></div></div>
+    <div class="essay-lines"><div></div><div></div><div></div></div>
+  </div>
+  <div class="folio"><span>I. 변화와 다양성</span><span class="num">43</span></div>
+</div>
+
+<!-- ═════════════ p.44 STEP 3 ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag">I. 변화와 다양성</span><span class="lesson-tag">03. 산화와 환원 | 문제</span></div>
+  <div class="step-head s3"><span class="stepno">STEP 3</span><span class="steptt">수능 도전</span><span class="stepdesc">2028 수능 규격 — ㄱㄴㄷ 합답형·자료 해석</span></div>
+  <div class="q">
+    <div class="qhead"><span class="qno">12</span><div class="stem"><span class="badge-data">자료</span>그림은 용광로에서 일어나는 반응을 나타낸 것이다. 옳은 것만을 &lt;보기&gt;에서 있는 대로 고른 것은? <span class="difficulty">[2점]</span>
+    <div class="tags">10통과2-01-03</div></div></div>
+    <figure style="margin:2mm 0 1.5mm 8.6mm;">
+      <svg width="300" height="70" viewBox="0 0 300 70" font-family="PC Sans">
+        <g font-size="7" text-anchor="middle">
+          <rect x="10" y="16" width="280" height="40" rx="6" fill="#FBEFE7" stroke="#EBC4AB" stroke-width="1"/>
+          <text x="150" y="34" font-size="8.6" font-weight="800" fill="#3D4C58">산화 철 + 탄소 → 철 + 이산화 탄소</text>
+          <path d="M78,42 q48,18 102,6" stroke="#C1521E" stroke-width="1.3" fill="none" marker-end="url(#arrP)"/>
+          <text x="130" y="64" font-size="6.4" fill="#C1521E" font-weight="800">산소의 이동</text>
+        </g>
+      </svg>
+    </figure>
+    <div class="bogi-box">
+      <div class="bt">보기</div>
+      ㄱ. 산화 철은 산소를 잃고 철로 환원된다.<br>
+      ㄴ. 탄소는 산소를 얻어 산화된다.<br>
+      ㄷ. 이 반응에서 산화와 환원은 서로 다른 시점에 일어난다.
+    </div>
+    <ul class="choices inline">
+      <li>① ㄱ</li><li>② ㄷ</li><li>③ ㄱ, ㄴ</li><li>④ ㄴ, ㄷ</li><li>⑤ ㄱ, ㄴ, ㄷ</li>
+    </ul>
+  </div>
+  <div class="q">
+    <div class="qhead"><span class="qno">13</span><div class="stem"><span class="badge-data">자료</span>다음은 생명 활동의 두 반응을 나타낸 것이다. 옳은 것만을 &lt;보기&gt;에서 있는 대로 고른 것은? <span class="difficulty">[2.5점]</span>
+    <div class="tags">10통과2-01-03</div></div></div>
+    <div class="bogi-box" style="background:#fff;">
+      (가) 광합성: 이산화 탄소 + 물 <b>→(빛에너지)→</b> 포도당 + 산소<br>
+      (나) 세포 호흡: 포도당 + 산소 → 이산화 탄소 + 물 + 에너지
+    </div>
+    <div class="bogi-box">
+      <div class="bt">보기</div>
+      ㄱ. (가)에서 이산화 탄소는 환원된다.<br>
+      ㄴ. (나)에서 포도당은 산화된다.<br>
+      ㄷ. (가)와 (나) 모두 산화와 환원이 동시에 일어나는 반응이다.
+    </div>
+    <ul class="choices inline">
+      <li>① ㄱ</li><li>② ㄷ</li><li>③ ㄱ, ㄴ</li><li>④ ㄴ, ㄷ</li><li>⑤ ㄱ, ㄴ, ㄷ</li>
+    </ul>
+  </div>
+  <div class="folio"><span>I. 변화와 다양성</span><span class="num">44</span></div>
+</div>
+
+<!-- ═════════════ p.45 해설 1 ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag" style="color:var(--brand);">알짜 해설</span><span class="lesson-tag">03. 산화와 환원</span></div>
+  <div class="sol-head"><span class="stt">알짜 해설</span><span class="sub">전 문항 해설 + 오답 선지 분석 — 맞힌 문제도 해설로 한 번 더!</span></div>
+  <table class="anstable">
+    <tr><th>문항</th><td>1</td><td>2</td><td>3</td><td>4</td><td>5</td><td>6</td><td>7</td><td>8</td><td>9</td><td>10</td><td>11</td><td>12</td><td>13</td></tr>
+    <tr><th>정답</th><td class="a">X</td><td class="a">O</td><td class="a">X</td><td class="a">산화</td><td class="a">환원</td><td class="a">전자</td><td class="a">⑤</td><td class="a">②</td><td class="a">①</td><td class="a">④</td><td class="a">서술형</td><td class="a">③</td><td class="a">⑤</td></tr>
+  </table>
+  <div class="solcols">
+    <div>
+      <div class="sol"><div class="shead"><span class="sno">1</span><span class="sans">X</span><span class="slink">개념 1</span></div>
+        <p>산소를 잃는 것은 환원 — 얻는 쪽이 산화다.</p></div>
+      <div class="sol"><div class="shead"><span class="sno">2</span><span class="sans">O</span><span class="slink">개념 5</span></div>
+        <p>주는 자 없이 받는 자 없다 — 동시성.</p></div>
+      <div class="sol"><div class="shead"><span class="sno">3</span><span class="sans">X</span><span class="slink">개념 2</span></div>
+        <p>이산화 탄소는 산소를 잃고 포도당으로 환원된다.</p></div>
+      <div class="sol"><div class="shead"><span class="sno">4</span><span class="sans">산화</span><span class="slink">개념 1</span></div>
+        <p>녹·연소·갈변 — 산소를 얻는 반응의 이름.</p></div>
+      <div class="sol"><div class="shead"><span class="sno">5</span><span class="sans">환원</span><span class="slink">개념 2</span></div>
+        <p>산소를 잃고 본모습(철)으로 돌아간다.</p></div>
+      <div class="sol"><div class="shead"><span class="sno">6</span><span class="sans">전자</span><span class="slink">개념 3</span></div>
+        <p>전자를 잃으면 산화 — 잃산얻환.</p></div>
+    </div>
+    <div>
+      <div class="sol"><div class="shead"><span class="sno">7</span><span class="sans">⑤</span><span class="slink">개념 1·3</span></div>
+        <p>산소 얻음 = 산화, 전자 잃음 = 산화 — 두 정의를 한 문장으로 묶었다.</p>
+        <div class="wrongbox"><div class="wt">오답 왜 틀렸나</div>
+          <p><b>①</b> 산소를 잃는 건 환원. <b>②</b> 전자를 잃는 건 산화. <b>③</b> 동시성 위반. <b>④</b> 연소는 격렬한 산화다.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">8</span><span class="sans">②</span><span class="slink">개념 2</span></div>
+        <p>코크스는 산화 철의 산소를 빼앗아 이산화 탄소가 된다 — 산화.</p>
+        <div class="wrongbox"><div class="wt">오답 왜 틀렸나</div>
+          <p><b>①</b> CO₂는 환원된다. <b>③</b> 연료는 산화된다. <b>④</b> 산화 철은 산소를 잃는다. <b>⑤</b> 셋 다 산화·환원 반응이다.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">9</span><span class="sans">①</span><span class="slink">개념 3</span></div>
+        <p>구리는 전자를 잃고(산화) 구리 이온이 되어 용액을 푸르게 만든다.</p>
+        <div class="wrongbox"><div class="wt">오답 왜 틀렸나</div>
+          <p><b>②</b> 은 이온은 전자를 <b>얻어</b> 환원. <b>③</b> 푸른색은 <b>구리 이온</b>. <b>④</b> 산화·환원 동시. <b>⑤</b> 잃었다.</p></div></div>
+    </div>
+  </div>
+  <div class="folio"><span>알짜 해설</span><span class="num">45</span></div>
+</div>
+
+<!-- ═════════════ p.46 해설 2 ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag" style="color:var(--brand);">알짜 해설</span><span class="lesson-tag">03. 산화와 환원</span></div>
+  <div class="solcols">
+    <div>
+      <div class="sol"><div class="shead"><span class="sno">10</span><span class="sans">④</span><span class="slink">개념 4</span></div>
+        <p>(가) 철가루의 느린 산화가 손난로의 열원. (나) 갈변 = 과일 속 물질 + 산소 — 둘 다 옳다.</p>
+        <div class="wrongbox"><div class="wt">오답 왜 틀렸나</div>
+          <p><b>(다)</b> 호흡에서 포도당은 산소를 얻어 <b>산화</b>된다 — 방향 뒤집기 함정.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">11</span><span class="sans">모범 답안</span><span class="slink">개념 2·자료</span></div>
+        <p>산화 철은 <b>산소</b>를 잃고 환원되어 철이 되고, 코크스(탄소)는 그 <b>산소</b>를 얻어 산화되어 이산화 탄소가 된다.</p>
+        <div class="wrongbox"><div class="wt">채점 기준 (감점 포인트)</div>
+          <p>① 산화 철: 산소 잃음 → 환원 ② 탄소: 산소 얻음 → 산화 — 두 방향을 <b>각각</b> 서술해야 만점. 주어 바꿔치기(코크스가 환원)에 주의.</p></div></div>
+    </div>
+    <div>
+      <div class="sol"><div class="shead"><span class="sno">12</span><span class="sans">③</span><span class="slink">개념 2·자료 | 2점</span></div>
+        <p><b>ㄱ (옳음)</b> 산소를 잃은 산화 철 → 철, 환원. <b>ㄴ (옳음)</b> 산소를 얻은 탄소 → 이산화 탄소, 산화. <b>ㄷ (틀림)</b> 산화와 환원은 한 반응에서 동시에 일어난다.</p>
+        <div class="wrongbox"><div class="wt">함정 체크</div>
+          <p>화살표 하나(산소의 이동)만 그리면 ㄱ·ㄴ이 저절로 판정된다 — 그림을 그리는 사람이 이긴다.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">13</span><span class="sans">⑤</span><span class="slink">개념 2·4 | 2.5점</span></div>
+        <p><b>ㄱ (옳음)</b> CO₂가 산소를 잃고 포도당으로 — 환원. <b>ㄴ (옳음)</b> 포도당이 산소를 얻어 — 산화. <b>ㄷ (옳음)</b> 어느 반응이든 잃는 자와 얻는 자가 함께 있다 — 동시성.</p>
+        <div class="wrongbox"><div class="wt">함정 체크</div>
+          <p>광합성과 호흡은 <b>정확히 반대 방향</b>의 한 쌍 — 한쪽만 외우면 다른 쪽은 뒤집으면 된다.</p></div></div>
+
+      <div class="gist" style="margin-top:5mm;">
+        <div class="boxtitle"><span class="ico">알</span>이 소단원, 이것만은!</div>
+        <ul>
+          <li>산소: <b>얻으면 산화, 잃으면 환원</b> / 전자: <b>잃으면 산화, 얻으면 환원</b>(잃산얻환)</li>
+          <li>광합성 = CO₂ <b>환원</b> · 연소 = 연료 <b>산화</b> · 제련 = 산화 철 <b>환원</b></li>
+          <li>산화와 환원은 <b>언제나 동시</b> — '무엇이 이동했나'부터 찾아라</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div class="folio"><span>알짜 해설</span><span class="num">46</span></div>
+</div>
+
+<!-- ═════════════ p.47 MEMO ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag">I. 변화와 다양성</span><span class="lesson-tag">03 ▸ 04 넘어가기 전에</span></div>
+  <div class="memo-head"><span class="mt">MEMO</span><span class="ms">헷갈린 개념, 다시 틀린 문제 번호, 나만의 암기법을 남겨 두는 자리</span></div>
+  <div class="memo-area"></div>
+  <div class="memo-pen">"광합성·연소·제련 셋을 놓고 '산소가 어디서 어디로 갔는지' 화살표만 그려 보자. 막히면 37쪽으로! — 박찬쌤"</div>
+  <div class="folio"><span>박찬 과학 | 통합과학 2</span><span class="num">47</span></div>
+</div>
+
+</body>
+</html>
