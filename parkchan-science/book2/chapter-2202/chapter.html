@@ -1,0 +1,945 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<title>박찬 과학 통합과학2 — II-02 생태계 평형</title>
+<style>
+  @font-face { font-family:'PC Sans'; src:url('file:///root/.fonts/NotoSansKR.ttf'); font-weight:100 900; }
+  @font-face { font-family:'PC Serif'; src:url('file:///root/.fonts/NotoSerifKR.ttf'); font-weight:100 900; }
+  @font-face { font-family:'PC Pen'; src:url('file:///root/.fonts/YeonSung-Regular.ttf'); font-weight:400; }
+
+  :root{
+    --brand:#0E5A6B;        /* 박찬 과학 브랜드 딥틸 */
+    --brand-lt:#E3F0F3;
+    --unit:#147D6F;         /* I. 과학의 기초 단원 컬러(그린) */
+    --unit-lt:#E7F5F1;
+    --unit-md:#A9D9CE;
+    --accent:#E8940A;       /* 알짜 앰버 */
+    --accent-lt:#FDF3E0;
+    --point:#D6455D;        /* 시험 포인트 */
+    --point-lt:#FBEBEE;
+    --ink:#22303A;
+    --sub:#5B6B77;
+    --line:#D8E0E5;
+  }
+  *{ box-sizing:border-box; margin:0; padding:0; -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+  @page{ size:210mm 275mm; margin:0; }
+  html,body{ font-family:'PC Sans',sans-serif; color:var(--ink); word-break:keep-all; overflow-wrap:anywhere; }
+
+  .page{ width:210mm; height:275mm; position:relative; overflow:hidden; background:#fff; page-break-after:always; padding:14mm 13mm 19mm 15mm; display:flex; flex-direction:column; }
+
+  /* ── 러닝 헤드 / 풋 ── */
+  .runhead{ display:flex; align-items:center; justify-content:space-between; border-bottom:0.35mm solid var(--unit); padding-bottom:2mm; margin-bottom:6.5mm; }
+  .runhead .unit-tag{ font-size:8.5pt; font-weight:700; color:var(--unit); letter-spacing:0.02em; }
+  .runhead .lesson-tag{ font-size:8.5pt; color:var(--sub); }
+  .folio{ position:absolute; bottom:7mm; left:0; right:0; display:flex; justify-content:space-between; padding:0 14mm 0 14mm; font-size:8pt; color:var(--sub); }
+  .folio .num{ font-weight:800; color:var(--unit); font-size:10pt; }
+
+  /* ── 본문 그리드: 본문 + 날개단 ── */
+  .cols{ display:grid; grid-template-columns:1fr 43mm; gap:8mm; flex:1; min-height:0; margin-bottom:4mm; }
+  .main{ min-width:0; }
+  .wing{ border-left:0.3mm solid var(--line); padding-left:5mm; font-size:8.2pt; color:var(--sub); line-height:1.7; }
+
+  /* ── 타이포 ── */
+  h2.lesson-title{ display:flex; align-items:baseline; gap:3.5mm; margin-bottom:2mm; }
+  h2.lesson-title .no{ background:var(--unit); color:#fff; font-size:13pt; font-weight:900; padding:1.2mm 3.2mm; border-radius:1.5mm; }
+  h2.lesson-title .tt{ font-size:16.5pt; font-weight:900; letter-spacing:-0.01em; }
+  .std-badges{ display:flex; gap:2mm; margin:2mm 0 6.5mm; }
+  .std{ font-size:7.4pt; color:var(--unit); background:none; border:0.3mm solid var(--unit-md); border-radius:5mm; padding:0.6mm 2.8mm; font-weight:600; }
+
+  h3.sec{ display:flex; align-items:baseline; gap:3mm; font-size:12.5pt; font-weight:800; margin:9mm 0 3.6mm; letter-spacing:-0.01em; }
+  h3.sec .n{ font-family:'PC Serif'; font-size:15.5pt; font-weight:900; color:var(--unit); border-bottom:0.7mm solid var(--accent); padding:0 0.8mm 0.2mm; flex:0 0 auto; line-height:1; }
+  h3.sec::after{ content:""; flex:1; border-top:0.25mm solid var(--line); align-self:center; margin-left:2mm; }
+  h3.sec:first-child{ margin-top:0; }
+
+  p.body{ font-family:'PC Serif'; font-size:9.6pt; line-height:1.92; margin-bottom:3.6mm; text-align:justify; }
+  p.body b{ font-weight:800; }
+  .kw{ font-weight:800; color:var(--unit); }
+  .u-amber{ background:#F8E9C6; font-weight:700; padding:0.15mm 0.6mm; border-radius:0.6mm; box-decoration-break:clone; -webkit-box-decoration-break:clone; }
+
+  ul.pts{ font-family:'PC Serif'; font-size:9.6pt; line-height:1.84; margin:1.5mm 0 3.5mm 1mm; list-style:none; }
+  ul.pts li{ padding-left:4.5mm; position:relative; margin-bottom:1.8mm; }
+  ul.pts li::before{ content:""; position:absolute; left:0.5mm; top:2.9mm; width:1.7mm; height:1.7mm; background:var(--accent); border-radius:50%; }
+
+  /* ── 코너 박스 ── */
+  .boxtitle{ display:inline-flex; align-items:center; gap:1.8mm; font-weight:900; font-size:9.5pt; margin-bottom:1.6mm; }
+  .boxtitle .ico{ width:5.2mm; height:5.2mm; border-radius:1.2mm; display:flex; align-items:center; justify-content:center; color:#fff; font-size:7.5pt; font-weight:900; }
+
+  .gist{ background:none; border:none; border-top:0.5mm solid var(--accent); border-bottom:0.5mm solid var(--accent); border-radius:0; padding:3.2mm 1.8mm 3mm; margin:6mm 0 5mm; }
+  .gist .boxtitle{ color:#9C6503; } .gist .ico{ background:var(--accent); }
+  .gist ul{ list-style:none; font-family:'PC Serif'; font-size:9.3pt; line-height:1.78; }
+  .gist li{ padding-left:4.2mm; position:relative; margin-bottom:1.2mm;}
+  .gist li::before{ content:"✓"; position:absolute; left:0; color:var(--accent); font-weight:900; }
+
+  .expoint{ background:none; border-left:0.5mm solid #D998A4; border-left-color:#D998A4; border-radius:0; padding:1.4mm 0 1.4mm 3.6mm; margin:4.5mm 0; }
+  .expoint .boxtitle{ color:#A9556A; font-size:8.6pt; margin-bottom:1mm;}
+  .expoint .ico{ background:none; color:#A9556A; border:0.35mm solid #D998A4; width:4.4mm; height:4.4mm; border-radius:50%; font-size:7pt; }
+  .expoint p{ font-family:'PC Serif'; font-size:8.9pt; line-height:1.7; }
+
+  .pen{ font-family:'PC Pen'; font-size:12pt; color:#0F6357; line-height:1.45; }
+  .saem{ display:flex; gap:3mm; align-items:flex-start; margin:4.5mm 0; }
+  .saem .avatar{ flex:0 0 auto; width:10.5mm; height:10.5mm; border-radius:50%; background:var(--brand); color:#fff; font-size:7pt; font-weight:800; display:flex; align-items:center; justify-content:center; line-height:1.35; letter-spacing:0.04em; text-align:center; border:0.5mm solid var(--accent); box-sizing:border-box;}
+  .saem .bubble{ background:#FFFBF0; border:0.4mm solid #EBCB9C; border-radius:3mm; padding:2.2mm 3.6mm 2mm; position:relative; }
+  .saem .bubble::before{ content:""; position:absolute; left:-1.8mm; top:3.2mm; width:3mm; height:3mm; background:#FFFBF0; border-left:0.4mm solid #EBCB9C; border-bottom:0.4mm solid #EBCB9C; transform:rotate(45deg); }
+
+  .wing .wtitle{ font-size:8pt; font-weight:900; color:var(--brand); display:flex; align-items:center; gap:1.5mm; margin:0 0 2.4mm; letter-spacing:0.05em; }
+  .wing .wtitle::before{ content:""; width:2.4mm; height:2.4mm; background:var(--accent); border-radius:50%; }
+  .wing .term{ margin-bottom:3.6mm; }
+  .wing .term b{ color:var(--ink); font-weight:800; display:block; font-size:8.5pt; margin-bottom:0.7mm;}
+  .wing .wsep{ border-top:0.3mm dashed var(--line); margin:4.5mm 0; }
+  .wing .wing-pen{ font-family:'PC Pen'; font-size:11pt; color:#0F6357; line-height:1.45; }
+
+  figure{ margin:5mm 0; }
+  figure figcaption{ font-size:8pt; color:var(--sub); text-align:center; margin-top:2mm; }
+  figure svg{ display:block; margin:0 auto; }
+
+  /* ── 비교형 그림 (2패널 + 범례) ── */
+  .fig-duo{ display:flex; align-items:stretch; gap:2.5mm; justify-content:center; }
+  .fig-duo .panel{ flex:0 0 auto; text-align:center; }
+  .fig-duo .p-title{ font-size:9pt; font-weight:900; color:var(--ink); margin-top:1.6mm; }
+  .fig-duo .p-sub{ font-size:7.8pt; color:var(--sub); line-height:1.45; margin-top:0.5mm; }
+  .fig-duo .mid{ display:flex; flex-direction:column; align-items:center; justify-content:center; gap:1mm; padding:0 1mm; }
+  .fig-duo .mid .mlab{ font-size:7.6pt; font-weight:800; color:var(--unit); text-align:center; line-height:1.3; }
+  .fig-legend{ display:flex; justify-content:center; gap:5mm; font-size:7.8pt; color:var(--ink); margin-top:1.2mm; align-items:center; }
+  .fig-legend span{ display:inline-flex; align-items:center; gap:1.4mm; }
+
+  /* ── 탐구 (자료 파헤치기) ── */
+  .lab{ border:0.5mm solid var(--brand); border-radius:2.5mm; overflow:hidden; margin-top:1mm;}
+  .lab .lab-head{ background:var(--brand); color:#fff; padding:2.2mm 4mm; font-weight:900; font-size:11pt; display:flex; align-items:center; gap:2.5mm;}
+  .lab .lab-head .tag{ font-size:7.5pt; background:rgba(255,255,255,.22); padding:0.6mm 2.4mm; border-radius:4mm; font-weight:700;}
+  .lab .lab-body{ padding:3.5mm 4mm; }
+  .lab h4{ font-size:9.6pt; font-weight:900; color:var(--brand); margin:2.5mm 0 1.4mm; }
+  .lab h4:first-child{ margin-top:0; }
+  .lab p, .lab li{ font-family:'PC Serif'; font-size:9.3pt; line-height:1.8; }
+  .lab ol{ margin-left:5mm; }
+
+  /* ── 문제부 ── */
+  .step-head{ display:flex; align-items:center; gap:3mm; margin:0 0 5mm; }
+  .step-head .stepno{ background:var(--unit); color:#fff; font-weight:900; font-size:9.5pt; padding:1.4mm 3.4mm; border-radius:1.5mm; letter-spacing:0.04em;}
+  .step-head .steptt{ font-size:12.5pt; font-weight:900; }
+  .step-head .stepdesc{ font-size:8.2pt; color:var(--sub); margin-left:auto; }
+  .step-head.s2 .stepno{ background:var(--brand); }
+  .step-head.s3 .stepno{ background:var(--point); }
+
+  .q{ margin-bottom:7.5mm; break-inside:avoid; }
+  .q .qhead{ display:flex; gap:2.4mm; align-items:flex-start; }
+  .q .qno{ flex:0 0 auto; min-width:6.2mm; height:6.2mm; border:0.45mm solid var(--unit); color:var(--unit); border-radius:50%; font-size:8.6pt; font-weight:900; line-height:1; display:flex; align-items:center; justify-content:center; padding-top:0.55mm; margin-top:0.4mm;}
+  .q .stem{ font-family:'PC Serif'; font-size:9.5pt; line-height:1.74; font-weight:500; }
+  .q .stem .difficulty{ color:#C9A227; font-size:8pt; letter-spacing:0.06em; margin-left:1.5mm;}
+  .q .tags{ margin-top:0.8mm; font-size:7pt; color:var(--sub); font-family:'PC Sans';}
+  .choices{ list-style:none; margin:2.2mm 0 0 8.6mm; font-family:'PC Serif'; font-size:9.3pt; line-height:1.85; }
+  .choices.inline{ display:flex; flex-wrap:wrap; gap:0 6mm; }
+  .bogi-box{ border:0.35mm solid #B8C2CA; border-radius:0; margin:2.5mm 0 0 8.6mm; padding:2.4mm 3.2mm; font-family:'PC Serif'; font-size:9.2pt; line-height:1.8; background:none;}
+  .bogi-box .bt{ text-align:center; font-weight:800; color:var(--sub); font-size:8.4pt; margin-bottom:0.8mm; letter-spacing:0.3em;}
+  .ox-answer{ margin-left:2mm; color:var(--sub); font-size:9pt; }
+  .blankline{ display:inline-block; min-width:14mm; border-bottom:0.4mm solid var(--ink); }
+  .qgrid{ display:grid; grid-template-columns:1fr 1fr; gap:0 9mm; }
+  .essay-lines{ margin:2mm 0 0 8.4mm; }
+  .essay-lines div{ border-bottom:0.3mm solid var(--line); height:6.2mm; }
+  .badge-essay{ display:inline-block; background:var(--point); color:#fff; font-size:7pt; font-weight:800; padding:0.4mm 2mm; border-radius:1mm; vertical-align:1pt; margin-right:1.2mm;}
+  .badge-data{ display:inline-block; background:var(--brand); color:#fff; font-size:7pt; font-weight:800; padding:0.4mm 2mm; border-radius:1mm; vertical-align:1pt; margin-right:1.2mm;}
+
+  /* ── 해설부 ── */
+  .sol-head{ display:flex; align-items:center; gap:3mm; margin-bottom:4mm;}
+  .sol-head .stt{ font-size:14.5pt; font-weight:900; color:var(--brand);}
+  .sol-head .sub{ font-size:8.5pt; color:var(--sub);}
+  .anstable{ width:100%; border-collapse:collapse; margin-bottom:4.5mm; }
+  .anstable th,.anstable td{ border:0.3mm solid var(--line); font-size:8.8pt; padding:1.4mm 0; text-align:center; }
+  .anstable th{ background:var(--brand-lt); color:var(--brand); font-weight:800; }
+  .anstable td.a{ font-weight:900; color:var(--unit); }
+  .sol{ margin-bottom:5mm; break-inside:avoid; }
+  .sol .shead{ display:flex; align-items:center; gap:2mm; margin-bottom:1.4mm;}
+  .sol .sno{ background:var(--unit); color:#fff; min-width:6mm; height:5.4mm; border-radius:1.2mm; font-size:8.6pt; font-weight:900; line-height:1; display:flex; align-items:center; justify-content:center; padding:0.5mm 1.5mm 0;}
+  .sol .sans{ font-weight:900; color:var(--unit); font-size:9.6pt;}
+  .sol .slink{ font-size:7.2pt; color:var(--sub); margin-left:auto;}
+  .sol p{ font-family:'PC Serif'; font-size:9.1pt; line-height:1.76; margin-bottom:0.8mm; }
+  .wrongbox{ background:none; border:none; border-left:0.7mm solid #E3A0AC; border-radius:0; padding:1mm 0 1mm 3mm; margin-top:2mm;}
+  .wrongbox .wt{ font-size:8pt; font-weight:900; color:var(--point); margin-bottom:0.8mm; font-family:'PC Sans';}
+  .wrongbox p{ font-family:'PC Serif'; font-size:8.6pt; line-height:1.68; margin-bottom:0.9mm;}
+  .wrongbox p:last-child{ margin-bottom:0; }
+  .solcols{ display:grid; grid-template-columns:1fr 1fr; gap:0 9mm; }
+
+  /* ── 단원 도입 (타이포그래피 중심) ── */
+  .opener{ padding:0 0 19mm; }
+  .opener-hero{ position:relative; padding:7mm 20mm 4.5mm; overflow:hidden; flex-shrink:0; }
+  .ghost-txt{ position:absolute; top:-10mm; right:6mm; font-size:118pt; font-weight:900; color:#EAF5F1; line-height:1; letter-spacing:-0.04em; }
+  .kicker{ display:flex; align-items:center; gap:4mm; position:relative; }
+  .kicker .kt{ font-size:9.5pt; font-weight:800; color:var(--unit); letter-spacing:0.24em; white-space:nowrap; }
+  .kicker::after{ content:""; flex:1; border-top:0.3mm solid var(--line); }
+  .opener-hero h1{ position:relative; font-size:36pt; font-weight:900; letter-spacing:-0.015em; margin:4mm 0 0; }
+  .opener-hero h1 .tick{ display:block; width:14mm; border-top:1.4mm solid var(--accent); margin-bottom:3.6mm; }
+  .opener-lede{ position:relative; font-family:'PC Serif'; font-size:10.2pt; font-weight:600; line-height:2.0; color:#3D4C58; max-width:138mm; margin-top:4mm; padding-left:5mm; border-left:0.8mm solid var(--accent); }
+  .opener-inner{ padding:0 20mm; }
+
+  /* ── 원소의 여정 스트립 ── */
+  .journey{ margin-top:3.5mm; }
+  .journey .j-label{ font-size:8pt; font-weight:800; color:var(--sub); letter-spacing:0.08em; margin-bottom:2.4mm; display:flex; align-items:center; gap:1.6mm;}
+  .journey .j-label::before{ content:""; width:2.4mm; height:2.4mm; background:var(--unit); border-radius:50%; }
+  .j-bar{ display:flex; align-items:center; gap:2mm; }
+  .j-chip{ flex:1; text-align:center; background:#EFF8F5; border:0.35mm solid #A9D9CE; color:#147D6F; border-radius:1.6mm; padding:3mm 1mm 2.6mm; }
+  .j-chip .jc-t{ font-size:8.8pt; font-weight:800; display:block; }
+  .j-chip .jc-s{ font-size:6.8pt; color:var(--sub); display:block; margin-top:0.5mm; }
+  .j-chip.on{ background:var(--unit); border-color:var(--unit); }
+  .j-chip.on .jc-t{ color:#fff; }
+  .j-chip.on .jc-s{ color:#C9E7DF; }
+  .j-arrow{ flex:0 0 auto; color:#6FB8AA; font-size:10pt; font-weight:900; }
+  .toc{ margin-top:6.5mm; }
+  .toc .toc-title{ font-size:11pt; font-weight:900; color:var(--ink); margin-bottom:3mm; display:flex; align-items:center; gap:2.5mm;}
+  .toc .toc-title::before{ content:""; width:3.4mm; height:3.4mm; background:var(--accent); border-radius:0.8mm; }
+  .toc-item{ display:flex; align-items:flex-start; gap:5mm; padding:4.4mm 6mm; border-bottom:0.3mm solid var(--line); }
+  .toc-item:first-of-type{ border-top:0.3mm solid var(--line); }
+  .toc-item.active{ background:#EFF8F5; border-left:1.2mm solid #4BA394; }
+  .toc-item .tno{ font-family:'PC Serif'; font-weight:900; color:#4BA394; font-size:14pt; width:10mm; line-height:1.1; flex:0 0 auto;}
+  .toc-item .tbody{ flex:1; min-width:0; }
+  .toc-item .ttt{ font-weight:800; font-size:10.5pt; letter-spacing:0.01em; display:flex; align-items:center;}
+  .toc-item .tdesc{ font-family:'PC Serif'; font-size:8.6pt; font-weight:600; color:#4A5964; margin-top:0.7mm; line-height:1.55;}
+  .toc-item .tstd{ font-size:7.2pt; color:var(--sub); flex:0 0 auto; padding-top:1.2mm;}
+  .toc-item.active .tag-now{ background:var(--accent); color:#fff; font-size:7pt; font-weight:900; border-radius:4mm; padding:0.7mm 2.6mm; margin-left:3.5mm;}
+  .toc-item .tag-done{ font-size:7.2pt; font-weight:800; color:#147D6F; margin-left:3.5mm; }
+  .opener-quote{ margin-top:7mm; text-align:center; font-family:'PC Serif'; font-size:9.8pt; font-weight:600; color:#4A5964; letter-spacing:0.01em; }
+  .opener-quote .who{ font-size:8pt; color:var(--sub); font-weight:400; margin-left:2.5mm; }
+  .qa-lead li .qgo{ font-family:'PC Sans'; font-size:7.4pt; font-weight:800; color:var(--unit); background:var(--unit-lt); border-radius:3mm; padding:0.5mm 2.2mm; margin-left:2mm; white-space:nowrap; vertical-align:1pt;}
+  .qa-lead{ margin-top:5mm; border:none; border-top:0.45mm solid var(--brand); border-bottom:0.45mm solid var(--brand); background:none; border-radius:0; padding:3mm 2mm 2.8mm; }
+  .qa-lead .qt{ font-weight:900; color:var(--brand); font-size:10.5pt; margin-bottom:2mm;}
+  .qa-lead li{ font-family:'PC Serif'; font-size:9.5pt; line-height:1.8; margin-left:5mm; }
+
+  /* ── 바로바로 체크 (개념 페이지 하단 즉석 OX) ── */
+  .quickcheck{ margin-top:auto; border-top:0.35mm dashed #C8B98F; padding-top:3mm; width:calc(100% - 51mm); }
+  .quickcheck .qc-title{ display:inline-flex; align-items:center; gap:1.6mm; font-size:8.2pt; font-weight:900; color:#9C6503; margin-bottom:1.4mm; }
+  .quickcheck .qc-title::before{ content:"✓"; color:var(--accent); font-weight:900; }
+  .quickcheck ol{ list-style:none; font-family:'PC Serif'; font-size:8.8pt; line-height:1.75; }
+  .quickcheck li{ display:flex; gap:2mm; align-items:baseline; }
+  .quickcheck li .no{ font-weight:800; color:var(--accent); flex:0 0 auto; }
+  .quickcheck .qc-ans{ margin-top:1mm; font-size:7.2pt; color:var(--sub); transform:rotate(180deg); text-align:left; }
+
+  /* ── 중학 과학 다시보기 (날개단) ── */
+  .wing .review{ background:#F6F3EC; border-radius:1.8mm; padding:2.8mm 3mm; margin-top:1mm; }
+  .wing .review .rv-title{ font-size:7.8pt; font-weight:900; color:#7A6A45; margin-bottom:1.4mm; display:flex; align-items:center; gap:1.4mm;}
+  .wing .review .rv-title::before{ content:"↺"; font-weight:900; color:#A08A55; }
+
+  /* ── MEMO 페이지 ── */
+  .memo-head{ display:flex; align-items:baseline; gap:3.5mm; margin-bottom:5mm; }
+  .memo-head .mt{ font-size:17pt; font-weight:900; color:var(--brand); letter-spacing:0.22em; }
+  .memo-head .ms{ font-size:8.6pt; color:var(--sub); }
+  .memo-area{ flex:1; border:0.4mm solid var(--line); border-radius:2.5mm;
+    background-image:linear-gradient(to bottom, transparent calc(100% - 0.3mm), #DCE4E9 0);
+    background-size:100% 9mm; background-position:0 4mm; padding:0 5mm; margin-bottom:4mm; }
+  .memo-pen{ font-family:'PC Pen'; font-size:12.5pt; color:#0F6357; text-align:right; }
+</style>
+</head>
+<body>
+<!-- ═════════════ p.89 소단원 도입 ═════════════ -->
+<div class="page opener">
+  <div class="opener-hero">
+    <div class="ghost-txt">02</div>
+    <div class="kicker"><span class="kt">통합과학 2 · II. 환경과 에너지</span></div>
+    <h1><span class="tick"></span>생태계 평형</h1>
+    <p class="opener-lede">늑대 몇 마리가 강의 물길을 바꿨다 —<br>
+    먹이 그물의 실 하나가 당겨지면, 생태계 전체가 움직인다.</p>
+  </div>
+
+  <div class="opener-inner">
+    <div class="journey">
+      <div class="j-label">환경과 에너지 — 지금 여기</div>
+      <div class="j-bar">
+        <div class="j-chip"><span class="jc-t">생태계</span><span class="jc-s">모두 연결되어 있다</span></div>
+        <span class="j-arrow">→</span>
+        <div class="j-chip on"><span class="jc-t">생태계 평형</span><span class="jc-s">그물이 버틴다</span></div>
+        <span class="j-arrow">→</span>
+        <div class="j-chip"><span class="jc-t">기후변화</span><span class="jc-s">뜨거워지는 지구</span></div>
+        <span class="j-arrow">→</span>
+        <div class="j-chip"><span class="jc-t">태양 에너지</span><span class="jc-s">모든 에너지의 뿌리</span></div>
+        <span class="j-arrow">→</span>
+        <div class="j-chip"><span class="jc-t">발전과 효율</span><span class="jc-s">전기를 만드는 법</span></div>
+      </div>
+    </div>
+    <div class="toc">
+      <div class="toc-title">이 단원의 학습 지도</div>
+      <div class="toc-item">
+        <span class="tno">01</span>
+        <span class="tbody"><span class="ttt">생태계의 구성과 상호 관계</span>
+        <span class="tdesc">생태계 구성 요소, 생물과 환경의 주고받기</span></span>
+        <span class="tstd">10통과2-02-01</span>
+      </div>
+      <div class="toc-item active">
+        <span class="tno">02</span>
+        <span class="tbody"><span class="ttt">생태계 평형<span class="tag-now">NOW</span></span>
+        <span class="tdesc">먹이 관계와 생태 피라미드 — 그물은 어떻게 버티나</span></span>
+        <span class="tstd">10통과2-02-02</span>
+      </div>
+      <div class="toc-item">
+        <span class="tno">03</span>
+        <span class="tbody"><span class="ttt">지구온난화와 기후변화</span>
+        <span class="tdesc">온실효과 강화의 메커니즘, 엘니뇨·사막화</span></span>
+        <span class="tstd">10통과2-02-03</span>
+      </div>
+      <div class="toc-item">
+        <span class="tno">04</span>
+        <span class="tbody"><span class="ttt">태양 에너지와 에너지 전환</span>
+        <span class="tdesc">수소 핵융합에서 지구의 에너지 흐름까지</span></span>
+        <span class="tstd">10통과2-02-04</span>
+      </div>
+      <div class="toc-item">
+        <span class="tno">05</span>
+        <span class="tbody"><span class="ttt">발전과 에너지의 효율적 이용</span>
+        <span class="tdesc">전자기 유도와 발전, 에너지 효율과 신재생 에너지</span></span>
+        <span class="tstd">10통과2-02-05 · 06</span>
+      </div>
+    </div>
+
+    <div class="qa-lead">
+      <div class="qt">이 소단원을 끝내면 답할 수 있는 질문</div>
+      <ul>
+        <li>먹이 '사슬'보다 먹이 '그물'이 튼튼한 이유는? <span class="qgo">개념 1</span></li>
+        <li>피라미드는 왜 위로 갈수록 좁아질까? <span class="qgo">개념 2</span></li>
+        <li>메뚜기가 갑자기 늘어나면 어떤 일이 벌어질까? <span class="qgo">개념 3</span></li>
+        <li>늑대가 돌아오자 왜 강이 달라졌을까? <span class="qgo">자료</span></li>
+      </ul>
+    </div>
+
+    <div class="opener-quote" style="margin-top:2.4mm;">"자연에서 하나만 집어 들어도, 우주의 모든 것이 딸려 온다."<span class="who">— 자연주의자 존 뮤어</span></div>
+  </div>
+
+  <div class="folio"><span>박찬 과학 | 통합과학 2</span><span class="num">89</span></div>
+</div>
+
+<!-- ═════════════ p.90 개념 01 먹이 사슬과 먹이 그물 ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag">II. 환경과 에너지</span><span class="lesson-tag">02. 생태계 평형</span></div>
+  <h2 class="lesson-title"><span class="no">02</span><span class="tt">생태계 평형</span></h2>
+  <div class="std-badges"><span class="std">성취기준 10통과2-02-02</span><span class="std">먹이 관계 → 생태 피라미드 → 평형과 회복 → 환경 변화</span></div>
+
+  <div class="cols">
+    <div class="main">
+      <h3 class="sec"><span class="n">1</span>사슬이 얽혀 그물이 된다</h3>
+      <p class="body">생태계의 생물들은 먹고 먹히는 관계로 이어져 있다. 벼 → 메뚜기 → 개구리 → 뱀 → 매처럼 <b>생산자에서 최종 소비자까지 한 줄로 이은 것</b>이 <span class="kw">먹이 사슬</span>이다. 그런데 실제 자연에서 개구리는 메뚜기만 먹지 않고, 메뚜기도 뱀도 여러 상대와 얽혀 있다 — 여러 먹이 사슬이 그물처럼 얽힌 <span class="kw">먹이 그물</span>이 생태계의 진짜 모습이다.</p>
+      <p class="body">그물이라는 구조가 중요한 이유 — <span class="u-amber">복잡하게 얽힌 그물일수록 생태계는 안정적</span>이다. 한 줄짜리 사슬에서는 고리 하나가 끊기면 그 위가 전부 무너지지만, 그물에서는 한 종이 줄어도 포식자가 <b>다른 먹이로 갈아탈 수 있어</b> 충격이 분산된다. 줄 하나짜리 다리와 그물망 다리의 차이다.</p>
+
+      <figure>
+        <svg width="470" height="150" viewBox="0 0 470 150" font-family="PC Sans">
+          <defs>
+            <marker id="arrP" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="#147D6F"/></marker>
+            <marker id="arrR" markerWidth="7" markerHeight="7" refX="5" refY="2.5" orient="auto"><path d="M0,0 L6,2.5 L0,5 Z" fill="#D6455D"/></marker>
+          </defs>
+          <g font-size="6.8">
+            <g text-anchor="middle">
+              <!-- 사슬 -->
+              <g transform="translate(120,10)">
+                <rect x="-100" y="0" width="200" height="106" rx="6" fill="#EFF8F5" stroke="#A9D9CE" stroke-width="1"/>
+                <text y="16" font-size="7.8" font-weight="800" fill="#147D6F">먹이 사슬 — 한 줄</text>
+                <g transform="translate(0,58)" font-size="6.6" font-weight="800" fill="#3D4C58">
+                  <text x="-76" y="0">벼</text>
+                  <line x1="-66" y1="-2" x2="-52" y2="-2" stroke="#147D6F" stroke-width="1.2" marker-end="url(#arrP)"/>
+                  <text x="-36" y="0">메뚜기</text>
+                  <line x1="-16" y1="-2" x2="-2" y2="-2" stroke="#147D6F" stroke-width="1.2" marker-end="url(#arrP)"/>
+                  <text x="16" y="0">개구리</text>
+                  <line x1="36" y1="-2" x2="50" y2="-2" stroke="#147D6F" stroke-width="1.2" marker-end="url(#arrP)"/>
+                  <text x="62" y="0">뱀</text>
+                </g>
+                <text y="94" fill="#B0483A" font-size="6.4" font-weight="800">고리 하나 끊기면 → 윗줄 전부 위험</text>
+              </g>
+              <!-- 그물 -->
+              <g transform="translate(350,10)">
+                <rect x="-100" y="0" width="200" height="106" rx="6" fill="#E7F5F1" stroke="#147D6F" stroke-width="1.1"/>
+                <text y="16" font-size="7.8" font-weight="800" fill="#0F6357">먹이 그물 — 얽힌 여러 줄</text>
+                <g font-size="6.4" font-weight="800" fill="#3D4C58">
+                  <text x="-64" y="96">벼</text><text x="0" y="96">옥수수</text><text x="64" y="96">풀</text>
+                  <text x="-40" y="66">메뚜기</text><text x="40" y="66">들쥐</text>
+                  <text x="-40" y="38">개구리</text><text x="46" y="38">올빼미</text>
+                  <text x="0" y="28" font-size="0"> </text>
+                  <g stroke="#147D6F" stroke-width="1" fill="none">
+                    <line x1="-60" y1="90" x2="-46" y2="72"/><line x1="-4" y1="90" x2="-38" y2="72"/>
+                    <line x1="4" y1="90" x2="36" y2="72"/><line x1="62" y1="90" x2="44" y2="72"/>
+                    <line x1="-40" y1="60" x2="-40" y2="44"/><line x1="34" y1="60" x2="-28" y2="42"/>
+                    <line x1="42" y1="60" x2="44" y2="44"/><line x1="-32" y1="60" x2="38" y2="44"/>
+                  </g>
+                </g>
+                <text y="26" fill="#0F6357" font-size="6.4" font-weight="800">한 종이 줄어도 — 다른 길로 분산</text>
+              </g>
+            </g>
+          </g>
+          <text x="235" y="144" text-anchor="middle" font-size="8.8" font-weight="800" fill="#E8940A">그물이 복잡할수록 안정 — 끊긴 줄을 다른 줄이 받쳐 준다</text>
+        </svg>
+        <figcaption>그림 1 | 먹이 사슬과 먹이 그물 — 자연의 진짜 모습은 그물이다</figcaption>
+      </figure>
+
+      <div class="saem">
+        <div class="avatar">박찬<br>쌤</div>
+        <div class="bubble"><span class="pen">"'복잡할수록 불안하다'는 직관을 뒤집는 게 이 단원의 첫 관문 — 생태계에서는 복잡한 그물이 곧 튼튼한 안전망이다."</span></div>
+      </div>
+    </div>
+
+    <div class="wing">
+      <div class="wtitle">날개 노트</div>
+      <div class="term"><b>먹이 사슬</b>먹고 먹히는 관계를 한 줄로 나타낸 것. 화살표는 '먹히는 쪽 → 먹는 쪽'.</div>
+      <div class="term"><b>먹이 그물</b>여러 먹이 사슬이 얽힌 실제 관계망 — 복잡할수록 안정.</div>
+      <div class="wsep"></div>
+      <div class="wtitle">한눈에 암기</div>
+      <div class="wing-pen">사슬 = 한 줄 (약함)<br>그물 = 얽힌 줄 (튼튼)<br>화살표 = 먹히는 → 먹는</div>
+      <div class="wsep"></div>
+      <div class="review">
+        <div class="rv-title">앞 소단원과 연결</div>
+        <div class="term" style="margin-bottom:0;"><b>3배역 (01)</b>먹이 사슬의 출발점은 언제나 생산자 — 양분의 입구가 여기서도 기준점이다.</div>
+      </div>
+    </div>
+  </div>
+  <div class="quickcheck">
+    <span class="qc-title">바로바로 체크</span>
+    <ol>
+      <li><span class="no">1</span>먹이 사슬의 화살표는 먹히는 생물에서 먹는 생물로 향한다. ( O , X )</li>
+      <li><span class="no">2</span>먹이 그물이 단순할수록 생태계는 안정적이다. ( O , X )</li>
+      <li><span class="no">3</span>먹이 사슬의 출발점은 생산자다. ( O , X )</li>
+    </ol>
+    <div class="qc-ans">정답 1 O 2 X (복잡할수록 안정) 3 O</div>
+  </div>
+  <div class="folio"><span>II. 환경과 에너지</span><span class="num">90</span></div>
+</div>
+
+<!-- ═════════════ p.91 개념 02 생태 피라미드 ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag">II. 환경과 에너지</span><span class="lesson-tag">02. 생태계 평형</span></div>
+  <div class="cols">
+    <div class="main">
+      <h3 class="sec"><span class="n">2</span>생태 피라미드 — 위로 갈수록 좁아지는 이유</h3>
+      <p class="body">먹이 사슬의 각 층 — 생산자, 1차 소비자, 2차 소비자… — 를 <span class="kw">영양 단계</span>라 한다. 각 단계의 <b>개체 수·생물량·에너지양</b>을 아래부터 쌓아 올리면 대체로 <span class="kw">생태 피라미드</span> 모양이 된다. 안정된 생태계에서는 <span class="u-amber">위 단계로 갈수록 개체 수도, 생물량도, 에너지양도 줄어든다</span>.</p>
+      <p class="body">왜 줄어들까 — <b>에너지가 새기 때문</b>이다. 메뚜기는 벼에게서 얻은 에너지의 대부분을 호흡(I-05의 발열 반응!)과 생명 활동으로 쓰고, 개구리에게 전달되는 것은 일부뿐이다. 단계를 오를 때마다 에너지가 크게 줄므로, 위층은 아래층보다 클 수 없다 — 매 한 마리를 떠받치려면 넓은 논 전체가 필요한 이유, 그리고 먹이 사슬이 무한히 길어질 수 없는 이유다.</p>
+
+      <figure>
+        <svg width="470" height="150" viewBox="0 0 470 150" font-family="PC Sans">
+          <g font-size="6.8">
+            <text x="235" y="13" text-anchor="middle" font-size="8.4" font-weight="800" fill="#147D6F">생태 피라미드 — 에너지가 새기에 좁아진다</text>
+            <g transform="translate(160,22)" text-anchor="middle">
+              <rect x="-120" y="84" width="240" height="24" fill="#147D6F" rx="3"/>
+              <text y="100" fill="#fff" font-weight="800">생산자 (벼) — 에너지 100</text>
+              <rect x="-82" y="57" width="164" height="24" fill="#4BA394" rx="3"/>
+              <text y="73" fill="#fff" font-weight="800">1차 소비자 (메뚜기)</text>
+              <rect x="-50" y="30" width="100" height="24" fill="#6FB8AA" rx="3"/>
+              <text y="46" fill="#fff" font-weight="800">2차 소비자 (개구리)</text>
+              <rect x="-26" y="3" width="52" height="24" fill="#A9D9CE" rx="3"/>
+              <text y="19" fill="#0F6357" font-weight="800">최종 (매)</text>
+            </g>
+            <g transform="translate(340,22)">
+              <line x1="0" y1="96" x2="0" y2="10" stroke="#D6455D" stroke-width="1.4" marker-end="url(#arrR)"/>
+              <text x="8" y="30" font-size="6.6" fill="#D6455D" font-weight="800">위로 갈수록</text>
+              <text x="8" y="42" font-size="6.6" fill="#D6455D" font-weight="800">개체 수 ↓ 생물량 ↓ 에너지 ↓</text>
+              <text x="8" y="66" font-size="6.2" fill="#5B6B77">단계마다 호흡·생명 활동으로</text>
+              <text x="8" y="76" font-size="6.2" fill="#5B6B77">에너지 대부분이 쓰이고</text>
+              <text x="8" y="86" font-size="6.2" fill="#5B6B77">일부만 위로 전달된다</text>
+            </g>
+          </g>
+          <text x="235" y="144" text-anchor="middle" font-size="8.8" font-weight="800" fill="#E8940A">피라미드가 좁아지는 원인 = 에너지의 손실 — 그래서 사슬은 길 수 없다</text>
+        </svg>
+        <figcaption>그림 2 | 생태 피라미드 — 층의 폭이 그 단계의 개체 수·생물량·에너지양이다</figcaption>
+      </figure>
+
+      <div class="expoint">
+        <div class="boxtitle"><span class="ico">!</span>시험엔 이렇게</div>
+        <p>"위 단계로 갈수록 에너지양이 <b>많아진다</b>"(X — 줄어든다)가 기본 함정. 심화형은 이유를 묻는다 — <b>각 단계가 에너지 대부분을 호흡 등으로 소비하고 일부만 전달하기 때문</b>. 한 문장으로 준비해 두자.</p>
+      </div>
+    </div>
+
+    <div class="wing">
+      <div class="wtitle">날개 노트</div>
+      <div class="term"><b>영양 단계</b>먹이 사슬에서 같은 위치에 있는 생물들의 층 — 생산자, 1차·2차 소비자….</div>
+      <div class="term"><b>생물량</b>한 영양 단계 생물의 총량(무게) — 개체 수와 함께 피라미드의 재료다.</div>
+      <div class="wsep"></div>
+      <div class="wtitle">한눈에 암기</div>
+      <div class="wing-pen">위로 갈수록 ↓↓↓<br>개체 수 · 생물량 · 에너지<br>이유 = 에너지가 샌다!</div>
+    </div>
+  </div>
+  <div class="quickcheck">
+    <span class="qc-title">바로바로 체크</span>
+    <ol>
+      <li><span class="no">1</span>안정된 생태계에서 위 영양 단계로 갈수록 에너지양이 줄어든다. ( O , X )</li>
+      <li><span class="no">2</span>에너지가 줄어드는 것은 각 단계가 호흡 등으로 소비하기 때문이다. ( O , X )</li>
+      <li><span class="no">3</span>먹이 사슬은 얼마든지 길어질 수 있다. ( O , X )</li>
+    </ol>
+    <div class="qc-ans">정답 1 O 2 O 3 X (에너지가 부족해져 한계가 있다)</div>
+  </div>
+  <div class="folio"><span>II. 환경과 에너지</span><span class="num">91</span></div>
+</div>
+
+<!-- ═════════════ p.92 개념 03 평형과 회복 ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag">II. 환경과 에너지</span><span class="lesson-tag">02. 생태계 평형</span></div>
+  <div class="cols">
+    <div class="main">
+      <h3 class="sec"><span class="n">3</span>흔들려도 되돌아온다 — 평형의 자동 조절</h3>
+      <p class="body"><span class="kw">생태계 평형</span>이란 생태계를 이루는 생물의 종류와 개체 수, 물질과 에너지의 흐름이 <b>크게 변하지 않고 유지되는 상태</b>다. 멈춰 있다는 뜻이 아니다 — 흔들려도 <b>되돌아오는 능력</b>이 평형의 본질이다. 그 복원력은 먹이 관계 속에 내장되어 있다.</p>
+      <p class="body">메뚜기(1차 소비자)가 갑자기 늘었다고 하자. ① 먹이인 벼(생산자)는 <b>줄고</b>, 메뚜기를 먹는 개구리(2차 소비자)는 먹이가 많아져 <b>늘어난다</b>. ② 먹이는 부족해지고 천적은 많아졌으니 <span class="u-amber">메뚜기는 다시 줄어든다</span>. ③ 그러면 벼는 회복되고 개구리도 원래 수준으로 돌아온다 — 어느 층이 흔들려도 위아래 층이 시소처럼 받쳐 주는 <b>자동 조절 장치</b>다. 단, 이 장치에는 한계가 있다 — 그것이 다음 개념이다.</p>
+
+      <figure>
+        <svg width="470" height="150" viewBox="0 0 470 150" font-family="PC Sans">
+          <g font-size="6.8">
+            <text x="235" y="13" text-anchor="middle" font-size="8.4" font-weight="800" fill="#147D6F">1차 소비자 급증 → 평형 회복의 3막</text>
+            <g transform="translate(0,24)" text-anchor="middle">
+              <g transform="translate(85,0)">
+                <rect x="-70" y="0" width="140" height="92" rx="6" fill="#EFF8F5" stroke="#A9D9CE" stroke-width="1"/>
+                <text y="15" font-size="7.2" font-weight="800" fill="#147D6F">① 메뚜기 급증</text>
+                <g transform="translate(0,50)" font-size="6.4" font-weight="800">
+                  <text y="-18" fill="#6FB8AA">개구리 —</text>
+                  <text y="0" fill="#D6455D" font-size="8.2">메뚜기 ▲▲</text>
+                  <text y="18" fill="#6FB8AA">벼 —</text>
+                </g>
+                <text y="84" fill="#5B6B77" font-size="6.2">한 층이 갑자기 불어난다</text>
+              </g>
+              <line x1="158" y1="46" x2="172" y2="46" stroke="#147D6F" stroke-width="1.4" marker-end="url(#arrP)"/>
+              <g transform="translate(235,0)">
+                <rect x="-70" y="0" width="140" height="92" rx="6" fill="#EFF8F5" stroke="#A9D9CE" stroke-width="1"/>
+                <text y="15" font-size="7.2" font-weight="800" fill="#147D6F">② 위아래가 반응</text>
+                <g transform="translate(0,50)" font-size="6.4" font-weight="800">
+                  <text y="-18" fill="#D6455D">개구리 ▲ (먹이 풍족)</text>
+                  <text y="0" fill="#3D4C58" font-size="8.2">메뚜기 ▼</text>
+                  <text y="18" fill="#B0483A">벼 ▼ (먹혀서 감소)</text>
+                </g>
+                <text y="84" fill="#5B6B77" font-size="6.2">먹이 부족 + 천적 증가의 협공</text>
+              </g>
+              <line x1="308" y1="46" x2="322" y2="46" stroke="#147D6F" stroke-width="1.4" marker-end="url(#arrP)"/>
+              <g transform="translate(385,0)">
+                <rect x="-70" y="0" width="140" height="92" rx="6" fill="#E7F5F1" stroke="#147D6F" stroke-width="1.1"/>
+                <text y="15" font-size="7.2" font-weight="800" fill="#0F6357">③ 평형 회복</text>
+                <g transform="translate(0,50)" font-size="6.4" font-weight="800" fill="#147D6F">
+                  <text y="-18">개구리 — 원래대로</text>
+                  <text y="0" font-size="8.2">메뚜기 —</text>
+                  <text y="18">벼 — 회복</text>
+                </g>
+                <text y="84" fill="#5B6B77" font-size="6.2">먹이 관계가 되돌려 놓는다</text>
+              </g>
+            </g>
+          </g>
+          <text x="235" y="144" text-anchor="middle" font-size="8.8" font-weight="800" fill="#E8940A">평형 = 멈춤이 아니라 복원력 — 먹이 그물에 내장된 자동 조절 장치</text>
+        </svg>
+        <figcaption>그림 3 | 평형 회복의 3막 — 급증한 층을 먹이 부족과 천적 증가가 함께 되돌린다</figcaption>
+      </figure>
+
+      <div class="expoint">
+        <div class="boxtitle"><span class="ico">!</span>시험엔 이렇게</div>
+        <p>순서 서술이 단골 — "1차 소비자 증가 → <b>생산자 감소·2차 소비자 증가</b> → 1차 소비자 감소 → 회복". 각 단계에서 <b>누가 늘고 누가 주는지</b> 화살표(▲▼)를 그리며 풀면 실수가 없다.</p>
+      </div>
+    </div>
+
+    <div class="wing">
+      <div class="wtitle">날개 노트</div>
+      <div class="term"><b>생태계 평형</b>생물의 종류·개체 수, 물질·에너지 흐름이 안정적으로 유지되는 상태.</div>
+      <div class="term"><b>천적</b>어떤 생물을 잡아먹는 상위 포식자 — 평형 조절의 브레이크 역할.</div>
+      <div class="wsep"></div>
+      <div class="wtitle">한눈에 암기</div>
+      <div class="wing-pen">급증 → 먹이 ↓ 천적 ▲<br>→ 다시 감소 → 회복!<br>평형 = 복원력</div>
+    </div>
+  </div>
+  <div class="quickcheck">
+    <span class="qc-title">바로바로 체크</span>
+    <ol>
+      <li><span class="no">1</span>1차 소비자가 급증하면 생산자는 일시적으로 감소한다. ( O , X )</li>
+      <li><span class="no">2</span>1차 소비자가 급증하면 2차 소비자는 일시적으로 증가한다. ( O , X )</li>
+      <li><span class="no">3</span>생태계 평형은 모든 개체 수가 변하지 않는 정지 상태다. ( O , X )</li>
+    </ol>
+    <div class="qc-ans">정답 1 O 2 O 3 X (흔들려도 되돌아오는 상태)</div>
+  </div>
+  <div class="folio"><span>II. 환경과 에너지</span><span class="num">92</span></div>
+</div>
+
+<!-- ═════════════ p.93 개념 04 평형이 깨질 때 ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag">II. 환경과 에너지</span><span class="lesson-tag">02. 생태계 평형</span></div>
+  <div class="cols">
+    <div class="main">
+      <h3 class="sec"><span class="n">4</span>복원력에도 한계가 있다 — 평형이 깨질 때</h3>
+      <p class="body">자동 조절 장치는 만능이 아니다. <span class="u-amber">복원력의 한계를 넘는 충격</span>이 오면 평형은 깨진다. 홍수·가뭄·산불·화산 폭발 같은 <b>자연재해</b>도 원인이지만, 오늘날 가장 큰 충격은 <b>인간 활동</b>이다 — 도로와 도시로 <b>서식지가 파괴·단절</b>되고, <b>남획</b>이 그물의 매듭(종)을 통째로 뽑아내며, <b>외래종</b>이 기존 먹이 그물을 교란하고, <b>환경 오염</b>과 기후변화(다음 소단원)가 무대 전체를 흔든다.</p>
+      <p class="body">특히 위험한 것이 <b>최상위 포식자의 제거</b>다. 20세기 초 미국 옐로스톤에서 늑대를 모두 없애자, 천적이 사라진 사슴 무리(엘크)가 불어나 어린 나무를 먹어 치웠고, 숲과 강기슭이 무너지며 다른 생물들까지 연쇄적으로 타격을 입었다 — 그물 꼭대기의 실 하나가 그물 전체를 지탱하고 있었던 것이다. 이 이야기의 뒷이야기(늑대의 귀환)는 자료 파헤치기에서 만난다.</p>
+
+      <figure>
+        <svg width="470" height="146" viewBox="0 0 470 146" font-family="PC Sans">
+          <g font-size="6.8">
+            <text x="235" y="13" text-anchor="middle" font-size="8.4" font-weight="800" fill="#147D6F">평형을 깨는 네 개의 손 — 인간 활동</text>
+            <g transform="translate(0,22)" text-anchor="middle">
+              <g transform="translate(66,0)">
+                <rect x="-52" y="0" width="104" height="90" rx="6" fill="#FDF3F0" stroke="#E5B8AC" stroke-width="1"/>
+                <text y="15" font-size="7" font-weight="800" fill="#B0483A">서식지 파괴</text>
+                <g transform="translate(0,46)">
+                  <path d="M-30,14 q10,-22 26,-24 q16,2 24,14" fill="none" stroke="#5E9C57" stroke-width="2"/>
+                  <rect x="-32" y="-4" width="64" height="8" fill="#8A949E"/>
+                  <line x1="-32" y1="0" x2="32" y2="0" stroke="#F4F7F9" stroke-width="1" stroke-dasharray="4 3"/>
+                </g>
+                <text y="80" fill="#5B6B77" font-size="6">도로가 숲을 두 동강 낸다</text>
+              </g>
+              <g transform="translate(178,0)">
+                <rect x="-52" y="0" width="104" height="90" rx="6" fill="#FDF3F0" stroke="#E5B8AC" stroke-width="1"/>
+                <text y="15" font-size="7" font-weight="800" fill="#B0483A">남획</text>
+                <g transform="translate(0,46)">
+                  <path d="M-26,-10 q26,-12 52,0 q-26,12 -52,0 z" fill="#9DB8CC" transform="translate(0,-4)"/>
+                  <path d="M-30,16 q30,-14 60,0" fill="none" stroke="#5B6B77" stroke-width="1.2" stroke-dasharray="3 2"/>
+                </g>
+                <text y="80" fill="#5B6B77" font-size="6">그물의 매듭을 통째로 뽑는다</text>
+              </g>
+              <g transform="translate(290,0)">
+                <rect x="-52" y="0" width="104" height="90" rx="6" fill="#FDF3F0" stroke="#E5B8AC" stroke-width="1"/>
+                <text y="15" font-size="7" font-weight="800" fill="#B0483A">외래종</text>
+                <g transform="translate(0,46)">
+                  <g transform="translate(-12,0)"><circle r="9" fill="#6FA86B"/><circle cx="-3" cy="-2" r="1.4" fill="#22303A"/></g>
+                  <g transform="translate(16,-4)"><ellipse rx="12" ry="8" fill="#C9822F"/><path d="M10,-4 l8,-6 l-2,8 z" fill="#C9822F"/><circle cx="-4" cy="-2" r="1.6" fill="#22303A"/></g>
+                </g>
+                <text y="80" fill="#5B6B77" font-size="6">기존 그물을 교란한다</text>
+              </g>
+              <g transform="translate(402,0)">
+                <rect x="-52" y="0" width="104" height="90" rx="6" fill="#FDF3F0" stroke="#E5B8AC" stroke-width="1"/>
+                <text y="15" font-size="7" font-weight="800" fill="#B0483A">환경 오염</text>
+                <g transform="translate(0,46)">
+                  <path d="M-16,16 h10 v-22 h12 v22 h10" fill="none" stroke="#8A949E" stroke-width="2"/>
+                  <g fill="#B8C2CA">
+                    <circle cx="2" cy="-14" r="5"/><circle cx="10" cy="-20" r="6"/><circle cx="20" cy="-24" r="7"/>
+                  </g>
+                </g>
+                <text y="80" fill="#5B6B77" font-size="6">무대(환경) 자체를 흔든다</text>
+              </g>
+            </g>
+          </g>
+          <text x="235" y="140" text-anchor="middle" font-size="8.8" font-weight="800" fill="#E8940A">복원력의 한계를 넘는 충격 — 오늘날 최대 변수는 인간이다</text>
+        </svg>
+        <figcaption>그림 4 | 평형을 깨는 인간 활동 — 서식지 파괴·남획·외래종·오염</figcaption>
+      </figure>
+
+      <div class="expoint">
+        <div class="boxtitle"><span class="ico">!</span>시험엔 이렇게</div>
+        <p>"생태계는 어떤 충격에도 스스로 회복한다"(X — <b>복원력에는 한계</b>가 있다). 최상위 포식자 제거 문제는 <b>사슴 급증 → 식물 황폐화 → 연쇄 붕괴</b> 순서로 서술 — 위에서 아래로 무너진다.</p>
+      </div>
+    </div>
+
+    <div class="wing">
+      <div class="wtitle">날개 노트</div>
+      <div class="term"><b>외래종</b>원래 살지 않던 곳에 들어온 종. 천적이 없으면 급증해 그물을 교란한다.</div>
+      <div class="term"><b>최상위 포식자</b>먹이 그물 꼭대기의 종 — 수는 적어도 그물 전체를 지탱한다.</div>
+      <div class="wsep"></div>
+      <div class="wtitle">한눈에 암기</div>
+      <div class="wing-pen">평형 파괴 4적:<br>서식지·남획·외래종·오염<br>복원력엔 한계가 있다!</div>
+    </div>
+  </div>
+  <div class="quickcheck">
+    <span class="qc-title">바로바로 체크</span>
+    <ol>
+      <li><span class="no">1</span>생태계의 복원력에는 한계가 있다. ( O , X )</li>
+      <li><span class="no">2</span>최상위 포식자가 사라지면 초식 동물이 급증할 수 있다. ( O , X )</li>
+      <li><span class="no">3</span>외래종의 유입은 생태계 평형과 무관하다. ( O , X )</li>
+    </ol>
+    <div class="qc-ans">정답 1 O 2 O 3 X (그물을 교란한다)</div>
+  </div>
+  <div class="folio"><span>II. 환경과 에너지</span><span class="num">93</span></div>
+</div>
+
+<!-- ═════════════ p.94 개념 05 지키는 기술 ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag">II. 환경과 에너지</span><span class="lesson-tag">02. 생태계 평형</span></div>
+  <div class="cols">
+    <div class="main">
+      <h3 class="sec"><span class="n">5</span>평형을 지키는 기술 — 함께 소통하며</h3>
+      <p class="body">평형 보전은 기술이자 약속이다. 끊긴 서식지는 <span class="kw">생태 통로</span>로 잇는다 — 도로 위를 가로지르는 야생동물의 다리로, 우리나라 고속도로에도 설치되어 있다. 훼손이 심한 곳은 <b>보호 구역·국립공원</b>으로 지정해 회복할 시간을 벌어 주고, 사라진 종을 되살리는 <b>복원 사업</b>(반달가슴곰·여우 복원 등)과 하천을 되살리는 <b>생태 하천 복원</b>이 이어진다.</p>
+      <p class="body">성취기준의 마지막 열쇳말은 <b>'협력적 소통'</b>이다. 생태계 문제는 한 사람의 정답이 아니라 <span class="u-amber">여러 이해(개발·보전·생계)가 얽힌 사회적 결정</span>이기 때문이다 — 데이터에 근거해 토론하고, 함께 결정하는 것까지가 과학의 일이다. 개인의 실천(소비·분리배출)과 제도(보호 구역·규제)가 만나야 그물은 지켜진다.</p>
+
+      <div class="gist" style="margin:2.8mm 0 4mm; padding:2.2mm 1.8mm 2mm;">
+        <div class="boxtitle"><span class="ico">알</span>알짜 정리 — 생태계 평형 한 장 요약</div>
+        <ul>
+          <li><b>먹이 그물</b>이 복잡할수록 안정 — 끊긴 줄을 다른 줄이 받친다</li>
+          <li><b>생태 피라미드</b>: 위로 갈수록 개체 수·생물량·에너지 ↓ (에너지가 새므로)</li>
+          <li>평형 = 복원력: 급증 → <b>먹이 ↓ + 천적 ▲</b> → 회복 — 단, <b>한계가 있다</b></li>
+          <li>파괴 4적(서식지·남획·외래종·오염) ↔ 보전 기술(생태 통로·보호 구역·복원)</li>
+        </ul>
+      </div>
+
+      <div class="saem">
+        <div class="avatar">박찬<br>쌤</div>
+        <div class="bubble"><span class="pen">"생태계 평형은 몸의 항상성과 같은 문법이다 — 흔들리면 되돌리는 장치가 있고, 그 한계를 넘으면 병이 된다. 의사가 몸을 지키듯, 이 단원은 지구를 지키는 진찰법이다."</span></div>
+      </div>
+    </div>
+
+    <div class="wing">
+      <div class="wtitle">날개 노트</div>
+      <div class="term"><b>생태 통로</b>도로 등으로 끊긴 서식지를 이어 야생동물이 오가게 만든 길.</div>
+      <div class="term"><b>복원 사업</b>사라지거나 줄어든 종·서식지를 되살리는 일 — 지리산 반달가슴곰이 대표.</div>
+      <div class="wsep"></div>
+      <div class="wtitle">한눈에 암기</div>
+      <div class="wing-pen">잇고(통로) 지키고(구역)<br>되살린다(복원)<br>+ 함께 결정한다(소통)</div>
+      <div class="wsep"></div>
+      <div class="review">
+        <div class="rv-title">다음 소단원 예고</div>
+        <div class="term" style="margin-bottom:0;"><b>기후변화 (03)</b>무대 전체를 데우는 가장 큰 교란 — 온실효과의 과학으로 들어간다.</div>
+      </div>
+    </div>
+  </div>
+  <div class="quickcheck">
+    <span class="qc-title">바로바로 체크</span>
+    <ol>
+      <li><span class="no">1</span>생태 통로는 끊긴 서식지를 이어 주는 시설이다. ( O , X )</li>
+      <li><span class="no">2</span>생태계 보전은 과학 데이터와 사회적 소통이 함께 필요한 문제다. ( O , X )</li>
+      <li><span class="no">3</span>보호 구역 지정은 생태계 회복에 도움이 되지 않는다. ( O , X )</li>
+    </ol>
+    <div class="qc-ans">정답 1 O 2 O 3 X (회복의 시간을 벌어 준다)</div>
+  </div>
+  <div class="folio"><span>II. 환경과 에너지</span><span class="num">94</span></div>
+</div>
+
+<!-- ═════════════ p.95 자료 파헤치기 ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag">II. 환경과 에너지</span><span class="lesson-tag">02. 생태계 평형</span></div>
+  <div class="lab">
+    <div class="lab-head">자료 파헤치기 <span class="tag">탐구·자료 분석</span> <span style="font-weight:600; font-size:9.5pt; margin-left:auto;">늑대가 강을 바꾸다 — 옐로스톤의 기적</span></div>
+    <div class="lab-body">
+      <h4>자료</h4>
+      <p>미국 옐로스톤 국립공원에서는 1920년대에 늑대가 사라졌다가, <b>1995년 다시 방사</b>되었다. 이후 관찰된 변화의 사슬은 다음과 같다.</p>
+      <figure>
+        <svg width="430" height="104" viewBox="0 0 430 104" font-family="PC Sans">
+          <g font-size="6.8" text-anchor="middle">
+            <g transform="translate(52,30)">
+              <rect x="-40" y="-20" width="80" height="40" rx="5" fill="#E7F5F1" stroke="#147D6F" stroke-width="1.1"/>
+              <text y="-4" font-weight="800" fill="#0F6357">늑대 귀환</text>
+              <text y="8" font-size="6" fill="#5B6B77">최상위 포식자</text>
+            </g>
+            <line x1="94" y1="30" x2="112" y2="30" stroke="#147D6F" stroke-width="1.3" marker-end="url(#arrP)"/>
+            <g transform="translate(158,30)">
+              <rect x="-44" y="-20" width="88" height="40" rx="5" fill="#EFF8F5" stroke="#A9D9CE" stroke-width="1"/>
+              <text y="-4" font-weight="800" fill="#3D4C58">엘크(사슴) 감소·이동</text>
+              <text y="8" font-size="6" fill="#5B6B77">강가에 머물지 못함</text>
+            </g>
+            <line x1="204" y1="30" x2="222" y2="30" stroke="#147D6F" stroke-width="1.3" marker-end="url(#arrP)"/>
+            <g transform="translate(268,30)">
+              <rect x="-44" y="-20" width="88" height="40" rx="5" fill="#EFF8F5" stroke="#A9D9CE" stroke-width="1"/>
+              <text y="-4" font-weight="800" fill="#2E7A54">버드나무·사시나무 회복</text>
+              <text y="8" font-size="6" fill="#5B6B77">강가의 숲이 되살아남</text>
+            </g>
+            <line x1="314" y1="30" x2="332" y2="30" stroke="#147D6F" stroke-width="1.3" marker-end="url(#arrP)"/>
+            <g transform="translate(378,30)">
+              <rect x="-44" y="-20" width="88" height="40" rx="5" fill="#E7F5F1" stroke="#147D6F" stroke-width="1.1"/>
+              <text y="-4" font-weight="800" fill="#0F6357">비버·새 증가</text>
+              <text y="8" font-size="6" fill="#5B6B77">둑 → 습지 → 물길 안정</text>
+            </g>
+            <text x="215" y="86" font-size="7.4" font-weight="800" fill="#B4830A">꼭대기의 실 하나가 — 나무와 강기슭, 물길의 모습까지 바꿨다</text>
+          </g>
+        </svg>
+      </figure>
+      <h4>해석의 3단계</h4>
+      <ol>
+        <li><b>그물로 읽는다</b> — 늑대 → 엘크 → 나무 → 비버·강. 영향이 먹이 그물을 타고 <b>여러 단계 아래까지</b> 전달되었다. 한 층의 변화가 그 층에서 멈추지 않는다는 것이 핵심이다.</li>
+        <li><b>거꾸로 확인한다</b> — 늑대가 '없던' 70년은 정확히 반대의 사슬이었다: 엘크 급증 → 어린 나무 전멸 → 강기슭 붕괴. 같은 그물이 양방향으로 작동함을 보여 준다.</li>
+        <li><b>생물 → 환경까지 본다</b> — 나무가 돌아오자 비버가 둑을 짓고 물길이 안정되었다 — 01에서 배운 <b>생물이 환경을 바꾸는</b> 화살표가 실제 강 지형에서 확인된 것이다.</li>
+      </ol>
+      <h4>결론</h4>
+      <p>옐로스톤은 '평형·복원력·먹이 그물'이 교과서 밖에서 실제로 작동한 거대한 실험이다. <b>최상위 포식자는 그물 전체의 버팀목</b>이며, 복원은 가능하다 — 다만 70년이 걸렸다.</p>
+      <div class="expoint">
+        <div class="boxtitle"><span class="ico">!</span>시험엔 이렇게</div>
+        <p>연쇄 문제는 화살표 방향만 따라가면 된다 — 늑대 ▲ → 엘크 ▼ → 식물 ▲ → 하위 생물 ▲. "늑대 증가로 식물이 감소한다"처럼 <b>한 칸 건너뛴 방향 착오</b>가 대표 함정.</p>
+      </div>
+    </div>
+  </div>
+  <div class="folio"><span>II. 환경과 에너지</span><span class="num">95</span></div>
+</div>
+
+<!-- ═════════════ p.96 STEP 1 + STEP 2 시작 ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag">II. 환경과 에너지</span><span class="lesson-tag">02. 생태계 평형 | 문제</span></div>
+  <div class="step-head"><span class="stepno">STEP 1</span><span class="steptt">개념 확인</span><span class="stepdesc">OX와 빈칸으로 개념 점검 — 막히면 알짜 정리로!</span></div>
+  <div class="qgrid">
+    <div>
+      <div class="q"><div class="qhead"><span class="qno">1</span><div class="stem">먹이 그물이 복잡할수록 생태계는 안정적이다. <span class="ox-answer">( O , X )</span></div></div></div>
+      <div class="q"><div class="qhead"><span class="qno">2</span><div class="stem">생태 피라미드에서 위 단계로 갈수록 에너지양이 많아진다. <span class="ox-answer">( O , X )</span></div></div></div>
+      <div class="q"><div class="qhead"><span class="qno">3</span><div class="stem">생태계 평형은 먹이 관계를 통해 스스로 회복될 수 있다. <span class="ox-answer">( O , X )</span></div></div></div>
+    </div>
+    <div>
+      <div class="q"><div class="qhead"><span class="qno">4</span><div class="stem">먹고 먹히는 관계를 한 줄로 나타낸 것을 <span class="blankline" style="min-width:16mm;"></span>이라 한다.</div></div></div>
+      <div class="q"><div class="qhead"><span class="qno">5</span><div class="stem">영양 단계별 개체 수·생물량·에너지를 층층이 쌓아 올린 것을 생태 <span class="blankline" style="min-width:16mm;"></span>라 한다.</div></div></div>
+      <div class="q"><div class="qhead"><span class="qno">6</span><div class="stem">생태 통로는 도로 등으로 끊긴 <span class="blankline" style="min-width:14mm;"></span>를 이어 주는 시설이다.</div></div></div>
+    </div>
+  </div>
+  <div style="border-top:0.5mm solid var(--line); margin:2mm 0 4mm;"></div>
+  <div class="step-head s2"><span class="stepno">STEP 2</span><span class="steptt">내신 완성</span><span class="stepdesc">학교 시험 유형 그대로 — 서술형까지 한 번에</span></div>
+  <div class="q">
+    <div class="qhead"><span class="qno">7</span><div class="stem">먹이 관계에 대한 설명으로 옳은 것은? <span class="difficulty">●●○</span>
+    <div class="tags">10통과2-02-02 | 개념 1</div></div></div>
+    <ul class="choices">
+      <li>① 먹이 사슬의 화살표는 먹는 생물에서 먹히는 생물로 향한다.</li>
+      <li>② 실제 생태계의 먹이 관계는 대부분 한 줄의 사슬이다.</li>
+      <li>③ 먹이 그물이 복잡한 생태계일수록 평형이 잘 유지된다.</li>
+      <li>④ 먹이 그물에서 한 종이 사라지면 생태계는 반드시 붕괴한다.</li>
+      <li>⑤ 먹이 사슬의 출발점은 1차 소비자다.</li>
+    </ul>
+  </div>
+  <div class="q">
+    <div class="qhead"><span class="qno">8</span><div class="stem">생태 피라미드에 대한 설명으로 옳은 것은? <span class="difficulty">●●●</span>
+    <div class="tags">10통과2-02-02 | 개념 2</div></div></div>
+    <ul class="choices">
+      <li>① 위 영양 단계로 갈수록 에너지양이 줄어든다.</li>
+      <li>② 위 영양 단계로 갈수록 개체 수는 많아진다.</li>
+      <li>③ 각 단계는 받은 에너지를 전부 위 단계로 전달한다.</li>
+      <li>④ 생산자의 에너지양이 가장 적다.</li>
+      <li>⑤ 먹이 사슬은 제한 없이 길어질 수 있다.</li>
+    </ul>
+  </div>
+  <div class="folio"><span>II. 환경과 에너지</span><span class="num">96</span></div>
+</div>
+
+<!-- ═════════════ p.97 STEP 2 계속 ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag">II. 환경과 에너지</span><span class="lesson-tag">02. 생태계 평형 | 문제</span></div>
+  <div class="q">
+    <div class="qhead"><span class="qno">9</span><div class="stem"><span class="badge-data">자료</span>안정된 생태계에서 1차 소비자가 갑자기 늘어났다. 이후 일어나는 변화로 옳은 것은? <span class="difficulty">●●●</span>
+    <div class="tags">10통과2-02-02 | 개념 3</div></div></div>
+    <ul class="choices">
+      <li>① 생산자가 일시적으로 증가한다.</li>
+      <li>② 2차 소비자가 일시적으로 감소한다.</li>
+      <li>③ 1차 소비자는 계속 늘어나기만 한다.</li>
+      <li>④ 생태계 평형은 영원히 회복되지 않는다.</li>
+      <li>⑤ 생산자는 줄고 2차 소비자는 늘어나, 1차 소비자가 다시 감소한다.</li>
+    </ul>
+  </div>
+  <div class="q">
+    <div class="qhead"><span class="qno">10</span><div class="stem">생태계 평형을 깨뜨리는 인간 활동으로 옳은 것만을 고른 것은? <span class="difficulty">●●○</span>
+    <div class="tags">10통과2-02-02 | 개념 4</div></div></div>
+    <div class="bogi-box" style="background:#fff;">
+      (가) 도로 건설로 서식지가 단절된다.<br>
+      (나) 무분별한 남획으로 한 종이 급감한다.<br>
+      (다) 외래종을 들여와 기존 먹이 그물이 교란된다.
+    </div>
+    <ul class="choices inline">
+      <li>① (가)</li><li>② (나)</li><li>③ (가), (나)</li><li>④ (가), (나), (다)</li><li>⑤ (나), (다)</li>
+    </ul>
+  </div>
+  <div class="q">
+    <div class="qhead"><span class="qno">11</span><div class="stem"><span class="badge-essay">서술형</span>안정된 생태계에서 1차 소비자가 급증했을 때 평형이 회복되는 과정을 <b>'생산자'와 '2차 소비자'</b>라는 말을 포함하여 순서대로 서술하시오. <span class="difficulty">●●●●</span>
+    <div class="tags">10통과2-02-02 | 개념 3</div></div></div>
+    <div class="essay-lines"><div></div><div></div><div></div></div>
+  </div>
+  <div class="folio"><span>II. 환경과 에너지</span><span class="num">97</span></div>
+</div>
+
+<!-- ═════════════ p.98 STEP 3 ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag">II. 환경과 에너지</span><span class="lesson-tag">02. 생태계 평형 | 문제</span></div>
+  <div class="step-head s3"><span class="stepno">STEP 3</span><span class="steptt">수능 도전</span><span class="stepdesc">2028 수능 규격 — ㄱㄴㄷ 합답형·자료 해석</span></div>
+  <div class="q">
+    <div class="qhead"><span class="qno">12</span><div class="stem"><span class="badge-data">자료</span>그림은 어느 안정된 생태계의 생태 피라미드를 나타낸 것이다. A~C는 각각 생산자, 1차 소비자, 2차 소비자 중 하나이다. 옳은 것만을 &lt;보기&gt;에서 있는 대로 고른 것은? <span class="difficulty">[2점]</span>
+    <div class="tags">10통과2-02-02</div></div></div>
+    <figure style="margin:2mm 0 1.5mm 8.6mm;">
+      <svg width="240" height="86" viewBox="0 0 240 86" font-family="PC Sans">
+        <g font-size="6.8" text-anchor="middle" transform="translate(120,6)">
+          <rect x="-90" y="52" width="180" height="20" fill="#147D6F" rx="3"/><text y="66" fill="#fff" font-weight="800">C</text>
+          <rect x="-58" y="28" width="116" height="20" fill="#4BA394" rx="3"/><text y="42" fill="#fff" font-weight="800">B</text>
+          <rect x="-30" y="4" width="60" height="20" fill="#A9D9CE" rx="3"/><text y="18" fill="#0F6357" font-weight="800">A</text>
+        </g>
+      </svg>
+    </figure>
+    <div class="bogi-box">
+      <div class="bt">보기</div>
+      ㄱ. C는 생산자이다.<br>
+      ㄴ. 에너지양은 A가 C보다 많다.<br>
+      ㄷ. B가 급증하면 C는 일시적으로 감소하고 A는 일시적으로 증가한다.
+    </div>
+    <ul class="choices inline">
+      <li>① ㄱ</li><li>② ㄴ</li><li>③ ㄴ, ㄷ</li><li>④ ㄱ, ㄷ</li><li>⑤ ㄱ, ㄴ, ㄷ</li>
+    </ul>
+  </div>
+  <div class="q">
+    <div class="qhead"><span class="qno">13</span><div class="stem"><span class="badge-data">자료</span>다음은 옐로스톤 국립공원의 사례다. 옳은 것만을 &lt;보기&gt;에서 있는 대로 고른 것은? <span class="difficulty">[2.5점]</span>
+    <div class="tags">10통과2-02-02</div></div></div>
+    <div class="bogi-box" style="background:#fff;">
+      1920년대 늑대가 사라지자 엘크(사슴)가 급증해 강가의 어린 나무가 크게 줄었다. 1995년 늑대를 다시 방사하자 엘크가 줄고 행동이 바뀌면서 나무가 회복되었고, 비버가 늘어 물길까지 안정되었다.
+    </div>
+    <div class="bogi-box">
+      <div class="bt">보기</div>
+      ㄱ. 늑대가 사라진 뒤 엘크의 급증은 천적이 없어졌기 때문이다.<br>
+      ㄴ. 최상위 포식자의 변화는 여러 영양 단계에 연쇄적으로 영향을 준다.<br>
+      ㄷ. 나무 회복 이후 비버가 물길을 바꾼 것은 생물이 환경에 영향을 준 예다.
+    </div>
+    <ul class="choices inline">
+      <li>① ㄱ</li><li>② ㄷ</li><li>③ ㄱ, ㄴ, ㄷ</li><li>④ ㄱ, ㄴ</li><li>⑤ ㄴ, ㄷ</li>
+    </ul>
+  </div>
+  <div class="folio"><span>II. 환경과 에너지</span><span class="num">98</span></div>
+</div>
+
+<!-- ═════════════ p.99 해설 1 ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag" style="color:var(--brand);">알짜 해설</span><span class="lesson-tag">02. 생태계 평형</span></div>
+  <div class="sol-head"><span class="stt">알짜 해설</span><span class="sub">전 문항 해설 + 오답 선지 분석 — 맞힌 문제도 해설로 한 번 더!</span></div>
+  <table class="anstable">
+    <tr><th>문항</th><td>1</td><td>2</td><td>3</td><td>4</td><td>5</td><td>6</td><td>7</td><td>8</td><td>9</td><td>10</td><td>11</td><td>12</td><td>13</td></tr>
+    <tr><th>정답</th><td class="a">O</td><td class="a">X</td><td class="a">O</td><td class="a">먹이 사슬</td><td class="a">피라미드</td><td class="a">서식지</td><td class="a">③</td><td class="a">①</td><td class="a">⑤</td><td class="a">④</td><td class="a">서술형</td><td class="a">④</td><td class="a">③</td></tr>
+  </table>
+  <div class="solcols">
+    <div>
+      <div class="sol"><div class="shead"><span class="sno">1</span><span class="sans">O</span><span class="slink">개념 1</span></div>
+        <p>그물이 복잡할수록 충격이 분산된다.</p></div>
+      <div class="sol"><div class="shead"><span class="sno">2</span><span class="sans">X</span><span class="slink">개념 2</span></div>
+        <p>위로 갈수록 줄어든다 — 에너지가 새기 때문.</p></div>
+      <div class="sol"><div class="shead"><span class="sno">3</span><span class="sans">O</span><span class="slink">개념 3</span></div>
+        <p>먹이 부족 + 천적 증가의 협공이 되돌린다.</p></div>
+      <div class="sol"><div class="shead"><span class="sno">4</span><span class="sans">먹이 사슬</span><span class="slink">개념 1</span></div>
+        <p>한 줄이면 사슬, 얽히면 그물.</p></div>
+      <div class="sol"><div class="shead"><span class="sno">5</span><span class="sans">피라미드</span><span class="slink">개념 2</span></div>
+        <p>개체 수·생물량·에너지 — 셋 다 피라미드형.</p></div>
+      <div class="sol"><div class="shead"><span class="sno">6</span><span class="sans">서식지</span><span class="slink">개념 5</span></div>
+        <p>끊긴 서식지를 잇는 야생동물의 다리.</p></div>
+    </div>
+    <div>
+      <div class="sol"><div class="shead"><span class="sno">7</span><span class="sans">③</span><span class="slink">개념 1</span></div>
+        <p>복잡한 그물 = 튼튼한 안전망.</p>
+        <div class="wrongbox"><div class="wt">오답 왜 틀렸나</div>
+          <p><b>①</b> 화살표는 먹히는 → 먹는. <b>②</b> 실제는 그물. <b>④</b> 다른 줄이 받칠 수 있다. <b>⑤</b> 출발점은 생산자.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">8</span><span class="sans">①</span><span class="slink">개념 2</span></div>
+        <p>위로 갈수록 에너지 ↓ — 피라미드의 기본 법칙.</p>
+        <div class="wrongbox"><div class="wt">오답 왜 틀렸나</div>
+          <p><b>②</b> 개체 수도 줄어든다. <b>③</b> 대부분은 호흡 등으로 소비. <b>④</b> 생산자가 가장 많다. <b>⑤</b> 에너지 한계로 길이 제한.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">9</span><span class="sans">⑤</span><span class="slink">개념 3</span></div>
+        <p>급증 → 생산자 ▼·2차 소비자 ▲ → 1차 소비자 ▼ → 회복.</p>
+        <div class="wrongbox"><div class="wt">오답 왜 틀렸나</div>
+          <p><b>①·②</b> 방향 반대. <b>③·④</b> 조절 장치가 작동해 회복된다(한계 내에서).</p></div></div>
+    </div>
+  </div>
+  <div class="folio"><span>알짜 해설</span><span class="num">99</span></div>
+</div>
+
+<!-- ═════════════ p.100 해설 2 ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag" style="color:var(--brand);">알짜 해설</span><span class="lesson-tag">02. 생태계 평형</span></div>
+  <div class="solcols">
+    <div>
+      <div class="sol"><div class="shead"><span class="sno">10</span><span class="sans">④</span><span class="slink">개념 4</span></div>
+        <p>서식지 단절·남획·외래종 — 셋 모두 평형 파괴의 대표 사례다.</p>
+        <div class="wrongbox"><div class="wt">함정 체크</div>
+          <p>넷째 손은 환경 오염 — '파괴 4적'으로 묶어 암기하라.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">11</span><span class="sans">모범 답안</span><span class="slink">개념 3</span></div>
+        <p>1차 소비자가 급증하면 먹이인 <b>생산자</b>는 줄고, 1차 소비자를 먹는 <b>2차 소비자</b>는 늘어난다. 먹이 부족과 천적 증가로 1차 소비자가 다시 감소하면, 생산자와 2차 소비자도 원래 수준으로 돌아와 평형이 회복된다.</p>
+        <div class="wrongbox"><div class="wt">채점 기준 (감점 포인트)</div>
+          <p>① 생산자 감소 + 2차 소비자 증가 ② 그로 인한 1차 소비자 감소 ③ 전체 회복 — 순서대로 서술해야 만점.</p></div></div>
+    </div>
+    <div>
+      <div class="sol"><div class="shead"><span class="sno">12</span><span class="sans">④</span><span class="slink">개념 2·3 | 2점</span></div>
+        <p><b>ㄱ (옳음)</b> 피라미드 맨 아래 C = 생산자. <b>ㄴ (틀림)</b> 에너지양은 C &gt; B &gt; A — 위층 A가 가장 적다. <b>ㄷ (옳음)</b> B(1차 소비자)가 급증하면 먹이인 C는 일시 감소, B를 먹는 A는 일시 증가한다.</p>
+        <div class="wrongbox"><div class="wt">함정 체크</div>
+          <p>ㄴ은 비교 방향을 뒤집은 함정 — 그림 없이 글만 읽으면 넘어간다. <b>"위층은 언제나 아래층보다 적다"</b>를 기준선으로 삼아 판정하라.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">13</span><span class="sans">③</span><span class="slink">개념 4·자료 | 2.5점</span></div>
+        <p><b>ㄱ (옳음)</b> 천적 소멸 → 급증. <b>ㄴ (옳음)</b> 늑대 → 엘크 → 나무 → 비버 — 여러 단계의 연쇄. <b>ㄷ (옳음)</b> 비버의 둑 짓기 = 생물 → 환경의 화살표.</p>
+        <div class="wrongbox"><div class="wt">함정 체크</div>
+          <p>세 진술이 모두 옳은 '전부 정답'형 — 하나쯤 틀렸겠지 하는 심리를 노린다. 각 진술을 독립적으로 판정하라.</p></div></div>
+
+      <div class="gist" style="margin-top:5mm;">
+        <div class="boxtitle"><span class="ico">알</span>이 소단원, 이것만은!</div>
+        <ul>
+          <li>그물 복잡 = 안정 / 피라미드는 위로 갈수록 ↓ (<b>에너지가 새므로</b>)</li>
+          <li>평형 회복 공식: 급증 → <b>먹이 ↓ + 천적 ▲</b> → 감소 → 회복 (한계 있음!)</li>
+          <li>옐로스톤: 최상위 포식자 = 그물의 버팀목 — 연쇄는 여러 단계를 타고 흐른다</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div class="folio"><span>알짜 해설</span><span class="num">100</span></div>
+</div>
+
+<!-- ═════════════ p.101 MEMO ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag">II. 환경과 에너지</span><span class="lesson-tag">02 ▸ 03 넘어가기 전에</span></div>
+  <div class="memo-head"><span class="mt">MEMO</span><span class="ms">헷갈린 개념, 다시 틀린 문제 번호, 나만의 암기법을 남겨 두는 자리</span></div>
+  <div class="memo-area"></div>
+  <div class="memo-pen">"'메뚜기 급증' 시나리오를 ▲▼ 화살표만으로 3막까지 그려 보자. 막히면 92쪽으로! — 박찬쌤"</div>
+  <div class="folio"><span>박찬 과학 | 통합과학 2</span><span class="num">101</span></div>
+</div>
+
+</body>
+</html>

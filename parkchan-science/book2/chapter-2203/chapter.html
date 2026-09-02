@@ -1,0 +1,941 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<title>박찬 과학 통합과학2 — II-03 지구온난화와 기후변화</title>
+<style>
+  @font-face { font-family:'PC Sans'; src:url('file:///root/.fonts/NotoSansKR.ttf'); font-weight:100 900; }
+  @font-face { font-family:'PC Serif'; src:url('file:///root/.fonts/NotoSerifKR.ttf'); font-weight:100 900; }
+  @font-face { font-family:'PC Pen'; src:url('file:///root/.fonts/YeonSung-Regular.ttf'); font-weight:400; }
+
+  :root{
+    --brand:#0E5A6B;        /* 박찬 과학 브랜드 딥틸 */
+    --brand-lt:#E3F0F3;
+    --unit:#147D6F;         /* I. 과학의 기초 단원 컬러(그린) */
+    --unit-lt:#E7F5F1;
+    --unit-md:#A9D9CE;
+    --accent:#E8940A;       /* 알짜 앰버 */
+    --accent-lt:#FDF3E0;
+    --point:#D6455D;        /* 시험 포인트 */
+    --point-lt:#FBEBEE;
+    --ink:#22303A;
+    --sub:#5B6B77;
+    --line:#D8E0E5;
+  }
+  *{ box-sizing:border-box; margin:0; padding:0; -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+  @page{ size:210mm 275mm; margin:0; }
+  html,body{ font-family:'PC Sans',sans-serif; color:var(--ink); word-break:keep-all; overflow-wrap:anywhere; }
+
+  .page{ width:210mm; height:275mm; position:relative; overflow:hidden; background:#fff; page-break-after:always; padding:14mm 13mm 19mm 15mm; display:flex; flex-direction:column; }
+
+  /* ── 러닝 헤드 / 풋 ── */
+  .runhead{ display:flex; align-items:center; justify-content:space-between; border-bottom:0.35mm solid var(--unit); padding-bottom:2mm; margin-bottom:6.5mm; }
+  .runhead .unit-tag{ font-size:8.5pt; font-weight:700; color:var(--unit); letter-spacing:0.02em; }
+  .runhead .lesson-tag{ font-size:8.5pt; color:var(--sub); }
+  .folio{ position:absolute; bottom:7mm; left:0; right:0; display:flex; justify-content:space-between; padding:0 14mm 0 14mm; font-size:8pt; color:var(--sub); }
+  .folio .num{ font-weight:800; color:var(--unit); font-size:10pt; }
+
+  /* ── 본문 그리드: 본문 + 날개단 ── */
+  .cols{ display:grid; grid-template-columns:1fr 43mm; gap:8mm; flex:1; min-height:0; margin-bottom:4mm; }
+  .main{ min-width:0; }
+  .wing{ border-left:0.3mm solid var(--line); padding-left:5mm; font-size:8.2pt; color:var(--sub); line-height:1.7; }
+
+  /* ── 타이포 ── */
+  h2.lesson-title{ display:flex; align-items:baseline; gap:3.5mm; margin-bottom:2mm; }
+  h2.lesson-title .no{ background:var(--unit); color:#fff; font-size:13pt; font-weight:900; padding:1.2mm 3.2mm; border-radius:1.5mm; }
+  h2.lesson-title .tt{ font-size:16.5pt; font-weight:900; letter-spacing:-0.01em; }
+  .std-badges{ display:flex; gap:2mm; margin:2mm 0 6.5mm; }
+  .std{ font-size:7.4pt; color:var(--unit); background:none; border:0.3mm solid var(--unit-md); border-radius:5mm; padding:0.6mm 2.8mm; font-weight:600; }
+
+  h3.sec{ display:flex; align-items:baseline; gap:3mm; font-size:12.5pt; font-weight:800; margin:9mm 0 3.6mm; letter-spacing:-0.01em; }
+  h3.sec .n{ font-family:'PC Serif'; font-size:15.5pt; font-weight:900; color:var(--unit); border-bottom:0.7mm solid var(--accent); padding:0 0.8mm 0.2mm; flex:0 0 auto; line-height:1; }
+  h3.sec::after{ content:""; flex:1; border-top:0.25mm solid var(--line); align-self:center; margin-left:2mm; }
+  h3.sec:first-child{ margin-top:0; }
+
+  p.body{ font-family:'PC Serif'; font-size:9.6pt; line-height:1.92; margin-bottom:3.6mm; text-align:justify; }
+  p.body b{ font-weight:800; }
+  .kw{ font-weight:800; color:var(--unit); }
+  .u-amber{ background:#F8E9C6; font-weight:700; padding:0.15mm 0.6mm; border-radius:0.6mm; box-decoration-break:clone; -webkit-box-decoration-break:clone; }
+
+  ul.pts{ font-family:'PC Serif'; font-size:9.6pt; line-height:1.84; margin:1.5mm 0 3.5mm 1mm; list-style:none; }
+  ul.pts li{ padding-left:4.5mm; position:relative; margin-bottom:1.8mm; }
+  ul.pts li::before{ content:""; position:absolute; left:0.5mm; top:2.9mm; width:1.7mm; height:1.7mm; background:var(--accent); border-radius:50%; }
+
+  /* ── 코너 박스 ── */
+  .boxtitle{ display:inline-flex; align-items:center; gap:1.8mm; font-weight:900; font-size:9.5pt; margin-bottom:1.6mm; }
+  .boxtitle .ico{ width:5.2mm; height:5.2mm; border-radius:1.2mm; display:flex; align-items:center; justify-content:center; color:#fff; font-size:7.5pt; font-weight:900; }
+
+  .gist{ background:none; border:none; border-top:0.5mm solid var(--accent); border-bottom:0.5mm solid var(--accent); border-radius:0; padding:3.2mm 1.8mm 3mm; margin:6mm 0 5mm; }
+  .gist .boxtitle{ color:#9C6503; } .gist .ico{ background:var(--accent); }
+  .gist ul{ list-style:none; font-family:'PC Serif'; font-size:9.3pt; line-height:1.78; }
+  .gist li{ padding-left:4.2mm; position:relative; margin-bottom:1.2mm;}
+  .gist li::before{ content:"✓"; position:absolute; left:0; color:var(--accent); font-weight:900; }
+
+  .expoint{ background:none; border-left:0.5mm solid #D998A4; border-left-color:#D998A4; border-radius:0; padding:1.4mm 0 1.4mm 3.6mm; margin:4.5mm 0; }
+  .expoint .boxtitle{ color:#A9556A; font-size:8.6pt; margin-bottom:1mm;}
+  .expoint .ico{ background:none; color:#A9556A; border:0.35mm solid #D998A4; width:4.4mm; height:4.4mm; border-radius:50%; font-size:7pt; }
+  .expoint p{ font-family:'PC Serif'; font-size:8.9pt; line-height:1.7; }
+
+  .pen{ font-family:'PC Pen'; font-size:12pt; color:#0F6357; line-height:1.45; }
+  .saem{ display:flex; gap:3mm; align-items:flex-start; margin:4.5mm 0; }
+  .saem .avatar{ flex:0 0 auto; width:10.5mm; height:10.5mm; border-radius:50%; background:var(--brand); color:#fff; font-size:7pt; font-weight:800; display:flex; align-items:center; justify-content:center; line-height:1.35; letter-spacing:0.04em; text-align:center; border:0.5mm solid var(--accent); box-sizing:border-box;}
+  .saem .bubble{ background:#FFFBF0; border:0.4mm solid #EBCB9C; border-radius:3mm; padding:2.2mm 3.6mm 2mm; position:relative; }
+  .saem .bubble::before{ content:""; position:absolute; left:-1.8mm; top:3.2mm; width:3mm; height:3mm; background:#FFFBF0; border-left:0.4mm solid #EBCB9C; border-bottom:0.4mm solid #EBCB9C; transform:rotate(45deg); }
+
+  .wing .wtitle{ font-size:8pt; font-weight:900; color:var(--brand); display:flex; align-items:center; gap:1.5mm; margin:0 0 2.4mm; letter-spacing:0.05em; }
+  .wing .wtitle::before{ content:""; width:2.4mm; height:2.4mm; background:var(--accent); border-radius:50%; }
+  .wing .term{ margin-bottom:3.6mm; }
+  .wing .term b{ color:var(--ink); font-weight:800; display:block; font-size:8.5pt; margin-bottom:0.7mm;}
+  .wing .wsep{ border-top:0.3mm dashed var(--line); margin:4.5mm 0; }
+  .wing .wing-pen{ font-family:'PC Pen'; font-size:11pt; color:#0F6357; line-height:1.45; }
+
+  figure{ margin:5mm 0; }
+  figure figcaption{ font-size:8pt; color:var(--sub); text-align:center; margin-top:2mm; }
+  figure svg{ display:block; margin:0 auto; }
+
+  /* ── 비교형 그림 (2패널 + 범례) ── */
+  .fig-duo{ display:flex; align-items:stretch; gap:2.5mm; justify-content:center; }
+  .fig-duo .panel{ flex:0 0 auto; text-align:center; }
+  .fig-duo .p-title{ font-size:9pt; font-weight:900; color:var(--ink); margin-top:1.6mm; }
+  .fig-duo .p-sub{ font-size:7.8pt; color:var(--sub); line-height:1.45; margin-top:0.5mm; }
+  .fig-duo .mid{ display:flex; flex-direction:column; align-items:center; justify-content:center; gap:1mm; padding:0 1mm; }
+  .fig-duo .mid .mlab{ font-size:7.6pt; font-weight:800; color:var(--unit); text-align:center; line-height:1.3; }
+  .fig-legend{ display:flex; justify-content:center; gap:5mm; font-size:7.8pt; color:var(--ink); margin-top:1.2mm; align-items:center; }
+  .fig-legend span{ display:inline-flex; align-items:center; gap:1.4mm; }
+
+  /* ── 탐구 (자료 파헤치기) ── */
+  .lab{ border:0.5mm solid var(--brand); border-radius:2.5mm; overflow:hidden; margin-top:1mm;}
+  .lab .lab-head{ background:var(--brand); color:#fff; padding:2.2mm 4mm; font-weight:900; font-size:11pt; display:flex; align-items:center; gap:2.5mm;}
+  .lab .lab-head .tag{ font-size:7.5pt; background:rgba(255,255,255,.22); padding:0.6mm 2.4mm; border-radius:4mm; font-weight:700;}
+  .lab .lab-body{ padding:3.5mm 4mm; }
+  .lab h4{ font-size:9.6pt; font-weight:900; color:var(--brand); margin:2.5mm 0 1.4mm; }
+  .lab h4:first-child{ margin-top:0; }
+  .lab p, .lab li{ font-family:'PC Serif'; font-size:9.3pt; line-height:1.8; }
+  .lab ol{ margin-left:5mm; }
+
+  /* ── 문제부 ── */
+  .step-head{ display:flex; align-items:center; gap:3mm; margin:0 0 5mm; }
+  .step-head .stepno{ background:var(--unit); color:#fff; font-weight:900; font-size:9.5pt; padding:1.4mm 3.4mm; border-radius:1.5mm; letter-spacing:0.04em;}
+  .step-head .steptt{ font-size:12.5pt; font-weight:900; }
+  .step-head .stepdesc{ font-size:8.2pt; color:var(--sub); margin-left:auto; }
+  .step-head.s2 .stepno{ background:var(--brand); }
+  .step-head.s3 .stepno{ background:var(--point); }
+
+  .q{ margin-bottom:7.5mm; break-inside:avoid; }
+  .q .qhead{ display:flex; gap:2.4mm; align-items:flex-start; }
+  .q .qno{ flex:0 0 auto; min-width:6.2mm; height:6.2mm; border:0.45mm solid var(--unit); color:var(--unit); border-radius:50%; font-size:8.6pt; font-weight:900; line-height:1; display:flex; align-items:center; justify-content:center; padding-top:0.55mm; margin-top:0.4mm;}
+  .q .stem{ font-family:'PC Serif'; font-size:9.5pt; line-height:1.74; font-weight:500; }
+  .q .stem .difficulty{ color:#C9A227; font-size:8pt; letter-spacing:0.06em; margin-left:1.5mm;}
+  .q .tags{ margin-top:0.8mm; font-size:7pt; color:var(--sub); font-family:'PC Sans';}
+  .choices{ list-style:none; margin:2.2mm 0 0 8.6mm; font-family:'PC Serif'; font-size:9.3pt; line-height:1.85; }
+  .choices.inline{ display:flex; flex-wrap:wrap; gap:0 6mm; }
+  .bogi-box{ border:0.35mm solid #B8C2CA; border-radius:0; margin:2.5mm 0 0 8.6mm; padding:2.4mm 3.2mm; font-family:'PC Serif'; font-size:9.2pt; line-height:1.8; background:none;}
+  .bogi-box .bt{ text-align:center; font-weight:800; color:var(--sub); font-size:8.4pt; margin-bottom:0.8mm; letter-spacing:0.3em;}
+  .ox-answer{ margin-left:2mm; color:var(--sub); font-size:9pt; }
+  .blankline{ display:inline-block; min-width:14mm; border-bottom:0.4mm solid var(--ink); }
+  .qgrid{ display:grid; grid-template-columns:1fr 1fr; gap:0 9mm; }
+  .essay-lines{ margin:2mm 0 0 8.4mm; }
+  .essay-lines div{ border-bottom:0.3mm solid var(--line); height:6.2mm; }
+  .badge-essay{ display:inline-block; background:var(--point); color:#fff; font-size:7pt; font-weight:800; padding:0.4mm 2mm; border-radius:1mm; vertical-align:1pt; margin-right:1.2mm;}
+  .badge-data{ display:inline-block; background:var(--brand); color:#fff; font-size:7pt; font-weight:800; padding:0.4mm 2mm; border-radius:1mm; vertical-align:1pt; margin-right:1.2mm;}
+
+  /* ── 해설부 ── */
+  .sol-head{ display:flex; align-items:center; gap:3mm; margin-bottom:4mm;}
+  .sol-head .stt{ font-size:14.5pt; font-weight:900; color:var(--brand);}
+  .sol-head .sub{ font-size:8.5pt; color:var(--sub);}
+  .anstable{ width:100%; border-collapse:collapse; margin-bottom:4.5mm; }
+  .anstable th,.anstable td{ border:0.3mm solid var(--line); font-size:8.8pt; padding:1.4mm 0; text-align:center; }
+  .anstable th{ background:var(--brand-lt); color:var(--brand); font-weight:800; }
+  .anstable td.a{ font-weight:900; color:var(--unit); }
+  .sol{ margin-bottom:5mm; break-inside:avoid; }
+  .sol .shead{ display:flex; align-items:center; gap:2mm; margin-bottom:1.4mm;}
+  .sol .sno{ background:var(--unit); color:#fff; min-width:6mm; height:5.4mm; border-radius:1.2mm; font-size:8.6pt; font-weight:900; line-height:1; display:flex; align-items:center; justify-content:center; padding:0.5mm 1.5mm 0;}
+  .sol .sans{ font-weight:900; color:var(--unit); font-size:9.6pt;}
+  .sol .slink{ font-size:7.2pt; color:var(--sub); margin-left:auto;}
+  .sol p{ font-family:'PC Serif'; font-size:9.1pt; line-height:1.76; margin-bottom:0.8mm; }
+  .wrongbox{ background:none; border:none; border-left:0.7mm solid #E3A0AC; border-radius:0; padding:1mm 0 1mm 3mm; margin-top:2mm;}
+  .wrongbox .wt{ font-size:8pt; font-weight:900; color:var(--point); margin-bottom:0.8mm; font-family:'PC Sans';}
+  .wrongbox p{ font-family:'PC Serif'; font-size:8.6pt; line-height:1.68; margin-bottom:0.9mm;}
+  .wrongbox p:last-child{ margin-bottom:0; }
+  .solcols{ display:grid; grid-template-columns:1fr 1fr; gap:0 9mm; }
+
+  /* ── 단원 도입 (타이포그래피 중심) ── */
+  .opener{ padding:0 0 19mm; }
+  .opener-hero{ position:relative; padding:7mm 20mm 4.5mm; overflow:hidden; flex-shrink:0; }
+  .ghost-txt{ position:absolute; top:-10mm; right:6mm; font-size:118pt; font-weight:900; color:#EAF5F1; line-height:1; letter-spacing:-0.04em; }
+  .kicker{ display:flex; align-items:center; gap:4mm; position:relative; }
+  .kicker .kt{ font-size:9.5pt; font-weight:800; color:var(--unit); letter-spacing:0.24em; white-space:nowrap; }
+  .kicker::after{ content:""; flex:1; border-top:0.3mm solid var(--line); }
+  .opener-hero h1{ position:relative; font-size:36pt; font-weight:900; letter-spacing:-0.015em; margin:4mm 0 0; }
+  .opener-hero h1 .tick{ display:block; width:14mm; border-top:1.4mm solid var(--accent); margin-bottom:3.6mm; }
+  .opener-lede{ position:relative; font-family:'PC Serif'; font-size:10.2pt; font-weight:600; line-height:2.0; color:#3D4C58; max-width:138mm; margin-top:4mm; padding-left:5mm; border-left:0.8mm solid var(--accent); }
+  .opener-inner{ padding:0 20mm; }
+
+  /* ── 원소의 여정 스트립 ── */
+  .journey{ margin-top:3.5mm; }
+  .journey .j-label{ font-size:8pt; font-weight:800; color:var(--sub); letter-spacing:0.08em; margin-bottom:2.4mm; display:flex; align-items:center; gap:1.6mm;}
+  .journey .j-label::before{ content:""; width:2.4mm; height:2.4mm; background:var(--unit); border-radius:50%; }
+  .j-bar{ display:flex; align-items:center; gap:2mm; }
+  .j-chip{ flex:1; text-align:center; background:#EFF8F5; border:0.35mm solid #A9D9CE; color:#147D6F; border-radius:1.6mm; padding:3mm 1mm 2.6mm; }
+  .j-chip .jc-t{ font-size:8.8pt; font-weight:800; display:block; }
+  .j-chip .jc-s{ font-size:6.8pt; color:var(--sub); display:block; margin-top:0.5mm; }
+  .j-chip.on{ background:var(--unit); border-color:var(--unit); }
+  .j-chip.on .jc-t{ color:#fff; }
+  .j-chip.on .jc-s{ color:#C9E7DF; }
+  .j-arrow{ flex:0 0 auto; color:#6FB8AA; font-size:10pt; font-weight:900; }
+  .toc{ margin-top:6.5mm; }
+  .toc .toc-title{ font-size:11pt; font-weight:900; color:var(--ink); margin-bottom:3mm; display:flex; align-items:center; gap:2.5mm;}
+  .toc .toc-title::before{ content:""; width:3.4mm; height:3.4mm; background:var(--accent); border-radius:0.8mm; }
+  .toc-item{ display:flex; align-items:flex-start; gap:5mm; padding:4.4mm 6mm; border-bottom:0.3mm solid var(--line); }
+  .toc-item:first-of-type{ border-top:0.3mm solid var(--line); }
+  .toc-item.active{ background:#EFF8F5; border-left:1.2mm solid #4BA394; }
+  .toc-item .tno{ font-family:'PC Serif'; font-weight:900; color:#4BA394; font-size:14pt; width:10mm; line-height:1.1; flex:0 0 auto;}
+  .toc-item .tbody{ flex:1; min-width:0; }
+  .toc-item .ttt{ font-weight:800; font-size:10.5pt; letter-spacing:0.01em; display:flex; align-items:center;}
+  .toc-item .tdesc{ font-family:'PC Serif'; font-size:8.6pt; font-weight:600; color:#4A5964; margin-top:0.7mm; line-height:1.55;}
+  .toc-item .tstd{ font-size:7.2pt; color:var(--sub); flex:0 0 auto; padding-top:1.2mm;}
+  .toc-item.active .tag-now{ background:var(--accent); color:#fff; font-size:7pt; font-weight:900; border-radius:4mm; padding:0.7mm 2.6mm; margin-left:3.5mm;}
+  .toc-item .tag-done{ font-size:7.2pt; font-weight:800; color:#147D6F; margin-left:3.5mm; }
+  .opener-quote{ margin-top:7mm; text-align:center; font-family:'PC Serif'; font-size:9.8pt; font-weight:600; color:#4A5964; letter-spacing:0.01em; }
+  .opener-quote .who{ font-size:8pt; color:var(--sub); font-weight:400; margin-left:2.5mm; }
+  .qa-lead li .qgo{ font-family:'PC Sans'; font-size:7.4pt; font-weight:800; color:var(--unit); background:var(--unit-lt); border-radius:3mm; padding:0.5mm 2.2mm; margin-left:2mm; white-space:nowrap; vertical-align:1pt;}
+  .qa-lead{ margin-top:5mm; border:none; border-top:0.45mm solid var(--brand); border-bottom:0.45mm solid var(--brand); background:none; border-radius:0; padding:3mm 2mm 2.8mm; }
+  .qa-lead .qt{ font-weight:900; color:var(--brand); font-size:10.5pt; margin-bottom:2mm;}
+  .qa-lead li{ font-family:'PC Serif'; font-size:9.5pt; line-height:1.8; margin-left:5mm; }
+
+  /* ── 바로바로 체크 (개념 페이지 하단 즉석 OX) ── */
+  .quickcheck{ margin-top:auto; border-top:0.35mm dashed #C8B98F; padding-top:3mm; width:calc(100% - 51mm); }
+  .quickcheck .qc-title{ display:inline-flex; align-items:center; gap:1.6mm; font-size:8.2pt; font-weight:900; color:#9C6503; margin-bottom:1.4mm; }
+  .quickcheck .qc-title::before{ content:"✓"; color:var(--accent); font-weight:900; }
+  .quickcheck ol{ list-style:none; font-family:'PC Serif'; font-size:8.8pt; line-height:1.75; }
+  .quickcheck li{ display:flex; gap:2mm; align-items:baseline; }
+  .quickcheck li .no{ font-weight:800; color:var(--accent); flex:0 0 auto; }
+  .quickcheck .qc-ans{ margin-top:1mm; font-size:7.2pt; color:var(--sub); transform:rotate(180deg); text-align:left; }
+
+  /* ── 중학 과학 다시보기 (날개단) ── */
+  .wing .review{ background:#F6F3EC; border-radius:1.8mm; padding:2.8mm 3mm; margin-top:1mm; }
+  .wing .review .rv-title{ font-size:7.8pt; font-weight:900; color:#7A6A45; margin-bottom:1.4mm; display:flex; align-items:center; gap:1.4mm;}
+  .wing .review .rv-title::before{ content:"↺"; font-weight:900; color:#A08A55; }
+
+  /* ── MEMO 페이지 ── */
+  .memo-head{ display:flex; align-items:baseline; gap:3.5mm; margin-bottom:5mm; }
+  .memo-head .mt{ font-size:17pt; font-weight:900; color:var(--brand); letter-spacing:0.22em; }
+  .memo-head .ms{ font-size:8.6pt; color:var(--sub); }
+  .memo-area{ flex:1; border:0.4mm solid var(--line); border-radius:2.5mm;
+    background-image:linear-gradient(to bottom, transparent calc(100% - 0.3mm), #DCE4E9 0);
+    background-size:100% 9mm; background-position:0 4mm; padding:0 5mm; margin-bottom:4mm; }
+  .memo-pen{ font-family:'PC Pen'; font-size:12.5pt; color:#0F6357; text-align:right; }
+</style>
+</head>
+<body>
+<!-- ═════════════ p.102 소단원 도입 ═════════════ -->
+<div class="page opener">
+  <div class="opener-hero">
+    <div class="ghost-txt">03</div>
+    <div class="kicker"><span class="kt">통합과학 2 · II. 환경과 에너지</span></div>
+    <h1><span class="tick"></span>지구온난화와 기후변화</h1>
+    <p class="opener-lede">지구를 덮은 담요는 원래 고마운 것이었다 —<br>
+    문제는 우리가 그 담요를 자꾸 두껍게 만들고 있다는 것.</p>
+  </div>
+
+  <div class="opener-inner">
+    <div class="journey">
+      <div class="j-label">환경과 에너지 — 지금 여기</div>
+      <div class="j-bar">
+        <div class="j-chip"><span class="jc-t">생태계</span><span class="jc-s">모두 연결되어 있다</span></div>
+        <span class="j-arrow">→</span>
+        <div class="j-chip"><span class="jc-t">생태계 평형</span><span class="jc-s">그물이 버틴다</span></div>
+        <span class="j-arrow">→</span>
+        <div class="j-chip on"><span class="jc-t">기후변화</span><span class="jc-s">뜨거워지는 지구</span></div>
+        <span class="j-arrow">→</span>
+        <div class="j-chip"><span class="jc-t">태양 에너지</span><span class="jc-s">모든 에너지의 뿌리</span></div>
+        <span class="j-arrow">→</span>
+        <div class="j-chip"><span class="jc-t">발전과 효율</span><span class="jc-s">전기를 만드는 법</span></div>
+      </div>
+    </div>
+    <div class="toc">
+      <div class="toc-title">이 단원의 학습 지도</div>
+      <div class="toc-item">
+        <span class="tno">01</span>
+        <span class="tbody"><span class="ttt">생태계의 구성과 상호 관계</span>
+        <span class="tdesc">생태계 구성 요소, 생물과 환경의 주고받기</span></span>
+        <span class="tstd">10통과2-02-01</span>
+      </div>
+      <div class="toc-item">
+        <span class="tno">02</span>
+        <span class="tbody"><span class="ttt">생태계 평형</span>
+        <span class="tdesc">먹이 관계와 생태 피라미드 — 그물은 어떻게 버티나</span></span>
+        <span class="tstd">10통과2-02-02</span>
+      </div>
+      <div class="toc-item active">
+        <span class="tno">03</span>
+        <span class="tbody"><span class="ttt">지구온난화와 기후변화<span class="tag-now">NOW</span></span>
+        <span class="tdesc">온실효과 강화의 메커니즘, 엘니뇨·사막화</span></span>
+        <span class="tstd">10통과2-02-03</span>
+      </div>
+      <div class="toc-item">
+        <span class="tno">04</span>
+        <span class="tbody"><span class="ttt">태양 에너지와 에너지 전환</span>
+        <span class="tdesc">수소 핵융합에서 지구의 에너지 흐름까지</span></span>
+        <span class="tstd">10통과2-02-04</span>
+      </div>
+      <div class="toc-item">
+        <span class="tno">05</span>
+        <span class="tbody"><span class="ttt">발전과 에너지의 효율적 이용</span>
+        <span class="tdesc">전자기 유도와 발전, 에너지 효율과 신재생 에너지</span></span>
+        <span class="tstd">10통과2-02-05 · 06</span>
+      </div>
+    </div>
+
+    <div class="qa-lead">
+      <div class="qt">이 소단원을 끝내면 답할 수 있는 질문</div>
+      <ul>
+        <li>온실효과가 없다면 지구는 어떤 모습일까? <span class="qgo">개념 1</span></li>
+        <li>이산화 탄소 그래프의 톱니 모양은 무엇일까? <span class="qgo">자료</span></li>
+        <li>엘니뇨는 왜 지구 반대편의 날씨까지 바꿀까? <span class="qgo">개념 4</span></li>
+        <li>사막은 정말 '저절로' 넓어지는 걸까? <span class="qgo">개념 5</span></li>
+      </ul>
+    </div>
+
+    <div class="opener-quote" style="margin-top:2.4mm;">"지구는 물려받은 것이 아니라, 후손에게서 빌린 것이다."<span class="who">— 오래된 격언, 기후 시대의 문장이 되다</span></div>
+  </div>
+
+  <div class="folio"><span>박찬 과학 | 통합과학 2</span><span class="num">102</span></div>
+</div>
+
+<!-- ═════════════ p.103 개념 01 온실효과 ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag">II. 환경과 에너지</span><span class="lesson-tag">03. 지구온난화와 기후변화</span></div>
+  <h2 class="lesson-title"><span class="no">03</span><span class="tt">지구온난화와 기후변화</span></h2>
+  <div class="std-badges"><span class="std">성취기준 10통과2-02-03</span><span class="std">온실효과 → 온난화 메커니즘 → 엘니뇨·사막화 → 대처</span></div>
+
+  <div class="cols">
+    <div class="main">
+      <h3 class="sec"><span class="n">1</span>온실효과 — 지구의 고마운 담요</h3>
+      <p class="body">먼저 오해부터 풀자. <span class="kw">온실효과</span> 자체는 재앙이 아니라 <b>생명의 조건</b>이다. 태양 에너지는 주로 <b>가시광선</b>으로 들어와 지표를 데우고, 데워진 지표는 <b>적외선</b>(지구 복사)의 형태로 열을 내보낸다. 이때 대기 중의 <span class="kw">온실 기체</span> — 수증기·이산화 탄소·메테인 — 가 <span class="u-amber">나가려는 적외선을 흡수했다가 사방으로 다시 내보내며</span> 열의 일부를 지표 근처에 붙잡아 둔다.</p>
+      <p class="body">이 담요 덕분에 지구의 평균 기온은 약 <b>15 ℃</b>로 유지된다. 온실 기체가 전혀 없다면 약 <b>−18 ℃</b> — 바다가 얼어붙는 행성이 되었을 것이다. 문제는 담요의 존재가 아니라 <b>두께의 변화</b>다. 담요가 두꺼워지면 무슨 일이 벌어지는지 — 다음 개념에서 본다.</p>
+
+      <figure>
+        <svg width="470" height="150" viewBox="0 0 470 150" font-family="PC Sans">
+          <defs>
+            <marker id="arrP" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="#147D6F"/></marker>
+            <marker id="arrR" markerWidth="7" markerHeight="7" refX="5" refY="2.5" orient="auto"><path d="M0,0 L6,2.5 L0,5 Z" fill="#D6455D"/></marker>
+            <marker id="arrY" markerWidth="7" markerHeight="7" refX="5" refY="2.5" orient="auto"><path d="M0,0 L6,2.5 L0,5 Z" fill="#E8940A"/></marker>
+          </defs>
+          <g font-size="6.8">
+            <text x="235" y="13" text-anchor="middle" font-size="8.4" font-weight="800" fill="#147D6F">온실효과의 구조 — 들어오는 빛, 붙잡히는 열</text>
+            <g transform="translate(20,20)">
+              <!-- 지표 -->
+              <rect x="0" y="100" width="430" height="14" fill="#A8886B" rx="3"/>
+              <text x="215" y="110" text-anchor="middle" fill="#fff" font-weight="800" font-size="6.4">지표 — 데워진 뒤 적외선으로 열을 내보낸다</text>
+              <!-- 대기층 -->
+              <rect x="0" y="34" width="430" height="12" fill="#CBE8E1" opacity="0.85" rx="6"/>
+              <text x="215" y="43" text-anchor="middle" fill="#0F6357" font-weight="800" font-size="6.4">온실 기체 층 (수증기 · 이산화 탄소 · 메테인)</text>
+              <!-- 태양 -->
+              <circle cx="46" cy="6" r="12" fill="#F3C24E"/>
+              <line x1="56" y1="16" x2="96" y2="96" stroke="#E8940A" stroke-width="1.8" marker-end="url(#arrY)"/>
+              <text x="96" y="66" font-size="6.2" fill="#B4830A" font-weight="800">가시광선 —</text>
+              <text x="96" y="75" font-size="6.2" fill="#B4830A" font-weight="800">대부분 통과해 지표를 데움</text>
+              <!-- 지구 복사 -->
+              <line x1="250" y1="98" x2="250" y2="50" stroke="#D6455D" stroke-width="1.6" marker-end="url(#arrR)"/>
+              <text x="256" y="76" font-size="6.2" fill="#D6455D" font-weight="800">적외선(지구 복사)</text>
+              <!-- 재방출 -->
+              <line x1="262" y1="46" x2="290" y2="20" stroke="#8A949E" stroke-width="1.2" marker-end="url(#arrP)" stroke-dasharray="3 2"/>
+              <line x1="258" y1="48" x2="258" y2="94" stroke="#B4560E" stroke-width="1.6" marker-end="url(#arrR)" transform="translate(64,0)"/>
+              <text x="330" y="76" font-size="6.2" fill="#B0483A" font-weight="800">흡수 후 재방출 —</text>
+              <text x="330" y="85" font-size="6.2" fill="#B0483A" font-weight="800">일부가 지표로 되돌아온다</text>
+              <text x="300" y="14" font-size="6" fill="#8A949E">일부는 우주로</text>
+            </g>
+          </g>
+          <text x="235" y="146" text-anchor="middle" font-size="8.8" font-weight="800" fill="#E8940A">담요 덕에 15 ℃ — 온실 기체가 없다면 지구는 약 −18 ℃의 얼음 행성</text>
+        </svg>
+        <figcaption>그림 1 | 온실효과 — 가시광선은 들여보내고, 적외선은 붙잡는 담요</figcaption>
+      </figure>
+
+      <div class="saem">
+        <div class="avatar">박찬<br>쌤</div>
+        <div class="bubble"><span class="pen">"온실효과는 죄가 없다 — 죄는 '강화'에 있다. 이 구분이 이 소단원 전체의 척추다. 담요와 담요 열 장은 다르다."</span></div>
+      </div>
+    </div>
+
+    <div class="wing">
+      <div class="wtitle">날개 노트</div>
+      <div class="term"><b>온실 기체</b>적외선을 흡수·재방출하는 기체 — 수증기, 이산화 탄소, 메테인 등.</div>
+      <div class="term"><b>지구 복사</b>데워진 지표가 내보내는 적외선. 태양 복사(가시광선 중심)와 파장이 다르다.</div>
+      <div class="wsep"></div>
+      <div class="wtitle">한눈에 암기</div>
+      <div class="wing-pen">들어올 땐 가시광선<br>나갈 땐 적외선 — 붙잡힘!<br>담요 없으면 −18 ℃</div>
+      <div class="wsep"></div>
+      <div class="review">
+        <div class="rv-title">중학 과학 다시보기</div>
+        <div class="term" style="margin-bottom:0;"><b>복사 (중2)</b>물질 없이 빛으로 전달되는 열 — 태양과 지구는 복사로 대화한다.</div>
+      </div>
+    </div>
+  </div>
+  <div class="quickcheck">
+    <span class="qc-title">바로바로 체크</span>
+    <ol>
+      <li><span class="no">1</span>온실 기체가 없다면 지구 평균 기온은 지금보다 훨씬 낮을 것이다. ( O , X )</li>
+      <li><span class="no">2</span>온실 기체는 주로 태양의 가시광선을 흡수한다. ( O , X )</li>
+      <li><span class="no">3</span>수증기와 이산화 탄소는 온실 기체다. ( O , X )</li>
+    </ol>
+    <div class="qc-ans">정답 1 O (약 −18 ℃) 2 X (지표의 적외선을 흡수) 3 O</div>
+  </div>
+  <div class="folio"><span>II. 환경과 에너지</span><span class="num">103</span></div>
+</div>
+
+<!-- ═════════════ p.104 개념 02 지구온난화 ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag">II. 환경과 에너지</span><span class="lesson-tag">03. 지구온난화와 기후변화</span></div>
+  <div class="cols">
+    <div class="main">
+      <h3 class="sec"><span class="n">2</span>강화된 온실효과 — 두꺼워진 담요</h3>
+      <p class="body">산업혁명 이후 인류는 화석 연료를 태워 왔다 — I단원에서 배운 그 <b>산화 반응</b>의 생성물이 바로 이산화 탄소다. 대기 중 이산화 탄소 농도는 산업화 이전 약 <b>280 ppm</b>에서 오늘날 <b>420 ppm</b>을 넘어섰다. 여기에 삼림 벌채(흡수원 감소), 가축·농업의 메테인까지 더해져 담요는 계속 두꺼워지고 있다.</p>
+      <p class="body">담요가 두꺼워지면 <span class="u-amber">붙잡히는 적외선이 늘어나 지표로 되돌아오는 열이 많아진다</span> — 이것이 <span class="kw">온실효과의 강화</span>이고, 그 결과가 <span class="kw">지구온난화</span>다. 지구 평균 기온은 산업화 이전보다 이미 약 <b>1.1~1.2 ℃</b> 올랐다. 핵심은 인과의 사슬이다: <b>화석 연료 연소 → 온실 기체 증가 → 온실효과 강화 → 평균 기온 상승</b>. 태양이 뜨거워져서가 아니라, 담요가 두꺼워져서다.</p>
+
+      <figure>
+        <svg width="470" height="150" viewBox="0 0 470 150" font-family="PC Sans">
+          <g font-size="6.8">
+            <text x="235" y="13" text-anchor="middle" font-size="8.4" font-weight="800" fill="#147D6F">두 개의 상승 곡선 — 원인과 결과</text>
+            <g transform="translate(30,24)">
+              <!-- CO2 -->
+              <line x1="0" y1="92" x2="190" y2="92" stroke="#5B6B77" stroke-width="1" marker-end="url(#arrP)"/>
+              <line x1="0" y1="92" x2="0" y2="10" stroke="#5B6B77" stroke-width="1" marker-end="url(#arrP)"/>
+              <text x="6" y="10" fill="#5B6B77">CO₂ 농도 (ppm)</text>
+              <path d="M8,78 q60,-2 100,-18 q50,-20 74,-44" fill="none" stroke="#B0483A" stroke-width="2"/>
+              <text x="16" y="72" fill="#8A949E" font-size="6.2">280 (산업화 이전)</text>
+            <text x="118" y="30" fill="#B0483A" font-weight="800" font-size="6.6">420+ (현재)</text>
+              <text x="95" y="104" text-anchor="middle" fill="#5B6B77" font-size="6.2">1850년 → 현재</text>
+            </g>
+            <g transform="translate(260,24)">
+              <line x1="0" y1="92" x2="180" y2="92" stroke="#5B6B77" stroke-width="1" marker-end="url(#arrP)"/>
+              <line x1="0" y1="92" x2="0" y2="10" stroke="#5B6B77" stroke-width="1" marker-end="url(#arrP)"/>
+              <text x="6" y="10" fill="#5B6B77">기온 편차 (℃)</text>
+              <line x1="0" y1="70" x2="172" y2="70" stroke="#C9BA9B" stroke-width="0.8" stroke-dasharray="3 2.5"/>
+              <path d="M8,72 q40,4 70,-2 q50,-10 88,-38" fill="none" stroke="#D6455D" stroke-width="2"/>
+              <text x="112" y="26" fill="#D6455D" font-weight="800" font-size="6.6">+1.1~1.2 ℃</text>
+              <text x="90" y="104" text-anchor="middle" fill="#5B6B77" font-size="6.2">같은 기간의 평균 기온</text>
+            </g>
+          </g>
+          <text x="235" y="146" text-anchor="middle" font-size="8.8" font-weight="800" fill="#E8940A">연소 → 온실 기체 ↑ → 온실효과 강화 → 기온 ↑ — 사슬의 순서가 시험 포인트</text>
+        </svg>
+        <figcaption>그림 2 | 이산화 탄소 농도와 지구 평균 기온 — 나란히 오르는 두 곡선</figcaption>
+      </figure>
+
+      <div class="expoint">
+        <div class="boxtitle"><span class="ico">!</span>시험엔 이렇게</div>
+        <p>인과 사슬 빈칸 채우기가 단골 — <b>화석 연료 연소 → CO₂ 증가 → 온실효과 강화 → 기온 상승</b>. "온실효과 자체가 온난화다"(X — <b>강화</b>가 온난화의 원인), "태양 활동 때문"(X)을 걸러 내라.</p>
+      </div>
+    </div>
+
+    <div class="wing">
+      <div class="wtitle">날개 노트</div>
+      <div class="term"><b>ppm</b>100만분의 1을 나타내는 농도 단위. 420 ppm = 공기 분자 100만 개 중 CO₂ 420개.</div>
+      <div class="term"><b>메테인</b>CO₂보다 양은 적지만 붙잡는 힘이 강한 온실 기체 — 가축·농업·습지에서 나온다.</div>
+      <div class="wsep"></div>
+      <div class="wtitle">한눈에 암기</div>
+      <div class="wing-pen">280 → 420 ppm<br>기온 +1.1~1.2 ℃<br>범인은 연소(산화)!</div>
+    </div>
+  </div>
+  <div class="quickcheck">
+    <span class="qc-title">바로바로 체크</span>
+    <ol>
+      <li><span class="no">1</span>산업혁명 이후 대기 중 이산화 탄소 농도는 증가해 왔다. ( O , X )</li>
+      <li><span class="no">2</span>지구온난화의 주된 원인은 태양이 뜨거워졌기 때문이다. ( O , X )</li>
+      <li><span class="no">3</span>삼림 벌채는 이산화 탄소 흡수원을 줄인다. ( O , X )</li>
+    </ol>
+    <div class="qc-ans">정답 1 O 2 X (온실효과 강화 때문) 3 O</div>
+  </div>
+  <div class="folio"><span>II. 환경과 에너지</span><span class="num">104</span></div>
+</div>
+
+<!-- ═════════════ p.105 개념 03 온난화의 영향 ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag">II. 환경과 에너지</span><span class="lesson-tag">03. 지구온난화와 기후변화</span></div>
+  <div class="cols">
+    <div class="main">
+      <h3 class="sec"><span class="n">3</span>1 ℃가 바꾸는 것들 — 온난화의 영향</h3>
+      <p class="body">"겨우 1 ℃"가 아니다. 첫째, <b>해수면 상승</b> — 빙하가 녹아 바다로 들어가고, 데워진 바닷물 자체의 <b>부피가 커지면서</b>(열팽창) 해수면이 오른다. 낮은 섬나라와 해안 도시가 먼저 위협받는다. 둘째, <b>극한 기상</b> — 폭염·집중호우·가뭄·강한 태풍이 잦아진다. 대기에 에너지가 많아졌다는 뜻이다.</p>
+      <p class="body">셋째, <b>생태계의 이동</b> — II-01·02에서 본 그물이 통째로 흔들린다. 개화 시기가 어긋나 곤충과 꽃의 약속이 깨지고, 서식지가 북상한다. 우리나라에서도 <b>사과 재배지가 북쪽으로</b> 옮겨 가고 바다에는 아열대 어종이 늘고 있다. 넷째, <b>해양 산성화</b> — 바다가 이산화 탄소를 흡수하며 산성 쪽으로 기울어(I-04의 산·염기!), 산호와 조개처럼 껍데기를 만드는 생물이 타격을 입는다.</p>
+
+      <figure>
+        <svg width="470" height="146" viewBox="0 0 470 146" font-family="PC Sans">
+          <g font-size="6.8">
+            <text x="235" y="13" text-anchor="middle" font-size="8.4" font-weight="800" fill="#147D6F">온난화의 네 얼굴</text>
+            <g transform="translate(0,22)" text-anchor="middle">
+              <g transform="translate(66,0)">
+                <rect x="-52" y="0" width="104" height="90" rx="6" fill="#EAF3F8" stroke="#A9C9DE" stroke-width="1"/>
+                <text y="15" font-size="7" font-weight="800" fill="#2E6690">해수면 상승</text>
+                <g transform="translate(0,48)">
+                  <path d="M-30,10 q15,-6 30,0 q15,6 30,0 v10 h-60 z" fill="#7FB8DE"/>
+                  <path d="M-8,2 l8,-16 l8,16 z" fill="#F4F7F9" stroke="#B8C2CA" stroke-width="1"/>
+                  <line x1="-30" y1="-6" x2="30" y2="-6" stroke="#D6455D" stroke-width="1.1" stroke-dasharray="2.5 2"/>
+                </g>
+                <text y="80" fill="#5B6B77" font-size="6">빙하 융해 + 바닷물 열팽창</text>
+              </g>
+              <g transform="translate(178,0)">
+                <rect x="-52" y="0" width="104" height="90" rx="6" fill="#FDF3F0" stroke="#E5B8AC" stroke-width="1"/>
+                <text y="15" font-size="7" font-weight="800" fill="#B0483A">극한 기상</text>
+                <g transform="translate(0,48)">
+                  <circle cx="-14" cy="-8" r="8" fill="#F3C24E"/>
+                  <path d="M4,-14 q14,0 16,10 q10,2 8,10 h-26 q-10,0 -8,-10 q2,-8 10,-10 z" fill="#8A949E"/>
+                  <path d="M6,10 l-4,10 M16,10 l-4,10" stroke="#4C86B0" stroke-width="1.6"/>
+                </g>
+                <text y="80" fill="#5B6B77" font-size="6">폭염·호우·가뭄·강한 태풍</text>
+              </g>
+              <g transform="translate(290,0)">
+                <rect x="-52" y="0" width="104" height="90" rx="6" fill="#E7F5F1" stroke="#A9D9CE" stroke-width="1"/>
+                <text y="15" font-size="7" font-weight="800" fill="#147D6F">생태계 이동</text>
+                <g transform="translate(0,48)">
+                  <circle cx="-10" cy="4" r="10" fill="#E85D3A"/>
+                  <line x1="-10" y1="-6" x2="-8" y2="-12" stroke="#5E7D57" stroke-width="1.6"/>
+                  <line x1="4" y1="4" x2="26" y2="-14" stroke="#147D6F" stroke-width="1.5" marker-end="url(#arrP)"/>
+                  <text x="22" y="2" font-size="6" fill="#0F6357" font-weight="800">북상</text>
+                </g>
+                <text y="80" fill="#5B6B77" font-size="6">사과 재배지 북상 · 개화 어긋남</text>
+              </g>
+              <g transform="translate(402,0)">
+                <rect x="-52" y="0" width="104" height="90" rx="6" fill="#EAF3F8" stroke="#A9C9DE" stroke-width="1"/>
+                <text y="15" font-size="7" font-weight="800" fill="#2E6690">해양 산성화</text>
+                <g transform="translate(0,48)">
+                  <path d="M-26,14 q26,-10 52,0 v6 h-52 z" fill="#7FB8DE"/>
+                  <text y="-6" font-size="7.4" font-weight="800" fill="#B0483A">CO₂ ↓</text>
+                  <path d="M-14,6 q-4,-8 4,-12 M10,8 q-2,-8 6,-10" stroke="#D6456F" stroke-width="1.3" fill="none"/>
+                </g>
+                <text y="80" fill="#5B6B77" font-size="6">산호·조개 껍데기의 위기</text>
+              </g>
+            </g>
+          </g>
+          <text x="235" y="140" text-anchor="middle" font-size="8.8" font-weight="800" fill="#E8940A">평균 1 ℃의 무게 — 바다·하늘·그물이 한꺼번에 움직인다</text>
+        </svg>
+        <figcaption>그림 3 | 온난화의 영향 — 해수면·극한 기상·생태계·바다의 화학까지</figcaption>
+      </figure>
+
+      <div class="expoint">
+        <div class="boxtitle"><span class="ico">!</span>시험엔 이렇게</div>
+        <p>해수면 상승의 원인은 <b>두 가지</b> — 빙하 융해 "그리고" <b>바닷물의 열팽창</b>. 열팽창을 빠뜨리면 반쪽 답이다. 우리나라 사례는 <b>사과 북상·아열대 어종 증가</b>로 답하면 안전하다.</p>
+      </div>
+    </div>
+
+    <div class="wing">
+      <div class="wtitle">날개 노트</div>
+      <div class="term"><b>열팽창</b>온도가 오르면 부피가 커지는 현상 — 바닷물도 예외가 아니다.</div>
+      <div class="term"><b>해양 산성화</b>바다가 CO₂를 녹이며 산성 쪽으로 기우는 것 — I-04의 산·염기가 바다에서 재등장.</div>
+      <div class="wsep"></div>
+      <div class="wtitle">한눈에 암기</div>
+      <div class="wing-pen">해수면 = 융해 + 열팽창<br>극한 기상 잦아짐<br>사과 북상 · 바다 산성화</div>
+    </div>
+  </div>
+  <div class="quickcheck">
+    <span class="qc-title">바로바로 체크</span>
+    <ol>
+      <li><span class="no">1</span>바닷물의 열팽창도 해수면 상승의 원인이다. ( O , X )</li>
+      <li><span class="no">2</span>온난화로 우리나라 사과 재배지는 남쪽으로 이동하고 있다. ( O , X )</li>
+      <li><span class="no">3</span>바다가 이산화 탄소를 흡수하면 산성 쪽으로 기운다. ( O , X )</li>
+    </ol>
+    <div class="qc-ans">정답 1 O 2 X (북상) 3 O</div>
+  </div>
+  <div class="folio"><span>II. 환경과 에너지</span><span class="num">105</span></div>
+</div>
+
+<!-- ═════════════ p.106 개념 04 엘니뇨 ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag">II. 환경과 에너지</span><span class="lesson-tag">03. 지구온난화와 기후변화</span></div>
+  <div class="cols">
+    <div class="main">
+      <h3 class="sec"><span class="n">4</span>대기와 해양의 춤 — 엘니뇨</h3>
+      <p class="body">기후를 이해하려면 <b>대기와 해양이 한 팀</b>이라는 것을 알아야 한다. 평상시 적도 태평양에서는 동쪽에서 서쪽으로 <span class="kw">무역풍</span>이 불어 따뜻한 표층수를 서쪽(인도네시아 쪽)으로 밀어 놓는다. 동쪽(페루 연안)에서는 그 빈자리를 아래의 <b>차가운 물이 올라와</b> 채우고, 이 찬물이 영양분을 실어 와 세계적 어장을 만든다.</p>
+      <p class="body">그런데 몇 년에 한 번 <span class="u-amber">무역풍이 약해지면</span>, 따뜻한 물이 동쪽으로 되밀려 와 <b>동태평양의 수온이 평소보다 높아진다</b> — 이것이 <span class="kw">엘니뇨</span>다. 페루 연안에서는 찬물이 올라오지 못해 어획량이 줄고 건조하던 곳에 폭우가 내리며, 서태평양(인도네시아·호주)에는 가뭄과 산불이 잦아진다. 반대로 무역풍이 강해지는 <b>라니냐</b> 때는 이 패턴이 뒤집힌다. 바다의 온도 하나가 지구 반대편의 날씨까지 바꾸는 것 — 기후가 '전 지구적 시스템'인 이유다.</p>
+
+      <figure>
+        <svg width="470" height="150" viewBox="0 0 470 150" font-family="PC Sans">
+          <g font-size="6.8">
+            <text x="235" y="13" text-anchor="middle" font-size="8.4" font-weight="800" fill="#147D6F">평상시 vs 엘니뇨 — 적도 태평양의 단면</text>
+            <g transform="translate(0,22)">
+              <!-- 평상시 -->
+              <g transform="translate(20,0)">
+                <rect x="0" y="0" width="200" height="96" rx="6" fill="#F4F8FB" stroke="#A9C9DE" stroke-width="1"/>
+                <text x="100" y="14" text-anchor="middle" font-size="7.2" font-weight="800" fill="#2E6690">평상시</text>
+                <text x="14" y="28" font-size="6" fill="#5B6B77">서(인도네시아)</text>
+                <text x="186" y="28" text-anchor="end" font-size="6" fill="#5B6B77">동(페루)</text>
+                <line x1="150" y1="36" x2="60" y2="36" stroke="#147D6F" stroke-width="1.8" marker-end="url(#arrP)"/>
+                <text x="105" y="32" text-anchor="middle" font-size="6.2" fill="#0F6357" font-weight="800">무역풍 (동→서)</text>
+                <path d="M10,52 h90 q14,0 22,8 h68 v28 h-180 z" fill="#E8945E"/>
+                <path d="M122,60 h68 v28 h-68 z" fill="#7FB8DE"/>
+                <line x1="168" y1="86" x2="168" y2="66" stroke="#2E6690" stroke-width="1.4" marker-end="url(#arrP)"/>
+                <text x="100" y="70" font-size="6" fill="#7A3E14" font-weight="800">따뜻한 물 — 서쪽에 쌓임</text>
+                <text x="182" y="94" text-anchor="end" font-size="5.8" fill="#1F4E70">찬물 상승 → 좋은 어장</text>
+              </g>
+              <!-- 엘니뇨 -->
+              <g transform="translate(250,0)">
+                <rect x="0" y="0" width="200" height="96" rx="6" fill="#FDF3F0" stroke="#E5B8AC" stroke-width="1"/>
+                <text x="100" y="14" text-anchor="middle" font-size="7.2" font-weight="800" fill="#B0483A">엘니뇨</text>
+                <text x="14" y="28" font-size="6" fill="#5B6B77">서 — 가뭄·산불</text>
+                <text x="186" y="28" text-anchor="end" font-size="6" fill="#5B6B77">동 — 폭우·어획 감소</text>
+                <line x1="128" y1="36" x2="92" y2="36" stroke="#8A949E" stroke-width="1.2" stroke-dasharray="3 2" marker-end="url(#arrP)"/>
+                <text x="110" y="32" text-anchor="middle" font-size="6.2" fill="#8A949E" font-weight="800">무역풍 약화</text>
+                <path d="M10,58 h180 v30 h-180 z" fill="#E8945E"/>
+                <text x="100" y="76" text-anchor="middle" font-size="6" fill="#7A3E14" font-weight="800">따뜻한 물이 동쪽까지 — 동태평양 수온 ↑</text>
+                <text x="184" y="94" text-anchor="end" font-size="5.8" fill="#B0483A">찬물이 못 올라온다</text>
+              </g>
+            </g>
+          </g>
+          <text x="235" y="146" text-anchor="middle" font-size="8.8" font-weight="800" fill="#E8940A">무역풍이 약해지면 엘니뇨 — 바람(대기)과 수온(해양)은 한 팀이다</text>
+        </svg>
+        <figcaption>그림 4 | 엘니뇨의 구조 — 무역풍 약화가 따뜻한 물을 동쪽으로 되돌린다</figcaption>
+      </figure>
+
+      <div class="expoint">
+        <div class="boxtitle"><span class="ico">!</span>시험엔 이렇게</div>
+        <p>세 줄 세트로 암기 — <b>엘니뇨 = 무역풍 약화 + 동태평양 수온 ↑ + 페루 폭우·서쪽 가뭄</b>. "무역풍이 강해질 때"(X — 그건 라니냐), "동태평양 수온 하강"(X)이 단골 뒤집기다.</p>
+      </div>
+    </div>
+
+    <div class="wing">
+      <div class="wtitle">날개 노트</div>
+      <div class="term"><b>무역풍</b>적도 부근에서 동에서 서로 부는 바람 — 옛 무역선의 길이었다.</div>
+      <div class="term"><b>라니냐</b>무역풍이 강해져 동태평양이 평소보다 차가워지는 반대 현상.</div>
+      <div class="wsep"></div>
+      <div class="wtitle">한눈에 암기</div>
+      <div class="wing-pen">엘니뇨 = 무역풍 약화<br>동태평양 수온 ↑<br>페루 폭우 · 서쪽 가뭄</div>
+    </div>
+  </div>
+  <div class="quickcheck">
+    <span class="qc-title">바로바로 체크</span>
+    <ol>
+      <li><span class="no">1</span>엘니뇨 시기에는 무역풍이 평소보다 약하다. ( O , X )</li>
+      <li><span class="no">2</span>엘니뇨 시기 동태평양의 표층 수온은 낮아진다. ( O , X )</li>
+      <li><span class="no">3</span>엘니뇨는 대기와 해양의 상호작용으로 일어난다. ( O , X )</li>
+    </ol>
+    <div class="qc-ans">정답 1 O 2 X (높아진다) 3 O</div>
+  </div>
+  <div class="folio"><span>II. 환경과 에너지</span><span class="num">106</span></div>
+</div>
+
+<!-- ═════════════ p.107 개념 05 사막화와 대처 ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag">II. 환경과 에너지</span><span class="lesson-tag">03. 지구온난화와 기후변화</span></div>
+  <div class="cols">
+    <div class="main">
+      <h3 class="sec"><span class="n">5</span>사막화, 그리고 우리가 할 수 있는 것</h3>
+      <p class="body"><span class="kw">사막화</span>는 건조한 땅이 생산력을 잃고 사막처럼 변해 가는 현상이다. 원인은 두 겹이다 — 오랜 <b>가뭄</b> 같은 자연적 원인 위에, <span class="u-amber">과도한 방목·경작과 삼림 벌채라는 인위적 원인</span>이 얹힌다. 풀이 사라지면 땅이 빛을 반사하고 물을 못 붙잡아 더 건조해지는 악순환이 돈다. 사하라 남쪽 사헬 지대가 대표 사례이고, 동아시아의 사막화는 우리나라의 <b>황사</b>를 심하게 만든다 — 남의 일이 아니다.</p>
+      <p class="body">대처는 두 갈래다. <b>완화</b> — 원인 자체를 줄이는 것: 화석 연료를 줄이고 신재생 에너지로 옮겨 가며(다음 소단원!), 숲을 지키고 되살린다. <b>적응</b> — 이미 온 변화에 대비하는 것: 방파제와 배수 시설, 가뭄에 강한 작물, 조기 경보 체계. 그리고 국제 협력 — 195개국이 함께 서명한 <b>파리 협정</b>(2015)은 기온 상승을 산업화 이전 대비 2 ℃보다 훨씬 아래로, 나아가 <b>1.5 ℃</b>로 억제하자는 지구의 약속이다.</p>
+
+      <div class="gist" style="margin:2.8mm 0 4mm; padding:2.2mm 1.8mm 2mm;">
+        <div class="boxtitle"><span class="ico">알</span>알짜 정리 — 지구온난화와 기후변화 한 장 요약</div>
+        <ul>
+          <li>온실효과 = 고마운 담요(없으면 −18 ℃) — 문제는 <b>강화</b>: 연소 → CO₂ ↑(280→420 ppm) → 기온 ↑</li>
+          <li>영향: 해수면(융해+<b>열팽창</b>) · 극한 기상 · 생태계 북상(사과) · 해양 산성화</li>
+          <li><b>엘니뇨</b> = 무역풍 약화 + 동태평양 수온 ↑ / <b>사막화</b> = 가뭄 + 방목·벌채 → 황사</li>
+          <li>대처 = <b>완화</b>(감축·신재생·숲) + <b>적응</b>(대비) + 국제 협력(파리 협정 1.5 ℃)</li>
+        </ul>
+      </div>
+
+      <div class="saem">
+        <div class="avatar">박찬<br>쌤</div>
+        <div class="bubble"><span class="pen">"진단(메커니즘) 없이 처방(대처) 없다 — 이 소단원의 구조가 딱 진료실이다. 원인 사슬을 정확히 짚을 수 있어야 완화와 적응이라는 처방이 나온다."</span></div>
+      </div>
+    </div>
+
+    <div class="wing">
+      <div class="wtitle">날개 노트</div>
+      <div class="term"><b>사헬 지대</b>사하라 사막 남쪽 가장자리 — 가뭄과 과도한 이용이 겹친 사막화의 최전선.</div>
+      <div class="term"><b>파리 협정</b>2015년 채택된 국제 기후 협약 — 상승 폭을 1.5 ℃로 묶자는 목표.</div>
+      <div class="wsep"></div>
+      <div class="wtitle">한눈에 암기</div>
+      <div class="wing-pen">사막화 = 가뭄 + 사람<br>대처 = 완화 + 적응<br>약속의 숫자 1.5 ℃</div>
+      <div class="wsep"></div>
+      <div class="review">
+        <div class="rv-title">다음 소단원 예고</div>
+        <div class="term" style="margin-bottom:0;"><b>태양 에너지 (04)</b>이 모든 기후의 엔진 — 태양 에너지가 어디서 오는지, 근원으로 내려간다.</div>
+      </div>
+    </div>
+  </div>
+  <div class="quickcheck">
+    <span class="qc-title">바로바로 체크</span>
+    <ol>
+      <li><span class="no">1</span>과도한 방목과 삼림 벌채는 사막화를 가속한다. ( O , X )</li>
+      <li><span class="no">2</span>동아시아의 사막화는 우리나라 황사에 영향을 준다. ( O , X )</li>
+      <li><span class="no">3</span>기후변화 대처는 완화 없이 적응만으로 충분하다. ( O , X )</li>
+    </ol>
+    <div class="qc-ans">정답 1 O 2 O 3 X (완화 + 적응 둘 다)</div>
+  </div>
+  <div class="folio"><span>II. 환경과 에너지</span><span class="num">107</span></div>
+</div>
+
+<!-- ═════════════ p.108 자료 파헤치기 ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag">II. 환경과 에너지</span><span class="lesson-tag">03. 지구온난화와 기후변화</span></div>
+  <div class="lab">
+    <div class="lab-head">자료 파헤치기 <span class="tag">탐구·자료 분석</span> <span style="font-weight:600; font-size:9.5pt; margin-left:auto;">킬링 곡선 — 지구의 숨과 인류의 발자국</span></div>
+    <div class="lab-body">
+      <h4>자료</h4>
+      <p>1958년부터 하와이 마우나로아 관측소에서는 대기 중 이산화 탄소 농도를 쉬지 않고 재 왔다. 이 기록 — <b>킬링 곡선</b> — 은 두 가지 무늬를 함께 보여 준다: 해마다 오르내리는 <b>톱니</b>와, 꾸준히 올라가는 <b>큰 추세</b>다.</p>
+      <figure>
+        <svg width="430" height="118" viewBox="0 0 430 118" font-family="PC Sans">
+          <g font-size="6.8">
+            <line x1="46" y1="92" x2="400" y2="92" stroke="#5B6B77" stroke-width="1.1" marker-end="url(#arrP)"/>
+            <line x1="46" y1="92" x2="46" y2="12" stroke="#5B6B77" stroke-width="1.1" marker-end="url(#arrP)"/>
+            <text x="398" y="104" text-anchor="end" fill="#5B6B77">연도 (1958 → 현재)</text>
+            <text x="52" y="12" fill="#5B6B77">CO₂ 농도 (ppm)</text>
+            <path d="M60,80 l7,-4 l7,2 l7,-5 l7,2 l7,-5 l7,2 l7,-5 l7,2 l7,-6 l7,2 l7,-5 l7,2 l7,-6 l7,2 l7,-5 l7,2 l7,-6 l7,2 l7,-6 l7,2 l7,-6 l7,1 l7,-6 l7,2 l7,-6 l7,1 l7,-7 l7,2 l7,-6 l7,1 l7,-7 l7,2 l7,-7 l7,1 l7,-7 l7,2 l7,-7 l7,1 l7,-7 l7,2 l7,-7 l7,1 l7,-7 l7,2"
+              fill="none" stroke="#B0483A" stroke-width="1.6"/>
+            <text x="76" y="94" fill="#8A949E" font-size="6.2">315 ppm</text>
+            <text x="392" y="24" text-anchor="end" fill="#B0483A" font-weight="800" font-size="6.6">420+ ppm</text>
+            <g transform="translate(120,30)">
+              <rect x="-4" y="-14" width="120" height="22" rx="4" fill="#FFFFFF" stroke="#C9BA9B" stroke-width="0.8"/>
+              <text x="56" y="0" text-anchor="middle" font-size="6.2" fill="#5B6B77">톱니 = 1년의 오르내림 (계절)</text>
+            </g>
+          </g>
+        </svg>
+      </figure>
+      <h4>해석의 3단계</h4>
+      <ol>
+        <li><b>톱니를 읽는다</b> — 북반구의 <b>여름</b>에는 육지의 숲이 왕성하게 광합성을 해 CO₂를 빨아들이므로 농도가 <b>내려가고</b>, 겨울에는 광합성이 줄어 다시 <b>올라간다</b>. 톱니는 지구가 해마다 쉬는 숨이다 — I단원의 광합성(CO₂의 환원)이 행성 규모로 보이는 것이다.</li>
+        <li><b>추세를 읽는다</b> — 숨은 매년 반복되지만, 곡선 전체는 1958년 약 315 ppm에서 오늘날 420 ppm 너머로 <b>쉼 없이 올라왔다</b>. 계절이 설명하지 못하는 이 상승분이 화석 연료 연소, 곧 인류의 발자국이다.</li>
+        <li><b>두 무늬를 겹쳐 본다</b> — 자연의 리듬(톱니)과 인위적 추세(상승)를 한 그래프에서 분리해 읽는 것. 이것이 "자연 변동이니 괜찮다"는 주장에 데이터로 답하는 방법이다.</li>
+      </ol>
+      <h4>결론</h4>
+      <p>킬링 곡선은 반세기 넘게 이어진 <b>가장 유명한 측정</b>이다(통합과학 1의 첫 단원 — 측정이 과학의 시작이라는 말이 여기서 완성된다). 지구의 숨결 위에 인류의 서명이 겹쳐 있다.</p>
+      <div class="expoint">
+        <div class="boxtitle"><span class="ico">!</span>시험엔 이렇게</div>
+        <p>톱니의 원인 = <b>광합성의 계절 변화</b>(여름 ↓ 겨울 ↑), 추세의 원인 = <b>화석 연료 연소</b>. 두 원인을 바꿔 묻는 것이 최고 빈출 — 무늬마다 원인을 따로 붙여 두라.</p>
+      </div>
+    </div>
+  </div>
+  <div class="folio"><span>II. 환경과 에너지</span><span class="num">108</span></div>
+</div>
+
+<!-- ═════════════ p.109 STEP 1 + STEP 2 시작 ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag">II. 환경과 에너지</span><span class="lesson-tag">03. 지구온난화와 기후변화 | 문제</span></div>
+  <div class="step-head"><span class="stepno">STEP 1</span><span class="steptt">개념 확인</span><span class="stepdesc">OX와 빈칸으로 개념 점검 — 막히면 알짜 정리로!</span></div>
+  <div class="qgrid">
+    <div>
+      <div class="q"><div class="qhead"><span class="qno">1</span><div class="stem">온실 기체가 없다면 지구 평균 기온은 지금보다 훨씬 낮을 것이다. <span class="ox-answer">( O , X )</span></div></div></div>
+      <div class="q"><div class="qhead"><span class="qno">2</span><div class="stem">온실 기체는 태양에서 오는 가시광선을 주로 흡수한다. <span class="ox-answer">( O , X )</span></div></div></div>
+      <div class="q"><div class="qhead"><span class="qno">3</span><div class="stem">엘니뇨는 무역풍이 평소보다 강해질 때 발생한다. <span class="ox-answer">( O , X )</span></div></div></div>
+    </div>
+    <div>
+      <div class="q"><div class="qhead"><span class="qno">4</span><div class="stem">지표가 내보내는 <span class="blankline" style="min-width:12mm;"></span>을 온실 기체가 흡수했다가 재방출한다.</div></div></div>
+      <div class="q"><div class="qhead"><span class="qno">5</span><div class="stem">무역풍 약화로 동태평양 수온이 높아지는 현상을 <span class="blankline" style="min-width:12mm;"></span>라 한다.</div></div></div>
+      <div class="q"><div class="qhead"><span class="qno">6</span><div class="stem">과도한 방목·벌채 등으로 땅이 사막처럼 변하는 현상을 <span class="blankline" style="min-width:12mm;"></span>라 한다.</div></div></div>
+    </div>
+  </div>
+  <div style="border-top:0.5mm solid var(--line); margin:2mm 0 4mm;"></div>
+  <div class="step-head s2"><span class="stepno">STEP 2</span><span class="steptt">내신 완성</span><span class="stepdesc">학교 시험 유형 그대로 — 서술형까지 한 번에</span></div>
+  <div class="q">
+    <div class="qhead"><span class="qno">7</span><div class="stem">온실효과와 지구온난화에 대한 설명으로 옳은 것은? <span class="difficulty">●●○</span>
+    <div class="tags">10통과2-02-03 | 개념 1·2</div></div></div>
+    <ul class="choices">
+      <li>① 온실효과가 없으면 지구는 지금보다 따뜻하다.</li>
+      <li>② 온실 기체는 가시광선을 흡수해 지구를 데운다.</li>
+      <li>③ 지구온난화는 태양이 뜨거워져 생긴 현상이다.</li>
+      <li>④ 대기 중 이산화 탄소 농도는 산업혁명 이후 감소해 왔다.</li>
+      <li>⑤ 강화된 온실효과로 지구의 평균 기온이 높아지고 있다.</li>
+    </ul>
+  </div>
+  <div class="q">
+    <div class="qhead"><span class="qno">8</span><div class="stem">지구온난화의 영향에 대한 설명으로 옳은 것은? <span class="difficulty">●●●</span>
+    <div class="tags">10통과2-02-03 | 개념 3</div></div></div>
+    <ul class="choices">
+      <li>① 해수면 상승은 빙하의 융해와는 무관하다.</li>
+      <li>② 온난화가 진행되면 극한 기상은 줄어든다.</li>
+      <li>③ 바닷물이 데워져 부피가 커지는 것도 해수면 상승의 원인이다.</li>
+      <li>④ 우리나라의 사과 재배지는 남쪽으로 이동하고 있다.</li>
+      <li>⑤ 온난화는 생물의 서식지에 영향을 주지 않는다.</li>
+    </ul>
+  </div>
+  <div class="folio"><span>II. 환경과 에너지</span><span class="num">109</span></div>
+</div>
+
+<!-- ═════════════ p.110 STEP 2 계속 ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag">II. 환경과 에너지</span><span class="lesson-tag">03. 지구온난화와 기후변화 | 문제</span></div>
+  <div class="q">
+    <div class="qhead"><span class="qno">9</span><div class="stem">엘니뇨에 대한 설명으로 옳은 것은? <span class="difficulty">●●●</span>
+    <div class="tags">10통과2-02-03 | 개념 4</div></div></div>
+    <ul class="choices">
+      <li>① 엘니뇨 시기에는 평상시보다 무역풍이 약하다.</li>
+      <li>② 엘니뇨 시기 동태평양의 표층 수온은 낮아진다.</li>
+      <li>③ 엘니뇨는 대기와 해양이 서로 무관함을 보여 주는 현상이다.</li>
+      <li>④ 엘니뇨 시기 페루 연안의 어획량은 늘어난다.</li>
+      <li>⑤ 엘니뇨의 영향은 태평양 한 지역에만 국한된다.</li>
+    </ul>
+  </div>
+  <div class="q">
+    <div class="qhead"><span class="qno">10</span><div class="stem">사막화에 대한 설명으로 옳은 것만을 고른 것은? <span class="difficulty">●●○</span>
+    <div class="tags">10통과2-02-03 | 개념 5</div></div></div>
+    <div class="bogi-box" style="background:#fff;">
+      (가) 사막화는 오직 자연적인 가뭄만으로 일어난다.<br>
+      (나) 과도한 방목과 삼림 벌채는 사막화를 가속한다.<br>
+      (다) 동아시아의 사막화가 심해지면 우리나라 황사가 심해질 수 있다.
+    </div>
+    <ul class="choices inline">
+      <li>① (가)</li><li>② (나), (다)</li><li>③ (가), (나)</li><li>④ (다)</li><li>⑤ (가), (나), (다)</li>
+    </ul>
+  </div>
+  <div class="q">
+    <div class="qhead"><span class="qno">11</span><div class="stem"><span class="badge-essay">서술형</span>화석 연료 사용이 지구온난화로 이어지는 과정을 <b>'온실 기체'와 '적외선'</b>이라는 말을 포함하여 서술하시오. <span class="difficulty">●●●●</span>
+    <div class="tags">10통과2-02-03 | 개념 1·2</div></div></div>
+    <div class="essay-lines"><div></div><div></div><div></div></div>
+  </div>
+  <div class="folio"><span>II. 환경과 에너지</span><span class="num">110</span></div>
+</div>
+
+<!-- ═════════════ p.111 STEP 3 ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag">II. 환경과 에너지</span><span class="lesson-tag">03. 지구온난화와 기후변화 | 문제</span></div>
+  <div class="step-head s3"><span class="stepno">STEP 3</span><span class="steptt">수능 도전</span><span class="stepdesc">2028 수능 규격 — ㄱㄴㄷ 합답형·자료 해석</span></div>
+  <div class="q">
+    <div class="qhead"><span class="qno">12</span><div class="stem"><span class="badge-data">자료</span>그림은 1958년부터 하와이 마우나로아에서 관측한 대기 중 이산화 탄소 농도를 나타낸 것이다(킬링 곡선 — 해마다 오르내리는 톱니와 장기 상승 추세가 함께 나타난다). 옳은 것만을 &lt;보기&gt;에서 있는 대로 고른 것은? <span class="difficulty">[2점]</span>
+    <div class="tags">10통과2-02-03</div></div></div>
+    <figure style="margin:2mm 0 1.5mm 8.6mm;">
+      <svg width="280" height="80" viewBox="0 0 280 80" font-family="PC Sans">
+        <line x1="26" y1="64" x2="270" y2="64" stroke="#5B6B77" stroke-width="1.1" marker-end="url(#arrP)"/>
+        <line x1="26" y1="64" x2="26" y2="8" stroke="#5B6B77" stroke-width="1.1" marker-end="url(#arrP)"/>
+        <text x="268" y="76" text-anchor="end" font-size="6.4" fill="#5B6B77">연도</text>
+        <text x="30" y="8" font-size="6.4" fill="#5B6B77">CO₂ (ppm)</text>
+        <path d="M38,56 l6,-3 l6,1 l6,-4 l6,1 l6,-4 l6,1 l6,-4 l6,1 l6,-4 l6,1 l6,-4 l6,1 l6,-5 l6,1 l6,-4 l6,1 l6,-5 l6,1 l6,-5 l6,1 l6,-5 l6,1 l6,-5 l6,1 l6,-5 l6,1 l6,-5 l6,1 l6,-5 l6,1 l6,-5 l6,1 l6,-5 l6,1 l6,-5 l6,1"
+          fill="none" stroke="#B0483A" stroke-width="1.5"/>
+      </svg>
+    </figure>
+    <div class="bogi-box">
+      <div class="bt">보기</div>
+      ㄱ. 이산화 탄소 농도는 장기적으로 상승하는 추세다.<br>
+      ㄴ. 톱니 모양의 오르내림은 광합성량의 계절 변화 때문이다.<br>
+      ㄷ. 이 곡선은 대기 중 온실 기체가 줄고 있음을 보여 준다.
+    </div>
+    <ul class="choices inline">
+      <li>① ㄴ</li><li>② ㄱ, ㄴ</li><li>③ ㄱ, ㄷ</li><li>④ ㄴ, ㄷ</li><li>⑤ ㄱ, ㄴ, ㄷ</li>
+    </ul>
+  </div>
+  <div class="q">
+    <div class="qhead"><span class="qno">13</span><div class="stem"><span class="badge-data">자료</span>그림 (가)는 평상시, (나)는 엘니뇨 시기의 적도 태평양 단면을 나타낸 것이다. 옳은 것만을 &lt;보기&gt;에서 있는 대로 고른 것은? <span class="difficulty">[2.5점]</span>
+    <div class="tags">10통과2-02-03</div></div></div>
+    <figure style="margin:2mm 0 1.5mm 8.6mm;">
+      <svg width="300" height="74" viewBox="0 0 300 74" font-family="PC Sans">
+        <g font-size="6.2">
+          <g transform="translate(8,6)">
+            <rect width="136" height="60" rx="5" fill="#F4F8FB" stroke="#A9C9DE" stroke-width="0.9"/>
+            <text x="68" y="12" text-anchor="middle" font-weight="800" fill="#2E6690">(가) 평상시</text>
+            <line x1="100" y1="20" x2="46" y2="20" stroke="#147D6F" stroke-width="1.4" marker-end="url(#arrP)"/>
+            <text x="73" y="17" text-anchor="middle" font-size="5.4" fill="#0F6357">무역풍</text>
+            <path d="M8,32 h56 q10,0 16,6 h48 v16 h-120 z" fill="#E8945E"/>
+            <path d="M80,38 h48 v16 h-48 z" fill="#7FB8DE"/>
+            <text x="10" y="70" font-size="5.4" fill="#5B6B77">서 — 따뜻한 물</text>
+            <text x="128" y="70" text-anchor="end" font-size="5.4" fill="#1F4E70">동 — 찬물 상승</text>
+          </g>
+          <g transform="translate(156,6)">
+            <rect width="136" height="60" rx="5" fill="#FDF3F0" stroke="#E5B8AC" stroke-width="0.9"/>
+            <text x="68" y="12" text-anchor="middle" font-weight="800" fill="#B0483A">(나) 엘니뇨</text>
+            <line x1="88" y1="20" x2="62" y2="20" stroke="#8A949E" stroke-width="1" stroke-dasharray="2.5 2" marker-end="url(#arrP)"/>
+            <text x="75" y="17" text-anchor="middle" font-size="5.4" fill="#8A949E">약화</text>
+            <path d="M8,34 h120 v20 h-120 z" fill="#E8945E"/>
+            <text x="68" y="70" text-anchor="middle" font-size="5.4" fill="#7A3E14">따뜻한 물이 동쪽까지</text>
+          </g>
+        </g>
+      </svg>
+    </figure>
+    <div class="bogi-box">
+      <div class="bt">보기</div>
+      ㄱ. (나) 시기 동태평양의 표층 수온은 (가) 시기보다 높다.<br>
+      ㄴ. 엘니뇨는 대기(무역풍)와 해양(수온)의 상호작용으로 일어난다.<br>
+      ㄷ. (나) 시기 인도네시아 쪽에는 평소보다 폭우가 잦아진다.
+    </div>
+    <ul class="choices inline">
+      <li>① ㄱ</li><li>② ㄷ</li><li>③ ㄱ, ㄷ</li><li>④ ㄱ, ㄴ</li><li>⑤ ㄱ, ㄴ, ㄷ</li>
+    </ul>
+  </div>
+  <div class="folio"><span>II. 환경과 에너지</span><span class="num">111</span></div>
+</div>
+
+<!-- ═════════════ p.112 해설 1 ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag" style="color:var(--brand);">알짜 해설</span><span class="lesson-tag">03. 지구온난화와 기후변화</span></div>
+  <div class="sol-head"><span class="stt">알짜 해설</span><span class="sub">전 문항 해설 + 오답 선지 분석 — 맞힌 문제도 해설로 한 번 더!</span></div>
+  <table class="anstable">
+    <tr><th>문항</th><td>1</td><td>2</td><td>3</td><td>4</td><td>5</td><td>6</td><td>7</td><td>8</td><td>9</td><td>10</td><td>11</td><td>12</td><td>13</td></tr>
+    <tr><th>정답</th><td class="a">O</td><td class="a">X</td><td class="a">X</td><td class="a">적외선</td><td class="a">엘니뇨</td><td class="a">사막화</td><td class="a">⑤</td><td class="a">③</td><td class="a">①</td><td class="a">②</td><td class="a">서술형</td><td class="a">②</td><td class="a">④</td></tr>
+  </table>
+  <div class="solcols">
+    <div>
+      <div class="sol"><div class="shead"><span class="sno">1</span><span class="sans">O</span><span class="slink">개념 1</span></div>
+        <p>담요가 없으면 약 −18 ℃ — 온실효과는 생명의 조건이다.</p></div>
+      <div class="sol"><div class="shead"><span class="sno">2</span><span class="sans">X</span><span class="slink">개념 1</span></div>
+        <p>흡수 대상은 지표가 내보내는 적외선이다.</p></div>
+      <div class="sol"><div class="shead"><span class="sno">3</span><span class="sans">X</span><span class="slink">개념 4</span></div>
+        <p>무역풍 약화가 엘니뇨 — 강화는 라니냐.</p></div>
+      <div class="sol"><div class="shead"><span class="sno">4</span><span class="sans">적외선</span><span class="slink">개념 1</span></div>
+        <p>들어올 땐 가시광선, 나갈 땐 적외선.</p></div>
+      <div class="sol"><div class="shead"><span class="sno">5</span><span class="sans">엘니뇨</span><span class="slink">개념 4</span></div>
+        <p>무역풍 약화 + 동태평양 수온 상승 세트.</p></div>
+      <div class="sol"><div class="shead"><span class="sno">6</span><span class="sans">사막화</span><span class="slink">개념 5</span></div>
+        <p>가뭄 위에 사람의 손이 얹힌 현상.</p></div>
+    </div>
+    <div>
+      <div class="sol"><div class="shead"><span class="sno">7</span><span class="sans">⑤</span><span class="slink">개념 1·2</span></div>
+        <p>온난화 = '강화된' 온실효과의 결과.</p>
+        <div class="wrongbox"><div class="wt">오답 왜 틀렸나</div>
+          <p><b>①</b> 없으면 −18 ℃. <b>②</b> 적외선을 흡수. <b>③</b> 태양 탓이 아니라 담요 탓. <b>④</b> 280 → 420 ppm으로 증가.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">8</span><span class="sans">③</span><span class="slink">개념 3</span></div>
+        <p>해수면 상승 = 빙하 융해 + 열팽창, 두 원인의 합.</p>
+        <div class="wrongbox"><div class="wt">오답 왜 틀렸나</div>
+          <p><b>②</b> 극한 기상은 잦아진다. <b>④</b> 사과 재배지는 북상. <b>⑤</b> 서식지·개화 시기가 흔들린다.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">9</span><span class="sans">①</span><span class="slink">개념 4</span></div>
+        <p>엘니뇨의 방아쇠 = 무역풍 약화.</p>
+        <div class="wrongbox"><div class="wt">오답 왜 틀렸나</div>
+          <p><b>②</b> 수온은 높아진다. <b>③</b> 대기·해양 상호작용의 대표 사례다. <b>④</b> 찬물이 못 올라와 어획량 감소. <b>⑤</b> 전 지구의 날씨에 영향.</p></div></div>
+    </div>
+  </div>
+  <div class="folio"><span>알짜 해설</span><span class="num">112</span></div>
+</div>
+
+<!-- ═════════════ p.113 해설 2 ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag" style="color:var(--brand);">알짜 해설</span><span class="lesson-tag">03. 지구온난화와 기후변화</span></div>
+  <div class="solcols">
+    <div>
+      <div class="sol"><div class="shead"><span class="sno">10</span><span class="sans">②</span><span class="slink">개념 5</span></div>
+        <p>(나) 방목·벌채의 인위적 가속, (다) 사막화 → 황사 심화 — 둘 다 옳다.</p>
+        <div class="wrongbox"><div class="wt">오답 왜 틀렸나</div>
+          <p><b>(가)</b> 자연적 가뭄 '위에' 인위적 원인이 얹힌다 — '오직'이 함정 단어다.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">11</span><span class="sans">모범 답안</span><span class="slink">개념 1·2</span></div>
+        <p>화석 연료를 태우면 이산화 탄소 같은 <b>온실 기체</b>가 늘어난다. 늘어난 온실 기체가 지표에서 나가는 <b>적외선</b>을 더 많이 흡수했다가 지표로 재방출하므로(온실효과 강화), 지구의 평균 기온이 높아진다.</p>
+        <div class="wrongbox"><div class="wt">채점 기준 (감점 포인트)</div>
+          <p>① 연소 → 온실 기체 증가 ② 적외선 흡수·재방출 증가 ③ 평균 기온 상승 — 사슬의 세 고리를 순서대로.</p></div></div>
+    </div>
+    <div>
+      <div class="sol"><div class="shead"><span class="sno">12</span><span class="sans">②</span><span class="slink">개념 2·자료 | 2점</span></div>
+        <p><b>ㄱ (옳음)</b> 315 → 420 ppm의 장기 상승. <b>ㄴ (옳음)</b> 여름 광합성 ↑ → 농도 ↓, 겨울 반대 — 톱니의 정체. <b>ㄷ (틀림)</b> 곡선은 증가를 보여 준다.</p>
+        <div class="wrongbox"><div class="wt">함정 체크</div>
+          <p>무늬마다 원인을 따로 — <b>톱니 = 계절(광합성), 추세 = 연소</b>. 원인을 서로 바꿔 묻는다.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">13</span><span class="sans">④</span><span class="slink">개념 4 | 2.5점</span></div>
+        <p><b>ㄱ (옳음)</b> 따뜻한 물이 동쪽으로 되밀려 온다. <b>ㄴ (옳음)</b> 바람과 수온의 합작 — 상호작용의 정의 그대로. <b>ㄷ (틀림)</b> 인도네시아 쪽은 가뭄·산불이 잦아진다 — 폭우는 페루 쪽.</p>
+        <div class="wrongbox"><div class="wt">함정 체크</div>
+          <p>동·서를 바꿔치는 것이 엘니뇨 문제의 전부다 — 단면도를 그려 놓고 판정하라.</p></div></div>
+
+      <div class="gist" style="margin-top:5mm;">
+        <div class="boxtitle"><span class="ico">알</span>이 소단원, 이것만은!</div>
+        <ul>
+          <li>사슬 암기: <b>연소 → 온실 기체 ↑ → 적외선 더 붙잡힘 → 기온 ↑</b> (온실효과 자체는 무죄)</li>
+          <li>해수면 = 융해 + <b>열팽창</b> / 킬링 곡선: 톱니 = 계절, 추세 = 인류</li>
+          <li>엘니뇨 = 무역풍 약화 + 동태평양 ↑ / 대처 = <b>완화 + 적응</b>(파리 협정 1.5 ℃)</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div class="folio"><span>알짜 해설</span><span class="num">113</span></div>
+</div>
+
+<!-- ═════════════ p.114 MEMO ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag">II. 환경과 에너지</span><span class="lesson-tag">03 ▸ 04 넘어가기 전에</span></div>
+  <div class="memo-head"><span class="mt">MEMO</span><span class="ms">헷갈린 개념, 다시 틀린 문제 번호, 나만의 암기법을 남겨 두는 자리</span></div>
+  <div class="memo-area"></div>
+  <div class="memo-pen">"'연소 → 온실 기체 → 적외선 → 기온'의 사슬을 안 보고 말해 보고, 엘니뇨 단면도를 손으로 그려 보자. 막히면 104·106쪽으로! — 박찬쌤"</div>
+  <div class="folio"><span>박찬 과학 | 통합과학 2</span><span class="num">114</span></div>
+</div>
+
+</body>
+</html>

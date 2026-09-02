@@ -1,0 +1,986 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<title>박찬 과학 통합과학2 — II-01 생태계의 구성과 상호 관계</title>
+<style>
+  @font-face { font-family:'PC Sans'; src:url('file:///root/.fonts/NotoSansKR.ttf'); font-weight:100 900; }
+  @font-face { font-family:'PC Serif'; src:url('file:///root/.fonts/NotoSerifKR.ttf'); font-weight:100 900; }
+  @font-face { font-family:'PC Pen'; src:url('file:///root/.fonts/YeonSung-Regular.ttf'); font-weight:400; }
+
+  :root{
+    --brand:#0E5A6B;        /* 박찬 과학 브랜드 딥틸 */
+    --brand-lt:#E3F0F3;
+    --unit:#147D6F;         /* I. 과학의 기초 단원 컬러(그린) */
+    --unit-lt:#E7F5F1;
+    --unit-md:#A9D9CE;
+    --accent:#E8940A;       /* 알짜 앰버 */
+    --accent-lt:#FDF3E0;
+    --point:#D6455D;        /* 시험 포인트 */
+    --point-lt:#FBEBEE;
+    --ink:#22303A;
+    --sub:#5B6B77;
+    --line:#D8E0E5;
+  }
+  *{ box-sizing:border-box; margin:0; padding:0; -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+  @page{ size:210mm 275mm; margin:0; }
+  html,body{ font-family:'PC Sans',sans-serif; color:var(--ink); word-break:keep-all; overflow-wrap:anywhere; }
+
+  .page{ width:210mm; height:275mm; position:relative; overflow:hidden; background:#fff; page-break-after:always; padding:14mm 13mm 19mm 15mm; display:flex; flex-direction:column; }
+
+  /* ── 러닝 헤드 / 풋 ── */
+  .runhead{ display:flex; align-items:center; justify-content:space-between; border-bottom:0.35mm solid var(--unit); padding-bottom:2mm; margin-bottom:6.5mm; }
+  .runhead .unit-tag{ font-size:8.5pt; font-weight:700; color:var(--unit); letter-spacing:0.02em; }
+  .runhead .lesson-tag{ font-size:8.5pt; color:var(--sub); }
+  .folio{ position:absolute; bottom:7mm; left:0; right:0; display:flex; justify-content:space-between; padding:0 14mm 0 14mm; font-size:8pt; color:var(--sub); }
+  .folio .num{ font-weight:800; color:var(--unit); font-size:10pt; }
+
+  /* ── 본문 그리드: 본문 + 날개단 ── */
+  .cols{ display:grid; grid-template-columns:1fr 43mm; gap:8mm; flex:1; min-height:0; margin-bottom:4mm; }
+  .main{ min-width:0; }
+  .wing{ border-left:0.3mm solid var(--line); padding-left:5mm; font-size:8.2pt; color:var(--sub); line-height:1.7; }
+
+  /* ── 타이포 ── */
+  h2.lesson-title{ display:flex; align-items:baseline; gap:3.5mm; margin-bottom:2mm; }
+  h2.lesson-title .no{ background:var(--unit); color:#fff; font-size:13pt; font-weight:900; padding:1.2mm 3.2mm; border-radius:1.5mm; }
+  h2.lesson-title .tt{ font-size:16.5pt; font-weight:900; letter-spacing:-0.01em; }
+  .std-badges{ display:flex; gap:2mm; margin:2mm 0 6.5mm; }
+  .std{ font-size:7.4pt; color:var(--unit); background:none; border:0.3mm solid var(--unit-md); border-radius:5mm; padding:0.6mm 2.8mm; font-weight:600; }
+
+  h3.sec{ display:flex; align-items:baseline; gap:3mm; font-size:12.5pt; font-weight:800; margin:9mm 0 3.6mm; letter-spacing:-0.01em; }
+  h3.sec .n{ font-family:'PC Serif'; font-size:15.5pt; font-weight:900; color:var(--unit); border-bottom:0.7mm solid var(--accent); padding:0 0.8mm 0.2mm; flex:0 0 auto; line-height:1; }
+  h3.sec::after{ content:""; flex:1; border-top:0.25mm solid var(--line); align-self:center; margin-left:2mm; }
+  h3.sec:first-child{ margin-top:0; }
+
+  p.body{ font-family:'PC Serif'; font-size:9.6pt; line-height:1.92; margin-bottom:3.6mm; text-align:justify; }
+  p.body b{ font-weight:800; }
+  .kw{ font-weight:800; color:var(--unit); }
+  .u-amber{ background:#F8E9C6; font-weight:700; padding:0.15mm 0.6mm; border-radius:0.6mm; box-decoration-break:clone; -webkit-box-decoration-break:clone; }
+
+  ul.pts{ font-family:'PC Serif'; font-size:9.6pt; line-height:1.84; margin:1.5mm 0 3.5mm 1mm; list-style:none; }
+  ul.pts li{ padding-left:4.5mm; position:relative; margin-bottom:1.8mm; }
+  ul.pts li::before{ content:""; position:absolute; left:0.5mm; top:2.9mm; width:1.7mm; height:1.7mm; background:var(--accent); border-radius:50%; }
+
+  /* ── 코너 박스 ── */
+  .boxtitle{ display:inline-flex; align-items:center; gap:1.8mm; font-weight:900; font-size:9.5pt; margin-bottom:1.6mm; }
+  .boxtitle .ico{ width:5.2mm; height:5.2mm; border-radius:1.2mm; display:flex; align-items:center; justify-content:center; color:#fff; font-size:7.5pt; font-weight:900; }
+
+  .gist{ background:none; border:none; border-top:0.5mm solid var(--accent); border-bottom:0.5mm solid var(--accent); border-radius:0; padding:3.2mm 1.8mm 3mm; margin:6mm 0 5mm; }
+  .gist .boxtitle{ color:#9C6503; } .gist .ico{ background:var(--accent); }
+  .gist ul{ list-style:none; font-family:'PC Serif'; font-size:9.3pt; line-height:1.78; }
+  .gist li{ padding-left:4.2mm; position:relative; margin-bottom:1.2mm;}
+  .gist li::before{ content:"✓"; position:absolute; left:0; color:var(--accent); font-weight:900; }
+
+  .expoint{ background:none; border-left:0.5mm solid #D998A4; border-left-color:#D998A4; border-radius:0; padding:1.4mm 0 1.4mm 3.6mm; margin:4.5mm 0; }
+  .expoint .boxtitle{ color:#A9556A; font-size:8.6pt; margin-bottom:1mm;}
+  .expoint .ico{ background:none; color:#A9556A; border:0.35mm solid #D998A4; width:4.4mm; height:4.4mm; border-radius:50%; font-size:7pt; }
+  .expoint p{ font-family:'PC Serif'; font-size:8.9pt; line-height:1.7; }
+
+  .pen{ font-family:'PC Pen'; font-size:12pt; color:#0F6357; line-height:1.45; }
+  .saem{ display:flex; gap:3mm; align-items:flex-start; margin:4.5mm 0; }
+  .saem .avatar{ flex:0 0 auto; width:10.5mm; height:10.5mm; border-radius:50%; background:var(--brand); color:#fff; font-size:7pt; font-weight:800; display:flex; align-items:center; justify-content:center; line-height:1.35; letter-spacing:0.04em; text-align:center; border:0.5mm solid var(--accent); box-sizing:border-box;}
+  .saem .bubble{ background:#FFFBF0; border:0.4mm solid #EBCB9C; border-radius:3mm; padding:2.2mm 3.6mm 2mm; position:relative; }
+  .saem .bubble::before{ content:""; position:absolute; left:-1.8mm; top:3.2mm; width:3mm; height:3mm; background:#FFFBF0; border-left:0.4mm solid #EBCB9C; border-bottom:0.4mm solid #EBCB9C; transform:rotate(45deg); }
+
+  .wing .wtitle{ font-size:8pt; font-weight:900; color:var(--brand); display:flex; align-items:center; gap:1.5mm; margin:0 0 2.4mm; letter-spacing:0.05em; }
+  .wing .wtitle::before{ content:""; width:2.4mm; height:2.4mm; background:var(--accent); border-radius:50%; }
+  .wing .term{ margin-bottom:3.6mm; }
+  .wing .term b{ color:var(--ink); font-weight:800; display:block; font-size:8.5pt; margin-bottom:0.7mm;}
+  .wing .wsep{ border-top:0.3mm dashed var(--line); margin:4.5mm 0; }
+  .wing .wing-pen{ font-family:'PC Pen'; font-size:11pt; color:#0F6357; line-height:1.45; }
+
+  figure{ margin:5mm 0; }
+  figure figcaption{ font-size:8pt; color:var(--sub); text-align:center; margin-top:2mm; }
+  figure svg{ display:block; margin:0 auto; }
+
+  /* ── 비교형 그림 (2패널 + 범례) ── */
+  .fig-duo{ display:flex; align-items:stretch; gap:2.5mm; justify-content:center; }
+  .fig-duo .panel{ flex:0 0 auto; text-align:center; }
+  .fig-duo .p-title{ font-size:9pt; font-weight:900; color:var(--ink); margin-top:1.6mm; }
+  .fig-duo .p-sub{ font-size:7.8pt; color:var(--sub); line-height:1.45; margin-top:0.5mm; }
+  .fig-duo .mid{ display:flex; flex-direction:column; align-items:center; justify-content:center; gap:1mm; padding:0 1mm; }
+  .fig-duo .mid .mlab{ font-size:7.6pt; font-weight:800; color:var(--unit); text-align:center; line-height:1.3; }
+  .fig-legend{ display:flex; justify-content:center; gap:5mm; font-size:7.8pt; color:var(--ink); margin-top:1.2mm; align-items:center; }
+  .fig-legend span{ display:inline-flex; align-items:center; gap:1.4mm; }
+
+  /* ── 탐구 (자료 파헤치기) ── */
+  .lab{ border:0.5mm solid var(--brand); border-radius:2.5mm; overflow:hidden; margin-top:1mm;}
+  .lab .lab-head{ background:var(--brand); color:#fff; padding:2.2mm 4mm; font-weight:900; font-size:11pt; display:flex; align-items:center; gap:2.5mm;}
+  .lab .lab-head .tag{ font-size:7.5pt; background:rgba(255,255,255,.22); padding:0.6mm 2.4mm; border-radius:4mm; font-weight:700;}
+  .lab .lab-body{ padding:3.5mm 4mm; }
+  .lab h4{ font-size:9.6pt; font-weight:900; color:var(--brand); margin:2.5mm 0 1.4mm; }
+  .lab h4:first-child{ margin-top:0; }
+  .lab p, .lab li{ font-family:'PC Serif'; font-size:9.3pt; line-height:1.8; }
+  .lab ol{ margin-left:5mm; }
+
+  /* ── 문제부 ── */
+  .step-head{ display:flex; align-items:center; gap:3mm; margin:0 0 5mm; }
+  .step-head .stepno{ background:var(--unit); color:#fff; font-weight:900; font-size:9.5pt; padding:1.4mm 3.4mm; border-radius:1.5mm; letter-spacing:0.04em;}
+  .step-head .steptt{ font-size:12.5pt; font-weight:900; }
+  .step-head .stepdesc{ font-size:8.2pt; color:var(--sub); margin-left:auto; }
+  .step-head.s2 .stepno{ background:var(--brand); }
+  .step-head.s3 .stepno{ background:var(--point); }
+
+  .q{ margin-bottom:7.5mm; break-inside:avoid; }
+  .q .qhead{ display:flex; gap:2.4mm; align-items:flex-start; }
+  .q .qno{ flex:0 0 auto; min-width:6.2mm; height:6.2mm; border:0.45mm solid var(--unit); color:var(--unit); border-radius:50%; font-size:8.6pt; font-weight:900; line-height:1; display:flex; align-items:center; justify-content:center; padding-top:0.55mm; margin-top:0.4mm;}
+  .q .stem{ font-family:'PC Serif'; font-size:9.5pt; line-height:1.74; font-weight:500; }
+  .q .stem .difficulty{ color:#C9A227; font-size:8pt; letter-spacing:0.06em; margin-left:1.5mm;}
+  .q .tags{ margin-top:0.8mm; font-size:7pt; color:var(--sub); font-family:'PC Sans';}
+  .choices{ list-style:none; margin:2.2mm 0 0 8.6mm; font-family:'PC Serif'; font-size:9.3pt; line-height:1.85; }
+  .choices.inline{ display:flex; flex-wrap:wrap; gap:0 6mm; }
+  .bogi-box{ border:0.35mm solid #B8C2CA; border-radius:0; margin:2.5mm 0 0 8.6mm; padding:2.4mm 3.2mm; font-family:'PC Serif'; font-size:9.2pt; line-height:1.8; background:none;}
+  .bogi-box .bt{ text-align:center; font-weight:800; color:var(--sub); font-size:8.4pt; margin-bottom:0.8mm; letter-spacing:0.3em;}
+  .ox-answer{ margin-left:2mm; color:var(--sub); font-size:9pt; }
+  .blankline{ display:inline-block; min-width:14mm; border-bottom:0.4mm solid var(--ink); }
+  .qgrid{ display:grid; grid-template-columns:1fr 1fr; gap:0 9mm; }
+  .essay-lines{ margin:2mm 0 0 8.4mm; }
+  .essay-lines div{ border-bottom:0.3mm solid var(--line); height:6.2mm; }
+  .badge-essay{ display:inline-block; background:var(--point); color:#fff; font-size:7pt; font-weight:800; padding:0.4mm 2mm; border-radius:1mm; vertical-align:1pt; margin-right:1.2mm;}
+  .badge-data{ display:inline-block; background:var(--brand); color:#fff; font-size:7pt; font-weight:800; padding:0.4mm 2mm; border-radius:1mm; vertical-align:1pt; margin-right:1.2mm;}
+
+  /* ── 해설부 ── */
+  .sol-head{ display:flex; align-items:center; gap:3mm; margin-bottom:4mm;}
+  .sol-head .stt{ font-size:14.5pt; font-weight:900; color:var(--brand);}
+  .sol-head .sub{ font-size:8.5pt; color:var(--sub);}
+  .anstable{ width:100%; border-collapse:collapse; margin-bottom:4.5mm; }
+  .anstable th,.anstable td{ border:0.3mm solid var(--line); font-size:8.8pt; padding:1.4mm 0; text-align:center; }
+  .anstable th{ background:var(--brand-lt); color:var(--brand); font-weight:800; }
+  .anstable td.a{ font-weight:900; color:var(--unit); }
+  .sol{ margin-bottom:5mm; break-inside:avoid; }
+  .sol .shead{ display:flex; align-items:center; gap:2mm; margin-bottom:1.4mm;}
+  .sol .sno{ background:var(--unit); color:#fff; min-width:6mm; height:5.4mm; border-radius:1.2mm; font-size:8.6pt; font-weight:900; line-height:1; display:flex; align-items:center; justify-content:center; padding:0.5mm 1.5mm 0;}
+  .sol .sans{ font-weight:900; color:var(--unit); font-size:9.6pt;}
+  .sol .slink{ font-size:7.2pt; color:var(--sub); margin-left:auto;}
+  .sol p{ font-family:'PC Serif'; font-size:9.1pt; line-height:1.76; margin-bottom:0.8mm; }
+  .wrongbox{ background:none; border:none; border-left:0.7mm solid #E3A0AC; border-radius:0; padding:1mm 0 1mm 3mm; margin-top:2mm;}
+  .wrongbox .wt{ font-size:8pt; font-weight:900; color:var(--point); margin-bottom:0.8mm; font-family:'PC Sans';}
+  .wrongbox p{ font-family:'PC Serif'; font-size:8.6pt; line-height:1.68; margin-bottom:0.9mm;}
+  .wrongbox p:last-child{ margin-bottom:0; }
+  .solcols{ display:grid; grid-template-columns:1fr 1fr; gap:0 9mm; }
+
+  /* ── 단원 도입 (타이포그래피 중심) ── */
+  .opener{ padding:0 0 19mm; }
+  .opener-hero{ position:relative; padding:7mm 20mm 4.5mm; overflow:hidden; flex-shrink:0; }
+  .ghost-txt{ position:absolute; top:-10mm; right:6mm; font-size:118pt; font-weight:900; color:#EAF5F1; line-height:1; letter-spacing:-0.04em; }
+  .kicker{ display:flex; align-items:center; gap:4mm; position:relative; }
+  .kicker .kt{ font-size:9.5pt; font-weight:800; color:var(--unit); letter-spacing:0.24em; white-space:nowrap; }
+  .kicker::after{ content:""; flex:1; border-top:0.3mm solid var(--line); }
+  .opener-hero h1{ position:relative; font-size:36pt; font-weight:900; letter-spacing:-0.015em; margin:4mm 0 0; }
+  .opener-hero h1 .tick{ display:block; width:14mm; border-top:1.4mm solid var(--accent); margin-bottom:3.6mm; }
+  .opener-lede{ position:relative; font-family:'PC Serif'; font-size:10.2pt; font-weight:600; line-height:2.0; color:#3D4C58; max-width:138mm; margin-top:4mm; padding-left:5mm; border-left:0.8mm solid var(--accent); }
+  .opener-inner{ padding:0 20mm; }
+
+  /* ── 원소의 여정 스트립 ── */
+  .journey{ margin-top:3.5mm; }
+  .journey .j-label{ font-size:8pt; font-weight:800; color:var(--sub); letter-spacing:0.08em; margin-bottom:2.4mm; display:flex; align-items:center; gap:1.6mm;}
+  .journey .j-label::before{ content:""; width:2.4mm; height:2.4mm; background:var(--unit); border-radius:50%; }
+  .j-bar{ display:flex; align-items:center; gap:2mm; }
+  .j-chip{ flex:1; text-align:center; background:#EFF8F5; border:0.35mm solid #A9D9CE; color:#147D6F; border-radius:1.6mm; padding:3mm 1mm 2.6mm; }
+  .j-chip .jc-t{ font-size:8.8pt; font-weight:800; display:block; }
+  .j-chip .jc-s{ font-size:6.8pt; color:var(--sub); display:block; margin-top:0.5mm; }
+  .j-chip.on{ background:var(--unit); border-color:var(--unit); }
+  .j-chip.on .jc-t{ color:#fff; }
+  .j-chip.on .jc-s{ color:#C9E7DF; }
+  .j-arrow{ flex:0 0 auto; color:#6FB8AA; font-size:10pt; font-weight:900; }
+  .toc{ margin-top:6.5mm; }
+  .toc .toc-title{ font-size:11pt; font-weight:900; color:var(--ink); margin-bottom:3mm; display:flex; align-items:center; gap:2.5mm;}
+  .toc .toc-title::before{ content:""; width:3.4mm; height:3.4mm; background:var(--accent); border-radius:0.8mm; }
+  .toc-item{ display:flex; align-items:flex-start; gap:5mm; padding:4.4mm 6mm; border-bottom:0.3mm solid var(--line); }
+  .toc-item:first-of-type{ border-top:0.3mm solid var(--line); }
+  .toc-item.active{ background:#EFF8F5; border-left:1.2mm solid #4BA394; }
+  .toc-item .tno{ font-family:'PC Serif'; font-weight:900; color:#4BA394; font-size:14pt; width:10mm; line-height:1.1; flex:0 0 auto;}
+  .toc-item .tbody{ flex:1; min-width:0; }
+  .toc-item .ttt{ font-weight:800; font-size:10.5pt; letter-spacing:0.01em; display:flex; align-items:center;}
+  .toc-item .tdesc{ font-family:'PC Serif'; font-size:8.6pt; font-weight:600; color:#4A5964; margin-top:0.7mm; line-height:1.55;}
+  .toc-item .tstd{ font-size:7.2pt; color:var(--sub); flex:0 0 auto; padding-top:1.2mm;}
+  .toc-item.active .tag-now{ background:var(--accent); color:#fff; font-size:7pt; font-weight:900; border-radius:4mm; padding:0.7mm 2.6mm; margin-left:3.5mm;}
+  .toc-item .tag-done{ font-size:7.2pt; font-weight:800; color:#147D6F; margin-left:3.5mm; }
+  .opener-quote{ margin-top:7mm; text-align:center; font-family:'PC Serif'; font-size:9.8pt; font-weight:600; color:#4A5964; letter-spacing:0.01em; }
+  .opener-quote .who{ font-size:8pt; color:var(--sub); font-weight:400; margin-left:2.5mm; }
+  .qa-lead li .qgo{ font-family:'PC Sans'; font-size:7.4pt; font-weight:800; color:var(--unit); background:var(--unit-lt); border-radius:3mm; padding:0.5mm 2.2mm; margin-left:2mm; white-space:nowrap; vertical-align:1pt;}
+  .qa-lead{ margin-top:5mm; border:none; border-top:0.45mm solid var(--brand); border-bottom:0.45mm solid var(--brand); background:none; border-radius:0; padding:3mm 2mm 2.8mm; }
+  .qa-lead .qt{ font-weight:900; color:var(--brand); font-size:10.5pt; margin-bottom:2mm;}
+  .qa-lead li{ font-family:'PC Serif'; font-size:9.5pt; line-height:1.8; margin-left:5mm; }
+
+  /* ── 바로바로 체크 (개념 페이지 하단 즉석 OX) ── */
+  .quickcheck{ margin-top:auto; border-top:0.35mm dashed #C8B98F; padding-top:3mm; width:calc(100% - 51mm); }
+  .quickcheck .qc-title{ display:inline-flex; align-items:center; gap:1.6mm; font-size:8.2pt; font-weight:900; color:#9C6503; margin-bottom:1.4mm; }
+  .quickcheck .qc-title::before{ content:"✓"; color:var(--accent); font-weight:900; }
+  .quickcheck ol{ list-style:none; font-family:'PC Serif'; font-size:8.8pt; line-height:1.75; }
+  .quickcheck li{ display:flex; gap:2mm; align-items:baseline; }
+  .quickcheck li .no{ font-weight:800; color:var(--accent); flex:0 0 auto; }
+  .quickcheck .qc-ans{ margin-top:1mm; font-size:7.2pt; color:var(--sub); transform:rotate(180deg); text-align:left; }
+
+  /* ── 중학 과학 다시보기 (날개단) ── */
+  .wing .review{ background:#F6F3EC; border-radius:1.8mm; padding:2.8mm 3mm; margin-top:1mm; }
+  .wing .review .rv-title{ font-size:7.8pt; font-weight:900; color:#7A6A45; margin-bottom:1.4mm; display:flex; align-items:center; gap:1.4mm;}
+  .wing .review .rv-title::before{ content:"↺"; font-weight:900; color:#A08A55; }
+
+  /* ── MEMO 페이지 ── */
+  .memo-head{ display:flex; align-items:baseline; gap:3.5mm; margin-bottom:5mm; }
+  .memo-head .mt{ font-size:17pt; font-weight:900; color:var(--brand); letter-spacing:0.22em; }
+  .memo-head .ms{ font-size:8.6pt; color:var(--sub); }
+  .memo-area{ flex:1; border:0.4mm solid var(--line); border-radius:2.5mm;
+    background-image:linear-gradient(to bottom, transparent calc(100% - 0.3mm), #DCE4E9 0);
+    background-size:100% 9mm; background-position:0 4mm; padding:0 5mm; margin-bottom:4mm; }
+  .memo-pen{ font-family:'PC Pen'; font-size:12.5pt; color:#0F6357; text-align:right; }
+</style>
+</head>
+<body>
+<!-- ═════════════ p.76 소단원 도입 ═════════════ -->
+<div class="page opener">
+  <div class="opener-hero">
+    <div class="ghost-txt">01</div>
+    <div class="kicker"><span class="kt">통합과학 2 · II. 환경과 에너지</span></div>
+    <h1><span class="tick"></span>생태계의 구성과 상호 관계</h1>
+    <p class="opener-lede">연못 하나에도 우주가 있다 — 붕어와 수초, 세균과 햇빛까지.<br>
+    살아 있는 것과 그렇지 않은 것이 서로를 만들어 간다.</p>
+  </div>
+
+  <div class="opener-inner">
+    <div class="journey">
+      <div class="j-label">환경과 에너지 — 지금 여기</div>
+      <div class="j-bar">
+        <div class="j-chip on"><span class="jc-t">생태계</span><span class="jc-s">모두 연결되어 있다</span></div>
+        <span class="j-arrow">→</span>
+        <div class="j-chip"><span class="jc-t">생태계 평형</span><span class="jc-s">그물이 버틴다</span></div>
+        <span class="j-arrow">→</span>
+        <div class="j-chip"><span class="jc-t">기후변화</span><span class="jc-s">뜨거워지는 지구</span></div>
+        <span class="j-arrow">→</span>
+        <div class="j-chip"><span class="jc-t">태양 에너지</span><span class="jc-s">모든 에너지의 뿌리</span></div>
+        <span class="j-arrow">→</span>
+        <div class="j-chip"><span class="jc-t">발전과 효율</span><span class="jc-s">전기를 만드는 법</span></div>
+      </div>
+    </div>
+    <div class="toc">
+      <div class="toc-title">이 단원의 학습 지도</div>
+      <div class="toc-item active">
+        <span class="tno">01</span>
+        <span class="tbody"><span class="ttt">생태계의 구성과 상호 관계<span class="tag-now">NOW</span></span>
+        <span class="tdesc">생태계 구성 요소, 생물과 환경의 주고받기</span></span>
+        <span class="tstd">10통과2-02-01</span>
+      </div>
+      <div class="toc-item">
+        <span class="tno">02</span>
+        <span class="tbody"><span class="ttt">생태계 평형</span>
+        <span class="tdesc">먹이 관계와 생태 피라미드 — 그물은 어떻게 버티나</span></span>
+        <span class="tstd">10통과2-02-02</span>
+      </div>
+      <div class="toc-item">
+        <span class="tno">03</span>
+        <span class="tbody"><span class="ttt">지구온난화와 기후변화</span>
+        <span class="tdesc">온실효과 강화의 메커니즘, 엘니뇨·사막화</span></span>
+        <span class="tstd">10통과2-02-03</span>
+      </div>
+      <div class="toc-item">
+        <span class="tno">04</span>
+        <span class="tbody"><span class="ttt">태양 에너지와 에너지 전환</span>
+        <span class="tdesc">수소 핵융합에서 지구의 에너지 흐름까지</span></span>
+        <span class="tstd">10통과2-02-04</span>
+      </div>
+      <div class="toc-item">
+        <span class="tno">05</span>
+        <span class="tbody"><span class="ttt">발전과 에너지의 효율적 이용</span>
+        <span class="tdesc">전자기 유도와 발전, 에너지 효율과 신재생 에너지</span></span>
+        <span class="tstd">10통과2-02-05 · 06</span>
+      </div>
+    </div>
+
+    <div class="qa-lead">
+      <div class="qt">이 소단원을 끝내면 답할 수 있는 질문</div>
+      <ul>
+        <li>곰팡이와 세균은 왜 생태계의 '청소부'일까? <span class="qgo">개념 2</span></li>
+        <li>사막여우의 귀는 왜 크고, 북극여우의 귀는 왜 작을까? <span class="qgo">개념 4</span></li>
+        <li>숲의 바닥과 꼭대기엔 왜 다른 식물이 살까? <span class="qgo">개념 4·자료</span></li>
+        <li>생물이 거꾸로 환경을 바꾼 사건은? <span class="qgo">개념 5</span></li>
+      </ul>
+    </div>
+
+    <div class="opener-quote" style="margin-top:2.4mm;">"이 거대한 원인과 결과의 사슬에서, 어떤 것도 홀로 떼어 볼 수 없다."<span class="who">— 생태학의 선구자 알렉산더 폰 훔볼트</span></div>
+  </div>
+
+  <div class="folio"><span>박찬 과학 | 통합과학 2</span><span class="num">76</span></div>
+</div>
+
+<!-- ═════════════ p.77 개념 01 생태계의 위계 ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag">II. 환경과 에너지</span><span class="lesson-tag">01. 생태계의 구성과 상호 관계</span></div>
+  <h2 class="lesson-title"><span class="no">01</span><span class="tt">생태계의 구성과 상호 관계</span></h2>
+  <div class="std-badges"><span class="std">성취기준 10통과2-02-01</span><span class="std">생태계 구성 요소 → 생물과 환경의 상호 관계</span></div>
+
+  <div class="cols">
+    <div class="main">
+      <h3 class="sec"><span class="n">1</span>연못 하나가 생태계다 — 위계로 보기</h3>
+      <p class="body">연못을 들여다보자. 붕어 한 마리는 <span class="kw">개체</span>다. 그 연못의 붕어 전부 — <b>같은 종</b>의 무리가 <span class="kw">개체군</span>이고, 붕어 개체군·수초 개체군·물벼룩 개체군처럼 <b>여러 개체군이 어울린 전체</b>가 <span class="kw">군집</span>이다. 그리고 이 생물 군집이 물·햇빛·흙 같은 <b>비생물 환경과 영향을 주고받는 시스템 전체</b> — 그것이 <span class="kw">생태계</span>다.</p>
+      <p class="body">핵심은 마지막 확장에 있다. 생태계는 생물들의 목록이 아니라 <span class="u-amber">생물과 환경이 서로 영향을 주고받는 관계의 그물</span>이다. 그래서 연못 하나도, 썩은 통나무 하나도, 지구 전체도 생태계가 될 수 있다 — 크기가 아니라 <b>관계</b>가 생태계를 정의한다.</p>
+
+      <figure>
+        <svg width="470" height="150" viewBox="0 0 470 150" font-family="PC Sans">
+          <defs>
+            <marker id="arrP" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="#147D6F"/></marker>
+            <marker id="arrR" markerWidth="7" markerHeight="7" refX="5" refY="2.5" orient="auto"><path d="M0,0 L6,2.5 L0,5 Z" fill="#D6455D"/></marker>
+          </defs>
+          <g font-size="6.8">
+            <text x="235" y="13" text-anchor="middle" font-size="8.4" font-weight="800" fill="#147D6F">개체에서 생태계까지 — 확장의 사다리</text>
+            <g transform="translate(0,24)" text-anchor="middle">
+              <g transform="translate(62,0)">
+                <rect x="-46" y="0" width="92" height="88" rx="6" fill="#E7F5F1" stroke="#A9D9CE" stroke-width="1"/>
+                <text y="15" font-size="7.4" font-weight="800" fill="#147D6F">개체</text>
+                <g transform="translate(0,46)">
+                  <ellipse rx="13" ry="7" fill="#E8940A"/><path d="M13,0 l8,-6 v12 z" fill="#E8940A"/><circle cx="-7" cy="-2" r="1.4" fill="#3B3B3B"/>
+                </g>
+                <text y="78" fill="#5B6B77" font-size="6.2">붕어 한 마리</text>
+              </g>
+              <line x1="110" y1="44" x2="122" y2="44" stroke="#147D6F" stroke-width="1.3" marker-end="url(#arrP)"/>
+              <g transform="translate(170,0)">
+                <rect x="-46" y="0" width="92" height="88" rx="6" fill="#E7F5F1" stroke="#A9D9CE" stroke-width="1"/>
+                <text y="15" font-size="7.4" font-weight="800" fill="#147D6F">개체군</text>
+                <g transform="translate(0,46)" fill="#E8940A">
+                  <g transform="translate(-14,-10) scale(0.7)"><ellipse rx="13" ry="7"/><path d="M13,0 l8,-6 v12 z"/></g>
+                  <g transform="translate(12,-2) scale(0.7)"><ellipse rx="13" ry="7"/><path d="M13,0 l8,-6 v12 z"/></g>
+                  <g transform="translate(-8,10) scale(0.7)"><ellipse rx="13" ry="7"/><path d="M13,0 l8,-6 v12 z"/></g>
+                </g>
+                <text y="78" fill="#5B6B77" font-size="6.2">같은 종의 무리</text>
+              </g>
+              <line x1="218" y1="44" x2="230" y2="44" stroke="#147D6F" stroke-width="1.3" marker-end="url(#arrP)"/>
+              <g transform="translate(278,0)">
+                <rect x="-46" y="0" width="92" height="88" rx="6" fill="#E7F5F1" stroke="#A9D9CE" stroke-width="1"/>
+                <text y="15" font-size="7.4" font-weight="800" fill="#147D6F">군집</text>
+                <g transform="translate(0,46)">
+                  <g transform="translate(-12,-6) scale(0.62)" fill="#E8940A"><ellipse rx="13" ry="7"/><path d="M13,0 l8,-6 v12 z"/></g>
+                  <path d="M14,10 q-3,-12 4,-20 q7,8 4,20 z" fill="#5E9C57"/>
+                  <circle cx="-16" cy="12" r="4" fill="#8A7A63"/>
+                  <g transform="translate(14,-14) scale(0.5)" fill="#4C86B0"><ellipse rx="13" ry="7"/><path d="M13,0 l8,-6 v12 z"/></g>
+                </g>
+                <text y="78" fill="#5B6B77" font-size="6.2">여러 개체군의 어울림</text>
+              </g>
+              <line x1="326" y1="44" x2="338" y2="44" stroke="#147D6F" stroke-width="1.3" marker-end="url(#arrP)"/>
+              <g transform="translate(400,0)">
+                <rect x="-60" y="0" width="120" height="88" rx="6" fill="#147D6F"/>
+                <text y="15" font-size="7.4" font-weight="800" fill="#fff">생태계</text>
+                <g transform="translate(0,46)">
+                  <circle cx="-30" cy="-16" r="9" fill="#F3C24E"/>
+                  <path d="M-48,22 q20,-10 48,-8 q26,2 44,8 z" fill="#7FB8DE"/>
+                  <g transform="translate(4,-2) scale(0.6)" fill="#E8940A"><ellipse rx="13" ry="7"/><path d="M13,0 l8,-6 v12 z"/></g>
+                  <path d="M28,4 q-3,-10 3,-16 q6,6 3,16 z" fill="#5E9C57"/>
+                </g>
+                <text y="78" fill="#C9E7DF" font-size="6.2">군집 + 빛·물·흙 (환경)</text>
+              </g>
+            </g>
+          </g>
+          <text x="235" y="144" text-anchor="middle" font-size="8.8" font-weight="800" fill="#E8940A">개체 → 개체군(같은 종) → 군집(여러 종) → 생태계(생물 + 환경)</text>
+        </svg>
+        <figcaption>그림 1 | 생태계의 위계 — 마지막 계단에서 '살아 있지 않은 것'까지 들어온다</figcaption>
+      </figure>
+
+      <div class="saem">
+        <div class="avatar">박찬<br>쌤</div>
+        <div class="bubble"><span class="pen">"개체군의 '군'에서 '같은 종'을, 군집의 '집'에서 '모여 산다'를 읽자. 생태계의 '계(系)'는 시스템 — 관계까지 포함한다는 신호다."</span></div>
+      </div>
+    </div>
+
+    <div class="wing">
+      <div class="wtitle">날개 노트</div>
+      <div class="term"><b>개체군</b>일정한 지역에 사는 같은 종 개체들의 무리.</div>
+      <div class="term"><b>군집</b>한 지역의 여러 개체군 전체 — 생물만의 모임이다.</div>
+      <div class="wsep"></div>
+      <div class="wtitle">한눈에 암기</div>
+      <div class="wing-pen">개체 → 개체군 → 군집<br>→ 생태계!<br>생태계 = 생물 + 환경</div>
+      <div class="wsep"></div>
+      <div class="review">
+        <div class="rv-title">중학 과학 다시보기</div>
+        <div class="term" style="margin-bottom:0;"><b>광합성 (중2)</b>식물이 빛으로 양분을 만든다 — 이 능력이 생태계의 '입구'가 된다는 것을 다음 개념에서 본다.</div>
+      </div>
+    </div>
+  </div>
+  <div class="quickcheck">
+    <span class="qc-title">바로바로 체크</span>
+    <ol>
+      <li><span class="no">1</span>개체군은 같은 종 개체들의 무리다. ( O , X )</li>
+      <li><span class="no">2</span>군집에는 물·햇빛 같은 비생물 환경이 포함된다. ( O , X )</li>
+      <li><span class="no">3</span>생태계는 생물 군집과 비생물 환경의 상호작용 시스템이다. ( O , X )</li>
+    </ol>
+    <div class="qc-ans">정답 1 O 2 X (군집은 생물만 — 환경까지 오면 생태계) 3 O</div>
+  </div>
+  <div class="folio"><span>II. 환경과 에너지</span><span class="num">77</span></div>
+</div>
+
+<!-- ═════════════ p.78 개념 02 생물적 요인 ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag">II. 환경과 에너지</span><span class="lesson-tag">01. 생태계의 구성과 상호 관계</span></div>
+  <div class="cols">
+    <div class="main">
+      <h3 class="sec"><span class="n">2</span>생물적 요인 — 만드는 자, 먹는 자, 되돌리는 자</h3>
+      <p class="body">생태계의 생물들은 '먹고사는 방식'에 따라 세 배역으로 나뉜다. 첫째, <span class="kw">생산자</span> — 광합성으로 <b>스스로 양분을 만드는</b> 생물이다. 식물·조류(藻類)·식물 플랑크톤이 여기 속하며, 생태계로 들어오는 <b>모든 양분의 입구</b>다. 둘째, <span class="kw">소비자</span> — 다른 생물을 먹어 양분을 얻는 생물이다. 풀을 먹는 메뚜기는 1차 소비자, 메뚜기를 먹는 개구리는 2차 소비자로 이어진다.</p>
+      <p class="body">셋째가 숨은 주역, <span class="kw">분해자</span>다. 세균·곰팡이·버섯은 죽은 생물과 배설물을 분해해 양분을 얻으면서, 그 속의 물질을 <span class="u-amber">흙과 공기로 되돌려 생산자가 다시 쓸 수 있게</span> 만든다. 분해자가 없다면 낙엽과 사체가 쌓이기만 하고 물질은 순환을 멈춘다 — 생태계의 청소부이자 재활용 공장이다.</p>
+
+      <figure>
+        <svg width="470" height="150" viewBox="0 0 470 150" font-family="PC Sans">
+          <g font-size="6.8">
+            <text x="235" y="13" text-anchor="middle" font-size="8.4" font-weight="800" fill="#147D6F">세 배역 — 양분이 도는 길</text>
+            <g transform="translate(0,24)" text-anchor="middle">
+              <g transform="translate(85,0)">
+                <rect x="-66" y="0" width="132" height="88" rx="6" fill="#E7F5F1" stroke="#A9D9CE" stroke-width="1"/>
+                <text y="15" font-size="7.4" font-weight="800" fill="#147D6F">생산자 — 만드는 자</text>
+                <g transform="translate(0,46)">
+                  <path d="M0,20 v-16" stroke="#7A5C3E" stroke-width="2.2"/>
+                  <circle cy="-8" r="11" fill="#5E9C57"/><circle cx="-9" cy="-2" r="7" fill="#7FB56E"/><circle cx="9" cy="-2" r="7" fill="#7FB56E"/>
+                  <path d="M-20,-24 l4,4 M0,-28 v6 M20,-24 l-4,4" stroke="#E8940A" stroke-width="1.3"/>
+                </g>
+                <text y="80" fill="#5B6B77" font-size="6.2">광합성 — 양분의 입구</text>
+              </g>
+              <line x1="153" y1="44" x2="167" y2="44" stroke="#147D6F" stroke-width="1.4" marker-end="url(#arrP)"/>
+              <g transform="translate(235,0)">
+                <rect x="-66" y="0" width="132" height="88" rx="6" fill="#E7F5F1" stroke="#A9D9CE" stroke-width="1"/>
+                <text y="15" font-size="7.4" font-weight="800" fill="#147D6F">소비자 — 먹는 자</text>
+                <g transform="translate(0,46)">
+                  <g transform="translate(-20,4)">
+                    <ellipse rx="8" ry="5" fill="#8FA85B"/><line x1="-6" y1="-4" x2="-10" y2="-10" stroke="#8FA85B" stroke-width="1.2"/>
+                  </g>
+                  <g transform="translate(18,-4)">
+                    <circle r="8" fill="#6FA86B"/><circle cx="-3" cy="-2" r="1.3" fill="#22303A"/><path d="M-8,6 q8,5 16,0" stroke="#4E7A4A" stroke-width="1.2" fill="none"/>
+                  </g>
+                </g>
+                <text y="80" fill="#5B6B77" font-size="6.2">메뚜기(1차) → 개구리(2차) …</text>
+              </g>
+              <line x1="303" y1="44" x2="317" y2="44" stroke="#147D6F" stroke-width="1.4" marker-end="url(#arrP)"/>
+              <g transform="translate(385,0)">
+                <rect x="-66" y="0" width="132" height="88" rx="6" fill="#EFF8F5" stroke="#147D6F" stroke-width="1.1"/>
+                <text y="15" font-size="7.4" font-weight="800" fill="#0F6357">분해자 — 되돌리는 자</text>
+                <g transform="translate(0,46)">
+                  <path d="M-16,14 h12 v-8 q0-10 -6,-10 q-6,0 -6,10 z" fill="#C9A76B"/>
+                  <ellipse cx="-10" cy="-6" rx="11" ry="6" fill="#B0483A"/>
+                  <g stroke="#8A7A63" stroke-width="1.1" fill="none">
+                    <circle cx="16" cy="2" r="4"/><circle cx="24" cy="-6" r="3"/><circle cx="24" cy="9" r="2.4"/>
+                  </g>
+                </g>
+                <text y="80" fill="#5B6B77" font-size="6.2">세균·곰팡이·버섯 — 재활용 공장</text>
+              </g>
+            </g>
+            <path d="M385,116 q-150,26 -300,-2" fill="none" stroke="#0F6357" stroke-width="1.3" stroke-dasharray="3 2.5" marker-end="url(#arrP)" transform="translate(0,-4)"/>
+            <text x="235" y="128" text-anchor="middle" font-size="6.6" font-weight="800" fill="#0F6357">분해된 물질은 흙·공기로 — 다시 생산자에게</text>
+          </g>
+          <text x="235" y="146" text-anchor="middle" font-size="8.8" font-weight="800" fill="#E8940A">만들고 → 먹고 → 되돌린다 — 분해자가 있어야 순환이 닫힌다</text>
+        </svg>
+        <figcaption>그림 2 | 생물적 요인의 세 배역 — 점선 화살표가 '순환'을 완성한다</figcaption>
+      </figure>
+
+      <div class="expoint">
+        <div class="boxtitle"><span class="ico">!</span>시험엔 이렇게</div>
+        <p>배역 바꿔치기 단골 — "버섯은 생산자다"(X — 광합성을 못 하는 <b>분해자</b>), "식물 플랑크톤은 소비자다"(X — 광합성 하는 <b>생산자</b>). 판별 기준은 딱 하나, <b>스스로 양분을 만드는가</b>.</p>
+      </div>
+    </div>
+
+    <div class="wing">
+      <div class="wtitle">날개 노트</div>
+      <div class="term"><b>조류(藻類)</b>미역·다시마·식물 플랑크톤처럼 물속에서 광합성 하는 생물 — 어엿한 생산자다.</div>
+      <div class="term"><b>버섯</b>곰팡이의 한 무리. 식물처럼 보여도 광합성을 못 한다 — 분해자.</div>
+      <div class="wsep"></div>
+      <div class="wtitle">한눈에 암기</div>
+      <div class="wing-pen">생산자 = 스스로 만든다<br>소비자 = 먹어서 얻는다<br>분해자 = 되돌린다 (순환!)</div>
+    </div>
+  </div>
+  <div class="quickcheck">
+    <span class="qc-title">바로바로 체크</span>
+    <ol>
+      <li><span class="no">1</span>식물 플랑크톤은 생산자다. ( O , X )</li>
+      <li><span class="no">2</span>버섯은 광합성으로 양분을 만드는 생산자다. ( O , X )</li>
+      <li><span class="no">3</span>분해자는 물질을 흙과 공기로 되돌려 순환을 완성한다. ( O , X )</li>
+    </ol>
+    <div class="qc-ans">정답 1 O 2 X (분해자) 3 O</div>
+  </div>
+  <div class="folio"><span>II. 환경과 에너지</span><span class="num">78</span></div>
+</div>
+
+<!-- ═════════════ p.79 개념 03 비생물적 요인 ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag">II. 환경과 에너지</span><span class="lesson-tag">01. 생태계의 구성과 상호 관계</span></div>
+  <div class="cols">
+    <div class="main">
+      <h3 class="sec"><span class="n">3</span>비생물적 요인 — 무대가 배우를 결정한다</h3>
+      <p class="body">생태계의 나머지 절반은 살아 있지 않다. <span class="kw">비생물적 요인</span> — <b>빛·온도·물·토양·공기</b>가 생물이 살아가는 무대를 이룬다. <b>빛</b>은 광합성의 에너지원이자 생물의 시계다(일조 시간이 개화와 번식 시기를 알린다). <b>온도</b>는 생물의 몸속 화학 반응 속도를 좌우해, 계절마다 생물의 모습을 바꾼다.</p>
+      <p class="body"><b>물</b>은 생명 활동의 용매 — 물이 귀한 곳의 생물은 물을 지키는 형태로 진화했다(I단원의 자연선택이 여기서 일한다). <b>토양</b>은 식물의 터전이자 수많은 미생물의 집이고, <b>공기</b>는 호흡의 산소와 광합성의 이산화 탄소를 공급한다. 무대가 달라지면 배우도 달라진다 — <span class="u-amber">사막·극지·심해의 생물이 저마다 다른 이유가 이 다섯 요인에 있다</span>.</p>
+
+      <figure>
+        <svg width="470" height="146" viewBox="0 0 470 146" font-family="PC Sans">
+          <g font-size="6.8">
+            <text x="235" y="13" text-anchor="middle" font-size="8.4" font-weight="800" fill="#147D6F">다섯 개의 무대 장치 — 비생물적 요인</text>
+            <g transform="translate(0,22)" text-anchor="middle">
+              <g transform="translate(60,0)">
+                <rect x="-44" y="0" width="88" height="90" rx="6" fill="#E7F5F1" stroke="#A9D9CE" stroke-width="1"/>
+                <text y="15" font-size="7.2" font-weight="800" fill="#147D6F">빛</text>
+                <g transform="translate(0,44)">
+                  <circle r="10" fill="#F3C24E"/>
+                  <g stroke="#E8940A" stroke-width="1.3">
+                    <line x1="-17" y1="0" x2="-13" y2="0"/><line x1="13" y1="0" x2="17" y2="0"/><line x1="0" y1="-17" x2="0" y2="-13"/><line x1="0" y1="13" x2="0" y2="17"/>
+                  </g>
+                </g>
+                <text y="78" fill="#5B6B77" font-size="6">광합성 · 생물의 시계</text>
+              </g>
+              <g transform="translate(148,0)">
+                <rect x="-44" y="0" width="88" height="90" rx="6" fill="#E7F5F1" stroke="#A9D9CE" stroke-width="1"/>
+                <text y="15" font-size="7.2" font-weight="800" fill="#147D6F">온도</text>
+                <g transform="translate(0,44)">
+                  <rect x="-3" y="-16" width="6" height="24" rx="3" fill="#EAF3F8" stroke="#8FB2C9" stroke-width="1"/>
+                  <circle cy="12" r="6" fill="#D6455D"/><rect x="-1.6" y="-6" width="3.2" height="16" fill="#D6455D"/>
+                </g>
+                <text y="78" fill="#5B6B77" font-size="6">반응 속도 · 계절의 얼굴</text>
+              </g>
+              <g transform="translate(236,0)">
+                <rect x="-44" y="0" width="88" height="90" rx="6" fill="#E7F5F1" stroke="#A9D9CE" stroke-width="1"/>
+                <text y="15" font-size="7.2" font-weight="800" fill="#147D6F">물</text>
+                <g transform="translate(0,44)">
+                  <path d="M0,-14 q12,14 6,24 q-6,8 -12,0 q-6,-10 6,-24 z" fill="#7FB8DE"/>
+                </g>
+                <text y="78" fill="#5B6B77" font-size="6">생명 활동의 용매</text>
+              </g>
+              <g transform="translate(324,0)">
+                <rect x="-44" y="0" width="88" height="90" rx="6" fill="#E7F5F1" stroke="#A9D9CE" stroke-width="1"/>
+                <text y="15" font-size="7.2" font-weight="800" fill="#147D6F">토양</text>
+                <g transform="translate(0,44)">
+                  <path d="M-20,12 h40 v-6 q-10,-8 -20,-8 q-10,0 -20,8 z" fill="#A8886B"/>
+                  <path d="M-6,-2 q-2,-10 4,-14 q5,5 2,14 z" fill="#5E9C57"/>
+                </g>
+                <text y="78" fill="#5B6B77" font-size="6">터전 · 미생물의 집</text>
+              </g>
+              <g transform="translate(412,0)">
+                <rect x="-44" y="0" width="88" height="90" rx="6" fill="#E7F5F1" stroke="#A9D9CE" stroke-width="1"/>
+                <text y="15" font-size="7.2" font-weight="800" fill="#147D6F">공기</text>
+                <g transform="translate(0,44)" stroke="#8FB2C9" stroke-width="1.6" fill="none">
+                  <path d="M-16,-6 h20 a5,5 0 1,0 -5,-8"/>
+                  <path d="M-14,4 h26 a5,5 0 1,1 -5,8"/>
+                </g>
+                <text y="78" fill="#5B6B77" font-size="6">산소 · 이산화 탄소</text>
+              </g>
+            </g>
+          </g>
+          <text x="235" y="140" text-anchor="middle" font-size="8.8" font-weight="800" fill="#E8940A">빛 · 온도 · 물 · 토양 · 공기 — 무대가 달라지면 배우가 달라진다</text>
+        </svg>
+        <figcaption>그림 3 | 비생물적 요인 다섯 가지 — 생물이 살아가는 무대 장치</figcaption>
+      </figure>
+
+      <div class="expoint">
+        <div class="boxtitle"><span class="ico">!</span>시험엔 이렇게</div>
+        <p>분류 문제의 기본기 — <b>빛·온도·물·토양·공기 = 비생물적</b>, 생산자·소비자·분해자 = 생물적. "세균은 비생물적 요인이다"(X — 작아도 살아 있으면 <b>생물적</b>, 분해자)가 대표 함정.</p>
+      </div>
+    </div>
+
+    <div class="wing">
+      <div class="wtitle">날개 노트</div>
+      <div class="term"><b>일조 시간</b>하루 중 해가 비추는 시간. 붓꽃과 코스모스의 개화 시기가 다른 이유다.</div>
+      <div class="term"><b>용매로서의 물</b>몸속 화학 반응은 대부분 물에 녹은 상태에서 일어난다.</div>
+      <div class="wsep"></div>
+      <div class="wtitle">한눈에 암기</div>
+      <div class="wing-pen">비생물 5형제:<br>빛·온도·물·토양·공기<br>세균은 생물적(분해자)!</div>
+    </div>
+  </div>
+  <div class="quickcheck">
+    <span class="qc-title">바로바로 체크</span>
+    <ol>
+      <li><span class="no">1</span>빛·온도·물·토양·공기는 비생물적 요인이다. ( O , X )</li>
+      <li><span class="no">2</span>세균은 비생물적 요인에 속한다. ( O , X )</li>
+      <li><span class="no">3</span>일조 시간은 식물의 개화 시기에 영향을 준다. ( O , X )</li>
+    </ol>
+    <div class="qc-ans">정답 1 O 2 X (생물적 요인 — 분해자) 3 O</div>
+  </div>
+  <div class="folio"><span>II. 환경과 에너지</span><span class="num">79</span></div>
+</div>
+
+<!-- ═════════════ p.80 개념 04 환경이 생물에게 ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag">II. 환경과 에너지</span><span class="lesson-tag">01. 생태계의 구성과 상호 관계</span></div>
+  <div class="cols">
+    <div class="main">
+      <h3 class="sec"><span class="n">4</span>환경이 생물을 조각한다 — 적응의 갤러리</h3>
+      <p class="body">무대(환경)가 배우(생물)를 어떻게 바꾸는지, 이름난 사례들을 보자. <b>온도와 귀</b> — 더운 사막의 사막여우는 <b>큰 귀</b>로 몸의 열을 내보내고, 추운 북극의 북극여우는 <b>작은 귀</b>로 열 손실을 줄인다. 같은 여우, 다른 온도, 다른 귀. <b>빛과 잎</b> — 강한 빛을 받는 <b>양엽</b>은 두껍고, 그늘의 <b>음엽</b>은 넓고 얇아 약한 빛을 최대한 받는다.</p>
+      <p class="body"><b>물과 형태</b> — 선인장은 잎을 <b>가시</b>로 바꿔 수분 증발을 줄이고 줄기에 물을 저장한다. <b>온도와 계절</b> — 곰의 겨울잠, 나무의 낙엽, 철새의 이동은 모두 온도 변화에 대한 답안지다. 눈여겨볼 것 — 이 모든 적응은 I단원에서 배운 <span class="u-amber">자연선택의 결과</span>다. 환경이 조각칼이 되어, 세대를 거치며 생물의 형태를 깎아 온 것이다.</p>
+
+      <figure>
+        <svg width="470" height="150" viewBox="0 0 470 150" font-family="PC Sans">
+          <g font-size="6.8">
+            <text x="235" y="13" text-anchor="middle" font-size="8.4" font-weight="800" fill="#147D6F">같은 여우, 다른 귀 — 온도가 조각한 형태</text>
+            <g transform="translate(0,22)" text-anchor="middle">
+              <g transform="translate(120,0)">
+                <rect x="-100" y="0" width="200" height="94" rx="6" fill="#FDF3E0" stroke="#E8C46B" stroke-width="1"/>
+                <text y="15" font-size="7.4" font-weight="800" fill="#B4830A">사막여우 — 더운 곳</text>
+                <g transform="translate(0,52)">
+                  <path d="M-22,-14 l-8,-24 l16,10 z" fill="#E0B478"/>
+                  <path d="M22,-14 l8,-24 l-16,10 z" fill="#E0B478"/>
+                  <circle r="16" fill="#EDD3A8"/>
+                  <circle cx="-6" cy="-3" r="1.8" fill="#3B3B3B"/><circle cx="6" cy="-3" r="1.8" fill="#3B3B3B"/>
+                  <ellipse cx="0" cy="6" rx="3" ry="2.2" fill="#8A7A63"/>
+                </g>
+                <text y="88" fill="#5B6B77" font-size="6.2">큰 귀 = 열 방출 라디에이터</text>
+              </g>
+              <g transform="translate(235,42)" font-weight="800">
+                <text font-size="8" fill="#5B6B77">온도가</text>
+                <text y="11" font-size="8" fill="#5B6B77">가른다</text>
+              </g>
+              <g transform="translate(350,0)">
+                <rect x="-100" y="0" width="200" height="94" rx="6" fill="#EAF3F8" stroke="#A9C9DE" stroke-width="1"/>
+                <text y="15" font-size="7.4" font-weight="800" fill="#2E6690">북극여우 — 추운 곳</text>
+                <g transform="translate(0,52)">
+                  <path d="M-14,-13 l-4,-11 l9,6 z" fill="#E8EEF2"/>
+                  <path d="M14,-13 l4,-11 l-9,6 z" fill="#E8EEF2"/>
+                  <circle r="17" fill="#F4F7F9"/>
+                  <circle cx="-6" cy="-3" r="1.8" fill="#3B3B3B"/><circle cx="6" cy="-3" r="1.8" fill="#3B3B3B"/>
+                  <ellipse cx="0" cy="6" rx="3" ry="2.2" fill="#8A949E"/>
+                </g>
+                <text y="88" fill="#5B6B77" font-size="6.2">작은 귀 + 둥근 몸 = 열 지키기</text>
+              </g>
+            </g>
+          </g>
+          <text x="235" y="144" text-anchor="middle" font-size="8.8" font-weight="800" fill="#E8940A">환경 → 생물: 무대가 배우의 형태를 깎는다 — 조각칼은 자연선택(I단원)</text>
+        </svg>
+        <figcaption>그림 4 | 온도에 대한 적응 — 귀의 크기는 열 관리 장치다</figcaption>
+      </figure>
+
+      <div class="expoint">
+        <div class="boxtitle"><span class="ico">!</span>시험엔 이렇게</div>
+        <p>사례 ↔ 요인 짝짓기가 핵심 — <b>여우 귀·겨울잠·낙엽·계절형 = 온도</b>, <b>층상 구조·양엽 음엽·개화 시기 = 빛</b>, <b>선인장 가시 = 물</b>. "양엽이 음엽보다 얇다"(X — 두껍다)는 뒤집기 함정.</p>
+      </div>
+    </div>
+
+    <div class="wing">
+      <div class="wtitle">날개 노트</div>
+      <div class="term"><b>양엽과 음엽</b>같은 나무에서도 볕 쪽 잎은 두껍고, 그늘 잎은 넓고 얇다 — 빛에 맞춘 잎의 설계.</div>
+      <div class="term"><b>겨울잠</b>먹이가 부족하고 추운 겨울, 체온과 대사를 낮춰 에너지를 아끼는 전략.</div>
+      <div class="wsep"></div>
+      <div class="wtitle">한눈에 암기</div>
+      <div class="wing-pen">귀·잠·낙엽 = 온도<br>잎·개화·층상 = 빛<br>가시·저수 = 물</div>
+      <div class="wsep"></div>
+      <div class="review">
+        <div class="rv-title">앞 단원과 연결</div>
+        <div class="term" style="margin-bottom:0;"><b>자연선택 (I-02)</b>적응은 하루아침의 변신이 아니라, 유리한 변이가 세대를 거쳐 선택된 결과다.</div>
+      </div>
+    </div>
+  </div>
+  <div class="quickcheck">
+    <span class="qc-title">바로바로 체크</span>
+    <ol>
+      <li><span class="no">1</span>사막여우의 큰 귀는 열을 내보내는 데 유리하다. ( O , X )</li>
+      <li><span class="no">2</span>강한 빛을 받는 양엽은 음엽보다 얇다. ( O , X )</li>
+      <li><span class="no">3</span>선인장의 가시는 물 부족 환경에 대한 적응이다. ( O , X )</li>
+    </ol>
+    <div class="qc-ans">정답 1 O 2 X (두껍다) 3 O</div>
+  </div>
+  <div class="folio"><span>II. 환경과 에너지</span><span class="num">80</span></div>
+</div>
+
+<!-- ═════════════ p.81 개념 05 생물이 환경을 ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag">II. 환경과 에너지</span><span class="lesson-tag">01. 생태계의 구성과 상호 관계</span></div>
+  <div class="cols">
+    <div class="main">
+      <h3 class="sec"><span class="n">5</span>생물도 환경을 바꾼다 — 주고받기의 완성</h3>
+      <p class="body">영향은 한 방향이 아니다. <b>생물이 거꾸로 환경을 바꾼 가장 큰 사건</b>을 우리는 이미 안다 — 통합과학 2의 첫 페이지, 광합성 생물이 대기에 산소를 채우고 오존층을 만들어 <b>지구라는 무대 자체를 개조</b>한 이야기다(I-01·I-03). 작은 규모로도 매일 일어난다. <b>지렁이</b>는 흙을 헤집어 통기성을 높이고 배설물로 토양을 비옥하게 하며, <b>숲</b>은 그늘과 증산으로 둘레의 온도·습도를 조절하고, <b>낙엽</b>은 분해되어 토양의 양분이 된다.</p>
+      <p class="body">그래서 생태계의 관계는 화살표 두 개로 완성된다. <span class="u-amber">환경 → 생물(무대가 배우를 조각하고), 생물 → 환경(배우가 무대를 고쳐 짓는다)</span>. 이 주고받기의 균형이 어떻게 유지되는지 — 그것이 다음 소단원, 생태계 평형이다.</p>
+
+      <div class="gist" style="margin:2.8mm 0 4mm; padding:2.2mm 1.8mm 2mm;">
+        <div class="boxtitle"><span class="ico">알</span>알짜 정리 — 생태계의 구성과 상호 관계 한 장 요약</div>
+        <ul>
+          <li>위계: <b>개체 → 개체군(같은 종) → 군집(여러 종) → 생태계(생물+환경)</b></li>
+          <li>생물적 3배역: <b>생산자</b>(광합성) · <b>소비자</b>(먹어서) · <b>분해자</b>(되돌려서 — 순환 완성)</li>
+          <li>비생물 5요인: <b>빛·온도·물·토양·공기</b> — 여우 귀(온도)·양엽 음엽(빛)·선인장(물)</li>
+          <li>상호 관계 = 쌍방향: 환경→생물(적응) + <b>생물→환경</b>(산소 대기·지렁이·숲)</li>
+        </ul>
+      </div>
+
+      <div class="saem">
+        <div class="avatar">박찬<br>쌤</div>
+        <div class="bubble"><span class="pen">"진료실 말로 하면 생태계는 '환자와 생활 환경'이다 — 몸이 환경의 영향을 받고, 생활 습관이 다시 환경을 바꾼다. 쌍방향 화살표를 놓치면 반쪽 진단이 된다."</span></div>
+      </div>
+    </div>
+
+    <div class="wing">
+      <div class="wtitle">날개 노트</div>
+      <div class="term"><b>증산</b>식물이 잎으로 물을 내보내는 작용 — 숲이 천연 에어컨이 되는 이유.</div>
+      <div class="term"><b>산소 대기의 기원</b>남세균의 광합성이 만든 산소 — 생물이 지구를 바꾼 최대 사건(I단원 복습).</div>
+      <div class="wsep"></div>
+      <div class="wtitle">한눈에 암기</div>
+      <div class="wing-pen">환경 → 생물 = 적응<br>생물 → 환경 = 개조<br>화살표는 쌍방향!</div>
+      <div class="wsep"></div>
+      <div class="review">
+        <div class="rv-title">다음 소단원 예고</div>
+        <div class="term" style="margin-bottom:0;"><b>생태계 평형 (02)</b>이 주고받기의 그물이 어떻게 버티고, 언제 무너지는가 — 먹이 관계가 열쇠다.</div>
+      </div>
+    </div>
+  </div>
+  <div class="quickcheck">
+    <span class="qc-title">바로바로 체크</span>
+    <ol>
+      <li><span class="no">1</span>지렁이는 토양의 통기성을 높여 환경에 영향을 준다. ( O , X )</li>
+      <li><span class="no">2</span>생물과 환경의 영향은 환경에서 생물로, 한 방향으로만 흐른다. ( O , X )</li>
+      <li><span class="no">3</span>대기에 산소가 쌓인 것은 광합성 생물의 작품이다. ( O , X )</li>
+    </ol>
+    <div class="qc-ans">정답 1 O 2 X (쌍방향) 3 O</div>
+  </div>
+  <div class="folio"><span>II. 환경과 에너지</span><span class="num">81</span></div>
+</div>
+
+<!-- ═════════════ p.82 자료 파헤치기 ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag">II. 환경과 에너지</span><span class="lesson-tag">01. 생태계의 구성과 상호 관계</span></div>
+  <div class="lab">
+    <div class="lab-head">자료 파헤치기 <span class="tag">탐구·자료 분석</span> <span style="font-weight:600; font-size:9.5pt; margin-left:auto;">숲의 층상 구조 — 빛이 지은 아파트</span></div>
+    <div class="lab-body">
+      <h4>자료</h4>
+      <p>우거진 숲의 높이별로 도달하는 빛의 세기를 조사하면, 숲 꼭대기를 100 %라 할 때 아래로 갈수록 급격히 줄어 <b>숲 바닥에는 수 % 남짓</b>만 도달한다. 그리고 각 층에는 서로 다른 식물이 산다 — 키 큰 나무(교목), 그 아래 작은 나무(관목), 풀, 바닥의 이끼.</p>
+      <figure>
+        <svg width="430" height="128" viewBox="0 0 430 128" font-family="PC Sans">
+          <g font-size="6.8">
+            <!-- 층 구조 -->
+            <g transform="translate(30,10)">
+              <rect x="0" y="0" width="220" height="24" fill="#5E9C57" opacity="0.9" rx="3"/>
+              <text x="8" y="15" fill="#fff" font-weight="800">교목층 — 키 큰 나무</text>
+              <rect x="0" y="28" width="220" height="22" fill="#7FB56E" opacity="0.9" rx="3"/>
+              <text x="8" y="42" fill="#fff" font-weight="800">관목층 — 작은 나무</text>
+              <rect x="0" y="54" width="220" height="22" fill="#A8C98A" rx="3"/>
+              <text x="8" y="68" fill="#3D5A2E" font-weight="800">초본층 — 풀</text>
+              <rect x="0" y="80" width="220" height="20" fill="#C9BA9B" rx="3"/>
+              <text x="8" y="93" fill="#5A4A30" font-weight="800">지표층 — 이끼·낙엽</text>
+            </g>
+            <!-- 빛 세기 -->
+            <g transform="translate(280,10)" font-weight="800">
+              <text x="0" y="15" fill="#E8940A">빛 100 %</text>
+              <text x="0" y="42" fill="#C9820A">빛 ↓</text>
+              <text x="0" y="68" fill="#A08A55">빛 ↓↓</text>
+              <text x="0" y="92" fill="#7A6A45">빛 수 % — 이끼도 살아간다</text>
+              <path d="M56,20 q6,30 0,66" stroke="#E8940A" stroke-width="1.6" fill="none" marker-end="url(#arrR)"/>
+            </g>
+          </g>
+        </svg>
+      </figure>
+      <h4>해석의 3단계</h4>
+      <ol>
+        <li><b>요인을 짚는다</b> — 층을 나눈 것은 <b>빛(비생물적 요인)</b>이다. 위층이 빛을 먼저 가로채므로, 아래로 갈수록 빛이 줄어드는 기울기가 생긴다.</li>
+        <li><b>배우를 읽는다</b> — 각 층의 식물은 그 층의 빛에 맞는 잎을 가진다. 꼭대기의 잎은 두꺼운 양엽형, 바닥의 풀과 이끼는 약한 빛에서도 광합성이 가능한 형태 — 한 숲 안에 여러 답안지가 공존한다.</li>
+        <li><b>거꾸로도 본다</b> — 층상 구조 자체가 숲 내부의 빛·온도·습도를 다시 바꾼다(생물 → 환경). 숲 바닥이 서늘하고 축축한 이유다 — 화살표는 여기서도 쌍방향이다.</li>
+      </ol>
+      <h4>결론</h4>
+      <p>숲의 층상 구조는 <b>비생물적 요인(빛)이 생물의 분포를 결정하고, 그 생물들이 다시 환경을 바꾸는</b> 상호 관계의 축소판이다. 한 장의 단면도에서 이 소단원 전체가 읽힌다.</p>
+      <div class="expoint">
+        <div class="boxtitle"><span class="ico">!</span>시험엔 이렇게</div>
+        <p>층상 구조 문제의 정답 요인은 언제나 <b>빛</b> — 온도·물을 고르면 함정에 빠진 것. "숲 바닥에는 식물이 살 수 없다"(X — 약한 빛에 적응한 식물이 산다)도 단골.</p>
+      </div>
+    </div>
+  </div>
+  <div class="folio"><span>II. 환경과 에너지</span><span class="num">82</span></div>
+</div>
+
+<!-- ═════════════ p.83 STEP 1 + STEP 2 시작 ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag">II. 환경과 에너지</span><span class="lesson-tag">01. 생태계의 구성과 상호 관계 | 문제</span></div>
+  <div class="step-head"><span class="stepno">STEP 1</span><span class="steptt">개념 확인</span><span class="stepdesc">OX와 빈칸으로 개념 점검 — 막히면 알짜 정리로!</span></div>
+  <div class="qgrid">
+    <div>
+      <div class="q"><div class="qhead"><span class="qno">1</span><div class="stem">생태계는 생물적 요인만으로 이루어진다. <span class="ox-answer">( O , X )</span></div></div></div>
+      <div class="q"><div class="qhead"><span class="qno">2</span><div class="stem">곰팡이와 세균은 생산자에 속한다. <span class="ox-answer">( O , X )</span></div></div></div>
+      <div class="q"><div class="qhead"><span class="qno">3</span><div class="stem">지렁이가 토양을 비옥하게 하는 것은 생물이 환경에 영향을 준 예다. <span class="ox-answer">( O , X )</span></div></div></div>
+    </div>
+    <div>
+      <div class="q"><div class="qhead"><span class="qno">4</span><div class="stem">일정한 지역에 사는 같은 종 개체들의 무리를 <span class="blankline" style="min-width:14mm;"></span>이라 한다.</div></div></div>
+      <div class="q"><div class="qhead"><span class="qno">5</span><div class="stem">빛·온도·물·토양·공기 같은 환경 요인을 <span class="blankline" style="min-width:16mm;"></span> 요인이라 한다.</div></div></div>
+      <div class="q"><div class="qhead"><span class="qno">6</span><div class="stem">광합성으로 스스로 양분을 만드는 생물을 <span class="blankline" style="min-width:14mm;"></span>라 한다.</div></div></div>
+    </div>
+  </div>
+  <div style="border-top:0.5mm solid var(--line); margin:2mm 0 4mm;"></div>
+  <div class="step-head s2"><span class="stepno">STEP 2</span><span class="steptt">내신 완성</span><span class="stepdesc">학교 시험 유형 그대로 — 서술형까지 한 번에</span></div>
+  <div class="q">
+    <div class="qhead"><span class="qno">7</span><div class="stem">생태계의 구성 요소에 대한 설명으로 옳은 것은? <span class="difficulty">●●○</span>
+    <div class="tags">10통과2-02-01 | 개념 2·3</div></div></div>
+    <ul class="choices">
+      <li>① 생태계는 생물적 요인만으로 구성된다.</li>
+      <li>② 버섯과 세균은 죽은 생물을 분해해 양분을 얻는 분해자다.</li>
+      <li>③ 풀을 먹는 메뚜기는 생산자다.</li>
+      <li>④ 빛과 온도는 생물적 요인이다.</li>
+      <li>⑤ 식물 플랑크톤은 소비자다.</li>
+    </ul>
+  </div>
+  <div class="q">
+    <div class="qhead"><span class="qno">8</span><div class="stem">생태계의 위계에 대한 설명으로 옳은 것은? <span class="difficulty">●●○</span>
+    <div class="tags">10통과2-02-01 | 개념 1</div></div></div>
+    <ul class="choices">
+      <li>① 군집은 같은 종 개체들의 무리다.</li>
+      <li>② 생태계는 생물 군집만을 가리킨다.</li>
+      <li>③ 개체군이 모여 개체가 된다.</li>
+      <li>④ 연못의 물과 햇빛은 군집에 포함된다.</li>
+      <li>⑤ 개체 → 개체군 → 군집 → 생태계 순으로 확장된다.</li>
+    </ul>
+  </div>
+  <div class="folio"><span>II. 환경과 에너지</span><span class="num">83</span></div>
+</div>
+
+<!-- ═════════════ p.84 STEP 2 계속 ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag">II. 환경과 에너지</span><span class="lesson-tag">01. 생태계의 구성과 상호 관계 | 문제</span></div>
+  <div class="q">
+    <div class="qhead"><span class="qno">9</span><div class="stem">환경이 생물에 영향을 준 사례에 대한 설명으로 옳은 것은? <span class="difficulty">●●●</span>
+    <div class="tags">10통과2-02-01 | 개념 4</div></div></div>
+    <ul class="choices">
+      <li>① 사막여우의 큰 귀는 몸의 열을 지키기 위한 적응이다.</li>
+      <li>② 강한 빛을 받는 양엽은 음엽보다 얇다.</li>
+      <li>③ 나무의 낙엽은 강한 빛에 대한 적응이다.</li>
+      <li>④ 북극여우의 작은 귀는 열 방출을 줄이는 데 유리하다.</li>
+      <li>⑤ 선인장의 가시는 낮은 온도에 대한 적응이다.</li>
+    </ul>
+  </div>
+  <div class="q">
+    <div class="qhead"><span class="qno">10</span><div class="stem">생물이 환경에 영향을 준 예로 옳은 것만을 고른 것은? <span class="difficulty">●●●</span>
+    <div class="tags">10통과2-02-01 | 개념 5</div></div></div>
+    <div class="bogi-box" style="background:#fff;">
+      (가) 식물의 광합성이 대기의 산소 농도를 높인다.<br>
+      (나) 지렁이가 흙을 헤집어 토양의 통기성을 높인다.<br>
+      (다) 일조 시간이 식물의 개화 시기를 결정한다.
+    </div>
+    <ul class="choices inline">
+      <li>① (가)</li><li>② (다)</li><li>③ (가), (나)</li><li>④ (나), (다)</li><li>⑤ (가), (나), (다)</li>
+    </ul>
+  </div>
+  <div class="q">
+    <div class="qhead"><span class="qno">11</span><div class="stem"><span class="badge-essay">서술형</span>더운 지역의 사막여우는 귀가 크고, 추운 지역의 북극여우는 귀가 작다. 그 까닭을 <b>'온도'와 '열'</b>이라는 말을 포함하여 서술하시오. <span class="difficulty">●●●●</span>
+    <div class="tags">10통과2-02-01 | 개념 4</div></div></div>
+    <div class="essay-lines"><div></div><div></div><div></div></div>
+  </div>
+  <div class="folio"><span>II. 환경과 에너지</span><span class="num">84</span></div>
+</div>
+
+<!-- ═════════════ p.85 STEP 3 ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag">II. 환경과 에너지</span><span class="lesson-tag">01. 생태계의 구성과 상호 관계 | 문제</span></div>
+  <div class="step-head s3"><span class="stepno">STEP 3</span><span class="steptt">수능 도전</span><span class="stepdesc">2028 수능 규격 — ㄱㄴㄷ 합답형·자료 해석</span></div>
+  <div class="q">
+    <div class="qhead"><span class="qno">12</span><div class="stem"><span class="badge-data">자료</span>그림은 우거진 숲의 높이별 층 구조와, 각 층에 도달하는 빛의 세기를 나타낸 것이다. 옳은 것만을 &lt;보기&gt;에서 있는 대로 고른 것은? <span class="difficulty">[2점]</span>
+    <div class="tags">10통과2-02-01</div></div></div>
+    <figure style="margin:2mm 0 1.5mm 8.6mm;">
+      <svg width="300" height="86" viewBox="0 0 300 86" font-family="PC Sans">
+        <g font-size="6.4">
+          <rect x="20" y="8" width="150" height="16" fill="#5E9C57" rx="2"/><text x="27" y="19" fill="#fff" font-weight="800">교목층</text>
+          <rect x="20" y="27" width="150" height="15" fill="#7FB56E" rx="2"/><text x="27" y="38" fill="#fff" font-weight="800">관목층</text>
+          <rect x="20" y="45" width="150" height="15" fill="#A8C98A" rx="2"/><text x="27" y="56" fill="#3D5A2E" font-weight="800">초본층</text>
+          <rect x="20" y="63" width="150" height="14" fill="#C9BA9B" rx="2"/><text x="27" y="73" fill="#5A4A30" font-weight="800">지표층(이끼)</text>
+          <g font-weight="800" text-anchor="start">
+            <text x="192" y="19" fill="#E8940A">빛 100 %</text>
+            <text x="192" y="38" fill="#C9820A">빛 감소</text>
+            <text x="192" y="56" fill="#A08A55">빛 크게 감소</text>
+            <text x="192" y="73" fill="#7A6A45">빛 수 %</text>
+          </g>
+        </g>
+      </svg>
+    </figure>
+    <div class="bogi-box">
+      <div class="bt">보기</div>
+      ㄱ. 숲의 층상 구조는 비생물적 요인인 빛이 생물의 분포에 영향을 준 예다.<br>
+      ㄴ. 지표층의 이끼는 약한 빛에서도 광합성을 할 수 있다.<br>
+      ㄷ. 층상 구조는 숲 내부의 온도와 습도에도 영향을 준다.
+    </div>
+    <ul class="choices inline">
+      <li>① ㄱ</li><li>② ㄷ</li><li>③ ㄱ, ㄴ</li><li>④ ㄴ, ㄷ</li><li>⑤ ㄱ, ㄴ, ㄷ</li>
+    </ul>
+  </div>
+  <div class="q">
+    <div class="qhead"><span class="qno">13</span><div class="stem">생태계에서 생물과 환경의 상호 관계에 대한 설명으로 옳은 것만을 &lt;보기&gt;에서 있는 대로 고른 것은? <span class="difficulty">[2.5점]</span>
+    <div class="tags">10통과2-02-01</div></div></div>
+    <div class="bogi-box">
+      <div class="bt">보기</div>
+      ㄱ. 생태계에서 생물과 환경은 서로 영향을 주고받는다.<br>
+      ㄴ. 분해자가 사라져도 생태계의 물질 순환에는 문제가 없다.<br>
+      ㄷ. 비생물적 요인은 생물의 영향을 받지 않는다.
+    </div>
+    <ul class="choices inline">
+      <li>① ㄱ</li><li>② ㄴ</li><li>③ ㄱ, ㄴ</li><li>④ ㄱ, ㄷ</li><li>⑤ ㄱ, ㄴ, ㄷ</li>
+    </ul>
+  </div>
+  <div class="folio"><span>II. 환경과 에너지</span><span class="num">85</span></div>
+</div>
+
+<!-- ═════════════ p.86 해설 1 ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag" style="color:var(--brand);">알짜 해설</span><span class="lesson-tag">01. 생태계의 구성과 상호 관계</span></div>
+  <div class="sol-head"><span class="stt">알짜 해설</span><span class="sub">전 문항 해설 + 오답 선지 분석 — 맞힌 문제도 해설로 한 번 더!</span></div>
+  <table class="anstable">
+    <tr><th>문항</th><td>1</td><td>2</td><td>3</td><td>4</td><td>5</td><td>6</td><td>7</td><td>8</td><td>9</td><td>10</td><td>11</td><td>12</td><td>13</td></tr>
+    <tr><th>정답</th><td class="a">X</td><td class="a">X</td><td class="a">O</td><td class="a">개체군</td><td class="a">비생물적</td><td class="a">생산자</td><td class="a">②</td><td class="a">⑤</td><td class="a">④</td><td class="a">③</td><td class="a">서술형</td><td class="a">⑤</td><td class="a">①</td></tr>
+  </table>
+  <div class="solcols">
+    <div>
+      <div class="sol"><div class="shead"><span class="sno">1</span><span class="sans">X</span><span class="slink">개념 1</span></div>
+        <p>생태계 = 생물적 요인 + 비생물적 요인(환경)의 시스템.</p></div>
+      <div class="sol"><div class="shead"><span class="sno">2</span><span class="sans">X</span><span class="slink">개념 2</span></div>
+        <p>곰팡이·세균은 분해자 — 광합성을 못 한다.</p></div>
+      <div class="sol"><div class="shead"><span class="sno">3</span><span class="sans">O</span><span class="slink">개념 5</span></div>
+        <p>생물 → 환경 방향의 대표 사례다.</p></div>
+      <div class="sol"><div class="shead"><span class="sno">4</span><span class="sans">개체군</span><span class="slink">개념 1</span></div>
+        <p>같은 종의 무리 — '군'자에 속지 말 것.</p></div>
+      <div class="sol"><div class="shead"><span class="sno">5</span><span class="sans">비생물적</span><span class="slink">개념 3</span></div>
+        <p>빛·온도·물·토양·공기 — 무대 장치 5형제.</p></div>
+      <div class="sol"><div class="shead"><span class="sno">6</span><span class="sans">생산자</span><span class="slink">개념 2</span></div>
+        <p>스스로 만드는 자 — 생태계 양분의 입구.</p></div>
+    </div>
+    <div>
+      <div class="sol"><div class="shead"><span class="sno">7</span><span class="sans">②</span><span class="slink">개념 2·3</span></div>
+        <p>버섯·세균 = 분해자. 정의 그대로다.</p>
+        <div class="wrongbox"><div class="wt">오답 왜 틀렸나</div>
+          <p><b>①</b> 환경까지 포함. <b>③</b> 메뚜기는 1차 소비자. <b>④</b> 빛·온도는 비생물적. <b>⑤</b> 식물 플랑크톤은 광합성 하는 생산자.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">8</span><span class="sans">⑤</span><span class="slink">개념 1</span></div>
+        <p>확장의 사다리: 개체 → 개체군 → 군집 → 생태계.</p>
+        <div class="wrongbox"><div class="wt">오답 왜 틀렸나</div>
+          <p><b>①</b> 군집은 여러 종. <b>②</b> 생태계는 환경 포함. <b>③</b> 방향 반대. <b>④</b> 물·햇빛은 군집이 아니라 생태계 단계에서 들어온다.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">9</span><span class="sans">④</span><span class="slink">개념 4</span></div>
+        <p>작은 귀 = 열 손실 줄이기 — 추운 곳의 답안지.</p>
+        <div class="wrongbox"><div class="wt">오답 왜 틀렸나</div>
+          <p><b>①</b> 큰 귀는 열 방출용. <b>②</b> 양엽은 두껍다. <b>③</b> 낙엽은 온도(겨울) 적응. <b>⑤</b> 가시는 물 부족 적응.</p></div></div>
+    </div>
+  </div>
+  <div class="folio"><span>알짜 해설</span><span class="num">86</span></div>
+</div>
+
+<!-- ═════════════ p.87 해설 2 ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag" style="color:var(--brand);">알짜 해설</span><span class="lesson-tag">01. 생태계의 구성과 상호 관계</span></div>
+  <div class="solcols">
+    <div>
+      <div class="sol"><div class="shead"><span class="sno">10</span><span class="sans">③</span><span class="slink">개념 5</span></div>
+        <p>(가) 광합성 → 대기 조성 변화, (나) 지렁이 → 토양 개조 — 둘 다 생물이 환경을 바꾼 예다.</p>
+        <div class="wrongbox"><div class="wt">오답 왜 틀렸나</div>
+          <p><b>(다)</b> 일조 시간 → 개화는 <b>환경 → 생물</b> 방향이다 — 화살표의 방향을 먼저 그려라.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">11</span><span class="sans">모범 답안</span><span class="slink">개념 4</span></div>
+        <p>귀가 크면 몸의 <b>열</b>을 내보내는 표면이 넓어진다. 더운 지역의 사막여우는 큰 귀로 열을 잘 방출해 체온을 지키고, 추운 지역의 북극여우는 작은 귀로 열 손실을 줄인다 — 서식지의 <b>온도</b>에 적응한 결과다.</p>
+        <div class="wrongbox"><div class="wt">채점 기준 (감점 포인트)</div>
+          <p>① 귀 = 열 출입의 표면 ② 더운 곳: 방출 유리 ③ 추운 곳: 손실 감소 — 양쪽을 모두 서술해야 만점.</p></div></div>
+    </div>
+    <div>
+      <div class="sol"><div class="shead"><span class="sno">12</span><span class="sans">⑤</span><span class="slink">개념 4·자료 | 2점</span></div>
+        <p><b>ㄱ (옳음)</b> 층을 나눈 요인은 빛. <b>ㄴ (옳음)</b> 바닥의 이끼는 약한 빛에 적응했다. <b>ㄷ (옳음)</b> 층상 구조가 숲 내부 환경을 다시 바꾼다 — 쌍방향.</p>
+        <div class="wrongbox"><div class="wt">함정 체크</div>
+          <p>ㄷ까지 골라야 만점 — <b>생물 → 환경</b> 방향을 빼먹는 것이 최다 실점 포인트다.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">13</span><span class="sans">①</span><span class="slink">개념 2·5 | 2.5점</span></div>
+        <p><b>ㄱ (옳음)</b> 상호 관계의 정의 그대로. <b>ㄴ (틀림)</b> 분해자가 없으면 물질이 되돌아가지 못해 순환이 멈춘다. <b>ㄷ (틀림)</b> 광합성이 대기를 바꿨듯, 비생물적 요인도 생물의 영향을 받는다.</p>
+        <div class="wrongbox"><div class="wt">함정 체크</div>
+          <p>ㄴ·ㄷ은 모두 '한 방향 화살표'의 함정 — 생태계의 화살표는 <b>언제나 쌍방향</b>이다.</p></div></div>
+
+      <div class="gist" style="margin-top:5mm;">
+        <div class="boxtitle"><span class="ico">알</span>이 소단원, 이것만은!</div>
+        <ul>
+          <li>위계: 개체 → <b>개체군(같은 종)</b> → <b>군집(여러 종)</b> → <b>생태계(+환경)</b></li>
+          <li>3배역: 생산자(입구) · 소비자 · <b>분해자(순환의 완성)</b> / 비생물 5요인: 빛·온도·물·토양·공기</li>
+          <li>상호 관계는 <b>쌍방향</b> — 여우 귀(환경→생물) vs 산소 대기·지렁이(생물→환경)</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div class="folio"><span>알짜 해설</span><span class="num">87</span></div>
+</div>
+
+<!-- ═════════════ p.88 MEMO ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag">II. 환경과 에너지</span><span class="lesson-tag">01 ▸ 02 넘어가기 전에</span></div>
+  <div class="memo-head"><span class="mt">MEMO</span><span class="ms">헷갈린 개념, 다시 틀린 문제 번호, 나만의 암기법을 남겨 두는 자리</span></div>
+  <div class="memo-area"></div>
+  <div class="memo-pen">"'여우 귀·낙엽·겨울잠 = 온도, 잎·개화·층상 = 빛, 가시 = 물' — 사례와 요인을 짝지어 말해 보자. 막히면 80쪽으로! — 박찬쌤"</div>
+  <div class="folio"><span>박찬 과학 | 통합과학 2</span><span class="num">88</span></div>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<title>박찬 과학 통합과학2 — 대단원 마무리 II — 환경과 에너지</title>
+<style>
+  @font-face { font-family:'PC Sans'; src:url('file:///root/.fonts/NotoSansKR.ttf'); font-weight:100 900; }
+  @font-face { font-family:'PC Serif'; src:url('file:///root/.fonts/NotoSerifKR.ttf'); font-weight:100 900; }
+  @font-face { font-family:'PC Pen'; src:url('file:///root/.fonts/YeonSung-Regular.ttf'); font-weight:400; }
+
+  :root{
+    --brand:#0E5A6B;        /* 박찬 과학 브랜드 딥틸 */
+    --brand-lt:#E3F0F3;
+    --unit:#147D6F;         /* II. 환경과 에너지 단원 컬러(딥 틸) */
+    --unit-lt:#E7F5F1;
+    --unit-md:#A9D9CE;
+    --accent:#E8940A;       /* 알짜 앰버 */
+    --accent-lt:#FDF3E0;
+    --point:#D6455D;        /* 시험 포인트 */
+    --point-lt:#FBEBEE;
+    --ink:#22303A;
+    --sub:#5B6B77;
+    --line:#D8E0E5;
+  }
+  *{ box-sizing:border-box; margin:0; padding:0; -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+  @page{ size:210mm 275mm; margin:0; }
+  html,body{ font-family:'PC Sans',sans-serif; color:var(--ink); word-break:keep-all; overflow-wrap:anywhere; }
+
+  .page{ width:210mm; height:275mm; position:relative; overflow:hidden; background:#fff; page-break-after:always; padding:14mm 13mm 19mm 15mm; display:flex; flex-direction:column; }
+
+  /* ── 러닝 헤드 / 풋 ── */
+  .runhead{ display:flex; align-items:center; justify-content:space-between; border-bottom:0.35mm solid var(--unit); padding-bottom:2mm; margin-bottom:6.5mm; }
+  .runhead .unit-tag{ font-size:8.5pt; font-weight:700; color:var(--unit); letter-spacing:0.02em; }
+  .runhead .lesson-tag{ font-size:8.5pt; color:var(--sub); }
+  .folio{ position:absolute; bottom:7mm; left:0; right:0; display:flex; justify-content:space-between; padding:0 14mm 0 14mm; font-size:8pt; color:var(--sub); }
+  .folio .num{ font-weight:800; color:var(--unit); font-size:10pt; }
+
+  /* ── 본문 그리드: 본문 + 날개단 ── */
+  .cols{ display:grid; grid-template-columns:1fr 43mm; gap:8mm; flex:1; min-height:0; margin-bottom:4mm; }
+  .main{ min-width:0; }
+  .wing{ border-left:0.3mm solid var(--line); padding-left:5mm; font-size:8.2pt; color:var(--sub); line-height:1.7; }
+
+  /* ── 타이포 ── */
+  h2.lesson-title{ display:flex; align-items:baseline; gap:3.5mm; margin-bottom:2mm; }
+  h2.lesson-title .no{ background:var(--unit); color:#fff; font-size:13pt; font-weight:900; padding:1.2mm 3.2mm; border-radius:1.5mm; }
+  h2.lesson-title .tt{ font-size:16.5pt; font-weight:900; letter-spacing:-0.01em; }
+  .std-badges{ display:flex; gap:2mm; margin:2mm 0 6.5mm; }
+  .std{ font-size:7.4pt; color:var(--unit); background:none; border:0.3mm solid var(--unit-md); border-radius:5mm; padding:0.6mm 2.8mm; font-weight:600; }
+
+  h3.sec{ display:flex; align-items:baseline; gap:3mm; font-size:12.5pt; font-weight:800; margin:9mm 0 3.6mm; letter-spacing:-0.01em; }
+  h3.sec .n{ font-family:'PC Serif'; font-size:15.5pt; font-weight:900; color:var(--unit); border-bottom:0.7mm solid var(--accent); padding:0 0.8mm 0.2mm; flex:0 0 auto; line-height:1; }
+  h3.sec::after{ content:""; flex:1; border-top:0.25mm solid var(--line); align-self:center; margin-left:2mm; }
+  h3.sec:first-child{ margin-top:0; }
+
+  p.body{ font-family:'PC Serif'; font-size:9.6pt; line-height:1.92; margin-bottom:3.6mm; text-align:justify; }
+  p.body b{ font-weight:800; }
+  .kw{ font-weight:800; color:var(--unit); }
+  .u-amber{ background:#F8E9C6; font-weight:700; padding:0.15mm 0.6mm; border-radius:0.6mm; box-decoration-break:clone; -webkit-box-decoration-break:clone; }
+
+  ul.pts{ font-family:'PC Serif'; font-size:9.6pt; line-height:1.84; margin:1.5mm 0 3.5mm 1mm; list-style:none; }
+  ul.pts li{ padding-left:4.5mm; position:relative; margin-bottom:1.8mm; }
+  ul.pts li::before{ content:""; position:absolute; left:0.5mm; top:2.9mm; width:1.7mm; height:1.7mm; background:var(--accent); border-radius:50%; }
+
+  /* ── 코너 박스 ── */
+  .boxtitle{ display:inline-flex; align-items:center; gap:1.8mm; font-weight:900; font-size:9.5pt; margin-bottom:1.6mm; }
+  .boxtitle .ico{ width:5.2mm; height:5.2mm; border-radius:1.2mm; display:flex; align-items:center; justify-content:center; color:#fff; font-size:7.5pt; font-weight:900; }
+
+  .gist{ background:none; border:none; border-top:0.5mm solid var(--accent); border-bottom:0.5mm solid var(--accent); border-radius:0; padding:3.2mm 1.8mm 3mm; margin:6mm 0 5mm; }
+  .gist .boxtitle{ color:#9C6503; } .gist .ico{ background:var(--accent); }
+  .gist ul{ list-style:none; font-family:'PC Serif'; font-size:9.3pt; line-height:1.78; }
+  .gist li{ padding-left:4.2mm; position:relative; margin-bottom:1.2mm;}
+  .gist li::before{ content:"✓"; position:absolute; left:0; color:var(--accent); font-weight:900; }
+
+  .expoint{ background:none; border-left:0.5mm solid #D998A4; border-left-color:#D998A4; border-radius:0; padding:1.4mm 0 1.4mm 3.6mm; margin:4.5mm 0; }
+  .expoint .boxtitle{ color:#A9556A; font-size:8.6pt; margin-bottom:1mm;}
+  .expoint .ico{ background:none; color:#A9556A; border:0.35mm solid #D998A4; width:4.4mm; height:4.4mm; border-radius:50%; font-size:7pt; }
+  .expoint p{ font-family:'PC Serif'; font-size:8.9pt; line-height:1.7; }
+
+  .pen{ font-family:'PC Pen'; font-size:12pt; color:#0F6357; line-height:1.45; }
+  .saem{ display:flex; gap:3mm; align-items:flex-start; margin:4.5mm 0; }
+  .saem .avatar{ flex:0 0 auto; width:10.5mm; height:10.5mm; border-radius:50%; background:var(--brand); color:#fff; font-size:7pt; font-weight:800; display:flex; align-items:center; justify-content:center; line-height:1.35; letter-spacing:0.04em; text-align:center; border:0.5mm solid var(--accent); box-sizing:border-box;}
+  .saem .bubble{ background:#FFFBF0; border:0.4mm solid #EBCB9C; border-radius:3mm; padding:2.2mm 3.6mm 2mm; position:relative; }
+  .saem .bubble::before{ content:""; position:absolute; left:-1.8mm; top:3.2mm; width:3mm; height:3mm; background:#FFFBF0; border-left:0.4mm solid #EBCB9C; border-bottom:0.4mm solid #EBCB9C; transform:rotate(45deg); }
+
+  .wing .wtitle{ font-size:8pt; font-weight:900; color:var(--brand); display:flex; align-items:center; gap:1.5mm; margin:0 0 2.4mm; letter-spacing:0.05em; }
+  .wing .wtitle::before{ content:""; width:2.4mm; height:2.4mm; background:var(--accent); border-radius:50%; }
+  .wing .term{ margin-bottom:3.6mm; }
+  .wing .term b{ color:var(--ink); font-weight:800; display:block; font-size:8.5pt; margin-bottom:0.7mm;}
+  .wing .wsep{ border-top:0.3mm dashed var(--line); margin:4.5mm 0; }
+  .wing .wing-pen{ font-family:'PC Pen'; font-size:11pt; color:#0F6357; line-height:1.45; }
+
+  figure{ margin:5mm 0; }
+  figure figcaption{ font-size:8pt; color:var(--sub); text-align:center; margin-top:2mm; }
+  figure svg{ display:block; margin:0 auto; }
+
+  /* ── 비교형 그림 (2패널 + 범례) ── */
+  .fig-duo{ display:flex; align-items:stretch; gap:2.5mm; justify-content:center; }
+  .fig-duo .panel{ flex:0 0 auto; text-align:center; }
+  .fig-duo .p-title{ font-size:9pt; font-weight:900; color:var(--ink); margin-top:1.6mm; }
+  .fig-duo .p-sub{ font-size:7.8pt; color:var(--sub); line-height:1.45; margin-top:0.5mm; }
+  .fig-duo .mid{ display:flex; flex-direction:column; align-items:center; justify-content:center; gap:1mm; padding:0 1mm; }
+  .fig-duo .mid .mlab{ font-size:7.6pt; font-weight:800; color:var(--unit); text-align:center; line-height:1.3; }
+  .fig-legend{ display:flex; justify-content:center; gap:5mm; font-size:7.8pt; color:var(--ink); margin-top:1.2mm; align-items:center; }
+  .fig-legend span{ display:inline-flex; align-items:center; gap:1.4mm; }
+
+  /* ── 탐구 (자료 파헤치기) ── */
+  .lab{ border:0.5mm solid var(--brand); border-radius:2.5mm; overflow:hidden; margin-top:1mm;}
+  .lab .lab-head{ background:var(--brand); color:#fff; padding:2.2mm 4mm; font-weight:900; font-size:11pt; display:flex; align-items:center; gap:2.5mm;}
+  .lab .lab-head .tag{ font-size:7.5pt; background:rgba(255,255,255,.22); padding:0.6mm 2.4mm; border-radius:4mm; font-weight:700;}
+  .lab .lab-body{ padding:3.5mm 4mm; }
+  .lab h4{ font-size:9.6pt; font-weight:900; color:var(--brand); margin:2.5mm 0 1.4mm; }
+  .lab h4:first-child{ margin-top:0; }
+  .lab p, .lab li{ font-family:'PC Serif'; font-size:9.3pt; line-height:1.8; }
+  .lab ol{ margin-left:5mm; }
+
+  /* ── 문제부 ── */
+  .step-head{ display:flex; align-items:center; gap:3mm; margin:0 0 5mm; }
+  .step-head .stepno{ background:var(--unit); color:#fff; font-weight:900; font-size:9.5pt; padding:1.4mm 3.4mm; border-radius:1.5mm; letter-spacing:0.04em;}
+  .step-head .steptt{ font-size:12.5pt; font-weight:900; }
+  .step-head .stepdesc{ font-size:8.2pt; color:var(--sub); margin-left:auto; }
+  .step-head.s2 .stepno{ background:var(--brand); }
+  .step-head.s3 .stepno{ background:var(--point); }
+
+  .q{ margin-bottom:7.5mm; break-inside:avoid; }
+  .q .qhead{ display:flex; gap:2.4mm; align-items:flex-start; }
+  .q .qno{ flex:0 0 auto; min-width:6.2mm; height:6.2mm; border:0.45mm solid var(--unit); color:var(--unit); border-radius:50%; font-size:8.6pt; font-weight:900; line-height:1; display:flex; align-items:center; justify-content:center; padding-top:0.55mm; margin-top:0.4mm;}
+  .q .stem{ font-family:'PC Serif'; font-size:9.5pt; line-height:1.74; font-weight:500; }
+  .q .stem .difficulty{ color:#C9A227; font-size:8pt; letter-spacing:0.06em; margin-left:1.5mm;}
+  .q .tags{ margin-top:0.8mm; font-size:7pt; color:var(--sub); font-family:'PC Sans';}
+  .choices{ list-style:none; margin:2.2mm 0 0 8.6mm; font-family:'PC Serif'; font-size:9.3pt; line-height:1.85; }
+  .choices.inline{ display:flex; flex-wrap:wrap; gap:0 6mm; }
+  .bogi-box{ border:0.35mm solid #B8C2CA; border-radius:0; margin:2.5mm 0 0 8.6mm; padding:2.4mm 3.2mm; font-family:'PC Serif'; font-size:9.2pt; line-height:1.8; background:none;}
+  .bogi-box .bt{ text-align:center; font-weight:800; color:var(--sub); font-size:8.4pt; margin-bottom:0.8mm; letter-spacing:0.3em;}
+  .ox-answer{ margin-left:2mm; color:var(--sub); font-size:9pt; }
+  .blankline{ display:inline-block; min-width:14mm; border-bottom:0.4mm solid var(--ink); }
+  .qgrid{ display:grid; grid-template-columns:1fr 1fr; gap:0 9mm; }
+  .essay-lines{ margin:2mm 0 0 8.4mm; }
+  .essay-lines div{ border-bottom:0.3mm solid var(--line); height:6.2mm; }
+  .badge-essay{ display:inline-block; background:var(--point); color:#fff; font-size:7pt; font-weight:800; padding:0.4mm 2mm; border-radius:1mm; vertical-align:1pt; margin-right:1.2mm;}
+  .badge-data{ display:inline-block; background:var(--brand); color:#fff; font-size:7pt; font-weight:800; padding:0.4mm 2mm; border-radius:1mm; vertical-align:1pt; margin-right:1.2mm;}
+
+  /* ── 해설부 ── */
+  .sol-head{ display:flex; align-items:center; gap:3mm; margin-bottom:4mm;}
+  .sol-head .stt{ font-size:14.5pt; font-weight:900; color:var(--brand);}
+  .sol-head .sub{ font-size:8.5pt; color:var(--sub);}
+  .anstable{ width:100%; border-collapse:collapse; margin-bottom:4.5mm; }
+  .anstable th,.anstable td{ border:0.3mm solid var(--line); font-size:8.8pt; padding:1.4mm 0; text-align:center; }
+  .anstable th{ background:var(--brand-lt); color:var(--brand); font-weight:800; }
+  .anstable td.a{ font-weight:900; color:var(--unit); }
+  .sol{ margin-bottom:5mm; break-inside:avoid; }
+  .sol .shead{ display:flex; align-items:center; gap:2mm; margin-bottom:1.4mm;}
+  .sol .sno{ background:var(--unit); color:#fff; min-width:6mm; height:5.4mm; border-radius:1.2mm; font-size:8.6pt; font-weight:900; line-height:1; display:flex; align-items:center; justify-content:center; padding:0.5mm 1.5mm 0;}
+  .sol .sans{ font-weight:900; color:var(--unit); font-size:9.6pt;}
+  .sol .slink{ font-size:7.2pt; color:var(--sub); margin-left:auto;}
+  .sol p{ font-family:'PC Serif'; font-size:9.1pt; line-height:1.76; margin-bottom:0.8mm; }
+  .wrongbox{ background:none; border:none; border-left:0.7mm solid #E3A0AC; border-radius:0; padding:1mm 0 1mm 3mm; margin-top:2mm;}
+  .wrongbox .wt{ font-size:8pt; font-weight:900; color:var(--point); margin-bottom:0.8mm; font-family:'PC Sans';}
+  .wrongbox p{ font-family:'PC Serif'; font-size:8.6pt; line-height:1.68; margin-bottom:0.9mm;}
+  .wrongbox p:last-child{ margin-bottom:0; }
+  .solcols{ display:grid; grid-template-columns:1fr 1fr; gap:0 9mm; }
+
+  /* ── 단원 도입 (타이포그래피 중심) ── */
+  .opener{ padding:0 0 19mm; }
+  .opener-hero{ position:relative; padding:7mm 20mm 4.5mm; overflow:hidden; flex-shrink:0; }
+  .ghost-txt{ position:absolute; top:-10mm; right:6mm; font-size:118pt; font-weight:900; color:#EAF5F1; line-height:1; letter-spacing:-0.04em; }
+  .kicker{ display:flex; align-items:center; gap:4mm; position:relative; }
+  .kicker .kt{ font-size:9.5pt; font-weight:800; color:var(--unit); letter-spacing:0.24em; white-space:nowrap; }
+  .kicker::after{ content:""; flex:1; border-top:0.3mm solid var(--line); }
+  .opener-hero h1{ position:relative; font-size:36pt; font-weight:900; letter-spacing:-0.015em; margin:4mm 0 0; }
+  .opener-hero h1 .tick{ display:block; width:14mm; border-top:1.4mm solid var(--accent); margin-bottom:3.6mm; }
+  .opener-lede{ position:relative; font-family:'PC Serif'; font-size:10.2pt; font-weight:600; line-height:2.0; color:#3D4C58; max-width:138mm; margin-top:4mm; padding-left:5mm; border-left:0.8mm solid var(--accent); }
+  .opener-inner{ padding:0 20mm; }
+
+  /* ── 원소의 여정 스트립 ── */
+  .journey{ margin-top:3.5mm; }
+  .journey .j-label{ font-size:8pt; font-weight:800; color:var(--sub); letter-spacing:0.08em; margin-bottom:2.4mm; display:flex; align-items:center; gap:1.6mm;}
+  .journey .j-label::before{ content:""; width:2.4mm; height:2.4mm; background:var(--unit); border-radius:50%; }
+  .j-bar{ display:flex; align-items:center; gap:2mm; }
+  .j-chip{ flex:1; text-align:center; background:#EFF8F5; border:0.35mm solid #A9D9CE; color:#147D6F; border-radius:1.6mm; padding:3mm 1mm 2.6mm; }
+  .j-chip .jc-t{ font-size:8.8pt; font-weight:800; display:block; }
+  .j-chip .jc-s{ font-size:6.8pt; color:var(--sub); display:block; margin-top:0.5mm; }
+  .j-chip.on{ background:var(--unit); border-color:var(--unit); }
+  .j-chip.on .jc-t{ color:#fff; }
+  .j-chip.on .jc-s{ color:#C9E7DF; }
+  .j-arrow{ flex:0 0 auto; color:#6FB8AA; font-size:10pt; font-weight:900; }
+  .toc{ margin-top:6.5mm; }
+  .toc .toc-title{ font-size:11pt; font-weight:900; color:var(--ink); margin-bottom:3mm; display:flex; align-items:center; gap:2.5mm;}
+  .toc .toc-title::before{ content:""; width:3.4mm; height:3.4mm; background:var(--accent); border-radius:0.8mm; }
+  .toc-item{ display:flex; align-items:flex-start; gap:5mm; padding:4.4mm 6mm; border-bottom:0.3mm solid var(--line); }
+  .toc-item:first-of-type{ border-top:0.3mm solid var(--line); }
+  .toc-item.active{ background:#EFF8F5; border-left:1.2mm solid #4BA394; }
+  .toc-item .tno{ font-family:'PC Serif'; font-weight:900; color:#4BA394; font-size:14pt; width:10mm; line-height:1.1; flex:0 0 auto;}
+  .toc-item .tbody{ flex:1; min-width:0; }
+  .toc-item .ttt{ font-weight:800; font-size:10.5pt; letter-spacing:0.01em; display:flex; align-items:center;}
+  .toc-item .tdesc{ font-family:'PC Serif'; font-size:8.6pt; font-weight:600; color:#4A5964; margin-top:0.7mm; line-height:1.55;}
+  .toc-item .tstd{ font-size:7.2pt; color:var(--sub); flex:0 0 auto; padding-top:1.2mm;}
+  .toc-item.active .tag-now{ background:var(--accent); color:#fff; font-size:7pt; font-weight:900; border-radius:4mm; padding:0.7mm 2.6mm; margin-left:3.5mm;}
+  .toc-item .tag-done{ font-size:7.2pt; font-weight:800; color:#147D6F; margin-left:3.5mm; }
+  .opener-quote{ margin-top:7mm; text-align:center; font-family:'PC Serif'; font-size:9.8pt; font-weight:600; color:#4A5964; letter-spacing:0.01em; }
+  .opener-quote .who{ font-size:8pt; color:var(--sub); font-weight:400; margin-left:2.5mm; }
+  .qa-lead li .qgo{ font-family:'PC Sans'; font-size:7.4pt; font-weight:800; color:var(--unit); background:var(--unit-lt); border-radius:3mm; padding:0.5mm 2.2mm; margin-left:2mm; white-space:nowrap; vertical-align:1pt;}
+  .qa-lead{ margin-top:5mm; border:none; border-top:0.45mm solid var(--brand); border-bottom:0.45mm solid var(--brand); background:none; border-radius:0; padding:3mm 2mm 2.8mm; }
+  .qa-lead .qt{ font-weight:900; color:var(--brand); font-size:10.5pt; margin-bottom:2mm;}
+  .qa-lead li{ font-family:'PC Serif'; font-size:9.5pt; line-height:1.8; margin-left:5mm; }
+
+  /* ── 바로바로 체크 (개념 페이지 하단 즉석 OX) ── */
+  .quickcheck{ margin-top:auto; border-top:0.35mm dashed #C8B98F; padding-top:3mm; width:calc(100% - 51mm); }
+  .quickcheck .qc-title{ display:inline-flex; align-items:center; gap:1.6mm; font-size:8.2pt; font-weight:900; color:#9C6503; margin-bottom:1.4mm; }
+  .quickcheck .qc-title::before{ content:"✓"; color:var(--accent); font-weight:900; }
+  .quickcheck ol{ list-style:none; font-family:'PC Serif'; font-size:8.8pt; line-height:1.75; }
+  .quickcheck li{ display:flex; gap:2mm; align-items:baseline; }
+  .quickcheck li .no{ font-weight:800; color:var(--accent); flex:0 0 auto; }
+  .quickcheck .qc-ans{ margin-top:1mm; font-size:7.2pt; color:var(--sub); transform:rotate(180deg); text-align:left; }
+
+  /* ── 중학 과학 다시보기 (날개단) ── */
+  .wing .review{ background:#F6F3EC; border-radius:1.8mm; padding:2.8mm 3mm; margin-top:1mm; }
+  .wing .review .rv-title{ font-size:7.8pt; font-weight:900; color:#7A6A45; margin-bottom:1.4mm; display:flex; align-items:center; gap:1.4mm;}
+  .wing .review .rv-title::before{ content:"↺"; font-weight:900; color:#A08A55; }
+
+  /* ── MEMO 페이지 ── */
+  .memo-head{ display:flex; align-items:baseline; gap:3.5mm; margin-bottom:5mm; }
+  .memo-head .mt{ font-size:17pt; font-weight:900; color:var(--brand); letter-spacing:0.22em; }
+  .memo-head .ms{ font-size:8.6pt; color:var(--sub); }
+  .memo-area{ flex:1; border:0.4mm solid var(--line); border-radius:2.5mm;
+    background-image:linear-gradient(to bottom, transparent calc(100% - 0.3mm), #DCE4E9 0);
+    background-size:100% 9mm; background-position:0 4mm; padding:0 5mm; margin-bottom:4mm; }
+  .memo-pen{ font-family:'PC Pen'; font-size:12.5pt; color:#0F6357; text-align:right; }
+  /* ── 대단원 마무리 ── */
+  .sumgrid{ display:grid; grid-template-columns:1fr 1fr; gap:3.5mm; }
+  .sumcard{ border:0.4mm solid var(--unit-md); border-radius:2.5mm; padding:3mm 3.5mm 2.6mm; }
+  .sumcard .sc-h{ display:flex; align-items:baseline; gap:2.2mm; margin-bottom:1.6mm; }
+  .sumcard .sc-no{ background:var(--unit); color:#fff; font-size:8pt; font-weight:900; padding:0.5mm 2.2mm; border-radius:1.2mm; }
+  .sumcard .sc-t{ font-size:10pt; font-weight:900; }
+  .sumcard .sc-pg{ margin-left:auto; font-size:7.4pt; color:var(--sub); }
+  .sumcard ul{ list-style:none; font-family:"PC Serif"; font-size:8.7pt; line-height:1.68; }
+  .sumcard li{ padding-left:3.6mm; position:relative; margin-bottom:0.9mm; }
+  .sumcard li::before{ content:"✓"; position:absolute; left:0; color:var(--unit); font-weight:900; font-size:7.5pt; }
+  .chip{ display:inline-block; background:var(--unit-lt); color:var(--unit); font-size:7.4pt; font-weight:800; border-radius:3mm; padding:0.5mm 2.4mm; margin:0.8mm 1.2mm 0 0; font-family:"PC Sans"; }
+  .one-line{ margin-top:4.5mm; background:var(--accent-lt); border-radius:3mm; padding:3.6mm 6mm 3mm; text-align:center; }
+  .one-line .pen{ font-size:14.5pt; }
+  .final-check{ margin-top:4.5mm; border-top:0.45mm solid var(--unit); border-bottom:0.45mm solid var(--unit); padding:3mm 2mm 2.6mm; }
+  .final-check .fc-title{ font-weight:900; color:var(--unit); font-size:10pt; margin-bottom:1.8mm; }
+  .final-check ol{ list-style:none; font-family:"PC Serif"; font-size:9.2pt; line-height:1.85; }
+  .final-check li{ display:flex; gap:2mm; align-items:baseline; }
+  .final-check li .no{ font-weight:800; color:var(--accent); flex:0 0 auto; }
+  .final-check .qc-ans{ margin-top:1.4mm; font-size:7.2pt; color:var(--sub); transform:rotate(180deg); text-align:left; }
+</style>
+</head>
+<body>
+
+<!-- ═════════════ p.141 대단원 마무리 A — 단원 개념 지도 ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag">II. 환경과 에너지</span><span class="lesson-tag">대단원 마무리 — 단원을 한눈에</span></div>
+  <div class="sol-head"><span class="stt" style="color:var(--unit);">II단원을 한눈에 — 환경과 에너지</span><span class="sub">다섯 소단원은 한 줄로 이어진다: 잇고 → 버티고 → 흔들리고 → 받고 → 만든다</span></div>
+
+  <figure style="margin:3mm 0 0;">
+    <svg width="640" height="583" viewBox="0 0 505 460" font-family="PC Sans">
+      <defs>
+        <marker id="arrU" markerWidth="9" markerHeight="9" refX="7" refY="3.5" orient="auto"><path d="M0,0 L8,3.5 L0,7 Z" fill="#147D6F"/></marker>
+      </defs>
+      <!-- 출발 질문 -->
+      <rect x="102" y="6" width="300" height="30" rx="15" fill="#FDF3E0" stroke="#E8940A" stroke-width="1.2"/>
+      <text x="252" y="26" text-anchor="middle" font-size="11" font-weight="900" fill="#B4830A">지구라는 집은 무엇으로 지어지고, 무엇으로 돌아가나?</text>
+      <line x1="252" y1="38" x2="252" y2="52" stroke="#147D6F" stroke-width="2.2" marker-end="url(#arrU)"/>
+
+      <!-- 노드 01 -->
+      <g transform="translate(30,56)">
+        <rect width="445" height="62" rx="6" fill="#EFF8F5" stroke="#147D6F" stroke-width="1.4"/>
+        <rect x="0" y="0" width="86" height="62" rx="6" fill="#147D6F"/>
+        <text x="43" y="27" text-anchor="middle" font-size="13" font-weight="900" fill="#fff">01</text>
+        <text x="43" y="44" text-anchor="middle" font-size="10" font-weight="900" fill="#C9E7DF">잇는다</text>
+        <text x="100" y="18" font-size="10.5" font-weight="900" fill="#22303A">생태계의 구성과 상호 관계</text>
+        <text x="100" y="34" font-size="8.6" fill="#3D4C58">개체 → 개체군 → 군집 → 생태계 · 3배역(생산자·소비자·분해자) + 비생물 5요인</text>
+        <text x="100" y="50" font-size="8.6" font-weight="800" fill="#0F6357">화살표는 쌍방향 — 여우 귀(환경→생물) vs 산소 대기·지렁이(생물→환경)</text>
+      </g>
+      <line x1="252" y1="120" x2="252" y2="134" stroke="#147D6F" stroke-width="2.2" marker-end="url(#arrU)"/>
+      <text x="262" y="131" font-size="8" fill="#5B6B77">이 관계망은 어떻게 버티나?</text>
+
+      <!-- 노드 02 -->
+      <g transform="translate(30,138)">
+        <rect width="445" height="62" rx="6" fill="#EFF8F5" stroke="#147D6F" stroke-width="1.4"/>
+        <rect x="0" y="0" width="86" height="62" rx="6" fill="#147D6F"/>
+        <text x="43" y="27" text-anchor="middle" font-size="13" font-weight="900" fill="#fff">02</text>
+        <text x="43" y="44" text-anchor="middle" font-size="10" font-weight="900" fill="#C9E7DF">버틴다</text>
+        <text x="100" y="18" font-size="10.5" font-weight="900" fill="#22303A">생태계 평형</text>
+        <text x="100" y="34" font-size="8.6" fill="#3D4C58">먹이 그물(복잡 = 안정) · 피라미드(위로 갈수록 ↓ — 에너지가 새므로)</text>
+        <text x="100" y="50" font-size="8.6" font-weight="800" fill="#0F6357">급증 → 먹이 ↓ + 천적 ▲ → 회복 — 단, 복원력엔 한계(옐로스톤의 교훈)</text>
+      </g>
+      <line x1="252" y1="202" x2="252" y2="216" stroke="#147D6F" stroke-width="2.2" marker-end="url(#arrU)"/>
+      <text x="262" y="213" font-size="8" fill="#5B6B77">무대 전체가 데워지면?</text>
+
+      <!-- 노드 03 -->
+      <g transform="translate(30,220)">
+        <rect width="445" height="62" rx="6" fill="#EFF8F5" stroke="#147D6F" stroke-width="1.4"/>
+        <rect x="0" y="0" width="86" height="62" rx="6" fill="#147D6F"/>
+        <text x="43" y="27" text-anchor="middle" font-size="13" font-weight="900" fill="#fff">03</text>
+        <text x="43" y="44" text-anchor="middle" font-size="10" font-weight="900" fill="#C9E7DF">흔들린다</text>
+        <text x="100" y="18" font-size="10.5" font-weight="900" fill="#22303A">지구온난화와 기후변화</text>
+        <text x="100" y="34" font-size="8.6" fill="#3D4C58">사슬: 연소 → 온실 기체 ↑(280→420 ppm) → 적외선 더 붙잡힘 → 기온 ↑</text>
+        <text x="100" y="50" font-size="8.6" font-weight="800" fill="#0F6357">엘니뇨 = 무역풍 약화 + 동태평양 ↑ / 대처 = 완화 + 적응 (1.5 ℃의 약속)</text>
+      </g>
+      <line x1="252" y1="284" x2="252" y2="298" stroke="#147D6F" stroke-width="2.2" marker-end="url(#arrU)"/>
+      <text x="262" y="295" font-size="8" fill="#5B6B77">이 모든 에너지는 어디서 오나?</text>
+
+      <!-- 노드 04 -->
+      <g transform="translate(30,302)">
+        <rect width="445" height="62" rx="6" fill="#EFF8F5" stroke="#147D6F" stroke-width="1.4"/>
+        <rect x="0" y="0" width="86" height="62" rx="6" fill="#147D6F"/>
+        <text x="43" y="27" text-anchor="middle" font-size="13" font-weight="900" fill="#fff">04</text>
+        <text x="43" y="44" text-anchor="middle" font-size="10" font-weight="900" fill="#C9E7DF">받는다</text>
+        <text x="100" y="18" font-size="10.5" font-weight="900" fill="#22303A">태양 에너지와 에너지 전환</text>
+        <text x="100" y="34" font-size="8.6" fill="#3D4C58">수소 4 → 헬륨 1 + 에너지(질량 감소분) · 위도 차 → 대기·해수 순환</text>
+        <text x="100" y="50" font-size="8.6" font-weight="800" fill="#0F6357">광합성(빛→화학) → 먹이 사슬 → 화석 연료 = 옛 태양 (예외: 지열·조력)</text>
+      </g>
+      <line x1="252" y1="366" x2="252" y2="380" stroke="#147D6F" stroke-width="2.2" marker-end="url(#arrU)"/>
+      <text x="262" y="377" font-size="8" fill="#5B6B77">그 에너지로 전기를 만들려면?</text>
+
+      <!-- 노드 05 -->
+      <g transform="translate(30,384)">
+        <rect width="445" height="62" rx="6" fill="#EFF8F5" stroke="#147D6F" stroke-width="1.4"/>
+        <rect x="0" y="0" width="86" height="62" rx="6" fill="#147D6F"/>
+        <text x="43" y="27" text-anchor="middle" font-size="13" font-weight="900" fill="#fff">05</text>
+        <text x="43" y="44" text-anchor="middle" font-size="10" font-weight="900" fill="#C9E7DF">만든다</text>
+        <text x="100" y="18" font-size="10.5" font-weight="900" fill="#22303A">발전과 에너지의 효율적 이용</text>
+        <text x="100" y="34" font-size="8.6" fill="#3D4C58">전자기 유도(상대 운동 → 전류) · 터빈+발전기 공통 문법 · 화력/핵의 저울</text>
+        <text x="100" y="50" font-size="8.6" font-weight="800" fill="#0F6357">효율 = 유용 ÷ 공급 ×100 · 신재생 = 지금의 태양 → 지속가능한 발전</text>
+      </g>
+    </svg>
+    <figcaption>단원 개념 지도 | 생태계에서 발전소까지 — 환경과 에너지가 흐르는 길</figcaption>
+  </figure>
+
+  <div class="one-line">
+    <span class="pen">"태양이 주고, 생태계가 돌리고, 우리가 태워 왔다 — 이제 어떻게 만들고 아껴 쓸지는 우리의 선택이다."</span>
+  </div>
+
+  <div class="folio"><span>대단원 마무리 | II. 환경과 에너지</span><span class="num">141</span></div>
+</div>
+
+<!-- ═════════════ p.142 대단원 마무리 B — 핵심 카드 + 최종 점검 ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag">II. 환경과 에너지</span><span class="lesson-tag">대단원 마무리 — 소단원 핵심 카드</span></div>
+
+  <div class="sumgrid">
+    <div class="sumcard">
+      <div class="sc-h"><span class="sc-no">01</span><span class="sc-t">생태계의 구성과 상호 관계</span><span class="sc-pg">76쪽</span></div>
+      <ul>
+        <li>위계: 개체 → <b>개체군(같은 종)</b> → <b>군집(여러 종)</b> → 생태계(+환경)</li>
+        <li>3배역: 생산자·소비자·<b>분해자(순환의 완성)</b> / 비생물 5요인</li>
+        <li>화살표는 <b>쌍방향</b> — 적응(환경→생물) vs 개조(생물→환경)</li>
+      </ul>
+      <div><span class="chip">여우 귀 = 온도</span><span class="chip">층상 구조 = 빛</span><span class="chip">가시 = 물</span></div>
+    </div>
+    <div class="sumcard">
+      <div class="sc-h"><span class="sc-no">02</span><span class="sc-t">생태계 평형</span><span class="sc-pg">89쪽</span></div>
+      <ul>
+        <li>그물 복잡 = 안정 / 피라미드 위로 갈수록 ↓ (<b>에너지가 새서</b>)</li>
+        <li>회복 공식: 급증 → <b>먹이 ↓ + 천적 ▲</b> → 감소 → 회복</li>
+        <li>복원력엔 한계 — 파괴 4적: 서식지·남획·외래종·오염</li>
+      </ul>
+      <div><span class="chip">옐로스톤 늑대</span><span class="chip">생태 통로</span><span class="chip">협력적 소통</span></div>
+    </div>
+    <div class="sumcard">
+      <div class="sc-h"><span class="sc-no">03</span><span class="sc-t">지구온난화와 기후변화</span><span class="sc-pg">102쪽</span></div>
+      <ul>
+        <li>사슬: 연소 → 온실 기체 ↑ → <b>적외선 더 붙잡힘</b> → 기온 ↑</li>
+        <li>해수면 = 융해 + <b>열팽창</b> / 킬링 곡선: 톱니 = 계절, 추세 = 인류</li>
+        <li><b>엘니뇨</b> = 무역풍 약화 + 동태평양 수온 ↑ / 사막화 → 황사</li>
+      </ul>
+      <div><span class="chip">280→420 ppm</span><span class="chip">완화 + 적응</span><span class="chip">1.5 ℃</span></div>
+    </div>
+    <div class="sumcard">
+      <div class="sc-h"><span class="sc-no">04</span><span class="sc-t">태양 에너지와 에너지 전환</span><span class="sc-pg">115쪽</span></div>
+      <ul>
+        <li>태양: <b>수소 4 → 헬륨 1</b> + 에너지(질량 감소분, 중심부에서)</li>
+        <li>위도 차 → 대기·해수 순환 / 광합성(빛→화학) → <b>화석 연료 = 옛 태양</b></li>
+        <li>족보 판정: 거의 모두 태양 — 예외는 <b>지열·조력</b>뿐</li>
+      </ul>
+      <div><span class="chip">반사 30 흡수 70</span><span class="chip">밥상의 족보</span><span class="chip">에너지 보존</span></div>
+    </div>
+    <div class="sumcard">
+      <div class="sc-h"><span class="sc-no">05</span><span class="sc-t">발전과 에너지의 효율적 이용</span><span class="sc-pg">128쪽</span></div>
+      <ul>
+        <li><b>전자기 유도</b>: 상대 운동 → 전류 — 발전기(운동→전기)</li>
+        <li>공통 문법: 터빈 → 발전기 / 화력 −CO₂ · 핵 −폐기물 (바꿔치기 금지)</li>
+        <li>효율 = 유용 ÷ 공급 ×100 — 효율 ↑ = 연료 ↓ = CO₂ ↓</li>
+      </ul>
+      <div><span class="chip">백열등 ~5 %</span><span class="chip">신재생 = 지금의 태양</span></div>
+    </div>
+    <div class="sumcard" style="border-style:dashed; display:flex; flex-direction:column; justify-content:center; text-align:center;">
+      <div style="font-family:'PC Pen'; font-size:12.5pt; color:#0F6357; line-height:1.7;">"01의 분해자, 02의 천적,<br>03의 적외선, 04의 광합성, 05의 터빈 —<br>다섯 열쇳말로 단원 전체를 이어 말해 보자."</div>
+      <div style="font-size:7.6pt; color:var(--sub); margin-top:2mm;">막히는 소단원이 오늘의 복습 목적지다</div>
+    </div>
+  </div>
+
+  <div class="final-check">
+    <div class="fc-title">시험 전 마지막 점검 — 3분 OX</div>
+    <ol>
+      <li><span class="no">1</span>버섯과 세균은 광합성을 하는 생산자다. ( O , X )</li>
+      <li><span class="no">2</span>생태 피라미드에서 위 단계로 갈수록 에너지양이 줄어든다. ( O , X )</li>
+      <li><span class="no">3</span>온실 기체는 지표가 내보내는 적외선을 흡수한다. ( O , X )</li>
+      <li><span class="no">4</span>핵융합 후 생성물의 질량은 재료의 질량 합보다 크다. ( O , X )</li>
+      <li><span class="no">5</span>수력·화력·핵발전의 전기 생산 원리는 모두 전자기 유도다. ( O , X )</li>
+    </ol>
+    <div class="qc-ans">정답 1 X (분해자) 2 O 3 O 4 X (조금 줄어든다 — 그만큼이 에너지) 5 O — 틀린 번호의 소단원으로 돌아가자!</div>
+  </div>
+
+  <div class="folio"><span>대단원 마무리 | II. 환경과 에너지</span><span class="num">142</span></div>
+</div>
+
+</body>
+</html>
