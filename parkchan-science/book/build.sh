@@ -28,17 +28,20 @@ render chapter-i01/chapter.html   chapter-i01/chapter.pdf
 render chapter-i02/chapter.html   chapter-i02/chapter.pdf
 render chapter-i03/chapter.html   chapter-i03/chapter.pdf
 render chapter-i04/chapter.html   chapter-i04/chapter.pdf
+render summary-1/summary.html     summary-1/summary.pdf
 render sample-chapter/chapter.html sample-chapter/chapter.pdf
 render chapter-02/chapter.html    chapter-02/chapter.pdf
 render chapter-03/chapter.html    chapter-03/chapter.pdf
 render chapter-04/chapter.html    chapter-04/chapter.pdf
 render chapter-05/chapter.html    chapter-05/chapter.pdf
+render summary-2/summary.html     summary-2/summary.pdf
 render chapter-06/chapter.html    chapter-06/chapter.pdf
 render chapter-07/chapter.html    chapter-07/chapter.pdf
 render chapter-08/chapter.html    chapter-08/chapter.pdf
 render chapter-09/chapter.html    chapter-09/chapter.pdf
 render chapter-10/chapter.html    chapter-10/chapter.pdf
 render chapter-11/chapter.html    chapter-11/chapter.pdf
+render summary-3/summary.html     summary-3/summary.pdf
 render back-matter/back.html      back-matter/back.pdf
 render mock-exam/exam.html        mock-exam/exam.pdf
 
@@ -48,17 +51,20 @@ python3 ../tools/qa_check.py chapter-i01/chapter.html
 python3 ../tools/qa_check.py chapter-i02/chapter.html
 python3 ../tools/qa_check.py chapter-i03/chapter.html
 python3 ../tools/qa_check.py chapter-i04/chapter.html
+python3 ../tools/qa_check.py summary-1/summary.html
 python3 ../tools/qa_check.py sample-chapter/chapter.html
 python3 ../tools/qa_check.py chapter-02/chapter.html
 python3 ../tools/qa_check.py chapter-03/chapter.html
 python3 ../tools/qa_check.py chapter-04/chapter.html
 python3 ../tools/qa_check.py chapter-05/chapter.html
+python3 ../tools/qa_check.py summary-2/summary.html
 python3 ../tools/qa_check.py chapter-06/chapter.html
 python3 ../tools/qa_check.py chapter-07/chapter.html
 python3 ../tools/qa_check.py chapter-08/chapter.html
 python3 ../tools/qa_check.py chapter-09/chapter.html
 python3 ../tools/qa_check.py chapter-10/chapter.html
 python3 ../tools/qa_check.py chapter-11/chapter.html
+python3 ../tools/qa_check.py summary-3/summary.html
 python3 ../tools/qa_check.py back-matter/back.html
 python3 ../tools/qa_check.py mock-exam/exam.html --floor-mm 285
 
@@ -69,17 +75,20 @@ python3 ../tools/pdf_text_check.py chapter-i01/chapter.html   chapter-i01/chapte
 python3 ../tools/pdf_text_check.py chapter-i02/chapter.html   chapter-i02/chapter.pdf
 python3 ../tools/pdf_text_check.py chapter-i03/chapter.html   chapter-i03/chapter.pdf
 python3 ../tools/pdf_text_check.py chapter-i04/chapter.html   chapter-i04/chapter.pdf
+python3 ../tools/pdf_text_check.py summary-1/summary.html     summary-1/summary.pdf
 python3 ../tools/pdf_text_check.py sample-chapter/chapter.html sample-chapter/chapter.pdf
 python3 ../tools/pdf_text_check.py chapter-02/chapter.html    chapter-02/chapter.pdf
 python3 ../tools/pdf_text_check.py chapter-03/chapter.html    chapter-03/chapter.pdf
 python3 ../tools/pdf_text_check.py chapter-04/chapter.html    chapter-04/chapter.pdf
 python3 ../tools/pdf_text_check.py chapter-05/chapter.html    chapter-05/chapter.pdf
+python3 ../tools/pdf_text_check.py summary-2/summary.html     summary-2/summary.pdf
 python3 ../tools/pdf_text_check.py chapter-06/chapter.html    chapter-06/chapter.pdf
 python3 ../tools/pdf_text_check.py chapter-07/chapter.html    chapter-07/chapter.pdf
 python3 ../tools/pdf_text_check.py chapter-08/chapter.html    chapter-08/chapter.pdf
 python3 ../tools/pdf_text_check.py chapter-09/chapter.html    chapter-09/chapter.pdf
 python3 ../tools/pdf_text_check.py chapter-10/chapter.html    chapter-10/chapter.pdf
 python3 ../tools/pdf_text_check.py chapter-11/chapter.html    chapter-11/chapter.pdf
+python3 ../tools/pdf_text_check.py summary-3/summary.html     summary-3/summary.pdf
 python3 ../tools/pdf_text_check.py back-matter/back.html      back-matter/back.pdf
 python3 ../tools/pdf_text_check.py mock-exam/exam.html        mock-exam/exam.pdf
 
@@ -90,11 +99,15 @@ out = pymupdf.open()
 for f in ["front-matter/front.pdf",
           "chapter-i01/chapter.pdf", "chapter-i02/chapter.pdf",
           "chapter-i03/chapter.pdf", "chapter-i04/chapter.pdf",
+          "summary-1/summary.pdf",
           "sample-chapter/chapter.pdf",
           "chapter-02/chapter.pdf", "chapter-03/chapter.pdf", "chapter-04/chapter.pdf",
-          "chapter-05/chapter.pdf", "chapter-06/chapter.pdf", "chapter-07/chapter.pdf",
+          "chapter-05/chapter.pdf",
+          "summary-2/summary.pdf",
+          "chapter-06/chapter.pdf", "chapter-07/chapter.pdf",
           "chapter-08/chapter.pdf", "chapter-09/chapter.pdf",
           "chapter-10/chapter.pdf", "chapter-11/chapter.pdf",
+          "summary-3/summary.pdf",
           "back-matter/back.pdf"]:
     with pymupdf.open(f) as d:
         out.insert_pdf(d)

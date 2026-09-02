@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<title>박찬 과학 통합과학1 — 대단원 마무리 I — 과학의 기초</title>
+<style>
+  @font-face { font-family:'PC Sans'; src:url('file:///root/.fonts/NotoSansKR.ttf'); font-weight:100 900; }
+  @font-face { font-family:'PC Serif'; src:url('file:///root/.fonts/NotoSerifKR.ttf'); font-weight:100 900; }
+  @font-face { font-family:'PC Pen'; src:url('file:///root/.fonts/YeonSung-Regular.ttf'); font-weight:400; }
+
+  :root{
+    --brand:#0E5A6B;        /* 박찬 과학 브랜드 딥틸 */
+    --brand-lt:#E3F0F3;
+    --unit:#3E9C6E;         /* I. 과학의 기초 단원 컬러(그린) */
+    --unit-lt:#EAF6EC;
+    --unit-md:#BFE0CD;
+    --accent:#E8940A;       /* 알짜 앰버 */
+    --accent-lt:#FDF3E0;
+    --point:#D6455D;        /* 시험 포인트 */
+    --point-lt:#FBEBEE;
+    --ink:#22303A;
+    --sub:#5B6B77;
+    --line:#D8E0E5;
+  }
+  *{ box-sizing:border-box; margin:0; padding:0; -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+  @page{ size:210mm 275mm; margin:0; }
+  html,body{ font-family:'PC Sans',sans-serif; color:var(--ink); word-break:keep-all; overflow-wrap:anywhere; }
+
+  .page{ width:210mm; height:275mm; position:relative; overflow:hidden; background:#fff; page-break-after:always; padding:14mm 13mm 19mm 15mm; display:flex; flex-direction:column; }
+
+  /* ── 러닝 헤드 / 풋 ── */
+  .runhead{ display:flex; align-items:center; justify-content:space-between; border-bottom:0.35mm solid var(--unit); padding-bottom:2mm; margin-bottom:6.5mm; }
+  .runhead .unit-tag{ font-size:8.5pt; font-weight:700; color:var(--unit); letter-spacing:0.02em; }
+  .runhead .lesson-tag{ font-size:8.5pt; color:var(--sub); }
+  .folio{ position:absolute; bottom:7mm; left:0; right:0; display:flex; justify-content:space-between; padding:0 14mm 0 14mm; font-size:8pt; color:var(--sub); }
+  .folio .num{ font-weight:800; color:var(--unit); font-size:10pt; }
+
+  /* ── 본문 그리드: 본문 + 날개단 ── */
+  .cols{ display:grid; grid-template-columns:1fr 43mm; gap:8mm; flex:1; min-height:0; margin-bottom:4mm; }
+  .main{ min-width:0; }
+  .wing{ border-left:0.3mm solid var(--line); padding-left:5mm; font-size:8.2pt; color:var(--sub); line-height:1.7; }
+
+  /* ── 타이포 ── */
+  h2.lesson-title{ display:flex; align-items:baseline; gap:3.5mm; margin-bottom:2mm; }
+  h2.lesson-title .no{ background:var(--unit); color:#fff; font-size:13pt; font-weight:900; padding:1.2mm 3.2mm; border-radius:1.5mm; }
+  h2.lesson-title .tt{ font-size:16.5pt; font-weight:900; letter-spacing:-0.01em; }
+  .std-badges{ display:flex; gap:2mm; margin:2mm 0 6.5mm; }
+  .std{ font-size:7.4pt; color:var(--unit); background:none; border:0.3mm solid var(--unit-md); border-radius:5mm; padding:0.6mm 2.8mm; font-weight:600; }
+
+  h3.sec{ display:flex; align-items:baseline; gap:3mm; font-size:12.5pt; font-weight:800; margin:9mm 0 3.6mm; letter-spacing:-0.01em; }
+  h3.sec .n{ font-family:'PC Serif'; font-size:15.5pt; font-weight:900; color:var(--unit); border-bottom:0.7mm solid var(--accent); padding:0 0.8mm 0.2mm; flex:0 0 auto; line-height:1; }
+  h3.sec::after{ content:""; flex:1; border-top:0.25mm solid var(--line); align-self:center; margin-left:2mm; }
+  h3.sec:first-child{ margin-top:0; }
+
+  p.body{ font-family:'PC Serif'; font-size:9.6pt; line-height:1.92; margin-bottom:3.6mm; text-align:justify; }
+  p.body b{ font-weight:800; }
+  .kw{ font-weight:800; color:var(--unit); }
+  .u-amber{ background:#F8E9C6; font-weight:700; padding:0.15mm 0.6mm; border-radius:0.6mm; box-decoration-break:clone; -webkit-box-decoration-break:clone; }
+
+  ul.pts{ font-family:'PC Serif'; font-size:9.6pt; line-height:1.84; margin:1.5mm 0 3.5mm 1mm; list-style:none; }
+  ul.pts li{ padding-left:4.5mm; position:relative; margin-bottom:1.8mm; }
+  ul.pts li::before{ content:""; position:absolute; left:0.5mm; top:2.9mm; width:1.7mm; height:1.7mm; background:var(--accent); border-radius:50%; }
+
+  /* ── 코너 박스 ── */
+  .boxtitle{ display:inline-flex; align-items:center; gap:1.8mm; font-weight:900; font-size:9.5pt; margin-bottom:1.6mm; }
+  .boxtitle .ico{ width:5.2mm; height:5.2mm; border-radius:1.2mm; display:flex; align-items:center; justify-content:center; color:#fff; font-size:7.5pt; font-weight:900; }
+
+  .gist{ background:none; border:none; border-top:0.5mm solid var(--accent); border-bottom:0.5mm solid var(--accent); border-radius:0; padding:3.2mm 1.8mm 3mm; margin:6mm 0 5mm; }
+  .gist .boxtitle{ color:#9C6503; } .gist .ico{ background:var(--accent); }
+  .gist ul{ list-style:none; font-family:'PC Serif'; font-size:9.3pt; line-height:1.78; }
+  .gist li{ padding-left:4.2mm; position:relative; margin-bottom:1.2mm;}
+  .gist li::before{ content:"✓"; position:absolute; left:0; color:var(--accent); font-weight:900; }
+
+  .expoint{ background:none; border-left:0.5mm solid #D998A4; border-left-color:#D998A4; border-radius:0; padding:1.4mm 0 1.4mm 3.6mm; margin:4.5mm 0; }
+  .expoint .boxtitle{ color:#A9556A; font-size:8.6pt; margin-bottom:1mm;}
+  .expoint .ico{ background:none; color:#A9556A; border:0.35mm solid #D998A4; width:4.4mm; height:4.4mm; border-radius:50%; font-size:7pt; }
+  .expoint p{ font-family:'PC Serif'; font-size:8.9pt; line-height:1.7; }
+
+  .pen{ font-family:'PC Pen'; font-size:12pt; color:#B4560E; line-height:1.45; }
+  .saem{ display:flex; gap:3mm; align-items:flex-start; margin:4.5mm 0; }
+  .saem .avatar{ flex:0 0 auto; width:10.5mm; height:10.5mm; border-radius:50%; background:var(--brand); color:#fff; font-size:7pt; font-weight:800; display:flex; align-items:center; justify-content:center; line-height:1.35; letter-spacing:0.04em; text-align:center; border:0.5mm solid var(--accent); box-sizing:border-box;}
+  .saem .bubble{ background:#FFFBF0; border:0.4mm solid #EBCB9C; border-radius:3mm; padding:2.2mm 3.6mm 2mm; position:relative; }
+  .saem .bubble::before{ content:""; position:absolute; left:-1.8mm; top:3.2mm; width:3mm; height:3mm; background:#FFFBF0; border-left:0.4mm solid #EBCB9C; border-bottom:0.4mm solid #EBCB9C; transform:rotate(45deg); }
+
+  .wing .wtitle{ font-size:8pt; font-weight:900; color:var(--brand); display:flex; align-items:center; gap:1.5mm; margin:0 0 2.4mm; letter-spacing:0.05em; }
+  .wing .wtitle::before{ content:""; width:2.4mm; height:2.4mm; background:var(--accent); border-radius:50%; }
+  .wing .term{ margin-bottom:3.6mm; }
+  .wing .term b{ color:var(--ink); font-weight:800; display:block; font-size:8.5pt; margin-bottom:0.7mm;}
+  .wing .wsep{ border-top:0.3mm dashed var(--line); margin:4.5mm 0; }
+  .wing .wing-pen{ font-family:'PC Pen'; font-size:11pt; color:#B4560E; line-height:1.45; }
+
+  figure{ margin:5mm 0; }
+  figure figcaption{ font-size:8pt; color:var(--sub); text-align:center; margin-top:2mm; }
+  figure svg{ display:block; margin:0 auto; }
+
+  /* ── 비교형 그림 (2패널 + 범례) ── */
+  .fig-duo{ display:flex; align-items:stretch; gap:2.5mm; justify-content:center; }
+  .fig-duo .panel{ flex:0 0 auto; text-align:center; }
+  .fig-duo .p-title{ font-size:9pt; font-weight:900; color:var(--ink); margin-top:1.6mm; }
+  .fig-duo .p-sub{ font-size:7.8pt; color:var(--sub); line-height:1.45; margin-top:0.5mm; }
+  .fig-duo .mid{ display:flex; flex-direction:column; align-items:center; justify-content:center; gap:1mm; padding:0 1mm; }
+  .fig-duo .mid .mlab{ font-size:7.6pt; font-weight:800; color:var(--unit); text-align:center; line-height:1.3; }
+  .fig-legend{ display:flex; justify-content:center; gap:5mm; font-size:7.8pt; color:var(--ink); margin-top:1.2mm; align-items:center; }
+  .fig-legend span{ display:inline-flex; align-items:center; gap:1.4mm; }
+
+  /* ── 탐구 (자료 파헤치기) ── */
+  .lab{ border:0.5mm solid var(--brand); border-radius:2.5mm; overflow:hidden; margin-top:1mm;}
+  .lab .lab-head{ background:var(--brand); color:#fff; padding:2.2mm 4mm; font-weight:900; font-size:11pt; display:flex; align-items:center; gap:2.5mm;}
+  .lab .lab-head .tag{ font-size:7.5pt; background:rgba(255,255,255,.22); padding:0.6mm 2.4mm; border-radius:4mm; font-weight:700;}
+  .lab .lab-body{ padding:3.5mm 4mm; }
+  .lab h4{ font-size:9.6pt; font-weight:900; color:var(--brand); margin:2.5mm 0 1.4mm; }
+  .lab h4:first-child{ margin-top:0; }
+  .lab p, .lab li{ font-family:'PC Serif'; font-size:9.3pt; line-height:1.8; }
+  .lab ol{ margin-left:5mm; }
+
+  /* ── 문제부 ── */
+  .step-head{ display:flex; align-items:center; gap:3mm; margin:0 0 5mm; }
+  .step-head .stepno{ background:var(--unit); color:#fff; font-weight:900; font-size:9.5pt; padding:1.4mm 3.4mm; border-radius:1.5mm; letter-spacing:0.04em;}
+  .step-head .steptt{ font-size:12.5pt; font-weight:900; }
+  .step-head .stepdesc{ font-size:8.2pt; color:var(--sub); margin-left:auto; }
+  .step-head.s2 .stepno{ background:var(--brand); }
+  .step-head.s3 .stepno{ background:var(--point); }
+
+  .q{ margin-bottom:7.5mm; break-inside:avoid; }
+  .q .qhead{ display:flex; gap:2.4mm; align-items:flex-start; }
+  .q .qno{ flex:0 0 auto; min-width:6.2mm; height:6.2mm; border:0.45mm solid var(--unit); color:var(--unit); border-radius:50%; font-size:8.6pt; font-weight:900; line-height:1; display:flex; align-items:center; justify-content:center; padding-top:0.55mm; margin-top:0.4mm;}
+  .q .stem{ font-family:'PC Serif'; font-size:9.5pt; line-height:1.74; font-weight:500; }
+  .q .stem .difficulty{ color:#C9A227; font-size:8pt; letter-spacing:0.06em; margin-left:1.5mm;}
+  .q .tags{ margin-top:0.8mm; font-size:7pt; color:var(--sub); font-family:'PC Sans';}
+  .choices{ list-style:none; margin:2.2mm 0 0 8.6mm; font-family:'PC Serif'; font-size:9.3pt; line-height:1.85; }
+  .choices.inline{ display:flex; flex-wrap:wrap; gap:0 6mm; }
+  .bogi-box{ border:0.35mm solid #B8C2CA; border-radius:0; margin:2.5mm 0 0 8.6mm; padding:2.4mm 3.2mm; font-family:'PC Serif'; font-size:9.2pt; line-height:1.8; background:none;}
+  .bogi-box .bt{ text-align:center; font-weight:800; color:var(--sub); font-size:8.4pt; margin-bottom:0.8mm; letter-spacing:0.3em;}
+  .ox-answer{ margin-left:2mm; color:var(--sub); font-size:9pt; }
+  .blankline{ display:inline-block; min-width:14mm; border-bottom:0.4mm solid var(--ink); }
+  .qgrid{ display:grid; grid-template-columns:1fr 1fr; gap:0 9mm; }
+  .essay-lines{ margin:2mm 0 0 8.4mm; }
+  .essay-lines div{ border-bottom:0.3mm solid var(--line); height:6.2mm; }
+  .badge-essay{ display:inline-block; background:var(--point); color:#fff; font-size:7pt; font-weight:800; padding:0.4mm 2mm; border-radius:1mm; vertical-align:1pt; margin-right:1.2mm;}
+  .badge-data{ display:inline-block; background:var(--brand); color:#fff; font-size:7pt; font-weight:800; padding:0.4mm 2mm; border-radius:1mm; vertical-align:1pt; margin-right:1.2mm;}
+
+  /* ── 해설부 ── */
+  .sol-head{ display:flex; align-items:center; gap:3mm; margin-bottom:4mm;}
+  .sol-head .stt{ font-size:14.5pt; font-weight:900; color:var(--brand);}
+  .sol-head .sub{ font-size:8.5pt; color:var(--sub);}
+  .anstable{ width:100%; border-collapse:collapse; margin-bottom:4.5mm; }
+  .anstable th,.anstable td{ border:0.3mm solid var(--line); font-size:8.8pt; padding:1.4mm 0; text-align:center; }
+  .anstable th{ background:var(--brand-lt); color:var(--brand); font-weight:800; }
+  .anstable td.a{ font-weight:900; color:var(--unit); }
+  .sol{ margin-bottom:5mm; break-inside:avoid; }
+  .sol .shead{ display:flex; align-items:center; gap:2mm; margin-bottom:1.4mm;}
+  .sol .sno{ background:var(--unit); color:#fff; min-width:6mm; height:5.4mm; border-radius:1.2mm; font-size:8.6pt; font-weight:900; line-height:1; display:flex; align-items:center; justify-content:center; padding:0.5mm 1.5mm 0;}
+  .sol .sans{ font-weight:900; color:var(--unit); font-size:9.6pt;}
+  .sol .slink{ font-size:7.2pt; color:var(--sub); margin-left:auto;}
+  .sol p{ font-family:'PC Serif'; font-size:9.1pt; line-height:1.76; margin-bottom:0.8mm; }
+  .wrongbox{ background:none; border:none; border-left:0.7mm solid #E3A0AC; border-radius:0; padding:1mm 0 1mm 3mm; margin-top:2mm;}
+  .wrongbox .wt{ font-size:8pt; font-weight:900; color:var(--point); margin-bottom:0.8mm; font-family:'PC Sans';}
+  .wrongbox p{ font-family:'PC Serif'; font-size:8.6pt; line-height:1.68; margin-bottom:0.9mm;}
+  .wrongbox p:last-child{ margin-bottom:0; }
+  .solcols{ display:grid; grid-template-columns:1fr 1fr; gap:0 9mm; }
+
+  /* ── 단원 도입 (타이포그래피 중심) ── */
+  .opener{ padding:0 0 19mm; }
+  .opener-hero{ position:relative; padding:7mm 20mm 4.5mm; overflow:hidden; flex-shrink:0; }
+  .ghost-txt{ position:absolute; top:-10mm; right:6mm; font-size:118pt; font-weight:900; color:#EBF5EF; line-height:1; letter-spacing:-0.04em; }
+  .kicker{ display:flex; align-items:center; gap:4mm; position:relative; }
+  .kicker .kt{ font-size:9.5pt; font-weight:800; color:var(--unit); letter-spacing:0.24em; white-space:nowrap; }
+  .kicker::after{ content:""; flex:1; border-top:0.3mm solid var(--line); }
+  .opener-hero h1{ position:relative; font-size:36pt; font-weight:900; letter-spacing:-0.015em; margin:4mm 0 0; }
+  .opener-hero h1 .tick{ display:block; width:14mm; border-top:1.4mm solid var(--accent); margin-bottom:3.6mm; }
+  .opener-lede{ position:relative; font-family:'PC Serif'; font-size:10.2pt; font-weight:600; line-height:2.0; color:#3D4C58; max-width:138mm; margin-top:4mm; padding-left:5mm; border-left:0.8mm solid var(--accent); }
+  .opener-inner{ padding:0 20mm; }
+
+  /* ── 원소의 여정 스트립 ── */
+  .journey{ margin-top:3.5mm; }
+  .journey .j-label{ font-size:8pt; font-weight:800; color:var(--sub); letter-spacing:0.08em; margin-bottom:2.4mm; display:flex; align-items:center; gap:1.6mm;}
+  .journey .j-label::before{ content:""; width:2.4mm; height:2.4mm; background:var(--unit); border-radius:50%; }
+  .j-bar{ display:flex; align-items:center; gap:2mm; }
+  .j-chip{ flex:1; text-align:center; background:#F0F8F3; border:0.35mm solid #BFE0CD; color:#3E9C6E; border-radius:1.6mm; padding:3mm 1mm 2.6mm; }
+  .j-chip .jc-t{ font-size:8.8pt; font-weight:800; display:block; }
+  .j-chip .jc-s{ font-size:6.8pt; color:var(--sub); display:block; margin-top:0.5mm; }
+  .j-chip.on{ background:var(--unit); border-color:var(--unit); }
+  .j-chip.on .jc-t{ color:#fff; }
+  .j-chip.on .jc-s{ color:#D6EEDF; }
+  .j-arrow{ flex:0 0 auto; color:#8CCBA8; font-size:10pt; font-weight:900; }
+  .toc{ margin-top:6.5mm; }
+  .toc .toc-title{ font-size:11pt; font-weight:900; color:var(--ink); margin-bottom:3mm; display:flex; align-items:center; gap:2.5mm;}
+  .toc .toc-title::before{ content:""; width:3.4mm; height:3.4mm; background:var(--accent); border-radius:0.8mm; }
+  .toc-item{ display:flex; align-items:flex-start; gap:5mm; padding:4.4mm 6mm; border-bottom:0.3mm solid var(--line); }
+  .toc-item:first-of-type{ border-top:0.3mm solid var(--line); }
+  .toc-item.active{ background:#F0F8F3; border-left:1.2mm solid #6FBE93; }
+  .toc-item .tno{ font-family:'PC Serif'; font-weight:900; color:#6FBE93; font-size:14pt; width:10mm; line-height:1.1; flex:0 0 auto;}
+  .toc-item .tbody{ flex:1; min-width:0; }
+  .toc-item .ttt{ font-weight:800; font-size:10.5pt; letter-spacing:0.01em; display:flex; align-items:center;}
+  .toc-item .tdesc{ font-family:'PC Serif'; font-size:8.6pt; font-weight:600; color:#4A5964; margin-top:0.7mm; line-height:1.55;}
+  .toc-item .tstd{ font-size:7.2pt; color:var(--sub); flex:0 0 auto; padding-top:1.2mm;}
+  .toc-item.active .tag-now{ background:var(--accent); color:#fff; font-size:7pt; font-weight:900; border-radius:4mm; padding:0.7mm 2.6mm; margin-left:3.5mm;}
+  .toc-item .tag-done{ font-size:7.2pt; font-weight:800; color:#3E9C6E; margin-left:3.5mm; }
+  .opener-quote{ margin-top:7mm; text-align:center; font-family:'PC Serif'; font-size:9.8pt; font-weight:600; color:#4A5964; letter-spacing:0.01em; }
+  .opener-quote .who{ font-size:8pt; color:var(--sub); font-weight:400; margin-left:2.5mm; }
+  .qa-lead li .qgo{ font-family:'PC Sans'; font-size:7.4pt; font-weight:800; color:var(--unit); background:var(--unit-lt); border-radius:3mm; padding:0.5mm 2.2mm; margin-left:2mm; white-space:nowrap; vertical-align:1pt;}
+  .qa-lead{ margin-top:5mm; border:none; border-top:0.45mm solid var(--brand); border-bottom:0.45mm solid var(--brand); background:none; border-radius:0; padding:3mm 2mm 2.8mm; }
+  .qa-lead .qt{ font-weight:900; color:var(--brand); font-size:10.5pt; margin-bottom:2mm;}
+  .qa-lead li{ font-family:'PC Serif'; font-size:9.5pt; line-height:1.8; margin-left:5mm; }
+
+  /* ── 바로바로 체크 (개념 페이지 하단 즉석 OX) ── */
+  .quickcheck{ margin-top:auto; border-top:0.35mm dashed #C8B98F; padding-top:3mm; width:calc(100% - 51mm); }
+  .quickcheck .qc-title{ display:inline-flex; align-items:center; gap:1.6mm; font-size:8.2pt; font-weight:900; color:#9C6503; margin-bottom:1.4mm; }
+  .quickcheck .qc-title::before{ content:"✓"; color:var(--accent); font-weight:900; }
+  .quickcheck ol{ list-style:none; font-family:'PC Serif'; font-size:8.8pt; line-height:1.75; }
+  .quickcheck li{ display:flex; gap:2mm; align-items:baseline; }
+  .quickcheck li .no{ font-weight:800; color:var(--accent); flex:0 0 auto; }
+  .quickcheck .qc-ans{ margin-top:1mm; font-size:7.2pt; color:var(--sub); transform:rotate(180deg); text-align:left; }
+
+  /* ── 중학 과학 다시보기 (날개단) ── */
+  .wing .review{ background:#F6F3EC; border-radius:1.8mm; padding:2.8mm 3mm; margin-top:1mm; }
+  .wing .review .rv-title{ font-size:7.8pt; font-weight:900; color:#7A6A45; margin-bottom:1.4mm; display:flex; align-items:center; gap:1.4mm;}
+  .wing .review .rv-title::before{ content:"↺"; font-weight:900; color:#A08A55; }
+
+  /* ── MEMO 페이지 ── */
+  .memo-head{ display:flex; align-items:baseline; gap:3.5mm; margin-bottom:5mm; }
+  .memo-head .mt{ font-size:17pt; font-weight:900; color:var(--brand); letter-spacing:0.22em; }
+  .memo-head .ms{ font-size:8.6pt; color:var(--sub); }
+  .memo-area{ flex:1; border:0.4mm solid var(--line); border-radius:2.5mm;
+    background-image:linear-gradient(to bottom, transparent calc(100% - 0.3mm), #DCE4E9 0);
+    background-size:100% 9mm; background-position:0 4mm; padding:0 5mm; margin-bottom:4mm; }
+  .memo-pen{ font-family:'PC Pen'; font-size:12.5pt; color:#B4560E; text-align:right; }
+  /* ── 대단원 마무리 ── */
+  .sumgrid{ display:grid; grid-template-columns:1fr 1fr; gap:3.5mm; }
+  .sumcard{ border:0.4mm solid var(--unit-md); border-radius:2.5mm; padding:3mm 3.5mm 2.6mm; }
+  .sumcard .sc-h{ display:flex; align-items:baseline; gap:2.2mm; margin-bottom:1.6mm; }
+  .sumcard .sc-no{ background:var(--unit); color:#fff; font-size:8pt; font-weight:900; padding:0.5mm 2.2mm; border-radius:1.2mm; }
+  .sumcard .sc-t{ font-size:10pt; font-weight:900; }
+  .sumcard .sc-pg{ margin-left:auto; font-size:7.4pt; color:var(--sub); }
+  .sumcard ul{ list-style:none; font-family:"PC Serif"; font-size:8.7pt; line-height:1.68; }
+  .sumcard li{ padding-left:3.6mm; position:relative; margin-bottom:0.9mm; }
+  .sumcard li::before{ content:"✓"; position:absolute; left:0; color:var(--unit); font-weight:900; font-size:7.5pt; }
+  .chip{ display:inline-block; background:var(--unit-lt); color:var(--unit); font-size:7.4pt; font-weight:800; border-radius:3mm; padding:0.5mm 2.4mm; margin:0.8mm 1.2mm 0 0; font-family:"PC Sans"; }
+  .one-line{ margin-top:4.5mm; background:var(--accent-lt); border-radius:3mm; padding:3.6mm 6mm 3mm; text-align:center; }
+  .one-line .pen{ font-size:14.5pt; }
+  .final-check{ margin-top:4.5mm; border-top:0.45mm solid var(--unit); border-bottom:0.45mm solid var(--unit); padding:3mm 2mm 2.6mm; }
+  .final-check .fc-title{ font-weight:900; color:var(--unit); font-size:10pt; margin-bottom:1.8mm; }
+  .final-check ol{ list-style:none; font-family:"PC Serif"; font-size:9.2pt; line-height:1.85; }
+  .final-check li{ display:flex; gap:2mm; align-items:baseline; }
+  .final-check li .no{ font-weight:800; color:var(--accent); flex:0 0 auto; }
+  .final-check .qc-ans{ margin-top:1.4mm; font-size:7.2pt; color:var(--sub); transform:rotate(180deg); text-align:left; }
+</style>
+</head>
+<body>
+
+<!-- ═════════════ p.61 대단원 마무리 A — 단원 개념 지도 ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag">I. 과학의 기초</span><span class="lesson-tag">대단원 마무리 — 단원을 한눈에</span></div>
+  <div class="sol-head"><span class="stt" style="color:var(--unit);">I단원을 한눈에 — 과학의 기초</span><span class="sub">네 소단원은 한 줄로 이어진다: 재고 → 적고 → 맞추고 → 잇는다</span></div>
+
+  <figure style="margin:3mm 0 0;">
+    <svg width="640" height="573" viewBox="0 0 505 452" font-family="PC Sans">
+      <defs>
+        <marker id="arrU" markerWidth="9" markerHeight="9" refX="7" refY="3.5" orient="auto"><path d="M0,0 L8,3.5 L0,7 Z" fill="#3E9C6E"/></marker>
+      </defs>
+      <!-- 출발 질문 -->
+      <rect x="122" y="8" width="260" height="34" rx="17" fill="#FDF3E0" stroke="#E8940A" stroke-width="1.2"/>
+      <text x="252" y="30" text-anchor="middle" font-size="11" font-weight="900" fill="#B4560E">자연에 묻는다 — "언제, 어디서, 얼마나?"</text>
+      <line x1="252" y1="44" x2="252" y2="62" stroke="#3E9C6E" stroke-width="2.2" marker-end="url(#arrU)"/>
+
+      <!-- 노드 01 -->
+      <g transform="translate(30,68)">
+        <rect width="445" height="76" rx="6" fill="#F0F8F3" stroke="#3E9C6E" stroke-width="1.4"/>
+        <rect x="0" y="0" width="86" height="76" rx="6" fill="#3E9C6E"/>
+        <text x="43" y="32" text-anchor="middle" font-size="13" font-weight="900" fill="#fff">01</text>
+        <text x="43" y="50" text-anchor="middle" font-size="10" font-weight="900" fill="#D6EEDF">잰다</text>
+        <text x="100" y="22" font-size="10.5" font-weight="900" fill="#22303A">자연을 재는 눈 — 시간과 공간</text>
+        <text x="100" y="40" font-size="8.6" fill="#3D4C58">모든 사건의 주소 = 시간 + 공간 · 규모는 10의 거듭제곱으로</text>
+        <text x="100" y="58" font-size="8.6" font-weight="800" fill="#2E7A54">1 m = 빛(진공, 1/299 792 458초) · 1초 = 세슘 진동 9 192 631 770번</text>
+      </g>
+      <line x1="252" y1="146" x2="252" y2="164" stroke="#3E9C6E" stroke-width="2.2" marker-end="url(#arrU)"/>
+      <text x="262" y="159" font-size="8" fill="#5B6B77">잰 값을 어떻게 적을까?</text>
+
+      <!-- 노드 02 -->
+      <g transform="translate(30,170)">
+        <rect width="445" height="76" rx="6" fill="#F0F8F3" stroke="#3E9C6E" stroke-width="1.4"/>
+        <rect x="0" y="0" width="86" height="76" rx="6" fill="#3E9C6E"/>
+        <text x="43" y="32" text-anchor="middle" font-size="13" font-weight="900" fill="#fff">02</text>
+        <text x="43" y="50" text-anchor="middle" font-size="10" font-weight="900" fill="#D6EEDF">적는다</text>
+        <text x="100" y="22" font-size="10.5" font-weight="900" fill="#22303A">기본량과 단위 — 자연을 쓰는 언어</text>
+        <text x="100" y="40" font-size="8.6" fill="#3D4C58">측정값 = 수치 + 단위 · 기본량 7가지(m·kg·s·A·K·mol·cd)의 조합이 유도량</text>
+        <text x="100" y="58" font-size="8.6" font-weight="800" fill="#2E7A54">접두어 = 크기의 옷: n(10⁻⁹) μ(10⁻⁶) m(10⁻³) k(10³) M(10⁶) G(10⁹)</text>
+      </g>
+      <line x1="252" y1="248" x2="252" y2="266" stroke="#3E9C6E" stroke-width="2.2" marker-end="url(#arrU)"/>
+      <text x="262" y="261" font-size="8" fill="#5B6B77">누가 재도 같은 값이 되려면?</text>
+
+      <!-- 노드 03 -->
+      <g transform="translate(30,272)">
+        <rect width="445" height="76" rx="6" fill="#F0F8F3" stroke="#3E9C6E" stroke-width="1.4"/>
+        <rect x="0" y="0" width="86" height="76" rx="6" fill="#3E9C6E"/>
+        <text x="43" y="32" text-anchor="middle" font-size="13" font-weight="900" fill="#fff">03</text>
+        <text x="43" y="50" text-anchor="middle" font-size="10" font-weight="900" fill="#D6EEDF">맞춘다</text>
+        <text x="100" y="22" font-size="10.5" font-weight="900" fill="#22303A">측정과 어림, 측정 표준 — 모두의 자</text>
+        <text x="100" y="40" font-size="8.6" fill="#3D4C58">측정(도구·오차·반복) vs 어림(쪼개기→대입→곱하기, 목표는 자릿수)</text>
+        <text x="100" y="58" font-size="8.6" font-weight="800" fill="#2E7A54">표준의 진화: 물체 → 자연 상수 (빛 · 세슘 · 플랑크 상수, 2019 kg 재정의)</text>
+      </g>
+      <line x1="252" y1="350" x2="252" y2="368" stroke="#3E9C6E" stroke-width="2.2" marker-end="url(#arrU)"/>
+      <text x="262" y="363" font-size="8" fill="#5B6B77">쌓인 측정은 무엇이 되나?</text>
+
+      <!-- 노드 04 -->
+      <g transform="translate(30,374)">
+        <rect width="445" height="76" rx="6" fill="#F0F8F3" stroke="#3E9C6E" stroke-width="1.4"/>
+        <rect x="0" y="0" width="86" height="76" rx="6" fill="#3E9C6E"/>
+        <text x="43" y="32" text-anchor="middle" font-size="13" font-weight="900" fill="#fff">04</text>
+        <text x="43" y="50" text-anchor="middle" font-size="10" font-weight="900" fill="#D6EEDF">잇는다</text>
+        <text x="100" y="22" font-size="10.5" font-weight="900" fill="#22303A">정보와 신호, 디지털 문명</text>
+        <text x="100" y="40" font-size="8.6" fill="#3D4C58">변화 → 측정 → 분석 → 정보 · 아날로그(연속) → 표본화+수치화 → 디지털(0과 1)</text>
+        <text x="100" y="58" font-size="8.6" font-weight="800" fill="#2E7A54">디지털의 힘: 잡음에 강함 · 저장·전송·가공 자유 · 복사해도 불변</text>
+      </g>
+    </svg>
+    <figcaption>단원 개념 지도 | 질문에서 문명까지 — 측정이 흘러가는 길</figcaption>
+  </figure>
+
+  <div class="one-line">
+    <span class="pen">"과학은 같은 자로 재어, 숫자로 적고, 정보로 이어 붙이는 데서 시작한다."</span>
+  </div>
+
+  <div class="folio"><span>대단원 마무리 | I. 과학의 기초</span><span class="num">61</span></div>
+</div>
+
+<!-- ═════════════ p.62 대단원 마무리 B — 핵심 카드 + 최종 점검 ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag">I. 과학의 기초</span><span class="lesson-tag">대단원 마무리 — 소단원 핵심 카드</span></div>
+
+  <div class="sumgrid">
+    <div class="sumcard">
+      <div class="sc-h"><span class="sc-no">01</span><span class="sc-t">자연을 재는 눈</span><span class="sc-pg">9쪽</span></div>
+      <ul>
+        <li>공간 규모 <b>10⁻¹⁵ ~ 10²⁶ m</b> · 시간 규모 <b>10⁻¹⁵ ~ 10¹⁷ s</b> — 지수로 비교</li>
+        <li>레이저 거리 측정: <b>거리 = 속력 × 시간 ÷ 2</b> (÷2가 최대 함정)</li>
+        <li>GPS = 위성 신호의 <b>시간 차 × 빛의 속력</b> → 위치</li>
+      </ul>
+      <div><span class="chip">1 m = 빛</span><span class="chip">1초 = 세슘</span><span class="chip">우주 138억 년</span></div>
+    </div>
+    <div class="sumcard">
+      <div class="sc-h"><span class="sc-no">02</span><span class="sc-t">기본량과 단위</span><span class="sc-pg">22쪽</span></div>
+      <ul>
+        <li>기본량 7가지: <b>m·kg·s·A·K·mol·cd</b> — 나머지는 전부 조합(유도량)</li>
+        <li>단위 없는 숫자는 과학이 아니다 — <b>화성 기후 궤도선</b> 사고가 증거</li>
+        <li>접두어 비교는 <b>지수의 뺄셈</b> (1 km ÷ 1 mm = 10⁶배)</li>
+      </ul>
+      <div><span class="chip">수치 + 단위</span><span class="chip">N = kg·m/s²</span><span class="chip">질량은 kg</span></div>
+    </div>
+    <div class="sumcard">
+      <div class="sc-h"><span class="sc-no">03</span><span class="sc-t">측정과 어림, 측정 표준</span><span class="sc-pg">35쪽</span></div>
+      <ul>
+        <li><b>도구·눈금이면 측정</b>, 지식으로 헤아리면 <b>어림</b> — 어림의 목표는 자릿수</li>
+        <li>오차는 0이 안 된다 — <b>반복 측정·평균</b>으로 줄인다</li>
+        <li>표준 = 모두의 자(KRISS) — 거래·의료·산업의 신뢰 기반</li>
+      </ul>
+      <div><span class="chip">길이 → 빛</span><span class="chip">시간 → 세슘</span><span class="chip">질량 → 플랑크 상수</span></div>
+    </div>
+    <div class="sumcard">
+      <div class="sc-h"><span class="sc-no">04</span><span class="sc-t">정보와 신호, 디지털 문명</span><span class="sc-pg">48쪽</span></div>
+      <ul>
+        <li>연속이면 <b>아날로그</b>, 0과 1의 불연속이면 <b>디지털</b> — 자연은 아날로그</li>
+        <li>변환 = <b>표본화</b>(간격대로 뽑고) + <b>수치화</b>(반올림해 적고)</li>
+        <li>촘촘할수록 정밀 ↔ 용량 증가 — 음질과 파일 크기의 저울질</li>
+      </ul>
+      <div><span class="chip">복사해도 불변</span><span class="chip">저장·전송·가공</span><span class="chip">데이터 = 자원</span></div>
+    </div>
+  </div>
+
+  <div class="final-check">
+    <div class="fc-title">시험 전 마지막 점검 — 3분 OX</div>
+    <ol>
+      <li><span class="no">1</span>10⁻¹⁰ m는 10⁻¹⁵ m보다 작다. ( O , X )</li>
+      <li><span class="no">2</span>속도와 밀도는 SI 기본량이다. ( O , X )</li>
+      <li><span class="no">3</span>어림의 목표는 정확한 값이 아니라 자릿수(규모)다. ( O , X )</li>
+      <li><span class="no">4</span>1 kg은 지금도 금속 원기의 질량으로 정의된다. ( O , X )</li>
+      <li><span class="no">5</span>디지털 신호는 복사를 거듭해도 내용이 변하지 않는다. ( O , X )</li>
+    </ol>
+    <div class="qc-ans">정답 1 X (10⁵배 크다) 2 X (둘 다 유도량) 3 O 4 X (플랑크 상수 기준) 5 O — 틀린 번호의 소단원으로 돌아가자!</div>
+  </div>
+
+  <div class="saem" style="margin-top:5mm;">
+    <div class="avatar">박찬<br>쌤</div>
+    <div class="bubble"><span class="pen">"I단원은 '내용'이 아니라 '도구 상자'다 — II단원부터 이 도구들이 실제로 일하는 걸 보게 된다. 스펙트럼이 곧 '빛의 측정'이라는 것부터!"</span></div>
+  </div>
+
+  <div class="folio"><span>대단원 마무리 | I. 과학의 기초</span><span class="num">62</span></div>
+</div>
+
+</body>
+</html>

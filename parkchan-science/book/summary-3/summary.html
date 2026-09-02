@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<title>박찬 과학 통합과학1 — 대단원 마무리 III — 시스템과 상호작용</title>
+<style>
+  @font-face { font-family:'PC Sans'; src:url('file:///root/.fonts/NotoSansKR.ttf'); font-weight:100 900; }
+  @font-face { font-family:'PC Serif'; src:url('file:///root/.fonts/NotoSerifKR.ttf'); font-weight:100 900; }
+  @font-face { font-family:'PC Pen'; src:url('file:///root/.fonts/YeonSung-Regular.ttf'); font-weight:400; }
+
+  :root{
+    --brand:#0E5A6B;        /* 박찬 과학 브랜드 딥틸 */
+    --brand-lt:#E3F0F3;
+    --unit:#6B46C8;         /* I. 과학의 기초 단원 컬러(그린) */
+    --unit-lt:#F2EDFB;
+    --unit-md:#CFC0EE;
+    --accent:#E8940A;       /* 알짜 앰버 */
+    --accent-lt:#FDF3E0;
+    --point:#D6455D;        /* 시험 포인트 */
+    --point-lt:#FBEBEE;
+    --ink:#22303A;
+    --sub:#5B6B77;
+    --line:#D8E0E5;
+  }
+  *{ box-sizing:border-box; margin:0; padding:0; -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+  @page{ size:210mm 275mm; margin:0; }
+  html,body{ font-family:'PC Sans',sans-serif; color:var(--ink); word-break:keep-all; overflow-wrap:anywhere; }
+
+  .page{ width:210mm; height:275mm; position:relative; overflow:hidden; background:#fff; page-break-after:always; padding:14mm 13mm 19mm 15mm; display:flex; flex-direction:column; }
+
+  /* ── 러닝 헤드 / 풋 ── */
+  .runhead{ display:flex; align-items:center; justify-content:space-between; border-bottom:0.35mm solid var(--unit); padding-bottom:2mm; margin-bottom:6.5mm; }
+  .runhead .unit-tag{ font-size:8.5pt; font-weight:700; color:var(--unit); letter-spacing:0.02em; }
+  .runhead .lesson-tag{ font-size:8.5pt; color:var(--sub); }
+  .folio{ position:absolute; bottom:7mm; left:0; right:0; display:flex; justify-content:space-between; padding:0 14mm 0 14mm; font-size:8pt; color:var(--sub); }
+  .folio .num{ font-weight:800; color:var(--unit); font-size:10pt; }
+
+  /* ── 본문 그리드: 본문 + 날개단 ── */
+  .cols{ display:grid; grid-template-columns:1fr 43mm; gap:8mm; flex:1; min-height:0; margin-bottom:4mm; }
+  .main{ min-width:0; }
+  .wing{ border-left:0.3mm solid var(--line); padding-left:5mm; font-size:8.2pt; color:var(--sub); line-height:1.7; }
+
+  /* ── 타이포 ── */
+  h2.lesson-title{ display:flex; align-items:baseline; gap:3.5mm; margin-bottom:2mm; }
+  h2.lesson-title .no{ background:var(--unit); color:#fff; font-size:13pt; font-weight:900; padding:1.2mm 3.2mm; border-radius:1.5mm; }
+  h2.lesson-title .tt{ font-size:16.5pt; font-weight:900; letter-spacing:-0.01em; }
+  .std-badges{ display:flex; gap:2mm; margin:2mm 0 6.5mm; }
+  .std{ font-size:7.4pt; color:var(--unit); background:none; border:0.3mm solid var(--unit-md); border-radius:5mm; padding:0.6mm 2.8mm; font-weight:600; }
+
+  h3.sec{ display:flex; align-items:baseline; gap:3mm; font-size:12.5pt; font-weight:800; margin:9mm 0 3.6mm; letter-spacing:-0.01em; }
+  h3.sec .n{ font-family:'PC Serif'; font-size:15.5pt; font-weight:900; color:var(--unit); border-bottom:0.7mm solid var(--accent); padding:0 0.8mm 0.2mm; flex:0 0 auto; line-height:1; }
+  h3.sec::after{ content:""; flex:1; border-top:0.25mm solid var(--line); align-self:center; margin-left:2mm; }
+  h3.sec:first-child{ margin-top:0; }
+
+  p.body{ font-family:'PC Serif'; font-size:9.6pt; line-height:1.92; margin-bottom:3.6mm; text-align:justify; }
+  p.body b{ font-weight:800; }
+  .kw{ font-weight:800; color:var(--unit); }
+  .u-amber{ background:#F8E9C6; font-weight:700; padding:0.15mm 0.6mm; border-radius:0.6mm; box-decoration-break:clone; -webkit-box-decoration-break:clone; }
+
+  ul.pts{ font-family:'PC Serif'; font-size:9.6pt; line-height:1.84; margin:1.5mm 0 3.5mm 1mm; list-style:none; }
+  ul.pts li{ padding-left:4.5mm; position:relative; margin-bottom:1.8mm; }
+  ul.pts li::before{ content:""; position:absolute; left:0.5mm; top:2.9mm; width:1.7mm; height:1.7mm; background:var(--accent); border-radius:50%; }
+
+  /* ── 코너 박스 ── */
+  .boxtitle{ display:inline-flex; align-items:center; gap:1.8mm; font-weight:900; font-size:9.5pt; margin-bottom:1.6mm; }
+  .boxtitle .ico{ width:5.2mm; height:5.2mm; border-radius:1.2mm; display:flex; align-items:center; justify-content:center; color:#fff; font-size:7.5pt; font-weight:900; }
+
+  .gist{ background:none; border:none; border-top:0.5mm solid var(--accent); border-bottom:0.5mm solid var(--accent); border-radius:0; padding:3.2mm 1.8mm 3mm; margin:6mm 0 5mm; }
+  .gist .boxtitle{ color:#9C6503; } .gist .ico{ background:var(--accent); }
+  .gist ul{ list-style:none; font-family:'PC Serif'; font-size:9.3pt; line-height:1.78; }
+  .gist li{ padding-left:4.2mm; position:relative; margin-bottom:1.2mm;}
+  .gist li::before{ content:"✓"; position:absolute; left:0; color:var(--accent); font-weight:900; }
+
+  .expoint{ background:none; border-left:0.5mm solid #D998A4; border-left-color:#D998A4; border-radius:0; padding:1.4mm 0 1.4mm 3.6mm; margin:4.5mm 0; }
+  .expoint .boxtitle{ color:#A9556A; font-size:8.6pt; margin-bottom:1mm;}
+  .expoint .ico{ background:none; color:#A9556A; border:0.35mm solid #D998A4; width:4.4mm; height:4.4mm; border-radius:50%; font-size:7pt; }
+  .expoint p{ font-family:'PC Serif'; font-size:8.9pt; line-height:1.7; }
+
+  .pen{ font-family:'PC Pen'; font-size:12pt; color:#B4560E; line-height:1.45; }
+  .saem{ display:flex; gap:3mm; align-items:flex-start; margin:4.5mm 0; }
+  .saem .avatar{ flex:0 0 auto; width:10.5mm; height:10.5mm; border-radius:50%; background:var(--brand); color:#fff; font-size:7pt; font-weight:800; display:flex; align-items:center; justify-content:center; line-height:1.35; letter-spacing:0.04em; text-align:center; border:0.5mm solid var(--accent); box-sizing:border-box;}
+  .saem .bubble{ background:#FFFBF0; border:0.4mm solid #EBCB9C; border-radius:3mm; padding:2.2mm 3.6mm 2mm; position:relative; }
+  .saem .bubble::before{ content:""; position:absolute; left:-1.8mm; top:3.2mm; width:3mm; height:3mm; background:#FFFBF0; border-left:0.4mm solid #EBCB9C; border-bottom:0.4mm solid #EBCB9C; transform:rotate(45deg); }
+
+  .wing .wtitle{ font-size:8pt; font-weight:900; color:var(--brand); display:flex; align-items:center; gap:1.5mm; margin:0 0 2.4mm; letter-spacing:0.05em; }
+  .wing .wtitle::before{ content:""; width:2.4mm; height:2.4mm; background:var(--accent); border-radius:50%; }
+  .wing .term{ margin-bottom:3.6mm; }
+  .wing .term b{ color:var(--ink); font-weight:800; display:block; font-size:8.5pt; margin-bottom:0.7mm;}
+  .wing .wsep{ border-top:0.3mm dashed var(--line); margin:4.5mm 0; }
+  .wing .wing-pen{ font-family:'PC Pen'; font-size:11pt; color:#B4560E; line-height:1.45; }
+
+  figure{ margin:5mm 0; }
+  figure figcaption{ font-size:8pt; color:var(--sub); text-align:center; margin-top:2mm; }
+  figure svg{ display:block; margin:0 auto; }
+
+  /* ── 비교형 그림 (2패널 + 범례) ── */
+  .fig-duo{ display:flex; align-items:stretch; gap:2.5mm; justify-content:center; }
+  .fig-duo .panel{ flex:0 0 auto; text-align:center; }
+  .fig-duo .p-title{ font-size:9pt; font-weight:900; color:var(--ink); margin-top:1.6mm; }
+  .fig-duo .p-sub{ font-size:7.8pt; color:var(--sub); line-height:1.45; margin-top:0.5mm; }
+  .fig-duo .mid{ display:flex; flex-direction:column; align-items:center; justify-content:center; gap:1mm; padding:0 1mm; }
+  .fig-duo .mid .mlab{ font-size:7.6pt; font-weight:800; color:var(--unit); text-align:center; line-height:1.3; }
+  .fig-legend{ display:flex; justify-content:center; gap:5mm; font-size:7.8pt; color:var(--ink); margin-top:1.2mm; align-items:center; }
+  .fig-legend span{ display:inline-flex; align-items:center; gap:1.4mm; }
+
+  /* ── 탐구 (자료 파헤치기) ── */
+  .lab{ border:0.5mm solid var(--brand); border-radius:2.5mm; overflow:hidden; margin-top:1mm;}
+  .lab .lab-head{ background:var(--brand); color:#fff; padding:2.2mm 4mm; font-weight:900; font-size:11pt; display:flex; align-items:center; gap:2.5mm;}
+  .lab .lab-head .tag{ font-size:7.5pt; background:rgba(255,255,255,.22); padding:0.6mm 2.4mm; border-radius:4mm; font-weight:700;}
+  .lab .lab-body{ padding:3.5mm 4mm; }
+  .lab h4{ font-size:9.6pt; font-weight:900; color:var(--brand); margin:2.5mm 0 1.4mm; }
+  .lab h4:first-child{ margin-top:0; }
+  .lab p, .lab li{ font-family:'PC Serif'; font-size:9.3pt; line-height:1.8; }
+  .lab ol{ margin-left:5mm; }
+
+  /* ── 문제부 ── */
+  .step-head{ display:flex; align-items:center; gap:3mm; margin:0 0 5mm; }
+  .step-head .stepno{ background:var(--unit); color:#fff; font-weight:900; font-size:9.5pt; padding:1.4mm 3.4mm; border-radius:1.5mm; letter-spacing:0.04em;}
+  .step-head .steptt{ font-size:12.5pt; font-weight:900; }
+  .step-head .stepdesc{ font-size:8.2pt; color:var(--sub); margin-left:auto; }
+  .step-head.s2 .stepno{ background:var(--brand); }
+  .step-head.s3 .stepno{ background:var(--point); }
+
+  .q{ margin-bottom:7.5mm; break-inside:avoid; }
+  .q .qhead{ display:flex; gap:2.4mm; align-items:flex-start; }
+  .q .qno{ flex:0 0 auto; min-width:6.2mm; height:6.2mm; border:0.45mm solid var(--unit); color:var(--unit); border-radius:50%; font-size:8.6pt; font-weight:900; line-height:1; display:flex; align-items:center; justify-content:center; padding-top:0.55mm; margin-top:0.4mm;}
+  .q .stem{ font-family:'PC Serif'; font-size:9.5pt; line-height:1.74; font-weight:500; }
+  .q .stem .difficulty{ color:#C9A227; font-size:8pt; letter-spacing:0.06em; margin-left:1.5mm;}
+  .q .tags{ margin-top:0.8mm; font-size:7pt; color:var(--sub); font-family:'PC Sans';}
+  .choices{ list-style:none; margin:2.2mm 0 0 8.6mm; font-family:'PC Serif'; font-size:9.3pt; line-height:1.85; }
+  .choices.inline{ display:flex; flex-wrap:wrap; gap:0 6mm; }
+  .bogi-box{ border:0.35mm solid #B8C2CA; border-radius:0; margin:2.5mm 0 0 8.6mm; padding:2.4mm 3.2mm; font-family:'PC Serif'; font-size:9.2pt; line-height:1.8; background:none;}
+  .bogi-box .bt{ text-align:center; font-weight:800; color:var(--sub); font-size:8.4pt; margin-bottom:0.8mm; letter-spacing:0.3em;}
+  .ox-answer{ margin-left:2mm; color:var(--sub); font-size:9pt; }
+  .blankline{ display:inline-block; min-width:14mm; border-bottom:0.4mm solid var(--ink); }
+  .qgrid{ display:grid; grid-template-columns:1fr 1fr; gap:0 9mm; }
+  .essay-lines{ margin:2mm 0 0 8.4mm; }
+  .essay-lines div{ border-bottom:0.3mm solid var(--line); height:6.2mm; }
+  .badge-essay{ display:inline-block; background:var(--point); color:#fff; font-size:7pt; font-weight:800; padding:0.4mm 2mm; border-radius:1mm; vertical-align:1pt; margin-right:1.2mm;}
+  .badge-data{ display:inline-block; background:var(--brand); color:#fff; font-size:7pt; font-weight:800; padding:0.4mm 2mm; border-radius:1mm; vertical-align:1pt; margin-right:1.2mm;}
+
+  /* ── 해설부 ── */
+  .sol-head{ display:flex; align-items:center; gap:3mm; margin-bottom:4mm;}
+  .sol-head .stt{ font-size:14.5pt; font-weight:900; color:var(--brand);}
+  .sol-head .sub{ font-size:8.5pt; color:var(--sub);}
+  .anstable{ width:100%; border-collapse:collapse; margin-bottom:4.5mm; }
+  .anstable th,.anstable td{ border:0.3mm solid var(--line); font-size:8.8pt; padding:1.4mm 0; text-align:center; }
+  .anstable th{ background:var(--brand-lt); color:var(--brand); font-weight:800; }
+  .anstable td.a{ font-weight:900; color:var(--unit); }
+  .sol{ margin-bottom:5mm; break-inside:avoid; }
+  .sol .shead{ display:flex; align-items:center; gap:2mm; margin-bottom:1.4mm;}
+  .sol .sno{ background:var(--unit); color:#fff; min-width:6mm; height:5.4mm; border-radius:1.2mm; font-size:8.6pt; font-weight:900; line-height:1; display:flex; align-items:center; justify-content:center; padding:0.5mm 1.5mm 0;}
+  .sol .sans{ font-weight:900; color:var(--unit); font-size:9.6pt;}
+  .sol .slink{ font-size:7.2pt; color:var(--sub); margin-left:auto;}
+  .sol p{ font-family:'PC Serif'; font-size:9.1pt; line-height:1.76; margin-bottom:0.8mm; }
+  .wrongbox{ background:none; border:none; border-left:0.7mm solid #E3A0AC; border-radius:0; padding:1mm 0 1mm 3mm; margin-top:2mm;}
+  .wrongbox .wt{ font-size:8pt; font-weight:900; color:var(--point); margin-bottom:0.8mm; font-family:'PC Sans';}
+  .wrongbox p{ font-family:'PC Serif'; font-size:8.6pt; line-height:1.68; margin-bottom:0.9mm;}
+  .wrongbox p:last-child{ margin-bottom:0; }
+  .solcols{ display:grid; grid-template-columns:1fr 1fr; gap:0 9mm; }
+
+  /* ── 단원 도입 (타이포그래피 중심) ── */
+  .opener{ padding:0 0 19mm; }
+  .opener-hero{ position:relative; padding:7mm 20mm 4.5mm; overflow:hidden; flex-shrink:0; }
+  .ghost-txt{ position:absolute; top:-10mm; right:6mm; font-size:118pt; font-weight:900; color:#EDF1FC; line-height:1; letter-spacing:-0.04em; }
+  .kicker{ display:flex; align-items:center; gap:4mm; position:relative; }
+  .kicker .kt{ font-size:9.5pt; font-weight:800; color:var(--unit); letter-spacing:0.24em; white-space:nowrap; }
+  .kicker::after{ content:""; flex:1; border-top:0.3mm solid var(--line); }
+  .opener-hero h1{ position:relative; font-size:36pt; font-weight:900; letter-spacing:-0.015em; margin:4mm 0 0; }
+  .opener-hero h1 .tick{ display:block; width:14mm; border-top:1.4mm solid var(--accent); margin-bottom:3.6mm; }
+  .opener-lede{ position:relative; font-family:'PC Serif'; font-size:10.2pt; font-weight:600; line-height:2.0; color:#3D4C58; max-width:138mm; margin-top:4mm; padding-left:5mm; border-left:0.8mm solid var(--accent); }
+  .opener-inner{ padding:0 20mm; }
+
+  /* ── 원소의 여정 스트립 ── */
+  .journey{ margin-top:3.5mm; }
+  .journey .j-label{ font-size:8pt; font-weight:800; color:var(--sub); letter-spacing:0.08em; margin-bottom:2.4mm; display:flex; align-items:center; gap:1.6mm;}
+  .journey .j-label::before{ content:""; width:2.4mm; height:2.4mm; background:var(--unit); border-radius:50%; }
+  .j-bar{ display:flex; align-items:center; gap:2mm; }
+  .j-chip{ flex:1; text-align:center; background:#F5F1FC; border:0.35mm solid #CFC0EE; color:#6B46C8; border-radius:1.6mm; padding:3mm 1mm 2.6mm; }
+  .j-chip .jc-t{ font-size:8.8pt; font-weight:800; display:block; }
+  .j-chip .jc-s{ font-size:6.8pt; color:var(--sub); display:block; margin-top:0.5mm; }
+  .j-chip.on{ background:var(--unit); border-color:var(--unit); }
+  .j-chip.on .jc-t{ color:#fff; }
+  .j-chip.on .jc-s{ color:#D9E2F8; }
+  .j-arrow{ flex:0 0 auto; color:#AB93E6; font-size:10pt; font-weight:900; }
+  .toc{ margin-top:6.5mm; }
+  .toc .toc-title{ font-size:11pt; font-weight:900; color:var(--ink); margin-bottom:3mm; display:flex; align-items:center; gap:2.5mm;}
+  .toc .toc-title::before{ content:""; width:3.4mm; height:3.4mm; background:var(--accent); border-radius:0.8mm; }
+  .toc-item{ display:flex; align-items:flex-start; gap:5mm; padding:4.4mm 6mm; border-bottom:0.3mm solid var(--line); }
+  .toc-item:first-of-type{ border-top:0.3mm solid var(--line); }
+  .toc-item.active{ background:#F5F1FC; border-left:1.2mm solid #9E85E0; }
+  .toc-item .tno{ font-family:'PC Serif'; font-weight:900; color:#9E85E0; font-size:14pt; width:10mm; line-height:1.1; flex:0 0 auto;}
+  .toc-item .tbody{ flex:1; min-width:0; }
+  .toc-item .ttt{ font-weight:800; font-size:10.5pt; letter-spacing:0.01em; display:flex; align-items:center;}
+  .toc-item .tdesc{ font-family:'PC Serif'; font-size:8.6pt; font-weight:600; color:#4A5964; margin-top:0.7mm; line-height:1.55;}
+  .toc-item .tstd{ font-size:7.2pt; color:var(--sub); flex:0 0 auto; padding-top:1.2mm;}
+  .toc-item.active .tag-now{ background:var(--accent); color:#fff; font-size:7pt; font-weight:900; border-radius:4mm; padding:0.7mm 2.6mm; margin-left:3.5mm;}
+  .toc-item .tag-done{ font-size:7.2pt; font-weight:800; color:#6B46C8; margin-left:3.5mm; }
+  .opener-quote{ margin-top:7mm; text-align:center; font-family:'PC Serif'; font-size:9.8pt; font-weight:600; color:#4A5964; letter-spacing:0.01em; }
+  .opener-quote .who{ font-size:8pt; color:var(--sub); font-weight:400; margin-left:2.5mm; }
+  .qa-lead li .qgo{ font-family:'PC Sans'; font-size:7.4pt; font-weight:800; color:var(--unit); background:var(--unit-lt); border-radius:3mm; padding:0.5mm 2.2mm; margin-left:2mm; white-space:nowrap; vertical-align:1pt;}
+  .qa-lead{ margin-top:5mm; border:none; border-top:0.45mm solid var(--brand); border-bottom:0.45mm solid var(--brand); background:none; border-radius:0; padding:3mm 2mm 2.8mm; }
+  .qa-lead .qt{ font-weight:900; color:var(--brand); font-size:10.5pt; margin-bottom:2mm;}
+  .qa-lead li{ font-family:'PC Serif'; font-size:9.5pt; line-height:1.8; margin-left:5mm; }
+
+  /* ── 바로바로 체크 (개념 페이지 하단 즉석 OX) ── */
+  .quickcheck{ margin-top:auto; border-top:0.35mm dashed #C8B98F; padding-top:3mm; width:calc(100% - 51mm); }
+  .quickcheck .qc-title{ display:inline-flex; align-items:center; gap:1.6mm; font-size:8.2pt; font-weight:900; color:#9C6503; margin-bottom:1.4mm; }
+  .quickcheck .qc-title::before{ content:"✓"; color:var(--accent); font-weight:900; }
+  .quickcheck ol{ list-style:none; font-family:'PC Serif'; font-size:8.8pt; line-height:1.75; }
+  .quickcheck li{ display:flex; gap:2mm; align-items:baseline; }
+  .quickcheck li .no{ font-weight:800; color:var(--accent); flex:0 0 auto; }
+  .quickcheck .qc-ans{ margin-top:1mm; font-size:7.2pt; color:var(--sub); transform:rotate(180deg); text-align:left; }
+
+  /* ── 중학 과학 다시보기 (날개단) ── */
+  .wing .review{ background:#F6F3EC; border-radius:1.8mm; padding:2.8mm 3mm; margin-top:1mm; }
+  .wing .review .rv-title{ font-size:7.8pt; font-weight:900; color:#7A6A45; margin-bottom:1.4mm; display:flex; align-items:center; gap:1.4mm;}
+  .wing .review .rv-title::before{ content:"↺"; font-weight:900; color:#A08A55; }
+
+  /* ── MEMO 페이지 ── */
+  .memo-head{ display:flex; align-items:baseline; gap:3.5mm; margin-bottom:5mm; }
+  .memo-head .mt{ font-size:17pt; font-weight:900; color:var(--brand); letter-spacing:0.22em; }
+  .memo-head .ms{ font-size:8.6pt; color:var(--sub); }
+  .memo-area{ flex:1; border:0.4mm solid var(--line); border-radius:2.5mm;
+    background-image:linear-gradient(to bottom, transparent calc(100% - 0.3mm), #DCE4E9 0);
+    background-size:100% 9mm; background-position:0 4mm; padding:0 5mm; margin-bottom:4mm; }
+  .memo-pen{ font-family:'PC Pen'; font-size:12.5pt; color:#B4560E; text-align:right; }
+  /* ── 대단원 마무리 ── */
+  .sumgrid{ display:grid; grid-template-columns:1fr 1fr; gap:3.5mm; }
+  .sumcard{ border:0.4mm solid var(--unit-md); border-radius:2.5mm; padding:3mm 3.5mm 2.6mm; }
+  .sumcard .sc-h{ display:flex; align-items:baseline; gap:2.2mm; margin-bottom:1.6mm; }
+  .sumcard .sc-no{ background:var(--unit); color:#fff; font-size:8pt; font-weight:900; padding:0.5mm 2.2mm; border-radius:1.2mm; }
+  .sumcard .sc-t{ font-size:10pt; font-weight:900; }
+  .sumcard .sc-pg{ margin-left:auto; font-size:7.4pt; color:var(--sub); }
+  .sumcard ul{ list-style:none; font-family:"PC Serif"; font-size:8.7pt; line-height:1.68; }
+  .sumcard li{ padding-left:3.6mm; position:relative; margin-bottom:0.9mm; }
+  .sumcard li::before{ content:"✓"; position:absolute; left:0; color:var(--unit); font-weight:900; font-size:7.5pt; }
+  .chip{ display:inline-block; background:var(--unit-lt); color:var(--unit); font-size:7.4pt; font-weight:800; border-radius:3mm; padding:0.5mm 2.4mm; margin:0.8mm 1.2mm 0 0; font-family:"PC Sans"; }
+  .one-line{ margin-top:4.5mm; background:var(--accent-lt); border-radius:3mm; padding:3.6mm 6mm 3mm; text-align:center; }
+  .one-line .pen{ font-size:14.5pt; }
+  .final-check{ margin-top:4.5mm; border-top:0.45mm solid var(--unit); border-bottom:0.45mm solid var(--unit); padding:3mm 2mm 2.6mm; }
+  .final-check .fc-title{ font-weight:900; color:var(--unit); font-size:10pt; margin-bottom:1.8mm; }
+  .final-check ol{ list-style:none; font-family:"PC Serif"; font-size:9.2pt; line-height:1.85; }
+  .final-check li{ display:flex; gap:2mm; align-items:baseline; }
+  .final-check li .no{ font-weight:800; color:var(--accent); flex:0 0 auto; }
+  .final-check .qc-ans{ margin-top:1.4mm; font-size:7.2pt; color:var(--sub); transform:rotate(180deg); text-align:left; }
+</style>
+</head>
+<body>
+
+<!-- ═════════════ p.210 대단원 마무리 A — 단원 개념 지도 ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag">III. 시스템과 상호작용</span><span class="lesson-tag">대단원 마무리 — 단원을 한눈에</span></div>
+  <div class="sol-head"><span class="stt" style="color:var(--unit);">III단원을 한눈에 — 시스템과 상호작용</span><span class="sub">지구라는 큰 시스템부터 세포 속 유전자까지 — 주고받아야 유지된다</span></div>
+
+  <figure style="margin:3mm 0 0;">
+    <svg width="640" height="573" viewBox="0 0 505 452" font-family="PC Sans">
+      <defs>
+        <marker id="arrU" markerWidth="9" markerHeight="9" refX="7" refY="3.5" orient="auto"><path d="M0,0 L8,3.5 L0,7 Z" fill="#6B46C8"/></marker>
+      </defs>
+      <!-- 1층: 지구 시스템 -->
+      <text x="252" y="16" text-anchor="middle" font-size="9.5" font-weight="900" fill="#5B6B77">거대한 시스템 — 행성 규모의 상호작용</text>
+      <g transform="translate(22,26)">
+        <rect width="225" height="86" rx="6" fill="#F2EDFB" stroke="#6B46C8" stroke-width="1.4"/>
+        <text x="112" y="21" text-anchor="middle" font-size="10" font-weight="900" fill="#6B46C8">01 지구시스템</text>
+        <text x="112" y="40" text-anchor="middle" font-size="8.2" fill="#3D4C58">기권·수권·지권·생물권·외권</text>
+        <text x="112" y="57" text-anchor="middle" font-size="8.2" font-weight="800" fill="#4A2E96">권역들이 물질·에너지를 주고받는다</text>
+        <text x="112" y="75" text-anchor="middle" font-size="7.8" fill="#5B6B77">에너지원: 태양 · 지구 내부 · 조력</text>
+      </g>
+      <line x1="251" y1="69" x2="266" y2="69" stroke="#6B46C8" stroke-width="2.2" marker-end="url(#arrU)"/>
+      <g transform="translate(270,26)">
+        <rect width="213" height="86" rx="6" fill="#F2EDFB" stroke="#6B46C8" stroke-width="1.4"/>
+        <text x="106" y="21" text-anchor="middle" font-size="10" font-weight="900" fill="#6B46C8">02 판구조론</text>
+        <text x="106" y="40" text-anchor="middle" font-size="8.2" fill="#3D4C58">맨틀 대류가 판을 움직인다</text>
+        <text x="106" y="57" text-anchor="middle" font-size="8.2" font-weight="800" fill="#4A2E96">경계 3종: 발산·수렴·보존(변환 단층)</text>
+        <text x="106" y="75" text-anchor="middle" font-size="7.8" fill="#5B6B77">지진·화산은 판 경계에 몰린다</text>
+      </g>
+      <line x1="252" y1="116" x2="252" y2="136" stroke="#6B46C8" stroke-width="2.4" marker-end="url(#arrU)"/>
+      <text x="262" y="131" font-size="8" fill="#5B6B77">시스템을 움직이는 힘의 법칙은?</text>
+
+      <!-- 2층: 힘과 운동 -->
+      <text x="252" y="152" text-anchor="middle" font-size="9.5" font-weight="900" fill="#5B6B77">상호작용의 법칙 — 힘이 운동을 바꾼다</text>
+      <g transform="translate(22,160)">
+        <rect width="225" height="86" rx="6" fill="#F2EDFB" stroke="#6B46C8" stroke-width="1.4"/>
+        <text x="112" y="21" text-anchor="middle" font-size="10" font-weight="900" fill="#6B46C8">03 중력과 운동</text>
+        <text x="112" y="40" text-anchor="middle" font-size="8.2" fill="#3D4C58">자유 낙하: 1초마다 9.8 m/s씩 빨라짐(질량 무관)</text>
+        <text x="112" y="57" text-anchor="middle" font-size="8.2" font-weight="800" fill="#4A2E96">수평 투사 = 수평 등속 + 연직 낙하</text>
+        <text x="112" y="75" text-anchor="middle" font-size="7.8" fill="#5B6B77">위성·달 = 계속 떨어지는 중</text>
+      </g>
+      <line x1="251" y1="203" x2="266" y2="203" stroke="#6B46C8" stroke-width="2.2" marker-end="url(#arrU)"/>
+      <g transform="translate(270,160)">
+        <rect width="213" height="86" rx="6" fill="#F2EDFB" stroke="#6B46C8" stroke-width="1.4"/>
+        <text x="106" y="21" text-anchor="middle" font-size="10" font-weight="900" fill="#6B46C8">04 운동량과 충격량</text>
+        <text x="106" y="40" text-anchor="middle" font-size="8.2" fill="#3D4C58">운동량 = mv · 충격량 = Ft = 운동량 변화</text>
+        <text x="106" y="57" text-anchor="middle" font-size="8.2" font-weight="800" fill="#4A2E96">안전장치: 시간 ↑ → 힘 ↓ (에어백)</text>
+        <text x="106" y="75" text-anchor="middle" font-size="7.8" fill="#5B6B77">스포츠: 시간·힘 ↑ → 충격량 ↑</text>
+      </g>
+      <line x1="252" y1="250" x2="252" y2="270" stroke="#6B46C8" stroke-width="2.4" marker-end="url(#arrU)"/>
+      <text x="262" y="265" font-size="8" fill="#5B6B77">가장 정교한 시스템은?</text>
+
+      <!-- 3층: 생명 시스템 -->
+      <text x="252" y="286" text-anchor="middle" font-size="9.5" font-weight="900" fill="#5B6B77">생명 시스템 — 세포 규모의 상호작용</text>
+      <g transform="translate(22,294)">
+        <rect width="225" height="86" rx="6" fill="#F2EDFB" stroke="#6B46C8" stroke-width="1.4"/>
+        <text x="112" y="21" text-anchor="middle" font-size="10" font-weight="900" fill="#6B46C8">05 생명 시스템과 화학 반응</text>
+        <text x="112" y="40" text-anchor="middle" font-size="8.2" fill="#3D4C58">물질대사 = 동화(합성·흡수) / 이화(분해·방출)</text>
+        <text x="112" y="57" text-anchor="middle" font-size="8.2" font-weight="800" fill="#4A2E96">효소: 활성화 에너지 ↓ (기질 특이성)</text>
+        <text x="112" y="75" text-anchor="middle" font-size="7.8" fill="#5B6B77">세포막 = 인지질 2중층, 선택적 투과성</text>
+      </g>
+      <line x1="251" y1="337" x2="266" y2="337" stroke="#6B46C8" stroke-width="2.2" marker-end="url(#arrU)"/>
+      <g transform="translate(270,294)">
+        <rect width="213" height="86" rx="6" fill="#F2EDFB" stroke="#6B46C8" stroke-width="1.4"/>
+        <text x="106" y="21" text-anchor="middle" font-size="10" font-weight="900" fill="#6B46C8">06 유전자에서 단백질까지</text>
+        <text x="106" y="40" text-anchor="middle" font-size="8.2" fill="#3D4C58">염색체 ⊃ DNA ⊃ 유전자 — 정보 = 염기 서열</text>
+        <text x="106" y="57" text-anchor="middle" font-size="8.2" font-weight="800" fill="#4A2E96">전사(핵, T→U) → 번역(리보솜, 코돈 3=아미노산 1)</text>
+        <text x="106" y="75" text-anchor="middle" font-size="7.8" fill="#5B6B77">염기 하나 → 형질까지 (낫 모양 적혈구)</text>
+      </g>
+      <text x="252" y="404" text-anchor="middle" font-size="8.6" font-weight="800" fill="#E8940A">행성의 권역도, 낙하하는 위성도, 세포 속 효소도 — '상호작용'이라는 하나의 언어로 읽힌다</text>
+      <text x="252" y="424" text-anchor="middle" font-size="8" fill="#5B6B77">그리고 05의 효소(단백질)는 06의 유전자가 만든다 — 두 소단원은 한 문장이다</text>
+    </svg>
+    <figcaption>단원 개념 지도 | 행성에서 유전자까지 — 세 층의 시스템</figcaption>
+  </figure>
+
+  <div class="one-line">
+    <span class="pen">"지구도 세포도 — 시스템은 주고받으며 유지된다."</span>
+  </div>
+
+  <div class="folio"><span>대단원 마무리 | III. 시스템과 상호작용</span><span class="num">210</span></div>
+</div>
+
+<!-- ═════════════ p.211 대단원 마무리 B — 핵심 카드 + 최종 점검 ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag">III. 시스템과 상호작용</span><span class="lesson-tag">대단원 마무리 — 소단원 핵심 카드</span></div>
+
+  <div class="sumgrid">
+    <div class="sumcard">
+      <div class="sc-h"><span class="sc-no">01</span><span class="sc-t">지구시스템</span><span class="sc-pg">131쪽</span></div>
+      <ul>
+        <li>다섯 권역(기권·수권·지권·생물권·외권)이 <b>물질 순환·에너지 흐름</b>으로 연결</li>
+        <li>에너지원 셋: <b>태양 에너지</b>(최대) · 지구 내부 에너지 · 조력</li>
+      </ul>
+    </div>
+    <div class="sumcard">
+      <div class="sc-h"><span class="sc-no">02</span><span class="sc-t">판구조론</span><span class="sc-pg">145쪽</span></div>
+      <ul>
+        <li>판 경계 3종: <b>발산</b>(새 지각) · <b>수렴</b>(소멸, 밀도 큰 해양판 침강) · <b>보존</b>(변환 단층)</li>
+        <li>지진·화산의 분포 = 판 경계의 지도 — 원동력은 <b>맨틀 대류</b></li>
+      </ul>
+    </div>
+    <div class="sumcard">
+      <div class="sc-h"><span class="sc-no">03</span><span class="sc-t">중력과 운동</span><span class="sc-pg">158쪽</span></div>
+      <ul>
+        <li><b>질량</b>(불변) vs <b>무게</b>(중력의 크기, 달에서 1/6) — 방향은 지구 중심 쪽</li>
+        <li>자유 낙하는 질량 무관 · 수평 투사 = <b>수평 등속 + 연직 낙하</b>(동시 착지)</li>
+        <li>위성 = 무중력이 아니라 <b>계속 낙하 중</b></li>
+      </ul>
+    </div>
+    <div class="sumcard">
+      <div class="sc-h"><span class="sc-no">04</span><span class="sc-t">운동량과 충격량</span><span class="sc-pg">171쪽</span></div>
+      <ul>
+        <li><b>충격량 = F × t = 운동량 변화량</b> — F-t 그래프의 넓이</li>
+        <li>한 등식, 두 용법: 보호는 <b>시간↑ → 힘↓</b> / 발사는 <b>시간·힘↑ → 충격량↑</b></li>
+      </ul>
+    </div>
+    <div class="sumcard">
+      <div class="sc-h"><span class="sc-no">05</span><span class="sc-t">생명 시스템과 화학 반응</span><span class="sc-pg">184쪽</span></div>
+      <ul>
+        <li>물질대사는 <b>체온에서, 단계적으로, 효소와 함께</b> — 연소와의 3대 차이</li>
+        <li>효소 = 활성화 에너지 ↓ 생체 촉매, <b>단백질이라 열에 약함</b>(감자 실험)</li>
+        <li>세포막: 작은 분자는 직접 확산, 큰 분자는 <b>막단백질 통로</b></li>
+      </ul>
+    </div>
+    <div class="sumcard">
+      <div class="sc-h"><span class="sc-no">06</span><span class="sc-t">유전자에서 단백질까지</span><span class="sc-pg">197쪽</span></div>
+      <ul>
+        <li>정보의 한 방향 흐름: <b>DNA →(전사)→ RNA →(번역)→ 단백질 → 형질</b></li>
+        <li>전사는 핵 안(T 대신 U), 번역은 리보솜 — <b>장소 바꿔치기</b>가 최다 함정</li>
+        <li>염기 수 ÷ 3 = 아미노산 수 · 염기 하나가 형질을 바꾼다</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="final-check">
+    <div class="fc-title">시험 전 마지막 점검 — 3분 OX</div>
+    <ol>
+      <li><span class="no">1</span>지진과 화산은 판의 안쪽 한가운데에 고르게 분포한다. ( O , X )</li>
+      <li><span class="no">2</span>달에 가면 질량이 1/6로 줄어든다. ( O , X )</li>
+      <li><span class="no">3</span>에어백은 충돌 시간을 늘려 사람이 받는 힘을 줄인다. ( O , X )</li>
+      <li><span class="no">4</span>세포 호흡은 포도당을 합성하는 동화 작용이다. ( O , X )</li>
+      <li><span class="no">5</span>전사는 핵 안에서, 번역은 리보솜에서 일어난다. ( O , X )</li>
+    </ol>
+    <div class="qc-ans">정답 1 X (판 경계에 몰린다) 2 X (무게만 1/6, 질량 불변) 3 O 4 X (분해 — 이화 작용) 5 O — 틀린 번호의 소단원으로!</div>
+  </div>
+
+  <div class="saem" style="margin-top:5mm;">
+    <div class="avatar">박찬<br>쌤</div>
+    <div class="bubble"><span class="pen">"통합과학 1 완주! I단원의 도구로 재고, II단원의 원소로 짓고, III단원의 시스템으로 굴렸다 — 2권에서는 이 세계가 '변화'하기 시작한다."</span></div>
+  </div>
+
+  <div class="folio"><span>대단원 마무리 | III. 시스템과 상호작용</span><span class="num">211</span></div>
+</div>
+
+</body>
+</html>
