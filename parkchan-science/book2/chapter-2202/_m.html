@@ -1105,5 +1105,25 @@
   <div class="folio"><span>박찬 과학 | 통합과학 2</span><span class="num">105</span></div>
 </div>
 
+
+<script>
+function run(){
+  const MM=96/25.4, out=[];
+  document.querySelectorAll('.page').forEach((pg,i)=>{
+    const pr=pg.getBoundingClientRect();
+    const main=pg.querySelector('.main'), qc=pg.querySelector('.quickcheck');
+    let mainBot=null, qcTop=null, maxBot=0, maxEl='';
+    if(main){ [...main.querySelectorAll('*')].forEach(el=>{const r=el.getBoundingClientRect(); if(r.height>0&&r.bottom>maxBot){maxBot=r.bottom;maxEl=el.tagName+'.'+(el.className||'').split(' ')[0];}}); mainBot=+((maxBot-pr.top)/MM).toFixed(1);}
+    if(qc){ qcTop=+((qc.getBoundingClientRect().top-pr.top)/MM).toFixed(1); }
+    // absolute deepest element except folio
+    let deep=0, dEl='';
+    [...pg.querySelectorAll('*')].forEach(el=>{ if(el.closest('.folio'))return; const r=el.getBoundingClientRect(); if(r.height>0&&r.bottom>deep){deep=r.bottom;dEl=el.tagName+'.'+(el.className||'').split(' ')[0];}});
+    out.push({p:i+1, mainBot, qcTop, deep:+((deep-pr.top)/MM).toFixed(1), dEl, maxEl});
+  });
+  const pre=document.createElement('pre'); pre.id='rep';
+  pre.textContent='BEGIN'+JSON.stringify(out)+'END'; document.body.appendChild(pre);
+}
+if(document.readyState==='complete') run(); else window.addEventListener('load',()=>document.fonts?document.fonts.ready.then(run):run());
+</script>
 </body>
 </html>
