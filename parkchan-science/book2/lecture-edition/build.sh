@@ -6,7 +6,9 @@ cd "$(dirname "$0")"
 CHROME="${CHROME:-/opt/pw-browsers/chromium}"
 
 # 챕터 순서 (존재하는 파일만)
-ORDER=(L-2101 L-2102 L-2103 L-2104 L-2105 L-2201 L-2202 L-2203 L-2204 L-2205 L-2301 L-2302 L-2303)
+ORDER=(L-front L-2101 L-2102 L-2103 L-2104 L-2105 L-sum1 \
+       L-2201 L-2202 L-2203 L-2204 L-2205 L-sum2 \
+       L-2301 L-2302 L-2303 L-sum3)
 FILES=()
 for c in "${ORDER[@]}"; do [ -f "$c.html" ] && FILES+=("$c"); done
 
