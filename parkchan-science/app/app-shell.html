@@ -1,4 +1,14 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>하루 한 개념 · 통합과학</title>
+<meta name="description" content="통합과학 개념 하나를 매일 배달합니다. 학원 강의 교재를 그대로 옮겼습니다.">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#147D6F">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="박찬 과학">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="icon" href="icon-192.png">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&family=Noto+Serif+KR:wght@400;600;700&display=swap">
 <style>
 :root{
@@ -191,6 +201,42 @@ figcaption{font-size:11.5px;color:var(--u-dark);font-weight:700;margin-top:7px;
   font-variant-numeric:tabular-nums;line-height:1.25}
 .prog .val small{font-size:13px;color:var(--muted);font-weight:600}
 
+/* 설정 · 학원 코드 */
+.pass{background:var(--card);border:1.5px solid var(--u);border-radius:16px;padding:16px;
+  position:relative;overflow:hidden;margin-bottom:14px}
+.pass::before{content:"";position:absolute;inset:0 0 auto 0;height:3px;background:var(--u)}
+.pass .badge{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:800;
+  color:var(--u);background:var(--u-soft);padding:4px 10px;border-radius:999px;margin-bottom:11px}
+.pass .who{font-size:19px;font-weight:900;letter-spacing:-.02em;margin-bottom:2px}
+.pass .where{font-size:12.5px;color:var(--muted);margin-bottom:13px}
+.pass .row{display:flex;gap:9px;font-size:12px;line-height:1.55;padding:6px 0;
+  border-top:1px solid var(--hair)}
+.pass .row dt{color:var(--muted);flex:0 0 44px}
+.pass .row dd{color:var(--body);flex:1}
+.pass .row dd b{color:var(--ink);font-weight:700}
+.codebox{background:var(--card);border:1px solid var(--line);border-radius:15px;
+  padding:16px;margin-bottom:14px}
+.codebox h3{font-size:15px;font-weight:900;margin-bottom:6px}
+.codebox p{font-size:12.5px;color:var(--muted);line-height:1.7;margin-bottom:13px}
+.codebox .f{display:flex;gap:7px}
+.codebox input{flex:1;border:1.5px solid var(--line);border-radius:11px;padding:12px 14px;
+  font-size:15px;font-family:inherit;letter-spacing:.16em;text-transform:uppercase;
+  background:var(--paper);color:var(--ink);min-width:0}
+.codebox input:focus{outline:2px solid var(--u);outline-offset:-2px}
+.codebox button{background:var(--u);color:#fff;border:none;border-radius:11px;
+  padding:12px 18px;font-size:14px;font-weight:800;cursor:pointer;font-family:inherit;
+  flex:0 0 auto}
+.codebox .demo{font-size:11.5px;color:var(--faint);margin-top:11px;line-height:1.7}
+.codebox .demo code{background:var(--u-soft);color:var(--u-dark);padding:2px 7px;
+  border-radius:6px;font-weight:800;letter-spacing:.05em}
+.codebox .err{font-size:12.5px;color:var(--no);margin-top:10px;font-weight:600}
+.setrow{display:flex;align-items:center;gap:11px;padding:14px 2px;
+  border-bottom:1px solid var(--hair);font-size:14px}
+.setrow .l{flex:1;color:var(--body)}
+.setrow .v{color:var(--faint);font-size:13px}
+.linkbtn{background:none;border:none;color:var(--muted);font-size:13px;font-family:inherit;
+  cursor:pointer;text-decoration:underline;padding:14px 2px}
+
 /* 탭바 */
 .tabs{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;
   max-width:440px;display:flex;border-top:1px solid var(--hair);background:var(--card);
@@ -217,11 +263,13 @@ figcaption{font-size:11.5px;color:var(--u-dark);font-weight:700;margin-top:7px;
     <section id="v-quiz" class="hide"></section>
     <section id="v-list" class="hide"></section>
     <section id="v-wrong" class="hide"></section>
+    <section id="v-me" class="hide"></section>
   </main>
   <nav class="tabs">
     <button class="tab on" data-v="today"><svg viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="15" rx="2.5"/><path d="M4 10h16M9 3v4M15 3v4"/></svg>오늘</button>
     <button class="tab" data-v="list"><svg viewBox="0 0 24 24"><path d="M5 4h9l5 5v11H5z"/><path d="M14 4v5h5"/></svg>교재</button>
     <button class="tab" data-v="wrong"><svg viewBox="0 0 24 24"><path d="M6 4h12v16l-6-4-6 4z"/></svg>오답</button>
+    <button class="tab" data-v="me"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.6"/><path d="M5 20c1.4-3.8 4-5.6 7-5.6s5.6 1.8 7 5.6"/></svg>내 정보</button>
   </nav>
 </div>
 
@@ -235,6 +283,20 @@ const QUIZZES  = JSON.parse(document.getElementById('d-quizzes').textContent);
 const MARKS = '①②③④⑤';
 const KEY = 'pcs.v1';
 const FREE_DAYS = 7;
+
+/* 데모용 학원 코드 — 실제로는 서버가 코드를 확인하고 학생과 반을 돌려준다 */
+const CODES = {
+  MON123: {name:'박○○', cls:'월목반', until:'2026년 2월 28일'},
+  TUE456: {name:'김○○', cls:'화금반', until:'2026년 2월 28일'},
+  WED789: {name:'이○○', cls:'수토반', until:'2026년 2월 28일'},
+};
+/* 공지는 반마다 다르다 — 월목반 학생에게 수토반 공지가 가면 안 된다 */
+const NOTICES = {
+  '월목반': {t:'월요일 수업 교실이 2층으로 바뀝니다', d:'201호 → 2층 강의실 · 원장님'},
+  '화금반': {t:'금요일 수업 30분 늦게 시작합니다', d:'6시 30분까지 와 주세요 · 원장님'},
+  '수토반': {t:'토요일 보강 안내', d:'오후 2시 · 실험실에서 · 원장님'},
+};
+const myNotice = () => (S.auth && NOTICES[S.auth.cls]) || null;
 
 const load = () => { try { return JSON.parse(localStorage.getItem(KEY)) || {}; } catch { return {}; } };
 const save = s => { try { localStorage.setItem(KEY, JSON.stringify(s)); } catch {} };
@@ -268,17 +330,21 @@ function renderToday(){
   document.getElementById('v-today').innerHTML = `
     <div class="top">
       <span class="date">${d.getMonth()+1}월 ${d.getDate()}일 ${wd}요일</span>
-      <span class="pill"><svg viewBox="0 0 24 24"><path d="M4 12.5l5.5 5.5L20 7"/></svg> 4:02 출석</span>
+      ${S.auth ? `<span class="pill"><svg viewBox="0 0 24 24"><path d="M4 12.5l5.5 5.5L20 7"/></svg> 4:02 출석</span>`
+               : `<span class="pill" style="background:var(--hair);color:var(--muted)">${dayIndex()+1}일째</span>`}
     </div>
-    ${S.notice ? '' : `
-    <div class="notice">
-      <div class="ic">!</div>
-      <div class="b">
-        <div class="t">오늘 수업 30분 늦게 시작합니다</div>
-        <div class="d">6시 30분까지 와 주세요 · 원장님</div>
-      </div>
-      <button id="okNotice">확인</button>
-    </div>`}
+    ${(() => {
+      const n = myNotice();
+      if (!n || S.noticeSeen === S.auth.cls) return '';
+      return `<div class="notice">
+        <div class="ic">!</div>
+        <div class="b">
+          <div class="t">${n.t}</div>
+          <div class="d">${n.d} · ${S.auth.cls}</div>
+        </div>
+        <button id="okNotice">확인</button>
+      </div>`;
+    })()}
     <article class="card">
       <div class="loc">${c.lessonId.slice(2,4)==='01'?'':''}${c.unit}-${c.lessonId.slice(2)} · 개념 ${c.no}</div>
       <h1>${c.title}</h1>
@@ -416,11 +482,56 @@ function renderWrong(){
     }).join('')}`;
 }
 
+/* ── 내 정보 ── */
+let codeErr = '';
+function renderMe(){
+  const a = S.auth;
+  document.getElementById('v-me').innerHTML = `
+    <h1 class="h-page">내 정보</h1>
+    ${a ? `
+      <div class="pass">
+        <span class="badge">✓ 학원 수강생 인증됨</span>
+        <div class="who">${a.name} 학생</div>
+        <div class="where">박찬 과학 · ${a.cls}</div>
+        <dl>
+          <div class="row"><dt>기기</dt><dd><b>이 기기에서만</b> 사용 · 변경 1회 남음</dd></div>
+          <div class="row"><dt>기간</dt><dd>${a.until}까지 · 수강 연장 시 자동 갱신</dd></div>
+          <div class="row"><dt>공지</dt><dd><b>${a.cls}</b> 공지만 받습니다</dd></div>
+        </dl>
+      </div>
+    ` : `
+      <div class="codebox">
+        <h3>학원 수강생이신가요?</h3>
+        <p>코드를 등록하면 전 범위가 열리고, <b>내 반 공지</b>와 출석이 함께 관리됩니다.
+          코드가 없어도 매일 1개념·1문제는 그대로 받습니다.</p>
+        <div class="f">
+          <input id="codeIn" placeholder="코드 6자리" maxlength="6" autocomplete="off">
+          <button id="codeGo">등록</button>
+        </div>
+        ${codeErr ? `<div class="err">${codeErr}</div>` : ''}
+        <div class="demo">시연용 코드 — <code>MON123</code> 월목반 · <code>TUE456</code> 화금반 · <code>WED789</code> 수토반</div>
+      </div>
+    `}
+    <div class="sec">
+      <h2>설정</h2>
+      <div class="setrow"><span class="l">알림 받을 시각</span><span class="v">오후 6:00</span></div>
+      <div class="setrow"><span class="l">글자 크기</span><span class="v">보통</span></div>
+      <div class="setrow" style="border:none"><span class="l">화면 테마</span><span class="v">시스템</span></div>
+    </div>
+    <div class="sec">
+      <h2>진도</h2>
+      <div class="setrow"><span class="l">공부한 개념</span><span class="v">${S.done.length}개</span></div>
+      <div class="setrow" style="border:none"><span class="l">오답 노트</span><span class="v">${S.wrong.length}문제</span></div>
+    </div>
+    ${a ? `<button class="linkbtn" id="unauth">이 기기에서 코드 등록 해제</button>` : ''}
+    <p class="fine">진도는 이 브라우저에 저장됩니다 · 실제 앱에서는 계정에 저장됩니다</p>`;
+}
+
 /* ── 화면 전환 ── */
 let view = 'today';
 function show(v){
   view = v;
-  ['today','quiz','list','wrong'].forEach(k=>
+  ['today','quiz','list','wrong','me'].forEach(k=>
     document.getElementById('v-'+k).classList.toggle('hide', k!==v));
   document.querySelectorAll('.tab').forEach(t=>
     t.classList.toggle('on', t.dataset.v === (v==='quiz'?'today':v)));
@@ -428,6 +539,7 @@ function show(v){
   if (v==='quiz')  renderQuiz();
   if (v==='list')  renderList();
   if (v==='wrong') renderWrong();
+  if (v==='me')    renderMe();
   window.scrollTo(0,0);
 }
 
@@ -446,7 +558,7 @@ document.addEventListener('click', e=>{
     return;
   }
 
-  if (e.target.closest('#okNotice')){ S.notice = true; save(S); renderToday(); return; }
+  if (e.target.closest('#okNotice')){ S.noticeSeen = S.auth.cls; save(S); renderToday(); return; }
   if (e.target.closest('#goQuiz')){ qState = null; show('quiz'); return; }
 
   const opt = e.target.closest('.opt');
@@ -474,6 +586,15 @@ document.addEventListener('click', e=>{
     return;
   }
 
+  if (e.target.closest('#codeGo')){
+    const v = (document.getElementById('codeIn').value || '').trim().toUpperCase();
+    const hit = CODES[v];
+    if (hit){ S.auth = {...hit, code:v}; S.noticeSeen = null; codeErr=''; save(S); renderMe(); }
+    else { codeErr = v ? '등록되지 않은 코드입니다. 원장님께 받은 코드를 확인해 주세요.' : '코드를 입력해 주세요.'; renderMe(); }
+    return;
+  }
+  if (e.target.closest('#unauth')){ S.auth = null; S.noticeSeen = null; save(S); renderMe(); return; }
+
   const row = e.target.closest('.row');
   if (row && !row.disabled){
     const c = CONCEPTS[+row.dataset.i];
@@ -483,4 +604,10 @@ document.addEventListener('click', e=>{
 });
 
 show('today');
+
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('sw.js').catch(() => {});
+  });
+}
 </script>

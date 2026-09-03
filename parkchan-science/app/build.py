@@ -13,4 +13,10 @@ out = (shell.replace('<!--CONCEPTS-->', j(concepts))
             .replace('<!--QUIZZES-->', j(quizzes))
             .replace('<!--FIGS-->', '\n'.join(figs)))
 (SC / 'parkchan-app.html').write_text(out, encoding='utf-8')
+
+# GitHub Pages 로 나가는 PWA 배포본 — manifest·service worker 가 함께 있어야 앱처럼 동작한다
+pages = ROOT.parent / 'docs' / 'parkchan'
+if pages.exists():
+    (pages / 'index.html').write_text(out, encoding='utf-8')
+    print(f'배포본 → {pages}/index.html')
 print(f'{len(out)//1024} KB · 개념 {len(concepts)} · 문항 {len(quizzes)} · 그림 {len(figs)}')

@@ -32,7 +32,11 @@ def txt(node, keep_bold=False):
 
 
 def parse_lesson(path):
-    soup = BeautifulSoup(path.read_text(encoding='utf-8'), 'html.parser')
+    src_text = path.read_text(encoding='utf-8')
+    # 페이지 원문을 순서대로 들고 있다가, 그림은 여기서 원문 그대로 꺼낸다
+    raw_pages = [seg for seg in re.split(r'(?=<div class="page lect")', src_text)
+                 if seg.lstrip().startswith('<div class="page lect"')]
+    soup = BeautifulSoup(src_text, 'html.parser')
     code = path.stem[2:]                       # L-2203 → 2203
     unit, unit_name = UNIT_OF[code[:2]]
     band = txt(soup.select_one('.tagband span'))          # "II. 환경과 에너지 · 03 지구온난화와 기후변화"
@@ -40,7 +44,7 @@ def parse_lesson(path):
     lesson_name = re.sub(r'^\d+\s*', '', lesson_name)
 
     concepts, cur = [], None
-    for page in soup.select('.page.lect'):
+    for pi, page in enumerate(soup.select('.page.lect')):
         if page.select_one('.qs-head') or page.select_one('.memo-area'):
             if cur:
                 concepts.append(cur)
@@ -75,10 +79,15 @@ def parse_lesson(path):
             fig = page.select_one('.a-fig')
             if fig and fig.find('svg'):
                 cap = fig.select_one('figcaption')
+                raw_svg = ''
+                if pi < len(raw_pages):
+                    m = re.search(r'<svg\b.*?</svg>', raw_pages[pi], re.S)
+                    if m:
+                        raw_svg = m.group()          # 원문 — 대소문자가 살아 있다
                 cur['figure'] = {
                     'caption': txt(cap).split('|')[-1].strip() if cap else '',
                     'file': f"figures/{cur['id']}.svg",
-                    '_svg': str(fig.find('svg'))}
+                    '_svg': raw_svg or str(fig.find('svg'))}
             for li in page.select('.howto li'):
                 n = li.select_one('b.n')          # 번호는 앱이 다시 붙인다
                 if n:
