@@ -24,6 +24,8 @@ jobs:
   build:
     runs-on: ubuntu-latest
     timeout-minutes: 40
+    env:
+      KS: ${{ secrets.ANDROID_KEYSTORE_B64 }}
     defaults:
       run:
         working-directory: parkchan-science/app-native
@@ -67,9 +69,8 @@ jobs:
           cp app/build/outputs/apk/debug/app-debug.apk ../parkchan-science-debug.apk
 
       - name: 서명된 배포용 APK·AAB (Secrets 있을 때만)
-        if: ${{ secrets.ANDROID_KEYSTORE_B64 != '' }}
+        if: ${{ env.KS != '' }}
         env:
-          KS: ${{ secrets.ANDROID_KEYSTORE_B64 }}
           KS_PW: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
           KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
           KEY_PW: ${{ secrets.ANDROID_KEY_PASSWORD }}
