@@ -178,6 +178,8 @@ figcaption{font-size:11.5px;color:var(--u-dark);font-weight:700;margin-top:7px;
 
 /* 목록 */
 .h-page{font-size:21px;font-weight:900;letter-spacing:-.02em;margin-bottom:14px}
+.book-h{font-family:'Noto Serif KR',serif;font-size:20px;font-weight:900;letter-spacing:-.01em;margin:26px 0 2px;padding-bottom:6px;border-bottom:2px solid var(--line)}
+.book-h:first-of-type{margin-top:4px}
 .unit-h{display:flex;align-items:center;gap:9px;margin:20px 0 10px}
 .unit-h:first-of-type{margin-top:4px}
 .unit-h .no{font-family:'Noto Serif KR',serif;font-size:17px;font-weight:900;color:var(--u)}
@@ -522,7 +524,7 @@ const quizFor = c => { const pool = QUIZZES.filter(q=>q.lessonId===c.lessonId); 
 function conceptCard(c, opts={}){
   return `
     <article class="card">
-      <div class="loc">${c.unit}-${c.lessonId.slice(2)} · 개념 ${c.no}${opts.date?` · ${opts.date}`:''}</div>
+      <div class="loc">${c.bookName?esc(c.bookName)+' · ':''}${c.unit}-${c.lessonId.slice(2)} · 개념 ${c.no}${opts.date?` · ${opts.date}`:''}</div>
       <h1>${esc(c.title)}</h1>
       <div class="sub">${esc(c.subtitle||c.lessonName)}</div>
       <div class="steps">${c.steps.map(s=>`
@@ -655,8 +657,10 @@ function renderList(){
     <p class="fine" style="text-align:left;padding:0 0 14px">${S.auth
       ? `${esc(S.auth.name)} 학생 · 학원 수강생은 전 범위가 열려 있습니다.`
       : `최근 ${FREE_DAYS}일치가 열려 있습니다. 그 앞의 개념은 학원 코드를 등록하거나 이용권을 구매하면 열립니다.`}</p>`;
-  let unit='';
+  let unit='', book='';
   CONCEPTS.forEach((c,i)=>{
+    if (c.book!==book){ book=c.book; unit='';
+      html += `<div class="book-h">${esc(c.bookName||'')}</div>`; }
     if (c.unit!==unit){ unit=c.unit;
       html += `<div class="unit-h" data-u="${c.unit}"><span class="no">${c.unit}</span><span class="nm">${esc(c.unitName)}</span><span class="ln"></span></div>`; }
     const open = isOpen(i), done = S.done.includes(c.id);

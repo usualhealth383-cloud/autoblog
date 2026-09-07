@@ -10,11 +10,14 @@
 import json, re, sys, pathlib
 from bs4 import BeautifulSoup
 
-SRC = pathlib.Path(__file__).resolve().parent.parent / 'book2' / 'lecture-edition'
-OUT = pathlib.Path(sys.argv[1] if len(sys.argv) > 1 else
-                   pathlib.Path(__file__).resolve().parent.parent / 'data')
-UNIT_OF = {'21': ('I', '변화와 다양성'), '22': ('II', '환경과 에너지'),
-           '23': ('III', '과학과 미래 사회')}
+ROOT = pathlib.Path(__file__).resolve().parent.parent
+# 통합과학1(book/) 이 앞, 통합과학2(book2/) 가 뒤 — 앱의 '오늘의 개념' 순서다
+SRCS = [(ROOT / 'book' / 'lecture-edition', 'L-1[0-9][0-9][0-9].html'),
+        (ROOT / 'book2' / 'lecture-edition', 'L-2[0-9][0-9][0-9].html')]
+OUT = pathlib.Path(sys.argv[1] if len(sys.argv) > 1 else ROOT / 'data')
+UNIT_OF = {'11': ('I', '과학의 기초'), '12': ('II', '물질과 규칙성'), '13': ('III', '시스템과 상호작용'),
+           '21': ('I', '변화와 다양성'), '22': ('II', '환경과 에너지'), '23': ('III', '과학과 미래 사회')}
+BOOK_OF = {'1': '통합과학 1', '2': '통합과학 2'}
 MARKS = '①②③④⑤'
 
 
@@ -31,14 +34,41 @@ def txt(node, keep_bold=False):
     return re.sub(r'\s+', ' ', node.get_text(' ')).strip()
 
 
+def file_markers(src_text):
+    """파일 상단 defs-only svg 의 마커들 — id → 마커 원문."""
+    m = re.search(r'<svg class="defs-only".*?<defs>(.*?)</defs>', src_text, re.S)
+    if not m:
+        return {}
+    return {mk.group(1): mk.group(0)
+            for mk in re.finditer(r'<marker id="([^"]+)".*?</marker>', m.group(1), re.S)}
+
+
+def selfcontain(svg, markers, cid):
+    """그림 하나를 독립 문서로: 쓰는 마커를 <defs> 로 넣고, 모든 id 에 개념 번호를 붙여
+    앱 한 문서 안에서 다른 그림과 id 가 부딪히지 않게 한다."""
+    used = set(re.findall(r'url\(#([^)]+)\)', svg)) | set(re.findall(r'href="#([^"]+)"', svg))
+    need = [markers[i] for i in used if i in markers]
+    if need:
+        svg = re.sub(r'(<svg\b[^>]*>)', lambda m: m.group(1) + '<defs>' + ''.join(need) + '</defs>', svg, count=1)
+    ids = set(re.findall(r'\bid="([^"]+)"', svg))
+    sfx = '-' + cid
+    for i in sorted(ids, key=len, reverse=True):
+        svg = svg.replace(f'id="{i}"', f'id="{i}{sfx}"')
+        svg = svg.replace(f'url(#{i})', f'url(#{i}{sfx})')
+        svg = svg.replace(f'href="#{i}"', f'href="#{i}{sfx}"')
+    return svg
+
+
 def parse_lesson(path):
     src_text = path.read_text(encoding='utf-8')
+    markers = file_markers(src_text)
     # 페이지 원문을 순서대로 들고 있다가, 그림은 여기서 원문 그대로 꺼낸다
     raw_pages = [seg for seg in re.split(r'(?=<div class="page lect")', src_text)
                  if seg.lstrip().startswith('<div class="page lect"')]
     soup = BeautifulSoup(src_text, 'html.parser')
     code = path.stem[2:]                       # L-2203 → 2203
     unit, unit_name = UNIT_OF[code[:2]]
+    book = code[0]
     band = txt(soup.select_one('.tagband span'))          # "II. 환경과 에너지 · 03 지구온난화와 기후변화"
     lesson_name = band.split('·')[-1].strip()
     lesson_name = re.sub(r'^\d+\s*', '', lesson_name)
@@ -61,6 +91,7 @@ def parse_lesson(path):
                 soft.extract()
             cur = {
                 'id': f"{code}-{txt(lesson_tag).replace('개념 ', '')}",
+                'book': book, 'bookName': BOOK_OF[book],
                 'unit': unit, 'unitName': unit_name,
                 'lessonId': code, 'lessonName': lesson_name,
                 'no': txt(lesson_tag).replace('개념 ', ''),
@@ -87,7 +118,7 @@ def parse_lesson(path):
                 cur['figure'] = {
                     'caption': txt(cap).split('|')[-1].strip() if cap else '',
                     'file': f"figures/{cur['id']}.svg",
-                    '_svg': raw_svg or str(fig.find('svg'))}
+                    '_svg': selfcontain(raw_svg or str(fig.find('svg')), markers, cur['id'])}
             for li in page.select('.howto li'):
                 n = li.select_one('b.n')          # 번호는 앱이 다시 붙인다
                 if n:
@@ -157,7 +188,8 @@ def parse_lesson(path):
 def main():
     (OUT / 'figures').mkdir(parents=True, exist_ok=True)
     all_c, all_q = [], []
-    for path in sorted(SRC.glob('L-2[0-9][0-9][0-9].html')):
+    paths = [p for src, pat in SRCS for p in sorted(src.glob(pat))]
+    for path in paths:
         cs, qs = parse_lesson(path)
         for c in cs:
             if c['figure']:
