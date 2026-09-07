@@ -52,7 +52,7 @@ for r in pills_raw:
         'f': (r.get('표시앞') or '').strip().replace('-', ''), 'b': (r.get('표시뒤') or '').strip().replace('-', ''),
         'sh': (r.get('의약품제형') or '').strip(), 'c': (r.get('색상앞') or '').strip(), 'c2': (r.get('색상뒤') or '').strip().replace('-', ''),
         'd': (r.get('성상') or '').strip(), 'cls': (r.get('분류명') or '').strip(), 'cvs': 1 if '안전상비' in kind else 0,
-        'sz': (r.get('크기장축') or '').strip(),
+        'sz': (r.get('크기장축') or '').strip(), 'seq': (r.get('품목일련번호') or '').strip(),
     }
     pills.append(item)
     by_name.setdefault(base_name(item['n']), item)
@@ -72,14 +72,14 @@ for r in read(easy_p):
         'n': r['제품명'].strip(), 'm': (r.get('업체명') or '').strip(), 'i': ingr, 'map': ids,
         'e': clean('이 약의 효능은 무엇입니까?'), 'u': clean('이 약은 어떻게 사용합니까?'), 'c': clean('이 약의 사용상 주의사항은 무엇입니까?'),
         'x': clean('이 약을 사용하는 동안 주의해야 할 약 또는 음식은 무엇입니까?'), 's': clean('이 약은 어떤 이상반응이 나타날 수 있습니까?'), 'k': clean('이 약은 어떻게 보관해야 합니까?'),
-        'img': pill['img'] if pill else '', 'cvs': pill['cvs'] if pill else 0,
+        'img': pill['img'] if pill else '', 'cvs': pill['cvs'] if pill else 0, 'seq': pill['seq'] if pill else '',
     })
 
 dump = lambda o: json.dumps(o, ensure_ascii=False, separators=(',', ':'))
 # 검색용 인덱스(가벼움) + 상세는 200건씩 조각으로 — 앱은 필요할 때만 조각을 받는다
 CH = 200
 for old in OUT.glob('easy-*.json'): old.unlink()
-index = [{'n': e['n'], 'm': e['m'], 'i': e['i'], 'map': e['map'], 'img': e['img'], 'cvs': e['cvs'], 'id': i} for i, e in enumerate(easy)]
+index = [{'n': e['n'], 'm': e['m'], 'i': e['i'], 'map': e['map'], 'img': e['img'], 'cvs': e['cvs'], 'seq': e['seq'], 'id': i} for i, e in enumerate(easy)]
 (OUT / 'easy-index.json').write_text(dump(index), encoding='utf-8')
 for k in range(0, len(easy), CH):
     (OUT / f'easy-{k // CH}.json').write_text(dump([{kk: v for kk, v in e.items() if kk in ('e', 'u', 'c', 'x', 's', 'k')} for e in easy[k:k + CH]]), encoding='utf-8')

@@ -39,7 +39,7 @@ for d in drugs:
             best = sorted(hits, key=lambda k: (0 if k.startswith(n) else 1, len(k)))[0]
             src = idx[best]
             if any(k in src['n'] for k in ('액', '시럽', '현탁')): continue
-            out[name] = {'img': src['img'], 'match': src['n']}
+            out[name] = {'img': src['img'], 'match': src['n'], 'seq': src.get('seq', '')}
             break
 (ROOT / 'content' / 'productImages.json').write_text(json.dumps(out, ensure_ascii=False, indent=1), encoding='utf-8')
 print(len(out), '개 제품 사진 매핑')
