@@ -129,3 +129,69 @@ create policy student_reads_sel   on notice_reads for select using (code = my_co
 create policy student_reads_ins   on notice_reads for insert with check (code = my_code());
 create policy student_progress    on progress     for all using (code = my_code()) with check (code = my_code());
 create policy classes_read        on classes      for select using (true);
+
+-- ══ v2: 계정 프로필 · 보호자 · 이용권 ══
+-- 프로필: Supabase Auth 사용자(auth.users) 1명당 1행. 역할·이름·연결된 학생 코드(학생) 또는 자녀 코드(보호자)·이용권 만료일
+create table if not exists profiles (
+  id          uuid primary key references auth.users(id) on delete cascade,
+  role        text not null default 'student' check (role in ('student','parent','owner')),
+  name        text not null default '',
+  phone       text default '',
+  student_code text references students(code) on delete set null,
+  child_code  text references students(code) on delete set null,
+  pass_until  date,
+  created_at  timestamptz not null default now()
+);
+-- 이용권 코드(원장이 발급, 앱에서 등록)
+create table if not exists passes (
+  code     text primary key,
+  days     int not null,
+  issued   date not null default current_date,
+  used_by  uuid references auth.users(id) on delete set null,
+  used_at  date
+);
+alter table profiles enable row level security;
+alter table passes   enable row level security;
+create policy profile_self   on profiles for all using (id = auth.uid()) with check (id = auth.uid() and (role <> 'owner' or is_owner()));
+create policy profile_owner  on profiles for select using (is_owner());
+create policy passes_owner   on passes   for all using (is_owner()) with check (is_owner());
+
+-- 로그인한 학생·보호자가 헤더 없이도 자기(자녀) 코드로 보이게
+create or replace function my_codes() returns setof text language sql stable as $$
+  select my_code() union select coalesce(student_code, '') from profiles where id = auth.uid() union select coalesce(child_code, '') from profiles where id = auth.uid();
+$$;
+drop policy if exists student_self on students;
+create policy student_self on students for select using (code in (select my_codes()) and until >= current_date);
+drop policy if exists student_att on attendance;
+create policy student_att on attendance for select using (code in (select my_codes()));
+drop policy if exists student_notices on notices;
+create policy student_notices on notices for select using (cls = '전체' or cls in (select cls from students where code in (select my_codes())));
+drop policy if exists student_reads_sel on notice_reads;
+create policy student_reads_sel on notice_reads for select using (code in (select my_codes()));
+drop policy if exists student_progress on progress;
+create policy student_progress on progress for all
+  using (code in (select my_codes()) or code = 'u:' || coalesce(auth.uid()::text, ''))
+  with check (code = my_code() or code = (select student_code from profiles where id = auth.uid()) or code = 'u:' || coalesce(auth.uid()::text, ''));
+
+-- 이용권 등록: 한 번만, 남은 기간이 있으면 그 뒤로 이어 붙인다
+create or replace function redeem_pass(p_code text) returns json language plpgsql security definer as $$
+declare p passes; pr profiles; base date;
+begin
+  if auth.uid() is null then return json_build_object('ok', false, 'why', '로그인이 필요합니다.'); end if;
+  select * into p from passes where code = p_code;
+  if not found then return json_build_object('ok', false, 'why', '없는 이용권 코드입니다.'); end if;
+  if p.used_by is not null then return json_build_object('ok', false, 'why', '이미 사용된 코드입니다.'); end if;
+  select * into pr from profiles where id = auth.uid();
+  base := greatest(coalesce(pr.pass_until, current_date), current_date);
+  update profiles set pass_until = base + p.days where id = auth.uid();
+  update passes set used_by = auth.uid(), used_at = current_date where code = p_code;
+  return json_build_object('ok', true, 'until', (base + p.days)::text);
+end $$;
+-- 계정 삭제(개인정보 처리방침): 프로필·진도·인증 사용자까지
+create or replace function delete_my_account() returns void language plpgsql security definer as $$
+begin
+  if auth.uid() is null then raise exception 'login required'; end if;
+  delete from progress where code = 'u:' || auth.uid()::text;
+  delete from profiles where id = auth.uid();
+  delete from auth.users where id = auth.uid();
+end $$;

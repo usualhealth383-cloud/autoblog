@@ -18,6 +18,13 @@
 5. **Project Settings → API** 의 `Project URL` 과 `anon public` 키를 `app/server/config.json` 에 넣습니다(`config.example.json` 참고).
 6. `python3 app/build.py` → `cd app-native && npm run sync` → APK 자동 빌드(Actions → android-apk).
 
+## v2 (2026-09-08) — 계정·보호자·이용권
+- `profiles`(계정 1명 = 1행: 역할 student/parent/owner · 이름 · 연락처 · 연결한 학생 코드 · 자녀 코드 · 이용권 만료일), `passes`(이용권 코드) 표와
+  RPC `redeem_pass`(이용권 등록) · `delete_my_account`(계정 삭제)가 추가됐다. `schema.sql` 을 다시 통째로 실행하면 된다(있는 표는 건너뛴다).
+- 회원가입은 Supabase Auth(이메일·비밀번호). **Authentication → Providers → Email** 에서 "Confirm email" 을 끄면 가입 즉시 로그인된다(켜 두면 메일 확인 뒤 로그인).
+- 원장 계정은 `is_owner()` 의 이메일 1개. 앱에서 '원장·선생님'으로 가입해도 그 이메일이 아니면 관리 화면이 열리지 않는다.
+- 보호자는 자녀 코드로 자녀의 출석·진도·공지를 읽기만 한다(RLS `my_codes()`).
+
 ## 앱 쪽에서 바뀌는 것 (이미 구현됨)
 `app-shell.html` 의 `DBX` 가 서버 어댑터로 바뀝니다. 함수 이름·반환 형태는 로컬 어댑터와 같으므로 화면 코드는 그대로입니다.
 - **학생**: 요청 헤더 `x-student-code` 로 자기 코드 행만 보입니다(RLS). 코드 등록 → 반 공지 → 출석(`mark_attend`, 서버가 30초 창 검증) → 진도(`progress`)가 서버에 저장되어 **폰을 바꿔도 이어집니다**.
@@ -28,7 +35,8 @@
 ```
 python3 app/server/mock_server.py 8766          # Supabase 흉내(메모리)
 cd docs/parkchan && python3 -m http.server 8765  # 앱
-python3 parkchan-science/tools/e2e_server.py     # 원장 로그인 → 코드 발급 → 공지 → 학생 출석·문제 → 새 폰 진도 이어짐 → 읽음·출석 집계
+python3 parkchan-science/tools/e2e_server.py     # 원장 → 학생 가입·출석·문제 → 새 폰 동기화 → 보호자 자녀 보기 → 이용권 → 계정 삭제 → 읽음·통계
+python3 parkchan-science/tools/e2e_local.py      # 같은 흐름을 로컬 모드(서버 없음)에서
 ```
 앱을 `?server=http://127.0.0.1:8766&key=anon` 으로 열면 그 기기에서 서버 주소를 기억합니다(`?server=` 빈값으로 열면 해제).
 
