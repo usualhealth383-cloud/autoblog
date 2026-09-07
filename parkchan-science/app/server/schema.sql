@@ -140,6 +140,8 @@ create table if not exists profiles (
   student_code text references students(code) on delete set null,
   child_code  text references students(code) on delete set null,
   pass_until  date,
+  under14     boolean not null default false,        -- 만 14세 미만(법정대리인 동의 확인)
+  guardian    text default '',                       -- 법정대리인 성명·연락처
   created_at  timestamptz not null default now()
 );
 -- 이용권 코드(원장이 발급, 앱에서 등록)
