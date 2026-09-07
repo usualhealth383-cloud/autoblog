@@ -55,8 +55,9 @@
 }
 *{box-sizing:border-box;margin:0;padding:0}
 html{-webkit-text-size-adjust:100%}
+html{font-size:var(--fs,16px)}
 body{background:var(--ground);color:var(--text);font-family:var(--font);word-break:keep-all;
-  line-height:1.6;display:flex;justify-content:center;min-height:100vh;font-size:16px;
+  line-height:1.6;display:flex;justify-content:center;min-height:100vh;font-size:1rem;
   -webkit-font-smoothing:antialiased;text-wrap:pretty}
 .app{width:100%;max-width:460px;background:var(--surface);min-height:100vh;display:flex;flex-direction:column;overflow-x:clip;
   box-shadow:0 0 40px rgba(0,0,0,.06);position:relative}
@@ -169,6 +170,38 @@ ul.steps li::before{content:counter(s);position:absolute;left:0;top:2px;width:24
 .disclaimer{display:flex;align-items:flex-start;gap:var(--s2);margin-top:var(--s5);padding:var(--s3) var(--s4);background:var(--tint);border-radius:var(--r-input);color:var(--muted);font-size:.8125rem;line-height:1.55}
 .disclaimer svg.i{width:16px;height:16px;margin-top:2px}
 
+/* 결론 카드(증상 첫 화면) */
+.answer{background:var(--card);border:1.5px solid var(--primary);border-radius:20px;padding:var(--s4);box-shadow:0 10px 30px rgba(var(--primary-rgb),.12)}
+.answer .eyebrow{margin-bottom:var(--s2)}
+.answer .buy{display:flex;flex-direction:column;gap:8px}
+.buy-item{display:grid;grid-template-columns:52px 1fr auto;align-items:center;gap:10px;padding:10px 12px;border-radius:12px;background:var(--tint2)}
+.buy-item .k{font-size:.6875rem;font-weight:800;color:var(--primary);background:var(--tint);border-radius:8px;padding:6px 0;text-align:center;line-height:1.2}
+.buy-item.opt .k{background:var(--tint2);color:var(--muted);border:1px dashed var(--hairline)}
+.buy-item b{font-size:1rem;display:block;line-height:1.3}
+.buy-item small{display:block;color:var(--muted);font-size:.75rem;margin-top:1px}
+.buy-item .rx{font-size:.6875rem}
+.answer .line{display:grid;grid-template-columns:56px 1fr;gap:10px;margin-top:12px;font-size:.9375rem;line-height:1.5}
+.answer .line span:first-child{font-weight:800;color:var(--muted);font-size:.8125rem;padding-top:2px}
+.answer .line.stop span:first-child{color:var(--alert)}
+.memo-actions{display:flex;gap:8px;margin-top:14px}
+.memo-actions .btn{min-height:44px;font-size:.875rem;padding:0 14px}
+/* 나에게 맞추기 칩 */
+.fitme{margin-top:var(--s3)}
+.fitme .chips .chip{min-height:40px}
+.fitme .chip.on{background:var(--alert-tint);border-color:var(--alert);color:var(--alert)}
+/* 접이식 섹션 */
+details.acc{background:var(--card);border:1px solid var(--hairline);border-radius:var(--r-card);box-shadow:var(--shadow-card);margin-top:var(--s3)}
+details.acc summary{list-style:none;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:16px var(--s4);font-size:1.0625rem;font-weight:700;min-height:56px}
+details.acc summary::-webkit-details-marker{display:none}
+details.acc summary small{font-weight:500;color:var(--muted);font-size:.8125rem;flex:1;text-align:left}
+details.acc summary svg.i{color:var(--faint);transition:transform .2s}
+details.acc[open] summary svg.i{transform:rotate(90deg)}
+details.acc .bd{padding:0 var(--s4) var(--s4)}
+/* 홈 빠른 선택 */
+.quick{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;margin:var(--s4) calc(-1 * var(--s4)) 0;padding:0 var(--s4) 4px}
+.quick::-webkit-scrollbar{display:none}
+.quick button{flex:none;display:inline-flex;align-items:center;gap:8px;min-height:48px;padding:0 16px 0 12px;border-radius:14px;background:var(--card);border:1px solid var(--hairline);box-shadow:var(--shadow-card);font-weight:700;font-size:.9375rem}
+.quick button svg.i{color:var(--primary)}
 /* 케어 카드 3단계 (NHS care cards → 약국/병원/응급) */
 .care{border-radius:var(--r-card);overflow:hidden;border:1px solid var(--hairline);background:var(--card)}
 .care+.care{margin-top:var(--s3)}
@@ -465,8 +498,9 @@ function vHome(){
   return `${topBar()}
   <section class="hero">
     <h1 class="greet">${esc(greet)}</h1>
-    <p>증상을 고르면 진료실에서 처방하듯 <b>진통·소염·근이완·위보호</b> 조합으로 풀어서, 약국에서 무엇을 사야 하는지까지 알려드려요.</p>
-    <div class="search" role="search">${I.search}<input id="q" placeholder="증상·약 이름·성분 검색" autocomplete="off" enterkeyhint="search"></div>
+    <p>증상을 고르면 <b>무엇을 사고, 어떻게 먹고, 언제 병원에 갈지</b> 세 줄로 먼저 알려드려요.</p>
+    <div class="search" role="search">${I.search}<input id="q" placeholder="증상이나 약 이름 (예: 허리, 타이레놀)" autocomplete="off" enterkeyhint="search"></div>
+    <div class="quick" aria-label="자주 찾는 증상">${['msk', 'dysmenorrhea', 'cold', 'headache', 'heartburn', 'fever'].map(id => byId(D.symptoms, id)).filter(Boolean).map(x => `<button onclick="go('/symptom/${x.id}')">${icon(x.icon)}${esc(x.name.split(' (')[0])}</button>`).join('')}</div>
   </section>
   ${groups.map(g => `<section class="sec"><h2>${esc(g)}</h2><div class="tiles">${(D.symptoms || []).filter(s => s.group === g).map(s => `<button class="tile" onclick="go('/symptom/${s.id}')"><div class="ic">${icon(s.icon)}</div><b>${esc(s.name)}</b><span>${esc(s.short || '')}</span></button>`).join('')}</div></section>`).join('')}
   <section class="sec"><h2>바로 가기</h2>
@@ -501,9 +535,32 @@ function vSearch(_, q){
 }
 
 /* ───────── 증상 상세: 처방 스타일 조합 ───────── */
+function fitChips(){
+  const opts = [['pregnant', '임신·수유'], ['ulcer', '위가 약함·궤양'], ['heart', '고혈압·심장'], ['anticoag', '항응고제'], ['kidney', '신장'], ['asthma', '천식']];
+  const age = [['senior', '65세 이상'], ['child', '소아·청소년']];
+  return `<div class="fitme"><div class="small muted" style="margin-bottom:6px;font-weight:600">나에게 맞추기 — 해당하면 눌러 주세요</div><div class="chips">${opts.map(([k, n]) => `<button class="chip ${ME[k] ? 'on' : ''}" onclick="ME['${k}']=!ME['${k}'];saveMe();route()">${ME[k] ? I.check : ''}${esc(n)}</button>`).join('')}${age.map(([k, n]) => `<button class="chip ${ME.age === k ? 'on' : ''}" onclick="ME.age=ME.age==='${k}'?'adult':'${k}';saveMe();route()">${ME.age === k ? I.check : ''}${esc(n)}</button>`).join('')}</div></div>`;
+}
+function basket(s){
+  const f = activeFlags();
+  return (s.plan || []).filter(p => p.otc !== false && p.options?.length).map(p => {
+    let pick = p.pick || p.options[0]; let d = drug(pick);
+    const bad = x => drug(x)?.avoid?.some(a => a.flags?.some(fl => f.includes(fl)));
+    let swapped = false;
+    if (d && bad(pick)) { const alt = p.options.find(o => !bad(o) && drug(o)?.rx !== '전문'); if (alt) { pick = alt; d = drug(alt); swapped = true; } }
+    return { slot: p.slot, d, optional: !!p.optional, swapped, blocked: d ? bad(pick) : false, product: d?.products?.[0]?.name };
+  }).filter(x => x.d);
+}
+function memoText(s){
+  const items = basket(s).map(x => x.blocked ? `${x.slot}: ${x.d.name}은(는) 내 상태(${activeFlags().map(k => FLAG_LABEL[k] || k).join('·')})에 주의 — 약사와 상의` : `${x.optional ? '(필요 시) ' : ''}${x.d.name}${x.product ? ' — 예: ' + x.product : ''}`);
+  return `[약손] ${s.name}\n${items.map(t => '· ' + t).join('\n')}\n${s.pharmacy?.[0] ? '\n' + s.pharmacy[0].replace(/\*\*/g, '') : ''}\n\n소염제는 한 가지만 · 아세트아미노펜 하루 4 g 이내`;
+}
+async function shareMemo(id){ const s = byId(D.symptoms, id); const t = memoText(s); try { if (navigator.share) { await navigator.share({ title: '약국 메모 · ' + s.name, text: t }); return; } } catch (e) { return; } try { await navigator.clipboard.writeText(t); toast('약국 메모를 복사했어요'); } catch (e) { prompt('복사해서 쓰세요', t); } }
+const acc = (title, body, sub, open) => body ? `<details class="acc" ${open ? 'open' : ''}><summary>${esc(title)}${sub ? `<small>${esc(sub)}</small>` : ''}${I.chev}</summary><div class="bd">${body}</div></details>` : '';
 function vSymptom(id){
   const s = byId(D.symptoms, id); if (!s) return vHome();
   const f = activeFlags();
+  const bk = basket(s);
+  const dups = dupCheck((s.plan || []).flatMap(p => p.options || []));
   const slotHtml = (p, i) => {
     const kind = p.otc === false ? 'rx' : (p.optional ? 'opt' : '');
     return `<div class="slot"><div class="n ${kind}">${esc(p.slot)}</div><div>
@@ -513,25 +570,34 @@ function vSymptom(id){
       ${p.alt ? `<p class="alt">${fmt(p.alt)}</p>` : ''}
     </div></div>`;
   };
+  const clinic = (s.care?.clinic || []).slice(0, 2), er = (s.care?.er || []).slice(0, 1);
   return `${topBar({ back:'증상' })}
   <div class="eyebrow">${esc(s.group)}</div>
   <h1>${esc(s.name)}</h1>
-  <p style="margin-top:8px">${fmt(s.lead)}</p>
-  ${f.length ? `<div class="me-flags">${f.map(x => `<span class="badge warn">${esc(FLAG_LABEL[x] || x)}</span>`).join('')}</div>` : ''}
+  ${fitChips()}
+  <section class="sec answer" aria-label="바로 답">
+    <div class="eyebrow">바로 답 — 이렇게 사세요</div>
+    <div class="buy">${bk.map(x => `<a class="buy-item ${x.optional ? 'opt' : ''}" href="#/drug/${x.d.id}" style="text-decoration:none;color:inherit"><span class="k">${esc(x.slot)}</span><span><b>${esc(x.d.name)}${x.blocked ? ' <span class="badge stop">내 정보 주의</span>' : x.swapped ? ' <span class="badge warn">내 정보에 맞춰 바꿈</span>' : ''}</b><small>${esc(x.product || '')}${x.optional ? ' · 필요할 때만' : ''}</small></span><span class="badge ${x.d.rx === '안전상비' ? 'cvs' : 'otc'} rx">${x.d.rx === '안전상비' ? '편의점' : '약국'}</span></a>`).join('')}</div>
+    ${s.plan?.some(p => p.otc === false) ? `<p class="small muted" style="margin-top:8px">${esc(s.plan.filter(p => p.otc === false).map(p => p.title || p.slot).join(', '))} — 처방이 필요해요(아래 자세히).</p>` : ''}
+    <div class="line"><span>이렇게</span><span>${fmt(s.how?.[0] || '')}</span></div>
+    ${clinic.length ? `<div class="line stop"><span>병원은</span><span>${esc(clinic.join(' · '))}${er.length ? ` · <b>응급실:</b> ${esc(er[0])}` : ''}</span></div>` : ''}
+    <div class="memo-actions"><button class="btn" onclick="shareMemo('${s.id}')">${I.cart} 약국 메모 보내기·복사</button></div>
+    ${dups.length ? dups.map(t => `<div class="dup">${I.alert}<span>${fmt(t)}</span></div>`).join('') : ''}
+  </section>
+  <p style="margin-top:16px">${fmt(s.lead)}</p>
   <section class="sec">
     <div class="rx-card">
       <div class="rx-head"><div><h2>${esc(s.planTitle || '진료실에서 처방하는 방식')}</h2><div class="lbl">${esc(s.planLabel || '같은 원리로 약국에서 고르면 돼요')}</div></div><span class="rx-stamp">${esc(D.meta?.stamp || '전문의 검수')}</span></div>
       ${(s.plan || []).map(slotHtml).join('')}
     </div>
   </section>
-  ${s.how?.length ? `<section class="sec card"><h2>이렇게 드세요</h2>${list(s.how, 'steps')}</section>` : ''}
-  ${s.pharmacy?.length ? `<section class="sec card"><h2>약국에서 이렇게 말하세요</h2>${list(s.pharmacy)}</section>` : ''}
-  ${s.selfcare?.length ? `<section class="sec card"><h2>약 없이도 도움이 되는 것</h2>${list(s.selfcare)}</section>` : ''}
-  ${s.avoid?.length ? `<section class="sec card"><h2>피해야 할 것</h2>${list(s.avoid, 'plain x')}</section>` : ''}
-  ${s.notWorking ? `<section class="sec card"><h2>${esc(s.notWorking.title || '약을 먹어도 낫지 않을 때')}</h2>${list(s.notWorking.steps, 'steps')}</section>` : ''}
-  ${(() => { const dups = dupCheck((s.plan || []).flatMap(p => p.options || [])); return dups.length ? `<section class="sec">${dups.map(t => `<div class="dup" style="margin-top:0;margin-bottom:8px">${I.alert}<span>${fmt(t)}</span></div>`).join('')}<p class="small muted">내 정보 › 지금 먹는 약을 기준으로 확인했어요.</p></section>` : ''; })()}
+  ${acc('이렇게 드세요', list(s.how, 'steps'), '순서·간격·상한', true)}
+  ${acc('약국에서 이렇게 말하세요', list(s.pharmacy), '한 문장으로')}
+  ${acc('약 없이도 도움이 되는 것', list(s.selfcare))}
+  ${acc('피해야 할 것', list(s.avoid, 'plain x'))}
+  ${s.notWorking ? acc(s.notWorking.title || '약을 먹어도 낫지 않을 때', list(s.notWorking.steps, 'steps')) : ''}
   <section class="sec"><h2>어디까지 약국, 어디부터 병원인가요</h2>${careCards(s.care)}${!s.care ? flagBox('이럴 땐 약을 사지 말고 진료를 받으세요', s.redflags, s.redflagLead) : ''}</section>
-  ${s.faq?.length ? `<section class="sec card"><h2>자주 묻는 질문</h2>${s.faq.map(f => `<h3 style="margin-top:12px">${esc(f.q)}</h3><p class="small" style="margin-top:4px;font-size:.9rem">${fmt(f.a)}</p>`).join('')}</section>` : ''}
+  ${s.faq?.length ? acc('자주 묻는 질문', s.faq.map(f => `<h3 style="margin-top:12px">${esc(f.q)}</h3><p style="margin-top:4px;font-size:.9375rem">${fmt(f.a)}</p>`).join('')) : ''}
   ${srcChips(s.sources)}
   ${disclaimer()}`;
 }
@@ -738,6 +804,7 @@ function vMe(){
   const T = (k, t, sub) => `<div class="toggle"><div class="t"><b>${esc(t)}</b>${sub ? `<span>${esc(sub)}</span>` : ''}</div><button class="sw ${ME[k] ? 'on' : ''}" role="switch" aria-checked="${!!ME[k]}" aria-label="${esc(t)}" onclick="ME['${k}']=!ME['${k}'];saveMe();route()"></button></div>`;
   return `${topBar()}
   <h1>내 정보</h1><p style="margin-top:6px">여기 표시한 상태에 따라 약 추천에 <b>주의 표시</b>가 붙어요. 진료실에서 의사가 처방 전에 꼭 묻는 것들이에요.</p>
+  <section class="sec card"><h2>글자 크기</h2><div class="seg" style="margin-top:12px">${[['16px', '보통'], ['18px', '크게'], ['20px', '더 크게']].map(([k, n]) => `<button class="${(localStorage.getItem('yakson.fs') || '16px') === k ? 'on' : ''}" onclick="setFs('${k}')">${n}</button>`).join('')}</div></section>
   <section class="sec card"><h2>나이</h2><div class="seg" style="margin-top:12px">${[['adult', '성인'], ['senior', '65세 이상'], ['child', '소아·청소년']].map(([k, n]) => `<button class="${ME.age === k ? 'on' : ''}" onclick="ME.age='${k}';saveMe();route()">${n}</button>`).join('')}</div></section>
   <section class="sec card"><h2>해당하는 것을 켜 주세요</h2>
     ${T('pregnant', '임신 중이거나 수유 중', '소염진통제는 임신 20주 이후 피해요')}
@@ -770,6 +837,8 @@ function vAbout(){
 }
 
 document.addEventListener('input', e => { if (!e.target.closest('.calc')) return; const id = location.hash.split('/')[2]?.split('?')[0]; const s = supp(id); if (!s?.calc) return; const amt = +document.getElementById('c-amt').value, per = +document.getElementById('c-per').value || 1, price = +document.getElementById('c-price').value, n = +document.getElementById('c-n').value; const pct = document.getElementById('c-pct'), won = document.getElementById('c-won'); if (amt > 0) { const perServing = amt * per; const r = perServing / s.calc.typical; pct.textContent = Math.round(r * 100) + '%'; pct.style.color = r > (s.calc.ulRatio || 99) ? 'var(--alert)' : r < 0.5 ? 'var(--caution)' : 'var(--primary-deep)'; if (price > 0 && n > 0) { const unitPrice = price / n; const effDoses = perServing / s.calc.typical; won.textContent = Math.round(unitPrice * per / effDoses).toLocaleString('ko-KR') + '원'; } else won.textContent = '—'; } else { pct.textContent = '—'; won.textContent = '—'; } });
+function setFs(v){ try { localStorage.setItem('yakson.fs', v); } catch (e) {} document.documentElement.style.setProperty('--fs', v); route(); }
+try { const fs = localStorage.getItem('yakson.fs'); if (fs) document.documentElement.style.setProperty('--fs', fs); } catch (e) {}
 /* ───────── 시작 ───────── */
 route();
 if ('serviceWorker' in navigator && location.protocol.startsWith('http')) { navigator.serviceWorker.register('sw.js').catch(() => {}); }
