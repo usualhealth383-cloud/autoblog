@@ -11,7 +11,7 @@ function run(){
   document.querySelectorAll('.page').forEach((pg,i)=>{
     const pr=pg.getBoundingClientRect();
     let deep=0, dEl='';
-    [...pg.querySelectorAll('*')].forEach(el=>{ if(el.closest('.folio')||el.closest('.tagband'))return; const r=el.getBoundingClientRect(); if(r.height>0&&r.bottom>deep){deep=r.bottom;dEl=el.tagName+'.'+(el.className||'').split(' ')[0];}});
+    [...pg.querySelectorAll('*')].forEach(el=>{ if(el.closest('.folio')||el.closest('.tagband'))return; const r=el.getBoundingClientRect(); if(r.height>0&&r.bottom>deep){deep=r.bottom;dEl=el.tagName+'.'+(el.getAttribute('class')||'').split(' ')[0];}});
     out.push({p:i+1, deep:+((deep-pr.top)/MM).toFixed(1), dEl});
   });
   const pre=document.createElement('pre'); pre.id='rep';
