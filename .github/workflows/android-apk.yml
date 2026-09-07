@@ -1,0 +1,97 @@
+name: android-apk
+
+# 박찬 과학 앱 — 안드로이드 APK 자동 빌드
+# 수동 실행(Actions 탭 → Run workflow) 또는 앱 코드가 main 에 올라갈 때 돈다.
+# 결과물: Actions 실행 화면의 Artifacts → parkchan-science-debug.apk (폰에 바로 설치 가능)
+# 서명된 배포용(Play 스토어)은 저장소 Secrets 에 아래 4개가 있을 때만 함께 만든다:
+#   ANDROID_KEYSTORE_B64 (keystore 파일을 base64 로), ANDROID_KEYSTORE_PASSWORD, ANDROID_KEY_ALIAS, ANDROID_KEY_PASSWORD
+on:
+  workflow_dispatch: {}
+  push:
+    branches: [main]
+    paths:
+      - 'parkchan-science/app/**'
+      - 'parkchan-science/app-native/**'
+      - 'parkchan-science/data/**'
+      - 'docs/parkchan/**'
+      - '.github/workflows/android-apk.yml'
+
+concurrency:
+  group: android-apk
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    defaults:
+      run:
+        working-directory: parkchan-science/app-native
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: parkchan-science/app-native/package-lock.json
+
+      - uses: android-actions/setup-android@v3
+        with:
+          packages: 'platforms;android-36 build-tools;36.0.0 platform-tools'
+
+      - name: 웹 앱 빌드 → Capacitor 동기화
+        run: |
+          npm ci
+          npm run web
+          npx cap sync android
+
+      - name: Gradle 캐시
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: gradle-${{ runner.os }}-${{ hashFiles('parkchan-science/app-native/android/**/*.gradle', 'parkchan-science/app-native/android/gradle/wrapper/gradle-wrapper.properties') }}
+
+      - name: 디버그 APK
+        working-directory: parkchan-science/app-native/android
+        run: |
+          chmod +x gradlew
+          ./gradlew assembleDebug --no-daemon --stacktrace
+          cp app/build/outputs/apk/debug/app-debug.apk ../parkchan-science-debug.apk
+
+      - name: 서명된 배포용 APK·AAB (Secrets 있을 때만)
+        if: ${{ secrets.ANDROID_KEYSTORE_B64 != '' }}
+        env:
+          KS: ${{ secrets.ANDROID_KEYSTORE_B64 }}
+          KS_PW: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          KEY_PW: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        working-directory: parkchan-science/app-native/android
+        run: |
+          echo "$KS" | base64 -d > /tmp/release.keystore
+          ./gradlew assembleRelease bundleRelease --no-daemon \
+            -Pandroid.injected.signing.store.file=/tmp/release.keystore \
+            -Pandroid.injected.signing.store.password="$KS_PW" \
+            -Pandroid.injected.signing.key.alias="$KEY_ALIAS" \
+            -Pandroid.injected.signing.key.password="$KEY_PW"
+          cp app/build/outputs/apk/release/app-release.apk ../parkchan-science-release.apk
+          cp app/build/outputs/bundle/release/app-release.aab ../parkchan-science-release.aab
+          rm -f /tmp/release.keystore
+
+      - name: 결과물 올리기
+        uses: actions/upload-artifact@v4
+        with:
+          name: parkchan-science-apk
+          path: |
+            parkchan-science/app-native/parkchan-science-debug.apk
+            parkchan-science/app-native/parkchan-science-release.apk
+            parkchan-science/app-native/parkchan-science-release.aab
+          if-no-files-found: error
+          retention-days: 30

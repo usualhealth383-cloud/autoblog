@@ -76,6 +76,29 @@ begin
   return json_build_object('ok', true, 'time', to_char(r.time, 'HH24:MI'), 'late', r.late);
 end $$;
 
+
+-- ── 원장 화면이 띄우는 '지금 코드' (원장만) ──
+create or replace function current_attend_code() returns json language plpgsql security definer as $$
+declare w bigint := floor(extract(epoch from now()) / 30);
+begin
+  if not is_owner() then raise exception 'owner only'; end if;
+  return json_build_object('code', attend_code(w), 'win', w);
+end $$;
+-- ── 원장이 명단에서 직접 체크하는 출석 (원장만) ──
+create or replace function mark_attend_manual(p_code text) returns json language plpgsql security definer as $$
+declare c classes; s students; t time := localtime; r attendance;
+begin
+  if not is_owner() then raise exception 'owner only'; end if;
+  select * into s from students where code = p_code;
+  if not found then return json_build_object('ok', false, 'why', '학생을 찾을 수 없습니다.'); end if;
+  select * into c from classes where cls = s.cls;
+  insert into attendance(code, date, time, late, manual) values (p_code, current_date, t, t > coalesce(c.start_time, '18:00'), true)
+    on conflict (code, date) do nothing returning * into r;
+  if r.code is null then select * into r from attendance where code = p_code and date = current_date;
+    return json_build_object('ok', true, 'dup', true, 'time', to_char(r.time, 'HH24:MI'), 'late', r.late); end if;
+  return json_build_object('ok', true, 'time', to_char(r.time, 'HH24:MI'), 'late', r.late);
+end $$;
+
 -- ── 행 단위 보안(RLS): 학생은 자기 코드 것만, 원장은 로그인 계정으로 전부 ──
 alter table students     enable row level security;
 alter table attendance   enable row level security;

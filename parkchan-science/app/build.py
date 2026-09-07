@@ -8,6 +8,11 @@ quizzes = json.loads((ROOT / 'data/quizzes.json').read_text(encoding='utf-8'))
 figs = [f'<div data-id="{c["id"]}">{(ROOT / "data" / c["figure"]["file"]).read_text(encoding="utf-8")}</div>'
         for c in concepts if c.get('figure')]
 j = lambda o: json.dumps(o, ensure_ascii=False).replace('</', '<\\/')
+# 서버 연결값: app/server/config.json {"url": "...", "anonKey": "..."} 이 있으면 심고, 없으면 로컬 모드
+cfg_p = ROOT / 'app' / 'server' / 'config.json'
+cfg = json.loads(cfg_p.read_text(encoding='utf-8')) if cfg_p.exists() else {}
+shell = shell.replace('__SB_URL__', cfg.get('url', '')).replace('__SB_KEY__', cfg.get('anonKey', ''))
+print('서버 모드:', cfg.get('url') or '(없음 → 로컬 모드)')
 out = (shell.replace('<!--CONCEPTS-->', j(concepts))
             .replace('<!--QUIZZES-->', j(quizzes))
             .replace('<!--FIGS-->', '\n'.join(figs)))

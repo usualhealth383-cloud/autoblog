@@ -400,7 +400,7 @@ const RETRY_DAYS = 3;                // 오답 재출제 간격 — 설계 §8
 const CLASSES = ['월목반','화금반','수토반'];   // [확인 필요] 반 편성은 가정값
 const CFG = {
   academy: '박찬 과학',
-  supabaseUrl: '', supabaseKey: '',  // 비어 있으면 로컬 모드
+  supabaseUrl: '__SB_URL__', supabaseKey: '__SB_KEY__',  // build.py 가 server/config.json 에서 심는다. 비어 있으면 로컬 모드
   adminPin: '2580',                  // 시연용 — 서버 모드에서는 원장님 로그인으로 대체
   attendSecret: 'parkchan-2026',     // 출석 코드 씨앗 — 서버 모드에서는 서버만 안다
   classTime: { '월목반':'18:00', '화금반':'18:00', '수토반':'14:00' },   // [확인 필요] 지각 기준 시각
@@ -421,6 +421,9 @@ const setUnit = u => document.documentElement.dataset.unit = u;
 const toast = msg => { const t=document.createElement('div'); t.className='toast'; t.textContent=msg;
   document.body.appendChild(t); setTimeout(()=>t.remove(),2500); };
 /* 문자열 → 32비트 해시(출석 코드·학생 코드에 쓴다. 암호가 아니라 '예측하기 어려운 숫자'용) */
+/* 네이티브(Capacitor) 감지 — 웹에서는 전부 null */
+const Cap = window.Capacitor, isNative = !!(Cap && Cap.isNativePlatform && Cap.isNativePlatform());
+const plug = n => (Cap && Cap.Plugins && Cap.Plugins[n]) || null;
 const h32 = s => { let h=2166136261; for (const ch of s){ h^=ch.charCodeAt(0); h=Math.imul(h,16777619)>>>0; } return h>>>0; };
 
 /* ── 출석 코드: 30초마다 바뀌는 4자리. 원장 화면이 보여 주고 학생이 친다 ── */
@@ -428,6 +431,44 @@ const ATT_WIN = 30000;
 const attWindow = (t=Date.now()) => Math.floor(t/ATT_WIN);
 const attCode = w => pad(h32(CFG.attendSecret+':'+w) % 10000).padStart(4,'0');
 const attCodeOK = c => [attWindow(), attWindow()-1].some(w => attCode(w) === c);
+
+/* ═══ 서버 연결(Supabase) — 있으면 서버 모드, 없으면 로컬 모드 ═══
+   빌드 때 CFG 에 심긴 값이 기본. 시험용으로 ?server=URL&key=KEY 로 열면 그 기기에 기억한다. */
+const SRV = (() => {
+  let o = null; try { o = JSON.parse(localStorage.getItem('pcs.server')); } catch {}
+  const qp = new URLSearchParams(location.search);
+  if (qp.get('server') !== null){ o = qp.get('server') ? { url: qp.get('server'), key: qp.get('key')||'' } : null;
+    try { o ? localStorage.setItem('pcs.server', JSON.stringify(o)) : localStorage.removeItem('pcs.server'); } catch {} }
+  const url = (o && o.url) || (CFG.supabaseUrl.startsWith('http') ? CFG.supabaseUrl : ''), key = (o && o.key) || (CFG.supabaseKey.startsWith('__') ? '' : CFG.supabaseKey);
+  return url ? { url: url.replace(/\/$/, ''), key } : null;
+})();
+let OWNER = null; try { OWNER = JSON.parse(localStorage.getItem('pcs.owner')); } catch {}
+const saveOwner = () => { try { OWNER ? localStorage.setItem('pcs.owner', JSON.stringify(OWNER)) : localStorage.removeItem('pcs.owner'); } catch {} };
+async function api(path, { method='GET', body, prefer, student, _retry } = {}){
+  const h = { apikey: SRV.key, 'Content-Type': 'application/json' };
+  if (OWNER && OWNER.access_token) h.Authorization = 'Bearer ' + OWNER.access_token;
+  else { h.Authorization = 'Bearer ' + SRV.key; const code = student || (S.auth && S.auth.code); if (code) h['x-student-code'] = code; }
+  if (prefer) h.Prefer = prefer;
+  const r = await fetch(SRV.url + path, { method, headers: h, body: body === undefined ? undefined : JSON.stringify(body) });
+  if (r.status === 401 && OWNER && OWNER.refresh_token && !_retry){ await ownerRefresh(); return api(path, { method, body, prefer, student, _retry: true }); }
+  const txt = await r.text(); let j = null; try { j = txt ? JSON.parse(txt) : null; } catch { j = txt; }
+  if (!r.ok) throw Object.assign(new Error((j && (j.message || j.msg || j.error_description)) || ('서버 오류 ' + r.status)), { status: r.status, body: j });
+  return j;
+}
+async function ownerLogin(email, password){
+  const r = await fetch(SRV.url + '/auth/v1/token?grant_type=password', { method: 'POST', headers: { apikey: SRV.key, 'Content-Type': 'application/json' }, body: JSON.stringify({ email, password }) });
+  const j = await r.json().catch(() => ({}));
+  if (!r.ok) throw new Error(j.error_description || j.msg || j.message || '로그인에 실패했습니다.');
+  OWNER = { access_token: j.access_token, refresh_token: j.refresh_token, email: (j.user && j.user.email) || email }; saveOwner();
+}
+async function ownerRefresh(){
+  const r = await fetch(SRV.url + '/auth/v1/token?grant_type=refresh_token', { method: 'POST', headers: { apikey: SRV.key, 'Content-Type': 'application/json' }, body: JSON.stringify({ refresh_token: OWNER.refresh_token }) });
+  const j = await r.json().catch(() => ({}));
+  if (!r.ok){ OWNER = null; saveOwner(); throw new Error('원장 로그인이 만료되었습니다. 다시 로그인해 주세요.'); }
+  OWNER = { ...OWNER, access_token: j.access_token, refresh_token: j.refresh_token || OWNER.refresh_token }; saveOwner();
+}
+const ownerLogout = () => { OWNER = null; saveOwner(); };
+const hhmm = t => (t || '').slice(0, 5);
 
 /* ═══ 데이터 계층 — 로컬 어댑터 ═══
    학생·출석·공지가 여기 산다. 서버 모드에서는 같은 이름의 함수가 Supabase 를 부른다. */
@@ -494,13 +535,90 @@ const DB = (() => {
       return { sent: target.length, read: target.length-unread.length, unread };
     },
     reset: () => { d = seed(); w(); },
+    attendNow: async () => ({ code: attCode(attWindow()), win: attWindow() }),
+    loadProgress: async () => null,
+    saveProgress: async () => {},
+    ownerLogin: async () => { throw new Error('로컬 모드'); }, ownerLogout: () => {},
+    ownerEmail: () => '',
   };
 })();
+
+/* ═══ 데이터 계층 — 서버 어댑터(Supabase PostgREST + Auth). 함수 이름·반환 형태는 로컬과 같다 ═══ */
+const serverDB = () => {
+  const genCode = name => { const A='ABCDEFGHJKMNPQRSTUVWXYZ'; const h=h32(name+Date.now()+Math.random());
+    return A[h%23]+A[(h>>>5)%23]+A[(h>>>10)%23]+pad(h%1000).padStart(3,'0'); };
+  const notice = (n, reads=[]) => ({ id:n.id, cls:n.cls, t:n.title, d:n.body||'', at:n.at, read: reads.filter(r=>r.notice_id===n.id).map(r=>r.code) });
+  const att = a => ({ code:a.code, date:a.date, time:hhmm(a.time), late:!!a.late, manual:!!a.manual });
+  let attCache = null;
+  return {
+    mode: 'server',
+    verifyCode: async code => {
+      const rows = await api(`/rest/v1/students?code=eq.${encodeURIComponent(code)}&select=code,name,cls,until`, { student: code });
+      if (!rows || !rows.length) return { ok:false, why:'등록되지 않았거나 수강 기간이 끝난 코드입니다. 원장님께 확인해 주세요.' };
+      return { ok:true, student: rows[0] };
+    },
+    students: async () => api('/rest/v1/students?select=code,name,cls,until,phone,joined&order=joined.asc,name.asc'),
+    addStudent: async ({name, cls, until, phone}) => {
+      for (let i=0;i<5;i++){
+        try { const r = await api('/rest/v1/students', { method:'POST', prefer:'return=representation', body:{ code:genCode(name), name, cls, until, phone:phone||'' } }); return r[0]; }
+        catch (e){ if (e.status!==409) throw e; }
+      }
+      throw new Error('코드 발급에 실패했습니다. 다시 시도해 주세요.');
+    },
+    removeStudent: async code => { await api(`/rest/v1/students?code=eq.${encodeURIComponent(code)}`, { method:'DELETE' }); },
+    attendanceOn: async date => (await api(`/rest/v1/attendance?date=eq.${date}&select=*`)).map(att),
+    myAttendance: async (code, date) => { const r = await api(`/rest/v1/attendance?code=eq.${encodeURIComponent(code)}&date=eq.${date}&select=*`, { student: code }); return r.length ? att(r[0]) : null; },
+    markAttend: async (code, entered, manual=false) => {
+      const r = manual
+        ? await api('/rest/v1/rpc/mark_attend_manual', { method:'POST', body:{ p_code: code } })
+        : await api('/rest/v1/rpc/mark_attend', { method:'POST', body:{ p_code: code, p_entered: entered }, student: code });
+      if (!r || !r.ok) return { ok:false, why: (r && r.why) || '출석 처리에 실패했습니다.' };
+      return { ok:true, dup: !!r.dup, rec: { code, date: todayISO(), time: hhmm(r.time), late: !!r.late, manual } };
+    },
+    notices: async cls => {
+      const [ns, reads] = await Promise.all([
+        api(`/rest/v1/notices?or=(cls.eq.전체,cls.eq.${encodeURIComponent(cls)})&select=*&order=at.desc`),
+        api('/rest/v1/notice_reads?select=notice_id,code')]);
+      return ns.map(n => notice(n, reads));
+    },
+    allNotices: async () => (await api('/rest/v1/notices?select=*&order=at.desc')).map(n => notice(n)),
+    sendNotice: async (cls, t, dd) => { const r = await api('/rest/v1/notices', { method:'POST', prefer:'return=representation', body:{ cls, title:t, body:dd } }); return notice(r[0]); },
+    markRead: async (id, code) => { await api('/rest/v1/notice_reads?on_conflict=notice_id,code', { method:'POST', prefer:'resolution=ignore-duplicates,return=minimal', body:{ notice_id:id, code }, student: code }); },
+    noticeStats: async id => {
+      const [ns, st, reads] = await Promise.all([api(`/rest/v1/notices?id=eq.${id}&select=cls`), api('/rest/v1/students?select=code,cls,phone,name'), api(`/rest/v1/notice_reads?notice_id=eq.${id}&select=code`)]);
+      if (!ns.length) return null;
+      const target = st.filter(s => ns[0].cls==='전체' || s.cls===ns[0].cls), done = new Set(reads.map(r=>r.code));
+      const unread = target.filter(s => !done.has(s.code));
+      return { sent: target.length, read: target.length-unread.length, unread };
+    },
+    reset: () => {},
+    attendNow: async () => {
+      const w = attWindow();
+      if (!attCache || attCache.win !== w){ const r = await api('/rest/v1/rpc/current_attend_code', { method:'POST', body:{} }); attCache = { code:r.code, win:w }; }
+      return attCache;
+    },
+    loadProgress: async code => { const r = await api(`/rest/v1/progress?code=eq.${encodeURIComponent(code)}&select=state`, { student: code }); return r.length ? r[0].state : null; },
+    saveProgress: async (code, state) => { await api('/rest/v1/progress?on_conflict=code', { method:'POST', prefer:'resolution=merge-duplicates,return=minimal', body:{ code, state, at:new Date().toISOString() }, student: code }); },
+    ownerLogin, ownerLogout,
+    ownerEmail: () => (OWNER && OWNER.email) || '',
+  };
+};
+const DBX = SRV ? serverDB() : DB;
 
 /* ═══ 내 상태 ═══ */
 const KEY = 'pcs.v1';
 const load = () => { try { return JSON.parse(localStorage.getItem(KEY)) || {}; } catch { return {}; } };
-const save = s => { try { localStorage.setItem(KEY, JSON.stringify(s)); } catch {} };
+let syncT = null;
+const save = s => { try { localStorage.setItem(KEY, JSON.stringify(s)); } catch {}
+  if (SRV && s.auth){ clearTimeout(syncT); syncT = setTimeout(() => DBX.saveProgress(s.auth.code, { start:s.start, done:s.done, wrong:s.wrong, read:s.read, notifyAt:s.notifyAt, at:new Date().toISOString() }).catch(()=>{}), 1200); } };
+/* 다른 기기에 남은 진도와 합친다: 공부한 개념은 합집합, 오답은 (소단원, 번호) 기준 합집합, 시작일은 서버 것 */
+const mergeProgress = p => { if (!p) return;
+  if (p.start) S.start = p.start;
+  S.done = [...new Set([...(p.done||[]), ...S.done])];
+  const key = w => w.l+':'+w.n; const have = new Set(S.wrong.map(key));
+  (p.wrong||[]).forEach(w => { if (!have.has(key(w))) S.wrong.push(w); });
+  S.read = [...new Set([...(p.read||[]), ...(S.read||[])])];
+  if (p.notifyAt && !S.notifyAt) S.notifyAt = p.notifyAt; };
 let S = load();
 if (!S.start){ S.start = todayISO(); S.done=[]; S.wrong=[]; save(S); }
 S.done ||= []; S.wrong ||= []; S.read ||= [];
@@ -509,6 +627,7 @@ const applyPrefs = () => {
   document.documentElement.style.setProperty('--fs', {작게:'14px',보통:'15px',크게:'17px'}[S.fs]||'15px');
   if (S.theme==='시스템') delete document.documentElement.dataset.theme;
   else document.documentElement.dataset.theme = S.theme==='어둡게'?'dark':'light';
+  if (typeof applyBar === 'function') applyBar();
 };
 applyPrefs();
 
@@ -574,9 +693,9 @@ async function renderToday(){
   const weekDone = S.done.length % 7, R=21, circ=2*Math.PI*R;
   unreadNotice = null; myAtt = null;
   if (S.auth){
-    const ns = await DB.notices(S.auth.cls);
+    const ns = await DBX.notices(S.auth.cls);
     unreadNotice = ns.find(n => !n.read.includes(S.auth.code)) || null;
-    myAtt = await DB.myAttendance(S.auth.code, todayISO());
+    myAtt = await DBX.myAttendance(S.auth.code, todayISO());
   }
   const retry = dueRetry();
   document.getElementById('v-today').innerHTML = `
@@ -603,7 +722,7 @@ async function renderToday(){
       <div><div class="lab">이번 주 진도</div><div class="val">${weekDone}<small> / 7일</small></div></div>
     </div>
     <button class="btn" id="goQuiz">${retry ? '다시 볼 문제부터 풀기' : '오늘의 문제 풀기'}</button>
-    <p class="fine">빈칸을 누르면 답이 보입니다 · 통합과학 2 · ${dayIndex()+1} / ${CONCEPTS.length}번째 개념</p>`;
+    <p class="fine">빈칸을 누르면 답이 보입니다 · ${esc(c.bookName||'')} · ${dayIndex()+1} / ${CONCEPTS.length}번째 개념</p>`;
 }
 
 /* ═══ 오늘의 문제 ═══ */
@@ -745,7 +864,7 @@ function renderMe(){
         <p>코드를 등록하면 전 범위가 열리고, <b>내 반 공지</b>와 출석이 함께 관리됩니다. 코드가 없어도 매일 1개념·1문제는 그대로 받습니다.</p>
         <div class="f"><input id="codeIn" placeholder="코드 6자리" maxlength="6" autocomplete="off" autocapitalize="characters"><button id="codeGo">등록</button></div>
         ${codeErr ? `<div class="err">${esc(codeErr)}</div>` : ''}
-        ${DB.mode==='local' ? `<div class="demo">시연용 코드 — <code>MON123</code> 월목반 · <code>TUE456</code> 화금반 · <code>WED789</code> 수토반</div>` : ''}
+        ${DBX.mode==='local' ? `<div class="demo">시연용 코드 — <code>MON123</code> 월목반 · <code>TUE456</code> 화금반 · <code>WED789</code> 수토반</div>` : ''}
       </div>
     `}
     <div class="sec">
@@ -763,10 +882,12 @@ function renderMe(){
     ${a ? `<button class="linkbtn" id="unauth">이 기기에서 코드 등록 해제</button>` : ''}
     ${S.admin ? `<button class="linkbtn" id="adminOff">원장 모드 끄기</button>`
       : (pinOpen ? `<div class="codebox"><h3>원장님 확인</h3><p>원장 화면은 학생에게 보이지 않습니다.</p>
-          <div class="f"><input id="pinIn" placeholder="비밀번호" type="password" inputmode="numeric" maxlength="6"><button id="pinGo">열기</button></div>
+          ${SRV ? `<div class="f" style="margin-bottom:8px"><input id="ownEmail" type="email" placeholder="원장 이메일" autocomplete="username"></div>
+                   <div class="f"><input id="pinIn" placeholder="비밀번호" type="password" autocomplete="current-password"><button id="pinGo">로그인</button></div>`
+                : `<div class="f"><input id="pinIn" placeholder="비밀번호" type="password" inputmode="numeric" maxlength="6"><button id="pinGo">열기</button></div>`}
           ${pinErr?`<div class="err">${esc(pinErr)}</div>`:''}</div>`
         : `<button class="linkbtn" id="adminOn">원장님이신가요?</button>`)}
-    <p class="fine">진도는 이 기기에 저장됩니다${DB.mode==='local'?' · 서버 연동 전':''}</p>`;
+    <p class="fine">${SRV ? (a ? '진도는 서버에 저장되어 기기를 바꿔도 이어집니다' : '코드를 등록하면 진도가 서버에 저장됩니다') : '진도는 이 기기에 저장됩니다 · 서버 연동 전'}</p>`;
 }
 
 /* ═══ 원장 모드 ═══ */
@@ -774,11 +895,11 @@ let admTab='students', issued=null, admCls=CLASSES[0], attTimer=null;
 async function renderAdmin(){
   const v = document.getElementById('v-admin');
   const seg = `<div class="seg">${[['students','학생·코드'],['attend','출석'],['notice','공지']].map(([k,l])=>`<button data-adm="${k}" class="${admTab===k?'on':''}">${l}</button>`).join('')}</div>`;
-  const head = `<div class="adm-h"><h1 class="h-page">원장</h1><span class="who">${esc(CFG.academy)}${DB.mode==='local'?' · 이 기기 안에서만':''}</span></div>${seg}`;
+  const head = `<div class="adm-h"><h1 class="h-page">원장</h1><span class="who">${esc(CFG.academy)}${SRV ? ' · '+esc(DBX.ownerEmail()) : ' · 이 기기 안에서만'}</span></div>${seg}`;
   clearInterval(attTimer); attTimer=null;
 
   if (admTab==='students'){
-    const st = await DB.students();
+    const st = await DBX.students();
     v.innerHTML = head + `
       <div class="form">
         <h3>수강생 등록 → 코드 발급</h3>
@@ -795,10 +916,12 @@ async function renderAdmin(){
   }
 
   if (admTab==='attend'){
-    const st = await DB.students(), att = await DB.attendanceOn(todayISO());
-    const draw = () => { const el=v.querySelector('#attV'); if(!el) return;
+    const st = await DBX.students(), att = await DBX.attendanceOn(todayISO());
+    let cur = null;
+    const draw = async () => { const el=v.querySelector('#attV'); if(!el) return;
       const w=attWindow(), left=Math.ceil((ATT_WIN-(Date.now()%ATT_WIN))/1000);
-      el.textContent = attCode(w); v.querySelector('#attLeft').textContent=`${left}초 뒤 바뀝니다`;
+      if (!cur || cur.win!==w){ try { cur = await DBX.attendNow(); } catch (e){ el.textContent='—'; v.querySelector('#attLeft').textContent=e.message; return; } }
+      el.textContent = cur.code; v.querySelector('#attLeft').textContent=`${left}초 뒤 바뀝니다`;
       v.querySelector('#attBar').style.width = (left/30*100)+'%'; };
     v.innerHTML = head + `
       <div class="code-big"><div class="k">지금 출석 코드 · 입구 화면에 띄워 두세요</div>
@@ -815,8 +938,8 @@ async function renderAdmin(){
   }
 
   if (admTab==='notice'){
-    const ns = await DB.allNotices();
-    const stats = await Promise.all(ns.map(n=>DB.noticeStats(n.id)));
+    const ns = await DBX.allNotices();
+    const stats = await Promise.all(ns.map(n=>DBX.noticeStats(n.id)));
     v.innerHTML = head + `
       <div class="form">
         <h3>급한 공지 보내기</h3>
@@ -832,6 +955,38 @@ async function renderAdmin(){
             ${s.unread.length ? `<a href="sms:${unreadPh.join(',')}${/iphone|ipad/i.test(navigator.userAgent)?'&':'?'}body=${encodeURIComponent(`[${CFG.academy}] ${n.t} — ${n.d}`)}">안 읽은 ${s.unread.length}명에게 문자 →</a>` : '<span style="color:var(--u);font-weight:800">모두 읽음</span>'}</div></div>`; }).join('')
         : `<div class="empty" style="padding:30px"><p>보낸 공지가 없습니다.</p></div>`}`;
   }
+}
+
+/* ═══ 네이티브(Capacitor) — 뒤로가기 · 상태바 · 스플래시 · 매일 알림. 웹에서는 전부 건너뛴다 ═══ */
+function applyBar(){
+  const Bar = plug('StatusBar'); if (!Bar) return;
+  const dark = document.documentElement.dataset.theme==='dark' || (!document.documentElement.dataset.theme && matchMedia('(prefers-color-scheme: dark)').matches);
+  const bg = getComputedStyle(document.documentElement).getPropertyValue('--bg').trim() || (dark ? '#0F1416' : '#FDFBF7');
+  try { Bar.setStyle({ style: dark ? 'DARK' : 'LIGHT' }); Bar.setBackgroundColor({ color: bg }); } catch {}
+}
+async function scheduleReminder(){
+  const LN = plug('LocalNotifications'); if (!LN) return;
+  try {
+    await LN.cancel({ notifications: [{ id: 1 }] });
+    if (!S.notifyAt || S.notifyAt==='안 받음') return;
+    let p = await LN.checkPermissions(); if (p.display !== 'granted') p = await LN.requestPermissions();
+    if (p.display !== 'granted') return;
+    const [h, m] = S.notifyAt.split(':').map(Number);
+    await LN.schedule({ notifications: [{ id: 1, title: `${CFG.academy} · 오늘의 개념`, body: '하루 1개념 1문제 — 3분이면 됩니다.',
+      schedule: { on: { hour: h, minute: m }, allowWhileIdle: true } }] });
+  } catch {}
+}
+function nativeInit(){
+  if (!isNative) return;
+  const App = plug('App');
+  App && App.addListener('backButton', () => {
+    if (document.getElementById('sheetBg')) return closeSheet();
+    if (view==='detail') return show('list');
+    if (view!=='today' && view!=='onboard') { qState=null; return show('today'); }
+    App.exitApp();
+  });
+  applyBar(); scheduleReminder();
+  const Splash = plug('SplashScreen'); Splash && setTimeout(() => Splash.hide(), 150);
 }
 
 /* ═══ 시트(출석 코드 입력 · 잠긴 개념 안내) ═══ */
@@ -860,7 +1015,7 @@ document.addEventListener('click', async e => {
   const tab = T('.tab'); if (tab){ qState=null; show(tab.dataset.v); return; }
 
   /* 온보딩 */
-  if (T('#onbGo')){ S.notifyAt = document.getElementById('onbAt').value; S.onboarded=true; save(S); show('today'); return; }
+  if (T('#onbGo')){ S.notifyAt = document.getElementById('onbAt').value; S.onboarded=true; save(S); scheduleReminder(); show('today'); return; }
 
   /* 빈칸 */
   const blank = T('.blank');
@@ -872,7 +1027,7 @@ document.addEventListener('click', async e => {
   }
 
   /* 오늘 */
-  if (T('#okNotice')){ await DB.markRead(T('#okNotice').dataset.id, S.auth.code); renderToday(); return; }
+  if (T('#okNotice')){ await DBX.markRead(T('#okNotice').dataset.id, S.auth.code); renderToday(); return; }
   if (T('#goQuiz')){ qState=null; show('quiz'); return; }
   if (T('#backToday')){ qState=null; show('today'); return; }
   if (T('#attOpen')){
@@ -883,7 +1038,7 @@ document.addEventListener('click', async e => {
     setTimeout(()=>document.getElementById('attIn')?.focus(), 50); return;
   }
   if (T('#attGo')){
-    const r = await DB.markAttend(S.auth.code, (document.getElementById('attIn').value||'').trim());
+    const r = await DBX.markAttend(S.auth.code, (document.getElementById('attIn').value||'').trim());
     if (!r.ok){ document.getElementById('attErr').textContent = r.why; return; }
     closeSheet(); toast(r.dup ? `오늘은 이미 ${r.rec.time}에 출석했습니다` : `${r.rec.time} 출석${r.rec.late?' (지각)':''}`); renderToday(); return;
   }
@@ -925,8 +1080,10 @@ document.addEventListener('click', async e => {
   if (T('#codeGo')){
     const v=(document.getElementById('codeIn').value||'').trim().toUpperCase();
     if (!v){ codeErr='코드를 입력해 주세요.'; renderMe(); return; }
-    const r = await DB.verifyCode(v);
-    if (r.ok){ S.auth={code:v, name:r.student.name, cls:r.student.cls, until:r.student.until}; codeErr=''; save(S); renderMe(); toast(`${r.student.name} 학생, 반갑습니다`); }
+    const r = await DBX.verifyCode(v);
+    if (r.ok){ S.auth={code:v, name:r.student.name, cls:r.student.cls, until:r.student.until}; codeErr='';
+      if (SRV){ try { mergeProgress(await DBX.loadProgress(v)); } catch {} }
+      save(S); renderMe(); toast(`${r.student.name} 학생, 반갑습니다`); scheduleReminder(); }
     else { codeErr=r.why; renderMe(); }
     return;
   }
@@ -934,11 +1091,17 @@ document.addEventListener('click', async e => {
   const st = T('[data-set]'); if (st){ S[st.dataset.set]=st.dataset.val; save(S); applyPrefs(); renderMe(); return; }
   if (T('#adminOn')){ pinOpen=true; pinErr=''; renderMe(); setTimeout(()=>document.getElementById('pinIn')?.focus(),50); return; }
   if (T('#pinGo')){
-    if ((document.getElementById('pinIn').value||'')===CFG.adminPin){ S.admin=true; pinOpen=false; save(S); show('admin'); }
+    const pw = document.getElementById('pinIn').value||'';
+    if (SRV){
+      const em = (document.getElementById('ownEmail').value||'').trim();
+      if (!em || !pw){ pinErr='이메일과 비밀번호를 넣어 주세요.'; renderMe(); return; }
+      try { await DBX.ownerLogin(em, pw); S.admin=true; pinOpen=false; save(S); show('admin'); }
+      catch (err){ pinErr = err.message||'로그인에 실패했습니다.'; renderMe(); }
+    } else if (pw===CFG.adminPin){ S.admin=true; pinOpen=false; save(S); show('admin'); }
     else { pinErr='비밀번호가 다릅니다.'; renderMe(); }
     return;
   }
-  if (T('#adminOff')){ S.admin=false; save(S); renderMe(); return; }
+  if (T('#adminOff')){ S.admin=false; save(S); DBX.ownerLogout(); renderMe(); return; }
 
   /* 원장 */
   const adm = T('[data-adm]'); if (adm){ admTab=adm.dataset.adm; issued=null; renderAdmin(); return; }
@@ -946,21 +1109,21 @@ document.addEventListener('click', async e => {
     const name=(document.getElementById('stName').value||'').trim(), cls=document.getElementById('stCls').value,
           until=document.getElementById('stUntil').value, phone=(document.getElementById('stPhone').value||'').trim();
     if (!name || !until){ toast('이름과 만료일을 채워 주세요'); return; }
-    issued = await DB.addStudent({name, cls, until, phone}); renderAdmin(); return;
+    issued = await DBX.addStudent({name, cls, until, phone}); renderAdmin(); return;
   }
-  const del = T('[data-del]'); if (del){ if (confirm('이 학생의 코드를 해제할까요? 앱 접근이 바로 닫힙니다.')){ await DB.removeStudent(del.dataset.del); renderAdmin(); } return; }
-  const man = T('[data-manual]'); if (man){ await DB.markAttend(man.dataset.manual, '', true); renderAdmin(); return; }
+  const del = T('[data-del]'); if (del){ if (confirm('이 학생의 코드를 해제할까요? 앱 접근이 바로 닫힙니다.')){ await DBX.removeStudent(del.dataset.del); renderAdmin(); } return; }
+  const man = T('[data-manual]'); if (man){ await DBX.markAttend(man.dataset.manual, '', true); renderAdmin(); return; }
   const chip = T('[data-chip]'); if (chip){ const t=document.getElementById('ntT');
     t.value = {휴강:'오늘 수업은 휴강입니다', '시간 변경':'수업 시작 시각이 바뀝니다', '교실 변경':'수업 교실이 바뀝니다', 준비물:'다음 수업 준비물 안내'}[chip.dataset.chip];
     document.getElementById('ntD').focus(); return; }
   if (T('#ntSend')){
     const cls=document.getElementById('ntCls').value, t=(document.getElementById('ntT').value||'').trim(), d=(document.getElementById('ntD').value||'').trim();
     if (!t){ toast('제목을 적어 주세요'); return; }
-    admCls=cls; await DB.sendNotice(cls, t, d); toast(`${cls}에 보냈습니다`); renderAdmin(); return;
+    admCls=cls; await DBX.sendNotice(cls, t, d); toast(`${cls}에 보냈습니다`); renderAdmin(); return;
   }
 });
 document.addEventListener('change', e => {
-  if (e.target.id==='notifyAt'){ S.notifyAt=e.target.value; save(S); toast(S.notifyAt==='안 받음'?'알림을 받지 않습니다':`매일 ${S.notifyAt}에 알려 드립니다`); }
+  if (e.target.id==='notifyAt'){ S.notifyAt=e.target.value; save(S); scheduleReminder(); toast(S.notifyAt==='안 받음'?'알림을 받지 않습니다':`매일 ${S.notifyAt}에 알려 드립니다`); }
 });
 document.addEventListener('keydown', e => {
   if (e.key!=='Enter') return;
@@ -969,6 +1132,9 @@ document.addEventListener('keydown', e => {
 });
 
 show(S.onboarded ? 'today' : 'onboard');
+nativeInit();
+/* 서버 모드에서 코드가 등록돼 있으면 다른 기기의 진도를 한 번 합친다 */
+if (SRV && S.auth) DBX.loadProgress(S.auth.code).then(p => { if (p){ mergeProgress(p); save(S); if (view==='today') renderToday(); } }).catch(()=>{});
 
-if ('serviceWorker' in navigator) window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(()=>{}));
+if (!isNative && 'serviceWorker' in navigator) window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(()=>{}));
 </script>
