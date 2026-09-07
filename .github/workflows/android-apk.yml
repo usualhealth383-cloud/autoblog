@@ -47,6 +47,11 @@ jobs:
         with:
           packages: 'platforms;android-36 build-tools;36.0.0 platform-tools'
 
+      - name: 교재 → 앱 데이터 추출 (data/ 는 저장소에 없고 교재에서 만든다)
+        run: |
+          pip install --quiet beautifulsoup4
+          python3 ../tools/extract_content.py | tail -2
+
       - name: 웹 앱 빌드 → Capacitor 동기화
         run: |
           npm ci
