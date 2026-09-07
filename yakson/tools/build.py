@@ -20,6 +20,12 @@ for p in sorted((ROOT / 'content').glob('*.json')):
 pub = ROOT.parent / 'docs' / 'yakson' / 'data'   # 공공데이터는 import_public_data.py 가 여기에 직접 쓴다
 if (pub / 'meta.json').exists():
     data['public'] = json.loads((pub / 'meta.json').read_text(encoding='utf-8'))  # 건수·출처만 인라인, 본문은 data/ 로 지연 로드
+# 로컬 썸네일(fetch_pill_images.py)이 있으면 정부 서버 대신 그것을 쓴다
+imgdir = ROOT.parent / 'docs' / 'yakson' / 'img'
+for v in (data.get('productImages') or {}).values():
+    iid = v['img'].rstrip('/').split('/')[-1]
+    for ext in ('.webp', '.jpg'):
+        if (imgdir / (iid + ext)).exists(): v['img'] = 'img/' + iid + ext; break
 j = json.dumps(data, ensure_ascii=False, separators=(',', ':')).replace('</', '<\\/')
 stamp = datetime.date.today().isoformat()
 out = shell.replace('<!--DATA-->', j).replace('__BUILD__', stamp)
