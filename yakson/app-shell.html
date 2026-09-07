@@ -170,6 +170,24 @@ ul.steps li::before{content:counter(s);position:absolute;left:0;top:2px;width:24
 .disclaimer{display:flex;align-items:flex-start;gap:var(--s2);margin-top:var(--s5);padding:var(--s3) var(--s4);background:var(--tint);border-radius:var(--r-input);color:var(--muted);font-size:.8125rem;line-height:1.55}
 .disclaimer svg.i{width:16px;height:16px;margin-top:2px}
 
+/* 아이 용량 계산기 */
+.kid-form{display:grid;grid-template-columns:1fr 1fr;gap:var(--s2);margin-top:var(--s3)}
+.kid-form label{display:flex;flex-direction:column;gap:4px;font-size:.75rem;font-weight:700;color:var(--muted)}
+.kid-form label.full{grid-column:1/-1}
+.kid-form input,.kid-form select{min-height:48px;border:1px solid var(--hairline);border-radius:var(--r-input);padding:0 12px;font:inherit;font-size:1.0625rem;background:var(--card);color:var(--text);width:100%}
+.kid-form input:focus,.kid-form select:focus{outline:2px solid var(--primary);outline-offset:1px}
+.dose-card{background:var(--card);border:1px solid var(--hairline);border-radius:var(--r-card);box-shadow:var(--shadow-card);padding:var(--s4);margin-top:var(--s3)}
+.dose-card .eyebrow{margin-bottom:4px}
+.dose-big{display:flex;align-items:baseline;gap:8px;margin-top:6px}
+.dose-big b{font-size:2.25rem;font-weight:800;letter-spacing:-.02em;color:var(--primary-deep);line-height:1.1}
+.dose-big span{color:var(--muted);font-size:.9375rem}
+.dose-meta{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-top:12px}
+.dose-meta div{background:var(--tint2);border-radius:10px;padding:8px 10px}
+.dose-meta small{display:block;font-size:.6875rem;font-weight:700;color:var(--muted)}
+.dose-meta b{display:block;font-size:.9375rem;margin-top:1px}
+.dose-card .warn{margin-top:10px}
+.kid-line{display:flex;gap:8px;align-items:flex-start;padding:10px 12px;border-radius:12px;background:var(--tint);color:var(--primary-deep);font-size:.875rem;font-weight:600;margin-top:10px;line-height:1.5}
+.kid-line svg.i{flex:none;margin-top:2px}
 /* 결론 카드(증상 첫 화면) */
 .answer{background:var(--card);border:1.5px solid var(--primary);border-radius:20px;padding:var(--s4);box-shadow:0 10px 30px rgba(var(--primary-rgb),.12)}
 .answer .eyebrow{margin-bottom:var(--s2)}
@@ -224,6 +242,8 @@ details.acc .bd{padding:0 var(--s4) var(--s4)}
 .g-chips .chip{min-height:52px;font-size:1rem;justify-content:flex-start;padding:0 16px;border-radius:14px}
 .g-chips .chip.on{background:var(--tint);border-color:var(--primary);color:var(--primary-deep)}
 .hero-cta{margin-top:var(--s4)}
+/* 블록 간 최소 여백 — 어떤 조합으로 이어져도 겹치지 않게 */
+main > .answer + *, main > .sec + .care, main > .card + .care, main > .rx-card + *, main > .care + .sec, main > .care + .card, main > .care + .actions, main > details.acc + .sec, main > .answer + .sec{margin-top:var(--s5)}
 /* 케어 카드 3단계 (NHS care cards → 약국/병원/응급) */
 .care{border-radius:var(--r-card);overflow:hidden;border:1px solid var(--hairline);background:var(--card)}
 .care+.care{margin-top:var(--s3)}
@@ -433,12 +453,12 @@ const icon = n => I[n] || I.pill;
 
 /* 내 정보(기기 내 저장) */
 const ME_KEY = 'yakson.me.v1';
-const ME_DEF = { age:'adult', pregnant:false, ulcer:false, kidney:false, liver:false, heart:false, asthma:false, anticoag:false, alcohol:false, gout:false, glaucoma:false, bph:false };
+const ME_DEF = { child:null, age:'adult', pregnant:false, ulcer:false, kidney:false, liver:false, heart:false, asthma:false, anticoag:false, alcohol:false, gout:false, glaucoma:false, bph:false };
 let ME = { ...ME_DEF };
 try { ME = { ...ME_DEF, ...(JSON.parse(localStorage.getItem(ME_KEY) || '{}')) }; } catch (e) {}
 const saveMe = () => { try { localStorage.setItem(ME_KEY, JSON.stringify(ME)); } catch (e) {} };
 const FLAG_LABEL = { pregnant:'임신·수유 중', ulcer:'위궤양·위장출혈 병력', kidney:'신장 질환', liver:'간 질환·음주', heart:'심장·혈관 질환', asthma:'천식', anticoag:'항응고제·항혈소판제 복용', alcohol:'술을 자주 마심', gout:'통풍', glaucoma:'녹내장', bph:'전립선비대', senior:'65세 이상', child:'소아' };
-function activeFlags(){ const f = Object.keys(ME).filter(k => k !== 'age' && k !== 'taking' && ME[k] === true); if (ME.age === 'senior') f.push('senior'); if (ME.age === 'child') f.push('child'); return f; }
+function activeFlags(){ const f = Object.keys(ME).filter(k => k !== 'age' && k !== 'taking' && k !== 'child' && ME[k] === true); if (ME.age === 'senior') f.push('senior'); if (ME.age === 'child') f.push('child'); return f; }
 
 /* 비교 바구니 */
 let CMP = [];
@@ -459,9 +479,9 @@ function route(){
   const [path, qs] = h.split('?');
   const seg = path.split('/');
   const q = Object.fromEntries(new URLSearchParams(qs || ''));
-  const tab = { home:'home', symptom:'home', drugs:'drugs', drug:'drugs', class:'drugs', search:'drugs', pub:'drugs', pill:'drugs', guide:'home', supp:'supp', compare:'supp', me:'me', about:'me' }[seg[0]] || 'home';
+  const tab = { home:'home', symptom:'home', drugs:'drugs', drug:'drugs', class:'drugs', search:'drugs', pub:'drugs', pill:'drugs', guide:'home', kids:'home', supp:'supp', compare:'supp', me:'me', about:'me' }[seg[0]] || 'home';
   document.querySelectorAll('nav.tabbar button').forEach(b => b.classList.toggle('on', b.dataset.tab === tab));
-  const R = { home:vHome, symptom:vSymptom, drugs:vDrugs, drug:vDrug, class:vClass, search:vSearch, pub:vPub, pill:vPill, guide:vGuide, supp:vSupp, compare:vCompare, me:vMe, about:vAbout };
+  const R = { home:vHome, symptom:vSymptom, drugs:vDrugs, drug:vDrug, class:vClass, search:vSearch, pub:vPub, pill:vPill, guide:vGuide, kids:vKids, supp:vSupp, compare:vCompare, me:vMe, about:vAbout };
   view.innerHTML = (R[seg[0]] || vHome)(seg[1], q);
   window.scrollTo({ top:0 });
   renderCmpBar();
@@ -531,6 +551,7 @@ function vHome(){
   <section class="sec"><h2>바로 가기</h2>
     <div class="tiles">
       <button class="tile wide" onclick="go('/class/nsaid')"><div class="ic">${I.scale}</div><div><b>소염진통제, 무엇이 위장에 덜 부담일까</b><span>이부프로펜·나프록센·덱시부프로펜·셀레콕시브 비교</span></div>${I.chev}</button>
+      <button class="tile wide" onclick="go('/kids')"><div class="ic">${I.user}</div><div><b>아이 해열제, 몇 mL 먹이지?</b><span>몸무게·개월로 시럽 용량 계산 · 우리집 소아과 연동</span></div>${I.chev}</button>
       <button class="tile wide" onclick="go('/supp')"><div class="ic">${I.leaf}</div><div><b>내 영양제 성분 겹치는지 보기</b><span>제형·함량·상한 기준으로 비교</span></div>${I.chev}</button>
       <button class="tile wide" onclick="go('/drugs?cat=cvs')"><div class="ic">${I.cart}</div><div><b>편의점에서 살 수 있는 약</b><span>안전상비의약품 13종</span></div>${I.chev}</button>
     </div></section>
@@ -580,6 +601,14 @@ function memoText(s){
   return `[약손] ${s.name}\n${items.map(t => '· ' + t).join('\n')}\n${s.pharmacy?.[0] ? '\n' + s.pharmacy[0].replace(/\*\*/g, '') : ''}\n\n소염제는 한 가지만 · 아세트아미노펜 하루 4 g 이내`;
 }
 async function shareMemo(id){ const s = byId(D.symptoms, id); const t = memoText(s); try { if (navigator.share) { await navigator.share({ title: '약국 메모 · ' + s.name, text: t }); return; } } catch (e) { return; } try { await navigator.clipboard.writeText(t); toast('약국 메모를 복사했어요'); } catch (e) { prompt('복사해서 쓰세요', t); } }
+function kidLine(){
+  if (ME.age !== 'child') return '';
+  const w = parseFloat(ME.child?.weight); const m = monthsFrom(ME.child?.birth);
+  if (!(w > 0)) return `<div class="kid-line">${I.user}<span>소아·청소년이면 약은 몸무게로 정해요. <a class="link" href="#/kids">몸무게를 넣고 시럽 mL 계산 ›</a></span></div>`;
+  const a = kidDose('apap', w, m), i = kidDose('ibu', w, m); if (!a) return '';
+  const ml = (r, k) => { const c = r.D.conc[0].mgPerMl; return `${(r.lo / c).toFixed(1)}~${(r.hi / c).toFixed(1)} mL`; };
+  return `<div class="kid-line">${I.user}<span><b>${esc(ME.child?.name || '아이')} ${w} kg</b> 기준 — 아세트아미노펜 시럽 <b>${ml(a)}</b>(${a.D.gapText} 간격, 하루 ${a.D.maxPerDay}회)${i && (m == null || m >= 6) ? ` · 이부프로펜 시럽 <b>${ml(i)}</b>(${i.D.gapText})` : ''}. 어른 정제·복합감기약은 아이에게 쓰지 마세요. <a class="link" href="#/kids">자세히 ›</a></span></div>`;
+}
 const acc = (title, body, sub, open) => body ? `<details class="acc" ${open ? 'open' : ''}><summary>${esc(title)}${sub ? `<small>${esc(sub)}</small>` : ''}${I.chev}</summary><div class="bd">${body}</div></details>` : '';
 function vSymptom(id){
   const s = byId(D.symptoms, id); if (!s) return vHome();
@@ -604,6 +633,7 @@ function vSymptom(id){
     <div class="eyebrow">바로 답 — 이렇게 사세요</div>
     <div class="buy">${bk.map(x => `<a class="buy-item ${x.optional ? 'opt' : ''} ${pimg(x.product) ? 'has-img' : ''}" href="#/drug/${x.d.id}" style="text-decoration:none;color:inherit"><span class="k">${esc(x.slot)}</span>${imgTag(pimg(x.product), 'pimg', x.product)}<span><b>${esc(x.d.name)}${x.blocked ? ' <span class="badge stop">내 정보 주의</span>' : x.swapped ? ' <span class="badge warn">내 정보에 맞춰 바꿈</span>' : ''}</b><small>${esc((x.product || '').split('·')[0].replace(/ 등$/, ''))}${x.optional ? ' · 필요할 때만' : ''}</small></span><span class="badge ${x.d.rx === '안전상비' ? 'cvs' : 'otc'} rx">${x.d.rx === '안전상비' ? '편의점' : '약국'}</span></a>`).join('')}</div>
     ${s.plan?.some(p => p.otc === false) ? `<p class="small muted" style="margin-top:8px">${esc(s.plan.filter(p => p.otc === false).map(p => p.title || p.slot).join(', '))} — 처방이 필요해요(아래 자세히).</p>` : ''}
+    ${kidLine()}
     <div class="line"><span>이렇게</span><span>${fmt(s.how?.[0] || '')}</span></div>
     ${clinic.length ? `<div class="line stop"><span>병원은</span><span>${esc(clinic.join(' · '))}${er.length ? ` · <b>응급실:</b> ${esc(er[0])}` : ''}</span></div>` : ''}
     <div class="memo-actions"><button class="btn" onclick="shareMemo('${s.id}')">${I.cart} 약국 메모 보내기·복사</button></div>
@@ -627,6 +657,68 @@ function vSymptom(id){
   ${disclaimer()}`;
 }
 
+/* ───────── 아이 해열제 용량 (우리집 소아과와 같은 기준) ───────── */
+function monthsFrom(birth){ if (!birth) return null; const b = new Date(birth); if (isNaN(b)) return null; const n = new Date(); let m = (n.getFullYear() - b.getFullYear()) * 12 + (n.getMonth() - b.getMonth()); if (n.getDate() < b.getDate()) m--; return m >= 0 ? m : null; }
+function kidAgeText(m){ if (m == null) return ''; return m < 24 ? `생후 ${m}개월` : `만 ${Math.floor(m / 12)}세 ${m % 12 ? (m % 12) + '개월' : ''}`.trim(); }
+function kidDose(k, w, m){
+  const D = (D_KIDS().drugs || []).find(x => x.id === k); if (!D || !(w > 0)) return null;
+  const rawLo = w * D.perKg[0], rawHi = w * D.perKg[1];
+  const lo = Math.round(Math.min(rawLo, D.capDose)), hi = Math.round(Math.min(rawHi, D.capDose));
+  const perKgDay = (k === 'apap' && m != null && m < 24) ? D.dayPerKgUnder24m : D.dayPerKg;
+  const rawDay = w * perKgDay; const day = Math.round(Math.min(rawDay, D.capDay));
+  return { D, lo, hi, day, perKgDay, capped: rawHi > D.capDose + .5 || rawDay > D.capDay + .5, rawHi: Math.round(rawHi), rawDay: Math.round(rawDay) };
+}
+const D_KIDS = () => D.kids || {};
+function kidWeightSanity(w, m){ if (m == null || !(w > 0)) return ''; const ref = m <= 12 ? 3.3 + 0.55 * m : m <= 24 ? 9.6 + 0.2 * (m - 12) : m <= 60 ? 12 + 0.17 * (m - 24) : 18 + 0.23 * (m - 60); const r = w / ref; if (r < 0.5 || r > 2.2) return `몸무게 ${w} kg이 맞나요? ${kidAgeText(m)} 아이는 보통 ${Math.round(ref * 0.7)}~${Math.round(ref * 1.4)} kg 안팎이에요. 자릿수가 어긋나면 약이 열 배가 됩니다 — 한 번만 확인해 주세요.`; return ''; }
+function kidImport(){
+  try {
+    const raw = localStorage.getItem('kh.kid'); const kids = localStorage.getItem('kh.kids');
+    let k = raw ? JSON.parse(raw) : null; if ((!k || !k.weight) && kids) { const arr = JSON.parse(kids); k = Array.isArray(arr) ? arr[0] : (arr && Object.values(arr)[0]); }
+    if (k && (k.weight || k.birth)) { ME.child = { name: k.name || '', birth: k.birth || '', weight: parseFloat(k.weight) || '' }; ME.age = 'child'; saveMe(); toast(`${k.name || '아이'} 정보를 가져왔어요`); route(); return; }
+  } catch (e) {}
+  const t = prompt('우리집 소아과가 같은 사이트에 없어요. 그 앱 「내보내기」의 내용(또는 이름, 생년월일, 체중)을 붙여 넣어 주세요.\n예: 서아, 2023-05-14, 12.4');
+  if (!t) return;
+  try { const j = JSON.parse(t); const k = j.kid || j; if (k.weight || k.birth) { ME.child = { name: k.name || '', birth: k.birth || '', weight: parseFloat(k.weight) || '' }; ME.age = 'child'; saveMe(); route(); return; } } catch (e) {}
+  const parts = t.split(/[,\s]+/).filter(Boolean); const birth = parts.find(x => /^\d{4}-\d{2}-\d{2}$/.test(x)) || ''; const weight = parseFloat(parts.find(x => /^\d+(\.\d+)?$/.test(x) && +x < 120 && +x > 1)) || ''; const name = parts.find(x => /^[가-힣]{1,6}$/.test(x)) || '';
+  if (birth || weight) { ME.child = { name, birth, weight }; ME.age = 'child'; saveMe(); route(); } else toast('형식을 읽지 못했어요');
+}
+function saveKid(){ const name = document.getElementById('k-name')?.value.trim() || ''; const birth = document.getElementById('k-birth')?.value || ''; const weight = parseFloat(document.getElementById('k-w')?.value) || ''; ME.child = { name, birth, weight }; if (weight) ME.age = 'child'; saveMe(); route(); }
+function vKids(){
+  const K = D_KIDS(); const c = ME.child || {}; const m = monthsFrom(c.birth); const w = parseFloat(c.weight);
+  const sane = kidWeightSanity(w, m);
+  const doseCard = (k) => { const r = kidDose(k, w, m); if (!r) return ''; const D = r.D; const conc = D.conc[0]; const mlLo = (r.lo / conc.mgPerMl).toFixed(1), mlHi = (r.hi / conc.mgPerMl).toFixed(1);
+    const tooYoung = m != null && m < D.minMonths;
+    let label = '';
+    if (k === 'apap') { const row = (K.apapLabelTable || []).find(([lo, hi]) => w >= lo && w <= hi); if (row) label = `<div class="kid-line">${I.check}<span>약병 표시 기준으로는 <b>${row[3]} mL</b>(${row[2]} mg) 한 번 — 어린이 타이레놀 용량표 ${row[0]}~${row[1] > 900 ? '' : row[1]} kg(${row[4]}) 칸. 위 범위 안이라 어느 쪽으로 드셔도 돼요.</span></div>`; else if (w < 7) label = `<div class="kid-line">${I.info}<span>약병 표시 용량표는 7 kg부터 있어요. 그보다 작은 아기는 몸무게 계산값을 쓰되 진료에서 확인하세요.</span></div>`; }
+    return `<div class="dose-card"><div class="eyebrow">${esc(D.name)} · ${esc(D.brand)}</div>
+      <div class="dose-big"><b>${mlLo === mlHi ? mlLo : mlLo + '~' + mlHi}</b><span>mL · 한 번에</span></div>
+      <p class="small muted">${esc(conc.label)} 기준. 가지고 계신 약병의 농도를 꼭 확인하세요.${D.conc.length > 1 ? ' 다른 제품: ' + D.conc.slice(1).map(x => esc(x.label)).join(', ') : ''}</p>
+      <div class="dose-meta"><div><small>성분량</small><b>${r.lo}~${r.hi} mg</b></div><div><small>간격</small><b>${esc(D.gapText)} 이상</b></div><div><small>하루 한도</small><b>${D.maxPerDay}회 · ${r.day} mg</b></div></div>
+      ${label}
+      ${tooYoung ? `<div class="note" style="margin-top:10px">${I.alert}<span>${esc(D.name)}은(는) 보통 생후 ${D.minMonths}개월 이후부터 써요. 그 전에는 임의로 먹이지 마세요.</span></div>` : ''}
+      ${r.capped ? `<div class="note" style="margin-top:10px">${I.info}<span>몸무게로만 곱하면 1회 ${r.rawHi} mg·하루 ${r.rawDay} mg이지만, 어른 상한(1회 ${D.capDose}·하루 ${D.capDay} mg)에서 멈춰요.</span></div>` : ''}
+      ${k === 'apap' && m != null && m < 24 ? `<p class="small muted" style="margin-top:8px">두 돌 전이라 하루 한도를 60 mg/kg으로 봤어요(그 뒤 75 mg/kg).</p>` : ''}
+      <p class="small muted" style="margin-top:8px">${esc(D.note)}</p>
+      <a class="link small" href="#/drug/${D.drugId}">성분 자세히 ›</a></div>`; };
+  return `${topBar({ back:'홈' })}
+  <div class="eyebrow">소아 용량</div><h1>아이 해열제, 몇 mL 먹이지?</h1>
+  <p style="margin-top:8px">${fmt(K.lead || '')}</p>
+  <section class="sec card">
+    <h2>${c.name ? esc(c.name) + ' ' : ''}아이 정보 ${m != null ? `<small>${esc(kidAgeText(m))}${w ? ' · ' + w + ' kg' : ''}</small>` : ''}</h2>
+    <div class="kid-form"><label>이름(선택)<input id="k-name" value="${esc(c.name || '')}" placeholder="서아"></label><label>생년월일<input id="k-birth" type="date" value="${esc(c.birth || '')}"></label><label class="full">몸무게 (kg) — 해열제는 나이가 아니라 몸무게로 정해요<input id="k-w" type="number" inputmode="decimal" step="0.1" min="2" max="120" value="${c.weight || ''}" placeholder="예: 12.4"></label></div>
+    <div class="actions" style="display:flex;gap:8px"><button class="btn" style="flex:1" onclick="saveKid()">${I.check} 계산하기</button><button class="btn line" style="flex:1" onclick="kidImport()">${I.user} ${esc(K.import?.title || '우리집 소아과에서 가져오기')}</button></div>
+    <p class="small muted" style="margin-top:10px">${esc(K.import?.text || '')}</p>
+    <p class="privacy">${I.lock}이 기기에만 저장돼요.</p>
+  </section>
+  ${sane ? `<div class="flag" style="margin-top:16px">${I.alert}<div><b>몸무게를 한 번만 확인해 주세요</b><p>${esc(sane)}</p></div></div>` : ''}
+  ${m != null && m < 3 ? `<div class="flag" style="margin-top:16px">${I.alert}<div><b>생후 ${m}개월이에요</b><p>3개월 미만 아기가 열이 나면 해열제를 먹이지 말고 <b>바로 진료</b>를 받으세요. 열을 낮추면 원인을 찾기 어려워져요.</p><a class="call" href="tel:119">${I.alert} 119</a></div></div>` : ''}
+  ${w > 0 ? `<section class="sec"><h2>한 번에 이만큼 <small>몸무게 ${w} kg 기준</small></h2>${doseCard('apap')}${doseCard('ibu')}${doseCard('dexibu')}</section>` : `<section class="sec"><div class="empty"><b>몸무게를 넣으면 바로 계산해 드려요</b>아세트아미노펜·이부프로펜·덱시부프로펜 시럽 mL, 간격, 하루 한도까지.</div></section>`}
+  ${acc('이렇게 먹이세요', list(K.rules, 'steps'), '교차·중복·계량', true)}
+  <section class="sec"><h2>병원에 가야 할 때</h2>${careCards({ clinic: K.care?.clinic, er: K.care?.er })}</section>
+  ${srcChips(K.sources)}
+  ${disclaimer('용량은 식약처 허가사항과 소아과 교과서 기준으로 계산한 참고값이에요. 약병 표시와 소아과 의사의 지시가 우선이에요.')}`;
+}
+
 /* ───────── 3단계 안내(처음 오신 분 진입로) ───────── */
 function vGuide(step, q){
   step = +step || 1; const sid = location.hash.split('/')[3]?.split('?')[0]; const s = sid ? byId(D.symptoms, sid) : null;
@@ -641,18 +733,20 @@ function vGuide(step, q){
     const age = [['senior', '65세 이상이에요'], ['child', '소아·청소년(15세 미만)이에요']];
     return `${topBar({ back:'이전' })}${bar}<div class="eyebrow">${esc(s.name)}</div><div class="g-q">몇 가지만 확인할게요</div><p class="small muted">의사가 처방 전에 꼭 묻는 것들이에요. 해당하는 것을 모두 누르고, 없으면 바로 다음으로.</p>
     <div class="g-chips">${opts.map(([k, n]) => `<button class="chip ${ME[k] ? 'on' : ''}" onclick="ME['${k}']=!ME['${k}'];saveMe();route()">${ME[k] ? I.check : I.x}${esc(n)}</button>`).join('')}${age.map(([k, n]) => `<button class="chip ${ME.age === k ? 'on' : ''}" onclick="ME.age=ME.age==='${k}'?'adult':'${k}';saveMe();route()">${ME.age === k ? I.check : I.x}${esc(n)}</button>`).join('')}</div>
-    <div class="actions"><button class="btn" onclick="go('/guide/3/${s.id}')">${I.check} ${activeFlags().length ? '이 조건으로 답 보기' : '해당 없음 — 답 보기'}</button></div>
+    ${ME.age === 'child' ? `<div class="kid-form" style="margin-top:12px"><label>생년월일<input id="k-birth" type="date" value="${esc(ME.child?.birth || '')}"></label><label>몸무게 (kg)<input id="k-w" type="number" inputmode="decimal" step="0.1" value="${ME.child?.weight || ''}" placeholder="예: 12.4" onchange="ME.child={...(ME.child||{}),weight:parseFloat(this.value)||'',birth:document.getElementById('k-birth').value};saveMe()"></label></div><p class="small muted" style="margin-top:6px">아이 약은 몸무게로 정해요. 넣어 두면 답 화면에 시럽 mL가 같이 나와요.</p>` : ''}
+    <div class="actions"><button class="btn" onclick="document.getElementById('k-w')&&(ME.child={...(ME.child||{}),weight:parseFloat(document.getElementById('k-w').value)||'',birth:document.getElementById('k-birth').value},saveMe());go('/guide/3/${s.id}')">${I.check} ${activeFlags().length ? '이 조건으로 답 보기' : '해당 없음 — 답 보기'}</button></div>
     <p class="privacy">${I.lock}이 기기에만 저장되고 전송되지 않아요.</p>`;
   }
   const bk = basket(s); const clinic = (s.care?.clinic || []).slice(0, 2), er = (s.care?.er || []).slice(0, 1);
   return `${topBar({ back:'이전' })}${bar}<div class="eyebrow">${esc(s.name)}${activeFlags().length ? ' · ' + activeFlags().map(x => FLAG_LABEL[x]).join(', ') : ''}</div><div class="g-q">이렇게 사세요</div>
   <section class="sec answer" style="margin-top:12px">
     <div class="buy">${bk.map(x => `<a class="buy-item ${x.optional ? 'opt' : ''} ${pimg(x.product) ? 'has-img' : ''}" href="#/drug/${x.d.id}" style="text-decoration:none;color:inherit"><span class="k">${esc(x.slot)}</span>${imgTag(pimg(x.product), 'pimg', x.product)}<span><b>${esc(x.d.name)}${x.blocked ? ' <span class="badge stop">약사와 상의</span>' : x.swapped ? ' <span class="badge warn">내 조건에 맞춰 바꿈</span>' : ''}</b><small>${esc((x.product || '').split('·')[0].replace(/ 등$/, ''))}${x.optional ? ' · 필요할 때만' : ''}</small></span><span class="badge ${x.d.rx === '안전상비' ? 'cvs' : 'otc'} rx">${x.d.rx === '안전상비' ? '편의점' : '약국'}</span></a>`).join('')}</div>
+    ${kidLine()}
     <div class="line"><span>이렇게</span><span>${fmt(s.how?.[0] || '')}</span></div>
     ${clinic.length ? `<div class="line stop"><span>병원은</span><span>${esc(clinic.join(' · '))}${er.length ? ` · <b>응급실:</b> ${esc(er[0])}` : ''}</span></div>` : ''}
     <div class="memo-actions"><button class="btn" onclick="shareMemo('${s.id}')">${I.cart} 약국 메모 보내기·복사</button></div>
   </section>
-  ${careCards(s.care)}
+  <section class="sec"><h2>어디까지 약국, 어디부터 병원인가요</h2>${careCards(s.care)}</section>
   <div class="actions"><button class="btn line" onclick="go('/symptom/${s.id}')">왜 이 조합인지 자세히 보기</button><button class="btn ghost" onclick="go('/guide/1')">다른 증상 고르기</button></div>
   ${disclaimer()}`;
 }
@@ -862,6 +956,7 @@ function vMe(){
   <h1>내 정보</h1><p style="margin-top:6px">여기 표시한 상태에 따라 약 추천에 <b>주의 표시</b>가 붙어요. 진료실에서 의사가 처방 전에 꼭 묻는 것들이에요.</p>
   <section class="sec card"><h2>글자 크기</h2><div class="seg" style="margin-top:12px">${[['16px', '보통'], ['18px', '크게'], ['20px', '더 크게']].map(([k, n]) => `<button class="${(localStorage.getItem('yakson.fs') || '16px') === k ? 'on' : ''}" onclick="setFs('${k}')">${n}</button>`).join('')}</div></section>
   <section class="sec card"><h2>나이</h2><div class="seg" style="margin-top:12px">${[['adult', '성인'], ['senior', '65세 이상'], ['child', '소아·청소년']].map(([k, n]) => `<button class="${ME.age === k ? 'on' : ''}" onclick="ME.age='${k}';saveMe();route()">${n}</button>`).join('')}</div></section>
+  ${ME.age === 'child' ? `<section class="sec card"><h2>아이 정보</h2><p class="small" style="margin-top:6px">${ME.child?.weight ? esc((ME.child.name || '아이') + ' · ' + ME.child.weight + ' kg' + (monthsFrom(ME.child.birth) != null ? ' · ' + kidAgeText(monthsFrom(ME.child.birth)) : '')) : '아직 몸무게가 없어요.'}</p><div class="actions"><button class="btn ghost" onclick="go('/kids')">${I.user} 아이 해열제 용량 계산</button></div></section>` : ''}
   <section class="sec card"><h2>해당하는 것을 켜 주세요</h2>
     ${T('pregnant', '임신 중이거나 수유 중', '소염진통제는 임신 20주 이후 피해요')}
     ${T('ulcer', '위궤양·위장출혈 병력', '소염진통제를 고를 때 가장 중요해요')}
