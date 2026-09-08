@@ -8568,6 +8568,10 @@ function renderBankSession(){
   else if (q.type==='blank') body = graded ? `<div class="opts"><div class="opt ${bankCorrect(q,bs.pick)?'ok':'bad'}" style="cursor:default"><span class="tx">내 답: ${esc(bs.pick||'(빈칸)')} · 정답: <b>${esc(q.answer)}</b></span></div></div>` : `<div class="blankin"><input id="blankIn" placeholder="답을 쓰세요" autocomplete="off"><button id="blankGo">확인</button></div>`;
   else body = `<textarea class="essay" id="essayIn" placeholder="문장으로 답을 써 보세요" ${graded?'disabled':''}>${esc(bs.ess||'')}</textarea>${graded ? '' : `<button class="btn soft" id="essayShow">모범 답안 보기 · 스스로 채점</button>`}`;
   const ok = graded && bankCorrect(q, bs.pick);
+  /* 아직 안 풀었을 때 화면 아래가 비어 보이지 않도록, 유형에 맞는 한 줄 안내를 둔다 */
+  const HINT = { ox:'맞으면 O, 틀리면 X를 고르세요.', mc:'하나만 고르면 바로 채점합니다.',
+    multi:'자료와 보기를 함께 보고 하나를 고르세요.', blank:'정답만 짧게 적으면 됩니다 — 띄어쓰기·가운뎃점은 무시합니다.',
+    essay:'문장으로 써 본 뒤 모범 답안과 견주어 스스로 채점합니다.' }[q.type] || '';
   v.innerHTML = `<button class="back" id="bankQuit"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg>그만 풀기</button>
     <div class="qbar"><span>${bs.i+1} / ${bs.items.length}</span><span class="bar"><i style="width:${Math.round(bs.i/bs.items.length*100)}%"></i></span><span>맞힘 ${bs.right}</span></div>
     <div class="qhead"><span class="l">${esc(L?L.unit+'-'+L.id.slice(2)+' '+L.name:'')}</span><span class="tag">${TYPE_NAME[q.type]} · ${esc(q.difficulty||'')}</span></div>
@@ -8575,6 +8579,7 @@ function renderBankSession(){
     ${q.figure ? `<div class="qfig" data-zoomsvg="${bs.i}">${q.figure}</div>` : ''}
     ${q.source ? `<div class="bogi">${rich(q.source).replace(/\n/g,'<br>')}</div>` : ''}
     ${body}
+    ${graded ? '' : `<p class="qhint">${HINT}<br>틀려도 괜찮아요 — 오답은 <b>오답 노트</b>에 모이고 다시 풀 수 있습니다.</p>`}
     ${graded ? `<div class="verdict"><div class="h">${q.type==='essay' ? '모범 답안' : ok ? '맞혔습니다' : '아쉽습니다'}${q.type!=='essay' && (q.type==='mc'||q.type==='multi') ? ` · 정답 ${MARKS[q.answer-1]}` : q.type==='ox'||q.type==='blank' ? ` · 정답 ${esc(q.answer)}` : ''}</div><p>${rich(q.explain||'개념 카드의 포인트를 다시 읽어 보세요.')}</p></div>
       ${q.wrong ? `<div class="wrongbox"><div class="h">${q.type==='essay'?'채점 기준':'오답 왜 틀렸나'}</div>${rich(q.wrong)}</div>` : ''}
       ${q.type==='essay' && bs.pick===null ? '' : ''}
