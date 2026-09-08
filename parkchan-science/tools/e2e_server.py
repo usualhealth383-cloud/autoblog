@@ -6,7 +6,7 @@
 import asyncio, sys, os, urllib.request
 from playwright.async_api import async_playwright
 APP = 'http://127.0.0.1:8765/index.html?server=http://127.0.0.1:8766&key=anon'
-SC = sys.argv[1] if len(sys.argv) > 1 else '/tmp/e2e_server'; os.makedirs(SC, exist_ok=True)
+SC = (sys.argv[sys.argv.index('--shots')+1] if '--shots' in sys.argv[:-1] else (sys.argv[1] if len(sys.argv) > 1 and not sys.argv[1].startswith('-') else '/tmp/e2e_server')); os.makedirs(SC, exist_ok=True)
 
 
 async def main():
