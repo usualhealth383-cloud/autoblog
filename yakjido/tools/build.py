@@ -34,15 +34,22 @@ ART_NAMES = ['hero-home', 'guide-1-where', 'guide-2-pharmacy', 'guide-3-take', '
              'me-safety', 'tips', 'empty-search']
 artsrc = ROOT / 'art'
 artdst = ROOT.parent / 'docs' / 'yakjido' / 'art'
+MAXW = {'easy-mode': 300}                  # 88px 원형이라 작게, 나머지는 900px 이면 2배 화면까지 충분
 found = []
 if artsrc.exists():
     for name in ART_NAMES:
-        for ext in ('.png', '.webp', '.jpg'):
-            f = artsrc / (name + ext)
-            if f.exists():
-                artdst.mkdir(parents=True, exist_ok=True)
-                (artdst / (name + '.png')).write_bytes(f.read_bytes())
-                found.append(name); break
+        f = next((artsrc / (name + e) for e in ('.webp', '.png', '.jpg') if (artsrc / (name + e)).exists()), None)
+        if not f: continue
+        artdst.mkdir(parents=True, exist_ok=True)
+        try:
+            from PIL import Image
+            im = Image.open(f).convert('RGB'); cap = MAXW.get(name, 900); long = max(im.size)
+            if long > cap:
+                r = cap / long; im = im.resize((round(im.width * r), round(im.height * r)), Image.LANCZOS)
+            im.save(artdst / (name + '.webp'), 'WEBP', quality=82, method=6)
+        except Exception as e:
+            (artdst / (name + f.suffix)).write_bytes(f.read_bytes()); print('그림 변환 실패, 원본 복사:', name, e)
+        found.append(name)
 for stale in (artdst.glob('*') if artdst.exists() else []):      # 지운 그림은 배포본에서도 지운다
     if stale.stem not in found: stale.unlink()
 data['art'] = found
