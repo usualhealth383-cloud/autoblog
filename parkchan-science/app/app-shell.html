@@ -16,6 +16,8 @@
   --ink:#1E2A2E; --body:#3A484D; --muted:#6B7A80; --faint:#96A2A6;
   --line:#E2DED6; --hair:#EDE9E2;
   --u:#147D6F; --u-soft:#E7F5F1; --u-line:#C9E7DF; --u-dark:#0F6357;
+  /* 브랜드 색 — 앱 껍데기(탭·기본 버튼·시작 화면)는 단원과 무관하게 늘 이 색이다 */
+  --brand:#147D6F; --brand-soft:#E7F5F1; --brand-line:#C9E7DF; --brand-dark:#0F6357;
   --no:#C0392B; --no-soft:#FBECEA; --warn:#B4830A; --warn-soft:#FFF7E0;
   --shadow:0 4px 20px rgba(30,42,46,.07);
 }
@@ -28,6 +30,7 @@
     --ink:#EDEAE4; --body:#C3CCCE; --muted:#8E9A9D; --faint:#6A7679;
     --line:#2C3538; --hair:#242C2E;
     --u:#4FBFAC; --u-soft:#122724; --u-line:#1D3D38; --u-dark:#7FD6C6;
+    --brand:#4FBFAC; --brand-soft:#122724; --brand-line:#1D3D38; --brand-dark:#7FD6C6;
     --no:#E4776A; --no-soft:#2C1A18; --warn:#D9A73C; --warn-soft:#2A2314;
     --shadow:0 4px 20px rgba(0,0,0,.45);
   }
@@ -40,6 +43,7 @@
   --ink:#EDEAE4; --body:#C3CCCE; --muted:#8E9A9D; --faint:#6A7679;
   --line:#2C3538; --hair:#242C2E;
   --u:#4FBFAC; --u-soft:#122724; --u-line:#1D3D38; --u-dark:#7FD6C6;
+  --brand:#4FBFAC; --brand-soft:#122724; --brand-line:#1D3D38; --brand-dark:#7FD6C6;
   --no:#E4776A; --no-soft:#2C1A18; --warn:#D9A73C; --warn-soft:#2A2314;
   --shadow:0 4px 20px rgba(0,0,0,.45);
 }
@@ -53,7 +57,7 @@ body{background:var(--ground);color:var(--ink);
   min-height:100vh;font-size:var(--fs,15px)}
 .app{width:100%;max-width:440px;background:var(--paper);min-height:100vh;
   display:flex;flex-direction:column;box-shadow:var(--shadow);position:relative}
-.stripe{height:4px;background:var(--u);flex:0 0 auto}
+.stripe{height:4px;background:var(--brand);flex:0 0 auto}
 main{flex:1;padding:16px 18px 96px;overflow-x:hidden}
 .hide{display:none!important}
 button{font-family:inherit}
@@ -89,17 +93,19 @@ button{font-family:inherit}
 .card::before{content:"";position:absolute;inset:0 0 auto 0;height:3px;background:var(--u)}
 .loc{font-size:11px;font-weight:800;letter-spacing:.1em;color:var(--u);margin-bottom:8px;display:flex;justify-content:space-between;align-items:center}
 .loc .acts{display:flex;gap:4px}
-.loc .acts button{background:none;border:1px solid var(--hair);border-radius:8px;width:30px;height:30px;display:grid;place-items:center;cursor:pointer;color:var(--muted)}
-.loc .acts button svg{width:15px;height:15px;stroke:currentColor;stroke-width:2;fill:none;stroke-linecap:round;stroke-linejoin:round}
+.loc .acts button{background:none;border:1px solid var(--hair);border-radius:10px;width:40px;height:40px;display:grid;place-items:center;cursor:pointer;color:var(--muted)}
+.loc .acts button svg{width:17px;height:17px;stroke:currentColor;stroke-width:2;fill:none;stroke-linecap:round;stroke-linejoin:round}
 .loc .acts button.on{color:var(--warn);border-color:var(--warn)}
 .loc .acts button.on svg{fill:var(--warn)}
 h1{font-size:23px;font-weight:900;letter-spacing:-.025em;line-height:1.3;margin-bottom:3px}
 .sub{font-size:13px;color:var(--muted);margin-bottom:16px}
-.steps{display:flex;gap:9px;margin-bottom:16px}
-.step{flex:1;border-top:2.5px solid var(--u);padding-top:8px}
-.step .n{font-size:13px;font-weight:900;color:var(--u);font-family:'Noto Serif KR',serif}
-.step .t{font-size:12px;font-weight:800;margin:2px 0 3px;line-height:1.35}
-.step .d{font-size:11px;color:var(--body);line-height:1.55}
+.steps{margin:2px 0 16px}
+.step{display:grid;grid-template-columns:26px 1fr;column-gap:9px;align-items:baseline;
+  border-top:1px solid var(--hair);padding:11px 0 12px}
+.step:first-child{border-top:2.5px solid var(--u);padding-top:10px}
+.step .n{grid-column:1;font-size:14px;font-weight:900;color:var(--u);font-family:'Noto Serif KR',serif}
+.step .t{grid-column:2;font-size:14.5px;font-weight:800;margin:0;line-height:1.4;letter-spacing:-.01em}
+.step .d{grid-column:2;font-size:13.5px;color:var(--body);line-height:1.75;margin-top:4px}
 figure{background:var(--u-soft);border-radius:11px;padding:12px 8px 8px;text-align:center;margin-bottom:15px}
 figure svg{max-width:100%;height:auto}
 figcaption{font-size:11.5px;color:var(--u-dark);font-weight:700;margin-top:7px;padding:0 6px;line-height:1.5}
@@ -113,11 +119,11 @@ figcaption{font-size:11.5px;color:var(--u-dark);font-weight:700;margin-top:7px;p
 .prose p{font-family:'Noto Serif KR',Georgia,serif;font-size:15px;line-height:2;color:var(--body);margin-bottom:15px}
 .prose p:last-child{margin-bottom:0}
 .prose b{color:var(--ink);font-weight:700}
-.blank{display:inline-block;min-width:52px;text-align:center;border:none;
+button.blank{display:inline-block;min-width:52px;text-align:center;border:none;
   border-bottom:2px solid var(--u);background:var(--u-soft);color:var(--u);
   font-weight:800;font-family:'Noto Sans KR',sans-serif;font-size:13px;
   padding:1px 7px;border-radius:5px 5px 0 0;cursor:pointer;font-feature-settings:normal}
-.blank.open{background:transparent;color:var(--u-dark)}
+button.blank.open{background:transparent;color:var(--u-dark)}
 
 /* 부속 카드 */
 .sec{background:var(--card);border:1px solid var(--hair);border-radius:15px;padding:15px 17px;margin-bottom:13px}
@@ -136,10 +142,10 @@ figcaption{font-size:11.5px;color:var(--u-dark);font-weight:700;margin-top:7px;p
 
 /* 버튼 */
 .btn{display:block;width:100%;text-align:center;font-size:15px;font-weight:800;padding:15px;border-radius:14px;border:none;
-  background:var(--u);color:#fff;cursor:pointer;letter-spacing:-.01em;margin-bottom:13px}
+  background:var(--brand);color:#fff;cursor:pointer;letter-spacing:-.01em;margin-bottom:13px}
 .btn:disabled{background:var(--line);color:var(--faint);cursor:default}
 .btn.ghost{background:transparent;color:var(--muted);border:1px solid var(--line)}
-.btn.soft{background:var(--u-soft);color:var(--u-dark)}
+.btn.soft{background:var(--brand-soft);color:var(--brand-dark)}
 .btn.sm{font-size:13px;padding:11px;margin-bottom:8px}
 .linkbtn{background:none;border:none;color:var(--muted);font-size:13px;cursor:pointer;text-decoration:underline;padding:14px 2px}
 .linkbtn.danger{color:var(--no)}
@@ -212,9 +218,11 @@ figcaption{font-size:11.5px;color:var(--u-dark);font-weight:700;margin-top:7px;p
 .prog .r{margin-left:auto;text-align:right}
 .week{display:flex;gap:6px;justify-content:space-between;margin:2px 0 13px}
 .week .d{flex:1;text-align:center;font-size:10.5px;color:var(--faint);font-weight:700}
-.week .d i{display:block;width:100%;aspect-ratio:1;border-radius:9px;background:var(--hair);margin-bottom:4px;border:1.5px solid transparent}
-.week .d.on i{background:var(--u)}
-.week .d.today i{border-color:var(--u)}
+.week .d i{display:grid;place-items:center;width:100%;aspect-ratio:1;border-radius:10px;background:var(--hair);
+  margin-bottom:4px;border:1.5px solid transparent;font-style:normal;font-size:12.5px;font-weight:700;color:var(--faint);font-variant-numeric:tabular-nums}
+.week .d.on i{background:var(--u);border-color:var(--u);color:#fff}
+.week .d.today i{border-color:var(--u);color:var(--u)}
+.week .d.today{color:var(--u)}
 .tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:13px}
 .tile{background:var(--card);border:1px solid var(--hair);border-radius:13px;padding:12px 10px;text-align:center}
 .tile .v{font-size:21px;font-weight:900;letter-spacing:-.02em;font-variant-numeric:tabular-nums;line-height:1.2;color:var(--ink)}
@@ -232,6 +240,8 @@ figcaption{font-size:11.5px;color:var(--u-dark);font-weight:700;margin-top:7px;p
 .cal .c.on{background:var(--u);color:#fff;font-weight:800}
 .cal .c.att{box-shadow:inset 0 0 0 2px var(--warn)}
 .cal .c.blank{background:transparent}
+.cal .c.today{box-shadow:inset 0 0 0 1.5px var(--brand)}
+.cal .c.on.today{box-shadow:inset 0 0 0 1.5px var(--paper)}
 .legend{display:flex;gap:12px;font-size:11px;color:var(--muted);margin-top:8px}
 .legend i{display:inline-block;width:10px;height:10px;border-radius:3px;vertical-align:-1px;margin-right:4px;background:var(--u)}
 .legend i.att{background:transparent;box-shadow:inset 0 0 0 2px var(--warn)}
@@ -271,38 +281,60 @@ figcaption{font-size:11.5px;color:var(--u-dark);font-weight:700;margin-top:7px;p
 select.sel{font-family:inherit;font-size:14px;font-weight:700;color:var(--u);background:var(--u-soft);border:none;border-radius:9px;padding:8px 10px;cursor:pointer}
 
 /* 시작 · 로그인 */
-.auth{min-height:calc(100vh - 4px);display:flex;flex-direction:column;justify-content:center;padding:28px 6px 36px}
-.auth .mark{width:72px;height:72px;border-radius:21px;background:var(--u);display:grid;place-items:center;margin-bottom:22px}
-.auth .mark svg{width:44px;height:44px}
+.auth{min-height:calc(100vh - 4px);display:flex;flex-direction:column;padding:clamp(16px,4vh,34px) 6px 30px}
+.auth.start{padding-top:clamp(10px,2.5vh,22px)}
+.auth .mark{width:52px;height:52px;border-radius:16px;background:var(--brand);display:grid;place-items:center;margin-bottom:14px;box-shadow:0 6px 18px rgba(20,125,111,.22)}
+.auth .mark svg{width:32px;height:32px}
 .auth h1{font-size:27px;line-height:1.3;margin-bottom:8px}
 .auth .lead{font-size:14.5px;color:var(--body);line-height:1.8;margin-bottom:22px}
 .auth .lead b{color:var(--ink)}
 .auth .f{display:flex;flex-direction:column;gap:9px;margin-bottom:12px}
 .auth input,.auth select{width:100%;border:1.5px solid var(--line);border-radius:12px;padding:13px 14px;font-size:15px;font-family:inherit;background:var(--card);color:var(--ink)}
-.auth input:focus,.auth select:focus{outline:2px solid var(--u);outline-offset:-2px}
+.auth input:focus,.auth select:focus{outline:2px solid var(--brand);outline-offset:-2px}
 .auth .err{font-size:12.5px;color:var(--no);font-weight:600;margin:-4px 0 10px}
 .auth .links{display:flex;justify-content:center;gap:18px;font-size:13px;color:var(--muted);margin-top:4px}
 .auth .links button{background:none;border:none;color:var(--muted);font-size:13px;cursor:pointer;text-decoration:underline}
-.auth .roles{display:flex;gap:8px;margin-bottom:12px}
-.auth .roles button{flex:1;border:1.5px solid var(--line);background:var(--card);border-radius:12px;padding:11px 8px;font-size:13px;font-weight:800;color:var(--muted);cursor:pointer;line-height:1.35}
-.auth .roles button small{display:block;font-size:11px;font-weight:500;color:var(--faint)}
-.auth .roles button.on{border-color:var(--u);color:var(--u);background:var(--u-soft)}
+.auth .roles{display:flex;flex-direction:column;gap:7px;margin-bottom:14px}
+.auth .roles button{display:flex;align-items:center;gap:11px;width:100%;border:1.5px solid var(--line);background:var(--card);border-radius:14px;padding:13px 15px;font-size:14.5px;font-weight:800;color:var(--ink);cursor:pointer;text-align:left;line-height:1.4;min-height:56px}
+.auth .roles button .ri{flex:0 0 34px;height:34px;border-radius:11px;background:var(--ground);display:grid;place-items:center;color:var(--muted)}
+.auth .roles button .ri svg{width:19px;height:19px;stroke:currentColor;stroke-width:1.9;fill:none;stroke-linecap:round;stroke-linejoin:round}
+.auth .roles button .rt{flex:1;min-width:0}
+.auth .roles button small{display:block;font-size:12px;font-weight:500;color:var(--muted);margin-top:1px}
+.auth .roles button.on{border-color:var(--brand);background:var(--brand-soft)}
+.auth .roles button.on .ri{background:var(--brand);color:#fff}
+.auth .roles button.on small{color:var(--brand-dark)}
 .auth label.agree{display:flex;gap:8px;align-items:flex-start;font-size:12.5px;color:var(--body);line-height:1.6;margin-bottom:14px}
 .auth label.agree input{width:auto;margin-top:4px}
-.auth label.agree u{cursor:pointer;color:var(--u)}
+.auth label.agree u{cursor:pointer;color:var(--brand)}
 .auth .fine{padding-top:10px}
+.auth .hero{width:100%;height:auto;display:block;margin:0 0 18px;border-radius:20px}
+.auth .facts{display:flex;gap:7px;margin:0 0 18px}
+.auth .facts div{flex:1;background:var(--card);border:1px solid var(--hair);border-radius:13px;padding:10px 6px;text-align:center}
+.auth .facts b{display:block;font-size:17px;font-weight:900;color:var(--brand);letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+.auth .facts span{display:block;font-size:10.5px;color:var(--muted);font-weight:600;margin-top:1px}
+.auth .lab{display:block;font-size:12px;font-weight:800;color:var(--muted);margin:0 0 5px 2px}
+.auth .lab.grp{margin:2px 0 7px 2px;color:var(--faint);font-weight:700}
+.auth .fld{margin-bottom:11px}
+.auth .fld input{margin:0}
+.auth .demo{border-top:1px solid var(--hair);margin-top:auto;padding-top:14px}
+.auth .demo p{font-size:11.5px;color:var(--faint);text-align:center;margin-bottom:8px}
+.auth .demo .row{display:flex;gap:6px}
+.auth .demo button{flex:1;font-size:12px;font-weight:700;color:var(--body);background:var(--card);border:1px solid var(--line);border-radius:10px;padding:9px 4px;cursor:pointer}
+.auth .demo button:active{background:var(--brand-soft)}
+.auth .code-in{letter-spacing:normal}
+.auth .code-in:not(:placeholder-shown){letter-spacing:.14em;text-transform:uppercase;font-weight:700}
 .auth .or{display:flex;align-items:center;gap:10px;color:var(--faint);font-size:11.5px;margin:6px 0 12px}
 .auth .or::before,.auth .or::after{content:"";flex:1;height:1px;background:var(--hair)}
 
 /* 이용권 */
 .plan{background:var(--card);border:1.5px solid var(--line);border-radius:16px;padding:16px;margin-bottom:10px;position:relative}
-.plan.best{border-color:var(--u)}
-.plan .tag{position:absolute;top:-10px;right:14px;background:var(--u);color:#fff}
+.plan.best{border-color:var(--brand)}
+.plan .tag{position:absolute;top:-10px;right:14px;background:var(--brand);color:#fff}
 .plan h3{font-size:16px;font-weight:900;margin-bottom:2px}
 .plan .price{font-size:22px;font-weight:900;letter-spacing:-.02em;margin:6px 0 4px;font-variant-numeric:tabular-nums}
 .plan .price small{font-size:12px;color:var(--muted);font-weight:600}
 .plan ul{list-style:none;font-size:12.5px;color:var(--body);line-height:1.8;margin-bottom:10px}
-.plan ul li::before{content:"✓ ";color:var(--u);font-weight:900}
+.plan ul li::before{content:"✓ ";color:var(--brand);font-weight:900}
 .plan .btn{margin:0}
 
 /* 문제 은행 */
@@ -348,13 +380,21 @@ figure.zoomable{cursor:zoom-in}
 .tabs{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:440px;display:flex;border-top:1px solid var(--hair);background:var(--card);
   padding:9px 0 max(11px,env(safe-area-inset-bottom));z-index:20}
 .tab{flex:1;text-align:center;font-size:10.5px;color:var(--faint);font-weight:700;display:flex;flex-direction:column;align-items:center;gap:4px;background:none;border:none;cursor:pointer;padding:2px 0}
-.tab.on{color:var(--u)}
+.tab.on{color:var(--brand)}
 .tab svg{width:21px;height:21px;stroke:currentColor;stroke-width:1.8;fill:none;stroke-linecap:round;stroke-linejoin:round}
 .fine{font-size:11.5px;color:var(--faint);text-align:center;line-height:1.7;padding:8px 10px 0}
+.nextup{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin:0 0 13px}
+.nextup.one{grid-template-columns:1fr}
+.nextup button{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px 13px;text-align:left;cursor:pointer;display:flex;flex-direction:column;gap:3px;min-height:72px;justify-content:center}
+.nextup .t{font-size:13.5px;font-weight:800;color:var(--ink);line-height:1.35}
+.nextup .d{font-size:11.5px;color:var(--muted);line-height:1.4}
+.donebar{background:var(--brand-soft);color:var(--brand-dark);border-radius:14px;padding:14px;text-align:center;font-size:14px;font-weight:800;margin-bottom:13px}
+.qhint{font-size:12.5px;color:var(--faint);text-align:center;line-height:1.85;margin-top:18px;padding:14px 12px;border-top:1px solid var(--hair)}
+.qhint b{color:var(--muted)}
 .seg{display:flex;gap:6px;margin-bottom:14px}
-.seg button{flex:1;font-size:12.5px;font-weight:700;padding:9px 4px;border-radius:10px;border:1px solid var(--line);background:var(--card);color:var(--muted);cursor:pointer}
-.seg button.on{background:var(--u);border-color:var(--u);color:#fff}
-.back{display:inline-flex;align-items:center;gap:6px;background:none;border:none;color:var(--muted);font-size:13px;font-weight:700;cursor:pointer;padding:4px 0 14px}
+.seg button{flex:1;font-size:12.5px;font-weight:700;padding:12px 4px;border-radius:10px;border:1px solid var(--line);background:var(--card);color:var(--muted);cursor:pointer;min-height:44px}
+.seg button.on{background:var(--brand);border-color:var(--brand);color:#fff}
+.back{display:inline-flex;align-items:center;gap:6px;background:none;border:none;color:var(--muted);font-size:13px;font-weight:700;cursor:pointer;padding:10px 8px 14px 0;margin-left:-2px;min-height:44px}
 .back svg{width:16px;height:16px;stroke:currentColor;stroke-width:2.4;fill:none;stroke-linecap:round;stroke-linejoin:round}
 
 /* 시트 */
@@ -459,6 +499,7 @@ const CONCEPTS = JSON.parse(document.getElementById('d-concepts').textContent);
 const QUIZZES  = JSON.parse(document.getElementById('d-quizzes').textContent);
 const BANK     = JSON.parse(document.getElementById('d-bank').textContent);      // 문제 은행
 const LABS     = JSON.parse(document.getElementById('d-labs').textContent);      // 자료 탐구 · 집에서 실험
+const FIGS_N = CONCEPTS.filter(c=>c.figure).length;
 const LESSONS  = (() => { const m = new Map(); CONCEPTS.forEach(c => { if (!m.has(c.lessonId)) m.set(c.lessonId, { id:c.lessonId, name:c.lessonName, book:c.book, bookName:c.bookName, unit:c.unit, unitName:c.unitName, idx:CONCEPTS.findIndex(x=>x.lessonId===c.lessonId) }); }); return [...m.values()]; })();
 const MARKS = '①②③④⑤';
 const FREE_DAYS = 7;                 // [확인 필요] 무료 체험: 최근 7일치 개념
@@ -780,6 +821,25 @@ function conceptCard(c, opts={}){
 /* ═══ 시작 · 로그인 · 회원가입 ═══ */
 let authMode = 'start', authErr = '', signRole = 'student', pendingCode = '';
 const MARK = `<svg viewBox="0 0 100 100" fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round"><ellipse cx="50" cy="50" rx="38" ry="15" transform="rotate(-30 50 50)"/><circle cx="50" cy="50" r="18" fill="#147D6F"/><circle cx="19" cy="66" r="5" fill="#fff" stroke="none"/><circle cx="82" cy="34" r="5" fill="#fff" stroke="none"/></svg>`;
+const AUTH_HERO = `<svg class="hero" viewBox="0 0 320 116" role="img" aria-label="궤도를 도는 행성 — 자연을 재는 눈">
+  <defs>
+    <linearGradient id="ahSky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="var(--brand-soft)"/><stop offset="1" stop-color="var(--card)"/></linearGradient>
+    <radialGradient id="ahOrb" cx="36%" cy="32%"><stop offset="0" stop-color="var(--brand)"/><stop offset="1" stop-color="var(--brand-dark)"/></radialGradient>
+  </defs>
+  <rect width="320" height="116" rx="20" fill="url(#ahSky)"/>
+  <g fill="var(--brand-line)"><circle cx="40" cy="26" r="2.2"/><circle cx="272" cy="21" r="1.8"/><circle cx="294" cy="60" r="2.4"/><circle cx="27" cy="66" r="1.6"/><circle cx="88" cy="15" r="1.4"/><circle cx="238" cy="88" r="1.5"/></g>
+  <ellipse cx="160" cy="54" rx="106" ry="33" fill="none" stroke="var(--brand-line)" stroke-width="1.6" stroke-dasharray="4 5" transform="rotate(-13 160 54)"/>
+  <ellipse cx="160" cy="54" rx="47" ry="14" fill="none" stroke="var(--brand)" stroke-width="3" opacity=".45" transform="rotate(-13 160 54)"/>
+  <circle cx="160" cy="54" r="25" fill="url(#ahOrb)"/>
+  <path d="M113 54a47 14 0 0 0 94 0" fill="none" stroke="var(--brand)" stroke-width="3" opacity=".8" transform="rotate(-13 160 54)"/>
+  <circle cx="254" cy="30" r="4.5" fill="var(--brand-dark)"/>
+  <g stroke="var(--brand)" opacity=".38" stroke-linecap="round"><path d="M46 100h228" stroke-width="1.4"/><g stroke-width="1.6"><path d="M46 100v-7"/><path d="M84 100v-4"/><path d="M122 100v-7"/><path d="M160 100v-4"/><path d="M198 100v-7"/><path d="M236 100v-4"/><path d="M274 100v-7"/></g></g>
+</svg>`;
+const ROLE_IC = {
+  student:'<path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v15H6.5A2.5 2.5 0 0 0 4 20.5z"/><path d="M20 18v3H6.5"/>',
+  parent:'<circle cx="9" cy="7.5" r="3.5"/><path d="M2.5 20c0-3.3 2.9-5.5 6.5-5.5s6.5 2.2 6.5 5.5"/><path d="M17 14.8c2.6.6 4.5 2.4 4.5 5.2"/><circle cx="17.5" cy="8.5" r="2.6"/>',
+  owner:'<path d="M3.5 10.5 12 4l8.5 6.5V20a1 1 0 0 1-1 1h-4.5v-6h-6v6H4.5a1 1 0 0 1-1-1z"/>'
+};
 function renderAuth(){
   const v = document.getElementById('v-auth');
   const err = authErr ? `<div class="err">${esc(authErr)}</div>` : '';
@@ -788,10 +848,16 @@ function renderAuth(){
   const agree = !!(document.getElementById('suAgree') && document.getElementById('suAgree').checked);
   const val = id => ` value="${esc(K[id]||'')}"`;
   if (authMode==='start') v.innerHTML = `
-    <div class="auth">
+    <div class="auth start">
       <div class="mark">${MARK}</div>
       <h1>하루 한 개념,<br>통합과학</h1>
-      <p class="lead">${esc(CFG.academy)} 강의 교재를 <b>매일 한 개념</b>씩 배달합니다. 읽고, 빈칸을 채우고, 문제 하나를 풉니다. <b>5분</b>이면 됩니다.</p>
+      <p class="lead">${esc(CFG.academy)} 강의 교재를 <b>매일 한 개념</b>씩 배달합니다. 읽고, 빈칸을 채우고, 문제를 풉니다.</p>
+      ${AUTH_HERO}
+      <div class="facts">
+        <div><b>${CONCEPTS.length}</b><span>개념</span></div>
+        <div><b>${BANK.length.toLocaleString()}</b><span>문제</span></div>
+        <div><b>${LABS.length}</b><span>자료 탐구</span></div>
+      </div>
       <button class="btn" id="goLogin">로그인</button>
       <button class="btn soft" id="goSignup">회원가입</button>
       <div class="or">또는</div>
@@ -804,12 +870,17 @@ function renderAuth(){
       <h1>로그인</h1>
       <p class="lead">가입한 이메일과 비밀번호를 넣어 주세요.</p>
       <div class="f">
-        <input id="lgEmail" type="email" placeholder="이메일" autocomplete="username" inputmode="email"${val('lgEmail')}>
-        <input id="lgPw" type="password" placeholder="비밀번호" autocomplete="current-password"${val('lgPw')}>
+        <div class="fld"><label class="lab" for="lgEmail">이메일</label>
+          <input id="lgEmail" type="email" placeholder="name@example.com" autocomplete="username" inputmode="email"${val('lgEmail')}></div>
+        <div class="fld"><label class="lab" for="lgPw">비밀번호</label>
+          <input id="lgPw" type="password" placeholder="비밀번호" autocomplete="current-password"${val('lgPw')}></div>
       </div>${err}
       <button class="btn" id="lgGo">로그인</button>
       <div class="links"><button id="goForgot">비밀번호를 잊었어요</button><button id="goSignup">회원가입</button></div>
-      ${DBX.mode==='local' ? `<p class="fine">시연 계정 — 학생 <b>student@demo.kr / 1234</b> · 보호자 <b>parent@demo.kr / 1234</b> · 원장 <b>owner@parkchan.kr / 2580</b></p>` : ''}
+      ${DBX.mode==='local' ? `<div class="demo"><p>시연용 계정 — 눌러서 채우기</p><div class="row">
+        <button data-demo="student@demo.kr|1234">학생</button>
+        <button data-demo="parent@demo.kr|1234">보호자</button>
+        <button data-demo="owner@parkchan.kr|2580">원장</button></div></div>` : ''}
     </div>`;
   if (authMode==='signup') v.innerHTML = `
     <div class="auth">
@@ -817,17 +888,20 @@ function renderAuth(){
       <h1>회원가입</h1>
       <p class="lead">누구로 쓰시나요?</p>
       <div class="roles">
-        ${[['student','학생','개념·문제·출석'],['parent','보호자','자녀 출석·진도 보기'],['owner','원장·선생님','학원 관리']].map(([r,l,s])=>`<button data-role="${r}" class="${signRole===r?'on':''}">${l}<small>${s}</small></button>`).join('')}
+        ${[['student','학생','매일 한 개념 · 문제 은행 · 출석'],['parent','보호자','자녀의 출석·진도·공지 보기'],['owner','원장·선생님','수강생 코드·출석·공지 관리']].map(([r,l,d])=>`<button data-role="${r}" class="${signRole===r?'on':''}"><span class="ri"><svg viewBox="0 0 24 24">${ROLE_IC[r]}</svg></span><span class="rt">${l}<small>${d}</small></span></button>`).join('')}
       </div>
       <div class="f">
         <input id="suName" placeholder="이름${signRole==='parent'?' (보호자 성함)':''}" autocomplete="name"${val('suName')}>
         <input id="suEmail" type="email" placeholder="이메일" autocomplete="username" inputmode="email"${val('suEmail')}>
         <input id="suPw" type="password" placeholder="비밀번호 (6자 이상)" autocomplete="new-password"${val('suPw')}>
-        <input id="suPhone" placeholder="연락처 (선택)" inputmode="tel" autocomplete="tel"${val('suPhone')}>
-        ${signRole==='student' ? `<input id="suCode" class="code" placeholder="학원 코드 6자리 (있으면)" maxlength="6" autocapitalize="characters" autocomplete="off" style="text-transform:uppercase;letter-spacing:.12em"${val('suCode')}>
+      </div>
+      <span class="lab grp">선택 — 나중에 내 정보에서도 넣을 수 있어요</span>
+      <div class="f">
+        <input id="suPhone" placeholder="연락처 (공지 문자를 받습니다)" inputmode="tel" autocomplete="tel"${val('suPhone')}>
+        ${signRole==='student' ? `<input id="suCode" class="code-in" placeholder="학원 코드 6자리 (있으면)" maxlength="6" autocapitalize="characters" autocomplete="off" ${val('suCode')}>
         <select id="suAge"><option value="14+" ${K.suAge!=='u14'?'selected':''}>만 14세 이상입니다</option><option value="u14" ${K.suAge==='u14'?'selected':''}>만 14세 미만입니다 (보호자 동의 필요)</option></select>
         ${K.suAge==='u14' ? `<input id="suGName" placeholder="보호자 성명"${val('suGName')}><input id="suGPhone" placeholder="보호자 연락처" inputmode="tel"${val('suGPhone')}>` : ''}` : ''}
-        ${signRole==='parent' ? `<input id="suChild" class="code" placeholder="자녀의 학원 코드 6자리 (있으면)" maxlength="6" autocapitalize="characters" autocomplete="off" style="text-transform:uppercase;letter-spacing:.12em"${val('suChild')}>` : ''}
+        ${signRole==='parent' ? `<input id="suChild" class="code-in" placeholder="자녀의 학원 코드 6자리 (있으면)" maxlength="6" autocapitalize="characters" autocomplete="off" ${val('suChild')}>` : ''}
       </div>
       <label class="agree"><input type="checkbox" id="suAgree"${agree?' checked':''}><span><u data-legal="terms">이용약관</u>과 <u data-legal="privacy">개인정보처리방침</u>에 동의합니다.${K.suAge==='u14'?' 보호자로서 아동의 가입과 개인정보 처리에 동의합니다.':''}</span></label>
       ${err}
@@ -864,7 +938,7 @@ async function renderToday(){
         : (hasPass() ? `<span class="pill">이용권 ~${kdate(ACC.passUntil)}</span>` : `<button class="pill warn" id="goPlansPill">체험 ${trialLeft}일 남음</button>`)}
     </div>
     ${unreadNotice ? `<div class="notice"><div class="ic">!</div><div class="b"><div class="t">${esc(unreadNotice.t)}</div><div class="d">${esc(unreadNotice.d)} · ${esc(unreadNotice.cls)}</div></div><button id="okNotice" data-id="${unreadNotice.id}">확인</button></div>` : ''}
-    <div class="week">${week.map(w=>`<div class="d ${w.on?'on':''} ${w.today?'today':''}"><i></i>${w.wd}</div>`).join('')}</div>
+    <div class="week">${week.map(w=>`<div class="d ${w.on?'on':''} ${w.today?'today':''}"><i>${+w.iso.slice(-2)}</i>${w.wd}</div>`).join('')}</div>
     ${conceptCard(c)}
     <button class="btn" id="goQuiz">${retry ? '다시 볼 문제부터 풀기' : '오늘의 문제 풀기'}</button>
     <button class="prog" id="goStats">
@@ -904,7 +978,7 @@ function renderQuiz(){
         ${pick!==q.answer && !retry ? `<div class="again">↻ 오답 노트에 담았습니다 · <b>${RETRY_DAYS}일 뒤</b> 한 번 더 물어볼게요</div>`:''}
         ${retry ? `<div class="again">${pick===q.answer ? '✓ 이제 됐습니다 — 오답 노트에서 정리됩니다' : '한 번 더 담아 둘게요 — 3일 뒤 다시'}</div>`:''}
         <button class="btn" id="grade">${mode==='review' ? '다음 복습 문제' : (retry ? '오늘의 문제로' : '오늘 개념으로 돌아가기')}</button>
-      ` : ''}
+      ` : `<p class="qhint">고르면 바로 채점하고, 왜 갈렸는지 알려 드립니다.<br>틀려도 괜찮아요 — 오답은 <b>${RETRY_DAYS}일 뒤</b> 한 번 더 나옵니다.</p>`}
     `}`;
 }
 function startReview(){
@@ -964,9 +1038,11 @@ function renderDetail(){
       <details><summary style="font-size:13px;font-weight:800;color:var(--u);cursor:pointer">정답 보기</summary>
         <div class="verdict" style="margin-top:10px"><div class="h">${q.answer ? `정답 ${MARKS[q.answer-1]}` : '예시 답안'}</div><p>${rich(q.explain || q.gradeNote || q.answerLine)}</p></div></details>
     </div>
-    ${LABS.some(l=>l.lessonId===c.lessonId) ? `<button class="btn soft" data-lab="${c.lessonId}">이 소단원의 자료 탐구 · 집에서 실험</button>` : ''}
-    <button class="btn ghost" data-drill="${c.lessonId}">이 소단원 문제 풀기</button>
-    ${S.done.includes(c.id) ? '' : `<button class="btn soft" id="markDone">이 개념 공부했음으로 표시</button>`}
+    ${S.done.includes(c.id) ? `<div class="donebar">✓ 공부한 개념입니다</div>` : `<button class="btn" id="markDone">이 개념 공부했음으로 표시</button>`}
+    <div class="nextup ${LABS.some(l=>l.lessonId===c.lessonId)?'':'one'}">
+      <button data-drill="${c.lessonId}"><span class="t">이 소단원 문제 풀기</span><span class="d">${BANK.filter(q=>q.lessonId===c.lessonId).length}문항</span></button>
+      ${LABS.some(l=>l.lessonId===c.lessonId) ? `<button data-lab="${c.lessonId}"><span class="t">자료 탐구 · 실험</span><span class="d">해석 3단계 · 집에서 해보기</span></button>` : ''}
+    </div>
     <div class="seg"><button id="prevC" ${detailIdx===0?'disabled':''}>← 이전 개념</button><button id="nextC" ${detailIdx>=CONCEPTS.length-1?'disabled':''}>다음 개념 →</button></div>`;
 }
 
@@ -1002,6 +1078,7 @@ function bankPool(){
     && (bankSel.only==='전체' || (bankSel.only==='안 푼' && !(S.bh||{})[q.id]) || (bankSel.only==='틀린' && (S.bh||{})[q.id]==='x')));
 }
 function renderBank(){
+  setUnit('');
   const v = document.getElementById('v-bank');
   if (bs) return renderBankSession();
   const pool = bankPool(), bh = S.bh||{}, done = Object.keys(bh).length, right = Object.values(bh).filter(x=>x==='o').length;
@@ -1118,7 +1195,7 @@ async function renderStats(){
   if (S.auth){ try { att = await DBX.attendanceRange(`${statMonth}-01`, `${statMonth}-${pad(days)}`, S.auth.code); } catch {} }
   const attSet = new Set(att.map(a=>a.date));
   const cal = ['일','월','화','수','목','금','토'].map(h=>`<div class="h">${h}</div>`).join('') + '<div class="c blank"></div>'.repeat(first.getDay()) +
-    [...Array(days)].map((_,i)=>{ const iso=`${statMonth}-${pad(i+1)}`; return `<div class="c ${S.days.includes(iso)?'on':''} ${attSet.has(iso)?'att':''}">${i+1}</div>`; }).join('');
+    [...Array(days)].map((_,i)=>{ const iso=`${statMonth}-${pad(i+1)}`; return `<div class="c ${S.days.includes(iso)?'on':''} ${attSet.has(iso)?'att':''} ${iso===todayISO()?'today':''}">${i+1}</div>`; }).join('');
   const units = []; CONCEPTS.forEach(c => { const k = c.book+c.unit; let u = units.find(x=>x.k===k); if (!u){ u={k, book:c.bookName, unit:c.unit, name:c.unitName, total:0, done:0}; units.push(u); } u.total++; if (S.done.includes(c.id)) u.done++; });
   const monthDays = S.days.filter(d=>d.startsWith(statMonth)).length;
   v.innerHTML = `<h1 class="h-page">학습 통계</h1>
@@ -1183,12 +1260,12 @@ function renderPlans(){
   document.getElementById('v-plans').innerHTML = `
     <button class="back" id="backMe"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg>내 정보</button>
     <h1 class="h-page">이용권</h1>
-    <p class="fine" style="text-align:left;padding:0 0 14px">${hasPass() ? `지금 이용권은 <b>${kdate(ACC.passUntil)}</b>까지입니다. 코드를 더 등록하면 그 뒤로 이어집니다.` : `가입 없이도 최근 ${FREE_DAYS}일치는 무료입니다. 전 범위(개념 ${CONCEPTS.length}개 · 문제 ${QUIZZES.length}개)를 열려면 아래 중 하나를 고르세요.`}</p>
+    <p class="fine" style="text-align:left;padding:0 0 14px">${hasPass() ? `지금 이용권은 <b>${kdate(ACC.passUntil)}</b>까지입니다. 코드를 더 등록하면 그 뒤로 이어집니다.` : `가입 없이도 최근 ${FREE_DAYS}일치는 무료입니다. 전 범위(개념 ${CONCEPTS.length}개 · 문제 은행 ${BANK.length.toLocaleString()}문항 · 자료 탐구 ${LABS.length}편)를 열려면 아래 중 하나를 고르세요.`}</p>
     <div class="plan best"><span class="tag">학원 수강생</span><h3>학원 코드 등록</h3><div class="price">무료<small> · 수강 기간 동안</small></div>
-      <ul><li>전 범위 개념·문제</li><li>내 반 공지 · 출석 체크</li><li>기기를 바꿔도 진도 이어짐</li></ul>
+      <ul><li>전 범위 개념 ${CONCEPTS.length}개 · 문제 은행 ${BANK.length.toLocaleString()}문항</li><li>내 반 공지 · 출석 체크</li><li>기기를 바꿔도 진도 이어짐</li></ul>
       <button class="btn soft" id="backMe2">내 정보에서 코드 등록</button></div>
     ${CFG.plans.map(p=>`<div class="plan ${p.best?'best':''}">${p.best?'<span class="tag">인기</span>':''}<h3>${esc(p.name)}</h3><div class="price">${p.price.toLocaleString()}원<small> · ${p.days>=365?'1년':p.days>=180?'6개월':'1개월'}${p.months>1?` · 월 ${Math.round(p.price/p.months).toLocaleString()}원꼴`:''}</small></div>
-      <ul><li>전 범위 개념 ${CONCEPTS.length}개 · 문제 ${QUIZZES.length}개</li><li>오답 노트 · 복습 문제 · 학습 통계</li><li>${esc(p.sub||'')}</li></ul>
+      <ul><li>전 범위 개념 ${CONCEPTS.length}개 · 그림 ${FIGS_N}장</li><li>문제 은행 ${BANK.length.toLocaleString()}문항 · 자료 탐구 ${LABS.length}편</li><li>오답 노트 · 복습 문제 · 학습 통계</li><li>${esc(p.sub||'')}</li></ul>
       <button class="btn ${p.best?'':'ghost'}" data-buy="${p.id}">스토어에서 구매</button></div>`).join('')}
     <div class="codebox"><h3>이용권 코드</h3><p>학원이나 이벤트로 받은 코드를 넣으면 바로 열립니다.</p>
       <div class="f"><input id="passIn" class="code" placeholder="이용권 코드" maxlength="6" autocapitalize="characters" autocomplete="off"><button id="passGo">등록</button></div>${passErr?`<div class="err">${esc(passErr)}</div>`:''}</div>
@@ -1355,6 +1432,9 @@ function renderTabs(){ document.getElementById('tabs').innerHTML = tabsFor().map
 let view = 'today';
 function show(v){
   view = v;
+  /* 단원 색(테라코타·딥틸·인디고)은 그 단원을 펼친 화면에서만 쓴다.
+     교재 목록·문제 은행·통계·내 정보에서는 브랜드 색으로 돌려놓아 앱이 한 색으로 읽히게 한다. */
+  if (!['today','quiz','detail','lab'].includes(v)) setUnit('');
   VIEWS.forEach(k => document.getElementById('v-'+k).classList.toggle('hide', k!==v));
   document.getElementById('tabs').classList.toggle('hide', v==='auth');
   const tabOf = {quiz: qState&&qState.mode==='review'?'stats':'today', detail:'list', plans:'me', wrong:'bank', lab:'bank'}[v] || v;
@@ -1409,6 +1489,8 @@ document.addEventListener('click', async e => {
   const go = T('[data-go]'); if (go){ show(go.dataset.go); return; }
 
   /* 시작 · 로그인 · 가입 */
+  const dm = T('[data-demo]');
+  if (dm){ const [em,pw] = dm.dataset.demo.split('|'); document.getElementById('lgEmail').value = em; document.getElementById('lgPw').value = pw; document.getElementById('lgGo').focus(); return; }
   if (T('#goLogin')){ authMode='login'; authErr=''; renderAuth(); return; }
   if (T('#goSignup')){ authMode='signup'; authErr=''; renderAuth(); return; }
   if (T('#goForgot')){ authMode='forgot'; authErr=''; renderAuth(); return; }

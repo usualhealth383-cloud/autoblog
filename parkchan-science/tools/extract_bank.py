@@ -68,7 +68,11 @@ def parse_chapter(path):
 
     # ── 정답표 · 해설 ──
     ans = {}
-    tbl = soup.select_one('table.anstable')
+    tbl = None
+    for t in soup.select('table.anstable'):          # 첫 칸 머리글이 '문항'인 표가 진짜 정답표
+        th = t.select_one('tr th')
+        if th and txt(th, False).startswith('문항'): tbl = t; break
+    if tbl is None: tbl = soup.select_one('table.anstable')
     if tbl:
         rows = tbl.select('tr')
         nums = [txt(td, False) for td in rows[0].select('td')]
@@ -82,6 +86,8 @@ def parse_chapter(path):
         wb = sol.select_one('.wrongbox')
         sols[n] = {'explain': txt(ps[0]) if ps else '', 'wrong': txt(wb.select_one('p')) if wb and wb.select_one('p') else '',
                    'concept': txt(sol.select_one('.slink'), False)}
+        sa = sol.select_one('.sans')                  # 해설 머리의 정답 — 정답표가 비었을 때의 보조
+        if sa and txt(sa, False) and not ans.get(n): ans[n] = txt(sa, False)
 
     # ── STEP 1~3 ──
     step = None; qi = 0
@@ -190,6 +196,10 @@ def main():
     auto = auto_from_lecture(concepts); items += auto
     # 개념 번호 없는 STEP 문항은 소단원 전체(0)로 둔다
     bad = [i['id'] for i in items if i['type'] in ('mc', 'multi') and not i['answer']]
+    dropped = [i for i in items if i['type'] != 'essay' and not str(i.get('answer', '')).strip()]
+    if dropped:
+        print(f"  ! 정답이 없어 제외한 문항 {len(dropped)}개: " + ', '.join(d['id'] for d in dropped[:8]))
+        items = [i for i in items if i not in dropped]
     (OUT / 'bank.json').write_text(json.dumps(items, ensure_ascii=False, indent=0), encoding='utf-8')
     (OUT / 'labs.json').write_text(json.dumps(labs, ensure_ascii=False, indent=0), encoding='utf-8')
     from collections import Counter
