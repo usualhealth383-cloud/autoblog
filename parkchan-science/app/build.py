@@ -7,6 +7,7 @@ concepts = json.loads((ROOT / 'data/concepts.json').read_text(encoding='utf-8'))
 quizzes = json.loads((ROOT / 'data/quizzes.json').read_text(encoding='utf-8'))
 bank = json.loads((ROOT / 'data/bank.json').read_text(encoding='utf-8'))
 labs = json.loads((ROOT / 'data/labs.json').read_text(encoding='utf-8'))
+quotes = json.loads((ROOT / 'data/quotes.json').read_text(encoding='utf-8'))
 figs = [f'<div data-id="{c["id"]}">{(ROOT / "data" / c["figure"]["file"]).read_text(encoding="utf-8")}</div>'
         for c in concepts if c.get('figure')]
 j = lambda o: json.dumps(o, ensure_ascii=False).replace('</', '<\\/')
@@ -22,6 +23,7 @@ out = (shell.replace('<!--CONCEPTS-->', j(concepts))
             .replace('<!--QUIZZES-->', j(quizzes))
             .replace('<!--BANK-->', j(bank))
             .replace('<!--LABS-->', j(labs))
+            .replace('<!--QUOTES-->', j(quotes))
             .replace('<!--FIGS-->', '\n'.join(figs)))
 
 # GitHub Pages 로 나가는 PWA 배포본 — manifest·service worker 가 함께 있어야 앱처럼 동작한다
@@ -35,4 +37,4 @@ if pages.exists():
     for k, t, fn in (('terms', '이용약관', 'terms.html'), ('privacy', '개인정보처리방침', 'privacy.html'), ('delete', '계정·데이터 삭제 안내', 'delete-account.html')):
         (pages / fn).write_text(PAGE.format(t=t, b=legal[k]), encoding='utf-8')
     print(f'배포본 → {pages}/index.html')
-print(f'{len(out)//1024} KB · 개념 {len(concepts)} · 문항 {len(quizzes)} · 은행 {len(bank)} · 탐구 {len(labs)} · 그림 {len(figs)}')
+print(f'{len(out)//1024} KB · 개념 {len(concepts)} · 문항 {len(quizzes)} · 은행 {len(bank)} · 탐구 {len(labs)} · 글귀 {len(quotes["quotes"])} · 그림 {len(figs)}')

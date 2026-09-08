@@ -392,6 +392,31 @@ figure.zoomable{cursor:zoom-in}
 .nextup .t{font-size:13.5px;font-weight:800;color:var(--ink);line-height:1.35}
 .nextup .d{font-size:11.5px;color:var(--muted);line-height:1.4}
 .donebar{background:var(--brand-soft);color:var(--brand-dark);border-radius:14px;padding:14px;text-align:center;font-size:14px;font-weight:800;margin-bottom:13px}
+/* 오늘의 한 마디 */
+.qsay{background:var(--card);border:1px solid var(--hair);border-radius:18px;padding:19px 17px 14px 20px;margin:0 0 11px;position:relative;overflow:hidden;box-shadow:var(--shadow)}
+.qsay::before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--brand)}
+.qsay .k{display:block;font-size:11px;font-weight:900;letter-spacing:.13em;color:var(--brand);margin-bottom:13px}
+.qsay blockquote{font-family:'Noto Serif KR',Georgia,serif;font-size:16.5px;line-height:1.9;color:var(--ink);letter-spacing:-.01em;font-weight:500;margin:0 0 13px}
+.qsay .orig{font-size:11.5px;color:var(--faint);line-height:1.65;margin:-7px 0 12px}
+.qsay .by{display:flex;flex-direction:column;gap:1px;margin-bottom:2px}
+.qsay .by .who{font-size:13.5px;font-weight:800;color:var(--body)}
+.qsay .by .role{font-size:11.5px;color:var(--muted)}
+.qsay .src{font-size:11px;color:var(--faint);line-height:1.65;margin-top:6px}
+.qsay .src a{color:var(--faint)}
+.qsay .note{background:var(--brand-soft);border-radius:12px;padding:11px 13px;font-size:13px;line-height:1.75;color:var(--brand-dark);margin-top:13px}
+.qsay .acts{display:flex;gap:8px;margin-top:14px;border-top:1px solid var(--hair);padding-top:11px}
+.qsay .acts button{flex:1;display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:40px;font-size:12.5px;font-weight:800;
+  color:var(--muted);background:none;border:1px solid var(--line);border-radius:11px;cursor:pointer}
+.qsay .acts button.on{color:var(--brand);border-color:var(--brand-line);background:var(--brand-soft)}
+.qsay .acts svg{width:15px;height:15px;stroke:currentColor;stroke-width:2;fill:none;stroke-linecap:round;stroke-linejoin:round}
+.qsay .acts button.on svg{fill:currentColor;stroke:none}
+.qbridge{background:var(--u-soft);border-radius:14px;padding:13px 15px;margin:0 0 13px;font-size:13px;line-height:1.75;color:var(--body)}
+.qbridge b{display:block;font-size:10.5px;font-weight:900;letter-spacing:.12em;color:var(--u);margin-bottom:5px}
+.qlist blockquote{font-family:'Noto Serif KR',Georgia,serif;font-size:14.5px;line-height:1.8;color:var(--ink);margin:0 0 6px}
+.qlist .row{border-bottom:1px solid var(--hair);padding:14px 0}
+.qlist .row:last-child{border-bottom:none}
+.qlist .m{font-size:11.5px;color:var(--muted);display:flex;justify-content:space-between;gap:10px;align-items:center}
+.qlist .m button{background:none;border:none;color:var(--faint);font-size:11.5px;cursor:pointer;text-decoration:underline;padding:4px}
 .qhint{font-size:12.5px;color:var(--faint);text-align:center;line-height:1.85;margin-top:18px;padding:14px 12px;border-top:1px solid var(--hair)}
 .qhint b{color:var(--muted)}
 .seg{display:flex;gap:6px;margin-bottom:14px}
@@ -493,6 +518,7 @@ figure.zoomable{cursor:zoom-in}
 <script type="application/json" id="d-quizzes"><!--QUIZZES--></script>
 <script type="application/json" id="d-bank"><!--BANK--></script>
 <script type="application/json" id="d-labs"><!--LABS--></script>
+<script type="application/json" id="d-quotes"><!--QUOTES--></script>
 <div id="figstore" hidden><!--FIGS--></div>
 
 <script>
@@ -504,6 +530,8 @@ const CONCEPTS = JSON.parse(document.getElementById('d-concepts').textContent);
 const QUIZZES  = JSON.parse(document.getElementById('d-quizzes').textContent);
 const BANK     = JSON.parse(document.getElementById('d-bank').textContent);      // 문제 은행
 const LABS     = JSON.parse(document.getElementById('d-labs').textContent);      // 자료 탐구 · 집에서 실험
+const QDATA    = JSON.parse(document.getElementById('d-quotes').textContent);    // 오늘의 한 마디
+const QUOTES   = QDATA.quotes, BRIDGE = QDATA.bridge;
 const FIGS_N = CONCEPTS.filter(c=>c.figure).length;
 const LESSONS  = (() => { const m = new Map(); CONCEPTS.forEach(c => { if (!m.has(c.lessonId)) m.set(c.lessonId, { id:c.lessonId, name:c.lessonName, book:c.book, bookName:c.bookName, unit:c.unit, unitName:c.unitName, idx:CONCEPTS.findIndex(x=>x.lessonId===c.lessonId) }); }); return [...m.values()]; })();
 const MARKS = '①②③④⑤';
@@ -766,7 +794,7 @@ const KEY = 'pcs.v2';
 const load = () => { try { return JSON.parse(localStorage.getItem(KEY)) || {}; } catch { return {}; } };
 let syncT = null;
 const progressKey = () => (S.auth && S.auth.code) || (ACC ? 'u:'+ACC.id : null);
-const snapshot = () => ({ start:S.start, done:S.done, wrong:S.wrong, read:S.read, days:S.days, bm:S.bm, stats:S.stats, bh:S.bh||{}, notifyAt:S.notifyAt, at:new Date().toISOString() });
+const snapshot = () => ({ start:S.start, done:S.done, wrong:S.wrong, read:S.read, days:S.days, bm:S.bm, stats:S.stats, bh:S.bh||{}, qkeep:S.qkeep||[], notifyAt:S.notifyAt, at:new Date().toISOString() });
 const save = s => { try { localStorage.setItem(KEY, JSON.stringify(s)); } catch {}
   const k = progressKey(); if (k){ clearTimeout(syncT); syncT = setTimeout(() => DBX.saveProgress(k, snapshot()).catch(()=>{}), 1000); } };
 const mergeProgress = p => { if (!p) return;
@@ -778,10 +806,12 @@ const mergeProgress = p => { if (!p) return;
   S.bm = [...new Set([...(p.bm||[]), ...(S.bm||[])])];
   if (p.stats){ S.stats = { a:(S.stats.a||0)+(p.stats.a||0), c:(S.stats.c||0)+(p.stats.c||0) }; }
   S.bh = { ...(p.bh||{}), ...(S.bh||{}) };
+  S.qkeep = [...new Set([...(p.qkeep||[]), ...(S.qkeep||[])])];
   if (p.notifyAt && !S.notifyAt) S.notifyAt = p.notifyAt; };
 let S = load();
 if (!S.start){ S.start = todayISO(); }
 S.done ||= []; S.wrong ||= []; S.read ||= []; S.days ||= []; S.bm ||= []; S.stats ||= { a:0, c:0 }; S.bh ||= {};
+S.qkeep ||= []; S.qskip ||= 0;
 S.fs ||= '보통'; S.theme ||= '시스템'; S.notifyAt ??= '18:00';
 const applyPrefs = () => {
   document.documentElement.style.setProperty('--fs', {작게:'14px',보통:'15px',크게:'17px'}[S.fs]||'15px');
@@ -926,6 +956,37 @@ function renderAuth(){
 
 /* ═══ 오늘(학생·게스트 홈) ═══ */
 let unreadNotice = null, myAtt = null;
+/* 날짜에서 정해지는 글귀 — 같은 날은 늘 같은 한 마디, '다른 한 마디'를 누르면 하나씩 넘어간다 */
+function quoteToday(){
+  const seed = [...todayISO()].reduce((a,ch) => (a*31 + ch.charCodeAt(0)) >>> 0, 7);
+  return QUOTES[(seed + (S.qskip||0)) % QUOTES.length];
+}
+function quoteCard(q, c){
+  const kept = (S.qkeep||[]).includes(q.id);
+  const br = c ? BRIDGE[`${c.book}-${c.unit}`] : '';
+  return `<div class="qsay">
+      <span class="k">오늘의 한 마디</span>
+      <blockquote>“${esc(q.ko)}”</blockquote>
+      ${q.orig ? `<p class="orig">${esc(q.orig)}</p>` : ''}
+      <div class="by"><span class="who">${esc(q.who||'')}</span>${q.role?`<span class="role">${esc(q.role)}</span>`:''}</div>
+      ${q.src ? `<div class="src">출처 · ${esc(q.src)}</div>` : ''}
+      ${q.note ? `<div class="note">${esc(q.note)}</div>` : ''}
+      <div class="acts">
+        <button id="qNext"><svg viewBox="0 0 24 24"><path d="M21 12a9 9 0 1 1-2.6-6.4"/><path d="M21 4v5h-5"/></svg>다른 한 마디</button>
+        <button id="qKeep" class="${kept?'on':''}"><svg viewBox="0 0 24 24"><path d="M12 20.5 4.5 13a4.6 4.6 0 0 1 6.5-6.5l1 1 1-1A4.6 4.6 0 0 1 19.5 13z"/></svg>${kept?'보관함에 있음':'보관하기'}</button>
+      </div>
+    </div>
+    ${br ? `<div class="qbridge"><b>과학으로 잇기</b>${esc(br)}</div>` : ''}`;
+}
+function openQuoteKeep(){
+  const keep = QUOTES.filter(q => (S.qkeep||[]).includes(q.id));
+  openSheet(`<h3>보관한 한 마디 <span style="font-size:12px;color:var(--muted);font-weight:600">${keep.length}개</span></h3>
+    ${keep.length ? `<div class="qlist">${keep.map(q=>`<div class="row"><blockquote>“${esc(q.ko)}”</blockquote>
+        <div class="m"><span>${esc(q.who||'')}${q.src?` · ${esc(q.src)}`:''}</span><button data-qdel="${q.id}">빼기</button></div></div>`).join('')}</div>`
+      : `<p class="fine" style="text-align:left;padding:6px 0 14px">아직 보관한 글귀가 없습니다. 오늘 화면 아래 <b>오늘의 한 마디</b>에서 마음에 드는 글을 보관해 두세요.</p>`}
+    <button class="btn ghost" id="sheetClose">닫기</button>`);
+}
+
 async function renderToday(){
   const c = todayConcept(); setUnit(c.unit);
   const d = new Date(), wd = ['일','월','화','수','목','금','토'][d.getDay()];
@@ -952,6 +1013,7 @@ async function renderToday(){
       <div><div class="lab">전체 진도</div><div class="val">${S.done.length}<small> / ${CONCEPTS.length}개념</small></div></div>
       <div class="r"><div class="lab">정답률</div><div class="val">${S.stats.a?Math.round(S.stats.c/S.stats.a*100):0}<small>%</small></div></div>
     </button>
+    ${quoteCard(quoteToday(), c)}
     <p class="fine">빈칸을 누르면 답이 보입니다 · ${esc(c.bookName||'')} · ${dayIndex()+1} / ${CONCEPTS.length}번째 개념</p>`;
 }
 
@@ -1247,6 +1309,7 @@ function renderMe(){
     ${ACC && ACC.role==='parent' && !ACC.childCode ? `<div class="codebox"><h3>자녀 연결</h3><p>자녀가 받은 학원 코드 6자리를 넣으면 출석·진도·공지를 볼 수 있습니다.</p>
         <div class="f"><input id="childIn" class="code" placeholder="자녀 코드 6자리" maxlength="6" autocomplete="off" autocapitalize="characters"><button id="childGo">연결</button></div>${childErr?`<div class="err">${esc(childErr)}</div>`:''}</div>` : ''}
     ${ACC && ACC.role!=='owner' && !a ? `<button class="setrow go" id="goPlans"><span class="l">이용권<small>${hasPass()?`${kdate(ACC.passUntil)}까지 · 연장하기`:'전 범위 열기 · 이용권 코드 등록'}</small></span><span class="v">보기</span></button>` : ''}
+    <button class="setrow go" id="qKeepOpen"><span class="l">보관한 한 마디<small>${(S.qkeep||[]).length}개 · 오늘의 한 마디에서 담은 글</small></span><span class="v">보기</span></button>
     <div class="sec"><h2>설정</h2>
       <div class="setrow"><span class="l">알림 받을 시각</span><select class="sel" id="notifyAt">${['07:00','12:00','18:00','21:00','안 받음'].map(v=>`<option ${v===S.notifyAt?'selected':''}>${v}</option>`).join('')}</select></div>
       <div class="setrow"><span class="l">글자 크기</span>${seg('fs',['작게','보통','크게'])}</div>
@@ -1499,6 +1562,14 @@ document.addEventListener('click', async e => {
   const go = T('[data-go]'); if (go){ show(go.dataset.go); return; }
 
   /* 시작 · 로그인 · 가입 */
+  if (T('#qNext')){ S.qskip = (S.qskip||0) + 1; save(S); renderToday(); return; }
+  if (T('#qKeep')){ const q = quoteToday(); S.qkeep ||= [];
+    const i = S.qkeep.indexOf(q.id);
+    if (i < 0){ S.qkeep.push(q.id); toast('보관했습니다 · 내 정보에서 다시 볼 수 있어요'); } else { S.qkeep.splice(i,1); toast('보관함에서 뺐습니다'); }
+    save(S); renderToday(); return; }
+  if (T('#qKeepOpen')){ openQuoteKeep(); return; }
+  const qd = T('[data-qdel]');
+  if (qd){ S.qkeep = (S.qkeep||[]).filter(x => x !== qd.dataset.qdel); save(S); openQuoteKeep(); return; }
   const dm = T('[data-demo]');
   if (dm){ const [em,pw] = dm.dataset.demo.split('|'); document.getElementById('lgEmail').value = em; document.getElementById('lgPw').value = pw; document.getElementById('lgGo').focus(); return; }
   if (T('#goLogin')){ authMode='login'; authErr=''; renderAuth(); return; }
