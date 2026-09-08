@@ -18,7 +18,7 @@ OWNER_EMAIL, ANON, SECRET = 'owner@parkchan.kr', 'anon', 'mock-secret'
 DB = {}
 USERS = {}    # id → {id, email, pw}
 TOKENS = {}   # access_token → user id
-PK = {'students': ['code'], 'attendance': ['code', 'date'], 'notices': ['id'], 'sched': ['id'], 'notice_reads': ['notice_id', 'code'], 'progress': ['code'],
+PK = {'students': ['code'], 'attendance': ['code', 'date'], 'notices': ['id'], 'sched': ['id'], 'posts': ['id'], 'comments': ['id'], 'notice_reads': ['notice_id', 'code'], 'progress': ['code'],
       'classes': ['cls'], 'profiles': ['id'], 'passes': ['code']}
 
 
@@ -100,6 +100,7 @@ class H(BaseHTTPRequestHandler):
         if table in ('notices', 'sched'):
             cls = {s['cls'] for s in DB['students'] if s['code'] in codes}
             return [r for r in rows if r['cls'] == '전체' or r['cls'] in cls]
+        if table in ('posts', 'comments'): return [r for r in rows if not r.get('deleted')] if uid else []
         if table == 'notice_reads': return [r for r in rows if r['code'] in codes]
         if table == 'progress': return [r for r in rows if r['code'] in codes or (uid and r['code'] == 'u:' + uid)]
         return []
@@ -107,6 +108,7 @@ class H(BaseHTTPRequestHandler):
     def can_write(self, table, role, uid, codes, row):
         if role == 'owner': return True
         if table == 'profiles': return uid and row.get('id') == uid and row.get('role') != 'owner'
+        if table in ('posts', 'comments'): return bool(uid)
         if table == 'notice_reads': return row.get('code') in codes
         if table == 'progress':
             p = self.profile(uid) if uid else None
@@ -161,6 +163,26 @@ class H(BaseHTTPRequestHandler):
                 until = (dt.date.fromisoformat(base) + dt.timedelta(days=p['days'])).isoformat()
                 pr['pass_until'] = until; p['used_by'] = uid; p['used_at'] = today()
                 return self.send(200, {'ok': True, 'until': until})
+            if fn in ('like_toggle', 'report_item'):
+                if not uid: return self.send(401, {'message': 'login required'})
+                tbl = 'posts' if b.get('p_kind') == 'post' else 'comments'
+                row = next((x for x in DB[tbl] if x['id'] == b.get('p_id')), None)
+                if not row: return self.send(200, 0 if fn == 'report_item' else None)
+                key = 'likes' if fn == 'like_toggle' else 'reports'
+                row.setdefault(key, [])
+                if fn == 'like_toggle':
+                    row[key].remove(uid) if uid in row[key] else row[key].append(uid)
+                    return self.send(200, None)
+                if uid not in row[key]: row[key].append(uid)
+                return self.send(200, len(row[key]))
+            if fn == 'pick_comment':
+                if not uid: return self.send(401, {'message': 'login required'})
+                post = next((x for x in DB['posts'] if x['id'] == b.get('p_post')), None)
+                if not post or post.get('author') != uid: return self.send(401, {'message': '글쓴이만 채택할 수 있습니다'})
+                for c in DB['comments']:
+                    if c['post_id'] == post['id']: c['picked'] = (c['id'] == b.get('p_comment'))
+                post['solved'] = True
+                return self.send(200, None)
             if fn == 'delete_my_account':
                 if not uid: return self.send(401, {'message': 'login required'})
                 DB['profiles'] = [p for p in DB['profiles'] if p['id'] != uid]; DB['progress'] = [p for p in DB['progress'] if p['code'] != 'u:' + uid]
@@ -183,10 +205,16 @@ class H(BaseHTTPRequestHandler):
             row = dict(b)
             if not self.can_write(table, role, uid, codes, row): return self.send(401, {'message': 'RLS: not allowed'})
             if table == 'notices': row.setdefault('id', str(uuid.uuid4())); row.setdefault('at', now()); row.setdefault('body', '')
+            if table in ('posts', 'comments'):
+                row.setdefault('id', str(uuid.uuid4())); row.setdefault('at', now()); row.setdefault('author', uid)
+                row.setdefault('nick', (self.profile(uid) or {}).get('nick') or '익명')
+                for k, dv in (('likes', []), ('reports', []), ('deleted', False)): row.setdefault(k, list(dv) if isinstance(dv, list) else dv)
+                if table == 'posts': row.setdefault('board', 'qna'); row.setdefault('body', ''); row.setdefault('solved', False); row.setdefault('attach', None)
+                else: row.setdefault('picked', False)
             if table == 'sched': row.setdefault('id', str(uuid.uuid4())); row.setdefault('at', now()); row.setdefault('memo', ''); row.setdefault('kind', 'etc')
             if table == 'students': row.setdefault('joined', today()); row.setdefault('phone', '')
             if table in ('notice_reads', 'progress'): row.setdefault('at', now())
-            if table == 'profiles': row.setdefault('created_at', now()); [row.setdefault(k, None) for k in ('student_code', 'child_code', 'pass_until')]; row.setdefault('phone', '')
+            if table == 'profiles': row.setdefault('created_at', now()); row.setdefault('nick', ''); [row.setdefault(k, None) for k in ('student_code', 'child_code', 'pass_until')]; row.setdefault('phone', '')
             if table == 'passes': row.setdefault('issued', today()); row.setdefault('used_by', None); row.setdefault('used_at', None)
             if table == 'classes' and len(row.get('start_time', '')) == 5: row['start_time'] += ':00'
             key = tuple(row.get(k) for k in PK[table])

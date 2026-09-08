@@ -46,6 +46,37 @@ create table if not exists sched (
 );
 create index if not exists sched_date_idx on sched (date);
 
+-- 이야기(커뮤니티) — 미성년자가 쓰는 공간이라 원장이 언제든 지울 수 있고, 신고가 쌓이면 가려진다
+create table if not exists posts (
+  id      uuid primary key default gen_random_uuid(),
+  author  uuid not null default auth.uid() references auth.users(id) on delete cascade,
+  nick    text not null default '익명',
+  board   text not null default 'qna',            -- qna · share · talk
+  title   text not null,
+  body    text not null default '',
+  attach  jsonb,                                  -- {kind:'concept'|'bank', id:'...'}
+  likes   uuid[] not null default '{}',
+  reports uuid[] not null default '{}',
+  solved  boolean not null default false,
+  deleted boolean not null default false,
+  at      timestamptz not null default now(),
+  edited  timestamptz
+);
+create table if not exists comments (
+  id      uuid primary key default gen_random_uuid(),
+  post_id uuid not null references posts(id) on delete cascade,
+  author  uuid not null default auth.uid() references auth.users(id) on delete cascade,
+  nick    text not null default '익명',
+  body    text not null,
+  likes   uuid[] not null default '{}',
+  reports uuid[] not null default '{}',
+  picked  boolean not null default false,
+  deleted boolean not null default false,
+  at      timestamptz not null default now()
+);
+create index if not exists posts_at_idx      on posts (at desc);
+create index if not exists comments_post_idx on comments (post_id, at);
+
 create table if not exists notice_reads (
   notice_id uuid references notices(id) on delete cascade,
   code      text references students(code) on delete cascade,
@@ -116,6 +147,8 @@ alter table students     enable row level security;
 alter table attendance   enable row level security;
 alter table notices      enable row level security;
 alter table sched        enable row level security;
+alter table posts        enable row level security;
+alter table comments     enable row level security;
 alter table notice_reads enable row level security;
 alter table progress     enable row level security;
 alter table classes      enable row level security;
@@ -128,6 +161,55 @@ create policy owner_all_students on students     for all using (is_owner()) with
 create policy owner_all_att      on attendance   for all using (is_owner()) with check (is_owner());
 create policy owner_all_notices  on notices      for all using (is_owner()) with check (is_owner());
 create policy owner_all_sched     on sched        for all using (is_owner()) with check (is_owner());
+create policy owner_all_posts     on posts        for all using (is_owner()) with check (is_owner());
+create policy owner_all_comments  on comments     for all using (is_owner()) with check (is_owner());
+
+-- 로그인한 사람은 지워지지 않은 글을 읽고, 자기 글만 쓰고 고칠 수 있다.
+create policy read_posts     on posts    for select using (auth.uid() is not null and deleted = false);
+create policy write_posts    on posts    for insert with check (auth.uid() = author);
+create policy edit_own_posts on posts    for update using (auth.uid() = author) with check (auth.uid() = author);
+create policy read_comments     on comments for select using (auth.uid() is not null and deleted = false);
+create policy write_comments    on comments for insert with check (auth.uid() = author);
+create policy edit_own_comments on comments for update using (auth.uid() = author) with check (auth.uid() = author);
+
+-- 좋아요·신고·채택은 남의 행에 손대야 하므로 함수로만 연다(본문은 못 고친다).
+create or replace function like_toggle(p_kind text, p_id uuid) returns void
+language plpgsql security definer set search_path = public as $$
+declare u uuid := auth.uid();
+begin
+  if u is null then raise exception '로그인이 필요합니다'; end if;
+  if p_kind = 'post' then
+    update posts set likes = case when u = any(likes) then array_remove(likes, u) else likes || u end where id = p_id;
+  else
+    update comments set likes = case when u = any(likes) then array_remove(likes, u) else likes || u end where id = p_id;
+  end if;
+end $$;
+
+create or replace function report_item(p_kind text, p_id uuid) returns int
+language plpgsql security definer set search_path = public as $$
+declare u uuid := auth.uid(); c int;
+begin
+  if u is null then raise exception '로그인이 필요합니다'; end if;
+  if p_kind = 'post' then
+    update posts set reports = case when u = any(reports) then reports else reports || u end where id = p_id
+      returning cardinality(reports) into c;
+  else
+    update comments set reports = case when u = any(reports) then reports else reports || u end where id = p_id
+      returning cardinality(reports) into c;
+  end if;
+  return coalesce(c, 0);
+end $$;
+
+-- 채택은 글쓴이만
+create or replace function pick_comment(p_post uuid, p_comment uuid) returns void
+language plpgsql security definer set search_path = public as $$
+begin
+  if not exists (select 1 from posts where id = p_post and author = auth.uid()) then
+    raise exception '글쓴이만 채택할 수 있습니다'; end if;
+  update comments set picked = (id = p_comment) where post_id = p_post;
+  update posts set solved = true where id = p_post;
+end $$;
+grant execute on function like_toggle(text, uuid), report_item(text, uuid), pick_comment(uuid, uuid) to authenticated;
 create policy owner_all_reads    on notice_reads for all using (is_owner()) with check (is_owner());
 create policy owner_all_progress on progress     for all using (is_owner()) with check (is_owner());
 create policy owner_all_classes  on classes      for all using (is_owner()) with check (is_owner());
@@ -180,6 +262,9 @@ drop policy if exists student_self on students;
 create policy student_self on students for select using (code in (select my_codes()) and until >= current_date);
 drop policy if exists student_att on attendance;
 create policy student_att on attendance for select using (code in (select my_codes()));
+-- 이야기 닉네임
+alter table profiles add column if not exists nick text default '';
+
 drop policy if exists student_sched on sched;
 create policy student_sched on sched for select using (cls = '전체' or cls in (select cls from students where code in (select my_codes())));
 

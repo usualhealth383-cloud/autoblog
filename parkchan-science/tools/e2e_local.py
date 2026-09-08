@@ -54,7 +54,7 @@ async def main():
         assert await s.evaluate('S.done.length') == 1 and await s.evaluate('S.wrong.length') == 1 and await s.evaluate('S.stats.a') == 1
         await shot(s, 'l06_quiz_wrong'); await s.click('#grade'); await s.wait_for_timeout(200)
         # 통계 · 복습
-        await s.click('.tab[data-v="stats"]'); await s.wait_for_timeout(400); assert '연속 학습' in await txt(s, '.tiles'); assert await s.locator('.cal .c.on').count() == 1; await shot(s, 'l07_stats')
+        await s.click('.tab[data-v="me"]'); await s.wait_for_timeout(300); await s.click('#goStats'); await s.wait_for_timeout(400); assert '연속 학습' in await txt(s, '.tiles'); assert await s.locator('.cal .c.on').count() == 1; await shot(s, 'l07_stats')
         await s.click('#goReview'); await s.wait_for_timeout(300); assert await s.evaluate('qState.mode') == 'review'
         ans = await s.evaluate('qState.q.answer'); await s.click(f'.opt[data-p="{ans}"]'); await s.wait_for_timeout(200); assert await s.evaluate('S.stats.c') == 1
         await s.click('#grade'); await s.wait_for_timeout(200); assert await s.evaluate('view') == 'quiz'
@@ -81,7 +81,7 @@ async def main():
         await pr.fill('#childIn', 'ZZZ000'); await pr.click('#childGo'); await pr.wait_for_timeout(200); assert '찾을 수 없' in await txt(pr, '.err')
         await pr.fill('#childIn', 'MON123'); await pr.click('#childGo'); await pr.wait_for_timeout(500)
         body = await txt(pr, '#v-parent'); assert '박○○ 학생' in body and '출석' in body, body[:200]; await shot(pr, 'l10_parent')
-        assert [t for t in await pr.locator('.tab').all_inner_texts()] == ['자녀', '교재', '문제', '일정', '내 정보']
+        assert [t for t in await pr.locator('.tab').all_inner_texts()] == ['자녀', '교재', '이야기', '일정', '내 정보']
         await ctx.close()
 
         # ── 원장: 로그인 → 학생 상세 → 통계 → 설정(반·이용권) ──

@@ -52,7 +52,7 @@ async def main():
         s2ctx, s2 = await page()
         await s2.click('#goLogin'); await s2.fill('#lgEmail', 'stu@srv.kr'); await s2.fill('#lgPw', '123456'); await s2.click('#lgGo'); await s2.wait_for_timeout(1200)
         assert await s2.evaluate('S.auth && S.auth.code') == code and await s2.evaluate('S.done.length') == 1 and await s2.evaluate('S.wrong.length') == 1 and await s2.evaluate('S.bm.length') == 1, '새 기기 동기화 실패'
-        await s2.click('.tab[data-v="stats"]'); await s2.wait_for_timeout(800); assert '학원 출석 1일' in await txt(s2, '.legend'); await shot(s2, 's04_student2_stats')
+        await s2.click('.tab[data-v="me"]'); await s2.wait_for_timeout(400); await s2.click('#goStats'); await s2.wait_for_timeout(800); assert '학원 출석 1일' in await txt(s2, '.legend'); await shot(s2, 's04_student2_stats')
 
         # ── 보호자: 가입 → 자녀 연결 → 출석·공지·진도 보기 ──
         pctx, pr = await page()

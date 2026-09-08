@@ -15,7 +15,7 @@ async def main():
         await pg.goto('http://127.0.0.1:8765/index.html'); await pg.wait_for_timeout(800)
         await pg.click('#goLogin'); await pg.click('[data-demo^="student"]'); await pg.click('#lgGo'); await pg.wait_for_timeout(900)
         tabs = await pg.locator('.tab').all_inner_texts()
-        assert tabs == ['오늘','교재','문제','일정','통계','내 정보'], tabs
+        assert tabs == ['오늘','교재','문제','이야기','일정','내 정보'], tabs
         await pg.click('.tab[data-v="plan"]'); await pg.wait_for_timeout(500)
         await pg.screenshot(path=f'{SC}/p1_empty.png', full_page=True)
         # 시간표 추가

@@ -15,7 +15,7 @@ async def main():
         pg.on('dialog', lambda d: asyncio.ensure_future(d.accept()))
         await pg.goto('http://127.0.0.1:8765/index.html'); await pg.wait_for_timeout(600)
         await pg.click('#goLogin'); await pg.fill('#lgEmail','student@demo.kr'); await pg.fill('#lgPw','1234'); await pg.click('#lgGo'); await pg.wait_for_timeout(700)
-        assert [t for t in await pg.locator('.tab').all_inner_texts()]==['오늘','교재','문제','일정','통계','내 정보']
+        assert [t for t in await pg.locator('.tab').all_inner_texts()]==['오늘','교재','문제','이야기','일정','내 정보']
         await pg.click('.tab[data-v="bank"]'); await pg.wait_for_timeout(400); await pg.screenshot(path=f'{SC}/b1_bank.png', full_page=True)
         t = await pg.locator('#v-bank').inner_text(); assert '1,695' in t and '자료 탐구' in t, t[:200]
         await pg.click('[data-bsel="type"][data-val="ox"]'); await pg.wait_for_timeout(200); await pg.click('#bankStart'); await pg.wait_for_timeout(400)
@@ -51,6 +51,6 @@ async def main():
         await pg.click('.tab[data-v="list"]'); await pg.wait_for_timeout(300); i = await pg.evaluate("CONCEPTS.findIndex(c=>c.id==='1304-05')"); await pg.click(f'.row[data-i="{i}"]'); await pg.wait_for_timeout(400)
         assert await pg.locator('#v-detail [data-lab="1304"]').count()==1 and await pg.locator('#v-detail [data-drill="1304"]').count()==1
         await pg.click('#v-detail [data-drill="1304"]'); await pg.wait_for_timeout(300); assert await pg.evaluate('bs && bs.items.every(q=>q.lessonId==="1304")')
-        await pg.click('.tab[data-v="stats"]'); await pg.wait_for_timeout(800); assert '문제 은행 · 소단원별 정답률' in await pg.locator('#v-stats').inner_text()
+        await pg.click('.tab[data-v="me"]'); await pg.wait_for_timeout(300); await pg.click('#goStats'); await pg.wait_for_timeout(800); assert '문제 은행 · 소단원별 정답률' in await pg.locator('#v-stats').inner_text()
         await b.close(); print('BANK OK', errs); assert not errs
 asyncio.run(main())
