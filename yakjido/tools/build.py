@@ -26,6 +26,27 @@ for v in (data.get('productImages') or {}).values():
     iid = v['img'].rstrip('/').split('/')[-1]
     for ext in ('.webp', '.jpg'):
         if (imgdir / (iid + ext)).exists(): v['img'] = 'img/' + iid + ext; break
+# ── 삽화(art/) ────────────────────────────────────────────────────────────
+# yakjido/art/ 에 PNG 를 넣어 두기만 하면 배포본으로 복사되고, 앱은 있는 그림만 그린다.
+# 파일이 없으면 D.art 목록에 안 들어가서 화면에 빈 자리도 안 생긴다.
+ART_NAMES = ['hero-home', 'guide-1-where', 'guide-2-pharmacy', 'guide-3-take', 'photo-guide',
+             'pill-search', 'schedule', 'supp-label', 'kids-dose', 'easy-mode',
+             'me-safety', 'tips', 'empty-search']
+artsrc = ROOT / 'art'
+artdst = ROOT.parent / 'docs' / 'yakjido' / 'art'
+found = []
+if artsrc.exists():
+    for name in ART_NAMES:
+        for ext in ('.png', '.webp', '.jpg'):
+            f = artsrc / (name + ext)
+            if f.exists():
+                artdst.mkdir(parents=True, exist_ok=True)
+                (artdst / (name + '.png')).write_bytes(f.read_bytes())
+                found.append(name); break
+for stale in (artdst.glob('*') if artdst.exists() else []):      # 지운 그림은 배포본에서도 지운다
+    if stale.stem not in found: stale.unlink()
+data['art'] = found
+
 j = json.dumps(data, ensure_ascii=False, separators=(',', ':')).replace('</', '<\\/')
 stamp = datetime.date.today().isoformat()
 out = shell.replace('<!--DATA-->', j).replace('__BUILD__', stamp)
@@ -44,5 +65,27 @@ for name in ('manifest.webmanifest',):
 for ic in (ROOT / 'icons').glob('*'):
     (pages / ic.name).write_bytes(ic.read_bytes())
 
+# ── 앱 아이콘 ──────────────────────────────────────────────────────────────
+# art/icon-1024.png 이 있으면 그것으로 각 크기의 아이콘을 다시 만든다(없으면 icons/ 의 기존 것 유지).
+src_icon = None
+for ext in ('.png', '.webp', '.jpg'):
+    f = ROOT / 'art' / ('icon-1024' + ext)
+    if f.exists(): src_icon = f; break
+if src_icon:
+    try:
+        from PIL import Image
+        im = Image.open(src_icon).convert('RGBA')
+        if im.width != im.height:                       # 두 안이 나란히 들어온 경우 왼쪽(캡슐 안) 정사각형만 쓴다
+            side = min(im.width, im.height); im = im.crop((0, 0, side, side))
+        bg = Image.new('RGBA', im.size, (250, 248, 243, 255))
+        bg.alpha_composite(im); im = bg.convert('RGB')
+        for size, name in ((1024, 'icon-1024.png'), (512, 'icon-512.png'), (192, 'icon-192.png'), (180, 'icon-180.png')):
+            im.resize((size, size), Image.LANCZOS).save(pages / name, 'PNG')
+        im.resize((512, 512), Image.LANCZOS).save(pages / 'icon-maskable-512.png', 'PNG')
+        print('앱 아이콘 재생성 ← art/' + src_icon.name)
+    except Exception as e:
+        print('아이콘 재생성 건너뜀:', e)
+
 counts = {k: (len(v) if isinstance(v, (list, dict)) else 1) for k, v in data.items()}
 print(f'배포본 → {pages}/index.html · {len(out)//1024} KB · {counts}')
+print('삽화:', ', '.join(found) if found else '없음 (yakjido/art/ 에 PNG 를 넣으면 자동 반영)')

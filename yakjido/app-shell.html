@@ -464,6 +464,17 @@ nav.tabbar button.on svg.i{stroke-width:2.2}
 /* 어르신 모드 홈 */
 .easy-home .big-btn{min-height:96px}
 .easy-home .big-btn b{font-size:1.375rem}
+/* 삽화 — art/ 폴더에 파일이 있을 때만 렌더된다(없으면 빌드가 아예 넣지 않음) */
+.art{background:#fff;border:1px solid var(--hairline);border-radius:var(--r-card);overflow:hidden;margin:var(--s4) 0 0;line-height:0}
+.art img{display:block;width:100%;height:auto}
+/* 원본 비율 그대로 — 원형 비네트가 잘리지 않게 crop 하지 않는다 */
+.art.spot{max-width:200px;margin-left:auto;margin-right:auto;border-radius:50%;border:0;background:none}
+.art.side{width:88px;height:88px;flex:none;border-radius:50%;border:0;background:none;margin:0}
+.art.side img{width:88px;height:88px;object-fit:cover}
+.art-row{display:flex;align-items:center;gap:var(--s4);margin-top:var(--s4)}
+.art-row .t{flex:1;min-width:0}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .art img{filter:brightness(.88) saturate(.95)}}
+:root[data-theme="dark"] .art img{filter:brightness(.88) saturate(.95)}
 /* 등장 모션 */
 @keyframes rise{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
 main>*{animation:rise .32s ease both}
@@ -573,6 +584,11 @@ const SHAPES_SVG = { '원형':'<circle cx="14" cy="14" r="11"/>', '타원형':'<
 async function pubDetail(id){ const ch = Math.floor(id / (D.public?.chunk || 200)); if (!PUB.chunks[ch]) PUB.chunks[ch] = await loadJSON(`easy-${ch}.json`); return PUB.chunks[ch][id % (D.public?.chunk || 200)]; }
 const COLORS = { '하양':'#F4F4F2', '노랑':'#F2D24B', '분홍':'#F2A7B8', '주황':'#F0923B', '갈색':'#8B5A2B', '파랑':'#4A7BD0', '연두':'#A8D66A', '초록':'#3E9E5B', '빨강':'#D5453C', '회색':'#9AA0A6', '보라':'#8E6BC8', '투명':'#E8F1F5', '검정':'#222', '자주':'#9B3B6A', '청록':'#3EA8A3', '남색':'#2F4A8A' };
 
+/* 삽화 헬퍼: 빌드가 넣어 준 목록에 있는 그림만 그린다. 파일이 없으면 빈 문자열이라 레이아웃 구멍이 안 생긴다. */
+const ART = new Set(D.art || []);
+const hasArt = n => ART.has(n);
+const art = (n, cls = '') => hasArt(n) ? `<figure class="art ${cls}"><img src="art/${n}.png" alt="" decoding="async" onerror="this.closest('.art')?.remove()"></figure>` : '';
+
 /* ───────── 라우터 ───────── */
 const view = document.getElementById('view');
 function go(hash){ location.hash = hash; }
@@ -643,7 +659,8 @@ function vHome(){
   const greet = hour < 5 ? '늦은 밤, 어디가 불편하세요?' : hour < 11 ? '좋은 아침이에요. 어디가 불편하세요?' : hour < 18 ? '어디가 불편하세요?' : '오늘 저녁, 어디가 불편하세요?';
   return `${topBar()}
   <section class="hero">
-    <h1 class="greet">${esc(greet)}</h1>
+    ${art('hero-home', 'banner')}
+    <h1 class="greet" style="margin-top:${hasArt('hero-home') ? '16px' : '0'}">${esc(greet)}</h1>
     <p>증상을 고르면 <b>무엇을 사고, 어떻게 먹고, 언제 병원에 갈지</b> 세 줄로 먼저 알려드려요.</p>
     <div class="search" role="search">${I.search}<input id="q" placeholder="증상이나 약 이름 (예: 허리, 타이레놀)" autocomplete="off" enterkeyhint="search"></div>
     ${ME.easy ? `<div class="easy-home" style="margin-top:16px"><button class="big-btn" onclick="go('/photo')"><div class="ic">${I.eye}</div><div><b>약 사진 찍어 알아보기</b><span>약봉투·알약·영양제</span></div></button><button class="big-btn soft" onclick="go('/guide/1')"><div class="ic">${I.check}</div><div><b>어디가 불편하세요?</b><span>질문 두 번이면 약이 나와요</span></div></button><button class="big-btn soft" onclick="go('/schedule')"><div class="ic">${I.clock}</div><div><b>오늘 약 체크</b><span>드셨는지 표시하고 알림 받기</span></div></button></div>` : `<div class="hero-cta"><button class="btn" onclick="go('/guide/1')">${I.check} 3단계로 약 고르기</button><button class="btn line" onclick="go('/photo')">${I.eye} 약 사진 찍어 알아보기</button><p class="small muted" style="text-align:center;margin-top:8px">처음이면 위 버튼 — 질문 두 번이면 끝나요</p></div>`}
@@ -766,7 +783,7 @@ function vSymptom(id){
     </div>
   </section>
   ${acc('이렇게 드세요', list(s.how, 'steps'), '순서와 간격, 하루 상한', true)}
-  ${acc('약국에서 이렇게 말씀하세요', list(s.pharmacy))}
+  ${acc('약국에서 이렇게 말씀하세요', art('guide-2-pharmacy', 'banner') + list(s.pharmacy))}
   ${acc('약 없이도 이렇게 해 보세요', list(s.selfcare))}
   ${acc('이것만은 피해 주세요', list(s.avoid, 'plain x'))}
   ${s.notWorking ? acc(s.notWorking.title || '약을 먹어도 잘 낫지 않으면', list(s.notWorking.steps, 'steps')) : ''}
@@ -820,7 +837,7 @@ function vKids(){
       <p class="small muted" style="margin-top:8px">${esc(D.note)}</p>
       <a class="link small" href="#/drug/${D.drugId}">성분 자세히 ›</a></div>`; };
   return `${topBar({ back:'홈' })}
-  <div class="eyebrow">소아 용량</div><h1>아이 해열제, 몇 mL 먹이지?</h1>
+  <div class="eyebrow">소아 용량</div><h1>아이 해열제, 몇 mL 먹이지?</h1>${art('kids-dose', 'spot')}
   <p style="margin-top:8px">${fmt(K.lead || '')}</p>
   <section class="sec card">
     <h2>${c.name ? esc(c.name) + ' ' : ''}아이 정보 ${m != null ? `<small>${esc(kidAgeText(m))}${w ? ' · ' + w + ' kg' : ''}</small>` : ''}</h2>
@@ -879,7 +896,7 @@ function vSchedule(){
   const now = new Date(); const nowMin = now.getHours() * 60 + now.getMinutes(); const taken = takenSet();
   const todays = []; for (const d of taking) for (const t of schedOf(d.id)) { const [h, m] = t.split(':').map(Number); todays.push({ d, t, min: h * 60 + m, done: taken.includes(d.id + '@' + t) }); }
   todays.sort((a, b) => a.min - b.min);
-  return `${topBar({ back:'내 정보' })}<div class="eyebrow">복용 시간 알림</div><h1>오늘 약, 잊지 않게</h1>
+  return `${topBar({ back:'내 정보' })}<div class="eyebrow">복용 시간 알림</div><h1>오늘 약, 잊지 않게</h1>${art('schedule', 'banner')}
   <p style="margin-top:6px">먹는 약마다 시간을 고르면 오늘 할 일이 체크 목록으로 나오고, 시간이 되면 알려드려요. 진료실 처방처럼 <b>하루 3번 식후</b>가 기본이에요.</p>
   ${!taking.length ? `<section class="sec card"><div class="empty"><b>아직 등록한 약이 없어요</b>약 사전에서 약을 찾아 ‘지금 먹는 약으로 등록’을 누르면 여기 나와요.</div><div class="actions"><button class="btn ghost" onclick="go('/drugs')">${I.search} 약 찾기</button></div></section>` : ''}
   ${todays.length ? `<section class="sec"><h2>오늘 <small>${now.getMonth() + 1}월 ${now.getDate()}일 · ${todays.filter(x => x.done).length}/${todays.length} 완료</small></h2><div class="today">${todays.map(x => `<button class="dose-tick ${x.done ? 'done' : (x.min < nowMin - 60 ? 'late' : '')}" onclick="tick('${x.d.id}','${x.t}')"><span class="t">${x.t}</span><span class="n"><b>${esc(x.d.name)}</b><small>${esc((x.d.simple || '').split('.')[0])}</small></span><span class="bx">${x.done ? I.check : ''}</span></button>`).join('')}</div></section>` : ''}
@@ -898,7 +915,7 @@ function vGuide(step, q){
   const bar = `<div class="steps-bar">${[1, 2, 3].map(i => `<i class="${i <= step ? 'on' : ''}"></i>`).join('')}</div>`;
   if (step === 1 || !s) {
     const groups = [...new Set((D.symptoms || []).map(x => x.group))];
-    return `${topBar({ back:'홈' })}${bar}<div class="g-q">어디가 불편하세요?</div><p class="small muted">가장 가까운 것을 하나 골라 주세요.</p>
+    return `${topBar({ back:'홈' })}${bar}${art('guide-1-where', 'spot')}<div class="g-q" style="margin-top:${hasArt('guide-1-where') ? '12px' : '0'}">어디가 불편하세요?</div><p class="small muted">가장 가까운 것을 하나 골라 주세요.</p>
     ${groups.map(g => `<div class="g-grp">${esc(g)}</div><div class="g-list">${(D.symptoms || []).filter(x => x.group === g).map(x => `<button class="g-item" onclick="go('/guide/2/${x.id}')"><div class="ic">${icon(x.icon)}</div><div><b>${esc(x.name)}</b><span>${esc(x.short || '')}</span></div>${I.chev}</button>`).join('')}</div>`).join('')}`;
   }
   if (step === 2) {
@@ -912,6 +929,7 @@ function vGuide(step, q){
   }
   const bk = basket(s); const clinic = (s.care?.clinic || []).slice(0, 2), er = (s.care?.er || []).slice(0, 1);
   return `${topBar({ back:'이전' })}${bar}<div class="eyebrow">${esc(s.name)}${activeFlags().length ? ' · ' + activeFlags().map(x => FLAG_LABEL[x]).join(', ') : ''}</div><div class="g-q">이렇게 사세요</div>
+  ${art('guide-3-take', 'spot')}
   <section class="sec answer" style="margin-top:12px">
     <div class="eyebrow">약을 누르면 복용법이 나와요</div>
     <div class="buy">${bk.map(buyItem).join('')}</div>
@@ -1028,7 +1046,7 @@ function vPill(){
   const active = PILLQ.txt.trim() || PILLQ.sh || PILLQ.c || PILLQ.ln;
   const shown = active ? res.slice(0, 30) : [];
   return `${topBar({ back:'약 사전' })}
-  <div class="eyebrow">약 알아보기</div><h1>이 약이 무슨 약일까</h1>
+  <div class="eyebrow">약 알아보기</div><h1>이 약이 무슨 약일까</h1>${art('pill-search', 'spot')}
   <p style="margin-top:6px">사진 한 장이면 제일 빨라요. 아니면 알약에 새겨진 글자·모양·색을 큰 단추로 고르면 후보가 사진으로 줄어들어요.</p>
   <div class="sec">
     <button class="big-btn" onclick="go('/photo?mode=pill')"><div class="ic">${I.eye}</div><div><b>사진 찍어서 찾기</b><span>알약·약봉투·약 상자·영양제 라벨 모두</span></div></button>
@@ -1131,7 +1149,7 @@ function vPhoto(_, q){
   else if (PH.err === 'noendpoint') body = `<div class="photo-box">${PH.img ? `<img src="${PH.img}" alt="">` : ''}<p style="margin-top:12px"><b>사진 읽기 서버가 아직 연결되지 않았어요.</b></p><p class="small muted" style="margin-top:6px">앱 관리자가 서버 주소를 넣으면 바로 동작해요(내 정보 › 사진 서버). 지금은 약 이름을 직접 적어서 같은 안내를 받을 수 있어요.</p><div class="actions"><button class="btn ghost" onclick="photoManual()">약 이름 직접 적기</button></div></div>`;
   else if (PH.err) body = `<div class="photo-box"><p><b>읽지 못했어요</b></p><p class="small muted" style="margin-top:6px">${esc(PH.err)}. 밝은 곳에서 글자가 보이게 다시 찍어 주세요.</p><div class="actions"><button class="btn ghost" onclick="photoManual()">약 이름 직접 적기</button></div></div>`;
   else if (R) body = photoResult(R);
-  else body = `<div class="photo-box"><p style="font-size:1.0625rem;font-weight:700">약봉투·약 상자·알약·영양제 라벨</p><p class="small muted" style="margin-top:6px">글자가 보이게 밝은 곳에서 찍어 주세요. 사진은 읽은 뒤 바로 버려지고 저장되지 않아요.</p></div>`;
+  else body = `${art('photo-guide', 'banner')}<div class="photo-box"><p style="font-size:1.0625rem;font-weight:700">약봉투·약 상자·알약·영양제 라벨</p><p class="small muted" style="margin-top:6px">글자가 보이게 밝은 곳에서 찍어 주세요. 사진은 읽은 뒤 바로 버려지고 저장되지 않아요.</p></div>`;
   return `${topBar({ back:'약 알아보기' })}
   <div class="eyebrow">사진으로 약 알아보기</div><h1>찍으면 알려드려요</h1>
   <p style="margin-top:6px">무슨 약인지, 어떻게 드시는지, 겹치는 약은 없는지 — 사진 한 장으로.</p>
@@ -1223,7 +1241,7 @@ function vSupp(id){
   return `${topBar()}
   <h1>영양제, 성분으로 비교하기</h1><p style="margin-top:6px">브랜드가 아니라 <b>성분·제형·함량</b>이 효과를 정해요. 두 개 이상 고르면 겹치는 성분과 상한을 같이 확인해요.</p>
   <div class="search" role="search">${I.search}<input id="q" placeholder="영양제 이름·성분 (예: 센트룸, 락토핏, 오메가3)" autocomplete="off"></div>
-  <div class="sec"><button class="big-btn soft" onclick="go('/photo')"><div class="ic">${I.eye}</div><div><b>영양제 라벨 사진 찍어 확인</b><span>성분·함량을 읽어 상한과 겹침을 봐 드려요</span></div></button></div>
+  <div class="sec">${art('supp-label', 'spot')}<button class="big-btn soft" onclick="go('/photo')"><div class="ic">${I.eye}</div><div><b>영양제 라벨 사진 찍어 확인</b><span>성분·함량을 읽어 상한과 겹침을 봐 드려요</span></div></button></div>
   <section class="sec"><h2>성분 고르기 <small>체크하면 비교</small></h2><div class="card rows">${(D.supplements || []).map(s => `<div class="checkrow"><input type="checkbox" id="c-${s.id}" ${CMP.includes(s.id) ? 'checked' : ''} onchange="toggleCmp('${s.id}',this.checked)"><label for="c-${s.id}">${esc(s.name)}<small>${esc(s.for || '')}</small></label>${evTag(s.evidence)}<button class="back" style="min-height:44px" aria-label="${esc(s.name)} 상세" onclick="go('/supp/${s.id}')">${I.chev}</button></div>`).join('')}</div></section>
   ${D.suppRules ? `<section class="sec card"><h2>라벨 읽는 법 5가지</h2>${list(D.suppRules.label, 'steps')}</section><section class="sec card"><h2>같이 먹을 때 조심할 조합</h2>${list(D.suppRules.stack, 'plain x')}${srcChips(D.suppRules.sources)}</section>` : ''}
   ${disclaimer(D.meta?.suppDisclaimer)}`;
@@ -1266,7 +1284,7 @@ function vMe(){
   const T = (k, t, sub) => `<div class="toggle"><div class="t"><b>${esc(t)}</b>${sub ? `<span>${esc(sub)}</span>` : ''}</div><button class="sw ${ME[k] ? 'on' : ''}" role="switch" aria-checked="${!!ME[k]}" aria-label="${esc(t)}" onclick="ME['${k}']=!ME['${k}'];saveMe();route()"></button></div>`;
   return `${topBar()}
   <h1>내 정보</h1><p style="margin-top:6px">여기 표시한 상태에 따라 약 추천에 <b>주의 표시</b>가 붙어요. 진료실에서 의사가 처방 전에 꼭 묻는 것들이에요.</p>
-  <section class="sec card"><h2>어르신 모드</h2><div class="toggle"><div class="t"><b>큰 글씨 · 큰 단추 · 단순한 홈</b><span>사진 찍기 / 어디가 불편한지 / 오늘 약 체크, 세 가지만</span></div><button class="sw ${ME.easy ? 'on' : ''}" role="switch" aria-checked="${!!ME.easy}" aria-label="어르신 모드" onclick="ME.easy=!ME.easy;saveMe();setFs(ME.easy?'20px':'16px')"></button></div></section>
+  <section class="sec card"><h2>어르신 모드</h2>${hasArt('easy-mode') ? `<div class="art-row">${art('easy-mode', 'side')}<div class="t small muted">글씨와 단추가 커지고, 홈은 꼭 필요한 세 가지만 남아요. 어르신께 권해 드리세요.</div></div>` : ''}<div class="toggle"><div class="t"><b>큰 글씨 · 큰 단추 · 단순한 홈</b><span>사진 찍기 / 어디가 불편한지 / 오늘 약 체크, 세 가지만</span></div><button class="sw ${ME.easy ? 'on' : ''}" role="switch" aria-checked="${!!ME.easy}" aria-label="어르신 모드" onclick="ME.easy=!ME.easy;saveMe();setFs(ME.easy?'20px':'16px')"></button></div></section>
   <section class="sec card"><h2>글자 크기</h2><div class="seg" style="margin-top:12px">${[['16px', '보통'], ['18px', '크게'], ['20px', '더 크게']].map(([k, n]) => `<button class="${(localStorage.getItem('yakjido.fs') || '16px') === k ? 'on' : ''}" onclick="setFs('${k}')">${n}</button>`).join('')}</div></section>
   <section class="sec card"><h2>나이</h2><div class="seg" style="margin-top:12px">${[['adult', '성인'], ['senior', '65세 이상'], ['child', '소아·청소년']].map(([k, n]) => `<button class="${ME.age === k ? 'on' : ''}" onclick="ME.age='${k}';saveMe();route()">${n}</button>`).join('')}</div></section>
   ${ME.age === 'child' ? `<section class="sec card"><h2>아이 정보</h2><p class="small" style="margin-top:6px">${ME.child?.weight ? esc((ME.child.name || '아이') + ' · ' + ME.child.weight + ' kg' + (monthsFrom(ME.child.birth) != null ? ' · ' + kidAgeText(monthsFrom(ME.child.birth)) : '')) : '아직 몸무게가 없어요.'}</p><div class="actions"><button class="btn ghost" onclick="go('/kids')">${I.user} 아이 해열제 용량 계산</button></div></section>` : ''}
