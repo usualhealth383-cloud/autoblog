@@ -1,6 +1,6 @@
 /* 오늘 분량을 미리 받아 둔다 — 지하 강의실이나 지하철에서도 열리도록.
    앱을 새로 배포하면 CACHE 이름을 바꿔 옛 캐시를 버린다. */
-const CACHE = 'pcs-2026-09-08c';
+const CACHE = 'pcs-2026-09-08d';
 const ASSETS = [
   './', './index.html', './manifest.webmanifest',
   './icon-192.png', './icon-512.png', './icon-180.png',
