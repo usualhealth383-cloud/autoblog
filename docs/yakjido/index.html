@@ -448,12 +448,7 @@ nav.tabbar button.on svg.i{stroke-width:2.2}
 .pill-hero{display:grid;grid-template-columns:120px 1fr;gap:14px;align-items:start}
 .pill-hero .ph{width:120px;height:120px;border-radius:14px;background:#fff;border:1px solid var(--hairline);display:grid;place-items:center;overflow:hidden}
 .pill-hero .ph img{width:100%;height:100%;object-fit:contain}
-.pill-card .ph .pill-draw{width:58%;height:auto;max-height:80%}
-.pill-card .ph img{position:absolute;inset:0;background:#fff;opacity:0;transition:opacity .2s}.pill-card .ph img.ok{opacity:1}
-.pill-card .ph .ph-tag{position:absolute;right:6px;bottom:6px;font-size:.625rem;color:var(--faint);background:var(--tint2);padding:1px 6px;border-radius:5px}
-.pill-hero .ph{position:relative}
-.pill-hero .ph .pill-draw{width:72%;height:auto}
-.pill-hero .ph img{position:absolute;inset:0;background:#fff;opacity:0;transition:opacity .2s}.pill-hero .ph img.ok{opacity:1}
+
 .kv3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-top:var(--s3)}
 .kv3 div{background:var(--tint2);border-radius:10px;padding:8px 10px}
 .kv3 small{display:block;font-size:.6875rem;font-weight:700;color:var(--muted)} .kv3 b{display:block;font-size:.9375rem;margin-top:1px;overflow-wrap:anywhere}
@@ -577,18 +572,6 @@ function pillSearch(qs, withRx){
 const SHAPES_SVG = { '원형':'<circle cx="14" cy="14" r="11"/>', '타원형':'<ellipse cx="14" cy="14" rx="12" ry="8"/>', '장방형':'<rect x="2" y="8" width="24" height="12" rx="6"/>', '삼각형':'<path d="M14 3L26 24H2z" stroke-linejoin="round"/>', '사각형':'<rect x="4" y="4" width="20" height="20" rx="3"/>', '오각형':'<path d="M14 2l12 9-4.6 14H6.6L2 11z" stroke-linejoin="round"/>', '육각형':'<path d="M8 3h12l6 11-6 11H8L2 14z" stroke-linejoin="round"/>', '팔각형':'<path d="M9 2h10l7 7v10l-7 7H9l-7-7V9z" stroke-linejoin="round"/>', '마름모형':'<path d="M14 2l12 12-12 12L2 14z" stroke-linejoin="round"/>', '기타':'<path d="M6 8c4-6 12-6 16 0s-4 14-8 14S2 14 6 8z"/>' };
 async function pubDetail(id){ const ch = Math.floor(id / (D.public?.chunk || 200)); if (!PUB.chunks[ch]) PUB.chunks[ch] = await loadJSON(`easy-${ch}.json`); return PUB.chunks[ch][id % (D.public?.chunk || 200)]; }
 const COLORS = { '하양':'#F4F4F2', '노랑':'#F2D24B', '분홍':'#F2A7B8', '주황':'#F0923B', '갈색':'#8B5A2B', '파랑':'#4A7BD0', '연두':'#A8D66A', '초록':'#3E9E5B', '빨강':'#D5453C', '회색':'#9AA0A6', '보라':'#8E6BC8', '투명':'#E8F1F5', '검정':'#222', '자주':'#9B3B6A', '청록':'#3EA8A3', '남색':'#2F4A8A' };
-/* 낱알 그리기 — 사진이 없거나 못 불러올 때 식약처 모양·색·각인·분할선 자료로 알약을 직접 그린다 */
-const DARK_C = new Set(['갈색','파랑','초록','빨강','보라','검정','자주','남색','회색']);
-function pillSvg(p, cls){
-  const cols = (p.c || '하양').split('|').map(c => COLORS[c] || '#DDD');
-  const shape = SHAPES_SVG[p.sh] || SHAPES_SVG['원형'];
-  const gid = 'g' + Math.random().toString(36).slice(2, 7);
-  const fill = cols.length > 1 ? `url(#${gid})` : cols[0];
-  const dark = DARK_C.has((p.c || '').split('|')[0]);
-  const txt = (p.f || '').slice(0, 8);
-  const fs = txt.length > 5 ? 2.6 : txt.length > 3 ? 3.4 : 4.2;
-  return `<svg class="pill-draw ${cls || ''}" viewBox="0 0 28 28" aria-hidden="true">${cols.length > 1 ? `<defs><linearGradient id="${gid}" x1="0" x2="1"><stop offset="50%" stop-color="${cols[0]}"/><stop offset="50%" stop-color="${cols[1]}"/></linearGradient></defs>` : ''}<g fill="${fill}" stroke="rgba(0,0,0,.28)" stroke-width=".7">${shape}</g>${p.ln ? '<line x1="14" y1="4" x2="14" y2="24" stroke="rgba(0,0,0,.35)" stroke-width=".7"/>' : ''}${txt ? `<text x="14" y="15.4" text-anchor="middle" font-size="${fs}" font-weight="700" font-family="ui-monospace,monospace" fill="${dark ? '#fff' : '#3B474E'}" letter-spacing=".02em">${esc(txt)}</text>` : ''}</svg>`;
-}
 
 /* ───────── 라우터 ───────── */
 const view = document.getElementById('view');
@@ -1065,12 +1048,12 @@ function vPill(){
   </section>
   <section class="sec"><h2>${active ? `후보 ${res.length.toLocaleString()}개` : '고르면 여기에 사진이 나와요'} <small>${res.length > 30 ? '30개만 표시 — 글자나 색을 더 고르면 줄어요' : PILLQ.rx ? `약국약 ${(PUB.pills || []).length.toLocaleString()} + 처방약 ${(PUB.rx || []).length.toLocaleString()}건에서` : `약국약 ${(PUB.pills || []).length.toLocaleString()}건에서`}</small></h2>
     ${shown.length ? `<div class="pill-grid">${shown.map(([sc, p]) => pillCard(p, sc)).join('')}</div>` : active ? '<div class="empty"><b>조건에 맞는 약이 없어요</b>글자를 줄이거나 색을 바꿔 보세요. 처방약이면 ‘처방약까지 찾기’를 켜 주세요.</div>' : ''}
-    <div class="srcs"><span class="src-chip">${I.link}출처: 식약처 의약품 낱알식별 정보 · 사진 약학정보원 · 사진이 없으면 자료로 그린 그림</span></div></section>
+    <div class="srcs"><span class="src-chip">${I.link}출처: 식약처 의약품 낱알식별 정보 · 사진 약학정보원</span></div></section>
   ${disclaimer('낱알 사진과 각인은 참고용이에요. 같은 모양의 다른 약도 있으니, 확실하지 않으면 약사에게 실물을 보여 주세요.')}`;
 }
 function pillCard(p, sc){
   const img = pillImg(p);
-  return `<button class="pill-card" onclick="go('/pillinfo/${p.seq}')"><div class="ph">${pillSvg(p)}${img ? `<img src="${esc(img)}" alt="" loading="lazy" onload="this.classList.add('ok')" onerror="this.remove()">` : '<span class="ph-tag">그림</span>'}${sc >= 80 ? '<span class="sc">일치</span>' : sc >= 40 ? '<span class="sc" style="background:var(--caution)">비슷</span>' : ''}</div>
+  return `<button class="pill-card" onclick="go('/pillinfo/${p.seq}')"><div class="ph">${img ? `<img src="${esc(img)}" alt="" loading="lazy" onerror="this.replaceWith(Object.assign(document.createElement('span'),{className:'ph-empty',textContent:'사진 없음'}))">` : '<span class="ph-empty">사진 없음</span>'}${sc >= 80 ? '<span class="sc">일치</span>' : sc >= 40 ? '<span class="sc" style="background:var(--caution)">비슷</span>' : ''}</div>
   <div class="bd"><b>${esc(p.n.replace(/\(.*?\)/g, ''))}</b><div class="imp">${p.f ? `<span>${esc(p.f)}</span>` : ''}${p.b ? `<span>${esc(p.b)}</span>` : ''}</div><small>${esc(p.sh)} · ${esc(p.c)}${p.ingr ? ' · ' + esc(p.ingr) : ''} · ${p.rx ? '처방약' : p.cvs ? '편의점' : '약국'}</small></div></button>`;
 }
 function findPill(seq){ return (PUB.pills || []).find(p => p.seq === seq) || (PUB.rx || []).find(p => p.seq === seq); }
@@ -1084,14 +1067,14 @@ function vPillInfo(seq){
   const pubHit = (PUB.index || []).find(x => x.seq === p.seq);
   const id = 'pub:' + p.seq; const taking = (ME.taking || []).includes(id) || (d && (ME.taking || []).includes(d.id));
   return `${topBar({ back:'약 알아보기' })}
-  <div class="pill-hero"><div class="ph">${pillSvg(p, 'big')}${img ? `<img src="${esc(img)}" alt="${esc(p.n)}" onload="this.classList.add('ok')" onerror="this.remove()">` : ''}</div>
+  <div class="pill-hero"><div class="ph">${img ? `<img src="${esc(img)}" alt="${esc(p.n)}" onerror="this.replaceWith(Object.assign(document.createElement('span'),{className:'small muted',textContent:'사진 없음'}))">` : '<span class="small muted">사진 없음</span>'}</div>
     <div><div class="eyebrow">${p.rx ? '처방약' : p.cvs ? '편의점 · 일반의약품' : '약국 · 일반의약품'}</div><h1 style="font-size:1.25rem">${esc(p.n.replace(/\(.*?\)/g, ''))}</h1><p class="small muted">${esc(p.m)}${p.ingr ? ' · ' + esc(p.ingr) : ''}</p>${p.cls ? `<p class="small muted">${esc(p.cls)}</p>` : ''}</div></div>
   <div class="kv3"><div><small>앞 글자</small><b>${esc(p.f || '—')}</b></div><div><small>뒤 글자</small><b>${esc(p.b || '—')}</b></div><div><small>모양·색</small><b>${esc(p.sh)} · ${esc(p.c)}</b></div><div><small>크기</small><b>${p.sz ? esc(p.sz) + ' mm' : '—'}</b></div><div><small>분할선</small><b>${p.ln ? '있음' : '없음'}</b></div><div><small>구분</small><b>${p.rx ? '처방 필요' : '처방 없이'}</b></div></div>
   ${d ? `<section class="sec"><h2>약지도 성분 해설</h2><div class="card rows"><button class="row" onclick="go('/drug/${d.id}')"><div class="ic">${icon(cls(d.class)?.icon || 'pill')}</div><div class="body"><b>${esc(d.name)}</b><span>${esc(d.tagline || '')}</span></div>${I.chev}</button></div>${meWarnings(d)}<div class="found" style="margin-top:10px"><div class="eyebrow">복용법 (약국 구입 기준)</div><div class="simple">${esc(d.simple || '')}</div>${p.rx ? '<p class="small muted" style="margin-top:6px">처방약은 봉투에 적힌 용법이 우선이에요.</p>' : ''}</div></section>` : p.rx ? `<section class="sec"><div class="note">${I.info}<span>처방약이에요. 용법·용량은 약봉투와 처방한 의사·약사 지시가 우선이에요. 궁금하면 약봉투를 사진 찍어 올려 주세요.</span></div></section>` : ''}
   ${pubHit ? `<section class="sec card rows"><button class="row" onclick="go('/pub/${pubHit.id}')"><div class="ic">${I.info}</div><div class="body"><b>식약처 e약은요 설명 보기</b><span>효능·사용법·주의사항 평문</span></div>${I.chev}</button></section>` : ''}
   <div class="actions"><button class="btn ${taking ? 'line' : ''}" onclick="togglePub('${p.seq}')">${taking ? I.check + ' 내 약통에 있어요 (빼기)' : I.pill + ' 내 약통에 등록'}</button>${taking ? `<button class="btn ghost" onclick="go('/schedule')">${I.clock} 복용 시간 알림 만들기</button>` : ''}</div>
   <div class="links" style="display:flex;gap:6px;flex-wrap:wrap;margin-top:12px"><a class="plink" href="https://nedrug.mfds.go.kr/pbp/CCBBB01/getItemDetail?itemSeq=${esc(p.seq)}" target="_blank" rel="noopener">${I.link}식약처 허가정보</a><a class="plink" href="https://search.naver.com/search.naver?query=${encodeURIComponent('약학정보원 ' + p.n.replace(/\(.*?\)/g, ''))}" target="_blank" rel="noopener">${I.search}약학정보원 검색</a></div>
-  <div class="srcs"><span class="src-chip">${I.link}출처: 식약처 의약품 낱알식별 정보 · 사진 약학정보원 · 사진이 없으면 자료로 그린 그림</span></div>
+  <div class="srcs"><span class="src-chip">${I.link}출처: 식약처 의약품 낱알식별 정보 · 사진 약학정보원</span></div>
   ${disclaimer('낱알 정보는 참고용이에요. 같은 모양의 다른 약도 있으니 확실하지 않으면 약사에게 실물을 보여 주세요.')}`;
 }
 function togglePub(seq){ const p = findPill(seq); if (!p) return; const d = drugByIngr(p.ingr); ME.pub = ME.pub || {}; const id = 'pub:' + seq; ME.taking = ME.taking || []; if (ME.taking.includes(id)) { ME.taking = ME.taking.filter(x => x !== id); delete ME.pub[id]; toast('내 약통에서 뺐어요'); } else { ME.taking.push(id); ME.pub[id] = { name: p.n.replace(/\(.*?\)/g, ''), ingr: p.ingr || '', rx: p.rx, seq, drugId: d?.id || '' }; toast('내 약통에 담았어요'); } saveMe(); route(); }
