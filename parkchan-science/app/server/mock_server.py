@@ -18,7 +18,7 @@ OWNER_EMAIL, ANON, SECRET = 'owner@parkchan.kr', 'anon', 'mock-secret'
 DB = {}
 USERS = {}    # id → {id, email, pw}
 TOKENS = {}   # access_token → user id
-PK = {'students': ['code'], 'attendance': ['code', 'date'], 'notices': ['id'], 'notice_reads': ['notice_id', 'code'], 'progress': ['code'],
+PK = {'students': ['code'], 'attendance': ['code', 'date'], 'notices': ['id'], 'sched': ['id'], 'notice_reads': ['notice_id', 'code'], 'progress': ['code'],
       'classes': ['cls'], 'profiles': ['id'], 'passes': ['code']}
 
 
@@ -97,7 +97,7 @@ class H(BaseHTTPRequestHandler):
         if table == 'passes': return []
         if table == 'students': return [r for r in rows if r['code'] in codes and r['until'] >= today()]
         if table == 'attendance': return [r for r in rows if r['code'] in codes]
-        if table == 'notices':
+        if table in ('notices', 'sched'):
             cls = {s['cls'] for s in DB['students'] if s['code'] in codes}
             return [r for r in rows if r['cls'] == '전체' or r['cls'] in cls]
         if table == 'notice_reads': return [r for r in rows if r['code'] in codes]
@@ -183,6 +183,7 @@ class H(BaseHTTPRequestHandler):
             row = dict(b)
             if not self.can_write(table, role, uid, codes, row): return self.send(401, {'message': 'RLS: not allowed'})
             if table == 'notices': row.setdefault('id', str(uuid.uuid4())); row.setdefault('at', now()); row.setdefault('body', '')
+            if table == 'sched': row.setdefault('id', str(uuid.uuid4())); row.setdefault('at', now()); row.setdefault('memo', ''); row.setdefault('kind', 'etc')
             if table == 'students': row.setdefault('joined', today()); row.setdefault('phone', '')
             if table in ('notice_reads', 'progress'): row.setdefault('at', now())
             if table == 'profiles': row.setdefault('created_at', now()); [row.setdefault(k, None) for k in ('student_code', 'child_code', 'pass_until')]; row.setdefault('phone', '')

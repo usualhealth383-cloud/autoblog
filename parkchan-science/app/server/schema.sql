@@ -34,6 +34,18 @@ create table if not exists notices (
   body   text default '',
   at     timestamptz not null default now()
 );
+-- 학원이 반에 보내는 일정 — 학생·보호자의 일정 화면에 자동으로 들어간다(읽기 전용)
+create table if not exists sched (
+  id     uuid primary key default gen_random_uuid(),
+  cls    text not null,                          -- '전체' 또는 반 이름
+  date   date not null,
+  title  text not null,
+  kind   text not null default 'etc',            -- exam · hw · class · off · etc
+  memo   text default '',
+  at     timestamptz not null default now()
+);
+create index if not exists sched_date_idx on sched (date);
+
 create table if not exists notice_reads (
   notice_id uuid references notices(id) on delete cascade,
   code      text references students(code) on delete cascade,
@@ -103,6 +115,7 @@ end $$;
 alter table students     enable row level security;
 alter table attendance   enable row level security;
 alter table notices      enable row level security;
+alter table sched        enable row level security;
 alter table notice_reads enable row level security;
 alter table progress     enable row level security;
 alter table classes      enable row level security;
@@ -114,6 +127,7 @@ $$;
 create policy owner_all_students on students     for all using (is_owner()) with check (is_owner());
 create policy owner_all_att      on attendance   for all using (is_owner()) with check (is_owner());
 create policy owner_all_notices  on notices      for all using (is_owner()) with check (is_owner());
+create policy owner_all_sched     on sched        for all using (is_owner()) with check (is_owner());
 create policy owner_all_reads    on notice_reads for all using (is_owner()) with check (is_owner());
 create policy owner_all_progress on progress     for all using (is_owner()) with check (is_owner());
 create policy owner_all_classes  on classes      for all using (is_owner()) with check (is_owner());
@@ -166,6 +180,9 @@ drop policy if exists student_self on students;
 create policy student_self on students for select using (code in (select my_codes()) and until >= current_date);
 drop policy if exists student_att on attendance;
 create policy student_att on attendance for select using (code in (select my_codes()));
+drop policy if exists student_sched on sched;
+create policy student_sched on sched for select using (cls = '전체' or cls in (select cls from students where code in (select my_codes())));
+
 drop policy if exists student_notices on notices;
 create policy student_notices on notices for select using (cls = '전체' or cls in (select cls from students where code in (select my_codes())));
 drop policy if exists student_reads_sel on notice_reads;

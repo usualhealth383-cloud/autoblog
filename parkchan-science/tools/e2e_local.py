@@ -81,7 +81,7 @@ async def main():
         await pr.fill('#childIn', 'ZZZ000'); await pr.click('#childGo'); await pr.wait_for_timeout(200); assert '찾을 수 없' in await txt(pr, '.err')
         await pr.fill('#childIn', 'MON123'); await pr.click('#childGo'); await pr.wait_for_timeout(500)
         body = await txt(pr, '#v-parent'); assert '박○○ 학생' in body and '출석' in body, body[:200]; await shot(pr, 'l10_parent')
-        assert [t for t in await pr.locator('.tab').all_inner_texts()] == ['자녀', '교재', '문제', '내 정보']
+        assert [t for t in await pr.locator('.tab').all_inner_texts()] == ['자녀', '교재', '문제', '일정', '내 정보']
         await ctx.close()
 
         # ── 원장: 로그인 → 학생 상세 → 통계 → 설정(반·이용권) ──
