@@ -766,9 +766,9 @@ function vSymptom(id){
   </section>
   ${acc('이렇게 드세요', list(s.how, 'steps'), '순서·간격·상한', true)}
   ${acc('약국에서 이렇게 말하세요', list(s.pharmacy), '한 문장으로')}
-  ${acc('약 없이도 도움이 되는 것', list(s.selfcare))}
-  ${acc('피해야 할 것', list(s.avoid, 'plain x'))}
-  ${s.notWorking ? acc(s.notWorking.title || '약을 먹어도 낫지 않을 때', list(s.notWorking.steps, 'steps')) : ''}
+  ${acc('약 없이도 이렇게 해 보세요', list(s.selfcare))}
+  ${acc('이것만은 피해 주세요', list(s.avoid, 'plain x'))}
+  ${s.notWorking ? acc(s.notWorking.title || '약을 먹어도 잘 낫지 않으면', list(s.notWorking.steps, 'steps')) : ''}
   <section class="sec"><h2>어디까지 약국, 어디부터 병원인가요</h2>${careCards(s.care)}${!s.care ? flagBox('이럴 땐 약을 사지 말고 진료를 받으세요', s.redflags, s.redflagLead) : ''}</section>
   ${s.faq?.length ? acc('자주 묻는 질문', s.faq.map(f => `<h3 style="margin-top:12px">${esc(f.q)}</h3><p style="margin-top:4px;font-size:.9375rem">${fmt(f.a)}</p>`).join('')) : ''}
   ${srcChips(s.sources)}

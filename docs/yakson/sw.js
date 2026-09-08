@@ -1,6 +1,6 @@
 /* 약손 — 오프라인에서도 약 정보가 열리도록 앱 셸을 캐시한다.
    빌드(tools/build.py)마다 CACHE 이름이 바뀌어 옛 캐시를 버린다. */
-const CACHE = 'yakson-2026-09-08-6400';
+const CACHE = 'yakson-2026-09-08-8141';
 const ASSETS = ['./', './index.html', './manifest.webmanifest', './icon-192.png', './icon-512.png', './icon-180.png'];
 
 self.addEventListener('install', (e) => {
