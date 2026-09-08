@@ -176,7 +176,7 @@ figcaption{font-size:11.5px;color:var(--u-dark);font-weight:700;margin-top:7px;p
 .search svg{width:16px;height:16px;stroke:var(--faint);stroke-width:2.2;fill:none;stroke-linecap:round;flex:0 0 auto}
 .search input{flex:1;border:none;background:none;padding:11px 0;font-size:14px;font-family:inherit;color:var(--ink);min-width:0}
 .search input:focus{outline:none}
-.chipbar{display:flex;gap:6px;margin-bottom:6px;overflow-x:auto;padding-bottom:4px}
+.chipbar{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:6px;padding-bottom:2px}
 .chipbar button{flex:0 0 auto;font-size:12px;font-weight:700;padding:6px 12px;border-radius:999px;border:1px solid var(--line);background:var(--card);color:var(--muted);cursor:pointer}
 .chipbar button.on{background:var(--u);border-color:var(--u);color:#fff}
 .book-h{font-family:'Noto Serif KR',serif;font-size:20px;font-weight:900;letter-spacing:-.01em;margin:26px 0 2px;padding-bottom:6px;border-bottom:2px solid var(--line)}
@@ -305,6 +305,45 @@ select.sel{font-family:inherit;font-size:14px;font-weight:700;color:var(--u);bac
 .plan ul li::before{content:"✓ ";color:var(--u);font-weight:900}
 .plan .btn{margin:0}
 
+/* 문제 은행 */
+.bank-top{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px}
+.pick{background:var(--card);border:1px solid var(--hair);border-radius:15px;padding:13px 15px;margin-bottom:10px}
+.pick .k{font-size:11.5px;font-weight:900;letter-spacing:.1em;color:var(--u);margin-bottom:8px;display:block}
+.pick .chipbar{margin-bottom:0}
+.pick select{width:100%;margin-top:8px;border:1.5px solid var(--line);border-radius:10px;padding:10px 12px;font-family:inherit;font-size:14px;background:var(--paper);color:var(--ink)}
+.qbar{display:flex;align-items:center;gap:10px;margin-bottom:12px;font-size:12px;color:var(--muted)}
+.qbar .bar{flex:1;height:6px;background:var(--hair);border-radius:3px;overflow:hidden}
+.qbar .bar i{display:block;height:100%;background:var(--u)}
+.oxrow{display:flex;gap:10px;margin-bottom:14px}
+.oxrow button{flex:1;font-size:26px;font-weight:900;padding:18px;border-radius:14px;border:1.5px solid var(--line);background:var(--card);color:var(--body);cursor:pointer}
+.oxrow button.ok{border-color:var(--u);background:var(--u-soft);color:var(--u-dark)}
+.oxrow button.bad{border-color:var(--no);background:var(--no-soft);color:var(--no)}
+.oxrow button:disabled{cursor:default}
+.blankin{display:flex;gap:8px;margin-bottom:14px}
+.blankin input{flex:1;border:1.5px solid var(--line);border-radius:12px;padding:13px 14px;font-size:16px;font-family:inherit;background:var(--card);color:var(--ink);min-width:0}
+.blankin button{background:var(--u);color:#fff;border:none;border-radius:12px;padding:12px 18px;font-size:14px;font-weight:800;cursor:pointer}
+.wrongbox{background:var(--no-soft);border-left:4px solid var(--no);border-radius:0 12px 12px 0;padding:11px 14px;margin-bottom:11px;font-size:13px;line-height:1.7;color:var(--body)}
+.wrongbox .h{font-size:12px;font-weight:900;color:var(--no);margin-bottom:3px}
+.result{background:var(--card);border:1.5px solid var(--u);border-radius:16px;padding:18px;text-align:center;margin-bottom:13px}
+.result .big{font-size:38px;font-weight:900;letter-spacing:-.03em;color:var(--u);line-height:1.1}
+.result .sub{margin:4px 0 0;font-size:13px}
+.lab-list .row .n{background:var(--warn-soft);color:var(--warn)}
+.labcard h3{font-size:19px;font-weight:900;letter-spacing:-.02em;margin-bottom:4px}
+.labcard .k{font-size:11.5px;font-weight:900;letter-spacing:.1em;color:var(--u);display:block;margin:14px 0 6px}
+.labcard p,.labcard li{font-size:14px;line-height:1.8;color:var(--body)}
+.labcard ol{padding-left:18px}
+.labcard figure{margin:10px 0}
+.qfig{background:var(--u-soft);border-radius:11px;padding:10px 6px;margin-bottom:12px;text-align:center;cursor:zoom-in}
+.qfig svg{max-width:100%;height:auto}
+figure.zoomable{cursor:zoom-in}
+/* 그림 확대 보기 */
+.fv{position:fixed;inset:0;background:var(--paper);z-index:50;display:flex;flex-direction:column}
+.fv .bar{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-bottom:1px solid var(--hair);font-size:13px;font-weight:800}
+.fv .bar button{background:var(--hair);border:none;border-radius:9px;padding:8px 12px;font-weight:800;cursor:pointer;color:var(--ink);font-family:inherit;margin-left:6px}
+.fv .stage{flex:1;overflow:hidden;touch-action:none;position:relative;display:grid;place-items:center;background:var(--card)}
+.fv .stage svg{max-width:100%;height:auto;transform-origin:0 0;user-select:none}
+.fv .cap{padding:10px 16px max(14px,env(safe-area-inset-bottom));font-size:12.5px;color:var(--muted);line-height:1.6;border-top:1px solid var(--hair)}
+
 /* 탭바 */
 .tabs{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:440px;display:flex;border-top:1px solid var(--hair);background:var(--card);
   padding:9px 0 max(11px,env(safe-area-inset-bottom));z-index:20}
@@ -393,6 +432,8 @@ select.sel{font-family:inherit;font-size:14px;font-weight:700;color:var(--u);bac
     <section id="v-list" class="hide"></section>
     <section id="v-detail" class="hide"></section>
     <section id="v-wrong" class="hide"></section>
+    <section id="v-bank" class="hide"></section>
+    <section id="v-lab" class="hide"></section>
     <section id="v-stats" class="hide"></section>
     <section id="v-me" class="hide"></section>
     <section id="v-plans" class="hide"></section>
@@ -405,6 +446,8 @@ select.sel{font-family:inherit;font-size:14px;font-weight:700;color:var(--u);bac
 
 <script type="application/json" id="d-concepts"><!--CONCEPTS--></script>
 <script type="application/json" id="d-quizzes"><!--QUIZZES--></script>
+<script type="application/json" id="d-bank"><!--BANK--></script>
+<script type="application/json" id="d-labs"><!--LABS--></script>
 <div id="figstore" hidden><!--FIGS--></div>
 
 <script>
@@ -414,6 +457,9 @@ select.sel{font-family:inherit;font-size:14px;font-weight:700;color:var(--u);bac
    ═══════════════════════════════════════════════════════════════ */
 const CONCEPTS = JSON.parse(document.getElementById('d-concepts').textContent);
 const QUIZZES  = JSON.parse(document.getElementById('d-quizzes').textContent);
+const BANK     = JSON.parse(document.getElementById('d-bank').textContent);      // 문제 은행
+const LABS     = JSON.parse(document.getElementById('d-labs').textContent);      // 자료 탐구 · 집에서 실험
+const LESSONS  = (() => { const m = new Map(); CONCEPTS.forEach(c => { if (!m.has(c.lessonId)) m.set(c.lessonId, { id:c.lessonId, name:c.lessonName, book:c.book, bookName:c.bookName, unit:c.unit, unitName:c.unitName, idx:CONCEPTS.findIndex(x=>x.lessonId===c.lessonId) }); }); return [...m.values()]; })();
 const MARKS = '①②③④⑤';
 const FREE_DAYS = 7;                 // [확인 필요] 무료 체험: 최근 7일치 개념
 const RETRY_DAYS = 3;                // 오답 재출제 간격
@@ -674,21 +720,22 @@ const KEY = 'pcs.v2';
 const load = () => { try { return JSON.parse(localStorage.getItem(KEY)) || {}; } catch { return {}; } };
 let syncT = null;
 const progressKey = () => (S.auth && S.auth.code) || (ACC ? 'u:'+ACC.id : null);
-const snapshot = () => ({ start:S.start, done:S.done, wrong:S.wrong, read:S.read, days:S.days, bm:S.bm, stats:S.stats, notifyAt:S.notifyAt, at:new Date().toISOString() });
+const snapshot = () => ({ start:S.start, done:S.done, wrong:S.wrong, read:S.read, days:S.days, bm:S.bm, stats:S.stats, bh:S.bh||{}, notifyAt:S.notifyAt, at:new Date().toISOString() });
 const save = s => { try { localStorage.setItem(KEY, JSON.stringify(s)); } catch {}
   const k = progressKey(); if (k){ clearTimeout(syncT); syncT = setTimeout(() => DBX.saveProgress(k, snapshot()).catch(()=>{}), 1000); } };
 const mergeProgress = p => { if (!p) return;
   if (p.start) S.start = p.start;
   S.done = [...new Set([...(p.done||[]), ...S.done])];
-  const key = w => w.l+':'+w.n; const have = new Set(S.wrong.map(key)); (p.wrong||[]).forEach(w => { if (!have.has(key(w))) S.wrong.push(w); });
+  const key = w => w.b ? 'b:'+w.b : w.l+':'+w.n; const have = new Set(S.wrong.map(key)); (p.wrong||[]).forEach(w => { if (!have.has(key(w))) S.wrong.push(w); });
   S.read = [...new Set([...(p.read||[]), ...(S.read||[])])];
   S.days = [...new Set([...(p.days||[]), ...(S.days||[])])].sort();
   S.bm = [...new Set([...(p.bm||[]), ...(S.bm||[])])];
   if (p.stats){ S.stats = { a:(S.stats.a||0)+(p.stats.a||0), c:(S.stats.c||0)+(p.stats.c||0) }; }
+  S.bh = { ...(p.bh||{}), ...(S.bh||{}) };
   if (p.notifyAt && !S.notifyAt) S.notifyAt = p.notifyAt; };
 let S = load();
 if (!S.start){ S.start = todayISO(); }
-S.done ||= []; S.wrong ||= []; S.read ||= []; S.days ||= []; S.bm ||= []; S.stats ||= { a:0, c:0 };
+S.done ||= []; S.wrong ||= []; S.read ||= []; S.days ||= []; S.bm ||= []; S.stats ||= { a:0, c:0 }; S.bh ||= {};
 S.fs ||= '보통'; S.theme ||= '시스템'; S.notifyAt ??= '18:00';
 const applyPrefs = () => {
   document.documentElement.style.setProperty('--fs', {작게:'14px',보통:'15px',크게:'17px'}[S.fs]||'15px');
@@ -704,7 +751,7 @@ const todayConcept = () => CONCEPTS[dayIndex()];
 const hasPass = () => !!(ACC && ACC.passUntil && ACC.passUntil >= todayISO());
 const fullAccess = () => !!(S.auth || hasPass() || (ACC && ACC.role==='owner'));
 const isOpen = i => fullAccess() || (i <= dayIndex() && i > dayIndex()-FREE_DAYS);
-const dueRetry = () => S.wrong.find(w => !w.redone && w.iso && daysBetween(w.iso, todayISO()) >= RETRY_DAYS);
+const dueRetry = () => S.wrong.find(w => !w.b && !w.redone && !w.cleared && w.iso && daysBetween(w.iso, todayISO()) >= RETRY_DAYS);
 const quizFor = c => { const pool = QUIZZES.filter(q=>q.lessonId===c.lessonId); return pool[(+c.no-1)%pool.length] || pool[0]; };
 const streak = () => { let n=0, d=todayISO(); if (!S.days.includes(d)) d = addDays(d,-1); while (S.days.includes(d)){ n++; d = addDays(d,-1); } return n; };
 
@@ -721,7 +768,7 @@ function conceptCard(c, opts={}){
       <h1>${esc(c.title)}</h1>
       <div class="sub">${esc(c.subtitle||c.lessonName)}</div>
       <div class="steps">${c.steps.map(s=>`<div class="step"><div class="n">${s.n}</div><div class="t">${esc(s.t)}</div><div class="d">${rich(s.d)}</div></div>`).join('')}</div>
-      ${c.figure ? `<figure>${figOf(c.id)}<figcaption>${esc(c.figure.caption)}</figcaption></figure>` : ''}
+      ${c.figure ? `<figure class="zoomable" data-zoom="${c.id}">${figOf(c.id)}<figcaption>${esc(c.figure.caption)} · 누르면 크게</figcaption></figure>` : ''}
       ${c.howto.length ? `<div class="howto"><span class="k">그림 읽는 법</span><ul>${c.howto.map((h,i)=>`<li><b class="n">${i+1}</b>${rich(h)}</li>`).join('')}</ul></div>`:''}
       <div class="prose">${c.body.map(p=>`<p>${rich(p)}</p>`).join('')}</div>
     </article>
@@ -917,6 +964,8 @@ function renderDetail(){
       <details><summary style="font-size:13px;font-weight:800;color:var(--u);cursor:pointer">정답 보기</summary>
         <div class="verdict" style="margin-top:10px"><div class="h">${q.answer ? `정답 ${MARKS[q.answer-1]}` : '예시 답안'}</div><p>${rich(q.explain || q.gradeNote || q.answerLine)}</p></div></details>
     </div>
+    ${LABS.some(l=>l.lessonId===c.lessonId) ? `<button class="btn soft" data-lab="${c.lessonId}">이 소단원의 자료 탐구 · 집에서 실험</button>` : ''}
+    <button class="btn ghost" data-drill="${c.lessonId}">이 소단원 문제 풀기</button>
     ${S.done.includes(c.id) ? '' : `<button class="btn soft" id="markDone">이 개념 공부했음으로 표시</button>`}
     <div class="seg"><button id="prevC" ${detailIdx===0?'disabled':''}>← 이전 개념</button><button id="nextC" ${detailIdx>=CONCEPTS.length-1?'disabled':''}>다음 개념 →</button></div>`;
 }
@@ -927,7 +976,12 @@ function renderWrong(){
   const live = S.wrong.filter(w=>!w.cleared), cleared = S.wrong.filter(w=>w.cleared);
   if (!S.wrong.length){ v.innerHTML = `<h1 class="h-page">오답 노트</h1><div class="empty"><svg viewBox="0 0 24 24"><path d="M6 4h12v16l-6-4-6 4z"/></svg><p>아직 담긴 문제가 없습니다.<br>틀린 문제는 여기 모이고, ${RETRY_DAYS}일 뒤 한 번 더 나옵니다.</p></div>
     <button class="btn soft" id="goReview">복습 문제 풀기</button>`; return; }
-  const item = w => { const q=QUIZZES.find(x=>x.lessonId===w.l && x.no===w.n); if(!q) return '';
+  const item = w => { if (w.b){ const q=BANK.find(x=>x.id===w.b); if(!q) return ''; const c = LESSONS.find(x=>x.id===q.lessonId);
+      return `<div class="sec"><h2><span>${w.date}${w.cleared ? ' · 정리됨' : ''}</span>${w.cleared?'':`<button class="more" data-bretry="${q.id}">지금 다시 풀기</button>`}</h2>
+      <p class="stem" style="font-size:14px;margin-bottom:9px">${rich(q.stem)}</p>
+      <div class="myth" style="margin:0"><span class="x">내 답 ${esc(String(w.p))}</span> &nbsp; <span class="o">정답 ${esc(q.type==='mc'||q.type==='multi'?MARKS[q.answer-1]:String(q.answer))}</span>${q.explain?`<br><span style="color:var(--body)">${rich(q.explain)}</span>`:''}</div>
+      ${c?`<p class="fine" style="text-align:left;padding:6px 0 0">${esc(c.name)} · 문제 은행</p>`:''}</div>`; }
+    const q=QUIZZES.find(x=>x.lessonId===w.l && x.no===w.n); if(!q) return '';
     const due = w.iso ? Math.max(0, RETRY_DAYS - daysBetween(w.iso, todayISO())) : RETRY_DAYS; const c = CONCEPTS.find(x=>x.lessonId===w.l);
     return `<div class="sec"><h2><span>${w.date}${w.cleared ? ' · 정리됨' : (due>0 ? ` · ${due}일 뒤 다시` : ' · 오늘 다시')}</span>${w.cleared?'':`<button class="more" data-retry="${w.l}:${w.n}">지금 다시 풀기</button>`}</h2>
       <p class="stem" style="font-size:14px;margin-bottom:9px">${rich(q.stem)}</p>
@@ -936,6 +990,123 @@ function renderWrong(){
   v.innerHTML = `<h1 class="h-page">오답 노트</h1>
     <p class="fine" style="text-align:left;padding:0 0 14px">${live.length}문제가 담겨 있습니다${cleared.length?` · ${cleared.length}문제는 다시 풀어 정리했습니다`:''}.</p>
     ${live.map(item).join('')}${cleared.map(item).join('')}<button class="btn soft" id="goReview">복습 문제 풀기</button>`;
+}
+
+/* ═══ 문제 은행 — 범위·유형·개수를 골라 풀고, 틀린 것은 오답 노트로 ═══ */
+let bankSel = { book:'전체', unit:'전체', lesson:'전체', type:'전체', n:10, only:'전체' }, bs = null;   // bs = 진행 중 세션
+const TYPE_NAME = { ox:'OX', blank:'빈칸', mc:'선다형', multi:'자료·보기', essay:'서술형' };
+const openLessons = () => LESSONS.filter(l => CONCEPTS.some((c,i) => c.lessonId===l.id && isOpen(i)));
+function bankPool(){
+  const ls = openLessons().filter(l => (bankSel.book==='전체' || l.book===bankSel.book) && (bankSel.unit==='전체' || l.unit===bankSel.unit) && (bankSel.lesson==='전체' || l.id===bankSel.lesson)).map(l=>l.id);
+  return BANK.filter(q => ls.includes(q.lessonId) && (bankSel.type==='전체' ? q.type!=='essay' : q.type===bankSel.type)
+    && (bankSel.only==='전체' || (bankSel.only==='안 푼' && !(S.bh||{})[q.id]) || (bankSel.only==='틀린' && (S.bh||{})[q.id]==='x')));
+}
+function renderBank(){
+  const v = document.getElementById('v-bank');
+  if (bs) return renderBankSession();
+  const pool = bankPool(), bh = S.bh||{}, done = Object.keys(bh).length, right = Object.values(bh).filter(x=>x==='o').length;
+  const ls = openLessons().filter(l => (bankSel.book==='전체' || l.book===bankSel.book) && (bankSel.unit==='전체' || l.unit===bankSel.unit));
+  const chips = (key, vals, label = x => x) => `<div class="chipbar">${vals.map(x=>`<button data-bsel="${key}" data-val="${x}" class="${String(bankSel[key])===String(x)?'on':''}">${esc(String(label(x)))}</button>`).join('')}</div>`;
+  v.innerHTML = `<h1 class="h-page">문제 풀기</h1>
+    <div class="bank-top"><div class="tile"><div class="v">${BANK.length.toLocaleString()}</div><div class="l">전체 문항</div></div><div class="tile"><div class="v">${done}</div><div class="l">내가 푼 문항</div></div><div class="tile"><div class="v">${done?Math.round(right/done*100):0}<small>%</small></div><div class="l">정답률</div></div></div>
+    <div class="pick"><span class="k">범위</span>${chips('book',['전체','1','2'], b => b==='전체' ? b : '통합과학 '+b)}
+      ${chips('unit',['전체','I','II','III'])}
+      <select id="bankLesson"><option value="전체">소단원 전체${bankSel.unit!=='전체'||bankSel.book!=='전체'?' (선택한 범위)':''}</option>${ls.map(l=>`<option value="${l.id}" ${bankSel.lesson===l.id?'selected':''}>${esc(l.bookName)} ${l.unit}-${l.id.slice(2)} ${esc(l.name)}</option>`).join('')}</select></div>
+    <div class="pick"><span class="k">유형</span>${chips('type',['전체','ox','blank','mc','multi','essay'], t => TYPE_NAME[t] || t)}</div>
+    <div class="pick"><span class="k">문제 수 · 대상</span>${chips('n',[10,20,40], n => n+'문제')}${chips('only',['전체','안 푼','틀린'])}</div>
+    <button class="btn" id="bankStart" ${pool.length?'':'disabled'}>${pool.length ? `${Math.min(bankSel.n,pool.length)}문제 시작 · 고를 수 있는 문항 ${pool.length}개` : '이 조건에 맞는 문항이 없습니다'}</button>
+    ${fullAccess() ? '' : `<p class="fine">무료 범위(최근 ${FREE_DAYS}일치 소단원)의 문제만 나옵니다. 학원 코드·이용권으로 전 범위가 열립니다.</p>`}
+    <div class="sec"><h2><span>오답 노트</span><button class="more" data-go="wrong">${S.wrong.filter(w=>!w.cleared).length}문제 보기 ›</button></h2><p class="fine" style="text-align:left;padding:0">틀린 문제는 오답 노트에 모이고, 오늘의 문제는 ${RETRY_DAYS}일 뒤 한 번 더 나옵니다.</p></div>
+    <div class="sec lab-list"><h2>자료 탐구 · 집에서 실험 <span style="font-weight:600;color:var(--faint);letter-spacing:0">${LABS.length}편</span></h2>
+      ${LABS.filter(l=>openLessons().some(x=>x.id===l.lessonId)).map(l=>{ const L=LESSONS.find(x=>x.id===l.lessonId); return `<button class="row" data-lab="${l.lessonId}"><span class="n">탐구</span><span class="b"><span class="t">${esc(l.title)}</span><span class="s">${esc(L?L.bookName+' '+L.unit+'-'+L.id.slice(2)+' '+L.name:'')}${l.tryTitle?` · 실험: ${esc(l.tryTitle)}`:''}</span></span><span class="st"><svg viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg></span></button>`; }).join('') || '<p class="fine" style="text-align:left;padding:0">열린 범위에 탐구가 아직 없습니다.</p>'}</div>`;
+}
+function startBank(items, label){
+  bs = { items, i:0, pick:null, right:0, wrong:[], label:label||'', ess:null }; show('bank');
+}
+function bankCorrect(q, pick){
+  if (q.type==='ox') return pick===q.answer;
+  if (q.type==='mc' || q.type==='multi') return +pick===q.answer;
+  if (q.type==='blank'){ const norm = t => String(t||'').replace(/\s+/g,'').replace(/[.,·]/g,''); const a = norm(q.answer), p = norm(pick); return !!p && (a===p || a.split(/[,/]/).every(x=>p.includes(norm(x)))); }
+  return pick==='맞음';
+}
+function renderBankSession(){
+  const v = document.getElementById('v-bank'); const q = bs.items[bs.i];
+  if (!q){ // 결과
+    const n = bs.items.length, pct = Math.round(bs.right/n*100);
+    v.innerHTML = `<button class="back" id="bankQuit"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg>문제 풀기</button>
+      <div class="result"><div class="big">${bs.right}<small style="font-size:18px;color:var(--muted)"> / ${n}</small></div><p class="sub">${pct>=90?'훌륭합니다 — 이 범위는 잡혔습니다.':pct>=70?'좋습니다. 틀린 것만 한 번 더 보면 됩니다.':'개념 카드로 돌아가 포인트를 다시 읽어 보세요.'}</p></div>
+      ${bs.wrong.length ? `<div class="sec"><h2>틀린 문제 ${bs.wrong.length} · 오답 노트에 담김</h2>${bs.wrong.map(w=>`<p class="stem" style="font-size:13.5px;margin-bottom:8px">${rich(w.stem)}</p>`).join('')}</div><button class="btn" id="bankRetryWrong">틀린 문제만 다시 풀기</button>` : ''}
+      <button class="btn ${bs.wrong.length?'soft':''}" id="bankAgain">같은 조건으로 새 세트</button><button class="btn ghost" id="bankQuit2">문제 풀기로</button>`; return;
+  }
+  const graded = bs.pick !== null, L = LESSONS.find(x=>x.id===q.lessonId);
+  let body = '';
+  if (q.type==='ox') body = `<div class="oxrow">${['O','X'].map(o=>`<button data-ox="${o}" ${graded?'disabled':''} class="${graded?(o===q.answer?'ok':(o===bs.pick?'bad':'')):''}">${o}</button>`).join('')}</div>`;
+  else if (q.type==='mc' || q.type==='multi') body = `<div class="opts">${q.choices.map((t,i)=>{ const n=i+1; let cls='', mk=''; if (graded){ if (n===q.answer){cls='ok';mk='정답';} else if (n===+bs.pick){cls='bad';mk='내 답';} }
+      return `<button class="opt ${cls}" data-bp="${n}" ${graded?'disabled':''}><span class="m">${MARKS[i]}</span><span class="tx">${rich(t)}</span>${mk?`<span class="mk">${mk}</span>`:''}</button>`; }).join('')}</div>`;
+  else if (q.type==='blank') body = graded ? `<div class="opts"><div class="opt ${bankCorrect(q,bs.pick)?'ok':'bad'}" style="cursor:default"><span class="tx">내 답: ${esc(bs.pick||'(빈칸)')} · 정답: <b>${esc(q.answer)}</b></span></div></div>` : `<div class="blankin"><input id="blankIn" placeholder="답을 쓰세요" autocomplete="off"><button id="blankGo">확인</button></div>`;
+  else body = `<textarea class="essay" id="essayIn" placeholder="문장으로 답을 써 보세요" ${graded?'disabled':''}>${esc(bs.ess||'')}</textarea>${graded ? '' : `<button class="btn soft" id="essayShow">모범 답안 보기 · 스스로 채점</button>`}`;
+  const ok = graded && bankCorrect(q, bs.pick);
+  v.innerHTML = `<button class="back" id="bankQuit"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg>그만 풀기</button>
+    <div class="qbar"><span>${bs.i+1} / ${bs.items.length}</span><span class="bar"><i style="width:${Math.round(bs.i/bs.items.length*100)}%"></i></span><span>맞힘 ${bs.right}</span></div>
+    <div class="qhead"><span class="l">${esc(L?L.unit+'-'+L.id.slice(2)+' '+L.name:'')}</span><span class="tag">${TYPE_NAME[q.type]} · ${esc(q.difficulty||'')}</span></div>
+    <p class="stem">${rich(q.stem)}</p>
+    ${q.figure ? `<div class="qfig" data-zoomsvg="${bs.i}">${q.figure}</div>` : ''}
+    ${q.source ? `<div class="bogi">${rich(q.source).replace(/\n/g,'<br>')}</div>` : ''}
+    ${body}
+    ${graded ? `<div class="verdict"><div class="h">${q.type==='essay' ? '모범 답안' : ok ? '맞혔습니다' : '아쉽습니다'}${q.type!=='essay' && (q.type==='mc'||q.type==='multi') ? ` · 정답 ${MARKS[q.answer-1]}` : q.type==='ox'||q.type==='blank' ? ` · 정답 ${esc(q.answer)}` : ''}</div><p>${rich(q.explain||'개념 카드의 포인트를 다시 읽어 보세요.')}</p></div>
+      ${q.wrong ? `<div class="wrongbox"><div class="h">${q.type==='essay'?'채점 기준':'오답 왜 틀렸나'}</div>${rich(q.wrong)}</div>` : ''}
+      ${q.type==='essay' && bs.pick===null ? '' : ''}
+      ${q.type==='essay' && bs.pick==='?' ? `<div class="oxrow"><button data-ess="맞음" class="">맞게 썼다</button><button data-ess="틀림">부족했다</button></div>` : `<button class="btn" id="bankNext">${bs.i+1<bs.items.length?'다음 문제':'결과 보기'}</button>`}` : ''}`;
+  if (!graded && q.type==='blank') setTimeout(()=>document.getElementById('blankIn')?.focus(), 50);
+}
+function bankAnswer(pick){
+  const q = bs.items[bs.i]; if (bs.pick !== null && bs.pick !== '?') return;
+  bs.pick = pick; touchDay(); S.bh ||= {};
+  if (pick === '?'){ renderBankSession(); return; }             // 서술형: 모범 답안 먼저 보여 주고 자가 채점
+  const ok = bankCorrect(q, pick); S.stats.a++; if (ok) S.stats.c++; S.bh[q.id] = ok ? 'o' : 'x';
+  if (ok) bs.right++; else { bs.wrong.push(q); if (!S.wrong.some(w=>w.b===q.id && !w.cleared)) S.wrong.push({ b:q.id, p:(q.type==='mc'||q.type==='multi')?MARKS[+pick-1]:String(pick), iso:todayISO(), date:kdate(todayISO()) }); }
+  if (ok){ const w = S.wrong.find(x=>x.b===q.id && !x.cleared); if (w) w.cleared = true; }
+  save(S); renderBankSession(); window.scrollTo(0, 0);
+}
+function pickBank(n){ const pool = bankPool(); const arr = pool.slice(); for (let i=arr.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [arr[i],arr[j]]=[arr[j],arr[i]]; } return arr.slice(0, n); }
+
+/* ═══ 자료 탐구 · 집에서 실험 ═══ */
+let labId = null;
+function renderLab(){
+  const l = LABS.find(x=>x.lessonId===labId); const L = LESSONS.find(x=>x.id===labId); const v = document.getElementById('v-lab');
+  if (!l){ v.innerHTML = '<div class="empty"><p>탐구 자료가 없습니다.</p></div>'; return; }
+  if (L) setUnit(L.unit);
+  v.innerHTML = `<button class="back" id="labBack"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg>${bs?'문제':'돌아가기'}</button>
+    <article class="card labcard"><div class="loc">자료 파헤치기 · ${esc(L?L.bookName+' '+L.unit+'-'+L.id.slice(2):'')}</div><h3>${esc(l.title)}</h3><div class="sub">${esc(L?L.name:'')}</div>
+      <span class="k">자료</span><p>${rich(l.data)}</p>
+      ${l.figure ? `<figure class="zoomable" data-zoomlab="${l.lessonId}">${l.figure}<figcaption>누르면 크게</figcaption></figure>` : ''}
+      <span class="k">해석의 3단계</span><ol>${l.steps.map(s=>`<li>${rich(s)}</li>`).join('')}</ol>
+      <span class="k">결론</span><p>${rich(l.conclusion)}</p></article>
+    ${l.exam ? `<div class="point"><span class="k">시험엔 이렇게</span><p style="font-weight:600;font-size:14px">${rich(l.exam)}</p></div>` : ''}
+    ${l.tryBody ? `<div class="sec"><h2>집에서 직접 해보기${l.tryTitle?` · ${esc(l.tryTitle)}`:''}</h2><p style="font-size:14px;line-height:1.8;color:var(--body)">${rich(l.tryBody)}</p></div>` : ''}
+    <button class="btn" data-drill="${l.lessonId}">이 소단원 문제 풀기</button>`;
+}
+
+/* ═══ 그림 확대 보기 — 두 손가락으로 키우고 끌어서 본다 ═══ */
+function openFigure(svg, caption){
+  const el = document.createElement('div'); el.className='fv'; el.id='fv';
+  el.innerHTML = `<div class="bar"><span>그림 크게 보기</span><span><button id="fvMinus">−</button><button id="fvPlus">＋</button><button id="fvClose">닫기</button></span></div><div class="stage" id="fvStage">${svg}</div><div class="cap">${esc(caption||'')} · 두 손가락으로 키우고 끌어서 봅니다</div>`;
+  document.body.appendChild(el);
+  const st = el.querySelector('#fvStage'), sv = st.querySelector('svg'); if (!sv) return;
+  sv.removeAttribute('width'); sv.removeAttribute('height'); sv.style.width = '100%';
+  let sc=1, tx=0, ty=0; const apply = () => { sv.style.transform = `translate(${tx}px,${ty}px) scale(${sc})`; };
+  const pts = new Map(); let last = null;
+  st.addEventListener('pointerdown', e => { pts.set(e.pointerId, [e.clientX, e.clientY]); st.setPointerCapture(e.pointerId); last = null; });
+  st.addEventListener('pointermove', e => { if (!pts.has(e.pointerId)) return; pts.set(e.pointerId, [e.clientX, e.clientY]); const p = [...pts.values()];
+    if (p.length===1){ if (last){ tx += p[0][0]-last[0]; ty += p[0][1]-last[1]; } last = p[0]; }
+    else if (p.length>=2){ const d = Math.hypot(p[0][0]-p[1][0], p[0][1]-p[1][1]); if (st._d){ sc = Math.min(6, Math.max(1, sc * d / st._d)); } st._d = d; }
+    apply(); });
+  const up = e => { pts.delete(e.pointerId); if (pts.size<2) st._d = null; last = null; if (!pts.size && sc<=1){ tx=ty=0; apply(); } };
+  st.addEventListener('pointerup', up); st.addEventListener('pointercancel', up);
+  st.addEventListener('dblclick', () => { sc = sc>1 ? 1 : 2.2; if (sc===1){ tx=ty=0; } apply(); });
+  el.querySelector('#fvPlus').onclick = () => { sc = Math.min(6, sc*1.4); apply(); };
+  el.querySelector('#fvMinus').onclick = () => { sc = Math.max(1, sc/1.4); if (sc===1){ tx=ty=0; } apply(); };
+  el.querySelector('#fvClose').onclick = () => el.remove();
 }
 
 /* ═══ 통계 (학습 달력 · 단원별 진도 · 정답률 · 출석) ═══ */
@@ -960,6 +1131,8 @@ async function renderStats(){
       <div class="cal">${cal}</div>
       <div class="legend"><span><i></i>공부한 날 ${monthDays}일</span>${S.auth?`<span><i class="att"></i>학원 출석 ${att.length}일${att.filter(a=>a.late).length?` · 지각 ${att.filter(a=>a.late).length}`:''}</span>`:''}</div></div>
     <div class="sec"><h2>단원별 진도</h2>${units.map(u=>`<div class="bar-row"><span class="k">${esc(u.unit)}. ${esc(u.name)}<small>${esc(u.book)}</small></span><span class="bar"><i style="width:${Math.round(u.done/u.total*100)}%"></i></span><span class="v">${u.done}/${u.total}</span></div>`).join('')}</div>
+    ${(() => { const bh=S.bh||{}; const ids=Object.keys(bh); if (!ids.length) return ''; const per = LESSONS.map(L => { const qs = BANK.filter(q=>q.lessonId===L.id && bh[q.id]); return { L, n:qs.length, r:qs.filter(q=>bh[q.id]==='o').length }; }).filter(x=>x.n>0).sort((a,b)=>b.n-a.n).slice(0,8);
+      return `<div class="sec"><h2>문제 은행 · 소단원별 정답률</h2>${per.map(x=>`<div class="bar-row"><span class="k">${esc(x.L.unit)}-${x.L.id.slice(2)} ${esc(x.L.name)}<small>${esc(x.L.bookName)} · ${x.n}문제</small></span><span class="bar"><i style="width:${Math.round(x.r/x.n*100)}%"></i></span><span class="v">${Math.round(x.r/x.n*100)}%</span></div>`).join('')}</div>`; })()}
     <div class="sec"><h2>오답</h2><div class="kv"><span class="k">담긴 문제</span><span class="v">${S.wrong.filter(w=>!w.cleared).length}</span></div><div class="kv"><span class="k">다시 풀어 정리</span><span class="v">${S.wrong.filter(w=>w.cleared).length}</span></div><div class="kv"><span class="k">북마크</span><span class="v">${S.bm.length}</span></div></div>
     <button class="btn" id="goReview">복습 문제 풀기 · 배운 범위에서 무작위</button>`;
 }
@@ -1163,29 +1336,30 @@ async function scheduleReminder(){ const LN = plug('LocalNotifications'); if (!L
     await LN.schedule({ notifications: [{ id: 1, title: `${CFG.academy} · 오늘의 개념`, body: '하루 1개념 1문제 — 3분이면 됩니다.', schedule: { on: { hour: h, minute: m }, allowWhileIdle: true } }] }); } catch {} }
 function nativeInit(){ if (!isNative) return; const App = plug('App');
   App && App.addListener('backButton', () => { if (document.getElementById('sheetBg')) return closeSheet();
-    if (view==='detail') return show('list'); if (view==='quiz') { qState=null; return show(home()); } if (view==='plans') return show('me');
+    if (document.getElementById('fv')) return document.getElementById('fv').remove();
+    if (view==='detail') return show('list'); if (view==='quiz') { qState=null; return show(home()); } if (view==='plans') return show('me'); if (view==='lab' || view==='wrong') return show('bank'); if (view==='bank' && bs){ bs=null; return renderBank(); }
     if (view!==home() && view!=='auth') return show(home()); App.exitApp(); });
   applyBar(); scheduleReminder(); const Splash = plug('SplashScreen'); Splash && setTimeout(() => Splash.hide(), 150); }
 
 /* ═══ 시트 · 화면 전환 · 탭 ═══ */
 function openSheet(html){ document.getElementById('sheet').innerHTML = `<div class="sheet-bg" id="sheetBg"><div class="sheet"><div class="grab"></div>${html}</div></div>`; }
 function closeSheet(){ document.getElementById('sheet').innerHTML=''; }
-const VIEWS = ['auth','today','quiz','list','detail','wrong','stats','me','plans','parent','admin'];
-const ICON = { today:'<rect x="4" y="5" width="16" height="15" rx="2.5"/><path d="M4 10h16M9 3v4M15 3v4"/>', list:'<path d="M5 4h9l5 5v11H5z"/><path d="M14 4v5h5"/>', wrong:'<path d="M6 4h12v16l-6-4-6 4z"/>', stats:'<path d="M4 20V10M10 20V4M16 20v-8M22 20H2"/>', me:'<circle cx="12" cy="8" r="3.6"/><path d="M5 20c1.4-3.8 4-5.6 7-5.6s5.6 1.8 7 5.6"/>', parent:'<circle cx="9" cy="8" r="3"/><circle cx="17" cy="10" r="2.2"/><path d="M3 20c1-3.5 3.3-5.2 6-5.2s5 1.7 6 5.2M14 20c.5-2 1.7-3.4 3.5-3.4s2.8 1.4 3.5 3.4"/>', admin:'<path d="M4 19h16M6 19V9l6-4 6 4v10"/><path d="M10 19v-5h4v5"/>' };
+const VIEWS = ['auth','today','quiz','list','detail','wrong','stats','me','plans','parent','admin','bank','lab'];
+const ICON = { bank:'<path d="M4 5h16v14H4z"/><path d="M8 9h8M8 13h5"/>', today:'<rect x="4" y="5" width="16" height="15" rx="2.5"/><path d="M4 10h16M9 3v4M15 3v4"/>', list:'<path d="M5 4h9l5 5v11H5z"/><path d="M14 4v5h5"/>', wrong:'<path d="M6 4h12v16l-6-4-6 4z"/>', stats:'<path d="M4 20V10M10 20V4M16 20v-8M22 20H2"/>', me:'<circle cx="12" cy="8" r="3.6"/><path d="M5 20c1.4-3.8 4-5.6 7-5.6s5.6 1.8 7 5.6"/>', parent:'<circle cx="9" cy="8" r="3"/><circle cx="17" cy="10" r="2.2"/><path d="M3 20c1-3.5 3.3-5.2 6-5.2s5 1.7 6 5.2M14 20c.5-2 1.7-3.4 3.5-3.4s2.8 1.4 3.5 3.4"/>', admin:'<path d="M4 19h16M6 19V9l6-4 6 4v10"/><path d="M10 19v-5h4v5"/>' };
 const home = () => ACC && ACC.role==='parent' ? 'parent' : ACC && ACC.role==='owner' ? 'admin' : 'today';
 function tabsFor(){ const r = ACC ? ACC.role : 'guest';
-  if (r==='parent') return [['parent','자녀'],['list','교재'],['me','내 정보']];
+  if (r==='parent') return [['parent','자녀'],['list','교재'],['bank','문제'],['me','내 정보']];
   if (r==='owner') return [['admin','원장'],['today','오늘'],['list','교재'],['me','내 정보']];
-  return [['today','오늘'],['list','교재'],['wrong','오답'],['stats','통계'],['me','내 정보']]; }
+  return [['today','오늘'],['list','교재'],['bank','문제'],['stats','통계'],['me','내 정보']]; }
 function renderTabs(){ document.getElementById('tabs').innerHTML = tabsFor().map(([v,l])=>`<button class="tab ${view===v?'on':''}" data-v="${v}"><svg viewBox="0 0 24 24">${ICON[v]}</svg>${l}</button>`).join(''); }
 let view = 'today';
 function show(v){
   view = v;
   VIEWS.forEach(k => document.getElementById('v-'+k).classList.toggle('hide', k!==v));
   document.getElementById('tabs').classList.toggle('hide', v==='auth');
-  const tabOf = {quiz: qState&&qState.mode==='review'?'stats':'today', detail:'list', plans:'me'}[v] || v;
+  const tabOf = {quiz: qState&&qState.mode==='review'?'stats':'today', detail:'list', plans:'me', wrong:'bank', lab:'bank'}[v] || v;
   renderTabs(); document.querySelectorAll('.tab').forEach(t => t.classList.toggle('on', t.dataset.v===tabOf));
-  ({auth:renderAuth, today:renderToday, quiz:renderQuiz, list:renderList, detail:renderDetail, wrong:renderWrong, stats:renderStats, me:renderMe, plans:renderPlans, parent:renderParent, admin:renderAdmin})[v]();
+  ({auth:renderAuth, today:renderToday, quiz:renderQuiz, list:renderList, detail:renderDetail, wrong:renderWrong, stats:renderStats, me:renderMe, plans:renderPlans, parent:renderParent, admin:renderAdmin, bank:renderBank, lab:renderLab})[v]();
   window.scrollTo(0,0);
 }
 
@@ -1212,6 +1386,27 @@ document.addEventListener('click', async e => {
   if (T('#sheetClose')){ closeSheet(); return; }
   const tab = T('.tab'); if (tab){ qState=null; show(tab.dataset.v); return; }
   const lg = T('[data-legal]'); if (lg){ openLegal(lg.dataset.legal); return; }
+  /* 그림 확대 */
+  const zf = T('[data-zoom]'); if (zf){ const c = CONCEPTS.find(x=>x.id===zf.dataset.zoom); openFigure(figOf(c.id), c.figure.caption); return; }
+  const zl = T('[data-zoomlab]'); if (zl){ const l = LABS.find(x=>x.lessonId===zl.dataset.zoomlab); openFigure(l.figure, l.title); return; }
+  const zq = T('[data-zoomsvg]'); if (zq && bs){ openFigure(bs.items[+zq.dataset.zoomsvg].figure, ''); return; }
+  /* 문제 은행 */
+  const bsel = T('[data-bsel]'); if (bsel){ const k=bsel.dataset.bsel; bankSel[k] = k==='n' ? +bsel.dataset.val : bsel.dataset.val; if (k==='book'||k==='unit') bankSel.lesson='전체'; renderBank(); return; }
+  if (T('#bankStart')){ startBank(pickBank(bankSel.n), ''); return; }
+  const drill = T('[data-drill]'); if (drill){ bankSel = { ...bankSel, book:'전체', unit:'전체', lesson:drill.dataset.drill, type:'전체', only:'전체' }; const pool = bankPool(); if (!pool.length){ toast('이 소단원은 아직 잠겨 있습니다'); return; } startBank(pickBank(Math.min(10,pool.length)), ''); return; }
+  const lab = T('[data-lab]'); if (lab){ labId = lab.dataset.lab; show('lab'); return; }
+  if (T('#labBack')){ show(bs?'bank':(view==='lab'&&detailIdx!==null?'bank':'bank')); return; }
+  if (T('#bankQuit') || T('#bankQuit2')){ bs=null; renderBank(); window.scrollTo(0,0); return; }
+  if (T('#bankAgain')){ startBank(pickBank(bankSel.n), ''); return; }
+  if (T('#bankRetryWrong')){ startBank(bs.wrong.slice(), '틀린 문제'); return; }
+  const oxb = T('[data-ox]'); if (oxb && bs){ bankAnswer(oxb.dataset.ox); return; }
+  const bp = T('[data-bp]'); if (bp && bs && !bp.disabled){ bankAnswer(bp.dataset.bp); return; }
+  if (T('#blankGo') && bs){ bankAnswer((document.getElementById('blankIn').value||'').trim()); return; }
+  if (T('#essayShow') && bs){ bs.ess = document.getElementById('essayIn').value; bankAnswer('?'); return; }
+  const essb = T('[data-ess]'); if (essb && bs){ bs.pick = null; bankAnswer(essb.dataset.ess); return; }
+  if (T('#bankNext') && bs){ bs.i++; bs.pick=null; bs.ess=null; renderBankSession(); window.scrollTo(0,0); return; }
+  const bre = T('[data-bretry]'); if (bre){ const q = BANK.find(x=>x.id===bre.dataset.bretry); if (q) startBank([q], '오답 다시'); return; }
+  const go = T('[data-go]'); if (go){ show(go.dataset.go); return; }
 
   /* 시작 · 로그인 · 가입 */
   if (T('#goLogin')){ authMode='login'; authErr=''; renderAuth(); return; }
@@ -1335,7 +1530,8 @@ document.addEventListener('click', async e => {
 document.addEventListener('input', e => { if (e.target.id==='listQ'){ listQ = e.target.value; const el=e.target; renderList(); const n=document.getElementById('listQ'); n.focus(); n.setSelectionRange(el.value.length, el.value.length); } });
 document.addEventListener('change', e => { if (e.target.id==='suAge'){ renderAuth(); return; } if (e.target.id==='notifyAt'){ S.notifyAt=e.target.value; save(S); scheduleReminder(); toast(S.notifyAt==='안 받음'?'알림을 받지 않습니다':`매일 ${S.notifyAt}에 알려 드립니다`); } });
 document.addEventListener('keydown', e => { if (e.key!=='Enter') return; const id = e.target.id; const click = s => document.getElementById(s)?.click();
-  ({codeIn:'codeGo', attIn:'attGo', lgPw:'lgGo', lgEmail:'lgGo', suPw:'suGo', fgEmail:'fgGo', childIn:'childGo', passIn:'passGo', clsName:'clsAdd'}[id]) && click({codeIn:'codeGo', attIn:'attGo', lgPw:'lgGo', lgEmail:'lgGo', suPw:'suGo', fgEmail:'fgGo', childIn:'childGo', passIn:'passGo', clsName:'clsAdd'}[id]); });
+  const M = {codeIn:'codeGo', attIn:'attGo', lgPw:'lgGo', lgEmail:'lgGo', suPw:'suGo', fgEmail:'fgGo', childIn:'childGo', passIn:'passGo', clsName:'clsAdd', blankIn:'blankGo'}; M[id] && click(M[id]); });
+document.addEventListener('change', e => { if (e.target.id==='bankLesson'){ bankSel.lesson = e.target.value; renderBank(); } });
 
 /* ═══ 시작 ═══ */
 (async () => {

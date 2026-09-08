@@ -34,7 +34,7 @@ async def main():
         await s.click('.row.locked'); await s.wait_for_timeout(200); assert await s.locator('#sheetBg').count() == 1; await s.click('#sheetClose')
         # 검색 · 필터
         await s.fill('#listQ', '효소'); await s.wait_for_timeout(300)
-        n = await s.locator('.row').count(); assert 1 <= n <= 20, f'검색 결과 {n}'; await shot(s, 'l03_search')
+        n = await s.locator('#v-list .row').count(); assert 1 <= n <= 20, f'검색 결과 {n}'; await shot(s, 'l03_search')
         await s.fill('#listQ', ''); await s.wait_for_timeout(200)
 
         # ── 학생 회원가입(학원 코드 포함) ──
@@ -59,11 +59,11 @@ async def main():
         ans = await s.evaluate('qState.q.answer'); await s.click(f'.opt[data-p="{ans}"]'); await s.wait_for_timeout(200); assert await s.evaluate('S.stats.c') == 1
         await s.click('#grade'); await s.wait_for_timeout(200); assert await s.evaluate('view') == 'quiz'
         # 오답 노트 · 지금 다시 풀기
-        await s.click('.tab[data-v="wrong"]'); await s.wait_for_timeout(300); assert await s.locator('[data-retry]').count() == 1; await shot(s, 'l08_wrong')
+        await s.click('.tab[data-v="bank"]'); await s.wait_for_timeout(300); await s.click('[data-go="wrong"]'); await s.wait_for_timeout(300); assert await s.locator('[data-retry]').count() == 1; await shot(s, 'l08_wrong')
         await s.click('[data-retry]'); await s.wait_for_timeout(200); ans = await s.evaluate('qState.q.answer'); await s.click(f'.opt[data-p="{ans}"]'); await s.wait_for_timeout(200)
         assert await s.evaluate('S.wrong[0].cleared') is True
         # 교재 필터: 북마크 1 · 공부함 ≥1
-        await s.click('.tab[data-v="list"]'); await s.wait_for_timeout(200); await s.click('[data-lf="북마크"]'); await s.wait_for_timeout(200); assert await s.locator('.row').count() == 1
+        await s.click('.tab[data-v="list"]'); await s.wait_for_timeout(200); await s.click('[data-lf="북마크"]'); await s.wait_for_timeout(200); assert await s.locator('#v-list .row').count() == 1
         await s.click('[data-lf="전체"]'); await s.wait_for_timeout(200); assert await s.locator('.row.locked').count() == 0, '수강생인데 잠긴 개념'
         # 내 정보 · 프로필 수정 · 로그아웃
         await s.click('.tab[data-v="me"]'); await s.wait_for_timeout(200); assert '학원 수강생' in await txt(s, '.badge'); await shot(s, 'l09_me')
@@ -81,7 +81,7 @@ async def main():
         await pr.fill('#childIn', 'ZZZ000'); await pr.click('#childGo'); await pr.wait_for_timeout(200); assert '찾을 수 없' in await txt(pr, '.err')
         await pr.fill('#childIn', 'MON123'); await pr.click('#childGo'); await pr.wait_for_timeout(500)
         body = await txt(pr, '#v-parent'); assert '박○○ 학생' in body and '출석' in body, body[:200]; await shot(pr, 'l10_parent')
-        assert [t for t in await pr.locator('.tab').all_inner_texts()] == ['자녀', '교재', '내 정보']
+        assert [t for t in await pr.locator('.tab').all_inner_texts()] == ['자녀', '교재', '문제', '내 정보']
         await ctx.close()
 
         # ── 원장: 로그인 → 학생 상세 → 통계 → 설정(반·이용권) ──
