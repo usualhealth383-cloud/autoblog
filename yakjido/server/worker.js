@@ -1,15 +1,15 @@
 /**
- * 약손 사진 지도 서버 — Cloudflare Worker (무료 플랜으로 충분)
+ * 약지도 사진 지도 서버 — Cloudflare Worker (무료 플랜으로 충분)
  *
  * 하는 일: 앱이 보낸 약 사진(약봉투·약 상자·알약)을 Gemini 2.5 Flash 로 읽어
  *          제품명·성분·함량·용법 텍스트를 JSON 으로 돌려준다. 사진은 저장하지 않는다.
  *
  * 배포 (현욱님 PC, 5분):
  *   1) npm i -g wrangler && wrangler login
- *   2) cd yakson/server && wrangler deploy            → https://yakson-photo.<계정>.workers.dev
+ *   2) cd yakjido/server && wrangler deploy            → https://yakjido-photo.<계정>.workers.dev
  *   3) wrangler secret put GEMINI_API_KEY             → Google AI Studio 에서 만든 키 붙여넣기
  *   4) (선택) wrangler secret put ALLOWED_ORIGIN      → https://usualhealth383-cloud.github.io
- *   5) yakson/content/meta.json 의 "photoEndpoint" 에 워커 주소를 적고 build.py 실행
+ *   5) yakjido/content/meta.json 의 "photoEndpoint" 에 워커 주소를 적고 build.py 실행
  *
  * 비용: Gemini 2.5 Flash 입력 $0.30/1M 토큰 — 1,024px 사진 1장 ≈ 1,300 토큰 ≈ 0.5원 + 출력 소량.
  *       월 1만 장이어도 1만 원 미만. AI Studio 무료 한도(분당 10건·일 250건)로 시작 가능.

@@ -1,11 +1,11 @@
-# 약손 — 증상에 맞는 약, 의사가 고르듯
+# 약지도 — 증상에 맞는 약, 의사가 고르듯
 
 > 증상을 고르면 진료실에서 처방하듯 **진통·소염·근이완·위보호** 조합으로 풀어 주고,
 > 약국(또는 편의점)에서 무엇을 사면 되는지, 왜 그 성분인지, 언제 병원에 가야 하는지를 알려주는 앱.
 > 약 정보(성분 기준)·같은 계열 비교(위장 vs 심혈관 부담)·영양제 성분 비교(제형·유효용량·상한)까지 한 곳에.
 
-- 배포: `https://usualhealth383-cloud.github.io/autoblog/yakson/` (GitHub Pages, PWA)
-- 소스: `yakson/app-shell.html`(단일 파일 앱) + `yakson/content/*.json`(콘텐츠) → `python3 yakson/tools/build.py` → `docs/yakson/`
+- 배포: `https://usualhealth383-cloud.github.io/autoblog/yakjido/` (GitHub Pages, PWA)
+- 소스: `yakjido/app-shell.html`(단일 파일 앱) + `yakjido/content/*.json`(콘텐츠) → `python3 yakjido/tools/build.py` → `docs/yakjido/`
 - 검수: 내과 전문의(박현욱) · 모든 임상 수치는 `content/sources.json`에 근거 등록. 근거 없는 값은 `[확인 필요]`로만 표기.
 
 ## 1. 벤치마크 + 차별점 (한 줄)
@@ -14,7 +14,7 @@
 
 리서치(`/scratchpad/research/01-apps-benchmark.md`, 20여 개 앱)에서 확인한, 아무도 제대로 하지 않는 것:
 
-| # | 빈칸 | 약손의 답 |
+| # | 빈칸 | 약지도의 답 |
 |---|---|---|
 | 1 | 증상 체커는 "병원 가세요"에서 끝남. 파미·이아소는 제품 1개만 찍어 줌 | **처방 스타일 조합 카드**: 슬롯(진통·소염·근이완·위보호)마다 "왜", 일반약 대안, 처방 필요 여부 |
 | 2 | 계열 안 비교(어느 소염제가 위장에 덜 부담?)는 블로그 글뿐 | **위장×심혈관 부담 산점도**(CNT 2013·Castellsague 2012 상대위험을 코드로 그림) + 상황별 결론 |

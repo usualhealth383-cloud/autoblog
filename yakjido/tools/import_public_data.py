@@ -4,16 +4,16 @@
 입력(두 파일, nedrug.mfds.go.kr '의약품등 정보 → 공공데이터 공개'에서 내려받은 벌크 CSV):
   - e약은요:   OpenData_EasyExcelList*.csv   (제품명·업체명·주성분 + 7문항 평문)
   - 낱알식별:  OpenData_PotOpenTabletIdntfc*.csv (이미지·각인·모양·색·전문/일반)
-사용:  python3 yakson/tools/import_public_data.py <easy.csv> <pills.csv>
-출력:  docs/yakson/data/easy-index.json + easy-N.json(200건씩), pills.json (일반의약품·안전상비만), meta.json
+사용:  python3 yakjido/tools/import_public_data.py <easy.csv> <pills.csv>
+출력:  docs/yakjido/data/easy-index.json + easy-N.json(200건씩), pills.json (일반의약품·안전상비만), meta.json
 라이선스: 공공데이터포털 식약처 데이터셋 — 이용허락범위 제한 없음(출처 표시 권장). 이미지 원제작 약학정보원.
 """
 import csv, json, re, sys, pathlib
 csv.field_size_limit(10**8)
 ROOT = pathlib.Path(__file__).resolve().parent.parent
-OUT = ROOT.parent / 'docs' / 'yakson' / 'data'; OUT.mkdir(parents=True, exist_ok=True)  # 배포본이 곧 원본(중복 저장 방지)
+OUT = ROOT.parent / 'docs' / 'yakjido' / 'data'; OUT.mkdir(parents=True, exist_ok=True)  # 배포본이 곧 원본(중복 저장 방지)
 
-# 성분명 → 약손 성분 id (drugs.json 의 id). 복합제는 여러 id 에 매핑된다.
+# 성분명 → 약지도 성분 id (drugs.json 의 id). 복합제는 여러 id 에 매핑된다.
 INGR = {
   '아세트아미노펜':'acetaminophen', '이부프로펜':'ibuprofen', '이부프로펜아르기닌':'ibuprofen', '덱시부프로펜':'dexibuprofen',
   '나프록센':'naproxen', '나프록센나트륨':'naproxen', '아스피린':'aspirin', '아스피린장용':'aspirin',

@@ -1,4 +1,4 @@
-# 약손 콘텐츠 스키마 (content/*.json)
+# 약지도 콘텐츠 스키마 (content/*.json)
 
 빌드(tools/build.py)가 이 폴더의 JSON을 파일명 키로 합쳐 `DATA` 전역에 심는다.
 모든 임상 수치는 `sources`에 근거가 있어야 한다. 근거가 없으면 값 대신 `"[확인 필요]"`.

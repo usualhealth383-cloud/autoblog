@@ -1,14 +1,14 @@
 #!/usr/bin/env python3
 """대표 제품명 → 식약처 낱알 사진 URL 매핑 (content/productImages.json).
 
-낱알식별 DB(docs/yakson/data/pills.json)와 e약은요 인덱스에서 제품명이 일치하는 정제·캡슐 사진을 찾는다.
+낱알식별 DB(docs/yakjido/data/pills.json)와 e약은요 인덱스에서 제품명이 일치하는 정제·캡슐 사진을 찾는다.
 액제·파스·연고는 낱알 DB에 사진이 없어 매핑되지 않는다(제품허가 API의 포장 사진은 별도 키 필요).
 사진 출처: 식품의약품안전처 의약품 낱알식별 정보(제작 약학정보원) — 출처 표시 후 사용.
-사용: python3 yakson/tools/match_images.py   → 이후 build.py 가 DATA.productImages 로 심는다.
+사용: python3 yakjido/tools/match_images.py   → 이후 build.py 가 DATA.productImages 로 심는다.
 """
 import json, re, pathlib
 ROOT = pathlib.Path(__file__).resolve().parent.parent
-DATA = ROOT.parent / 'docs' / 'yakson' / 'data'
+DATA = ROOT.parent / 'docs' / 'yakjido' / 'data'
 pills = json.loads((DATA / 'pills.json').read_text(encoding='utf-8'))
 for p_ in pills:
     if p_.get('img') and not p_['img'].startswith('http'): p_['img'] = 'https://nedrug.mfds.go.kr/pbp/cmn/itemImageDownload/' + p_['img']
