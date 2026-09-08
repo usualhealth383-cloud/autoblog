@@ -701,10 +701,48 @@ function vSearch(_, q){
 }
 
 /* ───────── 증상 상세: 처방 스타일 조합 ───────── */
-function fitChips(){
-  const opts = [['pregnant', '임신·수유'], ['ulcer', '위가 약함·궤양'], ['heart', '고혈압·심장'], ['anticoag', '항응고제'], ['kidney', '신장'], ['asthma', '천식']];
-  const age = [['senior', '65세 이상'], ['child', '소아·청소년']];
-  return `<div class="fitme"><div class="small muted" style="margin-bottom:6px;font-weight:600">해당되는 것이 있으면 눌러 주세요. 약 추천이 그에 맞게 바뀌어요</div><div class="chips">${opts.map(([k, n]) => `<button class="chip ${ME[k] ? 'on' : ''}" onclick="ME['${k}']=!ME['${k}'];saveMe();route()">${ME[k] ? I.check : ''}${esc(n)}</button>`).join('')}${age.map(([k, n]) => `<button class="chip ${ME.age === k ? 'on' : ''}" onclick="ME.age=ME.age==='${k}'?'adult':'${k}';saveMe();route()">${ME.age === k ? I.check : ''}${esc(n)}</button>`).join('')}</div></div>`;
+/* ───────── 이 증상에서 실제로 약을 바꾸는 조건만 골라 묻기 ───────── */
+/* 후보 약들의 avoid(금기)·caution(주의)에 걸린 flag 를 점수로 세어, 관련 없는 질문은 아예 묻지 않는다. */
+const FLAG_Q = {
+  pregnant:'임신 중이거나 수유 중이에요', ulcer:'위가 약하거나 위궤양이 있었어요',
+  heart:'고혈압·심장병이 있어요', anticoag:'피를 묽게 하는 약(항응고제·아스피린)을 먹어요',
+  kidney:'신장이 안 좋아요', liver:'간이 안 좋아요', alcohol:'술을 자주 드세요',
+  asthma:'천식이 있어요', glaucoma:'녹내장이 있어요', bph:'전립선이 커요(소변 줄기가 약해요)',
+  gout:'통풍이 있어요', senior:'65세 이상이에요', child:'소아·청소년(15세 미만)이에요'
+};
+const isAgeFlag = k => k === 'senior' || k === 'child';
+const flagOn = k => isAgeFlag(k) ? ME.age === k : !!ME[k];
+function flagScore(s){
+  const sc = {};
+  for (const p of (s?.plan || [])) for (const id of (p.options || [])) {
+    const d = drug(id); if (!d) continue;
+    for (const a of (d.avoid || [])) for (const f of (a.flags || [])) sc[f] = (sc[f] || 0) + 3;
+    for (const c of (d.caution || [])) for (const f of (c.flags || [])) sc[f] = (sc[f] || 0) + 1;
+  }
+  return sc;
+}
+/* 상위 n개는 바로 보여 주고 나머지는 접어 둔다. 이미 켜 둔 조건은 접힌 곳에 숨기지 않는다. */
+function askFlags(s, n = 3){
+  const sc = flagScore(s); const keys = Object.keys(FLAG_Q);
+  const rel = keys.filter(k => sc[k]).sort((a, b) => sc[b] - sc[a]);
+  let top = rel.slice(0, n);
+  let more = rel.slice(n).concat(keys.filter(k => !sc[k]));
+  const on = more.filter(flagOn);
+  if (on.length) { top = top.concat(on); more = more.filter(k => !flagOn(k)); }
+  return { top, more };
+}
+const flagBtn = k => isAgeFlag(k)
+  ? `<button class="chip ${ME.age === k ? 'on' : ''}" onclick="ME.age=ME.age==='${k}'?'adult':'${k}';saveMe();route()">${ME.age === k ? I.check : I.x}${esc(FLAG_Q[k])}</button>`
+  : `<button class="chip ${ME[k] ? 'on' : ''}" onclick="ME['${k}']=!ME['${k}'];saveMe();route()">${ME[k] ? I.check : I.x}${esc(FLAG_Q[k])}</button>`;
+function fitChips(s){
+  const { top, more } = askFlags(s, 4);
+  if (!top.length && !more.length) return '';
+  const id = 'more-fit';
+  return `<div class="fitme">
+    <div class="small muted" style="margin-bottom:6px;font-weight:600">${top.length ? '해당되는 것이 있으면 눌러 주세요. 약 추천이 그에 맞게 바뀌어요' : '이 증상은 따로 여쭤볼 것이 없어요'}</div>
+    <div class="chips">${top.map(flagBtn).join('')}${more.length ? `<button class="chip" onclick="document.getElementById('${id}')?.classList.toggle('hide')">${I.chev} 다른 조건 ${more.length}가지</button>` : ''}</div>
+    ${more.length ? `<div id="${id}" class="chips hide" style="margin-top:8px">${more.map(flagBtn).join('')}</div>` : ''}
+  </div>`;
 }
 function basket(s){
   const f = activeFlags();
@@ -765,7 +803,7 @@ function vSymptom(id){
   return `${topBar({ back:'증상' })}
   <div class="eyebrow">${esc(s.group)}</div>
   <h1>${esc(s.name)}</h1>
-  ${fitChips()}
+  ${fitChips(s)}
   <section class="sec answer" aria-label="바로 답">
     <div class="eyebrow">이렇게 사시면 돼요 <span class="muted" style="font-weight:500;letter-spacing:0;text-transform:none">· 약 이름을 누르면 드시는 법이 나와요</span></div>
     <div class="buy">${bk.map(buyItem).join('')}</div>
@@ -919,12 +957,19 @@ function vGuide(step, q){
     ${groups.map(g => `<div class="g-grp">${esc(g)}</div><div class="g-list">${(D.symptoms || []).filter(x => x.group === g).map(x => `<button class="g-item" onclick="go('/guide/2/${x.id}')"><div class="ic">${icon(x.icon)}</div><div><b>${esc(x.name)}</b><span>${esc(x.short || '')}</span></div>${I.chev}</button>`).join('')}</div>`).join('')}`;
   }
   if (step === 2) {
-    const opts = [['pregnant', '임신 중이거나 수유 중이에요'], ['ulcer', '위가 약하거나 위궤양이 있었어요'], ['heart', '고혈압·심장병이 있어요'], ['anticoag', '피를 묽게 하는 약(항응고제·아스피린)을 먹어요'], ['kidney', '신장이 안 좋아요'], ['asthma', '천식이 있어요']];
-    const age = [['senior', '65세 이상이에요'], ['child', '소아·청소년(15세 미만)이에요']];
-    return `${topBar({ back:'이전' })}${bar}<div class="eyebrow">${esc(s.name)}</div><div class="g-q">몇 가지만 확인할게요</div><p class="small muted">의사가 처방 전에 꼭 묻는 것들이에요. 해당하는 것을 모두 누르고, 없으면 바로 다음으로.</p>
-    <div class="g-chips">${opts.map(([k, n]) => `<button class="chip ${ME[k] ? 'on' : ''}" onclick="ME['${k}']=!ME['${k}'];saveMe();route()">${ME[k] ? I.check : I.x}${esc(n)}</button>`).join('')}${age.map(([k, n]) => `<button class="chip ${ME.age === k ? 'on' : ''}" onclick="ME.age=ME.age==='${k}'?'adult':'${k}';saveMe();route()">${ME.age === k ? I.check : I.x}${esc(n)}</button>`).join('')}</div>
-    ${ME.age === 'child' ? `<div class="kid-form" style="margin-top:12px"><label>생년월일<input id="k-birth" type="date" value="${esc(ME.child?.birth || '')}"></label><label>몸무게 (kg)<input id="k-w" type="number" inputmode="decimal" step="0.1" value="${ME.child?.weight || ''}" placeholder="예: 12.4" onchange="ME.child={...(ME.child||{}),weight:parseFloat(this.value)||'',birth:document.getElementById('k-birth').value};saveMe()"></label></div><p class="small muted" style="margin-top:6px">아이 약은 몸무게로 정해요. 넣어 두면 답 화면에 시럽 mL가 같이 나와요.</p>` : ''}
-    <div class="actions"><button class="btn" onclick="document.getElementById('k-w')&&(ME.child={...(ME.child||{}),weight:parseFloat(document.getElementById('k-w').value)||'',birth:document.getElementById('k-birth').value},saveMe());go('/guide/3/${s.id}')">${I.check} ${activeFlags().length ? '이 조건으로 답 보기' : '해당 없음 — 답 보기'}</button></div>
+    const { top, more } = askFlags(s, 3);
+    const anyOn = top.concat(more).some(flagOn);
+    const kid = ME.age === 'child';
+    const nextLabel = anyOn ? '이 조건으로 답 보기' : '해당 없어요 · 답 보기';
+    return `${topBar({ back:'이전' })}${bar}<div class="eyebrow">${esc(s.name)}</div>
+    <div class="g-q">${top.length ? '이것만 확인할게요' : '바로 답을 보시면 돼요'}</div>
+    <p class="small muted">${top.length
+      ? `이 증상에서 <b>약이 달라지는 것</b>만 여쭤봐요. 해당하는 것을 누르고, 없으면 바로 다음으로.`
+      : '이 증상은 몸 상태에 따라 약이 달라지는 것이 없어요.'}</p>
+    ${top.length ? `<div class="g-chips">${top.map(flagBtn).join('')}</div>` : ''}
+    ${more.length ? `<details class="acc" style="margin-top:12px"><summary>다른 것도 확인하기<small>${more.length}가지</small>${I.chev}</summary><div class="bd"><div class="g-chips">${more.map(flagBtn).join('')}</div></div></details>` : ''}
+    ${kid ? `<div class="card" style="margin-top:12px"><b class="small">아이 정보</b><div class="kid-form"><label>생년월일<input id="k-birth" type="date" value="${esc(ME.child?.birth || '')}"></label><label>몸무게 (kg)<input id="k-w" type="number" inputmode="decimal" step="0.1" value="${ME.child?.weight || ''}" placeholder="예: 12.4" onchange="ME.child={...(ME.child||{}),weight:parseFloat(this.value)||'',birth:document.getElementById('k-birth').value};saveMe()"></label></div><p class="small muted" style="margin-top:6px">아이 약은 몸무게로 정해요. 넣어 두면 답 화면에 시럽 몇 mL인지 같이 나와요.</p></div>` : ''}
+    <div class="actions"><button class="btn" onclick="document.getElementById('k-w')&&(ME.child={...(ME.child||{}),weight:parseFloat(document.getElementById('k-w').value)||'',birth:document.getElementById('k-birth').value},saveMe());go('/guide/3/${s.id}')">${I.check} ${nextLabel}</button></div>
     <p class="privacy">${I.lock}이 기기에만 저장되고 전송되지 않아요.</p>`;
   }
   const bk = basket(s); const clinic = (s.care?.clinic || []).slice(0, 2), er = (s.care?.er || []).slice(0, 1);
