@@ -10,6 +10,8 @@ import json, re, pathlib
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 DATA = ROOT.parent / 'docs' / 'yakson' / 'data'
 pills = json.loads((DATA / 'pills.json').read_text(encoding='utf-8'))
+for p_ in pills:
+    if p_.get('img') and not p_['img'].startswith('http'): p_['img'] = 'https://nedrug.mfds.go.kr/pbp/cmn/itemImageDownload/' + p_['img']
 easy = json.loads((DATA / 'easy-index.json').read_text(encoding='utf-8'))
 drugs = []
 for f in ('drugs.json', 'drugs.part2.json'):

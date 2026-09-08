@@ -46,16 +46,20 @@ pills = []
 by_name = {}
 for r in pills_raw:
     kind = r.get('전문일반구분', '')
-    if not (kind.startswith('일반')): continue
+    if not kind: continue
+    # 품목명 괄호 안 = 성분명 (예: 가스디알정50밀리그램(디메크로틴산마그네슘))
+    mm = re.search(r'\(([^()]*)\)\s*$', r['품목명'] or '')
     item = {
-        'n': r['품목명'].strip(), 'm': r['업소명'].strip(), 'img': r.get('큰제품이미지', '').strip(),
+        'n': r['품목명'].strip(), 'm': r['업소명'].strip(), 'img': (r.get('큰제품이미지', '').strip().split('/')[-1] if r.get('큰제품이미지') else ''),
         'f': (r.get('표시앞') or '').strip().replace('-', ''), 'b': (r.get('표시뒤') or '').strip().replace('-', ''),
         'sh': (r.get('의약품제형') or '').strip(), 'c': (r.get('색상앞') or '').strip(), 'c2': (r.get('색상뒤') or '').strip().replace('-', ''),
-        'd': (r.get('성상') or '').strip(), 'cls': (r.get('분류명') or '').strip(), 'cvs': 1 if '안전상비' in kind else 0,
+        'cls': (r.get('분류명') or '').strip(), 'cvs': 1 if '안전상비' in kind else 0,
         'sz': (r.get('크기장축') or '').strip(), 'seq': (r.get('품목일련번호') or '').strip(),
+        'rx': 1 if kind.startswith('전문') else 0, 'ln': (r.get('분할선앞') or '').strip().replace('-', ''),
+        'ingr': (mm.group(1) if mm and not mm.group(1).startswith('수출') else ''),
     }
     pills.append(item)
-    by_name.setdefault(base_name(item['n']), item)
+    if not item['rx']: by_name.setdefault(base_name(item['n']), item)
 
 easy = []
 for r in read(easy_p):
@@ -72,7 +76,7 @@ for r in read(easy_p):
         'n': r['제품명'].strip(), 'm': (r.get('업체명') or '').strip(), 'i': ingr, 'map': ids,
         'e': clean('이 약의 효능은 무엇입니까?'), 'u': clean('이 약은 어떻게 사용합니까?'), 'c': clean('이 약의 사용상 주의사항은 무엇입니까?'),
         'x': clean('이 약을 사용하는 동안 주의해야 할 약 또는 음식은 무엇입니까?'), 's': clean('이 약은 어떤 이상반응이 나타날 수 있습니까?'), 'k': clean('이 약은 어떻게 보관해야 합니까?'),
-        'img': pill['img'] if pill else '', 'cvs': pill['cvs'] if pill else 0, 'seq': pill['seq'] if pill else '',
+        'img': ('https://nedrug.mfds.go.kr/pbp/cmn/itemImageDownload/' + pill['img']) if pill and pill['img'] else '', 'cvs': pill['cvs'] if pill else 0, 'seq': pill['seq'] if pill else '',
     })
 
 dump = lambda o: json.dumps(o, ensure_ascii=False, separators=(',', ':'))
@@ -83,8 +87,10 @@ index = [{'n': e['n'], 'm': e['m'], 'i': e['i'], 'map': e['map'], 'img': e['img'
 (OUT / 'easy-index.json').write_text(dump(index), encoding='utf-8')
 for k in range(0, len(easy), CH):
     (OUT / f'easy-{k // CH}.json').write_text(dump([{kk: v for kk, v in e.items() if kk in ('e', 'u', 'c', 'x', 's', 'k')} for e in easy[k:k + CH]]), encoding='utf-8')
-(OUT / 'pills.json').write_text(dump(pills), encoding='utf-8')
-meta = {'easy_count': len(easy), 'pills_count': len(pills), 'easy_source': pathlib.Path(easy_p).name, 'pills_source': pathlib.Path(pills_p).name,
+(OUT / 'pills.json').write_text(dump([x for x in pills if not x['rx']]), encoding='utf-8')   # 일반의약품 — 먼저 받는 파일
+(OUT / 'pills-rx.json').write_text(dump([x for x in pills if x['rx']]), encoding='utf-8')  # 전문의약품 — '처방약 포함' 때 추가로
+IMG_PREFIX = 'https://nedrug.mfds.go.kr/pbp/cmn/itemImageDownload/'
+meta = {'easy_count': len(easy), 'pills_count': len(pills), 'pills_otc': sum(1 for x in pills if not x['rx']), 'easy_source': pathlib.Path(easy_p).name, 'pills_source': pathlib.Path(pills_p).name,
         'mapped': sum(1 for e in easy if e['map']), 'with_image': sum(1 for e in easy if e['img']),
         'license': '식품의약품안전처 공공데이터(공공데이터포털) — 이용허락범위 제한 없음, 출처 표시. 낱알 이미지 제작: 약학정보원'}
 (OUT / 'meta.json').write_text(json.dumps(meta, ensure_ascii=False, indent=1), encoding='utf-8')
