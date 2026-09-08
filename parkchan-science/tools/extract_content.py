@@ -47,7 +47,7 @@ def selfcontain(svg, markers, cid):
     """그림 하나를 독립 문서로: 쓰는 마커를 <defs> 로 넣고, 모든 id 에 개념 번호를 붙여
     앱 한 문서 안에서 다른 그림과 id 가 부딪히지 않게 한다."""
     used = set(re.findall(r'url\(#([^)]+)\)', svg)) | set(re.findall(r'href="#([^"]+)"', svg))
-    need = [markers[i] for i in used if i in markers]
+    need = [markers[i] for i in sorted(used) if i in markers]   # 집합 순회는 실행마다 순서가 달라 빌드가 흔들린다
     if need:
         svg = re.sub(r'(<svg\b[^>]*>)', lambda m: m.group(1) + '<defs>' + ''.join(need) + '</defs>', svg, count=1)
     ids = set(re.findall(r'\bid="([^"]+)"', svg))
