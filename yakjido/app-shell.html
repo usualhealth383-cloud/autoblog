@@ -303,7 +303,12 @@ main > .answer + *, main > .sec + .care, main > .card + .care, main > .rx-card +
 .calc-out div{background:var(--tint);border-radius:12px;padding:12px 14px}
 .calc-out small{display:block;font-size:.6875rem;font-weight:700;color:var(--muted);letter-spacing:.05em}
 .calc-out b{display:block;font-size:1.375rem;font-weight:800;letter-spacing:-.02em;color:var(--primary-deep)}
-.dup{display:flex;gap:var(--s2);align-items:flex-start;padding:12px 14px;border-radius:12px;background:var(--alert-tint);color:var(--alert);font-size:.875rem;font-weight:600;line-height:1.5;margin-top:var(--s3)}
+.dup{padding:12px 14px;border-radius:12px;background:var(--caution-tint);color:var(--caution);margin-top:var(--s3)}
+.dup-h{display:flex;align-items:center;gap:8px;font-size:.9375rem;font-weight:800}
+.dup ul.plain{margin-top:6px}
+.dup ul.plain li{font-size:.875rem;font-weight:600;color:var(--caution);line-height:1.55;padding-left:0}
+.dup ul.plain li::before{display:none}
+.dup ul.plain li+li{margin-top:8px;padding-top:8px;border-top:1px solid rgba(138,99,19,.18)}
 .taking{display:flex;flex-wrap:wrap;gap:6px;margin-top:var(--s3)}
 .taking .chip{gap:8px} .taking .chip button{display:grid;place-items:center;width:22px;height:22px;border-radius:50%;background:var(--card);color:var(--muted)}
 .taking .chip button svg.i{width:12px;height:12px}
@@ -320,7 +325,8 @@ main > .answer + *, main > .sec + .care, main > .card + .care, main > .rx-card +
 .ach{border-radius:var(--r-card);border:1px solid var(--hairline);background:var(--card);padding:var(--s4);margin-top:var(--s3)}
 .ach.ok{border-color:rgba(26,121,70,.35)}
 .ach.warn{border-color:var(--caution);background:var(--caution-tint)}
-.ach.stop{border-color:var(--alert);background:var(--alert-tint)}
+.ach.stop{border-color:var(--alert);background:var(--caution-tint)}
+.ach.stop .ach-n{background:var(--alert);color:#fff;border-color:var(--alert)}
 .ach-h{display:flex;align-items:center;gap:8px;font-size:1.0625rem;font-weight:800}
 .ach.ok .ach-h{color:var(--normal)} .ach.warn .ach-h{color:var(--caution)} .ach.stop .ach-h{color:var(--alert)}
 .ach-h b{flex:1;min-width:0;font-weight:800}
@@ -604,6 +610,7 @@ const I = {
   info:'<svg class="i" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 8h.01M12 12v4"/></svg>',
   shield:'<svg class="i" viewBox="0 0 24 24"><path d="M12 3l7 3v5c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6z"/><path d="M9 12l2 2 4-4"/></svg>',
   alert:'<svg class="i" viewBox="0 0 24 24"><path d="M12 3l10 18H2z"/><path d="M12 10v4M12 17.5h.01"/></svg>',
+  circle:'<svg class="i" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/></svg>',
   lock:'<svg class="i" viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>',
   pill:'<svg class="i" viewBox="0 0 24 24"><rect x="3" y="8" width="18" height="8" rx="4" transform="rotate(-45 12 12)"/><path d="M9 9l6 6"/></svg>',
   leaf:'<svg class="i" viewBox="0 0 24 24"><path d="M12 3c-3 4-7 6-7 11a7 7 0 0 0 14 0c0-5-4-7-7-11z"/><path d="M12 21v-6"/></svg>',
@@ -913,8 +920,8 @@ function askFlags(s, n = 3){
   return { top, more };
 }
 const flagBtn = k => isAgeFlag(k)
-  ? `<button class="chip ${ME.age === k ? 'on' : ''}" onclick="ME.age=ME.age==='${k}'?'adult':'${k}';saveMe();route()">${ME.age === k ? I.check : I.x}${esc(FLAG_Q[k])}</button>`
-  : `<button class="chip ${ME[k] ? 'on' : ''}" onclick="ME['${k}']=!ME['${k}'];saveMe();route()">${ME[k] ? I.check : I.x}${esc(FLAG_Q[k])}</button>`;
+  ? `<button class="chip ${ME.age === k ? 'on' : ''}" aria-pressed="${ME.age === k}" onclick="ME.age=ME.age==='${k}'?'adult':'${k}';saveMe();route()">${ME.age === k ? I.check : I.circle}${esc(FLAG_Q[k])}</button>`
+  : `<button class="chip ${ME[k] ? 'on' : ''}" aria-pressed="${!!ME[k]}" onclick="ME['${k}']=!ME['${k}'];saveMe();route()">${ME[k] ? I.check : I.circle}${esc(FLAG_Q[k])}</button>`;
 function fitChips(s){
   const { top, more } = askFlags(s, 4);
   if (!top.length && !more.length) return '';
@@ -970,7 +977,19 @@ function prodNames(d, max = 4){
 }
 const prodChips = d => { const n = prodNames(d); return n.length > 1 ? `<div class="prodchips"><span class="pl">약국에서 찾으실 이름</span>${n.map(x => `<span class="pc">${esc(x)}</span>`).join('')}</div>` : ''; };
 const ingrName = d => String(d?.name || '').replace(/\s*\(.*$/, '').trim();
-const short = (t, n) => { const x = String(t || ''); return x.length > n ? x.slice(0, n).trim() + '…' : x; };
+const plainTxt = t => String(t || '').replace(/\*\*(.+?)\*\*/g, '$1').replace(/\[\[\w+:[\w-]+\|([^\]]+)\]\]/g, '$1');
+/* 말줄임은 단어 중간에서 자르지 않는다 — 어르신께는 잘린 글자가 읽기 어렵다 */
+const short = (t, n) => {
+  const x = String(t || '').trim(); if (x.length <= n) return x;
+  const cut = x.slice(0, n); const sp = cut.lastIndexOf(' ');
+  return (sp > n * 0.6 ? cut.slice(0, sp) : cut).replace(/[\s,·]+$/, '') + '…';
+};
+/* 첫 문장만 — 요약 줄에는 한 문장이면 충분하다 */
+const firstSentence = (t, n) => {
+  const x = plainTxt(t).trim(); const m = x.match(/^[^.!?]*[.!?]/);
+  const one = (m ? m[0] : x).trim();
+  return one.length <= n ? one : short(one, n);
+};
 /* '병원은' 줄을 누르면 아래 케어 카드로 데려간다 */
 function openCare(){ const el = document.getElementById('care'); if (el) el.scrollIntoView({ behavior:'smooth', block:'start' }); }
 let OPEN_BUY = '';
@@ -1005,10 +1024,9 @@ function buyItem(x){
     <div class="links">${prodLinks(x.d, x.product)}</div></div>` : ''}`;
 }
 /* 약이 아닌 슬롯(운동·생활습관·진료)도 답 카드에 같이 보여준다 */
-const plainTxt = t => String(t || '').replace(/\*\*(.+?)\*\*/g, '$1').replace(/\[\[\w+:[\w-]+\|([^\]]+)\]\]/g, '$1');
 function doItem(p){
   return `<div class="buy-item do"><span class="k">${esc(p.slot)}</span>
-    <span class="bi-t"><b>${esc(p.title || p.slot)}</b><small>${esc(short(plainTxt(p.why), 44))}</small></span>
+    <span class="bi-t"><b>${esc(p.title || p.slot)}</b><small>${esc(firstSentence(p.why, 58))}</small></span>
     <span class="bi-r"><span class="badge cvs rx">약 없이</span></span></div>`;
 }
 /* 답 카드 줄 = 계획 순서대로, 약이 있으면 buyItem, 없으면 doItem */
@@ -1054,11 +1072,11 @@ function vSymptom(id){
     <div class="buy">${planRows(s)}</div>
     ${s.plan?.some(p => p.otc === false) ? `<div class="rxline">${I.info}${esc(s.plan.filter(p => p.otc === false).map(p => ingrName(drug(p.options?.[0])) || String(p.title || p.slot).split('—').pop().replace(/\(처방\)/g, '').trim()).join(' · '))} — 병원 처방이 필요해요</div>` : ''}
     ${kidLine()}
+    ${(() => { const w = [...dups, ...sameProductWarn(bk)]; return w.length ? `<div class="dup"><div class="dup-h">${I.alert}<b>사시기 전에 확인할 것 ${w.length}가지</b></div><ul class="plain">${w.map(t => `<li>${fmt(t)}</li>`).join('')}</ul></div>` : ''; })()}
+    ${achPanel(bk.map(x => x.d), { compact:true })}
     ${clinic.length ? `<button class="gate" onclick="openCare()">${I.alert}<span class="lb">병원은</span><span class="tx">${esc(short(clinic[0], 34))} — 자세히 보기</span>${I.chev}</button>` : ''}
     <div class="memo-actions" style="display:flex;gap:8px"><button class="btn" style="flex:1" onclick="go('/show/${s.id}')">${I.cart} 약국에서 보여드리기</button></div>
     <div class="actions" style="margin-top:8px"><button class="btn line" onclick="go('/check/${s.id}')">${I.shield} 약사님이 다른 걸 권했어요</button></div>
-    ${[...dups, ...sameProductWarn(bk)].map(t => `<div class="dup">${I.alert}<span>${fmt(t)}</span></div>`).join('')}
-    ${achPanel(bk.map(x => x.d), { compact:true })}
   </section>
   <p style="margin-top:16px">${fmt(s.lead)}</p>
   <section class="sec">
