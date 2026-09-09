@@ -316,6 +316,32 @@ main > .answer + *, main > .sec + .care, main > .card + .care, main > .rx-card +
 .note{display:flex;gap:var(--s2);padding:var(--s3) var(--s4);border-radius:var(--r-input);background:var(--caution-tint);color:var(--caution);font-size:.875rem;font-weight:600;line-height:1.5}
 .note svg.i{margin-top:2px;width:18px;height:18px}
 .me-flags{display:flex;flex-wrap:wrap;gap:6px;margin-top:var(--s2)}
+/* 항콜린 부담 카드 */
+.ach{border-radius:var(--r-card);border:1px solid var(--hairline);background:var(--card);padding:var(--s4);margin-top:var(--s3)}
+.ach.ok{border-color:rgba(26,121,70,.35)}
+.ach.warn{border-color:var(--caution);background:var(--caution-tint)}
+.ach.stop{border-color:var(--alert);background:var(--alert-tint)}
+.ach-h{display:flex;align-items:center;gap:8px;font-size:1.0625rem;font-weight:800}
+.ach.ok .ach-h{color:var(--normal)} .ach.warn .ach-h{color:var(--caution)} .ach.stop .ach-h{color:var(--alert)}
+.ach-h b{flex:1;min-width:0;font-weight:800}
+.ach-n{font-size:.8125rem;font-weight:800;padding:3px 10px;border-radius:var(--r-pill);background:var(--card);color:inherit;flex:none;border:1px solid currentColor}
+.ach-w{margin-top:8px;font-size:.9375rem;line-height:1.6;color:var(--body)}
+.ach-l{list-style:none;margin-top:10px;display:flex;flex-direction:column;gap:6px}
+.ach-l li{display:grid;grid-template-columns:1fr auto;gap:4px 8px;align-items:center;background:var(--card);border-radius:10px;padding:9px 12px}
+.ach-l .nm{font-weight:700;font-size:.9375rem;text-decoration:none;overflow-wrap:anywhere}
+.ach-l .lv{font-size:.6875rem;font-weight:800;padding:2px 8px;border-radius:6px;background:var(--tint2);color:var(--muted)}
+.ach-l .lv.l2{background:var(--caution-tint);color:var(--caution)} .ach-l .lv.l3{background:var(--alert-tint);color:var(--alert)}
+.ach-l small{grid-column:1/-1;color:var(--muted);font-size:.75rem;line-height:1.4}
+details.ach-alt{margin-top:10px;background:var(--card);border-radius:10px}
+details.ach-alt summary{list-style:none;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:8px;padding:11px 12px;font-size:.9375rem;font-weight:700;min-height:44px}
+details.ach-alt summary::-webkit-details-marker{display:none}
+details.ach-alt summary svg.i{color:var(--faint);transition:transform .2s}
+details.ach-alt[open] summary svg.i{transform:rotate(90deg)}
+details.ach-alt .bd{padding:0 12px 12px}
+details.ach-alt .bd p{font-size:.875rem;line-height:1.6;margin-bottom:8px}
+details.ach-alt .bd p:last-child{margin-bottom:0}
+.ach-ask{display:flex;align-items:flex-start;gap:8px;margin-top:10px;font-size:.9375rem;line-height:1.5;color:var(--body)}
+.ach-ask svg.i{color:var(--primary);flex:none;margin-top:2px}
 
 /* 약 상세 */
 .drug-hero{display:flex;flex-direction:column;gap:6px}
@@ -486,6 +512,7 @@ nav.tabbar button.on svg.i{stroke-width:2.2}
 .buy-item .bi-t{min-width:0}
 .buy-item .bi-t b{font-size:1.0625rem;font-weight:700;line-height:1.3;display:block;overflow-wrap:anywhere}
 .buy-item .bi-t small{display:block;color:var(--muted);font-size:.8125rem;margin-top:2px;overflow-wrap:anywhere}
+.buy-item .bi-t small.opt-t{color:var(--caution);font-weight:700}
 .buy-item .bi-r{display:flex;align-items:center;gap:4px}
 .buy-item .bi-r svg.i{color:var(--faint);width:18px;height:18px;transition:transform .2s}
 .buy-item.open .bi-r svg.i{transform:rotate(90deg)}
@@ -509,6 +536,8 @@ nav.tabbar button.on svg.i{stroke-width:2.2}
 .show-list b{display:block;font-size:1.25rem;font-weight:800;line-height:1.3;overflow-wrap:anywhere}
 .show-list small{display:block;color:var(--muted);font-size:.875rem;margin-top:2px}
 .show-ask{margin-top:12px;padding-top:12px;border-top:1px dashed var(--hairline);font-size:1rem;font-weight:600;color:var(--body);line-height:1.6}
+.show-ach{display:flex;align-items:flex-start;gap:8px;margin-top:10px;padding:10px 12px;border-radius:10px;background:var(--caution-tint);color:var(--caution);font-size:.9375rem;font-weight:600;line-height:1.5}
+.show-ach svg.i{flex:none;margin-top:2px}
 /* 권한 약 판정 카드 */
 .vd{background:var(--card);border:1px solid var(--hairline);border-radius:var(--r-card);padding:var(--s4);box-shadow:var(--shadow-card)}
 .vd+.vd{margin-top:var(--s3)}
@@ -724,16 +753,83 @@ const careCards = c => c ? `
   ${c.clinic?.length ? `<div class="care clinic"><div class="hd">${I.clock}이럴 땐 병원 진료를 받으세요</div><div class="bd">${list(c.clinic)}</div></div>` : ''}
   ${c.er?.length ? `<div class="care er"><div class="hd">${I.alert}지금 바로 응급실·119</div><div class="bd">${list(c.er)}<a class="call" href="tel:119">${I.alert} 119 전화</a></div></div>` : ''}` : '';
 /* 내 약통: 지금 먹는 약과 겹치는 성분 */
+/* 한 조합 안에서 같은 제품 하나로 두 자리가 채워지면 두 번 사서 겹쳐 드시게 된다 */
+const prodKey = n => String(n || '').replace(/\s*(내복액|현탁액|연질캡슐|캡슐|정제|정|액|시럽|과립|산|겔|크림|연고|패치|파프)\s*$/, '').replace(/\s+/g, '').trim();
+function sameProductWarn(bk){
+  const seen = new Map(); const out = [];
+  for (const x of bk) {
+    const n = prodKey(prodName(x.product)); if (!n) continue;
+    if (seen.has(n)) out.push(`‘${seen.get(n).slot}’과 ‘${x.slot}’ — 이 두 자리는 **${prodName(x.product)}** 하나로 함께 채워집니다. **두 개를 따로 사서 같이 드시면 성분이 겹쳐요.** 하나만 사세요.`);
+    else seen.set(n, x);
+  }
+  return out;
+}
 function dupCheck(optionIds){
   const taking = takingItems().map(x => x.d || (x.pub?.ingr ? { id: 'pub', name: x.name, contains: [drugByIngr(x.pub.ingr)?.id].filter(Boolean), class: drugByIngr(x.pub.ingr)?.class } : null)).filter(Boolean); if (!taking.length) return [];
   const out = [];
-  optionIds.forEach(oid => { const o = drug(oid); if (!o) return; taking.forEach(t => {
+  /* 약 하나에 대해 한 줄로 묶는다 — 성분마다 경고를 띄우면 빨간 상자가 다섯 개가 된다 */
+  taking.forEach(t => {
     const ingr = [t.id, ...(t.contains || [])];
-    if (t.id === oid) out.push(`**${t.name}**은(는) 이미 드시고 있어요. 같은 성분을 다시 사거나 겹쳐 드시지 마세요.`);
-    else if (ingr.includes(oid)) out.push(`지금 드시는 **${t.name}**에 이미 ${o.name} 성분이 들어 있어요. 따로 더 드시면 중복돼요.`);
-    else if (o.class === 'nsaid' && (t.class === 'nsaid' || (t.contains || []).some(x => drug(x)?.class === 'nsaid'))) out.push(`지금 드시는 **${t.name}**도 소염진통제(NSAID) 계열이에요. ${o.name}과 겹쳐 먹지 마세요 — 소염제는 한 번에 한 가지.`);
-  }); });
+    const opts = [...new Set(optionIds)].map(drug).filter(Boolean);
+    if (opts.some(o => o.id === t.id)) {
+      out.push(`**${t.name}** — 이미 드시고 계세요. 같은 것을 또 사지 마세요.`);
+    } else {
+      const inside = opts.filter(o => ingr.includes(o.id));
+      if (inside.length) out.push(`지금 드시는 **${t.name}** 한 가지에 이미 ${inside.map(o => ingrName(o)).join(' · ')}${inside.length > 1 ? ' 성분이 모두' : ' 성분이'} 들어 있어요. 따로 더 사시면 겹쳐요.`);
+    }
+    const mineNsaid = t.class === 'nsaid' || (t.contains || []).some(x => drug(x)?.class === 'nsaid');
+    const newNsaid = opts.filter(o => o.class === 'nsaid' && o.id !== t.id && !ingr.includes(o.id));
+    if (mineNsaid && newNsaid.length) out.push(`지금 드시는 **${t.name}**도 소염진통제 계열이에요. ${newNsaid.map(o => ingrName(o)).join('·')}과(와) 겹쳐 드시지 마세요 — 소염제는 한 번에 한 가지.`);
+  });
   return [...new Set(out)];
+}
+/* ───────── 항콜린 부담 ─────────
+   1세대 항히스타민제·멀미약·방광약처럼 입마름·변비·어지럼·기억력 부담을 주는 성분이
+   내 약통과 이번 추천에 몇 개나 겹쳐 있는지 합산한다. 점수는 판정이 아니라 상의할 거리. */
+const ACH_WORD = ['', '약함', '중간', '강함'];
+function achAdd(map, d, from){
+  if (!d || !d.ach) return;
+  const cur = map.get(d.id);
+  if (cur) { if (!cur.from.includes(from)) cur.from.push(from); return; }
+  map.set(d.id, { d, from: [from] });
+}
+function achList(extra){
+  const map = new Map();
+  for (const x of takingItems()) achAdd(map, x.d, '내 약통');
+  for (const d of (extra || [])) achAdd(map, d, '이번 추천');
+  return [...map.values()].sort((a, b) => b.d.ach - a.d.ach);
+}
+const achScore = items => items.reduce((n, x) => n + x.d.ach, 0);
+/* 0~2 안심 · 3~5 확인 · 6+ 주의 */
+function achLevel(n){ return n >= 6 ? 'stop' : n >= 3 ? 'warn' : 'ok'; }
+function achPanel(extra, opts){
+  opts = opts || {};
+  const items = achList(extra), n = achScore(items), lv = achLevel(n);
+  if (!opts.always && (lv === 'ok' || !items.length)) return '';
+  if (!items.length) return `<div class="ach ok"><div class="ach-h">${I.check}<b>항콜린 부담 없음</b><span class="ach-n">0점</span></div>
+    <p class="ach-w">등록하신 약 중에 입마름·변비·기억력에 부담을 주는 성분은 없어요.</p></div>`;
+  const head = lv === 'stop' ? '항콜린 성분이 많이 겹쳤어요' : lv === 'warn' ? '항콜린 성분이 겹쳐 있어요' : '항콜린 부담 낮음';
+  const why = opts.compact
+    ? `입마름·변비·어지럼을 만드는 성분이 <b>${items.length}가지</b> 겹쳐 있어요.`
+    : lv === 'ok'
+    ? '지금은 부담이 크지 않아요. 여기에 감기약·수면유도제·멀미약을 더하면 금세 올라갑니다.'
+    : `이런 성분은 <b>입마름·변비·어지럼·소변이 잘 안 나오는 것</b>을 만들고, 나이가 드신 분이 여러 해 겹쳐 쓰면 <b>기억력에도 부담</b>이 쌓입니다. ${ME.age === 'senior' ? '65세 이상이시라 특히 살펴볼 일이에요.' : ''}`;
+  return `<div class="ach ${lv}">
+    <div class="ach-h">${lv === 'ok' ? I.check : I.alert}<b>${esc(head)}</b><span class="ach-n">${n}점</span></div>
+    <p class="ach-w">${why}</p>
+    <ul class="ach-l">${items.map(x => `<li><a class="nm" href="#/drug/${x.d.id}">${esc(ingrName(x.d))}</a><span class="lv l${x.d.ach}">${esc(ACH_WORD[x.d.ach])}</span><small>${esc(x.from.join(' · '))}${x.d.achNote ? ' · ' + esc(x.d.achNote) : ''}</small></li>`).join('')}</ul>
+    ${items.filter(x => x.d.achAlt).length ? `<details class="ach-alt"><summary>부담을 줄이는 방법 보기${I.chev}</summary><div class="bd">${items.filter(x => x.d.achAlt).map(x => `<p><b>${esc(ingrName(x.d))}</b> — ${fmt(x.d.achAlt)}</p>`).join('')}</div></details>` : ''}
+    <p class="ach-ask">${I.cart}<span>약국에서 이렇게 물어보세요 — <b>“이 약들에 항콜린 성분이 겹치나요?”</b></span></p>
+    ${opts.compact ? '' : srcChips(['kiesel2018acb', 'naples2015acb'])}
+    ${opts.compact ? '' : '<p class="small muted" style="margin-top:8px">점수는 국제적으로 쓰이는 항콜린 부담 척도를 참고해 <b>등록된 성분만</b> 더한 값이에요. 척도마다 기준이 조금씩 달라 <b>판정이 아니라 상의할 거리</b>로 봐 주세요. 약을 스스로 끊지 마세요.</p>'}
+  </div>`;
+}
+/* 약국 카드용 한 줄 — 약사님이 읽으실 문장 */
+function achLine(extra){
+  const items = achList(extra), n = achScore(items);
+  const big = items.filter(x => x.d.ach >= 2);
+  if (achLevel(n) === 'ok' || !big.length) return '';
+  return `<p class="show-ach">${I.alert}<span>항콜린 성분이 겹칩니다 — <b>${big.slice(0, 4).map(x => esc(ingrName(x.d))).join(', ')}</b>${big.length > 4 ? ` 외 ${big.length - 4}가지` : ''}. 부담이 덜한 것으로 바꿀 수 있을지 봐 주세요.</span></p>`;
 }
 const pimg = name => D.productImages?.[name]?.img || '';
 const imgTag = (src, cls, alt) => src ? `<img class="${cls}" src="${esc(src)}" alt="${esc(alt || '')}" loading="lazy" onerror="this.closest('.has-img')?.classList.remove('has-img');this.closest('.drug-photo')?.remove();this.remove()">` : '';
@@ -836,7 +932,13 @@ function basket(s){
     const bad = x => drug(x)?.avoid?.some(a => a.flags?.some(fl => f.includes(fl)));
     let swapped = false;
     if (d && bad(pick)) { const alt = p.options.find(o => !bad(o) && drug(o)?.rx !== '전문'); if (alt) { pick = alt; d = drug(alt); swapped = true; } }
-    return { slot: p.slot, d, optional: !!p.optional, swapped, blocked: d ? bad(pick) : false, product: d?.products?.[0]?.name };
+    /* 65세 이상이면 같은 자리에서 항콜린 부담이 낮은 쪽을 먼저 권한다 */
+    if (ME.age === 'senior' && (d?.ach || 0) >= 2) {
+      const soft = p.options.find(o => { const x = drug(o); return x && !bad(o) && x.rx !== '전문' && (x.ach || 0) < d.ach; });
+      if (soft) { pick = soft; d = drug(soft); swapped = 'ach'; }
+    }
+    const achWarn = ME.age === 'senior' && (d?.ach || 0) >= 3;
+    return { slot: p.slot, d, optional: !!p.optional, swapped, achWarn, blocked: d ? bad(pick) : false, product: d?.products?.[0]?.name };
   }).filter(x => x.d);
 }
 function memoText(s){
@@ -883,13 +985,18 @@ function prodName(p){
 function buyItem(x){
   const open = OPEN_BUY === x.d.id;
   const prod = prodName(x.product);
-  const title = prod || x.d.name;                       /* 제품이 없으면 성분명을 크게 */
   const ing = ingrName(x.d);
-  const sub = prod && ing !== prod ? ing : '';                /* 성분명은 아래 작게, 제품명과 같으면 생략 */
-  const badge = x.blocked ? '<span class="badge stop">약사와 상의</span>' : x.swapped ? '<span class="badge warn">조건에 맞춰 바꿈</span>' : '';
+  /* 단일제가 없고 복합제 안에만 있는 성분은 제품명을 앞세우지 않는다 — 종합감기약을 두 번 사게 된다 */
+  const title = x.d.combo ? ing : (prod || x.d.name);
+  const sub = x.d.combo ? '이 성분이 든 제품: ' + prodNames(x.d, 2).join(' · ')
+    : (prod && ing !== prod ? ing : '');
+  const badge = x.blocked ? '<span class="badge stop">약사와 상의</span>'
+    : x.swapped === 'ach' ? '<span class="badge warn">부담 적은 쪽으로 바꿈</span>'
+    : x.swapped ? '<span class="badge warn">조건에 맞춰 바꿈</span>'
+    : x.achWarn ? '<span class="badge warn">어르신 주의 · 짧게만</span>' : '';
   return `<button class="buy-item ${x.optional ? 'opt' : ''} ${pimg(x.product) ? 'has-img' : ''} ${open ? 'open' : ''}" onclick="OPEN_BUY=OPEN_BUY==='${x.d.id}'?'':'${x.d.id}';route()" aria-expanded="${open}">
     <span class="k">${esc(x.slot)}</span>${imgTag(pimg(x.product), 'pimg', x.product)}
-    <span class="bi-t"><b>${esc(title)}</b><small>${sub ? esc(sub) : ''}${x.optional ? (sub ? ' · ' : '') + '필요할 때만' : ''}</small>${badge}</span>
+    <span class="bi-t"><b>${esc(title)}</b>${sub ? `<small>${esc(sub)}</small>` : ''}${x.optional ? '<small class="opt-t">필요할 때만</small>' : ''}${badge}</span>
     <span class="bi-r"><span class="badge ${x.d.rx === '안전상비' ? 'cvs' : 'otc'} rx">${x.d.rx === '안전상비' ? '편의점' : '약국'}</span>${I.chev}</span></button>
   ${open ? `<div class="buy-more"><div class="how">${esc(x.d.simple || ((x.d.dose?.adult || '') + (x.d.dose?.interval ? ' · ' + x.d.dose.interval : '')))}<small>${x.d.dose?.max ? '하루 최대 ' + esc(x.d.dose.max) : ''}</small></div>
     ${x.blocked ? `<div class="note" style="margin-top:8px">${I.alert}<span>내 조건(${activeFlags().map(f => FLAG_LABEL[f]).join(', ')})에서는 주의가 필요해요. 약사에게 조건을 말하고 고르세요.</span></div>` : ''}
@@ -950,7 +1057,8 @@ function vSymptom(id){
     ${clinic.length ? `<button class="gate" onclick="openCare()">${I.alert}<span class="lb">병원은</span><span class="tx">${esc(short(clinic[0], 34))} — 자세히 보기</span>${I.chev}</button>` : ''}
     <div class="memo-actions" style="display:flex;gap:8px"><button class="btn" style="flex:1" onclick="go('/show/${s.id}')">${I.cart} 약국에서 보여드리기</button></div>
     <div class="actions" style="margin-top:8px"><button class="btn line" onclick="go('/check/${s.id}')">${I.shield} 약사님이 다른 걸 권했어요</button></div>
-    ${dups.length ? dups.map(t => `<div class="dup">${I.alert}<span>${fmt(t)}</span></div>`).join('') : ''}
+    ${[...dups, ...sameProductWarn(bk)].map(t => `<div class="dup">${I.alert}<span>${fmt(t)}</span></div>`).join('')}
+    ${achPanel(bk.map(x => x.d), { compact:true })}
   </section>
   <p style="margin-top:16px">${fmt(s.lead)}</p>
   <section class="sec">
@@ -1150,8 +1258,9 @@ function vDrug(id){
   const pub = (PUB.index || []).filter(p => p.map.includes(d.id));
   const pubHtml = pub.length ? `<h3 style="margin-top:20px">식약처 등록 제품 <small class="muted" style="font-weight:500">${pub.length}개 · e약은요 공공데이터${pub.length > 30 ? ' · 30개만 표시' : ''}</small></h3><div class="rows">${pub.slice(0, 30).map(p => `<button class="row" onclick="go('/pub/${p.id}')">${p.img ? `<img class="pillimg" src="${esc(p.img)}" alt="" loading="lazy" onerror="this.style.visibility='hidden'">` : ''}<div class="body"><b>${esc(p.n)}</b><span>${esc(p.m)}${p.map.length > 1 ? ' · 복합제(' + p.map.length + '성분)' : ''}</span></div>${p.cvs ? '<span class="badge cvs">편의점</span>' : ''}${I.chev}</button>`).join('')}</div>` : (PUB.index ? '' : '<p class="loading">식약처 제품 목록을 불러오는 중…</p>');
   return `${topBar({ back:'약 사전' })}
-  <div class="drug-hero">${c ? `<a class="cls link" href="#/class/${c.id}">${esc(c.name)} ›</a>` : ''}<h1>${esc(d.name)}</h1><div class="en">${esc(d.en || '')} ${badge(d.rx)}</div></div>
+  <div class="drug-hero">${c ? `<a class="cls link" href="#/class/${c.id}">${esc(c.name)} ›</a>` : ''}<h1>${esc(d.name)}</h1><div class="en">${esc(d.en || '')} ${badge(d.rx)}${d.ach ? `<span class="badge ${d.ach >= 3 ? 'stop' : d.ach === 2 ? 'warn' : ''}" style="margin-left:4px">항콜린 ${esc(ACH_WORD[d.ach])}</span>` : ''}</div></div>
   ${d.useNote ? `<div class="usebar">${I.alert}<span>${fmt(d.useNote)}</span></div>` : ''}
+  ${d.ach ? `<div class="usebar" style="${d.ach >= 2 ? '' : 'background:var(--tint2);color:var(--body)'}">${d.ach >= 2 ? I.alert : I.info}<span><b>항콜린 부담 ${esc(ACH_WORD[d.ach])}</b> — ${esc(d.achNote || '')}${d.achAlt ? '<br>' + fmt(d.achAlt) : ''}</span></div>` : ''}
   <p style="margin-top:10px">${fmt(d.lead || '')}</p>
   ${picts(d.pict)}
   ${(() => { const pr = (d.products || []).find(x => pimg(x.name)); return pr ? `<div class="drug-photo">${imgTag(pimg(pr.name), '', pr.name)}<div><b>${esc(pr.name)}</b><small>${esc(pr.maker || '')} · ${esc(pr.amount || '')}</small><small style="display:block;margin-top:2px">사진: 식약처·약학정보원 낱알식별</small></div></div>` : ''; })()}
@@ -1398,9 +1507,10 @@ function vShow(sid){
     <div class="show-head">${esc(s.name)}${f.length ? ` · ${f.map(k => esc(FLAG_LABEL[k])).join(' · ')}` : ''}</div>
     <ol class="show-list">${bk.map((x, i) => {
       const prod = prodName(x.product);
-      return `<li><span class="n">${i + 1}</span><div><b>${esc(prod || ingrName(x.d))}</b><small>${prod ? '성분: ' + esc(ingrName(x.d)) : ''}</small>${(() => { const alt = prodNames(x.d).filter(n => n !== prod).slice(0, 3); return alt.length ? `<small class="alt">또는 ${alt.map(esc).join(' · ')}</small>` : ''; })()}${x.optional ? '<span class="badge warn" style="margin-top:4px">필요할 때만</span>' : ''}</div><span class="badge ${x.d.rx === '안전상비' ? 'cvs' : 'otc'}">${x.d.rx === '안전상비' ? '편의점' : '약국'}</span></li>`;
+      return `<li><span class="n">${i + 1}</span><div><b>${esc(x.d.combo ? ingrName(x.d) : (prod || ingrName(x.d)))}</b><small>${x.d.combo ? '이 성분이 든 종합감기약이면 됩니다' : (prod && ingrName(x.d) !== prod ? '성분: ' + esc(ingrName(x.d)) : '')}</small>${(() => { const alt = prodNames(x.d).filter(n => n !== prod).slice(0, 3); return alt.length ? `<small class="alt">또는 ${alt.map(esc).join(' · ')}</small>` : ''; })()}${x.optional ? '<span class="badge warn" style="margin-top:4px">필요할 때만</span>' : ''}</div><span class="badge ${x.d.rx === '안전상비' ? 'cvs' : 'otc'}">${x.d.rx === '안전상비' ? '편의점' : '약국'}</span></li>`;
     }).join('')}</ol>
     <p class="show-ask">같은 성분이면 다른 제품도 괜찮습니다.<br>겹치는 성분이 없게 부탁드립니다.</p>
+    ${achLine(bk.map(x => x.d))}
   </div>
   ${f.length ? `<div class="note" style="margin-top:12px">${I.alert}<span>제 상태를 꼭 말씀드리세요 — <b>${f.map(k => esc(FLAG_LABEL[k])).join(', ')}</b></span></div>` : ''}
   <div class="actions"><button class="btn line" onclick="go('/check/${s.id}')">${I.shield} 다른 걸 권하시면 여기서 확인</button><button class="btn ghost" onclick="shareMemo('${s.id}')">${I.cart} 메모로 복사·전송</button></div>
@@ -1579,6 +1689,7 @@ function vMe(){
     <div class="actions" style="display:flex;gap:8px"><button class="btn ghost" style="flex:1" onclick="go('/photo')">${I.eye} 사진으로 등록</button><button class="btn ghost" style="flex:1" onclick="go('/pill')">${I.search} 알약으로 찾기</button></div>
     <div class="search" style="margin-top:12px">${I.search}<input id="mq" placeholder="약 이름으로 찾아 등록 (예: 타이레놀)" value="${esc(MQ)}" autocomplete="off"></div>
     ${MQ.trim() ? `<div class="card rows" style="margin-top:8px">${(search(MQ.trim()).filter(h => h.h.startsWith('/drug/')).slice(0, 6).map(h => { const id = h.h.slice(6); const on = (ME.taking || []).includes(id); return `<button class="row" onclick="${on ? '' : `toggleTaking('${id}');`}MQ='';route()"><div class="ic">${I.pill}</div><div class="body"><b>${esc(h.t)}</b><span>${on ? '이미 등록돼 있어요' : '눌러서 내 약통에 담기'}</span></div>${I.chev}</button>`; }).join('')) || '<div class="empty">찾는 약이 없어요</div>'}</div>` : ''}
+    ${achPanel([], { always:true })}
     <div class="actions"><button class="btn ghost" onclick="go('/schedule')">${I.clock} 복용 시간 알림 만들기</button></div>
   </section>
   <section class="sec card"><h2>알아두면 좋은 것</h2><p class="small" style="margin-top:6px">상품명과 성분명, 해열제는 치료가 아니라는 것, 소염제는 한 가지만 — 짧은 건강정보 ${(D.tips || []).length}가지.</p><div class="actions"><button class="btn ghost" onclick="go('/tips')">${I.info} 읽어 보기</button></div></section>
