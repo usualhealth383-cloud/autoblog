@@ -490,6 +490,8 @@ nav.tabbar button.on svg.i{stroke-width:2.2}
 .buy-item .bi-r svg.i{color:var(--faint);width:18px;height:18px;transition:transform .2s}
 .buy-item.open .bi-r svg.i{transform:rotate(90deg)}
 .buy-item .badge.stop,.buy-item .badge.warn{margin-top:4px;display:inline-flex}
+.buy-item.do{cursor:default;background:var(--tint2)}
+.buy-item.do .bi-r{opacity:.85}
 /* 병원 가야 할 때 — 한 줄, 자세히는 눌러서 */
 .gate{display:flex;align-items:center;gap:10px;width:100%;text-align:left;margin-top:12px;padding:12px 14px;border-radius:12px;background:var(--alert-tint);min-height:52px}
 .gate .lb{font-weight:800;color:var(--alert);font-size:.8125rem;flex:none}
@@ -616,7 +618,8 @@ const PUB = { index:null, pills:null, chunks:{}, err:false };
 const pubFailed = () => PUB.err && !(PUB.pills || []).length;
 function pubRetry(){ PUB.err = false; PUB.pills = null; PUB.rx = null; PUB.index = null; PUB.chunks = {}; route(); }
 async function loadJSON(name){ const r = await fetch('data/' + name, { cache:'force-cache' }); if (!r.ok) throw new Error(name); return r.json(); }
-async function pubIndex(){ if (!PUB.index) { try { PUB.index = await loadJSON('easy-index.json'); } catch (e) { PUB.index = []; PUB.err = true; } } return PUB.index; }
+async function pubIndex(){ if (!PUB.index && window.__EASY__) PUB.index = window.__EASY__;   /* 미리보기용 내장 자료 */
+  if (!PUB.index) { try { PUB.index = await loadJSON('easy-index.json'); } catch (e) { PUB.index = []; PUB.err = true; } } return PUB.index; }
 const IMG_PREFIX = 'https://nedrug.mfds.go.kr/pbp/cmn/itemImageDownload/';
 const pillImg = p => p?.img ? (p.img.startsWith('http') ? p.img : IMG_PREFIX + p.img) : '';
 async function pubPills(){ if (!PUB.pills && window.__PILLS__) PUB.pills = window.__PILLS__;   /* 미리보기용 내장 자료 */
@@ -881,7 +884,8 @@ function buyItem(x){
   const open = OPEN_BUY === x.d.id;
   const prod = prodName(x.product);
   const title = prod || x.d.name;                       /* 제품이 없으면 성분명을 크게 */
-  const sub = prod ? ingrName(x.d) : '';                     /* 성분명은 아래 작게 */
+  const ing = ingrName(x.d);
+  const sub = prod && ing !== prod ? ing : '';                /* 성분명은 아래 작게, 제품명과 같으면 생략 */
   const badge = x.blocked ? '<span class="badge stop">약사와 상의</span>' : x.swapped ? '<span class="badge warn">조건에 맞춰 바꿈</span>' : '';
   return `<button class="buy-item ${x.optional ? 'opt' : ''} ${pimg(x.product) ? 'has-img' : ''} ${open ? 'open' : ''}" onclick="OPEN_BUY=OPEN_BUY==='${x.d.id}'?'':'${x.d.id}';route()" aria-expanded="${open}">
     <span class="k">${esc(x.slot)}</span>${imgTag(pimg(x.product), 'pimg', x.product)}
@@ -892,6 +896,23 @@ function buyItem(x){
     ${x.d.pict?.length ? picts(x.d.pict) : ''}
     ${prodChips(x.d)}
     <div class="links">${prodLinks(x.d, x.product)}</div></div>` : ''}`;
+}
+/* 약이 아닌 슬롯(운동·생활습관·진료)도 답 카드에 같이 보여준다 */
+const plainTxt = t => String(t || '').replace(/\*\*(.+?)\*\*/g, '$1').replace(/\[\[\w+:[\w-]+\|([^\]]+)\]\]/g, '$1');
+function doItem(p){
+  return `<div class="buy-item do"><span class="k">${esc(p.slot)}</span>
+    <span class="bi-t"><b>${esc(p.title || p.slot)}</b><small>${esc(short(plainTxt(p.why), 44))}</small></span>
+    <span class="bi-r"><span class="badge cvs rx">약 없이</span></span></div>`;
+}
+/* 답 카드 줄 = 계획 순서대로, 약이 있으면 buyItem, 없으면 doItem */
+function planRows(s){
+  const bk = basket(s); const out = [];
+  for (const p of (s.plan || [])) {
+    if (p.otc === false) continue;
+    if ((p.options || []).length) { const x = bk.find(b => b.slot === p.slot); if (x) out.push(buyItem(x)); }
+    else out.push(doItem(p));
+  }
+  return out.join('');
 }
 function kidLine(){
   if (ME.age !== 'child') return '';
@@ -910,7 +931,7 @@ function vSymptom(id){
   const slotHtml = (p, i) => {
     const kind = p.otc === false ? 'rx' : (p.optional ? 'opt' : '');
     return `<div class="slot"><div class="n ${kind}">${esc(p.slot)}</div><div>
-      <h3>${esc(p.title || p.slot)} ${p.otc === false ? '<span class="badge rx">처방 필요</span>' : p.optional ? '<span class="badge warn">필요할 때만</span>' : '<span class="badge otc">약국 구입</span>'}</h3>
+      <h3>${esc(p.title || p.slot)} ${p.otc === false ? '<span class="badge rx">처방 필요</span>' : !(p.options || []).length ? '<span class="badge cvs">약 없이 할 일</span>' : p.optional ? '<span class="badge warn">필요할 때만</span>' : '<span class="badge otc">약국 구입</span>'}</h3>
       <p class="why">${fmt(p.why)}</p>
       <div class="opts">${(p.options || []).map(oid => { const d = drug(oid); if (!d) return ''; const warn = d.avoid?.some(a => a.flags?.some(x => f.includes(x))); return `<a class="opt-pill ${p.pick === oid ? 'pick' : ''}" href="#/drug/${oid}">${p.pick === oid ? '<span class="dot"></span>' : ''}${esc(d.name)}${warn ? ' <span class="badge stop">내 정보 주의</span>' : ''}</a>`; }).join('')}</div>
       ${p.alt ? `<p class="alt">${fmt(p.alt)}</p>` : ''}
@@ -923,7 +944,7 @@ function vSymptom(id){
   ${fitChips(s)}
   <section class="sec answer" aria-label="바로 답">
     <div class="eyebrow">이렇게 사시면 돼요 <span class="muted" style="font-weight:500;letter-spacing:0;text-transform:none">· 누르면 드시는 법</span></div>
-    <div class="buy">${bk.map(buyItem).join('')}</div>
+    <div class="buy">${planRows(s)}</div>
     ${s.plan?.some(p => p.otc === false) ? `<div class="rxline">${I.info}${esc(s.plan.filter(p => p.otc === false).map(p => ingrName(drug(p.options?.[0])) || String(p.title || p.slot).split('—').pop().replace(/\(처방\)/g, '').trim()).join(' · '))} — 병원 처방이 필요해요</div>` : ''}
     ${kidLine()}
     ${clinic.length ? `<button class="gate" onclick="openCare()">${I.alert}<span class="lb">병원은</span><span class="tx">${esc(short(clinic[0], 34))} — 자세히 보기</span>${I.chev}</button>` : ''}
@@ -1095,7 +1116,7 @@ function vGuide(step, q){
   ${art('guide-3-take', 'spot')}
   <section class="sec answer" style="margin-top:12px">
     <div class="eyebrow">약을 누르면 복용법이 나와요</div>
-    <div class="buy">${bk.map(buyItem).join('')}</div>
+    <div class="buy">${planRows(s)}</div>
     ${kidLine()}
     <div class="memo-actions"><button class="btn" onclick="shareMemo('${s.id}')">${I.cart} 약국에 보여줄 메모 만들기</button></div>
   </section>
