@@ -134,13 +134,13 @@ figcaption{font-size:11.5px;color:var(--u-dark);font-weight:700;margin-top:7px;p
 button.blank{display:inline-block;min-width:52px;text-align:center;border:none;
   border-bottom:2px solid var(--u);background:var(--u-soft);color:var(--u);
   font-weight:800;font-family:var(--sans);font-size:13px;
-  padding:1px 7px;border-radius:5px 5px 0 0;cursor:pointer;font-feature-settings:normal}
+  padding:3px 8px;border-radius:5px 5px 0 0;cursor:pointer;font-feature-settings:normal}
 button.blank.open{background:transparent;color:var(--u-dark)}
 
 /* 부속 카드 */
 .sec{background:var(--card);border:1px solid var(--hair);border-radius:15px;padding:15px 17px;margin-bottom:13px}
 .sec h2{font-size:12px;font-weight:900;letter-spacing:.11em;color:var(--u);margin-bottom:11px;display:flex;justify-content:space-between;align-items:center}
-.sec h2 .more{font-size:11px;font-weight:800;color:var(--muted);background:none;border:none;cursor:pointer;letter-spacing:0}
+.sec h2 .more{font-size:11px;font-weight:800;color:var(--muted);background:none;border:none;cursor:pointer;letter-spacing:0;min-height:36px;min-width:36px;padding:0 8px}
 .terms dt{font-size:13px;font-weight:800;color:var(--u-dark);margin-bottom:3px}
 .terms dd{font-size:13px;color:var(--body);line-height:1.72;padding-bottom:11px;margin-bottom:11px;border-bottom:1px solid var(--hair)}
 .terms dd:last-child{border:none;padding-bottom:0;margin-bottom:0}
@@ -304,8 +304,8 @@ select.sel{font-family:inherit;font-size:14px;font-weight:700;color:var(--u);bac
 .auth input,.auth select{width:100%;border:1.5px solid var(--line);border-radius:12px;padding:13px 14px;font-size:15px;font-family:inherit;background:var(--card);color:var(--ink)}
 .auth input:focus,.auth select:focus{outline:2px solid var(--brand);outline-offset:-2px}
 .auth .err{font-size:12.5px;color:var(--no);font-weight:600;margin:-4px 0 10px}
-.auth .links{display:flex;justify-content:center;gap:18px;font-size:13px;color:var(--muted);margin-top:4px}
-.auth .links button{background:none;border:none;color:var(--muted);font-size:13px;cursor:pointer;text-decoration:underline}
+.auth .links{display:flex;justify-content:center;gap:10px;font-size:13px;color:var(--muted);margin-top:0}
+.auth .links button{background:none;border:none;color:var(--muted);font-size:13px;cursor:pointer;text-decoration:underline;min-height:44px;padding:0 6px}
 .auth .roles{display:flex;flex-direction:column;gap:7px;margin-bottom:14px}
 .auth .roles button{display:flex;align-items:center;gap:11px;width:100%;border:1.5px solid var(--line);background:var(--card);border-radius:14px;padding:13px 15px;font-size:14.5px;font-weight:800;color:var(--ink);cursor:pointer;text-align:left;line-height:1.4;min-height:56px}
 .auth .roles button .ri{flex:0 0 34px;height:34px;border-radius:11px;background:var(--ground);display:grid;place-items:center;color:var(--muted)}
@@ -315,8 +315,8 @@ select.sel{font-family:inherit;font-size:14px;font-weight:700;color:var(--u);bac
 .auth .roles button.on{border-color:var(--brand);background:var(--brand-soft)}
 .auth .roles button.on .ri{background:var(--brand);color:#fff}
 .auth .roles button.on small{color:var(--brand-dark)}
-.auth label.agree{display:flex;gap:8px;align-items:flex-start;font-size:12.5px;color:var(--body);line-height:1.6;margin-bottom:14px}
-.auth label.agree input{width:auto;margin-top:4px}
+.auth label.agree{display:flex;gap:10px;align-items:center;font-size:12.5px;color:var(--body);line-height:1.6;margin-bottom:14px;min-height:44px;cursor:pointer}
+.auth label.agree input{width:24px;height:24px;flex:0 0 auto;margin:0;accent-color:var(--brand);cursor:pointer}
 .auth label.agree u{cursor:pointer;color:var(--brand)}
 .auth .fine{padding-top:10px}
 .auth .hero{width:100%;height:auto;display:block;margin:0 0 18px;border-radius:20px}
@@ -1114,17 +1114,25 @@ function renderAuth(){
         ${[['student','학생','매일 한 개념 · 문제 은행 · 출석'],['parent','보호자','자녀의 출석·진도·공지 보기'],['owner','원장·선생님','수강생 코드·출석·공지 관리']].map(([r,l,d])=>`<button data-role="${r}" class="${signRole===r?'on':''}"><span class="ri"><svg viewBox="0 0 24 24">${ROLE_IC[r]}</svg></span><span class="rt">${l}<small>${d}</small></span></button>`).join('')}
       </div>
       <div class="f">
-        <input id="suName" placeholder="이름${signRole==='parent'?' (보호자 성함)':''}" autocomplete="name"${val('suName')}>
-        <input id="suEmail" type="email" placeholder="이메일" autocomplete="username" inputmode="email"${val('suEmail')}>
-        <input id="suPw" type="password" placeholder="비밀번호 (6자 이상)" autocomplete="new-password"${val('suPw')}>
+        <div class="fld"><label class="lab" for="suName">이름${signRole==='parent'?' (보호자 성함)':''}</label>
+          <input id="suName" placeholder="${signRole==='parent'?'보호자 성함':'실명'}" autocomplete="name"${val('suName')}></div>
+        <div class="fld"><label class="lab" for="suEmail">이메일</label>
+          <input id="suEmail" type="email" placeholder="name@example.com" autocomplete="username" inputmode="email"${val('suEmail')}></div>
+        <div class="fld"><label class="lab" for="suPw">비밀번호</label>
+          <input id="suPw" type="password" placeholder="6자 이상" autocomplete="new-password"${val('suPw')}></div>
       </div>
       <span class="lab grp">선택 — 나중에 내 정보에서도 넣을 수 있어요</span>
       <div class="f">
-        <input id="suPhone" placeholder="연락처 (공지 문자를 받습니다)" inputmode="tel" autocomplete="tel"${val('suPhone')}>
-        ${signRole==='student' ? `<input id="suCode" class="code-in" placeholder="학원 코드 6자리 (있으면)" maxlength="6" autocapitalize="characters" autocomplete="off" ${val('suCode')}>
-        <select id="suAge"><option value="14+" ${K.suAge!=='u14'?'selected':''}>만 14세 이상입니다</option><option value="u14" ${K.suAge==='u14'?'selected':''}>만 14세 미만입니다 (보호자 동의 필요)</option></select>
-        ${K.suAge==='u14' ? `<input id="suGName" placeholder="보호자 성명"${val('suGName')}><input id="suGPhone" placeholder="보호자 연락처" inputmode="tel"${val('suGPhone')}>` : ''}` : ''}
-        ${signRole==='parent' ? `<input id="suChild" class="code-in" placeholder="자녀의 학원 코드 6자리 (있으면)" maxlength="6" autocapitalize="characters" autocomplete="off" ${val('suChild')}>` : ''}
+        <div class="fld"><label class="lab" for="suPhone">연락처</label>
+          <input id="suPhone" placeholder="공지 문자를 받습니다" inputmode="tel" autocomplete="tel"${val('suPhone')}></div>
+        ${signRole==='student' ? `<div class="fld"><label class="lab" for="suCode">학원 코드 (있으면)</label>
+          <input id="suCode" class="code-in" placeholder="6자리" maxlength="6" autocapitalize="characters" autocomplete="off" ${val('suCode')}></div>
+        <div class="fld"><label class="lab" for="suAge">나이</label>
+        <select id="suAge"><option value="14+" ${K.suAge!=='u14'?'selected':''}>만 14세 이상입니다</option><option value="u14" ${K.suAge==='u14'?'selected':''}>만 14세 미만입니다 (보호자 동의 필요)</option></select></div>
+        ${K.suAge==='u14' ? `<div class="fld"><label class="lab" for="suGName">보호자 성명</label><input id="suGName"${val('suGName')}></div>
+        <div class="fld"><label class="lab" for="suGPhone">보호자 연락처</label><input id="suGPhone" inputmode="tel"${val('suGPhone')}></div>` : ''}` : ''}
+        ${signRole==='parent' ? `<div class="fld"><label class="lab" for="suChild">자녀의 학원 코드 (있으면)</label>
+          <input id="suChild" class="code-in" placeholder="6자리" maxlength="6" autocapitalize="characters" autocomplete="off" ${val('suChild')}></div>` : ''}
       </div>
       <label class="agree"><input type="checkbox" id="suAgree"${agree?' checked':''}><span><u data-legal="terms">이용약관</u>과 <u data-legal="privacy">개인정보처리방침</u>에 동의합니다.${K.suAge==='u14'?' 보호자로서 아동의 가입과 개인정보 처리에 동의합니다.':''}</span></label>
       ${err}
@@ -1266,7 +1274,7 @@ function renderList(){
   const hit = c => !q || [c.title, c.subtitle, c.lessonName, c.unitName, ...c.terms.map(t=>t.k)].some(t => (t||'').toLowerCase().includes(q));
   const pass = (c,i) => listF==='전체' ? true : listF==='공부함' ? S.done.includes(c.id) : listF==='북마크' ? S.bm.includes(c.id) : listF==='안 함' ? !S.done.includes(c.id) && isOpen(i) : true;
   let html = `<h1 class="h-page">교재</h1>
-    <div class="search"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg><input id="listQ" placeholder="개념·용어 검색 (예: 효소, 운동량)" value="${esc(listQ)}"></div>
+    <div class="search"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg><input id="listQ" aria-label="개념·용어 검색" placeholder="개념·용어 검색 (예: 효소, 운동량)" value="${esc(listQ)}"></div>
     <div class="chipbar">${['전체','안 함','공부함','북마크'].map(f=>`<button data-lf="${f}" class="${listF===f?'on':''}">${f}</button>`).join('')}</div>
     <p class="fine" style="text-align:left;padding:0 0 8px">${fullAccess() ? '전 범위가 열려 있습니다.' : `최근 ${FREE_DAYS}일치가 열려 있습니다. 학원 코드를 등록하거나 이용권을 등록하면 전 범위가 열립니다.`}</p>`;
   let unit='', book='', n=0;
@@ -1411,7 +1419,7 @@ async function renderTalk(){
   list = list.filter(x => !blocked(x));
   v.innerHTML = `<h1 class="h-page">이야기</h1>
     <div class="search"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
-      <input id="talkSearch" placeholder="글 검색 (예: 충격량, 오답)" value="${esc(talkQ)}"></div>
+      <input id="talkSearch" aria-label="이야기 글 검색" placeholder="글 검색 (예: 충격량, 오답)" value="${esc(talkQ)}"></div>
     <div class="chipbar">${['전체', ...Object.keys(BOARDS)].map(b=>`<button data-tb="${b}" class="${talkBoard===b?'on':''}">${b==='전체'?'전체':BOARDS[b]}</button>`).join('')}</div>
     <button class="btn" id="postNew">글쓰기</button>
     ${failed ? `<div class="loadfail"><p>글을 불러오지 못했습니다.<br>연결을 확인한 뒤 다시 시도해 주세요.</p><button class="btn soft" id="talkRetry" style="margin:0">다시 불러오기</button></div>` : ''}
@@ -1615,7 +1623,7 @@ function renderBank(){
     <div class="bank-top"><div class="tile"><div class="v">${BANK.length.toLocaleString()}</div><div class="l">전체 문항</div></div><div class="tile"><div class="v">${done}</div><div class="l">내가 푼 문항</div></div><div class="tile"><div class="v">${done?Math.round(right/done*100):0}<small>%</small></div><div class="l">정답률</div></div></div>
     <div class="pick"><span class="k">범위</span>${chips('book',['전체','1','2'], b => b==='전체' ? b : '통합과학 '+b)}
       ${chips('unit',['전체','I','II','III'])}
-      <select id="bankLesson"><option value="전체">소단원 전체${bankSel.unit!=='전체'||bankSel.book!=='전체'?' (선택한 범위)':''}</option>${ls.map(l=>`<option value="${l.id}" ${bankSel.lesson===l.id?'selected':''}>${esc(l.bookName)} ${l.unit}-${l.id.slice(2)} ${esc(l.name)}</option>`).join('')}</select></div>
+      <select id="bankLesson" aria-label="소단원 고르기"><option value="전체">소단원 전체${bankSel.unit!=='전체'||bankSel.book!=='전체'?' (선택한 범위)':''}</option>${ls.map(l=>`<option value="${l.id}" ${bankSel.lesson===l.id?'selected':''}>${esc(l.bookName)} ${l.unit}-${l.id.slice(2)} ${esc(l.name)}</option>`).join('')}</select></div>
     <div class="pick"><span class="k">유형</span>${chips('type',['전체','ox','blank','mc','multi','essay'], t => TYPE_NAME[t] || t)}</div>
     <div class="pick"><span class="k">문제 수 · 대상</span>${chips('n',[10,20,40], n => n+'문제')}${chips('only',['전체','안 푼','틀린'])}</div>
     <button class="btn" id="bankStart" ${pool.length?'':'disabled'}>${pool.length ? `${Math.min(bankSel.n,pool.length)}문제 시작 · 고를 수 있는 문항 ${pool.length}개` : '이 조건에 맞는 문항이 없습니다'}</button>
@@ -1775,7 +1783,7 @@ function renderMe(){
     <button class="setrow go" id="goStats"><span class="l">학습 통계<small>연속 학습 ${streak()}일 · 공부한 개념 ${S.done.length}/${CONCEPTS.length} · 정답률 ${S.stats.a?Math.round(S.stats.c/S.stats.a*100):0}%</small></span><span class="v">보기</span></button>
     <button class="setrow go" id="qKeepOpen"><span class="l">보관한 한 마디<small>${(S.qkeep||[]).length}개 · 오늘의 한 마디에서 담은 글</small></span><span class="v">보기</span></button>
     <div class="sec"><h2>설정</h2>
-      <div class="setrow"><span class="l">알림 받을 시각</span><select class="sel" id="notifyAt">${['07:00','12:00','18:00','21:00','안 받음'].map(v=>`<option ${v===S.notifyAt?'selected':''}>${v}</option>`).join('')}</select></div>
+      <div class="setrow"><span class="l">알림 받을 시각</span><select class="sel" id="notifyAt" aria-label="알림 받을 시각">${['07:00','12:00','18:00','21:00','안 받음'].map(v=>`<option ${v===S.notifyAt?'selected':''}>${v}</option>`).join('')}</select></div>
       <div class="setrow"><span class="l">글자 크기</span>${seg('fs',['작게','보통','크게'])}</div>
       <div class="setrow" style="border:none"><span class="l">화면 테마</span>${seg('theme',['시스템','밝게','어둡게'])}</div></div>
     ${ACC ? `<div class="sec"><h2>계정</h2>
