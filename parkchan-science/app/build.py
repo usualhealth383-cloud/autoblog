@@ -8,8 +8,9 @@ quizzes = json.loads((ROOT / 'data/quizzes.json').read_text(encoding='utf-8'))
 bank = json.loads((ROOT / 'data/bank.json').read_text(encoding='utf-8'))
 labs = json.loads((ROOT / 'data/labs.json').read_text(encoding='utf-8'))
 quotes = json.loads((ROOT / 'data/quotes.json').read_text(encoding='utf-8'))
-figs = [f'<div data-id="{c["id"]}">{(ROOT / "data" / c["figure"]["file"]).read_text(encoding="utf-8")}</div>'
-        for c in concepts if c.get('figure')]
+# 그림은 문서에 미리 그려 두지 않는다 — 필요할 때 만들도록 문자열로만 싣는다
+figs = {c['id']: (ROOT / 'data' / c['figure']['file']).read_text(encoding='utf-8')
+        for c in concepts if c.get('figure')}
 j = lambda o: json.dumps(o, ensure_ascii=False).replace('</', '<\\/')
 # 서버 연결값: app/server/config.json {"url": "...", "anonKey": "..."} 이 있으면 심고, 없으면 로컬 모드
 cfg_p = ROOT / 'app' / 'server' / 'config.json'
@@ -24,7 +25,7 @@ out = (shell.replace('<!--CONCEPTS-->', j(concepts))
             .replace('<!--BANK-->', j(bank))
             .replace('<!--LABS-->', j(labs))
             .replace('<!--QUOTES-->', j(quotes))
-            .replace('<!--FIGS-->', '\n'.join(figs)))
+            .replace('<!--FIGS-->', j(figs)))
 
 # GitHub Pages 로 나가는 PWA 배포본 — manifest·service worker 가 함께 있어야 앱처럼 동작한다
 pages = ROOT.parent / 'docs' / 'parkchan'

@@ -12,7 +12,13 @@
 <meta name="apple-mobile-web-app-title" content="박찬 과학">
 <link rel="apple-touch-icon" href="icon-180.png">
 <link rel="icon" href="icon-192.png">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&family=Noto+Serif+KR:wght@400;600;700&display=swap">
+<!-- 웹폰트는 첫 화면을 막지 않는다. 망이 느리면(지하철·학교 와이파이) 기기 한글 고딕으로 먼저 읽히고,
+     폰트가 도착하면 자연스럽게 바뀐다. media 를 print 로 두었다가 onload 에서 all 로 올리는 방법. -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" media="print" onload="this.media='all';this.onload=null"
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&family=Noto+Serif+KR:wght@400;600;700&display=swap">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&family=Noto+Serif+KR:wght@400;600;700&display=swap"></noscript>
 <style>
 :root{
   --paper:#FAF8F4; --ground:#EFECE6; --card:#FFFFFF;
@@ -23,6 +29,9 @@
   --brand:#147D6F; --brand-soft:#E7F5F1; --brand-line:#C9E7DF; --brand-dark:#0F6357;
   --no:#C0392B; --no-soft:#FBECEA; --warn:#B4830A; --warn-soft:#FFF7E0;
   --shadow:0 4px 20px rgba(30,42,46,.07);
+  /* 웹폰트가 늦거나 막혀도 한글이 바탕체로 떨어지지 않도록 기기 고딕을 명시한다 */
+  --sans:'Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic','맑은 고딕',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+  --serif:'Noto Serif KR','Apple SD Gothic Neo',Georgia,'Nanum Myeongjo',serif;
 }
 :root[data-unit="I"]{ --u:#C1521E; --u-soft:#FBEFE7; --u-line:#F0D9C7; --u-dark:#A64516; }
 :root[data-unit="II"]{ --u:#147D6F; --u-soft:#E7F5F1; --u-line:#C9E7DF; --u-dark:#0F6357; }
@@ -55,7 +64,7 @@
 :root[data-theme="dark"][data-unit="III"]{ --u:#8B99E4; --u-soft:#191D2E; --u-line:#2A3054; --u-dark:#A9B4EE; }
 *{box-sizing:border-box;margin:0;padding:0}
 body{background:var(--ground);color:var(--ink);
-  font-family:'Noto Sans KR',system-ui,-apple-system,sans-serif;
+  font-family:var(--sans);
   word-break:keep-all;line-height:1.6;display:flex;justify-content:center;
   min-height:100vh;font-size:var(--fs,15px)}
 .app{width:100%;max-width:440px;background:var(--paper);min-height:100vh;
@@ -106,7 +115,7 @@ h1{font-size:23px;font-weight:900;letter-spacing:-.025em;line-height:1.3;margin-
 .step{display:grid;grid-template-columns:26px 1fr;column-gap:9px;align-items:baseline;
   border-top:1px solid var(--hair);padding:11px 0 12px}
 .step:first-child{border-top:2.5px solid var(--u);padding-top:10px}
-.step .n{grid-column:1;font-size:14px;font-weight:900;color:var(--u);font-family:'Noto Serif KR',serif}
+.step .n{grid-column:1;font-size:14px;font-weight:900;color:var(--u);font-family:var(--serif)}
 .step .t{grid-column:2;font-size:14.5px;font-weight:800;margin:0;line-height:1.4;letter-spacing:-.01em}
 .step .d{grid-column:2;font-size:13.5px;color:var(--body);line-height:1.75;margin-top:4px}
 figure{background:var(--u-soft);border-radius:11px;padding:12px 8px 8px;text-align:center;margin-bottom:15px}
@@ -119,12 +128,12 @@ figcaption{font-size:11.5px;color:var(--u-dark);font-weight:700;margin-top:7px;p
 .howto li{font-size:12.5px;line-height:1.7;color:var(--body);margin-bottom:5px;list-style:none;padding-left:15px;text-indent:-15px}
 .howto li b.n{color:#B4830A;font-weight:900;margin-right:6px}
 :root:not([data-theme="light"]) .howto li b.n{color:#D9A73C}
-.prose p{font-family:'Noto Serif KR',Georgia,serif;font-size:15px;line-height:2;color:var(--body);margin-bottom:15px}
+.prose p{font-family:var(--serif);font-size:15px;line-height:2;color:var(--body);margin-bottom:15px}
 .prose p:last-child{margin-bottom:0}
 .prose b{color:var(--ink);font-weight:700}
 button.blank{display:inline-block;min-width:52px;text-align:center;border:none;
   border-bottom:2px solid var(--u);background:var(--u-soft);color:var(--u);
-  font-weight:800;font-family:'Noto Sans KR',sans-serif;font-size:13px;
+  font-weight:800;font-family:var(--sans);font-size:13px;
   padding:1px 7px;border-radius:5px 5px 0 0;cursor:pointer;font-feature-settings:normal}
 button.blank.open{background:transparent;color:var(--u-dark)}
 
@@ -157,7 +166,7 @@ button.blank.open{background:transparent;color:var(--u-dark)}
 .qhead{display:flex;align-items:center;justify-content:space-between;margin-bottom:13px}
 .qhead .l{font-size:14px;font-weight:900}
 .tag{font-size:11px;font-weight:800;padding:4px 10px;border-radius:999px;background:var(--u-soft);color:var(--u)}
-.stem{font-family:'Noto Serif KR',Georgia,serif;font-size:15px;line-height:1.85;margin-bottom:13px}
+.stem{font-family:var(--serif);font-size:15px;line-height:1.85;margin-bottom:13px}
 .bogi{border:1px solid var(--u-line);background:var(--u-soft);border-radius:11px;padding:12px 14px;margin-bottom:13px;font-size:13.5px;line-height:1.8}
 .ask{font-size:14px;line-height:1.75;margin-bottom:12px;font-weight:500}
 .opts{display:flex;flex-direction:column;gap:8px;margin-bottom:14px}
@@ -188,11 +197,11 @@ button.blank.open{background:transparent;color:var(--u-dark)}
 .chipbar{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:6px;padding-bottom:2px}
 .chipbar button{flex:0 0 auto;font-size:12px;font-weight:700;padding:6px 12px;border-radius:999px;border:1px solid var(--line);background:var(--card);color:var(--muted);cursor:pointer}
 .chipbar button.on{background:var(--u);border-color:var(--u);color:#fff}
-.book-h{font-family:'Noto Serif KR',serif;font-size:20px;font-weight:900;letter-spacing:-.01em;margin:26px 0 2px;padding-bottom:6px;border-bottom:2px solid var(--line)}
+.book-h{font-family:var(--serif);font-size:20px;font-weight:900;letter-spacing:-.01em;margin:26px 0 2px;padding-bottom:6px;border-bottom:2px solid var(--line)}
 .book-h:first-of-type{margin-top:4px}
 .unit-h{display:flex;align-items:center;gap:9px;margin:20px 0 10px}
 .unit-h:first-of-type{margin-top:4px}
-.unit-h .no{font-family:'Noto Serif KR',serif;font-size:17px;font-weight:900;color:var(--u)}
+.unit-h .no{font-family:var(--serif);font-size:17px;font-weight:900;color:var(--u)}
 .unit-h .nm{font-size:14px;font-weight:900}
 .unit-h .ln{flex:1;height:2px;background:var(--u-line)}
 .row{display:flex;align-items:center;gap:11px;padding:13px 2px;border-bottom:1px solid var(--hair);cursor:pointer;width:100%;background:none;
@@ -396,7 +405,7 @@ figure.zoomable{cursor:zoom-in}
 .qsay{background:var(--card);border:1px solid var(--hair);border-radius:18px;padding:19px 17px 14px 20px;margin:0 0 11px;position:relative;overflow:hidden;box-shadow:var(--shadow)}
 .qsay::before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--brand)}
 .qsay .k{display:block;font-size:11px;font-weight:900;letter-spacing:.13em;color:var(--brand);margin-bottom:13px}
-.qsay blockquote{font-family:'Noto Serif KR',Georgia,serif;font-size:16.5px;line-height:1.9;color:var(--ink);letter-spacing:-.01em;font-weight:500;margin:0 0 13px}
+.qsay blockquote{font-family:var(--serif);font-size:16.5px;line-height:1.9;color:var(--ink);letter-spacing:-.01em;font-weight:500;margin:0 0 13px}
 .qsay .orig{font-size:11.5px;color:var(--faint);line-height:1.65;margin:-7px 0 12px}
 .qsay .by{display:flex;flex-direction:column;gap:1px;margin-bottom:2px}
 .qsay .by .who{font-size:13.5px;font-weight:800;color:var(--body)}
@@ -418,7 +427,7 @@ figure.zoomable{cursor:zoom-in}
 .todaysched .dd{flex:0 0 auto;font-size:12px;font-weight:900;color:var(--brand);background:var(--brand-soft);border-radius:999px;padding:5px 10px;font-variant-numeric:tabular-nums}
 .qbridge{background:var(--u-soft);border-radius:14px;padding:13px 15px;margin:0 0 13px;font-size:13px;line-height:1.75;color:var(--body)}
 .qbridge b{display:block;font-size:10.5px;font-weight:900;letter-spacing:.12em;color:var(--u);margin-bottom:5px}
-.qlist blockquote{font-family:'Noto Serif KR',Georgia,serif;font-size:14.5px;line-height:1.8;color:var(--ink);margin:0 0 6px}
+.qlist blockquote{font-family:var(--serif);font-size:14.5px;line-height:1.8;color:var(--ink);margin:0 0 6px}
 .qlist .row{border-bottom:1px solid var(--hair);padding:14px 0}
 .qlist .row:last-child{border-bottom:none}
 .qlist .m{font-size:11.5px;color:var(--muted);display:flex;justify-content:space-between;gap:10px;align-items:center}
@@ -611,7 +620,7 @@ figure.zoomable{cursor:zoom-in}
 <script type="application/json" id="d-bank"><!--BANK--></script>
 <script type="application/json" id="d-labs"><!--LABS--></script>
 <script type="application/json" id="d-quotes"><!--QUOTES--></script>
-<div id="figstore" hidden><!--FIGS--></div>
+<script type="application/json" id="d-figs"><!--FIGS--></script>
 
 <script>
 /* ═══════════════════════════════════════════════════════════════
@@ -646,11 +655,15 @@ const nowHM = () => { const d=new Date(); return `${pad(d.getHours())}:${pad(d.g
 const kdate = iso => { if(!iso) return ''; const [y,m,d]=iso.split('-'); return (+y!==new Date().getFullYear()?`${y}년 `:'')+`${+m}월 ${+d}일`; };
 const daysBetween = (a,b) => Math.round((Date.parse(b)-Date.parse(a))/86400000);
 const addDays = (iso, n) => { const d=new Date(iso+'T00:00:00'); d.setDate(d.getDate()+n); return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`; };
+const tel = t => String(t??'').replace(/[^0-9+\-]/g,'');
 const esc = t => String(t??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 const rich = t => esc(t).replace(/&lt;b&gt;/g,'<b>').replace(/&lt;\/b&gt;/g,'</b>')
   .replace(/\{\{(.+?)\}\}/g, (_,m) => `<button class="blank" data-b="${m}">${m}</button>`);
 const plain = t => String(t||'').replace(/<[^>]+>/g,'').replace(/\{\{(.+?)\}\}/g,'$1');
-const figOf = id => { const el=document.querySelector(`#figstore [data-id="${id}"]`); return el?el.innerHTML:''; };
+/* 그림 140장을 시작할 때 전부 그려 두면(755KB · 만 개 넘는 노드) 느린 폰에서 첫 화면이 늦다.
+   문자열로만 싣고, 처음 필요해질 때 한 번 해석한다. */
+let FIGMAP = null;
+const figOf = id => { if (!FIGMAP){ try { FIGMAP = JSON.parse(document.getElementById('d-figs').textContent); } catch { FIGMAP = {}; } } return FIGMAP[id] || ''; };
 const setUnit = u => document.documentElement.dataset.unit = u;
 const toast = msg => { const t=document.createElement('div'); t.className='toast'; t.textContent=msg; document.body.appendChild(t); setTimeout(()=>t.remove(),2500); };
 const Cap = window.Capacitor, isNative = !!(Cap && Cap.isNativePlatform && Cap.isNativePlatform());
@@ -1797,7 +1810,7 @@ async function renderAdmin(){
         <div class="g"><input id="stPhone" placeholder="연락처(문자 발송용)" inputmode="tel"><input id="stUntil" type="date" value="${new Date().getFullYear()+1}-02-28"></div>
         <button class="btn" id="stAdd">코드 만들기</button>
         ${issued ? `<div class="issued">${esc(issued.name)} 학생 · ${esc(issued.cls)} · ${kdate(issued.until)}까지<br>코드 <code>${issued.code}</code>
-          <br><a href="sms:${issued.phone||''}${/iphone|ipad/i.test(navigator.userAgent)?'&':'?'}body=${encodeURIComponent(`[${CFG.academy}] ${issued.name} 학생 앱 코드: ${issued.code} — 앱 > 내 정보에서 등록하면 전 범위가 열립니다. 보호자도 같은 코드로 자녀를 연결할 수 있습니다.`)}">문자로 보내기 →</a></div>` : ''}</div>
+          <br><a href="sms:${tel(issued.phone)}${/iphone|ipad/i.test(navigator.userAgent)?'&':'?'}body=${encodeURIComponent(`[${CFG.academy}] ${issued.name} 학생 앱 코드: ${issued.code} — 앱 > 내 정보에서 등록하면 전 범위가 열립니다. 보호자도 같은 코드로 자녀를 연결할 수 있습니다.`)}">문자로 보내기 →</a></div>` : ''}</div>
       <p class="tip">1인 1코드. 학생은 '학원 코드 등록', 보호자는 '자녀 연결'에 같은 코드를 씁니다. 만료일이 지나면 저절로 닫힙니다. 이름을 누르면 출석·진도가 보입니다.</p>
       ${CL.map(c => { const rows = st.filter(s=>s.cls===c); if(!rows.length) return '';
         return `<div class="unit-h"><span class="nm">${esc(c)}</span><span class="ln"></span><span class="s" style="font-size:12px;color:var(--faint)">${rows.length}명</span></div>` +
@@ -1826,7 +1839,7 @@ async function renderAdmin(){
         <div class="g"><select id="ntCls">${['전체',...CL].map(c=>`<option ${c===admCls?'selected':''}>${esc(c)}</option>`).join('')}</select><input id="ntT" placeholder="제목 (예: 수요일 수업 30분 늦게 시작)"></div>
         <textarea id="ntD" placeholder="내용 (예: 6시 30분까지 와 주세요)"></textarea><button class="btn" id="ntSend">보내기</button></div>
       <p class="tip">그 반 학생 홈 맨 위에 뜨고, [확인]을 눌러야 사라집니다. 보호자 앱의 자녀 화면에도 보입니다. 안 읽은 학생만 골라 문자로 한 번 더 보낼 수 있습니다.</p>
-      ${ns.length ? ns.map((n,i)=>{ const s=stats[i]||{sent:0,read:0,unread:[]}; const unreadPh = s.unread.map(u=>u.phone).filter(Boolean);
+      ${ns.length ? ns.map((n,i)=>{ const s=stats[i]||{sent:0,read:0,unread:[]}; const unreadPh = s.unread.map(u=>tel(u.phone)).filter(Boolean);
         return `<div class="sent"><div class="t">${esc(n.t)}</div><div class="d">${esc(n.cls)} · ${kdate(n.at.slice(0,10))} ${n.at.slice(11,16)}${n.d?` · ${esc(n.d)}`:''}</div>
           <div class="r"><span>읽음 <b>${s.read}</b> / ${s.sent}명</span>${s.unread.length ? `<a href="sms:${unreadPh.join(',')}${/iphone|ipad/i.test(navigator.userAgent)?'&':'?'}body=${encodeURIComponent(`[${CFG.academy}] ${n.t} — ${n.d}`)}">안 읽은 ${s.unread.length}명에게 문자 →</a>` : '<span style="color:var(--u);font-weight:800">모두 읽음</span>'}</div></div>`; }).join('')
         : `<div class="empty" style="padding:30px"><p>보낸 공지가 없습니다.</p></div>`}`;
@@ -1906,7 +1919,7 @@ async function openStudent(code){
     <p>수강 ${kdate(st.until)}까지${st.phone?` · ${esc(st.phone)}`:''} · 보호자 연결 ${gs.length}명</p>
     <div class="tiles"><div class="tile"><div class="v">${att.filter(a=>a.date.startsWith(ym)).length}<small>일</small></div><div class="l">이달 출석</div></div><div class="tile"><div class="v">${done}</div><div class="l">공부한 개념</div></div><div class="tile"><div class="v">${prog&&prog.stats&&prog.stats.a?Math.round(prog.stats.c/prog.stats.a*100):0}<small>%</small></div><div class="l">정답률</div></div></div>
     <div class="legal" style="max-height:34vh">${att.length ? att.slice(0,20).map(a=>`<div class="kv"><span class="k">${kdate(a.date)}</span><span class="v" style="color:${a.late?'var(--warn)':'var(--u)'}">${a.time} ${a.late?'지각':'출석'}${a.manual?' (수동)':''}</span></div>`).join('') : '최근 60일 출석 기록이 없습니다.'}${days.length?`<div class="kv"><span class="k">마지막 학습</span><span class="v">${kdate(days[days.length-1])}</span></div>`:''}</div>
-    ${st.phone ? `<a class="btn soft" href="sms:${st.phone}" style="text-decoration:none">문자 보내기</a>` : ''}<button class="btn ghost" id="sheetClose">닫기</button>`);
+    ${tel(st.phone) ? `<a class="btn soft" href="sms:${tel(st.phone)}" style="text-decoration:none">문자 보내기</a>` : ''}<button class="btn ghost" id="sheetClose">닫기</button>`);
 }
 
 /* ═══ 약관 · 개인정보 · 앱 정보 (시트) ═══ */
