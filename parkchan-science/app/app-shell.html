@@ -433,6 +433,13 @@ figure.zoomable{cursor:zoom-in}
 .qlist .m{font-size:11.5px;color:var(--muted);display:flex;justify-content:space-between;gap:10px;align-items:center}
 .qlist .m button{background:none;border:none;color:var(--faint);font-size:11.5px;cursor:pointer;text-decoration:underline;padding:4px}
 /* 이야기 (커뮤니티) */
+.netbar{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(72px + env(safe-area-inset-bottom));width:calc(100% - 36px);max-width:404px;
+  display:flex;align-items:center;gap:9px;background:var(--warn-soft);border:1px solid var(--warn);border-radius:13px;padding:11px 13px;z-index:30}
+.netbar svg{width:17px;height:17px;flex:0 0 auto;stroke:var(--warn);stroke-width:2;fill:none;stroke-linecap:round;stroke-linejoin:round}
+.netbar span{flex:1;min-width:0;font-size:12.5px;font-weight:700;color:var(--warn);line-height:1.5}
+.netbar button{flex:0 0 auto;font-size:12px;font-weight:800;color:var(--warn);background:none;border:1px solid var(--warn);border-radius:9px;padding:7px 11px;cursor:pointer;min-height:34px}
+.loadfail{background:var(--card);border:1px dashed var(--line);border-radius:15px;padding:22px 16px;text-align:center;margin-bottom:12px}
+.loadfail p{font-size:13px;color:var(--muted);line-height:1.8;margin-bottom:12px}
 .tsafe{background:var(--brand-soft);border-radius:13px;padding:11px 13px;margin-bottom:12px;font-size:11.5px;line-height:1.7;color:var(--brand-dark)}
 .tsafe b{font-weight:900}
 .pcard{display:block;width:100%;text-align:left;background:var(--card);border:1px solid var(--hair);border-radius:16px;padding:14px 15px;margin-bottom:9px;cursor:pointer}
@@ -613,7 +620,8 @@ figure.zoomable{cursor:zoom-in}
   </main>
   <nav class="tabs" id="tabs"></nav>
 </div>
-<div id="sheet"></div>
+<div id="netbar"></div>
+  <div id="sheet"></div>
 
 <script type="application/json" id="d-concepts"><!--CONCEPTS--></script>
 <script type="application/json" id="d-quizzes"><!--QUIZZES--></script>
@@ -665,6 +673,18 @@ const plain = t => String(t||'').replace(/<[^>]+>/g,'').replace(/\{\{(.+?)\}\}/g
 let FIGMAP = null;
 const figOf = id => { if (!FIGMAP){ try { FIGMAP = JSON.parse(document.getElementById('d-figs').textContent); } catch { FIGMAP = {}; } } return FIGMAP[id] || ''; };
 const setUnit = u => document.documentElement.dataset.unit = u;
+/* 연결이 끊기거나 서버가 응답하지 않을 때 조용히 빈 화면을 보여 주지 않는다 */
+let netDown = false;
+function setNet(down){ if (netDown === down) return; netDown = down; drawNet(); }
+function drawNet(){
+  const host = document.getElementById('netbar'); if (!host) return;
+  const off = !navigator.onLine;
+  host.innerHTML = (off || netDown) ? `<div class="netbar"><svg viewBox="0 0 24 24"><path d="M2 8.8a16 16 0 0 1 20 0"/><path d="M5.5 12.4a11 11 0 0 1 13 0"/><path d="M9 16a6 6 0 0 1 6 0"/><circle cx="12" cy="19.5" r=".6"/><path d="M3 3l18 18"/></svg>
+      <span>${off ? '인터넷에 연결되어 있지 않습니다. 받아 둔 개념과 문제는 그대로 풀 수 있어요.' : '학원 서버에 연결하지 못했습니다. 잠시 뒤 다시 시도해 주세요.'}</span>
+      <button id="netRetry">다시</button></div>` : '';
+}
+window.addEventListener('online',  () => { setNet(false); drawNet(); });
+window.addEventListener('offline', drawNet);
 const toast = msg => { const t=document.createElement('div'); t.className='toast'; t.textContent=msg; document.body.appendChild(t); setTimeout(()=>t.remove(),2500); };
 const Cap = window.Capacitor, isNative = !!(Cap && Cap.isNativePlatform && Cap.isNativePlatform());
 const plug = n => (Cap && Cap.Plugins && Cap.Plugins[n]) || null;
@@ -957,7 +977,7 @@ const KEY = 'pcs.v2';
 const load = () => { try { return JSON.parse(localStorage.getItem(KEY)) || {}; } catch { return {}; } };
 let syncT = null;
 const progressKey = () => (S.auth && S.auth.code) || (ACC ? 'u:'+ACC.id : null);
-const snapshot = () => ({ start:S.start, done:S.done, wrong:S.wrong, read:S.read, days:S.days, bm:S.bm, stats:S.stats, bh:S.bh||{}, qkeep:S.qkeep||[], sched:S.sched, notifyAt:S.notifyAt, at:new Date().toISOString() });
+const snapshot = () => ({ start:S.start, done:S.done, wrong:S.wrong, read:S.read, days:S.days, bm:S.bm, stats:S.stats, bh:S.bh||{}, qkeep:S.qkeep||[], blocked:S.blocked||[], sched:S.sched, notifyAt:S.notifyAt, at:new Date().toISOString() });
 const save = s => { try { localStorage.setItem(KEY, JSON.stringify(s)); } catch {}
   const k = progressKey(); if (k){ clearTimeout(syncT); syncT = setTimeout(() => DBX.saveProgress(k, snapshot()).catch(()=>{}), 1000); } };
 const mergeProgress = p => { if (!p) return;
@@ -970,13 +990,14 @@ const mergeProgress = p => { if (!p) return;
   if (p.stats){ S.stats = { a:(S.stats.a||0)+(p.stats.a||0), c:(S.stats.c||0)+(p.stats.c||0) }; }
   S.bh = { ...(p.bh||{}), ...(S.bh||{}) };
   S.qkeep = [...new Set([...(p.qkeep||[]), ...(S.qkeep||[])])];
+  S.blocked = [...new Set([...(p.blocked||[]), ...(S.blocked||[])])];
   if (p.sched){ const merge = (a=[], b=[]) => { const m = new Map(); [...a, ...b].forEach(x => m.set(x.id, x)); return [...m.values()]; };
     S.sched = { fixed:merge(p.sched.fixed, S.sched.fixed), events:merge(p.sched.events, S.sched.events), ddays:merge(p.sched.ddays, S.sched.ddays) }; }
   if (p.notifyAt && !S.notifyAt) S.notifyAt = p.notifyAt; };
 let S = load();
 if (!S.start){ S.start = todayISO(); }
 S.done ||= []; S.wrong ||= []; S.read ||= []; S.days ||= []; S.bm ||= []; S.stats ||= { a:0, c:0 }; S.bh ||= {};
-S.qkeep ||= []; S.qskip ||= 0;
+S.qkeep ||= []; S.qskip ||= 0; S.blocked ||= [];
 S.sched ||= { fixed:[], events:[], ddays:[] };
 S.sched.fixed ||= []; S.sched.events ||= []; S.sched.ddays ||= [];
 S.fs ||= '보통'; S.theme ||= '시스템'; S.notifyAt ??= '18:00';
@@ -1363,6 +1384,10 @@ function piiCheck(text){
 const mine = x => ACC && x.uid === ACC.id;
 const isOwner = () => ACC && ACC.role === 'owner';
 const shown = x => !(x.reports||[]).length || (x.reports||[]).length < REPORT_HIDE || mine(x) || isOwner();
+/* 구글 플레이는 사용자 제작 콘텐츠 앱에 '신고'와 함께 '차단'을 요구한다.
+   차단하면 그 사람의 글과 댓글이 내 화면에서 사라진다(기기가 아니라 계정에 붙어 따라간다). */
+const blocked = x => !!x && !mine(x) && !isOwner() && (S.blocked||[]).includes(x.uid);
+const nickOf = x => (S.blocked||[]).includes(x.uid) ? '차단한 사용자' : (x.nick || '익명');
 const ago = iso => { const m = Math.floor((Date.now() - new Date(iso)) / 60000);
   if (m < 1) return '방금'; if (m < 60) return m + '분 전'; if (m < 1440) return Math.floor(m/60) + '시간 전';
   if (m < 43200) return Math.floor(m/1440) + '일 전'; return kdate(iso.slice(0,10)); };
@@ -1381,23 +1406,26 @@ async function renderTalk(){
       <div class="tsafe">닉네임으로 활동합니다. 실명·전화번호·주소는 적지 마세요. 신고된 글은 원장님이 확인합니다.</div>`;
     return;
   }
-  let list = []; try { list = await DBX.posts(talkBoard, talkQ); } catch {}
+  let list = [], failed = false;
+  try { list = await DBX.posts(talkBoard, talkQ); setNet(false); } catch { failed = true; setNet(true); }
+  list = list.filter(x => !blocked(x));
   v.innerHTML = `<h1 class="h-page">이야기</h1>
     <div class="search"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
       <input id="talkSearch" placeholder="글 검색 (예: 충격량, 오답)" value="${esc(talkQ)}"></div>
     <div class="chipbar">${['전체', ...Object.keys(BOARDS)].map(b=>`<button data-tb="${b}" class="${talkBoard===b?'on':''}">${b==='전체'?'전체':BOARDS[b]}</button>`).join('')}</div>
     <button class="btn" id="postNew">글쓰기</button>
+    ${failed ? `<div class="loadfail"><p>글을 불러오지 못했습니다.<br>연결을 확인한 뒤 다시 시도해 주세요.</p><button class="btn soft" id="talkRetry" style="margin:0">다시 불러오기</button></div>` : ''}
     ${list.length ? list.map(x => {
       const hid = !shown(x), at = attachName(x.attach);
       return `<button class="pcard ${hid?'hidden':''}" data-post="${esc(x.id)}">
         <div class="h"><span class="bd ${x.board}">${BOARDS[x.board]||''}</span>${x.solved?'<span class="ok">해결됨</span>':''}</div>
         <div class="t">${hid ? '신고가 쌓여 가려진 글입니다' : esc(x.title)}</div>
         ${hid ? '' : `<div class="x">${esc(String(x.body||'').replace(/\s+/g,' '))}</div>`}
-        <div class="m"><span>${esc(x.nick||'익명')}</span><span>${ago(x.at)}</span>
+        <div class="m"><span>${esc(nickOf(x))}</span><span>${ago(x.at)}</span>
           <span><svg viewBox="0 0 24 24"><path d="M20.5 12c0 4-3.8 7.2-8.5 7.2-1 0-2-.15-2.9-.42L4 20.5l1.5-3.6C4.2 15.6 3.5 13.9 3.5 12c0-4 3.8-7.2 8.5-7.2s8.5 3.2 8.5 7.2z"/></svg>${x.comments||0}</span>
           <span><svg viewBox="0 0 24 24"><path d="M12 20.5 4.5 13a4.6 4.6 0 0 1 6.5-6.5l1 1 1-1A4.6 4.6 0 0 1 19.5 13z"/></svg>${(x.likes||[]).length}</span>
           ${at?`<span>· ${esc(at.k)} 첨부</span>`:''}</div></button>`; }).join('')
-      : `<p class="planempty">${talkQ ? '찾는 글이 없습니다.' : '아직 글이 없습니다. 첫 질문을 올려 보세요.'}</p>`}
+      : (failed ? '' : `<p class="planempty">${talkQ ? '찾는 글이 없습니다.' : '아직 글이 없습니다. 첫 질문을 올려 보세요.'}</p>`)}
     <div class="tsafe"><b>함께 쓰는 규칙</b><br>· 닉네임으로 활동합니다. 실명·전화번호·주소·SNS 아이디는 적지 않습니다.<br>
       · 시중 문제집이나 기출 문제의 <b>원문을 그대로 올리지 않습니다</b>(저작권). 어디가 막히는지 자기 말로 적어 주세요.<br>
       · 비방·욕설은 신고해 주세요. 신고가 ${REPORT_HIDE}건 쌓이면 자동으로 가려지고 원장님이 확인합니다.</div>`;
@@ -1408,11 +1436,12 @@ async function renderPost(){
   let x = null; try { x = await DBX.post(postId); } catch {}
   if (!x){ v.innerHTML = `<button class="back" id="talkBack"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg>이야기</button><p class="planempty">지워졌거나 없는 글입니다.</p>`; return; }
   const at = attachName(x.attach), liked = ACC && (x.likes||[]).includes(ACC.id), hid = !shown(x);
+  const cms = (x.comments||[]).filter(c => !blocked(c));
   v.innerHTML = `<button class="back" id="talkBack"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg>이야기</button>
     <div class="pfull">
       <div class="meta"><span class="bd ${x.board}" style="font-size:10.5px;font-weight:900;color:#fff;border-radius:5px;padding:2px 7px;background:${x.board==='qna'?'#4053B8':x.board==='share'?'#C1521E':'var(--brand)'}">${BOARDS[x.board]||''}</span>
         ${x.solved?'<span class="ok" style="font-size:10.5px;font-weight:900;color:var(--brand-dark);background:var(--brand-soft);border-radius:5px;padding:2px 7px">해결됨</span>':''}
-        <span>${esc(x.nick||'익명')}</span><span>${ago(x.at)}</span>${(x.reports||[]).length?`<span style="color:var(--warn)">신고 ${(x.reports||[]).length}</span>`:''}</div>
+        <span>${esc(nickOf(x))}</span><span>${ago(x.at)}</span>${(x.reports||[]).length?`<span style="color:var(--warn)">신고 ${(x.reports||[]).length}</span>`:''}</div>
       <h2>${hid ? '신고가 쌓여 가려진 글입니다' : esc(x.title)}</h2>
       ${hid ? `<p class="body" style="color:var(--muted)">원장님이 확인할 때까지 다른 학생에게는 보이지 않습니다.</p>` : `<div class="body">${esc(x.body)}</div>`}
       ${at ? `<button class="attachcard" data-openatt="${esc(x.attach.kind)}:${esc(x.attach.id)}">
@@ -1422,15 +1451,15 @@ async function renderPost(){
     <div class="prow">
       <button id="pLike" class="${liked?'on':''}"><svg viewBox="0 0 24 24"><path d="M12 20.5 4.5 13a4.6 4.6 0 0 1 6.5-6.5l1 1 1-1A4.6 4.6 0 0 1 19.5 13z"/></svg>도움이 됐어요 ${(x.likes||[]).length}</button>
       ${mine(x) ? `<button id="pEdit">고치기</button><button id="pDel">지우기</button>`
-        : `<button id="pReport">신고</button>${isOwner()?`<button id="pDel">삭제(원장)</button>`:''}`}
+        : `<button id="pReport">신고</button><button id="pBlock" data-u="${esc(x.uid||'')}">${(S.blocked||[]).includes(x.uid)?'차단 해제':'차단'}</button>${isOwner()?`<button id="pDel">삭제(원장)</button>`:''}`}
     </div>
-    <div class="sec"><h2>댓글 ${x.comments.length}</h2>
-      ${x.comments.length ? x.comments.map(c => { const ch = !shown(c), cl = ACC && (c.likes||[]).includes(ACC.id);
-        return `<div class="cm"><div class="h"><b>${esc(c.nick||'익명')}</b><span>${ago(c.at)}</span>${c.picked?'<span class="picked">채택</span>':''}${(c.reports||[]).length?`<span style="color:var(--warn)">신고 ${(c.reports||[]).length}</span>`:''}</div>
+    <div class="sec"><h2>댓글 ${cms.length}</h2>
+      ${cms.length ? cms.map(c => { const ch = !shown(c), cl = ACC && (c.likes||[]).includes(ACC.id);
+        return `<div class="cm"><div class="h"><b>${esc(nickOf(c))}</b><span>${ago(c.at)}</span>${c.picked?'<span class="picked">채택</span>':''}${(c.reports||[]).length?`<span style="color:var(--warn)">신고 ${(c.reports||[]).length}</span>`:''}</div>
           <div class="body" ${ch?'style="color:var(--muted)"':''}>${ch ? '신고가 쌓여 가려진 댓글입니다.' : esc(c.body)}</div>
           <div class="a"><button data-clike="${esc(c.id)}" class="${cl?'on':''}">도움됨 ${(c.likes||[]).length}</button>
             ${mine(x) && x.board==='qna' && !c.picked ? `<button data-cpick="${esc(c.id)}">채택하기</button>` : ''}
-            ${mine(c) || isOwner() ? `<button data-cdel="${esc(c.id)}">지우기</button>` : `<button data-creport="${esc(c.id)}">신고</button>`}</div></div>`; }).join('')
+            ${mine(c) || isOwner() ? `<button data-cdel="${esc(c.id)}">지우기</button>` : `<button data-creport="${esc(c.id)}">신고</button><button data-cblock="${esc(c.uid||'')}">차단</button>`}</div></div>`; }).join('')
         : `<p class="planempty">아직 댓글이 없습니다. 아는 만큼만 알려 줘도 큰 도움이 됩니다.</p>`}
       ${talkErr ? `<div class="piiwarn">${esc(talkErr)}</div>` : ''}
       <div class="cwrite"><textarea id="cIn" placeholder="댓글 쓰기 · 실명·연락처는 적지 마세요"></textarea><button id="cGo">등록</button></div>
@@ -1453,6 +1482,15 @@ function sheetPost(ed){
     <button class="btn" id="poSave" data-id="${esc(e.id)}">${ed?'고치기':'올리기'}</button>
     <button class="btn ghost" id="sheetClose">닫기</button>`);
 }
+function openBlockList(){
+  const list = S.blocked || [];
+  openSheet(`<h3>차단한 사용자 <span style="font-size:12px;color:var(--muted);font-weight:600">${list.length}명</span></h3>
+    <p class="fine" style="text-align:left;padding:0 0 12px">차단하면 그 사람의 글과 댓글이 <b>이야기</b>에서 보이지 않습니다.
+      차단 사실은 상대에게 알리지 않습니다. 심한 글은 차단과 함께 <b>신고</b>도 해 주세요 — 원장님이 확인합니다.</p>
+    ${list.length ? list.map((u,i)=>`<div class="setrow"><span class="l">차단한 사용자 ${i+1}<small>닉네임은 보여 드리지 않습니다</small></span><button class="more" data-unblock="${esc(u)}">차단 해제</button></div>`).join('')
+      : `<p class="planempty">차단한 사용자가 없습니다.</p>`}
+    <button class="btn ghost" id="sheetClose">닫기</button>`);
+}
 function sheetNick(next){
   openSheet(`<h3>닉네임 정하기</h3>
     <p class="fine" style="text-align:left;padding:0 0 12px">이야기에서는 <b>닉네임</b>으로만 보입니다. 실명이나 학교 이름은 쓰지 마세요. 나중에 내 정보에서 바꿀 수 있습니다.</p>
@@ -1464,7 +1502,7 @@ function sheetNick(next){
 
 async function renderPlan(){
   const v = document.getElementById('v-plan');
-  if (S.auth){ try { acadEvents = (await DBX.schedule(S.auth.cls)).map(e => ({ ...e, acad:true })); } catch { acadEvents = []; } }
+  if (S.auth){ try { acadEvents = (await DBX.schedule(S.auth.cls)).map(e => ({ ...e, acad:true })); setNet(false); } catch { acadEvents = []; setNet(true); } }
   else acadEvents = [];
   const day = planDay || todayISO();
   const dds = (S.sched.ddays||[]).slice().sort((a,b)=>a.date<b.date?-1:1);
@@ -1733,6 +1771,7 @@ function renderMe(){
         <div class="f"><input id="childIn" class="code" placeholder="자녀 코드 6자리" maxlength="6" autocomplete="off" autocapitalize="characters"><button id="childGo">연결</button></div>${childErr?`<div class="err">${esc(childErr)}</div>`:''}</div>` : ''}
     ${ACC && ACC.role!=='owner' && !a ? `<button class="setrow go" id="goPlans"><span class="l">이용권<small>${hasPass()?`${kdate(ACC.passUntil)}까지 · 연장하기`:'전 범위 열기 · 이용권 코드 등록'}</small></span><span class="v">보기</span></button>` : ''}
     ${ACC ? `<button class="setrow go" id="nickOpen"><span class="l">이야기 닉네임<small>${ACC.nick ? esc(ACC.nick) : '아직 정하지 않았습니다 · 글을 쓰려면 필요합니다'}</small></span><span class="v">${ACC.nick?'바꾸기':'정하기'}</span></button>` : ''}
+    ${ACC ? `<button class="setrow go" id="blockOpen"><span class="l">차단한 사용자<small>${(S.blocked||[]).length}명 · 이야기에서 보이지 않습니다</small></span><span class="v">관리</span></button>` : ''}
     <button class="setrow go" id="goStats"><span class="l">학습 통계<small>연속 학습 ${streak()}일 · 공부한 개념 ${S.done.length}/${CONCEPTS.length} · 정답률 ${S.stats.a?Math.round(S.stats.c/S.stats.a*100):0}%</small></span><span class="v">보기</span></button>
     <button class="setrow go" id="qKeepOpen"><span class="l">보관한 한 마디<small>${(S.qkeep||[]).length}개 · 오늘의 한 마디에서 담은 글</small></span><span class="v">보기</span></button>
     <div class="sec"><h2>설정</h2>
@@ -2022,6 +2061,8 @@ document.addEventListener('click', async e => {
   /* ── 이야기 ── */
   if (T('#talkLogin')){ authMode='start'; show('auth'); return; }
   if (T('#talkBack')){ show('talk'); return; }
+  if (T('#netRetry') || T('#talkRetry')){ setNet(false); drawNet();
+    ({ talk:renderTalk, post:renderPost, plan:renderPlan, today:renderToday, admin:renderAdmin, parent:renderParent })[view]?.(); return; }
   const tb = T('[data-tb]'); if (tb){ talkBoard = tb.dataset.tb; renderTalk(); return; }
   const pOpen = T('[data-post]'); if (pOpen){ postId = pOpen.dataset.post; talkErr=''; poiOk = false; show('post'); return; }
   if (T('#postNew')){ if (!ACC){ authMode='start'; show('auth'); return; }
@@ -2063,6 +2104,15 @@ document.addEventListener('click', async e => {
     if (hard){ talkErr = `${hard.label}로 보이는 내용이 있어 올릴 수 없습니다.`; renderPost(); return; }
     if (hits.length && !poiOk){ poiOk = true; talkErr = `${hits.map(h=>h.label).join(' · ')}로 보이는 내용이 있습니다. 그래도 올리려면 등록을 한 번 더 누르세요.`; renderPost(); return; }
     poiOk = false; talkErr = ''; await DBX.addComment(postId, body); renderPost(); return; }
+  const bk = T('#pBlock'); if (bk){ const u = bk.dataset.u; if (!u) return;
+    S.blocked ||= []; const i = S.blocked.indexOf(u);
+    if (i < 0){ if (!confirm('이 사용자를 차단할까요? 이 사람의 글과 댓글이 보이지 않게 됩니다.')) return; S.blocked.push(u); toast('차단했습니다'); save(S); show('talk'); return; }
+    S.blocked.splice(i,1); toast('차단을 풀었습니다'); save(S); renderPost(); return; }
+  const cb = T('[data-cblock]'); if (cb){ const u = cb.dataset.cblock; if (!u) return;
+    if (!confirm('이 사용자를 차단할까요? 이 사람의 글과 댓글이 보이지 않게 됩니다.')) return;
+    S.blocked ||= []; if (!S.blocked.includes(u)) S.blocked.push(u); save(S); toast('차단했습니다'); renderPost(); return; }
+  if (T('#blockOpen')){ openBlockList(); return; }
+  const ub = T('[data-unblock]'); if (ub){ S.blocked = (S.blocked||[]).filter(x => x !== ub.dataset.unblock); save(S); openBlockList(); return; }
   const cl = T('[data-clike]'); if (cl){ await DBX.likeToggle('comment', cl.dataset.clike); renderPost(); return; }
   const cp = T('[data-cpick]'); if (cp){ await DBX.pickComment(postId, cp.dataset.cpick); toast('채택했습니다'); renderPost(); return; }
   const cd = T('[data-cdel]'); if (cd){ if (!confirm('이 댓글을 지울까요?')) return; await DBX.delComment(cd.dataset.cdel); renderPost(); return; }

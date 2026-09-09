@@ -92,6 +92,27 @@ async def main():
         assert await pg.locator('.pcard .ok').count() == 1, '해결됨 표시가 없다'
         await pg.screenshot(path=f'{SC}/t5_solved.png', full_page=True)
 
+        # 차단 — 구글 플레이가 UGC 앱에 요구하는 기능
+        await pg.evaluate("['pcs.v2','pcs.local.sid'].forEach(k=>localStorage.removeItem(k))")
+        await pg.goto('http://127.0.0.1:8765/index.html'); await pg.wait_for_timeout(700)
+        await pg.click('#goLogin'); await pg.click('[data-demo^="parent"]'); await pg.click('#lgGo'); await pg.wait_for_timeout(900)
+        await pg.click('.tab[data-v="talk"]'); await pg.wait_for_timeout(500)
+        n_before = await pg.locator('.pcard').count()
+        assert n_before >= 1
+        await pg.click('.pcard'); await pg.wait_for_timeout(500)
+        assert await pg.locator('#pBlock').count() == 1, '차단 버튼이 없다'
+        assert await pg.locator('[data-cblock]').count() >= 1, '댓글 차단 버튼이 없다'
+        await pg.click('#pBlock'); await pg.wait_for_timeout(800)
+        assert await pg.evaluate('S.blocked.length') == 1, '차단이 저장되지 않았다'
+        assert await pg.locator('.pcard').count() == n_before - 1, '차단한 사람 글이 그대로 보인다'
+        await pg.screenshot(path=f'{SC}/t6_blocked.png', full_page=True)
+        await pg.click('.tab[data-v="me"]'); await pg.wait_for_timeout(500)
+        await pg.click('#blockOpen'); await pg.wait_for_timeout(500)
+        assert '차단한 사용자' in await pg.locator('.sheet').inner_text()
+        await pg.click('[data-unblock]'); await pg.wait_for_timeout(500)
+        assert await pg.evaluate('S.blocked.length') == 0, '차단 해제가 안 된다'
+        await pg.click('#sheetClose'); await pg.wait_for_timeout(300)
+
         # 원장은 어느 글이든 삭제할 수 있다
         await login(pg, 'owner')
         await pg.click('.tab[data-v="talk"]'); await pg.wait_for_timeout(500)
@@ -130,6 +151,20 @@ async def server_mode():
         assert await pg.locator('.cm .picked').count() == 1, '채택 실패'
         await pg.click('#talkBack'); await pg.wait_for_timeout(800)
         assert await pg.locator('.pcard .ok').count() == 1, '해결됨 표시 실패'
+        # 연결이 끊겼을 때 빈 화면 대신 안내가 뜨는가
+        await ctx.route(lambda url: '8766' in url, lambda r: asyncio.ensure_future(r.abort()))
+        await pg.click('.tab[data-v="plan"]'); await pg.wait_for_timeout(500)
+        await pg.click('.tab[data-v="talk"]'); await pg.wait_for_timeout(1200)
+        assert await pg.locator('.loadfail').count() == 1, '불러오기 실패 안내가 없다'
+        assert await pg.locator('.netbar').count() == 1, '연결 안내 띠가 없다'
+        await ctx.set_offline(True); await pg.evaluate("window.dispatchEvent(new Event('offline'))"); await pg.wait_for_timeout(400)
+        assert '인터넷에 연결되어 있지 않습니다' in await pg.locator('.netbar span').inner_text()
+        await ctx.set_offline(False); await ctx.unroute_all()
+        await pg.evaluate("window.dispatchEvent(new Event('online'))"); await pg.wait_for_timeout(300)
+        await pg.click('#talkRetry'); await pg.wait_for_timeout(900)
+        assert await pg.locator('.loadfail').count() == 0, '다시 불러오기가 듣지 않는다'
+        assert await pg.locator('.netbar').count() == 0, '복구 뒤에도 안내 띠가 남는다'
+
         assert not errs, errs
         print('SERVER TALK OK'); await b.close()
 
