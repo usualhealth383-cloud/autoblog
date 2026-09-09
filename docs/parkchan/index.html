@@ -1949,6 +1949,11 @@ async function renderAdmin(){
   if (admTab==='settings'){
     const passes = await DBX.passes().catch(()=>[]);
     v.innerHTML = head + `
+      <div class="tsafe"><b>운영이 처음이시면</b><br>
+        · 수업 전 <b>출석</b>에서 4자리 숫자를 띄웁니다(30초마다 바뀜).<br>
+        · <b>이야기</b>의 신고는 <b>하루 한 번</b> 확인하기로 약관에 적어 두었습니다.<br>
+        · 시험·보강·휴강은 <b>일정</b>에서 반별로 보내면 학생 일정에 자동으로 들어갑니다.<br>
+        · 자세한 순서는 저장소의 <b>docs/10-원장-운영-안내.md</b> 에 정리해 두었습니다.</div>
       <div class="form"><h3>반 · 수업 시작 시각(지각 기준)</h3>
         ${classes.map(c=>`<div class="kv"><span class="k">${esc(c.cls)}</span><span class="v">${esc(c.start)} <button class="mini" data-delcls="${esc(c.cls)}" style="margin-left:8px">삭제</button></span></div>`).join('')}
         <div class="g" style="margin-top:10px"><input id="clsName" placeholder="반 이름 (예: 일요반)"><input id="clsStart" type="time" value="18:00"></div><button class="btn" id="clsAdd">반 추가</button></div>

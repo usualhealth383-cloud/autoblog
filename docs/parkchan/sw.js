@@ -8,7 +8,7 @@
    2. 화면 이동(navigate)은 네트워크를 먼저 보고 실패하면 캐시로 연다(새 개념 반영).
    3. 그 밖의 자원(아이콘·매니페스트)은 캐시를 먼저 보고 없으면 받아 온다.
    4. 정상 응답(200, 같은 출처)만 캐시에 넣는다. API 실패 자리에 index.html 을 돌려주지 않는다. */
-const CACHE = 'pcs-2026-09-09c';
+const CACHE = 'pcs-2026-09-09d';
 const ASSETS = [
   './', './index.html', './manifest.webmanifest',
   './icon-192.png', './icon-512.png', './icon-180.png',
