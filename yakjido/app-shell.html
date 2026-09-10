@@ -1350,7 +1350,8 @@ function vBrand(name){
   ${b.use ? `<section class="sec card"><h2>이런 때 도움이 될 수 있어요</h2><p>${lexMark(b.use)}</p></section>` : ''}
   ${b.how ? `<section class="sec card"><h2>이렇게 드세요</h2><p>${lexMark(b.how)}</p></section>` : ''}
   ${b.who ? `<div class="note" style="margin-top:16px">${I.alert}<span>${lexMark(b.who)}</span></div>` : ''}
-  ${ings.length ? `<section class="sec"><h2>성분 하나하나 보기</h2><div class="card rows">${ings.map(x => { const d = x.drug && drug(x.drug); return `<button class="row" onclick="go('${d ? '/drug/' + x.drug : '/ingr/' + x.id}')"><div class="ic">${icon(d ? (cls(d.class)?.icon || 'pill') : 'pill')}</div><div class="body"><b>${esc(x.n)}</b><span>${esc(x.cls)}</span></div>${I.chev}</button>`; }).join('')}</div>${ings.map(x => x.drug && drug(x.drug) ? meWarnings(drug(x.drug)) : '').join('')}</section>` : ''}
+  ${ings.length ? `<section class="sec"><h2>성분 하나하나 보기</h2><div class="card rows">${ings.map(x => { const d = x.drug && drug(x.drug); return `<button class="row" onclick="go('${d ? '/drug/' + x.drug : '/ingr/' + x.id}')"><div class="ic">${icon(d ? (cls(d.class)?.icon || 'pill') : 'pill')}</div><div class="body"><b>${esc(x.n)}</b><span>${esc(x.cls)}</span>${d ? useTag(d) : ''}</div>${d?.ach ? `<span class="badge ${d.ach >= 3 ? 'stop' : 'warn'}">항콜린 ${esc(ACH_WORD[d.ach])}</span>` : ''}${I.chev}</button>`; }).join('')}</div>${ings.map(x => x.drug && drug(x.drug) ? meWarnings(drug(x.drug)) : '').join('')}
+  ${achPanel(ings.map(x => x.drug && drug(x.drug)).filter(Boolean), { compact:true })}</section>` : ''}
   <div class="actions"><button class="btn line" onclick="go('/pillinfo')">${I.eye} 이 약이 맞는지 사진으로 확인</button></div>
   ${disclaimer('제품 정보는 식약처 허가사항 기준이에요. 실제 복용은 포장 문구와 약사 안내가 우선입니다.')}`;
 }
