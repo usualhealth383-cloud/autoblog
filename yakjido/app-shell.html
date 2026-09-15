@@ -367,6 +367,31 @@ details.ach-alt .bd p:last-child{margin-bottom:0}
 .ixline span{flex:1;min-width:0}
 .ixline.stop{background:var(--alert-tint);border-color:var(--alert);color:var(--alert)}
 .ixline.warn{background:var(--caution-tint);border-color:var(--caution);color:var(--caution)}
+.kind-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:9px;margin-top:14px}
+.kind{position:relative;display:flex;flex-direction:column;align-items:flex-start;gap:8px;padding:15px 14px;
+  border-radius:var(--r-card);border:1px solid var(--hairline);background:var(--card);cursor:pointer;text-align:left;min-height:96px}
+.kind .ic{display:grid;place-items:center;width:34px;height:34px;border-radius:10px;background:var(--tint2);color:var(--primary)}
+.kind b{font-size:.9375rem;font-weight:700;line-height:1.35}
+.kind .cnt{position:absolute;top:10px;right:10px;min-width:22px;height:22px;display:grid;place-items:center;
+  border-radius:11px;background:var(--primary);color:var(--on-primary);font-size:.75rem;font-weight:800}
+.kind-subs{display:flex;flex-direction:column;gap:9px;margin-top:14px}
+.kind-sub{display:flex;flex-direction:column;gap:4px;padding:15px 15px;border-radius:var(--r-card);
+  border:1px solid var(--hairline);background:var(--card);cursor:pointer;text-align:left;min-height:56px}
+.kind-sub.on{border-color:var(--primary);background:var(--tint)}
+.kind-sub .tk{display:flex;align-items:center;gap:7px}
+.kind-sub .tk svg.i{color:var(--primary);flex:none}
+.kind-sub b{font-size:1.0625rem;font-weight:700;line-height:1.4}
+.kind-sub span{font-size:.875rem;line-height:1.55;color:var(--muted)}
+.kind-sub .ach-tag{font-style:normal;align-self:flex-start;margin-top:3px;font-size:.75rem;font-weight:800;
+  padding:2px 8px;border-radius:6px;background:var(--caution-tint);color:var(--caution)}
+.kind-note{display:flex;align-items:flex-start;gap:8px;margin-top:12px;font-size:.875rem;line-height:1.6;color:var(--body)}
+.kind-note svg.i{color:var(--faint);flex:none;margin-top:2px}
+.kind-why{display:flex;align-items:flex-start;gap:10px;margin-top:18px;padding:14px 15px;border-radius:var(--r-card);
+  background:var(--card);border:1px solid var(--hairline)}
+.kind-why svg.i{color:var(--primary);flex:none;margin-top:2px}
+.kind-why b{font-size:.9375rem;font-weight:800}
+.kind-why p{font-size:.875rem;line-height:1.7;color:var(--body);margin-top:5px}
+.ix-chip.approx{border:1px dashed var(--primary);background:transparent}
 .tog-cta{display:flex;align-items:center;gap:11px;width:100%;margin-top:14px;padding:14px 15px;
   border-radius:var(--r-card);border:1px solid var(--primary);background:var(--card);text-align:left;cursor:pointer}
 .tog-cta>svg.i{color:var(--primary);flex:none}
@@ -928,9 +953,9 @@ function route(){
   if (path !== LASTPATH) { GQ = ''; LASTPATH = path; }
   const seg = path.split('/');
   const q = Object.fromEntries(new URLSearchParams(qs || ''));
-  const tab = { show:'home', check:'home', home:'home', symptom:'home', drugs:'drugs', drug:'drugs', class:'drugs', search:'drugs', pub:'drugs', pill:'drugs', guide:'home', kids:'home', tips:'home', schedule:'me', photo:'drugs', pillinfo:'drugs', supp:'supp', compare:'supp', me:'me', about:'me', ingr:'drugs', brand:'drugs', nut:'supp', hello:'home', mix:'drugs', together:'me' }[seg[0]] || 'home';
+  const tab = { show:'home', check:'home', home:'home', symptom:'home', drugs:'drugs', drug:'drugs', class:'drugs', search:'drugs', pub:'drugs', pill:'drugs', guide:'home', kids:'home', tips:'home', schedule:'me', photo:'drugs', pillinfo:'drugs', supp:'supp', compare:'supp', me:'me', about:'me', ingr:'drugs', brand:'drugs', nut:'supp', hello:'home', mix:'drugs', together:'me', kinds:'me' }[seg[0]] || 'home';
   document.querySelectorAll('nav.tabbar button').forEach(b => b.classList.toggle('on', b.dataset.tab === tab));
-  const R = { show:vShow, check:vCheck, home:vHome, symptom:vSymptom, drugs:vDrugs, drug:vDrug, class:vClass, search:vSearch, pub:vPub, pill:vPill, guide:vGuide, kids:vKids, tips:vTips, schedule:vSchedule, photo:vPhoto, pillinfo:vPillInfo, supp:vSupp, compare:vCompare, me:vMe, about:vAbout, ingr:vIngr, brand:vBrand, nut:vNut, hello:vHello, mix:vMix, together:vTogether };
+  const R = { show:vShow, check:vCheck, home:vHome, symptom:vSymptom, drugs:vDrugs, drug:vDrug, class:vClass, search:vSearch, pub:vPub, pill:vPill, guide:vGuide, kids:vKids, tips:vTips, schedule:vSchedule, photo:vPhoto, pillinfo:vPillInfo, supp:vSupp, compare:vCompare, me:vMe, about:vAbout, ingr:vIngr, brand:vBrand, nut:vNut, hello:vHello, mix:vMix, together:vTogether, kinds:vKinds };
   const html = (R[seg[0]] || vHome)(seg[1], q);
   const panel = gqPanel();
   view.innerHTML = panel ? insertPanel(html, panel) : html;
@@ -971,6 +996,14 @@ function meWarnings(dr){
 }
 const PICT = { '식후':['meal','식후 복용'], '공복':['meal','공복 복용'], '졸음':['moon','졸음 주의'], '운전주의':['car','운전·기계 조작 주의'], '음주금지':['no','술과 함께 금지'], '임부주의':['user','임신 중 주의'], '소아주의':['user','소아 연령 제한'], '물많이':['drop','물 충분히'], '햇빛주의':['eye','햇빛 노출 주의'], '단기만':['clock','단기간만'] };
 I.meal='<svg class="i" viewBox="0 0 24 24"><path d="M5 3v18M5 3c0 4 2 6 2 6s2-2 2-6M17 3v18M17 3c-2 0-3 3-3 6s1 3 3 3"/></svg>';
+I.heart='<svg class="i" viewBox="0 0 24 24"><path d="M12 20s-7-4.5-7-9.5A4 4 0 0 1 12 8a4 4 0 0 1 7 2.5c0 5-7 9.5-7 9.5z"/></svg>';
+I.brain='<svg class="i" viewBox="0 0 24 24"><path d="M12 5.5a2.5 2.5 0 0 0-4.8-1A2.5 2.5 0 0 0 5 7a2.5 2.5 0 0 0-.5 4.7A2.5 2.5 0 0 0 6 16a2.5 2.5 0 0 0 3.5 2.3A2.5 2.5 0 0 0 12 20zM12 5.5a2.5 2.5 0 0 1 4.8-1A2.5 2.5 0 0 1 19 7a2.5 2.5 0 0 1 .5 4.7A2.5 2.5 0 0 1 18 16a2.5 2.5 0 0 1-3.5 2.3A2.5 2.5 0 0 1 12 20z"/></svg>';
+I.lung='<svg class="i" viewBox="0 0 24 24"><path d="M12 3v8M9.5 11C8 11 5 12.5 5 16v3a2 2 0 0 0 2 2h1.5a2 2 0 0 0 2-2v-5c0-2-.5-3-1-3zM14.5 11c1.5 0 4.5 1.5 4.5 5v3a2 2 0 0 1-2 2h-1.5a2 2 0 0 1-2-2v-5c0-2 .5-3 1-3z"/></svg>';
+I.wave='<svg class="i" viewBox="0 0 24 24"><path d="M3 14c2.5 0 2.5-4 5-4s2.5 4 5 4 2.5-4 5-4 2.5 4 3 4"/><path d="M3 19h18"/></svg>';
+I.vessel='<svg class="i" viewBox="0 0 24 24"><path d="M12 3s-5 5.5-5 9a5 5 0 0 0 10 0c0-3.5-5-9-5-9z"/><path d="M9.5 13.5h5M12 11v5"/></svg>';
+I.bladder='<svg class="i" viewBox="0 0 24 24"><path d="M6 8a6 6 0 0 1 12 0v4a6 6 0 0 1-12 0z"/><path d="M12 18v3M9.5 7.5h5"/></svg>';
+I.foot='<svg class="i" viewBox="0 0 24 24"><path d="M9 21c-2 0-3-1.3-3-3 0-2 1.5-3 1.5-5.5S6 8 6 6a3 3 0 0 1 6 0c0 2-1 3.5-1 6.5S13 17 13 19c0 1.3-1 2-2 2z"/><circle cx="16" cy="5.5" r="1.5"/><circle cx="18.5" cy="9" r="1.3"/></svg>';
+I.joint='<svg class="i" viewBox="0 0 24 24"><path d="M7 3v5a3 3 0 0 0 3 3h1"/><path d="M17 21v-5a3 3 0 0 0-3-3h-1"/><circle cx="12" cy="12" r="2.5"/></svg>';
 I.no='<svg class="i" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M6 6l12 12"/></svg>';
 const picts = arr => arr?.length ? `<div class="picts">${arr.map(k => { const p = PICT[k] || ['info', k]; return `<span class="pict ${k === '음주금지' ? 'no' : ''}">${icon(p[0])}${esc(p[1])}</span>`; }).join('')}</div>` : '';
 const careCards = c => c ? `
@@ -1036,12 +1069,15 @@ function ingIndex(){
   ING_IX = { norm, roots, byKey, byDrug, n: list.length };
   return ING_IX;
 }
-/* 문자열(성분명·제품명)에서 아는 성분을 골라낸다 */
+/* 문자열(성분명·제품명)에서 아는 성분을 골라낸다.
+   '부틸스코폴라민'은 '스코폴라민'도 품고 있고 '페소테로딘'은 '테로딘'도 품고 있다.
+   짧은 쪽까지 같이 세면 항콜린 점수가 두 배가 된다 — 더 긴 어근이 이겼으면 짧은 쪽은 버린다. */
 function ingFind(text){
   const ix = ingIndex(); if (!ix.n) return [];
   const t = ix.norm(text); if (!t) return [];
-  const out = []; for (const [r, e] of ix.roots) if (t.includes(r) && !out.includes(e)) out.push(e);
-  return out;
+  const hit = [];
+  for (const [r, e] of ix.roots) if (t.includes(r) && !hit.some(h => h.e === e)) hit.push({ r, e });
+  return hit.filter(h => !hit.some(o => o !== h && o.r.length > h.r.length && o.r.includes(h.r))).map(h => h.e);
 }
 /* 내 약통 한 줄 → { ings:[성분…], known:true|false } */
 function ingOf(x){
@@ -1054,6 +1090,10 @@ function ingOf(x){
     if (!out.length) ingFind(x.d.name).forEach(push);
   }
   if (x.pub) { ingFind(x.pub.ingr).forEach(push); if (!out.length) ingFind(x.pub.full || x.pub.name).forEach(push); }
+  if (x.quick) {  /* 이름 없이 계열만 — 규칙은 계열로 돌아간다 */
+    const q = x.quick.x;
+    return { ings: [{ k: q.k || ('q:' + q.id), n: x.name, cls: q.cls, ach: q.ach || 0, approx: true }], known: true, approx: true };
+  }
   if (!out.length && x.name) ingFind(x.name).forEach(push);
   /* 앱이 직접 적어 둔 약은 성분표에 없어도 '아는 약'이다 — 점수는 약에 달린 값을 쓴다 */
   return { ings: out, known: out.length > 0 || !!(x.d && x.d.ach != null) };
@@ -1648,7 +1688,7 @@ function ixItems(extra){
   const out = [];
   for (const x of takingItems()) {
     const r = ingOf(x);
-    out.push({ name: x.name, ings: r.ings, known: r.known, from: '내 약통',
+    out.push({ name: x.name, ings: r.ings, known: r.known, approx: !!r.approx, from: '내 약통',
                link: x.d ? '#/drug/' + x.d.id : (x.pub ? '#/pillinfo/' + x.pub.seq : '') });
   }
   for (const d of (extra || [])) {
@@ -1722,6 +1762,42 @@ function ixCard(h){
     ${srcChips(h.r.src)}
   </div>`;
 }
+/* ───────── 이름을 몰라도 담기 ─────────
+   "혈압약 먹어요"까지는 아시지만 성분명은 모르시는 분이 대부분이다. 한국 약 이름은
+   어미가 곧 계열이라(…사르탄 = ARB), 끝 두세 글자만 읽으셔도 계열이 정해진다.
+   그러면 삼중고 같은 큰 위험은 이름 없이도 걸러진다. 정확한 점수는 이름을 담아야 나온다. */
+let KIND = '';
+function vKinds(id){
+  const Q = D.ingredients?.quick || [];
+  const on = qid => (ME.taking || []).includes('cls:' + qid);
+  const n = (ME.taking || []).filter(x => x.startsWith('cls:')).length;
+  if (id) {
+    const g = Q.find(x => x.id === id);
+    if (!g) return vKinds('');
+    return `${topBar({ back: '약 종류' })}
+      <div class="eyebrow">이름을 몰라도 담기</div>
+      <h1>${esc(g.n)}</h1>
+      <p class="ix-lead">약봉투나 약 상자에서 <b>이름의 끝 두세 글자</b>만 읽어 보세요. 한국 약은 끝 글자가 종류를 말해 줍니다.</p>
+      <div class="kind-subs">${g.subs.map(x => `<button class="kind-sub ${on(x.id) ? 'on' : ''}" onclick="toggleQuick('${x.id}')">
+        <div class="tk">${on(x.id) ? I.check : ''}<b>${esc(x.n)}</b></div>
+        ${x.ex ? `<span>${esc(x.ex)}</span>` : ''}
+        ${x.ach ? `<em class="ach-tag">항콜린 부담이 큰 편</em>` : ''}</button>`).join('')}</div>
+      <p class="kind-note">${I.info}<span>여러 개를 드시면 <b>해당하는 것을 모두</b> 눌러 주세요. 잘못 누르셨으면 다시 눌러 빼시면 됩니다.</span></p>
+      <div class="actions"><button class="btn" onclick="go('/kinds')">${I.check} 다 골랐어요</button></div>`;
+  }
+  return `${topBar({ back: '이전' })}
+    <div class="eyebrow">이름을 몰라도 담기</div>
+    <h1>어떤 약을 드세요?</h1>
+    <p class="ix-lead">약 이름을 모르셔도 괜찮아요. <b>무슨 병 때문에 드시는지</b>만 고르시면, 위험한 조합은 그것만으로도 대부분 걸러집니다.</p>
+    ${n ? `<div class="ix-sum ok">${I.check}<div><b>${n}가지를 담아 두셨어요</b><p>이름까지 담으시면 더 정확해집니다.</p></div></div>` : ''}
+    <div class="kind-grid">${Q.map(g => { const c = g.subs.filter(x => on(x.id)).length;
+      return `<button class="kind" onclick="go('/kinds/${g.id}')"><div class="ic">${icon(g.ico)}</div><b>${esc(g.n)}</b>${c ? `<span class="cnt">${c}</span>` : ''}</button>`; }).join('')}</div>
+    ${n ? `<div class="actions"><button class="btn" onclick="go('/together')">${I.shield} 같이 먹어도 되는지 보기</button></div>` : ''}
+    <div class="kind-why">${I.info}<div><b>대략만 담아도 되나요</b>
+      <p>네. 예를 들어 <b>혈압약 + 소변 자주 나오는 약</b>을 드시는 분이 소염진통제를 사시면, 이름을 몰라도 <b>콩팥이 위험하다</b>는 것을 알려 드릴 수 있어요.</p>
+      <p>다만 <b>항콜린 점수</b>처럼 성분마다 다른 것은 이름을 담아야 정확합니다. 약봉투가 있으시면 <a class="link" href="#/pill">이름으로 찾아 담기</a>가 가장 좋아요.</p></div></div>
+    ${disclaimer('대략 담으신 약은 화면에 ‘대략’으로 표시됩니다. 판정도 그만큼만 정확해요.')}`;
+}
 function vTogether(){
   const res = ixRun([]);
   const n = res.items.length;
@@ -1739,9 +1815,10 @@ function vTogether(){
     <h1>같이 먹어도 되나요</h1>
     <p class="ix-lead">내 약통에 담아 두신 약들을 <b>성분</b>으로 풀어서, 서로 부딪히는 자리가 있는지 봅니다. 처방약도 함께 봅니다.</p>
     ${!n ? `<div class="empty">${I.pill}<p><b>아직 담아 두신 약이 없어요.</b><br>약봉투에 적힌 이름이나 약 사진으로 담으시면 바로 봐 드려요.</p>
-        <div class="ix-cta"><a class="btn" href="#/photo">${I.eye}약봉투·약 사진으로 담기</a><a class="btn line" href="#/pill">${I.search}이름으로 찾아 담기</a></div></div>`
+        <div class="ix-cta"><a class="btn" href="#/photo">${I.eye}약봉투·약 사진으로 담기</a><a class="btn line" href="#/pill">${I.search}이름으로 찾아 담기</a><a class="btn line" href="#/kinds">${I.pill}이름을 모르면 — 종류만 고르기</a></div></div>`
       : `${head}
-      <div class="ix-list">${res.items.map(it => `<span class="ix-chip ${it.known ? '' : 'unk'}">${it.link ? `<a href="${it.link}">${esc(it.name)}</a>` : esc(it.name)}${it.known ? '' : '<em>성분 모름</em>'}</span>`).join('')}</div>
+      <div class="ix-list">${res.items.map(it => `<span class="ix-chip ${it.approx ? 'approx' : it.known ? '' : 'unk'}">${it.link ? `<a href="${it.link}">${esc(it.name)}</a>` : esc(it.name)}${it.approx ? '<em>대략</em>' : it.known ? '' : '<em>성분 모름</em>'}</span>`).join('')}</div>
+      ${res.items.some(i => i.approx) ? `<p class="ix-unk">${I.info}<span><b>‘대략’</b>으로 담으신 약이 있어요. 종류만으로도 큰 위험은 걸러지지만, <b>항콜린 점수처럼 성분마다 다른 것</b>은 이름을 담아야 정확합니다. <a class="link" href="#/pill">이름으로 찾아 담기</a></span></p>` : ''}
       ${res.unknown.length ? `<p class="ix-unk">${I.info}<span><b>${res.unknown.length}가지</b>는 성분을 확인하지 못해 판정에서 빠졌어요. 약봉투에 적힌 <b>성분 이름</b>으로 다시 담으시면 함께 봐 드려요.</span></p>` : ''}
       ${res.dupe.length ? `<div class="ix stop"><div class="ix-h">${I.alert}<b>같은 성분이 두 군데에 들어 있어요</b><span class="ix-lv">겹침</span></div>
         ${res.dupe.map(d => `<p class="ix-why"><b>${esc(d.e?.n || '')}</b> — ${d.items.map(i => esc(i.name)).join(' · ')}</p>`).join('')}
@@ -2072,7 +2149,13 @@ function vPillInfo(seq){
 }
 function togglePub(seq){ const p = findPill(seq); if (!p) return; const d = drugByIngr(p.ingr); ME.pub = ME.pub || {}; const id = 'pub:' + seq; ME.taking = ME.taking || []; if (ME.taking.includes(id)) { ME.taking = ME.taking.filter(x => x !== id); delete ME.pub[id]; toast('내 약통에서 뺐어요'); } else { ME.taking.push(id); ME.pub[id] = { name: p.n.replace(/\(.*?\)/g, '').replace(/[()]/g, '').trim(), full: p.n, ingr: p.ingr || '', rx: p.rx, seq, drugId: d?.id || '' };  /* full: 괄호 속에 성분이 들어 있는 제품이 많다 — 버리지 않는다 */ toast('내 약통에 담았어요'); } saveMe(); route(); }
 /* 내 약통 항목 통합 조회(약지도 성분 | 공공 제품) */
-function takingItems(){ return (ME.taking || []).map(id => { if (id.startsWith('pub:')) { const x = (ME.pub || {})[id]; if (!x) return null; const d = x.drugId ? drug(x.drugId) : null; return { id, name: x.name, simple: x.rx ? '처방대로 (약봉투 용법)' : (d?.simple || '라벨대로'), d, pub: x }; } const d = drug(id); return d ? { id, name: d.name, simple: d.simple || '', d } : null; }).filter(Boolean); }
+/* 대략 담기: 'cls:bp.arb' 처럼 계열만 아는 항목 */
+function quickSub(qid){ for (const g of (D.ingredients?.quick || [])) for (const x of (g.subs || [])) if (x.id === qid) return { g, x }; return null; }
+function toggleQuick(qid){ ME.taking = ME.taking || []; const id = 'cls:' + qid;
+  if (ME.taking.includes(id)) { ME.taking = ME.taking.filter(v => v !== id); toast('내 약통에서 뺐어요'); }
+  else { ME.taking.push(id); toast('내 약통에 담았어요'); }
+  saveMe(); route(); }
+function takingItems(){ return (ME.taking || []).map(id => { if (id.startsWith('cls:')) { const q = quickSub(id.slice(4)); if (!q) return null; return { id, name: q.g.n + ' — ' + q.x.n.replace(/으로 끝나요|이에요|예요|이 들어 있어요/g, '').trim(), quick: q, approx: true, simple: '처방대로 (약봉투 용법)' }; } if (id.startsWith('pub:')) { const x = (ME.pub || {})[id]; if (!x) return null; const d = x.drugId ? drug(x.drugId) : null; return { id, name: x.name, simple: x.rx ? '처방대로 (약봉투 용법)' : (d?.simple || '라벨대로'), d, pub: x }; } const d = drug(id); return d ? { id, name: d.name, simple: d.simple || '', d } : null; }).filter(Boolean); }
 document.addEventListener('input', e => { if (e.target.id === 'mq') { MQ = e.target.value; clearTimeout(window._mt); window._mt = setTimeout(() => { const pos = e.target.selectionStart; route(); const el = document.getElementById('mq'); if (el) { el.focus(); el.setSelectionRange(pos, pos); } }, 300); }
   if (e.target.id === 'phq') { PH.q = e.target.value; clearTimeout(window._pt); window._pt = setTimeout(() => { const pos = e.target.selectionStart; route(); const el = document.getElementById('phq'); if (el) { el.focus(); el.setSelectionRange(pos, pos); } }, 280); return; }
   if (e.target.id === 'gq') { GQ = e.target.value; clearTimeout(window._gt); window._gt = setTimeout(() => { const pos = e.target.selectionStart; route(); const el = document.getElementById('gq'); if (el) { el.focus(); el.setSelectionRange(pos, pos); } }, 300); }
@@ -2450,8 +2533,9 @@ function vMe(){
   </section>
   <section class="sec card"><h2>지금 먹는 약 <small class="muted" style="font-weight:500;font-size:.8125rem">중복 성분을 잡아드려요</small></h2>
     <p class="small" style="margin-top:6px">감기약·진통제·처방약을 등록해 두면, 증상별 추천에서 <b>같은 성분이 겹치는지</b> 알려드려요.</p>
-    <div class="taking">${takingItems().map(x => `<span class="chip">${esc(x.name)}<button aria-label="${esc(x.name)} 빼기" onclick="${x.id.startsWith('pub:') ? `togglePub('${x.id.slice(4)}')` : `toggleTaking('${x.id}')`}">${I.x}</button></span>`).join('') || '<span class="small muted">아직 등록한 약이 없어요.</span>'}</div>
-    <div class="actions" style="display:flex;gap:8px"><button class="btn ghost" style="flex:1" onclick="go('/photo')">${I.eye} 사진으로 등록</button><button class="btn ghost" style="flex:1" onclick="go('/pill')">${I.search} 알약으로 찾기</button></div>
+    <div class="taking">${takingItems().map(x => `<span class="chip">${esc(x.name)}<button aria-label="${esc(x.name)} 빼기" onclick="${x.id.startsWith('pub:') ? `togglePub('${x.id.slice(4)}')` : x.id.startsWith('cls:') ? `toggleQuick('${x.id.slice(4)}')` : `toggleTaking('${x.id}')`}">${I.x}</button></span>`).join('') || '<span class="small muted">아직 등록한 약이 없어요.</span>'}</div>
+    <div class="actions" style="display:flex;gap:8px"><button class="btn ghost" style="flex:1" onclick="go('/photo')">${I.eye} 사진으로 등록</button><button class="btn ghost" style="flex:1" onclick="go('/pill')">${I.search} 이름·알약으로</button></div>
+    <div class="actions"><button class="btn line" onclick="go('/kinds')">${I.pill} 약 이름을 모르시나요 — 종류만 골라도 돼요</button></div>
     <div class="search" style="margin-top:12px">${I.search}<input id="mq" placeholder="약 이름으로 찾아 등록 (예: 타이레놀)" value="${esc(MQ)}" autocomplete="off"></div>
     ${MQ.trim() ? `<div class="card rows" style="margin-top:8px">${(search(MQ.trim()).filter(h => h.h.startsWith('/drug/')).slice(0, 6).map(h => { const id = h.h.slice(6); const on = (ME.taking || []).includes(id); return `<button class="row" onclick="${on ? '' : `toggleTaking('${id}');`}MQ='';route()"><div class="ic">${I.pill}</div><div class="body"><b>${esc(h.t)}</b><span>${on ? '이미 등록돼 있어요' : '눌러서 내 약통에 담기'}</span></div>${I.chev}</button>`; }).join('')) || '<div class="empty">찾는 약이 없어요</div>'}</div>` : ''}
     ${takingItems().length ? `<button class="tog-cta" onclick="go('/together')">${I.shield}<div><b>같이 먹어도 되나요</b><span>담아 두신 ${takingItems().length}가지를 성분으로 풀어서 서로 부딪히는 자리를 봐 드려요</span></div>${I.chev}</button>` : ''}
