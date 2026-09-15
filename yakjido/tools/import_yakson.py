@@ -25,6 +25,14 @@ FIX = {
 NOTE = {
     'pse': '단일제는 전문의약품이에요. 약국에서는 종합감기약 등 복합제 형태로만 살 수 있습니다(식약처 e약은요 확인).',
 }
+# 영문·한글 이름이 같아도 «제형·용도가 다르면 다른 약»이다. 이름만 보고 연결하면
+# 입술 포진에 먹는 대상포진약을, 발뒤꿈치에 인후통 트로키를 권하게 된다.
+# 여기 적힌 것은 약지도 해설로 보내지 않고 사전 항목 그대로 쓴다.
+NO_LINK = {
+    'u_acv': '크림(일반)과 먹는 약(전문)이 다르다 — 약지도 acyclovir 는 먹는 대상포진약',
+    'p_flb': '파스(외용)와 인후통 트로키가 다르다 — 약지도 flurbiprofen 은 트로키',
+    'dic':   '먹는 약(전문)과 바르는 겔(일반)이 다르다 — 사전은 둘을 묶어 설명한다',
+}
 RXW = {'otc': '일반', 'rx': '전문', 'both': '둘 다'}
 
 
@@ -52,7 +60,8 @@ def main():
     lex = []
     for x in ING:
         k = FIX[x['id']][0] if x['id'] in FIX else x['k']
-        link = by_en.get((x.get('en') or '').lower().split('(')[0].strip()) or by_nm.get(x['n'].split('(')[0].strip())
+        link = None if x['id'] in NO_LINK else (
+            by_en.get((x.get('en') or '').lower().split('(')[0].strip()) or by_nm.get(x['n'].split('(')[0].strip()))
         o = {'id': x['id'], 'n': x['n'], 'en': x.get('en', ''), 'cls': x['cls'], 'rx': RXW[k],
              'use': x.get('use', ''), 'dose': x.get('dose', ''), 'gap': x.get('gap', ''), 'max': x.get('max', ''),
              'care': x.get('care', []), 'inter': x.get('inter', []), 'risk': x.get('risk', {}),
