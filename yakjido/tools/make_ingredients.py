@@ -188,6 +188,18 @@ ING = [
  ('tetracycline','테트라사이클린계 항생제',0,'ACB',['abx','mineral-bind'],['독시사이클린','미노사이클린','테트라사이클린'],'','',''),
  ('metronidazole','메트로니다졸',0,'ACB',['abx'],['메트로니다졸','티니다졸'],'','',''),
  ('sulfa','설파계 항생제',0,'ACB',['abx'],['설파메톡사졸','트리메토프림'],'','',''),
+ # ── 바르는·붙이는 소염제 — 먹는 것과 같은 계열로 묶으면 안 된다 ──────────
+ # 약지도는 파스와 먹는 진통제를 함께 권한다(옳다). 같은 'nsaid' 로 묶어 두면
+ # 앱이 스스로 "소염진통제가 두 가지 겹쳤어요" 라고 잘못 말한다.
+ ('ketoprofen-top','케토프로펜 파스',0,'ACB',['nsaid-top'],['케토프로펜'],'','','ketoprofen'),
+ ('piroxicam-top','피록시캄 패치',0,'ACB',['nsaid-top'],['피록시캄'],'','','piroxicam'),
+ ('diclofenac-top','디클로페낙 겔',0,'ACB',['nsaid-top'],[],'','','diclofenac-topical'),
+ ('flurbiprofen-top','플루르비프로펜 외용',0,'ACB',['nsaid-top'],[],'','','flurbiprofen'),
+ ('salicylate-top','살리실산메틸 파스',0,'ACB',['nsaid-top'],[],'','','methyl-salicylate'),
+ ('triamcinolone-top','트리암시놀론 연고',0,'ACB',['steroid-top'],[],'','','triamcinolone'),
+ ('amoxclav','아목시실린·클라불란산',0,'ACB',['abx'],[],'','','amox-clav'),
+ ('alpha-bph','전립선약(알파차단제)',0,'ACB',['alpha'],['실로도신','알푸조신','나프토피딜'],
+  '','',''),
  ('prednisolone','스테로이드(먹는)',0,'확인 필요',['steroid'],['프레드니솔론','프레드니손','메틸프레드니솔론','메칠프레드니솔론','데플라자코트','트리암시놀론'],'','',''),
 ]
 

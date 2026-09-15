@@ -360,6 +360,13 @@ details.ach-alt .bd p{font-size:.875rem;line-height:1.6;margin-bottom:8px}
 details.ach-alt .bd p:last-child{margin-bottom:0}
 
 /* ── 병용 판정 ── */
+.ixline{display:flex;align-items:center;gap:9px;width:100%;margin-top:10px;padding:12px 13px;border-radius:12px;
+  text-align:left;cursor:pointer;font-size:.9375rem;line-height:1.55;border:1px solid}
+.ixline>svg.i{flex:none}
+.ixline>svg.i:last-child{margin-left:auto;opacity:.7}
+.ixline span{flex:1;min-width:0}
+.ixline.stop{background:var(--alert-tint);border-color:var(--alert);color:var(--alert)}
+.ixline.warn{background:var(--caution-tint);border-color:var(--caution);color:var(--caution)}
 .tog-cta{display:flex;align-items:center;gap:11px;width:100%;margin-top:14px;padding:14px 15px;
   border-radius:var(--r-card);border:1px solid var(--primary);background:var(--card);text-align:left;cursor:pointer}
 .tog-cta>svg.i{color:var(--primary);flex:none}
@@ -834,7 +841,45 @@ function allPills(withRx){ return withRx && PUB.rx ? PUB.pills.concat(PUB.rx) : 
 const IMP_MAP = { O:'0', Q:'0', D:'0', I:'1', L:'1', S:'5', B:'8', Z:'2', G:'6' };
 const normImp = t => (t || '').toUpperCase().replace(/[^0-9A-Z가-힣]/g, '').replace(/[OQDILSBZG]/g, c => IMP_MAP[c] || c);
 function lev(a, b){ if (a === b) return 0; if (!a.length) return b.length; if (!b.length) return a.length; let prev = Array.from({ length: b.length + 1 }, (_, i) => i); for (let i = 1; i <= a.length; i++) { const cur = [i]; for (let j = 1; j <= b.length; j++) cur[j] = Math.min(prev[j] + 1, cur[j - 1] + 1, prev[j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1)); prev = cur; } return prev[b.length]; }
-function impScore(p, q){ if (!q) return 0; const f = normImp(p.f), b = normImp(p.b); let best = 0; for (const side of [f, b]) { if (!side) continue; if (side === q) best = Math.max(best, 100); else if (side.startsWith(q) || q.startsWith(side) && side.length >= 2) best = Math.max(best, 80); else if (side.includes(q)) best = Math.max(best, 65); else if (q.length >= 3 && Math.abs(side.length - q.length) <= 2) { const d = lev(side, q); if (d === 1) best = Math.max(best, 55); else if (d === 2 && q.length >= 4) best = Math.max(best, 40); } } if (!best && p.n.toUpperCase().includes((q || '').toUpperCase())) best = 30; return best; }
+/* 앞면과 뒷면을 띄어 적어 오시는 분들 — 'TY 500' 처럼. 조각마다 어느 한 면에 걸리면 맞는 약이다 */
+function impSplit(p, raw){
+  const parts = String(raw || '').trim().split(/[\s,·]+/).map(normImp).filter(x => x.length >= 2);
+  if (parts.length < 2) return 0;
+  const sides = [normImp(p.f), normImp(p.b)].filter(Boolean);
+  if (!sides.length) return 0;
+  const used = [];
+  for (const t of parts) {
+    const i = sides.findIndex((sd, k) => !used.includes(k) && (sd.startsWith(t) || sd.includes(t)));
+    if (i < 0) return 0;
+    used.push(i);
+  }
+  return 88;
+}
+function impScore(p, q){ if (!q) return 0; const f = normImp(p.f), b = normImp(p.b); let best = 0;
+  /* 앞면 TYLENOL · 뒷면 500 인 알약을 보고 'TY 500' 이라 치는 분이 많다 — 합쳐서도 본다 */
+  for (const side of [f, b, f && b ? f + b : '', f && b ? b + f : '']) { if (!side) continue; if (side === q) best = Math.max(best, 100); else if (side.startsWith(q) || q.startsWith(side) && side.length >= 2) best = Math.max(best, 80); else if (side.includes(q)) best = Math.max(best, 65); else if (q.length >= 3 && Math.abs(side.length - q.length) <= 2) { const d = lev(side, q); if (d === 1) best = Math.max(best, 55); else if (d === 2 && q.length >= 4) best = Math.max(best, 40); } } return best; }
+/* 약봉투를 보고 이름을 치는 분이 훨씬 많다 — 이름 일치는 유사 각인보다 위에 와야 한다.
+   예전에는 이름 일치가 30점이라 '타이레놀'을 치면 난타코연질캡슐이 1등으로 올라왔다. */
+const normName = t => String(t || '').toUpperCase().replace(/\s/g, '')
+  .replace(/밀리그램|밀리그람|MILLIGRAM/g, 'MG').replace(/마이크로그램/g, 'UG').replace(/그램|그람/g, 'G')
+  .replace(/[()\[\]·・,.\-]/g, '');
+/* '베시케어 5mg' 처럼 용량까지 적어 오시면, 용량을 뗀 이름으로도 한 번 본다 */
+const nameHead = q => q.replace(/[0-9]+(\.[0-9]+)?(MG|G|UG|IU|%)?$/, '').replace(/[0-9/.]+$/, '');
+function nameScore(p, raw){
+  const q0 = normName(raw); if (q0.length < 2) return 0;
+  const head = nameHead(q0);
+  const one = q => {
+    const n = normName(p.n), g = normName(p.ingr || '');
+    if (!q || q.length < 2) return 0;
+    if (n === q) return 99;
+    if (n.startsWith(q)) return 95;
+    if (n.includes(q)) return 85;
+    if (g.startsWith(q)) return 75;
+    if (g.includes(q)) return 70;
+    return 0;
+  };
+  return Math.max(one(q0), head !== q0 ? one(head) - 2 : 0);
+}
 function pillSearch(qs, withRx){
   const q = normImp(qs.txt); const list = allPills(withRx);
   const out = [];
@@ -842,11 +887,11 @@ function pillSearch(qs, withRx){
     if (qs.sh && p.sh !== qs.sh) continue;
     if (qs.c && !(p.c === qs.c || p.c.startsWith(qs.c + '|') || p.c.endsWith('|' + qs.c))) continue;
     if (qs.ln === 'y' && !p.ln) continue; if (qs.ln === 'n' && p.ln) continue;
-    let sc = q ? impScore(p, q) : 1; if (q && !sc) continue;
+    let sc = q ? Math.max(impScore(p, q), impSplit(p, qs.txt), nameScore(p, qs.txt)) : 1; if (q && !sc) continue;
     if (qs.sh && p.sh === qs.sh) sc += 5; if (qs.c && p.c === qs.c) sc += 5;
     out.push([sc, p]);
   }
-  out.sort((a, b) => b[0] - a[0] || (a[1].rx - b[1].rx)); return out;
+  out.sort((a, b) => b[0] - a[0] || (a[1].rx - b[1].rx) || (a[1].n.length - b[1].n.length)); return out;  /* 같은 점수면 이름이 짧은 쪽(기본 제품)이 먼저 */
 }
 const SHAPES_SVG = { '원형':'<circle cx="14" cy="14" r="11"/>', '타원형':'<ellipse cx="14" cy="14" rx="12" ry="8"/>', '장방형':'<rect x="2" y="8" width="24" height="12" rx="6"/>', '삼각형':'<path d="M14 3L26 24H2z" stroke-linejoin="round"/>', '사각형':'<rect x="4" y="4" width="20" height="20" rx="3"/>', '오각형':'<path d="M14 2l12 9-4.6 14H6.6L2 11z" stroke-linejoin="round"/>', '육각형':'<path d="M8 3h12l6 11-6 11H8L2 14z" stroke-linejoin="round"/>', '팔각형':'<path d="M9 2h10l7 7v10l-7 7H9l-7-7V9z" stroke-linejoin="round"/>', '마름모형':'<path d="M14 2l12 12-12 12L2 14z" stroke-linejoin="round"/>', '기타':'<path d="M6 8c4-6 12-6 16 0s-4 14-8 14S2 14 6 8z"/>' };
 async function pubDetail(id){ const ch = Math.floor(id / (D.public?.chunk || 200)); if (!PUB.chunks[ch]) PUB.chunks[ch] = await loadJSON(`easy-${ch}.json`); return PUB.chunks[ch][id % (D.public?.chunk || 200)]; }
@@ -1095,6 +1140,24 @@ function achRisk(n){
     <p>한국 노인 46만 명을 본 연구에서, 항콜린 부담 3점 이상인 분들은 0점인 분들보다 <b>헛것이 보이고 정신이 흐려져(섬망) 응급실에 가는 일이 약 3배</b>, <b>소변이 막혀 가는 일이 약 2배</b>, 넘어져 다치는 일이 1.5배였어요.</p>
     <p>4만 2천 명을 5.7년 따라간 연구에서는 1년에 <b>1,000명 중 약 10명(0점) → 약 18명(3점 이상)</b>이 돌아가셨어요. 나이·병·다른 약을 감안한 뒤의 수치입니다.</p>
     <p class="small">약을 끊으라는 뜻이 아니라, <b>꼭 필요한 약인지 한 번 여쭤볼 만하다</b>는 뜻이에요. 필요해서 드시는 약이 대부분입니다.</p></div>`;
+}
+/* 증상 화면용 한 줄 — 이번에 사려는 약이 처방약과 부딪히는지 그 자리에서 알린다 */
+function ixLine(extra){
+  if (!takingItems().length) return '';
+  const res = ixRun(extra);
+  /* 추천 약이 한쪽 자리에 들어간 것만 — 내 약통끼리의 문제는 병용 화면에서 따로 본다 */
+  const now = res.hits.filter(h => h.r.lv !== 'info' && h.items.some(i => i.from === '지금 보는 약'));
+  /* 추천 안에서 성분이 겹치는 것은 위쪽 '사시기 전에 확인할 것'이 이미 말한다.
+     여기서는 내 약통과 이번 추천 사이에 걸친 것만 — 모르고 두 배로 드시게 되는 자리다 */
+  const dup = res.dupe.filter(d => d.items.some(i => i.from === '지금 보는 약') && d.items.some(i => i.from === '내 약통'));
+  if (!now.length && !dup.length) return '';
+  const spans = h => h.items.some(i => i.from === '내 약통') && h.items.some(i => i.from === '지금 보는 약');
+  const worst = now.find(h => h.r.lv === 'stop' && spans(h)) || now.find(h => h.r.lv === 'stop')
+             || now.find(spans) || now[0];
+  const lv = dup.length || (worst && worst.r.lv === 'stop') ? 'stop' : 'warn';
+  const t = dup.length ? `${dup[0].e?.n || ''} — 지금 드시는 약에 이미 들어 있어요` : worst.r.t;
+  const more = now.length + dup.length - 1;
+  return `<button class="ixline ${lv}" onclick="go('/together')">${I.alert}<span>${lv === 'stop' ? '사시기 전에 꼭 보세요' : '지금 드시는 약과' } — <b>${esc(t)}</b>${more > 0 ? ` 외 ${more}가지` : ''}</span>${I.chev}</button>`;
 }
 /* 약국 카드용 한 줄 — 약사님이 읽으실 문장 */
 function achLine(extra){
@@ -1373,6 +1436,7 @@ function vSymptom(id){
     ${s.plan?.some(p => p.otc === false) ? `<div class="rxline">${I.info}${esc(s.plan.filter(p => p.otc === false).map(p => (p.options || []).map(o => ingrName(drug(o))).filter(Boolean).join(' · ') || String(p.title || p.slot).split('—').pop().replace(/\(처방\)/g, '').trim()).join(' · '))} — 병원 처방이 필요해요</div>` : ''}
     ${kidLine()}
     ${(() => { const w = [...dups, ...sameProductWarn(bk)]; return w.length ? `<div class="dup"><div class="dup-h">${I.alert}<b>사시기 전에 확인할 것 ${w.length}가지</b></div><ul class="plain">${w.map(t => `<li>${fmt(t)}</li>`).join('')}</ul></div>` : ''; })()}
+    ${ixLine(bk.map(x => x.d))}
     ${achPanel(bk.map(x => x.d), { compact:true })}
     ${takingItems().length ? '' : `<button class="bag-line sm" onclick="go('/me')">${I.pill}<span>지금 드시는 약이 있으면 알려 주세요 — 겹치는 성분을 걸러 드려요</span>${I.chev}</button>`}
     ${(() => { const rel = mixFor(bk.map(x => x.d)); return rel.length ? `<button class="mixline" onclick="go('/mix/${rel[0].id}')">${I.scale}<span>같이 드시는 약이 있다면 — <b>${esc(rel[0].t)}</b></span>${I.chev}</button>` : ''; })()}
@@ -1950,13 +2014,14 @@ function vPill(){
   const shown = active ? res.slice(0, 30) : [];
   return `${topBar({ back:'약 사전' })}
   <div class="eyebrow">약 알아보기</div><h1>이 약이 무슨 약일까</h1>${art('pill-search', 'spot')}
-  <p style="margin-top:6px">사진 한 장이면 제일 빨라요. 아니면 알약에 새겨진 글자·모양·색을 큰 단추로 고르면 후보가 사진으로 줄어들어요.</p>
+  <p style="margin-top:6px"><b>약봉투에 적힌 이름</b>을 그대로 치시는 것이 가장 빨라요. 이름을 모르면 알약에 <b>새겨진 글자·모양·색</b>으로 찾습니다. 사진 한 장이면 더 빠르고요.</p>
   <div class="sec">
     <button class="big-btn" onclick="go('/photo?mode=pill')"><div class="ic">${I.eye}</div><div><b>사진 찍어서 찾기</b><span>알약·약봉투·약 상자·영양제 라벨 모두</span></div></button>
   </div>
   <section class="sec card">
-    <h2>새겨진 글자 <small>대소문자·O/0 구분 안 해도 돼요</small></h2>
-    <div class="search" style="margin-top:10px">${I.search}<input id="pq" placeholder="예: TY 500, 부루펜, 82" value="${esc(PILLQ.txt)}" autocomplete="off" style="font-size:1.25rem;letter-spacing:.05em"></div>
+    <h2>이름 또는 새겨진 글자 <small>띄어쓰기·대소문자·O/0 구분 안 해도 돼요</small></h2>
+    <div class="search" style="margin-top:10px">${I.search}<input id="pq" placeholder="예: 베시케어, 타이레놀, TY 500" value="${esc(PILLQ.txt)}" autocomplete="off" style="font-size:1.25rem;letter-spacing:.05em"></div>
+    <p class="small muted" style="margin-top:7px">약봉투·약 상자에 적힌 이름 그대로 치셔도 되고, 용량까지 적으셔도 돼요(베시케어 5mg). <b>한글 이름을 치시면 처방약도 함께 찾습니다.</b></p>
     <h2 style="margin-top:16px">모양</h2>
     <div class="shape-grid">${Object.keys(SHAPES_SVG).map(x => `<button class="shape-btn ${PILLQ.sh === x ? 'on' : ''}" onclick="PILLQ.sh=PILLQ.sh==='${x}'?'':'${x}';route()"><svg viewBox="0 0 28 28">${SHAPES_SVG[x]}</svg>${x.replace('형', '')}</button>`).join('')}</div>
     <h2 style="margin-top:16px">색</h2>
@@ -1968,7 +2033,7 @@ function vPill(){
     </div>
   </section>
   <section class="sec"><h2>${active ? `후보 ${res.length.toLocaleString()}개` : '고르면 여기에 사진이 나와요'} <small>${res.length > 30 ? '30개만 표시 — 글자나 색을 더 고르면 줄어요' : PILLQ.rx ? `약국약 ${(PUB.pills || []).length.toLocaleString()} + 처방약 ${(PUB.rx || []).length.toLocaleString()}건에서` : `약국약 ${(PUB.pills || []).length.toLocaleString()}건에서`}</small></h2>
-    ${shown.length ? `<div class="pill-grid">${shown.map(([sc, p]) => pillCard(p, sc)).join('')}</div>` : active ? '<div class="empty"><b>조건에 맞는 약이 없어요</b>글자를 줄이거나 색을 바꿔 보세요. 처방약이면 ‘처방약까지 찾기’를 켜 주세요.</div>' : ''}
+    ${shown.length ? `<div class="pill-grid">${shown.map(([sc, p]) => pillCard(p, sc)).join('')}</div>` : active ? '<div class="empty"><b>조건에 맞는 약이 없어요</b>이름이면 앞 두세 글자만 쳐 보세요(베시케어 → 베시). 각인이면 글자를 줄이거나 색을 바꿔 보세요.</div>' : ''}
     <div class="srcs"><span class="src-chip">${I.link}출처: 식약처 의약품 낱알식별 정보 · 사진 약학정보원</span></div></section>
   ${disclaimer('낱알 사진과 각인은 참고용이에요. 같은 모양의 다른 약도 있으니, 확실하지 않으면 약사에게 실물을 보여 주세요.')}`;
 }
@@ -1993,7 +2058,14 @@ function vPillInfo(seq){
   <div class="kv3"><div><small>앞 글자</small><b>${esc(p.f || '—')}</b></div><div><small>뒤 글자</small><b>${esc(p.b || '—')}</b></div><div><small>모양·색</small><b>${esc(p.sh)} · ${esc(p.c)}</b></div><div><small>크기</small><b>${p.sz ? esc(p.sz) + ' mm' : '—'}</b></div><div><small>분할선</small><b>${p.ln ? '있음' : '없음'}</b></div><div><small>구분</small><b>${p.rx ? '처방 필요' : '처방 없이'}</b></div></div>
   ${d ? `<section class="sec"><h2>약지도 성분 해설</h2><div class="card rows"><button class="row" onclick="go('/drug/${d.id}')"><div class="ic">${icon(cls(d.class)?.icon || 'pill')}</div><div class="body"><b>${esc(d.name)}</b><span>${esc(d.tagline || '')}</span></div>${I.chev}</button></div>${meWarnings(d)}<div class="found" style="margin-top:10px"><div class="eyebrow">복용법 (약국 구입 기준)</div><div class="simple">${esc(d.simple || '')}</div>${p.rx ? '<p class="small muted" style="margin-top:6px">처방약은 봉투에 적힌 용법이 우선이에요.</p>' : ''}</div></section>` : p.rx ? `<section class="sec"><div class="note">${I.info}<span>처방약이에요. 용법·용량은 약봉투와 처방한 의사·약사 지시가 우선이에요. 궁금하면 약봉투를 사진 찍어 올려 주세요.</span></div></section>` : ''}
   ${pubHit ? `<section class="sec card rows"><button class="row" onclick="go('/pub/${pubHit.id}')"><div class="ic">${I.info}</div><div class="body"><b>식약처 e약은요 설명 보기</b><span>효능·사용법·주의사항 평문</span></div>${I.chev}</button></section>` : ''}
-  <div class="actions"><button class="btn ${taking ? 'line' : ''}" onclick="togglePub('${p.seq}')">${taking ? I.check + ' 내 약통에 있어요 (빼기)' : I.pill + ' 내 약통에 등록'}</button>${taking ? `<button class="btn ghost" onclick="go('/schedule')">${I.clock} 복용 시간 알림 만들기</button>` : ''}</div>
+  ${(() => {  /* 이 약 자체의 항콜린 부담 — 처방약도 성분으로 풀어 본다 */
+    const es = ingFind(p.ingr).concat(ingFind(p.n)).filter(e => e.ach);
+    if (!es.length) return '';
+    const e = es.sort((a, b) => b.ach - a.ach)[0];
+    return `<section class="sec"><div class="ach ${e.ach >= 3 ? 'warn' : 'ok'}"><div class="ach-h">${e.ach >= 3 ? I.alert : I.check}<b>이 약의 항콜린 부담 — ${esc(ACH_WORD[e.ach])}</b><span class="ach-n">${e.ach}점</span></div>
+      <p class="ach-w">${esc(e.n)}이 들어 있어요.${e.achNote ? ' ' + esc(e.achNote) + '.' : ''} 입마름·변비·어지럼·소변이 잘 안 나오는 것과 관계있는 성분이에요.${e.achAlt ? ` <b>${fmt(e.achAlt)}</b>` : ''}</p></div></section>`;
+  })()}
+  <div class="actions"><button class="btn ${taking ? 'line' : ''}" onclick="togglePub('${p.seq}')">${taking ? I.check + ' 내 약통에 있어요 (빼기)' : I.pill + ' 내 약통에 등록'}</button>${taking && takingItems().length >= 2 ? `<button class="btn ghost" onclick="go('/together')">${I.shield} 다른 약과 같이 먹어도 되는지 보기</button>` : ''}${taking ? `<button class="btn ghost" onclick="go('/schedule')">${I.clock} 복용 시간 알림 만들기</button>` : ''}</div>
   <div class="links" style="display:flex;gap:6px;flex-wrap:wrap;margin-top:12px"><a class="plink" href="https://nedrug.mfds.go.kr/pbp/CCBBB01/getItemDetail?itemSeq=${esc(p.seq)}" target="_blank" rel="noopener">${I.link}식약처 허가정보</a><a class="plink" href="https://search.naver.com/search.naver?query=${encodeURIComponent('약학정보원 ' + p.n.replace(/\(.*?\)/g, ''))}" target="_blank" rel="noopener">${I.search}약학정보원 검색</a></div>
   <div class="srcs"><span class="src-chip">${I.link}출처: 식약처 의약품 낱알식별 정보 · 사진 약학정보원</span></div>
   ${disclaimer('낱알 정보는 참고용이에요. 같은 모양의 다른 약도 있으니 확실하지 않으면 약사에게 실물을 보여 주세요.')}`;
@@ -2004,7 +2076,7 @@ function takingItems(){ return (ME.taking || []).map(id => { if (id.startsWith('
 document.addEventListener('input', e => { if (e.target.id === 'mq') { MQ = e.target.value; clearTimeout(window._mt); window._mt = setTimeout(() => { const pos = e.target.selectionStart; route(); const el = document.getElementById('mq'); if (el) { el.focus(); el.setSelectionRange(pos, pos); } }, 300); }
   if (e.target.id === 'phq') { PH.q = e.target.value; clearTimeout(window._pt); window._pt = setTimeout(() => { const pos = e.target.selectionStart; route(); const el = document.getElementById('phq'); if (el) { el.focus(); el.setSelectionRange(pos, pos); } }, 280); return; }
   if (e.target.id === 'gq') { GQ = e.target.value; clearTimeout(window._gt); window._gt = setTimeout(() => { const pos = e.target.selectionStart; route(); const el = document.getElementById('gq'); if (el) { el.focus(); el.setSelectionRange(pos, pos); } }, 300); }
-  if (e.target.id === 'chk') { CHK.q = e.target.value; clearTimeout(window._ct); window._ct = setTimeout(() => { const pos = e.target.selectionStart; route(); const el = document.getElementById('chk'); if (el) { el.focus(); el.setSelectionRange(pos, pos); } }, 350); } if (e.target.id === 'pq') { PILLQ.txt = e.target.value; clearTimeout(window._pt); window._pt = setTimeout(() => { const pos = e.target.selectionStart; route(); const el = document.getElementById('pq'); if (el) { el.focus(); el.setSelectionRange(pos, pos); } }, 250); } });
+  if (e.target.id === 'chk') { CHK.q = e.target.value; clearTimeout(window._ct); window._ct = setTimeout(() => { const pos = e.target.selectionStart; route(); const el = document.getElementById('chk'); if (el) { el.focus(); el.setSelectionRange(pos, pos); } }, 350); } if (e.target.id === 'pq') { PILLQ.txt = e.target.value; if (!PILLQ.rx && (e.target.value.match(/[가-힣]/g) || []).length >= 2) PILLQ.rx = true;  /* 약봉투 이름을 치는 것이면 처방약도 봐야 한다 */ clearTimeout(window._pt); window._pt = setTimeout(() => { const pos = e.target.selectionStart; route(); const el = document.getElementById('pq'); if (el) { el.focus(); el.setSelectionRange(pos, pos); } }, 250); } });
 
 /* ───────── 사진으로 약 알아보기 ───────── */
 const PH = { ocr:null, step:'', q:'', busy:false, result:null, img:'', err:'' };
