@@ -46,6 +46,9 @@ def main():
     by_en = {(d.get('en') or '').lower().split('(')[0].strip(): i for i, d in mine.items() if d.get('en')}
     by_nm = {d['name'].split('(')[0].strip(): i for i, d in mine.items()}
 
+    # 생약·한방 처방은 «근거가 약하다»는 사실을 화면에서 숨기지 않는다.
+    # 추천 슬롯에는 넣지 않되, 약사가 권했을 때 무엇인지 알 수 있어야 한다.
+    HERB = ('생약', '한방')
     lex = []
     for x in ING:
         k = FIX[x['id']][0] if x['id'] in FIX else x['k']
@@ -60,6 +63,8 @@ def main():
             o['fixNote'] = FIX[x['id']][1]
         if x['id'] in NOTE:
             o['fixNote'] = NOTE[x['id']]
+        if any(h in x['cls'] for h in HERB):
+            o['herb'] = True
         lex.append(o)
 
     br = [{'n': b['n'], 'rx': RXW[b['k']], 'ing': b.get('ing', []), 'comp': b.get('comp', ''),

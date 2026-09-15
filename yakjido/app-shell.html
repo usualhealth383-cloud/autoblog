@@ -707,7 +707,7 @@ let CMP = [];
 /* ───────── 공공데이터(식약처 e약은요·낱알식별) 지연 로드 ───────── */
 const PUB = { index:null, pills:null, chunks:{}, err:false };
 /* 성분·제품·질문 사전 — 크기가 커서 검색을 처음 쓸 때 받아 온다 */
-const LEX = { ing:null, brand:null, qa:null, nut:null, loading:false, err:false };
+const LEX = { ing:null, brand:null, qa:null, nut:null, mix:null, loading:false, err:false };
 /* 자료를 못 불러온 것과 '결과가 없는 것'은 완전히 다른 얘기라 화면에서 구분해 보여 준다 */
 const pubFailed = () => PUB.err && !(PUB.pills || []).length;
 function pubRetry(){ PUB.err = false; PUB.pills = null; PUB.rx = null; PUB.index = null; PUB.chunks = {}; route(); }
@@ -721,13 +721,13 @@ async function pubPills(){ if (!PUB.pills && window.__PILLS__) PUB.pills = windo
 /* 사전 세 벌을 한 번에 받아 둔다. 실패해도 앱의 나머지는 그대로 돈다 */
 async function lexLoad(){
   if (LEX.ing || LEX.loading) return LEX;
-  if (window.__LEX__) { LEX.ing = __LEX__.ing; LEX.brand = __LEX__.brand; LEX.qa = __LEX__.qa; LEX.nut = __LEX__.nut || []; LEX.ingI = {}; LEX.ing.forEach(x => { LEX.ingI[x.id] = x; }); return LEX; }  /* 미리보기용 내장 자료 */
+  if (window.__LEX__) { LEX.ing = __LEX__.ing; LEX.brand = __LEX__.brand; LEX.qa = __LEX__.qa; LEX.nut = __LEX__.nut || []; LEX.mix = __LEX__.mix || []; LEX.ingI = {}; LEX.ing.forEach(x => { LEX.ingI[x.id] = x; }); return LEX; }  /* 미리보기용 내장 자료 */
   LEX.loading = true;
   try {
-    const [a, b, c, d] = await Promise.all([loadJSON('lexicon.json'), loadJSON('brands.json'), loadJSON('qa.json'), loadJSON('nutrients.json')]);
-    LEX.ing = a; LEX.brand = b; LEX.qa = c; LEX.nut = d;
+    const [a, b, c, d, e2] = await Promise.all([loadJSON('lexicon.json'), loadJSON('brands.json'), loadJSON('qa.json'), loadJSON('nutrients.json'), loadJSON('mixes.json')]);
+    LEX.ing = a; LEX.brand = b; LEX.qa = c; LEX.nut = d; LEX.mix = e2;
     LEX.ingI = {}; a.forEach(x => { LEX.ingI[x.id] = x; });
-  } catch (e) { LEX.ing = []; LEX.brand = []; LEX.qa = []; LEX.nut = []; LEX.ingI = {}; LEX.err = true; }
+  } catch (e) { LEX.ing = []; LEX.brand = []; LEX.qa = []; LEX.nut = []; LEX.mix = []; LEX.ingI = {}; LEX.err = true; }
   LEX.loading = false; route(); return LEX;
 }
 const lexOf = id => LEX.ingI?.[id] || null;
@@ -802,9 +802,9 @@ function route(){
   if (path !== LASTPATH) { GQ = ''; LASTPATH = path; }
   const seg = path.split('/');
   const q = Object.fromEntries(new URLSearchParams(qs || ''));
-  const tab = { show:'home', check:'home', home:'home', symptom:'home', drugs:'drugs', drug:'drugs', class:'drugs', search:'drugs', pub:'drugs', pill:'drugs', guide:'home', kids:'home', tips:'home', schedule:'me', photo:'drugs', pillinfo:'drugs', supp:'supp', compare:'supp', me:'me', about:'me', ingr:'drugs', brand:'drugs', nut:'supp', hello:'home' }[seg[0]] || 'home';
+  const tab = { show:'home', check:'home', home:'home', symptom:'home', drugs:'drugs', drug:'drugs', class:'drugs', search:'drugs', pub:'drugs', pill:'drugs', guide:'home', kids:'home', tips:'home', schedule:'me', photo:'drugs', pillinfo:'drugs', supp:'supp', compare:'supp', me:'me', about:'me', ingr:'drugs', brand:'drugs', nut:'supp', hello:'home', mix:'drugs' }[seg[0]] || 'home';
   document.querySelectorAll('nav.tabbar button').forEach(b => b.classList.toggle('on', b.dataset.tab === tab));
-  const R = { show:vShow, check:vCheck, home:vHome, symptom:vSymptom, drugs:vDrugs, drug:vDrug, class:vClass, search:vSearch, pub:vPub, pill:vPill, guide:vGuide, kids:vKids, tips:vTips, schedule:vSchedule, photo:vPhoto, pillinfo:vPillInfo, supp:vSupp, compare:vCompare, me:vMe, about:vAbout, ingr:vIngr, brand:vBrand, nut:vNut, hello:vHello };
+  const R = { show:vShow, check:vCheck, home:vHome, symptom:vSymptom, drugs:vDrugs, drug:vDrug, class:vClass, search:vSearch, pub:vPub, pill:vPill, guide:vGuide, kids:vKids, tips:vTips, schedule:vSchedule, photo:vPhoto, pillinfo:vPillInfo, supp:vSupp, compare:vCompare, me:vMe, about:vAbout, ingr:vIngr, brand:vBrand, nut:vNut, hello:vHello, mix:vMix };
   const html = (R[seg[0]] || vHome)(seg[1], q);
   const panel = gqPanel();
   view.innerHTML = panel ? insertPanel(html, panel) : html;
@@ -978,7 +978,14 @@ function search(q){
   const have = new Set((D.drugs || []).map(d => d.id));
   (LEX.ing || []).forEach(x => { if (!m(x.n) && !m(x.en)) return;
     if (x.drug && have.has(x.drug)) return;                      /* 위에서 이미 잡힘 */
-    out.push({ k:'성분', c:'', t:x.n, d:x.cls + ' · ' + x.rx, h:'/ingr/' + x.id, w:1 }); });
+    out.push({ k:x.herb ? '생약' : '성분', c:x.herb ? 'p' : '', t:x.n, d:x.cls + ' · ' + x.rx, h:'/ingr/' + x.id, w:1 }); });
+  /* 같이 먹어도 되나요 — 띄어 쓴 질문도 잡게 낱말마다 본다 */
+  const toks = q.split(/\s+/).filter(t => t.length > 1);
+  (LEX.mix || []).forEach(x => {
+    const hay = (x.t + ' ' + x.s + ' ' + (x.kw || []).join(' ')).toLowerCase();
+    const hit = hay.includes(q) || (toks.length >= 1 && toks.every(t => hay.includes(t)));
+    if (hit) out.push({ k:'같이', c:'s', t:x.t, d:esc0(x.s), h:'/mix/' + x.id, w:4 });
+  });
   const haveS = new Set((D.supplements || []).map(x => x.id));
   (LEX.nut || []).forEach(x => { if (!m(x.n)) return; if (x.supp && haveS.has(x.supp)) return;
     out.push({ k:'영양제', c:'', t:x.n, d:esc0(x.what), h:'/nut/' + x.id, w:1 }); });
@@ -1360,6 +1367,37 @@ function vGuide(step, q){
   ${disclaimer()}`;
 }
 
+/* ───────── 같이 먹어도 되나요 ─────────
+   증상이 아니라 «조합»을 묻는 자리. 약끼리·지병 약·영양제·음식술·사람에 따라. */
+const MIX_KINDS = ['약끼리', '지병 약', '영양제', '음식·술', '사람에 따라'];
+function vMix(id){
+  if (!LEX.mix) { lexLoad(); return `${topBar({ back:'약 사전' })}<p class="loading">불러오는 중…</p>`; }
+  if (!id) {
+    return `${topBar({ back:'약 사전' })}
+    <div class="eyebrow">같이 먹어도 되나요</div><h1>이 약, 같이 먹어도 될까요?</h1>
+    <p style="margin-top:8px">두 가지를 같이 드시기 전에 한 번 보세요. 흔히 겹치는 <b>${(LEX.mix || []).length}가지</b>를 정리했어요.</p>
+    ${MIX_KINDS.map(k => { const list = (LEX.mix || []).filter(x => x.kind === k); if (!list.length) return '';
+      return `<section class="sec"><h2>${esc(k)} <small>${list.length}가지</small></h2><div class="card rows">${list.map(x => `<button class="row" onclick="go('/mix/${x.id}')"><div class="body"><b>${esc(x.t)}</b><span>${esc(x.s)}</span></div>${I.chev}</button>`).join('')}</div></section>`; }).join('')}
+    ${disclaimer()}`;
+  }
+  const x = (LEX.mix || []).find(v => v.id === id);
+  if (!x) return `${topBar({ back:'뒤로' })}<div class="empty"><b>찾는 조합이 없어요</b>위 검색창에 약 이름 두 개를 넣어 보세요.</div>`;
+  const rxItems = x.items.filter(i => i.rx === '전문');
+  return `${topBar({ back:'같이 먹기' })}
+  <div class="eyebrow">같이 먹기 · ${esc(x.kind)}</div><h1>${esc(x.t)}</h1>
+  <p style="margin-top:8px">${esc(x.s)}</p>
+  ${x.items.length ? `<section class="sec"><h2>이 조합에 나오는 약</h2><div class="card rows">${x.items.map(i => `<button class="row" onclick="go('${String(i.id).startsWith('lex:') ? '/ingr/' + String(i.id).slice(4) : '/drug/' + i.id}')"><div class="ic">${icon('pill')}</div><div class="body"><b>${esc(i.n)}</b><span>${esc(i.why)}</span></div>${badge(i.rx === '둘 다' ? '' : i.rx)}${I.chev}</button>`).join('')}</div>
+  ${achPanel(x.items.map(i => drug(i.id)).filter(Boolean), { compact:true })}</section>` : ''}
+  ${x.how.length ? `<section class="sec card"><h2>어떻게 하면 되나</h2><ul class="plain">${x.how.map(t => `<li>${fmt(t)}</li>`).join('')}</ul></section>` : ''}
+  ${x.ask ? `<div class="quote" style="margin-top:16px"><b>약국에서 이렇게 말씀하세요</b>${esc(x.ask)}</div>` : ''}
+  ${x.avoid.length ? `<section class="sec card"><h2>이것만은 피해 주세요</h2><ul class="plain x">${x.avoid.map(t => `<li>${fmt(t)}</li>`).join('')}</ul></section>` : ''}
+  ${x.days || x.fail ? `<section class="sec card"><h2>얼마나 · 안 되면</h2>${x.days ? `<p>${fmt(x.days)}</p>` : ''}${x.fail ? `<p style="margin-top:8px">${fmt(x.fail)}</p>` : ''}</section>` : ''}
+  ${x.dr ? `<section class="sec card"><h2>병원에서는 <small>${rxItems.length ? '처방약 ' + rxItems.length + '가지' : ''}</small></h2><p>${fmt(x.dr)}</p></section>` : ''}
+  ${x.red.length ? `<div class="care er" style="margin-top:16px"><div class="hd">${I.alert}이럴 땐 지금 진료</div><div class="bd"><ul class="plain">${x.red.map(t => `<li>${fmt(t)}</li>`).join('')}</ul><a class="call" href="tel:119">${I.alert}119</a></div></div>` : ''}
+  ${x.src.length ? `<div class="srcs">${x.src.map(t => `<span class="src-chip${/검수 전|검수 필요|미확인/.test(t) ? ' unv' : ''}">${I.link}${esc(t)}</span>`).join('')}</div>` : ''}
+  ${disclaimer()}`;
+}
+
 /* ───────── 첫 만남 — 약을 고르기 전에 알아야 할 것만 먼저 여쭙는다 ─────────
    벽이 아니라 안내다. 어느 단계에서든 건너뛸 수 있고, 나중에 내 정보에서 바꿀 수 있다. */
 const HELLO_KEY = 'yakjido.hello.v1';
@@ -1422,8 +1460,9 @@ function vIngr(id){
   if (x.drug && drug(x.drug)) { go('/drug/' + x.drug); return ''; }
   const bs = (LEX.brand || []).filter(b => (b.ing || []).includes(x.id)).slice(0, 12);
   return `${topBar({ back:'뒤로' })}
-  <div class="drug-hero"><span class="cls">${esc(x.cls)}</span><h1>${esc(x.n)}</h1><div class="en">${esc(x.en || '')} ${badge(x.rx === '둘 다' ? '' : x.rx)}${x.rx === '둘 다' ? '<span class="badge warn">제품에 따라 일반·전문</span>' : ''}</div></div>
+  <div class="drug-hero"><span class="cls">${esc(x.cls)}</span><h1>${esc(x.n)}</h1><div class="en">${esc(x.en || '')} ${badge(x.rx === '둘 다' ? '' : x.rx)}${x.rx === '둘 다' ? '<span class="badge warn">제품에 따라 일반·전문</span>' : ''}${x.herb ? '<span class="badge" style="background:var(--tint2);color:var(--muted);margin-left:4px">근거 제한적</span>' : ''}</div></div>
   ${x.fixNote ? `<div class="usebar">${I.info}<span>${esc(x.fixNote)}</span></div>` : ''}
+  ${x.herb ? `<div class="usebar" style="background:var(--tint2);color:var(--body)">${I.leaf}<span><b>생약·한방 제제예요.</b> 약국에서 자주 권하는 쪽이고 해가 크지는 않지만, <b>효과 근거는 대체로 제한적</b>입니다. 약지도가 증상마다 먼저 권하는 것은 근거가 분명한 성분이에요. 그리고 여러 한방약을 겹치면 <b>감초·마황이 겹칩니다</b> — <a class="link" href="#/mix/nut_gamcho">겹침 확인하기 ›</a></span></div>` : ''}
   <p style="margin-top:10px">${lexMark(x.use)}</p>
   ${(() => {
     const rxOnly = [x.dose, x.gap, x.max].every(v => !v || /^처방대로$/.test(String(v).trim()));
@@ -1481,6 +1520,7 @@ function vDrugs(_, q){
   return `${topBar()}
   <h1>약 사전</h1><p style="margin-top:6px">성분 기준으로 정리했어요. 제품 이름이 달라도 성분이 같으면 같은 약이에요.</p>
   <button class="tile wide" style="margin-top:12px" onclick="go('/pill')"><div class="ic">${I.eye}</div><div><b>이 알약이 무슨 약인지 찾기</b><span>모양·색·각인으로 식약처 낱알 ${(D.public?.pills_count || 0).toLocaleString()}건 검색</span></div>${I.chev}</button>
+  <button class="tile wide" onclick="go('/mix')"><div class="ic">${I.scale}</div><div><b>같이 먹어도 되나요</b><span>혈압약과 진통제, 항생제와 유산균, 한방약 겹침 — ${(D.public?.mixes_count || 0)}가지</span></div>${I.chev}</button>
   <button class="tile wide" onclick="lexLoad();document.getElementById('gq')?.focus()"><div class="ic">${I.book || I.search}</div><div><b>제품 이름으로 찾기</b><span>게보린·판피린·훼스탈처럼 아시는 이름으로 — 제품 ${(D.public?.brands_count || 0).toLocaleString()}개 · 성분 ${(D.public?.lexicon_count || 0).toLocaleString()}가지</span></div>${I.chev}</button>
   <div class="tabs">${cats.map(([k, n]) => `<button class="tab ${cat === k ? 'on' : ''}" onclick="go('/drugs?cat=${k}')">${esc(n)}</button>`).join('')}</div>
   ${cat !== 'all' && cat !== 'cvs' && cls(cat) ? `<button class="tile wide" style="margin-bottom:12px" onclick="go('/class/${cat}')"><div class="ic">${I.scale}</div><div><b>${esc(cls(cat).name)} 한눈에 비교</b><span>${esc(cls(cat).short2 || '위장·심혈관 부담, 지속시간, 구입 방법')}</span></div>${I.chev}</button>` : ''}
