@@ -733,7 +733,7 @@ async function pubPills(){ if (!PUB.pills && window.__PILLS__) PUB.pills = windo
 /* 사전 세 벌을 한 번에 받아 둔다. 실패해도 앱의 나머지는 그대로 돈다 */
 async function lexLoad(){
   if (LEX.ing || LEX.loading) return LEX;
-  if (window.__LEX__) { LEX.ing = __LEX__.ing; LEX.brand = __LEX__.brand; LEX.qa = __LEX__.qa; LEX.nut = __LEX__.nut || []; LEX.mix = __LEX__.mix || []; LEX.ingI = {}; LEX.ing.forEach(x => { LEX.ingI[x.id] = x; }); return LEX; }  /* 미리보기용 내장 자료 */
+  if (window.__LEX__) { LEX.ing = __LEX__.ing; LEX.brand = __LEX__.brand; LEX.qa = __LEX__.qa; LEX.nut = __LEX__.nut || []; LEX.mix = __LEX__.mix || []; LEX.ingI = {}; LEX.ing.forEach(x => { LEX.ingI[x.id] = x; }); setTimeout(route, 0); return LEX; }  /* 미리보기용 내장 자료 */
   LEX.loading = true;
   try {
     const [a, b, c, d, e2] = await Promise.all([loadJSON('lexicon.json'), loadJSON('brands.json'), loadJSON('qa.json'), loadJSON('nutrients.json'), loadJSON('mixes.json')]);
