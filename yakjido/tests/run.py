@@ -22,9 +22,11 @@ ROOT = pathlib.Path(__file__).resolve().parents[2]
 DOCS = ROOT / 'docs' / 'yakjido'
 CHROME = os.environ.get('CHROME', '/opt/pw-browsers/chromium-1194/chrome-linux/chrome')
 
+class _Quiet(http.server.SimpleHTTPRequestHandler):
+    def log_message(self, *a, **k): pass          # 접속 기록으로 결과를 가리지 않는다
+
 def serve():
-    handler = functools.partial(http.server.SimpleHTTPRequestHandler, directory=str(DOCS))
-    handler.log_message = lambda *a, **k: None
+    handler = functools.partial(_Quiet, directory=str(DOCS))
     srv = socketserver.TCPServer(('127.0.0.1', 0), handler)
     threading.Thread(target=srv.serve_forever, daemon=True).start()
     return f'http://127.0.0.1:{srv.server_address[1]}/index.html'
