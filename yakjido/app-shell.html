@@ -454,6 +454,12 @@ details.ix-how .bd p:last-child{margin-bottom:0}
   background:var(--tint2);color:var(--body);font-size:.875rem;line-height:1.55}
 .ach-unk svg.i{color:var(--faint);flex:none;margin-top:2px}
 .ach-unk b{color:var(--ink)}
+.ach-go{display:flex;align-items:center;gap:9px;width:100%;margin-top:10px;padding:12px 13px;border-radius:10px;
+  background:var(--tint2);border:1px solid var(--hairline);text-align:left;cursor:pointer;font-size:.9375rem;line-height:1.5;color:var(--body)}
+.ach-go>svg.i{color:var(--primary);flex:none}
+.ach-go>svg.i:last-child{margin-left:auto;color:var(--faint)}
+.ach-go span{flex:1;min-width:0}
+.ach-go b{color:var(--ink)}
 .ach-risk{margin-top:10px;padding:12px 13px;border-radius:10px;background:var(--card);border:1px solid var(--hairline)}
 .ach-risk>b{display:block;font-size:.9375rem;font-weight:800;margin-bottom:6px}
 .ach-risk p{font-size:.875rem;line-height:1.65;color:var(--body);margin-bottom:6px}
@@ -1168,6 +1174,7 @@ function achPanel(extra, opts){
     ${unkBox}
     ${items.filter(x => x.e.achAlt).length ? `<details class="ach-alt"><summary>부담을 줄이는 방법 보기${I.chev}</summary><div class="bd">${items.filter(x => x.e.achAlt).map(x => `<p><b>${esc(x.e.n)}</b> — ${fmt(x.e.achAlt)}</p>`).join('')}</div></details>` : ''}
     <p class="ach-ask">${I.cart}<span>약국에서 이렇게 물어보세요 — <b>“이 약들에 항콜린 성분이 겹치나요?”</b></span></p>
+    ${opts.compact || LASTPATH === 'symptom/drymouth' ? '' : `<button class="ach-go" onclick="go('/symptom/drymouth')">${I.drop}<span><b>입이 마르시나요?</b> 그것이 이 성분들 때문일 수 있어요 — 덜 힘들게 지내는 법</span>${I.chev}</button>`}
     ${opts.compact ? '' : achRisk(n)}
     ${opts.compact ? '' : srcChips(['kabs2021ed', 'kabs2024mort', 'kabs2019dev'])}
     ${opts.compact ? '' : '<p class="small muted" style="margin-top:8px">한국인 노인에게 가장 잘 맞는 척도는 <b>KABS(한국형 항콜린 부담 척도)</b>입니다. KABS 의 성분별 점수표 원문은 공개돼 있지 않아, 개별 점수는 국제 척도(ACB·ARS)의 합의를 따르고 KABS 가 따로 넣은 한국 성분(트리메부틴·옥틸로늄)은 그에 맞췄어요. <b>판정이 아니라 상의할 거리</b>입니다 — 약을 스스로 끊지 마세요.</p>'}
@@ -1477,7 +1484,7 @@ function vSymptom(id){
     ${kidLine()}
     ${(() => { const w = [...dups, ...sameProductWarn(bk)]; return w.length ? `<div class="dup"><div class="dup-h">${I.alert}<b>사시기 전에 확인할 것 ${w.length}가지</b></div><ul class="plain">${w.map(t => `<li>${fmt(t)}</li>`).join('')}</ul></div>` : ''; })()}
     ${ixLine(bk.map(x => x.d))}
-    ${achPanel(bk.map(x => x.d), { compact:true })}
+    ${achPanel(bk.map(x => x.d), { compact: !s.achAlways, always: !!s.achAlways })}
     ${takingItems().length ? '' : `<button class="bag-line sm" onclick="go('/me')">${I.pill}<span>지금 드시는 약이 있으면 알려 주세요 — 겹치는 성분을 걸러 드려요</span>${I.chev}</button>`}
     ${(() => { const rel = mixFor(bk.map(x => x.d)); return rel.length ? `<button class="mixline" onclick="go('/mix/${rel[0].id}')">${I.scale}<span>같이 드시는 약이 있다면 — <b>${esc(rel[0].t)}</b></span>${I.chev}</button>` : ''; })()}
     ${clinic.length ? `<button class="gate" onclick="openCare()">${I.alert}<span class="lb">병원은</span><span class="tx">${esc(short(clinic[0], 34))} — 자세히 보기</span>${I.chev}</button>` : ''}
