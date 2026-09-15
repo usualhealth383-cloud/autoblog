@@ -248,6 +248,10 @@ ul.steps li::before{content:counter(s);position:absolute;left:0;top:2px;width:24
 .fitme{margin-top:var(--s3)}
 .fitme .chips .chip{min-height:40px}
 .fitme .chip.on{background:var(--alert-tint);border-color:var(--alert);color:var(--alert)}
+.fit-me{display:flex;align-items:center;gap:8px;width:100%;text-align:left;margin-top:10px;padding:10px 12px;border-radius:12px;background:var(--tint2);color:var(--muted);font-size:.8125rem;font-weight:600;min-height:44px}
+.fit-me svg.i{flex:none;width:16px;height:16px}
+.fit-me span{flex:1;min-width:0}
+.fit-me svg.chev{width:15px;height:15px}
 /* 접이식 섹션 */
 details.acc{background:var(--card);border:1px solid var(--hairline);border-radius:var(--r-card);box-shadow:var(--shadow-card);margin-top:var(--s3)}
 details.acc summary{list-style:none;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:16px var(--s4);font-size:1.0625rem;font-weight:700;min-height:56px}
@@ -582,6 +586,40 @@ nav.tabbar button.on svg.i{stroke-width:2.2}
 main>*{animation:rise .32s ease both}
 main>*:nth-child(2){animation-delay:.04s} main>*:nth-child(3){animation-delay:.08s} main>*:nth-child(4){animation-delay:.12s} main>*:nth-child(n+5){animation-delay:.16s}
 @media (prefers-reduced-motion:reduce){main>*{animation:none}.tile{transition:none}}
+/* 첫 만남 */
+.hello-hi{text-align:center;padding:var(--s5) var(--s3) var(--s4)}
+.hello-mark{width:64px;height:64px;border-radius:20px;background:var(--primary);color:#fff;display:grid;place-items:center;margin:0 auto var(--s4)}
+.hello-mark svg{width:34px;height:34px;stroke:#fff;stroke-width:2;fill:none;stroke-linecap:round;stroke-linejoin:round}
+.hello-mark.ok{background:var(--normal)}
+.hello-mark.ok svg.i{width:34px;height:34px;stroke-width:2.4}
+.hello-hi h1{font-size:1.625rem}
+.hello-hi p{margin-top:var(--s3);font-size:1rem;line-height:1.7}
+.hello-q{font-size:1.25rem;font-weight:800;margin:var(--s5) 2px var(--s2);line-height:1.4}
+.hello-sub{font-size:.9375rem;color:var(--body);line-height:1.65;margin-bottom:var(--s3)}
+.hello-list{display:flex;flex-direction:column;gap:10px}
+.hello-big{display:flex;align-items:center;gap:14px;width:100%;text-align:left;padding:18px 16px;border-radius:16px;background:var(--card);border:1.5px solid var(--hairline);box-shadow:var(--shadow-card);min-height:82px}
+.hello-big .ic{width:46px;height:46px;border-radius:14px;background:var(--tint);color:var(--primary);display:grid;place-items:center;flex:none}
+.hello-big div:nth-child(2){flex:1;min-width:0}
+.hello-big b{display:block;font-size:1.125rem;line-height:1.35}
+.hello-big span{display:block;font-size:.875rem;color:var(--muted);margin-top:3px;line-height:1.5}
+.hello-big.on{border-color:var(--primary);background:var(--tint)}
+.hello-big svg.chev{color:var(--faint)}
+.hello-chips{display:flex;flex-direction:column;gap:8px}
+.hello-chk{display:flex;align-items:center;gap:12px;width:100%;text-align:left;padding:13px 15px;border-radius:14px;background:var(--card);border:1.5px solid var(--hairline);font-size:1rem;font-weight:600;min-height:58px;line-height:1.4}
+.hello-chk .bx{width:26px;height:26px;border-radius:9px;border:1.5px solid var(--hairline);background:var(--surface);display:grid;place-items:center;flex:none;color:#fff}
+.hello-chk .bx svg.i{width:17px;height:17px;stroke-width:2.6}
+.hello-chk.on{border-color:var(--primary);background:var(--tint);color:var(--primary-deep)}
+.hello-chk.on .bx{background:var(--primary);border-color:var(--primary)}
+.hello-skip{display:block;width:100%;margin:var(--s5) 0 var(--s4);min-height:52px;border-radius:12px;color:var(--muted);font-size:.9375rem;font-weight:600}
+.hello-card h2{font-size:1.0625rem}
+.hello-card p{margin-top:var(--s2);font-size:.9375rem;line-height:1.7}
+.hello-where{display:flex;align-items:center;gap:8px;margin-top:var(--s3);padding:12px 14px;border-radius:12px;background:var(--tint);color:var(--primary-deep);font-size:.9375rem;font-weight:700}
+.hello-where svg.i{width:18px;height:18px;flex:none}
+.hello-where svg.chev{width:15px;height:15px;opacity:.6}
+.hint-line{display:flex;align-items:flex-start;gap:9px;padding:12px 14px;border-radius:14px;background:var(--tint);color:var(--primary-deep);font-size:.9375rem;font-weight:600;line-height:1.55;margin-top:var(--s4)}
+.hint-line svg.i{flex:none;margin-top:2px}
+.hint-line .x{margin-left:auto;flex:none;width:28px;height:28px;border-radius:50%;display:grid;place-items:center;color:var(--muted)}
+.hint-line .x svg.i{width:14px;height:14px;margin:0}
 .toast{position:fixed;left:50%;bottom:96px;transform:translateX(-50%);background:var(--text);color:var(--card);padding:10px 16px;border-radius:12px;font-size:.875rem;font-weight:600;z-index:20;box-shadow:0 8px 24px rgba(0,0,0,.25);animation:rise .25s ease}
 </style>
 
@@ -739,7 +777,7 @@ const hasArt = n => ART.has(n);
 const art = (n, cls = '') => hasArt(n) ? `<figure class="art ${cls}"><img src="art/${n}.webp" alt="" decoding="async" onerror="this.closest('.art')?.remove()"></figure>` : '';
 
 /* 상단 검색 — 어느 화면에서든 바로 찾을 수 있게. 입력하면 결과가 그 자리에 뜬다. */
-let GQ = '', MQ = '', LASTPATH = '';
+let GQ = '', MQ = '', LASTPATH = '', HINT = 0;
 function gqPanel(){
   const q = GQ.trim(); if (q.length < 1) return '';
   lexLoad();                                  /* 사전은 검색을 처음 쓸 때 받는다 */
@@ -764,9 +802,9 @@ function route(){
   if (path !== LASTPATH) { GQ = ''; LASTPATH = path; }
   const seg = path.split('/');
   const q = Object.fromEntries(new URLSearchParams(qs || ''));
-  const tab = { show:'home', check:'home', home:'home', symptom:'home', drugs:'drugs', drug:'drugs', class:'drugs', search:'drugs', pub:'drugs', pill:'drugs', guide:'home', kids:'home', tips:'home', schedule:'me', photo:'drugs', pillinfo:'drugs', supp:'supp', compare:'supp', me:'me', about:'me', ingr:'drugs', brand:'drugs', nut:'supp' }[seg[0]] || 'home';
+  const tab = { show:'home', check:'home', home:'home', symptom:'home', drugs:'drugs', drug:'drugs', class:'drugs', search:'drugs', pub:'drugs', pill:'drugs', guide:'home', kids:'home', tips:'home', schedule:'me', photo:'drugs', pillinfo:'drugs', supp:'supp', compare:'supp', me:'me', about:'me', ingr:'drugs', brand:'drugs', nut:'supp', hello:'home' }[seg[0]] || 'home';
   document.querySelectorAll('nav.tabbar button').forEach(b => b.classList.toggle('on', b.dataset.tab === tab));
-  const R = { show:vShow, check:vCheck, home:vHome, symptom:vSymptom, drugs:vDrugs, drug:vDrug, class:vClass, search:vSearch, pub:vPub, pill:vPill, guide:vGuide, kids:vKids, tips:vTips, schedule:vSchedule, photo:vPhoto, pillinfo:vPillInfo, supp:vSupp, compare:vCompare, me:vMe, about:vAbout, ingr:vIngr, brand:vBrand, nut:vNut };
+  const R = { show:vShow, check:vCheck, home:vHome, symptom:vSymptom, drugs:vDrugs, drug:vDrug, class:vClass, search:vSearch, pub:vPub, pill:vPill, guide:vGuide, kids:vKids, tips:vTips, schedule:vSchedule, photo:vPhoto, pillinfo:vPillInfo, supp:vSupp, compare:vCompare, me:vMe, about:vAbout, ingr:vIngr, brand:vBrand, nut:vNut, hello:vHello };
   const html = (R[seg[0]] || vHome)(seg[1], q);
   const panel = gqPanel();
   view.innerHTML = panel ? insertPanel(html, panel) : html;
@@ -908,6 +946,7 @@ function vHome(){
     <p>증상을 고르면 <b>무엇을 사고, 어떻게 먹고, 언제 병원에 갈지</b> 세 줄로 먼저 알려드려요.</p>
     ${ME.easy ? `<div class="easy-home" style="margin-top:16px"><button class="big-btn" onclick="go('/photo')"><div class="ic">${I.eye}</div><div><b>약 사진 찍어 알아보기</b><span>약봉투·알약·영양제</span></div></button><button class="big-btn soft" onclick="go('/guide/1')"><div class="ic">${I.check}</div><div><b>어디가 불편하세요?</b><span>질문 두 번이면 약이 나와요</span></div></button><button class="big-btn soft" onclick="go('/schedule')"><div class="ic">${I.clock}</div><div><b>오늘 약 체크</b><span>드셨는지 표시하고 알림 받기</span></div></button></div>` : `<div class="hero-cta"><button class="btn" onclick="go('/guide/1')">${I.check} 3단계로 약 고르기</button><button class="btn line" onclick="go('/photo')">${I.eye} 약 사진 찍어 알아보기</button><p class="small muted" style="text-align:center;margin-top:8px">처음이면 위 버튼 — 질문 두 번이면 끝나요</p></div>`}
     <div class="quick" aria-label="자주 찾는 증상">${['msk', 'dysmenorrhea', 'cold', 'headache', 'heartburn', 'fever'].map(id => byId(D.symptoms, id)).filter(Boolean).map(x => `<button onclick="go('/symptom/${x.id}')">${icon(x.icon)}${esc(x.name.split(' (')[0])}</button>`).join('')}</div>
+    ${HINT ? `<div class="hint-line">${I.user}<span>알려 주신 내용은 <b>내 정보</b> 탭 › <b>‘해당하는 것을 켜 주세요’</b>에서 언제든 바꾸실 수 있어요.</span><button class="x" onclick="HINT=0;route()" aria-label="닫기">${I.x}</button></div>` : ''}
   </section>
   ${groups.map(g => `<section class="sec"><h2>${esc(g)}</h2><div class="tiles">${(D.symptoms || []).filter(s => s.group === g).map(s => `<button class="tile ${s.reviewed === false ? 'wait' : ''}" onclick="go('/symptom/${s.id}')"><div class="ic">${icon(s.icon)}</div><b>${esc(s.name)}</b><span>${esc(s.short || '')}</span>${s.reviewed === false ? '<span class="wait-t">검수 대기</span>' : ''}</button>`).join('')}</div></section>`).join('')}
   ${(() => { const T = D.tips || []; if (!T.length) return ''; const t = T[new Date().getDate() % T.length]; return `<section class="sec"><h2>알아두면 좋은 것 <small><a class="link" href="#/tips">전부 보기</a></small></h2><button class="tip-card" onclick="go('/tips?open=${t.id}')"><div class="ic">${icon(t.icon)}</div><div><b>${esc(t.title)}</b><span>${esc(t.body.replace(/\*\*/g, '').slice(0, 70))}…</span></div></button></section>`; })()}
@@ -996,6 +1035,7 @@ function fitChips(s){
     <div class="small muted" style="margin-bottom:6px;font-weight:600">${top.length ? '해당되는 것이 있으면 눌러 주세요. 약 추천이 그에 맞게 바뀌어요' : '이 증상은 따로 여쭤볼 것이 없어요'}</div>
     <div class="chips">${top.map(flagBtn).join('')}${more.length ? `<button class="chip" onclick="document.getElementById('${id}')?.classList.toggle('hide')">${I.chev} 다른 조건 ${more.length}가지</button>` : ''}</div>
     ${more.length ? `<div id="${id}" class="chips hide" style="margin-top:8px">${more.map(flagBtn).join('')}</div>` : ''}
+    ${top.length ? `<button class="fit-me" onclick="go('/me')">${I.user}<span>매번 누르기 번거로우시면 <b>내 정보</b>에 미리 정해 두세요</span>${I.chev}</button>` : ''}
   </div>`;
 }
 function basket(s){
@@ -1138,7 +1178,7 @@ function vSymptom(id){
   <section class="sec answer" aria-label="바로 답">
     <div class="eyebrow">이렇게 사시면 돼요 <span class="muted" style="font-weight:500;letter-spacing:0;text-transform:none">· 누르면 드시는 법</span></div>
     <div class="buy">${planRows(s)}</div>
-    ${s.plan?.some(p => p.otc === false) ? `<div class="rxline">${I.info}${esc(s.plan.filter(p => p.otc === false).map(p => ingrName(drug(p.options?.[0])) || String(p.title || p.slot).split('—').pop().replace(/\(처방\)/g, '').trim()).join(' · '))} — 병원 처방이 필요해요</div>` : ''}
+    ${s.plan?.some(p => p.otc === false) ? `<div class="rxline">${I.info}${esc(s.plan.filter(p => p.otc === false).map(p => (p.options || []).map(o => ingrName(drug(o))).filter(Boolean).join(' · ') || String(p.title || p.slot).split('—').pop().replace(/\(처방\)/g, '').trim()).join(' · '))} — 병원 처방이 필요해요</div>` : ''}
     ${kidLine()}
     ${(() => { const w = [...dups, ...sameProductWarn(bk)]; return w.length ? `<div class="dup"><div class="dup-h">${I.alert}<b>사시기 전에 확인할 것 ${w.length}가지</b></div><ul class="plain">${w.map(t => `<li>${fmt(t)}</li>`).join('')}</ul></div>` : ''; })()}
     ${achPanel(bk.map(x => x.d), { compact:true })}
@@ -1318,6 +1358,51 @@ function vGuide(step, q){
   <section class="sec" id="care"><h2>어디까지 약국, 어디부터 병원인가요</h2>${careCards(s.care)}</section>
   <div class="actions"><button class="btn line" onclick="go('/symptom/${s.id}')">왜 이 조합인지 자세히 보기</button><button class="btn ghost" onclick="go('/guide/1')">다른 증상 고르기</button></div>
   ${disclaimer()}`;
+}
+
+/* ───────── 첫 만남 — 약을 고르기 전에 알아야 할 것만 먼저 여쭙는다 ─────────
+   벽이 아니라 안내다. 어느 단계에서든 건너뛸 수 있고, 나중에 내 정보에서 바꿀 수 있다. */
+const HELLO_KEY = 'yakjido.hello.v1';
+const helloDone = () => { try { return !!localStorage.getItem(HELLO_KEY); } catch (e) { return true; } };
+function helloFinish(){ try { localStorage.setItem(HELLO_KEY, '1'); } catch (e) {} HINT = 1; go('/home'); }
+function vHello(step){
+  const n = Math.min(3, Math.max(1, parseInt(step || '1', 10) || 1));
+  const dots = `<div class="steps-bar">${[1, 2, 3].map(i => `<i class="${i <= n ? 'on' : ''}"></i>`).join('')}</div>`;
+  const skip = `<button class="hello-skip" onclick="helloFinish()">나중에 할게요</button>`;
+  if (n === 1) {
+    const ICO3 = { adult:'user', senior:'shield', child:'flower' };
+    const pick = (k, t, sub) => `<button class="hello-big" onclick="ME.age='${k}';saveMe();go('/hello/2')">
+      <div class="ic">${icon(ICO3[k])}</div><div><b>${esc(t)}</b><span>${esc(sub)}</span></div>${I.chev}</button>`;
+    return `${topBar({ nosearch:true })}${dots}
+    <div class="hello-hi">
+      <div class="hello-mark"><svg viewBox="0 0 24 24"><rect x="3" y="8" width="18" height="8" rx="4" transform="rotate(-45 12 12)"/><path d="M9 9l6 6"/></svg></div>
+      <h1>약지도에 오셨어요</h1>
+      <p>증상에 맞는 약을 <b>의사가 고르듯</b> 골라 드려요.<br>먼저 한 가지만 여쭐게요.</p>
+    </div>
+    <h2 class="hello-q">누가 드실 약인가요?</h2>
+    <div class="hello-list">${pick('adult', '제가 먹을 약이에요', '성인 기준으로 골라 드려요')}${pick('senior', '어르신이 드실 약이에요', '65세 이상 — 부담이 적은 쪽을 먼저 권해요')}${pick('child', '아이가 먹을 약이에요', '소아·청소년 — 몸무게로 용량을 계산해요')}</div>
+    ${skip}`;
+  }
+  if (n === 2) {
+    const KEYS = ['heart', 'ulcer', 'kidney', 'liver', 'anticoag', 'glaucoma', 'bph', 'asthma', 'alcohol', 'gout', 'pregnant'];
+    const on = KEYS.filter(k => ME[k]).length;
+    return `${topBar({ back:'이전', nosearch:true })}${dots}
+    <h2 class="hello-q">해당하는 것이 있으면 눌러 주세요</h2>
+    <p class="hello-sub">이걸 알면 <b>위험한 조합을 미리 걸러</b> 드릴 수 있어요. 해당하는 것이 없으면 그냥 넘어가셔도 됩니다.</p>
+    <div class="hello-chips">${KEYS.map(k => `<button class="hello-chk ${ME[k] ? 'on' : ''}" aria-pressed="${!!ME[k]}" onclick="ME['${k}']=!ME['${k}'];saveMe();route()"><span class="bx">${ME[k] ? I.check : ''}</span>${esc(FLAG_Q[k])}</button>`).join('')}</div>
+    <p class="privacy">${I.lock}이 기기에만 저장되고 어디로도 전송되지 않아요.</p>
+    <div class="actions"><button class="btn" onclick="go('/hello/3')">${on ? `${on}가지 골랐어요 · 다음` : '해당 없어요 · 다음'}</button></div>`;
+  }
+  const f = activeFlags();
+  return `${topBar({ back:'이전', nosearch:true })}${dots}
+  <div class="hello-hi"><div class="hello-mark ok">${I.check}</div><h1>준비됐어요</h1>
+  <p>${f.length ? `이렇게 기억해 둘게요 — <b>${f.map(k => esc(FLAG_LABEL[k])).join(' · ')}</b>.<br>약을 고를 때마다 알아서 살펴 드릴게요.` : '약을 고를 때마다 필요한 것만 여쭤볼게요.'}</p></div>
+  <div class="card hello-card">
+    <h2>언제든 바꾸실 수 있어요</h2>
+    <p>아래 <b>내 정보</b> 탭 → <b>‘해당하는 것을 켜 주세요’</b>에서 고치시면 됩니다. 병이 생기거나 약이 바뀌었을 때 한 번씩 봐 주세요.</p>
+    <div class="hello-where">${I.user}<span>내 정보</span>${I.chev}<span>해당하는 것을 켜 주세요</span></div>
+  </div>
+  <div class="actions"><button class="btn" onclick="helloFinish()">${I.check} 시작하기</button><button class="btn line" onclick="go('/me')">내 정보 먼저 볼게요</button></div>`;
 }
 
 /* ───────── 성분 사전(넓게) · 제품 이름 사전 ─────────
@@ -1837,6 +1922,7 @@ function vMe(){
     ${T('glaucoma', '녹내장', '일부 감기약·멀미약 성분에 주의')}
     ${T('bph', '전립선비대', '코감기약·항히스타민제로 소변이 막힐 수 있어요')}
     <p class="privacy">${I.lock}입력한 내용은 이 기기에만 저장되고 어디로도 전송되지 않아요.</p>
+    <div class="actions"><button class="btn line" onclick="go('/hello/1')">${I.info} 처음 안내 다시 보기</button></div>
   </section>
   <section class="sec card"><h2>지금 먹는 약 <small class="muted" style="font-weight:500;font-size:.8125rem">중복 성분을 잡아드려요</small></h2>
     <p class="small" style="margin-top:6px">감기약·진통제·처방약을 등록해 두면, 증상별 추천에서 <b>같은 성분이 겹치는지</b> 알려드려요.</p>
@@ -1864,7 +1950,7 @@ document.addEventListener('input', e => { if (!e.target.closest('.calc')) return
 function setFs(v){ try { localStorage.setItem('yakjido.fs', v); } catch (e) {} document.documentElement.style.setProperty('--fs', v); route(); }
 try { const fs = localStorage.getItem('yakjido.fs'); if (fs) document.documentElement.style.setProperty('--fs', fs); } catch (e) {}
 /* ───────── 시작 ───────── */
-try { if (!localStorage.getItem('yakjido.seen') && !location.hash) { localStorage.setItem('yakjido.seen', '1'); location.hash = '#/guide/1'; } } catch (e) {}
+try { if (!helloDone() && !location.hash) { location.hash = '#/hello/1'; } } catch (e) {}
 armNotifications();
 route();
 if ('serviceWorker' in navigator && location.protocol.startsWith('http')) { navigator.serviceWorker.register('sw.js').catch(() => {}); }
