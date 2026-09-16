@@ -126,7 +126,7 @@ export async function wx(req, env, cors){
   const ncst = `https://apis.data.go.kr/1360000/VilageFcstInfoService_2.0/getUltraSrtNcst?serviceKey=${encodeURIComponent(key)}&dataType=JSON&numOfRows=100&pageNo=1&base_date=${ymd(nc)}&base_time=${pad(nc.getUTCHours())}00&nx=${nx}&ny=${ny}`;
   /* 오늘 최고·최저는 02시 발표 단기예보(TMX·TMN) — 02:10 전이면 어제 23시 발표 */
   const fd = new Date(now); let fb = '0200'; if (hh < 2 || (hh === 2 && mm < 10)) { fd.setUTCDate(fd.getUTCDate() - 1); fb = '2300'; }
-  const fcst = `https://apis.data.go.kr/1360000/VilageFcstInfoService_2.0/getVilageFcst?serviceKey=${encodeURIComponent(key)}&dataType=JSON&numOfRows=300&pageNo=1&base_date=${ymd(fd)}&base_time=${fb}&nx=${nx}&ny=${ny}`;
+  const fcst = `https://apis.data.go.kr/1360000/VilageFcstInfoService_2.0/getVilageFcst?serviceKey=${encodeURIComponent(key)}&dataType=JSON&numOfRows=400&pageNo=1&base_date=${ymd(fd)}&base_time=${fb}&nx=${nx}&ny=${ny}`;
   const air = `https://apis.data.go.kr/B552584/ArpltnInforInqireSvc/getCtprvnRltmMesureDnsty?serviceKey=${encodeURIComponent(key)}&returnType=json&numOfRows=100&pageNo=1&sidoName=${encodeURIComponent(sido)}&ver=1.0`;
   const get = async url => { try { const r = await fetch(url, { headers: { Accept: 'application/json' } }); if (!r.ok) return null; return await r.json(); } catch (e) { return null; } };
   const [n, f, a] = await Promise.all([get(ncst), get(fcst), get(air)]);
