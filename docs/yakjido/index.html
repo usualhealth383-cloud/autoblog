@@ -2344,14 +2344,13 @@ function vHello(step){
   return `${topBar({ back:'이전', nosearch:true })}${dots}
   <div class="hello-hi"><div class="hello-mark ok">${I.check}</div><h1>준비됐어요</h1>
   <p>${f.length ? `이렇게 기억해 둘게요 — <b>${f.map(k => esc(FLAG_LABEL[k])).join(' · ')}</b>.<br>약을 고를 때마다 알아서 살펴 드릴게요.` : '약을 고를 때마다 필요한 것만 여쭤볼게요.'}</p></div>
-  <div class="card hello-card">
-    <h2>언제든 바꾸실 수 있어요</h2>
-    <p>아래 <b>내 정보</b> 탭 → <b>‘해당하는 것을 켜 주세요’</b>에서 고치시면 됩니다. 병이 생기거나 약이 바뀌었을 때 한 번씩 봐 주세요.</p>
-    <div class="hello-where">${I.user}<span>내 정보</span>${I.chev}<span>해당하는 것을 켜 주세요</span></div>
-  </div>
-  <div class="hello-fs"><b>글씨가 작으면 여기서 키우세요</b>${fsSeg()}</div>
-  <p class="hello-close">오늘 어디가 불편하신지부터 함께 볼게요.<br>급하지 않으면, 천천히 둘러보셔도 좋아요.</p>
-  <div class="actions"><button class="btn" onclick="helloFinish()">${I.check} 시작하기</button><button class="btn line" onclick="go('/me')">내 정보 먼저 볼게요</button></div>`;
+  ${(() => { /* 어르신이 드실 약이면 큰 글씨·큰 단추를 기본으로 켜 둔다 — 첫 화면부터 편해야 한다. 여기서 끄면 그대로 존중 */
+    if (ME.age === 'senior' && ME.easy === undefined) { ME.easy = true; saveMe(); try { if (!localStorage.getItem('yakjido.fs')) { localStorage.setItem('yakjido.fs', '18px'); document.documentElement.style.setProperty('--fs', '18px'); } } catch (e) {} } return ''; })()}
+  <div class="hello-fs"><b>글씨가 작으면 키우세요</b>${fsSeg()}</div>
+  <div class="hello-fs"><b>큰 단추·단순한 화면<span class="small muted" style="display:block;font-weight:500">어르신 모드</span></b><button class="sw ${ME.easy ? 'on' : ''}" role="switch" aria-checked="${!!ME.easy}" aria-label="어르신 모드" onclick="ME.easy=!ME.easy;saveMe();setFs(ME.easy?'20px':'16px')"></button></div>
+  <p class="hello-close">오늘 어디가 불편하신지부터 함께 볼게요.</p>
+  <div class="actions"><button class="btn" onclick="helloFinish()">${I.check} 시작하기</button></div>
+  <p class="small muted" style="text-align:center;margin-top:10px">지금 고른 것은 언제든 <b>내 정보</b>에서 바꿀 수 있어요.</p>`;
 }
 
 /* ───────── 성분 사전(넓게) · 제품 이름 사전 ─────────
