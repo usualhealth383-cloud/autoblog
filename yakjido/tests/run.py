@@ -125,6 +125,10 @@ def main():
         pg.unroute('**/*open-meteo.com/**')
         pg.route('**/api.open-meteo.com/**', lambda rt: rt.fulfill(status=200, content_type='application/json', body=FC))
         pg.route('**/air-quality-api.open-meteo.com/**', lambda rt: rt.fulfill(status=200, content_type='application/json', body=AQ))
+        # 10. 소아 용량 계산 — 아세트아미노펜 10~15 mg/kg(하루 75, 두 돌 전 60), 이부프로펜 5~10 mg/kg(하루 40), 상한
+        kd = pg.evaluate("()=>[[15,36],[8,5],[40,150],[10,20]].map(([w,m])=>['apap','ibu'].map(k=>{const r=kidDose(k,w,m);return [r.lo,r.hi,r.day]}))")
+        want = [[[150, 225, 1125], [75, 150, 600]], [[80, 120, 480], [40, 80, 320]], [[400, 600, 3000], [200, 400, 1600]], [[100, 150, 600], [50, 100, 400]]]
+        if kd != want: fails.append(f'소아 용량 계산 불일치: {kd} ≠ {want}')
         # 7. 항콜린 이중 계산 · 8. 이름 검색
         r7 = pg.evaluate("""async()=>{ await pubPills(); await pubPillsRx(); let n=0;
           for(const p of (PUB.rx||[]).concat(PUB.pills||[])){ if(ingFind((p.ingr||'')+' '+(p.n||'')).filter(e=>e.ach).length>1) n++; } return n; }""")

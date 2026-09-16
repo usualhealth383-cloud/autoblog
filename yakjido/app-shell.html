@@ -832,6 +832,8 @@ nav.tabbar button.on svg.i{stroke-width:2.2}
 .jump{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:12px}
 .jump button{display:flex;align-items:center;justify-content:center;gap:2px;min-height:44px;padding:6px 4px;border-radius:12px;background:var(--tint2);color:var(--body);font-size:.8125rem;font-weight:700;line-height:1.25}
 .jump button svg.i{width:12px;height:12px;color:var(--faint);flex:none}
+/* 종이로 뽑기 — 한 장 화면은 카드만, 나머지는 숨긴다 */
+@media print{nav.tabbar,.top,.topfind,.actions,.disclaimer,.netbar,#cmpbar,.eyebrow{display:none!important}.app,#view{max-width:none;padding:0}.show-card{box-shadow:none;border:1.5px solid #333;break-inside:avoid;page-break-inside:avoid}.show-big{border:1px solid #999}body{background:#fff;color:#000}h1{font-size:18pt}}
 /* 내 약통 줄 — 며칠만 토글 + 빼기 */
 .bag-rows{margin-top:var(--s3)}
 .bag-row{display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid var(--hairline)} .bag-row:last-child{border-bottom:0}
@@ -1157,7 +1159,11 @@ function route(){
   if (back) { HIST.pop(); const y = SCROLL[path] || 0; requestAnimationFrame(() => window.scrollTo({ top: y })); }
   else { if (HIST[HIST.length - 1] !== path) HIST.push(path); window.scrollTo({ top:0 }); }
   renderCmpBar();
+  /* 화면이 바뀌면 초점을 제목으로 — 화면낭독기가 새 화면의 이름부터 읽는다. 입력칸에 커서가 있으면 건드리지 않는다 */
+  if (path !== ROUTE_PREV && document.activeElement?.tagName !== 'INPUT') { const h1 = view.querySelector('h1'); if (h1) { h1.setAttribute('tabindex', '-1'); try { h1.focus({ preventScroll: true }); } catch (e) {} } }
+  ROUTE_PREV = path;
 }
+let ROUTE_PREV = '';
 const HIST = [], SCROLL = {};
 window.addEventListener('scroll', () => { SCROLL[LASTPATH] = window.scrollY; }, { passive:true });
 window.addEventListener('hashchange', route);
@@ -2809,7 +2815,7 @@ function vBag(){
     ${sc ? `<p class="show-big ${lv}">${lv === 'ok' ? I.info : I.alert}<span>항콜린 부담 ${sc}점 · ${ACH_LV_WORD[lv]}<small>${al.filter(x => x.e.ach).map(x => esc(x.e.n)).slice(0, 6).join(' · ')}${lv === 'ok' ? '' : ' — 입마름·변비·어지럼·기억 흐림이 있으면 말씀하세요'}</small></span></p>` : ''}
     ${res.unknown.length ? `<p class="small muted" style="margin-top:8px">성분을 확인하지 못한 약 ${res.unknown.length}가지는 판정에서 빠져 있어요.</p>` : ''}
   </div>
-  <div class="actions"><button class="btn ghost" onclick="shareBag()">${I.cart} 메모로 복사·전송</button><button class="btn ghost" onclick="go('/together')">${I.shield} 자세한 판정 보기</button></div>`}
+  <div class="actions"><button class="btn ghost" onclick="shareBag()">${I.cart} 메모로 복사·전송</button><button class="btn ghost" onclick="window.print()">${I.book} 종이로 뽑기</button><button class="btn ghost" onclick="go('/together')">${I.shield} 자세한 판정 보기</button></div>`}
   ${disclaimer('이 한 장은 참고용이에요. 약을 스스로 끊거나 바꾸지 마시고, 약사·의사의 판단을 따르세요.')}`;
 }
 function bagText(){
@@ -2953,6 +2959,7 @@ function vSuppDetail(id){
   ${s.timing ? `<section class="sec card"><h2>언제, 어떻게</h2><p>${fmt(s.timing)}</p></section>` : ''}
   ${s.cautions?.length ? `<section class="sec card"><h2>주의</h2>${list(s.cautions, 'plain x')}</section>` : ''}
   ${s.priceTip ? `<section class="sec card"><h2>가격 비교는 이렇게</h2><p>${fmt(s.priceTip)}</p></section>` : ''}
+  ${s.faq?.length ? `<section class="sec card"><h2>자주 묻는 질문</h2>${faqList(s.faq)}</section>` : ''}
   ${srcChips(s.sources)}
   <div class="actions"><button class="btn ghost" onclick="toggleCmp('${s.id}',true);go('/supp')">${I.scale} 비교 목록에 담기</button></div>
   ${disclaimer(D.meta?.suppDisclaimer)}`;
