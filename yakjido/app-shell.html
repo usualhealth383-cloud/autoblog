@@ -2483,7 +2483,7 @@ function vDrug(id){
     ${pubHtml}
   </section></div>
   <div class="pane" id="p4"><section class="card"><h2>같이 먹으면 안 되거나 조심할 것</h2>
-    ${(d.interactions || []).map(x => `<div class="prod" style="margin-top:8px;align-items:flex-start"><div><b>${esc(x.with)}</b><span style="font-size:.8125rem;color:var(--body);margin-top:2px">${fmt(x.note)}</span></div><span class="badge ${x.level === '금기' ? 'stop' : 'warn'}">${esc(x.level)}</span></div>`).join('') || '<p class="small muted">등록된 상호작용이 없어요. 복용 중인 약이 있으면 약사에게 알려주세요.</p>'}
+    ${(d.interactions || []).map(x => `<div class="prod" style="margin-top:8px;align-items:flex-start"><div><b>${esc(x.with)}</b><span style="font-size:.8125rem;color:var(--body);margin-top:2px">${fmt(x.note)}</span></div><span class="badge ${x.level === '금기' ? 'stop' : 'warn'}">${x.level === '금기' ? '같이 안 돼요' : esc(x.level)}</span></div>`).join('') || '<p class="small muted">등록된 상호작용이 없어요. 복용 중인 약이 있으면 약사에게 알려주세요.</p>'}
   </section></div>
   ${same.length ? `<section class="sec"><h2>같은 계열 다른 성분 <small>비교해서 고르기</small></h2><div class="card rows">${same.map(x => `<button class="row" onclick="go('/drug/${x.id}')"><div class="body"><b>${esc(x.name)}</b><span>${esc(x.tagline || (x.for || []).join(' · '))}</span>${useTag(x)}</div>${badge(x.rx)}</button>`).join('')}</div>${c ? `<a class="btn ghost" style="margin-top:12px" href="#/class/${c.id}">${I.scale} ${esc(c.name)} 한눈에 비교</a>` : ''}</section>` : ''}
   <div class="actions"><button class="btn ${(ME.taking || []).includes(d.id) ? 'line' : 'ghost'}" onclick="toggleTaking('${d.id}')">${(ME.taking || []).includes(d.id) ? I.check + ' 내 약통에 있어요 (빼기)' : I.pill + ' 지금 먹는 약으로 등록'}</button></div>
