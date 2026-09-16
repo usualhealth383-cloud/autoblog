@@ -2452,7 +2452,7 @@ function vDrug(id){
   ${d.useNote ? `<div class="usebar">${I.alert}<span>${fmt(d.useNote)}</span></div>` : ''}
   ${d.ach ? `<div class="usebar" style="${d.ach >= 2 ? '' : 'background:var(--tint2);color:var(--body)'}">${d.ach >= 2 ? I.alert : I.info}<span><b>항콜린 부담 ${esc(ACH_WORD[d.ach])}</b> — ${esc(d.achNote || '')}${d.achAlt ? '<br>' + fmt(d.achAlt) : ''}</span></div>` : ''}
   ${ixLine([d])}
-  <div class="jump" role="navigation" aria-label="이 화면의 차례">${[['p1', '복용법'], ['p2', '주의·부작용'], ['p3', '제품'], ['p4', '상호작용']].map(([p, n]) => `<button onclick="jumpTab('${p}')">${n}${I.chev}</button>`).join('')}</div>
+  <div class="jump" role="navigation" aria-label="이 화면의 차례">${[['p1', '복용법'], ['p2', '주의·부작용'], ['p3', '제품'], ['p4', '같이 먹으면']].map(([p, n]) => `<button onclick="jumpTab('${p}')">${n}${I.chev}</button>`).join('')}</div>
   <p style="margin-top:10px">${fmt(d.lead || '')}</p>
   ${picts(d.pict)}
   ${(() => { const pr = (d.products || []).find(x => pimg(x.name)); return pr ? `<div class="drug-photo">${imgTag(pimg(pr.name), '', pr.name)}<div><b>${esc(pr.name)}</b><small>${esc(pr.maker || '')} · ${esc(pr.amount || '')}</small><small style="display:block;margin-top:2px">사진: 식약처·약학정보원 낱알식별</small></div></div>` : ''; })()}
@@ -2463,7 +2463,7 @@ function vDrug(id){
   </div>
   ${d.dose ? `<div class="dose-hero"><small>성인 1회 용량</small><div class="big">${esc(d.dose.adult || '')}</div><small>하루 최대 ${esc(d.dose.max || '[확인 필요]')}${d.dose.interval ? ` · 간격 ${esc(d.dose.interval)}` : ''}</small>${d.dose.child ? `<small style="margin-top:6px">소아: ${esc(d.dose.child)}</small>` : ''}</div>` : ''}
   <div class="tabs">
-    <button class="tab on" data-p="p1">복용법</button><button class="tab" data-p="p2">주의·부작용</button><button class="tab" data-p="p3">제품</button><button class="tab" data-p="p4">상호작용</button>
+    <button class="tab on" data-p="p1">복용법</button><button class="tab" data-p="p2">주의·부작용</button><button class="tab" data-p="p3">제품</button><button class="tab" data-p="p4">같이 먹으면</button>
   </div>
   <div class="pane on" id="p1"><section class="card">
     ${d.simple ? `<div class="dose-hero" style="margin-top:0;margin-bottom:16px"><small>간단히 — 약국 구입 기준</small><div style="font-size:1.0625rem;font-weight:700;line-height:1.5;margin-top:4px">${esc(d.simple)}</div></div>` : ''}
@@ -2483,7 +2483,7 @@ function vDrug(id){
     ${pubHtml}
   </section></div>
   <div class="pane" id="p4"><section class="card"><h2>같이 먹으면 안 되거나 조심할 것</h2>
-    ${(d.interactions || []).map(x => `<div class="prod" style="margin-top:8px;align-items:flex-start"><div><b>${esc(x.with)}</b><span style="font-size:.8125rem;color:var(--body);margin-top:2px">${fmt(x.note)}</span></div><span class="badge ${x.level === '금기' ? 'stop' : 'warn'}">${x.level === '금기' ? '같이 안 돼요' : esc(x.level)}</span></div>`).join('') || '<p class="small muted">등록된 상호작용이 없어요. 복용 중인 약이 있으면 약사에게 알려주세요.</p>'}
+    ${(d.interactions || []).map(x => `<div class="prod" style="margin-top:8px;align-items:flex-start"><div><b>${esc(x.with)}</b><span style="font-size:.8125rem;color:var(--body);margin-top:2px">${fmt(x.note)}</span></div><span class="badge ${x.level === '금기' ? 'stop' : 'warn'}">${x.level === '금기' ? '같이 안 돼요' : esc(x.level)}</span></div>`).join('') || '<p class="small muted">같이 먹을 때 조심할 약이 등록되지 않았어요. 드시는 약이 있으면 약사에게 알려주세요.</p>'}
   </section></div>
   ${same.length ? `<section class="sec"><h2>같은 계열 다른 성분 <small>비교해서 고르기</small></h2><div class="card rows">${same.map(x => `<button class="row" onclick="go('/drug/${x.id}')"><div class="body"><b>${esc(x.name)}</b><span>${esc(x.tagline || (x.for || []).join(' · '))}</span>${useTag(x)}</div>${badge(x.rx)}</button>`).join('')}</div>${c ? `<a class="btn ghost" style="margin-top:12px" href="#/class/${c.id}">${I.scale} ${esc(c.name)} 한눈에 비교</a>` : ''}</section>` : ''}
   <div class="actions"><button class="btn ${(ME.taking || []).includes(d.id) ? 'line' : 'ghost'}" onclick="toggleTaking('${d.id}')">${(ME.taking || []).includes(d.id) ? I.check + ' 내 약통에 있어요 (빼기)' : I.pill + ' 지금 먹는 약으로 등록'}</button></div>
@@ -2507,7 +2507,7 @@ function vPub(id){
   return `${topBar({ back:'약 사전' })}
   <div class="pub-hero">${ix.img ? `<img class="pillimg" src="${esc(ix.img)}" alt="${esc(ix.n)} 낱알 사진" onerror="this.remove()">` : ''}<div><div class="eyebrow">식약처 e약은요</div><h1 style="font-size:1.25rem">${esc(ix.n)}</h1><p class="small muted">${esc(ix.m)} ${ix.cvs ? '<span class="badge cvs">편의점 가능</span>' : '<span class="badge otc">약국 구입</span>'}</p></div></div>
   <div class="chips" style="margin-top:12px">${ix.i.map(x => `<span class="chip" style="min-height:32px;font-size:.8125rem">${esc(x)}</span>`).join('')}</div>
-  ${ours.length ? `<section class="sec"><h2>약지도 성분 해설 <small>부담 정도·상호작용·같은 계열 비교</small></h2><div class="card rows">${ours.map(d => `<button class="row" onclick="go('/drug/${d.id}')"><div class="ic">${icon(cls(d.class)?.icon || 'pill')}</div><div class="body"><b>${esc(d.name)}</b><span>${esc(d.tagline || (d.for || []).join(' · '))}</span></div>${I.chev}</button>`).join('')}</div>${ours.map(meWarnings).join('')}</section>` : ''}
+  ${ours.length ? `<section class="sec"><h2>약지도 성분 해설 <small>부담 정도·같이 먹을 때·같은 계열 비교</small></h2><div class="card rows">${ours.map(d => `<button class="row" onclick="go('/drug/${d.id}')"><div class="ic">${icon(cls(d.class)?.icon || 'pill')}</div><div class="body"><b>${esc(d.name)}</b><span>${esc(d.tagline || (d.for || []).join(' · '))}</span></div>${I.chev}</button>`).join('')}</div>${ours.map(meWarnings).join('')}</section>` : ''}
   ${dup.length ? `<section class="sec">${dup.map(t => `<div class="dup" style="margin-top:0;margin-bottom:8px">${I.alert}<span>${fmt(t)}</span></div>`).join('')}</section>` : ''}
   <section class="sec card qa">${det ? `
     <h3>이 약의 효능은 무엇입니까?</h3><p>${esc(det.e)}</p>
