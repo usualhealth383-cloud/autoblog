@@ -384,6 +384,8 @@ ul.steps li::before{content:counter(s);position:absolute;left:0;top:2px;width:24
 .fitme{margin-top:var(--s3)}
 .fitme .chips .chip{min-height:40px}
 .fitme .chip.on{background:var(--alert-tint);border-color:var(--alert);color:var(--alert)}
+.fit-bar{display:flex;align-items:center;gap:9px;width:100%;text-align:left;padding:11px 13px;border-radius:12px;background:var(--tint);color:var(--text);font-size:.9375rem;line-height:1.45;min-height:46px}
+.fit-bar>svg.i{flex:none;color:var(--primary)} .fit-bar span{flex:1;min-width:0} .fit-bar>svg.i:last-child{color:var(--faint)}
 .fit-me{display:flex;align-items:center;gap:8px;width:100%;text-align:left;margin-top:10px;padding:10px 12px;border-radius:12px;background:var(--tint2);color:var(--muted);font-size:.8125rem;font-weight:600;min-height:44px}
 .fit-me svg.i{flex:none;width:16px;height:16px}
 .fit-me span{flex:1;min-width:0}
@@ -1679,9 +1681,13 @@ function askFlags(s, n = 3){
 const flagBtn = k => isAgeFlag(k)
   ? `<button class="chip ${ME.age === k ? 'on' : ''}" aria-pressed="${ME.age === k}" onclick="ME.age=ME.age==='${k}'?'adult':'${k}';saveMe();route()">${ME.age === k ? I.check : I.circle}${esc(FLAG_Q[k])}</button>`
   : `<button class="chip ${ME[k] ? 'on' : ''}" aria-pressed="${!!ME[k]}" onclick="ME['${k}']=!ME['${k}'];saveMe();route()">${ME[k] ? I.check : I.circle}${esc(FLAG_Q[k])}</button>`;
+/* 내 정보를 이미 정해 둔 분께는 칩 그리드 대신 한 줄 — 첫 화면에 답이 올라온다(감사 #10) */
+let FIT_OPEN = '';
 function fitChips(s){
   const { top, more } = askFlags(s, 4);
   if (!top.length && !more.length) return '';
+  const act = activeFlags().filter(k => FLAG_LABEL[k]);
+  if (act.length && FIT_OPEN !== s.id) return `<div class="fitme"><button class="fit-bar" onclick="FIT_OPEN='${s.id}';route()">${I.user}<span><b>내 정보 기준</b> — ${act.map(k => esc(FLAG_LABEL[k])).join(' · ')}. 오늘 다른 조건이 있으면 눌러서 더하세요</span>${I.chev}</button></div>`;
   const id = 'more-fit';
   return `<div class="fitme">
     <div class="small muted" style="margin-bottom:6px;font-weight:600">${top.length ? '해당되는 것이 있으면 눌러 주세요. 약 추천이 그에 맞게 바뀌어요' : '이 증상은 따로 여쭤볼 것이 없어요'}</div>
