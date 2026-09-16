@@ -1507,19 +1507,37 @@ function wxCode(c){ c = +c; if (c === 0) return ['맑음', 'sun']; if (c <= 2) r
 function wxPm(d){ const g = (v, a, b, c) => v == null ? -1 : v <= a ? 0 : v <= b ? 1 : v <= c ? 2 : 3; const k = Math.max(g(d.pm10, 30, 80, 150), g(d.pm25, 15, 35, 75));
   return k < 0 ? { t:'—', cls:'' } : [{ t:'좋음', cls:'ok' }, { t:'보통', cls:'' }, { t:'나쁨', cls:'hi' }, { t:'매우 나쁨', cls:'bad' }][k]; }
 function wxGap(d){ return d.max != null && d.min != null ? Math.round(d.max - d.min) : null; }  /* 어르신 화면 — 소수점은 뺀다 */
-/* 오늘 날씨에서 나오는 건강 한 줄 — 우선순위대로 둘만 */
+/* 내 약통을 날씨에 겹쳐 본다 — 이것이 날씨 앱과 다른 자리. 성분 계열 태그와 항콜린 점수만 쓴다(기기 안에서만) */
+function wxBag(){
+  const tags = new Set(); let n = 0;
+  for (const x of takingItems()) { n++; for (const e of ingOf(x).ings) (e.cls || []).forEach(t => tags.add(t)); }
+  return { n, tags, ach: n ? achScore(achList([])) : 0, has: (...ts) => ts.some(t => tags.has(t)) };
+}
+/* 오늘 날씨에서 나오는 건강 한 줄 — 우선순위대로 둘만. 약통에 걸리는 것이 있으면 그 줄이 먼저 */
 function wxAdvice(d){
-  const r = v => Math.round(v), gap = wxGap(d), pm = wxPm(d), A = [];
-  if (pm.cls === 'bad') A.push({ p:0, t:'미세먼지가 <b>매우 나쁨</b>이에요. 천식·기침·심장병이 있으면 외출을 줄이고, 나가시면 KF80 이상 마스크를 쓰세요.', link:'/symptom/cough' });
-  else if (pm.cls === 'hi') A.push({ p:1, t:'미세먼지 <b>나쁨</b> — 천식·기침·비염이 있으면 마스크를, 돌아와서 식염수로 코를 씻으세요.', link:'/symptom/rhinitis' });
-  if (d.max >= 33) A.push({ p:0, t:`한낮 <b>${r(d.max)}℃</b> — 이뇨제·혈압약을 드시면 어지럼·탈수가 오기 쉬워요. 물을 자주, 낮 12~5시 외출은 줄이세요.`, link:'/symptom/dizziness' });
-  else if (d.max >= 30) A.push({ p:2, t:'더운 날이에요 — 목마르기 전에 물 한 컵씩. 65세 이상은 갈증을 늦게 느껴요.', link:'/symptom/dizziness' });
-  if (d.min <= 0) A.push({ p:0, t:`아침 <b>${r(d.min)}℃</b> — 빙판 낙상을 조심하세요. 수면제·항히스타민제를 드신 아침은 특히 천천히.`, link:'/symptom/insomnia' });
-  if (gap >= 10) A.push({ p:1, t:`일교차 <b>${gap}℃</b> — 아침저녁 겉옷 하나 더. 혈압약을 드시면 아침 혈압이 더 오르는 날이고, 감기와 비염이 헷갈리기 쉬운 날이에요.`, link:'/symptom/cold' });
-  else if (gap >= 8) A.push({ p:3, t:`일교차 ${gap}℃ — 저녁 산책엔 겉옷을 챙기세요.`, link:'/symptom/cold' });
-  if (d.rh != null && d.rh <= 35) A.push({ p:2, t:`습도 <b>${d.rh}%</b>로 건조해요 — 입마름·눈 건조·피부 가려움이 늘어요. 물 자주, 가습기.`, link:'/symptom/drymouth' });
-  if (!A.length) A.push({ p:9, t:'무난한 날씨예요 — 30분 걷기 좋은 날. 무릎이 아프면 평지로.', link:'/symptom/arthritis' });
-  return A.sort((a, b) => a.p - b.p).slice(0, 2);
+  const r = v => Math.round(v), gap = wxGap(d), pm = wxPm(d), A = [], bag = wxBag();
+  const hot = d.max >= 30, icy = d.min <= 0;
+  if (bag.n) {
+    const diur = bag.has('diuretic'), achHi = bag.ach >= 3, sedat = bag.has('sed', 'sleep', 'bzd', 'zdrug'), bp = bag.has('arb', 'acei', 'ccb', 'beta', 'diuretic');
+    if (hot && diur && bag.has('nsaid')) A.push({ th:'heat', p:-2, t:`<b>내 약통</b> — 이뇨제와 소염진통제를 함께 드시는데 오늘 <b>${r(d.max)}℃</b>예요. 더위에 탈수까지 겹치면 콩팥이 가장 위험한 날입니다. 소염진통제는 오늘 쉬고, 물을 자주.`, link:'/together' });
+    else if (hot && (diur || bag.has('lithium'))) A.push({ th:'heat', p:-1, t:`<b>내 약통</b> — 이뇨제${bag.has('lithium') ? '·리튬' : ''}를 드셔서 더위에 더 약해요. 탈수가 빨라 어지럼·콩팥 부담이 옵니다. 물을 자주, 어지러우면 그늘에서 쉬세요. 약은 스스로 끊지 말고 의사와.`, link:'/symptom/dizziness' });
+    else if (hot && achHi) A.push({ th:'heat', p:-1, t:`<b>내 약통</b> — 항콜린 성분(${bag.ach}점)이 땀을 덜 나게 해 오늘처럼 더운 날 체온이 쉽게 오릅니다. 낮 외출을 줄이고 물을 자주 드세요.`, link:'/together' });
+    if (icy && (sedat || achHi)) A.push({ th:'ice', p:-1, t:`<b>내 약통</b> — 졸리는 약(수면제·항히스타민)을 드시는 분은 <b>${r(d.min)}℃</b> 새벽 빙판 낙상이 가장 위험해요. 아침 첫걸음은 천천히, 밤 화장실 길에 불을 켜 두세요.`, link:'/symptom/insomnia' });
+    if (gap >= 10 && bp) A.push({ th:'gap', p:-1, t:`<b>내 약통</b> — 혈압약을 드시니 일교차 <b>${gap}℃</b>인 오늘은 아침 혈압을 한 번 재 보세요. 큰 일교차는 아침 혈압을 올리고, 갑자기 추운 아침 외출은 심장에 부담이에요.`, link:'/kinds/bp' });
+  }
+  if ((pm.cls === 'hi' || pm.cls === 'bad') && (bag.has('asthma', 'resp') || ME.asthma)) A.push({ th:'pm', p:-1, t:`<b>내 정보</b> — 천식이 있으신데 오늘 미세먼지는 <b>${pm.t}</b>이에요. 흡입기를 챙기고 외출을 줄이세요. 쌕쌕거림이 평소보다 심하면 진료.`, link:'/symptom/cough' });
+  if (pm.cls === 'bad') A.push({ th:'pm', p:0, t:'미세먼지가 <b>매우 나쁨</b>이에요. 천식·기침·심장병이 있으면 외출을 줄이고, 나가시면 KF80 이상 마스크를 쓰세요.', link:'/symptom/cough' });
+  else if (pm.cls === 'hi') A.push({ th:'pm', p:1, t:'미세먼지 <b>나쁨</b> — 천식·기침·비염이 있으면 마스크를, 돌아와서 식염수로 코를 씻으세요.', link:'/symptom/rhinitis' });
+  if (d.max >= 33) A.push({ th:'heat', p:0, t:`한낮 <b>${r(d.max)}℃</b> — 이뇨제·혈압약을 드시면 어지럼·탈수가 오기 쉬워요. 물을 자주, 낮 12~5시 외출은 줄이세요.`, link:'/symptom/dizziness' });
+  else if (d.max >= 30) A.push({ th:'heat', p:2, t:'더운 날이에요 — 목마르기 전에 물 한 컵씩. 65세 이상은 갈증을 늦게 느껴요.', link:'/symptom/dizziness' });
+  if (d.min <= 0) A.push({ th:'ice', p:0, t:`아침 <b>${r(d.min)}℃</b> — 빙판 낙상을 조심하세요. 수면제·항히스타민제를 드신 아침은 특히 천천히.`, link:'/symptom/insomnia' });
+  if (gap >= 10) A.push({ th:'gap', p:1, t:`일교차 <b>${gap}℃</b> — 아침저녁 겉옷 하나 더. 혈압약을 드시면 아침 혈압이 더 오르는 날이고, 감기와 비염이 헷갈리기 쉬운 날이에요.`, link:'/symptom/cold' });
+  else if (gap >= 8) A.push({ th:'gap', p:3, t:`일교차 ${gap}℃ — 저녁 산책엔 겉옷을 챙기세요.`, link:'/symptom/cold' });
+  if (d.rh != null && d.rh <= 35) A.push({ th:'dry', p:2, t:`습도 <b>${d.rh}%</b>로 건조해요 — 입마름·눈 건조·피부 가려움이 늘어요. 물 자주, 가습기.`, link:'/symptom/drymouth' });
+  if (!A.length) A.push({ th:'ok', p:9, t:'무난한 날씨예요 — 30분 걷기 좋은 날. 무릎이 아프면 평지로.', link:'/symptom/arthritis' });
+  /* 같은 주제(더위·빙판·일교차·미세먼지)는 약통 줄이 일반 줄을 대신한다. 둘까지만 */
+  const seen = new Set();
+  return A.sort((a, b) => a.p - b.p).filter(a => !seen.has(a.th) && seen.add(a.th)).slice(0, 2);
 }
 function wxCard(){
   const loc = wxLoc(); const d = WX.data && WX.data.name === loc.name ? WX.data : null;
