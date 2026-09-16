@@ -10,6 +10,7 @@
   3. 글자 잘림 0 (scrollWidth > clientWidth 인 말단 요소)
   4. 명암비 — 밝은/어두운 테마 모두 WCAG AA (본문 4.5, 큰 글씨 3.0)
   5. 탭 타깃 44px 미만 0 (문장 속 인라인 링크는 WCAG 2.5.8 예외)
+  5b. 어르신 모드(글자 20px) 16화면에서 넘침·잘림 0
   6. 병용 판정 시나리오 5건 (삼중고·와파린·전립선·치매약+방광약·혈압약 모름)
   7. 항콜린 이중 계산 0 (식약처 2.4만 제품 전수)
   8. 이름 검색 16건 (베시케어·하루날디·타이레놀·TY 500 …)
@@ -86,6 +87,14 @@ def main():
             if bad: fails.append(f'명암비({theme}) {len(bad)}: {bad[:3]}')
             if tap: fails.append(f'44px 미만({theme}) {len(tap)}: {sorted(set(tap))[:5]}')
         pg.emulate_media(color_scheme='light')
+        # 5b. 어르신 모드(글자 20px·큰 단추) — 넘침·잘림은 큰 글씨에서 먼저 터진다
+        pg.evaluate("localStorage.setItem('yakjido.fs','20px');localStorage.setItem('yakjido.me.v1',JSON.stringify({age:'senior',easy:true,taking:['cls:bp.arb','ibuprofen'],pub:{}}))")
+        for r in SC + ['/bag', '/schedule', '/symptom/cramp', '/symptom/sprain', '/drug/acetaminophen', '/kinds/bp']:
+            pg.goto(url + '#' + r); pg.reload(); pg.wait_for_timeout(500)
+            o = pg.evaluate(OVERFLOW_JS)
+            if o['ov']: fails.append(f'어르신 모드 가로 넘침 {r}: {o["ov"]}')
+            if o['clip']: fails.append(f'어르신 모드 글자 잘림 {r}: {o["clip"]}')
+        pg.evaluate("localStorage.setItem('yakjido.fs','16px')")
         # 6. 병용 판정 시나리오 (이름 없이 종류로)
         CASES = [(['bp.arb', 'bp.diur'], '/symptom/arthritis', '콩팥'), (['blood.warf'], '/symptom/msk', '와파린'),
                  (['pros.alpha'], '/symptom/cold', '전립선'), (['dem.ache', 'blad.oab'], '/together', '치매약'), (['bp.any'], '/symptom/arthritis', '혈압약')]
@@ -106,7 +115,7 @@ def main():
     print(f'화면 {len(routes)}개 검사 완료')
     if fails:
         print('실패', len(fails)); [print('  ✗', f) for f in fails]; sys.exit(1)
-    print('✓ 전부 통과 — JS 오류 0 · 넘침 0 · 잘림 0 · 명암비 AA · 44px · 병용 5건 · 이중계산 0 · 검색 8건')
+    print('✓ 전부 통과 — JS 오류 0 · 넘침 0 · 잘림 0 · 명암비 AA · 44px · 어르신 모드 · 병용 5건 · 이중계산 0 · 검색 8건')
 
 if __name__ == '__main__':
     main()
