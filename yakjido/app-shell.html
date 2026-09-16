@@ -564,6 +564,11 @@ details.ach-alt .bd p:last-child{margin-bottom:0}
   font-size:.875rem;font-weight:700;line-height:1.35;max-width:100%;overflow-wrap:anywhere}
 .ix-p em{font-style:normal;font-size:.6875rem;font-weight:600;color:var(--faint);margin-top:1px}
 .ix-plus{font-weight:800;color:var(--faint);font-size:.9375rem}
+/* 조합 → 장기: 무엇이 어디를 건드리는지 한눈에 */
+.ix-arrow{display:inline-grid;place-items:center;color:var(--faint)} .ix-arrow svg.i{width:16px;height:16px}
+.ix-org{display:inline-flex;align-items:center;gap:7px;padding:6px 11px 6px 7px;border-radius:9px;background:var(--tint);color:var(--primary-deep);font-size:.875rem;font-weight:800;border:1px solid transparent}
+.ix-org .ic{width:28px;height:28px;border-radius:8px;display:grid;place-items:center;background:var(--card);color:inherit} .ix-org .ic svg.i{width:17px;height:17px}
+.ix.stop .ix-org{background:var(--alert-tint);color:var(--alert)} .ix.warn .ix-org{background:var(--caution-tint);color:var(--caution)}
 .ix-why{margin-top:10px;font-size:.9375rem;line-height:1.7;color:var(--body)}
 .ix-do{display:flex;align-items:flex-start;gap:8px;margin-top:10px;padding:11px 12px;border-radius:10px;
   background:var(--tint2);font-size:.9375rem;line-height:1.65;color:var(--ink)}
@@ -820,7 +825,7 @@ nav.tabbar button.on svg.i{stroke-width:2.2}
 .show-card.tone-stop{border-color:var(--alert)} .show-card.tone-warn{border-color:var(--caution)}
 .show-big{display:flex;align-items:flex-start;gap:8px;margin-top:10px;padding:12px 14px;border-radius:12px;font-size:1.125rem;font-weight:800;line-height:1.4}
 .show-big>span{flex:1;min-width:0} .show-big small{display:block;font-size:.875rem;font-weight:600;margin-top:3px;opacity:.9;line-height:1.45}
-.show-big svg.i{flex:none;margin-top:3px}
+.show-big svg.i{flex:none;margin-top:3px} .show-big em.org{font-style:normal;font-size:.75rem;font-weight:800;padding:2px 7px;border-radius:6px;border:1px solid currentColor;vertical-align:2px;margin-right:2px}
 .show-big.stop{background:var(--alert-tint);color:var(--alert)} .show-big.warn{background:var(--caution-tint);color:var(--caution)}
 .show-big.ok{background:var(--tint);color:var(--primary-deep)} .show-big.info{background:var(--tint2);color:var(--body)}
 /* 약 상세 차례 줄 — 탭이 첫 화면 아래에 있어 있는 줄 모른다 */
@@ -1191,6 +1196,8 @@ function meWarnings(dr){
 }
 const PICT = { '식후':['meal','식후 복용'], '공복':['meal','공복 복용'], '졸음':['moon','졸음 주의'], '운전주의':['car','운전·기계 조작 주의'], '음주금지':['no','술과 함께 금지'], '임부주의':['user','임신 중 주의'], '소아주의':['user','소아 연령 제한'], '물많이':['drop','물 충분히'], '햇빛주의':['eye','햇빛 노출 주의'], '단기만':['clock','단기간만'] };
 I.meal='<svg class="i" viewBox="0 0 24 24"><path d="M5 3v18M5 3c0 4 2 6 2 6s2-2 2-6M17 3v18M17 3c-2 0-3 3-3 6s1 3 3 3"/></svg>';
+I.kidney='<svg class="i" viewBox="0 0 24 24"><path d="M9 4C6 4 4.5 7 4.5 12S6 20 9 20c2 0 2.5-2 2.5-4v-2c0-2-.5-4-2.5-4"/><path d="M15 4c3 0 4.5 3 4.5 8S18 20 15 20c-2 0-2.5-2-2.5-4v-2c0-2 .5-4 2.5-4"/></svg>';
+I.liver='<svg class="i" viewBox="0 0 24 24"><path d="M3 9c0-2 2-4 5-4h8c3 0 5 2 5 4 0 4-4 9-9 9H9c-3 0-6-3-6-9z"/><path d="M12 5v6"/></svg>';
 I.heart='<svg class="i" viewBox="0 0 24 24"><path d="M12 20s-7-4.5-7-9.5A4 4 0 0 1 12 8a4 4 0 0 1 7 2.5c0 5-7 9.5-7 9.5z"/></svg>';
 I.brain='<svg class="i" viewBox="0 0 24 24"><path d="M12 5.5a2.5 2.5 0 0 0-4.8-1A2.5 2.5 0 0 0 5 7a2.5 2.5 0 0 0-.5 4.7A2.5 2.5 0 0 0 6 16a2.5 2.5 0 0 0 3.5 2.3A2.5 2.5 0 0 0 12 20zM12 5.5a2.5 2.5 0 0 1 4.8-1A2.5 2.5 0 0 1 19 7a2.5 2.5 0 0 1 .5 4.7A2.5 2.5 0 0 1 18 16a2.5 2.5 0 0 1-3.5 2.3A2.5 2.5 0 0 1 12 20z"/></svg>';
 I.lung='<svg class="i" viewBox="0 0 24 24"><path d="M12 3v8M9.5 11C8 11 5 12.5 5 16v3a2 2 0 0 0 2 2h1.5a2 2 0 0 0 2-2v-5c0-2-.5-3-1-3zM14.5 11c1.5 0 4.5 1.5 4.5 5v3a2 2 0 0 1-2 2h-1.5a2 2 0 0 1-2-2v-5c0-2 .5-3 1-3z"/></svg>';
@@ -2156,7 +2163,7 @@ function ixCard(h){
   const [label, icon] = IX_LV[h.r.lv];
   return `<div class="ix ${h.r.lv}">
     <div class="ix-h">${icon}<b>${esc(h.r.t)}</b><span class="ix-lv">${esc(label)}</span></div>
-    <div class="ix-w">${h.items.map(it => `<span class="ix-p">${esc(it.name)}<em>${esc(it.from)}</em></span>`).join('<span class="ix-plus">+</span>')}</div>
+    <div class="ix-w">${h.items.map(it => `<span class="ix-p">${esc(it.name)}<em>${esc(it.from)}</em></span>`).join('<span class="ix-plus">+</span>')}${h.r.organ ? `<span class="ix-arrow" aria-hidden="true">${I.chev}</span><span class="ix-org"><span class="ic">${I[h.r.organ.ico] || I.pill}</span><b>${esc(h.r.organ.n)}</b></span>` : ''}</div>
     <p class="ix-why">${fmt(h.r.why)}</p>
     <p class="ix-do">${I.check}<span>${fmt(h.r.do)}</span></p>
     ${srcChips(h.r.src)}
@@ -2794,7 +2801,7 @@ function vBag(){
     <div class="show-head">앱이 미리 본 것</div>
     ${!res.hits.length && !res.dupe.length && lv === 'ok' ? `<p class="show-big ok">${I.check}<span>걸리는 조합은 나오지 않았어요<small>모든 조합을 담지는 못해요 — 약사님 판단이 우선입니다</small></span></p>` : ''}
     ${res.dupe.map(d => `<p class="show-big stop">${I.alert}<span>같은 성분이 두 번<small>${esc(d.e?.n || '')} — ${d.items.map(i => esc(i.name)).join(' · ')}</small></span></p>`).join('')}
-    ${res.hits.map(h => `<p class="show-big ${h.r.lv}">${h.r.lv === 'info' ? I.clock : I.alert}<span>${esc(h.r.t)}<small>${h.items.map(i => esc(i.name)).join(' + ')} · ${esc(IX_LV[h.r.lv][0])}</small></span></p>`).join('')}
+    ${res.hits.map(h => `<p class="show-big ${h.r.lv}">${h.r.organ ? icon(h.r.organ.ico) : h.r.lv === 'info' ? I.clock : I.alert}<span>${h.r.organ ? `<em class="org">${esc(h.r.organ.n)}</em> ` : ''}${esc(h.r.t)}<small>${h.items.map(i => esc(i.name)).join(' + ')} · ${esc(IX_LV[h.r.lv][0])}</small></span></p>`).join('')}
     ${sc ? `<p class="show-big ${lv}">${lv === 'ok' ? I.info : I.alert}<span>항콜린 부담 ${sc}점 · ${ACH_LV_WORD[lv]}<small>${al.filter(x => x.e.ach).map(x => esc(x.e.n)).slice(0, 6).join(' · ')}${lv === 'ok' ? '' : ' — 입마름·변비·어지럼·기억 흐림이 있으면 말씀하세요'}</small></span></p>` : ''}
     ${res.unknown.length ? `<p class="small muted" style="margin-top:8px">성분을 확인하지 못한 약 ${res.unknown.length}가지는 판정에서 빠져 있어요.</p>` : ''}
   </div>

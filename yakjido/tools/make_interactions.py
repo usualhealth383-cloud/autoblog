@@ -258,6 +258,25 @@ R = [
 ]
 
 
+# 규칙 id → (아이콘, 한 단어) — "무엇이 어디를 건드리나". 아이콘은 app-shell 의 I.* 이름
+ORGAN = {
+    'nsaid-dup': ('stomach', '위·콩팥'), 'apap-dup': ('liver', '간'), 'oab-dup': ('bladder', '입마름·소변'), 'anti1-dup': ('brain', '졸음·낙상'),
+    'ppi-h2': ('stomach', '위산'), 'sed-load': ('brain', '졸음·낙상'),
+    'warfarin-nsaid': ('drop', '출혈'), 'warfarin-abx': ('drop', '출혈'), 'doac-nsaid': ('drop', '출혈'), 'antiplt-nsaid': ('drop', '위출혈'),
+    'ssri-nsaid': ('drop', '위출혈'), 'ssri-tramadol': ('brain', '세로토닌'),
+    'triple-whammy': ('kidney', '콩팥'), 'bpany-nsaid': ('kidney', '혈압·콩팥'), 'raas-nsaid': ('kidney', '콩팥'),
+    'lithium-nsaid': ('brain', '리튬 농도'), 'digoxin-diuretic': ('heart', '심장 리듬'), 'clopi-ppi': ('vessel', '혈전'),
+    'statin-azole': ('joint', '근육'), 'colchicine-inhib': ('stomach', '콜히친 독성'), 'su-quinolone': ('bolt', '저혈당'),
+    'theo-abx': ('lung', '테오필린 농도'), 'ache-anticho': ('brain', '기억'), 'alpha-anticho': ('bladder', '소변'),
+    'nsaid-top-oral': ('check', '같이 가능'), 'alcohol-sed': ('brain', '졸음·호흡'), 'alcohol-apap': ('liver', '간'), 'alcohol-metro': ('heart', '구토·두근'),
+    'preg-nsaid': ('user', '태아'), 'preg-retinoid': ('user', '태아'), 'preg-raas': ('user', '태아'),
+    'kidney-metformin': ('kidney', '콩팥'), 'kidney-gaba': ('kidney', '콩팥'), 'kidney-doac': ('kidney', '콩팥·출혈'),
+    'liver-apap': ('liver', '간'), 'liver-statin': ('liver', '간'),
+    'levo-mineral': ('stomach', '흡수'), 'bisphos-mineral': ('stomach', '흡수'), 'quinolone-mineral': ('stomach', '흡수'),
+    'anticho-glaucoma': ('eye', '안압'), 'anticho-bph': ('bladder', '소변 막힘'), 'decongest-heart': ('heart', '혈압·심장'),
+    'nsaid-ulcer': ('stomach', '위출혈'), 'nsaid-kidney': ('kidney', '콩팥'),
+}
+
 def main():
     root = pathlib.Path(__file__).resolve().parent.parent
     out = {'meta': {
@@ -275,6 +294,10 @@ def main():
     for r in out['rules']:
         for o in r.get('over', []):
             assert o in seen, f'{r["id"]} → 없는 규칙 {o}'
+    # 조합이 건드리는 자리 — 카드에 「A + B → 콩팥」 그림으로 나온다. 모든 규칙에 하나씩
+    for r in out['rules']:
+        assert r['id'] in ORGAN, f'{r["id"]} 장기 없음'
+        ico, n = ORGAN[r['id']]; r['organ'] = {'ico': ico, 'n': n}
     p = root / 'content' / 'interactions.json'
     p.write_text(json.dumps(out, ensure_ascii=False, indent=1), encoding='utf-8')
     lv = {}
