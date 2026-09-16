@@ -13,7 +13,8 @@
   5b. 어르신 모드(글자 20px) 16화면에서 넘침·잘림 0
   6. 병용 판정 시나리오 5건 (삼중고·와파린·전립선·치매약+방광약·혈압약 모름)
   7. 항콜린 이중 계산 0 (식약처 2.4만 제품 전수)
-  8. 이름 검색 16건 (베시케어·하루날디·타이레놀·TY 500 …)
+  8. 이름 검색 8건 (베시케어·하루날디·타이레놀·TY 500 …)
+  9. 홈 날씨 카드 — Open-Meteo 응답을 모의로 넣어 일교차·미세먼지 문구가 뜨는지
 
 Playwright 와 Chromium 이 필요하다. 실패는 마지막에 모아서 보여 주고 종료 코드 1.
 """
@@ -65,6 +66,11 @@ def main():
         errs = []
         pg.on('pageerror', lambda e: errs.append(str(e)))
         pg.on('console', lambda m: errs.append('console: ' + m.text) if m.type == 'error' and 'ERR_' not in m.text else None)
+        # 날씨는 바깥 서비스라 모의 응답으로 — 홈이 '데이터 있는 상태'로 검사된다(일교차 큼·미세먼지 나쁨)
+        FC = json.dumps({"current": {"temperature_2m": 19.4, "apparent_temperature": 18.1, "relative_humidity_2m": 31, "weather_code": 1}, "daily": {"temperature_2m_max": [27.8], "temperature_2m_min": [14.2]}})
+        AQ = json.dumps({"current": {"pm10": 92.0, "pm2_5": 41.0}})
+        pg.route('**/api.open-meteo.com/**', lambda rt: rt.fulfill(status=200, content_type='application/json', body=FC))
+        pg.route('**/air-quality-api.open-meteo.com/**', lambda rt: rt.fulfill(status=200, content_type='application/json', body=AQ))
         pg.goto(url); pg.wait_for_timeout(1200)
         pg.evaluate("localStorage.setItem('yakjido.hello.v1','1');localStorage.setItem('yakjido.me.v1',JSON.stringify({age:'senior',taking:['cls:bp.arb'],pub:{}}))")
         routes = pg.evaluate("()=>['/home','/drugs','/tips','/me','/together','/kinds','/kinds/bp','/pill','/supp','/kids','/mix','/hello/1','/hello/3','/photo','/schedule','/about','/bag']" +
@@ -103,6 +109,11 @@ def main():
             pg.goto(url + '#' + r); pg.reload(); pg.wait_for_timeout(700)
             txt = pg.evaluate("()=>[...document.querySelectorAll('.ixline,.ix-h b')].map(x=>x.innerText).join(' | ')")
             if kw not in txt: fails.append(f'병용 시나리오 {picks} → "{kw}" 없음: {txt[:80]}')
+        # 9. 날씨 카드
+        pg.goto(url + '#/home'); pg.reload(); pg.wait_for_timeout(1000)
+        wx = pg.evaluate("()=>document.querySelector('.wx')?.innerText||''")
+        for kw in ['일교차', '14℃', '미세먼지', '나쁨']:
+            if kw not in wx: fails.append(f'날씨 카드에 "{kw}" 없음: {wx[:80]!r}')
         # 7. 항콜린 이중 계산 · 8. 이름 검색
         r7 = pg.evaluate("""async()=>{ await pubPills(); await pubPillsRx(); let n=0;
           for(const p of (PUB.rx||[]).concat(PUB.pills||[])){ if(ingFind((p.ingr||'')+' '+(p.n||'')).filter(e=>e.ach).length>1) n++; } return n; }""")

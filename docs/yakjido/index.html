@@ -219,7 +219,7 @@ p{color:var(--body)}
 .review-stamp svg.i{width:15px;height:15px}
 .review-stamp.wait{color:var(--caution)}
 .rx-stamp.wait{color:var(--caution);border-color:var(--caution)}
-.back{display:inline-flex;align-items:center;gap:6px;color:var(--muted);font-size:.9375rem;font-weight:600;min-height:44px;margin-left:-6px;padding:0 6px}
+.back{display:inline-flex;align-items:center;gap:6px;color:var(--muted);font-size:.9375rem;font-weight:600;min-height:46px;margin-left:-6px;padding:0 6px}
 .back:hover{color:var(--text)}
 
 /* 카드 */
@@ -897,6 +897,22 @@ main>*:nth-child(2){animation-delay:.04s} main>*:nth-child(3){animation-delay:.0
 .hello-where{display:flex;align-items:center;gap:8px;margin-top:var(--s3);padding:12px 14px;border-radius:12px;background:var(--tint);color:var(--primary-deep);font-size:.9375rem;font-weight:700}
 .hello-where svg.i{width:18px;height:18px;flex:none}
 .hello-where svg.chev{width:15px;height:15px;opacity:.6}
+.wx{margin-top:12px;padding:14px 16px;border-radius:18px;background:var(--card);border:1px solid var(--hairline);box-shadow:var(--shadow-card)}
+.wx-top{display:flex;align-items:center;gap:10px}
+.wx-top .ic{width:44px;height:44px;border-radius:14px;background:var(--gbg,var(--tint));color:var(--gfg,var(--primary));display:grid;place-items:center;flex:none}
+.wx-top>div:nth-child(2){flex:1;min-width:0}
+.wx-now{font-size:1.75rem;font-weight:800;letter-spacing:-.02em;line-height:1.1;font-variant-numeric:tabular-nums}
+.wx-now small{font-size:.875rem;font-weight:600;color:var(--muted);margin-left:4px;letter-spacing:0}
+.wx-sub{font-size:.8125rem;color:var(--muted);margin-top:4px;line-height:1.4}
+.wx-city{flex:none;min-height:44px;padding:0 10px;border-radius:var(--r-pill);background:var(--tint2);color:var(--body);font-size:.8125rem;font-weight:700;border:0;font-family:inherit;max-width:96px}
+.wx-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:12px}
+.wx-stats div{background:var(--tint2);border-radius:12px;padding:8px 4px;text-align:center;min-width:0}
+.wx-stats small{display:block;font-size:.6875rem;color:var(--muted);font-weight:700;letter-spacing:.04em}
+.wx-stats b{display:block;font-size:1.0625rem;font-variant-numeric:tabular-nums;margin-top:2px;line-height:1.3}
+.wx-stats .hi b{color:var(--caution)} .wx-stats .bad b{color:var(--alert)} .wx-stats .ok b{color:var(--normal)}
+.wx-tip{display:flex;align-items:flex-start;gap:8px;margin-top:10px;padding:10px 12px;border-radius:12px;background:var(--tint);color:var(--text);font-size:.9375rem;line-height:1.5;width:100%;text-align:left;min-height:46px}
+.wx-tip svg.i{flex:none;margin-top:3px;color:var(--gfg,var(--primary))} .wx-tip span{flex:1;min-width:0} .wx-tip svg.i:last-child{color:var(--faint)}
+.wx-foot{font-size:.6875rem;color:var(--muted);margin-top:8px;line-height:1.4}
 .hint-line{display:flex;align-items:flex-start;gap:9px;padding:12px 14px;border-radius:14px;background:var(--tint);color:var(--primary-deep);font-size:.9375rem;font-weight:600;line-height:1.55;margin-top:var(--s4)}
 .hint-line svg.i{flex:none;margin-top:2px}
 .hint-line .x{margin-left:auto;flex:none;width:28px;height:28px;border-radius:50%;display:grid;place-items:center;color:var(--muted)}
@@ -1439,6 +1455,75 @@ const ICON_BY_ID = { msk:'spine', dysmenorrhea:'flower', headache:'head', tootha
   drymouth:'drop', gumdisease:'tooth', ibs:'stomach', burn:'flame', numbness:'hand' };
 const sicon = s => icon(ICON_BY_ID[s.id] || s.icon);
 /* 계절·시간이 홈의 순서를 정한다. 12~2월엔 감기가, 7~8월엔 장염이 위로 */
+/* ───────── 오늘 날씨 — 기온·일교차·미세먼지가 곧 증상이다 ─────────
+   기상청 API 는 키가 필요해 Open-Meteo(무료·키 없음)를 쓴다. 보내는 것은 도시 좌표(또는 소수 1자리로 뭉갠 내 위치 ≈ 10 km)뿐이고,
+   건강 정보는 아무것도 나가지 않는다. 한 시간 캐시. 못 받으면 조용히 접는다. */
+const WX_KEY = 'yakjido.wx.v1';
+const WX_CITIES = [['서울',37.57,126.98],['부산',35.18,129.08],['대구',35.87,128.60],['인천',37.46,126.71],['광주',35.16,126.85],['대전',36.35,127.38],['울산',35.54,129.31],['세종',36.48,127.29],['수원',37.26,127.03],['춘천',37.88,127.73],['강릉',37.75,128.88],['청주',36.64,127.49],['전주',35.82,127.15],['창원',35.23,128.68],['포항',36.02,129.36],['목포',34.81,126.39],['제주',33.50,126.53]];
+let WX = {}; try { WX = JSON.parse(localStorage.getItem(WX_KEY) || '{}'); } catch (e) {}
+let WX_BUSY = false;
+function wxSave(){ try { localStorage.setItem(WX_KEY, JSON.stringify(WX)); } catch (e) {} }
+function wxLoc(){ if (WX.city === '내 위치' && WX.lat != null) return { name:'내 위치', lat:WX.lat, lon:WX.lon }; const c = WX_CITIES.find(x => x[0] === WX.city) || WX_CITIES[0]; return { name:c[0], lat:c[1], lon:c[2] }; }
+async function wxFetch(force){
+  if (WX_BUSY || (typeof navigator !== 'undefined' && navigator.onLine === false)) return;
+  const loc = wxLoc();
+  if (!force && WX.data && WX.at && Date.now() - WX.at < 60 * 60 * 1000 && WX.data.name === loc.name) return;
+  WX_BUSY = true;
+  try {
+    const q = `latitude=${loc.lat}&longitude=${loc.lon}&timezone=Asia%2FSeoul`;
+    const [f, a] = await Promise.allSettled([
+      fetch(`https://api.open-meteo.com/v1/forecast?${q}&current=temperature_2m,apparent_temperature,relative_humidity_2m,weather_code&daily=temperature_2m_max,temperature_2m_min&forecast_days=1`).then(r => r.ok ? r.json() : null),
+      fetch(`https://air-quality-api.open-meteo.com/v1/air-quality?${q}&current=pm10,pm2_5`).then(r => r.ok ? r.json() : null)]);
+    const fj = f.status === 'fulfilled' ? f.value : null, aj = a.status === 'fulfilled' ? a.value : null;
+    if (fj?.current && fj?.daily) {
+      WX.data = { name: loc.name, now: fj.current.temperature_2m, feel: fj.current.apparent_temperature, rh: fj.current.relative_humidity_2m, code: fj.current.weather_code,
+                  max: fj.daily.temperature_2m_max?.[0], min: fj.daily.temperature_2m_min?.[0], pm10: aj?.current?.pm10 ?? null, pm25: aj?.current?.pm2_5 ?? null };
+      WX.at = Date.now(); WX.fail = 0;
+    } else WX.fail = (WX.fail || 0) + 1;
+  } catch (e) { WX.fail = (WX.fail || 0) + 1; }
+  WX_BUSY = false; wxSave();
+  if (document.querySelector('.wx')) route();
+}
+function wxSetCity(v){
+  if (v === 'geo') {
+    if (!navigator.geolocation) { toast('이 기기에서는 위치를 못 받아요 — 도시를 골라 주세요'); return; }
+    navigator.geolocation.getCurrentPosition(p => { WX.city = '내 위치'; WX.lat = +p.coords.latitude.toFixed(1); WX.lon = +p.coords.longitude.toFixed(1); wxSave(); route(); wxFetch(true); },
+      () => { toast('위치를 못 받았어요 — 도시를 골라 주세요'); route(); }, { timeout: 8000, maximumAge: 600000 });
+    return;
+  }
+  WX.city = v; wxSave(); route(); wxFetch(true);
+}
+/* WMO 날씨 코드 → 말·아이콘 */
+function wxCode(c){ c = +c; if (c === 0) return ['맑음', 'sun']; if (c <= 2) return ['구름 조금', 'sun']; if (c === 3) return ['흐림', 'temp']; if (c === 45 || c === 48) return ['안개', 'temp'];
+  if (c >= 71 && c <= 77 || c === 85 || c === 86) return ['눈', 'snow']; if (c >= 95) return ['천둥번개', 'bolt']; if (c >= 51) return ['비', 'drop']; return ['—', 'temp']; }
+/* 환경부 통합대기환경지수 구간(PM10 30/80/150, PM2.5 15/35/75) */
+function wxPm(d){ const g = (v, a, b, c) => v == null ? -1 : v <= a ? 0 : v <= b ? 1 : v <= c ? 2 : 3; const k = Math.max(g(d.pm10, 30, 80, 150), g(d.pm25, 15, 35, 75));
+  return k < 0 ? { t:'—', cls:'' } : [{ t:'좋음', cls:'ok' }, { t:'보통', cls:'' }, { t:'나쁨', cls:'hi' }, { t:'매우 나쁨', cls:'bad' }][k]; }
+function wxGap(d){ return d.max != null && d.min != null ? Math.round(d.max - d.min) : null; }  /* 어르신 화면 — 소수점은 뺀다 */
+/* 오늘 날씨에서 나오는 건강 한 줄 — 우선순위대로 둘만 */
+function wxAdvice(d){
+  const r = v => Math.round(v), gap = wxGap(d), pm = wxPm(d), A = [];
+  if (pm.cls === 'bad') A.push({ p:0, t:'미세먼지가 <b>매우 나쁨</b>이에요. 천식·기침·심장병이 있으면 외출을 줄이고, 나가시면 KF80 이상 마스크를 쓰세요.', link:'/symptom/cough' });
+  else if (pm.cls === 'hi') A.push({ p:1, t:'미세먼지 <b>나쁨</b> — 천식·기침·비염이 있으면 마스크를, 돌아와서 식염수로 코를 씻으세요.', link:'/symptom/rhinitis' });
+  if (d.max >= 33) A.push({ p:0, t:`한낮 <b>${r(d.max)}℃</b> — 이뇨제·혈압약을 드시면 어지럼·탈수가 오기 쉬워요. 물을 자주, 낮 12~5시 외출은 줄이세요.`, link:'/symptom/dizziness' });
+  else if (d.max >= 30) A.push({ p:2, t:'더운 날이에요 — 목마르기 전에 물 한 컵씩. 65세 이상은 갈증을 늦게 느껴요.', link:'/symptom/dizziness' });
+  if (d.min <= 0) A.push({ p:0, t:`아침 <b>${r(d.min)}℃</b> — 빙판 낙상을 조심하세요. 수면제·항히스타민제를 드신 아침은 특히 천천히.`, link:'/symptom/insomnia' });
+  if (gap >= 10) A.push({ p:1, t:`일교차 <b>${gap}℃</b> — 아침저녁 겉옷 하나 더. 혈압약을 드시면 아침 혈압이 더 오르는 날이고, 감기와 비염이 헷갈리기 쉬운 날이에요.`, link:'/symptom/cold' });
+  else if (gap >= 8) A.push({ p:3, t:`일교차 ${gap}℃ — 저녁 산책엔 겉옷을 챙기세요.`, link:'/symptom/cold' });
+  if (d.rh != null && d.rh <= 35) A.push({ p:2, t:`습도 <b>${d.rh}%</b>로 건조해요 — 입마름·눈 건조·피부 가려움이 늘어요. 물 자주, 가습기.`, link:'/symptom/drymouth' });
+  if (!A.length) A.push({ p:9, t:'무난한 날씨예요 — 30분 걷기 좋은 날. 무릎이 아프면 평지로.', link:'/symptom/arthritis' });
+  return A.sort((a, b) => a.p - b.p).slice(0, 2);
+}
+function wxCard(){
+  const loc = wxLoc(); const d = WX.data && WX.data.name === loc.name ? WX.data : null;
+  const sel = `<select class="wx-city" aria-label="지역" onchange="wxSetCity(this.value)">${WX_CITIES.map(c => `<option value="${c[0]}"${loc.name === c[0] ? ' selected' : ''}>${c[0]}</option>`).join('')}<option value="geo"${loc.name === '내 위치' ? ' selected' : ''}>내 위치</option></select>`;
+  if (!d) return `<div class="wx"><div class="wx-top"><div class="ic">${I.temp}</div><div><div class="wx-sub" style="margin-top:0">${WX.fail ? '지금은 날씨를 못 받았어요. 잠시 뒤 다시 열어 주세요.' : '오늘 날씨를 받는 중이에요…'}</div></div>${sel}</div></div>`;
+  const r = v => Math.round(v), gap = wxGap(d), pm = wxPm(d), [ct, ci] = wxCode(d.code);
+  return `<div class="wx" aria-label="오늘 날씨"><div class="wx-top"><div class="ic">${icon(ci)}</div><div><div class="wx-now">${r(d.now)}<small>℃ · ${ct}</small></div><div class="wx-sub">체감 ${r(d.feel)}℃ · 습도 ${r(d.rh)}% · ${esc(d.name)} ${new Date(WX.at).getHours()}시</div></div>${sel}</div>
+  <div class="wx-stats"><div class="${gap >= 10 ? 'hi' : ''}"><small>일교차</small><b>${gap != null ? gap + '℃' : '—'}</b></div><div><small>최고 / 최저</small><b>${r(d.max)} / ${r(d.min)}℃</b></div><div class="${pm.cls}"><small>미세먼지</small><b>${pm.t}</b></div></div>
+  ${wxAdvice(d).map(a => `<button class="wx-tip" onclick="go('${a.link}')">${I.info}<span>${a.t}</span>${I.chev}</button>`).join('')}
+  <div class="wx-foot">Open-Meteo 기상 자료 · 보내는 정보는 지역 위치뿐, 건강 정보는 나가지 않아요</div></div>`;
+}
 function seasonPick(){
   const m = new Date().getMonth() + 1, h = new Date().getHours();
   if (m === 12 || m <= 2) return { ids:['cold','fever','cough','sorethroat','drymouth'], eb:'겨울', t:'감기·독감이 도는 철이에요', d:'열이 38.5도를 넘거나 근육통이 심하면 독감일 수 있어요 — 48시간 안에 진료가 값을 합니다.', ico:'snow', g:'감기·호흡기' };
@@ -1455,6 +1540,7 @@ function vHome(){
   const groups0 = [...new Set((D.symptoms || []).map(s => s.group))];
   const groups = [sp.g, ...groups0.filter(g => g !== sp.g)].filter(g => groups0.includes(g));
   const n = takingItems().length;
+  setTimeout(() => wxFetch(false), 0);
   return `${topBar()}
   <section class="hero">
     <h1 class="greet">${esc(greet)}</h1>
@@ -1466,6 +1552,7 @@ function vHome(){
   </section>
   <section class="sec ${gcls(sp.g)}" aria-label="오늘">
     <button class="today" onclick="go('/symptom/${sp.ids[0]}')"><div class="in"><div><div class="eb">${esc(sp.eb)} · 오늘의 한 장</div><b>${esc(sp.t)}</b><span>${esc(sp.d)}</span></div><div class="ic">${icon(sp.ico)}</div></div></button>
+    ${wxCard()}
     <div class="today-row" aria-label="이 철에 많은 증상">${sp.ids.map(id => byId(D.symptoms, id)).filter(Boolean).map(x => `<button class="${gcls(x.group)}" onclick="go('/symptom/${x.id}')"><span class="ic">${sicon(x)}</span>${esc(x.name.split(' (')[0])}</button>`).join('')}</div>
   </section>
   ${groups.map(g => { const items = (D.symptoms || []).filter(s => s.group === g && s.reviewed !== false); if (!items.length) return '';
