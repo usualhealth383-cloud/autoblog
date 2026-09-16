@@ -1,0 +1,42 @@
+import re, json, base64, pathlib, sys
+ROOT = pathlib.Path('/home/user/autoblog/docs/yakjido')
+OUT  = pathlib.Path('/tmp/claude-0/-home-user-autoblog/cf2f6625-dcb1-56a6-b544-ead87bbf0fa1/scratchpad/artifact/yakson.html')
+s = (ROOT/'index.html').read_text()
+# 1) strip the outer document wrapper (Artifact adds its own)
+s = re.sub(r'^<!doctype html>\s*|^<html[^>]*>\s*|</html>\s*$', '', s, flags=re.I|re.M)
+s = re.sub(r'</?(head|body)[^>]*>\s*', '', s, flags=re.I)
+# 2) drop PWA-only bits (no manifest / icons / service worker on the artifact host)
+s = re.sub(r'^\s*<link rel="(manifest|apple-touch-icon|icon)"[^>]*>\s*$\n?', '', s, flags=re.M)
+# 아티팩트 CSP 는 Google Fonts 외 스타일시트를 막는다 — jsdelivr 의 Pretendard 링크는 빼고 Noto Sans KR 로 간다
+s = re.sub(r'^\s*<link rel="preconnect" href="https://cdn.jsdelivr.net"[^>]*>\s*$\n?', '', s, flags=re.M)
+s = re.sub(r'^\s*<link rel="stylesheet" href="https://cdn.jsdelivr.net[^"]*">\s*$\n?', '', s, flags=re.M)
+# 서비스워커 등록 블록 전체를 뺀다(아티팩트에는 워커가 없다). 여러 줄이라 중괄호를 세어 자른다.
+i = s.find("if ('serviceWorker' in navigator")
+if i >= 0:
+    j = s.index('{', i); depth = 0; k = j
+    while k < len(s):
+        if s[k] == '{': depth += 1
+        elif s[k] == '}':
+            depth -= 1
+            if depth == 0: break
+        k += 1
+    s = s[:i] + s[k+1:]
+# 3) inline the illustrations as data URIs
+art = {}
+for f in sorted((ROOT/'art').glob('*.webp')):
+    art[f.stem] = 'data:image/webp;base64,' + base64.b64encode(f.read_bytes()).decode()
+s = s.replace('<img src="art/${n}.webp"', '<img src="${ART_DATA[n] || ("art/" + n + ".webp")}"')
+inject = ('<script>const ART_DATA = ' + json.dumps(art) + ';\n'
+          "window.__PILLS__ = " + (ROOT/'data/pills.json').read_text() + ';\n'
+          "window.__EASY__ = "  + (ROOT/'data/easy-index.json').read_text() + ';\n'
+          "window.__LEX__ = {ing:" + (ROOT/'data/lexicon.json').read_text()
+          + ",brand:" + (ROOT/'data/brands.json').read_text()
+          + ",qa:" + (ROOT/'data/qa.json').read_text()
+          + ",nut:" + (ROOT/'data/nutrients.json').read_text()
+          + ",mix:" + (ROOT/'data/mixes.json').read_text() + '};</script>\n')
+i = s.index('<div class="app">')
+s = s[:i] + inject + s[i:]
+OUT.parent.mkdir(parents=True, exist_ok=True); OUT.write_text(s)
+print('wrote', OUT, round(len(s.encode())/1e6, 2), 'MB · art', len(art))
+for bad in ['serviceWorker', 'rel="manifest"', '<!doctype', '<body']:
+    if bad in s: print('!! still present:', bad)
