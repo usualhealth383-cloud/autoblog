@@ -370,7 +370,7 @@ ul.steps li::before{content:counter(s);position:absolute;left:0;top:2px;width:24
 .times{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
 .times .chip{min-height:44px;padding:0 12px}
 .times .chip.on{background:var(--tint);border-color:var(--primary);color:var(--primary-deep)}
-.today{display:flex;flex-direction:column;gap:8px;margin-top:var(--s3)}
+.dose-list{display:flex;flex-direction:column;gap:8px;margin-top:var(--s3)}  /* 예전 이름 .today 가 홈 카드와 충돌했다 */
 .dose-tick{display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:14px;background:var(--card);border:1px solid var(--hairline);width:100%;text-align:left;min-height:60px}
 .dose-tick .t{font-weight:800;font-size:1.0625rem;min-width:52px;font-variant-numeric:tabular-nums}
 .dose-tick .n{flex:1}
@@ -2026,7 +2026,7 @@ function vSchedule(){
   return `${topBar({ back:'내 정보' })}<div class="eyebrow">복용 시간 알림</div><h1>오늘 약, 잊지 않게</h1>${art('schedule', 'banner')}
   <p style="margin-top:6px">먹는 약마다 시간을 고르면 오늘 할 일이 체크 목록으로 나오고, 시간이 되면 알려드려요. 진료실 처방처럼 <b>하루 3번 식후</b>가 기본이에요.</p>
   ${!taking.length ? `<section class="sec card"><div class="empty"><b>아직 등록한 약이 없어요</b>약 사전에서 약을 찾아 ‘지금 먹는 약으로 등록’을 누르면 여기 나와요.</div><div class="actions"><button class="btn ghost" onclick="go('/drugs')">${I.search} 약 찾기</button></div></section>` : ''}
-  ${todays.length ? `<section class="sec"><h2>오늘 <small>${now.getMonth() + 1}월 ${now.getDate()}일 · ${todays.filter(x => x.done).length}/${todays.length} 완료</small></h2><div class="today">${todays.map(x => `<button class="dose-tick ${x.done ? 'done' : (x.min < nowMin - 60 ? 'late' : '')}" onclick="tick('${x.d.id}','${x.t}')"><span class="t">${x.t}</span><span class="n"><b>${esc(x.d.name)}</b><small>${esc((x.d.simple || '').split('.')[0])}</small></span><span class="bx">${x.done ? I.check : ''}</span></button>`).join('')}</div></section>` : ''}
+  ${todays.length ? `<section class="sec"><h2>오늘 <small>${now.getMonth() + 1}월 ${now.getDate()}일 · ${todays.filter(x => x.done).length}/${todays.length} 완료</small></h2><div class="dose-list">${todays.map(x => `<button class="dose-tick ${x.done ? 'done' : (x.min < nowMin - 60 ? 'late' : '')}" onclick="tick('${x.d.id}','${x.t}')"><span class="t">${x.t}</span><span class="n"><b>${esc(x.d.name)}</b><small>${esc((x.d.simple || '').split('.')[0])}</small></span><span class="bx">${x.done ? I.check : ''}</span></button>`).join('')}</div></section>` : ''}
   ${taking.length ? `<section class="sec card"><h2>약마다 시간 고르기</h2>${taking.map(d => `<div class="sched-row"><div class="nm"><span>${esc(d.name)}</span>${d.d ? `<a class="link small" href="#/drug/${d.d.id}">복용법 ›</a>` : ''}</div><div class="small muted">${esc((d.simple || '').split('.')[0])}</div><div class="times">${SLOTS.map(([n, t]) => `<button class="chip ${schedOf(d.id).includes(t) ? 'on' : ''}" onclick="toggleSlot('${d.id}','${t}')">${schedOf(d.id).includes(t) ? I.check : ''}${n} ${t}</button>`).join('')}</div></div>`).join('')}</section>
   <section class="sec card"><h2>알림 방법</h2>
     <div class="toggle"><div class="t"><b>앱이 열려 있을 때 알림</b><span>${perm === 'granted' ? '켜져 있어요' : perm === 'denied' ? '브라우저 설정에서 차단됨' : perm === 'unsupported' ? '이 브라우저는 지원하지 않아요' : '허용하면 시간에 맞춰 알려드려요'}</span></div><button class="btn ghost" style="width:auto;min-height:40px;padding:0 14px" onclick="askNoti()">${perm === 'granted' ? '켜짐' : '켜기'}</button></div>
