@@ -430,6 +430,17 @@ details.acc .bd{padding:0 var(--s4) var(--s4)}
 .g-chips .chip{min-height:52px;font-size:1rem;justify-content:flex-start;padding:0 16px;border-radius:14px}
 .g-chips .chip.on{background:var(--tint);border-color:var(--primary);color:var(--primary-deep)}
 .hero-cta{margin-top:var(--s4)}
+/* 첫 화면: 큰 그림 단추 여섯 개 */
+.q6{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:14px}
+.q6i{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;min-height:100px;padding:12px 6px;border-radius:18px;background:var(--card);border:1px solid var(--hairline);box-shadow:var(--shadow-card);font-weight:700;font-size:1rem;line-height:1.25;text-align:center;color:var(--text)}
+.q6i .ic{width:46px;height:46px;border-radius:15px;display:grid;place-items:center;background:var(--gbg,var(--tint));color:var(--gfg,var(--primary))} .q6i .ic svg.i{width:26px;height:26px}
+.q6i b{overflow-wrap:anywhere}
+.q6-more{display:flex;align-items:center;gap:9px;width:100%;text-align:left;margin-top:10px;padding:12px 14px;border-radius:14px;background:var(--tint);color:var(--primary-deep);font-size:1rem;min-height:52px;line-height:1.4}
+.q6-more>svg.i{flex:none} .q6-more span{flex:1;min-width:0} .q6-more>svg.i:last-child{color:var(--faint)}
+.q-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
+.q-row button{display:flex;align-items:center;justify-content:center;gap:8px;min-height:52px;padding:8px 10px;border-radius:14px;background:var(--card);border:1px solid var(--hairline);font-weight:700;font-size:.9375rem;color:var(--text)}
+.q-row button svg.i{flex:none;color:var(--primary)}
+.easy-home .q6i,.q6i:where(.easy *){min-height:110px}
 /* 블록 간 최소 여백 — 어떤 조합으로 이어져도 겹치지 않게 */
 main > .answer + *, main > .sec + .care, main > .card + .care, main > .rx-card + *, main > .care + .sec, main > .care + .card, main > .care + .actions, main > details.acc + .sec, main > .answer + .sec{margin-top:var(--s5)}
 /* 케어 카드 3단계 (NHS care cards → 약국/병원/응급) */
@@ -1596,21 +1607,27 @@ function seasonPick(){
 /* ───────── 홈: 증상 ───────── */
 function vHome(){
   const hour = new Date().getHours();
-  const greet = hour < 5 ? '늦은 밤, 어디가 불편하세요?' : hour < 11 ? '좋은 아침이에요. 어디가 불편하세요?' : hour < 18 ? '어디가 불편하세요?' : '오늘 저녁, 어디가 불편하세요?';
+  /* 첫 화면은 질문 하나와 큰 단추 — 설명은 전부 뒤로. 어르신이 처음 열어도 3초 안에 누를 곳이 보이게 */
+  const hello = hour < 5 ? '늦은 밤이네요' : hour < 11 ? '좋은 아침이에요' : hour < 18 ? '안녕하세요' : '편안한 저녁이에요';
   const sp = seasonPick();
   /* 계절에 맞는 그룹을 위로 — 나머지는 원래 순서 */
   const groups0 = [...new Set((D.symptoms || []).map(s => s.group))];
   const groups = [sp.g, ...groups0.filter(g => g !== sp.g)].filter(g => groups0.includes(g));
   const n = takingItems().length;
   setTimeout(() => wxFetch(false), 0);
+  /* 어르신이 가장 자주 찾는 여섯 가지 — 두세 글자 이름으로 */
+  const Q6 = [['cold', '감기'], ['headache', '두통'], ['msk', '허리·무릎'], ['heartburn', '속쓰림'], ['diarrhea', '배탈·설사'], ['insomnia', '잠이 안 와요']];
   return `${topBar()}
   <section class="hero">
-    <h1 class="greet">${esc(greet)}</h1>
-    <p>증상을 고르면 <b>무엇을 사고, 어떻게 먹고, 언제 병원에 갈지</b> 세 줄로 먼저 알려드려요.</p>
-    ${ME.easy ? `<div class="easy-home" style="margin-top:16px"><button class="big-btn" onclick="go('/photo')"><div class="ic">${I.eye}</div><div><b>약 사진 찍어 알아보기</b><span>약봉투·알약·영양제</span></div></button><button class="big-btn soft" onclick="go('/guide/1')"><div class="ic">${I.check}</div><div><b>어디가 불편하세요?</b><span>질문 두 번이면 약이 나와요</span></div></button><button class="big-btn soft" onclick="go('/schedule')"><div class="ic">${I.clock}</div><div><b>오늘 약 체크</b><span>드셨는지 표시하고 알림 받기</span></div></button></div>` : `<div class="hero-cta"><button class="btn" onclick="go('/guide/1')">${I.check} 3단계로 약 고르기</button><button class="btn line" onclick="go('/photo')">${I.eye} 약 사진 찍어 알아보기</button></div>`}
-    ${n ? `<button class="bag-line on" onclick="go('/together')"><span class="cnt">${n}</span><span>지금 드시는 약 <b>${n}가지</b> — <b>같이 먹어도 되는지</b> 봐 드릴까요?</span>${I.chev}</button>`
-        : `<button class="bag-line" onclick="go('/me')">${I.pill}<span><b>지금 드시는 약을 알려 주시면</b> 겹치는 성분과 항콜린 부담을 걸러 드려요 — 이름을 몰라도 돼요</span>${I.chev}</button>`}
-    ${HINT ? `<div class="hint-line">${I.user}<span>알려 주신 내용은 <b>내 정보</b> 탭 › <b>‘해당하는 것을 켜 주세요’</b>에서 언제든 바꾸실 수 있어요.</span><button class="x" onclick="HINT=0;route()" aria-label="닫기">${I.x}</button></div>` : ''}
+    <div class="eyebrow">${esc(hello)}</div>
+    <h1 class="greet">어디가 불편하세요?</h1>
+    <div class="q6" aria-label="자주 찾는 증상">${Q6.map(([id, nm]) => { const x = byId(D.symptoms, id); return x ? `<button class="q6i ${gcls(x.group)}" onclick="go('/symptom/${id}')"><span class="ic">${sicon(x)}</span><b>${esc(nm)}</b></button>` : ''; }).join('')}</div>
+    <button class="q6-more" onclick="go('/guide/1')">${I.check}<span>여기 없어요 — <b>질문 두 번</b>이면 찾아 드려요</span>${I.chev}</button>
+    <div class="q-row">
+      <button onclick="go('/photo')">${I.eye}<span>약 사진 찍기</span></button>
+      <button onclick="go('${n ? '/together' : '/kinds'}')">${I.pill}<span>${n ? `드시는 약 ${n}가지 확인` : '드시는 약 알려 주기'}</span></button>
+    </div>
+    ${ME.easy ? `<button class="big-btn soft" style="margin-top:12px" onclick="go('/schedule')"><div class="ic">${I.clock}</div><div><b>오늘 약 체크</b><span>드셨는지 표시하고 알림 받기</span></div></button>` : ''}
   </section>
   <section class="sec ${gcls(sp.g)}" aria-label="오늘">
     <button class="today" onclick="go('/symptom/${sp.ids[0]}')"><div class="in"><div><div class="eb">${esc(sp.eb)} · 오늘의 한 장</div><b>${esc(sp.t)}</b><span>${esc(sp.d)}</span></div><div class="ic">${icon(sp.ico)}</div></div></button>
