@@ -1534,6 +1534,12 @@ function wxAdvice(d){
     if (icy && (sedat || achHi)) A.push({ th:'ice', p:-1, t:`<b>내 약통</b> — 졸리는 약(수면제·항히스타민)을 드시는 분은 <b>${r(d.min)}℃</b> 새벽 빙판 낙상이 가장 위험해요. 아침 첫걸음은 천천히, 밤 화장실 길에 불을 켜 두세요.`, link:'/symptom/insomnia' });
     if (gap >= 10 && bp) A.push({ th:'gap', p:-1, t:`<b>내 약통</b> — 혈압약을 드시니 일교차 <b>${gap}℃</b>인 오늘은 아침 혈압을 한 번 재 보세요. 큰 일교차는 아침 혈압을 올리고, 갑자기 추운 아침 외출은 심장에 부담이에요.`, link:'/kinds/bp' });
   }
+  /* 아이 정보로 쓰는 분 — 아이는 탈수가 빠르고 미세먼지에 더 약하다 */
+  if (ME.age === 'child') {
+    if (d.max >= 30) A.push({ th:'heat', p:-1, t:`<b>아이</b> — 오늘 <b>${r(d.max)}℃</b>. 아이는 어른보다 탈수가 빨라요. 30분마다 물 한 모금, 낮 12~5시는 그늘·실내 놀이. 소변이 진하거나 축 처지면 바로 수분·진료.`, link:'/kids' });
+    if (pm.cls === 'hi' || pm.cls === 'bad') A.push({ th:'pm', p:-1, t:`<b>아이</b> — 미세먼지 <b>${pm.t}</b>. 아이는 숨을 더 자주 쉬어 더 많이 마셔요. 오늘은 실내 놀이, 나가면 어린이용 마스크, 돌아와서 세수·코 세척.`, link:'/symptom/rhinitis' });
+    if (d.min <= 5 && gap >= 10) A.push({ th:'gap', p:0, t:`<b>아이</b> — 일교차 <b>${gap}℃</b>. 아침엔 겉옷, 낮엔 벗기기. 열이 38℃ 넘으면 해열제는 몸무게로 계산해요.`, link:'/kids' });
+  }
   if ((pm.cls === 'hi' || pm.cls === 'bad') && (bag.has('asthma', 'resp') || ME.asthma)) A.push({ th:'pm', p:-1, t:`<b>내 정보</b> — 천식이 있으신데 오늘 미세먼지는 <b>${pm.t}</b>이에요. 흡입기를 챙기고 외출을 줄이세요. 쌕쌕거림이 평소보다 심하면 진료.`, link:'/symptom/cough' });
   if (pm.cls === 'bad') A.push({ th:'pm', p:0, t:'미세먼지가 <b>매우 나쁨</b>이에요. 천식·기침·심장병이 있으면 외출을 줄이고, 나가시면 KF80 이상 마스크를 쓰세요.', link:'/symptom/cough' });
   else if (pm.cls === 'hi') A.push({ th:'pm', p:1, t:'미세먼지 <b>나쁨</b> — 천식·기침·비염이 있으면 마스크를, 돌아와서 식염수로 코를 씻으세요.', link:'/symptom/rhinitis' });
@@ -2405,6 +2411,7 @@ function vDrug(id){
   <div class="drug-hero">${c ? `<a class="cls link" href="#/class/${c.id}">${esc(c.name)} ›</a>` : ''}<h1>${esc(d.name)}</h1><div class="en">${esc(d.en || '')} ${badge(d.rx)}${d.ach ? `<span class="badge ${d.ach >= 3 ? 'stop' : d.ach === 2 ? 'warn' : ''}" style="margin-left:4px">항콜린 ${esc(ACH_WORD[d.ach])}</span>` : ''}</div></div>
   ${d.useNote ? `<div class="usebar">${I.alert}<span>${fmt(d.useNote)}</span></div>` : ''}
   ${d.ach ? `<div class="usebar" style="${d.ach >= 2 ? '' : 'background:var(--tint2);color:var(--body)'}">${d.ach >= 2 ? I.alert : I.info}<span><b>항콜린 부담 ${esc(ACH_WORD[d.ach])}</b> — ${esc(d.achNote || '')}${d.achAlt ? '<br>' + fmt(d.achAlt) : ''}</span></div>` : ''}
+  ${ixLine([d])}
   <div class="jump" role="navigation" aria-label="이 화면의 차례">${[['p1', '복용법'], ['p2', '주의·부작용'], ['p3', '제품'], ['p4', '상호작용']].map(([p, n]) => `<button onclick="jumpTab('${p}')">${n}${I.chev}</button>`).join('')}</div>
   <p style="margin-top:10px">${fmt(d.lead || '')}</p>
   ${picts(d.pict)}
