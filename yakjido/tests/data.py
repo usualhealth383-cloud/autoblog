@@ -60,6 +60,21 @@ def route_ok(link):
 for t in T:
     if t.get('link') and not route_ok(t['link']): fails.append(f'팁 {t["id"]} 링크 없음 → {t["link"]}')
     if not t.get('link'): fails.append(f'팁 {t["id"]} 링크 비어 있음(갈 곳을 달아 주세요)')
+# 통계 약어가 어르신 화면에 그대로 나오면 안 된다 — 영양제 「어디까지 입증됐나」(evidenceNote)와 출처 문구만 예외
+JARGON = re.compile(r'\b(NNT|NNH|RR|HR|OR|SMD|CI|P\s*[=<]|I²|RCT|n=)\b')
+def jargon(o, path, owner):
+    if isinstance(o, str):
+        if JARGON.search(o) and '.evidenceNote' not in path and 'srcText' not in path and 'sources' not in path and 'note' not in path.split('.')[-1]:
+            fails.append(f'통계 약어 {owner}{path}: {o[:60]!r}')
+    elif isinstance(o, dict):
+        for k, v in o.items(): jargon(v, path + '.' + k, owner)
+    elif isinstance(o, list):
+        for i, v in enumerate(o): jargon(v, path + f'[{i}]', owner)
+for s in S: jargon(s, '', '증상 ' + s['id'])
+for d in D: jargon({k: v for k, v in d.items() if k != 'riskNote'}, '', '약 ' + d['id'])
+for k in K: jargon(k, '', '계열 ' + k['id'])
+for x in SUP: jargon(x, '', '영양제 ' + x['id'])
+for t in T: jargon(t, '', '팁 ' + t['id'])
 print(f'증상 {len(S)} · 약 {len(D)} · 계열 {len(K)} · 영양제 {len(SUP)} · 팁 {len(T)} · 규칙 {len(IX["rules"])} · 출처 {len(SRC)}')
 if fails:
     print('실패', len(fails)); [print('  ✗', f) for f in fails]; sys.exit(1)
