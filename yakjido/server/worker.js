@@ -109,8 +109,10 @@ const ymd = d => `${d.getUTCFullYear()}${pad(d.getUTCMonth() + 1)}${pad(d.getUTC
 function wmo(pty, sky){ pty = +pty || 0; sky = +sky || 0; if ([3, 7].includes(pty)) return 71; if (pty === 4) return 80; if (pty) return 61; return sky >= 4 ? 3 : sky === 3 ? 2 : 0; }
 const median = a => { a = a.map(Number).filter(v => Number.isFinite(v) && v >= 0).sort((x, y) => x - y); return a.length ? a[Math.floor(a.length / 2)] : null; };
 export async function wx(req, env, cors){
-  const key = env.DATA_GO_KR_KEY;
+  let key = env.DATA_GO_KR_KEY;
   if (!key) return new Response(JSON.stringify({ error: 'DATA_GO_KR_KEY 미설정' }), { status: 404, headers: cors });
+  /* 포털은 Encoding 키(%2F·%3D 가 든 것)와 Decoding 키를 둘 다 준다. 어느 쪽을 넣어도 되게 — 아래에서 다시 encodeURIComponent 하므로 여기서는 풀어 둔다 */
+  try { if (/%[0-9A-Fa-f]{2}/.test(key)) key = decodeURIComponent(key); } catch (e) {}
   const u = new URL(req.url); const lat = +u.searchParams.get('lat'), lon = +u.searchParams.get('lon');
   if (!(lat > 32 && lat < 40 && lon > 124 && lon < 132)) return new Response(JSON.stringify({ error: '한국 안 좌표만' }), { status: 400, headers: cors });
   const { nx, ny } = toGrid(lat, lon); const sido = nearestSido(lat, lon);
