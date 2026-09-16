@@ -11,6 +11,11 @@
  *   4) (선택) wrangler secret put ALLOWED_ORIGIN      → https://usualhealth383-cloud.github.io
  *   5) yakjido/content/meta.json 의 "photoEndpoint" 에 워커 주소를 적고 build.py 실행
  *
+ * 날씨 (선택): GET /wx?lat=&lon=  → 기상청 초단기실황·단기예보 + 에어코리아 미세먼지를 한 JSON 으로.
+ *   wrangler secret put DATA_GO_KR_KEY   ← 공공데이터포털(data.go.kr) 일반 인증키(Decoding). 두 서비스 모두 활용신청 필요:
+ *     · 기상청_단기예보 ((구)_동네예보) 조회서비스   · 한국환경공단_에어코리아_대기오염정보
+ *   키가 없으면 /wx 는 404 를 주고 앱은 Open-Meteo 로 넘어간다. 30분 캐시(개발계정 일 1,000건 한도 보호).
+ *
  * 비용: Gemini 2.5 Flash 입력 $0.30/1M 토큰 — 1,024px 사진 1장 ≈ 1,300 토큰 ≈ 0.5원 + 출력 소량.
  *       월 1만 장이어도 1만 원 미만. AI Studio 무료 한도(분당 10건·일 250건)로 시작 가능.
  */
@@ -25,6 +30,7 @@ export default {
       'Content-Type': 'application/json; charset=utf-8',
     };
     if (req.method === 'OPTIONS') return new Response(null, { headers: cors });
+    if (req.method === 'GET' && new URL(req.url).pathname.endsWith('/wx')) return wx(req, env, { ...cors, 'Access-Control-Allow-Methods': 'GET, POST, OPTIONS' });
     if (req.method !== 'POST') return new Response(JSON.stringify({ error: 'POST only' }), { status: 405, headers: cors });
     if (!env.GEMINI_API_KEY) return new Response(JSON.stringify({ error: 'GEMINI_API_KEY 미설정' }), { status: 500, headers: cors });
 
@@ -79,3 +85,60 @@ ${hint ? '참고: ' + hint : ''}`;
     return new Response(JSON.stringify(out), { headers: cors });
   },
 };
+
+/* ───────── 날씨: 기상청 + 에어코리아 ─────────
+   앱이 보내는 것은 좌표뿐. 좌표 → 기상청 격자(nx,ny)와 가장 가까운 시도(에어코리아)로 바꿔 조회한다. */
+const SIDO = [['서울',37.57,126.98],['부산',35.18,129.08],['대구',35.87,128.60],['인천',37.46,126.71],['광주',35.16,126.85],['대전',36.35,127.38],['울산',35.54,129.31],['세종',36.48,127.29],
+  ['경기',37.26,127.03],['강원',37.88,127.73],['강원',37.75,128.88],['충북',36.64,127.49],['전북',35.82,127.15],['경남',35.23,128.68],['경북',36.02,129.36],['전남',34.81,126.39],['제주',33.50,126.53],['충남',36.80,127.15]];
+function nearestSido(lat, lon){ let b = SIDO[0], bd = 1e9; for (const c of SIDO) { const d = (c[1] - lat) ** 2 + ((c[2] - lon) * Math.cos(lat * Math.PI / 180)) ** 2; if (d < bd) { bd = d; b = c; } } return b[0]; }
+/* 기상청 LCC DFS 격자 변환 — 기상청 공개 산식 그대로 */
+export function toGrid(lat, lon){
+  const RE = 6371.00877, GRID = 5.0, SLAT1 = 30.0, SLAT2 = 60.0, OLON = 126.0, OLAT = 38.0, XO = 43, YO = 136, D = Math.PI / 180;
+  const re = RE / GRID, slat1 = SLAT1 * D, slat2 = SLAT2 * D, olon = OLON * D, olat = OLAT * D;
+  let sn = Math.tan(Math.PI * 0.25 + slat2 * 0.5) / Math.tan(Math.PI * 0.25 + slat1 * 0.5); sn = Math.log(Math.cos(slat1) / Math.cos(slat2)) / Math.log(sn);
+  let sf = Math.tan(Math.PI * 0.25 + slat1 * 0.5); sf = Math.pow(sf, sn) * Math.cos(slat1) / sn;
+  let ro = Math.tan(Math.PI * 0.25 + olat * 0.5); ro = re * sf / Math.pow(ro, sn);
+  let ra = Math.tan(Math.PI * 0.25 + lat * D * 0.5); ra = re * sf / Math.pow(ra, sn);
+  let theta = lon * D - olon; if (theta > Math.PI) theta -= 2 * Math.PI; if (theta < -Math.PI) theta += 2 * Math.PI; theta *= sn;
+  return { nx: Math.floor(ra * Math.sin(theta) + XO + 0.5), ny: Math.floor(ro - ra * Math.cos(theta) + YO + 0.5) };  /* XO 43·YO 136 이면 +0.5 (+1.5 는 XO 42 판) */
+}
+const pad = n => String(n).padStart(2, '0');
+function kst(){ return new Date(Date.now() + 9 * 3600 * 1000); }  /* UTC getter 로 읽으면 한국 시각 */
+const ymd = d => `${d.getUTCFullYear()}${pad(d.getUTCMonth() + 1)}${pad(d.getUTCDate())}`;
+/* PTY(강수형태)·SKY(하늘) → 앱이 쓰는 WMO 비슷한 코드 */
+function wmo(pty, sky){ pty = +pty || 0; sky = +sky || 0; if ([3, 7].includes(pty)) return 71; if (pty === 4) return 80; if (pty) return 61; return sky >= 4 ? 3 : sky === 3 ? 2 : 0; }
+const median = a => { a = a.map(Number).filter(v => Number.isFinite(v) && v >= 0).sort((x, y) => x - y); return a.length ? a[Math.floor(a.length / 2)] : null; };
+export async function wx(req, env, cors){
+  const key = env.DATA_GO_KR_KEY;
+  if (!key) return new Response(JSON.stringify({ error: 'DATA_GO_KR_KEY 미설정' }), { status: 404, headers: cors });
+  const u = new URL(req.url); const lat = +u.searchParams.get('lat'), lon = +u.searchParams.get('lon');
+  if (!(lat > 32 && lat < 40 && lon > 124 && lon < 132)) return new Response(JSON.stringify({ error: '한국 안 좌표만' }), { status: 400, headers: cors });
+  const { nx, ny } = toGrid(lat, lon); const sido = nearestSido(lat, lon);
+  /* 30분 캐시 — 같은 격자·시도는 다시 묻지 않는다 */
+  const ck = new Request(`https://wx.cache/${nx}/${ny}/${encodeURIComponent(sido)}/${Math.floor(Date.now() / (30 * 60 * 1000))}`);
+  const cache = typeof caches !== 'undefined' ? caches.default : null;
+  const hit = cache && await cache.match(ck); if (hit) return new Response(await hit.text(), { headers: cors });
+  const now = kst(); const hh = now.getUTCHours(), mm = now.getUTCMinutes();
+  /* 초단기실황은 매시 40분 뒤에 나온다 */
+  const nc = new Date(now); if (mm < 40) nc.setUTCHours(nc.getUTCHours() - 1);
+  const ncst = `https://apis.data.go.kr/1360000/VilageFcstInfoService_2.0/getUltraSrtNcst?serviceKey=${encodeURIComponent(key)}&dataType=JSON&numOfRows=100&pageNo=1&base_date=${ymd(nc)}&base_time=${pad(nc.getUTCHours())}00&nx=${nx}&ny=${ny}`;
+  /* 오늘 최고·최저는 02시 발표 단기예보(TMX·TMN) — 02:10 전이면 어제 23시 발표 */
+  const fd = new Date(now); let fb = '0200'; if (hh < 2 || (hh === 2 && mm < 10)) { fd.setUTCDate(fd.getUTCDate() - 1); fb = '2300'; }
+  const fcst = `https://apis.data.go.kr/1360000/VilageFcstInfoService_2.0/getVilageFcst?serviceKey=${encodeURIComponent(key)}&dataType=JSON&numOfRows=300&pageNo=1&base_date=${ymd(fd)}&base_time=${fb}&nx=${nx}&ny=${ny}`;
+  const air = `https://apis.data.go.kr/B552584/ArpltnInforInqireSvc/getCtprvnRltmMesureDnsty?serviceKey=${encodeURIComponent(key)}&returnType=json&numOfRows=100&pageNo=1&sidoName=${encodeURIComponent(sido)}&ver=1.0`;
+  const get = async url => { try { const r = await fetch(url, { headers: { Accept: 'application/json' } }); if (!r.ok) return null; return await r.json(); } catch (e) { return null; } };
+  const [n, f, a] = await Promise.all([get(ncst), get(fcst), get(air)]);
+  const nItems = n?.response?.body?.items?.item || []; const fItems = f?.response?.body?.items?.item || []; const aItems = a?.response?.body?.items || [];
+  const nv = c => { const x = nItems.find(i => i.category === c); return x ? +x.obsrValue : null; };
+  const today = ymd(now);
+  const fv = c => { const x = fItems.find(i => i.category === c && i.fcstDate === today); return x ? +x.fcstValue : null; };
+  const skyNow = (() => { const t = `${pad(hh)}00`; const x = fItems.filter(i => i.category === 'SKY' && i.fcstDate === today).sort((p, q) => Math.abs(+p.fcstTime - +t) - Math.abs(+q.fcstTime - +t))[0]; return x ? +x.fcstValue : null; })();
+  const out = { src: 'kma', sido, nx, ny, now: nv('T1H'), feel: null, rh: nv('REH'), wind: nv('WSD'), code: wmo(nv('PTY'), skyNow), max: fv('TMX'), min: fv('TMN'),
+    pm10: median(aItems.map(i => i.pm10Value)), pm25: median(aItems.map(i => i.pm25Value)), stations: aItems.length, at: Date.now() };
+  if (out.now == null && out.max == null) return new Response(JSON.stringify({ error: '기상청 응답 없음', detail: (n?.response?.header?.resultMsg || '') }), { status: 502, headers: cors });
+  /* 체감온도: 기상청 산식(겨울 풍속냉각)은 10℃ 이하·바람 1.3 m/s 이상일 때만 뜻이 있다 */
+  if (out.now != null && out.wind != null && out.now <= 10 && out.wind >= 1.3) { const v = Math.pow(out.wind * 3.6, 0.16); out.feel = Math.round((13.12 + 0.6215 * out.now - 11.37 * v + 0.3965 * out.now * v) * 10) / 10; } else out.feel = out.now;
+  const body = JSON.stringify(out);
+  if (cache) try { await cache.put(ck, new Response(body, { headers: { 'Cache-Control': 'max-age=1800' } })); } catch (e) {}
+  return new Response(body, { headers: cors });
+}

@@ -1470,20 +1470,27 @@ async function wxFetch(force){
   if (!force && WX.data && WX.at && Date.now() - WX.at < 60 * 60 * 1000 && WX.data.name === loc.name) return;
   WX_BUSY = true;
   try {
-    const q = `latitude=${loc.lat}&longitude=${loc.lon}&timezone=Asia%2FSeoul`;
-    const [f, a] = await Promise.allSettled([
-      fetch(`https://api.open-meteo.com/v1/forecast?${q}&current=temperature_2m,apparent_temperature,relative_humidity_2m,weather_code&daily=temperature_2m_max,temperature_2m_min&forecast_days=1`).then(r => r.ok ? r.json() : null),
-      fetch(`https://air-quality-api.open-meteo.com/v1/air-quality?${q}&current=pm10,pm2_5`).then(r => r.ok ? r.json() : null)]);
-    const fj = f.status === 'fulfilled' ? f.value : null, aj = a.status === 'fulfilled' ? a.value : null;
-    if (fj?.current && fj?.daily) {
-      WX.data = { name: loc.name, now: fj.current.temperature_2m, feel: fj.current.apparent_temperature, rh: fj.current.relative_humidity_2m, code: fj.current.weather_code,
+    let got = null;
+    /* 1) 우리 워커(기상청 실황·에어코리아 실측) — 키가 설정돼 있을 때만 응답한다 */
+    const ep = wxEndpoint();
+    if (ep) { try { const r = await fetch(`${ep}?lat=${loc.lat}&lon=${loc.lon}`); const j = r.ok ? await r.json() : null; if (j && (j.now != null || j.max != null)) got = { ...j, name: loc.name, src: 'kma' }; } catch (e) {} }
+    /* 2) Open-Meteo — 기상청 모델(kma_seamless)을 먼저, 모델 이름이 안 받아들여지면 기본 모델로 */
+    if (!got) {
+      const q = `latitude=${loc.lat}&longitude=${loc.lon}&timezone=Asia%2FSeoul`;
+      const fc = `https://api.open-meteo.com/v1/forecast?${q}&current=temperature_2m,apparent_temperature,relative_humidity_2m,weather_code&daily=temperature_2m_max,temperature_2m_min&forecast_days=1`;
+      const getJ = u => fetch(u).then(r => r.ok ? r.json() : null).catch(() => null);
+      let [fj, aj] = await Promise.all([getJ(fc + '&models=kma_seamless'), getJ(`https://air-quality-api.open-meteo.com/v1/air-quality?${q}&current=pm10,pm2_5`)]);
+      if (!fj?.current) fj = await getJ(fc);
+      if (fj?.current && fj?.daily) got = { name: loc.name, src: 'om', now: fj.current.temperature_2m, feel: fj.current.apparent_temperature, rh: fj.current.relative_humidity_2m, code: fj.current.weather_code,
                   max: fj.daily.temperature_2m_max?.[0], min: fj.daily.temperature_2m_min?.[0], pm10: aj?.current?.pm10 ?? null, pm25: aj?.current?.pm2_5 ?? null };
-      WX.at = Date.now(); WX.fail = 0;
-    } else WX.fail = (WX.fail || 0) + 1;
+    }
+    if (got) { WX.data = got; WX.at = Date.now(); WX.fail = 0; } else WX.fail = (WX.fail || 0) + 1;
   } catch (e) { WX.fail = (WX.fail || 0) + 1; }
   WX_BUSY = false; wxSave();
   if (document.querySelector('.wx')) route();
 }
+/* 워커 주소가 있으면 그 옆 /wx — 사진 서버와 같은 워커 */
+function wxEndpoint(){ const p = (D.meta?.wxEndpoint || '') || (photoEndpoint() ? photoEndpoint().replace(/\/+$/, '') + '/wx' : ''); return p; }
 function wxSetCity(v){
   if (v === 'geo') {
     if (!navigator.geolocation) { toast('이 기기에서는 위치를 못 받아요 — 도시를 골라 주세요'); return; }
@@ -1522,7 +1529,7 @@ function wxCard(){
   return `<div class="wx" aria-label="오늘 날씨"><div class="wx-top"><div class="ic">${icon(ci)}</div><div><div class="wx-now">${r(d.now)}<small>℃ · ${ct}</small></div><div class="wx-sub">체감 ${r(d.feel)}℃ · 습도 ${r(d.rh)}% · ${esc(d.name)} ${new Date(WX.at).getHours()}시</div></div>${sel}</div>
   <div class="wx-stats"><div class="${gap >= 10 ? 'hi' : ''}"><small>일교차</small><b>${gap != null ? gap + '℃' : '—'}</b></div><div><small>최고 / 최저</small><b>${r(d.max)} / ${r(d.min)}℃</b></div><div class="${pm.cls}"><small>미세먼지</small><b>${pm.t}</b></div></div>
   ${wxAdvice(d).map(a => `<button class="wx-tip" onclick="go('${a.link}')">${I.info}<span>${a.t}</span>${I.chev}</button>`).join('')}
-  <div class="wx-foot">Open-Meteo 기상 자료 · 보내는 정보는 지역 위치뿐, 건강 정보는 나가지 않아요</div></div>`;
+  <div class="wx-foot">${d.src === 'kma' ? `기상청 실황·에어코리아 미세먼지${d.stations ? `(${esc(d.sido || '')} 측정소 ${d.stations}곳)` : ''}` : 'Open-Meteo 기상 자료(미세먼지는 모델 추정)'} · 보내는 정보는 지역 위치뿐, 건강 정보는 나가지 않아요</div></div>`;
 }
 function seasonPick(){
   const m = new Date().getMonth() + 1, h = new Date().getHours();
