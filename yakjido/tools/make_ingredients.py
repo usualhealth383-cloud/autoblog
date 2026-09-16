@@ -118,7 +118,7 @@ ING = [
  # ── 약하지만 자주 겹치는 것들 ──────────────────────────────────────────
  ('tramadol','트라마돌',1,'KABS',['opioid','sed'],['트라마돌'],
   'KABS 연구에서 한국 노인 부담 3위 성분이에요','',''),
- ('codeine','코데인',1,'ACB',['opioid','sed'],['코데인','디히드로코데인'],'','',''),
+ ('codeine','코데인',1,'ACB',['opioid','sed'],['코데인','디히드로코데인'],'','','dihydrocodeine'),
  ('furosemide','푸로세미드',1,'KABS',['diuretic'],['푸로세미드'],
   'KABS 연구에서 한국 노인 부담 5위 성분이에요','',''),
  ('digoxin','디곡신',1,'ACB',['cardiac'],['디곡신'],'','',''),
@@ -142,6 +142,11 @@ ING = [
  ('celecoxib','셀레콕시브',0,'ACB',['nsaid'],['세레콕시브','셀레콕시브'],'','','celecoxib'),
  ('meloxicam','멜록시캄',0,'ACB',['nsaid'],['멜록시캄'],'','','meloxicam'),
  ('loxoprofen','록소프로펜',0,'ACB',['nsaid'],['록소프로펜'],'','','loxoprofen'),
+ # 현욱님 진료실 감기 조합(뮤테란·록스펜·타이레놀·코푸시럽·가스모틴·슈프락스)이 성분으로 풀리게
+ ('acetylcysteine','아세틸시스테인',0,'ACB',['mucolytic'],['아세틸시스테인'],'','','acetylcysteine'),
+ ('mosapride','모사프리드',0,'ACB',['gi-move'],['모사프리드'],'','','mosapride'),
+ ('cefixime','세픽심',0,'ACB',['abx','cephalosporin'],['세픽심'],'','','cefixime'),
+ ('guaifenesin','구아이페네신',0,'ACB',['mucolytic'],['구아이페네신'],'','','guaifenesin'),
  ('zaltoprofen','잘토프로펜',0,'ACB',['nsaid'],['잘토프로펜'],'','',''),
  ('talniflumate','탈니플루메이트',0,'ACB',['nsaid'],['탈니플루메이트','모니플루메이트'],'','',''),
  ('clopidogrel','클로피도그렐',0,'ACB',['antiplt'],['클로피도그렐'],'','',''),
