@@ -57,6 +57,11 @@ TAP_JS = """()=>[...document.querySelectorAll('#view button,#view a')].filter(e=
 
 def main():
     ap = argparse.ArgumentParser(); ap.add_argument('--url'); a = ap.parse_args()
+    # 0. 자료 고리(브라우저 없이 1초) — 끊긴 출처·약 id·팁 링크가 있으면 여기서 멈춘다
+    import subprocess
+    r0 = subprocess.run([sys.executable, str(pathlib.Path(__file__).with_name('data.py'))], capture_output=True, text=True)
+    print(r0.stdout.strip())
+    if r0.returncode: sys.exit(1)
     url = a.url or serve()
     from playwright.sync_api import sync_playwright
     fails = []
