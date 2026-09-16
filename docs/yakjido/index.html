@@ -1023,16 +1023,18 @@ const pillImg = p => p?.img ? (p.img.startsWith('http') ? p.img : IMG_PREFIX + p
 async function pubPills(){ if (!PUB.pills && window.__PILLS__) PUB.pills = window.__PILLS__;   /* 미리보기용 내장 자료 */
   if (!PUB.pills) { try { PUB.pills = await loadJSON('pills.json'); } catch (e) { PUB.pills = []; PUB.err = true; } } return PUB.pills; }
 /* 사전 세 벌을 한 번에 받아 둔다. 실패해도 앱의 나머지는 그대로 돈다 */
-async function lexLoad(){
+/* quiet: 화면이 조용할 때 미리 받아 두기 — 검색 중이 아니면 다시 그리지 않는다(입력 중 커서를 뺏지 않게) */
+const lexRedraw = quiet => { if (!quiet) { route(); return; } if ((GQ || MQ) && document.activeElement?.tagName !== 'INPUT') route(); };
+async function lexLoad(quiet){
   if (LEX.ing || LEX.loading) return LEX;
-  if (window.__LEX__) { LEX.ing = __LEX__.ing; LEX.brand = __LEX__.brand; LEX.qa = __LEX__.qa; LEX.nut = __LEX__.nut || []; LEX.mix = __LEX__.mix || []; LEX.ingI = {}; LEX.ing.forEach(x => { LEX.ingI[x.id] = x; }); setTimeout(route, 0); return LEX; }  /* 미리보기용 내장 자료 */
+  if (window.__LEX__) { LEX.ing = __LEX__.ing; LEX.brand = __LEX__.brand; LEX.qa = __LEX__.qa; LEX.nut = __LEX__.nut || []; LEX.mix = __LEX__.mix || []; LEX.ingI = {}; LEX.ing.forEach(x => { LEX.ingI[x.id] = x; }); setTimeout(() => lexRedraw(quiet), 0); return LEX; }  /* 미리보기용 내장 자료 */
   LEX.loading = true;
   try {
     const [a, b, c, d, e2] = await Promise.all([loadJSON('lexicon.json'), loadJSON('brands.json'), loadJSON('qa.json'), loadJSON('nutrients.json'), loadJSON('mixes.json')]);
     LEX.ing = a; LEX.brand = b; LEX.qa = c; LEX.nut = d; LEX.mix = e2;
     LEX.ingI = {}; a.forEach(x => { LEX.ingI[x.id] = x; });
   } catch (e) { LEX.ing = []; LEX.brand = []; LEX.qa = []; LEX.nut = []; LEX.mix = []; LEX.ingI = {}; LEX.err = true; }
-  LEX.loading = false; route(); return LEX;
+  LEX.loading = false; lexRedraw(quiet); return LEX;
 }
 const lexOf = id => LEX.ingI?.[id] || null;
 const brandOf = n => (LEX.brand || []).find(b => b.n === n) || null;
@@ -1644,14 +1646,16 @@ function search(q){
   (LEX.mix || []).forEach(x => {
     const hay = (x.t + ' ' + x.s + ' ' + (x.kw || []).join(' ')).toLowerCase();
     const hit = hay.includes(q) || (toks.length >= 1 && toks.every(t => hay.includes(t)));
-    if (hit) out.push({ k:'같이', c:'s', t:x.t, d:esc0(x.s), h:'/mix/' + x.id, w:4 });
+    if (hit) out.push({ k:'같이', c:'s', t:x.t, d:esc0(x.s), h:'/mix/' + x.id, w:3 });
   });
   const haveS = new Set((D.supplements || []).map(x => x.id));
   (LEX.nut || []).forEach(x => { if (!m(x.n)) return; if (x.supp && haveS.has(x.supp)) return;
     out.push({ k:'영양제', c:'', t:x.n, d:esc0(x.what), h:'/nut/' + x.id, w:1 }); });
   (PUB.index || []).forEach(p => { if (m(p.n) || p.i.some(m)) out.push({ k:'식약처', c:'p', t:p.n, d:p.m + ' · ' + p.i.slice(0, 3).join(', '), h:'/pub/' + p.id, w:0 }); });
+  /* 이름이 그 글자로 시작하면 위로 — "인사돌" 은 잇몸 증상(태그)보다 인사돌정(제품)이 먼저다 */
+  const sc = h => h.w + (h.k !== '같이' && (h.t || '').toLowerCase().startsWith(q) ? 2 : 0) + ((h.t || '').toLowerCase() === q ? 1 : 0);  /* '같이' 질문은 제목이 그 글자로 시작해도 우연이다 */
   const seen = new Set();
-  return out.sort((a, b) => b.w - a.w).filter(h => { const k = h.k + h.t; if (seen.has(k)) return false; seen.add(k); return true; });
+  return out.sort((a, b) => sc(b) - sc(a)).filter(h => { const k = h.k + h.t; if (seen.has(k)) return false; seen.add(k); return true; });
 }
 pubIndex(); // 검색에 식약처 제품이 바로 잡히도록 미리 받아둔다(약 1MB, 캐시)
 const hitsHtml = hits => hits.map(h => `<button class="hit" onclick="go('${h.h}')"><span class="k ${h.c}">${h.k}</span><div><b>${esc(h.t)}</b><span>${esc(h.d)}</span></div>${I.chev}</button>`).join('');
@@ -3018,6 +3022,8 @@ function vAbout(){
 document.addEventListener('input', e => { if (!e.target.closest('.calc')) return; const id = location.hash.split('/')[2]?.split('?')[0]; const s = supp(id); if (!s?.calc) return; const amt = +document.getElementById('c-amt').value, per = +document.getElementById('c-per').value || 1, price = +document.getElementById('c-price').value, n = +document.getElementById('c-n').value; const pct = document.getElementById('c-pct'), won = document.getElementById('c-won'); if (amt > 0) { const perServing = amt * per; const r = perServing / s.calc.typical; pct.textContent = Math.round(r * 100) + '%'; pct.style.color = r > (s.calc.ulRatio || 99) ? 'var(--alert)' : r < 0.5 ? 'var(--caution)' : 'var(--primary-deep)'; if (price > 0 && n > 0) { const unitPrice = price / n; const effDoses = perServing / s.calc.typical; won.textContent = Math.round(unitPrice * per / effDoses).toLocaleString('ko-KR') + '원'; } else won.textContent = '—'; } else { pct.textContent = '—'; won.textContent = '—'; } });
 function setFs(v){ try { localStorage.setItem('yakjido.fs', v); } catch (e) {} document.documentElement.style.setProperty('--fs', v); route(); }
 try { const fs = localStorage.getItem('yakjido.fs'); if (fs) document.documentElement.style.setProperty('--fs', fs); } catch (e) {}
+/* 제품·성분 사전(약 700 KB)은 첫 화면이 자리 잡은 뒤 조용히 미리 받는다 — "인사돌" 을 쳤을 때 제품이 증상보다 위에 오게(감사 #38). 데이터 절약 모드면 안 받는다 */
+setTimeout(() => { try { if (navigator.connection && navigator.connection.saveData) return; } catch (e) {} lexLoad(true); }, 3500);
 /* ───────── 시작 ───────── */
 try { if (!helloDone() && !location.hash) { location.hash = '#/hello/1'; } } catch (e) {}
 armNotifications();
