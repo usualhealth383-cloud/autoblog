@@ -1464,11 +1464,17 @@ let WX = {}; try { WX = JSON.parse(localStorage.getItem(WX_KEY) || '{}'); } catc
 let WX_BUSY = false;
 function wxSave(){ try { localStorage.setItem(WX_KEY, JSON.stringify(WX)); } catch (e) {} }
 function wxLoc(){ if (WX.city === '내 위치' && WX.lat != null) return { name:'내 위치', lat:WX.lat, lon:WX.lon }; const c = WX_CITIES.find(x => x[0] === WX.city) || WX_CITIES[0]; return { name:c[0], lat:c[1], lon:c[2] }; }
+let WX_TRIED = '';  /* 이 화면 세션에서 이미 시도한 지역 — 실패해도 홈을 그릴 때마다 다시 가지 않는다 */
 async function wxFetch(force){
   if (WX_BUSY || (typeof navigator !== 'undefined' && navigator.onLine === false)) return;
   const loc = wxLoc();
   if (!force && WX.data && WX.at && Date.now() - WX.at < 60 * 60 * 1000 && WX.data.name === loc.name) return;
+  /* 실패 뒤 10분은 다시 묻지 않는다. 예전엔 실패 → 홈 다시 그림 → 다시 요청 → … 무한 반복이었다(아티팩트처럼 바깥 요청이 막힌 곳에서 4초에 170번) */
+  if (!force && WX.failAt && Date.now() - WX.failAt < 10 * 60 * 1000) return;
+  if (!force && WX_TRIED === loc.name) return;
+  WX_TRIED = loc.name;
   WX_BUSY = true;
+  const before = WX.at, failBefore = !!WX.fail;
   try {
     let got = null;
     /* 1) 우리 워커(기상청 실황·에어코리아 실측) — 키가 설정돼 있을 때만 응답한다 */
@@ -1484,10 +1490,11 @@ async function wxFetch(force){
       if (fj?.current && fj?.daily) got = { name: loc.name, src: 'om', now: fj.current.temperature_2m, feel: fj.current.apparent_temperature, rh: fj.current.relative_humidity_2m, code: fj.current.weather_code,
                   max: fj.daily.temperature_2m_max?.[0], min: fj.daily.temperature_2m_min?.[0], pm10: aj?.current?.pm10 ?? null, pm25: aj?.current?.pm2_5 ?? null };
     }
-    if (got) { WX.data = got; WX.at = Date.now(); WX.fail = 0; } else WX.fail = (WX.fail || 0) + 1;
-  } catch (e) { WX.fail = (WX.fail || 0) + 1; }
+    if (got) { WX.data = got; WX.at = Date.now(); WX.fail = 0; WX.failAt = 0; } else { WX.fail = (WX.fail || 0) + 1; WX.failAt = Date.now(); }
+  } catch (e) { WX.fail = (WX.fail || 0) + 1; WX.failAt = Date.now(); }
   WX_BUSY = false; wxSave();
-  if (document.querySelector('.wx')) route();
+  /* 바뀐 것이 있을 때만 다시 그린다 — 새 자료가 왔거나, 처음 실패해서 문구가 바뀌어야 할 때 */
+  if (document.querySelector('.wx') && (WX.at !== before || (!!WX.fail) !== failBefore)) route();
 }
 /* 워커 주소가 있으면 그 옆 /wx — 사진 서버와 같은 워커 */
 function wxEndpoint(){ const p = (D.meta?.wxEndpoint || '') || (photoEndpoint() ? photoEndpoint().replace(/\/+$/, '') + '/wx' : ''); return p; }
@@ -1498,7 +1505,7 @@ function wxSetCity(v){
       () => { toast('위치를 못 받았어요 — 도시를 골라 주세요'); route(); }, { timeout: 8000, maximumAge: 600000 });
     return;
   }
-  WX.city = v; wxSave(); route(); wxFetch(true);
+  WX.city = v; WX.failAt = 0; wxSave(); route(); wxFetch(true);
 }
 /* WMO 날씨 코드 → 말·아이콘 */
 function wxCode(c){ c = +c; if (c === 0) return ['맑음', 'sun']; if (c <= 2) return ['구름 조금', 'sun']; if (c === 3) return ['흐림', 'temp']; if (c === 45 || c === 48) return ['안개', 'temp'];
