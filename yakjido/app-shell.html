@@ -435,6 +435,29 @@ details.acc .bd{padding:0 var(--s4) var(--s4)}
 .q6i{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;min-height:100px;padding:12px 6px;border-radius:18px;background:var(--card);border:1px solid var(--hairline);box-shadow:var(--shadow-card);font-weight:700;font-size:1rem;line-height:1.25;text-align:center;color:var(--text)}
 .q6i .ic{width:46px;height:46px;border-radius:15px;display:grid;place-items:center;background:var(--gbg,var(--tint));color:var(--gfg,var(--primary))} .q6i .ic svg.i{width:26px;height:26px}
 .q6i b{overflow-wrap:anywhere}
+/* 펼친 약의 설명 한 줄과 제품 사진 */
+.bm-lead{font-size:.9375rem;line-height:1.55;color:var(--body);margin-bottom:var(--s3);word-break:keep-all}
+.shots{display:flex;gap:var(--s2);overflow-x:auto;padding-bottom:4px;margin-bottom:var(--s3);-webkit-overflow-scrolling:touch}
+.shots .ps{flex:0 0 96px;margin:0;text-align:center}
+.shots .ps img{width:96px;height:72px;object-fit:contain;background:var(--tint2);border:1px solid var(--hairline);border-radius:10px;padding:4px}
+.shots .ps figcaption{font-size:.6875rem;line-height:1.3;color:var(--muted);margin-top:4px;word-break:keep-all}
+
+/* 증상 맨 위 세 줄 요약 — 어르신이 먼저 읽는 자리라 글자를 키우고 줄을 넉넉히 */
+.triage{margin-top:var(--s4);background:var(--card);border:1px solid var(--hairline);border-radius:var(--r-card);overflow:hidden;box-shadow:var(--shadow-card)}
+.tg-row{display:grid;grid-template-columns:40px 1fr;gap:var(--s3);padding:var(--s4);align-items:start;border-bottom:1px solid var(--hairline)}
+.tg-row:last-child{border-bottom:0}
+.tg-i{width:40px;height:40px;border-radius:12px;display:grid;place-items:center}
+.tg-i svg{width:22px;height:22px}
+.tg-row.clinic .tg-i{background:var(--rx-tint);color:var(--rx)}
+.tg-row.pharm .tg-i{background:var(--tint);color:var(--primary)}
+.tg-row.esc .tg-i{background:var(--caution-tint);color:var(--caution)}
+.tg-b>b{display:block;font-size:.8125rem;font-weight:800;letter-spacing:.02em;margin-bottom:3px}
+.tg-row.clinic .tg-b>b{color:var(--rx)}
+.tg-row.pharm .tg-b>b{color:var(--primary)}
+.tg-row.esc .tg-b>b{color:var(--caution)}
+.tg-b p{font-size:.9375rem;line-height:1.6;color:var(--text);word-break:keep-all}
+.tg-b p b{font-weight:700;color:inherit}
+
 .chk{display:inline-block;font-size:.75rem;font-weight:600;padding:1px 8px;border-radius:999px;background:var(--tint2);color:var(--muted);vertical-align:middle;white-space:nowrap;letter-spacing:0}
 .q6-more{display:flex;align-items:center;gap:9px;width:100%;text-align:left;margin-top:10px;padding:12px 14px;border-radius:14px;background:var(--tint);color:var(--primary-deep);font-size:1rem;min-height:52px;line-height:1.4}
 .q6-more>svg.i{flex:none} .q6-more span{flex:1;min-width:0} .q6-more>svg.i:last-child{color:var(--faint)}
@@ -1787,6 +1810,16 @@ function prodNames(d, max = 4){
   if (!out.length) for (const pr of (d?.products || [])) { const t = prodName(String(pr.name).split('·')[0]); if (t) return [t]; }
   return out;
 }
+/* 펼친 약의 대표 제품 사진들 — 이름만으로는 진열대에서 못 찾으신다 */
+function prodShots(d){
+  const seen = new Set(), out = [];
+  for (const nm of prodNames(d, 6)) {
+    const src = pimg(nm); if (!src || seen.has(src)) continue; seen.add(src);
+    out.push(`<figure class="ps"><img src="${esc(src)}" alt="${esc(nm)}" loading="lazy" onerror="this.closest('.ps')?.remove()"><figcaption>${esc(nm)}</figcaption></figure>`);
+    if (out.length >= 4) break;
+  }
+  return out.length ? `<div class="shots">${out.join('')}</div>` : '';
+}
 const prodChips = d => { const n = prodNames(d); return n.length > 1 ? `<div class="prodchips"><span class="pl">약국에서 찾으실 이름</span>${n.map(x => `<span class="pc">${esc(x)}</span>`).join('')}</div>` : ''; };
 const ingrName = d => String(d?.name || '').replace(/\s*\(.*$/, '').trim();
 const plainTxt = t => String(t || '').replace(/\*\*(.+?)\*\*/g, '$1').replace(/\[\[\w+:[\w-]+\|([^\]]+)\]\]/g, '$1');
@@ -1829,7 +1862,10 @@ function buyItem(x){
     <span class="k">${esc(x.slot)}</span>${imgTag(pimg(x.product), 'pimg', x.product)}
     <span class="bi-t"><b>${esc(title)}</b>${sub ? `<small>${esc(sub)}</small>` : ''}${x.optional ? '<small class="opt-t">필요할 때만</small>' : ''}${badge}</span>
     <span class="bi-r"><span class="badge ${x.d.rx === '안전상비' ? 'cvs' : x.d.rx === '제품별' ? 'warn' : 'otc'} rx">${x.d.rx === '안전상비' ? '편의점' : x.d.rx === '제품별' ? '제품별' : '약국'}</span>${I.chev}</span></button>
-  ${open ? `<div class="buy-more"><div class="how">${esc(x.d.simple || ((x.d.dose?.adult || '') + (x.d.dose?.interval ? ' · ' + x.d.dose.interval : '')))}<small>${x.d.dose?.max ? '하루 최대 ' + esc(x.d.dose.max) : ''}</small></div>
+  ${open ? `<div class="buy-more">
+    ${x.d.tagline ? `<p class="bm-lead">${fmt(x.d.tagline)}</p>` : ''}
+    ${prodShots(x.d)}
+    <div class="how">${esc(x.d.simple || ((x.d.dose?.adult || '') + (x.d.dose?.interval ? ' · ' + x.d.dose.interval : '')))}<small>${x.d.dose?.max ? '하루 최대 ' + esc(x.d.dose.max) : ''}</small></div>
     ${x.blocked ? `<div class="note" style="margin-top:8px">${I.alert}<span>내 조건(${activeFlags().map(f => FLAG_LABEL[f]).join(', ')})에서는 주의가 필요해요. 약사에게 조건을 말하고 고르세요.</span></div>` : ''}
     ${x.d.pict?.length ? picts(x.d.pict) : ''}
     ${prodChips(x.d)}
@@ -1840,6 +1876,23 @@ function doItem(p){
   return `<div class="buy-item do"><span class="k">${esc(p.slot)}</span>
     <span class="bi-t"><b>${esc(p.title || p.slot)}</b><small>${esc(firstSentence(p.why, 58))}</small></span>
     <span class="bi-r"><span class="badge cvs rx">약 없이</span></span></div>`;
+}
+/* 증상 맨 위 세 줄 — 병원에서는 / 약국에서는 / 이럴 땐 병원으로.
+   현욱님 지시(2026-09-17): 약을 보여 주기 전에 "이 증상을 어떻게 보는지"를 먼저 알려 준다. */
+function triageCard(s){
+  const t = s.triage; if (!t) return '';
+  const rows = [
+    ['clinic', I.cross, '병원에서는', t.clinic],
+    ['pharm', I.pill, '약국에서는', t.pharmacy],
+    ['esc', I.alert, '이럴 땐 병원으로', t.escalate],
+  ].filter(r => r[3]);
+  if (!rows.length) return '';
+  return `<section class="triage" aria-label="이 증상을 보는 법">
+    ${rows.map(([k, ic, lab, txt]) => `<div class="tg-row ${k}">
+      <span class="tg-i">${ic}</span>
+      <div class="tg-b"><b>${lab}</b><p>${fmt(txt)}</p></div>
+    </div>`).join('')}
+  </section>`;
 }
 /* 답 카드 줄 = 계획 순서대로, 약이 있으면 buyItem, 없으면 doItem */
 function planRows(s){
@@ -1908,6 +1961,7 @@ function vSymptom(id){
   return `${topBar({ back:'증상', unreviewed:s.reviewed === false })}
   <div class="${gcls(s.group)}"><div class="eyebrow" style="color:var(--gfg,var(--primary))"><span class="gdot"></span>${esc(s.group)}</div>
   <h1>${esc(s.name)}</h1></div>
+  ${triageCard(s)}
   ${fitChips(s)}
   <section class="sec answer" aria-label="바로 답">
     <div class="ans-head"><div class="eyebrow">이렇게 사시면 돼요 <span class="muted" style="font-weight:500;letter-spacing:0;text-transform:none">· 누르면 드시는 법</span></div><button class="speak" onclick="speakAnswer('${s.id}', this)" aria-label="핵심 읽어 주기">${I.info}읽어 주기</button></div>
