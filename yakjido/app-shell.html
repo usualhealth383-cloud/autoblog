@@ -1750,10 +1750,10 @@ function basket(s){
     let pick = p.pick || p.options[0]; let d = drug(pick);
     const bad = x => drug(x)?.avoid?.some(a => a.flags?.some(fl => f.includes(fl)));
     let swapped = false;
-    if (d && bad(pick)) { const alt = p.options.find(o => !bad(o) && drug(o)?.rx !== '전문'); if (alt) { pick = alt; d = drug(alt); swapped = true; } }
+    if (d && bad(pick)) { const alt = p.options.find(o => !bad(o) && !['전문', '제품별'].includes(drug(o)?.rx)); if (alt) { pick = alt; d = drug(alt); swapped = true; } }
     /* 65세 이상이면 같은 자리에서 항콜린 부담이 낮은 쪽을 먼저 권한다 */
     if (ME.age === 'senior' && (d?.ach || 0) >= 2) {
-      const soft = p.options.find(o => { const x = drug(o); return x && !bad(o) && x.rx !== '전문' && (x.ach || 0) < d.ach; });
+      const soft = p.options.find(o => { const x = drug(o); return x && !bad(o) && !['전문', '제품별'].includes(x.rx) && (x.ach || 0) < d.ach; });
       if (soft) { pick = soft; d = drug(soft); swapped = 'ach'; }
     }
     const achWarn = ME.age === 'senior' && achOfDrug(d) >= 3;
