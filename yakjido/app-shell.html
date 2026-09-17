@@ -312,7 +312,7 @@ ul.steps li{counter-increment:s;position:relative;padding-left:34px;font-size:.9
 ul.steps li::before{content:counter(s);position:absolute;left:0;top:2px;width:24px;height:24px;border-radius:8px;background:var(--tint);color:var(--primary);font-weight:800;font-size:.75rem;display:grid;place-items:center}
 
 /* 근거·면책 */
-.src-chip{display:inline-flex;align-items:center;gap:6px;padding:8px 12px;min-height:44px;border-radius:var(--r-pill);background:var(--tint);color:var(--muted);font-size:.75rem;text-decoration:none;margin:4px 4px 0 0;max-width:100%}
+.src-chip{display:inline-flex;align-items:center;gap:6px;padding:8px 12px;min-height:46px;border-radius:var(--r-pill);background:var(--tint);color:var(--muted);font-size:.75rem;text-decoration:none;margin:4px 4px 0 0;max-width:100%}
 .src-chip svg.i{width:13px;height:13px}
 .src-chip:hover{color:var(--text)}
 .src-chip.unv{background:var(--caution-tint);color:var(--caution)}
@@ -435,6 +435,42 @@ details.acc .bd{padding:0 var(--s4) var(--s4)}
 .q6i{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;min-height:100px;padding:12px 6px;border-radius:18px;background:var(--card);border:1px solid var(--hairline);box-shadow:var(--shadow-card);font-weight:700;font-size:1rem;line-height:1.25;text-align:center;color:var(--text)}
 .q6i .ic{width:46px;height:46px;border-radius:15px;display:grid;place-items:center;background:var(--gbg,var(--tint));color:var(--gfg,var(--primary))} .q6i .ic svg.i{width:26px;height:26px}
 .q6i b{overflow-wrap:anywhere}
+/* 「자세히」 — 긴 설명을 접어 둔다 */
+.why-more{margin-top:6px}
+.why-more>summary{display:inline-flex;align-items:center;gap:4px;font-size:.8125rem;font-weight:700;color:var(--primary);cursor:pointer;list-style:none;padding:4px 0;min-height:32px}
+.why-more>summary::-webkit-details-marker{display:none}
+.why-more>summary::after{content:'▾';font-size:.75rem}
+.why-more[open]>summary::after{content:'▴'}
+.why-more .why{margin-top:2px}
+
+/* 약 줄 다시 — 역할을 위에 작게, 약 이름을 크게. 배지·칩을 줄여 눈이 쉬게 한다 */
+.buy .buy-item{grid-template-columns:1fr auto auto;gap:var(--s3);padding:var(--s4);background:var(--card);border:1px solid var(--hairline);border-radius:var(--r-card);align-items:center;margin-bottom:var(--s2)}
+.buy .buy-item.open{border-color:var(--primary)}
+.buy .buy-item .bi-t{display:block;min-width:0}
+.buy .buy-item .role{display:block;font-size:.75rem;font-weight:700;color:var(--primary);letter-spacing:.01em;margin-bottom:3px}
+.buy .buy-item.opt .role{color:var(--muted)}
+.buy .buy-item b{display:block;font-size:1.125rem;font-weight:800;line-height:1.35;letter-spacing:-.01em;color:var(--text);overflow-wrap:anywhere}
+.buy .buy-item .sub{display:block;font-size:.875rem;color:var(--muted);margin-top:2px;overflow-wrap:anywhere}
+.buy .buy-item .pimg{width:52px;height:42px;object-fit:contain;border-radius:8px;background:var(--tint2)}
+.buy .buy-item .bi-r svg{width:20px;height:20px;color:var(--muted)}
+.buy .buy-item .badge{margin-top:6px}
+
+/* 병원 신호 — 세 칸 색띠 대신 한 줄 */
+.tl1{display:flex;align-items:center;gap:var(--s3);width:100%;min-height:56px;margin-top:var(--s4);padding:var(--s3) var(--s4);background:var(--alert-tint);border:1px solid var(--alert);border-radius:var(--r-card);color:var(--alert);text-align:left;cursor:pointer}
+.tl1>svg:first-child{width:22px;height:22px;flex:0 0 auto}
+.tl1>span{flex:1;min-width:0}
+.tl1 b{display:block;font-size:1rem;font-weight:700}
+.tl1 small{display:block;font-size:.8125rem;opacity:.85;font-weight:500}
+.tl1>svg:last-child{width:18px;height:18px;flex:0 0 auto}
+
+/* 약 없이 할 일 — 살 것 목록과 섞이지 않게 따로 */
+.care-do{margin-top:var(--s4);background:var(--card);border:1px solid var(--hairline);border-radius:var(--r-card);padding:var(--s4)}
+.care-do h2{font-size:1rem;margin-bottom:var(--s3)}
+.do-row{padding:var(--s3) 0;border-top:1px solid var(--hairline)}
+.do-row:first-of-type{border-top:0;padding-top:0}
+.do-row b{display:block;font-size:1rem;font-weight:700;margin-bottom:4px}
+.do-row p{font-size:.9375rem;line-height:1.6;color:var(--body);word-break:keep-all;white-space:pre-line}
+
 /* 「+ 추가 설명」 — 상세를 접어 두는 버튼 */
 .more-btn{display:flex;flex-direction:column;align-items:center;gap:2px;width:100%;min-height:56px;margin-top:var(--s4);padding:var(--s3) var(--s4);background:var(--card);border:1.5px solid var(--primary);border-radius:var(--r-card);color:var(--primary);cursor:pointer}
 .more-btn span{font-size:1.0625rem;font-weight:800;letter-spacing:-.01em}
@@ -464,21 +500,17 @@ details.acc .bd{padding:0 var(--s4) var(--s4)}
 .shots .ps img{width:96px;height:72px;object-fit:contain;background:var(--tint2);border:1px solid var(--hairline);border-radius:10px;padding:4px}
 .shots .ps figcaption{font-size:.6875rem;line-height:1.3;color:var(--muted);margin-top:4px;word-break:keep-all}
 
-/* 증상 맨 위 세 줄 요약 — 어르신이 먼저 읽는 자리라 글자를 키우고 줄을 넉넉히 */
-.triage{margin-top:var(--s4);background:var(--card);border:1px solid var(--hairline);border-radius:var(--r-card);overflow:hidden;box-shadow:var(--shadow-card)}
-.tg-row{display:grid;grid-template-columns:40px 1fr;gap:var(--s3);padding:var(--s4);align-items:start;border-bottom:1px solid var(--hairline)}
-.tg-row:last-child{border-bottom:0}
-.tg-i{width:40px;height:40px;border-radius:12px;display:grid;place-items:center}
-.tg-i svg{width:22px;height:22px}
-.tg-row.clinic .tg-i{background:var(--rx-tint);color:var(--rx)}
-.tg-row.pharm .tg-i{background:var(--tint);color:var(--primary)}
-.tg-row.esc .tg-i{background:var(--caution-tint);color:var(--caution)}
-.tg-b>b{display:block;font-size:.8125rem;font-weight:800;letter-spacing:.02em;margin-bottom:3px}
-.tg-row.clinic .tg-b>b{color:var(--rx)}
-.tg-row.pharm .tg-b>b{color:var(--primary)}
-.tg-row.esc .tg-b>b{color:var(--caution)}
-.tg-b p{font-size:.9375rem;line-height:1.6;color:var(--text);word-break:keep-all}
-.tg-b p b{font-weight:700;color:inherit}
+/* 증상 맨 위 세 줄 — 색은 왼쪽 띠에만 두고 글자는 검정으로 읽는다(색이 많으면 어지럽다) */
+.triage{margin-top:var(--s4)}
+.tg-row{padding:var(--s3) 0 var(--s4) var(--s4);border-left:3px solid var(--hairline);margin-bottom:2px}
+.tg-row:last-child{margin-bottom:0}
+.tg-row.clinic{border-left-color:var(--primary)}
+.tg-row.pharm{border-left-color:var(--primary);opacity:1}
+.tg-row.esc{border-left-color:var(--alert)}
+.tg-row>b{display:block;font-size:.8125rem;font-weight:800;letter-spacing:.02em;margin-bottom:5px;color:var(--muted)}
+.tg-row.esc>b{color:var(--alert)}
+.tg-row>p{font-size:1rem;line-height:1.65;color:var(--text);word-break:keep-all}
+.tg-row>p b{font-weight:700}
 
 .chk{display:inline-block;font-size:.75rem;font-weight:600;padding:1px 8px;border-radius:999px;background:var(--tint2);color:var(--muted);vertical-align:middle;white-space:nowrap;letter-spacing:0}
 .q6-more{display:flex;align-items:center;gap:9px;width:100%;text-align:left;margin-top:10px;padding:12px 14px;border-radius:14px;background:var(--tint);color:var(--primary-deep);font-size:1rem;min-height:52px;line-height:1.4}
@@ -1875,6 +1907,17 @@ const prodChips = d => { const n = prodNames(d); return n.length > 1 ? `<div cla
 const ingrName = d => String(d?.name || '').replace(/\s*\(.*$/, '').trim();
 const plainTxt = t => String(t || '').replace(/\*\*(.+?)\*\*/g, '$1').replace(/\[\[\w+:[\w-]+\|([^\]]+)\]\]/g, '$1');
 /* 말줄임은 단어 중간에서 자르지 않는다 — 어르신께는 잘린 글자가 읽기 어렵다 */
+/* 긴 설명은 첫 문단만 보여 주고 나머지는 접는다 — 읽을 사람만 편다 */
+function whyHtml(t){
+  const x = String(t || '').trim(); if (!x) return '';
+  const parts = x.split(/\n\n+/);
+  let head = parts[0], rest = parts.slice(1).join('\n\n');
+  if (!rest && head.length > 150) {                       /* 한 문단인데 길면 문장으로 자른다 */
+    const m = head.match(/^[\s\S]{60,150}?[.!?。](\s|$)/);
+    if (m) { rest = head.slice(m[0].length).trim(); head = m[0].trim(); }
+  }
+  return `<p class="why">${fmt(head)}</p>` + (rest ? `<details class="why-more"><summary>자세히</summary><p class="why">${fmt(rest)}</p></details>` : '');
+}
 const short = (t, n) => {
   const x = String(t || '').trim(); if (x.length <= n) return x;
   const cut = x.slice(0, n); const sp = cut.lastIndexOf(' ');
@@ -1910,9 +1953,12 @@ function buyItem(x){
     : x.swapped ? '<span class="badge warn">조건에 맞춰 바꿈</span>'
     : x.achWarn ? '<span class="badge warn">어르신 주의 · 짧게만</span>' : '';
   return `<button class="buy-item ${x.optional ? 'opt' : ''} ${pimg(x.product) ? 'has-img' : ''} ${open ? 'open' : ''}" onclick="OPEN_BUY=OPEN_BUY==='${x.d.id}'?'':'${x.d.id}';route()" aria-expanded="${open}">
-    <span class="k">${esc(x.slot)}</span>${imgTag(pimg(x.product), 'pimg', x.product)}
-    <span class="bi-t"><b>${esc(title)}</b>${sub ? `<small>${esc(sub)}</small>` : ''}${x.optional ? '<small class="opt-t">필요할 때만</small>' : ''}${SYM_NOW && isWorked(SYM_NOW, x.d.id) ? '<small class="wk-t">' + I.check + '효과 봤던 약</small>' : ''}${badge}</span>
-    <span class="bi-r"><span class="badge ${x.d.rx === '안전상비' ? 'cvs' : x.d.rx === '제품별' ? 'warn' : 'otc'} rx">${x.d.rx === '안전상비' ? '편의점' : x.d.rx === '제품별' ? '제품별' : '약국'}</span>${I.chev}</span></button>
+    <span class="bi-t">
+      <small class="role">${esc(x.slot)}${x.optional ? ' · 필요할 때만' : ''}${SYM_NOW && isWorked(SYM_NOW, x.d.id) ? ' · 효과 봤던 약' : ''}</small>
+      <b>${esc(title)}</b>${sub ? `<small class="sub">${esc(sub)}</small>` : ''}${badge}
+    </span>
+    ${imgTag(pimg(x.product), 'pimg', x.product)}
+    <span class="bi-r">${I.chev}</span></button>
   ${open ? `<div class="buy-more">
     ${x.d.tagline ? `<p class="bm-lead">${fmt(x.d.tagline)}</p>` : ''}
     ${prodShots(x.d)}
@@ -1942,8 +1988,7 @@ function triageCard(s){
   if (!rows.length) return '';
   return `<section class="triage" aria-label="이 증상을 보는 법">
     ${rows.map(([k, ic, lab, txt]) => `<div class="tg-row ${k}">
-      <span class="tg-i">${ic}</span>
-      <div class="tg-b"><b>${lab}</b><p>${fmt(txt)}</p></div>
+      <b>${lab}</b><p>${fmt(txt)}</p>
     </div>`).join('')}
   </section>`;
 }
@@ -1958,9 +2003,16 @@ function planRows(s){ SYM_NOW = s.id;
     i++;
     if (p.otc === false) continue;
     if ((p.options || []).length) { const x = bk.find(b => b.i === i); if (x) out.push(buyItem(x)); }
-    else out.push(doItem(p));
   }
   return out.join('');
+}
+/* 약이 아닌 칸(물 마시기·먹는 법 같은 것)은 살 것 목록에서 빼고 따로 묶는다 */
+function doRows(s){
+  const rows = (s.plan || []).filter(p => p.otc !== false && !(p.options || []).length);
+  if (!rows.length) return '';
+  return `<section class="sec care-do"><h2>약 없이 할 일</h2>
+    ${rows.map(p => `<div class="do-row"><b>${esc(p.title || p.slot)}</b>${whyHtml(p.why)}</div>`).join('')}
+  </section>`;
 }
 /* 내 약통 담기 — 성분·제품·사전 어디서나 같은 모양으로 */
 function takeBtn(id, label){
@@ -1993,10 +2045,8 @@ const faqList = items => (items || []).map(f => `<div class="qa"><div class="q">
 /* 신호등 — 문장을 자르지 않는다. 개수만 보이고, 누르면 아래로 간다 */
 function trafficLight(c){
   if (!c) return '';
-  return `<div class="tl3" role="group" aria-label="어디까지 약국인가">
-    <button class="ok" onclick="openCare()"><span class="lb">약국으로 충분</span><span class="tx">${c.pharmacy?.length ? '이럴 땐 약국' : '—'}</span></button>
-    <button class="cl" onclick="openCare()"><span class="lb">병원 진료</span><span class="tx">${c.clinic?.length ? `신호 ${c.clinic.length}가지` : '—'}</span></button>
-    <button class="er" onclick="openCare()"><span class="lb">응급실·119</span><span class="tx">${c.er?.length ? `신호 ${c.er.length}가지` : '—'}</span></button></div>`;
+  const n = (c.clinic?.length || 0) + (c.er?.length || 0);
+  return `<button class="tl1" onclick="openCare()">${I.alert}<span><b>병원에 가야 하는 신호 ${n}가지</b><small>눌러서 확인하세요</small></span>${I.chev}</button>`;
 }
 const acc = (title, body, sub, open) => body ? `<details class="acc" ${open ? 'open' : ''}><summary>${esc(title)}${sub ? `<small>${esc(sub)}</small>` : ''}${I.chev}</summary><div class="bd">${body}</div></details>` : '';
 function vSymptom(id){
@@ -2008,7 +2058,7 @@ function vSymptom(id){
     const kind = p.otc === false ? 'rx' : (p.optional ? 'opt' : '');
     return `<div class="slot"><div class="n ${kind}">${esc(p.slot)}</div><div>
       <h3>${esc(p.title || p.slot)} ${p.otc === false ? '<span class="badge rx">처방 필요</span>' : !(p.options || []).length ? '<span class="badge cvs">약 없이 할 일</span>' : p.optional ? '<span class="badge warn">필요할 때만</span>' : '<span class="badge otc">약국 구입</span>'}</h3>
-      <p class="why">${fmt(p.why)}</p>
+      ${whyHtml(p.why)}
       <div class="opts">${(p.options || []).map(oid => { const d = drug(oid); if (!d) return ''; const warn = d.avoid?.some(a => a.flags?.some(x => f.includes(x))); return `<a class="opt-pill ${p.pick === oid ? 'pick' : ''}" href="#${String(oid).startsWith('lex:') ? '/ingr/' + String(oid).slice(4) : '/drug/' + oid}">${p.pick === oid ? '<span class="dot"></span>' : ''}${esc(d.name)}${warn ? ' <span class="badge stop">내 정보 주의</span>' : ''}</a>`; }).join('')}</div>
       ${p.alt ? `<p class="alt">${fmt(p.alt)}</p>` : ''}
     </div></div>`;
@@ -2038,6 +2088,7 @@ function vSymptom(id){
     <span>${MORE_OPEN ? '− 설명 접기' : '+ 추가 설명'}</span>
     <small>${MORE_OPEN ? '' : '이 증상을 자세히 · 진료실에서 쓰는 방식 · 드시는 법 · 자주 묻는 질문'}</small>
   </button>
+  ${doRows(s)}
   ${MORE_OPEN ? `
   <p class="lead-p">${fmt(s.lead)}</p>
   <section class="sec">
