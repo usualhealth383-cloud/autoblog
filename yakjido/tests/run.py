@@ -131,9 +131,14 @@ def main():
         pg.route('**/api.open-meteo.com/**', lambda rt: rt.fulfill(status=200, content_type='application/json', body=FC))
         pg.route('**/air-quality-api.open-meteo.com/**', lambda rt: rt.fulfill(status=200, content_type='application/json', body=AQ))
         # 10. 소아 용량 계산 — 아세트아미노펜 10~15 mg/kg(하루 75, 두 돌 전 60), 이부프로펜 5~10 mg/kg(하루 40), 상한
+        #     15 kg 이부프로펜의 하루 500 mg 은 허가사항의 '30 kg 미만 하루 500 mg' 한도가 걸린 값이다(몸무게로만 곱하면 600).
         kd = pg.evaluate("()=>[[15,36],[8,5],[40,150],[10,20]].map(([w,m])=>['apap','ibu'].map(k=>{const r=kidDose(k,w,m);return [r.lo,r.hi,r.day]}))")
-        want = [[[150, 225, 1125], [75, 150, 600]], [[80, 120, 480], [40, 80, 320]], [[400, 600, 3000], [200, 400, 1600]], [[100, 150, 600], [50, 100, 400]]]
+        want = [[[150, 225, 1125], [75, 150, 500]], [[80, 120, 480], [40, 80, 320]], [[400, 600, 3000], [200, 400, 1600]], [[100, 150, 600], [50, 100, 400]]]
         if kd != want: fails.append(f'소아 용량 계산 불일치: {kd} ≠ {want}')
+        # 10b. 몸무게로 걸린 허가 한도 — 부루펜 30 kg 미만 하루 500 mg, 맥시부펜 30 kg 이하 하루 300 mg
+        kc = pg.evaluate("()=>[['ibu',29],['ibu',30],['dexibu',30],['dexibu',31]].map(([k,w])=>{const r=kidDose(k,w,48);return [r.day, !!r.kidCap]})")
+        wantc = [[500, True], [1200, False], [300, True], [868, False]]
+        if kc != wantc: fails.append(f'소아 몸무게 한도 불일치: {kc} ≠ {wantc}')
         # 7. 항콜린 이중 계산 · 8. 이름 검색
         r7 = pg.evaluate("""async()=>{ await pubPills(); await pubPillsRx(); let n=0;
           for(const p of (PUB.rx||[]).concat(PUB.pills||[])){ if(ingFind((p.ingr||'')+' '+(p.n||'')).filter(e=>e.ach).length>1) n++; } return n; }""")
