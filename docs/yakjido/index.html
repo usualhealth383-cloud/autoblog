@@ -435,6 +435,18 @@ details.acc .bd{padding:0 var(--s4) var(--s4)}
 .q6i{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;min-height:100px;padding:12px 6px;border-radius:18px;background:var(--card);border:1px solid var(--hairline);box-shadow:var(--shadow-card);font-weight:700;font-size:1rem;line-height:1.25;text-align:center;color:var(--text)}
 .q6i .ic{width:46px;height:46px;border-radius:15px;display:grid;place-items:center;background:var(--tint);color:var(--primary)} .q6i .ic svg.i{width:26px;height:26px}
 .q6i b{overflow-wrap:anywhere}
+/* 조건 칩 — 글자가 두 줄이 되어도 잘리지 않게 */
+.chips .chip{min-height:52px;line-height:1.35;align-items:center;padding-top:10px;padding-bottom:10px}
+.ans-head .eyebrow{font-size:.9375rem}
+
+/* 누를 수 있는 것과 없는 것을 눈으로 가른다(토스 시니어 리서치: 태그와 버튼을 구분 못 하신다).
+   배지는 «설명»이라 알약 모양을 버리고 글자만 남기고, 누르는 것에만 테두리를 준다. */
+.buy .buy-item .badge,.slot h3 .badge{background:transparent!important;padding:0;border-radius:0;font-size:.75rem;font-weight:600;letter-spacing:0}
+.buy .buy-item .badge::before,.slot h3 .badge::before{content:'· '}
+.buy .buy-item{border-width:1.5px}
+.buy .buy-item+.buy-item{margin-top:var(--s3)}   /* 손가락 간격 12px 이상 */
+.opt-pill{border:1.5px solid var(--hairline)}
+
 /* 「자세히」 — 긴 설명을 접어 둔다 */
 .why-more{margin-top:6px}
 .why-more>summary{display:inline-flex;align-items:center;gap:4px;font-size:.8125rem;font-weight:700;color:var(--primary);cursor:pointer;list-style:none;padding:4px 0;min-height:32px}
@@ -2071,7 +2083,7 @@ function vSymptom(id){
   ${workedCard(s)}
   ${fitChips(s)}
   <section class="sec answer" aria-label="바로 답">
-    <div class="ans-head"><div class="eyebrow">이렇게 사시면 돼요 <span class="muted" style="font-weight:500;letter-spacing:0;text-transform:none">· 누르면 드시는 법</span></div><button class="speak" onclick="speakAnswer('${s.id}', this)" aria-label="핵심 읽어 주기">${I.info}읽어 주기</button></div>
+    <div class="ans-head"><div class="eyebrow">약국에서 이렇게 사세요</div><button class="speak" onclick="speakAnswer('${s.id}', this)" aria-label="핵심 읽어 주기">${I.info}읽어 주기</button></div>
     <div class="buy">${planRows(s)}</div>
     ${kidLine()}
     ${(() => { const w = [...dups, ...sameProductWarn(bk)]; return w.length ? `<div class="dup"><div class="dup-h">${I.alert}<b>사시기 전에 확인할 것 ${w.length}가지</b></div><ul class="plain">${w.map(t => `<li>${fmt(t)}</li>`).join('')}</ul></div>` : ''; })()}
