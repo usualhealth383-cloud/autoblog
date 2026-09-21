@@ -1542,7 +1542,24 @@ const topBar = (opts = {}) => `
     ${opts.unreviewed ? `<span class="review-stamp wait">${I.alert}검수 대기</span>` : `<span class="review-stamp">${I.shield}${esc(D.meta?.reviewLabel || '의료진 검수')} · ${esc(D.meta?.reviewed || '')}</span>`}
   </div>
   ${opts.nosearch ? '' : `<div class="topfind">${I.search}<input id="gq" placeholder="증상·약 이름으로 찾기 (예: 허리, 타이레놀)" autocomplete="off" enterkeyhint="search" value="${esc(GQ)}"><button class="gq-x ${GQ ? '' : 'hide'}" onclick="GQ='';route()" aria-label="지우기">${I.x}</button></div>`}<!--TOPEND-->`;
-const srcChips = ids => (ids || []).length ? `<div class="srcs">${ids.map(id => { const s = D.sources?.[id]; if (!s) return `<span class="src-chip">${I.link}출처: ${esc(id)}</span>`; const short = s.label.split(' (')[0]; return `<a class="src-chip" href="${esc(s.url)}" target="_blank" rel="noopener" title="${esc(s.label)}" aria-label="출처: ${esc(s.label)}">${I.link}출처: ${esc(short)}</a>`; }).join('')}</div>` : '';  /* 칩은 짧게(저자·연도), 전체 제목은 길게 누르면·출처 화면에서 */
+/* 출처 칩은 «저자·연도»까지만. 예전 규칙은 괄호 «(»에서만 잘라서, «—»로 쓴 출처 44개가
+   문장째로 화면에 깔렸다(어지럼 화면이 출처 문단 여섯 개로 끝나고 있었다).
+   연도(19xx·20xx)를 만나면 거기서 끊고, 연도가 없으면 «—»·«·» 앞에서 끊는다. */
+const srcShort = t => {
+  let x = String(t || '').replace(/\*\*/g, '').split(' (')[0];
+  const m = x.match(/^(.{0,60}?(?:19|20)\d{2}[a-z]?)\b/);
+  /* 「2023 AGS Beers Criteria」처럼 «연도로 시작»하는 출처는 연도만 남으면 무엇인지 알 수 없다 */
+  if (m && m[1].length >= 10) return m[1];
+  for (const sep of [' — ', ' – ', ' - ', ' · ']) if (x.includes(sep)) {
+    const head = x.split(sep)[0];
+    /* 「식약처 허가사항」처럼 앞머리가 같은 출처가 여럿이면 뒤를 조금 더 붙여 구분한다 */
+    const tail = x.slice(head.length + sep.length);
+    const one = head.length < 12 && tail ? head + ' — ' + tail.split(/[(,]/)[0].trim() : head;
+    return one.length > 46 ? one.slice(0, 44).replace(/[\s,·]+$/, '') + '…' : one;
+  }
+  return x.length > 46 ? x.slice(0, 44).replace(/[\s,·]+$/, '') + '…' : x;
+};
+const srcChips = ids => (ids || []).length ? `<div class="srcs">${ids.map(id => { const s = D.sources?.[id]; if (!s) return `<span class="src-chip">${I.link}출처: ${esc(id)}</span>`; const full = String(s.label || '').replace(/\*\*/g, ''); return `<a class="src-chip" href="${esc(s.url)}" target="_blank" rel="noopener" title="${esc(full)}" aria-label="출처: ${esc(full)}">${I.link}출처: ${esc(srcShort(s.label))}</a>`; }).join('')}</div>` : '';
 const disclaimer = txt => `<p class="disclaimer">${I.info}<span>${esc(txt || D.meta?.disclaimer || '이 정보는 참고용이에요. 약 선택이 어렵거나 증상이 계속되면 약사·의사와 상의하세요.')}</span></p>`;
 const badge = rx => rx === '안전상비' ? '<span class="badge cvs">편의점 가능</span>' : rx === '일반' ? '<span class="badge otc">약국 구입</span>' : rx === '전문' ? '<span class="badge rx">처방 필요</span>' : rx === '제품별' ? '<span class="badge warn">제품에 따라 처방</span>' : rx === '건기식' ? '<span class="badge otc">건강기능식품</span>' : '';
 const useTag = d => d?.useNote ? `<em class="unote">${I.alert}${fmt(d.useNote)}</em>` : '';
@@ -2234,6 +2251,8 @@ function search(q){
   /* 낱말을 «전부» 맞추라고 하면 한 낱말만 어긋나도 0건이 된다.
      그럴 땐 가장 긴 낱말 하나로 한 번 더 — 빈손으로 돌려보내지 않는다. */
   if (!res.length && words.length > 1) return search([...words].sort((a, b) => b.length - a.length)[0]);
+  /* 한 마디로 치셔도 말끝을 떼 본다 — 「어지러워요」는 구어 사전의 「어지러워」에 닿지 못하고 있었다 */
+  if (!res.length) { const st = SEARCH_SYN[stem(q)] || stem(q); if (st && st !== q) return search(st); }
   return res;
 }
 pubIndex(); // 검색에 식약처 제품이 바로 잡히도록 미리 받아둔다(약 1MB, 캐시)
@@ -2546,7 +2565,9 @@ function planRows(s){ SYM_NOW = s.id;
 function doRows(s){
   const rows = (s.plan || []).filter(p => p.otc !== false && !(p.options || []).length);
   if (!rows.length) return '';
-  return `<section class="sec care-do"><h2>약 없이 할 일</h2>
+  /* 어떤 증상은 이 칸이 «약 없이 할 일»이 아니라 «원인 가리기»다(어지럼의 119·빈혈 감별).
+     자료에서 제목을 덮어쓸 수 있게 둔다 — 잘못된 제목은 내용을 통째로 다르게 읽히게 한다. */
+  return `<section class="sec care-do"><h2>${esc(s.doTitle || '약 없이 할 일')}</h2>
     ${rows.map(p => `<div class="do-row"><b>${esc(p.title || p.slot)}</b>${whyHtml(p.why)}</div>`).join('')}
   </section>`;
 }
@@ -2884,7 +2905,7 @@ function vGuide(step, q){
   const bar = `<div class="steps-bar">${[1, 2, 3].map(i => `<i class="${i <= step ? 'on' : ''}"></i>`).join('')}</div>`;
   if (step === 1 || !s) {
     const groups = [...new Set((D.symptoms || []).map(x => x.group))];
-    return `${topBar({ back:'홈' })}${bar}${art('guide-1-where', 'spot')}<div class="g-q" style="margin-top:${hasArt('guide-1-where') ? '12px' : '0'}">어디가 불편하세요?</div><p class="small muted">가장 가까운 것을 하나 골라 주세요.</p>
+    return `${topBar({ back:'홈' })}${bar}${art('guide-1-where', 'spot')}<h1 class="g-q" style="margin-top:${hasArt('guide-1-where') ? '12px' : '0'}">어디가 불편하세요?</h1><p class="small muted">가장 가까운 것을 하나 골라 주세요.</p>
     ${groups.map(g => `<div class="g-grp">${esc(g)}</div><div class="g-list">${(D.symptoms || []).filter(x => x.group === g).map(x => `<button class="g-item" onclick="go('/guide/2/${x.id}')"><div class="ic">${icon(x.icon)}</div><div><b>${esc(x.name)}</b><span>${esc(x.short || '')}</span></div>${I.chev}</button>`).join('')}</div>`).join('')}`;
   }
   if (step === 2) {
@@ -4037,7 +4058,7 @@ function vAbout(){
   const S = D.sources || {};
   return `${topBar({ back:'내 정보' })}<h1>근거와 검수 기준</h1>
   <section class="sec card"><h2>이렇게 만들었어요</h2>${list(D.meta?.method || [])}</section>
-  <section class="sec card"><h2>참고 문헌·지침 <small>${Object.keys(S).length}건</small></h2><div class="rows">${Object.entries(S).map(([k, s]) => `<a class="row" href="${esc(s.url)}" target="_blank" rel="noopener" style="text-decoration:none"><div class="body"><b>${esc(s.label)}</b><span>${esc(s.type || '')}${s.note ? ' · ' + esc(s.note) : ''}</span></div>${I.link}</a>`).join('')}</div></section>
+  <section class="sec card"><h2>참고 문헌·지침 <small>${Object.keys(S).length}건</small></h2><div class="rows">${Object.entries(S).map(([k, s]) => `<a class="row" href="${esc(s.url)}" target="_blank" rel="noopener" style="text-decoration:none"><div class="body"><b>${fmt(s.label)}</b><span>${esc(s.type || '')}${s.note ? ' · ' + esc(s.note) : ''}</span></div>${I.link}</a>`).join('')}</div></section>
   ${disclaimer()}`;
 }
 

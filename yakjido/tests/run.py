@@ -134,6 +134,13 @@ def main():
             pg.goto(url + '#' + r); pg.reload(); pg.wait_for_timeout(700)
             txt = pg.evaluate("()=>[...document.querySelectorAll('.ixline,.ix-h b')].map(x=>x.innerText).join(' | ')")
             if kw not in txt: fails.append(f'병용 시나리오 {picks} → "{kw}" 없음: {txt[:80]}')
+        # 6-0. 약 123개가 «성분»으로 풀려야 한다. 안 풀리면 그 약은 병용 판정·항콜린 계산에서
+        #      통째로 빠진다 — 실제로 33개가 그 상태였고 화면에는 아무 표시가 없었다.
+        nores = pg.evaluate("()=>(D.drugs||[]).filter(d=>!ingOf({d}).ings.length).map(d=>d.id)")
+        if nores: fails.append(f'성분으로 안 풀리는 약 {len(nores)}개: {nores[:6]}')
+        # 6-0b. 규칙이 쓰는 계열 태그는 «어떤 성분이나 약 종류»에든 있어야 한다. 없으면 죽은 규칙이다.
+        dead = pg.evaluate("()=>{const tags=new Set();for(const e of (D.ingredients?.ing||[])) for(const c of (e.cls||[])) tags.add(c);for(const g of (D.ingredients?.quick||[])) for(const s of (g.subs||[])) for(const c of (s.cls||[])) tags.add(c);const out=[];for(const r of (D.interactions?.rules||[])){const used=[];for(const grp of (r.need||[])) for(const t of grp) if(!String(t).startsWith('k:')) used.push(t);if(r.count) used.push(r.count.tag);const miss=used.filter(t=>!tags.has(t));if(miss.length) out.push(r.id+':'+miss.join(','));}return out;}")
+        if dead: fails.append(f'어떤 성분에도 없는 태그를 쓰는 규칙(죽은 규칙): {dead}')
         # 6a. 병명 대신 «드시는 약»으로도 걸려야 한다 — 어르신은 «녹내장»·«천식»이라는 말보다 «넣는 안약»을 아신다.
         #     전에는 이 경고들이 내 정보의 병명 체크에만 달려 있어, 약통만 채운 분께는 아예 뜨지 않았다.
         MEDCASE = [(['cls:bp.arb', 'coldaewon'], 'decongest-bp'), (['cls:eye.glau', 'dimenhydrinate'], 'anticho-glaucoma-med'),
@@ -217,7 +224,7 @@ def main():
     print(f'화면 {len(routes)}개 검사 완료')
     if fails:
         print('실패', len(fails)); [print('  ✗', f) for f in fails]; sys.exit(1)
-    print('✓ 전부 통과 — JS 오류 0 · 넘침 0 · 잘림 0 · 명암비 AA · 44px · 어르신 모드 · 320px · 병용 8건 · 약통 판정 4건 · 자기중복 3건 · 바구니 겹침 · 이중계산 0 · 검색 8건 · 구어 12건 · 문장 16건')
+    print('✓ 전부 통과 — JS 오류 0 · 넘침 0 · 잘림 0 · 명암비 AA · 44px · 어르신 모드 · 320px · 병용 8건 · 성분 해석 123 · 죽은 규칙 0 · 약통 판정 4건 · 자기중복 3건 · 바구니 겹침 · 이중계산 0 · 검색 8건 · 구어 12건 · 문장 16건')
 
 if __name__ == '__main__':
     main()
