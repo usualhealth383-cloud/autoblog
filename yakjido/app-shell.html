@@ -473,6 +473,15 @@ details.acc .bd{padding:0 var(--s4) var(--s4)}
 .buy .buy-item .badge{margin-top:6px}
 
 /* 병원 신호 — 세 칸 색띠 대신 한 줄 */
+.nobuy{margin:0;padding:14px 16px;border-radius:14px;background:var(--soft,#f1f4f6);color:var(--ink2,#4a5b66);line-height:1.65;word-break:keep-all}
+.nobuy b{color:var(--ink,#16232b)}
+.wk-home h2 span{display:flex;align-items:center;gap:8px}
+.wk-home h2 svg{width:20px;height:20px}
+.wk-home .wk+.wk{margin-top:8px}
+/* 갈래 바로가기 — 가로로 밀어 보는 한 줄 */
+.gjump{display:flex;flex-wrap:wrap;gap:8px;padding:4px 0 6px;margin-top:var(--s4)}
+.gjump button{display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:46px;padding:0 14px;border-radius:999px;background:var(--card);border:1px solid var(--hairline);color:var(--text);font-size:.9375rem;font-weight:700;line-height:1.3;cursor:pointer;max-width:100%}
+.gjump button .gdot{width:8px;height:8px;border-radius:50%;background:var(--gfg,var(--primary));flex:0 0 auto}
 .tl1{display:flex;align-items:center;gap:var(--s3);width:100%;min-height:56px;margin-top:var(--s4);padding:var(--s3) var(--s4);background:var(--alert-tint);border:1px solid var(--alert);border-radius:var(--r-card);color:var(--alert);text-align:left;cursor:pointer}
 .tl1>svg:first-child{width:22px;height:22px;flex:0 0 auto}
 .tl1>span{flex:1;min-width:0}
@@ -503,12 +512,12 @@ details.acc .bd{padding:0 var(--s4) var(--s4)}
 .wk-h{display:flex;align-items:center;gap:6px;color:var(--normal);font-size:.9375rem;margin-bottom:var(--s3)}
 .wk-h svg{width:20px;height:20px}
 .wk-list{display:flex;flex-direction:column;gap:var(--s2)}
-.worked .wk{display:flex;align-items:center;gap:var(--s3);width:100%;min-height:52px;padding:var(--s3);background:var(--card);border:1px solid var(--hairline);border-radius:var(--r-input);text-align:left;cursor:pointer}
-.worked .wk>span{flex:1;min-width:0}
-.worked .wk b{display:block;font-size:1rem;font-weight:700}
-.worked .wk small{display:block;font-size:.8125rem;color:var(--muted);overflow-wrap:anywhere}
-.worked .wk-img{width:40px;height:32px;object-fit:contain;border-radius:6px;background:var(--tint2)}
-.worked .wk svg{width:18px;height:18px;color:var(--muted);flex:0 0 auto}
+.worked .wk, .wk-home .wk{display:flex;align-items:center;gap:var(--s3);width:100%;min-height:52px;padding:var(--s3);background:var(--card);border:1px solid var(--hairline);border-radius:var(--r-input);text-align:left;cursor:pointer}
+.worked .wk>span, .wk-home .wk>span{flex:1;min-width:0}
+.worked .wk b, .wk-home .wk b{display:block;font-size:1rem;font-weight:700}
+.worked .wk small, .wk-home .wk small{display:block;font-size:.8125rem;color:var(--muted);overflow-wrap:anywhere}
+.worked .wk-img, .wk-home .wk-img{width:40px;height:32px;object-fit:contain;border-radius:6px;background:var(--tint2)}
+.worked .wk svg, .wk-home .wk svg{width:18px;height:18px;color:var(--muted);flex:0 0 auto}
 
 /* 펼친 약의 설명 한 줄과 제품 사진 */
 .bm-lead{font-size:.9375rem;line-height:1.55;color:var(--body);margin-bottom:var(--s3);word-break:keep-all}
@@ -1094,6 +1103,7 @@ const I = {
   temp: '<svg class="i" viewBox="0 0 24 24"><path d="M14 13.8V5.2a2 2 0 1 0-4 0v8.6a4 4 0 1 0 4 0z"/><path d="M12 9.5v5.2"/><path d="M16.2 6.2h2.3M16.2 9.2h1.6M16.2 12.2h2.3"/></svg>',
   drop:'<svg class="i" viewBox="0 0 24 24"><path d="M12 3s-6 7-6 11.5a6 6 0 0 0 12 0C18 10 12 3 12 3z"/></svg>',
   stomach:'<svg class="i" viewBox="0 0 24 24"><path d="M9 3v4a4 4 0 0 0 4 4h1a5 5 0 0 1 0 10H9a5 5 0 0 1-5-5v-1"/></svg>',
+  gutboth:'<svg class="i" viewBox="0 0 24 24"><path d="M9 3v4a4 4 0 0 0 4 4h1a5 5 0 0 1 0 10H9a5 5 0 0 1-5-5v-1"/><path d="M18.6 3.2v5M18.6 3.2l-1.8 1.8M18.6 3.2l1.8 1.8"/><path d="M18.6 15.6v5.2M18.6 20.8l-1.8-1.8M18.6 20.8l1.8-1.8"/></svg>',
   nose:'<svg class="i" viewBox="0 0 24 24"><path d="M12 4v8l-4 5a3 3 0 0 0 3 3h2a3 3 0 0 0 3-3l-4-5"/><path d="M9 20h6"/></svg>',
   moon: '<svg class="i" viewBox="0 0 24 24"><path d="M20.4 14.8A7.7 7.7 0 0 1 9.6 4a7.7 7.7 0 1 0 10.8 10.8z"/><path d="M14.6 3.2h3.6l-3.6 4h3.6"/></svg>',
   cough:'<svg class="i" viewBox="0 0 24 24"><path d="M12 20V9a4 4 0 0 1 8 0"/><path d="M4 12h4M3 16h5M5 8h3"/></svg>',
@@ -1123,6 +1133,8 @@ const I = {
   flame:'<svg class="i" viewBox="0 0 24 24"><path d="M12 2.8c2.6 3.6 5.6 5.1 5.6 9.2a5.6 5.6 0 0 1-11.2 0c0-2 1-3.6 2-4.6.3 1.3 1 2.1 2 2.1.5-2.6-.5-4.6 1.6-6.7z"/></svg>',
   wine:'<svg class="i" viewBox="0 0 24 24"><path d="M7 3.2h10l-.9 5.6A4.5 4.5 0 0 1 12 12.4a4.5 4.5 0 0 1-4.1-3.6z"/><path d="M12 12.4v6.8M8.4 19.2h7.2"/></svg>',
   heart:'<svg class="i" viewBox="0 0 24 24"><path d="M12 20.2s-7.2-4.5-7.2-9.4A4.1 4.1 0 0 1 12 7.9a4.1 4.1 0 0 1 7.2 2.9c0 4.9-7.2 9.4-7.2 9.4z"/></svg>',
+  anxiety:'<svg class="i" viewBox="0 0 24 24"><path d="M12 20.2s-7.2-4.5-7.2-9.4A4.1 4.1 0 0 1 12 7.9a4.1 4.1 0 0 1 7.2 2.9c0 4.9-7.2 9.4-7.2 9.4z"/><path d="M3.2 10a4.6 4.6 0 0 0 0 4.6M20.8 10a4.6 4.6 0 0 1 0 4.6"/></svg>', face:'<svg class="i" viewBox="0 0 24 24"><path d="M12 3.4c3.6 0 6 2.5 6 6.1 0 5-2.6 11.1-6 11.1S6 14.5 6 9.5c0-3.6 2.4-6.1 6-6.1z"/><path d="M9.3 10.4h1.2M13.5 10.4h1.2M10.6 15.4c.9.6 1.9.6 2.8 0"/><circle cx="8.6" cy="7.1" r=".8"/><circle cx="15.4" cy="12.6" r=".8"/><circle cx="12.3" cy="6.3" r=".8"/></svg>',
+  numb:'<svg class="i" viewBox="0 0 24 24"><path d="M8.6 11.2V6.1a1.6 1.6 0 0 1 3.2 0v5.1M11.8 11.2V5a1.6 1.6 0 0 1 3.2 0v6.2M15 11.2V6.7a1.6 1.6 0 0 1 3.2 0v7c0 4.1-2.9 7.2-6.7 7.2S5.4 17.8 5.4 13.8v-2.6a1.6 1.6 0 0 1 3.2 0"/><path d="M2.6 6.6l1.6 1M2.2 10.4h1.8M2.6 14.2l1.6-1"/></svg>', shoulder:'<svg class="i" viewBox="0 0 24 24"><circle cx="9" cy="12" r="3.2"/><path d="M9 5.6v3.2M9 15.2v3.2"/><path d="M15.2 7.4a6.2 6.2 0 0 1 0 9.2"/><path d="M15.4 16.8l-2.4-.6M15.4 16.8l.5-2.4"/></svg>', toe:'<svg class="i" viewBox="0 0 24 24"><path d="M8.6 20.6c-1.9 0-3.2-1.3-3.2-3.1 0-1.7.9-2.6.9-4.4C6.3 9.9 7.7 7.9 10.2 7.9c2.3 0 3.5 1.8 3.5 4.2 0 2.6-.9 3.7-.9 5.5 0 2-1.3 3-4.2 3z"/><circle cx="17.4" cy="7.6" r="1.9"/><path d="M17.4 2.6v1.6M22.4 7.6h-1.6M21.3 3.7l-1.1 1.1M21.3 11.5l-1.1-1.1"/></svg>', eyelump:'<svg class="i" viewBox="0 0 24 24"><path d="M2.4 13.6c3-4 6-6 9.4-6s6.4 2 9.4 6c-3 4-6 6-9.4 6s-6.4-2-9.4-6z"/><circle cx="11.8" cy="13.6" r="2.5"/><circle cx="15.8" cy="7.4" r="1.9"/></svg>', eyewet:'<svg class="i" viewBox="0 0 24 24"><path d="M2.4 10.6c3-4 6-6 9.4-6s6.4 2 9.4 6c-3 4-6 6-9.4 6s-6.4-2-9.4-6z"/><circle cx="11.8" cy="10.6" r="2.5"/><path d="M8.2 19c0 1 .8 1.8 1.8 1.8s1.8-.8 1.8-1.8c0-1-1.8-3-1.8-3S8.2 18 8.2 19z"/></svg>',
   wave:'<svg class="i" viewBox="0 0 24 24"><path d="M3 8.6c2-2.1 4-2.1 6 0s4 2.1 6 0 4-2.1 6 0"/><path d="M3 14.4c2-2.1 4-2.1 6 0s4 2.1 6 0 4-2.1 6 0"/><path d="M3 20c2-2.1 4-2.1 6 0"/></svg>',
   heartburn:'<svg class="i" viewBox="0 0 24 24"><path d="M9.6 4.6v3A3.7 3.7 0 0 0 13.3 11c2.4 0 4.2 2 4.2 4.4s-1.8 4.6-4.2 4.6h-2.6A4.7 4.7 0 0 1 6 15.3v-1.1"/><path d="M12.7 8.4c.7-1 .4-2-.6-2.9M15.8 7.6c.7-1 .4-2-.6-2.9"/></svg>',
   f_tube:'<svg class="i" viewBox="0 0 24 24"><path d="M8.5 3.2h7l1 2.4v13a2.2 2.2 0 0 1-2.2 2.2h-4.6A2.2 2.2 0 0 1 7.5 18.6v-13z"/><path d="M8.5 8.4h7"/><path d="M10.6 3.2V1.6h2.8v1.6"/></svg>',
@@ -1165,8 +1177,22 @@ function workedCard(s){
     <div class="wk-h">${I.check}<b>지난번에 효과 보신 약</b></div>
     <div class="wk-list">${ids.map(d => `<button class="wk" onclick="go('/drug/${d.id}')">
       ${imgTag(pimg((d.products || [])[0]?.name), 'wk-img', '')}
-      <span><b>${esc(ingrName(d))}</b><small>${esc(d.simple || '')}</small></span>${I.chev}</button>`).join('')}</div>
+      <span><b>${esc(prodName((d.products || [])[0]?.name) || ingrName(d))}</b><small>${esc(d.simple || '')}</small></span>${I.chev}</button>`).join('')}</div>
     <p class="small muted" style="margin-top:8px">이 기록은 이 기기에만 저장돼요. 같은 증상이라도 몸 상태가 달라졌으면 약사·의사와 다시 상의하세요.</p>
+  </section>`;
+}
+/* 첫 화면 — 적어 두신 «효과 본 약»이 있으면 제일 먼저 꺼내 드린다.
+   현욱님 지시(2026-09-19): 다음에 또 그 증상일 때 그 약을 바로 찾을 수 있어야 한다. */
+function workedHome(){
+  const rows = Object.entries(ME.worked || {})
+    .map(([sid, ids]) => ({ s: byId(D.symptoms, sid), ds: (ids || []).map(drug).filter(Boolean) }))
+    .filter(r => r.s && r.ds.length).slice(0, 3);
+  if (!rows.length) return '';
+  return `<section class="sec wk-home" aria-label="지난번에 효과 보신 약">
+    <h2><span>${I.check}지난번에 효과 보신 약</span></h2>
+    ${rows.map(r => `<button class="wk" onclick="go('/symptom/${r.s.id}')">
+      ${imgTag(pimg((r.ds[0].products || [])[0]?.name), 'wk-img', '')}
+      <span><b>${esc(r.s.name.split(' (')[0])}</b><small>${esc(r.ds.map(d => prodName((d.products || [])[0]?.name) || ingrName(d)).join(' · '))}</small></span>${I.chev}</button>`).join('')}
   </section>`;
 }
 function activeFlags(){ const f = Object.keys(ME).filter(k => k !== 'age' && k !== 'taking' && k !== 'child' && ME[k] === true); if (ME.age === 'senior') f.push('senior'); if (ME.age === 'child') f.push('child'); return f; }
@@ -1367,7 +1393,7 @@ function meWarnings(dr){
   if (!hits.length) return '';
   return `<div class="card" style="border-color:rgba(182,54,41,.25)"><div class="eyebrow" style="color:var(--alert)">내 정보 기준 확인</div>${hits.map(h => `<div class="note" style="${h.lv === 'stop' ? 'background:var(--alert-tint);color:var(--alert)' : ''};margin-bottom:8px">${I.alert}<span>${fmt(h.t)}</span></div>`).join('')}<p class="small muted">내 정보 탭에서 표시한 상태를 기준으로 골라낸 항목이에요. 최종 판단은 약사·의사와 함께 하세요.</p></div>`;
 }
-const PICT = { '식후':['meal','식후 복용'], '공복':['meal','공복 복용'], '졸음':['moon','졸음 주의'], '운전주의':['car','운전·기계 조작 주의'], '음주금지':['no','술과 함께 금지'], '임부주의':['user','임신 중 주의'], '소아주의':['user','소아 연령 제한'], '물많이':['drop','물 충분히'], '햇빛주의':['eye','햇빛 노출 주의'], '단기만':['clock','단기간만'] };
+const PICT = { '식후':['meal','식후 복용'], '공복':['meal','공복 복용'], '졸음':['moon','졸음 주의'], '운전주의':['car','운전·기계 조작 주의'], '음주금지':['no','술과 함께 금지'], '임부주의':['user','임신 중 주의'], '소아주의':['user','소아 연령 제한'], '물많이':['drop','물 충분히'], '햇빛주의':['eye','햇빛 노출 주의'], '단기만':['clock','단기간만'], '바르는약':['pill','바르는 약 — 먹지 마세요'], '넣는약':['pill','넣는 약 — 먹지 마세요'] };
 I.meal='<svg class="i" viewBox="0 0 24 24"><path d="M5 3v18M5 3c0 4 2 6 2 6s2-2 2-6M17 3v18M17 3c-2 0-3 3-3 6s1 3 3 3"/></svg>';
 I.kidney='<svg class="i" viewBox="0 0 24 24"><path d="M9 4C6 4 4.5 7 4.5 12S6 20 9 20c2 0 2.5-2 2.5-4v-2c0-2-.5-4-2.5-4"/><path d="M15 4c3 0 4.5 3 4.5 8S18 20 15 20c-2 0-2.5-2-2.5-4v-2c0-2 .5-4 2.5-4"/></svg>';
 I.liver='<svg class="i" viewBox="0 0 24 24"><path d="M3 9c0-2 2-4 5-4h8c3 0 5 2 5 4 0 4-4 9-9 9H9c-3 0-6-3-6-9z"/><path d="M12 5v6"/></svg>';
@@ -1609,7 +1635,12 @@ function speakAnswer(sid, btn){
   const buy = bk.map(x => `${x.slot}, ${prodName(x.product) || ingrName(x.d)}${x.optional ? ', 필요할 때만' : ''}`).join('. ');
   const how = (s.how || []).slice(0, 2).map(t => String(t).replace(/\*\*/g, '')).join(' ');
   const care = (s.care?.clinic || []).slice(0, 1).map(t => String(t).replace(/\*\*/g, '')).join('');
-  const text = `${s.name}. 이렇게 사시면 돼요. ${buy}. ${how} ${care ? '병원은, ' + care : ''}`;
+  const t3 = s.triage || {};
+  const plain = t => String(t || '').replace(/\*\*/g, '');
+  /* 살 약이 없는 증상은 «이렇게 사시면 돼요» 라고 읽으면 안 된다 */
+  const text = buy
+    ? `${s.name}. 이렇게 사시면 돼요. ${buy}. ${how} ${care ? '병원은, ' + care : ''}`
+    : `${s.name}. 약국에서 사실 약은 없어요. ${plain(t3.clinic)} ${plain(t3.escalate)}`;
   const u = new SpeechSynthesisUtterance(text); u.lang = 'ko-KR'; u.rate = 0.92;
   u.onend = () => { SPEAKING = null; btn?.classList.remove('on'); };
   SPEAKING = u; btn?.classList.add('on'); speechSynthesis.speak(u);
@@ -1631,10 +1662,10 @@ const GROUP_CLS = { '통증':'g-pain', '감기·호흡기':'g-resp', '소화기'
 const gcls = g => GROUP_CLS[g] || '';
 const ICON_BY_ID = { msk:'spine', dysmenorrhea:'flower', headache:'head', toothache:'tooth', sorethroat:'throat', cold:'coldnose', fever:'temp', cough:'cough', rhinitis:'nose',
   heartburn:'heartburn', dyspepsia:'stomach', diarrhea:'gutwave', constipation:'clock', motion:'car', allergy:'leaf', wound:'band', mouth:'lips', insomnia:'moon', dryeye:'eye',
-  hangover:'wine', arthritis:'joint', gout:'foot', cramp:'bolt', hemorrhoid:'drop', 'athletes-foot':'foot', shingles:'shield', bite:'bug', dizziness:'wave', stye:'eye',
-  gastroenteritis:'stomach', uti:'bladder', conjunctivitis:'eye', nosebleed:'nose', 'frozen-shoulder':'joint', incontinence:'bladder', bph:'user', osteoporosis:'bone',
-  sprain:'foot', tendon:'hand', plantar:'foot', coldsore:'lips', eczema:'hand', acne:'drop', vaginitis:'flower', pms:'flower', meno:'heart', fatigue:'moon',
-  drymouth:'drop', gumdisease:'tooth', ibs:'stomach', burn:'flame', numbness:'hand' };
+  hangover:'wine', arthritis:'joint', gout:'toe', cramp:'bolt', hemorrhoid:'drop', 'athletes-foot':'foot', shingles:'shield', bite:'bug', dizziness:'wave', stye:'eyelump',
+  gastroenteritis:'gutboth', uti:'bladder', conjunctivitis:'eyewet', nosebleed:'nose', 'frozen-shoulder':'shoulder', incontinence:'bladder', bph:'user', osteoporosis:'bone',
+  sprain:'band', tendon:'hand', plantar:'foot', coldsore:'lips', eczema:'hand', acne:'face', vaginitis:'flower', pms:'flower', meno:'heart', fatigue:'moon',
+  drymouth:'drop', gumdisease:'tooth', ibs:'stomach', burn:'flame', numbness:'numb', anxiety:'anxiety' };
 const sicon = s => icon(ICON_BY_ID[s.id] || s.icon);
 /* 계절·시간이 홈의 순서를 정한다. 12~2월엔 감기가, 7~8월엔 장염이 위로 */
 /* ───────── 오늘 날씨 — 기온·일교차·미세먼지가 곧 증상이다 ─────────
@@ -1776,13 +1807,17 @@ function vHome(){
     </div>
     ${ME.easy ? `<button class="big-btn soft" style="margin-top:12px" onclick="go('/schedule')"><div class="ic">${I.clock}</div><div><b>오늘 약 체크</b><span>드셨는지 표시하고 알림 받기</span></div></button>` : ''}
   </section>
+  ${workedHome()}
   <section class="sec ${gcls(sp.g)}" aria-label="오늘">
     <button class="today" onclick="go('/symptom/${sp.ids[0]}')"><div class="in"><div><div class="eb">${esc(sp.eb)} · 오늘의 한 장</div><b>${esc(sp.t)}</b><span>${esc(sp.d)}</span></div><div class="ic">${icon(sp.ico)}</div></div></button>
     ${wxCard()}
     <div class="today-row" aria-label="이 철에 많은 증상">${sp.ids.map(id => byId(D.symptoms, id)).filter(Boolean).map(x => `<button class="${gcls(x.group)}" onclick="go('/symptom/${x.id}')"><span class="ic">${sicon(x)}</span>${esc(x.name.split(' (')[0])}</button>`).join('')}</div>
   </section>
-  ${groups.map(g => { const items = (D.symptoms || []).filter(s => s.group === g && s.reviewed !== false); if (!items.length) return '';
-    return `<section class="sec ${gcls(g)}"><h2><span><span class="gdot"></span>${esc(g)}</span><small>${items.length}가지</small></h2><div class="tiles">${items.map(s => `<button class="tile" onclick="go('/symptom/${s.id}')"><div class="ic">${sicon(s)}</div><b>${esc(s.name)}</b><span>${esc(s.short || '')}</span></button>`).join('')}</div></section>`; }).join('')}
+  ${(() => { /* 53가지를 다 스크롤하지 않게 — 갈래로 바로 뛰는 줄 */
+    const gs = groups.filter(g => (D.symptoms || []).some(s => s.group === g && s.reviewed !== false));
+    return gs.length > 3 ? `<nav class="gjump" aria-label="갈래로 바로 가기">${gs.map((g, i) => `<button class="${gcls(g)}" onclick="jumpTo('grp${i}')"><span class="gdot"></span>${esc(g)}</button>`).join('')}</nav>` : ''; })()}
+  ${groups.map((g, i) => { const items = (D.symptoms || []).filter(s => s.group === g && s.reviewed !== false); if (!items.length) return '';
+    return `<section class="sec ${gcls(g)}" id="grp${i}"><h2><span><span class="gdot"></span>${esc(g)}</span><small>${items.length}가지</small></h2><div class="tiles">${items.map(s => `<button class="tile" onclick="go('/symptom/${s.id}')"><div class="ic">${sicon(s)}</div><b>${esc(s.name)}</b><span>${esc(s.short || '')}</span></button>`).join('')}</div></section>`; }).join('')}
   ${(() => { const wait = (D.symptoms || []).filter(s => s.reviewed === false); if (!wait.length) return '';
     return `<section class="sec g-etc"><h2><span><span class="gdot"></span>검수 대기</span><small>전문의 확인 전 ${wait.length}가지</small></h2>
       <p class="small muted" style="margin:-4px 0 10px">자료를 바탕으로 정리했지만 아직 의사 확인을 거치지 않았어요. 참고만 하시고 약사·의사와 상의하세요.</p>
@@ -1990,6 +2025,10 @@ const firstSentence = (t, n) => {
 };
 /* '병원은' 줄을 누르면 아래 케어 카드로 데려간다 */
 function openCare(){ const el = document.getElementById('care'); if (el) el.scrollIntoView({ behavior:'smooth', block:'start' }); }
+/* 홈에서 갈래 제목으로 뛴다 — 상단 바 높이만큼 띄워서 제목이 가리지 않게 */
+function jumpTo(id){ const el = document.getElementById(id); if (!el) return;
+  const y = el.getBoundingClientRect().top + window.scrollY - 12;
+  window.scrollTo({ top: y, behavior:'smooth' }); }
 let OPEN_BUY = '';
 /* 제품명 다듬기 — 여러 제품이 나열됐으면 첫 번째만, 괄호가 안 닫혔으면 잘라낸다 */
 function prodName(p){
@@ -2006,7 +2045,8 @@ function buyItem(x){
   /* 단일제가 없고 복합제 안에만 있는 성분은 제품명을 앞세우지 않는다 — 종합감기약을 두 번 사게 된다 */
   const title = x.d.combo ? ing : (prod || x.d.name);
   const sub = x.d.combo ? '이 성분이 든 제품: ' + prodNames(x.d, 2).join(' · ')
-    : (prod && ing !== prod ? ing : '');
+    /* 「콜대원 콜드에스 / 콜대원」처럼 되풀이되는 줄은 지운다 */
+    : (prod && ing && !prod.includes(ing) && !ing.includes(prod) ? ing : '');
   const badge = x.blocked ? '<span class="badge stop">약사와 상의</span>'
     : x.swapped === 'ach' ? '<span class="badge warn">부담 적은 쪽으로 바꿈</span>'
     : x.swapped ? '<span class="badge warn">조건에 맞춰 바꿈</span>'
@@ -2123,6 +2163,8 @@ function vSymptom(id){
     </div></div>`;
   };
   const clinic = (s.care?.clinic || []).slice(0, 2), er = (s.care?.er || []).slice(0, 1);
+  /* 약국에서 살 것이 없는 증상(저림·전립선·요실금 등)은 빈 장바구니를 보여 주지 않는다 */
+  const buyHtml = planRows(s); const noBuy = !buyHtml.trim();
   return `${topBar({ back:'증상', unreviewed:s.reviewed === false })}
   <div class="${gcls(s.group)}"><div class="eyebrow" style="color:var(--gfg,var(--primary))"><span class="gdot"></span>${esc(s.group)}</div>
   <h1>${esc(s.name)}</h1></div>
@@ -2130,8 +2172,8 @@ function vSymptom(id){
   ${workedCard(s)}
   ${fitChips(s)}
   <section class="sec answer" aria-label="바로 답">
-    <div class="ans-head"><div class="eyebrow">약국에서 이렇게 사세요</div><button class="speak" onclick="speakAnswer('${s.id}', this)" aria-label="핵심 읽어 주기">${I.info}읽어 주기</button></div>
-    <div class="buy">${planRows(s)}</div>
+    <div class="ans-head"><div class="eyebrow">${noBuy ? '약국에서 살 약은 없어요' : '약국에서 이렇게 사세요'}</div><button class="speak" onclick="speakAnswer('${s.id}', this)" aria-label="핵심 읽어 주기">${I.info}읽어 주기</button></div>
+    ${noBuy ? `<p class="nobuy">이 증상은 약국 약으로 해결되지 않아요. 위의 <b>병원에서는</b> 칸을 보시고, 아래 <b>약 없이 할 일</b>부터 챙기세요.</p>` : `<div class="buy">${buyHtml}</div>`}
     ${kidLine()}
     ${(() => { const w = [...dups, ...sameProductWarn(bk)]; return w.length ? `<div class="dup"><div class="dup-h">${I.alert}<b>사시기 전에 확인할 것 ${w.length}가지</b></div><ul class="plain">${w.map(t => `<li>${fmt(t)}</li>`).join('')}</ul></div>` : ''; })()}
     ${ixLine(bk.map(x => x.d))}
@@ -2139,15 +2181,15 @@ function vSymptom(id){
     ${takingItems().length ? '' : `<button class="bag-line sm" onclick="go('/me')">${I.pill}<span>지금 드시는 약이 있으면 알려 주세요 — 겹치는 성분을 걸러 드려요</span>${I.chev}</button>`}
     ${(() => { const rel = mixFor(bk.map(x => x.d)); return rel.length ? `<button class="mixline" onclick="go('/mix/${rel[0].id}')">${I.scale}<span>같이 드시는 약이 있다면 — <b>${esc(rel[0].t)}</b></span>${I.chev}</button>` : ''; })()}
     ${trafficLight(s.care)}
-    <div class="memo-actions" style="display:flex;gap:8px"><button class="btn" style="flex:1" onclick="go('/show/${s.id}')">${I.cart} 약국에서 보여드리기</button></div>
-    <div class="actions" style="margin-top:8px"><button class="btn line" onclick="go('/check/${s.id}')">${I.shield} 약사님이 다른 걸 권했어요</button></div>
+    ${noBuy ? '' : `<div class="memo-actions" style="display:flex;gap:8px"><button class="btn" style="flex:1" onclick="go('/show/${s.id}')">${I.cart} 약국에서 보여드리기</button></div>
+    <div class="actions" style="margin-top:8px"><button class="btn line" onclick="go('/check/${s.id}')">${I.shield} 약사님이 다른 걸 권했어요</button></div>`}
   </section>
   ${s.reviewed === false ? `<div class="note" style="margin-top:16px">${I.alert}<span><b>아직 전문의 검수를 받지 않은 내용이에요.</b> 자료(진료지침·식약처 허가사항)를 바탕으로 정리했지만, 다른 화면과 달리 의사 확인을 거치지 않았습니다. 참고만 하시고 약사·의사와 꼭 상의하세요.</span></div>` : ''}
+  ${doRows(s)}
   <button class="more-btn" onclick="MORE_OPEN=!MORE_OPEN;route()" aria-expanded="${MORE_OPEN}">
     <span>${MORE_OPEN ? '− 설명 접기' : '+ 추가 설명'}</span>
     <small>${MORE_OPEN ? '' : '이 증상을 자세히 · 진료실에서 쓰는 방식 · 드시는 법 · 자주 묻는 질문'}</small>
   </button>
-  ${doRows(s)}
   ${MORE_OPEN ? `
   <p class="lead-p">${fmt(s.lead)}</p>
   <section class="sec">
