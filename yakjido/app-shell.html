@@ -1628,7 +1628,9 @@ function planDup(bk){
     return { x, es: es.filter(e => { if (seen.has(e.k)) return false; seen.add(e.k); return true; }) };
   });
   /* 같은 «둘 중 하나» 묶음에 든 자리끼리는 겹침이 아니다 — 화면이 이미 하나만 고르라고 말한다 */
-  const sameEither = (a, b) => a.x.either && a.x.either === b.x.either;
+  /* 같은 «둘 중 하나» 묶음이거나, 같은 약을 «7일 뒤에 한 번 더» 드시는 자리는 겹침이 아니다
+     (구충제가 그렇다 — 요충은 알이 남아 다시 깨어나므로 같은 약을 한 번 더 쓴다) */
+  const sameEither = (a, b) => (a.x.either && a.x.either === b.x.either) || a.x.again || b.x.again;
   const across = rs => rs.some((a, i) => rs.slice(i + 1).some(b => !sameEither(a, b)));
   const label = r => `**${prodName(r.x.product) || ingrName(r.x.d)}**(${r.x.slot} 칸)`;
   /* 1. 똑같은 성분이 두 자리에 — 모르고 두 배를 드시게 되는 자리 */
@@ -2324,7 +2326,7 @@ function basket(s){
       if (soft) { pick = soft; d = drug(soft); swapped = 'ach'; }
     }
     const achWarn = ME.age === 'senior' && achOfDrug(d) >= 3;
-    return { slot: p.slot, i: p._i, d, optional: !!p.optional, either: p.either || '', swapped, achWarn, blocked: d ? bad(pick) : false,
+    return { slot: p.slot, i: p._i, d, optional: !!p.optional, either: p.either || '', swapped, achWarn, blocked: d ? bad(pick) : false, again: !!p.again,
              product: (p.prod && (d?.products || []).some(pr => pr.name === p.prod) ? p.prod : d?.products?.[0]?.name) };
   }).filter(x => x.d);
 }
@@ -4058,7 +4060,28 @@ function vAbout(){
   const S = D.sources || {};
   return `${topBar({ back:'내 정보' })}<h1>근거와 검수 기준</h1>
   <section class="sec card"><h2>이렇게 만들었어요</h2>${list(D.meta?.method || [])}</section>
-  <section class="sec card"><h2>참고 문헌·지침 <small>${Object.keys(S).length}건</small></h2><div class="rows">${Object.entries(S).map(([k, s]) => `<a class="row" href="${esc(s.url)}" target="_blank" rel="noopener" style="text-decoration:none"><div class="body"><b>${fmt(s.label)}</b><span>${esc(s.type || '')}${s.note ? ' · ' + esc(s.note) : ''}</span></div>${I.link}</a>`).join('')}</div></section>
+  ${(() => {
+    /* 출처 242건을 한 줄로 늘어놓으면 화면이 25,000픽셀(폰 30장)이 된다 —
+       종류별로 묶고 접어 둔다. 코크란·메타분석처럼 «근거가 센 것»을 맨 위로. */
+    const ORDER = ['코크란 리뷰', '메타분석', '우산 리뷰', '체계적 고찰', '무작위 비교 시험', '진료 지침', '종설', '후향 연구', '관찰 연구', '허가사항', '기타'];
+    const g = new Map();
+    for (const [k, v] of Object.entries(S)) {
+      let t = String(v.type || '기타').trim();
+      if (/허가|식약처|e약은요/.test(t)) t = '허가사항';
+      if (!ORDER.includes(t)) t = ORDER.includes(t) ? t : (/지침|가이드/.test(t) ? '진료 지침' : /코크란/.test(t) ? '코크란 리뷰' : t);
+      if (!g.has(t)) g.set(t, []);
+      g.get(t).push([k, v]);
+    }
+    const keys = [...g.keys()].sort((a, b) => {
+      const ia = ORDER.indexOf(a), ib = ORDER.indexOf(b);
+      return (ia < 0 ? 99 : ia) - (ib < 0 ? 99 : ib);
+    });
+    const row = ([k, v]) => `<a class="row" href="${esc(v.url)}" target="_blank" rel="noopener" style="text-decoration:none"><div class="body"><b>${fmt(v.label)}</b><span>${esc(v.type || '')}${v.note ? ' · ' + esc(v.note) : ''}</span></div>${I.link}</a>`;
+    return `<section class="sec"><h2>참고 문헌·지침 <small>${Object.keys(S).length}건</small></h2>
+      <p class="small muted" style="margin-bottom:8px">근거가 센 것부터 묶어 두었어요. 갈래를 누르면 펼쳐집니다.</p>
+      ${keys.map(t => `<details class="acc"><summary>${esc(t)}<small>${g.get(t).length}건</small>${I.chev}</summary><div class="bd"><div class="rows">${g.get(t).map(row).join('')}</div></div></details>`).join('')}
+    </section>`;
+  })()}
   ${disclaimer()}`;
 }
 
