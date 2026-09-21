@@ -48,7 +48,7 @@ for r in IX['rules']:
     if not r.get('organ') or r['organ']['ico'] not in icons: fails.append(f'규칙 {r["id"]} 장기 아이콘 없음 → {r.get("organ")}')
     if not re.search(r'\*\*', r.get('why', '') + r.get('do', '')): pass
 def route_ok(link):
-    m = re.match(r'^/(symptom|drug|class|supp|kinds|tips|me|schedule|pill|photo|together|bag|kids|mix|about|drugs|hello)(?:/([^?]+))?', link or '')
+    m = re.match(r'^/(symptom|drug|class|supp|kinds|tips|me|schedule|pill|photo|together|bag|kids|mix|about|drugs|hello|senior|rxout)(?:/([^?]+))?', link or '')
     if not m: return False
     kind, x = m.group(1), m.group(2)
     if kind == 'symptom': return x in sid

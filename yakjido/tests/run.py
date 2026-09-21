@@ -14,6 +14,7 @@
   6. 병용 판정 시나리오 5건 (삼중고·와파린·전립선·치매약+방광약·혈압약 모름)
   7. 항콜린 이중 계산 0 (식약처 2.4만 제품 전수)
   8. 이름 검색 8건 (베시케어·하루날디·타이레놀·TY 500 …)
+  8c. 구어·띄어쓰기 오타 12건 (「타이 레놀」·「머리아파」·「소화제」 — 어르신이 실제로 치는 말)
   9. 홈 날씨 카드 — Open-Meteo 응답을 모의로 넣어 일교차·미세먼지 문구가 뜨는지
 
 Playwright 와 Chromium 이 필요하다. 실패는 마지막에 모아서 보여 주고 종료 코드 1.
@@ -78,7 +79,7 @@ def main():
         pg.route('**/air-quality-api.open-meteo.com/**', lambda rt: rt.fulfill(status=200, content_type='application/json', body=AQ))
         pg.goto(url); pg.wait_for_timeout(1200)
         pg.evaluate("localStorage.setItem('yakjido.hello.v1','1');localStorage.setItem('yakjido.me.v1',JSON.stringify({age:'senior',taking:['cls:bp.arb'],pub:{}}))")
-        routes = pg.evaluate("()=>['/home','/drugs','/tips','/me','/together','/kinds','/kinds/bp','/pill','/supp','/kids','/mix','/hello/1','/hello/3','/photo','/schedule','/about','/bag','/rxout']" +
+        routes = pg.evaluate("()=>['/home','/drugs','/tips','/me','/together','/kinds','/kinds/bp','/pill','/supp','/kids','/mix','/hello/1','/hello/3','/photo','/schedule','/about','/bag','/rxout','/senior']" +
                              ".concat(D.symptoms.map(s=>'/symptom/'+s.id)).concat(D.drugs.map(d=>'/drug/'+d.id)).concat(D.classes.map(c=>'/class/'+c.id)).concat(D.classes.map(c=>'/drugs?cat='+c.id))")
         # 1~3. 모든 화면
         for r in routes:
@@ -151,11 +152,16 @@ def main():
         r8b = pg.evaluate("async()=>{ await lexLoad(true); return Object.fromEntries(['인사돌','타이레놀','감기','변비','오메가3'].map(q=>[q,(search(q)[0]||{}).k])); }")
         for q, want in {'인사돌': '제품', '타이레놀': '제품', '감기': '증상', '변비': '증상', '오메가3': '영양제'}.items():
             if r8b.get(q) != want: fails.append(f'검색 순위 "{q}" 첫 결과 {r8b.get(q)!r} (기대: {want})')
+        # 8c. 어르신이 실제로 치는 말 — 띄어쓰기 오타와 구어. 하나라도 0건이면 검색이 죽은 것이다
+        SAY = ['타이 레놀', '이부 프로펜', '머리아파', '배아파', '목아파', '잠이안와', '소화제', '감기약', '무좀약', '변비약', '어지러워', '속쓰려']
+        r8c = pg.evaluate("(L)=>Object.fromEntries(L.map(q=>[q,search(q).length]))", SAY)
+        zero = [q for q, n in r8c.items() if not n]
+        if zero: fails.append(f'구어 검색 0건: {zero}')
         br.close()
     print(f'화면 {len(routes)}개 검사 완료')
     if fails:
         print('실패', len(fails)); [print('  ✗', f) for f in fails]; sys.exit(1)
-    print('✓ 전부 통과 — JS 오류 0 · 넘침 0 · 잘림 0 · 명암비 AA · 44px · 어르신 모드 · 병용 5건 · 이중계산 0 · 검색 8건')
+    print('✓ 전부 통과 — JS 오류 0 · 넘침 0 · 잘림 0 · 명암비 AA · 44px · 어르신 모드 · 병용 5건 · 이중계산 0 · 검색 8건 · 구어 12건')
 
 if __name__ == '__main__':
     main()

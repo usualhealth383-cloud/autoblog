@@ -74,7 +74,15 @@ for ic in (ROOT / 'icons').glob('*'):
 
 # ── 앱 아이콘 ──────────────────────────────────────────────────────────────
 # art/icon-1024.png 이 있으면 그것으로 각 크기의 아이콘을 다시 만든다(없으면 icons/ 의 기존 것 유지).
+# 원본이 SVG 면 크기마다 «다시 그린다» — 키우고 줄여도 테두리가 뭉개지지 않는다.
 src_icon = None
+svg_icon = ROOT / 'art' / 'icon.svg'
+if svg_icon.exists():
+    try:
+        import cairosvg, io as _io
+        cairosvg.svg2png(url=str(svg_icon), write_to=str(ROOT / 'art' / 'icon-1024.png'), output_width=1024, output_height=1024)
+    except Exception as e:
+        print('아이콘 SVG 굽기 건너뜀:', e)
 for ext in ('.png', '.webp', '.jpg'):
     f = ROOT / 'art' / ('icon-1024' + ext)
     if f.exists(): src_icon = f; break
@@ -86,9 +94,18 @@ if src_icon:
             side = min(im.width, im.height); im = im.crop((0, 0, side, side))
         bg = Image.new('RGBA', im.size, (250, 248, 243, 255))
         bg.alpha_composite(im); im = bg.convert('RGB')
-        for size, name in ((1024, 'icon-1024.png'), (512, 'icon-512.png'), (192, 'icon-192.png'), (180, 'icon-180.png')):
-            im.resize((size, size), Image.LANCZOS).save(pages / name, 'PNG')
-        im.resize((512, 512), Image.LANCZOS).save(pages / 'icon-maskable-512.png', 'PNG')
+        sizes = ((1024, 'icon-1024.png'), (512, 'icon-512.png'), (192, 'icon-192.png'), (180, 'icon-180.png'))
+        mask_svg = ROOT / 'art' / 'icon-maskable.svg'
+        if svg_icon.exists():
+            import cairosvg
+            for size, name in sizes:
+                cairosvg.svg2png(url=str(svg_icon), write_to=str(pages / name), output_width=size, output_height=size)
+            # 마스크용은 안드로이드가 동그랗게 잘라낸다 — 그림을 줄여 둔 판을 따로 쓴다
+            cairosvg.svg2png(url=str(mask_svg if mask_svg.exists() else svg_icon), write_to=str(pages / 'icon-maskable-512.png'), output_width=512, output_height=512)
+        else:
+            for size, name in sizes:
+                im.resize((size, size), Image.LANCZOS).save(pages / name, 'PNG')
+            im.resize((512, 512), Image.LANCZOS).save(pages / 'icon-maskable-512.png', 'PNG')
         print('앱 아이콘 재생성 ← art/' + src_icon.name)
     except Exception as e:
         print('아이콘 재생성 건너뜀:', e)
