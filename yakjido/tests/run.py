@@ -134,6 +134,13 @@ def main():
             pg.goto(url + '#' + r); pg.reload(); pg.wait_for_timeout(700)
             txt = pg.evaluate("()=>[...document.querySelectorAll('.ixline,.ix-h b')].map(x=>x.innerText).join(' | ')")
             if kw not in txt: fails.append(f'병용 시나리오 {picks} → "{kw}" 없음: {txt[:80]}')
+        # 5d. 입력칸에는 이름표가 있어야 한다 — 자리표시 글자만으로는 화면낭독기가 못 읽는다.
+        #     모든 화면 위에 떠 있는 검색칸이 그 상태였다.
+        nolab = []
+        for r in SC + ['/pill', '/me', '/supp/vitd', '/kids', '/about']:
+            pg.goto(url + '#' + r); pg.wait_for_timeout(320)
+            nolab += [f'{r}:{x}' for x in pg.evaluate("()=>[...document.querySelectorAll('#view input,#view select,#view textarea')].filter(e=>e.type!=='hidden'&&!e.getAttribute('aria-label')&&!(e.labels&&e.labels.length)).map(e=>e.id||e.name||e.placeholder||e.tagName)")]
+        if nolab: fails.append(f'이름표 없는 입력칸 {len(nolab)}: {nolab[:4]}')
         # 6-0. 약 123개가 «성분»으로 풀려야 한다. 안 풀리면 그 약은 병용 판정·항콜린 계산에서
         #      통째로 빠진다 — 실제로 33개가 그 상태였고 화면에는 아무 표시가 없었다.
         nores = pg.evaluate("()=>(D.drugs||[]).filter(d=>!ingOf({d}).ings.length).map(d=>d.id)")
@@ -224,7 +231,7 @@ def main():
     print(f'화면 {len(routes)}개 검사 완료')
     if fails:
         print('실패', len(fails)); [print('  ✗', f) for f in fails]; sys.exit(1)
-    print('✓ 전부 통과 — JS 오류 0 · 넘침 0 · 잘림 0 · 명암비 AA · 44px · 어르신 모드 · 320px · 병용 8건 · 성분 해석 123 · 죽은 규칙 0 · 약통 판정 4건 · 자기중복 3건 · 바구니 겹침 · 이중계산 0 · 검색 8건 · 구어 12건 · 문장 16건')
+    print('✓ 전부 통과 — JS 오류 0 · 넘침 0 · 잘림 0 · 명암비 AA · 44px · 어르신 모드 · 320px · 병용 8건 · 입력칸 이름표 · 성분 해석 123 · 죽은 규칙 0 · 약통 판정 4건 · 자기중복 3건 · 바구니 겹침 · 이중계산 0 · 검색 8건 · 구어 12건 · 문장 16건')
 
 if __name__ == '__main__':
     main()

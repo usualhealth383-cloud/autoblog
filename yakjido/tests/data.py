@@ -146,6 +146,17 @@ for d in D:
     if not d.get('children') and not (d.get('dose') or {}).get('child'):
         fails.append(f'약 {d["id"]} 에 소아 기준이 비어 있습니다')
 
+# 「내 정보」 조건 이름은 정해진 13가지뿐이다. 없는 이름을 쓰면 그 주의는 «영원히 안 뜬다».
+# 실제로 달걀 알레르기에 없는 이름(allergy)을 쓴 곳이 있었다.
+VALID_FLAG = {'pregnant', 'ulcer', 'heart', 'anticoag', 'kidney', 'liver', 'alcohol',
+              'asthma', 'glaucoma', 'bph', 'gout', 'diabetes', 'senior', 'child'}
+for d in D:
+    for a in (d.get('avoid') or []) + (d.get('caution') or []):
+        if not isinstance(a, dict): continue
+        for fl in (a.get('flags') or []):
+            if fl not in VALID_FLAG:
+                fails.append(f'약 {d["id"]} 에 없는 조건 이름 «{fl}» — 이 주의는 화면에 뜨지 않습니다')
+
 print(f'증상 {len(S)} · 약 {len(D)} · 계열 {len(K)} · 영양제 {len(SUP)} · 팁 {len(T)} · 규칙 {len(IX["rules"])} · 출처 {len(SRC)}')
 if fails:
     print('실패', len(fails)); [print('  ✗', f) for f in fails]; sys.exit(1)

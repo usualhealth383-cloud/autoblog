@@ -1077,7 +1077,9 @@ nav.tabbar button.on svg.i{stroke-width:2.2}
 /* 화면 이동 뒤 제목에 옮긴 초점 — 화면낭독기용이라 눈에 보이는 테두리는 뺀다(키보드 탭으로 온 초점은 아니다) */
 #view h1[tabindex="-1"]:focus{outline:none;box-shadow:none}
 /* 종이로 뽑기 — 한 장 화면은 카드만, 나머지는 숨긴다 */
-@media print{nav.tabbar,.top,.topfind,.actions,.disclaimer,.netbar,#cmpbar,.eyebrow{display:none!important}.app,#view{max-width:none;padding:0}.show-card{box-shadow:none;border:1.5px solid #333;break-inside:avoid;page-break-inside:avoid}.show-big{border:1px solid #999}body{background:#fff;color:#000}h1{font-size:18pt}}
+/* 종이에 찍히면 안 되는 것 — 누를 수 없는 단추와 상단 바.
+   「메모로 복사·전송」·「종이로 뽑기」·「자세한 판정 보기」가 그대로 찍히고 있었다. */
+@media print{nav.tabbar,.top,.topfind,.actions,.disclaimer,.netbar,#cmpbar,.eyebrow,.back,.speak,.tabs,.quick,.today-row,.memo-actions,.search,.acc>summary svg,.more-btn,.act,.tog-cta,.btn{display:none!important}details.acc,details.why-more,details.pub-more{display:block!important}details[open]>.bd,details>.bd{display:block!important}.app,#view{max-width:none;padding:0}.show-card{box-shadow:none;border:1.5px solid #333;break-inside:avoid;page-break-inside:avoid}.show-big{border:1px solid #999}body{background:#fff;color:#000}h1{font-size:18pt}}
 /* 내 약통 줄 — 며칠만 토글 + 빼기 */
 .bag-rows{margin-top:var(--s3)}
 .bag-row{display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid var(--hairline)} .bag-row:last-child{border-bottom:0}
@@ -1275,7 +1277,7 @@ const ME_DEF = { child:null, age:'adult', pregnant:false, ulcer:false, kidney:fa
 let ME = { ...ME_DEF };
 try { ME = { ...ME_DEF, ...(JSON.parse(localStorage.getItem(ME_KEY) || '{}')) }; } catch (e) {}
 const saveMe = () => { try { localStorage.setItem(ME_KEY, JSON.stringify(ME)); } catch (e) {} };
-const FLAG_LABEL = { pregnant:'임신·수유 중', ulcer:'위궤양·위장출혈 병력', kidney:'신장 질환', liver:'간 질환·음주', heart:'심장·혈관 질환', asthma:'천식', anticoag:'항응고제·항혈소판제 복용', alcohol:'술을 자주 마심', gout:'통풍', glaucoma:'녹내장', bph:'전립선비대', senior:'65세 이상', child:'소아' };
+const FLAG_LABEL = { pregnant:'임신·수유 중', ulcer:'위궤양·위장출혈 병력', kidney:'신장 질환', liver:'간 질환·음주', heart:'심장·혈관 질환', asthma:'천식', anticoag:'항응고제·항혈소판제 복용', alcohol:'술을 자주 마심', gout:'통풍', glaucoma:'녹내장', bph:'전립선비대', diabetes:'당뇨', senior:'65세 이상', child:'소아' };
 /* 「이 약, 효과 봤어요」 — 증상마다 내가 효과 본 약을 기억해 둔다.
    현욱님 지시(2026-09-17): 다음에 같은 증상이 오면 지난번에 들었던 약부터 보여 준다.
    기기에만 저장되고 어디로도 보내지 않는다. */
@@ -1541,7 +1543,7 @@ const topBar = (opts = {}) => `
     <div class="brand"><div class="mark"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.6a6.6 6.6 0 0 1 6.6 6.6c0 4.4-4.8 9.2-6.3 12a.35.35 0 0 1-.6 0C10.2 18.4 5.4 13.6 5.4 9.2A6.6 6.6 0 0 1 12 2.6Z"/><rect x="7.9" y="6.2" width="8.2" height="5.2" rx="2.6" transform="rotate(-42 12 8.8)" fill="none"/><path d="M12 6.2v5.2" transform="rotate(-42 12 8.8)"/></svg></div><div><b>약지도</b><span>증상에 맞는 약, 의사가 고르듯</span></div></div>`}
     ${opts.unreviewed ? `<span class="review-stamp wait">${I.alert}검수 대기</span>` : `<span class="review-stamp">${I.shield}${esc(D.meta?.reviewLabel || '의료진 검수')} · ${esc(D.meta?.reviewed || '')}</span>`}
   </div>
-  ${opts.nosearch ? '' : `<div class="topfind">${I.search}<input id="gq" placeholder="증상·약 이름으로 찾기 (예: 허리, 타이레놀)" autocomplete="off" enterkeyhint="search" value="${esc(GQ)}"><button class="gq-x ${GQ ? '' : 'hide'}" onclick="GQ='';route()" aria-label="지우기">${I.x}</button></div>`}<!--TOPEND-->`;
+  ${opts.nosearch ? '' : `<div class="topfind">${I.search}<input id="gq" aria-label="증상이나 약 이름으로 찾기" placeholder="증상·약 이름으로 찾기 (예: 허리, 타이레놀)" autocomplete="off" enterkeyhint="search" value="${esc(GQ)}"><button class="gq-x ${GQ ? '' : 'hide'}" onclick="GQ='';route()" aria-label="지우기">${I.x}</button></div>`}<!--TOPEND-->`;
 /* 출처 칩은 «저자·연도»까지만. 예전 규칙은 괄호 «(»에서만 잘라서, «—»로 쓴 출처 44개가
    문장째로 화면에 깔렸다(어지럼 화면이 출처 문단 여섯 개로 끝나고 있었다).
    연도(19xx·20xx)를 만나면 거기서 끊고, 연도가 없으면 «—»·«·» 앞에서 끊는다. */
@@ -2272,7 +2274,7 @@ const FLAG_Q = {
   heart:'고혈압·심장병이 있어요', anticoag:'피를 묽게 하는 약(항응고제·아스피린)을 먹어요',
   kidney:'신장이 안 좋아요', liver:'간이 안 좋아요', alcohol:'술을 자주 드세요',
   asthma:'천식이 있어요', glaucoma:'녹내장이 있어요', bph:'전립선이 커요(소변 줄기가 약해요)',
-  gout:'통풍이 있어요', senior:'65세 이상이에요', child:'소아·청소년(15세 미만)이에요'
+  gout:'통풍이 있어요', diabetes:'당뇨가 있어요', senior:'65세 이상이에요', child:'소아·청소년(15세 미만)이에요'
 };
 const isAgeFlag = k => k === 'senior' || k === 'child';
 const flagOn = k => isAgeFlag(k) ? ME.age === k : !!ME[k];
@@ -3177,10 +3179,10 @@ function vHello(step){
     ${skip}`;
   }
   if (n === 2) {
-    const KEYS = ['heart', 'ulcer', 'kidney', 'liver', 'anticoag', 'glaucoma', 'bph', 'asthma', 'alcohol', 'gout', 'pregnant'];
+    const KEYS = ['heart', 'diabetes', 'ulcer', 'kidney', 'liver', 'anticoag', 'glaucoma', 'bph', 'asthma', 'alcohol', 'gout', 'pregnant'];
     const on = KEYS.filter(k => ME[k]).length;
     return `${topBar({ back:'이전', nosearch:true })}${dots}
-    <h2 class="hello-q">해당하는 것이 있으면 눌러 주세요</h2>
+    <h1 class="hello-q">해당하는 것이 있으면 눌러 주세요</h1>
     <p class="hello-sub">이걸 알면 <b>위험한 조합을 미리 걸러</b> 드릴 수 있어요. 해당하는 것이 없으면 그냥 넘어가셔도 됩니다.</p>
     <div class="hello-chips">${KEYS.map(k => `<button class="hello-chk ${ME[k] ? 'on' : ''}" aria-pressed="${!!ME[k]}" onclick="ME['${k}']=!ME['${k}'];saveMe();route()"><span class="bx">${ME[k] ? I.check : ''}</span>${esc(FLAG_Q[k])}</button>`).join('')}</div>
     <p class="privacy">${I.lock}이 기기에만 저장되고 어디로도 전송되지 않아요.</p>
@@ -3476,7 +3478,7 @@ function vPill(){
   </div>
   <section class="sec card">
     <h2>이름 또는 새겨진 글자 <small>띄어쓰기·대소문자·O/0 구분 안 해도 돼요</small></h2>
-    <div class="search" style="margin-top:10px">${I.search}<input id="pq" placeholder="예: 베시케어, 타이레놀, TY 500" value="${esc(PILLQ.txt)}" autocomplete="off" style="font-size:1.25rem;letter-spacing:.05em;min-width:0;max-width:100%"></div>
+    <div class="search" style="margin-top:10px">${I.search}<input id="pq" aria-label="약 이름이나 알약에 새겨진 글자" placeholder="예: 베시케어, 타이레놀, TY 500" value="${esc(PILLQ.txt)}" autocomplete="off" style="font-size:1.25rem;letter-spacing:.05em;min-width:0;max-width:100%"></div>
     <p class="small muted" style="margin-top:7px">약봉투·약 상자에 적힌 이름 그대로 치셔도 되고, 용량까지 적으셔도 돼요(베시케어 5mg). <b>한글 이름을 치시면 처방약도 함께 찾습니다.</b></p>
     <h2 style="margin-top:16px">모양</h2>
     <div class="shape-grid">${Object.keys(SHAPES_SVG).map(x => `<button class="shape-btn ${PILLQ.sh === x ? 'on' : ''}" onclick="PILLQ.sh=PILLQ.sh==='${x}'?'':'${x}';route()"><svg viewBox="0 0 28 28">${SHAPES_SVG[x]}</svg>${x.replace('형', '')}</button>`).join('')}</div>
@@ -4045,14 +4047,14 @@ function vMe(){
     <div class="bag-rows">${takingItems().map(x => `<div class="bag-row"><div class="t"><b>${esc(x.name)}</b><span>${esc(x.short ? '며칠만 — 항콜린 부담은 절반으로 셌어요' : x.approx ? '종류만 담았어요 (대략)' : x.simple || '')}</span></div><button class="dur ${x.short ? 'on' : ''}" aria-pressed="${!!x.short}" onclick="toggleShort('${x.id}')">${x.short ? I.check + ' ' : ''}며칠만</button><button class="rm" aria-label="${esc(x.name)} 빼기" onclick="${x.id.startsWith('pub:') ? `togglePub('${x.id.slice(4)}')` : x.id.startsWith('cls:') ? `toggleQuick('${x.id.slice(4)}')` : `toggleTaking('${x.id}')`}">${I.x}</button></div>`).join('') || `<div class="empty-bag">${I.check}<span>약통이 비어 있어요 — <b>좋은 일이죠.</b> 감기약 하나라도 드시게 되면 여기 담아 두세요. 그때부터 겹치는 성분을 봐 드려요.</span></div>`}</div>
     <div class="actions two"><button class="btn ghost" onclick="go('/photo')">${I.eye} 사진으로 등록</button><button class="btn ghost" onclick="go('/pill')">${I.search} 이름·알약으로</button></div>
     <div class="actions"><button class="btn line" onclick="go('/kinds')">${I.pill} 약 이름을 모르시나요 — 종류만 골라도 돼요</button></div>
-    <div class="search" style="margin-top:12px">${I.search}<input id="mq" placeholder="약 이름으로 찾아 등록 (예: 타이레놀)" value="${esc(MQ)}" autocomplete="off"></div>
+    <div class="search" style="margin-top:12px">${I.search}<input id="mq" aria-label="약 이름으로 찾아 내 약통에 등록" placeholder="약 이름으로 찾아 등록 (예: 타이레놀)" value="${esc(MQ)}" autocomplete="off"></div>
     ${MQ.trim() ? `<div class="card rows" style="margin-top:8px">${(search(MQ.trim()).filter(h => h.h.startsWith('/drug/')).slice(0, 6).map(h => { const id = h.h.slice(6); const on = (ME.taking || []).includes(id); return `<button class="row" onclick="${on ? '' : `toggleTaking('${id}');`}MQ='';route()"><div class="ic">${I.pill}</div><div class="body"><b>${esc(h.t)}</b><span>${on ? '이미 등록돼 있어요' : '눌러서 내 약통에 담기'}</span></div>${I.chev}</button>`; }).join('')) || '<div class="empty">찾는 약이 없어요</div>'}</div>` : ''}
     ${takingItems().length ? `<p class="small muted" style="margin-top:8px">항생제·감기약처럼 <b>며칠만</b> 드시는 약은 ‘며칠만’을 눌러 두세요. 매일 드시는 약과 구분해서 부담을 셉니다.</p><button class="tog-cta" onclick="go('/together')">${I.shield}<div><b>같이 먹어도 되나요</b><span>담아 두신 ${takingItems().length}가지를 성분으로 풀어서 서로 부딪히는 자리를 봐 드려요</span></div>${I.chev}</button><button class="tog-cta" onclick="go('/bag')">${I.eye}<div><b>내 약 목록 한 장</b><span>진료실·약국에서 큰 글씨로 보여 드리세요</span></div>${I.chev}</button>` : ''}
     ${achPanel([], { always:true })}
     <div class="actions"><button class="btn ghost" onclick="go('/schedule')">${I.clock} 복용 시간 알림 만들기</button></div>
   </section>
   <section class="sec card"><h2>알아두면 좋은 것</h2><p class="small" style="margin-top:6px">상품명과 성분명, 해열제는 치료가 아니라는 것, 소염제는 한 가지만 — 짧은 건강정보 ${(D.tips || []).length}가지.</p><div class="actions"><button class="btn ghost" onclick="go('/tips')">${I.info} 읽어 보기</button></div></section>
-  <section class="sec card"><h2>사진 서버 <small class="muted" style="font-weight:500;font-size:.8125rem">관리자용</small></h2><p class="small" style="margin-top:6px">사진 읽기(Gemini) 서버 주소예요. yakjido/server 를 배포한 뒤 붙여 넣으세요. 비워 두면 기본값(${esc(D.meta?.photoEndpoint || '없음')}).</p><div class="search" style="margin-top:10px">${I.link}<input id="ep" placeholder="https://<워커이름>.workers.dev" value="${esc((() => { try { return localStorage.getItem('yakjido.photo') || ''; } catch (e) { return ''; } })())}" onchange="try{localStorage.setItem('yakjido.photo',this.value.trim())}catch(e){};toast('저장했어요')"></div></section>
+  <section class="sec card"><h2>사진 서버 <small class="muted" style="font-weight:500;font-size:.8125rem">관리자용</small></h2><p class="small" style="margin-top:6px">사진 읽기(Gemini) 서버 주소예요. yakjido/server 를 배포한 뒤 붙여 넣으세요. 비워 두면 기본값(${esc(D.meta?.photoEndpoint || '없음')}).</p><div class="search" style="margin-top:10px">${I.link}<input id="ep" aria-label="사진 서버 주소" placeholder="https://<워커이름>.workers.dev" value="${esc((() => { try { return localStorage.getItem('yakjido.photo') || ''; } catch (e) { return ''; } })())}" onchange="try{localStorage.setItem('yakjido.photo',this.value.trim())}catch(e){};toast('저장했어요')"></div></section>
   <section class="sec card"><h2>이 앱에 대해</h2><p class="small" style="margin-top:6px">${esc(D.meta?.about || '')}</p><div class="actions"><button class="btn line" onclick="go('/about')">근거·검수 기준 보기</button></div></section>
   <p class="small muted" style="margin-top:16px;text-align:center">약지도 v${esc(D.meta?.version || '')} · 빌드 ${BUILD}<br>식약처 공공데이터 — e약은요 ${esc(String(D.public?.easy_source || '').match(/\d{8}/)?.[0] || '')} · 낱알식별 ${esc(String(D.public?.pills_source || '').match(/\d{8}/)?.[0] || '')} 기준</p>`;
 }
