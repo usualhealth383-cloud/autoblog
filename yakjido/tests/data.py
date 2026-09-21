@@ -60,6 +60,23 @@ def route_ok(link):
 for t in T:
     if t.get('link') and not route_ok(t['link']): fails.append(f'팁 {t["id"]} 링크 없음 → {t["link"]}')
     if not t.get('link'): fails.append(f'팁 {t["id"]} 링크 비어 있음(갈 곳을 달아 주세요)')
+# 처방약 대체는 «약국에서 살 수 있는 약»만 — 자기 자신이나 다른 처방약이 들어가면 화면이 거짓말을 한다
+byid = {d['id']: d for d in D}
+for d in D:
+    a = d.get('otcAlt') or {}
+    for o in (a.get('options') or []):
+        t = byid.get(o)
+        if o == d['id']: fails.append(f'대체 약 {d["id"]}: 자기 자신을 대체로 넣었습니다')
+        elif not t: fails.append(f'대체 약 {d["id"]}: 없는 약 → {o}')
+        elif t.get('rx') == '전문': fails.append(f'대체 약 {d["id"]}: 전문의약품을 대체로 넣었습니다 → {o}')
+    if a.get('has') and not (a.get('options') or a.get('text')): fails.append(f'대체 약 {d["id"]}: 있다고만 하고 무엇인지 비어 있습니다')
+    if d.get('rx') == '전문' and not d.get('otcAlt'): fails.append(f'처방약 {d["id"]}: otcAlt 가 없습니다(약국에 없으면 has:false 로 적어 주세요)')
+
+# 팁에는 갈래(group)가 있어야 «알아두면 좋은 것» 화면에서 제자리에 들어간다
+TIPG = {'약 이름과 고르기', '제대로 드시는 법', '조심할 것', '열·감기·배탈일 때', '보관하고 버리기', '병원·헌혈 가실 때'}
+for t in T:
+    if t.get('group') not in TIPG: fails.append(f'팁 {t["id"]} 갈래가 비었거나 모르는 이름 → {t.get("group")!r}')
+
 # 통계 약어가 어르신 화면에 그대로 나오면 안 된다 — 영양제 「어디까지 입증됐나」(evidenceNote)와 출처 문구만 예외
 JARGON = re.compile(r'\b(NNT|NNH|RR|HR|OR|SMD|CI|P\s*[=<]|I²|RCT|n=)\b')
 def jargon(o, path, owner):
