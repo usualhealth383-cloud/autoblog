@@ -81,7 +81,11 @@ def main():
         AQ = json.dumps({"current": {"pm10": 92.0, "pm2_5": 41.0}})
         pg.route('**/api.open-meteo.com/**', lambda rt: rt.fulfill(status=200, content_type='application/json', body=FC))
         pg.route('**/air-quality-api.open-meteo.com/**', lambda rt: rt.fulfill(status=200, content_type='application/json', body=AQ))
-        pg.goto(url); pg.wait_for_timeout(1200)
+        def ready(ms=8000):
+            # 본문 자료(data/core.json)는 첫 화면이 뜬 뒤에 받는다 — 다 받을 때까지 기다린다
+            try: pg.wait_for_function('window.__READY__===true', timeout=ms)
+            except Exception: fails.append('본문 자료(core.json)를 못 받았습니다 — ' + pg.url)
+        pg.goto(url); ready(); pg.wait_for_timeout(1200)
         pg.evaluate("localStorage.setItem('yakjido.hello.v1','1');localStorage.setItem('yakjido.me.v1',JSON.stringify({age:'senior',taking:['cls:bp.arb'],pub:{}}))")
         routes = pg.evaluate("()=>['/home','/drugs','/tips','/me','/together','/kinds','/kinds/bp','/pill','/supp','/kids','/mix','/hello/1','/hello/3','/photo','/schedule','/about','/bag','/rxout','/senior']" +
                              ".concat(D.symptoms.map(s=>'/symptom/'+s.id)).concat(D.drugs.map(d=>'/drug/'+d.id)).concat(D.classes.map(c=>'/class/'+c.id)).concat(D.classes.map(c=>'/drugs?cat='+c.id))")
@@ -110,7 +114,7 @@ def main():
         # 5b. 어르신 모드(글자 20px·큰 단추) — 넘침·잘림은 큰 글씨에서 먼저 터진다
         pg.evaluate("localStorage.setItem('yakjido.fs','20px');localStorage.setItem('yakjido.me.v1',JSON.stringify({age:'senior',easy:true,taking:['cls:bp.arb','ibuprofen'],pub:{}}))")
         for r in SC + ['/bag', '/schedule', '/symptom/cramp', '/symptom/sprain', '/drug/acetaminophen', '/kinds/bp']:
-            pg.goto(url + '#' + r); pg.reload(); pg.wait_for_timeout(500)
+            pg.goto(url + '#' + r); pg.reload(); ready(); pg.wait_for_timeout(500)
             o = pg.evaluate(OVERFLOW_JS)
             if o['ov']: fails.append(f'어르신 모드 가로 넘침 {r}: {o["ov"]}')
             if o['clip']: fails.append(f'어르신 모드 글자 잘림 {r}: {o["clip"]}')
@@ -118,7 +122,7 @@ def main():
         #     낱알 검색칸과 소아 화면 단추가 실제로 화면을 넘고 있었다.
         pg.set_viewport_size({'width': 320, 'height': 640})
         for r in SC + ['/pill', '/kids', '/kinds', '/bag', '/schedule', '/symptom/fever', '/symptom/motion']:
-            pg.goto(url + '#' + r); pg.reload(); pg.wait_for_timeout(420)
+            pg.goto(url + '#' + r); pg.reload(); ready(); pg.wait_for_timeout(420)
             o = pg.evaluate(OVERFLOW_JS)
             if o['ov']: fails.append(f'좁은 화면 가로 넘침 {r}: {o["ov"][:2]}')
             if o['clip']: fails.append(f'좁은 화면 글자 잘림 {r}: {o["clip"][:2]}')
@@ -131,7 +135,7 @@ def main():
                   (['ster.pred'], '/symptom/msk', '스테로이드')]
         for picks, r, kw in CASES:
             pg.evaluate("(p)=>localStorage.setItem('yakjido.me.v1',JSON.stringify({age:'senior',taking:p.map(x=>'cls:'+x),pub:{}}))", picks)
-            pg.goto(url + '#' + r); pg.reload(); pg.wait_for_timeout(700)
+            pg.goto(url + '#' + r); pg.reload(); ready(); pg.wait_for_timeout(700)
             txt = pg.evaluate("()=>[...document.querySelectorAll('.ixline,.ix-h b')].map(x=>x.innerText).join(' | ')")
             if kw not in txt: fails.append(f'병용 시나리오 {picks} → "{kw}" 없음: {txt[:80]}')
         # 5d. 입력칸에는 이름표가 있어야 한다 — 자리표시 글자만으로는 화면낭독기가 못 읽는다.
@@ -154,7 +158,7 @@ def main():
                    (['cls:resp.luka', 'ibuprofen'], 'nsaid-asthma-med'), (['cls:ster.pred', 'ibuprofen'], 'steroid-nsaid')]
         for taking, rid in MEDCASE:
             pg.evaluate("(t)=>localStorage.setItem('yakjido.me.v1',JSON.stringify({age:'senior',taking:t,pub:{}}))", taking)
-            pg.goto(url + '#/together'); pg.reload(); pg.wait_for_timeout(600)
+            pg.goto(url + '#/together'); pg.reload(); ready(); pg.wait_for_timeout(600)
             ids = pg.evaluate("()=>ixRun().hits.map(h=>h.r.id)")
             if rid not in ids: fails.append(f'약통으로 걸려야 할 규칙이 안 뜸 {taking} → {rid} (뜬 것: {ids})')
         # 6b. 한 통이 «자기 자신과» 겹쳤다고 세면 안 된다 — 복합제는 약 이름과 속 성분이 둘 다 잡힌다.
@@ -162,13 +166,13 @@ def main():
         SELF = [(['relax-combo'], 'sed-load'), (['cold-combo'], 'sed-load'), (['antihist-1g'], 'ach-load')]
         for picks, rid in SELF:
             pg.evaluate("(p)=>localStorage.setItem('yakjido.me.v1',JSON.stringify({age:'senior',taking:p,pub:{}}))", picks)
-            pg.goto(url + '#/together'); pg.reload(); pg.wait_for_timeout(700)
+            pg.goto(url + '#/together'); pg.reload(); ready(); pg.wait_for_timeout(700)
             ids = pg.evaluate("()=>ixRun().hits.map(h=>h.r.id)")
             if rid in ids: fails.append(f'한 통이 자기 자신과 겹침 {picks} → {rid} 떴음')
         # 6c. 우리가 권하는 바구니가 «스스로» 겹치지 않는지 — 약통을 등록하지 않은 분께도 보여야 한다.
         #     감기 화면이 타이레놀과 콜대원(아세트아미노펜 함유)을 나란히 권하던 것을 이 검사가 잡는다.
         pg.evaluate("()=>localStorage.setItem('yakjido.me.v1',JSON.stringify({age:'senior',taking:[],pub:{}}))")
-        pg.goto(url + '#/home'); pg.reload(); pg.wait_for_timeout(700)
+        pg.goto(url + '#/home'); pg.reload(); ready(); pg.wait_for_timeout(700)
         pdup = pg.evaluate("()=>Object.fromEntries((D.symptoms||[]).map(s=>[s.id,planDup(basket(s))]).filter(x=>x[1].length))")
         KNOWN = {'msk', 'headache', 'arthritis'}      # 에텐자미드(근이완 복합제) — 본문에 설명을 달아 둔 자리
         for sid, msgs in pdup.items():
@@ -177,7 +181,7 @@ def main():
         for sid in KNOWN:
             if sid not in pdup: fails.append(f'{sid} 소염 성분 겹침 경고가 사라짐 — 규칙이 죽었는지 확인')
         # 9. 날씨 카드
-        pg.goto(url + '#/home'); pg.reload(); pg.wait_for_timeout(1000)
+        pg.goto(url + '#/home'); pg.reload(); ready(); pg.wait_for_timeout(1000)
         wx = pg.evaluate("()=>document.querySelector('.wx')?.innerText||''")
         for kw in ['일교차', '14℃', '미세먼지', '나쁨']:
             if kw not in wx: fails.append(f'날씨 카드에 "{kw}" 없음: {wx[:80]!r}')
@@ -185,7 +189,7 @@ def main():
         pg.unroute('**/api.open-meteo.com/**'); pg.unroute('**/air-quality-api.open-meteo.com/**')
         cnt = [0]
         pg.route('**/*open-meteo.com/**', lambda rt: (cnt.__setitem__(0, cnt[0] + 1), rt.abort()))
-        pg.evaluate("localStorage.removeItem('yakjido.wx.v1')"); pg.goto(url + '#/home'); pg.reload(); pg.wait_for_timeout(3000)
+        pg.evaluate("localStorage.removeItem('yakjido.wx.v1')"); pg.goto(url + '#/home'); pg.reload(); ready(); pg.wait_for_timeout(3000)
         if cnt[0] > 6: fails.append(f'날씨 실패 시 요청 반복 {cnt[0]}회/3초 (6회 이하여야)')
         wx = pg.evaluate("()=>document.querySelector('.wx')?.innerText||''")
         if '못 받았어요' not in wx: fails.append(f'날씨 실패 문구 없음: {wx[:60]!r}')

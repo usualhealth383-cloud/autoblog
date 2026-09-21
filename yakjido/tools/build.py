@@ -54,12 +54,40 @@ for stale in (artdst.glob('*') if artdst.exists() else []):      # 지운 그림
     if stale.stem not in found: stale.unlink()
 data['art'] = found
 
-j = json.dumps(data, ensure_ascii=False, separators=(',', ':')).replace('</', '<\\/')
+# ── 첫 화면 자료와 나머지를 나눈다 ────────────────────────────────────────
+# 첫 화면(어디가 불편하세요 · 증상 타일 · 검색)에 필요한 것은 «이름·갈래·아이콘·
+# 한 줄 설명»뿐이다. 나머지 본문(계획·복용법·출처 …)은 data/core.json 으로 빼서
+# 화면이 뜬 뒤에 받는다. 받아 오면 같은 객체에 그대로 덧씌우므로(Object.assign)
+# 화면 함수는 하나도 바꾸지 않아도 된다.
+SLIM = {
+    'symptoms':    ['id', 'group', 'icon', 'name', 'short', 'tags', 'reviewed'],
+    'drugs':       ['id', 'name', 'en', 'class', 'rx', 'tagline', 'simple', 'tags'],
+    'supplements': ['id', 'name', 'en', 'tags', 'brands', 'evidence'],
+    'classes':     ['id', 'name', 'short', 'icon'],
+}
+CORE_KEYS = ['sources', 'ingredients', 'interactions', 'kids', 'productImages', 'suppRules']
+inline, core = {}, {}
+for k, v in data.items():
+    if k in SLIM:
+        fs = SLIM[k]
+        inline[k] = [{f: o[f] for f in fs if f in o} for o in v]
+        rest = [{f: o[f] for f in o if f not in fs or f == 'id'} for o in v]
+        core[k] = [o for o in rest if len(o) > 1]
+    elif k in CORE_KEYS:
+        core[k] = v
+    else:
+        inline[k] = v                       # meta · art · public · tips 는 작아서 그대로 둔다
+
+jc = json.dumps(core, ensure_ascii=False, separators=(',', ':'))
+j = json.dumps(inline, ensure_ascii=False, separators=(',', ':')).replace('</', '<\\/')
 stamp = datetime.date.today().isoformat()
 out = shell.replace('<!--DATA-->', j).replace('__BUILD__', stamp)
 pages = ROOT.parent / 'docs' / 'yakjido'
 pages.mkdir(parents=True, exist_ok=True)
 (pages / 'index.html').write_text(out, encoding='utf-8')
+(pages / 'data').mkdir(parents=True, exist_ok=True)
+(pages / 'data' / 'core.json').write_text(jc, encoding='utf-8')
+print(f'첫 화면 {len(out)/1024:.0f} KB · 본문 data/core.json {len(jc)/1024:.0f} KB')
 # 서비스워커 캐시 이름을 빌드마다 갱신
 sw = ROOT / 'sw.js'
 if sw.exists():

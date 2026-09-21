@@ -28,7 +28,9 @@ for f in sorted((ROOT/'art').glob('*.webp')):
 # 미리보기(아티팩트)에서는 파일 내려받기가 막혀 있어 달력 파일 버튼을 안내 문구로 바꾼다 — 설치한 앱에서는 그대로 동작
 s = s.replace("onclick=\"downloadIcs()\">${I.clock} 받기</button>", "onclick=\"toast('달력 파일은 설치한 약지도 앱에서 받을 수 있어요')\">${I.clock} 앱에서</button>")
 s = s.replace('<img src="art/${n}.webp"', '<img src="${ART_DATA[n] || ("art/" + n + ".webp")}"')
+# 아티팩트는 파일 하나라 서버가 없다 — 본문 자료(core.json)도 같이 심는다
 inject = ('<script>const ART_DATA = ' + json.dumps(art) + ';\n'
+          "window.__CORE__ = " + (ROOT/'data/core.json').read_text() + ';\n'
           "window.__PILLS__ = " + (ROOT/'data/pills.json').read_text() + ';\n'
           "window.__EASY__ = "  + (ROOT/'data/easy-index.json').read_text() + ';\n'
           "window.__LEX__ = {ing:" + (ROOT/'data/lexicon.json').read_text()

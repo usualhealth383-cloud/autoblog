@@ -157,6 +157,51 @@ for d in D:
             if fl not in VALID_FLAG:
                 fails.append(f'약 {d["id"]} 에 없는 조건 이름 «{fl}» — 이 주의는 화면에 뜨지 않습니다')
 
+# ── 항콜린 점수는 출처 없이 붙이지 않는다 ─────────────────────────────────
+# 카페인·이소프로필안티피린·에텐자미드에 «어르신 조심» 뜻으로 ach=1 이 붙어 있었다.
+# 게보린 한 알이 그것만으로 2점을 만들어, 진짜 항콜린제의 신호를 묽게 하고 있었다.
+_ING = json.load(open(C / 'ingredients.json', encoding='utf-8'))
+_OKSRC = {'ACB', 'KABS', '확인 필요'}
+for _e in _ING.get('ing', []):
+    if _e.get('ach'):
+        if _e.get('achSrc') not in _OKSRC:
+            fails.append(f'성분 {_e.get("k")} 의 항콜린 점수에 출처 표시가 없습니다(ACB·KABS·확인 필요 중 하나)')
+    else:
+        for _f in ('achSrc', 'achNote', 'achAlt'):
+            if _e.get(_f):
+                fails.append(f'성분 {_e.get("k")} 에 점수 없이 {_f} 만 남아 있습니다 — 화면에 안 나오는 죽은 자료입니다')
+
+# ── 영양제 계산기와 글이 서로 다른 숫자를 말하면 안 된다 ────────────────────
+# 비타민 C 의 상한이 «35 mg»(아연 값)으로 적혀 있었고, 아연 계산기는 한국 상한 35 mg 을
+# 두고 40 mg 에서야 빨개졌다. 계산기 설명(note)에 적힌 mg 과 실제 경계를 맞춰 본다.
+_mgre = re.compile(r'([\d,]+(?:\.\d+)?)\s*mg[^.]{0,12}상한')
+for _x in SUP:
+    _c = _x.get('calc') or {}
+    if not (_c.get('typical') and _c.get('ulRatio')): continue
+    _edge = _c['typical'] * _c['ulRatio']
+    for _f in ('note', 'caveat'):
+        for _n in _mgre.findall(_c.get(_f) or ''):
+            _v = float(_n.replace(',', ''))
+            if abs(_v - _edge) > 0.01:
+                fails.append(f'영양제 {_x["id"]} — 계산기는 {_edge:g} mg 에서 경계인데 설명은 «{_v:g} mg 이 상한»이라고 합니다')
+
+# ── 첫 화면이 가벼운지 — 어르신은 데이터가 느린 곳에서 여신다 ──────────────
+# 본문을 data/core.json 으로 뺀 뒤 첫 내려받기가 1.47 MB → 0.5 MB 가 됐다(v84).
+# 다시 통째로 심는 실수를 하면 여기서 걸린다.
+import gzip as _gz
+_idx = ROOT.parent / 'docs' / 'yakjido' / 'index.html'
+_core = ROOT.parent / 'docs' / 'yakjido' / 'data' / 'core.json'
+if _idx.exists():
+    _b = _idx.read_bytes(); _gzkb = len(_gz.compress(_b, 6)) / 1024
+    if _gzkb > 220:
+        fails.append(f'첫 화면이 무겁습니다 — index.html 압축 {_gzkb:.0f} KB (한계 220 KB). 본문은 data/core.json 으로 빼야 합니다')
+    if not _core.exists():
+        fails.append('docs/yakjido/data/core.json 이 없습니다 — 빌드를 다시 돌리세요')
+    else:
+        _c = json.loads(_core.read_text(encoding='utf-8'))
+        for _k in ('symptoms', 'drugs', 'sources', 'ingredients', 'interactions'):
+            if not _c.get(_k): fails.append(f'core.json 에 {_k} 가 비어 있습니다')
+
 print(f'증상 {len(S)} · 약 {len(D)} · 계열 {len(K)} · 영양제 {len(SUP)} · 팁 {len(T)} · 규칙 {len(IX["rules"])} · 출처 {len(SRC)}')
 if fails:
     print('실패', len(fails)); [print('  ✗', f) for f in fails]; sys.exit(1)

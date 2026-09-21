@@ -1195,6 +1195,33 @@ main>*:nth-child(2){animation-delay:.04s} main>*:nth-child(3){animation-delay:.0
 /* ───────── 데이터·유틸 ───────── */
 const D = JSON.parse(document.getElementById('data').textContent || '{}');
 const BUILD = '__BUILD__';
+/* ── 본문 자료는 첫 화면이 뜬 뒤에 받는다 ──────────────────────────────
+   첫 화면에 필요한 것은 증상·약의 «이름·갈래·아이콘·한 줄»뿐이라 그것만 심어 두고,
+   계획·복용법·주의·출처 같은 본문은 data/core.json 으로 뺐다. 받아 오면
+   «같은 객체에 덧씌우기»(Object.assign)라서 화면 함수는 그대로 쓴다.
+   아티팩트(파일 하나로 여는 판)는 서버가 없어 window.__CORE__ 에 심어 둔다. */
+let CORE = 0, CORE_P = null;          /* 0 아직 · 1 받는 중 · 2 준비됨 · 3 실패 */
+function mergeCore(c){
+  for (const k of ['symptoms', 'drugs', 'supplements', 'classes']) {
+    const by = new Map((D[k] || []).map(x => [x.id, x]));
+    (c[k] || []).forEach(o => { const t = by.get(o.id); if (t) Object.assign(t, o); else (D[k] = D[k] || []).push(o); });
+  }
+  for (const k of ['sources', 'ingredients', 'interactions', 'kids', 'productImages', 'suppRules'])
+    if (c[k]) D[k] = c[k];
+  CORE = 2; window.__READY__ = true;
+  /* 첫 화면을 이미 그린 뒤에 자료가 왔다면 — 약통 개수처럼 본문이 있어야 맞는 것들을 다시 그린다 */
+  try { if (typeof route === 'function' && document.getElementById('view')?.innerHTML) route(); } catch (e) {}
+}
+function ensureCore(){
+  if (CORE_P) return CORE_P;
+  CORE = 1;
+  if (window.__CORE__) { mergeCore(window.__CORE__); return (CORE_P = Promise.resolve()); }
+  CORE_P = fetch('data/core.json').then(r => { if (!r.ok) throw 0; return r.json(); })
+    .then(mergeCore).catch(() => { CORE = 3; });
+  return CORE_P;
+}
+/* 첫 화면을 그리는 것과 동시에 시작한다 — 기다리는 시간이 겹치게 */
+ensureCore();
 const byId = (arr, id) => (arr || []).find(x => x.id === id);
 /* 사전에만 있는 성분도 조합에 넣을 수 있게 — 'lex:id' 는 최소한의 약 객체로 만들어 준다 */
 function lexAsDrug(lid){
@@ -1506,6 +1533,17 @@ function route(){
   const q = Object.fromEntries(new URLSearchParams(qs || ''));
   const tab = { show:'home', check:'home', home:'home', symptom:'home', drugs:'drugs', drug:'drugs', class:'drugs', search:'drugs', pub:'drugs', pill:'drugs', guide:'home', kids:'home', tips:'home', schedule:'me', photo:'drugs', pillinfo:'drugs', supp:'supp', compare:'supp', me:'me', about:'me', ingr:'drugs', brand:'drugs', nut:'supp', hello:'home', mix:'drugs', together:'me', kinds:'me', rxout:'drugs', senior:'drugs' }[seg[0]] || 'home';
   document.querySelectorAll('nav.tabbar button').forEach(b => b.classList.toggle('on', b.dataset.tab === tab));
+  /* 본문 자료가 아직이면 — 첫 화면과 인사만 먼저 그리고, 나머지는 받은 뒤에 다시 그린다.
+     기다리는 동안에도 상단 바와 뒤로 가기는 살아 있어야 한다. */
+  if (CORE !== 2 && !CORE_SAFE.has(seg[0])) {
+    if (CORE === 3) {
+      view.innerHTML = topBar({ back:'뒤로', nosearch:true }) + `<section class="sec"><div class="empty card"><b>자료를 불러오지 못했어요</b>인터넷 연결을 확인하고 <button class="btn line" onclick="CORE=0;CORE_P=null;ensureCore().then(route)">다시 시도</button></div></section>`;
+      return;
+    }
+    view.innerHTML = topBar({ back:'뒤로', nosearch:true }) + `<section class="sec"><p class="loading">자료를 불러오는 중이에요…</p></section>`;
+    ensureCore().then(route);
+    return;
+  }
   const R = { show:vShow, check:vCheck, home:vHome, symptom:vSymptom, drugs:vDrugs, drug:vDrug, class:vClass, search:vSearch, pub:vPub, pill:vPill, guide:vGuide, kids:vKids, tips:vTips, schedule:vSchedule, photo:vPhoto, pillinfo:vPillInfo, supp:vSupp, compare:vCompare, me:vMe, about:vAbout, ingr:vIngr, brand:vBrand, nut:vNut, hello:vHello, mix:vMix, together:vTogether, kinds:vKinds, bag:vBag, rxout:vRxOut, senior:vSenior };
   const html = (R[seg[0]] || vHome)(seg[1], q);
   const panel = gqPanel();
@@ -1521,6 +1559,8 @@ function route(){
   ROUTE_PREV = path;
 }
 let ROUTE_PREV = '';
+/* 본문 자료 없이도 온전히 그려지는 화면 — 첫 화면과 첫 인사뿐이다 */
+const CORE_SAFE = new Set(['home', 'hello', '']);
 const HIST = [], SCROLL = {};
 window.addEventListener('scroll', () => { SCROLL[LASTPATH] = window.scrollY; }, { passive:true });
 window.addEventListener('hashchange', route);
@@ -1831,7 +1871,7 @@ function achPanel(extra, opts){
         items.some(x => x.prn) ? `<p class="small muted">‘도움될 수 있어요’·‘며칠만’ 드시는 약은 <b>절반</b>으로 셌어요. 점수는 용량·기간을 보지 못하니, 매일 드시는 약이 많을수록 실제 부담은 더 큽니다.</p>` : '',
         /* 척도 원문에서 확인하지 못한 성분은 그렇다고 적는다 — 점수는 판정이 아니라 상의할 거리다 */
         (() => { const ck = items.filter(x => x.e.achSrc === '확인 필요'); return ck.length
-          ? `<p class="small muted">${esc(ck.map(x => x.e.n).join(' · '))}${josa(ck[ck.length - 1].e.n, '은', '는')} 국제 척도 원문에서 <b>아직 확인하지 못한 성분</b>이에요. 점수에는 넣었지만 <b>확실하지 않습니다</b>.</p>` : ''; })(),
+          ? `<p class="small muted">${esc(ck.map(x => x.e.n).join(' · '))}${josa(ck[ck.length - 1].e.n, '은', '는')} 척도 원문에서 직접 확인하지 못하고 <b>같은 계열 약의 점수를 따랐어요.</b> 점수에는 넣었지만 <b>확실하지 않습니다</b>.</p>` : ''; })(),
       ].filter(Boolean).join('');
       if (!detail) return '';
       return opts.compact
