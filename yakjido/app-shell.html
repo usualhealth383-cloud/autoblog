@@ -483,6 +483,20 @@ details.acc .bd{padding:0 var(--s4) var(--s4)}
 .gjump button{display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:46px;padding:0 14px;border-radius:999px;background:var(--card);border:1px solid var(--hairline);color:var(--text);font-size:.9375rem;font-weight:700;line-height:1.3;cursor:pointer;max-width:100%}
 .gjump button .gdot{width:8px;height:8px;border-radius:50%;background:var(--gfg,var(--primary));flex:0 0 auto}
 .pub-qa p,.qa p{white-space:pre-line}
+/* 처방약이 떨어졌을 때 — 약국에서 가장 가까운 것 */
+.rxout{margin-top:var(--s4);padding:var(--s4);border-radius:var(--r-card);border:1px solid var(--hairline);background:var(--card)}
+.rxout.yes{border-color:var(--normal);background:var(--normal-tint)}
+.rxout.no{border-color:var(--hairline);background:var(--tint2)}
+.ro-h{display:flex;align-items:center;gap:8px;font-size:1rem;margin-bottom:var(--s2)}
+.rxout.yes .ro-h{color:var(--normal)} .rxout.no .ro-h{color:var(--muted)}
+.ro-h svg{width:20px;height:20px;flex:0 0 auto}
+.rxout>p{font-size:.9375rem;line-height:1.65;color:var(--text);word-break:keep-all}
+.ro-list{display:flex;flex-direction:column;gap:var(--s2);margin-top:var(--s3)}
+.ro{display:flex;align-items:center;gap:var(--s3);width:100%;min-height:52px;padding:var(--s3);background:var(--card);border:1px solid var(--hairline);border-radius:var(--r-input);text-align:left;cursor:pointer}
+.ro>span{flex:1;min-width:0}
+.ro b{display:block;font-size:1rem;font-weight:700}
+.ro small{display:block;font-size:.8125rem;color:var(--muted);overflow-wrap:anywhere}
+.ro svg{width:18px;height:18px;color:var(--muted);flex:0 0 auto}
 .tl1{display:flex;align-items:center;gap:var(--s3);width:100%;min-height:56px;margin-top:var(--s4);padding:var(--s3) var(--s4);background:var(--alert-tint);border:1px solid var(--alert);border-radius:var(--r-card);color:var(--alert);text-align:left;cursor:pointer}
 .tl1>svg:first-child{width:22px;height:22px;flex:0 0 auto}
 .tl1>span{flex:1;min-width:0}
@@ -1348,9 +1362,9 @@ function route(){
   if (path !== LASTPATH) { SCROLL[LASTPATH] = window.scrollY; GQ = ''; LASTPATH = path; }
   const seg = path.split('/');
   const q = Object.fromEntries(new URLSearchParams(qs || ''));
-  const tab = { show:'home', check:'home', home:'home', symptom:'home', drugs:'drugs', drug:'drugs', class:'drugs', search:'drugs', pub:'drugs', pill:'drugs', guide:'home', kids:'home', tips:'home', schedule:'me', photo:'drugs', pillinfo:'drugs', supp:'supp', compare:'supp', me:'me', about:'me', ingr:'drugs', brand:'drugs', nut:'supp', hello:'home', mix:'drugs', together:'me', kinds:'me' }[seg[0]] || 'home';
+  const tab = { show:'home', check:'home', home:'home', symptom:'home', drugs:'drugs', drug:'drugs', class:'drugs', search:'drugs', pub:'drugs', pill:'drugs', guide:'home', kids:'home', tips:'home', schedule:'me', photo:'drugs', pillinfo:'drugs', supp:'supp', compare:'supp', me:'me', about:'me', ingr:'drugs', brand:'drugs', nut:'supp', hello:'home', mix:'drugs', together:'me', kinds:'me', rxout:'drugs' }[seg[0]] || 'home';
   document.querySelectorAll('nav.tabbar button').forEach(b => b.classList.toggle('on', b.dataset.tab === tab));
-  const R = { show:vShow, check:vCheck, home:vHome, symptom:vSymptom, drugs:vDrugs, drug:vDrug, class:vClass, search:vSearch, pub:vPub, pill:vPill, guide:vGuide, kids:vKids, tips:vTips, schedule:vSchedule, photo:vPhoto, pillinfo:vPillInfo, supp:vSupp, compare:vCompare, me:vMe, about:vAbout, ingr:vIngr, brand:vBrand, nut:vNut, hello:vHello, mix:vMix, together:vTogether, kinds:vKinds, bag:vBag };
+  const R = { show:vShow, check:vCheck, home:vHome, symptom:vSymptom, drugs:vDrugs, drug:vDrug, class:vClass, search:vSearch, pub:vPub, pill:vPill, guide:vGuide, kids:vKids, tips:vTips, schedule:vSchedule, photo:vPhoto, pillinfo:vPillInfo, supp:vSupp, compare:vCompare, me:vMe, about:vAbout, ingr:vIngr, brand:vBrand, nut:vNut, hello:vHello, mix:vMix, together:vTogether, kinds:vKinds, bag:vBag, rxout:vRxOut };
   const html = (R[seg[0]] || vHome)(seg[1], q);
   const panel = gqPanel();
   view.innerHTML = panel ? insertPanel(html, panel) : html;
@@ -2085,6 +2099,18 @@ function doItem(p){
     <span class="bi-t"><b>${esc(p.title || p.slot)}</b><small>${esc(firstSentence(p.why, 58))}</small></span>
     <span class="bi-r"><span class="badge cvs rx">약 없이</span></span></div>`;
 }
+/* 처방약 화면의 「약국에서 가장 가까운 것」 — 처방약이 떨어졌을 때 무엇을 살 수 있는지.
+   없으면 없다고 분명히 말한다(항생제·호르몬·요산약이 그렇다). */
+function otcAltCard(d){
+  const a = d.otcAlt; if (!a) return '';
+  const opts = (a.options || []).map(drug).filter(Boolean);
+  return `<section class="rxout ${a.has ? 'yes' : 'no'}" aria-label="약국에서 가장 가까운 것">
+    <div class="ro-h">${a.has ? I.pill : I.no}<b>${a.has ? '약국에서 가장 가까운 것' : '약국에는 대신할 약이 없어요'}</b></div>
+    <p>${fmt(a.text)}</p>
+    ${opts.length ? `<div class="ro-list">${opts.map(o => `<button class="ro" onclick="go('/drug/${o.id}')">
+      <span><b>${esc(ingrName(o))}</b><small>${esc(o.simple || o.tagline || '')}</small></span>${I.chev}</button>`).join('')}</div>` : ''}
+  </section>`;
+}
 /* 증상 맨 위 세 줄 — 병원에서는 / 약국에서는 / 이럴 땐 병원으로.
    현욱님 지시(2026-09-17): 약을 보여 주기 전에 "이 증상을 어떻게 보는지"를 먼저 알려 준다. */
 function triageCard(s){
@@ -2717,6 +2743,7 @@ function vDrugs(_, q){
   <h1>약 사전</h1><p style="margin-top:6px">성분 기준으로 정리했어요. 제품 이름이 달라도 성분이 같으면 같은 약이에요.</p>
   <button class="tile wide" style="margin-top:12px" onclick="go('/pill')"><div class="ic">${I.eye}</div><div><b>이 알약이 무슨 약인지 찾기</b><span>모양·색·각인으로 식약처 낱알 ${(D.public?.pills_count || 0).toLocaleString()}건 검색</span></div>${I.chev}</button>
   <button class="tile wide" onclick="go('/mix')"><div class="ic">${I.scale}</div><div><b>같이 먹어도 되나요</b><span>혈압약과 진통제, 항생제와 유산균, 한방약 겹침 — ${(D.public?.mixes_count || 0)}가지</span></div>${I.chev}</button>
+  <button class="tile wide" onclick="go('/rxout')"><div class="ic">${I.cross}</div><div><b>처방받은 약이 떨어졌어요</b><span>약국에서 이어 갈 수 있는 것과 없는 것 — 처방약 ${(D.drugs || []).filter(d => d.otcAlt).length}가지</span></div>${I.chev}</button>
   <button class="tile wide" onclick="lexLoad();document.getElementById('gq')?.focus()"><div class="ic">${I.book || I.search}</div><div><b>제품 이름으로 찾기</b><span>게보린·판피린·훼스탈처럼 아시는 이름으로 — 제품 ${(D.public?.brands_count || 0).toLocaleString()}개 · 성분 ${(D.public?.lexicon_count || 0).toLocaleString()}가지</span></div>${I.chev}</button>
   <div class="tabs">${cats.map(([k, n]) => `<button class="tab ${cat === k ? 'on' : ''}" onclick="go('/drugs?cat=${k}')">${esc(n)}</button>`).join('')}</div>
   ${cat !== 'all' && cat !== 'cvs' && cls(cat) ? `<button class="tile wide" style="margin-bottom:12px" onclick="go('/class/${cat}')"><div class="ic">${I.scale}</div><div><b>${esc(cls(cat).name)} 한눈에 비교</b><span>${esc(cls(cat).short2 || '위장·심혈관 부담, 지속시간, 구입 방법')}</span></div>${I.chev}</button>` : ''}
@@ -2724,6 +2751,24 @@ function vDrugs(_, q){
       return `<section class="sec"><h2><span>${esc(c.name)}</span><small>${L.length}가지</small></h2><div class="card rows">${L.slice(0, 3).map(rowOf).join('')}${L.length > 3 ? `<button class="row more" onclick="go('/drugs?cat=${c.id}')"><div class="ic">${I.chev}</div><div class="body"><b>${L.length - 3}가지 더 보기</b><span>${esc(L.slice(3).map(ingrName).join(' · '))}</span></div></button>` : ''}</div></section>`; }).join('')
    : `<div class="card rows">${items.map(d => `<button class="row" onclick="go('/drug/${d.id}')">${(() => { const pr = (d.products || []).find(x => pimg(x.name)); return pr ? imgTag(pimg(pr.name), 'pimg', pr.name) : `<div class="ic">${icon(cls(d.class)?.icon || 'pill')}</div>`; })()}<div class="body"><b>${esc(d.name)} <span style="display:inline;color:var(--faint);font-weight:500">${esc(d.en || '')}</span></b><span>${esc((d.for || []).join(' · '))}</span>${useTag(d)}</div>${badge(d.rx)}</button>`).join('') || '<div class="empty">아직 등록된 약이 없어요.</div>'}</div>`}
   ${disclaimer()}`;
+}
+/* 「처방받은 약이 떨어졌어요」 — 처방약 하나하나에 약국에서 가장 가까운 것을 붙여 둔 목록.
+   현욱님 설계(2026-09-21): 없으면 없다고 분명히 말하는 것이 이 화면의 값이다. */
+function vRxOut(){
+  const rx = (D.drugs || []).filter(d => d.otcAlt);
+  const yes = rx.filter(d => d.otcAlt.has), no = rx.filter(d => !d.otcAlt.has);
+  const row = d => { const opts = (d.otcAlt.options || []).map(drug).filter(Boolean);
+    return `<button class="row" onclick="go('/drug/${d.id}')"><div class="ic">${icon(cls(d.class)?.icon || 'pill')}</div>
+      <div class="body"><b>${esc(ingrName(d))}</b><span>${opts.length ? '약국에서는 → <b style="color:var(--normal)">' + opts.map(o => esc(ingrName(o))).join(' · ') + '</b>' : esc(firstSentence(d.otcAlt.text, 40))}</span></div>${I.chev}</button>`; };
+  return `${topBar({ back:'약 사전' })}
+  <h1>처방받은 약이 떨어졌어요</h1>
+  <p style="margin-top:6px">주말이나 연휴에 처방약이 떨어졌을 때, <b>약국에서 이어 갈 수 있는 것</b>과 <b>없는 것</b>을 나눠 두었어요. 약을 누르면 얼마나 가까운지 설명이 나옵니다.</p>
+  <div class="note" style="margin-top:12px">${I.alert}<span>대체는 <b>며칠을 버티기 위한 것</b>이에요. 원래 약을 끊으라는 뜻이 아니고, 혈압·심장·호르몬약은 임의로 바꾸면 안 됩니다.</span></div>
+  <section class="sec"><h2><span>${I.check} 약국에서 이어 갈 수 있어요</span><small>${yes.length}가지</small></h2>
+    <div class="card rows">${yes.map(row).join('')}</div></section>
+  <section class="sec"><h2><span>${I.no} 약국에는 없어요</span><small>${no.length}가지</small></h2>
+    <div class="card rows">${no.map(row).join('')}</div></section>
+  ${disclaimer('처방약을 임의로 바꾸거나 끊지 마세요. 이 목록은 약이 떨어진 며칠을 어떻게 버틸지 돕기 위한 것이고, 최종 판단은 약사·의사와 하세요.')}`;
 }
 function riskBar(label, v, note){ if (!v) return ''; const lv = Math.max(1, Math.min(5, v)); const word = ['', '낮음', '낮은 편', '보통', '높은 편', '높음'][lv]; return `<div class="rb"><span>${esc(label)}</span><div class="track"><div class="fill l${lv}" style="width:${lv * 20}%"></div></div><span class="v">${word}</span></div>${note ? `<p class="small muted" style="margin:-4px 0 4px">${fmt(note)}</p>` : ''}`; }
 function vDrug(id){
@@ -2734,6 +2779,7 @@ function vDrug(id){
   const pubHtml = pub.length ? `<h3 style="margin-top:20px">식약처 등록 제품 <small class="muted" style="font-weight:500">${pub.length}개 · e약은요 공공데이터${pub.length > 30 ? ' · 30개만 표시' : ''}</small></h3><div class="rows">${pub.slice(0, 30).map(p => `<button class="row" onclick="go('/pub/${p.id}')">${p.img ? `<img class="pillimg" src="${esc(p.img)}" alt="" loading="lazy" onerror="this.style.visibility='hidden'">` : ''}<div class="body"><b>${esc(p.n)}</b><span>${esc(p.m)}${p.map.length > 1 ? ' · 복합제(' + p.map.length + '성분)' : ''}</span></div>${p.cvs ? '<span class="badge cvs">편의점</span>' : ''}${I.chev}</button>`).join('')}</div>` : (PUB.index ? '' : '<p class="loading">식약처 제품 목록을 불러오는 중…</p>');
   return `${topBar({ back:'약 사전' })}
   <div class="drug-hero">${c ? `<a class="cls link" href="#/class/${c.id}">${esc(c.name)} ›</a>` : ''}<h1>${esc(d.name)}</h1><div class="en">${esc(d.en || '')} ${badge(d.rx)}${d.ach ? `<span class="badge ${d.ach >= 3 ? 'stop' : d.ach === 2 ? 'warn' : ''}" style="margin-left:4px">항콜린 ${esc(ACH_WORD[d.ach])}</span>` : ''}</div></div>
+  ${otcAltCard(d)}
   ${d.useNote ? `<div class="usebar">${I.alert}<span>${fmt(d.useNote)}</span></div>` : ''}
   ${d.ach ? `<div class="usebar" style="${d.ach >= 2 ? '' : 'background:var(--tint2);color:var(--body)'}">${d.ach >= 2 ? I.alert : I.info}<span><b>항콜린 부담 ${esc(ACH_WORD[d.ach])}</b> — ${esc(d.achNote || '')}${d.achAlt ? '<br>' + fmt(d.achAlt) : ''}</span></div>` : ''}
   ${ixLine([d])}
