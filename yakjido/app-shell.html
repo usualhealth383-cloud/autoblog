@@ -912,6 +912,7 @@ nav.tabbar button.on svg.i{stroke-width:2.2}
 .pill-card{background:var(--card);border:1px solid var(--hairline);border-radius:14px;overflow:hidden;text-align:left;box-shadow:var(--shadow-card);display:flex;flex-direction:column}
 .pill-card .ph{aspect-ratio:4/3;background:#fff;display:grid;place-items:center;border-bottom:1px solid var(--hairline);position:relative}
 .pill-card .ph img{width:100%;height:100%;object-fit:contain}
+.pill-card .ph .pglyph,.pglyph{width:100%;height:100%;display:block;padding:6px}
 .pill-card .ph .ph-empty{color:var(--faint);font-size:.75rem}
 .pill-card .ph .sc{position:absolute;top:6px;left:6px;font-size:.6875rem;font-weight:800;padding:2px 7px;border-radius:6px;background:var(--primary);color:var(--on-primary)}
 .pill-card .bd{padding:10px 12px 12px}
@@ -2977,7 +2978,39 @@ function vPill(){
 }
 function pillCard(p, sc){
   const img = pillImg(p);
-  return `<button class="pill-card" onclick="go('/pillinfo/${p.seq}')"><div class="ph">${img ? `<img src="${esc(img)}" alt="" loading="lazy" onerror="this.replaceWith(Object.assign(document.createElement('span'),{className:'ph-empty',textContent:'사진 없음'}))">` : '<span class="ph-empty">사진 없음</span>'}${sc >= 80 ? '<span class="sc">일치</span>' : sc >= 40 ? '<span class="sc" style="background:var(--caution)">비슷</span>' : ''}</div>
+/* 사진이 없거나 안 뜰 때 — 자료에 있는 모양·색·각인으로 알약을 직접 그린다.
+   인터넷이 없어도 되고, 작은 칸에서는 사진보다 오히려 또렷하다. */
+const PCOLOR = { '하양':'#FFFFFF', '노랑':'#F3CE52', '분홍':'#F2A7B5', '주황':'#EFA049', '갈색':'#A97450',
+  '파랑':'#5B8FD6', '연두':'#A9D06C', '초록':'#4EA96B', '빨강':'#DD5D54', '회색':'#BCC2C6',
+  '보라':'#A98BD1', '투명':'#EDEFF1', '검정':'#4A5157', '자주':'#8E4A63', '청록':'#4FB3A6', '남색':'#3E5590' };
+function pillGlyph(p){
+  const raw = String(p.c || '').split('|')[0].trim();
+  const fill = PCOLOR[raw] || '#E9ECEE';
+  const sh = String(p.sh || '');
+  const poly = n => { const pts = []; const cx = 50, cy = 38, r = 27;
+    for (let i = 0; i < n; i++) { const a = -Math.PI / 2 + i * 2 * Math.PI / n;
+      pts.push((cx + r * Math.cos(a)).toFixed(1) + ',' + (cy + r * Math.sin(a)).toFixed(1)); }
+    return `<polygon points="${pts.join(' ')}"/>`; };
+  let body;
+  if (/타원|장방|캡슐/.test(sh)) body = '<rect x="14" y="23" width="72" height="30" rx="15"/>';
+  else if (/삼각/.test(sh)) body = poly(3);
+  else if (/마름모/.test(sh)) body = '<polygon points="50,11 77,38 50,65 23,38"/>';
+  else if (/사각|정방/.test(sh)) body = '<rect x="24" y="12" width="52" height="52" rx="8"/>';
+  else if (/오각/.test(sh)) body = poly(5);
+  else if (/육각/.test(sh)) body = poly(6);
+  else if (/팔각/.test(sh)) body = poly(8);
+  else body = '<circle cx="50" cy="38" r="27"/>';
+  const mark = String(p.f || '').slice(0, 6);
+  const fs = mark.length >= 5 ? 9 : mark.length >= 4 ? 11 : 13;
+  const dark = /하양|투명|노랑|연두|회색/.test(raw);
+  const ink = dark ? '#3A4045' : '#FFFFFF';
+  return `<svg class="pglyph" viewBox="0 0 100 76" role="img" aria-label="${esc(sh)} ${esc(raw)} 모양 그림">
+    <g fill="${fill}" stroke="rgba(0,0,0,.28)" stroke-width="1.4">${body}</g>
+    ${p.ln ? `<path d="M50 14 V62" stroke="rgba(0,0,0,.28)" stroke-width="1.4"/>` : ''}
+    ${mark ? `<text x="50" y="42" text-anchor="middle" font-size="${fs}" font-weight="700" fill="${ink}">${esc(mark)}</text>` : ''}
+  </svg>`;
+}
+  return `<button class="pill-card" onclick="go('/pillinfo/${p.seq}')"><div class="ph">${img ? `<img src="${esc(img)}" alt="" loading="lazy" onerror="this.outerHTML=this.dataset.glyph" data-glyph="${esc(pillGlyph(p))}">` : pillGlyph(p)}${sc >= 80 ? '<span class="sc">일치</span>' : sc >= 40 ? '<span class="sc" style="background:var(--caution)">비슷</span>' : ''}</div>
   <div class="bd"><b>${esc(p.n.replace(/\(.*?\)/g, ''))}</b><div class="imp">${p.f ? `<span>${esc(p.f)}</span>` : ''}${p.b ? `<span>${esc(p.b)}</span>` : ''}</div><small>${esc(p.sh)} · ${esc(p.c)}${p.ingr ? ' · ' + esc(p.ingr) : ''} · ${p.rx ? '처방약' : p.cvs ? '편의점' : '약국'}</small></div></button>`;
 }
 function findPill(seq){ return (PUB.pills || []).find(p => p.seq === seq) || (PUB.rx || []).find(p => p.seq === seq); }
