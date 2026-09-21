@@ -11,9 +11,13 @@
   4. 명암비 — 밝은/어두운 테마 모두 WCAG AA (본문 4.5, 큰 글씨 3.0)
   5. 탭 타깃 44px 미만 0 (문장 속 인라인 링크는 WCAG 2.5.8 예외)
   5b. 어르신 모드(글자 20px) 16화면에서 넘침·잘림 0
-  6. 병용 판정 시나리오 5건 (삼중고·와파린·전립선·치매약+방광약·혈압약 모름)
-  7. 항콜린 이중 계산 0 (식약처 2.4만 제품 전수)
-  8. 이름 검색 8건 (베시케어·하루날디·타이레놀·TY 500 …)
+  5c. 좁은 화면(320px) × 20px 글씨 17화면에서 넘침·잘림 0
+  6.  병용 판정 시나리오 8건 (삼중고·와파린·전립선·치매약+방광약·혈압약 모름·안압·천식·스테로이드)
+  6a. 병명이 아니라 «드시는 약»으로 걸려야 할 규칙 4건
+  6b. 한 통이 자기 자신과 겹쳤다고 세지 않는지 3건
+  6c. 우리가 권하는 바구니가 스스로 겹치지 않는지 (증상 56개 전수)
+  7.  항콜린 이중 계산 0 (식약처 2.4만 제품 전수)
+  8. 이름 검색 8건 · 구어 12건 · 문장 16건 (베시케어·하루날디·타이레놀·TY 500 …)
   8c. 구어·띄어쓰기 오타 12건 (「타이 레놀」·「머리아파」·「소화제」 — 어르신이 실제로 치는 말)
   9. 홈 날씨 카드 — Open-Meteo 응답을 모의로 넣어 일교차·미세먼지 문구가 뜨는지
 
@@ -88,6 +92,10 @@ def main():
             if o['ov']: fails.append(f'가로 넘침 {r}: {o["ov"]}')
             if o['clip']: fails.append(f'글자 잘림 {r}: {o["clip"]}')
             if o['len'] < 40: fails.append(f'빈 화면 {r}')
+            # 1b. 굵게 표시(**)가 글자 그대로 보이면 안 된다 — esc() 로 그린 칸을 잡아낸다.
+            #     약의 «간단히» 한 줄 7곳이 실제로 그랬다.
+            md = pg.evaluate("()=>{const t=(document.getElementById('app')||document.body).innerText;const m=t.match(/\\*\\*[^*\\n]{1,40}\\*\\*/g);return m?m.slice(0,2):[]}")
+            if md: fails.append(f'굵게 표시가 글자로 보임 {r}: {md}')
         if errs: fails.append(f'JS 오류 {len(errs)}: {errs[:3]}')
         # 4~5. 명암비·탭 타깃 (대표 화면, 두 테마)
         SC = ['/home', '/symptom/cold', '/symptom/drymouth', '/drug/ibuprofen', '/me', '/together', '/kinds', '/tips', '/drugs', '/hello/3']
@@ -106,15 +114,54 @@ def main():
             o = pg.evaluate(OVERFLOW_JS)
             if o['ov']: fails.append(f'어르신 모드 가로 넘침 {r}: {o["ov"]}')
             if o['clip']: fails.append(f'어르신 모드 글자 잘림 {r}: {o["clip"]}')
+        # 5c. 좁은 화면(320px) × 가장 큰 글씨 — 오래된 안드로이드 폰과 «화면 확대»를 켜신 분의 자리.
+        #     낱알 검색칸과 소아 화면 단추가 실제로 화면을 넘고 있었다.
+        pg.set_viewport_size({'width': 320, 'height': 640})
+        for r in SC + ['/pill', '/kids', '/kinds', '/bag', '/schedule', '/symptom/fever', '/symptom/motion']:
+            pg.goto(url + '#' + r); pg.reload(); pg.wait_for_timeout(420)
+            o = pg.evaluate(OVERFLOW_JS)
+            if o['ov']: fails.append(f'좁은 화면 가로 넘침 {r}: {o["ov"][:2]}')
+            if o['clip']: fails.append(f'좁은 화면 글자 잘림 {r}: {o["clip"][:2]}')
+        pg.set_viewport_size({'width': 390, 'height': 844})
         pg.evaluate("localStorage.setItem('yakjido.fs','16px')")
         # 6. 병용 판정 시나리오 (이름 없이 종류로)
         CASES = [(['bp.arb', 'bp.diur'], '/symptom/arthritis', '콩팥'), (['blood.warf'], '/symptom/msk', '와파린'),
                  (['pros.alpha'], '/symptom/cold', '전립선'), (['dem.ache', 'blad.oab'], '/together', '치매약'), (['bp.any'], '/symptom/arthritis', '혈압약')]
+        CASES += [(['eye.glau'], '/symptom/cold', '안압'), (['resp.luka'], '/symptom/msk', '천식'),
+                  (['ster.pred'], '/symptom/msk', '스테로이드')]
         for picks, r, kw in CASES:
             pg.evaluate("(p)=>localStorage.setItem('yakjido.me.v1',JSON.stringify({age:'senior',taking:p.map(x=>'cls:'+x),pub:{}}))", picks)
             pg.goto(url + '#' + r); pg.reload(); pg.wait_for_timeout(700)
             txt = pg.evaluate("()=>[...document.querySelectorAll('.ixline,.ix-h b')].map(x=>x.innerText).join(' | ')")
             if kw not in txt: fails.append(f'병용 시나리오 {picks} → "{kw}" 없음: {txt[:80]}')
+        # 6a. 병명 대신 «드시는 약»으로도 걸려야 한다 — 어르신은 «녹내장»·«천식»이라는 말보다 «넣는 안약»을 아신다.
+        #     전에는 이 경고들이 내 정보의 병명 체크에만 달려 있어, 약통만 채운 분께는 아예 뜨지 않았다.
+        MEDCASE = [(['cls:bp.arb', 'coldaewon'], 'decongest-bp'), (['cls:eye.glau', 'dimenhydrinate'], 'anticho-glaucoma-med'),
+                   (['cls:resp.luka', 'ibuprofen'], 'nsaid-asthma-med'), (['cls:ster.pred', 'ibuprofen'], 'steroid-nsaid')]
+        for taking, rid in MEDCASE:
+            pg.evaluate("(t)=>localStorage.setItem('yakjido.me.v1',JSON.stringify({age:'senior',taking:t,pub:{}}))", taking)
+            pg.goto(url + '#/together'); pg.reload(); pg.wait_for_timeout(600)
+            ids = pg.evaluate("()=>ixRun().hits.map(h=>h.r.id)")
+            if rid not in ids: fails.append(f'약통으로 걸려야 할 규칙이 안 뜸 {taking} → {rid} (뜬 것: {ids})')
+        # 6b. 한 통이 «자기 자신과» 겹쳤다고 세면 안 된다 — 복합제는 약 이름과 속 성분이 둘 다 잡힌다.
+        #     신신플렉스(클로르족사존+에텐자미드) 한 통만 들고 있을 때 '졸음이 겹쳤다'가 뜨면 버그다.
+        SELF = [(['relax-combo'], 'sed-load'), (['cold-combo'], 'sed-load'), (['antihist-1g'], 'ach-load')]
+        for picks, rid in SELF:
+            pg.evaluate("(p)=>localStorage.setItem('yakjido.me.v1',JSON.stringify({age:'senior',taking:p,pub:{}}))", picks)
+            pg.goto(url + '#/together'); pg.reload(); pg.wait_for_timeout(700)
+            ids = pg.evaluate("()=>ixRun().hits.map(h=>h.r.id)")
+            if rid in ids: fails.append(f'한 통이 자기 자신과 겹침 {picks} → {rid} 떴음')
+        # 6c. 우리가 권하는 바구니가 «스스로» 겹치지 않는지 — 약통을 등록하지 않은 분께도 보여야 한다.
+        #     감기 화면이 타이레놀과 콜대원(아세트아미노펜 함유)을 나란히 권하던 것을 이 검사가 잡는다.
+        pg.evaluate("()=>localStorage.setItem('yakjido.me.v1',JSON.stringify({age:'senior',taking:[],pub:{}}))")
+        pg.goto(url + '#/home'); pg.reload(); pg.wait_for_timeout(700)
+        pdup = pg.evaluate("()=>Object.fromEntries((D.symptoms||[]).map(s=>[s.id,planDup(basket(s))]).filter(x=>x[1].length))")
+        KNOWN = {'msk', 'headache', 'arthritis'}      # 에텐자미드(근이완 복합제) — 본문에 설명을 달아 둔 자리
+        for sid, msgs in pdup.items():
+            if sid not in KNOWN: fails.append(f'추천 바구니가 스스로 겹침 {sid}: {msgs[0][:70]}')
+            elif '소염' not in msgs[0]: fails.append(f'{sid} 겹침 내용이 바뀜: {msgs[0][:70]}')
+        for sid in KNOWN:
+            if sid not in pdup: fails.append(f'{sid} 소염 성분 겹침 경고가 사라짐 — 규칙이 죽었는지 확인')
         # 9. 날씨 카드
         pg.goto(url + '#/home'); pg.reload(); pg.wait_for_timeout(1000)
         wx = pg.evaluate("()=>document.querySelector('.wx')?.innerText||''")
@@ -157,11 +204,20 @@ def main():
         r8c = pg.evaluate("(L)=>Object.fromEntries(L.map(q=>[q,search(q).length]))", SAY)
         zero = [q for q, n in r8c.items() if not n]
         if zero: fails.append(f'구어 검색 0건: {zero}')
+        # 8d. 문장으로 치시는 분 — 「어깨 아파」·「아이 해열제」·「변비가 있어요」가 전부 0건이었다.
+        #     결과 «개수»만이 아니라 «맨 위에 무엇이 오는지»까지 본다.
+        SAY2 = {'목이 아파요': '인후통', '어깨 아파': '어깨', '무릎 통증': '관절', '벌레 물림': '벌레',
+                '아이 해열제': '열', '변비가 있어요': '변비', '입이 말라요': '마름', '귀가 먹먹해요': '귀',
+                '다리에 쥐가 나요': '쥐', '잠이 안 와요': '잠', '손발이 저려요': '저리', '이가 아파요': '치통',
+                '발목을 삐었어요': '삠', '눈이 뻑뻑해요': '눈', '소변이 잘 안 나와요': '소변', '기침이 나요': '기침'}
+        r8d = pg.evaluate("async(Q)=>{ await lexLoad(true); return Object.fromEntries(Object.keys(Q).map(q=>[q,(search(q)[0]||{t:''}).t])); }", SAY2)
+        for q, want in SAY2.items():
+            if want not in (r8d.get(q) or ''): fails.append(f'문장 검색 "{q}" 첫 결과 {r8d.get(q)!r} (기대: {want} 포함)')
         br.close()
     print(f'화면 {len(routes)}개 검사 완료')
     if fails:
         print('실패', len(fails)); [print('  ✗', f) for f in fails]; sys.exit(1)
-    print('✓ 전부 통과 — JS 오류 0 · 넘침 0 · 잘림 0 · 명암비 AA · 44px · 어르신 모드 · 병용 5건 · 이중계산 0 · 검색 8건 · 구어 12건')
+    print('✓ 전부 통과 — JS 오류 0 · 넘침 0 · 잘림 0 · 명암비 AA · 44px · 어르신 모드 · 320px · 병용 8건 · 약통 판정 4건 · 자기중복 3건 · 바구니 겹침 · 이중계산 0 · 검색 8건 · 구어 12건 · 문장 16건')
 
 if __name__ == '__main__':
     main()

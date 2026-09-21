@@ -24,7 +24,8 @@ INGR = {
   '슈도에페드린염산염':'pseudoephedrine', '페닐레프린염산염':'phenylephrine', 'dl-메틸에페드린염산염':'methylephedrine',
   '덱스트로메토르판브롬화수소산염수화물':'dextromethorphan', '구아이페네신':'guaifenesin',
   '파모티딘':'famotidine', '알마게이트':'almagate', '인산알루미늄겔':'aluminium-phosphate', '알긴산나트륨':'alginate',
-  '수산화마그네슘':'antacid-mg', '산화마그네슘':'magnesium-oxide', '비사코딜':'bisacodyl',
+  # 한 성분이 «제산제로도 변비약으로도» 쓰인다 — 둘 다 이어 준다
+  '수산화마그네슘':['antacid-mg', 'magnesium-oxide'], '산화마그네슘':'magnesium-oxide', '비사코딜':'bisacodyl',
   '로페라미드염산염':'loperamide', '디옥타헤드랄스멕타이트':'smectite',
   '디펜히드라민염산염':'diphenhydramine', '디펜히드라민':'diphenhydramine', '독시라민숙신산염':'doxylamine',
   '디멘히드리네이트':'dimenhydrinate', '스코폴라민':'scopolamine',
@@ -45,6 +46,53 @@ INGR = {
   '아모롤핀염산염':'amorolfine', '디오스민':'diosmin', '벤지다민염산염':'benzydamine',
   '클로르헥시딘글루콘산염액':'chlorhexidine', '글루콘산클로르헥시딘액':'chlorhexidine',
   '아세틸시스테인':'acetylcysteine',
+  # ── 2026-09-21 보강 ①: 앱에 «이미 있는 약»인데 식약처 표기가 달라 안 붙던 것 ──
+  # 4,766개 일반약 중 46%가 우리 약으로 이어지지 않았다. 대부분 염 이름·표기 차이였다.
+  '트리메부틴말레산염':'trimebutine', '트리메부틴':'trimebutine',
+  '베타메타손발레레이트':'topical-steroid', '베타메타손디프로피오네이트':'topical-steroid',
+  '덱사메타손':'topical-steroid', '덱사메타손아세테이트':'topical-steroid',
+  '프레드니솔론':'topical-steroid', '프레드니솔론아세테이트':'topical-steroid',
+  '카르바조크롬':'gum-combo', '리소짐염산염':'gum-combo',
+  '옥수수불검화정량추출물':'corn-unsap',
+  '콜레칼시페롤':'vitamin-d-rx', '콜레칼시페롤농축분말':'vitamin-d-rx', '콜레칼시페롤과립':'vitamin-d-rx',
+  '농축콜레칼시페롤':'vitamin-d-rx', '농축콜레칼시페롤과립':'vitamin-d-rx', '비타민D3':'vitamin-d-rx',
+  '펠비낙':'felbinac',
+  '리파제':'digestive-enzyme', '브로멜라인':'digestive-enzyme', '비오디아스타제':'digestive-enzyme',
+  '디아스타제·프로테아제·셀룰라제':'digestive-enzyme', '디아스타제':'digestive-enzyme',
+  '판셀라제':'digestive-enzyme', '판프로신':'digestive-enzyme', '크리아제-PEG':'digestive-enzyme',
+  '탄산수소나트륨':'antacid-mg', '탄산마그네슘':'antacid-mg', '글리세로인산마그네슘':'antacid-mg',
+  '건조수산화알루미늄겔':'aluminium-phosphate', '메타규산알루민산마그네슘':'aluminium-phosphate',
+  '침강탄산칼슘':'aluminium-phosphate',
+  '자일리톨':'xylitol-gum',
+  '부틸스코폴라민브롬화물':'butylscopolamine', '스코폴리아엑스':'butylscopolamine',
+  '비타민B1':'thiamine-like', '나프록센나트륨수화물':'naproxen',
+  '이소프로필안티피린':'ipa', '아세트아미노펜(서방정)':'acetaminophen',
+  '크로모글리크산나트륨':'artificial-tears',
+  '폴리비닐알코올':'artificial-tears', '트레할로스':'artificial-tears',
+  '클로르페니라민':'chlorpheniramine',
+  '옥시메타졸린염산염':'xylometazoline', '나파졸린염산염':'xylometazoline',
+  '브롬헥신염산염':'guaifenesin',
+  # ── 2026-09-21 보강 ②: 새로 넣은 약 6종 ──
+  '에르도스테인':'erdosteine', '암브록솔염산염':'ambroxol', '암브록솔':'ambroxol',
+  '포비돈요오드':'povidone-iodine', '알벤다졸':'albendazole',
+  '겐타마이신황산염':'genta-steroid-cream',
+  '바실루스리케니포르미스균':'probiotic-otc', '바실루스서브틸리스균':'probiotic-otc',
+  '사카로마이세스보울라디':'probiotic-otc', '락토바실루스아시도필루스':'probiotic-otc',
+  '비피더스균':'probiotic-otc', '유산균':'probiotic-otc',
+}
+# 성분이 «영양제 화면»으로 가는 것 — 비타민·미네랄 복합제가 일반의약품으로도 팔린다.
+# 이것이 빠져 있어 1,000개 넘는 제품이 어디로도 이어지지 않았다.
+SUPP = {
+  '피리독신염산염':'vitb', '티아민질산염':'vitb', '티아민염산염':'vitb', '벤포티아민':'vitb', '푸르설티아민':'vitb',
+  '리보플라빈':'vitb', '리보플라빈부티레이트':'vitb', '리보플라빈포스페이트나트륨':'vitb',
+  '니코틴산아미드':'vitb', '판토텐산칼슘':'vitb', '폴산':'vitb', '비오틴':'vitb', 'd-비오틴':'vitb',
+  '시아노코발라민':'vitb', '시아노코발라민1000배산':'vitb', '메코발라민':'vitb', '히드록소코발라민':'vitb',
+  '아스코르브산':'vitc', '아스코르브산과립97%':'vitc', '아스코르브산97%과립':'vitc', '제피아스코르브산':'vitc',
+  '푸마르산철':'iron', '폴리사카리드철착염':'iron', '건조황산철':'iron',
+  '유비데카레논':'coq10',
+  '콘드로이틴설페이트나트륨':'glucosamine', '글루코사민황산염':'glucosamine', '글루코사민염산염':'glucosamine',
+  '밀크시슬열매건조엑스':'milkthistle', '실리마린':'milkthistle',
+  '루테인':'lutein',
 }
 # 같은 성분이라도 제형에 따라 다른 약으로 간다
 BY_FORM = {'클로트리마졸': {'insert':'clotrimazole-vag', 'skin':'clotrimazole', 'liquid':'clotrimazole'}}
@@ -56,7 +104,10 @@ def main():
     for e in idx:
         ids = set()
         for i in e.get('i', []):
-            if i in INGR: ids.add(INGR[i])
+            if i in INGR:
+                v = INGR[i]
+                ids.update(v if isinstance(v, (list, tuple)) else [v])
+            if i in SUPP: ids.add('supp:' + SUPP[i])
             if i in BY_FORM:
                 got = BY_FORM[i].get(formclass(e['n']))
                 if got: ids.add(got)

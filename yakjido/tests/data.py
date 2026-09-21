@@ -77,6 +77,17 @@ TIPG = {'약 이름과 고르기', '제대로 드시는 법', '조심할 것', '
 for t in T:
     if t.get('group') not in TIPG: fails.append(f'팁 {t["id"]} 갈래가 비었거나 모르는 이름 → {t.get("group")!r}')
 
+# 「검수 대기」 화면은 검수 요청 문서에 반드시 적혀 있어야 한다 — 문서가 자료와 어긋나 14개로 남아 있었다
+import pathlib as _pl
+_doc = _pl.Path(__file__).resolve().parents[1] / '검수-대기.md'
+if _doc.exists():
+    _t = _doc.read_text(encoding='utf-8')
+    for _s in S:
+        if _s.get('reviewed') is False and f"`{_s['id']}`" not in _t:
+            fails.append(f'검수 대기 {_s["id"]} 가 검수-대기.md 에 없습니다')
+else:
+    fails.append('검수-대기.md 가 없습니다')
+
 # 통계 약어가 어르신 화면에 그대로 나오면 안 된다 — 영양제 「어디까지 입증됐나」(evidenceNote)와 출처 문구만 예외
 JARGON = re.compile(r'\b(NNT|NNH|RR|HR|OR|SMD|CI|P\s*[=<]|I²|RCT|n=)\b')
 def jargon(o, path, owner):
@@ -92,6 +103,49 @@ for d in D: jargon({k: v for k, v in d.items() if k != 'riskNote'}, '', '약 ' +
 for k in K: jargon(k, '', '계열 ' + k['id'])
 for x in SUP: jargon(x, '', '영양제 ' + x['id'])
 for t in T: jargon(t, '', '팁 ' + t['id'])
+# 「쉬운 말 한 줄」과 「용법」의 하루 횟수가 어긋나면 안 된다.
+# 신신플렉스가 한쪽엔 «하루 3번», 허가 용법엔 «1일 2회»로 적혀 있었다 — 어르신이 읽는 쪽이 1.5배였다.
+_NUM = {'한': 1, '두': 2, '세': 3, '네': 4, '다섯': 5, '여섯': 6}
+def _times(t):
+    if not t: return None
+    t = str(t).replace('1일', '하루')
+    for pat in (r'하루\s*([0-9]+)\s*~\s*([0-9]+)\s*[회번]', r'하루\s*([0-9]+)\s*[회번]', r'하루\s*(한|두|세|네|다섯|여섯)\s*[회번]'):
+        m = re.search(pat, t)
+        if m:
+            g = [int(_NUM.get(x, x)) for x in m.groups() if x]
+            return (min(g), max(g))
+    return None
+for d in D:
+    a = _times(d.get('simple')); b = _times((d.get('dose') or {}).get('interval')) or _times((d.get('dose') or {}).get('adult'))
+    if a and b and not (a[0] <= b[1] and b[0] <= a[1]):
+        fails.append(f'약 {d["id"]} 하루 횟수가 어긋남 — 쉬운 말 {a} · 용법 {b}')
+
+# 어르신이 못 읽는 한자말이 다시 들어오면 멈춘다(출처 문구는 예외).
+# 한 번 풀어 놓아도 새 내용을 쓸 때 습관처럼 되돌아오는 말들이다.
+HARDWORD = {'부종': '붓기', '공복': '빈속', '병용': '같이 드시는', '호전': '좋아지는 것',
+            '오심': '메스꺼움', '발적': '붉어짐', '장기 복용': '오래 드시는 것', '장기간': '오랫동안'}
+def hardword(o, path, owner):
+    if isinstance(o, str):
+        if 'src' in path or 'source' in path: return
+        for w, alt in HARDWORD.items():
+            if w in o: fails.append(f'어려운 말 «{w}»(→{alt}) {owner}{path}: {o[:50]!r}')
+    elif isinstance(o, dict):
+        for k, v in o.items(): hardword(v, path + '.' + k, owner)
+    elif isinstance(o, list):
+        for i, v in enumerate(o): hardword(v, path + f'[{i}]', owner)
+for s in S: hardword(s, '', '증상 ' + s['id'])
+for d in D: hardword(d, '', '약 ' + d['id'])
+for k in K: hardword(k, '', '계열 ' + k['id'])
+for x in SUP: hardword(x, '', '영양제 ' + x['id'])
+for t in T: hardword(t, '', '팁 ' + t['id'])
+for r in IX['rules']: hardword({k: v for k, v in r.items() if k != 'src'}, '', '규칙 ' + r['id'])
+
+# 약 122개 전부에 부작용이 적혀 있어야 한다 — 처방약 6개가 비어 있었다
+for d in D:
+    if not d.get('sideEffects'): fails.append(f'약 {d["id"]} 에 부작용이 비어 있습니다')
+    if not d.get('children') and not (d.get('dose') or {}).get('child'):
+        fails.append(f'약 {d["id"]} 에 소아 기준이 비어 있습니다')
+
 print(f'증상 {len(S)} · 약 {len(D)} · 계열 {len(K)} · 영양제 {len(SUP)} · 팁 {len(T)} · 규칙 {len(IX["rules"])} · 출처 {len(SRC)}')
 if fails:
     print('실패', len(fails)); [print('  ✗', f) for f in fails]; sys.exit(1)
