@@ -13,7 +13,8 @@
 사진 출처: 식품의약품안전처 의약품 낱알식별·의약품개요정보(e약은요) — 출처 표시 후 사용.
 사용: python3 yakjido/tools/match_images.py   → 이후 build.py 가 DATA.productImages 로 심는다.
 """
-import json, re, pathlib, glob
+import json, re, pathlib, glob, sys
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 DATA = ROOT.parent / 'docs' / 'yakjido' / 'data'
 URL = 'https://nedrug.mfds.go.kr/pbp/cmn/itemImageDownload/'
@@ -41,24 +42,7 @@ def stem(s):
     for _ in range(2): x = re.sub(FORM, '', x)
     return re.sub(r'\d+%?$', '', x)
 
-# 제형 갈래 — 사진을 바꿔 달면 안 되는 단위다. 로션 자리에 알약 사진이 들어가는 사고를 막는다.
-# 괄호 안 성분명을 먼저 떼고 본다. 그러지 않으면 '염산염'의 «산» 이 가루약으로 잡힌다.
-FORMPAT = (
-    ('eye',    r'점안|안연고'),
-    ('nasal',  r'나잘|비강|점비|스프레이|분무'),
-    ('patch',  r'파스|파프|카타플라스마|플라스타|첩부|패치|패취|경고제'),
-    ('insert', r'질정$|좌약$|좌제$'),
-    ('nail',   r'네일|라카$'),
-    ('skin',   r'연고$|크림$|로션$|겔$|외용액$'),
-    ('troche', r'트로키$|츄어블'),
-    ('liquid', r'시럽$|현탁액$|내복액$|드링크$|액$'),
-    ('powder', r'산$|과립$|세립$|건조시럽$'),
-)
-def formclass(t):
-    x = re.sub(r'[\d.]+\s*%?$', '', norm(t))
-    for name, pat in FORMPAT:
-        if re.search(pat, x): return name
-    return 'solid'          # 정·캡슐 등 먹는 고형제
+from pharmform import formclass          # 제형 갈래 — 사진을 바꿔 달면 안 되는 단위
 def liquidish(t): return formclass(t)
 
 cands = [(p['n'], p['img'], p.get('seq', ''), p.get('ingr', '')) for p in pills if p.get('img')]

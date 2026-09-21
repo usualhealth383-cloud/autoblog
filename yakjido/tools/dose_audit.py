@@ -7,6 +7,8 @@
   python3 yakjido/tools/dose_audit.py > yakjido/용량-대조표.md
 """
 import json, glob, os, re, sys
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from pharmform import formclass, LABEL      # 겔 자리에 파스 용법을 놓지 않기 위해
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DATA = os.path.join(os.path.dirname(ROOT), 'docs', 'yakjido', 'data')
 drugs = [x for f in sorted(glob.glob(os.path.join(ROOT, 'content', 'drugs*.json')))
@@ -35,10 +37,18 @@ for d in sorted(drugs, key=lambda x: x['id']):
     # 앱이 이어 둔 단일 성분 제품만 — 복합제 용법은 성분 용량이 아니다
     prods = [it for it in idx if d['id'] in it.get('map', []) and len(set(it.get('i', []))) == 1]
     if not prods: continue
+    # 제형이 같은 것만 — 겔을 적어 두고 파스 용법을 나란히 놓으면 대조가 안 된다
+    want = {formclass(pr.get('name', '')) for pr in (d.get('products') or [])} or {'solid'}
+    same = [it for it in prods if formclass(it['n']) in want]
     n += 1
     app = ' · '.join(f"{k}: {v}" for k, v in dose.items() if v)
     print(f"\n## {d['name']}\n")
     print(f"- **앱**: {app}")
-    for it in prods[:2]:
-        print(f"- 식약처 「{it['n']}」: {spaced(detail(it['id']).get('u'))[:330]}")
+    if same:
+        for it in same[:2]:
+            print(f"- 식약처 「{it['n']}」({LABEL[formclass(it['n'])]}): {spaced(detail(it['id']).get('u'))[:330]}")
+    else:
+        kinds = ', '.join(sorted({LABEL[formclass(it['n'])] for it in prods}))
+        want_l = ', '.join(sorted({LABEL[w] for w in want}))
+        print(f"- **같은 제형의 허가사항을 못 찾았습니다** — 앱은 「{want_l}」인데 자료에 있는 것은 「{kinds}」뿐이에요. 직접 확인이 필요합니다.")
 print(f"\n---\n\n대조한 약 {n}개.")
