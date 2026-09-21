@@ -30,6 +30,11 @@ def main():
         return x['drug'] if (x.get('drug') and x['drug'] in mine) else 'lex:' + iid
 
     clean = lambda t: re.sub(r'«(.+?)»', r'**\1**', str(t or '')).strip()
+    def sentence(t):
+        """약손의 한 줄 설명은 «…겹치는» 처럼 꾸미는 말로 끝난다.
+           목록에서는 읽히지만 상세 화면에서는 문장이 잘린 것처럼 보여서 끝을 맺어 준다."""
+        t = clean(t)
+        return t if (not t or re.search(r'(요|다|\.|!|\?)$', t)) else t + ' 경우예요.'
     out = []
     for c in C:
         grp = c.get('grp', '')
@@ -43,7 +48,7 @@ def main():
                 continue
             items.append({'id': o, 'n': L[iid]['n'], 'why': clean(why), 'rx': L[iid]['rx']})
         out.append({
-            'id': c['id'], 'kind': kind, 't': c['t'], 's': c['s'],
+            'id': c['id'], 'kind': kind, 't': c['t'], 's': sentence(c['s']),
             'kw': c.get('kw') or [],
             'items': items,
             'how': [clean(t) for t in (c.get('pharm') or [])],
