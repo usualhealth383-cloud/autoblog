@@ -101,40 +101,50 @@ for ic in (ROOT / 'icons').glob('*'):
     (pages / ic.name).write_bytes(ic.read_bytes())
 
 # ── 앱 아이콘 ──────────────────────────────────────────────────────────────
-# art/icon-1024.png 이 있으면 그것으로 각 크기의 아이콘을 다시 만든다(없으면 icons/ 의 기존 것 유지).
-# 원본이 SVG 면 크기마다 «다시 그린다» — 키우고 줄여도 테두리가 뭉개지지 않는다.
+# 정본은 **현욱님이 주신 art/icon-1024.png** 다. 빌드는 이 파일을 «읽기만» 한다.
+#
+# 2026-09-21 사고: 예전 빌드는 art/icon.svg 로 art/icon-1024.png 를 «덮어썼다».
+# 현욱님이 원본 파일을 올려 주셔도 빌드 한 번이면 지워지는 구조였다.
+# → 이제 art/ 안에는 아무것도 쓰지 않는다. 내보내는 곳은 docs/ 뿐이다.
+#
+# icon.svg 는 «같은 그림을 벡터로 옮긴 보조본»이다. 작은 크기에서 더 선명해서
+# docs/ 아이콘을 구울 때만 쓰고, 래스터 원본과 어긋나면 래스터가 이긴다.
 src_icon = None
-svg_icon = ROOT / 'art' / 'icon.svg'
-if svg_icon.exists():
-    try:
-        import cairosvg, io as _io
-        cairosvg.svg2png(url=str(svg_icon), write_to=str(ROOT / 'art' / 'icon-1024.png'), output_width=1024, output_height=1024)
-    except Exception as e:
-        print('아이콘 SVG 굽기 건너뜀:', e)
 for ext in ('.png', '.webp', '.jpg'):
     f = ROOT / 'art' / ('icon-1024' + ext)
     if f.exists(): src_icon = f; break
+svg_icon = ROOT / 'art' / 'icon.svg'
+mask_svg = ROOT / 'art' / 'icon-maskable.svg'
+SIZES = ((1024, 'icon-1024.png'), (512, 'icon-512.png'), (192, 'icon-192.png'), (180, 'icon-180.png'))
 if src_icon:
     try:
         from PIL import Image
+        before = src_icon.read_bytes()              # 빌드가 원본을 건드렸는지 끝에서 확인한다
         im = Image.open(src_icon).convert('RGBA')
-        if im.width != im.height:                       # 두 안이 나란히 들어온 경우 왼쪽(캡슐 안) 정사각형만 쓴다
+        if im.width != im.height:
             side = min(im.width, im.height); im = im.crop((0, 0, side, side))
         bg = Image.new('RGBA', im.size, (250, 248, 243, 255))
         bg.alpha_composite(im); im = bg.convert('RGB')
-        sizes = ((1024, 'icon-1024.png'), (512, 'icon-512.png'), (192, 'icon-192.png'), (180, 'icon-180.png'))
-        mask_svg = ROOT / 'art' / 'icon-maskable.svg'
+        baked = False
         if svg_icon.exists():
-            import cairosvg
-            for size, name in sizes:
-                cairosvg.svg2png(url=str(svg_icon), write_to=str(pages / name), output_width=size, output_height=size)
-            # 마스크용은 안드로이드가 동그랗게 잘라낸다 — 그림을 줄여 둔 판을 따로 쓴다
-            cairosvg.svg2png(url=str(mask_svg if mask_svg.exists() else svg_icon), write_to=str(pages / 'icon-maskable-512.png'), output_width=512, output_height=512)
-        else:
-            for size, name in sizes:
+            try:                                     # 벡터가 있으면 크기마다 다시 그린다(가장자리가 산다)
+                import cairosvg
+                for size, name in SIZES:
+                    cairosvg.svg2png(url=str(svg_icon), write_to=str(pages / name), output_width=size, output_height=size)
+                cairosvg.svg2png(url=str(mask_svg if mask_svg.exists() else svg_icon),
+                                 write_to=str(pages / 'icon-maskable-512.png'), output_width=512, output_height=512)
+                baked = True
+            except Exception as e:
+                print('아이콘 벡터 굽기 건너뜀(래스터로 대신):', e)
+        if not baked:
+            for size, name in SIZES:
                 im.resize((size, size), Image.LANCZOS).save(pages / name, 'PNG')
-            im.resize((512, 512), Image.LANCZOS).save(pages / 'icon-maskable-512.png', 'PNG')
-        print('앱 아이콘 재생성 ← art/' + src_icon.name)
+            # 안드로이드는 바깥을 동그랗게 잘라낸다 — 80% 로 줄여 가운데 두고 바탕색으로 채운다
+            pad = Image.new('RGB', (512, 512), im.getpixel((6, 6)))
+            pad.paste(im.resize((410, 410), Image.LANCZOS), (51, 51))
+            pad.save(pages / 'icon-maskable-512.png', 'PNG')
+        assert src_icon.read_bytes() == before, 'ERROR: 빌드가 art/ 의 아이콘 원본을 고쳤습니다'
+        print(f'앱 아이콘 ← art/{src_icon.name}' + (' + icon.svg' if baked else '') + ' (원본은 읽기만 합니다)')
     except Exception as e:
         print('아이콘 재생성 건너뜀:', e)
 
