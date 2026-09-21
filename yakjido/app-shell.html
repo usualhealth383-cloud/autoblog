@@ -309,6 +309,9 @@ a.link.crumb,.drug-hero a.cls,.sec>h2 small a.link{display:inline-flex;align-ite
 .row span{display:block;font-size:.8125rem;color:var(--muted);line-height:1.4;margin-top:1px}
 /* 배지는 글자만큼만 — .row span 의 display:block 에 먹혀 줄 전체를 채우던 것 */
 .row .badge{display:inline-flex;width:auto;margin-top:0;vertical-align:middle}
+/* 사진이 없을 때 그려 주는 제형 그림 */
+.pimg.drawn{display:grid;place-items:center;background:var(--tint2);border:1px solid var(--hairline)}
+.pimg.drawn .pform{width:78%;height:78%;fill:none;stroke:var(--primary);stroke-width:3.4;stroke-linecap:round;stroke-linejoin:round;opacity:.85}
 /* 제형 표시 — 먹는 약인지 바르는 약인지가 이름만으로는 안 보인다 */
 /* 남은 약 — 숫자 한 칸과 남은 날 */
 .stock{width:130px;min-height:46px;padding:0 12px;border:1px solid var(--hairline);border-radius:var(--r-input);background:var(--card);color:var(--text);font-size:1rem;font-weight:700}
@@ -1773,6 +1776,26 @@ function achLine(extra){
 }
 const pimg = name => D.productImages?.[name]?.img || '';
 const imgTag = (src, cls, alt) => src ? `<img class="${cls}" src="${esc(src)}" alt="${esc(alt || '')}" loading="lazy" onerror="this.closest('.has-img')?.classList.remove('has-img');this.closest('.drug-photo')?.remove();this.remove()">` : '';
+/* ── 사진이 없는 제품은 «생김새»를 그린다 ──
+   식약처 제품 이미지 접속이 막혀 있어 96개 제품에 사진이 없다.
+   빈칸을 두는 대신, 이름에서 읽은 제형으로 «약국에서 집어 들 물건»을 그려 준다. */
+const FORM_ART = {
+  pill:   '<rect x="14" y="26" width="52" height="28" rx="14"/><path d="M40 26v28"/>',
+  f_bottle:'<path d="M34 6h12v8h-12z"/><path d="M32 14h16l6 12v38a6 6 0 0 1-6 6H32a6 6 0 0 1-6-6V26z"/><path d="M28 36h24v14H28z"/>',
+  f_tube: '<path d="M36 6h8v10h-8z"/><path d="M30 16h20l4 10v34a6 6 0 0 1-6 6H32a6 6 0 0 1-6-6V26z"/><path d="M26 62h28"/><path d="M26 68h28"/>',
+  f_patch:'<rect x="14" y="22" width="52" height="36" rx="8"/><path d="M28 22v36M52 22v36" stroke-dasharray="3 4"/>',
+  f_spray:'<path d="M32 22h16v44a6 6 0 0 1-6 6h-4a6 6 0 0 1-6-6z"/><path d="M34 22v-8h12v8"/><path d="M52 14h8M52 20h6M52 8h6"/>',
+  f_drop: '<path d="M40 12s-14 18-14 28a14 14 0 0 0 28 0c0-10-14-28-14-28z"/>',
+  f_sup:  '<path d="M40 10c9 0 14 10 14 26s-5 34-14 34-14-18-14-34 5-26 14-26z"/>',
+};
+function formArt(name){
+  const [ic] = formOf(name);
+  const d = FORM_ART[ic] || FORM_ART.pill;
+  return `<svg class="pform" viewBox="0 0 80 80" role="img" aria-label="${esc(formOf(name)[1])} 모양">${d}</svg>`;
+}
+const prodArt = (src, name) => src ? imgTag(src, 'pimg', name)
+  : (isList(name) ? '' : `<div class="pimg drawn" aria-hidden="false">${formArt(name)}</div>`);
+
 const flagBox = (title, items, sub) => items?.length ? `<div class="flag">${I.alert}<div><b>${esc(title)}</b>${sub ? `<p>${esc(sub)}</p>` : ''}${list(items)}</div></div>` : '';
 
 
@@ -3101,7 +3124,7 @@ function vDrug(id){
     ${d.stop?.length ? `<div style="margin-top:20px">${flagBox('이런 증상이 나타나면 바로 중단하고 진료', d.stop)}</div>` : ''}
   </section></div>
   <div class="pane" id="p3"><section class="card"><h2>이 성분이 든 제품</h2><p class="small muted" style="margin-top:4px">제품명이 달라도 성분이 같으면 같은 약이에요. 함량을 확인하세요.</p>
-    <div class="products">${(d.products || []).map(p => `<div class="prod" style="flex-wrap:wrap">${imgTag(pimg(p.name), 'pimg', p.name)}<div style="flex:1;min-width:0"><b>${esc(p.name)}</b><span>${esc(p.maker || '')} · ${esc(p.amount || '')}${p.note ? ' · ' + esc(p.note) : ''}</span>${formTag(p.name)}</div>${badge(p.rx || d.rx)}<div class="links" style="display:flex;gap:6px;flex-wrap:wrap;width:100%;margin-top:8px">${prodSeq(p.name) ? `<a class="plink" href="https://nedrug.mfds.go.kr/pbp/CCBBB01/getItemDetail?itemSeq=${esc(prodSeq(p.name))}" target="_blank" rel="noopener">${I.link}식약처 허가정보</a>` : ''}<a class="plink" href="https://www.health.kr/searchDrug/search_detail.asp" target="_blank" rel="noopener" onclick="copyName('${esc(p.name.split('·')[0]).replace(/'/g, "\\'")}')">${I.search}약학정보원에서 찾기</a></div></div>`).join('') || '<p class="small muted">대표 제품 정보를 준비 중이에요.</p>'}</div>
+    <div class="products">${(d.products || []).map(p => `<div class="prod" style="flex-wrap:wrap">${prodArt(pimg(p.name), p.name)}<div style="flex:1;min-width:0"><b>${esc(p.name)}</b><span>${esc(p.maker || '')} · ${esc(p.amount || '')}${p.note ? ' · ' + esc(p.note) : ''}</span>${formTag(p.name)}</div>${badge(p.rx || d.rx)}<div class="links" style="display:flex;gap:6px;flex-wrap:wrap;width:100%;margin-top:8px">${prodSeq(p.name) ? `<a class="plink" href="https://nedrug.mfds.go.kr/pbp/CCBBB01/getItemDetail?itemSeq=${esc(prodSeq(p.name))}" target="_blank" rel="noopener">${I.link}식약처 허가정보</a>` : ''}<a class="plink" href="https://www.health.kr/searchDrug/search_detail.asp" target="_blank" rel="noopener" onclick="copyName('${esc(p.name.split('·')[0]).replace(/'/g, "\\'")}')">${I.search}약학정보원에서 찾기</a></div></div>`).join('') || '<p class="small muted">대표 제품 정보를 준비 중이에요.</p>'}</div>
     ${pubHtml}
   </section></div>
   <div class="pane" id="p4"><section class="card"><h2>같이 먹으면 안 되거나 조심할 것</h2>
