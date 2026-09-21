@@ -529,6 +529,20 @@ details.acc .bd{padding:0 var(--s4) var(--s4)}
 .buy-more .bm-links{display:flex;flex-wrap:wrap;gap:2px 20px;margin-top:var(--s3)}
 .buy-more .bm-links a{display:inline-flex;align-items:center;min-height:44px;color:var(--primary);font-size:.9375rem;font-weight:700;text-decoration:underline;text-underline-offset:3px;background:none;border:0;padding:0}
 .buy-more .bm-links a svg.i{display:none}
+/* 같은 일을 하는 다른 약 */
+.bm-alts{display:flex;flex-direction:column;gap:6px}
+.bm-alt{display:block;width:100%;text-align:left;padding:10px 12px;border-radius:12px;background:var(--tint2);border:1px solid var(--hairline);cursor:pointer}
+.bm-alt b{display:block;font-size:1rem;font-weight:700;color:var(--text)}
+.bm-alt small{display:block;font-size:.8125rem;color:var(--muted);line-height:1.45;margin-top:1px;word-break:keep-all}
+/* 꼭 살 것과 «도움될 수 있는 것»을 눈으로 가른다 — 후자는 옅게(현욱님 지시 2026-09-21) */
+.badge.soft{background:var(--tint2);color:var(--faint);font-weight:600}
+.buy .buy-item{border-width:1.5px}
+.buy .buy-item.opt{border-width:1px;border-color:var(--hairline);background:var(--surface);box-shadow:none}
+.buy .buy-item.opt b{color:var(--body);font-weight:700}
+.buy .buy-item.opt .role{color:var(--muted);font-weight:600}
+.buy .buy-item.opt .pimg{opacity:.85}
+.buy .buy-item:not(.opt) b{font-weight:800}
+.buy .buy-item:not(.opt) .role{color:var(--primary);font-weight:800}
 .tl1{display:flex;align-items:center;gap:var(--s3);width:100%;min-height:56px;margin-top:var(--s4);padding:var(--s3) var(--s4);background:var(--alert-tint);border:1px solid var(--alert);border-radius:var(--r-card);color:var(--alert);text-align:left;cursor:pointer}
 .tl1>svg:first-child{width:22px;height:22px;flex:0 0 auto}
 .tl1>span{flex:1;min-width:0}
@@ -2079,6 +2093,28 @@ function doseSplit(d){
   const i = t.indexOf('. ');
   return i > 0 ? { head: t.slice(0, i + 1).trim(), tail: t.slice(i + 2).trim() } : { head: t, tail: '' };
 }
+/* 같은 일을 하는 다른 약 — 「케토톱만 있는 게 아니다」(현욱님 지적 2026-09-21).
+   같은 계열에서 제형이 같은 것을 먼저 보여 준다. 파스 자리에 먹는 약을 올리지 않기 위해서다. */
+function altSame(d, max = 4){
+  const mine = formclass2(d);
+  const uses = new Set(d.for || []);
+  /* 같은 계열이어도 쓰는 자리가 다르면 대안이 아니다 — 관절 파스 옆에 목 트로키를 놓지 않는다 */
+  const pool = (D.drugs || []).filter(x => x.class === d.class && x.id !== d.id && x.rx !== '전문'
+    && (!uses.size || !(x.for || []).length || (x.for || []).some(f => uses.has(f))));
+  const same = pool.filter(x => formclass2(x) === mine), other = pool.filter(x => formclass2(x) !== mine);
+  return [...same, ...other].slice(0, max);
+}
+/* 약의 제형을 대표 제품 이름으로 가늠한다 */
+function formclass2(d){
+  const t = ((d.products || [])[0]?.name || '') + ' ' + (d.name || '');
+  if (/파스|플라스타|카타플라스마|첩부|패치|패취/.test(t)) return 'patch';
+  if (/연고|크림|로션|겔|에멀/.test(t)) return 'skin';
+  if (/점안|안연고/.test(t)) return 'eye';
+  if (/가글|양치|액$/.test(t)) return 'liquid';
+  if (/질정|좌약|좌제/.test(t)) return 'insert';
+  if (/스프레이|분무|나잘/.test(t)) return 'spray';
+  return 'solid';
+}
 /* 하루 최대량 — 이미 한 줄 설명에 들어 있는 말은 되풀이하지 않는다 */
 function maxNote(d){
   const mx = d.dose?.max; if (!mx) return '';
@@ -2164,6 +2200,7 @@ function buyItem(x){
     ${rules ? sec('꼭 지킬 것', `<ul class="bm-rules">${rules}</ul>`) : ''}
     ${x.blocked ? `<div class="note" style="margin-top:12px">${I.alert}<span>내 조건(${activeFlags().map(f => FLAG_LABEL[f]).join(', ')})에서는 주의가 필요해요. 약사에게 조건을 말하고 고르세요.</span></div>` : ''}
     ${names.length ? sec('약국에서 찾으실 이름', shots + `<p class="bm-names">${names.map(esc).join(' · ')}</p>`) : ''}
+    ${(() => { const alts = altSame(d); return alts.length ? sec('같은 일을 하는 다른 약', `<div class="bm-alts">${alts.map(a => `<button class="bm-alt" onclick="event.stopPropagation();go('/drug/${a.id}')"><b>${esc(ingrName(a))}</b><small>${esc(a.tagline || (a.for || []).join(' · '))}</small></button>`).join('')}</div>`) : ''; })()}
     <div class="bm-links">${prodLinks(d, x.product)}</div>
     ${SYM_NOW ? `<button class="mark ${isWorked(SYM_NOW, d.id) ? 'on' : ''}" onclick="event.stopPropagation();toggleWorked('${SYM_NOW}','${d.id}')">${isWorked(SYM_NOW, d.id) ? I.check + '효과 본 약으로 적어 뒀어요 — 누르면 빼기' : I.check + '이 약, 효과 봤어요'}</button>` : ''}
     </div>`; })()}` : ''}`;
@@ -2267,7 +2304,7 @@ function vSymptom(id){
   const slotHtml = (p, i) => {
     const kind = p.otc === false ? 'rx' : (p.optional ? 'opt' : '');
     return `<div class="slot"><div class="n ${kind}">${esc(p.slot)}</div><div>
-      <h3>${esc(p.title || p.slot)} ${p.otc === false ? '<span class="badge rx">처방 필요</span>' : !(p.options || []).length ? '<span class="badge cvs">약 없이 할 일</span>' : p.optional ? '<span class="badge warn">도움될 수 있어요</span>' : '<span class="badge otc">약국 구입</span>'}</h3>
+      <h3>${esc(p.title || p.slot)} ${p.otc === false ? '<span class="badge rx">처방 필요</span>' : !(p.options || []).length ? '<span class="badge cvs">약 없이 할 일</span>' : p.optional ? '<span class="badge soft">도움될 수 있어요</span>' : '<span class="badge otc">약국 구입</span>'}</h3>
       ${whyHtml(p.why)}
       <div class="opts">${(p.options || []).map(oid => { const d = drug(oid); if (!d) return ''; const warn = d.avoid?.some(a => a.flags?.some(x => f.includes(x))); return `<a class="opt-pill ${p.pick === oid ? 'pick' : ''}" href="#${String(oid).startsWith('lex:') ? '/ingr/' + String(oid).slice(4) : '/drug/' + oid}">${p.pick === oid ? '<span class="dot"></span>' : ''}${esc(d.name)}${warn ? ' <span class="badge stop">내 정보 주의</span>' : ''}</a>`; }).join('')}</div>
       ${p.alt ? `<p class="alt">${fmt(p.alt)}</p>` : ''}
@@ -3248,7 +3285,7 @@ function vShow(sid){
     <div class="show-head">${esc(s.name)}${f.length ? ` · ${f.map(k => esc(FLAG_LABEL[k])).join(' · ')}` : ''}</div>
     <ol class="show-list">${bk.map((x, i) => {
       const prod = prodName(x.product);
-      return `<li><span class="n">${i + 1}</span><div><b>${esc(x.d.combo ? ingrName(x.d) : (prod || ingrName(x.d)))}</b><small>${x.d.combo ? '이 성분이 든 종합감기약이면 됩니다' : (prod && ingrName(x.d) !== prod ? '성분: ' + esc(ingrName(x.d)) : '')}</small>${(() => { const alt = prodNames(x.d).filter(n => n !== prod).slice(0, 3); return alt.length ? `<small class="alt">또는 ${alt.map(esc).join(' · ')}</small>` : ''; })()}${x.optional ? '<span class="badge warn" style="margin-top:4px">도움될 수 있어요</span>' : ''}</div><span class="badge ${x.d.rx === '안전상비' ? 'cvs' : 'otc'}">${x.d.rx === '안전상비' ? '편의점' : '약국'}</span></li>`;
+      return `<li><span class="n">${i + 1}</span><div><b>${esc(x.d.combo ? ingrName(x.d) : (prod || ingrName(x.d)))}</b><small>${x.d.combo ? '이 성분이 든 종합감기약이면 됩니다' : (prod && ingrName(x.d) !== prod ? '성분: ' + esc(ingrName(x.d)) : '')}</small>${(() => { const alt = prodNames(x.d).filter(n => n !== prod).slice(0, 3); return alt.length ? `<small class="alt">또는 ${alt.map(esc).join(' · ')}</small>` : ''; })()}${x.optional ? '<span class="badge soft" style="margin-top:4px">도움될 수 있어요</span>' : ''}</div><span class="badge ${x.d.rx === '안전상비' ? 'cvs' : 'otc'}">${x.d.rx === '안전상비' ? '편의점' : '약국'}</span></li>`;
     }).join('')}</ol>
     <p class="show-ask">같은 성분이면 다른 제품도 괜찮습니다.<br>겹치는 성분이 없게 부탁드립니다.</p>
     ${achLine(bk.map(x => x.d))}
