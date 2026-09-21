@@ -482,6 +482,7 @@ details.acc .bd{padding:0 var(--s4) var(--s4)}
 .gjump{display:flex;flex-wrap:wrap;gap:8px;padding:4px 0 6px;margin-top:var(--s4)}
 .gjump button{display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:46px;padding:0 14px;border-radius:999px;background:var(--card);border:1px solid var(--hairline);color:var(--text);font-size:.9375rem;font-weight:700;line-height:1.3;cursor:pointer;max-width:100%}
 .gjump button .gdot{width:8px;height:8px;border-radius:50%;background:var(--gfg,var(--primary));flex:0 0 auto}
+.pub-qa p,.qa p{white-space:pre-line}
 .tl1{display:flex;align-items:center;gap:var(--s3);width:100%;min-height:56px;margin-top:var(--s4);padding:var(--s3) var(--s4);background:var(--alert-tint);border:1px solid var(--alert);border-radius:var(--r-card);color:var(--alert);text-align:left;cursor:pointer}
 .tl1>svg:first-child{width:22px;height:22px;flex:0 0 auto}
 .tl1>span{flex:1;min-width:0}
@@ -1200,6 +1201,15 @@ function activeFlags(){ const f = Object.keys(ME).filter(k => k !== 'age' && k !
 /* 비교 바구니 */
 let CMP = [];
 
+/* 식약처 공공데이터 원문은 공백이 모두 지워진 채로 온다("이약은1일3회복용합니다").
+   글자를 지어내지 않는 선에서 읽기만 돕는다 — 숫자와 한글 사이를 띄우고, 문장마다 줄을 바꾼다. */
+function pubText(t){
+  let x = String(t || '');
+  /* 숫자 «앞»에만 띄운다 — 뒤까지 띄우면 「1일」이 「1 일」로 갈라져 더 읽기 나쁘다 */
+  x = x.replace(/([가-힣])(\d)/g, '$1 $2');
+  x = x.replace(/([다요오])\.(?=\S)/g, '$1.\n');
+  return x.replace(/[ \t]+/g, ' ').trim();
+}
 /* ───────── 공공데이터(식약처 e약은요·낱알식별) 지연 로드 ───────── */
 const PUB = { index:null, pills:null, chunks:{}, err:false };
 /* 성분·제품·질문 사전 — 크기가 커서 검색을 처음 쓸 때 받아 온다 */
@@ -2785,12 +2795,12 @@ function vPub(id){
   ${ours.length ? `<section class="sec"><h2>약지도 성분 해설 <small>부담 정도·같이 먹을 때·같은 계열 비교</small></h2><div class="card rows">${ours.map(d => `<button class="row" onclick="go('/drug/${d.id}')"><div class="ic">${icon(cls(d.class)?.icon || 'pill')}</div><div class="body"><b>${esc(d.name)}</b><span>${esc(d.tagline || (d.for || []).join(' · '))}</span></div>${I.chev}</button>`).join('')}</div>${ours.map(meWarnings).join('')}</section>` : ''}
   ${dup.length ? `<section class="sec">${dup.map(t => `<div class="dup" style="margin-top:0;margin-bottom:8px">${I.alert}<span>${fmt(t)}</span></div>`).join('')}</section>` : ''}
   <section class="sec card qa">${det ? `
-    <h3>이 약의 효능은 무엇입니까?</h3><p>${esc(det.e)}</p>
-    <h3>이 약은 어떻게 사용합니까?</h3><p>${esc(det.u)}</p>
-    <h3>사용상 주의사항</h3><p>${esc(det.c)}</p>
-    ${det.x ? `<h3>주의해야 할 약 또는 음식</h3><p>${esc(det.x)}</p>` : ''}
-    ${det.s ? `<h3>나타날 수 있는 이상반응</h3><p>${esc(det.s)}</p>` : ''}
-    ${det.k ? `<h3>보관 방법</h3><p>${esc(det.k)}</p>` : ''}` : '<p class="loading">허가사항 요약을 불러오는 중…</p>'}
+    <h3>이 약의 효능은 무엇입니까?</h3><p>${esc(pubText(det.e))}</p>
+    <h3>이 약은 어떻게 사용합니까?</h3><p>${esc(pubText(det.u))}</p>
+    <h3>사용상 주의사항</h3><p>${esc(pubText(det.c))}</p>
+    ${det.x ? `<h3>주의해야 할 약 또는 음식</h3><p>${esc(pubText(det.x))}</p>` : ''}
+    ${det.s ? `<h3>나타날 수 있는 이상반응</h3><p>${esc(pubText(det.s))}</p>` : ''}
+    ${det.k ? `<h3>보관 방법</h3><p>${esc(pubText(det.k))}</p>` : ''}` : '<p class="loading">허가사항 요약을 불러오는 중…</p>'}
     <div class="srcs"><span class="src-chip">${I.link}출처: 식품의약품안전처 e약은요(의약품개요정보) · 공공데이터포털</span>${ix.img ? `<span class="src-chip">${I.link}낱알 사진: 약학정보원·식약처</span>` : ''}</div>
   </section>
   <div class="actions">${ours.length === 1 ? `<button class="btn ghost" onclick="toggleTaking('${ours[0].id}')">${I.pill} 지금 먹는 약으로 등록</button>` : ''}</div>

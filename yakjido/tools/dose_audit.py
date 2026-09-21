@@ -8,7 +8,7 @@
 """
 import json, glob, os, re, sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from pharmform import formclass, LABEL      # 겔 자리에 파스 용법을 놓지 않기 위해
+from pharmform import formclass, LABEL, norm   # 겔 자리에 파스 용법을 놓지 않기 위해
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DATA = os.path.join(os.path.dirname(ROOT), 'docs', 'yakjido', 'data')
 drugs = [x for f in sorted(glob.glob(os.path.join(ROOT, 'content', 'drugs*.json')))
@@ -40,6 +40,13 @@ for d in sorted(drugs, key=lambda x: x['id']):
     # 제형이 같은 것만 — 겔을 적어 두고 파스 용법을 나란히 놓으면 대조가 안 된다
     want = {formclass(pr.get('name', '')) for pr in (d.get('products') or [])} or {'solid'}
     same = [it for it in prods if formclass(it['n']) in want]
+    # 앱이 적어 둔 제품과 이름이 같은 것을 앞으로 — 같은 성분·같은 제형이라도
+    # 쓰임이 다른 제품이 섞인다(클로르헥시딘은 가글과 수술 소독액이 같은 액제다)
+    mine = [norm(pr.get('name', '')) for pr in (d.get('products') or []) if pr.get('name')]
+    def near(it):
+        n = norm(it['n'])
+        return 0 if any(m and (n.startswith(m) or m in n) for m in mine) else 1
+    same.sort(key=near)
     n += 1
     app = ' · '.join(f"{k}: {v}" for k, v in dose.items() if v)
     print(f"\n## {d['name']}\n")

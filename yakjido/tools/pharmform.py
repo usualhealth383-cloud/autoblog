@@ -16,7 +16,8 @@ def norm(s):
 
 FORMPAT = (
     ('eye',    r'점안|안연고'),
-    ('nasal',  r'나잘|비강|점비|스프레이|분무'),
+    ('nasal',  r'나잘|비강|점비'),
+    ('spray',  r'스프레이|분무|네뷸라이저'),
     ('patch',  r'파스|파프|카타플라스마|플라스타|첩부|패치|패취|경고제'),
     ('insert', r'질정$|좌약$|좌제$'),
     ('nail',   r'네일|라카$'),
@@ -33,6 +34,6 @@ def formclass(t):
         if re.search(pat, x): return name
     return 'solid'
 
-LABEL = {'eye': '눈에 넣는 약', 'nasal': '코에 뿌리는 약', 'patch': '붙이는 약', 'insert': '넣는 약',
+LABEL = {'eye': '눈에 넣는 약', 'nasal': '코에 뿌리는 약', 'spray': '뿌리는 약', 'patch': '붙이는 약', 'insert': '넣는 약',
          'nail': '바르는 네일', 'skin': '바르는 약', 'troche': '입에서 녹이는 약',
          'liquid': '마시는 약', 'powder': '가루약', 'solid': '먹는 약'}
