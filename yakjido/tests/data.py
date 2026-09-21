@@ -157,6 +157,32 @@ for d in D:
             if fl not in VALID_FLAG:
                 fails.append(f'약 {d["id"]} 에 없는 조건 이름 «{fl}» — 이 주의는 화면에 뜨지 않습니다')
 
+# ── 「그런 줄 알았는데」 — 출처 없이는 한 꼭지도 실을 수 없다 ────────────────
+# 흔히 듣는 말을 뒤집는 화면이라, 근거가 없으면 그냥 다른 소문이 된다.
+_MY = json.load(open(C / 'myths.json', encoding='utf-8')) if (C / 'myths.json').exists() else []
+_ROUTES = {'home','drugs','tips','me','together','kinds','pill','supp','kids','mix','photo',
+           'schedule','about','bag','rxout','senior','myths','symptom','drug','class','guide','hello'}
+for _m in _MY:
+    if not _m.get('src'): fails.append(f'그런줄 {_m["id"]} 에 출처가 없습니다')
+    src_ok('그런줄 ' + _m['id'], _m.get('src'))
+    for _f in ('heard', 'verdict', 'n', 'body', 'group', 'icon'):
+        if not _m.get(_f): fails.append(f'그런줄 {_m["id"]} 의 {_f} 가 비었습니다')
+    _g = (_m.get('go') or '').lstrip('/').split('?')[0].split('/')[0]
+    if _g and _g not in _ROUTES: fails.append(f'그런줄 {_m["id"]} 의 연결 화면이 없습니다 → {_m.get("go")}')
+    _t = (_m.get('go') or '')
+    if _t.startswith('/symptom/') and _t.split('/')[2].split('?')[0] not in sid:
+        fails.append(f'그런줄 {_m["id"]} 가 없는 증상으로 갑니다 → {_t}')
+    if _t.startswith('/drug/') and _t.split('/')[2].split('?')[0] not in did:
+        fails.append(f'그런줄 {_m["id"]} 가 없는 약으로 갑니다 → {_t}')
+    if _t.startswith('/supp/') and _t.split('/')[2].split('?')[0] not in supid:
+        fails.append(f'그런줄 {_m["id"]} 가 없는 영양제로 갑니다 → {_t}')
+    if _t.startswith('/class/') and _t.split('/')[2].split('?')[0] not in kid:
+        fails.append(f'그런줄 {_m["id"]} 가 없는 계열로 갑니다 → {_t}')
+    if _t.startswith('/tips?open='):
+        if _t.split('=')[1] not in {t['id'] for t in T}: fails.append(f'그런줄 {_m["id"]} 가 없는 팁으로 갑니다 → {_t}')
+for _m in _MY: hardword(_m, '', '그런줄 ' + _m['id'])
+for _m in _MY: jargon(_m, '', '그런줄 ' + _m['id'])
+
 # ── 항콜린 점수는 출처 없이 붙이지 않는다 ─────────────────────────────────
 # 카페인·이소프로필안티피린·에텐자미드에 «어르신 조심» 뜻으로 ach=1 이 붙어 있었다.
 # 게보린 한 알이 그것만으로 2점을 만들어, 진짜 항콜린제의 신호를 묽게 하고 있었다.
@@ -202,7 +228,7 @@ if _idx.exists():
         for _k in ('symptoms', 'drugs', 'sources', 'ingredients', 'interactions'):
             if not _c.get(_k): fails.append(f'core.json 에 {_k} 가 비어 있습니다')
 
-print(f'증상 {len(S)} · 약 {len(D)} · 계열 {len(K)} · 영양제 {len(SUP)} · 팁 {len(T)} · 규칙 {len(IX["rules"])} · 출처 {len(SRC)}')
+print(f'증상 {len(S)} · 약 {len(D)} · 계열 {len(K)} · 영양제 {len(SUP)} · 팁 {len(T)} · 그런줄 {len(_MY)} · 규칙 {len(IX["rules"])} · 출처 {len(SRC)}')
 if fails:
     print('실패', len(fails)); [print('  ✗', f) for f in fails]; sys.exit(1)
 print('✓ 자료 고리 전부 연결')

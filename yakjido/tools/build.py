@@ -65,7 +65,7 @@ SLIM = {
     'supplements': ['id', 'name', 'en', 'tags', 'brands', 'evidence'],
     'classes':     ['id', 'name', 'short', 'icon'],
 }
-CORE_KEYS = ['sources', 'ingredients', 'interactions', 'kids', 'productImages', 'suppRules']
+CORE_KEYS = ['sources', 'ingredients', 'interactions', 'kids', 'productImages', 'suppRules', 'myths']
 inline, core = {}, {}
 for k, v in data.items():
     if k in SLIM:

@@ -119,6 +119,14 @@
 .xc.self{--xbg:var(--normal-tint);--xfg:var(--normal)} .xc.nono{--xbg:var(--alert-tint);--xfg:var(--alert)}
 .xc.next{--xbg:var(--caution-tint);--xfg:var(--caution)} .xc.faq{--xbg:var(--tint2);--xfg:var(--muted)}
 .xc.talk .art{margin:0 0 10px}
+/* 「그런 줄 알았는데」 — 흔히 듣는 말 위에 근거를 나란히 놓는다 */
+.xc.myth{--xbg:var(--caution-tint);--xfg:var(--caution)}
+.xc.myth summary .heard{font-size:.9375rem;line-height:1.35;font-weight:700;color:var(--muted);word-break:keep-all}
+.xc.myth summary .verdict{font-size:.9375rem;line-height:1.4;font-weight:800;color:var(--body);word-break:keep-all;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:3;overflow:hidden}
+.xc.myth[open] summary{flex-direction:column;align-items:flex-start}
+.xc.myth[open] summary .verdict{display:block;-webkit-line-clamp:none}
+.myth-n{display:inline-flex;align-items:center;gap:6px;font-size:.8125rem;font-weight:800;color:var(--primary-deep);background:var(--tint);border-radius:999px;padding:6px 12px;margin-bottom:10px;word-break:keep-all}
+.myth-lead{margin:10px 0 0;font-size:.9375rem;line-height:1.65;word-break:keep-all}
 /* 말풍선 — 약국 카운터에서 실제로 하는 말 */
 .chat{display:flex;flex-direction:column;gap:8px}
 .bubble{position:relative;max-width:88%;padding:11px 14px;border-radius:16px 16px 16px 4px;background:var(--tint2);font-size:.9375rem;line-height:1.6;color:var(--text)}
@@ -1206,8 +1214,8 @@ function mergeCore(c){
     const by = new Map((D[k] || []).map(x => [x.id, x]));
     (c[k] || []).forEach(o => { const t = by.get(o.id); if (t) Object.assign(t, o); else (D[k] = D[k] || []).push(o); });
   }
-  for (const k of ['sources', 'ingredients', 'interactions', 'kids', 'productImages', 'suppRules'])
-    if (c[k]) D[k] = c[k];
+  /* 나머지 칸은 통째로 받는다 — 새 자료를 core 로 빼도 여기를 또 고칠 필요가 없게 */
+  for (const k of Object.keys(c)) if (!['symptoms', 'drugs', 'supplements', 'classes'].includes(k)) D[k] = c[k];
   CORE = 2; window.__READY__ = true;
   /* 첫 화면을 이미 그린 뒤에 자료가 왔다면 — 약통 개수처럼 본문이 있어야 맞는 것들을 다시 그린다 */
   try { if (typeof route === 'function' && document.getElementById('view')?.innerHTML) route(); } catch (e) {}
@@ -1531,7 +1539,7 @@ function route(){
   if (path !== LASTPATH) { SCROLL[LASTPATH] = window.scrollY; GQ = ''; LASTPATH = path; }
   const seg = path.split('/');
   const q = Object.fromEntries(new URLSearchParams(qs || ''));
-  const tab = { show:'home', check:'home', home:'home', symptom:'home', drugs:'drugs', drug:'drugs', class:'drugs', search:'drugs', pub:'drugs', pill:'drugs', guide:'home', kids:'home', tips:'home', schedule:'me', photo:'drugs', pillinfo:'drugs', supp:'supp', compare:'supp', me:'me', about:'me', ingr:'drugs', brand:'drugs', nut:'supp', hello:'home', mix:'drugs', together:'me', kinds:'me', rxout:'drugs', senior:'drugs' }[seg[0]] || 'home';
+  const tab = { show:'home', check:'home', home:'home', symptom:'home', drugs:'drugs', drug:'drugs', class:'drugs', search:'drugs', pub:'drugs', pill:'drugs', guide:'home', kids:'home', tips:'home', myths:'home', schedule:'me', photo:'drugs', pillinfo:'drugs', supp:'supp', compare:'supp', me:'me', about:'me', ingr:'drugs', brand:'drugs', nut:'supp', hello:'home', mix:'drugs', together:'me', kinds:'me', rxout:'drugs', senior:'drugs' }[seg[0]] || 'home';
   document.querySelectorAll('nav.tabbar button').forEach(b => b.classList.toggle('on', b.dataset.tab === tab));
   /* 본문 자료가 아직이면 — 첫 화면과 인사만 먼저 그리고, 나머지는 받은 뒤에 다시 그린다.
      기다리는 동안에도 상단 바와 뒤로 가기는 살아 있어야 한다. */
@@ -1544,7 +1552,7 @@ function route(){
     ensureCore().then(route);
     return;
   }
-  const R = { show:vShow, check:vCheck, home:vHome, symptom:vSymptom, drugs:vDrugs, drug:vDrug, class:vClass, search:vSearch, pub:vPub, pill:vPill, guide:vGuide, kids:vKids, tips:vTips, schedule:vSchedule, photo:vPhoto, pillinfo:vPillInfo, supp:vSupp, compare:vCompare, me:vMe, about:vAbout, ingr:vIngr, brand:vBrand, nut:vNut, hello:vHello, mix:vMix, together:vTogether, kinds:vKinds, bag:vBag, rxout:vRxOut, senior:vSenior };
+  const R = { show:vShow, check:vCheck, home:vHome, symptom:vSymptom, drugs:vDrugs, drug:vDrug, class:vClass, search:vSearch, pub:vPub, pill:vPill, guide:vGuide, kids:vKids, tips:vTips, myths:vMyths, schedule:vSchedule, photo:vPhoto, pillinfo:vPillInfo, supp:vSupp, compare:vCompare, me:vMe, about:vAbout, ingr:vIngr, brand:vBrand, nut:vNut, hello:vHello, mix:vMix, together:vTogether, kinds:vKinds, bag:vBag, rxout:vRxOut, senior:vSenior };
   const html = (R[seg[0]] || vHome)(seg[1], q);
   const panel = gqPanel();
   view.innerHTML = panel ? insertPanel(html, panel) : html;
@@ -2165,6 +2173,7 @@ function vHome(){
   <section class="sec"><h2>바로 가기</h2>
     <div class="tiles">
       <button class="tile wide" onclick="go('/kinds')"><div class="ic">${I.pill}</div><div><b>약 이름을 몰라도 담기</b><span>“혈압약 먹어요”까지만 아셔도 위험한 조합을 걸러요</span></div>${I.chev}</button>
+      <button class="tile wide" onclick="go('/myths')"><div class="ic">${I.scale}</div><div><b>그런 줄 알았는데</b><span>흔히 듣는 말 ${(D.myths||[]).length || 18}가지를 근거로 다시 봤어요</span></div>${I.chev}</button>
       <button class="tile wide" onclick="go('/class/nsaid')"><div class="ic">${I.scale}</div><div><b>소염진통제, 무엇이 위장에 덜 부담일까</b><span>이부프로펜·나프록센·덱시부프로펜·셀레콕시브 비교</span></div>${I.chev}</button>
       <button class="tile wide" onclick="go('/kids')"><div class="ic">${I.user}</div><div><b>아이 해열제, 몇 mL 먹이지?</b><span>몸무게·개월로 시럽 용량 계산 · 우리집 소아과 연동</span></div>${I.chev}</button>
       <button class="tile wide" onclick="go('/supp')"><div class="ic">${I.leaf}</div><div><b>내 영양제 성분 겹치는지 보기</b><span>제형·함량·상한 기준으로 비교</span></div>${I.chev}</button>
@@ -2820,9 +2829,42 @@ function vTips(_, q){
   const rest = T.filter(t => !TG.includes(t.group));
   return `${topBar({ back:'홈' })}<div class="eyebrow">약 상식</div><h1>알아두면 좋은 것</h1><p style="margin-top:6px">약국에서 약을 고르기 전에 알면 안전이 달라지는 것들이에요. 짧게, 하나씩. 모두 ${T.length}꼭지.</p>
   ${(() => { const today = T[new Date().getDate() % T.length]; return `<section class="sec ${gcls(today.group)}"><button class="today" onclick="go('/tips?open=${today.id}')"><div class="in"><div><div class="eb">오늘의 한 장</div><b>${esc(today.title)}</b><span>${esc(today.body.replace(/\*\*/g, '').slice(0, 60))}…</span></div><div class="ic">${icon(today.icon)}</div></div></button></section>`; })()}
+  <section class="sec"><button class="today" onclick="go('/myths')"><div class="in"><div><div class="eb">근거로 다시 보기</div><b>그런 줄 알았는데</b><span>«숙취해소제가 듣는다» «철분은 비타민 C와» — 자료를 찾아보면 달랐던 것들</span></div><div class="ic">${I.scale}</div></div></button></section>
   <nav class="gjump" aria-label="갈래로 바로 가기">${groups.map(([g], i) => `<button class="${gcls(g)}" onclick="jumpTo('tgrp${i}')"><span class="gdot"></span>${esc(g)}</button>`).join('')}</nav>
   ${groups.map(([g, xs], i) => `<section class="sec ${gcls(g)}" id="tgrp${i}"><h2><span><span class="gdot"></span>${esc(g)}</span><small>${xs.length}꼭지</small></h2><div class="explore">${xs.map(card).join('')}</div></section>`).join('')}
   ${rest.length ? `<section class="sec g-etc"><h2><span><span class="gdot"></span>그 밖에</span><small>${rest.length}꼭지</small></h2><div class="explore">${rest.map(card).join('')}</div></section>` : ''}
+  ${disclaimer()}`;
+}
+
+/* ───────── 「그런 줄 알았는데」 ─────────
+   흔히 듣는 말과 근거가 어긋나는 자리를 한곳에 모았다. 약을 파는 화면이 아니라
+   «이 말은 어디까지 맞나»를 숫자로 보여 주는 화면이다. */
+function vMyths(_, q){
+  const M = D.myths || [];
+  if (!M.length) return vHome();
+  const MG = ['약국에서 사는 것', '영양제', '약 고르기', '같이 먹어도 되나', '그 밖에'];
+  const card = m => `<details class="xc myth" id="my-${m.id}" ${q.open === m.id ? 'open' : ''}><summary>
+    <div class="ic">${icon(m.icon)}</div>
+    <b class="heard">“${esc(m.heard)}”</b>
+    <span class="verdict">${esc(m.verdict)}</span>
+    <span class="cnt">근거 보기${I.chev}</span></summary>
+    <div class="bd">
+      <div class="myth-n">${I.scale}${esc(m.n)}</div>
+      <p class="myth-lead">${fmt(m.body)}</p>
+      <div class="actions" style="margin-top:6px">${speakBtn(`(D.myths.find(x=>x.id==='${m.id}')||{}).body`, m.heard + ' 근거 읽어 주기')}</div>
+      ${srcChips(m.src)}
+      ${m.go ? `<div class="actions"><a class="btn ghost" href="#${m.go}">${I.chev} ${esc(m.goText || '자세히 보기')}</a></div>` : ''}
+    </div></details>`;
+  const groups = MG.map(g => [g, M.filter(m => m.group === g)]).filter(([, xs]) => xs.length);
+  const rest = M.filter(m => !MG.includes(m.group));
+  return `${topBar({ back:'홈' })}<div class="eyebrow">근거로 다시 보기</div><h1>그런 줄 알았는데</h1>
+  <p style="margin-top:6px">약에 대해 흔히 듣는 말 가운데, <b>자료를 찾아보면 달랐던 것</b>들이에요.
+  «하지 마세요»가 아니라 <b>숫자가 어디까지 말하는지</b>를 그대로 적었습니다. 모두 ${M.length}가지.</p>
+  ${(() => { const today = M[new Date().getDate() % M.length]; return `<section class="sec"><button class="today" onclick="go('/myths?open=${today.id}')"><div class="in"><div><div class="eb">오늘의 한 가지</div><b>${esc(today.heard)}</b><span>${esc(today.verdict)}</span></div><div class="ic">${icon(today.icon)}</div></div></button></section>`; })()}
+  <nav class="gjump" aria-label="갈래로 바로 가기">${groups.map(([g], i) => `<button onclick="jumpTo('mgrp${i}')"><span class="gdot"></span>${esc(g)}</button>`).join('')}</nav>
+  ${groups.map(([g, xs], i) => `<section class="sec" id="mgrp${i}"><h2><span><span class="gdot"></span>${esc(g)}</span><small>${xs.length}가지</small></h2><div class="explore">${xs.map(card).join('')}</div></section>`).join('')}
+  ${rest.length ? `<section class="sec g-etc"><h2><span><span class="gdot"></span>그 밖에</span><small>${rest.length}가지</small></h2><div class="explore">${rest.map(card).join('')}</div></section>` : ''}
+  <section class="sec"><div class="note">${I.info}<span><b>이 화면은 «약을 먹지 마세요»가 아닙니다.</b> 근거가 없다고 밝힌 것은 «효과가 없다고 증명됐다»와 다르고, 근거가 약한 것도 의사가 이유가 있어 내실 수 있어요. <b>드시던 약을 이 화면을 보고 스스로 끊지 마세요.</b></span></div></section>
   ${disclaimer()}`;
 }
 
