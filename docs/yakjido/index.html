@@ -1359,6 +1359,7 @@ const cls = id => byId(D.classes, id);
 const supp = id => byId(D.supplements, id);
 const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const I = {
+  prev: '<svg class="i" viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></svg>',   /* 뒤로 가기 화살표. 아래 back 은 «허리»라 여기에 쓰면 안 된다 (2026-09-22) */
   back: '<svg class="i" viewBox="0 0 24 24"><circle cx="10.4" cy="4" r="2"/><path d="M10.4 6.8c-2.4 1-3.6 3-3.6 5.6 0 1.6.4 2.8 1.2 4"/><path d="M8 16.4 7 21M11.6 16.2l2 4.8"/><path d="M11.2 11.4c1.4.4 2.2 1.2 2.6 2.4"/><path d="M16.4 10.4h2.4M15.6 7.2l1.8-1.6M15.8 14l2 1.4"/></svg>',
   chev:'<svg class="i chev" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg>',
   search:'<svg class="i" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>',
@@ -1729,7 +1730,7 @@ function insertPanel(html, panel){
 /* ───────── 공통 조각 ───────── */
 const topBar = (opts = {}) => `
   <div class="top">
-    ${opts.back ? `<button class="back" onclick="goBack()">${I.back}${esc(opts.back)}</button>` : `
+    ${opts.back ? `<button class="back" onclick="goBack()">${I.prev}${esc(opts.back)}</button>` : `
     <div class="brand"><div class="mark"><img src="${BRANDMARK}" alt="" width="34" height="34"></div><div><b>약지도</b><span>증상에 맞는 약, 의사가 고르듯</span></div></div>`}
     ${opts.unreviewed ? `<span class="review-stamp wait">${I.alert}검수 대기</span>` : `<span class="review-stamp">${I.shield}${esc(D.meta?.reviewLabel || '의료진 검수')} · ${esc(D.meta?.reviewed || '')}</span>`}
   </div>
@@ -2590,7 +2591,11 @@ function basket(s){
       if (soft) { pick = soft; d = drug(soft); swapped = 'ach'; }
     }
     const achWarn = ME.age === 'senior' && achOfDrug(d) >= 3;
-    return { slot: p.slot, i: p._i, d, optional: !!p.optional, either: p.either || '', swapped, achWarn, blocked: d ? bad(pick) : false, again: !!p.again,
+    /* 65세가 넘으면 소염제도 따로 일러 드린다. 항콜린 점수만 보던 탓에
+       「어르신 주의」가 종합감기약 한 줄에만 붙고, 정작 소염제에는 아무 표시가 없었다.
+       나이가 들면 위장 출혈·콩팥 손상 위험이 같은 용량에서도 올라간다(2026-09-22 발견). */
+    const nsaidWarn = ME.age === 'senior' && d && d.class === 'nsaid';
+    return { slot: p.slot, i: p._i, d, optional: !!p.optional, either: p.either || '', swapped, achWarn, nsaidWarn, blocked: d ? bad(pick) : false, again: !!p.again,
              product: (p.prod && (d?.products || []).some(pr => pr.name === p.prod) ? p.prod : d?.products?.[0]?.name) };
   }).filter(x => x.d);
 }
@@ -2739,7 +2744,8 @@ function buyItem(x){
   const badge = x.blocked ? '<span class="badge stop">약사와 상의</span>'
     : x.swapped === 'ach' ? '<span class="badge warn">부담 적은 쪽으로 바꿈</span>'
     : x.swapped ? '<span class="badge warn">조건에 맞춰 바꿈</span>'
-    : x.achWarn ? '<span class="badge warn">어르신 주의 · 짧게만</span>' : '';
+    : x.achWarn ? '<span class="badge warn">어르신 주의 · 짧게만</span>'
+    : x.nsaidWarn ? '<span class="badge warn">어르신 주의 · 적은 양으로 짧게</span>' : '';
   return `<button class="buy-item ${x.optional ? 'opt' : ''} ${pimg(x.product) ? 'has-img' : ''} ${open ? 'open' : ''}" onclick="OPEN_BUY=OPEN_BUY==='${x.d.id}'?'':'${x.d.id}';route()" aria-expanded="${open}">
     <span class="bi-t">
       <small class="role">${esc(x.slot)}${x.optional ? ' · 도움될 수 있어요' : ''}${SYM_NOW && isWorked(SYM_NOW, x.d.id) ? ' · 효과 봤던 약' : ''}</small>

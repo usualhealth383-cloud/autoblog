@@ -277,6 +277,21 @@ def main():
         if _c['bad']: fails.append(f'복약 달력 칸이 정사각이 아닙니다: {_c["bad"]}')
         if not _c['says']: fails.append('복약 달력에 «며칠 중 며칠» 문장이 없습니다')
         if _c['pct']: fails.append('복약률을 %로 적고 있습니다 — 자연빈도(며칠 중 며칠)로 적어야 합니다')
+        # 5a-6. 65세 이상으로 켜면 «소염제»에도 주의가 붙어야 한다.
+        #       전에는 항콜린 점수만 보아, 「어르신 주의」가 종합감기약 한 줄에만 붙고
+        #       정작 소염제에는 아무 표시가 없었다(2026-09-22).
+        pg.goto(url + '#/symptom/cold'); ready(); pg.wait_for_timeout(400)
+        _s = pg.evaluate("""()=>{
+          /* 앞 검사가 켜 둔 몸 상태가 남아 있으면 「약사와 상의」 배지가 먼저 붙는다 — 비우고 본다 */
+          ['heart','diabetes','ulcer','kidney','liver','anticoag','glaucoma','bph','asthma','alcohol','gout','pregnant'].forEach(f=>{ME[f]=false;});
+          const has = a => { ME.age=a; ME.taking=[]; ME.pub={}; route();
+            return [...document.querySelectorAll('.buy-item')]
+              .some(e=>/이부프로펜|나프록센|덱시부프로펜/.test(e.innerText) && /어르신 주의/.test(e.innerText)); };
+          const senior = has('senior'), adult = has('adult');
+          ME.age='adult'; saveMe();
+          return {senior, adult};}""")
+        if not _s['senior']: fails.append('65세 이상인데 소염제에 「어르신 주의」가 안 붙습니다')
+        if _s['adult']: fails.append('성인인데도 소염제에 「어르신 주의」가 붙습니다')
         # 5a-4. 홈 「오늘 약」 한 장 — 약이 없으면 안 뜨고, 있으면 지금 드실 것을 보여 줘야 한다
         pg.goto(url + '#/home'); ready(); pg.wait_for_timeout(250)
         _h = pg.evaluate("""()=>{
@@ -433,7 +448,7 @@ def main():
     print(f'화면 {len(routes)}개 검사 완료')
     if fails:
         print('실패', len(fails)); [print('  ✗', f) for f in fails]; sys.exit(1)
-    print('✓ 전부 통과 — JS 오류 0 · 넘침 0 · 잘림 0 · 명암비 AA · 조작 부품 3:1 · 44px · 단추 누르기 · 복용 간격 · 복약 달력 · 홈 오늘약 · 아이콘 전수 · 약 알림 · 어르신 모드 · 320px · 병용 8건 · 겹침 규칙 52 · 입력칸 이름표 · 성분 해석 123 · 죽은 규칙 0 · 약통 판정 4건 · 자기중복 3건 · 바구니 겹침 · 이중계산 0 · 검색 8건 · 구어 12건 · 문장 16건')
+    print('✓ 전부 통과 — JS 오류 0 · 넘침 0 · 잘림 0 · 명암비 AA · 조작 부품 3:1 · 44px · 단추 누르기 · 복용 간격 · 복약 달력 · 홈 오늘약 · 어르신 소염제 · 아이콘 전수 · 약 알림 · 어르신 모드 · 320px · 병용 8건 · 겹침 규칙 52 · 입력칸 이름표 · 성분 해석 123 · 죽은 규칙 0 · 약통 판정 4건 · 자기중복 3건 · 바구니 겹침 · 이중계산 0 · 검색 8건 · 구어 12건 · 문장 16건')
 
 if __name__ == '__main__':
     main()
