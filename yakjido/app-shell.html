@@ -2319,7 +2319,7 @@ function search(q){
      「변비가」라는 없는 말이 생겨, 「변비가 있어요」가 엉뚱한 화면으로 갔다. */
   if (!SEARCH_CORPUS) SEARCH_CORPUS = '|' + [
     ...(D.symptoms || []).flatMap(x => [x.name, ...(x.tags || [])]),
-    ...(D.drugs || []).flatMap(x => [x.name, x.en]),
+    ...(D.drugs || []).flatMap(x => [x.name, x.en, ...(x.for || [])]),
     ...(D.supplements || []).flatMap(x => [x.name, ...(x.tags || [])]),
   ].filter(Boolean).map(norm).join('|') + '|';
   /* 원래 친 말도 함께 남긴다 — 구어 사전이 「해열제」를 「열」로 바꿔 버리면
@@ -2340,7 +2340,10 @@ function search(q){
   const mAll = (...parts) => { if (!many) return false; const hay = norm(parts.filter(Boolean).join(' ')); return words.every(w => hay.includes(w)); };
   (D.symptoms || []).forEach(s => { if (m(s.name) || (s.tags || []).some(m) || mAll(s.name, (s.tags || []).join(' '), s.short)) out.push({ k:'증상', c:'s', t:s.name, d:s.short || '', h:'/symptom/' + s.id, w:3 }); });
   (D.drugs || []).forEach(d => {
+    /* 이름만 보면 「생리통」으로 찾아도 아세트아미노펜이 안 나왔다. 약마다 적힌 「이럴 때 씁니다(for)」도 본다. */
+    const hitFor = (d.for || []).find(m);
     if (m(d.name) || m(d.en) || mAll(d.name, d.en, d.tagline)) out.push({ k:'성분', c:'', t:d.name, d:(cls(d.class)?.name || '') + ' · ' + d.rx, h:'/drug/' + d.id, w:2 });
+    else if (hitFor || mAll(d.name, d.en, d.tagline, (d.for || []).join(' '))) out.push({ k:'성분', c:'', t:d.name, d:(hitFor ? `‘${hitFor}’에 쓰는 · ` : '') + (cls(d.class)?.name || '') + ' · ' + d.rx, h:'/drug/' + d.id, w:1 });
     (d.products || []).forEach(p => { if (!p.name.includes('·') && !p.name.includes(' 등') && m(p.name)) out.push({ k:'제품', c:'p', t:p.name, d:`${d.name} · ${p.amount || ''}`, h:'/drug/' + d.id, w:2 }); });
   });
   (D.supplements || []).forEach(s => { const hitTag = (s.tags || []).find(m); if (m(s.name) || hitTag || mAll(s.name, (s.tags || []).join(' '), s.for)) out.push({ k:'영양제', c:'', t:s.name, d:(hitTag && !m(s.name) ? `‘${hitTag}’ → 이 성분 · ` : '') + (s.for || ''), h:'/supp/' + s.id, w:1 }); });

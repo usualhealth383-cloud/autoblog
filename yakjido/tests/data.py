@@ -228,6 +228,33 @@ if _idx.exists():
         for _k in ('symptoms', 'drugs', 'sources', 'ingredients', 'interactions'):
             if not _c.get(_k): fails.append(f'core.json 에 {_k} 가 비어 있습니다')
 
+# ── PubMed 을 근거로 쓴 출처에는 DOI 링크를 단다 ─────────────────────────
+# 현욱님 규칙. DOI 가 아예 없는 옛 논문도 있어서, 그때는 「DOI 가 등록돼 있지 않다」고
+# 적어 두게 했다. 둘 다 아니면 그냥 빠뜨린 것이다.
+for _k, _v in SRC.items():
+    _u = _v.get('url') or ''; _n = _v.get('note') or ''
+    if 'PMID' in _n or 'pubmed.ncbi' in _u:
+        if 'doi.org' not in _u and 'DOI 가 등록돼 있지 않은' not in _n:
+            fails.append(f'출처 {_k} — PubMed 근거인데 DOI 링크가 없습니다(없는 논문이면 note 에 적어 주세요)')
+
+# ── 숫자와 영어 단위는 한 칸 띄운다 ────────────────────────────────────
+# 「3,000mg」처럼 붙여 쓴 곳이 섞여 있었다. 한글 단위(알·정·캡슐)는 붙여 쓰는 것이 맞아
+# 영어 단위만 본다. 허가사항 제품명(타이레놀정 500mg)은 원문 그대로라 출처에서는 넘어간다.
+_unit = re.compile(r'(?<![A-Za-z0-9.])(\d[\d,.]*)(mg|g|mL|ml|µg|mcg|IU|kg)\b')
+for _p in sorted(ROOT.glob('content/*.json')):
+    if _p.name.startswith('sources'): continue
+    for _m in _unit.finditer(_p.read_text(encoding='utf-8')):
+        fails.append(f'{_p.name} — 숫자와 단위를 붙여 썼습니다: «{_m.group(0)}»')
+
+# ── 같은 성분의 상한을 두 곳이 다르게 말하면 안 된다 ──────────────────────
+# 아연 상한이 영양제 화면에서는 35 mg, 겹침 규칙에서는 40 mg 이었다.
+_ul = {'아연': '35 mg', '비타민 C': '2,000 mg'}
+for _name, _want in _ul.items():
+    _txt = ''.join(_p.read_text(encoding='utf-8') for _p in sorted(ROOT.glob('content/*.json')) if not _p.name.startswith('sources'))
+    for _m in re.finditer(re.escape(_name) + r'[^"]{0,40}?상한[^"]{0,24}?([\d,]+)\s?mg', _txt):
+        if _m.group(1) + ' mg' != _want:
+            fails.append(f'{_name} 상한이 {_m.group(1)} mg 로 적힌 곳이 있습니다 — 기준은 {_want} 입니다')
+
 print(f'증상 {len(S)} · 약 {len(D)} · 계열 {len(K)} · 영양제 {len(SUP)} · 팁 {len(T)} · 그런줄 {len(_MY)} · 규칙 {len(IX["rules"])} · 출처 {len(SRC)}')
 if fails:
     print('실패', len(fails)); [print('  ✗', f) for f in fails]; sys.exit(1)

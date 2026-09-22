@@ -61,7 +61,7 @@ data['art'] = found
 # 화면 함수는 하나도 바꾸지 않아도 된다.
 SLIM = {
     'symptoms':    ['id', 'group', 'icon', 'name', 'short', 'tags', 'reviewed'],
-    'drugs':       ['id', 'name', 'en', 'class', 'rx', 'tagline', 'simple', 'tags'],
+    'drugs':       ['id', 'name', 'en', 'class', 'rx', 'tagline', 'simple', 'for'],
     'supplements': ['id', 'name', 'en', 'tags', 'brands', 'evidence'],
     'classes':     ['id', 'name', 'short', 'icon'],
 }
