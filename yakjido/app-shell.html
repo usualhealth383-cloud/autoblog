@@ -1563,7 +1563,7 @@ const art = (n, cls = '') => hasArt(n) ? `<figure class="art ${cls}"><img src="a
 let GQ = '', MQ = '', LASTPATH = '', HINT = 0;
 function gqPanel(){
   const q = GQ.trim(); if (q.length < 1) return '';
-  lexLoad();                                  /* 사전은 검색을 처음 쓸 때 받는다 */
+  lexLoad(); pubIndexSoon();                  /* 사전과 식약처 목록은 검색을 처음 쓸 때 받는다 */
   const hits = search(q).slice(0, 12);
   const a = qaFind(q);
   const goHref = a?.go ? (a.go[0] === 'ing' ? (lexOf(a.go[1])?.drug && drug(lexOf(a.go[1]).drug) ? '/drug/' + lexOf(a.go[1]).drug : '/ingr/' + a.go[1]) : '') : '';
@@ -2413,9 +2413,17 @@ function search(q){
   if (!res.length) { const st = SEARCH_SYN[stem(q)] || stem(q); if (st && st !== q) return search(st); }
   return res;
 }
-pubIndex(); // 검색에 식약처 제품이 바로 잡히도록 미리 받아둔다(약 1MB, 캐시)
+/* 식약처 낱알 목록(약 1.2 MB)은 예전에 앱이 뜨자마자 받았다. 본문(core.json)과 같이
+   내려받느라, 신호가 약한 곳에서는 첫 화면이 20초 넘게 걸렸다. 이제는
+   ① 3.5초 뒤 조용히 받거나 ② 검색을 시작하시면 그때 받는다. 다 받으면 화면을 다시 그린다. */
+let PUB_SOON = 0;
+function pubIndexSoon(){
+  if (PUB.index || PUB_SOON) return; PUB_SOON = 1;
+  pubIndex().then(() => { if (typeof route === 'function') route(); });
+}
 const hitsHtml = hits => hits.map(h => `<button class="hit" onclick="go('${h.h}')"><span class="k ${h.c}">${h.k}</span><div><b>${esc(h.t)}</b><span>${esc(h.d)}</span></div>${I.chev}</button>`).join('');
 function vSearch(_, q){
+  lexLoad(); pubIndexSoon();
   const hits = search(q.q || '');
   return `${topBar({ back:'뒤로' })}<h1>‘${esc(q.q || '')}’ 검색</h1><div class="card results" style="margin-top:16px">${hitsHtml(hits) || `<div class="empty"><b>검색 결과가 없어요</b>증상 이름(허리·두통·생리통)이나 성분 이름으로 찾아보세요.</div>`}</div>`;
 }
@@ -3604,6 +3612,7 @@ function vDrug(id){
   const d = drug(id); if (!d) return vDrugs('', {});
   const c = cls(d.class);
   const same = (D.drugs || []).filter(x => x.class === d.class && x.id !== d.id);
+  if (!PUB.index) pubIndexSoon();   /* 아직 안 왔으면 받아 두고, 오면 다시 그린다 */
   const pub = (PUB.index || []).filter(p => (p.map || []).includes(d.id));
   const pubHtml = pub.length ? `<h3 style="margin-top:20px">식약처 등록 제품 <small class="muted" style="font-weight:500">${pub.length}개 · e약은요 공공데이터${pub.length > 30 ? ' · 30개만 표시' : ''}</small></h3><div class="rows">${pub.slice(0, 30).map(p => `<button class="row" onclick="go('/pub/${p.id}')">${p.img ? `<img class="pillimg" src="${esc(p.img)}" alt="" loading="lazy" onerror="this.style.visibility='hidden'">` : ''}<div class="body"><b>${esc(p.n)}</b><span>${esc(p.m)}${p.map.length > 1 ? ' · 복합제(' + p.map.length + '성분)' : ''}</span></div>${p.cvs ? '<span class="badge cvs">편의점</span>' : ''}${I.chev}</button>`).join('')}</div>` : (PUB.index ? '' : '<p class="loading">식약처 제품 목록을 불러오는 중…</p>');
   return `${topBar({ back:'약 사전' })}
@@ -4334,7 +4343,7 @@ document.addEventListener('input', e => { if (!e.target.closest('.calc')) return
 function setFs(v){ try { localStorage.setItem('yakjido.fs', v); } catch (e) {} document.documentElement.style.setProperty('--fs', v); route(); }
 try { const fs = localStorage.getItem('yakjido.fs'); if (fs) document.documentElement.style.setProperty('--fs', fs); } catch (e) {}
 /* 제품·성분 사전(약 700 KB)은 첫 화면이 자리 잡은 뒤 조용히 미리 받는다 — "인사돌" 을 쳤을 때 제품이 증상보다 위에 오게(감사 #38). 데이터 절약 모드면 안 받는다 */
-setTimeout(() => { try { if (navigator.connection && navigator.connection.saveData) return; } catch (e) {} lexLoad(true); }, 3500);
+setTimeout(() => { try { if (navigator.connection && navigator.connection.saveData) return; } catch (e) {} lexLoad(true); pubIndexSoon(); }, 3500);
 /* ───────── 시작 ───────── */
 try { if (!helloDone() && !location.hash) { location.hash = '#/hello/1'; } } catch (e) {}
 armNotifications();

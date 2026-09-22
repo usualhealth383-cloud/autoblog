@@ -227,6 +227,11 @@ if _idx.exists():
         _c = json.loads(_core.read_text(encoding='utf-8'))
         for _k in ('symptoms', 'drugs', 'sources', 'ingredients', 'interactions'):
             if not _c.get(_k): fails.append(f'core.json 에 {_k} 가 비어 있습니다')
+        # 본문도 첫 화면에서 바로 받는다 — 여기가 커지면 신호 약한 곳에서 그대로 기다림이 된다.
+        # (식약처 낱알 목록·성분 사전은 3.5초 뒤나 검색할 때 받으므로 첫 화면과 경쟁하지 않는다)
+        _ckb = len(_gz.compress(_core.read_bytes(), 6)) / 1024
+        if _ckb > 400:
+            fails.append(f'본문이 무겁습니다 — core.json 압축 {_ckb:.0f} KB (한계 400 KB)')
 
 # ── PubMed 을 근거로 쓴 출처에는 DOI 링크를 단다 ─────────────────────────
 # 현욱님 규칙. DOI 가 아예 없는 옛 논문도 있어서, 그때는 「DOI 가 등록돼 있지 않다」고
