@@ -90,6 +90,10 @@
 #view>*:nth-child(5){animation-delay:160ms} #view>*:nth-child(6){animation-delay:200ms} #view>*:nth-child(7){animation-delay:240ms}
 #view>*:nth-child(n+8){animation-delay:280ms}
 @media (prefers-reduced-motion:reduce){#view>*{animation:none}}
+/* 움직임을 줄여 달라고 해 두신 분께는 전부 멈춘다 — 어지럼·멀미가 있으신 분께 필요하다 */
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important;scroll-behavior:auto!important}
+}
 
 
 /* ── 증상 상세: 똑같은 흰 막대 다섯 개 대신, 색과 아이콘이 다른 펼침 카드 ── */
@@ -1171,7 +1175,7 @@ main>*:nth-child(2){animation-delay:.04s} main>*:nth-child(3){animation-delay:.0
 .hello-mark{width:64px;height:64px;border-radius:20px;background:var(--primary);color:var(--on-primary);display:grid;place-items:center;margin:0 auto var(--s4)}
 .hello-mark svg{width:34px;height:34px;stroke:var(--on-primary);stroke-width:2;fill:none;stroke-linecap:round;stroke-linejoin:round}
 .hello-mark.ok{background:var(--normal)}
-.hello-mark.ok{color:#fff}
+.hello-mark.ok{color:var(--on-primary)}   /* 어두운 테마의 연한 초록 위에 흰 체크는 2.49:1 이었다 */
 .hello-mark.ok svg.i{width:34px;height:34px;stroke-width:2.4;stroke:currentColor}
 .hello-hi h1{font-size:1.625rem}
 .hello-hi p{margin-top:var(--s3);font-size:1rem;line-height:1.7}

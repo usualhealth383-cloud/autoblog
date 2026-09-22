@@ -76,6 +76,10 @@ UICON_JS = """()=>{
    const base=bg(e.parentElement);
    const best=cols.reduce((a,c)=>Math.max(a,cr(c,base)),0);
    if(best<3)out.push(who+' '+best.toFixed(2)+':1');}
+ /* 아이콘도 본다 — 이 앱에서 아이콘은 장식이 아니라 «무슨 증상인지»를 말하는 그림이다 */
+ for(const sv of document.querySelectorAll('#view svg.i')){
+   const r=cr(getComputedStyle(sv).color, bg(sv.parentElement));
+   if(r<3) out.push('아이콘('+((sv.parentElement.className+'')||'').slice(0,14)+') '+r.toFixed(2)+':1');}
  return [...new Set(out)];}"""
 
 # 약 알림이 실제로 만들어지는지.
