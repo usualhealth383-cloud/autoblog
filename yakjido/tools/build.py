@@ -139,10 +139,36 @@ if src_icon:
         if not baked:
             for size, name in SIZES:
                 im.resize((size, size), Image.LANCZOS).save(pages / name, 'PNG')
-            # 안드로이드는 바깥을 동그랗게 잘라낸다 — 80% 로 줄여 가운데 두고 바탕색으로 채운다
-            pad = Image.new('RGB', (512, 512), im.getpixel((6, 6)))
-            pad.paste(im.resize((410, 410), Image.LANCZOS), (51, 51))
-            pad.save(pages / 'icon-maskable-512.png', 'PNG')
+            # ── 안드로이드용 maskable 아이콘 ────────────────────────────────
+            # 런처가 아이콘을 동그라미·네모·물방울로 잘라낸다. 규칙은 둘이다.
+            #   ① 바탕색이 네 변 끝까지 차 있어야 한다 (안 그러면 원 밖에 흰 테가 생긴다)
+            #   ② 그림은 «가운데 지름 80% 원» 안에 들어와야 한다 (밖은 잘려 나간다)
+            # 예전 코드는 80% 로 줄여 (6,6) 픽셀 색으로 채웠는데, 그 자리가 크림색 여백이라
+            # 정확히 ①을 어겼다. 지금은 파란 바탕의 그라데이션을 좌표 1차식으로 맞춰 새로 깔고,
+            # 그림만 떼어 안전원에 맞게 줄여 얹는다.
+            try:
+                import numpy as _np
+                _sq = im.crop((int(im.width * .1), int(im.height * .1),
+                               int(im.width * .9), int(im.height * .9))).resize((512, 512), Image.LANCZOS)
+                _a = _np.array(_sq).astype(float)
+                _alpha = _np.clip((_a.sum(axis=2) - 430) / 130.0, 0, 1)      # 흰·연파랑 그림만 1 에 가깝다
+                _yy, _xx = _np.mgrid[0:512, 0:512]
+                _ok = _alpha < 0.05
+                _A = _np.stack([_xx[_ok], _yy[_ok], _np.ones(_ok.sum())], axis=1)
+                _bg = _np.zeros((512, 512, 3))
+                for _c in range(3):
+                    _k, *_ = _np.linalg.lstsq(_A, _a[:, :, _c][_ok], rcond=None)
+                    _bg[:, :, _c] = _k[0] * _xx + _k[1] * _yy + _k[2]
+                _ys, _xs = _np.where(_alpha > 0.5)
+                _r = _np.sqrt((_xs - 256.) ** 2 + (_ys - 256.) ** 2).max()
+                _s = max(64, int(512 * (200.0 / _r)))                        # 안전원 반지름 205 보다 조금 안쪽
+                _art = Image.fromarray(_np.dstack([_a, _alpha * 255]).astype('uint8'), 'RGBA').resize((_s, _s), Image.LANCZOS)
+                _out = Image.fromarray(_np.clip(_bg, 0, 255).astype('uint8'), 'RGB').convert('RGBA')
+                _out.alpha_composite(_art, ((512 - _s) // 2, (512 - _s) // 2))
+                _out.convert('RGB').save(pages / 'icon-maskable-512.png', 'PNG')
+            except Exception as _e:
+                print('maskable 아이콘은 단순 확대로 대신합니다:', _e)
+                im.resize((640, 640), Image.LANCZOS).crop((64, 64, 576, 576)).save(pages / 'icon-maskable-512.png', 'PNG')
         assert src_icon.read_bytes() == before, 'ERROR: 빌드가 art/ 의 아이콘 원본을 고쳤습니다'
         print(f'앱 아이콘 ← art/{src_icon.name}' + (' + icon.svg' if baked else '') + ' (원본은 읽기만 합니다)')
     except Exception as e:

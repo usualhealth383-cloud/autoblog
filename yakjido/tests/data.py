@@ -255,6 +255,26 @@ for _name, _want in _ul.items():
         if _m.group(1) + ' mg' != _want:
             fails.append(f'{_name} 상한이 {_m.group(1)} mg 로 적힌 곳이 있습니다 — 기준은 {_want} 입니다')
 
+# ── 「이렇게 드세요」가 계획에 없는 약을 권하면 안 된다 ────────────────────
+# 기침 화면이 계획에서는 아세틸시스테인을 고르면서, 아래 안내문에서는 구아이페네신이
+# 든 감기약을 권하고 있었다. 화면 하나가 서로 다른 말을 하던 자리다.
+_dname = {}
+for _d in D:
+    _n = _d['name'].split('(')[0].strip()
+    if len(_n) >= 3: _dname.setdefault(_n, _d['id'])
+for _s in S:
+    _ids = set()
+    for _p in _s.get('plan', []):
+        _ids |= set(_p.get('options') or [])
+        if _p.get('pick'): _ids.add(_p['pick'])
+    # 「그 약은 이 자리에 안 맞는다」고 설명하는 문장은 권하는 것이 아니다 — 그 문장만 따로 본다
+    _no = ('잘 듣지 않', '권하지', '피하', '낫습니다', '양이 적', '아니', '대신')
+    for _line in (_s.get('how') or []):
+        for _sent in re.split(r'(?<=[.!?])\s+', _line):
+            for _n, _i in _dname.items():
+                if _n in _sent and _i not in _ids and _n != '카페인' and not any(_k in _sent for _k in _no):
+                    fails.append(f'증상 {_s["id"]} — 「이렇게 드세요」는 «{_n}»을 권하는데 계획 칸에는 없습니다')
+
 print(f'증상 {len(S)} · 약 {len(D)} · 계열 {len(K)} · 영양제 {len(SUP)} · 팁 {len(T)} · 그런줄 {len(_MY)} · 규칙 {len(IX["rules"])} · 출처 {len(SRC)}')
 if fails:
     print('실패', len(fails)); [print('  ✗', f) for f in fails]; sys.exit(1)
