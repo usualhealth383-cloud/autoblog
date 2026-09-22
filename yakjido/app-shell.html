@@ -1119,7 +1119,11 @@ nav.tabbar button.on svg.i{stroke-width:2.2}
 /* 종이로 뽑기 — 한 장 화면은 카드만, 나머지는 숨긴다 */
 /* 종이에 찍히면 안 되는 것 — 누를 수 없는 단추와 상단 바.
    「메모로 복사·전송」·「종이로 뽑기」·「자세한 판정 보기」가 그대로 찍히고 있었다. */
-@media print{nav.tabbar,.top,.topfind,.actions,.disclaimer,.netbar,#cmpbar,.eyebrow,.back,.speak,.tabs,.quick,.today-row,.memo-actions,.search,.acc>summary svg,.more-btn,.act,.tog-cta,.btn{display:none!important}details.acc,details.why-more,details.pub-more{display:block!important}details[open]>.bd,details>.bd{display:block!important}.app,#view{max-width:none;padding:0}.show-card{box-shadow:none;border:1.5px solid #333;break-inside:avoid;page-break-inside:avoid}.show-big{border:1px solid #999}body{background:#fff;color:#000}h1{font-size:18pt}}
+#printhead{display:none}
+@media print{#printhead{display:block;margin:0 0 14px;padding:0 0 10px;border-bottom:2px solid #333}
+#printhead b{display:block;font-size:15pt;font-weight:800}
+#printhead span{display:block;font-size:9.5pt;color:#444;margin-top:3px;line-height:1.5}
+nav.tabbar,.top,.topfind,.actions,.disclaimer,.netbar,#cmpbar,.eyebrow,.back,.speak,.tabs,.quick,.today-row,.memo-actions,.search,.acc>summary svg,.more-btn,.act,.tog-cta,.btn{display:none!important}details.acc,details.why-more,details.pub-more{display:block!important}details[open]>.bd,details>.bd{display:block!important}.app,#view{max-width:none;padding:0}.show-card{box-shadow:none;border:1.5px solid #333;break-inside:avoid;page-break-inside:avoid}.show-big{border:1px solid #999}body{background:#fff;color:#000}h1{font-size:18pt}}
 /* 내 약통 줄 — 며칠만 토글 + 빼기 */
 .bag-rows{margin-top:var(--s3)}
 .bag-row{display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid var(--hairline)} .bag-row:last-child{border-bottom:0}
@@ -1235,6 +1239,7 @@ main>*:nth-child(2){animation-delay:.04s} main>*:nth-child(3){animation-delay:.0
 </style>
 
 <div class="app">
+  <div id="printhead" aria-hidden="true"></div>
   <main id="view" aria-live="polite"></main>
   <div id="cmpbar" class="cmp-bar hide"></div>
   <nav class="tabbar" aria-label="주요 화면">
@@ -4333,6 +4338,15 @@ setTimeout(() => { try { if (navigator.connection && navigator.connection.saveDa
 /* ───────── 시작 ───────── */
 try { if (!helloDone() && !location.hash) { location.hash = '#/hello/1'; } } catch (e) {}
 armNotifications();
+
+/* 종이에는 앱 이름도 날짜도 없었다. 약국·진료실에 내미는 종이이니 그 둘과
+   「이것은 처방이 아니다」 한 줄을 맨 위에 둔다. 화면에서는 보이지 않는다. */
+window.addEventListener('beforeprint', () => {
+  const d = new Date(), p2 = n => String(n).padStart(2, '0');
+  const el = document.getElementById('printhead'); if (!el) return;
+  el.innerHTML = '<b>약지도</b>'
+    + `<span>${d.getFullYear()}년 ${d.getMonth() + 1}월 ${d.getDate()}일 ${p2(d.getHours())}:${p2(d.getMinutes())} · 환자가 앱으로 정리한 내용입니다 — 처방이 아닙니다.</span>`;
+});
 route();
 if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
   navigator.serviceWorker.register('sw.js').catch(() => {});
