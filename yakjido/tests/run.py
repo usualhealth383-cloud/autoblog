@@ -10,8 +10,8 @@
   3. 글자 잘림 0 (scrollWidth > clientWidth 인 말단 요소)
   4. 명암비 — 밝은/어두운 테마 모두 WCAG AA (본문 4.5, 큰 글씨 3.0)
   5. 탭 타깃 44px 미만 0 (문장 속 인라인 링크는 WCAG 2.5.8 예외)
-  5b. 어르신 모드(글자 20px) 16화면에서 넘침·잘림 0
-  5c. 좁은 화면(320px) × 20px 글씨 17화면에서 넘침·잘림 0
+  5b. 어르신 모드(글자 22px — 가장 큰 단계) 16화면에서 넘침·잘림 0
+  5c. 좁은 화면(320px) × 22px 글씨 17화면에서 넘침·잘림 0
   6.  병용 판정 시나리오 8건 (삼중고·와파린·전립선·치매약+방광약·혈압약 모름·안압·천식·스테로이드)
   6a. 병명이 아니라 «드시는 약»으로 걸려야 할 규칙 4건
   6b. 한 통이 자기 자신과 겹쳤다고 세지 않는지 3건
@@ -404,7 +404,7 @@ def main():
         if _n['errs']: fails.append(f'약 알림이 터집니다: {_n["errs"][:2]}')
         if not _n['fired']: fails.append('약 알림이 하나도 만들어지지 않습니다 — 시간이 돼도 안 옵니다')
         # 5b. 어르신 모드(글자 20px·큰 단추) — 넘침·잘림은 큰 글씨에서 먼저 터진다
-        pg.evaluate("localStorage.setItem('yakjido.fs','20px');localStorage.setItem('yakjido.me.v1',JSON.stringify({age:'senior',easy:true,taking:['cls:bp.arb','ibuprofen'],pub:{}}))")
+        pg.evaluate("localStorage.setItem('yakjido.fs','22px');localStorage.setItem('yakjido.me.v1',JSON.stringify({age:'senior',easy:true,taking:['cls:bp.arb','ibuprofen'],pub:{}}))")
         for r in SC + ['/bag', '/schedule', '/symptom/cramp', '/symptom/sprain', '/drug/acetaminophen', '/kinds/bp']:
             pg.goto(url + '#' + r); pg.reload(); ready(); pg.wait_for_timeout(500)
             o = pg.evaluate(OVERFLOW_JS)

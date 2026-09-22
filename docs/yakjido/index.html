@@ -210,10 +210,11 @@ ol.tl li:last-child{padding-bottom:0}
 .view-row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 0}
 .view-row .t b{display:block;font-size:.9375rem;font-weight:700}
 .view-row .t span{display:block;font-size:.8125rem;color:var(--muted)}
-.fs-seg{display:flex;gap:6px}
+.fs-seg{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end;min-width:0}
 .fs-seg button{min-width:52px;min-height:44px;border-radius:12px;background:var(--tint2);color:var(--muted);font-weight:800}
 .fs-seg button.on{background:var(--primary);color:var(--on-primary)}
-.fs-seg button:nth-child(1){font-size:.875rem} .fs-seg button:nth-child(2){font-size:1.0625rem} .fs-seg button:nth-child(3){font-size:1.25rem}
+.fs-seg button:nth-child(1){font-size:.875rem} .fs-seg button:nth-child(2){font-size:1.0625rem} .fs-seg button:nth-child(3){font-size:1.25rem} .fs-seg button:nth-child(4){font-size:1.4375rem}
+.fs-seg button{min-width:46px}
 .hello-fs{margin-top:var(--s3);padding:14px;border-radius:14px;background:var(--tint2);display:flex;align-items:center;justify-content:space-between;gap:10px}
 .hello-fs b{font-size:.9375rem}
 .hello-close{margin-top:var(--s4);font-size:1.0625rem;line-height:1.7;color:var(--body);text-align:center}
@@ -347,7 +348,7 @@ a.link.crumb,.drug-hero a.cls,.sec>h2 small a.link{display:inline-flex;align-ite
 .row .ic{width:40px;height:40px;border-radius:12px;background:var(--tint);color:var(--primary);display:grid;place-items:center;flex:none}
 .row .body{flex:1;min-width:0}
 .row b{display:block;font-size:.9375rem;font-weight:700;line-height:1.35;word-break:keep-all;overflow-wrap:anywhere}
-.row span{display:block;font-size:.8125rem;color:var(--muted);line-height:1.4;margin-top:1px}
+.row span{display:block;font-size:.8125rem;color:var(--muted);line-height:1.4;margin-top:1px;white-space:normal;overflow-wrap:anywhere;word-break:keep-all}
 /* 배지는 글자만큼만 — .row span 의 display:block 에 먹혀 줄 전체를 채우던 것 */
 .row .badge{display:inline-flex;width:auto;margin-top:0;vertical-align:middle}
 /* 사진이 없을 때 그려 주는 제형 그림 */
@@ -392,6 +393,8 @@ ul.steps li::before{content:counter(s);position:absolute;left:0;top:2px;width:24
 
 /* 아이 용량 계산기 */
 .kid-form{display:grid;grid-template-columns:1fr 1fr;gap:var(--s2);margin-top:var(--s3)}
+/* 가장 큰 글씨 × 좁은 화면에서는 두 칸이 안 들어간다 — 한 줄씩 */
+@media (max-width:360px){.kid-form{grid-template-columns:1fr}}
 .kid-form label{display:flex;flex-direction:column;gap:4px;font-size:.75rem;font-weight:700;color:var(--muted)}
 .kid-form label.full{grid-column:1/-1}
 .kid-form input,.kid-form select{min-height:48px;border:1px solid var(--hairline);border-radius:var(--r-input);padding:0 12px;font:inherit;font-size:1.0625rem;background:var(--card);color:var(--text);width:100%}
@@ -474,6 +477,11 @@ ul.steps li::before{content:counter(s);position:absolute;left:0;top:2px;width:24
 .dose-tick.done{background:var(--normal-tint);border-color:transparent}
 .dose-tick.done .bx{background:var(--normal);border-color:var(--normal)}
 .dose-tick.late{border-color:rgba(182,54,41,.35)}
+.wait-fold>summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:8px;min-height:52px;font-size:1.0625rem}
+.wait-fold>summary::-webkit-details-marker{display:none}
+.wait-fold>summary small{flex:1;font-size:.8125rem;font-weight:500;color:var(--muted)}
+.wait-fold>summary svg.i{color:var(--faint);transition:transform .2s}
+.wait-fold[open]>summary svg.i{transform:rotate(90deg)}
 /* 홈 「오늘 약」 한 장 */
 .dh{background:var(--card);border:1px solid var(--hairline);border-radius:var(--r-card);box-shadow:var(--shadow-card);overflow:hidden}
 .dh-go{display:block;width:100%;text-align:left;padding:13px 16px 10px}
@@ -2372,9 +2380,10 @@ function vHome(){
   ${groups.map((g, i) => { const items = (D.symptoms || []).filter(s => s.group === g && s.reviewed !== false); if (!items.length) return '';
     return `<section class="sec ${gcls(g)}" id="grp${i}"><h2><span><span class="gdot"></span>${esc(g)}</span><small>${items.length}가지</small></h2><div class="tiles">${items.map(s => `<button class="tile" onclick="go('/symptom/${s.id}')"><div class="ic">${sicon(s)}</div><b>${esc(s.name)}</b><span>${esc(s.short || '')}</span></button>`).join('')}</div></section>`; }).join('')}
   ${(() => { const wait = (D.symptoms || []).filter(s => s.reviewed === false); if (!wait.length) return '';
-    return `<section class="sec g-etc"><h2><span><span class="gdot"></span>검수 대기</span><small>전문의 확인 전 ${wait.length}가지</small></h2>
-      <p class="small muted" style="margin:-4px 0 10px">자료를 바탕으로 정리했지만 아직 의사 확인을 거치지 않았어요. 참고만 하시고 약사·의사와 상의하세요.</p>
-      <div class="tiles">${wait.map(s => `<button class="tile wait ${gcls(s.group)}" onclick="go('/symptom/${s.id}')"><div class="ic">${sicon(s)}</div><b>${esc(s.name)}</b><span>${esc(s.short || '')}</span><span class="wait-t">검수 대기</span></button>`).join('')}</div></section>`; })()}
+    /* 홈에서 가장 긴 덩어리였다(타일 18개). 감추지는 않되 접어 둔다 — 찾는 분은 한 번만 누르면 된다 */
+    return `<section class="sec g-etc"><details class="wait-fold"><summary><span class="gdot"></span><b>검수 대기</b><small>전문의 확인 전 ${wait.length}가지 — 눌러서 보기</small>${I.chev}</summary>
+      <p class="small muted" style="margin:10px 0">자료를 바탕으로 정리했지만 아직 의사 확인을 거치지 않았어요. 참고만 하시고 약사·의사와 상의하세요.</p>
+      <div class="tiles">${wait.map(s => `<button class="tile wait ${gcls(s.group)}" onclick="go('/symptom/${s.id}')"><div class="ic">${sicon(s)}</div><b>${esc(s.name)}</b><span>${esc(s.short || '')}</span><span class="wait-t">검수 대기</span></button>`).join('')}</div></details></section>`; })()}
   ${(() => { const T = D.tips || []; if (!T.length) return ''; const t = T[new Date().getDate() % T.length]; return `<section class="sec"><h2>알아두면 좋은 것 <small><a class="link" href="#/tips">전부 보기</a></small></h2><button class="tip-card" onclick="go('/tips?open=${t.id}')"><div class="ic">${icon(t.icon)}</div><div><b>${esc(t.title)}</b><span>${esc(t.body.replace(/\*\*/g, '').slice(0, 70))}…</span></div></button></section>`; })()}
   <section class="sec"><h2>바로 가기</h2>
     <div class="tiles">
@@ -4617,7 +4626,8 @@ function vCompare(_, q){
 }
 
 /* ───────── 내 정보 ───────── */
-const fsSeg = () => `<div class="fs-seg" role="group" aria-label="글자 크기">${[['16px','가'],['18px','가'],['20px','가']].map(([k, n]) => `<button class="${(localStorage.getItem('yakjido.fs') || '16px') === k ? 'on' : ''}" onclick="setFs('${k}');route()" aria-label="글자 ${k === '16px' ? '보통' : k === '18px' ? '크게' : '더 크게'}">${n}</button>`).join('')}</div>`;
+const FS_STEPS = [['16px', '보통'], ['18px', '크게'], ['20px', '더 크게'], ['22px', '가장 크게']];
+const fsSeg = () => `<div class="fs-seg" role="group" aria-label="글자 크기">${FS_STEPS.map(([k, n]) => `<button class="${(localStorage.getItem('yakjido.fs') || '16px') === k ? 'on' : ''}" onclick="setFs('${k}');route()" aria-label="글자 ${esc(n)}">가</button>`).join('')}</div>`;
 /* ── 내 기록을 파일 하나로 옮기기 ──
    기록을 서버에 두지 않기로 했으니, 휴대폰을 바꾸면 그대로 사라진다.
    복약 달력 60일치와 불편했던 일까지 쌓이기 시작하면 그 손실이 크다.
@@ -4646,10 +4656,10 @@ function vMe(){
   <h1>내 정보</h1><p style="margin-top:6px">여기 표시한 상태에 따라 약 추천에 <b>주의 표시</b>가 붙어요. 진료실에서 의사가 처방 전에 꼭 묻는 것들이에요.</p>
   <section class="sec card" style="padding-top:10px;padding-bottom:10px"><div class="view-row"><div class="t"><b>글자 크기</b><span>지금 이 글씨가 작으면 키우세요</span></div>${fsSeg()}</div>
     <div class="view-row" style="border-top:1px solid var(--hairline)"><div class="t"><b>화면 밝기</b><span>눈이 부시거나 어두운 화면이 안 보이면 바꾸세요</span></div>
-      <div class="fs-seg" role="group" aria-label="화면 밝기">${[['auto','자동'],['light','밝게'],['dark','어둡게']].map(([k, n]) => `<button class="${themeNow() === k ? 'on' : ''}" style="min-width:auto;padding:0 10px;font-size:.8125rem" aria-pressed="${themeNow() === k}" onclick="setTheme('${k}')">${n}</button>`).join('')}</div></div>
+      <div class="fs-seg" role="group" aria-label="화면 밝기">${[['auto','자동'],['light','밝게'],['dark','어둡게']].map(([k, n]) => `<button class="${themeNow() === k ? 'on' : ''}" style="min-width:auto;min-height:46px;padding:0 10px;font-size:.8125rem" aria-pressed="${themeNow() === k}" onclick="setTheme('${k}')">${n}</button>`).join('')}</div></div>
     <div class="view-row" style="border-top:1px solid var(--hairline)"><div class="t"><b>어르신 모드</b><span>큰 단추 · 홈은 세 가지만</span></div><button class="sw ${ME.easy ? 'on' : ''}" role="switch" aria-checked="${!!ME.easy}" aria-label="어르신 모드" onclick="ME.easy=!ME.easy;saveMe();setFs(ME.easy?'20px':'16px');route()"></button></div></section>
   <section class="sec card hide"><h2>어르신 모드</h2>${hasArt('easy-mode') ? `<div class="art-row">${art('easy-mode', 'side')}<div class="t small muted">글씨와 단추가 커지고, 홈은 꼭 필요한 세 가지만 남아요. 어르신께 권해 드리세요.</div></div>` : ''}<div class="toggle"><div class="t"><b>큰 글씨 · 큰 단추 · 단순한 홈</b><span>사진 찍기 / 어디가 불편한지 / 오늘 약 체크, 세 가지만</span></div><button class="sw ${ME.easy ? 'on' : ''}" role="switch" aria-checked="${!!ME.easy}" aria-label="어르신 모드" onclick="ME.easy=!ME.easy;saveMe();setFs(ME.easy?'20px':'16px')"></button></div></section>
-  <section class="sec card hide"><h2>글자 크기</h2><div class="seg" style="margin-top:12px">${[['16px', '보통'], ['18px', '크게'], ['20px', '더 크게']].map(([k, n]) => `<button class="${(localStorage.getItem('yakjido.fs') || '16px') === k ? 'on' : ''}" onclick="setFs('${k}')">${n}</button>`).join('')}</div></section>
+  <section class="sec card hide"><h2>글자 크기</h2><div class="seg" style="margin-top:12px">${FS_STEPS.map(([k, n]) => `<button class="${(localStorage.getItem('yakjido.fs') || '16px') === k ? 'on' : ''}" onclick="setFs('${k}')">${n}</button>`).join('')}</div></section>
   <section class="sec card"><h2>나이</h2><div class="seg" style="margin-top:12px">${[['adult', '성인'], ['senior', '65세 이상'], ['child', '소아·청소년']].map(([k, n]) => `<button class="${ME.age === k ? 'on' : ''}" onclick="ME.age='${k}';saveMe();route()">${n}</button>`).join('')}</div>
     ${ME.age === 'senior' ? `<div class="actions" style="margin-top:12px"><button class="btn ghost" onclick="go('/senior')">${I.chev} 나이가 들면 달라지는 약 — ${seniorItems().filter(i => i.d.rx !== '전문').length}가지 보기</button></div>
     <p class="small muted" style="margin-top:8px">이제부터 약 화면에 <b>65세 이상 기준 주의</b>가 함께 떠요.</p>` : ''}</section>
