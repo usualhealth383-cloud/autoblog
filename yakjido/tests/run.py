@@ -277,6 +277,27 @@ def main():
         if _c['bad']: fails.append(f'복약 달력 칸이 정사각이 아닙니다: {_c["bad"]}')
         if not _c['says']: fails.append('복약 달력에 «며칠 중 며칠» 문장이 없습니다')
         if _c['pct']: fails.append('복약률을 %로 적고 있습니다 — 자연빈도(며칠 중 며칠)로 적어야 합니다')
+        # 5a-7. 소아 용량 — 「N회 · M mg」이 곱셈을 부추기면 안 된다.
+        #       덱시부프로펜 12 kg 에서 「4회 · 300 mg」이 떠서, 1회 84 mg × 4 = 336 mg 으로
+        #       허가 한도를 넘기게 읽혔다(2026-09-22). 몸무게를 훑어 전부 본다.
+        pg.goto(url + '#/kids'); ready(); pg.wait_for_timeout(400)
+        _k = pg.evaluate("""()=>{
+          const bad=[];
+          for (const w of [6,8,10,12,15,18,20,24,28,30,35,40,50]) {
+            ME.age='child'; ME.child={name:'',birth:'2016-03-01',weight:w}; route();
+            for (const c of document.querySelectorAll('.dose-card')) {
+              const nm=(c.querySelector('.eyebrow')||{}).innerText||'';
+              const mg=(c.querySelector('.dose-meta div:nth-child(1) b')||{}).innerText||'';
+              const cap=(c.querySelector('.dose-meta div:nth-child(3) b')||{}).innerText||'';
+              const hi=+((mg.match(/~\s*([0-9.]+)/)||[])[1]||0);
+              const day=+((cap.match(/([0-9,]+)\s*mg/)||[])[1]||'0').replace(/,/g,'');
+              const n=+((cap.match(/^([0-9]+)회/)||[])[1]||0);
+              if (n && hi && day && n*hi > day + 0.5) bad.push(w+'kg '+nm.slice(0,8)+' '+cap+' (1회 '+hi+'×'+n+'='+(n*hi)+')');
+            }
+          }
+          ME.age='adult'; ME.child={}; saveMe();
+          return bad;}""")
+        if _k: fails.append(f'소아 하루 한도가 곱하면 넘습니다: {_k[:3]}')
         # 5a-6. 65세 이상으로 켜면 «소염제»에도 주의가 붙어야 한다.
         #       전에는 항콜린 점수만 보아, 「어르신 주의」가 종합감기약 한 줄에만 붙고
         #       정작 소염제에는 아무 표시가 없었다(2026-09-22).
@@ -448,7 +469,7 @@ def main():
     print(f'화면 {len(routes)}개 검사 완료')
     if fails:
         print('실패', len(fails)); [print('  ✗', f) for f in fails]; sys.exit(1)
-    print('✓ 전부 통과 — JS 오류 0 · 넘침 0 · 잘림 0 · 명암비 AA · 조작 부품 3:1 · 44px · 단추 누르기 · 복용 간격 · 복약 달력 · 홈 오늘약 · 어르신 소염제 · 아이콘 전수 · 약 알림 · 어르신 모드 · 320px · 병용 8건 · 겹침 규칙 52 · 입력칸 이름표 · 성분 해석 123 · 죽은 규칙 0 · 약통 판정 4건 · 자기중복 3건 · 바구니 겹침 · 이중계산 0 · 검색 8건 · 구어 12건 · 문장 16건')
+    print('✓ 전부 통과 — JS 오류 0 · 넘침 0 · 잘림 0 · 명암비 AA · 조작 부품 3:1 · 44px · 단추 누르기 · 복용 간격 · 복약 달력 · 홈 오늘약 · 어르신 소염제 · 소아 한도 · 아이콘 전수 · 약 알림 · 어르신 모드 · 320px · 병용 8건 · 겹침 규칙 52 · 입력칸 이름표 · 성분 해석 123 · 죽은 규칙 0 · 약통 판정 4건 · 자기중복 3건 · 바구니 겹침 · 이중계산 0 · 검색 8건 · 구어 12건 · 문장 16건')
 
 if __name__ == '__main__':
     main()

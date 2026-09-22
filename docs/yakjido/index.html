@@ -2983,7 +2983,10 @@ function kidDose(k, w, m){
   const kidCap = kc && (kc.inclusive ? w <= kc.kg : w < kc.kg) ? kc : null;
   const capDay = Math.min(D.capDay, kidCap ? kidCap.mg : Infinity);
   const rawDay = w * perKgDay; const day = Math.round(Math.min(rawDay, capDay));
-  return { D, lo, hi, day, perKgDay, kidCap, capDay,
+  /* 「4회 · 300 mg」처럼 적으면 부모가 84 mg × 4 = 336 mg 으로 곱해 버린다 — 허가 한도를 넘는다.
+     한 번에 드리는 «많은 쪽»으로 하루 몇 번까지인지를 그대로 센다(2026-09-22). */
+  const times = Math.max(1, Math.min(D.maxPerDay, Math.floor((day + 0.5) / Math.max(1, hi))));
+  return { D, lo, hi, day, times, perKgDay, kidCap, capDay,
            capped: rawHi > D.capDose + .5 || rawDay > capDay + .5,
            rawHi: Math.round(rawHi), rawDay: Math.round(rawDay) };
 }
@@ -3021,9 +3024,10 @@ function vKids(){
     return `<div class="dose-card"><div class="eyebrow">${esc(D.name)} · ${esc(D.brand)}</div>
       <div class="dose-big"><b>${mlLo === mlHi ? mlLo : mlLo + '~' + mlHi}</b><span>mL · 한 번에</span></div>
       <p class="small muted">${esc(conc.label)} 기준. 가지고 계신 약병의 농도를 꼭 확인하세요.${D.conc.length > 1 ? ' 다른 제품: ' + D.conc.slice(1).map(x => esc(x.label)).join(', ') : ''}</p>
-      <div class="dose-meta"><div><small>성분량</small><b>${r.lo}~${r.hi} mg</b></div><div><small>간격</small><b>${esc(D.gapText)} 이상</b></div><div><small>하루 한도</small><b>${D.maxPerDay}회 · ${r.day} mg</b></div></div>
+      <div class="dose-meta"><div><small>성분량</small><b>${r.lo}~${r.hi} mg</b></div><div><small>간격</small><b>${esc(D.gapText)} 이상</b></div><div><small>하루 한도</small><b>${r.times < D.maxPerDay ? `${r.day} mg` : `${D.maxPerDay}회 · ${r.day} mg`}</b></div></div>
       ${label}
       ${r.capped ? `<div class="note" style="margin-top:10px">${I.info}<span>몸무게로만 곱하면 1회 ${r.rawHi} mg·하루 ${r.rawDay} mg이지만, ${r.kidCap ? esc(r.kidCap.why) : `어른 상한(1회 ${D.capDose}·하루 ${D.capDay} mg)`}에서 멈춰요.</span></div>` : ''}
+      ${r.times < D.maxPerDay ? (() => { const nLo = Math.max(1, Math.min(D.maxPerDay, Math.floor((r.day + 0.5) / Math.max(1, r.lo)))); return `<div class="kid-line" style="background:var(--caution-tint);color:var(--caution)">${I.alert}<span><b>횟수보다 «하루 총량»이 먼저 걸리는 몸무게예요.</b> 이 약은 하루 ${D.maxPerDay}번까지 쓸 수 있지만, <b>하루 ${r.day} mg</b>을 넘기면 안 됩니다. ${r.lo === r.hi ? '' : `적은 쪽 <b>${r.lo} mg</b>씩이면 <b>${nLo}번</b>, `}많은 쪽 <b>${r.hi} mg</b>씩이면 <b>${r.times}번</b>까지예요. <b>횟수와 1회 양을 곱해서 총량을 넘기지 마세요.</b></span></div>`; })() : ''}
       ${k === 'apap' && m != null && m < 24 ? `<p class="small muted" style="margin-top:8px">두 돌 전이라 하루 한도를 60 mg/kg으로 봤어요(그 뒤 75 mg/kg).</p>` : ''}
       <p class="small muted" style="margin-top:8px">${esc(D.note)}</p>
       <a class="link small" href="#/drug/${D.drugId}">성분 자세히 ›</a></div>`; };
