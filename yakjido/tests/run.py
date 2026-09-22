@@ -135,6 +135,44 @@ RULES_JS = """()=>{
   F.forEach(f=>{ME[f]=false;}); ME.taking=[]; ME.pub={}; saveMe();
   return bad;}"""
 
+# 아이콘이 «서로 같은 그림»이 되는 사고를 막는다.
+# 허리(back)와 장 경련(gutpain)이 24px 에서 사실상 같은 그림이었고,
+# 감기(sneeze)·기침(cough)은 뿜는 표시가 «뒤통수»에 붙어 있었다(2026-09-22).
+# 사람 눈을 대신할 수는 없지만, «둘이 똑같다»는 기계가 잡을 수 있다.
+ICONDUP_JS = """async()=>{
+  const names = Object.keys(I).filter(k=>typeof I[k]==='string' && I[k].indexOf('<svg')===0);
+  const N=24, bits={};
+  for (const k of names){
+    const svg = I[k].replace('<svg', '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"')
+                    .replace('class="i"', 'fill="none" stroke="#000" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"');
+    const img = new Image();
+    const url = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
+    await new Promise((res,rej)=>{ img.onload=res; img.onerror=()=>res(); img.src=url; });
+    const c=document.createElement('canvas'); c.width=N; c.height=N;
+    const g=c.getContext('2d'); g.clearRect(0,0,N,N);
+    try{ g.drawImage(img,0,0,N,N); }catch(e){}
+    const d=g.getImageData(0,0,N,N).data; const b=[];
+    for(let i=0;i<N*N;i++) b.push(d[i*4+3]>60?1:0);
+    bits[k]=b;
+  }
+  const ink = k => bits[k].reduce((a,b)=>a+b,0);
+  const same=[];
+  for(let i=0;i<names.length;i++) for(let j=i+1;j<names.length;j++){
+    const a=names[i], b=names[j];
+    if(ink(a)<12 || ink(b)<12) continue;
+    let eq=0; for(let t=0;t<N*N;t++) if(bits[a][t]===bits[b][t]) eq++;
+    const r=eq/(N*N);
+    if(r<0.965) continue;
+    /* 일부러 그대로 두는 짝 — 세계 공통 기호라 바꾸면 오히려 못 읽는다.
+       숫자를 느슨하게 푸는 대신, 예외를 눈에 보이게 적어 둔다. */
+    const KEEP = ['clock|info'];
+    if (KEEP.includes([a,b].sort().join('|'))) continue;
+    same.push(a+'≈'+b+' '+Math.round(r*1000)/10+'%');
+  }
+  const blank = names.filter(k=>ink(k)<12);
+  return {same, blank};
+}"""
+
 TAP_JS = """()=>[...document.querySelectorAll('#view button,#view a')].filter(e=>!((e.matches('a.link')||e.matches('a.call-in'))&&e.closest('p,span,li,div'))).map(e=>{const b=e.getBoundingClientRect();return b.height>0&&b.height<44?((e.innerText||e.className)+'').slice(0,20)+':'+Math.round(b.height):null}).filter(Boolean)"""
 
 def main():
@@ -255,6 +293,11 @@ def main():
         if not _h['has']: fails.append('약을 담고 시간을 골랐는데 홈에 「오늘 약」이 없습니다')
         if not _h['due']: fails.append('드실 시간이 지났는데 홈에서 「드셨어요」를 누를 수 없습니다')
         if not _h['ok']: fails.append('홈에서 「드셨어요」를 눌러도 다 드신 것으로 바뀌지 않습니다')
+        # 5a-5. 아이콘 전수 — 서로 같은 그림이거나 비어 있으면 잡는다
+        pg.goto(url + '#/home'); ready(); pg.wait_for_timeout(300)
+        _i = pg.evaluate(ICONDUP_JS)
+        if _i['blank']: fails.append(f'아이콘이 비어 있습니다: {_i["blank"][:4]}')
+        if _i['same']: fails.append(f'아이콘 둘이 24px 에서 같은 그림입니다: {_i["same"][:4]}')
         # 5a. 약 알림 — 시간이 돼도 안 오던 것(타이머 안에서 조용히 터지고 있었다)
         pg.goto(url + '#/schedule'); ready(); pg.wait_for_timeout(300)
         _n = pg.evaluate(NOTI_JS)
@@ -390,7 +433,7 @@ def main():
     print(f'화면 {len(routes)}개 검사 완료')
     if fails:
         print('실패', len(fails)); [print('  ✗', f) for f in fails]; sys.exit(1)
-    print('✓ 전부 통과 — JS 오류 0 · 넘침 0 · 잘림 0 · 명암비 AA · 조작 부품 3:1 · 44px · 단추 누르기 · 복용 간격 · 복약 달력 · 홈 오늘약 · 약 알림 · 어르신 모드 · 320px · 병용 8건 · 겹침 규칙 52 · 입력칸 이름표 · 성분 해석 123 · 죽은 규칙 0 · 약통 판정 4건 · 자기중복 3건 · 바구니 겹침 · 이중계산 0 · 검색 8건 · 구어 12건 · 문장 16건')
+    print('✓ 전부 통과 — JS 오류 0 · 넘침 0 · 잘림 0 · 명암비 AA · 조작 부품 3:1 · 44px · 단추 누르기 · 복용 간격 · 복약 달력 · 홈 오늘약 · 아이콘 전수 · 약 알림 · 어르신 모드 · 320px · 병용 8건 · 겹침 규칙 52 · 입력칸 이름표 · 성분 해석 123 · 죽은 규칙 0 · 약통 판정 4건 · 자기중복 3건 · 바구니 겹침 · 이중계산 0 · 검색 8건 · 구어 12건 · 문장 16건')
 
 if __name__ == '__main__':
     main()
