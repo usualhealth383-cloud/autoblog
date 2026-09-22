@@ -168,6 +168,18 @@ def main():
                     pg.goto(url + '#' + r); ready(); pg.wait_for_timeout(120)
         errs.clear()
 
+        # 5a-2. 고른 시간이 약의 최소 간격보다 촘촘하면 알려 줘야 한다
+        pg.goto(url + '#/schedule'); ready(); pg.wait_for_timeout(250)
+        _w = pg.evaluate("""()=>{
+          ME.taking=['naproxen']; ME.sched={naproxen:['08:00','13:00']}; route();
+          const a=document.getElementById('view').innerText.includes('시간이 너무 촘촘해요');
+          ME.sched={naproxen:['08:00','19:00']}; route();
+          const b=document.getElementById('view').innerText.includes('시간이 너무 촘촘해요');
+          ME.taking=[]; ME.sched={}; saveMe();
+          return {tight:a, ok:b};}""")
+        if not _w['tight']: fails.append('시간 간격이 촘촘한데 알려 주지 않습니다(나프록센 08:00+13:00)')
+        if _w['ok']: fails.append('간격이 충분한데도 촘촘하다고 합니다(나프록센 08:00+19:00)')
+
         # 5a. 약 알림 — 시간이 돼도 안 오던 것(타이머 안에서 조용히 터지고 있었다)
         pg.goto(url + '#/schedule'); ready(); pg.wait_for_timeout(300)
         _n = pg.evaluate(NOTI_JS)
@@ -297,7 +309,7 @@ def main():
     print(f'화면 {len(routes)}개 검사 완료')
     if fails:
         print('실패', len(fails)); [print('  ✗', f) for f in fails]; sys.exit(1)
-    print('✓ 전부 통과 — JS 오류 0 · 넘침 0 · 잘림 0 · 명암비 AA · 조작 부품 3:1 · 44px · 단추 누르기 · 약 알림 · 어르신 모드 · 320px · 병용 8건 · 입력칸 이름표 · 성분 해석 123 · 죽은 규칙 0 · 약통 판정 4건 · 자기중복 3건 · 바구니 겹침 · 이중계산 0 · 검색 8건 · 구어 12건 · 문장 16건')
+    print('✓ 전부 통과 — JS 오류 0 · 넘침 0 · 잘림 0 · 명암비 AA · 조작 부품 3:1 · 44px · 단추 누르기 · 복용 간격 · 약 알림 · 어르신 모드 · 320px · 병용 8건 · 입력칸 이름표 · 성분 해석 123 · 죽은 규칙 0 · 약통 판정 4건 · 자기중복 3건 · 바구니 겹침 · 이중계산 0 · 검색 8건 · 구어 12건 · 문장 16건')
 
 if __name__ == '__main__':
     main()

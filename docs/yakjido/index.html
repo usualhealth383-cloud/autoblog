@@ -3135,6 +3135,25 @@ function daysLeft(id){
 }
 function lowStock(){ return takingItems().map(d => ({ n: d.name, days: daysLeft(d.id) })).filter(x => x.days != null && x.days <= 5); }
 
+/* 고르신 시간이 약의 «최소 간격»보다 촘촘하면 알려 드린다.
+   칩을 네 개 다 누르면 하루 4번이 되는데, 6~8시간짜리 약은 그러면 안 된다.
+   허가사항의 간격 표현(「4~6시간」·「6~8시간」·「12시간」)에서 앞 숫자를 최소로 본다. */
+function minGapH(item){
+  const t = String(item?.d?.dose?.interval || '');
+  const m = t.match(/([0-9]+)\s*(?:~\s*[0-9]+)?\s*시간/);
+  return m ? +m[1] : 0;
+}
+function schedWarn(item){
+  const need = minGapH(item); if (!need) return '';
+  const ts = schedOf(item.id, item).map(x => { const [h, m] = x.split(':').map(Number); return h * 60 + m; }).sort((a, b) => a - b);
+  if (ts.length < 2) return '';
+  let worst = 24 * 60;
+  for (let i = 1; i < ts.length; i++) worst = Math.min(worst, ts[i] - ts[i - 1]);
+  worst = Math.min(worst, (ts[0] + 24 * 60) - ts[ts.length - 1]);   /* 밤 → 다음 날 아침 */
+  if (worst >= need * 60) return '';
+  const h = Math.floor(worst / 60), mm = worst % 60;
+  return `<div class="note" style="margin-top:8px">${I.alert}<span><b>시간이 너무 촘촘해요</b> — 이 약은 <b>${need}시간</b>은 띄우는 것이 허가 용법인데, 지금은 가장 가까운 두 번이 <b>${h}시간${mm ? ' ' + mm + '분' : ''}</b> 차이예요. 한 번을 빼시거나 시간을 옮겨 주세요.</span></div>`;
+}
 function vSchedule(){
   const taking = takingItems();
   const perm = ('Notification' in window) ? Notification.permission : 'unsupported';
@@ -3145,7 +3164,7 @@ function vSchedule(){
   <p style="margin-top:6px">먹는 약마다 시간을 고르면 오늘 할 일이 체크 목록으로 나오고, 시간이 되면 알려드려요. 약마다 <b>허가 용법대로 시간을 미리 골라</b> 두었으니, 다르시면 눌러서 바꾸시면 돼요.</p>
   ${!taking.length ? `<section class="sec card"><div class="empty"><b>아직 등록한 약이 없어요</b>약 사전에서 약을 찾아 ‘지금 먹는 약으로 등록’을 누르면 여기 나와요.</div><div class="actions"><button class="btn ghost" onclick="go('/drugs')">${I.search} 약 찾기</button></div></section>` : ''}
   ${todays.length ? `<section class="sec"><h2>오늘 <small>${now.getMonth() + 1}월 ${now.getDate()}일 · ${todays.filter(x => x.done).length}/${todays.length} 완료</small></h2><div class="dose-list">${todays.map(x => `<button class="dose-tick ${x.done ? 'done' : (x.min < nowMin - 60 ? 'late' : '')}" onclick="tick('${x.d.id}','${x.t}')"><span class="t">${x.t}</span><span class="n"><b>${esc(x.d.name)}</b><small>${fmt((x.d.simple || '').split('.')[0])}</small></span><span class="bx">${x.done ? I.check : ''}</span></button>`).join('')}</div></section>` : ''}
-  ${taking.length ? `<section class="sec card"><h2>약마다 시간 고르기</h2>${taking.map(d => `<div class="sched-row"><div class="nm"><span>${esc(d.name)}</span>${d.d ? `<a class="link small" href="#/drug/${d.d.id}">복용법 ›</a>` : ''}</div><div class="small muted">${fmt((d.simple || '').split('.')[0])}</div><div class="times">${SLOTS.map(([n, t]) => `<button class="chip ${schedOf(d.id, d).includes(t) ? 'on' : ''}" onclick="toggleSlot('${d.id}','${t}')">${schedOf(d.id, d).includes(t) ? I.check : ''}${n} ${t}</button>`).join('')}</div></div>`).join('')}</section>
+  ${taking.length ? `<section class="sec card"><h2>약마다 시간 고르기</h2>${taking.map(d => `<div class="sched-row"><div class="nm"><span>${esc(d.name)}</span>${d.d ? `<a class="link small" href="#/drug/${d.d.id}">복용법 ›</a>` : ''}</div><div class="small muted">${fmt((d.simple || '').split('.')[0])}</div><div class="times">${SLOTS.map(([n, t]) => `<button class="chip ${schedOf(d.id, d).includes(t) ? 'on' : ''}" onclick="toggleSlot('${d.id}','${t}')">${schedOf(d.id, d).includes(t) ? I.check : ''}${n} ${t}</button>`).join('')}</div>${schedWarn(d)}</div>`).join('')}</section>
   ${taking.length ? `<section class="sec card"><h2>보호자에게 오늘 상황 보내기</h2>
     <p class="small" style="margin-top:6px">오늘 무엇을 드셨고 무엇이 남았는지 <b>한 장으로 만들어</b> 드려요. 카카오톡·문자로 보내시면 됩니다. <b>이 앱이 대신 보내지 않습니다</b> — 기록은 이 휴대폰에만 있어요.</p>
     <div class="actions"><button class="btn" onclick="sendCare()">${I.user} 보호자에게 보내기</button></div>
@@ -3848,7 +3867,17 @@ async function photoPick(file){
     const cv = document.createElement('canvas'); cv.width = Math.round(bmp.width * r); cv.height = Math.round(bmp.height * r); cv.getContext('2d').drawImage(bmp, 0, 0, cv.width, cv.height);
     const dataUrl = cv.toDataURL('image/jpeg', .85); PH.img = dataUrl;
     const ep = photoEndpoint(); if (!ep) { PH.busy = false; PH.err = 'noendpoint'; route(); return; }
-    const res = await fetch(ep, { method:'POST', headers:{ 'Content-Type':'application/json' }, body: JSON.stringify({ image: dataUrl.split(',')[1], mime:'image/jpeg' }) });
+    /* 서버가 대답을 안 하면 「읽는 중…」이 영원히 돌았다. 25초에서 끊고 말씀드린다. */
+    const ac = (typeof AbortController === 'function') ? new AbortController() : null;
+    const tm = ac ? setTimeout(() => ac.abort(), 25000) : 0;
+    let res;
+    try {
+      res = await fetch(ep, { method:'POST', headers:{ 'Content-Type':'application/json' }, signal: ac?.signal, body: JSON.stringify({ image: dataUrl.split(',')[1], mime:'image/jpeg' }) });
+    } catch (e) {
+      clearTimeout(tm);
+      throw new Error(e && e.name === 'AbortError' ? '사진 읽기가 너무 오래 걸려요. 잠시 뒤 다시 찍어 보시거나, 이름으로 찾아 담아 주세요' : (e.message || e));
+    }
+    clearTimeout(tm);
     const j = await res.json(); if (!res.ok || j.error) throw new Error(j.error || res.status);
     PH.result = j;
     if (j.kind === 'pill' || (j.pill && (j.pill.imprint_front || j.pill.imprint_back))) { await pubPills(); await pubPillsRx(); }
