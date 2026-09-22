@@ -474,6 +474,40 @@ ul.steps li::before{content:counter(s);position:absolute;left:0;top:2px;width:24
 .dose-tick.done{background:var(--normal-tint);border-color:transparent}
 .dose-tick.done .bx{background:var(--normal);border-color:var(--normal)}
 .dose-tick.late{border-color:rgba(182,54,41,.35)}
+/* 지난 기록 달력 — 색만으로 뜻을 나르지 않도록 «다 드심»에는 채움, «일부»에는 반달, «빠짐»에는 테두리만 */
+.cal-dow{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px;margin-top:8px}
+.cal-dow span{text-align:center;font-size:.6875rem;font-weight:700;color:var(--muted)}
+.cal{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));grid-auto-rows:1fr;gap:4px;margin-top:4px}
+.cal-d{aspect-ratio:1;min-width:0;border-radius:9px;display:grid;place-items:center;font-size:.75rem;font-weight:700;
+  font-variant-numeric:tabular-nums;background:var(--tint2);color:var(--faint);border:1px solid transparent}
+.cal-d.full{background:var(--normal);color:var(--on-primary);border-color:var(--normal)}
+.cal-d.part{background:var(--caution-tint);color:var(--caution);border-color:var(--caution)}
+.cal-d.miss{background:transparent;color:var(--alert);border:1px dashed var(--alert)}
+.cal-d.soon{background:var(--tint);color:var(--primary-deep);border-color:var(--primary)}
+.cal-d.fut{background:transparent;color:var(--hairline);border-color:transparent}
+.cal-key{display:flex;flex-wrap:wrap;align-items:center;gap:5px 10px;margin-top:10px;font-size:.75rem;color:var(--muted)}
+.cal-key .ki{display:inline-flex;align-items:center;gap:5px;white-space:nowrap}
+.cal-key .k{width:12px;height:12px;border-radius:4px;flex:none;border:1px solid transparent}
+.cal-key .k.full{background:var(--normal);border-color:var(--normal)}
+.cal-key .k.part{background:var(--caution-tint);border-color:var(--caution)}
+.cal-key .k.miss{border:1px dashed var(--alert)}
+.cal-key .k.none{background:var(--tint2);border-color:var(--hairline)}
+.cal-key .k.cal-now{background:transparent;box-shadow:0 0 0 2px var(--primary);border-color:transparent}
+/* 불편했던 일 적기 */
+.ae-list{list-style:none;margin-top:12px;display:flex;flex-direction:column;gap:8px}
+.ae-list li{display:flex;align-items:flex-start;gap:8px;background:var(--tint2);border-radius:12px;padding:10px 10px 10px 12px}
+.ae-list li>div{flex:1;min-width:0}
+.ae-list b{font-size:.875rem}
+.ae-list span{margin-left:6px;font-size:.75rem;color:var(--muted);font-variant-numeric:tabular-nums}
+.ae-list p{font-size:.875rem;color:var(--body);margin-top:3px;word-break:keep-all}
+.ae-x{flex:none;width:32px;height:32px;border-radius:50%;display:grid;place-items:center;color:var(--muted);background:transparent}
+.ae-form{display:flex;flex-direction:column;gap:5px;margin-top:14px}
+.ae-lbl{font-size:.75rem;font-weight:700;color:var(--muted);margin-top:6px}
+.ae-inp{width:100%;min-height:48px;padding:0 12px;border-radius:var(--r-input);border:1px solid var(--ui-line);background:var(--card);color:var(--text);font:inherit;font-size:1rem}
+.ae-inp:focus-visible{outline:2px solid var(--primary);outline-offset:1px}
+.ae-form .btn{margin-top:10px}
+.cal-span{margin-top:12px;font-size:.75rem;font-weight:700;color:var(--muted);text-align:center;font-variant-numeric:tabular-nums}
+.cal-d.cal-now{box-shadow:0 0 0 2px var(--primary)}
 /* 나에게 맞추기 칩 */
 .fitme{margin-top:var(--s3)}
 .fitme .chips .chip{min-height:40px}
@@ -1127,7 +1161,10 @@ nav.tabbar button.on svg.i{stroke-width:2.2}
 @media print{#printhead{display:block;margin:0 0 14px;padding:0 0 10px;border-bottom:2px solid #333}
 #printhead b{display:block;font-size:15pt;font-weight:800}
 #printhead span{display:block;font-size:9.5pt;color:#444;margin-top:3px;line-height:1.5}
-nav.tabbar,.top,.topfind,.actions,.disclaimer,.netbar,#cmpbar,.eyebrow,.back,.speak,.tabs,.quick,.today-row,.memo-actions,.search,.acc>summary svg,.more-btn,.act,.tog-cta,.btn{display:none!important}details.acc,details.why-more,details.pub-more{display:block!important}details[open]>.bd,details>.bd{display:block!important}.app,#view{max-width:none;padding:0}.show-card{box-shadow:none;border:1.5px solid #333;break-inside:avoid;page-break-inside:avoid}.show-big{border:1px solid #999}body{background:#fff;color:#000}h1{font-size:18pt}}
+nav.tabbar,.top,.topfind,.actions,.disclaimer,.netbar,#cmpbar,.eyebrow,.back,.speak,.tabs,.quick,.today-row,.memo-actions,.search,.acc>summary svg,.more-btn,.act,.tog-cta,.btn{display:none!important}details.acc,details.why-more,details.pub-more{display:block!important}details[open]>.bd,details>.bd{display:block!important}.app,#view{max-width:none;padding:0}.show-card{box-shadow:none;border:1.5px solid #333;break-inside:avoid;page-break-inside:avoid}.show-big{border:1px solid #999}body{background:#fff;color:#000}h1{font-size:18pt}
+/* 진료실에 내미는 종이 — 적는 칸과 안내는 빼고, «적어 두신 내용»만 남긴다 */
+.ae-form,.ae-x,.cal-key{display:none!important}details.ae-why{display:none!important}
+.ae-list li{background:none;border:1px solid #999;border-radius:0}}
 /* 내 약통 줄 — 며칠만 토글 + 빼기 */
 .bag-rows{margin-top:var(--s3)}
 .bag-row{display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid var(--hairline)} .bag-row:last-child{border-bottom:0}
@@ -3055,7 +3092,10 @@ function vMyths(_, q){
 
 /* ───────── 복용 시간 알림 ───────── */
 const SLOTS = [['아침', '08:00'], ['점심', '13:00'], ['저녁', '19:00'], ['취침 전', '22:00']];
-const todayKey = () => new Date().toISOString().slice(0, 10);
+/* 날짜는 «그 사람의 시계»로 세야 한다. toISOString() 은 세계 표준시라서,
+   한국에서 아침 9시 전에 드신 약이 «어제»로 적히고 있었다. */
+const dayKey = d => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+const todayKey = () => dayKey(new Date());
 /* 약의 용법에서 「하루 몇 번」을 읽어 기본 시간을 미리 골라 둔다.
    전에는 네 칸이 모두 비어 있어서, 약 네 개면 어르신이 칩을 열두 번 눌러야 알림이 잡혔다.
    화면은 「하루 3번 식후가 기본」이라고 적어 놓고 실제로는 하나도 안 골라 둔 상태였다.
@@ -3079,9 +3119,76 @@ function toggleSlot(id, t){ ME.sched = ME.sched || {};
   /* 아직 손대지 않은 약이면 「미리 골라 둔 것」에서 출발한다 — 누르자마자 나머지가 사라지면 놀라신다 */
   const item = takingItems().find(x => x.id === id);
   const cur = new Set(ME.sched[id] || defaultSlots(item));
-  cur.has(t) ? cur.delete(t) : cur.add(t); ME.sched[id] = [...cur].sort(); saveMe(); armNotifications(); route(); }
-function takenSet(){ ME.taken = ME.taken || {}; const k = todayKey(); for (const d in ME.taken) if (d !== k) delete ME.taken[d]; ME.taken[k] = ME.taken[k] || []; return ME.taken[k]; }
-function tick(id, t){ const arr = takenSet(); const key = id + '@' + t; const i = arr.indexOf(key); i >= 0 ? arr.splice(i, 1) : arr.push(key); saveMe(); route(); }
+  cur.has(t) ? cur.delete(t) : cur.add(t); ME.sched[id] = [...cur].sort(); saveMe(); rollDay(); armNotifications(); route(); }
+/* ── 지난 기록을 남긴다 ──
+   전에는 «오늘»만 두고 어제 것을 지웠다. 그러면 달력도 복용률도 만들 수 없고,
+   진료 때 「요즘 잘 드셨어요?」에 대답할 근거가 없다. 해외 복약 앱(메디세이프)의
+   «복약 리포트», 국내 「오늘의약」의 «달력 기록»이 바로 이 자리다.
+   60일치만 둔다 — 그 이상은 이 휴대폰 저장칸을 잡아먹기만 한다. 서버로는 가지 않는다. */
+const DAYS_KEEP = 60;
+const dayBefore = n => { const d = new Date(); d.setDate(d.getDate() - n); return dayKey(d); };
+function takenSet(){ ME.taken = ME.taken || {}; const k = todayKey(); ME.taken[k] = ME.taken[k] || []; return ME.taken[k]; }
+/* 그날 «몇 번 드시기로 했는지»를 그날 안에 적어 둔다.
+   나중에 약을 빼도 지난 날의 기록이 뒤바뀌지 않아야 한다. */
+function rollDay(){
+  ME.taken = ME.taken || {}; ME.days = ME.days || {};
+  const k = todayKey(), cut = dayBefore(DAYS_KEEP);
+  let dirty = false;
+  for (const d in ME.taken) if (d < cut) { delete ME.taken[d]; dirty = true; }
+  for (const d in ME.days) if (d < cut) { delete ME.days[d]; dirty = true; }
+  /* 몇 번인지뿐 아니라 «어느 때»였는지도 적는다 — 아침을 놓치시는지 저녁을 놓치시는지가
+     진료에서 실제로 약을 바꾸는 근거가 된다. */
+  const slots = {}; let plan = 0;
+  for (const d of takingItems()) for (const t of schedOf(d.id, d)) { slots[t] = (slots[t] || 0) + 1; plan++; }
+  if (plan) { const cur = ME.days[k];
+    const same = cur && typeof cur === 'object' && cur.n === plan && JSON.stringify(cur.s) === JSON.stringify(slots);
+    if (!same) { ME.days[k] = { n: plan, s: slots }; dirty = true; } }
+  if (dirty) saveMe();
+}
+/* 옛 기록은 숫자 하나로만 적혀 있었다 — 둘 다 읽는다 */
+function dayPlan(k){ const v = (ME.days || {})[k]; if (!v) return { n: 0, s: {} };
+  return typeof v === 'number' ? { n: v, s: {} } : { n: v.n || 0, s: v.s || {} }; }
+/* 하루의 상태 — 다 드심 / 일부 / 빠짐 / 정해 둔 것이 없던 날 */
+function dayStat(k){
+  const plan = dayPlan(k).n;
+  const done = ((ME.taken || {})[k] || []).length;
+  if (!plan) return { s: 'none', plan: 0, done };
+  if (done >= plan) return { s: 'full', plan, done };
+  return { s: done ? 'part' : 'miss', plan, done };
+}
+/* 어느 때를 가장 많이 놓치시나 — 30일을 시간대별로 센다.
+   「아침은 잘 드시는데 저녁을 자주 놓치십니다」는 하루 한 번짜리로 바꿀 근거가 된다. */
+function slotMiss(n = 30){
+  const tally = {};
+  /* 오늘은 빼고 센다 — 아직 저녁이 오지도 않았는데 「저녁을 놓치셨다」고 하면 안 된다 */
+  for (let i = 1; i <= n; i++) { const k = dayBefore(i); const p = dayPlan(k); if (!p.n) continue;
+    const took = (ME.taken || {})[k] || [];
+    for (const t in p.s) { const want = p.s[t];
+      const got = took.filter(x => x.endsWith('@' + t)).length;
+      const a = tally[t] || (tally[t] = { want: 0, got: 0 });
+      a.want += want; a.got += Math.min(got, want); } }
+  const rows = Object.keys(tally).sort().map(t => ({ t, ...tally[t], miss: tally[t].want - tally[t].got }));
+  return rows.filter(r => r.want >= 5);   /* 표본이 너무 적으면 말하지 않는다 */
+}
+const SLOT_WORD = { '08:00': '아침', '13:00': '점심', '19:00': '저녁', '22:00': '자기 전' };
+function slotLine(){
+  const rows = slotMiss(); if (rows.length < 2) return '';
+  const worst = rows.reduce((a, b) => (b.miss / b.want > a.miss / a.want ? b : a));
+  const best = rows.reduce((a, b) => (b.miss / b.want < a.miss / a.want ? b : a));
+  if (worst.t === best.t || worst.miss === 0) return '';
+  const w = SLOT_WORD[worst.t] || worst.t, g = SLOT_WORD[best.t] || best.t;
+  if (worst.miss / worst.want < 0.2) return '';
+  return `<div class="note" style="margin-top:12px">${I.clock}<span><b>${esc(g)} 약은 잘 챙기시는데 ${esc(w)} 약을 자주 놓치세요</b> — 어제까지 30일 동안 ${esc(w)}은 ${worst.want}번 중 ${worst.miss}번을 못 드셨어요. 진료 때 <b>이 말씀을 그대로 전해 주세요.</b> 하루 한 번 먹는 약으로 바꿀 수 있는 경우가 많습니다.</span></div>`;
+}
+/* 지난 n일 가운데 «정해 둔 것이 있던 날»만 세어, 다 드신 날이 며칠인지.
+   비율(%)이 아니라 「30일 중 27일」로 적는다 — 자연빈도가 읽기 쉽다. */
+function adherence(n = 30){
+  let days = 0, full = 0, doses = 0, took = 0;
+  /* 오늘은 아직 끝나지 않았으니 세지 않는다 — 어제까지 n일 */
+  for (let i = 1; i <= n; i++) { const st = dayStat(dayBefore(i)); if (!st.plan) continue; days++; if (st.s === 'full') full++; doses += st.plan; took += Math.min(st.done, st.plan); }
+  return { days, full, doses, took };
+}
+function tick(id, t){ const arr = takenSet(); const key = id + '@' + t; const i = arr.indexOf(key); i >= 0 ? arr.splice(i, 1) : arr.push(key); rollDay(); saveMe(); route(); }
 let NOTI_TIMERS = [];
 function armNotifications(){
   NOTI_TIMERS.forEach(clearTimeout); NOTI_TIMERS = [];
@@ -3116,7 +3223,9 @@ function careReport(){
   const done = rows.filter(r => r.done).length;
   const body = rows.map(r => `${r.done ? '✓' : '□'} ${r.t}  ${r.n}`).join('\n');
   const low = lowStock();
+  const a = adherence(30);
   return `${head} (${done}/${rows.length} 드셨어요)\n\n${body}` +
+    (a.days ? `\n\n어제까지 30일: 드시기로 한 ${a.days}일 중 ${a.full}일은 빠짐없이 드셨어요` : '') +
     (low.length ? `\n\n※ 곧 떨어져요: ${low.map(x => `${x.n} ${x.days}일치`).join(', ')}` : '') +
     `\n\n— 약지도에서 보냄`;
 }
@@ -3177,8 +3286,44 @@ function schedWarn(item){
   const h = Math.floor(worst / 60), mm = worst % 60;
   return many + `<div class="note" style="margin-top:8px">${I.alert}<span><b>시간이 너무 촘촘해요</b> — 이 약은 <b>${need}시간</b>은 띄우는 것이 허가 용법인데, 지금은 가장 가까운 두 번이 <b>${h}시간${mm ? ' ' + mm + '분' : ''}</b> 차이예요. 한 번을 빼시거나 시간을 옮겨 주세요.</span></div>`;
 }
+/* ── 지난 30일 달력 ──
+   「요즘 약 잘 드셨어요?」는 진료실에서 가장 많이 묻는 말인데, 대답할 근거가 없었다.
+   국내 「오늘의약」의 달력 기록, 해외 메디세이프의 복약 리포트가 이 자리를 메운다.
+   비율(%) 대신 「30일 중 27일」로 적는다 — 자연빈도가 어르신께 훨씬 잘 읽힌다. */
+const DOW = ['일', '월', '화', '수', '목', '금', '토'];
+function calCard(){
+  const today = new Date(todayKey() + 'T00:00:00');
+  /* 오늘이 들어간 주의 토요일까지 채워 5주를 그린다 */
+  const end = new Date(today); end.setDate(end.getDate() + (6 - today.getDay()));
+  const cells = [];
+  for (let i = 34; i >= 0; i--) { const d = new Date(end); d.setDate(d.getDate() - i); cells.push(d); }
+  const a = adherence(30);
+  const LBL = { full: '다 드셨어요', part: '일부만', miss: '빠짐', none: '정해 둔 것 없음', soon: '아직 남은 시간이 있어요' };
+  const grid = cells.map(d => {
+    const k = dayKey(d);
+    const future = k > todayKey();
+    let st = dayStat(k).s;
+    /* 오늘은 아직 끝나지 않았다 — 덜 드셨다고 «빠짐»으로 칠하면 억울하시다 */
+    if (k === todayKey() && st !== 'full') st = 'soon';
+    const stat = dayStat(k);
+    return `<div class="cal-d ${future ? 'fut' : st}${k === todayKey() ? ' cal-now' : ''}" ${future ? '' : `title="${d.getMonth() + 1}월 ${d.getDate()}일 — ${stat.plan ? `${stat.plan}번 중 ${Math.min(stat.done, stat.plan)}번` : LBL.none}"`}>
+      <span class="n">${d.getDate()}</span></div>`;
+  }).join('');
+  const first = cells[0], last = new Date(today);
+  const span = `${first.getMonth() + 1}월 ${first.getDate()}일 — ${last.getMonth() + 1}월 ${last.getDate()}일`;
+  return `<section class="sec card"><h2>지난 기록 <small>${DAYS_KEEP}일까지 이 휴대폰에만</small></h2>
+  ${a.days ? `<p style="margin-top:6px"><b>어제까지 30일 가운데 약을 드시기로 한 날이 ${a.days}일</b>이었고, 그중 <b>${a.full}일</b>은 빠짐없이 드셨어요.${a.doses ? ` 전체로는 ${a.doses}번 중 ${a.took}번이에요.` : ''}</p>`
+    : `<p style="margin-top:6px">아직 기록이 없어요. 위에서 시간을 고르고 드실 때마다 눌러 두시면 여기에 쌓입니다.</p>`}
+  <div class="cal-span">${span}</div>
+  <div class="cal-dow">${DOW.map(x => `<span>${x}</span>`).join('')}</div>
+  <div class="cal" role="img" aria-label="${a.days ? `지난 30일 중 ${a.days}일이 복용일이었고 ${a.full}일은 모두 드셨습니다` : '아직 복용 기록이 없습니다'}">${grid}</div>
+  ${slotLine()}
+  <div class="cal-key">${[['full', '다 드심'], ['part', '일부'], ['miss', '빠짐'], ['none', '정해 둔 것 없음'], ['cal-now', '오늘']].map(([c, n]) => `<span class="ki"><span class="k ${c}"></span>${n}</span>`).join('')}</div>
+  <p class="small muted" style="margin-top:10px">진료 때 이 화면을 그대로 보여 주시면 됩니다. <b>못 드신 날을 탓하려고 만든 것이 아니에요</b> — 언제 왜 놓치시는지 의사·약사가 보면 약을 더 쉬운 쪽으로 바꿔 드릴 수 있어요.</p>
+  </section>`
+}
 function vSchedule(){
-  const taking = takingItems();
+  const taking = takingItems(); rollDay();
   const perm = ('Notification' in window) ? Notification.permission : 'unsupported';
   const now = new Date(); const nowMin = now.getHours() * 60 + now.getMinutes(); const taken = takenSet();
   const todays = []; for (const d of taking) for (const t of schedOf(d.id, d)) { const [h, m] = t.split(':').map(Number); todays.push({ d, t, min: h * 60 + m, done: taken.includes(d.id + '@' + t) }); }
@@ -3199,6 +3344,7 @@ function vSchedule(){
       <div class="times"><input class="stock" type="number" inputmode="numeric" min="0" step="1" placeholder="남은 알 수" value="${stockOf(d.id) ? esc(String(stockOf(d.id).left)) : ''}" onchange="setStock('${d.id}', this.value)" aria-label="${esc(d.name)} 남은 알 수"></div></div>`; }).join('')}
     ${lowStock().length ? `<div class="note" style="margin-top:10px">${I.alert}<span><b>곧 떨어져요</b> — ${lowStock().map(x => esc(x.n) + ' ' + x.days + '일치').join(' · ')}. 처방약이면 <b>미리 진료를 잡아 두세요.</b></span></div>` : ''}
   </section>` : ''}
+  ${taking.length ? calCard() : ''}
   <section class="sec card"><h2>알림 방법</h2>
     <div class="toggle"><div class="t"><b>앱이 열려 있을 때 알림</b><span>${perm === 'granted' ? '켜져 있어요' : perm === 'denied' ? '브라우저 설정에서 차단됨' : perm === 'unsupported' ? '이 브라우저는 지원하지 않아요' : '허용하면 시간에 맞춰 알려드려요'}</span></div><button class="btn ghost" style="width:auto;min-height:40px;padding:0 14px" onclick="askNoti()">${perm === 'granted' ? '켜짐' : '켜기'}</button></div>
     <div class="toggle"><div class="t"><b>휴대폰 달력에 매일 알림 넣기</b><span>앱을 닫아도 울려요. 파일을 열면 달력이 등록해요</span></div><button class="btn ghost" style="width:auto;min-height:40px;padding:0 14px" onclick="downloadIcs()">${I.clock} 받기</button></div>
@@ -4124,8 +4270,52 @@ function vBag(){
     ${sc ? `<p class="show-big ${lv}">${lv === 'ok' ? I.info : I.alert}<span>항콜린 부담 ${sc}점 · ${ACH_LV_WORD[lv]}<small>${al.filter(x => x.e.ach).map(x => esc(x.e.n)).slice(0, 6).join(' · ')}${lv === 'ok' ? '' : ' — 입마름·변비·어지럼·기억 흐림이 있으면 말씀하세요'}</small></span></p>` : ''}
     ${res.unknown.length ? `<p class="small muted" style="margin-top:8px">성분을 확인하지 못한 약 ${res.unknown.length}가지는 판정에서 빠져 있어요.</p>` : ''}
   </div>
+  ${aeCard()}
   <div class="actions"><button class="btn ghost" onclick="shareBag()">${I.cart} 메모로 복사·전송</button><button class="btn ghost" onclick="window.print()">${I.book} 종이로 뽑기</button><button class="btn ghost" onclick="go('/together')">${I.shield} 자세한 판정 보기</button></div>`}
   ${disclaimer('이 한 장은 참고용이에요. 약을 스스로 끊거나 바꾸지 마시고, 약사·의사의 판단을 따르세요.')}`;
+}
+/* ── 약 먹고 불편했던 일 ──
+   해외 복약 앱은 「오늘 몸이 어땠나」를 묻고, 국내 앱에는 그 자리가 없다.
+   진료실에서 「그 약 먹고 어땠어요?」에 「좀 안 좋았던 것 같은데…」로 끝나는 그 자리다.
+   적어 두면 다음 진료 때 약을 바꿀 근거가 된다. 기록은 이 휴대폰에만 둔다. */
+/* 2026-09-18 → 「9월 18일」. 해가 다르면 해까지 적는다 */
+function dateWord(k){ const m = String(k).match(/^(\d{4})-(\d{2})-(\d{2})$/); if (!m) return k;
+  const y = +m[1], mo = +m[2], d = +m[3]; const now = new Date().getFullYear();
+  return (y === now ? '' : y + '년 ') + mo + '월 ' + d + '일'; }
+function aeList(){ ME.ae = ME.ae || []; return ME.ae; }
+function aeAdd(){
+  const who = document.getElementById('ae-who')?.value || '';
+  const what = (document.getElementById('ae-what')?.value || '').trim();
+  const when = document.getElementById('ae-when')?.value || todayKey();
+  if (!what) { toast('어떤 일이 있었는지 한 줄만 적어 주세요'); document.getElementById('ae-what')?.focus(); return; }
+  const it = takingItems().find(x => x.id === who);
+  aeList().unshift({ id: who, n: it ? it.name : '어느 약인지 모르겠어요', at: when, t: what.slice(0, 200) });
+  ME.ae = aeList().slice(0, 50);
+  saveMe(); route(); toast('적어 두었어요 — 진료 때 보여 주세요');
+}
+function aeDel(i){ aeList().splice(i, 1); saveMe(); route(); }
+function aeCard(){
+  const items = takingItems(); const list = aeList();
+  return `<section class="sec card"><h2>약 먹고 불편했던 일</h2>
+  <p class="small" style="margin-top:6px">진료실에서 <b>「그 약 드시고 어떠셨어요?」</b>라고 여쭤보면 막상 떠오르지 않으시죠. 그때그때 한 줄로 적어 두시면 됩니다. <b>이 휴대폰에만 남아요.</b></p>
+  ${list.length ? `<ul class="ae-list">${list.map((x, i) => `<li><div><b>${esc(x.n)}</b><span>${esc(dateWord(x.at))}</span><p>${esc(x.t)}</p></div><button class="ae-x" onclick="aeDel(${i})" aria-label="${esc(x.t.slice(0, 20))} 지우기">${I.x}</button></li>`).join('')}</ul>` : ''}
+  <div class="ae-form">
+    <label class="ae-lbl" for="ae-who">어느 약이었나요</label>
+    <select id="ae-who" class="ae-inp">${items.map(x => `<option value="${esc(x.id)}">${esc(x.name)}</option>`).join('')}<option value="">어느 약인지 모르겠어요</option></select>
+    <label class="ae-lbl" for="ae-what">어떤 일이 있었나요</label>
+    <input id="ae-what" class="ae-inp" placeholder="예) 속이 메스껍고 어지러웠어요" maxlength="200" autocomplete="off">
+    <label class="ae-lbl" for="ae-when">언제였나요</label>
+    <input id="ae-when" class="ae-inp" type="date" value="${todayKey()}" max="${todayKey()}">
+    <button class="btn ghost" onclick="aeAdd()">${I.check} 적어 두기</button>
+  </div>
+  <div class="note" style="margin-top:12px">${I.info}<span><b>숨이 차거나 얼굴·입술이 붓거나 온몸에 두드러기가 번지면 적지 마시고 바로 119입니다.</b> 그 약은 다시 드시지 마시고, 약 이름을 꼭 기억해 두세요.</span></div>
+  <details class="why-more ae-why" style="margin-top:10px"><summary>크게 다치셨다면 — 나라가 보상해 주는 제도가 있어요</summary>
+    <div class="why" style="margin-top:8px">
+    <p>약을 정해진 대로 드셨는데 <b>사망·장애·입원</b> 같은 중대한 피해를 입으셨다면, <b>의약품 부작용 피해구제</b>를 신청하실 수 있어요. 식약처가 주관하고 한국의약품안전관리원이 조사합니다. 사망일시보상금·장애일시보상금·진료비·장례비가 있고, <b>사망·장애는 그날부터 5년 안에</b> 신청하셔야 해요.</p>
+    <p style="margin-top:8px">가벼운 부작용도 신고해 두시면 다른 분들이 같은 일을 겪지 않게 됩니다. 신고는 <b>의무가 아니고</b>, 진료를 대신하지도 않아요.</p>
+    <p style="margin-top:8px"><b>한국의약품안전관리원</b><br><a class="call-in" href="tel:1644-6223">1644-6223</a> <span class="muted small">(또는 14-3330)</span></p>
+    </div></details>
+  </section>`;
 }
 function bagText(){
   const items = takingItems(); const res = ixRun([]); const sc = achScore(achList([])); const f = activeFlags();
@@ -4134,6 +4324,11 @@ function bagText(){
   if (res.dupe.length) L.push('· 같은 성분 두 번: ' + res.dupe.map(d => d.e?.n || '').join(', '));
   res.hits.forEach(h => L.push(`· ${h.r.t} (${h.items.map(i => i.name).join(' + ')}) — ${IX_LV[h.r.lv][0]}`));
   if (sc) L.push(`· 항콜린 부담 ${sc}점 · ${ACH_LV_WORD[achLevel(sc)]}`);
+  const a = adherence(30);
+  if (a.days) { L.push('', '[어제까지 30일 복용]', `· 드시기로 한 ${a.days}일 중 ${a.full}일은 빠짐없이 (전체 ${a.doses}번 중 ${a.took}번)`);
+    const sm = slotMiss().filter(r => r.miss);
+    if (sm.length) L.push('· 시간대별로 못 드신 횟수: ' + sm.map(r => `${SLOT_WORD[r.t] || r.t} ${r.want}번 중 ${r.miss}번`).join(', ')); }
+  const ae = aeList(); if (ae.length) { L.push('', '[약 먹고 불편했던 일]'); ae.slice(0, 10).forEach(x => L.push(`· ${dateWord(x.at)} ${x.n} — ${x.t}`)); }
   L.push('앱이 미리 본 것이라 참고용이에요. 약사·의사 판단이 우선입니다.');
   return L.join('\n');
 }
@@ -4330,6 +4525,32 @@ function vCompare(_, q){
 
 /* ───────── 내 정보 ───────── */
 const fsSeg = () => `<div class="fs-seg" role="group" aria-label="글자 크기">${[['16px','가'],['18px','가'],['20px','가']].map(([k, n]) => `<button class="${(localStorage.getItem('yakjido.fs') || '16px') === k ? 'on' : ''}" onclick="setFs('${k}');route()" aria-label="글자 ${k === '16px' ? '보통' : k === '18px' ? '크게' : '더 크게'}">${n}</button>`).join('')}</div>`;
+/* ── 내 기록을 파일 하나로 옮기기 ──
+   기록을 서버에 두지 않기로 했으니, 휴대폰을 바꾸면 그대로 사라진다.
+   복약 달력 60일치와 불편했던 일까지 쌓이기 시작하면 그 손실이 크다.
+   해외 앱들은 계정으로 옮기지만 우리는 «파일 한 개»로 옮긴다 — 그 파일은 온전히 본인 것이다. */
+function exportMe(){
+  const payload = { app:'yakjido', v:1, at:new Date().toISOString(), me:ME };
+  const blob = new Blob([JSON.stringify(payload, null, 1)], { type:'application/json' });
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+  a.download = `약지도-내기록-${todayKey()}.json`;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+  toast('파일로 받았어요 — 새 휴대폰에서 「가져오기」로 넣으시면 돼요');
+}
+async function importMe(file){
+  if (!file) return;
+  let j; try { j = JSON.parse(await file.text()); } catch (e) { toast('읽을 수 없는 파일이에요'); return; }
+  const me = j && (j.me || (j.app === 'yakjido' ? null : j));
+  if (!me || typeof me !== 'object' || Array.isArray(me)) { toast('약지도에서 받은 파일이 아니에요'); return; }
+  const n = (me.taking || []).length, d = Object.keys(me.taken || {}).length, ae = (me.ae || []).length;
+  if (!confirm(`가져오면 지금 이 휴대폰의 기록을 «덮어씁니다».\n\n들어 있는 것 — 약 ${n}가지 · 복용 기록 ${d}일치 · 불편했던 일 ${ae}건\n\n계속할까요?`)) return;
+  ME = { ...ME_DEF, ...me };   /* 옛 파일에 없는 칸은 기본값으로 채운다 */
+  saveMe();
+  try { rollDay(); } catch (e) {}
+  armNotifications(); go('/me'); route();
+  toast('가져왔어요');
+}
 function vMe(){
   const T = (k, t, sub) => `<div class="toggle"><div class="t"><b>${esc(t)}</b>${sub ? `<span>${esc(sub)}</span>` : ''}</div><button class="sw ${ME[k] ? 'on' : ''}" role="switch" aria-checked="${!!ME[k]}" aria-label="${esc(t)}" onclick="ME['${k}']=!ME['${k}'];saveMe();route()"></button></div>`;
   return `${topBar()}
@@ -4370,6 +4591,13 @@ function vMe(){
   </section>
   <section class="sec card"><h2>알아두면 좋은 것</h2><p class="small" style="margin-top:6px">상품명과 성분명, 해열제는 치료가 아니라는 것, 소염제는 한 가지만 — 짧은 건강정보 ${(D.tips || []).length}가지.</p><div class="actions"><button class="btn ghost" onclick="go('/tips')">${I.info} 읽어 보기</button></div></section>
   <section class="sec card"><h2>사진 서버 <small class="muted" style="font-weight:500;font-size:.8125rem">관리자용</small></h2><p class="small" style="margin-top:6px">사진 읽기(Gemini) 서버 주소예요. yakjido/server 를 배포한 뒤 붙여 넣으세요. 비워 두면 기본값(${esc(D.meta?.photoEndpoint || '없음')}).</p><div class="search" style="margin-top:10px">${I.link}<input id="ep" aria-label="사진 서버 주소" placeholder="https://<워커이름>.workers.dev" value="${esc((() => { try { return localStorage.getItem('yakjido.photo') || ''; } catch (e) { return ''; } })())}" onchange="try{localStorage.setItem('yakjido.photo',this.value.trim())}catch(e){};toast('저장했어요')"></div></section>
+  <section class="sec card"><h2>휴대폰을 바꾸실 때</h2>
+    <p class="small" style="margin-top:6px">이 앱은 기록을 <b>서버에 두지 않아요.</b> 그래서 휴대폰을 바꾸시면 담아 둔 약·복용 기록·불편했던 일이 함께 사라집니다. <b>파일 하나로 받아 두셨다가</b> 새 휴대폰에서 넣으시면 그대로 이어져요. 그 파일은 온전히 본인 것이고, 어디로도 올라가지 않아요.</p>
+    <div class="actions two"><button class="btn ghost" onclick="exportMe()">${I.book} 파일로 받기</button>
+      <button class="btn ghost" onclick="document.getElementById('mefile').click()">${I.user} 파일에서 가져오기</button></div>
+    <input id="mefile" type="file" accept="application/json,.json" style="position:absolute;width:1px;height:1px;opacity:0;pointer-events:none" aria-label="약지도 기록 파일 고르기" onchange="importMe(this.files[0]);this.value=''">
+    <p class="small muted" style="margin-top:8px">가져오면 <b>지금 기록을 덮어씁니다.</b> 넣기 전에 한 번 더 여쭤볼게요.</p>
+  </section>
   <section class="sec card"><h2>이 앱에 대해</h2><p class="small" style="margin-top:6px">${esc(D.meta?.about || '')}</p><div class="actions"><button class="btn line" onclick="go('/about')">근거·검수 기준 보기</button></div></section>
   <p class="small muted" style="margin-top:16px;text-align:center">약지도 v${esc(D.meta?.version || '')} · 빌드 ${BUILD}<br>식약처 공공데이터 — e약은요 ${esc(String(D.public?.easy_source || '').match(/\d{8}/)?.[0] || '')} · 낱알식별 ${esc(String(D.public?.pills_source || '').match(/\d{8}/)?.[0] || '')} 기준</p>`;
 }
@@ -4409,6 +4637,7 @@ try { const fs = localStorage.getItem('yakjido.fs'); if (fs) document.documentEl
 setTimeout(() => { try { if (navigator.connection && navigator.connection.saveData) return; } catch (e) {} lexLoad(true); pubIndexSoon(); }, 3500);
 /* ───────── 시작 ───────── */
 try { if (!helloDone() && !location.hash) { location.hash = '#/hello/1'; } } catch (e) {}
+try { rollDay(); } catch (e) {}   /* 앱을 열 때 오늘 계획을 기록에 적고, 60일 지난 것을 치운다 */
 armNotifications();
 
 /* 종이에는 앱 이름도 날짜도 없었다. 약국·진료실에 내미는 종이이니 그 둘과

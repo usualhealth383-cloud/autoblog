@@ -219,6 +219,26 @@ def main():
         if not _w['tight']: fails.append('시간 간격이 촘촘한데 알려 주지 않습니다(나프록센 08:00+13:00)')
         if _w['ok']: fails.append('간격이 충분한데도 촘촘하다고 합니다(나프록센 08:00+19:00)')
 
+        # 5a-3. 지난 기록 달력 — 35칸이 «정사각»으로 서고, 복용률 문장이 자연빈도로 나와야 한다.
+        #       .today 라는 이름이 앱 안에 이미 있어서 달력 칸이 카드 여백을 물려받아 터진 적이 있다(2026-09-22).
+        _c = pg.evaluate("""()=>{
+          const day=n=>{const d=new Date();d.setDate(d.getDate()-n);
+            return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')};
+          ME.taking=['acetaminophen']; ME.sched={acetaminophen:['08:00','19:00']};
+          ME.taken={}; ME.days={};
+          for(let n=1;n<=10;n++){ ME.days[day(n)]=2; ME.taken[day(n)]= n%3 ? ['acetaminophen@08:00','acetaminophen@19:00'] : []; }
+          route();
+          const cells=[...document.querySelectorAll('.cal-d')];
+          const bad=cells.map(c=>{const b=c.getBoundingClientRect();
+            return Math.abs(b.width-b.height)>1.5 ? Math.round(b.width)+'x'+Math.round(b.height) : null}).filter(Boolean);
+          const txt=document.getElementById('view').innerText;
+          const pct=/[0-9]+ ?%/.test(txt.split('지난 기록')[1]||'');
+          ME.taking=[]; ME.sched={}; ME.taken={}; ME.days={}; saveMe();
+          return {n:cells.length, bad:bad.slice(0,3), says:txt.includes('빠짐없이 드셨어요'), pct};}""")
+        if _c['n'] != 35: fails.append(f'복약 달력 칸이 35개가 아닙니다: {_c["n"]}개')
+        if _c['bad']: fails.append(f'복약 달력 칸이 정사각이 아닙니다: {_c["bad"]}')
+        if not _c['says']: fails.append('복약 달력에 «며칠 중 며칠» 문장이 없습니다')
+        if _c['pct']: fails.append('복약률을 %로 적고 있습니다 — 자연빈도(며칠 중 며칠)로 적어야 합니다')
         # 5a. 약 알림 — 시간이 돼도 안 오던 것(타이머 안에서 조용히 터지고 있었다)
         pg.goto(url + '#/schedule'); ready(); pg.wait_for_timeout(300)
         _n = pg.evaluate(NOTI_JS)
@@ -354,7 +374,7 @@ def main():
     print(f'화면 {len(routes)}개 검사 완료')
     if fails:
         print('실패', len(fails)); [print('  ✗', f) for f in fails]; sys.exit(1)
-    print('✓ 전부 통과 — JS 오류 0 · 넘침 0 · 잘림 0 · 명암비 AA · 조작 부품 3:1 · 44px · 단추 누르기 · 복용 간격 · 약 알림 · 어르신 모드 · 320px · 병용 8건 · 겹침 규칙 52 · 입력칸 이름표 · 성분 해석 123 · 죽은 규칙 0 · 약통 판정 4건 · 자기중복 3건 · 바구니 겹침 · 이중계산 0 · 검색 8건 · 구어 12건 · 문장 16건')
+    print('✓ 전부 통과 — JS 오류 0 · 넘침 0 · 잘림 0 · 명암비 AA · 조작 부품 3:1 · 44px · 단추 누르기 · 복용 간격 · 복약 달력 · 약 알림 · 어르신 모드 · 320px · 병용 8건 · 겹침 규칙 52 · 입력칸 이름표 · 성분 해석 123 · 죽은 규칙 0 · 약통 판정 4건 · 자기중복 3건 · 바구니 겹침 · 이중계산 0 · 검색 8건 · 구어 12건 · 문장 16건')
 
 if __name__ == '__main__':
     main()
