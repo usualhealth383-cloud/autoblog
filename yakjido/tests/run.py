@@ -150,6 +150,24 @@ def main():
             if bad: fails.append(f'명암비({theme}) {len(bad)}: {bad[:3]}')
             if tap: fails.append(f'44px 미만({theme}) {len(tap)}: {sorted(set(tap))[:5]}')
         pg.emulate_media(color_scheme='light')
+        # 5a-1. 단추를 전부 눌러 본다 — 화면만 그려 보는 검사로는 «눌렀을 때 터지는 것»을 못 잡는다.
+        #        되돌리기 어려운 단추(삭제·내보내기·인쇄·공유)는 건드리지 않는다.
+        _CLICK = ['/home', '/kinds', '/supp', '/tips', '/myths', '/me', '/schedule',
+                  '/symptom/msk', '/symptom/gout', '/symptom/cold', '/drug/acetaminophen', '/supp/mg', '/kids']
+        pg.on('dialog', lambda d: d.dismiss())
+        for r in _CLICK:
+            pg.goto(url + '#' + r); ready(); pg.wait_for_timeout(250)
+            n = pg.evaluate("()=>document.querySelectorAll('#view button, #view summary').length")
+            for i in range(min(n, 40)):
+                errs.clear()
+                pg.evaluate("""(i)=>{const e=document.querySelectorAll('#view button, #view summary')[i];
+                   if(!e) return; if(/삭제|지우|초기화|비우|내보내|다운|인쇄|공유|보내기/.test((e.innerText||'').trim())) return; e.click();}""", i)
+                pg.wait_for_timeout(45)
+                if errs: fails.append(f'단추를 누르니 터집니다 {r} [{i}]: {errs[0][:110]}')
+                if pg.evaluate("()=>location.hash") != '#' + r:
+                    pg.goto(url + '#' + r); ready(); pg.wait_for_timeout(120)
+        errs.clear()
+
         # 5a. 약 알림 — 시간이 돼도 안 오던 것(타이머 안에서 조용히 터지고 있었다)
         pg.goto(url + '#/schedule'); ready(); pg.wait_for_timeout(300)
         _n = pg.evaluate(NOTI_JS)
@@ -279,7 +297,7 @@ def main():
     print(f'화면 {len(routes)}개 검사 완료')
     if fails:
         print('실패', len(fails)); [print('  ✗', f) for f in fails]; sys.exit(1)
-    print('✓ 전부 통과 — JS 오류 0 · 넘침 0 · 잘림 0 · 명암비 AA · 조작 부품 3:1 · 44px · 약 알림 · 어르신 모드 · 320px · 병용 8건 · 입력칸 이름표 · 성분 해석 123 · 죽은 규칙 0 · 약통 판정 4건 · 자기중복 3건 · 바구니 겹침 · 이중계산 0 · 검색 8건 · 구어 12건 · 문장 16건')
+    print('✓ 전부 통과 — JS 오류 0 · 넘침 0 · 잘림 0 · 명암비 AA · 조작 부품 3:1 · 44px · 단추 누르기 · 약 알림 · 어르신 모드 · 320px · 병용 8건 · 입력칸 이름표 · 성분 해석 123 · 죽은 규칙 0 · 약통 판정 4건 · 자기중복 3건 · 바구니 겹침 · 이중계산 0 · 검색 8건 · 구어 12건 · 문장 16건')
 
 if __name__ == '__main__':
     main()
