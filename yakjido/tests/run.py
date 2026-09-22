@@ -173,6 +173,28 @@ ICONDUP_JS = """async()=>{
   return {same, blank};
 }"""
 
+# 계열이 같으면 «피해야 할 몸 상태»도 같아야 한다.
+# 이부프로펜에는 「심부전·신부전」이 달려 있는데 나프록센에는 없었고, 어느 소염제에도
+# 「와파린」이 없었다. 그래서 와파린 드시는 어르신께 앱이 «같이 드시면 안 된다»고
+# 경고하면서 동시에 그 소염제를 사라고 권하고 있었다(2026-09-22).
+# 여기 적은 짝은 «성분 계열 → 그 계열이면 무조건 달려야 하는 몸 상태»다.
+CLASSFLAG_JS = """pairs=>{
+  const out=[];
+  const KEEP = { 'celecoxib': ['ulcer'],        /* 위를 덜 건드리라고 만든 약이다 */
+                 'xylometazoline': ['bph'] };   /* 코에 뿌리는 약이라 전신 흡수가 적다 */
+  for (const d of (D.drugs||[])) {
+    ME.taking=[d.id]; ME.pub={};
+    const cls=new Set(); ixItems([]).forEach(it=>it.ings.forEach(e=>(e.cls||[]).forEach(c=>cls.add(c))));
+    const fl=new Set((d.avoid||[]).flatMap(a=>a.flags||[]));
+    for (const [c,f] of pairs)
+      if (cls.has(c) && !fl.has(f) && !(KEEP[d.id]||[]).includes(f)) out.push(d.id+' 에 '+f+' 가 없습니다('+c+' 계열)');
+  }
+  ME.taking=[]; ME.pub={}; saveMe();
+  return out;}"""
+CLASSFLAG_PAIRS = [['nsaid', 'anticoag'], ['nsaid', 'asthma'], ['nsaid', 'ulcer'],
+                   ['anti1', 'glaucoma'], ['anti1', 'bph'],
+                   ['decongest', 'bph'], ['decongest', 'heart']]
+
 TAP_JS = """()=>[...document.querySelectorAll('#view button,#view a')].filter(e=>!((e.matches('a.link')||e.matches('a.call-in'))&&e.closest('p,span,li,div'))).map(e=>{const b=e.getBoundingClientRect();return b.height>0&&b.height<44?((e.innerText||e.className)+'').slice(0,20)+':'+Math.round(b.height):null}).filter(Boolean)"""
 
 def main():
@@ -298,6 +320,10 @@ def main():
           ME.age='adult'; ME.child={}; saveMe();
           return bad;}""")
         if _k: fails.append(f'소아 하루 한도가 곱하면 넘습니다: {_k[:3]}')
+        # 5a-8. 계열↔몸 상태 짝 — 같은 계열인데 한 약에만 경고가 달린 곳을 잡는다
+        pg.goto(url + '#/home'); ready(); pg.wait_for_timeout(250)
+        _cf = pg.evaluate(CLASSFLAG_JS, CLASSFLAG_PAIRS)
+        if _cf: fails.append(f'계열은 같은데 피할 몸 상태가 빠졌습니다({len(_cf)}건): {_cf[:4]}')
         # 5a-6. 65세 이상으로 켜면 «소염제»에도 주의가 붙어야 한다.
         #       전에는 항콜린 점수만 보아, 「어르신 주의」가 종합감기약 한 줄에만 붙고
         #       정작 소염제에는 아무 표시가 없었다(2026-09-22).
@@ -469,7 +495,7 @@ def main():
     print(f'화면 {len(routes)}개 검사 완료')
     if fails:
         print('실패', len(fails)); [print('  ✗', f) for f in fails]; sys.exit(1)
-    print('✓ 전부 통과 — JS 오류 0 · 넘침 0 · 잘림 0 · 명암비 AA · 조작 부품 3:1 · 44px · 단추 누르기 · 복용 간격 · 복약 달력 · 홈 오늘약 · 어르신 소염제 · 소아 한도 · 아이콘 전수 · 약 알림 · 어르신 모드 · 320px · 병용 8건 · 겹침 규칙 52 · 입력칸 이름표 · 성분 해석 123 · 죽은 규칙 0 · 약통 판정 4건 · 자기중복 3건 · 바구니 겹침 · 이중계산 0 · 검색 8건 · 구어 12건 · 문장 16건')
+    print('✓ 전부 통과 — JS 오류 0 · 넘침 0 · 잘림 0 · 명암비 AA · 조작 부품 3:1 · 44px · 단추 누르기 · 복용 간격 · 복약 달력 · 홈 오늘약 · 어르신 소염제 · 소아 한도 · 계열 경고 · 아이콘 전수 · 약 알림 · 어르신 모드 · 320px · 병용 8건 · 겹침 규칙 52 · 입력칸 이름표 · 성분 해석 123 · 죽은 규칙 0 · 약통 판정 4건 · 자기중복 3건 · 바구니 겹침 · 이중계산 0 · 검색 8건 · 구어 12건 · 문장 16건')
 
 if __name__ == '__main__':
     main()
