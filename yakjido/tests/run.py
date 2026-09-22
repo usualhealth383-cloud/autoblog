@@ -239,6 +239,22 @@ def main():
         if _c['bad']: fails.append(f'복약 달력 칸이 정사각이 아닙니다: {_c["bad"]}')
         if not _c['says']: fails.append('복약 달력에 «며칠 중 며칠» 문장이 없습니다')
         if _c['pct']: fails.append('복약률을 %로 적고 있습니다 — 자연빈도(며칠 중 며칠)로 적어야 합니다')
+        # 5a-4. 홈 「오늘 약」 한 장 — 약이 없으면 안 뜨고, 있으면 지금 드실 것을 보여 줘야 한다
+        pg.goto(url + '#/home'); ready(); pg.wait_for_timeout(250)
+        _h = pg.evaluate("""()=>{
+          ME.taking=[]; ME.sched={}; ME.taken={}; route();
+          const none = !document.querySelector('.dh');
+          ME.taking=['acetaminophen']; ME.sched={acetaminophen:['00:01']}; ME.taken={}; route();
+          const card = document.querySelector('.dh');
+          const due = !!(card && card.querySelector('.dh-tick'));
+          if (due) card.querySelector('.dh-tick').click();
+          const ok = !!document.querySelector('.dh-b.ok');
+          ME.taking=[]; ME.sched={}; ME.taken={}; ME.days={}; saveMe();
+          return {none, has:!!card, due, ok};}""")
+        if not _h['none']: fails.append('담아 둔 약이 없는데 홈에 「오늘 약」이 뜹니다')
+        if not _h['has']: fails.append('약을 담고 시간을 골랐는데 홈에 「오늘 약」이 없습니다')
+        if not _h['due']: fails.append('드실 시간이 지났는데 홈에서 「드셨어요」를 누를 수 없습니다')
+        if not _h['ok']: fails.append('홈에서 「드셨어요」를 눌러도 다 드신 것으로 바뀌지 않습니다')
         # 5a. 약 알림 — 시간이 돼도 안 오던 것(타이머 안에서 조용히 터지고 있었다)
         pg.goto(url + '#/schedule'); ready(); pg.wait_for_timeout(300)
         _n = pg.evaluate(NOTI_JS)
@@ -374,7 +390,7 @@ def main():
     print(f'화면 {len(routes)}개 검사 완료')
     if fails:
         print('실패', len(fails)); [print('  ✗', f) for f in fails]; sys.exit(1)
-    print('✓ 전부 통과 — JS 오류 0 · 넘침 0 · 잘림 0 · 명암비 AA · 조작 부품 3:1 · 44px · 단추 누르기 · 복용 간격 · 복약 달력 · 약 알림 · 어르신 모드 · 320px · 병용 8건 · 겹침 규칙 52 · 입력칸 이름표 · 성분 해석 123 · 죽은 규칙 0 · 약통 판정 4건 · 자기중복 3건 · 바구니 겹침 · 이중계산 0 · 검색 8건 · 구어 12건 · 문장 16건')
+    print('✓ 전부 통과 — JS 오류 0 · 넘침 0 · 잘림 0 · 명암비 AA · 조작 부품 3:1 · 44px · 단추 누르기 · 복용 간격 · 복약 달력 · 홈 오늘약 · 약 알림 · 어르신 모드 · 320px · 병용 8건 · 겹침 규칙 52 · 입력칸 이름표 · 성분 해석 123 · 죽은 규칙 0 · 약통 판정 4건 · 자기중복 3건 · 바구니 겹침 · 이중계산 0 · 검색 8건 · 구어 12건 · 문장 16건')
 
 if __name__ == '__main__':
     main()

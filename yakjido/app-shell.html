@@ -474,6 +474,21 @@ ul.steps li::before{content:counter(s);position:absolute;left:0;top:2px;width:24
 .dose-tick.done{background:var(--normal-tint);border-color:transparent}
 .dose-tick.done .bx{background:var(--normal);border-color:var(--normal)}
 .dose-tick.late{border-color:rgba(182,54,41,.35)}
+/* 홈 「오늘 약」 한 장 */
+.dh{background:var(--card);border:1px solid var(--hairline);border-radius:var(--r-card);box-shadow:var(--shadow-card);overflow:hidden}
+.dh-go{display:block;width:100%;text-align:left;padding:13px 16px 10px}
+.dh-h .eb{display:block;font-size:.6875rem;font-weight:800;letter-spacing:.04em;color:var(--primary);text-transform:none}
+.dh-h b{display:block;font-size:1.0625rem;margin-top:2px;color:var(--text)}
+.dh-b{display:flex;align-items:center;gap:10px;padding:12px 16px;border-top:1px solid var(--hairline)}
+.dh-b svg.i{flex:none;width:22px;height:22px;color:var(--muted)}
+.dh-b span{flex:1;min-width:0}
+.dh-b b{display:block;font-size:1rem;line-height:1.35;overflow-wrap:anywhere}
+.dh-b small{display:block;font-size:.8125rem;color:var(--muted);margin-top:2px}
+.dh-b.ok{background:var(--normal-tint)} .dh-b.ok svg.i{color:var(--normal)}
+.dh-b.due{background:var(--tint)} .dh-b.due svg.i{color:var(--primary)}
+.dh-tick{flex:none;min-height:44px;padding:0 14px;border-radius:var(--r-pill);background:var(--primary);color:var(--on-primary);font-weight:800;font-size:.875rem}
+.dh-low{display:flex;align-items:flex-start;gap:8px;padding:10px 16px;border-top:1px solid var(--hairline);background:var(--caution-tint);color:var(--caution);font-size:.8125rem}
+.dh-low svg.i{flex:none;width:17px;height:17px;margin-top:1px}
 /* 지난 기록 달력 — 색만으로 뜻을 나르지 않도록 «다 드심»에는 채움, «일부»에는 반달, «빠짐»에는 테두리만 */
 .cal-dow{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px;margin-top:8px}
 .cal-dow span{text-align:center;font-size:.6875rem;font-weight:700;color:var(--muted)}
@@ -1451,6 +1466,37 @@ function workedHome(){
       <span><b>${esc(r.s.name.split(' (')[0])}</b><small>${esc(r.ds.map(d => prodName((d.products || [])[0]?.name) || ingrName(d)).join(' · '))}</small></span>${I.chev}</button>`).join('')}
   </section>`;
 }
+/* ── 홈에 「오늘 약」 한 장 ──
+   메디세이프의 첫 화면은 «오늘 먹을 약»이다. 우리는 그것을 알림 화면 안쪽에 묻어 두어서,
+   약을 등록하신 분이 앱을 열어도 지금 드실 것이 있는지 바로 알 수 없었다.
+   다만 조르지는 않는다 — 다 드신 날은 조용히 「다 드셨어요」 한 줄로 끝난다. */
+function doseHome(){
+  const taking = takingItems(); if (!taking.length) return '';
+  try { rollDay(); } catch (e) {}
+  const taken = takenSet(); const now = new Date(); const nowMin = now.getHours() * 60 + now.getMinutes();
+  const rows = [];
+  for (const d of taking) for (const t of schedOf(d.id, d)) { const [h, m] = t.split(':').map(Number); rows.push({ d, t, min: h * 60 + m, done: taken.includes(d.id + '@' + t) }); }
+  if (!rows.length) return '';
+  rows.sort((a, b) => a.min - b.min);
+  const left = rows.filter(r => !r.done), done = rows.length - left.length;
+  const due = left.find(r => r.min <= nowMin + 30);     /* 시간이 됐거나 30분 안에 오는 것 */
+  const next = left.find(r => r.min > nowMin + 30);
+  const low = lowStock();
+  /* 「1번 중 0번 드셨어요」처럼 읽히지 않게, 상황마다 말을 바꾼다 */
+  const say = !done ? `오늘 ${rows.length}번 드실 차례예요` : !left.length ? `오늘 ${rows.length}번, 모두 드셨어요` : `${rows.length}번 중 ${done}번 드셨어요`;
+  const head = `<div class="dh-h"><span class="eb">오늘 약</span><b>${say}</b></div>`;
+  let body;
+  if (!left.length) body = `<div class="dh-b ok">${I.check}<span><b>잘 챙기셨어요</b><small>내일 ${rows[0].t}에 다시 알려드릴게요</small></span></div>`;
+  else if (due) body = `<div class="dh-b due">${I.clock}<span><b>${esc(due.d.name)}</b><small>${due.t} — ${due.min <= nowMin ? '드실 시간이 지났어요' : '곧 드실 시간이에요'}</small></span>
+    <button class="dh-tick" onclick="event.stopPropagation();tick('${due.d.id}','${due.t}')">드셨어요</button></div>`;
+  else body = `<div class="dh-b">${I.clock}<span><b>다음은 ${next.t} · ${esc(next.d.name)}</b><small>오늘 ${left.length}번 남았어요</small></span></div>`;
+  return `<section class="sec" aria-label="오늘 약">
+    <div class="dh" role="group">
+      <button class="dh-go" onclick="go('/schedule')" aria-label="복용 시간 알림 열기">${head}</button>
+      ${body}
+      ${low.length ? `<div class="dh-low">${I.alert}<span><b>곧 떨어져요</b> — ${low.map(x => esc(x.n) + ' ' + x.days + '일치').join(' · ')}</span></div>` : ''}
+    </div></section>`;
+}
 function activeFlags(){ const f = Object.keys(ME).filter(k => k !== 'age' && k !== 'taking' && k !== 'child' && ME[k] === true); if (ME.age === 'senior') f.push('senior'); if (ME.age === 'child') f.push('child'); return f; }
 
 /* 비교 바구니 */
@@ -2300,6 +2346,7 @@ function vHome(){
     </div>
     ${ME.easy ? `<button class="big-btn soft" style="margin-top:12px" onclick="go('/schedule')"><div class="ic">${I.clock}</div><div><b>오늘 약 체크</b><span>드셨는지 표시하고 알림 받기</span></div></button>` : ''}
   </section>
+  ${doseHome()}
   ${workedHome()}
   <section class="sec ${gcls(sp.g)}" aria-label="오늘">
     <button class="today" onclick="go('/symptom/${sp.ids[0]}')"><div class="in"><div><div class="eb">${esc(sp.eb)} · 오늘의 한 장</div><b>${esc(sp.t)}</b><span>${esc(sp.d)}</span></div><div class="ic">${icon(sp.ico)}</div></div></button>
