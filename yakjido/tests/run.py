@@ -58,6 +58,26 @@ CONTRAST_JS = """()=>{
    if(r<need)out.push({t:t.slice(0,24),r:+r.toFixed(2),need,cls:(''+e.className).slice(0,18)});}
  return out;}"""
 
+# 글자 말고 «조작 부품»의 대비 — WCAG 1.4.11(3:1).
+# 스위치가 꺼져 있을 때 막대가 안 보였고(1.29:1), 나이 고르는 칸은 고른 쪽이
+# 흰 조각뿐이라 어느 쪽인지 알기 어려웠다(1.13:1). 어르신 앱에서는 특히 문제다.
+UICON_JS = """()=>{
+ const lum=c=>{const m=c.match(/\\d+(\\.\\d+)?/g);if(!m)return 1;const [r,g,b]=m.slice(0,3).map(Number).map(v=>{v/=255;return v<=.03928?v/12.92:Math.pow((v+.055)/1.055,2.4)});return .2126*r+.7152*g+.0722*b};
+ const bg=e=>{while(e){const c=getComputedStyle(e).backgroundColor;if(c&&!/rgba\\(0, 0, 0, 0\\)|transparent/.test(c))return c;e=e.parentElement}return 'rgb(255,255,255)'};
+ const cr=(a,b)=>{const x=lum(a),y=lum(b);return (Math.max(x,y)+.05)/(Math.min(x,y)+.05)};
+ const out=[];
+ for(const e of document.querySelectorAll('button.sw, .seg button.on')){
+   const st=getComputedStyle(e);
+   const who=e.classList.contains('sw')?'스위치':'고른 칸';
+   const ps=getComputedStyle(e,'::before');
+   const bw=parseFloat(st.borderTopWidth)||0, pw=parseFloat(ps.borderTopWidth)||0;
+   const cand=[ps.backgroundColor, ps.boxShadow, st.boxShadow, bw?st.borderTopColor:'', pw?ps.borderTopColor:'', st.backgroundColor].join(' ');
+   const cols=[...cand.matchAll(/rgba?\\([^)]+\\)/g)].map(m=>m[0]).filter(c=>!/, 0\\)$/.test(c));
+   const base=bg(e.parentElement);
+   const best=cols.reduce((a,c)=>Math.max(a,cr(c,base)),0);
+   if(best<3)out.push(who+' '+best.toFixed(2)+':1');}
+ return [...new Set(out)];}"""
+
 TAP_JS = """()=>[...document.querySelectorAll('#view button,#view a')].filter(e=>!(e.matches('a.link')&&e.closest('p,span,li'))).map(e=>{const b=e.getBoundingClientRect();return b.height>0&&b.height<44?((e.innerText||e.className)+'').slice(0,20)+':'+Math.round(b.height):null}).filter(Boolean)"""
 
 def main():
@@ -108,6 +128,7 @@ def main():
             for r in SC:
                 pg.goto(url + '#' + r); pg.wait_for_timeout(500)
                 bad += pg.evaluate(CONTRAST_JS); tap += pg.evaluate(TAP_JS)
+                for u in pg.evaluate(UICON_JS): fails.append(f'조작 부품 대비({theme}) {r}: {u} — 3:1 이 필요합니다')
             if bad: fails.append(f'명암비({theme}) {len(bad)}: {bad[:3]}')
             if tap: fails.append(f'44px 미만({theme}) {len(tap)}: {sorted(set(tap))[:5]}')
         pg.emulate_media(color_scheme='light')
@@ -235,7 +256,7 @@ def main():
     print(f'화면 {len(routes)}개 검사 완료')
     if fails:
         print('실패', len(fails)); [print('  ✗', f) for f in fails]; sys.exit(1)
-    print('✓ 전부 통과 — JS 오류 0 · 넘침 0 · 잘림 0 · 명암비 AA · 44px · 어르신 모드 · 320px · 병용 8건 · 입력칸 이름표 · 성분 해석 123 · 죽은 규칙 0 · 약통 판정 4건 · 자기중복 3건 · 바구니 겹침 · 이중계산 0 · 검색 8건 · 구어 12건 · 문장 16건')
+    print('✓ 전부 통과 — JS 오류 0 · 넘침 0 · 잘림 0 · 명암비 AA · 조작 부품 3:1 · 44px · 어르신 모드 · 320px · 병용 8건 · 입력칸 이름표 · 성분 해석 123 · 죽은 규칙 0 · 약통 판정 4건 · 자기중복 3건 · 바구니 겹침 · 이중계산 0 · 검색 8건 · 구어 12건 · 문장 16건')
 
 if __name__ == '__main__':
     main()
