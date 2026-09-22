@@ -181,7 +181,9 @@ ICONDUP_JS = """async()=>{
 CLASSFLAG_JS = """pairs=>{
   const out=[];
   const KEEP = { 'celecoxib': ['ulcer'],        /* 위를 덜 건드리라고 만든 약이다 */
-                 'xylometazoline': ['bph'] };   /* 코에 뿌리는 약이라 전신 흡수가 적다 */
+                 'xylometazoline': ['bph', 'diabetes', 'glaucoma'],  /* 코에 뿌리는 약이라 전신 흡수가 적다 */
+                 'benzoyl-peroxide': ['kidney'],                     /* 바르는 여드름약이다 */
+                 'cough-syrup-rx': ['diabetes'] };                   /* 처방 시럽 — 성분이 제품마다 다르다 */
   for (const d of (D.drugs||[])) {
     ME.taking=[d.id]; ME.pub={};
     const cls=new Set(); ixItems([]).forEach(it=>it.ings.forEach(e=>(e.cls||[]).forEach(c=>cls.add(c))));
@@ -193,7 +195,9 @@ CLASSFLAG_JS = """pairs=>{
   return out;}"""
 CLASSFLAG_PAIRS = [['nsaid', 'anticoag'], ['nsaid', 'asthma'], ['nsaid', 'ulcer'],
                    ['anti1', 'glaucoma'], ['anti1', 'bph'],
-                   ['decongest', 'bph'], ['decongest', 'heart']]
+                   ['decongest', 'bph'], ['decongest', 'heart'], ['decongest', 'diabetes'],
+                   ['antacid', 'kidney'], ['ginkgo', 'anticoag'], ['h2', 'kidney'],
+                   ['macrolide', 'heart'], ['quinolone', 'child']]
 
 TAP_JS = """()=>[...document.querySelectorAll('#view button,#view a')].filter(e=>!((e.matches('a.link')||e.matches('a.call-in'))&&e.closest('p,span,li,div'))).map(e=>{const b=e.getBoundingClientRect();return b.height>0&&b.height<44?((e.innerText||e.className)+'').slice(0,20)+':'+Math.round(b.height):null}).filter(Boolean)"""
 
@@ -320,6 +324,40 @@ def main():
           ME.age='adult'; ME.child={}; saveMe();
           return bad;}""")
         if _k: fails.append(f'소아 하루 한도가 곱하면 넘습니다: {_k[:3]}')
+        # 5a-10. 규칙이 쓰는 몸 상태는 «내 정보»에서 켤 수 있어야 한다.
+        #        당뇨는 약 경고에 쓰이는데 정작 켤 칸이 없었다(2026-09-22).
+        pg.goto(url + '#/me'); ready(); pg.wait_for_timeout(500)
+        _fl = pg.evaluate("""()=>{
+          const txt = document.getElementById('view').innerText;
+          /* 칸의 문구는 조금씩 다르다 — 핵심 낱말로 본다 */
+          const need = {pregnant:'임신', ulcer:'위궤양', kidney:'신장', liver:'간 질환', heart:'심장',
+                        asthma:'천식', anticoag:'항응고', glaucoma:'녹내장', bph:'전립선', gout:'통풍', diabetes:'당뇨'};
+          return Object.keys(need).filter(k => !txt.includes(need[k]));}""")
+        if _fl: fails.append(f'내 정보에서 켤 수 없는 몸 상태가 있습니다: {_fl}')
+        # 5a-11. 화면 밝기 — 휴대폰 설정만 따르지 말고 앱에서도 고를 수 있어야 한다
+        _th = pg.evaluate("""()=>{
+          const before = themeNow();
+          setTheme('light'); const a = document.documentElement.dataset.theme;
+          setTheme('dark');  const b = document.documentElement.dataset.theme;
+          setTheme('auto');  const c = document.documentElement.dataset.theme || '(없음)';
+          setTheme(before);
+          return {a, b, c};}""")
+        if _th['a'] != 'light' or _th['b'] != 'dark' or _th['c'] != '(없음)':
+            fails.append(f'화면 밝기 고르기가 듣지 않습니다: {_th}')
+        # 5a-9. 성분 이름 읽기 — «두 글자 어근»이 엉뚱한 약을 물면 안 된다.
+        #       「산화마그네슘」에서 염을 떼다 남은 「산화」가 여드름 겔(과산화벤조일)을
+        #       제산제로 만들고 있었다. 겹침 경고가 통째로 틀어지는 자리다(2026-09-22).
+        _ig = pg.evaluate("""cases=>cases.map(([t,want])=>{
+          const got=ingFind(t).map(e=>e.k).sort();
+          const ok = want.length ? want.every(w=>got.includes(w)) : got.length===0;
+          return ok ? null : t+' → ['+got.join(',')+'] (바라던 것: '+(want.join(',')||'없음')+')';
+        }).filter(Boolean)""", [
+            ['과산화벤조일', ['benzoyl-peroxide']], ['산화아연연고', []], ['이산화티탄', []],
+            ['산화마그네슘', ['antacid']], ['수산화마그네슘', ['antacid']], ['마그밀', ['magnesium-lax']],
+            ['이부프로펜나트륨', ['ibuprofen']], ['나프록센나트륨', ['naproxen']],
+            ['탄산리튬', ['lithium']], ['리시노프릴', ['acei']], ['알프라졸람', ['bzd']], ['은행잎', ['ginkgo']],
+        ])
+        if _ig: fails.append(f'성분 이름을 잘못 읽습니다: {_ig[:4]}')
         # 5a-8. 계열↔몸 상태 짝 — 같은 계열인데 한 약에만 경고가 달린 곳을 잡는다
         pg.goto(url + '#/home'); ready(); pg.wait_for_timeout(250)
         _cf = pg.evaluate(CLASSFLAG_JS, CLASSFLAG_PAIRS)
@@ -495,7 +533,7 @@ def main():
     print(f'화면 {len(routes)}개 검사 완료')
     if fails:
         print('실패', len(fails)); [print('  ✗', f) for f in fails]; sys.exit(1)
-    print('✓ 전부 통과 — JS 오류 0 · 넘침 0 · 잘림 0 · 명암비 AA · 조작 부품 3:1 · 44px · 단추 누르기 · 복용 간격 · 복약 달력 · 홈 오늘약 · 어르신 소염제 · 소아 한도 · 계열 경고 · 아이콘 전수 · 약 알림 · 어르신 모드 · 320px · 병용 8건 · 겹침 규칙 52 · 입력칸 이름표 · 성분 해석 123 · 죽은 규칙 0 · 약통 판정 4건 · 자기중복 3건 · 바구니 겹침 · 이중계산 0 · 검색 8건 · 구어 12건 · 문장 16건')
+    print('✓ 전부 통과 — JS 오류 0 · 넘침 0 · 잘림 0 · 명암비 AA · 조작 부품 3:1 · 44px · 단추 누르기 · 복용 간격 · 복약 달력 · 홈 오늘약 · 어르신 소염제 · 소아 한도 · 계열 경고 · 어근 오인 · 내 정보 칸 · 화면 밝기 · 아이콘 전수 · 약 알림 · 어르신 모드 · 320px · 병용 8건 · 겹침 규칙 52 · 입력칸 이름표 · 성분 해석 123 · 죽은 규칙 0 · 약통 판정 4건 · 자기중복 3건 · 바구니 겹침 · 이중계산 0 · 검색 8건 · 구어 12건 · 문장 16건')
 
 if __name__ == '__main__':
     main()

@@ -1929,10 +1929,20 @@ function ingIndex(){
   const byKey = {}, byDrug = {};
   for (const e of list) {
     byKey[e.k] = e; if (e.drug) byDrug[e.drug] = e;
-    for (const a of (e.aka || [])) { const r = norm(a); if (r) roots.push([r, e]); }
+    for (const a of (e.aka || [])) {
+      /* 염(마그네슘·나트륨…)을 떼다가 «두 글자»만 남는 수가 있다.
+         「산화마그네슘」이 「산화」가 되어, 여드름 바르는 약 «과산화벤조일»이
+         제산제로 잡히고 있었다(2026-09-22). 떼기 전 이름은 언제나 넣고,
+         떼어서 짧아진 것은 세 글자부터만 넣는다 — 지은이가 «일부러» 짧게 쓴
+         「프릴」·「졸람」 같은 것은 떼기 전 이름이라 그대로 남는다. */
+      const base = String(a || '').toLowerCase().replace(/\s/g, '').replace(/[()\[\]{}<>,./|·+-]/g, '');
+      if (base) roots.push([base, e]);
+      const r = norm(a); if (r && r !== base && r.length >= 3) roots.push([r, e]);
+    }
   }
   roots.sort((a, b) => b[0].length - a[0].length);   /* 긴 어근부터 — 겹칠 때 더 구체적인 쪽 */
-  ING_IX = { norm, roots, byKey, byDrug, n: list.length };
+  const norm0 = s => String(s || '').toLowerCase().replace(/\s/g, '').replace(/[()\[\]{}<>,./|·+-]/g, '');
+  ING_IX = { norm, norm0, roots, byKey, byDrug, n: list.length };
   return ING_IX;
 }
 /* 문자열(성분명·제품명)에서 아는 성분을 골라낸다.
@@ -1940,9 +1950,11 @@ function ingIndex(){
    짧은 쪽까지 같이 세면 항콜린 점수가 두 배가 된다 — 더 긴 어근이 이겼으면 짧은 쪽은 버린다. */
 function ingFind(text){
   const ix = ingIndex(); if (!ix.n) return [];
-  const t = ix.norm(text); if (!t) return [];
+  /* 들어온 글자도 «염을 뗀 것»과 «떼지 않은 것» 둘 다로 본다.
+     「산화마그네슘」은 떼면 「산화」가 되는데, 어근은 떼지 않은 full 이름으로 들고 있다. */
+  const t = ix.norm(text), t0 = ix.norm0(text); if (!t && !t0) return [];
   const hit = [];
-  for (const [r, e] of ix.roots) if (t.includes(r) && !hit.some(h => h.e === e)) hit.push({ r, e });
+  for (const [r, e] of ix.roots) if ((t.includes(r) || t0.includes(r)) && !hit.some(h => h.e === e)) hit.push({ r, e });
   return hit.filter(h => !hit.some(o => o !== h && o.r.length > h.r.length && o.r.includes(h.r))).map(h => h.e);
 }
 /* 내 약통 한 줄 → { ings:[성분…], known:true|false } */
@@ -4633,6 +4645,8 @@ function vMe(){
   return `${topBar()}
   <h1>내 정보</h1><p style="margin-top:6px">여기 표시한 상태에 따라 약 추천에 <b>주의 표시</b>가 붙어요. 진료실에서 의사가 처방 전에 꼭 묻는 것들이에요.</p>
   <section class="sec card" style="padding-top:10px;padding-bottom:10px"><div class="view-row"><div class="t"><b>글자 크기</b><span>지금 이 글씨가 작으면 키우세요</span></div>${fsSeg()}</div>
+    <div class="view-row" style="border-top:1px solid var(--hairline)"><div class="t"><b>화면 밝기</b><span>눈이 부시거나 어두운 화면이 안 보이면 바꾸세요</span></div>
+      <div class="fs-seg" role="group" aria-label="화면 밝기">${[['auto','자동'],['light','밝게'],['dark','어둡게']].map(([k, n]) => `<button class="${themeNow() === k ? 'on' : ''}" style="min-width:auto;padding:0 10px;font-size:.8125rem" aria-pressed="${themeNow() === k}" onclick="setTheme('${k}')">${n}</button>`).join('')}</div></div>
     <div class="view-row" style="border-top:1px solid var(--hairline)"><div class="t"><b>어르신 모드</b><span>큰 단추 · 홈은 세 가지만</span></div><button class="sw ${ME.easy ? 'on' : ''}" role="switch" aria-checked="${!!ME.easy}" aria-label="어르신 모드" onclick="ME.easy=!ME.easy;saveMe();setFs(ME.easy?'20px':'16px');route()"></button></div></section>
   <section class="sec card hide"><h2>어르신 모드</h2>${hasArt('easy-mode') ? `<div class="art-row">${art('easy-mode', 'side')}<div class="t small muted">글씨와 단추가 커지고, 홈은 꼭 필요한 세 가지만 남아요. 어르신께 권해 드리세요.</div></div>` : ''}<div class="toggle"><div class="t"><b>큰 글씨 · 큰 단추 · 단순한 홈</b><span>사진 찍기 / 어디가 불편한지 / 오늘 약 체크, 세 가지만</span></div><button class="sw ${ME.easy ? 'on' : ''}" role="switch" aria-checked="${!!ME.easy}" aria-label="어르신 모드" onclick="ME.easy=!ME.easy;saveMe();setFs(ME.easy?'20px':'16px')"></button></div></section>
   <section class="sec card hide"><h2>글자 크기</h2><div class="seg" style="margin-top:12px">${[['16px', '보통'], ['18px', '크게'], ['20px', '더 크게']].map(([k, n]) => `<button class="${(localStorage.getItem('yakjido.fs') || '16px') === k ? 'on' : ''}" onclick="setFs('${k}')">${n}</button>`).join('')}</div></section>
@@ -4647,6 +4661,7 @@ function vMe(){
     ${T('liver', '간 질환', '아세트아미노펜 용량에 주의')}
     ${T('alcohol', '술을 자주 마심', '주 3회 이상이면 켜 주세요')}
     ${T('heart', '심장·혈관 질환, 고혈압', '일부 소염진통제·코감기약에 주의')}
+    ${T('diabetes', '당뇨', '코감기약 성분이 혈당을 올릴 수 있어요')}
     ${T('asthma', '천식', '아스피린·소염진통제로 악화될 수 있어요')}
     ${T('anticoag', '항응고제·항혈소판제 복용', '와파린·아스피린·클로피도그렐 등')}
     ${T('gout', '통풍', '아스피린 저용량은 요산을 올려요')}
@@ -4709,7 +4724,19 @@ function vAbout(){
 
 document.addEventListener('input', e => { if (!e.target.closest('.calc')) return; const id = location.hash.split('/')[2]?.split('?')[0]; const s = supp(id); if (!s?.calc) return; const amt = +document.getElementById('c-amt').value, per = +document.getElementById('c-per').value || 1, price = +document.getElementById('c-price').value, n = +document.getElementById('c-n').value; const pct = document.getElementById('c-pct'), won = document.getElementById('c-won'); if (amt > 0) { const perServing = amt * per; const r = perServing / s.calc.typical; pct.textContent = Math.round(r * 100) + '%'; pct.style.color = r > (s.calc.ulRatio || 99) ? 'var(--alert)' : r < 0.5 ? 'var(--caution)' : 'var(--primary-deep)'; if (price > 0 && n > 0) { const unitPrice = price / n; const effDoses = perServing / s.calc.typical; won.textContent = Math.round(unitPrice * per / effDoses).toLocaleString('ko-KR') + '원'; } else won.textContent = '—'; } else { pct.textContent = '—'; won.textContent = '—'; } });
 function setFs(v){ try { localStorage.setItem('yakjido.fs', v); } catch (e) {} document.documentElement.style.setProperty('--fs', v); route(); }
+/* 자동 = 휴대폰 설정을 따름 */
+function setTheme(v){
+  try { if (v === 'auto') localStorage.removeItem('yakjido.theme'); else localStorage.setItem('yakjido.theme', v); } catch (e) {}
+  if (v === 'auto') delete document.documentElement.dataset.theme; else document.documentElement.dataset.theme = v;
+  const m = document.querySelector('meta[name="theme-color"]');
+  if (m) m.content = (v === 'dark' || (v === 'auto' && matchMedia('(prefers-color-scheme:dark)').matches)) ? '#161A1C' : '#0B6E8F';
+  route();
+}
+const themeNow = () => { try { return localStorage.getItem('yakjido.theme') || 'auto'; } catch (e) { return 'auto'; } };
 try { const fs = localStorage.getItem('yakjido.fs'); if (fs) document.documentElement.style.setProperty('--fs', fs); } catch (e) {}
+/* 화면 밝기는 휴대폰 설정만 따라가고 있었다. 눈이 부시거나(백내장) 어두운 화면이
+   안 보이는 분이 스스로 고를 칸이 없었다 — 앱 안에서 고르게 한다(2026-09-22). */
+try { const th = localStorage.getItem('yakjido.theme'); if (th === 'light' || th === 'dark') document.documentElement.dataset.theme = th; } catch (e) {}
 /* 제품·성분 사전(약 700 KB)은 첫 화면이 자리 잡은 뒤 조용히 미리 받는다 — "인사돌" 을 쳤을 때 제품이 증상보다 위에 오게(감사 #38). 데이터 절약 모드면 안 받는다 */
 setTimeout(() => { try { if (navigator.connection && navigator.connection.saveData) return; } catch (e) {} lexLoad(true); pubIndexSoon(); }, 3500);
 /* ───────── 시작 ───────── */
