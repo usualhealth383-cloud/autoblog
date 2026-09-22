@@ -3143,16 +3143,28 @@ function minGapH(item){
   const m = t.match(/([0-9]+)\s*(?:~\s*[0-9]+)?\s*시간/);
   return m ? +m[1] : 0;
 }
+/* 허가 용법이 「하루 몇 번」인지 — defaultSlots 와 같은 규칙으로 읽는다 */
+function maxPerDay(item){
+  const t = String((item?.d?.dose?.interval || '') + ' ' + (item?.simple || '') + ' ' + (item?.d?.simple || '')).replace(/\s+/g, '');
+  const NUM = { '한': 1, '두': 2, '세': 3, '네': 4 };
+  let m = t.match(/(?:하루|1일)[0-9]~?([0-9])[회번]/) || t.match(/(?:하루|1일)([0-9])[회번]/);
+  if (m) return +m[1];
+  m = t.match(/(?:하루|1일)(한|두|세|네)[회번]/);
+  return m ? NUM[m[1]] : 0;
+}
 function schedWarn(item){
-  const need = minGapH(item); if (!need) return '';
+  const cnt = maxPerDay(item), picked = schedOf(item.id, item).length;
+  const many = (cnt && picked > cnt)
+    ? `<div class="note" style="margin-top:8px">${I.info}<span><b>이 약은 하루 ${cnt}번으로 안내드리고 있어요</b> — 지금 <b>${picked}번</b>을 골라 두셨습니다. 의사·약사와 정하신 것이 아니라면 한 번을 빼 주세요.</span></div>` : '';
+  const need = minGapH(item); if (!need) return many;
   const ts = schedOf(item.id, item).map(x => { const [h, m] = x.split(':').map(Number); return h * 60 + m; }).sort((a, b) => a - b);
   if (ts.length < 2) return '';
   let worst = 24 * 60;
   for (let i = 1; i < ts.length; i++) worst = Math.min(worst, ts[i] - ts[i - 1]);
   worst = Math.min(worst, (ts[0] + 24 * 60) - ts[ts.length - 1]);   /* 밤 → 다음 날 아침 */
-  if (worst >= need * 60) return '';
+  if (worst >= need * 60) return many;
   const h = Math.floor(worst / 60), mm = worst % 60;
-  return `<div class="note" style="margin-top:8px">${I.alert}<span><b>시간이 너무 촘촘해요</b> — 이 약은 <b>${need}시간</b>은 띄우는 것이 허가 용법인데, 지금은 가장 가까운 두 번이 <b>${h}시간${mm ? ' ' + mm + '분' : ''}</b> 차이예요. 한 번을 빼시거나 시간을 옮겨 주세요.</span></div>`;
+  return many + `<div class="note" style="margin-top:8px">${I.alert}<span><b>시간이 너무 촘촘해요</b> — 이 약은 <b>${need}시간</b>은 띄우는 것이 허가 용법인데, 지금은 가장 가까운 두 번이 <b>${h}시간${mm ? ' ' + mm + '분' : ''}</b> 차이예요. 한 번을 빼시거나 시간을 옮겨 주세요.</span></div>`;
 }
 function vSchedule(){
   const taking = takingItems();
