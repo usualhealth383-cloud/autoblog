@@ -280,6 +280,30 @@ for _s in S:
                 if _n in _sent and _i not in _ids and _n != '카페인' and not any(_k in _sent for _k in _no):
                     fails.append(f'증상 {_s["id"]} — 「이렇게 드세요」는 «{_n}»을 권하는데 계획 칸에는 없습니다')
 
+# ── 아이콘 — 정본은 JSON 이고, 증상 56가지는 서로 달라야 한다 ────────────
+# 2026-09-22: 앱 안에 ICON_BY_ID 라는 덮어쓰기 표가 있어서 자료를 고쳐도 화면이 안 바뀌었다.
+# 그리고 증상 56가지가 아이콘 19개를 나눠 쓰고 있었다(물방울 하나가 7가지를 맡았다).
+_shell = (ROOT / 'app-shell.html').read_text(encoding='utf-8')
+if 'ICON_BY_ID' in _shell:
+    fails.append('app-shell.html 에 ICON_BY_ID 같은 아이콘 덮어쓰기 표가 생겼습니다 — 정본은 content 의 icon 입니다')
+_ICON = set(re.findall(r"^I\.(\w+)\s*=\s*'<svg", _shell, re.M))
+_m = re.search(r'^const I = \{(.*?)^\};', _shell, re.S | re.M)
+if _m: _ICON |= {k for k, _ in re.findall(r"(\w+)\s*:\s*'(<svg.*?</svg>)'", _m.group(1), re.S)}
+_seen = {}
+for _s in S:
+    _ic = _s.get('icon')
+    if not _ic: fails.append(f'증상 {_s["id"]} 에 icon 이 없습니다')
+    elif _ic not in _ICON: fails.append(f'증상 {_s["id"]} 의 아이콘 «{_ic}» 이 app-shell.html 에 없습니다 — 알약 그림으로 대체돼 버립니다')
+    elif _ic in _seen: fails.append(f'증상 «{_seen[_ic]}» 와 «{_s["id"]}» 가 같은 아이콘 «{_ic}» 을 씁니다 — 어르신이 골라야 하는 화면입니다')
+    else: _seen[_ic] = _s['id']
+for _name, _rows in (('계열', K), ('그런줄', _MY)):
+    _u = {}
+    for _r in _rows:
+        _ic = _r.get('icon')
+        if _ic and _ic not in _ICON: fails.append(f'{_name} {_r.get("id")} 의 아이콘 «{_ic}» 이 없습니다')
+        elif _ic and _ic in _u: fails.append(f'{_name} «{_u[_ic]}» 와 «{_r.get("id")}» 가 같은 아이콘 «{_ic}» 을 씁니다')
+        elif _ic: _u[_ic] = _r.get('id')
+
 print(f'증상 {len(S)} · 약 {len(D)} · 계열 {len(K)} · 영양제 {len(SUP)} · 팁 {len(T)} · 그런줄 {len(_MY)} · 규칙 {len(IX["rules"])} · 출처 {len(SRC)}')
 if fails:
     print('실패', len(fails)); [print('  ✗', f) for f in fails]; sys.exit(1)
