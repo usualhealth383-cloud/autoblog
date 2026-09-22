@@ -96,7 +96,7 @@ NOTI_JS = """()=>{
   return {fired, errs};
 }"""
 
-TAP_JS = """()=>[...document.querySelectorAll('#view button,#view a')].filter(e=>!(e.matches('a.link')&&e.closest('p,span,li'))).map(e=>{const b=e.getBoundingClientRect();return b.height>0&&b.height<44?((e.innerText||e.className)+'').slice(0,20)+':'+Math.round(b.height):null}).filter(Boolean)"""
+TAP_JS = """()=>[...document.querySelectorAll('#view button,#view a')].filter(e=>!((e.matches('a.link')||e.matches('a.call-in'))&&e.closest('p,span,li,div'))).map(e=>{const b=e.getBoundingClientRect();return b.height>0&&b.height<44?((e.innerText||e.className)+'').slice(0,20)+':'+Math.round(b.height):null}).filter(Boolean)"""
 
 def main():
     ap = argparse.ArgumentParser(); ap.add_argument('--url'); a = ap.parse_args()
