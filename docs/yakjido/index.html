@@ -2025,6 +2025,22 @@ function ixLine(extra){
 
 /* 읽어 주기 — 기기에 내장된 음성(Web Speech). 어디로도 보내지 않는다. 핵심 세 줄만 */
 let SPEAKING = null;
+/* 읽어 주기 한 군데로 — 실패했을 때 단추가 켜진 채 굳어 버리던 것을 막는다.
+   기기에 한국어 음성이 없으면 읽지 않고 그렇다고 말씀드린다(엉뚱한 발음으로 읽느니 낫다). */
+function speakNow(text, btn){
+  const t = String(text || '').trim(); if (!t) return;
+  const done = () => { SPEAKING = null; document.querySelectorAll('.speak.on').forEach(b => b.classList.remove('on')); };
+  let voices = []; try { voices = speechSynthesis.getVoices() || []; } catch (e) {}
+  if (voices.length && !voices.some(v => (v.lang || '').toLowerCase().startsWith('ko'))) {
+    toast('이 기기에 한국어 음성이 없어요 — 기기 설정에서 한국어 음성을 받으시면 읽어 드릴 수 있어요');
+    return;
+  }
+  const u = new SpeechSynthesisUtterance(t.slice(0, 1200)); u.lang = 'ko-KR'; u.rate = 0.92;
+  u.onend = done;
+  u.onerror = () => { done(); toast('읽어 주기가 안 됐어요. 기기 소리와 한국어 음성을 확인해 주세요'); };
+  SPEAKING = u; btn?.classList.add('on');
+  try { speechSynthesis.speak(u); } catch (e) { done(); toast('읽어 주기가 안 됐어요'); }
+}
 function speakAnswer(sid, btn){
   const s = byId(D.symptoms, sid); if (!s || !('speechSynthesis' in window)) { toast('이 기기는 읽어 주기를 지원하지 않아요'); return; }
   if (SPEAKING) { speechSynthesis.cancel(); SPEAKING = null; document.querySelectorAll('.speak.on').forEach(b => b.classList.remove('on')); return; }
@@ -2038,9 +2054,7 @@ function speakAnswer(sid, btn){
   const text = buy
     ? `${s.name}. 이렇게 사시면 돼요. ${buy}. ${how} ${care ? '병원은, ' + care : ''}`
     : `${s.name}. 약국에서 사실 약은 없어요. ${plain(t3.clinic)} ${plain(t3.escalate)}`;
-  const u = new SpeechSynthesisUtterance(text); u.lang = 'ko-KR'; u.rate = 0.92;
-  u.onend = () => { SPEAKING = null; btn?.classList.remove('on'); };
-  SPEAKING = u; btn?.classList.add('on'); speechSynthesis.speak(u);
+  speakNow(text, btn);
 }
 /* ── 어디서든 읽어 주기 ──
    읽어 주기가 증상 화면에만 있었다. 어르신 앱인데 「가장 긴 글」인 약 설명과 약 상식에는 없었다.
@@ -2049,10 +2063,7 @@ function speakText(text, btn){
   if (!('speechSynthesis' in window)) { toast('이 기기는 읽어 주기를 지원하지 않아요'); return; }
   if (SPEAKING) { speechSynthesis.cancel(); SPEAKING = null; document.querySelectorAll('.speak.on').forEach(b => b.classList.remove('on')); return; }
   const t = String(text || '').replace(/\*\*/g, '').replace(/「|」|「|」/g, '').replace(/\[\[[^\]|]*\|([^\]]*)\]\]/g, '$1').replace(/\s+/g, ' ').trim();
-  if (!t) return;
-  const u = new SpeechSynthesisUtterance(t.slice(0, 1200)); u.lang = 'ko-KR'; u.rate = 0.92;
-  u.onend = () => { SPEAKING = null; btn?.classList.remove('on'); };
-  SPEAKING = u; btn?.classList.add('on'); speechSynthesis.speak(u);
+  speakNow(t, btn);
 }
 const speakBtn = (expr, label) => `<button class="speak" onclick="speakText(${expr}, this)" aria-label="${esc(label || '읽어 주기')}">${I.info}읽어 주기</button>`;
 /* 약 하나를 읽어 주는 문장 — 이름·무엇에 쓰는지·어떻게 드시는지·조심할 것 */
