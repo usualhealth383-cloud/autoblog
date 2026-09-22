@@ -3148,14 +3148,20 @@ function minGapH(item){
   const m = t.match(/([0-9]+)\s*(?:~\s*[0-9]+)?\s*시간/);
   return m ? +m[1] : 0;
 }
-/* 허가 용법이 「하루 몇 번」인지 — defaultSlots 와 같은 규칙으로 읽는다 */
+/* 허가 용법이 「하루 몇 번」인지.
+   글에 적힌 횟수만 보면 안 된다 — 타이레놀은 「하루 3번」이 기본이지만 4~6시간 간격으로
+   더 드실 수 있다(현욱님 2026-09-22). 그래서 «간격으로 계산한 횟수»와 «글에 적힌 횟수»
+   가운데 큰 쪽을 상한으로 본다. 간격 「4~6시간」이면 24÷6 = 하루 4번까지. */
 function maxPerDay(item){
   const t = String((item?.d?.dose?.interval || '') + ' ' + (item?.simple || '') + ' ' + (item?.d?.simple || '')).replace(/\s+/g, '');
   const NUM = { '한': 1, '두': 2, '세': 3, '네': 4 };
+  let said = 0;
   let m = t.match(/(?:하루|1일)[0-9]~?([0-9])[회번]/) || t.match(/(?:하루|1일)([0-9])[회번]/);
-  if (m) return +m[1];
-  m = t.match(/(?:하루|1일)(한|두|세|네)[회번]/);
-  return m ? NUM[m[1]] : 0;
+  if (m) said = +m[1];
+  else { m = t.match(/(?:하루|1일)(한|두|세|네)[회번]/); if (m) said = NUM[m[1]]; }
+  const g = String(item?.d?.dose?.interval || '').match(/([0-9]+)\s*(?:~\s*([0-9]+))?\s*시간/);
+  const byGap = g ? Math.floor(24 / (+(g[2] || g[1]))) : 0;
+  return Math.max(said, byGap);
 }
 function schedWarn(item){
   const cnt = maxPerDay(item), picked = schedOf(item.id, item).length;
