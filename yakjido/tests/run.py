@@ -100,6 +100,41 @@ NOTI_JS = """()=>{
   return {fired, errs};
 }"""
 
+# 겹침 규칙 52개가 «실제로» 뜨는지 전수로 본다.
+# 자료가 이어져 있는지(죽은 규칙)만 보던 것으로는 부족했다 — 아세트아미노펜 중복 규칙은
+# 고리가 멀쩡한데도 세는 방식 때문에 한 번도 뜨지 않았고, 리튬·디곡신·메트로니다졸은
+# 사용자가 그 약을 담을 길 자체가 없어 영영 뜰 수 없었다(2026-09-22).
+RULES_JS = """()=>{
+  const rules=(D.interactions&&D.interactions.rules)||[];
+  const cands=[];
+  for(const d of (D.drugs||[])) cands.push(d.id);
+  for(const g of (D.ingredients.quick||[])) for(const x of (g.subs||[])) cands.push('cls:'+x.id);
+  const info={};
+  for(const id of cands){ ME.taking=[id]; ME.pub={};
+    const c=new Set(), k=new Set();
+    ixItems([]).forEach(it=>it.ings.forEach(e=>{(e.cls||[]).forEach(x=>c.add(x)); if(e.k)k.add(e.k);}));
+    info[id]={c,k}; }
+  const hit=(id,g)=>g.some(t=>t.startsWith('k:')?info[id].k.has(t.slice(2)):info[id].c.has(t));
+  const F=['heart','diabetes','ulcer','kidney','liver','anticoag','glaucoma','bph','asthma','alcohol','gout','pregnant','senior'];
+  const bad=[];
+  for(const r of rules){
+    let pick=[],ok=true;
+    if(r.count){ const c=cands.filter(id=>info[id].c.has(r.count.tag));
+      if(c.length<r.count.n) ok=false; else pick=c.slice(0,r.count.n); }
+    else { const used=new Set();
+      for(const g of (r.need||[])){ const id=cands.find(x=>!used.has(x)&&hit(x,g)); if(!id){ok=false;break;} used.add(id); pick.push(id); } }
+    if(!ok){ bad.push(r.id+' — 이 약을 담을 길이 없습니다'); continue; }
+    F.forEach(f=>{ME[f]=false;}); if(r.flags) r.flags.forEach(f=>{ME[f]=true;});
+    ME.taking=pick; ME.pub={};
+    const sc=ixRun([]);
+    if(!sc.hits.some(h=>h.r.id===r.id)){
+      const over=sc.hits.filter(h=>(h.r.over||[]).includes(r.id)).map(h=>h.r.id);
+      if(!over.length) bad.push(r.id+' — '+pick.join('+')+' 를 담아도 안 뜹니다');
+    }
+  }
+  F.forEach(f=>{ME[f]=false;}); ME.taking=[]; ME.pub={}; saveMe();
+  return bad;}"""
+
 TAP_JS = """()=>[...document.querySelectorAll('#view button,#view a')].filter(e=>!((e.matches('a.link')||e.matches('a.call-in'))&&e.closest('p,span,li,div'))).map(e=>{const b=e.getBoundingClientRect();return b.height>0&&b.height<44?((e.innerText||e.className)+'').slice(0,20)+':'+Math.round(b.height):null}).filter(Boolean)"""
 
 def main():
@@ -216,6 +251,12 @@ def main():
             pg.goto(url + '#' + r); pg.reload(); ready(); pg.wait_for_timeout(700)
             txt = pg.evaluate("()=>[...document.querySelectorAll('.ixline,.ix-h b')].map(x=>x.innerText).join(' | ')")
             if kw not in txt: fails.append(f'병용 시나리오 {picks} → "{kw}" 없음: {txt[:80]}')
+        # 6b. 겹침 규칙 52개 전수 — 조건을 만족하는 약을 담으면 실제로 떠야 한다
+        pg.evaluate("localStorage.removeItem('yakjido.me.v1')")
+        pg.goto(url + '#/together'); pg.reload(); ready(); pg.wait_for_timeout(500)
+        for b in pg.evaluate(RULES_JS): fails.append(f'겹침 규칙 {b}')
+        pg.evaluate("localStorage.removeItem('yakjido.me.v1')")
+
         # 5d. 입력칸에는 이름표가 있어야 한다 — 자리표시 글자만으로는 화면낭독기가 못 읽는다.
         #     모든 화면 위에 떠 있는 검색칸이 그 상태였다.
         nolab = []
@@ -313,7 +354,7 @@ def main():
     print(f'화면 {len(routes)}개 검사 완료')
     if fails:
         print('실패', len(fails)); [print('  ✗', f) for f in fails]; sys.exit(1)
-    print('✓ 전부 통과 — JS 오류 0 · 넘침 0 · 잘림 0 · 명암비 AA · 조작 부품 3:1 · 44px · 단추 누르기 · 복용 간격 · 약 알림 · 어르신 모드 · 320px · 병용 8건 · 입력칸 이름표 · 성분 해석 123 · 죽은 규칙 0 · 약통 판정 4건 · 자기중복 3건 · 바구니 겹침 · 이중계산 0 · 검색 8건 · 구어 12건 · 문장 16건')
+    print('✓ 전부 통과 — JS 오류 0 · 넘침 0 · 잘림 0 · 명암비 AA · 조작 부품 3:1 · 44px · 단추 누르기 · 복용 간격 · 약 알림 · 어르신 모드 · 320px · 병용 8건 · 겹침 규칙 52 · 입력칸 이름표 · 성분 해석 123 · 죽은 규칙 0 · 약통 판정 4건 · 자기중복 3건 · 바구니 겹침 · 이중계산 0 · 검색 8건 · 구어 12건 · 문장 16건')
 
 if __name__ == '__main__':
     main()

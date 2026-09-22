@@ -296,7 +296,8 @@ for _s in S:
     elif _ic not in _ICON: fails.append(f'증상 {_s["id"]} 의 아이콘 «{_ic}» 이 app-shell.html 에 없습니다 — 알약 그림으로 대체돼 버립니다')
     elif _ic in _seen: fails.append(f'증상 «{_seen[_ic]}» 와 «{_s["id"]}» 가 같은 아이콘 «{_ic}» 을 씁니다 — 어르신이 골라야 하는 화면입니다')
     else: _seen[_ic] = _s['id']
-for _name, _rows in (('계열', K), ('그런줄', _MY)):
+_quick = [{'id': _g.get('id'), 'icon': _g.get('ico')} for _g in (ING.get('quick') or [])]
+for _name, _rows in (('계열', K), ('그런줄', _MY), ('담기 계열', _quick)):
     _u = {}
     for _r in _rows:
         _ic = _r.get('icon')
