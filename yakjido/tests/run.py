@@ -78,6 +78,24 @@ UICON_JS = """()=>{
    if(best<3)out.push(who+' '+best.toFixed(2)+':1');}
  return [...new Set(out)];}"""
 
+# 약 알림이 실제로 만들어지는지.
+# 화면에는 「알림 켜짐」이라고 떠 있는데, 시간이 돼도 알림이 안 왔다. 타이머 안에서
+# 없는 변수(id)를 써서 터지고 있었고, try/catch 가 그것을 조용히 삼키고 있었다.
+NOTI_JS = """()=>{
+  const fired=[], errs=[];
+  const RT=window.setTimeout, RN=window.Notification;
+  window.setTimeout=(fn)=>{ try{ fn(); }catch(e){ errs.push(''+e); } return 0; };
+  const F=function(t,o){ fired.push(t+'|'+((o&&o.tag)||'')); };
+  F.permission='granted'; window.Notification=F;
+  try{
+    ME.taking=['ibuprofen'];
+    ME.sched={ibuprofen:['23:59']};
+    armNotifications();
+  }catch(e){ errs.push('armNotifications: '+e); }
+  finally{ window.setTimeout=RT; window.Notification=RN; }
+  return {fired, errs};
+}"""
+
 TAP_JS = """()=>[...document.querySelectorAll('#view button,#view a')].filter(e=>!(e.matches('a.link')&&e.closest('p,span,li'))).map(e=>{const b=e.getBoundingClientRect();return b.height>0&&b.height<44?((e.innerText||e.className)+'').slice(0,20)+':'+Math.round(b.height):null}).filter(Boolean)"""
 
 def main():
@@ -132,6 +150,11 @@ def main():
             if bad: fails.append(f'명암비({theme}) {len(bad)}: {bad[:3]}')
             if tap: fails.append(f'44px 미만({theme}) {len(tap)}: {sorted(set(tap))[:5]}')
         pg.emulate_media(color_scheme='light')
+        # 5a. 약 알림 — 시간이 돼도 안 오던 것(타이머 안에서 조용히 터지고 있었다)
+        pg.goto(url + '#/schedule'); ready(); pg.wait_for_timeout(300)
+        _n = pg.evaluate(NOTI_JS)
+        if _n['errs']: fails.append(f'약 알림이 터집니다: {_n["errs"][:2]}')
+        if not _n['fired']: fails.append('약 알림이 하나도 만들어지지 않습니다 — 시간이 돼도 안 옵니다')
         # 5b. 어르신 모드(글자 20px·큰 단추) — 넘침·잘림은 큰 글씨에서 먼저 터진다
         pg.evaluate("localStorage.setItem('yakjido.fs','20px');localStorage.setItem('yakjido.me.v1',JSON.stringify({age:'senior',easy:true,taking:['cls:bp.arb','ibuprofen'],pub:{}}))")
         for r in SC + ['/bag', '/schedule', '/symptom/cramp', '/symptom/sprain', '/drug/acetaminophen', '/kinds/bp']:
@@ -256,7 +279,7 @@ def main():
     print(f'화면 {len(routes)}개 검사 완료')
     if fails:
         print('실패', len(fails)); [print('  ✗', f) for f in fails]; sys.exit(1)
-    print('✓ 전부 통과 — JS 오류 0 · 넘침 0 · 잘림 0 · 명암비 AA · 조작 부품 3:1 · 44px · 어르신 모드 · 320px · 병용 8건 · 입력칸 이름표 · 성분 해석 123 · 죽은 규칙 0 · 약통 판정 4건 · 자기중복 3건 · 바구니 겹침 · 이중계산 0 · 검색 8건 · 구어 12건 · 문장 16건')
+    print('✓ 전부 통과 — JS 오류 0 · 넘침 0 · 잘림 0 · 명암비 AA · 조작 부품 3:1 · 44px · 약 알림 · 어르신 모드 · 320px · 병용 8건 · 입력칸 이름표 · 성분 해석 123 · 죽은 규칙 0 · 약통 판정 4건 · 자기중복 3건 · 바구니 겹침 · 이중계산 0 · 검색 8건 · 구어 12건 · 문장 16건')
 
 if __name__ == '__main__':
     main()
