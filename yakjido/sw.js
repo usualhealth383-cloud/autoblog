@@ -8,7 +8,7 @@
    자료는 «캐시 먼저» — 한 번 받은 것은 즉시 열리고, 뒤에서 조용히 새로 받아 둔다. */
 const CACHE = 'yakjido-2026-09-21-8896';
 const DATA = 'yakjido-data-v1';
-const ASSETS = ['./', './index.html', './data/core.json', './manifest.webmanifest', './icon-192.png', './icon-512.png', './icon-180.png'];
+const ASSETS = ['./', './index.html', './data/core.json', './manifest.webmanifest', './icon-192.png', './icon-512.png', './icon-180.png', './icon-maskable-512.png'];
 
 self.addEventListener('install', (e) => {
   e.waitUntil(caches.open(CACHE).then((c) => c.addAll(ASSETS)).then(() => self.skipWaiting()));
@@ -31,10 +31,19 @@ self.addEventListener('fetch', (e) => {
     })));
     return;
   }
-  // 앱 셸 — 네트워크 우선, 실패하면 캐시
-  e.respondWith(fetch(e.request).then((res) => {
-    const copy = res.clone();
-    caches.open(CACHE).then((c) => c.put(e.request, copy)).catch(() => {});
-    return res;
-  }).catch(() => caches.match(e.request).then((hit) => hit || caches.match('./index.html'))));
+  /* 앱 셸 — 네트워크 우선이되 «2.5초까지만» 기다린다.
+     껍데기가 420 KB 라, 신호가 나쁜 곳에서는 캐시에 있는데도 매번 기다리셔야 했다.
+     2.5초 안에 안 오면 캐시에 있는 것을 먼저 열어 드리고, 받아 온 새것은 캐시에 넣어
+     다음에 여실 때 반영한다. 신호가 좋으면 예전과 똑같이 늘 최신을 받는다. */
+  e.respondWith((async () => {
+    const net = fetch(e.request).then((res) => {
+      if (res && res.ok) caches.open(CACHE).then((c) => c.put(e.request, res.clone())).catch(() => {});
+      return res;
+    });
+    const hit = await caches.match(e.request);
+    if (!hit) return net.catch(() => caches.match('./index.html'));
+    const slow = new Promise((r) => setTimeout(() => r(null), 2500));
+    const first = await Promise.race([net.catch(() => null), slow]);
+    return first || hit;
+  })());
 });
