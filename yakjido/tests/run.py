@@ -359,7 +359,7 @@ def main():
             # 「니코틴산아미드」는 비타민 B3 — 종합비타민 489개가 금연 보조제로 읽히면 안 된다(2026-09-23)
             ['니코틴산아미드', []], ['니코틴산벤질', []], ['니코틴', ['nicotine']], ['니코틴폴라크리렉스', ['nicotine']],
             ['니코틴타르타르산염수화물', ['nicotine']], ['미녹시딜', ['minoxidil']],
-            ['살리실산', ['salicylic-acid']], ['브롬페니라민말레산염', ['brompheniramine']], ['d-클로르페니라민말레산염', ['chlorpheniramine']], ['페니라민말레산염', ['pheniramine']], ['살리실산 락트산', ['salicylic-acid']], ['살리실산글리콜', ['glycol-salicylate']], ['클로닉신리시네이트', ['clonixin']], ['돔페리돈', ['domperidone']], ['스코폴리아엑스', ['scopolia']], ['니자티딘', ['nizatidine']], ['아세틸살리실산', ['aspirin']],
+            ['살리실산', ['salicylic-acid']], ['브롬페니라민말레산염', ['brompheniramine']], ['d-클로르페니라민말레산염', ['chlorpheniramine']], ['페니라민말레산염', ['pheniramine']], ['살리실산 락트산', ['salicylic-acid']], ['살리실산글리콜', ['glycol-salicylate']], ['클로닉신리시네이트', ['clonixin']], ['돔페리돈', ['domperidone']], ['스코폴리아엑스', ['scopolia']], ['니자티딘', ['nizatidine']], ['폴마콕시브', ['polmacoxib']], ['옥시코돈염산염', ['opioid-strong']], ['트리플루살', ['triflusal']], ['네비보롤염산염', ['betablock']], ['아세틸살리실산', ['aspirin']],
         ])
         _ig += pg.evaluate("""L=>L.map(([t,bad])=>{ const d=drugByIngr(t); return d&&d.id===bad ? t+' → '+bad : null; }).filter(Boolean)""", [
             ['니코틴산아미드', 'nicotine-patch'], ['니코틴산아미드 리보플라빈', 'nicotine-patch'], ['니코틴산벤질', 'nicotine-patch'],
