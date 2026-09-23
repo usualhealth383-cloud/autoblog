@@ -3358,6 +3358,19 @@ function adherence(n = 30){
 }
 function tick(id, t){ const arr = takenSet(); const key = id + '@' + t; const i = arr.indexOf(key); i >= 0 ? arr.splice(i, 1) : arr.push(key); rollDay(); saveMe(); route(); }
 let NOTI_TIMERS = [];
+/* 알림 띄우기 — 서비스워커가 있으면 그쪽으로(안드로이드는 이것만 된다), 없으면 예전 방식.
+   「먹었어요」 단추를 달아 알림에서 바로 체크할 수 있게 한다(메디세이프와 같은 자리). */
+async function showNote(title, body, key){
+  try {
+    const reg = navigator.serviceWorker && await navigator.serviceWorker.getRegistration();
+    if (reg && reg.showNotification) {
+      await reg.showNotification(title, { body, tag: key, renotify: true, requireInteraction: true, icon: 'icon-192.png', badge: 'icon-192.png',
+        data: { key }, actions: [{ action: 'took', title: '먹었어요' }, { action: 'open', title: '열기' }] });
+      return;
+    }
+  } catch (e) {}
+  try { new Notification(title, { body, tag: key }); } catch (e) { console.warn('알림을 띄우지 못했습니다', e); }
+}
 function armNotifications(){
   NOTI_TIMERS.forEach(clearTimeout); NOTI_TIMERS = [];
   if (!('Notification' in window) || Notification.permission !== 'granted') return;
@@ -3365,10 +3378,18 @@ function armNotifications(){
   /* 화면에 「켜져 있는」 것과 실제 알림이 달라지지 않도록, 미리 골라 둔 시간도 함께 건다 */
   for (const d of takingItems()) for (const t of schedOf(d.id, d)) {
     const [h, m] = t.split(':').map(Number); const at = new Date(); at.setHours(h, m, 0, 0);
-    if (at <= now) continue;
-    NOTI_TIMERS.push(setTimeout(() => { try { new Notification('약지도 · 약 드실 시간', { body: `${d.name} — ${d.simple || ''}`.slice(0, 120), tag: d.id + t }); } catch (e) { console.warn('알림을 띄우지 못했습니다', e); } }, at - now));
+    const key = d.id + '@' + t;
+    if (at > now) NOTI_TIMERS.push(setTimeout(() => { if (!takenSet().includes(key)) showNote('약지도 · 약 드실 시간', `${d.name} — ${d.simple || ''}`.slice(0, 120), key); }, at - now));
+    /* 30분이 지나도 체크가 없으면 한 번만 더 — 놓친 복용을 줄이는 가장 흔한 방법 */
+    const again = new Date(at.getTime() + 30 * 60000);
+    if (again > now) NOTI_TIMERS.push(setTimeout(() => { if (!takenSet().includes(key)) showNote('아직 안 드셨어요', `${d.name} — ${t}에 드실 약이에요. 드셨으면 「먹었어요」를 눌러 주세요.`.slice(0, 120), key); }, again - now));
   }
 }
+/* 알림의 「먹었어요」 — 앱이 열려 있으면 메시지로, 닫혀 있었으면 #/schedule?tick= 으로 들어온다 */
+function tickFromNote(key){
+  if (!key) return; const arr = takenSet(); if (!arr.includes(key)) { arr.push(key); rollDay(); saveMe(); toast('먹었다고 적어 두었어요'); }
+}
+try { navigator.serviceWorker && navigator.serviceWorker.addEventListener('message', ev => { if (ev.data && ev.data.type === 'yakjido-tick') { tickFromNote(ev.data.key); go('/schedule'); route(); } }); } catch (e) {}
 async function askNoti(){ if (!('Notification' in window)) { toast('이 브라우저는 알림을 지원하지 않아요'); return; } const r = await Notification.requestPermission(); if (r === 'granted') { toast('알림을 켰어요 — 앱이 열려 있을 때 울려요'); armNotifications(); } else toast('알림이 꺼져 있어요'); route(); }
 function icsText(){
   const pad = n => String(n).padStart(2, '0'); const d0 = new Date(); const ds = `${d0.getFullYear()}${pad(d0.getMonth() + 1)}${pad(d0.getDate())}`;
@@ -3514,7 +3535,8 @@ function calCard(){
   <p class="small muted" style="margin-top:10px">진료 때 이 화면을 그대로 보여 주시면 됩니다. <b>못 드신 날을 탓하려고 만든 것이 아니에요</b> — 언제 왜 놓치시는지 의사·약사가 보면 약을 더 쉬운 쪽으로 바꿔 드릴 수 있어요.</p>
   </section>`
 }
-function vSchedule(){
+function vSchedule(_, q){
+  if (q && q.tick) { tickFromNote(q.tick); setTimeout(() => { try { history.replaceState(null, '', '#/schedule'); } catch (e) {} }, 0); }
   const taking = takingItems(); rollDay();
   const perm = ('Notification' in window) ? Notification.permission : 'unsupported';
   const now = new Date(); const nowMin = now.getHours() * 60 + now.getMinutes(); const taken = takenSet();
@@ -3540,7 +3562,7 @@ function vSchedule(){
   <section class="sec card"><h2>알림 방법</h2>
     <div class="toggle"><div class="t"><b>앱이 열려 있을 때 알림</b><span>${perm === 'granted' ? '켜져 있어요' : perm === 'denied' ? '브라우저 설정에서 차단됨' : perm === 'unsupported' ? '이 브라우저는 지원하지 않아요' : '허용하면 시간에 맞춰 알려드려요'}</span></div><button class="btn ghost" style="width:auto;min-height:40px;padding:0 14px" onclick="askNoti()">${perm === 'granted' ? '켜짐' : '켜기'}</button></div>
     <div class="toggle"><div class="t"><b>휴대폰 달력에 매일 알림 넣기</b><span>앱을 닫아도 울려요. 파일을 열면 달력이 등록해요</span></div><button class="btn ghost" style="width:auto;min-height:40px;padding:0 14px" onclick="downloadIcs()">${I.clock} 받기</button></div>
-    <p class="small muted" style="margin-top:10px">앱을 닫아도 오는 진짜 푸시 알림은 안드로이드 앱(설치형)에서 제공할 예정이에요.</p>
+    <p class="small muted" style="margin-top:10px">알림의 <b>「먹었어요」</b>를 누르면 바로 체크돼요. 30분이 지나도 체크가 없으면 <b>한 번 더</b> 알려 드려요. 앱을 완전히 닫아 두시면 울리지 않으니, 그럴 땐 <b>달력 알림</b>을 함께 켜 두세요.</p>
   </section>` : ''}
   ${disclaimer('알림은 잊지 않도록 돕는 도구예요. 용량·간격은 약 상자와 약사·의사 지시가 우선이에요.')}`;
 }

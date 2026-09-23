@@ -47,3 +47,18 @@ self.addEventListener('fetch', (e) => {
     return first || hit;
   })());
 });
+
+/* 약 알림 — 안드로이드 크롬은 페이지의 new Notification() 을 막는다(서비스워커로만 띄울 수 있다).
+   그래서 알림은 여기서 띄우고, 「먹었어요」를 누르면 앱을 열어 그 복용을 체크한다(2026-09-23). */
+self.addEventListener('notificationclick', (e) => {
+  e.notification.close();
+  const d = e.notification.data || {};
+  const hash = e.action === 'took' && d.key ? '#/schedule?tick=' + encodeURIComponent(d.key) : '#/schedule';
+  e.waitUntil((async () => {
+    const all = await self.clients.matchAll({ type: 'window', includeUncontrolled: true });
+    for (const c of all) {
+      if ('focus' in c) { try { c.postMessage({ type: 'yakjido-tick', key: e.action === 'took' ? d.key : '' }); } catch (x) {} return c.focus(); }
+    }
+    return self.clients.openWindow('./' + hash);
+  })());
+});

@@ -6,7 +6,7 @@
                        내용이 거의 안 바뀌는데 빌드마다 버리면 어르신 폰이 매번 다시 받는다.
                        그래서 이름을 고정하고, 빌드가 바뀌어도 그대로 둔다.
    자료는 «캐시 먼저» — 한 번 받은 것은 즉시 열리고, 뒤에서 조용히 새로 받아 둔다. */
-const CACHE = 'yakjido-2026-09-23-2163';
+const CACHE = 'yakjido-2026-09-23-5712';
 const DATA = 'yakjido-data-v1';
 const ASSETS = ['./', './index.html', './data/core.json', './manifest.webmanifest', './icon-192.png', './icon-512.png', './icon-180.png', './icon-maskable-512.png'];
 
@@ -45,5 +45,20 @@ self.addEventListener('fetch', (e) => {
     const slow = new Promise((r) => setTimeout(() => r(null), 2500));
     const first = await Promise.race([net.catch(() => null), slow]);
     return first || hit;
+  })());
+});
+
+/* 약 알림 — 안드로이드 크롬은 페이지의 new Notification() 을 막는다(서비스워커로만 띄울 수 있다).
+   그래서 알림은 여기서 띄우고, 「먹었어요」를 누르면 앱을 열어 그 복용을 체크한다(2026-09-23). */
+self.addEventListener('notificationclick', (e) => {
+  e.notification.close();
+  const d = e.notification.data || {};
+  const hash = e.action === 'took' && d.key ? '#/schedule?tick=' + encodeURIComponent(d.key) : '#/schedule';
+  e.waitUntil((async () => {
+    const all = await self.clients.matchAll({ type: 'window', includeUncontrolled: true });
+    for (const c of all) {
+      if ('focus' in c) { try { c.postMessage({ type: 'yakjido-tick', key: e.action === 'took' ? d.key : '' }); } catch (x) {} return c.focus(); }
+    }
+    return self.clients.openWindow('./' + hash);
   })());
 });

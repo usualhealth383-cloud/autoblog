@@ -91,12 +91,14 @@ NOTI_JS = """()=>{
   window.setTimeout=(fn)=>{ try{ fn(); }catch(e){ errs.push(''+e); } return 0; };
   const F=function(t,o){ fired.push(t+'|'+((o&&o.tag)||'')); };
   F.permission='granted'; window.Notification=F;
+  /* 2026-09-23 — 알림은 이제 showNote(서비스워커)로 띄운다. 그 입구를 가로채 센다 */
+  const RS=window.showNote; window.showNote=(t,b,k)=>{ fired.push(t+'|'+k); };
   try{
     ME.taking=['ibuprofen'];
     ME.sched={ibuprofen:['23:59']};
     armNotifications();
   }catch(e){ errs.push('armNotifications: '+e); }
-  finally{ window.setTimeout=RT; window.Notification=RN; }
+  finally{ window.setTimeout=RT; window.Notification=RN; window.showNote=RS; }
   return {fired, errs};
 }"""
 
@@ -457,6 +459,11 @@ def main():
         pg.evaluate("localStorage.removeItem('yakjido.me.v1')")
         pg.goto(url + '#/together'); pg.reload(); ready(); pg.wait_for_timeout(500)
         for b in pg.evaluate(RULES_JS): fails.append(f'겹침 규칙 {b}')
+        pg.evaluate("localStorage.removeItem('yakjido.me.v1')")
+        # 알림의 「먹었어요」 → #/schedule?tick= 으로 들어오면 그 복용이 체크돼야 한다(2026-09-23)
+        pg.evaluate("localStorage.setItem('yakjido.me.v1',JSON.stringify({taking:['ibuprofen'],sched:{ibuprofen:['08:00']},pub:{}}))")
+        pg.goto(url + '#/schedule?tick=ibuprofen%4008%3A00'); pg.reload(); ready(); pg.wait_for_timeout(400)
+        if 'ibuprofen@08:00' not in pg.evaluate("()=>takenSet()"): fails.append('알림의 「먹었어요」가 복용 체크로 이어지지 않습니다')
         pg.evaluate("localStorage.removeItem('yakjido.me.v1')")
         # 6b-2. 성분표에 없던 공공 제품 — 클로닉신(먹는 소염제 26개 제품)·돔페리돈이 약통에서 실제로 걸려야 한다(2026-09-23)
         _pb = {'노리스정 + 와파린': ({'taking':['pub:1','cls:blood.warf'],'pub':{'pub:1':{'name':'노리스정','full':'노리스정(클로닉신리시네이트)','ingr':'클로닉신리시네이트','rx':0,'seq':'1','drugId':''}}}, 'warfarin-nsaid'),
