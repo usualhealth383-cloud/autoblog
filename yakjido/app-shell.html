@@ -1958,8 +1958,10 @@ function ingIndex(){
   }
   roots.sort((a, b) => b[0].length - a[0].length);   /* 긴 어근부터 — 겹칠 때 더 구체적인 쪽 */
   const norm0 = s => String(s || '').toLowerCase().replace(/\s/g, '').replace(/[()\[\]{}<>,./|·+-]/g, '');
-  ING_IX = { norm, norm0, roots, exact, byKey, byDrug, n: list.length };
-  return ING_IX;
+  const ix = { norm, norm0, roots, exact, byKey, byDrug, n: list.length };
+  /* 자료가 아직 안 들어온 순간(첫 화면)에 불리면 빈 표가 굳어 버린다 — 비어 있으면 저장하지 않는다 */
+  if (list.length) ING_IX = ix;
+  return ix;
 }
 /* 문자열(성분명·제품명)에서 아는 성분을 골라낸다.
    '부틸스코폴라민'은 '스코폴라민'도 품고 있고 '페소테로딘'은 '테로딘'도 품고 있다.
@@ -4221,7 +4223,7 @@ function toggleQuick(qid){ ME.taking = ME.taking || []; const id = 'cls:' + qid;
   else { ME.taking.push(id); toast('내 약통에 담았어요'); }
   saveMe(); route(); }
 function toggleShort(id){ ME.short = ME.short || {}; if (ME.short[id]) delete ME.short[id]; else ME.short[id] = 1; saveMe(); route(); }
-function takingItems(){ const SH = ME.short || {}; return (ME.taking || []).map(id => { if (id.startsWith('cls:')) { const q = quickSub(id.slice(4)); if (!q) return null; return { id, name: q.g.n + ' — ' + q.x.n.replace(/으로 끝나요|이에요|예요|이 들어 있어요/g, '').trim(), quick: q, approx: true, simple: '처방대로 (약봉투 용법)' }; } if (id.startsWith('pub:')) { const x = (ME.pub || {})[id]; if (!x) return null; const d = x.drugId ? drug(x.drugId) : null; return { id, name: x.name, simple: x.rx ? '처방대로 (약봉투 용법)' : (d?.simple || '라벨대로'), d, pub: x }; } const d = drug(id); return d ? { id, name: d.name, simple: d.simple || '', d } : null; }).filter(Boolean).map(x => (x.short = !!SH[x.id], x)); }
+function takingItems(){ const SH = ME.short || {}; return (ME.taking || []).map(id => { if (id.startsWith('cls:')) { const q = quickSub(id.slice(4)); if (!q) return null; return { id, name: q.g.n + ' — ' + q.x.n.replace(/으로 끝나요|이에요|예요|이 들어 있어요/g, '').trim(), quick: q, approx: true, simple: '처방대로 (약봉투 용법)' }; } if (id.startsWith('pub:')) { const x = (ME.pub || {})[id]; if (!x) return null; /* 저장할 때 붙인 연결은 낡을 수 있다(연결 규칙을 고치면) — 성분이 있으면 지금 규칙으로 다시 잇는다 */ const d = x.ingr ? drugByIngr(x.ingr, x) : (x.drugId ? drug(x.drugId) : null); return { id, name: x.name, simple: x.rx ? '처방대로 (약봉투 용법)' : (d?.simple || '라벨대로'), d, pub: x }; } const d = drug(id); return d ? { id, name: d.name, simple: d.simple || '', d } : null; }).filter(Boolean).map(x => (x.short = !!SH[x.id], x)); }
 document.addEventListener('input', e => { if (e.target.id === 'mq') { MQ = e.target.value; clearTimeout(window._mt); window._mt = setTimeout(() => { const pos = e.target.selectionStart; route(); const el = document.getElementById('mq'); if (el) { el.focus(); el.setSelectionRange(pos, pos); } }, 300); }
   if (e.target.id === 'phq') { PH.q = e.target.value; clearTimeout(window._pt); window._pt = setTimeout(() => { const pos = e.target.selectionStart; route(); const el = document.getElementById('phq'); if (el) { el.focus(); el.setSelectionRange(pos, pos); } }, 280); return; }
   if (e.target.id === 'gq') { GQ = e.target.value; clearTimeout(window._gt); window._gt = setTimeout(() => { const pos = e.target.selectionStart; route(); const el = document.getElementById('gq'); if (el) { el.focus(); el.setSelectionRange(pos, pos); } }, 300); }
