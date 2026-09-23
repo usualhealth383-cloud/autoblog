@@ -299,6 +299,14 @@ def main():
         assert r['id'] in ORGAN, f'{r["id"]} 장기 없음'
         ico, n = ORGAN[r['id']]; r['organ'] = {'ico': ico, 'n': n}
     p = root / 'content' / 'interactions.json'
+    # ⚠️ 2026-09-23 — interactions.json 을 직접 고친 규칙이 있다(돔페리돈 등). 생성기에 없는 규칙이 있으면 멈춘다.
+    import sys as _s
+    if p.exists() and '--force' not in _s.argv:
+        _have = {r['id'] for r in json.loads(p.read_text(encoding='utf-8')).get('rules', [])}
+        _lost = sorted(_have - seen)
+        if _lost:
+            print(f'멈춤: 덮어쓰면 규칙 {len(_lost)}개가 사라집니다 — {", ".join(_lost)}. interactions.json 이 정본입니다(--force 로만 덮어씀).')
+            _s.exit(1)
     p.write_text(json.dumps(out, ensure_ascii=False, indent=1), encoding='utf-8')
     lv = {}
     for r in out['rules']: lv[r['lv']] = lv.get(r['lv'], 0) + 1
