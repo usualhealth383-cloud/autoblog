@@ -359,7 +359,7 @@ def main():
             # 「니코틴산아미드」는 비타민 B3 — 종합비타민 489개가 금연 보조제로 읽히면 안 된다(2026-09-23)
             ['니코틴산아미드', []], ['니코틴산벤질', []], ['니코틴', ['nicotine']], ['니코틴폴라크리렉스', ['nicotine']],
             ['니코틴타르타르산염수화물', ['nicotine']], ['미녹시딜', ['minoxidil']],
-            ['살리실산', ['salicylic-acid']], ['브롬페니라민말레산염', ['brompheniramine']], ['d-클로르페니라민말레산염', ['chlorpheniramine']], ['페니라민말레산염', ['pheniramine']], ['살리실산 락트산', ['salicylic-acid']], ['살리실산글리콜', []], ['아세틸살리실산', ['aspirin']],
+            ['살리실산', ['salicylic-acid']], ['브롬페니라민말레산염', ['brompheniramine']], ['d-클로르페니라민말레산염', ['chlorpheniramine']], ['페니라민말레산염', ['pheniramine']], ['살리실산 락트산', ['salicylic-acid']], ['살리실산글리콜', ['glycol-salicylate']], ['클로닉신리시네이트', ['clonixin']], ['돔페리돈', ['domperidone']], ['스코폴리아엑스', ['scopolia']], ['니자티딘', ['nizatidine']], ['아세틸살리실산', ['aspirin']],
         ])
         _ig += pg.evaluate("""L=>L.map(([t,bad])=>{ const d=drugByIngr(t); return d&&d.id===bad ? t+' → '+bad : null; }).filter(Boolean)""", [
             ['니코틴산아미드', 'nicotine-patch'], ['니코틴산아미드 리보플라빈', 'nicotine-patch'], ['니코틴산벤질', 'nicotine-patch'],
@@ -457,6 +457,14 @@ def main():
         pg.evaluate("localStorage.removeItem('yakjido.me.v1')")
         pg.goto(url + '#/together'); pg.reload(); ready(); pg.wait_for_timeout(500)
         for b in pg.evaluate(RULES_JS): fails.append(f'겹침 규칙 {b}')
+        pg.evaluate("localStorage.removeItem('yakjido.me.v1')")
+        # 6b-2. 성분표에 없던 공공 제품 — 클로닉신(먹는 소염제 26개 제품)·돔페리돈이 약통에서 실제로 걸려야 한다(2026-09-23)
+        _pb = {'노리스정 + 와파린': ({'taking':['pub:1','cls:blood.warf'],'pub':{'pub:1':{'name':'노리스정','full':'노리스정(클로닉신리시네이트)','ingr':'클로닉신리시네이트','rx':0,'seq':'1','drugId':''}}}, 'warfarin-nsaid'),
+               '노리스정 + 이부프로펜': ({'taking':['pub:1','ibuprofen'],'pub':{'pub:1':{'name':'노리스정','full':'노리스정','ingr':'클로닉신리시네이트','rx':0,'seq':'1','drugId':''}}}, 'nsaid-dup'),
+               '멕시롱 + 플루코나졸': ({'taking':['pub:1','pub:2'],'pub':{'pub:1':{'name':'멕시롱액','full':'멕시롱액(돔페리돈)','ingr':'돔페리돈','rx':0,'seq':'1','drugId':''},'pub:2':{'name':'디푸루칸','full':'디푸루칸캡슐(플루코나졸)','ingr':'플루코나졸','rx':1,'seq':'2','drugId':''}}}, 'domperidone-cyp3a4')}
+        for _nm, (_me, _rid) in _pb.items():
+            pg.evaluate("(me)=>localStorage.setItem('yakjido.me.v1',JSON.stringify(me))", _me); pg.reload(); ready(); pg.wait_for_timeout(300)
+            if _rid not in pg.evaluate("()=>ixRun().hits.map(h=>h.r.id)"): fails.append(f'약통 판정 누락: {_nm} → {_rid}')
         pg.evaluate("localStorage.removeItem('yakjido.me.v1')")
 
         # 5d. 입력칸에는 이름표가 있어야 한다 — 자리표시 글자만으로는 화면낭독기가 못 읽는다.
@@ -571,7 +579,7 @@ def main():
     print(f'화면 {len(routes)}개 검사 완료')
     if fails:
         print('실패', len(fails)); [print('  ✗', f) for f in fails]; sys.exit(1)
-    print('✓ 전부 통과 — JS 오류 0 · 넘침 0 · 잘림 0 · 명암비 AA · 조작 부품 3:1 · 44px · 단추 누르기 · 복용 간격 · 복약 달력 · 홈 오늘약 · 어르신 소염제 · 소아 한도 · 계열 경고 · 어근 오인 · 내 정보 칸 · 화면 밝기 · 아이콘 전수 · 약 알림 · 어르신 모드 · 320px · 병용 8건 · 겹침 규칙 52 · 입력칸 이름표 · 성분 해석 123 · 죽은 규칙 0 · 약통 판정 4건 · 자기중복 3건 · 바구니 겹침 · 이중계산 0 · 검색 8건 · 구어 30건 · 문장 16건')
+    print('✓ 전부 통과 — JS 오류 0 · 넘침 0 · 잘림 0 · 명암비 AA · 조작 부품 3:1 · 44px · 단추 누르기 · 복용 간격 · 복약 달력 · 홈 오늘약 · 어르신 소염제 · 소아 한도 · 계열 경고 · 어근 오인 · 내 정보 칸 · 화면 밝기 · 아이콘 전수 · 약 알림 · 어르신 모드 · 320px · 병용 8건 · 겹침 규칙 53 · 입력칸 이름표 · 성분 해석 123 · 죽은 규칙 0 · 약통 판정 4건 · 자기중복 3건 · 바구니 겹침 · 이중계산 0 · 검색 8건 · 구어 30건 · 문장 16건')
 
 if __name__ == '__main__':
     main()
