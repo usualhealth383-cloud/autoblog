@@ -2837,7 +2837,8 @@ function buyItem(x){
   const sub = x.d.combo ? '이 성분이 든 제품: ' + prodNames(x.d, 2).join(' · ')
     /* 「콜대원 콜드에스 / 콜대원」처럼 되풀이되는 줄은 지운다 */
     : (prod && ing && !prod.includes(ing) && !ing.includes(prod) ? ing : '');
-  const badge = x.blocked ? '<span class="badge stop">약사와 상의</span>'
+  const badge = aeFor(x.d.id).length ? '<span class="badge stop">전에 불편했던 약</span>'
+    : x.blocked ? '<span class="badge stop">약사와 상의</span>'
     : x.swapped === 'ach' ? '<span class="badge warn">부담 적은 쪽으로 바꿈</span>'
     : x.swapped ? '<span class="badge warn">조건에 맞춰 바꿈</span>'
     : x.nsaidWarn ? '<span class="badge warn">어르신 주의 · 적은 양으로 짧게</span>'
@@ -3344,7 +3345,7 @@ function slotLine(){
   const best = rows.reduce((a, b) => (b.miss / b.want < a.miss / a.want ? b : a));
   if (worst.t === best.t || worst.miss === 0) return '';
   const w = SLOT_WORD[worst.t] || worst.t, g = SLOT_WORD[best.t] || best.t;
-  if (worst.miss / worst.want < 0.2) return '';
+  if (worst.miss / worst.want < 0.3) return '';
   return `<div class="note" style="margin-top:12px">${I.clock}<span><b>${esc(g)} 약은 잘 챙기시는데 ${esc(w)} 약을 자주 놓치세요</b> — 어제까지 30일 동안 ${esc(w)}은 ${worst.want}번 중 ${worst.miss}번을 못 드셨어요. 진료 때 <b>이 말씀을 그대로 전해 주세요.</b> 하루 한 번 먹는 약으로 바꿀 수 있는 경우가 많습니다.</span></div>`;
 }
 /* 지난 n일 가운데 «정해 둔 것이 있던 날»만 세어, 다 드신 날이 며칠인지.
@@ -3940,7 +3941,7 @@ const SENIOR_WHY = [
   ['위에서 피가 날 수 있어요', 'stomach', '소염진통제 계열', ['ibuprofen','naproxen','dexibuprofen','aspirin','loxoprofen','gnalen','easy6-eve','penzal','ethenzamide','aceclofenac']],
   ['소변·변비가 막힐 수 있어요', 'drop', '', ['solifenacin','loperamide']],
   ['혈압·심장이 부담을 받아요', 'temp', '', ['pseudoephedrine','phenylephrine','methylephedrine','caffeine','diosmin']],
-  ['콩팥에 쌓이거나 물·소금이 빠져요', 'scale', '', ['magnesium-oxide','antacid-mg','almagate','famotidine','bisacodyl']],
+  ['콩팥에 쌓이거나 물·소금이 빠져요', 'scale', '', ['magnesium-oxide','antacid-mg','almagate','bisacodyl']],
 ];
 const SENIOR_OF = (() => { const m = {}; for (const w of SENIOR_WHY) for (const id of w[3]) m[id] = w[0]; return m; })();
 function seniorItems(){
@@ -4013,6 +4014,7 @@ function vDrug(id){
   ${d.ach ? `<div class="usebar" style="${d.ach >= 2 ? '' : 'background:var(--tint2);color:var(--body)'}">${d.ach >= 2 ? I.alert : I.info}<span><b>항콜린 부담 ${esc(ACH_WORD[d.ach])}</b> — ${esc(d.achNote || '')}${d.achAlt ? '<br>' + fmt(d.achAlt) : ''}</span></div>` : ''}
   ${ixLine([d])}
   <p style="margin-top:10px">${fmt(d.lead || '')}</p>
+  ${aeRemind(d)}
   ${d.reviewed === false ? `<div class="note" style="margin-top:12px">${I.alert}<span><b>아직 전문의 검수를 받지 않은 약 화면이에요.</b> 식약처 허가사항과 연구를 바탕으로 정리했습니다. 참고만 하시고 약사·의사와 상의하세요.</span></div>` : ''}
   ${picts(d.pict)}
   ${(() => { const pr = (d.products || []).find(x => pimg(x.name)); return pr ? `<div class="drug-photo">${imgTag(pimg(pr.name), '', pr.name)}<div><b>${esc(pr.name)}</b><small>${esc(pr.maker || '')} · ${esc(pr.amount || '')}</small><small style="display:block;margin-top:2px">사진: 식약처·약학정보원 낱알식별</small></div></div>` : ''; })()}
@@ -4053,6 +4055,7 @@ function vDrug(id){
   </section></div>
   ${same.length ? `<section class="sec"><h2>같은 계열 다른 성분 <small>비교해서 고르기</small></h2><div class="card rows">${same.map(x => `<button class="row" onclick="go('/drug/${x.id}')"><div class="body"><b>${esc(x.name)}</b><span>${esc(x.tagline || (x.for || []).join(' · '))}</span>${useTag(x)}</div>${badge(x.rx)}</button>`).join('')}</div>${c ? `<a class="btn ghost" style="margin-top:12px" href="#/class/${c.id}">${I.scale} ${esc(c.name)} 한눈에 비교</a>` : ''}</section>` : ''}
   <div class="actions"><button class="btn ${(ME.taking || []).includes(d.id) ? 'line' : 'ghost'}" onclick="toggleTaking('${d.id}')">${(ME.taking || []).includes(d.id) ? I.check + ' 내 약통에 있어요 (빼기)' : I.pill + ' 지금 먹는 약으로 등록'}</button></div>
+  ${aeDrugCard(d)}
   ${srcChips(d.sources)}
   ${disclaimer()}`;
 }
@@ -4498,6 +4501,34 @@ function aeAdd(){
   saveMe(); route(); toast('적어 두었어요 — 진료 때 보여 주세요');
 }
 function aeDel(i){ aeList().splice(i, 1); saveMe(); route(); }
+/* 약 화면마다 「이 약 먹고 불편했어요」 — 현욱님 답(2026-09-23): 약 화면마다 두고 잘 기억할 수 있게.
+   적은 것은 약통 화면의 목록과 같은 곳(ME.ae)에 모이고, 그 약 화면·증상 추천에서 다시 보인다. */
+function aeFor(id){ return aeList().filter(x => x.id === id); }
+function aeRemind(d){
+  const xs = aeFor(d.id); if (!xs.length) return '';
+  return `<div class="flag" style="margin-top:12px">${I.alert}<div><b>전에 이 약을 드시고 불편하셨던 적이 있어요</b>
+    <p>${xs.slice(0, 3).map(x => `${esc(dateWord(x.at))} — ${esc(x.t)}`).join('<br>')}</p>
+    <p class="small muted" style="margin-top:4px">다시 드시기 전에 약사·의사에게 이 내용을 보여 주세요.</p></div></div>`;
+}
+function aeDrugCard(d){
+  return `<details class="acc" id="ae-drug"><summary>이 약 먹고 불편했어요${I.chev}</summary><div class="bd"><p class="small muted" style="margin:0 0 10px">적어 두시면 이 약 화면 위와 약통에 계속 보여 드려요.</p>
+    <div class="ae-form" style="margin-top:0">
+      <label class="ae-lbl" for="aed-what">어떤 일이 있었나요</label>
+      <input id="aed-what" class="ae-inp" placeholder="예) 속이 메스껍고 어지러웠어요" maxlength="200" autocomplete="off">
+      <label class="ae-lbl" for="aed-when">언제였나요</label>
+      <input id="aed-when" class="ae-inp" type="date" value="${todayKey()}" max="${todayKey()}">
+      <button class="btn ghost" onclick="aeAddFor('${esc(d.id)}')">${I.check} 적어 두기</button>
+    </div>
+    <p class="small muted" style="margin-top:10px">숨이 차거나 얼굴·입술이 붓거나 온몸에 두드러기가 번지면 적지 마시고 <b>바로 119</b>입니다.</p>
+  </div></details>`;
+}
+function aeAddFor(id){
+  const d = drug(id); const what = (document.getElementById('aed-what')?.value || '').trim();
+  const when = document.getElementById('aed-when')?.value || todayKey();
+  if (!what) { toast('어떤 일이 있었는지 한 줄만 적어 주세요'); document.getElementById('aed-what')?.focus(); return; }
+  aeList().unshift({ id, n: d ? d.name : id, at: when, t: what.slice(0, 200) });
+  ME.ae = aeList().slice(0, 50); saveMe(); route(); toast('적어 두었어요 — 이 약 화면 위에 계속 보여 드려요');
+}
 function aeCard(){
   const items = takingItems(); const list = aeList();
   return `<section class="sec card"><h2>약 먹고 불편했던 일</h2>
