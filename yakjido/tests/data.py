@@ -85,6 +85,9 @@ if _doc.exists():
     for _s in S:
         if _s.get('reviewed') is False and f"`{_s['id']}`" not in _t:
             fails.append(f'검수 대기 {_s["id"]} 가 검수-대기.md 에 없습니다')
+    for _d in D:
+        if _d.get('reviewed') is False and f"`{_d['id']}`" not in _t:
+            fails.append(f'검수 대기 약 {_d["id"]} 가 검수-대기.md 에 없습니다')
 else:
     fails.append('검수-대기.md 가 없습니다')
 

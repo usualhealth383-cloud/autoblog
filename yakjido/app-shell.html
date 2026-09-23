@@ -1806,6 +1806,9 @@ I.lips='<svg class="i" viewBox="0 0 24 24"><path d="M3.4 12.4c2.8-3.8 5.6-3.8 8.
 I.sun='<svg class="i" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 3v2M12 19v2M3 12h2M19 12h2M5.6 5.6l1.4 1.4M17 17l1.4 1.4M5.6 18.4L7 17M17 7l1.4-1.4"/></svg>';
 /* 증상 아이콘 — 「부위 + 증상 표시」. 추상 기호는 어르신이 못 읽는다(현욱님 지적 2026-09-22) */
 I.sneeze='<svg class="i" viewBox="0 0 24 24"><path d="M12.4 18.2V16c1-.3 2.4-.9 2.4-1.7 0-.9-2-2-2-3.2 0-3.6-1.4-7.1-5.2-7.1C4.5 4 2.6 6.9 2.6 10.2c0 4.4 2.8 8 6.2 8Z"/><path d="M12.4 18.2v2.6"/><circle cx="18" cy="12.4" r="1.45"/><circle cx="20.4" cy="16.8" r="1.1"/></svg>';   /* 감기 — 재채기하는 옆얼굴. 비말은 «얼굴 앞»으로 (2026-09-22) */
+I.nosmoke='<svg class="i" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M5.7 5.7l12.6 12.6"/><path d="M5.5 12.6h9.4v2.6H5.5z"/><path d="M17.2 12.6v2.6M18.4 9.6c0-1.2-1-1.6-1-2.8"/></svg>';   /* 금연 */
+I.hairloss='<svg class="i" viewBox="0 0 24 24"><path d="M3.6 8.4h16.8v3.2H3.6z"/><path d="M5.6 11.6v3.4M8.4 11.6v3.4M11.2 11.6v3.4M14 11.6v3.4M16.8 11.6v3.4"/><path d="M6 19.6c2.6-1.8 5.4 1.4 8.2-.4 1.6-1 2.8-.6 3.8.4"/></svg>';   /* 탈모 — 빗과 빠진 머리카락 */
+I.corn='<svg class="i" viewBox="0 0 24 24"><path d="M10 7.4c-2.6 0-4 2.4-4 6 0 2.8.9 4.4 1.1 6.1.2 1.4 1.4 2.3 2.9 2.3 1.6 0 2.7-1 2.7-2.4 0-1.7 1.7-3 1.7-5.6 0-4-1.9-6.4-4.4-6.4Z"/><circle cx="8" cy="3.6" r="1.1"/><circle cx="11" cy="3.1" r="1"/><circle cx="13.7" cy="4" r=".9"/><circle cx="10.4" cy="12.4" r="2"/><circle cx="10.4" cy="12.4" r=".45"/></svg>';   /* 티눈 — 발바닥의 딱딱한 점 */
 I.heel='<svg class="i" viewBox="0 0 24 24"><path d="M9.6 4c2.2 0 3.2 1.6 3.4 3.4l.5 4.6c.2 1.4.8 2.2 2.2 2.7l3 1.2c1.4.6 2.1 1.5 2.1 2.9V21"/><circle cx="6.4" cy="17.6" r="3"/><path d="M9.6 4c-2 0-3.4 1.4-3.4 3.4v7.2"/><path d="M2.6 21h4"/></svg>';
 I.calf='<svg class="i" viewBox="0 0 24 24"><path d="M10.8 2.6v3.2c0 1.1.3 1.8.9 2.5"/><path d="M12.2 16.6c.5.8.7 1.6.7 2.5V22"/><path d="M8.8 8.8c-1.9 1.2-2.9 3-2.9 5.1 0 1.5.5 2.8 1.5 3.8"/><path d="M12.6 9.2c1.8 1.1 2.7 2.9 2.7 4.9 0 1.3-.4 2.4-1.1 3.3"/><path d="M8.4 12.4c1.2-1 2.4-.4 3 .7s1.9 1.3 2.9.2"/></svg>';
 I.dizzy='<svg class="i" viewBox="0 0 24 24"><path d="M9.8 21v-2.2a6.6 6.6 0 1 1 8-6.4c0 1 .4 1.6.8 2.2l-1.4.5V17a1.8 1.8 0 0 1-1.8 1.8h-1.6V21"/><path d="M8.2 10.4a3.4 3.4 0 0 1 5.4-.6"/><path d="M11.6 8.6l2.2 1.2-1 2.2"/><path d="M8.4 13.8a3.4 3.4 0 0 0 5.2.4"/></svg>';
@@ -1924,7 +1927,7 @@ let ING_IX = null;
 function ingIndex(){
   if (ING_IX) return ING_IX;
   const salt = (D.ingredients?.salt || []), list = (D.ingredients?.ing || []);
-  const roots = [];
+  const roots = [], exact = [];
   const norm = s => {
     s = String(s || '').toLowerCase().replace(/\s/g, '').replace(/[()\[\]{}<>,./|·+-]/g, '');
     let prev = null;
@@ -1944,13 +1947,16 @@ function ingIndex(){
          떼어서 짧아진 것은 세 글자부터만 넣는다 — 지은이가 «일부러» 짧게 쓴
          「프릴」·「졸람」 같은 것은 떼기 전 이름이라 그대로 남는다. */
       const base = String(a || '').toLowerCase().replace(/\s/g, '').replace(/[()\[\]{}<>,./|·+-]/g, '');
+      /* 「니코틴」처럼 다른 성분의 앞머리인 짧은 이름(니코틴산아미드 = 비타민 B3)은
+         «통째로 같을 때만» 잡는다. 안 그러면 종합비타민 489개가 금연 보조제가 된다. */
+      if ((e.exact || []).includes(a)) { if (base) exact.push([base, e]); continue; }
       if (base) roots.push([base, e]);
       const r = norm(a); if (r && r !== base && r.length >= 3) roots.push([r, e]);
     }
   }
   roots.sort((a, b) => b[0].length - a[0].length);   /* 긴 어근부터 — 겹칠 때 더 구체적인 쪽 */
   const norm0 = s => String(s || '').toLowerCase().replace(/\s/g, '').replace(/[()\[\]{}<>,./|·+-]/g, '');
-  ING_IX = { norm, norm0, roots, byKey, byDrug, n: list.length };
+  ING_IX = { norm, norm0, roots, exact, byKey, byDrug, n: list.length };
   return ING_IX;
 }
 /* 문자열(성분명·제품명)에서 아는 성분을 골라낸다.
@@ -1963,6 +1969,8 @@ function ingFind(text){
   const t = ix.norm(text), t0 = ix.norm0(text); if (!t && !t0) return [];
   const hit = [];
   for (const [r, e] of ix.roots) if ((t.includes(r) || t0.includes(r)) && !hit.some(h => h.e === e)) hit.push({ r, e });
+  const pieces = String(text || '').split(/[\s,\/|·+;]+/).flatMap(w => [ix.norm(w), ix.norm0(w)]);
+  for (const [r, e] of ix.exact) if (pieces.includes(r) && !hit.some(h => h.e === e)) hit.push({ r, e });
   return hit.filter(h => !hit.some(o => o !== h && o.r.length > h.r.length && o.r.includes(h.r))).map(h => h.e);
 }
 /* 내 약통 한 줄 → { ings:[성분…], known:true|false } */
@@ -3950,7 +3958,7 @@ function vDrug(id){
   if (!PUB.index) pubIndexSoon();   /* 아직 안 왔으면 받아 두고, 오면 다시 그린다 */
   const pub = (PUB.index || []).filter(p => (p.map || []).includes(d.id));
   const pubHtml = pub.length ? `<h3 style="margin-top:20px">식약처 등록 제품 <small class="muted" style="font-weight:500">${pub.length}개 · e약은요 공공데이터${pub.length > 30 ? ' · 30개만 표시' : ''}</small></h3><div class="rows">${pub.slice(0, 30).map(p => `<button class="row" onclick="go('/pub/${p.id}')">${p.img ? `<img class="pillimg" src="${esc(p.img)}" alt="" loading="lazy" onerror="this.style.visibility='hidden'">` : ''}<div class="body"><b>${esc(p.n)}</b><span>${esc(p.m)}${p.map.length > 1 ? ' · 복합제(' + p.map.length + '성분)' : ''}</span></div>${p.cvs ? '<span class="badge cvs">편의점</span>' : ''}${I.chev}</button>`).join('')}</div>` : (PUB.index ? '' : '<p class="loading">식약처 제품 목록을 불러오는 중…</p>');
-  return `${topBar({ back:'약 사전' })}
+  return `${topBar({ back:'약 사전', unreviewed:d.reviewed === false })}
   <div class="drug-hero">${c ? `<a class="cls link" href="#/class/${c.id}">${esc(c.name)} ›</a>` : ''}<h1>${esc(d.name)}</h1><div class="en">${esc(d.en || '')} ${badge(d.rx)}${d.ach ? `<span class="badge ${d.ach >= 3 ? 'stop' : d.ach === 2 ? 'warn' : ''}" style="margin-left:4px">항콜린 ${esc(ACH_WORD[d.ach])}</span>` : ''}</div>
     <div class="hero-speak">${speakBtn(`drugSpeech(drug('${d.id}'))`, d.name + ' 읽어 주기')}</div></div>
   ${otcAltCard(d)}
@@ -3958,6 +3966,7 @@ function vDrug(id){
   ${d.ach ? `<div class="usebar" style="${d.ach >= 2 ? '' : 'background:var(--tint2);color:var(--body)'}">${d.ach >= 2 ? I.alert : I.info}<span><b>항콜린 부담 ${esc(ACH_WORD[d.ach])}</b> — ${esc(d.achNote || '')}${d.achAlt ? '<br>' + fmt(d.achAlt) : ''}</span></div>` : ''}
   ${ixLine([d])}
   <p style="margin-top:10px">${fmt(d.lead || '')}</p>
+  ${d.reviewed === false ? `<div class="note" style="margin-top:12px">${I.alert}<span><b>아직 전문의 검수를 받지 않은 약 화면이에요.</b> 식약처 허가사항과 연구를 바탕으로 정리했습니다. 참고만 하시고 약사·의사와 상의하세요.</span></div>` : ''}
   ${picts(d.pict)}
   ${(() => { const pr = (d.products || []).find(x => pimg(x.name)); return pr ? `<div class="drug-photo">${imgTag(pimg(pr.name), '', pr.name)}<div><b>${esc(pr.name)}</b><small>${esc(pr.maker || '')} · ${esc(pr.amount || '')}</small><small style="display:block;margin-top:2px">사진: 식약처·약학정보원 낱알식별</small></div></div>` : ''; })()}
   ${meWarnings(d) ? `<section class="sec">${meWarnings(d)}</section>` : ''}
@@ -4122,7 +4131,11 @@ function pillGlyph(p){
 function findPill(seq){ return (PUB.pills || []).find(p => p.seq === seq) || (PUB.rx || []).find(p => p.seq === seq); }
 /* 성분명(한글) → 약지도 성분 사전 */
 const INGR_STRIP = /(염산염|말레산염|나트륨|칼륨|수화물|아르기닌|무수물|디에틸암모늄|숙신산염|브롬화수소산염|아세토니드|황산염|장용|농축분말|\s)/g;
-function drugByIngr(name){ if (!name) return null; const n = name.replace(INGR_STRIP, ''); if (!n) return null; return (D.drugs || []).find(d => { const dn = d.name.split(' ')[0].replace(INGR_STRIP, ''); return dn && (n.startsWith(dn) || dn.startsWith(n)); }) || null; }
+/* 성분이 «통째로» 짧은 이름(살리실산·니코틴)이면 성분표가 먼저 답한다. 앞머리 비교만 하면
+   티눈약 「살리실산」이 파스 「살리실산메틸」로 읽혔다(2026-09-23). */
+function drugByIngr(name){ if (!name) return null; const n = name.replace(INGR_STRIP, ''); if (!n) return null;
+  const ix = ingIndex(), n0 = ix.norm0(name); for (const [r, e] of (ix.exact || [])) if (n0 === r) return e.drug ? drug(e.drug) : null;
+  return (D.drugs || []).find(d => { const dn = d.name.split(' ')[0].replace(INGR_STRIP, ''); return dn && (n.startsWith(dn) || dn.startsWith(n)); }) || null; }
 function vPillInfo(seq){
   const p = findPill(seq);
   if (!p) { if (!PUB.pills) { pubPills().then(route); return `${topBar({ back:'뒤로' })}<p class="loading">불러오는 중…</p>`; } if (!PUB.rx) { pubPillsRx().then(route); return `${topBar({ back:'뒤로' })}<p class="loading">처방약 자료를 불러오는 중…</p>`; } return vPill(); }

@@ -356,6 +356,14 @@ def main():
             ['산화마그네슘', ['antacid']], ['수산화마그네슘', ['antacid']], ['마그밀', ['magnesium-lax']],
             ['이부프로펜나트륨', ['ibuprofen']], ['나프록센나트륨', ['naproxen']],
             ['탄산리튬', ['lithium']], ['리시노프릴', ['acei']], ['알프라졸람', ['bzd']], ['은행잎', ['ginkgo']],
+            # 「니코틴산아미드」는 비타민 B3 — 종합비타민 489개가 금연 보조제로 읽히면 안 된다(2026-09-23)
+            ['니코틴산아미드', []], ['니코틴산벤질', []], ['니코틴', ['nicotine']], ['니코틴폴라크리렉스', ['nicotine']],
+            ['니코틴타르타르산염수화물', ['nicotine']], ['미녹시딜', ['minoxidil']],
+            ['살리실산', ['salicylic-acid']], ['살리실산 락트산', ['salicylic-acid']], ['살리실산글리콜', []], ['아세틸살리실산', ['aspirin']],
+        ])
+        _ig += pg.evaluate("""L=>L.map(([t,bad])=>{ const d=drugByIngr(t); return d&&d.id===bad ? t+' → '+bad : null; }).filter(Boolean)""", [
+            ['니코틴산아미드', 'nicotine-patch'], ['니코틴산아미드 리보플라빈', 'nicotine-patch'], ['니코틴산벤질', 'nicotine-patch'],
+            ['살리실산글리콜', 'salicylic-corn'], ['살리실산메틸', 'salicylic-corn'], ['아세틸살리실산', 'salicylic-corn'], ['살리실산', 'methyl-salicylate'],
         ])
         if _ig: fails.append(f'성분 이름을 잘못 읽습니다: {_ig[:4]}')
         # 5a-8. 계열↔몸 상태 짝 — 같은 계열인데 한 약에만 경고가 달린 곳을 잡는다
