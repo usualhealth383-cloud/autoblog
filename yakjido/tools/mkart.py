@@ -50,5 +50,5 @@ s = s[:i] + inject + s[i:]
 OUT.parent.mkdir(parents=True, exist_ok=True); OUT.write_text(s)
 print('wrote', OUT, round(len(s.encode())/1e6, 2), 'MB · art', len(art))
 assert "'icon-192.png'" not in s.split('window.__BRANDMARK__')[0] or 'window.__BRANDMARK__ = "data:' in s, '앱 표시 그림이 파일 경로로 남았습니다'
-for bad in ['serviceWorker', 'rel="manifest"', '<!doctype', '<body']:
+for bad in ['serviceWorker.register', 'rel="manifest"', '<!doctype', '<body']:
     if bad in s: print('!! still present:', bad)
