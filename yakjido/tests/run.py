@@ -519,14 +519,24 @@ def main():
         pg.route('**/api.open-meteo.com/**', lambda rt: rt.fulfill(status=200, content_type='application/json', body=FC))
         pg.route('**/air-quality-api.open-meteo.com/**', lambda rt: rt.fulfill(status=200, content_type='application/json', body=AQ))
         # 10. 소아 용량 계산 — 아세트아미노펜 10~15 mg/kg(하루 75, 두 돌 전 60), 이부프로펜 5~10 mg/kg(하루 40), 상한
-        #     15 kg 이부프로펜의 하루 500 mg 은 허가사항의 '30 kg 미만 하루 500 mg' 한도가 걸린 값이다(몸무게로만 곱하면 600).
+        #     우리집 소아과 계산기와 같은 식이다(현욱님 지시 2026-09-23) — 몸무게로 걸린 별도 한도는 두지 않는다.
         kd = pg.evaluate("()=>[[15,36],[8,5],[40,150],[10,20]].map(([w,m])=>['apap','ibu'].map(k=>{const r=kidDose(k,w,m);return [r.lo,r.hi,r.day]}))")
-        want = [[[150, 225, 1125], [75, 150, 500]], [[80, 120, 480], [40, 80, 320]], [[400, 600, 3000], [200, 400, 1600]], [[100, 150, 600], [50, 100, 400]]]
+        want = [[[150, 225, 1125], [75, 150, 600]], [[80, 120, 480], [40, 80, 320]], [[400, 600, 3000], [200, 400, 1600]], [[100, 150, 600], [50, 100, 400]]]
         if kd != want: fails.append(f'소아 용량 계산 불일치: {kd} ≠ {want}')
-        # 10b. 몸무게로 걸린 허가 한도 — 부루펜 30 kg 미만 하루 500 mg, 맥시부펜 30 kg 이하 하루 300 mg
-        kc = pg.evaluate("()=>[['ibu',29],['ibu',30],['dexibu',30],['dexibu',31]].map(([k,w])=>{const r=kidDose(k,w,48);return [r.day, !!r.kidCap]})")
-        wantc = [[500, True], [1200, False], [300, True], [868, False]]
-        if kc != wantc: fails.append(f'소아 몸무게 한도 불일치: {kc} ≠ {wantc}')
+        # 10b. 우리집 소아과와 같은 답인지 — 그 앱의 doseRange 를 그대로 옮긴 식과 몸무게 4~70 kg 전부 비교.
+        #      그리고 「하루 1번」 같은 횟수 문장·맥시부펜 계산 카드가 다시 생기면 안 된다.
+        pg.goto(url + '#/kids'); ready(); pg.wait_for_timeout(400)
+        kc = pg.evaluate("""()=>{const DR={apap:{pk:[10,15],day:75,capDose:1000,capDay:4000},ibu:{pk:[5,10],day:40,capDose:400,capDay:2400}};
+          const bad=[]; for(let w=4;w<=70;w+=0.5) for(const m of [12,48]) for(const k of ['apap','ibu']){ const D=DR[k];
+            const perKg=(k==='apap'&&m<24)?60:D.day; const lo=Math.round(Math.min(w*D.pk[0],D.capDose)), hi=Math.round(Math.min(w*D.pk[1],D.capDose)), day=Math.round(Math.min(w*perKg,D.capDay));
+            const r=kidDose(k,w,m); if(r.lo!==lo||r.hi!==hi||r.day!==day) bad.push(k+' '+w+'kg '+[r.lo,r.hi,r.day]+' ≠ '+[lo,hi,day]); }
+          ME.age='child'; ME.child={name:'',birth:'2016-03-01',weight:28}; route();
+          const txt=document.getElementById('view').innerText; ME.age='adult'; ME.child={}; saveMe();
+          if(/하루\s*\d+번까지|번까지예요/.test(txt)) bad.push('횟수 문장이 남아 있음');
+          if(document.querySelectorAll('.dose-card').length!==2) bad.push('용량 카드가 2장이 아님');
+          if(!txt.includes('맥시부펜은 덱시부프로펜')) bad.push('맥시부펜 안내 없음');
+          return bad;}""")
+        if kc: fails.append(f'소아 계산이 우리집 소아과와 다릅니다: {kc[:3]}')
         # 7. 항콜린 이중 계산 · 8. 이름 검색
         r7 = pg.evaluate("""async()=>{ await pubPills(); await pubPillsRx(); let n=0;
           for(const p of (PUB.rx||[]).concat(PUB.pills||[])){ if(ingFind((p.ingr||'')+' '+(p.n||'')).filter(e=>e.ach).length>1) n++; } return n; }""")

@@ -3054,15 +3054,12 @@ function kidDose(k, w, m){
   const rawLo = w * D.perKg[0], rawHi = w * D.perKg[1];
   const lo = Math.round(Math.min(rawLo, D.capDose)), hi = Math.round(Math.min(rawHi, D.capDose));
   const perKgDay = (k === 'apap' && m != null && m < 24) ? D.dayPerKgUnder24m : D.dayPerKg;
-  /* 허가사항에 몸무게로 걸린 하루 한도가 따로 있는 약이 있다(부루펜 30 kg 미만 500 mg 등) */
-  const kc = D.capDayUnderKg;
-  const kidCap = kc && (kc.inclusive ? w <= kc.kg : w < kc.kg) ? kc : null;
-  const capDay = Math.min(D.capDay, kidCap ? kidCap.mg : Infinity);
+  /* 우리집 소아과 계산기와 같은 식(현욱님 지시 2026-09-23 「그거 베껴와라」):
+     1회 = 몸무게 × mg/kg 범위(어른 1회 상한까지), 하루 = 몸무게 × 하루 mg/kg(어른 하루 상한까지).
+     「하루 몇 번」을 따로 셈하지 않는다 — 25~30 kg 아이에게 「하루 1번」이 나오던 자리다. */
+  const capDay = D.capDay;
   const rawDay = w * perKgDay; const day = Math.round(Math.min(rawDay, capDay));
-  /* 「4회 · 300 mg」처럼 적으면 부모가 84 mg × 4 = 336 mg 으로 곱해 버린다 — 허가 한도를 넘는다.
-     한 번에 드리는 «많은 쪽»으로 하루 몇 번까지인지를 그대로 센다(2026-09-22). */
-  const times = Math.max(1, Math.min(D.maxPerDay, Math.floor((day + 0.5) / Math.max(1, hi))));
-  return { D, lo, hi, day, times, perKgDay, kidCap, capDay,
+  return { D, lo, hi, day, perKgDay, capDay,
            capped: rawHi > D.capDose + .5 || rawDay > capDay + .5,
            rawHi: Math.round(rawHi), rawDay: Math.round(rawDay) };
 }
@@ -3100,10 +3097,9 @@ function vKids(){
     return `<div class="dose-card"><div class="eyebrow">${esc(D.name)} · ${esc(D.brand)}</div>
       <div class="dose-big"><b>${mlLo === mlHi ? mlLo : mlLo + '~' + mlHi}</b><span>mL · 한 번에</span></div>
       <p class="small muted">${esc(conc.label)} 기준. 가지고 계신 약병의 농도를 꼭 확인하세요.${D.conc.length > 1 ? ' 다른 제품: ' + D.conc.slice(1).map(x => esc(x.label)).join(', ') : ''}</p>
-      <div class="dose-meta"><div><small>성분량</small><b>${r.lo}~${r.hi} mg</b></div><div><small>간격</small><b>${esc(D.gapText)} 이상</b></div><div><small>하루 한도</small><b>${r.times < D.maxPerDay ? `${r.day} mg` : `${D.maxPerDay}회 · ${r.day} mg`}</b></div></div>
+      <div class="dose-meta"><div><small>성분량</small><b>${r.lo}~${r.hi} mg</b></div><div><small>간격</small><b>${esc(D.gapText)} 이상</b></div><div><small>하루 한도</small><b>${r.day} mg${k === 'apap' ? ` · ${D.maxPerDay}회` : ''}</b></div></div>
       ${label}
-      ${r.capped ? `<div class="note" style="margin-top:10px">${I.info}<span>몸무게로만 곱하면 1회 ${r.rawHi} mg·하루 ${r.rawDay} mg이지만, ${r.kidCap ? esc(r.kidCap.why) : `어른 상한(1회 ${D.capDose}·하루 ${D.capDay} mg)`}에서 멈춰요.</span></div>` : ''}
-      ${r.times < D.maxPerDay ? (() => { const nLo = Math.max(1, Math.min(D.maxPerDay, Math.floor((r.day + 0.5) / Math.max(1, r.lo)))); return `<div class="kid-line" style="background:var(--caution-tint);color:var(--caution)">${I.alert}<span><b>횟수보다 «하루 총량»이 먼저 걸리는 몸무게예요.</b> 이 약은 하루 ${D.maxPerDay}번까지 쓸 수 있지만, <b>하루 ${r.day} mg</b>을 넘기면 안 됩니다. ${r.lo === r.hi ? '' : `적은 쪽 <b>${r.lo} mg</b>씩이면 <b>${nLo}번</b>, `}많은 쪽 <b>${r.hi} mg</b>씩이면 <b>${r.times}번</b>까지예요. <b>횟수와 1회 양을 곱해서 총량을 넘기지 마세요.</b></span></div>`; })() : ''}
+      ${r.capped ? `<div class="note" style="margin-top:10px">${I.info}<span>몸무게로만 곱하면 1회 ${r.rawHi} mg·하루 ${r.rawDay} mg이지만, 어른 상한(1회 ${D.capDose}·하루 ${D.capDay} mg)에서 멈춰요.</span></div>` : ''}
       ${k === 'apap' && m != null && m < 24 ? `<p class="small muted" style="margin-top:8px">두 돌 전이라 하루 한도를 60 mg/kg으로 봤어요(그 뒤 75 mg/kg).</p>` : ''}
       <p class="small muted" style="margin-top:8px">${esc(D.note)}</p>
       <a class="link small" href="#/drug/${D.drugId}">성분 자세히 ›</a></div>`; };
@@ -3119,7 +3115,7 @@ function vKids(){
   </section>
   ${sane ? `<div class="flag" style="margin-top:16px">${I.alert}<div><b>몸무게를 한 번만 확인해 주세요</b><p>${esc(sane)}</p></div></div>` : ''}
   ${m != null && m < 3 ? `<div class="flag" style="margin-top:16px">${I.alert}<div><b>생후 ${m}개월이에요</b><p>3개월 미만 아기가 열이 나면 해열제를 먹이지 말고 <b>바로 진료</b>를 받으세요. 열을 낮추면 원인을 찾기 어려워져요.</p><a class="call" href="tel:119">${I.alert} 119</a></div></div>` : ''}
-  ${w > 0 ? `<section class="sec"><h2>한 번에 이만큼 <small>몸무게 ${w} kg 기준</small></h2>${doseCard('apap')}${doseCard('ibu')}${doseCard('dexibu')}</section>` : `<section class="sec"><div class="empty"><b>몸무게를 넣으면 바로 계산해 드려요</b>아세트아미노펜·이부프로펜·덱시부프로펜 시럽 mL, 간격, 하루 한도까지.</div></section>`}
+  ${w > 0 ? `<section class="sec"><h2>한 번에 이만큼 <small>몸무게 ${w} kg 기준</small></h2>${doseCard('apap')}${doseCard('ibu')}<div class="note" style="margin-top:12px">${I.info}<span>${esc(K.dexibuNote || '')}</span></div></section>` : `<section class="sec"><div class="empty"><b>몸무게를 넣으면 바로 계산해 드려요</b>아세트아미노펜·이부프로펜 시럽 mL, 간격, 하루 한도까지.</div></section>`}
   ${acc('이렇게 먹이세요', list(K.rules, 'steps'), '교차·중복·계량', true)}
   <section class="sec"><h2>병원에 가야 할 때</h2>${careCards({ clinic: K.care?.clinic, er: K.care?.er })}</section>
   ${srcChips(K.sources)}
