@@ -532,7 +532,7 @@ def main():
             const r=kidDose(k,w,m); if(r.lo!==lo||r.hi!==hi||r.day!==day) bad.push(k+' '+w+'kg '+[r.lo,r.hi,r.day]+' ≠ '+[lo,hi,day]); }
           ME.age='child'; ME.child={name:'',birth:'2016-03-01',weight:28}; route();
           const txt=document.getElementById('view').innerText; ME.age='adult'; ME.child={}; saveMe();
-          if(/하루\s*\d+번까지|번까지예요/.test(txt)) bad.push('횟수 문장이 남아 있음');
+          if(/씩이면\s*\d+번|번까지예요/.test(txt)) bad.push('횟수 문장이 남아 있음');
           if(document.querySelectorAll('.dose-card').length!==2) bad.push('용량 카드가 2장이 아님');
           if(!txt.includes('맥시부펜은 덱시부프로펜')) bad.push('맥시부펜 안내 없음');
           return bad;}""")

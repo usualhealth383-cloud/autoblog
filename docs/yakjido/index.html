@@ -3049,6 +3049,7 @@ function vSymptom(id){
 /* ───────── 아이 해열제 용량 (우리집 소아과와 같은 기준) ───────── */
 function monthsFrom(birth){ if (!birth) return null; const b = new Date(birth); if (isNaN(b)) return null; const n = new Date(); let m = (n.getFullYear() - b.getFullYear()) * 12 + (n.getMonth() - b.getMonth()); if (n.getDate() < b.getDate()) m--; return m >= 0 ? m : null; }
 function kidAgeText(m){ if (m == null) return ''; return m < 24 ? `생후 ${m}개월` : `만 ${Math.floor(m / 12)}세 ${m % 12 ? (m % 12) + '개월' : ''}`.trim(); }
+const mlTxt = x => { const v = Math.floor(x * 2 + 1e-9) / 2; return (v % 1 ? v.toFixed(1) : String(v)); };   /* 하루 최대 mL — 0.5 mL 단위로 «내림»(올리면 한도를 넘는다) */
 function kidDose(k, w, m){
   const D = (D_KIDS().drugs || []).find(x => x.id === k); if (!D || !(w > 0)) return null;
   const rawLo = w * D.perKg[0], rawHi = w * D.perKg[1];
@@ -3097,7 +3098,8 @@ function vKids(){
     return `<div class="dose-card"><div class="eyebrow">${esc(D.name)} · ${esc(D.brand)}</div>
       <div class="dose-big"><b>${mlLo === mlHi ? mlLo : mlLo + '~' + mlHi}</b><span>mL · 한 번에</span></div>
       <p class="small muted">${esc(conc.label)} 기준. 가지고 계신 약병의 농도를 꼭 확인하세요.${D.conc.length > 1 ? ' 다른 제품: ' + D.conc.slice(1).map(x => esc(x.label)).join(', ') : ''}</p>
-      <div class="dose-meta"><div><small>성분량</small><b>${r.lo}~${r.hi} mg</b></div><div><small>간격</small><b>${esc(D.gapText)} 이상</b></div><div><small>하루 한도</small><b>${r.day} mg${k === 'apap' ? ` · ${D.maxPerDay}회` : ''}</b></div></div>
+      <div class="dose-meta"><div><small>성분량</small><b>${r.lo}~${r.hi} mg</b></div><div><small>간격</small><b>${esc(D.gapText)} 이상</b></div><div><small>하루 최대</small><b>${mlTxt(r.day / conc.mgPerMl)} mL</b></div></div>
+      <p class="small muted" style="margin-top:6px">하루 최대 ${mlTxt(r.day / conc.mgPerMl)} mL(${r.day.toLocaleString()} mg)는 <b>몸무게 ${w} kg × ${r.perKgDay} mg/kg</b> 기준이에요${k === 'apap' ? ` · 하루 ${D.maxPerDay}번까지` : ''}.</p>
       ${label}
       ${r.capped ? `<div class="note" style="margin-top:10px">${I.info}<span>몸무게로만 곱하면 1회 ${r.rawHi} mg·하루 ${r.rawDay} mg이지만, 어른 상한(1회 ${D.capDose}·하루 ${D.capDay} mg)에서 멈춰요.</span></div>` : ''}
       ${k === 'apap' && m != null && m < 24 ? `<p class="small muted" style="margin-top:8px">두 돌 전이라 하루 한도를 60 mg/kg으로 봤어요(그 뒤 75 mg/kg).</p>` : ''}
