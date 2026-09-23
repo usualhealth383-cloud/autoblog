@@ -273,6 +273,16 @@ def main():
         if did: e['drug'] = did
         out['ing'].append(e)
     p = root / 'content' / 'ingredients.json'
+    # ⚠️ 2026-09-23 — 이 생성기는 오래 손대지 않았고, 그 사이 ingredients.json 을 «직접» 고쳐 왔다
+    #    (니코틴·미녹시딜·클로닉신·돔페리돈·바르는 아졸 등 수십 개). 그대로 다시 돌리면 전부 사라진다.
+    #    지금의 정본은 ingredients.json 이다. 생성기에 없는 항목이 있으면 멈춘다(--force 로만 덮어쓴다).
+    if p.exists() and '--force' not in sys.argv:
+        have = {e['k'] for e in json.loads(p.read_text(encoding='utf-8')).get('ing', [])}
+        lost = sorted(have - {e['k'] for e in out['ing']})
+        if lost:
+            print(f'멈춤: 이 생성기로 덮어쓰면 성분 {len(lost)}개가 사라집니다 — {", ".join(lost[:12])}…')
+            print('ingredients.json 을 직접 고치세요(정본). 정말 덮어쓰려면 --force.')
+            sys.exit(1)
     p.write_text(json.dumps(out, ensure_ascii=False, indent=1), encoding='utf-8')
     print(f'{p} · 성분 {len(out["ing"])}개 · 항콜린 점수 있는 것 {sum(1 for e in out["ing"] if e.get("ach"))}개')
 
