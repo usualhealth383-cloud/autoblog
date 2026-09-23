@@ -2474,17 +2474,41 @@ function search(q){
     ...(D.symptoms || []).flatMap(x => [x.name, ...(x.tags || [])]),
     ...(D.drugs || []).flatMap(x => [x.name, x.en, ...(x.for || [])]),
     ...(D.supplements || []).flatMap(x => [x.name, ...(x.tags || [])]),
+    /* 처방약을 드시는 분이 「와파린」·「혈압약」·「갑상선약」을 치면 0건이었다.
+       종류로 담는 «빠른 묶음»과 성분표가 말뭉치에 빠져 있었다(2026-09-23). */
+    ...(D.ingredients?.quick || []).flatMap(g => [g.n, ...(g.subs || []).flatMap(x => [x.n, ...(x.aka || [])])]),
+    ...(D.ingredients?.ing || []).flatMap(e => [e.n, ...(e.aka || [])]),
   ].filter(Boolean).map(norm).join('|') + '|';
   /* 원래 친 말도 함께 남긴다 — 구어 사전이 「해열제」를 「열」로 바꿔 버리면
      한 글자라 버려지고, 남은 「아이」가 「구아이페네신」에 붙어 엉뚱한 답이 먼저 나왔다. */
-  const cand = q.split(/\s+/).flatMap(w => [w, SEARCH_SYN[w] || w, SEARCH_SYN[stem(w)] || stem(w)])
-                 .filter(w => w.length > 0);
+  /* 붙여 쓰신 말은 앞에서부터 잘라 가며 «자료에 있는 가장 긴 말»을 찾는다.
+     「허리아파요」→「허리」, 「열나요」→「열」. 말끝을 일일이 적는 방식으로는 늘 새는 곳이 생긴다.
+     한 글자까지 내려가되, 그때는 자료에 «낱말 그대로» 있는 것만 인정한다(2026-09-23). */
+  const cutFit = w => {
+    const t = norm(w);
+    /* «낱말 그대로» 있는 것만 인정한다. 아무 데나 걸치는 조각을 받아 주면
+       「어깨 아파」의 「아파」가 낱말이 되어(태그 「허리아파」 안에 있다) 오십견이 밀려났다. */
+    for (let n = t.length; n >= 1; n--) if (SEARCH_CORPUS.includes('|' + t.slice(0, n) + '|')) return t.slice(0, n);
+    return '';
+  };
+  const cand = q.split(/\s+/).flatMap(w => {
+    const base = [w, SEARCH_SYN[w] || w, SEARCH_SYN[stem(w)] || stem(w)];
+    const cut = cutFit(w); if (cut) base.push(cut, SEARCH_SYN[cut] || cut);
+    return base;
+  }).filter(w => w.length > 0);
   /* 한 글자 낱말(「잘」·「안」·「나」)은 어딘가에는 반드시 들어 있어서, 요구 조건으로 삼으면 다 막힌다.
      두 글자 이상만 쓰고, 그것이 하나도 없을 때만 한 글자를 본다. */
   const inCorpus = w => SEARCH_CORPUS.includes(norm(w));
-  let words = [...new Set(cand.filter(w => w.length >= 2 && inCorpus(w)))];
+  /* 자료에 «낱말 그대로» 있는 것을 먼저 쓴다. 아무 데나 걸치는 조각(「아파」는 태그
+     「허리아파」 안에 있다)까지 요구 조건으로 삼으면 엉뚱한 것만 남는다(2026-09-23). */
+  const isWord = w => SEARCH_CORPUS.includes('|' + norm(w) + '|');
+  let words = [...new Set(cand.filter(w => w.length >= 2 && isWord(w)))];
+  if (!words.length) words = [...new Set(cand.filter(w => w.length >= 2 && inCorpus(w)))];
   if (!words.length) words = [...new Set(cand.filter(inCorpus))];
-  const many = q.split(/\s+/).length > 1 && words.length > 0;
+  /* 낱말 맞추기를 «띄어쓰기가 있을 때만» 하고 있었다. 그래서 「허리아파요」처럼 붙여 치시면
+     알맹이(「허리」)를 뽑아 놓고도 쓰지 못해 0건이 됐다. 잘라낸 말이 원래 친 말과 다르면,
+     띄어쓰기가 없어도 낱말로 본다(2026-09-23). */
+  const many = words.length > 0 && (q.split(/\s+/).length > 1 || words.some(w => norm(w) !== qs));
   const m = (s) => {
     const x = (s || '').toLowerCase(); const xs = norm(x);
     return x.includes(q) || (qs.length > 1 && xs.includes(qs));
@@ -2500,6 +2524,16 @@ function search(q){
     (d.products || []).forEach(p => { if (!p.name.includes('·') && !p.name.includes(' 등') && m(p.name)) out.push({ k:'제품', c:'p', t:p.name, d:`${d.name} · ${p.amount || ''}`, h:'/drug/' + d.id, w:2 }); });
   });
   (D.supplements || []).forEach(s => { const hitTag = (s.tags || []).find(m); if (m(s.name) || hitTag || mAll(s.name, (s.tags || []).join(' '), s.for)) out.push({ k:'영양제', c:'', t:s.name, d:(hitTag && !m(s.name) ? `‘${hitTag}’ → 이 성분 · ` : '') + (s.for || ''), h:'/supp/' + s.id, w:1 }); });
+  /* 종류로 담는 «빠른 묶음» — 「와파린」·「혈압약」처럼 처방약 이름을 치신 경우.
+     이름을 정확히 모르셔도 종류만 고르면 겹침 판정이 돌아간다. */
+  (D.ingredients?.quick || []).forEach(g => {
+    const hitSub = (g.subs || []).find(x => m(x.n) || (x.aka || []).some(m));
+    if (m(g.n) || hitSub || mAll(g.n, (g.subs || []).map(x => x.n).join(' '))) {
+      const label = hitSub ? hitSub.n.replace(/으로 끝나요|이에요|예요|이 들어 있어요/g, '').trim() : g.n;
+      out.push({ k:'종류', c:'s', t:`${g.n}${hitSub ? ' — ' + label : ''}`,
+                 d:'이름을 몰라도 종류만 고르면 겹치는지 봐 드려요', h:'/kinds/' + g.id, w:2 });
+    }
+  });
   /* 제품 이름 사전 — 어르신이 아시는 것은 성분명이 아니라 제품 이름이다 */
   (LEX.brand || []).forEach(b => { if (m(b.n)) out.push({ k:'제품', c:'p', t:b.n, d:esc0(b.comp || b.use), h:'/brand/' + encodeURIComponent(b.n), w:4 }); });
   /* 성분 사전 — 약지도에 해설이 있으면 그쪽으로 보낸다 */
