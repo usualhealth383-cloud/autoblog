@@ -1900,7 +1900,7 @@ function planDup(bk){
   return out;
 }
 function dupCheck(optionIds){
-  const taking = takingItems().map(x => x.d || (x.pub?.ingr ? { id: 'pub', name: x.name, contains: [drugByIngr(x.pub.ingr)?.id].filter(Boolean), class: drugByIngr(x.pub.ingr)?.class } : null)).filter(Boolean); if (!taking.length) return [];
+  const taking = takingItems().map(x => x.d || (x.pub?.ingr ? { id: 'pub', name: x.name, contains: [drugByIngr(x.pub.ingr, x.pub)?.id].filter(Boolean), class: drugByIngr(x.pub.ingr, x.pub)?.class } : null)).filter(Boolean); if (!taking.length) return [];
   const out = [];
   /* 약 하나에 대해 한 줄로 묶는다 — 성분마다 경고를 띄우면 빨간 상자가 다섯 개가 된다 */
   taking.forEach(t => {
@@ -4133,13 +4133,21 @@ function findPill(seq){ return (PUB.pills || []).find(p => p.seq === seq) || (PU
 const INGR_STRIP = /(염산염|말레산염|나트륨|칼륨|수화물|아르기닌|무수물|디에틸암모늄|숙신산염|브롬화수소산염|아세토니드|황산염|장용|농축분말|\s)/g;
 /* 성분이 «통째로» 짧은 이름(살리실산·니코틴)이면 성분표가 먼저 답한다. 앞머리 비교만 하면
    티눈약 「살리실산」이 파스 「살리실산메틸」로 읽혔다(2026-09-23). */
-function drugByIngr(name){ if (!name) return null; const n = name.replace(INGR_STRIP, ''); if (!n) return null;
+/* prod(제품)를 주면 제형도 본다 — 처방 «정·캡슐»(트리코탈정 = 먹는 스테로이드)이
+   약국 «연고» 화면(오라메디)으로 연결되고 있었다(2026-09-23). */
+const TOPICAL_ONLY = new Set(['skin', 'topical']);
+function drugByIngr(name, prod){ if (!name) return null; const n = name.replace(INGR_STRIP, ''); if (!n) return null;
   const ix = ingIndex(), n0 = ix.norm0(name); for (const [r, e] of (ix.exact || [])) if (n0 === r) return e.drug ? drug(e.drug) : null;
-  return (D.drugs || []).find(d => { const dn = d.name.split(' ')[0].replace(INGR_STRIP, ''); return dn && (n.startsWith(dn) || dn.startsWith(n)); }) || null; }
+  /* 성분 칸에 맛 이름만 적힌 제품이 있다(「페퍼민트맛|오렌지맛」) — 페퍼민트 오일 캡슐로 읽으면 안 된다 */
+  if (/^[가-힣]+(맛|향)(\||$)/.test(name.trim())) return null;
+  /* 약 이름이 성분보다 길 때는 뒤에 붙은 것이 «다른 약 이름»이 아닐 때만 — 「포비돈」(인공눈물 성분)이
+     「포비돈요오드」(소독약)로 읽히고 있었다. 「오메프라졸·에스오메프라졸」처럼 가운뎃점으로 이어진 것만 허용 */
+  const oral = !!(prod && prod.rx && /정|캡슐/.test(String(prod.n || prod.full || '').replace(/\(.*?\)/g, '')));
+  return (D.drugs || []).find(d => { if (oral && TOPICAL_ONLY.has(d.class)) return false; const dn = d.name.split(' ')[0].replace(INGR_STRIP, ''); return dn && (n.startsWith(dn) || (dn.startsWith(n) && !/^[가-힣]/.test(dn.slice(n.length)))); }) || null; }
 function vPillInfo(seq){
   const p = findPill(seq);
   if (!p) { if (!PUB.pills) { pubPills().then(route); return `${topBar({ back:'뒤로' })}<p class="loading">불러오는 중…</p>`; } if (!PUB.rx) { pubPillsRx().then(route); return `${topBar({ back:'뒤로' })}<p class="loading">처방약 자료를 불러오는 중…</p>`; } return vPill(); }
-  const img = pillImg(p); const d = drugByIngr(p.ingr);
+  const img = pillImg(p); const d = drugByIngr(p.ingr, p);
   const pubHit = (PUB.index || []).find(x => x.seq === p.seq);
   const id = 'pub:' + p.seq; const taking = (ME.taking || []).includes(id) || (d && (ME.taking || []).includes(d.id));
   return `${topBar({ back:'약 알아보기' })}
@@ -4160,7 +4168,7 @@ function vPillInfo(seq){
   <div class="srcs"><span class="src-chip">${I.link}출처: 식약처 의약품 낱알식별 정보 · 사진 약학정보원</span></div>
   ${disclaimer('낱알 정보는 참고용이에요. 같은 모양의 다른 약도 있으니 확실하지 않으면 약사에게 실물을 보여 주세요.')}`;
 }
-function togglePub(seq){ const p = findPill(seq); if (!p) return; const d = drugByIngr(p.ingr); ME.pub = ME.pub || {}; const id = 'pub:' + seq; ME.taking = ME.taking || []; if (ME.taking.includes(id)) { ME.taking = ME.taking.filter(x => x !== id); delete ME.pub[id]; toast('내 약통에서 뺐어요'); } else { ME.taking.push(id); ME.pub[id] = { name: p.n.replace(/\(.*?\)/g, '').replace(/[()]/g, '').trim(), full: p.n, ingr: p.ingr || '', rx: p.rx, seq, drugId: d?.id || '' };  /* full: 괄호 속에 성분이 들어 있는 제품이 많다 — 버리지 않는다 */ toast('내 약통에 담았어요'); } saveMe(); route(); }
+function togglePub(seq){ const p = findPill(seq); if (!p) return; const d = drugByIngr(p.ingr, p); ME.pub = ME.pub || {}; const id = 'pub:' + seq; ME.taking = ME.taking || []; if (ME.taking.includes(id)) { ME.taking = ME.taking.filter(x => x !== id); delete ME.pub[id]; toast('내 약통에서 뺐어요'); } else { ME.taking.push(id); ME.pub[id] = { name: p.n.replace(/\(.*?\)/g, '').replace(/[()]/g, '').trim(), full: p.n, ingr: p.ingr || '', rx: p.rx, seq, drugId: d?.id || '' };  /* full: 괄호 속에 성분이 들어 있는 제품이 많다 — 버리지 않는다 */ toast('내 약통에 담았어요'); } saveMe(); route(); }
 /* 내 약통 항목 통합 조회(약지도 성분 | 공공 제품) */
 /* 대략 담기: 'cls:bp.arb' 처럼 계열만 아는 항목 */
 function quickSub(qid){ for (const g of (D.ingredients?.quick || [])) for (const x of (g.subs || [])) if (x.id === qid) return { g, x }; return null; }

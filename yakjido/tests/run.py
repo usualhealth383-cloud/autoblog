@@ -363,8 +363,23 @@ def main():
         ])
         _ig += pg.evaluate("""L=>L.map(([t,bad])=>{ const d=drugByIngr(t); return d&&d.id===bad ? t+' → '+bad : null; }).filter(Boolean)""", [
             ['니코틴산아미드', 'nicotine-patch'], ['니코틴산아미드 리보플라빈', 'nicotine-patch'], ['니코틴산벤질', 'nicotine-patch'],
-            ['살리실산글리콜', 'salicylic-corn'], ['살리실산메틸', 'salicylic-corn'], ['아세틸살리실산', 'salicylic-corn'], ['살리실산', 'methyl-salicylate'],
+            ['살리실산글리콜', 'salicylic-corn'], ['살리실산메틸', 'salicylic-corn'], ['아세틸살리실산', 'salicylic-corn'], ['살리실산', 'methyl-salicylate'], ['포비돈', 'povidone-iodine'], ['페퍼민트맛|오렌지맛|모과맛', 'peppermint-oil'],
         ])
+        _ig += pg.evaluate("""L=>L.map(([t,want])=>{ const d=drugByIngr(t); return (d&&d.id)===want ? null : t+' → '+(d&&d.id)+' (바라던 것: '+want+')'; }).filter(Boolean)""", [
+            ['오메프라졸', 'omeprazole'], ['니코틴', 'nicotine-patch'], ['미녹시딜', 'minoxidil'], ['포비돈요오드', 'povidone-iodine'],
+        ])
+        _ig += pg.evaluate("""L=>L.map(([t,p,want])=>{ const d=drugByIngr(t,p); return (d&&d.id||null)===want ? null : p.n+' → '+(d&&d.id)+' (바라던 것: '+want+')'; }).filter(Boolean)""", [
+            ['트리암시놀론', {'n': '트리코탈정(트리암시놀론)', 'rx': 1}, None],
+            ['트리암시놀론아세토니드', {'n': '아프타치정(트리암시놀론아세토니드)', 'rx': 0}, 'triamcinolone'],
+            ['플루르비프로펜', {'n': '스트렙실트로키', 'rx': 0}, 'flurbiprofen'],
+        ])
+        # 공공 제품 전부(약 1만 개) — 「제품 → 약 화면」 연결이 성분 해석과 어긋나는 곳이 없어야 한다.
+        # 포비돈 인공눈물이 소독약으로, 맛 이름이 페퍼민트 캡슐로 가던 것을 이 검사로 찾았다(2026-09-23).
+        _ig += pg.evaluate("""async()=>{await pubPills(); try{await pubPillsRx()}catch(e){} const idx=await pubIndex();
+          const rows=[...(PUB.pills||[]),...(PUB.rx||[]),...idx.map(r=>({n:r.n,ingr:(r.i||[]).join(' '),rx:0}))]; const bad=new Set();
+          for(const x of rows){ if(!x.ingr) continue; const d=drugByIngr(x.ingr,x); if(!d) continue; const di=ingIndex().byDrug[d.id];
+            if(di && (di.aka||[]).length && !ingFind(x.ingr).includes(di)) bad.add(x.n.slice(0,24)+' → '+d.id); }
+          return [...bad];}""")
         if _ig: fails.append(f'성분 이름을 잘못 읽습니다: {_ig[:4]}')
         # 5a-8. 계열↔몸 상태 짝 — 같은 계열인데 한 약에만 경고가 달린 곳을 잡는다
         pg.goto(url + '#/home'); ready(); pg.wait_for_timeout(250)
