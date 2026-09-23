@@ -2525,6 +2525,8 @@ function search(q){
   /* 여러 조각(이름·태그·설명)을 한 줄로 보고 낱말이 「전부」 들어 있으면 맞다고 본다 */
   const mAll = (...parts) => { if (!many) return false; const hay = norm(parts.filter(Boolean).join(' ')); return words.every(w => hay.includes(w)); };
   (D.symptoms || []).forEach(s => { if (m(s.name) || (s.tags || []).some(m) || mAll(s.name, (s.tags || []).join(' '), s.short)) out.push({ k:'증상', c:'s', t:s.name, d:s.short || '', h:'/symptom/' + s.id, w:3 }); });
+  /* 「의사에게 물었어요」 — 질문 문장으로 찾는다. 증상·약보다 뒤에 오도록 가중치는 가장 낮게 */
+  (D.askdoc || []).forEach(x => { if (mAll(x.q)) out.push({ k:'의사 답', c:'', t:x.q, d:'내과 전문의가 진료실에서 하는 대답', h:'/askdoc?open=' + x.id, w:1 }); });
   (D.drugs || []).forEach(d => {
     /* 이름만 보면 「생리통」으로 찾아도 아세트아미노펜이 안 나왔다. 약마다 적힌 「이럴 때 씁니다(for)」도 본다. */
     const hitFor = (d.for || []).find(m);
