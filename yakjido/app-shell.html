@@ -1690,7 +1690,7 @@ function route(){
   if (path !== LASTPATH) { SCROLL[LASTPATH] = window.scrollY; GQ = ''; LASTPATH = path; }
   const seg = path.split('/');
   const q = Object.fromEntries(new URLSearchParams(qs || ''));
-  const tab = { show:'home', check:'home', home:'home', symptom:'home', drugs:'drugs', drug:'drugs', class:'drugs', search:'drugs', pub:'drugs', pill:'drugs', guide:'home', kids:'home', tips:'home', myths:'home', schedule:'me', photo:'drugs', pillinfo:'drugs', supp:'supp', compare:'supp', me:'me', about:'me', ingr:'drugs', brand:'drugs', nut:'supp', hello:'home', mix:'drugs', together:'me', kinds:'me', rxout:'drugs', senior:'drugs' }[seg[0]] || 'home';
+  const tab = { show:'home', check:'home', home:'home', symptom:'home', drugs:'drugs', drug:'drugs', class:'drugs', search:'drugs', pub:'drugs', pill:'drugs', guide:'home', kids:'home', tips:'home', myths:'home', schedule:'me', photo:'drugs', pillinfo:'drugs', supp:'supp', compare:'supp', me:'me', about:'me', ingr:'drugs', brand:'drugs', nut:'supp', hello:'home', mix:'drugs', together:'me', kinds:'me', rxout:'drugs', senior:'drugs', askdoc:'home' }[seg[0]] || 'home';
   document.querySelectorAll('nav.tabbar button').forEach(b => b.classList.toggle('on', b.dataset.tab === tab));
   /* 본문 자료가 아직이면 — 첫 화면과 인사만 먼저 그리고, 나머지는 받은 뒤에 다시 그린다.
      기다리는 동안에도 상단 바와 뒤로 가기는 살아 있어야 한다. */
@@ -1703,7 +1703,7 @@ function route(){
     ensureCore().then(route);
     return;
   }
-  const R = { show:vShow, check:vCheck, home:vHome, symptom:vSymptom, drugs:vDrugs, drug:vDrug, class:vClass, search:vSearch, pub:vPub, pill:vPill, guide:vGuide, kids:vKids, tips:vTips, myths:vMyths, schedule:vSchedule, photo:vPhoto, pillinfo:vPillInfo, supp:vSupp, compare:vCompare, me:vMe, about:vAbout, ingr:vIngr, brand:vBrand, nut:vNut, hello:vHello, mix:vMix, together:vTogether, kinds:vKinds, bag:vBag, rxout:vRxOut, senior:vSenior };
+  const R = { show:vShow, check:vCheck, home:vHome, symptom:vSymptom, drugs:vDrugs, drug:vDrug, class:vClass, search:vSearch, pub:vPub, pill:vPill, guide:vGuide, kids:vKids, tips:vTips, myths:vMyths, schedule:vSchedule, photo:vPhoto, pillinfo:vPillInfo, supp:vSupp, compare:vCompare, me:vMe, about:vAbout, ingr:vIngr, brand:vBrand, nut:vNut, hello:vHello, mix:vMix, together:vTogether, kinds:vKinds, bag:vBag, rxout:vRxOut, senior:vSenior, askdoc:vAskDoc };
   const html = (R[seg[0]] || vHome)(seg[1], q);
   const panel = gqPanel();
   view.innerHTML = panel ? insertPanel(html, panel) : html;
@@ -2397,6 +2397,7 @@ function vHome(){
     <div class="tiles">
       <button class="tile wide" onclick="go('/kinds')"><div class="ic">${I.pill}</div><div><b>약 이름을 몰라도 담기</b><span>“혈압약 먹어요”까지만 아셔도 위험한 조합을 걸러요</span></div>${I.chev}</button>
       <button class="tile wide" onclick="go('/myths')"><div class="ic">${I.scale}</div><div><b>그런 줄 알았는데</b><span>흔히 듣는 말 ${(D.myths||[]).length || 18}가지를 근거로 다시 봤어요</span></div>${I.chev}</button>
+      ${(D.askdoc || []).length ? `<button class="tile wide" onclick="go('/askdoc')"><div class="ic">${I.user}</div><div><b>의사에게 물었어요</b><span>자주 묻는 ${D.askdoc.length}가지 — 진료실에서 하는 대답 그대로</span></div>${I.chev}</button>` : ''}
       <button class="tile wide" onclick="go('/class/nsaid')"><div class="ic">${I.scale}</div><div><b>소염진통제, 무엇이 위장에 덜 부담일까</b><span>이부프로펜·나프록센·덱시부프로펜·셀레콕시브 비교</span></div>${I.chev}</button>
       <button class="tile wide" onclick="go('/kids')"><div class="ic">${I.user}</div><div><b>아이 해열제, 몇 mL 먹이지?</b><span>몸무게·개월로 시럽 용량 계산 · 우리집 소아과 연동</span></div>${I.chev}</button>
       <button class="tile wide" onclick="go('/supp')"><div class="ic">${I.leaf}</div><div><b>내 영양제 성분 겹치는지 보기</b><span>제형·함량·상한 기준으로 비교</span></div>${I.chev}</button>
@@ -3192,6 +3193,21 @@ function rxComboCard(rc){
 /* ───────── 「그런 줄 알았는데」 ─────────
    흔히 듣는 말과 근거가 어긋나는 자리를 한곳에 모았다. 약을 파는 화면이 아니라
    「이 말은 어디까지 맞나」를 숫자로 보여 주는 화면이다. */
+/* 「의사에게 물었어요」 — 이 앱을 검수하는 내과 전문의가 실제로 한 대답만 옮긴다(의사-피드백.md 가 원문).
+   새 임상 내용을 지어 넣는 자리가 아니다. 개별 상담 창구도 아니다(서버·의료법 — 현욱님 결정 전). */
+function vAskDoc(_, q){
+  const A = D.askdoc || []; if (!A.length) return vHome();
+  const item = x => `<details class="xc" id="ad-${x.id}" ${q.open === x.id ? 'open' : ''}><summary>
+    <div class="ic">${icon(x.icon)}</div><b>${esc(x.q)}</b><span class="cnt">답 보기${I.chev}</span></summary>
+    <div class="bd"><div class="chat"><div class="bubble me"><span class="who">물은 말</span>${esc(x.q)}</div>
+      <div class="bubble"><span class="who">내과 전문의</span>${fmt(x.a)}</div></div>
+      <div class="actions" style="margin-top:10px">${speakBtn(`(D.askdoc.find(y=>y.id==='${x.id}')||{}).a`, '답 읽어 주기')}${x.go ? `<a class="btn ghost" href="#${x.go}">${I.chev} ${esc(x.goText || '자세히')}</a>` : ''}</div>
+    </div></details>`;
+  return `${topBar({ back:'홈' })}<div class="eyebrow">진료실 답</div><h1>의사에게 물었어요</h1>
+  <p style="margin-top:6px">약국·진료실에서 자주 듣는 질문에, <b>이 앱을 검수하는 내과 전문의가 진료실에서 하는 대답</b>을 그대로 옮겼어요. 모두 ${A.length}가지.</p>
+  <section class="sec"><div class="explore">${A.map(item).join('')}</div></section>
+  <section class="sec"><div class="note">${I.info}<span>일반적인 설명이에요. <b>드시는 약이나 몸 상태에 따라 답이 달라질 수 있어</b> 약사·의사와 상의하세요.</span></div></section>`;
+}
 function vMyths(_, q){
   const M = D.myths || [];
   if (!M.length) return vHome();

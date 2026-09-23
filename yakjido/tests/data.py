@@ -79,6 +79,11 @@ for t in T:
 
 # 「검수 대기」 화면은 검수 요청 문서에 반드시 적혀 있어야 한다 — 문서가 자료와 어긋나 14개로 남아 있었다
 import pathlib as _pl
+# 「의사에게 물었어요」 — 이어 주는 화면이 실제로 있어야 한다
+for _a in json.load(open(C / 'askdoc.json', encoding='utf-8')):
+    _g = _a.get('go', '')
+    if _g.startswith('/symptom/') and _g.split('/')[2] not in {s['id'] for s in S}: fails.append(f'askdoc {_a["id"]} 없는 증상 → {_g}')
+    if _g.startswith('/drug/') and _g.split('/')[2] not in {d['id'] for d in D}: fails.append(f'askdoc {_a["id"]} 없는 약 → {_g}')
 _doc = _pl.Path(__file__).resolve().parents[1] / '검수-대기.md'
 if _doc.exists():
     _t = _doc.read_text(encoding='utf-8')
