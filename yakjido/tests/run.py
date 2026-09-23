@@ -180,7 +180,7 @@ ICONDUP_JS = """async()=>{
 # 여기 적은 짝은 «성분 계열 → 그 계열이면 무조건 달려야 하는 몸 상태»다.
 CLASSFLAG_JS = """pairs=>{
   const out=[];
-  const KEEP = { 'celecoxib': ['ulcer'],        /* 위를 덜 건드리라고 만든 약이다 */
+  const KEEP = { 'celecoxib': ['ulcer', 'asthma'],   /* 위를 덜 건드리라고 만든 약 · 천식은 현욱님 답으로 안 단다(2026-09-23) */
                  'xylometazoline': ['bph', 'diabetes', 'glaucoma'],  /* 코에 뿌리는 약이라 전신 흡수가 적다 */
                  'benzoyl-peroxide': ['kidney'],                     /* 바르는 여드름약이다 */
                  'cough-syrup-rx': ['diabetes'] };                   /* 처방 시럽 — 성분이 제품마다 다르다 */
@@ -359,7 +359,7 @@ def main():
             # 「니코틴산아미드」는 비타민 B3 — 종합비타민 489개가 금연 보조제로 읽히면 안 된다(2026-09-23)
             ['니코틴산아미드', []], ['니코틴산벤질', []], ['니코틴', ['nicotine']], ['니코틴폴라크리렉스', ['nicotine']],
             ['니코틴타르타르산염수화물', ['nicotine']], ['미녹시딜', ['minoxidil']],
-            ['살리실산', ['salicylic-acid']], ['살리실산 락트산', ['salicylic-acid']], ['살리실산글리콜', []], ['아세틸살리실산', ['aspirin']],
+            ['살리실산', ['salicylic-acid']], ['브롬페니라민말레산염', ['brompheniramine']], ['d-클로르페니라민말레산염', ['chlorpheniramine']], ['페니라민말레산염', ['pheniramine']], ['살리실산 락트산', ['salicylic-acid']], ['살리실산글리콜', []], ['아세틸살리실산', ['aspirin']],
         ])
         _ig += pg.evaluate("""L=>L.map(([t,bad])=>{ const d=drugByIngr(t); return d&&d.id===bad ? t+' → '+bad : null; }).filter(Boolean)""", [
             ['니코틴산아미드', 'nicotine-patch'], ['니코틴산아미드 리보플라빈', 'nicotine-patch'], ['니코틴산벤질', 'nicotine-patch'],
@@ -495,12 +495,13 @@ def main():
         pg.evaluate("()=>localStorage.setItem('yakjido.me.v1',JSON.stringify({age:'senior',taking:[],pub:{}}))")
         pg.goto(url + '#/home'); pg.reload(); ready(); pg.wait_for_timeout(700)
         pdup = pg.evaluate("()=>Object.fromEntries((D.symptoms||[]).map(s=>[s.id,planDup(basket(s))]).filter(x=>x[1].length))")
-        KNOWN = {'msk', 'headache', 'arthritis'}      # 에텐자미드(근이완 복합제) — 본문에 설명을 달아 둔 자리
+        # 에텐자미드(근이완 복합제)는 소염 효과가 거의 없어 겹침으로 세지 않는다(현욱님 답, 2026-09-23) — 이제 겹치는 바구니는 0이어야 한다
         for sid, msgs in pdup.items():
-            if sid not in KNOWN: fails.append(f'추천 바구니가 스스로 겹침 {sid}: {msgs[0][:70]}')
-            elif '소염' not in msgs[0]: fails.append(f'{sid} 겹침 내용이 바뀜: {msgs[0][:70]}')
-        for sid in KNOWN:
-            if sid not in pdup: fails.append(f'{sid} 소염 성분 겹침 경고가 사라짐 — 규칙이 죽었는지 확인')
+            fails.append(f'추천 바구니가 스스로 겹침 {sid}: {msgs[0][:70]}')
+        # 규칙이 죽지 않았는지 — 진짜 소염제 두 가지(이부프로펜+나프록센)는 여전히 잡혀야 하고, 이부프로펜+신신플렉스는 잡히면 안 된다
+        _pd = pg.evaluate("""()=>[planDup([{d:drug('ibuprofen'),slot:'가'},{d:drug('naproxen'),slot:'나'}]).length, planDup([{d:drug('ibuprofen'),slot:'가'},{d:drug('relax-combo'),slot:'나'}]).length]""")
+        if _pd[0] == 0: fails.append('소염제 두 가지(이부프로펜+나프록센) 겹침 경고가 사라짐 — 규칙이 죽었는지 확인')
+        if _pd[1] != 0: fails.append('이부프로펜+신신플렉스에 겹침 경고가 뜸 — 현욱님 답과 어긋남')
         # 9. 날씨 카드
         pg.goto(url + '#/home'); pg.reload(); ready(); pg.wait_for_timeout(1000)
         wx = pg.evaluate("()=>document.querySelector('.wx')?.innerText||''")

@@ -29,7 +29,14 @@ for f in sorted((ROOT/'art').glob('*.webp')):
 s = s.replace("onclick=\"downloadIcs()\">${I.clock} 받기</button>", "onclick=\"toast('달력 파일은 설치한 약지도 앱에서 받을 수 있어요')\">${I.clock} 앱에서</button>")
 s = s.replace('<img src="art/${n}.webp"', '<img src="${ART_DATA[n] || ("art/" + n + ".webp")}"')
 # 아티팩트는 파일 하나라 서버가 없다 — 본문 자료(core.json)도 같이 심는다
+# 첫 화면 머리의 앱 표시(34px) — 아티팩트 호스트에는 icon-192.png 파일이 없어 깨진 그림이 나왔다(2026-09-23 현욱님 캡처)
+import io
+from PIL import Image
+_im = Image.open(ROOT/'icon-192.png').convert('RGBA').resize((68, 68), Image.LANCZOS)
+_b = io.BytesIO(); _im.save(_b, 'PNG', optimize=True)
+brandmark = 'data:image/png;base64,' + base64.b64encode(_b.getvalue()).decode()
 inject = ('<script>const ART_DATA = ' + json.dumps(art) + ';\n'
+          "window.__BRANDMARK__ = " + json.dumps(brandmark) + ';\n'
           "window.__CORE__ = " + (ROOT/'data/core.json').read_text() + ';\n'
           "window.__PILLS__ = " + (ROOT/'data/pills.json').read_text() + ';\n'
           "window.__EASY__ = "  + (ROOT/'data/easy-index.json').read_text() + ';\n'
@@ -42,5 +49,6 @@ i = s.index('<div class="app">')
 s = s[:i] + inject + s[i:]
 OUT.parent.mkdir(parents=True, exist_ok=True); OUT.write_text(s)
 print('wrote', OUT, round(len(s.encode())/1e6, 2), 'MB · art', len(art))
+assert "'icon-192.png'" not in s.split('window.__BRANDMARK__')[0] or 'window.__BRANDMARK__ = "data:' in s, '앱 표시 그림이 파일 경로로 남았습니다'
 for bad in ['serviceWorker', 'rel="manifest"', '<!doctype', '<body']:
     if bad in s: print('!! still present:', bad)

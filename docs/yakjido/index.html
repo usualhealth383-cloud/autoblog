@@ -1825,7 +1825,7 @@ I.gutpain='<svg class="i" viewBox="0 0 24 24"><path d="M12 3c-4.5 0-7.8 3.5-7.8 
 I.seat='<svg class="i" viewBox="0 0 24 24"><ellipse cx="12" cy="10.8" rx="8.6" ry="5.2"/><ellipse cx="12" cy="10.8" rx="3.2" ry="1.8"/><path d="M3.4 10.8v2c0 2.9 3.9 5.2 8.6 5.2s8.6-2.3 8.6-5.2v-2"/></svg>';
 I.cycle='<svg class="i" viewBox="0 0 24 24"><rect x="3.2" y="4.6" width="17.6" height="16.2" rx="3"/><path d="M3.2 9.4h17.6M8 2.8v3.6M16 2.8v3.6"/><circle cx="12" cy="15.2" r="2.6"/><path d="M12 11.4v1M12 18.8v1M8.2 15.2h1M15 15.2h1"/></svg>';
 I.flush='<svg class="i" viewBox="0 0 24 24"><circle cx="12" cy="12.4" r="5.6"/><path d="M10.1 11.2h.01M13.9 11.2h.01"/><path d="M9.9 15c1.3 1 2.9 1 4.2 0"/><path d="M3.4 8.8c.9.8.9 1.8 0 2.6s-.9 1.8 0 2.6M20.6 8.8c-.9.8-.9 1.8 0 2.6s.9 1.8 0 2.6"/></svg>';
-I.swell='<svg class="i" viewBox="0 0 24 24"><path d="M6.4 3v4.4a3 3 0 0 0 3 3h.4"/><path d="M16.2 21v-4.4a3 3 0 0 0-3-3h-.4"/><circle cx="11.3" cy="12" r="3.4"/><path d="M18.4 7.8 20.6 6.6M19.4 11.6h2.6M18.4 15.4l2.2 1.2"/></svg>';
+I.swell='<svg class="i" viewBox="0 0 24 24"><path d="M9.4 21.5v-5.4c-2.3-.9-3.4-2.4-3.4-4.1s1.1-3.2 3.4-4.1V4.6a2.6 2.6 0 0 1 5.2 0v3.3c2.3.9 3.4 2.4 3.4 4.1s-1.1 3.2-3.4 4.1v5.4"/><path d="M10.8 11.1c.8.4 1.6.4 2.4 0M10.8 12.9c.8.4 1.6.4 2.4 0"/><path d="M20.6 9c.8.8.8 1.7 0 2.5s-.8 1.7 0 2.5M3.4 9c-.8.8-.8 1.7 0 2.5s.8 1.7 0 2.5"/></svg>';  /* 부은 손가락 마디 — 엄지발가락으로 한정하지 않는다(현욱님 답: 부은 관절, 2026-09-23) */  /* 부은 관절 — 부위를 정하지 않는다(통풍 = 엄지발가락만이 아니다, 현욱님 답 2026-09-23) */
 I.shoulder='<svg class="i" viewBox="0 0 24 24"><circle cx="7.6" cy="4.4" r="2.1"/><path d="M7.6 6.8c-2 0-3.2 1.4-3.2 3.4v3.4"/><path d="M4.4 13.6 3.6 21M7.6 13.6l1.4 7.4"/><path d="M10.6 8.6l3.4 1.8"/><path d="M18 12.4V6.2M15.8 8.4 18 6.2l2.2 2.2"/><path d="M14.6 13.2l6.8-6.8"/></svg>';
 I.nosebleed='<svg class="i" viewBox="0 0 24 24"><path d="M8.6 3.4v6.8c0 1.5.9 2.4 2 3.1 1.1.7 1.2 2.2 0 2.7l-1.9.8v1.8a2.6 2.6 0 0 1-2.6 2.6H4"/><path d="M5.4 16.8h3.3"/><path d="M16.6 10.34c-0.9900000000000001 1.62 -1.8 2.43 -1.8 1.8a1.8 1.8 0 0 0 3.6 0c0-1.8 -0.9900000000000001 -1.62 -1.8 -3.06z"/><path d="M19.6 15.96c-0.66 1.08 -1.2 1.62 -1.2 1.2a1.2 1.2 0 0 0 2.4 0c0-1.2 -0.66 -1.08 -1.2 -2.04z"/></svg>';
 I.shingles='<svg class="i" viewBox="0 0 24 24"><path d="M6 8.6c1.4-2.6 4.6-3.6 7.6-2.8 3 .8 5.4 2.6 5.2 5.4-.2 2.8-2.2 5.4-5 6.2-3 .8-6.4-.2-7.8-2.6-1.2-2.2-1.2-4.4 0-6.2z"/><circle cx="9.4" cy="14" r="1.5"/><circle cx="12.4" cy="11.4" r="1.5"/><circle cx="15.4" cy="8.8" r="1.5"/></svg>';
@@ -2658,9 +2658,21 @@ function basket(s){
        「어르신 주의」가 종합감기약 한 줄에만 붙고, 정작 소염제에는 아무 표시가 없었다.
        나이가 들면 위장 출혈·콩팥 손상 위험이 같은 용량에서도 올라간다(2026-09-22 발견). */
     const nsaidWarn = ME.age === 'senior' && d && d.class === 'nsaid';
-    return { slot: p.slot, i: p._i, d, optional: !!p.optional, either: p.either || '', swapped, achWarn, nsaidWarn, blocked: d ? bad(pick) : false, again: !!p.again,
+    const senWarn = ME.age === 'senior' && d ? seniorWord(d) : '';
+    return { slot: p.slot, i: p._i, d, optional: !!p.optional, either: p.either || '', swapped, achWarn, nsaidWarn, senWarn, blocked: d ? bad(pick) : false, again: !!p.again,
              product: (p.prod && (d?.products || []).some(pr => pr.name === p.prod) ? p.prod : d?.products?.[0]?.name) };
   }).filter(x => x.d);
+}
+/* 65세가 넘으면 소염제 말고도 따로 일러 드릴 계열 — 현욱님 답(2026-09-23):
+   1세대 항히스타민·코막힘 성분 → 전립선·소변 막힘 / 카페인 복합 → 불면 / 마그네슘(마그밀) 과용 → 콩팥 부담 */
+function seniorWord(d){
+  const ks = new Set(), cls = new Set(); drugIngs(d).forEach(e => { ks.add(e.k); (e.cls || []).forEach(c => cls.add(c)); });
+  if (d.class === 'nsaid') return '';
+  /* 코에 뿌리는 약(자일로메타졸린)은 몸으로 거의 안 들어가 뺀다 */
+  if (cls.has('anti1') || [...ks].some(k => ['pseudoephedrine', 'phenylephrine', 'methylephedrine'].includes(k))) return '소변 줄기가 약해질 수 있어요(전립선)';
+  if (ks.has('caffeine-otc')) return '저녁엔 잠이 안 올 수 있어요';
+  if (ks.has('magnesium-lax') || d.id === 'magnesium-oxide') return '많이·오래 드시면 콩팥 부담';
+  return '';
 }
 function memoText(s){
   const items = basket(s).map(x => x.blocked ? `${x.slot}: ${x.d.name}은(는) 내 상태(${activeFlags().map(k => FLAG_LABEL[k] || k).join('·')})에 주의 — 약사와 상의` : `${x.optional ? '(필요 시) ' : ''}${x.d.name}${x.product ? ' — 예: ' + x.product : ''}`);
@@ -2807,8 +2819,9 @@ function buyItem(x){
   const badge = x.blocked ? '<span class="badge stop">약사와 상의</span>'
     : x.swapped === 'ach' ? '<span class="badge warn">부담 적은 쪽으로 바꿈</span>'
     : x.swapped ? '<span class="badge warn">조건에 맞춰 바꿈</span>'
-    : x.achWarn ? '<span class="badge warn">어르신 주의 · 짧게만</span>'
-    : x.nsaidWarn ? '<span class="badge warn">어르신 주의 · 적은 양으로 짧게</span>' : '';
+    : x.nsaidWarn ? '<span class="badge warn">어르신 주의 · 적은 양으로 짧게</span>'
+    : x.senWarn ? `<span class="badge warn">어르신 주의 · ${esc(x.senWarn)}</span>`
+    : x.achWarn ? '<span class="badge warn">어르신 주의 · 짧게만</span>' : '';
   return `<button class="buy-item ${x.optional ? 'opt' : ''} ${pimg(x.product) ? 'has-img' : ''} ${open ? 'open' : ''}" onclick="OPEN_BUY=OPEN_BUY==='${x.d.id}'?'':'${x.d.id}';route()" aria-expanded="${open}">
     <span class="bi-t">
       <small class="role">${esc(x.slot)}${x.optional ? ' · 도움될 수 있어요' : ''}${SYM_NOW && isWorked(SYM_NOW, x.d.id) ? ' · 효과 봤던 약' : ''}</small>
