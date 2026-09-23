@@ -1989,10 +1989,23 @@ function drugIngs(d){
   else { push(ix.byDrug[d.id]); inside.forEach(push); }
   return out;
 }
+/* 바르는·붙이는·넣는 제품이면 「먹는 약」 계열을 바깥용으로 바꿔 읽는다(2026-09-23).
+   디클로페낙 파스를 먹는 소염제로 읽어 「소염제 두 가지」, 디펜히드라민 크림을 먹는 항히스타민으로 읽어
+   「녹내장·전립선 금지」가 뜨고 있었다. 단, 피부로 «몸에 들어가라고» 만든 패치(키미테·니코틴·펜타닐)는 그대로. */
+const TOPICAL_FORM = /(크림|겔|젤|연고|로션|외용|스프레이|패치|패취|플라스타|카타플라스마|파프|첩부|경고제|점안|점비|나잘|질정|질좌|좌제|좌약|샴푸|네일|라카|가글|에어로졸|폼)/;
+const TRANSDERMAL = new Set(['scopolamine', 'nicotine', 'opioid-strong']);
+const TOP_CLS = { nsaid:'nsaid-top', steroid:'steroid-top', anti1:'anti1-top', sed:null, decongest:null, 'gi-spasm':null, abx:'abx-top', azole:'antifungal-top', oab:null, tca:null, h2:null };
+function isTopicalProduct(name){ const n = String(name || '').replace(/\(수출명.*$/, ''); return TOPICAL_FORM.test(n) && !/(내복|시럽|정$|정\(|캡슐|트로키|과립|산$)/.test(n); }
+function topicalize(e){
+  if (TRANSDERMAL.has(e.k)) return e;
+  const cls = [...new Set((e.cls || []).map(c => c in TOP_CLS ? TOP_CLS[c] : c).filter(Boolean))];
+  return { ...e, cls, ach: 0, topical: true };
+}
 function ingOf(x){
   const ix = ingIndex();
   const out = [];
-  const push = e => { if (e && !out.includes(e)) out.push(e); };
+  const topical = !!(x.pub && isTopicalProduct(x.pub.full || x.pub.name));
+  const push = e => { if (!e) return; const f = topical ? topicalize(e) : e; if (!out.some(o => o.k === f.k)) out.push(f); };
   if (x.d) {
     drugIngs(x.d).forEach(push);
     if (!out.length) ingFind(x.d.name).forEach(push);

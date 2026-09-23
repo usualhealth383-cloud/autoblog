@@ -359,7 +359,7 @@ def main():
             # 「니코틴산아미드」는 비타민 B3 — 종합비타민 489개가 금연 보조제로 읽히면 안 된다(2026-09-23)
             ['니코틴산아미드', []], ['니코틴산벤질', []], ['니코틴', ['nicotine']], ['니코틴폴라크리렉스', ['nicotine']],
             ['니코틴타르타르산염수화물', ['nicotine']], ['미녹시딜', ['minoxidil']],
-            ['살리실산', ['salicylic-acid']], ['브롬페니라민말레산염', ['brompheniramine']], ['d-클로르페니라민말레산염', ['chlorpheniramine']], ['페니라민말레산염', ['pheniramine']], ['살리실산 락트산', ['salicylic-acid']], ['살리실산글리콜', ['glycol-salicylate']], ['클로닉신리시네이트', ['clonixin']], ['돔페리돈', ['domperidone']], ['스코폴리아엑스', ['scopolia']], ['니자티딘', ['nizatidine']], ['폴마콕시브', ['polmacoxib']], ['옥시코돈염산염', ['opioid-strong']], ['트리플루살', ['triflusal']], ['네비보롤염산염', ['betablock']], ['아세틸살리실산', ['aspirin']],
+            ['살리실산', ['salicylic-acid']], ['브롬페니라민말레산염', ['brompheniramine']], ['d-클로르페니라민말레산염', ['chlorpheniramine']], ['페니라민말레산염', ['pheniramine']], ['살리실산 락트산', ['salicylic-acid']], ['살리실산글리콜', ['glycol-salicylate']], ['클로닉신리시네이트', ['clonixin']], ['돔페리돈', ['domperidone']], ['스코폴리아엑스', ['scopolia']], ['니자티딘', ['nizatidine']], ['폴마콕시브', ['polmacoxib']], ['케토코나졸', ['azole-top']], ['에코나졸질산염', ['azole-top']], ['플루코나졸', ['azole']], ['이트라코나졸고체분산체', ['azole']], ['옥시코돈염산염', ['opioid-strong']], ['트리플루살', ['triflusal']], ['네비보롤염산염', ['betablock']], ['아세틸살리실산', ['aspirin']],
         ])
         _ig += pg.evaluate("""L=>L.map(([t,bad])=>{ const d=drugByIngr(t); return d&&d.id===bad ? t+' → '+bad : null; }).filter(Boolean)""", [
             ['니코틴산아미드', 'nicotine-patch'], ['니코틴산아미드 리보플라빈', 'nicotine-patch'], ['니코틴산벤질', 'nicotine-patch'],
@@ -462,6 +462,14 @@ def main():
         _pb = {'노리스정 + 와파린': ({'taking':['pub:1','cls:blood.warf'],'pub':{'pub:1':{'name':'노리스정','full':'노리스정(클로닉신리시네이트)','ingr':'클로닉신리시네이트','rx':0,'seq':'1','drugId':''}}}, 'warfarin-nsaid'),
                '노리스정 + 이부프로펜': ({'taking':['pub:1','ibuprofen'],'pub':{'pub:1':{'name':'노리스정','full':'노리스정','ingr':'클로닉신리시네이트','rx':0,'seq':'1','drugId':''}}}, 'nsaid-dup'),
                '멕시롱 + 플루코나졸': ({'taking':['pub:1','pub:2'],'pub':{'pub:1':{'name':'멕시롱액','full':'멕시롱액(돔페리돈)','ingr':'돔페리돈','rx':0,'seq':'1','drugId':''},'pub:2':{'name':'디푸루칸','full':'디푸루칸캡슐(플루코나졸)','ingr':'플루코나졸','rx':1,'seq':'2','drugId':''}}}, 'domperidone-cyp3a4')}
+        # 바르는·붙이는 제품은 먹는 약 계열로 읽으면 안 된다 — 그런데 키미테(스코폴라민 패치)는 몸으로 들어가는 약이라 그대로(2026-09-23)
+        _pn = {'디클로페낙 파스 + 이부프로펜': ({'taking':['pub:1','ibuprofen'],'pub':{'pub:1':{'name':'게보핏파스','full':'게보핏스트롱카타플라스마(디클로페낙나트륨)','ingr':'디클로페낙나트륨','rx':0,'seq':'1','drugId':''}}}, 'nsaid-dup'),
+               '디펜히드라민 크림 + 녹내장': ({'glaucoma':True,'taking':['pub:1'],'pub':{'pub:1':{'name':'가두벌크림','full':'가두벌크림','ingr':'디펜히드라민염산염 리도카인','rx':0,'seq':'1','drugId':''}}}, 'anticho-glaucoma'),
+               '프레드니솔론 크림 + 이부프로펜': ({'taking':['pub:1','ibuprofen'],'pub':{'pub:1':{'name':'더마스톤지크림','full':'더마스톤지크림','ingr':'프레드니솔론아세테이트','rx':0,'seq':'1','drugId':''}}}, 'steroid-nsaid')}
+        for _nm, (_me, _rid) in _pn.items():
+            pg.evaluate("(me)=>localStorage.setItem('yakjido.me.v1',JSON.stringify(me))", _me); pg.reload(); ready(); pg.wait_for_timeout(300)
+            if _rid in pg.evaluate("()=>ixRun().hits.map(h=>h.r.id)"): fails.append(f'바르는 약을 먹는 약으로 읽음: {_nm} → {_rid}')
+        _pb['키미테 패치 + 녹내장'] = ({'glaucoma':True,'taking':['pub:1'],'pub':{'pub:1':{'name':'키미테패취','full':'키미테패취(스코폴라민)','ingr':'스코폴라민','rx':0,'seq':'1','drugId':''}}}, 'anticho-glaucoma')
         for _nm, (_me, _rid) in _pb.items():
             pg.evaluate("(me)=>localStorage.setItem('yakjido.me.v1',JSON.stringify(me))", _me); pg.reload(); ready(); pg.wait_for_timeout(300)
             if _rid not in pg.evaluate("()=>ixRun().hits.map(h=>h.r.id)"): fails.append(f'약통 판정 누락: {_nm} → {_rid}')
