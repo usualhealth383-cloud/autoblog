@@ -85,6 +85,25 @@ UICON_JS = """()=>{
 # 약 알림이 실제로 만들어지는지.
 # 화면에는 「알림 켜짐」이라고 떠 있는데, 시간이 돼도 알림이 안 왔다. 타이머 안에서
 # 없는 변수(id)를 써서 터지고 있었고, try/catch 가 그것을 조용히 삼키고 있었다.
+# 설치한 안드로이드 앱(Capacitor) 흉내 — 휴대폰 알람 장치를 가짜로 두고, 앱이 무엇을 거는지 본다
+CAP_MOCK = """
+window.__LN = {pending:[], listeners:{}, perm:'granted', exact:'denied', types:null};
+window.Capacitor = { isNativePlatform: () => true, Plugins: {
+  LocalNotifications: {
+    createChannel: async () => {}, registerActionTypes: async o => { __LN.types = o; },
+    addListener: (n, f) => { __LN.listeners[n] = f; return { remove(){} }; },
+    checkPermissions: async () => ({ display: __LN.perm }), requestPermissions: async () => ({ display: __LN.perm }),
+    checkExactNotificationSetting: async () => ({ exact_alarm: __LN.exact }),
+    changeExactNotificationSetting: async () => ({ exact_alarm: (__LN.exact = 'granted') }),
+    getPending: async () => ({ notifications: __LN.pending.slice() }),
+    cancel: async o => { const ids = o.notifications.map(x => x.id); __LN.pending = __LN.pending.filter(p => !ids.includes(p.id)); },
+    schedule: async o => { for (const n of o.notifications) { __LN.pending = __LN.pending.filter(p => p.id !== n.id); __LN.pending.push(JSON.parse(JSON.stringify(n))); } return { notifications: o.notifications.map(n => ({ id: n.id })) }; }
+  },
+  App: { addListener: () => ({ remove(){} }), exitApp(){} },
+  StatusBar: { setStyle(){}, setBackgroundColor(){} }, SplashScreen: { hide(){} }
+} };
+"""
+
 NOTI_JS = """()=>{
   const fired=[], errs=[];
   const RT=window.setTimeout, RN=window.Notification;
@@ -465,6 +484,38 @@ def main():
         pg.goto(url + '#/schedule?tick=ibuprofen%4008%3A00'); pg.reload(); ready(); pg.wait_for_timeout(400)
         if 'ibuprofen@08:00' not in pg.evaluate("()=>takenSet()"): fails.append('알림의 「먹었어요」가 복용 체크로 이어지지 않습니다')
         pg.evaluate("localStorage.removeItem('yakjido.me.v1')")
+        # 설치한 안드로이드 앱 — 앱을 닫아도 울리도록 휴대폰 알람으로 거는지(2026-09-28)
+        pn = br.new_page(viewport={'width': 390, 'height': 844}); nerr = []
+        pn.on('pageerror', lambda e: nerr.append(str(e)))
+        pn.clock.install(time='2026-09-28T10:00:00')
+        pn.add_init_script(CAP_MOCK)
+        pn.add_init_script("localStorage.setItem('yakjido.hello.v1','1');localStorage.setItem('yakjido.me.v1',JSON.stringify({taking:['ibuprofen'],sched:{ibuprofen:['08:00','20:00']},pub:{}}))")
+        pn.goto(url + '#/schedule'); pn.wait_for_selector('.app', timeout=15000); pn.wait_for_timeout(1500)
+        L = pn.evaluate("()=>__LN.pending")
+        daily = [x for x in L if x.get('schedule', {}).get('on')]
+        again = [x for x in L if x.get('schedule', {}).get('at')]
+        if sorted((x['schedule']['on']['hour'], x['schedule']['on']['minute']) for x in daily) != [(8, 0), (20, 0)]:
+            fails.append(f'앱 알람: 매일 반복 알림이 08:00·20:00 둘이어야 합니다 — {[x.get("schedule") for x in daily]}')
+        if any(x.get('channelId') != 'dose' or x.get('actionTypeId') != 'dose' for x in L): fails.append('앱 알람: 복용 알림 채널·「먹었어요」 단추가 빠졌습니다')
+        if any(x.get('isExactNotification') for x in L): fails.append('앱 알람: 정확한 시각 권한이 없는데 정확 알람으로 걸어 설정 화면이 매번 뜹니다')
+        if len(again) != 13: fails.append(f'앱 알람: 「아직 안 드셨어요」가 7일치 13개(오늘 08:30 은 지남)여야 합니다 — {len(again)}')
+        if not (pn.evaluate("()=>__LN.types && __LN.types.types[0].actions.map(a=>a.id).join()") == 'took,later'): fails.append('앱 알람: 「먹었어요」·「10분 뒤 다시」 단추가 없습니다')
+        t = pn.inner_text('.app')
+        if '휴대폰 알림' not in t or '앱이 열려 있을 때' in t: fails.append('앱 알람: 알림 방법 카드가 설치 앱용으로 바뀌지 않았습니다')
+        if '정확한 시각에 울리기' not in t: fails.append('앱 알람: 정확한 시각 허용 단추가 없습니다')
+        pn.click('button:has-text("허용")'); pn.wait_for_timeout(600)
+        if not all(x.get('isExactNotification') for x in pn.evaluate("()=>__LN.pending")): fails.append('앱 알람: 허용 뒤에도 정확 알람으로 다시 걸리지 않습니다')
+        # 알림의 「먹었어요」 → 체크되고, 오늘 20:30 「아직 안 드셨어요」는 지워져야 한다
+        pn.evaluate("()=>__LN.listeners.localNotificationActionPerformed({actionId:'took',notification:{extra:{key:'ibuprofen@20:00'}}})"); pn.wait_for_timeout(600)
+        if 'ibuprofen@20:00' not in pn.evaluate("()=>takenSet()"): fails.append('앱 알람: 「먹었어요」가 체크로 이어지지 않습니다')
+        if pn.evaluate("()=>__LN.pending.some(x=>x.schedule.at && new Date(x.schedule.at).getDate()===28 && new Date(x.schedule.at).getHours()===20)"):
+            fails.append('앱 알람: 먹었다고 누른 뒤에도 오늘 「아직 안 드셨어요」가 남아 있습니다')
+        if len([x for x in pn.evaluate("()=>__LN.pending") if x['schedule'].get('at')]) != 12: fails.append('앱 알람: 먹었어요 뒤 「아직 안 드셨어요」가 12개여야 합니다')
+        pn.evaluate("()=>__LN.listeners.localNotificationActionPerformed({actionId:'later',notification:{title:'약지도 · 약 드실 시간',body:'x',extra:{key:'ibuprofen@08:00'}}})"); pn.wait_for_timeout(400)
+        if not [x for x in pn.evaluate("()=>__LN.pending") if x['id'] >= 900000]: fails.append('앱 알람: 「10분 뒤 다시」가 걸리지 않습니다')
+        if pn.evaluate("async()=>!!(navigator.serviceWorker && await navigator.serviceWorker.getRegistration())"): fails.append('앱 알람: 설치 앱에서 서비스워커가 등록됩니다')
+        if nerr: fails.append(f'앱 알람: JS 오류 {nerr[:2]}')
+        pn.close()
         # 6b-2. 성분표에 없던 공공 제품 — 클로닉신(먹는 소염제 26개 제품)·돔페리돈이 약통에서 실제로 걸려야 한다(2026-09-23)
         _pb = {'노리스정 + 와파린': ({'taking':['pub:1','cls:blood.warf'],'pub':{'pub:1':{'name':'노리스정','full':'노리스정(클로닉신리시네이트)','ingr':'클로닉신리시네이트','rx':0,'seq':'1','drugId':''}}}, 'warfarin-nsaid'),
                '노리스정 + 이부프로펜': ({'taking':['pub:1','ibuprofen'],'pub':{'pub:1':{'name':'노리스정','full':'노리스정','ingr':'클로닉신리시네이트','rx':0,'seq':'1','drugId':''}}}, 'nsaid-dup'),
