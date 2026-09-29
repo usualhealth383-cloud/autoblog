@@ -16,6 +16,7 @@ j = lambda o: json.dumps(o, ensure_ascii=False).replace('</', '<\\/')
 cfg_p = ROOT / 'app' / 'server' / 'config.json'
 cfg = json.loads(cfg_p.read_text(encoding='utf-8')) if cfg_p.exists() else {}
 shell = shell.replace('__SB_URL__', cfg.get('url', '')).replace('__SB_KEY__', cfg.get('anonKey', ''))
+shell = shell.replace('__PUSH__', 'on' if cfg.get('push') else 'off')   # 푸시: google-services.json 과 함께 켠다
 print('서버 모드:', cfg.get('url') or '(없음 → 로컬 모드)')
 legal = {k: (ROOT / 'app' / 'legal' / f'{k}.html').read_text(encoding='utf-8') for k in ('terms', 'privacy', 'delete')}
 for k, v in legal.items():

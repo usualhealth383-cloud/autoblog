@@ -116,7 +116,7 @@ class H(BaseHTTPRequestHandler):
         if u.path == '/__anon': return self.out(200, {'anon': ANON, 'service': SERVICE})
         if u.path.startswith('/rest/v1/'): return self.proxy(m, u, raw)
         if u.path.startswith('/auth/v1/'): return self.auth(m, u.path[9:], qs, j)
-        if u.path.startswith('/functions/v1/'): return self.fn(u.path[14:], j)
+        if u.path.startswith('/functions/v1/'): return self.fn(m, u.path[14:], raw)
         self.out(404, {'message': 'not found'})
 
     def proxy(self, m, u, raw):
@@ -173,8 +173,17 @@ class H(BaseHTTPRequestHandler):
             return self.out(200, {'id': r[0][0], 'email': r[0][1], 'user_metadata': r[0][2]})
         self.out(404, {'msg': 'unknown auth path ' + p})
 
-    def fn(self, name, j):
-        self.out(404, {'message': 'function not deployed in testbed: ' + name})
+    def fn(self, m, name, raw):
+        # 로컬에서 띄운 Edge Function(Deno)으로 넘긴다 — FN_PORTS='verify-purchase=8801,push=8802'
+        ports = dict(x.split('=') for x in os.environ.get('FN_PORTS', 'verify-purchase=8801,push=8802').split(','))
+        if name not in ports: return self.out(404, {'message': 'function not deployed in testbed: ' + name})
+        h = {k: v for k, v in self.headers.items() if k.lower() in ('authorization', 'content-type', 'apikey', 'x-cron-secret', 'x-push-secret')}
+        req = urllib.request.Request(f'http://127.0.0.1:{ports[name]}/', data=raw or None, method=m, headers=h)
+        try:
+            with urllib.request.urlopen(req, timeout=30) as r: code, data = r.status, r.read()
+        except urllib.error.HTTPError as e: code, data = e.code, e.read()
+        except Exception as e: code, data = 502, json.dumps({'message': f'function {name} not running: {e}'}).encode()
+        self.out(code, data, {'Content-Type': 'application/json'})
 
 
 if __name__ == '__main__':

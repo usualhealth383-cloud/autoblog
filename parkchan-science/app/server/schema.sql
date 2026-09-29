@@ -493,6 +493,18 @@ begin delete from progress where code = old.code; return old; end $$;
 drop trigger if exists students_drop_progress on students;
 create trigger students_drop_progress after delete on students for each row execute function private.drop_progress();
 
+-- ═══ 보관 기간이 지난 기록 지우기(개인정보처리방침 3항) — 오류 기록 90일 · 틀린 입력 기록 1일 ═══
+create or replace function private.purge_old() returns void language sql security definer set search_path = public, private as $$
+  delete from client_errors where at < now() - interval '90 days';
+  delete from private.attempts where at < now() - interval '1 day';
+$$;
+-- Supabase 에서는 pg_cron 으로 매일 새벽 4시에 돌린다(Database → Extensions 에서 pg_cron 켠 뒤 이 파일을 다시 실행)
+do $$ begin
+  if exists (select 1 from pg_extension where extname = 'pg_cron') then
+    perform cron.schedule('pcs-purge-old', '0 19 * * *', 'select private.purge_old()');   -- 19시 UTC = 04시 KST
+  end if;
+end $$;
+
 -- ═══ [설정] 앞의 -- 를 지우고 원장님 이메일로 바꿔 실행 ═══
 -- insert into private.config values ('owner_email', '원장님@이메일') on conflict (k) do update set v = excluded.v;
 -- update profiles set role = 'owner' where id in (select id from auth.users where lower(email) = lower((select v from private.config where k = 'owner_email')));

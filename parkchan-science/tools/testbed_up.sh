@@ -7,6 +7,8 @@ mkdir -p "$W"; chmod 755 "$W"; chown postgres "$W"
 if [ ! -x "$W/postgrest" ]; then
   curl -sSL -o "$W/pgrst.tar.xz" https://github.com/PostgREST/postgrest/releases/download/v12.2.3/postgrest-v12.2.3-linux-static-x64.tar.xz
   tar xJf "$W/pgrst.tar.xz" -C "$W"; fi
+if [ ! -x "$W/deno" ]; then   # Edge Function(Deno) 시험용
+  curl -sSL -o "$W/deno.zip" https://github.com/denoland/deno/releases/download/v2.5.6/deno-x86_64-unknown-linux-gnu.zip && (cd "$W" && unzip -q -o deno.zip); fi
 if [ ! -d "$W/data" ]; then mkdir -p "$W/data"; chown postgres "$W/data"
   su postgres -c "$PGBIN/initdb -D $W/data -U postgres --auth=trust -E UTF8 --locale=C.UTF-8 >/dev/null"; fi
 chown -R postgres "$W/data"

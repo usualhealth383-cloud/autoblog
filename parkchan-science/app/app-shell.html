@@ -667,7 +667,9 @@ const CFG = {
   attendSecret: 'parkchan-2026',     // 로컬 출석 코드 씨앗 — 서버 모드에서는 서버만 안다
   classes: [{cls:'월목반',start:'18:00'},{cls:'화금반',start:'18:00'},{cls:'수토반',start:'14:00'}],   // [확인 필요] 반 편성 기본값
   phone: '', kakao: '', email: '',   // [확인 필요] 학원 연락처 — 비어 있으면 문의 줄이 숨는다
-  plans: [ { id:'m1', name:'월 이용권', days:30, months:1, price:9900, sub:'자동 갱신 · 언제든 해지' }, { id:'m6', name:'6개월 이용권', days:180, months:6, price:49000, sub:'17 % 할인' }, { id:'y1', name:'12개월 이용권', days:365, months:12, price:79000, sub:'33 % 할인', best:true } ],   // 2026-09-08 결정: 월 9,900 · 수강생 무료
+  /* 스토어 상품은 모두 '일회성 이용권'(자동 결제 없음 — 미성년 이용자가 모르게 결제가 이어지지 않게). sku 는 Play Console 상품 ID 와 같아야 한다 */
+  plans: [ { id:'m1', sku:'pass_m1', name:'월 이용권', days:30, months:1, price:9900, sub:'한 달 · 자동 결제 없음' }, { id:'m6', sku:'pass_m6', name:'6개월 이용권', days:180, months:6, price:49000, sub:'17 % 할인 · 자동 결제 없음' }, { id:'y1', sku:'pass_y1', name:'12개월 이용권', days:365, months:12, price:79000, sub:'33 % 할인 · 자동 결제 없음', best:true } ],
+  push: '__PUSH__' === 'on',          // build.py 가 server/config.json 의 "push": true 를 보고 켠다(google-services.json 이 있어야 함)   // 2026-09-08 결정: 월 9,900 · 수강생 무료
 };
 
 const TERMS_VER = '2026-09-29';        // 약관·개인정보처리방침 판 — 바꾸면 가입 때 동의한 판이 계정에 남는다
@@ -1899,16 +1901,48 @@ function renderPlans(){
   document.getElementById('v-plans').innerHTML = `
     <button class="back" id="backMe"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg>내 정보</button>
     <h1 class="h-page">이용권</h1>
-    <p class="fine" style="text-align:left;padding:0 0 14px">${hasPass() ? `지금 이용권은 <b>${kdate(ACC.passUntil)}</b>까지입니다. 코드를 더 등록하면 그 뒤로 이어집니다.` : `가입 없이도 최근 ${FREE_DAYS}일치는 무료입니다. 전 범위(개념 ${CONCEPTS.length}개 · 문제 은행 ${BANK.length.toLocaleString()}문항 · 자료 탐구 ${LABS.length}편)를 열려면 아래 중 하나를 고르세요.`}</p>
+    <p class="fine" style="text-align:left;padding:0 0 14px">${hasPass() ? `지금 이용권은 <b>${kdate(ACC.passUntil)}</b>까지입니다. 이용권을 더 사거나 코드를 등록하면 그 뒤로 이어집니다.` : `가입 없이도 최근 ${FREE_DAYS}일치는 무료입니다. 전 범위(개념 ${CONCEPTS.length}개 · 문제 은행 ${BANK.length.toLocaleString()}문항 · 자료 탐구 ${LABS.length}편)를 열려면 아래 중 하나를 고르세요.`}</p>
     <div class="plan best"><span class="tag">학원 수강생</span><h3>학원 코드 등록</h3><div class="price">무료<small> · 수강 기간 동안</small></div>
       <ul><li>전 범위 개념 ${CONCEPTS.length}개 · 문제 은행 ${BANK.length.toLocaleString()}문항</li><li>내 반 공지 · 출석 체크</li><li>기기를 바꿔도 진도 이어짐</li></ul>
       <button class="btn soft" id="backMe2">내 정보에서 코드 등록</button></div>
     ${CFG.plans.map(p=>`<div class="plan ${p.best?'best':''}">${p.best?'<span class="tag">인기</span>':''}<h3>${esc(p.name)}</h3><div class="price">${p.price.toLocaleString()}원<small> · ${p.days>=365?'1년':p.days>=180?'6개월':'1개월'}${p.months>1?` · 월 ${Math.round(p.price/p.months).toLocaleString()}원꼴`:''}</small></div>
       <ul><li>전 범위 개념 ${CONCEPTS.length}개 · 그림 ${FIGS_N}장</li><li>문제 은행 ${BANK.length.toLocaleString()}문항 · 자료 탐구 ${LABS.length}편</li><li>오답 노트 · 복습 문제 · 학습 통계</li><li>${esc(p.sub||'')}</li></ul>
-      <button class="btn ${p.best?'':'ghost'}" data-buy="${p.id}">스토어에서 구매</button></div>`).join('')}
+      <button class="btn ${p.best?'':'ghost'}" data-buy="${p.id}">${STORE_PRICE[p.sku] ? `${esc(STORE_PRICE[p.sku])} · 구매` : '스토어에서 구매'}</button></div>`).join('')}
+    ${IAP() ? `<button class="linkbtn" id="iapRestore">구매 복원 · 결제했는데 열리지 않았어요</button>` : ''}
     <div class="codebox"><h3>이용권 코드</h3><p>학원이나 이벤트로 받은 코드를 넣으면 바로 열립니다.</p>
       <div class="f"><input id="passIn" class="code" placeholder="이용권 코드" maxlength="6" autocapitalize="characters" autocomplete="off"><button id="passGo">등록</button></div>${passErr?`<div class="err">${esc(passErr)}</div>`:''}</div>
-    <p class="fine">가격은 부가세 포함. 결제는 Google Play·App Store를 통해 이루어지며, 구매 후 7일 이내 이용 전이면 전액 환불됩니다(이용약관 제7조). 학원 수강생은 결제 없이 코드로 열립니다.</p>`;
+    <p class="fine">가격은 부가세 포함. 결제는 Google Play를 통해 이루어지며 자동으로 다시 결제되지 않습니다. 구매 후 7일 이내 이용 전이면 전액 환불됩니다(이용약관 제7조). 학원 수강생은 결제 없이 코드로 열립니다.</p>`;
+  loadStorePrices();
+}
+/* ── 스토어 결제(Google Play · 일회성 이용권) — 결제 → 서버가 Google 에 영수증 확인 → 이용권 연장 ── */
+const IAP = () => (isNative && SRV && plug('NativePurchases')) || null;
+const STORE_PRICE = {}; let pricesAsked = false, buying = false;
+async function loadStorePrices(){ const NP = IAP(); if (!NP || pricesAsked) return; pricesAsked = true;
+  try { const { products } = await NP.getProducts({ productIdentifiers: CFG.plans.map(p=>p.sku), productType:'inapp' });
+    (products||[]).forEach(x => { if (x.identifier && x.priceString) STORE_PRICE[x.identifier] = x.priceString; });
+    if (Object.keys(STORE_PRICE).length && view==='plans') renderPlans(); } catch {} }
+async function buyPlan(p){
+  const NP = IAP();
+  if (!NP){ openSheet(`<h3>${esc(p.name)} · ${p.price.toLocaleString()}원</h3><p>이용권 결제는 <b>안드로이드 앱</b>(Google Play)에서 할 수 있습니다. 학원이나 이벤트로 받은 <b>이용권 코드</b>가 있으면 아래 칸에 넣어 바로 열 수 있습니다.</p><button class="btn ghost" id="sheetClose">닫기</button>`); return; }
+  if (buying) return; buying = true;
+  try {
+    const r = await NP.purchaseProduct({ productIdentifier: p.sku, productType:'inapp', quantity:1, appAccountToken: ACC.id });
+    if (!r || !r.purchaseToken) throw new Error('결제 정보를 받지 못했습니다. [구매 복원]을 눌러 주세요.');
+    toast('결제를 확인하는 중입니다…');
+    const v = await DBX.verifyPurchase({ productId:p.sku, purchaseToken:r.purchaseToken, orderId:r.transactionId||'' });
+    ACC = await DBX.me(); passErr=''; toast(`${kdate(v.until)}까지 전 범위가 열렸습니다`); renderPlans();
+  } catch (err){ const m = String((err && err.message) || err || '');
+    if (!/cancel|취소/i.test(m)) openSheet(`<h3>결제를 마치지 못했습니다</h3><p>${esc(m)}</p><p class="fine" style="text-align:left;padding:0">돈이 빠져나갔는데 열리지 않았다면 [구매 복원]을 누르세요. 같은 결제가 두 번 반영되지는 않습니다.</p><button class="btn" id="iapRestore">구매 복원</button><button class="btn ghost" id="sheetClose">닫기</button>`);
+  } finally { buying = false; }
+}
+async function restorePurchases(){ const NP = IAP(); if (!NP) return; closeSheet(); toast('스토어에서 결제 내역을 확인합니다…');
+  let n = 0, last = '';
+  try { const { purchases } = await NP.getPurchases({ productType:'inapp' });
+    for (const x of (purchases||[])) { if (!x.purchaseToken) continue;
+      try { await DBX.verifyPurchase({ productId:x.productIdentifier, purchaseToken:x.purchaseToken, orderId:x.transactionId||'' }); n++; } catch (e){ last = e.message; } }
+  } catch (e){ last = e.message; }
+  ACC = await DBX.me(); renderPlans();
+  toast(n ? `결제 ${n}건을 확인했습니다${hasPass()?` · ${kdate(ACC.passUntil)}까지`:''}` : (last || '복원할 결제가 없습니다'));
 }
 
 /* ═══ 보호자 홈 ═══ */
@@ -2116,6 +2150,20 @@ async function scheduleReminder(){ const LN = plug('LocalNotifications'); if (!L
     let p = await LN.checkPermissions(); if (p.display !== 'granted') p = await LN.requestPermissions(); if (p.display !== 'granted') return;
     const [h, m] = S.notifyAt.split(':').map(Number);
     await LN.schedule({ notifications: [{ id: 1, title: `${CFG.academy} · 오늘의 개념`, body: '하루 1개념 1문제 — 3분이면 됩니다.', schedule: { on: { hour: h, minute: m }, allowWhileIdle: true } }] }); } catch {} }
+/* 푸시 알림(공지·일정·등원) — 첫 화면에서 묻지 않고, 학원과 연결된 뒤에만 묻는다. 로그아웃하면 이 기기 등록을 지운다 */
+let pushToken = '', pushWired = false;
+async function initPush(){ const PN = plug('PushNotifications'); if (!isNative || !CFG.push || !SRV || !PN || !ACC) return;
+  if (!(authLive() || ACC.childCode || ACC.role==='owner')) return;
+  try {
+    if (!pushWired){ pushWired = true;
+      PN.addListener('registration', t => { pushToken = t.value; DBX.registerPush(t.value, 'android').catch(()=>{}); });
+      PN.addListener('pushNotificationActionPerformed', a => { const k = ((a.notification||{}).data||{}).kind; show(k==='sched' ? 'plan' : home()); }); }
+    let p = await PN.checkPermissions(); if (p.receive === 'prompt' || p.receive === 'prompt-with-rationale') p = await PN.requestPermissions();
+    if (p.receive !== 'granted') return;
+    try { await PN.createChannel({ id:'academy', name:'학원 알림', description:'공지 · 일정 · 등원', importance:4 }); } catch {}
+    await PN.register();
+  } catch {} }
+async function dropPush(){ if (!pushToken || !SRV) return; try { await api(`/rest/v1/push_tokens?token=eq.${encodeURIComponent(pushToken)}`, { method:'DELETE' }); } catch {} pushToken = ''; }
 function nativeInit(){ if (!isNative) return; const App = plug('App');
   App && App.addListener('backButton', () => { if (document.getElementById('sheetBg')) return closeSheet();
     if (document.getElementById('fv')) return document.getElementById('fv').remove();
@@ -2158,7 +2206,7 @@ async function afterLogin(acc){
   if (acc.role==='student' && acc.studentCode){ try { const r = await DBX.verifyCode(acc.studentCode); if (r.ok) S.auth = { code:acc.studentCode, name:r.student.name, cls:r.student.cls, until:r.student.until }; } catch {} }
   else S.auth = null;
   try { mergeProgress(await DBX.loadProgress(progressKey())); } catch {}
-  save(S); scheduleReminder(); show(home());
+  save(S); scheduleReminder(); show(home()); initPush();
 }
 async function linkStudentCode(code){
   const r = await DBX.linkCode('student', code); if (!r.ok) return r;
@@ -2406,15 +2454,15 @@ document.addEventListener('click', async e => {
 
   /* 내 정보 */
   if (T('#codeGo')){ const v=(document.getElementById('codeIn').value||'').trim().toUpperCase(); if (!v){ codeErr='코드를 입력해 주세요.'; renderMe(); return; }
-    try { const r = await linkStudentCode(v); if (r.ok){ codeErr=''; renderMe(); toast(`${r.student.name} 학생, 반갑습니다`); scheduleReminder(); } else { codeErr=r.why; renderMe(); } } catch (err){ codeErr=err.message; renderMe(); } return; }
+    try { const r = await linkStudentCode(v); if (r.ok){ codeErr=''; renderMe(); toast(`${r.student.name} 학생, 반갑습니다`); scheduleReminder(); initPush(); } else { codeErr=r.why; renderMe(); } } catch (err){ codeErr=err.message; renderMe(); } return; }
   if (T('#childGo')){ /* 내 정보와 자녀 화면에 같은 입력이 동시에 있으므로, 지금 누른 쪽의 입력을 읽는다 */
     const box = T('#childGo').closest('.codebox') || document;
     const v=((box.querySelector('#childIn')||{}).value||'').trim().toUpperCase(); if (!v){ childErr='코드를 입력해 주세요.'; (view==='parent'?renderParent:renderMe)(); return; }
     try { const r = await DBX.linkCode('child', v); if (!r.ok){ childErr = r.why; (view==='parent'?renderParent:renderMe)(); return; }
-      ACC = await DBX.me(); childErr=''; toast(`${r.student.name} 학생과 연결했습니다`); show('parent'); } catch (err){ childErr=err.message; (view==='parent'?renderParent:renderMe)(); } return; }
+      ACC = await DBX.me(); childErr=''; toast(`${r.student.name} 학생과 연결했습니다`); show('parent'); initPush(); } catch (err){ childErr=err.message; (view==='parent'?renderParent:renderMe)(); } return; }
   if (T('#unlinkChild')){ if (!confirm('자녀 연결을 해제할까요?')) return; await DBX.linkCode('child', ''); ACC = await DBX.me(); renderParent(); return; }
   if (T('#unauth')){ if (!confirm('학원 코드 연결을 해제할까요? 공지·출석이 닫힙니다.')) return; await flushProgress(); S.auth=null; if (ACC){ await DBX.linkCode('student', ''); ACC = await DBX.me(); } save(S); renderMe(); return; }
-  if (T('#logout')){ if (!confirm('로그아웃할까요? 진도는 계정에 저장되어 있습니다.')) return; await flushProgress(); await DBX.signOut(); ACC=null; S = freshS(); save(S); authMode='start'; show('auth'); return; }
+  if (T('#logout')){ if (!confirm('로그아웃할까요? 진도는 계정에 저장되어 있습니다.')) return; await flushProgress(); await dropPush(); await DBX.signOut(); ACC=null; S = freshS(); save(S); authMode='start'; show('auth'); return; }
   if (T('#delAccount')){ if (!confirm('계정을 삭제하면 진도·오답 노트가 함께 지워지고 되돌릴 수 없습니다. 삭제할까요?')) return;
     try { await DBX.deleteAccount(); ACC=null; clearTimeout(syncT); S = freshS(); try { localStorage.removeItem(KEY); } catch {} authMode='start'; toast('계정을 삭제했습니다'); show('auth'); } catch (err){ toast(err.message); } return; }
   if (T('#editProfile')){ openSheet(`<h3>이름 · 연락처</h3><div class="f"><input id="epName" placeholder="이름" value="${esc(ACC.name)}" style="flex:1;border:1.5px solid var(--line);border-radius:12px;padding:12px 14px;font-size:15px;font-family:inherit;background:var(--paper);color:var(--ink)"></div>
@@ -2426,8 +2474,8 @@ document.addEventListener('click', async e => {
   if (T('#backMe') || T('#backMe2')){ show('me'); return; }
   if (T('#passGo')){ const v=(document.getElementById('passIn').value||'').trim().toUpperCase(); if (!v){ passErr='코드를 입력해 주세요.'; renderPlans(); return; }
     try { const r = await DBX.redeemPass(v); if (r.ok){ ACC = await DBX.me(); passErr=''; toast(`${kdate(r.until)}까지 전 범위가 열렸습니다`); renderPlans(); } else { passErr=r.why; renderPlans(); } } catch (err){ passErr=err.message; renderPlans(); } return; }
-  const buy = T('[data-buy]'); if (buy){ const p = CFG.plans.find(x=>x.id===buy.dataset.buy);
-    openSheet(`<h3>${esc(p.name)} · ${p.price.toLocaleString()}원</h3><p>스토어 결제는 출시(11월) 심사 통과 뒤 열립니다. 지금은 학원에서 받은 <b>이용권 코드</b>로 같은 기간을 열 수 있습니다.</p>${CFG.phone?`<a class="btn soft" href="tel:${esc(CFG.phone)}" style="text-decoration:none">학원에 문의 ${esc(CFG.phone)}</a>`:''}<button class="btn ghost" id="sheetClose">닫기</button>`); return; }
+  const buy = T('[data-buy]'); if (buy){ const p = CFG.plans.find(x=>x.id===buy.dataset.buy); if (!ACC){ authMode='start'; show('auth'); return; } await buyPlan(p); return; }
+  if (T('#iapRestore')){ await restorePurchases(); return; }
 
   /* 원장 — 운영 도구 */
   const sp = T('[data-seplus]'); if (sp){ const el = document.getElementById('seUntil'); const base = el.value && el.value > todayISO() ? el.value : todayISO();
@@ -2468,6 +2516,12 @@ document.addEventListener('keydown', e => { if (e.key!=='Enter') return; const i
   const M = {codeIn:'codeGo', attIn:'attGo', lgPw:'lgGo', lgEmail:'lgGo', suPw:'suGo', fgEmail:'fgGo', childIn:'childGo', passIn:'passGo', clsName:'clsAdd', blankIn:'blankGo'}; M[id] && click(M[id]); });
 document.addEventListener('change', e => { if (e.target.id==='bankLesson'){ bankSel.lesson = e.target.value; renderBank(); } });
 
+/* ═══ 오류 기록 ═══ */
+const errSeen = new Set();
+function reportError(msg, stack){ const m = String(msg||'').slice(0, 480); if (!m || errSeen.has(m) || errSeen.size >= 5) return; errSeen.add(m);
+  try { DBX.logError({ ver:CFG.version + (isNative?'-app':'-web'), msg:m, stack:String(stack||'').slice(0, 1900), url:(view||'')+' '+location.pathname.slice(-60), ua:navigator.userAgent.slice(0, 280) }).catch(()=>{}); } catch {} }
+window.addEventListener('error', e => reportError(e.message, e.error && e.error.stack));
+window.addEventListener('unhandledrejection', e => { const r = e.reason || {}; if ((r.status && r.status < 500) || /Failed to fetch|NetworkError|Load failed/i.test(r.message||'')) return; reportError('Promise: ' + (r.message || r), r.stack); });
 /* ═══ 시작 ═══ */
 (async () => {
   /* 가입 확인·비밀번호 재설정 메일의 링크로 들어왔으면 그 세션을 받는다 */
@@ -2496,7 +2550,7 @@ document.addEventListener('change', e => { if (e.target.id==='bankLesson'){ bank
     if (S.auth) S.auth = null;      // 로그아웃 상태에서는 학원 연결도 닫는다
     show(S.onboarded ? 'today' : 'auth');
   }
-  nativeInit();
+  nativeInit(); initPush();
 })();
 if (!isNative && 'serviceWorker' in navigator) window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(()=>{}));
 </script>

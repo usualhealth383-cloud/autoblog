@@ -23,6 +23,26 @@
 6. **Project Settings → API** 의 `Project URL` 과 `anon public` 키를 `app/server/config.json` 에 넣습니다(`config.example.json` 참고).
 7. `python3 app/build.py` → `cd app-native && npm run sync` → APK 자동 빌드(Actions → android-apk).
 
+## 결제 · 푸시 알림 (서버 연결 뒤, 한 번)
+앱 쪽 코드와 서버 함수(`functions/verify-purchase`, `functions/push`)는 다 되어 있습니다. 원장님 계정으로 켜는 일만 남았습니다.
+
+**A. 스토어 결제(Google Play · 일회성 이용권, 자동 결제 없음)**
+1. Play Console → 앱 → **수익 창출 → 인앱 상품**: `pass_m1`(9,900원) · `pass_m6`(49,000원) · `pass_y1`(79,000원) 세 개를 만들고 활성화.
+2. Google Cloud 에서 **서비스 계정** 하나 만들고 JSON 키 받기 → Play Console **사용자 및 권한**에서 그 이메일을 초대(권한: 재무 데이터 보기 · 주문 관리).
+3. Supabase → **Edge Functions → Secrets**: `GOOGLE_SA_JSON`(키 JSON 전체) · `ANDROID_PACKAGE`=`kr.parkchan.science` · `CRON_SECRET`(아무 긴 문자열).
+4. 배포: `npx supabase functions deploy verify-purchase --project-ref <REF>` (함수 폴더는 이 `functions/`).
+5. `functions.sql` 의 ② 부분(환불 정리)을 값 바꿔 실행.
+6. Play Console **라이선스 테스트**에 원장님 Gmail 을 넣으면 실제 돈 없이 결제 시험을 할 수 있습니다.
+
+**B. 푸시 알림(공지 · 일정 · 보호자 등원 알림)**
+1. https://console.firebase.google.com → 프로젝트 만들기 → Android 앱 추가(패키지 `kr.parkchan.science`) → `google-services.json` 받기.
+2. GitHub 저장소 Secrets 에 `GOOGLE_SERVICES_JSON`(파일 내용), `SUPABASE_CONFIG_JSON`(`config.json` 내용) 등록 → APK 가 푸시를 켠 채로 빌드됩니다.
+3. Firebase → 프로젝트 설정 → 서비스 계정 → **새 비공개 키** → Supabase Secrets `FIREBASE_SA_JSON` 에 넣고, `PUSH_SECRET`(아무 긴 문자열) · `ACADEMY`=`박찬 과학`.
+4. 배포: `npx supabase functions deploy push --no-verify-jwt --project-ref <REF>` (DB 가 부르므로 로그인 토큰 검사를 끄고, 대신 `x-push-secret` 으로 막습니다).
+5. `functions.sql` 의 ① 부분(푸시)을 값 바꿔 실행.
+
+알림은 학원과 연결된 사람(학원 코드를 등록한 학생 · 자녀를 연결한 보호자 · 원장)에게만, 연결하는 순간 한 번 묻습니다. 로그아웃하면 그 폰의 알림 등록을 지웁니다.
+
 ## 보안 설계 (v3 · 2026-09-29)
 | 지키는 것 | 방법 |
 |---|---|
@@ -32,7 +52,7 @@
 | 원장 사칭 | 설정한 이메일 **+ 메일 인증 완료** 계정만 원장 |
 | 커뮤니티 사칭·도배·신고자 노출 | 글쓴이·닉네임은 서버가 채움 · 글 10분 5개/댓글 10분 20개 · 신고자 목록은 API로 안 나감(수만) · 신고 3건이면 서버에서 가림 |
 | 저녁 수업 지각 판정 | DB 시간대를 **Asia/Seoul** 로 — 기본값(UTC)이면 18시 수업이 9시로 기록돼 지각이 안 잡힘 |
-| 결제 위조 | 이용권 연장은 `grant_purchase()`(서비스 키 전용)만 — 앱은 영수증을 서버 함수에 넘길 뿐 |
+| 결제 위조 · 남의 영수증 · 상품 바꿔치기 | 이용권 연장은 `grant_purchase()`(서비스 키 전용)만. 서버 함수가 Google 에 직접 물어 ‘결제 완료 · 이 계정(결제 때 넣은 계정 표시) · 이 상품’을 확인하고, 날수는 서버가 정함. 같은 영수증은 한 번만 |
 
 ## 로컬 시험대 — 진짜 Postgres·PostgREST 로 확인 (개발용)
 ```
@@ -42,6 +62,9 @@ python3 tools/testbed_security.py        # 막혀야 할 일 56가지를 직접 
 python3 tools/e2e_server.py              # 원장 → 학생 가입·출석·문제 → 새 폰 동기화 → 보호자 → 이용권 → 계정 삭제 → 읽음·통계
 python3 tools/e2e_talk.py --server       # 이야기(글·댓글·도움됨·채택·연결 끊김 안내)
 python3 tools/e2e_authmail.py            # 가입 확인 메일 · 비밀번호 재설정 메일을 끝까지
+python3 tools/e2e_admin.py --server      # 원장 운영 도구(학생 수정·연장·연결 풀기·출석 취소·공지 삭제·출석부)
+python3 tools/testbed_functions.py       # 결제 확인·푸시 함수를 진짜 Deno 로 + 가짜 Google(서명 검증·영수증·FCM) — 21가지
+python3 tools/e2e_native.py              # 앱에서 결제 → 복원 → 코드 연결 때 푸시 등록 → 공지 푸시 → 오류 자동 기록 → 로그아웃 때 해제
 ```
 `schema.sql` 을 그대로 깔고 RLS·칸 권한·트리거를 진짜로 돌립니다(예전 파이썬 흉내 서버는 이 규칙을 놓쳐서 없앴습니다 —
 이 시험대로 옮기자마자 ‘학원 밖 이용자 진도 저장 실패’와 ‘30일인 달 보호자 화면 오류’ 두 버그가 바로 드러났습니다).
