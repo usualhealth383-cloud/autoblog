@@ -126,6 +126,7 @@ create table if not exists posts (
   reports   uuid[] not null default '{}',           -- 누가 신고했는지는 API 로 보이지 않는다(report_n 만)
   report_n  int not null default 0,
   comment_n int not null default 0,
+  staff     boolean not null default false,          -- 원장(선생님)이 쓴 글 — 서버가 표시한다
   solved    boolean not null default false,
   deleted   boolean not null default false,
   at        timestamptz not null default now(),
@@ -140,6 +141,7 @@ create table if not exists comments (
   likes   uuid[] not null default '{}',
   reports uuid[] not null default '{}',
   report_n int not null default 0,
+  staff   boolean not null default false,             -- 선생님 답변
   picked  boolean not null default false,
   deleted boolean not null default false,
   at      timestamptz not null default now()
@@ -328,7 +330,8 @@ declare n int;
 begin
   if not is_owner() then new.author := auth.uid(); end if;
   if new.author is null then raise exception '로그인이 필요합니다' using errcode = '42501'; end if;
-  select coalesce(nullif(nick, ''), '익명') into new.nick from profiles where id = new.author;
+  new.staff := is_owner();
+  select coalesce(nullif(nick, ''), case when new.staff then '원장님' else '익명' end) into new.nick from profiles where id = new.author;
   new.nick := coalesce(new.nick, '익명');
   new.likes := '{}'; new.reports := '{}'; new.report_n := 0; new.deleted := false; new.at := now();
   if tg_table_name = 'posts' then
@@ -479,8 +482,8 @@ grant insert (id, role, name, phone, under14, guardian, terms_ver) on profiles t
 grant update (name, phone, nick) on profiles to authenticated;
 
 revoke select, insert, update on posts, comments from anon, authenticated;
-grant select (id, author, nick, board, title, body, attach, likes, report_n, comment_n, solved, deleted, at, edited) on posts to authenticated;
-grant select (id, post_id, author, nick, body, likes, report_n, picked, deleted, at) on comments to authenticated;
+grant select (id, author, nick, board, title, body, attach, likes, report_n, comment_n, staff, solved, deleted, at, edited) on posts to authenticated;
+grant select (id, post_id, author, nick, body, likes, report_n, staff, picked, deleted, at) on comments to authenticated;
 grant insert (board, title, body, attach) on posts to authenticated;
 grant insert (post_id, body) on comments to authenticated;
 grant update (board, title, body, attach, edited, deleted) on posts to authenticated;
@@ -550,6 +553,16 @@ create policy read_comments on comments for select to authenticated using (not d
 create policy write_comments on comments for insert to authenticated
   with check (author = (select auth.uid()) and (select consent_ok()) and exists (select 1 from posts p where p.id = post_id and not p.deleted));
 create policy edit_comments on comments for update to authenticated using (author = (select auth.uid()) and not deleted) with check (author = (select auth.uid()));
+
+-- 닉네임으로 선생님·원장 사칭 금지(진짜 선생님 글에는 서버가 '선생님' 표시를 단다)
+create or replace function private.check_nick() returns trigger language plpgsql security definer set search_path = public as $$
+begin
+  if new.nick is distinct from old.nick and new.nick ~ '(선생|원장|관리자|운영자|admin|teacher)' and not is_owner() then
+    raise exception '선생님·원장·관리자로 보이는 닉네임은 쓸 수 없습니다.' using errcode = 'P0001'; end if;
+  return new;
+end $$;
+drop trigger if exists profiles_nick on profiles;
+create trigger profiles_nick before update of nick on profiles for each row execute function private.check_nick();
 
 -- 학생 코드가 지워지면 그 진도도 지운다
 create or replace function private.drop_progress() returns trigger language plpgsql security definer set search_path = public as $$

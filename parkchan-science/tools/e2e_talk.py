@@ -169,6 +169,25 @@ async def server_mode():
         await pg.click('#talkRetry'); await pg.wait_for_timeout(900)
         assert await pg.locator('.loadfail').count() == 0, '다시 불러오기가 듣지 않는다'
         assert await pg.locator('.netbar').count() == 0, '복구 뒤에도 안내 띠가 남는다'
+        # 원장이 답을 달면: 선생님 표시 · 글쓴이에게 새 댓글 표시(탭 점 → 글을 열면 사라짐)
+        oc = await b.new_context(viewport={'width':390,'height':844}); o = await oc.new_page(); o.on('pageerror', lambda e: errs.append(str(e)))
+        await o.goto(APP); await o.wait_for_timeout(600)
+        await o.click('#goLogin'); await o.fill('#lgEmail','owner@parkchan.kr'); await o.fill('#lgPw','owner-pass'); await o.click('#lgGo'); await o.wait_for_timeout(1000)
+        await o.click('.tab[data-v="talk"]'); await o.wait_for_timeout(700); await o.click('.pcard'); await o.wait_for_timeout(800)
+        await o.fill('#cIn','그래프 넓이 = 힘 × 시간 = 충격량입니다.'); await o.click('#cGo'); await o.wait_for_timeout(900)
+        assert await o.locator('.cm.staffc .staff').count() == 1, '원장 댓글에 선생님 표시가 없다'
+        await pg.reload(); await pg.wait_for_timeout(2200)
+        assert await pg.locator('.tab[data-v="talk"] .tdot').count() == 1, '새 댓글 점이 안 뜬다'
+        await pg.click('.tab[data-v="talk"]'); await pg.wait_for_timeout(800)
+        assert '새 댓글 1' in await pg.locator('.pcard .newc').first.inner_text()
+        await pg.screenshot(path=f'{SC}/t_srv_newc.png')
+        await pg.click('.pcard'); await pg.wait_for_timeout(900)
+        assert await pg.locator('.cm .staff').count() == 1 and '원장님' in await pg.locator('.cm.staffc b').inner_text()
+        assert await pg.locator('.tab .tdot').count() == 0, '글을 열었는데 탭 점이 남는다'
+        await pg.screenshot(path=f'{SC}/t_srv_staff.png', full_page=True)
+        await pg.click('#talkBack'); await pg.wait_for_timeout(800)
+        assert await pg.locator('.pcard .newc').count() == 0 and await pg.locator('.tab .tdot').count() == 0, '읽었는데 새 댓글 표시가 남는다'
+        await oc.close()
 
         assert not errs, errs
         print('SERVER TALK OK'); await b.close()

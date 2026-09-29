@@ -158,6 +158,13 @@ def main():
       SENT.clear(); call('POST', '/functions/v1/push', {'type': 'INSERT', 'table': 'attendance', 'record': {'code': 'PUSH01', 'time': '18:02:11', 'late': True, 'manual': False}}, headers=PH)
       check('출석 → 보호자에게만 "푸시학생 학생 지각 · 18:02"', [m['token'] for m in SENT] == ['tok-par1'] and '푸시학생 학생 지각' in SENT[0]['notification']['title'] and '18:02' in SENT[0]['notification']['body'], SENT)
       check('  └ Firebase 범위로 따로 인증', any('firebase.messaging' in x for x in SCOPES))
+      # 이야기 댓글 → 글쓴이에게만(자기 댓글은 알리지 않음)
+      pid = call('POST', '/rest/v1/posts?select=id', {'board': 'qna', 'title': '충격량 질문', 'body': '넓이가 왜 충격량인가요'}, S1, headers={'Prefer': 'return=representation'})[1][0]['id']
+      SENT.clear(); call('POST', '/functions/v1/push', {'type': 'INSERT', 'table': 'comments', 'record': {'post_id': pid, 'author': 'someone-else', 'body': '힘-시간 그래프의 넓이는 F×Δt 입니다', 'staff': True}}, headers=PH)
+      check('댓글 → 글쓴이 폰에만 · "선생님이 답을 달았어요"', [m['token'] for m in SENT] == ['tok-stu1'] and '선생님이 답을' in SENT[0]['notification']['title'] and SENT[0]['data'].get('post') == pid, SENT)
+      s1_uid = call('GET', '/auth/v1/user', tok=S1)[1]['id']
+      SENT.clear(); call('POST', '/functions/v1/push', {'type': 'INSERT', 'table': 'comments', 'record': {'post_id': pid, 'author': s1_uid, 'body': '고맙습니다'}}, headers=PH)
+      check('  └ 자기 글에 자기가 단 댓글은 알리지 않음', SENT == [], SENT)
   finally:
       for p in procs: p.terminate()
 

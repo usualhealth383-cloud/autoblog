@@ -433,6 +433,11 @@ figure.zoomable{cursor:zoom-in}
 .qsay .acts button.on{color:var(--brand);border-color:var(--brand-line);background:var(--brand-soft)}
 .qsay .acts svg{width:15px;height:15px;stroke:currentColor;stroke-width:2;fill:none;stroke-linecap:round;stroke-linejoin:round}
 .qsay .acts button.on svg{fill:currentColor;stroke:none}
+.staff{display:inline-block;margin-left:5px;font-size:10px;font-weight:900;color:var(--on-color);background:var(--brand);border-radius:5px;padding:1px 6px;vertical-align:1px}
+.cm.staffc{border-left:3px solid var(--brand);padding-left:10px}
+.newc{display:inline-block;font-size:11px;font-weight:900;color:var(--brand-dark);background:var(--brand-soft);border-radius:999px;padding:2px 9px;margin:6px 0 2px}
+.tab{position:relative}
+.tdot{position:absolute;top:6px;left:calc(50% + 8px);width:8px;height:8px;border-radius:50%;background:#C2410C;box-shadow:0 0 0 2px var(--card)}
 .consent{background:var(--brand-soft);border:1px solid var(--brand-line);border-radius:16px;padding:14px 16px;margin:0 0 14px;word-break:keep-all}
 .consent .t{font-size:14px;font-weight:900;color:var(--brand-dark);margin-bottom:3px}
 .consent .d{font-size:12.5px;line-height:1.65;color:var(--body);margin-bottom:10px}
@@ -883,14 +888,14 @@ const DB = (() => {
     post: async id => { const x = (d.posts||[]).find(y => y.id === id && !y.deleted); if (!x) return null;
       return { ...x, comments: (d.comments||[]).filter(c => c.postId === id && !c.deleted).sort((a,b)=>a.at.localeCompare(b.at)) }; },
     addPost: async body => { d.posts ||= []; const a = me();
-      const x = { id: uid(), uid: a ? a.id : '', nick: (a && a.nick) || '익명', cls: (a && a.studentCode) ? (d.students.find(s=>s.code===a.studentCode)||{}).cls || '' : '',
-        at: new Date().toISOString(), likes: [], reports: [], solved: false, deleted: false, ...body };
+      const x = { id: uid(), uid: a ? a.id : '', nick: (a && a.nick) || (a && a.role==='owner' ? '원장님' : '익명'), cls: (a && a.studentCode) ? (d.students.find(s=>s.code===a.studentCode)||{}).cls || '' : '',
+        at: new Date().toISOString(), likes: [], reports: [], solved: false, deleted: false, ...body, staff: !!(a && a.role==='owner') };
       d.posts.unshift(x); w(); return x; },
     editPost: async (id, body) => { const x = (d.posts||[]).find(y=>y.id===id); if (x){ Object.assign(x, body, { edited:new Date().toISOString() }); w(); } return x; },
     delPost: async id => { const x = (d.posts||[]).find(y=>y.id===id); if (x){ x.deleted = true; w(); } },
     addComment: async (postId, text) => { d.comments ||= []; const a = me();
-      const c = { id: uid(), postId, uid: a ? a.id : '', nick: (a && a.nick) || '익명', body: text,
-        at: new Date().toISOString(), likes: [], reports: [], picked: false, deleted: false };
+      const c = { id: uid(), postId, uid: a ? a.id : '', nick: (a && a.nick) || (a && a.role==='owner' ? '원장님' : '익명'), body: text,
+        at: new Date().toISOString(), likes: [], reports: [], picked: false, deleted: false, staff: !!(a && a.role==='owner') };
       d.comments.push(c); w(); return c; },
     delComment: async id => { const c = (d.comments||[]).find(x=>x.id===id); if (c){ c.deleted = true; w(); } },
     pickComment: async (postId, cid) => { (d.comments||[]).filter(c=>c.postId===postId).forEach(c => c.picked = (c.id === cid));
@@ -1063,8 +1068,8 @@ const serverDB = () => {
     reset: () => {},
   };
 };
-const POST_COLS = 'id,author,nick,board,title,body,attach,likes,report_n,comment_n,solved,deleted,at,edited';
-const CM_COLS = 'id,post_id,author,nick,body,likes,report_n,picked,deleted,at';
+const POST_COLS = 'id,author,nick,board,title,body,attach,likes,report_n,comment_n,staff,solved,deleted,at,edited';
+const CM_COLS = 'id,post_id,author,nick,body,likes,report_n,staff,picked,deleted,at';
 const DBX = SRV ? serverDB() : DB;
 
 /* ═══ 계정 · 내 진도 ═══ */
@@ -1075,7 +1080,7 @@ let syncT = null;
 /* 만 14세 미만은 보호자 동의를 확인하기 전까지 진도를 서버에 올리지 않는다(이 기기에만) */
 const consentPending = () => !!(ACC && ACC.under14 && !ACC.guardianOk);
 const progressKey = () => consentPending() ? null : (S.auth && S.auth.code) || (ACC ? 'u:'+ACC.id : null);
-const snapshot = () => ({ start:S.start, done:S.done, wrong:S.wrong, read:S.read, days:S.days, bm:S.bm, stats:S.stats, bh:S.bh||{}, qkeep:S.qkeep||[], blocked:S.blocked||[], sched:S.sched, notifyAt:S.notifyAt, at:new Date().toISOString() });
+const snapshot = () => ({ start:S.start, done:S.done, wrong:S.wrong, read:S.read, days:S.days, bm:S.bm, stats:S.stats, bh:S.bh||{}, qkeep:S.qkeep||[], blocked:S.blocked||[], seenC:S.seenC||{}, sched:S.sched, notifyAt:S.notifyAt, at:new Date().toISOString() });
 const save = s => { try { localStorage.setItem(KEY, JSON.stringify(s)); } catch {}
   const k = progressKey(); if (k){ clearTimeout(syncT); syncT = setTimeout(() => DBX.saveProgress(k, snapshot()).catch(()=>{}), 1000); } };
 const mergeProgress = p => { if (!p) return;
@@ -1090,17 +1095,18 @@ const mergeProgress = p => { if (!p) return;
   S.bh = { ...(p.bh||{}), ...(S.bh||{}) };
   S.qkeep = [...new Set([...(p.qkeep||[]), ...(S.qkeep||[])])];
   S.blocked = [...new Set([...(p.blocked||[]), ...(S.blocked||[])])];
+  { const sc = { ...(p.seenC||{}) }; Object.entries(S.seenC||{}).forEach(([k,v]) => { sc[k] = Math.max(v, sc[k]||0); }); S.seenC = sc; }   // 내 글에서 본 댓글 수 — 큰 쪽
   if (p.sched){ const merge = (a=[], b=[]) => { const m = new Map(); [...a, ...b].forEach(x => m.set(x.id, x)); return [...m.values()]; };
     S.sched = { fixed:merge(p.sched.fixed, S.sched.fixed), events:merge(p.sched.events, S.sched.events), ddays:merge(p.sched.ddays, S.sched.ddays) }; }
   if (p.notifyAt && !S.notifyAt) S.notifyAt = p.notifyAt; };
 /* 새 진도(로그아웃·계정 삭제 뒤) — 화면 설정만 남기고 비운다. 한 기기를 여럿이 쓸 때 진도가 섞이지 않게 */
-const freshS = () => ({ start:todayISO(), done:[], wrong:[], read:[], days:[], bm:[], stats:{a:0,c:0}, bh:{}, qkeep:[], qskip:0, blocked:[],
+const freshS = () => ({ start:todayISO(), done:[], wrong:[], read:[], days:[], bm:[], stats:{a:0,c:0}, bh:{}, qkeep:[], qskip:0, blocked:[], seenC:{},
   sched:{ fixed:[], events:[], ddays:[] }, fs:S.fs||'보통', theme:S.theme||'시스템', notifyAt:S.notifyAt||'18:00', onboarded:true });
 const flushProgress = async () => { clearTimeout(syncT); const k = progressKey(); if (k) try { await DBX.saveProgress(k, snapshot()); } catch {} };
 let S = load();
 if (!S.start){ S.start = todayISO(); }
 S.done ||= []; S.wrong ||= []; S.read ||= []; S.days ||= []; S.bm ||= []; S.stats ||= { a:0, c:0 }; S.bh ||= {};
-S.qkeep ||= []; S.qskip ||= 0; S.blocked ||= [];
+S.qkeep ||= []; S.qskip ||= 0; S.blocked ||= []; S.seenC ||= {};
 S.sched ||= { fixed:[], events:[], ddays:[] };
 S.sched.fixed ||= []; S.sched.events ||= []; S.sched.ddays ||= [];
 S.fs ||= '보통'; S.theme ||= '시스템'; S.notifyAt ??= '18:00';
@@ -1524,6 +1530,10 @@ function piiCheck(text){
 }
 const mine = x => ACC && x.uid === ACC.id;
 const isOwner = () => ACC && ACC.role === 'owner';
+const STAFF = x => x.staff ? '<span class="staff">선생님</span>' : '';
+/* 내 글에 새로 달린 댓글 수(마지막으로 연 뒤) */
+const newC = x => mine(x) ? Math.max(0, (x.comments||0) - ((S.seenC||{})[x.id] ?? 0)) : 0;
+let talkNew = 0;
 const repN = x => x.report_n ?? (x.reports||[]).length;     // 서버는 신고한 사람 목록을 주지 않고 수만 준다
 const shown = x => repN(x) < REPORT_HIDE || mine(x) || isOwner();
 /* 구글 플레이는 사용자 제작 콘텐츠 앱에 '신고'와 함께 '차단'을 요구한다.
@@ -1553,6 +1563,7 @@ async function renderTalk(){
   let list = [], failed = false;
   try { list = await DBX.posts(talkBoard, talkQ); setNet(false); } catch { failed = true; setNet(true); }
   list = list.filter(x => !blocked(x));
+  if (!failed && talkBoard === '전체' && !talkQ){ const n = list.reduce((a,x) => a + newC(x), 0); if (n !== talkNew){ talkNew = n; renderTabs(); document.querySelectorAll('.tab').forEach(t => t.classList.toggle('on', t.dataset.v==='talk')); } }
   v.innerHTML = `<h1 class="h-page">이야기</h1>
     <div class="search"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
       <input id="talkSearch" aria-label="이야기 글 검색" placeholder="글 검색 (예: 충격량, 오답)" value="${esc(talkQ)}"></div>
@@ -1565,7 +1576,8 @@ async function renderTalk(){
         <div class="h"><span class="bd ${x.board}">${BOARDS[x.board]||''}</span>${x.solved?'<span class="ok">해결됨</span>':''}</div>
         <div class="t">${hid ? '신고가 쌓여 가려진 글입니다' : esc(x.title)}</div>
         ${hid ? '' : `<div class="x">${esc(String(x.body||'').replace(/\s+/g,' '))}</div>`}
-        <div class="m"><span>${esc(nickOf(x))}</span><span>${ago(x.at)}</span>
+        ${newC(x) ? `<span class="newc">새 댓글 ${newC(x)}</span>` : ''}
+        <div class="m"><span>${esc(nickOf(x))}${STAFF(x)}</span><span>${ago(x.at)}</span>
           <span><svg viewBox="0 0 24 24"><path d="M20.5 12c0 4-3.8 7.2-8.5 7.2-1 0-2-.15-2.9-.42L4 20.5l1.5-3.6C4.2 15.6 3.5 13.9 3.5 12c0-4 3.8-7.2 8.5-7.2s8.5 3.2 8.5 7.2z"/></svg>${x.comments||0}</span>
           <span><svg viewBox="0 0 24 24"><path d="M12 20.5 4.5 13a4.6 4.6 0 0 1 6.5-6.5l1 1 1-1A4.6 4.6 0 0 1 19.5 13z"/></svg>${(x.likes||[]).length}</span>
           ${at?`<span>· ${esc(at.k)} 첨부</span>`:''}</div></button>`; }).join('')
@@ -1581,11 +1593,13 @@ async function renderPost(){
   if (!x){ v.innerHTML = `<button class="back" id="talkBack"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg>이야기</button><p class="planempty">지워졌거나 없는 글입니다.</p>`; return; }
   const at = attachName(x.attach), liked = ACC && (x.likes||[]).includes(ACC.id), hid = !shown(x);
   const cms = (x.comments||[]).filter(c => !blocked(c));
+  if (mine(x) && (S.seenC||{})[x.id] !== (x.comments||[]).length){ S.seenC = { ...(S.seenC||{}), [x.id]: (x.comments||[]).length }; save(S);
+    if (talkNew){ talkNew = 0; renderTabs(); document.querySelectorAll('.tab').forEach(t => t.classList.toggle('on', t.dataset.v==='talk')); setTimeout(checkTalkNew, 300); } }
   v.innerHTML = `<button class="back" id="talkBack"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg>이야기</button>
     <div class="pfull">
       <div class="meta"><span class="bd ${x.board}" style="font-size:10.5px;font-weight:900;color:var(--on-color);border-radius:5px;padding:2px 7px;background:${x.board==='qna'?'#4053B8':x.board==='share'?'#C1521E':'var(--brand)'}">${BOARDS[x.board]||''}</span>
         ${x.solved?'<span class="ok" style="font-size:10.5px;font-weight:900;color:var(--brand-dark);background:var(--brand-soft);border-radius:5px;padding:2px 7px">해결됨</span>':''}
-        <span>${esc(nickOf(x))}</span><span>${ago(x.at)}</span>${repN(x)?`<span style="color:var(--warn)">신고 ${repN(x)}</span>`:''}</div>
+        <span>${esc(nickOf(x))}${STAFF(x)}</span><span>${ago(x.at)}</span>${repN(x)?`<span style="color:var(--warn)">신고 ${repN(x)}</span>`:''}</div>
       <h2>${hid ? '신고가 쌓여 가려진 글입니다' : esc(x.title)}</h2>
       ${hid ? `<p class="body" style="color:var(--muted)">원장님이 확인할 때까지 다른 학생에게는 보이지 않습니다.</p>` : `<div class="body">${esc(x.body)}</div>`}
       ${at ? `<button class="attachcard" data-openatt="${esc(x.attach.kind)}:${esc(x.attach.id)}">
@@ -1599,7 +1613,7 @@ async function renderPost(){
     </div>
     <div class="sec"><h2>댓글 ${cms.length}</h2>
       ${cms.length ? cms.map(c => { const ch = !shown(c), cl = ACC && (c.likes||[]).includes(ACC.id);
-        return `<div class="cm"><div class="h"><b>${esc(nickOf(c))}</b><span>${ago(c.at)}</span>${c.picked?'<span class="picked">채택</span>':''}${repN(c)?`<span style="color:var(--warn)">신고 ${repN(c)}</span>`:''}</div>
+        return `<div class="cm ${c.staff?'staffc':''}"><div class="h"><b>${esc(nickOf(c))}</b>${STAFF(c)}<span>${ago(c.at)}</span>${c.picked?'<span class="picked">채택</span>':''}${repN(c)?`<span style="color:var(--warn)">신고 ${repN(c)}</span>`:''}</div>
           <div class="body" ${ch?'style="color:var(--muted)"':''}>${ch ? '신고가 쌓여 가려진 댓글입니다.' : esc(c.body)}</div>
           <div class="a"><button data-clike="${esc(c.id)}" class="${cl?'on':''}">도움됨 ${(c.likes||[]).length}</button>
             ${mine(x) && x.board==='qna' && !c.picked ? `<button data-cpick="${esc(c.id)}">채택하기</button>` : ''}
@@ -2298,7 +2312,8 @@ async function initPush(){ const PN = plug('PushNotifications'); if (!isNative |
   try {
     if (!pushWired){ pushWired = true;
       PN.addListener('registration', t => { pushToken = t.value; DBX.registerPush(t.value, 'android').catch(()=>{}); });
-      PN.addListener('pushNotificationActionPerformed', a => { const k = ((a.notification||{}).data||{}).kind; show(k==='sched' ? 'plan' : home()); }); }
+      PN.addListener('pushNotificationActionPerformed', a => { const dd = (a.notification||{}).data||{}, k = dd.kind;
+        if (k==='comment' && dd.post){ postId = dd.post; show('post'); } else show(k==='sched' ? 'plan' : home()); }); }
     let p = await PN.checkPermissions(); if (p.receive === 'prompt' || p.receive === 'prompt-with-rationale') p = await PN.requestPermissions();
     if (p.receive !== 'granted') return;
     try { await PN.createChannel({ id:'academy', name:'학원 알림', description:'공지 · 일정 · 등원', importance:4 }); } catch {}
@@ -2322,7 +2337,9 @@ function tabsFor(){ const r = ACC ? ACC.role : 'guest';
   if (r==='parent') return [['parent','자녀'],['list','교재'],['talk','이야기'],['plan','일정'],['me','내 정보']];
   if (r==='owner') return [['admin','원장'],['today','오늘'],['talk','이야기'],['plan','일정'],['me','내 정보']];
   return [['today','오늘'],['list','교재'],['bank','문제'],['talk','이야기'],['plan','일정'],['me','내 정보']]; }
-function renderTabs(){ document.getElementById('tabs').innerHTML = tabsFor().map(([v,l])=>`<button class="tab ${view===v?'on':''}" data-v="${v}"><svg viewBox="0 0 24 24">${ICON[v]}</svg>${l}</button>`).join(''); }
+function renderTabs(){ document.getElementById('tabs').innerHTML = tabsFor().map(([v,l])=>`<button class="tab ${view===v?'on':''}" data-v="${v}"><svg viewBox="0 0 24 24">${ICON[v]}</svg>${l}${v==='talk'&&talkNew?`<i class="tdot" aria-label="내 글에 새 댓글 ${talkNew}개"></i>`:''}</button>`).join(''); }
+/* 켤 때 한 번: 내 글에 새 댓글이 있으면 이야기 탭에 점 */
+async function checkTalkNew(){ if (!ACC || consentPending()) return; try { const list = await DBX.posts('전체', ''); const n = list.reduce((a,x) => a + newC(x), 0); if (n !== talkNew){ talkNew = n; renderTabs(); const tabOf = view==='post'?'talk':view; document.querySelectorAll('.tab').forEach(t => t.classList.toggle('on', t.dataset.v===tabOf)); } } catch {} }
 let view = 'today';
 function show(v){
   view = v;
@@ -2347,7 +2364,7 @@ async function afterLogin(acc){
   if (acc.role==='student' && acc.studentCode){ try { const r = await DBX.verifyCode(acc.studentCode); if (r.ok) S.auth = { code:acc.studentCode, name:r.student.name, cls:r.student.cls, until:r.student.until }; } catch {} }
   else S.auth = null;
   try { mergeProgress(await DBX.loadProgress(progressKey())); } catch {}
-  save(S); scheduleReminder(); show(home()); initPush();
+  save(S); scheduleReminder(); show(home()); initPush(); checkTalkNew();
 }
 async function linkStudentCode(code){
   const r = await DBX.linkCode('student', code); if (!r.ok) return r;
@@ -2396,12 +2413,13 @@ document.addEventListener('click', async e => {
   const tb = T('[data-tb]'); if (tb){ talkBoard = tb.dataset.tb; renderTalk(); return; }
   const pOpen = T('[data-post]'); if (pOpen){ postId = pOpen.dataset.post; talkErr=''; poiOk = false; show('post'); return; }
   if (T('#postNew')){ if (!ACC){ authMode='start'; show('auth'); return; }
-    if (!ACC.nick){ sheetNick('new'); return; } sheetPost(null); return; }
+    if (!ACC.nick && ACC.role!=='owner'){ sheetNick('new'); return; } sheetPost(null); return; }
   if (T('#nkSave')){
     const nk = (document.getElementById('nkIn').value||'').trim();
     const w = document.getElementById('nkWarn');
     if (nk.length < 2 || nk.length > 12){ w.innerHTML = `<div class="piiwarn">닉네임은 2~12자로 정해 주세요.</div>`; return; }
     if (piiCheck(nk).length){ w.innerHTML = `<div class="piiwarn">닉네임에 연락처나 아이디를 넣지 마세요.</div>`; return; }
+    if (!isOwner() && /선생|원장|관리자|운영자|admin|teacher/i.test(nk)){ w.innerHTML = `<div class="piiwarn">선생님·원장·관리자로 보이는 닉네임은 쓸 수 없습니다. 진짜 선생님 글에는 <b>선생님</b> 표시가 따로 붙습니다.</div>`; return; }
     const nx = T('#nkSave').dataset.next;
     ACC = await DBX.setNick(nk); closeSheet(); toast('닉네임을 정했습니다');
     if (nx === 'new') sheetPost(null); else if (view === 'post') renderPost(); else if (view === 'me') renderMe(); else renderTalk(); return; }
@@ -2428,7 +2446,7 @@ document.addEventListener('click', async e => {
   if (T('#cGo')){
     const el = document.getElementById('cIn'), body = (el.value||'').trim();
     if (!ACC){ authMode='start'; show('auth'); return; }
-    if (!ACC.nick){ sheetNick(''); return; }
+    if (!ACC.nick && ACC.role!=='owner'){ sheetNick(''); return; }
     if (body.length < 2){ talkErr = '댓글을 조금 더 적어 주세요.'; renderPost(); return; }
     const hits = piiCheck(body), hard = hits.find(h => h.hard);
     if (hard){ talkErr = `${hard.label}로 보이는 내용이 있어 올릴 수 없습니다.`; renderPost(); return; }
@@ -2696,7 +2714,7 @@ window.addEventListener('unhandledrejection', e => { const r = e.reason || {}; i
     if (S.auth) S.auth = null;      // 로그아웃 상태에서는 학원 연결도 닫는다
     show(S.onboarded ? 'today' : 'auth');
   }
-  nativeInit(); initPush();
+  nativeInit(); initPush(); setTimeout(checkTalkNew, 1200);
 })();
 if (!isNative && 'serviceWorker' in navigator) window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(()=>{}));
 </script>

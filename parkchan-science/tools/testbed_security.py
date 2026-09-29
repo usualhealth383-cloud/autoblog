@@ -106,6 +106,8 @@ s, j = call('POST', '/rest/v1/posts', {'board': 'qna', 'title': '질문', 'body'
 check('남의 이름(author)으로 글을 못 씀', s in (401, 403), s)
 s, j = call('POST', '/rest/v1/posts?select=id,nick,author', {'board': 'qna', 'title': '질문', 'body': '효소 질문', 'nick': '원장'}, A, 'return=representation')
 check('닉네임을 사칭해도 막힘', s in (401, 403), s)
+s, j = call('POST', '/rest/v1/posts', {'board': 'qna', 'title': '선생님인 척', 'body': '...', 'staff': True}, A); check('학생이 선생님 표시를 달 수 없음', s in (401, 403), s)
+s, _ = call('PATCH', f'/rest/v1/profiles?id=eq.{A_ID}', {'nick': '박찬선생님'}, A); check('닉네임으로 선생님 사칭 불가', s >= 400 and me(A, A_ID)['nick'] != '박찬선생님', s)
 s, j = call('POST', '/rest/v1/posts?select=id,nick,author', {'board': 'qna', 'title': '질문', 'body': '효소 질문'}, A, 'return=representation')
 check('글쓴이·닉네임은 서버가 채움', s == 201 and j[0]['nick'] == '에이' and j[0]['author'] == A_ID, j)
 pid = j[0]['id']
