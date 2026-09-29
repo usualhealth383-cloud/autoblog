@@ -463,6 +463,7 @@ ul.steps li::before{content:counter(s);position:absolute;left:0;top:2px;width:24
 /* 복용 시간표 */
 .sched-row{padding:12px 0;border-bottom:1px solid var(--hairline)}
 .sched-row:last-child{border-bottom:0}
+.prn-undo{display:block;min-height:44px;margin:2px auto 0;padding:0 8px;background:none;border:0;color:var(--muted);font:inherit;font-size:.875rem;text-decoration:underline;text-underline-offset:3px;cursor:pointer}
 .sched-row .nm{display:flex;align-items:center;justify-content:space-between;gap:8px;font-weight:700}
 .times{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
 .times .chip{min-height:44px;padding:0 12px}
@@ -3282,7 +3283,34 @@ function defaultSlots(item){
   if (n === 2) return ['08:00', '19:00'];
   return ['08:00'];
 }
-function schedOf(id, item){ ME.sched = ME.sched || {}; return ME.sched[id] || (item ? defaultSlots(item) : []); }
+function schedOf(id, item){ ME.sched = ME.sched || {}; if (isPrn(id)) return []; return ME.sched[id] || (item ? defaultSlots(item) : []); }
+/* ── 필요할 때만 드시는 약 ──
+   진통제·해열제·제산제처럼 아플 때만 드시는 약은 시간 알람이 맞지 않는다. 대신 «드신 때»를 적고,
+   허가 간격으로 «다음은 몇 시부터»와 하루 상한 대비 «오늘 몇 번»을 보여 드린다 — 겹쳐 드시는 것을 막는 자리.
+   (메디세이프의 「필요 시 복용」은 적기만 한다. 간격·상한을 약마다 계산해 주는 것은 약지도가 앞서는 곳) */
+const isPrn = id => !!(ME.prn || {})[id];
+const hhmm = d => `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
+function prnLog(k){ ME.prnLog = ME.prnLog || {}; k = k || todayKey(); ME.prnLog[k] = ME.prnLog[k] || []; return ME.prnLog[k]; }
+function togglePrn(id){ ME.prn = ME.prn || {}; if (ME.prn[id]) delete ME.prn[id]; else ME.prn[id] = true; saveMe(); rollDay(); armNotifications(); route(); }
+function prnLast(id){
+  let last = null;
+  for (const k of [dayBefore(1), todayKey()]) for (const x of ((ME.prnLog || {})[k] || [])) if (x.id === id) { const d = new Date(k + 'T' + x.t + ':00'); if (!last || d > last) last = d; }
+  return last;
+}
+function prnState(item){
+  const gap = minGapH(item), max = maxPerDay(item), last = prnLast(item.id), now = new Date();
+  const count = ((ME.prnLog || {})[todayKey()] || []).filter(x => x.id === item.id).length;
+  const next = last && gap ? new Date(last.getTime() + gap * 3600000) : null;
+  return { gap, max, last, next, count, early: !!(next && next > now), full: !!(max && count >= max) };
+}
+function prnTook(id){
+  const item = takingItems().find(x => x.id === id); if (!item) return;
+  const st = prnState(item);
+  if (st.early && !confirm(`마지막으로 드신 때가 ${hhmm(st.last)}이에요. 이 약은 ${st.gap}시간은 띄우는 것이 허가 용법이에요.\n\n그래도 지금 드신 것으로 적을까요?`)) return;
+  if (st.full && !confirm(`오늘 벌써 ${st.count}번 드셨어요 — 이 약은 하루 ${st.max}번까지로 안내드려요.\n\n그래도 적을까요?`)) return;
+  prnLog().push({ id, t: hhmm(new Date()) }); saveMe(); toast('드신 시각을 적어 두었어요'); route();
+}
+function prnUndo(id){ const L = prnLog(); for (let i = L.length - 1; i >= 0; i--) if (L[i].id === id) { L.splice(i, 1); break; } saveMe(); route(); }
 function toggleSlot(id, t){ ME.sched = ME.sched || {};
   /* 아직 손대지 않은 약이면 「미리 골라 둔 것」에서 출발한다 — 누르자마자 나머지가 사라지면 놀라신다 */
   const item = takingItems().find(x => x.id === id);
@@ -3304,6 +3332,7 @@ function rollDay(){
   let dirty = false;
   for (const d in ME.taken) if (d < cut) { delete ME.taken[d]; dirty = true; }
   for (const d in ME.days) if (d < cut) { delete ME.days[d]; dirty = true; }
+  for (const d in (ME.prnLog || {})) if (d < cut) { delete ME.prnLog[d]; dirty = true; }
   /* 몇 번인지뿐 아니라 «어느 때»였는지도 적는다 — 아침을 놓치시는지 저녁을 놓치시는지가
      진료에서 실제로 약을 바꾸는 근거가 된다. */
   const slots = {}; let plan = 0;
@@ -3516,13 +3545,15 @@ function careReport(){
   for (const d of taking) for (const t of schedOf(d.id, d)) rows.push({ n: d.name, t, done: taken.includes(d.id + '@' + t) });
   rows.sort((a, b) => a.t.localeCompare(b.t));
   const head = `${now.getMonth() + 1}월 ${now.getDate()}일 오늘 약`;
-  if (!rows.length) return head + '\n아직 시간을 정해 둔 약이 없어요.';
+  const prnTxt = taking.filter(d => isPrn(d.id)).map(d => { const L = prnLog().filter(x => x.id === d.id).map(x => x.t); return L.length ? `${d.name} ${L.length}번 (${L.join(', ')})` : ''; }).filter(Boolean);
+  const prnLine = prnTxt.length ? `\n\n필요할 때 드신 약: ${prnTxt.join(' · ')}` : '';
+  if (!rows.length) return head + (prnLine || '\n아직 시간을 정해 둔 약이 없어요.');
   const done = rows.filter(r => r.done).length;
   const body = rows.map(r => `${r.done ? '✓' : '□'} ${r.t}  ${r.n}`).join('\n');
   const low = lowStock();
   const a = adherence(30);
   return `${head} (${done}/${rows.length} 드셨어요)\n\n${body}` +
-    (a.days ? `\n\n어제까지 30일: 드시기로 한 ${a.days}일 중 ${a.full}일은 빠짐없이 드셨어요` : '') +
+    prnLine + (a.days ? `\n\n어제까지 30일: 드시기로 한 ${a.days}일 중 ${a.full}일은 빠짐없이 드셨어요` : '') +
     (low.length ? `\n\n※ 곧 떨어져요: ${low.map(x => `${x.n} ${x.days}일치`).join(', ')}` : '') +
     `\n\n— 약지도에서 보냄`;
 }
@@ -3539,10 +3570,16 @@ async function sendCare(){
 function stockOf(id){ return (ME.stock || {})[id]; }
 function setStock(id, n){ ME.stock = ME.stock || {}; const v = parseFloat(n); if (!(v > 0)) delete ME.stock[id]; else ME.stock[id] = { left: v, at: todayKey() }; saveMe(); route(); }
 function daysLeft(id){
-  const st = stockOf(id); if (!st) return null;
+  const st = stockOf(id); if (!st || isPrn(id)) return null;   /* 필요할 때만 드시는 약은 날짜로 셀 수 없다 — prnLeft 로 */
   const perDay = Math.max(1, schedOf(id, takingItems().find(x => x.id === id)).length);
   const gone = Math.max(0, Math.round((new Date(todayKey()) - new Date(st.at)) / 86400000)) * perDay;
   return Math.max(0, Math.floor((st.left - gone) / perDay));
+}
+/* 필요할 때만 드시는 약 — 남은 알 수에서 «적어 두신 횟수»를 뺀다(한 번에 한 알로 본다) */
+function prnLeft(id){
+  const st = stockOf(id); if (!st || !isPrn(id)) return null;
+  let used = 0; for (const k in (ME.prnLog || {})) if (k >= st.at) used += ME.prnLog[k].filter(x => x.id === id).length;
+  return Math.max(0, Math.floor(st.left - used));
 }
 function lowStock(){ return takingItems().map(d => ({ n: d.name, days: daysLeft(d.id) })).filter(x => x.days != null && x.days <= 5); }
 
@@ -3630,7 +3667,14 @@ function vSchedule(_, q){
   <p style="margin-top:6px">먹는 약마다 시간을 고르면 오늘 할 일이 체크 목록으로 나오고, 시간이 되면 알려드려요. 약마다 <b>허가 용법대로 시간을 미리 골라</b> 두었으니, 다르시면 눌러서 바꾸시면 돼요.</p>
   ${!taking.length ? `<section class="sec card"><div class="empty"><b>아직 등록한 약이 없어요</b>약 사전에서 약을 찾아 ‘지금 먹는 약으로 등록’을 누르면 여기 나와요.</div><div class="actions"><button class="btn ghost" onclick="go('/drugs')">${I.search} 약 찾기</button></div></section>` : ''}
   ${todays.length ? `<section class="sec"><h2>오늘 <small>${now.getMonth() + 1}월 ${now.getDate()}일 · ${todays.filter(x => x.done).length}/${todays.length} 완료</small></h2><div class="dose-list">${todays.map(x => `<button class="dose-tick ${x.done ? 'done' : (x.min < nowMin - 60 ? 'late' : '')}" onclick="tick('${x.d.id}','${x.t}')"><span class="t">${x.t}</span><span class="n"><b>${esc(x.d.name)}</b><small>${fmt((x.d.simple || '').split('.')[0])}</small></span><span class="bx">${x.done ? I.check : ''}</span></button>`).join('')}</div></section>` : ''}
-  ${taking.length ? `<section class="sec card"><h2>약마다 시간 고르기</h2>${taking.map(d => `<div class="sched-row"><div class="nm"><span>${esc(d.name)}</span>${d.d ? `<a class="link small" href="#/drug/${d.d.id}">복용법 ›</a>` : ''}</div><div class="small muted">${fmt((d.simple || '').split('.')[0])}</div><div class="times">${SLOTS.map(([n, t]) => `<button class="chip ${schedOf(d.id, d).includes(t) ? 'on' : ''}" onclick="toggleSlot('${d.id}','${t}')">${schedOf(d.id, d).includes(t) ? I.check : ''}${n} ${t}</button>`).join('')}</div>${schedWarn(d)}</div>`).join('')}</section>
+  ${taking.filter(d => isPrn(d.id)).length ? `<section class="sec card"><h2>필요할 때 드신 약</h2>
+    <p class="small muted" style="margin-top:4px">아플 때만 드시는 약은 드실 때마다 눌러 적어 두세요. <b>다음은 몇 시부터</b>인지, 오늘 몇 번째인지 알려 드려요.</p>
+    ${taking.filter(d => isPrn(d.id)).map(d => { const st = prnState(d); return `<div class="sched-row prn-row"><div class="nm"><span>${esc(d.name)}</span>${st.count ? `<b class="${st.full ? 'stockwarn' : 'stockok'}">오늘 ${st.count}번${st.max ? ` / ${st.max}번` : ''}</b>` : ''}</div>
+      <div class="small" style="margin-top:4px">${st.last ? `마지막 <b>${hhmm(st.last)}</b>${st.last.getDate() !== new Date().getDate() ? '(어제)' : ''}` : '오늘은 아직 안 드셨어요'}${st.early ? ` · <b>${hhmm(st.next)}부터</b> 다시 드실 수 있어요` : ''}${st.gap ? `<span class="muted"> · ${st.gap}시간 간격${st.max ? `, 하루 ${st.max}번까지` : ''}(허가 용법)</span>` : ''}</div>
+      ${st.full ? `<div class="note" style="margin-top:8px">${I.alert}<span><b>오늘 드실 만큼 드셨어요.</b> 더 아프시면 더 드시기보다 약사·의사와 상의하세요.</span></div>` : ''}
+      <div class="actions" style="margin-top:8px"><button class="btn ${st.early || st.full ? 'ghost' : ''}" onclick="prnTook('${d.id}')">${I.check} 지금 먹었어요</button></div>${st.count ? `<button class="prn-undo" onclick="prnUndo('${d.id}')">잘못 눌렀어요 — 방금 적은 것 지우기</button>` : ''}</div>`; }).join('')}
+  </section>` : ''}
+  ${taking.length ? `<section class="sec card"><h2>약마다 시간 고르기</h2>${taking.map(d => `<div class="sched-row"><div class="nm"><span>${esc(d.name)}</span>${d.d ? `<a class="link small" href="#/drug/${d.d.id}">복용법 ›</a>` : ''}</div><div class="small muted">${fmt((d.simple || '').split('.')[0])}</div><div class="times">${isPrn(d.id) ? '' : SLOTS.map(([n, t]) => `<button class="chip ${schedOf(d.id, d).includes(t) ? 'on' : ''}" onclick="toggleSlot('${d.id}','${t}')">${schedOf(d.id, d).includes(t) ? I.check : ''}${n} ${t}</button>`).join('')}<button class="chip ${isPrn(d.id) ? 'on' : ''}" onclick="togglePrn('${d.id}')" aria-pressed="${isPrn(d.id)}">${isPrn(d.id) ? I.check : ''}필요할 때만</button></div>${isPrn(d.id) ? `<p class="small muted" style="margin-top:6px">시간 알림 없이, 드실 때마다 위의 <b>「필요할 때 드신 약」</b>에 적어요.</p>` : schedWarn(d)}</div>`).join('')}</section>
   ${taking.length ? `<section class="sec card"><h2>보호자에게 오늘 상황 보내기</h2>
     <p class="small" style="margin-top:6px">오늘 무엇을 드셨고 무엇이 남았는지 <b>한 장으로 만들어</b> 드려요. 카카오톡·문자로 보내시면 됩니다. <b>이 앱이 대신 보내지 않습니다</b> — 기록은 이 휴대폰에만 있어요.</p>
     <div class="actions"><button class="btn" onclick="sendCare()">${I.user} 보호자에게 보내기</button></div>
@@ -3638,7 +3682,7 @@ function vSchedule(_, q){
   </section>
   <section class="sec card"><h2>약이 며칠 남았나요</h2>
     <p class="small" style="margin-top:6px">남은 알 수를 넣어 두시면 <b>떨어지기 전에</b> 알려드려요. 주말·연휴 전에 미리 받아 두시라고요.</p>
-    ${taking.map(d => { const dl = daysLeft(d.id); return `<div class="sched-row"><div class="nm"><span>${esc(d.name)}</span>${dl != null ? `<b class="${dl <= 3 ? 'stockwarn' : 'stockok'}">${dl === 0 ? '오늘 떨어져요' : dl + '일치 남음'}</b>` : ''}</div>
+    ${taking.map(d => { const dl = daysLeft(d.id), pl = prnLeft(d.id); return `<div class="sched-row"><div class="nm"><span>${esc(d.name)}</span>${dl != null ? `<b class="${dl <= 3 ? 'stockwarn' : 'stockok'}">${dl === 0 ? '오늘 떨어져요' : dl + '일치 남음'}</b>` : ''}${pl != null ? `<b class="${pl <= 3 ? 'stockwarn' : 'stockok'}">${pl === 0 ? '다 드셨어요' : pl + '번 분 남음'}</b>` : ''}</div>
       <div class="times"><input class="stock" type="number" inputmode="numeric" min="0" step="1" placeholder="남은 알 수" value="${stockOf(d.id) ? esc(String(stockOf(d.id).left)) : ''}" onchange="setStock('${d.id}', this.value)" aria-label="${esc(d.name)} 남은 알 수"></div></div>`; }).join('')}
     ${lowStock().length ? `<div class="note" style="margin-top:10px">${I.alert}<span><b>곧 떨어져요</b> — ${lowStock().map(x => esc(x.n) + ' ' + x.days + '일치').join(' · ')}. 처방약이면 <b>미리 진료를 잡아 두세요.</b></span></div>` : ''}
   </section>` : ''}
