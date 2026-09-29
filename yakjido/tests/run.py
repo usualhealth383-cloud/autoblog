@@ -249,7 +249,7 @@ def main():
             except Exception: fails.append('본문 자료(core.json)를 못 받았습니다 — ' + pg.url)
         pg.goto(url); ready(); pg.wait_for_timeout(1200)
         pg.evaluate("localStorage.setItem('yakjido.hello.v1','1');localStorage.setItem('yakjido.me.v1',JSON.stringify({age:'senior',taking:['cls:bp.arb'],pub:{}}))")
-        routes = pg.evaluate("()=>['/home','/drugs','/tips','/me','/together','/kinds','/kinds/bp','/pill','/supp','/kids','/mix','/hello/1','/hello/3','/photo','/schedule','/about','/bag','/rxout','/senior','/myths','/askdoc','/askdoc?open=gout','/vitals','/visits']" +
+        routes = pg.evaluate("()=>['/home','/drugs','/tips','/me','/together','/kinds','/kinds/bp','/pill','/supp','/kids','/mix','/hello/1','/hello/3','/photo','/schedule','/about','/bag','/rxout','/senior','/myths','/askdoc','/askdoc?open=gout','/vitals','/visits','/me?t=meds','/me?t=set','/drugs?cat=all','/drugs?cat=nsaid','/senior?w=rx','/supp?t=label','/supp?t=stack','/tips?g=5']" +
                              ".concat(D.symptoms.map(s=>'/symptom/'+s.id)).concat(D.drugs.map(d=>'/drug/'+d.id)).concat(D.classes.map(c=>'/class/'+c.id)).concat(D.classes.map(c=>'/drugs?cat='+c.id)).concat((D.myths||[]).map(m=>'/myths?open='+m.id))")
         # 1~3. 모든 화면
         for r in routes:
@@ -355,6 +355,39 @@ def main():
                         asthma:'천식', anticoag:'항응고', glaucoma:'녹내장', bph:'전립선', gout:'통풍', diabetes:'당뇨'};
           return Object.keys(need).filter(k => !txt.includes(need[k]));}""")
         if _fl: fails.append(f'내 정보에서 켤 수 없는 몸 상태가 있습니다: {_fl}')
+        # 5a-10b. ClinicScore 문법(2026-09-29 현욱님) — 내 정보는 탭 셋, 건강 상태는 누르는 단추.
+        #         누르면 그 자리에서 켜지고(맨 위로 튀지 않고) 「켜 둔 것」에 설명이 붙어야 한다.
+        _mt = pg.evaluate("""()=>{
+          ME.bph=false; saveMe(); route();
+          const tabs=[...document.querySelectorAll('.metabs .tab')].map(b=>b.innerText.trim().replace(/\\s*\\d+$/,''));
+          window.scrollTo(0,400); const y=window.scrollY;
+          const chip=[...document.querySelectorAll('.chip-m')].find(b=>b.innerText.includes('전립선비대')); chip.click();
+          const on=ME.bph===true, desc=(document.querySelector('.cond-on')||{}).innerText||'', stay=window.scrollY===y;
+          [...document.querySelectorAll('.chip-m')].find(b=>b.innerText.includes('전립선비대')).click();
+          const off=ME.bph===false && !document.querySelector('.cond-on');
+          return {tabs, on, desc, stay, off, chips:document.querySelectorAll('.chip-m').length};}""")
+        if _mt['tabs'] != ['내 몸', '먹는 약', '설정']: fails.append(f'내 정보 탭이 셋이 아닙니다: {_mt["tabs"]}')
+        if _mt['chips'] != 12 or not _mt['on'] or not _mt['off']: fails.append(f'건강 상태 단추가 켜지고 꺼지지 않습니다: {_mt}')
+        if '소변이 막힐 수' not in _mt['desc']: fails.append('건강 상태를 눌러도 「켜 둔 것」 설명이 안 붙습니다')
+        if not _mt['stay']: fails.append('건강 상태를 누르면 화면이 맨 위로 튑니다')
+        pg.goto(url + '#/me?t=meds'); ready(); pg.wait_for_timeout(300)
+        if not pg.query_selector('#mq') or '복용 시간 알림' not in pg.inner_text('#view'): fails.append('내 정보 「먹는 약」 탭에 약 담기·알림이 없습니다')
+        pg.goto(url + '#/me?t=set'); ready(); pg.wait_for_timeout(300)
+        _st = pg.inner_text('#view')
+        for kw in ('글자 크기', '화면 밝기', '휴대폰을 바꾸실 때', '개인정보처리방침'):
+            if kw not in _st: fails.append(f'내 정보 「설정」 탭에 {kw} 없음')
+        # 홈 — 탭을 누르면 그 묶음만. 전체 = 검수 끝난 증상 전부, 검수 대기는 따로
+        pg.goto(url + '#/home'); ready(); pg.wait_for_timeout(300)
+        _hm = pg.evaluate("""()=>{
+          const n=()=>document.querySelectorAll('#hlist .srow').length, S=D.symptoms||[];
+          const tab=k=>{ const b=[...document.querySelectorAll('.htabs .tab')].find(x=>x.dataset.k===k); b.click(); return n(); };
+          const r={top:tab('top'), pain:tab('g:통증'), all:tab('all'), wait:tab('wait'),
+            wantPain:S.filter(s=>s.group==='통증'&&s.reviewed!==false).length, wantAll:S.filter(s=>s.reviewed!==false).length, wantWait:S.filter(s=>s.reviewed===false).length,
+            oneOn:document.querySelectorAll('.htabs .tab.on').length};
+          tab('top'); return r;}""")
+        if _hm['top'] != 12: fails.append(f'홈 「자주 찾는」이 12가지가 아닙니다: {_hm["top"]}')
+        if _hm['pain'] != _hm['wantPain'] or _hm['all'] != _hm['wantAll'] or _hm['wait'] != _hm['wantWait']: fails.append(f'홈 탭 목록 수가 어긋납니다: {_hm}')
+        if _hm['oneOn'] != 1: fails.append('홈 탭에서 고른 것이 하나가 아닙니다')
         # 5a-11. 화면 밝기 — 휴대폰 설정만 따르지 말고 앱에서도 고를 수 있어야 한다
         _th = pg.evaluate("""()=>{
           const before = themeNow();
@@ -449,7 +482,7 @@ def main():
         if not _n['fired']: fails.append('약 알림이 하나도 만들어지지 않습니다 — 시간이 돼도 안 옵니다')
         # 5b. 어르신 모드(글자 20px·큰 단추) — 넘침·잘림은 큰 글씨에서 먼저 터진다
         pg.evaluate("localStorage.setItem('yakjido.fs','22px');localStorage.setItem('yakjido.me.v1',JSON.stringify({age:'senior',easy:true,taking:['cls:bp.arb','ibuprofen'],pub:{}}))")
-        for r in SC + ['/bag', '/schedule', '/symptom/cramp', '/symptom/sprain', '/drug/acetaminophen', '/kinds/bp', '/vitals', '/visits']:
+        for r in SC + ['/bag', '/schedule', '/symptom/cramp', '/symptom/sprain', '/drug/acetaminophen', '/kinds/bp', '/vitals', '/visits', '/me?t=meds', '/me?t=set']:
             pg.goto(url + '#' + r); pg.reload(); ready(); pg.wait_for_timeout(500)
             o = pg.evaluate(OVERFLOW_JS)
             if o['ov']: fails.append(f'어르신 모드 가로 넘침 {r}: {o["ov"]}')
@@ -457,7 +490,7 @@ def main():
         # 5c. 좁은 화면(320px) × 가장 큰 글씨 — 오래된 안드로이드 폰과 «화면 확대»를 켜신 분의 자리.
         #     낱알 검색칸과 소아 화면 단추가 실제로 화면을 넘고 있었다.
         pg.set_viewport_size({'width': 320, 'height': 640})
-        for r in SC + ['/pill', '/kids', '/kinds', '/bag', '/schedule', '/symptom/fever', '/symptom/motion', '/vitals', '/visits']:
+        for r in SC + ['/pill', '/kids', '/kinds', '/bag', '/schedule', '/symptom/fever', '/symptom/motion', '/vitals', '/visits', '/me?t=meds', '/me?t=set']:
             pg.goto(url + '#' + r); pg.reload(); ready(); pg.wait_for_timeout(420)
             o = pg.evaluate(OVERFLOW_JS)
             if o['ov']: fails.append(f'좁은 화면 가로 넘침 {r}: {o["ov"][:2]}')
