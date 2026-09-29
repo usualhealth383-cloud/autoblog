@@ -1116,28 +1116,48 @@ let syncT = null;
 const consentPending = () => !!(ACC && ACC.under14 && !ACC.guardianOk);
 const progressKey = () => consentPending() ? null : (S.auth && S.auth.code) || (ACC ? 'u:'+ACC.id : null);
 const snapshot = () => ({ start:S.start, done:S.done, wrong:S.wrong, read:S.read, days:S.days, bm:S.bm, stats:S.stats, bh:S.bh||{}, qkeep:S.qkeep||[], blocked:S.blocked||[], seenC:S.seenC||{}, sched:S.sched, notifyAt:S.notifyAt, at:new Date().toISOString() });
+/* 기기 여러 대(폰·태블릿): 저장한 스냅숏 시각(syncAt)을 기억해 두고, 앱으로 돌아올 때 서버가 더 새 것이면 받아 합친다 */
+const saveLocal = () => { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch {} };
+const pushProgress = async k => { const snap = snapshot(); await DBX.saveProgress(k, snap); S.syncAt = snap.at; saveLocal(); };
 const save = s => { try { localStorage.setItem(KEY, JSON.stringify(s)); } catch {}
-  const k = progressKey(); if (k){ clearTimeout(syncT); syncT = setTimeout(() => DBX.saveProgress(k, snapshot()).catch(()=>{}), 1000); } };
+  const k = progressKey(); if (k){ clearTimeout(syncT); syncT = setTimeout(() => pushProgress(k).catch(()=>{}), 1000); } };
+/* 합치기 규칙
+   · 늘기만 하는 것(공부한 개념·학습한 날·읽음·통계·문제 은행 기록): 합집합 · 큰 쪽
+   · 지울 수 있는 것(북마크·보관 글귀·차단·일정·시간표·D-day): 처음 합칠 때만 합집합, 그다음부터는 '더 새 스냅숏'이 이긴다
+     — 한 기기에서 지운 북마크가 다른 기기에서 되살아나지 않게 */
 const mergeProgress = p => { if (!p) return;
+  const first = !S.syncAt, newer = !!(p.at && (!S.syncAt || p.at > S.syncAt));
   if (p.start) S.start = p.start;
   S.done = [...new Set([...(p.done||[]), ...S.done])];
-  const key = w => w.b ? 'b:'+w.b : w.l+':'+w.n; const have = new Set(S.wrong.map(key)); (p.wrong||[]).forEach(w => { if (!have.has(key(w))) S.wrong.push(w); });
+  const key = w => w.b ? 'b:'+w.b : w.l+':'+w.n;
+  if (newer && !first){ const srv = new Map((p.wrong||[]).map(w => [key(w), w])); S.wrong = [...(p.wrong||[]), ...S.wrong.filter(w => !srv.has(key(w)))]; }
+  else { const have = new Set(S.wrong.map(key)); (p.wrong||[]).forEach(w => { if (!have.has(key(w))) S.wrong.push(w); }); }
   S.read = [...new Set([...(p.read||[]), ...(S.read||[])])];
   S.days = [...new Set([...(p.days||[]), ...(S.days||[])])].sort();
-  S.bm = [...new Set([...(p.bm||[]), ...(S.bm||[])])];
+  const pick = (srv, loc) => first ? [...new Set([...(srv||[]), ...(loc||[])])] : newer ? (srv||[]).slice() : (loc||[]);
+  S.bm = pick(p.bm, S.bm);
   /* 통계는 더하지 않는다 — 같은 기록이 기기와 서버에 모두 있어 더하면 켤 때마다 두 배가 된다. 더 많이 푼 쪽을 취한다 */
   if (p.stats && (p.stats.a||0) > (S.stats.a||0)) S.stats = { a:p.stats.a||0, c:p.stats.c||0 };
-  S.bh = { ...(p.bh||{}), ...(S.bh||{}) };
-  S.qkeep = [...new Set([...(p.qkeep||[]), ...(S.qkeep||[])])];
-  S.blocked = [...new Set([...(p.blocked||[]), ...(S.blocked||[])])];
+  S.bh = newer ? { ...(S.bh||{}), ...(p.bh||{}) } : { ...(p.bh||{}), ...(S.bh||{}) };
+  S.qkeep = pick(p.qkeep, S.qkeep);
+  S.blocked = pick(p.blocked, S.blocked);
   { const sc = { ...(p.seenC||{}) }; Object.entries(S.seenC||{}).forEach(([k,v]) => { sc[k] = Math.max(v, sc[k]||0); }); S.seenC = sc; }   // 내 글에서 본 댓글 수 — 큰 쪽
   if (p.sched){ const merge = (a=[], b=[]) => { const m = new Map(); [...a, ...b].forEach(x => m.set(x.id, x)); return [...m.values()]; };
-    S.sched = { fixed:merge(p.sched.fixed, S.sched.fixed), events:merge(p.sched.events, S.sched.events), ddays:merge(p.sched.ddays, S.sched.ddays) }; }
-  if (p.notifyAt && !S.notifyAt) S.notifyAt = p.notifyAt; };
+    if (first) S.sched = { fixed:merge(p.sched.fixed, S.sched.fixed), events:merge(p.sched.events, S.sched.events), ddays:merge(p.sched.ddays, S.sched.ddays) };
+    else if (newer) S.sched = { fixed:(p.sched.fixed||[]).slice(), events:(p.sched.events||[]).slice(), ddays:(p.sched.ddays||[]).slice() }; }
+  if (p.notifyAt && !S.notifyAt) S.notifyAt = p.notifyAt;
+  if (p.at && (!S.syncAt || p.at > S.syncAt)) S.syncAt = p.at; };
+/* 앱으로 돌아왔을 때(다른 기기에서 공부했을 수 있다) — 서버가 더 새 것이면 받아 합치고 지금 화면을 다시 그린다 */
+let lastPull = 0;
+async function pullProgress(){ const k = progressKey(); if (!k || !SRV || Date.now() - lastPull < 8000) return; lastPull = Date.now();
+  try { const p = await DBX.loadProgress(k); if (!p || !p.at || (S.syncAt && p.at <= S.syncAt)) return;
+    mergeProgress(p); saveLocal();
+    if (['today','list','stats','plan','bank','wrong','me'].includes(view) && !document.getElementById('sheetBg')) show(view); } catch {} }
+document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') pullProgress(); });
 /* 새 진도(로그아웃·계정 삭제 뒤) — 화면 설정만 남기고 비운다. 한 기기를 여럿이 쓸 때 진도가 섞이지 않게 */
 const freshS = () => ({ start:todayISO(), done:[], wrong:[], read:[], days:[], bm:[], stats:{a:0,c:0}, bh:{}, qkeep:[], qskip:0, blocked:[], seenC:{},
-  sched:{ fixed:[], events:[], ddays:[] }, fs:S.fs||'보통', theme:S.theme||'시스템', notifyAt:S.notifyAt||'18:00', onboarded:true });
-const flushProgress = async () => { clearTimeout(syncT); const k = progressKey(); if (k) try { await DBX.saveProgress(k, snapshot()); } catch {} };
+  sched:{ fixed:[], events:[], ddays:[] }, syncAt:'', fs:S.fs||'보통', theme:S.theme||'시스템', notifyAt:S.notifyAt||'18:00', onboarded:true });
+const flushProgress = async () => { clearTimeout(syncT); const k = progressKey(); if (k) try { await pushProgress(k); } catch {} };
 let S = load();
 if (!S.start){ S.start = todayISO(); }
 S.done ||= []; S.wrong ||= []; S.read ||= []; S.days ||= []; S.bm ||= []; S.stats ||= { a:0, c:0 }; S.bh ||= {};
@@ -2402,6 +2422,7 @@ async function initPush(){ const PN = plug('PushNotifications'); if (!isNative |
   } catch {} }
 async function dropPush(){ if (!pushToken || !SRV) return; try { await api(`/rest/v1/push_tokens?token=eq.${encodeURIComponent(pushToken)}`, { method:'DELETE' }); } catch {} pushToken = ''; }
 function nativeInit(){ if (!isNative) return; const App = plug('App');
+  App && App.addListener('resume', () => pullProgress());
   App && App.addListener('backButton', () => { if (document.getElementById('sheetBg')) return closeSheet();
     if (document.getElementById('fv')) return document.getElementById('fv').remove();
     if (view==='detail') return show('list'); if (view==='quiz') { qState=null; return show(home()); } if (view==='plans') return show('me'); if (view==='lab' || view==='wrong') return show('bank'); if (view==='bank' && bs){ bs=null; return renderBank(); }
