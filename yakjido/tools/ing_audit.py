@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""성분 읽기 전수 대조 — 식약처 낱알 자료(일반 5,660 · 전문 19,034)의 성분 칸을 앱의 성분 엔진(ingFind)으로 읽어 본다.
+"""성분 읽기 전수 대조 — 식약처 낱알 자료(일반 5,660 · 전문 19,034)와 e약은요(4,766 — 시럽·연고·파스 포함)의 성분 칸을 앱의 성분 엔진(ingFind)으로 읽어 본다.
 
 실제 앱을 브라우저로 열어 «앱이 쓰는 그 함수»로 센다(파이썬으로 흉내 내면 앱과 어긋난다).
   · 제품 기준: 성분을 하나도 못 읽은 제품 수
@@ -20,7 +20,7 @@ JS = """async (files) => {
     const rows = await (await fetch('data/' + f)).json();
     let none = 0, parts = 0, miss = 0; const bad = {};
     for (const p of rows) {
-      const comps = String(p.ingr || '').split(/[|,]/).map(s => s.trim()).filter(Boolean);
+      const comps = (Array.isArray(p.i) ? p.i : String(p.ingr || '').split(/[|,]/)).map(s => String(s).trim()).filter(Boolean);
       if (!comps.length) continue;
       let any = false;
       for (const c of comps) { parts++; if (ingFind(c).length) any = true; else { miss++; bad[c] = (bad[c] || 0) + 1; } }
@@ -33,9 +33,9 @@ JS = """async (files) => {
 
 def main():
     ap = argparse.ArgumentParser(); ap.add_argument('--top', type=int, default=60)
-    ap.add_argument('--rx', action='store_true'); ap.add_argument('--otc', action='store_true'); ap.add_argument('--json')
+    ap.add_argument('--rx', action='store_true'); ap.add_argument('--otc', action='store_true'); ap.add_argument('--easy', action='store_true'); ap.add_argument('--json')
     a = ap.parse_args()
-    files = ['pills-rx.json'] if a.rx else ['pills.json'] if a.otc else ['pills.json', 'pills-rx.json']
+    files = ['pills-rx.json'] if a.rx else ['pills.json'] if a.otc else ['easy-index.json'] if a.easy else ['pills.json', 'pills-rx.json', 'easy-index.json']
     h = functools.partial(http.server.SimpleHTTPRequestHandler, directory=str(DOCS)); h.log_message = lambda *x: None
     srv = socketserver.TCPServer(('127.0.0.1', 0), h); threading.Thread(target=srv.serve_forever, daemon=True).start()
     from playwright.sync_api import sync_playwright

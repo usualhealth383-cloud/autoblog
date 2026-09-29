@@ -377,8 +377,8 @@ def main():
             ['산화마그네슘', ['antacid']], ['수산화마그네슘', ['antacid']], ['마그밀', ['magnesium-lax']],
             ['이부프로펜나트륨', ['ibuprofen']], ['나프록센나트륨', ['naproxen']],
             ['탄산리튬', ['lithium']], ['리시노프릴', ['acei']], ['알프라졸람', ['bzd']], ['은행잎', ['ginkgo']],
-            # 「니코틴산아미드」는 비타민 B3 — 종합비타민 489개가 금연 보조제로 읽히면 안 된다(2026-09-23)
-            ['니코틴산아미드', []], ['니코틴산벤질', []], ['니코틴', ['nicotine']], ['니코틴폴라크리렉스', ['nicotine']],
+            # 「니코틴산아미드」는 비타민 B3 — 종합비타민 489개가 금연 보조제로 읽히면 안 된다(2026-09-23). 비타민으로 읽는 것은 맞다(2026-09-29)
+            ['니코틴산아미드', ['vitamin-b']], ['니코틴산벤질', []], ['니코틴', ['nicotine']], ['니코틴폴라크리렉스', ['nicotine']],
             ['니코틴타르타르산염수화물', ['nicotine']], ['미녹시딜', ['minoxidil']],
             ['살리실산', ['salicylic-acid']], ['브롬페니라민말레산염', ['brompheniramine']], ['d-클로르페니라민말레산염', ['chlorpheniramine']], ['페니라민말레산염', ['pheniramine']], ['살리실산 락트산', ['salicylic-acid']], ['살리실산글리콜', ['glycol-salicylate']], ['클로닉신리시네이트', ['clonixin']], ['돔페리돈', ['domperidone']], ['스코폴리아엑스', ['scopolia']], ['니자티딘', ['nizatidine']], ['폴마콕시브', ['polmacoxib']], ['케토코나졸', ['azole-top']], ['에코나졸질산염', ['azole-top']], ['플루코나졸', ['azole']], ['이트라코나졸고체분산체', ['azole']], ['옥시코돈염산염', ['opioid-strong']], ['트리플루살', ['triflusal']], ['네비보롤염산염', ['betablock']], ['아세틸살리실산', ['aspirin']],
         ])
@@ -484,6 +484,13 @@ def main():
         pg.goto(url + '#/schedule?tick=ibuprofen%4008%3A00'); pg.reload(); ready(); pg.wait_for_timeout(400)
         if 'ibuprofen@08:00' not in pg.evaluate("()=>takenSet()"): fails.append('알림의 「먹었어요」가 복용 체크로 이어지지 않습니다')
         pg.evaluate("localStorage.removeItem('yakjido.me.v1')")
+        # 성분 읽기 전수 — 식약처 2.9만 제품에서 «하나도 못 읽는 제품»이 다시 늘면 잡는다(2026-09-29 기준선)
+        import importlib.util as _iu
+        _sp = _iu.spec_from_file_location('ing_audit', str(ROOT / 'yakjido' / 'tools' / 'ing_audit.py')); _ia = _iu.module_from_spec(_sp); _sp.loader.exec_module(_ia)
+        pg.goto(url + '#/home'); ready(); pg.wait_for_timeout(600)
+        _cov = pg.evaluate(_ia.JS, ['pills.json', 'pills-rx.json', 'easy-index.json'])
+        for _f, _lim in (('pills.json', 150), ('pills-rx.json', 169), ('easy-index.json', 91)):
+            if _cov[_f]['none'] > _lim: fails.append(f'성분을 못 읽는 제품이 늘었습니다 {_f}: {_cov[_f]["none"]} (기준 {_lim}) — {_cov[_f]["bad"][:5]}')
         # 필요할 때만 드시는 약 — 드신 때를 적고, 허가 간격·하루 상한으로 막아 드리는지(2026-09-29)
         pp = br.new_page(viewport={'width': 390, 'height': 844}); perr = []; dlg = []
         pp.on('pageerror', lambda e: perr.append(str(e)))
