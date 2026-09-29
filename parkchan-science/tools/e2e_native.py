@@ -9,6 +9,8 @@ from zoneinfo import ZoneInfo
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import testbed_functions as tf
 from playwright.async_api import async_playwright
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from _ui import signup, NO_INTRO
 SC = sys.argv[sys.argv.index('--shots')+1] if '--shots' in sys.argv[:-1] else '/tmp/e2e_native'; os.makedirs(SC, exist_ok=True)
 GW = tf.GW
 STUB = """
@@ -45,7 +47,7 @@ async def main():
     try:
         async with async_playwright() as p:
             b = await p.chromium.launch(executable_path='/opt/pw-browsers/chromium'); errs = []
-            ctx = await b.new_context(viewport={'width': 400, 'height': 820}); await ctx.add_init_script(STUB); s = await ctx.new_page()
+            ctx = await b.new_context(viewport={'width': 400, 'height': 820}); await ctx.add_init_script(NO_INTRO); await ctx.add_init_script(STUB); s = await ctx.new_page()
             s.on('pageerror', lambda e: errs.append(str(e)) if '시험용' not in str(e) else None)
             s.on('console', lambda m: errs.append(m.text) if m.type == 'error' and 'ERR_' not in m.text and 'status of 4' not in m.text else None)
             s.on('dialog', lambda d: asyncio.ensure_future(d.accept()))
@@ -53,7 +55,7 @@ async def main():
             assert await s.evaluate('isNative') is True
             await s.evaluate('CFG.push = true')
             # 가입(학원 코드 없음) — 이때는 푸시 권한을 묻지 않는다
-            await s.click('#goSignup'); await s.fill('#suName', '앱학생'); await s.fill('#suEmail', 'app@t.kr'); await s.fill('#suPw', '123456'); await s.check('#suAgree'); await s.click('#suGo'); await s.wait_for_timeout(1200)
+            await signup(s, '앱학생', 'app@t.kr')
             assert await s.evaluate('__push.asked') == 0, '학원과 연결도 안 했는데 푸시 권한부터 물음'
             uid = await s.evaluate('ACC.id')
             # ① 스토어 가격 표시 → 1년 이용권 결제

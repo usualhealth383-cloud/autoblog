@@ -3,8 +3,10 @@
 
 전제: docs/parkchan 이 :8765 에, tools/testbed_up.sh 시험대가 :8767 에 떠 있다.   사용: python3 tools/e2e_sync.py
 """
-import asyncio, sys, json, urllib.request as U
+import asyncio, sys, os, json, urllib.request as U
 from playwright.async_api import async_playwright
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from _ui import signup, NO_INTRO
 GW = 'http://127.0.0.1:8767'; ANON = json.loads(U.urlopen(GW + '/__anon').read())['anon']
 APP = f'http://127.0.0.1:8765/index.html?server={GW}&key={ANON}'
 
@@ -14,13 +16,13 @@ async def main():
     async with async_playwright() as p:
         b = await p.chromium.launch(executable_path='/opt/pw-browsers/chromium'); errs = []
         async def device():
-            ctx = await b.new_context(viewport={'width': 400, 'height': 820}); pg = await ctx.new_page()
+            ctx = await b.new_context(viewport={'width': 400, 'height': 820}); await ctx.add_init_script(NO_INTRO); pg = await ctx.new_page()
             pg.on('pageerror', lambda e: errs.append(str(e))); pg.on('dialog', lambda d: asyncio.ensure_future(d.accept()))
             await pg.goto(APP); await pg.wait_for_timeout(600); return pg
         async def resume(pg):   # 앱으로 돌아옴(다른 앱 갔다 옴)
             await pg.evaluate("lastPull = 0; document.dispatchEvent(new Event('visibilitychange'))"); await pg.wait_for_timeout(900)
         A = await device()
-        await A.click('#goSignup'); await A.fill('#suName', '두기기'); await A.fill('#suEmail', 'two@t.kr'); await A.fill('#suPw', '123456'); await A.check('#suAgree'); await A.click('#suGo'); await A.wait_for_timeout(1200)
+        await signup(A, '두기기', 'two@t.kr')
         B = await device()
         await B.click('#goLogin'); await B.fill('#lgEmail', 'two@t.kr'); await B.fill('#lgPw', '123456'); await B.click('#lgGo'); await B.wait_for_timeout(1200)
         # ① A 에서 북마크 → B 로 돌아오면 보인다

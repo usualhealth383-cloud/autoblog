@@ -67,6 +67,7 @@ async def capture():
     async with async_playwright() as p:
         b = await p.chromium.launch(executable_path='/opt/pw-browsers/chromium')
         ctx = await b.new_context(viewport={'width':390,'height':780}, device_scale_factor=2)
+        await ctx.add_init_script("try { if (!localStorage.getItem('pcs.v2')) localStorage.setItem('pcs.v2', JSON.stringify({ introSeen: true })); } catch (e) {}")   # 첫 실행 소개는 건너뛴다
         pg = await ctx.new_page()
         pg.on('dialog', lambda dlg: asyncio.ensure_future(dlg.accept()))
         async def fresh(who='student'):

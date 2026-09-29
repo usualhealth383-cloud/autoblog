@@ -5,6 +5,8 @@
 """
 import asyncio, sys, os
 from playwright.async_api import async_playwright
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from _ui import signup, NO_INTRO
 APP = 'http://127.0.0.1:8765/index.html'
 SC = (sys.argv[sys.argv.index('--shots')+1] if '--shots' in sys.argv[:-1] else (sys.argv[1] if len(sys.argv) > 1 and not sys.argv[1].startswith('-') else '/tmp/e2e_local')); os.makedirs(SC, exist_ok=True)
 
@@ -14,7 +16,7 @@ async def main():
         b = await p.chromium.launch(executable_path='/opt/pw-browsers/chromium')
         errs = []
         async def page():
-            ctx = await b.new_context(viewport={'width': 400, 'height': 820}, device_scale_factor=2)
+            ctx = await b.new_context(viewport={'width': 400, 'height': 820}, device_scale_factor=2); await ctx.add_init_script(NO_INTRO)
             pg = await ctx.new_page()
             pg.on('pageerror', lambda e: errs.append(str(e)))
             pg.on('console', lambda m: errs.append(m.text) if m.type == 'error' and 'ERR_' not in m.text else None)
@@ -38,12 +40,8 @@ async def main():
         await s.fill('#listQ', ''); await s.wait_for_timeout(200)
 
         # ── 학생 회원가입(학원 코드 포함) ──
-        await s.click('.tab[data-v="me"]'); await s.click('#goAuth'); await s.wait_for_timeout(200); await s.click('#goSignup'); await s.wait_for_timeout(200)
-        await s.click('#suGo'); assert '이름' in await txt(s, '.err')
-        await s.fill('#suName', '테스트학생'); await s.fill('#suEmail', 'bad'); await s.fill('#suPw', '123456'); await s.click('#suGo'); assert '이메일' in await txt(s, '.err')
-        await s.fill('#suEmail', 'stu1@test.kr'); await s.fill('#suCode', 'MON123'); await s.click('#suGo'); assert '약관' in await txt(s, '.err')
-        await s.click('[data-legal="terms"]'); await s.wait_for_timeout(200); assert '이용약관' in await txt(s, '.sheet h3'); await s.click('#sheetClose')
-        await s.check('#suAgree'); await shot(s, 'l04_signup'); await s.click('#suGo'); await s.wait_for_timeout(700)
+        await s.click('.tab[data-v="me"]'); await s.click('#goAuth'); await s.wait_for_timeout(200)
+        await signup(s, '테스트학생', 'stu1@test.kr', code='MON123'); await shot(s, 'l04_after_signup')
         assert await s.evaluate('view') == 'today' and await s.evaluate('S.auth && S.auth.cls') == '월목반', '학생 가입+코드 연결 실패'
         assert '테스트학생' in await txt(s, '.hello'); await shot(s, 'l05_student_today')
         # 출석 (로컬 코드) · 문제 · 북마크 · 공유
@@ -76,7 +74,7 @@ async def main():
 
         # ── 보호자: 가입 → 자녀 연결 → 자녀 화면 ──
         ctx, pr = await page()
-        await pr.click('#goSignup'); await pr.click('[data-role="parent"]'); await pr.fill('#suName', '테스트보호자'); await pr.fill('#suEmail', 'par1@test.kr'); await pr.fill('#suPw', '123456'); await pr.check('#suAgree'); await pr.click('#suGo'); await pr.wait_for_timeout(500)
+        await signup(pr, '테스트보호자', 'par1@test.kr', role='parent')
         assert await pr.evaluate('view') == 'parent' and await pr.locator('#childIn').count() == 1
         await pr.fill('#childIn', 'ZZZ000'); await pr.click('#childGo'); await pr.wait_for_timeout(200); assert '등록되지 않은' in await txt(pr, '.err')
         await pr.fill('#childIn', 'MON123'); await pr.click('#childGo'); await pr.wait_for_timeout(500)
@@ -102,7 +100,7 @@ async def main():
         await g.click('#goLogin'); await g.fill('#lgEmail', 'owner@parkchan.kr'); await g.fill('#lgPw', '2580'); await g.click('#lgGo'); await g.wait_for_timeout(500)
         await g.click('[data-adm="settings"]'); await g.wait_for_timeout(300); await g.select_option('#passDays', '90'); await g.click('#passIssue'); await g.wait_for_timeout(300); pcode = await g.evaluate('issuedPass.code')
         await g.click('.tab[data-v="me"]'); await g.wait_for_timeout(200); await g.click('#logout'); await g.wait_for_timeout(300)
-        await g.click('#goSignup'); await g.fill('#suName', '외부학생'); await g.fill('#suEmail', 'out1@test.kr'); await g.fill('#suPw', '123456'); await g.check('#suAgree'); await g.click('#suGo'); await g.wait_for_timeout(500)
+        await signup(g, '외부학생', 'out1@test.kr')
         assert await g.evaluate('fullAccess()') is False
         await g.click('.tab[data-v="me"]'); await g.wait_for_timeout(200); await g.click('#goPlans'); await g.wait_for_timeout(300); await shot(g, 'l15_plans')
         await g.fill('#passIn', 'NOPE00'); await g.click('#passGo'); await g.wait_for_timeout(200); assert '없는' in await txt(g, '.err')

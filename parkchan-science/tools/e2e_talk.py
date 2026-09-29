@@ -5,6 +5,8 @@
 """
 import asyncio, os, sys
 from playwright.async_api import async_playwright
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from _ui import signup, NO_INTRO
 SC = sys.argv[sys.argv.index('--shots')+1] if '--shots' in sys.argv[:-1] else '/tmp/pcs-e2e-talk'
 os.makedirs(SC, exist_ok=True)
 import json as _j, urllib.request as _u
@@ -21,7 +23,7 @@ async def login(pg, who):
 async def main():
     async with async_playwright() as p:
         b = await p.chromium.launch(executable_path='/opt/pw-browsers/chromium')
-        ctx = await b.new_context(viewport={'width':390,'height':844}, device_scale_factor=2); pg = await ctx.new_page()
+        ctx = await b.new_context(viewport={'width':390,'height':844}, device_scale_factor=2); await ctx.add_init_script(NO_INTRO); pg = await ctx.new_page()
         errs = []; pg.on('pageerror', lambda e: errs.append(str(e)))
         pg.on('dialog', lambda d: asyncio.ensure_future(d.accept()))
         await pg.goto('http://127.0.0.1:8765/index.html'); await pg.wait_for_timeout(700)
@@ -69,9 +71,7 @@ async def main():
         # 학생 B(다른 계정)로 댓글 · 도움됨
         await pg.evaluate("['pcs.v2','pcs.local.sid'].forEach(k=>localStorage.removeItem(k))")
         await pg.goto('http://127.0.0.1:8765/index.html'); await pg.wait_for_timeout(700)
-        await pg.click('#goSignup'); await pg.wait_for_timeout(400)
-        await pg.fill('#suName', '김학생'); await pg.fill('#suEmail', 'b@demo.kr'); await pg.fill('#suPw', '123456')
-        await pg.check('#suAgree'); await pg.click('#suGo'); await pg.wait_for_timeout(900)
+        await signup(pg, '김학생', 'b@demo.kr')
         await pg.click('.tab[data-v="talk"]'); await pg.wait_for_timeout(500)
         await pg.click('.pcard'); await pg.wait_for_timeout(500)
         await pg.fill('#cIn', '넓이는 충격량(운동량 변화량), 봉우리 높이는 그 순간 최대 힘이에요.')
@@ -131,14 +131,12 @@ async def server_mode():
 
     async with async_playwright() as p:
         b=await p.chromium.launch(executable_path='/opt/pw-browsers/chromium')
-        ctx=await b.new_context(viewport={'width':390,'height':844}); pg=await ctx.new_page()
+        ctx=await b.new_context(viewport={'width':390,'height':844}); await ctx.add_init_script(NO_INTRO); pg=await ctx.new_page()
         errs=[]; pg.on('pageerror', lambda e: errs.append(str(e)))
         pg.on('dialog', lambda d: asyncio.ensure_future(d.accept()))
         _u.urlopen(_u.Request(GW + '/__reset', method='POST')).read()
         await pg.goto(APP); await pg.wait_for_timeout(800)
-        await pg.click('#goSignup'); await pg.wait_for_timeout(400)
-        await pg.fill('#suName','서버학생'); await pg.fill('#suEmail','s1@demo.kr'); await pg.fill('#suPw','123456')
-        await pg.check('#suAgree'); await pg.click('#suGo'); await pg.wait_for_timeout(1200)
+        await signup(pg, '서버학생', 's1@demo.kr')
         await pg.click('.tab[data-v="talk"]'); await pg.wait_for_timeout(600)
         await pg.click('#postNew'); await pg.wait_for_timeout(400)
         await pg.fill('#nkIn','서버닉'); await pg.click('#nkSave'); await pg.wait_for_timeout(900)
@@ -170,7 +168,7 @@ async def server_mode():
         assert await pg.locator('.loadfail').count() == 0, '다시 불러오기가 듣지 않는다'
         assert await pg.locator('.netbar').count() == 0, '복구 뒤에도 안내 띠가 남는다'
         # 원장이 답을 달면: 선생님 표시 · 글쓴이에게 새 댓글 표시(탭 점 → 글을 열면 사라짐)
-        oc = await b.new_context(viewport={'width':390,'height':844}); o = await oc.new_page(); o.on('pageerror', lambda e: errs.append(str(e)))
+        oc = await b.new_context(viewport={'width':390,'height':844}); await oc.add_init_script(NO_INTRO); o = await oc.new_page(); o.on('pageerror', lambda e: errs.append(str(e)))
         await o.goto(APP); await o.wait_for_timeout(600)
         await o.click('#goLogin'); await o.fill('#lgEmail','owner@parkchan.kr'); await o.fill('#lgPw','owner-pass'); await o.click('#lgGo'); await o.wait_for_timeout(1000)
         await o.click('.tab[data-v="talk"]'); await o.wait_for_timeout(700); await o.click('.pcard'); await o.wait_for_timeout(800)

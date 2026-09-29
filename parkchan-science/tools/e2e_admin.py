@@ -6,6 +6,8 @@
 """
 import asyncio, sys, os, json, datetime as dt, urllib.request as U
 from playwright.async_api import async_playwright
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from _ui import signup, NO_INTRO
 SRV = '--server' in sys.argv
 GW = 'http://127.0.0.1:8767'
 APP = 'http://127.0.0.1:8765/index.html' + (f"?server={GW}&key={json.loads(U.urlopen(GW + '/__anon').read())['anon']}" if SRV else '?server=')
@@ -17,7 +19,7 @@ async def main():
     if SRV: U.urlopen(U.Request(GW + '/__reset', method='POST')).read()
     async with async_playwright() as p:
         b = await p.chromium.launch(executable_path='/opt/pw-browsers/chromium'); errs = []
-        ctx = await b.new_context(viewport={'width': 400, 'height': 820}, accept_downloads=True); o = await ctx.new_page()
+        ctx = await b.new_context(viewport={'width': 400, 'height': 820}, accept_downloads=True); await ctx.add_init_script(NO_INTRO); o = await ctx.new_page()
         o.on('pageerror', lambda e: errs.append(str(e)))
         o.on('console', lambda m: errs.append(m.text) if m.type == 'error' and 'ERR_' not in m.text and 'status of 4' not in m.text else None)
         o.on('dialog', lambda d: asyncio.ensure_future(d.accept()))
@@ -84,7 +86,7 @@ async def main():
         # ⑥ 학생 계정 연결 풀기: 학생 A 가 코드를 쓰고 있으면 B 는 막힘 → 원장이 풀면 B 가 등록
         await logout()
         for em in ('ka@t.kr', 'kb@t.kr'):
-            await o.click('#goSignup'); await o.fill('#suName', em[:2]); await o.fill('#suEmail', em); await o.fill('#suPw', '123456'); await o.fill('#suCode', code); await o.check('#suAgree'); await o.click('#suGo'); await o.wait_for_timeout(1100)
+            await signup(o, em[:2], em, code=code)
             if em == 'kb@t.kr': assert await o.evaluate('S.auth') is None, '같은 코드가 두 번째 계정에도 연결됨'
             await logout()
         await login(*OWNER); await o.click(f'[data-stu="{code}"]'); await o.wait_for_timeout(800)

@@ -6,11 +6,14 @@
 """
 import asyncio, os, sys
 from playwright.async_api import async_playwright
+import os as _os
+sys.path.insert(0, _os.path.dirname(_os.path.abspath(__file__)))
+from _ui import NO_INTRO
 SC = sys.argv[sys.argv.index('--shots')+1] if '--shots' in sys.argv else '/tmp/pcs-e2e-bank'
 os.makedirs(SC, exist_ok=True)
 async def main():
     async with async_playwright() as p:
-        b = await p.chromium.launch(executable_path='/opt/pw-browsers/chromium'); ctx = await b.new_context(viewport={'width':400,'height':820}, device_scale_factor=2); pg = await ctx.new_page()
+        b = await p.chromium.launch(executable_path='/opt/pw-browsers/chromium'); ctx = await b.new_context(viewport={'width':400,'height':820}, device_scale_factor=2); await ctx.add_init_script(NO_INTRO); pg = await ctx.new_page()
         errs=[]; pg.on('pageerror', lambda e: errs.append(str(e))); pg.on('console', lambda m: errs.append(m.text) if m.type=='error' and 'ERR_' not in m.text else None)
         pg.on('dialog', lambda d: asyncio.ensure_future(d.accept()))
         await pg.goto('http://127.0.0.1:8765/index.html'); await pg.wait_for_timeout(600)

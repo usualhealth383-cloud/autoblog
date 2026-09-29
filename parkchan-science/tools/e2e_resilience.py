@@ -5,6 +5,8 @@
 """
 import asyncio, sys, os, json, urllib.request as U
 from playwright.async_api import async_playwright
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from _ui import signup, NO_INTRO
 GW = 'http://127.0.0.1:8767'; ANON = json.loads(U.urlopen(GW + '/__anon').read())['anon']
 APP = f'http://127.0.0.1:8765/index.html?server={GW}&key={ANON}'
 SC = sys.argv[sys.argv.index('--shots')+1] if '--shots' in sys.argv[:-1] else '/tmp/e2e_resilience'; os.makedirs(SC, exist_ok=True)
@@ -14,7 +16,7 @@ async def main():
     U.urlopen(U.Request(GW + '/__reset', method='POST')).read()
     async with async_playwright() as p:
         b = await p.chromium.launch(executable_path='/opt/pw-browsers/chromium'); errs = []
-        ctx = await b.new_context(viewport={'width': 400, 'height': 820}); s = await ctx.new_page()
+        ctx = await b.new_context(viewport={'width': 400, 'height': 820}); await ctx.add_init_script(NO_INTRO); s = await ctx.new_page()
         s.on('pageerror', lambda e: errs.append(str(e)))
         s.on('dialog', lambda d: asyncio.ensure_future(d.accept()))
         await s.goto(APP); await s.wait_for_timeout(700)
@@ -24,7 +26,7 @@ async def main():
         e = await s.locator('.auth .err').inner_text(); assert '인터넷' in e and 'fetch' not in e.lower(), e
         await s.screenshot(path=f'{SC}/r01_offline_login.png'); await ctx.unroute_all()
         # 가입 → 이야기 글 하나
-        await s.click('#goSignup'); await s.fill('#suName', '끊김학생'); await s.fill('#suEmail', 'net@t.kr'); await s.fill('#suPw', '123456'); await s.check('#suAgree'); await s.click('#suGo'); await s.wait_for_timeout(1200)
+        await signup(s, '끊김학생', 'net@t.kr')
         await s.evaluate("DBX.setNick('끊김닉').then(a => ACC = a)"); await s.wait_for_timeout(300)
         await s.evaluate("DBX.addPost({ board:'talk', title:'연결 시험', body:'연결 시험 글입니다' })"); await s.wait_for_timeout(300)
         await s.click('.tab[data-v="talk"]'); await s.wait_for_timeout(700); await s.click('.pcard'); await s.wait_for_timeout(700)

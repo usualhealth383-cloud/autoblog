@@ -5,6 +5,8 @@
 """
 import asyncio, sys, os, json, urllib.request as U
 from playwright.async_api import async_playwright
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from _ui import signup, NO_INTRO
 GW = 'http://127.0.0.1:8767'; ANON = json.loads(U.urlopen(GW + '/__anon').read())['anon']
 APP = f'http://127.0.0.1:8765/index.html?server={GW}&key={ANON}'
 SC = sys.argv[sys.argv.index('--shots')+1] if '--shots' in sys.argv[:-1] else '/tmp/e2e_authmail'; os.makedirs(SC, exist_ok=True)
@@ -20,13 +22,12 @@ async def main():
     try:
         async with async_playwright() as p:
             b = await p.chromium.launch(executable_path='/opt/pw-browsers/chromium'); errs = []
-            ctx = await b.new_context(viewport={'width': 400, 'height': 820}); s = await ctx.new_page()
+            ctx = await b.new_context(viewport={'width': 400, 'height': 820}); await ctx.add_init_script(NO_INTRO); s = await ctx.new_page()
             s.on('pageerror', lambda e: errs.append(str(e)))
             s.on('console', lambda m: errs.append(m.text) if m.type == 'error' and 'ERR_' not in m.text and 'status of 4' not in m.text else None)
             await s.goto(APP); await s.wait_for_timeout(600)
             # 1) 가입 → '메일을 보냈습니다' 안내 → 인증 전 로그인은 한국어로 막힘
-            await s.click('#goSignup'); await s.fill('#suName', '메일학생'); await s.fill('#suEmail', 'mail@test.kr'); await s.fill('#suPw', '123456')
-            await s.fill('#suCode', 'MAIL01'); await s.check('#suAgree'); await s.click('#suGo'); await s.wait_for_timeout(900)
+            await signup(s, '메일학생', 'mail@test.kr', code='MAIL01', welcome=False, wait=900)
             assert await s.evaluate('authMode') == 'login' and '메일' in await s.locator('.auth .info').inner_text(), '가입 확인 안내가 없다'
             assert await s.input_value('#lgEmail') == 'mail@test.kr'; await s.screenshot(path=f'{SC}/m01_mail_sent.png')
             await s.fill('#lgPw', '123456'); await s.click('#lgGo'); await s.wait_for_timeout(600)

@@ -29,6 +29,26 @@ JS = r"""
 }
 """
 
+
+async def walk_onboarding(pg, look):
+    """소개 3장 → 시작 → 가입 1~5단계(만 14세 미만 길: 보호자 칸까지) → 환영. 화면마다 look(이름) 호출"""
+    for i in range(3):
+        await look(f'소개 {i+1}'); await pg.click('#introNext'); await pg.wait_for_timeout(250)
+    await look('시작')
+    await pg.click('#goSignup'); await pg.wait_for_timeout(200); await look('가입1 누구')
+    await pg.click('[data-role="student"]'); await pg.click('#suNext'); await pg.wait_for_timeout(200)
+    await pg.check('input[name=suAge][value="u14"]'); await pg.wait_for_timeout(120); await pg.click('#pvToggle'); await pg.wait_for_timeout(150)
+    await pg.click('#suNext'); await pg.wait_for_timeout(150); await look('가입2 약관(오류)')
+    await pg.check('#agAll'); await pg.wait_for_timeout(150); await look('가입2 약관')
+    await pg.click('#suNext'); await pg.wait_for_timeout(200); await look('가입3 계정')
+    await pg.fill('#suEmail', 'audit@t.kr'); await pg.fill('#suPw', 'abc123'); await pg.click('#suNext'); await pg.wait_for_timeout(200)
+    await pg.fill('#suName', '점검'); await look('가입4 내 정보')
+    await pg.fill('#suGName', '점검보호'); await pg.fill('#suGPhone', '01012341234'); await pg.click('#suNext'); await pg.wait_for_timeout(200); await look('가입5 코드')
+    await pg.click('#suSkipCode'); await pg.wait_for_timeout(900); await look('환영')
+    await pg.click('#welcomeGo'); await pg.wait_for_timeout(700)
+    await pg.click('.tab[data-v="me"]'); await pg.wait_for_timeout(300)
+    pg.on('dialog', lambda d: __import__('asyncio').ensure_future(d.accept())); await pg.click('#logout'); await pg.wait_for_timeout(600)
+
 async def main():
     async with async_playwright() as p:
         b = await p.chromium.launch(executable_path='/opt/pw-browsers/chromium')
@@ -46,9 +66,8 @@ async def main():
             if r['noLang']:  issues.append('html lang 없음')
             print(f"{label:14s} " + ('OK' if not issues else ' · '.join(issues)))
             bad += len(issues)
-        await check('시작')
-        await pg.click('#goSignup'); await pg.wait_for_timeout(400); await check('회원가입')
-        await pg.click('#authBack'); await pg.click('#goLogin'); await pg.wait_for_timeout(300); await check('로그인')
+        await walk_onboarding(pg, check)
+        await pg.click('#goLogin'); await pg.wait_for_timeout(300); await check('로그인')
         await pg.click('[data-demo^="student"]'); await pg.click('#lgGo'); await pg.wait_for_timeout(900); await check('오늘')
         for v, n in [('list','교재'),('bank','문제'),('talk','이야기'),('plan','일정'),('me','내 정보')]:
             await pg.click(f'.tab[data-v="{v}"]'); await pg.wait_for_timeout(500); await check(n)

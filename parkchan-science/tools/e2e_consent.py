@@ -7,6 +7,8 @@
 import asyncio, sys, os, json, re, urllib.request as U
 from urllib.parse import unquote
 from playwright.async_api import async_playwright
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from _ui import signup, NO_INTRO
 GW = 'http://127.0.0.1:8767'; ANON = json.loads(U.urlopen(GW + '/__anon').read())['anon']; SERVICE = json.loads(U.urlopen(GW + '/__anon').read())['service']
 APP = f'http://127.0.0.1:8765/index.html?server={GW}&key={ANON}'
 SC = sys.argv[sys.argv.index('--shots')+1] if '--shots' in sys.argv[:-1] else '/tmp/e2e_consent'; os.makedirs(SC, exist_ok=True)
@@ -18,15 +20,13 @@ async def main():
     async with async_playwright() as p:
         b = await p.chromium.launch(executable_path='/opt/pw-browsers/chromium'); errs = []
         async def page():
-            ctx = await b.new_context(viewport={'width': 400, 'height': 820}); pg = await ctx.new_page()
+            ctx = await b.new_context(viewport={'width': 400, 'height': 820}); await ctx.add_init_script(NO_INTRO); pg = await ctx.new_page()
             pg.on('pageerror', lambda e: errs.append(str(e)))
             pg.on('console', lambda m: errs.append(m.text) if m.type == 'error' and 'ERR_' not in m.text and 'status of 4' not in m.text else None)
             pg.on('dialog', lambda d: asyncio.ensure_future(d.accept())); return ctx, pg
         # ① 아이 가입(만 14세 미만)
         kc, k = await page(); await k.goto(APP); await k.wait_for_timeout(700)
-        await k.click('#goSignup'); await k.fill('#suName', '어린이'); await k.fill('#suEmail', 'kid@t.kr'); await k.fill('#suPw', '123456')
-        await k.select_option('#suAge', 'u14'); await k.wait_for_timeout(200)
-        await k.fill('#suGName', '김보호'); await k.fill('#suGPhone', '010-1111-2222'); await k.check('#suAgree'); await k.click('#suGo'); await k.wait_for_timeout(1200)
+        await signup(k, '어린이', 'kid@t.kr', u14=True, gname='김보호', gphone='010-1111-2222')
         assert await k.evaluate('view') == 'today' and await k.evaluate('consentPending()') is True
         assert await k.locator('#v-today .consent').count() == 1, '홈에 동의 안내가 없다'
         assert await k.locator('#goQuiz').count() == 1, '동의 전에도 오늘의 문제는 풀 수 있어야 한다'
@@ -58,8 +58,7 @@ async def main():
         await k.evaluate('save(S)'); await k.wait_for_timeout(1600); assert len(svc('progress?select=code')) == 1, '동의 뒤 진도가 서버에 안 올라감'
         # ⑤ 원장: 웹 동의 → 확인 문자 → 완료 / 다른 아이는 서면 동의
         k2c, k2 = await page(); await k2.goto(APP); await k2.wait_for_timeout(600)
-        await k2.click('#goSignup'); await k2.fill('#suName', '둘째아이'); await k2.fill('#suEmail', 'kid2@t.kr'); await k2.fill('#suPw', '123456')
-        await k2.select_option('#suAge', 'u14'); await k2.wait_for_timeout(200); await k2.fill('#suGName', '이보호'); await k2.fill('#suGPhone', '01033334444'); await k2.check('#suAgree'); await k2.click('#suGo'); await k2.wait_for_timeout(1100)
+        await signup(k2, '둘째아이', 'kid2@t.kr', u14=True, gname='이보호', gphone='01033334444')
         oc, o = await page(); await o.goto(APP); await o.wait_for_timeout(600)
         await o.click('#goLogin'); await o.fill('#lgEmail', 'owner@parkchan.kr'); await o.fill('#lgPw', 'owner-pass'); await o.click('#lgGo'); await o.wait_for_timeout(1200)
         box = o.locator('#v-admin #consentBox').first; t = await box.inner_text()
@@ -76,8 +75,7 @@ async def main():
         # ⑥ 로컬(시연) 모드: 같은 브라우저에서 동의 페이지가 기기 저장소를 읽고 쓴다
         lc, l = await page(); await l.goto('http://127.0.0.1:8765/index.html?server='); await l.wait_for_timeout(600)
         assert await l.evaluate('DBX.mode') == 'local'
-        await l.click('#goSignup'); await l.fill('#suName', '시연아이'); await l.fill('#suEmail', 'demo-kid@t.kr'); await l.fill('#suPw', '123456')
-        await l.select_option('#suAge', 'u14'); await l.wait_for_timeout(200); await l.fill('#suGName', '박보호'); await l.fill('#suGPhone', '01077778888'); await l.check('#suAgree'); await l.click('#suGo'); await l.wait_for_timeout(900)
+        await signup(l, '시연아이', 'demo-kid@t.kr', u14=True, gname='박보호', gphone='01077778888')
         await l.click('#v-today #consentSend'); await l.wait_for_timeout(500)
         lk = re.search(r'https?://\S+consent\.html\?t=[0-9a-f]{36}', unquote(await l.locator('.sheet a.btn').first.get_attribute('href'))).group(0)
         await l.goto(lk); await l.wait_for_timeout(600); await l.fill('#gName', '박보호'); await l.check('#gAgree'); await l.click('#gGo'); await l.wait_for_timeout(500)

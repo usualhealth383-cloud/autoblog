@@ -5,6 +5,8 @@
 """
 import asyncio, sys, os, urllib.request
 from playwright.async_api import async_playwright
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from _ui import signup, NO_INTRO
 import json as _j, urllib.request as _u
 GW = 'http://127.0.0.1:8767'   # tools/testbed_up.sh — 진짜 Postgres·PostgREST 시험대
 try: ANON = _j.loads(_u.urlopen(GW + '/__anon').read())['anon']
@@ -18,7 +20,7 @@ async def main():
         b = await p.chromium.launch(executable_path='/opt/pw-browsers/chromium')
         errs = []
         async def page():
-            ctx = await b.new_context(viewport={'width': 400, 'height': 820}, device_scale_factor=2)
+            ctx = await b.new_context(viewport={'width': 400, 'height': 820}, device_scale_factor=2); await ctx.add_init_script(NO_INTRO)
             pg = await ctx.new_page()
             pg.on('pageerror', lambda e: errs.append(str(e)))
             pg.on('console', lambda m: errs.append(m.text) if m.type == 'error' and 'ERR_' not in m.text and 'status of 4' not in m.text else None)
@@ -44,7 +46,7 @@ async def main():
 
         # ── 학생: 가입(코드 포함) → 공지·출석 → 문제 → 진도 서버 저장 ──
         sctx, s = await page()
-        await s.click('#goSignup'); await s.fill('#suName', '서버학생'); await s.fill('#suEmail', 'stu@srv.kr'); await s.fill('#suPw', '123456'); await s.fill('#suCode', code); await s.check('#suAgree'); await s.click('#suGo'); await s.wait_for_timeout(1200)
+        await signup(s, '서버학생', 'stu@srv.kr', code=code)
         assert await s.evaluate('view') == 'today' and await s.evaluate('S.auth && S.auth.cls') == '월목반', '학생 가입+코드 연결 실패'
         assert await s.locator('.notice').count() == 1, '공지 배너 없음'
         await s.click('#attOpen'); await s.fill('#attIn', '0000'); await s.click('#attGo'); await s.wait_for_timeout(500); assert '맞지' in await txt(s, '#attErr')
@@ -60,13 +62,13 @@ async def main():
 
         # ── 보호자: 가입 → 자녀 연결 → 출석·공지·진도 보기 ──
         pctx, pr = await page()
-        await pr.click('#goSignup'); await pr.click('[data-role="parent"]'); await pr.fill('#suName', '서버보호자'); await pr.fill('#suEmail', 'par@srv.kr'); await pr.fill('#suPw', '123456'); await pr.fill('#suChild', code); await pr.check('#suAgree'); await pr.click('#suGo'); await pr.wait_for_timeout(1500)
+        await signup(pr, '서버보호자', 'par@srv.kr', role='parent', child=code, wait=1500)
         assert await pr.evaluate('view') == 'parent'; body = await txt(pr, '#v-parent')
         assert '서버학생 학생' in body and '출석' in body and '휴강' in body and '개념 1개' in body, body[:300]; await shot(pr, 's05_parent')
 
         # ── 학원 밖 학생: 이용권 코드 ──
         gctx, g = await page()
-        await g.click('#goSignup'); await g.fill('#suName', '외부'); await g.fill('#suEmail', 'out@srv.kr'); await g.fill('#suPw', '123456'); await g.check('#suAgree'); await g.click('#suGo'); await g.wait_for_timeout(1000)
+        await signup(g, '외부', 'out@srv.kr')
         assert await g.evaluate('fullAccess()') is False
         await g.click('.tab[data-v="me"]'); await g.wait_for_timeout(300); await g.click('#goPlans'); await g.wait_for_timeout(400)
         await g.fill('#passIn', pcode); await g.click('#passGo'); await g.wait_for_timeout(800); assert await g.evaluate('fullAccess()') is True, '이용권 등록 실패'

@@ -8,6 +8,8 @@
 """
 import asyncio, sys, os
 from playwright.async_api import async_playwright
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from _ui import signup, NO_INTRO
 APP = 'http://127.0.0.1:8765/index.html'
 SC = sys.argv[sys.argv.index('--shots')+1] if '--shots' in sys.argv[:-1] else '/tmp/e2e_regress'; os.makedirs(SC, exist_ok=True)
 
@@ -16,7 +18,7 @@ async def main():
     async with async_playwright() as p:
         b = await p.chromium.launch(executable_path='/opt/pw-browsers/chromium')
         errs = []
-        ctx = await b.new_context(viewport={'width': 400, 'height': 820})
+        ctx = await b.new_context(viewport={'width': 400, 'height': 820}); await ctx.add_init_script(NO_INTRO)
         s = await ctx.new_page()
         s.on('pageerror', lambda e: errs.append(str(e)))
         s.on('console', lambda m: errs.append(m.text) if m.type == 'error' and 'ERR_' not in m.text else None)
@@ -40,8 +42,7 @@ async def main():
         # 2) 로그아웃 → 다른 계정: 앞 사람 진도가 섞이지 않는다 · 다시 로그인하면 돌아온다
         await logout()
         assert await s.evaluate('S.done.length') == 0 and await s.evaluate('S.stats.a') == 0, '로그아웃했는데 진도가 남음'
-        await s.click('#goSignup'); await s.fill('#suName', '둘째'); await s.fill('#suEmail', 'second@test.kr'); await s.fill('#suPw', '123456'); await s.check('#suAgree')
-        await s.click('#suGo'); await s.wait_for_timeout(600)
+        await signup(s, '둘째', 'second@test.kr')
         assert await s.evaluate('S.done.length') == 0 and await s.evaluate('S.stats.a') == 0, '다른 계정에 앞 사람 진도가 섞임'
         await logout(); await login('student@demo.kr', '1234')
         assert await s.evaluate('S.done.length') == 1 and await s.evaluate('S.stats.a') == 1, '다시 로그인했는데 진도가 돌아오지 않음'

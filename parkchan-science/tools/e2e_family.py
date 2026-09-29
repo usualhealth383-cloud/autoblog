@@ -6,6 +6,8 @@
 """
 import asyncio, sys, os, json, urllib.request as U
 from playwright.async_api import async_playwright
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from _ui import signup, NO_INTRO
 SRV = '--server' in sys.argv; GW = 'http://127.0.0.1:8767'
 APP = 'http://127.0.0.1:8765/index.html' + (f"?server={GW}&key={json.loads(U.urlopen(GW + '/__anon').read())['anon']}" if SRV else '?server=')
 SC = sys.argv[sys.argv.index('--shots')+1] if '--shots' in sys.argv[:-1] else '/tmp/e2e_family'; os.makedirs(SC, exist_ok=True)
@@ -16,7 +18,7 @@ async def main():
     if SRV: U.urlopen(U.Request(GW + '/__reset', method='POST')).read()
     async with async_playwright() as p:
         b = await p.chromium.launch(executable_path='/opt/pw-browsers/chromium'); errs = []
-        ctx = await b.new_context(viewport={'width': 400, 'height': 820}); pg = await ctx.new_page()
+        ctx = await b.new_context(viewport={'width': 400, 'height': 820}); await ctx.add_init_script(NO_INTRO); pg = await ctx.new_page()
         pg.on('pageerror', lambda e: errs.append(str(e)))
         pg.on('console', lambda m: errs.append(m.text) if m.type == 'error' and 'ERR_' not in m.text and 'status of 4' not in m.text else None)
         pg.on('dialog', lambda d: asyncio.ensure_future(d.accept()))
@@ -35,8 +37,7 @@ async def main():
         await pg.click('#scSend'); await pg.wait_for_timeout(800)
         await logout()
         # 보호자: 형 코드로 가입 → 동생 추가
-        await pg.click('#goSignup'); await pg.click('[data-role="parent"]'); await pg.fill('#suName', '형제보호자'); await pg.fill('#suEmail', 'fam@t.kr'); await pg.fill('#suPw', '123456')
-        await pg.fill('#suChild', codes[0]); await pg.check('#suAgree'); await pg.click('#suGo'); await pg.wait_for_timeout(1400)
+        await signup(pg, '형제보호자', 'fam@t.kr', role='parent', child=codes[0])
         assert await pg.evaluate('view') == 'parent' and '형학생 학생' in await pg.locator('#v-parent').inner_text()
         assert await pg.locator('[data-kid]').count() == 0, '자녀가 하나인데 고르기 칩이 보임'
         await pg.click('#childAdd'); await pg.wait_for_timeout(300)

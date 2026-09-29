@@ -75,7 +75,7 @@ body{background:var(--ground);color:var(--ink);
 .app{width:100%;max-width:440px;background:var(--paper);min-height:100vh;
   display:flex;flex-direction:column;box-shadow:var(--shadow);position:relative}
 .stripe{height:4px;background:var(--brand);flex:0 0 auto}
-main{flex:1;padding:16px 18px 96px;overflow-x:hidden}
+main{flex:1;padding:16px 18px 96px;overflow-x:hidden;overflow-x:clip}   /* clip: 가로 넘침만 자르고, 가입 화면 아래 고정 버튼(sticky)은 살린다 */
 .hide{display:none!important}
 button{font-family:inherit;color:inherit}
 
@@ -342,6 +342,58 @@ select.sel{font-family:inherit;font-size:14px;font-weight:700;color:var(--u);bac
 .auth .lab.grp{margin:2px 0 7px 2px;color:var(--faint);font-weight:700}
 .auth .fld{margin-bottom:11px}
 .auth .fld input{margin:0}
+/* 가입 단계 · 첫 실행 소개 */
+.stepbar{display:flex;align-items:center;gap:10px;margin:0 0 18px;min-height:44px}
+.stepbar .back{margin:0;padding:0 6px 0 0}
+.stepbar .track{flex:1;height:5px;border-radius:99px;background:var(--hair);overflow:hidden}
+.stepbar .track i{display:block;height:100%;background:var(--brand);border-radius:99px;transition:width .3s ease}
+.stepbar .n{font-size:12px;font-weight:800;color:var(--faint);font-variant-numeric:tabular-nums;min-width:34px;text-align:right}
+.auth .grow{flex:1}
+.auth .cta{position:sticky;bottom:0;padding:12px 0 calc(8px + env(safe-area-inset-bottom));background:linear-gradient(to top,var(--paper) 80%,transparent);margin-top:10px}
+.auth .cta .btn{margin:0}
+.auth .cta .btn + .btn{margin-top:8px}
+.auth .btn.dim{opacity:.5}
+.auth h1.q{font-size:24px;line-height:1.35;margin-bottom:6px}
+.agrees{border:1.5px solid var(--line);border-radius:16px;background:var(--card);overflow:hidden;margin-bottom:12px}
+.agrees .all{display:flex;align-items:center;gap:12px;padding:15px 15px;font-size:15.5px;font-weight:900;color:var(--ink);cursor:pointer;min-height:56px;border-bottom:1px solid var(--hair)}
+.agrees .one{display:flex;align-items:center;gap:12px;padding:11px 15px;font-size:14px;color:var(--body);min-height:48px;cursor:pointer}
+.agrees .one + .one{border-top:1px solid var(--hair)}
+.agrees input{width:24px;height:24px;flex:0 0 24px;margin:0;accent-color:var(--brand);cursor:pointer}
+.agrees .req{font-size:11.5px;font-weight:900;color:var(--brand-dark);margin-right:2px}
+.agrees .opt{font-size:11.5px;font-weight:800;color:var(--faint);margin-right:2px}
+.agrees .t{flex:1;min-width:0;word-break:keep-all}
+.auth .see{background:none;border:0;color:var(--muted);font-size:12.5px;font-weight:700;text-decoration:underline;cursor:pointer;min-height:44px;padding:0 2px}
+.pv{margin:0 15px 12px;border:1px solid var(--hair);border-radius:12px;overflow:hidden;font-size:12.5px;line-height:1.6;color:var(--body)}
+.pv table{width:100%;border-collapse:collapse}
+.pv th,.pv td{padding:8px 10px;text-align:left;vertical-align:top;border-bottom:1px solid var(--hair);word-break:keep-all}
+.pv th{width:74px;color:var(--muted);font-weight:800;background:var(--ground)}
+.pv p{margin:0;padding:9px 10px;background:var(--ground)}
+.ages{display:flex;flex-direction:column;gap:8px;margin-bottom:12px}
+.ages label{display:flex;align-items:center;gap:11px;border:1.5px solid var(--line);border-radius:14px;padding:13px 15px;background:var(--card);cursor:pointer;font-size:14.5px;font-weight:800;color:var(--ink);min-height:54px}
+.ages label small{display:block;font-size:12px;font-weight:500;color:var(--muted)}
+.ages label:has(input:checked){border-color:var(--brand);background:var(--brand-soft)}
+.ages input{width:24px;height:24px;flex:0 0 24px;margin:0;accent-color:var(--brand)}
+.pwrow{position:relative}
+.pwrow input{padding-right:64px}
+.pwrow button{position:absolute;right:6px;top:50%;transform:translateY(-50%);background:none;border:0;color:var(--muted);font-size:12.5px;font-weight:800;min-height:40px;min-width:48px;cursor:pointer}
+.rules{display:flex;gap:12px;font-size:12px;color:var(--faint);margin:-2px 0 10px 2px;font-weight:700}
+.rules .ok{color:var(--brand-dark)}
+.intro{min-height:calc(100vh - 4px);display:flex;flex-direction:column;padding:12px 6px calc(20px + env(safe-area-inset-bottom))}
+.intro .skip{align-self:flex-end;background:none;border:0;color:var(--muted);font-size:13.5px;font-weight:700;min-height:44px;padding:0 6px;cursor:pointer}
+.intro .art{flex:1;display:flex;align-items:center;justify-content:center;min-height:220px}
+.intro .art svg{width:100%;max-width:340px;height:auto}
+.intro h1{font-size:26px;line-height:1.35;margin:10px 0 8px}
+.intro p{font-size:15px;line-height:1.8;color:var(--body);margin:0 0 22px;word-break:keep-all}
+.intro .dots{display:flex;gap:7px;justify-content:center;margin:0 0 16px}
+.intro .dots i{width:7px;height:7px;border-radius:99px;background:var(--line);transition:all .25s}
+.intro .dots i.on{width:22px;background:var(--brand)}
+.welcome .big{width:72px;height:72px;border-radius:24px;background:var(--brand-soft);display:grid;place-items:center;margin:26px 0 16px}
+.welcome .next{display:flex;flex-direction:column;gap:9px;margin:4px 0 16px}
+.welcome .next div{display:flex;gap:11px;align-items:flex-start;background:var(--card);border:1px solid var(--hair);border-radius:14px;padding:12px 14px;font-size:14px;color:var(--body);line-height:1.6;word-break:keep-all}
+.welcome .next .no{font-style:normal;flex:0 0 24px;height:24px;border-radius:8px;background:var(--brand);color:var(--on-color);display:grid;place-items:center;font-size:12px;font-weight:900}
+.permcard{border:1.5px solid var(--brand-line);background:var(--brand-soft);border-radius:16px;padding:14px 15px;margin:0 0 6px}
+.permcard .t{font-size:14.5px;font-weight:900;color:var(--brand-dark)}
+.permcard .d{font-size:12.5px;color:var(--body);line-height:1.6;margin:3px 0 10px}
 .auth .demo{border-top:1px solid var(--hair);margin-top:auto;padding-top:14px}
 .auth .demo p{font-size:11.5px;color:var(--faint);text-align:center;margin-bottom:8px}
 .auth .demo .row{display:flex;gap:6px}
@@ -1208,6 +1260,10 @@ function conceptCard(c, opts={}){
 
 /* ═══ 시작 · 로그인 · 회원가입 ═══ */
 let authMode = 'start', authErr = '', authInfo = '', signRole = 'student', pendingCode = '';
+/* 가입 단계 상태 — 화면을 넘겨도 적은 값이 남는다 */
+const SU0 = () => ({ step:1, role:'student', age:'', terms:false, privacy:false, pvOpen:false, email:'', pw:'', showPw:false, name:'', phone:'', gName:'', gPhone:'', code:'', child:'' });
+let SU = SU0(), introIdx = 0, lgShow = false;
+const SU_STEPS = () => SU.role === 'owner' ? 4 : 5;     // 원장은 학원 코드 단계가 없다
 const MARK = `<svg viewBox="0 0 100 100" fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round"><ellipse cx="50" cy="50" rx="38" ry="15" transform="rotate(-30 50 50)"/><circle cx="50" cy="50" r="18" fill="#147D6F"/><circle cx="19" cy="66" r="5" fill="#fff" stroke="none"/><circle cx="82" cy="34" r="5" fill="#fff" stroke="none"/></svg>`;
 const AUTH_HERO = `<svg class="hero" viewBox="0 0 320 116" role="img" aria-label="궤도를 도는 행성 — 자연을 재는 눈">
   <defs>
@@ -1223,6 +1279,30 @@ const AUTH_HERO = `<svg class="hero" viewBox="0 0 320 116" role="img" aria-label
   <circle cx="254" cy="30" r="4.5" fill="var(--brand-dark)"/>
   <g stroke="var(--brand)" opacity=".38" stroke-linecap="round"><path d="M46 100h228" stroke-width="1.4"/><g stroke-width="1.6"><path d="M46 100v-7"/><path d="M84 100v-4"/><path d="M122 100v-7"/><path d="M160 100v-4"/><path d="M198 100v-7"/><path d="M236 100v-4"/><path d="M274 100v-7"/></g></g>
 </svg>`;
+const INTRO = [
+  { t:'하루 한 개념,<br>5분이면 됩니다', d:'박찬 과학 강의 교재를 그대로 옮겼습니다. 매일 개념 하나를 읽고, 빈칸을 채우고, 문제 하나를 풉니다.', art:() => AUTH_HERO.replace('class="hero"', '') },
+  { t:'시험 날까지<br>이어지는 연습', d:`문제 은행 ${BANK.length.toLocaleString()}문항. 틀린 문제는 3일 뒤 다시 나오고, 시험 일정에 범위를 걸면 그 범위 문제로 바로 갑니다.`,
+    art:() => `<svg viewBox="0 0 320 200" role="img" aria-label="문제 카드와 정답률 막대"><rect width="320" height="200" rx="22" fill="var(--brand-soft)"/>
+      <g transform="rotate(-7 118 104)"><rect x="46" y="44" width="150" height="110" rx="14" fill="var(--card)" stroke="var(--brand-line)"/></g>
+      <rect x="62" y="40" width="150" height="116" rx="14" fill="var(--card)" stroke="var(--brand-line)" stroke-width="1.5"/>
+      <rect x="78" y="58" width="80" height="9" rx="4.5" fill="var(--brand)" opacity=".85"/><rect x="78" y="75" width="112" height="7" rx="3.5" fill="var(--line)"/>
+      ${[0,1,2].map(i=>`<rect x="78" y="${94+i*18}" width="112" height="13" rx="6.5" fill="${i===1?'var(--brand-soft)':'var(--ground)'}" stroke="${i===1?'var(--brand)':'var(--hair)'}"/><circle cx="87" cy="${100.5+i*18}" r="3.2" fill="${i===1?'var(--brand)':'var(--line)'}"/>`).join('')}
+      <path d="M170 113l5 5 9-10" fill="none" stroke="var(--brand)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+      ${[42,64,53,80].map((h,i)=>`<rect x="${230+i*18}" y="${150-h}" width="11" height="${h}" rx="4" fill="var(--brand)" opacity="${.45+i*.15}"/>`).join('')}
+      <path d="M224 152h76" stroke="var(--brand-line)" stroke-width="2" stroke-linecap="round"/></svg>` },
+  { t:'학원과<br>한 앱에서', d:'출석은 입구 화면의 30초 코드로, 공지는 바로 받고, 보호자는 자녀의 출석과 공부를 함께 봅니다.',
+    art:() => `<svg viewBox="0 0 320 200" role="img" aria-label="학원 건물과 알림"><rect width="320" height="200" rx="22" fill="var(--brand-soft)"/>
+      <path d="M70 150V92l62-38 62 38v58" fill="var(--card)" stroke="var(--brand)" stroke-width="3" stroke-linejoin="round"/>
+      <rect x="116" y="112" width="32" height="38" rx="5" fill="var(--brand-soft)" stroke="var(--brand)" stroke-width="2.5"/>
+      <rect x="86" y="100" width="18" height="16" rx="3" fill="var(--brand-soft)" stroke="var(--brand-line)" stroke-width="2"/><rect x="160" y="100" width="18" height="16" rx="3" fill="var(--brand-soft)" stroke="var(--brand-line)" stroke-width="2"/>
+      <path d="M52 150h160" stroke="var(--brand-line)" stroke-width="3" stroke-linecap="round"/>
+      <rect x="206" y="44" width="92" height="46" rx="14" fill="var(--card)" stroke="var(--brand-line)" stroke-width="1.5"/>
+      <circle cx="226" cy="67" r="9" fill="var(--brand)"/><path d="M222 67l3 3 6-6" fill="none" stroke="var(--on-color)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+      <rect x="242" y="59" width="44" height="6" rx="3" fill="var(--brand)" opacity=".8"/><rect x="242" y="70" width="32" height="5" rx="2.5" fill="var(--line)"/>
+      <rect x="214" y="104" width="84" height="40" rx="14" fill="var(--card)" stroke="var(--brand-line)" stroke-width="1.5"/>
+      <path d="M232 131c0-6 3-11 7-11s7 5 7 11" fill="none" stroke="var(--brand)" stroke-width="2.4" stroke-linecap="round"/><circle cx="239" cy="116" r="4" fill="var(--brand)"/>
+      <rect x="254" y="116" width="34" height="6" rx="3" fill="var(--brand)" opacity=".7"/><rect x="254" y="127" width="24" height="5" rx="2.5" fill="var(--line)"/></svg>` },
+];
 const ROLE_IC = {
   student:'<path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v15H6.5A2.5 2.5 0 0 0 4 20.5z"/><path d="M20 18v3H6.5"/>',
   parent:'<circle cx="9" cy="7.5" r="3.5"/><path d="M2.5 20c0-3.3 2.9-5.5 6.5-5.5s6.5 2.2 6.5 5.5"/><path d="M17 14.8c2.6.6 4.5 2.4 4.5 5.2"/><circle cx="17.5" cy="8.5" r="2.6"/>',
@@ -1261,7 +1341,7 @@ function renderAuth(){
         <div class="fld"><label class="lab" for="lgEmail">이메일</label>
           <input id="lgEmail" type="email" placeholder="name@example.com" autocomplete="username" inputmode="email"${val('lgEmail')}></div>
         <div class="fld"><label class="lab" for="lgPw">비밀번호</label>
-          <input id="lgPw" type="password" placeholder="비밀번호" autocomplete="current-password"${val('lgPw')}></div>
+          <div class="pwrow"><input id="lgPw" type="${lgShow?'text':'password'}" placeholder="비밀번호" autocomplete="current-password"${val('lgPw')}><button id="lgEye" type="button" aria-pressed="${lgShow}">${lgShow?'숨기기':'보기'}</button></div></div>
       </div>${err}
       <button class="btn" id="lgGo">로그인</button>
       <div class="links"><button id="goForgot">비밀번호를 잊었어요</button><button id="goSignup">회원가입</button></div>
@@ -1270,41 +1350,83 @@ function renderAuth(){
         <button data-demo="parent@demo.kr|1234">보호자</button>
         <button data-demo="owner@parkchan.kr|2580">원장</button></div></div>` : ''}
     </div>`;
-  if (authMode==='signup') v.innerHTML = `
-    <div class="auth">
-      <button class="back" id="authBack"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg>처음으로</button>
-      <h1>회원가입</h1>
-      <p class="lead">누구로 쓰시나요?</p>
-      <div class="roles">
-        ${[['student','학생','매일 한 개념 · 문제 은행 · 출석'],['parent','보호자','자녀의 출석·진도·공지 보기'],['owner','원장·선생님','수강생 코드·출석·공지 관리']].map(([r,l,d])=>`<button data-role="${r}" class="${signRole===r?'on':''}"><span class="ri"><svg viewBox="0 0 24 24">${ROLE_IC[r]}</svg></span><span class="rt">${l}<small>${d}</small></span></button>`).join('')}
-      </div>
-      <div class="f">
-        <div class="fld"><label class="lab" for="suName">이름${signRole==='parent'?' (보호자 성함)':''}</label>
-          <input id="suName" placeholder="${signRole==='parent'?'보호자 성함':'실명'}" autocomplete="name"${val('suName')}></div>
-        <div class="fld"><label class="lab" for="suEmail">이메일</label>
-          <input id="suEmail" type="email" placeholder="name@example.com" autocomplete="username" inputmode="email"${val('suEmail')}></div>
-        <div class="fld"><label class="lab" for="suPw">비밀번호</label>
-          <input id="suPw" type="password" placeholder="6자 이상" autocomplete="new-password"${val('suPw')}></div>
-      </div>
-      <span class="lab grp">선택 — 나중에 내 정보에서도 넣을 수 있어요</span>
-      <div class="f">
-        <div class="fld"><label class="lab" for="suPhone">연락처</label>
-          <input id="suPhone" placeholder="공지 문자를 받습니다" inputmode="tel" autocomplete="tel"${val('suPhone')}></div>
-        ${signRole==='student' ? `<div class="fld"><label class="lab" for="suCode">학원 코드 (있으면)</label>
-          <input id="suCode" class="code-in" placeholder="6자리" maxlength="6" autocapitalize="characters" autocomplete="off" ${val('suCode')}></div>
-        <div class="fld"><label class="lab" for="suAge">나이</label>
-        <select id="suAge"><option value="14+" ${K.suAge!=='u14'?'selected':''}>만 14세 이상입니다</option><option value="u14" ${K.suAge==='u14'?'selected':''}>만 14세 미만입니다 (보호자 동의 필요)</option></select></div>
-        ${K.suAge==='u14' ? `<div class="fld"><label class="lab" for="suGName">보호자 성명</label><input id="suGName"${val('suGName')}></div>
-        <div class="fld"><label class="lab" for="suGPhone">보호자 연락처</label><input id="suGPhone" inputmode="tel"${val('suGPhone')}></div>` : ''}` : ''}
-        ${signRole==='parent' ? `<div class="fld"><label class="lab" for="suChild">자녀의 학원 코드 (있으면)</label>
-          <input id="suChild" class="code-in" placeholder="6자리" maxlength="6" autocapitalize="characters" autocomplete="off" ${val('suChild')}></div>` : ''}
-      </div>
-      <label class="agree"><input type="checkbox" id="suAgree"${agree?' checked':''}><span><u data-legal="terms">이용약관</u>과 <u data-legal="privacy">개인정보처리방침</u>에 동의합니다.${K.suAge==='u14'?' 보호자로서 아동의 가입과 개인정보 처리에 동의합니다.':''}</span></label>
-      ${err}
-      <button class="btn" id="suGo">가입하고 시작</button>
-      <div class="links"><button id="goLogin">이미 계정이 있어요</button></div>
-      ${signRole==='owner' ? `<p class="fine">원장 계정은 학원 관리 권한이 필요합니다. 서버 모드에서는 등록된 원장 이메일만 관리 화면이 열립니다.</p>` : ''}
-    </div>`;
+  if (authMode==='intro'){ const it = INTRO[introIdx], last = introIdx === INTRO.length-1;
+    v.innerHTML = `<div class="intro" aria-roledescription="소개">
+      ${last ? `<span class="skip" aria-hidden="true"></span>` : `<button class="skip" id="introSkip">건너뛰기</button>`}
+      <div class="art">${it.art()}</div>
+      <h1>${it.t}</h1><p>${it.d}</p>
+      <div class="dots" aria-label="${introIdx+1} / ${INTRO.length}">${INTRO.map((_,i)=>`<i class="${i===introIdx?'on':''}"></i>`).join('')}</div>
+      <button class="btn" id="introNext">${last?'시작하기':'다음'}</button></div>`; return; }
+  if (authMode==='signup'){
+    const N = SU_STEPS(), st = Math.min(SU.step, N), bar = `<div class="stepbar"><button class="back" id="suPrev" aria-label="이전"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg>${st===1?'처음으로':'이전'}</button>
+      <span class="track" role="progressbar" aria-valuemin="1" aria-valuemax="${N}" aria-valuenow="${st}"><i style="width:${Math.round(st/N*100)}%"></i></span><span class="n">${st} / ${N}</span></div>`;
+    const kid = SU.role==='student' && SU.age==='u14', who = SU.role==='parent' ? '보호자' : SU.role==='owner' ? '원장·선생님' : '학생';
+    const sv = k => ` value="${esc(SU[k]||'')}"`;
+    let body = '', cta = '';
+    if (st === 1){
+      body = `<h1 class="q">누구로 쓰시나요?</h1><p class="lead">고르신 대로 첫 화면이 달라집니다. 나중에 바꿀 수 없으니 맞게 골라 주세요.</p>
+        <div class="roles">${[['student','학생','매일 한 개념 · 문제 은행 · 출석'],['parent','보호자','자녀의 출석·진도·공지 보기'],['owner','원장·선생님','수강생 코드·출석·공지 관리']].map(([r,l,d])=>`<button data-role="${r}" class="${SU.role===r?'on':''}"><span class="ri"><svg viewBox="0 0 24 24">${ROLE_IC[r]}</svg></span><span class="rt">${l}<small>${d}</small></span></button>`).join('')}</div>
+        ${SU.role==='owner' ? `<p class="fine" style="text-align:left;padding:0">원장 화면은 학원에 등록된 원장 이메일로 가입해야 열립니다.</p>` : ''}`;
+      cta = `<button class="btn" id="suNext">다음</button>`;
+    }
+    if (st === 2){
+      const allOn = SU.terms && SU.privacy && (SU.role!=='student' || SU.age);
+      body = `<h1 class="q">약관에 동의해 주세요</h1><p class="lead">꼭 필요한 것만 받습니다. 광고·마케팅에는 쓰지 않습니다.</p>
+        ${SU.role==='student' ? `<span class="lab grp">나이 <span style="color:var(--brand-dark)">(필수)</span></span><div class="ages" role="radiogroup" aria-label="나이">
+          <label><input type="radio" name="suAge" value="14+" ${SU.age==='14+'?'checked':''}><span>만 14세 이상입니다</span></label>
+          <label><input type="radio" name="suAge" value="u14" ${SU.age==='u14'?'checked':''}><span>만 14세 미만입니다<small>보호자 동의가 필요합니다 — 가입한 뒤 보호자에게 링크를 보냅니다</small></span></label></div>` : ''}
+        <div class="agrees">
+          <label class="all"><input type="checkbox" id="agAll" ${allOn?'checked':''}><span class="t">모두 동의합니다</span></label>
+          <label class="one"><input type="checkbox" id="agTerms" ${SU.terms?'checked':''}><span class="t"><span class="req">[필수]</span> 이용약관</span><button class="see" data-legal="terms" type="button">보기</button></label>
+          <label class="one"><input type="checkbox" id="agPrivacy" ${SU.privacy?'checked':''}><span class="t"><span class="req">[필수]</span> 개인정보 수집·이용</span><button class="see" id="pvToggle" type="button" aria-expanded="${SU.pvOpen}">${SU.pvOpen?'접기':'보기'}</button></label>
+          ${SU.pvOpen ? `<div class="pv"><table>
+            <tr><th>목적</th><td>회원 식별과 로그인, 학습 기록 저장, 학원 출석·공지 연결, 문의 응대</td></tr>
+            <tr><th>항목</th><td>이메일, 비밀번호(암호화), 이름, 역할 · 선택: 연락처${kid?' · 보호자 성함·연락처(동의 확인용)':''}</td></tr>
+            <tr><th>보유 기간</th><td>회원 탈퇴 시 바로 파기. 법으로 정한 기록(결제 5년 등)은 그 기간만</td></tr></table>
+            <p>동의하지 않을 권리가 있습니다. 다만 위 필수 항목에 동의하지 않으면 가입할 수 없고, <b>가입 없이 둘러보기</b>(최근 7일치)는 그대로 쓸 수 있습니다.</p></div>` : ''}
+        </div>
+        <p class="fine" style="text-align:left;padding:0"><button class="see" data-legal="privacy" type="button" style="padding:0">개인정보처리방침 전문</button></p>`;
+      cta = `<button class="btn ${allOn?'':'dim'}" id="suNext">동의하고 다음</button>`;
+    }
+    if (st === 3){
+      const pw = SU.pw||'', r1 = pw.length >= 6, r2 = /[0-9]/.test(pw) && /[a-zA-Z가-힣]/.test(pw);
+      body = `<h1 class="q">로그인할 계정을 만들어요</h1><p class="lead">이메일은 비밀번호를 잊었을 때 재설정 메일을 받는 데에도 씁니다.</p>
+        <div class="fld"><label class="lab" for="suEmail">이메일</label><input id="suEmail" type="email" inputmode="email" autocomplete="username" placeholder="name@example.com"${sv('email')}></div>
+        <div class="fld"><label class="lab" for="suPw">비밀번호</label><div class="pwrow"><input id="suPw" type="${SU.showPw?'text':'password'}" autocomplete="new-password" placeholder="6자 이상"${sv('pw')}><button id="pwEye" type="button" aria-pressed="${SU.showPw}">${SU.showPw?'숨기기':'보기'}</button></div></div>
+        <div class="rules" aria-live="polite"><span class="${r1?'ok':''}">${r1?'✓':'·'} 6자 이상</span><span class="${r2?'ok':''}">${r2?'✓':'·'} 글자와 숫자 섞기(권장)</span></div>`;
+      cta = `<button class="btn" id="suNext">다음</button>`;
+    }
+    if (st === 4){
+      body = `<h1 class="q">${SU.role==='parent'?'보호자님 성함을 알려 주세요':'이름을 알려 주세요'}</h1><p class="lead">${SU.role==='student'?'학원 명단과 맞춰 보는 데 씁니다. 이야기(커뮤니티)에는 이름 대신 닉네임이 보입니다.':'학원에서 알아볼 수 있게 실명을 적어 주세요.'}</p>
+        <div class="fld"><label class="lab" for="suName">${SU.role==='parent'?'보호자 성함':'이름'}</label><input id="suName" autocomplete="name" placeholder="${SU.role==='parent'?'보호자 성함':'실명'}"${sv('name')}></div>
+        <div class="fld"><label class="lab" for="suPhone">연락처 <span style="color:var(--faint);font-weight:700">(선택)</span></label><input id="suPhone" inputmode="tel" autocomplete="tel" placeholder="학원 공지 문자를 받습니다"${sv('phone')}></div>
+        ${kid ? `<span class="lab grp" style="margin-top:6px">보호자 정보 <span style="color:var(--brand-dark)">(필수 · 만 14세 미만)</span></span>
+          <div class="fld"><label class="lab" for="suGName">보호자 성함</label><input id="suGName"${sv('gName')}></div>
+          <div class="fld"><label class="lab" for="suGPhone">보호자 휴대전화</label><input id="suGPhone" inputmode="tel" placeholder="동의 요청 링크를 이 번호로 보냅니다"${sv('gPhone')}></div>` : ''}`;
+      cta = `<button class="btn" id="${SU.role==='owner'?'suGo':'suNext'}">${SU.role==='owner'?'가입하기':'다음'}</button>`;
+    }
+    if (st === 5){
+      const isP = SU.role==='parent', k = isP ? 'child' : 'code';
+      body = `<h1 class="q">${isP?'자녀의 학원 코드가 있나요?':'학원 코드가 있나요?'}</h1><p class="lead">${isP?'자녀가 받은 6자리 코드를 넣으면 출석·진도·공지를 바로 볼 수 있습니다.':`${esc(CFG.academy)} 수강생은 원장님께 받은 6자리 코드를 넣으면 전 범위가 무료로 열리고, 출석과 반 공지가 연결됩니다.`}</p>
+        <div class="fld"><label class="lab" for="${isP?'suChild':'suCode'}">${isP?'자녀 코드':'학원 코드'}</label><input id="${isP?'suChild':'suCode'}" class="code-in" maxlength="6" autocapitalize="characters" autocomplete="off" placeholder="6자리"${sv(k)}></div>
+        <p class="fine" style="text-align:left;padding:0">없어도 괜찮습니다. 나중에 <b>내 정보</b>에서 넣을 수 있어요.</p>
+        ${DBX.mode==='local' ? `<div class="demo" style="margin-top:14px"><p>시연용 코드 — <code>MON123</code> · <code>TUE456</code> · <code>WED789</code></p></div>` : ''}`;
+      cta = `<button class="btn" id="suGo">가입하기</button><button class="btn ghost" id="suSkipCode">코드 없이 가입하기</button>`;
+    }
+    v.innerHTML = `<div class="auth">${bar}<div class="grow">${body}${err}</div><div class="cta">${cta}</div></div>`;
+    return;
+  }
+  if (authMode==='welcome'){ const r = ACC ? ACC.role : 'student', nm = ACC ? esc(ACC.name) : '';
+    const steps = r==='parent' ? ['자녀 화면에서 오늘 출석과 이번 달 기록을 봅니다', '학원 공지와 시험 일정이 자녀별로 들어옵니다', '자녀가 둘이면 <b>자녀 한 명 더 연결</b>로 함께 봅니다']
+      : r==='owner' ? ['<b>학생</b>에서 수강생을 등록하고 코드를 보냅니다(엑셀 붙여 넣기 가능)', '수업 전 <b>출석</b>에서 30초 코드를 띄웁니다', '<b>공지</b>·<b>일정</b>은 반별로 보내면 학생·보호자에게 바로 갑니다']
+      : ['홈의 <b>오늘의 개념</b>을 읽고 문제 하나를 풀어 보세요', '틀린 문제는 오답 노트에 담겨 3일 뒤 다시 나옵니다', '시험 날짜는 <b>일정</b>에 D-day로 넣어 두세요'];
+    const LN = plug('LocalNotifications');
+    v.innerHTML = `<div class="auth welcome"><div class="grow">
+      <div class="big"><svg width="38" height="38" viewBox="0 0 24 24" fill="none" stroke="var(--brand)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 12.5l5 5L19.5 7"/></svg></div>
+      <h1 class="q">${nm}님, 준비됐어요</h1><p class="lead">${r==='owner'?'학원 운영은 세 가지면 됩니다.':'이렇게 시작해 보세요.'}</p>
+      <div class="next">${steps.map((t,i)=>`<div><i class="no">${i+1}</i><span>${t}</span></div>`).join('')}</div>
+      ${isNative && LN && r!=='owner' ? `<div class="permcard"><div class="t">매일 공부 알림 받기</div><div class="d">정한 시각에 "오늘의 개념"을 알려 드립니다. 시각은 내 정보에서 바꿀 수 있어요.</div><button class="btn soft" id="welcomeNotify" style="margin:0">알림 받기</button></div>` : ''}
+      </div><div class="cta"><button class="btn" id="welcomeGo">시작하기</button></div></div>`; return; }
   if (authMode==='forgot') v.innerHTML = `
     <div class="auth">
       <button class="back" id="authBack"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg>로그인으로</button>
@@ -1342,6 +1464,19 @@ async function sendConsent(){
   openSheet(`<h3>보호자에게 보내기</h3><p>가입할 때 적은 보호자 연락처${ph?` <b>${esc(ph)}</b>`:''}로 문자를 보냅니다. 보호자가 링크에서 동의하면 바로 열립니다.</p>
     ${ph ? `<a class="btn" href="sms:${ph}${/iphone|ipad/i.test(navigator.userAgent)?'&':'?'}body=${encodeURIComponent(body)}" style="text-decoration:none">문자 앱으로 보내기</a>` : ''}
     <button class="btn soft" id="consentCopy" data-t="${esc(body)}">링크 복사 · 카카오톡으로 보내기</button><button class="btn ghost" id="sheetClose">닫기</button>`); }
+
+/* 가입 단계: 지금 화면의 입력을 SU 에 담고, 넘어가기 전에 확인한다 */
+function suKeep(){ const g = id => document.getElementById(id);
+  [['suEmail','email'],['suPw','pw'],['suName','name'],['suPhone','phone'],['suGName','gName'],['suGPhone','gPhone'],['suCode','code'],['suChild','child']].forEach(([id,k]) => { if (g(id)) SU[k] = g(id).value; });
+  const age = document.querySelector('input[name=suAge]:checked'); if (age) SU.age = age.value;
+  if (g('agTerms')) SU.terms = g('agTerms').checked; if (g('agPrivacy')) SU.privacy = g('agPrivacy').checked; }
+function suCheck(final){ const st = SU.step, phoneOk = t => String(t||'').replace(/[^0-9]/g,'').length >= 9;
+  if (st >= 2 || final){ if (SU.role==='student' && !SU.age && (st===2 || final)) return '나이를 골라 주세요.'; if ((st===2 || final) && !(SU.terms && SU.privacy)) return '필수 약관에 동의해 주세요.'; }
+  if (st === 3 || final){ if (!validEmail(SU.email.trim())) return '이메일 형식을 확인해 주세요.'; if (SU.pw.length < 6) return '비밀번호는 6자 이상이어야 합니다.'; }
+  if (st === 4 || final){ if (!SU.name.trim()) return SU.role==='parent' ? '보호자 성함을 적어 주세요.' : '이름을 적어 주세요.';
+    if (SU.phone.trim() && !phoneOk(SU.phone)) return '연락처를 확인해 주세요.';
+    if (SU.role==='student' && SU.age==='u14' && (!SU.gName.trim() || !phoneOk(SU.gPhone))) return '만 14세 미만은 보호자 성함과 휴대전화가 필요합니다.'; }
+  return ''; }
 
 /* ═══ 오늘(학생·게스트 홈) ═══ */
 let unreadNotice = null, myAtt = null;
@@ -2401,11 +2536,12 @@ function openLegal(k){ const L = LEGAL[k]; if (!L) return; openSheet(`<h3>${L.t}
 function applyBar(){ const Bar = plug('StatusBar'); if (!Bar) return;
   const dark = document.documentElement.dataset.theme==='dark' || (!document.documentElement.dataset.theme && matchMedia('(prefers-color-scheme: dark)').matches);
   try { Bar.setStyle({ style: dark ? 'DARK' : 'LIGHT' }); Bar.setBackgroundColor({ color: dark ? '#14191B' : '#FAF8F4' }); } catch {} }
-async function scheduleReminder(){ const LN = plug('LocalNotifications'); if (!LN) return;
-  try { await LN.cancel({ notifications: [{ id: 1 }] }); if (!S.notifyAt || S.notifyAt==='안 받음') return;
-    let p = await LN.checkPermissions(); if (p.display !== 'granted') p = await LN.requestPermissions(); if (p.display !== 'granted') return;
+/* 매일 알림: 앱을 켤 때는 권한을 묻지 않는다(첫 화면에 권한 창 금지). 사용자가 켜겠다고 할 때(ask)만 묻는다 */
+async function scheduleReminder(ask){ const LN = plug('LocalNotifications'); if (!LN) return false;
+  try { await LN.cancel({ notifications: [{ id: 1 }] }); if (!S.notifyAt || S.notifyAt==='안 받음') return false;
+    let p = await LN.checkPermissions(); if (p.display !== 'granted' && ask) p = await LN.requestPermissions(); if (p.display !== 'granted') return false;
     const [h, m] = S.notifyAt.split(':').map(Number);
-    await LN.schedule({ notifications: [{ id: 1, title: `${CFG.academy} · 오늘의 개념`, body: '하루 1개념 1문제 — 3분이면 됩니다.', schedule: { on: { hour: h, minute: m }, allowWhileIdle: true } }] }); } catch {} }
+    await LN.schedule({ notifications: [{ id: 1, title: `${CFG.academy} · 오늘의 개념`, body: '하루 1개념 1문제 — 3분이면 됩니다.', schedule: { on: { hour: h, minute: m }, allowWhileIdle: true } }] }); return true; } catch { return false; } }
 /* 푸시 알림(공지·일정·등원) — 첫 화면에서 묻지 않고, 학원과 연결된 뒤에만 묻는다. 로그아웃하면 이 기기 등록을 지운다 */
 let pushToken = '', pushWired = false;
 async function initPush(){ const PN = plug('PushNotifications'); if (!isNative || !CFG.push || !SRV || !PN || !ACC) return;
@@ -2424,6 +2560,9 @@ async function dropPush(){ if (!pushToken || !SRV) return; try { await api(`/res
 function nativeInit(){ if (!isNative) return; const App = plug('App');
   App && App.addListener('resume', () => pullProgress());
   App && App.addListener('backButton', () => { if (document.getElementById('sheetBg')) return closeSheet();
+    if (view==='auth' && authMode==='signup'){ document.getElementById('suPrev')?.click(); return; }
+    if (view==='auth' && ['login','forgot'].includes(authMode)){ document.getElementById('authBack')?.click(); return; }
+    if (view==='auth' && authMode==='intro' && introIdx > 0){ introIdx--; renderAuth(); return; }
     if (document.getElementById('fv')) return document.getElementById('fv').remove();
     if (view==='detail') return show('list'); if (view==='quiz') { qState=null; return show(home()); } if (view==='plans') return show('me'); if (view==='lab' || view==='wrong') return show('bank'); if (view==='bank' && bs){ bs=null; return renderBank(); }
     if (view!==home() && view!=='auth') return show(home()); App.exitApp(); });
@@ -2626,37 +2765,42 @@ document.addEventListener('click', async e => {
   const dm = T('[data-demo]');
   if (dm){ const [em,pw] = dm.dataset.demo.split('|'); document.getElementById('lgEmail').value = em; document.getElementById('lgPw').value = pw; document.getElementById('lgGo').focus(); return; }
   if (T('#goLogin')){ authMode='login'; authErr=''; renderAuth(); window.scrollTo(0,0); return; }
-  if (T('#goSignup')){ authMode='signup'; authErr=''; renderAuth(); window.scrollTo(0,0); return; }
+  if (T('#goSignup')){ authMode='signup'; authErr=''; SU = SU0(); renderAuth(); window.scrollTo(0,0); return; }
+  if (T('#introNext')){ if (introIdx < INTRO.length-1){ introIdx++; renderAuth(); return; } S.introSeen = true; save(S); authMode='start'; renderAuth(); window.scrollTo(0,0); return; }
+  if (T('#introSkip')){ S.introSeen = true; save(S); authMode='start'; renderAuth(); window.scrollTo(0,0); return; }
+  if (T('#suPrev')){ suKeep(); authErr=''; if (SU.step <= 1){ authMode='start'; } else SU.step--; renderAuth(); window.scrollTo(0,0); return; }
+  if (T('#lgEye')){ lgShow = !lgShow; renderAuth(); document.getElementById('lgPw')?.focus(); return; }
+  if (T('#pwEye')){ suKeep(); SU.showPw = !SU.showPw; renderAuth(); document.getElementById('suPw')?.focus(); return; }
+  if (T('#pvToggle')){ e.preventDefault(); SU.pvOpen = !SU.pvOpen; renderAuth(); return; }
+  if (T('#suNext')){ suKeep(); const why = suCheck(); if (why){ authErr = why; renderAuth(); return; } authErr=''; SU.step++; renderAuth(); window.scrollTo(0,0); setTimeout(() => document.querySelector('.auth .grow input:not([type=radio]):not([type=checkbox])')?.focus(), 60); return; }
+  if (T('#suSkipCode')){ suKeep(); SU.code = ''; SU.child = ''; document.getElementById(SU.role==='parent'?'suChild':'suCode') && (document.getElementById(SU.role==='parent'?'suChild':'suCode').value = ''); }
+  if (T('#welcomeNotify')){ S.notifyAt = S.notifyAt && S.notifyAt!=='안 받음' ? S.notifyAt : '18:00'; save(S); const ok = await scheduleReminder(true); toast(ok ? `매일 ${S.notifyAt}에 알려 드립니다` : '알림이 꺼져 있습니다. 휴대폰 설정에서 켤 수 있어요'); const b = T('#welcomeNotify'); if (b){ b.textContent = ok ? '✓ 알림을 켰습니다' : '알림 꺼짐'; b.disabled = true; } return; }
+  if (T('#welcomeGo')){ await afterLogin(ACC); return; }
   if (T('#goForgot')){ authMode='forgot'; authErr=''; renderAuth(); window.scrollTo(0,0); return; }
   if (T('#authBack')){ authMode = authMode==='forgot' ? 'login' : 'start'; authErr=''; renderAuth(); return; }
   if (T('#goGuest')){ S.onboarded=true; save(S); show('today'); return; }
   if (T('#goAuth')){ authMode='start'; authErr=''; show('auth'); return; }
-  const rb = T('[data-role]'); if (rb){ signRole = rb.dataset.role; renderAuth(); return; }
+  const rb = T('[data-role]'); if (rb){ SU.role = signRole = rb.dataset.role; if (SU.role!=='student') SU.age = ''; renderAuth(); return; }
   if (T('#lgGo')){
     const em=(document.getElementById('lgEmail').value||'').trim(), pw=document.getElementById('lgPw').value||'';
     if (!validEmail(em) || !pw){ authErr='이메일과 비밀번호를 확인해 주세요.'; renderAuth(); return; }
     try { authInfo=''; const acc = await DBX.signIn(em, pw); S.onboarded=true; toast(`${acc.name||'회원'}님, 반갑습니다`); await afterLogin(acc); } catch (err){ authErr = err.message; renderAuth(); }
     return;
   }
-  if (T('#suGo')){
-    const g = id => (document.getElementById(id)||{}).value||'';
-    const name=g('suName').trim(), em=g('suEmail').trim(), pw=g('suPw'), phone=g('suPhone').trim(), code=g('suCode').trim().toUpperCase(), child=g('suChild').trim().toUpperCase();
-    const u14 = g('suAge')==='u14', gName=g('suGName').trim(), gPhone=g('suGPhone').trim();
-    if (u14 && (!gName || !gPhone)){ authErr='만 14세 미만은 보호자 성명과 연락처가 필요합니다.'; renderAuth(); return; }
-    if (!name){ authErr='이름을 넣어 주세요.'; renderAuth(); return; }
-    if (!validEmail(em)){ authErr='이메일 형식을 확인해 주세요.'; renderAuth(); return; }
-    if (pw.length<6){ authErr='비밀번호는 6자 이상이어야 합니다.'; renderAuth(); return; }
-    if (!document.getElementById('suAgree').checked){ authErr='약관에 동의해 주세요.'; renderAuth(); return; }
+  if (T('#suGo') || T('#suSkipCode')){
+    suKeep(); const why = suCheck(true); if (why){ authErr = why; renderAuth(); return; }
+    const u14 = SU.role==='student' && SU.age==='u14', code = SU.code.trim().toUpperCase(), child = SU.child.trim().toUpperCase();
+    const btn = T('#suGo') || T('#suSkipCode'); if (btn){ btn.disabled = true; btn.textContent = '가입하는 중…'; }
     try {
-      let acc = await DBX.signUp({ email:em, password:pw, name, role:signRole, phone, under14:u14, guardian: u14 ? `${gName} ${gPhone}` : '' });
-      ACC = acc; S.onboarded=true;
-      if (signRole==='student' && code){ const r = await linkStudentCode(code); if (!r.ok) toast(r.why); }
-      if (signRole==='parent' && child){ const r = await DBX.linkCode('child', child); if (r.ok) ACC = await DBX.me(); else toast(r.why); }
-      if (signRole==='owner' && ACC.role!=='owner') toast('원장 화면은 학원에 등록된 원장 이메일로만 열립니다');
-      toast('가입되었습니다'); await afterLogin(ACC);
-    } catch (err){ if (err.mailSent){ if (code || child) try { localStorage.setItem('pcs.pendingLink', JSON.stringify({ kind: signRole==='parent'?'child':'student', code: signRole==='parent'?child:code })); } catch {}
-      authMode='login'; authErr=''; authInfo=err.message; const em=g('suEmail'); renderAuth(); window.scrollTo(0,0); const el=document.getElementById('lgEmail'); if (el) el.value=em; return; }
-      authErr = err.message; renderAuth(); }
+      let acc = await DBX.signUp({ email:SU.email.trim(), password:SU.pw, name:SU.name.trim(), role:SU.role, phone:SU.phone.trim(), under14:u14, guardian: u14 ? `${SU.gName.trim()} ${SU.gPhone.trim()}` : '' });
+      ACC = acc; S.onboarded = true; S.introSeen = true;
+      if (SU.role==='student' && code){ const r = await linkStudentCode(code); if (!r.ok) toast(r.why); }
+      if (SU.role==='parent' && child){ const r = await DBX.linkCode('child', child); if (r.ok) ACC = await DBX.me(); else toast(r.why); }
+      if (SU.role==='owner' && ACC.role!=='owner') toast('원장 화면은 학원에 등록된 원장 이메일로만 열립니다');
+      save(S); SU = SU0(); authMode='welcome'; authErr=''; renderAuth(); window.scrollTo(0,0);
+    } catch (err){ if (err.mailSent){ if (code || child) try { localStorage.setItem('pcs.pendingLink', JSON.stringify({ kind: SU.role==='parent'?'child':'student', code: SU.role==='parent'?child:code })); } catch {}
+      const em = SU.email; SU = SU0(); authMode='login'; authErr=''; authInfo=err.message; renderAuth(); window.scrollTo(0,0); const el=document.getElementById('lgEmail'); if (el) el.value=em; return; }
+      authErr = err.message; if (/이미 가입/.test(err.message)){ SU.step = 3; } renderAuth(); }
     return;
   }
   if (T('#fgGo')){ const em=(document.getElementById('fgEmail').value||'').trim(); if (!validEmail(em)){ authErr='이메일 형식을 확인해 주세요.'; renderAuth(); return; }
@@ -2816,11 +2960,18 @@ document.addEventListener('click', async e => {
   if (T('#passIssue')){ issuedPass = await DBX.issuePass(+document.getElementById('passDays').value); renderAdmin(); return; }
 });
 document.addEventListener('input', e => {
+  /* 가입 단계: 고치기 시작하면 앞의 오류 문구는 거둔다 */
+  if (/^su/.test(e.target.id) && authErr){ authErr = ''; document.querySelector('.auth .err')?.remove(); }
+  if (e.target.id==='suPw'){ SU.pw = e.target.value; const pw = SU.pw, r1 = pw.length >= 6, r2 = /[0-9]/.test(pw) && /[a-zA-Z가-힣]/.test(pw), el = document.querySelector('.rules');
+    if (el) el.innerHTML = `<span class="${r1?'ok':''}">${r1?'✓':'·'} 6자 이상</span><span class="${r2?'ok':''}">${r2?'✓':'·'} 글자와 숫자 섞기(권장)</span>`; return; }
   if (e.target.id==='talkSearch'){ talkQ = e.target.value; const el=e.target; renderTalk().then(()=>{ const n=document.getElementById('talkSearch'); if (n){ n.focus(); n.setSelectionRange(el.value.length, el.value.length); } }); return; }
   if (e.target.id==='listQ'){ listQ = e.target.value; const el=e.target; renderList(); const n=document.getElementById('listQ'); n.focus(); n.setSelectionRange(el.value.length, el.value.length); } });
-document.addEventListener('change', e => { if (e.target.id==='suAge'){ renderAuth(); return; } if (e.target.id==='notifyAt'){ S.notifyAt=e.target.value; save(S); scheduleReminder(); toast(S.notifyAt==='안 받음'?'알림을 받지 않습니다':`매일 ${S.notifyAt}에 알려 드립니다`); } });
+document.addEventListener('change', e => {
+  if (e.target.id==='agAll'){ SU.terms = SU.privacy = e.target.checked; if (e.target.checked && SU.role==='student' && !SU.age){ suKeep(); } authErr=''; renderAuth(); return; }
+  if (e.target.id==='agTerms' || e.target.id==='agPrivacy' || e.target.name==='suAge'){ suKeep(); authErr=''; renderAuth(); return; } if (e.target.id==='notifyAt'){ S.notifyAt=e.target.value; save(S); scheduleReminder(true); toast(S.notifyAt==='안 받음'?'알림을 받지 않습니다':`매일 ${S.notifyAt}에 알려 드립니다`); } });
 document.addEventListener('keydown', e => { if (e.key!=='Enter') return; const id = e.target.id; const click = s => document.getElementById(s)?.click();
-  const M = {codeIn:'codeGo', attIn:'attGo', lgPw:'lgGo', lgEmail:'lgGo', suPw:'suGo', fgEmail:'fgGo', childIn:'childGo', passIn:'passGo', clsName:'clsAdd', blankIn:'blankGo'}; M[id] && click(M[id]); });
+  if (/^su(Email|Pw|Name|Phone|GName|GPhone|Code|Child)$/.test(id)){ e.preventDefault(); (document.getElementById('suNext') || document.getElementById('suGo'))?.click(); return; }
+  const M = {codeIn:'codeGo', attIn:'attGo', lgPw:'lgGo', lgEmail:'lgGo', fgEmail:'fgGo', childIn:'childGo', passIn:'passGo', clsName:'clsAdd', blankIn:'blankGo'}; M[id] && click(M[id]); });
 document.addEventListener('change', e => { if (e.target.id==='bankLesson'){ bankSel.lesson = e.target.value; renderBank(); } });
 
 /* ═══ 오류 기록 ═══ */
@@ -2859,6 +3010,7 @@ window.addEventListener('unhandledrejection', e => { const r = e.reason || {};
     DBX.loadProgress(progressKey()).then(p => { if (p){ mergeProgress(p); save(S); if (view==='today') renderToday(); } }).catch(()=>{});
   } else {
     if (S.auth) S.auth = null;      // 로그아웃 상태에서는 학원 연결도 닫는다
+    if (!S.onboarded && !S.introSeen) authMode = 'intro';
     show(S.onboarded ? 'today' : 'auth');
   }
   nativeInit(); initPush(); setTimeout(checkTalkNew, 1200);
