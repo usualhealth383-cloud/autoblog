@@ -449,7 +449,7 @@ def main():
         if not _n['fired']: fails.append('약 알림이 하나도 만들어지지 않습니다 — 시간이 돼도 안 옵니다')
         # 5b. 어르신 모드(글자 20px·큰 단추) — 넘침·잘림은 큰 글씨에서 먼저 터진다
         pg.evaluate("localStorage.setItem('yakjido.fs','22px');localStorage.setItem('yakjido.me.v1',JSON.stringify({age:'senior',easy:true,taking:['cls:bp.arb','ibuprofen'],pub:{}}))")
-        for r in SC + ['/bag', '/schedule', '/symptom/cramp', '/symptom/sprain', '/drug/acetaminophen', '/kinds/bp']:
+        for r in SC + ['/bag', '/schedule', '/symptom/cramp', '/symptom/sprain', '/drug/acetaminophen', '/kinds/bp', '/vitals', '/visits']:
             pg.goto(url + '#' + r); pg.reload(); ready(); pg.wait_for_timeout(500)
             o = pg.evaluate(OVERFLOW_JS)
             if o['ov']: fails.append(f'어르신 모드 가로 넘침 {r}: {o["ov"]}')
@@ -457,7 +457,7 @@ def main():
         # 5c. 좁은 화면(320px) × 가장 큰 글씨 — 오래된 안드로이드 폰과 «화면 확대»를 켜신 분의 자리.
         #     낱알 검색칸과 소아 화면 단추가 실제로 화면을 넘고 있었다.
         pg.set_viewport_size({'width': 320, 'height': 640})
-        for r in SC + ['/pill', '/kids', '/kinds', '/bag', '/schedule', '/symptom/fever', '/symptom/motion']:
+        for r in SC + ['/pill', '/kids', '/kinds', '/bag', '/schedule', '/symptom/fever', '/symptom/motion', '/vitals', '/visits']:
             pg.goto(url + '#' + r); pg.reload(); ready(); pg.wait_for_timeout(420)
             o = pg.evaluate(OVERFLOW_JS)
             if o['ov']: fails.append(f'좁은 화면 가로 넘침 {r}: {o["ov"][:2]}')
