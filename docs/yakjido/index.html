@@ -4089,7 +4089,8 @@ function ixRun(extra){
 }
 const IX_LV = { stop: ['같이 드시면 안 돼요', I.alert], warn: ['조심해서 드세요', I.alert], info: ['시간만 띄우면 돼요', I.clock] };
 function ixCard(h){
-  const [label, icon] = IX_LV[h.r.lv];
+  /* 「시간만 띄우면 돼요」는 흡수 방해(시간 간격) 규칙에만 — 나머지 알림 단계는 r.badge 「알아 두기」(2026-09-29) */
+  const label = h.r.badge || IX_LV[h.r.lv][0], icon = h.r.badge ? I.info : IX_LV[h.r.lv][1];
   return `<div class="ix ${h.r.lv}">
     <div class="ix-h">${icon}<b>${esc(h.r.t)}</b><span class="ix-lv">${esc(label)}</span></div>
     <div class="ix-w">${h.items.map(it => `<span class="ix-p">${esc(it.name)}<em>${esc(it.from)}</em></span>`).join('<span class="ix-plus">+</span>')}${h.r.organ ? `<span class="ix-arrow" aria-hidden="true">${I.chev}</span><span class="ix-org"><span class="ic">${I[h.r.organ.ico] || I.pill}</span><b>${esc(h.r.organ.n)}</b></span>` : ''}</div>
@@ -4890,7 +4891,7 @@ function vBag(){
     <div class="show-head">앱이 미리 본 것</div>
     ${!res.hits.length && !res.dupe.length && lv === 'ok' ? `<p class="show-big ok">${I.check}<span>걸리는 조합은 나오지 않았어요<small>모든 조합을 담지는 못해요 — 약사님 판단이 우선입니다</small></span></p>` : ''}
     ${res.dupe.map(d => `<p class="show-big stop">${I.alert}<span>같은 성분이 두 번<small>${esc(d.e?.n || '')} — ${d.items.map(i => esc(i.name)).join(' · ')}</small></span></p>`).join('')}
-    ${res.hits.map(h => `<p class="show-big ${h.r.lv}">${h.r.organ ? icon(h.r.organ.ico) : h.r.lv === 'info' ? I.clock : I.alert}<span>${h.r.organ ? `<em class="org">${esc(h.r.organ.n)}</em> ` : ''}${esc(h.r.t)}<small>${h.items.map(i => esc(i.name)).join(' + ')} · ${esc(IX_LV[h.r.lv][0])}</small></span></p>`).join('')}
+    ${res.hits.map(h => `<p class="show-big ${h.r.lv}">${h.r.organ ? icon(h.r.organ.ico) : h.r.lv === 'info' ? (h.r.badge ? I.info : I.clock) : I.alert}<span>${h.r.organ ? `<em class="org">${esc(h.r.organ.n)}</em> ` : ''}${esc(h.r.t)}<small>${h.items.map(i => esc(i.name)).join(' + ')} · ${esc(IX_LV[h.r.lv][0])}</small></span></p>`).join('')}
     ${sc ? `<p class="show-big ${lv}">${lv === 'ok' ? I.info : I.alert}<span>항콜린 부담 ${sc}점 · ${ACH_LV_WORD[lv]}<small>${al.filter(x => x.e.ach).map(x => esc(x.e.n)).slice(0, 6).join(' · ')}${lv === 'ok' ? '' : ' — 입마름·변비·어지럼·기억 흐림이 있으면 말씀하세요'}</small></span></p>` : ''}
     ${res.unknown.length ? `<p class="small muted" style="margin-top:8px">성분을 확인하지 못한 약 ${res.unknown.length}가지는 판정에서 빠져 있어요.</p>` : ''}
   </div>
@@ -4976,7 +4977,7 @@ function bagText(){
   const L = ['[약지도] 제가 먹는 약 ' + items.length + '가지' + (f.length ? ' · ' + f.map(k => FLAG_LABEL[k]).join(', ') : '')];
   items.forEach((x, i) => L.push(`${i + 1}. ${x.name}${x.approx ? ' (종류만)' : x.pub?.ingr ? ' — ' + x.pub.ingr : ''}${x.short ? ' (며칠만)' : ''}`));
   if (res.dupe.length) L.push('· 같은 성분 두 번: ' + res.dupe.map(d => d.e?.n || '').join(', '));
-  res.hits.forEach(h => L.push(`· ${h.r.t} (${h.items.map(i => i.name).join(' + ')}) — ${IX_LV[h.r.lv][0]}`));
+  res.hits.forEach(h => L.push(`· ${h.r.t} (${h.items.map(i => i.name).join(' + ')}) — ${h.r.badge || IX_LV[h.r.lv][0]}`));
   if (sc) L.push(`· 항콜린 부담 ${sc}점 · ${ACH_LV_WORD[achLevel(sc)]}`);
   const a = adherence(30);
   if (a.days) { L.push('', '[어제까지 30일 복용]', `· 드시기로 한 ${a.days}일 중 ${a.full}일은 빠짐없이 (전체 ${a.doses}번 중 ${a.took}번)`);
