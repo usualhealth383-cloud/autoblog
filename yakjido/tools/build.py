@@ -93,7 +93,7 @@ sw = ROOT / 'sw.js'
 if sw.exists():
     s = re.sub(r"const CACHE = '[^']*'", f"const CACHE = 'yakjido-{stamp}-{abs(hash(j)) % 10000}'", sw.read_text(encoding='utf-8'))
     (pages / 'sw.js').write_text(s, encoding='utf-8')
-for name in ('manifest.webmanifest',):
+for name in ('manifest.webmanifest', 'privacy.html'):   # privacy.html = 스토어에 적는 개인정보처리방침 주소
     src = ROOT / name
     if src.exists():
         (pages / name).write_text(src.read_text(encoding='utf-8'), encoding='utf-8')

@@ -15,11 +15,16 @@
 |---|---|
 | 앱 ID | `kr.yakjido.app` |
 | 웹 소스 | `www/` ← `docs/yakjido/` 복사본 (`npm run web`, 서비스워커·매니페스트는 뺌) |
-| 아이콘·스플래시·상태바 아이콘 | `python3 yakjido/tools/make_native_icons.py` 가 `icons/icon.svg` 에서 만든다 |
+| 아이콘·스플래시·상태바 아이콘 | `python3 yakjido/tools/make_native_icons.py` 가 **정본 `art/icon-1024.png`** 에서 만든다 |
 | 알림 코드 | `app-shell.html` 의 `nativeArm()` — 웹에서는 `NATIVE` 가 거짓이라 건너뛴다 |
 | 검사 | `tests/run.py` 의 「앱 알람」 — 가짜 휴대폰 알람 장치로 무엇을 거는지 본다 |
 
-## APK 받는 법 — 자동 빌드 (PC 설치 없음)
+## APK 받는 법 — 폰에서 링크 하나
+
+**https://github.com/usualhealth383-cloud/autoblog/releases/download/yakjido-latest/yakjido.apk**
+(늘 가장 최근 시험판. 저장소가 공개라 링크를 아는 누구나 받을 수 있습니다 — 2026-09-29 현욱님 허락)
+
+## 자동 빌드 (PC 설치 없음)
 
 약지도 코드가 이 브랜치나 `main` 에 올라가면 **Actions → `yakjido-apk`** 가 저절로 돕니다(5~8분).
 실행 화면 아래 **Artifacts → `yakjido-apk`** 의 `yakjido-debug.apk` 를 폰에 옮겨 설치합니다
