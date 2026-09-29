@@ -795,7 +795,7 @@ const DB = (() => {
     accounts: [   // 시연용 계정
       { id:'a-owner',   email:'owner@parkchan.kr',  pw:h32('2580'), role:'owner',   name:'원장', phone:'', created:'2026-09-01' },
       { id:'a-student', email:'student@demo.kr',    pw:h32('1234'), role:'student', name:'박○○', phone:'', studentCode:'DEMO01', created:'2026-09-01' },
-      { id:'a-parent',  email:'parent@demo.kr',     pw:h32('1234'), role:'parent',  name:'박○○ 보호자', phone:'', childCode:'DEMO01', created:'2026-09-01' },
+      { id:'a-parent',  email:'parent@demo.kr',     pw:h32('1234'), role:'parent',  name:'박○○ 보호자', phone:'', childCodes:['DEMO01'], created:'2026-09-01' },
     ],
     attendance: [], notices: [], sched: [], posts: [], comments: [], passes: [], progress: {},
     classes: CFG.classes.slice(),
@@ -803,10 +803,11 @@ const DB = (() => {
   let d; try { d = JSON.parse(localStorage.getItem(DBKEY)); } catch {}
   if (!d || !d.accounts) d = seed();
   d.classes ||= CFG.classes.slice(); d.passes ||= []; d.progress ||= {};
+  d.accounts.forEach(a => { if (a.childCode && !a.childCodes){ a.childCodes = [a.childCode]; } delete a.childCode; });   // 자녀 여러 명으로 옮김
   CLASSES_CACHE = d.classes.slice();
   const w = () => { try { localStorage.setItem(DBKEY, JSON.stringify(d)); } catch {} };
   let sid = null; try { sid = localStorage.getItem('pcs.local.sid'); } catch {}
-  const pub = a => a ? { id:a.id, email:a.email, role:a.role, name:a.name, phone:a.phone||'', studentCode:a.studentCode||'', childCode:a.childCode||'', passUntil:a.passUntil||'', nick:a.nick||'', under14:!!a.under14, guardian:a.guardian||'', guardianOk:!!a.guardianOk, guardianHow:a.guardianHow||'', created:a.created } : null;
+  const pub = a => a ? { id:a.id, email:a.email, role:a.role, name:a.name, phone:a.phone||'', studentCode:a.studentCode||'', childCodes:(a.childCodes||[]).slice(), childCode:(a.childCodes||[])[0]||'', passUntil:a.passUntil||'', nick:a.nick||'', under14:!!a.under14, guardian:a.guardian||'', guardianOk:!!a.guardianOk, guardianHow:a.guardianHow||'', created:a.created } : null;
   const me = () => d.accounts.find(a => a.id === sid) || null;
   const stateOf = code => d.progress[code] || null;
   const attend = (s, manual) => {
@@ -835,8 +836,8 @@ const DB = (() => {
     setPassword: async pw => { const a = me(); if (!a) throw new Error('로그인이 필요합니다.'); a.pw = h32(pw); w(); return { ok:true }; },
     /* 서버의 link_code 와 같은 규칙: 틀린 코드 1시간 10번 · 한 코드 한 학생 계정 · 만료 코드 거절 */
     linkCode: async (kind, code) => { const a = me(); if (!a) return { ok:false, why:'로그인이 필요합니다.' };
-      const c = String(code||'').trim().toUpperCase(), key = kind === 'student' ? 'studentCode' : 'childCode';
-      if (!c){ a[key] = ''; w(); return { ok:true }; }
+      const c = String(code||'').trim().toUpperCase();
+      if (!c){ if (kind === 'student') a.studentCode = ''; else a.childCodes = []; w(); return { ok:true }; }
       d.attempts ||= []; const hr = Date.now() - 3600e3; d.attempts = d.attempts.filter(x => x.at > hr);
       if (d.attempts.filter(x => x.uid === a.id && !x.ok).length >= 10) return { ok:false, why:'코드를 여러 번 틀렸습니다. 1시간 뒤에 다시 시도하거나 원장님께 문의해 주세요.' };
       const s = d.students.find(x => x.code === c);
@@ -846,7 +847,10 @@ const DB = (() => {
         if (d.accounts.some(x => x.id !== a.id && x.role === 'student' && x.studentCode === c)) return { ok:false, why:'이 코드는 이미 다른 학생 계정에 연결되어 있습니다. 원장님께 문의해 주세요.' };
         if (!a.name) a.name = s.name; }
       else if (a.role !== 'parent') return { ok:false, why:'보호자 계정에서만 자녀를 연결할 수 있습니다.' };
-      a[key] = c; w(); return { ok:true, student:{ code:s.code, name:s.name, cls:s.cls, until:s.until } }; },
+      if (kind === 'student') a.studentCode = c;
+      else { a.childCodes ||= []; if (!a.childCodes.includes(c)){ if (a.childCodes.length >= 5) return { ok:false, why:'자녀는 다섯 명까지 연결할 수 있습니다.' }; a.childCodes.push(c); } }
+      w(); return { ok:true, student:{ code:s.code, name:s.name, cls:s.cls, until:s.until } }; },
+    unlinkChild: async code => { const a = me(); if (a){ a.childCodes = (a.childCodes||[]).filter(x => x !== code); w(); } },
     deleteAccount: async () => { const a = me(); if (!a) return; d.accounts = d.accounts.filter(x => x.id !== a.id); if (a.studentCode) delete d.progress['u:'+a.id]; sid = null; try { localStorage.removeItem('pcs.local.sid'); } catch {} w(); },
     /* 학원 코드 · 자녀 연결 */
     verifyCode: async code => {
@@ -861,8 +865,8 @@ const DB = (() => {
     removeStudent: async code => { d.students = d.students.filter(s=>s.code!==code); delete d.progress[code]; w(); },
     updateStudent: async (code, patch) => { const s = d.students.find(x=>x.code===code); if (s){ ['name','cls','until','phone'].forEach(k => { if (k in patch) s[k] = patch[k]; }); w(); } return s; },
     extendClass: async (cls, until) => { const rows = d.students.filter(s => (cls==='전체' || s.cls===cls) && s.until < until); rows.forEach(s => s.until = until); w(); return rows.length; },
-    guardiansOf: async code => d.accounts.filter(a => a.role==='parent' && a.childCode===code).map(a => ({ name:a.name, phone:a.phone||'' })),
-    linkedOf: async code => ({ student: d.accounts.filter(a => a.role==='student' && a.studentCode===code).length, guardians: d.accounts.filter(a => a.role==='parent' && a.childCode===code).map(a => ({ name:a.name, phone:a.phone||'' })) }),
+    guardiansOf: async code => d.accounts.filter(a => a.role==='parent' && (a.childCodes||[]).includes(code)).map(a => ({ name:a.name, phone:a.phone||'' })),
+    linkedOf: async code => ({ student: d.accounts.filter(a => a.role==='student' && a.studentCode===code).length, guardians: d.accounts.filter(a => a.role==='parent' && (a.childCodes||[]).includes(code)).map(a => ({ name:a.name, phone:a.phone||'' })) }),
     releaseCode: async code => { const rows = d.accounts.filter(a => a.studentCode===code); rows.forEach(a => a.studentCode=''); w(); return rows.length; },
     /* 출석 */
     attendanceOn: async date => d.attendance.filter(a=>a.date===date),
@@ -958,9 +962,12 @@ const DB = (() => {
 const serverDB = () => {
   const notice = (n, reads=[]) => ({ id:n.id, cls:n.cls, t:n.title, d:n.body||'', at:n.at, read: reads.filter(r=>r.notice_id===n.id).map(r=>r.code) });
   const att = a => ({ code:a.code, date:a.date, time:hhmm(a.time), late:!!a.late, manual:!!a.manual });
-  const prof = p => p ? { id:p.id, email:p.email||'', role:p.role, name:p.name, phone:p.phone||'', studentCode:p.student_code||'', childCode:p.child_code||'', passUntil:p.pass_until||'', nick:p.nick||'', under14:!!p.under14, guardian:p.guardian||'', guardianOk:!!p.guardian_ok, guardianHow:p.guardian_how||'', created:p.created_at } : null;
+  const prof = p => p ? { id:p.id, email:p.email||'', role:p.role, name:p.name, phone:p.phone||'', studentCode:p.student_code||'', childCodes:(p._children||[]).slice(), childCode:(p._children||[])[0]||'', passUntil:p.pass_until||'', nick:p.nick||'', under14:!!p.under14, guardian:p.guardian||'', guardianOk:!!p.guardian_ok, guardianHow:p.guardian_how||'', created:p.created_at } : null;
   let attCache = null, meCache = null;
-  const myProfile = async () => { if (!SESSION) return null; const r = await api(`/rest/v1/profiles?id=eq.${SESSION.user.id}&select=*`); meCache = r.length ? prof({ ...r[0], email:SESSION.user.email }) : null; return meCache; };
+  const myProfile = async () => { if (!SESSION) return null; const r = await api(`/rest/v1/profiles?id=eq.${SESSION.user.id}&select=*`);
+    if (!r.length){ meCache = null; return null; }
+    const kids = r[0].role === 'parent' ? (await api('/rest/v1/guardian_links?select=code&order=at.asc')).map(x => x.code) : [];
+    meCache = prof({ ...r[0], email:SESSION.user.email, _children:kids }); return meCache; };
   return {
     mode: 'server',
     me: async () => { if (!SESSION) return null; try { return await myProfile(); } catch { return meCache; } },
@@ -989,6 +996,7 @@ const serverDB = () => {
     updateMe: async patch => { const b = {}; if ('name' in patch) b.name = patch.name; if ('phone' in patch) b.phone = patch.phone; if ('nick' in patch) b.nick = patch.nick;
       await api(`/rest/v1/profiles?id=eq.${SESSION.user.id}`, { method:'PATCH', prefer:'return=minimal', body:b }); return myProfile(); },
     /* 학원 코드·자녀 연결은 서버 함수 한 곳에서만(틀린 코드 제한 · 한 코드 한 학생 계정) */
+    unlinkChild: async code => { await api('/rest/v1/rpc/unlink_child', { method:'POST', body:{ p_code: code } }); meCache = null; },
     linkCode: async (kind, code) => { const r = await api('/rest/v1/rpc/link_code', { method:'POST', body:{ p_kind:kind, p_code:code||'' } }); meCache = null; return r || { ok:false, why:'연결하지 못했습니다.' }; },
     deleteAccount: async () => { await api('/rest/v1/rpc/delete_my_account', { method:'POST', body:{} }); SESSION = null; saveSession(); meCache = null; },
     verifyCode: async code => { const rows = await api(`/rest/v1/students?code=eq.${encodeURIComponent(code)}&select=code,name,cls,until`);
@@ -1073,7 +1081,7 @@ const CM_COLS = 'id,post_id,author,nick,body,likes,report_n,staff,picked,deleted
 const DBX = SRV ? serverDB() : DB;
 
 /* ═══ 계정 · 내 진도 ═══ */
-let ACC = null;                                  // 로그인한 계정 { id, email, role, name, studentCode, childCode, passUntil }
+let ACC = null;                                  // 로그인한 계정 { id, email, role, name, studentCode, childCodes[], passUntil }
 const KEY = 'pcs.v2';
 const load = () => { try { return JSON.parse(localStorage.getItem(KEY)) || {}; } catch { return {}; } };
 let syncT = null;
@@ -1918,7 +1926,7 @@ function renderMe(){
         <div class="where">${esc(ACC.email)}</div>
         <dl>
           ${a ? `<div class="row"><dt>학원</dt><dd><b>${esc(CFG.academy)} ${esc(a.cls)}</b> · ${kdate(a.until)}까지</dd></div><div class="row"><dt>공지</dt><dd><b>${esc(a.cls)}</b> 공지를 받고, 홈에서 출석을 칩니다</dd></div>` : ''}
-          ${ACC.role==='parent' ? `<div class="row"><dt>자녀</dt><dd>${ACC.childCode?`코드 <b>${esc(ACC.childCode)}</b> 연결됨`:'아직 연결하지 않았습니다'}</dd></div>` : ''}
+          ${ACC.role==='parent' ? `<div class="row"><dt>자녀</dt><dd>${ACC.childCodes.length?`<b>${ACC.childCodes.length}명</b> 연결됨 · ${ACC.childCodes.map(esc).join(', ')}`:'아직 연결하지 않았습니다'}</dd></div>` : ''}
           <div class="row"><dt>진도</dt><dd>${SRV ? '서버에 저장 — 기기를 바꿔도 이어집니다' : '이 기기에 저장 (서버 연동 전)'}</dd></div>
         </dl></div>`
       : `<div class="codebox"><h3>가입 없이 둘러보는 중</h3><p>로그인하면 진도가 계정에 저장되고, 학원 코드·이용권을 등록할 수 있습니다.</p><button class="btn sm" id="goAuth" style="width:100%">로그인 · 회원가입</button></div>`}
@@ -1926,7 +1934,7 @@ function renderMe(){
     ${ACC && ACC.role==='student' && !a ? `<div class="codebox"><h3>학원 코드 등록</h3><p>원장님께 받은 6자리 코드를 넣으면 전 범위가 열리고 <b>내 반 공지</b>와 출석이 연결됩니다.</p>
         <div class="f"><input id="codeIn" class="code" placeholder="코드 6자리" maxlength="6" autocomplete="off" autocapitalize="characters"><button id="codeGo">등록</button></div>${codeErr?`<div class="err">${esc(codeErr)}</div>`:''}
         ${DBX.mode==='local' ? `<div class="demo">시연용 코드 — <code>MON123</code> 월목반 · <code>TUE456</code> 화금반 · <code>WED789</code> 수토반</div>` : ''}</div>` : ''}
-    ${ACC && ACC.role==='parent' && !ACC.childCode ? `<div class="codebox"><h3>자녀 연결</h3><p>자녀가 받은 학원 코드 6자리를 넣으면 출석·진도·공지를 볼 수 있습니다.</p>
+    ${ACC && ACC.role==='parent' && !ACC.childCodes.length ? `<div class="codebox"><h3>자녀 연결</h3><p>자녀가 받은 학원 코드 6자리를 넣으면 출석·진도·공지를 볼 수 있습니다.</p>
         <div class="f"><input id="childIn" class="code" placeholder="자녀 코드 6자리" maxlength="6" autocomplete="off" autocapitalize="characters"><button id="childGo">연결</button></div>${childErr?`<div class="err">${esc(childErr)}</div>`:''}</div>` : ''}
     ${ACC && ACC.role!=='owner' && !a ? `<button class="setrow go" id="goPlans"><span class="l">이용권<small>${hasPass()?`${kdate(ACC.passUntil)}까지 · 연장하기`:'전 범위 열기 · 이용권 코드 등록'}</small></span><span class="v">보기</span></button>` : ''}
     ${ACC ? `<button class="setrow go" id="nickOpen"><span class="l">이야기 닉네임<small>${ACC.nick ? esc(ACC.nick) : '아직 정하지 않았습니다 · 글을 쓰려면 필요합니다'}</small></span><span class="v">${ACC.nick?'바꾸기':'정하기'}</span></button>` : ''}
@@ -2003,15 +2011,18 @@ async function restorePurchases(){ const NP = IAP(); if (!NP) return; closeSheet
 /* ═══ 보호자 홈 ═══ */
 async function renderParent(){
   const v = document.getElementById('v-parent');
-  if (!ACC || !ACC.childCode){ v.innerHTML = `<h1 class="h-page">자녀</h1><div class="codebox"><h3>자녀 연결</h3><p>자녀가 받은 학원 코드 6자리를 넣으면 출석·진도·공지를 볼 수 있습니다.</p>
+  if (!ACC || !ACC.childCodes.length){ v.innerHTML = `<h1 class="h-page">자녀</h1><div class="codebox"><h3>자녀 연결</h3><p>자녀가 받은 학원 코드 6자리를 넣으면 출석·진도·공지를 볼 수 있습니다.</p>
       <div class="f"><input id="childIn" class="code" placeholder="자녀 코드 6자리" maxlength="6" autocapitalize="characters" autocomplete="off"><button id="childGo">연결</button></div>${childErr?`<div class="err">${esc(childErr)}</div>`:''}
       ${DBX.mode==='local' ? `<div class="demo">시연용 — <code>MON123</code></div>`:''}</div>`; return; }
-  const code = ACC.childCode; let st=null, todayA=null, month=[], prog=null, ns=[];
+  if (!ACC.childCodes.includes(parentSel)) parentSel = ACC.childCodes[0];
+  const code = parentSel; let st=null, todayA=null, month=[], prog=null, ns=[], kids=[];
+  if (ACC.childCodes.length > 1){ try { kids = await Promise.all(ACC.childCodes.map(async c => ({ c, s: await DBX.student(c).catch(()=>null) }))); } catch {} }
   try { st = await DBX.student(code); todayA = await DBX.myAttendance(code, todayISO()); const ym = todayISO().slice(0,7); month = await DBX.attendanceRange(`${ym}-01`, monthEnd(ym), code); prog = await DBX.loadProgress(code); if (st) ns = await DBX.notices(st.cls); } catch (e){ v.innerHTML = `<h1 class="h-page">자녀</h1><div class="empty"><p>${esc(e.message)}</p></div>`; return; }
   if (!st){ v.innerHTML = `<h1 class="h-page">자녀</h1><div class="empty"><p>연결된 코드(${esc(code)})의 학생을 찾을 수 없습니다. 수강이 끝났거나 코드가 바뀌었을 수 있습니다.</p></div><button class="btn ghost" id="unlinkChild">연결 해제</button>`; return; }
   const done = prog ? (prog.done||[]).length : 0, days = prog ? (prog.days||[]) : [], last = days.length ? days[days.length-1] : '';
   const lateN = month.filter(a=>a.late).length;
   v.innerHTML = `<h1 class="h-page">자녀</h1>
+    ${kids.length ? `<div class="chipbar" role="tablist" aria-label="자녀 고르기">${kids.map(k => `<button role="tab" aria-selected="${k.c===code}" data-kid="${esc(k.c)}" class="${k.c===code?'on':''}">${esc(k.s ? k.s.name : k.c)}</button>`).join('')}</div>` : ''}
     <div class="pass"><span class="badge">${esc(CFG.academy)} · ${esc(st.cls)}</span><div class="who">${esc(st.name)} 학생</div><div class="where">수강 ${kdate(st.until)}까지 · 수업 시작 ${classStart(st.cls)}</div>
       <dl><div class="row"><dt>오늘</dt><dd>${todayA ? `<b>${todayA.time} 출석</b>${todayA.late?' · 지각':''}` : '아직 출석 전'}</dd></div>
       <div class="row"><dt>이달</dt><dd>출석 <b>${month.length}일</b>${lateN?` · 지각 ${lateN}일`:''}</dd></div>
@@ -2019,8 +2030,10 @@ async function renderParent(){
     <div class="sec"><h2>이달 출석</h2>${month.length ? month.map(a=>`<div class="kv"><span class="k">${kdate(a.date)}</span><span class="v" style="color:${a.late?'var(--warn)':'var(--u)'}">${a.time} ${a.late?'지각':'출석'}${a.manual?' (수동)':''}</span></div>`).join('') : `<p class="fine" style="text-align:left;padding:0">이달 출석 기록이 아직 없습니다.</p>`}</div>
     <div class="sec"><h2>학원 공지 · ${esc(st.cls)}</h2>${ns.length ? ns.slice(0,5).map(n=>`<div class="kv" style="flex-direction:column;align-items:flex-start;gap:2px"><span class="v">${esc(n.t)}</span><span class="k">${kAt(n.at)} · ${esc(n.cls)}${n.d?` · ${esc(n.d)}`:''}</span></div>`).join('') : `<p class="fine" style="text-align:left;padding:0">최근 공지가 없습니다.</p>`}</div>
     ${CFG.phone ? `<a class="btn ghost" href="tel:${esc(CFG.phone)}" style="text-decoration:none">학원에 전화 ${esc(CFG.phone)}</a>` : ''}
-    <button class="linkbtn" id="unlinkChild">자녀 연결 해제</button>`;
+    <button class="btn soft" id="childAdd">자녀 한 명 더 연결 <small style="font-weight:600">· 형제·자매가 같은 학원에 다닐 때</small></button>
+    <button class="linkbtn" id="unlinkChild" data-code="${esc(code)}">${esc(st.name)} 학생 연결 해제</button>`;
 }
+let parentSel = '';
 
 /* ═══ 원장 ═══ */
 let admTab='students', issued=null, admCls='', attTimer=null, admMonth=todayISO().slice(0,7), issuedPass=null;
@@ -2219,7 +2232,7 @@ async function scheduleReminder(){ const LN = plug('LocalNotifications'); if (!L
 /* 푸시 알림(공지·일정·등원) — 첫 화면에서 묻지 않고, 학원과 연결된 뒤에만 묻는다. 로그아웃하면 이 기기 등록을 지운다 */
 let pushToken = '', pushWired = false;
 async function initPush(){ const PN = plug('PushNotifications'); if (!isNative || !CFG.push || !SRV || !PN || !ACC) return;
-  if (!(authLive() || ACC.childCode || ACC.role==='owner')) return;
+  if (!(authLive() || (ACC.childCodes||[]).length || ACC.role==='owner')) return;
   try {
     if (!pushWired){ pushWired = true;
       PN.addListener('registration', t => { pushToken = t.value; DBX.registerPush(t.value, 'android').catch(()=>{}); });
@@ -2270,7 +2283,7 @@ async function afterLogin(acc){
   ACC = acc; codeErr = childErr = passErr = '';
   /* 메일 인증 전에 적어 둔 학원 코드·자녀 코드 — 인증을 마치고 처음 들어올 때 연결한다 */
   let pl = null; try { pl = JSON.parse(localStorage.getItem('pcs.pendingLink')); localStorage.removeItem('pcs.pendingLink'); } catch {}
-  if (pl && pl.code && ((pl.kind==='student' && acc.role==='student' && !acc.studentCode) || (pl.kind==='child' && acc.role==='parent' && !acc.childCode))){
+  if (pl && pl.code && ((pl.kind==='student' && acc.role==='student' && !acc.studentCode) || (pl.kind==='child' && acc.role==='parent' && !(acc.childCodes||[]).includes(String(pl.code).toUpperCase())))){
     try { const r = await DBX.linkCode(pl.kind, pl.code); if (r.ok){ acc = ACC = await DBX.me(); } else toast(r.why); } catch {} }
   if (acc.role==='student' && acc.studentCode){ try { const r = await DBX.verifyCode(acc.studentCode); if (r.ok) S.auth = { code:acc.studentCode, name:r.student.name, cls:r.student.cls, until:r.student.until }; } catch {} }
   else S.auth = null;
@@ -2528,11 +2541,17 @@ document.addEventListener('click', async e => {
   if (T('#childGo')){ /* 내 정보와 자녀 화면에 같은 입력이 동시에 있으므로, 지금 누른 쪽의 입력을 읽는다 */
     const box = T('#childGo').closest('.codebox') || document;
     const v=((box.querySelector('#childIn')||{}).value||'').trim().toUpperCase(); if (!v){ childErr='코드를 입력해 주세요.'; (view==='parent'?renderParent:renderMe)(); return; }
-    try { const r = await DBX.linkCode('child', v); if (!r.ok){ childErr = r.why; (view==='parent'?renderParent:renderMe)(); return; }
-      ACC = await DBX.me(); childErr=''; toast(`${r.student.name} 학생과 연결했습니다`); show('parent'); initPush(); } catch (err){ childErr=err.message; (view==='parent'?renderParent:renderMe)(); } return; }
-  if (T('#unlinkChild')){ if (!confirm('자녀 연결을 해제할까요?')) return; await DBX.linkCode('child', ''); ACC = await DBX.me(); renderParent(); return; }
+    const inSheet = !!T('#childGo').closest('.sheet');
+    try { const r = await DBX.linkCode('child', v); if (!r.ok){ if (inSheet){ document.getElementById('childAddErr').textContent = r.why; return; } childErr = r.why; (view==='parent'?renderParent:renderMe)(); return; }
+      ACC = await DBX.me(); childErr=''; parentSel = r.student.code; closeSheet(); toast(`${r.student.name} 학생과 연결했습니다`); show('parent'); initPush(); } catch (err){ childErr=err.message; (view==='parent'?renderParent:renderMe)(); } return; }
+  if (T('#unlinkChild')){ const c = T('#unlinkChild').dataset.code; if (!confirm('이 자녀와의 연결을 해제할까요? 출석·진도·공지를 더 볼 수 없습니다.')) return;
+    if (c) await DBX.unlinkChild(c); else await DBX.linkCode('child', ''); ACC = await DBX.me(); parentSel = ''; renderParent(); return; }
+  const kid = T('[data-kid]'); if (kid){ parentSel = kid.dataset.kid; renderParent(); return; }
+  if (T('#childAdd')){ childErr = ''; openSheet(`<h3>자녀 한 명 더 연결</h3><p>다른 자녀가 받은 학원 코드 6자리를 넣으세요. 자녀 화면 맨 위에서 이름을 눌러 바꿔 볼 수 있습니다.</p>
+      <div class="codebox" style="margin:0 0 10px"><div class="f"><input id="childIn" class="code" placeholder="자녀 코드 6자리" maxlength="6" autocapitalize="characters" autocomplete="off"><button id="childGo">연결</button></div><div class="err" id="childAddErr"></div></div>
+      <button class="btn ghost" id="sheetClose">닫기</button>`); setTimeout(()=>document.querySelector('.sheet #childIn')?.focus(), 50); return; }
   if (T('#unauth')){ if (!confirm('학원 코드 연결을 해제할까요? 공지·출석이 닫힙니다.')) return; await flushProgress(); S.auth=null; if (ACC){ await DBX.linkCode('student', ''); ACC = await DBX.me(); } save(S); renderMe(); return; }
-  if (T('#logout')){ if (!confirm('로그아웃할까요? 진도는 계정에 저장되어 있습니다.')) return; await flushProgress(); await dropPush(); await DBX.signOut(); ACC=null; S = freshS(); save(S); authMode='start'; show('auth'); return; }
+  if (T('#logout')){ if (!confirm('로그아웃할까요? 진도는 계정에 저장되어 있습니다.')) return; await flushProgress(); await dropPush(); await DBX.signOut(); ACC=null; S = freshS(); admTab='students'; parentSel=''; talkNew=0; talkBoard='전체'; talkQ=''; save(S); authMode='start'; show('auth'); return; }
   if (T('#delAccount')){ if (!confirm('계정을 삭제하면 진도·오답 노트가 함께 지워지고 되돌릴 수 없습니다. 삭제할까요?')) return;
     try { await DBX.deleteAccount(); ACC=null; clearTimeout(syncT); S = freshS(); try { localStorage.removeItem(KEY); } catch {} authMode='start'; toast('계정을 삭제했습니다'); show('auth'); } catch (err){ toast(err.message); } return; }
   if (T('#editProfile')){ openSheet(`<h3>이름 · 연락처</h3><div class="f"><input id="epName" placeholder="이름" value="${esc(ACC.name)}" style="flex:1;border:1.5px solid var(--line);border-radius:12px;padding:12px 14px;font-size:15px;font-family:inherit;background:var(--paper);color:var(--ink)"></div>

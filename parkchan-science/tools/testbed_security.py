@@ -69,6 +69,9 @@ r = rpc('link_code', {'p_kind': 'student', 'p_code': 'ZZZ999'}, B)[1]; check('�
 P, P_ID = signup('p@test.kr', '보호자', role='parent')
 r = rpc('link_code', {'p_kind': 'student', 'p_code': 'MON123'}, P)[1]; check('보호자 계정은 학생 코드 등록 불가', not r['ok'], r)
 r = rpc('link_code', {'p_kind': 'child', 'p_code': 'MON123'}, P)[1]; check('보호자가 자녀 연결', r['ok'], r)
+s, _ = call('POST', '/rest/v1/guardian_links', {'uid': P_ID, 'code': 'OLD111'}, P); check('보호자가 자녀 연결 표를 직접 못 씀(함수로만)', s in (401, 403), s)
+s, j = call('GET', '/rest/v1/guardian_links?select=code', tok=P); check('보호자는 자기 자녀 연결만 봄', [x['code'] for x in j] == ['MON123'], j)
+s, j = call('GET', '/rest/v1/guardian_links?select=code', tok=A); check('학생은 남의 보호자 연결을 못 봄', j == [], j)
 s, n = rpc('release_code', {'p_code': 'MON123'}, A); check('학생은 코드 풀기 함수를 못 씀', s >= 400, s)
 
 print('▸ 출석(30초 코드 · 한국 시간)')

@@ -73,7 +73,6 @@ create table if not exists profiles (
   phone        text not null default '',
   nick         text not null default '',
   student_code text references students(code) on delete set null,
-  child_code   text references students(code) on delete set null,
   pass_until   date,
   under14      boolean not null default false,       -- 만 14세 미만(법정대리인 동의)
   guardian     text not null default '',             -- 법정대리인 성명·연락처
@@ -84,6 +83,13 @@ create table if not exists profiles (
   guardian_notified_at timestamptz,                  -- 웹 동의를 확인했다고 보호자에게 문자로 알린 시각
   agreed_at    timestamptz,
   created_at   timestamptz not null default now()
+);
+-- 보호자 ↔ 자녀(여러 명 가능 — 형제가 같은 학원에 다닐 때). 한 자녀에 보호자도 여럿 가능
+create table if not exists guardian_links (
+  uid  uuid not null references auth.users(id) on delete cascade,
+  code text not null references students(code) on delete cascade,
+  at   timestamptz not null default now(),
+  primary key (uid, code)
 );
 -- 한 학생 코드는 학생 계정 하나에만(코드 돌려쓰기 방지). 보호자는 여럿 연결 가능
 create unique index if not exists profiles_student_code_uq on profiles (student_code) where student_code is not null;
@@ -176,7 +182,7 @@ create or replace function my_student_code() returns text language sql stable se
   select student_code from profiles where id = auth.uid() and role = 'student' $$;
 create or replace function my_codes() returns setof text language sql stable security definer set search_path = public as $$
   select student_code from profiles where id = auth.uid() and student_code is not null
-  union select child_code from profiles where id = auth.uid() and child_code is not null $$;
+  union select code from guardian_links where uid = auth.uid() $$;
 create or replace function my_classes() returns setof text language sql stable security definer set search_path = public as $$
   select cls from students where code in (select my_codes()) and until >= kst_today() $$;
 
@@ -212,7 +218,7 @@ begin
   if not found then return json_build_object('ok', false, 'why', '계정 정보를 찾을 수 없습니다. 다시 로그인해 주세요.'); end if;
   if p_kind not in ('student','child') then return json_build_object('ok', false, 'why', '잘못된 요청입니다.'); end if;
   if c = '' then
-    if p_kind = 'student' then update profiles set student_code = null where id = u; else update profiles set child_code = null where id = u; end if;
+    if p_kind = 'student' then update profiles set student_code = null where id = u; else delete from guardian_links where uid = u; end if;
     return json_build_object('ok', true);
   end if;
   if private.too_many('code', 10) then return json_build_object('ok', false, 'why', '코드를 여러 번 틀렸습니다. 1시간 뒤에 다시 시도하거나 원장님께 문의해 주세요.'); end if;
@@ -226,7 +232,9 @@ begin
     update profiles set student_code = c, name = case when name = '' then s.name else name end where id = u;
   else
     if pr.role <> 'parent' then return json_build_object('ok', false, 'why', '보호자 계정에서만 자녀를 연결할 수 있습니다.'); end if;
-    update profiles set child_code = c where id = u;
+    if (select count(*) from guardian_links where uid = u) >= 5 and not exists (select 1 from guardian_links where uid = u and code = c) then
+      return json_build_object('ok', false, 'why', '자녀는 다섯 명까지 연결할 수 있습니다.'); end if;
+    insert into guardian_links(uid, code) values (u, c) on conflict do nothing;
   end if;
   perform private.note('code', true);
   return json_build_object('ok', true, 'student', json_build_object('code', s.code, 'name', s.name, 'cls', s.cls, 'until', s.until));
@@ -243,8 +251,12 @@ end $$;
 create or replace function linked_of(p_code text) returns json language sql stable security definer set search_path = public as $$
   select case when is_owner() then json_build_object(
     'student', (select count(*) from profiles where student_code = p_code),
-    'guardians', coalesce((select json_agg(json_build_object('name', name, 'phone', phone)) from profiles where child_code = p_code), '[]'::json))
+    'guardians', coalesce((select json_agg(json_build_object('name', p.name, 'phone', p.phone)) from guardian_links g join profiles p on p.id = g.uid where g.code = p_code), '[]'::json))
   end $$;
+
+-- 보호자: 자녀 한 명만 연결 해제
+create or replace function unlink_child(p_code text) returns void language sql security definer set search_path = public as $$
+  delete from guardian_links where uid = auth.uid() and code = upper(trim(coalesce(p_code, ''))) $$;
 
 -- ═══ 출석 ═══
 create or replace function private.attend_code(win bigint) returns text language sql stable security definer set search_path = private as $$
@@ -411,7 +423,7 @@ language sql stable security definer set search_path = public as $$
   select t.token, t.uid, case when pr.role = 'parent' then 'parent' else 'student' end
     from push_tokens t join profiles pr on pr.id = t.uid
    where (p_kind <> 'attend' and pr.student_code in (select code from codes))
-      or pr.child_code in (select code from codes)
+      or exists (select 1 from guardian_links g where g.uid = t.uid and g.code in (select code from codes))
 $$;
 
 -- ═══ 만 14세 미만 — 법정대리인 동의 확인(개인정보 보호법 제22조의2) ═══
@@ -491,6 +503,7 @@ grant update (deleted) on comments to authenticated;
 
 revoke all on purchases from anon, authenticated; grant select on purchases to authenticated;
 revoke all on push_tokens from anon, authenticated; grant select, delete on push_tokens to authenticated;
+revoke all on guardian_links from anon, authenticated; grant select on guardian_links to authenticated;   -- 연결·해제는 link_code()·unlink_child() 로만
 revoke all on client_errors from anon, authenticated; grant insert (ver, msg, stack, url, ua) on client_errors to anon, authenticated; grant select on client_errors to authenticated;
 grant usage, select on sequence client_errors_id_seq to anon, authenticated;
 
@@ -502,6 +515,7 @@ alter table profiles enable row level security;   alter table progress enable ro
 alter table passes enable row level security;     alter table purchases enable row level security;
 alter table posts enable row level security;      alter table comments enable row level security;
 alter table push_tokens enable row level security; alter table client_errors enable row level security;
+alter table guardian_links enable row level security;
 
 do $$ declare p record; begin      -- 다시 실행해도 되게 기존 정책을 비운다
   for p in select policyname, tablename from pg_policies where schemaname = 'public' loop
@@ -535,6 +549,8 @@ create policy self_profile_ins on profiles   for insert to authenticated with ch
 create policy self_profile_upd on profiles   for update to authenticated using (id = (select auth.uid())) with check (id = (select auth.uid()));
 create policy self_purchases on purchases    for select to authenticated using (uid = (select auth.uid()));
 create policy self_push      on push_tokens  for select to authenticated using (uid = (select auth.uid()));
+create policy self_children  on guardian_links for select to authenticated using (uid = (select auth.uid()));
+create policy owner_read on guardian_links for select to authenticated using ((select is_owner()));
 create policy self_push_del  on push_tokens  for delete to authenticated using (uid = (select auth.uid()));
 create policy errors_ins     on client_errors for insert with check (uid is null or uid = (select auth.uid()));
 -- 진도: 읽기는 내 코드·자녀 코드·내 계정 키, 쓰기는 내 코드·내 계정 키만(보호자는 못 고친다)
