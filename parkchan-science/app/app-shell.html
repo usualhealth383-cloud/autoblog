@@ -992,13 +992,18 @@ const mergeProgress = p => { if (!p) return;
   S.read = [...new Set([...(p.read||[]), ...(S.read||[])])];
   S.days = [...new Set([...(p.days||[]), ...(S.days||[])])].sort();
   S.bm = [...new Set([...(p.bm||[]), ...(S.bm||[])])];
-  if (p.stats){ S.stats = { a:(S.stats.a||0)+(p.stats.a||0), c:(S.stats.c||0)+(p.stats.c||0) }; }
+  /* 통계는 더하지 않는다 — 같은 기록이 기기와 서버에 모두 있어 더하면 켤 때마다 두 배가 된다. 더 많이 푼 쪽을 취한다 */
+  if (p.stats && (p.stats.a||0) > (S.stats.a||0)) S.stats = { a:p.stats.a||0, c:p.stats.c||0 };
   S.bh = { ...(p.bh||{}), ...(S.bh||{}) };
   S.qkeep = [...new Set([...(p.qkeep||[]), ...(S.qkeep||[])])];
   S.blocked = [...new Set([...(p.blocked||[]), ...(S.blocked||[])])];
   if (p.sched){ const merge = (a=[], b=[]) => { const m = new Map(); [...a, ...b].forEach(x => m.set(x.id, x)); return [...m.values()]; };
     S.sched = { fixed:merge(p.sched.fixed, S.sched.fixed), events:merge(p.sched.events, S.sched.events), ddays:merge(p.sched.ddays, S.sched.ddays) }; }
   if (p.notifyAt && !S.notifyAt) S.notifyAt = p.notifyAt; };
+/* 새 진도(로그아웃·계정 삭제 뒤) — 화면 설정만 남기고 비운다. 한 기기를 여럿이 쓸 때 진도가 섞이지 않게 */
+const freshS = () => ({ start:todayISO(), done:[], wrong:[], read:[], days:[], bm:[], stats:{a:0,c:0}, bh:{}, qkeep:[], qskip:0, blocked:[],
+  sched:{ fixed:[], events:[], ddays:[] }, fs:S.fs||'보통', theme:S.theme||'시스템', notifyAt:S.notifyAt||'18:00', onboarded:true });
+const flushProgress = async () => { clearTimeout(syncT); const k = progressKey(); if (k) try { await DBX.saveProgress(k, snapshot()); } catch {} };
 let S = load();
 if (!S.start){ S.start = todayISO(); }
 S.done ||= []; S.wrong ||= []; S.read ||= []; S.days ||= []; S.bm ||= []; S.stats ||= { a:0, c:0 }; S.bh ||= {};
@@ -1018,7 +1023,8 @@ const dayIndex = () => Math.max(0, daysBetween(S.start, todayISO())) % CONCEPTS.
 const todayConcept = () => CONCEPTS[dayIndex()];
 /* 이용 권한: 학원 수강생(코드) · 이용권 · 원장 → 전 범위. 그 외는 최근 7일치(무료 체험) */
 const hasPass = () => !!(ACC && ACC.passUntil && ACC.passUntil >= todayISO());
-const fullAccess = () => !!(S.auth || hasPass() || (ACC && ACC.role==='owner'));
+const authLive = () => !!(S.auth && (!S.auth.until || S.auth.until >= todayISO()));
+const fullAccess = () => !!(authLive() || hasPass() || (ACC && ACC.role==='owner'));
 const isOpen = i => fullAccess() || (i <= dayIndex() && i > dayIndex()-FREE_DAYS);
 const dueRetry = () => S.wrong.find(w => !w.b && !w.redone && !w.cleared && w.iso && daysBetween(w.iso, todayISO()) >= RETRY_DAYS);
 const quizFor = c => { const pool = QUIZZES.filter(q=>q.lessonId===c.lessonId); return pool[(+c.no-1)%pool.length] || pool[0]; };
@@ -2284,9 +2290,9 @@ document.addEventListener('click', async e => {
       ACC = await DBX.updateMe({ childCode: v }); childErr=''; toast(`${s.name} 학생과 연결했습니다`); show('parent'); } catch (err){ childErr=err.message; (view==='parent'?renderParent:renderMe)(); } return; }
   if (T('#unlinkChild')){ ACC = await DBX.updateMe({ childCode: '' }); renderParent(); return; }
   if (T('#unauth')){ if (!confirm('학원 코드 연결을 해제할까요? 공지·출석이 닫힙니다.')) return; S.auth=null; if (ACC) ACC = await DBX.updateMe({ studentCode:'' }); save(S); renderMe(); return; }
-  if (T('#logout')){ if (!confirm('로그아웃할까요? 진도는 계정에 저장되어 있습니다.')) return; await DBX.signOut(); ACC=null; S.auth=null; save(S); authMode='start'; show('auth'); return; }
+  if (T('#logout')){ if (!confirm('로그아웃할까요? 진도는 계정에 저장되어 있습니다.')) return; await flushProgress(); await DBX.signOut(); ACC=null; S = freshS(); save(S); authMode='start'; show('auth'); return; }
   if (T('#delAccount')){ if (!confirm('계정을 삭제하면 진도·오답 노트가 함께 지워지고 되돌릴 수 없습니다. 삭제할까요?')) return;
-    try { await DBX.deleteAccount(); ACC=null; S = { start:todayISO(), done:[], wrong:[], read:[], days:[], bm:[], stats:{a:0,c:0}, fs:S.fs, theme:S.theme, notifyAt:S.notifyAt }; localStorage.removeItem(KEY); authMode='start'; toast('계정을 삭제했습니다'); show('auth'); } catch (err){ toast(err.message); } return; }
+    try { await DBX.deleteAccount(); ACC=null; clearTimeout(syncT); S = freshS(); try { localStorage.removeItem(KEY); } catch {} authMode='start'; toast('계정을 삭제했습니다'); show('auth'); } catch (err){ toast(err.message); } return; }
   if (T('#editProfile')){ openSheet(`<h3>이름 · 연락처</h3><div class="f"><input id="epName" placeholder="이름" value="${esc(ACC.name)}" style="flex:1;border:1.5px solid var(--line);border-radius:12px;padding:12px 14px;font-size:15px;font-family:inherit;background:var(--paper);color:var(--ink)"></div>
       <div class="f"><input id="epPhone" placeholder="연락처" inputmode="tel" value="${esc(ACC.phone)}" style="flex:1;border:1.5px solid var(--line);border-radius:12px;padding:12px 14px;font-size:15px;font-family:inherit;background:var(--paper);color:var(--ink)"></div>
       <button class="btn" id="epSave">저장</button><button class="btn ghost" id="sheetClose">취소</button>`); return; }
@@ -2326,7 +2332,11 @@ document.addEventListener('change', e => { if (e.target.id==='bankLesson'){ bank
 (async () => {
   try { ACC = await DBX.me(); } catch { ACC = null; }
   if (ACC){
-    if (ACC.role==='student' && ACC.studentCode && !S.auth){ try { const r = await DBX.verifyCode(ACC.studentCode); if (r.ok) S.auth = { code:ACC.studentCode, name:r.student.name, cls:r.student.cls, until:r.student.until }; } catch {} }
+    /* 켤 때마다 학원 코드를 다시 확인한다 — 수강이 끝났거나 원장님이 해제했으면 닫는다. 연결이 안 되면 저장된 만료일로 판단 */
+    if (ACC.role==='student' && ACC.studentCode){ try { const r = await DBX.verifyCode(ACC.studentCode);
+        if (r.ok) S.auth = { code:ACC.studentCode, name:r.student.name, cls:r.student.cls, until:r.student.until };
+        else { if (S.auth) toast(r.why || '학원 코드가 닫혔습니다'); S.auth = null; } } catch {} }
+    else if (S.auth && ACC.role==='student') S.auth = null;
     if (S.auth && ACC.role!=='student') S.auth = null;
     show(home());
     DBX.loadProgress(progressKey()).then(p => { if (p){ mergeProgress(p); save(S); if (view==='today') renderToday(); } }).catch(()=>{});
