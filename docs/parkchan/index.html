@@ -2453,9 +2453,9 @@ document.addEventListener('click', async e => {
   if (qd){ S.qkeep = (S.qkeep||[]).filter(x => x !== qd.dataset.qdel); save(S); openQuoteKeep(); return; }
   const dm = T('[data-demo]');
   if (dm){ const [em,pw] = dm.dataset.demo.split('|'); document.getElementById('lgEmail').value = em; document.getElementById('lgPw').value = pw; document.getElementById('lgGo').focus(); return; }
-  if (T('#goLogin')){ authMode='login'; authErr=''; renderAuth(); return; }
-  if (T('#goSignup')){ authMode='signup'; authErr=''; renderAuth(); return; }
-  if (T('#goForgot')){ authMode='forgot'; authErr=''; renderAuth(); return; }
+  if (T('#goLogin')){ authMode='login'; authErr=''; renderAuth(); window.scrollTo(0,0); return; }
+  if (T('#goSignup')){ authMode='signup'; authErr=''; renderAuth(); window.scrollTo(0,0); return; }
+  if (T('#goForgot')){ authMode='forgot'; authErr=''; renderAuth(); window.scrollTo(0,0); return; }
   if (T('#authBack')){ authMode = authMode==='forgot' ? 'login' : 'start'; authErr=''; renderAuth(); return; }
   if (T('#goGuest')){ S.onboarded=true; save(S); show('today'); return; }
   if (T('#goAuth')){ authMode='start'; authErr=''; show('auth'); return; }
@@ -2483,12 +2483,12 @@ document.addEventListener('click', async e => {
       if (signRole==='owner' && ACC.role!=='owner') toast('원장 화면은 학원에 등록된 원장 이메일로만 열립니다');
       toast('가입되었습니다'); await afterLogin(ACC);
     } catch (err){ if (err.mailSent){ if (code || child) try { localStorage.setItem('pcs.pendingLink', JSON.stringify({ kind: signRole==='parent'?'child':'student', code: signRole==='parent'?child:code })); } catch {}
-      authMode='login'; authErr=''; authInfo=err.message; const em=g('suEmail'); renderAuth(); const el=document.getElementById('lgEmail'); if (el) el.value=em; return; }
+      authMode='login'; authErr=''; authInfo=err.message; const em=g('suEmail'); renderAuth(); window.scrollTo(0,0); const el=document.getElementById('lgEmail'); if (el) el.value=em; return; }
       authErr = err.message; renderAuth(); }
     return;
   }
   if (T('#fgGo')){ const em=(document.getElementById('fgEmail').value||'').trim(); if (!validEmail(em)){ authErr='이메일 형식을 확인해 주세요.'; renderAuth(); return; }
-    try { const r = await DBX.resetPassword(em); authMode='login'; authErr=''; authInfo=r.note||'메일을 보냈습니다'; renderAuth(); } catch (err){ authErr=err.message; renderAuth(); } return; }
+    try { const r = await DBX.resetPassword(em); authMode='login'; authErr=''; authInfo=r.note||'메일을 보냈습니다'; renderAuth(); window.scrollTo(0,0); } catch (err){ authErr=err.message; renderAuth(); } return; }
   if (T('#npGo')){ const a=(document.getElementById('npPw').value||''), b=(document.getElementById('npPw2').value||'');
     if (a.length<6){ authErr='비밀번호는 6자 이상이어야 합니다.'; renderAuth(); return; }
     if (a!==b){ authErr='두 비밀번호가 다릅니다.'; renderAuth(); return; }
