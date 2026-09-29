@@ -489,7 +489,7 @@ def main():
         _sp = _iu.spec_from_file_location('ing_audit', str(ROOT / 'yakjido' / 'tools' / 'ing_audit.py')); _ia = _iu.module_from_spec(_sp); _sp.loader.exec_module(_ia)
         pg.goto(url + '#/home'); ready(); pg.wait_for_timeout(600)
         _cov = pg.evaluate(_ia.JS, ['pills.json', 'pills-rx.json', 'easy-index.json'])
-        for _f, _lim in (('pills.json', 150), ('pills-rx.json', 169), ('easy-index.json', 91)):
+        for _f, _lim in (('pills.json', 25), ('pills-rx.json', 157), ('easy-index.json', 85)):
             if _cov[_f]['none'] > _lim: fails.append(f'성분을 못 읽는 제품이 늘었습니다 {_f}: {_cov[_f]["none"]} (기준 {_lim}) — {_cov[_f]["bad"][:5]}')
         # 혈압·혈당 수첩 — 적기·7일 평균·기준(135/85) 안내·지우기(2026-09-29)
         pv = br.new_page(viewport={'width': 390, 'height': 844}); verr = []
