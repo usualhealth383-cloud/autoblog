@@ -17,6 +17,8 @@ set timezone to 'Asia/Seoul';
 create schema if not exists private;
 revoke all on schema private from public;
 create table if not exists private.config (k text primary key, v text not null);
+-- 보호자 동의 링크(한 번 쓰면 끝 · 7일)
+create table if not exists private.consent_links (token text primary key, uid uuid not null, at timestamptz not null default now(), used_at timestamptz);
 -- 틀린 코드 입력 기록(학원 코드·출석 코드·이용권 코드 무차별 대입 방지)
 create table if not exists private.attempts (uid uuid, kind text not null, ok boolean not null, at timestamptz not null default now());
 create index if not exists attempts_idx on private.attempts (uid, kind, at desc);
@@ -76,6 +78,10 @@ create table if not exists profiles (
   under14      boolean not null default false,       -- 만 14세 미만(법정대리인 동의)
   guardian     text not null default '',             -- 법정대리인 성명·연락처
   terms_ver    text not null default '',             -- 동의한 약관 판(날짜)
+  guardian_ok  boolean not null default false,       -- 만 14세 미만: 법정대리인 동의를 확인했는가
+  guardian_how text not null default '',             -- 'web'(동의 페이지) · 'paper'(서면)
+  guardian_at  timestamptz,                          -- 동의 시각
+  guardian_notified_at timestamptz,                  -- 웹 동의를 확인했다고 보호자에게 문자로 알린 시각
   agreed_at    timestamptz,
   created_at   timestamptz not null default now()
 );
@@ -97,7 +103,7 @@ create table if not exists passes (
 -- 스토어 결제 영수증(검증 함수가 서비스 키로만 쓴다) — 같은 영수증은 한 번만 반영
 create table if not exists purchases (
   purchase_token text primary key,
-  uid        uuid not null references auth.users(id) on delete cascade,
+  uid        uuid references auth.users(id) on delete set null,   -- 탈퇴해도 결제 기록은 5년 보관(전자상거래법) — 누구 것인지만 끊는다
   product    text not null,
   order_id   text,
   platform   text not null default 'android',
@@ -390,7 +396,7 @@ begin
   if u is null then raise exception 'login required' using errcode = '42501'; end if;
   delete from progress where code = 'u:' || u::text;
   delete from progress where code = (select student_code from profiles where id = u);
-  delete from auth.users where id = u;      -- 프로필·글·댓글·푸시 기기·결제 기록은 연쇄 삭제
+  delete from auth.users where id = u;      -- 프로필·글·댓글·푸시 기기는 연쇄 삭제, 결제 기록은 계정 연결만 끊고 5년 보관
 end $$;
 -- 푸시 받을 기기 목록(서비스 키 전용 · push 함수가 부른다): 공지/일정 → 그 반 학생·보호자, 출석 → 그 학생의 보호자
 create or replace function push_targets(p_kind text, p_cls text, p_code text) returns table(token text, uid uuid, who text)
@@ -405,8 +411,66 @@ language sql stable security definer set search_path = public as $$
       or pr.child_code in (select code from codes)
 $$;
 
+-- ═══ 만 14세 미만 — 법정대리인 동의 확인(개인정보 보호법 제22조의2) ═══
+-- 방법 ① 동의 페이지: 아이가 보호자 폰으로 링크를 보내고 → 보호자가 페이지에서 동의 표시 → 학원이 '확인했다'는 문자를 보호자에게 보냄
+-- 방법 ② 서면: 학원에서 동의서에 서명을 받고 원장이 앱에 '서면 동의 받음'을 누름
+-- 동의 전에는 이야기(글·댓글·읽기)와 진도의 서버 저장을 막고, 7일 안에 동의가 없으면 계정을 지운다(purge_old).
+create or replace function consent_ok(u uuid default auth.uid()) returns boolean language sql stable security definer set search_path = public as $$
+  select coalesce((select not under14 or guardian_ok from profiles where id = u), true) $$;
+create or replace function consent_request() returns json language plpgsql security definer set search_path = public, private as $$
+declare pr profiles; t text;
+begin
+  select * into pr from profiles where id = auth.uid();
+  if not found or not pr.under14 then return json_build_object('ok', false, 'why', '보호자 동의가 필요한 계정이 아닙니다.'); end if;
+  if pr.guardian_ok then return json_build_object('ok', true, 'done', true); end if;
+  if (select count(*) from private.consent_links where uid = pr.id and at > now() - interval '1 day') >= 5 then
+    return json_build_object('ok', false, 'why', '오늘은 요청을 너무 많이 보냈습니다. 내일 다시 시도해 주세요.'); end if;
+  t := encode(gen_random_bytes(18), 'hex');
+  insert into private.consent_links(token, uid) values (t, pr.id);
+  return json_build_object('ok', true, 'token', t, 'guardian', pr.guardian);
+end $$;
+-- 동의 페이지가 보여 줄 것(로그인 없이) — 아이 이름은 첫 글자만
+create or replace function consent_info(p_token text) returns json language plpgsql stable security definer set search_path = public, private as $$
+declare l private.consent_links; pr profiles;
+begin
+  select * into l from private.consent_links where token = p_token and at > now() - interval '7 days';
+  if not found then return json_build_object('ok', false, 'why', '만료된 링크입니다. 자녀에게 새 링크를 보내 달라고 해 주세요.'); end if;
+  select * into pr from profiles where id = l.uid;
+  if not found then return json_build_object('ok', false, 'why', '계정을 찾을 수 없습니다.'); end if;
+  if l.used_at is not null and not pr.guardian_ok then return json_build_object('ok', false, 'why', '이미 사용한 링크입니다. 자녀에게 새 링크를 보내 달라고 해 주세요.'); end if;
+  return json_build_object('ok', true, 'child', left(pr.name, 1) || repeat('○', greatest(char_length(pr.name) - 1, 1)), 'done', pr.guardian_ok,
+                           'expires', to_char((l.at + interval '7 days') at time zone 'Asia/Seoul', 'FMMM"월" FMDD"일"'));
+end $$;
+create or replace function consent_give(p_token text, p_name text) returns json language plpgsql security definer set search_path = public, private as $$
+declare l private.consent_links;
+begin
+  if char_length(trim(coalesce(p_name, ''))) < 2 then return json_build_object('ok', false, 'why', '보호자 성함을 적어 주세요.'); end if;
+  select * into l from private.consent_links where token = p_token and used_at is null and at > now() - interval '7 days' for update;
+  if not found then return json_build_object('ok', false, 'why', '만료되었거나 이미 사용한 링크입니다.'); end if;
+  update private.consent_links set used_at = now() where token = p_token;
+  update profiles set guardian_ok = true, guardian_how = 'web', guardian_at = now(),
+         guardian = left(trim(p_name) || ' ' || coalesce(nullif(substring(guardian from '[0-9][0-9 -]{7,}'), ''), ''), 60)
+   where id = l.uid;
+  return json_build_object('ok', true);
+end $$;
+-- 원장: 동의가 필요한 계정 목록 · 서면 동의 표시 · 확인 문자 보냄 표시
+create or replace function consent_list() returns table(id uuid, name text, guardian text, guardian_ok boolean, guardian_how text, guardian_at timestamptz, notified_at timestamptz, created_at timestamptz)
+language sql stable security definer set search_path = public as $$
+  select p.id, p.name, p.guardian, p.guardian_ok, p.guardian_how, p.guardian_at, p.guardian_notified_at, p.created_at from profiles p
+   where p.under14 and is_owner() order by p.guardian_ok, p.created_at desc $$;
+create or replace function consent_mark(p_uid uuid, p_what text) returns void language plpgsql security definer set search_path = public as $$
+begin
+  if not is_owner() then raise exception 'owner only' using errcode = '42501'; end if;
+  if p_what = 'paper' then update profiles set guardian_ok = true, guardian_how = 'paper', guardian_at = now() where id = p_uid and under14;
+  elsif p_what = 'notified' then update profiles set guardian_notified_at = now() where id = p_uid and under14 and guardian_ok;
+  end if;
+end $$;
+
 -- ═══ 권한 — Supabase 는 public 표에 전부 열어 두므로, 여기서 칸 단위로 다시 좁힌다 ═══
 revoke all on all functions in schema private from public, anon, authenticated;
+revoke execute on function consent_list(), consent_mark(uuid, text), consent_request() from public, anon;
+grant execute on function consent_list(), consent_mark(uuid, text), consent_request() to authenticated;
+grant execute on function consent_info(text), consent_give(text, text) to anon, authenticated;
 revoke execute on function grant_purchase(uuid, text, text, text, int, jsonb), revoke_purchase(text), push_targets(text, text, text) from public, anon, authenticated;
 grant execute on function grant_purchase(uuid, text, text, text, int, jsonb), revoke_purchase(text), push_targets(text, text, text) to service_role;
 
@@ -474,17 +538,17 @@ create policy errors_ins     on client_errors for insert with check (uid is null
 create policy prog_read on progress for select to authenticated
   using (code in (select my_codes()) or code = 'u:' || (select auth.uid())::text);
 create policy prog_ins  on progress for insert to authenticated
-  with check (code = (select my_student_code()) or code = 'u:' || (select auth.uid())::text);
+  with check ((code = (select my_student_code()) or code = 'u:' || (select auth.uid())::text) and (select consent_ok()));
 create policy prog_upd  on progress for update to authenticated
   using (code = (select my_student_code()) or code = 'u:' || (select auth.uid())::text)
-  with check (code = (select my_student_code()) or code = 'u:' || (select auth.uid())::text);
+  with check ((code = (select my_student_code()) or code = 'u:' || (select auth.uid())::text) and (select consent_ok()));
 -- 이야기: 로그인한 사람은 지워지지 않았고 신고 3건 미만인 글을 본다(자기 글은 늘 보인다). 자기 글만 고치고 지운다(되살리기는 안 됨)
-create policy read_posts on posts for select to authenticated using (not deleted and (report_n < 3 or author = (select auth.uid())));
-create policy write_posts on posts for insert to authenticated with check (author = (select auth.uid()));
+create policy read_posts on posts for select to authenticated using (not deleted and (report_n < 3 or author = (select auth.uid())) and (select consent_ok()));
+create policy write_posts on posts for insert to authenticated with check (author = (select auth.uid()) and (select consent_ok()));
 create policy edit_posts on posts for update to authenticated using (author = (select auth.uid()) and not deleted) with check (author = (select auth.uid()));
-create policy read_comments on comments for select to authenticated using (not deleted and (report_n < 3 or author = (select auth.uid())));
+create policy read_comments on comments for select to authenticated using (not deleted and (report_n < 3 or author = (select auth.uid())) and (select consent_ok()));
 create policy write_comments on comments for insert to authenticated
-  with check (author = (select auth.uid()) and exists (select 1 from posts p where p.id = post_id and not p.deleted));
+  with check (author = (select auth.uid()) and (select consent_ok()) and exists (select 1 from posts p where p.id = post_id and not p.deleted));
 create policy edit_comments on comments for update to authenticated using (author = (select auth.uid()) and not deleted) with check (author = (select auth.uid()));
 
 -- 학생 코드가 지워지면 그 진도도 지운다
@@ -493,10 +557,12 @@ begin delete from progress where code = old.code; return old; end $$;
 drop trigger if exists students_drop_progress on students;
 create trigger students_drop_progress after delete on students for each row execute function private.drop_progress();
 
--- ═══ 보관 기간이 지난 기록 지우기(개인정보처리방침 3항) — 오류 기록 90일 · 틀린 입력 기록 1일 ═══
+-- ═══ 보관 기간이 지난 기록 지우기(개인정보처리방침 3항) — 오류 기록 90일 · 틀린 입력 기록 1일 · 보호자 동의가 7일 안에 없는 만 14세 미만 계정 ═══
 create or replace function private.purge_old() returns void language sql security definer set search_path = public, private as $$
   delete from client_errors where at < now() - interval '90 days';
   delete from private.attempts where at < now() - interval '1 day';
+  delete from private.consent_links where at < now() - interval '8 days';
+  delete from auth.users where id in (select id from profiles where under14 and not guardian_ok and created_at < now() - interval '7 days');
 $$;
 -- Supabase 에서는 pg_cron 으로 매일 새벽 4시에 돌린다(Database → Extensions 에서 pg_cron 켠 뒤 이 파일을 다시 실행)
 do $$ begin

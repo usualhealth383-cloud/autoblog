@@ -34,9 +34,19 @@ PAGE = '''<!DOCTYPE html><html lang="ko"><head><meta charset="utf-8"><meta name=
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700;900&display=swap">
 <style>body{{margin:0;background:#FAF8F4;color:#1E2A2E;font-family:'Noto Sans KR',system-ui,sans-serif;line-height:1.75;word-break:keep-all}}main{{max-width:720px;margin:0 auto;padding:32px 20px 60px}}h1{{font-size:24px;margin:0 0 4px}}.meta{{color:#6B7A80;font-size:13px}}h4{{margin:22px 0 6px;font-size:15px}}p{{margin:0 0 10px;font-size:14.5px;color:#3A484D}}table{{border-collapse:collapse;width:100%;font-size:13px}}th,td{{border:1px solid #E2DED6;padding:6px 8px;text-align:left;vertical-align:top}}nav a{{color:#147D6F;font-weight:700;margin-right:14px;font-size:13px;text-decoration:none}}footer{{margin-top:36px;font-size:12px;color:#96A2A6}}</style></head>
 <body><main><nav><a href="./">앱</a><a href="terms.html">이용약관</a><a href="privacy.html">개인정보처리방침</a><a href="delete-account.html">계정 삭제</a></nav><h1>{t}</h1>{b}<footer>박찬 과학 · 하루 한 개념</footer></main></body></html>'''
+# 배포 전에 앱 스크립트 문법 검사 — 중복 선언처럼 앱 전체가 멈추는 실수를 배포본에 넣지 않는다(node 가 있을 때)
+import re, shutil, subprocess, tempfile
+if shutil.which('node'):
+    js = '\n'.join(re.findall(r'<script>([\s\S]*?)</script>', out))
+    with tempfile.NamedTemporaryFile('w', suffix='.js', delete=False, encoding='utf-8') as f: f.write(js)
+    r = subprocess.run(['node', '--check', f.name], capture_output=True, text=True)
+    if r.returncode: raise SystemExit('✗ 앱 스크립트 문법 오류 — 배포하지 않습니다\n' + r.stderr[-1500:])
 if pages.exists():
     (pages / 'index.html').write_text(out, encoding='utf-8')
     for k, t, fn in (('terms', '이용약관', 'terms.html'), ('privacy', '개인정보처리방침', 'privacy.html'), ('delete', '계정·데이터 삭제 안내', 'delete-account.html')):
         (pages / fn).write_text(PAGE.format(t=t, b=legal[k]), encoding='utf-8')
+    # 보호자 동의 페이지(자녀가 보낸 링크로 열림) — 서버 연결값만 심는다
+    consent = (ROOT / 'app' / 'consent.html').read_text(encoding='utf-8').replace('__SB_URL__', cfg.get('url', '')).replace('__SB_KEY__', cfg.get('anonKey', ''))
+    (pages / 'consent.html').write_text(consent, encoding='utf-8')
     print(f'배포본 → {pages}/index.html')
 print(f'{len(out)//1024} KB · 개념 {len(concepts)} · 문항 {len(quizzes)} · 은행 {len(bank)} · 탐구 {len(labs)} · 글귀 {len(quotes["quotes"])} · 그림 {len(figs)}')

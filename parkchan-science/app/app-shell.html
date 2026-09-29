@@ -433,6 +433,14 @@ figure.zoomable{cursor:zoom-in}
 .qsay .acts button.on{color:var(--brand);border-color:var(--brand-line);background:var(--brand-soft)}
 .qsay .acts svg{width:15px;height:15px;stroke:currentColor;stroke-width:2;fill:none;stroke-linecap:round;stroke-linejoin:round}
 .qsay .acts button.on svg{fill:currentColor;stroke:none}
+.consent{background:var(--brand-soft);border:1px solid var(--brand-line);border-radius:16px;padding:14px 16px;margin:0 0 14px;word-break:keep-all}
+.consent .t{font-size:14px;font-weight:900;color:var(--brand-dark);margin-bottom:3px}
+.consent .d{font-size:12.5px;line-height:1.65;color:var(--body);margin-bottom:10px}
+.consent .r{display:flex;gap:8px;flex-wrap:wrap}
+.consent .r .btn{flex:1;min-width:140px;margin:0;padding:11px 12px;font-size:13.5px}
+.cst{font-size:11.5px;font-weight:800;border-radius:999px;padding:3px 9px;white-space:nowrap}
+.cst.wait{color:var(--warn);background:var(--warn-soft,rgba(138,100,8,.1))}
+.cst.ok{color:var(--brand-dark);background:var(--brand-soft)}
 .todaysched{display:flex;align-items:center;gap:10px;width:100%;background:var(--card);border:1px solid var(--hair);border-radius:14px;
   padding:12px 14px;margin-bottom:12px;cursor:pointer;text-align:left}
 .todaysched .l{flex:1;min-width:0;font-size:12.5px;font-weight:700;color:var(--body);line-height:1.5;
@@ -793,7 +801,7 @@ const DB = (() => {
   CLASSES_CACHE = d.classes.slice();
   const w = () => { try { localStorage.setItem(DBKEY, JSON.stringify(d)); } catch {} };
   let sid = null; try { sid = localStorage.getItem('pcs.local.sid'); } catch {}
-  const pub = a => a ? { id:a.id, email:a.email, role:a.role, name:a.name, phone:a.phone||'', studentCode:a.studentCode||'', childCode:a.childCode||'', passUntil:a.passUntil||'', nick:a.nick||'', under14:!!a.under14, guardian:a.guardian||'', created:a.created } : null;
+  const pub = a => a ? { id:a.id, email:a.email, role:a.role, name:a.name, phone:a.phone||'', studentCode:a.studentCode||'', childCode:a.childCode||'', passUntil:a.passUntil||'', nick:a.nick||'', under14:!!a.under14, guardian:a.guardian||'', guardianOk:!!a.guardianOk, guardianHow:a.guardianHow||'', created:a.created } : null;
   const me = () => d.accounts.find(a => a.id === sid) || null;
   const stateOf = code => d.progress[code] || null;
   const attend = (s, manual) => {
@@ -925,6 +933,13 @@ const DB = (() => {
     },
     issuePass: async days => { const p = { code: genCode('pass', c=>d.passes.some(x=>x.code===c)), days, issued: todayISO() }; d.passes.push(p); w(); return p; },
     passes: async () => d.passes.slice().reverse(),
+    /* 보호자 동의(서버의 consent_* 와 같은 규칙) — 로컬 시연에서는 같은 브라우저의 동의 페이지가 이 저장소를 읽는다 */
+    consentRequest: async () => { const a = me(); if (!a || !a.under14) return { ok:false, why:'보호자 동의가 필요한 계정이 아닙니다.' }; if (a.guardianOk) return { ok:true, done:true };
+      d.consents ||= []; const t = Array.from(crypto.getRandomValues(new Uint8Array(18)), b => b.toString(16).padStart(2,'0')).join('');
+      d.consents.push({ token:t, uid:a.id, at:Date.now() }); w(); return { ok:true, token:t, guardian:a.guardian }; },
+    consentList: async () => d.accounts.filter(a => a.under14).map(a => ({ id:a.id, name:a.name, guardian:a.guardian||'', guardian_ok:!!a.guardianOk, guardian_how:a.guardianHow||'', guardian_at:a.guardianAt||null, notified_at:a.notifiedAt||null, created_at:a.created })),
+    consentMark: async (id, what) => { const a = d.accounts.find(x => x.id === id && x.under14); if (!a) return;
+      if (what === 'paper'){ a.guardianOk = true; a.guardianHow = 'paper'; a.guardianAt = new Date().toISOString(); } else if (what === 'notified' && a.guardianOk) a.notifiedAt = new Date().toISOString(); w(); },
     registerPush: async () => {},
     logError: async e => { d.errors ||= []; d.errors.unshift({ ...e, at:new Date().toISOString() }); d.errors = d.errors.slice(0, 30); w(); },
     errors: async () => (d.errors||[]).slice(),
@@ -938,7 +953,7 @@ const DB = (() => {
 const serverDB = () => {
   const notice = (n, reads=[]) => ({ id:n.id, cls:n.cls, t:n.title, d:n.body||'', at:n.at, read: reads.filter(r=>r.notice_id===n.id).map(r=>r.code) });
   const att = a => ({ code:a.code, date:a.date, time:hhmm(a.time), late:!!a.late, manual:!!a.manual });
-  const prof = p => p ? { id:p.id, email:p.email||'', role:p.role, name:p.name, phone:p.phone||'', studentCode:p.student_code||'', childCode:p.child_code||'', passUntil:p.pass_until||'', nick:p.nick||'', under14:!!p.under14, guardian:p.guardian||'', created:p.created_at } : null;
+  const prof = p => p ? { id:p.id, email:p.email||'', role:p.role, name:p.name, phone:p.phone||'', studentCode:p.student_code||'', childCode:p.child_code||'', passUntil:p.pass_until||'', nick:p.nick||'', under14:!!p.under14, guardian:p.guardian||'', guardianOk:!!p.guardian_ok, guardianHow:p.guardian_how||'', created:p.created_at } : null;
   let attCache = null, meCache = null;
   const myProfile = async () => { if (!SESSION) return null; const r = await api(`/rest/v1/profiles?id=eq.${SESSION.user.id}&select=*`); meCache = r.length ? prof({ ...r[0], email:SESSION.user.email }) : null; return meCache; };
   return {
@@ -1035,6 +1050,9 @@ const serverDB = () => {
     redeemPass: async code => { const r = await api('/rest/v1/rpc/redeem_pass', { method:'POST', body:{ p_code: code } }); if (r && r.ok){ meCache = null; } return r; },
     issuePass: async days => { const r = await api('/rest/v1/passes', { method:'POST', prefer:'return=representation', body:{ code:genCode('pass'), days } }); return r[0]; },
     passes: async () => (await api('/rest/v1/passes?select=*&order=issued.desc')).map(p => ({ code:p.code, days:p.days, issued:p.issued, usedBy:p.used_by||'', usedAt:p.used_at||'' })),
+    consentRequest: async () => (await api('/rest/v1/rpc/consent_request', { method:'POST', body:{} })) || { ok:false, why:'요청하지 못했습니다.' },
+    consentList: async () => api('/rest/v1/rpc/consent_list', { method:'POST', body:{} }),
+    consentMark: async (id, what) => { await api('/rest/v1/rpc/consent_mark', { method:'POST', body:{ p_uid:id, p_what:what } }); },
     /* 푸시 받을 기기 · 앱 오류 기록 · 스토어 결제 확인 */
     registerPush: async (token, platform) => { await api('/rest/v1/rpc/register_push', { method:'POST', body:{ p_token:token, p_platform:platform } }); },
     logError: async e => { await api('/rest/v1/client_errors', { method:'POST', prefer:'return=minimal', body:e }); },
@@ -1054,7 +1072,9 @@ let ACC = null;                                  // 로그인한 계정 { id, em
 const KEY = 'pcs.v2';
 const load = () => { try { return JSON.parse(localStorage.getItem(KEY)) || {}; } catch { return {}; } };
 let syncT = null;
-const progressKey = () => (S.auth && S.auth.code) || (ACC ? 'u:'+ACC.id : null);
+/* 만 14세 미만은 보호자 동의를 확인하기 전까지 진도를 서버에 올리지 않는다(이 기기에만) */
+const consentPending = () => !!(ACC && ACC.under14 && !ACC.guardianOk);
+const progressKey = () => consentPending() ? null : (S.auth && S.auth.code) || (ACC ? 'u:'+ACC.id : null);
 const snapshot = () => ({ start:S.start, done:S.done, wrong:S.wrong, read:S.read, days:S.days, bm:S.bm, stats:S.stats, bh:S.bh||{}, qkeep:S.qkeep||[], blocked:S.blocked||[], sched:S.sched, notifyAt:S.notifyAt, at:new Date().toISOString() });
 const save = s => { try { localStorage.setItem(KEY, JSON.stringify(s)); } catch {}
   const k = progressKey(); if (k){ clearTimeout(syncT); syncT = setTimeout(() => DBX.saveProgress(k, snapshot()).catch(()=>{}), 1000); } };
@@ -1245,6 +1265,23 @@ function renderAuth(){
     </div>`;
 }
 
+/* ═══ 보호자 동의(만 14세 미만) — 벽이 아니라 조용한 카드. 교재·문제는 그대로 쓰고, 이야기와 서버 저장만 동의 뒤에 열린다 ═══ */
+const CONSENT_BASE = () => (isNative || !/^https?:/.test(location.href)) ? WEB_URL : location.origin + location.pathname.replace(/[^/]*$/, '');
+function consentCard(where){ if (!consentPending()) return '';
+  const left = Math.max(0, 7 - Math.max(0, daysBetween(String(ACC.created||todayISO()).slice(0,10), todayISO())));
+  return `<div class="consent" role="note"><div class="t">보호자 동의를 기다리고 있어요</div>
+    <div class="d">만 14세 미만은 보호자가 동의해야 <b>이야기</b>와 <b>진도 저장</b>이 열립니다. 교재와 문제는 지금도 그대로 쓸 수 있어요.${where==='me'?` ${left}일 안에 동의가 없으면 계정이 지워집니다(개인정보 보호법 제22조의2).`:''}</div>
+    <div class="r"><button class="btn" id="consentSend">보호자에게 동의 요청 보내기</button>${where!=='today'?`<button class="btn ghost" id="consentPaper">학원에서 서면으로</button>`:''}</div></div>`; }
+async function sendConsent(){
+  let r; try { r = await DBX.consentRequest(); } catch (e){ toast(e.message); return; }
+  if (!r.ok){ toast(r.why); return; }
+  if (r.done){ ACC = await DBX.me(); show(view); toast('이미 동의가 확인되었습니다'); return; }
+  const link = `${CONSENT_BASE()}consent.html?t=${r.token}`, ph = tel(String(r.guardian||'').replace(/^\S+\s*/, ''));
+  const body = `[${CFG.academy}] ${ACC.name} 학생이 '하루 한 개념' 앱 가입에 보호자 동의를 요청했습니다. 아래 링크에서 내용을 보고 동의해 주세요(7일).\n${link}`;
+  openSheet(`<h3>보호자에게 보내기</h3><p>가입할 때 적은 보호자 연락처${ph?` <b>${esc(ph)}</b>`:''}로 문자를 보냅니다. 보호자가 링크에서 동의하면 바로 열립니다.</p>
+    ${ph ? `<a class="btn" href="sms:${ph}${/iphone|ipad/i.test(navigator.userAgent)?'&':'?'}body=${encodeURIComponent(body)}" style="text-decoration:none">문자 앱으로 보내기</a>` : ''}
+    <button class="btn soft" id="consentCopy" data-t="${esc(body)}">링크 복사 · 카카오톡으로 보내기</button><button class="btn ghost" id="sheetClose">닫기</button>`); }
+
 /* ═══ 오늘(학생·게스트 홈) ═══ */
 let unreadNotice = null, myAtt = null;
 /* 날짜에서 정해지는 글귀 — 같은 날은 늘 같은 한 마디, '다른 한 마디'를 누르면 하나씩 넘어간다 */
@@ -1280,7 +1317,7 @@ function openQuoteKeep(){
 
 async function renderToday(){
   const c = todayConcept(); setUnit(c.unit);
-  const d = new Date(), wd = ['일','월','화','수','목','금','토'][d.getDay()];
+  const d = new Date(todayISO()+'T00:00:00'), wd = ['일','월','화','수','목','금','토'][d.getDay()];   // 한국 날짜 기준(주간 띠와 같게)
   unreadNotice = null; myAtt = null;
   if (S.auth){ try { const ns = await DBX.notices(S.auth.cls); unreadNotice = ns.find(n => !n.read.includes(S.auth.code)) || null; myAtt = await DBX.myAttendance(S.auth.code, todayISO()); } catch {}
     try { acadEvents = (await DBX.schedule(S.auth.cls)).map(e => ({ ...e, acad:true })); } catch {} }
@@ -1295,6 +1332,7 @@ async function renderToday(){
                  : `<button class="pill att-pill todo" id="attOpen"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="3"/><path d="M8 12h8M12 8v8"/></svg> 출석 체크</button>`)
         : (hasPass() ? `<span class="pill">이용권 ~${kdate(ACC.passUntil)}</span>` : `<button class="pill warn" id="goPlansPill">체험 ${trialLeft}일 남음</button>`)}
     </div>
+    ${consentCard('today')}
     ${unreadNotice ? `<div class="notice"><div class="ic">!</div><div class="b"><div class="t">${esc(unreadNotice.t)}</div><div class="d">${esc(unreadNotice.d)} · ${esc(unreadNotice.cls)}</div></div><button id="okNotice" data-id="${unreadNotice.id}">확인</button></div>` : ''}
     <div class="week">${week.map(w=>`<div class="d ${w.on?'on':''} ${w.today?'today':''}"><i>${+w.iso.slice(-2)}</i>${w.wd}</div>`).join('')}</div>
     ${(() => { const iso = todayISO();
@@ -1510,6 +1548,8 @@ async function renderTalk(){
       <div class="tsafe">닉네임으로 활동합니다. 실명·전화번호·주소는 적지 마세요. 신고된 글은 원장님이 확인합니다.</div>`;
     return;
   }
+  if (consentPending()){ v.innerHTML = `<h1 class="h-page">이야기</h1>${consentCard('talk')}
+      <div class="tsafe">이야기는 다른 학생들이 보는 공간이라, 만 14세 미만은 보호자 동의를 확인한 뒤에 열립니다.</div>`; return; }
   let list = [], failed = false;
   try { list = await DBX.posts(talkBoard, talkQ); setNet(false); } catch { failed = true; setNet(true); }
   list = list.filter(x => !blocked(x));
@@ -1868,6 +1908,7 @@ function renderMe(){
           <div class="row"><dt>진도</dt><dd>${SRV ? '서버에 저장 — 기기를 바꿔도 이어집니다' : '이 기기에 저장 (서버 연동 전)'}</dd></div>
         </dl></div>`
       : `<div class="codebox"><h3>가입 없이 둘러보는 중</h3><p>로그인하면 진도가 계정에 저장되고, 학원 코드·이용권을 등록할 수 있습니다.</p><button class="btn sm" id="goAuth" style="width:100%">로그인 · 회원가입</button></div>`}
+    ${consentCard('me')}
     ${ACC && ACC.role==='student' && !a ? `<div class="codebox"><h3>학원 코드 등록</h3><p>원장님께 받은 6자리 코드를 넣으면 전 범위가 열리고 <b>내 반 공지</b>와 출석이 연결됩니다.</p>
         <div class="f"><input id="codeIn" class="code" placeholder="코드 6자리" maxlength="6" autocomplete="off" autocapitalize="characters"><button id="codeGo">등록</button></div>${codeErr?`<div class="err">${esc(codeErr)}</div>`:''}
         ${DBX.mode==='local' ? `<div class="demo">시연용 코드 — <code>MON123</code> 월목반 · <code>TUE456</code> 화금반 · <code>WED789</code> 수토반</div>` : ''}</div>` : ''}
@@ -1987,6 +2028,17 @@ async function renderAdmin(){
         ${issued ? `<div class="issued">${esc(issued.name)} 학생 · ${esc(issued.cls)} · ${kdate(issued.until)}까지<br>코드 <code>${issued.code}</code>
           <br><a href="sms:${tel(issued.phone)}${/iphone|ipad/i.test(navigator.userAgent)?'&':'?'}body=${encodeURIComponent(`[${CFG.academy}] ${issued.name} 학생 앱 코드: ${issued.code} — 앱 > 내 정보에서 등록하면 전 범위가 열립니다. 보호자도 같은 코드로 자녀를 연결할 수 있습니다.`)}">문자로 보내기 →</a></div>` : ''}</div>
       <p class="tip">1인 1코드. 학생은 '학원 코드 등록', 보호자는 '자녀 연결'에 같은 코드를 씁니다. 만료일이 지나면 저절로 닫힙니다. 이름을 누르면 출석·진도·정보 고치기가 보입니다.</p>
+      ${await (async () => { let cl = []; try { cl = await DBX.consentList(); } catch {} if (!cl.length) return '';
+        const todo = cl.filter(x => !x.guardian_ok || (x.guardian_how==='web' && !x.notified_at));
+        const smsBody = x => encodeURIComponent(`[${CFG.academy}] ${x.name} 학생의 앱 가입에 대한 보호자님의 동의를 확인했습니다. 동의를 철회하거나 문의하시려면 학원으로 연락 주세요.${CFG.phone?' '+CFG.phone:''}`);
+        return `<details class="stuedit" ${todo.length?'open':''}><summary>만 14세 미만 · 보호자 동의 확인 ${todo.length?`<span class="cst wait">${todo.length}건 할 일</span>`:''}</summary>
+          <p class="tip" style="margin:0 0 8px">보호자가 동의 페이지에서 동의하면, <b>확인 문자</b>를 보호자에게 보내야 확인 절차가 끝납니다(개인정보 보호법 시행령). 서면으로 받았다면 ‘서면 동의 받음’을 누르세요.</p>
+          ${cl.map(x => { const ph = tel(String(x.guardian||'').replace(/^\S+\s*/, '')), days = daysBetween(String(x.created_at||'').slice(0,10), todayISO());
+            return `<div class="kv" style="align-items:flex-start;gap:8px"><span class="k" style="flex:1">${esc(x.name)} <small style="color:var(--faint)">· 보호자 ${esc(x.guardian||'미기재')}</small></span><span class="v" style="display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end">
+              ${!x.guardian_ok ? `<span class="cst wait">동의 대기 · ${Math.max(0, 7-days)}일 남음</span><button class="mini" data-cpaper="${esc(x.id)}">서면 동의 받음</button>`
+                : x.guardian_how==='web' && !x.notified_at ? `<span class="cst ok">웹 동의</span>${ph?`<a class="mini" href="sms:${ph}${/iphone|ipad/i.test(navigator.userAgent)?'&':'?'}body=${smsBody(x)}" data-cnotify="${esc(x.id)}" style="text-decoration:none">확인 문자 보내기</a>`:`<button class="mini" data-cnotify="${esc(x.id)}">연락처 없음 · 전화로 알림 완료</button>`}`
+                : `<span class="cst ok">${x.guardian_how==='paper'?'서면':'웹'} 동의 확인 완료</span>`}</span></div>`; }).join('')}
+        </details>`; })()}
       <details class="stuedit"><summary>학기가 바뀔 때 · 수강 기간 한꺼번에 연장</summary>
         <div class="g"><select id="exCls" aria-label="연장할 반">${['전체',...CL].map(c=>`<option>${esc(c)}</option>`).join('')}</select><input id="exUntil" type="date" value="${new Date().getFullYear()+1}-02-28" aria-label="새 만료일"></div>
         <button class="btn" id="exGo">이 날짜보다 먼저 끝나는 학생을 이 날짜까지 연장</button>
@@ -2476,6 +2528,11 @@ document.addEventListener('click', async e => {
     try { const r = await DBX.redeemPass(v); if (r.ok){ ACC = await DBX.me(); passErr=''; toast(`${kdate(r.until)}까지 전 범위가 열렸습니다`); renderPlans(); } else { passErr=r.why; renderPlans(); } } catch (err){ passErr=err.message; renderPlans(); } return; }
   const buy = T('[data-buy]'); if (buy){ const p = CFG.plans.find(x=>x.id===buy.dataset.buy); if (!ACC){ authMode='start'; show('auth'); return; } await buyPlan(p); return; }
   if (T('#iapRestore')){ await restorePurchases(); return; }
+  if (T('#consentSend')){ await sendConsent(); return; }
+  if (T('#consentCopy')){ const t = T('#consentCopy').dataset.t; try { if (navigator.share) await navigator.share({ text:t }); else { await navigator.clipboard.writeText(t); toast('복사했습니다 · 보호자에게 붙여 보내 주세요'); } } catch {} return; }
+  if (T('#consentPaper')){ openSheet(`<h3>학원에서 서면으로 동의</h3><p>보호자가 학원에 오시면 원장님께 <b>보호자 동의서</b>를 받아 서명해 주세요. 원장님이 앱에서 확인하면 바로 열립니다.</p><button class="btn ghost" id="sheetClose">닫기</button>`); return; }
+  const cpap = T('[data-cpaper]'); if (cpap){ if (!confirm('보호자에게 서면 동의서를 받으셨나요? 받은 서면은 보관해 주세요.')) return; await DBX.consentMark(cpap.dataset.cpaper, 'paper'); toast('서면 동의를 기록했습니다'); renderAdmin(); return; }
+  const cnot = T('[data-cnotify]'); if (cnot){ await DBX.consentMark(cnot.dataset.cnotify, 'notified'); setTimeout(renderAdmin, 400); return; }
 
   /* 원장 — 운영 도구 */
   const sp = T('[data-seplus]'); if (sp){ const el = document.getElementById('seUntil'); const base = el.value && el.value > todayISO() ? el.value : todayISO();
