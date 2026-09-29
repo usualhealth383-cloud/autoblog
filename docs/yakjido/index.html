@@ -28,6 +28,7 @@
   --normal:#1A7946; --caution:#8A6313; --alert:#B63629;
   --normal-tint:#E4F1E9; --caution-tint:#F6EEDD; --alert-tint:#F6E4E1;
   --rx:#4C5FB5; --rx-tint:#E9ECF8;
+  --viz-1:#0075A8; --viz-2:#B96A12;   /* 그림 두 줄 — dataviz 검사기 통과(색각·명도·대비) */
   --on-primary:#FFFFFF; --on-alert:#FFFFFF;   /* 밝은 바탕 위 글자 — 다크에서 뒤집힌다 */
   --r-card:16px; --r-input:10px; --r-pill:999px;
   --s1:4px; --s2:8px; --s3:12px; --s4:16px; --s5:24px; --s6:32px; --s7:48px;
@@ -44,7 +45,7 @@
     --hairline:#2B3438; --tint:#1F3540; --tint2:#1B2226; --ui-line:#75828A; --ui-line:#75828A;
     --normal:#4FB783; --caution:#E0A83A; --alert:#E8635A;
     --normal-tint:#1C2A22; --caution-tint:#2A2418; --alert-tint:#2C1E1C;
-    --rx:#9AA8EA; --rx-tint:#1F2438;
+    --rx:#9AA8EA; --rx-tint:#1F2438; --viz-1:#2E9BC8; --viz-2:#BA7B26;
     --on-primary:#06222C; --on-alert:#2A0F0C;
     --shadow-card:0 4px 18px rgba(0,0,0,.35); --shadow-raised:0 6px 16px rgba(0,0,0,.45);
   }
@@ -57,7 +58,7 @@
   --hairline:#2B3438; --tint:#1F3540; --tint2:#1B2226; --ui-line:#75828A;
   --normal:#4FB783; --caution:#E0A83A; --alert:#E8635A;
   --normal-tint:#1C2A22; --caution-tint:#2A2418; --alert-tint:#2C1E1C;
-  --rx:#9AA8EA; --rx-tint:#1F2438;
+  --rx:#9AA8EA; --rx-tint:#1F2438; --viz-1:#2E9BC8; --viz-2:#BA7B26;
     --on-primary:#06222C; --on-alert:#2A0F0C;
   --shadow-card:0 4px 18px rgba(0,0,0,.35); --shadow-raised:0 6px 16px rgba(0,0,0,.45);
 }
@@ -463,6 +464,29 @@ ul.steps li::before{content:counter(s);position:absolute;left:0;top:2px;width:24
 /* 복용 시간표 */
 .sched-row{padding:12px 0;border-bottom:1px solid var(--hairline)}
 .sched-row:last-child{border-bottom:0}
+.note.soft{background:var(--tint2);color:var(--body)}
+.vt-row{display:flex;flex-wrap:wrap;align-items:flex-end;gap:8px 10px;margin-top:10px}
+.vt-f{display:flex;flex-direction:column;gap:4px;font-size:.8125rem;color:var(--muted);font-weight:600}
+.vt-f input{width:96px;min-height:52px;padding:0 12px;border:1px solid var(--hairline);border-radius:var(--r-input);background:var(--card);color:var(--text);font-size:1.375rem;font-weight:800;font-variant-numeric:tabular-nums}
+.vt-f input::placeholder{color:var(--faint);font-weight:500;opacity:.55}
+.vt-f input:focus-visible{outline:2px solid var(--primary);outline-offset:1px}
+.vt-sl{font-size:1.5rem;color:var(--faint);padding-bottom:10px}
+.vt-big{display:flex;flex-direction:column;gap:2px}.vt-big span{font-size:.8125rem;color:var(--muted);font-weight:600}
+.vt-big b{font-size:2.25rem;line-height:1.1;color:var(--text);font-variant-numeric:tabular-nums;letter-spacing:-.5px}.vt-big b small{font-size:1.5rem;color:var(--faint);margin:0 2px}
+.vt-big em{font-style:normal;font-size:.8125rem;color:var(--muted)}
+.vt-list{display:flex;flex-direction:column}
+.vt-li{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--hairline)}.vt-li:last-child{border-bottom:0}
+.vt-t{flex:1;min-width:0;font-weight:700;color:var(--text);font-variant-numeric:tabular-nums}.vt-t small{font-weight:500;color:var(--muted)}
+.vt-li b{font-variant-numeric:tabular-nums;color:var(--text)}.vt-li b small{font-weight:500;color:var(--muted);font-size:.8125rem}
+.vt-x{width:44px;height:44px;display:grid;place-items:center;border-radius:12px;color:var(--faint);background:none;border:0}
+.vz{width:100%;height:auto;display:block;margin-top:8px}
+.vz-grid{stroke:var(--hairline);stroke-width:1}.vz-ax{fill:var(--muted);font-size:11px;font-variant-numeric:tabular-nums}
+.vz-ref{stroke:var(--faint);stroke-width:1.5;stroke-dasharray:4 4}.vz-reft{fill:var(--muted);font-size:10.5px;font-weight:600}
+.vz-line{fill:none;stroke-width:2;stroke-linejoin:round;stroke-linecap:round}.vz-dot{stroke:var(--card);stroke-width:2}
+.vz-line.v1{stroke:var(--viz-1)}.vz-line.v2{stroke:var(--viz-2)}.vz-dot.v1{fill:var(--viz-1)}.vz-dot.v2{fill:var(--viz-2)}
+.vz-legend{display:flex;flex-wrap:wrap;gap:6px 14px;margin-top:6px;font-size:.8125rem;color:var(--muted)}
+.vz-legend span{display:inline-flex;align-items:center;gap:6px}.vz-legend i{width:14px;height:3px;border-radius:2px;display:inline-block}
+.vz-legend i.v1{background:var(--viz-1)}.vz-legend i.v2{background:var(--viz-2)}.vz-legend i.ref{background:none;border-top:2px dashed var(--faint);height:0}
 .prn-undo{display:block;min-height:44px;margin:2px auto 0;padding:0 8px;background:none;border:0;color:var(--muted);font:inherit;font-size:.875rem;text-decoration:underline;text-underline-offset:3px;cursor:pointer}
 .sched-row .nm{display:flex;align-items:center;justify-content:space-between;gap:8px;font-weight:700}
 .times{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
@@ -1704,7 +1728,7 @@ function route(){
     ensureCore().then(route);
     return;
   }
-  const R = { show:vShow, check:vCheck, home:vHome, symptom:vSymptom, drugs:vDrugs, drug:vDrug, class:vClass, search:vSearch, pub:vPub, pill:vPill, guide:vGuide, kids:vKids, tips:vTips, myths:vMyths, schedule:vSchedule, photo:vPhoto, pillinfo:vPillInfo, supp:vSupp, compare:vCompare, me:vMe, about:vAbout, ingr:vIngr, brand:vBrand, nut:vNut, hello:vHello, mix:vMix, together:vTogether, kinds:vKinds, bag:vBag, rxout:vRxOut, senior:vSenior, askdoc:vAskDoc };
+  const R = { show:vShow, check:vCheck, home:vHome, symptom:vSymptom, drugs:vDrugs, drug:vDrug, class:vClass, search:vSearch, pub:vPub, pill:vPill, guide:vGuide, kids:vKids, tips:vTips, myths:vMyths, schedule:vSchedule, photo:vPhoto, pillinfo:vPillInfo, supp:vSupp, compare:vCompare, me:vMe, about:vAbout, ingr:vIngr, brand:vBrand, nut:vNut, hello:vHello, mix:vMix, together:vTogether, kinds:vKinds, bag:vBag, rxout:vRxOut, senior:vSenior, askdoc:vAskDoc, vitals:vVitals };
   const html = (R[seg[0]] || vHome)(seg[1], q);
   const panel = gqPanel();
   view.innerHTML = panel ? insertPanel(html, panel) : html;
@@ -3699,6 +3723,96 @@ function vSchedule(_, q){
   ${disclaimer('알림은 잊지 않도록 돕는 도구예요. 용량·간격은 약 상자와 약사·의사 지시가 우선이에요.')}`;
 }
 
+/* ───────── 혈압·혈당 수첩 ─────────
+   메디세이프의 「측정값 기록」 자리. 기록은 이 휴대폰에만 둔다(ME.vitals).
+   기준 숫자는 검증된 것만: 가정혈압 135/85 mmHg — 대한고혈압학회 2018·2022.
+   «위험한 숫자»(예: 180/120)는 지침 원문에서 확인하지 못해 숫자로 겁주지 않고, 증상으로만 안내한다.
+   혈당 기준은 VREF.bg 가 비어 있으면 숫자 판정을 하지 않는다(검증 전). */
+const VREF = { bp: { s: 135, d: 85, src: ['ksh2018hbpm', 'ksh2022'] }, bg: null };
+let VT = { k: 'bp' };
+function vitals(){ ME.vitals = ME.vitals || []; return ME.vitals; }
+function vitalSave(){
+  const num = id => { const v = parseFloat((document.getElementById(id) || {}).value); return isFinite(v) ? v : null; };
+  const now = new Date(), t = dayKey(now) + 'T' + hhmm(now);
+  if (VT.k === 'bp') {
+    const s = num('vs'), d = num('vd'), pl = num('vp');
+    if (!(s >= 60 && s <= 260) || !(d >= 30 && d <= 160) || d >= s) { toast('위·아래 혈압을 확인해 주세요 (예: 128 / 82)'); return; }
+    if (pl != null && !(pl >= 30 && pl <= 220)) { toast('맥박을 확인해 주세요 (예: 72)'); return; }
+    vitals().push({ t, k: 'bp', s, d, p: pl, w: VT.w || slotWord(now) });
+  } else {
+    const v = num('vg');
+    if (!(v >= 20 && v <= 600)) { toast('혈당 숫자를 확인해 주세요 (예: 110)'); return; }
+    vitals().push({ t, k: 'bg', v, w: VT.gw || '공복' });
+  }
+  /* 1년·400건까지만 둔다 */
+  const cut = dayBefore(366); ME.vitals = vitals().filter(x => x.t >= cut).slice(-400);
+  saveMe(); toast('적어 두었어요'); route();
+}
+function vitalDel(i){ const L = vitals(); if (!L[i]) return; L.splice(i, 1); saveMe(); route(); }
+const slotWord = d => d.getHours() < 12 ? '아침' : d.getHours() >= 18 ? '저녁' : '낮';
+/* 최근 7일 평균 — 지침은 «주 5일 이상, 아침·저녁» 잰 값을 평균 낸다 */
+function bpAvg(days){
+  const cut = dayBefore(days - 1), L = vitals().filter(x => x.k === 'bp' && x.t.slice(0, 10) >= cut);
+  if (!L.length) return null;
+  const avg = f => Math.round(L.reduce((n, x) => n + x[f], 0) / L.length);
+  return { s: avg('s'), d: avg('d'), n: L.length, days: new Set(L.map(x => x.t.slice(0, 10))).size };
+}
+/* 추세 그림 — 그림도 진짜 숫자로만 그린다. 한 축(mmHg 또는 mg/dL), 기준선은 점선 + 글자 */
+function vitalChart(k){
+  const L = vitals().filter(x => x.k === k && x.t.slice(0, 10) >= dayBefore(13)).sort((a, b) => a.t.localeCompare(b.t));
+  if (L.length < 2) return `<p class="small muted" style="margin-top:8px">두 번 이상 적으시면 2주 흐름을 그림으로 보여 드려요.</p>`;
+  const W = 340, H = 190, pl = 34, pr = 12, pt = 12, pb = 26;
+  const t0 = new Date(dayBefore(13) + 'T00:00').getTime(), t1 = new Date(dayKey(new Date()) + 'T23:59').getTime();
+  const X = t => pl + (new Date(t).getTime() - t0) / (t1 - t0) * (W - pl - pr);
+  const vals = k === 'bp' ? L.flatMap(x => [x.s, x.d]) : L.map(x => x.v);
+  const ref = k === 'bp' ? [VREF.bp.s, VREF.bp.d] : [];
+  let lo = Math.min(...vals, ...ref), hi = Math.max(...vals, ...ref);
+  const step = k === 'bp' ? 20 : 50; lo = Math.floor((lo - 5) / step) * step; hi = Math.ceil((hi + 5) / step) * step;
+  const Y = v => pt + (hi - v) / (hi - lo) * (H - pt - pb);
+  const ticks = []; for (let v = lo; v <= hi; v += step) ticks.push(v);
+  const grid = ticks.map(v => `<line x1="${pl}" x2="${W - pr}" y1="${Y(v)}" y2="${Y(v)}" class="vz-grid"/><text x="${pl - 6}" y="${Y(v) + 4}" text-anchor="end" class="vz-ax">${v}</text>`).join('');
+  const days = [13, 6, 0].map(n => { const d = new Date(); d.setDate(d.getDate() - n); return `<text x="${X(dayKey(d) + 'T12:00')}" y="${H - 6}" text-anchor="middle" class="vz-ax">${d.getMonth() + 1}/${d.getDate()}</text>`; }).join('');
+  const refs = ref.map((v, i) => `<line x1="${pl}" x2="${W - pr}" y1="${Y(v)}" y2="${Y(v)}" class="vz-ref"/><text x="${W - pr}" y="${Y(v) - 4}" text-anchor="end" class="vz-reft">${i ? '아래' : '위'} ${v}</text>`).join('');
+  const line = (f, c) => `<polyline points="${L.map(x => `${X(x.t).toFixed(1)},${Y(x[f]).toFixed(1)}`).join(' ')}" class="vz-line ${c}"/>` +
+    L.map(x => `<circle cx="${X(x.t).toFixed(1)}" cy="${Y(x[f]).toFixed(1)}" r="4.5" class="vz-dot ${c}"><title>${x.t.slice(5, 10).replace('-', '/')} ${x.t.slice(11)} · ${k === 'bp' ? x.s + '/' + x.d + ' mmHg' : x.v + ' mg/dL'}</title></circle>`).join('');
+  const series = k === 'bp' ? line('s', 'v1') + line('d', 'v2') : line('v', 'v1');
+  const legend = k === 'bp' ? `<div class="vz-legend"><span><i class="v1"></i>위 혈압(수축기)</span><span><i class="v2"></i>아래 혈압(이완기)</span><span><i class="ref"></i>가정혈압 기준</span></div>` : '';
+  return `<svg class="vz" viewBox="0 0 ${W} ${H}" role="img" aria-label="최근 2주 ${k === 'bp' ? '혈압' : '혈당'} 흐름 — 아래 목록에 같은 숫자가 있어요">${grid}${refs}${days}${series}</svg>${legend}`;
+}
+function vVitals(){
+  const k = VT.k, L = vitals(), mine = L.map((x, i) => ({ ...x, i })).filter(x => x.k === k).reverse();
+  const av = bpAvg(7), hiAvg = av && av.n >= 3 && (av.s >= VREF.bp.s || av.d >= VREF.bp.d);
+  const takesBp = takingItems().some(d => ingOf(d).ings.some(e => (e.cls || []).some(c => ['arb', 'acei', 'ccb', 'beta', 'diuretic', 'bp-any'].includes(c))));
+  const lastBp = L.filter(x => x.k === 'bp').slice(-1)[0];
+  const form = k === 'bp' ? `
+    <div class="vt-row"><label class="vt-f"><span>위 혈압</span><input id="vs" type="number" inputmode="numeric" min="60" max="260" placeholder="128" aria-label="위 혈압(수축기)"></label>
+      <b class="vt-sl">/</b><label class="vt-f"><span>아래 혈압</span><input id="vd" type="number" inputmode="numeric" min="30" max="160" placeholder="82" aria-label="아래 혈압(이완기)"></label>
+      <label class="vt-f"><span>맥박 <small>(선택)</small></span><input id="vp" type="number" inputmode="numeric" min="30" max="220" placeholder="72" aria-label="맥박(선택)"></label></div>
+    <div class="times" style="margin-top:10px">${['아침', '낮', '저녁'].map(w => `<button class="chip ${(VT.w || slotWord(new Date())) === w ? 'on' : ''}" onclick="VT.w='${w}';route()">${w}</button>`).join('')}</div>`
+  : `<div class="vt-row"><label class="vt-f"><span>혈당 (mg/dL)</span><input id="vg" type="number" inputmode="numeric" min="20" max="600" placeholder="110" aria-label="혈당"></label></div>
+    <div class="times" style="margin-top:10px">${['공복', '식후 2시간', '그 밖'].map(w => `<button class="chip ${(VT.gw || '공복') === w ? 'on' : ''}" onclick="VT.gw='${w}';route()">${w}</button>`).join('')}</div>`;
+  return `${topBar({ back:'내 정보' })}<div class="eyebrow">혈압·혈당 수첩</div><h1>재 두신 숫자, 진료 때 한눈에</h1>
+  <p style="margin-top:6px">집에서 잰 혈압·혈당을 적어 두면 <b>2주 흐름</b>과 <b>7일 평균</b>을 보여 드려요. 기록은 <b>이 휴대폰에만</b> 있어요.</p>
+  <div class="seg" style="margin-top:14px" role="group" aria-label="무엇을 적을까요">${[['bp', '혈압'], ['bg', '혈당']].map(([v, n]) => `<button class="${k === v ? 'on' : ''}" onclick="VT.k='${v}';route()" aria-pressed="${k === v}">${n}</button>`).join('')}</div>
+  <section class="sec card"><h2>지금 잰 값 적기</h2>${form}
+    <div class="actions" style="margin-top:12px"><button class="btn" onclick="vitalSave()">${I.check} 적어 두기</button></div></section>
+  ${k === 'bp' && av ? `<section class="sec card vt-sum"><div class="vt-big"><span>최근 7일 평균</span><b>${av.s}<small>/</small>${av.d}</b><em>mmHg · ${av.days}일 ${av.n}번</em></div>
+    ${hiAvg ? `<div class="note" style="margin-top:10px">${I.info}<span><b>가정혈압 기준(135/85)보다 높은 편이에요.</b> ${takesBp ? '혈압약을 드시고 계시니, 이 기록을 <b>다음 진료 때 보여 주세요.</b>' : '며칠 더 재 보시고, 계속 높으면 <b>내과 진료</b>를 받아 보세요.'}</span></div>` : av.n < 3 ? `<p class="small muted" style="margin-top:8px">아침·저녁으로 며칠 더 적으시면 평균이 믿을 만해져요.</p>` : ''}
+    ${lastBp && hiAvg ? `<p class="small muted" style="margin-top:8px">코막힘약(슈도에페드린·페닐레프린·에페드린)은 혈압을 올릴 수 있어요 — 약국에서 «혈압이 높다»고 말씀하세요.</p>` : ''}
+  </section>` : ''}
+  <section class="sec card"><h2>2주 흐름</h2>${vitalChart(k)}</section>
+  <section class="sec card"><h2>적은 기록 <small>${mine.length}번</small></h2>
+    ${mine.length ? `<div class="vt-list">${mine.slice(0, 30).map(x => `<div class="vt-li"><span class="vt-t">${x.t.slice(5, 10).replace('-', '/')} <small>${x.t.slice(11)} · ${esc(x.w || '')}</small></span><b>${k === 'bp' ? `${x.s}/${x.d}<small> mmHg${x.p ? ` · 맥박 ${x.p}` : ''}</small>` : `${x.v}<small> mg/dL</small>`}</b><button class="vt-x" onclick="vitalDel(${x.i})" aria-label="이 기록 지우기">${I.x}</button></div>`).join('')}</div>` : `<div class="empty"><b>아직 적은 기록이 없어요</b>위에서 한 번 적어 보세요.</div>`}
+    ${mine.length ? `<div class="actions" style="margin-top:12px"><button class="btn line" onclick="window.print()">${I.book} 진료 때 보여 드리기(인쇄·PDF)</button></div>` : ''}
+  </section>
+  <details class="why-more sec"><summary>어떻게 재면 좋을까요</summary>
+    ${k === 'bp' ? `<p class="why" style="margin-top:6px"><b>아침</b> — 일어나 1시간 안, 소변을 본 뒤, 혈압약을 먹기 전.<br><b>저녁</b> — 잠자기 전.<br>앉아서 몇 분 쉰 뒤 재고, <b>주 5일 이상</b> 재서 평균을 봅니다. 가정혈압은 <b>135/85 mmHg 이상</b>이면 높은 것으로 봐요.</p>${srcChips(VREF.bp.src)}`
+    : `<p class="why" style="margin-top:6px">공복 혈당은 <b>아침 식사 전</b>, 식후 혈당은 <b>식사 시작 2시간 뒤</b>에 잽니다. 목표 범위는 사람마다 달라 <b>담당 의사가 정해 준 숫자</b>를 따르세요.</p>${VREF.bg ? srcChips(VREF.bg.src) : ''}`}
+  </details>
+  <div class="note soft" style="margin-top:12px">${I.alert}<span><b>갑자기 심한 두통·가슴 통증·숨참·한쪽 팔다리 힘 빠짐·말이 어눌함</b>이 있으면 숫자와 상관없이 <b>119</b>에 연락하세요.</span></div>
+  ${disclaimer('기록은 진료를 돕는 참고 자료예요. 약을 늘리거나 줄이는 것은 의사와 상의하세요.')}`;
+}
+
 /* ───────── 3단계 안내(처음 오신 분 진입로) ───────── */
 function vGuide(step, q){
   step = +step || 1; const sid = location.hash.split('/')[3]?.split('?')[0]; const s = sid ? byId(D.symptoms, sid) : null;
@@ -4987,7 +5101,7 @@ function vMe(){
     ${MQ.trim() ? `<div class="card rows" style="margin-top:8px">${(search(MQ.trim()).filter(h => h.h.startsWith('/drug/')).slice(0, 6).map(h => { const id = h.h.slice(6); const on = (ME.taking || []).includes(id); return `<button class="row" onclick="${on ? '' : `toggleTaking('${id}');`}MQ='';route()"><div class="ic">${I.pill}</div><div class="body"><b>${esc(h.t)}</b><span>${on ? '이미 등록돼 있어요' : '눌러서 내 약통에 담기'}</span></div>${I.chev}</button>`; }).join('')) || '<div class="empty">찾는 약이 없어요</div>'}</div>` : ''}
     ${takingItems().length ? `<p class="small muted" style="margin-top:8px">항생제·감기약처럼 <b>며칠만</b> 드시는 약은 ‘며칠만’을 눌러 두세요. 매일 드시는 약과 구분해서 부담을 셉니다.</p><button class="tog-cta" onclick="go('/together')">${I.shield}<div><b>같이 먹어도 되나요</b><span>담아 두신 ${takingItems().length}가지를 성분으로 풀어서 서로 부딪히는 자리를 봐 드려요</span></div>${I.chev}</button><button class="tog-cta" onclick="go('/bag')">${I.eye}<div><b>내 약 목록 한 장</b><span>진료실·약국에서 큰 글씨로 보여 드리세요</span></div>${I.chev}</button>` : ''}
     ${achPanel([], { always:true })}
-    <div class="actions"><button class="btn ghost" onclick="go('/schedule')">${I.clock} 복용 시간 알림 만들기</button></div>
+    <div class="actions two"><button class="btn ghost" onclick="go('/schedule')">${I.clock} 복용 시간 알림</button><button class="btn ghost" onclick="go('/vitals')">${I.heart} 혈압·혈당 수첩</button></div>
   </section>
   <section class="sec card"><h2>알아두면 좋은 것</h2><p class="small" style="margin-top:6px">상품명과 성분명, 해열제는 치료가 아니라는 것, 소염제는 한 가지만 — 짧은 건강정보 ${(D.tips || []).length}가지.</p><div class="actions"><button class="btn ghost" onclick="go('/tips')">${I.info} 읽어 보기</button></div></section>
   <section class="sec card"><h2>사진 서버 <small class="muted" style="font-weight:500;font-size:.8125rem">관리자용</small></h2><p class="small" style="margin-top:6px">사진 읽기(Gemini) 서버 주소예요. yakjido/server 를 배포한 뒤 붙여 넣으세요. 비워 두면 기본값(${esc(D.meta?.photoEndpoint || '없음')}).</p><div class="search" style="margin-top:10px">${I.link}<input id="ep" aria-label="사진 서버 주소" placeholder="https://<워커이름>.workers.dev" value="${esc((() => { try { return localStorage.getItem('yakjido.photo') || ''; } catch (e) { return ''; } })())}" onchange="try{localStorage.setItem('yakjido.photo',this.value.trim())}catch(e){};toast('저장했어요')"></div></section>

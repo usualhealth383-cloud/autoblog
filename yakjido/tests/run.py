@@ -249,7 +249,7 @@ def main():
             except Exception: fails.append('본문 자료(core.json)를 못 받았습니다 — ' + pg.url)
         pg.goto(url); ready(); pg.wait_for_timeout(1200)
         pg.evaluate("localStorage.setItem('yakjido.hello.v1','1');localStorage.setItem('yakjido.me.v1',JSON.stringify({age:'senior',taking:['cls:bp.arb'],pub:{}}))")
-        routes = pg.evaluate("()=>['/home','/drugs','/tips','/me','/together','/kinds','/kinds/bp','/pill','/supp','/kids','/mix','/hello/1','/hello/3','/photo','/schedule','/about','/bag','/rxout','/senior','/myths','/askdoc','/askdoc?open=gout']" +
+        routes = pg.evaluate("()=>['/home','/drugs','/tips','/me','/together','/kinds','/kinds/bp','/pill','/supp','/kids','/mix','/hello/1','/hello/3','/photo','/schedule','/about','/bag','/rxout','/senior','/myths','/askdoc','/askdoc?open=gout','/vitals']" +
                              ".concat(D.symptoms.map(s=>'/symptom/'+s.id)).concat(D.drugs.map(d=>'/drug/'+d.id)).concat(D.classes.map(c=>'/class/'+c.id)).concat(D.classes.map(c=>'/drugs?cat='+c.id)).concat((D.myths||[]).map(m=>'/myths?open='+m.id))")
         # 1~3. 모든 화면
         for r in routes:
@@ -491,6 +491,26 @@ def main():
         _cov = pg.evaluate(_ia.JS, ['pills.json', 'pills-rx.json', 'easy-index.json'])
         for _f, _lim in (('pills.json', 150), ('pills-rx.json', 169), ('easy-index.json', 91)):
             if _cov[_f]['none'] > _lim: fails.append(f'성분을 못 읽는 제품이 늘었습니다 {_f}: {_cov[_f]["none"]} (기준 {_lim}) — {_cov[_f]["bad"][:5]}')
+        # 혈압·혈당 수첩 — 적기·7일 평균·기준(135/85) 안내·지우기(2026-09-29)
+        pv = br.new_page(viewport={'width': 390, 'height': 844}); verr = []
+        pv.on('pageerror', lambda e: verr.append(str(e)))
+        pv.clock.install(time='2026-09-29T08:00:00')
+        pv.add_init_script("localStorage.setItem('yakjido.hello.v1','1');localStorage.setItem('yakjido.me.v1',JSON.stringify({taking:['cls:bp.arb'],pub:{}}))")
+        pv.goto(url + '#/vitals'); pv.wait_for_selector('.app', timeout=15000); pv.wait_for_timeout(600)
+        for sv, dv in ((142, 88), (138, 86), (140, 90)):
+            pv.fill('#vs', str(sv)); pv.fill('#vd', str(dv)); pv.click('button:has-text("적어 두기")'); pv.wait_for_timeout(250)
+        vt = pv.inner_text('.app')
+        if '140/88' not in vt.replace('\n', '').replace(' ', '') and '140' not in pv.inner_text('.vt-big'): fails.append(f'혈압 수첩: 7일 평균이 틀립니다 — {pv.inner_text(".vt-big")[:60]}')
+        if '가정혈압 기준(135/85)보다 높은 편' not in vt or '다음 진료 때 보여 주세요' not in vt: fails.append('혈압 수첩: 높은 평균 안내가 없습니다(혈압약 드시는 분)')
+        if not pv.query_selector('svg.vz polyline'): fails.append('혈압 수첩: 2주 흐름 그림이 없습니다')
+        pv.fill('#vs', '80'); pv.fill('#vd', '120'); pv.click('button:has-text("적어 두기")'); pv.wait_for_timeout(250)
+        if len(pv.evaluate("()=>ME.vitals")) != 3: fails.append('혈압 수첩: 아래가 위보다 큰 값을 받아들였습니다')
+        pv.click('.vt-x'); pv.wait_for_timeout(250)
+        if len(pv.evaluate("()=>ME.vitals")) != 2: fails.append('혈압 수첩: 지우기가 안 됩니다')
+        pv.click('.seg button:has-text("혈당")'); pv.wait_for_timeout(250); pv.fill('#vg', '112'); pv.click('button:has-text("적어 두기")'); pv.wait_for_timeout(250)
+        if not any(x.get('k') == 'bg' and x.get('v') == 112 for x in pv.evaluate("()=>ME.vitals")): fails.append('혈압 수첩: 혈당이 적히지 않습니다')
+        if verr: fails.append(f'혈압 수첩: JS 오류 {verr[:2]}')
+        pv.close()
         # 필요할 때만 드시는 약 — 드신 때를 적고, 허가 간격·하루 상한으로 막아 드리는지(2026-09-29)
         pp = br.new_page(viewport={'width': 390, 'height': 844}); perr = []; dlg = []
         pp.on('pageerror', lambda e: perr.append(str(e)))
