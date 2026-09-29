@@ -1322,7 +1322,7 @@ main>*:nth-child(2){animation-delay:.04s} main>*:nth-child(3){animation-delay:.0
 <script>
 /* ───────── 데이터·유틸 ───────── */
 const D = JSON.parse(document.getElementById('data').textContent || '{}');
-const BUILD = '2026-09-28';
+const BUILD = '2026-09-29';
 /* 상단 마크는 현욱님 아이콘 파일 그대로 쓴다 — 옮겨 그리면 또 틀어진다(2026-09-21 사고) */
 const BRANDMARK = (typeof window !== 'undefined' && window.__BRANDMARK__) || 'icon-192.png';
 /* ── 본문 자료는 첫 화면이 뜬 뒤에 받는다 ──────────────────────────────
@@ -3420,6 +3420,16 @@ async function nativeArm(){
           extra: { key, again: dayKey(at) }, isExactNotification: exact, schedule: { at, allowWhileIdle: true } });
       }
     }
+    /* 약이 떨어지기 전에 — 남은 알 수를 넣어 두신 약만. 3일치·1일치 남는 날 아침 9시에 한 번씩(메디세이프의 「리필 알림」 자리) */
+    for (const d of takingItems()) {
+      const dl = daysLeft(d.id); if (dl == null) continue;
+      for (const left of [3, 1]) {
+        const at = new Date(); at.setDate(at.getDate() + (dl - left)); at.setHours(9, 0, 0, 0);
+        if (dl < left || at.getTime() <= now) continue;
+        list.push({ id: 800000 + id++, title: left === 1 ? '약이 오늘 치만 남았어요' : '약이 3일치 남았어요', body: `${d.name} — 주말·연휴 전에 미리 받아 두세요.${(d.quick || (d.pub && d.pub.rx)) ? ' 처방약이면 진료를 미리 잡아 두세요.' : ''}`.slice(0, 120),
+          channelId: 'dose', extra: { stock: d.id }, isExactNotification: false, schedule: { at, allowWhileIdle: true } });
+      }
+    }
     if (list.length) await LN.schedule({ notifications: list });
   } catch (e) { console.warn('알림을 걸지 못했습니다', e); }
 }
@@ -4870,6 +4880,17 @@ async function exportMe(){
   if (await saveFile(`약지도-내기록-${todayKey()}.json`, JSON.stringify(payload, null, 1), 'application/json'))
     toast('파일로 받았어요 — 새 휴대폰에서 「가져오기」로 넣으시면 돼요');
 }
+/* 기록 모두 지우기 — 글자 크기·화면 밝기 같은 보기 설정은 개인 기록이 아니라 남긴다 */
+async function wipeMe(){
+  const n = (ME.taking || []).length, d = Object.keys(ME.taken || {}).length;
+  if (!confirm(`이 휴대폰의 약지도 기록을 «모두» 지웁니다.\n\n약 ${n}가지 · 복용 기록 ${d}일치 · 불편했던 일 · 알림\n\n되돌릴 수 없어요. 지울까요?`)) return;
+  try { localStorage.removeItem(ME_KEY); localStorage.removeItem(WX_KEY); } catch (e) {}
+  ME = { ...ME_DEF }; WX = {};
+  NOTI_TIMERS.forEach(clearTimeout); NOTI_TIMERS = [];
+  const LN = plug('LocalNotifications');
+  if (LN) { try { const pend = (await LN.getPending()).notifications || []; if (pend.length) await LN.cancel({ notifications: pend.map(p => ({ id: p.id })) }); } catch (e) {} }
+  toast('모두 지웠어요'); go('/home'); route();
+}
 async function importMe(file){
   if (!file) return;
   let j; try { j = JSON.parse(await file.text()); } catch (e) { toast('읽을 수 없는 파일이에요'); return; }
@@ -4932,6 +4953,10 @@ function vMe(){
       <button class="btn ghost" onclick="document.getElementById('mefile').click()">${I.user} 파일에서 가져오기</button></div>
     <input id="mefile" type="file" accept="application/json,.json" style="position:absolute;width:1px;height:1px;opacity:0;pointer-events:none" aria-label="약지도 기록 파일 고르기" onchange="importMe(this.files[0]);this.value=''">
     <p class="small muted" style="margin-top:8px">가져오면 <b>지금 기록을 덮어씁니다.</b> 넣기 전에 한 번 더 여쭤볼게요.</p>
+    <details class="why-more" style="margin-top:10px"><summary>이 휴대폰의 기록 모두 지우기</summary>
+      <p class="small" style="margin-top:6px">담아 둔 약·복용 기록·불편했던 일·알림·날씨 위치를 <b>이 휴대폰에서 모두 지웁니다.</b> 저희 서버에는 처음부터 없으니, 지우시면 어디에도 남지 않아요. 되돌릴 수 없으니 필요하면 먼저 <b>파일로 받아</b> 두세요.</p>
+      <div class="actions"><button class="btn ghost" onclick="wipeMe()">${I.x} 모두 지우기</button></div>
+    </details>
   </section>
   <section class="sec card"><h2>이 앱에 대해</h2><p class="small" style="margin-top:6px">${esc(D.meta?.about || '')}</p><div class="actions"><button class="btn line" onclick="go('/about')">근거·검수 기준 보기</button></div></section>
   <p class="small muted" style="margin-top:16px;text-align:center">약지도 v${esc(D.meta?.version || '')} · 빌드 ${BUILD}<br>식약처 공공데이터 — e약은요 ${esc(String(D.public?.easy_source || '').match(/\d{8}/)?.[0] || '')} · 낱알식별 ${esc(String(D.public?.pills_source || '').match(/\d{8}/)?.[0] || '')} 기준</p>`;

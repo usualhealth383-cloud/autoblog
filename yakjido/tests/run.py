@@ -514,6 +514,16 @@ def main():
         pn.evaluate("()=>__LN.listeners.localNotificationActionPerformed({actionId:'later',notification:{title:'약지도 · 약 드실 시간',body:'x',extra:{key:'ibuprofen@08:00'}}})"); pn.wait_for_timeout(400)
         if not [x for x in pn.evaluate("()=>__LN.pending") if x['id'] >= 900000]: fails.append('앱 알람: 「10분 뒤 다시」가 걸리지 않습니다')
         if pn.evaluate("async()=>!!(navigator.serviceWorker && await navigator.serviceWorker.getRegistration())"): fails.append('앱 알람: 설치 앱에서 서비스워커가 등록됩니다')
+        # 남은 알 수 10알·하루 2번 → 5일치 → 3일치 되는 날(9/30)·오늘 치만 남는 날(10/2) 아침 9시
+        pn.evaluate("()=>{ME.stock={ibuprofen:{left:10,at:todayKey()}};saveMe();nativeArm();}"); pn.wait_for_timeout(600)
+        rf = pn.evaluate("()=>__LN.pending.filter(x=>x.extra&&x.extra.stock).map(x=>{const d=new Date(x.schedule.at);return (d.getMonth()+1)+'/'+d.getDate()+' '+d.getHours()+'시 '+x.title})")
+        if sorted(rf) != ['10/2 9시 약이 오늘 치만 남았어요', '9/30 9시 약이 3일치 남았어요']: fails.append(f'앱 알람: 약 떨어지기 전 알림이 틀립니다 — {rf}')
+        # 기록 모두 지우기 — 기록·알람이 다 사라지고, 글자 크기 같은 보기 설정은 남는다
+        pn.once('dialog', lambda dg: dg.accept())
+        pn.evaluate("()=>localStorage.setItem('yakjido.fs','20px')")
+        pn.evaluate("()=>wipeMe()"); pn.wait_for_timeout(600)
+        w = pn.evaluate("()=>({t:(ME.taking||[]).length, p:__LN.pending.length, ls:localStorage.getItem('yakjido.me.v1'), fs:localStorage.getItem('yakjido.fs')})")
+        if w['t'] or w['p'] or w['ls'] or w['fs'] != '20px': fails.append(f'기록 모두 지우기가 제대로 안 됩니다 — {w}')
         if nerr: fails.append(f'앱 알람: JS 오류 {nerr[:2]}')
         pn.close()
         # 6b-2. 성분표에 없던 공공 제품 — 클로닉신(먹는 소염제 26개 제품)·돔페리돈이 약통에서 실제로 걸려야 한다(2026-09-23)
