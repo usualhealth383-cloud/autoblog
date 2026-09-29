@@ -78,7 +78,7 @@ async def main():
         ctx, pr = await page()
         await pr.click('#goSignup'); await pr.click('[data-role="parent"]'); await pr.fill('#suName', '테스트보호자'); await pr.fill('#suEmail', 'par1@test.kr'); await pr.fill('#suPw', '123456'); await pr.check('#suAgree'); await pr.click('#suGo'); await pr.wait_for_timeout(500)
         assert await pr.evaluate('view') == 'parent' and await pr.locator('#childIn').count() == 1
-        await pr.fill('#childIn', 'ZZZ000'); await pr.click('#childGo'); await pr.wait_for_timeout(200); assert '찾을 수 없' in await txt(pr, '.err')
+        await pr.fill('#childIn', 'ZZZ000'); await pr.click('#childGo'); await pr.wait_for_timeout(200); assert '등록되지 않은' in await txt(pr, '.err')
         await pr.fill('#childIn', 'MON123'); await pr.click('#childGo'); await pr.wait_for_timeout(500)
         body = await txt(pr, '#v-parent'); assert '박○○ 학생' in body and '출석' in body, body[:200]; await shot(pr, 'l10_parent')
         assert [t for t in await pr.locator('.tab').all_inner_texts()] == ['자녀', '교재', '이야기', '일정', '내 정보']
@@ -88,7 +88,7 @@ async def main():
         ctx, o = await page()
         await o.click('#goLogin'); await o.fill('#lgEmail', 'owner@parkchan.kr'); await o.fill('#lgPw', '2580'); await o.click('#lgGo'); await o.wait_for_timeout(600)
         assert await o.evaluate('view') == 'admin'; await shot(o, 'l11_admin_students')
-        await o.click('[data-stu="MON123"]'); await o.wait_for_timeout(400); sh = await txt(o, '.sheet'); assert '박○○ 학생' in sh and '보호자 연결 1명' in sh and '이달 출석' in sh, sh[:300]; await shot(o, 'l12_student_sheet'); await o.click('#sheetClose')
+        await o.click('[data-stu="DEMO01"]'); await o.wait_for_timeout(400); sh = await txt(o, '.sheet'); assert '박○○ 학생' in sh and '보호자 연결 1명' in sh and '이달 출석' in sh, sh[:300]; await shot(o, 'l12_student_sheet'); await o.click('#sheetClose')
         await o.click('[data-adm="stats"]'); await o.wait_for_timeout(500); st = await txt(o, '#v-admin'); assert '수강생' in st and '반별 출석' in st; await shot(o, 'l13_admin_stats')
         await o.click('[data-adm="settings"]'); await o.wait_for_timeout(400)
         await o.fill('#clsName', '일요반'); await o.fill('#clsStart', '10:00'); await o.click('#clsAdd'); await o.wait_for_timeout(400); assert '일요반' in await txt(o, '#v-admin')

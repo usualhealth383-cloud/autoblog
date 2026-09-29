@@ -29,7 +29,7 @@ async def main():
 
         # 1) 통계가 켤 때마다 두 배가 되지 않는다
         await login('student@demo.kr', '1234')
-        assert await s.evaluate('S.auth && S.auth.code') == 'MON123'
+        assert await s.evaluate('S.auth && S.auth.code') == 'DEMO01'
         await s.click('#goQuiz'); await s.wait_for_timeout(300); ans = await s.evaluate('qState.q.answer')
         await s.click(f'.opt[data-p="{ans}"]'); await s.wait_for_timeout(1500)       # 서버(로컬 DB) 저장 1초 디바운스
         assert await s.evaluate('S.stats.a') == 1
@@ -47,13 +47,13 @@ async def main():
         assert await s.evaluate('S.done.length') == 1 and await s.evaluate('S.stats.a') == 1, '다시 로그인했는데 진도가 돌아오지 않음'
 
         # 3) 수강 만료 → 켜면 닫힌다 / 원장이 해제 → 켜면 닫힌다
-        await s.evaluate("""() => { const d = JSON.parse(localStorage.getItem('pcs.db.v2')); d.students.find(x=>x.code==='MON123').until = '2020-01-01'; localStorage.setItem('pcs.db.v2', JSON.stringify(d)); }""")
+        await s.evaluate("""() => { const d = JSON.parse(localStorage.getItem('pcs.db.v2')); d.students.find(x=>x.code==='DEMO01').until = '2020-01-01'; localStorage.setItem('pcs.db.v2', JSON.stringify(d)); }""")
         await s.reload(); await s.wait_for_timeout(900)
         assert await s.evaluate('S.auth') is None and await s.evaluate('fullAccess()') is False, '수강이 끝났는데 전 범위가 열려 있음'
         await s.click('.tab[data-v="list"]'); await s.wait_for_timeout(300); assert await s.locator('.row.locked').count() > 100
-        await s.evaluate("""() => { const d = JSON.parse(localStorage.getItem('pcs.db.v2')); d.students.find(x=>x.code==='MON123').until = '2099-01-01'; localStorage.setItem('pcs.db.v2', JSON.stringify(d)); }""")
-        await s.reload(); await s.wait_for_timeout(900); assert await s.evaluate('S.auth && S.auth.code') == 'MON123', '기간을 늘렸는데 다시 열리지 않음'
-        await s.evaluate("""() => { const d = JSON.parse(localStorage.getItem('pcs.db.v2')); d.students = d.students.filter(x=>x.code!=='MON123'); localStorage.setItem('pcs.db.v2', JSON.stringify(d)); }""")
+        await s.evaluate("""() => { const d = JSON.parse(localStorage.getItem('pcs.db.v2')); d.students.find(x=>x.code==='DEMO01').until = '2099-01-01'; localStorage.setItem('pcs.db.v2', JSON.stringify(d)); }""")
+        await s.reload(); await s.wait_for_timeout(900); assert await s.evaluate('S.auth && S.auth.code') == 'DEMO01', '기간을 늘렸는데 다시 열리지 않음'
+        await s.evaluate("""() => { const d = JSON.parse(localStorage.getItem('pcs.db.v2')); d.students = d.students.filter(x=>x.code!=='DEMO01'); localStorage.setItem('pcs.db.v2', JSON.stringify(d)); }""")
         await s.reload(); await s.wait_for_timeout(900); assert await s.evaluate('S.auth') is None, '원장이 해제했는데 열려 있음'
         # 만료일이 지난 저장값은 연결이 끊겨도 열지 않는다
         await s.evaluate("() => { S.auth = { code:'X', cls:'월목반', until:'2020-01-01' }; }")

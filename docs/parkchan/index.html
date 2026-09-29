@@ -309,6 +309,7 @@ select.sel{font-family:inherit;font-size:14px;font-weight:700;color:var(--u);bac
 .auth input,.auth select{width:100%;border:1.5px solid var(--line);border-radius:12px;padding:13px 14px;font-size:15px;font-family:inherit;background:var(--card);color:var(--ink)}
 .auth input:focus,.auth select:focus{outline:2px solid var(--brand);outline-offset:-2px}
 .auth .err{font-size:12.5px;color:var(--no);font-weight:600;margin:-4px 0 10px}
+.auth .info{font-size:13px;line-height:1.6;color:var(--brand-dark);background:var(--brand-soft);border-radius:12px;padding:11px 13px;margin:0 0 12px;font-weight:600;word-break:keep-all}
 .auth .links{display:flex;justify-content:center;gap:10px;font-size:13px;color:var(--muted);margin-top:0}
 .auth .links button{background:none;border:none;color:var(--muted);font-size:13px;cursor:pointer;text-decoration:underline;min-height:44px;padding:0 6px}
 .auth .roles{display:flex;flex-direction:column;gap:7px;margin-bottom:14px}
@@ -661,11 +662,16 @@ const CFG = {
   plans: [ { id:'m1', name:'월 이용권', days:30, months:1, price:9900, sub:'자동 갱신 · 언제든 해지' }, { id:'m6', name:'6개월 이용권', days:180, months:6, price:49000, sub:'17 % 할인' }, { id:'y1', name:'12개월 이용권', days:365, months:12, price:79000, sub:'33 % 할인', best:true } ],   // 2026-09-08 결정: 월 9,900 · 수강생 무료
 };
 
+const TERMS_VER = '2026-09-29';        // 약관·개인정보처리방침 판 — 바꾸면 가입 때 동의한 판이 계정에 남는다
+/* 메일 링크(가입 확인·비밀번호 재설정)가 돌아올 주소. 앱(네이티브)은 웹 주소로 돌아오게 한다 */
+const WEB_URL = 'https://usualhealth383-cloud.github.io/autoblog/parkchan/';
+const authRedirect = () => (window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform()) || !/^https?:/.test(location.href) ? WEB_URL : location.origin + location.pathname;
 /* ── 작은 도우미 ── */
 const pad = n => String(n).padStart(2,'0');
 const todayISO = () => { const d=new Date(); return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`; };
 const nowHM = () => { const d=new Date(); return `${pad(d.getHours())}:${pad(d.getMinutes())}`; };
 const kdate = iso => { if(!iso) return ''; const [y,m,d]=iso.split('-'); return (+y!==new Date().getFullYear()?`${y}년 `:'')+`${+m}월 ${+d}일`; };
+const monthEnd = ym => { const [y,m] = ym.split('-').map(Number); return `${ym}-${pad(new Date(y, m, 0).getDate())}`; };   // 그 달 마지막 날(30일·2월도 맞게)
 const daysBetween = (a,b) => Math.round((Date.parse(b)-Date.parse(a))/86400000);
 const addDays = (iso, n) => { const d=new Date(iso+'T00:00:00'); d.setDate(d.getDate()+n); return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`; };
 const tel = t => String(t??'').replace(/[^0-9+\-]/g,'');
@@ -720,22 +726,26 @@ const SRV = (() => {
 /* 로그인 세션(서버 모드): access_token · refresh_token · user */
 let SESSION = null; try { SESSION = JSON.parse(localStorage.getItem('pcs.session')); } catch {}
 const saveSession = () => { try { SESSION ? localStorage.setItem('pcs.session', JSON.stringify(SESSION)) : localStorage.removeItem('pcs.session'); } catch {} };
+/* Supabase Auth 의 영어 오류를 학생이 읽을 말로 */
+const AUTH_KO = m => { const t = String(m||''); const M = [[/link.*(invalid|expired)|expired|invalid.*token|otp/i,'링크가 만료되었거나 이미 사용되었습니다. 다시 요청해 주세요.'],[/invalid login credentials/i,'이메일 또는 비밀번호가 다릅니다.'],[/email not confirmed/i,'메일 인증이 아직입니다. 가입 확인 메일의 링크를 먼저 눌러 주세요.'],
+  [/already registered|already been registered/i,'이미 가입된 이메일입니다. 로그인해 주세요.'],[/at least 6/i,'비밀번호는 6자 이상이어야 합니다.'],[/rate limit|too many/i,'요청이 너무 잦습니다. 잠시 뒤에 다시 시도해 주세요.'],
+  [/invalid.*email|email.*invalid/i,'이메일 형식을 확인해 주세요.'],[/same.*password|different from the old/i,'이전과 다른 비밀번호를 정해 주세요.']];
+  const hit = M.find(([r]) => r.test(t)); return hit ? hit[1] : t; };
 async function authPost(path, body){
   const r = await fetch(SRV.url + path, { method:'POST', headers:{ apikey:SRV.key, 'Content-Type':'application/json', ...(SESSION&&SESSION.access_token?{Authorization:'Bearer '+SESSION.access_token}:{}) }, body: JSON.stringify(body) });
   const j = await r.json().catch(()=>({}));
-  if (!r.ok) throw new Error(j.error_description || j.msg || j.message || ('요청 실패 '+r.status));
+  if (!r.ok) throw new Error(AUTH_KO(j.error_description || j.msg || j.message || '') || ('요청 실패 '+r.status));
   return j;
 }
-async function api(path, { method='GET', body, prefer, student, _retry } = {}){
+async function api(path, { method='GET', body, prefer, _retry } = {}){
   const h = { apikey: SRV.key, 'Content-Type': 'application/json' };
   h.Authorization = 'Bearer ' + ((SESSION && SESSION.access_token) || SRV.key);
-  const code = student || (S.auth && S.auth.code); if (code) h['x-student-code'] = code;
   if (prefer) h.Prefer = prefer;
   const r = await fetch(SRV.url + path, { method, headers: h, body: body === undefined ? undefined : JSON.stringify(body) });
   if (r.status === 401 && SESSION && SESSION.refresh_token && !_retry){
     try { const j = await authPost('/auth/v1/token?grant_type=refresh_token', { refresh_token: SESSION.refresh_token });
       SESSION = { ...SESSION, access_token:j.access_token, refresh_token:j.refresh_token||SESSION.refresh_token }; saveSession();
-      return api(path, { method, body, prefer, student, _retry:true }); }
+      return api(path, { method, body, prefer, _retry:true }); }
     catch { SESSION = null; saveSession(); }
   }
   const txt = await r.text(); let j = null; try { j = txt ? JSON.parse(txt) : null; } catch { j = txt; }
@@ -749,14 +759,15 @@ const DBKEY = 'pcs.db.v2';
 const DB = (() => {
   const seed = () => ({
     students: [
+      { code:'DEMO01', name:'박○○', cls:'월목반', until:'2027-02-28', phone:'', joined:'2026-09-01' },   // 시연 계정(학생·보호자)이 쓰는 코드
       { code:'MON123', name:'박○○', cls:'월목반', until:'2027-02-28', phone:'', joined:'2026-09-01' },
       { code:'TUE456', name:'김○○', cls:'화금반', until:'2027-02-28', phone:'', joined:'2026-09-01' },
       { code:'WED789', name:'이○○', cls:'수토반', until:'2027-02-28', phone:'', joined:'2026-09-01' },
     ],
     accounts: [   // 시연용 계정
       { id:'a-owner',   email:'owner@parkchan.kr',  pw:h32('2580'), role:'owner',   name:'원장', phone:'', created:'2026-09-01' },
-      { id:'a-student', email:'student@demo.kr',    pw:h32('1234'), role:'student', name:'박○○', phone:'', studentCode:'MON123', created:'2026-09-01' },
-      { id:'a-parent',  email:'parent@demo.kr',     pw:h32('1234'), role:'parent',  name:'박○○ 보호자', phone:'', childCode:'MON123', created:'2026-09-01' },
+      { id:'a-student', email:'student@demo.kr',    pw:h32('1234'), role:'student', name:'박○○', phone:'', studentCode:'DEMO01', created:'2026-09-01' },
+      { id:'a-parent',  email:'parent@demo.kr',     pw:h32('1234'), role:'parent',  name:'박○○ 보호자', phone:'', childCode:'DEMO01', created:'2026-09-01' },
     ],
     attendance: [], notices: [], sched: [], posts: [], comments: [], passes: [], progress: {},
     classes: CFG.classes.slice(),
@@ -782,7 +793,7 @@ const DB = (() => {
     signUp: async ({ email, password, name, role, phone, under14, guardian }) => {
       email = email.trim().toLowerCase();
       if (d.accounts.some(a => a.email === email)) throw new Error('이미 가입된 이메일입니다. 로그인해 주세요.');
-      const a = { id: uid(), email, pw: h32(password), role, name, phone: phone||'', under14: !!under14, guardian: guardian||'', created: todayISO() };
+      const a = { id: uid(), email, pw: h32(password), role, name, phone: phone||'', under14: !!under14, guardian: guardian||'', termsVer: TERMS_VER, agreedAt: new Date().toISOString(), created: todayISO() };
       d.accounts.push(a); sid = a.id; try { localStorage.setItem('pcs.local.sid', sid); } catch {} w(); return pub(a);
     },
     signIn: async (email, password) => {
@@ -792,7 +803,22 @@ const DB = (() => {
     },
     signOut: async () => { sid = null; try { localStorage.removeItem('pcs.local.sid'); } catch {} },
     resetPassword: async email => { const a = d.accounts.find(x => x.email === email.trim().toLowerCase()); if (!a) throw new Error('가입되지 않은 이메일입니다.'); return { ok:true, note:'로컬 모드에서는 메일이 가지 않습니다. 서버 모드에서는 재설정 메일이 발송됩니다.' }; },
-    updateMe: async patch => { const a = me(); if (!a) throw new Error('로그인이 필요합니다.'); Object.assign(a, patch); w(); return pub(a); },
+    updateMe: async patch => { const a = me(); if (!a) throw new Error('로그인이 필요합니다.'); ['name','phone','nick'].forEach(k => { if (k in patch) a[k] = patch[k]; }); w(); return pub(a); },
+    setPassword: async pw => { const a = me(); if (!a) throw new Error('로그인이 필요합니다.'); a.pw = h32(pw); w(); return { ok:true }; },
+    /* 서버의 link_code 와 같은 규칙: 틀린 코드 1시간 10번 · 한 코드 한 학생 계정 · 만료 코드 거절 */
+    linkCode: async (kind, code) => { const a = me(); if (!a) return { ok:false, why:'로그인이 필요합니다.' };
+      const c = String(code||'').trim().toUpperCase(), key = kind === 'student' ? 'studentCode' : 'childCode';
+      if (!c){ a[key] = ''; w(); return { ok:true }; }
+      d.attempts ||= []; const hr = Date.now() - 3600e3; d.attempts = d.attempts.filter(x => x.at > hr);
+      if (d.attempts.filter(x => x.uid === a.id && !x.ok).length >= 10) return { ok:false, why:'코드를 여러 번 틀렸습니다. 1시간 뒤에 다시 시도하거나 원장님께 문의해 주세요.' };
+      const s = d.students.find(x => x.code === c);
+      if (!s){ d.attempts.push({ uid:a.id, ok:false, at:Date.now() }); w(); return { ok:false, why:'등록되지 않은 코드입니다. 원장님께 받은 코드를 확인해 주세요.' }; }
+      if (s.until < todayISO()) return { ok:false, why:`수강 기간이 ${kdate(s.until)}에 끝났습니다. 원장님께 문의해 주세요.` };
+      if (kind === 'student'){ if (a.role !== 'student') return { ok:false, why:'학생 계정에서만 학원 코드를 등록할 수 있습니다.' };
+        if (d.accounts.some(x => x.id !== a.id && x.role === 'student' && x.studentCode === c)) return { ok:false, why:'이 코드는 이미 다른 학생 계정에 연결되어 있습니다. 원장님께 문의해 주세요.' };
+        if (!a.name) a.name = s.name; }
+      else if (a.role !== 'parent') return { ok:false, why:'보호자 계정에서만 자녀를 연결할 수 있습니다.' };
+      a[key] = c; w(); return { ok:true, student:{ code:s.code, name:s.name, cls:s.cls, until:s.until } }; },
     deleteAccount: async () => { const a = me(); if (!a) return; d.accounts = d.accounts.filter(x => x.id !== a.id); if (a.studentCode) delete d.progress['u:'+a.id]; sid = null; try { localStorage.removeItem('pcs.local.sid'); } catch {} w(); },
     /* 학원 코드 · 자녀 연결 */
     verifyCode: async code => {
@@ -804,8 +830,12 @@ const DB = (() => {
     student: async code => { const s = d.students.find(x => x.code === code); return s ? { code:s.code, name:s.name, cls:s.cls, until:s.until } : null; },
     students: async () => d.students.slice(),
     addStudent: async ({name, cls, until, phone}) => { const s = { code:genCode(name, c=>d.students.some(x=>x.code===c)), name, cls, until, phone:phone||'', joined:todayISO() }; d.students.push(s); w(); return s; },
-    removeStudent: async code => { d.students = d.students.filter(s=>s.code!==code); w(); },
-    guardiansOf: async code => d.accounts.filter(a => a.role==='parent' && a.childCode===code).map(pub),
+    removeStudent: async code => { d.students = d.students.filter(s=>s.code!==code); delete d.progress[code]; w(); },
+    updateStudent: async (code, patch) => { const s = d.students.find(x=>x.code===code); if (s){ ['name','cls','until','phone'].forEach(k => { if (k in patch) s[k] = patch[k]; }); w(); } return s; },
+    extendClass: async (cls, until) => { const rows = d.students.filter(s => (cls==='전체' || s.cls===cls) && s.until < until); rows.forEach(s => s.until = until); w(); return rows.length; },
+    guardiansOf: async code => d.accounts.filter(a => a.role==='parent' && a.childCode===code).map(a => ({ name:a.name, phone:a.phone||'' })),
+    linkedOf: async code => ({ student: d.accounts.filter(a => a.role==='student' && a.studentCode===code).length, guardians: d.accounts.filter(a => a.role==='parent' && a.childCode===code).map(a => ({ name:a.name, phone:a.phone||'' })) }),
+    releaseCode: async code => { const rows = d.accounts.filter(a => a.studentCode===code); rows.forEach(a => a.studentCode=''); w(); return rows.length; },
     /* 출석 */
     attendanceOn: async date => d.attendance.filter(a=>a.date===date),
     attendanceRange: async (from, to, code) => d.attendance.filter(a => a.date>=from && a.date<=to && (!code || a.code===code)).sort((a,b)=>b.date.localeCompare(a.date)),
@@ -816,6 +846,7 @@ const DB = (() => {
       return attend(s, manual);
     },
     attendNow: async () => ({ code: attCode(attWindow()), win: attWindow() }),
+    cancelAttend: async (code, date) => { d.attendance = d.attendance.filter(a => !(a.code===code && a.date===date)); w(); },
     /* 공지 */
     notices: async cls => d.notices.filter(n => n.cls===cls || n.cls==='전체').sort((a,b)=>b.at.localeCompare(a.at)),
     allNotices: async () => d.notices.slice().sort((a,b)=>b.at.localeCompare(a.at)),
@@ -857,6 +888,7 @@ const DB = (() => {
     delSchedule: async id => { d.sched = (d.sched||[]).filter(e => e.id !== id); w(); },
     sendNotice: async (cls, t, dd) => { const n = { id:'n'+Date.now(), cls, t, d:dd, at:new Date().toISOString(), read:[] }; d.notices.unshift(n); w(); return n; },
     markRead: async (id, code) => { const n=d.notices.find(x=>x.id===id); if (n && !n.read.includes(code)){ n.read.push(code); w(); } },
+    delNotice: async id => { d.notices = d.notices.filter(n => n.id !== id); w(); },
     noticeStats: async id => { const n = d.notices.find(x=>x.id===id); if (!n) return null;
       const target = d.students.filter(s => n.cls==='전체' || s.cls===n.cls); const unread = target.filter(s => !n.read.includes(s.code));
       return { sent: target.length, read: target.length-unread.length, unread }; },
@@ -878,6 +910,10 @@ const DB = (() => {
     },
     issuePass: async days => { const p = { code: genCode('pass', c=>d.passes.some(x=>x.code===c)), days, issued: todayISO() }; d.passes.push(p); w(); return p; },
     passes: async () => d.passes.slice().reverse(),
+    registerPush: async () => {},
+    logError: async e => { d.errors ||= []; d.errors.unshift({ ...e, at:new Date().toISOString() }); d.errors = d.errors.slice(0, 30); w(); },
+    errors: async () => (d.errors||[]).slice(),
+    verifyPurchase: async () => { throw new Error('스토어 결제는 서버에 연결된 앱에서만 됩니다.'); },
     ownerEmail: () => (me() && me().email) || '',
     reset: () => { d = seed(); w(); },
   };
@@ -893,41 +929,54 @@ const serverDB = () => {
   return {
     mode: 'server',
     me: async () => { if (!SESSION) return null; try { return await myProfile(); } catch { return meCache; } },
+    /* 프로필은 서버 트리거가 가입 정보(data)로 만든다 — 메일 인증을 켜 두어도 역할·보호자 정보가 빠지지 않는다 */
     signUp: async ({ email, password, name, role, phone, under14, guardian }) => {
-      const j = await authPost('/auth/v1/signup', { email, password, data:{ name, role } });
-      if (!j.access_token) throw new Error('가입 확인 메일을 보냈습니다. 메일의 링크를 누른 뒤 로그인해 주세요.');
+      const j = await authPost('/auth/v1/signup?redirect_to=' + encodeURIComponent(authRedirect()), { email, password, data:{ name, role, phone:phone||'', under14:!!under14, guardian:guardian||'', terms_ver:TERMS_VER } });
+      if (!j.access_token) throw Object.assign(new Error(`${email} 로 가입 확인 메일을 보냈습니다. 메일의 링크를 누르면 바로 로그인됩니다.`), { mailSent:true });
       SESSION = { access_token:j.access_token, refresh_token:j.refresh_token, user:{ id:j.user.id, email:j.user.email } }; saveSession();
-      await api('/rest/v1/profiles?on_conflict=id', { method:'POST', prefer:'resolution=merge-duplicates,return=minimal', body:{ id:j.user.id, role, name, phone:phone||'', under14:!!under14, guardian:guardian||'' } });
       return myProfile();
     },
     signIn: async (email, password) => {
       const j = await authPost('/auth/v1/token?grant_type=password', { email, password });
       SESSION = { access_token:j.access_token, refresh_token:j.refresh_token, user:{ id:j.user.id, email:j.user.email } }; saveSession();
       let p = await myProfile();
-      if (!p){ await api('/rest/v1/profiles?on_conflict=id', { method:'POST', prefer:'resolution=merge-duplicates,return=minimal', body:{ id:j.user.id, role:'student', name:(j.user.user_metadata&&j.user.user_metadata.name)||'' } }); p = await myProfile(); }
+      if (!p){ const m = j.user.user_metadata || {};   // 트리거 이전에 만든 옛 계정만 여기로 온다
+        await api('/rest/v1/profiles', { method:'POST', prefer:'return=minimal', body:{ id:j.user.id, role: m.role==='parent'?'parent':'student', name:m.name||'' } }); p = await myProfile(); }
       return p;
     },
     signOut: async () => { try { if (SESSION) await authPost('/auth/v1/logout', {}); } catch {} SESSION = null; saveSession(); meCache = null; },
-    resetPassword: async email => { await authPost('/auth/v1/recover', { email }); return { ok:true, note:'비밀번호 재설정 메일을 보냈습니다.' }; },
-    updateMe: async patch => { const b = {}; if ('name' in patch) b.name = patch.name; if ('phone' in patch) b.phone = patch.phone; if ('studentCode' in patch) b.student_code = patch.studentCode; if ('childCode' in patch) b.child_code = patch.childCode; if ('nick' in patch) b.nick = patch.nick;
+    resetPassword: async email => { await authPost('/auth/v1/recover?redirect_to=' + encodeURIComponent(authRedirect()), { email }); return { ok:true, note:'비밀번호 재설정 메일을 보냈습니다. 메일의 링크를 눌러 주세요.' }; },
+    setPassword: async pw => { const r = await fetch(SRV.url + '/auth/v1/user', { method:'PUT', headers:{ apikey:SRV.key, 'Content-Type':'application/json', Authorization:'Bearer '+SESSION.access_token }, body: JSON.stringify({ password: pw }) });
+      if (!r.ok){ const j = await r.json().catch(()=>({})); throw new Error(j.msg || j.message || '비밀번호를 바꾸지 못했습니다.'); } return { ok:true }; },
+    /* 메일 링크로 돌아왔을 때(#access_token=…) 세션을 받는다 */
+    adoptSession: async (at, rt) => { const r = await fetch(SRV.url + '/auth/v1/user', { headers:{ apikey:SRV.key, Authorization:'Bearer '+at } }); if (!r.ok) throw new Error('링크가 만료되었습니다. 다시 요청해 주세요.');
+      const u = await r.json(); SESSION = { access_token:at, refresh_token:rt, user:{ id:u.id, email:u.email } }; saveSession(); meCache = null; return myProfile(); },
+    updateMe: async patch => { const b = {}; if ('name' in patch) b.name = patch.name; if ('phone' in patch) b.phone = patch.phone; if ('nick' in patch) b.nick = patch.nick;
       await api(`/rest/v1/profiles?id=eq.${SESSION.user.id}`, { method:'PATCH', prefer:'return=minimal', body:b }); return myProfile(); },
+    /* 학원 코드·자녀 연결은 서버 함수 한 곳에서만(틀린 코드 제한 · 한 코드 한 학생 계정) */
+    linkCode: async (kind, code) => { const r = await api('/rest/v1/rpc/link_code', { method:'POST', body:{ p_kind:kind, p_code:code||'' } }); meCache = null; return r || { ok:false, why:'연결하지 못했습니다.' }; },
     deleteAccount: async () => { await api('/rest/v1/rpc/delete_my_account', { method:'POST', body:{} }); SESSION = null; saveSession(); meCache = null; },
-    verifyCode: async code => { const rows = await api(`/rest/v1/students?code=eq.${encodeURIComponent(code)}&select=code,name,cls,until`, { student: code });
-      if (!rows || !rows.length) return { ok:false, why:'등록되지 않았거나 수강 기간이 끝난 코드입니다. 원장님께 확인해 주세요.' }; return { ok:true, student: rows[0] }; },
-    student: async code => { const rows = await api(`/rest/v1/students?code=eq.${encodeURIComponent(code)}&select=code,name,cls,until`, { student: code }); return rows.length ? rows[0] : null; },
+    verifyCode: async code => { const rows = await api(`/rest/v1/students?code=eq.${encodeURIComponent(code)}&select=code,name,cls,until`);
+      if (!rows || !rows.length) return { ok:false, why:'수강 기간이 끝났거나 원장님이 연결을 해제했습니다. 원장님께 확인해 주세요.' }; return { ok:true, student: rows[0] }; },
+    student: async code => { const rows = await api(`/rest/v1/students?code=eq.${encodeURIComponent(code)}&select=code,name,cls,until`); return rows.length ? rows[0] : null; },
     students: async () => api('/rest/v1/students?select=code,name,cls,until,phone,joined&order=joined.asc,name.asc'),
     addStudent: async ({name, cls, until, phone}) => {
       for (let i=0;i<5;i++){ try { const r = await api('/rest/v1/students', { method:'POST', prefer:'return=representation', body:{ code:genCode(name), name, cls, until, phone:phone||'' } }); return r[0]; } catch (e){ if (e.status!==409) throw e; } }
       throw new Error('코드 발급에 실패했습니다. 다시 시도해 주세요.');
     },
     removeStudent: async code => { await api(`/rest/v1/students?code=eq.${encodeURIComponent(code)}`, { method:'DELETE' }); },
-    guardiansOf: async code => (await api(`/rest/v1/profiles?child_code=eq.${encodeURIComponent(code)}&select=id,name,phone,role`)).map(prof),
+    updateStudent: async (code, patch) => (await api(`/rest/v1/students?code=eq.${encodeURIComponent(code)}`, { method:'PATCH', prefer:'return=representation', body:patch }))[0],
+    extendClass: async (cls, until) => (await api(`/rest/v1/students?${cls==='전체'?'':`cls=eq.${encodeURIComponent(cls)}&`}until=lt.${until}`, { method:'PATCH', prefer:'return=representation', body:{ until } })).length,
+    guardiansOf: async code => { const r = await api('/rest/v1/rpc/linked_of', { method:'POST', body:{ p_code: code } }); return (r && r.guardians) || []; },
+    linkedOf: async code => (await api('/rest/v1/rpc/linked_of', { method:'POST', body:{ p_code: code } })) || { student:0, guardians:[] },
+    releaseCode: async code => api('/rest/v1/rpc/release_code', { method:'POST', body:{ p_code: code } }),
     attendanceOn: async date => (await api(`/rest/v1/attendance?date=eq.${date}&select=*`)).map(att),
-    attendanceRange: async (from, to, code) => (await api(`/rest/v1/attendance?date=gte.${from}&date=lte.${to}${code?`&code=eq.${encodeURIComponent(code)}`:''}&select=*&order=date.desc`, { student: code })).map(att),
-    myAttendance: async (code, date) => { const r = await api(`/rest/v1/attendance?code=eq.${encodeURIComponent(code)}&date=eq.${date}&select=*`, { student: code }); return r.length ? att(r[0]) : null; },
+    attendanceRange: async (from, to, code) => (await api(`/rest/v1/attendance?date=gte.${from}&date=lte.${to}${code?`&code=eq.${encodeURIComponent(code)}`:''}&select=*&order=date.desc`)).map(att),
+    myAttendance: async (code, date) => { const r = await api(`/rest/v1/attendance?code=eq.${encodeURIComponent(code)}&date=eq.${date}&select=*`); return r.length ? att(r[0]) : null; },
+    cancelAttend: async (code, date) => { await api(`/rest/v1/attendance?code=eq.${encodeURIComponent(code)}&date=eq.${date}`, { method:'DELETE' }); },
     markAttend: async (code, entered, manual=false) => {
       const r = manual ? await api('/rest/v1/rpc/mark_attend_manual', { method:'POST', body:{ p_code: code } })
-                       : await api('/rest/v1/rpc/mark_attend', { method:'POST', body:{ p_code: code, p_entered: entered }, student: code });
+                       : await api('/rest/v1/rpc/mark_attend', { method:'POST', body:{ p_code: code, p_entered: entered } });
       if (!r || !r.ok) return { ok:false, why: (r && r.why) || '출석 처리에 실패했습니다.' };
       return { ok:true, dup: !!r.dup, rec: { code, date: todayISO(), time: hhmm(r.time), late: !!r.late, manual } };
     },
@@ -935,45 +984,54 @@ const serverDB = () => {
     notices: async cls => { const [ns, reads] = await Promise.all([api(`/rest/v1/notices?or=(cls.eq.전체,cls.eq.${encodeURIComponent(cls)})&select=*&order=at.desc`), api('/rest/v1/notice_reads?select=notice_id,code')]); return ns.map(n => notice(n, reads)); },
     allNotices: async () => (await api('/rest/v1/notices?select=*&order=at.desc')).map(n => notice(n)),
     posts: async (board, q) => { const bq = board === '전체' ? '' : `&board=eq.${encodeURIComponent(board)}`;
-      const kw = (q||'').trim(), kq = kw ? `&or=(title.ilike.*${encodeURIComponent(kw)}*,body.ilike.*${encodeURIComponent(kw)}*)` : '';
-      const rows = await api(`/rest/v1/posts?deleted=is.false${bq}${kq}&select=*&order=at.desc&limit=60`);
-      return rows.map(r => ({ ...r, uid: r.author, likes: r.likes||[], reports: r.reports||[], comments: r.comment_n || 0 })); },
-    post: async id => { const [rs, cs] = await Promise.all([api(`/rest/v1/posts?id=eq.${id}&select=*`), api(`/rest/v1/comments?post_id=eq.${id}&deleted=is.false&select=*&order=at.asc`)]);
-      if (!rs.length) return null; return { ...rs[0], uid: rs[0].author, likes: rs[0].likes||[], reports: rs[0].reports||[],
-        comments: cs.map(c => ({ ...c, uid: c.author, postId: c.post_id, likes: c.likes||[], reports: c.reports||[] })) }; },
-    addPost: async body => (await api('/rest/v1/posts', { method:'POST', prefer:'return=representation', body }))[0],
-    editPost: async (id, body) => (await api(`/rest/v1/posts?id=eq.${id}`, { method:'PATCH', prefer:'return=representation', body }))[0],
+      const kw = (q||'').trim().replace(/[(),*]/g, ' '), kq = kw ? `&or=(title.ilike.*${encodeURIComponent(kw)}*,body.ilike.*${encodeURIComponent(kw)}*)` : '';
+      const rows = await api(`/rest/v1/posts?deleted=is.false${bq}${kq}&select=${POST_COLS}&order=at.desc&limit=60`);
+      return rows.map(r => ({ ...r, uid: r.author, likes: r.likes||[], comments: r.comment_n || 0 })); },
+    post: async id => { const [rs, cs] = await Promise.all([api(`/rest/v1/posts?id=eq.${id}&select=${POST_COLS}`), api(`/rest/v1/comments?post_id=eq.${id}&deleted=is.false&select=${CM_COLS}&order=at.asc`)]);
+      if (!rs.length) return null; return { ...rs[0], uid: rs[0].author, likes: rs[0].likes||[],
+        comments: cs.map(c => ({ ...c, uid: c.author, postId: c.post_id, likes: c.likes||[] })) }; },
+    addPost: async body => (await api(`/rest/v1/posts?select=${POST_COLS}`, { method:'POST', prefer:'return=representation', body }))[0],
+    editPost: async (id, body) => (await api(`/rest/v1/posts?id=eq.${id}&select=${POST_COLS}`, { method:'PATCH', prefer:'return=representation', body:{ ...body, edited:new Date().toISOString() } }))[0],
     delPost: async id => { await api(`/rest/v1/posts?id=eq.${id}`, { method:'PATCH', prefer:'return=minimal', body:{ deleted:true } }); },
-    addComment: async (postId, text) => (await api('/rest/v1/comments', { method:'POST', prefer:'return=representation', body:{ post_id:postId, body:text } }))[0],
+    addComment: async (postId, text) => (await api(`/rest/v1/comments?select=${CM_COLS}`, { method:'POST', prefer:'return=representation', body:{ post_id:postId, body:text } }))[0],
     delComment: async id => { await api(`/rest/v1/comments?id=eq.${id}`, { method:'PATCH', prefer:'return=minimal', body:{ deleted:true } }); },
     pickComment: async (postId, cid) => { await api(`/rest/v1/rpc/pick_comment`, { method:'POST', body:{ p_post: postId, p_comment: cid } }); },
     likeToggle: async (kind, id) => { await api('/rest/v1/rpc/like_toggle', { method:'POST', body:{ p_kind: kind, p_id: id } }); },
     reportItem: async (kind, id) => (await api('/rest/v1/rpc/report_item', { method:'POST', body:{ p_kind: kind, p_id: id } })) || 0,
-    reported: async () => { const [ps, cs] = await Promise.all([api('/rest/v1/posts?deleted=is.false&select=*'), api('/rest/v1/comments?deleted=is.false&select=*')]);
-      return { posts: ps.filter(x => (x.reports||[]).length).map(x => ({ ...x, uid:x.author })), comments: cs.filter(c => (c.reports||[]).length).map(c => ({ ...c, uid:c.author })) }; },
+    reported: async () => { const [ps, cs] = await Promise.all([api(`/rest/v1/posts?deleted=is.false&report_n=gt.0&select=${POST_COLS}&order=report_n.desc`), api(`/rest/v1/comments?deleted=is.false&report_n=gt.0&select=${CM_COLS}&order=report_n.desc`)]);
+      return { posts: ps.map(x => ({ ...x, uid:x.author })), comments: cs.map(c => ({ ...c, uid:c.author })) }; },
     setNick: async nick => { await api(`/rest/v1/profiles?id=eq.${SESSION.user.id}`, { method:'PATCH', prefer:'return=minimal', body:{ nick } }); meCache = null; return await myProfile(); },
     schedule: async cls => await api(`/rest/v1/sched?or=(cls.eq.전체,cls.eq.${encodeURIComponent(cls)})&select=*&order=date.asc`),
     allSchedule: async () => await api('/rest/v1/sched?select=*&order=date.asc'),
     sendSchedule: async (cls, date, title, kind, memo) => (await api('/rest/v1/sched', { method:'POST', prefer:'return=representation', body:{ cls, date, title, kind, memo:memo||'' } }))[0],
     delSchedule: async id => { await api(`/rest/v1/sched?id=eq.${id}`, { method:'DELETE', prefer:'return=minimal' }); },
     sendNotice: async (cls, t, dd) => { const r = await api('/rest/v1/notices', { method:'POST', prefer:'return=representation', body:{ cls, title:t, body:dd } }); return notice(r[0]); },
-    markRead: async (id, code) => { await api('/rest/v1/notice_reads?on_conflict=notice_id,code', { method:'POST', prefer:'resolution=ignore-duplicates,return=minimal', body:{ notice_id:id, code }, student: code }); },
+    delNotice: async id => { await api(`/rest/v1/notices?id=eq.${id}`, { method:'DELETE' }); },
+    markRead: async (id, code) => { await api('/rest/v1/notice_reads?on_conflict=notice_id,code', { method:'POST', prefer:'resolution=ignore-duplicates,return=minimal', body:{ notice_id:id, code } }); },
     noticeStats: async id => { const [ns, st, reads] = await Promise.all([api(`/rest/v1/notices?id=eq.${id}&select=cls`), api('/rest/v1/students?select=code,cls,phone,name'), api(`/rest/v1/notice_reads?notice_id=eq.${id}&select=code`)]);
       if (!ns.length) return null; const target = st.filter(s => ns[0].cls==='전체' || s.cls===ns[0].cls), done = new Set(reads.map(r=>r.code)); const unread = target.filter(s => !done.has(s.code));
       return { sent: target.length, read: target.length-unread.length, unread }; },
     classes: async () => { const r = await api('/rest/v1/classes?select=cls,start_time&order=cls.asc'); CLASSES_CACHE = r.map(c => ({ cls:c.cls, start:hhmm(c.start_time) })); return CLASSES_CACHE.slice(); },
     addClass: async (cls, start) => { await api('/rest/v1/classes?on_conflict=cls', { method:'POST', prefer:'resolution=merge-duplicates,return=minimal', body:{ cls, start_time:start } }); },
     removeClass: async cls => { await api(`/rest/v1/classes?cls=eq.${encodeURIComponent(cls)}`, { method:'DELETE' }); },
-    loadProgress: async key => { const r = await api(`/rest/v1/progress?code=eq.${encodeURIComponent(key)}&select=state`, { student: key.startsWith('u:')?undefined:key }); return r.length ? r[0].state : null; },
-    saveProgress: async (key, state) => { await api('/rest/v1/progress?on_conflict=code', { method:'POST', prefer:'resolution=merge-duplicates,return=minimal', body:{ code:key, state, at:new Date().toISOString() }, student: key.startsWith('u:')?undefined:key }); },
+    loadProgress: async key => { const r = await api(`/rest/v1/progress?code=eq.${encodeURIComponent(key)}&select=state`); return r.length ? r[0].state : null; },
+    saveProgress: async (key, state) => { await api('/rest/v1/progress?on_conflict=code', { method:'POST', prefer:'resolution=merge-duplicates,return=minimal', body:{ code:key, state, at:new Date().toISOString() } }); },
     progressAll: async () => (await api('/rest/v1/progress?select=code,state,at&code=not.like.u:*')).map(r => ({ code:r.code, state:r.state })),
     redeemPass: async code => { const r = await api('/rest/v1/rpc/redeem_pass', { method:'POST', body:{ p_code: code } }); if (r && r.ok){ meCache = null; } return r; },
     issuePass: async days => { const r = await api('/rest/v1/passes', { method:'POST', prefer:'return=representation', body:{ code:genCode('pass'), days } }); return r[0]; },
     passes: async () => (await api('/rest/v1/passes?select=*&order=issued.desc')).map(p => ({ code:p.code, days:p.days, issued:p.issued, usedBy:p.used_by||'', usedAt:p.used_at||'' })),
+    /* 푸시 받을 기기 · 앱 오류 기록 · 스토어 결제 확인 */
+    registerPush: async (token, platform) => { await api('/rest/v1/rpc/register_push', { method:'POST', body:{ p_token:token, p_platform:platform } }); },
+    logError: async e => { await api('/rest/v1/client_errors', { method:'POST', prefer:'return=minimal', body:e }); },
+    errors: async () => api('/rest/v1/client_errors?select=*&order=at.desc&limit=30'),
+    verifyPurchase: async p => { const r = await fetch(SRV.url + '/functions/v1/verify-purchase', { method:'POST', headers:{ apikey:SRV.key, 'Content-Type':'application/json', Authorization:'Bearer '+((SESSION&&SESSION.access_token)||SRV.key) }, body: JSON.stringify(p) });
+      const j = await r.json().catch(()=>({})); if (!r.ok || !j.ok) throw new Error(j.why || j.message || '결제를 확인하지 못했습니다. 잠시 뒤 [구매 복원]을 눌러 주세요.'); meCache = null; return j; },
     ownerEmail: () => (SESSION && SESSION.user.email) || '',
     reset: () => {},
   };
 };
+const POST_COLS = 'id,author,nick,board,title,body,attach,likes,report_n,comment_n,solved,deleted,at,edited';
+const CM_COLS = 'id,post_id,author,nick,body,likes,report_n,picked,deleted,at';
 const DBX = SRV ? serverDB() : DB;
 
 /* ═══ 계정 · 내 진도 ═══ */
@@ -1053,7 +1111,7 @@ function conceptCard(c, opts={}){
 }
 
 /* ═══ 시작 · 로그인 · 회원가입 ═══ */
-let authMode = 'start', authErr = '', signRole = 'student', pendingCode = '';
+let authMode = 'start', authErr = '', authInfo = '', signRole = 'student', pendingCode = '';
 const MARK = `<svg viewBox="0 0 100 100" fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round"><ellipse cx="50" cy="50" rx="38" ry="15" transform="rotate(-30 50 50)"/><circle cx="50" cy="50" r="18" fill="#147D6F"/><circle cx="19" cy="66" r="5" fill="#fff" stroke="none"/><circle cx="82" cy="34" r="5" fill="#fff" stroke="none"/></svg>`;
 const AUTH_HERO = `<svg class="hero" viewBox="0 0 320 116" role="img" aria-label="궤도를 도는 행성 — 자연을 재는 눈">
   <defs>
@@ -1076,9 +1134,9 @@ const ROLE_IC = {
 };
 function renderAuth(){
   const v = document.getElementById('v-auth');
-  const err = authErr ? `<div class="err">${esc(authErr)}</div>` : '';
+  const err = (authErr ? `<div class="err" role="alert">${esc(authErr)}</div>` : '') + (authInfo ? `<div class="info" role="status">${esc(authInfo)}</div>` : '');
   /* 다시 그릴 때 입력값을 잃지 않는다 */
-  const K = {}; ['lgEmail','lgPw','suName','suEmail','suPw','suPhone','suCode','suChild','fgEmail','suAge','suGName','suGPhone'].forEach(id => { const el=document.getElementById(id); if (el) K[id]=el.value; });
+  const K = {}; ['lgEmail','lgPw','suName','suEmail','suPw','suPhone','suCode','suChild','fgEmail','suAge','suGName','suGPhone','npPw','npPw2'].forEach(id => { const el=document.getElementById(id); if (el) K[id]=el.value; });
   const agree = !!(document.getElementById('suAgree') && document.getElementById('suAgree').checked);
   const val = id => ` value="${esc(K[id]||'')}"`;
   if (authMode==='start') v.innerHTML = `
@@ -1158,6 +1216,17 @@ function renderAuth(){
       <p class="lead">가입한 이메일로 재설정 링크를 보냅니다.</p>
       <div class="f"><input id="fgEmail" type="email" placeholder="이메일" inputmode="email"${val('fgEmail')}></div>${err}
       <button class="btn" id="fgGo">메일 보내기</button>
+    </div>`;
+  /* 재설정 메일의 링크로 돌아온 화면 */
+  if (authMode==='newpw') v.innerHTML = `
+    <div class="auth">
+      <h1>새 비밀번호</h1>
+      <p class="lead">${esc(DBX.ownerEmail()||'')} 계정의 새 비밀번호를 정해 주세요.</p>
+      <div class="f">
+        <div class="fld"><label class="lab" for="npPw">새 비밀번호</label><input id="npPw" type="password" placeholder="6자 이상" autocomplete="new-password"${val('npPw')}></div>
+        <div class="fld"><label class="lab" for="npPw2">한 번 더</label><input id="npPw2" type="password" placeholder="같은 비밀번호" autocomplete="new-password"${val('npPw2')}></div>
+      </div>${err}
+      <button class="btn" id="npGo">바꾸고 시작</button>
     </div>`;
 }
 
@@ -1402,7 +1471,8 @@ function piiCheck(text){
 }
 const mine = x => ACC && x.uid === ACC.id;
 const isOwner = () => ACC && ACC.role === 'owner';
-const shown = x => !(x.reports||[]).length || (x.reports||[]).length < REPORT_HIDE || mine(x) || isOwner();
+const repN = x => x.report_n ?? (x.reports||[]).length;     // 서버는 신고한 사람 목록을 주지 않고 수만 준다
+const shown = x => repN(x) < REPORT_HIDE || mine(x) || isOwner();
 /* 구글 플레이는 사용자 제작 콘텐츠 앱에 '신고'와 함께 '차단'을 요구한다.
    차단하면 그 사람의 글과 댓글이 내 화면에서 사라진다(기기가 아니라 계정에 붙어 따라간다). */
 const blocked = x => !!x && !mine(x) && !isOwner() && (S.blocked||[]).includes(x.uid);
@@ -1460,7 +1530,7 @@ async function renderPost(){
     <div class="pfull">
       <div class="meta"><span class="bd ${x.board}" style="font-size:10.5px;font-weight:900;color:var(--on-color);border-radius:5px;padding:2px 7px;background:${x.board==='qna'?'#4053B8':x.board==='share'?'#C1521E':'var(--brand)'}">${BOARDS[x.board]||''}</span>
         ${x.solved?'<span class="ok" style="font-size:10.5px;font-weight:900;color:var(--brand-dark);background:var(--brand-soft);border-radius:5px;padding:2px 7px">해결됨</span>':''}
-        <span>${esc(nickOf(x))}</span><span>${ago(x.at)}</span>${(x.reports||[]).length?`<span style="color:var(--warn)">신고 ${(x.reports||[]).length}</span>`:''}</div>
+        <span>${esc(nickOf(x))}</span><span>${ago(x.at)}</span>${repN(x)?`<span style="color:var(--warn)">신고 ${repN(x)}</span>`:''}</div>
       <h2>${hid ? '신고가 쌓여 가려진 글입니다' : esc(x.title)}</h2>
       ${hid ? `<p class="body" style="color:var(--muted)">원장님이 확인할 때까지 다른 학생에게는 보이지 않습니다.</p>` : `<div class="body">${esc(x.body)}</div>`}
       ${at ? `<button class="attachcard" data-openatt="${esc(x.attach.kind)}:${esc(x.attach.id)}">
@@ -1474,7 +1544,7 @@ async function renderPost(){
     </div>
     <div class="sec"><h2>댓글 ${cms.length}</h2>
       ${cms.length ? cms.map(c => { const ch = !shown(c), cl = ACC && (c.likes||[]).includes(ACC.id);
-        return `<div class="cm"><div class="h"><b>${esc(nickOf(c))}</b><span>${ago(c.at)}</span>${c.picked?'<span class="picked">채택</span>':''}${(c.reports||[]).length?`<span style="color:var(--warn)">신고 ${(c.reports||[]).length}</span>`:''}</div>
+        return `<div class="cm"><div class="h"><b>${esc(nickOf(c))}</b><span>${ago(c.at)}</span>${c.picked?'<span class="picked">채택</span>':''}${repN(c)?`<span style="color:var(--warn)">신고 ${repN(c)}</span>`:''}</div>
           <div class="body" ${ch?'style="color:var(--muted)"':''}>${ch ? '신고가 쌓여 가려진 댓글입니다.' : esc(c.body)}</div>
           <div class="a"><button data-clike="${esc(c.id)}" class="${cl?'on':''}">도움됨 ${(c.likes||[]).length}</button>
             ${mine(x) && x.board==='qna' && !c.picked ? `<button data-cpick="${esc(c.id)}">채택하기</button>` : ''}
@@ -1835,7 +1905,7 @@ async function renderParent(){
       <div class="f"><input id="childIn" class="code" placeholder="자녀 코드 6자리" maxlength="6" autocapitalize="characters" autocomplete="off"><button id="childGo">연결</button></div>${childErr?`<div class="err">${esc(childErr)}</div>`:''}
       ${DBX.mode==='local' ? `<div class="demo">시연용 — <code>MON123</code></div>`:''}</div>`; return; }
   const code = ACC.childCode; let st=null, todayA=null, month=[], prog=null, ns=[];
-  try { st = await DBX.student(code); todayA = await DBX.myAttendance(code, todayISO()); const ym = todayISO().slice(0,7); month = await DBX.attendanceRange(`${ym}-01`, `${ym}-31`, code); prog = await DBX.loadProgress(code); if (st) ns = await DBX.notices(st.cls); } catch (e){ v.innerHTML = `<h1 class="h-page">자녀</h1><div class="empty"><p>${esc(e.message)}</p></div>`; return; }
+  try { st = await DBX.student(code); todayA = await DBX.myAttendance(code, todayISO()); const ym = todayISO().slice(0,7); month = await DBX.attendanceRange(`${ym}-01`, monthEnd(ym), code); prog = await DBX.loadProgress(code); if (st) ns = await DBX.notices(st.cls); } catch (e){ v.innerHTML = `<h1 class="h-page">자녀</h1><div class="empty"><p>${esc(e.message)}</p></div>`; return; }
   if (!st){ v.innerHTML = `<h1 class="h-page">자녀</h1><div class="empty"><p>연결된 코드(${esc(code)})의 학생을 찾을 수 없습니다. 수강이 끝났거나 코드가 바뀌었을 수 있습니다.</p></div><button class="btn ghost" id="unlinkChild">연결 해제</button>`; return; }
   const done = prog ? (prog.done||[]).length : 0, days = prog ? (prog.days||[]) : [], last = days.length ? days[days.length-1] : '';
   const lateN = month.filter(a=>a.late).length;
@@ -1924,11 +1994,11 @@ async function renderAdmin(){
         개인정보·비방·기출 원문이 올라온 글은 지워 주세요. 지운 글은 되돌릴 수 없습니다.</div>
       <div class="sec"><h2>신고된 글 ${rep.posts.length}건</h2>
         ${rep.posts.length ? rep.posts.map(x=>`<div class="setrow" style="align-items:flex-start">
-            <span class="l">${esc(x.title)}<small>${esc(x.nick||'익명')} · ${ago(x.at)} · 신고 ${(x.reports||[]).length}건<br>${esc(String(x.body||'').slice(0,70))}</small></span>
+            <span class="l">${esc(x.title)}<small>${esc(x.nick||'익명')} · ${ago(x.at)} · 신고 ${repN(x)}건<br>${esc(String(x.body||'').slice(0,70))}</small></span>
             <button class="more" data-admpdel="${esc(x.id)}">지우기</button></div>`).join('') : `<p class="planempty">신고된 글이 없습니다.</p>`}</div>
       <div class="sec"><h2>신고된 댓글 ${rep.comments.length}건</h2>
         ${rep.comments.length ? rep.comments.map(c=>`<div class="setrow" style="align-items:flex-start">
-            <span class="l">${esc(String(c.body||'').slice(0,70))}<small>${esc(c.nick||'익명')} · ${ago(c.at)} · 신고 ${(c.reports||[]).length}건</small></span>
+            <span class="l">${esc(String(c.body||'').slice(0,70))}<small>${esc(c.nick||'익명')} · ${ago(c.at)} · 신고 ${repN(c)}건</small></span>
             <button class="more" data-admcdel="${esc(c.id)}">지우기</button></div>`).join('') : `<p class="planempty">신고된 댓글이 없습니다.</p>`}</div>
       ${total ? '' : `<p class="fine">신고가 없다고 안심하지 마시고, 가끔 <b>이야기</b> 탭을 직접 둘러봐 주세요.</p>`}`;
     return;
@@ -2126,16 +2196,20 @@ function show(v){
 /* ═══ 로그인 뒤 처리: 계정 → 학원 코드 → 진도 합치기 ═══ */
 async function afterLogin(acc){
   ACC = acc; codeErr = childErr = passErr = '';
+  /* 메일 인증 전에 적어 둔 학원 코드·자녀 코드 — 인증을 마치고 처음 들어올 때 연결한다 */
+  let pl = null; try { pl = JSON.parse(localStorage.getItem('pcs.pendingLink')); localStorage.removeItem('pcs.pendingLink'); } catch {}
+  if (pl && pl.code && ((pl.kind==='student' && acc.role==='student' && !acc.studentCode) || (pl.kind==='child' && acc.role==='parent' && !acc.childCode))){
+    try { const r = await DBX.linkCode(pl.kind, pl.code); if (r.ok){ acc = ACC = await DBX.me(); } else toast(r.why); } catch {} }
   if (acc.role==='student' && acc.studentCode){ try { const r = await DBX.verifyCode(acc.studentCode); if (r.ok) S.auth = { code:acc.studentCode, name:r.student.name, cls:r.student.cls, until:r.student.until }; } catch {} }
   else S.auth = null;
   try { mergeProgress(await DBX.loadProgress(progressKey())); } catch {}
   save(S); scheduleReminder(); show(home());
 }
 async function linkStudentCode(code){
-  const r = await DBX.verifyCode(code); if (!r.ok) return r;
-  S.auth = { code, name:r.student.name, cls:r.student.cls, until:r.student.until };
-  if (ACC){ ACC = await DBX.updateMe({ studentCode: code }); if (!ACC.name && r.student.name) ACC = await DBX.updateMe({ name:r.student.name }); }
-  try { mergeProgress(await DBX.loadProgress(code)); } catch {}
+  const r = await DBX.linkCode('student', code); if (!r.ok) return r;
+  const c = r.student.code; S.auth = { code:c, name:r.student.name, cls:r.student.cls, until:r.student.until };
+  ACC = await DBX.me();
+  try { mergeProgress(await DBX.loadProgress(c)); } catch {}
   save(S); return r;
 }
 
@@ -2297,7 +2371,7 @@ document.addEventListener('click', async e => {
   if (T('#lgGo')){
     const em=(document.getElementById('lgEmail').value||'').trim(), pw=document.getElementById('lgPw').value||'';
     if (!validEmail(em) || !pw){ authErr='이메일과 비밀번호를 확인해 주세요.'; renderAuth(); return; }
-    try { const acc = await DBX.signIn(em, pw); S.onboarded=true; toast(`${acc.name||'회원'}님, 반갑습니다`); await afterLogin(acc); } catch (err){ authErr = err.message; renderAuth(); }
+    try { authInfo=''; const acc = await DBX.signIn(em, pw); S.onboarded=true; toast(`${acc.name||'회원'}님, 반갑습니다`); await afterLogin(acc); } catch (err){ authErr = err.message; renderAuth(); }
     return;
   }
   if (T('#suGo')){
@@ -2313,13 +2387,20 @@ document.addEventListener('click', async e => {
       let acc = await DBX.signUp({ email:em, password:pw, name, role:signRole, phone, under14:u14, guardian: u14 ? `${gName} ${gPhone}` : '' });
       ACC = acc; S.onboarded=true;
       if (signRole==='student' && code){ const r = await linkStudentCode(code); if (!r.ok) toast(r.why); }
-      if (signRole==='parent' && child){ const s = await DBX.student(child); if (s) ACC = await DBX.updateMe({ childCode: child }); else toast('자녀 코드를 찾지 못했습니다. 내 정보에서 다시 연결해 주세요.'); }
+      if (signRole==='parent' && child){ const r = await DBX.linkCode('child', child); if (r.ok) ACC = await DBX.me(); else toast(r.why); }
+      if (signRole==='owner' && ACC.role!=='owner') toast('원장 화면은 학원에 등록된 원장 이메일로만 열립니다');
       toast('가입되었습니다'); await afterLogin(ACC);
-    } catch (err){ authErr = err.message; renderAuth(); }
+    } catch (err){ if (err.mailSent){ if (code || child) try { localStorage.setItem('pcs.pendingLink', JSON.stringify({ kind: signRole==='parent'?'child':'student', code: signRole==='parent'?child:code })); } catch {}
+      authMode='login'; authErr=''; authInfo=err.message; const em=g('suEmail'); renderAuth(); const el=document.getElementById('lgEmail'); if (el) el.value=em; return; }
+      authErr = err.message; renderAuth(); }
     return;
   }
   if (T('#fgGo')){ const em=(document.getElementById('fgEmail').value||'').trim(); if (!validEmail(em)){ authErr='이메일 형식을 확인해 주세요.'; renderAuth(); return; }
-    try { const r = await DBX.resetPassword(em); toast(r.note||'메일을 보냈습니다'); authMode='login'; authErr=''; renderAuth(); } catch (err){ authErr=err.message; renderAuth(); } return; }
+    try { const r = await DBX.resetPassword(em); authMode='login'; authErr=''; authInfo=r.note||'메일을 보냈습니다'; renderAuth(); } catch (err){ authErr=err.message; renderAuth(); } return; }
+  if (T('#npGo')){ const a=(document.getElementById('npPw').value||''), b=(document.getElementById('npPw2').value||'');
+    if (a.length<6){ authErr='비밀번호는 6자 이상이어야 합니다.'; renderAuth(); return; }
+    if (a!==b){ authErr='두 비밀번호가 다릅니다.'; renderAuth(); return; }
+    try { await DBX.setPassword(a); authErr=''; authInfo=''; toast('비밀번호를 바꿨습니다'); await afterLogin(await DBX.me()); } catch (err){ authErr=err.message; renderAuth(); } return; }
 
   /* 빈칸 · 북마크 · 공유 */
   const blank = T('.blank'); if (blank){ const c = view==='detail' ? CONCEPTS[detailIdx] : todayConcept(); const key = blank.dataset.b;
@@ -2374,10 +2455,10 @@ document.addEventListener('click', async e => {
   if (T('#childGo')){ /* 내 정보와 자녀 화면에 같은 입력이 동시에 있으므로, 지금 누른 쪽의 입력을 읽는다 */
     const box = T('#childGo').closest('.codebox') || document;
     const v=((box.querySelector('#childIn')||{}).value||'').trim().toUpperCase(); if (!v){ childErr='코드를 입력해 주세요.'; (view==='parent'?renderParent:renderMe)(); return; }
-    try { const s = await DBX.student(v); if (!s){ childErr='그 코드의 학생을 찾을 수 없습니다. 자녀에게 받은 코드를 다시 확인해 주세요.'; (view==='parent'?renderParent:renderMe)(); return; }
-      ACC = await DBX.updateMe({ childCode: v }); childErr=''; toast(`${s.name} 학생과 연결했습니다`); show('parent'); } catch (err){ childErr=err.message; (view==='parent'?renderParent:renderMe)(); } return; }
-  if (T('#unlinkChild')){ ACC = await DBX.updateMe({ childCode: '' }); renderParent(); return; }
-  if (T('#unauth')){ if (!confirm('학원 코드 연결을 해제할까요? 공지·출석이 닫힙니다.')) return; S.auth=null; if (ACC) ACC = await DBX.updateMe({ studentCode:'' }); save(S); renderMe(); return; }
+    try { const r = await DBX.linkCode('child', v); if (!r.ok){ childErr = r.why; (view==='parent'?renderParent:renderMe)(); return; }
+      ACC = await DBX.me(); childErr=''; toast(`${r.student.name} 학생과 연결했습니다`); show('parent'); } catch (err){ childErr=err.message; (view==='parent'?renderParent:renderMe)(); } return; }
+  if (T('#unlinkChild')){ if (!confirm('자녀 연결을 해제할까요?')) return; await DBX.linkCode('child', ''); ACC = await DBX.me(); renderParent(); return; }
+  if (T('#unauth')){ if (!confirm('학원 코드 연결을 해제할까요? 공지·출석이 닫힙니다.')) return; await flushProgress(); S.auth=null; if (ACC){ await DBX.linkCode('student', ''); ACC = await DBX.me(); } save(S); renderMe(); return; }
   if (T('#logout')){ if (!confirm('로그아웃할까요? 진도는 계정에 저장되어 있습니다.')) return; await flushProgress(); await DBX.signOut(); ACC=null; S = freshS(); save(S); authMode='start'; show('auth'); return; }
   if (T('#delAccount')){ if (!confirm('계정을 삭제하면 진도·오답 노트가 함께 지워지고 되돌릴 수 없습니다. 삭제할까요?')) return;
     try { await DBX.deleteAccount(); ACC=null; clearTimeout(syncT); S = freshS(); try { localStorage.removeItem(KEY); } catch {} authMode='start'; toast('계정을 삭제했습니다'); show('auth'); } catch (err){ toast(err.message); } return; }
@@ -2418,7 +2499,19 @@ document.addEventListener('change', e => { if (e.target.id==='bankLesson'){ bank
 
 /* ═══ 시작 ═══ */
 (async () => {
+  /* 가입 확인·비밀번호 재설정 메일의 링크로 들어왔으면 그 세션을 받는다 */
+  const hp = new URLSearchParams(location.hash.slice(1)); let linkErr = '';
+  if (SRV && (hp.get('access_token') || hp.get('error_description'))){
+    history.replaceState(null, '', location.pathname + location.search);
+    if (hp.get('error_description')) linkErr = AUTH_KO(hp.get('error_description'));
+    else try { ACC = await DBX.adoptSession(hp.get('access_token'), hp.get('refresh_token'));
+      if (hp.get('type')==='recovery'){ authMode='newpw'; show('auth'); nativeInit(); return; }
+      toast('메일 인증이 끝났습니다. 반갑습니다'); S.onboarded=true; await afterLogin(ACC); nativeInit(); return;
+    } catch (e){ linkErr = e.message; }
+  }
   try { ACC = await DBX.me(); } catch { ACC = null; }
+  /* 이미 쓴 링크·만료된 링크: 로그인해 있으면 알림만, 아니면 로그인 화면에 이유를 적는다 */
+  if (linkErr){ if (ACC) setTimeout(() => toast(linkErr), 600); else { authMode='login'; authErr=linkErr; S.onboarded=true; show('auth'); nativeInit(); return; } }
   if (ACC){
     /* 켤 때마다 학원 코드를 다시 확인한다 — 수강이 끝났거나 원장님이 해제했으면 닫는다. 연결이 안 되면 저장된 만료일로 판단 */
     if (ACC.role==='student' && ACC.studentCode){ try { const r = await DBX.verifyCode(ACC.studentCode);

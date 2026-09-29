@@ -1,13 +1,17 @@
 #!/usr/bin/env python3
 """이야기(커뮤니티) E2E — 닉네임 · 글쓰기 · 개념 첨부 · 댓글 · 채택 · 도움됨 · 신고/가림 · 개인정보 감지 · 원장 삭제.
 사전: docs/parkchan 을 http://127.0.0.1:8765 로 띄운 뒤  python3 tools/e2e_talk.py --shots DIR
-서버 모드도 확인하려면 mock_server.py 를 :8766 에 띄우고  --server 를 덧붙인다.
+서버 모드도 확인하려면 tools/testbed_up.sh 로 시험대(:8767)를 띄우고  --server 를 덧붙인다.
 """
 import asyncio, os, sys
 from playwright.async_api import async_playwright
 SC = sys.argv[sys.argv.index('--shots')+1] if '--shots' in sys.argv[:-1] else '/tmp/pcs-e2e-talk'
 os.makedirs(SC, exist_ok=True)
-APP = 'http://127.0.0.1:8765/index.html?server=http://127.0.0.1:8766&key=anon'
+import json as _j, urllib.request as _u
+GW = 'http://127.0.0.1:8767'   # tools/testbed_up.sh — 진짜 Postgres·PostgREST 시험대
+try: ANON = _j.loads(_u.urlopen(GW + '/__anon').read())['anon']
+except Exception: ANON = 'anon'
+APP = f'http://127.0.0.1:8765/index.html?server={GW}&key={ANON}'
 
 async def login(pg, who):
     await pg.evaluate("['pcs.v2','pcs.local.sid','pcs.session'].forEach(k=>localStorage.removeItem(k))")
@@ -130,6 +134,7 @@ async def server_mode():
         ctx=await b.new_context(viewport={'width':390,'height':844}); pg=await ctx.new_page()
         errs=[]; pg.on('pageerror', lambda e: errs.append(str(e)))
         pg.on('dialog', lambda d: asyncio.ensure_future(d.accept()))
+        _u.urlopen(_u.Request(GW + '/__reset', method='POST')).read()
         await pg.goto(APP); await pg.wait_for_timeout(800)
         await pg.click('#goSignup'); await pg.wait_for_timeout(400)
         await pg.fill('#suName','서버학생'); await pg.fill('#suEmail','s1@demo.kr'); await pg.fill('#suPw','123456')
@@ -152,7 +157,7 @@ async def server_mode():
         await pg.click('#talkBack'); await pg.wait_for_timeout(800)
         assert await pg.locator('.pcard .ok').count() == 1, '해결됨 표시 실패'
         # 연결이 끊겼을 때 빈 화면 대신 안내가 뜨는가
-        await ctx.route(lambda url: '8766' in url, lambda r: asyncio.ensure_future(r.abort()))
+        await ctx.route(lambda url: '8767' in url, lambda r: asyncio.ensure_future(r.abort()))
         await pg.click('.tab[data-v="plan"]'); await pg.wait_for_timeout(500)
         await pg.click('.tab[data-v="talk"]'); await pg.wait_for_timeout(1200)
         assert await pg.locator('.loadfail').count() == 1, '불러오기 실패 안내가 없다'

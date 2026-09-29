@@ -1,11 +1,15 @@
 #!/usr/bin/env python3
-"""서버 모드 E2E(v2) — 모의 Supabase(mock_server.py) 앞에서 계정·학생·보호자·원장·이용권 흐름을 돌려 본다.
+"""서버 모드 E2E(v2) — 진짜 Postgres·PostgREST 시험대(tools/testbed_up.sh) 앞에서 계정·학생·보호자·원장·이용권 흐름을 돌려 본다.
 
-전제: docs/parkchan 이 http://127.0.0.1:8765 에, mock_server.py 가 :8766 에 떠 있다.
+전제: docs/parkchan 이 http://127.0.0.1:8765 에, tools/testbed_up.sh 로 시험대(:8767)가 떠 있다.
 """
 import asyncio, sys, os, urllib.request
 from playwright.async_api import async_playwright
-APP = 'http://127.0.0.1:8765/index.html?server=http://127.0.0.1:8766&key=anon'
+import json as _j, urllib.request as _u
+GW = 'http://127.0.0.1:8767'   # tools/testbed_up.sh — 진짜 Postgres·PostgREST 시험대
+try: ANON = _j.loads(_u.urlopen(GW + '/__anon').read())['anon']
+except Exception: ANON = 'anon'
+APP = f'http://127.0.0.1:8765/index.html?server={GW}&key={ANON}'
 SC = (sys.argv[sys.argv.index('--shots')+1] if '--shots' in sys.argv[:-1] else (sys.argv[1] if len(sys.argv) > 1 and not sys.argv[1].startswith('-') else '/tmp/e2e_server')); os.makedirs(SC, exist_ok=True)
 
 
@@ -23,7 +27,7 @@ async def main():
             return ctx, pg
         shot = lambda pg, n: pg.screenshot(path=f'{SC}/{n}.png', full_page=True)
         async def txt(pg, sel): return await pg.locator(sel).first.inner_text()
-        urllib.request.urlopen(urllib.request.Request('http://127.0.0.1:8766/__reset', method='POST')).read()
+        urllib.request.urlopen(urllib.request.Request('http://127.0.0.1:8767/__reset', method='POST')).read()
 
         # ── 원장: 로그인 → 학생 등록 → 공지 → 출석 코드 → 이용권 발급 ──
         octx, o = await page(); assert await o.evaluate('DBX.mode') == 'server'

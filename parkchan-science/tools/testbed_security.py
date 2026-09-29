@@ -1,0 +1,145 @@
+#!/usr/bin/env python3
+"""서버 보안 시험 — 진짜 Postgres·PostgREST 시험대(tools/testbed_up.sh)에 대고, 막혀야 할 일이 실제로 막히는지 두드려 본다.
+
+사용: bash tools/testbed_up.sh && python3 tools/testbed_security.py
+"""
+import json, sys, datetime as dt, urllib.request, urllib.error
+from zoneinfo import ZoneInfo
+GW = 'http://127.0.0.1:8767'
+OK, BAD = [], []
+
+
+def call(m, path, body=None, tok=None, prefer=None):
+    h = {'Content-Type': 'application/json', 'apikey': ANON, 'Authorization': 'Bearer ' + (tok or ANON)}
+    if prefer: h['Prefer'] = prefer
+    req = urllib.request.Request(GW + path, data=None if body is None else json.dumps(body).encode(), method=m, headers=h)
+    try:
+        with urllib.request.urlopen(req) as r: t = r.read(); return r.status, (json.loads(t) if t else None)
+    except urllib.error.HTTPError as e:
+        t = e.read()
+        try: return e.code, json.loads(t)
+        except Exception: return e.code, t.decode()
+
+
+def check(name, cond, info=''):
+    (OK if cond else BAD).append(name); print(('  ✓ ' if cond else '  ✗ ') + name + ('' if cond else f'   ← {info}'))
+
+
+def signup(email, name, role='student', **meta):
+    s, j = call('POST', '/auth/v1/signup', {'email': email, 'password': 'pw123456', 'data': {'name': name, 'role': role, **meta}})
+    assert s == 200 and j.get('access_token'), (s, j); return j['access_token'], j['user']['id']
+def login(email, pw):
+    s, j = call('POST', '/auth/v1/token?grant_type=password', {'email': email, 'password': pw}); assert s == 200, j; return j['access_token'], j['user']['id']
+def rpc(fn, body, tok): return call('POST', f'/rest/v1/rpc/{fn}', body, tok)
+def me(tok, uid): return call('GET', f'/rest/v1/profiles?id=eq.{uid}&select=*', tok=tok)[1][0]
+
+
+ANON = json.loads(urllib.request.urlopen(GW + '/__anon').read())['anon']
+call('POST', '/__reset')
+OWN, OWN_ID = login('owner@parkchan.kr', 'owner-pass')
+print('▸ 원장 · 가입 트리거')
+check('원장 계정은 원장 역할', me(OWN, OWN_ID)['role'] == 'owner')
+s, st = call('POST', '/rest/v1/students?select=code,name,cls,until', {'code': 'MON123', 'name': '박○○', 'cls': '월목반', 'until': '2099-02-28'}, OWN, 'return=representation')
+check('원장이 학생 코드 발급', s == 201, st)
+call('POST', '/rest/v1/students', {'code': 'OLD111', 'name': '졸업생', 'cls': '월목반', 'until': '2020-02-28'}, OWN)
+A, A_ID = signup('a@test.kr', '학생A', phone='010', terms_ver='2026-09-29')
+pa = me(A, A_ID)
+check('가입하면 프로필이 저절로 생김(역할·연락처·약관 동의 시각)', pa['role'] == 'student' and pa['phone'] == '010' and pa['agreed_at'], pa)
+X, X_ID = signup('x@test.kr', '사칭', role='owner')
+check('가입할 때 역할을 owner 로 보내도 학생이 됨', me(X, X_ID)['role'] == 'student')
+
+print('▸ 프로필 칸 권한')
+s, _ = call('PATCH', f'/rest/v1/profiles?id=eq.{A_ID}', {'pass_until': '2099-12-31'}, A)
+check('학생이 자기 이용권 만료일을 못 고침', s in (401, 403) and me(A, A_ID)['pass_until'] is None, s)
+s, _ = call('PATCH', f'/rest/v1/profiles?id=eq.{A_ID}', {'role': 'owner'}, A); check('학생이 자기 역할을 못 바꿈', s in (401, 403), s)
+s, _ = call('PATCH', f'/rest/v1/profiles?id=eq.{A_ID}', {'student_code': 'MON123'}, A); check('학원 코드를 직접 못 써 넣음(함수로만)', s in (401, 403), s)
+s, _ = call('PATCH', f'/rest/v1/profiles?id=eq.{A_ID}', {'name': '학생에이', 'nick': '에이'}, A); check('이름·닉네임은 고칠 수 있음', s == 204 and me(A, A_ID)['nick'] == '에이', s)
+s, j = call('GET', '/rest/v1/profiles?select=id', tok=A); check('남의 프로필은 안 보임', s == 200 and len(j) == 1, j)
+
+print('▸ 학원 코드 연결')
+s, j = call('GET', '/rest/v1/students?select=*', tok=A); check('연결 전에는 학생 명단이 안 보임', j == [], j)
+s, j = call('GET', '/rest/v1/students?code=eq.MON123&select=*', tok=ANON); check('비로그인은 코드로 조회해도 안 보임', j == [], j)
+r = rpc('link_code', {'p_kind': 'student', 'p_code': 'OLD111'}, A)[1]; check('수강 끝난 코드는 거절', not r['ok'] and '끝났' in r['why'], r)
+r = rpc('link_code', {'p_kind': 'student', 'p_code': 'mon123'}, A)[1]; check('맞는 코드(소문자도)로 연결', r['ok'] and r['student']['cls'] == '월목반', r)
+s, j = call('GET', '/rest/v1/students?select=code', tok=A); check('연결 뒤 내 코드만 보임', [x['code'] for x in j] == ['MON123'], j)
+B, B_ID = signup('b@test.kr', '학생B')
+r = rpc('link_code', {'p_kind': 'student', 'p_code': 'MON123'}, B)[1]; check('같은 코드를 다른 학생 계정에 못 씀(돌려쓰기)', not r['ok'] and '다른 학생' in r['why'], r)
+for i in range(10): rpc('link_code', {'p_kind': 'student', 'p_code': f'ZZZ{i:03d}'}, B)
+r = rpc('link_code', {'p_kind': 'student', 'p_code': 'ZZZ999'}, B)[1]; check('틀린 코드 10번 뒤 1시간 잠김', not r['ok'] and '여러 번' in r['why'], r)
+P, P_ID = signup('p@test.kr', '보호자', role='parent')
+r = rpc('link_code', {'p_kind': 'student', 'p_code': 'MON123'}, P)[1]; check('보호자 계정은 학생 코드 등록 불가', not r['ok'], r)
+r = rpc('link_code', {'p_kind': 'child', 'p_code': 'MON123'}, P)[1]; check('보호자가 자녀 연결', r['ok'], r)
+s, n = rpc('release_code', {'p_code': 'MON123'}, A); check('학생은 코드 풀기 함수를 못 씀', s >= 400, s)
+
+print('▸ 출석(30초 코드 · 한국 시간)')
+code = rpc('current_attend_code', {}, OWN)[1]['code']
+s, _ = rpc('current_attend_code', {}, A); check('학생은 지금 출석 코드를 못 봄', s >= 400, s)
+r = rpc('mark_attend', {'p_code': 'MON123', 'p_entered': code}, B)[1]; check('남의 코드로 출석 못 함', not r['ok'], r)
+for i in range(6): rpc('mark_attend', {'p_code': 'MON123', 'p_entered': '0000' if code != '0000' else '1111'}, A)
+r = rpc('mark_attend', {'p_code': 'MON123', 'p_entered': code}, A)[1]; check('틀린 출석 코드 6번 뒤 잠김(원격 대입 방지)', not r['ok'] and '여러 번' in r['why'], r)
+r = rpc('mark_attend_manual', {'p_code': 'MON123'}, OWN)[1]
+kst = dt.datetime.now(ZoneInfo('Asia/Seoul'))
+hh, mm = map(int, r['time'].split(':')); diff = abs((hh * 60 + mm) - (kst.hour * 60 + kst.minute))
+check('출석 시각이 한국 시간으로 기록됨', r['ok'] and min(diff, 1440 - diff) <= 1, (r, kst.strftime('%H:%M')))
+s, j = call('GET', '/rest/v1/attendance?select=date', tok=P); check('보호자는 자녀 출석을 봄', len(j) == 1 and j[0]['date'] == kst.date().isoformat(), j)
+s, j = call('GET', '/rest/v1/attendance?select=date', tok=B); check('다른 학생은 못 봄', j == [], j)
+
+print('▸ 진도')
+s, _ = call('POST', '/rest/v1/progress?on_conflict=code', {'code': f'u:{B_ID}', 'state': {'done': [1]}}, B, 'resolution=merge-duplicates,return=minimal')
+check('학원 밖 이용자 진도(u:계정) 저장됨', s == 201, s)
+s, _ = call('POST', '/rest/v1/progress?on_conflict=code', {'code': 'MON123', 'state': {'done': [1, 2]}}, A, 'resolution=merge-duplicates,return=minimal'); check('학생 진도 저장', s == 201, s)
+s, _ = call('POST', '/rest/v1/progress?on_conflict=code', {'code': 'MON123', 'state': {'done': []}}, P, 'resolution=merge-duplicates,return=minimal'); check('보호자는 자녀 진도를 못 고침', s >= 400, s)
+s, _ = call('DELETE', '/rest/v1/progress?code=eq.MON123', tok=P)
+s, j = call('GET', '/rest/v1/progress?code=eq.MON123&select=state', tok=P); check('보호자는 자녀 진도를 보되 못 지움', len(j) == 1 and j[0]['state']['done'] == [1, 2], j)
+s, j = call('GET', '/rest/v1/progress?select=code', tok=B); check('남의 진도는 안 보임', [x['code'] for x in j] == [f'u:{B_ID}'], j)
+
+print('▸ 이용권 · 결제')
+call('POST', '/rest/v1/passes', {'code': 'PASS01', 'days': 30}, OWN)
+r = rpc('redeem_pass', {'p_code': 'pass01'}, B)[1]; check('이용권 등록', r['ok'], r)
+r = rpc('redeem_pass', {'p_code': 'PASS01'}, X)[1]; check('쓴 이용권은 다시 못 씀', not r['ok'], r)
+s, _ = rpc('grant_purchase', {'p_uid': B_ID, 'p_token': 't', 'p_product': 'y1', 'p_order': 'o', 'p_days': 365, 'p_raw': {}}, B)
+check('앱에서 결제 반영 함수를 직접 못 부름(서버 검증 전용)', s >= 400, s)
+s, _ = call('POST', '/rest/v1/passes', {'code': 'FREE99', 'days': 365}, B); check('학생이 이용권 코드를 못 만듦', s >= 400, s)
+
+print('▸ 이야기')
+s, j = call('POST', '/rest/v1/posts', {'board': 'qna', 'title': '질문', 'body': '효소 질문', 'author': B_ID}, A)
+check('남의 이름(author)으로 글을 못 씀', s in (401, 403), s)
+s, j = call('POST', '/rest/v1/posts?select=id,nick,author', {'board': 'qna', 'title': '질문', 'body': '효소 질문', 'nick': '원장'}, A, 'return=representation')
+check('닉네임을 사칭해도 막힘', s in (401, 403), s)
+s, j = call('POST', '/rest/v1/posts?select=id,nick,author', {'board': 'qna', 'title': '질문', 'body': '효소 질문'}, A, 'return=representation')
+check('글쓴이·닉네임은 서버가 채움', s == 201 and j[0]['nick'] == '에이' and j[0]['author'] == A_ID, j)
+pid = j[0]['id']
+s, j = call('GET', '/rest/v1/posts?select=reports', tok=B); check('누가 신고했는지는 안 보임', s >= 400, s)
+s, j = call('POST', '/rest/v1/posts', {'board': 'qna', 'title': 't', 'body': 'b'}, ANON); check('비로그인은 글 못 씀', s >= 400, s)
+s, j = call('GET', '/rest/v1/posts?select=id', tok=ANON); check('비로그인은 글 못 봄', s >= 400 or j == [], j)
+for tok in (B, P): call('POST', '/rest/v1/comments', {'post_id': pid, 'body': '답'}, tok)
+s, j = call('GET', f'/rest/v1/posts?id=eq.{pid}&select=comment_n', tok=B); check('댓글 수가 서버에서 셈', j[0]['comment_n'] == 2, j)
+s, _ = call('PATCH', f'/rest/v1/posts?id=eq.{pid}', {'title': '남이 고침'}, B)
+s, j = call('GET', f'/rest/v1/posts?id=eq.{pid}&select=title', tok=A); check('남의 글은 못 고침', j[0]['title'] == '질문', j)
+s, _ = call('PATCH', f'/rest/v1/posts?id=eq.{pid}', {'likes': [B_ID, B_ID]}, A); check('좋아요 칸을 직접 못 고침', s >= 400, s)
+for tok in (B, P, X): rpc('report_item', {'p_kind': 'post', 'p_id': pid}, tok)
+s, j = call('GET', f'/rest/v1/posts?id=eq.{pid}&select=id', tok=B); check('신고 3건이면 다른 사람에게 가려짐(서버에서)', j == [], j)
+s, j = call('GET', f'/rest/v1/posts?id=eq.{pid}&select=report_n', tok=A); check('글쓴이에게는 보임', len(j) == 1 and j[0]['report_n'] == 3, j)
+s, j = call('GET', f'/rest/v1/posts?id=eq.{pid}&select=report_n', tok=OWN); check('원장에게는 보임', len(j) == 1, j)
+call('PATCH', f'/rest/v1/posts?id=eq.{pid}', {'deleted': True}, OWN)
+s, _ = call('PATCH', f'/rest/v1/posts?id=eq.{pid}', {'deleted': False}, A)
+import psycopg2
+cur = psycopg2.connect('host=127.0.0.1 port=54329 user=postgres dbname=pcs').cursor(); cur.execute('select deleted from posts where id=%s', (pid,))
+check('원장이 지운 글을 글쓴이가 되살리지 못함', cur.fetchone()[0] is True)
+codes = [call('POST', '/rest/v1/posts', {'board': 'talk', 'title': f'도배{i}', 'body': '...'}, B)[0] for i in range(6)]
+check('글 도배 제한(10분에 5개)', codes[:5] == [201] * 5 and codes[5] >= 400, codes)
+
+print('▸ 원장 판정 · 오류 기록 · 계정 삭제')
+cur.execute("update auth.users set email_confirmed_at = null where email = 'owner@parkchan.kr'"); cur.connection.commit()
+s, _ = rpc('current_attend_code', {}, OWN); check('메일 인증 안 된 원장 이메일은 원장 아님', s >= 400, s)
+cur.execute("update auth.users set email_confirmed_at = now() where email = 'owner@parkchan.kr'"); cur.connection.commit()
+s, _ = call('POST', '/rest/v1/client_errors', {'ver': '1', 'msg': 'TypeError x'}, ANON); check('앱 오류는 비로그인도 남김', s == 201, s)
+s, j = call('GET', '/rest/v1/client_errors?select=id', tok=A); check('오류 기록은 원장만 봄', j == [], j)
+s, j = call('GET', '/rest/v1/client_errors?select=id', tok=OWN); check('  └ 원장은 봄', len(j) == 1, j)
+s, _ = rpc('register_push', {'p_token': 'tokA', 'p_platform': 'android'}, A); check('푸시 기기 등록', s in (200, 204), s)
+s, j = call('GET', '/rest/v1/push_tokens?select=token', tok=B); check('남의 푸시 기기는 안 보임', j == [], j)
+s, _ = rpc('delete_my_account', {}, B); check('계정 삭제', s in (200, 204), s)
+s, _ = call('POST', '/auth/v1/token?grant_type=password', {'email': 'b@test.kr', 'password': 'pw123456'}); check('  └ 삭제한 계정으로 로그인 불가', s == 400, s)
+
+print(f'\n보안 시험 {len(OK)}/{len(OK) + len(BAD)} 통과')
+sys.exit(1 if BAD else 0)
