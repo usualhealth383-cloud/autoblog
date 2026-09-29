@@ -358,7 +358,7 @@ def main():
         # 5a-10b. ClinicScore 문법(2026-09-29 현욱님) — 내 정보는 탭 셋, 건강 상태는 누르는 단추.
         #         누르면 그 자리에서 켜지고(맨 위로 튀지 않고) 「켜 둔 것」에 설명이 붙어야 한다.
         _mt = pg.evaluate("""()=>{
-          ME.bph=false; saveMe(); route();
+          ['heart','diabetes','ulcer','kidney','liver','anticoag','glaucoma','bph','asthma','alcohol','gout','pregnant'].forEach(f=>{ME[f]=false;}); saveMe(); route();
           const tabs=[...document.querySelectorAll('.metabs .tab')].map(b=>b.innerText.trim().replace(/\\s*\\d+$/,''));
           window.scrollTo(0,400); const y=window.scrollY;
           const chip=[...document.querySelectorAll('.chip-m')].find(b=>b.innerText.includes('전립선비대')); chip.click();
