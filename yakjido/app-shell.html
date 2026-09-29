@@ -224,12 +224,12 @@ ol.tl li:last-child{padding-bottom:0}
 /* ── 홈: 오늘의 한 장 ── */
 .today{display:block;margin-top:var(--s4);padding:16px 18px;border-radius:20px;
   background:linear-gradient(135deg,var(--gbg,var(--tint)) 0%,var(--card) 100%);border:1px solid var(--hairline);box-shadow:var(--shadow-card);text-align:left;width:100%}
-.today .in{display:grid;grid-template-columns:1fr auto;gap:12px;align-items:center}
-.today .eb{font-size:.6875rem;font-weight:800;letter-spacing:.08em;color:var(--gfg,var(--primary));text-transform:uppercase}
-.today b{display:block;font-size:1.125rem;font-weight:800;line-height:1.35;margin-top:3px}
-.today span{display:block;font-size:.875rem;color:var(--body);line-height:1.5;margin-top:4px}
-.today .ic{width:56px;height:56px;border-radius:18px;background:var(--card);color:var(--gfg,var(--primary));display:grid;place-items:center;box-shadow:var(--shadow-card)}
-.today .ic svg.i{width:28px;height:28px}
+.today-go .in{display:grid;grid-template-columns:1fr auto;gap:12px;align-items:center}
+.today-go .eb{font-size:.6875rem;font-weight:800;letter-spacing:.08em;color:var(--gfg,var(--primary));text-transform:uppercase}
+.today-go b{display:block;font-size:1.125rem;font-weight:800;line-height:1.35;margin-top:3px}
+.today-go span{display:block;font-size:.875rem;color:var(--body);line-height:1.5;margin-top:4px}
+.today-go .ic{width:56px;height:56px;border-radius:18px;background:var(--card);color:var(--gfg,var(--primary));display:grid;place-items:center;box-shadow:var(--shadow-card)}
+.today-go .ic svg.i{width:28px;height:28px}
 .today-row{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;margin:10px calc(-1 * var(--s4)) 0;padding:2px var(--s4) 6px}
 .today-row::-webkit-scrollbar{display:none}
 .today-row button{flex:none;display:inline-flex;align-items:center;gap:8px;min-height:46px;padding:0 14px 0 10px;border-radius:14px;background:var(--card);border:1px solid var(--hairline);box-shadow:var(--shadow-card);font-weight:700;font-size:.9375rem}
@@ -487,6 +487,30 @@ ul.steps li::before{content:counter(s);position:absolute;left:0;top:2px;width:24
 .vz-legend{display:flex;flex-wrap:wrap;gap:6px 14px;margin-top:6px;font-size:.8125rem;color:var(--muted)}
 .vz-legend span{display:inline-flex;align-items:center;gap:6px}.vz-legend i{width:14px;height:3px;border-radius:2px;display:inline-block}
 .vz-legend i.v1{background:var(--viz-1)}.vz-legend i.v2{background:var(--viz-2)}.vz-legend i.ref{background:none;border-top:2px dashed var(--faint);height:0}
+/* 홈 가운데 — ClinicScore 처럼 같은 모양 한 줄 행, 한 장 카드, 한 줄 가로 탭 (2026-09-29) */
+.util{display:flex;flex-direction:column;gap:8px;margin-top:12px}
+.util-row{display:flex;align-items:center;gap:12px;width:100%;min-height:56px;padding:8px 14px;border-radius:14px;background:var(--card);border:1px solid var(--hairline);text-align:left;color:var(--text)}
+.util-row .ic{flex:0 0 36px;width:36px;height:36px;border-radius:10px;display:grid;place-items:center;background:var(--tint);color:var(--primary-deep)}
+.util-row .ic svg.i{width:19px;height:19px}
+.util-row .t{flex:1;min-width:0;display:flex;flex-wrap:wrap;align-items:baseline;gap:2px 8px}
+.util-row .t b{font-size:1rem;font-weight:700}.util-row .t small{font-size:.8125rem;color:var(--muted)}
+.util-row>svg.i:last-child{flex:none;color:var(--faint)}
+.today{padding:0!important;margin-top:var(--s4);border-radius:20px;background:linear-gradient(160deg,var(--gbg,var(--tint)),var(--card) 72%);border:1px solid var(--hairline);overflow:hidden}
+.today-go{display:block;width:100%;text-align:left;padding:16px 18px 12px;background:none;border:0;color:var(--text)}
+.wx.wx-in,.wx.wx-in.quiet{margin:0 18px;padding:12px 0 4px;border:0;border-top:1px solid var(--hairline);background:none;box-shadow:none;border-radius:0}
+.wx-line{display:flex;flex-wrap:wrap;align-items:center;gap:4px 10px;font-size:.9375rem;color:var(--body)}
+.wx-line .wx-ic{display:grid;place-items:center;color:var(--gfg,var(--primary))}.wx-line .wx-ic svg.i{width:20px;height:20px}
+.wx-line .wx-now{font-size:1.25rem;font-weight:800;color:var(--text);font-variant-numeric:tabular-nums}
+.wx-line .wx-st{white-space:nowrap}.wx-line .wx-st.hi{color:var(--caution);font-weight:700}.wx-line .wx-st.bad{color:var(--alert);font-weight:700}
+.wx-line .wx-city{margin-left:auto}
+.wx-in .wx-retry{display:inline-flex;align-items:center;gap:4px;min-height:40px;padding:0 10px;border-radius:10px;background:none;border:1px solid var(--hairline);color:var(--primary-deep);font:inherit;font-size:.875rem}
+.wx-in .wx-tip{margin-top:10px}
+.wx-in .wx-foot{margin-top:8px;font-size:.6875rem;color:var(--muted)}
+.today-links{display:flex;flex-wrap:wrap;gap:0 14px;padding:4px 18px 10px}
+.today-links button{display:inline-flex;align-items:center;min-height:44px;padding:0;background:none;border:0;color:var(--gfg,var(--primary-deep));font:inherit;font-size:.9375rem;font-weight:700}
+.today-links button::after{content:'›';margin-left:4px;font-weight:600;opacity:.7}
+nav.gjump{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;margin-left:calc(-1 * var(--s4));margin-right:calc(-1 * var(--s4));padding:4px var(--s4) 6px}
+.gjump::-webkit-scrollbar{display:none}.gjump button{flex:none}
 .prn-undo{display:block;min-height:44px;margin:2px auto 0;padding:0 8px;background:none;border:0;color:var(--muted);font:inherit;font-size:.875rem;text-decoration:underline;text-underline-offset:3px;cursor:pointer}
 .sched-row .nm{display:flex;align-items:center;justify-content:space-between;gap:8px;font-weight:700}
 .times{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
@@ -2370,21 +2394,21 @@ function wxAdvice(d){
   return A.sort((a, b) => a.p - b.p).filter(a => !seen.has(a.th) && seen.add(a.th)).slice(0, 2);
 }
 function wxCard(){
+  /* 오늘의 한 장 카드 안의 한 줄 — 예전엔 따로 큰 카드였고, 못 받으면 빈 카드가 한 칸을 통째로 차지했다(2026-09-29 현욱님 캡처).
+     ClinicScore 처럼 조용하게: 받았으면 한 줄 + 내 약통 조언 하나, 못 받았으면 작은 글씨 한 줄 */
   const loc = wxLoc(); const d = WX.data && WX.data.name === loc.name ? WX.data : null;
   const sel = `<select class="wx-city" aria-label="지역" onchange="wxSetCity(this.value)">${WX_CITIES.map(c => `<option value="${c[0]}"${loc.name === c[0] ? ' selected' : ''}>${c[0]}</option>`).join('')}<option value="geo"${loc.name === '내 위치' ? ' selected' : ''}>내 위치</option></select>`;
-  if (!d) return `<div class="wx quiet" aria-label="오늘 날씨">
-    <div class="wx-empty"><div class="ic">${WX.fail ? I.cloud : I.temp}</div>
-      <div class="t">${WX.fail
-        ? `<b>오늘 날씨를 못 받았어요</b><span>인터넷이 잠깐 끊겼을 수 있어요</span>`
-        : `<b>오늘 날씨를 보는 중이에요</b><div class="wx-skel" style="width:62%;margin-top:7px"></div>`}</div>
-      ${sel}</div>
-    ${WX.fail ? `<button class="wx-retry" onclick="wxFetch(true)">${I.refresh} 다시 받기</button>` : ''}
+  /* 아티팩트(미리보기)는 바깥 날씨 서비스에 닿지 못한다 — 늘 실패할 줄이면 아예 두지 않는다 */
+  if (!d && WX.fail && window.__NOWX) return '';
+  if (!d) return `<div class="wx wx-in quiet" aria-label="오늘 날씨"><div class="wx-line">${WX.fail
+    ? `<span class="muted">오늘 날씨를 못 받았어요</span><button class="wx-retry" onclick="wxFetch(true)">${I.refresh} 다시</button>`
+    : `<span class="muted">날씨를 보는 중이에요</span><span class="wx-skel" style="width:70px"></span>`}</div></div>`;
+  const r = v => Math.round(v), gap = wxGap(d), pm = wxPm(d), [ct, ci] = wxCode(d.code), tip = wxAdvice(d)[0];
+  return `<div class="wx wx-in" aria-label="오늘 날씨"><div class="wx-line"><span class="wx-ic">${icon(ci)}</span><b class="wx-now">${r(d.now)}℃</b><span>${ct}</span>
+    <span class="wx-st ${gap >= 10 ? 'hi' : ''}">일교차 ${gap != null ? gap + '℃' : '—'}</span><span class="wx-st ${pm.cls}">미세먼지 ${pm.t}</span>${sel}</div>
+    ${tip ? `<button class="wx-tip" onclick="go('${tip.link}')">${I.info}<span>${tip.t}</span>${I.chev}</button>` : ''}
+    <div class="wx-foot">${d.src === 'kma' ? `기상청 실황·에어코리아 미세먼지${d.stations ? `(${esc(d.sido || '')} 측정소 ${d.stations}곳)` : ''}` : 'Open-Meteo 기상 자료(미세먼지는 모델 추정)'} · 보내는 정보는 지역 위치뿐</div>
   </div>`;
-  const r = v => Math.round(v), gap = wxGap(d), pm = wxPm(d), [ct, ci] = wxCode(d.code);
-  return `<div class="wx" aria-label="오늘 날씨"><div class="wx-top"><div class="ic">${icon(ci)}</div><div><div class="wx-now">${r(d.now)}<small>℃ · ${ct}</small></div><div class="wx-sub">체감 ${r(d.feel)}℃ · 습도 ${r(d.rh)}% · ${esc(d.name)} ${new Date(WX.at).getHours()}시</div></div>${sel}</div>
-  <div class="wx-stats"><div class="${gap >= 10 ? 'hi' : ''}"><small>일교차</small><b>${gap != null ? gap + '℃' : '—'}</b></div><div><small>최고 / 최저</small><b>${r(d.max)} / ${r(d.min)}℃</b></div><div class="${pm.cls}"><small>미세먼지</small><b>${pm.t}</b></div></div>
-  ${wxAdvice(d).map(a => `<button class="wx-tip" onclick="go('${a.link}')">${I.info}<span>${a.t}</span>${I.chev}</button>`).join('')}
-  <div class="wx-foot">${d.src === 'kma' ? `기상청 실황·에어코리아 미세먼지${d.stations ? `(${esc(d.sido || '')} 측정소 ${d.stations}곳)` : ''}` : 'Open-Meteo 기상 자료(미세먼지는 모델 추정)'} · 보내는 정보는 지역 위치뿐, 건강 정보는 나가지 않아요</div></div>`;
 }
 function seasonPick(){
   const m = new Date().getMonth() + 1, h = new Date().getHours();
@@ -2411,19 +2435,19 @@ function vHome(){
     <div class="eyebrow">${esc(hello)}</div>
     <h1 class="greet">어디가 불편하세요?</h1>
     <div class="q6" aria-label="자주 찾는 증상">${Q6.map(([id, nm]) => { const x = byId(D.symptoms, id); return x ? `<button class="q6i ${gcls(x.group)}" onclick="go('/symptom/${id}')"><span class="ic">${sicon(x)}</span><b>${esc(nm)}</b></button>` : ''; }).join('')}</div>
-    <button class="q6-more" onclick="go('/guide/1')">${I.check}<span>여기 없어요 — <b>질문 두 번</b>이면 찾아 드려요</span>${I.chev}</button>
-    <div class="q-row">
-      <button onclick="go('/photo')">${I.eye}<span>약 사진 찍기</span></button>
-      <button onclick="go('${n ? '/together' : '/kinds'}')">${I.pill}<span>${n ? `드시는 약 ${n}가지 확인` : '드시는 약 알려 주기'}</span></button>
+    <div class="util" aria-label="다른 방법으로 찾기">
+      <button class="util-row" onclick="go('/guide/1')"><span class="ic">${I.check}</span><span class="t"><b>여기 없어요</b><small>질문 두 번으로 찾기</small></span>${I.chev}</button>
+      <button class="util-row" onclick="go('/photo')"><span class="ic">${I.eye}</span><span class="t"><b>약 사진 찍기</b><small>상자·약봉투로 확인</small></span>${I.chev}</button>
+      <button class="util-row" onclick="go('${n ? '/together' : '/kinds'}')"><span class="ic">${I.pill}</span><span class="t"><b>${n ? `드시는 약 ${n}가지` : '드시는 약 알려 주기'}</b><small>${n ? '같이 먹어도 되는지 확인' : '겹치는 약 거르기'}</small></span>${I.chev}</button>
     </div>
     ${ME.easy ? `<button class="big-btn soft" style="margin-top:12px" onclick="go('/schedule')"><div class="ic">${I.clock}</div><div><b>오늘 약 체크</b><span>드셨는지 표시하고 알림 받기</span></div></button>` : ''}
   </section>
   ${doseHome()}
   ${workedHome()}
   <section class="sec ${gcls(sp.g)}" aria-label="오늘">
-    <button class="today" onclick="go('/symptom/${sp.ids[0]}')"><div class="in"><div><div class="eb">${esc(sp.eb)} · 오늘의 한 장</div><b>${esc(sp.t)}</b><span>${esc(sp.d)}</span></div><div class="ic">${icon(sp.ico)}</div></div></button>
+    <div class="today"><button class="today-go" onclick="go('/symptom/${sp.ids[0]}')"><div class="in"><div><div class="eb">${esc(sp.eb)} · 오늘의 한 장</div><b>${esc(sp.t)}</b><span>${esc(sp.d)}</span></div><div class="ic">${icon(sp.ico)}</div></div></button>
     ${wxCard()}
-    <div class="today-row" aria-label="이 철에 많은 증상">${sp.ids.map(id => byId(D.symptoms, id)).filter(Boolean).map(x => `<button class="${gcls(x.group)}" onclick="go('/symptom/${x.id}')"><span class="ic">${sicon(x)}</span>${esc(x.name.split(' (')[0])}</button>`).join('')}</div>
+    <div class="today-links" aria-label="이 철에 많은 증상">${sp.ids.map(id => byId(D.symptoms, id)).filter(Boolean).map(x => `<button class="${gcls(x.group)}" onclick="go('/symptom/${x.id}')">${esc(x.name.split(' (')[0])}</button>`).join('')}</div></div>
   </section>
   ${(() => { /* 53가지를 다 스크롤하지 않게 — 갈래로 바로 뛰는 줄 */
     const gs = groups.filter(g => (D.symptoms || []).some(s => s.group === g && s.reviewed !== false));
