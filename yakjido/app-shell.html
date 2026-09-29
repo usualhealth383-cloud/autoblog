@@ -465,6 +465,8 @@ ul.steps li::before{content:counter(s);position:absolute;left:0;top:2px;width:24
 .sched-row{padding:12px 0;border-bottom:1px solid var(--hairline)}
 .sched-row:last-child{border-bottom:0}
 .note.soft{background:var(--tint2);color:var(--body)}
+.how-list{margin:8px 0 0;padding-left:18px;display:flex;flex-direction:column;gap:6px;line-height:1.6;color:var(--body)}
+.note.alert{background:var(--alert-tint);color:var(--text)}
 .vt-row{display:flex;flex-wrap:wrap;align-items:flex-end;gap:8px 10px;margin-top:10px}
 .vt-f{display:flex;flex-direction:column;gap:4px;font-size:.8125rem;color:var(--muted);font-weight:600}
 .vt-f input{width:96px;min-height:52px;padding:0 12px;border:1px solid var(--hairline);border-radius:var(--r-input);background:var(--card);color:var(--text);font-size:1.375rem;font-weight:800;font-variant-numeric:tabular-nums}
@@ -511,6 +513,9 @@ ul.steps li::before{content:counter(s);position:absolute;left:0;top:2px;width:24
 .today-links button::after{content:'›';margin-left:4px;font-weight:600;opacity:.7}
 nav.gjump{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;margin-left:calc(-1 * var(--s4));margin-right:calc(-1 * var(--s4));padding:4px var(--s4) 6px}
 .gjump::-webkit-scrollbar{display:none}.gjump button{flex:none}
+.prn-qty{display:flex;align-items:center;gap:8px;margin-top:10px;font-size:.875rem;color:var(--muted)}
+.prn-qty button{min-width:56px;min-height:44px;border-radius:12px;border:1px solid var(--hairline);background:var(--card);color:var(--body);font:inherit;font-weight:700}
+.prn-qty button.on{border-color:var(--primary);color:var(--primary-deep);box-shadow:inset 0 0 0 1px var(--primary)}
 .prn-undo{display:block;min-height:44px;margin:2px auto 0;padding:0 8px;background:none;border:0;color:var(--muted);font:inherit;font-size:.875rem;text-decoration:underline;text-underline-offset:3px;cursor:pointer}
 .sched-row .nm{display:flex;align-items:center;justify-content:space-between;gap:8px;font-weight:700}
 .times{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
@@ -2456,7 +2461,7 @@ function vHome(){
     return `<section class="sec ${gcls(g)}" id="grp${i}"><h2><span><span class="gdot"></span>${esc(g)}</span><small>${items.length}가지</small></h2><div class="tiles">${items.map(s => `<button class="tile" onclick="go('/symptom/${s.id}')"><div class="ic">${sicon(s)}</div><b>${esc(s.name)}</b><span>${esc(s.short || '')}</span></button>`).join('')}</div></section>`; }).join('')}
   ${(() => { const wait = (D.symptoms || []).filter(s => s.reviewed === false); if (!wait.length) return '';
     /* 홈에서 가장 긴 덩어리였다(타일 18개). 감추지는 않되 접어 둔다 — 찾는 분은 한 번만 누르면 된다 */
-    return `<section class="sec g-etc"><details class="wait-fold"><summary><span class="gdot"></span><b>검수 대기</b><small>전문의 확인 전 ${wait.length}가지 — 눌러서 보기</small>${I.chev}</summary>
+    return `<section class="sec g-etc"><details class="wait-fold"><summary><span class="gdot"></span><b>검수 대기</b><small>의사 확인 전 ${wait.length}가지 — 눌러서 보기</small>${I.chev}</summary>
       <p class="small muted" style="margin:10px 0">자료를 바탕으로 정리했지만 아직 의사 확인을 거치지 않았어요. 참고만 하시고 약사·의사와 상의하세요.</p>
       <div class="tiles">${wait.map(s => `<button class="tile wait ${gcls(s.group)}" onclick="go('/symptom/${s.id}')"><div class="ic">${sicon(s)}</div><b>${esc(s.name)}</b><span>${esc(s.short || '')}</span><span class="wait-t">검수 대기</span></button>`).join('')}</div></details></section>`; })()}
   ${(() => { const T = D.tips || []; if (!T.length) return ''; const t = T[new Date().getDate() % T.length]; return `<section class="sec"><h2>알아두면 좋은 것 <small><a class="link" href="#/tips">전부 보기</a></small></h2><button class="tip-card" onclick="go('/tips?open=${t.id}')"><div class="ic">${icon(t.icon)}</div><div><b>${esc(t.title)}</b><span>${esc(t.body.replace(/\*\*/g, '').slice(0, 70))}…</span></div></button></section>`; })()}
@@ -2593,7 +2598,7 @@ function search(q){
   const mAll = (...parts) => { if (!many) return false; const hay = norm(parts.filter(Boolean).join(' ')); return words.every(w => hay.includes(w)); };
   (D.symptoms || []).forEach(s => { if (m(s.name) || (s.tags || []).some(m) || mAll(s.name, (s.tags || []).join(' '), s.short)) out.push({ k:'증상', c:'s', t:s.name, d:s.short || '', h:'/symptom/' + s.id, w:3 }); });
   /* 「의사에게 물었어요」 — 질문 문장으로 찾는다. 증상·약보다 뒤에 오도록 가중치는 가장 낮게 */
-  (D.askdoc || []).forEach(x => { if (mAll(x.q)) out.push({ k:'의사 답', c:'', t:x.q, d:'내과 전문의가 진료실에서 하는 대답', h:'/askdoc?open=' + x.id, w:1 }); });
+  (D.askdoc || []).forEach(x => { if (mAll(x.q)) out.push({ k:'의사 답', c:'', t:x.q, d:'응급실 의사가 실제로 한 대답', h:'/askdoc?open=' + x.id, w:1 }); });
   (D.drugs || []).forEach(d => {
     /* 이름만 보면 「생리통」으로 찾아도 아세트아미노펜이 안 나왔다. 약마다 적힌 「이럴 때 씁니다(for)」도 본다. */
     const hitFor = (d.for || []).find(m);
@@ -3088,7 +3093,7 @@ function vSymptom(id){
     })()}
     ${noBuy ? '' : `<button class="btn go-cart" onclick="go('/show/${s.id}')">${I.cart} 약국에서 보여드리기</button>`}
   </section>
-  ${s.reviewed === false ? `<div class="note" style="margin-top:16px">${I.alert}<span><b>아직 전문의 검수를 받지 않은 내용이에요.</b> 자료(진료지침·식약처 허가사항)를 바탕으로 정리했지만, 다른 화면과 달리 의사 확인을 거치지 않았습니다. 참고만 하시고 약사·의사와 꼭 상의하세요.</span></div>` : ''}
+  ${s.reviewed === false ? `<div class="note" style="margin-top:16px">${I.alert}<span><b>아직 의사 검수를 받지 않은 내용이에요.</b> 자료(진료지침·식약처 허가사항)를 바탕으로 정리했지만, 다른 화면과 달리 의사 확인을 거치지 않았습니다. 참고만 하시고 약사·의사와 꼭 상의하세요.</span></div>` : ''}
   ${doRows(s)}
   ${rxComboCard(s.rxCombo)}
   <button class="more-btn" onclick="MORE_OPEN=!MORE_OPEN;route()" aria-expanded="${MORE_OPEN}">
@@ -3099,7 +3104,7 @@ function vSymptom(id){
   <p class="lead-p">${fmt(s.lead)}</p>
   <section class="sec">
     <div class="rx-card">
-      <div class="rx-head"><div><h2>${esc(s.planTitle || '진료실에서 처방하는 방식')}</h2><div class="lbl">${esc(s.planLabel || '같은 원리로 약국에서 고르면 돼요')}</div></div><span class="rx-stamp${s.reviewed === false ? ' wait' : ''}">${s.reviewed === false ? '검수 대기' : esc(D.meta?.stamp || '전문의 검수')}</span></div>
+      <div class="rx-head"><div><h2>${esc(s.planTitle || '진료실에서 처방하는 방식')}</h2><div class="lbl">${esc(s.planLabel || '같은 원리로 약국에서 고르면 돼요')}</div></div><span class="rx-stamp${s.reviewed === false ? ' wait' : ''}">${s.reviewed === false ? '검수 대기' : esc(D.meta?.stamp || '의사 검수')}</span></div>
       ${(s.plan || []).map(slotHtml).join('')}
     </div>
   </section>
@@ -3263,18 +3268,18 @@ function rxComboCard(rc){
 /* ───────── 「그런 줄 알았는데」 ─────────
    흔히 듣는 말과 근거가 어긋나는 자리를 한곳에 모았다. 약을 파는 화면이 아니라
    「이 말은 어디까지 맞나」를 숫자로 보여 주는 화면이다. */
-/* 「의사에게 물었어요」 — 이 앱을 검수하는 내과 전문의가 실제로 한 대답만 옮긴다(의사-피드백.md 가 원문).
+/* 「의사에게 물었어요」 — 이 앱을 검수하는 응급실 의사가 실제로 한 대답만 옮긴다(의사-피드백.md 가 원문).
    새 임상 내용을 지어 넣는 자리가 아니다. 개별 상담 창구도 아니다(서버·의료법 — 현욱님 결정 전). */
 function vAskDoc(_, q){
   const A = D.askdoc || []; if (!A.length) return vHome();
   const item = x => `<details class="xc" id="ad-${x.id}" ${q.open === x.id ? 'open' : ''}><summary>
     <div class="ic">${icon(x.icon)}</div><b>${esc(x.q)}</b><span class="cnt">답 보기${I.chev}</span></summary>
     <div class="bd"><div class="chat"><div class="bubble me"><span class="who">물은 말</span>${esc(x.q)}</div>
-      <div class="bubble"><span class="who">내과 전문의</span>${fmt(x.a)}</div></div>
+      <div class="bubble"><span class="who">응급실 의사</span>${fmt(x.a)}</div></div>
       <div class="actions" style="margin-top:10px">${speakBtn(`(D.askdoc.find(y=>y.id==='${x.id}')||{}).a`, '답 읽어 주기')}${x.go ? `<a class="btn ghost" href="#${x.go}">${I.chev} ${esc(x.goText || '자세히')}</a>` : ''}</div>
     </div></details>`;
   return `${topBar({ back:'홈' })}<div class="eyebrow">진료실 답</div><h1>의사에게 물었어요</h1>
-  <p style="margin-top:6px">약국·진료실에서 자주 듣는 질문에, <b>이 앱을 검수하는 내과 전문의가 진료실에서 하는 대답</b>을 그대로 옮겼어요. 모두 ${A.length}가지.</p>
+  <p style="margin-top:6px">약국·진료실에서 자주 듣는 질문에, <b>이 앱을 검수하는 응급실 의사가 실제로 하는 대답</b>을 그대로 옮겼어요. 모두 ${A.length}가지.</p>
   <section class="sec"><div class="explore">${A.map(item).join('')}</div></section>
   <section class="sec"><div class="note">${I.info}<span>일반적인 설명이에요. <b>드시는 약이나 몸 상태에 따라 답이 달라질 수 있어</b> 약사·의사와 상의하세요.</span></div></section>`;
 }
@@ -3356,8 +3361,10 @@ function prnTook(id){
   const st = prnState(item);
   if (st.early && !confirm(`마지막으로 드신 때가 ${hhmm(st.last)}이에요. 이 약은 ${st.gap}시간은 띄우는 것이 허가 용법이에요.\n\n그래도 지금 드신 것으로 적을까요?`)) return;
   if (st.full && !confirm(`오늘 벌써 ${st.count}번 드셨어요 — 이 약은 하루 ${st.max}번까지로 안내드려요.\n\n그래도 적을까요?`)) return;
-  prnLog().push({ id, t: hhmm(new Date()) }); saveMe(); toast('드신 시각을 적어 두었어요'); route();
+  const n = prnQty(id); prnLog().push({ id, t: hhmm(new Date()), n }); saveMe(); toast(`드신 시각을 적어 두었어요 (${n}알)`); route();
 }
+const prnQty = id => ((ME.prnQty || {})[id] || 1);
+function setPrnQty(id, n){ ME.prnQty = ME.prnQty || {}; ME.prnQty[id] = n; saveMe(); route(); }
 function prnUndo(id){ const L = prnLog(); for (let i = L.length - 1; i >= 0; i--) if (L[i].id === id) { L.splice(i, 1); break; } saveMe(); route(); }
 function toggleSlot(id, t){ ME.sched = ME.sched || {};
   /* 아직 손대지 않은 약이면 「미리 골라 둔 것」에서 출발한다 — 누르자마자 나머지가 사라지면 놀라신다 */
@@ -3630,7 +3637,7 @@ function daysLeft(id){
 /* 필요할 때만 드시는 약 — 남은 알 수에서 «적어 두신 횟수»를 뺀다(한 번에 한 알로 본다) */
 function prnLeft(id){
   const st = stockOf(id); if (!st || !isPrn(id)) return null;
-  let used = 0; for (const k in (ME.prnLog || {})) if (k >= st.at) used += ME.prnLog[k].filter(x => x.id === id).length;
+  let used = 0; for (const k in (ME.prnLog || {})) if (k >= st.at) used += ME.prnLog[k].filter(x => x.id === id).reduce((a, x) => a + (x.n || 1), 0);
   return Math.max(0, Math.floor(st.left - used));
 }
 function lowStock(){ return takingItems().map(d => ({ n: d.name, days: daysLeft(d.id) })).filter(x => x.days != null && x.days <= 5); }
@@ -3724,7 +3731,8 @@ function vSchedule(_, q){
     ${taking.filter(d => isPrn(d.id)).map(d => { const st = prnState(d); return `<div class="sched-row prn-row"><div class="nm"><span>${esc(d.name)}</span>${st.count ? `<b class="${st.full ? 'stockwarn' : 'stockok'}">오늘 ${st.count}번${st.max ? ` / ${st.max}번` : ''}</b>` : ''}</div>
       <div class="small" style="margin-top:4px">${st.last ? `마지막 <b>${hhmm(st.last)}</b>${st.last.getDate() !== new Date().getDate() ? '(어제)' : ''}` : '오늘은 아직 안 드셨어요'}${st.early ? ` · <b>${hhmm(st.next)}부터</b> 다시 드실 수 있어요` : ''}${st.gap ? `<span class="muted"> · ${st.gap}시간 간격${st.max ? `, 하루 ${st.max}번까지` : ''}(허가 용법)</span>` : ''}</div>
       ${st.full ? `<div class="note" style="margin-top:8px">${I.alert}<span><b>오늘 드실 만큼 드셨어요.</b> 더 아프시면 더 드시기보다 약사·의사와 상의하세요.</span></div>` : ''}
-      <div class="actions" style="margin-top:8px"><button class="btn ${st.early || st.full ? 'ghost' : ''}" onclick="prnTook('${d.id}')">${I.check} 지금 먹었어요</button></div>${st.count ? `<button class="prn-undo" onclick="prnUndo('${d.id}')">잘못 눌렀어요 — 방금 적은 것 지우기</button>` : ''}</div>`; }).join('')}
+      <div class="prn-qty" role="group" aria-label="한 번에 몇 알"><span>한 번에</span>${[1, 2].map(k => `<button class="${prnQty(d.id) === k ? 'on' : ''}" aria-pressed="${prnQty(d.id) === k}" onclick="setPrnQty('${d.id}',${k})">${k}알</button>`).join('')}</div>
+      <div class="actions" style="margin-top:8px"><button class="btn ${st.early || st.full ? 'ghost' : ''}" onclick="prnTook('${d.id}')">${I.check} 지금 먹었어요 (${prnQty(d.id)}알)</button></div>${st.count ? `<button class="prn-undo" onclick="prnUndo('${d.id}')">잘못 눌렀어요 — 방금 적은 것 지우기</button>` : ''}</div>`; }).join('')}
   </section>` : ''}
   ${taking.length ? `<section class="sec card"><h2>약마다 시간 고르기</h2>${taking.map(d => `<div class="sched-row"><div class="nm"><span>${esc(d.name)}</span>${d.d ? `<a class="link small" href="#/drug/${d.d.id}">복용법 ›</a>` : ''}</div><div class="small muted">${fmt((d.simple || '').split('.')[0])}</div><div class="times">${isPrn(d.id) ? '' : SLOTS.map(([n, t]) => `<button class="chip ${schedOf(d.id, d).includes(t) ? 'on' : ''}" onclick="toggleSlot('${d.id}','${t}')">${schedOf(d.id, d).includes(t) ? I.check : ''}${n} ${t}</button>`).join('')}<button class="chip ${isPrn(d.id) ? 'on' : ''}" onclick="togglePrn('${d.id}')" aria-pressed="${isPrn(d.id)}">${isPrn(d.id) ? I.check : ''}필요할 때만</button></div>${isPrn(d.id) ? `<p class="small muted" style="margin-top:6px">시간 알림 없이, 드실 때마다 위의 <b>「필요할 때 드신 약」</b>에 적어요.</p>` : schedWarn(d)}</div>`).join('')}</section>
   ${taking.length ? `<section class="sec card"><h2>보호자에게 오늘 상황 보내기</h2>
@@ -3755,8 +3763,10 @@ function vSchedule(_, q){
    메디세이프의 「측정값 기록」 자리. 기록은 이 휴대폰에만 둔다(ME.vitals).
    기준 숫자는 검증된 것만: 가정혈압 135/85 mmHg — 대한고혈압학회 2018·2022.
    «위험한 숫자»(예: 180/120)는 지침 원문에서 확인하지 못해 숫자로 겁주지 않고, 증상으로만 안내한다.
-   혈당 기준은 VREF.bg 가 비어 있으면 숫자 판정을 하지 않는다(검증 전). */
-const VREF = { bp: { s: 135, d: 85, src: ['ksh2018hbpm', 'ksh2022'] }, bg: null };
+   혈당 기준(공복 80~130 · 식후 2시간 180 미만 · 70 미만 저혈당)은 현욱님 승인(2026-09-29), 근거 ADA 2025.
+   아주 높은 혈압(180/120)은 «바르게 재고, 5분 쉬고 다시 잰 값»으로만 판단한다 — 커프를 세게 감거나
+   팔을 심장보다 낮게 두고 재서 높게 나오는 분이 많다(현욱님). */
+const VREF = { bp: { s: 135, d: 85, hs: 180, hd: 120, src: ['ksh2018hbpm', 'ksh2022'] }, bg: { fLo: 80, fHi: 130, pHi: 180, hypo: 70, src: ['ada2025glyc'] } };
 let VT = { k: 'bp' };
 function vitals(){ ME.vitals = ME.vitals || []; return ME.vitals; }
 function vitalSave(){
@@ -3766,11 +3776,16 @@ function vitalSave(){
     const s = num('vs'), d = num('vd'), pl = num('vp');
     if (!(s >= 60 && s <= 260) || !(d >= 30 && d <= 160) || d >= s) { toast('위·아래 혈압을 확인해 주세요 (예: 128 / 82)'); return; }
     if (pl != null && !(pl >= 30 && pl <= 220)) { toast('맥박을 확인해 주세요 (예: 72)'); return; }
+    const hi = s >= VREF.bp.hs || d >= VREF.bp.hd;
+    const prev = vitals().filter(x => x.k === 'bp').slice(-1)[0];
+    const prevHi = prev && (prev.s >= VREF.bp.hs || prev.d >= VREF.bp.hd) && (now - new Date(prev.t)) < 40 * 60000;
     vitals().push({ t, k: 'bp', s, d, p: pl, w: VT.w || slotWord(now) });
+    VT.alert = hi ? (prevHi ? 'bp-again' : 'bp-first') : null;
   } else {
     const v = num('vg');
     if (!(v >= 20 && v <= 600)) { toast('혈당 숫자를 확인해 주세요 (예: 110)'); return; }
     vitals().push({ t, k: 'bg', v, w: VT.gw || '공복' });
+    VT.alert = v < VREF.bg.hypo ? 'bg-low' : null;
   }
   /* 1년·400건까지만 둔다 */
   const cut = dayBefore(366); ME.vitals = vitals().filter(x => x.t >= cut).slice(-400);
@@ -3786,6 +3801,16 @@ function vitalsCard(){
     ${a ? `<p class="show-big info">${I.heart}<span>혈압 최근 2주 평균 ${a.s}/${a.d} mmHg<small>${a.days}일 ${a.n}번${[part('아침'), part('저녁')].filter(Boolean).map(x => ' · ' + x).join('')}</small></span></p>` : ''}
     ${g.length ? `<p class="show-big info">${I.info}<span>혈당 최근 ${g.length}번 (mg/dL)<small>${g.map(x => `${x.t.slice(5, 10).replace('-', '/')} ${esc(x.w || '')} ${x.v}`).join(' · ')}</small></span></p>` : ''}
     <p class="small" style="margin-top:6px"><a class="link" href="#/vitals">혈압·혈당 수첩 열기 ›</a></p></div>`;
+}
+function bgTag(x){ const B = VREF.bg; if (x.v < B.hypo) return ' · 저혈당';
+  if (x.w === '공복') return x.v <= B.fHi && x.v >= B.fLo ? ' · 목표 안' : x.v > B.fHi ? ' · 목표보다 높음' : '';
+  if (x.w === '식후 2시간') return x.v < B.pHi ? ' · 목표 안' : ' · 목표보다 높음'; return ''; }
+function vitalAlert(){
+  const a = VT.alert; if (!a) return '';
+  if (a === 'bp-first') return `<div class="note" style="margin-top:14px">${I.alert}<span><b>높게 나왔어요 — 먼저 바르게 쟀는지 확인해 주세요.</b> 커프를 세게 감지 않았는지, 팔이 심장 높이였는지 보시고 <b>등을 기대고 5분 쉰 뒤 다시 재서</b> 적어 주세요.</span></div>`;
+  if (a === 'bp-again') return `<div class="note alert" style="margin-top:14px">${I.alert}<span><b>쉬고 다시 재도 ${VREF.bp.hs}/${VREF.bp.hd} 이상이에요.</b> 심한 두통·가슴 통증·숨참·한쪽 팔다리 마비·말 어눌함이 있으면 <b>바로 119</b>에 연락하세요. 증상이 없어도 <b>오늘 안에 진료</b>를 받으세요.</span></div>`;
+  if (a === 'bg-low') return `<div class="note alert" style="margin-top:14px">${I.alert}<span><b>저혈당이에요 (70 mg/dL 미만).</b> 지금 당분 15~20 g(주스 반 컵 정도)을 드시고 <b>15분 뒤 다시 재세요.</b> 정신이 흐려지거나 삼키기 어려우면 억지로 먹이지 말고 <b>119</b>에 연락하세요.</span></div>`;
+  return '';
 }
 function vitalRemindToggle(){
   ME.vitalRemind = ME.vitalRemind || {};
@@ -3837,7 +3862,8 @@ function vVitals(){
     <div class="times" style="margin-top:10px">${['공복', '식후 2시간', '그 밖'].map(w => `<button class="chip ${(VT.gw || '공복') === w ? 'on' : ''}" onclick="VT.gw='${w}';route()">${w}</button>`).join('')}</div>`;
   return `${topBar({ back:'내 정보' })}<div class="eyebrow">혈압·혈당 수첩</div><h1>재 두신 숫자, 진료 때 한눈에</h1>
   <p style="margin-top:6px">집에서 잰 혈압·혈당을 적어 두면 <b>2주 흐름</b>과 <b>7일 평균</b>을 보여 드려요. 기록은 <b>이 휴대폰에만</b> 있어요.</p>
-  <div class="seg" style="margin-top:14px" role="group" aria-label="무엇을 적을까요">${[['bp', '혈압'], ['bg', '혈당']].map(([v, n]) => `<button class="${k === v ? 'on' : ''}" onclick="VT.k='${v}';route()" aria-pressed="${k === v}">${n}</button>`).join('')}</div>
+  <div class="seg" style="margin-top:14px" role="group" aria-label="무엇을 적을까요">${[['bp', '혈압'], ['bg', '혈당']].map(([v, n]) => `<button class="${k === v ? 'on' : ''}" onclick="VT.k='${v}';VT.alert=null;route()" aria-pressed="${k === v}">${n}</button>`).join('')}</div>
+  ${vitalAlert()}
   <section class="sec card"><h2>지금 잰 값 적기</h2>${form}
     <div class="actions" style="margin-top:12px"><button class="btn" onclick="vitalSave()">${I.check} 적어 두기</button></div></section>
   ${k === 'bp' && av ? `<section class="sec card vt-sum"><div class="vt-big"><span>최근 7일 평균</span><b>${av.s}<small>/</small>${av.d}</b><em>mmHg · ${av.days}일 ${av.n}번</em></div>
@@ -3847,12 +3873,22 @@ function vVitals(){
   <section class="sec card"><h2>2주 흐름</h2>${vitalChart(k)}</section>
   ${k === 'bp' && NATIVE ? `<section class="sec card"><div class="toggle"><div class="t"><b>혈압 재기 알림</b><span>${((ME.vitalRemind || {}).bp || []).length ? '아침 7:30 · 저녁 9:00 — 켜져 있어요' : '매일 아침·저녁 잴 시간을 알려 드려요'}</span></div><button class="btn ghost" style="width:auto;min-height:40px;padding:0 14px" onclick="vitalRemindToggle()">${((ME.vitalRemind || {}).bp || []).length ? '끄기' : '켜기'}</button></div></section>` : ''}
   <section class="sec card"><h2>적은 기록 <small>${mine.length}번</small></h2>
-    ${mine.length ? `<div class="vt-list">${mine.slice(0, 30).map(x => `<div class="vt-li"><span class="vt-t">${x.t.slice(5, 10).replace('-', '/')} <small>${x.t.slice(11)} · ${esc(x.w || '')}</small></span><b>${k === 'bp' ? `${x.s}/${x.d}<small> mmHg${x.p ? ` · 맥박 ${x.p}` : ''}</small>` : `${x.v}<small> mg/dL</small>`}</b><button class="vt-x" onclick="vitalDel(${x.i})" aria-label="이 기록 지우기">${I.x}</button></div>`).join('')}</div>` : `<div class="empty"><b>아직 적은 기록이 없어요</b>위에서 한 번 적어 보세요.</div>`}
+    ${mine.length ? `<div class="vt-list">${mine.slice(0, 30).map(x => `<div class="vt-li"><span class="vt-t">${x.t.slice(5, 10).replace('-', '/')} <small>${x.t.slice(11)} · ${esc(x.w || '')}</small></span><b>${k === 'bp' ? `${x.s}/${x.d}<small> mmHg${x.p ? ` · 맥박 ${x.p}` : ''}</small>` : `${x.v}<small> mg/dL${bgTag(x)}</small>`}</b><button class="vt-x" onclick="vitalDel(${x.i})" aria-label="이 기록 지우기">${I.x}</button></div>`).join('')}</div>` : `<div class="empty"><b>아직 적은 기록이 없어요</b>위에서 한 번 적어 보세요.</div>`}
     ${mine.length ? `<div class="actions" style="margin-top:12px"><button class="btn line" onclick="window.print()">${I.book} 진료 때 보여 드리기(인쇄·PDF)</button></div>` : ''}
   </section>
-  <details class="why-more sec"><summary>어떻게 재면 좋을까요</summary>
-    ${k === 'bp' ? `<p class="why" style="margin-top:6px"><b>아침</b> — 일어나 1시간 안, 소변을 본 뒤, 혈압약을 먹기 전.<br><b>저녁</b> — 잠자기 전.<br>앉아서 몇 분 쉰 뒤 재고, <b>주 5일 이상</b> 재서 평균을 봅니다. 가정혈압은 <b>135/85 mmHg 이상</b>이면 높은 것으로 봐요.</p>${srcChips(VREF.bp.src)}`
-    : `<p class="why" style="margin-top:6px">공복 혈당은 <b>아침 식사 전</b>, 식후 혈당은 <b>식사 시작 2시간 뒤</b>에 잽니다. 목표 범위는 사람마다 달라 <b>담당 의사가 정해 준 숫자</b>를 따르세요.</p>${VREF.bg ? srcChips(VREF.bg.src) : ''}`}
+  <details class="why-more sec" ${vitals().filter(x => x.k === k).length < 3 || VT.alert === 'bp-first' ? 'open' : ''}><summary>${k === 'bp' ? '혈압, 바르게 재는 법' : '혈당, 언제 재고 어떻게 볼까요'}</summary>
+    ${k === 'bp' ? `<ul class="how-list">
+      <li><b>등을 기대고 앉아 5분 쉰 뒤</b> 재세요. 발은 바닥에, 다리는 꼬지 않아요.</li>
+      <li><b>팔을 탁자에 올려 커프가 심장 높이</b>에 오게 하세요. 팔을 늘어뜨려 낮게 재면 높게 나와요.</li>
+      <li><b>커프는 맨팔에, 손가락 하나가 들어갈 만큼만</b> 감으세요. 세게 감으면 높게 나와요.</li>
+      <li>재는 동안 <b>말하지 않기</b>. 한 번 더 재서 두 번을 적으면 더 정확해요.</li>
+      <li><b>아침</b> — 일어나 1시간 안, 소변 본 뒤, 혈압약 먹기 전 · <b>저녁</b> — 잠자기 전. <b>주 5일 이상</b> 재서 평균을 봐요.</li>
+    </ul><p class="why" style="margin-top:6px">가정혈압은 <b>135/85 mmHg 이상</b>이면 높은 것으로 봐요.</p>${srcChips(VREF.bp.src)}`
+    : `<ul class="how-list">
+      <li><b>공복</b> — 아침 식사 전. 목표 <b>80~130 mg/dL</b></li>
+      <li><b>식후 2시간</b> — 식사를 시작하고 2시간 뒤. 목표 <b>180 mg/dL 미만</b></li>
+      <li><b>70 mg/dL 미만이면 저혈당</b> — 당분 15~20 g(주스 반 컵 정도)을 드시고 15분 뒤 다시 재세요.</li>
+    </ul><p class="why" style="margin-top:6px">목표는 사람마다 다를 수 있어요 — <b>담당 의사가 따로 정해 준 숫자가 있으면 그것이 우선</b>이에요.</p>${srcChips(VREF.bg.src)}`}
   </details>
   <div class="note soft" style="margin-top:12px">${I.alert}<span><b>갑자기 심한 두통·가슴 통증·숨참·한쪽 팔다리 힘 빠짐·말이 어눌함</b>이 있으면 숫자와 상관없이 <b>119</b>에 연락하세요.</span></div>
   ${disclaimer('기록은 진료를 돕는 참고 자료예요. 약을 늘리거나 줄이는 것은 의사와 상의하세요.')}`;
@@ -4328,7 +4364,7 @@ function vDrug(id){
   ${ixLine([d])}
   <p style="margin-top:10px">${fmt(d.lead || '')}</p>
   ${aeRemind(d)}
-  ${d.reviewed === false ? `<div class="note" style="margin-top:12px">${I.alert}<span><b>아직 전문의 검수를 받지 않은 약 화면이에요.</b> 식약처 허가사항과 연구를 바탕으로 정리했습니다. 참고만 하시고 약사·의사와 상의하세요.</span></div>` : ''}
+  ${d.reviewed === false ? `<div class="note" style="margin-top:12px">${I.alert}<span><b>아직 의사 검수를 받지 않은 약 화면이에요.</b> 식약처 허가사항과 연구를 바탕으로 정리했습니다. 참고만 하시고 약사·의사와 상의하세요.</span></div>` : ''}
   ${picts(d.pict)}
   ${(() => { const pr = (d.products || []).find(x => pimg(x.name)); return pr ? `<div class="drug-photo">${imgTag(pimg(pr.name), '', pr.name)}<div><b>${esc(pr.name)}</b><small>${esc(pr.maker || '')} · ${esc(pr.amount || '')}</small><small style="display:block;margin-top:2px">사진: 식약처·약학정보원 낱알식별</small></div></div>` : ''; })()}
   ${meWarnings(d) ? `<section class="sec">${meWarnings(d)}</section>` : ''}
@@ -4372,7 +4408,18 @@ function vDrug(id){
   ${srcChips(d.sources)}
   ${disclaimer()}`;
 }
-function toggleTaking(id){ ME.taking = ME.taking || []; ME.taking = ME.taking.includes(id) ? ME.taking.filter(x => x !== id) : [...ME.taking, id]; saveMe(); route(); toast(ME.taking.includes(id) ? '내 약통에 담았어요' : '내 약통에서 뺐어요'); }
+/* 아플 때만 드시는 약 — 담자마자 «필요할 때만»(시간 알림 없음). 매일 드시면 알림 화면에서 한 번 눌러 바꾼다(2026-09-29 현욱님) */
+const PRN_DRUG_CLS = new Set(['nsaid', 'analgesic', 'gi-acid', 'bowel']);
+const PRN_ING_CLS = new Set(['nsaid', 'apap', 'antacid', 'gi-stop', 'laxative-osm', 'laxative-stim', 'laxative-bulk', 'laxative-soft', 'h2']);
+function prnDefault(id){
+  const it = takingItems().find(x => x.id === id); if (!it || it.quick) return false;
+  if (it.d && it.d.rx === '전문') return false;
+  if (it.pub && it.pub.rx) return false;
+  if (it.d && PRN_DRUG_CLS.has(it.d.class)) return true;
+  return ingOf(it).ings.some(e => (e.cls || []).some(c => PRN_ING_CLS.has(c)));
+}
+function markPrnIfNew(id){ if (!prnDefault(id)) return false; ME.prn = ME.prn || {}; ME.prn[id] = true; return true; }
+function toggleTaking(id){ ME.taking = ME.taking || []; const adding = !ME.taking.includes(id); ME.taking = adding ? [...ME.taking, id] : ME.taking.filter(x => x !== id); const prn = adding && markPrnIfNew(id); saveMe(); route(); toast(prn ? '내 약통에 담았어요 — 아플 때만 드시는 약이라 «필요할 때만»으로 두었어요' : ME.taking.includes(id) ? '내 약통에 담았어요' : '내 약통에서 뺐어요'); }
 function toast(t){ document.querySelector('.toast')?.remove(); const el = document.createElement('div'); el.className = 'toast'; el.textContent = t; document.body.appendChild(el); setTimeout(() => el.remove(), 1800); }
 function jumpTab(p){ const t = document.querySelector(`.tab[data-p="${p}"]`); if (!t) return; t.click(); const top = document.querySelector('.tabs'); if (top) window.scrollTo({ top: top.getBoundingClientRect().top + window.scrollY - 8, behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' }); }
 document.addEventListener('click', e => { const t = e.target.closest('.tab[data-p]'); if (!t) return; t.parentElement.querySelectorAll('.tab').forEach(x => x.classList.toggle('on', x === t)); document.querySelectorAll('.pane').forEach(p => p.classList.toggle('on', p.id === t.dataset.p)); });
@@ -4531,7 +4578,7 @@ function vPillInfo(seq){
   <div class="srcs"><span class="src-chip">${I.link}출처: 식약처 의약품 낱알식별 정보 · 사진 약학정보원</span></div>
   ${disclaimer('낱알 정보는 참고용이에요. 같은 모양의 다른 약도 있으니 확실하지 않으면 약사에게 실물을 보여 주세요.')}`;
 }
-function togglePub(seq){ const p = findPill(seq); if (!p) return; const d = drugByIngr(p.ingr, p); ME.pub = ME.pub || {}; const id = 'pub:' + seq; ME.taking = ME.taking || []; if (ME.taking.includes(id)) { ME.taking = ME.taking.filter(x => x !== id); delete ME.pub[id]; toast('내 약통에서 뺐어요'); } else { ME.taking.push(id); ME.pub[id] = { name: p.n.replace(/\(.*?\)/g, '').replace(/[()]/g, '').trim(), full: p.n, ingr: p.ingr || '', rx: p.rx, seq, drugId: d?.id || '' };  /* full: 괄호 속에 성분이 들어 있는 제품이 많다 — 버리지 않는다 */ toast('내 약통에 담았어요'); } saveMe(); route(); }
+function togglePub(seq){ const p = findPill(seq); if (!p) return; const d = drugByIngr(p.ingr, p); ME.pub = ME.pub || {}; const id = 'pub:' + seq; ME.taking = ME.taking || []; if (ME.taking.includes(id)) { ME.taking = ME.taking.filter(x => x !== id); delete ME.pub[id]; toast('내 약통에서 뺐어요'); } else { ME.taking.push(id); ME.pub[id] = { name: p.n.replace(/\(.*?\)/g, '').replace(/[()]/g, '').trim(), full: p.n, ingr: p.ingr || '', rx: p.rx, seq, drugId: d?.id || '' }; markPrnIfNew(id);  /* full: 괄호 속에 성분이 들어 있는 제품이 많다 — 버리지 않는다 */ toast('내 약통에 담았어요'); } saveMe(); route(); }
 /* 내 약통 항목 통합 조회(약지도 성분 | 공공 제품) */
 /* 대략 담기: 'cls:bp.arb' 처럼 계열만 아는 항목 */
 function quickSub(qid){ for (const g of (D.ingredients?.quick || [])) for (const x of (g.subs || [])) if (x.id === qid) return { g, x }; return null; }

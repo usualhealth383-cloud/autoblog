@@ -5,7 +5,7 @@
 
 ## meta.json
 ```
-{ "version": "0.1", "reviewed": "2026-09", "reviewer": "내과 전문의 검수(박현욱)",
+{ "version": "0.1", "reviewed": "2026-09", "reviewer": "응급실 의사 검수(박현욱)",
   "disclaimer": "…", "sources_global": [ {"id":"cnt2013","label":"…","url":"…"} ] }
 ```
 
