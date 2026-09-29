@@ -31,6 +31,8 @@ async def main():
             await pg.fill('#stName', nm); await pg.select_option('#stCls', cls); await pg.fill('#stUntil', '2099-12-31'); await pg.click('#stAdd'); await pg.wait_for_timeout(700)
             codes.append(await pg.evaluate('issued.code'))
         await pg.click('[data-adm="attend"]'); await pg.wait_for_timeout(900); await pg.click(f'[data-manual="{codes[1]}"]'); await pg.wait_for_timeout(800)
+        await pg.click('[data-adm="sched"]'); await pg.wait_for_timeout(700); await pg.select_option('#scCls', '화금반'); await pg.fill('#scDate', '2099-10-15'); await pg.fill('#scT', '3단원 평가')
+        await pg.click('#scSend'); await pg.wait_for_timeout(800)
         await logout()
         # 보호자: 형 코드로 가입 → 동생 추가
         await pg.click('#goSignup'); await pg.click('[data-role="parent"]'); await pg.fill('#suName', '형제보호자'); await pg.fill('#suEmail', 'fam@t.kr'); await pg.fill('#suPw', '123456')
@@ -47,6 +49,15 @@ async def main():
         await pg.click(f'[data-kid="{codes[0]}"]'); await pg.wait_for_timeout(900)
         body = await pg.locator('#v-parent').inner_text(); assert '형학생 학생' in body and '아직 출석 전' in body, body[:200]
         await pg.click('.tab[data-v="me"]'); await pg.wait_for_timeout(300); assert '2명' in await pg.locator('#v-me').inner_text()
+        # 보호자 일정 화면에 동생 반 일정이 이름과 함께
+        await pg.evaluate("planDay = '2099-10-15'"); await pg.click('.tab[data-v="plan"]'); await pg.wait_for_timeout(900)
+        assert await pg.evaluate("acadEvents.some(e => e.title === '동생학생 · 3단원 평가')"), await pg.evaluate('acadEvents')
+        # 비밀번호 바꾸기 → 새 비밀번호로만 로그인
+        await pg.click('.tab[data-v="me"]'); await pg.wait_for_timeout(300); await pg.click('#pwOpen')
+        await pg.fill('#pwNew', 'newpw77'); await pg.fill('#pwNew2', 'newpw78'); await pg.click('#pwSave'); assert '다릅니다' in await pg.locator('#pwErr').inner_text()
+        await pg.fill('#pwNew2', 'newpw77'); await pg.click('#pwSave'); await pg.wait_for_timeout(800); assert await pg.locator('#sheetBg').count() == 0
+        await logout(); await login('fam@t.kr', '123456'); assert '다릅니다' in await pg.locator('.auth .err').inner_text(), '옛 비밀번호로 로그인됨'
+        await pg.fill('#lgPw', 'newpw77'); await pg.click('#lgGo'); await pg.wait_for_timeout(1200); assert await pg.evaluate('view') == 'parent'
         # 동생만 연결 해제 → 형만 남음
         await pg.click('.tab[data-v="parent"]'); await pg.wait_for_timeout(600); await pg.click(f'[data-kid="{codes[1]}"]'); await pg.wait_for_timeout(800)
         await pg.click('#unlinkChild'); await pg.wait_for_timeout(1000)

@@ -1505,6 +1505,17 @@ const KINDS = { exam:'시험', hw:'과제·수행', class:'수업·보강', off:
 let planDay = null;          // 보고 있는 날짜(ISO). null 이면 오늘
 let planDday = null;         // 크게 띄운 D-day id
 let acadEvents = [];         // 학원에서 보낸 일정(읽기 전용)
+/* 학원 일정: 학생은 내 반, 보호자는 자녀들의 반(자녀가 둘이면 이름을 붙여 구분) */
+async function loadAcadEvents(){
+  if (S.auth){ acadEvents = (await DBX.schedule(S.auth.cls)).map(e => ({ ...e, acad:true })); return; }
+  const kids = (ACC && ACC.role==='parent' && ACC.childCodes) || [];
+  if (!kids.length){ acadEvents = []; return; }
+  const seen = new Map();
+  for (const c of kids){ const st = await DBX.student(c).catch(() => null); if (!st) continue;
+    (await DBX.schedule(st.cls)).forEach(e => { const k = e.id; const who = kids.length > 1 ? `${st.name} · ` : '';
+      if (!seen.has(k)) seen.set(k, { ...e, acad:true, title: e.cls==='전체' ? e.title : who + e.title }); }); }
+  acadEvents = [...seen.values()];
+}
 
 const dLeft = iso => daysBetween(todayISO(), iso);
 const ddayText = n => n === 0 ? 'D-DAY' : n > 0 ? `D-${n}` : `D+${-n}`;
@@ -1668,7 +1679,7 @@ function sheetNick(next){
 
 async function renderPlan(){
   const v = document.getElementById('v-plan');
-  if (S.auth){ try { acadEvents = (await DBX.schedule(S.auth.cls)).map(e => ({ ...e, acad:true })); setNet(false); } catch { acadEvents = []; setNet(true); } }
+  if (S.auth || (ACC && ACC.role==='parent')){ try { await loadAcadEvents(); setNet(false); } catch { acadEvents = []; setNet(true); } }
   else acadEvents = [];
   const day = planDay || todayISO();
   const dds = (S.sched.ddays||[]).slice().sort((a,b)=>a.date<b.date?-1:1);
@@ -1947,6 +1958,7 @@ function renderMe(){
       <div class="setrow" style="border:none"><span class="l">화면 테마</span>${seg('theme',['시스템','밝게','어둡게'])}</div></div>
     ${ACC ? `<div class="sec"><h2>계정</h2>
       <button class="setrow go" id="editProfile"><span class="l">이름·연락처 수정</span><span class="v"></span></button>
+      <button class="setrow go" id="pwOpen"><span class="l">비밀번호 바꾸기</span><span class="v"></span></button>
       ${a ? `<button class="setrow go" id="unauth"><span class="l">학원 코드 연결 해제</span><span class="v"></span></button>` : ''}
       <button class="setrow go" id="logout" style="border:none"><span class="l">로그아웃</span><span class="v"></span></button></div>` : ''}
     <div class="sec"><h2>지원</h2>
@@ -2557,6 +2569,14 @@ document.addEventListener('click', async e => {
   if (T('#editProfile')){ openSheet(`<h3>이름 · 연락처</h3><div class="f"><input id="epName" placeholder="이름" value="${esc(ACC.name)}" style="flex:1;border:1.5px solid var(--line);border-radius:12px;padding:12px 14px;font-size:15px;font-family:inherit;background:var(--paper);color:var(--ink)"></div>
       <div class="f"><input id="epPhone" placeholder="연락처" inputmode="tel" value="${esc(ACC.phone)}" style="flex:1;border:1.5px solid var(--line);border-radius:12px;padding:12px 14px;font-size:15px;font-family:inherit;background:var(--paper);color:var(--ink)"></div>
       <button class="btn" id="epSave">저장</button><button class="btn ghost" id="sheetClose">취소</button>`); return; }
+  if (T('#pwOpen')){ openSheet(`<h3>비밀번호 바꾸기</h3>
+      <div class="fld"><label for="pwNew">새 비밀번호</label><input id="pwNew" type="password" autocomplete="new-password" placeholder="6자 이상"></div>
+      <div class="fld"><label for="pwNew2">한 번 더</label><input id="pwNew2" type="password" autocomplete="new-password" placeholder="같은 비밀번호"></div>
+      <div class="err" id="pwErr" role="alert" style="font-size:12.5px;color:var(--no);font-weight:600;margin:-4px 0 10px"></div>
+      <button class="btn" id="pwSave">바꾸기</button><button class="btn ghost" id="sheetClose">닫기</button>`); return; }
+  if (T('#pwSave')){ const a = document.getElementById('pwNew').value||'', b = document.getElementById('pwNew2').value||'', e = document.getElementById('pwErr');
+    if (a.length < 6){ e.textContent = '비밀번호는 6자 이상이어야 합니다.'; return; } if (a !== b){ e.textContent = '두 비밀번호가 다릅니다.'; return; }
+    try { await DBX.setPassword(a); closeSheet(); toast('비밀번호를 바꿨습니다'); } catch (err){ e.textContent = AUTH_KO(err.message); } return; }
   if (T('#epSave')){ const name=(document.getElementById('epName').value||'').trim(), phone=(document.getElementById('epPhone').value||'').trim(); if (!name){ toast('이름을 넣어 주세요'); return; }
     ACC = await DBX.updateMe({ name, phone }); closeSheet(); renderMe(); toast('저장했습니다'); return; }
   const st = T('[data-set]'); if (st){ S[st.dataset.set]=st.dataset.val; save(S); applyPrefs(); renderMe(); return; }
