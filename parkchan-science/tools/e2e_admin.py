@@ -41,7 +41,7 @@ async def main():
         st = await o.evaluate(f"DBX.students().then(r=>r.find(s=>s.code==='{c1}'))")
         assert st['name'] == '운영학생(고침)' and st['cls'] == '화금반' and st['until'] == '2027-03-31' and st['phone'] == '01012345678', st
         # ② 반 전체 연장: 월목반 → 2027-02-28 (먼저 끝나는 학생만)
-        await o.click('#v-admin .stuedit summary'); await o.select_option('#exCls', '월목반'); await o.fill('#exUntil', '2027-02-28'); await o.click('#exGo'); await o.wait_for_timeout(800)
+        await o.click('#v-admin details:has(#exCls) summary'); await o.select_option('#exCls', '월목반'); await o.fill('#exUntil', '2027-02-28'); await o.click('#exGo'); await o.wait_for_timeout(800)
         st2 = await o.evaluate(f"DBX.students().then(r=>r.find(s=>s.code==='{code}'))"); assert st2['until'] == '2027-02-28', st2
         st1 = await o.evaluate(f"DBX.students().then(r=>r.find(s=>s.code==='{c1}'))"); assert st1['until'] == '2027-03-31', '다른 반·더 긴 학생까지 바뀜'
         # ③ 수동 출석 → 학생 상세에서 취소
@@ -64,6 +64,23 @@ async def main():
         line = [r for r in rows if code in r][0]; assert ('출석 ' in line or '지각 ' in line) and line.split(',')[-2] == '1', line
         print('  출석부:', f.suggested_filename, len(rows) - 1, '명')
         await o.screenshot(path=f'{SC}/a02_stats.png')
+        # ⑤-2 여러 명 한꺼번에: 엑셀 붙여 넣기(탭) · 쉼표 · 제목 줄 · 없는 반 · 이미 있는 학생
+        await o.click('[data-adm="students"]'); await o.wait_for_timeout(700)
+        await o.click('#bulkBox summary')
+        await o.fill('#bulkIn', '이름\t반\t연락처\n일괄하나\t월목반\t010-1111-0001\n일괄둘, 화금반, 01011110002\n없는반학생, 토요반, \n운영학생(고침)\t화금반\t')
+        await o.fill('#bulkUntil', '2027-08-31'); await o.click('#bulkCheck'); await o.wait_for_timeout(700)
+        t = await o.locator('#bulkBox').inner_text()
+        assert '2명 등록 준비' in t and '2줄 확인 필요' in t and '제목 줄' in t and "'토요반' 반이 없습니다" in t and '이미 있는 학생' in t, t[:400]
+        await o.screenshot(path=f'{SC}/a04_bulk_preview.png', full_page=True)
+        await o.click('#bulkGo'); await o.wait_for_timeout(2000)
+        t = await o.locator('#bulkBox').inner_text(); assert '2명의 코드를 만들었습니다' in t, t[:300]
+        assert await o.locator('#bulkBox a.mini[href^="sms:"]').count() == 2
+        async with o.expect_download() as dl: await o.click('#bulkCsv')
+        f = await dl.value; raw = open(await f.path(), 'rb').read().decode('utf-8-sig').splitlines()
+        assert raw[0] == '이름,반,연락처,코드,만료일' and len(raw) == 3 and all(r.endswith(',2027-08-31') for r in raw[1:]), raw
+        st = await o.evaluate("DBX.students().then(r=>r.filter(s=>s.name.startsWith('일괄')).map(s=>s.cls+':'+s.until).sort())")
+        assert st == ['월목반:2027-08-31', '화금반:2027-08-31'], st
+        await o.click('#bulkReset'); await o.wait_for_timeout(500)
         # ⑥ 학생 계정 연결 풀기: 학생 A 가 코드를 쓰고 있으면 B 는 막힘 → 원장이 풀면 B 가 등록
         await logout()
         for em in ('ka@t.kr', 'kb@t.kr'):

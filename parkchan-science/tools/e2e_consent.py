@@ -62,15 +62,15 @@ async def main():
         await k2.select_option('#suAge', 'u14'); await k2.wait_for_timeout(200); await k2.fill('#suGName', '이보호'); await k2.fill('#suGPhone', '01033334444'); await k2.check('#suAgree'); await k2.click('#suGo'); await k2.wait_for_timeout(1100)
         oc, o = await page(); await o.goto(APP); await o.wait_for_timeout(600)
         await o.click('#goLogin'); await o.fill('#lgEmail', 'owner@parkchan.kr'); await o.fill('#lgPw', 'owner-pass'); await o.click('#lgGo'); await o.wait_for_timeout(1200)
-        box = o.locator('#v-admin details.stuedit').first; t = await box.inner_text()
+        box = o.locator('#v-admin #consentBox').first; t = await box.inner_text()
         assert '보호자 동의 확인' in t and '2건 할 일' in t and '웹 동의' in t and '동의 대기' in t, t[:300]
         await o.screenshot(path=f'{SC}/c06_owner_list.png', full_page=True)
         sms = await o.locator('a[data-cnotify]').get_attribute('href'); assert re.sub(r'[^0-9]', '', sms.split('?')[0]) == '01011112222' and '동의를 확인했습니다' in unquote(sms), sms
         await o.evaluate("document.querySelector('a[data-cnotify]').removeAttribute('href')")   # 시험에서는 문자 앱을 열지 않는다
         await o.click('a[data-cnotify]'); await o.wait_for_timeout(1200)
         await o.click('[data-cpaper]'); await o.wait_for_timeout(1200)
-        t = await o.locator('#v-admin details.stuedit').first.text_content()
-        assert await o.locator('#v-admin details.stuedit').first.get_attribute('open') is None, '할 일이 없으면 접혀 있어야 한다'
+        t = await o.locator('#v-admin #consentBox').first.text_content()
+        assert await o.locator('#v-admin #consentBox').first.get_attribute('open') is None, '할 일이 없으면 접혀 있어야 한다'
         assert '할 일' not in t and t.count('동의 확인 완료') == 2 and '서면 동의 확인 완료' in t, t[:300]
         await k2.reload(); await k2.wait_for_timeout(1200); assert await k2.evaluate('consentPending()') is False, '서면 동의 뒤에도 잠김'
         # ⑥ 로컬(시연) 모드: 같은 브라우저에서 동의 페이지가 기기 저장소를 읽고 쓴다

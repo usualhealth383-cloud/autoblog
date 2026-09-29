@@ -759,8 +759,28 @@ const AUTH_KO = m => { const t = String(m||''); const M = [[/link.*(invalid|expi
   [/already registered|already been registered/i,'이미 가입된 이메일입니다. 로그인해 주세요.'],[/at least 6/i,'비밀번호는 6자 이상이어야 합니다.'],[/rate limit|too many/i,'요청이 너무 잦습니다. 잠시 뒤에 다시 시도해 주세요.'],
   [/invalid.*email|email.*invalid/i,'이메일 형식을 확인해 주세요.'],[/same.*password|different from the old/i,'이전과 다른 비밀번호를 정해 주세요.']];
   const hit = M.find(([r]) => r.test(t)); return hit ? hit[1] : t; };
+/* 서버 호출 — 20초 넘게 답이 없거나 연결이 안 되면 학생이 읽을 말로 알린다(영어 'Failed to fetch' 를 그대로 보여 주지 않는다) */
+const NET_MSG = '인터넷에 연결되어 있지 않거나 서버에 닿지 않습니다. 연결을 확인하고 다시 시도해 주세요.';
+async function fetchT(url, opts = {}){
+  const ac = new AbortController(), t = setTimeout(() => ac.abort(), 20000);
+  try { return await fetch(url, { ...opts, signal: ac.signal }); }
+  catch (e){ setNet(true); throw Object.assign(new Error(e && e.name === 'AbortError' ? '서버 응답이 너무 늦습니다. 잠시 뒤 다시 시도해 주세요.' : NET_MSG), { net:true }); }
+  finally { clearTimeout(t); } }
+/* 서버(PostgREST) 오류를 한국어로 — 우리 트리거가 낸 한국어 문구는 그대로 둔다 */
+const DB_KO = (j, status) => { const m = String((j && (j.message || j.msg || j.error_description)) || ''), code = j && j.code;
+  if (/[가-힣]/.test(m)) return m;
+  if (code === '42501' || /permission denied|row-level security/i.test(m)) return '이 작업을 할 수 있는 권한이 없습니다. 다시 로그인해 보세요.';
+  if (code === '23505' || /duplicate key/i.test(m)) return '이미 있는 값입니다. 다른 값으로 해 주세요.';
+  if (code === '23503' || /foreign key/i.test(m)) return '연결된 항목을 찾을 수 없습니다. 새로고침해 주세요.';
+  if (/JWT expired|invalid jwt/i.test(m) || status === 401) return '로그인이 만료되었습니다. 다시 로그인해 주세요.';
+  if (status >= 500) return '서버에 잠시 문제가 있습니다. 잠시 뒤 다시 시도해 주세요.';
+  return m || ('요청을 처리하지 못했습니다 (' + status + ')'); };
+/* 로그인이 만료되어 되살릴 수 없으면: 조용히 실패하지 않고 로그인 화면으로 */
+let sessionLostShown = false;
+function sessionLost(){ if (sessionLostShown || !ACC) return; sessionLostShown = true;
+  setTimeout(() => { ACC = null; S.auth = null; authMode = 'login'; authErr = '로그인이 만료되었습니다. 다시 로그인해 주세요. 기록은 그대로 남아 있습니다.'; closeSheet(); show('auth'); sessionLostShown = false; }, 0); }
 async function authPost(path, body){
-  const r = await fetch(SRV.url + path, { method:'POST', headers:{ apikey:SRV.key, 'Content-Type':'application/json', ...(SESSION&&SESSION.access_token?{Authorization:'Bearer '+SESSION.access_token}:{}) }, body: JSON.stringify(body) });
+  const r = await fetchT(SRV.url + path, { method:'POST', headers:{ apikey:SRV.key, 'Content-Type':'application/json', ...(SESSION&&SESSION.access_token?{Authorization:'Bearer '+SESSION.access_token}:{}) }, body: JSON.stringify(body) });
   const j = await r.json().catch(()=>({}));
   if (!r.ok) throw new Error(AUTH_KO(j.error_description || j.msg || j.message || '') || ('요청 실패 '+r.status));
   return j;
@@ -769,15 +789,16 @@ async function api(path, { method='GET', body, prefer, _retry } = {}){
   const h = { apikey: SRV.key, 'Content-Type': 'application/json' };
   h.Authorization = 'Bearer ' + ((SESSION && SESSION.access_token) || SRV.key);
   if (prefer) h.Prefer = prefer;
-  const r = await fetch(SRV.url + path, { method, headers: h, body: body === undefined ? undefined : JSON.stringify(body) });
+  const r = await fetchT(SRV.url + path, { method, headers: h, body: body === undefined ? undefined : JSON.stringify(body) });
   if (r.status === 401 && SESSION && SESSION.refresh_token && !_retry){
     try { const j = await authPost('/auth/v1/token?grant_type=refresh_token', { refresh_token: SESSION.refresh_token });
       SESSION = { ...SESSION, access_token:j.access_token, refresh_token:j.refresh_token||SESSION.refresh_token }; saveSession();
       return api(path, { method, body, prefer, _retry:true }); }
-    catch { SESSION = null; saveSession(); }
+    catch (e){ if (!e.net){ SESSION = null; saveSession(); sessionLost(); } }
   }
+  if (r.ok) setNet(false);
   const txt = await r.text(); let j = null; try { j = txt ? JSON.parse(txt) : null; } catch { j = txt; }
-  if (!r.ok) throw Object.assign(new Error((j && (j.message || j.msg || j.error_description)) || ('서버 오류 ' + r.status)), { status: r.status, body: j });
+  if (!r.ok) throw Object.assign(new Error(DB_KO(j, r.status)), { status: r.status, body: j });
   return j;
 }
 const hhmm = t => (t || '').slice(0, 5);
@@ -949,6 +970,9 @@ const DB = (() => {
     consentList: async () => d.accounts.filter(a => a.under14).map(a => ({ id:a.id, name:a.name, guardian:a.guardian||'', guardian_ok:!!a.guardianOk, guardian_how:a.guardianHow||'', guardian_at:a.guardianAt||null, notified_at:a.notifiedAt||null, created_at:a.created })),
     consentMark: async (id, what) => { const a = d.accounts.find(x => x.id === id && x.under14); if (!a) return;
       if (what === 'paper'){ a.guardianOk = true; a.guardianHow = 'paper'; a.guardianAt = new Date().toISOString(); } else if (what === 'notified' && a.guardianOk) a.notifiedAt = new Date().toISOString(); w(); },
+    myWritings: async () => { const a = me(); if (!a) return { posts:[], comments:[] };
+      return { posts:(d.posts||[]).filter(x => x.uid===a.id && !x.deleted).map(x => ({ at:x.at, board:x.board, title:x.title, body:x.body })),
+               comments:(d.comments||[]).filter(c => c.uid===a.id && !c.deleted).map(c => ({ at:c.at, body:c.body })) }; },
     registerPush: async () => {},
     logError: async e => { d.errors ||= []; d.errors.unshift({ ...e, at:new Date().toISOString() }); d.errors = d.errors.slice(0, 30); w(); },
     errors: async () => (d.errors||[]).slice(),
@@ -988,10 +1012,10 @@ const serverDB = () => {
     },
     signOut: async () => { try { if (SESSION) await authPost('/auth/v1/logout', {}); } catch {} SESSION = null; saveSession(); meCache = null; },
     resetPassword: async email => { await authPost('/auth/v1/recover?redirect_to=' + encodeURIComponent(authRedirect()), { email }); return { ok:true, note:'비밀번호 재설정 메일을 보냈습니다. 메일의 링크를 눌러 주세요.' }; },
-    setPassword: async pw => { const r = await fetch(SRV.url + '/auth/v1/user', { method:'PUT', headers:{ apikey:SRV.key, 'Content-Type':'application/json', Authorization:'Bearer '+SESSION.access_token }, body: JSON.stringify({ password: pw }) });
+    setPassword: async pw => { const r = await fetchT(SRV.url + '/auth/v1/user', { method:'PUT', headers:{ apikey:SRV.key, 'Content-Type':'application/json', Authorization:'Bearer '+SESSION.access_token }, body: JSON.stringify({ password: pw }) });
       if (!r.ok){ const j = await r.json().catch(()=>({})); throw new Error(j.msg || j.message || '비밀번호를 바꾸지 못했습니다.'); } return { ok:true }; },
     /* 메일 링크로 돌아왔을 때(#access_token=…) 세션을 받는다 */
-    adoptSession: async (at, rt) => { const r = await fetch(SRV.url + '/auth/v1/user', { headers:{ apikey:SRV.key, Authorization:'Bearer '+at } }); if (!r.ok) throw new Error('링크가 만료되었습니다. 다시 요청해 주세요.');
+    adoptSession: async (at, rt) => { const r = await fetchT(SRV.url + '/auth/v1/user', { headers:{ apikey:SRV.key, Authorization:'Bearer '+at } }); if (!r.ok) throw new Error('링크가 만료되었습니다. 다시 요청해 주세요.');
       const u = await r.json(); SESSION = { access_token:at, refresh_token:rt, user:{ id:u.id, email:u.email } }; saveSession(); meCache = null; return myProfile(); },
     updateMe: async patch => { const b = {}; if ('name' in patch) b.name = patch.name; if ('phone' in patch) b.phone = patch.phone; if ('nick' in patch) b.nick = patch.nick;
       await api(`/rest/v1/profiles?id=eq.${SESSION.user.id}`, { method:'PATCH', prefer:'return=minimal', body:b }); return myProfile(); },
@@ -1063,6 +1087,9 @@ const serverDB = () => {
     redeemPass: async code => { const r = await api('/rest/v1/rpc/redeem_pass', { method:'POST', body:{ p_code: code } }); if (r && r.ok){ meCache = null; } return r; },
     issuePass: async days => { const r = await api('/rest/v1/passes', { method:'POST', prefer:'return=representation', body:{ code:genCode('pass'), days } }); return r[0]; },
     passes: async () => (await api('/rest/v1/passes?select=*&order=issued.desc')).map(p => ({ code:p.code, days:p.days, issued:p.issued, usedBy:p.used_by||'', usedAt:p.used_at||'' })),
+    myWritings: async () => { const u = SESSION && SESSION.user.id; if (!u) return { posts:[], comments:[] };
+      const [ps, cs] = await Promise.all([api(`/rest/v1/posts?author=eq.${u}&deleted=is.false&select=at,board,title,body&order=at.asc`), api(`/rest/v1/comments?author=eq.${u}&deleted=is.false&select=at,body&order=at.asc`)]);
+      return { posts:ps, comments:cs }; },
     consentRequest: async () => (await api('/rest/v1/rpc/consent_request', { method:'POST', body:{} })) || { ok:false, why:'요청하지 못했습니다.' },
     consentList: async () => api('/rest/v1/rpc/consent_list', { method:'POST', body:{} }),
     consentMark: async (id, what) => { await api('/rest/v1/rpc/consent_mark', { method:'POST', body:{ p_uid:id, p_what:what } }); },
@@ -1070,7 +1097,7 @@ const serverDB = () => {
     registerPush: async (token, platform) => { await api('/rest/v1/rpc/register_push', { method:'POST', body:{ p_token:token, p_platform:platform } }); },
     logError: async e => { await api('/rest/v1/client_errors', { method:'POST', prefer:'return=minimal', body:e }); },
     errors: async () => api('/rest/v1/client_errors?select=*&order=at.desc&limit=30'),
-    verifyPurchase: async p => { const r = await fetch(SRV.url + '/functions/v1/verify-purchase', { method:'POST', headers:{ apikey:SRV.key, 'Content-Type':'application/json', Authorization:'Bearer '+((SESSION&&SESSION.access_token)||SRV.key) }, body: JSON.stringify(p) });
+    verifyPurchase: async p => { const r = await fetchT(SRV.url + '/functions/v1/verify-purchase', { method:'POST', headers:{ apikey:SRV.key, 'Content-Type':'application/json', Authorization:'Bearer '+((SESSION&&SESSION.access_token)||SRV.key) }, body: JSON.stringify(p) });
       const j = await r.json().catch(()=>({})); if (!r.ok || !j.ok) throw new Error(j.why || j.message || '결제를 확인하지 못했습니다. 잠시 뒤 [구매 복원]을 눌러 주세요.'); meCache = null; return j; },
     ownerEmail: () => (SESSION && SESSION.user.email) || '',
     reset: () => {},
@@ -1959,6 +1986,7 @@ function renderMe(){
     ${ACC ? `<div class="sec"><h2>계정</h2>
       <button class="setrow go" id="editProfile"><span class="l">이름·연락처 수정</span><span class="v"></span></button>
       <button class="setrow go" id="pwOpen"><span class="l">비밀번호 바꾸기</span><span class="v"></span></button>
+      <button class="setrow go" id="myExport"><span class="l">내 기록 내려받기<small>계정 정보·학습 기록·출석·쓴 글을 파일 하나로</small></span><span class="v"></span></button>
       ${a ? `<button class="setrow go" id="unauth"><span class="l">학원 코드 연결 해제</span><span class="v"></span></button>` : ''}
       <button class="setrow go" id="logout" style="border:none"><span class="l">로그아웃</span><span class="v"></span></button></div>` : ''}
     <div class="sec"><h2>지원</h2>
@@ -2048,6 +2076,21 @@ async function renderParent(){
 let parentSel = '';
 
 /* ═══ 원장 ═══ */
+/* 여러 명 등록: 붙여 넣은 줄 → 미리 보기(rows) → 발급 결과(done) */
+let bulk = { rows:null, done:null, until:'' };
+const smsCode = x => `sms:${tel(x.phone)}${/iphone|ipad/i.test(navigator.userAgent)?'&':'?'}body=${encodeURIComponent(`[${CFG.academy}] ${x.name} 학생 앱 코드: ${x.code} — 앱 > 내 정보에서 등록하면 전 범위가 열립니다. 보호자도 같은 코드로 자녀를 연결할 수 있습니다.`)}`;
+function parseBulk(text, classes, taken){
+  const seen = new Set();
+  return String(text||'').split(/\r?\n/).map(l => l.trim()).filter(Boolean).slice(0, 200).map(l => {
+    const f = (l.includes('\t') ? l.split('\t') : l.split(/\s*,\s*/)).map(x => x.trim());
+    const [name='', cls='', phone=''] = f; const r = { name, cls, phone };
+    if (!name || name.length > 20) r.err = '이름을 확인해 주세요';
+    else if (/^(이름|성명|학생)$/.test(name)){ r.err = '제목 줄 — 뺍니다'; r.skip = true; }
+    else if (!classes.includes(cls)) r.err = cls ? `'${cls}' 반이 없습니다` : '반을 적어 주세요';
+    else if (phone && tel(phone).replace(/[^0-9]/g,'').length < 9) r.err = '연락처를 확인해 주세요';
+    else if (seen.has(name+'|'+cls) || taken.has(name+'|'+cls)) r.err = '이미 있는 학생입니다';
+    seen.add(name+'|'+cls); return r; });
+}
 let admTab='students', issued=null, admCls='', attTimer=null, admMonth=todayISO().slice(0,7), issuedPass=null;
 async function renderAdmin(){
   const v = document.getElementById('v-admin');
@@ -2066,11 +2109,24 @@ async function renderAdmin(){
         <button class="btn" id="stAdd">코드 만들기</button>
         ${issued ? `<div class="issued">${esc(issued.name)} 학생 · ${esc(issued.cls)} · ${kdate(issued.until)}까지<br>코드 <code>${issued.code}</code>
           <br><a href="sms:${tel(issued.phone)}${/iphone|ipad/i.test(navigator.userAgent)?'&':'?'}body=${encodeURIComponent(`[${CFG.academy}] ${issued.name} 학생 앱 코드: ${issued.code} — 앱 > 내 정보에서 등록하면 전 범위가 열립니다. 보호자도 같은 코드로 자녀를 연결할 수 있습니다.`)}">문자로 보내기 →</a></div>` : ''}</div>
+      <details class="stuedit" id="bulkBox" ${bulk.rows||bulk.done?'open':''}><summary>여러 명 한꺼번에 등록 · 엑셀에서 붙여 넣기</summary>
+        ${bulk.done ? `<p class="tip" style="margin:0 0 8px"><b>${bulk.done.length}명</b>의 코드를 만들었습니다. 코드 목록을 내려받아 두거나, 줄마다 문자로 보내세요.</p>
+          <button class="btn soft" id="bulkCsv" style="margin:0 0 8px">코드 목록 내려받기 (엑셀)</button>
+          ${bulk.done.map(x => `<div class="kv"><span class="k">${esc(x.name)} <small style="color:var(--faint)">${esc(x.cls)}</small></span><span class="v"><code>${esc(x.code)}</code>${tel(x.phone)?` <a class="mini" href="${smsCode(x)}" style="text-decoration:none">문자</a>`:''}</span></div>`).join('')}
+          <button class="btn ghost" id="bulkReset" style="margin-top:10px">새로 붙여 넣기</button>`
+        : bulk.rows ? `<p class="tip" style="margin:0 0 8px">${bulk.rows.filter(r=>!r.err).length}명 등록 준비${bulk.rows.some(r=>r.err&&!r.skip)?` · <b style="color:var(--no)">${bulk.rows.filter(r=>r.err&&!r.skip).length}줄 확인 필요</b>(그 줄은 빼고 등록합니다)`:''} · 만료일 ${kdate(bulk.until)}</p>
+          ${bulk.rows.map(r => `<div class="kv"><span class="k">${esc(r.name||'(이름 없음)')} <small style="color:var(--faint)">${esc(r.cls)} ${esc(r.phone)}</small></span><span class="v" style="${r.skip?'color:var(--faint)':r.err?'color:var(--no)':''}">${r.err?esc(r.err):'✓'}</span></div>`).join('')}
+          <button class="btn" id="bulkGo" style="margin-top:10px" ${bulk.rows.some(r=>!r.err)?'':'disabled'}>${bulk.rows.filter(r=>!r.err).length}명 코드 만들기</button><button class="btn ghost" id="bulkReset">다시 붙여 넣기</button>`
+        : `<p class="tip" style="margin:0 0 8px">엑셀에서 <b>이름 · 반 · 연락처</b> 세 칸을 골라 복사한 뒤 붙여 넣으세요. 쉼표로 구분해 적어도 됩니다. 한 줄에 한 명, 200명까지.</p>
+          <textarea id="bulkIn" rows="6" placeholder="박○○	월목반	010-1234-5678&#10;김○○, 화금반, 01098765432" style="width:100%;border:1.5px solid var(--line);border-radius:12px;padding:11px 12px;font-size:14px;font-family:inherit;background:var(--card);color:var(--ink);margin-bottom:8px"></textarea>
+          <div class="g"><label for="bulkUntil" style="flex:0 0 auto;align-self:center;font-size:13px;font-weight:700;color:var(--muted);border:0;padding:0;background:none">수강 만료일</label><input id="bulkUntil" type="date" value="${new Date().getFullYear()+1}-02-28"></div>
+          <button class="btn" id="bulkCheck">미리 보기</button>`}
+      </details>
       <p class="tip">1인 1코드. 학생은 '학원 코드 등록', 보호자는 '자녀 연결'에 같은 코드를 씁니다. 만료일이 지나면 저절로 닫힙니다. 이름을 누르면 출석·진도·정보 고치기가 보입니다.</p>
       ${await (async () => { let cl = []; try { cl = await DBX.consentList(); } catch {} if (!cl.length) return '';
         const todo = cl.filter(x => !x.guardian_ok || (x.guardian_how==='web' && !x.notified_at));
         const smsBody = x => encodeURIComponent(`[${CFG.academy}] ${x.name} 학생의 앱 가입에 대한 보호자님의 동의를 확인했습니다. 동의를 철회하거나 문의하시려면 학원으로 연락 주세요.${CFG.phone?' '+CFG.phone:''}`);
-        return `<details class="stuedit" ${todo.length?'open':''}><summary>만 14세 미만 · 보호자 동의 확인 ${todo.length?`<span class="cst wait">${todo.length}건 할 일</span>`:''}</summary>
+        return `<details class="stuedit" id="consentBox" ${todo.length?'open':''}><summary>만 14세 미만 · 보호자 동의 확인 ${todo.length?`<span class="cst wait">${todo.length}건 할 일</span>`:''}</summary>
           <p class="tip" style="margin:0 0 8px">보호자가 동의 페이지에서 동의하면, <b>확인 문자</b>를 보호자에게 보내야 확인 절차가 끝납니다(개인정보 보호법 시행령). 서면으로 받았다면 ‘서면 동의 받음’을 누르세요.</p>
           ${cl.map(x => { const ph = tel(String(x.guardian||'').replace(/^\S+\s*/, '')), days = daysBetween(String(x.created_at||'').slice(0,10), todayISO());
             return `<div class="kv" style="align-items:flex-start;gap:8px"><span class="k" style="flex:1">${esc(x.name)} <small style="color:var(--faint)">· 보호자 ${esc(x.guardian||'미기재')}</small></span><span class="v" style="display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end">
@@ -2569,6 +2625,18 @@ document.addEventListener('click', async e => {
   if (T('#editProfile')){ openSheet(`<h3>이름 · 연락처</h3><div class="f"><input id="epName" placeholder="이름" value="${esc(ACC.name)}" style="flex:1;border:1.5px solid var(--line);border-radius:12px;padding:12px 14px;font-size:15px;font-family:inherit;background:var(--paper);color:var(--ink)"></div>
       <div class="f"><input id="epPhone" placeholder="연락처" inputmode="tel" value="${esc(ACC.phone)}" style="flex:1;border:1.5px solid var(--line);border-radius:12px;padding:12px 14px;font-size:15px;font-family:inherit;background:var(--paper);color:var(--ink)"></div>
       <button class="btn" id="epSave">저장</button><button class="btn ghost" id="sheetClose">취소</button>`); return; }
+  if (T('#myExport')){ toast('기록을 모으는 중입니다…');
+    let att = [], wr = { posts:[], comments:[] };
+    try { if (S.auth) att = await DBX.attendanceRange(addDays(todayISO(), -400), todayISO(), S.auth.code); } catch {}
+    try { wr = await DBX.myWritings(); } catch {}
+    const acc = { ...ACC }; delete acc.id;
+    const out = { 안내: `${CFG.academy} '하루 한 개념' 앱이 이 계정에 대해 가진 기록입니다(개인정보 보호법 제35조 열람). 내려받은 날: ${todayISO()}`,
+      계정: acc, 학원: S.auth ? { 코드:S.auth.code, 반:S.auth.cls, 수강_만료일:S.auth.until } : null,
+      학습: { 시작일:S.start, 공부한_개념:S.done.length, 개념_목록:S.done, 문제_풀이:S.stats, 오답:S.wrong, 북마크:S.bm, 학습한_날:S.days, 문제은행_기록:S.bh, 보관한_글귀:S.qkeep },
+      일정: S.sched, 출석: att, 이야기: { 글:wr.posts, 댓글:wr.comments }, 차단한_사용자_수:(S.blocked||[]).length };
+    const name = `${CFG.academy}_내기록_${todayISO()}.json`, file = new File([JSON.stringify(out, null, 2)], name, { type:'application/json' });
+    try { if (isNative && navigator.canShare && navigator.canShare({ files:[file] })){ await navigator.share({ files:[file], title:name }); return; } } catch {}
+    const a = document.createElement('a'); a.href = URL.createObjectURL(file); a.download = name; document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(a.href), 4000); return; }
   if (T('#pwOpen')){ openSheet(`<h3>비밀번호 바꾸기</h3>
       <div class="fld"><label for="pwNew">새 비밀번호</label><input id="pwNew" type="password" autocomplete="new-password" placeholder="6자 이상"></div>
       <div class="fld"><label for="pwNew2">한 번 더</label><input id="pwNew2" type="password" autocomplete="new-password" placeholder="같은 비밀번호"></div>
@@ -2591,6 +2659,21 @@ document.addEventListener('click', async e => {
   const cpap = T('[data-cpaper]'); if (cpap){ if (!confirm('보호자에게 서면 동의서를 받으셨나요? 받은 서면은 보관해 주세요.')) return; await DBX.consentMark(cpap.dataset.cpaper, 'paper'); toast('서면 동의를 기록했습니다'); renderAdmin(); return; }
   const cnot = T('[data-cnotify]'); if (cnot){ await DBX.consentMark(cnot.dataset.cnotify, 'notified'); setTimeout(renderAdmin, 400); return; }
 
+  /* 원장 — 여러 명 등록 */
+  if (T('#bulkCheck')){ const text = document.getElementById('bulkIn').value, until = document.getElementById('bulkUntil').value;
+    if (!text.trim()){ toast('붙여 넣은 내용이 없습니다'); return; } if (!until){ toast('수강 만료일을 골라 주세요'); return; }
+    const st = await DBX.students(); bulk = { rows: parseBulk(text, CLASSES_CACHE.map(c=>c.cls), new Set(st.map(x => x.name+'|'+x.cls))), done:null, until }; renderAdmin(); return; }
+  if (T('#bulkReset')){ bulk = { rows:null, done:null, until:'' }; renderAdmin(); return; }
+  if (T('#bulkGo')){ const ok = bulk.rows.filter(r => !r.err); const btn = T('#bulkGo'); btn.disabled = true; const done = [];
+    for (let i = 0; i < ok.length; i++){ btn.textContent = `만드는 중… ${i+1} / ${ok.length}`;
+      try { const x = await DBX.addStudent({ name:ok[i].name, cls:ok[i].cls, until:bulk.until, phone:ok[i].phone }); done.push({ ...x, phone: x.phone || ok[i].phone }); }
+      catch (err){ toast(`${ok[i].name}: ${err.message}`); } }
+    bulk = { rows:null, done, until:bulk.until }; toast(`${done.length}명의 코드를 만들었습니다`); renderAdmin(); return; }
+  if (T('#bulkCsv')){ const q = v => /[",\n]/.test(String(v)) ? `"${String(v).replace(/"/g,'""')}"` : String(v);
+    const csv = '\uFEFF' + [['이름','반','연락처','코드','만료일'], ...bulk.done.map(x => [x.name, x.cls, x.phone||'', x.code, x.until])].map(r => r.map(q).join(',')).join('\r\n');
+    const name = `${CFG.academy}_학생코드_${todayISO()}.csv`, file = new File([csv], name, { type:'text/csv' });
+    try { if (isNative && navigator.canShare && navigator.canShare({ files:[file] })){ await navigator.share({ files:[file], title:name }); return; } } catch {}
+    const a = document.createElement('a'); a.href = URL.createObjectURL(file); a.download = name; document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(a.href), 4000); return; }
   /* 원장 — 운영 도구 */
   const sp = T('[data-seplus]'); if (sp){ const el = document.getElementById('seUntil'); const base = el.value && el.value > todayISO() ? el.value : todayISO();
     const d = new Date(base+'T00:00:00'); d.setMonth(d.getMonth() + (+sp.dataset.seplus)); el.value = `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`; return; }
@@ -2635,7 +2718,11 @@ const errSeen = new Set();
 function reportError(msg, stack){ const m = String(msg||'').slice(0, 480); if (!m || errSeen.has(m) || errSeen.size >= 5) return; errSeen.add(m);
   try { DBX.logError({ ver:CFG.version + (isNative?'-app':'-web'), msg:m, stack:String(stack||'').slice(0, 1900), url:(view||'')+' '+location.pathname.slice(-60), ua:navigator.userAgent.slice(0, 280) }).catch(()=>{}); } catch {} }
 window.addEventListener('error', e => reportError(e.message, e.error && e.error.stack));
-window.addEventListener('unhandledrejection', e => { const r = e.reason || {}; if ((r.status && r.status < 500) || /Failed to fetch|NetworkError|Load failed/i.test(r.message||'')) return; reportError('Promise: ' + (r.message || r), r.stack); });
+/* 처리하지 않은 실패(버튼을 눌렀는데 서버가 거절·끊김)는 조용히 넘어가지 않고 한 줄로 알린다 */
+window.addEventListener('unhandledrejection', e => { const r = e.reason || {};
+  if (r && r.message && (r.net || r.status || /[가-힣]/.test(r.message))){ toast(r.message); e.preventDefault(); }
+  if (r.net || (r.status && r.status < 500) || /Failed to fetch|NetworkError|Load failed/i.test(r.message||'')) return;
+  reportError('Promise: ' + (r.message || r), r.stack); });
 /* ═══ 시작 ═══ */
 (async () => {
   /* 가입 확인·비밀번호 재설정 메일의 링크로 들어왔으면 그 세션을 받는다 */
