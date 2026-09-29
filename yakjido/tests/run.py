@@ -509,6 +509,8 @@ def main():
         if len(pv.evaluate("()=>ME.vitals")) != 2: fails.append('혈압 수첩: 지우기가 안 됩니다')
         pv.click('.seg button:has-text("혈당")'); pv.wait_for_timeout(250); pv.fill('#vg', '112'); pv.click('button:has-text("적어 두기")'); pv.wait_for_timeout(250)
         if not any(x.get('k') == 'bg' and x.get('v') == 112 for x in pv.evaluate("()=>ME.vitals")): fails.append('혈압 수첩: 혈당이 적히지 않습니다')
+        pv.goto(url + '#/bag'); pv.wait_for_timeout(800)
+        if '집에서 잰 숫자' not in pv.inner_text('.app') or '혈압 최근 2주 평균' not in pv.inner_text('.app'): fails.append('혈압 수첩: 진료실 한 장(내 약 목록)에 집에서 잰 숫자가 없습니다')
         if verr: fails.append(f'혈압 수첩: JS 오류 {verr[:2]}')
         pv.close()
         # 필요할 때만 드시는 약 — 드신 때를 적고, 허가 간격·하루 상한으로 막아 드리는지(2026-09-29)

@@ -3752,6 +3752,17 @@ function vitalSave(){
   const cut = dayBefore(366); ME.vitals = vitals().filter(x => x.t >= cut).slice(-400);
   saveMe(); toast('적어 두었어요'); route();
 }
+/* 진료실 한 장에 붙는 «집에서 잰 숫자» — 아침·저녁을 나눠 보여야 약 시간을 바꿀 근거가 된다 */
+function vitalsCard(){
+  const a = bpAvg(14), cut = dayBefore(13);
+  const part = w => { const L = vitals().filter(x => x.k === 'bp' && x.w === w && x.t.slice(0, 10) >= cut); return L.length ? `${w} ${Math.round(L.reduce((n, x) => n + x.s, 0) / L.length)}/${Math.round(L.reduce((n, x) => n + x.d, 0) / L.length)}` : ''; };
+  const g = vitals().filter(x => x.k === 'bg').slice(-5);
+  if (!a && !g.length) return '';
+  return `<div class="show-card"><div class="show-head">집에서 잰 숫자</div>
+    ${a ? `<p class="show-big info">${I.heart}<span>혈압 최근 2주 평균 ${a.s}/${a.d} mmHg<small>${a.days}일 ${a.n}번${[part('아침'), part('저녁')].filter(Boolean).map(x => ' · ' + x).join('')}</small></span></p>` : ''}
+    ${g.length ? `<p class="show-big info">${I.info}<span>혈당 최근 ${g.length}번 (mg/dL)<small>${g.map(x => `${x.t.slice(5, 10).replace('-', '/')} ${esc(x.w || '')} ${x.v}`).join(' · ')}</small></span></p>` : ''}
+    <p class="small" style="margin-top:6px"><a class="link" href="#/vitals">혈압·혈당 수첩 열기 ›</a></p></div>`;
+}
 function vitalRemindToggle(){
   ME.vitalRemind = ME.vitalRemind || {};
   ME.vitalRemind.bp = (ME.vitalRemind.bp || []).length ? [] : ['07:30', '21:00'];
@@ -4756,6 +4767,7 @@ function vBag(){
     ${res.unknown.length ? `<p class="small muted" style="margin-top:8px">성분을 확인하지 못한 약 ${res.unknown.length}가지는 판정에서 빠져 있어요.</p>` : ''}
   </div>
   ${aeCard()}
+  ${vitalsCard()}
   <div class="actions"><button class="btn ghost" onclick="shareBag()">${I.cart} 메모로 복사·전송</button><button class="btn ghost" onclick="window.print()">${I.book} 종이로 뽑기</button><button class="btn ghost" onclick="go('/together')">${I.shield} 자세한 판정 보기</button></div>`}
   ${disclaimer('이 한 장은 참고용이에요. 약을 스스로 끊거나 바꾸지 마시고, 약사·의사의 판단을 따르세요.')}`;
 }
