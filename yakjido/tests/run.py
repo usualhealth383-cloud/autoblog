@@ -249,7 +249,7 @@ def main():
             except Exception: fails.append('본문 자료(core.json)를 못 받았습니다 — ' + pg.url)
         pg.goto(url); ready(); pg.wait_for_timeout(1200)
         pg.evaluate("localStorage.setItem('yakjido.hello.v1','1');localStorage.setItem('yakjido.me.v1',JSON.stringify({age:'senior',taking:['cls:bp.arb'],pub:{}}))")
-        routes = pg.evaluate("()=>['/home','/drugs','/tips','/me','/together','/kinds','/kinds/bp','/pill','/supp','/kids','/mix','/hello/1','/hello/3','/photo','/schedule','/about','/bag','/rxout','/senior','/myths','/askdoc','/askdoc?open=gout','/vitals']" +
+        routes = pg.evaluate("()=>['/home','/drugs','/tips','/me','/together','/kinds','/kinds/bp','/pill','/supp','/kids','/mix','/hello/1','/hello/3','/photo','/schedule','/about','/bag','/rxout','/senior','/myths','/askdoc','/askdoc?open=gout','/vitals','/visits']" +
                              ".concat(D.symptoms.map(s=>'/symptom/'+s.id)).concat(D.drugs.map(d=>'/drug/'+d.id)).concat(D.classes.map(c=>'/class/'+c.id)).concat(D.classes.map(c=>'/drugs?cat='+c.id)).concat((D.myths||[]).map(m=>'/myths?open='+m.id))")
         # 1~3. 모든 화면
         for r in routes:
@@ -519,7 +519,14 @@ def main():
         pv.click('.seg button:has-text("혈당")'); pv.wait_for_timeout(200); pv.fill('#vg', '62'); pv.click('button:has-text("적어 두기")'); pv.wait_for_timeout(250)
         if not pv.query_selector('.note.alert') or '저혈당' not in pv.inner_text('.note.alert'): fails.append('혈압 수첩: 70 미만인데 저혈당 안내가 없습니다')
         if '저혈당' not in pv.inner_text('.vt-list'): fails.append('혈압 수첩: 혈당 목록에 저혈당 표시가 없습니다')
+        # 진료 예약 적기 → 목록·홈 «내일 진료»·진료실 한 장
+        pv.goto(url + '#/visits'); pv.wait_for_timeout(600)
+        pv.fill('#vdate', '2026-09-30'); pv.fill('#vtime', '10:30'); pv.fill('#vwhere', '동네 내과'); pv.click('button:has-text("적어 두기")'); pv.wait_for_timeout(300)
+        if '9월 30일' not in pv.inner_text('.vt-list'): fails.append('진료 예약: 적은 예약이 목록에 없습니다')
+        pv.goto(url + '#/home'); pv.wait_for_timeout(800)
+        if '내일 진료' not in pv.inner_text('.util'): fails.append('진료 예약: 홈에 «내일 진료»가 없습니다')
         pv.goto(url + '#/bag'); pv.wait_for_timeout(800)
+        if '다음 진료' not in pv.inner_text('.app'): fails.append('진료 예약: 진료실 한 장에 다음 진료가 없습니다')
         if '집에서 잰 숫자' not in pv.inner_text('.app') or '혈압 최근 2주 평균' not in pv.inner_text('.app'): fails.append('혈압 수첩: 진료실 한 장(내 약 목록)에 집에서 잰 숫자가 없습니다')
         if verr: fails.append(f'혈압 수첩: JS 오류 {verr[:2]}')
         pv.close()
@@ -597,6 +604,10 @@ def main():
         pn.evaluate("()=>wipeMe()"); pn.wait_for_timeout(600)
         w = pn.evaluate("()=>({t:(ME.taking||[]).length, p:__LN.pending.length, ls:localStorage.getItem('yakjido.me.v1'), fs:localStorage.getItem('yakjido.fs')})")
         if w['t'] or w['p'] or w['ls'] or w['fs'] != '20px': fails.append(f'기록 모두 지우기가 제대로 안 됩니다 — {w}')
+        # 진료 예약 — 전날 19시·2시간 전
+        pn.evaluate("()=>{ME.visits=[{id:'v1',at:'2026-10-02T10:30',where:'동네 내과'}];saveMe();nativeArm();}"); pn.wait_for_timeout(500)
+        vv = pn.evaluate("()=>__LN.pending.filter(x=>x.extra&&x.extra.visit).map(x=>{const d=new Date(x.schedule.at);return (d.getMonth()+1)+'/'+d.getDate()+' '+d.getHours()+':'+d.getMinutes()}).sort()")
+        if vv != ['10/1 19:0', '10/2 8:30']: fails.append(f'앱 알람: 진료 예약 알림이 틀립니다 — {vv}')
         # 혈압 재기 알림 — 켜면 매일 7:30·21:00 두 개
         pn.evaluate("()=>{ME.vitalRemind={bp:['07:30','21:00']};saveMe();nativeArm();}"); pn.wait_for_timeout(500)
         vr = pn.evaluate("()=>__LN.pending.filter(x=>x.extra&&x.extra.vitals).map(x=>x.schedule.on.hour+':'+x.schedule.on.minute).sort()")

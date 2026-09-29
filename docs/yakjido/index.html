@@ -471,6 +471,7 @@ ul.steps li::before{content:counter(s);position:absolute;left:0;top:2px;width:24
 .vt-f{display:flex;flex-direction:column;gap:4px;font-size:.8125rem;color:var(--muted);font-weight:600}
 .vt-f input{width:96px;min-height:52px;padding:0 12px;border:1px solid var(--hairline);border-radius:var(--r-input);background:var(--card);color:var(--text);font-size:1.375rem;font-weight:800;font-variant-numeric:tabular-nums}
 .vt-f input::placeholder{color:var(--faint);font-weight:500;opacity:.55}
+.vt-f input[type=date],.vt-f input[type=time]{width:auto;min-width:150px;font-size:1.0625rem}
 .vt-f input:focus-visible{outline:2px solid var(--primary);outline-offset:1px}
 .vt-sl{font-size:1.5rem;color:var(--faint);padding-bottom:10px}
 .vt-big{display:flex;flex-direction:column;gap:2px}.vt-big span{font-size:.8125rem;color:var(--muted);font-weight:600}
@@ -1453,6 +1454,7 @@ const I = {
   x:'<svg class="i" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg>',
   user:'<svg class="i" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>',
   clock:'<svg class="i" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>',
+  cal:'<svg class="i" viewBox="0 0 24 24"><rect x="4" y="5.5" width="16" height="14.5" rx="2.5"/><path d="M4 10h16M8.5 3.5v4M15.5 3.5v4M8 14h2M14 14h2"/></svg>',
   cart:'<svg class="i" viewBox="0 0 24 24"><path d="M3 4h2l2.5 11h11L21 7H6.5"/><circle cx="9" cy="19" r="1.5"/><circle cx="17" cy="19" r="1.5"/></svg>',
   spine:'<svg class="i" viewBox="0 0 24 24"><path d="M12.6 3c-1.4 2.8-1.4 4.8 0 7.4s1.4 4.6 0 7.2-.9 2.4 0 3.4"/><path d="M9.6 5.2h5M9.2 8.8h5.4M9.6 12.4h5M9.2 16h5.4M10 19.4h4"/></svg>',
   joint: '<svg class="i" viewBox="0 0 24 24"><path d="M9.6 2.6v4.2a3 3 0 0 0 .9 2.1l1.2 1.2"/><path d="M12.6 14.2l-1.3 1.3a3 3 0 0 0-.9 2.1V22"/><circle cx="12" cy="12" r="3.4"/><path d="M4.6 11.4H2.4M5.2 7.8 3.4 6.6M5.2 15.6l-1.8 1.2"/><path d="M19.4 11.4h2.2M18.8 7.8l1.8-1.2M18.8 15.6l1.8 1.2"/></svg>',
@@ -1757,7 +1759,7 @@ function route(){
     ensureCore().then(route);
     return;
   }
-  const R = { show:vShow, check:vCheck, home:vHome, symptom:vSymptom, drugs:vDrugs, drug:vDrug, class:vClass, search:vSearch, pub:vPub, pill:vPill, guide:vGuide, kids:vKids, tips:vTips, myths:vMyths, schedule:vSchedule, photo:vPhoto, pillinfo:vPillInfo, supp:vSupp, compare:vCompare, me:vMe, about:vAbout, ingr:vIngr, brand:vBrand, nut:vNut, hello:vHello, mix:vMix, together:vTogether, kinds:vKinds, bag:vBag, rxout:vRxOut, senior:vSenior, askdoc:vAskDoc, vitals:vVitals };
+  const R = { show:vShow, check:vCheck, home:vHome, symptom:vSymptom, drugs:vDrugs, drug:vDrug, class:vClass, search:vSearch, pub:vPub, pill:vPill, guide:vGuide, kids:vKids, tips:vTips, myths:vMyths, schedule:vSchedule, photo:vPhoto, pillinfo:vPillInfo, supp:vSupp, compare:vCompare, me:vMe, about:vAbout, ingr:vIngr, brand:vBrand, nut:vNut, hello:vHello, mix:vMix, together:vTogether, kinds:vKinds, bag:vBag, rxout:vRxOut, senior:vSenior, askdoc:vAskDoc, vitals:vVitals, visits:vVisits };
   const html = (R[seg[0]] || vHome)(seg[1], q);
   const panel = gqPanel();
   view.innerHTML = panel ? insertPanel(html, panel) : html;
@@ -2441,6 +2443,7 @@ function vHome(){
     <h1 class="greet">어디가 불편하세요?</h1>
     <div class="q6" aria-label="자주 찾는 증상">${Q6.map(([id, nm]) => { const x = byId(D.symptoms, id); return x ? `<button class="q6i ${gcls(x.group)}" onclick="go('/symptom/${id}')"><span class="ic">${sicon(x)}</span><b>${esc(nm)}</b></button>` : ''; }).join('')}</div>
     <div class="util" aria-label="다른 방법으로 찾기">
+      ${(() => { const v = nextVisit(); if (!v) return ''; const days = Math.round((new Date(dayKey(new Date(v.at))) - new Date(todayKey())) / 86400000); return days <= 3 ? `<button class="util-row visit-soon" onclick="go('/visits')"><span class="ic">${I.cal}</span><span class="t"><b>${days <= 0 ? '오늘' : days === 1 ? '내일' : days + '일 뒤'} 진료</b><small>${esc(visitWord(v, false))} · 내 약 한 장 챙기기</small></span>${I.chev}</button>` : ''; })()}
       <button class="util-row" onclick="go('/guide/1')"><span class="ic">${I.check}</span><span class="t"><b>여기 없어요</b><small>질문 두 번으로 찾기</small></span>${I.chev}</button>
       <button class="util-row" onclick="go('/photo')"><span class="ic">${I.eye}</span><span class="t"><b>약 사진 찍기</b><small>상자·약봉투로 확인</small></span>${I.chev}</button>
       <button class="util-row" onclick="go('${n ? '/together' : '/kinds'}')"><span class="ic">${I.pill}</span><span class="t"><b>${n ? `드시는 약 ${n}가지` : '드시는 약 알려 주기'}</b><small>${n ? '같이 먹어도 되는지 확인' : '겹치는 약 거르기'}</small></span>${I.chev}</button>
@@ -3471,7 +3474,7 @@ async function nativeSetup(){
       const n = ev && ev.notification || {}; const key = n.extra && n.extra.key;
       if (ev.actionId === 'later') { nativeSnooze(n); return; }
       if (ev.actionId === 'took') tickFromNote(key);
-      go(n.extra && n.extra.vitals ? '/vitals' : '/schedule'); route();
+      go(n.extra && n.extra.vitals ? '/vitals' : n.extra && n.extra.visit ? '/visits' : '/schedule'); route();
     });
     NATIVE_PERM = (await LN.checkPermissions()).display;
     try { NATIVE_EXACT = (await LN.checkExactNotificationSetting()).exact_alarm; } catch (e) {}
@@ -3502,6 +3505,15 @@ async function nativeArm(){
         if (k === 0 && takenSet().includes(key)) continue;             /* 오늘 이미 드셨으면 다시 묻지 않는다 */
         list.push({ id: id++, title: '아직 안 드셨어요', body: `${d.name} — ${t}에 드실 약이에요. 드셨으면 「먹었어요」를 눌러 주세요.`.slice(0, 120), channelId: 'dose', actionTypeId: 'dose',
           extra: { key, again: dayKey(at) }, isExactNotification: exact, schedule: { at, allowWhileIdle: true } });
+      }
+    }
+    /* 진료 예약 — 전날 저녁 7시, 2시간 전 */
+    for (const v of visits()) {
+      const at = new Date(v.at); const eve = new Date(at); eve.setDate(eve.getDate() - 1); eve.setHours(19, 0, 0, 0);
+      const pre = new Date(at.getTime() - 2 * 3600000);
+      for (const [when, title, body] of [[eve, '내일 진료가 있어요', `${visitWord(v)} — 내 약 한 장·혈압 수첩을 챙기세요.`], [pre, '2시간 뒤 진료예요', `${visitWord(v)} — 드시는 약 목록을 챙기세요.`]]) {
+        if (when.getTime() <= now) continue;
+        list.push({ id: 600000 + id++, title, body: body.slice(0, 120), channelId: 'dose', extra: { visit: v.id }, isExactNotification: exact, schedule: { at: when, allowWhileIdle: true } });
       }
     }
     /* 혈압 재기 알림 — 수첩에서 켜 두신 분만. 지침의 «아침·저녁» 측정에 맞춘다 */
@@ -3892,6 +3904,51 @@ function vVitals(){
   </details>
   <div class="note soft" style="margin-top:12px">${I.alert}<span><b>갑자기 심한 두통·가슴 통증·숨참·한쪽 팔다리 힘 빠짐·말이 어눌함</b>이 있으면 숫자와 상관없이 <b>119</b>에 연락하세요.</span></div>
   ${disclaimer('기록은 진료를 돕는 참고 자료예요. 약을 늘리거나 줄이는 것은 의사와 상의하세요.')}`;
+}
+
+/* ───────── 진료 예약 ─────────
+   메디세이프의 「진료 예약」 자리. 전날 저녁 7시·2시간 전에 알리고, 진료실에 가져갈 것(내 약 한 장·혈압 수첩)을 바로 연다.
+   기록은 이 휴대폰에만(ME.visits). 병원 이름은 적지 않아도 된다. */
+let VS = {};
+function visits(){ ME.visits = ME.visits || []; return ME.visits; }
+function nextVisit(){ const now = Date.now(); return visits().filter(v => new Date(v.at).getTime() > now - 3 * 3600000).sort((a, b) => a.at.localeCompare(b.at))[0] || null; }
+function visitWord(v, rel = true){ const d = new Date(v.at), W = '일월화수목금토';
+  const days = Math.round((new Date(dayKey(d)) - new Date(todayKey())) / 86400000);
+  const when = days === 0 ? '오늘' : days === 1 ? '내일' : days > 0 ? `${days}일 뒤` : '';
+  return `${d.getMonth() + 1}월 ${d.getDate()}일(${W[d.getDay()]}) ${hhmm(d)}${rel && when ? ' · ' + when : ''}${v.where ? ' · ' + v.where : ''}`; }
+function visitSave(){
+  const dv = document.getElementById('vdate')?.value, tv = document.getElementById('vtime')?.value || '09:00';
+  const where = (document.getElementById('vwhere')?.value || '').trim().slice(0, 30);
+  if (!dv) { toast('날짜를 골라 주세요'); return; }
+  const at = dv + 'T' + tv;
+  if (new Date(at).getTime() < Date.now() - 60000) { toast('지난 날짜예요 — 다시 골라 주세요'); return; }
+  visits().push({ id: Date.now().toString(36), at, where });
+  ME.visits = visits().filter(v => new Date(v.at).getTime() > Date.now() - 30 * 86400000).sort((a, b) => a.at.localeCompare(b.at)).slice(-20);
+  saveMe(); armNotifications(); toast('적어 두었어요 — 전날·2시간 전에 알려 드려요'); route();
+}
+function visitDel(id){ ME.visits = visits().filter(v => v.id !== id); saveMe(); armNotifications(); route(); }
+function vVisits(){
+  const list = visits().filter(v => new Date(v.at).getTime() > Date.now() - 3 * 3600000).sort((a, b) => a.at.localeCompare(b.at));
+  const tmr = new Date(); tmr.setDate(tmr.getDate() + 1);
+  return `${topBar({ back:'내 정보' })}<div class="eyebrow">진료 예약</div><h1>다음 진료, 잊지 않게</h1>
+  <p style="margin-top:6px">날짜만 적어 두시면 ${NATIVE ? '<b>전날 저녁 7시</b>와 <b>2시간 전</b>에 알려 드려요.' : '여기와 홈에서 보여 드려요.'} 진료실에 가져가실 <b>내 약 한 장</b>과 <b>혈압 수첩</b>도 바로 열 수 있어요.</p>
+  <section class="sec card"><h2>예약 적기</h2>
+    <div class="vt-row"><label class="vt-f"><span>날짜</span><input id="vdate" type="date" min="${todayKey()}" value="${dayKey(tmr)}" aria-label="진료 날짜"></label>
+      <label class="vt-f"><span>시간</span><input id="vtime" type="time" value="10:00" aria-label="진료 시간"></label></div>
+    <label class="vt-f" style="margin-top:10px"><span>병원·과 <small>(선택)</small></span><input id="vwhere" type="text" maxlength="30" placeholder="예: 동네 내과" aria-label="병원이나 과 이름(선택)" style="width:100%;font-size:1.0625rem;font-weight:600"></label>
+    <div class="actions" style="margin-top:12px"><button class="btn" onclick="visitSave()">${I.check} 적어 두기</button></div>
+  </section>
+  <section class="sec card"><h2>다가오는 진료 <small>${list.length}건</small></h2>
+    ${list.length ? `<div class="vt-list">${list.map(v => `<div class="vt-li"><span class="vt-t">${esc(visitWord(v))}</span><button class="vt-x" onclick="visitDel('${v.id}')" aria-label="이 예약 지우기">${I.x}</button></div>`).join('')}</div>` : `<div class="empty"><b>적어 둔 예약이 없어요</b>위에서 날짜를 골라 적어 보세요.</div>`}
+  </section>
+  <section class="sec card"><h2>진료실에 가져가실 것</h2>
+    <div class="util" style="margin-top:10px">
+      <button class="util-row" onclick="go('/bag')"><span class="ic">${I.pill}</span><span class="t"><b>내 약 한 장</b><small>드시는 약·집에서 잰 혈압</small></span>${I.chev}</button>
+      <button class="util-row" onclick="go('/vitals')"><span class="ic">${I.heart}</span><span class="t"><b>혈압·혈당 수첩</b><small>2주 흐름</small></span>${I.chev}</button>
+    </div>
+    <p class="small muted" style="margin-top:10px">약이 며칠 남았는지도 확인해 두시면, 진료 때 처방 기간을 맞추기 좋아요.</p>
+  </section>
+  ${disclaimer('알림은 잊지 않도록 돕는 도구예요. 예약 변경은 병원에 직접 확인하세요.')}`;
 }
 
 /* ───────── 3단계 안내(처음 오신 분 진입로) ───────── */
@@ -4839,6 +4896,7 @@ function vBag(){
   </div>
   ${aeCard()}
   ${vitalsCard()}
+  ${nextVisit() ? `<p class="small muted" style="margin-top:10px">다음 진료 — ${esc(visitWord(nextVisit()))}</p>` : ''}
   <div class="actions"><button class="btn ghost" onclick="shareBag()">${I.cart} 메모로 복사·전송</button><button class="btn ghost" onclick="window.print()">${I.book} 종이로 뽑기</button><button class="btn ghost" onclick="go('/together')">${I.shield} 자세한 판정 보기</button></div>`}
   ${disclaimer('이 한 장은 참고용이에요. 약을 스스로 끊거나 바꾸지 마시고, 약사·의사의 판단을 따르세요.')}`;
 }
@@ -5194,7 +5252,11 @@ function vMe(){
     ${MQ.trim() ? `<div class="card rows" style="margin-top:8px">${(search(MQ.trim()).filter(h => h.h.startsWith('/drug/')).slice(0, 6).map(h => { const id = h.h.slice(6); const on = (ME.taking || []).includes(id); return `<button class="row" onclick="${on ? '' : `toggleTaking('${id}');`}MQ='';route()"><div class="ic">${I.pill}</div><div class="body"><b>${esc(h.t)}</b><span>${on ? '이미 등록돼 있어요' : '눌러서 내 약통에 담기'}</span></div>${I.chev}</button>`; }).join('')) || '<div class="empty">찾는 약이 없어요</div>'}</div>` : ''}
     ${takingItems().length ? `<p class="small muted" style="margin-top:8px">항생제·감기약처럼 <b>며칠만</b> 드시는 약은 ‘며칠만’을 눌러 두세요. 매일 드시는 약과 구분해서 부담을 셉니다.</p><button class="tog-cta" onclick="go('/together')">${I.shield}<div><b>같이 먹어도 되나요</b><span>담아 두신 ${takingItems().length}가지를 성분으로 풀어서 서로 부딪히는 자리를 봐 드려요</span></div>${I.chev}</button><button class="tog-cta" onclick="go('/bag')">${I.eye}<div><b>내 약 목록 한 장</b><span>진료실·약국에서 큰 글씨로 보여 드리세요</span></div>${I.chev}</button>` : ''}
     ${achPanel([], { always:true })}
-    <div class="actions two"><button class="btn ghost" onclick="go('/schedule')">${I.clock} 복용 시간 알림</button><button class="btn ghost" onclick="go('/vitals')">${I.heart} 혈압·혈당 수첩</button></div>
+    <div class="util" style="margin-top:14px">
+      <button class="util-row" onclick="go('/schedule')"><span class="ic">${I.clock}</span><span class="t"><b>복용 시간 알림</b><small>먹었어요 체크·약 떨어지기 전 알림</small></span>${I.chev}</button>
+      <button class="util-row" onclick="go('/vitals')"><span class="ic">${I.heart}</span><span class="t"><b>혈압·혈당 수첩</b><small>2주 흐름·7일 평균</small></span>${I.chev}</button>
+      <button class="util-row" onclick="go('/visits')"><span class="ic">${I.cal}</span><span class="t"><b>진료 예약</b><small>${nextVisit() ? esc(visitWord(nextVisit())) : '전날·2시간 전에 알려 드려요'}</small></span>${I.chev}</button>
+    </div>
   </section>
   <section class="sec card"><h2>알아두면 좋은 것</h2><p class="small" style="margin-top:6px">상품명과 성분명, 해열제는 치료가 아니라는 것, 소염제는 한 가지만 — 짧은 건강정보 ${(D.tips || []).length}가지.</p><div class="actions"><button class="btn ghost" onclick="go('/tips')">${I.info} 읽어 보기</button></div></section>
   <section class="sec card"><h2>사진 서버 <small class="muted" style="font-weight:500;font-size:.8125rem">관리자용</small></h2><p class="small" style="margin-top:6px">사진 읽기(Gemini) 서버 주소예요. yakjido/server 를 배포한 뒤 붙여 넣으세요. 비워 두면 기본값(${esc(D.meta?.photoEndpoint || '없음')}).</p><div class="search" style="margin-top:10px">${I.link}<input id="ep" aria-label="사진 서버 주소" placeholder="https://<워커이름>.workers.dev" value="${esc((() => { try { return localStorage.getItem('yakjido.photo') || ''; } catch (e) { return ''; } })())}" onchange="try{localStorage.setItem('yakjido.photo',this.value.trim())}catch(e){};toast('저장했어요')"></div></section>
