@@ -572,6 +572,10 @@ def main():
         pn.evaluate("()=>wipeMe()"); pn.wait_for_timeout(600)
         w = pn.evaluate("()=>({t:(ME.taking||[]).length, p:__LN.pending.length, ls:localStorage.getItem('yakjido.me.v1'), fs:localStorage.getItem('yakjido.fs')})")
         if w['t'] or w['p'] or w['ls'] or w['fs'] != '20px': fails.append(f'기록 모두 지우기가 제대로 안 됩니다 — {w}')
+        # 혈압 재기 알림 — 켜면 매일 7:30·21:00 두 개
+        pn.evaluate("()=>{ME.vitalRemind={bp:['07:30','21:00']};saveMe();nativeArm();}"); pn.wait_for_timeout(500)
+        vr = pn.evaluate("()=>__LN.pending.filter(x=>x.extra&&x.extra.vitals).map(x=>x.schedule.on.hour+':'+x.schedule.on.minute).sort()")
+        if vr != ['21:0', '7:30']: fails.append(f'앱 알람: 혈압 재기 알림이 틀립니다 — {vr}')
         if nerr: fails.append(f'앱 알람: JS 오류 {nerr[:2]}')
         pn.close()
         # 6b-2. 성분표에 없던 공공 제품 — 클로닉신(먹는 소염제 26개 제품)·돔페리돈이 약통에서 실제로 걸려야 한다(2026-09-23)

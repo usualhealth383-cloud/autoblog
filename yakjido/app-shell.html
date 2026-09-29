@@ -3440,7 +3440,7 @@ async function nativeSetup(){
       const n = ev && ev.notification || {}; const key = n.extra && n.extra.key;
       if (ev.actionId === 'later') { nativeSnooze(n); return; }
       if (ev.actionId === 'took') tickFromNote(key);
-      go('/schedule'); route();
+      go(n.extra && n.extra.vitals ? '/vitals' : '/schedule'); route();
     });
     NATIVE_PERM = (await LN.checkPermissions()).display;
     try { NATIVE_EXACT = (await LN.checkExactNotificationSetting()).exact_alarm; } catch (e) {}
@@ -3473,6 +3473,10 @@ async function nativeArm(){
           extra: { key, again: dayKey(at) }, isExactNotification: exact, schedule: { at, allowWhileIdle: true } });
       }
     }
+    /* 혈압 재기 알림 — 수첩에서 켜 두신 분만. 지침의 «아침·저녁» 측정에 맞춘다 */
+    for (const t of ((ME.vitalRemind || {}).bp || [])) { const [h, m] = t.split(':').map(Number);
+      list.push({ id: 700000 + id++, title: '약지도 · 혈압 잴 시간', body: t < '12:00' ? '일어나 1시간 안, 소변 본 뒤, 혈압약 먹기 전에 재 주세요.' : '잠자기 전에 재 주세요. 앉아서 몇 분 쉰 뒤에요.',
+        channelId: 'dose', extra: { vitals: 'bp' }, isExactNotification: exact, schedule: { on: { hour: h, minute: m }, allowWhileIdle: true } }); }
     /* 약이 떨어지기 전에 — 남은 알 수를 넣어 두신 약만. 3일치·1일치 남는 날 아침 9시에 한 번씩(메디세이프의 「리필 알림」 자리) */
     for (const d of takingItems()) {
       const dl = daysLeft(d.id); if (dl == null) continue;
@@ -3577,7 +3581,7 @@ function careReport(){
   const low = lowStock();
   const a = adherence(30);
   return `${head} (${done}/${rows.length} 드셨어요)\n\n${body}` +
-    prnLine + (a.days ? `\n\n어제까지 30일: 드시기로 한 ${a.days}일 중 ${a.full}일은 빠짐없이 드셨어요` : '') +
+    prnLine + (bpAvg(7) ? `\n\n최근 7일 혈압 평균 ${bpAvg(7).s}/${bpAvg(7).d} mmHg (${bpAvg(7).n}번 잼)` : '') + (a.days ? `\n\n어제까지 30일: 드시기로 한 ${a.days}일 중 ${a.full}일은 빠짐없이 드셨어요` : '') +
     (low.length ? `\n\n※ 곧 떨어져요: ${low.map(x => `${x.n} ${x.days}일치`).join(', ')}` : '') +
     `\n\n— 약지도에서 보냄`;
 }
@@ -3748,6 +3752,11 @@ function vitalSave(){
   const cut = dayBefore(366); ME.vitals = vitals().filter(x => x.t >= cut).slice(-400);
   saveMe(); toast('적어 두었어요'); route();
 }
+function vitalRemindToggle(){
+  ME.vitalRemind = ME.vitalRemind || {};
+  ME.vitalRemind.bp = (ME.vitalRemind.bp || []).length ? [] : ['07:30', '21:00'];
+  saveMe(); armNotifications(); toast(ME.vitalRemind.bp.length ? '아침 7:30 · 저녁 9:00에 알려 드릴게요' : '혈압 재기 알림을 껐어요'); route();
+}
 function vitalDel(i){ const L = vitals(); if (!L[i]) return; L.splice(i, 1); saveMe(); route(); }
 const slotWord = d => d.getHours() < 12 ? '아침' : d.getHours() >= 18 ? '저녁' : '낮';
 /* 최근 7일 평균 — 지침은 «주 5일 이상, 아침·저녁» 잰 값을 평균 낸다 */
@@ -3801,6 +3810,7 @@ function vVitals(){
     ${lastBp && hiAvg ? `<p class="small muted" style="margin-top:8px">코막힘약(슈도에페드린·페닐레프린·에페드린)은 혈압을 올릴 수 있어요 — 약국에서 «혈압이 높다»고 말씀하세요.</p>` : ''}
   </section>` : ''}
   <section class="sec card"><h2>2주 흐름</h2>${vitalChart(k)}</section>
+  ${k === 'bp' && NATIVE ? `<section class="sec card"><div class="toggle"><div class="t"><b>혈압 재기 알림</b><span>${((ME.vitalRemind || {}).bp || []).length ? '아침 7:30 · 저녁 9:00 — 켜져 있어요' : '매일 아침·저녁 잴 시간을 알려 드려요'}</span></div><button class="btn ghost" style="width:auto;min-height:40px;padding:0 14px" onclick="vitalRemindToggle()">${((ME.vitalRemind || {}).bp || []).length ? '끄기' : '켜기'}</button></div></section>` : ''}
   <section class="sec card"><h2>적은 기록 <small>${mine.length}번</small></h2>
     ${mine.length ? `<div class="vt-list">${mine.slice(0, 30).map(x => `<div class="vt-li"><span class="vt-t">${x.t.slice(5, 10).replace('-', '/')} <small>${x.t.slice(11)} · ${esc(x.w || '')}</small></span><b>${k === 'bp' ? `${x.s}/${x.d}<small> mmHg${x.p ? ` · 맥박 ${x.p}` : ''}</small>` : `${x.v}<small> mg/dL</small>`}</b><button class="vt-x" onclick="vitalDel(${x.i})" aria-label="이 기록 지우기">${I.x}</button></div>`).join('')}</div>` : `<div class="empty"><b>아직 적은 기록이 없어요</b>위에서 한 번 적어 보세요.</div>`}
     ${mine.length ? `<div class="actions" style="margin-top:12px"><button class="btn line" onclick="window.print()">${I.book} 진료 때 보여 드리기(인쇄·PDF)</button></div>` : ''}
