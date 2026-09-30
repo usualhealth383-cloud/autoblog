@@ -111,6 +111,29 @@ for d in D: jargon({k: v for k, v in d.items() if k != 'riskNote'}, '', '약 ' +
 for k in K: jargon(k, '', '계열 ' + k['id'])
 for x in SUP: jargon(x, '', '영양제 ' + x['id'])
 for t in T: jargon(t, '', '팁 ' + t['id'])
+
+# ── 영어 약어를 본문에 쓰지 않는다(현욱님 규칙) — MAO·SSRI·PPI·DUR 가 약 화면·병용 규칙에 남아 있었다(자체 비판 3차) ──
+ABBR = re.compile(r'\b(SSRI|SNRI|MAO|MAOI|PPI|DUR|NSAIDs?|ACE|ARB|INR|VTE|DVT|OTC)\b')
+def abbr(o, path, owner):
+    if isinstance(o, str):
+        if ABBR.search(o) and not any(k in path for k in ('src', 'source', '.en', 'note')): fails.append(f'영어 약어 {owner}{path}: {o[:60]!r}')
+    elif isinstance(o, dict):
+        for k, v in o.items():
+            if k not in ('id', 'en', 'class', 'flags', 'sources', 'srcText'): abbr(v, path + '.' + k, owner)
+    elif isinstance(o, list):
+        for i, v in enumerate(o): abbr(v, path + f'[{i}]', owner)
+for s in S: abbr(s, '', '증상 ' + s['id'])
+for d in D: abbr(d, '', '약 ' + d['id'])
+for k in K: abbr(k, '', '계열 ' + k['id'])
+for x in SUP: abbr(x, '', '영양제 ' + x['id'])
+
+# ── 계열 설명이 «모두 처방약·약국에서 살 수 없다»고 하는데 약국 약이 끼어 있으면 안 된다 ──
+# 여성 호르몬약(피임약 추가)·방광·전립선약(리도카인 크림 추가) 설명이 새 약과 어긋나 있었다(자체 비판 3차)
+_DRX = {d['id']: d.get('rx') for d in D}
+for k in K:
+    if re.search(r'약국에서 살 수 없|모두 처방', k.get('lead', '')) and not re.search(r'약국|처방 없이', re.sub(r'약국에서 살 수 없', '', k.get('lead', ''))):
+        otc = [m for m in k.get('members', []) if _DRX.get(m) in ('일반', '안전상비')]
+        if otc: fails.append(f'계열 {k["id"]} 설명은 «모두 처방»인데 약국 약이 있어요: {otc}')
 # 「쉬운 말 한 줄」과 「용법」의 하루 횟수가 어긋나면 안 된다.
 # 신신플렉스가 한쪽엔 «하루 3번», 허가 용법엔 «1일 2회»로 적혀 있었다 — 어르신이 읽는 쪽이 1.5배였다.
 _NUM = {'한': 1, '두': 2, '세': 3, '네': 4, '다섯': 5, '여섯': 6}

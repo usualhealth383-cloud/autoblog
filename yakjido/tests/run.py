@@ -824,11 +824,28 @@ def main():
         r8d = pg.evaluate("async(Q)=>{ await lexLoad(true); return Object.fromEntries(Object.keys(Q).map(q=>[q,(search(q)[0]||{t:''}).t])); }", SAY2)
         for q, want in SAY2.items():
             if want not in (r8d.get(q) or ''): fails.append(f'문장 검색 "{q}" 첫 결과 {r8d.get(q)!r} (기대: {want} 포함)')
+        # 8e. 자체 비판 3차(2026-09-30) — 새 약 화면을 사람들이 부르는 말로 찾을 수 있어야 하고, 엉뚱한 것이 끼면 안 된다.
+        #     「안약」에 티눈이, 「멍빼는약」에 수면유도제가 떠 있었고 「빨간눈」·「간장약」은 0건이었다.
+        SAY3 = {'안약': ('안약', '티눈'), '빨간눈': ('충혈', None), '간장약': ('우르소데옥시콜산', None), '간영양제': ('우르소데옥시콜산', None),
+                '눈가려움': ('알레르기 안약', None), '각질': ('요소', None), '멍빼는약': ('멍', '독시라민'), '피임약': ('피임', None),
+                '조루': ('리도카인', None), '흉터': ('흉터', None), '발톱무좀': ('네일라카', None), '우루사': ('우루사', None)}
+        r8e = pg.evaluate("async(Q)=>{ await lexLoad(true); return Object.fromEntries(Q.map(q=>[q,search(q).slice(0,5).map(x=>x.t)])); }", list(SAY3))
+        for q, (want, bad) in SAY3.items():
+            got = r8e.get(q) or []
+            if not any(want in t for t in got): fails.append(f'검색 "{q}" 상위 5개에 {want!r} 없음: {got}')
+            if bad and any(bad in t for t in got): fails.append(f'검색 "{q}" 에 엉뚱한 {bad!r}: {got}')
+        # 8f. 「하루 최대」는 숫자일 때만 — 「하루 최대 처방에 따름」이 65개 약에 떠 있었다
+        r8f = pg.evaluate("""()=>(D.drugs||[]).filter(d=>d.dose).map(d=>{ const mx=d.dose.max||''; const rule=/세요|따르|달라져|줄이/.test(mx);
+            const t=maxLine(mx,rule).replace(/<[^>]+>/g,''); return (/하루 최대 하루/.test(t) || /^하루 최대 [^\d약]/.test(t) || /^하루 최대 [\d.,~\s]+(일|주|개월|달|시간|년)/.test(t) || /하루 최대 [^·]*\/일/.test(t)) ? d.id+': '+t : null; }).filter(Boolean)""")
+        if r8f: fails.append(f'「하루 최대」가 어색하게 붙은 약 {len(r8f)}개: {r8f[:4]}')
+        # 8g. 안약·크림에 «먹는 약»이라고 쓰지 않는다
+        r8g = pg.evaluate("()=>['eye-decongestant','allergy-eyedrop','urea-cream','scar-gel','artificial-tears','naftifine','ciclopirox-nail'].filter(id=>isOral(drug(id))).concat(['ibuprofen','udca','oral-contraceptive'].filter(id=>!isOral(drug(id))).map(x=>'!'+x))")
+        if r8g: fails.append(f'먹는 약/바르는 약 구분이 틀림: {r8g}')
         br.close()
     print(f'화면 {len(routes)}개 검사 완료')
     if fails:
         print('실패', len(fails)); [print('  ✗', f) for f in fails]; sys.exit(1)
-    print('✓ 전부 통과 — JS 오류 0 · 넘침 0 · 잘림 0 · 명암비 AA · 조작 부품 3:1 · 44px · 단추 누르기 · 복용 간격 · 복약 달력 · 홈 오늘약 · 어르신 소염제 · 소아 한도 · 계열 경고 · 어근 오인 · 내 정보 칸 · 화면 밝기 · 아이콘 전수 · 약 알림 · 어르신 모드 · 320px · 병용 8건 · 겹침 규칙 53 · 입력칸 이름표 · 성분 해석 123 · 죽은 규칙 0 · 약통 판정 4건 · 자기중복 3건 · 바구니 겹침 · 이중계산 0 · 검색 8건 · 구어 30건 · 문장 16건')
+    print('✓ 전부 통과 — JS 오류 0 · 넘침 0 · 잘림 0 · 명암비 AA · 조작 부품 3:1 · 44px · 단추 누르기 · 복용 간격 · 복약 달력 · 홈 오늘약 · 어르신 소염제 · 소아 한도 · 계열 경고 · 어근 오인 · 내 정보 칸 · 화면 밝기 · 아이콘 전수 · 약 알림 · 어르신 모드 · 320px · 병용 8건 · 겹침 규칙 53 · 입력칸 이름표 · 성분 해석 123 · 죽은 규칙 0 · 약통 판정 4건 · 자기중복 3건 · 바구니 겹침 · 이중계산 0 · 검색 8건 · 구어 30건 · 문장 16건 · 새 약 검색 12건 · 하루 최대 표기 · 먹는/바르는 구분')
 
 if __name__ == '__main__':
     main()
