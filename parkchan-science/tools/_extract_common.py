@@ -6,7 +6,6 @@
   → 파일 안의 모든 <defs> 에서 id 가 붙은 정의를 모아, 그림이 쓰는 것을 (그 정의가 다시 쓰는 것까지) 넣는다
 """
 import html as _html, re
-from bs4 import BeautifulSoup
 
 SUP_U = str.maketrans('0123456789+-−n', '⁰¹²³⁴⁵⁶⁷⁸⁹⁺⁻⁻ⁿ'); SUB_U = str.maketrans('0123456789+-', '₀₁₂₃₄₅₆₇₈₉₊₋')
 UNI_SS = '⁰¹²³⁴⁵⁶⁷⁸⁹⁺⁻ⁿ₀₁₂₃₄₅₆₇₈₉₊₋'
@@ -26,6 +25,7 @@ def strip_tags(t):
 
 
 def plain_text(node, sep=' '):
+    from bs4 import BeautifulSoup   # 추출할 때만 필요(점검 check_content.py 는 bs4 없이 돈다 — CI)
     return BeautifulSoup(supsub_uni(str(node)), 'html.parser').get_text(sep)
 
 
