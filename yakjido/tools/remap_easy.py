@@ -109,6 +109,7 @@ BY_FORM = {'클로트리마졸': {'insert':'clotrimazole-vag', 'skin':'clotrimaz
            '니코틴': {'patch':'nicotine-patch', 'solid':'nicotine-gum', 'troche':'nicotine-gum'},
            # 산화아연은 알약(종합비타민)에서는 아연 보충, 연고·파스에서는 피부 보호제 — 알약만 아연 화면으로
            '산화아연': {'solid':'supp:zinc'}, '황산아연': {'solid':'supp:zinc'}, '황산아연일수화물': {'solid':'supp:zinc'},
+           '테트라히드로졸린염산염': {'eye':'eye-decongestant'},
            '우레아': {'skin':'urea-cream'}, '요소': {'skin':'urea-cream'}}
 # 제품 이름에 이 말이 있을 때만 잇는다 — 케토코나졸 «샴푸»만 약 사전의 샴푸 화면으로(크림·정제는 다른 약)
 BY_NAME = {'케토코나졸': ('샴푸', 'ketoconazole-shampoo'), '시클로피록스': ('샴푸', 'ciclopirox-shampoo')}
@@ -120,9 +121,9 @@ TOPICAL = ('skin', 'patch', 'spray')
 FORM_FIX = {
   'chlorpheniramine': {'eye': None, 'nasal': None, **{f: 'antihistamine-topical' for f in TOPICAL}},
   'diphenhydramine': {'eye': None, 'nasal': None, **{f: 'antihistamine-topical' for f in TOPICAL}},
-  'xylometazoline': {'eye': None},                     # 나파졸린 «점안액»은 코 뚫는 약이 아니다
+  'xylometazoline': {'eye': 'eye-decongestant'},       # 나파졸린 «점안액»은 코 뚫는 약이 아니라 충혈 안약
   'methylephedrine': {'skin': 'hemorrhoid-topical', 'eye': None},   # 치질 연고의 혈관수축 성분
-  'phenylephrine': {'skin': 'hemorrhoid-topical', 'eye': None},
+  'phenylephrine': {'skin': 'hemorrhoid-topical', 'eye': 'eye-decongestant'},
   'ibuprofen': {'patch': 'ibuprofen-patch'},
   'menthol': {'liquid': None},                         # 마시는 소화제·드링크의 멘톨은 냉감 파스가 아니다
   'antacid-mg': {'eye': None},

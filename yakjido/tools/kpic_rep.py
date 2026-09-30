@@ -32,6 +32,7 @@ MANUAL = {
     'cyclobenzaprine': ('cyclobenzaprine', '시클펜정', 'cyclobenzaprine'),
     'udca': ('우루사정', '우루사정100', 'ursodeoxycholic'),
     'urea-cream': ('유리아크림', '한미유리아크림', 'urea'),
+    'eye-decongestant': ('나조린', '나조린점안액', 'naphazoline'),
     'vitamin-d-rx': ('디맥', '디맥정7000IU', 'cholecalciferol'),
 }
 
