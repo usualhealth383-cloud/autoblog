@@ -174,6 +174,7 @@ def main():
       check('  └ 보통 글은 원장에게 알리지 않음', SENT == [], SENT)
       SENT.clear(); call('POST', '/functions/v1/push', {'type': 'INSERT', 'table': 'comments', 'record': {'post_id': pid, 'author': 'someone-else', 'body': '자해하고 싶어', 'care': True}}, headers=PH)
       check('힘든 마음의 댓글 → 원장 + 글쓴이(보통 댓글 알림)', sorted(m['token'] for m in SENT) == ['tok-own', 'tok-stu1'], [m['token'] for m in SENT])
+      check('  └ 글쓴이 폰 알림에도 댓글 내용은 싣지 않음', all('자해' not in json.dumps(m, ensure_ascii=False) for m in SENT), SENT)
   finally:
       for p in procs: p.terminate()
 

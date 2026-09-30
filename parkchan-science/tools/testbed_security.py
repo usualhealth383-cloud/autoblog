@@ -193,6 +193,16 @@ s, _ = call('POST', '/rest/v1/notes', {'id': str(_uuid.uuid4()), 'date': '2026-0
 s, _ = call('POST', '/rest/v1/notes', {'id': str(_uuid.uuid4()), 'date': '2026-09-30', 'title': '', 'body': 'x' * 5001, 'cids': []}, N1); check('내용 5,000자 넘으면 거절', s >= 400, s)
 K5, K5_ID = signup('kid5@test.kr', '동의전', under14=True, guardian='최보호 01077778888')
 s, _ = call('POST', '/rest/v1/notes', {'id': str(_uuid.uuid4()), 'date': '2026-09-30', 'title': '동의 전', 'body': '', 'cids': []}, K5); check('보호자 동의 전에는 노트를 서버에 못 남김', s >= 400, s)
+# 나중에 고친 쪽이 이긴다 — 옛 기기가 늦게 올린 더 오래된 수정은 버린다
+s, _ = call('POST', '/rest/v1/notes?on_conflict=id', {'id': nid, 'date': '2026-09-30', 'title': '새 제목', 'body': '나만 봄', 'cids': [], 'updated_at': '2026-10-01T10:05:00+09:00'}, N1, UP)
+s, _ = call('POST', '/rest/v1/notes?on_conflict=id', {'id': nid, 'date': '2026-09-30', 'title': '옛 제목', 'body': '나만 봄', 'cids': [], 'updated_at': '2026-10-01T10:00:00+09:00'}, N1, UP)
+s, j = call('GET', f'/rest/v1/notes?id=eq.{nid}&select=title', tok=N1); check('더 오래된 수정은 새 수정을 덮지 않음', j and j[0]['title'] == '새 제목', (s, j))
+call('PATCH', f'/rest/v1/notes?id=eq.{nid}', {'title': '비밀 메모', 'updated_at': '2026-10-01T11:00:00+09:00'}, N1)
+# 3,000개 제한: 가득 차도 이미 있는 노트는 고칠 수 있고, 새로 넣기만 막힌다
+cur.execute("insert into notes (id, uid, date, title) select gen_random_uuid(), %s, date '2026-01-01', 'bulk' from generate_series(1, 2999)", (N1_ID,)); cur.connection.commit()
+s, _ = call('POST', '/rest/v1/notes?on_conflict=id', {'id': nid, 'date': '2026-09-30', 'title': '비밀 메모', 'body': '가득 차도 고침', 'cids': [], 'updated_at': '2026-10-01T12:00:00+09:00'}, N1, UP); check('3,000개가 차도 기존 노트 고치기는 됨', s in (200, 201), s)
+s, _ = call('POST', '/rest/v1/notes?on_conflict=id', {'id': str(_uuid.uuid4()), 'date': '2026-09-30', 'title': '하나 더', 'body': '', 'cids': []}, N1, UP); check('3,000개를 넘는 새 노트는 거절', s >= 400, s)
+cur.execute("delete from notes where uid = %s and title = 'bulk'", (N1_ID,)); cur.connection.commit()
 cur.execute('select count(*) from notes where title = %s', ('비밀 메모',)); before = cur.fetchone()[0]
 rpc('delete_my_account', {}, N1); cur.connection.commit()
 cur.execute('select count(*) from notes where title = %s', ('비밀 메모',)); check('계정 삭제하면 노트도 지워짐', before == 1 and cur.fetchone()[0] == 0)
@@ -203,8 +213,12 @@ check('힘든 마음의 글은 서버가 care 표시', s == 201 and j[0].get('ca
 s, j = call('PATCH', f'/rest/v1/posts?id=eq.{cid}', {'care': False}, N2, 'return=representation'); check('care 표시를 스스로 못 끔', s >= 400, (s, j))
 s, j = call('POST', '/rest/v1/posts?select=id,care', {'board': 'qna', 'title': '세포 자살', 'body': '아폽토시스를 세포 자살이라 하나요? 유서 깊은 실험'}, N2, 'return=representation'); check('과학 용어는 care 아님', s == 201 and j[0].get('care') is False, (s, j))
 s, j = call('POST', '/rest/v1/posts', {'board': 'talk', 'title': '괜찮아', 'body': '그냥 궁금해서', 'care': False}, N2); check('글쓸 때 care 칸을 직접 못 넣음', s >= 400, (s, j))
+s, j = call('POST', '/rest/v1/posts?select=id,care', {'board': 'talk', 'title': '109 안내', 'body': '친구가 죽고 싶다고 하면 109로 연락하세요'}, OWN, 'return=representation'); oid = j[0]['id'] if s == 201 else None
+check('원장이 쓴 안내 글도 care 판정은 됨', s == 201 and j[0].get('care') is True, (s, j))
+s, j = call('POST', '/rest/v1/posts?select=id,care', {'board': 'qna', 'title': '세포의 자살', 'body': '세포가 자살한다는 게 무슨 뜻? 자살예방 캠페인 과제도 있어요'}, N2, 'return=representation'); check('세포의 자살·자살예방 과제는 care 아님', s == 201 and j[0].get('care') is False, (s, j))
 s, j = rpc('care_list', {}, N2); check('학생은 먼저 살펴볼 목록을 못 받음', s == 200 and j == [], j)
 s, j = rpc('care_list', {}, OWN); check('원장은 이름과 함께 받음', s == 200 and any(x['post_id'] == cid and x['name'] == '노트둘' for x in j), j)
+check('  └ 원장이 쓴 글은 먼저 살펴볼 목록에 안 뜸', not any(x['post_id'] == oid for x in j), j)
 s, j = call('PATCH', f'/rest/v1/posts?id=eq.{cid}&select=id,care', {'body': '이제 괜찮아요. 고마워요'}, N2, 'return=representation'); check('  └ 고쳐 쓰면 다시 판정', s == 200 and j and j[0].get('care') is False, (s, j))
 
 print(f'\n보안 시험 {len(OK)}/{len(OK) + len(BAD)} 통과')

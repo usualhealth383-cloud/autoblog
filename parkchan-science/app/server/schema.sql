@@ -134,15 +134,25 @@ create table if not exists notes (
 create index if not exists notes_uid_date on notes (uid, date);
 create or replace function private.note_guard() returns trigger language plpgsql security definer set search_path = public as $$
 begin
-  if tg_op = 'INSERT' and (select count(*) from notes where uid = new.uid) >= 3000 then
-    raise exception 'note_limit' using hint = '노트는 3,000개까지 저장됩니다';
+  if auth.uid() is not null then new.uid := auth.uid(); end if;   -- 앱에서 오는 요청은 늘 본인 것으로(남의 계정으로 넣기 막기) · 관리용 SQL 은 그대로
+  if tg_op = 'UPDATE' then
+    new.created_at := old.created_at;
+    if new.updated_at < old.updated_at then return null; end if;   -- 더 오래된 수정(늦게 올라온 옛 기기의 것)은 버린다 — 나중에 고친 쪽이 이긴다
   end if;
-  new.uid := auth.uid();                       -- 남의 계정으로 넣기 막기
-  if tg_op = 'UPDATE' then new.created_at := old.created_at; end if;
   return new;
 end $$;
 drop trigger if exists notes_guard on notes;
 create trigger notes_guard before insert or update on notes for each row execute function private.note_guard();
+-- 개수 제한은 '정말 새로 들어간 뒤'에 센다 — 올리기(upsert)의 BEFORE INSERT 는 이미 있는 노트를 고칠 때도 불리므로
+create or replace function private.note_limit() returns trigger language plpgsql security definer set search_path = public as $$
+begin
+  if (select count(*) from notes where uid = new.uid) > 3000 then
+    raise exception 'note_limit' using hint = '노트는 3,000개까지 저장됩니다';
+  end if;
+  return null;
+end $$;
+drop trigger if exists notes_limit on notes;
+create trigger notes_limit after insert on notes for each row execute function private.note_limit();
 
 -- 이야기(커뮤니티)
 create table if not exists posts (
@@ -365,7 +375,7 @@ end $$;
 -- 도움이 필요해 보이는 글(자해·자살 신호) — 가리지 않고, 쓴 사람에게는 상담 안내를, 원장에게는 '먼저 살펴볼 글'로 알린다.
 -- 앱(careCheck)과 같은 규칙. '세포 자살'(생물 용어)·'유서 깊은'은 빼고 본다.
 create or replace function private.care_hit(t text) returns boolean language sql immutable as $$
-  select coalesce(regexp_replace(regexp_replace(t, '세포\s*자살', '', 'g'), '유서\s*깊', '', 'g')
+  select coalesce(regexp_replace(t, '세포\s*(의|가|는|들의|들이)?\s*자살|자살\s*예방|자살률|유서\s*깊', '', 'g')
     ~ '(죽고\s*싶|죽어\s*버리고\s*싶|자살|자해|손목을?\s*긋|목숨을?\s*끊|뛰어\s*내리고\s*싶|살기\s*싫|살고\s*싶지\s*않|사라지고\s*싶|없어지고\s*싶|극단적\s*선택|유서를|유서\s*(를\s*)?(써|쓰)|그만\s*살고\s*싶|살\s*이유가\s*없|다\s*끝내고\s*싶)', false) $$;
 alter table posts    add column if not exists care boolean not null default false;
 alter table comments add column if not exists care boolean not null default false;
@@ -395,16 +405,19 @@ drop trigger if exists comments_stamp on comments; create trigger comments_stamp
 create or replace function private.recare() returns trigger language plpgsql security definer set search_path = public as $$
 begin new.care := private.care_hit(coalesce(new.title, '') || ' ' || coalesce(new.body, '')); return new; end $$;
 drop trigger if exists posts_recare on posts; create trigger posts_recare before update of title, body on posts for each row execute function private.recare();
+-- 이 칸이 생기기 전에 올라온 글·댓글도 한 번 판정(여러 번 돌려도 같다)
+update posts    set care = private.care_hit(coalesce(title, '') || ' ' || coalesce(body, '')) where care is distinct from private.care_hit(coalesce(title, '') || ' ' || coalesce(body, ''));
+update comments set care = private.care_hit(body) where care is distinct from private.care_hit(body);
 -- 원장: 최근 30일 '먼저 살펴볼 글·댓글' — 누가 썼는지(이름·학원 코드)까지. 원장만 부를 수 있다
 create or replace function care_list() returns json language plpgsql stable security definer set search_path = public as $$
 begin
   if not is_owner() then return '[]'::json; end if;
   return coalesce((select json_agg(x order by x.at desc) from (
     select 'post' as kind, p.id, p.id as post_id, p.title, left(p.body, 140) as body, p.nick, p.at, pr.name, pr.student_code as code, pr.role
-      from posts p join profiles pr on pr.id = p.author where p.care and not p.deleted and p.at > now() - interval '30 days'
+      from posts p join profiles pr on pr.id = p.author where p.care and not p.staff and not p.deleted and p.at > now() - interval '30 days'
     union all
     select 'comment', c.id, c.post_id, null, left(c.body, 140), c.nick, c.at, pr.name, pr.student_code, pr.role
-      from comments c join profiles pr on pr.id = c.author where c.care and not c.deleted and c.at > now() - interval '30 days') x), '[]'::json);
+      from comments c join profiles pr on pr.id = c.author where c.care and not c.staff and not c.deleted and c.at > now() - interval '30 days') x), '[]'::json);
 end $$;
 create or replace function private.count_comments() returns trigger language plpgsql security definer set search_path = public as $$
 begin

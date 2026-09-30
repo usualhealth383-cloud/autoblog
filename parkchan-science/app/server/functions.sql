@@ -17,6 +17,8 @@ drop trigger if exists push_attendance on attendance; create trigger push_attend
 drop trigger if exists push_comments on comments;     create trigger push_comments   after insert on comments   for each row execute function private.call_push();
 -- 도움이 필요해 보이는 글 → 원장 폰('먼저 살펴볼 글', 잠금화면에는 내용을 싣지 않는다)
 drop trigger if exists push_care_posts on posts;       create trigger push_care_posts after insert on posts      for each row when (new.care) execute function private.call_push();
+-- 고쳐 쓰다가 도움이 필요해 보이게 된 글도(처음 한 번만 — care 가 false→true 로 바뀔 때)
+drop trigger if exists push_care_edit on posts;        create trigger push_care_edit  after update on posts for each row when (new.care and not old.care) execute function private.call_push();
 
 -- ② 환불·취소 정리 — 매일 04:10(KST). Database → Extensions 에서 pg_cron · pg_net 을 켠 뒤 실행
 create extension if not exists pg_cron;

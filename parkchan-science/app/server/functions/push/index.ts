@@ -35,7 +35,9 @@ async function compose(table: string, r: Record<string, any>): Promise<Job | nul
     const post = (await rest(`posts?id=eq.${encodeURIComponent(r.post_id)}&select=author,title,deleted`))[0];
     if (!post || post.deleted || post.author === r.author) return null;
     const who = r.staff ? '선생님이 답을 달았어요' : '내 글에 댓글이 달렸어요';
-    return { args: null, uid: post.author, msg: { kind: 'comment', post: r.post_id, title: `[${A}] ${who}`, body: `${post.title} — ${String(r.body || '').replace(/\s+/g, ' ').slice(0, 60)}` } };
+    // 도움이 필요해 보이는 댓글은 잠금화면에 내용을 싣지 않는다
+    const body = r.care ? `${post.title} — 새 댓글을 앱에서 확인해 주세요` : `${post.title} — ${String(r.body || '').replace(/\s+/g, ' ').slice(0, 60)}`;
+    return { args: null, uid: post.author, msg: { kind: 'comment', post: r.post_id, title: `[${A}] ${who}`, body } };
   }
   return null;
 }
@@ -48,10 +50,9 @@ Deno.serve(async (req) => {
     if (ev.type !== 'INSERT' || !ev.record) return json({ ok: true, skipped: 'not insert' });
     const jobs = await composeAll(ev.table, ev.record);
     if (!jobs.length) return json({ ok: true, skipped: ev.table });
-    const plan: { c: Job; targets: { token: string; uid: string; who?: string }[] }[] = [];
-    for (const c of jobs) plan.push({ c, targets: c.uid
+    const plan: { c: Job; targets: { token: string; uid: string; who?: string }[] }[] = await Promise.all(jobs.map(async (c) => ({ c, targets: c.uid
       ? await rest(`push_tokens?uid=eq.${encodeURIComponent(c.uid)}&select=token,uid`)
-      : await rpc('push_targets', c.args) });
+      : await rpc('push_targets', c.args) })));
     const total = plan.reduce((a, x) => a + x.targets.length, 0);
     if (!total) return json({ ok: true, sent: 0 });
     const sa = Deno.env.get('FIREBASE_SA_JSON')!, pid = JSON.parse(sa).project_id;

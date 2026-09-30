@@ -267,6 +267,7 @@ button,.tab,.btn,.chip,.chipbar button,.seg button{-webkit-user-select:none;user
 .week .d.on i{background:var(--u);border-color:var(--u);color:var(--on-color)}
 .week .d.today i{border-color:var(--u);color:var(--u)}
 .week .d.today{color:var(--u)}
+.week .d.on.today i{color:var(--on-color);box-shadow:0 0 0 2px var(--paper),0 0 0 3.5px var(--u)}   /* 오늘 공부했으면: 채운 칸 + 바깥 고리(숫자가 배경색에 묻히지 않게) */
 .tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:13px}
 .tile{background:var(--card);border:1px solid var(--hair);border-radius:13px;padding:12px 10px;text-align:center}
 .tile .v{font-size:21px;font-weight:900;letter-spacing:-.02em;font-variant-numeric:tabular-nums;line-height:1.2;color:var(--ink)}
@@ -289,6 +290,16 @@ button,.tab,.btn,.chip,.chipbar button,.seg button{-webkit-user-select:none;user
 .legend{display:flex;gap:12px;font-size:11px;color:var(--muted);margin-top:8px}
 .legend i{display:inline-block;width:10px;height:10px;border-radius:3px;vertical-align:-1px;margin-right:4px;background:var(--u)}
 .legend i.att{background:transparent;box-shadow:inset 0 0 0 2px var(--warn)}
+/* ═ 보호자 — 이번 주 한눈에 ═ */
+.pweek .week{margin-bottom:10px}
+.pweek .week .d{position:relative}
+.pweek .week .d b.att{display:block;width:5px;height:5px;border-radius:50%;background:var(--warn);margin:3px auto 0}
+.pstat{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.pstat>div{background:var(--paper);border:1px solid var(--hair);border-radius:12px;padding:10px 8px;text-align:center}
+.pstat b{display:block;font-size:22px;font-weight:900;color:var(--ink);font-variant-numeric:tabular-nums;line-height:1.2}
+.pstat b small{font-size:12px;font-weight:700;color:var(--muted);margin-left:1px}
+.pstat span{font-size:11.5px;color:var(--muted);font-weight:700}
+.pnext{margin-top:10px;border-top:1px solid var(--hair);padding-top:6px}
 /* ═ 교재 화면 워터마크 — 계정 이름·연락처 끝 4자리를 아주 옅게(읽기를 방해하지 않게). 탭(20)·시트(30) 아래 ═ */
 #wm{position:fixed;inset:0;pointer-events:none;z-index:15;background-repeat:repeat;background-position:0 0}
 /* ═ 마음이 힘들 때 · 상담 창구 ═ */
@@ -1270,8 +1281,11 @@ const serverDB = () => {
     classes: async () => { const r = await api('/rest/v1/classes?select=cls,start_time&order=cls.asc'); CLASSES_CACHE = r.map(c => ({ cls:c.cls, start:hhmm(c.start_time) })); return CLASSES_CACHE.slice(); },
     addClass: async (cls, start) => { await api('/rest/v1/classes?on_conflict=cls', { method:'POST', prefer:'resolution=merge-duplicates,return=minimal', body:{ cls, start_time:start } }); },
     removeClass: async cls => { await api(`/rest/v1/classes?cls=eq.${encodeURIComponent(cls)}`, { method:'DELETE' }); },
-    notesAll: async () => (await api('/rest/v1/notes?select=id,date,title,body,cids,updated_at&order=date.desc,updated_at.desc&limit=3000'))
-      .map(n => ({ id:n.id, date:n.date, title:n.title||'', body:n.body||'', cids:n.cids||[], at:n.updated_at })),
+    notesAll: async () => { const out = [];   // 서버가 한 번에 주는 줄 수 상한(기본 1,000) 때문에 나눠 받는다
+      for (let off = 0; off < 6000; off += 1000){
+        const r = await api(`/rest/v1/notes?select=id,date,title,body,cids,updated_at&order=date.desc,updated_at.desc,id.asc&limit=1000&offset=${off}`);
+        out.push(...r); if (r.length < 1000) break; }
+      return out.map(n => ({ id:n.id, date:n.date, title:n.title||'', body:n.body||'', cids:n.cids||[], at:n.updated_at })); },
     noteSave: async n => { await api('/rest/v1/notes?on_conflict=id', { method:'POST', prefer:'resolution=merge-duplicates,return=minimal',
       body:{ id:n.id, date:n.date, title:(n.title||'').slice(0,80), body:(n.body||'').slice(0,NOTE_MAX), cids:(n.cids||[]).slice(0,12), updated_at:n.at } }); },
     noteDel: async id => { await api(`/rest/v1/notes?id=eq.${encodeURIComponent(id)}`, { method:'DELETE' }); },
@@ -1875,7 +1889,9 @@ const PII = [
    막지 않는다. 쓰는 사람에게는 올리기 전에 상담 창구를 조용히 보여 주고, 원장님은 '먼저 살펴볼 글'로 본다.
    참고: Samaritans 「온라인 자해·자살 콘텐츠 관리 지침」(2020) — 지우기보다 도움으로 잇기, 사람 말투로 */
 const CARE_RE = /(죽고\s*싶|죽어\s*버리고\s*싶|자살|자해|손목을?\s*긋|목숨을?\s*끊|뛰어\s*내리고\s*싶|살기\s*싫|살고\s*싶지\s*않|사라지고\s*싶|없어지고\s*싶|극단적\s*선택|유서를|유서\s*(를\s*)?(써|쓰)|그만\s*살고\s*싶|살\s*이유가\s*없|다\s*끝내고\s*싶)/;
-const careCheck = t => CARE_RE.test(String(t||'').replace(/세포\s*자살/g, '').replace(/유서\s*깊/g, ''));
+/* 걸리지 않게 뺄 말: 생물 용어(세포 자살·세포의 자살·세포가 자살), 예방·통계 과제(자살 예방·자살률), '유서 깊은' */
+const CARE_SKIP = /세포\s*(?:의|가|는|들의|들이)?\s*자살|자살\s*예방|자살률|유서\s*깊/g;
+const careCheck = t => CARE_RE.test(String(t||'').replace(CARE_SKIP, ''));
 /* 상담 창구 — 2026-09 확인: 109 자살예방 상담전화(2024-01 개통, 24시간) · 1388 청소년 상담(24시간, 카카오톡·온라인 cyber1388.kr) */
 const HELP = [
   { n:'109', t:'자살예방 상담전화', d:'24시간 · 누구나 · 무료' },
@@ -2255,6 +2271,7 @@ function openFigure(svg, caption){
    기기 안(localStorage)에 먼저 쓰고, 계정이 있으면 서버와 맞춘다. 서버에서도 본인만 읽는다(원장·보호자도 못 본다 — 진도와 다르다).
    지운 노트는 서버에서 지울 때까지 표시(del)만 남긴다. 두 기기에서 같은 노트를 고치면 나중에 고친 쪽이 이긴다. */
 const NOTE_MAX = 5000;
+let noteSyncErr = '';
 let NOTES = [], notesOwner = null, noteDay = '', noteMonth = '', noteQ = '', noteEd = null, noteFrom = 'today', noteSyncing = null, noteT = null, noteSyncT = null;
 const notesKey = () => 'pcs.notes.' + (ACC ? ACC.id : 'guest');
 function notesLoad(){ const k = notesKey(); if (notesOwner === k) return; notesOwner = k; try { NOTES = JSON.parse(localStorage.getItem(k)) || []; } catch { NOTES = []; } }
@@ -2267,8 +2284,11 @@ const noteLocalOnly = () => !ACC || consentPending();
 async function syncNotes(){
   if (noteLocalOnly()) return; if (noteSyncing) return noteSyncing;
   noteSyncing = (async () => { notesLoad(); const owner = notesOwner;
+    /* 하나가 계속 실패해도(서버가 거절) 나머지는 올린다. 연결이 끊긴 것 같으면(연속 3번) 그만두고 다음에 */
+    let fails = 0, netFails = 0; noteSyncErr = '';
     for (const n of NOTES.filter(x => x.dirty)){
-      try { if (n.del) await DBX.noteDel(n.id); else await DBX.noteSave(n); n.dirty = false; } catch { break; } }
+      try { if (n.del) await DBX.noteDel(n.id); else await DBX.noteSave(n); n.dirty = false; netFails = 0; }   // 올리는 동안 고치거나 지우면 새 사본이 들어오므로 그쪽은 dirty 로 남는다
+      catch (e) { fails++; noteSyncErr = e && e.message || '저장 실패'; if (++netFails >= 3 || (navigator.onLine === false)) break; } }
     if (owner !== notesOwner) return;
     NOTES = NOTES.filter(n => !(n.del && !n.dirty));
     try { const srv = await DBX.notesAll(); const m = new Map(srv.map(n => [n.id, n]));
@@ -2285,7 +2305,9 @@ function adoptGuestNotes(){ let g = []; try { g = JSON.parse(localStorage.getIte
 function dropNotesCache(all){ notesLoad(); if (all || !NOTES.some(n => n.dirty)){ try { localStorage.removeItem(notesOwner); } catch {} } NOTES = []; notesOwner = null; }
 function putNote(n){ notesLoad(); const i = NOTES.findIndex(x => x.id === n.id); const r = { id:n.id, date:n.date, title:n.title||'', body:n.body||'', cids:(n.cids||[]).slice(0,12), at:new Date().toISOString(), dirty:true };
   if (i < 0) NOTES.push(r); else NOTES[i] = r; notesSave(); syncNotesSoon(); return r; }
-function removeNote(id){ notesLoad(); const n = NOTES.find(x => x.id === id); if (!n) return; n.del = true; n.dirty = true; n.at = new Date().toISOString(); notesSave(); syncNotesSoon(); }
+function removeNote(id){ notesLoad(); const i = NOTES.findIndex(x => x.id === id); if (i < 0) return;
+  NOTES[i] = { ...NOTES[i], del:true, dirty:true, at:new Date().toISOString() };   // 새 사본으로 — 올리는 중이던 저장이 끝나며 dirty 를 지우지 않게
+  notesSave(); syncNotesSoon(); }
 const noteBlank = n => !(n.title||'').trim() && !(n.body||'').trim() && !(n.cids||[]).length;
 const cById = id => CONCEPTS.find(c => c.id === id);
 const cName = c => c ? `${c.title}` : '';
@@ -2313,7 +2335,7 @@ function renderNote(){
   const dayNotes = live.filter(n => n.date === noteDay).sort((a,b) => a.at < b.at ? 1 : -1);
   const onDay = [...fixedOn(noteDay), ...evs.filter(e => e.date === noteDay), ...(S.sched.ddays||[]).filter(d => d.date === noteDay)];
   const q = noteQ.trim().toLowerCase();
-  const hits = q ? live.filter(n => (n.title + '\n' + n.body + '\n' + (n.cids||[]).map(id => cName(cById(id))).join(' ')).toLowerCase().includes(q)).sort((a,b) => a.date < b.date ? 1 : a.date > b.date ? -1 : (a.at < b.at ? 1 : -1)) : [];
+  const hits = q ? noteSearch(q) : [];
   const monthN = live.filter(n => n.date.startsWith(noteMonth)).length;
   v.innerHTML = `<button class="back" id="noteBack"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg>${({plan:'일정',me:'내 정보',detail:'개념'})[noteFrom]||'오늘'}</button>
     <h1 class="h-page">공부 노트</h1>
@@ -2332,8 +2354,12 @@ function renderNote(){
     ${onDay.length ? `<div class="nsched"><b>일정</b>${onDay.map(x => esc(x.title) + (x.from ? ` ${esc(x.from)}` : '')).join(' · ')}</div>` : ''}
     ${dayNotes.length ? dayNotes.map(noteItem).join('') : `<div class="nempty">${noteDay===today ? '오늘 공부한 것을 세 줄로 남겨 두면<br>시험 전날 다시 읽을 나만의 요약이 됩니다.' : '이 날의 노트가 없습니다.'}</div>`}
     <button class="btn" id="noteNew">${noteDay===today ? '오늘 노트 쓰기' : `${kdate(noteDay)} 노트 쓰기`}</button>`}</div>
+    ${noteSyncErr && NOTES.some(n => n.dirty) ? `<p class="fine" style="color:var(--warn)">일부 노트를 서버에 아직 올리지 못했습니다(${esc(noteSyncErr)}). 이 기기에는 그대로 남아 있고, 다음에 다시 올립니다.</p>` : ''}
     <p class="fine">노트는 나만 봅니다 — 원장님·보호자도 볼 수 없습니다.${noteLocalOnly() ? (ACC ? ' 보호자 동의 전이라 지금은 이 기기에만 저장됩니다.' : ' 로그인하면 다른 기기에서도 이어서 봅니다.') : ''}</p>`;
 }
+/* 노트 검색 — 제목·내용·붙인 개념 이름, 최근 날짜부터 */
+const noteSearch = q => liveNotes().filter(n => (n.title + '\n' + n.body + '\n' + (n.cids||[]).map(id => cName(cById(id))).join(' ')).toLowerCase().includes(q))
+  .sort((a,b) => a.date < b.date ? 1 : a.date > b.date ? -1 : (a.at < b.at ? 1 : -1));
 const noteHits = hits => hits.length ? `<p class="fine" style="text-align:left;padding:0 2px 10px">${hits.length}개 찾음</p>${hits.map(noteItem).join('')}`
   : `<div class="nempty">‘${esc(noteQ)}’가 들어간 노트가 없습니다.</div>`;
 function renderNoted(){
@@ -2524,6 +2550,15 @@ async function renderParent(){
   try { st = await DBX.student(code); todayA = await DBX.myAttendance(code, todayISO()); const ym = todayISO().slice(0,7); month = await DBX.attendanceRange(`${ym}-01`, monthEnd(ym), code); prog = await DBX.loadProgress(code); if (st) ns = await DBX.notices(st.cls); } catch (e){ v.innerHTML = `<h1 class="h-page">자녀</h1><div class="empty"><p>${esc(e.message)}</p></div>`; return; }
   if (!st){ v.innerHTML = `<h1 class="h-page">자녀</h1><div class="empty"><p>연결된 코드(${esc(code)})의 학생을 찾을 수 없습니다. 수강이 끝났거나 코드가 바뀌었을 수 있습니다.</p></div><button class="btn ghost" id="unlinkChild">연결 해제</button>`; return; }
   const done = prog ? (prog.done||[]).length : 0, days = prog ? (prog.days||[]) : [], last = days.length ? days[days.length-1] : '';
+  /* 이번 주 한눈에 — 최근 7일 공부한 날·학원 출석, 연속 학습, 다시 볼 문제, 다가오는 학원 일정 (자녀의 공부 노트는 보여 주지 않는다) */
+  let wkAtt = [], acad = [];
+  try { wkAtt = await DBX.attendanceRange(addDays(todayISO(), -6), todayISO(), code); } catch {}
+  try { acad = (await DBX.schedule(st.cls)).filter(e => e.date >= todayISO()).slice(0, 3); } catch {}
+  const dset = new Set(days), aset = new Set(wkAtt.map(a => a.date));
+  const wk = [...Array(7)].map((_, i) => { const iso = addDays(todayISO(), i - 6); return { iso, st:dset.has(iso), at:aset.has(iso), today:i === 6 }; });
+  const wkStudy = wk.filter(x => x.st).length;
+  let run = 0; { let d = todayISO(); if (!dset.has(d)) d = addDays(d, -1); while (dset.has(d)){ run++; d = addDays(d, -1); } }
+  const retry = prog ? (prog.wrong||[]).filter(w => !w.cleared).length : 0;
   const lateN = month.filter(a=>a.late).length;
   v.innerHTML = `<h1 class="h-page">자녀</h1>
     ${kids.length ? `<div class="chipbar" role="tablist" aria-label="자녀 고르기">${kids.map(k => `<button role="tab" aria-selected="${k.c===code}" data-kid="${esc(k.c)}" class="${k.c===code?'on':''}">${esc(k.s ? k.s.name : k.c)}</button>`).join('')}</div>` : ''}
@@ -2531,6 +2566,11 @@ async function renderParent(){
       <dl><div class="row"><dt>오늘</dt><dd>${todayA ? `<b>${todayA.time} 출석</b>${todayA.late?' · 지각':''}` : '아직 출석 전'}</dd></div>
       <div class="row"><dt>이달</dt><dd>출석 <b>${month.length}일</b>${lateN?` · 지각 ${lateN}일`:''}</dd></div>
       <div class="row"><dt>학습</dt><dd>개념 <b>${done}개</b> 공부${last?` · 마지막 ${kdate(last)}`:''}${prog&&prog.stats&&prog.stats.a?` · 정답률 ${Math.round(prog.stats.c/prog.stats.a*100)}%`:''}</dd></div></dl></div>
+    <div class="sec pweek"><h2>이번 주 한눈에</h2>
+      <div class="week">${wk.map(x => `<div class="d ${x.st?'on':''} ${x.today?'today':''}" aria-label="${kdate(x.iso)}${x.st?' 공부함':''}${x.at?' · 학원 출석':''}"><i>${+x.iso.slice(-2)}</i>${WD[wdOf(x.iso)]}${x.at?'<b class="att" aria-hidden="true"></b>':''}</div>`).join('')}</div>
+      <div class="pstat"><div><b>${wkStudy}<small>/7일</small></b><span>이번 주 공부</span></div><div><b>${run}<small>일</small></b><span>연속 학습</span></div><div><b>${retry}<small>문제</small></b><span>다시 풀 문제</span></div></div>
+      <p class="fine" style="text-align:left;padding:8px 2px 0">칸이 채워진 날은 앱으로 공부한 날, 아래 점은 학원에 출석한 날입니다.</p>
+      ${acad.length ? `<div class="pnext">${acad.map(e => `<div class="kv"><span class="k">${kdate(e.date)} ${WD[wdOf(e.date)]}</span><span class="v">${esc(e.title)} <b style="color:${dLeft(e.date)<=3?'var(--no)':'var(--brand-dark)'}">${ddayText(dLeft(e.date))}</b></span></div>`).join('')}</div>` : ''}</div>
     <div class="sec"><h2>이달 출석</h2>${month.length ? month.map(a=>`<div class="kv"><span class="k">${kdate(a.date)}</span><span class="v" style="color:${a.late?'var(--warn)':'var(--u)'}">${a.time} ${a.late?'지각':'출석'}${a.manual?' (수동)':''}</span></div>`).join('') : `<p class="fine" style="text-align:left;padding:0">이달 출석 기록이 아직 없습니다.</p>`}</div>
     <div class="sec"><h2>학원 공지 · ${esc(st.cls)}</h2>${ns.length ? ns.slice(0,5).map(n=>`<div class="kv" style="flex-direction:column;align-items:flex-start;gap:2px"><span class="v">${esc(n.t)}</span><span class="k">${kAt(n.at)} · ${esc(n.cls)}${n.d?` · ${esc(n.d)}`:''}</span></div>`).join('') : `<p class="fine" style="text-align:left;padding:0">최근 공지가 없습니다.</p>`}</div>
     ${CFG.phone ? `<a class="btn ghost" href="tel:${esc(CFG.phone)}" style="text-decoration:none">학원에 전화 ${esc(CFG.phone)}</a>` : ''}
@@ -3269,7 +3309,7 @@ document.addEventListener('input', e => {
   if (e.target.id==='suPw'){ SU.pw = e.target.value; const pw = SU.pw, r1 = pw.length >= 6, r2 = /[0-9]/.test(pw) && /[a-zA-Z가-힣]/.test(pw), el = document.querySelector('.rules');
     if (el) el.innerHTML = `<span class="${r1?'ok':''}">${r1?'✓':'·'} 6자 이상</span><span class="${r2?'ok':''}">${r2?'✓':'·'} 글자와 숫자 섞기(권장)</span>`; return; }
   if (e.target.id==='talkSearch'){ talkQ = e.target.value; const el=e.target; renderTalk().then(()=>{ const n=document.getElementById('talkSearch'); if (n){ n.focus(); n.setSelectionRange(el.value.length, el.value.length); } }); return; }
-  if (e.target.id==='noteQ'){ noteQ = e.target.value; const b = document.getElementById('noteBody'); if (!noteQ.trim()){ renderNote(); const n = document.getElementById('noteQ'); n.focus(); } else if (b) { const q = noteQ.trim().toLowerCase(); const hits = liveNotes().filter(n => (n.title + '\n' + n.body + '\n' + (n.cids||[]).map(id => cName(cById(id))).join(' ')).toLowerCase().includes(q)).sort((a,b) => a.date < b.date ? 1 : a.date > b.date ? -1 : (a.at < b.at ? 1 : -1)); b.innerHTML = noteHits(hits); } return; }
+  if (e.target.id==='noteQ'){ noteQ = e.target.value; const b = document.getElementById('noteBody'); if (!noteQ.trim()){ renderNote(); const n = document.getElementById('noteQ'); n.focus(); } else if (b) { const q = noteQ.trim().toLowerCase(); b.innerHTML = noteHits(noteSearch(q)); } return; }
   if (noteEd && ['nedTitle','nedBody','nedDate'].includes(e.target.id)){ const f = { nedTitle:'title', nedBody:'body', nedDate:'date' }[e.target.id];
     if (f === 'date'){ if (!/^\d{4}-\d{2}-\d{2}$/.test(e.target.value)) return; } noteEd[f] = f === 'body' ? e.target.value.slice(0, NOTE_MAX) : e.target.value;
     if (f === 'body'){ const c = document.getElementById('nedCnt'); if (c) c.textContent = `${noteEd.body.length.toLocaleString()} / ${NOTE_MAX.toLocaleString()}`; }

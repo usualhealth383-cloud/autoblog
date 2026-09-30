@@ -143,6 +143,21 @@ async def main():
             assert await s.evaluate('liveNotes().length') == 2
             if SERVER:
                 st, rows = rest('/rest/v1/notes?select=id', tok); assert len(rows) == 2, f'서버에서 안 지워짐 {rows}'
+        # ⑥-2 올리는 도중에 지운 노트가 되살아나지 않는다 · 하나가 계속 실패해도 나머지는 올라간다
+        r = await s.evaluate("""async () => { const orig = DBX.noteSave;
+            DBX.noteSave = async n => { await new Promise(r => setTimeout(r, 700)); return orig(n); };
+            const a = putNote({ id:newId(), date:todayISO(), title:'지울 노트', body:'x', cids:[] }); clearTimeout(noteSyncT);
+            const p = syncNotes(); await new Promise(r => setTimeout(r, 200)); removeNote(a.id); await p; clearTimeout(noteSyncT); await syncNotes();
+            DBX.noteSave = orig; const srv = await DBX.notesAll();
+            return { srv: srv.some(n => n.id === a.id), live: liveNotes().some(n => n.id === a.id) }; }""")
+        assert r == {'srv': False, 'live': False}, f'올리는 중에 지운 노트가 되살아남: {r}'
+        r = await s.evaluate("""async () => { const orig = DBX.noteSave; let bad;
+            DBX.noteSave = async n => { if (n.id === bad) throw new Error('거절됨'); return orig(n); };
+            const x = putNote({ id:newId(), date:todayISO(), title:'막히는 노트', body:'x', cids:[] }); bad = x.id;
+            const y = putNote({ id:newId(), date:todayISO(), title:'뒤따르는 노트', body:'y', cids:[] }); clearTimeout(noteSyncT); await syncNotes();
+            DBX.noteSave = orig; const srv = await DBX.notesAll(); const out = { y: srv.some(n => n.id === y.id), xDirty: NOTES.find(n => n.id === x.id).dirty, err: noteSyncErr };
+            removeNote(x.id); removeNote(y.id); clearTimeout(noteSyncT); await syncNotes(); return out; }""")
+        assert r['y'] and r['xDirty'] and r['err'], f'실패한 노트 하나가 나머지를 막음: {r}'
         # ⑦ 로그아웃하면 기기에서 노트를 비우고, 다시 로그인하면 돌아온다
         await s.evaluate("show('me')"); await s.wait_for_timeout(200); await s.click('#logout'); await s.wait_for_timeout(900)
         assert await s.evaluate("Object.keys(localStorage).filter(k => k.startsWith('pcs.notes.') && JSON.parse(localStorage.getItem(k)).length).length") == 0, '로그아웃했는데 노트가 기기에 남음'
