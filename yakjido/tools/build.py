@@ -30,6 +30,9 @@ for v in (data.get('productImages') or {}).values():
 kg = pub / 'kpic-guide.json'
 if kg.exists():
     _g = json.loads(kg.read_text(encoding='utf-8')); _kd = pub / 'kg'; _kd.mkdir(exist_ok=True)
+    if (pub / 'kpic-extra.json').exists():   # 약 사전 대표 제품(tools/kpic_rep.py) — 수집 파일과 따로 받은 것
+        for _s, _v in json.loads((pub / 'kpic-extra.json').read_text(encoding='utf-8')).items():
+            if _v and not _g.get(_s): _g[_s] = _v
     _sh = [{} for _ in range(16)]
     for _seq, _v in _g.items():
         if _v: _sh[(int(str(_seq)[-3:]) if str(_seq)[-3:].isdigit() else 0) % 16][_seq] = _v
