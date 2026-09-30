@@ -94,6 +94,9 @@ create table if not exists guardian_links (
   at   timestamptz not null default now(),
   primary key (uid, code)
 );
+-- 보호자 연결은 원장이 확인해야 열린다 — 코드만 알면 반 친구도 '보호자'로 출석 알림·연락처를 받던 것(2026-10-01 점검에서 재현)
+alter table guardian_links add column if not exists approved boolean not null default false;
+alter table guardian_links add column if not exists decided_at timestamptz;
 -- 한 학생 코드는 학생 계정 하나에만(코드 돌려쓰기 방지). 보호자는 여럿 연결 가능
 create unique index if not exists profiles_student_code_uq on profiles (student_code) where student_code is not null;
 
@@ -248,7 +251,7 @@ create or replace function my_student_code() returns text language sql stable se
   select student_code from profiles where id = auth.uid() and role = 'student' $$;
 create or replace function my_codes() returns setof text language sql stable security definer set search_path = public as $$
   select student_code from profiles where id = auth.uid() and student_code is not null
-  union select code from guardian_links where uid = auth.uid() $$;
+  union select code from guardian_links where uid = auth.uid() and approved $$;
 create or replace function my_classes() returns setof text language sql stable security definer set search_path = public as $$
   select cls from students where code in (select my_codes()) and until >= kst_today() $$;
 
@@ -309,6 +312,11 @@ begin
     if (select count(*) from guardian_links where uid = u) >= 5 and not exists (select 1 from guardian_links where uid = u and code = c) then
       return json_build_object('ok', false, 'why', '자녀는 다섯 명까지 연결할 수 있습니다.'); end if;
     insert into guardian_links(uid, code) values (u, c) on conflict do nothing;
+    perform private.note('code', true);
+    if not exists (select 1 from guardian_links where uid = u and code = c and approved) then
+      return json_build_object('ok', true, 'pending', true);   -- 원장 확인 전에는 자녀 이름도 보여 주지 않는다
+    end if;
+    return json_build_object('ok', true, 'student', json_build_object('code', s.code, 'name', s.name, 'cls', s.cls, 'until', s.until));
   end if;
   perform private.note('code', true);
   return json_build_object('ok', true, 'student', json_build_object('code', s.code, 'name', s.name, 'cls', s.cls, 'until', s.until));
@@ -325,8 +333,28 @@ end $$;
 create or replace function linked_of(p_code text) returns json language sql stable security definer set search_path = public as $$
   select case when is_owner() then json_build_object(
     'student', (select count(*) from profiles where student_code = p_code),
-    'guardians', coalesce((select json_agg(json_build_object('name', p.name, 'phone', p.phone)) from guardian_links g join profiles p on p.id = g.uid where g.code = p_code), '[]'::json))
+    'guardians', coalesce((select json_agg(json_build_object('uid', g.uid, 'name', p.name, 'phone', p.phone, 'approved', g.approved, 'at', g.at) order by g.at) from guardian_links g join profiles p on p.id = g.uid where g.code = p_code), '[]'::json))
   end $$;
+-- 원장: 보호자 연결 요청(확인 전) 목록 · 확인/거절(거절·해제는 연결을 지운다)
+create or replace function guardian_requests() returns json language plpgsql stable security definer set search_path = public as $$
+begin
+  if not is_owner() then return '[]'::json; end if;
+  return coalesce((select json_agg(x order by x.at) from (
+    select g.uid, g.code, g.at, p.name, p.phone, u.email, s.name as student, s.cls
+      from guardian_links g join profiles p on p.id = g.uid join auth.users u on u.id = g.uid join students s on s.code = g.code
+     where not g.approved limit 200) x), '[]'::json);
+end $$;
+create or replace function guardian_decide(p_uid uuid, p_code text, p_ok boolean) returns void language plpgsql security definer set search_path = public as $$
+begin
+  if not is_owner() then raise exception 'owner only' using errcode = '42501'; end if;
+  if p_ok then update guardian_links set approved = true, decided_at = now() where uid = p_uid and code = p_code;
+  else delete from guardian_links where uid = p_uid and code = p_code; end if;
+end $$;
+-- 학생: 내 코드에 연결된(확인된) 보호자 — 누가 내 출석·진도를 보는지 학생도 안다
+create or replace function my_guardians() returns json language sql stable security definer set search_path = public as $$
+  select coalesce(json_agg(json_build_object('name', p.name, 'at', g.decided_at) order by g.decided_at), '[]'::json)
+    from guardian_links g join profiles p on p.id = g.uid
+   where g.approved and g.code = (select student_code from profiles where id = auth.uid() and role = 'student') $$;
 
 -- 보호자: 자녀 한 명만 연결 해제
 create or replace function unlink_child(p_code text) returns void language sql security definer set search_path = public as $$
@@ -394,6 +422,7 @@ declare base date; u date; old purchases;
 begin
   select * into old from purchases where purchase_token = p_token for update;
   if found and old.revoked_at is not null then return json_build_object('ok', false, 'revoked', true, 'why', '환불·취소된 결제입니다.'); end if;
+  if found and old.uid is distinct from p_uid then return json_build_object('ok', false, 'why', '다른 계정으로 반영된 결제입니다.'); end if;   -- 남이 먼저 낸 영수증을 '반영됨'으로 속이지 않게
   if found then return json_build_object('ok', true, 'dup', true, 'until', old.until::text); end if;
   select greatest(coalesce(pass_until, kst_today()), kst_today()) into base from profiles where id = p_uid for update;
   if base is null then return json_build_object('ok', false, 'why', 'no profile'); end if;
@@ -418,6 +447,8 @@ create or replace function private.care_hit(t text) returns boolean language sql
   select coalesce(regexp_replace(t, '세포\s*(의|가|는|들의|들이)?\s*자살|자살\s*예방|자살률|유서\s*깊', '', 'g')
     ~ '(죽고\s*싶|죽어\s*버리고\s*싶|자살|자해|손목을?\s*긋|목숨을?\s*끊|뛰어\s*내리고\s*싶|살기\s*싫|살고\s*싶지\s*않|사라지고\s*싶|없어지고\s*싶|극단적\s*선택|유서를|유서\s*(를\s*)?(써|쓰)|그만\s*살고\s*싶|살\s*이유가\s*없|다\s*끝내고\s*싶)', false) $$;
 alter table posts    add column if not exists care boolean not null default false;
+alter table posts add column if not exists deleted_at timestamptz;
+alter table comments add column if not exists deleted_at timestamptz;
 alter table comments add column if not exists care boolean not null default false;
 create or replace function private.stamp_author() returns trigger language plpgsql security definer set search_path = public as $$
 declare n int;
@@ -486,23 +517,38 @@ create or replace function like_toggle(p_kind text, p_id uuid) returns void lang
 declare u uuid := auth.uid();
 begin
   if u is null then raise exception '로그인이 필요합니다' using errcode = '42501'; end if;
-  if p_kind = 'post' then update posts set likes = case when u = any(likes) then array_remove(likes, u) else likes || u end where id = p_id and not deleted;
-  else update comments set likes = case when u = any(likes) then array_remove(likes, u) else likes || u end where id = p_id and not deleted; end if;
+  if not consent_ok() then raise exception '보호자 동의가 끝난 뒤에 쓸 수 있습니다.' using errcode = '42501'; end if;
+  if p_kind = 'post' then update posts set likes = case when u = any(likes) then array_remove(likes, u) else likes || u end where id = p_id and not deleted and report_n < 3;
+  else update comments set likes = case when u = any(likes) then array_remove(likes, u) else likes || u end where id = p_id and not deleted and report_n < 3; end if;
 end $$;
 create or replace function report_item(p_kind text, p_id uuid) returns int language plpgsql security definer set search_path = public as $$
 declare u uuid := auth.uid(); c int;
 begin
   if u is null then raise exception '로그인이 필요합니다' using errcode = '42501'; end if;
+  -- 신고 3건이면 글이 가려지므로, 계정을 여러 개 만들어 남의 글을 지우는 일을 막는다: 보호자 동의 · 가입 하루 뒤 · 하루 20건 · 선생님 글 제외
+  if not consent_ok() then raise exception '보호자 동의가 끝난 뒤에 신고할 수 있습니다. 급한 일은 원장님께 알려 주세요.' using errcode = '42501'; end if;
+  if (select created_at from profiles where id = u) > now() - interval '1 day' then
+    raise exception '가입하고 하루가 지나면 신고할 수 있습니다. 급한 일은 내 정보 › 의견 보내기로 원장님께 알려 주세요.' using errcode = 'P0001'; end if;
+  if (select count(*) from private.attempts where uid = u and kind = 'report' and at > now() - interval '1 day') >= 20 then
+    raise exception '오늘은 신고를 너무 많이 했습니다. 원장님께 직접 알려 주세요.' using errcode = '54000'; end if;
+  insert into private.attempts(uid, kind, ok) values (u, 'report', true);
   if p_kind = 'post' then
     update posts set reports = case when u = any(reports) then reports else reports || u end,
                      report_n = cardinality(case when u = any(reports) then reports else reports || u end)
-     where id = p_id returning report_n into c;
+     where id = p_id and not staff returning report_n into c;
   else
     update comments set reports = case when u = any(reports) then reports else reports || u end,
                         report_n = cardinality(case when u = any(reports) then reports else reports || u end)
-     where id = p_id returning report_n into c;
+     where id = p_id and not staff returning report_n into c;
   end if;
   return coalesce(c, 0);
+end $$;
+-- 원장: 잘못된 신고 되돌리기(가려진 글·댓글을 다시 보이게)
+create or replace function clear_reports(p_kind text, p_id uuid) returns void language plpgsql security definer set search_path = public as $$
+begin
+  if not is_owner() then raise exception 'owner only' using errcode = '42501'; end if;
+  if p_kind = 'post' then update posts set reports = '{}', report_n = 0 where id = p_id;
+  else update comments set reports = '{}', report_n = 0 where id = p_id; end if;
 end $$;
 create or replace function pick_comment(p_post uuid, p_comment uuid) returns void language plpgsql security definer set search_path = public as $$
 begin
@@ -518,11 +564,16 @@ begin
   if auth.uid() is null or coalesce(p_token, '') = '' then return; end if;
   delete from push_tokens where token = p_token;
   insert into push_tokens(token, uid, platform) values (left(p_token, 400), auth.uid(), left(coalesce(p_platform, 'android'), 20));
+  delete from push_tokens where uid = auth.uid() and token not in (select token from push_tokens where uid = auth.uid() order by at desc limit 5);   -- 한 사람 기기 5대까지
 end $$;
-create or replace function delete_my_account() returns void language plpgsql security definer set search_path = public as $$
+create or replace function delete_my_account() returns void language plpgsql security definer set search_path = public, private as $$
 declare u uuid := auth.uid();
 begin
   if u is null then raise exception 'login required' using errcode = '42501'; end if;
+  -- 남의 글에 남은 내 흔적(도움됨·신고)도 지운다 — 탈퇴한 계정의 신고로 글이 계속 가려지지 않게
+  update posts set likes = array_remove(likes, u), reports = array_remove(reports, u), report_n = cardinality(array_remove(reports, u)) where u = any(likes) or u = any(reports);
+  update comments set likes = array_remove(likes, u), reports = array_remove(reports, u), report_n = cardinality(array_remove(reports, u)) where u = any(likes) or u = any(reports);
+  delete from client_errors where uid = u; delete from private.attempts where uid = u; delete from private.consent_links where uid = u;
   delete from progress where code = 'u:' || u::text;
   delete from progress where code = (select student_code from profiles where id = u);
   delete from auth.users where id = u;      -- 프로필·글·댓글·푸시 기기는 연쇄 삭제, 결제 기록은 계정 연결만 끊고 5년 보관
@@ -538,15 +589,18 @@ language sql stable security definer set search_path = public as $$
     from push_tokens t join profiles pr on pr.id = t.uid
    where (p_kind = 'care' and pr.role = 'owner')
       or (p_kind not in ('attend', 'care') and pr.student_code in (select code from codes))
-      or exists (select 1 from guardian_links g where g.uid = t.uid and g.code in (select code from codes))
+      or exists (select 1 from guardian_links g where g.uid = t.uid and g.approved and g.code in (select code from codes))
 $$;
 
 -- ═══ 만 14세 미만 — 법정대리인 동의 확인(개인정보 보호법 제22조의2) ═══
 -- 방법 ① 동의 페이지: 아이가 보호자 폰으로 링크를 보내고 → 보호자가 페이지에서 동의 표시 → 학원이 '확인했다'는 문자를 보호자에게 보냄
 -- 방법 ② 서면: 학원에서 동의서에 서명을 받고 원장이 앱에 '서면 동의 받음'을 누름
 -- 동의 전에는 이야기(글·댓글·읽기)와 진도의 서버 저장을 막고, 7일 안에 동의가 없으면 계정을 지운다(purge_old).
-create or replace function consent_ok(u uuid default auth.uid()) returns boolean language sql stable security definer set search_path = public as $$
-  select coalesce((select not under14 or guardian_ok from profiles where id = u), true) $$;
+-- 인자 없이 '나'만 — 남의 id 로 부르면 동의 전 14세 미만 계정을 가려낼 수 있었다(2026-10-01 점검). 정책을 새로 거는 아래에서 다시 만든다
+drop function if exists consent_ok(uuid) cascade;
+create or replace function consent_ok() returns boolean language sql stable security definer set search_path = public as $$
+  select coalesce((select not under14 or guardian_ok from profiles where id = auth.uid()), true) $$;
+revoke execute on function consent_ok() from public, anon; grant execute on function consent_ok() to authenticated;
 -- p_phone: 학원이 '번호가 달라요'로 되돌린 뒤 아이가 보호자 번호를 고쳐 다시 보낼 때만(동의 확인 전까지)
 drop function if exists consent_request();
 create or replace function consent_request(p_phone text default null) returns json language plpgsql security definer set search_path = public, private as $$
@@ -644,7 +698,9 @@ grant usage on sequence feedback_id_seq to authenticated;
 revoke execute on function feedback_list(), feedback_done(bigint, boolean) from public, anon; grant execute on function feedback_list(), feedback_done(bigint, boolean) to authenticated;
 revoke all on notes from anon, authenticated; grant select, delete on notes to authenticated;
 grant insert (id, date, title, body, cids, updated_at), update (id, date, title, body, cids, updated_at) on notes to authenticated;   -- 올리기(upsert)가 id 도 SET 한다 · 남의 행은 RLS 가 막는다
-revoke all on guardian_links from anon, authenticated; grant select on guardian_links to authenticated;   -- 연결·해제는 link_code()·unlink_child() 로만
+revoke all on guardian_links from anon, authenticated; grant select on guardian_links to authenticated;   -- 연결·해제는 link_code()·unlink_child()·guardian_decide() 로만
+revoke execute on function guardian_requests(), guardian_decide(uuid, text, boolean), my_guardians() from public, anon;
+grant execute on function guardian_requests(), guardian_decide(uuid, text, boolean), my_guardians() to authenticated;
 revoke all on client_errors from anon, authenticated; grant insert (ver, msg, stack, url, ua) on client_errors to anon, authenticated; grant select on client_errors to authenticated;
 grant usage, select on sequence client_errors_id_seq to anon, authenticated;
 
@@ -716,7 +772,8 @@ create policy fb_ins on feedback for insert to authenticated with check (uid = (
 create policy read_posts on posts for select to authenticated using (not deleted and (report_n < 3 or author = (select auth.uid())) and (select consent_ok()));
 create policy write_posts on posts for insert to authenticated with check (author = (select auth.uid()) and (select consent_ok()));
 create policy edit_posts on posts for update to authenticated using (author = (select auth.uid()) and not deleted) with check (author = (select auth.uid()));
-create policy read_comments on comments for select to authenticated using (not deleted and (report_n < 3 or author = (select auth.uid())) and (select consent_ok()));
+create policy read_comments on comments for select to authenticated using (not deleted and (report_n < 3 or author = (select auth.uid())) and (select consent_ok())
+  and exists (select 1 from posts p where p.id = post_id));   -- 가려진 글의 댓글도 가린다(글 정책이 그대로 걸림)
 create policy write_comments on comments for insert to authenticated
   with check (author = (select auth.uid()) and (select consent_ok()) and exists (select 1 from posts p where p.id = post_id and not p.deleted));
 create policy edit_comments on comments for update to authenticated using (author = (select auth.uid()) and not deleted) with check (author = (select auth.uid()));
@@ -724,7 +781,7 @@ create policy edit_comments on comments for update to authenticated using (autho
 -- 닉네임으로 선생님·원장 사칭 금지(진짜 선생님 글에는 서버가 '선생님' 표시를 단다)
 create or replace function private.check_nick() returns trigger language plpgsql security definer set search_path = public as $$
 begin
-  if new.nick is distinct from old.nick and new.nick ~ '(선생|원장|관리자|운영자|admin|teacher)' and not is_owner() then
+  if new.nick is distinct from old.nick and lower(regexp_replace(coalesce(new.nick, ''), '[\s._\-·]', '', 'g')) ~ '(선생|쌤|원장|관리|운영|매니저|교사|강사|admin|teacher|staff|manager|official)' and not is_owner() then
     raise exception '선생님·원장·관리자로 보이는 닉네임은 쓸 수 없습니다.' using errcode = 'P0001'; end if;
   return new;
 end $$;
@@ -743,14 +800,82 @@ create or replace function private.purge_old() returns void language sql securit
   delete from private.attempts where at < now() - interval '1 day';
   delete from private.consent_links where at < now() - interval '8 days';
   delete from feedback where at < now() - interval '1 year';
+  delete from comments where deleted and deleted_at < now() - interval '6 months';
+  delete from posts where deleted and deleted_at < now() - interval '6 months';
   delete from auth.users where id in (select id from profiles where under14 and not guardian_ok
     and ((guardian_at is null and created_at < now() - interval '7 days') or (guardian_how = 'reset' and guardian_at < now() - interval '7 days')));   -- 보호자가 동의를 표시했고 학원 확인만 남은 계정은 두고 원장 목록에 남긴다 · '번호 다름'으로 되돌린 계정은 그때부터 7일
 $$;
 -- Supabase 에서는 pg_cron 으로 매일 새벽 4시에 돌린다(Database → Extensions 에서 pg_cron 켠 뒤 이 파일을 다시 실행)
+-- 매일 새벽 정리가 돌아야 처리방침의 보관 기간(오류 90일·IP 1일·의견 1년·동의 없는 14세 미만 7일)이 지켜진다 — pg_cron 을 켠다(Supabase 는 된다)
 do $$ begin
+  begin create extension if not exists pg_cron; exception when others then raise notice 'pg_cron 을 켜지 못했습니다 — Supabase Database › Extensions 에서 켠 뒤 이 파일을 다시 실행하세요: %', sqlerrm; end;
   if exists (select 1 from pg_extension where extname = 'pg_cron') then
     perform cron.schedule('pcs-purge-old', '0 19 * * *', 'select private.purge_old()');   -- 19시 UTC = 04시 KST
   end if;
+end $$;
+
+-- ═══ 크기·개수 한도(2026-10-01 점검: 로그인 없이 오류 기록을 무한히 넣어 DB 를 채우거나, 3MB 첨부·200,000자 닉네임이 들어갔다) ═══
+create or replace function private.errors_cap() returns trigger language plpgsql security definer set search_path = public as $$
+begin
+  if new.uid is not null and (select count(*) from client_errors where uid = new.uid and at > now() - interval '1 hour') >= 30 then return null; end if;
+  if new.uid is null and (select count(*) from client_errors where uid is null and at > now() - interval '1 hour') >= 300 then return null; end if;
+  if (select count(*) from client_errors where at > now() - interval '1 hour') >= 3000 then return null; end if;
+  return new;
+end $$;
+drop trigger if exists client_errors_cap on client_errors;
+create trigger client_errors_cap before insert on client_errors for each row execute function private.errors_cap();
+-- 지운 글·댓글은 6개월 뒤 실제로 지운다(처리방침 3③) — 지운 시각을 서버가 적는다
+create or replace function private.mark_deleted() returns trigger language plpgsql security definer set search_path = public as $$
+begin
+  if new.deleted and not coalesce(old.deleted, false) then new.deleted_at := now(); end if;
+  return new;
+end $$;
+drop trigger if exists posts_deleted_at on posts;
+create trigger posts_deleted_at before update of deleted on posts for each row execute function private.mark_deleted();
+drop trigger if exists comments_deleted_at on comments;
+create trigger comments_deleted_at before update of deleted on comments for each row execute function private.mark_deleted();
+-- 원장: 앱을 지운 사람이 전화·메일로 계정 삭제를 요청했을 때(처리방침 6①·삭제 안내) — 앱의 '계정 삭제'와 같은 정리를 한다
+create or replace function delete_user(p_email text) returns json language plpgsql security definer set search_path = public, private as $$
+declare u uuid;
+begin
+  if not is_owner() then raise exception 'owner only' using errcode = '42501'; end if;
+  select id into u from auth.users where lower(email) = lower(trim(p_email));
+  if u is null then return json_build_object('ok', false, 'why', '그 이메일로 가입한 계정이 없습니다.'); end if;
+  if u = auth.uid() then return json_build_object('ok', false, 'why', '원장 계정은 여기서 지울 수 없습니다.'); end if;
+  update posts set likes = array_remove(likes, u), reports = array_remove(reports, u), report_n = cardinality(array_remove(reports, u)) where u = any(likes) or u = any(reports);
+  update comments set likes = array_remove(likes, u), reports = array_remove(reports, u), report_n = cardinality(array_remove(reports, u)) where u = any(likes) or u = any(reports);
+  delete from progress where code = 'u:' || u::text;
+  delete from progress where code = (select student_code from profiles where id = u);
+  delete from client_errors where uid = u; delete from private.attempts where uid = u; delete from private.consent_links where uid = u;
+  delete from auth.users where id = u;
+  return json_build_object('ok', true);
+end $$;
+revoke execute on function delete_user(text) from public, anon; grant execute on function delete_user(text) to authenticated;
+-- 진도 저장 시각은 서버 시계로(기기 시계가 틀린 폰의 기록이 밀리거나 남의 기록을 덮지 않게 — 2026-10-01 점검)
+create or replace function private.progress_at() returns trigger language plpgsql security definer set search_path = public as $$
+begin
+  new.state := jsonb_set(coalesce(new.state, '{}'::jsonb), '{at}', to_jsonb(to_char(clock_timestamp() at time zone 'UTC', 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"')));
+  new.at := clock_timestamp();
+  return new;
+end $$;
+drop trigger if exists progress_at on progress;
+create trigger progress_at before insert or update on progress for each row execute function private.progress_at();
+-- 글 수정 시각은 서버가 적는다(아무 날짜나 넣지 못하게)
+create or replace function private.post_edited() returns trigger language plpgsql security definer set search_path = public as $$
+begin
+  new.edited := case when new.title is distinct from old.title or new.body is distinct from old.body or new.attach is distinct from old.attach then now() else old.edited end;
+  return new;
+end $$;
+drop trigger if exists posts_edited on posts;
+create trigger posts_edited before update on posts for each row execute function private.post_edited();
+do $$ begin
+  if not exists (select 1 from pg_constraint where conname = 'posts_attach_shape') then
+    alter table posts add constraint posts_attach_shape check (attach is null or (jsonb_typeof(attach) = 'object' and octet_length(attach::text) <= 300
+      and attach->>'kind' in ('concept','bank') and coalesce(attach->>'id', '') ~ '^[A-Za-z0-9_#.㉠-㉢-]{1,60}$')) not valid; end if;
+  if not exists (select 1 from pg_constraint where conname = 'progress_size') then
+    alter table progress add constraint progress_size check (octet_length(state::text) < 500000) not valid; end if;
+  if not exists (select 1 from pg_constraint where conname = 'profiles_lengths') then
+    alter table profiles add constraint profiles_lengths check (char_length(nick) <= 12 and char_length(name) <= 40 and phone ~ '^[0-9+ ()-]{0,20}$') not valid; end if;
 end $$;
 
 -- ═══ [설정] 앞의 -- 를 지우고 원장님 이메일로 바꿔 실행 ═══
@@ -760,3 +885,6 @@ end $$;
 -- insert into private.config select 'owner_uid', id::text from auth.users where lower(email) = lower((select v from private.config where k = 'owner_email')) and email_confirmed_at is not null on conflict (k) do update set v = excluded.v;
 -- 출석 씨앗은 자동으로 만든다(아무도 몰라야 하는 값)
 insert into private.config values ('attend_secret', encode(gen_random_bytes(24), 'hex')) on conflict (k) do nothing;
+
+-- 뒤에서 만든 private 함수까지 다시 잠근다(맨 위의 일괄 회수는 그 뒤에 만든 함수에 안 걸린다)
+revoke all on all functions in schema private from public, anon, authenticated;

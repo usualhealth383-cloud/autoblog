@@ -23,7 +23,7 @@ body{{background:linear-gradient(115deg,#0F6357 0%,#147D6F 55%,#1C9280 100%);col
 h1{{font-size:62px;font-weight:900;line-height:1.18;margin:14px 0 20px;letter-spacing:-.02em}}
 p{{font-size:25px;font-weight:500;color:#E3F6F2;line-height:1.5}}
 .orb{{position:absolute;right:-60px;top:-80px;width:560px;height:560px;border-radius:50%;border:2px dashed rgba(255,255,255,.16)}}
-</style><div class="orb"></div><div class="t"><div class="k">통합과학 · 박찬 과학</div><h1>하루 한 개념,<br>5분이면 끝</h1><p>학원 교재 그대로 · 문제 은행 1,696문항</p></div>
+</style><div class="orb"></div><div class="t"><div class="k">통합과학 · 박찬 과학</div><h1>하루 한 개념,<br>5분이면 끝</h1><p>학원 교재 그대로 · 문제 은행 1,214문항</p></div>
 <div class="phone" style="right:250px;top:62px;transform:rotate(-5deg)"><img src="{img('02')}"></div>
 <div class="phone" style="right:44px;top:28px;transform:rotate(4deg)"><img src="{img('03')}"></div>"""
 
@@ -50,7 +50,7 @@ h1{{font-size:58px;font-weight:900;line-height:1.2;letter-spacing:-.02em}}
 .ring2{{position:absolute;right:30px;top:10px;width:480px;height:480px;border-radius:50%;border:2px dashed rgba(255,255,255,.1)}}
 </style><div class="ring2"></div><div class="ring"></div>
 <div class="t"><h1>통합과학을<br>매일 조금씩, 끝까지</h1>
-<div class="chips"><div class="chip"><b>140</b><span>교재 개념</span></div><div class="chip"><b>1,696</b><span>문제 은행</span></div><div class="chip"><b>396</b><span>날마다 명언</span></div></div></div>
+<div class="chips"><div class="chip"><b>140</b><span>교재 개념</span></div><div class="chip"><b>1,214</b><span>문제 은행</span></div><div class="chip"><b>396</b><span>날마다 명언</span></div></div></div>
 <div class="phone" style="right:152px;top:14px"><img src="{img('02')}"></div>"""
 
 async def main():

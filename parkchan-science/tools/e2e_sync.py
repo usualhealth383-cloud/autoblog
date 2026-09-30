@@ -24,7 +24,7 @@ async def main():
         A = await device()
         await signup(A, '두기기', 'two@t.kr')
         B = await device()
-        await B.click('#goLogin'); await B.fill('#lgEmail', 'two@t.kr'); await B.fill('#lgPw', '123456'); await B.click('#lgGo'); await B.wait_for_timeout(1200)
+        await B.click('#goLogin'); await B.fill('#lgEmail', 'two@t.kr'); await B.fill('#lgPw', 'pass1234'); await B.click('#lgGo'); await B.wait_for_timeout(1200)
         # ① A 에서 북마크 → B 로 돌아오면 보인다
         await A.click('#v-today [data-bm]'); await A.wait_for_timeout(1600)
         await resume(B); assert await B.evaluate('S.bm.length') == 1, 'A 의 북마크가 B 에 안 옴'

@@ -6,7 +6,7 @@
 import asyncio, sys, os, urllib.request
 from playwright.async_api import async_playwright
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from _ui import signup, NO_INTRO, auto_yes
+from _ui import signup, NO_INTRO, auto_yes, approve_child
 import json as _j, urllib.request as _u
 GW = 'http://127.0.0.1:8767'   # tools/testbed_up.sh — 진짜 Postgres·PostgREST 시험대
 try: ANON = _j.loads(_u.urlopen(GW + '/__anon').read())['anon']
@@ -56,14 +56,15 @@ async def main():
         await shot(s, 's03_student_quiz')
         # 새 폰: 로그인만 하면 진도·북마크·코드가 따라온다
         s2ctx, s2 = await page()
-        await s2.click('#goLogin'); await s2.fill('#lgEmail', 'stu@srv.kr'); await s2.fill('#lgPw', '123456'); await s2.click('#lgGo'); await s2.wait_for_timeout(1200)
+        await s2.click('#goLogin'); await s2.fill('#lgEmail', 'stu@srv.kr'); await s2.fill('#lgPw', 'pass1234'); await s2.click('#lgGo'); await s2.wait_for_timeout(1200)
         assert await s2.evaluate('S.auth && S.auth.code') == code and await s2.evaluate('S.done.length') == 1 and await s2.evaluate('S.wrong.length') == 1 and await s2.evaluate('S.bm.length') == 1, '새 기기 동기화 실패'
         await s2.click('.tab[data-v="me"]'); await s2.wait_for_timeout(400); await s2.click('#goStats'); await s2.wait_for_timeout(800); assert '학원 출석 1일' in await txt(s2, '.legend'); await shot(s2, 's04_student2_stats')
 
         # ── 보호자: 가입 → 자녀 연결 → 출석·공지·진도 보기 ──
         pctx, pr = await page()
         await signup(pr, '서버보호자', 'par@srv.kr', role='parent', child=code, wait=1500)
-        assert await pr.evaluate('view') == 'parent'; body = await txt(pr, '#v-parent')
+        assert await pr.evaluate('view') == 'parent' and '원장님 확인을 기다리고' in await txt(pr, '#v-parent'), '원장 확인 전 안내가 없다'
+        await approve_child(pr, code); body = await txt(pr, '#v-parent')
         assert '서버학생 학생' in body and '출석' in body and '휴강' in body and '개념 1개' in body, body[:300]; await shot(pr, 's05_parent')
 
         # ── 학원 밖 학생: 이용권 코드 ──
@@ -77,11 +78,11 @@ async def main():
         r = await g.evaluate("api('/rest/v1/students?select=*').then(x=>x.length).catch(e=>'denied:'+e.status)"); assert r in (0, 'denied:401'), f'RLS 누수: {r}'
         # 계정 삭제 뒤 로그인 불가
         await g.click('.tab[data-v="me"]'); await g.wait_for_timeout(300); await g.click('#delAccount'); await g.wait_for_timeout(800); assert await g.evaluate('view') == 'auth'
-        await g.click('#goLogin'); await g.fill('#lgEmail', 'out@srv.kr'); await g.fill('#lgPw', '123456'); await g.click('#lgGo'); await g.wait_for_timeout(500); assert '다릅니다' in await txt(g, '.err')
+        await g.click('#goLogin'); await g.fill('#lgEmail', 'out@srv.kr'); await g.fill('#lgPw', 'pass1234'); await g.click('#lgGo'); await g.wait_for_timeout(500); assert '다릅니다' in await txt(g, '.err')
 
         # ── 원장: 읽음 1 · 출석 1 · 학생 상세에 보호자 1명 · 통계 ──
         await o.click('[data-adm="notice"]'); await o.wait_for_timeout(700); assert '읽음 1' in await txt(o, '.sent .r'), '읽음 집계 실패'
-        await o.click('[data-adm="students"]'); await o.wait_for_timeout(500); await o.click(f'[data-stu="{code}"]'); await o.wait_for_timeout(800); sh = await txt(o, '.sheet'); assert '보호자 연결 1명' in sh and '공부한 개념' in sh, sh[:300]; await o.click('#sheetClose')
+        await o.click('[data-adm="students"]'); await o.wait_for_timeout(500); await o.click(f'[data-stu="{code}"]'); await o.wait_for_timeout(800); sh = await txt(o, '.sheet'); assert '보호자 1명' in sh and '공부한 개념' in sh, sh[:300]; await o.click('#sheetClose')
         await o.click('[data-adm="stats"]'); await o.wait_for_timeout(900); st = await txt(o, '#v-admin'); assert '1명' in st and '7일 내 학습' in st; await shot(o, 's06_owner_stats')
         await o.click('.tab[data-v="me"]'); await o.wait_for_timeout(300); await o.click('#logout'); await o.wait_for_timeout(500); assert await o.evaluate('SESSION') is None
         for c in (octx, sctx, s2ctx, pctx, gctx): await c.close()

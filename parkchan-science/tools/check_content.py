@@ -28,5 +28,16 @@ src = sum(len(re.findall(r'<su[pb]\b', open(p, encoding='utf-8').read())) for p 
 got = sum(json.dumps(v, ensure_ascii=False).count('<sup>') + json.dumps(v, ensure_ascii=False).count('<sub>') + sum(json.dumps(v, ensure_ascii=False).count(c) for c in UNI) for k, v in data.items() if k in ('concepts', 'quizzes'))
 print(f'강의용 교재 원본 첨자 {src}개 · 개념·확인 문제 데이터 첨자 {got}자')
 if src and got < src * 0.8: bad.append(f'개념·확인 문제의 첨자가 원본보다 너무 적음({got} < {src}×0.8) — 추출기가 <sup>·<sub> 를 걷고 있지 않은지')
+# 그림: 정의 없이 참조만 하는 기호·그라데이션(그리면 빈칸) — 0 이어야 한다
+sys.path.insert(0, str(ROOT / 'tools')); from _extract_common import dangling
+for f in sorted((ROOT / 'data' / 'figures').glob('*.svg')):
+    d = dangling(f.read_text(encoding='utf-8'))
+    if d: bad.append(f'그림 {f.name}: 정의 없는 참조 {d[:4]}')
+for k in ('bank', 'labs'):
+    for it in data[k]:
+        if it.get('figure') and dangling(it['figure']): bad.append(f'{k} {it.get("id") or it.get("lessonId")}: 그림 정의 없는 참조 {dangling(it["figure"])[:4]}')
+# '<보기>' 같은 글자가 태그로 오인돼 지워진 흔적
+for it in data['bank']:
+    if it['type'] == 'multi' and re.search(r'옳은 것만을\s+에서', it['stem']): bad.append(f'bank {it["id"]}: "<보기>" 가 지워진 듯함')
 for b in bad[:30]: print('✗', b)
 print('교재 데이터 점검', '통과' if not bad else f'실패 {len(bad)}건'); sys.exit(1 if bad else 0)

@@ -16,9 +16,9 @@
      폰트가 도착하면 자연스럽게 바뀐다. media 를 print 로 두었다가 onload 에서 all 로 올리는 방법. -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" media="print" onload="this.media='all';this.onload=null"
-      href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&family=Noto+Serif+KR:wght@400;600;700&display=swap">
-<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&family=Noto+Serif+KR:wght@400;600;700&display=swap"></noscript>
+<link rel="stylesheet" media="print" crossorigin="anonymous" onload="this.media='all';this.onload=null"
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&family=Noto+Serif+KR:wght@400;700&display=swap">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&family=Noto+Serif+KR:wght@400;700&display=swap"></noscript>
 <style>
 :root{
   --paper:#FAF8F4; --ground:#EFECE6; --card:#FFFFFF;
@@ -422,7 +422,8 @@ button,.tab,.btn,.chip,.chipbar button,.seg button{-webkit-user-select:none;user
 .setrow .l{flex:1;color:var(--body)}
 .setrow .l small{display:block;font-size:11.5px;color:var(--faint)}
 .setrow .v{color:var(--faint);font-size:13px}
-.setrow .ctl{display:flex;gap:4px}
+.setrow .ctl{display:flex;gap:4px;flex-wrap:wrap;justify-content:flex-end}
+.setrow{flex-wrap:wrap}
 .setrow .ctl button{font-size:12px;font-weight:700;padding:6px 10px;border-radius:8px;border:1px solid var(--line);background:var(--card);color:var(--muted);cursor:pointer}
 .setrow .ctl button.on{background:var(--u);border-color:var(--u);color:var(--on-color)}
 .setrow.go{cursor:pointer}
@@ -702,6 +703,7 @@ figure.zoomable{cursor:zoom-in}
 .fbrow .kd{display:inline-block;font-size:11px;font-weight:800;border-radius:999px;padding:2px 8px;margin-right:6px;background:var(--brand-soft);color:var(--brand-dark)}
 .fbrow .kd.care{background:var(--warn-soft,rgba(138,100,8,.1));color:var(--warn)}
 sup,sub{font-size:.72em;line-height:0;position:relative;vertical-align:baseline}sup{top:-.5em}sub{bottom:-.2em}
+.sr{position:absolute!important;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
 .piiwarn{background:var(--warn-soft);border:1px solid var(--warn);border-radius:12px;padding:12px 13px;margin-bottom:10px;font-size:12.5px;line-height:1.7;color:var(--warn)}
 .needlogin{background:var(--card);border:1px solid var(--hair);border-radius:16px;padding:26px 18px;text-align:center;margin-bottom:12px}
 .needlogin p{font-size:13.5px;color:var(--muted);line-height:1.8;margin-bottom:14px}
@@ -850,6 +852,7 @@ sup,sub{font-size:.72em;line-height:0;position:relative;vertical-align:baseline}
 <div id="netbar"></div>
   <div id="sheet"></div>
   <div id="ask"></div>
+  <div id="live" class="sr" role="status" aria-live="polite"></div>
   <div id="wm" class="hide" aria-hidden="true"></div>
 
 <script type="application/json" id="d-concepts"><!--CONCEPTS--></script>
@@ -887,7 +890,7 @@ const CFG = {
   push: '__PUSH__' === 'on',          // build.py 가 server/config.json 의 "push": true 를 보고 켠다(google-services.json 이 있어야 함)   // 2026-09-08 결정: 월 9,900 · 수강생 무료
 };
 
-const TERMS_VER = '2026-09-29';        // 약관·개인정보처리방침 판 — 바꾸면 가입 때 동의한 판이 계정에 남는다
+const TERMS_VER = '2026-10-02';        // 약관·개인정보처리방침 판 — 문서 머리의 '판'과 같게 적는다(가입 때 동의한 판이 계정에 남는다)
 /* 메일 링크(가입 확인·비밀번호 재설정)가 돌아올 주소. 앱(네이티브)은 웹 주소로 돌아오게 한다 */
 const WEB_URL = 'https://usualhealth383-cloud.github.io/autoblog/parkchan/';
 const authRedirect = () => (window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform()) || !/^https?:/.test(location.href) ? WEB_URL : location.origin + location.pathname;
@@ -929,12 +932,15 @@ function drawNet(){
 }
 window.addEventListener('online',  () => { setNet(false); drawNet(); });
 window.addEventListener('offline', drawNet);
-const toast = msg => { const t=document.createElement('div'); t.className='toast'; t.textContent=msg; document.body.appendChild(t); setTimeout(()=>t.remove(),2500); };
+const toast = msg => { const t=document.createElement('div'); t.className='toast'; t.setAttribute('aria-hidden','true'); t.textContent=msg; document.body.appendChild(t); setTimeout(()=>t.remove(),2500);
+  const lv = document.getElementById('live'); if (lv){ lv.textContent = ''; setTimeout(() => { lv.textContent = msg; }, 30); } };   // 화면낭독기는 늘 있는 알림 칸(role=status)으로 읽는다
 const Cap = window.Capacitor, isNative = !!(Cap && Cap.isNativePlatform && Cap.isNativePlatform());
 const plug = n => (Cap && Cap.Plugins && Cap.Plugins[n]) || null;
 const h32 = s => { let h=2166136261; for (const ch of s){ h^=ch.charCodeAt(0); h=Math.imul(h,16777619)>>>0; } return h>>>0; };
 const uid = () => (crypto.randomUUID ? crypto.randomUUID() : 'u'+Date.now().toString(36)+Math.random().toString(36).slice(2));
 const validEmail = e => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e);
+/* 비밀번호: 8자 이상 + 글자와 숫자 — 원장 계정이 학생 전원의 정보를 보므로(2026-10-01 점검). 서버(Supabase Auth)도 같은 규칙으로 맞춘다 */
+const pwProblem = pw => String(pw||'').length < 8 ? '비밀번호는 8자 이상이어야 합니다.' : !(/[0-9]/.test(pw) && /[a-zA-Z가-힣]/.test(pw)) ? '비밀번호에 글자와 숫자를 함께 넣어 주세요.' : '';
 const genCode = (seed, taken=()=>false) => { const A='ABCDEFGHJKMNPQRSTUVWXYZ';
   for (let i=0;i<50;i++){ const h=h32(seed+Date.now()+i+Math.random()); const c=A[h%23]+A[(h>>>5)%23]+A[(h>>>10)%23]+pad(h%1000).padStart(3,'0'); if(!taken(c)) return c; }
   return 'PCS'+pad(Date.now()%1000).padStart(3,'0'); };
@@ -949,9 +955,12 @@ let CLASSES_CACHE = CFG.classes.slice();
 
 /* ═══ 서버 연결(Supabase) — 있으면 서버 모드, 없으면 로컬 모드 ═══ */
 const SRV = (() => {
-  let o = null; try { o = JSON.parse(localStorage.getItem('pcs.server')); } catch {}
+  /* 서버 주소 바꾸기(?server=)는 개발 기기(127.0.0.1·localhost 브라우저)에서만. 공개 주소에서 받아 주면 남이 보낸 링크 한 번으로
+     로그인이 가짜 서버로 가고 그 설정이 남는다(비밀번호 가로채기) — 2026-10-01 점검에서 재현 */
+  const DEV = /^(127\.0\.0\.1|localhost)$/.test(location.hostname) && !(Cap && Cap.isNativePlatform && Cap.isNativePlatform());
+  let o = null; if (DEV) { try { o = JSON.parse(localStorage.getItem('pcs.server')); } catch {} } else { try { localStorage.removeItem('pcs.server'); } catch {} }
   const qp = new URLSearchParams(location.search);
-  if (qp.get('server') !== null){ o = qp.get('server') ? { url: qp.get('server'), key: qp.get('key')||'' } : null;
+  if (DEV && qp.get('server') !== null){ o = qp.get('server') ? { url: qp.get('server'), key: qp.get('key')||'' } : null;
     try { o ? localStorage.setItem('pcs.server', JSON.stringify(o)) : localStorage.removeItem('pcs.server'); } catch {} }
   const url = (o && o.url) || (CFG.supabaseUrl.startsWith('http') ? CFG.supabaseUrl : ''), key = (o && o.key) || (CFG.supabaseKey.startsWith('__') ? '' : CFG.supabaseKey);
   return url ? { url: url.replace(/\/$/, ''), key } : null;
@@ -961,7 +970,7 @@ let SESSION = null; try { SESSION = JSON.parse(localStorage.getItem('pcs.session
 const saveSession = () => { try { SESSION ? localStorage.setItem('pcs.session', JSON.stringify(SESSION)) : localStorage.removeItem('pcs.session'); } catch {} };
 /* Supabase Auth 의 영어 오류를 학생이 읽을 말로 */
 const AUTH_KO = m => { const t = String(m||''); const M = [[/link.*(invalid|expired)|expired|invalid.*token|otp/i,'링크가 만료되었거나 이미 사용되었습니다. 다시 요청해 주세요.'],[/invalid login credentials/i,'이메일 또는 비밀번호가 다릅니다.'],[/email not confirmed/i,'메일 인증이 아직입니다. 가입 확인 메일의 링크를 먼저 눌러 주세요.'],
-  [/already registered|already been registered/i,'이미 가입된 이메일입니다. 로그인해 주세요.'],[/at least 6/i,'비밀번호는 6자 이상이어야 합니다.'],[/rate limit|too many/i,'요청이 너무 잦습니다. 잠시 뒤에 다시 시도해 주세요.'],
+  [/already registered|already been registered/i,'이미 가입된 이메일입니다. 로그인해 주세요.'],[/at least \d+/i,'비밀번호는 8자 이상, 글자와 숫자를 함께 넣어 주세요.'],[/weak|pwned|leaked/i,'너무 쉽거나 유출된 적 있는 비밀번호입니다. 다른 비밀번호로 해 주세요.'],[/rate limit|too many/i,'요청이 너무 잦습니다. 잠시 뒤에 다시 시도해 주세요.'],
   [/invalid.*email|email.*invalid/i,'이메일 형식을 확인해 주세요.'],[/same.*password|different from the old/i,'이전과 다른 비밀번호를 정해 주세요.']];
   const hit = M.find(([r]) => r.test(t)); return hit ? hit[1] : t; };
 /* 서버 호출 — 20초 넘게 답이 없거나 연결이 안 되면 학생이 읽을 말로 알린다(영어 'Failed to fetch' 를 그대로 보여 주지 않는다) */
@@ -983,7 +992,7 @@ const DB_KO = (j, status) => { const m = String((j && (j.message || j.msg || j.e
 /* 로그인이 만료되어 되살릴 수 없으면: 조용히 실패하지 않고 로그인 화면으로 */
 let sessionLostShown = false;
 function sessionLost(){ if (sessionLostShown || !ACC) return; sessionLostShown = true;
-  setTimeout(() => { ACC = null; S.auth = null; authMode = 'login'; authErr = '로그인이 만료되었습니다. 다시 로그인해 주세요. 기록은 그대로 남아 있습니다.'; closeSheet(); show('auth'); sessionLostShown = false; }, 0); }
+  try { localStorage.removeItem('pcs.me'); } catch {} setTimeout(() => { ACC = null; S.auth = null; authMode = 'login'; authErr = '로그인이 만료되었습니다. 다시 로그인해 주세요. 기록은 그대로 남아 있습니다.'; closeSheet(); show('auth'); sessionLostShown = false; }, 0); }
 async function authPost(path, body){
   const r = await fetchT(SRV.url + path, { method:'POST', headers:{ apikey:SRV.key, 'Content-Type':'application/json', ...(SESSION&&SESSION.access_token?{Authorization:'Bearer '+SESSION.access_token}:{}) }, body: JSON.stringify(body) });
   const j = await r.json().catch(()=>({}));
@@ -1028,13 +1037,14 @@ const DB = (() => {
     classes: CFG.classes.slice(),
   });
   let d; try { d = JSON.parse(localStorage.getItem(DBKEY)); } catch {}
-  if (!d || !d.accounts) d = seed();
+  if (!d || typeof d !== 'object' || !Array.isArray(d.accounts)) d = seed();   // 모양이 깨진 기록이면 새로(흰 화면으로 멈추지 않게)
+  ['students','attendance','notices','posts','comments','sched','consents'].forEach(k => { if (k in d && !Array.isArray(d[k])) d[k] = []; });
   d.classes ||= CFG.classes.slice(); d.passes ||= []; d.progress ||= {};
   d.accounts.forEach(a => { if (a.childCode && !a.childCodes){ a.childCodes = [a.childCode]; } delete a.childCode; });   // 자녀 여러 명으로 옮김
   CLASSES_CACHE = d.classes.slice();
   const w = () => { try { localStorage.setItem(DBKEY, JSON.stringify(d)); } catch {} };
   let sid = null; try { sid = localStorage.getItem('pcs.local.sid'); } catch {}
-  const pub = a => a ? { id:a.id, email:a.email, role:a.role, name:a.name, phone:a.phone||'', studentCode:a.studentCode||'', childCodes:(a.childCodes||[]).slice(), childCode:(a.childCodes||[])[0]||'', passUntil:a.passUntil||'', nick:a.nick||'', under14:!!a.under14, guardian:a.guardian||'', guardianOk:!!a.guardianOk, guardianHow:a.guardianHow||'', guardianAt:a.guardianAt||'', created:a.created } : null;
+  const pub = a => a ? { id:a.id, email:a.email, role:a.role, name:a.name, phone:a.phone||'', studentCode:a.studentCode||'', childCodes:(a.childCodes||[]).slice(), childPending:(a.childPending||[]).slice(), childCode:(a.childCodes||[])[0]||'', passUntil:a.passUntil||'', nick:a.nick||'', under14:!!a.under14, guardian:a.guardian||'', guardianOk:!!a.guardianOk, guardianHow:a.guardianHow||'', guardianAt:a.guardianAt||'', created:a.created } : null;
   const me = () => d.accounts.find(a => a.id === sid) || null;
   const stateOf = code => d.progress[code] || null;
   const attend = (s, manual) => {
@@ -1075,8 +1085,19 @@ const DB = (() => {
         if (!a.name) a.name = s.name; }
       else if (a.role !== 'parent') return { ok:false, why:'보호자 계정에서만 자녀를 연결할 수 있습니다.' };
       if (kind === 'student') a.studentCode = c;
-      else { a.childCodes ||= []; if (!a.childCodes.includes(c)){ if (a.childCodes.length >= 5) return { ok:false, why:'자녀는 다섯 명까지 연결할 수 있습니다.' }; a.childCodes.push(c); } }
+      else { a.childCodes ||= []; a.childPending ||= [];   // 서버와 같이: 보호자 연결은 원장이 확인해야 열린다
+        if (!a.childCodes.includes(c)){ if (a.childCodes.length + a.childPending.length >= 5 && !a.childPending.includes(c)) return { ok:false, why:'자녀는 다섯 명까지 연결할 수 있습니다.' };
+          if (!a.childPending.includes(c)) a.childPending.push(c); a.pendingAt ||= {}; a.pendingAt[c] ||= new Date().toISOString(); w(); return { ok:true, pending:true }; } }
       w(); return { ok:true, student:{ code:s.code, name:s.name, cls:s.cls, until:s.until } }; },
+    clearReports: async (kind, id) => { const arr = kind === 'post' ? (d.posts||[]) : (d.comments||[]); const x = arr.find(y => y.id === id); if (x){ x.reports = []; w(); } },
+    deleteUser: async email => { const a = d.accounts.find(x => x.email === String(email).trim().toLowerCase()); if (!a) return { ok:false, why:'그 이메일로 가입한 계정이 없습니다.' };
+      if (a.role === 'owner') return { ok:false, why:'원장 계정은 여기서 지울 수 없습니다.' }; d.accounts = d.accounts.filter(x => x !== a); delete d.progress['u:'+a.id]; if (d.notes) delete d.notes[a.id]; w(); return { ok:true }; },
+    guardianRequests: async () => d.accounts.filter(a => a.role==='parent' && (a.childPending||[]).length).flatMap(a => a.childPending.map(c => { const s = d.students.find(x => x.code === c) || {};
+      return { uid:a.id, code:c, at:(a.pendingAt||{})[c] || a.created, name:a.name, phone:a.phone||'', email:a.email, student:s.name||'', cls:s.cls||'' }; })),
+    guardianDecide: async (uid, code, ok) => { const a = d.accounts.find(x => x.id === uid); if (!a) return;
+      a.childPending = (a.childPending||[]).filter(x => x !== code);
+      if (ok){ a.childCodes ||= []; if (!a.childCodes.includes(code)) a.childCodes.push(code); } else a.childCodes = (a.childCodes||[]).filter(x => x !== code); w(); },
+    myGuardians: async () => { const a = me(); if (!a || !a.studentCode) return []; return d.accounts.filter(x => x.role==='parent' && (x.childCodes||[]).includes(a.studentCode)).map(x => ({ name:x.name })); },
     unlinkChild: async code => { const a = me(); if (a){ a.childCodes = (a.childCodes||[]).filter(x => x !== code); w(); } },
     deleteAccount: async () => { const a = me(); if (!a) return; d.accounts = d.accounts.filter(x => x.id !== a.id); delete d.progress['u:'+a.id]; if (d.notes) delete d.notes[a.id]; sid = null; try { localStorage.removeItem('pcs.local.sid'); } catch {} w(); },
     /* 학원 코드 · 자녀 연결 */
@@ -1093,7 +1114,8 @@ const DB = (() => {
     updateStudent: async (code, patch) => { const s = d.students.find(x=>x.code===code); if (s){ ['name','cls','until','phone'].forEach(k => { if (k in patch) s[k] = patch[k]; }); w(); } return s; },
     extendClass: async (cls, until) => { const rows = d.students.filter(s => (cls==='전체' || s.cls===cls) && s.until < until); rows.forEach(s => s.until = until); w(); return rows.length; },
     guardiansOf: async code => d.accounts.filter(a => a.role==='parent' && (a.childCodes||[]).includes(code)).map(a => ({ name:a.name, phone:a.phone||'' })),
-    linkedOf: async code => ({ student: d.accounts.filter(a => a.role==='student' && a.studentCode===code).length, guardians: d.accounts.filter(a => a.role==='parent' && (a.childCodes||[]).includes(code)).map(a => ({ name:a.name, phone:a.phone||'' })) }),
+    linkedOf: async code => ({ student: d.accounts.filter(a => a.role==='student' && a.studentCode===code).length,
+      guardians: d.accounts.filter(a => a.role==='parent' && ((a.childCodes||[]).includes(code) || (a.childPending||[]).includes(code))).map(a => ({ uid:a.id, name:a.name, phone:a.phone||'', approved:(a.childCodes||[]).includes(code) })) }),
     releaseCode: async code => { const rows = d.accounts.filter(a => a.studentCode===code); rows.forEach(a => a.studentCode=''); w(); return rows.length; },
     /* 출석 */
     attendanceOn: async date => d.attendance.filter(a=>a.date===date),
@@ -1212,19 +1234,24 @@ const DB = (() => {
 const serverDB = () => {
   const notice = (n, reads=[]) => ({ id:n.id, cls:n.cls, t:n.title, d:n.body||'', at:n.at, read: reads.filter(r=>r.notice_id===n.id).map(r=>r.code) });
   const att = a => ({ code:a.code, date:a.date, time:hhmm(a.time), late:!!a.late, manual:!!a.manual });
-  const prof = p => p ? { id:p.id, email:p.email||'', role:p.role, name:p.name, phone:p.phone||'', studentCode:p.student_code||'', childCodes:(p._children||[]).slice(), childCode:(p._children||[])[0]||'', passUntil:p.pass_until||'', nick:p.nick||'', under14:!!p.under14, guardian:p.guardian||'', guardianOk:!!p.guardian_ok, guardianHow:p.guardian_how||'', guardianAt:p.guardian_at||'', created:p.created_at } : null;
+  const prof = p => p ? { id:p.id, email:p.email||'', role:p.role, name:p.name, phone:p.phone||'', studentCode:p.student_code||'', childCodes:(p._children||[]).slice(), childPending:(p._pending||[]).slice(), childCode:(p._children||[])[0]||'', passUntil:p.pass_until||'', nick:p.nick||'', under14:!!p.under14, guardian:p.guardian||'', guardianOk:!!p.guardian_ok, guardianHow:p.guardian_how||'', guardianAt:p.guardian_at||'', created:p.created_at } : null;
   let attCache = null, meCache = null;
   const myProfile = async () => { if (!SESSION) return null; const r = await api(`/rest/v1/profiles?id=eq.${SESSION.user.id}&select=*`);
     if (!r.length){ meCache = null; return null; }
-    const kids = r[0].role === 'parent' ? (await api('/rest/v1/guardian_links?select=code&order=at.asc')).map(x => x.code) : [];
-    meCache = prof({ ...r[0], email:SESSION.user.email, _children:kids }); return meCache; };
+    const links = r[0].role === 'parent' ? await api('/rest/v1/guardian_links?select=code,approved&order=at.asc') : [];
+    const kids = links.filter(x => x.approved).map(x => x.code), pend = links.filter(x => !x.approved).map(x => x.code);
+    meCache = prof({ ...r[0], email:SESSION.user.email, _children:kids, _pending:pend }); return meCache; };
   return {
     mode: 'server',
-    me: async () => { if (!SESSION) return null; try { return await myProfile(); } catch { return meCache; } },
+    /* 망이 안 될 때(지하철·지하): 이 기기에 남긴 마지막 프로필로 — 학원 학생이 '둘러보는 중'으로 보이던 것(2026-10-01). 로그인이 만료(401)면 쓰지 않는다 */
+    me: async () => { if (!SESSION) return null;
+      try { const p = await myProfile(); try { p ? localStorage.setItem('pcs.me', JSON.stringify(p)) : localStorage.removeItem('pcs.me'); } catch {} return p; }
+      catch (e){ if (meCache) return meCache; if (e && e.status && e.status < 500) return null;
+        try { const c = JSON.parse(localStorage.getItem('pcs.me')); if (c && SESSION.user && c.id === SESSION.user.id){ meCache = c; return c; } } catch {} return null; } },
     /* 프로필은 서버 트리거가 가입 정보(data)로 만든다 — 메일 인증을 켜 두어도 역할·보호자 정보가 빠지지 않는다 */
     signUp: async ({ email, password, name, role, phone, under14, guardian }) => {
       const j = await authPost('/auth/v1/signup?redirect_to=' + encodeURIComponent(authRedirect()), { email, password, data:{ name, role, phone:phone||'', under14:!!under14, guardian:guardian||'', terms_ver:TERMS_VER } });
-      if (!j.access_token) throw Object.assign(new Error(`${email} 로 가입 확인 메일을 보냈습니다. 메일의 링크를 누르면 바로 로그인됩니다.`), { mailSent:true });
+      if (!j.access_token) throw Object.assign(new Error(isNative ? `${email} 로 가입 확인 메일을 보냈습니다. 메일의 링크를 누르면 인증이 끝납니다 — 그다음 이 앱으로 돌아와 로그인해 주세요.` : `${email} 로 가입 확인 메일을 보냈습니다. 메일의 링크를 누르면 바로 로그인됩니다.`), { mailSent:true });
       SESSION = { access_token:j.access_token, refresh_token:j.refresh_token, user:{ id:j.user.id, email:j.user.email } }; saveSession();
       return myProfile();
     },
@@ -1236,8 +1263,8 @@ const serverDB = () => {
         await api('/rest/v1/profiles', { method:'POST', prefer:'return=minimal', body:{ id:j.user.id, role: m.role==='parent'?'parent':'student', name:m.name||'' } }); p = await myProfile(); }
       return p;
     },
-    signOut: async () => { try { if (SESSION) await authPost('/auth/v1/logout', {}); } catch {} SESSION = null; saveSession(); meCache = null; },
-    resetPassword: async email => { await authPost('/auth/v1/recover?redirect_to=' + encodeURIComponent(authRedirect()), { email }); return { ok:true, note:'비밀번호 재설정 메일을 보냈습니다. 메일의 링크를 눌러 주세요.' }; },
+    signOut: async () => { try { if (SESSION) await authPost('/auth/v1/logout', {}); } catch {} SESSION = null; saveSession(); meCache = null; try { localStorage.removeItem('pcs.me'); } catch {} },
+    resetPassword: async email => { await authPost('/auth/v1/recover?redirect_to=' + encodeURIComponent(authRedirect()), { email }); return { ok:true, note: isNative ? '비밀번호 재설정 메일을 보냈습니다. 메일의 링크(웹 페이지)에서 새 비밀번호를 정한 뒤, 이 앱에서 새 비밀번호로 로그인해 주세요.' : '비밀번호 재설정 메일을 보냈습니다. 메일의 링크를 눌러 주세요.' }; },
     setPassword: async pw => { const r = await fetchT(SRV.url + '/auth/v1/user', { method:'PUT', headers:{ apikey:SRV.key, 'Content-Type':'application/json', Authorization:'Bearer '+SESSION.access_token }, body: JSON.stringify({ password: pw }) });
       if (!r.ok){ const j = await r.json().catch(()=>({})); throw new Error(j.msg || j.message || '비밀번호를 바꾸지 못했습니다.'); } return { ok:true }; },
     /* 메일 링크로 돌아왔을 때(#access_token=…) 세션을 받는다 */
@@ -1262,6 +1289,11 @@ const serverDB = () => {
     extendClass: async (cls, until) => (await api(`/rest/v1/students?${cls==='전체'?'':`cls=eq.${encodeURIComponent(cls)}&`}until=lt.${until}`, { method:'PATCH', prefer:'return=representation', body:{ until } })).length,
     guardiansOf: async code => { const r = await api('/rest/v1/rpc/linked_of', { method:'POST', body:{ p_code: code } }); return (r && r.guardians) || []; },
     linkedOf: async code => (await api('/rest/v1/rpc/linked_of', { method:'POST', body:{ p_code: code } })) || { student:0, guardians:[] },
+    guardianRequests: async () => (await api('/rest/v1/rpc/guardian_requests', { method:'POST', body:{} })) || [],
+    clearReports: async (kind, id) => { await api('/rest/v1/rpc/clear_reports', { method:'POST', body:{ p_kind:kind, p_id:id } }); },
+    deleteUser: async email => (await api('/rest/v1/rpc/delete_user', { method:'POST', body:{ p_email:email } })) || { ok:false, why:'지우지 못했습니다.' },
+    guardianDecide: async (uid, code, ok) => { await api('/rest/v1/rpc/guardian_decide', { method:'POST', body:{ p_uid:uid, p_code:code, p_ok:!!ok } }); },
+    myGuardians: async () => (await api('/rest/v1/rpc/my_guardians', { method:'POST', body:{} })) || [],
     releaseCode: async code => api('/rest/v1/rpc/release_code', { method:'POST', body:{ p_code: code } }),
     attendanceOn: async date => (await api(`/rest/v1/attendance?date=eq.${date}&select=*`)).map(att),
     attendanceRange: async (from, to, code) => (await api(`/rest/v1/attendance?date=gte.${from}&date=lte.${to}${code?`&code=eq.${encodeURIComponent(code)}`:''}&select=*&order=date.desc`)).map(att),
@@ -1317,7 +1349,8 @@ const serverDB = () => {
       body:{ id:n.id, date:n.date, title:(n.title||'').slice(0,80), body:(n.body||'').slice(0,NOTE_MAX), cids:(n.cids||[]).slice(0,12), updated_at:n.at } }); },
     noteDel: async id => { await api(`/rest/v1/notes?id=eq.${encodeURIComponent(id)}`, { method:'DELETE' }); },
     loadProgress: async key => { const r = await api(`/rest/v1/progress?code=eq.${encodeURIComponent(key)}&select=state`); return r.length ? r[0].state : null; },
-    saveProgress: async (key, state) => { await api('/rest/v1/progress?on_conflict=code', { method:'POST', prefer:'resolution=merge-duplicates,return=minimal', body:{ code:key, state, at:new Date().toISOString() } }); },
+    saveProgress: async (key, state) => { const r = await api('/rest/v1/progress?on_conflict=code&select=state', { method:'POST', prefer:'resolution=merge-duplicates,return=representation', body:{ code:key, state, at:new Date().toISOString() } });
+      return { at: r && r[0] && r[0].state && r[0].state.at }; },   // 서버가 적은 저장 시각
     progressAll: async () => (await api('/rest/v1/progress?select=code,state,at&code=not.like.u:*')).map(r => ({ code:r.code, state:r.state })),
     redeemPass: async code => { const r = await api('/rest/v1/rpc/redeem_pass', { method:'POST', body:{ p_code: code } }); if (r && r.ok){ meCache = null; } return r; },
     issuePass: async days => { const r = await api('/rest/v1/passes', { method:'POST', prefer:'return=representation', body:{ code:genCode('pass'), days } }); return r[0]; },
@@ -1349,16 +1382,30 @@ const DBX = SRV ? serverDB() : DB;
 /* ═══ 계정 · 내 진도 ═══ */
 let ACC = null;                                  // 로그인한 계정 { id, email, role, name, studentCode, childCodes[], passUntil }
 const KEY = 'pcs.v2';
-const load = () => { try { return JSON.parse(localStorage.getItem(KEY)) || {}; } catch { return {}; } };
+/* 기기 기록 읽기 — 깨졌으면(모양이 다르거나 JSON 이 아님) 원본을 따로 남기고 새로 시작한다. 예전엔 흰 화면으로 멈추거나 말없이 지워졌다(2026-10-01) */
+let storeWarn = '';
+const load = () => { let raw = null; try { raw = localStorage.getItem(KEY); } catch { return {}; }
+  if (!raw) return {};
+  try { const v = JSON.parse(raw); if (v && typeof v === 'object' && !Array.isArray(v)) return v; } catch {}
+  try { localStorage.setItem(KEY + '.broken', raw.slice(0, 2e6)); } catch {} storeWarn = '이 기기의 공부 기록을 읽지 못해 새로 시작합니다. 로그인하면 서버에 남은 기록을 다시 받아 옵니다.'; return {}; };
+const fixS = S => { const arr = k => { if (!Array.isArray(S[k])) S[k] = []; }, obj = (o, k) => { if (!o[k] || typeof o[k] !== 'object' || Array.isArray(o[k])) o[k] = {}; };
+  ['done','wrong','read','days','bm','qkeep','blocked'].forEach(arr); obj(S, 'bh'); obj(S, 'seenC');
+  if (!S.stats || typeof S.stats !== 'object') S.stats = { a:0, c:0 }; S.stats.a = +S.stats.a || 0; S.stats.c = +S.stats.c || 0;
+  if (typeof S.start !== 'string' || !/^\d{4}-\d\d-\d\d$/.test(S.start)) S.start = '';
+  if (!S.sched || typeof S.sched !== 'object' || Array.isArray(S.sched)) S.sched = {}; ['fixed','events','ddays'].forEach(k => { if (!Array.isArray(S.sched[k])) S.sched[k] = []; });
+  if (typeof S.qskip !== 'number') S.qskip = 0;
+  S.wrong = S.wrong.filter(w => w && typeof w === 'object'); return S; };
 let syncT = null;
 /* 만 14세 미만은 보호자 동의를 확인하기 전까지 진도를 서버에 올리지 않는다(이 기기에만) */
 const consentPending = () => !!(ACC && ACC.under14 && !ACC.guardianOk);
 const progressKey = () => consentPending() ? null : (S.auth && S.auth.code) || (ACC ? 'u:'+ACC.id : null);
 const snapshot = () => ({ start:S.start, done:S.done, wrong:S.wrong, read:S.read, days:S.days, bm:S.bm, stats:S.stats, bh:S.bh||{}, qkeep:S.qkeep||[], blocked:S.blocked||[], seenC:S.seenC||{}, sched:S.sched, notifyAt:S.notifyAt, at:new Date().toISOString() });
 /* 기기 여러 대(폰·태블릿): 저장한 스냅숏 시각(syncAt)을 기억해 두고, 앱으로 돌아올 때 서버가 더 새 것이면 받아 합친다 */
-const saveLocal = () => { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch {} };
-const pushProgress = async k => { const snap = snapshot(); await DBX.saveProgress(k, snap); S.syncAt = snap.at; saveLocal(); };
-const save = s => { try { localStorage.setItem(KEY, JSON.stringify(s)); } catch {}
+let quotaWarned = false;
+const quotaFail = () => { if (quotaWarned) return; quotaWarned = true; setTimeout(() => toast('기기 저장 공간이 가득 차 방금 기록을 저장하지 못했습니다. 저장 공간을 비우거나 로그인해 서버에 남겨 주세요.'), 50); };
+const saveLocal = () => { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch { quotaFail(); } };
+const pushProgress = async k => { const snap = snapshot(); const r = await DBX.saveProgress(k, snap); S.syncAt = (r && r.at) || snap.at; saveLocal(); };
+const save = s => { try { localStorage.setItem(KEY, JSON.stringify(s)); } catch { quotaFail(); }
   const k = progressKey(); if (k){ clearTimeout(syncT); syncT = setTimeout(() => pushProgress(k).catch(()=>{}), 1000); } };
 /* 합치기 규칙
    · 늘기만 하는 것(공부한 개념·학습한 날·읽음·통계·문제 은행 기록): 합집합 · 큰 쪽
@@ -1392,20 +1439,27 @@ async function pullProgress(force){ const k = progressKey(); if (!k || !SRV || (
   try { const p = await DBX.loadProgress(k); if (!p || !p.at || (S.syncAt && p.at <= S.syncAt)) return;
     mergeProgress(p); saveLocal();
     if (['today','list','stats','plan','bank','wrong','me'].includes(view) && !document.getElementById('sheetBg')) show(view); } catch {} }
+/* 자정을 넘기면 '오늘'을 다시 그린다 — 앱을 켜 둔 채 밤을 넘기면 어제 개념·어제 날짜가 남던 것(2026-10-01) */
+let drawnDay = null;
+const dayRoll = () => { const d = todayISO(); if (drawnDay && d !== drawnDay && ['today','plan','note','parent','admin'].includes(view)){ qState = null; show(view); } drawnDay = d; };
+setInterval(() => { if (document.visibilityState === 'visible') dayRoll(); }, 60000);
+document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') dayRoll(); });
 document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible'){ pullProgress(); syncNotes().then(() => { if (view === 'note') renderNote(); else refreshNoteCard(); }).catch(()=>{}); } else if (view === 'noted') nedCommit(); });
 /* 새 진도(로그아웃·계정 삭제 뒤) — 화면 설정만 남기고 비운다. 한 기기를 여럿이 쓸 때 진도가 섞이지 않게 */
 const freshS = () => ({ start:todayISO(), done:[], wrong:[], read:[], days:[], bm:[], stats:{a:0,c:0}, bh:{}, qkeep:[], qskip:0, blocked:[], seenC:{},
-  sched:{ fixed:[], events:[], ddays:[] }, syncAt:'', fs:S.fs||'보통', theme:S.theme||'시스템', notifyAt:S.notifyAt||'18:00', onboarded:true });
+  sched:{ fixed:[], events:[], ddays:[] }, syncAt:'', fs:S.fs||'보통', theme:S.theme||'시스템', notifyAt:S.notifyAt||'안 받음', onboarded:true });
 const flushProgress = async () => { clearTimeout(syncT); const k = progressKey(); if (k) try { await pushProgress(k); } catch {} };
-let S = load();
+let S = fixS(load());
 if (!S.start){ S.start = todayISO(); }
 S.done ||= []; S.wrong ||= []; S.read ||= []; S.days ||= []; S.bm ||= []; S.stats ||= { a:0, c:0 }; S.bh ||= {};
 S.qkeep ||= []; S.qskip ||= 0; S.blocked ||= []; S.seenC ||= {};
 S.sched ||= { fixed:[], events:[], ddays:[] };
 S.sched.fixed ||= []; S.sched.events ||= []; S.sched.ddays ||= [];
-S.fs ||= '보통'; S.theme ||= '시스템'; S.notifyAt ??= '18:00';
+S.fs ||= '보통'; S.theme ||= '시스템'; S.notifyAt ??= '안 받음';   // 매일 알림은 사용자가 켤 때만(가입 환영 화면·내 정보) — 모두에게 18시로 켜 두던 것(2026-10-01)
 const applyPrefs = () => {
-  document.documentElement.style.setProperty('--fs', {작게:'14px',보통:'15px',크게:'17px'}[S.fs]||'15px');
+  /* 글자 크기: 몸글자만 바꾸면 고정 크기(px) 글자가 그대로여서 '크게'가 거의 안 바뀌었다(2026-10-01 점검) → 화면 전체 배율로 */
+  document.documentElement.style.setProperty('--fs', '15px');
+  document.documentElement.style.zoom = ({작게:0.93, 보통:1, 크게:1.15}[S.fs]) || 1;
   if (S.theme==='시스템') delete document.documentElement.dataset.theme; else document.documentElement.dataset.theme = S.theme==='어둡게'?'dark':'light';
   if (typeof applyBar === 'function') applyBar();
 };
@@ -1436,7 +1490,7 @@ function conceptCard(c, opts={}){
       <h1>${esc(c.title)}</h1>
       <div class="sub">${esc(c.subtitle||c.lessonName)}</div>
       <div class="steps">${c.steps.map(s=>`<div class="step"><div class="n">${s.n}</div><div class="t">${esc(s.t)}</div><div class="d">${rich(s.d)}</div></div>`).join('')}</div>
-      ${c.figure ? `<figure class="zoomable" data-zoom="${c.id}">${figOf(c.id)}<figcaption>${esc(c.figure.caption)} · 누르면 크게</figcaption></figure>` : ''}
+      ${c.figure ? `<figure class="zoomable" data-zoom="${c.id}" tabindex="0" role="button" aria-label="그림 크게 보기: ${esc(c.figure.caption)}">${figOf(c.id)}<figcaption>${esc(c.figure.caption)} · 누르면 크게</figcaption></figure>` : ''}
       ${c.howto.length ? `<div class="howto"><span class="k">그림 읽는 법</span><ul>${c.howto.map((h,i)=>`<li><b class="n">${i+1}</b>${rich(h)}</li>`).join('')}</ul></div>`:''}
       <div class="prose">${c.body.map(p=>`<p>${rich(p)}</p>`).join('')}</div>
     </article>
@@ -1576,11 +1630,11 @@ function renderAuth(){
       cta = `<button class="btn ${allOn?'':'dim'}" id="suNext">동의하고 다음</button>`;
     }
     if (st === 3){
-      const pw = SU.pw||'', r1 = pw.length >= 6, r2 = /[0-9]/.test(pw) && /[a-zA-Z가-힣]/.test(pw);
+      const pw = SU.pw||'', r1 = pw.length >= 8, r2 = /[0-9]/.test(pw) && /[a-zA-Z가-힣]/.test(pw);
       body = `<h1 class="q">로그인할 계정을 만들어요</h1><p class="lead">이메일은 비밀번호를 잊었을 때 재설정 메일을 받는 데에도 씁니다.</p>
         <div class="fld"><label class="lab" for="suEmail">이메일</label><input id="suEmail" type="email" inputmode="email" autocomplete="username" placeholder="name@example.com"${sv('email')}></div>
-        <div class="fld"><label class="lab" for="suPw">비밀번호</label><div class="pwrow"><input id="suPw" type="${SU.showPw?'text':'password'}" autocomplete="new-password" placeholder="6자 이상"${sv('pw')}><button id="pwEye" type="button" aria-pressed="${SU.showPw}">${SU.showPw?'숨기기':'보기'}</button></div></div>
-        <div class="rules" aria-live="polite"><span class="${r1?'ok':''}">${r1?'✓':'·'} 6자 이상</span><span class="${r2?'ok':''}">${r2?'✓':'·'} 글자와 숫자 섞기(권장)</span></div>`;
+        <div class="fld"><label class="lab" for="suPw">비밀번호</label><div class="pwrow"><input id="suPw" type="${SU.showPw?'text':'password'}" autocomplete="new-password" placeholder="8자 이상 · 글자와 숫자"${sv('pw')}><button id="pwEye" type="button" aria-pressed="${SU.showPw}">${SU.showPw?'숨기기':'보기'}</button></div></div>
+        <div class="rules" aria-live="polite"><span class="${r1?'ok':''}">${r1?'✓':'·'} 8자 이상</span><span class="${r2?'ok':''}">${r2?'✓':'·'} 글자와 숫자 함께</span></div>`;
       cta = `<button class="btn" id="suNext">다음</button>`;
     }
     if (st === 4){
@@ -1628,7 +1682,7 @@ function renderAuth(){
       <h1>새 비밀번호</h1>
       <p class="lead">${esc(DBX.ownerEmail()||'')} 계정의 새 비밀번호를 정해 주세요.</p>
       <div class="f">
-        <div class="fld"><label class="lab" for="npPw">새 비밀번호</label><input id="npPw" type="password" placeholder="6자 이상" autocomplete="new-password"${val('npPw')}></div>
+        <div class="fld"><label class="lab" for="npPw">새 비밀번호</label><input id="npPw" type="password" placeholder="8자 이상 · 글자와 숫자" autocomplete="new-password"${val('npPw')}></div>
         <div class="fld"><label class="lab" for="npPw2">한 번 더</label><input id="npPw2" type="password" placeholder="같은 비밀번호" autocomplete="new-password"${val('npPw2')}></div>
       </div>${err}
       <button class="btn" id="npGo">바꾸고 시작</button>
@@ -1669,7 +1723,7 @@ function suKeep(){ const g = id => document.getElementById(id);
   if (g('agTerms')) SU.terms = g('agTerms').checked; if (g('agPrivacy')) SU.privacy = g('agPrivacy').checked; }
 function suCheck(final){ const st = SU.step, phoneOk = t => String(t||'').replace(/[^0-9]/g,'').length >= 9;
   if (st >= 2 || final){ if (SU.role==='student' && !SU.age && (st===2 || final)) return '나이를 골라 주세요.'; if ((st===2 || final) && !(SU.terms && SU.privacy)) return '필수 약관에 동의해 주세요.'; }
-  if (st === 3 || final){ if (!validEmail(SU.email.trim())) return '이메일 형식을 확인해 주세요.'; if (SU.pw.length < 6) return '비밀번호는 6자 이상이어야 합니다.'; }
+  if (st === 3 || final){ if (!validEmail(SU.email.trim())) return '이메일 형식을 확인해 주세요.'; if (pwProblem(SU.pw)) return pwProblem(SU.pw); }
   if (st === 4 || final){ if (!SU.name.trim()) return SU.role==='parent' ? '보호자 성함을 적어 주세요.' : '이름을 적어 주세요.';
     if (SU.phone.trim() && !phoneOk(SU.phone)) return '연락처를 확인해 주세요.';
     if (SU.role==='student' && SU.age==='u14' && (!SU.gName.trim() || !phoneOk(SU.gPhone))) return '만 14세 미만은 보호자 성함과 휴대전화가 필요합니다.'; }
@@ -1760,6 +1814,7 @@ function renderQuiz(){
   const label = mode==='review' ? '복습 문제' : (retry ? '다시 볼 문제' : '오늘의 문제');
   document.getElementById('v-quiz').innerHTML = `
     <button class="back" id="backToday"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg>${mode==='review'?'통계':'오늘 개념'}</button>
+    <h1 class="sr">${mode==='review'?'복습 문제':'오늘의 문제'}</h1>
     <div class="qhead"><span class="l">${label}${mode==='review'?` · ${esc(qState.lessonName||'')}`:''}</span>
       <span class="tag">${retry ? `${kdate(retry.iso)}에 틀림` : (graded && pick!==q.answer ? '다시 볼 문제' : (q.type||'확인'))}</span></div>
     ${retry ? `<p class="again">↻ ${RETRY_DAYS}일 전에 갈렸던 문제입니다. 이번엔 어디서 갈리는지 보세요.</p>` : ''}
@@ -1774,7 +1829,7 @@ function renderQuiz(){
       <div class="opts">${q.choices.map((t,i)=>{ const n=i+1; let cls='', mk=''; if (graded){ if (n===q.answer){cls='ok';mk='정답';} else if (n===pick){cls='bad';mk='내 답';} }
         return `<button class="opt ${cls}" data-p="${n}" ${graded?'disabled':''}><span class="m">${MARKS[i]}</span><span class="tx">${rich(t)}</span>${mk?`<span class="mk">${mk}</span>`:''}</button>`; }).join('')}</div>
       ${graded ? `
-        <div class="verdict"><div class="h">${pick===q.answer ? '맞혔습니다' : `${MARKS[pick-1]}는 맞는 설명이에요`}</div>
+        <div class="verdict" tabindex="-1" role="status"><div class="h">${pick===q.answer ? '맞혔습니다' : `아쉬워요 · 정답은 ${MARKS[q.answer-1]}`}</div>
           <p>${rich(q.explain || (pick===q.answer ? '정답입니다.' : `정답은 ${MARKS[q.answer-1]}입니다. 개념의 포인트를 다시 읽어 보세요.`))}</p></div>
         ${pick!==q.answer && !retry ? `<div class="again">↻ 오답 노트에 담았습니다 · <b>${RETRY_DAYS}일 뒤</b> 한 번 더 물어볼게요</div>`:''}
         ${retry ? `<div class="again">${pick===q.answer ? '✓ 이제 됐습니다 — 오답 노트에서 정리됩니다' : '한 번 더 담아 둘게요 — 3일 뒤 다시'}</div>`:''}
@@ -1795,7 +1850,7 @@ function gradePick(pick){
   if (mode==='today'){ const c = todayConcept(); if (!S.done.includes(c.id)) S.done.push(c.id); }
   if (retry){ retry.redone=true; if (pick===q.answer) retry.cleared=true; else { retry.redone=false; retry.iso=todayISO(); retry.p=pick; } }
   else if (pick!==q.answer && !S.wrong.some(w=>w.l===q.lessonId && w.n===q.no && !w.cleared)) S.wrong.push({l:q.lessonId, n:q.no, p:pick, iso:todayISO(), date:kdate(todayISO())});
-  save(S); renderQuiz();
+  save(S); renderQuiz(); document.querySelector('#v-quiz .verdict')?.focus({ preventScroll:true });   // 채점 결과를 화면낭독기가 읽게
 }
 
 /* ═══ 교재 목록 (검색 · 필터 · 북마크) ═══ */
@@ -2254,10 +2309,24 @@ function renderBank(){
 function startBank(items, label){
   bs = { items, i:0, pick:null, right:0, wrong:[], label:label||'', ess:null }; show('bank');
 }
+/* 빈칸 채점 — 칸마다 정확히 맞아야 한다(예전엔 '16'이 정답 '6'을 품어 맞다고 했다). 괄호는 있어도 없어도: '(태양계) 성운'·'s(초)'.
+   한 글자 답은 온전한 말도 인정(고 → 고생대). 빈칸이 여럿이면 쉼표로 순서대로(순서가 뜻을 가르는 문제가 있다: 이온, 공유) */
+const bnorm = t => String(t||'').replace(/\s+/g,'').replace(/[。．]$|\.$/,'').toLowerCase();
+function bvariants(a){ const v = new Set([bnorm(a), bnorm(a).replace(/[()]/g,'')]);
+  const pre = String(a).match(/^\((.+?)\)\s*(.+)$/); if (pre){ v.add(bnorm(pre[2])); v.add(bnorm(pre[1] + pre[2])); }
+  const post = String(a).match(/^(.+?)\s*\((.+?)\)$/); if (post){ v.add(bnorm(post[1])); v.add(bnorm(post[2])); v.add(bnorm(post[1] + post[2])); }
+  return v; }
+const bpart = (a, p) => !!p && (bvariants(a).has(p) || (bnorm(a).length === 1 && p.startsWith(bnorm(a)) && p.length <= 4));
+function blankCorrect(answer, pick){
+  const parts = String(answer||'').split(/\s*,\s*/).filter(Boolean); if (!parts.length) return false;
+  if (parts.length === 1) return bpart(parts[0], bnorm(pick));
+  let ins = String(pick||'').split(/[,/、]/).map(x => x.trim()).filter(Boolean);
+  if (ins.length !== parts.length){ const sp = String(pick||'').trim().split(/\s+/); if (sp.length === parts.length) ins = sp; else return false; }
+  return parts.every((a, i) => bpart(a, bnorm(ins[i]))); }
 function bankCorrect(q, pick){
   if (q.type==='ox') return pick===q.answer;
   if (q.type==='mc' || q.type==='multi') return +pick===q.answer;
-  if (q.type==='blank'){ const norm = t => String(t||'').replace(/\s+/g,'').replace(/[.,·]/g,''); const a = norm(q.answer), p = norm(pick); return !!p && (a===p || a.split(/[,/]/).every(x=>p.includes(norm(x)))); }
+  if (q.type==='blank') return blankCorrect(q.answer, pick);
   return pick==='맞음';
 }
 function renderBankSession(){
@@ -2274,7 +2343,7 @@ function renderBankSession(){
   if (q.type==='ox') body = `<div class="oxrow">${['O','X'].map(o=>`<button data-ox="${o}" ${graded?'disabled':''} class="${graded?(o===q.answer?'ok':(o===bs.pick?'bad':'')):''}">${o}</button>`).join('')}</div>`;
   else if (q.type==='mc' || q.type==='multi') body = `<div class="opts">${q.choices.map((t,i)=>{ const n=i+1; let cls='', mk=''; if (graded){ if (n===q.answer){cls='ok';mk='정답';} else if (n===+bs.pick){cls='bad';mk='내 답';} }
       return `<button class="opt ${cls}" data-bp="${n}" ${graded?'disabled':''}><span class="m">${MARKS[i]}</span><span class="tx">${rich(t)}</span>${mk?`<span class="mk">${mk}</span>`:''}</button>`; }).join('')}</div>`;
-  else if (q.type==='blank') body = graded ? `<div class="opts"><div class="opt ${bankCorrect(q,bs.pick)?'ok':'bad'}" style="cursor:default"><span class="tx">내 답: ${esc(bs.pick||'(빈칸)')} · 정답: <b>${esc(q.answer)}</b></span></div></div>` : `<div class="blankin"><input id="blankIn" placeholder="답을 쓰세요" autocomplete="off"><button id="blankGo">확인</button></div>`;
+  else if (q.type==='blank') body = graded ? `<div class="opts"><div class="opt ${bankCorrect(q,bs.pick)?'ok':'bad'}" style="cursor:default"><span class="tx">내 답: ${esc(bs.pick||'(빈칸)')} · 정답: <b>${esc(q.answer)}</b></span></div></div>` : `<div class="blankin"><input id="blankIn" aria-label="빈칸의 답" placeholder="${String(q.answer).includes(',') ? `빈칸 ${String(q.answer).split(',').length}개 — 순서대로 쉼표로 (예: 가, 나)` : '답을 쓰세요'}" autocomplete="off"><button id="blankGo">확인</button></div>`;
   else body = `<textarea class="essay" id="essayIn" placeholder="문장으로 답을 써 보세요" ${graded?'disabled':''}>${esc(bs.ess||'')}</textarea>${graded ? '' : `<button class="btn soft" id="essayShow">모범 답안 보기 · 스스로 채점</button>`}`;
   const ok = graded && bankCorrect(q, bs.pick);
   /* 아직 안 풀었을 때 화면 아래가 비어 보이지 않도록, 유형에 맞는 한 줄 안내를 둔다 */
@@ -2289,7 +2358,7 @@ function renderBankSession(){
     ${q.source ? `<div class="bogi">${rich(q.source).replace(/\n/g,'<br>')}</div>` : ''}
     ${body}
     ${graded ? '' : `<p class="qhint">${HINT}<br>틀려도 괜찮아요 — 오답은 <b>오답 노트</b>에 모이고 다시 풀 수 있습니다.</p>`}
-    ${graded ? `<div class="verdict"><div class="h">${q.type==='essay' ? '모범 답안' : ok ? '맞혔습니다' : '아쉽습니다'}${q.type!=='essay' && (q.type==='mc'||q.type==='multi') ? ` · 정답 ${MARKS[q.answer-1]}` : q.type==='ox'||q.type==='blank' ? ` · 정답 ${esc(q.answer)}` : ''}</div><p>${rich(q.explain||'개념 카드의 포인트를 다시 읽어 보세요.')}</p></div>
+    ${graded ? `<div class="verdict" tabindex="-1" role="status"><div class="h">${q.type==='essay' ? '모범 답안' : ok ? '맞혔습니다' : '아쉽습니다'}${q.type!=='essay' && (q.type==='mc'||q.type==='multi') ? ` · 정답 ${MARKS[q.answer-1]}` : q.type==='ox'||q.type==='blank' ? ` · 정답 ${esc(q.answer)}` : ''}</div><p>${rich(q.explain||'개념 카드의 포인트를 다시 읽어 보세요.')}</p></div>
       ${q.wrong ? `<div class="wrongbox"><div class="h">${q.type==='essay'?'채점 기준':'오답 왜 틀렸나'}</div>${rich(q.wrong)}</div>` : ''}
       ${q.type==='essay' && bs.pick===null ? '' : ''}
       ${q.type==='essay' && bs.pick==='?' ? `<div class="oxrow"><button data-ess="맞음" class="">맞게 썼다</button><button data-ess="틀림">부족했다</button></div>` : `<button class="btn" id="bankNext">${bs.i+1<bs.items.length?'다음 문제':'결과 보기'}</button>`}
@@ -2303,7 +2372,7 @@ function bankAnswer(pick){
   const ok = bankCorrect(q, pick); S.stats.a++; if (ok) S.stats.c++; S.bh[q.id] = ok ? 'o' : 'x';
   if (ok) bs.right++; else { bs.wrong.push(q); if (!S.wrong.some(w=>w.b===q.id && !w.cleared)) S.wrong.push({ b:q.id, p:(q.type==='mc'||q.type==='multi')?MARKS[+pick-1]:String(pick), iso:todayISO(), date:kdate(todayISO()) }); }
   if (ok){ const w = S.wrong.find(x=>x.b===q.id && !x.cleared); if (w) w.cleared = true; }
-  save(S); renderBankSession(); window.scrollTo(0, 0);
+  save(S); renderBankSession(); window.scrollTo(0, 0); document.querySelector('#v-bank .verdict')?.focus({ preventScroll:true });
 }
 function pickBank(n){ const pool = bankPool(); const arr = pool.slice(); for (let i=arr.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [arr[i],arr[j]]=[arr[j],arr[i]]; } return arr.slice(0, n); }
 
@@ -2316,7 +2385,7 @@ function renderLab(){
   v.innerHTML = `<button class="back" id="labBack"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg>${bs?'문제':'돌아가기'}</button>
     <article class="card labcard"><div class="loc">자료 파헤치기 · ${esc(L?L.bookName+' '+L.unit+'-'+L.id.slice(2):'')}</div><h3>${esc(l.title)}</h3><div class="sub">${esc(L?L.name:'')}</div>
       <span class="k">자료</span><p>${rich(l.data)}</p>
-      ${l.figure ? `<figure class="zoomable" data-zoomlab="${l.lessonId}">${l.figure}<figcaption>누르면 크게</figcaption></figure>` : ''}
+      ${l.figure ? `<figure class="zoomable" data-zoomlab="${l.lessonId}" tabindex="0" role="button" aria-label="그림 크게 보기">${l.figure}<figcaption>누르면 크게</figcaption></figure>` : ''}
       <span class="k">해석의 3단계</span><ol>${l.steps.map(s=>`<li>${rich(s)}</li>`).join('')}</ol>
       <span class="k">결론</span><p>${rich(l.conclusion)}</p></article>
     ${l.exam ? `<div class="point"><span class="k">시험엔 이렇게</span><p style="font-weight:600;font-size:14px">${rich(l.exam)}</p></div>` : ''}
@@ -2325,9 +2394,12 @@ function renderLab(){
 }
 
 /* ═══ 그림 확대 보기 — 두 손가락으로 키우고 끌어서 본다 ═══ */
+let fvFrom = null;
+function closeFigure(){ document.getElementById('fv')?.remove(); if (!document.getElementById('sheet').innerHTML) document.querySelector('.app')?.removeAttribute('inert'); const f = fvFrom; fvFrom = null; if (f && document.contains(f)) f.focus({ preventScroll:true }); }
 function openFigure(svg, caption){
-  const el = document.createElement('div'); el.className='fv'; el.id='fv';
-  el.innerHTML = `<div class="bar"><span>그림 크게 보기</span><span><button id="fvMinus">−</button><button id="fvPlus">＋</button><button id="fvClose">닫기</button></span></div><div class="stage" id="fvStage">${svg}</div><div class="cap">${esc(caption||'')} · 두 손가락으로 키우고 끌어서 봅니다</div>`;
+  const el = document.createElement('div'); el.className='fv'; el.id='fv'; el.setAttribute('role', 'dialog'); el.setAttribute('aria-modal', 'true'); el.setAttribute('aria-label', '그림 크게 보기');
+  fvFrom = document.activeElement; document.querySelector('.app')?.setAttribute('inert', '');
+  el.innerHTML = `<div class="bar"><span>그림 크게 보기</span><span><button id="fvMinus" aria-label="그림 작게">−</button><button id="fvPlus" aria-label="그림 크게">＋</button><button id="fvClose">닫기</button></span></div><div class="stage" id="fvStage">${svg}</div><div class="cap">${esc(caption||'')} · 두 손가락으로 키우고 끌어서 봅니다</div>`;
   document.body.appendChild(el);
   const st = el.querySelector('#fvStage'), sv = st.querySelector('svg'); if (!sv) return;
   sv.removeAttribute('width'); sv.removeAttribute('height'); sv.style.width = '100%';
@@ -2343,7 +2415,7 @@ function openFigure(svg, caption){
   st.addEventListener('dblclick', () => { sc = sc>1 ? 1 : 2.2; if (sc===1){ tx=ty=0; } apply(); });
   el.querySelector('#fvPlus').onclick = () => { sc = Math.min(6, sc*1.4); apply(); };
   el.querySelector('#fvMinus').onclick = () => { sc = Math.max(1, sc/1.4); if (sc===1){ tx=ty=0; } apply(); };
-  el.querySelector('#fvClose').onclick = () => el.remove();
+  el.querySelector('#fvClose').onclick = () => closeFigure(); setTimeout(() => el.querySelector('#fvClose')?.focus(), 30);
 }
 
 /* ═══ 공부 노트 · 달력 — 나만 보는 메모장 ═══
@@ -2353,8 +2425,8 @@ const NOTE_MAX = 5000;
 let noteSyncErr = '';
 let NOTES = [], notesOwner = null, noteDay = '', noteMonth = '', noteQ = '', noteEd = null, noteFrom = 'today', noteSyncing = null, noteT = null, noteSyncT = null;
 const notesKey = () => 'pcs.notes.' + (ACC ? ACC.id : 'guest');
-function notesLoad(){ const k = notesKey(); if (notesOwner === k) return; notesOwner = k; try { NOTES = JSON.parse(localStorage.getItem(k)) || []; } catch { NOTES = []; } }
-function notesSave(){ try { localStorage.setItem(notesOwner || notesKey(), JSON.stringify(NOTES)); } catch {} }
+function notesLoad(){ const k = notesKey(); if (notesOwner === k) return; notesOwner = k; try { NOTES = JSON.parse(localStorage.getItem(k)) || []; } catch { NOTES = []; } if (!Array.isArray(NOTES)) NOTES = []; NOTES = NOTES.filter(n => n && typeof n === 'object' && n.id); }
+function notesSave(){ try { localStorage.setItem(notesOwner || notesKey(), JSON.stringify(NOTES)); } catch { quotaFail(); } }
 const liveNotes = () => { notesLoad(); return NOTES.filter(n => !n.del); };
 const newId = () => { try { if (crypto.randomUUID) return crypto.randomUUID(); } catch {} return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, ch => { const r = Math.random()*16|0; return (ch==='x' ? r : (r&3|8)).toString(16); }); };
 const noteTab = () => ({ plan:'plan', me:'me', detail:'list' })[noteFrom] || 'today';
@@ -2556,17 +2628,21 @@ function renderMe(){
       <button class="setrow go" id="editProfile"><span class="l">이름·연락처 수정</span><span class="v"></span></button>
       <button class="setrow go" id="pwOpen"><span class="l">비밀번호 바꾸기</span><span class="v"></span></button>
       <button class="setrow go" id="myExport"><span class="l">내 기록 내려받기<small>계정 정보·학습 기록·출석·쓴 글을 파일 하나로</small></span><span class="v"></span></button>
+      ${a && ACC.role==='student' ? `<div class="setrow"><span class="l">내 출석·진도를 보는 보호자<small id="myGuard">확인하는 중…</small></span></div>` : ''}
       ${a ? `<button class="setrow go" id="unauth"><span class="l">학원 코드 연결 해제</span><span class="v"></span></button>` : ''}
       <button class="setrow go" id="logout" style="border:none"><span class="l">로그아웃</span><span class="v"></span></button></div>` : ''}
     <div class="sec"><h2>지원</h2>
       ${!isOwner() ? `<button class="setrow go" id="fbOpen"><span class="l">의견 보내기 · 오류 신고<small>불편한 점·교재의 틀린 곳을 원장님께</small></span><span class="v"></span></button>` : ''}
       ${CFG.phone ? `<a class="setrow go" href="tel:${esc(CFG.phone)}" style="text-decoration:none"><span class="l">학원에 전화</span><span class="v">${esc(CFG.phone)}</span></a>` : ''}
       ${CFG.kakao ? `<a class="setrow go" href="${esc(CFG.kakao)}" target="_blank" style="text-decoration:none"><span class="l">카카오톡 문의</span><span class="v"></span></a>` : ''}
+      ${CFG.email ? `<div class="setrow"><span class="l">학원 이메일<small>계정 삭제·개인정보 문의도 여기로</small></span><span class="v" style="user-select:text">${esc(CFG.email)}</span></div>` : ''}
       <button class="setrow go" data-legal="terms"><span class="l">이용약관</span><span class="v"></span></button>
       <button class="setrow go" data-legal="privacy"><span class="l">개인정보처리방침</span><span class="v"></span></button>
       <button class="setrow go" data-legal="delete"><span class="l">계정·데이터 삭제 안내</span><span class="v"></span></button>
       <button class="setrow go" data-legal="about" style="border:none"><span class="l">앱 정보</span><span class="v">v${CFG.version}</span></button></div>
     ${ACC ? `<button class="linkbtn danger" id="delAccount">계정 삭제</button>` : ''}`;
+  if (document.getElementById('myGuard')) DBX.myGuardians().then(g => { const el = document.getElementById('myGuard'); if (el) el.textContent = g.length ? `${g.map(x => x.name || '이름 없음').join(', ')} · 학원이 확인한 보호자만 봅니다` : '아직 없습니다 · 모르는 사람이 보이면 원장님께 알려 주세요'; })
+    .catch(() => { const el = document.getElementById('myGuard'); if (el) el.textContent = '지금은 확인하지 못했습니다'; });
 }
 
 /* ═══ 이용권 ═══ */
@@ -2633,7 +2709,9 @@ async function restorePurchases(quiet){ const NP = IAP(); if (!NP || !ACC) retur
 /* ═══ 보호자 홈 ═══ */
 async function renderParent(){
   const v = document.getElementById('v-parent');
-  if (!ACC || !ACC.childCodes.length){ v.innerHTML = `<h1 class="h-page">자녀</h1><div class="codebox"><h3>자녀 연결</h3><p>자녀가 받은 학원 코드 6자리를 넣으면 출석·진도·공지를 볼 수 있습니다.</p>
+  const pendHtml = ACC && (ACC.childPending||[]).length ? `<div class="consent" role="note"><div class="t">원장님 확인을 기다리고 있어요</div>
+    <div class="d">자녀 코드 <b>${ACC.childPending.map(esc).join(', ')}</b> — 학원에서 보호자님이 맞는지 확인하면 출석·진도·공지가 열립니다. 코드만 알면 누구나 연결을 요청할 수 있어, 학원이 한 번 확인합니다.</div></div>` : '';
+  if (!ACC || !ACC.childCodes.length){ v.innerHTML = `<h1 class="h-page">자녀</h1>${pendHtml}<div class="codebox"><h3>자녀 연결</h3><p>자녀가 받은 학원 코드 6자리를 넣으면 출석·진도·공지를 볼 수 있습니다.</p>
       <div class="f"><input id="childIn" class="code" placeholder="자녀 코드 6자리" maxlength="6" autocapitalize="characters" autocomplete="off"><button id="childGo">연결</button></div>${childErr?`<div class="err">${esc(childErr)}</div>`:''}
       ${DBX.mode==='local' ? `<div class="demo">시연용 — <code>MON123</code></div>`:''}</div>`; return; }
   if (!ACC.childCodes.includes(parentSel)) parentSel = ACC.childCodes[0];
@@ -2652,7 +2730,7 @@ async function renderParent(){
   let run = 0; { let d = todayISO(); if (!dset.has(d)) d = addDays(d, -1); while (dset.has(d)){ run++; d = addDays(d, -1); } }
   const retry = prog ? (prog.wrong||[]).filter(w => !w.cleared).length : 0;
   const lateN = month.filter(a=>a.late).length;
-  v.innerHTML = `<h1 class="h-page">자녀</h1>
+  v.innerHTML = `<h1 class="h-page">자녀</h1>${pendHtml}
     ${kids.length ? `<div class="chipbar" role="tablist" aria-label="자녀 고르기">${kids.map(k => `<button role="tab" aria-selected="${k.c===code}" data-kid="${esc(k.c)}" class="${k.c===code?'on':''}">${esc(k.s ? k.s.name : k.c)}</button>`).join('')}</div>` : ''}
     <div class="pass"><span class="badge">${esc(CFG.academy)} · ${esc(st.cls)}</span><div class="who">${esc(st.name)} 학생</div><div class="where">수강 ${kdate(st.until)}까지 · 수업 시작 ${classStart(st.cls)}</div>
       <dl><div class="row"><dt>오늘</dt><dd>${todayA ? `<b>${todayA.time} 출석</b>${todayA.late?' · 지각':''}` : '아직 출석 전'}</dd></div>
@@ -2719,6 +2797,11 @@ async function renderAdmin(){
           <button class="btn" id="bulkCheck">미리 보기</button>`}
       </details>
       <p class="tip">1인 1코드. 학생은 '학원 코드 등록', 보호자는 '자녀 연결'에 같은 코드를 씁니다. 만료일이 지나면 저절로 닫힙니다. 이름을 누르면 출석·진도·정보 고치기가 보입니다.</p>
+      ${await (async () => { let gr = []; try { gr = await DBX.guardianRequests(); } catch {} if (!gr.length) return '';
+        return `<details class="stuedit" id="grBox" open><summary>보호자 연결 요청 <span class="cst wait">${gr.length}건 할 일</span></summary>
+          <p class="tip" style="margin:0 0 8px">학생 코드만 알면 누구나 ‘보호자’로 연결을 요청할 수 있어, 원장님이 확인해야 열립니다. 수강 신청서의 보호자 이름·연락처와 같은지 보고 확인해 주세요. 모르는 사람이면 거절하세요.</p>
+          ${gr.map(x => `<div class="kv" style="align-items:flex-start;gap:8px"><span class="k" style="flex:1">${esc(x.student||x.code)} <small style="color:var(--faint)">${esc(x.cls||'')} · ${esc(x.code)}</small><br><small>요청: ${esc(x.name||'이름 없음')}${x.phone?` · ${esc(x.phone)}`:''}${x.email?` · ${esc(x.email)}`:''} · ${ago(x.at)}</small></span>
+            <span class="v" style="display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end"><button class="mini pri" data-gok="${esc(x.uid)}" data-code="${esc(x.code)}">확인</button><button class="mini" data-gno="${esc(x.uid)}" data-code="${esc(x.code)}">거절</button></span></div>`).join('')}</details>`; })()}
       ${await (async () => { let fb = []; try { fb = await DBX.feedbackList(); } catch {} if (!fb.length) return '';
         const open = fb.filter(x => !x.done_at), kname = k => (FB_KIND.find(x => x[0] === k) || [0, '기타'])[1];
         return `<details class="stuedit" id="fbBox" ${open.length?'open':''}><summary>받은 의견 · 오류 신고 ${open.length?`<span class="cst wait">새 ${open.length}건</span>`:''}</summary>
@@ -2802,11 +2885,11 @@ async function renderAdmin(){
       <div class="sec"><h2>신고된 글 ${rep.posts.length}건</h2>
         ${rep.posts.length ? rep.posts.map(x=>`<div class="setrow" style="align-items:flex-start">
             <span class="l">${esc(x.title)}<small>${esc(x.nick||'익명')} · ${ago(x.at)} · 신고 ${repN(x)}건<br>${esc(String(x.body||'').slice(0,70))}</small></span>
-            <button class="more" data-admpdel="${esc(x.id)}">지우기</button></div>`).join('') : `<p class="planempty">신고된 글이 없습니다.</p>`}</div>
+            <span style="display:flex;flex-direction:column;gap:6px"><button class="more" data-admpdel="${esc(x.id)}">지우기</button><button class="more" data-admclr="post:${esc(x.id)}">신고 되돌리기</button></span></div>`).join('') : `<p class="planempty">신고된 글이 없습니다.</p>`}</div>
       <div class="sec"><h2>신고된 댓글 ${rep.comments.length}건</h2>
         ${rep.comments.length ? rep.comments.map(c=>`<div class="setrow" style="align-items:flex-start">
             <span class="l">${esc(String(c.body||'').slice(0,70))}<small>${esc(c.nick||'익명')} · ${ago(c.at)} · 신고 ${repN(c)}건</small></span>
-            <button class="more" data-admcdel="${esc(c.id)}">지우기</button></div>`).join('') : `<p class="planempty">신고된 댓글이 없습니다.</p>`}</div>
+            <span style="display:flex;flex-direction:column;gap:6px"><button class="more" data-admcdel="${esc(c.id)}">지우기</button><button class="more" data-admclr="comment:${esc(c.id)}">신고 되돌리기</button></span></div>`).join('') : `<p class="planempty">신고된 댓글이 없습니다.</p>`}</div>
       ${total ? '' : `<p class="fine">신고가 없다고 안심하지 마시고, 가끔 <b>이야기</b> 탭을 직접 둘러봐 주세요.</p>`}`;
     return;
   }
@@ -2849,7 +2932,11 @@ async function renderAdmin(){
         return `<div class="form"><h3>앱 오류 기록 · 최근 ${Math.min(er.length,10)}건</h3><p class="tip" style="margin:0 0 8px">학생 폰에서 난 오류가 자동으로 모입니다. 같은 오류가 여러 번이면 제작자에게 알려 주세요.</p>
           ${er.slice(0,10).map(e=>`<div class="kv" style="flex-direction:column;align-items:flex-start;gap:2px"><span class="v" style="font-size:12.5px;word-break:break-all">${esc(String(e.msg||'').slice(0,120))}</span><span class="k">${esc(String(e.at||'').slice(0,16).replace('T',' '))} · v${esc(e.ver||'')}</span></div>`).join('')}</div>`; })()}
       <div class="form"><h3>학원 정보</h3><div class="kv"><span class="k">학원명</span><span class="v">${esc(CFG.academy)}</span></div><div class="kv"><span class="k">연락처</span><span class="v">${esc(CFG.phone||'미설정 [확인 필요]')}</span></div><div class="kv"><span class="k">모드</span><span class="v">${SRV?'서버(Supabase)':'로컬 · 이 기기 안에서만'}</span></div>
-        <p class="tip" style="margin:8px 0 0">학원명·연락처는 앱 빌드 설정(CFG)에서 바꿉니다.</p></div>`;
+        <p class="tip" style="margin:8px 0 0">학원명·연락처는 앱 빌드 설정(CFG)에서 바꿉니다.</p></div>
+      <details class="stuedit"><summary>계정 삭제 요청 처리 · 앱을 지운 사람</summary>
+        <p class="tip" style="margin:0 0 8px">앱을 지운 사람이 전화·메일로 계정 삭제를 요청하면 여기서 지웁니다(요청 뒤 10일 안 — 개인정보처리방침). 가입한 이메일로 온 요청이거나 전화로 본인을 확인한 뒤에 하세요.</p>
+        <div class="g"><input id="delUserEmail" type="email" inputmode="email" aria-label="지울 계정의 이메일" placeholder="지울 계정의 이메일"></div>
+        <button class="btn soft" id="delUserGo">이 계정 지우기</button></details>`;
   }
 }
 /* 월 출석부 — 학생 × 날짜 표를 CSV(엑셀에서 한글이 깨지지 않게 BOM) 로. 앱에서는 공유 시트로 넘긴다 */
@@ -2875,7 +2962,8 @@ async function openStudent(code){
   const gs = lk.guardians || [];
   const done = prog ? (prog.done||[]).length : 0, days = prog ? (prog.days||[]) : [];
   openSheet(`<h3>${esc(st.name)} 학생 <span style="font-size:12px;color:var(--muted);font-weight:600">${esc(st.cls)} · ${st.code}</span></h3>
-    <p>수강 ${kdate(st.until)}까지${st.phone?` · ${esc(st.phone)}`:''} · 학생 앱 ${lk.student?'연결됨':'아직 연결 전'} · 보호자 연결 ${gs.length}명${gs.length?` (${gs.map(g=>esc(g.name)).join(', ')})`:''}</p>
+    <p>수강 ${kdate(st.until)}까지${st.phone?` · ${esc(st.phone)}`:''} · 학생 앱 ${lk.student?'연결됨':'아직 연결 전'} · 보호자 ${gs.filter(g=>g.approved!==false).length}명</p>
+    ${gs.length ? `<div class="legal" style="max-height:none;margin-bottom:10px">${gs.map(g => `<div class="kv"><span class="k">${esc(g.name||'이름 없음')}${g.phone?` <small>${esc(g.phone)}</small>`:''}${g.approved===false?' <span class="cst wait">확인 전</span>':''}</span><span class="v">${g.uid ? `<button class="mini" data-gno="${esc(g.uid)}" data-code="${esc(st.code)}">${g.approved===false?'거절':'연결 해제'}</button>` : ''}</span></div>`).join('')}</div>` : ''}
     <div class="tiles"><div class="tile"><div class="v">${att.filter(a=>a.date.startsWith(ym)).length}<small>일</small></div><div class="l">이달 출석</div></div><div class="tile"><div class="v">${done}</div><div class="l">공부한 개념</div></div><div class="tile"><div class="v">${prog&&prog.stats&&prog.stats.a?Math.round(prog.stats.c/prog.stats.a*100):0}<small>%</small></div><div class="l">정답률</div></div></div>
     <div class="legal" style="max-height:30vh">${att.length ? att.slice(0,20).map(a=>`<div class="kv"><span class="k">${kdate(a.date)}</span><span class="v" style="color:${a.late?'var(--warn)':'var(--u)'}">${a.time} ${a.late?'지각':'출석'}${a.manual?' (수동)':''}${a.date>=addDays(todayISO(),-7)?` <button class="mini" data-attcancel="${esc(st.code)}|${a.date}" style="margin-left:6px">취소</button>`:''}</span></div>`).join('') : '최근 60일 출석 기록이 없습니다.'}${days.length?`<div class="kv"><span class="k">마지막 학습</span><span class="v">${kdate(days[days.length-1])}</span></div>`:''}</div>
     <details class="stuedit"><summary>학생 정보 고치기 · 수강 연장</summary>
@@ -2906,7 +2994,7 @@ async function scheduleReminder(ask){ const LN = plug('LocalNotifications'); if 
   try { await LN.cancel({ notifications: [{ id: 1 }] }); if (!S.notifyAt || S.notifyAt==='안 받음') return false;
     let p = await LN.checkPermissions(); if (p.display !== 'granted' && ask) p = await LN.requestPermissions(); if (p.display !== 'granted') return false;
     const [h, m] = S.notifyAt.split(':').map(Number);
-    await LN.schedule({ notifications: [{ id: 1, title: `${CFG.academy} · 오늘의 개념`, body: '하루 1개념 1문제 — 3분이면 됩니다.', schedule: { on: { hour: h, minute: m }, allowWhileIdle: true } }] }); return true; } catch { return false; } }
+    await LN.schedule({ notifications: [{ id: 1, title: `${CFG.academy} · 오늘의 개념`, body: '하루 한 개념 — 5분이면 끝.', schedule: { on: { hour: h, minute: m }, allowWhileIdle: true }, isExactNotification: false }] }); return true; } catch { return false; } }
 /* 푸시 알림(공지·일정·등원) — 첫 화면에서 묻지 않고, 학원과 연결된 뒤에만 묻는다. 로그아웃하면 이 기기 등록을 지운다 */
 let pushToken = '', pushWired = false;
 async function initPush(){ const PN = plug('PushNotifications'); if (!isNative || !CFG.push || !SRV || !PN || !ACC) return;
@@ -2930,10 +3018,12 @@ function nativeInit(){ if (!isNative) return; const App = plug('App');
     if (view==='auth' && authMode==='signup'){ document.getElementById('suPrev')?.click(); return; }
     if (view==='auth' && ['login','forgot'].includes(authMode)){ document.getElementById('authBack')?.click(); return; }
     if (view==='auth' && authMode==='intro' && introIdx > 0){ introIdx--; renderAuth(); return; }
-    if (document.getElementById('fv')) return document.getElementById('fv').remove();
+    if (document.getElementById('fv')) return closeFigure();
     if (view==='noted') return nedLeave(); if (view==='note'){ noteQ=''; return show(noteFrom === 'detail' ? 'detail' : (noteFrom || home())); }
     if (view==='detail') return show('list'); if (view==='quiz') { qState=null; return show(home()); } if (view==='plans') return show('me'); if (view==='lab' || view==='wrong') return show('bank'); if (view==='bank' && bs){ bs=null; return renderBank(); }
     if (view!==home() && view!=='auth') return show(home());
+    if (view==='auth' && authMode==='welcome'){ const g = document.getElementById('welcomeGo'); if (g){ g.click(); return; } }   // 가입 직후 환영 화면: 뒤로 = 시작하기(로그인한 채 '처음으로'가 뜨던 것)
+    if (view==='auth' && authMode==='newpw'){ ask('새 비밀번호 정하기를 그만둘까요? 그만두면 로그아웃됩니다.', '그만두기', false).then(async ok => { if (!ok) return; await DBX.signOut(); ACC = null; authMode = 'start'; authErr = ''; renderAuth(); }); return; }
     if (view==='auth' && authMode!=='start' && authMode!=='intro'){ authMode = 'start'; authErr = ''; renderAuth(); return; }
     if (Date.now() - lastBack < 2000) return App.exitApp();
     lastBack = Date.now(); toast('한 번 더 누르면 종료됩니다'); });
@@ -2957,8 +3047,19 @@ function guardScreen(v){ const on = SECURE_VIEWS.includes(v);
   if (isNative && secureOn !== on){ secureOn = on;
     try { SecurePlug ||= (Cap.registerPlugin ? Cap.registerPlugin('SecureScreen') : plug('SecureScreen')); const r = SecurePlug && SecurePlug.set({ on }); r && r.catch && r.catch(() => {}); } catch {} }
   paintWM(); document.getElementById('wm')?.classList.toggle('hide', !(on && wmText())); }
-function openSheet(html){ document.getElementById('sheet').innerHTML = `<div class="sheet-bg" id="sheetBg"><div class="sheet"><div class="grab"></div>${html}</div></div>`; }
-function closeSheet(){ document.getElementById('sheet').innerHTML=''; }
+/* 아래에서 올라오는 창: 화면낭독기에 '대화상자'로 알리고, 포커스를 안으로 옮기고(Tab 은 안에서만 돈다), Esc 로 닫고, 닫으면 누른 자리로 돌아간다 */
+let sheetFrom = null;
+function openSheet(html){ const box = document.getElementById('sheet'); if (!box.innerHTML) sheetFrom = document.activeElement;
+  box.innerHTML = `<div class="sheet-bg" id="sheetBg"><div class="sheet" role="dialog" aria-modal="true" tabindex="-1">` + `<div class="grab" aria-hidden="true"></div>${html}</div></div>`;
+  const sh = box.querySelector('.sheet'), h = sh.querySelector('h3'); if (h){ h.id = 'sheetH'; sh.setAttribute('aria-labelledby', 'sheetH'); }
+  document.querySelector('.app')?.setAttribute('inert', '');
+  setTimeout(() => { if (!sh.contains(document.activeElement)) (sh.querySelector('input,textarea,select') || sh).focus({ preventScroll:true }); }, 30); }
+function closeSheet(){ const box = document.getElementById('sheet'); if (!box.innerHTML) return; box.innerHTML=''; document.querySelector('.app')?.removeAttribute('inert');
+  const f = sheetFrom; sheetFrom = null; if (f && document.contains(f)) f.focus({ preventScroll:true }); }
+/* 창 안에서만 Tab 이 돌게 */
+function trapTab(e, root){ const f = [...root.querySelectorAll('button,a[href],input,select,textarea,[tabindex]:not([tabindex="-1"])')].filter(x => !x.disabled && x.offsetParent !== null);
+  if (!f.length) return; const i = f.indexOf(document.activeElement);
+  if (e.shiftKey && (i <= 0)){ e.preventDefault(); f[f.length-1].focus(); } else if (!e.shiftKey && (i === f.length-1 || i < 0)){ e.preventDefault(); f[0].focus(); } }
 // 확인 묻기: await ask('지울까요?', '지우기', true) → true/false. 바깥·취소·뒤로가기·Esc 는 false
 let askDone = null;
 function ask(msg, ok='확인', danger=false){ return new Promise(res => { askDone && askDone(false);
@@ -2974,7 +3075,9 @@ function tabsFor(){ const r = ACC ? ACC.role : 'guest';
   if (r==='parent') return [['parent','자녀'],['list','교재'],['talk','이야기'],['plan','일정'],['me','내 정보']];
   if (r==='owner') return [['admin','원장'],['today','오늘'],['talk','이야기'],['plan','일정'],['me','내 정보']];
   return [['today','오늘'],['list','교재'],['bank','문제'],['talk','이야기'],['plan','일정'],['me','내 정보']]; }
-function renderTabs(){ document.getElementById('tabs').innerHTML = tabsFor().map(([v,l])=>`<button class="tab ${view===v?'on':''}" data-v="${v}"><svg viewBox="0 0 24 24">${ICON[v]}</svg>${l}${v==='talk'&&talkNew?`<i class="tdot" aria-label="내 글에 새 댓글 ${talkNew}개"></i>`:''}</button>`).join(''); }
+function renderTabs(){ const had = document.activeElement && document.activeElement.closest && document.activeElement.closest('#tabs') ? document.activeElement.dataset.v : null;
+  document.getElementById('tabs').innerHTML = tabsFor().map(([v,l])=>`<button class="tab ${view===v?'on':''}" data-v="${v}" ${view===v?'aria-current="page"':''}><svg viewBox="0 0 24 24" aria-hidden="true">${ICON[v]}</svg>${l}${v==='talk'&&talkNew?`<i class="tdot" role="img" aria-label="내 글에 새 댓글 ${talkNew}개"></i>`:''}</button>`).join('');
+  if (had) document.querySelector(`#tabs [data-v="${had}"]`)?.focus({ preventScroll:true }); }
 /* 켤 때 한 번: 내 글에 새 댓글이 있으면 이야기 탭에 점 */
 async function checkTalkNew(){ if (!ACC || consentPending()) return; try { const list = await DBX.posts('전체', ''); const n = list.reduce((a,x) => a + newC(x), 0); if (n !== talkNew){ talkNew = n; renderTabs(); const tabOf = view==='post'?'talk':view; document.querySelectorAll('.tab').forEach(t => t.classList.toggle('on', t.dataset.v===tabOf)); } } catch {} }
 let view = 'today';
@@ -2990,7 +3093,7 @@ function show(v){
   guardScreen(v);
   document.getElementById('tabs').classList.toggle('hide', v==='auth');
   const tabOf = {quiz: qState&&qState.mode==='review'?'me':'today', detail:'list', plans:'me', wrong:'bank', lab:'bank', stats:'me', post:'talk', note:noteTab(), noted:noteTab()}[v] || v;
-  renderTabs(); document.querySelectorAll('.tab').forEach(t => t.classList.toggle('on', t.dataset.v===tabOf));
+  renderTabs(); document.querySelectorAll('.tab').forEach(t => { t.classList.toggle('on', t.dataset.v===tabOf); if (t.dataset.v===tabOf) t.setAttribute('aria-current', 'page'); else t.removeAttribute('aria-current'); });
   const el = document.getElementById('v-'+v); el.classList.remove('vin'); void el.offsetWidth; el.classList.add('vin');
   const r = ({auth:renderAuth, today:renderToday, quiz:renderQuiz, list:renderList, detail:renderDetail, wrong:renderWrong, stats:renderStats, me:renderMe, plans:renderPlans, parent:renderParent, admin:renderAdmin, bank:renderBank, lab:renderLab, plan:renderPlan, talk:renderTalk, post:renderPost, note:renderNote, noted:renderNoted})[v]();
   if (r && r.then && !el.innerHTML.trim()){ let done = false; r.finally(() => { done = true; }); setTimeout(() => { if (!done && view===v && seq===renderSeq && !el.innerHTML.trim()) el.innerHTML = SKEL; }, 220); }
@@ -3160,6 +3263,11 @@ document.addEventListener('click', async e => {
     if (!t || !dt){ toast('제목과 날짜를 넣어 주세요'); return; }
     await DBX.sendSchedule(g('scCls'), dt, t, g('scK'), g('scM').trim()); toast('일정을 보냈습니다'); renderAdmin(); return; }
   const acr = T('[data-admcare]'); if (acr){ postId = acr.dataset.admcare; show('post'); return; }
+  const aclr = T('[data-admclr]'); if (aclr){ if (!await ask('신고를 되돌릴까요? 문제없는 글인데 신고가 몰려 가려졌을 때 씁니다. 다시 모두에게 보입니다.', '되돌리기', false)) return;
+    const [k, id] = aclr.dataset.admclr.split(':'); await DBX.clearReports(k, id); toast('신고를 되돌렸습니다'); renderAdmin(); return; }
+  if (T('#delUserGo')){ const em = (document.getElementById('delUserEmail').value || '').trim(); if (!validEmail(em)){ toast('이메일을 확인해 주세요'); return; }
+    if (!await ask(`${em} 계정과 그 학습 기록·노트·글을 지웁니다. 되돌릴 수 없습니다. 본인 확인(가입 이메일로 온 요청·전화)을 하셨나요?`, '지우기', true)) return;
+    const r = await DBX.deleteUser(em).catch(e => ({ ok:false, why:e.message })); toast(r.ok ? '계정을 지웠습니다. 요청하신 분께 처리했다고 알려 주세요' : r.why); if (r.ok) document.getElementById('delUserEmail').value = ''; return; }
   const apd = T('[data-admpdel]'); if (apd){ if (!await ask('이 글을 지울까요? 되돌릴 수 없습니다.', '지우기',true)) return; await DBX.delPost(apd.dataset.admpdel); toast('지웠습니다'); renderAdmin(); return; }
   const acd = T('[data-admcdel]'); if (acd){ if (!await ask('이 댓글을 지울까요?', '지우기',true)) return; await DBX.delComment(acd.dataset.admcdel); toast('지웠습니다'); renderAdmin(); return; }
   const scd = T('[data-scdel]'); if (scd){ await DBX.delSchedule(scd.dataset.scdel); toast('지웠습니다'); renderAdmin(); return; }
@@ -3263,7 +3371,7 @@ document.addEventListener('click', async e => {
   if (T('#fgGo')){ const em=(document.getElementById('fgEmail').value||'').trim(); if (!validEmail(em)){ authErr='이메일 형식을 확인해 주세요.'; renderAuth(); return; }
     try { const r = await DBX.resetPassword(em); authMode='login'; authErr=''; authInfo=r.note||'메일을 보냈습니다'; renderAuth(); window.scrollTo(0,0); } catch (err){ authErr=err.message; renderAuth(); } return; }
   if (T('#npGo')){ const a=(document.getElementById('npPw').value||''), b=(document.getElementById('npPw2').value||'');
-    if (a.length<6){ authErr='비밀번호는 6자 이상이어야 합니다.'; renderAuth(); return; }
+    if (pwProblem(a)){ authErr=pwProblem(a); renderAuth(); return; }
     if (a!==b){ authErr='두 비밀번호가 다릅니다.'; renderAuth(); return; }
     try { await DBX.setPassword(a); authErr=''; authInfo=''; toast('비밀번호를 바꿨습니다'); await afterLogin(await DBX.me()); } catch (err){ authErr=err.message; renderAuth(); } return; }
 
@@ -3322,7 +3430,9 @@ document.addEventListener('click', async e => {
     const v=((box.querySelector('#childIn')||{}).value||'').trim().toUpperCase(); if (!v){ childErr='코드를 입력해 주세요.'; (view==='parent'?renderParent:renderMe)(); return; }
     const inSheet = !!T('#childGo').closest('.sheet');
     try { const r = await DBX.linkCode('child', v); if (!r.ok){ if (inSheet){ document.getElementById('childAddErr').textContent = r.why; return; } childErr = r.why; (view==='parent'?renderParent:renderMe)(); return; }
-      ACC = await DBX.me(); childErr=''; parentSel = r.student.code; closeSheet(); toast(`${r.student.name} 학생과 연결했습니다`); show('parent'); initPush(); } catch (err){ childErr=err.message; (view==='parent'?renderParent:renderMe)(); } return; }
+      ACC = await DBX.me(); childErr=''; closeSheet();
+      if (r.pending){ toast('연결을 요청했습니다. 원장님이 확인하면 열립니다'); show('parent'); return; }
+      parentSel = r.student.code; toast(`${r.student.name} 학생과 연결했습니다`); show('parent'); initPush(); } catch (err){ childErr=err.message; (view==='parent'?renderParent:renderMe)(); } return; }
   if (T('#unlinkChild')){ const c = T('#unlinkChild').dataset.code; if (!await ask('이 자녀와의 연결을 해제할까요? 출석·진도·공지를 더 볼 수 없습니다.', '연결 해제',true)) return;
     if (c) await DBX.unlinkChild(c); else await DBX.linkCode('child', ''); ACC = await DBX.me(); parentSel = ''; renderParent(); return; }
   const kid = T('[data-kid]'); if (kid){ parentSel = kid.dataset.kid; renderParent(); return; }
@@ -3349,12 +3459,12 @@ document.addEventListener('click', async e => {
     try { if (isNative && navigator.canShare && navigator.canShare({ files:[file] })){ await navigator.share({ files:[file], title:name }); return; } } catch {}
     const a = document.createElement('a'); a.href = URL.createObjectURL(file); a.download = name; document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(a.href), 4000); return; }
   if (T('#pwOpen')){ openSheet(`<h3>비밀번호 바꾸기</h3>
-      <div class="fld"><label for="pwNew">새 비밀번호</label><input id="pwNew" type="password" autocomplete="new-password" placeholder="6자 이상"></div>
+      <div class="fld"><label for="pwNew">새 비밀번호</label><input id="pwNew" type="password" autocomplete="new-password" placeholder="8자 이상 · 글자와 숫자"></div>
       <div class="fld"><label for="pwNew2">한 번 더</label><input id="pwNew2" type="password" autocomplete="new-password" placeholder="같은 비밀번호"></div>
       <div class="err" id="pwErr" role="alert" style="font-size:12.5px;color:var(--no);font-weight:600;margin:-4px 0 10px"></div>
       <button class="btn" id="pwSave">바꾸기</button><button class="btn ghost" id="sheetClose">닫기</button>`); return; }
   if (T('#pwSave')){ const a = document.getElementById('pwNew').value||'', b = document.getElementById('pwNew2').value||'', e = document.getElementById('pwErr');
-    if (a.length < 6){ e.textContent = '비밀번호는 6자 이상이어야 합니다.'; return; } if (a !== b){ e.textContent = '두 비밀번호가 다릅니다.'; return; }
+    if (pwProblem(a)){ e.textContent = pwProblem(a); return; } if (a !== b){ e.textContent = '두 비밀번호가 다릅니다.'; return; }
     try { await DBX.setPassword(a); closeSheet(); toast('비밀번호를 바꿨습니다'); } catch (err){ e.textContent = AUTH_KO(err.message); } return; }
   if (T('#epSave')){ const name=(document.getElementById('epName').value||'').trim(), phone=(document.getElementById('epPhone').value||'').trim(); if (!name){ toast('이름을 넣어 주세요'); return; }
     ACC = await DBX.updateMe({ name, phone }); closeSheet(); renderMe(); toast('저장했습니다'); return; }
@@ -3368,6 +3478,9 @@ document.addEventListener('click', async e => {
   if (T('#consentCopy')){ const t = T('#consentCopy').dataset.t; try { if (navigator.share) await navigator.share({ text:t }); else { await navigator.clipboard.writeText(t); toast('복사했습니다 · 보호자에게 붙여 보내 주세요'); } } catch {} return; }
   if (T('#consentPaper')){ openSheet(`<h3>학원에서 서면으로 동의</h3><p>보호자가 학원에 오시면 원장님께 <b>보호자 동의서</b>를 받아 서명해 주세요. 원장님이 앱에서 확인하면 바로 열립니다.</p><button class="btn ghost" id="sheetClose">닫기</button>`); return; }
   const cpap = T('[data-cpaper]'); if (cpap){ if (!await ask('보호자에게 서면 동의서를 받으셨나요? 받은 서면은 보관해 주세요.', '받았습니다',false)) return; await DBX.consentMark(cpap.dataset.cpaper, 'paper'); toast('서면 동의를 기록했습니다'); renderAdmin(); return; }
+  const gok = T('[data-gok]'); if (gok){ await DBX.guardianDecide(gok.dataset.gok, gok.dataset.code, true); toast('보호자 연결을 확인했습니다'); renderAdmin(); return; }
+  const gno = T('[data-gno]'); if (gno){ if (!await ask('이 보호자 연결을 지울까요? 그 계정은 이 학생의 출석·진도·공지를 더 볼 수 없습니다.', '연결 지우기', true)) return;
+    await DBX.guardianDecide(gno.dataset.gno, gno.dataset.code, false); toast('보호자 연결을 지웠습니다'); closeSheet(); renderAdmin(); return; }
   const crst = T('[data-creset]'); if (crst){ if (!await ask('보호자 번호가 등록 서류와 다른가요? 이 동의 표시를 지우고, 학생이 올바른 보호자 번호로 다시 요청하게 합니다. 보호자께 직접 연락해 서면으로 받으셔도 됩니다.', '동의 표시 지우기', true)) return; await DBX.consentMark(crst.dataset.creset, 'reset'); toast('동의 표시를 지웠습니다. 학생에게 다시 요청하도록 알려 주세요'); renderAdmin(); return; }
   const cnot = T('[data-cnotify]'); if (cnot){ await DBX.consentMark(cnot.dataset.cnotify, 'notified'); setTimeout(renderAdmin, 400); return; }
 
@@ -3421,8 +3534,8 @@ document.addEventListener('input', e => {
   /* 가입 단계: 고치기 시작하면 앞의 오류 문구는 거둔다 */
   if (e.target.id==='fbBody'){ const n = document.getElementById('fbN'); if (n) n.textContent = e.target.value.length; const wb = document.getElementById('fbWarn'); if (wb) wb.innerHTML = ''; return; }
   if (/^su/.test(e.target.id) && authErr){ authErr = ''; document.querySelector('.auth .err')?.remove(); }
-  if (e.target.id==='suPw'){ SU.pw = e.target.value; const pw = SU.pw, r1 = pw.length >= 6, r2 = /[0-9]/.test(pw) && /[a-zA-Z가-힣]/.test(pw), el = document.querySelector('.rules');
-    if (el) el.innerHTML = `<span class="${r1?'ok':''}">${r1?'✓':'·'} 6자 이상</span><span class="${r2?'ok':''}">${r2?'✓':'·'} 글자와 숫자 섞기(권장)</span>`; return; }
+  if (e.target.id==='suPw'){ SU.pw = e.target.value; const pw = SU.pw, r1 = pw.length >= 8, r2 = /[0-9]/.test(pw) && /[a-zA-Z가-힣]/.test(pw), el = document.querySelector('.rules');
+    if (el) el.innerHTML = `<span class="${r1?'ok':''}">${r1?'✓':'·'} 8자 이상</span><span class="${r2?'ok':''}">${r2?'✓':'·'} 글자와 숫자 함께</span>`; return; }
   if (e.target.id==='talkSearch'){ talkQ = e.target.value; const el=e.target; renderTalk().then(()=>{ const n=document.getElementById('talkSearch'); if (n){ n.focus(); n.setSelectionRange(el.value.length, el.value.length); } }); return; }
   if (e.target.id==='noteQ'){ noteQ = e.target.value; const b = document.getElementById('noteBody'); if (!noteQ.trim()){ renderNote(); const n = document.getElementById('noteQ'); n.focus(); } else if (b) { const q = noteQ.trim().toLowerCase(); b.innerHTML = noteHits(noteSearch(q)); } return; }
   if (noteEd && ['nedTitle','nedBody','nedDate'].includes(e.target.id)){ const f = { nedTitle:'title', nedBody:'body', nedDate:'date' }[e.target.id];
@@ -3430,10 +3543,23 @@ document.addEventListener('input', e => {
     if (f === 'body'){ const c = document.getElementById('nedCnt'); if (c) c.textContent = `${noteEd.body.length.toLocaleString()} / ${NOTE_MAX.toLocaleString()}`; }
     nedChanged(); return; }
   if (e.target.id==='listQ'){ listQ = e.target.value; const el=e.target; renderList(); const n=document.getElementById('listQ'); n.focus(); n.setSelectionRange(el.value.length, el.value.length); } });
+/* 접근성 뒷받침(2026-10-01 점검): 이름 없는 입력칸에는 안내 문구를 이름으로 · 고르는 단추(.seg·.chipbar)에는 눌림 상태를 알린다.
+   화면을 그릴 때마다 새로 생긴 칸에 저절로 붙는다 */
+function a11yPass(root){
+  root.querySelectorAll('input:not([type=hidden]),select,textarea').forEach(el => { if (el.hasAttribute('aria-label') || (el.labels && el.labels.length)) return;
+    const t = el.placeholder || el.title || (el.type === 'date' ? '날짜' : el.type === 'time' ? '시각' : ''); if (t) el.setAttribute('aria-label', t); });
+  root.querySelectorAll('.seg button, .chipbar button:not([role]), .chips button:not([role])').forEach(b => b.setAttribute('aria-pressed', b.classList.contains('on') ? 'true' : 'false'));
+}
+new MutationObserver(ms => { for (const m of ms) m.addedNodes.forEach(n => { if (n.nodeType === 1) a11yPass(n.parentElement || n); }); }).observe(document.body, { childList:true, subtree:true });
 document.addEventListener('change', e => {
   if (e.target.id==='agAll'){ SU.terms = SU.privacy = e.target.checked; if (e.target.checked && SU.role==='student' && !SU.age){ suKeep(); } authErr=''; renderAuth(); return; }
   if (e.target.id==='agTerms' || e.target.id==='agPrivacy' || e.target.name==='suAge'){ suKeep(); authErr=''; renderAuth(); return; } if (e.target.id==='notifyAt'){ S.notifyAt=e.target.value; save(S); scheduleReminder(true); toast(S.notifyAt==='안 받음'?'알림을 받지 않습니다':`매일 ${S.notifyAt}에 알려 드립니다`); } });
-document.addEventListener('keydown', e => { if (e.key==='Escape' && askDone){ e.preventDefault(); return askDone(false); } if (e.key!=='Enter') return; if (askDone) return; const id = e.target.id; const click = s => document.getElementById(s)?.click();
+document.addEventListener('keydown', e => {
+  const trapRoot = document.querySelector('#ask .sheet') || document.getElementById('fv') || document.querySelector('#sheet .sheet');
+  if (e.key === 'Tab' && trapRoot){ trapTab(e, trapRoot); return; }
+  if (e.key==='Escape' && !askDone){ if (document.getElementById('fv')){ e.preventDefault(); closeFigure(); return; } if (document.getElementById('sheet').innerHTML){ e.preventDefault(); closeSheet(); return; } }
+  if (e.key==='Escape' && askDone){ e.preventDefault(); return askDone(false); }
+  if ((e.key === 'Enter' || e.key === ' ') && e.target.matches && e.target.matches('figure.zoomable')){ e.preventDefault(); e.target.click(); return; } if (e.key!=='Enter') return; if (askDone) return; const id = e.target.id; const click = s => document.getElementById(s)?.click();
   if (/^su(Email|Pw|Name|Phone|GName|GPhone|Code|Child)$/.test(id)){ e.preventDefault(); (document.getElementById('suNext') || document.getElementById('suGo'))?.click(); return; }
   const M = {codeIn:'codeGo', attIn:'attGo', lgPw:'lgGo', lgEmail:'lgGo', fgEmail:'fgGo', childIn:'childGo', passIn:'passGo', clsName:'clsAdd', blankIn:'blankGo'}; M[id] && click(M[id]); });
 document.addEventListener('change', e => { if (e.target.id==='bankLesson'){ bankSel.lesson = e.target.value; renderBank(); } });
@@ -3464,6 +3590,8 @@ window.addEventListener('unhandledrejection', e => { const r = e.reason || {};
   reportError('Promise: ' + (r.message || r), r.stack); });
 /* ═══ 시작 ═══ */
 (async () => {
+  setTimeout(() => { const Sp = plug('SplashScreen'); Sp && Sp.hide(); }, 1500);   // 망이 느려도 첫 화면을 21초씩 가리지 않게
+  if (storeWarn) setTimeout(() => toast(storeWarn), 900);
   /* 가입 확인·비밀번호 재설정 메일의 링크로 들어왔으면 그 세션을 받는다 */
   const hp = new URLSearchParams(location.hash.slice(1)); let linkErr = '';
   if (SRV && (hp.get('access_token') || hp.get('error_description'))){

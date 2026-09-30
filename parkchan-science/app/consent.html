@@ -43,7 +43,7 @@ input[type=text]:focus{outline:2px solid var(--brand);outline-offset:1px}
 const ACADEMY = '박찬 과학';
 const esc = t => String(t ?? '').replace(/[&<>"]/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;' }[c]));
 const token = new URLSearchParams(location.search).get('t') || '';
-let srv = null; try { srv = JSON.parse(localStorage.getItem('pcs.server')); } catch {}
+let srv = null; if (/^(127\.0\.0\.1|localhost)$/.test(location.hostname)) { try { srv = JSON.parse(localStorage.getItem('pcs.server')); } catch {} }   // 개발 기기에서만(공개 주소에서는 빌드에 심은 서버만)
 const URL0 = '__SB_URL__', KEY0 = '__SB_KEY__';
 const SB = URL0.startsWith('http') ? { url: URL0, key: KEY0 } : (srv && srv.url ? srv : null);
 const app = document.getElementById('app');

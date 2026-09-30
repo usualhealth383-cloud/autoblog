@@ -51,7 +51,7 @@ Deno.serve(async (req) => {
     if (p.purchaseState === 2) return json({ ok: false, why: '결제가 아직 끝나지 않았습니다(보류 중). 결제가 끝나면 [구매 복원]을 눌러 주세요.' }, 202);
     if (p.purchaseState !== 0) return json({ ok: false, why: '취소된 결제입니다.' }, 400);
     // 결제할 때 넣은 계정 표시(obfuscatedExternalAccountId = Supabase 사용자 id)와 지금 로그인한 계정이 같아야 한다 — 남의 영수증 재사용 방지
-    if (p.obfuscatedExternalAccountId && p.obfuscatedExternalAccountId !== user.id) return json({ ok: false, why: '다른 계정으로 결제한 영수증입니다.' }, 403);
+    if (p.obfuscatedExternalAccountId !== user.id) return json({ ok: false, why: '다른 계정으로 결제한 영수증입니다.' }, 403);   // 계정 표시가 없는 영수증도 거절(남이 먼저 가져가지 못하게) — 앱은 결제할 때 늘 계정 id 를 넣는다
     const g = await rpc('grant_purchase', { p_uid: user.id, p_token: purchaseToken, p_product: productId, p_order: p.orderId || orderId || null, p_days: days * (p.quantity || 1), p_raw: p });
     if (g && g.revoked) return json({ ok: false, why: g.why }, 400);   // 환불된 영수증을 다시 보낸 경우
     if (!g || !g.ok) return json({ ok: false, why: '이용권을 반영하지 못했습니다. 학원에 문의해 주세요.' }, 500);

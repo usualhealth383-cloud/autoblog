@@ -20,63 +20,46 @@ UNIT_OF = {'11': ('I', '과학의 기초'), '12': ('II', '물질과 규칙성'),
 BOOK_OF = {'1': '통합과학 1', '2': '통합과학 2'}
 MARKS = '①②③④⑤'
 
-# 위·아래 첨자(10<sup>−10</sup>, H<sub>2</sub>O, Na<sup>+</sup>)를 잃지 않는다 — 2026-10-01 이전 추출본은 '10−10 m' 처럼 지수가 사라졌다
-SUP_U = str.maketrans('0123456789+-−n', '⁰¹²³⁴⁵⁶⁷⁸⁹⁺⁻⁻ⁿ'); SUB_U = str.maketrans('0123456789+-', '₀₁₂₃₄₅₆₇₈₉₊₋')
-def supsub_uni(html):
-    """글자만 남길 칸(제목·용어·캡션)용: 첨자를 유니코드 첨자로"""
-    html = re.sub(r'<sup\b[^>]*>(.*?)</sup>', lambda m: re.sub(r'<[^>]+>', '', m[1]).translate(SUP_U), html, flags=re.S)
-    return re.sub(r'<sub\b[^>]*>(.*?)</sub>', lambda m: re.sub(r'<[^>]+>', '', m[1]).translate(SUB_U), html, flags=re.S)
-def strip_tags(t):
-    """<sup>·<sub> 만 남기고 태그를 걷는다(앱이 그대로 그린다)"""
-    return re.sub(r'<(?!/?(?:sup|sub)>)[^>]+>', '', re.sub(r'<(sup|sub)\b[^>]*>', r'<\1>', t))
-def plain_text(node, sep=' '):
-    """get_text 대신: 첨자를 유니코드로 바꾼 사본에서 글자를 뽑는다(원본 트리는 건드리지 않음)"""
-    from bs4 import BeautifulSoup
-    return BeautifulSoup(supsub_uni(str(node)), 'html.parser').get_text(sep)
+import sys as _sys; _sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
+from _extract_common import txt as _txt, defs_map, selfcontain, strip_tags, supsub_uni, plain_text
 
 
 def txt(node, keep_bold=False):
-    """조판 태그를 걷어 낸 문자열. keep_bold 면 <b> 만 남긴다(앱에서 강조에 쓴다)."""
-    if node is None:
-        return ''
-    if keep_bold:
-        html = ''.join(str(c) for c in node.contents)
-        html = re.sub(r'<span class="blank">(.*?)</span>', r'{{\1}}', html)
-        html = re.sub(r'<b\b[^>]*>', '<b>', html)
-        html = re.sub(r'<(sup|sub)\b[^>]*>', r'<\1>', html)
-        html = re.sub(r'<(?!/?(?:b|sup|sub)>)[^>]+>', '', html)
-        return re.sub(r'\s+', ' ', html).strip()
-    return re.sub(r'\s+([⁰¹²³⁴⁵⁶⁷⁸⁹⁺⁻ⁿ₀₁₂₃₄₅₆₇₈₉₊₋]+)', r'\1', re.sub(r'\s+', ' ', plain_text(node, ' '))).strip()
+    """조판 태그를 걷어 낸 문자열. keep_bold 면 <b>·첨자를 남기고 빈칸을 {{㉠}} 로(앱에서 강조·빈칸에 쓴다)."""
+    return _txt(node, keep_bold, blanks=keep_bold)
 
 
-def file_markers(src_text):
-    """파일 상단 defs-only svg 의 마커들 — id → 마커 원문."""
-    m = re.search(r'<svg class="defs-only".*?<defs>(.*?)</defs>', src_text, re.S)
-    if not m:
-        return {}
-    return {mk.group(1): mk.group(0)
-            for mk in re.finditer(r'<marker id="([^"]+)".*?</marker>', m.group(1), re.S)}
-
-
-def selfcontain(svg, markers, cid):
-    """그림 하나를 독립 문서로: 쓰는 마커를 <defs> 로 넣고, 모든 id 에 개념 번호를 붙여
-    앱 한 문서 안에서 다른 그림과 id 가 부딪히지 않게 한다."""
-    used = set(re.findall(r'url\(#([^)]+)\)', svg)) | set(re.findall(r'href="#([^"]+)"', svg))
-    need = [markers[i] for i in sorted(used) if i in markers]   # 집합 순회는 실행마다 순서가 달라 빌드가 흔들린다
-    if need:
-        svg = re.sub(r'(<svg\b[^>]*>)', lambda m: m.group(1) + '<defs>' + ''.join(need) + '</defs>', svg, count=1)
-    ids = set(re.findall(r'\bid="([^"]+)"', svg))
-    sfx = '-' + cid
-    for i in sorted(ids, key=len, reverse=True):
-        svg = svg.replace(f'id="{i}"', f'id="{i}{sfx}"')
-        svg = svg.replace(f'url(#{i})', f'url(#{i}{sfx})')
-        svg = svg.replace(f'href="#{i}"', f'href="#{i}{sfx}"')
-    return svg
+def parse_keyline(line, count):
+    """'정답 1 ③ (해설) 2 ② (… 3 × 10⁸ …) 3 서술형 모범 답안' 을 앞에서부터 차례로 읽는다.
+    예전에는 ' 3 ' 을 아무 데서나 찾아 괄호 속 식(3 × 10⁸)에서 잘렸다(2026-10-01 점검: 해설 5개가 잘리거나 섞임)."""
+    body = re.sub(r'^\s*정답\s*', '', line); out, pos = {}, 0
+    for i in range(1, count + 1):
+        m = re.compile(rf'\s*{i}\s+').match(body, pos)
+        if not m: break
+        pos = m.end(); mk = re.compile(r'([①②③④⑤])\s*').match(body, pos)
+        if mk and body[mk.end():mk.end() + 1] == '(':            # ③ (해설) — 괄호 짝을 세어 끝을 찾는다
+            depth, j = 0, mk.end()
+            while j < len(body):
+                if body[j] == '(': depth += 1
+                elif body[j] == ')':
+                    depth -= 1
+                    if depth == 0: break
+                j += 1
+            out[i] = (mk.group(1), body[mk.end() + 1:j].strip()); pos = j + 1
+        elif mk and ((i == count and not body[mk.end():].strip()) or (i < count and re.compile(rf'\s*{i + 1}\s').match(body, mk.end()))):
+            out[i] = (mk.group(1), ''); pos = mk.end()
+        else:                                                   # 서술형: 다음 번호(맨 끝이면 끝)까지
+            if i == count: end = len(body)
+            else:
+                n = re.compile(rf'\s{i + 1}\s').search(body, pos); end = n.start() if n else len(body)
+            m2 = mk.group(1) if mk else None
+            out[i] = (m2, body[(mk.end() if mk else pos):end].strip()); pos = end
+    return out
 
 
 def parse_lesson(path):
     src_text = path.read_text(encoding='utf-8')
-    markers = file_markers(src_text)
+    markers = defs_map(src_text)
     # 페이지 원문을 순서대로 들고 있다가, 그림은 여기서 원문 그대로 꺼낸다
     raw_pages = [seg for seg in re.split(r'(?=<div class="page lect")', src_text)
                  if seg.lstrip().startswith('<div class="page lect"')]
@@ -120,7 +103,7 @@ def parse_lesson(path):
             for st in page.select('.a-step'):
                 cur['steps'].append({
                     'n': txt(st.select_one('.n')),
-                    't': txt(st.select_one('.t')),
+                    't': txt(st.select_one('.t'), keep_bold=True),   # 제목에도 빈칸(㉠)이 있다(2303-01)
                     'd': txt(st.select_one('.d'), keep_bold=True)})
             fig = page.select_one('.a-fig')
             if fig and fig.find('svg'):
@@ -174,7 +157,9 @@ def parse_lesson(path):
     if qpage:
         note = qpage.select_one('.qs-note p')
         keyline = txt(qpage.select_one('.ans-line'))
-        for i, qq in enumerate(qpage.select('.qq'), 1):
+        qqs = qpage.select('.qq')
+        keys = parse_keyline(txt(qpage.select_one('.ans-line'), keep_bold=True), len(qqs))
+        for i, qq in enumerate(qqs, 1):
             stems = qq.select('.stem')
             qn = qq.select_one('.qn')
             if qn:
@@ -191,11 +176,10 @@ def parse_lesson(path):
                  'essay': bool(qq.select_one('.write')),
                  'gradeNote': txt(note, keep_bold=True) if i == 3 and note else '',
                  'answerLine': keyline}
-            m = re.search(rf'\b{i} ([①②③④⑤])', keyline)
-            q['answer'] = MARKS.index(m.group(1)) + 1 if m else None
-            body = keyline.replace('정답 ', '', 1)
-            seg = re.search(rf'(?:^|\s){i} (.+?)(?=\s{i+1} |$)', body)
-            q['explain'] = re.sub(r'^[①②③④⑤]\s*', '', seg.group(1)).strip(' ()') if seg else ''
+            mk, ex = keys.get(i, (None, ''))
+            if q['essay']: mk, ex = None, (('' if not mk else mk + ' ') + ex).strip()   # 서술형 모범 답안이 ①로 시작해도 정답 ①이 아니다(1201 #3)
+            q['answer'] = MARKS.index(mk) + 1 if mk else None
+            q['explain'] = ex
             quizzes.append(q)
     return concepts, quizzes
 

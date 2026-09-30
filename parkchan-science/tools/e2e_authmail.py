@@ -30,7 +30,7 @@ async def main():
             await signup(s, '메일학생', 'mail@test.kr', code='MAIL01', welcome=False, wait=900)
             assert await s.evaluate('authMode') == 'login' and '메일' in await s.locator('.auth .info').inner_text(), '가입 확인 안내가 없다'
             assert await s.input_value('#lgEmail') == 'mail@test.kr'; await s.screenshot(path=f'{SC}/m01_mail_sent.png')
-            await s.fill('#lgPw', '123456'); await s.click('#lgGo'); await s.wait_for_timeout(600)
+            await s.fill('#lgPw', 'pass1234'); await s.click('#lgGo'); await s.wait_for_timeout(600)
             assert '메일 인증이 아직' in await s.locator('.auth .err').inner_text(), await s.locator('.auth .err').inner_text()
             # 2) 메일 링크 → 앱으로 돌아와 바로 로그인 · 적어 둔 학원 코드가 연결됨
             link = [m for m in mails() if m['type'] == 'signup'][-1]['link'].replace('redirect_to=', 'redirect_to=')
@@ -61,7 +61,7 @@ async def main():
             await s.fill('#npPw', 'newpass1'); await s.fill('#npPw2', 'newpass1'); await s.click('#npGo'); await s.wait_for_timeout(1000)
             assert await s.evaluate('view') == 'today'
             await s.click('.tab[data-v="me"]'); await s.click('#logout'); await s.wait_for_timeout(600)
-            await s.click('#goLogin'); await s.fill('#lgEmail', 'mail@test.kr'); await s.fill('#lgPw', '123456'); await s.click('#lgGo'); await s.wait_for_timeout(600)
+            await s.click('#goLogin'); await s.fill('#lgEmail', 'mail@test.kr'); await s.fill('#lgPw', 'pass1234'); await s.click('#lgGo'); await s.wait_for_timeout(600)
             assert '다릅니다' in await s.locator('.auth .err').inner_text(), '옛 비밀번호로 로그인됨'
             await s.fill('#lgPw', 'newpass1'); await s.click('#lgGo'); await s.wait_for_timeout(900)
             assert await s.evaluate('view') == 'today' and await s.evaluate('S.auth && S.auth.code') == 'MAIL01'

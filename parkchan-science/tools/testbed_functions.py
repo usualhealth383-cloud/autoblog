@@ -145,9 +145,10 @@ def main():
       OWN = json.loads(U.urlopen(U.Request(GW + '/auth/v1/token?grant_type=password', data=json.dumps({'email': 'owner@parkchan.kr', 'password': 'owner-pass'}).encode(), headers={'Content-Type': 'application/json'}, method='POST')).read())['access_token']
       for code, nm, cls in (('PUSH01', '푸시학생', '월목반'), ('PUSH02', '다른반', '화금반')):
           call('POST', '/rest/v1/students', {'code': code, 'name': nm, 'cls': cls, 'until': '2099-01-01'}, OWN)
-      S1, _ = signup('ps1@t.kr'); S2, _ = signup('ps2@t.kr'); P1, _ = signup('pp1@t.kr', 'parent')
+      S1, _ = signup('ps1@t.kr'); S2, _ = signup('ps2@t.kr'); P1, P1_ID = signup('pp1@t.kr', 'parent')
       call('POST', '/rest/v1/rpc/link_code', {'p_kind': 'student', 'p_code': 'PUSH01'}, S1); call('POST', '/rest/v1/rpc/link_code', {'p_kind': 'student', 'p_code': 'PUSH02'}, S2)
       call('POST', '/rest/v1/rpc/link_code', {'p_kind': 'child', 'p_code': 'PUSH01'}, P1)
+      call('POST', '/rest/v1/rpc/guardian_decide', {'p_uid': P1_ID, 'p_code': 'PUSH01', 'p_ok': True}, OWN)   # 보호자 연결은 원장 확인 뒤
       for t, tok in ((S1, 'tok-stu1'), (S2, 'tok-stu2'), (P1, 'tok-par1')): call('POST', '/rest/v1/rpc/register_push', {'p_token': tok, 'p_platform': 'android'}, t)
       call('POST', '/rest/v1/rpc/register_push', {'p_token': 'dead-old-phone', 'p_platform': 'android'}, P1)
       PH = {'x-push-secret': 'push-s'}

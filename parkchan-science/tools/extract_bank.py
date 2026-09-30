@@ -15,34 +15,17 @@ OUT = ROOT / 'data'
 ROMAN = {'I': '1', 'II': '2', 'III': '3'}
 MARKS = '①②③④⑤'
 
-# 위·아래 첨자(10<sup>−10</sup>, H<sub>2</sub>O, Na<sup>+</sup>)를 잃지 않는다 — 2026-10-01 이전 추출본은 '10−10 m' 처럼 지수가 사라졌다
-SUP_U = str.maketrans('0123456789+-−n', '⁰¹²³⁴⁵⁶⁷⁸⁹⁺⁻⁻ⁿ'); SUB_U = str.maketrans('0123456789+-', '₀₁₂₃₄₅₆₇₈₉₊₋')
-def supsub_uni(html):
-    """글자만 남길 칸(제목·용어·캡션)용: 첨자를 유니코드 첨자로"""
-    html = re.sub(r'<sup\b[^>]*>(.*?)</sup>', lambda m: re.sub(r'<[^>]+>', '', m[1]).translate(SUP_U), html, flags=re.S)
-    return re.sub(r'<sub\b[^>]*>(.*?)</sub>', lambda m: re.sub(r'<[^>]+>', '', m[1]).translate(SUB_U), html, flags=re.S)
-def strip_tags(t):
-    """<sup>·<sub> 만 남기고 태그를 걷는다(앱이 그대로 그린다)"""
-    return re.sub(r'<(?!/?(?:sup|sub)>)[^>]+>', '', re.sub(r'<(sup|sub)\b[^>]*>', r'<\1>', t))
-def plain_text(node, sep=' '):
-    """get_text 대신: 첨자를 유니코드로 바꾼 사본에서 글자를 뽑는다(원본 트리는 건드리지 않음)"""
-    from bs4 import BeautifulSoup
-    return BeautifulSoup(supsub_uni(str(node)), 'html.parser').get_text(sep)
+import sys as _sys; _sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
+from _extract_common import txt as _txt, defs_map, selfcontain, strip_tags, plain_text
 
 
 def txt(node, keep_bold=True):
-    if node is None: return ''
-    if keep_bold:
-        html = ''.join(str(c) for c in node.contents)
-        html = re.sub(r'<b\b[^>]*>', '<b>', html)
-        html = re.sub(r'<(sup|sub)\b[^>]*>', r'<\1>', html)
-        html = re.sub(r'<(?!/?(?:b|sup|sub)>)[^>]+>', '', html)
-        return re.sub(r'\s+', ' ', html).replace('&lt;', '<').replace('&gt;', '>').replace('&amp;', '&').strip()
-    return re.sub(r'\s+([⁰¹²³⁴⁵⁶⁷⁸⁹⁺⁻ⁿ₀₁₂₃₄₅₆₇₈₉₊₋]+)', r'\1', re.sub(r'\s+', ' ', plain_text(node, ' '))).strip()
+    return _txt(node, keep_bold)
 
 
 def lesson_code(path):
     """book/chapter-09 → 1304, book/chapter-i02 → 1102, book/chapter-03 → 1203, book2/chapter-2203 → 2203"""
+    if path.parent.name == 'sample-chapter': return '1201'   # 빅뱅 단원은 표본 장(sample-chapter)에 있다 — 예전엔 빠져 문항이 자동 생성뿐이었다
     d = path.parent.name.replace('chapter-', '')
     if path.parts[-3] == 'book2': return d
     if d.startswith('i'): return '11' + d[1:].zfill(2)
@@ -50,20 +33,10 @@ def lesson_code(path):
     return f'12{n:02d}' if n <= 5 else f'13{n-5:02d}'
 
 
-def selfcontain(svg, markers, cid):
-    used = set(re.findall(r'url\(#([^)]+)\)', svg)) | set(re.findall(r'href="#([^"]+)"', svg))
-    need = [markers[i] for i in sorted(used) if i in markers]   # 집합 순회 순서는 실행마다 달라 빌드가 흔들린다
-    if need:
-        svg = re.sub(r'(<svg\b[^>]*>)', lambda m: m.group(1) + '<defs>' + ''.join(need) + '</defs>', svg, count=1)
-    for i in sorted(set(re.findall(r'\bid="([^"]+)"', svg)), key=len, reverse=True):
-        svg = svg.replace(f'id="{i}"', f'id="{i}-{cid}"').replace(f'url(#{i})', f'url(#{i}-{cid})').replace(f'href="#{i}"', f'href="#{i}-{cid}"')
-    return svg
-
-
 def parse_chapter(path):
     src = path.read_text(encoding='utf-8')
     code = lesson_code(path)
-    markers = {m.group(1): m.group(0) for m in re.finditer(r'<marker id="([^"]+)".*?</marker>', src, re.S)}
+    markers = defs_map(src)
     soup = BeautifulSoup(src, 'html.parser')
     items, labs = [], []
 
@@ -170,45 +143,86 @@ def parse_chapter(path):
     return items, labs
 
 
+# 자동 문항 품질(2026-10-01 점검) — 앞 문장 없이는 뜻이 안 서는 문장, 시험 요령 문장, 그림을 가리키는 문장은 문제로 내지 않는다
+CONNECT = re.compile(r'^(그런데|그래서|하지만|그러나|따라서|그러므로|또|또한|즉|반면|이때|이것|이는|이를|이 |그 |그것|저 |여기|위의?|아래|앞의?|왼쪽|오른쪽|가운데|한 칸|둘 다|모두 )')
+FIGREF = re.compile(r'그림\s*\d|표\s*\d|왼쪽|오른쪽|가운데는|위 그림|아래 그림|[㉠㉡㉢](?![}])')
+TIPS = re.compile(r'선지|함정|단골|오답|출제|시험에|문제에서')
+SUBJ = re.compile(r'^[^.]{0,28}?\S(은|는|이|가|에는|에서는)\s')      # 첫 문장 앞쪽에 주어(은·는·이·가)가 있어야 홀로 선다
+def standalone(t):
+    t = re.sub(r'<[^>]+>', '', t).strip()
+    return len(t) >= 12 and not CONNECT.match(t) and not FIGREF.search(t) and not TIPS.search(t) and bool(SUBJ.match(t))
+PRED_END = ('다', '게', '고', '며', '해', '져', '라', '서', '아', '어', '은')
+def kind(v):
+    v = re.sub(r'<[^>]+>', '', v)
+    if re.search(r'\d', v): return 'num'
+    if v.endswith(PRED_END) and len(v) <= 5: return 'pred'
+    return 'noun'
+
+
 def auto_from_lecture(concepts):
-    """강의용 교재에서 자동 생성: 오해✗ 문장 → X, 진실✓ 문장 → O · 빈칸 ㉠㉡㉢ → 4지선다(다른 개념의 정답이 오답 보기)"""
+    """강의용 교재에서 자동 생성: 오해✗ 문장 → X, 진실✓ 문장 → O · 빈칸 ㉠㉡㉢ → 4지선다(같은 종류의 다른 빈칸 정답이 오답 보기)"""
     items = []
-    all_blanks = [v for c in concepts for v in c['blanks'].values() if 2 <= len(v) <= 12]
+    pool = []                                   # (값, 소단원, 단원) — 같은 값은 한 번만
+    for c in concepts:
+        for v in c['blanks'].values():
+            if 1 <= len(re.sub(r'<[^>]+>', '', v)) <= 12 and v not in [p[0] for p in pool]: pool.append((v, c['lessonId'], c['lessonId'][:2]))
     rnd = random.Random(7)
     for c in concepts:
         code, no = c['lessonId'], int(c['no'])
         for i, m in enumerate(c['myths'], 1):
             x = strip_tags(m['x']).strip(); o = strip_tags(m['o']).strip()
-            if x.endswith('.') and len(x) > 8:
+            if x.endswith('.') and standalone(x):
                 items.append({'id': f'{code}-m{no}-{i}x', 'lessonId': code, 'concept': no, 'step': 'auto', 'type': 'ox', 'stem': x,
                               'source': '', 'choices': [], 'answer': 'X', 'explain': o, 'wrong': '', 'figure': '', 'difficulty': '●○○'})
-            if o.endswith('.') and len(o) > 8 and not re.search(r'반대다|틀렸다|아니다\.$', o):
+            if False and o.endswith('.') and standalone(o):   # 진실(✓) 문장은 오해 없이 홀로 읽으면 뜻이 비는 것이 많아(2026-10-01 점검 77건+) 문제로 내지 않고 X 문항의 해설로만 쓴다
                 items.append({'id': f'{code}-m{no}-{i}o', 'lessonId': code, 'concept': no, 'step': 'auto', 'type': 'ox', 'stem': o,
-                              'source': '', 'choices': [], 'answer': 'O', 'explain': '', 'wrong': '', 'figure': '', 'difficulty': '●○○'})
+                              'source': '', 'choices': [], 'answer': 'O', 'explain': '교재 개념 카드의 설명 그대로입니다.', 'wrong': '', 'figure': '', 'difficulty': '●○○'})
         # 빈칸: 뼈대·본문에서 {{㉠}} 이 든 문장을 뽑아 4지선다로
         texts = [s['d'] for s in c['steps']] + c['body']
         for k, v in c['blanks'].items():
             for t in texts:
-                if '{{' + k + '}}' in t:
-                    sent = next((x for x in re.split(r'(?<=[.!?])\s+', strip_tags(t)) if '{{' + k + '}}' in x), None)
-                    if not sent: break
-                    stem = re.sub(r'\{\{[㉠㉡㉢]\}\}', '＿＿＿', sent).strip()
-                    others = [b for b in all_blanks if b != v and abs(len(b) - len(v)) <= 4]
-                    if len(others) < 3 or not (1 <= len(v) <= 12): break
-                    ch = rnd.sample(others, 3) + [v]; rnd.shuffle(ch)
-                    items.append({'id': f'{code}-b{no}-{k}', 'lessonId': code, 'concept': no, 'step': 'auto', 'type': 'mc', 'stem': '빈칸에 들어갈 말은? ' + stem,
-                                  'source': '', 'choices': ch, 'answer': ch.index(v) + 1, 'explain': c['point'], 'wrong': '', 'figure': '', 'difficulty': '●○○'})
-                    break
+                if '{{' + k + '}}' not in t: continue
+                sent = next((x for x in re.split(r'(?<=[.!?])\s+', strip_tags(t)) if '{{' + k + '}}' in x), None)
+                if not sent: break
+                # 묻는 빈칸만 비우고, 같은 문장의 다른 빈칸은 답으로 채운다(빈칸 둘인데 하나만 묻던 것)
+                stem = re.sub(r'\{\{([㉠㉡㉢])\}\}', lambda mm: '＿＿＿' if mm.group(1) == k else c['blanks'].get(mm.group(1), '＿＿＿'), sent).strip()
+                bare = re.sub(r'<[^>]+>', '', v)
+                if bare in re.sub(r'<[^>]+>', '', stem).replace('＿＿＿', ''): break       # 답이 문장에 이미 있다(거저 주는 문제)
+                if not standalone(stem.replace('＿＿＿', '빈칸')) : break
+                kv = kind(v)
+                plain_stem = re.sub(r'<[^>]+>', '', stem)
+                def ok(b): bb = re.sub(r'<[^>]+>', '', b); return b != v and bb not in bare and bare not in bb and bb not in plain_stem and kind(b) == kv and abs(len(bb) - len(bare)) <= 4
+                near = [p[0] for p in pool if ok(p[0]) and p[1] == code] + [p[0] for p in pool if ok(p[0]) and p[2] == code[:2] and p[1] != code] + [p[0] for p in pool if ok(p[0]) and p[2] != code[:2]]
+                near = list(dict.fromkeys(near))
+                if len(near) < 3: break
+                ch = rnd.sample(near[:12], 3) + [v]; rnd.shuffle(ch)
+                items.append({'id': f'{code}-b{no}-{k}', 'lessonId': code, 'concept': no, 'step': 'auto', 'type': 'mc', 'stem': '빈칸에 들어갈 말은? ' + stem,
+                              'source': '', 'choices': ch, 'answer': ch.index(v) + 1, 'explain': c['point'], 'wrong': '', 'figure': '', 'difficulty': '●○○'})
+                break
     return items
 
 
 def main():
     concepts = json.loads((OUT / 'concepts.json').read_text(encoding='utf-8'))
     items, labs = [], []
-    for path in sorted(list((ROOT / 'book').glob('chapter-*/chapter.html')) + list((ROOT / 'book2').glob('chapter-*/chapter.html'))):
+    for path in sorted(list((ROOT / 'book').glob('chapter-*/chapter.html')) + [ROOT / 'book' / 'sample-chapter' / 'chapter.html'] + list((ROOT / 'book2').glob('chapter-*/chapter.html'))):
         its, lbs = parse_chapter(path); items += its; labs += lbs
         print(f'{path.parent.name} → {lesson_code(path)}: 문항 {len(its)} · 탐구 {len(lbs)}')
     auto = auto_from_lecture(concepts); items += auto
+    # 개념 번호는 그 소단원의 개념 수를 넘지 않게(바로바로 체크가 개념보다 많은 장이 있다 — 없는 개념 카드로 가던 것)
+    nmax = {}
+    for c in concepts: nmax[c['lessonId']] = max(nmax.get(c['lessonId'], 0), int(c['no']))
+    for it in items:
+        if it['concept'] and it['lessonId'] in nmax: it['concept'] = min(int(it['concept']), nmax[it['lessonId']])
+    # 같은 OX 문장이 바로바로 체크와 자동(오해/진실)에 두 번 — 본책 것을 남긴다
+    key = lambda t: re.sub(r'[\W_]+', '', re.sub(r'<[^>]+>', '', t))
+    seen, keep = set(), []
+    for it in items:
+        k = (it['type'], key(it['stem'])) if it['type'] == 'ox' else None
+        if k and k in seen: continue
+        if k: seen.add(k)
+        keep.append(it)
+    print(f'  같은 OX 문장 중복 {len(items) - len(keep)}개 뺌'); items = keep
     # 개념 번호 없는 STEP 문항은 소단원 전체(0)로 둔다
     bad = [i['id'] for i in items if i['type'] in ('mc', 'multi') and not i['answer']]
     dropped = [i for i in items if i['type'] != 'essay' and not str(i.get('answer', '')).strip()]
@@ -218,7 +232,8 @@ def main():
     (OUT / 'bank.json').write_text(json.dumps(items, ensure_ascii=False, indent=0), encoding='utf-8')
     (OUT / 'labs.json').write_text(json.dumps(labs, ensure_ascii=False, indent=0), encoding='utf-8')
     from collections import Counter
-    print(f'\n합계 문항 {len(items)} (본책 {len(items)-len(auto)} · 자동 {len(auto)}) · 탐구 {len(labs)} · 유형 {dict(Counter(i["type"] for i in items))}')
+    na = sum(1 for i in items if i['step'] == 'auto')
+    print(f'\n합계 문항 {len(items)} (본책 {len(items) - na} · 자동 {na}) · 탐구 {len(labs)} · 유형 {dict(Counter(i["type"] for i in items))}')
     if bad: print('정답 못 읽은 문항:', bad)
 
 

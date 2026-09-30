@@ -7,8 +7,9 @@ android {
         applicationId "kr.parkchan.science"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 1
-        versionName "1.0"
+        // Play 는 같은 versionCode 를 다시 받지 않는다 — CI 가 실행 번호를 넘긴다(-PversionCode=…). 이름은 앱의 CFG.version 과 같게
+        versionCode((project.findProperty("versionCode") ?: "1") as Integer)
+        versionName((project.findProperty("versionName") ?: "1.0.0") as String)
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         aaptOptions {
              // Files and dirs to omit from the packaged assets dir, modified to accommodate modern web apps.

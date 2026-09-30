@@ -92,7 +92,7 @@ async def main():
         await login(*OWNER); await o.click(f'[data-stu="{code}"]'); await o.wait_for_timeout(800)
         assert '학생 앱 연결됨' in await o.locator('.sheet').inner_text(); await o.click('.sheet .stuedit summary'); await o.click('#seRelease'); await o.wait_for_timeout(900)
         assert '아직 연결 전' in await o.locator('.sheet').inner_text(), '연결 풀기 실패'
-        await o.click('#sheetClose'); await logout(); await login('kb@t.kr', '123456')
+        await o.click('#sheetClose'); await logout(); await login('kb@t.kr', 'pass1234')
         await o.click('.tab[data-v="me"]'); await o.wait_for_timeout(300); await o.fill('#codeIn', code); await o.click('#codeGo'); await o.wait_for_timeout(900)
         assert await o.evaluate('S.auth && S.auth.code') == code, '풀어 준 뒤에도 새 계정이 등록 못 함'
         # ⑦ 오류 기록이 원장 설정에 보인다

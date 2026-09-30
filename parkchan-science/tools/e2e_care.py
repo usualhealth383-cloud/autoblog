@@ -88,7 +88,7 @@ async def main():
         await box.locator('[data-admcare]').first.click(); await o.wait_for_timeout(500); assert await o.evaluate('view') == 'post'
 
         # ⑤ 내 정보 — 마음이 힘들 때 (학생으로 다시)
-        await logout(o); await s.click('#goLogin'); await s.fill('#lgEmail', 'care@t.kr'); await s.fill('#lgPw', '123456'); await s.click('#lgGo'); await s.wait_for_timeout(900)
+        await logout(o); await s.click('#goLogin'); await s.fill('#lgEmail', 'care@t.kr'); await s.fill('#lgPw', 'pass1234'); await s.click('#lgGo'); await s.wait_for_timeout(900)
         await s.click('.tab[data-v="me"]'); await s.wait_for_timeout(300); await s.click('#goHelp'); await s.wait_for_timeout(250)
         assert await s.locator('.sheet .help a[href="tel:109"]').count() == 1
         await s.screenshot(path=f'{SC}/c05_help_sheet.png')

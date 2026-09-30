@@ -7,7 +7,7 @@
 import asyncio, sys, os, json, urllib.request as U
 from playwright.async_api import async_playwright
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from _ui import signup, NO_INTRO, auto_yes
+from _ui import signup, NO_INTRO, auto_yes, approve_child
 SRV = '--server' in sys.argv; GW = 'http://127.0.0.1:8767'
 APP = 'http://127.0.0.1:8765/index.html' + (f"?server={GW}&key={json.loads(U.urlopen(GW + '/__anon').read())['anon']}" if SRV else '?server=')
 SC = sys.argv[sys.argv.index('--shots')+1] if '--shots' in sys.argv[:-1] else '/tmp/e2e_family'; os.makedirs(SC, exist_ok=True)
@@ -38,13 +38,17 @@ async def main():
         await logout()
         # 보호자: 형 코드로 가입 → 동생 추가
         await signup(pg, '형제보호자', 'fam@t.kr', role='parent', child=codes[0])
+        assert '원장님 확인을 기다리고' in await pg.locator('#v-parent').inner_text(), '확인 전 안내가 없다'
+        await approve_child(pg, codes[0])
         assert await pg.evaluate('view') == 'parent' and '형학생 학생' in await pg.locator('#v-parent').inner_text()
         assert await pg.locator('[data-kid]').count() == 0, '자녀가 하나인데 고르기 칩이 보임'
         await pg.click('#childAdd'); await pg.wait_for_timeout(300)
         await pg.fill('.sheet #childIn', 'ZZZ999'); await pg.click('.sheet #childGo'); await pg.wait_for_timeout(600)
         assert '등록되지 않은' in await pg.locator('#childAddErr').inner_text(), '시트 안에 오류가 안 뜸'
         await pg.fill('.sheet #childIn', codes[1]); await pg.click('.sheet #childGo'); await pg.wait_for_timeout(1400)
+        await approve_child(pg, codes[1])
         assert await pg.locator('#sheetBg').count() == 0 and await pg.locator('[data-kid]').count() == 2, '자녀 고르기 칩이 두 개가 아님'
+        await pg.click(f'[data-kid="{codes[1]}"]'); await pg.wait_for_timeout(900)
         body = await pg.locator('#v-parent').inner_text(); assert '동생학생 학생' in body and '출석' in body, body[:200]
         await pg.screenshot(path=f'{SC}/f01_two_kids.png', full_page=True)
         await pg.click(f'[data-kid="{codes[0]}"]'); await pg.wait_for_timeout(900)
@@ -60,7 +64,7 @@ async def main():
         await pg.click('.tab[data-v="me"]'); await pg.wait_for_timeout(300); await pg.click('#pwOpen')
         await pg.fill('#pwNew', 'newpw77'); await pg.fill('#pwNew2', 'newpw78'); await pg.click('#pwSave'); assert '다릅니다' in await pg.locator('#pwErr').inner_text()
         await pg.fill('#pwNew2', 'newpw77'); await pg.click('#pwSave'); await pg.wait_for_timeout(800); assert await pg.locator('#sheetBg').count() == 0
-        await logout(); await login('fam@t.kr', '123456'); assert '다릅니다' in await pg.locator('.auth .err').inner_text(), '옛 비밀번호로 로그인됨'
+        await logout(); await login('fam@t.kr', 'pass1234'); assert '다릅니다' in await pg.locator('.auth .err').inner_text(), '옛 비밀번호로 로그인됨'
         await pg.fill('#lgPw', 'newpw77'); await pg.click('#lgGo'); await pg.wait_for_timeout(1200); assert await pg.evaluate('view') == 'parent'
         # 동생만 연결 해제 → 형만 남음
         await pg.click('.tab[data-v="parent"]'); await pg.wait_for_timeout(600); await pg.click(f'[data-kid="{codes[1]}"]'); await pg.wait_for_timeout(800)
@@ -69,8 +73,8 @@ async def main():
         assert await pg.evaluate('ACC.childCodes.length') == 1
         # 원장 학생 상세: 형에게 보호자 1명, 동생 0명
         await logout(); await login(*OWNER); await pg.click('[data-adm="students"]'); await pg.wait_for_timeout(700)
-        await pg.click(f'[data-stu="{codes[0]}"]'); await pg.wait_for_timeout(800); assert '보호자 연결 1명' in await pg.locator('.sheet').inner_text(); await pg.click('#sheetClose')
-        await pg.click(f'[data-stu="{codes[1]}"]'); await pg.wait_for_timeout(800); assert '보호자 연결 0명' in await pg.locator('.sheet').inner_text()
+        await pg.click(f'[data-stu="{codes[0]}"]'); await pg.wait_for_timeout(800); assert '보호자 1명' in await pg.locator('.sheet').inner_text(); await pg.click('#sheetClose')
+        await pg.click(f'[data-stu="{codes[1]}"]'); await pg.wait_for_timeout(800); assert '보호자 0명' in await pg.locator('.sheet').inner_text()
         assert not errs, errs
         print(('SERVER ' if SRV else 'LOCAL ') + 'FAMILY E2E OK · 콘솔 오류', errs); await b.close()
 

@@ -22,7 +22,7 @@ async def main():
         await s.goto(APP); await s.wait_for_timeout(700)
         # ① 서버가 안 닿을 때 로그인 → 한국어 안내(영어 'Failed to fetch' 금지)
         await ctx.route(lambda url: '8767' in url, lambda r: asyncio.ensure_future(r.abort()))
-        await s.click('#goLogin'); await s.fill('#lgEmail', 'x@t.kr'); await s.fill('#lgPw', '123456'); await s.click('#lgGo'); await s.wait_for_timeout(800)
+        await s.click('#goLogin'); await s.fill('#lgEmail', 'x@t.kr'); await s.fill('#lgPw', 'pass1234'); await s.click('#lgGo'); await s.wait_for_timeout(800)
         e = await s.locator('.auth .err').inner_text(); assert '인터넷' in e and 'fetch' not in e.lower(), e
         await s.screenshot(path=f'{SC}/r01_offline_login.png'); await ctx.unroute_all()
         # 가입 → 이야기 글 하나
@@ -41,7 +41,7 @@ async def main():
         await s.click('.tab[data-v="me"]'); await s.wait_for_timeout(300); await s.click('.tab[data-v="talk"]'); await s.wait_for_timeout(1500)
         assert await s.evaluate('view') == 'auth' and '만료' in await s.locator('.auth .err').inner_text(), await s.evaluate('view')
         await s.screenshot(path=f'{SC}/r02_session_expired.png')
-        await s.fill('#lgEmail', 'net@t.kr'); await s.fill('#lgPw', '123456'); await s.click('#lgGo'); await s.wait_for_timeout(1200)
+        await s.fill('#lgEmail', 'net@t.kr'); await s.fill('#lgPw', 'pass1234'); await s.click('#lgGo'); await s.wait_for_timeout(1200)
         assert await s.evaluate('view') == 'today' and await s.evaluate('ACC.nick') == '끊김닉'
         # ⑤ 내 기록 내려받기(열람권): 계정·학습·이야기 글이 들어 있고 계정 id 는 빠진다
         await s.click('.tab[data-v="me"]'); await s.wait_for_timeout(400)

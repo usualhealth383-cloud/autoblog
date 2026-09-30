@@ -15,9 +15,11 @@
 
 ## 순서 (처음 한 번)
 1. https://supabase.com → **New project** (Region: Northeast Asia — Seoul). 비밀번호는 안전한 곳에 적어 둡니다.
-2. **SQL Editor** → `schema.sql` 을 통째로 붙여 넣고 **Run**.
+2. **Database → Extensions** 에서 **pg_cron** 켜기 → **SQL Editor** → `schema.sql` 을 통째로 붙여 넣고 **Run**.
+   pg_cron 이 있어야 매일 새벽 정리(오류 기록 90일·코드 입력 IP 1일·의견 1년·지운 글 6개월·동의 없는 14세 미만 7일)가 돕니다 — 개인정보처리방침의 보관 기간 약속. 확인: `select jobname, schedule from cron.job;` 에 `pcs-purge-old` 가 보여야 합니다.
 3. 같은 파일 맨 아래 **[설정]** 두 줄의 `--` 를 지우고 원장님 이메일을 넣어 그 두 줄만 다시 Run.
 4. **Authentication → Sign In / Providers → Email**: "Confirm email" **켜기**(원장 이메일 사칭 방지 · 메일 인증을 해야 원장 화면이 열립니다).
+   같은 화면에서 **비밀번호 규칙**: 최소 길이 **8**, "Lowercase, uppercase letters and digits" 가 아니라 **"Letters and digits"**, **Leaked password protection 켜기**(유출된 비밀번호 차단 · 앱도 8자+글자·숫자로 맞춰 둠).
    **Authentication → URL Configuration → Site URL / Redirect URLs** 에 `https://usualhealth383-cloud.github.io/autoblog/parkchan/` 추가(가입 확인·비밀번호 재설정 메일이 돌아올 주소).
 5. 앱에서 원장님 이메일로 **회원가입** → 메일의 링크 누르기 → 원장 화면이 열립니다.
    **바로 이어서** `schema.sql` 맨 아래 ▼ 한 줄(`owner_uid`)의 `--` 를 지우고 실행 — 원장 계정을 id 로 못 박습니다. 이렇게 해 두면 누가 같은 이메일로 먼저 가입을 시도해도 원장이 될 수 없습니다(메일 인증을 실수로 꺼 둔 경우에도).

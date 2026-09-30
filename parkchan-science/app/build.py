@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """앱 셸에 개념·문항·그림 데이터를 심어 배포용 한 파일로 만든다."""
-import json, pathlib
+import json, pathlib, re
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 # 교재 데이터 점검 — 지수·첨자가 사라진 채(10−10 m) 배포되지 않게. 실패하면 빌드하지 않는다
 import subprocess as _sp, sys as _sys
@@ -24,6 +24,12 @@ shell = shell.replace('__SB_URL__', cfg.get('url', '')).replace('__SB_KEY__', cf
 shell = shell.replace('__PUSH__', 'on' if cfg.get('push') else 'off')   # 푸시: google-services.json 과 함께 켠다
 print('서버 모드:', cfg.get('url') or '(없음 → 로컬 모드)')
 legal = {k: (ROOT / 'app' / 'legal' / f'{k}.html').read_text(encoding='utf-8') for k in ('terms', 'privacy', 'delete')}
+# 학원 연락처(app-shell 의 CFG.phone·email)를 약관·처리방침·삭제 안내에 그대로 넣는다 — 앱이 없는 사람도 볼 수 있게(Play 계정 삭제 요건)
+_cfg = {k: (re.search(k + r": *'([^']*)'", shell) or [None, ''])[1] for k in ('phone', 'email', 'academy')}
+_parts = [x for x in (f"전화 {_cfg['phone']}" if _cfg['phone'] else '', f"이메일 {_cfg['email']}" if _cfg['email'] else '') if x]
+CONTACT = ' · '.join(_parts) if _parts else '학원 대표 전화·이메일(출시 전에 적어 넣습니다)'
+if not _parts: print('! 학원 연락처(CFG.phone·CFG.email)가 비어 있습니다 — 출시 전에 채워야 계정 삭제 안내·개인정보 보호책임자 연락처가 완성됩니다')
+legal = {k: v.replace('<!--CONTACT-->', CONTACT) for k, v in legal.items()}
 for k, v in legal.items():
     shell = shell.replace(f'<!--LEGAL_{k.upper()}-->', v.replace('`', '&#96;').replace('${', '&#36;{'))
 out = (shell.replace('<!--CONCEPTS-->', j(concepts))

@@ -108,7 +108,7 @@ async def main():
             st, rows = rest('/rest/v1/notes?select=id,title', tok); assert st == 200 and len(rows) == 3, (st, rows)
             # ④ 새 기기(같은 계정): 로그인하면 노트가 보인다 · 거기서 고치면 이 기기에도
             c2, s2 = await page(dark=True)
-            await s2.click('#goLogin'); await s2.fill('#lgEmail', 'note@t.kr'); await s2.fill('#lgPw', '123456'); await s2.click('#lgGo'); await s2.wait_for_timeout(1500)
+            await s2.click('#goLogin'); await s2.fill('#lgEmail', 'note@t.kr'); await s2.fill('#lgPw', 'pass1234'); await s2.click('#lgGo'); await s2.wait_for_timeout(1500)
             await s2.click('#goNote'); await s2.wait_for_timeout(900)
             assert await s2.evaluate('liveNotes().length') == 3, '새 기기에서 노트가 안 보임'
             await s2.locator('.ncard', has_text='밀도와 부피').click(); await s2.wait_for_timeout(200)
@@ -161,7 +161,7 @@ async def main():
         # ⑦ 로그아웃하면 기기에서 노트를 비우고, 다시 로그인하면 돌아온다
         await s.evaluate("show('me')"); await s.wait_for_timeout(200); await s.click('#logout'); await s.wait_for_timeout(900)
         assert await s.evaluate("Object.keys(localStorage).filter(k => k.startsWith('pcs.notes.') && JSON.parse(localStorage.getItem(k)).length).length") == 0, '로그아웃했는데 노트가 기기에 남음'
-        await s.click('#goLogin'); await s.fill('#lgEmail', 'note@t.kr'); await s.fill('#lgPw', '123456'); await s.click('#lgGo'); await s.wait_for_timeout(1500)
+        await s.click('#goLogin'); await s.fill('#lgEmail', 'note@t.kr'); await s.fill('#lgPw', 'pass1234'); await s.click('#lgGo'); await s.wait_for_timeout(1500)
         await s.wait_for_function('liveNotes().length > 0 && !noteSyncing', timeout=6000)
         assert str(await s.evaluate('liveNotes().filter(n => n.date === todayISO()).length')) + '개' in await s.inner_text('#goNote'), '로그인 뒤 오늘 카드가 노트 수로 바뀌지 않음'
         got = await s.evaluate('liveNotes().length'); assert got == (2 if y[:7] == today[:7] else 3), f'다시 로그인했는데 노트가 없음: {got} · {await s.evaluate("[view, notesOwner, !!ACC]")}'

@@ -61,7 +61,7 @@ async def main():
         assert await s.evaluate('fullAccess()') is False
 
         # 4) 계정 삭제 뒤 둘러보기 → 일정 화면이 멀쩡하다
-        await logout(); await login('second@test.kr', '123456')
+        await logout(); await login('second@test.kr', 'pass1234')
         await s.click('.tab[data-v="me"]'); await s.wait_for_timeout(200); await s.click('#delAccount'); await s.wait_for_timeout(500)
         assert await s.evaluate('view') == 'auth'
         await s.click('#goGuest'); await s.wait_for_timeout(300); await s.click('.tab[data-v="plan"]'); await s.wait_for_timeout(400)

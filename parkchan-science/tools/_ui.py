@@ -4,7 +4,7 @@
 NO_INTRO = "try { if (!localStorage.getItem('pcs.v2')) localStorage.setItem('pcs.v2', JSON.stringify({ introSeen: true })); } catch (e) {}"
 
 
-async def signup(pg, name, email, pw='123456', role='student', code='', child='', u14=False, gname='', gphone='', phone='', welcome=True, wait=1300):
+async def signup(pg, name, email, pw='pass1234', role='student', code='', child='', u14=False, gname='', gphone='', phone='', welcome=True, wait=1300):
     """단계별 가입: 누구 → 약관(+나이) → 계정 → 내 정보(+보호자) → 학원 코드 → 환영"""
     await pg.click('#goSignup'); await pg.wait_for_timeout(150)
     await pg.click(f'[data-role="{role}"]'); await pg.click('#suNext'); await pg.wait_for_timeout(100)
@@ -41,3 +41,19 @@ async def auto_yes(pg):
         await pg.evaluate(AUTO_YES)
     except Exception:
         pass
+
+
+async def approve_child(pg, code, gw='http://127.0.0.1:8767'):
+    """보호자 연결은 원장 확인 뒤 열린다(2026-10-01) — 시험에서 원장 대신 확인을 누르고 보호자 화면을 새로 그린다.
+    로컬 모드: 같은 기기 저장소에서 바로 확인 · 서버 모드: 원장 계정으로 guardian_decide"""
+    mode = await pg.evaluate('DBX.mode')
+    if mode == 'local':
+        await pg.evaluate(f"(async () => {{ await DBX.guardianDecide(ACC.id, '{code}', true); ACC = await DBX.me(); }})()")
+    else:
+        import json, urllib.request as U
+        anon = json.loads(U.urlopen(gw + '/__anon').read())['anon']
+        tok = json.loads(U.urlopen(U.Request(gw + '/auth/v1/token?grant_type=password', data=json.dumps({'email': 'owner@parkchan.kr', 'password': 'owner-pass'}).encode(), headers={'Content-Type': 'application/json', 'apikey': anon}, method='POST')).read())['access_token']
+        uid = await pg.evaluate('ACC.id')
+        U.urlopen(U.Request(gw + '/rest/v1/rpc/guardian_decide', data=json.dumps({'p_uid': uid, 'p_code': code, 'p_ok': True}).encode(), headers={'Content-Type': 'application/json', 'apikey': anon, 'Authorization': 'Bearer ' + tok}, method='POST')).read()
+        await pg.evaluate("(async () => { ACC = await DBX.me(); })()")
+    await pg.evaluate("show('parent')"); await pg.wait_for_timeout(900)

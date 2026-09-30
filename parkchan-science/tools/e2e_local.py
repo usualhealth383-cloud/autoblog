@@ -6,7 +6,7 @@
 import asyncio, sys, os
 from playwright.async_api import async_playwright
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from _ui import signup, NO_INTRO, auto_yes
+from _ui import signup, NO_INTRO, auto_yes, approve_child
 APP = 'http://127.0.0.1:8765/index.html'
 SC = (sys.argv[sys.argv.index('--shots')+1] if '--shots' in sys.argv[:-1] else (sys.argv[1] if len(sys.argv) > 1 and not sys.argv[1].startswith('-') else '/tmp/e2e_local')); os.makedirs(SC, exist_ok=True)
 
@@ -69,7 +69,7 @@ async def main():
         await s.click('#logout'); await s.wait_for_timeout(300); assert await s.evaluate('view') == 'auth' and await s.evaluate('ACC') is None
         # 다시 로그인 → 진도 유지
         await s.click('#goLogin'); await s.fill('#lgEmail', 'stu1@test.kr'); await s.fill('#lgPw', 'wrongpw'); await s.click('#lgGo'); await s.wait_for_timeout(200); assert '다릅니다' in await txt(s, '.err')
-        await s.fill('#lgPw', '123456'); await s.click('#lgGo'); await s.wait_for_timeout(500); assert await s.evaluate('S.done.length') == 1 and await s.evaluate('S.auth.code') == 'MON123'
+        await s.fill('#lgPw', 'pass1234'); await s.click('#lgGo'); await s.wait_for_timeout(500); assert await s.evaluate('S.done.length') == 1 and await s.evaluate('S.auth.code') == 'MON123'
         await ctx.close()
 
         # ── 보호자: 가입 → 자녀 연결 → 자녀 화면 ──
@@ -78,7 +78,8 @@ async def main():
         assert await pr.evaluate('view') == 'parent' and await pr.locator('#childIn').count() == 1
         await pr.fill('#childIn', 'ZZZ000'); await pr.click('#childGo'); await pr.wait_for_timeout(200); assert '등록되지 않은' in await txt(pr, '.err')
         await pr.fill('#childIn', 'MON123'); await pr.click('#childGo'); await pr.wait_for_timeout(500)
-        body = await txt(pr, '#v-parent'); assert '박○○ 학생' in body and '출석' in body, body[:200]; await shot(pr, 'l10_parent')
+        body = await txt(pr, '#v-parent'); assert '원장님 확인을 기다리고' in body and '박○○' not in body, '확인 전에 자녀 정보가 보임'
+        await approve_child(pr, 'MON123'); body = await txt(pr, '#v-parent'); assert '박○○ 학생' in body and '출석' in body, body[:200]; await shot(pr, 'l10_parent')
         assert [t for t in await pr.locator('.tab').all_inner_texts()] == ['자녀', '교재', '이야기', '일정', '내 정보']
         await ctx.close()
 
@@ -86,7 +87,7 @@ async def main():
         ctx, o = await page()
         await o.click('#goLogin'); await o.fill('#lgEmail', 'owner@parkchan.kr'); await o.fill('#lgPw', '2580'); await o.click('#lgGo'); await o.wait_for_timeout(600)
         assert await o.evaluate('view') == 'admin'; await shot(o, 'l11_admin_students')
-        await o.click('[data-stu="DEMO01"]'); await o.wait_for_timeout(400); sh = await txt(o, '.sheet'); assert '박○○ 학생' in sh and '보호자 연결 1명' in sh and '이달 출석' in sh, sh[:300]; await shot(o, 'l12_student_sheet'); await o.click('#sheetClose')
+        await o.click('[data-stu="DEMO01"]'); await o.wait_for_timeout(400); sh = await txt(o, '.sheet'); assert '박○○ 학생' in sh and '보호자 1명' in sh and '이달 출석' in sh, sh[:300]; await shot(o, 'l12_student_sheet'); await o.click('#sheetClose')
         await o.click('[data-adm="stats"]'); await o.wait_for_timeout(500); st = await txt(o, '#v-admin'); assert '수강생' in st and '반별 출석' in st; await shot(o, 'l13_admin_stats')
         await o.click('[data-adm="settings"]'); await o.wait_for_timeout(400)
         await o.fill('#clsName', '일요반'); await o.fill('#clsStart', '10:00'); await o.click('#clsAdd'); await o.wait_for_timeout(400); assert '일요반' in await txt(o, '#v-admin')
@@ -109,7 +110,7 @@ async def main():
         await g.click('.tab[data-v="list"]'); await g.wait_for_timeout(300); assert await g.locator('.row.locked').count() == 0
         # 계정 삭제
         await g.click('.tab[data-v="me"]'); await g.wait_for_timeout(200); await g.click('#delAccount'); await g.wait_for_timeout(400); assert await g.evaluate('view') == 'auth'
-        await g.click('#goLogin'); await g.fill('#lgEmail', 'out1@test.kr'); await g.fill('#lgPw', '123456'); await g.click('#lgGo'); await g.wait_for_timeout(200); assert '다릅니다' in await txt(g, '.err'), '삭제된 계정으로 로그인됨'
+        await g.click('#goLogin'); await g.fill('#lgEmail', 'out1@test.kr'); await g.fill('#lgPw', 'pass1234'); await g.click('#lgGo'); await g.wait_for_timeout(200); assert '다릅니다' in await txt(g, '.err'), '삭제된 계정으로 로그인됨'
         await ctx.close(); await b.close()
         print('LOCAL E2E OK · 콘솔 오류', errs); assert not errs
 asyncio.run(main())
