@@ -50,6 +50,9 @@ async def main():
             await s.goto(link); await s.locator('#askMsg').wait_for(timeout=4000)
             assert '비밀번호를 새로 정합니다' in await s.inner_text('#askMsg'); await s.click('#askNo'); await s.wait_for_timeout(700)
             assert await s.evaluate('ACC') is None and await s.evaluate('authMode') != 'newpw' and '로그인하지 않았습니다' in await s.locator('.auth .err').inner_text(), '내 계정이 아니라고 했는데 로그인됨'
+            # 메일 링크는 한 번만 쓰인다 — 아니라고 했으면 재설정 메일을 다시 받는다
+            await s.click('#goForgot'); await s.fill('#fgEmail', 'mail@test.kr'); await s.click('#fgGo'); await s.wait_for_timeout(700)
+            link = [m for m in mails() if m['type'] == 'recovery'][-1]['link']
             await s.goto(link); await s.locator('#askMsg').wait_for(timeout=4000); await s.click('#askYes'); await s.wait_for_timeout(1300)
             await s.evaluate("sessionStorage.removeItem('askManual')")
             assert await s.evaluate('authMode') == 'newpw' and await s.locator('#npPw').count() == 1, '새 비밀번호 화면이 안 뜬다'
