@@ -83,6 +83,8 @@ def main():
     for f in ['easy-index.json', 'pills.json'] + (['pills-rx.json'] if a.rx else []):
         for p in json.loads((DATA / f).read_text(encoding='utf-8')):
             if p.get('seq') and p.get('n'): items.setdefault(str(p['seq']), p['n'])
+    for name, v in json.loads((ROOT / 'content' / 'productImages.json').read_text(encoding='utf-8')).items():   # 약 사전 대표 제품
+        if v.get('seq'): items.setdefault(str(v['seq']), v.get('match') or name)
     done = json.loads(OUT.read_text(encoding='utf-8')) if OUT.exists() else {}
     todo = [(s, n) for s, n in items.items() if s not in done]
     if a.limit: todo = todo[:a.limit]

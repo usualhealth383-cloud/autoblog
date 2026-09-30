@@ -5,12 +5,13 @@
 (2026-09-30 현욱님 캡처 「이거 왜이래」). 앱·웹 배포본은 그대로 식약처 주소를 쓰고, 아티팩트에만 이 판을 함께 싣는다.
 식약처 낱알 사진은 약학정보원이 찍은 사진이다(사진 아래 띠에 「약학정보원」) — 현욱님 「약학정보원 사진 그냥 쓰자」.
 
-  · 일반약 낱알 5,660장 + 약 화면 제품 사진(productImages) → 168×92 작은 사진, 64장씩 한 판(8×8)
+  · 일반약 낱알 5,660장 + 제품 사진(e약은요·productImages) → 140×76 작은 사진, 64장씩 한 판(8×8)
+  · 알약은 모양·색 순으로 묶는다 — 낱알 검색은 모양·색으로 거르므로 한 번에 몇 판만 받으면 된다
   · 낱알 사진은 위 눈금자·아래 띠를 잘라 알약만 크게. 제품 상자는 흰 바탕에 통째로.
   · 받은 원본은 <out>/raw 에 두어 이어 돌릴 수 있게.
 
 사용:  python3 yakjido/tools/pill_sprites.py <out 폴더> [--workers 6]
-결과:  <out>/ps/NNN.jpg, <out>/ps.json {seq 또는 "p:제품이름": 번호}
+결과:  <out>/ps/NNN.jpg, <out>/ps.json {사진 주소: 번호}
 """
 import argparse, concurrent.futures as cf, hashlib, io, json, pathlib, sys, time, urllib.request
 from PIL import Image
@@ -18,7 +19,7 @@ from PIL import Image
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 DATA = ROOT.parent / 'docs' / 'yakjido' / 'data'
 IMG_PREFIX = 'https://nedrug.mfds.go.kr/pbp/cmn/itemImageDownload/'
-W, H, COLS, ROWS = 168, 92, 8, 8
+W, H, COLS, ROWS = 140, 76, 8, 8
 PER = COLS * ROWS
 UA = {'User-Agent': 'Mozilla/5.0 (Linux; Android 14) AppleWebKit/537.36 Chrome/126 Mobile Safari/537.36'}
 
@@ -51,10 +52,15 @@ def main():
     ap = argparse.ArgumentParser(); ap.add_argument('out'); ap.add_argument('--workers', type=int, default=6); a = ap.parse_args()
     out = pathlib.Path(a.out); raw = out / 'raw'; ps = out / 'ps'; raw.mkdir(parents=True, exist_ok=True); ps.mkdir(exist_ok=True)
     jobs = []   # (key, url, pill?)
-    for p in json.loads((DATA / 'pills.json').read_text(encoding='utf-8')):
-        if p.get('img') and p.get('seq'): jobs.append((str(p['seq']), p['img'] if p['img'].startswith('http') else IMG_PREFIX + p['img'], True))
+    pills = [p for p in json.loads((DATA / 'pills.json').read_text(encoding='utf-8')) if p.get('img') and p.get('seq')]
+    pills.sort(key=lambda p: (str(p.get('sh', '')), str(p.get('c', '')).split('|')[0], str(p.get('f', ''))))
+    for p in pills: jobs.append((str(p['seq']), p['img'] if p['img'].startswith('http') else IMG_PREFIX + p['img'], True))
+    seen = {u for _, u, _ in jobs}
+    for e in json.loads((DATA / 'easy-index.json').read_text(encoding='utf-8')):   # e약은요 제품 화면 사진(대부분 낱알과 같음)
+        u = e.get('img') or ''
+        if u.startswith('http') and u not in seen: jobs.append(('e:' + str(e.get('seq')), u, True)); seen.add(u)
     for name, v in json.loads((ROOT / 'content' / 'productImages.json').read_text(encoding='utf-8')).items():
-        if v.get('img', '').startswith('http'): jobs.append(('p:' + name, v['img'], 'itemImageDownload' in v['img']))
+        if v.get('img', '').startswith('http') and v['img'] not in seen: jobs.append(('p:' + name, v['img'], 'itemImageDownload' in v['img'])); seen.add(v['img'])
     fn = lambda u: raw / (hashlib.sha1(u.encode()).hexdigest()[:16] + '.jpg')
     t0 = time.time(); ok = {}
     with cf.ThreadPoolExecutor(a.workers) as ex:
@@ -70,7 +76,7 @@ def main():
         if c == 0:
             if sheet: sheet.save(ps / f'{n:03d}.jpg', 'JPEG', quality=70, optimize=True, progressive=True)
             sheet = Image.new('RGB', (W * COLS, H * ROWS), (255, 255, 255)); n = s
-        try: sheet.paste(thumb(fn(ok[k][0]), ok[k][1]), ((c % COLS) * W, (c // COLS) * H)); idx[k] = i
+        try: sheet.paste(thumb(fn(ok[k][0]), ok[k][1]), ((c % COLS) * W, (c // COLS) * H)); idx[ok[k][0]] = i   # 사진 주소 → 번호(앱이 주소로 찾는다)
         except Exception as e: print('  사진을 못 읽음', k, e, file=sys.stderr)
     if sheet: sheet.save(ps / f'{n:03d}.jpg', 'JPEG', quality=70, optimize=True, progressive=True)
     (out / 'ps.json').write_text(json.dumps(idx, ensure_ascii=False, separators=(',', ':')), encoding='utf-8')

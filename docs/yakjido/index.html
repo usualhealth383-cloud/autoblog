@@ -1438,6 +1438,9 @@ main>*:nth-child(2){animation-delay:.04s} main>*:nth-child(3){animation-delay:.0
 .kg-p{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}.kg-p img{width:64px;height:64px;border-radius:10px;border:1px solid var(--hairline);background:#fff;object-fit:contain}
 .kg-dur{display:flex;flex-direction:column;gap:6px;margin-top:12px}.kg-dur div{display:flex;gap:10px;padding:9px 12px;border-radius:10px;background:var(--caution-tint)}
 .kg-dur small{flex:none;min-width:5.5em;font-weight:800;color:var(--caution);font-size:.8125rem}.kg-dur span{font-size:.875rem;line-height:1.5;color:var(--text)}
+.psp{display:block;width:100%;aspect-ratio:140/76;background-size:800% 800%;background-repeat:no-repeat;background-color:#fff;border-radius:inherit}
+.pill-card .ph .psp,.pill-hero .ph .psp{width:100%;height:auto;aspect-ratio:140/76}
+.psp.pillimg{flex:none;height:auto;aspect-ratio:140/76;align-self:center;border-radius:10px}
 </style>
 
 <div class="app">
@@ -1831,6 +1834,20 @@ function goBack(){
   if (history.length > 1) { history.back(); setTimeout(() => { if (location.hash === at) go('/home'); }, 250); return; }
   go('/home');
 }
+/* 아티팩트(미리보기)는 바깥 사진을 막는다 — 함께 실어 보낸 작은 사진 판(ps/NNN.jpg, 64칸)으로 바꿔 끼운다(2026-09-30).
+   window.__PS = {사진 주소: 번호} 는 mkart.py 가 넣는다. 앱·웹 배포본에는 없어서 아무 일도 하지 않는다 */
+function psSwap(root){
+  const M = window.__PS; if (!M || !root) return;
+  root.querySelectorAll('img').forEach(im => {
+    const n = M[im.getAttribute('src')]; if (n == null) return;
+    const sh = Math.floor(n / 64), c = n % 64;
+    const sp = document.createElement('span');
+    sp.className = 'psp ' + im.className; sp.setAttribute('role', 'img'); sp.setAttribute('aria-label', im.alt || '약 사진');
+    sp.style.backgroundImage = `url(ps/${String(sh).padStart(3, '0')}.jpg)`;
+    sp.style.backgroundPosition = `${(c % 8) / 7 * 100}% ${Math.floor(c / 8) / 7 * 100}%`;
+    im.replaceWith(sp);
+  });
+}
 function route(){
   const h = location.hash.replace(/^#\/?/, '') || 'home';
   const [path, qs] = h.split('?');
@@ -1854,6 +1871,7 @@ function route(){
   const html = (R[seg[0]] || vHome)(seg[1], q);
   const panel = gqPanel();
   view.innerHTML = panel ? insertPanel(html, panel) : html;
+  psSwap(view);
   /* 뒤로 갔을 때는 보던 자리로 — 긴 목록에서 맨 위로 튀지 않게 */
   const back = HIST.length >= 2 && HIST[HIST.length - 2] === path;
   if (back) { HIST.pop(); const y = SCROLL[path] || 0; requestAnimationFrame(() => window.scrollTo({ top: y })); }
@@ -4586,6 +4604,11 @@ function vRxOut(){
   ${disclaimer('처방약을 임의로 바꾸거나 끊지 마세요. 이 목록은 약이 떨어진 며칠을 어떻게 버틸지 돕기 위한 것이고, 최종 판단은 약사·의사와 하세요.')}`;
 }
 function riskBar(label, v, note){ if (!v) return ''; const lv = Math.max(1, Math.min(5, v)); const word = ['', '낮음', '낮은 편', '보통', '높은 편', '높음'][lv]; return `<div class="rb"><span>${esc(label)}</span><div class="track"><div class="fill l${lv}" style="width:${lv * 20}%"></div></div><span class="v">${word}</span></div>${note ? `<p class="small muted" style="margin:-4px 0 4px">${fmt(note)}</p>` : ''}`; }
+/* 약 사전 성분 화면의 「약사 안내」 — 대표 제품(제품 목록 앞에서부터, 식약처 코드가 있는 것)의 약학정보원 복약정보 */
+function drugRepKg(d){
+  for (const p of (d.products || [])) { const q = D.productImages?.[p.name]?.seq; if (q) { const g = kgGet(q); if (g && (g.t || (g.g || []).length)) return [q, p.name]; } }
+  return null;
+}
 function vDrug(id){
   const d = drug(id); if (!d) return vDrugs('', {});
   const c = cls(d.class);
@@ -4616,7 +4639,8 @@ function vDrug(id){
   ${d.dose ? (() => { const mx = d.dose.max || '[확인 필요]'; const rule = /세요|따르|달라져|줄이/.test(mx); /* 파스·연고는 「하루 최대 몇 개」가 없다 — 그럴 땐 그 말을 붙이지 않는다 */
     return `<div class="dose-hero"><small>성인 1회 용량</small><div class="big">${fmt(d.dose.adult || '')}</div><small>${rule ? '' : '하루 최대 '}${fmt(mx)}${d.dose.interval ? ` · 간격 ${fmt(d.dose.interval)}` : ''}</small>${d.dose.child ? `<small style="margin-top:6px">소아: ${fmt(d.dose.child)}</small>` : ''}</div>`; })() : ''}
   ${(() => { /* 2026-09-29 — ClinicScore 문법: 아래로 이어 붙던 「같은 계열」·출처 7개도 탭 안으로. 한 번에 한 칸만 */
-    const T = [['p1', '복용법'], ['p2', '주의·부작용'], ['p4', '같이 먹으면', (d.interactions || []).length], ['p3', '제품', (d.products || []).length], ...(same.length ? [['p5', '같은 계열', same.length]] : []), ...((d.sources || []).length ? [['p6', '근거', d.sources.length]] : [])];
+    const rep = drugRepKg(d);
+    const T = [['p1', '복용법'], ['p2', '주의·부작용'], ['p4', '같이 먹으면', (d.interactions || []).length], ...(rep ? [['p7', '약사 안내']] : []), ['p3', '제품', (d.products || []).length], ...(same.length ? [['p5', '같은 계열', same.length]] : []), ...((d.sources || []).length ? [['p6', '근거', d.sources.length]] : [])];
     return `<div class="rows-l" style="margin-top:14px">${lrow((ME.taking || []).includes(d.id) ? I.check : I.pill, (ME.taking || []).includes(d.id) ? '내 약통에 있어요' : '지금 먹는 약으로 등록', (ME.taking || []).includes(d.id) ? '누르면 빼요' : '겹치는 성분·복용 알림을 챙겨 드려요', `toggleTaking('${d.id}')`)}</div>
   <nav class="tabs dtabs" role="tablist" aria-label="약 정보">${T.map(([k, n, c], i) => `<button class="tab ${i ? '' : 'on'}" role="tab" data-p="${k}">${n}${c ? `<span class="n">${c}</span>` : ''}</button>`).join('')}</nav>`; })()}
   <div class="pane on" id="p1"><section class="card">
@@ -4644,6 +4668,7 @@ function vDrug(id){
   </section></div>
   ${same.length ? `<div class="pane" id="p5"><section class="sec" style="margin-top:0"><h2>같은 계열 다른 성분 <small>비교해서 고르기</small></h2><div class="card rows">${same.map(x => `<button class="row" onclick="go('/drug/${x.id}')"><div class="body"><b>${esc(x.name)}</b><span>${esc(x.tagline || (x.for || []).join(' · '))}</span>${useTag(x)}</div>${badge(x.rx)}</button>`).join('')}</div>${c ? `<a class="btn ghost" style="margin-top:12px" href="#/class/${c.id}">${I.scale} ${esc(c.name)} 한눈에 비교</a>` : ''}</section></div>` : ''}
   ${(d.sources || []).length ? `<div class="pane" id="p6"><section class="card"><h2>이 화면의 근거 <small>${d.sources.length}건</small></h2>${srcChips(d.sources)}</section></div>` : ''}
+  ${(() => { const rep = drugRepKg(d); return rep ? `<div class="pane" id="p7">${kgCard(rep[0])}<p class="small muted" style="margin-top:8px">대표 제품 <b>${esc(rep[1])}</b> 기준이에요. 같은 성분이라도 제품마다 함량·첨가물이 다를 수 있어요.</p></div>` : ''; })()}
   ${aeDrugCard(d)}
   ${disclaimer()}`;
 }

@@ -48,6 +48,27 @@ inject = ('<script>const ART_DATA = ' + json.dumps(art) + ';\n'
           + ",qa:" + (ROOT/'data/qa.json').read_text()
           + ",nut:" + (ROOT/'data/nutrients.json').read_text()
           + ",mix:" + (ROOT/'data/mixes.json').read_text() + '};</script>\n')
+# 낱알·제품 사진 판(tools/pill_sprites.py)과 약학정보원 그림 표시·복약정보 조각을 함께 싣는다 — 아티팩트는 바깥 사진을 막아서(2026-09-30)
+SP = OUT.parent.parent / 'sprites'
+files = {}
+if (SP / 'ps.json').exists():
+    inject += '<script>window.__PS = ' + (SP / 'ps.json').read_text() + ';window.__PICTO_LOCAL = true;</script>\n'
+    for f in sorted((SP / 'ps').glob('*.jpg')): files['ps/' + f.name] = str(f)
+    # 그림 표시(픽토그램) — 복약정보에 나오는 것만 받아 둔다
+    kgp = ROOT / 'data' / 'kpic-guide.json'
+    if kgp.exists():
+        import urllib.request
+        codes = sorted({c for v in json.loads(kgp.read_text()).values() for c in (v.get('p') or [])})
+        (SP / 'pg').mkdir(exist_ok=True)
+        for c in codes:
+            f = SP / 'pg' / (c + '.jpg')
+            if not f.exists():
+                try: f.write_bytes(urllib.request.urlopen(f'https://common.health.kr/shared/images/pictogram/black/kor/{c}.jpg', timeout=30).read())
+                except Exception as e: print('그림 표시 못 받음', c, e); continue
+            files['pg/' + f.name] = str(f)
+for f in sorted((ROOT / 'data' / 'kg').glob('*.json')): files['data/kg/' + f.name] = str(f)
+(OUT.parent / 'files.json').write_text(json.dumps(files, ensure_ascii=False, indent=0))
+print('함께 싣는 파일', len(files), '개 ·', round(sum(pathlib.Path(v).stat().st_size for v in files.values()) / 1e6, 1), 'MB → files.json')
 i = s.index('<div class="app">')
 s = s[:i] + inject + s[i:]
 OUT.parent.mkdir(parents=True, exist_ok=True); OUT.write_text(s)
