@@ -18,7 +18,8 @@ FIELDS = ('kind', 'kindName', 'ko', 'orig', 'who', 'role', 'src', 'url', 'note')
 
 old = json.loads((ROOT / 'data/quotes.json').read_text(encoding='utf-8'))
 DROPARG = sys.argv[sys.argv.index('--drop') + 1] if '--drop' in sys.argv else None
-args = [a for a in sys.argv[1:] if not a.startswith('--') and a != DROPARG]
+OPTV = {sys.argv[i + 1] for i, a in enumerate(sys.argv[:-1]) if a in ('--drop', '--cap')}   # 옵션 값은 파일이 아니다
+args = [a for a in sys.argv[1:] if not a.startswith('--') and a not in OPTV]
 DROP = [x for x in (DROPARG.split(';') if DROPARG else []) if x]
 items = []
 if args and all(a.endswith('.json') for a in args):          # 파일을 직접 고르면 그것만(검증을 통과한 *.fixed.json 등)
