@@ -60,13 +60,15 @@
 | 원장 사칭 | 설정한 이메일 **+ 메일 인증 완료** 계정만 원장 |
 | 커뮤니티 사칭·도배·신고자 노출 | 글쓴이·닉네임은 서버가 채움 · 글 10분 5개/댓글 10분 20개 · 신고자 목록은 API로 안 나감(수만) · 신고 3건이면 서버에서 가림 |
 | 저녁 수업 지각 판정 | DB 시간대를 **Asia/Seoul** 로 — 기본값(UTC)이면 18시 수업이 9시로 기록돼 지각이 안 잡힘 |
+| 공부 노트 엿보기 | `notes` 는 본인 것만 읽고 쓴다(원장·보호자 정책 없음). 남의 노트 id 로 덮어쓰기·고치기·지우기 불가, 주인 칸은 서버가 채움. 만 14세 미만은 보호자 동의 전 서버 저장 안 함. 계정 삭제 시 함께 삭제 |
 | 결제 위조 · 남의 영수증 · 상품 바꿔치기 | 이용권 연장은 `grant_purchase()`(서비스 키 전용)만. 서버 함수가 Google 에 직접 물어 ‘결제 완료 · 이 계정(결제 때 넣은 계정 표시) · 이 상품’을 확인하고, 날수는 서버가 정함. 같은 영수증은 한 번만 |
 
 ## 로컬 시험대 — 진짜 Postgres·PostgREST 로 확인 (개발용)
 ```
 bash tools/testbed_up.sh                 # Postgres 16(:54329) + PostgREST 12(:3001) + Auth 흉내 게이트웨이(:8767)
 cd ../docs/parkchan && python3 -m http.server 8765 --bind 127.0.0.1 &
-python3 tools/testbed_security.py        # 막혀야 할 일 56가지를 직접 두드림
+python3 tools/testbed_security.py        # 막혀야 할 일 96가지를 직접 두드림
+python3 tools/e2e_note.py --server       # 공부 노트: 로그인 전 쓰기 → 가입 때 옮김 → 새 기기 동기화 → 남은 못 읽음 → 지우기
 python3 tools/e2e_server.py              # 원장 → 학생 가입·출석·문제 → 새 폰 동기화 → 보호자 → 이용권 → 계정 삭제 → 읽음·통계
 python3 tools/e2e_talk.py --server       # 이야기(글·댓글·도움됨·채택·연결 끊김 안내)
 python3 tools/e2e_authmail.py            # 가입 확인 메일 · 비밀번호 재설정 메일을 끝까지

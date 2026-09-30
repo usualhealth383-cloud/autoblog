@@ -1603,7 +1603,7 @@ function quoteCard(q, c){
   const kept = (S.qkeep||[]).includes(q.id);
   const br = c ? BRIDGE[`${c.book}-${c.unit}`] : '';
   return `<div class="qsay">
-      <span class="k">오늘의 한 마디</span>
+      <span class="k">오늘의 한 마디${q.kindName ? ` · ${esc(q.kindName)}` : ''}</span>
       <blockquote>“${esc(q.ko)}”</blockquote>
       ${q.orig ? `<p class="orig">${esc(q.orig)}</p>` : ''}
       <div class="by"><span class="who">${esc(q.who||'')}</span>${q.role?`<span class="role">${esc(q.role)}</span>`:''}</div>
