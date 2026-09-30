@@ -249,7 +249,7 @@ def main():
             except Exception: fails.append('본문 자료(core.json)를 못 받았습니다 — ' + pg.url)
         pg.goto(url); ready(); pg.wait_for_timeout(1200)
         pg.evaluate("localStorage.setItem('yakjido.hello.v1','1');localStorage.setItem('yakjido.me.v1',JSON.stringify({age:'senior',taking:['cls:bp.arb'],pub:{}}))")
-        routes = pg.evaluate("()=>['/home','/drugs','/tips','/me','/together','/kinds','/kinds/bp','/pill','/supp','/kids','/mix','/hello/1','/hello/3','/photo','/schedule','/about','/bag','/rxout','/senior','/myths','/askdoc','/askdoc?open=gout','/vitals','/visits','/me?t=meds','/me?t=set','/drugs?cat=all','/drugs?cat=nsaid','/senior?w=rx','/supp?t=label','/supp?t=stack','/tips?g=5','/myths?g=3','/schedule?t=sc2','/schedule?t=sc4']" +
+        routes = pg.evaluate("()=>['/home','/drugs','/tips','/me','/together','/kinds','/kinds/bp','/pill','/supp','/kids','/mix','/hello/1','/hello/3','/photo','/schedule','/about','/bag','/rxout','/senior','/myths','/askdoc','/askdoc?open=gout','/vitals','/visits','/me?t=meds','/me?t=set','/drugs?cat=all','/drugs?cat=nsaid','/senior?w=rx','/supp?t=label','/supp?t=stack','/tips?g=5','/myths?g=3','/schedule?t=sc2','/schedule?t=sc4','/pub/0','/pub/5']" +
                              ".concat(D.symptoms.map(s=>'/symptom/'+s.id)).concat(D.drugs.map(d=>'/drug/'+d.id)).concat(D.classes.map(c=>'/class/'+c.id)).concat(D.classes.map(c=>'/drugs?cat='+c.id)).concat((D.myths||[]).map(m=>'/myths?open='+m.id))")
         # 1~3. 모든 화면
         for r in routes:
@@ -421,6 +421,13 @@ def main():
             if 'nedrug' not in (_kp['before'] or ''): fails.append(f'약학정보원 짝이 없을 때 식약처 사진을 안 씁니다: {_kp["before"]}')
             if _kp['after'] != 'https://common.health.kr/shared/images/sb_photo/big3/201306280000401.jpg': fails.append(f'약학정보원 사진 주소가 틀립니다: {_kp["after"]}')
             if 'result_drug.asp?drug_cd=2013062800004' not in (_kp['link'] or ''): fails.append(f'약학정보원 제품 페이지 링크가 없습니다: {_kp["link"]}')
+        # 식약처 제품 화면(e약은요) — 탭(약사 안내·허가 내용·성분 해설) 칸마다 내용이 있고 날것 코드(${)가 보이면 안 된다(2026-09-30)
+        pg.goto(url + '#/pub/0'); ready(); pg.wait_for_timeout(1500)
+        _pb = pg.evaluate("""()=>['pb1','pb2','pb3'].filter(k=>document.getElementById(k)).map(k=>{const t=document.getElementById(k).textContent; return [k, t.trim().length, t.includes('${')];})""")
+        if not _pb: fails.append('식약처 제품 화면에 탭 칸이 없습니다')
+        for _k, _n, _raw in _pb:
+            if _n < 20: fails.append(f'식약처 제품 화면 {_k} 칸이 비었습니다')
+            if _raw: fails.append(f'식약처 제품 화면 {_k} 칸에 날것 코드가 보입니다')
         # 5a-11. 화면 밝기 — 휴대폰 설정만 따르지 말고 앱에서도 고를 수 있어야 한다
         _th = pg.evaluate("""()=>{
           const before = themeNow();

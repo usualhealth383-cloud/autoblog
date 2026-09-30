@@ -58,7 +58,10 @@ class Kpic:
 def names(n):
     """「타이레놀정500밀리그람(아세트아미노펜)」 → 전체 이름, 괄호 뗀 이름 순으로 찾아본다"""
     a = n.strip(); b = re.sub(r'\(.*?\)|\[.*?\]', '', a).strip()
-    return [x for x in dict.fromkeys([a, b]) if x]
+    # 식약처 「200밀리그램」 ↔ 약학정보원 「200mg」, 그래도 없으면 함량 앞 이름(「부루펜정」)으로 넓게 — 짝은 어차피 코드로만 맞춘다
+    c = re.sub(r'밀리그(램|람)', 'mg', b).replace('마이크로그램', 'μg').replace('그램', 'g')
+    d = re.split(r'\d', b, 1)[0].strip()
+    return [x for x in dict.fromkeys([a, b, c, d]) if x and len(x) >= 2]
 
 
 def main():

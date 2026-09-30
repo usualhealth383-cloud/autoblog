@@ -26,6 +26,15 @@ for v in (data.get('productImages') or {}).values():
     iid = v['img'].rstrip('/').split('/')[-1]
     for ext in ('.webp', '.jpg'):
         if (imgdir / (iid + ext)).exists(): v['img'] = 'img/' + iid + ext; break
+# 약학정보원 복약정보(tools/kpic_detail.py) — 제품 화면이 그 제품 조각만 받게 16개로 나눈다(2026-09-30)
+kg = pub / 'kpic-guide.json'
+if kg.exists():
+    _g = json.loads(kg.read_text(encoding='utf-8')); _kd = pub / 'kg'; _kd.mkdir(exist_ok=True)
+    _sh = [{} for _ in range(16)]
+    for _seq, _v in _g.items():
+        if _v: _sh[(int(str(_seq)[-3:]) if str(_seq)[-3:].isdigit() else 0) % 16][_seq] = _v
+    for _i, _d in enumerate(_sh): (_kd / f'{_i}.json').write_text(json.dumps(_d, ensure_ascii=False, separators=(',', ':')), encoding='utf-8')
+if not (pub / 'kpic.json').exists(): (pub / 'kpic.json').write_text('{}', encoding='utf-8')   # 없으면 앱이 404 를 낸다
 # ── 삽화(art/) ────────────────────────────────────────────────────────────
 # yakjido/art/ 에 PNG 를 넣어 두기만 하면 배포본으로 복사되고, 앱은 있는 그림만 그린다.
 # 파일이 없으면 D.art 목록에 안 들어가서 화면에 빈 자리도 안 생긴다.

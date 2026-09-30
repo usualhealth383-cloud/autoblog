@@ -1432,6 +1432,12 @@ main>*:nth-child(2){animation-delay:.04s} main>*:nth-child(3){animation-delay:.0
 .dup.dupbox .ach{margin-top:10px;padding:10px 0 0;border:0;border-top:1px solid var(--hairline);border-radius:0;background:none}
 .dup.dupbox .ach-h{font-size:.9375rem}
 .dup.dupbox .ach-l li{background:var(--tint2)}
+.badge.dur{background:var(--tint);color:var(--primary-deep);margin-left:4px}
+.kg .kg-t{font-size:1.0625rem;font-weight:700;line-height:1.5;margin-top:6px}
+.kg ul.kg-g{margin-top:10px}.kg ul.kg-g li{font-size:.9375rem;line-height:1.6}
+.kg-p{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}.kg-p img{width:64px;height:64px;border-radius:10px;border:1px solid var(--hairline);background:#fff;object-fit:contain}
+.kg-dur{display:flex;flex-direction:column;gap:6px;margin-top:12px}.kg-dur div{display:flex;gap:10px;padding:9px 12px;border-radius:10px;background:var(--caution-tint)}
+.kg-dur small{flex:none;min-width:5.5em;font-weight:800;color:var(--caution);font-size:.8125rem}.kg-dur span{font-size:.875rem;line-height:1.5;color:var(--text)}
 </style>
 
 <div class="app">
@@ -1693,7 +1699,7 @@ let KPIC = null;
 const KPIC_PIC = 'https://common.health.kr/shared/images/sb_photo/big3/';
 function kpicLoad(){ if (KPIC) return; KPIC = {}; fetch('data/kpic.json').then(r => r.ok ? r.json() : {}).then(j => { if (j && Object.keys(j).length) { KPIC = j; route(); } }).catch(() => {}); }
 const kpicOf = seq => (KPIC && seq && KPIC[String(seq)]) || null;
-const kpicLink = seq => { const k = kpicOf(seq); return k && k[0] ? `https://www.health.kr/searchDrug/result_drug.asp?drug_cd=${encodeURIComponent(k[0])}` : ''; };
+const kpicLink = seq => { const g = kgGet(seq); const k = kpicOf(seq) || (g && g.c ? [g.c] : null); return k && k[0] ? `https://www.health.kr/searchDrug/result_drug.asp?drug_cd=${encodeURIComponent(k[0])}` : ''; };
 const pillImg = p => { const k = p && kpicOf(p.seq); if (k && k[1]) return k[1].startsWith('http') ? k[1] : KPIC_PIC + k[1];
   return p?.img ? (p.img.startsWith('http') ? p.img : IMG_PREFIX + p.img) : ''; };
 async function pubPills(){ if (!PUB.pills && window.__PILLS__) PUB.pills = window.__PILLS__;   /* 미리보기용 내장 자료 */
@@ -1915,6 +1921,17 @@ function fmt(t){ return esc(t).replace(/\*\*(.+?)\*\*/g, '<b>$1</b>').replace(/\
   /* 119 는 본문 어디에 나와도 누르면 걸리게. 이 앱의 모든 119 는 «지금 전화하세요»라는 뜻이고,
      용량·개수로 119 가 쓰인 곳은 없다(검사로 확인). 이미 링크가 된 것은 건드리지 않는다. */
   .replace(/(?<!tel:)(?<![\d>-])119(?![\d-])/g, '<a class="call-in" href="tel:119">119</a>'); }
+/* 여러 성분의 「내 정보 기준」 경고를 한 목록으로 — 성분 이름을 앞에 붙인다 */
+function meWarningsMany(list){
+  const f = activeFlags(); if (!f.length) return '';
+  const rows = [];
+  for (const dr of list) {
+    (dr.avoid || []).forEach(a => { if (a.flags?.some(x => f.includes(x))) rows.push(['stop', dr, a.text || a]); });
+    (dr.caution || []).forEach(a => { if (a.flags?.some(x => f.includes(x))) rows.push(['warn', dr, a.text || a]); });
+  }
+  if (!rows.length) return '';
+  return `<ul class="plain mew">${rows.map(([lv, dr, t]) => `<li class="${lv}"><b>${esc(ingrName(dr))}</b> — ${fmt(t)}</li>`).join('')}</ul><p class="small muted" style="margin-top:6px">내 정보 탭에서 표시한 상태를 기준으로 골라낸 항목이에요. 최종 판단은 약사·의사와 함께 하세요.</p>`;
+}
 function meWarnings(dr){
   const f = activeFlags(); if (!f.length) return '';
   const hits = [];
@@ -4507,6 +4524,10 @@ const SENIOR_WHY = [
   ['콩팥에 쌓이거나 물·소금이 빠져요', 'scale', '', ['magnesium-oxide','antacid-mg','almagate','bisacodyl']],
 ];
 const SENIOR_OF = (() => { const m = {}; for (const w of SENIOR_WHY) for (const id of w[3]) m[id] = w[0]; return m; })();
+/* 식약처 고시 노인주의 성분(2025.5.30 공고, 한국의약품안전관리원 「노인주의 성분리스트」) 가운데 우리 사전에 있는 것 — 2026-09-30 원문 대조.
+   스코폴라민은 먹는 제형만 목록에 있고 붙이는 패치(키미테)는 없다. 플루르비프로펜은 트로키제가 목록에 있다 */
+const DUR_SENIOR = new Set(['chlorpheniramine', 'diphenhydramine', 'doxylamine', 'dimenhydrinate', 'butylscopolamine', 'hydroxyzine', 'ibuprofen', 'naproxen', 'dexibuprofen', 'aspirin', 'loxoprofen', 'aceclofenac', 'ethenzamide', 'solifenacin', 'flurbiprofen']);
+const durSenior = d => d && (DUR_SENIOR.has(d.id) || (d.contains || []).some(x => DUR_SENIOR.has(x)));
 function seniorItems(){
   const out = [];
   for (const d of (D.drugs || [])) {
@@ -4526,7 +4547,7 @@ function vSenior(_, q){
   const order = [...SENIOR_WHY.map(w => w[0]), '그 밖에 조심할 것'];
   const byWhy = order.map(w => [w, items.filter(i => i.why === w)]).filter(([, xs]) => xs.length);
   const srow = i => `<button class="row" onclick="go('/drug/${i.d.id}')"><div class="ic">${icon(cls(i.d.class)?.icon || 'pill')}</div>
-      <div class="body"><b>${esc(i.d.name)} ${i.stop ? '<span class="badge stop">되도록 피하기</span>' : '<span class="badge soft">조심해서</span>'}</b><span>${esc(firstSentence(i.text.replace(/\*\*/g, ''), 62))}</span></div>${I.chev}</button>`;
+      <div class="body"><b>${esc(i.d.name)} ${i.stop ? '<span class="badge stop">되도록 피하기</span>' : '<span class="badge soft">조심해서</span>'}${durSenior(i.d) ? '<span class="badge dur">심평원 노인주의</span>' : ''}</b><span>${esc(firstSentence(i.text.replace(/\*\*/g, ''), 62))}</span></div>${I.chev}</button>`;
   const meta = w => SENIOR_WHY.find(x => x[0] === w) || [w, 'info', ''];
   return `${topBar({ back:'약 사전' })}
   <div class="eyebrow">65세 이상</div><h1>나이가 들면 달라지는 약</h1>
@@ -4542,8 +4563,8 @@ function vSenior(_, q){
     <div class="card rows">${cur[2].map(srow).join('')}</div>`; })()}
   <section class="sec card"><h2>무엇을 보고 고른 것인가요</h2>
     <p>미국 노인병학회가 65세 이상에서 「되도록 피할 약」을 정리한 기준(2023년 판)과, 같은 기준을 국내에 옮긴 <b>건강보험심사평가원 「노인주의 의약품」</b>을 봤습니다. 그중 <b>약국에서 살 수 있는 약</b>만 골라, 왜 조심해야 하는지와 <b>대신 쓸 것</b>을 적었어요.</p>
-    <p class="small muted" style="margin-top:8px">심평원의 성분 목록 원문은 이 환경에서 열람하지 못해, 개별 성분은 국제 기준과 식약처 허가사항으로 맞췄습니다. [확인 필요]</p>
-    ${srcChips(['beers2023'])}</section>
+    <p class="small muted" style="margin-top:8px"><b>「심평원 노인주의」</b> 딱지는 식약처 고시로 정한 노인주의 성분 목록(2025년 5월 30일 공고, 한국의약품안전관리원 배포)에 실제로 있는 성분이에요 — 약국에서 약을 지을 때 약사 화면에 뜨는 그 목록입니다. 딱지가 없는 것은 그 목록에는 없지만 미국 노인병학회 기준과 식약처 허가사항의 「고령자 주의」에서 가져왔어요. 목록의 사유가 다를 때도 있어요 — 졸리는 콧물약(1세대 항히스타민)은 공식 목록에서 <b>항콜린 부작용</b>(기억력·섬망·입마름·소변 막힘·변비)이 이유입니다.</p>
+    ${srcChips(['beers2023', 'kids_senior2025'])}</section>
   ${disclaimer()}`;
 }
 
@@ -4643,6 +4664,29 @@ function jumpTab(p){ const t = document.querySelector(`.tab[data-p="${p}"]`); if
 document.addEventListener('click', e => { const t = e.target.closest('.tab[data-p]'); if (!t) return; if (t.closest('.schtabs')) PANE.schedule = t.dataset.p; t.parentElement.querySelectorAll('.tab').forEach(x => x.classList.toggle('on', x === t)); document.querySelectorAll('.pane').forEach(p => p.classList.toggle('on', p.id === t.dataset.p)); });
 
 /* ───────── 식약처 제품 상세(e약은요) ───────── */
+/* 약학정보원 복약정보(2026-09-30 현욱님 「약 사전 내용도 약학정보원 참고해서 잘 보완해」) — tools/kpic_detail.py 가 식약처 코드로 짝지어 모은 것.
+   제품 하나에 한 줄 설명·복약 안내·그림 표시·생김새·보관·포장·DUR. 16조각(data/kg/N.json)으로 나눠 그 제품 조각만 받는다 */
+const KG = {};
+const kgShard = seq => (parseInt(String(seq).slice(-3), 10) || 0) % 16;
+function kgGet(seq){
+  if (!seq) return null; const k = kgShard(seq);
+  if (!(k in KG)) { KG[k] = null; fetch(`data/kg/${k}.json`).then(r => r.ok ? r.json() : {}).then(j => { KG[k] = j || {}; if (j && j[String(seq)]) route(); }).catch(() => { KG[k] = {}; }); return null; }
+  return KG[k] ? (KG[k][String(seq)] || null) : null;
+}
+const pictoSrc = c => (window.__PICTO_LOCAL ? `pg/${c}.jpg` : `https://common.health.kr/shared/images/pictogram/black/kor/${c}.jpg`);
+const KG_DUR = { dose: '하루 최대', preg: '임신 중', senior: '65세 이상', age: '나이', period: '쓰는 기간', contra: '같이 쓰면 안 되는 약' };
+function kgCard(seq){
+  const g = kgGet(seq); if (!g || !(g.t || (g.g || []).length)) return '';
+  const dur = Object.entries(g.dur || {}).map(([k, v]) => [KG_DUR[k] || k, String(v).replace(/^[A-Za-z0-9 ,.()\-]+ : /, '').replace(/\s*\|\s*/g, ' · ').replace(/^1일 최대 투여량\s*-\s*/, '').replace(/(\d등급)\s*,\s*/, '$1 — ')]);
+  const facts = [['생김새', g.ch], ['보관', g.st], ['포장', g.bx]].filter(x => x[1]);
+  return `<section class="sec card kg"><h2>약사가 알려 드리는 것 <small>약학정보원 복약정보</small></h2>
+    ${g.t ? `<p class="kg-t">${esc(g.t)}</p>` : ''}
+    ${(g.g || []).length ? `<ul class="plain kg-g">${g.g.map(x => `<li>${esc(x)}</li>`).join('')}</ul>` : ''}
+    ${(g.p || []).length ? `<div class="kg-p" aria-label="복약 그림 표시">${g.p.map(c => `<img src="${pictoSrc(c)}" alt="복약 그림 표시" loading="lazy" onerror="this.remove()">`).join('')}</div>` : ''}
+    ${dur.length ? `<div class="kg-dur">${dur.map(([k, v]) => `<div><small>${esc(k)}</small><span>${esc(v)}</span></div>`).join('')}</div>` : ''}
+    ${facts.length ? `<div class="kv" style="grid-template-columns:1fr;margin-top:12px">${facts.map(([k, v]) => `<div><small>${k}</small><b>${esc(v)}</b></div>`).join('')}</div>` : ''}
+    <p class="small muted" style="margin-top:10px">출처: 약학정보원 복약정보${g.c ? ` · <a class="link" href="https://www.health.kr/searchDrug/result_drug.asp?drug_cd=${encodeURIComponent(g.c)}" target="_blank" rel="noopener">약학정보원에서 자세히</a>` : ''}</p></section>`;
+}
 function vPub(id){
   id = +id; const ix = (PUB.index || [])[id];
   if (!PUB.index) { pubIndex().then(route); return `${topBar({ back:'뒤로' })}<p class="loading">식약처 제품 정보를 불러오는 중…</p>`; }
@@ -4661,10 +4705,15 @@ function vPub(id){
   ${(() => { const kf = pubKeyFacts(det); return kf.length ? `<section class="sec"><h2>먼저 보실 것</h2>
     <div class="card keyfacts">${kf.map(f => `<div class="kf"><b>${esc(f.k)}</b><span>${esc(f.v)}</span></div>`).join('')}</div>
     <p class="small muted" style="margin-top:8px">식약처 허가 용법에 적힌 그대로예요. 아래 원문에서 다시 확인하실 수 있어요.</p></section>` : ''; })()}
-  ${ours.length ? `<section class="sec"><h2>약지도 성분 해설 <small>부담 정도·같이 먹을 때·같은 계열 비교</small></h2><div class="card rows">${ours.map(d => `<button class="row" onclick="go('/drug/${d.id}')"><div class="ic">${icon(cls(d.class)?.icon || 'pill')}</div><div class="body"><b>${esc(d.name)}</b><span>${fmt(d.tagline || (d.for || []).join(' · '))}</span></div>${I.chev}</button>`).join('')}</div>${ours.map(meWarnings).join('')}</section>` : ''}
-  ${oursSupp.length ? `<section class="sec"><h2>영양 성분 해설 <small>얼마나 듣는지·상한·겹침</small></h2><div class="card rows">${oursSupp.map(sp => `<button class="row" onclick="go('/supp/${sp.id}')"><div class="ic">${I.leaf}</div><div class="body"><b>${esc(sp.name)}</b><span>${esc(sp.for || '')}</span></div>${I.chev}</button>`).join('')}</div>
-    <p class="small muted" style="margin-top:8px">비타민·미네랄은 <b>약으로도, 건강기능식품으로도</b> 팔려요. 다른 영양제와 겹쳐 상한을 넘기기 쉬우니 한 번 확인해 보세요.</p></section>` : ''}
-  ${dup.length ? `<section class="sec">${dup.map(t => `<div class="dup" style="margin-top:0;margin-bottom:8px">${I.alert}<span>${fmt(t)}</span></div>`).join('')}</section>` : ''}
+  ${(() => { /* 2026-09-30 — 성분마다 따로 뜨던 「내 정보 기준 확인」 카드 셋과 겹침 경고를 한 상자로, 위쪽에 */
+    const w = meWarningsMany(ours); const dd = dup.length ? `<ul class="plain">${dup.map(t => `<li>${fmt(t)}</li>`).join('')}</ul>` : '';
+    return w || dd ? `<div class="dup dupbox ${/stop/.test(w) ? 'stop' : 'warn'}" style="margin-top:16px"><div class="dup-h">${I.alert}<b>내 정보 기준 확인</b></div>${w}${dd}</div>` : ''; })()}
+  ${(() => { /* ClinicScore 문법 — 약사 안내 · 허가 내용 · 성분 해설을 탭으로(한 번에 한 칸) */
+    const hasKg = !!kgCard(ix.seq), hasOurs = ours.length || oursSupp.length;
+    const T = [...(hasKg ? [['pb1', '약사 안내']] : []), ['pb2', '허가 내용'], ...(hasOurs ? [['pb3', '성분 해설', ours.length + oursSupp.length]] : [])];
+    return `<nav class="tabs" role="tablist" aria-label="이 제품" style="margin-top:20px">${T.map(([k, n, c], i) => `<button class="tab ${i ? '' : 'on'}" role="tab" data-p="${k}">${n}${c ? `<span class="n">${c}</span>` : ''}</button>`).join('')}</nav>
+  ${hasKg ? `<div class="pane on" id="pb1">${kgCard(ix.seq)}</div>` : ''}
+  <div class="pane${hasKg ? '' : ' on'}" id="pb2">
   <section class="sec card qa">${det ? `
     <h3>이 약의 효능은 무엇입니까?</h3><p>${esc(pubText(det.e))}</p>
     <h3>이 약은 어떻게 사용합니까?</h3><p>${esc(pubText(det.u))}</p>
@@ -4676,6 +4725,11 @@ function vPub(id){
     </div></details>` : '<p class="loading">허가사항 요약을 불러오는 중…</p>'}
     <div class="srcs"><span class="src-chip">${I.link}출처: 식품의약품안전처 e약은요(의약품개요정보) · 공공데이터포털</span>${ix.img ? `<span class="src-chip">${I.link}낱알 사진: 약학정보원·식약처</span>` : ''}</div>
   </section>
+  </div>
+  ${hasOurs ? `<div class="pane" id="pb3">  ${ours.length ? `<section class="sec"><h2>약지도 성분 해설 <small>부담 정도·같이 먹을 때·같은 계열 비교</small></h2><div class="card rows">${ours.map(d => `<button class="row" onclick="go('/drug/${d.id}')"><div class="ic">${icon(cls(d.class)?.icon || 'pill')}</div><div class="body"><b>${esc(d.name)}</b><span>${fmt(d.tagline || (d.for || []).join(' · '))}</span></div>${I.chev}</button>`).join('')}</div></section>` : ''}
+  ${oursSupp.length ? `<section class="sec"><h2>영양 성분 해설 <small>얼마나 듣는지·상한·겹침</small></h2><div class="card rows">${oursSupp.map(sp => `<button class="row" onclick="go('/supp/${sp.id}')"><div class="ic">${I.leaf}</div><div class="body"><b>${esc(sp.name)}</b><span>${esc(sp.for || '')}</span></div>${I.chev}</button>`).join('')}</div>
+    <p class="small muted" style="margin-top:8px">비타민·미네랄은 <b>약으로도, 건강기능식품으로도</b> 팔려요. 다른 영양제와 겹쳐 상한을 넘기기 쉬우니 한 번 확인해 보세요.</p></section>` : ''}
+</div>` : ''}`; })()}
   <div class="actions">${ours.length === 1 ? `<button class="btn ghost" onclick="toggleTaking('${ours[0].id}')">${I.pill} 지금 먹는 약으로 등록</button>` : ''}</div>
   ${disclaimer('식약처 허가사항의 공공데이터 요약이에요. 원문은 공백이 제거된 형태라 읽기 어려운 부분이 있을 수 있어요. 최종 확인은 약 상자의 설명서와 약사에게.')}`;
 }
@@ -4795,6 +4849,7 @@ function vPillInfo(seq){
   })()}
   <div class="actions"><button class="btn ${taking ? 'line' : ''}" onclick="togglePub('${p.seq}')">${taking ? I.check + ' 내 약통에 있어요 (빼기)' : I.pill + ' 내 약통에 등록'}</button>${taking && takingItems().length >= 2 ? `<button class="btn ghost" onclick="go('/together')">${I.shield} 다른 약과 같이 먹어도 되는지 보기</button>` : ''}${taking ? `<button class="btn ghost" onclick="go('/schedule')">${I.clock} 복용 시간 알림 만들기</button>` : ''}</div>
   <div class="links" style="display:flex;gap:6px;flex-wrap:wrap;margin-top:12px"><a class="plink" href="https://nedrug.mfds.go.kr/pbp/CCBBB01/getItemDetail?itemSeq=${esc(p.seq)}" target="_blank" rel="noopener">${I.link}식약처 허가정보</a>${kpicLink(p.seq) ? `<a class="plink" href="${kpicLink(p.seq)}" target="_blank" rel="noopener">${I.search}약학정보원 — 사진·자세히</a>` : `<a class="plink" href="https://www.health.kr/searchDrug/search_detail.asp" target="_blank" rel="noopener" onclick="copyName('${esc(p.n.replace(/\(.*?\)/g, '')).replace(/'/g, "\\'")}')">${I.search}약학정보원에서 찾기</a>`}</div>
+  ${kgCard(p.seq)}
   <div class="srcs"><span class="src-chip">${I.link}출처: 식약처 의약품 낱알식별 정보 · 사진 약학정보원</span></div>
   ${disclaimer('낱알 정보는 참고용이에요. 같은 모양의 다른 약도 있으니 확실하지 않으면 약사에게 실물을 보여 주세요.')}`;
 }

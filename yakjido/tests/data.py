@@ -255,7 +255,7 @@ for _k, _v in SRC.items():
 # 영어 단위만 본다. 허가사항 제품명(타이레놀정 500mg)은 원문 그대로라 출처에서는 넘어간다.
 _unit = re.compile(r'(?<![A-Za-z0-9.])(\d[\d,.]*)(mg|g|mL|ml|µg|mcg|IU|kg)\b')
 for _p in sorted(ROOT.glob('content/*.json')):
-    if _p.name.startswith('sources'): continue
+    if _p.name.startswith('sources') or _p.name == 'productImages.json': continue   # 제품 이름 짝(원문 그대로)
     for _m in _unit.finditer(_p.read_text(encoding='utf-8')):
         fails.append(f'{_p.name} — 숫자와 단위를 붙여 썼습니다: «{_m.group(0)}»')
 
