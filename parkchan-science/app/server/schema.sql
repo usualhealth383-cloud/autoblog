@@ -119,6 +119,31 @@ create table if not exists purchases (
   at         timestamptz not null default now()
 );
 
+-- 공부 노트 — 나만 보는 메모장. 원장·보호자도 못 본다(진도와 달리 owner_read 정책이 없다).
+-- id 는 앱이 만든다(오프라인에서 쓰고 나중에 올려도 같은 노트로 합쳐지게)
+create table if not exists notes (
+  id         uuid primary key,
+  uid        uuid not null default auth.uid() references auth.users(id) on delete cascade,
+  date       date not null,
+  title      text not null default '' check (char_length(title) <= 80),
+  body       text not null default '' check (char_length(body) <= 5000),
+  cids       text[] not null default '{}' check (cardinality(cids) <= 12),
+  updated_at timestamptz not null default now(),
+  created_at timestamptz not null default now()
+);
+create index if not exists notes_uid_date on notes (uid, date);
+create or replace function private.note_guard() returns trigger language plpgsql security definer set search_path = public as $$
+begin
+  if tg_op = 'INSERT' and (select count(*) from notes where uid = new.uid) >= 3000 then
+    raise exception 'note_limit' using hint = '노트는 3,000개까지 저장됩니다';
+  end if;
+  new.uid := auth.uid();                       -- 남의 계정으로 넣기 막기
+  if tg_op = 'UPDATE' then new.created_at := old.created_at; end if;
+  return new;
+end $$;
+drop trigger if exists notes_guard on notes;
+create trigger notes_guard before insert or update on notes for each row execute function private.note_guard();
+
 -- 이야기(커뮤니티)
 create table if not exists posts (
   id        uuid primary key default gen_random_uuid(),
@@ -513,6 +538,8 @@ grant update (deleted) on comments to authenticated;
 
 revoke all on purchases from anon, authenticated; grant select on purchases to authenticated;
 revoke all on push_tokens from anon, authenticated; grant select, delete on push_tokens to authenticated;
+revoke all on notes from anon, authenticated; grant select, delete on notes to authenticated;
+grant insert (id, date, title, body, cids, updated_at), update (id, date, title, body, cids, updated_at) on notes to authenticated;   -- 올리기(upsert)가 id 도 SET 한다 · 남의 행은 RLS 가 막는다
 revoke all on guardian_links from anon, authenticated; grant select on guardian_links to authenticated;   -- 연결·해제는 link_code()·unlink_child() 로만
 revoke all on client_errors from anon, authenticated; grant insert (ver, msg, stack, url, ua) on client_errors to anon, authenticated; grant select on client_errors to authenticated;
 grant usage, select on sequence client_errors_id_seq to anon, authenticated;
@@ -526,6 +553,7 @@ alter table passes enable row level security;     alter table purchases enable r
 alter table posts enable row level security;      alter table comments enable row level security;
 alter table push_tokens enable row level security; alter table client_errors enable row level security;
 alter table guardian_links enable row level security;
+alter table notes enable row level security;
 
 do $$ declare p record; begin      -- 다시 실행해도 되게 기존 정책을 비운다
   for p in select policyname, tablename from pg_policies where schemaname = 'public' loop
@@ -571,6 +599,11 @@ create policy prog_ins  on progress for insert to authenticated
 create policy prog_upd  on progress for update to authenticated
   using (code = (select my_student_code()) or code = 'u:' || (select auth.uid())::text)
   with check ((code = (select my_student_code()) or code = 'u:' || (select auth.uid())::text) and (select consent_ok()));
+-- 노트: 내 것만 · 만 14세 미만 보호자 동의 전에는 서버에 올리지 않는다(앱은 기기 안에 둔다)
+create policy note_sel on notes for select to authenticated using (uid = (select auth.uid()));
+create policy note_ins on notes for insert to authenticated with check (uid = (select auth.uid()) and (select consent_ok()));
+create policy note_upd on notes for update to authenticated using (uid = (select auth.uid())) with check (uid = (select auth.uid()) and (select consent_ok()));
+create policy note_del on notes for delete to authenticated using (uid = (select auth.uid()));
 -- 이야기: 로그인한 사람은 지워지지 않았고 신고 3건 미만인 글을 본다(자기 글은 늘 보인다). 자기 글만 고치고 지운다(되살리기는 안 됨)
 create policy read_posts on posts for select to authenticated using (not deleted and (report_n < 3 or author = (select auth.uid())) and (select consent_ok()));
 create policy write_posts on posts for insert to authenticated with check (author = (select auth.uid()) and (select consent_ok()));

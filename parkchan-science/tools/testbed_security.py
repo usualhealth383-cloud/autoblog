@@ -176,5 +176,26 @@ cur.execute("update profiles set created_at = now() - interval '8 days' where id
 cur.execute('select count(*) from auth.users where id = %s', (K3_ID,)); check('7일 안에 동의 없는 계정은 지움', cur.fetchone()[0] == 0)
 cur.execute('select count(*) from auth.users where id in (%s, %s)', (K_ID, K2_ID)); check('  └ 동의한 계정은 남김', cur.fetchone()[0] == 2)
 
+print('▸ 공부 노트 — 나만 본다')
+import uuid as _uuid
+N1, N1_ID = signup('note1@test.kr', '노트하나'); N2, N2_ID = signup('note2@test.kr', '노트둘')
+nid = str(_uuid.uuid4()); UP = 'resolution=merge-duplicates,return=minimal'
+s, _ = call('POST', '/rest/v1/notes?on_conflict=id', {'id': nid, 'date': '2026-09-30', 'title': '비밀 메모', 'body': '나만 봄', 'cids': ['1101-01']}, N1, UP); check('내 노트 저장', s in (200, 201), s)
+s, j = call('GET', '/rest/v1/notes?select=id,uid', tok=N1); check('  └ 내 노트는 내가 읽음 · 주인은 서버가 채움', len(j) == 1 and j[0]['uid'] == N1_ID, j)
+s, j = call('GET', '/rest/v1/notes?select=id', tok=N2); check('다른 학생은 내 노트를 못 읽음', j == [], j)
+s, j = call('GET', '/rest/v1/notes?select=id', tok=OWN); check('원장도 학생 노트를 못 읽음', j == [], j)
+s, j = call('GET', '/rest/v1/notes?select=id', tok=ANON); check('로그인 안 하면 못 읽음', s >= 400 or j == [], j)
+s, _ = call('POST', '/rest/v1/notes?on_conflict=id', {'id': nid, 'date': '2026-09-30', 'title': '덮어쓰기', 'body': 'x', 'cids': []}, N2, UP); check('남의 노트 id 로 덮어쓰기 불가', s >= 400, s)
+s, j = call('PATCH', f'/rest/v1/notes?id=eq.{nid}', {'title': '남이 고침'}, N2, 'return=representation'); check('남의 노트 고치기 불가', j == [], j)
+s, j = call('DELETE', f'/rest/v1/notes?id=eq.{nid}', None, N2, 'return=representation'); check('남의 노트 지우기 불가', j == [], j)
+s, _ = call('POST', '/rest/v1/notes', {'id': str(_uuid.uuid4()), 'uid': N1_ID, 'date': '2026-09-30', 'title': '남 이름으로', 'body': '', 'cids': []}, N2); check('남의 계정 이름으로 노트 넣기 불가', s >= 400, s)
+s, _ = call('POST', '/rest/v1/notes', {'id': str(_uuid.uuid4()), 'date': '2026-09-30', 'title': 'x' * 81, 'body': '', 'cids': []}, N1); check('제목 80자 넘으면 거절', s >= 400, s)
+s, _ = call('POST', '/rest/v1/notes', {'id': str(_uuid.uuid4()), 'date': '2026-09-30', 'title': '', 'body': 'x' * 5001, 'cids': []}, N1); check('내용 5,000자 넘으면 거절', s >= 400, s)
+K5, K5_ID = signup('kid5@test.kr', '동의전', under14=True, guardian='최보호 01077778888')
+s, _ = call('POST', '/rest/v1/notes', {'id': str(_uuid.uuid4()), 'date': '2026-09-30', 'title': '동의 전', 'body': '', 'cids': []}, K5); check('보호자 동의 전에는 노트를 서버에 못 남김', s >= 400, s)
+cur.execute('select count(*) from notes where title = %s', ('비밀 메모',)); before = cur.fetchone()[0]
+rpc('delete_my_account', {}, N1); cur.connection.commit()
+cur.execute('select count(*) from notes where title = %s', ('비밀 메모',)); check('계정 삭제하면 노트도 지워짐', before == 1 and cur.fetchone()[0] == 0)
+
 print(f'\n보안 시험 {len(OK)}/{len(OK) + len(BAD)} 통과')
 sys.exit(1 if BAD else 0)

@@ -78,6 +78,10 @@ async def run(theme):
         await sweep(pg, '오늘', bad)
         for v, n in [('list','교재'),('bank','문제'),('talk','이야기'),('plan','일정'),('me','내 정보')]:
             await pg.click(f'.tab[data-v="{v}"]'); await pg.wait_for_timeout(500); await sweep(pg, n, bad)
+        await pg.click('#goNoteMe'); await pg.wait_for_timeout(400); await pg.click('#noteNew'); await pg.wait_for_timeout(300)
+        await pg.fill('#nedTitle', '대비 점검'); await pg.fill('#nedBody', '점검 메모'); await pg.wait_for_timeout(700); await sweep(pg, '노트 쓰기', bad)
+        await pg.click('#nedDone'); await pg.wait_for_timeout(300); await sweep(pg, '공부 노트', bad)
+        await pg.click('#noteBack'); await pg.wait_for_timeout(300); await pg.click('.tab[data-v="today"]'); await pg.wait_for_timeout(500); await sweep(pg, '오늘(노트 카드)', bad)
         await b.close(); return bad
 
 async def main():

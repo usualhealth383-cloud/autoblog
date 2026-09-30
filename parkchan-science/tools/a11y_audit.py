@@ -74,6 +74,10 @@ async def main():
         for v, n in [('list','교재'),('bank','문제'),('talk','이야기'),('plan','일정'),('me','내 정보')]:
             await pg.click(f'.tab[data-v="{v}"]'); await pg.wait_for_timeout(500); await check(n)
         await pg.click('#goStats'); await pg.wait_for_timeout(500); await check('통계')
+        await pg.click('.tab[data-v="me"]'); await pg.wait_for_timeout(300); await pg.click('#goNoteMe'); await pg.wait_for_timeout(400); await check('공부 노트')
+        await pg.click('#noteNew'); await pg.wait_for_timeout(300); await pg.fill('#nedBody', '점검 메모'); await pg.wait_for_timeout(700); await check('노트 쓰기')
+        await pg.click('#nedAddC'); await pg.wait_for_timeout(300); await check('개념 붙이기'); await pg.click('#sheetClose'); await pg.wait_for_timeout(200)
+        await pg.click('#nedDone'); await pg.wait_for_timeout(300); await check('노트 달력')
         await b.close()
         print('\n지적 합계', bad)
         sys.exit(1 if bad else 0)
