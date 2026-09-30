@@ -362,6 +362,13 @@ begin
 end $$;
 
 -- ═══ 이야기: 글쓴이·닉네임은 서버가 채운다 · 도배 제한 · 댓글 수 ═══
+-- 도움이 필요해 보이는 글(자해·자살 신호) — 가리지 않고, 쓴 사람에게는 상담 안내를, 원장에게는 '먼저 살펴볼 글'로 알린다.
+-- 앱(careCheck)과 같은 규칙. '세포 자살'(생물 용어)·'유서 깊은'은 빼고 본다.
+create or replace function private.care_hit(t text) returns boolean language sql immutable as $$
+  select coalesce(regexp_replace(regexp_replace(t, '세포\s*자살', '', 'g'), '유서\s*깊', '', 'g')
+    ~ '(죽고\s*싶|죽어\s*버리고\s*싶|자살|자해|손목을?\s*긋|목숨을?\s*끊|뛰어\s*내리고\s*싶|살기\s*싫|살고\s*싶지\s*않|사라지고\s*싶|없어지고\s*싶|극단적\s*선택|유서를|유서\s*(를\s*)?(써|쓰)|그만\s*살고\s*싶|살\s*이유가\s*없|다\s*끝내고\s*싶)', false) $$;
+alter table posts    add column if not exists care boolean not null default false;
+alter table comments add column if not exists care boolean not null default false;
 create or replace function private.stamp_author() returns trigger language plpgsql security definer set search_path = public as $$
 declare n int;
 begin
@@ -372,11 +379,12 @@ begin
   new.nick := coalesce(new.nick, '익명');
   new.likes := '{}'; new.reports := '{}'; new.report_n := 0; new.deleted := false; new.at := now();
   if tg_table_name = 'posts' then
+    new.care := private.care_hit(coalesce(new.title, '') || ' ' || coalesce(new.body, ''));
     new.comment_n := 0; new.solved := false;
     select count(*) into n from posts where author = new.author and at > now() - interval '10 minutes';
     if n >= 5 and not is_owner() then raise exception '글은 10분에 5개까지 올릴 수 있습니다. 잠시 뒤에 올려 주세요.' using errcode = 'P0001'; end if;
   else
-    new.picked := false;
+    new.picked := false; new.care := private.care_hit(new.body);
     select count(*) into n from comments where author = new.author and at > now() - interval '10 minutes';
     if n >= 20 and not is_owner() then raise exception '댓글은 10분에 20개까지 달 수 있습니다. 잠시 뒤에 달아 주세요.' using errcode = 'P0001'; end if;
   end if;
@@ -384,6 +392,20 @@ begin
 end $$;
 drop trigger if exists posts_stamp on posts;       create trigger posts_stamp    before insert on posts    for each row execute function private.stamp_author();
 drop trigger if exists comments_stamp on comments; create trigger comments_stamp before insert on comments for each row execute function private.stamp_author();
+create or replace function private.recare() returns trigger language plpgsql security definer set search_path = public as $$
+begin new.care := private.care_hit(coalesce(new.title, '') || ' ' || coalesce(new.body, '')); return new; end $$;
+drop trigger if exists posts_recare on posts; create trigger posts_recare before update of title, body on posts for each row execute function private.recare();
+-- 원장: 최근 30일 '먼저 살펴볼 글·댓글' — 누가 썼는지(이름·학원 코드)까지. 원장만 부를 수 있다
+create or replace function care_list() returns json language plpgsql stable security definer set search_path = public as $$
+begin
+  if not is_owner() then return '[]'::json; end if;
+  return coalesce((select json_agg(x order by x.at desc) from (
+    select 'post' as kind, p.id, p.id as post_id, p.title, left(p.body, 140) as body, p.nick, p.at, pr.name, pr.student_code as code, pr.role
+      from posts p join profiles pr on pr.id = p.author where p.care and not p.deleted and p.at > now() - interval '30 days'
+    union all
+    select 'comment', c.id, c.post_id, null, left(c.body, 140), c.nick, c.at, pr.name, pr.student_code, pr.role
+      from comments c join profiles pr on pr.id = c.author where c.care and not c.deleted and c.at > now() - interval '30 days') x), '[]'::json);
+end $$;
 create or replace function private.count_comments() returns trigger language plpgsql security definer set search_path = public as $$
 begin
   update posts set comment_n = (select count(*) from comments where post_id = coalesce(new.post_id, old.post_id) and not deleted)
@@ -445,9 +467,10 @@ language sql stable security definer set search_path = public as $$
     select code from students where p_kind in ('notice','sched') and (p_cls = '전체' or cls = p_cls) and until >= kst_today()
     union select p_code where p_kind = 'attend'
   )
-  select t.token, t.uid, case when pr.role = 'parent' then 'parent' else 'student' end
+  select t.token, t.uid, case when pr.role = 'parent' then 'parent' when pr.role = 'owner' then 'owner' else 'student' end
     from push_tokens t join profiles pr on pr.id = t.uid
-   where (p_kind <> 'attend' and pr.student_code in (select code from codes))
+   where (p_kind = 'care' and pr.role = 'owner')
+      or (p_kind not in ('attend', 'care') and pr.student_code in (select code from codes))
       or exists (select 1 from guardian_links g where g.uid = t.uid and g.code in (select code from codes))
 $$;
 
@@ -521,6 +544,7 @@ revoke execute on function consent_list(), consent_mark(uuid, text), consent_req
 grant execute on function consent_list(), consent_mark(uuid, text), consent_request() to authenticated;
 grant execute on function consent_info(text), consent_give(text, text) to anon, authenticated;
 grant execute on function app_meta() to anon, authenticated;
+revoke execute on function care_list() from public, anon; grant execute on function care_list() to authenticated;   -- 안에서 원장만 결과를 받는다
 revoke execute on function grant_purchase(uuid, text, text, text, int, jsonb), revoke_purchase(text), push_targets(text, text, text) from public, anon, authenticated;
 grant execute on function grant_purchase(uuid, text, text, text, int, jsonb), revoke_purchase(text), push_targets(text, text, text) to service_role;
 
@@ -529,8 +553,8 @@ grant insert (id, role, name, phone, under14, guardian, terms_ver) on profiles t
 grant update (name, phone, nick) on profiles to authenticated;
 
 revoke select, insert, update on posts, comments from anon, authenticated;
-grant select (id, author, nick, board, title, body, attach, likes, report_n, comment_n, staff, solved, deleted, at, edited) on posts to authenticated;
-grant select (id, post_id, author, nick, body, likes, report_n, staff, picked, deleted, at) on comments to authenticated;
+grant select (id, author, nick, board, title, body, attach, likes, report_n, comment_n, staff, solved, deleted, at, edited, care) on posts to authenticated;
+grant select (id, post_id, author, nick, body, likes, report_n, staff, picked, deleted, at, care) on comments to authenticated;
 grant insert (board, title, body, attach) on posts to authenticated;
 grant insert (post_id, body) on comments to authenticated;
 grant update (board, title, body, attach, edited, deleted) on posts to authenticated;

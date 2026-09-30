@@ -197,5 +197,15 @@ cur.execute('select count(*) from notes where title = %s', ('비밀 메모',)); 
 rpc('delete_my_account', {}, N1); cur.connection.commit()
 cur.execute('select count(*) from notes where title = %s', ('비밀 메모',)); check('계정 삭제하면 노트도 지워짐', before == 1 and cur.fetchone()[0] == 0)
 
+print('▸ 이야기 안전장치(도움이 필요해 보이는 글)')
+s, j = call('POST', '/rest/v1/posts?select=id,care', {'board': 'talk', 'title': '힘들어요', 'body': '요즘 죽고 싶다는 생각이 들어요'}, N2, 'return=representation'); cid = j[0]['id'] if s == 201 else None
+check('힘든 마음의 글은 서버가 care 표시', s == 201 and j[0].get('care') is True, (s, j))
+s, j = call('PATCH', f'/rest/v1/posts?id=eq.{cid}', {'care': False}, N2, 'return=representation'); check('care 표시를 스스로 못 끔', s >= 400, (s, j))
+s, j = call('POST', '/rest/v1/posts?select=id,care', {'board': 'qna', 'title': '세포 자살', 'body': '아폽토시스를 세포 자살이라 하나요? 유서 깊은 실험'}, N2, 'return=representation'); check('과학 용어는 care 아님', s == 201 and j[0].get('care') is False, (s, j))
+s, j = call('POST', '/rest/v1/posts', {'board': 'talk', 'title': '괜찮아', 'body': '그냥 궁금해서', 'care': False}, N2); check('글쓸 때 care 칸을 직접 못 넣음', s >= 400, (s, j))
+s, j = rpc('care_list', {}, N2); check('학생은 먼저 살펴볼 목록을 못 받음', s == 200 and j == [], j)
+s, j = rpc('care_list', {}, OWN); check('원장은 이름과 함께 받음', s == 200 and any(x['post_id'] == cid and x['name'] == '노트둘' for x in j), j)
+s, j = call('PATCH', f'/rest/v1/posts?id=eq.{cid}&select=id,care', {'body': '이제 괜찮아요. 고마워요'}, N2, 'return=representation'); check('  └ 고쳐 쓰면 다시 판정', s == 200 and j and j[0].get('care') is False, (s, j))
+
 print(f'\n보안 시험 {len(OK)}/{len(OK) + len(BAD)} 통과')
 sys.exit(1 if BAD else 0)

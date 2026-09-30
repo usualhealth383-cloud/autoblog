@@ -285,6 +285,23 @@ button,.tab,.btn,.chip,.chipbar button,.seg button{-webkit-user-select:none;user
 .legend{display:flex;gap:12px;font-size:11px;color:var(--muted);margin-top:8px}
 .legend i{display:inline-block;width:10px;height:10px;border-radius:3px;vertical-align:-1px;margin-right:4px;background:var(--u)}
 .legend i.att{background:transparent;box-shadow:inset 0 0 0 2px var(--warn)}
+/* ═ 마음이 힘들 때 · 상담 창구 ═ */
+.help{display:flex;flex-direction:column;gap:8px;margin:4px 0 6px}
+.help .hc{display:flex;align-items:center;gap:14px;padding:13px 14px;border-radius:14px;background:var(--brand-soft);color:var(--ink);text-decoration:none;border:1px solid var(--brand-line)}
+.help .hc b{font-size:24px;font-weight:900;color:var(--brand-dark);font-variant-numeric:tabular-nums;min-width:62px;letter-spacing:-.01em}
+.help .hc span{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.help .hc i{font-style:normal;font-size:14px;font-weight:800}
+.help .hc small{font-size:12px;color:var(--body);word-break:keep-all}
+.help .hc em{font-style:normal;font-size:12px;font-weight:800;color:var(--on-color);background:var(--brand);border-radius:999px;padding:6px 12px}
+.help .now{font-size:12.5px;color:var(--muted);margin:2px 2px 0;line-height:1.6}
+.sheet.care h3{font-size:18px}
+.sheet.care p{color:var(--body)}
+.carenote{font-size:12.5px;color:var(--body);background:var(--brand-soft);border-radius:12px;padding:10px 13px;margin:10px 0 0;line-height:1.7;word-break:keep-all}
+.carenote b{color:var(--brand-dark)}
+.carenote .linkbtn{padding:2px 0;font-size:12.5px;font-weight:800;color:var(--brand-dark);min-height:24px}
+.carerow{border-left:3px solid var(--warn)}
+.setrow>button.more{flex:0 0 auto;font-size:12px;font-weight:800;color:var(--brand-dark);background:var(--brand-soft);border:none;border-radius:999px;padding:0 13px;min-height:34px;cursor:pointer;font-family:inherit;white-space:nowrap}
+.setrow>button[data-admpdel],.setrow>button[data-admcdel]{color:var(--no);background:var(--no-soft)}
 /* ═ 공부 노트 · 달력 ═ */
 .hrow{display:flex;align-items:center;justify-content:space-between;gap:8px}
 .hrow .h-page{flex:1;min-width:0}
@@ -1068,13 +1085,13 @@ const DB = (() => {
     addPost: async body => { d.posts ||= []; const a = me();
       const x = { id: uid(), uid: a ? a.id : '', nick: (a && a.nick) || (a && a.role==='owner' ? '원장님' : '익명'), cls: (a && a.studentCode) ? (d.students.find(s=>s.code===a.studentCode)||{}).cls || '' : '',
         at: new Date().toISOString(), likes: [], reports: [], solved: false, deleted: false, ...body, staff: !!(a && a.role==='owner') };
-      d.posts.unshift(x); w(); return x; },
-    editPost: async (id, body) => { const x = (d.posts||[]).find(y=>y.id===id); if (x){ Object.assign(x, body, { edited:new Date().toISOString() }); w(); } return x; },
+      x.care = careCheck(x.title + ' ' + x.body); d.posts.unshift(x); w(); return x; },
+    editPost: async (id, body) => { const x = (d.posts||[]).find(y=>y.id===id); if (x){ Object.assign(x, body, { edited:new Date().toISOString() }); x.care = careCheck(x.title + ' ' + x.body); w(); } return x; },
     delPost: async id => { const x = (d.posts||[]).find(y=>y.id===id); if (x){ x.deleted = true; w(); } },
     addComment: async (postId, text) => { d.comments ||= []; const a = me();
       const c = { id: uid(), postId, uid: a ? a.id : '', nick: (a && a.nick) || (a && a.role==='owner' ? '원장님' : '익명'), body: text,
         at: new Date().toISOString(), likes: [], reports: [], picked: false, deleted: false, staff: !!(a && a.role==='owner') };
-      d.comments.push(c); w(); return c; },
+      c.care = careCheck(text); d.comments.push(c); w(); return c; },
     delComment: async id => { const c = (d.comments||[]).find(x=>x.id===id); if (c){ c.deleted = true; w(); } },
     pickComment: async (postId, cid) => { (d.comments||[]).filter(c=>c.postId===postId).forEach(c => c.picked = (c.id === cid));
       const p = (d.posts||[]).find(x=>x.id===postId); if (p) p.solved = true; w(); },
@@ -1084,6 +1101,11 @@ const DB = (() => {
     reportItem: async (kind, id) => { const a = me(); if (!a) return 0;
       const arr = kind === 'post' ? d.posts : d.comments, x = (arr||[]).find(y=>y.id===id); if (!x) return 0;
       x.reports ||= []; if (!x.reports.includes(a.id)) x.reports.push(a.id); w(); return x.reports.length; },
+    careList: async () => { const a = me(); if (!a || a.role !== 'owner') return []; const since = new Date(Date.now() - 30*864e5).toISOString();
+      const who = uid => { const u = d.accounts.find(z => z.id === uid) || {}; return { name:u.name||'', code:u.studentCode||'', role:u.role||'' }; };
+      return [...(d.posts||[]).filter(x => x.care && !x.deleted && !x.staff && x.at > since).map(x => ({ kind:'post', id:x.id, post_id:x.id, title:x.title, body:String(x.body||'').slice(0,140), nick:x.nick, at:x.at, ...who(x.uid) })),
+              ...(d.comments||[]).filter(c => c.care && !c.deleted && !c.staff && c.at > since).map(c => ({ kind:'comment', id:c.id, post_id:c.postId, title:null, body:String(c.body||'').slice(0,140), nick:c.nick, at:c.at, ...who(c.uid) }))]
+        .sort((p, q) => p.at < q.at ? 1 : -1); },
     reported: async () => ({ posts: (d.posts||[]).filter(x => (x.reports||[]).length && !x.deleted),
       comments: (d.comments||[]).filter(c => (c.reports||[]).length && !c.deleted) }),
     setNick: async nick => { const a = me(); if (!a) return null; a.nick = nick; w(); return pub(a); },
@@ -1224,6 +1246,7 @@ const serverDB = () => {
     pickComment: async (postId, cid) => { await api(`/rest/v1/rpc/pick_comment`, { method:'POST', body:{ p_post: postId, p_comment: cid } }); },
     likeToggle: async (kind, id) => { await api('/rest/v1/rpc/like_toggle', { method:'POST', body:{ p_kind: kind, p_id: id } }); },
     reportItem: async (kind, id) => (await api('/rest/v1/rpc/report_item', { method:'POST', body:{ p_kind: kind, p_id: id } })) || 0,
+    careList: async () => await api('/rest/v1/rpc/care_list', { method:'POST', body:{} }) || [],
     reported: async () => { const [ps, cs] = await Promise.all([api(`/rest/v1/posts?deleted=is.false&report_n=gt.0&select=${POST_COLS}&order=report_n.desc`), api(`/rest/v1/comments?deleted=is.false&report_n=gt.0&select=${CM_COLS}&order=report_n.desc`)]);
       return { posts: ps.map(x => ({ ...x, uid:x.author })), comments: cs.map(c => ({ ...c, uid:c.author })) }; },
     setNick: async nick => { await api(`/rest/v1/profiles?id=eq.${SESSION.user.id}`, { method:'PATCH', prefer:'return=minimal', body:{ nick } }); meCache = null; return await myProfile(); },
@@ -1267,8 +1290,8 @@ const serverDB = () => {
     reset: () => {},
   };
 };
-const POST_COLS = 'id,author,nick,board,title,body,attach,likes,report_n,comment_n,staff,solved,deleted,at,edited';
-const CM_COLS = 'id,post_id,author,nick,body,likes,report_n,staff,picked,deleted,at';
+const POST_COLS = 'id,author,nick,board,title,body,attach,likes,report_n,comment_n,staff,solved,deleted,at,edited,care';
+const CM_COLS = 'id,post_id,author,nick,body,likes,report_n,staff,picked,deleted,at,care';
 const DBX = SRV ? serverDB() : DB;
 
 /* ═══ 계정 · 내 진도 ═══ */
@@ -1603,7 +1626,7 @@ function quoteCard(q, c){
   const kept = (S.qkeep||[]).includes(q.id);
   const br = c ? BRIDGE[`${c.book}-${c.unit}`] : '';
   return `<div class="qsay">
-      <span class="k">오늘의 한 마디</span>
+      <span class="k">오늘의 한 마디${q.kindName ? ` · ${esc(q.kindName)}` : ''}</span>
       <blockquote>“${esc(q.ko)}”</blockquote>
       ${q.orig ? `<p class="orig">${esc(q.orig)}</p>` : ''}
       <div class="by"><span class="who">${esc(q.who||'')}</span>${q.role?`<span class="role">${esc(q.role)}</span>`:''}</div>
@@ -1840,6 +1863,32 @@ const PII = [
   [/(카톡|카카오톡|오픈챗|오픈카톡|인스타|텔레그램)\s*(아이디|id)?\s*[:：]?\s*@?[\w.-]{3,}/i, 'SNS·메신저 아이디', false],
   [/\b\d{1,3}\s*동\s*\d{1,4}\s*호\b/, '집 주소로 보이는 표현', false],
 ];
+/* 도움이 필요해 보이는 글(자해·자살 신호) — 서버의 private.care_hit() 와 같은 규칙.
+   막지 않는다. 쓰는 사람에게는 올리기 전에 상담 창구를 조용히 보여 주고, 원장님은 '먼저 살펴볼 글'로 본다.
+   참고: Samaritans 「온라인 자해·자살 콘텐츠 관리 지침」(2020) — 지우기보다 도움으로 잇기, 사람 말투로 */
+const CARE_RE = /(죽고\s*싶|죽어\s*버리고\s*싶|자살|자해|손목을?\s*긋|목숨을?\s*끊|뛰어\s*내리고\s*싶|살기\s*싫|살고\s*싶지\s*않|사라지고\s*싶|없어지고\s*싶|극단적\s*선택|유서를|유서\s*(를\s*)?(써|쓰)|그만\s*살고\s*싶|살\s*이유가\s*없|다\s*끝내고\s*싶)/;
+const careCheck = t => CARE_RE.test(String(t||'').replace(/세포\s*자살/g, '').replace(/유서\s*깊/g, ''));
+/* 상담 창구 — 2026-09 확인: 109 자살예방 상담전화(2024-01 개통, 24시간) · 1388 청소년 상담(24시간, 카카오톡·온라인 cyber1388.kr) */
+const HELP = [
+  { n:'109', t:'자살예방 상담전화', d:'24시간 · 누구나 · 무료' },
+  { n:'1388', t:'청소년 상담', d:'24시간 · 카카오톡·온라인(cyber1388.kr)도 됩니다' },
+];
+const helpCards = () => `<div class="help">${HELP.map(x => `<a class="hc" href="tel:${x.n}"><b>${x.n}</b><span><i>${x.t}</i><small>${x.d}</small></span><em>전화</em></a>`).join('')}
+  <p class="now">지금 위험한 상황이라면 <b>112</b> · <b>119</b></p></div>`;
+/* 올리기 전 한 번: 'post'(그래도 올리기) / 'wait'(잠시 쉬기) */
+function careAsk(){ return new Promise(res => { askDone && askDone(false);
+  const el = document.getElementById('ask'); el.innerHTML = `<div class="sheet-bg yn-bg" id="askBg"><div class="sheet yn care" role="dialog" aria-modal="true" aria-labelledby="careH"><div class="grab"></div>
+    <h3 id="careH">마음이 많이 무거운가요?</h3>
+    <p>쓰신 글에 힘든 마음이 담겨 있는 것 같아요. 혼자 견디지 않아도 됩니다. 지금 이야기를 들어 줄 사람이 있어요.</p>
+    ${helpCards()}
+    <p class="fine" style="text-align:left;padding:4px 0 12px">이런 글은 원장님이 함께 살펴보고, 필요하면 먼저 연락드립니다.</p>
+    <div class="ynb"><button class="btn ghost" id="careWait">잠시 쉬었다 쓸게요</button><button class="btn" id="carePost">글 올리기</button></div></div></div>`;
+  askDone = v => { askDone = null; el.innerHTML = ''; el.onclick = null; res(v === true ? 'post' : 'wait'); };
+  el.onclick = e => { if (e.target.closest('a.hc')) return; e.stopPropagation(); const id = e.target.closest('button')?.id || e.target.id;
+    if (id === 'carePost') askDone(true); else if (id === 'careWait' || id === 'askBg') askDone(false); };
+  setTimeout(() => document.getElementById('careWait')?.focus(), 30); }); }
+function openHelp(){ openSheet(`<h3>마음이 힘들 때</h3><p>공부가 버겁거나, 사람 때문에 힘들거나, 그냥 다 싫은 날이 있습니다. 그럴 때 기댈 수 있는 곳입니다. 전화하면 바로 연결되고, 비밀은 지켜집니다.</p>
+  ${helpCards()}<p class="fine" style="text-align:left;padding:4px 0 12px">원장님께 직접 이야기해도 좋습니다.</p><button class="btn ghost" id="sheetClose">닫기</button>`); }
 function piiCheck(text){
   const hits = [];
   for (const [re, label, hard] of PII) if (re.test(text)) hits.push({ label, hard });
@@ -1919,6 +1968,7 @@ async function renderPost(){
         <span>${esc(nickOf(x))}${STAFF(x)}</span><span>${ago(x.at)}</span>${repN(x)?`<span style="color:var(--warn)">신고 ${repN(x)}</span>`:''}</div>
       <h2>${hid ? '신고가 쌓여 가려진 글입니다' : esc(x.title)}</h2>
       ${hid ? `<p class="body" style="color:var(--muted)">원장님이 확인할 때까지 다른 학생에게는 보이지 않습니다.</p>` : `<div class="body">${esc(x.body)}</div>`}
+      ${x.care && !hid ? `<div class="carenote">${mine(x) ? '털어놓아 줘서 고마워요. 혼자 견디지 않아도 됩니다.' : '힘든 마음을 꺼낸 글이에요. 따뜻한 말 한마디가 큰 힘이 됩니다.'} <button class="linkbtn" id="openHelp">도움받을 곳 · 109 · 1388</button></div>` : ''}
       ${at ? `<button class="attachcard" data-openatt="${esc(x.attach.kind)}:${esc(x.attach.id)}">
         <span style="flex:1;min-width:0"><span class="k">${esc(at.k)}</span><b>${esc(at.t)}</b><small>${esc(at.s)}</small></span>
         <span style="color:var(--muted);font-size:18px">›</span></button>` : ''}
@@ -2381,6 +2431,7 @@ function renderMe(){
     ${ACC && ACC.role!=='owner' && !a ? `<button class="setrow go" id="goPlans"><span class="l">이용권<small>${hasPass()?`${kdate(ACC.passUntil)}까지 · 연장하기`:'전 범위 열기 · 이용권 코드 등록'}</small></span><span class="v">보기</span></button>` : ''}
     ${ACC ? `<button class="setrow go" id="nickOpen"><span class="l">이야기 닉네임<small>${ACC.nick ? esc(ACC.nick) : '아직 정하지 않았습니다 · 글을 쓰려면 필요합니다'}</small></span><span class="v">${ACC.nick?'바꾸기':'정하기'}</span></button>` : ''}
     ${ACC ? `<button class="setrow go" id="blockOpen"><span class="l">차단한 사용자<small>${(S.blocked||[]).length}명 · 이야기에서 보이지 않습니다</small></span><span class="v">관리</span></button>` : ''}
+    <button class="setrow go" id="goHelp"><span class="l">마음이 힘들 때<small>24시간 상담 109 · 청소년 상담 1388</small></span><span class="v">보기</span></button>
     <button class="setrow go" id="goNoteMe"><span class="l">공부 노트 · 달력<small>${liveNotes().length ? `노트 ${liveNotes().length}개 · 나만 봅니다` : '오늘 공부한 내용을 정리하는 나만의 메모장'}</small></span><span class="v">열기</span></button>
     <button class="setrow go" id="goStats"><span class="l">학습 통계<small>연속 학습 ${streak()}일 · 공부한 개념 ${S.done.length}/${CONCEPTS.length} · 정답률 ${S.stats.a?Math.round(S.stats.c/S.stats.a*100):0}%</small></span><span class="v">보기</span></button>
     <button class="setrow go" id="qKeepOpen"><span class="l">보관한 한 마디<small>${(S.qkeep||[]).length}개 · 오늘의 한 마디에서 담은 글</small></span><span class="v">보기</span></button>
@@ -2591,10 +2642,15 @@ async function renderAdmin(){
     return;
   }
   if (admTab==='talk'){
-    let rep = { posts:[], comments:[] }; try { rep = await DBX.reported(); } catch {}
+    let rep = { posts:[], comments:[] }, care = []; try { rep = await DBX.reported(); } catch {} try { care = await DBX.careList(); } catch {}
     const total = rep.posts.length + rep.comments.length;
+    const careHtml = care.length ? `<div class="sec carerow"><h2 style="color:var(--warn)">먼저 살펴볼 글 ${care.length}건 · 최근 30일</h2>
+        <p class="fine" style="text-align:left;padding:0 0 8px">힘든 마음(자해·자살 신호로 보이는 말)이 담긴 글·댓글입니다. 글은 그대로 두고, 학생에게는 상담 창구(109·1388)를 안내했습니다. 학생을 알고 계시면 따로 안부를 물어 주세요. 위급해 보이면 112·119.</p>
+        ${care.map(c => `<div class="setrow" style="align-items:flex-start"><span class="l">${c.title ? esc(c.title) : '(댓글)'}<small>${esc(c.name || '')}${c.code ? ` · ${esc(c.code)}` : ''} · 닉네임 ${esc(c.nick||'익명')} · ${ago(c.at)}<br>${esc(String(c.body||''))}</small></span>
+          <button class="more" data-admcare="${esc(c.post_id)}">글 보기</button></div>`).join('')}</div>` : '';
     v.innerHTML = head + `<div class="tsafe"><b>이야기 운영</b><br>학생이 신고한 글·댓글이 여기 모입니다. 신고가 ${REPORT_HIDE}건 쌓이면 학생 화면에서는 이미 가려져 있고, 원장님만 원문을 봅니다.<br>
         개인정보·비방·기출 원문이 올라온 글은 지워 주세요. 지운 글은 되돌릴 수 없습니다.</div>
+      ${careHtml}
       <div class="sec"><h2>신고된 글 ${rep.posts.length}건</h2>
         ${rep.posts.length ? rep.posts.map(x=>`<div class="setrow" style="align-items:flex-start">
             <span class="l">${esc(x.title)}<small>${esc(x.nick||'익명')} · ${ago(x.at)} · 신고 ${repN(x)}건<br>${esc(String(x.body||'').slice(0,70))}</small></span>
@@ -2714,7 +2770,7 @@ const LEGAL = {
 <h4>제8조의3 (청소년 보호)</h4>
 <p>① 서비스는 초·중·고등학생이 주로 이용합니다. 회사는 청소년에게 유해한 게시물을 발견하거나 신고받은 즉시 삭제하고, 반복 위반한 이용자의 커뮤니티 이용을 제한합니다.</p>
 <p>② 만 14세 미만 아동은 법정대리인의 동의를 받아 가입하며, 법정대리인은 언제든 자녀의 게시물 삭제와 커뮤니티 이용 중지를 요청할 수 있습니다.</p>
-<p>③ 이용자가 자기 또는 타인을 해치려는 뜻이 담긴 글을 올린 경우, 회사는 해당 글을 가리고 필요한 도움을 안내할 수 있습니다. 긴급한 경우 <b>청소년 상담 1388</b>, <b>자살예방 상담 109</b>로 연락하시기 바랍니다.</p>
+<p>③ 글이나 댓글에 자기 또는 타인을 해치려는 뜻으로 보이는 말이 있으면, 서비스는 올리기 전에 상담 창구를 안내하고, 학원(원장)이 그 글을 먼저 살펴 필요하면 이용자에게 연락할 수 있도록 알립니다. 글은 가리지 않는 것이 원칙이며, 다른 이용자에게 해가 되는 내용(방법의 구체적 묘사 등)은 지울 수 있습니다. 도움이 필요하면 <b>자살예방 상담전화 109</b>(24시간), <b>청소년 상담 1388</b>(24시간)로 연락하시고, 위급한 경우 <b>112 · 119</b>로 신고하시기 바랍니다.</p>
 
 <h4>제9조 (개인정보 보호)</h4>
 <p>회사는 「개인정보 보호법」에 따라 이용자의 개인정보를 보호하며, 처리 항목·목적·보유 기간·권리 행사 방법은 별도의 개인정보처리방침에 따릅니다.</p>
@@ -2736,7 +2792,7 @@ const LEGAL = {
 <h4>1. 개인정보의 처리 목적</h4>
 <p>① 회원 가입·관리: 본인 확인, 계정 유지, 만 14세 미만 아동의 법정대리인 동의 확인, 부정 이용 방지<br>② 학습 서비스 제공: 개념·문제 제공, 진도·오답·북마크·통계와 공부 노트의 저장 및 기기 간 동기화, 알림 발송<br>③ 학원 운영: 수강생 인증(학원 코드), 출석 기록, 반별 공지와 확인 여부 관리, 보호자에게 자녀의 출석·진도 제공<br>④ 유료 서비스: 이용권 개통·기간 관리(결제 자체는 앱 마켓이 처리하며 회사는 결제 정보를 저장하지 않습니다)<br>⑤ 고충 처리: 문의 응대, 분쟁 조정, 공지 전달</p>
 <h4>2. 처리하는 개인정보의 항목</h4>
-<p>① 회원가입 시(필수): 이메일, 비밀번호(암호화 저장), 이름, 역할(학생/보호자/교사) / (선택): 연락처<br>② 만 14세 미만 아동: 법정대리인의 성명·연락처(동의 확인용)<br>③ 학원 수강생: 학원 코드, 반, 수강 기간, 출석 일시, 공지 확인 여부<br>④ 보호자: 연결한 자녀의 학원 코드<br>⑤ 커뮤니티('이야기') 이용 시: 닉네임, 작성한 글·댓글의 내용과 작성 일시, 도움됨·채택 기록, 신고한 내역과 신고받은 내역, 차단한 이용자 목록<br>⑥ 일정 기능 이용 시: 이용자가 직접 넣은 시간표(수업 이름·장소·요일·시각), 일정, D-day. 학원이 반에 보낸 일정<br>⑦ 공부 노트 기능 이용 시: 이용자가 직접 쓴 노트(날짜, 제목, 내용, 노트에 붙인 개념). 노트는 작성자 본인만 볼 수 있으며 학원(원장)과 보호자에게도 제공하지 않습니다<br>⑧ 서비스 이용 중 자동 생성: 학습 기록(공부한 개념, 문제 풀이 결과, 오답, 북마크, 학습 일자), 이용권 만료일, 알림 설정<br>⑨ 이용권을 앱 마켓에서 구매한 경우: 상품, 주문번호, 결제 확인 토큰, 결제·반영 일시(카드번호 등 결제 수단 정보는 마켓이 처리하며 회사는 받지 않습니다)<br>⑩ 푸시 알림을 켠 경우: 알림을 받을 기기의 알림 토큰<br>⑪ 앱 오류가 났을 때 자동으로: 오류 내용, 앱 버전, 화면 이름, 기기·브라우저 종류(오류 진단용)<br>⑫ 회사는 주민등록번호, 위치 정보, 사진, 연락처 목록을 수집하지 않습니다.</p>
+<p>① 회원가입 시(필수): 이메일, 비밀번호(암호화 저장), 이름, 역할(학생/보호자/교사) / (선택): 연락처<br>② 만 14세 미만 아동: 법정대리인의 성명·연락처(동의 확인용)<br>③ 학원 수강생: 학원 코드, 반, 수강 기간, 출석 일시, 공지 확인 여부<br>④ 보호자: 연결한 자녀의 학원 코드<br>⑤ 커뮤니티('이야기') 이용 시: 닉네임, 작성한 글·댓글의 내용과 작성 일시, 도움됨·채택 기록, 신고한 내역과 신고받은 내역, 차단한 이용자 목록. 글·댓글에 자해·자살 신호로 보이는 말이 있는지 자동으로 확인한 결과(학원이 먼저 살펴보고 필요하면 연락하기 위한 목적)<br>⑥ 일정 기능 이용 시: 이용자가 직접 넣은 시간표(수업 이름·장소·요일·시각), 일정, D-day. 학원이 반에 보낸 일정<br>⑦ 공부 노트 기능 이용 시: 이용자가 직접 쓴 노트(날짜, 제목, 내용, 노트에 붙인 개념). 노트는 작성자 본인만 볼 수 있으며 학원(원장)과 보호자에게도 제공하지 않습니다<br>⑧ 서비스 이용 중 자동 생성: 학습 기록(공부한 개념, 문제 풀이 결과, 오답, 북마크, 학습 일자), 이용권 만료일, 알림 설정<br>⑨ 이용권을 앱 마켓에서 구매한 경우: 상품, 주문번호, 결제 확인 토큰, 결제·반영 일시(카드번호 등 결제 수단 정보는 마켓이 처리하며 회사는 받지 않습니다)<br>⑩ 푸시 알림을 켠 경우: 알림을 받을 기기의 알림 토큰<br>⑪ 앱 오류가 났을 때 자동으로: 오류 내용, 앱 버전, 화면 이름, 기기·브라우저 종류(오류 진단용)<br>⑫ 회사는 주민등록번호, 위치 정보, 사진, 연락처 목록을 수집하지 않습니다.</p>
 <h4>3. 개인정보의 처리 및 보유 기간</h4>
 <p>① 회원 정보와 학습 기록(진도·오답·보관한 글귀·일정·시간표·공부 노트 포함): 회원 탈퇴 시 즉시 파기. 공부 노트는 이용자가 지우면 그때 바로 파기<br>② 커뮤니티 게시물·댓글: 회원 탈퇴 시 삭제하거나 작성자를 알 수 없도록 처리. 다만 다른 이용자의 답변이 달린 질문은 학습 자료로서의 맥락을 위해 작성자 정보를 지운 뒤 남길 수 있습니다<br>③ 신고 접수·처리 기록: 반복 위반 확인과 분쟁 대응을 위해 처리 완료 후 <b>6개월</b>간 보관 후 파기<br>④ 출석 기록·수강생 정보: 학원 운영과 수강료 정산의 근거로 수강 종료 후 1년까지 보관 후 파기(학원의 설립·운영 및 과외교습에 관한 법률에 따른 장부 관리)<br>⑤ 이용권 구매·개통 기록(마켓 결제 기록 포함): 「전자상거래 등에서의 소비자보호에 관한 법률」에 따라 5년<br>⑥ 소비자 불만·분쟁 처리 기록: 같은 법에 따라 3년<br>⑦ 서비스 접속 기록(서버 로그): 「통신비밀보호법」에 따라 3개월<br>⑧ 앱 오류 기록: 수집 후 90일이 지나면 파기<br>⑨ 푸시 알림 토큰: 로그아웃·회원 탈퇴 시 즉시 삭제, 앱을 지운 기기의 토큰은 알림 전송이 실패하는 즉시 삭제</p>
 <h4>3의2. 커뮤니티에서 다른 이용자에게 보이는 정보</h4>
@@ -2904,6 +2960,7 @@ document.addEventListener('click', async e => {
   const T = sel => e.target.closest(sel);
   if (T('#sheetBg') && !T('.sheet')){ closeSheet(); return; }
   if (T('#sheetClose')){ closeSheet(); return; }
+  if (T('#openHelp') || T('#goHelp')){ openHelp(); return; }
   const tab = T('.tab'); if (tab){ qState=null; show(tab.dataset.v); return; }
   const lg = T('[data-legal]'); if (lg){ openLegal(lg.dataset.legal); return; }
   /* 그림 확대 */
@@ -2981,6 +3038,7 @@ document.addEventListener('click', async e => {
     if (hits.length && !poiOk){ poiOk = true;
       w.innerHTML = `<div class="piiwarn"><b>${hits.map(h=>esc(h.label)).join(' · ')}로 보이는 내용이 있습니다.</b><br>모르는 사람도 볼 수 있는 글입니다. 그래도 올리려면 <b>올리기</b>를 한 번 더 누르세요.</div>`; return; }
     poiOk = false;
+    if (careCheck(title + ' ' + body) && !isOwner() && await careAsk() !== 'post') return;
     const av = g('poA'), attach = av ? { kind: av.split(':')[0], id: av.slice(av.indexOf(':')+1) } : null;
     const id = T('#poSave').dataset.id;
     if (id) await DBX.editPost(id, { board:g('poB'), title, body, attach });
@@ -2999,6 +3057,7 @@ document.addEventListener('click', async e => {
     const hits = piiCheck(body), hard = hits.find(h => h.hard);
     if (hard){ talkErr = `${hard.label}로 보이는 내용이 있어 올릴 수 없습니다.`; renderPost(); return; }
     if (hits.length && !poiOk){ poiOk = true; talkErr = `${hits.map(h=>h.label).join(' · ')}로 보이는 내용이 있습니다. 그래도 올리려면 등록을 한 번 더 누르세요.`; renderPost(); return; }
+    if (careCheck(body) && !isOwner() && await careAsk() !== 'post') return;
     poiOk = false; talkErr = ''; await DBX.addComment(postId, body); renderPost(); return; }
   const bk = T('#pBlock'); if (bk){ const u = bk.dataset.u; if (!u) return;
     S.blocked ||= []; const i = S.blocked.indexOf(u);
@@ -3021,6 +3080,7 @@ document.addEventListener('click', async e => {
     const t = g('scT').trim(), dt = g('scDate');
     if (!t || !dt){ toast('제목과 날짜를 넣어 주세요'); return; }
     await DBX.sendSchedule(g('scCls'), dt, t, g('scK'), g('scM').trim()); toast('일정을 보냈습니다'); renderAdmin(); return; }
+  const acr = T('[data-admcare]'); if (acr){ postId = acr.dataset.admcare; show('post'); return; }
   const apd = T('[data-admpdel]'); if (apd){ if (!await ask('이 글을 지울까요? 되돌릴 수 없습니다.', '지우기',true)) return; await DBX.delPost(apd.dataset.admpdel); toast('지웠습니다'); renderAdmin(); return; }
   const acd = T('[data-admcdel]'); if (acd){ if (!await ask('이 댓글을 지울까요?', '지우기',true)) return; await DBX.delComment(acd.dataset.admcdel); toast('지웠습니다'); renderAdmin(); return; }
   const scd = T('[data-scdel]'); if (scd){ await DBX.delSchedule(scd.dataset.scdel); toast('지웠습니다'); renderAdmin(); return; }

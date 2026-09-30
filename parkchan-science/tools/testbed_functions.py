@@ -165,6 +165,15 @@ def main():
       s1_uid = call('GET', '/auth/v1/user', tok=S1)[1]['id']
       SENT.clear(); call('POST', '/functions/v1/push', {'type': 'INSERT', 'table': 'comments', 'record': {'post_id': pid, 'author': s1_uid, 'body': '고맙습니다'}}, headers=PH)
       check('  └ 자기 글에 자기가 단 댓글은 알리지 않음', SENT == [], SENT)
+      # 도움이 필요해 보이는 글·댓글 → 원장 폰에만, 잠금화면에 내용은 싣지 않는다
+      call('POST', '/rest/v1/rpc/register_push', {'p_token': 'tok-own', 'p_platform': 'android'}, OWN)
+      SENT.clear(); call('POST', '/functions/v1/push', {'type': 'INSERT', 'table': 'posts', 'record': {'id': pid, 'author': s1_uid, 'title': '요즘 지쳐요', 'body': '그만 살고 싶어요', 'care': True}}, headers=PH)
+      check('힘든 마음의 글 → 원장 폰에만 "먼저 살펴볼 글"', [m['token'] for m in SENT] == ['tok-own'] and '먼저 살펴볼 글' in SENT[0]['notification']['title'] and SENT[0]['data'].get('kind') == 'care', SENT)
+      check('  └ 알림에 글 내용은 싣지 않음', SENT and '살고 싶' not in json.dumps(SENT[0], ensure_ascii=False) and '지쳐요' not in json.dumps(SENT[0], ensure_ascii=False), SENT[:1])
+      SENT.clear(); call('POST', '/functions/v1/push', {'type': 'INSERT', 'table': 'posts', 'record': {'id': pid, 'author': s1_uid, 'title': '질문', 'body': '충격량', 'care': False}}, headers=PH)
+      check('  └ 보통 글은 원장에게 알리지 않음', SENT == [], SENT)
+      SENT.clear(); call('POST', '/functions/v1/push', {'type': 'INSERT', 'table': 'comments', 'record': {'post_id': pid, 'author': 'someone-else', 'body': '자해하고 싶어', 'care': True}}, headers=PH)
+      check('힘든 마음의 댓글 → 원장 + 글쓴이(보통 댓글 알림)', sorted(m['token'] for m in SENT) == ['tok-own', 'tok-stu1'], [m['token'] for m in SENT])
   finally:
       for p in procs: p.terminate()
 
