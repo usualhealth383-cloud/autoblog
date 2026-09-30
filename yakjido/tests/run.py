@@ -399,6 +399,14 @@ def main():
                 if _pv < 20: fails.append(f'{_r} 탭 {_k}: 누르면 보이는 내용이 없습니다({_pv})')
                 o = pg.evaluate(OVERFLOW_JS)
                 if o['ov'] or o['clip']: fails.append(f'{_r} 탭 {_k}: 넘침·잘림 {o["ov"][:1]}{o["clip"][:1]}')
+        # 탭 칸(.pane) 안에 다른 칸이 들어가 있으면 그 탭을 골라야만 보인다 — 복용 알림에서 한 번 그랬다(2026-09-30)
+        pg.goto(url + '#/schedule'); ready(); pg.wait_for_timeout(250)
+        _nest = pg.evaluate("""()=>{ ME.taking=['ibuprofen','acetaminophen']; ME.prn={acetaminophen:true}; ME.sched={ibuprofen:['08:00']}; route();
+          const out=[]; for (const r of ['/schedule','/symptom/cold','/drug/ibuprofen']) { location.hash='#'+r; route();
+            document.querySelectorAll('.pane .pane').forEach(p=>out.push(r+' #'+p.id));
+            if (r==='/schedule' && getComputedStyle(document.querySelector('.prn-row')).display==='none') out.push('필요할 때 드신 약이 숨음'); }
+          ME.taking=[]; ME.prn={}; ME.sched={}; saveMe(); return out; }""")
+        if _nest: fails.append(f'탭 칸이 다른 칸 안에 들어가 있습니다: {_nest[:4]}')
         pg.goto(url + '#/symptom/cold'); ready(); pg.wait_for_timeout(300)
         if pg.evaluate("()=>{openCare();return getComputedStyle(document.getElementById('sp2')).display!=='none'&&document.querySelector('.tab[data-p=sp2]').classList.contains('on')}") is not True:
             fails.append('증상 화면: 「이럴 땐 병원으로」를 눌러도 병원 탭이 열리지 않습니다')
@@ -631,7 +639,7 @@ def main():
         t = pn.inner_text('.app')
         if '휴대폰 알림' not in t or '앱이 열려 있을 때' in t: fails.append('앱 알람: 알림 방법 카드가 설치 앱용으로 바뀌지 않았습니다')
         if '정확한 시각에 울리기' not in t: fails.append('앱 알람: 정확한 시각 허용 단추가 없습니다')
-        pn.click('button:has-text("허용")'); pn.wait_for_timeout(600)
+        pn.click('#sc4 button:has-text("허용")'); pn.wait_for_timeout(600)
         if not all(x.get('isExactNotification') for x in pn.evaluate("()=>__LN.pending")): fails.append('앱 알람: 허용 뒤에도 정확 알람으로 다시 걸리지 않습니다')
         # 알림의 「먹었어요」 → 체크되고, 오늘 20:30 「아직 안 드셨어요」는 지워져야 한다
         pn.evaluate("()=>__LN.listeners.localNotificationActionPerformed({actionId:'took',notification:{extra:{key:'ibuprofen@20:00'}}})"); pn.wait_for_timeout(600)
