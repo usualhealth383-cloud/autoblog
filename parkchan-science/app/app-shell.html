@@ -289,6 +289,8 @@ button,.tab,.btn,.chip,.chipbar button,.seg button{-webkit-user-select:none;user
 .legend{display:flex;gap:12px;font-size:11px;color:var(--muted);margin-top:8px}
 .legend i{display:inline-block;width:10px;height:10px;border-radius:3px;vertical-align:-1px;margin-right:4px;background:var(--u)}
 .legend i.att{background:transparent;box-shadow:inset 0 0 0 2px var(--warn)}
+/* ═ 교재 화면 워터마크 — 계정 이름·연락처 끝 4자리를 아주 옅게(읽기를 방해하지 않게). 탭(20)·시트(30) 아래 ═ */
+#wm{position:fixed;inset:0;pointer-events:none;z-index:15;background-repeat:repeat;background-position:0 0}
 /* ═ 마음이 힘들 때 · 상담 창구 ═ */
 .help{display:flex;flex-direction:column;gap:8px;margin:4px 0 6px}
 .help .hc{display:flex;align-items:center;gap:14px;padding:13px 14px;border-radius:14px;background:var(--brand-soft);color:var(--ink);text-decoration:none;border:1px solid var(--brand-line)}
@@ -823,6 +825,7 @@ figure.zoomable{cursor:zoom-in}
 <div id="netbar"></div>
   <div id="sheet"></div>
   <div id="ask"></div>
+  <div id="wm" class="hide" aria-hidden="true"></div>
 
 <script type="application/json" id="d-concepts"><!--CONCEPTS--></script>
 <script type="application/json" id="d-quizzes"><!--QUIZZES--></script>
@@ -2796,6 +2799,23 @@ function nativeInit(){ if (!isNative) return; const App = plug('App');
   applyBar(); scheduleReminder(); const Splash = plug('SplashScreen'); Splash && setTimeout(() => Splash.hide(), 150); }
 
 /* ═══ 시트 · 화면 전환 · 탭 ═══ */
+/* 캡처 막기(docs/03 기획 결정): 교재·문제 화면에서만 안드로이드 FLAG_SECURE 를 켠다 — 노트·일정·이야기·내 정보는 학생이 캡처할 수 있게.
+   카메라로 찍는 것은 못 막으므로 같은 화면에 계정 워터마크를 옅게 깐다(웹에서도) */
+const SECURE_VIEWS = ['today','list','detail','quiz','bank','lab','wrong'];
+let secureOn = null, SecurePlug = null;
+const wmText = () => { if (!ACC || ACC.role === 'owner') return ''; const tail = String(ACC.phone||'').replace(/\D/g,'').slice(-4) || (String(ACC.email||'').split('@')[0].slice(0,3) + '***'); return `${ACC.name||''} · ${tail}`; };
+let wmPainted = '';
+function paintWM(){ const el = document.getElementById('wm'); if (!el) return; const t = wmText();
+  const dark = document.documentElement.dataset.theme==='dark' || (!document.documentElement.dataset.theme && matchMedia('(prefers-color-scheme: dark)').matches);
+  const key = t + dark; if (key === wmPainted) return; wmPainted = key;
+  if (!t){ el.style.backgroundImage = ''; return; }
+  const x = t.replace(/[<>&"']/g, c => ({ '<':'&lt;', '>':'&gt;', '&':'&amp;', '"':'&quot;', "'":'&#39;' })[c]);
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="250" height="160"><text x="125" y="88" text-anchor="middle" transform="rotate(-22 125 80)" font-family="Noto Sans KR, sans-serif" font-size="13" font-weight="700" fill="${dark ? 'rgba(237,234,228,0.085)' : 'rgba(30,42,46,0.075)'}">${x}</text></svg>`;
+  el.style.backgroundImage = `url("data:image/svg+xml,${encodeURIComponent(svg)}")`; }
+function guardScreen(v){ const on = SECURE_VIEWS.includes(v);
+  if (isNative && secureOn !== on){ secureOn = on;
+    try { SecurePlug ||= (Cap.registerPlugin ? Cap.registerPlugin('SecureScreen') : plug('SecureScreen')); const r = SecurePlug && SecurePlug.set({ on }); r && r.catch && r.catch(() => {}); } catch {} }
+  paintWM(); document.getElementById('wm')?.classList.toggle('hide', !(on && wmText())); }
 function openSheet(html){ document.getElementById('sheet').innerHTML = `<div class="sheet-bg" id="sheetBg"><div class="sheet"><div class="grab"></div>${html}</div></div>`; }
 function closeSheet(){ document.getElementById('sheet').innerHTML=''; }
 // 확인 묻기: await ask('지울까요?', '지우기', true) → true/false. 바깥·취소·뒤로가기·Esc 는 false
@@ -2826,6 +2846,7 @@ function show(v){
      교재 목록·문제 은행·통계·내 정보에서는 브랜드 색으로 돌려놓아 앱이 한 색으로 읽히게 한다. */
   if (!['today','quiz','detail','lab'].includes(v)) setUnit('');
   VIEWS.forEach(k => document.getElementById('v-'+k).classList.toggle('hide', k!==v));
+  guardScreen(v);
   document.getElementById('tabs').classList.toggle('hide', v==='auth');
   const tabOf = {quiz: qState&&qState.mode==='review'?'me':'today', detail:'list', plans:'me', wrong:'bank', lab:'bank', stats:'me', post:'talk', note:noteTab(), noted:noteTab()}[v] || v;
   renderTabs(); document.querySelectorAll('.tab').forEach(t => t.classList.toggle('on', t.dataset.v===tabOf));

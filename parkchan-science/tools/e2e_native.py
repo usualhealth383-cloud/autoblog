@@ -14,7 +14,7 @@ from _ui import signup, NO_INTRO, auto_yes
 SC = sys.argv[sys.argv.index('--shots')+1] if '--shots' in sys.argv[:-1] else '/tmp/e2e_native'; os.makedirs(SC, exist_ok=True)
 GW = tf.GW
 STUB = """
-window.__iap = { next: '', purchases: [], calls: [] }; window.__push = { asked: 0, registered: 0 };
+window.__iap = { next: '', purchases: [], calls: [] }; window.__push = { asked: 0, registered: 0 }; window.__secure = [];
 const L = {};
 window.Capacitor = { isNativePlatform: () => true, getPlatform: () => 'android', Plugins: {
   NativePurchases: {
@@ -23,6 +23,7 @@ window.Capacitor = { isNativePlatform: () => true, getPlatform: () => 'android',
       const t = window.__iap.next; const r = { productIdentifier:o.productIdentifier, purchaseToken:t, transactionId:'GPA.'+t }; window.__iap.purchases.push(r); return r; },
     getPurchases: async () => ({ purchases: window.__iap.purchases }),
   },
+  SecureScreen: { set: async ({ on }) => { window.__secure.push(on); } },
   PushNotifications: {
     addListener: (ev, fn) => { L[ev] = fn; return { remove(){} }; },
     checkPermissions: async () => ({ receive: window.__push.asked ? 'granted' : 'prompt' }),
@@ -97,6 +98,17 @@ async def main():
             for _ in range(2): await s.evaluate("setTimeout(() => { throw new Error('시험용 앱 오류') }, 0)")
             await s.wait_for_timeout(900)
             er = svc("client_errors?select=msg,ver&msg=like.*시험용*"); assert len(er) == 1 and er[0]['ver'].endswith('-app'), er
+            # ⑤-2 교재·문제 화면에서만 캡처 막기(FLAG_SECURE) · 노트·이야기·내 정보는 풀기 · 교재 화면 워터마크
+            async def sec(): return await s.evaluate('__secure[__secure.length-1]')
+            await s.click('.tab[data-v="today"]'); await s.wait_for_timeout(300); assert await sec() is True, '오늘(교재) 화면인데 캡처가 열려 있음'
+            assert not await s.evaluate("document.getElementById('wm').classList.contains('hide')"), '교재 화면에 워터마크가 없음'
+            assert 'svg' in await s.evaluate("document.getElementById('wm').style.backgroundImage"), '워터마크 그림이 비어 있음'
+            await s.click('.tab[data-v="talk"]'); await s.wait_for_timeout(300); assert await sec() is False, '이야기 화면은 캡처할 수 있어야 함'
+            assert await s.evaluate("document.getElementById('wm').classList.contains('hide')"), '이야기 화면에 워터마크가 남음'
+            await s.click('.tab[data-v="list"]'); await s.wait_for_timeout(300); assert await sec() is True
+            await s.click('.tab[data-v="me"]'); await s.wait_for_timeout(300); assert await sec() is False
+            n = await s.evaluate('__secure.length'); await s.click('.tab[data-v="plan"]'); await s.wait_for_timeout(200)
+            assert await s.evaluate('__secure.length') == n, '같은 상태면 다시 부르지 않아야 함'
             # ⑥ 로그아웃하면 이 기기 푸시 등록을 지운다(다음 사람이 앞사람 알림을 받지 않게)
             await s.click('.tab[data-v="me"]'); await s.wait_for_timeout(300); await s.click('#logout'); await s.wait_for_timeout(900)
             assert svc('push_tokens?select=token') == [], '로그아웃했는데 푸시 등록이 남음'
