@@ -11,6 +11,7 @@
 import argparse, glob, json, pathlib, re, sys, time
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
 from kpic_photos import Kpic, PIC
+from kpic_detail import detail
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 PI = ROOT / 'content' / 'productImages.json'
@@ -35,16 +36,25 @@ def main():
         want = norm(n); word = re.sub(r'\(.*?\)', '', n).strip()
         # 약학정보원 검색은 띄어쓰기가 있으면 0건 — 붙여 쓴 이름, 그다음 상표(첫 낱말)로 넓게 찾고 짝은 이름으로만 맞춘다
         res = []
-        for w in dict.fromkeys([word.replace(' ', ''), word, word.split(' ')[0]]):
+        # 약학정보원은 «100mg»으로 적는다 — «100밀리그램»으로 찾으면 0건. 함량을 뗀 이름(우루사정)으로도 넓게 찾는다
+        mgw = re.sub(r'밀리그(램|람)', 'mg', word).replace(' ', '')
+        base = re.sub(r'[\d.,]+\s*(mg|밀리그(램|람)|%|IU)?.*$', '', word.replace(' ', ''))
+        for w in dict.fromkeys([word.replace(' ', ''), mgw, word, word.split(' ')[0], base]):
             if len(w) < 2: continue
             try: res = k.search(w)
             except Exception as e: res = []; time.sleep(2)
             if any(norm(r.get('drug_name', '')).startswith(want) for r in res): break
             time.sleep(0.4)
         cand = [r for r in res if norm(r.get('drug_name', '')) == want] or [r for r in res if norm(r.get('drug_name', '')).startswith(want)]
-        cand = [r for r in cand if str(r.get('pack_img') or '').strip('|') or str(r.get('drug_pic') or '').strip('|')]
         if not cand: none.append((n, f'이름이 같은 제품 없음(검색 {len(res)}건)')); time.sleep(0.5); continue
-        r = cand[0]
+        r = next((c for c in cand if str(c.get('pack_img') or '').strip('|') or str(c.get('drug_pic') or '').strip('|')), None)
+        if not r:   # 검색 결과에 사진 칸이 비어 있으면 상세에서 받는다
+            try: dd = detail(k, cand[0]['drug_code']) or {}
+            except Exception: dd = {}
+            time.sleep(0.4)
+            if not (str(dd.get('pack_img') or '').strip('|') or str(dd.get('drug_pic') or '').strip('|')):
+                none.append((n, '이름은 같으나 사진 없음')); continue
+            r = {**cand[0], 'pack_img': str(dd.get('pack_img') or '').replace('@', '|'), 'drug_pic': dd.get('drug_pic')}
         img = str(r.get('pack_img') or '').strip('|').split('|')[0] or str(r.get('drug_pic') or '').strip('|').split('|')[0]
         got[n] = {'img': img, 'match': r.get('drug_name', ''), 'kpic': r.get('drug_code', ''), 'seq': str(r.get('kfda_code', '')), 'src': '약학정보원'}
         print(f'  ✓ {n}  →  {r.get("drug_name")}  ({"상자" if r.get("pack_img") else "낱알"})', flush=True)
