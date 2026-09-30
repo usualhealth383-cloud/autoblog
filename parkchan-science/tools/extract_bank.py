@@ -15,15 +15,30 @@ OUT = ROOT / 'data'
 ROMAN = {'I': '1', 'II': '2', 'III': '3'}
 MARKS = '①②③④⑤'
 
+# 위·아래 첨자(10<sup>−10</sup>, H<sub>2</sub>O, Na<sup>+</sup>)를 잃지 않는다 — 2026-10-01 이전 추출본은 '10−10 m' 처럼 지수가 사라졌다
+SUP_U = str.maketrans('0123456789+-−n', '⁰¹²³⁴⁵⁶⁷⁸⁹⁺⁻⁻ⁿ'); SUB_U = str.maketrans('0123456789+-', '₀₁₂₃₄₅₆₇₈₉₊₋')
+def supsub_uni(html):
+    """글자만 남길 칸(제목·용어·캡션)용: 첨자를 유니코드 첨자로"""
+    html = re.sub(r'<sup\b[^>]*>(.*?)</sup>', lambda m: re.sub(r'<[^>]+>', '', m[1]).translate(SUP_U), html, flags=re.S)
+    return re.sub(r'<sub\b[^>]*>(.*?)</sub>', lambda m: re.sub(r'<[^>]+>', '', m[1]).translate(SUB_U), html, flags=re.S)
+def strip_tags(t):
+    """<sup>·<sub> 만 남기고 태그를 걷는다(앱이 그대로 그린다)"""
+    return re.sub(r'<(?!/?(?:sup|sub)>)[^>]+>', '', re.sub(r'<(sup|sub)\b[^>]*>', r'<\1>', t))
+def plain_text(node, sep=' '):
+    """get_text 대신: 첨자를 유니코드로 바꾼 사본에서 글자를 뽑는다(원본 트리는 건드리지 않음)"""
+    from bs4 import BeautifulSoup
+    return BeautifulSoup(supsub_uni(str(node)), 'html.parser').get_text(sep)
+
 
 def txt(node, keep_bold=True):
     if node is None: return ''
     if keep_bold:
         html = ''.join(str(c) for c in node.contents)
         html = re.sub(r'<b\b[^>]*>', '<b>', html)
-        html = re.sub(r'<(?!/?b>)[^>]+>', '', html)
+        html = re.sub(r'<(sup|sub)\b[^>]*>', r'<\1>', html)
+        html = re.sub(r'<(?!/?(?:b|sup|sub)>)[^>]+>', '', html)
         return re.sub(r'\s+', ' ', html).replace('&lt;', '<').replace('&gt;', '>').replace('&amp;', '&').strip()
-    return re.sub(r'\s+', ' ', node.get_text(' ')).strip()
+    return re.sub(r'\s+([⁰¹²³⁴⁵⁶⁷⁸⁹⁺⁻ⁿ₀₁₂₃₄₅₆₇₈₉₊₋]+)', r'\1', re.sub(r'\s+', ' ', plain_text(node, ' '))).strip()
 
 
 def lesson_code(path):
@@ -37,7 +52,7 @@ def lesson_code(path):
 
 def selfcontain(svg, markers, cid):
     used = set(re.findall(r'url\(#([^)]+)\)', svg)) | set(re.findall(r'href="#([^"]+)"', svg))
-    need = [markers[i] for i in used if i in markers]
+    need = [markers[i] for i in sorted(used) if i in markers]   # 집합 순회 순서는 실행마다 달라 빌드가 흔들린다
     if need:
         svg = re.sub(r'(<svg\b[^>]*>)', lambda m: m.group(1) + '<defs>' + ''.join(need) + '</defs>', svg, count=1)
     for i in sorted(set(re.findall(r'\bid="([^"]+)"', svg)), key=len, reverse=True):
@@ -110,7 +125,7 @@ def parse_chapter(path):
             bt = bogi.select_one('.bt');
             if bt: bt.extract()
             for br in bogi.find_all('br'): br.replace_with('\n')
-            source = re.sub(r'[ \t]+', ' ', bogi.get_text('')).strip(); source = re.sub(r'\n\s*\n+', '\n', source)
+            source = re.sub(r'[ \t]+', ' ', plain_text(bogi, '')).strip(); source = re.sub(r'\n\s*\n+', '\n', source)
         else: source = ''
         choices = [re.sub(r'^[①②③④⑤]\s*', '', txt(li)) for li in el.select('ul.choices li')]
         fig = el.select_one('figure svg'); figure = selfcontain(str(fig), markers, f'{code}q{n}') if fig else ''
@@ -163,7 +178,7 @@ def auto_from_lecture(concepts):
     for c in concepts:
         code, no = c['lessonId'], int(c['no'])
         for i, m in enumerate(c['myths'], 1):
-            x = re.sub(r'<[^>]+>', '', m['x']).strip(); o = re.sub(r'<[^>]+>', '', m['o']).strip()
+            x = strip_tags(m['x']).strip(); o = strip_tags(m['o']).strip()
             if x.endswith('.') and len(x) > 8:
                 items.append({'id': f'{code}-m{no}-{i}x', 'lessonId': code, 'concept': no, 'step': 'auto', 'type': 'ox', 'stem': x,
                               'source': '', 'choices': [], 'answer': 'X', 'explain': o, 'wrong': '', 'figure': '', 'difficulty': '●○○'})
@@ -175,7 +190,7 @@ def auto_from_lecture(concepts):
         for k, v in c['blanks'].items():
             for t in texts:
                 if '{{' + k + '}}' in t:
-                    sent = next((x for x in re.split(r'(?<=[.!?])\s+', re.sub(r'<[^>]+>', '', t)) if '{{' + k + '}}' in x), None)
+                    sent = next((x for x in re.split(r'(?<=[.!?])\s+', strip_tags(t)) if '{{' + k + '}}' in x), None)
                     if not sent: break
                     stem = re.sub(r'\{\{[㉠㉡㉢]\}\}', '＿＿＿', sent).strip()
                     others = [b for b in all_blanks if b != v and abs(len(b) - len(v)) <= 4]

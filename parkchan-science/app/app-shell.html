@@ -690,6 +690,18 @@ figure.zoomable{cursor:zoom-in}
 .cwrite{display:flex;gap:8px;align-items:flex-end;margin-top:6px}
 .cwrite textarea{flex:1;min-height:46px;max-height:140px;border:1.5px solid var(--line);border-radius:12px;padding:12px 13px;font-family:inherit;font-size:14px;line-height:1.7;background:var(--card);color:var(--ink);resize:vertical}
 .cwrite button{flex:0 0 auto;min-height:46px;padding:0 16px;font-size:14px;font-weight:800;background:var(--brand);color:var(--on-color);border:none;border-radius:12px;cursor:pointer}
+.fbref{font-size:12.5px;line-height:1.6;background:var(--paper,var(--bg));border:1px solid var(--line);border-radius:11px;padding:9px 12px;margin-bottom:10px;color:var(--ink);word-break:keep-all}
+.fbref span{display:block;font-size:11px;font-weight:800;color:var(--faint);letter-spacing:.02em}
+.fbcount{text-align:right;font-size:11.5px;color:var(--faint);margin:-4px 2px 10px;font-variant-numeric:tabular-nums}
+.flag{display:block;margin:4px auto 14px;background:none;border:none;font:inherit;font-size:12.5px;font-weight:700;color:var(--faint);text-decoration:underline;text-underline-offset:3px;cursor:pointer;padding:8px 10px;min-height:36px}
+.fbrow{display:flex;gap:10px;align-items:flex-start;padding:11px 0;border-top:1px solid var(--line)}
+.fbrow:first-of-type{border-top:none}
+.fbrow .b{flex:1;min-width:0;font-size:13.5px;line-height:1.65;word-break:keep-all;overflow-wrap:anywhere}
+.fbrow .m{display:block;font-size:11.5px;color:var(--faint);margin-top:3px}
+.fbrow.done .b{color:var(--faint)}
+.fbrow .kd{display:inline-block;font-size:11px;font-weight:800;border-radius:999px;padding:2px 8px;margin-right:6px;background:var(--brand-soft);color:var(--brand-dark)}
+.fbrow .kd.care{background:var(--warn-soft,rgba(138,100,8,.1));color:var(--warn)}
+sup,sub{font-size:.72em;line-height:0;position:relative;vertical-align:baseline}sup{top:-.5em}sub{bottom:-.2em}
 .piiwarn{background:var(--warn-soft);border:1px solid var(--warn);border-radius:12px;padding:12px 13px;margin-bottom:10px;font-size:12.5px;line-height:1.7;color:var(--warn)}
 .needlogin{background:var(--card);border:1px solid var(--hair);border-radius:16px;padding:26px 18px;text-align:center;margin-bottom:12px}
 .needlogin p{font-size:13.5px;color:var(--muted);line-height:1.8;margin-bottom:14px}
@@ -894,9 +906,12 @@ const daysBetween = (a,b) => Math.round((Date.parse(b)-Date.parse(a))/86400000);
 const addDays = (iso, n) => { const d=new Date(iso+'T00:00:00'); d.setDate(d.getDate()+n); return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`; };
 const tel = t => String(t??'').replace(/[^0-9+\-]/g,'');
 const esc = t => String(t??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-const rich = t => esc(t).replace(/&lt;b&gt;/g,'<b>').replace(/&lt;\/b&gt;/g,'</b>')
+const rich = t => esc(t).replace(/&lt;(\/?)(b|sup|sub)&gt;/g,'<$1$2>')
   .replace(/\{\{(.+?)\}\}/g, (_,m) => `<button class="blank" data-b="${m}">${m}</button>`);
-const plain = t => String(t||'').replace(/<[^>]+>/g,'').replace(/\{\{(.+?)\}\}/g,'$1');
+/* 태그를 걷되 위·아래 첨자는 유니코드로 살린다(10<sup>−10</sup> → 10⁻¹⁰, H<sub>2</sub>O → H₂O) — 검색·공유·원장 목록에서도 뜻이 남게 */
+const SUP = { '0':'⁰','1':'¹','2':'²','3':'³','4':'⁴','5':'⁵','6':'⁶','7':'⁷','8':'⁸','9':'⁹','-':'⁻','−':'⁻','+':'⁺','n':'ⁿ' }, SUB = { '0':'₀','1':'₁','2':'₂','3':'₃','4':'₄','5':'₅','6':'₆','7':'₇','8':'₈','9':'₉','+':'₊','-':'₋' };
+const plainText = h => String(h || '').replace(/<sup>(.*?)<\/sup>/g, (_, t) => [...t].map(ch => SUP[ch] || ch).join('')).replace(/<sub>(.*?)<\/sub>/g, (_, t) => [...t].map(ch => SUB[ch] || ch).join('')).replace(/<[^>]+>/g, '');
+const plain = t => plainText(t).replace(/\{\{(.+?)\}\}/g,'$1');
 /* 그림 140장을 시작할 때 전부 그려 두면(755KB · 만 개 넘는 노드) 느린 폰에서 첫 화면이 늦다.
    문자열로만 싣고, 처음 필요해질 때 한 번 해석한다. */
 let FIGMAP = null;
@@ -1174,6 +1189,13 @@ const DB = (() => {
     consentMark: async (id, what) => { const a = d.accounts.find(x => x.id === id && x.under14); if (!a) return;
       if (what === 'paper'){ a.guardianOk = true; a.guardianHow = 'paper'; a.guardianAt = new Date().toISOString(); } else if (what === 'notified' && (a.guardianOk || (a.guardianHow === 'web' && a.guardianAt))){ a.notifiedAt = new Date().toISOString(); a.guardianOk = true; }
       else if (what === 'reset' && !a.guardianOk && a.guardianHow === 'web'){ a.guardianHow = 'reset'; a.guardianAt = new Date().toISOString(); } w(); },
+    sendFeedback: async f => { const a = me(); if (!a) throw new Error('로그인하면 보낼 수 있어요.');
+      if (a.under14 && !a.guardianOk) throw new Error('보호자 동의가 끝난 뒤에 보낼 수 있어요. 급한 일은 학원에 직접 말해 주세요.');
+      d.feedback = d.feedback || []; if (d.feedback.filter(x => x.uid === a.id && Date.now() - new Date(x.at) < 864e5).length >= 10) throw new Error('의견은 하루 10건까지 보낼 수 있습니다.');
+      d.feedback.push({ id: Date.now(), uid:a.id, kind:f.kind, body:f.body, ref:f.ref||null, ver:f.ver||'', care:careCheck(f.body), at:new Date().toISOString(), done_at:null }); w(); return true; },
+    feedbackList: async () => (d.feedback||[]).filter(x => !x.done_at || Date.now() - new Date(x.done_at) < 30*864e5).map(x => { const a = d.accounts.find(y => y.id === x.uid) || {}; return { ...x, name:a.name||'', code:a.studentCode||'', role:a.role||'' }; })
+      .sort((x, y) => (!!x.done_at - !!y.done_at) || (x.at < y.at ? 1 : -1)),
+    feedbackDone: async (id, done = true) => { const x = (d.feedback||[]).find(y => y.id === id); if (x){ x.done_at = done ? new Date().toISOString() : null; w(); } },
     myWritings: async () => { const a = me(); if (!a) return { posts:[], comments:[] };
       return { posts:(d.posts||[]).filter(x => x.uid===a.id && !x.deleted).map(x => ({ at:x.at, board:x.board, title:x.title, body:x.body })),
                comments:(d.comments||[]).filter(c => c.uid===a.id && !c.deleted).map(c => ({ at:c.at, body:c.body })) }; },
@@ -1304,6 +1326,9 @@ const serverDB = () => {
       const [ps, cs] = await Promise.all([api(`/rest/v1/posts?author=eq.${u}&deleted=is.false&select=at,board,title,body&order=at.asc`), api(`/rest/v1/comments?author=eq.${u}&deleted=is.false&select=at,body&order=at.asc`)]);
       return { posts:ps, comments:cs }; },
     consentRequest: async phone => (await api('/rest/v1/rpc/consent_request', { method:'POST', body: phone != null ? { p_phone:String(phone) } : {} })) || { ok:false, why:'요청하지 못했습니다.' },
+    sendFeedback: async f => { await api('/rest/v1/feedback', { method:'POST', body:{ kind:f.kind, body:f.body, ref:f.ref||null, ver:f.ver||null }, prefer:'return=minimal' }); return true; },
+    feedbackList: async () => (await api('/rest/v1/rpc/feedback_list', { method:'POST', body:{} })) || [],
+    feedbackDone: async (id, done = true) => { await api('/rest/v1/rpc/feedback_done', { method:'POST', body:{ p_id:id, p_done:done } }); },
     consentList: async () => api('/rest/v1/rpc/consent_list', { method:'POST', body:{} }),
     consentMark: async (id, what) => { await api('/rest/v1/rpc/consent_mark', { method:'POST', body:{ p_uid:id, p_what:what } }); },
     /* 푸시 받을 기기 · 앱 오류 기록 · 스토어 결제 확인 */
@@ -1754,6 +1779,7 @@ function renderQuiz(){
         ${pick!==q.answer && !retry ? `<div class="again">↻ 오답 노트에 담았습니다 · <b>${RETRY_DAYS}일 뒤</b> 한 번 더 물어볼게요</div>`:''}
         ${retry ? `<div class="again">${pick===q.answer ? '✓ 이제 됐습니다 — 오답 노트에서 정리됩니다' : '한 번 더 담아 둘게요 — 3일 뒤 다시'}</div>`:''}
         <button class="btn" id="grade">${mode==='review' ? '다음 복습 문제' : (retry ? '오늘의 문제로' : '오늘 개념으로 돌아가기')}</button>
+        <button class="flag" data-report="quiz:${esc(q.lessonId)}#${q.no}">문제·해설에 틀린 곳이 있나요?</button>
       ` : `<p class="qhint">고르면 바로 채점하고, 왜 갈렸는지 알려 드립니다.<br>틀려도 괜찮아요 — 오답은 <b>${RETRY_DAYS}일 뒤</b> 한 번 더 나옵니다.</p>`}
     `}`;
 }
@@ -1820,7 +1846,8 @@ function renderDetail(){
       ${LABS.some(l=>l.lessonId===c.lessonId) ? `<button data-lab="${c.lessonId}"><span class="t">자료 탐구 · 실험</span><span class="d">해석 3단계 · 집에서 해보기</span></button>` : ''}
     </div>
     <button class="btn soft" id="noteThis">이 개념 노트에 적기</button>
-    <div class="seg"><button id="prevC" ${detailIdx===0?'disabled':''}>← 이전 개념</button><button id="nextC" ${detailIdx>=CONCEPTS.length-1?'disabled':''}>다음 개념 →</button></div>`;
+    <div class="seg"><button id="prevC" ${detailIdx===0?'disabled':''}>← 이전 개념</button><button id="nextC" ${detailIdx>=CONCEPTS.length-1?'disabled':''}>다음 개념 →</button></div>
+    <button class="flag" data-report="concept:${esc(c.id)}">이 개념·확인 문제에 틀린 곳이 있나요?</button>`;
 }
 
 /* ═══ 오답 노트 ═══ */
@@ -1952,7 +1979,7 @@ const ago = iso => { const m = Math.floor((Date.now() - new Date(iso)) / 60000);
 const attachName = a => { if (!a) return null;
   if (a.kind === 'concept'){ const c = CONCEPTS.find(x=>x.id===a.id); return c && { k:'교재 개념', t:c.title, s:`${c.bookName} ${c.unit}-${c.lessonId.slice(2)} · 개념 ${c.no}` }; }
   if (a.kind === 'bank'){ const q = BANK.find(x=>x.id===a.id); const L = q && LESSONS.find(l=>l.id===q.lessonId);
-    return q && { k:'문제 은행', t:q.stem.replace(/<[^>]+>/g,'').slice(0,44), s:`${TYPE_NAME[q.type]||''}${L?` · ${L.unit}-${L.id.slice(2)} ${L.name}`:''}` }; }
+    return q && { k:'문제 은행', t:[...plain(q.stem)].slice(0,44).join(''), s:`${TYPE_NAME[q.type]||''}${L?` · ${L.unit}-${L.id.slice(2)} ${L.name}`:''}` }; }
   return null; };
 
 async function renderTalk(){
@@ -2064,6 +2091,41 @@ function sheetNick(next){
     <button class="btn" id="nkSave" data-next="${esc(next||'')}">저장</button>
     <button class="btn ghost" id="sheetClose">닫기</button>`);
 }
+
+/* ═══ 의견 보내기 · 교재 오류 신고 — 어느 개념·문제에서 보냈는지 같이 간다(원장님이 교재를 바로 고칠 수 있게) ═══ */
+const FB_KIND = [['content','교재·문제 오류'],['bug','앱이 이상해요'],['idea','이런 게 있으면'],['other','기타']];
+const FB_HINT = { content:'어디가 어떻게 틀렸는지 적어 주세요. 예) 해설의 단위가 J 가 아니라 N 같아요', bug:'무엇을 하다가 어떻게 됐는지 적어 주세요. 예) 노트 저장을 누르면 화면이 멈춰요', idea:'있으면 좋겠는 기능이나 바꾸고 싶은 점', other:'하고 싶은 말' };
+const VIEW_KO = { today:'오늘', detail:'개념', quiz:'오늘의 문제', bank:'문제 은행', lab:'자료 탐구', me:'내 정보', list:'교재', wrong:'오답 노트', note:'노트', talk:'이야기', plan:'일정', stats:'통계' };
+function refLabel(ref){ if (!ref) return ''; const [k, v = ''] = String(ref).split(':');
+  if (k === 'concept'){ const c = CONCEPTS.find(x => x.id === v); return c ? `개념 ${c.unit}-${c.lessonId.slice(2)} · ${c.no}. ${c.title}` : '개념'; }
+  if (k === 'quiz'){ const [l, n] = v.split('#'); const L = LESSONS.find(x => x.id === l); return `확인 문제 · ${L ? `${L.unit}-${L.id.slice(2)} ${L.name}` : l} ${n}번`; }
+  if (k === 'bank'){ const q = BANK.find(x => x.id === v); const L = q && LESSONS.find(x => x.id === q.lessonId);
+    return `문제 은행 · ${L ? `${L.unit}-${L.id.slice(2)} ${L.name} · ` : ''}${[...plainText(q ? q.stem : v)].slice(0, 30).join('')}…`; }
+  return ref; }
+let fbState = { kind:'content', ref:null };
+function sheetFeedback(ref, kind){
+  if (!ACC){ openSheet(`<h3>의견 보내기</h3><p>로그인하면 원장님께 바로 보낼 수 있어요.${CFG.phone ? ` 지금은 학원(<b>${esc(CFG.phone)}</b>)으로 알려 주셔도 됩니다.` : ''}</p>
+      <button class="btn" id="fbLogin">로그인하기</button><button class="btn ghost" id="sheetClose">닫기</button>`); return; }
+  if (consentPending()){ openSheet(`<h3>의견 보내기</h3><p>보호자 동의가 끝나면 앱에서 보낼 수 있어요. 급한 일은 학원에 직접 말해 주세요.${CFG.phone ? ` (${esc(CFG.phone)})` : ''}</p><button class="btn ghost" id="sheetClose">닫기</button>`); return; }
+  fbState = { kind: kind || (ref ? 'content' : 'bug'), ref: ref || null };
+  openSheet(`<h3>${ref ? '틀린 곳 알려 주기' : '의견 보내기 · 오류 신고'}</h3>
+    <p class="fine" style="text-align:left;padding:0 0 10px">원장님만 읽습니다. 고치면 교재와 앱이 같이 바뀝니다. 이름·전화번호 같은 개인정보는 적지 마세요.</p>
+    ${ref ? `<div class="fbref"><span>보내는 곳</span>${esc(refLabel(ref))}</div>` : ''}
+    <div class="chipbar" role="radiogroup" aria-label="종류" id="fbKinds">${FB_KIND.map(([k, l]) => `<button role="radio" aria-checked="${fbState.kind===k}" data-fbk="${k}" class="${fbState.kind===k?'on':''}">${l}</button>`).join('')}</div>
+    <textarea id="fbBody" maxlength="1000" aria-label="내용" placeholder="${esc(FB_HINT[fbState.kind])}"></textarea>
+    <div class="fbcount"><span id="fbN">0</span> / 1000</div>
+    <div id="fbWarn"></div>
+    <button class="btn" id="fbSend">보내기</button><button class="btn ghost" id="sheetClose">닫기</button>`);
+  setTimeout(() => document.getElementById('fbBody')?.focus(), 60); }
+async function sendFeedback(){
+  const b = document.getElementById('fbBody'), wbox = document.getElementById('fbWarn'); const body = (b.value || '').trim();
+  if (body.length < 2){ wbox.innerHTML = `<div class="piiwarn">내용을 적어 주세요.</div>`; b.focus(); return; }
+  const hard = piiCheck(body).find(h => h.hard); if (hard){ wbox.innerHTML = `<div class="piiwarn">${hard.label}는 보낼 수 없어요. 지우고 다시 보내 주세요.</div>`; return; }
+  const btn = document.getElementById('fbSend'); btn.disabled = true;
+  try { await DBX.sendFeedback({ kind: fbState.kind, body, ref: fbState.ref, ver: `${CFG.version}${isNative ? '-app' : ''} · ${VIEW_KO[view] || view}` }); }
+  catch (e){ btn.disabled = false; wbox.innerHTML = `<div class="piiwarn">${esc(e.message)}</div>`; return; }
+  if (careCheck(body)){ openSheet(`<h3>보내 주셔서 고마워요</h3><p>원장님께 잘 전했어요. 그리고 혹시 마음이 많이 무겁다면, 지금 이야기를 들어 줄 사람이 있어요.</p>${helpCards()}<button class="btn ghost" id="sheetClose">닫기</button>`); return; }
+  closeSheet(); toast('원장님께 보냈어요. 고맙습니다'); }
 
 async function renderPlan(){
   const v = document.getElementById('v-plan');
@@ -2230,7 +2292,8 @@ function renderBankSession(){
     ${graded ? `<div class="verdict"><div class="h">${q.type==='essay' ? '모범 답안' : ok ? '맞혔습니다' : '아쉽습니다'}${q.type!=='essay' && (q.type==='mc'||q.type==='multi') ? ` · 정답 ${MARKS[q.answer-1]}` : q.type==='ox'||q.type==='blank' ? ` · 정답 ${esc(q.answer)}` : ''}</div><p>${rich(q.explain||'개념 카드의 포인트를 다시 읽어 보세요.')}</p></div>
       ${q.wrong ? `<div class="wrongbox"><div class="h">${q.type==='essay'?'채점 기준':'오답 왜 틀렸나'}</div>${rich(q.wrong)}</div>` : ''}
       ${q.type==='essay' && bs.pick===null ? '' : ''}
-      ${q.type==='essay' && bs.pick==='?' ? `<div class="oxrow"><button data-ess="맞음" class="">맞게 썼다</button><button data-ess="틀림">부족했다</button></div>` : `<button class="btn" id="bankNext">${bs.i+1<bs.items.length?'다음 문제':'결과 보기'}</button>`}` : ''}`;
+      ${q.type==='essay' && bs.pick==='?' ? `<div class="oxrow"><button data-ess="맞음" class="">맞게 썼다</button><button data-ess="틀림">부족했다</button></div>` : `<button class="btn" id="bankNext">${bs.i+1<bs.items.length?'다음 문제':'결과 보기'}</button>`}
+      <button class="flag" data-report="bank:${esc(q.id)}">문제·해설에 틀린 곳이 있나요?</button>` : ''}`;
   if (!graded && q.type==='blank') setTimeout(()=>document.getElementById('blankIn')?.focus(), 50);
 }
 function bankAnswer(pick){
@@ -2496,6 +2559,7 @@ function renderMe(){
       ${a ? `<button class="setrow go" id="unauth"><span class="l">학원 코드 연결 해제</span><span class="v"></span></button>` : ''}
       <button class="setrow go" id="logout" style="border:none"><span class="l">로그아웃</span><span class="v"></span></button></div>` : ''}
     <div class="sec"><h2>지원</h2>
+      ${!isOwner() ? `<button class="setrow go" id="fbOpen"><span class="l">의견 보내기 · 오류 신고<small>불편한 점·교재의 틀린 곳을 원장님께</small></span><span class="v"></span></button>` : ''}
       ${CFG.phone ? `<a class="setrow go" href="tel:${esc(CFG.phone)}" style="text-decoration:none"><span class="l">학원에 전화</span><span class="v">${esc(CFG.phone)}</span></a>` : ''}
       ${CFG.kakao ? `<a class="setrow go" href="${esc(CFG.kakao)}" target="_blank" style="text-decoration:none"><span class="l">카카오톡 문의</span><span class="v"></span></a>` : ''}
       <button class="setrow go" data-legal="terms"><span class="l">이용약관</span><span class="v"></span></button>
@@ -2655,6 +2719,13 @@ async function renderAdmin(){
           <button class="btn" id="bulkCheck">미리 보기</button>`}
       </details>
       <p class="tip">1인 1코드. 학생은 '학원 코드 등록', 보호자는 '자녀 연결'에 같은 코드를 씁니다. 만료일이 지나면 저절로 닫힙니다. 이름을 누르면 출석·진도·정보 고치기가 보입니다.</p>
+      ${await (async () => { let fb = []; try { fb = await DBX.feedbackList(); } catch {} if (!fb.length) return '';
+        const open = fb.filter(x => !x.done_at), kname = k => (FB_KIND.find(x => x[0] === k) || [0, '기타'])[1];
+        return `<details class="stuedit" id="fbBox" ${open.length?'open':''}><summary>받은 의견 · 오류 신고 ${open.length?`<span class="cst wait">새 ${open.length}건</span>`:''}</summary>
+          ${fb.map(x => `<div class="fbrow ${x.done_at?'done':''}"><div class="b"><span class="kd ${x.care?'care':''}">${x.care?'먼저 살펴보기':esc(kname(x.kind))}</span>${esc(x.body)}
+            ${x.ref ? `<span class="m">${esc(refLabel(x.ref))}</span>` : ''}<span class="m">${esc(x.name||'이름 없음')}${x.code?` · ${esc(x.code)}`:''} · ${ago(x.at)}${x.ver?` · ${esc(x.ver)}`:''}</span></div>
+            <span style="display:flex;flex-direction:column;gap:6px;align-items:flex-end">${x.ref ? `<button class="mini" data-fbgo="${esc(x.ref)}">개념 보기</button>` : ''}<button class="mini ${x.done_at?'':'pri'}" data-fbdone="${esc(String(x.id))}" data-v="${x.done_at?0:1}">${x.done_at?'되돌리기':'처리함'}</button></span></div>`).join('')}
+          <p class="tip" style="margin:8px 0 0">‘먼저 살펴보기’는 힘든 마음이 담긴 글입니다 — 이야기의 ‘먼저 살펴볼 글’처럼 안부를 물어 주세요. 처리한 의견은 30일 뒤 목록에서 빠지고 1년 뒤 지워집니다.</p></details>`; })()}
       ${await (async () => { let cl = []; try { cl = await DBX.consentList(); } catch {} if (!cl.length) return '';
         const given = x => x.guardian_how==='web' && x.guardian_at && !x.notified_at;   // 보호자가 동의를 표시함 → 확인 문자를 보내야 열린다
         const todo = cl.filter(x => !x.guardian_ok || given(x));
@@ -3139,6 +3210,17 @@ document.addEventListener('click', async e => {
   if (qd){ S.qkeep = (S.qkeep||[]).filter(x => x !== qd.dataset.qdel); save(S); openQuoteKeep(); return; }
   const dm = T('[data-demo]');
   if (dm){ const [em,pw] = dm.dataset.demo.split('|'); document.getElementById('lgEmail').value = em; document.getElementById('lgPw').value = pw; document.getElementById('lgGo').focus(); return; }
+  const rep = T('[data-report]'); if (rep){ sheetFeedback(rep.dataset.report); return; }
+  if (T('#fbOpen')){ sheetFeedback(null); return; }
+  const fbk = T('[data-fbk]'); if (fbk){ fbState.kind = fbk.dataset.fbk; document.querySelectorAll('#fbKinds [data-fbk]').forEach(b => { const on = b.dataset.fbk === fbState.kind; b.classList.toggle('on', on); b.setAttribute('aria-checked', on); });
+    const ta = document.getElementById('fbBody'); if (ta) ta.placeholder = FB_HINT[fbState.kind]; return; }
+  if (T('#fbSend')){ await sendFeedback(); return; }
+  if (T('#fbLogin')){ closeSheet(); authMode='login'; authErr=''; show('auth'); return; }
+  const fbd = T('[data-fbdone]'); if (fbd){ await DBX.feedbackDone(Number(fbd.dataset.fbdone), fbd.dataset.v === '1'); toast(fbd.dataset.v === '1' ? '처리함으로 표시했습니다' : '다시 새 의견으로 돌렸습니다'); renderAdmin(); return; }
+  const fbg = T('[data-fbgo]'); if (fbg){ const [k, v = ''] = fbg.dataset.fbgo.split(':'); let cid = v;
+    if (k === 'quiz') cid = (CONCEPTS.find(c => c.lessonId === v.split('#')[0]) || {}).id;
+    if (k === 'bank'){ const q = BANK.find(x => x.id === v); cid = q && `${q.lessonId}-${String(q.concept).padStart(2, '0')}`; }
+    const i = CONCEPTS.findIndex(c => c.id === cid); if (i >= 0){ detailIdx = i; show('detail'); } else toast('개념을 찾지 못했습니다'); return; }
   if (T('#goLogin')){ authMode='login'; authErr=''; renderAuth(); window.scrollTo(0,0); return; }
   if (T('#goSignup')){ authMode='signup'; authErr=''; SU = SU0(); renderAuth(); window.scrollTo(0,0); return; }
   if (T('#introNext')){ if (introIdx < INTRO.length-1){ introIdx++; renderAuth(); return; } S.introSeen = true; save(S); authMode='start'; renderAuth(); window.scrollTo(0,0); return; }
@@ -3337,6 +3419,7 @@ document.addEventListener('click', async e => {
 });
 document.addEventListener('input', e => {
   /* 가입 단계: 고치기 시작하면 앞의 오류 문구는 거둔다 */
+  if (e.target.id==='fbBody'){ const n = document.getElementById('fbN'); if (n) n.textContent = e.target.value.length; const wb = document.getElementById('fbWarn'); if (wb) wb.innerHTML = ''; return; }
   if (/^su/.test(e.target.id) && authErr){ authErr = ''; document.querySelector('.auth .err')?.remove(); }
   if (e.target.id==='suPw'){ SU.pw = e.target.value; const pw = SU.pw, r1 = pw.length >= 6, r2 = /[0-9]/.test(pw) && /[a-zA-Z가-힣]/.test(pw), el = document.querySelector('.rules');
     if (el) el.innerHTML = `<span class="${r1?'ok':''}">${r1?'✓':'·'} 6자 이상</span><span class="${r2?'ok':''}">${r2?'✓':'·'} 글자와 숫자 섞기(권장)</span>`; return; }

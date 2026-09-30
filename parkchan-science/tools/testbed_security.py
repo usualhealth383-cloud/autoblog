@@ -262,5 +262,33 @@ s, j = rpc('care_list', {}, OWN); check('원장은 이름과 함께 받음', s =
 check('  └ 원장이 쓴 글은 먼저 살펴볼 목록에 안 뜸', not any(x['post_id'] == oid for x in j), j)
 s, j = call('PATCH', f'/rest/v1/posts?id=eq.{cid}&select=id,care', {'body': '이제 괜찮아요. 고마워요'}, N2, 'return=representation'); check('  └ 고쳐 쓰면 다시 판정', s == 200 and j and j[0].get('care') is False, (s, j))
 
+print('▸ 의견 보내기 · 교재 오류 신고')
+FBP = 'return=minimal'
+F1, F1_ID = signup('fb1@test.kr', '의견하나'); F2, F2_ID = signup('fb2@test.kr', '의견둘')
+s, _ = call('POST', '/rest/v1/feedback', {'kind': 'content', 'body': '해설 단위가 틀린 것 같아요', 'ref': 'concept:1101-01', 'ver': '1.0'}, F1, FBP); check('학생이 의견 보냄', s == 201, s)
+s, j = call('GET', '/rest/v1/feedback?select=uid,kind,body,care,done_at', tok=F1); check('  └ 보낸 사람은 자기 의견을 봄 · 주인은 서버가 채움', len(j) == 1 and j[0]['uid'] == F1_ID and j[0]['done_at'] is None, j)
+s, j = call('GET', '/rest/v1/feedback?select=id', tok=F2); check('다른 학생은 남의 의견을 못 봄', j == [], j)
+s, _ = call('POST', '/rest/v1/feedback', {'kind': 'bug', 'body': '비로그인 도배'}, None, FBP); check('로그인 안 하면 못 보냄', s in (401, 403), s)
+s, _ = call('POST', '/rest/v1/feedback', {'kind': 'bug', 'body': '남인 척', 'uid': F2_ID}, F1, FBP); check('남의 이름으로 못 보냄(uid 칸 못 씀)', s >= 400, s)
+s, _ = call('POST', '/rest/v1/feedback', {'kind': 'bug', 'body': '처리 표시 조작', 'done_at': '2026-01-01T00:00:00Z'}, F1, FBP); check('처리 표시를 스스로 못 넣음', s >= 400, s)
+s, _ = call('POST', '/rest/v1/feedback', {'kind': 'hack', 'body': '없는 종류'}, F1, FBP); check('없는 종류는 거절', s >= 400, s)
+s, _ = call('POST', '/rest/v1/feedback', {'kind': 'bug', 'body': 'x' * 1001}, F1, FBP); check('1,000자 넘으면 거절', s >= 400, s)
+s, _ = call('POST', '/rest/v1/feedback', {'kind': 'bug', 'body': '링크', 'ref': 'javascript:alert(1)'}, F1, FBP); check('이상한 참조(ref)는 거절', s >= 400, s)
+s, _ = call('PATCH', '/rest/v1/feedback?uid=eq.' + F1_ID, {'body': '고쳐 쓰기'}, F1); check('보낸 의견은 못 고침', s >= 400 or call('GET', '/rest/v1/feedback?select=body', tok=F1)[1][0]['body'] != '고쳐 쓰기', s)
+s, _ = call('POST', '/rest/v1/feedback', {'kind': 'other', 'body': '요즘 너무 힘들어서 죽고 싶어요'}, F2, FBP)
+s, j = rpc('feedback_list', {}, F2); check('학생은 받은 의견 목록을 못 받음', s == 200 and j == [], j)
+s, j = rpc('feedback_list', {}, OWN); fbs = j if isinstance(j, list) else []
+check('원장은 이름과 함께 받음', len(fbs) == 2 and all(x.get('name') for x in fbs), j)
+check('  └ 힘든 마음이 담긴 의견은 care 표시', any(x['care'] for x in fbs if '죽고' in x['body']) and not any(x['care'] for x in fbs if '단위' in x['body']), fbs)
+fid = next(x['id'] for x in fbs if '단위' in x['body'])
+s, _ = rpc('feedback_done', {'p_id': fid}, F1); check('학생은 처리 표시 못 함', s >= 400, s)
+rpc('feedback_done', {'p_id': fid}, OWN); check('원장이 처리함 표시', call('GET', '/rest/v1/feedback?select=done_at', tok=F1)[1][0]['done_at'] is not None)
+codes = [call('POST', '/rest/v1/feedback', {'kind': 'idea', 'body': f'제안 {i}'}, F1, FBP)[0] for i in range(10)]
+check('하루 10건까지(도배 제한)', codes[:9] == [201] * 9 and codes[9] >= 400, codes)
+s, _ = call('POST', '/rest/v1/feedback', {'kind': 'bug', 'body': '동의 전 아이'}, K6, FBP); check('보호자 동의 전 14세 미만은 서버에 못 보냄', s >= 400, s)
+cur.execute("update feedback set at = now() - interval '13 months' where uid = %s and body = '요즘 너무 힘들어서 죽고 싶어요'", (F2_ID,)); cur.execute('select private.purge_old()'); cur.connection.commit()
+cur.execute("select count(*) from feedback where uid = %s", (F2_ID,)); check('1년 지난 의견은 지움', cur.fetchone()[0] == 0)
+rpc('delete_my_account', {}, F1); cur.execute("select count(*) from feedback where uid = %s", (F1_ID,)); check('계정을 지우면 의견도 지워짐', cur.fetchone()[0] == 0)
+
 print(f'\n보안 시험 {len(OK)}/{len(OK) + len(BAD)} 통과')
 sys.exit(1 if BAD else 0)

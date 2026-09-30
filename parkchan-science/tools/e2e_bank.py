@@ -20,7 +20,7 @@ async def main():
         await pg.click('#goLogin'); await pg.fill('#lgEmail','student@demo.kr'); await pg.fill('#lgPw','1234'); await pg.click('#lgGo'); await pg.wait_for_timeout(700)
         assert [t for t in await pg.locator('.tab').all_inner_texts()]==['오늘','교재','문제','이야기','일정','내 정보']
         await pg.click('.tab[data-v="bank"]'); await pg.wait_for_timeout(400); await pg.screenshot(path=f'{SC}/b1_bank.png', full_page=True)
-        t = await pg.locator('#v-bank').inner_text(); assert '1,695' in t and '자료 탐구' in t, t[:200]
+        t = await pg.locator('#v-bank').inner_text(); assert f"{await pg.evaluate('BANK.length'):,}" in t and '자료 탐구' in t, t[:200]
         await pg.click('[data-bsel="type"][data-val="ox"]'); await pg.wait_for_timeout(200); await pg.click('#bankStart'); await pg.wait_for_timeout(400)
         assert await pg.evaluate('bs && bs.items.length')==10 and await pg.evaluate('bs.items.every(q=>q.type==="ox")')
         for i in range(10):

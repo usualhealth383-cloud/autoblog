@@ -158,6 +158,29 @@ end $$;
 drop trigger if exists notes_limit on notes;
 create trigger notes_limit after insert on notes for each row execute function private.note_limit();
 
+-- 의견 보내기 · 교재 오류 신고 — 보낸 사람과 원장만 본다. 하루 10건 · 1년 뒤 파기 · 만 14세 미만은 보호자 동의 뒤
+create table if not exists feedback (
+  id      bigint generated always as identity primary key,
+  uid     uuid not null default auth.uid() references auth.users on delete cascade,
+  kind    text not null check (kind in ('content','bug','idea','other')),   -- 교재·문제 오류 / 앱 오류 / 제안 / 기타
+  body    text not null check (char_length(body) between 2 and 1000),
+  ref     text check (ref is null or ref ~ '^(concept|quiz|bank|lab):[A-Za-z0-9_#.-]{1,60}$'),   -- 어느 개념·문제에서 보냈는지
+  ver     text check (ver is null or char_length(ver) <= 40),
+  care    boolean not null default false,                                    -- 힘든 마음이 담긴 글(이야기와 같은 규칙)
+  at      timestamptz not null default now(),
+  done_at timestamptz
+);
+create index if not exists feedback_open on feedback (at desc) where done_at is null;
+create or replace function private.feedback_guard() returns trigger language plpgsql security definer set search_path = public, private as $$
+begin
+  new.uid := auth.uid(); new.at := now(); new.done_at := null; new.care := private.care_hit(new.body);
+  if (select count(*) from feedback where uid = new.uid and at > now() - interval '1 day') >= 10 then
+    raise exception '의견은 하루 10건까지 보낼 수 있습니다.' using errcode = '54000'; end if;
+  return new;
+end $$;
+drop trigger if exists feedback_guard on feedback;
+create trigger feedback_guard before insert on feedback for each row execute function private.feedback_guard();
+
 -- 이야기(커뮤니티)
 create table if not exists posts (
   id        uuid primary key default gen_random_uuid(),
@@ -436,6 +459,20 @@ begin
     select 'comment', c.id, c.post_id, null, left(c.body, 140), c.nick, c.at, pr.name, pr.student_code, pr.role
       from comments c join profiles pr on pr.id = c.author where c.care and not c.staff and not c.deleted and c.at > now() - interval '30 days') x), '[]'::json);
 end $$;
+-- 원장: 받은 의견(보낸 사람 이름·학원 코드와 함께) · 처리 표시
+create or replace function feedback_list() returns json language plpgsql stable security definer set search_path = public as $$
+begin
+  if not is_owner() then return '[]'::json; end if;
+  return coalesce((select json_agg(x order by x.done_at is not null, x.at desc) from (
+    select f.id, f.kind, f.body, f.ref, f.ver, f.care, f.at, f.done_at, pr.name, pr.student_code as code, pr.role
+      from feedback f join profiles pr on pr.id = f.uid
+     where f.done_at is null or f.done_at > now() - interval '30 days' limit 200) x), '[]'::json);
+end $$;
+create or replace function feedback_done(p_id bigint, p_done boolean default true) returns void language plpgsql security definer set search_path = public as $$
+begin
+  if not is_owner() then raise exception 'owner only' using errcode = '42501'; end if;
+  update feedback set done_at = case when p_done then now() else null end where id = p_id;
+end $$;
 create or replace function private.count_comments() returns trigger language plpgsql security definer set search_path = public as $$
 begin
   update posts set comment_n = (select count(*) from comments where post_id = coalesce(new.post_id, old.post_id) and not deleted)
@@ -602,6 +639,9 @@ grant update (deleted) on comments to authenticated;
 
 revoke all on purchases from anon, authenticated; grant select on purchases to authenticated;
 revoke all on push_tokens from anon, authenticated; grant select, delete on push_tokens to authenticated;
+revoke all on feedback from anon, authenticated; grant select, insert (kind, body, ref, ver) on feedback to authenticated;
+grant usage on sequence feedback_id_seq to authenticated;
+revoke execute on function feedback_list(), feedback_done(bigint, boolean) from public, anon; grant execute on function feedback_list(), feedback_done(bigint, boolean) to authenticated;
 revoke all on notes from anon, authenticated; grant select, delete on notes to authenticated;
 grant insert (id, date, title, body, cids, updated_at), update (id, date, title, body, cids, updated_at) on notes to authenticated;   -- 올리기(upsert)가 id 도 SET 한다 · 남의 행은 RLS 가 막는다
 revoke all on guardian_links from anon, authenticated; grant select on guardian_links to authenticated;   -- 연결·해제는 link_code()·unlink_child() 로만
@@ -618,6 +658,7 @@ alter table posts enable row level security;      alter table comments enable ro
 alter table push_tokens enable row level security; alter table client_errors enable row level security;
 alter table guardian_links enable row level security;
 alter table notes enable row level security;
+alter table feedback enable row level security;
 
 do $$ declare p record; begin      -- 다시 실행해도 되게 기존 정책을 비운다
   for p in select policyname, tablename from pg_policies where schemaname = 'public' loop
@@ -668,6 +709,9 @@ create policy note_sel on notes for select to authenticated using (uid = (select
 create policy note_ins on notes for insert to authenticated with check (uid = (select auth.uid()) and (select consent_ok()));
 create policy note_upd on notes for update to authenticated using (uid = (select auth.uid())) with check (uid = (select auth.uid()) and (select consent_ok()));
 create policy note_del on notes for delete to authenticated using (uid = (select auth.uid()));
+-- 의견: 보낸 사람은 자기 것만 본다(원장은 feedback_list 로). 고치기·지우기 없음
+create policy fb_sel on feedback for select to authenticated using (uid = (select auth.uid()));
+create policy fb_ins on feedback for insert to authenticated with check (uid = (select auth.uid()) and (select consent_ok()));
 -- 이야기: 로그인한 사람은 지워지지 않았고 신고 3건 미만인 글을 본다(자기 글은 늘 보인다). 자기 글만 고치고 지운다(되살리기는 안 됨)
 create policy read_posts on posts for select to authenticated using (not deleted and (report_n < 3 or author = (select auth.uid())) and (select consent_ok()));
 create policy write_posts on posts for insert to authenticated with check (author = (select auth.uid()) and (select consent_ok()));
@@ -698,6 +742,7 @@ create or replace function private.purge_old() returns void language sql securit
   delete from client_errors where at < now() - interval '90 days';
   delete from private.attempts where at < now() - interval '1 day';
   delete from private.consent_links where at < now() - interval '8 days';
+  delete from feedback where at < now() - interval '1 year';
   delete from auth.users where id in (select id from profiles where under14 and not guardian_ok
     and ((guardian_at is null and created_at < now() - interval '7 days') or (guardian_how = 'reset' and guardian_at < now() - interval '7 days')));   -- 보호자가 동의를 표시했고 학원 확인만 남은 계정은 두고 원장 목록에 남긴다 · '번호 다름'으로 되돌린 계정은 그때부터 7일
 $$;

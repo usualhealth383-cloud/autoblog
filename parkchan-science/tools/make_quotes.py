@@ -1,4 +1,4 @@
-#!/usrr/bin/env python3
+#!/usr/bin/env python3
 """오늘의 한 마디 — 글귀 모음을 만든다.
 
 원칙
@@ -140,6 +140,9 @@ for i, q in enumerate(Q, 1):
     items.append(it)
 
 out = {'quotes': items, 'bridge': BRIDGE}
+import sys
+if '--force' not in sys.argv:   # 2026-10-01: 이 옛 모음(39개·선생님 글 포함)이 CI 에서 검증된 396개를 덮어썼다. 지금 글귀는 tools/build_quotes.py 로 만든다
+    raise SystemExit('✗ 옛 글귀 모음입니다. data/quotes.json 은 tools/build_quotes.py(출처 대조: tools/verify_quotes.py)로 만듭니다. 정말 덮어쓰려면 --force')
 (ROOT / 'data' / 'quotes.json').write_text(json.dumps(out, ensure_ascii=False, indent=1), encoding='utf-8')
 from collections import Counter
 print(f"글귀 {len(items)}개 · {dict(Counter(i['kind'] for i in items))} · 단원 잇기 {len(BRIDGE)}개")

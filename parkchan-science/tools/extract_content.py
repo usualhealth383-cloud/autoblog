@@ -20,6 +20,20 @@ UNIT_OF = {'11': ('I', '과학의 기초'), '12': ('II', '물질과 규칙성'),
 BOOK_OF = {'1': '통합과학 1', '2': '통합과학 2'}
 MARKS = '①②③④⑤'
 
+# 위·아래 첨자(10<sup>−10</sup>, H<sub>2</sub>O, Na<sup>+</sup>)를 잃지 않는다 — 2026-10-01 이전 추출본은 '10−10 m' 처럼 지수가 사라졌다
+SUP_U = str.maketrans('0123456789+-−n', '⁰¹²³⁴⁵⁶⁷⁸⁹⁺⁻⁻ⁿ'); SUB_U = str.maketrans('0123456789+-', '₀₁₂₃₄₅₆₇₈₉₊₋')
+def supsub_uni(html):
+    """글자만 남길 칸(제목·용어·캡션)용: 첨자를 유니코드 첨자로"""
+    html = re.sub(r'<sup\b[^>]*>(.*?)</sup>', lambda m: re.sub(r'<[^>]+>', '', m[1]).translate(SUP_U), html, flags=re.S)
+    return re.sub(r'<sub\b[^>]*>(.*?)</sub>', lambda m: re.sub(r'<[^>]+>', '', m[1]).translate(SUB_U), html, flags=re.S)
+def strip_tags(t):
+    """<sup>·<sub> 만 남기고 태그를 걷는다(앱이 그대로 그린다)"""
+    return re.sub(r'<(?!/?(?:sup|sub)>)[^>]+>', '', re.sub(r'<(sup|sub)\b[^>]*>', r'<\1>', t))
+def plain_text(node, sep=' '):
+    """get_text 대신: 첨자를 유니코드로 바꾼 사본에서 글자를 뽑는다(원본 트리는 건드리지 않음)"""
+    from bs4 import BeautifulSoup
+    return BeautifulSoup(supsub_uni(str(node)), 'html.parser').get_text(sep)
+
 
 def txt(node, keep_bold=False):
     """조판 태그를 걷어 낸 문자열. keep_bold 면 <b> 만 남긴다(앱에서 강조에 쓴다)."""
@@ -29,9 +43,10 @@ def txt(node, keep_bold=False):
         html = ''.join(str(c) for c in node.contents)
         html = re.sub(r'<span class="blank">(.*?)</span>', r'{{\1}}', html)
         html = re.sub(r'<b\b[^>]*>', '<b>', html)
-        html = re.sub(r'<(?!/?b>)[^>]+>', '', html)
+        html = re.sub(r'<(sup|sub)\b[^>]*>', r'<\1>', html)
+        html = re.sub(r'<(?!/?(?:b|sup|sub)>)[^>]+>', '', html)
         return re.sub(r'\s+', ' ', html).strip()
-    return re.sub(r'\s+', ' ', node.get_text(' ')).strip()
+    return re.sub(r'\s+([⁰¹²³⁴⁵⁶⁷⁸⁹⁺⁻ⁿ₀₁₂₃₄₅₆₇₈₉₊₋]+)', r'\1', re.sub(r'\s+', ' ', plain_text(node, ' '))).strip()
 
 
 def file_markers(src_text):

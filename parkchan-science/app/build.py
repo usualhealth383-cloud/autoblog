@@ -2,6 +2,11 @@
 """앱 셸에 개념·문항·그림 데이터를 심어 배포용 한 파일로 만든다."""
 import json, pathlib
 ROOT = pathlib.Path(__file__).resolve().parent.parent
+# 교재 데이터 점검 — 지수·첨자가 사라진 채(10−10 m) 배포되지 않게. 실패하면 빌드하지 않는다
+import subprocess as _sp, sys as _sys
+_chk = _sp.run([_sys.executable, str(ROOT / 'tools' / 'check_content.py')], capture_output=True, text=True)
+if _chk.returncode != 0:
+    print(_chk.stdout[-2000:]); raise SystemExit('✗ 교재 데이터 점검 실패 — tools/check_content.py 를 확인하세요. 배포본을 만들지 않았습니다.')
 shell = (ROOT / 'app' / 'app-shell.html').read_text(encoding='utf-8')
 concepts = json.loads((ROOT / 'data/concepts.json').read_text(encoding='utf-8'))
 quizzes = json.loads((ROOT / 'data/quizzes.json').read_text(encoding='utf-8'))
