@@ -6,7 +6,7 @@
 import asyncio, sys, os, json, urllib.request as U
 from playwright.async_api import async_playwright
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from _ui import signup, NO_INTRO
+from _ui import signup, NO_INTRO, auto_yes
 GW = 'http://127.0.0.1:8767'; ANON = json.loads(U.urlopen(GW + '/__anon').read())['anon']
 APP = f'http://127.0.0.1:8765/index.html?server={GW}&key={ANON}'
 
@@ -17,7 +17,7 @@ async def main():
         b = await p.chromium.launch(executable_path='/opt/pw-browsers/chromium'); errs = []
         async def device():
             ctx = await b.new_context(viewport={'width': 400, 'height': 820}); await ctx.add_init_script(NO_INTRO); pg = await ctx.new_page()
-            pg.on('pageerror', lambda e: errs.append(str(e))); pg.on('dialog', lambda d: asyncio.ensure_future(d.accept()))
+            pg.on('pageerror', lambda e: errs.append(str(e))); await auto_yes(pg)
             await pg.goto(APP); await pg.wait_for_timeout(600); return pg
         async def resume(pg):   # 앱으로 돌아옴(다른 앱 갔다 옴)
             await pg.evaluate("lastPull = 0; document.dispatchEvent(new Event('visibilitychange'))"); await pg.wait_for_timeout(900)

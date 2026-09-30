@@ -6,7 +6,7 @@
 import asyncio, sys, os, json, urllib.request as U
 from playwright.async_api import async_playwright
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from _ui import signup, NO_INTRO
+from _ui import signup, NO_INTRO, auto_yes
 GW = 'http://127.0.0.1:8767'; ANON = json.loads(U.urlopen(GW + '/__anon').read())['anon']
 APP = f'http://127.0.0.1:8765/index.html?server={GW}&key={ANON}'
 SC = sys.argv[sys.argv.index('--shots')+1] if '--shots' in sys.argv[:-1] else '/tmp/e2e_authmail'; os.makedirs(SC, exist_ok=True)
@@ -39,7 +39,7 @@ async def main():
             assert await s.evaluate('S.auth && S.auth.code') == 'MAIL01', '인증 뒤 학원 코드가 연결되지 않았다'
             assert 'access_token' not in s.url, '주소창에 토큰이 남았다'; await s.screenshot(path=f'{SC}/m02_confirmed.png')
             # 3) 로그아웃 → 비밀번호 재설정 메일 → 새 비밀번호 → 새 비밀번호로 로그인
-            await s.click('.tab[data-v="me"]'); s.on('dialog', lambda d: asyncio.ensure_future(d.accept())); await s.click('#logout'); await s.wait_for_timeout(600)
+            await s.click('.tab[data-v="me"]'); await auto_yes(s); await s.click('#logout'); await s.wait_for_timeout(600)
             await s.click('#goLogin'); await s.click('#goForgot'); await s.fill('#fgEmail', 'mail@test.kr'); await s.click('#fgGo'); await s.wait_for_timeout(700)
             assert '재설정 메일' in await s.locator('.auth .info').inner_text()
             link = [m for m in mails() if m['type'] == 'recovery'][-1]['link']

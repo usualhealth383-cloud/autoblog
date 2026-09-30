@@ -7,7 +7,7 @@
 import asyncio, sys, os, json, datetime as dt, urllib.request as U
 from playwright.async_api import async_playwright
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from _ui import signup, NO_INTRO
+from _ui import signup, NO_INTRO, auto_yes
 SRV = '--server' in sys.argv
 GW = 'http://127.0.0.1:8767'
 APP = 'http://127.0.0.1:8765/index.html' + (f"?server={GW}&key={json.loads(U.urlopen(GW + '/__anon').read())['anon']}" if SRV else '?server=')
@@ -22,7 +22,7 @@ async def main():
         ctx = await b.new_context(viewport={'width': 400, 'height': 820}, accept_downloads=True); await ctx.add_init_script(NO_INTRO); o = await ctx.new_page()
         o.on('pageerror', lambda e: errs.append(str(e)))
         o.on('console', lambda m: errs.append(m.text) if m.type == 'error' and 'ERR_' not in m.text and 'status of 4' not in m.text else None)
-        o.on('dialog', lambda d: asyncio.ensure_future(d.accept()))
+        await auto_yes(o)
         await o.goto(APP); await o.wait_for_timeout(700)
         async def login(em, pw):
             await o.click('#goLogin'); await o.fill('#lgEmail', em); await o.fill('#lgPw', pw); await o.click('#lgGo'); await o.wait_for_timeout(900)

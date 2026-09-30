@@ -5,6 +5,8 @@
 전제: docs/parkchan 이 :8765 에 떠 있다.   사용: python3 tools/e2e_onboard.py [--shots 폴더]
 """
 import asyncio, sys, os
+import sys as _s, os as _o; _s.path.insert(0, _o.path.dirname(_o.path.abspath(__file__)))
+from _ui import auto_yes
 from playwright.async_api import async_playwright
 APP = 'http://127.0.0.1:8765/index.html?server='
 SC = sys.argv[sys.argv.index('--shots')+1] if '--shots' in sys.argv[:-1] else '/tmp/e2e_onboard'; os.makedirs(SC, exist_ok=True)
@@ -65,7 +67,7 @@ async def main():
         assert await s.evaluate('view') == 'today' and await s.evaluate('S.auth && S.auth.code') == 'MON123'
         assert await s.evaluate('ACC.under14') is True and await s.evaluate('consentPending()') is True
         # ⑨ 원장 가입은 4단계에서 끝(학원 코드 단계 없음) · 보호자는 5단계에서 자녀 코드
-        await s.click('.tab[data-v="me"]'); await s.wait_for_timeout(300); s.on('dialog', lambda d: asyncio.ensure_future(d.accept())); await s.click('#logout'); await s.wait_for_timeout(600)
+        await s.click('.tab[data-v="me"]'); await s.wait_for_timeout(300); await auto_yes(s); await s.click('#logout'); await s.wait_for_timeout(600)
         await s.click('#goSignup'); await s.click('[data-role="owner"]'); await s.click('#suNext'); await s.wait_for_timeout(150)
         assert '2 / 4' in await s.locator('.stepbar').inner_text() and await s.locator('input[name=suAge]').count() == 0, '원장에게 나이를 묻거나 단계 수가 틀림'
         await s.click('#suPrev'); await s.click('#suPrev'); await s.wait_for_timeout(150); assert await s.evaluate('authMode') == 'start'

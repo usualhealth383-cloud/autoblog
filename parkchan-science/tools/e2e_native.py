@@ -10,7 +10,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import testbed_functions as tf
 from playwright.async_api import async_playwright
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from _ui import signup, NO_INTRO
+from _ui import signup, NO_INTRO, auto_yes
 SC = sys.argv[sys.argv.index('--shots')+1] if '--shots' in sys.argv[:-1] else '/tmp/e2e_native'; os.makedirs(SC, exist_ok=True)
 GW = tf.GW
 STUB = """
@@ -50,7 +50,7 @@ async def main():
             ctx = await b.new_context(viewport={'width': 400, 'height': 820}); await ctx.add_init_script(NO_INTRO); await ctx.add_init_script(STUB); s = await ctx.new_page()
             s.on('pageerror', lambda e: errs.append(str(e)) if '시험용' not in str(e) else None)
             s.on('console', lambda m: errs.append(m.text) if m.type == 'error' and 'ERR_' not in m.text and 'status of 4' not in m.text else None)
-            s.on('dialog', lambda d: asyncio.ensure_future(d.accept()))
+            await auto_yes(s)
             await s.goto(APP); await s.wait_for_timeout(700)
             assert await s.evaluate('isNative') is True
             await s.evaluate('CFG.push = true')

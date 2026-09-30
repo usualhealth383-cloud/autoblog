@@ -26,3 +26,18 @@ async def signup(pg, name, email, pw='123456', role='student', code='', child=''
     await pg.wait_for_timeout(wait)
     if welcome and await pg.locator('#welcomeGo').count():
         await pg.click('#welcomeGo'); await pg.wait_for_timeout(900)
+
+
+# 앱은 기기 기본 confirm() 대신 앱 안 확인 시트(#askYes)를 쓴다. 시험에서는 뜨는 대로 '확인'을 누른다.
+# 직접 누르는 시험을 하려면 페이지에서 window.__askManual = true.
+AUTO_YES = ("(() => { if (window.__autoYes) return; window.__autoYes = 1; new MutationObserver(() => { if (window.__askManual) return; "
+            "const b = document.getElementById('askYes'); if (b && !b.dataset.auto){ b.dataset.auto = 1; setTimeout(() => b.click(), 60); } })"
+            ".observe(document, { childList: true, subtree: true }); })()")
+
+
+async def auto_yes(pg):
+    await pg.add_init_script(AUTO_YES)
+    try:
+        await pg.evaluate(AUTO_YES)
+    except Exception:
+        pass

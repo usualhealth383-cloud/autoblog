@@ -9,7 +9,7 @@
 import asyncio, sys, os
 from playwright.async_api import async_playwright
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from _ui import signup, NO_INTRO
+from _ui import signup, NO_INTRO, auto_yes
 APP = 'http://127.0.0.1:8765/index.html'
 SC = sys.argv[sys.argv.index('--shots')+1] if '--shots' in sys.argv[:-1] else '/tmp/e2e_regress'; os.makedirs(SC, exist_ok=True)
 
@@ -22,7 +22,7 @@ async def main():
         s = await ctx.new_page()
         s.on('pageerror', lambda e: errs.append(str(e)))
         s.on('console', lambda m: errs.append(m.text) if m.type == 'error' and 'ERR_' not in m.text else None)
-        s.on('dialog', lambda d: asyncio.ensure_future(d.accept()))
+        await auto_yes(s)
         await s.goto(APP); await s.wait_for_timeout(400)
         async def login(em, pw):
             await s.click('#goLogin'); await s.fill('#lgEmail', em); await s.fill('#lgPw', pw); await s.click('#lgGo'); await s.wait_for_timeout(600)

@@ -8,7 +8,7 @@ import asyncio, sys, os, json, re, urllib.request as U
 from urllib.parse import unquote
 from playwright.async_api import async_playwright
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from _ui import signup, NO_INTRO
+from _ui import signup, NO_INTRO, auto_yes
 GW = 'http://127.0.0.1:8767'; ANON = json.loads(U.urlopen(GW + '/__anon').read())['anon']; SERVICE = json.loads(U.urlopen(GW + '/__anon').read())['service']
 APP = f'http://127.0.0.1:8765/index.html?server={GW}&key={ANON}'
 SC = sys.argv[sys.argv.index('--shots')+1] if '--shots' in sys.argv[:-1] else '/tmp/e2e_consent'; os.makedirs(SC, exist_ok=True)
@@ -23,7 +23,7 @@ async def main():
             ctx = await b.new_context(viewport={'width': 400, 'height': 820}); await ctx.add_init_script(NO_INTRO); pg = await ctx.new_page()
             pg.on('pageerror', lambda e: errs.append(str(e)))
             pg.on('console', lambda m: errs.append(m.text) if m.type == 'error' and 'ERR_' not in m.text and 'status of 4' not in m.text else None)
-            pg.on('dialog', lambda d: asyncio.ensure_future(d.accept())); return ctx, pg
+            await auto_yes(pg); return ctx, pg
         # ① 아이 가입(만 14세 미만)
         kc, k = await page(); await k.goto(APP); await k.wait_for_timeout(700)
         await signup(k, '어린이', 'kid@t.kr', u14=True, gname='김보호', gphone='010-1111-2222')

@@ -7,7 +7,7 @@
 import asyncio, sys, os, json, urllib.request as U
 from playwright.async_api import async_playwright
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from _ui import signup, NO_INTRO
+from _ui import signup, NO_INTRO, auto_yes
 SRV = '--server' in sys.argv; GW = 'http://127.0.0.1:8767'
 APP = 'http://127.0.0.1:8765/index.html' + (f"?server={GW}&key={json.loads(U.urlopen(GW + '/__anon').read())['anon']}" if SRV else '?server=')
 SC = sys.argv[sys.argv.index('--shots')+1] if '--shots' in sys.argv[:-1] else '/tmp/e2e_family'; os.makedirs(SC, exist_ok=True)
@@ -21,7 +21,7 @@ async def main():
         ctx = await b.new_context(viewport={'width': 400, 'height': 820}); await ctx.add_init_script(NO_INTRO); pg = await ctx.new_page()
         pg.on('pageerror', lambda e: errs.append(str(e)))
         pg.on('console', lambda m: errs.append(m.text) if m.type == 'error' and 'ERR_' not in m.text and 'status of 4' not in m.text else None)
-        pg.on('dialog', lambda d: asyncio.ensure_future(d.accept()))
+        await auto_yes(pg)
         await pg.goto(APP); await pg.wait_for_timeout(700)
         async def login(em, pw):
             await pg.click('#goLogin'); await pg.fill('#lgEmail', em); await pg.fill('#lgPw', pw); await pg.click('#lgGo'); await pg.wait_for_timeout(1000)

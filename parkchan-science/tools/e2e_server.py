@@ -6,7 +6,7 @@
 import asyncio, sys, os, urllib.request
 from playwright.async_api import async_playwright
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from _ui import signup, NO_INTRO
+from _ui import signup, NO_INTRO, auto_yes
 import json as _j, urllib.request as _u
 GW = 'http://127.0.0.1:8767'   # tools/testbed_up.sh — 진짜 Postgres·PostgREST 시험대
 try: ANON = _j.loads(_u.urlopen(GW + '/__anon').read())['anon']
@@ -24,7 +24,7 @@ async def main():
             pg = await ctx.new_page()
             pg.on('pageerror', lambda e: errs.append(str(e)))
             pg.on('console', lambda m: errs.append(m.text) if m.type == 'error' and 'ERR_' not in m.text and 'status of 4' not in m.text else None)
-            pg.on('dialog', lambda d: asyncio.ensure_future(d.accept()))
+            await auto_yes(pg)
             await pg.goto(APP); await pg.wait_for_timeout(600)
             return ctx, pg
         shot = lambda pg, n: pg.screenshot(path=f'{SC}/{n}.png', full_page=True)

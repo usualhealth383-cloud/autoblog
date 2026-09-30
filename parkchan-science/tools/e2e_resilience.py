@@ -6,7 +6,7 @@
 import asyncio, sys, os, json, urllib.request as U
 from playwright.async_api import async_playwright
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from _ui import signup, NO_INTRO
+from _ui import signup, NO_INTRO, auto_yes
 GW = 'http://127.0.0.1:8767'; ANON = json.loads(U.urlopen(GW + '/__anon').read())['anon']
 APP = f'http://127.0.0.1:8765/index.html?server={GW}&key={ANON}'
 SC = sys.argv[sys.argv.index('--shots')+1] if '--shots' in sys.argv[:-1] else '/tmp/e2e_resilience'; os.makedirs(SC, exist_ok=True)
@@ -18,7 +18,7 @@ async def main():
         b = await p.chromium.launch(executable_path='/opt/pw-browsers/chromium'); errs = []
         ctx = await b.new_context(viewport={'width': 400, 'height': 820}); await ctx.add_init_script(NO_INTRO); s = await ctx.new_page()
         s.on('pageerror', lambda e: errs.append(str(e)))
-        s.on('dialog', lambda d: asyncio.ensure_future(d.accept()))
+        await auto_yes(s)
         await s.goto(APP); await s.wait_for_timeout(700)
         # ① 서버가 안 닿을 때 로그인 → 한국어 안내(영어 'Failed to fetch' 금지)
         await ctx.route(lambda url: '8767' in url, lambda r: asyncio.ensure_future(r.abort()))

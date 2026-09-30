@@ -3,6 +3,8 @@
 사용: python3 tools/a11y_audit.py   (앱이 http://127.0.0.1:8765 에 떠 있어야 한다)
 """
 import asyncio, json, sys
+import sys as _s, os as _o; _s.path.insert(0, _o.path.dirname(_o.path.abspath(__file__)))
+from _ui import auto_yes
 from playwright.async_api import async_playwright
 
 JS = r"""
@@ -47,7 +49,7 @@ async def walk_onboarding(pg, look):
     await pg.click('#suSkipCode'); await pg.wait_for_timeout(900); await look('환영')
     await pg.click('#welcomeGo'); await pg.wait_for_timeout(700)
     await pg.click('.tab[data-v="me"]'); await pg.wait_for_timeout(300)
-    pg.on('dialog', lambda d: __import__('asyncio').ensure_future(d.accept())); await pg.click('#logout'); await pg.wait_for_timeout(600)
+    await auto_yes(pg); await pg.click('#logout'); await pg.wait_for_timeout(600)
 
 async def main():
     async with async_playwright() as p:

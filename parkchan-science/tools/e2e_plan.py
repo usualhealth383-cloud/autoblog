@@ -6,7 +6,7 @@ import asyncio, os, sys
 from playwright.async_api import async_playwright
 import os as _os
 sys.path.insert(0, _os.path.dirname(_os.path.abspath(__file__)))
-from _ui import NO_INTRO
+from _ui import NO_INTRO, auto_yes
 SC = sys.argv[sys.argv.index('--shots')+1] if '--shots' in sys.argv[:-1] else '/tmp/pcs-e2e-plan'
 os.makedirs(SC, exist_ok=True)
 async def main():
@@ -14,7 +14,7 @@ async def main():
         b = await p.chromium.launch(executable_path='/opt/pw-browsers/chromium')
         ctx = await b.new_context(viewport={'width':390,'height':844}, device_scale_factor=2); await ctx.add_init_script(NO_INTRO); pg = await ctx.new_page()
         errs=[]; pg.on('pageerror', lambda e: errs.append(str(e)))
-        pg.on('dialog', lambda d: asyncio.ensure_future(d.accept()))
+        await auto_yes(pg)
         await pg.goto('http://127.0.0.1:8765/index.html'); await pg.wait_for_timeout(800)
         await pg.click('#goLogin'); await pg.click('[data-demo^="student"]'); await pg.click('#lgGo'); await pg.wait_for_timeout(900)
         tabs = await pg.locator('.tab').all_inner_texts()

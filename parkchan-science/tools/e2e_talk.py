@@ -6,7 +6,7 @@
 import asyncio, os, sys
 from playwright.async_api import async_playwright
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from _ui import signup, NO_INTRO
+from _ui import signup, NO_INTRO, auto_yes
 SC = sys.argv[sys.argv.index('--shots')+1] if '--shots' in sys.argv[:-1] else '/tmp/pcs-e2e-talk'
 os.makedirs(SC, exist_ok=True)
 import json as _j, urllib.request as _u
@@ -25,7 +25,7 @@ async def main():
         b = await p.chromium.launch(executable_path='/opt/pw-browsers/chromium')
         ctx = await b.new_context(viewport={'width':390,'height':844}, device_scale_factor=2); await ctx.add_init_script(NO_INTRO); pg = await ctx.new_page()
         errs = []; pg.on('pageerror', lambda e: errs.append(str(e)))
-        pg.on('dialog', lambda d: asyncio.ensure_future(d.accept()))
+        await auto_yes(pg)
         await pg.goto('http://127.0.0.1:8765/index.html'); await pg.wait_for_timeout(700)
 
         # 로그인 전에는 읽기만 안내
@@ -133,7 +133,7 @@ async def server_mode():
         b=await p.chromium.launch(executable_path='/opt/pw-browsers/chromium')
         ctx=await b.new_context(viewport={'width':390,'height':844}); await ctx.add_init_script(NO_INTRO); pg=await ctx.new_page()
         errs=[]; pg.on('pageerror', lambda e: errs.append(str(e)))
-        pg.on('dialog', lambda d: asyncio.ensure_future(d.accept()))
+        await auto_yes(pg)
         _u.urlopen(_u.Request(GW + '/__reset', method='POST')).read()
         await pg.goto(APP); await pg.wait_for_timeout(800)
         await signup(pg, '서버학생', 's1@demo.kr')

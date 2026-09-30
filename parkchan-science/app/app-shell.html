@@ -179,6 +179,13 @@ button,.tab,.btn,.chip,.chipbar button,.seg button{-webkit-user-select:none;user
 @media (prefers-reduced-motion: reduce){.vin,.skel i,#ptr.spin svg{animation:none}.btn,.pcard,.setrow.go,.stu{transition:none}}
 .btn.ghost{background:transparent;color:var(--muted);border:1px solid var(--line)}
 .btn.soft{background:var(--brand-soft);color:var(--brand-dark)}
+.btn.danger{background:var(--no);color:var(--on-color)}
+/* 확인 묻기 — 기기 기본 대화상자(주소가 찍히는 회색 창) 대신 앱 안의 작은 시트. 열린 시트 위에도 뜬다 */
+.sheet-bg.yn-bg{z-index:45}
+.sheet.yn{padding-top:22px}
+.sheet.yn p{font-size:15px;color:var(--ink);line-height:1.65;margin-bottom:18px;word-break:keep-all}
+.sheet.yn .ynb{display:flex;gap:8px}
+.sheet.yn .ynb .btn{margin:0;flex:1}
 .btn.sm{font-size:13px;padding:11px;margin-bottom:8px}
 .linkbtn{background:none;border:none;color:var(--muted);font-size:13px;cursor:pointer;text-decoration:underline;padding:14px 2px}
 .linkbtn.danger{color:var(--no)}
@@ -717,6 +724,7 @@ figure.zoomable{cursor:zoom-in}
 </div>
 <div id="netbar"></div>
   <div id="sheet"></div>
+  <div id="ask"></div>
 
 <script type="application/json" id="d-concepts"><!--CONCEPTS--></script>
 <script type="application/json" id="d-quizzes"><!--QUIZZES--></script>
@@ -2487,7 +2495,7 @@ async function dropPush(){ if (!pushToken || !SRV) return; try { await api(`/res
 let lastBack = 0;
 function nativeInit(){ if (!isNative) return; const App = plug('App');
   App && App.addListener('resume', () => pullProgress());
-  App && App.addListener('backButton', () => { if (document.getElementById('sheetLock')) return; if (document.getElementById('sheetBg')) return closeSheet();
+  App && App.addListener('backButton', () => { if (askDone) return askDone(false); if (document.getElementById('sheetLock')) return; if (document.getElementById('sheetBg')) return closeSheet();
     if (view==='auth' && authMode==='signup'){ document.getElementById('suPrev')?.click(); return; }
     if (view==='auth' && ['login','forgot'].includes(authMode)){ document.getElementById('authBack')?.click(); return; }
     if (view==='auth' && authMode==='intro' && introIdx > 0){ introIdx--; renderAuth(); return; }
@@ -2502,6 +2510,14 @@ function nativeInit(){ if (!isNative) return; const App = plug('App');
 /* ═══ 시트 · 화면 전환 · 탭 ═══ */
 function openSheet(html){ document.getElementById('sheet').innerHTML = `<div class="sheet-bg" id="sheetBg"><div class="sheet"><div class="grab"></div>${html}</div></div>`; }
 function closeSheet(){ document.getElementById('sheet').innerHTML=''; }
+// 확인 묻기: await ask('지울까요?', '지우기', true) → true/false. 바깥·취소·뒤로가기·Esc 는 false
+let askDone = null;
+function ask(msg, ok='확인', danger=false){ return new Promise(res => { askDone && askDone(false);
+  const el = document.getElementById('ask'); const back = document.activeElement;
+  el.innerHTML = `<div class="sheet-bg yn-bg" id="askBg"><div class="sheet yn" role="alertdialog" aria-modal="true" aria-labelledby="askMsg"><div class="grab"></div><p id="askMsg">${esc(msg)}</p><div class="ynb"><button class="btn ghost" id="askNo">취소</button><button class="btn${danger?' danger':''}" id="askYes">${esc(ok)}</button></div></div></div>`;
+  askDone = v => { askDone = null; el.innerHTML = ''; el.onclick = null; try { back && back.focus && back.focus({ preventScroll:true }); } catch {} res(v); };
+  el.onclick = e => { e.stopPropagation(); const id = e.target.closest('button')?.id || e.target.id; if (id==='askYes') askDone(true); else if (id==='askNo' || id==='askBg') askDone(false); };
+  setTimeout(() => document.getElementById('askNo')?.focus(), 30); }); }
 const VIEWS = ['auth','today','quiz','list','detail','wrong','stats','me','plans','parent','admin','bank','lab','plan','talk','post'];
 const ICON = { talk:'<path d="M20.5 12c0 4-3.8 7.2-8.5 7.2-1 0-2-.15-2.9-.42L4 20.5l1.5-3.6C4.2 15.6 3.5 13.9 3.5 12c0-4 3.8-7.2 8.5-7.2s8.5 3.2 8.5 7.2z"/><path d="M8.5 11.5h7M8.5 14h4.5"/>', plan:'<rect x="3.5" y="5" width="17" height="15" rx="2.5"/><path d="M3.5 10h17M8 3v4M16 3v4"/><path d="M8.5 14.5l2 2 4-4"/>', bank:'<path d="M4 5h16v14H4z"/><path d="M8 9h8M8 13h5"/>', today:'<rect x="4" y="5" width="16" height="15" rx="2.5"/><path d="M4 10h16M9 3v4M15 3v4"/>', list:'<path d="M5 4h9l5 5v11H5z"/><path d="M14 4v5h5"/>', wrong:'<path d="M6 4h12v16l-6-4-6 4z"/>', stats:'<path d="M4 20V10M10 20V4M16 20v-8M22 20H2"/>', me:'<circle cx="12" cy="8" r="3.6"/><path d="M5 20c1.4-3.8 4-5.6 7-5.6s5.6 1.8 7 5.6"/>', parent:'<circle cx="9" cy="8" r="3"/><circle cx="17" cy="10" r="2.2"/><path d="M3 20c1-3.5 3.3-5.2 6-5.2s5 1.7 6 5.2M14 20c.5-2 1.7-3.4 3.5-3.4s2.8 1.4 3.5 3.4"/>', admin:'<path d="M4 19h16M6 19V9l6-4 6 4v10"/><path d="M10 19v-5h4v5"/>' };
 const home = () => ACC && ACC.role==='parent' ? 'parent' : ACC && ACC.role==='owner' ? 'admin' : 'today';
@@ -2631,9 +2647,9 @@ document.addEventListener('click', async e => {
     else await DBX.addPost({ board:g('poB'), title, body, attach });
     closeSheet(); toast(id ? '고쳤습니다' : '올렸습니다'); if (id) renderPost(); else { talkBoard='전체'; show('talk'); } return; }
   if (T('#pEdit')){ const x = await DBX.post(postId); if (x) sheetPost(x); return; }
-  if (T('#pDel')){ if (!confirm('이 글을 지울까요?')) return; await DBX.delPost(postId); toast('지웠습니다'); show('talk'); return; }
+  if (T('#pDel')){ if (!await ask('이 글을 지울까요?', '지우기',true)) return; await DBX.delPost(postId); toast('지웠습니다'); show('talk'); return; }
   if (T('#pLike')){ await DBX.likeToggle('post', postId); renderPost(); return; }
-  if (T('#pReport')){ if (!confirm('이 글을 신고할까요? 신고가 쌓이면 가려지고 원장님이 확인합니다.')) return;
+  if (T('#pReport')){ if (!await ask('이 글을 신고할까요? 신고가 쌓이면 가려지고 원장님이 확인합니다.', '신고하기',true)) return;
     const cnt = await DBX.reportItem('post', postId); toast(`신고했습니다 (${cnt}건)`); renderPost(); return; }
   if (T('#cGo')){
     const el = document.getElementById('cIn'), body = (el.value||'').trim();
@@ -2646,17 +2662,17 @@ document.addEventListener('click', async e => {
     poiOk = false; talkErr = ''; await DBX.addComment(postId, body); renderPost(); return; }
   const bk = T('#pBlock'); if (bk){ const u = bk.dataset.u; if (!u) return;
     S.blocked ||= []; const i = S.blocked.indexOf(u);
-    if (i < 0){ if (!confirm('이 사용자를 차단할까요? 이 사람의 글과 댓글이 보이지 않게 됩니다.')) return; S.blocked.push(u); toast('차단했습니다'); save(S); show('talk'); return; }
+    if (i < 0){ if (!await ask('이 사용자를 차단할까요? 이 사람의 글과 댓글이 보이지 않게 됩니다.', '차단하기',true)) return; S.blocked.push(u); toast('차단했습니다'); save(S); show('talk'); return; }
     S.blocked.splice(i,1); toast('차단을 풀었습니다'); save(S); renderPost(); return; }
   const cb = T('[data-cblock]'); if (cb){ const u = cb.dataset.cblock; if (!u) return;
-    if (!confirm('이 사용자를 차단할까요? 이 사람의 글과 댓글이 보이지 않게 됩니다.')) return;
+    if (!await ask('이 사용자를 차단할까요? 이 사람의 글과 댓글이 보이지 않게 됩니다.', '차단하기',true)) return;
     S.blocked ||= []; if (!S.blocked.includes(u)) S.blocked.push(u); save(S); toast('차단했습니다'); renderPost(); return; }
   if (T('#blockOpen')){ openBlockList(); return; }
   const ub = T('[data-unblock]'); if (ub){ S.blocked = (S.blocked||[]).filter(x => x !== ub.dataset.unblock); save(S); openBlockList(); return; }
   const cl = T('[data-clike]'); if (cl){ await DBX.likeToggle('comment', cl.dataset.clike); renderPost(); return; }
   const cp = T('[data-cpick]'); if (cp){ await DBX.pickComment(postId, cp.dataset.cpick); toast('채택했습니다'); renderPost(); return; }
-  const cd = T('[data-cdel]'); if (cd){ if (!confirm('이 댓글을 지울까요?')) return; await DBX.delComment(cd.dataset.cdel); renderPost(); return; }
-  const cr = T('[data-creport]'); if (cr){ if (!confirm('이 댓글을 신고할까요?')) return; const cnt = await DBX.reportItem('comment', cr.dataset.creport); toast(`신고했습니다 (${cnt}건)`); renderPost(); return; }
+  const cd = T('[data-cdel]'); if (cd){ if (!await ask('이 댓글을 지울까요?', '지우기',true)) return; await DBX.delComment(cd.dataset.cdel); renderPost(); return; }
+  const cr = T('[data-creport]'); if (cr){ if (!await ask('이 댓글을 신고할까요?', '신고하기',true)) return; const cnt = await DBX.reportItem('comment', cr.dataset.creport); toast(`신고했습니다 (${cnt}건)`); renderPost(); return; }
   const oa = T('[data-openatt]'); if (oa){ const [k, id] = [oa.dataset.openatt.split(':')[0], oa.dataset.openatt.slice(oa.dataset.openatt.indexOf(':')+1)];
     if (k === 'concept'){ const i = CONCEPTS.findIndex(c=>c.id===id); if (i >= 0){ detailIdx = i; show('detail'); } } return; }
   if (T('#nickOpen')){ sheetNick(''); return; }
@@ -2665,8 +2681,8 @@ document.addEventListener('click', async e => {
     const t = g('scT').trim(), dt = g('scDate');
     if (!t || !dt){ toast('제목과 날짜를 넣어 주세요'); return; }
     await DBX.sendSchedule(g('scCls'), dt, t, g('scK'), g('scM').trim()); toast('일정을 보냈습니다'); renderAdmin(); return; }
-  const apd = T('[data-admpdel]'); if (apd){ if (!confirm('이 글을 지울까요? 되돌릴 수 없습니다.')) return; await DBX.delPost(apd.dataset.admpdel); toast('지웠습니다'); renderAdmin(); return; }
-  const acd = T('[data-admcdel]'); if (acd){ if (!confirm('이 댓글을 지울까요?')) return; await DBX.delComment(acd.dataset.admcdel); toast('지웠습니다'); renderAdmin(); return; }
+  const apd = T('[data-admpdel]'); if (apd){ if (!await ask('이 글을 지울까요? 되돌릴 수 없습니다.', '지우기',true)) return; await DBX.delPost(apd.dataset.admpdel); toast('지웠습니다'); renderAdmin(); return; }
+  const acd = T('[data-admcdel]'); if (acd){ if (!await ask('이 댓글을 지울까요?', '지우기',true)) return; await DBX.delComment(acd.dataset.admcdel); toast('지웠습니다'); renderAdmin(); return; }
   const scd = T('[data-scdel]'); if (scd){ await DBX.delSchedule(scd.dataset.scdel); toast('지웠습니다'); renderAdmin(); return; }
   /* 일정 */
   const ddSel = T('[data-dd]'); if (ddSel){ planDday = ddSel.dataset.dd; renderPlan(); return; }
@@ -2817,15 +2833,15 @@ document.addEventListener('click', async e => {
     const inSheet = !!T('#childGo').closest('.sheet');
     try { const r = await DBX.linkCode('child', v); if (!r.ok){ if (inSheet){ document.getElementById('childAddErr').textContent = r.why; return; } childErr = r.why; (view==='parent'?renderParent:renderMe)(); return; }
       ACC = await DBX.me(); childErr=''; parentSel = r.student.code; closeSheet(); toast(`${r.student.name} 학생과 연결했습니다`); show('parent'); initPush(); } catch (err){ childErr=err.message; (view==='parent'?renderParent:renderMe)(); } return; }
-  if (T('#unlinkChild')){ const c = T('#unlinkChild').dataset.code; if (!confirm('이 자녀와의 연결을 해제할까요? 출석·진도·공지를 더 볼 수 없습니다.')) return;
+  if (T('#unlinkChild')){ const c = T('#unlinkChild').dataset.code; if (!await ask('이 자녀와의 연결을 해제할까요? 출석·진도·공지를 더 볼 수 없습니다.', '연결 해제',true)) return;
     if (c) await DBX.unlinkChild(c); else await DBX.linkCode('child', ''); ACC = await DBX.me(); parentSel = ''; renderParent(); return; }
   const kid = T('[data-kid]'); if (kid){ parentSel = kid.dataset.kid; renderParent(); return; }
   if (T('#childAdd')){ childErr = ''; openSheet(`<h3>자녀 한 명 더 연결</h3><p>다른 자녀가 받은 학원 코드 6자리를 넣으세요. 자녀 화면 맨 위에서 이름을 눌러 바꿔 볼 수 있습니다.</p>
       <div class="codebox" style="margin:0 0 10px"><div class="f"><input id="childIn" class="code" placeholder="자녀 코드 6자리" maxlength="6" autocapitalize="characters" autocomplete="off"><button id="childGo">연결</button></div><div class="err" id="childAddErr"></div></div>
       <button class="btn ghost" id="sheetClose">닫기</button>`); setTimeout(()=>document.querySelector('.sheet #childIn')?.focus(), 50); return; }
-  if (T('#unauth')){ if (!confirm('학원 코드 연결을 해제할까요? 공지·출석이 닫힙니다.')) return; await flushProgress(); S.auth=null; if (ACC){ await DBX.linkCode('student', ''); ACC = await DBX.me(); } save(S); renderMe(); return; }
-  if (T('#logout')){ if (!confirm('로그아웃할까요? 진도는 계정에 저장되어 있습니다.')) return; await flushProgress(); await dropPush(); await DBX.signOut(); ACC=null; S = freshS(); admTab='students'; parentSel=''; talkNew=0; talkBoard='전체'; talkQ=''; save(S); authMode='start'; show('auth'); return; }
-  if (T('#delAccount')){ if (!confirm('계정을 삭제하면 진도·오답 노트가 함께 지워지고 되돌릴 수 없습니다. 삭제할까요?')) return;
+  if (T('#unauth')){ if (!await ask('학원 코드 연결을 해제할까요? 공지·출석이 닫힙니다.', '연결 해제',true)) return; await flushProgress(); S.auth=null; if (ACC){ await DBX.linkCode('student', ''); ACC = await DBX.me(); } save(S); renderMe(); return; }
+  if (T('#logout')){ if (!await ask('로그아웃할까요? 진도는 계정에 저장되어 있습니다.', '로그아웃',false)) return; await flushProgress(); await dropPush(); await DBX.signOut(); ACC=null; S = freshS(); admTab='students'; parentSel=''; talkNew=0; talkBoard='전체'; talkQ=''; save(S); authMode='start'; show('auth'); return; }
+  if (T('#delAccount')){ if (!await ask('계정을 삭제하면 진도·오답 노트가 함께 지워지고 되돌릴 수 없습니다. 삭제할까요?', '계정 삭제',true)) return;
     try { await DBX.deleteAccount(); ACC=null; clearTimeout(syncT); S = freshS(); try { localStorage.removeItem(KEY); } catch {} authMode='start'; toast('계정을 삭제했습니다'); show('auth'); } catch (err){ toast(err.message); } return; }
   if (T('#editProfile')){ openSheet(`<h3>이름 · 연락처</h3><div class="f"><input id="epName" placeholder="이름" value="${esc(ACC.name)}" style="flex:1;border:1.5px solid var(--line);border-radius:12px;padding:12px 14px;font-size:15px;font-family:inherit;background:var(--paper);color:var(--ink)"></div>
       <div class="f"><input id="epPhone" placeholder="연락처" inputmode="tel" value="${esc(ACC.phone)}" style="flex:1;border:1.5px solid var(--line);border-radius:12px;padding:12px 14px;font-size:15px;font-family:inherit;background:var(--paper);color:var(--ink)"></div>
@@ -2861,7 +2877,7 @@ document.addEventListener('click', async e => {
   if (T('#consentSend')){ await sendConsent(); return; }
   if (T('#consentCopy')){ const t = T('#consentCopy').dataset.t; try { if (navigator.share) await navigator.share({ text:t }); else { await navigator.clipboard.writeText(t); toast('복사했습니다 · 보호자에게 붙여 보내 주세요'); } } catch {} return; }
   if (T('#consentPaper')){ openSheet(`<h3>학원에서 서면으로 동의</h3><p>보호자가 학원에 오시면 원장님께 <b>보호자 동의서</b>를 받아 서명해 주세요. 원장님이 앱에서 확인하면 바로 열립니다.</p><button class="btn ghost" id="sheetClose">닫기</button>`); return; }
-  const cpap = T('[data-cpaper]'); if (cpap){ if (!confirm('보호자에게 서면 동의서를 받으셨나요? 받은 서면은 보관해 주세요.')) return; await DBX.consentMark(cpap.dataset.cpaper, 'paper'); toast('서면 동의를 기록했습니다'); renderAdmin(); return; }
+  const cpap = T('[data-cpaper]'); if (cpap){ if (!await ask('보호자에게 서면 동의서를 받으셨나요? 받은 서면은 보관해 주세요.', '받았습니다',false)) return; await DBX.consentMark(cpap.dataset.cpaper, 'paper'); toast('서면 동의를 기록했습니다'); renderAdmin(); return; }
   const cnot = T('[data-cnotify]'); if (cnot){ await DBX.consentMark(cnot.dataset.cnotify, 'notified'); setTimeout(renderAdmin, 400); return; }
 
   /* 원장 — 여러 명 등록 */
@@ -2886,18 +2902,18 @@ document.addEventListener('click', async e => {
     const patch = { name:g('seName').trim(), cls:g('seCls'), phone:g('sePhone').trim(), until:g('seUntil') };
     if (!patch.name || !patch.until){ toast('이름과 만료일을 채워 주세요'); return; }
     try { await DBX.updateStudent(code, patch); toast('저장했습니다'); closeSheet(); renderAdmin(); } catch (err){ toast(err.message); } return; }
-  if (T('#seRelease')){ if (!confirm('이 코드에 묶인 학생 계정을 풀까요? 학생이 새 계정에서 코드를 다시 등록할 수 있게 됩니다.')) return;
+  if (T('#seRelease')){ if (!await ask('이 코드에 묶인 학생 계정을 풀까요? 학생이 새 계정에서 코드를 다시 등록할 수 있게 됩니다.', '연결 풀기',true)) return;
     const code = T('#seRelease').dataset.code; try { await DBX.releaseCode(code); toast('연결을 풀었습니다'); openStudent(code); } catch (err){ toast(err.message); } return; }
-  const ac = T('[data-attcancel]'); if (ac){ const [code, date] = ac.dataset.attcancel.split('|'); if (!confirm(`${kdate(date)} 출석을 취소할까요?`)) return;
+  const ac = T('[data-attcancel]'); if (ac){ const [code, date] = ac.dataset.attcancel.split('|'); if (!await ask(`${kdate(date)} 출석을 취소할까요?`, '출석 취소',true)) return;
     try { await DBX.cancelAttend(code, date); toast('출석을 취소했습니다'); openStudent(code); } catch (err){ toast(err.message); } return; }
   if (T('#exGo')){ const cls = document.getElementById('exCls').value, until = document.getElementById('exUntil').value; if (!until){ toast('새 만료일을 골라 주세요'); return; }
-    if (!confirm(`${cls} 학생 중 ${kdate(until)}보다 먼저 끝나는 학생을 모두 ${kdate(until)}까지 늘릴까요?`)) return;
+    if (!await ask(`${cls} 학생 중 ${kdate(until)}보다 먼저 끝나는 학생을 모두 ${kdate(until)}까지 늘릴까요?`, '모두 늘리기',false)) return;
     try { const n = await DBX.extendClass(cls, until); toast(`${n}명의 수강 기간을 늘렸습니다`); renderAdmin(); } catch (err){ toast(err.message); } return; }
-  const nd = T('[data-ntdel]'); if (nd){ if (!confirm('이 공지를 지울까요? 학생·보호자 화면에서도 사라집니다.')) return; await DBX.delNotice(nd.dataset.ntdel); toast('지웠습니다'); renderAdmin(); return; }
+  const nd = T('[data-ntdel]'); if (nd){ if (!await ask('이 공지를 지울까요? 학생·보호자 화면에서도 사라집니다.', '지우기',true)) return; await DBX.delNotice(nd.dataset.ntdel); toast('지웠습니다'); renderAdmin(); return; }
   if (T('#attCsv')){ await downloadAttendance(admMonth); return; }
   /* 원장 */
   const adm = T('[data-adm]'); if (adm){ admTab=adm.dataset.adm; issued=null; issuedPass=null; renderAdmin(); return; }
-  const del = T('[data-del]'); if (del){ e.stopPropagation(); if (confirm('이 학생의 코드를 해제할까요? 앱 접근이 바로 닫힙니다.')){ await DBX.removeStudent(del.dataset.del); renderAdmin(); } return; }
+  const del = T('[data-del]'); if (del){ e.stopPropagation(); if (await ask('이 학생의 코드를 해제할까요? 앱 접근이 바로 닫힙니다.', '코드 해제',true)){ await DBX.removeStudent(del.dataset.del); renderAdmin(); } return; }
   const stu = T('[data-stu]'); if (stu){ openStudent(stu.dataset.stu); return; }
   if (T('#stAdd')){ const name=(document.getElementById('stName').value||'').trim(), cls=document.getElementById('stCls').value, until=document.getElementById('stUntil').value, phone=(document.getElementById('stPhone').value||'').trim();
     if (!name || !until){ toast('이름과 만료일을 채워 주세요'); return; } issued = await DBX.addStudent({name, cls, until, phone}); renderAdmin(); return; }
@@ -2907,7 +2923,7 @@ document.addEventListener('click', async e => {
     admCls=cls; await DBX.sendNotice(cls, t, d); toast(`${cls}에 보냈습니다`); renderAdmin(); return; }
   const am = T('[data-amon]'); if (am){ const [y,m]=admMonth.split('-').map(Number); const d=new Date(y, m-1+(+am.dataset.amon), 1); admMonth=`${d.getFullYear()}-${pad(d.getMonth()+1)}`; renderAdmin(); return; }
   if (T('#clsAdd')){ const n=(document.getElementById('clsName').value||'').trim(), s=document.getElementById('clsStart').value||'18:00'; if (!n){ toast('반 이름을 넣어 주세요'); return; } await DBX.addClass(n, s); renderAdmin(); return; }
-  const dc = T('[data-delcls]'); if (dc){ if (confirm(`${dc.dataset.delcls} 반을 삭제할까요? 학생은 남고 반만 사라집니다.`)){ await DBX.removeClass(dc.dataset.delcls); renderAdmin(); } return; }
+  const dc = T('[data-delcls]'); if (dc){ if (await ask(`${dc.dataset.delcls} 반을 삭제할까요? 학생은 남고 반만 사라집니다.`, '반 삭제',true)){ await DBX.removeClass(dc.dataset.delcls); renderAdmin(); } return; }
   if (T('#passIssue')){ issuedPass = await DBX.issuePass(+document.getElementById('passDays').value); renderAdmin(); return; }
 });
 document.addEventListener('input', e => {
@@ -2920,7 +2936,7 @@ document.addEventListener('input', e => {
 document.addEventListener('change', e => {
   if (e.target.id==='agAll'){ SU.terms = SU.privacy = e.target.checked; if (e.target.checked && SU.role==='student' && !SU.age){ suKeep(); } authErr=''; renderAuth(); return; }
   if (e.target.id==='agTerms' || e.target.id==='agPrivacy' || e.target.name==='suAge'){ suKeep(); authErr=''; renderAuth(); return; } if (e.target.id==='notifyAt'){ S.notifyAt=e.target.value; save(S); scheduleReminder(true); toast(S.notifyAt==='안 받음'?'알림을 받지 않습니다':`매일 ${S.notifyAt}에 알려 드립니다`); } });
-document.addEventListener('keydown', e => { if (e.key!=='Enter') return; const id = e.target.id; const click = s => document.getElementById(s)?.click();
+document.addEventListener('keydown', e => { if (e.key==='Escape' && askDone){ e.preventDefault(); return askDone(false); } if (e.key!=='Enter') return; if (askDone) return; const id = e.target.id; const click = s => document.getElementById(s)?.click();
   if (/^su(Email|Pw|Name|Phone|GName|GPhone|Code|Child)$/.test(id)){ e.preventDefault(); (document.getElementById('suNext') || document.getElementById('suGo'))?.click(); return; }
   const M = {codeIn:'codeGo', attIn:'attGo', lgPw:'lgGo', lgEmail:'lgGo', fgEmail:'fgGo', childIn:'childGo', passIn:'passGo', clsName:'clsAdd', blankIn:'blankGo'}; M[id] && click(M[id]); });
 document.addEventListener('change', e => { if (e.target.id==='bankLesson'){ bankSel.lesson = e.target.value; renderBank(); } });
