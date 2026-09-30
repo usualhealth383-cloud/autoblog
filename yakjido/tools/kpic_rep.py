@@ -33,6 +33,8 @@ MANUAL = {
     'udca': ('우루사정', '우루사정100', 'ursodeoxycholic'),
     'urea-cream': ('유리아크림', '한미유리아크림', 'urea'),
     'eye-decongestant': ('나조린', '나조린점안액', 'naphazoline'),
+    'allergy-eyedrop': ('알러콘', '알러콘점안액', 'ketotifen'),
+    'oral-contraceptive': ('에이리스', '에이리스정', 'levonorgestrel'),
     'vitamin-d-rx': ('디맥', '디맥정7000IU', 'cholecalciferol'),
 }
 
@@ -64,7 +66,9 @@ def main():
     for f in sorted((ROOT / 'content').glob('drugs*.json')):
         v = json.loads(f.read_text(encoding='utf-8')); drugs += v if isinstance(v, list) else v.get('drugs', [])
     out = json.loads((DATA / 'kpic-extra.json').read_text(encoding='utf-8')) if (DATA / 'kpic-extra.json').exists() else {}
-    rep = {}
+    # 이미 찾은 대표 제품은 지킨다 — 한 번 검색이 실패(네트워크)했다고 빠지면 「약사 안내」 탭이 사라진다
+    repf = ROOT / 'content' / 'drugRep.json'
+    rep = json.loads(repf.read_text(encoding='utf-8')) if repf.exists() else {}
     k = Kpic()
     for d in drugs:
         s = src.get('label_' + d['id'].replace('-', '_'))

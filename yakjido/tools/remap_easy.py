@@ -35,7 +35,7 @@ INGR = {
   '자일로메타졸린염산염':'xylometazoline', '클로르족사존':'chlorzoxazone', '이소프로필안티피린':'ipa',
   '에텐자미드':'ethenzamide', '카페인무수물':'caffeine', '파마브롬':'pamabrom',
   '퓨시드산나트륨':'fusidic-acid', '무피로신':'mupirocin', '테르비나핀염산염':'terbinafine', '테르비나핀':'terbinafine',
-  '트리암시놀론아세토니드':'triamcinolone', '폴리크레줄렌':'policresulen', '판크레아틴':'digestive-enzyme',
+  '트리암시놀론아세토니드':'triamcinolone', '폴리크레줄렌':'policresulen', '폴리크레줄렌액50%':'policresulen', '판크레아틴':'digestive-enzyme',
   '시메티콘':'simethicone', '카르복시메틸셀룰로오스나트륨':'artificial-tears', '히알루론산나트륨':'artificial-tears',
   # ── 2026-09 보강: 성분명만 걸려 있던 약국 약들 ──
   '폴리에틸렌글리콜4000':'peg', '폴리에틸렌글리콜3350':'peg',
@@ -67,7 +67,6 @@ INGR = {
   '부틸스코폴라민브롬화물':'butylscopolamine', '스코폴리아엑스':'butylscopolamine',
   '비타민B1':'thiamine-like', '나프록센나트륨수화물':'naproxen',
   '이소프로필안티피린':'ipa', '아세트아미노펜(서방정)':'acetaminophen',
-  '크로모글리크산나트륨':'artificial-tears',
   '폴리비닐알코올':'artificial-tears', '트레할로스':'artificial-tears',
   '클로르페니라민':'chlorpheniramine',
   '옥시메타졸린염산염':'xylometazoline', '나파졸린염산염':'xylometazoline',
@@ -75,6 +74,7 @@ INGR = {
   # ── 2026-09-21 보강 ②: 새로 넣은 약 6종 ──
   '에르도스테인':'erdosteine', '암브록솔염산염':'ambroxol', '암브록솔':'ambroxol',
   '포비돈요오드':'povidone-iodine', '알벤다졸':'albendazole',
+  '에티닐에스트라디올':'oral-contraceptive',
   '겐타마이신황산염':'genta-steroid-cream',
   '바실루스리케니포르미스균':'probiotic-otc', '바실루스서브틸리스균':'probiotic-otc',
   '사카로마이세스보울라디':'probiotic-otc', '락토바실루스아시도필루스':'probiotic-otc',
@@ -110,6 +110,8 @@ BY_FORM = {'클로트리마졸': {'insert':'clotrimazole-vag', 'skin':'clotrimaz
            # 산화아연은 알약(종합비타민)에서는 아연 보충, 연고·파스에서는 피부 보호제 — 알약만 아연 화면으로
            '산화아연': {'solid':'supp:zinc'}, '황산아연': {'solid':'supp:zinc'}, '황산아연일수화물': {'solid':'supp:zinc'},
            '테트라히드로졸린염산염': {'eye':'eye-decongestant'},
+           '케토티펜푸마르산염': {'eye':'allergy-eyedrop'}, '크로몰린나트륨': {'eye':'allergy-eyedrop'}, '크로모글리크산나트륨': {'eye':'allergy-eyedrop'},
+           '설파메톡사졸': {'eye':'antibiotic-eyedrop'}, '설파메톡사졸나트륨': {'eye':'antibiotic-eyedrop'},
            '우레아': {'skin':'urea-cream'}, '요소': {'skin':'urea-cream'}}
 # 제품 이름에 이 말이 있을 때만 잇는다 — 케토코나졸 «샴푸»만 약 사전의 샴푸 화면으로(크림·정제는 다른 약)
 BY_NAME = {'케토코나졸': ('샴푸', 'ketoconazole-shampoo'), '시클로피록스': ('샴푸', 'ciclopirox-shampoo')}
@@ -129,6 +131,9 @@ FORM_FIX = {
   'antacid-mg': {'eye': None},
 }
 ORAL = ('solid', 'liquid', 'powder', 'troche')
+LUBE = {'염화나트륨', '염화칼륨', '염화칼슘수화물', '포도당', '탄산수소나트륨', '히프로멜로오스', '히프로멜로오스2910',
+        '트레할로스수화물', '트레할로스', '콘드로이틴설페이트나트륨', '덱스트란70', '카보머', '포비돈', '글리세린',
+        '폴리에틸렌글리콜400', '폴리소르베이트80', '폴리비닐알코올'}
 
 def fix_form(e, ids):
     f = formclass(e['n'])
@@ -143,7 +148,9 @@ def fix_form(e, ids):
             if rule[f]: out.add(rule[f])
             continue
         out.add(d)
-    if 'peg' in out: out.discard('antacid-mg')   # 장 청소용 가루의 탄산수소나트륨은 전해질이지 제산제가 아니다
+    if 'peg' in out: out.discard('antacid-mg')
+    # 눈물 대용 성분만으로 된 점안액(식염·전해질·점도 성분) → 인공눈물. 약효 성분이 하나라도 있으면 붙이지 않는다
+    if f == 'eye' and not out and e.get('i') and all(i in LUBE for i in e['i']): out.add('artificial-tears')   # 장 청소용 가루의 탄산수소나트륨은 전해질이지 제산제가 아니다
     return out
 
 def main():

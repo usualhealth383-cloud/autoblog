@@ -205,7 +205,8 @@ CLASSFLAG_JS = """pairs=>{
                  'xylometazoline': ['bph', 'diabetes', 'glaucoma'],  /* 코에 뿌리는 약이라 전신 흡수가 적다 */
                  'benzoyl-peroxide': ['kidney'],                     /* 바르는 여드름약이다 */
                  'cough-syrup-rx': ['diabetes'],                     /* 처방 시럽 — 성분이 제품마다 다르다 */
-                 'eye-decongestant': ['bph', 'heart', 'diabetes'] }; /* 눈에 넣는 약 — 허가사항도 심장·당뇨는 «상의»(caution)로만 둔다 */
+                 'eye-decongestant': ['bph', 'heart', 'diabetes'],  /* 눈에 넣는 약 — 허가사항도 심장·당뇨는 «상의»(caution)로만 둔다 */
+                 'allergy-eyedrop': ['glaucoma', 'bph'] };           /* 케토티펜 «안약» — 허가사항에 녹내장·전립선 금기가 없다(먹는 1세대 항히스타민과 다름) */
   for (const d of (D.drugs||[])) {
     ME.taking=[d.id]; ME.pub={};
     const cls=new Set(); ixItems([]).forEach(it=>it.ings.forEach(e=>(e.cls||[]).forEach(c=>cls.add(c))));
