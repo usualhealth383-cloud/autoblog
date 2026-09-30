@@ -79,6 +79,11 @@ INGR = {
   '바실루스리케니포르미스균':'probiotic-otc', '바실루스서브틸리스균':'probiotic-otc',
   '사카로마이세스보울라디':'probiotic-otc', '락토바실루스아시도필루스':'probiotic-otc',
   '비피더스균':'probiotic-otc', '유산균':'probiotic-otc',
+  # ── 2026-09-30 보강: 약 사전에 있는데 표기가 달라 안 붙던 것(미녹시딜 31개 제품 등) ──
+  '미녹시딜':'minoxidil', 'DL-메틸에페드린염산염':'methylephedrine', '수도에페드린염산염':'pseudoephedrine',
+  '카르보시스테인':'carbocisteine', '카페인수화물':'caffeine',
+  '농축콜레칼시페롤(분말형)':'vitamin-d-rx', '농축콜레칼시페롤산':'vitamin-d-rx', '농축콜레칼시페롤(유상)':'vitamin-d-rx',
+  '농축콜레칼시페롤유':'vitamin-d-rx', '콜레칼시페롤농축물(분말형)':'vitamin-d-rx',
 }
 # 성분이 «영양제 화면»으로 가는 것 — 비타민·미네랄 복합제가 일반의약품으로도 팔린다.
 # 이것이 빠져 있어 1,000개 넘는 제품이 어디로도 이어지지 않았다.
@@ -93,9 +98,17 @@ SUPP = {
   '콘드로이틴설페이트나트륨':'glucosamine', '글루코사민황산염':'glucosamine', '글루코사민염산염':'glucosamine',
   '밀크시슬열매건조엑스':'milkthistle', '실리마린':'milkthistle',
   '루테인':'lutein',
+  '아스코르브산과립':'vitc', '직타용아스코르브산97%':'vitc',
+  '푸르설티아민염산염':'vitb', '비스벤티아민':'vitb', '티아민질산염3배산':'vitb', '피리독신염산염3배산':'vitb',
+  '피리독살포스페이트수화물':'vitb', '시아노코발라민100배산':'vitb', '히드록소코발라민아세트산염':'vitb',
+  'D-비오틴':'vitb', 'd-비오틴1%':'vitb',
+  '폴리말토오스수산화제이철착염':'iron', '황산아연수화물':'zinc',
 }
 # 같은 성분이라도 제형에 따라 다른 약으로 간다
-BY_FORM = {'클로트리마졸': {'insert':'clotrimazole-vag', 'skin':'clotrimazole', 'liquid':'clotrimazole'}}
+BY_FORM = {'클로트리마졸': {'insert':'clotrimazole-vag', 'skin':'clotrimazole', 'liquid':'clotrimazole'},
+           '니코틴': {'patch':'nicotine-patch', 'solid':'nicotine-gum', 'troche':'nicotine-gum'}}
+# 제품 이름에 이 말이 있을 때만 잇는다 — 케토코나졸 «샴푸»만 약 사전의 샴푸 화면으로(크림·정제는 다른 약)
+BY_NAME = {'케토코나졸': ('샴푸', 'ketoconazole-shampoo'), '시클로피록스': ('샴푸', 'ciclopirox-shampoo')}
 
 def main():
     idx = json.loads((DATA/'easy-index.json').read_text(encoding='utf-8'))
@@ -108,6 +121,7 @@ def main():
                 v = INGR[i]
                 ids.update(v if isinstance(v, (list, tuple)) else [v])
             if i in SUPP: ids.add('supp:' + SUPP[i])
+            if i in BY_NAME and BY_NAME[i][0] in e['n']: ids.add(BY_NAME[i][1])
             if i in BY_FORM:
                 got = BY_FORM[i].get(formclass(e['n']))
                 if got: ids.add(got)
