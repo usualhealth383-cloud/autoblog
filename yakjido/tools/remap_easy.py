@@ -8,7 +8,7 @@
 제형을 보는 연결이 있다. 클로트리마졸은 «질정이면 질염약, 크림이면 무좀약»이다.
 사용:  python3 yakjido/tools/remap_easy.py        (--dry 로 미리보기)
 """
-import json, pathlib, sys, collections
+import json, pathlib, re, sys, collections
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
 from pharmform import formclass
 
@@ -81,7 +81,7 @@ INGR = {
   '비피더스균':'probiotic-otc', '유산균':'probiotic-otc',
   # ── 2026-09-30 보강: 약 사전에 있는데 표기가 달라 안 붙던 것(미녹시딜 31개 제품 등) ──
   '미녹시딜':'minoxidil', 'DL-메틸에페드린염산염':'methylephedrine', '수도에페드린염산염':'pseudoephedrine',
-  '카르보시스테인':'carbocisteine', '카페인수화물':'caffeine',
+  '카르보시스테인':'carbocisteine', '카페인수화물':'caffeine', '우르소데옥시콜산':'udca',
   '농축콜레칼시페롤(분말형)':'vitamin-d-rx', '농축콜레칼시페롤산':'vitamin-d-rx', '농축콜레칼시페롤(유상)':'vitamin-d-rx',
   '농축콜레칼시페롤유':'vitamin-d-rx', '콜레칼시페롤농축물(분말형)':'vitamin-d-rx',
 }
@@ -106,9 +106,43 @@ SUPP = {
 }
 # 같은 성분이라도 제형에 따라 다른 약으로 간다
 BY_FORM = {'클로트리마졸': {'insert':'clotrimazole-vag', 'skin':'clotrimazole', 'liquid':'clotrimazole'},
-           '니코틴': {'patch':'nicotine-patch', 'solid':'nicotine-gum', 'troche':'nicotine-gum'}}
+           '니코틴': {'patch':'nicotine-patch', 'solid':'nicotine-gum', 'troche':'nicotine-gum'},
+           # 산화아연은 알약(종합비타민)에서는 아연 보충, 연고·파스에서는 피부 보호제 — 알약만 아연 화면으로
+           '산화아연': {'solid':'supp:zinc'}, '황산아연': {'solid':'supp:zinc'}, '황산아연일수화물': {'solid':'supp:zinc'}}
 # 제품 이름에 이 말이 있을 때만 잇는다 — 케토코나졸 «샴푸»만 약 사전의 샴푸 화면으로(크림·정제는 다른 약)
 BY_NAME = {'케토코나졸': ('샴푸', 'ketoconazole-shampoo'), '시클로피록스': ('샴푸', 'ciclopirox-shampoo')}
+
+# 먹는 약 화면으로 잘못 가는 «바르는·눈·코» 제품을 바로잡는다 (2026-09-30 전수 점검에서 찾음)
+#  — 점안액의 클로르페니라민이 «졸린 감기약 성분» 화면으로, 가려움 크림의 디펜히드라민이 «수면유도제» 화면으로,
+#    까스명수의 멘톨이 «냉감 파스» 화면으로 가 있었다. 약 id → {제형: 바꿀 id(None 이면 뺌)}
+TOPICAL = ('skin', 'patch', 'spray')
+FORM_FIX = {
+  'chlorpheniramine': {'eye': None, 'nasal': None, **{f: 'antihistamine-topical' for f in TOPICAL}},
+  'diphenhydramine': {'eye': None, 'nasal': None, **{f: 'antihistamine-topical' for f in TOPICAL}},
+  'xylometazoline': {'eye': None},                     # 나파졸린 «점안액»은 코 뚫는 약이 아니다
+  'methylephedrine': {'skin': 'hemorrhoid-topical', 'eye': None},   # 치질 연고의 혈관수축 성분
+  'phenylephrine': {'skin': 'hemorrhoid-topical', 'eye': None},
+  'ibuprofen': {'patch': 'ibuprofen-patch'},
+  'menthol': {'liquid': None},                         # 마시는 소화제·드링크의 멘톨은 냉감 파스가 아니다
+  'antacid-mg': {'eye': None},
+}
+ORAL = ('solid', 'liquid', 'powder', 'troche')
+
+def fix_form(e, ids):
+    f = formclass(e['n'])
+    out = set()
+    for d in ids:
+        if d.startswith('supp:') and f not in ORAL: continue   # 점안액·크림 속 비타민·콘드로이틴은 영양제가 아니다
+        # «액»은 먹는 물약도 바르는 물약도 된다 — 디펜히드라민 «액»(버물리·물린디)은 벌레 물린 데 바르는 약
+        if d == 'diphenhydramine' and f == 'liquid' and not re.search(r'시럽|내복|드링크', e['n']):
+            out.add('antihistamine-topical'); continue
+        rule = FORM_FIX.get(d, {})
+        if f in rule:
+            if rule[f]: out.add(rule[f])
+            continue
+        out.add(d)
+    if 'peg' in out: out.discard('antacid-mg')   # 장 청소용 가루의 탄산수소나트륨은 전해질이지 제산제가 아니다
+    return out
 
 def main():
     idx = json.loads((DATA/'easy-index.json').read_text(encoding='utf-8'))
@@ -125,7 +159,7 @@ def main():
             if i in BY_FORM:
                 got = BY_FORM[i].get(formclass(e['n']))
                 if got: ids.add(got)
-        ids = sorted(ids)
+        ids = sorted(fix_form(e, ids))
         for d in ids:
             if d not in (e.get('map') or []): added[d] += 1
         e['map'] = ids

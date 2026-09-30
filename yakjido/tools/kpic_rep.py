@@ -30,6 +30,7 @@ MANUAL = {
     'allopurinol': ('자이로릭', '자이로릭정', 'allopurinol'),
     'azithromycin': ('아지트로마이신', '지스로맥스정250mg', 'azithromycin'),
     'cyclobenzaprine': ('cyclobenzaprine', '시클펜정', 'cyclobenzaprine'),
+    'udca': ('우루사정', '우루사정100', 'ursodeoxycholic'),
     'vitamin-d-rx': ('디맥', '디맥정7000IU', 'cholecalciferol'),
 }
 
