@@ -38,6 +38,7 @@ MANUAL = {
     'clonixin': ('클로나인', '클로나인연질캡슐', 'clonixin'),
     'ciclopirox-nail': ('로푸록스네일라카', '로푸록스네일라카', 'ciclopirox'),
     'naftifine': ('엑소데릴', '일동엑소데릴크림', 'naftifine'),
+    'scar-gel': ('노스카나', '노스카나겔', 'heparin'),
     'vitamin-d-rx': ('디맥', '디맥정7000IU', 'cholecalciferol'),
 }
 

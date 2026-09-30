@@ -150,6 +150,8 @@ def fix_form(e, ids):
             continue
         out.add(d)
     if 'peg' in out: out.discard('antacid-mg')
+    # 헤파린 + 알란토인 바르는 겔은 흉터 연고(벤트락스·노스카나 계열) — 에스신이 든 멍·부기 겔과 다르다
+    if f == 'skin' and '헤파린나트륨' in e.get('i', []) and '알란토인' in e.get('i', []): out.add('scar-gel')
     # 눈물 대용 성분만으로 된 점안액(식염·전해질·점도 성분) → 인공눈물. 약효 성분이 하나라도 있으면 붙이지 않는다
     if f == 'eye' and not out and e.get('i') and all(i in LUBE for i in e['i']): out.add('artificial-tears')   # 장 청소용 가루의 탄산수소나트륨은 전해질이지 제산제가 아니다
     return out
