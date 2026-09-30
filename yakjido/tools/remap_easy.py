@@ -136,6 +136,12 @@ LUBE = {'염화나트륨', '염화칼륨', '염화칼슘수화물', '포도당',
         '트레할로스수화물', '트레할로스', '콘드로이틴설페이트나트륨', '덱스트란70', '카보머', '포비돈', '글리세린',
         '폴리에틸렌글리콜400', '폴리소르베이트80', '폴리비닐알코올'}
 
+_SH = {}
+def label(i):
+    b = i // 200
+    if b not in _SH: _SH[b] = json.loads((DATA / f'easy-{b}.json').read_text(encoding='utf-8'))
+    return _SH[b][i % 200]
+
 def fix_form(e, ids):
     f = formclass(e['n'])
     out = set()
@@ -153,6 +159,8 @@ def fix_form(e, ids):
     # 헤파린 + 알란토인 바르는 겔은 흉터 연고(벤트락스·노스카나 계열) — 에스신이 든 멍·부기 겔과 다르다
     if f == 'skin' and '헤파린나트륨' in e.get('i', []) and '알란토인' in e.get('i', []): out.add('scar-gel')
     if f == 'skin' and '헤파린나트륨' in e.get('i', []) and '무정형에스신' in e.get('i', []): out.add('bruise-gel')
+    # 리도카인 단일제 중 허가 효능이 «남성 성기 촉각의 예민성 감소»인 것만 — 이름으로는 화상용 겔과 못 가른다(원문 효능을 본다)
+    if e.get('i') == ['리도카인'] and not out and '성기' in label(e['id']).get('e', ''): out.add('lidocaine-pe')
     # 눈물 대용 성분만으로 된 점안액(식염·전해질·점도 성분) → 인공눈물. 약효 성분이 하나라도 있으면 붙이지 않는다
     if f == 'eye' and not out and e.get('i') and all(i in LUBE for i in e['i']): out.add('artificial-tears')   # 장 청소용 가루의 탄산수소나트륨은 전해질이지 제산제가 아니다
     return out
