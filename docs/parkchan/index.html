@@ -2245,7 +2245,7 @@ function renderBank(){
       <select id="bankLesson" aria-label="소단원 고르기"><option value="전체">소단원 전체${bankSel.unit!=='전체'||bankSel.book!=='전체'?' (선택한 범위)':''}</option>${ls.map(l=>`<option value="${l.id}" ${bankSel.lesson===l.id?'selected':''}>${esc(l.bookName)} ${l.unit}-${l.id.slice(2)} ${esc(l.name)}</option>`).join('')}</select></div>
     <div class="pick"><span class="k">유형</span>${chips('type',['전체','ox','blank','mc','multi','essay'], t => TYPE_NAME[t] || t)}</div>
     <div class="pick"><span class="k">문제 수 · 대상</span>${chips('n',[10,20,40], n => n+'문제')}${chips('only',['전체','안 푼','틀린'])}</div>
-    <button class="btn" id="bankStart" ${pool.length?'':'disabled'}>${pool.length ? `${Math.min(bankSel.n,pool.length)}문제 시작 · 고를 수 있는 문항 ${pool.length}개` : '이 조건에 맞는 문항이 없습니다'}</button>
+    <button class="btn" id="bankStart" ${pool.length?'':'disabled'}>${pool.length ? `${Math.min(bankSel.n,pool.length)}문제 시작 · 고를 수 있는 문항 ${pool.length.toLocaleString('ko-KR')}개` : '이 조건에 맞는 문항이 없습니다'}</button>
     ${fullAccess() ? '' : `<p class="fine">무료 범위(최근 ${FREE_DAYS}일치 소단원)의 문제만 나옵니다. 학원 코드·이용권으로 전 범위가 열립니다.</p>`}
     <div class="sec"><h2><span>오답 노트</span><button class="more" data-go="wrong">${S.wrong.filter(w=>!w.cleared).length}문제 보기 ›</button></h2><p class="fine" style="text-align:left;padding:0">틀린 문제는 오답 노트에 모이고, 오늘의 문제는 ${RETRY_DAYS}일 뒤 한 번 더 나옵니다.</p></div>
     <div class="sec lab-list"><h2>자료 탐구 · 집에서 실험 <span style="font-weight:600;color:var(--faint);letter-spacing:0">${LABS.length}편</span></h2>

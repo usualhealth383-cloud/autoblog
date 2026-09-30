@@ -70,6 +70,7 @@ async def capture():
         b = await p.chromium.launch(executable_path='/opt/pw-browsers/chromium')
         ctx = await b.new_context(viewport={'width':390,'height':780}, device_scale_factor=2)
         await ctx.add_init_script("try { if (!localStorage.getItem('pcs.v2')) localStorage.setItem('pcs.v2', JSON.stringify({ introSeen: true })); } catch (e) {}")   # 첫 실행 소개는 건너뛴다
+        await ctx.add_init_script("document.addEventListener('DOMContentLoaded', () => { const st = document.createElement('style'); st.textContent = '#wm{display:none!important}'; document.head.appendChild(st); })")   # 캡처 막기 워터마크(계정 이름)는 스토어 사진에서 뺀다
         pg = await ctx.new_page()
         await auto_yes(pg)
         async def fresh(who='student'):
