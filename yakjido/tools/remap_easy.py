@@ -74,7 +74,7 @@ INGR = {
   # ── 2026-09-21 보강 ②: 새로 넣은 약 6종 ──
   '에르도스테인':'erdosteine', '암브록솔염산염':'ambroxol', '암브록솔':'ambroxol',
   '포비돈요오드':'povidone-iodine', '알벤다졸':'albendazole',
-  '에티닐에스트라디올':'oral-contraceptive',
+  '에티닐에스트라디올':'oral-contraceptive', '클로닉신리시네이트':'clonixin',
   '겐타마이신황산염':'genta-steroid-cream',
   '바실루스리케니포르미스균':'probiotic-otc', '바실루스서브틸리스균':'probiotic-otc',
   '사카로마이세스보울라디':'probiotic-otc', '락토바실루스아시도필루스':'probiotic-otc',
