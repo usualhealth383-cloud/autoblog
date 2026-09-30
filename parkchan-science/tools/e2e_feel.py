@@ -63,6 +63,15 @@ async def main():
         await s.evaluate("""() => { const mk = y => new Touch({ identifier: 2, target: document.body, clientX: 190, clientY: y });
           dispatchEvent(new TouchEvent('touchstart', { touches:[mk(120)] })); dispatchEvent(new TouchEvent('touchmove', { touches:[mk(150)] })); dispatchEvent(new TouchEvent('touchend', { touches:[] })); }""")
         await s.wait_for_timeout(400); assert await s.evaluate("getComputedStyle(document.getElementById('ptr')).opacity") == '0'
+        # Android 15·16 화면 끝까지 그리기: 상태바(32px)·제스처 막대(24px) 밑으로 내용이 들어가지 않는다
+        await s.evaluate("document.documentElement.style.setProperty('--safe-area-inset-top','32px'); document.documentElement.style.setProperty('--safe-area-inset-bottom','24px')")
+        await s.click('.tab[data-v="today"]'); await s.wait_for_timeout(300); await s.evaluate('window.scrollTo(0,0)')
+        top = await s.evaluate("document.querySelector('#v-today .top').getBoundingClientRect().top"); assert top >= 32, f'인사말이 상태바 밑으로 들어감: {top}'
+        tb = await s.evaluate("(() => { const t = document.getElementById('tabs'); const r = t.getBoundingClientRect(); const lab = [...t.querySelectorAll('.tab')].map(x => x.getBoundingClientRect().bottom); return [r.bottom, Math.max(...lab)]; })()")
+        assert tb[1] <= tb[0] - 24 + 1, f'탭 글자가 제스처 막대에 가려짐: {tb}'
+        await s.screenshot(path=f'{SC}/f10_insets.png')
+        await s.evaluate("document.documentElement.style.removeProperty('--safe-area-inset-top'); document.documentElement.style.removeProperty('--safe-area-inset-bottom')")
+
         # 확인 묻기는 앱 안 시트 — 취소·바깥·Esc 는 아무 일도 안 한다, 확인만 진행
         await s.evaluate('window.__askManual = true'); await s.click('.tab[data-v="me"]'); await s.wait_for_timeout(250)
         await s.click('#logout'); await s.wait_for_timeout(200)

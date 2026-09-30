@@ -32,6 +32,10 @@
   --no:#C0392B; --no-soft:#FBECEA; --warn:#8A6408; --warn-soft:#FFF7E0;
   --shadow:0 4px 20px rgba(30,42,46,.07);
   /* 웹폰트가 늦거나 막혀도 한글이 바탕체로 떨어지지 않도록 기기 고딕을 명시한다 */
+  /* 화면 가장자리 안전 영역 — Android 15·16(API 35·36)은 앱을 상태바·제스처 막대 밑까지 그린다(끌 수 없음).
+     Capacitor 가 넣어 주는 --safe-area-inset-*(옛 WebView 에서도 정확)을 먼저, 없으면 env() */
+  --sat:var(--safe-area-inset-top, env(safe-area-inset-top, 0px)); --sab:var(--safe-area-inset-bottom, env(safe-area-inset-bottom, 0px));
+  --sal:var(--safe-area-inset-left, env(safe-area-inset-left, 0px)); --sar:var(--safe-area-inset-right, env(safe-area-inset-right, 0px));
   --sans:'Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic','맑은 고딕',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
   --serif:'Noto Serif KR','Apple SD Gothic Neo',Georgia,'Nanum Myeongjo',serif;
 }
@@ -73,9 +77,9 @@ body{background:var(--ground);color:var(--ink);
   word-break:keep-all;line-height:1.6;display:flex;justify-content:center;
   min-height:100vh;font-size:var(--fs,15px)}
 .app{width:100%;max-width:440px;background:var(--paper);min-height:100vh;
-  display:flex;flex-direction:column;box-shadow:var(--shadow);position:relative}
+  display:flex;flex-direction:column;box-shadow:var(--shadow);position:relative;padding:var(--sat) var(--sar) 0 var(--sal)}
 .stripe{height:4px;background:var(--brand);flex:0 0 auto}
-main{flex:1;padding:16px 18px 96px;overflow-x:hidden;overflow-x:clip}   /* clip: 가로 넘침만 자르고, 가입 화면 아래 고정 버튼(sticky)은 살린다 */
+main{flex:1;padding:16px 18px calc(96px + var(--sab));overflow-x:hidden;overflow-x:clip}   /* clip: 가로 넘침만 자르고, 가입 화면 아래 고정 버튼(sticky)은 살린다 */
 .hide{display:none!important}
 button{font-family:inherit;color:inherit}
 
@@ -172,7 +176,7 @@ button,.tab,.btn,.chip,.chipbar button,.seg button{-webkit-user-select:none;user
 .skel{display:flex;flex-direction:column;gap:12px;padding-top:6px}
 .skel i{display:block;border-radius:14px;background:linear-gradient(90deg,var(--hair) 0%,var(--ground) 45%,var(--hair) 90%);background-size:220% 100%;animation:shim 1.2s linear infinite}
 @keyframes shim{from{background-position:100% 0}to{background-position:-120% 0}}
-#ptr{position:fixed;left:50%;top:6px;z-index:60;width:38px;height:38px;margin-left:-19px;border-radius:50%;background:var(--card);box-shadow:0 4px 14px rgba(0,0,0,.14);display:grid;place-items:center;opacity:0;transform:translateY(-50px);pointer-events:none}
+#ptr{position:fixed;left:50%;top:calc(6px + var(--sat));z-index:60;width:38px;height:38px;margin-left:-19px;border-radius:50%;background:var(--card);box-shadow:0 4px 14px rgba(0,0,0,.14);display:grid;place-items:center;opacity:0;transform:translateY(-50px);pointer-events:none}
 #ptr svg{width:20px;height:20px;stroke:var(--brand);stroke-width:2.4;fill:none;stroke-linecap:round}
 #ptr.spin svg{animation:spin .8s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
@@ -464,7 +468,7 @@ select.sel{font-family:inherit;font-size:14px;font-weight:700;color:var(--u);bac
 .stepbar .track i{display:block;height:100%;background:var(--brand);border-radius:99px;transition:width .3s ease}
 .stepbar .n{font-size:12px;font-weight:800;color:var(--faint);font-variant-numeric:tabular-nums;min-width:34px;text-align:right}
 .auth .grow{flex:1}
-.auth .cta{position:sticky;bottom:0;padding:12px 0 calc(8px + env(safe-area-inset-bottom));background:linear-gradient(to top,var(--paper) 80%,transparent);margin-top:10px}
+.auth .cta{position:sticky;bottom:0;padding:12px 0 calc(8px + var(--sab));background:linear-gradient(to top,var(--paper) 80%,transparent);margin-top:10px}
 .auth .cta .btn{margin:0}
 .auth .cta .btn + .btn{margin-top:8px}
 .auth .btn.dim{opacity:.5}
@@ -493,7 +497,7 @@ select.sel{font-family:inherit;font-size:14px;font-weight:700;color:var(--u);bac
 .pwrow button{position:absolute;right:6px;top:50%;transform:translateY(-50%);background:none;border:0;color:var(--muted);font-size:12.5px;font-weight:800;min-height:40px;min-width:48px;cursor:pointer}
 .rules{display:flex;gap:12px;font-size:12px;color:var(--faint);margin:-2px 0 10px 2px;font-weight:700}
 .rules .ok{color:var(--brand-dark)}
-.intro{min-height:calc(100vh - 4px);display:flex;flex-direction:column;padding:12px 6px calc(20px + env(safe-area-inset-bottom))}
+.intro{min-height:calc(100vh - 4px);display:flex;flex-direction:column;padding:12px 6px calc(20px + var(--sab))}
 .intro .skip{align-self:flex-end;background:none;border:0;color:var(--muted);font-size:13.5px;font-weight:700;min-height:44px;padding:0 6px;cursor:pointer}
 .intro .art{flex:1;display:flex;align-items:center;justify-content:center;min-height:220px}
 .intro .art svg{width:100%;max-width:340px;height:auto}
@@ -562,16 +566,16 @@ select.sel{font-family:inherit;font-size:14px;font-weight:700;color:var(--u);bac
 .qfig svg{max-width:100%;height:auto}
 figure.zoomable{cursor:zoom-in}
 /* 그림 확대 보기 */
-.fv{position:fixed;inset:0;background:var(--paper);z-index:50;display:flex;flex-direction:column}
+.fv{position:fixed;inset:0;background:var(--paper);z-index:50;display:flex;flex-direction:column;padding:var(--sat) var(--sar) 0 var(--sal)}
 .fv .bar{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-bottom:1px solid var(--hair);font-size:13px;font-weight:800}
 .fv .bar button{background:var(--hair);border:none;border-radius:9px;padding:8px 12px;font-weight:800;cursor:pointer;color:var(--ink);font-family:inherit;margin-left:6px}
 .fv .stage{flex:1;overflow:hidden;touch-action:none;position:relative;display:grid;place-items:center;background:var(--card)}
 .fv .stage svg{max-width:100%;height:auto;transform-origin:0 0;user-select:none}
-.fv .cap{padding:10px 16px max(14px,env(safe-area-inset-bottom));font-size:12.5px;color:var(--muted);line-height:1.6;border-top:1px solid var(--hair)}
+.fv .cap{padding:10px 16px max(14px,var(--sab));font-size:12.5px;color:var(--muted);line-height:1.6;border-top:1px solid var(--hair)}
 
 /* 탭바 */
 .tabs{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:440px;display:flex;border-top:1px solid var(--hair);background:var(--card);
-  padding:9px 0 max(11px,env(safe-area-inset-bottom));z-index:20}
+  padding:9px 0 max(11px,var(--sab));z-index:20}
 .tab{flex:1;text-align:center;font-size:10.5px;color:var(--faint);font-weight:700;display:flex;flex-direction:column;align-items:center;gap:4px;background:none;border:none;cursor:pointer;padding:2px 0}
 .tab.on{color:var(--brand)}
 .tab svg{width:21px;height:21px;stroke:currentColor;stroke-width:1.8;fill:none;stroke-linecap:round;stroke-linejoin:round}
@@ -627,7 +631,7 @@ figure.zoomable{cursor:zoom-in}
 .qlist .m{font-size:11.5px;color:var(--muted);display:flex;justify-content:space-between;gap:10px;align-items:center}
 .qlist .m button{background:none;border:none;color:var(--faint);font-size:11.5px;cursor:pointer;text-decoration:underline;padding:4px}
 /* 이야기 (커뮤니티) */
-.netbar{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(72px + env(safe-area-inset-bottom));width:calc(100% - 36px);max-width:404px;
+.netbar{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(72px + var(--sab));width:calc(100% - 36px);max-width:404px;
   display:flex;align-items:center;gap:9px;background:var(--warn-soft);border:1px solid var(--warn);border-radius:13px;padding:11px 13px;z-index:30}
 .netbar svg{width:17px;height:17px;flex:0 0 auto;stroke:var(--warn);stroke-width:2;fill:none;stroke-linecap:round;stroke-linejoin:round}
 .netbar span{flex:1;min-width:0;font-size:12.5px;font-weight:700;color:var(--warn);line-height:1.5}
@@ -726,7 +730,7 @@ figure.zoomable{cursor:zoom-in}
 
 /* 시트 */
 .sheet-bg{position:fixed;inset:0;background:rgba(20,30,34,.42);display:flex;align-items:flex-end;justify-content:center;z-index:30}
-.sheet{width:100%;max-width:440px;background:var(--card);border-radius:22px 22px 0 0;padding:18px 20px max(22px,env(safe-area-inset-bottom));max-height:88vh;overflow-y:auto}
+.sheet{width:100%;max-width:440px;background:var(--card);border-radius:22px 22px 0 0;padding:18px 20px max(22px,var(--sab));max-height:88vh;overflow-y:auto}
 .sheet .grab{width:38px;height:4px;border-radius:2px;background:var(--line);margin:0 auto 16px}
 .sheet h3{font-size:17px;font-weight:900;margin-bottom:6px}
 .sheet p{font-size:13.5px;color:var(--body);line-height:1.7;margin-bottom:14px}
@@ -786,7 +790,7 @@ figure.zoomable{cursor:zoom-in}
 .kv:last-child{border:none}
 .kv .k{color:var(--muted)}
 .kv .v{font-weight:700;font-variant-numeric:tabular-nums}
-.toast{position:fixed;left:50%;bottom:92px;transform:translateX(-50%);background:var(--ink);color:var(--paper);font-size:13px;font-weight:700;padding:10px 16px;border-radius:999px;z-index:40;box-shadow:var(--shadow);animation:tst 2.4s forwards;max-width:86%;text-align:center}
+.toast{position:fixed;left:50%;bottom:calc(92px + var(--sab));transform:translateX(-50%);background:var(--ink);color:var(--paper);font-size:13px;font-weight:700;padding:10px 16px;border-radius:999px;z-index:40;box-shadow:var(--shadow);animation:tst 2.4s forwards;max-width:86%;text-align:center}
 @keyframes tst{0%{opacity:0;transform:translate(-50%,8px)}12%{opacity:1;transform:translate(-50%,0)}80%{opacity:1}100%{opacity:0}}
 </style>
 </head>

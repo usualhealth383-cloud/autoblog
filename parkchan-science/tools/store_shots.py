@@ -19,13 +19,13 @@ W, H = 1080, 1920
 BRAND, DARK, PAPER, INK, MUTED = (20,125,111), (15,99,87), (250,248,244), (30,42,46), (107,122,128)
 
 SHOTS = [
-    ('01', '하루 한 개념, 5분이면 끝', '학원 교재를 그대로 옮겼습니다'),
+    ('01', '하루 한 개념, 5분이면 끝', '학원 교재 그대로 · 매일 다른 한 마디'),
     ('02', '오늘 배울 개념 하나', '읽고, 빈칸을 채우고, 문제를 풉니다'),
     ('03', '문제 은행 1,695문항', '범위와 유형을 골라 원하는 만큼'),
     ('04', '틀린 이유까지 알려 줍니다', '오답은 3일 뒤 한 번 더'),
     ('05', '학원·학교·과외를 한 곳에', '시험 범위에서 바로 문제 풀기'),
     ('06', '서로 묻고 답하는 이야기', '닉네임으로, 안전하게'),
-    ('07', '오늘의 한 마디', '출처를 밝힌 글귀와 그날의 과학'),
+    ('07', '공부한 내용은 노트로', '달력에서 다시 보는 나만의 요약'),
     ('08', '보호자도 원장님도 같은 앱', '출석·진도·공지를 한눈에'),
 ]
 
@@ -79,6 +79,19 @@ async def capture():
                 await pg.click('#goLogin'); await pg.click(f'[data-demo^="{who}"]'); await pg.click('#lgGo'); await pg.wait_for_timeout(3000)
         await pg.goto('http://127.0.0.1:8765/index.html'); await pg.wait_for_timeout(900)
         await pg.screenshot(path=RAW/'01.png')
+        await pg.evaluate("DBX.addClass('임시', '19:00').then(() => DBX.removeClass('임시'))")   # 기기 안 DB 를 저장소에 한 번 쓰게 한다
+        await pg.evaluate("""(()=>{ const d = JSON.parse(localStorage.getItem('pcs.db.v2')); const ago = h => new Date(Date.now() - h*36e5).toISOString();
+          const P = (id, nick, board, title, body, h, extra={}) => ({ id, uid:'demo-'+id, nick, board, title, body, at:ago(h), likes:[], reports:[], solved:false, deleted:false, staff:false, ...extra });
+          d.posts = [
+            P('p1', '충격량파이터', 'qna', '충격량이랑 운동량 변화량이 왜 같은 건가요?', '교재 III-1에서 F×Δt = Δp 라고 하는데 그림으로 이해가 잘 안 돼요', 3, { solved:true }),
+            P('p2', '원소수집가', 'share', '산화·환원 한 줄로 외우는 법', '산소를 얻으면 산화, 전자를 잃으면 산화! "잃산얻환" 으로 외웠어요', 9),
+            P('p3', '새벽공부', 'talk', '모의고사 끝났다 다들 수고했어요', '과학 그래프 문제 너무 어려웠는데 자료 탐구 한 번 더 보려고요', 20) ];
+          d.comments = [
+            { id:'c1', postId:'p1', uid:'a-owner', nick:'원장님', body:'힘-시간 그래프 아래 넓이가 충격량이고, 그게 곧 운동량의 변화량이에요. 에어백은 시간을 늘려 힘을 줄입니다.', at:ago(2), likes:['x','y'], reports:[], picked:true, deleted:false, staff:true },
+            { id:'c2', postId:'p1', uid:'demo-u2', nick:'원소수집가', body:'저도 이거 헷갈렸는데 그래프 넓이로 보니까 이해돼요', at:ago(1), likes:[], reports:[], picked:false, deleted:false, staff:false },
+            { id:'c3', postId:'p2', uid:'demo-u3', nick:'새벽공부', body:'오 이거 좋다 저장!', at:ago(5), likes:[], reports:[], picked:false, deleted:false, staff:false } ];
+          d.posts[0].likes = ['a','b','c','d']; d.posts[1].likes = ['a','b','c','d','e','f','g'];
+          localStorage.setItem('pcs.db.v2', JSON.stringify(d)); })()""")
         await fresh()
         await settle(pg); await pg.screenshot(path=RAW/'02.png')
         await pg.click('.tab[data-v="bank"]'); await settle(pg); await pg.screenshot(path=RAW/'03.png')
@@ -98,8 +111,17 @@ async def capture():
           save(S); })()""")
         await pg.click('.tab[data-v="plan"]'); await settle(pg); await pg.screenshot(path=RAW/'05.png')
         await pg.click('.tab[data-v="talk"]'); await settle(pg); await pg.screenshot(path=RAW/'06.png')
-        await pg.click('.tab[data-v="today"]'); await pg.wait_for_timeout(600)
-        await pg.evaluate("document.querySelector('.qsay').scrollIntoView({block:'center'})"); await settle(pg, 400)
+        # 공부 노트: 오늘 정리 한 편 + 지난 며칠의 노트(달력 점) — 달 중간처럼 보이게 이 장면만 날짜를 10월 20일로
+        await pg.clock.set_fixed_time('2026-10-20T19:30:00+09:00')
+        await pg.evaluate("""(()=>{ const t = todayISO(), c = CONCEPTS.find(x => x.title.includes('충격량')) || CONCEPTS[0];
+          const mk = (d, title, body, cids) => putNote({ id:newId(), date:d, title, body, cids });
+          [-6,-5,-4,-2,-1,0].forEach(k => { const d = addDays(t,k); if (!S.days.includes(d)) S.days.push(d); }); save(S);
+          mk(addDays(t,-6), '원소의 주기성', '같은 족 = 원자가 전자 수가 같다 → 화학적 성질이 비슷', []);
+          mk(addDays(t,-4), '', '모의고사 과학 42점 → 틀린 5문제 중 3개가 그래프 해석. 주말에 자료 탐구 다시.', []);
+          mk(addDays(t,-2), '산화·환원', '산소를 얻으면 산화, 잃으면 환원 · 전자를 잃으면 산화', []);
+          mk(t, c.title + ' 정리', '오늘 배운 것\\n· 충격량 = 힘 × 시간 = 운동량의 변화량\\n\\n헷갈린 것\\n· 에어백은 힘을 줄이는 게 아니라 시간을 늘린다\\n\\n다음에 할 것\\n· 문제 은행 III-1 10문제', [c.id]);
+        })()""")
+        await pg.evaluate("openNotes('today', todayISO())"); await settle(pg, 500)
         await pg.screenshot(path=RAW/'07.png')
         await fresh('owner'); await settle(pg); await pg.screenshot(path=RAW/'08.png')
         await b.close()
