@@ -4549,7 +4549,7 @@ const SENIOR_WHY = [
 const SENIOR_OF = (() => { const m = {}; for (const w of SENIOR_WHY) for (const id of w[3]) m[id] = w[0]; return m; })();
 /* 식약처 고시 노인주의 성분(2025.5.30 공고, 한국의약품안전관리원 「노인주의 성분리스트」) 가운데 우리 사전에 있는 것 — 2026-09-30 원문 대조.
    스코폴라민은 먹는 제형만 목록에 있고 붙이는 패치(키미테)는 없다. 플루르비프로펜은 트로키제가 목록에 있다 */
-const DUR_SENIOR = new Set(['chlorpheniramine', 'diphenhydramine', 'doxylamine', 'dimenhydrinate', 'butylscopolamine', 'hydroxyzine', 'ibuprofen', 'naproxen', 'dexibuprofen', 'aspirin', 'loxoprofen', 'aceclofenac', 'ethenzamide', 'solifenacin', 'flurbiprofen']);
+const DUR_SENIOR = new Set(['chlorpheniramine', 'diphenhydramine', 'doxylamine', 'dimenhydrinate', 'butylscopolamine', 'hydroxyzine', 'ibuprofen', 'naproxen', 'dexibuprofen', 'aspirin', 'loxoprofen', 'aceclofenac', 'ethenzamide', 'solifenacin', 'flurbiprofen', 'celecoxib', 'meloxicam']);
 const durSenior = d => d && (DUR_SENIOR.has(d.id) || (d.contains || []).some(x => DUR_SENIOR.has(x)));
 function seniorItems(){
   const out = [];
@@ -4675,7 +4675,7 @@ function vDrug(id){
   </section></div>
   ${same.length ? `<div class="pane" id="p5"><section class="sec" style="margin-top:0"><h2>같은 계열 다른 성분 <small>비교해서 고르기</small></h2><div class="card rows">${same.map(x => `<button class="row" onclick="go('/drug/${x.id}')"><div class="body"><b>${esc(x.name)}</b><span>${esc(x.tagline || (x.for || []).join(' · '))}</span>${useTag(x)}</div>${badge(x.rx)}</button>`).join('')}</div>${c ? `<a class="btn ghost" style="margin-top:12px" href="#/class/${c.id}">${I.scale} ${esc(c.name)} 한눈에 비교</a>` : ''}</section></div>` : ''}
   ${(d.sources || []).length ? `<div class="pane" id="p6"><section class="card"><h2>이 화면의 근거 <small>${d.sources.length}건</small></h2>${srcChips(d.sources)}</section></div>` : ''}
-  ${(() => { const rep = drugRepKg(d); return rep ? `<div class="pane" id="p7">${kgCard(rep[0])}<p class="small muted" style="margin-top:8px">대표 제품 <b>${esc(rep[1])}</b> 기준이에요. 같은 성분이라도 제품마다 함량·첨가물이 다를 수 있어요.</p></div>` : ''; })()}
+  ${(() => { const rep = drugRepKg(d); return rep ? `<div class="pane" id="p7">${kgCard(rep[0])}<p class="small muted" style="margin-top:8px">대표 제품 <b>${esc(rep[1])}</b> 기준이에요.${rep[2] > 1 && !(d.contains || []).length ? ` 이 제품은 <b>${rep[2]}가지 성분이 든 복합제</b>라 안내에 다른 성분 이야기도 섞여 있어요.` : ''} 같은 성분이라도 제품마다 함량·첨가물이 다를 수 있어요.</p></div>` : ''; })()}
   ${aeDrugCard(d)}
   ${disclaimer()}`;
 }
