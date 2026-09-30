@@ -388,6 +388,20 @@ def main():
         if _hm['top'] != 12: fails.append(f'홈 「자주 찾는」이 12가지가 아닙니다: {_hm["top"]}')
         if _hm['pain'] != _hm['wantPain'] or _hm['all'] != _hm['wantAll'] or _hm['wait'] != _hm['wantWait']: fails.append(f'홈 탭 목록 수가 어긋납니다: {_hm}')
         if _hm['oneOn'] != 1: fails.append('홈 탭에서 고른 것이 하나가 아닙니다')
+        # 5a-10c. 증상·약 상세도 탭(2026-09-30 현욱님 「증상상세 약 상세도 잘 정리하자」) — 탭마다 내용이 있고 넘침·잘림이 없어야 한다
+        for _r in ['/symptom/cold', '/symptom/bph', '/symptom/fever', '/drug/ibuprofen', '/drug/acetaminophen']:
+            pg.goto(url + '#' + _r); ready(); pg.wait_for_timeout(350)
+            _tabs = pg.evaluate("()=>[...document.querySelectorAll('.stabs .tab,.dtabs .tab')].map(b=>b.dataset.p)")
+            if len(_tabs) < 3: fails.append(f'{_r}: 탭이 없습니다 ({_tabs})')
+            for _k in _tabs:
+                pg.click(f'.tab[data-p="{_k}"]'); pg.wait_for_timeout(120)
+                _pv = pg.evaluate("(k)=>{const p=document.getElementById(k);return p&&getComputedStyle(p).display!=='none'?p.innerText.trim().length:-1}", _k)
+                if _pv < 20: fails.append(f'{_r} 탭 {_k}: 누르면 보이는 내용이 없습니다({_pv})')
+                o = pg.evaluate(OVERFLOW_JS)
+                if o['ov'] or o['clip']: fails.append(f'{_r} 탭 {_k}: 넘침·잘림 {o["ov"][:1]}{o["clip"][:1]}')
+        pg.goto(url + '#/symptom/cold'); ready(); pg.wait_for_timeout(300)
+        if pg.evaluate("()=>{openCare();return getComputedStyle(document.getElementById('sp2')).display!=='none'&&document.querySelector('.tab[data-p=sp2]').classList.contains('on')}") is not True:
+            fails.append('증상 화면: 「이럴 땐 병원으로」를 눌러도 병원 탭이 열리지 않습니다')
         # 5a-11. 화면 밝기 — 휴대폰 설정만 따르지 말고 앱에서도 고를 수 있어야 한다
         _th = pg.evaluate("""()=>{
           const before = themeNow();
