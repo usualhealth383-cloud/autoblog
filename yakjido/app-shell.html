@@ -1687,7 +1687,15 @@ async function loadJSON(name){ const r = await fetch('data/' + name, { cache:'fo
 async function pubIndex(){ if (!PUB.index && window.__EASY__) PUB.index = window.__EASY__;   /* 미리보기용 내장 자료 */
   if (!PUB.index) { try { PUB.index = await loadJSON('easy-index.json'); } catch (e) { PUB.index = []; PUB.err = true; } } return PUB.index; }
 const IMG_PREFIX = 'https://nedrug.mfds.go.kr/pbp/cmn/itemImageDownload/';
-const pillImg = p => p?.img ? (p.img.startsWith('http') ? p.img : IMG_PREFIX + p.img) : '';
+/* 약학정보원 낱알 사진(2026-09-30 현욱님 「그냥 쓰자」) — tools/kpic_photos.py 가 짝지어 둔 data/kpic.json {seq:[약학정보원 코드, 사진 파일]}.
+   있으면 그 사진을 먼저, 없으면 식약처 사진, 그것도 안 뜨면 모양·색으로 그린 그림. 사진 파일은 저장하지 않고 약학정보원 서버에서 바로 부른다 */
+let KPIC = null;
+const KPIC_PIC = 'https://common.health.kr/shared/images/sb_photo/big3/';
+function kpicLoad(){ if (KPIC) return; KPIC = {}; fetch('data/kpic.json').then(r => r.ok ? r.json() : {}).then(j => { if (j && Object.keys(j).length) { KPIC = j; route(); } }).catch(() => {}); }
+const kpicOf = seq => (KPIC && seq && KPIC[String(seq)]) || null;
+const kpicLink = seq => { const k = kpicOf(seq); return k && k[0] ? `https://www.health.kr/searchDrug/result_drug.asp?drug_cd=${encodeURIComponent(k[0])}` : ''; };
+const pillImg = p => { const k = p && kpicOf(p.seq); if (k && k[1]) return k[1].startsWith('http') ? k[1] : KPIC_PIC + k[1];
+  return p?.img ? (p.img.startsWith('http') ? p.img : IMG_PREFIX + p.img) : ''; };
 async function pubPills(){ if (!PUB.pills && window.__PILLS__) PUB.pills = window.__PILLS__;   /* 미리보기용 내장 자료 */
   if (!PUB.pills) { try { PUB.pills = await loadJSON('pills.json'); } catch (e) { PUB.pills = []; PUB.err = true; } } return PUB.pills; }
 /* 사전 세 벌을 한 번에 받아 둔다. 실패해도 앱의 나머지는 그대로 돈다 */
@@ -2866,7 +2874,7 @@ function prodLinks(d, product){
      확인되면 제품 이름을 실어 바로 떨어지게 바꾼다. 지금은 검색 화면으로 보낸다. */
   return `<a href="#/drug/${d.id}">${I.pill}성분 자세히</a>`
     + (seq ? `<a href="https://nedrug.mfds.go.kr/pbp/CCBBB01/getItemDetail?itemSeq=${esc(seq)}" target="_blank" rel="noopener">${I.link}식약처 허가정보</a>` : '')
-    + `<a href="https://www.health.kr/searchDrug/search_detail.asp" target="_blank" rel="noopener">${I.search}약학정보원</a>`;
+    + (kpicLink(seq) ? `<a href="${kpicLink(seq)}" target="_blank" rel="noopener">${I.search}약학정보원</a>` : `<a href="https://www.health.kr/searchDrug/search_detail.asp" target="_blank" rel="noopener">${I.search}약학정보원</a>`);
 }
 /* 약국에 있을 만한 제품 이름들 — 진열대에서 뭘 집어야 할지 알 수 있게 여러 개를 보여 준다 */
 function prodNames(d, max = 4){
@@ -4675,6 +4683,7 @@ function vPub(id){
 /* ───────── 약 알아보기(낱알 식별) — 약학정보원 식별기보다 앞서기 위한 설계 ───────── */
 const PILLQ = { sh:'', c:'', txt:'', ln:'', rx:false };
 function vPill(){
+  kpicLoad();
   if (!PUB.pills) { pubPills().then(route); return `${topBar({ back:'약 사전' })}<h1>이 약이 무슨 약일까</h1><p class="loading">식약처 낱알식별 자료를 불러오는 중… (한 번만 받아요)</p>`; }
   if (pubFailed()) return `${topBar({ back:'약 사전' })}
   <div class="eyebrow">약 알아보기</div><h1>이 약이 무슨 약일까</h1>
@@ -4765,6 +4774,7 @@ function drugByIngr(name, prod){ if (!name) return null; const n = name.replace(
   const oral = !!(prod && prod.rx && /정|캡슐/.test(String(prod.n || prod.full || '').replace(/\(.*?\)/g, '')));
   return (D.drugs || []).find(d => { if (oral && TOPICAL_ONLY.has(d.class)) return false; const dn = d.name.split(' ')[0].replace(INGR_STRIP, ''); return dn && (n.startsWith(dn) || (dn.startsWith(n) && !/^[가-힣]/.test(dn.slice(n.length)))); }) || null; }
 function vPillInfo(seq){
+  kpicLoad();
   const p = findPill(seq);
   if (!p) { if (!PUB.pills) { pubPills().then(route); return `${topBar({ back:'뒤로' })}<p class="loading">불러오는 중…</p>`; } if (!PUB.rx) { pubPillsRx().then(route); return `${topBar({ back:'뒤로' })}<p class="loading">처방약 자료를 불러오는 중…</p>`; } return vPill(); }
   const img = pillImg(p); const d = drugByIngr(p.ingr, p);
@@ -4784,7 +4794,7 @@ function vPillInfo(seq){
       <p class="ach-w">${esc(e.n)}이 들어 있어요.${e.achNote ? ' ' + esc(e.achNote) + '.' : ''} 입마름·변비·어지럼·소변이 잘 안 나오는 것과 관계있는 성분이에요.${e.achAlt ? ` <b>${fmt(e.achAlt)}</b>` : ''}</p></div></section>`;
   })()}
   <div class="actions"><button class="btn ${taking ? 'line' : ''}" onclick="togglePub('${p.seq}')">${taking ? I.check + ' 내 약통에 있어요 (빼기)' : I.pill + ' 내 약통에 등록'}</button>${taking && takingItems().length >= 2 ? `<button class="btn ghost" onclick="go('/together')">${I.shield} 다른 약과 같이 먹어도 되는지 보기</button>` : ''}${taking ? `<button class="btn ghost" onclick="go('/schedule')">${I.clock} 복용 시간 알림 만들기</button>` : ''}</div>
-  <div class="links" style="display:flex;gap:6px;flex-wrap:wrap;margin-top:12px"><a class="plink" href="https://nedrug.mfds.go.kr/pbp/CCBBB01/getItemDetail?itemSeq=${esc(p.seq)}" target="_blank" rel="noopener">${I.link}식약처 허가정보</a><a class="plink" href="https://www.health.kr/searchDrug/search_detail.asp" target="_blank" rel="noopener" onclick="copyName('${esc(p.n.replace(/\(.*?\)/g, '')).replace(/'/g, "\\'")}')">${I.search}약학정보원에서 찾기</a></div>
+  <div class="links" style="display:flex;gap:6px;flex-wrap:wrap;margin-top:12px"><a class="plink" href="https://nedrug.mfds.go.kr/pbp/CCBBB01/getItemDetail?itemSeq=${esc(p.seq)}" target="_blank" rel="noopener">${I.link}식약처 허가정보</a>${kpicLink(p.seq) ? `<a class="plink" href="${kpicLink(p.seq)}" target="_blank" rel="noopener">${I.search}약학정보원 — 사진·자세히</a>` : `<a class="plink" href="https://www.health.kr/searchDrug/search_detail.asp" target="_blank" rel="noopener" onclick="copyName('${esc(p.n.replace(/\(.*?\)/g, '')).replace(/'/g, "\\'")}')">${I.search}약학정보원에서 찾기</a>`}</div>
   <div class="srcs"><span class="src-chip">${I.link}출처: 식약처 의약품 낱알식별 정보 · 사진 약학정보원</span></div>
   ${disclaimer('낱알 정보는 참고용이에요. 같은 모양의 다른 약도 있으니 확실하지 않으면 약사에게 실물을 보여 주세요.')}`;
 }

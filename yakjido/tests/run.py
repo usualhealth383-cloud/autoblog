@@ -410,6 +410,17 @@ def main():
         pg.goto(url + '#/symptom/cold'); ready(); pg.wait_for_timeout(300)
         if pg.evaluate("()=>{openCare();return getComputedStyle(document.getElementById('sp2')).display!=='none'&&document.querySelector('.tab[data-p=sp2]').classList.contains('on')}") is not True:
             fails.append('증상 화면: 「이럴 땐 병원으로」를 눌러도 병원 탭이 열리지 않습니다')
+        # 약학정보원 사진(2026-09-30 현욱님 「그냥 쓰자」) — 짝 자료가 있으면 그 사진·그 제품 페이지로, 없으면 식약처 사진·검색 화면
+        pg.goto(url + '#/pill'); ready(); pg.wait_for_timeout(300)
+        _kp = pg.evaluate("""async()=>{ await pubPills(); const p=(PUB.pills||[]).find(x=>x.img); if(!p) return {skip:true};
+          const before=pillImg(p); KPIC={[p.seq]:['2013062800004','201306280000401.jpg']};
+          const after=pillImg(p); location.hash='#/pillinfo/'+p.seq; route();
+          const a=[...document.querySelectorAll('a.plink')].find(x=>/health\.kr/.test(x.href));
+          const r={before, after, link:a&&a.href}; KPIC={}; return r; }""")
+        if not _kp.get('skip'):
+            if 'nedrug' not in (_kp['before'] or ''): fails.append(f'약학정보원 짝이 없을 때 식약처 사진을 안 씁니다: {_kp["before"]}')
+            if _kp['after'] != 'https://common.health.kr/shared/images/sb_photo/big3/201306280000401.jpg': fails.append(f'약학정보원 사진 주소가 틀립니다: {_kp["after"]}')
+            if 'result_drug.asp?drug_cd=2013062800004' not in (_kp['link'] or ''): fails.append(f'약학정보원 제품 페이지 링크가 없습니다: {_kp["link"]}')
         # 5a-11. 화면 밝기 — 휴대폰 설정만 따르지 말고 앱에서도 고를 수 있어야 한다
         _th = pg.evaluate("""()=>{
           const before = themeNow();
