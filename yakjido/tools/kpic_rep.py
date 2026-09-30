@@ -31,6 +31,7 @@ MANUAL = {
     'azithromycin': ('아지트로마이신', '지스로맥스정250mg', 'azithromycin'),
     'cyclobenzaprine': ('cyclobenzaprine', '시클펜정', 'cyclobenzaprine'),
     'udca': ('우루사정', '우루사정100', 'ursodeoxycholic'),
+    'urea-cream': ('유리아크림', '한미유리아크림', 'urea'),
     'vitamin-d-rx': ('디맥', '디맥정7000IU', 'cholecalciferol'),
 }
 
