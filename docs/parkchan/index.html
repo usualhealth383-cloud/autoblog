@@ -161,6 +161,22 @@ button.blank.open{background:transparent;color:var(--u-dark)}
 .btn{display:block;width:100%;text-align:center;font-size:15px;font-weight:800;padding:15px;border-radius:14px;border:none;
   background:var(--brand);color:var(--on-color);cursor:pointer;letter-spacing:-.01em;margin-bottom:13px}
 .btn:disabled{background:var(--line);color:var(--faint);cursor:default}
+/* 앱처럼: 누르면 살짝 눌리고, 파란 반짝임·300ms 터치 지연은 없다. 단추 글자는 길게 눌러도 선택되지 않는다 */
+button,a,label,.tab,.pcard,.stu,.setrow{-webkit-tap-highlight-color:transparent;touch-action:manipulation}
+button,.tab,.btn,.chip,.chipbar button,.seg button{-webkit-user-select:none;user-select:none}
+.btn,.pcard,.setrow.go,.stu,.roles button,.ages label,.tab,.chip,.more,.mini,.opt{transition:transform .08s ease,background-color .15s ease}
+.btn:not(:disabled):active,.pcard:active,.setrow.go:active,.stu:active,.roles button:active,.ages label:active,.chip:active,.opt:not(:disabled):active{transform:scale(.985)}
+.tab:active svg{transform:scale(.9)}
+.vin{animation:vin .18s ease-out}
+@keyframes vin{from{opacity:.001;transform:translateY(6px)}to{opacity:1;transform:none}}
+.skel{display:flex;flex-direction:column;gap:12px;padding-top:6px}
+.skel i{display:block;border-radius:14px;background:linear-gradient(90deg,var(--hair) 0%,var(--ground) 45%,var(--hair) 90%);background-size:220% 100%;animation:shim 1.2s linear infinite}
+@keyframes shim{from{background-position:100% 0}to{background-position:-120% 0}}
+#ptr{position:fixed;left:50%;top:6px;z-index:60;width:38px;height:38px;margin-left:-19px;border-radius:50%;background:var(--card);box-shadow:0 4px 14px rgba(0,0,0,.14);display:grid;place-items:center;opacity:0;transform:translateY(-50px);pointer-events:none}
+#ptr svg{width:20px;height:20px;stroke:var(--brand);stroke-width:2.4;fill:none;stroke-linecap:round}
+#ptr.spin svg{animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+@media (prefers-reduced-motion: reduce){.vin,.skel i,#ptr.spin svg{animation:none}.btn,.pcard,.setrow.go,.stu{transition:none}}
 .btn.ghost{background:transparent;color:var(--muted);border:1px solid var(--line)}
 .btn.soft{background:var(--brand-soft);color:var(--brand-dark)}
 .btn.sm{font-size:13px;padding:11px;margin-bottom:8px}
@@ -1201,7 +1217,7 @@ const mergeProgress = p => { if (!p) return;
   if (p.at && (!S.syncAt || p.at > S.syncAt)) S.syncAt = p.at; };
 /* 앱으로 돌아왔을 때(다른 기기에서 공부했을 수 있다) — 서버가 더 새 것이면 받아 합치고 지금 화면을 다시 그린다 */
 let lastPull = 0;
-async function pullProgress(){ const k = progressKey(); if (!k || !SRV || Date.now() - lastPull < 8000) return; lastPull = Date.now();
+async function pullProgress(force){ const k = progressKey(); if (!k || !SRV || (!force && Date.now() - lastPull < 8000)) return; lastPull = Date.now();
   try { const p = await DBX.loadProgress(k); if (!p || !p.at || (S.syncAt && p.at <= S.syncAt)) return;
     mergeProgress(p); saveLocal();
     if (['today','list','stats','plan','bank','wrong','me'].includes(view) && !document.getElementById('sheetBg')) show(view); } catch {} }
@@ -2557,6 +2573,7 @@ async function initPush(){ const PN = plug('PushNotifications'); if (!isNative |
     await PN.register();
   } catch {} }
 async function dropPush(){ if (!pushToken || !SRV) return; try { await api(`/rest/v1/push_tokens?token=eq.${encodeURIComponent(pushToken)}`, { method:'DELETE' }); } catch {} pushToken = ''; }
+let lastBack = 0;
 function nativeInit(){ if (!isNative) return; const App = plug('App');
   App && App.addListener('resume', () => pullProgress());
   App && App.addListener('backButton', () => { if (document.getElementById('sheetBg')) return closeSheet();
@@ -2565,7 +2582,10 @@ function nativeInit(){ if (!isNative) return; const App = plug('App');
     if (view==='auth' && authMode==='intro' && introIdx > 0){ introIdx--; renderAuth(); return; }
     if (document.getElementById('fv')) return document.getElementById('fv').remove();
     if (view==='detail') return show('list'); if (view==='quiz') { qState=null; return show(home()); } if (view==='plans') return show('me'); if (view==='lab' || view==='wrong') return show('bank'); if (view==='bank' && bs){ bs=null; return renderBank(); }
-    if (view!==home() && view!=='auth') return show(home()); App.exitApp(); });
+    if (view!==home() && view!=='auth') return show(home());
+    if (view==='auth' && authMode!=='start' && authMode!=='intro'){ authMode = 'start'; authErr = ''; renderAuth(); return; }
+    if (Date.now() - lastBack < 2000) return App.exitApp();
+    lastBack = Date.now(); toast('한 번 더 누르면 종료됩니다'); });
   applyBar(); scheduleReminder(); const Splash = plug('SplashScreen'); Splash && setTimeout(() => Splash.hide(), 150); }
 
 /* ═══ 시트 · 화면 전환 · 탭 ═══ */
@@ -2582,8 +2602,11 @@ function renderTabs(){ document.getElementById('tabs').innerHTML = tabsFor().map
 /* 켤 때 한 번: 내 글에 새 댓글이 있으면 이야기 탭에 점 */
 async function checkTalkNew(){ if (!ACC || consentPending()) return; try { const list = await DBX.posts('전체', ''); const n = list.reduce((a,x) => a + newC(x), 0); if (n !== talkNew){ talkNew = n; renderTabs(); const tabOf = view==='post'?'talk':view; document.querySelectorAll('.tab').forEach(t => t.classList.toggle('on', t.dataset.v===tabOf)); } } catch {} }
 let view = 'today';
+/* 서버를 기다리는 화면: 처음 여는데 0.22초 안에 못 그리면 자리 표시를 먼저 보여 준다(빈 화면 금지) */
+const SKEL = `<div class="skel" aria-hidden="true"><i style="height:30px;width:42%"></i><i style="height:118px"></i><i style="height:64px"></i><i style="height:64px"></i><i style="height:64px;width:80%"></i></div>`;
+let renderSeq = 0;
 function show(v){
-  view = v;
+  view = v; const seq = ++renderSeq;
   /* 단원 색(테라코타·딥틸·인디고)은 그 단원을 펼친 화면에서만 쓴다.
      교재 목록·문제 은행·통계·내 정보에서는 브랜드 색으로 돌려놓아 앱이 한 색으로 읽히게 한다. */
   if (!['today','quiz','detail','lab'].includes(v)) setUnit('');
@@ -2591,9 +2614,26 @@ function show(v){
   document.getElementById('tabs').classList.toggle('hide', v==='auth');
   const tabOf = {quiz: qState&&qState.mode==='review'?'me':'today', detail:'list', plans:'me', wrong:'bank', lab:'bank', stats:'me', post:'talk'}[v] || v;
   renderTabs(); document.querySelectorAll('.tab').forEach(t => t.classList.toggle('on', t.dataset.v===tabOf));
-  ({auth:renderAuth, today:renderToday, quiz:renderQuiz, list:renderList, detail:renderDetail, wrong:renderWrong, stats:renderStats, me:renderMe, plans:renderPlans, parent:renderParent, admin:renderAdmin, bank:renderBank, lab:renderLab, plan:renderPlan, talk:renderTalk, post:renderPost})[v]();
+  const el = document.getElementById('v-'+v); el.classList.remove('vin'); void el.offsetWidth; el.classList.add('vin');
+  const r = ({auth:renderAuth, today:renderToday, quiz:renderQuiz, list:renderList, detail:renderDetail, wrong:renderWrong, stats:renderStats, me:renderMe, plans:renderPlans, parent:renderParent, admin:renderAdmin, bank:renderBank, lab:renderLab, plan:renderPlan, talk:renderTalk, post:renderPost})[v]();
+  if (r && r.then && !el.innerHTML.trim()){ let done = false; r.finally(() => { done = true; }); setTimeout(() => { if (!done && view===v && seq===renderSeq && !el.innerHTML.trim()) el.innerHTML = SKEL; }, 220); }
   window.scrollTo(0,0);
 }
+/* 당겨서 새로고침 — 맨 위에서 아래로 끌면 지금 화면을 서버에서 다시 받아 그린다 */
+const PTR_VIEWS = { today:()=>renderToday(), talk:()=>renderTalk(), post:()=>renderPost(), parent:()=>renderParent(), admin:()=>renderAdmin(), plan:()=>renderPlan(), stats:()=>renderStats() };
+(() => { let y0 = null, dy = 0, busy = false; const ptr = document.createElement('div'); ptr.id = 'ptr'; ptr.setAttribute('aria-hidden', 'true');
+  ptr.innerHTML = '<svg viewBox="0 0 24 24"><path d="M20 12a8 8 0 1 1-2.3-5.6"/><path d="M20 4v5h-5"/></svg>'; document.body.appendChild(ptr);
+  const set = (d, o) => { ptr.style.transform = `translateY(${d}px) rotate(${d*3}deg)`; ptr.style.opacity = o; };
+  addEventListener('touchstart', e => { if (busy || window.scrollY > 0 || !PTR_VIEWS[view] || document.getElementById('sheetBg') || e.touches.length > 1) { y0 = null; return; } y0 = e.touches[0].clientY; dy = 0; }, { passive:true });
+  addEventListener('touchmove', e => { if (y0 === null) return; dy = e.touches[0].clientY - y0; if (dy <= 0 || window.scrollY > 0){ set(-50, 0); return; } set(Math.min(dy * .45, 64) - 20, Math.min(dy / 90, 1)); }, { passive:true });
+  addEventListener('touchend', async () => { if (y0 === null) return; y0 = null;
+    if (dy < 90 || !PTR_VIEWS[view]){ set(-50, 0); return; }
+    busy = true; ptr.classList.add('spin'); set(34, 1);
+    try { await pullProgress(true); await PTR_VIEWS[view](); } catch {} finally { busy = false; ptr.classList.remove('spin'); set(-50, 0); } }, { passive:true });
+})();
+/* 입력칸을 누르면 키보드에 가리지 않게 가운데로 */
+document.addEventListener('focusin', e => { if (!e.target.matches('input:not([type=checkbox]):not([type=radio]),textarea')) return;
+  if (!isNative && innerWidth > 700) return; setTimeout(() => { try { e.target.scrollIntoView({ block:'center', behavior:'smooth' }); } catch {} }, 320); });
 
 /* ═══ 로그인 뒤 처리: 계정 → 학원 코드 → 진도 합치기 ═══ */
 async function afterLogin(acc){
