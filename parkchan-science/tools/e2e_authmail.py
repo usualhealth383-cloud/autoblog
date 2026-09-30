@@ -34,7 +34,9 @@ async def main():
             assert '메일 인증이 아직' in await s.locator('.auth .err').inner_text(), await s.locator('.auth .err').inner_text()
             # 2) 메일 링크 → 앱으로 돌아와 바로 로그인 · 적어 둔 학원 코드가 연결됨
             link = [m for m in mails() if m['type'] == 'signup'][-1]['link'].replace('redirect_to=', 'redirect_to=')
-            await s.goto(link); await s.wait_for_timeout(1500)
+            await s.goto(link); await s.locator('#askMsg').wait_for(timeout=4000)
+            assert 'mail@test.kr 계정으로 로그인합니다' in await s.inner_text('#askMsg'), '링크의 계정을 먼저 보여 주지 않음(로그인 바꿔치기 방지)'
+            await s.screenshot(path=f'{SC}/m01b_link_confirm.png'); await s.click('#askYes'); await s.wait_for_timeout(1500)
             assert await s.evaluate('view') == 'today' and await s.evaluate('ACC && ACC.email') == 'mail@test.kr', await s.evaluate('view')
             assert await s.evaluate('S.auth && S.auth.code') == 'MAIL01', '인증 뒤 학원 코드가 연결되지 않았다'
             assert 'access_token' not in s.url, '주소창에 토큰이 남았다'; await s.screenshot(path=f'{SC}/m02_confirmed.png')
@@ -43,7 +45,13 @@ async def main():
             await s.click('#goLogin'); await s.click('#goForgot'); await s.fill('#fgEmail', 'mail@test.kr'); await s.click('#fgGo'); await s.wait_for_timeout(700)
             assert '재설정 메일' in await s.locator('.auth .info').inner_text()
             link = [m for m in mails() if m['type'] == 'recovery'][-1]['link']
-            await s.goto(link); await s.wait_for_timeout(1300)
+            await s.add_init_script("Object.defineProperty(window, '__askManual', { get: () => sessionStorage.getItem('askManual') === '1', configurable: true })")
+            await s.evaluate("sessionStorage.setItem('askManual', '1')")   # 이 링크에서는 확인 창을 사람처럼 직접 누른다
+            await s.goto(link); await s.locator('#askMsg').wait_for(timeout=4000)
+            assert '비밀번호를 새로 정합니다' in await s.inner_text('#askMsg'); await s.click('#askNo'); await s.wait_for_timeout(700)
+            assert await s.evaluate('ACC') is None and await s.evaluate('authMode') != 'newpw' and '로그인하지 않았습니다' in await s.locator('.auth .err').inner_text(), '내 계정이 아니라고 했는데 로그인됨'
+            await s.goto(link); await s.locator('#askMsg').wait_for(timeout=4000); await s.click('#askYes'); await s.wait_for_timeout(1300)
+            await s.evaluate("sessionStorage.removeItem('askManual')")
             assert await s.evaluate('authMode') == 'newpw' and await s.locator('#npPw').count() == 1, '새 비밀번호 화면이 안 뜬다'
             await s.fill('#npPw', 'newpass1'); await s.fill('#npPw2', 'newpass2'); await s.click('#npGo'); await s.wait_for_timeout(300)
             assert '다릅니다' in await s.locator('.auth .err').inner_text(); await s.screenshot(path=f'{SC}/m03_newpw.png')

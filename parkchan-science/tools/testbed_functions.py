@@ -93,8 +93,8 @@ def call(m, path, body=None, tok=None, headers=None):
         t = e.read()
         try: return e.code, json.loads(t)
         except Exception: return e.code, t.decode()
-def signup(email, role='student'):
-    s, j = call('POST', '/auth/v1/signup', {'email': email, 'password': 'pw123456', 'data': {'name': email[:2], 'role': role}}); return j['access_token'], j['user']['id']
+def signup(email, role='student', **meta):
+    s, j = call('POST', '/auth/v1/signup', {'email': email, 'password': 'pw123456', 'data': {'name': email[:2], 'role': role, **meta}}); return j['access_token'], j['user']['id']
 def buy(pid, tok, uid, state=0): PURCHASES[(pid, tok)] = {'kind': 'androidpublisher#productPurchase', 'purchaseState': state, 'consumptionState': 0, 'acknowledgementState': 1, 'orderId': 'GPA.' + tok, 'obfuscatedExternalAccountId': uid, 'purchaseType': 0}
 def until(tok, uid): return call('GET', f'/rest/v1/profiles?id=eq.{uid}&select=pass_until', tok=tok)[1][0]['pass_until']
 VP = '/functions/v1/verify-purchase'
@@ -134,6 +134,13 @@ def main():
       s, j = call('POST', VP, {'action': 'voided'}, headers={'x-cron-secret': 'cron-s'})
       check('환불된 1년 결제 → 그만큼 되돌림', s == 200 and j['revoked'] == 1 and until(A, A_ID) == (today + dt.timedelta(days=180)).isoformat(), (s, j, until(A, A_ID)))
 
+      s, j = call('POST', VP, {'productId': 'pass_y1', 'purchaseToken': 'tokA-0000000001'}, A)
+      check('환불된 영수증을 다시 보내도 다시 열리지 않음', s == 400 and '환불' in j.get('why', '') and until(A, A_ID) == (today + dt.timedelta(days=180)).isoformat(), (s, j, until(A, A_ID)))
+      K, K_ID = signup('kidbuy@t.kr', under14=True, guardian='김보호 01011112222')
+      buy('pass_m1', 'tokK-0000000001', K_ID)
+      s, j = call('POST', VP, {'productId': 'pass_m1', 'purchaseToken': 'tokK-0000000001'}, K)
+      check('보호자 동의 전 14세 미만 결제는 반영 안 함', s == 403 and until(K, K_ID) is None, (s, j))
+      check('  └ 소비하지 않아 마켓이 자동 환불(3일 미확인)', PURCHASES[('pass_m1', 'tokK-0000000001')]['consumptionState'] == 0)
       print('▸ 푸시 알림(push)')
       OWN = json.loads(U.urlopen(U.Request(GW + '/auth/v1/token?grant_type=password', data=json.dumps({'email': 'owner@parkchan.kr', 'password': 'owner-pass'}).encode(), headers={'Content-Type': 'application/json'}, method='POST')).read())['access_token']
       for code, nm, cls in (('PUSH01', '푸시학생', '월목반'), ('PUSH02', '다른반', '화금반')):

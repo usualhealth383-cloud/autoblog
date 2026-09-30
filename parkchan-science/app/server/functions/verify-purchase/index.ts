@@ -3,7 +3,7 @@
 //  여기: Google Play 에 영수증을 직접 물어 '결제 완료 · 이 계정의 결제'인지 확인 → grant_purchase(같은 영수증은 한 번만) → 소비 처리(다시 살 수 있게).
 //  하루 한 번(cron) x-cron-secret 을 붙여 { action:'voided' } 로 부르면 환불·취소된 영수증만큼 기간을 되돌린다.
 // 비밀값(Supabase → Edge Functions → Secrets): GOOGLE_SA_JSON(서비스 계정 JSON), ANDROID_PACKAGE, CRON_SECRET
-import { googleToken, rpc, json, CORS } from '../_shared/google.ts';
+import { googleToken, rpc, rest, json, CORS } from '../_shared/google.ts';
 
 // 상품 ID → 날수. 날수는 서버가 정한다(앱이 보낸 값은 믿지 않는다)
 const PRODUCTS: Record<string, number> = { pass_m1: 30, pass_m6: 180, pass_y1: 365 };
@@ -40,6 +40,9 @@ Deno.serve(async (req) => {
     const days = PRODUCTS[productId];
     if (!days || typeof purchaseToken !== 'string' || purchaseToken.length < 10) return json({ ok: false, why: '알 수 없는 상품입니다.' }, 400);
 
+    // 만 14세 미만은 보호자 동의가 끝난 뒤에만 이용권을 반영한다. 확인(소비)하지 않은 결제는 Google Play 가 3일 안에 자동 환불한다
+    const pr = (await rest(`profiles?id=eq.${encodeURIComponent(user.id)}&select=under14,guardian_ok`))[0];
+    if (pr && pr.under14 && !pr.guardian_ok) return json({ ok: false, why: '보호자 동의가 끝난 뒤에 이용권을 살 수 있습니다. 이 결제는 반영하지 않았고 Google Play 가 3일 안에 자동으로 환불합니다.' }, 403);
     const at = await googleToken(Deno.env.get('GOOGLE_SA_JSON')!, SCOPE);
     const url = `${API()}/purchases/products/${encodeURIComponent(productId)}/tokens/${encodeURIComponent(purchaseToken)}`;
     const r = await fetch(url, { headers: { Authorization: `Bearer ${at}` } });
@@ -50,6 +53,7 @@ Deno.serve(async (req) => {
     // 결제할 때 넣은 계정 표시(obfuscatedExternalAccountId = Supabase 사용자 id)와 지금 로그인한 계정이 같아야 한다 — 남의 영수증 재사용 방지
     if (p.obfuscatedExternalAccountId && p.obfuscatedExternalAccountId !== user.id) return json({ ok: false, why: '다른 계정으로 결제한 영수증입니다.' }, 403);
     const g = await rpc('grant_purchase', { p_uid: user.id, p_token: purchaseToken, p_product: productId, p_order: p.orderId || orderId || null, p_days: days * (p.quantity || 1), p_raw: p });
+    if (g && g.revoked) return json({ ok: false, why: g.why }, 400);   // 환불된 영수증을 다시 보낸 경우
     if (!g || !g.ok) return json({ ok: false, why: '이용권을 반영하지 못했습니다. 학원에 문의해 주세요.' }, 500);
     if (p.consumptionState === 0) {   // 소비 처리해야 같은 상품을 다시 살 수 있다. 실패해도 다음 복원 때 다시 시도
       await fetch(url + ':consume', { method: 'POST', headers: { Authorization: `Bearer ${at}` } }).catch(() => null);

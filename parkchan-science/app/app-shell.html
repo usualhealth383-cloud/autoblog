@@ -779,7 +779,9 @@ figure.zoomable{cursor:zoom-in}
 .stu .st.ok{color:var(--u)}
 .stu .st.late{color:var(--warn)}
 .stu .st.no{color:var(--faint)}
-.stu .mini{font-size:11px;font-weight:800;padding:5px 9px;border-radius:8px;border:1px solid var(--line);background:var(--card);color:var(--muted);cursor:pointer;flex:0 0 auto}
+.mini{font-size:11px;font-weight:800;padding:5px 9px;border-radius:8px;border:1px solid var(--line);background:var(--card);color:var(--muted);cursor:pointer;flex:0 0 auto}
+.mini{font-family:inherit;text-decoration:none;display:inline-flex;align-items:center;min-height:30px;line-height:1.2}
+.mini.pri{background:var(--brand);border-color:var(--brand);color:var(--on-color)}
 .form{background:var(--card);border:1px solid var(--line);border-radius:15px;padding:15px;margin-bottom:13px}
 .form h3{font-size:14px;font-weight:900;margin-bottom:10px}
 .form .g{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px}
@@ -973,17 +975,18 @@ async function authPost(path, body){
   if (!r.ok) throw new Error(AUTH_KO(j.error_description || j.msg || j.message || '') || ('요청 실패 '+r.status));
   return j;
 }
+/* 로그인 토큰 새로 받기(1시간마다 만료) — 성공하면 true. 네트워크 문제가 아닌 거절이면 로그아웃 처리 */
+async function refreshSession(){ if (!SESSION || !SESSION.refresh_token) return false;
+  try { const j = await authPost('/auth/v1/token?grant_type=refresh_token', { refresh_token: SESSION.refresh_token });
+    SESSION = { ...SESSION, access_token:j.access_token, refresh_token:j.refresh_token||SESSION.refresh_token }; saveSession(); return true; }
+  catch (e){ if (!e.net){ SESSION = null; saveSession(); sessionLost(); } return false; } }
 async function api(path, { method='GET', body, prefer, _retry } = {}){
   const h = { apikey: SRV.key, 'Content-Type': 'application/json' };
   h.Authorization = 'Bearer ' + ((SESSION && SESSION.access_token) || SRV.key);
   if (prefer) h.Prefer = prefer;
   const r = await fetchT(SRV.url + path, { method, headers: h, body: body === undefined ? undefined : JSON.stringify(body) });
   if (r.status === 401 && SESSION && SESSION.refresh_token && !_retry){
-    try { const j = await authPost('/auth/v1/token?grant_type=refresh_token', { refresh_token: SESSION.refresh_token });
-      SESSION = { ...SESSION, access_token:j.access_token, refresh_token:j.refresh_token||SESSION.refresh_token }; saveSession();
-      return api(path, { method, body, prefer, _retry:true }); }
-    catch (e){ if (!e.net){ SESSION = null; saveSession(); sessionLost(); } }
-  }
+    if (await refreshSession()) return api(path, { method, body, prefer, _retry:true }); }
   if (r.ok) setNet(false);
   const txt = await r.text(); let j = null; try { j = txt ? JSON.parse(txt) : null; } catch { j = txt; }
   if (!r.ok) throw Object.assign(new Error(DB_KO(j, r.status)), { status: r.status, body: j });
@@ -1016,7 +1019,7 @@ const DB = (() => {
   CLASSES_CACHE = d.classes.slice();
   const w = () => { try { localStorage.setItem(DBKEY, JSON.stringify(d)); } catch {} };
   let sid = null; try { sid = localStorage.getItem('pcs.local.sid'); } catch {}
-  const pub = a => a ? { id:a.id, email:a.email, role:a.role, name:a.name, phone:a.phone||'', studentCode:a.studentCode||'', childCodes:(a.childCodes||[]).slice(), childCode:(a.childCodes||[])[0]||'', passUntil:a.passUntil||'', nick:a.nick||'', under14:!!a.under14, guardian:a.guardian||'', guardianOk:!!a.guardianOk, guardianHow:a.guardianHow||'', created:a.created } : null;
+  const pub = a => a ? { id:a.id, email:a.email, role:a.role, name:a.name, phone:a.phone||'', studentCode:a.studentCode||'', childCodes:(a.childCodes||[]).slice(), childCode:(a.childCodes||[])[0]||'', passUntil:a.passUntil||'', nick:a.nick||'', under14:!!a.under14, guardian:a.guardian||'', guardianOk:!!a.guardianOk, guardianHow:a.guardianHow||'', guardianAt:a.guardianAt||'', created:a.created } : null;
   const me = () => d.accounts.find(a => a.id === sid) || null;
   const stateOf = code => d.progress[code] || null;
   const attend = (s, manual) => {
@@ -1163,12 +1166,14 @@ const DB = (() => {
     issuePass: async days => { const p = { code: genCode('pass', c=>d.passes.some(x=>x.code===c)), days, issued: todayISO() }; d.passes.push(p); w(); return p; },
     passes: async () => d.passes.slice().reverse(),
     /* 보호자 동의(서버의 consent_* 와 같은 규칙) — 로컬 시연에서는 같은 브라우저의 동의 페이지가 이 저장소를 읽는다 */
-    consentRequest: async () => { const a = me(); if (!a || !a.under14) return { ok:false, why:'보호자 동의가 필요한 계정이 아닙니다.' }; if (a.guardianOk) return { ok:true, done:true };
+    consentRequest: async phone => { const a = me(); if (!a || !a.under14) return { ok:false, why:'보호자 동의가 필요한 계정이 아닙니다.' }; if (a.guardianOk) return { ok:true, done:true }; if (a.guardianHow === 'web' && a.guardianAt) return { ok:true, given:true };
+      if (phone != null){ const dg = String(phone).replace(/[^0-9]/g, ''); if (!/^01\d{8,9}$/.test(dg)) return { ok:false, why:'보호자 휴대전화 번호를 확인해 주세요.' }; a.guardian = String(a.guardian||'').split(' ')[0] + ' ' + dg; }
       d.consents ||= []; const t = Array.from(crypto.getRandomValues(new Uint8Array(18)), b => b.toString(16).padStart(2,'0')).join('');
       d.consents.push({ token:t, uid:a.id, at:Date.now() }); w(); return { ok:true, token:t, guardian:a.guardian }; },
     consentList: async () => d.accounts.filter(a => a.under14).map(a => ({ id:a.id, name:a.name, guardian:a.guardian||'', guardian_ok:!!a.guardianOk, guardian_how:a.guardianHow||'', guardian_at:a.guardianAt||null, notified_at:a.notifiedAt||null, created_at:a.created })),
     consentMark: async (id, what) => { const a = d.accounts.find(x => x.id === id && x.under14); if (!a) return;
-      if (what === 'paper'){ a.guardianOk = true; a.guardianHow = 'paper'; a.guardianAt = new Date().toISOString(); } else if (what === 'notified' && a.guardianOk) a.notifiedAt = new Date().toISOString(); w(); },
+      if (what === 'paper'){ a.guardianOk = true; a.guardianHow = 'paper'; a.guardianAt = new Date().toISOString(); } else if (what === 'notified' && (a.guardianOk || (a.guardianHow === 'web' && a.guardianAt))){ a.notifiedAt = new Date().toISOString(); a.guardianOk = true; }
+      else if (what === 'reset' && !a.guardianOk && a.guardianHow === 'web'){ a.guardianHow = 'reset'; a.guardianAt = new Date().toISOString(); } w(); },
     myWritings: async () => { const a = me(); if (!a) return { posts:[], comments:[] };
       return { posts:(d.posts||[]).filter(x => x.uid===a.id && !x.deleted).map(x => ({ at:x.at, board:x.board, title:x.title, body:x.body })),
                comments:(d.comments||[]).filter(c => c.uid===a.id && !c.deleted).map(c => ({ at:c.at, body:c.body })) }; },
@@ -1185,7 +1190,7 @@ const DB = (() => {
 const serverDB = () => {
   const notice = (n, reads=[]) => ({ id:n.id, cls:n.cls, t:n.title, d:n.body||'', at:n.at, read: reads.filter(r=>r.notice_id===n.id).map(r=>r.code) });
   const att = a => ({ code:a.code, date:a.date, time:hhmm(a.time), late:!!a.late, manual:!!a.manual });
-  const prof = p => p ? { id:p.id, email:p.email||'', role:p.role, name:p.name, phone:p.phone||'', studentCode:p.student_code||'', childCodes:(p._children||[]).slice(), childCode:(p._children||[])[0]||'', passUntil:p.pass_until||'', nick:p.nick||'', under14:!!p.under14, guardian:p.guardian||'', guardianOk:!!p.guardian_ok, guardianHow:p.guardian_how||'', created:p.created_at } : null;
+  const prof = p => p ? { id:p.id, email:p.email||'', role:p.role, name:p.name, phone:p.phone||'', studentCode:p.student_code||'', childCodes:(p._children||[]).slice(), childCode:(p._children||[])[0]||'', passUntil:p.pass_until||'', nick:p.nick||'', under14:!!p.under14, guardian:p.guardian||'', guardianOk:!!p.guardian_ok, guardianHow:p.guardian_how||'', guardianAt:p.guardian_at||'', created:p.created_at } : null;
   let attCache = null, meCache = null;
   const myProfile = async () => { if (!SESSION) return null; const r = await api(`/rest/v1/profiles?id=eq.${SESSION.user.id}&select=*`);
     if (!r.length){ meCache = null; return null; }
@@ -1214,8 +1219,8 @@ const serverDB = () => {
     setPassword: async pw => { const r = await fetchT(SRV.url + '/auth/v1/user', { method:'PUT', headers:{ apikey:SRV.key, 'Content-Type':'application/json', Authorization:'Bearer '+SESSION.access_token }, body: JSON.stringify({ password: pw }) });
       if (!r.ok){ const j = await r.json().catch(()=>({})); throw new Error(j.msg || j.message || '비밀번호를 바꾸지 못했습니다.'); } return { ok:true }; },
     /* 메일 링크로 돌아왔을 때(#access_token=…) 세션을 받는다 */
-    adoptSession: async (at, rt) => { const r = await fetchT(SRV.url + '/auth/v1/user', { headers:{ apikey:SRV.key, Authorization:'Bearer '+at } }); if (!r.ok) throw new Error('링크가 만료되었습니다. 다시 요청해 주세요.');
-      const u = await r.json(); SESSION = { access_token:at, refresh_token:rt, user:{ id:u.id, email:u.email } }; saveSession(); meCache = null; return myProfile(); },
+    linkUser: async at => { const r = await fetchT(SRV.url + '/auth/v1/user', { headers:{ apikey:SRV.key, Authorization:'Bearer '+at } }); if (!r.ok) throw new Error('링크가 만료되었습니다. 다시 요청해 주세요.'); return r.json(); },
+    adoptSession: async (at, rt, u) => { u = u || await DBX.linkUser(at); SESSION = { access_token:at, refresh_token:rt, user:{ id:u.id, email:u.email } }; saveSession(); meCache = null; return myProfile(); },
     updateMe: async patch => { const b = {}; if ('name' in patch) b.name = patch.name; if ('phone' in patch) b.phone = patch.phone; if ('nick' in patch) b.nick = patch.nick;
       await api(`/rest/v1/profiles?id=eq.${SESSION.user.id}`, { method:'PATCH', prefer:'return=minimal', body:b }); return myProfile(); },
     /* 학원 코드·자녀 연결은 서버 함수 한 곳에서만(틀린 코드 제한 · 한 코드 한 학생 계정) */
@@ -1298,14 +1303,15 @@ const serverDB = () => {
     myWritings: async () => { const u = SESSION && SESSION.user.id; if (!u) return { posts:[], comments:[] };
       const [ps, cs] = await Promise.all([api(`/rest/v1/posts?author=eq.${u}&deleted=is.false&select=at,board,title,body&order=at.asc`), api(`/rest/v1/comments?author=eq.${u}&deleted=is.false&select=at,body&order=at.asc`)]);
       return { posts:ps, comments:cs }; },
-    consentRequest: async () => (await api('/rest/v1/rpc/consent_request', { method:'POST', body:{} })) || { ok:false, why:'요청하지 못했습니다.' },
+    consentRequest: async phone => (await api('/rest/v1/rpc/consent_request', { method:'POST', body: phone != null ? { p_phone:String(phone) } : {} })) || { ok:false, why:'요청하지 못했습니다.' },
     consentList: async () => api('/rest/v1/rpc/consent_list', { method:'POST', body:{} }),
     consentMark: async (id, what) => { await api('/rest/v1/rpc/consent_mark', { method:'POST', body:{ p_uid:id, p_what:what } }); },
     /* 푸시 받을 기기 · 앱 오류 기록 · 스토어 결제 확인 */
     registerPush: async (token, platform) => { await api('/rest/v1/rpc/register_push', { method:'POST', body:{ p_token:token, p_platform:platform } }); },
     logError: async e => { await api('/rest/v1/client_errors', { method:'POST', prefer:'return=minimal', body:e }); },
     errors: async () => api('/rest/v1/client_errors?select=*&order=at.desc&limit=30'),
-    verifyPurchase: async p => { const r = await fetchT(SRV.url + '/functions/v1/verify-purchase', { method:'POST', headers:{ apikey:SRV.key, 'Content-Type':'application/json', Authorization:'Bearer '+((SESSION&&SESSION.access_token)||SRV.key) }, body: JSON.stringify(p) });
+    verifyPurchase: async p => { const call = () => fetchT(SRV.url + '/functions/v1/verify-purchase', { method:'POST', headers:{ apikey:SRV.key, 'Content-Type':'application/json', Authorization:'Bearer '+((SESSION&&SESSION.access_token)||SRV.key) }, body: JSON.stringify(p) });
+      let r = await call(); if (r.status === 401 && await refreshSession()) r = await call();   // 앱을 오래 켜 둬 토큰이 만료됐어도 결제 확인이 실패하지 않게
       const j = await r.json().catch(()=>({})); if (!r.ok || !j.ok) throw new Error(j.why || j.message || '결제를 확인하지 못했습니다. 잠시 뒤 [구매 복원]을 눌러 주세요.'); meCache = null; return j; },
     ownerEmail: () => (SESSION && SESSION.user.email) || '',
     reset: () => {},
@@ -1607,17 +1613,27 @@ function renderAuth(){
 /* ═══ 보호자 동의(만 14세 미만) — 벽이 아니라 조용한 카드. 교재·문제는 그대로 쓰고, 이야기와 서버 저장만 동의 뒤에 열린다 ═══ */
 const CONSENT_BASE = () => (isNative || !/^https?:/.test(location.href)) ? WEB_URL : location.origin + location.pathname.replace(/[^/]*$/, '');
 function consentCard(where){ if (!consentPending()) return '';
-  const left = Math.max(0, 7 - Math.max(0, daysBetween(String(ACC.created||todayISO()).slice(0,10), todayISO())));
+  const reset = ACC.guardianHow === 'reset' && ACC.guardianAt;
+  const left = Math.max(0, 7 - Math.max(0, daysBetween(String((reset ? ACC.guardianAt : ACC.created)||todayISO()).slice(0,10), todayISO())));
+  if (reset) return `<div class="consent" role="note"><div class="t">보호자 번호를 다시 확인해 주세요</div>
+    <div class="d">학원에서 확인해 보니, 적어 둔 번호가 학원에 등록된 보호자 번호와 달랐어요. 보호자 휴대전화 번호를 다시 적고 요청을 보내 주세요.${where==='me'?` ${left}일 안에 동의가 없으면 계정이 지워집니다.`:''}</div>
+    <input id="consentPhone" type="tel" inputmode="numeric" autocomplete="off" aria-label="보호자 휴대전화" placeholder="보호자 휴대전화 (010-0000-0000)" value="${esc(tel(String(ACC.guardian||'').replace(/^\S+\s*/, ''))||'')}" style="width:100%;border:1.5px solid var(--line);border-radius:12px;padding:11px 12px;font-size:15px;font-family:inherit;background:var(--card);color:var(--ink);margin:8px 0 2px">
+    <div class="r"><button class="btn" id="consentSend">고친 번호로 다시 요청 보내기</button>${where!=='today'?`<button class="btn ghost" id="consentPaper">학원에서 서면으로</button>`:''}</div></div>`;
+  if (ACC.guardianHow === 'web' && ACC.guardianAt) return `<div class="consent" role="note"><div class="t">보호자가 동의했어요</div>
+    <div class="d">학원에서 보호자께 <b>확인 문자</b>를 보내면 이야기와 진도 저장이 열립니다. 교재와 문제는 지금도 그대로 쓸 수 있어요.</div></div>`;
   return `<div class="consent" role="note"><div class="t">보호자 동의를 기다리고 있어요</div>
     <div class="d">만 14세 미만은 보호자가 동의해야 <b>이야기</b>와 <b>진도 저장</b>이 열립니다. 교재와 문제는 지금도 그대로 쓸 수 있어요.${where==='me'?` ${left}일 안에 동의가 없으면 계정이 지워집니다(개인정보 보호법 제22조의2).`:''}</div>
     <div class="r"><button class="btn" id="consentSend">보호자에게 동의 요청 보내기</button>${where!=='today'?`<button class="btn ghost" id="consentPaper">학원에서 서면으로</button>`:''}</div></div>`; }
 async function sendConsent(){
-  let r; try { r = await DBX.consentRequest(); } catch (e){ toast(e.message); return; }
+  const pin = document.querySelector('.consent #consentPhone');
+  let r; try { r = await DBX.consentRequest(pin ? pin.value : undefined); } catch (e){ toast(e.message); return; }
+  if (pin && r.ok) ACC = await DBX.me();
   if (!r.ok){ toast(r.why); return; }
   if (r.done){ ACC = await DBX.me(); show(view); toast('이미 동의가 확인되었습니다'); return; }
+  if (r.given){ ACC = await DBX.me(); show(view); toast('보호자가 이미 동의했습니다. 학원 확인 문자를 기다려 주세요'); return; }
   const link = `${CONSENT_BASE()}consent.html?t=${r.token}`, ph = tel(String(r.guardian||'').replace(/^\S+\s*/, ''));
   const body = `[${CFG.academy}] ${ACC.name} 학생이 '하루 한 개념' 앱 가입에 보호자 동의를 요청했습니다. 아래 링크에서 내용을 보고 동의해 주세요(7일).\n${link}`;
-  openSheet(`<h3>보호자에게 보내기</h3><p>가입할 때 적은 보호자 연락처${ph?` <b>${esc(ph)}</b>`:''}로 문자를 보냅니다. 보호자가 링크에서 동의하면 바로 열립니다.</p>
+  openSheet(`<h3>보호자에게 보내기</h3><p>가입할 때 적은 보호자 연락처${ph?` <b>${esc(ph)}</b>`:''}로 문자를 보냅니다. 보호자가 링크에서 동의하고 학원이 보호자께 확인 문자를 보내면 열립니다.</p>
     ${ph ? `<a class="btn" href="sms:${ph}${/iphone|ipad/i.test(navigator.userAgent)?'&':'?'}body=${encodeURIComponent(body)}" style="text-decoration:none">문자 앱으로 보내기</a>` : ''}
     <button class="btn soft" id="consentCopy" data-t="${esc(body)}">링크 복사 · 카카오톡으로 보내기</button><button class="btn ghost" id="sheetClose">닫기</button>`); }
 
@@ -2517,25 +2533,37 @@ async function loadStorePrices(){ const NP = IAP(); if (!NP || pricesAsked) retu
 async function buyPlan(p){
   const NP = IAP();
   if (!NP){ openSheet(`<h3>${esc(p.name)} · ${p.price.toLocaleString()}원</h3><p>이용권 결제는 <b>안드로이드 앱</b>(Google Play)에서 할 수 있습니다. 학원이나 이벤트로 받은 <b>이용권 코드</b>가 있으면 아래 칸에 넣어 바로 열 수 있습니다.</p><button class="btn ghost" id="sheetClose">닫기</button>`); return; }
+  if (consentPending()){ openSheet(`<h3>보호자 동의가 먼저 필요합니다</h3><p>만 14세 미만은 보호자 동의가 끝난 뒤에 이용권을 살 수 있습니다. 동의 안내는 오늘 화면 위에 있습니다.</p><button class="btn ghost" id="sheetClose">닫기</button>`); return; }
   if (buying) return; buying = true;
   try {
-    const r = await NP.purchaseProduct({ productIdentifier: p.sku, productType:'inapp', quantity:1, appAccountToken: ACC.id });
+    // 확인(소비)은 서버만 한다 — 서버가 반영하지 못한 결제(동의 전·검증 실패)는 확인되지 않은 채 남아 Google Play 가 3일 뒤 자동 환불
+    const r = await NP.purchaseProduct({ productIdentifier: p.sku, productType:'inapp', quantity:1, appAccountToken: ACC.id, autoAcknowledgePurchases:false });
     if (!r || !r.purchaseToken) throw new Error('결제 정보를 받지 못했습니다. [구매 복원]을 눌러 주세요.');
     toast('결제를 확인하는 중입니다…');
     const v = await DBX.verifyPurchase({ productId:p.sku, purchaseToken:r.purchaseToken, orderId:r.transactionId||'' });
     ACC = await DBX.me(); passErr=''; toast(`${kdate(v.until)}까지 전 범위가 열렸습니다`); renderPlans();
-  } catch (err){ const m = String((err && err.message) || err || '');
+  } catch (err){ let m = String((err && err.message) || err || '');
+    if (/pending/i.test(m)) m = '결제가 아직 처리 중입니다(보류 중인 결제). 결제가 끝나면 앱을 열 때 자동으로 이용권이 열립니다.';
     if (!/cancel|취소/i.test(m)) openSheet(`<h3>결제를 마치지 못했습니다</h3><p>${esc(m)}</p><p class="fine" style="text-align:left;padding:0">돈이 빠져나갔는데 열리지 않았다면 [구매 복원]을 누르세요. 같은 결제가 두 번 반영되지는 않습니다.</p><button class="btn" id="iapRestore">구매 복원</button><button class="btn ghost" id="sheetClose">닫기</button>`);
   } finally { buying = false; }
 }
-async function restorePurchases(){ const NP = IAP(); if (!NP) return; closeSheet(); toast('스토어에서 결제 내역을 확인합니다…');
-  let n = 0, last = '';
+/* 구매 복원 — [구매 복원]을 누를 때, 그리고 앱을 켤 때 조용히(quiet) 한 번.
+   보류 중이던 결제가 나중에 끝났거나 결제 뒤 연결이 끊겼던 것을 여기서 받는다(확인하지 않은 결제는 Play 가 3일 뒤 자동 환불).
+   이미 확인한 영수증은 기기에 적어 두고 다시 보내지 않는다. 다른 계정(가족 폰)으로 산 결제는 세기만 한다 */
+async function restorePurchases(quiet){ const NP = IAP(); if (!NP || !ACC) return; if (!quiet){ closeSheet(); toast('스토어에서 결제 내역을 확인합니다…'); }
+  let n = 0, fresh = 0, other = 0, last = ''; const doneKey = 'pcs.iap.done.' + ACC.id; let done = []; try { done = JSON.parse(localStorage.getItem(doneKey)) || []; } catch {}
   try { const { purchases } = await NP.getPurchases({ productType:'inapp' });
-    for (const x of (purchases||[])) { if (!x.purchaseToken) continue;
-      try { await DBX.verifyPurchase({ productId:x.productIdentifier, purchaseToken:x.purchaseToken, orderId:x.transactionId||'' }); n++; } catch (e){ last = e.message; } }
+    for (const x of (purchases||[])) { if (!x.purchaseToken || (quiet && done.includes(x.purchaseToken))) continue;
+      const acct = x.appAccountToken || x.obfuscatedAccountId || x.accountIdentifier || '';
+      if (acct && acct !== ACC.id){ other++; continue; }
+      try { const j = await DBX.verifyPurchase({ productId:x.productIdentifier, purchaseToken:x.purchaseToken, orderId:x.transactionId||'' }); n++; if (!j.dup) fresh++; if (!done.includes(x.purchaseToken)) done.push(x.purchaseToken); }
+      catch (e){ if (/다른 계정|account/i.test(e.message)) other++; else last = e.message; } }
   } catch (e){ last = e.message; }
-  ACC = await DBX.me(); renderPlans();
-  toast(n ? `결제 ${n}건을 확인했습니다${hasPass()?` · ${kdate(ACC.passUntil)}까지`:''}` : (last || '복원할 결제가 없습니다'));
+  try { localStorage.setItem(doneKey, JSON.stringify(done.slice(-50))); } catch {}
+  if (quiet && !fresh) return;
+  ACC = await DBX.me(); if (view === 'plans') renderPlans(); else if (view === 'today' && n) renderToday();
+  const until = hasPass() ? ` · ${kdate(ACC.passUntil)}까지` : '';
+  toast(fresh ? `결제 ${fresh}건을 새로 반영했습니다${until}` : n ? `이미 모두 반영된 결제입니다${until}` : last ? last : other ? `이 계정으로 산 결제가 없습니다(다른 계정 결제 ${other}건)` : '복원할 결제가 없습니다');
 }
 
 /* ═══ 보호자 홈 ═══ */
@@ -2628,14 +2656,15 @@ async function renderAdmin(){
       </details>
       <p class="tip">1인 1코드. 학생은 '학원 코드 등록', 보호자는 '자녀 연결'에 같은 코드를 씁니다. 만료일이 지나면 저절로 닫힙니다. 이름을 누르면 출석·진도·정보 고치기가 보입니다.</p>
       ${await (async () => { let cl = []; try { cl = await DBX.consentList(); } catch {} if (!cl.length) return '';
-        const todo = cl.filter(x => !x.guardian_ok || (x.guardian_how==='web' && !x.notified_at));
+        const given = x => x.guardian_how==='web' && x.guardian_at && !x.notified_at;   // 보호자가 동의를 표시함 → 확인 문자를 보내야 열린다
+        const todo = cl.filter(x => !x.guardian_ok || given(x));
         const smsBody = x => encodeURIComponent(`[${CFG.academy}] ${x.name} 학생의 앱 가입에 대한 보호자님의 동의를 확인했습니다. 동의를 철회하거나 문의하시려면 학원으로 연락 주세요.${CFG.phone?' '+CFG.phone:''}`);
         return `<details class="stuedit" id="consentBox" ${todo.length?'open':''}><summary>만 14세 미만 · 보호자 동의 확인 ${todo.length?`<span class="cst wait">${todo.length}건 할 일</span>`:''}</summary>
-          <p class="tip" style="margin:0 0 8px">보호자가 동의 페이지에서 동의하면, <b>확인 문자</b>를 보호자에게 보내야 확인 절차가 끝납니다(개인정보 보호법 시행령). 서면으로 받았다면 ‘서면 동의 받음’을 누르세요.</p>
-          ${cl.map(x => { const ph = tel(String(x.guardian||'').replace(/^\S+\s*/, '')), days = daysBetween(String(x.created_at||'').slice(0,10), todayISO());
+          <p class="tip" style="margin:0 0 8px">보호자가 동의 페이지에서 동의를 표시하면, 원장님이 <b>보호자 휴대전화로 확인 문자</b>를 보내야 동의가 끝나고 학생 앱이 열립니다. 보내기 전에 번호가 학원 등록 서류의 보호자 번호와 같은지 확인해 주세요(아이가 자기 번호를 적었을 수 있습니다). 서면으로 받았다면 ‘서면 동의 받음’을 누르세요.</p>
+          ${cl.map(x => { const ph = tel(String(x.guardian||'').replace(/^\S+\s*/, '')), days = daysBetween(String((x.guardian_how==='reset' ? x.guardian_at : x.created_at)||'').slice(0,10), todayISO());
             return `<div class="kv" style="align-items:flex-start;gap:8px"><span class="k" style="flex:1">${esc(x.name)} <small style="color:var(--faint)">· 보호자 ${esc(x.guardian||'미기재')}</small></span><span class="v" style="display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end">
-              ${!x.guardian_ok ? `<span class="cst wait">동의 대기 · ${Math.max(0, 7-days)}일 남음</span><button class="mini" data-cpaper="${esc(x.id)}">서면 동의 받음</button>`
-                : x.guardian_how==='web' && !x.notified_at ? `<span class="cst ok">웹 동의</span>${ph?`<a class="mini" href="sms:${ph}${/iphone|ipad/i.test(navigator.userAgent)?'&':'?'}body=${smsBody(x)}" data-cnotify="${esc(x.id)}" style="text-decoration:none">확인 문자 보내기</a>`:`<button class="mini" data-cnotify="${esc(x.id)}">연락처 없음 · 전화로 알림 완료</button>`}`
+              ${given(x) ? `<span class="cst ok">보호자 동의 표시</span>${ph?`<a class="mini pri" href="sms:${ph}${/iphone|ipad/i.test(navigator.userAgent)?'&':'?'}body=${smsBody(x)}" data-cnotify="${esc(x.id)}">확인 문자 보내기</a>`:`<button class="mini" data-cnotify="${esc(x.id)}">연락처 없음 · 전화로 알림 완료</button>`}<button class="mini" data-creset="${esc(x.id)}">번호가 달라요</button>`
+                : !x.guardian_ok ? `<span class="cst wait">${x.guardian_how==='reset'?'번호 다시 받는 중':'동의 대기'} · ${Math.max(0, 7-days)}일 남음</span><button class="mini" data-cpaper="${esc(x.id)}">서면 동의 받음</button>`
                 : `<span class="cst ok">${x.guardian_how==='paper'?'서면':'웹'} 동의 확인 완료</span>`}</span></div>`; }).join('')}
         </details>`; })()}
       <details class="stuedit"><summary>학기가 바뀔 때 · 수강 기간 한꺼번에 연장</summary>
@@ -2824,7 +2853,8 @@ async function initPush(){ const PN = plug('PushNotifications'); if (!isNative |
 async function dropPush(){ if (!pushToken || !SRV) return; try { await api(`/rest/v1/push_tokens?token=eq.${encodeURIComponent(pushToken)}`, { method:'DELETE' }); } catch {} pushToken = ''; }
 let lastBack = 0;
 function nativeInit(){ if (!isNative) return; const App = plug('App');
-  App && App.addListener('resume', () => pullProgress());
+  App && App.addListener('resume', () => { pullProgress(); restorePurchases(true).catch(()=>{}); });
+  setTimeout(() => restorePurchases(true).catch(()=>{}), 2500);   // 켤 때 한 번 — 보류 결제가 끝났거나 결제 뒤 끊겼던 것
   App && App.addListener('backButton', () => { if (askDone) return askDone(false); if (document.getElementById('sheetLock')) return; if (document.getElementById('sheetBg')) return closeSheet();
     if (view==='auth' && authMode==='signup'){ document.getElementById('suPrev')?.click(); return; }
     if (view==='auth' && ['login','forgot'].includes(authMode)){ document.getElementById('authBack')?.click(); return; }
@@ -2922,6 +2952,7 @@ async function afterLogin(acc){
   else S.auth = null;
   try { mergeProgress(await DBX.loadProgress(progressKey())); } catch {}
   adoptGuestNotes(); syncNotes().then(refreshNoteCard).catch(()=>{});
+  if (isNative) setTimeout(() => restorePurchases(true).catch(()=>{}), 1500);
   save(S); scheduleReminder(); show(home()); initPush(); checkTalkNew();
 }
 async function linkStudentCode(code){
@@ -3255,6 +3286,7 @@ document.addEventListener('click', async e => {
   if (T('#consentCopy')){ const t = T('#consentCopy').dataset.t; try { if (navigator.share) await navigator.share({ text:t }); else { await navigator.clipboard.writeText(t); toast('복사했습니다 · 보호자에게 붙여 보내 주세요'); } } catch {} return; }
   if (T('#consentPaper')){ openSheet(`<h3>학원에서 서면으로 동의</h3><p>보호자가 학원에 오시면 원장님께 <b>보호자 동의서</b>를 받아 서명해 주세요. 원장님이 앱에서 확인하면 바로 열립니다.</p><button class="btn ghost" id="sheetClose">닫기</button>`); return; }
   const cpap = T('[data-cpaper]'); if (cpap){ if (!await ask('보호자에게 서면 동의서를 받으셨나요? 받은 서면은 보관해 주세요.', '받았습니다',false)) return; await DBX.consentMark(cpap.dataset.cpaper, 'paper'); toast('서면 동의를 기록했습니다'); renderAdmin(); return; }
+  const crst = T('[data-creset]'); if (crst){ if (!await ask('보호자 번호가 등록 서류와 다른가요? 이 동의 표시를 지우고, 학생이 올바른 보호자 번호로 다시 요청하게 합니다. 보호자께 직접 연락해 서면으로 받으셔도 됩니다.', '동의 표시 지우기', true)) return; await DBX.consentMark(crst.dataset.creset, 'reset'); toast('동의 표시를 지웠습니다. 학생에게 다시 요청하도록 알려 주세요'); renderAdmin(); return; }
   const cnot = T('[data-cnotify]'); if (cnot){ await DBX.consentMark(cnot.dataset.cnotify, 'notified'); setTimeout(renderAdmin, 400); return; }
 
   /* 원장 — 여러 명 등록 */
@@ -3354,7 +3386,13 @@ window.addEventListener('unhandledrejection', e => { const r = e.reason || {};
   if (SRV && (hp.get('access_token') || hp.get('error_description'))){
     history.replaceState(null, '', location.pathname + location.search);
     if (hp.get('error_description')) linkErr = AUTH_KO(hp.get('error_description'));
-    else try { ACC = await DBX.adoptSession(hp.get('access_token'), hp.get('refresh_token'));
+    else try {
+      /* 링크에 든 계정을 먼저 보여 주고 확인받는다 — 남이 보낸 링크로 조용히 다른 계정에 로그인되는 일(로그인 바꿔치기) 방지 */
+      const lu = await DBX.linkUser(hp.get('access_token')); const cur = SESSION && SESSION.user && SESSION.user.email;
+      const msg = hp.get('type')==='recovery' ? `${lu.email} 계정의 비밀번호를 새로 정합니다. 내 계정이 맞나요?`
+        : `${lu.email} 계정으로 로그인합니다. 내 계정이 맞나요?${cur && cur !== lu.email ? ` (지금 로그인한 ${cur} 에서는 로그아웃됩니다)` : ''}`;
+      if (!await ask(msg, '내 계정 맞아요', false)) throw new Error('링크의 계정으로 로그인하지 않았습니다.');
+      ACC = await DBX.adoptSession(hp.get('access_token'), hp.get('refresh_token'), lu);
       if (hp.get('type')==='recovery'){ authMode='newpw'; show('auth'); nativeInit(); return; }
       toast('메일 인증이 끝났습니다. 반갑습니다'); S.onboarded=true; await afterLogin(ACC); nativeInit(); return;
     } catch (e){ linkErr = e.message; }

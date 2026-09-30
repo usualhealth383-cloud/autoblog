@@ -6,7 +6,8 @@
 -- 보안 원칙
 --  · 학생·보호자가 직접 고칠 수 있는 칸은 이름·연락처·닉네임뿐이다. 역할·이용권 만료일·학원 코드는 함수로만 바뀐다.
 --  · 학원 코드 연결은 link_code() 한 곳 — 틀린 코드는 1시간에 10번까지, 한 학생 코드는 학생 계정 하나에만.
---  · 원장 = 설정한 이메일로 로그인했고 그 메일을 인증한 계정.
+--  · 원장 = 설정한 이메일로 가입해 메일 인증을 마친 계정 → 그 뒤 owner_uid 로 못 박으면 그 계정만.
+--  · 코드 추측: 계정당 10번 · 같은 IP 30번 · 전체 300번(1시간, 틀린 것만) — 계정을 여러 개 만들어도 막힌다.
 --  · 날짜·시각은 모두 한국 시간(Asia/Seoul). 서버 기본값(UTC)이면 저녁 수업이 지각으로 안 잡힌다.
 
 create extension if not exists pgcrypto;
@@ -21,6 +22,8 @@ create table if not exists private.config (k text primary key, v text not null);
 create table if not exists private.consent_links (token text primary key, uid uuid not null, at timestamptz not null default now(), used_at timestamptz);
 -- 틀린 코드 입력 기록(학원 코드·출석 코드·이용권 코드 무차별 대입 방지)
 create table if not exists private.attempts (uid uuid, kind text not null, ok boolean not null, at timestamptz not null default now());
+alter table private.attempts add column if not exists ip text;
+create index if not exists attempts_kind_at on private.attempts (kind, at desc) where not ok;
 create index if not exists attempts_idx on private.attempts (uid, kind, at desc);
 
 create or replace function kst_today() returns date language sql stable as $$ select (now() at time zone 'Asia/Seoul')::date $$;
@@ -118,6 +121,7 @@ create table if not exists purchases (
   raw        jsonb,
   at         timestamptz not null default now()
 );
+alter table purchases add column if not exists revoked_at timestamptz;   -- 환불·취소 — 줄은 지우지 않는다(같은 영수증 재사용 막기 · 5년 보관)
 
 -- 공부 노트 — 나만 보는 메모장. 원장·보호자도 못 본다(진도와 달리 owner_read 정책이 없다).
 -- id 는 앱이 만든다(오프라인에서 쓰고 나중에 올려도 같은 노트로 합쳐지게)
@@ -209,9 +213,13 @@ create table if not exists client_errors (
 );
 
 -- ═══ 누가 누구인가 ═══
+-- 원장 판정: 원장이 가입·메일 인증을 마친 뒤 owner_uid 로 계정을 못 박으면(README 순서 ③) 그 계정만 원장.
+-- 못 박기 전에는 설정한 이메일 + 메일 인증 완료 계정. (메일 인증을 꺼 두면 먼저 그 이메일로 가입한 사람이 원장이 될 수 있어 못 박기가 꼭 필요)
 create or replace function is_owner() returns boolean language sql stable security definer set search_path = public, private as $$
-  select exists (select 1 from auth.users u join private.config c on c.k = 'owner_email'
-                 where u.id = auth.uid() and lower(u.email) = lower(c.v) and u.email_confirmed_at is not null);
+  select case when exists (select 1 from private.config where k = 'owner_uid')
+    then exists (select 1 from private.config c join auth.users u on u.id::text = c.v where c.k = 'owner_uid' and u.id = auth.uid() and u.email_confirmed_at is not null)
+    else exists (select 1 from auth.users u join private.config c on c.k = 'owner_email'
+                 where u.id = auth.uid() and lower(u.email) = lower(c.v) and u.email_confirmed_at is not null) end;
 $$;
 create or replace function my_student_code() returns text language sql stable security definer set search_path = public as $$
   select student_code from profiles where id = auth.uid() and role = 'student' $$;
@@ -222,17 +230,25 @@ create or replace function my_classes() returns setof text language sql stable s
   select cls from students where code in (select my_codes()) and until >= kst_today() $$;
 
 -- 틀린 입력 제한: 최근 1시간 실패가 n번 이상이면 true
+-- 요청한 기기의 IP(PostgREST 가 넘기는 헤더) — 없으면 null
+create or replace function private.req_ip() returns text language sql stable as $$
+  with h as (select nullif(current_setting('request.headers', true), '')::json j)
+  select nullif(trim(coalesce(j->>'cf-connecting-ip', split_part(coalesce(j->>'x-forwarded-for', ''), ',', 1))), '') from h $$;   -- 앞단(Cloudflare)이 채운 값을 먼저 · 위조해도 계정당·전체 한도는 그대로
+-- 코드 추측 막기: 계정당 n번 · 같은 IP 3n번 · 학원 전체 300번(1시간, 틀린 것만). 계정을 여러 개 만들어 돌려도 전체 한도에 걸린다
 create or replace function private.too_many(k text, n int) returns boolean language sql stable security definer set search_path = private as $$
-  select count(*) >= n from private.attempts where uid = auth.uid() and kind = k and not ok and at > now() - interval '1 hour' $$;
+  select (select count(*) from private.attempts where uid = auth.uid() and kind = k and not ok and at > now() - interval '1 hour') >= n
+      or (private.req_ip() is not null and (select count(*) from private.attempts where ip = private.req_ip() and kind = k and not ok and at > now() - interval '1 hour') >= n * 3)
+      or (select count(*) from private.attempts where kind = k and not ok and at > now() - interval '1 hour') >= 300 $$;
 create or replace function private.note(k text, good boolean) returns void language sql security definer set search_path = private as $$
-  insert into private.attempts(uid, kind, ok) values (auth.uid(), k, good) $$;
+  insert into private.attempts(uid, kind, ok, ip) values (auth.uid(), k, good, private.req_ip()) $$;
 
 -- ═══ 가입하면 프로필을 만든다(역할은 학생·보호자만 — 원장은 설정한 이메일만) ═══
 create or replace function private.on_signup() returns trigger language plpgsql security definer set search_path = public, private as $$
 declare m jsonb := coalesce(new.raw_user_meta_data, '{}'::jsonb); r text := coalesce(m->>'role', 'student');
 begin
   if r not in ('student','parent') then r := 'student'; end if;
-  if exists (select 1 from private.config where k = 'owner_email' and lower(v) = lower(new.email)) then r := 'owner'; end if;
+  if not exists (select 1 from private.config where k = 'owner_uid')
+     and exists (select 1 from private.config where k = 'owner_email' and lower(v) = lower(new.email)) then r := 'owner'; end if;   -- 원장 계정을 못 박은 뒤에는 새 가입자에게 원장 역할을 주지 않는다
   insert into profiles (id, role, name, phone, under14, guardian, terms_ver, agreed_at)
   values (new.id, r, left(coalesce(m->>'name',''), 40), left(coalesce(m->>'phone',''), 20),
           coalesce((m->>'under14')::boolean, false), left(coalesce(m->>'guardian',''), 60),
@@ -259,11 +275,11 @@ begin
   if private.too_many('code', 10) then return json_build_object('ok', false, 'why', '코드를 여러 번 틀렸습니다. 1시간 뒤에 다시 시도하거나 원장님께 문의해 주세요.'); end if;
   select * into s from students where code = c;
   if not found then perform private.note('code', false); return json_build_object('ok', false, 'why', '등록되지 않은 코드입니다. 원장님께 받은 코드를 확인해 주세요.'); end if;
-  if s.until < kst_today() then return json_build_object('ok', false, 'why', '수강 기간이 ' || to_char(s.until, 'FMMM"월" FMDD"일"') || '에 끝났습니다. 원장님께 문의해 주세요.'); end if;
+  if s.until < kst_today() then perform private.note('code', false); return json_build_object('ok', false, 'why', '수강 기간이 ' || to_char(s.until, 'FMMM"월" FMDD"일"') || '에 끝났습니다. 원장님께 문의해 주세요.'); end if;
   if p_kind = 'student' then
     if pr.role <> 'student' then return json_build_object('ok', false, 'why', '학생 계정에서만 학원 코드를 등록할 수 있습니다.'); end if;
     if exists (select 1 from profiles where student_code = c and id <> u) then
-      return json_build_object('ok', false, 'why', '이 코드는 이미 다른 학생 계정에 연결되어 있습니다. 원장님께 문의해 주세요.'); end if;
+      perform private.note('code', false); return json_build_object('ok', false, 'why', '이 코드는 이미 다른 학생 계정에 연결되어 있습니다. 원장님께 문의해 주세요.'); end if;
     update profiles set student_code = c, name = case when name = '' then s.name else name end where id = u;
   else
     if pr.role <> 'parent' then return json_build_object('ok', false, 'why', '보호자 계정에서만 자녀를 연결할 수 있습니다.'); end if;
@@ -341,8 +357,8 @@ begin
   if private.too_many('pass', 10) then return json_build_object('ok', false, 'why', '코드를 여러 번 틀렸습니다. 1시간 뒤에 다시 시도해 주세요.'); end if;
   select * into p from passes where code = c for update;
   if not found then perform private.note('pass', false); return json_build_object('ok', false, 'why', '없는 이용권 코드입니다.'); end if;
-  if p.used_by is not null then return json_build_object('ok', false, 'why', '이미 사용된 코드입니다.'); end if;
-  select greatest(coalesce(pass_until, kst_today()), kst_today()) into base from profiles where id = auth.uid();
+  if p.used_by is not null then perform private.note('pass', false); return json_build_object('ok', false, 'why', '이미 사용된 코드입니다.'); end if;
+  select greatest(coalesce(pass_until, kst_today()), kst_today()) into base from profiles where id = auth.uid() for update;   -- 결제 반영과 동시에 와도 기간이 덮이지 않게
   update profiles set pass_until = base + p.days where id = auth.uid();
   update passes set used_by = auth.uid(), used_at = kst_today() where code = c;
   perform private.note('pass', true);
@@ -353,7 +369,8 @@ create or replace function grant_purchase(p_uid uuid, p_token text, p_product te
 language plpgsql security definer set search_path = public as $$
 declare base date; u date; old purchases;
 begin
-  select * into old from purchases where purchase_token = p_token;
+  select * into old from purchases where purchase_token = p_token for update;
+  if found and old.revoked_at is not null then return json_build_object('ok', false, 'revoked', true, 'why', '환불·취소된 결제입니다.'); end if;
   if found then return json_build_object('ok', true, 'dup', true, 'until', old.until::text); end if;
   select greatest(coalesce(pass_until, kst_today()), kst_today()) into base from profiles where id = p_uid for update;
   if base is null then return json_build_object('ok', false, 'why', 'no profile'); end if;
@@ -366,9 +383,9 @@ end $$;
 create or replace function revoke_purchase(p_token text) returns void language plpgsql security definer set search_path = public as $$
 declare p purchases;
 begin
-  select * into p from purchases where purchase_token = p_token; if not found then return; end if;
+  select * into p from purchases where purchase_token = p_token for update; if not found or p.revoked_at is not null then return; end if;
   update profiles set pass_until = greatest(kst_today() - 1, pass_until - p.days) where id = p.uid;
-  delete from purchases where purchase_token = p_token;
+  update purchases set revoked_at = now() where purchase_token = p_token;   -- 지우지 않는다: 같은 영수증으로 다시 받기 막기 · 전자상거래법 5년 보관
 end $$;
 
 -- ═══ 이야기: 글쓴이·닉네임은 서버가 채운다 · 도배 제한 · 댓글 수 ═══
@@ -493,12 +510,18 @@ $$;
 -- 동의 전에는 이야기(글·댓글·읽기)와 진도의 서버 저장을 막고, 7일 안에 동의가 없으면 계정을 지운다(purge_old).
 create or replace function consent_ok(u uuid default auth.uid()) returns boolean language sql stable security definer set search_path = public as $$
   select coalesce((select not under14 or guardian_ok from profiles where id = u), true) $$;
-create or replace function consent_request() returns json language plpgsql security definer set search_path = public, private as $$
-declare pr profiles; t text;
+-- p_phone: 학원이 '번호가 달라요'로 되돌린 뒤 아이가 보호자 번호를 고쳐 다시 보낼 때만(동의 확인 전까지)
+drop function if exists consent_request();
+create or replace function consent_request(p_phone text default null) returns json language plpgsql security definer set search_path = public, private as $$
+declare pr profiles; t text; d text := regexp_replace(coalesce(p_phone, ''), '[^0-9]', '', 'g');
 begin
   select * into pr from profiles where id = auth.uid();
   if not found or not pr.under14 then return json_build_object('ok', false, 'why', '보호자 동의가 필요한 계정이 아닙니다.'); end if;
   if pr.guardian_ok then return json_build_object('ok', true, 'done', true); end if;
+  if pr.guardian_how = 'web' and pr.guardian_at is not null then return json_build_object('ok', true, 'given', true); end if;
+  if p_phone is not null then
+    if d !~ '^01[0-9]{8,9}$' then return json_build_object('ok', false, 'why', '보호자 휴대전화 번호를 확인해 주세요.'); end if;
+    update profiles set guardian = left(split_part(guardian, ' ', 1) || ' ' || d, 60) where id = pr.id returning * into pr; end if;
   if (select count(*) from private.consent_links where uid = pr.id and at > now() - interval '1 day') >= 5 then
     return json_build_object('ok', false, 'why', '오늘은 요청을 너무 많이 보냈습니다. 내일 다시 시도해 주세요.'); end if;
   t := encode(gen_random_bytes(18), 'hex');
@@ -513,8 +536,8 @@ begin
   if not found then return json_build_object('ok', false, 'why', '만료된 링크입니다. 자녀에게 새 링크를 보내 달라고 해 주세요.'); end if;
   select * into pr from profiles where id = l.uid;
   if not found then return json_build_object('ok', false, 'why', '계정을 찾을 수 없습니다.'); end if;
-  if l.used_at is not null and not pr.guardian_ok then return json_build_object('ok', false, 'why', '이미 사용한 링크입니다. 자녀에게 새 링크를 보내 달라고 해 주세요.'); end if;
-  return json_build_object('ok', true, 'child', left(pr.name, 1) || repeat('○', greatest(char_length(pr.name) - 1, 1)), 'done', pr.guardian_ok,
+  if l.used_at is not null and not pr.guardian_ok and not (pr.guardian_how = 'web' and pr.guardian_at is not null) then return json_build_object('ok', false, 'why', '이미 사용한 링크입니다. 자녀에게 새 링크를 보내 달라고 해 주세요.'); end if;
+  return json_build_object('ok', true, 'child', left(pr.name, 1) || repeat('○', greatest(char_length(pr.name) - 1, 1)), 'done', pr.guardian_ok or (pr.guardian_how = 'web' and pr.guardian_at is not null),
                            'expires', to_char((l.at + interval '7 days') at time zone 'Asia/Seoul', 'FMMM"월" FMDD"일"'));
 end $$;
 create or replace function consent_give(p_token text, p_name text) returns json language plpgsql security definer set search_path = public, private as $$
@@ -524,7 +547,9 @@ begin
   select * into l from private.consent_links where token = p_token and used_at is null and at > now() - interval '7 days' for update;
   if not found then return json_build_object('ok', false, 'why', '만료되었거나 이미 사용한 링크입니다.'); end if;
   update private.consent_links set used_at = now() where token = p_token;
-  update profiles set guardian_ok = true, guardian_how = 'web', guardian_at = now(),
+  -- 동의 '표시'만 기록한다. 학원이 보호자 휴대전화로 확인 문자를 보낸 때(consent_mark 'notified') 동의가 끝난다
+  --  (개인정보 보호법 시행령의 '인터넷 동의 표시 + 확인 문자' 방법 — 아이가 링크를 스스로 눌러도, 확인 문자를 받은 보호자가 알게 된다)
+  update profiles set guardian_how = 'web', guardian_at = now(),
          guardian = left(trim(p_name) || ' ' || coalesce(nullif(substring(guardian from '[0-9][0-9 -]{7,}'), ''), ''), 60)
    where id = l.uid;
   return json_build_object('ok', true);
@@ -538,7 +563,9 @@ create or replace function consent_mark(p_uid uuid, p_what text) returns void la
 begin
   if not is_owner() then raise exception 'owner only' using errcode = '42501'; end if;
   if p_what = 'paper' then update profiles set guardian_ok = true, guardian_how = 'paper', guardian_at = now() where id = p_uid and under14;
-  elsif p_what = 'notified' then update profiles set guardian_notified_at = now() where id = p_uid and under14 and guardian_ok;
+  elsif p_what = 'notified' then update profiles set guardian_notified_at = now(), guardian_ok = true where id = p_uid and under14 and (guardian_ok or (guardian_how = 'web' and guardian_at is not null));
+  elsif p_what = 'reset' then   -- 번호가 등록 서류와 다름 → 웹 동의 표시를 지우고 다시 요청받게(이때부터 7일)
+    update profiles set guardian_how = 'reset', guardian_at = now() where id = p_uid and under14 and not guardian_ok and guardian_how = 'web';
   end if;
 end $$;
 
@@ -553,8 +580,8 @@ create or replace function app_meta() returns json language sql stable security 
 
 -- ═══ 권한 — Supabase 는 public 표에 전부 열어 두므로, 여기서 칸 단위로 다시 좁힌다 ═══
 revoke all on all functions in schema private from public, anon, authenticated;
-revoke execute on function consent_list(), consent_mark(uuid, text), consent_request() from public, anon;
-grant execute on function consent_list(), consent_mark(uuid, text), consent_request() to authenticated;
+revoke execute on function consent_list(), consent_mark(uuid, text), consent_request(text) from public, anon;
+grant execute on function consent_list(), consent_mark(uuid, text), consent_request(text) to authenticated;
 grant execute on function consent_info(text), consent_give(text, text) to anon, authenticated;
 grant execute on function app_meta() to anon, authenticated;
 revoke execute on function care_list() from public, anon; grant execute on function care_list() to authenticated;   -- 안에서 원장만 결과를 받는다
@@ -671,7 +698,8 @@ create or replace function private.purge_old() returns void language sql securit
   delete from client_errors where at < now() - interval '90 days';
   delete from private.attempts where at < now() - interval '1 day';
   delete from private.consent_links where at < now() - interval '8 days';
-  delete from auth.users where id in (select id from profiles where under14 and not guardian_ok and created_at < now() - interval '7 days');
+  delete from auth.users where id in (select id from profiles where under14 and not guardian_ok
+    and ((guardian_at is null and created_at < now() - interval '7 days') or (guardian_how = 'reset' and guardian_at < now() - interval '7 days')));   -- 보호자가 동의를 표시했고 학원 확인만 남은 계정은 두고 원장 목록에 남긴다 · '번호 다름'으로 되돌린 계정은 그때부터 7일
 $$;
 -- Supabase 에서는 pg_cron 으로 매일 새벽 4시에 돌린다(Database → Extensions 에서 pg_cron 켠 뒤 이 파일을 다시 실행)
 do $$ begin
@@ -683,5 +711,7 @@ end $$;
 -- ═══ [설정] 앞의 -- 를 지우고 원장님 이메일로 바꿔 실행 ═══
 -- insert into private.config values ('owner_email', '원장님@이메일') on conflict (k) do update set v = excluded.v;
 -- update profiles set role = 'owner' where id in (select id from auth.users where lower(email) = lower((select v from private.config where k = 'owner_email')));
+-- ▼ 원장님이 가입하고 메일 인증까지 마친 뒤 한 번 — 원장 계정을 id 로 못 박는다(그 뒤엔 이메일이 같아도 다른 계정은 원장이 못 된다)
+-- insert into private.config select 'owner_uid', id::text from auth.users where lower(email) = lower((select v from private.config where k = 'owner_email')) and email_confirmed_at is not null on conflict (k) do update set v = excluded.v;
 -- 출석 씨앗은 자동으로 만든다(아무도 몰라야 하는 값)
 insert into private.config values ('attend_secret', encode(gen_random_bytes(24), 'hex')) on conflict (k) do nothing;

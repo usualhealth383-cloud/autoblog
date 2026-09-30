@@ -9,9 +9,10 @@ GW = 'http://127.0.0.1:8767'
 OK, BAD = [], []
 
 
-def call(m, path, body=None, tok=None, prefer=None):
+def call(m, path, body=None, tok=None, prefer=None, ip=None):
     h = {'Content-Type': 'application/json', 'apikey': ANON, 'Authorization': 'Bearer ' + (tok or ANON)}
     if prefer: h['Prefer'] = prefer
+    if ip: h['X-Forwarded-For'] = ip
     req = urllib.request.Request(GW + path, data=None if body is None else json.dumps(body).encode(), method=m, headers=h)
     try:
         with urllib.request.urlopen(req) as r: t = r.read(); return r.status, (json.loads(t) if t else None)
@@ -30,7 +31,7 @@ def signup(email, name, role='student', **meta):
     assert s == 200 and j.get('access_token'), (s, j); return j['access_token'], j['user']['id']
 def login(email, pw):
     s, j = call('POST', '/auth/v1/token?grant_type=password', {'email': email, 'password': pw}); assert s == 200, j; return j['access_token'], j['user']['id']
-def rpc(fn, body, tok): return call('POST', f'/rest/v1/rpc/{fn}', body, tok)
+def rpc(fn, body, tok, ip=None): return call('POST', f'/rest/v1/rpc/{fn}', body, tok, ip=ip)
 def me(tok, uid): return call('GET', f'/rest/v1/profiles?id=eq.{uid}&select=*', tok=tok)[1][0]
 
 
@@ -67,6 +68,17 @@ r = rpc('link_code', {'p_kind': 'student', 'p_code': 'MON123'}, B)[1]; check('�
 for i in range(10): rpc('link_code', {'p_kind': 'student', 'p_code': f'ZZZ{i:03d}'}, B)
 r = rpc('link_code', {'p_kind': 'student', 'p_code': 'ZZZ999'}, B)[1]; check('틀린 코드 10번 뒤 1시간 잠김', not r['ok'] and '여러 번' in r['why'], r)
 P, P_ID = signup('p@test.kr', '보호자', role='parent')
+r = rpc('link_code', {'p_kind': 'student', 'p_code': 'OLD111'}, X)[1]
+cur0 = __import__('psycopg2').connect('host=127.0.0.1 port=54329 user=postgres dbname=pcs').cursor()
+cur0.execute("select count(*) from private.attempts where uid = %s and kind = 'code' and not ok", (X_ID,)); check('끝난 코드를 대 봐도 틀린 횟수로 셈', cur0.fetchone()[0] == 1)
+IPS = [signup(f'ip{i}@test.kr', f'같은IP{i}') for i in range(4)]
+for t, _u in IPS[:3]:
+    for i in range(10): rpc('link_code', {'p_kind': 'student', 'p_code': f'IP{i:04d}'}, t, ip='203.0.113.7')
+r = rpc('link_code', {'p_kind': 'student', 'p_code': 'MON123'}, IPS[3][0], ip='203.0.113.7')[1]; check('같은 곳(IP)에서 계정을 바꿔 30번 틀리면 새 계정도 잠김', not r['ok'] and '여러 번' in r['why'], r)
+r = rpc('link_code', {'p_kind': 'student', 'p_code': 'IPX001'}, IPS[3][0], ip='198.51.100.9')[1]; check('  └ 다른 곳에서는 그대로 시도 가능', '여러 번' not in r.get('why', ''), r)
+cur0.execute("insert into private.attempts(uid, kind, ok, ip) select null, 'code', false, '192.0.2.' || g from generate_series(1, 300) g"); cur0.connection.commit()
+r = rpc('link_code', {'p_kind': 'student', 'p_code': 'MON123'}, P, ip='198.51.100.10')[1]; check('학원 전체로 1시간 300번 틀리면 잠시 모두 멈춤(대량 추측 차단)', not r['ok'] and '여러 번' in r['why'], r)
+cur0.execute("delete from private.attempts where uid is null and ip like '192.0.2.%%'"); cur0.connection.commit()
 r = rpc('link_code', {'p_kind': 'student', 'p_code': 'MON123'}, P)[1]; check('보호자 계정은 학생 코드 등록 불가', not r['ok'], r)
 r = rpc('link_code', {'p_kind': 'child', 'p_code': 'MON123'}, P)[1]; check('보호자가 자녀 연결', r['ok'], r)
 s, _ = call('POST', '/rest/v1/guardian_links', {'uid': P_ID, 'code': 'OLD111'}, P); check('보호자가 자녀 연결 표를 직접 못 씀(함수로만)', s in (401, 403), s)
@@ -100,6 +112,7 @@ print('▸ 이용권 · 결제')
 call('POST', '/rest/v1/passes', {'code': 'PASS01', 'days': 30}, OWN)
 r = rpc('redeem_pass', {'p_code': 'pass01'}, B)[1]; check('이용권 등록', r['ok'], r)
 r = rpc('redeem_pass', {'p_code': 'PASS01'}, X)[1]; check('쓴 이용권은 다시 못 씀', not r['ok'], r)
+cur0.execute("select count(*) from private.attempts where uid = %s and kind = 'pass' and not ok", (X_ID,)); check('  └ 이미 쓴 이용권을 대 봐도 틀린 횟수로 셈', cur0.fetchone()[0] == 1)
 s, _ = rpc('grant_purchase', {'p_uid': B_ID, 'p_token': 't', 'p_product': 'y1', 'p_order': 'o', 'p_days': 365, 'p_raw': {}}, B)
 check('앱에서 결제 반영 함수를 직접 못 부름(서버 검증 전용)', s >= 400, s)
 s, _ = call('POST', '/rest/v1/passes', {'code': 'FREE99', 'days': 365}, B); check('학생이 이용권 코드를 못 만듦', s >= 400, s)
@@ -138,6 +151,11 @@ print('▸ 원장 판정 · 오류 기록 · 계정 삭제')
 cur.execute("update auth.users set email_confirmed_at = null where email = 'owner@parkchan.kr'"); cur.connection.commit()
 s, _ = rpc('current_attend_code', {}, OWN); check('메일 인증 안 된 원장 이메일은 원장 아님', s >= 400, s)
 cur.execute("update auth.users set email_confirmed_at = now() where email = 'owner@parkchan.kr'"); cur.connection.commit()
+cur.execute("insert into private.config values ('owner_uid', %s) on conflict (k) do update set v = excluded.v", (OWN_ID,)); cur.connection.commit()
+s, _ = rpc('current_attend_code', {}, OWN); check('원장 계정을 못 박은 뒤에도 원장은 그대로', s == 200, s)
+cur.execute("update private.config set v = %s where k = 'owner_uid'", (A_ID,)); cur.connection.commit()
+s, _ = rpc('current_attend_code', {}, OWN); check('못 박은 계정이 아니면 원장 이메일이어도 원장 아님', s >= 400, s)
+cur.execute("delete from private.config where k = 'owner_uid'"); cur.connection.commit()
 s, _ = call('POST', '/rest/v1/client_errors', {'ver': '1', 'msg': 'TypeError x'}, ANON); check('앱 오류는 비로그인도 남김', s == 201, s)
 s, j = call('GET', '/rest/v1/client_errors?select=id', tok=A); check('오류 기록은 원장만 봄', j == [], j)
 s, j = call('GET', '/rest/v1/client_errors?select=id', tok=OWN); check('  └ 원장은 봄', len(j) == 1, j)
@@ -161,20 +179,39 @@ r = rpc('consent_info', {'p_token': tok}, ANON)[1]; check('동의 페이지는 �
 r = rpc('consent_info', {'p_token': 'x' * 36}, ANON)[1]; check('없는 링크는 거절', not r['ok'], r)
 r = rpc('consent_give', {'p_token': tok, 'p_name': '김'}, ANON)[1]; check('보호자 성함 없이 동의 불가', not r['ok'], r)
 r = rpc('consent_give', {'p_token': tok, 'p_name': '김보호'}, ANON)[1]; check('보호자가 동의 표시', r['ok'], r)
-pk = me(K, K_ID); check('  └ 동의 확인 · 방법 web · 연락처 유지', pk['guardian_ok'] and pk['guardian_how'] == 'web' and '01011112222' in pk['guardian'], pk)
+pk = me(K, K_ID); check('  └ 동의 표시만으로는 아직 안 열림 · 방법 web · 연락처 유지', not pk['guardian_ok'] and pk['guardian_how'] == 'web' and pk['guardian_at'] and '01011112222' in pk['guardian'], pk)
+r = rpc('consent_info', {'p_token': tok}, ANON)[1]; check('  └ 동의 페이지를 다시 열면 "동의함"으로 보임', r['ok'] and r.get('done'), r)
 r = rpc('consent_give', {'p_token': tok, 'p_name': '김보호'}, ANON)[1]; check('한 번 쓴 링크는 다시 못 씀', not r['ok'], r)
-s, _ = call('POST', '/rest/v1/posts', {'board': 'talk', 'title': '안녕', 'body': '이제 써져요'}, K); check('동의 뒤에는 글을 씀', s == 201, s)
+s, _ = call('POST', '/rest/v1/posts', {'board': 'talk', 'title': '안녕', 'body': '아직이에요'}, K); check('확인 문자 전에는 아직 글을 못 씀', s >= 400, s)
+r = rpc('consent_request', {}, K)[1]; check('  └ 아이 앱은 "보호자가 동의함"을 앎', r.get('given'), r)
 s, j = rpc('consent_list', {}, A); check('원장 아닌 사람은 동의 목록이 비어 보임', s == 200 and j == [], j)
 s, _ = rpc('consent_mark', {'p_uid': K_ID, 'p_what': 'paper'}, A); check('원장 아닌 사람은 서면 동의 표시 불가', s >= 400, s)
-s, j = rpc('consent_list', {}, OWN); check('원장은 동의 목록을 봄', s == 200 and any(x['id'] == K_ID and x['guardian_ok'] for x in j), j)
+s, _ = rpc('consent_mark', {'p_uid': K_ID, 'p_what': 'notified'}, A); check('원장 아닌 사람은 확인 문자 표시 불가', s >= 400 and not me(K, K_ID)['guardian_ok'], s)
+s, j = rpc('consent_list', {}, OWN); check('원장은 동의 표시된 목록을 봄', s == 200 and any(x['id'] == K_ID and x['guardian_how'] == 'web' and x['guardian_at'] and not x['guardian_ok'] for x in j), j)
 rpc('consent_mark', {'p_uid': K_ID, 'p_what': 'notified'}, OWN)
-check('원장이 확인 문자 보냄 표시', rpc('consent_list', {}, OWN)[1][0]['notified_at'] is not None)
+check('원장이 확인 문자 보냄 → 동의 확인 완료', rpc('consent_list', {}, OWN)[1][0]['notified_at'] is not None and me(K, K_ID)['guardian_ok'])
+s, _ = call('POST', '/rest/v1/posts', {'board': 'talk', 'title': '안녕', 'body': '이제 써져요'}, K); check('확인 문자 뒤에는 글을 씀', s == 201, s)
+K4, K4_ID = signup('kid4@test.kr', '표시없음', under14=True, guardian='최보호 01077778888')
+rpc('consent_mark', {'p_uid': K4_ID, 'p_what': 'notified'}, OWN); check('보호자 동의 표시가 없으면 확인 문자 표시로 열리지 않음', not me(K4, K4_ID)['guardian_ok'])
+K7, K7_ID = signup('kid7@test.kr', '번호틀림', under14=True, guardian='한보호 01012340000')
+t7 = rpc('consent_request', {}, K7)[1]['token']; rpc('consent_give', {'p_token': t7, 'p_name': '한보호'}, ANON)
+s, _ = rpc('consent_mark', {'p_uid': K7_ID, 'p_what': 'reset'}, A); check('원장 아닌 사람은 동의 표시를 못 지움', s >= 400 and me(K7, K7_ID)['guardian_how'] == 'web', s)
+rpc('consent_mark', {'p_uid': K7_ID, 'p_what': 'reset'}, OWN); p7 = me(K7, K7_ID)
+check('원장이 "번호가 달라요" → 동의 표시가 지워지고 잠김 유지', p7['guardian_how'] == 'reset' and not p7['guardian_ok'], p7)
+rpc('consent_mark', {'p_uid': K7_ID, 'p_what': 'notified'}, OWN); check('  └ 지운 뒤에는 확인 문자 표시로 안 열림', not me(K7, K7_ID)['guardian_ok'])
+r = rpc('consent_request', {'p_phone': '1234'}, K7)[1]; check('  └ 휴대전화가 아닌 번호로는 다시 요청 못 함', not r['ok'], r)
+r = rpc('consent_request', {'p_phone': '010-5555-6666'}, K7)[1]; check('  └ 고친 번호로 새 링크 · 보호자 번호가 바뀜', r['ok'] and r['token'] and r['guardian'] == '한보호 01055556666', r)
+rpc('consent_give', {'p_token': r['token'], 'p_name': '한보호'}, ANON); check('  └ 보호자가 다시 동의 표시', me(K7, K7_ID)['guardian_how'] == 'web')
+r = rpc('consent_request', {'p_phone': '01099999999'}, K7)[1]; check('  └ 동의 표시 뒤에는 아이가 번호를 못 바꿈', r.get('given') and '01055556666' in me(K7, K7_ID)['guardian'], r)
 K2, K2_ID = signup('kid2@test.kr', '늦은아이', under14=True, guardian='이보호 01033334444')
 rpc('consent_mark', {'p_uid': K2_ID, 'p_what': 'paper'}, OWN); check('서면 동의 표시 → 동의 확인', me(K2, K2_ID)['guardian_how'] == 'paper')
 K3, K3_ID = signup('kid3@test.kr', '방치', under14=True, guardian='박보호 01055556666')
-cur.execute("update profiles set created_at = now() - interval '8 days' where id = %s", (K3_ID,)); cur.execute('select private.purge_old()'); cur.connection.commit()
-cur.execute('select count(*) from auth.users where id = %s', (K3_ID,)); check('7일 안에 동의 없는 계정은 지움', cur.fetchone()[0] == 0)
+K6, K6_ID = signup('kid6@test.kr', '문자대기', under14=True, guardian='정보호 01099990000')
+t6 = rpc('consent_request', {}, K6)[1]['token']; rpc('consent_give', {'p_token': t6, 'p_name': '정보호'}, ANON)
+cur.execute("update profiles set created_at = now() - interval '8 days' where id in (%s, %s, %s)", (K3_ID, K4_ID, K6_ID)); cur.execute('select private.purge_old()'); cur.connection.commit()
+cur.execute('select count(*) from auth.users where id in (%s, %s)', (K3_ID, K4_ID)); check('7일 안에 동의 없는 계정은 지움', cur.fetchone()[0] == 0)
 cur.execute('select count(*) from auth.users where id in (%s, %s)', (K_ID, K2_ID)); check('  └ 동의한 계정은 남김', cur.fetchone()[0] == 2)
+cur.execute('select count(*) from auth.users where id = %s', (K6_ID,)); check('  └ 보호자가 동의를 표시하고 확인 문자만 남은 계정은 남김', cur.fetchone()[0] == 1)
 
 print('▸ 공부 노트 — 나만 본다')
 import uuid as _uuid

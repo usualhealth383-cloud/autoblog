@@ -121,7 +121,7 @@ class H(BaseHTTPRequestHandler):
 
     def proxy(self, m, u, raw):
         url = PGRST + u.path[8:] + (('?' + u.query) if u.query else '')
-        h = {k: v for k, v in self.headers.items() if k.lower() in ('authorization', 'content-type', 'prefer', 'accept', 'range', 'x-student-code')}
+        h = {k: v for k, v in self.headers.items() if k.lower() in ('authorization', 'content-type', 'prefer', 'accept', 'range', 'x-student-code', 'x-forwarded-for')}
         if not h.get('Authorization') and not h.get('authorization'): h['Authorization'] = 'Bearer ' + ANON
         req = urllib.request.Request(url, data=raw if m in ('POST', 'PATCH', 'PUT', 'DELETE') and raw else None, method=m, headers=h)
         try:

@@ -14,7 +14,8 @@ from _ui import signup, NO_INTRO, auto_yes
 SC = sys.argv[sys.argv.index('--shots')+1] if '--shots' in sys.argv[:-1] else '/tmp/e2e_native'; os.makedirs(SC, exist_ok=True)
 GW = tf.GW
 STUB = """
-window.__iap = { next: '', purchases: [], calls: [] }; window.__push = { asked: 0, registered: 0 }; window.__secure = [];
+window.__iap = { next: '', purchases: [], calls: [] }; window.__push = { asked: 0, registered: 0 }; window.__secure = []; window.__toasts = [];
+document.addEventListener('DOMContentLoaded', () => new MutationObserver(ms => ms.forEach(m => m.addedNodes.forEach(n => n.classList && n.classList.contains('toast') && window.__toasts.push(n.textContent)))).observe(document.body, { childList: true }));
 const L = {};
 window.Capacitor = { isNativePlatform: () => true, getPlatform: () => 'android', Plugins: {
   NativePurchases: {
@@ -68,7 +69,7 @@ async def main():
             tf.buy('pass_y1', 'tok-native-000001', uid); await s.evaluate("__iap.next = 'tok-native-000001'")
             await s.click('[data-buy="y1"]'); await s.wait_for_timeout(1800)
             call = (await s.evaluate('__iap.calls'))[-1]
-            assert call['productIdentifier'] == 'pass_y1' and call['productType'] == 'inapp' and call['appAccountToken'] == uid, call
+            assert call['productIdentifier'] == 'pass_y1' and call['productType'] == 'inapp' and call['appAccountToken'] == uid and call.get('autoAcknowledgePurchases') is False, call
             exp = (today + dt.timedelta(days=365)).isoformat()
             assert await s.evaluate('hasPass()') is True and await s.evaluate('ACC.passUntil') == exp, await s.evaluate('ACC.passUntil')
             assert await s.evaluate('fullAccess()') is True
@@ -79,6 +80,16 @@ async def main():
             await s.click('#iapRestore'); await s.wait_for_timeout(2000)
             exp2 = (today + dt.timedelta(days=395)).isoformat(); assert await s.evaluate('ACC.passUntil') == exp2, await s.evaluate('ACC.passUntil')
             await s.click('#iapRestore'); await s.wait_for_timeout(2000); assert await s.evaluate('ACC.passUntil') == exp2, '복원을 두 번 누르니 두 번 늘어남'
+            assert '이미 모두 반영' in (await s.evaluate('__toasts'))[-1], await s.evaluate('__toasts')
+            # ②-2 조용한 복원(켤 때·앱으로 돌아올 때): 확인 못 한 내 결제만 반영, 다른 계정 결제는 보내지 않고, 이미 반영한 것은 다시 묻지 않음
+            tf.buy('pass_m1', 'tok-native-000004', uid)
+            await s.evaluate("__iap.purchases.push({ productIdentifier:'pass_m1', purchaseToken:'tok-native-000004', transactionId:'GPA.4' }, { productIdentifier:'pass_m6', purchaseToken:'tok-native-other1', transactionId:'GPA.o', appAccountToken:'00000000-0000-0000-0000-000000000000' })")
+            await s.evaluate('restorePurchases(true)'); await s.wait_for_timeout(2000)
+            exp3 = (today + dt.timedelta(days=425)).isoformat(); assert await s.evaluate('ACC.passUntil') == exp3, await s.evaluate('ACC.passUntil')
+            dn = await s.evaluate(f"JSON.parse(localStorage.getItem('pcs.iap.done.{uid}'))"); assert 'tok-native-000004' in dn and 'tok-native-other1' not in dn, dn
+            assert '새로 반영' in (await s.evaluate('__toasts'))[-1]
+            nt = len(await s.evaluate('__toasts')); await s.evaluate('restorePurchases(true)'); await s.wait_for_timeout(1500)
+            assert len(await s.evaluate('__toasts')) == nt and await s.evaluate('ACC.passUntil') == exp3, '조용한 복원이 새 결제 없이 알림을 띄움'
             # ③ 결제 확인 실패(남의 영수증) → 안내 창 + 복원 버튼
             tf.buy('pass_m6', 'tok-native-000003', '00000000-0000-0000-0000-000000000000'); await s.evaluate("__iap.next = 'tok-native-000003'")
             await s.click('[data-buy="m6"]'); await s.wait_for_timeout(1500)
