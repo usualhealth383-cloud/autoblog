@@ -240,7 +240,7 @@ create or replace function private.too_many(k text, n int) returns boolean langu
       or (private.req_ip() is not null and (select count(*) from private.attempts where ip = private.req_ip() and kind = k and not ok and at > now() - interval '1 hour') >= n * 3)
       or (select count(*) from private.attempts where kind = k and not ok and at > now() - interval '1 hour') >= 300 $$;
 create or replace function private.note(k text, good boolean) returns void language sql security definer set search_path = private as $$
-  insert into private.attempts(uid, kind, ok, ip) values (auth.uid(), k, good, private.req_ip()) $$;
+  insert into private.attempts(uid, kind, ok, ip) values (auth.uid(), k, good, case when good then null else private.req_ip() end) $$;   -- IP 는 틀린 입력에만(최소 수집 · 하루 뒤 파기)
 
 -- ═══ 가입하면 프로필을 만든다(역할은 학생·보호자만 — 원장은 설정한 이메일만) ═══
 create or replace function private.on_signup() returns trigger language plpgsql security definer set search_path = public, private as $$
