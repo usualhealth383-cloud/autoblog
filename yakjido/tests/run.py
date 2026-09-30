@@ -249,7 +249,7 @@ def main():
             except Exception: fails.append('본문 자료(core.json)를 못 받았습니다 — ' + pg.url)
         pg.goto(url); ready(); pg.wait_for_timeout(1200)
         pg.evaluate("localStorage.setItem('yakjido.hello.v1','1');localStorage.setItem('yakjido.me.v1',JSON.stringify({age:'senior',taking:['cls:bp.arb'],pub:{}}))")
-        routes = pg.evaluate("()=>['/home','/drugs','/tips','/me','/together','/kinds','/kinds/bp','/pill','/supp','/kids','/mix','/hello/1','/hello/3','/photo','/schedule','/about','/bag','/rxout','/senior','/myths','/askdoc','/askdoc?open=gout','/vitals','/visits','/me?t=meds','/me?t=set','/drugs?cat=all','/drugs?cat=nsaid','/senior?w=rx','/supp?t=label','/supp?t=stack','/tips?g=5']" +
+        routes = pg.evaluate("()=>['/home','/drugs','/tips','/me','/together','/kinds','/kinds/bp','/pill','/supp','/kids','/mix','/hello/1','/hello/3','/photo','/schedule','/about','/bag','/rxout','/senior','/myths','/askdoc','/askdoc?open=gout','/vitals','/visits','/me?t=meds','/me?t=set','/drugs?cat=all','/drugs?cat=nsaid','/senior?w=rx','/supp?t=label','/supp?t=stack','/tips?g=5','/myths?g=3','/schedule?t=sc2','/schedule?t=sc4']" +
                              ".concat(D.symptoms.map(s=>'/symptom/'+s.id)).concat(D.drugs.map(d=>'/drug/'+d.id)).concat(D.classes.map(c=>'/class/'+c.id)).concat(D.classes.map(c=>'/drugs?cat='+c.id)).concat((D.myths||[]).map(m=>'/myths?open='+m.id))")
         # 1~3. 모든 화면
         for r in routes:
@@ -295,7 +295,7 @@ def main():
         # 5a-2. 고른 시간이 약의 최소 간격보다 촘촘하면 알려 줘야 한다
         pg.goto(url + '#/schedule'); ready(); pg.wait_for_timeout(250)
         _w = pg.evaluate("""()=>{
-          ME.taking=['naproxen']; ME.sched={naproxen:['08:00','13:00']}; route();
+          PANE.schedule='sc1'; ME.taking=['naproxen']; ME.sched={naproxen:['08:00','13:00']}; route();
           const a=document.getElementById('view').innerText.includes('시간이 너무 촘촘해요');
           ME.sched={naproxen:['08:00','19:00']}; route();
           const b=document.getElementById('view').innerText.includes('시간이 너무 촘촘해요');
@@ -312,13 +312,13 @@ def main():
           ME.taking=['acetaminophen']; ME.sched={acetaminophen:['08:00','19:00']};
           ME.taken={}; ME.days={};
           for(let n=1;n<=10;n++){ ME.days[day(n)]=2; ME.taken[day(n)]= n%3 ? ['acetaminophen@08:00','acetaminophen@19:00'] : []; }
-          route();
+          PANE.schedule='sc3'; route();   /* 달력은 「지난 기록」 탭(2026-09-30) */
           const cells=[...document.querySelectorAll('.cal-d')];
           const bad=cells.map(c=>{const b=c.getBoundingClientRect();
             return Math.abs(b.width-b.height)>1.5 ? Math.round(b.width)+'x'+Math.round(b.height) : null}).filter(Boolean);
           const txt=document.getElementById('view').innerText;
           const pct=/[0-9]+ ?%/.test(txt.split('지난 기록')[1]||'');
-          ME.taking=[]; ME.sched={}; ME.taken={}; ME.days={}; saveMe();
+          ME.taking=[]; ME.sched={}; ME.taken={}; ME.days={}; saveMe(); PANE.schedule='sc1';
           return {n:cells.length, bad:bad.slice(0,3), says:txt.includes('빠짐없이 드셨어요'), pct};}""")
         if _c['n'] != 35: fails.append(f'복약 달력 칸이 35개가 아닙니다: {_c["n"]}개')
         if _c['bad']: fails.append(f'복약 달력 칸이 정사각이 아닙니다: {_c["bad"]}')
@@ -618,7 +618,7 @@ def main():
         pn.clock.install(time='2026-09-28T10:00:00')
         pn.add_init_script(CAP_MOCK)
         pn.add_init_script("localStorage.setItem('yakjido.hello.v1','1');localStorage.setItem('yakjido.me.v1',JSON.stringify({taking:['ibuprofen'],sched:{ibuprofen:['08:00','20:00']},pub:{}}))")
-        pn.goto(url + '#/schedule'); pn.wait_for_selector('.app', timeout=15000); pn.wait_for_timeout(1500)
+        pn.goto(url + '#/schedule?t=sc4'); pn.wait_for_selector('.app', timeout=15000); pn.wait_for_timeout(1500)   # 알림 방법은 탭 안(2026-09-30)
         L = pn.evaluate("()=>__LN.pending")
         daily = [x for x in L if x.get('schedule', {}).get('on')]
         again = [x for x in L if x.get('schedule', {}).get('at')]
