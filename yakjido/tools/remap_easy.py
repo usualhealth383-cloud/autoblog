@@ -74,7 +74,7 @@ INGR = {
   # ── 2026-09-21 보강 ②: 새로 넣은 약 6종 ──
   '에르도스테인':'erdosteine', '암브록솔염산염':'ambroxol', '암브록솔':'ambroxol',
   '포비돈요오드':'povidone-iodine', '알벤다졸':'albendazole',
-  '에티닐에스트라디올':'oral-contraceptive', '클로닉신리시네이트':'clonixin',
+  '에티닐에스트라디올':'oral-contraceptive', '클로닉신리시네이트':'clonixin', '나프티핀염산염':'naftifine',
   '겐타마이신황산염':'genta-steroid-cream',
   '바실루스리케니포르미스균':'probiotic-otc', '바실루스서브틸리스균':'probiotic-otc',
   '사카로마이세스보울라디':'probiotic-otc', '락토바실루스아시도필루스':'probiotic-otc',
@@ -111,6 +111,7 @@ BY_FORM = {'클로트리마졸': {'insert':'clotrimazole-vag', 'skin':'clotrimaz
            '산화아연': {'solid':'supp:zinc'}, '황산아연': {'solid':'supp:zinc'}, '황산아연일수화물': {'solid':'supp:zinc'},
            '테트라히드로졸린염산염': {'eye':'eye-decongestant'},
            '케토티펜푸마르산염': {'eye':'allergy-eyedrop'}, '크로몰린나트륨': {'eye':'allergy-eyedrop'}, '크로모글리크산나트륨': {'eye':'allergy-eyedrop'},
+           '시클로피록스': {'nail':'ciclopirox-nail', 'liquid':'ciclopirox-nail'}, '시클로피록스올아민': {'liquid':'ciclopirox-shampoo'},
            '설파메톡사졸': {'eye':'antibiotic-eyedrop'}, '설파메톡사졸나트륨': {'eye':'antibiotic-eyedrop'},
            '우레아': {'skin':'urea-cream'}, '요소': {'skin':'urea-cream'}}
 # 제품 이름에 이 말이 있을 때만 잇는다 — 케토코나졸 «샴푸»만 약 사전의 샴푸 화면으로(크림·정제는 다른 약)

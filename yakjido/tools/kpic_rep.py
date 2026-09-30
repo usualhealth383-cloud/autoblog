@@ -36,6 +36,8 @@ MANUAL = {
     'allergy-eyedrop': ('알러콘', '알러콘점안액', 'ketotifen'),
     'oral-contraceptive': ('에이리스', '에이리스정', 'levonorgestrel'),
     'clonixin': ('클로나인', '클로나인연질캡슐', 'clonixin'),
+    'ciclopirox-nail': ('로푸록스네일라카', '로푸록스네일라카', 'ciclopirox'),
+    'naftifine': ('엑소데릴', '일동엑소데릴크림', 'naftifine'),
     'vitamin-d-rx': ('디맥', '디맥정7000IU', 'cholecalciferol'),
 }
 
