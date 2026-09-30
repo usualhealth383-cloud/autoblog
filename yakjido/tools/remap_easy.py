@@ -108,7 +108,8 @@ SUPP = {
 BY_FORM = {'클로트리마졸': {'insert':'clotrimazole-vag', 'skin':'clotrimazole', 'liquid':'clotrimazole'},
            '니코틴': {'patch':'nicotine-patch', 'solid':'nicotine-gum', 'troche':'nicotine-gum'},
            # 산화아연은 알약(종합비타민)에서는 아연 보충, 연고·파스에서는 피부 보호제 — 알약만 아연 화면으로
-           '산화아연': {'solid':'supp:zinc'}, '황산아연': {'solid':'supp:zinc'}, '황산아연일수화물': {'solid':'supp:zinc'}}
+           '산화아연': {'solid':'supp:zinc'}, '황산아연': {'solid':'supp:zinc'}, '황산아연일수화물': {'solid':'supp:zinc'},
+           '우레아': {'skin':'urea-cream'}, '요소': {'skin':'urea-cream'}}
 # 제품 이름에 이 말이 있을 때만 잇는다 — 케토코나졸 «샴푸»만 약 사전의 샴푸 화면으로(크림·정제는 다른 약)
 BY_NAME = {'케토코나졸': ('샴푸', 'ketoconazole-shampoo'), '시클로피록스': ('샴푸', 'ciclopirox-shampoo')}
 
