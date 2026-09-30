@@ -473,7 +473,8 @@ def main():
         _h = pg.evaluate("""()=>{
           ME.taking=[]; ME.sched={}; ME.taken={}; route();
           const none = !document.querySelector('.dh');
-          ME.taking=['acetaminophen']; ME.sched={acetaminophen:['00:01']}; ME.taken={}; route();
+          /* 앞 검사(단추 전부 누르기)가 아세트아미노펜을 담았다 빼면서 «필요할 때만»으로 표시해 둘 수 있다 — 비우고 본다 */
+          ME.prn={}; ME.taking=['acetaminophen']; ME.sched={acetaminophen:['00:01']}; ME.taken={}; route();
           const card = document.querySelector('.dh');
           const due = !!(card && card.querySelector('.dh-tick'));
           if (due) card.querySelector('.dh-tick').click();
