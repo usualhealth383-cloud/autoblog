@@ -43,6 +43,14 @@
 
 알림은 학원과 연결된 사람(학원 코드를 등록한 학생 · 자녀를 연결한 보호자 · 원장)에게만, 연결하는 순간 한 번 묻습니다. 로그아웃하면 그 폰의 알림 등록을 지웁니다.
 
+## 운영 스위치 — 새 APK 없이 알리기 (SQL Editor 에서 한 줄)
+| 하고 싶은 것 | 실행할 SQL |
+|---|---|
+| 점검·안내 한 줄 띄우기(앱을 켤 때 한 번) | `insert into private.config values ('notice', '10월 3일 새벽 2~4시 점검') on conflict (k) do update set v = excluded.v;` |
+| 안내 내리기 | `delete from private.config where k = 'notice';` |
+| 옛 버전 막기(업데이트해야 씀) | `insert into private.config values ('min_version', '1.1.0') on conflict (k) do update set v = excluded.v;` |
+| 새 버전 권하기(가볍게 알림) | `insert into private.config values ('latest_version', '1.1.0') on conflict (k) do update set v = excluded.v;` |
+
 ## 보안 설계 (v3 · 2026-09-29)
 | 지키는 것 | 방법 |
 |---|---|

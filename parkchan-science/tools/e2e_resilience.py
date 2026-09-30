@@ -51,6 +51,19 @@ async def main():
         # ④ 권한 없는 요청의 영어 오류도 한국어로
         m = await s.evaluate("api('/rest/v1/passes', { method:'POST', body:{ code:'HACK01', days:365 } }).then(()=>'ok').catch(e => e.message)")
         assert '권한' in m, m
+        # ⑥ 운영 스위치: 최소 버전보다 낮으면 막는 창(바깥을 눌러도 안 닫힘) · 안내 문구는 한 번만
+        import psycopg2
+        db = psycopg2.connect('host=127.0.0.1 port=54329 user=postgres dbname=pcs'); db.autocommit = True; cur = db.cursor()
+        cur.execute("insert into private.config values ('min_version','9.0.0') on conflict (k) do update set v = excluded.v")
+        await s.reload(); await s.wait_for_timeout(1500)
+        assert '업데이트가 필요합니다' in await s.locator('.sheet h3').inner_text(); await s.screenshot(path=f'{SC}/r03_force_update.png')
+        await s.mouse.click(195, 60); await s.wait_for_timeout(300); assert await s.locator('#sheetLock').count() == 1, '업데이트 창이 닫혀 버림'
+        cur.execute("delete from private.config where k = 'min_version'")
+        cur.execute("insert into private.config values ('notice','10월 3일 새벽 2시~4시 서버 점검이 있습니다') on conflict (k) do update set v = excluded.v")
+        await s.reload(); await s.wait_for_timeout(1500)
+        assert '서버 점검' in await s.locator('.sheet').inner_text(); await s.click('#sheetClose')
+        await s.reload(); await s.wait_for_timeout(1500); assert await s.locator('.sheet').count() == 0, '안내가 매번 뜸'
+        cur.execute("delete from private.config where k = 'notice'")
         assert not errs, errs
         print('RESILIENCE E2E OK · 콘솔 오류', errs); await b.close()
 

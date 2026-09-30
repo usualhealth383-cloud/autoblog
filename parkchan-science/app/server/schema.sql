@@ -481,11 +481,21 @@ begin
   end if;
 end $$;
 
+-- ═══ 앱 운영 스위치(로그인 없이 읽음) — 새 APK 없이 '업데이트 필요'·'점검 중'을 알린다 ═══
+-- 값은 private.config 에 넣는다: min_version(이보다 낮으면 업데이트해야 씀) · latest_version(권장) · notice(점검·안내 한 줄)
+--   insert into private.config values ('min_version', '1.0.0') on conflict (k) do update set v = excluded.v;
+create or replace function app_meta() returns json language sql stable security definer set search_path = private as $$
+  select json_build_object(
+    'min_version',    (select v from private.config where k = 'min_version'),
+    'latest_version', (select v from private.config where k = 'latest_version'),
+    'notice',         (select v from private.config where k = 'notice')) $$;
+
 -- ═══ 권한 — Supabase 는 public 표에 전부 열어 두므로, 여기서 칸 단위로 다시 좁힌다 ═══
 revoke all on all functions in schema private from public, anon, authenticated;
 revoke execute on function consent_list(), consent_mark(uuid, text), consent_request() from public, anon;
 grant execute on function consent_list(), consent_mark(uuid, text), consent_request() to authenticated;
 grant execute on function consent_info(text), consent_give(text, text) to anon, authenticated;
+grant execute on function app_meta() to anon, authenticated;
 revoke execute on function grant_purchase(uuid, text, text, text, int, jsonb), revoke_purchase(text), push_targets(text, text, text) from public, anon, authenticated;
 grant execute on function grant_purchase(uuid, text, text, text, int, jsonb), revoke_purchase(text), push_targets(text, text, text) to service_role;
 
