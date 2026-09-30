@@ -2452,10 +2452,15 @@ async function wxFetch(force){
     if (!got) {
       const q = `latitude=${loc.lat}&longitude=${loc.lon}&timezone=Asia%2FSeoul`;
       const fc = `https://api.open-meteo.com/v1/forecast?${q}&current=temperature_2m,apparent_temperature,relative_humidity_2m,weather_code&daily=temperature_2m_max,temperature_2m_min&forecast_days=1`;
-      const getJ = u => fetch(u).then(r => r.ok ? r.json() : null).catch(() => null);
+      /* 한 요청이 멈춰 있으면(기상청 모델이 가끔 그렇다) 6초에서 끊고 다음으로 — 「보는 중」이 오래 남지 않게 */
+      const getJ = (u, ms = 6000) => { const c = typeof AbortController !== 'undefined' ? new AbortController() : null; const t = c && setTimeout(() => c.abort(), ms);
+        return fetch(u, c ? { signal: c.signal } : undefined).then(r => r.ok ? r.json() : null).catch(() => null).finally(() => t && clearTimeout(t)); };
       let [fj, aj] = await Promise.all([getJ(fc + '&models=kma_seamless'), getJ(`https://air-quality-api.open-meteo.com/v1/air-quality?${q}&current=pm10,pm2_5`)]);
-      if (!fj?.current) fj = await getJ(fc);
-      if (fj?.current && fj?.daily) got = { name: loc.name, src: 'om', now: fj.current.temperature_2m, feel: fj.current.apparent_temperature, rh: fj.current.relative_humidity_2m, code: fj.current.weather_code,
+      /* 기상청 모델은 «지금 기온»이 비어(null) 올 때가 있다 — 그걸 그대로 쓰면 0℃·일교차 «—»로 떴다(2026-09-30 실측). 숫자가 다 있어야 쓴다 */
+      const full = j => j?.current && typeof j.current.temperature_2m === 'number' && typeof j.daily?.temperature_2m_max?.[0] === 'number' && typeof j.daily?.temperature_2m_min?.[0] === 'number';
+      if (!full(fj)) fj = await getJ(fc);
+      if (!aj?.current) aj = await getJ(`https://air-quality-api.open-meteo.com/v1/air-quality?${q}&current=pm10,pm2_5`);
+      if (full(fj)) got = { name: loc.name, src: 'om', now: fj.current.temperature_2m, feel: fj.current.apparent_temperature, rh: fj.current.relative_humidity_2m, code: fj.current.weather_code,
                   max: fj.daily.temperature_2m_max?.[0], min: fj.daily.temperature_2m_min?.[0], pm10: aj?.current?.pm10 ?? null, pm25: aj?.current?.pm2_5 ?? null };
     }
     if (got) { WX.data = got; WX.at = Date.now(); WX.fail = 0; WX.failAt = 0; } else { WX.fail = (WX.fail || 0) + 1; WX.failAt = Date.now(); }

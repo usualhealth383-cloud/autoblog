@@ -753,6 +753,15 @@ def main():
         wx = pg.evaluate("()=>document.querySelector('.wx')?.innerText||''")
         for kw in ['일교차', '14℃', '미세먼지', '나쁨']:
             if kw not in wx: fails.append(f'날씨 카드에 "{kw}" 없음: {wx[:80]!r}')
+        # 9a. 기상청 모델이 값을 모두 비워(null) 보낼 때 — 0℃·일교차 「—」가 뜨던 것(2026-09-30 실측). 기본 모델로 넘어가야 한다
+        pg.unroute('**/api.open-meteo.com/**')
+        _NULL = json.dumps({'current': {'temperature_2m': None, 'apparent_temperature': None, 'relative_humidity_2m': None, 'weather_code': None}, 'daily': {'temperature_2m_max': [None], 'temperature_2m_min': [None]}})
+        pg.route('**/api.open-meteo.com/**', lambda rt: rt.fulfill(status=200, content_type='application/json', body=_NULL if 'kma_seamless' in rt.request.url else FC))
+        pg.evaluate("localStorage.removeItem('yakjido.wx.v1')"); pg.goto(url + '#/home'); pg.reload(); ready(); pg.wait_for_timeout(1500)
+        wx = pg.evaluate("()=>document.querySelector('.wx')?.innerText||''")
+        if '0℃' in wx.split('\n')[0][:4] or '일교차 —' in wx or '14℃' not in wx: fails.append(f'기상청 모델이 빈 값을 보낼 때 날씨가 틀립니다: {wx[:80]!r}')
+        pg.unroute('**/api.open-meteo.com/**')
+        pg.route('**/api.open-meteo.com/**', lambda rt: rt.fulfill(status=200, content_type='application/json', body=FC))
         # 9b. 날씨를 못 받는 곳(아티팩트·오프라인)에서 요청이 반복되지 않는지 — 예전에 4초 170번 돌았다
         pg.unroute('**/api.open-meteo.com/**'); pg.unroute('**/air-quality-api.open-meteo.com/**')
         cnt = [0]
