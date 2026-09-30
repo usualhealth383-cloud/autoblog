@@ -4549,10 +4549,11 @@ function vRxOut(){
   <h1>처방받은 약이 떨어졌어요</h1>
   <p style="margin-top:6px">주말이나 연휴에 처방약이 떨어졌을 때, <b>약국에서 이어 갈 수 있는 것</b>과 <b>없는 것</b>을 나눠 두었어요. 약을 누르면 얼마나 가까운지 설명이 나옵니다.</p>
   <div class="note" style="margin-top:12px">${I.alert}<span>대체는 <b>며칠을 버티기 위한 것</b>이에요. 원래 약을 끊으라는 뜻이 아니고, 혈압·심장·호르몬약은 임의로 바꾸면 안 됩니다.</span></div>
-  <section class="sec"><h2><span>${I.check} 약국에서 이어 갈 수 있어요</span><small>${yes.length}가지</small></h2>
-    <div class="card rows">${yes.map(row).join('')}</div></section>
-  <section class="sec"><h2><span>${I.no} 약국에는 없어요</span><small>${no.length}가지</small></h2>
-    <div class="card rows">${no.map(row).join('')}</div></section>
+  ${(() => { /* 2026-09-30 — 두 목록을 이어 붙이면 폰 4장이었다 → 탭 둘(ClinicScore 문법), 제자리 전환 */
+    const T = [['rx1', '이어 갈 수 있어요', yes.length], ['rx2', '약국에는 없어요', no.length]];
+    return `<nav class="tabs" role="tablist" aria-label="약국에서" style="margin-top:20px">${T.map(([k, n, c], i) => `<button class="tab ${i ? '' : 'on'}" role="tab" data-p="${k}">${n}<span class="n">${c}</span></button>`).join('')}</nav>
+  <div class="pane on" id="rx1"><div class="sech"><h2 class="sec-h">약국에서 이어 갈 수 있어요</h2><span class="secn">${yes.length}가지</span></div><div class="card rows">${yes.map(row).join('')}</div></div>
+  <div class="pane" id="rx2"><div class="sech"><h2 class="sec-h">약국에는 없어요</h2><span class="secn">${no.length}가지</span></div><p class="viewnote">약국에 같은 일을 하는 약이 없어요. 떨어지기 전에 진료를 잡아 두세요.</p><div class="card rows">${no.map(row).join('')}</div></div>`; })()}
   ${disclaimer('처방약을 임의로 바꾸거나 끊지 마세요. 이 목록은 약이 떨어진 며칠을 어떻게 버틸지 돕기 위한 것이고, 최종 판단은 약사·의사와 하세요.')}`;
 }
 function riskBar(label, v, note){ if (!v) return ''; const lv = Math.max(1, Math.min(5, v)); const word = ['', '낮음', '낮은 편', '보통', '높은 편', '높음'][lv]; return `<div class="rb"><span>${esc(label)}</span><div class="track"><div class="fill l${lv}" style="width:${lv * 20}%"></div></div><span class="v">${word}</span></div>${note ? `<p class="small muted" style="margin:-4px 0 4px">${fmt(note)}</p>` : ''}`; }
@@ -4950,8 +4951,8 @@ function vPhoto(_, q){
   else if (PH.err) body = `<div class="photo-box"><p><b>읽지 못했어요</b></p><p class="small muted" style="margin-top:6px">${esc(PH.err)}. 밝은 곳에서 글자가 보이게 다시 찍어 주세요.</p><div class="actions"><button class="btn ghost" onclick="photoManual()">약 이름 직접 적기</button></div></div>`;
   else if (R) body = photoResult(R);
   else body = `${art('photo-guide', 'banner')}<div class="photo-box"><p style="font-size:1.0625rem;font-weight:700">약봉투·약 상자·알약·영양제 라벨</p><p class="small muted" style="margin-top:6px">글자가 보이게 밝은 곳에서 찍어 주세요. <b>사진은 이 폰 안에서 읽고 바로 버립니다</b> — 어디로도 보내지 않고 저장하지도 않아요.</p></div>
-    <div class="sec"><button class="big-btn soft" onclick="photoManual()"><div class="ic">${I.search}</div><div><b>이름이 보이면 — 적어서 찾기</b><span>제품 ${(D.public?.brands_count || 0)}개 · 성분 ${(D.public?.lexicon_count || 0)}가지에서 바로</span></div>${I.chev}</button>
-    <button class="big-btn soft" onclick="go('/pill')"><div class="ic">${I.eye}</div><div><b>알약만 있으면 — 모양·색으로 찾기</b><span>식약처 낱알 ${(D.public?.pills_count || 0).toLocaleString()}건</span></div>${I.chev}</button></div>`;
+    <div class="sec rows-l">${lrow(I.search, '이름이 보이면 — 적어서 찾기', `제품 ${(D.public?.brands_count || 0)}개 · 성분 ${(D.public?.lexicon_count || 0)}가지에서 바로`, 'photoManual()')}
+    ${lrow(I.eye, '알약만 있으면 — 모양·색으로 찾기', `식약처 낱알 ${(D.public?.pills_count || 0).toLocaleString()}건`, "go('/pill')")}</div>`;
   return `${topBar({ back:'약 알아보기' })}
   <div class="eyebrow">사진으로 약 알아보기</div><h1>찍으면 알려드려요</h1>
   <p style="margin-top:6px">무슨 약인지, 어떻게 드시는지, 겹치는 약은 없는지 — 사진 한 장으로.</p>
