@@ -10,7 +10,7 @@
    3. 네트워크를 먼저 보되 3.5초 안에 안 오면 저장본으로 연다(약한 망에서 한참 기다리지 않게). 받아 오면 저장본을 새로 바꾼다.
    4. 보호자 동의 페이지는 저장하지 않는다(늘 새로, 토큰을 남기지 않게).
    5. 웹 글꼴(Google Fonts)은 따로 오래 두는 캐시에 — 오프라인에서도 제 글꼴로 보이게. 판이 바뀌어도 지우지 않는다. */
-const CACHE = 'pcs-2026-10-02a';
+const CACHE = 'pcs-2026-10-02b';
 const FONTS = 'pcs-fonts-v1';
 const ASSETS = ['./index.html', './manifest.webmanifest', './icon-192.png', './icon-512.png', './icon-180.png'];
 

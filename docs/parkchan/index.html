@@ -957,7 +957,7 @@ let CLASSES_CACHE = CFG.classes.slice();
 const SRV = (() => {
   /* 서버 주소 바꾸기(?server=)는 개발 기기(127.0.0.1·localhost 브라우저)에서만. 공개 주소에서 받아 주면 남이 보낸 링크 한 번으로
      로그인이 가짜 서버로 가고 그 설정이 남는다(비밀번호 가로채기) — 2026-10-01 점검에서 재현 */
-  const DEV = /^(127\.0\.0\.1|localhost)$/.test(location.hostname) && !(Cap && Cap.isNativePlatform && Cap.isNativePlatform());
+  const DEV = location.hostname === '127.0.0.1' || (location.hostname === 'localhost' && !(Cap && Cap.isNativePlatform && Cap.isNativePlatform()));   // 실제 안드로이드 앱은 https://localhost — 거기선 받지 않는다
   let o = null; if (DEV) { try { o = JSON.parse(localStorage.getItem('pcs.server')); } catch {} } else { try { localStorage.removeItem('pcs.server'); } catch {} }
   const qp = new URLSearchParams(location.search);
   if (DEV && qp.get('server') !== null){ o = qp.get('server') ? { url: qp.get('server'), key: qp.get('key')||'' } : null;

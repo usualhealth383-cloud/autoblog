@@ -47,13 +47,13 @@ async def main():
         # ④ 3단계 계정: 이메일·비밀번호 확인, 보기 전환, 규칙 표시
         assert '3 / 5' in await s.locator('.stepbar').inner_text()
         await s.fill('#suEmail', 'bad'); await s.fill('#suPw', '12'); await s.click('#suNext'); assert '이메일' in await err()
-        await s.fill('#suEmail', 'first@t.kr'); await s.click('#suNext'); assert '6자' in await err()
-        await s.fill('#suPw', 'abc123'); await s.wait_for_timeout(80)
+        await s.fill('#suEmail', 'first@t.kr'); await s.click('#suNext'); assert '8자' in await err()
+        await s.fill('#suPw', 'abc12345'); await s.wait_for_timeout(80)
         assert (await s.locator('.rules .ok').count()) == 2
         await s.click('#pwEye'); await s.wait_for_timeout(100); assert await s.get_attribute('#suPw', 'type') == 'text'
         await shot('o07_account'); await s.click('#suNext'); await s.wait_for_timeout(200)
         # ⑤ 이전으로 갔다 와도 값이 남는다
-        await s.click('#suPrev'); await s.wait_for_timeout(150); assert await s.input_value('#suEmail') == 'first@t.kr' and await s.input_value('#suPw') == 'abc123'
+        await s.click('#suPrev'); await s.wait_for_timeout(150); assert await s.input_value('#suEmail') == 'first@t.kr' and await s.input_value('#suPw') == 'abc12345'
         await s.click('#suNext'); await s.wait_for_timeout(150)
         # ⑥ 4단계 내 정보: 만 14세 미만이라 보호자 정보 필수
         await s.fill('#suName', '첫학생'); await s.click('#suNext'); assert '보호자' in await err()
@@ -73,7 +73,7 @@ async def main():
         await s.click('#suPrev'); await s.click('#suPrev'); await s.wait_for_timeout(150); assert await s.evaluate('authMode') == 'start'
         # ⑩ 이미 가입한 이메일이면 계정 단계로 돌아가 알려 준다
         await s.click('#goSignup'); await s.click('[data-role="student"]'); await s.click('#suNext'); await s.check('input[name=suAge][value="14+"]'); await s.check('#agAll'); await s.click('#suNext')
-        await s.fill('#suEmail', 'first@t.kr'); await s.fill('#suPw', 'abc123'); await s.click('#suNext'); await s.fill('#suName', '또가입'); await s.click('#suNext'); await s.click('#suSkipCode'); await s.wait_for_timeout(900)
+        await s.fill('#suEmail', 'first@t.kr'); await s.fill('#suPw', 'abc12345'); await s.click('#suNext'); await s.fill('#suName', '또가입'); await s.click('#suNext'); await s.click('#suSkipCode'); await s.wait_for_timeout(900)
         assert '이미 가입' in await err() and '3 / 5' in await s.locator('.stepbar').inner_text()
         assert not errs, errs
         print('ONBOARD E2E OK · 콘솔 오류', errs); await b.close()

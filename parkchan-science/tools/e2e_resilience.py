@@ -65,6 +65,14 @@ async def main():
         await s.reload(); await s.wait_for_timeout(1500); assert await s.locator('.sheet').count() == 0, '안내가 매번 뜸'
         cur.execute("delete from private.config where k = 'notice'")
         assert not errs, errs
+        # 공개 주소에서는 ?server= 로 서버를 바꾸지 못한다(남이 보낸 링크로 로그인이 가짜 서버로 가던 것 — 2026-10-01)
+        b2 = await p.chromium.launch(executable_path='/opt/pw-browsers/chromium', args=['--host-resolver-rules=MAP parkchan.test 127.0.0.1'])
+        c2 = await b2.new_context(); await c2.add_init_script(NO_INTRO); q = await c2.new_page()
+        await q.goto('http://parkchan.test:8765/index.html?server=http://evil.test:9&key=x'); await q.wait_for_timeout(600)
+        assert await q.evaluate('DBX.mode') == 'local' and await q.evaluate("localStorage.getItem('pcs.server')") is None, '공개 주소에서 서버 바꾸기가 받아들여짐'
+        await q.evaluate("localStorage.setItem('pcs.server', JSON.stringify({url:'http://evil.test:9', key:'x'}))"); await q.goto('http://parkchan.test:8765/index.html'); await q.wait_for_timeout(600)
+        assert await q.evaluate('DBX.mode') == 'local' and await q.evaluate("localStorage.getItem('pcs.server')") is None, '저장된 가짜 서버가 쓰임'
+        await b2.close()
         print('RESILIENCE E2E OK · 콘솔 오류', errs); await b.close()
 
 asyncio.run(main())

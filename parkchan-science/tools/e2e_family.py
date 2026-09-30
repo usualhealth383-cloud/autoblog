@@ -62,10 +62,10 @@ async def main():
         assert await pg.evaluate("acadEvents.some(e => e.title === '동생학생 · 3단원 평가')"), await pg.evaluate('acadEvents')
         # 비밀번호 바꾸기 → 새 비밀번호로만 로그인
         await pg.click('.tab[data-v="me"]'); await pg.wait_for_timeout(300); await pg.click('#pwOpen')
-        await pg.fill('#pwNew', 'newpw77'); await pg.fill('#pwNew2', 'newpw78'); await pg.click('#pwSave'); assert '다릅니다' in await pg.locator('#pwErr').inner_text()
-        await pg.fill('#pwNew2', 'newpw77'); await pg.click('#pwSave'); await pg.wait_for_timeout(800); assert await pg.locator('#sheetBg').count() == 0
+        await pg.fill('#pwNew', 'newpass77'); await pg.fill('#pwNew2', 'newpass78'); await pg.click('#pwSave'); assert '다릅니다' in await pg.locator('#pwErr').inner_text()
+        await pg.fill('#pwNew2', 'newpass77'); await pg.click('#pwSave'); await pg.wait_for_timeout(800); assert await pg.locator('#sheetBg').count() == 0
         await logout(); await login('fam@t.kr', 'pass1234'); assert '다릅니다' in await pg.locator('.auth .err').inner_text(), '옛 비밀번호로 로그인됨'
-        await pg.fill('#lgPw', 'newpw77'); await pg.click('#lgGo'); await pg.wait_for_timeout(1200); assert await pg.evaluate('view') == 'parent'
+        await pg.fill('#lgPw', 'newpass77'); await pg.click('#lgGo'); await pg.wait_for_timeout(1200); assert await pg.evaluate('view') == 'parent'
         # 동생만 연결 해제 → 형만 남음
         await pg.click('.tab[data-v="parent"]'); await pg.wait_for_timeout(600); await pg.click(f'[data-kid="{codes[1]}"]'); await pg.wait_for_timeout(800)
         await pg.click('#unlinkChild'); await pg.wait_for_timeout(1000)

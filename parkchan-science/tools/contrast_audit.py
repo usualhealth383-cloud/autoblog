@@ -57,7 +57,7 @@ async def walk_onboarding(pg, look):
     await pg.click('#suNext'); await pg.wait_for_timeout(150); await look('가입2 약관(오류)')
     await pg.check('#agAll'); await pg.wait_for_timeout(150); await look('가입2 약관')
     await pg.click('#suNext'); await pg.wait_for_timeout(200); await look('가입3 계정')
-    await pg.fill('#suEmail', 'audit@t.kr'); await pg.fill('#suPw', 'abc123'); await pg.click('#suNext'); await pg.wait_for_timeout(200)
+    await pg.fill('#suEmail', 'audit@t.kr'); await pg.fill('#suPw', 'abc12345'); await pg.click('#suNext'); await pg.wait_for_timeout(200)
     await pg.fill('#suName', '점검'); await look('가입4 내 정보')
     await pg.fill('#suGName', '점검보호'); await pg.fill('#suGPhone', '01012341234'); await pg.click('#suNext'); await pg.wait_for_timeout(200); await look('가입5 코드')
     await pg.click('#suSkipCode'); await pg.wait_for_timeout(900); await look('환영')
