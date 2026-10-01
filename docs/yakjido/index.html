@@ -4721,9 +4721,10 @@ document.addEventListener('click', e => { const t = e.target.closest('.tab[data-
 
 /* ───────── 식약처 제품 상세(e약은요) ───────── */
 /* 약학정보원 복약정보(2026-09-30 현욱님 「약 사전 내용도 약학정보원 참고해서 잘 보완해」) — tools/kpic_detail.py 가 식약처 코드로 짝지어 모은 것.
-   제품 하나에 한 줄 설명·복약 안내·그림 표시·생김새·보관·포장·DUR. 16조각(data/kg/N.json)으로 나눠 그 제품 조각만 받는다 */
+   제품 하나에 한 줄 설명·복약 안내·그림 표시·생김새·보관·포장·DUR. 128조각(data/kg/N.json)으로 나눠 그 제품 조각만 받는다 */
 const KG = {};
-const kgShard = seq => (parseInt(String(seq).slice(-3), 10) || 0) % 16;
+const KG_N = 128;   /* tools/build.py 와 같은 수 — 처방약까지 늘자 16조각은 한 조각 1.3 MB 였다 */
+const kgShard = seq => (/^\d+$/.test(String(seq)) ? Number(String(seq)) : 0) % KG_N;
 function kgGet(seq){
   if (!seq) return null; const k = kgShard(seq);
   if (!(k in KG)) { KG[k] = null; fetch(`data/kg/${k}.json`).then(r => r.ok ? r.json() : {}).then(j => { KG[k] = j || {}; if (j && j[String(seq)]) route(); }).catch(() => { KG[k] = {}; }); return null; }

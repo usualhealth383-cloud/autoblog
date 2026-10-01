@@ -33,9 +33,13 @@ if kg.exists():
     if (pub / 'kpic-extra.json').exists():   # 약 사전 대표 제품(tools/kpic_rep.py) — 수집 파일과 따로 받은 것
         for _s, _v in json.loads((pub / 'kpic-extra.json').read_text(encoding='utf-8')).items():
             if _v and not _g.get(_s): _g[_s] = _v
-    _sh = [{} for _ in range(16)]
+    # 128조각 — 처방약까지 1만 9천 개가 되자 16조각이면 한 조각이 1.3 MB 였다(제품 하나 보려고 휴대폰이 1.3 MB를 받는다).
+    # 조각 번호는 앱의 kgShard 와 똑같이 «품목코드 % KG_N».
+    KG_N = 128
+    _sh = [{} for _ in range(KG_N)]
     for _seq, _v in _g.items():
-        if _v: _sh[(int(str(_seq)[-3:]) if str(_seq)[-3:].isdigit() else 0) % 16][_seq] = _v
+        if _v: _sh[(int(str(_seq)) if str(_seq).isdigit() else 0) % KG_N][_seq] = _v
+    for _old in _kd.glob('*.json'): _old.unlink()
     for _i, _d in enumerate(_sh): (_kd / f'{_i}.json').write_text(json.dumps(_d, ensure_ascii=False, separators=(',', ':')), encoding='utf-8')
 if not (pub / 'kpic.json').exists(): (pub / 'kpic.json').write_text('{}', encoding='utf-8')   # 없으면 앱이 404 를 낸다
 # ── 삽화(art/) ────────────────────────────────────────────────────────────
