@@ -84,6 +84,49 @@ main{flex:1;padding:16px 18px calc(96px + var(--sab));overflow-x:hidden;overflow
 button{font-family:inherit;color:inherit}
 
 /* 상단 바 */
+/* 이번 주 리듬 — 월–일 점 7개. 이어진 날(연속)은 세지 않는다 */
+.rhythm{display:flex;align-items:center;gap:12px;background:var(--card);border:1px solid var(--hair);border-radius:14px;padding:10px 14px;margin:2px 0 13px}
+.rhythm .k{flex:0 0 auto;font-size:12px;font-weight:800;color:var(--muted);line-height:1.3}
+.rhythm .dots{flex:1;display:flex;justify-content:space-between;gap:4px;max-width:236px;margin-left:auto}
+.rhythm .dt{display:flex;flex-direction:column;align-items:center;gap:3px;font-size:10.5px;font-weight:700;color:var(--faint);min-width:18px}
+.rhythm .dt i{display:block;width:10px;height:10px;border-radius:50%;background:var(--hair);border:1.5px solid var(--line)}
+.rhythm .dt.on i{background:var(--u);border-color:var(--u)}
+.rhythm .dt.today{color:var(--u)}
+.rhythm .dt.today i{box-shadow:0 0 0 2px var(--paper),0 0 0 3.5px var(--u)}
+.rhythm .dt.later i{background:transparent;border-style:dashed}
+.rhythm .n{flex:0 0 auto;font-size:15px;font-weight:900;color:var(--ink);font-variant-numeric:tabular-nums}
+.rhythm .n small{font-size:11px;color:var(--muted);font-weight:700}
+.rhythm.tile{flex-direction:column;gap:6px;background:none;border:none;padding:0;margin:0}
+.rhythm.tile .dots{max-width:none;width:100%;margin:0;gap:2px}
+.rhythm.tile .dt{min-width:0;font-size:0;gap:0}
+.rhythm.tile .dt i{width:8px;height:8px}
+.rhythm.tile .k{order:3;font-size:11px;font-weight:400;color:var(--muted)}
+.rhythm.tile .n{order:1;font-size:21px;line-height:1.2}
+.rhythm.tile .n small{font-size:12px;font-weight:600}
+.rhythm.tile .dots{order:2}
+.tile.rtile{padding:12px 8px}
+.week .d.later i{background:transparent;border:1.5px dashed var(--line)}
+/* 오늘의 복습 카드 — 차분하게, 숫자 하나 */
+.revcard{display:flex;align-items:center;gap:12px;width:100%;min-height:64px;text-align:left;background:var(--card);border:1px solid var(--u-line);border-radius:16px;padding:12px 14px;margin:-2px 0 13px;cursor:pointer;font-family:inherit;color:var(--ink)}
+.revcard .ic{flex:0 0 38px;height:38px;border-radius:12px;background:var(--u-soft);display:grid;place-items:center}
+.revcard .ic svg{width:20px;height:20px;stroke:var(--u);stroke-width:2.2;fill:none;stroke-linecap:round;stroke-linejoin:round}
+.revcard .tx{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.revcard .tx b{font-size:14.5px;font-weight:800}
+.revcard .tx b em{font-style:normal;color:var(--u);font-variant-numeric:tabular-nums;margin-left:2px}
+.revcard .tx span{font-size:12.5px;color:var(--muted);line-height:1.5}
+.revcard .chev{flex:0 0 18px;width:18px;height:18px;stroke:var(--faint);stroke-width:2.2;fill:none;stroke-linecap:round}
+.revcard.done{cursor:default;border-color:var(--hair)}
+.qhead .rk{display:inline-block;font-size:11px;font-weight:800;color:var(--u);background:var(--u-soft);border-radius:999px;padding:1px 8px;margin-right:6px}
+.revnext{justify-content:center;font-size:13.5px;margin:0 0 14px}
+/* 여러 번 갈린 문제 — 다시 묻지 않고 개념 카드로 */
+.leechcard{background:var(--card);border:1px solid var(--hair);border-radius:16px;padding:16px;margin:4px 0 13px}
+.leechcard .h{font-size:15px;font-weight:900;color:var(--ink);margin-bottom:6px}
+.leechcard p{font-size:13.5px;color:var(--body);line-height:1.7;margin-bottom:8px}
+.leechcard p.c{font-size:12.5px;color:var(--muted);font-weight:700;margin-bottom:12px}
+.leechcard .btn{margin-bottom:8px}
+p.leech{font-size:12.5px;color:var(--muted);line-height:1.6;margin:-4px 0 8px}
+.pausenote{display:flex;align-items:center;justify-content:space-between;gap:10px;background:var(--card);border:1px solid var(--hair);border-radius:14px;padding:8px 8px 8px 14px;margin:0 0 13px;font-size:12.5px;line-height:1.6;color:var(--body)}
+.pausenote .linkbtn{flex:0 0 auto;min-height:44px;padding:0 10px;font-weight:800;color:var(--brand-dark)}
 .top{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
 .top .date{font-size:13px;color:var(--muted)}
 .top .hello{font-size:15px;font-weight:900;letter-spacing:-.01em}
@@ -892,7 +935,6 @@ const FIGS_N = CONCEPTS.filter(c=>c.figure).length;
 const LESSONS  = (() => { const m = new Map(); CONCEPTS.forEach(c => { if (!m.has(c.lessonId)) m.set(c.lessonId, { id:c.lessonId, name:c.lessonName, book:c.book, bookName:c.bookName, unit:c.unit, unitName:c.unitName, idx:CONCEPTS.findIndex(x=>x.lessonId===c.lessonId) }); }); return [...m.values()]; })();
 const MARKS = '①②③④⑤';
 const FREE_DAYS = 7;                 // [확인 필요] 무료 체험: 최근 7일치 개념
-const RETRY_DAYS = 3;                // 오답 재출제 간격
 const CFG = {
   academy: '박찬 과학', version: '1.0.0',
   supabaseUrl: '', supabaseKey: '',   // build.py 가 server/config.json 에서 심는다. 비어 있으면 로컬 모드
@@ -1482,6 +1524,7 @@ const mergeProgress = p => { if (!p) return;
     if (first) S.sched = { fixed:merge(p.sched.fixed, S.sched.fixed), events:merge(p.sched.events, S.sched.events), ddays:merge(p.sched.ddays, S.sched.ddays) };
     else if (newer) S.sched = { fixed:(p.sched.fixed||[]).slice(), events:(p.sched.events||[]).slice(), ddays:(p.sched.ddays||[]).slice() }; }
   if (p.notifyAt && !S.notifyAt) S.notifyAt = p.notifyAt;
+  migrateWrong(S.wrong);   // 옛 앱이 올린 기록도 상자에 넣는다
   if (p.at && (!S.syncAt || p.at > S.syncAt)) S.syncAt = p.at; };
 /* 앱으로 돌아왔을 때(다른 기기에서 공부했을 수 있다) — 서버가 더 새 것이면 받아 합치고 지금 화면을 다시 그린다 */
 let lastPull = 0;
@@ -1523,9 +1566,112 @@ const hasPass = () => !!(ACC && ACC.passUntil && ACC.passUntil >= todayISO());
 const authLive = () => !!(S.auth && (!S.auth.until || S.auth.until >= todayISO()));
 const fullAccess = () => !!(authLive() || hasPass() || (ACC && ACC.role==='owner'));
 const isOpen = i => fullAccess() || (i <= Math.max(dayIndex(), FREE_DAYS - 1) && i > dayIndex() - FREE_DAYS);   // 첫날부터 7개를 열어 '최근 7일치 무료' 약속을 지킨다(첫날 1개만 열리던 것 — 2026-10-01)
-const dueRetry = () => S.wrong.find(w => !w.b && !w.redone && !w.cleared && w.iso && daysBetween(w.iso, todayISO()) >= RETRY_DAYS);
 const quizFor = c => { const pool = QUIZZES.filter(q=>q.lessonId===c.lessonId); return pool[(+c.no-1)%pool.length] || pool[0]; };
-const streak = () => { let n=0, d=todayISO(); if (!S.days.includes(d)) d = addDays(d,-1); while (S.days.includes(d)){ n++; d = addDays(d,-1); } return n; };
+
+/* ═══ 간격을 넓혀 가는 복습(라이트너 상자) — 오늘의 문제·문제 은행·복습에서 틀린 것 모두 ═══
+   상자 1→5 = 1·3·7·14·30일. 기한이 된 문제를 맞히면 다음 상자, 틀리면 상자 1(내일).
+   기한 전에 미리 맞힌 것은 간격을 바꾸지 않는다(하루에 몰아 맞혀 상자를 올리지 않게).
+   7일 넘게 띄운 복습에서 두 번 잇달아 맞혀야 '정리됨'. 범위에 든 시험이 다가오면 간격을 남은 날의 20 %(최소 1일)로 줄인다.
+   하루 복습은 10문항까지(밀린 것부터) — 넘치는 것은 다음 날로. 6번 넘게 틀린 문제는 다시 묻지 않고 개념 카드로 돌려보낸다.
+   기록(오답 하나): b(문제 은행 id) 또는 l·n(오늘의 문제) · p 내 답 · iso 처음 틀린 날 · a 마지막으로 푼 날 · d 다음 복습 날
+                    · x 상자(1–5) · k 틀린 횟수 · g 7일 넘는 간격에서 잇달아 맞힌 수 · rd 개념 카드로 돌아가 읽은 날 · cleared 정리됨 */
+const SRS = [1, 3, 7, 14, 30], SRS_CAP = 10, LEECH = 6;
+const wKey = w => w.b ? 'b:'+w.b : w.l+':'+w.n;
+const lessonOfW = w => w.l || String(w.b||'').split('-')[0];
+/* 옛 기록(3일 뒤 한 번) → 상자 1. 날짜(iso·date)는 그대로 두고, 다음 복습은 틀린 날 + 1일(이미 지났으면 오늘 기한 — 하루 10개씩 나눠 나온다) */
+const migrateWrong = arr => { let n = 0; (arr||[]).forEach(w => { if (!w || typeof w !== 'object') return;
+  if (typeof w.iso !== 'string' || !/^\d{4}-\d\d-\d\d$/.test(w.iso)){ w.iso = todayISO(); n++; }
+  if (!(w.x >= 1 && w.x <= 5)){ w.x = 1; w.a ||= w.iso; w.d ||= addDays(w.iso, SRS[0]); w.k = Math.max(1, +w.k || 1); n++; }
+  if ('redone' in w){ delete w.redone; n++; } }); return n; };
+if (migrateWrong(S.wrong)) saveLocal();
+/* 범위에 든 시험(D-day · 범위를 건 시험 일정)까지 남은 날 — 범위가 없는 D-day 는 모든 소단원에 든다 */
+const examLeft = lessonId => { const L = LESSONS.find(x => x.id === lessonId); let best = null;
+  const cov = sc => !sc || !!(L && (sc.lesson ? sc.lesson === L.id : sc.unit ? (String(sc.book) === String(L.book) && sc.unit === L.unit) : sc.book ? String(sc.book) === String(L.book) : true));
+  const see = (date, sc) => { const n = dLeft(date); if (n >= 1 && cov(sc) && (best === null || n < best)) best = n; };
+  (S.sched.ddays||[]).forEach(d => see(d.date, d.scope));
+  myEvents().forEach(e => { if (e.kind === 'exam' && e.scope) see(e.date, e.scope); });
+  return best; };
+const srsGap = (x, lessonId) => { const base = SRS[Math.min(5, Math.max(1, x)) - 1], left = examLeft(lessonId);
+  return left === null ? base : Math.min(base, Math.max(1, Math.floor(left * 0.2))); };
+const findW = ref => { const k = wKey(ref); return S.wrong.find(w => !w.cleared && wKey(w) === k) || S.wrong.find(w => wKey(w) === k) || null; };
+const isLeech = w => !!w && (w.k||0) >= LEECH && !w.rd;
+const isDueW = w => !!w && !w.cleared && (w.d || '') <= todayISO();
+const rvToday = () => (S.rv && S.rv.d === todayISO()) ? S.rv : (S.rv = { d:todayISO(), n:0, s:0 });
+/* 오늘 기한인 복습 — 밀린 것부터, 오늘 이미 푼 만큼 빼고 10개까지 */
+const dueAll = () => S.wrong.filter(isDueW).sort((a, b) => a.d < b.d ? -1 : a.d > b.d ? 1 : (a.iso < b.iso ? -1 : a.iso > b.iso ? 1 : 0));
+const dueToday = () => dueAll().slice(0, Math.max(0, SRS_CAP - rvToday().n));
+/* 채점 결과를 상자에 반영 — 돌려주는 st: new(새로 담음) · reset(상자 1로) · up(다음 상자) · clear(정리됨) · early(기한 전이라 그대로) · null */
+function srsMark(ref, ok, p){
+  const t = todayISO(); let w = findW(ref);
+  if (isDueW(w)) rvToday().n++;
+  if (!ok){
+    if (!w){ w = ref.b ? { b:ref.b } : { l:ref.l, n:ref.n }; Object.assign(w, { p, iso:t, a:t, x:1, k:1 }); w.d = addDays(t, srsGap(1, lessonOfW(w))); S.wrong.push(w); return { st:'new', d:w.d, w }; }
+    delete w.cleared; delete w.rd; delete w.g; w.p = p; w.a = t; w.x = 1; w.k = (w.k||1) + 1; w.d = addDays(t, srsGap(1, lessonOfW(w))); return { st:'reset', d:w.d, w }; }
+  if (!w || w.cleared) return null;
+  if (w.d > t) return { st:'early', d:w.d, w };
+  const gap = daysBetween(w.a || w.iso, t); w.g = gap >= 7 ? (w.g||0) + 1 : 0; w.a = t; w.x = Math.min(5, (w.x||1) + 1);
+  if (w.g >= 2){ w.cleared = true; delete w.g; return { st:'clear', w }; }
+  if (!w.g) delete w.g;
+  w.d = addDays(t, srsGap(w.x, lessonOfW(w))); return { st:'up', d:w.d, w }; }
+const dueWord = d => { const n = daysBetween(todayISO(), d); return n <= 0 ? '오늘' : n === 1 ? '내일' : `${kdate(d)}(${n}일 뒤)`; };
+const srsLine = r => !r ? '' : r.st === 'new' ? `↻ 오답 노트에 담았습니다 · <b>${dueWord(r.d)}</b> 한 번 더 묻습니다`
+  : r.st === 'reset' ? `↻ 한 번 더 담아 둡니다 · <b>${dueWord(r.d)}</b> 다시 묻습니다`
+  : r.st === 'up' ? `✓ 간격을 넓힙니다 · 다음 복습은 <b>${dueWord(r.d)}</b>입니다`
+  : r.st === 'clear' ? '✓ 이제 됐습니다 — 오답 노트에서 정리됩니다'
+  : r.st === 'early' ? `맞혔습니다 · 복습 날짜는 그대로 <b>${dueWord(r.d)}</b>입니다` : '';
+/* 개념 카드 자리 — 오답 문제가 나온 개념(문제 은행은 concept 번호, 오늘의 문제는 그 문제를 내는 개념) */
+const conceptIdxOfW = w => { const l = lessonOfW(w); let i = -1;
+  if (w.b){ const q = BANK.find(x => x.id === w.b); if (q && +q.concept) i = CONCEPTS.findIndex(c => c.lessonId === l && +c.no === +q.concept); }
+  else i = CONCEPTS.findIndex(c => c.lessonId === l && (quizFor(c)||{}).no === w.n);
+  return i >= 0 ? i : CONCEPTS.findIndex(c => c.lessonId === l); };
+
+/* ═══ 오늘의 복습 — 기한 된 복습 3 + 이미 배운 다른 소단원 2, 같은 소단원이 잇달아 나오지 않게 ═══ */
+const studiedLessons = () => { const s = new Set();
+  S.done.forEach(id => { const c = CONCEPTS.find(x => x.id === id); if (c) s.add(c.lessonId); });
+  Object.keys(S.bh||{}).forEach(id => s.add(String(id).split('-')[0]));
+  const open = new Set(openLessons().map(l => l.id)); return [...s].filter(l => open.has(l)); };
+/* 같은 소단원이 붙지 않게 줄 세운다 — 남은 것이 가장 많은 소단원부터(같으면 기한 된 복습 먼저). 어떻게 해도 붙는 것은 다음으로 미룬다 */
+function interleave(list){ const g = new Map(); list.forEach(e => { if (!g.has(e.lesson)) g.set(e.lesson, []); g.get(e.lesson).push(e); });
+  const out = []; let prev = null;
+  for (;;){ const cand = [...g.entries()].filter(([l, a]) => a.length && l !== prev);
+    if (!cand.length) break;
+    cand.sort((A, B) => B[1].length - A[1].length || (B[1][0].w ? 1 : 0) - (A[1][0].w ? 1 : 0));
+    const [l, a] = cand[0]; out.push(a.shift()); prev = l; }
+  return out; }
+/* 세트 짜기 — 문제 은행을 아직 못 받았으면 소단원만 정한다(개수 세기용). 받았으면 실제 문항까지 */
+function reviewPlan(real){
+  const t = todayISO(), rv = rvToday(), todayL = todayConcept().lessonId, open = new Set(openLessons().map(l => l.id));
+  const due = dueToday().filter(w => open.has(lessonOfW(w)) && (!real || reviewItem(w))).slice(0, 3).map(w => ({ w, lesson:lessonOfW(w) }));
+  let extra = [];
+  if (!rv.s){ const dueL = new Set(due.map(e => e.lesson)), live = new Set(S.wrong.filter(w => !w.cleared).map(wKey));
+    const shuffle = a => { for (let i = a.length - 1; i > 0; i--){ const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+    const ls = studiedLessons().filter(l => l !== todayL), pref = [...shuffle(ls.filter(l => !dueL.has(l))), ...shuffle(ls.filter(l => dueL.has(l)))];
+    for (const l of pref){ if (extra.length >= 2) break;
+      if (!real){ extra.push({ lesson:l }); continue; }
+      const pool = BANK.filter(q => q.lessonId === l && q.type !== 'essay' && !live.has('b:'+q.id)), fresh = pool.filter(q => !(S.bh||{})[q.id]);
+      const from = fresh.length ? fresh : pool; if (from.length) extra.push({ lesson:l, q: from[Math.floor(Math.random() * from.length)] }); } }
+  return { items: interleave([...due, ...extra]), t }; }
+/* 오늘의 문제(5지선다)를 문제 은행 화면에서 풀 수 있는 모양으로 */
+const quizAsBank = q => ({ id:`q:${q.lessonId}:${q.no}`, lessonId:q.lessonId, type:'mc', stem:q.stem, ask:q.ask, source:q.source, choices:q.choices, answer:q.answer,
+  explain:q.explain || '', wrong:'', figure:'', difficulty:'', _qz:q });
+const reviewItem = w => { if (w.b) return BANK.find(q => q.id === w.b) || null; const q = QUIZZES.find(x => x.lessonId === w.l && x.no === w.n); return q && !q.essay ? quizAsBank(q) : null; };
+const nextDueText = () => { const left = dueToday().length; if (left) return `오늘 다시 볼 문제가 ${left}개 더 있습니다`;
+  const ds = S.wrong.filter(w => !w.cleared && w.d > todayISO()).map(w => w.d).sort(); return ds.length ? `다음 복습은 ${dueWord(ds[0])}입니다` : '기한이 다가온 복습이 없습니다'; };
+let revHold = null;   // 문제 탭으로 옮겨 가며 잠시 내려 둔 오늘의 복습
+const revCur = () => { const r = bs && bs.kind === 'review' ? bs : revHold; return r && r.i < r.items.length && r.day === todayISO() ? r : null; };
+function startTodayReview(){
+  const cur = revCur(); if (cur){ bs = cur; revHold = null; show('bank'); return; }   // 하다 만 세트는 이어서
+  const plan = reviewPlan(true); if (!plan.items.length){ toast('오늘은 복습할 문제가 없습니다'); renderToday(); return; }
+  revHold = null; bs = { items: plan.items.map(e => e.q || reviewItem(e.w)), recs: plan.items.map(e => e.w ? wKey(e.w) : ''), i:0, pick:null, right:0, wrong:[], label:'오늘의 복습', ess:null, kind:'review', res:[], day:todayISO() };
+  show('bank'); }
+/* 이번 주 리듬 — 월요일부터 일요일까지 공부한 날을 점 7개로(이어진 날은 세지 않는다) */
+const weekDays = () => { const t = todayISO(), mon = addDays(t, -((wdOf(t) + 6) % 7)); return [...Array(7)].map((_, i) => addDays(mon, i)); };
+function rhythm(days, cls){ const set = new Set(days||[]), t = todayISO(), wk = weekDays(), n = wk.filter(d => set.has(d)).length;
+  const on = wk.filter(d => set.has(d)).map(d => WD[wdOf(d)]);
+  return `<div class="rhythm ${cls||''}" role="img" aria-label="이번 주 리듬: 7일 가운데 ${n}일 공부했습니다${on.length ? ` (${on.join('·')})` : ''}">
+    <span class="k">이번 주 리듬</span><span class="dots" aria-hidden="true">${wk.map(d => `<span class="dt ${set.has(d)?'on':''} ${d===t?'today':''} ${d>t?'later':''}"><i></i>${WD[wdOf(d)]}</span>`).join('')}</span>
+    <span class="n" aria-hidden="true">${n}<small>/7</small></span></div>`; }
+const weekCount = days => { const set = new Set(days||[]); return weekDays().filter(d => set.has(d)).length; };
 
 /* ═══ 개념 카드(오늘·상세 공용) ═══ */
 function conceptCard(c, opts={}){
@@ -1710,13 +1856,13 @@ function renderAuth(){
   if (authMode==='welcome'){ const r = ACC ? ACC.role : 'student', nm = ACC ? esc(ACC.name) : '';
     const steps = r==='parent' ? ['자녀 화면에서 오늘 출석과 이번 달 기록을 봅니다', '학원 공지와 시험 일정이 자녀별로 들어옵니다', '자녀가 둘이면 <b>자녀 한 명 더 연결</b>로 함께 봅니다']
       : r==='owner' ? ['<b>학생</b>에서 수강생을 등록하고 코드를 보냅니다(엑셀 붙여 넣기 가능)', '수업 전 <b>출석</b>에서 30초 코드를 띄웁니다', '<b>공지</b>·<b>일정</b>은 반별로 보내면 학생·보호자에게 바로 갑니다']
-      : ['홈의 <b>오늘의 개념</b>을 읽고 문제 하나를 풀어 보세요', '틀린 문제는 오답 노트에 담겨 3일 뒤 다시 나옵니다', '시험 날짜는 <b>일정</b>에 D-day로 넣어 두세요'];
+      : ['홈의 <b>오늘의 개념</b>을 읽고 문제 하나를 풀어 보세요', '틀린 문제는 오답 노트에 담겨 내일, 3일, 7일… 간격을 넓혀 가며 다시 나옵니다', '시험 날짜는 <b>일정</b>에 D-day로 넣어 두세요'];
     const LN = plug('LocalNotifications');
     v.innerHTML = `<div class="auth welcome"><div class="grow">
       <div class="big"><svg width="38" height="38" viewBox="0 0 24 24" fill="none" stroke="var(--brand)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 12.5l5 5L19.5 7"/></svg></div>
       <h1 class="q">${nm}님, 준비됐어요</h1><p class="lead">${r==='owner'?'학원 운영은 세 가지면 됩니다.':'이렇게 시작해 보세요.'}</p>
       <div class="next">${steps.map((t,i)=>`<div><i class="no">${i+1}</i><span>${t}</span></div>`).join('')}</div>
-      ${isNative && LN && r!=='owner' ? `<div class="permcard"><div class="t">매일 공부 알림 받기</div><div class="d">정한 시각에 "오늘의 개념"을 알려 드립니다. 시각은 내 정보에서 바꿀 수 있어요.</div><button class="btn soft" id="welcomeNotify" style="margin:0">알림 받기</button></div>` : ''}
+      ${isNative && LN && r!=='owner' ? `<div class="permcard"><div class="t">매일 공부 알림 받기</div><div class="d">정한 시각에 하루 한 번 "오늘의 개념"과 다시 볼 문제 수를 알려 드립니다. 3일 동안 앱을 열지 않으면 알림을 스스로 멈춥니다. 시각은 내 정보에서 바꿀 수 있어요.</div><button class="btn soft" id="welcomeNotify" style="margin:0">알림 받기</button></div>` : ''}
       </div><div class="cta"><button class="btn" id="welcomeGo">시작하기</button></div></div>`; return; }
   if (authMode==='forgot') v.innerHTML = `
     <div class="auth">
@@ -1815,18 +1961,30 @@ function openQuoteKeep(){
     <button class="btn ghost" id="sheetClose">닫기</button>`);
 }
 
+/* 오늘 화면 '오늘의 복습' — 기한 된 것도, 배운 소단원도 없으면 숨긴다. 오늘 세트를 마쳤으면 한 줄만 */
+function reviewCard(){
+  const cur = revCur();
+  if (cur) return `<button class="revcard" id="revStart" aria-label="오늘의 복습 이어서 풀기, ${cur.items.length}문제 가운데 ${cur.i}문제 풀었습니다">
+      <span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M20 12a8 8 0 1 1-2.3-5.6"/><path d="M20 4v5h-5"/></svg></span>
+      <span class="tx"><b>오늘의 복습 <em>${cur.items.length}</em></b><span>이어서 풀기 · ${cur.i} / ${cur.items.length}</span></span>
+      <svg class="chev" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg></button>`;
+  const plan = reviewPlan(false), n = plan.items.length;
+  if (!n){ const rv = rvToday(); return rv.s ? `<div class="revcard done" role="status"><span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4.5 12.5l5 5L19.5 7"/></svg></span><span class="tx"><b>오늘의 복습을 마쳤습니다</b><span>${esc(nextDueText())}</span></span></div>` : ''; }
+  const dn = plan.items.filter(e => e.w).length, xn = n - dn;
+  return `<button class="revcard" id="revStart" aria-label="오늘의 복습 ${n}문제 시작${dn ? ` — 다시 볼 문제 ${dn}` : ''}${xn ? ` · 지난 소단원 ${xn}` : ''}">
+      <span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M20 12a8 8 0 1 1-2.3-5.6"/><path d="M20 4v5h-5"/></svg></span>
+      <span class="tx"><b>오늘의 복습 <em>${n}</em></b><span>${[dn ? `다시 볼 문제 ${dn}` : '', xn ? `지난 소단원 ${xn}` : ''].filter(Boolean).join(' · ')}</span></span>
+      <svg class="chev" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg></button>`; }
 async function renderToday(){
   const c = todayConcept(); setUnit(c.unit);
   const d = new Date(todayISO()+'T00:00:00'), wd = ['일','월','화','수','목','금','토'][d.getDay()];   // 한국 날짜 기준(주간 띠와 같게)
   unreadNotice = null; myAtt = null;
   if (S.auth){ try { const ns = await DBX.notices(S.auth.cls); unreadNotice = ns.find(n => !n.read.includes(S.auth.code)) || null; myAtt = await DBX.myAttendance(S.auth.code, todayISO()); } catch {}
     try { acadEvents = (await DBX.schedule(S.auth.cls)).map(e => ({ ...e, acad:true })); } catch {} }
-  const retry = dueRetry(), st = streak();
-  const week = [...Array(7)].map((_,i) => { const iso = addDays(todayISO(), i-6); return { iso, on:S.days.includes(iso), today:i===6, wd:['일','월','화','수','목','금','토'][new Date(iso+'T00:00:00').getDay()] }; });
   const trialLeft = fullAccess() ? null : Math.max(0, FREE_DAYS - Math.min(FREE_DAYS, daysBetween(S.start, todayISO())));
   document.getElementById('v-today').innerHTML = `
     <div class="top">
-      <span class="hello">${ACC ? `${esc(ACC.name)}${ACC.role==='student'?' 학생':''}, 안녕하세요` : '안녕하세요'}<small>${d.getMonth()+1}월 ${d.getDate()}일 ${wd}요일 · ${st>0?`${st}일째 연속 학습`:'오늘 첫 개념을 열어 보세요'}</small></span>
+      <span class="hello">${ACC ? `${esc(ACC.name)}${ACC.role==='student'?' 학생':''}, 안녕하세요` : '안녕하세요'}<small>${d.getMonth()+1}월 ${d.getDate()}일 ${wd}요일</small></span>
       ${S.auth
         ? (myAtt ? `<span class="pill"><svg viewBox="0 0 24 24"><path d="M4 12.5l5.5 5.5L20 7"/></svg> ${myAtt.time} 출석${myAtt.late?' · 지각':''}</span>`
                  : `<button class="pill att-pill todo" id="attOpen"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="3"/><path d="M8 12h8M12 8v8"/></svg> 출석 체크</button>`)
@@ -1834,7 +1992,7 @@ async function renderToday(){
     </div>
     ${consentCard('today')}
     ${unreadNotice ? `<div class="notice"><div class="ic">!</div><div class="b"><div class="t">${esc(unreadNotice.t)}</div><div class="d">${esc(unreadNotice.d)} · ${esc(unreadNotice.cls)}</div></div><button id="okNotice" data-id="${unreadNotice.id}">확인</button></div>` : ''}
-    <div class="week">${week.map(w=>`<div class="d ${w.on?'on':''} ${w.today?'today':''}"><i>${+w.iso.slice(-2)}</i>${w.wd}</div>`).join('')}</div>
+    ${rhythm(S.days, 'home')}
     ${(() => { const iso = todayISO();
         const todayList = [...fixedOn(iso), ...myEvents().filter(e => e.date === iso)];
         const nextDday = (S.sched.ddays||[]).filter(d => dLeft(d.date) >= 0).sort((a,b)=>a.date<b.date?-1:1)[0];
@@ -1843,7 +2001,8 @@ async function renderToday(){
           <span class="l">${todayList.length ? todayList.map(x => esc(x.title) + (x.from ? ` <i>${esc(x.from)}</i>` : '')).join(' · ') : '오늘 등록된 일정 없음'}</span>
           ${nextDday ? `<span class="dd">${esc(nextDday.title)} ${ddayText(dLeft(nextDday.date))}</span>` : ''}</button>`; })()}
     ${conceptCard(c)}
-    <button class="btn" id="goQuiz">${retry ? '다시 볼 문제부터 풀기' : '오늘의 문제 풀기'}</button>
+    <button class="btn" id="goQuiz">오늘의 문제 풀기</button>
+    ${reviewCard()}
     <button class="prog" id="goStatsRing">
       <svg class="ring" viewBox="0 0 52 52"><circle cx="26" cy="26" r="21" fill="none" stroke="var(--line)" stroke-width="5"/>
         <circle cx="26" cy="26" r="21" fill="none" stroke="var(--u)" stroke-width="5" stroke-linecap="round" stroke-dasharray="131.9" stroke-dashoffset="${(131.9*(1-Math.min(1,S.done.length/CONCEPTS.length))).toFixed(1)}" transform="rotate(-90 26 26)"/></svg>
@@ -1859,7 +2018,7 @@ async function renderToday(){
 let qState = null;
 function renderQuiz(){
   const c = todayConcept();
-  if (!qState){ const r = dueRetry(); const q = r ? QUIZZES.find(x=>x.lessonId===r.l && x.no===r.n) : null; qState = q ? { q, pick:null, retry:r, mode:'today' } : { q: quizFor(c), pick:null, retry:null, mode:'today' }; }
+  if (!qState) qState = { q: quizFor(c), pick:null, retry:null, mode:'today' };   // 기한 된 복습은 오늘 화면의 '오늘의 복습'에서 푼다
   const {q, pick, retry, mode} = qState; const graded = pick !== null;
   const label = mode==='review' ? '복습 문제' : (retry ? '다시 볼 문제' : '오늘의 문제');
   document.getElementById('v-quiz').innerHTML = `
@@ -1867,7 +2026,7 @@ function renderQuiz(){
     <h1 class="sr">${mode==='review'?'복습 문제':'오늘의 문제'}</h1>
     <div class="qhead"><span class="l">${label}${mode==='review'?` · ${esc(qState.lessonName||'')}`:''}</span>
       <span class="tag">${retry ? `${kdate(retry.iso)}에 틀림` : (graded && pick!==q.answer ? '다시 볼 문제' : (q.type||'확인'))}</span></div>
-    ${retry ? `<p class="again">↻ ${RETRY_DAYS}일 전에 갈렸던 문제입니다. 이번엔 어디서 갈리는지 보세요.</p>` : ''}
+    ${retry ? `<p class="again">↻ 전에 갈렸던 문제입니다. 이번엔 어디서 갈리는지 보세요.</p>` : ''}
     <p class="stem">${rich(q.stem)}</p>
     ${q.source ? `<div class="bogi">${rich(q.source)}</div>`:''}
     ${q.ask ? `<p class="ask">${rich(q.ask)}</p>`:''}
@@ -1881,11 +2040,10 @@ function renderQuiz(){
       ${graded ? `
         <div class="verdict" tabindex="-1" role="status"><div class="h">${pick===q.answer ? '맞혔습니다' : `아쉬워요 · 정답은 ${MARKS[q.answer-1]}`}</div>
           <p>${rich(q.explain || (pick===q.answer ? '정답입니다.' : `정답은 ${MARKS[q.answer-1]}입니다. 개념의 포인트를 다시 읽어 보세요.`))}</p></div>
-        ${pick!==q.answer && !retry ? `<div class="again">↻ 오답 노트에 담았습니다 · <b>${RETRY_DAYS}일 뒤</b> 한 번 더 묻습니다</div>`:''}
-        ${retry ? `<div class="again">${pick===q.answer ? '✓ 이제 됐습니다 — 오답 노트에서 정리됩니다' : '한 번 더 담아 둘게요 — 3일 뒤 다시'}</div>`:''}
+        ${srsLine(qState.srs) ? `<div class="again">${srsLine(qState.srs)}</div>` : ''}
         <button class="btn" id="grade">${mode==='review' ? '다음 복습 문제' : (retry ? '오늘의 문제로' : '오늘 개념으로 돌아가기')}</button>
         <button class="flag" data-report="quiz:${esc(q.lessonId)}#${q.no}">문제·해설에 틀린 곳이 있나요?</button>
-      ` : `<p class="qhint">고르면 바로 채점하고, 왜 갈렸는지 알려 드립니다.<br>틀려도 괜찮습니다 — 오답은 <b>${RETRY_DAYS}일 뒤</b> 한 번 더 나옵니다.</p>`}
+      ` : `<p class="qhint">고르면 바로 채점하고, 왜 갈렸는지 알려 드립니다.<br>틀려도 괜찮습니다 — 오답은 <b>내일</b> 다시 나오고, 맞힐수록 간격이 늘어납니다.</p>`}
     `}`;
 }
 function startReview(){
@@ -1898,8 +2056,7 @@ function gradePick(pick){
   const {q, retry, mode} = qState; qState.pick = pick; touchDay();
   S.stats.a++; if (pick===q.answer) S.stats.c++;
   if (mode==='today'){ const c = todayConcept(); if (!S.done.includes(c.id)) S.done.push(c.id); }
-  if (retry){ retry.redone=true; if (pick===q.answer) retry.cleared=true; else { retry.redone=false; retry.iso=todayISO(); retry.p=pick; } }
-  else if (pick!==q.answer && !S.wrong.some(w=>w.l===q.lessonId && w.n===q.no && !w.cleared)) S.wrong.push({l:q.lessonId, n:q.no, p:pick, iso:todayISO(), date:kdate(todayISO())});
+  qState.srs = srsMark({ l:q.lessonId, n:q.no }, pick===q.answer, pick);   // 오늘의 문제·다시 풀기·복습 모두 같은 상자 규칙
   save(S); renderQuiz(); document.querySelector('#v-quiz .verdict')?.focus({ preventScroll:true });   // 채점 결과를 화면낭독기가 읽게
 }
 
@@ -1956,24 +2113,31 @@ function renderDetail(){
 }
 
 /* ═══ 오답 노트 ═══ */
+const LEECH_NOTE = '여러 번 갈린 문제입니다. 문제를 또 풀기보다 개념 카드를 먼저 다시 읽어 보세요.';
 function renderWrong(){
   const v = document.getElementById('v-wrong');
-  const live = S.wrong.filter(w=>!w.cleared), cleared = S.wrong.filter(w=>w.cleared);
-  if (!S.wrong.length){ v.innerHTML = `<h1 class="h-page">오답 노트</h1><div class="empty"><svg viewBox="0 0 24 24"><path d="M6 4h12v16l-6-4-6 4z"/></svg><p>아직 담긴 문제가 없습니다.<br>틀린 문제는 여기 모이고, ${RETRY_DAYS}일 뒤 한 번 더 나옵니다.</p></div>
+  const live = S.wrong.filter(w=>!w.cleared).sort((a,b) => (a.d||'') < (b.d||'') ? -1 : (a.d||'') > (b.d||'') ? 1 : 0), cleared = S.wrong.filter(w=>w.cleared);
+  if (!S.wrong.length){ v.innerHTML = `<h1 class="h-page">오답 노트</h1><div class="empty"><svg viewBox="0 0 24 24"><path d="M6 4h12v16l-6-4-6 4z"/></svg><p>아직 담긴 문제가 없습니다.<br>틀린 문제는 여기 모이고, 내일 · 3일 · 7일 · 14일 · 30일로 간격을 넓혀 가며 다시 나옵니다.</p></div>
     <button class="btn soft" id="goReview">복습 문제 풀기</button>`; return; }
-  const item = w => { if (w.b){ const q=BANK.find(x=>x.id===w.b); if(!q) return ''; const c = LESSONS.find(x=>x.id===q.lessonId);
-      return `<div class="sec"><h2><span>${w.date}${w.cleared ? ' · 정리됨' : ''}</span>${w.cleared?'':`<button class="more" data-bretry="${q.id}">지금 다시 풀기</button>`}</h2>
+  const when = w => { if (w.cleared) return ' · 정리됨'; if (isLeech(w)) return ' · 개념부터 다시'; const n = daysBetween(todayISO(), w.d || todayISO()); return n > 0 ? ` · ${n}일 뒤 다시` : ' · 오늘 다시'; };
+  const act = (w, retry) => w.cleared ? '' : isLeech(w) ? `<button class="more" data-leech="${esc(wKey(w))}">개념 카드부터 다시</button>` : retry;
+  const foot = (w, name) => `<p class="fine" style="text-align:left;padding:6px 0 0">${esc(name)}${w.cleared ? '' : ` · 복습 ${w.x||1}/5단계`}</p>`;
+  const item = w => { const date = kdate(w.iso) || w.date || '';
+    if (w.b){ const q=BANK.find(x=>x.id===w.b); if(!q) return ''; const c = LESSONS.find(x=>x.id===q.lessonId);
+      return `<div class="sec"><h2><span>${date}${when(w)}</span>${act(w, `<button class="more" data-bretry="${q.id}">지금 다시 풀기</button>`)}</h2>
+      ${isLeech(w) ? `<p class="leech">${LEECH_NOTE}</p>` : ''}
       <p class="stem" style="font-size:14px;margin-bottom:9px">${rich(q.stem)}</p>
       <div class="myth" style="margin:0"><span class="x">내 답 ${esc(String(w.p))}</span> &nbsp; <span class="o">정답 ${esc(q.type==='mc'||q.type==='multi'?MARKS[q.answer-1]:String(q.answer))}</span>${q.explain?`<br><span style="color:var(--body)">${rich(q.explain)}</span>`:''}</div>
-      ${c?`<p class="fine" style="text-align:left;padding:6px 0 0">${esc(c.name)} · 문제 은행</p>`:''}</div>`; }
-    const q=QUIZZES.find(x=>x.lessonId===w.l && x.no===w.n); if(!q) return '';
-    const due = w.iso ? Math.max(0, RETRY_DAYS - daysBetween(w.iso, todayISO())) : RETRY_DAYS; const c = CONCEPTS.find(x=>x.lessonId===w.l);
-    return `<div class="sec"><h2><span>${w.date}${w.cleared ? ' · 정리됨' : (due>0 ? ` · ${due}일 뒤 다시` : ' · 오늘 다시')}</span>${w.cleared?'':`<button class="more" data-retry="${w.l}:${w.n}">지금 다시 풀기</button>`}</h2>
+      ${c ? foot(w, `${c.name} · 문제 은행`) : ''}</div>`; }
+    const q=QUIZZES.find(x=>x.lessonId===w.l && x.no===w.n); if(!q) return ''; const c = CONCEPTS.find(x=>x.lessonId===w.l);
+    return `<div class="sec"><h2><span>${date}${when(w)}</span>${act(w, `<button class="more" data-retry="${w.l}:${w.n}">지금 다시 풀기</button>`)}</h2>
+      ${isLeech(w) ? `<p class="leech">${LEECH_NOTE}</p>` : ''}
       <p class="stem" style="font-size:14px;margin-bottom:9px">${rich(q.stem)}</p>
-      <div class="myth" style="margin:0"><span class="x">내 답 ${MARKS[w.p-1]}</span> &nbsp; <span class="o">정답 ${MARKS[q.answer-1]}</span>${q.explain?`<br><span style="color:var(--body)">${rich(q.explain)}</span>`:''}</div>
-      ${c?`<p class="fine" style="text-align:left;padding:6px 0 0">${esc(c.lessonName)}</p>`:''}</div>`; };
+      <div class="myth" style="margin:0"><span class="x">내 답 ${MARKS[w.p-1]||esc(String(w.p))}</span> &nbsp; <span class="o">정답 ${MARKS[q.answer-1]}</span>${q.explain?`<br><span style="color:var(--body)">${rich(q.explain)}</span>`:''}</div>
+      ${c ? foot(w, c.lessonName) : ''}</div>`; };
   v.innerHTML = `<h1 class="h-page">오답 노트</h1>
-    <p class="fine" style="text-align:left;padding:0 0 14px">${live.length}문제가 담겨 있습니다${cleared.length?` · ${cleared.length}문제는 다시 풀어 정리했습니다`:''}.</p>
+    <p class="fine" style="text-align:left;padding:0 0 6px">${live.length}문제가 담겨 있습니다${cleared.length?` · ${cleared.length}문제는 다시 풀어 정리했습니다`:''}.</p>
+    <p class="fine" style="text-align:left;padding:0 0 14px">틀린 문제는 내일 다시 나오고, 맞힐 때마다 3일 · 7일 · 14일 · 30일로 간격이 늘어납니다. 7일 넘게 띄워 두 번 잇달아 맞히면 정리됩니다. 하루에 10문제까지만 나옵니다.</p>
     ${live.map(item).join('')}${cleared.map(item).join('')}<button class="btn soft" id="goReview">복습 문제 풀기</button>`;
 }
 
@@ -2355,7 +2519,7 @@ function renderBank(){
     <div class="pick"><span class="k">문제 수 · 대상</span>${chips('n',[10,20,40], n => n+'문제')}${chips('only',['전체','안 푼','틀린'])}</div>
     <button class="btn" id="bankStart" ${pool.length?'':'disabled'}>${pool.length ? `${Math.min(bankSel.n,pool.length)}문제 시작 · 고를 수 있는 문항 ${pool.length.toLocaleString('ko-KR')}개` : '이 조건에 맞는 문항이 없습니다'}</button>
     ${fullAccess() ? '' : `<p class="fine">무료 범위(최근 ${FREE_DAYS}일치 소단원)의 문제만 나옵니다. 학원 코드·이용권으로 전 범위가 열립니다.</p>`}
-    <div class="sec"><h2><span>오답 노트</span><button class="more" data-go="wrong">${S.wrong.filter(w=>!w.cleared).length}문제 보기 ›</button></h2><p class="fine" style="text-align:left;padding:0">틀린 문제는 오답 노트에 모이고, 오늘의 문제는 ${RETRY_DAYS}일 뒤 한 번 더 나옵니다.</p></div>
+    <div class="sec"><h2><span>오답 노트</span><button class="more" data-go="wrong">${S.wrong.filter(w=>!w.cleared).length}문제 보기 ›</button></h2><p class="fine" style="text-align:left;padding:0">틀린 문제는 오답 노트에 모이고, 내일부터 간격을 넓혀 가며 오늘 화면의 <b>오늘의 복습</b>에 다시 나옵니다.</p></div>
     <div class="sec lab-list"><h2>자료 탐구 · 집에서 실험 <span style="font-weight:600;color:var(--faint);letter-spacing:0">${LABS_N}편</span></h2>
       ${LABS.filter(l=>openLessons().some(x=>x.id===l.lessonId)).map(l=>{ const L=LESSONS.find(x=>x.id===l.lessonId); return `<button class="row" data-lab="${l.lessonId}"><span class="n">탐구</span><span class="b"><span class="t">${esc(l.title)}</span><span class="s">${esc(L?L.bookName+' '+L.unit+'-'+L.id.slice(2)+' '+L.name:'')}${l.tryTitle?` · 실험: ${esc(l.tryTitle)}`:''}</span></span><span class="st"><svg viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg></span></button>`; }).join('') || '<p class="fine" style="text-align:left;padding:0">열린 범위에 탐구가 아직 없습니다.</p>'}</div>`;
 }
@@ -2384,6 +2548,13 @@ function bankCorrect(q, pick){
 }
 function renderBankSession(){
   const v = document.getElementById('v-bank'); const q = bs.items[bs.i];
+  if (!q && bs.kind === 'review'){ // 오늘의 복습 결과 — 점수와 '다음 복습' 한 줄만
+    if (!bs.fin){ bs.fin = true; rvToday().s++; save(S); }
+    v.innerHTML = `<button class="back" id="bankQuit"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg>오늘</button>
+      <div class="result"><div class="big">${bs.right}<small style="font-size:18px;color:var(--muted)"> / ${bs.items.length}</small></div><p class="sub">오늘의 복습을 마쳤습니다.</p></div>
+      <p class="again revnext" role="status">${esc(nextDueText())}</p>
+      <button class="btn" id="bankQuit2">오늘로 돌아가기</button>`; return;
+  }
   if (!q){ // 결과
     const n = bs.items.length, pct = Math.round(bs.right/n*100);
     v.innerHTML = `<button class="back" id="bankQuit"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg>문제 풀기</button>
@@ -2392,6 +2563,15 @@ function renderBankSession(){
       <button class="btn ${bs.wrong.length?'soft':''}" id="bankAgain">같은 조건으로 새 세트</button><button class="btn ghost" id="bankQuit2">문제 풀기로</button>`; return;
   }
   const graded = bs.pick !== null, L = LESSONS.find(x=>x.id===q.lessonId);
+  const rk = (bs.recs||[])[bs.i], rw = rk ? S.wrong.find(w => !w.cleared && wKey(w) === rk) : null;
+  const bar = `<button class="back" id="bankQuit"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg>그만 풀기</button>
+    <div class="qbar"><span>${bs.i+1} / ${bs.items.length}</span><span class="bar"><i style="width:${Math.round(bs.i/bs.items.length*100)}%"></i></span><span>맞힘 ${bs.right}</span></div>`;
+  const kindTag = bs.kind === 'review' ? `<span class="rk">${rk ? '다시 볼 문제' : '지난 소단원'}</span>` : '';
+  if (rw && isLeech(rw) && !graded){   // 여러 번 갈린 문제 — 다시 묻지 않고 개념 카드로
+    const ci = conceptIdxOfW(rw), c = CONCEPTS[ci];
+    v.innerHTML = `${bar}<div class="qhead"><span class="l">${kindTag}${esc(L?L.unit+'-'+L.id.slice(2)+' '+L.name:'')}</span></div>
+      <div class="leechcard"><div class="h">개념 카드부터 다시</div><p>${LEECH_NOTE}</p>${c ? `<p class="c">${esc(c.title)} · ${esc(c.lessonName)}</p>` : ''}
+        <button class="btn" data-leech="${esc(rk)}">개념 카드 읽기</button><button class="btn ghost" id="leechSkip">이 문제는 건너뛰기</button></div>`; return; }
   let body = '';
   if (q.type==='ox') body = `<div class="oxrow">${['O','X'].map(o=>`<button data-ox="${o}" ${graded?'disabled':''} class="${graded?(o===q.answer?'ok':(o===bs.pick?'bad':'')):''}">${o}</button>`).join('')}</div>`;
   else if (q.type==='mc' || q.type==='multi') body = `<div class="opts">${q.choices.map((t,i)=>{ const n=i+1; let cls='', mk=''; if (graded){ if (n===q.answer){cls='ok';mk='정답';} else if (n===+bs.pick){cls='bad';mk='내 답';} }
@@ -2403,17 +2583,17 @@ function renderBankSession(){
   const HINT = { ox:'맞으면 O, 틀리면 X를 고르세요.', mc:'하나만 고르면 바로 채점합니다.',
     multi:'자료와 보기를 함께 보고 하나를 고르세요.', blank:'정답만 짧게 적으면 됩니다 — 띄어쓰기·가운뎃점은 무시합니다.',
     essay:'문장으로 써 본 뒤 모범 답안과 견주어 스스로 채점합니다.' }[q.type] || '';
-  v.innerHTML = `<button class="back" id="bankQuit"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg>그만 풀기</button>
-    <div class="qbar"><span>${bs.i+1} / ${bs.items.length}</span><span class="bar"><i style="width:${Math.round(bs.i/bs.items.length*100)}%"></i></span><span>맞힘 ${bs.right}</span></div>
-    <div class="qhead"><span class="l">${esc(L?L.unit+'-'+L.id.slice(2)+' '+L.name:'')}</span><span class="tag">${TYPE_NAME[q.type]} · ${esc(q.difficulty||'')}</span></div>
+  v.innerHTML = `${bar}
+    <div class="qhead"><span class="l">${kindTag}${esc(L?L.unit+'-'+L.id.slice(2)+' '+L.name:'')}</span><span class="tag">${TYPE_NAME[q.type]}${q.difficulty ? ` · ${esc(q.difficulty)}` : ''}</span></div>
     <p class="stem">${rich(q.stem)}</p>
     ${q.figure ? `<div class="qfig" data-zoomsvg="${bs.i}">${q.figure}</div>` : ''}
     ${q.source ? `<div class="bogi">${rich(q.source).replace(/\n/g,'<br>')}</div>` : ''}
+    ${q.ask ? `<p class="ask">${rich(q.ask)}</p>` : ''}
     ${body}
-    ${graded ? '' : `<p class="qhint">${HINT}<br>틀려도 괜찮습니다 — 오답은 <b>오답 노트</b>에 모이고 다시 풀 수 있습니다.</p>`}
+    ${graded ? '' : `<p class="qhint">${HINT}<br>틀려도 괜찮습니다 — 오답은 <b>내일</b> 다시 나오고, 맞힐수록 간격이 늘어납니다.</p>`}
     ${graded ? `<div class="verdict" tabindex="-1" role="status"><div class="h">${q.type==='essay' ? '모범 답안' : ok ? '맞혔습니다' : '아쉽습니다'}${q.type!=='essay' && (q.type==='mc'||q.type==='multi') ? ` · 정답 ${MARKS[q.answer-1]}` : q.type==='ox'||q.type==='blank' ? ` · 정답 ${esc(q.answer)}` : ''}</div><p>${rich(q.explain||'개념 카드의 포인트를 다시 읽어 보세요.')}</p></div>
       ${q.wrong ? `<div class="wrongbox"><div class="h">${q.type==='essay'?'채점 기준':'오답 왜 틀렸나'}</div>${rich(q.wrong)}</div>` : ''}
-      ${q.type==='essay' && bs.pick===null ? '' : ''}
+      ${srsLine((bs.res||[])[bs.i]) ? `<div class="again">${srsLine(bs.res[bs.i])}</div>` : ''}
       ${q.type==='essay' && bs.pick==='?' ? `<div class="oxrow"><button data-ess="맞음" class="">맞게 썼다</button><button data-ess="틀림">부족했다</button></div>` : `<button class="btn" id="bankNext">${bs.i+1<bs.items.length?'다음 문제':'결과 보기'}</button>`}
       <button class="flag" data-report="bank:${esc(q.id)}">문제·해설에 틀린 곳이 있나요?</button>` : ''}`;
   if (!graded && q.type==='blank') setTimeout(()=>document.getElementById('blankIn')?.focus(), 50);
@@ -2422,9 +2602,10 @@ function bankAnswer(pick){
   const q = bs.items[bs.i]; if (bs.pick !== null && bs.pick !== '?') return;
   bs.pick = pick; touchDay(); S.bh ||= {};
   if (pick === '?'){ renderBankSession(); return; }             // 서술형: 모범 답안 먼저 보여 주고 자가 채점
-  const ok = bankCorrect(q, pick); S.stats.a++; if (ok) S.stats.c++; S.bh[q.id] = ok ? 'o' : 'x';
-  if (ok) bs.right++; else { bs.wrong.push(q); if (!S.wrong.some(w=>w.b===q.id && !w.cleared)) S.wrong.push({ b:q.id, p:(q.type==='mc'||q.type==='multi')?MARKS[+pick-1]:String(pick), iso:todayISO(), date:kdate(todayISO()) }); }
-  if (ok){ const w = S.wrong.find(x=>x.b===q.id && !x.cleared); if (w) w.cleared = true; }
+  const ok = bankCorrect(q, pick); S.stats.a++; if (ok) S.stats.c++; if (!q._qz) S.bh[q.id] = ok ? 'o' : 'x';
+  if (ok) bs.right++; else bs.wrong.push(q);
+  /* 간격 복습 — 문제 은행 오답도 같은 상자에(예전엔 담기만 하고 다시 나오지 않았다) */
+  (bs.res ||= [])[bs.i] = q._qz ? srsMark({ l:q._qz.lessonId, n:q._qz.no }, ok, +pick) : srsMark({ b:q.id }, ok, (q.type==='mc'||q.type==='multi')?MARKS[+pick-1]:String(pick));
   save(S); renderBankSession(); window.scrollTo(0, 0); document.querySelector('#v-bank .verdict')?.focus({ preventScroll:true });
 }
 function pickBank(n){ const pool = bankPool(); const arr = pool.slice(); for (let i=arr.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [arr[i],arr[j]]=[arr[j],arr[i]]; } return arr.slice(0, n); }
@@ -2634,7 +2815,7 @@ async function renderStats(){
   v.innerHTML = `<button class="back" id="backMe3"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg>내 정보</button>
     <h1 class="h-page">학습 통계</h1>
     <div class="tiles">
-      <div class="tile"><div class="v">${streak()}<small>일</small></div><div class="l">연속 학습</div></div>
+      <div class="tile rtile">${rhythm(S.days, 'tile')}</div>
       <div class="tile"><div class="v">${S.done.length}<small>/${CONCEPTS.length}</small></div><div class="l">공부한 개념</div></div>
       <div class="tile"><div class="v">${S.stats.a?Math.round(S.stats.c/S.stats.a*100):0}<small>%</small></div><div class="l">정답률 · ${S.stats.a}문제</div></div>
     </div>
@@ -2649,6 +2830,11 @@ async function renderStats(){
 }
 
 /* ═══ 내 정보 · 설정 ═══ */
+/* 알림을 스스로 멈췄다는 것은 한 번만, 조용히 — 이번에 앱을 켠 동안만 보이고 다음부터는 설정 줄의 작은 글씨만 남는다 */
+let pauseShown = false;
+function pauseNote(){ const P = S.nPause; if (!P || !S.notifyAt || S.notifyAt === '안 받음' || (P.seen && !pauseShown)) return '';
+  if (!P.seen){ P.seen = 1; pauseShown = true; saveLocal(); }
+  return `<div class="pausenote" role="status"><span>알림을 잠시 멈췄습니다 — 3일 동안 앱을 열지 않아 매일 알림을 더 보내지 않았습니다.</span><button class="linkbtn" id="notifyResume">다시 켜기</button></div>`; }
 let codeErr='', childErr='', passErr='';
 function renderMe(){
   const a = S.auth, seg = (key, vals) => `<span class="ctl">${vals.map(v=>`<button data-set="${key}" data-val="${v}" class="${S[key]===v?'on':''}">${v}</button>`).join('')}</span>`;
@@ -2676,10 +2862,11 @@ function renderMe(){
     ${ACC ? `<button class="setrow go" id="blockOpen"><span class="l">차단한 사용자<small>${(S.blocked||[]).length}명 · 이야기에서 보이지 않습니다</small></span><span class="v">관리</span></button>` : ''}
     <button class="setrow go" id="goHelp"><span class="l">마음이 힘들 때<small>24시간 상담 109 · 청소년 상담 1388</small></span><span class="v">보기</span></button>
     <button class="setrow go" id="goNoteMe"><span class="l">공부 노트 · 달력<small>${liveNotes().length ? `노트 ${liveNotes().length}개 · 나만 봅니다` : '오늘 공부한 내용을 정리하는 나만의 메모장'}</small></span><span class="v">열기</span></button>
-    <button class="setrow go" id="goStats"><span class="l">학습 통계<small>연속 학습 ${streak()}일 · 공부한 개념 ${S.done.length}/${CONCEPTS.length} · 정답률 ${S.stats.a?Math.round(S.stats.c/S.stats.a*100):0}%</small></span><span class="v">보기</span></button>
+    <button class="setrow go" id="goStats"><span class="l">학습 통계<small>이번 주 ${weekCount(S.days)}일 · 공부한 개념 ${S.done.length}/${CONCEPTS.length} · 정답률 ${S.stats.a?Math.round(S.stats.c/S.stats.a*100):0}%</small></span><span class="v">보기</span></button>
     <button class="setrow go" id="qKeepOpen"><span class="l">보관한 한 마디<small>${(S.qkeep||[]).length}개 · 오늘의 한 마디에서 담은 글</small></span><span class="v">보기</span></button>
+    ${pauseNote()}
     <div class="sec"><h2>설정</h2>
-      <div class="setrow"><span class="l">알림 받을 시각</span><select class="sel" id="notifyAt" aria-label="알림 받을 시각">${['07:00','12:00','18:00','21:00','안 받음'].map(v=>`<option ${v===S.notifyAt?'selected':''}>${v}</option>`).join('')}</select></div>
+      <div class="setrow"><span class="l">알림 받을 시각${S.nPause && S.notifyAt && S.notifyAt!=='안 받음' ? '<small>잠시 멈춤 · 시각을 다시 고르면 켜집니다</small>' : ''}</span><select class="sel" id="notifyAt" aria-label="알림 받을 시각">${['07:00','12:00','18:00','21:00','안 받음'].map(v=>`<option ${v===S.notifyAt?'selected':''}>${v}</option>`).join('')}</select></div>
       <div class="setrow"><span class="l">글자 크기</span>${seg('fs',['작게','보통','크게'])}</div>
       <div class="setrow" style="border:none"><span class="l">화면 테마</span>${seg('theme',['시스템','밝게','어둡게'])}</div></div>
     ${ACC ? `<div class="sec"><h2>계정</h2>
@@ -2778,15 +2965,14 @@ async function renderParent(){
   try { st = await DBX.student(code); todayA = await DBX.myAttendance(code, todayISO()); const ym = todayISO().slice(0,7); month = await DBX.attendanceRange(`${ym}-01`, monthEnd(ym), code); prog = await DBX.loadProgress(code); if (st) ns = await DBX.notices(st.cls); } catch (e){ v.innerHTML = `<h1 class="h-page">자녀</h1><div class="empty"><p>${esc(e.message)}</p></div>`; return; }
   if (!st){ v.innerHTML = `<h1 class="h-page">자녀</h1><div class="empty"><p>연결된 코드(${esc(code)})의 학생을 찾을 수 없습니다. 수강이 끝났거나 코드가 바뀌었을 수 있습니다.</p></div><button class="btn ghost" id="unlinkChild">연결 해제</button>`; return; }
   const done = prog ? (prog.done||[]).length : 0, days = prog ? (prog.days||[]) : [], last = days.length ? days[days.length-1] : '';
-  /* 이번 주 한눈에 — 최근 7일 공부한 날·학원 출석, 연속 학습, 다시 볼 문제, 다가오는 학원 일정 (자녀의 공부 노트는 보여 주지 않는다) */
-  let wkAtt = [], acad = [];
-  try { wkAtt = await DBX.attendanceRange(addDays(todayISO(), -6), todayISO(), code); } catch {}
+  /* 이번 주 한눈에 — 이번 주(월–일) 공부한 날·학원 출석, 다시 볼 문제, 다가오는 학원 일정. 이어진 날(연속 일수)은 세지 않는다 — 집 안의 압박이 되지 않게
+     (자녀의 공부 노트는 보여 주지 않는다) */
+  let wkAtt = [], acad = []; const wdays = weekDays();
+  try { wkAtt = await DBX.attendanceRange(wdays[0], wdays[6], code); } catch {}
   try { acad = (await DBX.schedule(st.cls)).filter(e => e.date >= todayISO()).slice(0, 3); } catch {}
   const dset = new Set(days), aset = new Set(wkAtt.map(a => a.date));
-  const wk = [...Array(7)].map((_, i) => { const iso = addDays(todayISO(), i - 6); return { iso, st:dset.has(iso), at:aset.has(iso), today:i === 6 }; });
-  const wkStudy = wk.filter(x => x.st).length;
-  let run = 0; { let d = todayISO(); if (!dset.has(d)) d = addDays(d, -1); while (dset.has(d)){ run++; d = addDays(d, -1); } }
-  const retry = prog ? (prog.wrong||[]).filter(w => !w.cleared).length : 0;
+  const wk = wdays.map(iso => ({ iso, st:dset.has(iso), at:aset.has(iso), today:iso === todayISO(), later:iso > todayISO() }));
+  const retry = prog ? (prog.wrong||[]).filter(w => !w.cleared).length : 0, fixedN = prog ? (prog.wrong||[]).filter(w => w.cleared).length : 0;
   const lateN = month.filter(a=>a.late).length;
   v.innerHTML = `<h1 class="h-page">자녀</h1>${pendHtml}
     ${kids.length ? `<div class="chipbar" role="tablist" aria-label="자녀 고르기">${kids.map(k => `<button role="tab" aria-selected="${k.c===code}" data-kid="${esc(k.c)}" class="${k.c===code?'on':''}">${esc(k.s ? k.s.name : k.c)}</button>`).join('')}</div>` : ''}
@@ -2795,8 +2981,8 @@ async function renderParent(){
       <div class="row"><dt>이달</dt><dd>출석 <b>${month.length}일</b>${lateN?` · 지각 ${lateN}일`:''}</dd></div>
       <div class="row"><dt>학습</dt><dd>개념 <b>${done}개</b> 공부${last?` · 마지막 ${kdate(last)}`:''}${prog&&prog.stats&&prog.stats.a?` · 정답률 ${Math.round(prog.stats.c/prog.stats.a*100)}%`:''}</dd></div></dl></div>
     <div class="sec pweek"><h2>이번 주 한눈에</h2>
-      <div class="week">${wk.map(x => `<div class="d ${x.st?'on':''} ${x.today?'today':''}" aria-label="${kdate(x.iso)}${x.st?' 공부함':''}${x.at?' · 학원 출석':''}"><i>${+x.iso.slice(-2)}</i>${WD[wdOf(x.iso)]}${x.at?'<b class="att" aria-hidden="true"></b>':''}</div>`).join('')}</div>
-      <div class="pstat"><div><b>${wkStudy}<small>/7일</small></b><span>이번 주 공부</span></div><div><b>${run}<small>일</small></b><span>연속 학습</span></div><div><b>${retry}<small>문제</small></b><span>오답 노트</span></div></div>
+      <div class="week">${wk.map(x => `<div class="d ${x.st?'on':''} ${x.today?'today':''} ${x.later?'later':''}" aria-label="${kdate(x.iso)}${x.st?' 공부함':''}${x.at?' · 학원 출석':''}"><i>${+x.iso.slice(-2)}</i>${WD[wdOf(x.iso)]}${x.at?'<b class="att" aria-hidden="true"></b>':''}</div>`).join('')}</div>
+      <div class="pstat"><div><b>${weekCount(days)}<small>/7일</small></b><span>이번 주 리듬</span></div><div><b>${retry}<small>문제</small></b><span>다시 볼 문제</span></div><div><b>${fixedN}<small>문제</small></b><span>다시 풀어 정리</span></div></div>
       <p class="fine" style="text-align:left;padding:8px 2px 0">칸이 채워진 날은 앱으로 공부한 날, 아래 점은 학원에 출석한 날입니다.</p>
       ${acad.length ? `<div class="pnext">${acad.map(e => `<div class="kv"><span class="k">${kdate(e.date)} ${WD[wdOf(e.date)]}</span><span class="v">${esc(e.title)} <b style="color:${dLeft(e.date)<=3?'var(--no)':'var(--brand-dark)'}">${ddayText(dLeft(e.date))}</b></span></div>`).join('')}</div>` : ''}</div>
     <div class="sec"><h2>이달 출석</h2>${month.length ? month.map(a=>`<div class="kv"><span class="k">${kdate(a.date)}</span><span class="v" style="color:${a.late?'var(--warn)':'var(--u)'}">${a.time} ${a.late?'지각':'출석'}${a.manual?' (수동)':''}</span></div>`).join('') : `<p class="fine" style="text-align:left;padding:0">이달 출석 기록이 아직 없습니다.</p>`}</div>
@@ -3151,12 +3337,25 @@ function openLegal(k){ const L = LEGAL[k]; if (!L) return; openSheet(`<h3>${L.t}
 function applyBar(){ const Bar = plug('StatusBar'); if (!Bar) return;
   const dark = document.documentElement.dataset.theme==='dark' || (!document.documentElement.dataset.theme && matchMedia('(prefers-color-scheme: dark)').matches);
   try { Bar.setStyle({ style: dark ? 'DARK' : 'LIGHT' }); Bar.setBackgroundColor({ color: dark ? '#14191B' : '#FAF8F4' }); } catch {} }
-/* 매일 알림: 앱을 켤 때는 권한을 묻지 않는다(첫 화면에 권한 창 금지). 사용자가 켜겠다고 할 때(ask)만 묻는다 */
+/* 매일 알림: 앱을 켤 때는 권한을 묻지 않는다(첫 화면에 권한 창 금지). 사용자가 켜겠다고 할 때(ask)만 묻는다.
+   차분한 알림(2026-10): 매일 반복 알림 대신 '앞으로 3일'만 한 번씩 걸어 두고, 앱을 열 때마다 다시 건다.
+   3일 내리 앱을 열지 않으면 걸어 둔 알림이 다 지나가 저절로 멈추고, 다음에 열 때 다시 걸지 않는다 — 내 정보에 한 번만 조용히 알린다.
+   문구는 사실만(그날 다시 볼 문제 수). 하루 한 번, 학생이 고른 시각에만 */
+const REMIND_IDS = [1, 2, 3, 4], REMIND_DAYS = 3;
 async function scheduleReminder(ask){ const LN = plug('LocalNotifications'); if (!LN) return false;
-  try { await LN.cancel({ notifications: [{ id: 1 }] }); if (!S.notifyAt || S.notifyAt==='안 받음') return false;
+  const t = todayISO(), last = S.lastOpen; S.lastOpen = t;
+  const on = !!S.notifyAt && S.notifyAt !== '안 받음';
+  if (ask) delete S.nPause;
+  else if (on && !S.nPause && last && daysBetween(last, t) - 1 >= REMIND_DAYS) S.nPause = { d:t };   // 알림이 간 3일 동안 한 번도 열지 않았다
+  saveLocal();
+  try { await LN.cancel({ notifications: REMIND_IDS.map(id => ({ id })) }); if (!on || S.nPause) return false;
     let p = await LN.checkPermissions(); if (p.display !== 'granted' && ask) p = await LN.requestPermissions(); if (p.display !== 'granted') return false;
-    const [h, m] = S.notifyAt.split(':').map(Number);
-    await LN.schedule({ notifications: [{ id: 1, title: `${CFG.academy} · 오늘의 개념`, body: '하루 한 개념 — 5분이면 끝.', schedule: { on: { hour: h, minute: m }, allowWhileIdle: true }, isExactNotification: false }] }); return true; } catch { return false; } }
+    const [h, m] = S.notifyAt.split(':').map(Number), now = Date.now(), list = [];
+    for (let i = 0; i <= REMIND_DAYS; i++){ const iso = addDays(t, i), [y, mo, d] = iso.split('-').map(Number), at = new Date(y, mo - 1, d, h, m);
+      if (i === 0 && (at.getTime() <= now || S.days.includes(t))) continue;   // 오늘은 아직 시각 전이고 공부 전일 때만
+      const due = Math.min(SRS_CAP, S.wrong.filter(w => !w.cleared && (w.d||'') <= iso).length);
+      list.push({ id: REMIND_IDS[i], title: `${CFG.academy} · ${due ? '오늘의 복습' : '오늘의 개념'}`, body: due ? `다시 볼 문제 ${due}개가 준비돼 있습니다.` : '오늘의 개념이 준비돼 있습니다.', schedule: { at, allowWhileIdle: true }, isExactNotification: false }); }   // false: 기본값(true)은 '알람·리마인더' 설정 화면을 띄운다(플러그인 8.3 원본 확인)
+    if (list.length) await LN.schedule({ notifications: list }); return true; } catch { return false; } }
 /* 푸시 알림(공지·일정·등원) — 첫 화면에서 묻지 않고, 학원과 연결된 뒤에만 묻는다. 로그아웃하면 이 기기 등록을 지운다 */
 let pushToken = '', pushWired = false;
 async function initPush(){ const PN = plug('PushNotifications'); if (!isNative || !CFG.push || !SRV || !PN || !ACC) return;
@@ -3174,7 +3373,7 @@ async function initPush(){ const PN = plug('PushNotifications'); if (!isNative |
 async function dropPush(){ if (!pushToken || !SRV) return; try { await api(`/rest/v1/push_tokens?token=eq.${encodeURIComponent(pushToken)}`, { method:'DELETE' }); } catch {} pushToken = ''; }
 let lastBack = 0;
 function nativeInit(){ if (!isNative) return; const App = plug('App');
-  App && App.addListener('resume', () => { pullProgress(); restorePurchases(true).catch(()=>{}); });
+  App && App.addListener('resume', () => { pullProgress(); restorePurchases(true).catch(()=>{}); scheduleReminder(); });   // 열 때마다 앞으로 3일 알림을 다시 건다
   setTimeout(() => restorePurchases(true).catch(()=>{}), 2500);   // 켤 때 한 번 — 보류 결제가 끝났거나 결제 뒤 끊겼던 것
   App && App.addListener('backButton', () => { if (askDone) return askDone(false); if (document.getElementById('sheetLock')) return; if (document.getElementById('sheetBg')) return closeSheet();
     if (view==='auth' && authMode==='signup'){ document.getElementById('suPrev')?.click(); return; }
@@ -3254,7 +3453,7 @@ function show(v){
   VIEWS.forEach(k => document.getElementById('v-'+k).classList.toggle('hide', k!==v));
   guardScreen(v);
   document.getElementById('tabs').classList.toggle('hide', v==='auth');
-  const tabOf = {quiz: qState&&qState.mode==='review'?'me':'today', detail:'list', plans:'me', wrong:'bank', lab:'bank', stats:'me', post:'talk', note:noteTab(), noted:noteTab()}[v] || v;
+  const tabOf = {quiz: qState&&qState.mode==='review'?'me':'today', bank: bs&&bs.kind==='review'?'today':'bank', detail:'list', plans:'me', wrong:'bank', lab:'bank', stats:'me', post:'talk', note:noteTab(), noted:noteTab()}[v] || v;
   renderTabs(); document.querySelectorAll('.tab').forEach(t => { t.classList.toggle('on', t.dataset.v===tabOf); if (t.dataset.v===tabOf) t.setAttribute('aria-current', 'page'); else t.removeAttribute('aria-current'); });
   const el = document.getElementById('v-'+v); el.classList.remove('vin'); void el.offsetWidth; el.classList.add('vin');
   const r = ({auth:renderAuth, today:renderToday, quiz:renderQuiz, list:renderList, detail:renderDetail, wrong:renderWrong, stats:renderStats, me:renderMe, plans:renderPlans, parent:renderParent, admin:renderAdmin, bank:renderBank, lab:renderLab, plan:renderPlan, talk:renderTalk, post:renderPost, note:renderNote, noted:renderNoted})[v]();
@@ -3305,11 +3504,11 @@ document.addEventListener('click', async e => {
   if (T('#sheetBg') && !T('.sheet')){ closeSheet(); return; }
   if (T('#sheetClose')){ closeSheet(); return; }
   if (T('#openHelp') || T('#goHelp')){ openHelp(); return; }
-  const tab = T('.tab'); if (tab){ qState=null; show(tab.dataset.v); return; }
+  const tab = T('.tab'); if (tab){ qState=null; if (tab.dataset.v==='bank' && bs && bs.kind==='review'){ revHold = bs; bs = null; } show(tab.dataset.v); return; }   // 문제 탭은 늘 문제 은행 — 하다 만 오늘의 복습은 오늘 화면에서 이어 푼다
   const lg = T('[data-legal]'); if (lg){ openLegal(lg.dataset.legal); return; }
   if (T('#moreRetry')){ MORE.err = false; moreArrived(); loadMore(); return; }
   /* 문제·탐구·그림을 쓰는 버튼 — 아직 못 받았으면 받은 뒤 다시 누른다 */
-  if (!MORE.ok){ const need = T('[data-drill],[data-lab],[data-zoom],[data-zoomlab],[data-bretry],#bankStart,#bankAgain'); if (need){ afterMore(need); return; } }
+  if (!MORE.ok){ const need = T('[data-drill],[data-lab],[data-zoom],[data-zoomlab],[data-bretry],[data-leech],#bankStart,#bankAgain,#revStart'); if (need){ afterMore(need); return; } }
   /* 그림 확대 */
   const zf = T('[data-zoom]'); if (zf){ const c = CONCEPTS.find(x=>x.id===zf.dataset.zoom); openFigure(figOf(c.id), c.figure.caption); return; }
   const zl = T('[data-zoomlab]'); if (zl){ const l = LABS.find(x=>x.lessonId===zl.dataset.zoomlab); openFigure(l.figure, l.title); return; }
@@ -3320,7 +3519,17 @@ document.addEventListener('click', async e => {
   const drill = T('[data-drill]'); if (drill){ bankSel = { ...bankSel, book:'전체', unit:'전체', lesson:drill.dataset.drill, type:'전체', only:'전체' }; const pool = bankPool(); if (!pool.length){ toast('이 소단원은 아직 잠겨 있습니다'); return; } startBank(pickBank(Math.min(10,pool.length)), ''); return; }
   const lab = T('[data-lab]'); if (lab){ labId = lab.dataset.lab; show('lab'); return; }
   if (T('#labBack')){ show(bs?'bank':(view==='lab'&&detailIdx!==null?'bank':'bank')); return; }
-  if (T('#bankQuit') || T('#bankQuit2')){ bs=null; renderBank(); window.scrollTo(0,0); return; }
+  if (T('#bankQuit') || T('#bankQuit2')){ const rev = bs && bs.kind === 'review'; bs=null; if (rev){ show('today'); return; } renderBank(); window.scrollTo(0,0); return; }
+  /* 오늘의 복습 */
+  if (T('#revStart')){ startTodayReview(); return; }
+  if (T('#leechSkip') && bs){ const k = (bs.recs||[])[bs.i], w = k && S.wrong.find(x => !x.cleared && wKey(x) === k); if (w){ if (isDueW(w)) rvToday().n++; w.d = addDays(todayISO(), 1); save(S); }
+    bs.i++; bs.pick=null; bs.ess=null; renderBankSession(); window.scrollTo(0,0); return; }
+  const lch = T('[data-leech]'); if (lch){ const w = S.wrong.find(x => !x.cleared && wKey(x) === lch.dataset.leech); if (!w) return;
+    const i = conceptIdxOfW(w); if (i < 0 || !isOpen(i)){ toast('이 개념은 지금 열려 있지 않습니다'); return; }
+    if (isDueW(w)) rvToday().n++;
+    w.rd = todayISO(); w.x = 1; w.d = addDays(todayISO(), srsGap(1, lessonOfW(w))); save(S);   // 개념을 다시 읽었으면 내일부터 다시 묻는다
+    if (bs && bs.kind === 'review' && (bs.recs||[])[bs.i] === lch.dataset.leech){ bs.i++; bs.pick=null; }
+    detailIdx = i; show('detail'); return; }
   if (T('#bankAgain')){ startBank(pickBank(bankSel.n), ''); return; }
   if (T('#bankRetryWrong')){ startBank(bs.wrong.slice(), '틀린 문제'); return; }
   const oxb = T('[data-ox]'); if (oxb && bs){ bankAnswer(oxb.dataset.ox); return; }
@@ -3504,6 +3713,7 @@ document.addEventListener('click', async e => {
   if (T('#pvToggle')){ e.preventDefault(); SU.pvOpen = !SU.pvOpen; renderAuth(); return; }
   if (T('#suNext')){ suKeep(); const why = suCheck(); if (why){ authErr = why; renderAuth(); return; } authErr=''; SU.step++; renderAuth(); window.scrollTo(0,0); setTimeout(() => document.querySelector('.auth .grow input:not([type=radio]):not([type=checkbox])')?.focus(), 60); return; }
   if (T('#suSkipCode')){ suKeep(); SU.code = ''; SU.child = ''; document.getElementById(SU.role==='parent'?'suChild':'suCode') && (document.getElementById(SU.role==='parent'?'suChild':'suCode').value = ''); }
+  if (T('#notifyResume')){ const ok = await scheduleReminder(true); pauseShown = false; toast(ok ? `매일 ${S.notifyAt}에 다시 알려 드립니다` : '알림이 꺼져 있습니다. 휴대폰 설정에서 켤 수 있습니다'); renderMe(); return; }
   if (T('#welcomeNotify')){ S.notifyAt = S.notifyAt && S.notifyAt!=='안 받음' ? S.notifyAt : '18:00'; save(S); const ok = await scheduleReminder(true); toast(ok ? `매일 ${S.notifyAt}에 알려 드립니다` : '알림이 꺼져 있습니다. 휴대폰 설정에서 켤 수 있어요'); const b = T('#welcomeNotify'); if (b){ b.textContent = ok ? '✓ 알림을 켰습니다' : '알림 꺼짐'; b.disabled = true; } return; }
   if (T('#welcomeGo')){ await afterLogin(ACC); return; }
   if (T('#goForgot')){ authMode='forgot'; authErr=''; renderAuth(); window.scrollTo(0,0); return; }

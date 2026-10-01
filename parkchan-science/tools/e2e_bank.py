@@ -33,7 +33,9 @@ async def main():
         await pg.click('#bankRetryWrong'); await pg.wait_for_timeout(300); assert await pg.evaluate('bs.items.length')==4
         for i in range(4):
             ans = await pg.evaluate('bs.items[bs.i].answer'); await pg.click(f'[data-ox="{ans}"]'); await pg.wait_for_timeout(120); await pg.click('#bankNext'); await pg.wait_for_timeout(120)
-        assert await pg.evaluate('S.wrong.filter(w=>w.b && !w.cleared).length')==0, '오답 정리 실패'
+        # 같은 날 다시 맞힌 것은 연습일 뿐 — 간격 복습 규칙상 정리되지 않고 내일 기한 그대로(7일 넘는 간격에서 두 번 맞혀야 정리)
+        assert await pg.evaluate('S.wrong.filter(w=>w.b && !w.cleared).length')==4, '같은 날 다시 맞혔다고 정리됨'
+        assert await pg.evaluate("S.wrong.filter(w=>w.b).every(w => w.x===1 && w.d===addDays(todayISO(),1))"), '문제 은행 오답의 다음 복습이 내일이 아님'
         await pg.click('#bankQuit2'); await pg.wait_for_timeout(200)
         await pg.select_option('#bankLesson','1304'); await pg.wait_for_timeout(200); await pg.click('[data-bsel="type"][data-val="mc"]'); await pg.click('#bankStart'); await pg.wait_for_timeout(300)
         ans = await pg.evaluate('bs.items[bs.i].answer'); await pg.click(f'[data-bp="{ans}"]'); await pg.wait_for_timeout(150); assert '맞혔습니다' in await pg.locator('.verdict').inner_text(); await pg.screenshot(path=f'{SC}/b4_mc.png', full_page=True)

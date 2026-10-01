@@ -55,7 +55,7 @@ async def main():
         body = await pg.locator('#v-parent').inner_text(); assert '형학생 학생' in body and '아직 출석 전' in body, body[:200]
         # 이번 주 한눈에: 최근 7일 띠 · 세 가지 수 · 노트는 보이지 않음
         assert await pg.locator('.pweek .week .d').count() == 7 and await pg.locator('.pweek .pstat > div').count() == 3, '이번 주 한눈에가 없음'
-        assert '이번 주 공부' in await pg.locator('.pweek').inner_text() and '공부 노트' not in (t := await pg.locator('.pweek').inner_text()) and '메모' not in t
+        assert '이번 주 리듬' in await pg.locator('.pweek').inner_text() and '연속' not in await pg.locator('.pweek').inner_text() and '공부 노트' not in (t := await pg.locator('.pweek').inner_text()) and '메모' not in t
         await pg.click('.tab[data-v="me"]'); await pg.wait_for_timeout(300); assert '2명' in await pg.locator('#v-me').inner_text()
         # 보호자 일정 화면에 동생 반 일정이 이름과 함께
         await pg.evaluate("planDay = '2099-10-15'"); await pg.click('.tab[data-v="plan"]'); await pg.wait_for_timeout(900)
