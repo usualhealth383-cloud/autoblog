@@ -229,6 +229,29 @@
   /* 화학식 첨자 — 본문 폰트를 그대로 축소해 자형이 어긋나지 않게 한다 */
   sub,sup{ font-size:0.68em; line-height:0; font-weight:inherit; }
   sub{ vertical-align:-0.14em; } sup{ vertical-align:0.34em; }
+/* ── 2026-10-02 보강: 중요 표시 · 채점 기준 · 꼼꼼 자료 분석 · 간격 두고 다시 꺼내기 ── */
+.must{ display:inline-block; font-size:7pt; font-weight:900; color:#fff; background:#D9534F; border-radius:1.6mm; padding:0.2mm 1.4mm; margin-right:1.2mm; vertical-align:1pt; }
+table.rubric{ border-collapse:collapse; width:100%; font-size:7.6pt; margin:1mm 0 0.5mm; }
+table.rubric th, table.rubric td{ border:0.25mm solid var(--line); padding:0.8mm 1.4mm; text-align:left; vertical-align:top; }
+table.rubric th{ background:#F4F1EA; font-weight:800; white-space:nowrap; }
+.analysis{ border:0.35mm dashed #C9A36A; border-radius:2.5mm; padding:1.6mm 2mm 1.2mm; margin:1.5mm 0; background:#FFFCF5; }
+.analysis .at{ font-size:7.6pt; font-weight:900; color:#9C6503; margin-bottom:0.8mm; }
+.analysis svg{ max-width:100%; height:auto; display:block; }
+.spaced{ border:0.4mm solid var(--line); border-radius:3mm; padding:3mm 4mm 2.6mm; margin:0 0 4mm; position:relative; background:#FAFBFC; }
+.spaced .st{ font-size:9.5pt; font-weight:900; color:var(--unit); margin-bottom:1.6mm; }
+.spaced ol{ margin:0; padding-left:5mm; font-size:8.8pt; line-height:1.75; }
+.spaced .when{ display:flex; gap:5mm; font-size:8pt; color:var(--sub); margin-top:1.8mm; }
+.spaced .ans{ position:absolute; right:4mm; bottom:2.4mm; transform:rotate(180deg); font-size:6.8pt; color:var(--sub); }
+/* 2단 문항 쪽 간격 · 발문 안 탐구 과정 상자 (합격본 chapter-08 에서) */
+.qg2 .q{ margin-bottom:6mm; }
+.qg2 > div > .q:last-child{ margin-bottom:0; }
+.qg2 .choices.inline{ gap:0 4mm; }
+.qg2 .choices{ margin-top:1.8mm; line-height:1.78; }
+.qg2 .bogi-box{ margin-top:2mm; padding:1.8mm 2.8mm; font-size:9pt; line-height:1.72; }
+.qg2 .bogi-box .bt{ margin-bottom:0.3mm; }
+.qg2 .q figure{ margin:1.6mm 0 0.6mm 8.4mm !important; }
+.exp{ border:0.35mm solid #B8C2CA; border-radius:1.6mm; background:#FAFBFC; padding:1.6mm 2.6mm; margin:1.4mm 0 1.6mm; font-size:8.9pt; line-height:1.7; }
+.exp b{ font-family:'PC Sans'; font-size:7.8pt; font-weight:900; color:var(--brand); }
 </style>
 </head>
 <body>
@@ -570,7 +593,8 @@
             <!-- 리보솜 -->
             <g transform="translate(105,60)">
               <ellipse cx="0" cy="-14" rx="26" ry="13" fill="#9E85E0" opacity="0.9"/>
-              <text x="0" y="-34" text-anchor="middle" font-size="6.6" fill="#6B46C8" font-weight="800">리보솜이 한 칸씩 읽는다 →</text>
+              <text x="0" y="-11.6" text-anchor="middle" font-size="6.6" fill="#fff" font-weight="800">리보솜</text>
+              <text x="31" y="-11.6" font-size="6.6" fill="#6B46C8" font-weight="800">한 칸씩 읽는다 →</text>
             </g>
             <!-- 아미노산 -->
             <g text-anchor="middle" font-weight="800">
@@ -757,7 +781,7 @@
   <div class="qgrid">
     <div>
       <div class="q"><div class="qhead"><span class="qno">1</span><div class="stem">유전자는 DNA에서 특정 단백질에 대한 정보를 담은 부분이다. <span class="ox-answer">( O , X )</span></div></div></div>
-      <div class="q"><div class="qhead"><span class="qno">2</span><div class="stem">전사는 리보솜에서, 번역은 핵 안에서 일어난다. <span class="ox-answer">( O , X )</span></div></div></div>
+      <div class="q"><div class="qhead"><span class="qno">2</span><div class="stem">전사는 리보솜에서, 번역은 핵 안에서 일어난다. <span class="ox-answer" style="white-space:nowrap;">( O , X )</span></div></div></div>
       <div class="q"><div class="qhead"><span class="qno">3</span><div class="stem">유전자의 염기 서열이 바뀌어도 만들어지는 단백질은 항상 같다. <span class="ox-answer">( O , X )</span></div></div></div>
     </div>
     <div>
@@ -771,129 +795,406 @@
 
   <div class="step-head s2"><span class="stepno">STEP 2</span><span class="steptt">내신 완성</span><span class="stepdesc">학교 시험 유형 그대로 — 서술형까지 한 번에</span></div>
 
-  <div class="q">
-    <div class="qhead"><span class="qno">7</span><div class="stem">염색체, DNA, 유전자에 대한 설명으로 옳은 것은? <span class="difficulty">●●○</span>
-    <div class="tags">10통과1-03-06 | 개념 1</div></div></div>
-    <ul class="choices">
-      <li>① 유전자는 DNA보다 큰 단위이다.</li>
-      <li>② 염색체는 유전자보다 작은 단위이다.</li>
-      <li>③ 하나의 DNA에는 많은 수의 유전자가 들어 있다.</li>
-      <li>④ DNA의 염기는 다섯 종류이다.</li>
-      <li>⑤ 형질은 유전자와 관계없이 결정된다.</li>
-    </ul>
-  </div>
+  <div class="qgrid qg2">
+    <div>
+      <div class="q">
+        <div class="qhead"><span class="qno">7</span><div class="stem">세포핵 속의 염색체, DNA, 유전자에 대한 설명으로 옳은 것은? <span class="difficulty">●○○</span>
+        <div class="tags">10통과1-03-06 | 개념 1</div></div></div>
+        <ul class="choices">
+          <li>① 하나의 DNA에는 많은 수의 유전자가 들어 있다.</li>
+          <li>② 유전자는 DNA보다 큰 단위이다.</li>
+          <li>③ 염색체는 유전자보다 작은 단위이다.</li>
+          <li>④ DNA의 염기는 다섯 종류이다.</li>
+          <li>⑤ 형질은 유전자와 관계없이 결정된다.</li>
+        </ul>
+      </div>
 
-  <div class="q">
-    <div class="qhead"><span class="qno">8</span><div class="stem">전사와 번역에 대한 설명으로 옳은 것은? <span class="difficulty">●●●</span>
-    <div class="tags">10통과1-03-06 | 개념 2·3</div></div></div>
-    <ul class="choices">
-      <li>① DNA는 핵 밖으로 나가 리보솜과 직접 결합한다.</li>
-      <li>② 전사는 핵 안에서 DNA를 틀로 RNA를 만드는 과정이다.</li>
-      <li>③ 번역은 핵 안에서 일어난다.</li>
-      <li>④ RNA는 DNA처럼 두 가닥의 이중나선 구조이다.</li>
-      <li>⑤ 단백질의 정보가 RNA로 옮겨지는 과정이 번역이다.</li>
-    </ul>
+      <div class="q">
+        <div class="qhead"><span class="qno">8</span><div class="stem"><span class="badge-data">자료</span>그림은 핵 속 구조를 확대한 것이다. (가)~(다)는 각각 염색체, DNA, 유전자 중 하나이다. 옳은 것만을 <span style="white-space:nowrap;">&lt;보기&gt;에서</span> 있는 대로 고른 것은? <span class="difficulty">●●○</span>
+        <div class="tags">10통과1-03-06 | 개념 1</div></div></div>
+        <figure style="margin:2mm 0 1mm 8.4mm;">
+          <svg width="276" height="88" viewBox="0 0 290 92" font-family="PC Sans">
+            <circle cx="44" cy="46" r="40" fill="#F5F1FC" stroke="#9E85E0" stroke-width="1.2"/>
+            <text x="44" y="17" text-anchor="middle" font-size="7" font-weight="800" fill="#6B46C8">핵</text>
+            <path d="M31,25 Q59,46 31,67 M57,25 Q29,46 57,67" stroke="#6B46C8" stroke-width="5.5" fill="none" stroke-linecap="round"/>
+            <circle cx="54" cy="29" r="5.5" fill="none" stroke="#D6455D" stroke-width="1" stroke-dasharray="2 1.5"/>
+            <g stroke="#D6455D" stroke-width="0.8" stroke-dasharray="2.5 2"><line x1="58" y1="25" x2="104" y2="19"/><line x1="58" y1="33" x2="104" y2="73"/></g>
+            <text x="44" y="81" text-anchor="middle" font-size="7.6" font-weight="900" fill="#22303A">(가)</text>
+            <rect x="104" y="19" width="184" height="54" rx="5" fill="#FDF9F0" stroke="#EBCB9C" stroke-width="0.9"/>
+            <path d="M114,40 q20,16 40,0 q20,-16 40,0 q20,16 40,0 q20,-16 40,0" stroke="#9E85E0" stroke-width="2.4" fill="none"/>
+            <path d="M114,56 q20,-16 40,0 q20,16 40,0 q20,-16 40,0 q20,16 40,0" stroke="#CFC0EE" stroke-width="2.4" fill="none"/>
+            <g stroke="#B8C2CA" stroke-width="1.2"><line x1="114" y1="42" x2="114" y2="54"/><line x1="154" y1="42" x2="154" y2="54"/><line x1="194" y1="42" x2="194" y2="54"/><line x1="234" y1="42" x2="234" y2="54"/><line x1="274" y1="42" x2="274" y2="54"/></g>
+            <rect x="186" y="33" width="56" height="30" rx="4" fill="none" stroke="#D6455D" stroke-width="1.5" stroke-dasharray="4 2.5"/>
+            <text x="132" y="31" text-anchor="middle" font-size="7.6" font-weight="900" fill="#22303A">(나)</text>
+            <text x="214" y="30" text-anchor="middle" font-size="7.6" font-weight="900" fill="#D6455D">(다)</text>
+          </svg>
+        </figure>
+        <div class="bogi-box">
+          <div class="bt">보기</div>
+          ㄱ. (가)는 (다)보다 작은 단위이다.<br>
+          ㄴ. (나)에는 A, G, C, T 네 종류의 염기가 있다.<br>
+          ㄷ. (다)에는 특정 단백질 하나의 정보가 담겨 있다.
+        </div>
+        <ul class="choices inline">
+          <li>① ㄱ</li><li>② ㄷ</li><li>③ ㄱ, ㄴ</li><li>④ ㄴ, ㄷ</li><li>⑤ ㄱ, ㄴ, ㄷ</li>
+        </ul>
+      </div>
+    </div>
+    <div>
+      <div class="q">
+        <div class="qhead"><span class="qno">9</span><div class="stem">전사와 번역에 대한 설명으로 옳은 것은? <span class="difficulty">●●○</span>
+        <div class="tags">10통과1-03-06 | 개념 2·3</div></div></div>
+        <ul class="choices">
+          <li>① DNA는 핵 밖으로 나가 리보솜과 직접 결합한다.</li>
+          <li>② 전사는 핵 안에서 DNA를 틀로 RNA를 만든다.</li>
+          <li>③ 번역은 핵 안에서 일어난다.</li>
+          <li>④ RNA는 DNA처럼 두 가닥의 이중나선 구조이다.</li>
+          <li>⑤ DNA의 정보가 RNA로 옮겨지는 과정이 번역이다.</li>
+        </ul>
+      </div>
+
+      <div class="q">
+        <div class="qhead"><span class="qno">10</span><div class="stem">다음은 세포 내 유전 정보의 흐름에 대해 학생 A, B, C가 나눈 대화이다. 옳게 말한 학생만을 있는 대로 고른 것은? <span class="difficulty">●●○</span>
+        <div class="tags">10통과1-03-06 | 개념 2</div></div></div>
+        <div class="bogi-box">
+          <b>학생 A</b> : 형질을 직접 나타내는 일꾼은 DNA야.<br>
+          <b>학생 B</b> : 효소, 케라틴, 헤모글로빈처럼 형질에 관여하는 물질은 단백질이야.<br>
+          <b>학생 C</b> : 단백질의 아미노산 서열은 결국 DNA의 염기 서열에 따라 정해져.
+        </div>
+        <ul class="choices inline">
+          <li>① A</li><li>② C</li><li>③ A, B</li><li>④ B, C</li><li>⑤ A, B, C</li>
+        </ul>
+      </div>
+    </div>
   </div>
 
   <div class="folio"><span>III. 시스템과 상호작용</span><span class="num">204</span></div>
 </div>
 
-<!-- ═════════════ p.150 STEP 2 계속 ═════════════ -->
+<!-- ═════════════ STEP 2 계속 (11~15) ═════════════ -->
 <div class="page">
   <div class="runhead"><span class="unit-tag">III. 시스템과 상호작용</span><span class="lesson-tag">06. 유전자에서 단백질까지 | 문제</span></div>
 
-  <div class="q">
-    <div class="qhead"><span class="qno">9</span><div class="stem"><span class="badge-data">자료</span>어떤 RNA의 염기 서열이 AUG – GUG – CAU이다. 코돈표에서 AUG는 메싸이오닌, GUG는 발린, CAU는 히스티딘을 지정할 때, 번역으로 만들어지는 아미노산 서열은? <span class="difficulty">●●●</span>
-    <div class="tags">10통과1-03-06 | 개념 4</div></div></div>
-    <ul class="choices">
-      <li>① 메싸이오닌 – 히스티딘 – 발린</li>
-      <li>② 발린 – 메싸이오닌 – 히스티딘</li>
-      <li>③ 히스티딘 – 발린 – 메싸이오닌</li>
-      <li>④ 메싸이오닌 – 발린 – 히스티딘</li>
-      <li>⑤ 발린 – 히스티딘 – 메싸이오닌</li>
-    </ul>
-  </div>
+  <div class="qgrid qg2">
+    <div>
+      <div class="q">
+        <div class="qhead"><span class="qno">11</span><div class="stem">DNA의 상보결합과 전사에 대한 설명으로 옳은 것만을 <span style="white-space:nowrap;">&lt;보기&gt;에서</span> 있는 대로 고른 것은? <span class="difficulty">●●○</span>
+        <div class="tags">10통과1-03-06 | 개념 3</div></div></div>
+        <div class="bogi-box">
+          <div class="bt">보기</div>
+          ㄱ. 전사가 일어날 때 DNA의 두 가닥이 모두 틀이 되어 RNA 두 가닥이 만들어진다.<br>
+          ㄴ. DNA 틀 가닥의 염기 A에는 RNA의 염기 T가 짝지어 붙는다.<br>
+          ㄷ. DNA 한 가닥의 염기 서열을 알면 반대 가닥의 서열도 정해진다.
+        </div>
+        <ul class="choices inline">
+          <li>① ㄱ</li><li>② ㄷ</li><li>③ ㄱ, ㄴ</li><li>④ ㄴ, ㄷ</li><li>⑤ ㄱ, ㄴ, ㄷ</li>
+        </ul>
+      </div>
 
-  <div class="q">
-    <div class="qhead"><span class="qno">10</span><div class="stem">낫 모양 적혈구 빈혈증에 대한 설명으로 옳은 것만을 고른 것은? <span class="difficulty">●●●</span>
-    <div class="tags">10통과1-03-06 | 개념 5</div></div></div>
-    <div class="bogi-box" style="background:#fff;">
-      (가) 헤모글로빈 유전자의 염기 하나가 바뀐 것이 원인이다.<br>
-      (나) 헤모글로빈의 아미노산 서열이 정상과 다르다.<br>
-      (다) 낫 모양 적혈구는 정상 적혈구보다 산소를 더 잘 운반한다.
+      <div class="q">
+        <div class="qhead"><span class="qno">12</span><div class="stem"><span class="must">중요</span><span class="badge-data">자료</span>그림은 어떤 유전자의 DNA 틀 가닥 일부를 나타낸 것이다. 이 부분이 전사되어 만들어지는 RNA의 염기 서열로 옳은 것은? <span class="difficulty">●●○</span>
+        <div class="tags">10통과1-03-06 | 개념 3, 자료 파헤치기</div></div></div>
+        <figure style="margin:2mm 0 1mm 8.4mm;">
+          <svg width="250" height="58" viewBox="0 0 250 58" font-family="PC Sans">
+            <rect x="1" y="1" width="248" height="26" rx="4" fill="#F5F1FC" stroke="#9E85E0" stroke-width="0.9"/>
+            <text x="12" y="17.5" font-size="7.6" font-weight="800" fill="#6B46C8">DNA 틀 가닥</text>
+            <text x="160" y="18.5" text-anchor="middle" font-size="9.6" font-weight="800" fill="#22303A" letter-spacing="1.5">TAC – GGA – TTC</text>
+            <line x1="160" y1="29" x2="160" y2="40" stroke="#D6455D" stroke-width="1.4" marker-end="url(#arrR)"/>
+            <text x="168" y="38" font-size="6.8" font-weight="700" fill="#D6455D">전사</text>
+            <text x="160" y="54" text-anchor="middle" font-size="8.4" font-weight="800" fill="#D6455D">RNA : ?</text>
+          </svg>
+        </figure>
+        <ul class="choices">
+          <li>① ATG – CCT – AAG</li>
+          <li>② TAC – GGA – TTC</li>
+          <li>③ UAC – GGA – UUC</li>
+          <li>④ AUG – CCT – AAG</li>
+          <li>⑤ AUG – CCU – AAG</li>
+        </ul>
+      </div>
+
+      <div class="q">
+        <div class="qhead"><span class="qno">13</span><div class="stem"><span class="must">중요</span>어떤 단백질은 아미노산 150개가 연결되어 만들어진다. 이 단백질의 아미노산 서열을 지정하는 RNA 부분의 염기는 몇 개인가? (단, 아미노산을 지정하는 코돈만 생각한다.) <span class="difficulty">●●○</span>
+        <div class="tags">10통과1-03-06 | 개념 4</div></div></div>
+        <ul class="choices inline">
+          <li>① 50</li><li>② 150</li><li>③ 300</li><li>④ 450</li><li>⑤ 600</li>
+        </ul>
+      </div>
     </div>
-    <ul class="choices inline">
-      <li>① (가)</li><li>② (나)</li><li>③ (가), (나)</li><li>④ (나), (다)</li><li>⑤ (가), (나), (다)</li>
-    </ul>
-  </div>
+    <div>
+      <div class="q">
+        <div class="qhead"><span class="qno">14</span><div class="stem"><span class="badge-data">탐구</span>다음은 유전 암호의 단위를 알아보는 활동이다.
+          <div class="exp"><b>[과정]</b> (가) 염기 카드 A, G, C, U를 종류별로 충분히 준비한다.<br>(나) 카드 1장, 2장, 3장을 한 줄로 늘어놓을 때 만들 수 있는 서로 다른 배열의 수를 각각 센다.<br><b>[결과]</b> 1장: 4가지, 2장: 16가지, 3장: ㉠가지</div>
+          이에 대한 설명으로 옳은 것만을 <span style="white-space:nowrap;">&lt;보기&gt;에서</span> 있는 대로 고른 것은? (단, 아미노산은 20종이다.) <span class="difficulty">●●○</span>
+        <div class="tags">10통과1-03-06 | 개념 4, 탐구</div></div></div>
+        <div class="bogi-box">
+          <div class="bt">보기</div>
+          ㄱ. ㉠은 64이다.<br>
+          ㄴ. 카드 2장 배열로는 아미노산 20종을 모두 다르게 지정할 수 없다.<br>
+          ㄷ. 이 결과는 연속된 염기 3개가 아미노산 1개를 지정하는 까닭을 보여 준다.
+        </div>
+        <ul class="choices inline">
+          <li>① ㄱ</li><li>② ㄷ</li><li>③ ㄱ, ㄴ</li><li>④ ㄴ, ㄷ</li><li>⑤ ㄱ, ㄴ, ㄷ</li>
+        </ul>
+      </div>
 
-  <div class="q">
-    <div class="qhead"><span class="qno">11</span><div class="stem"><span class="badge-essay">서술형</span>DNA는 핵 밖으로 나가지 않는데도 핵 밖의 리보솜에서 단백질이 만들어질 수 있다. 그 까닭을 <b>'전사'와 'RNA'</b>라는 말을 포함하여 서술하시오. <span class="difficulty">●●●●</span>
-    <div class="tags">10통과1-03-06 | 개념 2·3</div></div></div>
-    <div class="essay-lines"><div></div><div></div><div></div></div>
+      <div class="q">
+        <div class="qhead"><span class="qno">15</span><div class="stem"><span class="badge-data">자료</span>그림은 어떤 RNA의 염기 서열 일부와 코돈표의 일부를 나타낸 것이다. 옳은 것만을 <span style="white-space:nowrap;">&lt;보기&gt;에서</span> 있는 대로 고른 것은? <span class="difficulty">●●●</span>
+        <div class="tags">10통과1-03-06 | 개념 4 (개념 3 연계)</div></div></div>
+        <figure style="margin:2mm 0 1mm 8.4mm;">
+          <svg width="290" height="82" viewBox="0 0 290 82" font-family="PC Sans">
+            <rect x="1" y="1" width="288" height="22" rx="4" fill="#FBEBEE" stroke="#D6455D" stroke-width="0.9"/>
+            <text x="12" y="15.5" font-size="7.6" font-weight="800" fill="#D6455D">RNA</text>
+            <text x="160" y="16.5" text-anchor="middle" font-size="9.4" font-weight="800" fill="#22303A" letter-spacing="1.4">GUG – UAC – CAU – GAA</text>
+            <rect x="1" y="29" width="288" height="16" fill="#FDF9F0"/>
+            <rect x="1" y="29" width="288" height="52" fill="none" stroke="#B8C2CA" stroke-width="0.9"/>
+            <g stroke="#B8C2CA" stroke-width="0.8"><line x1="1" y1="45" x2="289" y2="45"/><line x1="1" y1="63" x2="289" y2="63"/><line x1="97" y1="45" x2="97" y2="81"/><line x1="193" y1="45" x2="193" y2="81"/></g>
+            <text x="145" y="40.5" text-anchor="middle" font-size="7.6" font-weight="800" fill="#B4560E">코돈표 (일부)</text>
+            <g font-size="7.6" fill="#22303A" text-anchor="middle">
+              <text x="49" y="57.5">AUG : 메싸이오닌</text><text x="145" y="57.5">GUG : 발린</text><text x="241" y="57.5">CAU : 히스티딘</text>
+              <text x="49" y="75.5">CAC : 히스티딘</text><text x="145" y="75.5">GAA : 글루탐산</text><text x="241" y="75.5">UAC : 타이로신</text>
+            </g>
+          </svg>
+        </figure>
+        <div class="bogi-box">
+          <div class="bt">보기</div>
+          ㄱ. 이 RNA 부분은 아미노산 4개를 지정한다.<br>
+          ㄴ. 표에서 히스티딘의 코돈은 한 가지뿐이다.<br>
+          ㄷ. 이 RNA를 만든 틀 가닥은 GTG로 시작한다.
+        </div>
+        <ul class="choices inline">
+          <li>① ㄱ</li><li>② ㄷ</li><li>③ ㄱ, ㄴ</li><li>④ ㄴ, ㄷ</li><li>⑤ ㄱ, ㄴ, ㄷ</li>
+        </ul>
+      </div>
+    </div>
   </div>
 
   <div class="folio"><span>III. 시스템과 상호작용</span><span class="num">205</span></div>
 </div>
 
-<!-- ═════════════ p.151 STEP 3 ═════════════ -->
+<!-- ═════════════ STEP 2 계속 (16~17) + 서술형 (18~20) ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag">III. 시스템과 상호작용</span><span class="lesson-tag">06. 유전자에서 단백질까지 | 문제</span></div>
+
+  <div class="qgrid qg2">
+    <div>
+      <div class="q">
+        <div class="qhead"><span class="qno">16</span><div class="stem">헤모글로빈 유전자 이상으로 나타나는 낫 모양 적혈구 빈혈증에 대한 설명으로 옳은 것은? <span class="difficulty">●○○</span>
+        <div class="tags">10통과1-03-06 | 개념 5</div></div></div>
+        <ul class="choices">
+          <li>① 헤모글로빈의 아미노산 수가 정상보다 적다.</li>
+          <li>② 아미노산 하나가 발린에서 글루탐산으로 바뀐다.</li>
+          <li>③ 헤모글로빈 유전자의 염기 하나가 바뀌어 생긴다.</li>
+          <li>④ 낫 모양 적혈구는 산소를 더 잘 운반한다.</li>
+          <li>⑤ 헤모글로빈의 모양은 정상과 같다.</li>
+        </ul>
+      </div>
+
+      <div class="q">
+        <div class="qhead"><span class="qno">17</span><div class="stem"><span class="must">중요</span><span class="badge-data">자료</span>표는 어떤 유전자의 정상 RNA 일부와, 이 유전자에 돌연변이가 일어난 (가), (나)의 RNA 같은 부분을 나타낸 것이다. 옳은 것만을 <span style="white-space:nowrap;">&lt;보기&gt;에서</span> 있는 대로 고른 것은? <span class="difficulty">●●●</span>
+        <div class="tags">10통과1-03-06 | 개념 5 (개념 4 연계)</div></div></div>
+        <figure style="margin:2mm 0 1mm 8.4mm;">
+          <svg width="290" height="94" viewBox="0 0 290 94" font-family="PC Sans">
+            <rect x="1" y="1" width="288" height="18" fill="#F5F1FC"/>
+            <rect x="1" y="1" width="288" height="92" fill="none" stroke="#B8C2CA" stroke-width="0.9"/>
+            <g stroke="#B8C2CA" stroke-width="0.8"><line x1="1" y1="19" x2="289" y2="19"/><line x1="1" y1="37" x2="289" y2="37"/><line x1="1" y1="55" x2="289" y2="55"/><line x1="1" y1="73" x2="289" y2="73"/><line x1="56" y1="1" x2="56" y2="93"/></g>
+            <g font-size="7.8" font-weight="800" fill="#6B46C8" text-anchor="middle"><text x="28.5" y="13">구분</text><text x="172.5" y="13">RNA 염기 서열 (일부)</text></g>
+            <g font-size="8" font-weight="800" fill="#22303A" text-anchor="middle"><text x="28.5" y="31">정상</text><text x="28.5" y="49">(가)</text><text x="28.5" y="67">(나)</text><text x="28.5" y="86" font-size="7.4" fill="#B4560E">코돈표</text></g>
+            <g font-size="9" font-weight="800" fill="#22303A" text-anchor="middle" letter-spacing="1.4">
+              <text x="172.5" y="31.5">CAU – GUG – GAA</text><text x="172.5" y="49.5">CAC – GUG – GAA</text><text x="172.5" y="67.5">CAU – AUG – GAA</text>
+            </g>
+            <text x="172.5" y="86" text-anchor="middle" font-size="7.6" fill="#22303A">CAU·CAC 히스티딘 / GUG 발린 / AUG 메싸이오닌 / GAA 글루탐산</text>
+          </svg>
+        </figure>
+        <div class="bogi-box">
+          <div class="bt">보기</div>
+          ㄱ. (가), (나)는 모두 정상과 염기 1개만 다르다.<br>
+          ㄴ. (가)의 아미노산 서열은 정상과 다르다.<br>
+          ㄷ. (나)에서 바뀐 아미노산은 히스티딘이다.
+        </div>
+        <ul class="choices inline">
+          <li>① ㄱ</li><li>② ㄷ</li><li>③ ㄱ, ㄴ</li><li>④ ㄴ, ㄷ</li><li>⑤ ㄱ, ㄴ, ㄷ</li>
+        </ul>
+      </div>
+    </div>
+    <div>
+      <div class="q">
+        <div class="qhead"><span class="qno">18</span><div class="stem"><span class="badge-essay">서술형</span>DNA 틀 가닥의 염기 서열이 CAT – GTA일 때, 전사되어 만들어지는 RNA의 염기 서열을 쓰고, 그렇게 정해지는 까닭을 <b>'상보결합'</b>, <b>'유라실(U)'</b>을 모두 포함하여 서술하시오. <span class="difficulty">●●○</span>
+        <div class="tags">10통과1-03-06 | 개념 3</div></div></div>
+        <div class="essay-lines"><div></div><div></div><div></div><div></div><div></div><div></div></div>
+      </div>
+
+      <div class="q">
+        <div class="qhead"><span class="qno">19</span><div class="stem"><span class="badge-essay">서술형</span>낫 모양 적혈구 빈혈증은 헤모글로빈 유전자의 염기 하나가 바뀌어 나타난다. 염기 하나의 변화가 형질의 변화로 이어지는 과정을 <b>'아미노산'</b>, <b>'헤모글로빈의 모양'</b>, <b>'적혈구'</b>를 모두 포함하여 서술하시오. <span class="difficulty">●●●</span>
+        <div class="tags">10통과1-03-06 | 개념 5</div></div></div>
+        <div class="essay-lines"><div></div><div></div><div></div><div></div><div></div><div></div></div>
+      </div>
+
+      <div class="q">
+        <div class="qhead"><span class="qno">20</span><div class="stem"><span class="must">중요</span><span class="badge-essay">서술형</span>DNA는 핵 밖으로 나가지 않는데도 핵 밖의 리보솜에서 단백질이 만들어질 수 있다. 그 까닭을 <b>'전사'</b>, <b>'RNA'</b>, <b>'리보솜'</b>을 모두 포함하여 서술하시오. <span class="difficulty">●●○</span>
+        <div class="tags">10통과1-03-06 | 개념 2·3</div></div></div>
+        <div class="essay-lines"><div></div><div></div><div></div><div></div><div></div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="folio"><span>III. 시스템과 상호작용</span><span class="num">?</span></div>
+</div>
+
+<!-- ═════════════ STEP 3 (21~24) ═════════════ -->
 <div class="page">
   <div class="runhead"><span class="unit-tag">III. 시스템과 상호작용</span><span class="lesson-tag">06. 유전자에서 단백질까지 | 문제</span></div>
   <div class="step-head s3"><span class="stepno">STEP 3</span><span class="steptt">수능 도전</span><span class="stepdesc">2028 수능 규격 — ㄱㄴㄷ 합답형·자료 해석</span></div>
 
-  <div class="q">
-    <div class="qhead"><span class="qno">12</span><div class="stem"><span class="badge-data">자료</span>그림은 세포 내 유전 정보의 흐름을 나타낸 것이다. ㉠, ㉡은 각각 전사와 번역 중 하나이다. 옳은 것만을 &lt;보기&gt;에서 있는 대로 고른 것은? <span class="difficulty">[2점]</span>
-    <div class="tags">10통과1-03-06</div></div></div>
-    <figure style="margin:2mm 0 1mm 8.6mm;">
-      <svg width="300" height="56" viewBox="0 0 300 56" font-family="PC Sans">
-        <g font-size="8" font-weight="800" text-anchor="middle">
-          <rect x="10" y="14" width="64" height="26" rx="5" fill="#F5F1FC" stroke="#9E85E0"/><text x="42" y="31" fill="#6B46C8">DNA</text>
-          <line x1="80" y1="27" x2="112" y2="27" stroke="#5B6B77" stroke-width="1.6" marker-end="url(#arrP)"/><text x="96" y="18" font-size="6.8" fill="#E8940A">㉠</text>
-          <rect x="118" y="14" width="64" height="26" rx="5" fill="#FBEBEE" stroke="#D6455D"/><text x="150" y="31" fill="#D6455D">RNA</text>
-          <line x1="188" y1="27" x2="220" y2="27" stroke="#5B6B77" stroke-width="1.6" marker-end="url(#arrP)"/><text x="204" y="18" font-size="6.8" fill="#E8940A">㉡</text>
-          <rect x="226" y="14" width="64" height="26" rx="5" fill="#EAF6EC" stroke="#5FA86A"/><text x="258" y="31" fill="#2E6B3A">단백질</text>
-        </g>
-      </svg>
-    </figure>
-    <div class="bogi-box">
-      <div class="bt">보기</div>
-      ㄱ. ㉠은 전사이며, 핵 안에서 일어난다.<br>
-      ㄴ. ㉡은 번역이며, 리보솜에서 일어난다.<br>
-      ㄷ. 유전 정보는 단백질에서 DNA 방향으로도 일상적으로 전달된다.
-    </div>
-    <ul class="choices inline">
-      <li>① ㄱ</li><li>② ㄴ</li><li>③ ㄷ</li><li>④ ㄱ, ㄴ</li><li>⑤ ㄱ, ㄴ, ㄷ</li>
-    </ul>
-  </div>
+  <div class="qgrid qg2">
+    <div>
+      <div class="q">
+        <div class="qhead"><span class="qno">21</span><div class="stem"><span class="badge-data">자료</span>그림은 세포 내 유전 정보의 흐름이다. ㉠과 <span style="white-space:nowrap;">㉡은</span> 각각 전사와 번역 중 하나이다. 옳은 것만을 <span style="white-space:nowrap;">&lt;보기&gt;에서</span> 있는 대로 고른 것은? <span class="difficulty">●●○ [2점]</span>
+        <div class="tags">10통과1-03-06 | 개념 2</div></div></div>
+        <figure style="margin:2mm 0 1mm 8.4mm;">
+          <svg width="290" height="56" viewBox="0 0 300 56" font-family="PC Sans">
+            <g font-size="8" font-weight="800" text-anchor="middle">
+              <rect x="10" y="14" width="64" height="26" rx="5" fill="#F5F1FC" stroke="#9E85E0"/><text x="42" y="31" fill="#6B46C8">DNA</text>
+              <line x1="80" y1="27" x2="112" y2="27" stroke="#5B6B77" stroke-width="1.6" marker-end="url(#arrP)"/><text x="96" y="18" font-size="6.8" fill="#E8940A">㉠</text>
+              <rect x="118" y="14" width="64" height="26" rx="5" fill="#FBEBEE" stroke="#D6455D"/><text x="150" y="31" fill="#D6455D">RNA</text>
+              <line x1="188" y1="27" x2="220" y2="27" stroke="#5B6B77" stroke-width="1.6" marker-end="url(#arrP)"/><text x="204" y="18" font-size="6.8" fill="#E8940A">㉡</text>
+              <rect x="226" y="14" width="64" height="26" rx="5" fill="#EAF6EC" stroke="#5FA86A"/><text x="258" y="31" fill="#2E6B3A">단백질</text>
+            </g>
+          </svg>
+        </figure>
+        <div class="bogi-box">
+          <div class="bt">보기</div>
+          ㄱ. ㉠은 전사이며, 핵 안에서 일어난다.<br>
+          ㄴ. ㉡은 번역이며, 리보솜에서 일어난다.<br>
+          ㄷ. 유전 정보는 단백질에서 DNA 방향으로도 일상적으로 전달된다.
+        </div>
+        <ul class="choices inline">
+          <li>① ㄱ</li><li>② ㄷ</li><li>③ ㄱ, ㄴ</li><li>④ ㄴ, ㄷ</li><li>⑤ ㄱ, ㄴ, ㄷ</li>
+        </ul>
+      </div>
 
-  <div class="q">
-    <div class="qhead"><span class="qno">13</span><div class="stem"><span class="badge-data">자료</span>표는 정상 헤모글로빈과 낫 모양 적혈구 빈혈증 환자의 헤모글로빈 RNA 일부와 그 위치의 아미노산을 비교한 것이다. 옳은 것만을 &lt;보기&gt;에서 있는 대로 고른 것은? <span class="difficulty">[2.5점]</span>
-    <div class="tags">10통과1-03-06</div></div></div>
-    <div class="bogi-box" style="background:#fff; margin-bottom:2mm;">
-      정상: ··· G A G ··· → 글루탐산 / 환자: ··· G <b>U</b> G ··· → 발린
+      <div class="q">
+        <div class="qhead"><span class="qno">22</span><div class="stem"><span class="badge-data">자료</span>표는 정상인과 낫 모양 적혈구 빈혈증 환자의 헤모글로빈 RNA 일부와 아미노산, 적혈구 모양을 비교한 것이다. 옳은 것만을 <span style="white-space:nowrap;">&lt;보기&gt;에서</span> 있는 대로 고른 것은? <span class="difficulty">●●● [2.5점]</span>
+        <div class="tags">10통과1-03-06 | 개념 5 (개념 3 연계)</div></div></div>
+        <figure style="margin:2mm 0 1mm 8.4mm;">
+          <svg width="290" height="78" viewBox="0 0 290 78" font-family="PC Sans">
+            <rect x="1" y="1" width="288" height="18" fill="#F5F1FC"/>
+            <rect x="1" y="1" width="288" height="76" fill="none" stroke="#B8C2CA" stroke-width="0.9"/>
+            <g stroke="#B8C2CA" stroke-width="0.8"><line x1="1" y1="19" x2="289" y2="19"/><line x1="1" y1="48" x2="289" y2="48"/><line x1="50" y1="1" x2="50" y2="77"/><line x1="130" y1="1" x2="130" y2="77"/><line x1="200" y1="1" x2="200" y2="77"/></g>
+            <g font-size="7.8" font-weight="800" fill="#6B46C8" text-anchor="middle"><text x="25.5" y="13">구분</text><text x="90" y="13">RNA (일부)</text><text x="165" y="13">아미노산</text><text x="244.5" y="13">적혈구 모양</text></g>
+            <g font-size="8" fill="#22303A" text-anchor="middle">
+              <text x="25.5" y="36.5" font-weight="800">정상인</text><text x="90" y="37" font-weight="800" letter-spacing="1.2">··· GAG ···</text><text x="165" y="36.5">글루탐산</text>
+              <text x="25.5" y="65.5" font-weight="800">환자</text><text x="90" y="66" font-weight="800" letter-spacing="1.2">··· GUG ···</text><text x="165" y="65.5">발린</text>
+            </g>
+            <g transform="translate(222,33.5)"><circle r="9" fill="#FBEBEE" stroke="#D6455D" stroke-width="1.2"/><circle r="4" fill="#fff" stroke="#E3A0AC" stroke-width="0.8"/></g>
+            <text x="238" y="36.5" font-size="7.4" fill="#22303A">둥근 모양</text>
+            <path d="M214,70 q-3,-11 7,-15 q13,-5 17,3 q-10,1 -14,6 q-4,4 -10,6 Z" fill="#FBEBEE" stroke="#D6455D" stroke-width="1.2"/>
+            <text x="244" y="65.5" font-size="7.4" fill="#22303A">낫 모양</text>
+          </svg>
+        </figure>
+        <div class="bogi-box">
+          <div class="bt">보기</div>
+          ㄱ. 두 RNA는 이 부분에서 염기 하나만 다르다.<br>
+          ㄴ. 염기 하나의 차이로 아미노산 하나가 달라졌다.<br>
+          ㄷ. 환자 DNA 틀 가닥의 이 부분은 ···CTC···이다.
+        </div>
+        <ul class="choices inline">
+          <li>① ㄱ</li><li>② ㄷ</li><li>③ ㄱ, ㄴ</li><li>④ ㄴ, ㄷ</li><li>⑤ ㄱ, ㄴ, ㄷ</li>
+        </ul>
+      </div>
     </div>
-    <div class="bogi-box">
-      <div class="bt">보기</div>
-      ㄱ. 두 RNA 서열은 염기 하나만 다르다.<br>
-      ㄴ. 염기 하나의 차이가 아미노산 하나의 차이를 만들었다.<br>
-      ㄷ. 아미노산이 하나 바뀌어도 단백질의 모양과 기능은 변하지 않는다.
+    <div>
+      <div class="q">
+        <div class="qhead"><span class="qno">23</span><div class="stem"><span class="badge-data">자료</span>그림은 DNA 두 가닥 Ⅰ, Ⅱ의 일부와 여기서 전사된 RNA X, 코돈표 일부이다. 옳은 것만을 <span style="white-space:nowrap;">&lt;보기&gt;에서</span> 있는 대로 고른 것은? <span class="difficulty">●●● [2.5점]</span>
+        <div class="tags">10통과1-03-06 | 개념 3·4</div></div></div>
+        <figure style="margin:2mm 0 1mm 8.4mm;">
+          <svg width="290" height="100" viewBox="0 0 290 100" font-family="PC Sans">
+            <rect x="1" y="1" width="186" height="98" rx="5" fill="#FAFBFC" stroke="#B8C2CA" stroke-width="0.9"/>
+            <g font-size="8" font-weight="900" fill="#6B46C8" text-anchor="middle"><text x="13" y="24">Ⅰ</text><text x="13" y="52">Ⅱ</text></g>
+            <text x="13" y="85" text-anchor="middle" font-size="8" font-weight="900" fill="#D6455D">X</text>
+            <g font-size="8.6" font-weight="800" fill="#22303A" text-anchor="middle">
+              <text x="32" y="24">A</text><text x="48" y="24">T</text><text x="64" y="24">G</text><text x="80" y="24">C</text><text x="96" y="24">A</text><text x="112" y="24">C</text><text x="128" y="24">G</text><text x="144" y="24">A</text><text x="160" y="24">A</text>
+              <text x="32" y="52">T</text><text x="48" y="52">A</text><text x="64" y="52">C</text><text x="80" y="52">G</text><text x="96" y="52">T</text><text x="112" y="52">G</text><text x="128" y="52">C</text><text x="144" y="52">T</text><text x="160" y="52">T</text>
+            </g>
+            <g stroke="#B8C2CA" stroke-width="1"><line x1="32" y1="28" x2="32" y2="42"/><line x1="48" y1="28" x2="48" y2="42"/><line x1="64" y1="28" x2="64" y2="42"/><line x1="80" y1="28" x2="80" y2="42"/><line x1="96" y1="28" x2="96" y2="42"/><line x1="112" y1="28" x2="112" y2="42"/><line x1="128" y1="28" x2="128" y2="42"/><line x1="144" y1="28" x2="144" y2="42"/><line x1="160" y1="28" x2="160" y2="42"/></g>
+            <text x="176" y="40" text-anchor="middle" font-size="6.8" font-weight="800" fill="#6B46C8">DNA</text>
+            <line x1="6" y1="64" x2="182" y2="64" stroke="#B8C2CA" stroke-width="0.7" stroke-dasharray="2.5 2"/>
+            <g font-size="8.6" font-weight="800" fill="#D6455D" text-anchor="middle">
+              <text x="32" y="85">A</text><text x="48" y="85">U</text><text x="64" y="85">G</text><text x="80" y="85">C</text><text x="96" y="85">A</text><text x="112" y="85">C</text><text x="128" y="85">G</text><text x="144" y="85">A</text><text x="160" y="85">A</text>
+            </g>
+            <text x="176" y="85" text-anchor="middle" font-size="6.8" font-weight="800" fill="#D6455D">RNA</text>
+            <rect x="194" y="1" width="95" height="98" rx="5" fill="#FDF9F0" stroke="#EBCB9C" stroke-width="0.9"/>
+            <text x="241.5" y="14" text-anchor="middle" font-size="7.4" font-weight="800" fill="#B4560E">코돈표 (일부)</text>
+            <g font-size="7.4" fill="#22303A">
+              <text x="202" y="29">AUG 메싸이오닌</text><text x="202" y="43">CAC 히스티딘</text><text x="202" y="57">GAA 글루탐산</text><text x="202" y="71">UAC 타이로신</text><text x="202" y="85">GUG 발린</text>
+            </g>
+          </svg>
+        </figure>
+        <div class="bogi-box">
+          <div class="bt">보기</div>
+          ㄱ. X의 틀 가닥은 Ⅱ이다.<br>
+          ㄴ. X의 서열은 Ⅰ에서 T를 U로 바꾼 것과 같다.<br>
+          ㄷ. X가 번역되면 메싸이오닌–히스티딘–글루탐산 순서로 아미노산이 연결된다.
+        </div>
+        <ul class="choices inline">
+          <li>① ㄱ</li><li>② ㄷ</li><li>③ ㄱ, ㄴ</li><li>④ ㄴ, ㄷ</li><li>⑤ ㄱ, ㄴ, ㄷ</li>
+        </ul>
+      </div>
+
+      <div class="q">
+        <div class="qhead"><span class="qno">24</span><div class="stem"><span class="badge-data">자료</span>그림 (가)는 어떤 식물에서 꽃잎 색소가 만들어지는 과정을, (나)는 이 식물의 개체 Ⅰ, Ⅱ의 특징을 단순하게 나타낸 것이다. 옳은 것만을 <span style="white-space:nowrap;">&lt;보기&gt;에서</span> 있는 대로 고른 것은? <span class="difficulty">●●○ [2점]</span>
+        <div class="tags">10통과1-03-06 | 개념 5 (III-05 효소 연계)</div></div></div>
+        <figure style="margin:2mm 0 1mm 8.4mm;">
+          <svg width="290" height="114" viewBox="0 0 290 114" font-family="PC Sans">
+            <text x="2" y="10" font-size="7.6" font-weight="900" fill="#22303A">(가)</text>
+            <g font-size="7.6" font-weight="800" text-anchor="middle">
+              <rect x="22" y="2" width="56" height="20" rx="4" fill="#F5F1FC" stroke="#9E85E0"/><text x="50" y="15" fill="#6B46C8">유전자 A</text>
+              <line x1="80" y1="12" x2="110" y2="12" stroke="#5B6B77" stroke-width="1.3" marker-end="url(#arrP)"/><text x="95" y="8" font-size="6.4" fill="#5B6B77" font-weight="700">전사</text>
+              <rect x="114" y="2" width="44" height="20" rx="4" fill="#FBEBEE" stroke="#D6455D"/><text x="136" y="15" fill="#D6455D">RNA</text>
+              <line x1="160" y1="12" x2="190" y2="12" stroke="#5B6B77" stroke-width="1.3" marker-end="url(#arrP)"/><text x="175" y="8" font-size="6.4" fill="#5B6B77" font-weight="700">번역</text>
+              <rect x="194" y="2" width="54" height="20" rx="4" fill="#EAF6EC" stroke="#5FA86A"/><text x="221" y="15" fill="#2E6B3A">효소 A</text>
+              <line x1="221" y1="23" x2="160" y2="38" stroke="#5FA86A" stroke-width="1" stroke-dasharray="2.5 2"/>
+              <rect x="60" y="32" width="56" height="18" rx="4" fill="#FFFFFF" stroke="#B8C2CA"/><text x="88" y="44.5" fill="#5B6B77">무색 물질</text>
+              <line x1="118" y1="41" x2="194" y2="41" stroke="#5FA86A" stroke-width="1.4" marker-end="url(#arrP)"/>
+              <rect x="200" y="32" width="56" height="18" rx="4" fill="#FBEBEE" stroke="#D6455D"/><text x="228" y="44.5" fill="#D6455D">붉은 색소</text>
+            </g>
+            <text x="2" y="70" font-size="7.6" font-weight="900" fill="#22303A">(나)</text>
+            <rect x="22" y="60" width="267" height="16" fill="#F5F1FC"/>
+            <rect x="22" y="60" width="267" height="52" fill="none" stroke="#B8C2CA" stroke-width="0.9"/>
+            <g stroke="#B8C2CA" stroke-width="0.8"><line x1="22" y1="76" x2="289" y2="76"/><line x1="22" y1="94" x2="289" y2="94"/><line x1="46" y1="60" x2="46" y2="112"/><line x1="112" y1="60" x2="112" y2="112"/><line x1="180" y1="60" x2="180" y2="112"/><line x1="248" y1="60" x2="248" y2="112"/></g>
+            <g font-size="6.8" font-weight="800" fill="#6B46C8" text-anchor="middle"><text x="34" y="71">개체</text><text x="79" y="71">유전자 A</text><text x="146" y="71">효소 A 아미노산</text><text x="214" y="71">무색 물질과 결합</text><text x="268.5" y="71">꽃 색</text></g>
+            <g font-size="7.2" fill="#22303A" text-anchor="middle">
+              <text x="34" y="88" font-weight="800">Ⅰ</text><text x="79" y="88">정상</text><text x="146" y="88">정상</text><text x="214" y="88">결합한다</text><text x="268.5" y="88">붉은색</text>
+              <text x="34" y="106" font-weight="800">Ⅱ</text><text x="79" y="106">염기 1개 바뀜</text><text x="146" y="106">1개 다름</text><text x="214" y="106">결합 못 한다</text><text x="268.5" y="106">흰색</text>
+            </g>
+          </svg>
+        </figure>
+        <div class="bogi-box">
+          <div class="bt">보기</div>
+          ㄱ. 효소 A는 핵 안에서 번역되어 만들어진다.<br>
+          ㄴ. Ⅱ의 흰 꽃은 효소 A가 반응 후 소모된 결과이다.<br>
+          ㄷ. Ⅱ의 효소 A가 무색 물질과 결합하지 못하는 것은 효소의 입체 구조가 달라졌기 때문이다.
+        </div>
+        <ul class="choices inline">
+          <li>① ㄱ</li><li>② ㄷ</li><li>③ ㄱ, ㄴ</li><li>④ ㄴ, ㄷ</li><li>⑤ ㄱ, ㄴ, ㄷ</li>
+        </ul>
+      </div>
     </div>
-    <ul class="choices inline">
-      <li>① ㄱ</li><li>② ㄷ</li><li>③ ㄱ, ㄴ</li><li>④ ㄴ, ㄷ</li><li>⑤ ㄱ, ㄴ, ㄷ</li>
-    </ul>
   </div>
 
   <div class="folio"><span>III. 시스템과 상호작용</span><span class="num">206</span></div>
 </div>
 
-<!-- ═════════════ p.152 해설 1 ═════════════ -->
+<!-- ═════════════ 해설 1 ═════════════ -->
 <div class="page">
   <div class="runhead"><span class="unit-tag" style="color:var(--brand);">알짜 해설</span><span class="lesson-tag">06. 유전자에서 단백질까지</span></div>
-  <div class="sol-head"><span class="stt">알짜 해설</span><span class="sub">전 문항 해설 + 오답 선지 분석 — 맞힌 문제도 해설로 한 번 더!</span></div>
+  <div class="sol-head"><span class="stt">알짜 해설</span><span class="sub">전 문항 해설 + 바로알기(틀린 선지를 옳게 고친 문장) — 맞힌 문제도 해설로 한 번 더!</span></div>
 
   <table class="anstable">
-    <tr><th>문항</th><td>1</td><td>2</td><td>3</td><td>4</td><td>5</td><td>6</td><td>7</td><td>8</td><td>9</td><td>10</td><td>11</td><td>12</td><td>13</td></tr>
-    <tr><th>정답</th><td class="a">O</td><td class="a">X</td><td class="a">X</td><td class="a">전사</td><td class="a">3</td><td class="a">아미노산</td><td class="a">③</td><td class="a">②</td><td class="a">④</td><td class="a">③</td><td class="a">서술형</td><td class="a">④</td><td class="a">③</td></tr>
+    <tr><th>문항</th><td>1</td><td>2</td><td>3</td><td>4</td><td>5</td><td>6</td><td>7</td><td>8</td><td>9</td><td>10</td><td>11</td><td>12</td></tr>
+    <tr><th>정답</th><td class="a">O</td><td class="a">X</td><td class="a">X</td><td class="a">전사</td><td class="a">3</td><td class="a">아미노산</td><td class="a">①</td><td class="a">④</td><td class="a">②</td><td class="a">④</td><td class="a">②</td><td class="a">⑤</td></tr>
+    <tr><th>문항</th><td>13</td><td>14</td><td>15</td><td>16</td><td>17</td><td>18</td><td>19</td><td>20</td><td>21</td><td>22</td><td>23</td><td>24</td></tr>
+    <tr><th>정답</th><td class="a">④</td><td class="a">⑤</td><td class="a">①</td><td class="a">③</td><td class="a">①</td><td class="a">서술형</td><td class="a">서술형</td><td class="a">서술형</td><td class="a">③</td><td class="a">③</td><td class="a">⑤</td><td class="a">②</td></tr>
   </table>
 
   <div class="solcols">
@@ -912,49 +1213,175 @@
         <p>염기 → 아미노산 → 단백질 모양 → 형질의 사슬을 기억하라.</p></div>
     </div>
     <div>
-      <div class="sol"><div class="shead"><span class="sno">7</span><span class="sans">③</span><span class="slink">개념 1</span></div>
-        <p>하나의 DNA에는 유전자가 수없이 많다 — 사람은 약 2만 개다.</p>
-        <div class="wrongbox"><div class="wt">오답 왜 틀렸나</div>
-          <p><b>①·②</b> 크기 순서는 염색체 ⊃ DNA ⊃ 유전자. <b>④</b> 염기는 A·G·C·T 네 종류. <b>⑤</b> 형질은 유전자가 단백질을 통해 결정한다.</p></div></div>
-      <div class="sol"><div class="shead"><span class="sno">8</span><span class="sans">②</span><span class="slink">개념 2·3</span></div>
+      <div class="sol"><div class="shead"><span class="sno">7</span><span class="sans">①</span><span class="slink">개념 1</span></div>
+        <p>하나의 DNA에는 유전자가 수없이 많다 — 사람의 DNA에는 약 2만 개가 들어 있다.</p>
+        <div class="wrongbox"><div class="wt">바로알기</div>
+          <p><b>②</b> 유전자는 DNA의 일부로, DNA보다 작은 단위이다. <b>③</b> 염색체는 DNA가 뭉쳐진 것으로, 유전자보다 큰 단위이다. <b>④</b> DNA의 염기는 A·G·C·T 네 종류이다. <b>⑤</b> 형질은 유전자가 단백질을 통해 결정한다.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">8</span><span class="sans">④</span><span class="slink">개념 1</span></div>
+        <p>(가)는 DNA가 뭉쳐진 염색체, (나)는 이중나선인 DNA, (다)는 DNA의 한 구간인 유전자다. <b>ㄴ (옳음)</b> DNA의 염기는 A·G·C·T 네 종류. <b>ㄷ (옳음)</b> 유전자 = 특정 단백질 하나의 정보 구간.</p>
+        <div class="wrongbox"><div class="wt">바로알기</div>
+          <p><b>ㄱ</b> (틀림 →) (가) 염색체는 (다) 유전자보다 <b>큰</b> 단위이다 — 염색체 ⊃ DNA ⊃ 유전자.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">9</span><span class="sans">②</span><span class="slink">개념 2·3</span></div>
         <p>전사의 정의 그대로 — 핵 안에서, DNA 한 가닥을 틀로, RNA를 만든다.</p>
-        <div class="wrongbox"><div class="wt">오답 왜 틀렸나</div>
-          <p><b>①</b> DNA는 핵 밖으로 나가지 않는다(RNA가 나간다). <b>③</b> 번역은 리보솜에서. <b>④</b> RNA는 한 가닥. <b>⑤</b> 번역은 RNA → 단백질 방향이다.</p></div></div>
-      <div class="sol"><div class="shead"><span class="sno">9</span><span class="sans">④</span><span class="slink">개념 4</span></div>
-        <p>코돈 순서대로 AUG(메싸이오닌) → GUG(발린) → CAU(히스티딘).</p>
-        <div class="wrongbox"><div class="wt">오답 왜 틀렸나</div>
-          <p>나머지는 순서를 섞은 것 — 번역은 코돈이 <b>놓인 순서 그대로</b> 아미노산을 잇는다. 순서가 곧 정보다.</p></div></div>
+        <div class="wrongbox"><div class="wt">바로알기</div>
+          <p><b>①</b> DNA는 핵 밖으로 나가지 않고, 복사본인 RNA가 리보솜으로 간다. <b>③</b> 번역은 세포질의 리보솜에서 일어난다. <b>④</b> RNA는 한 가닥이다. <b>⑤</b> DNA의 정보가 RNA로 옮겨지는 과정은 전사이다.</p></div></div>
     </div>
   </div>
-
   <div class="folio"><span>알짜 해설</span><span class="num">207</span></div>
 </div>
 
-<!-- ═════════════ p.153 해설 2 ═════════════ -->
+<!-- ═════════════ 해설 2 ═════════════ -->
 <div class="page">
   <div class="runhead"><span class="unit-tag" style="color:var(--brand);">알짜 해설</span><span class="lesson-tag">06. 유전자에서 단백질까지</span></div>
   <div class="solcols">
     <div>
-      <div class="sol"><div class="shead"><span class="sno">10</span><span class="sans">③</span><span class="slink">개념 5</span></div>
-        <p>(가) 염기 하나의 변화가 원인, (나) 글루탐산이 발린으로 바뀌어 서열이 다르다 — 둘 다 옳다.</p>
-        <div class="wrongbox"><div class="wt">오답 왜 틀렸나</div>
-          <p><b>(다)</b> 낫 모양 적혈구는 산소 운반 능력이 떨어지고 모세혈관을 막는다 — '다르다'가 '낫다'는 아니다.</p></div></div>
-      <div class="sol"><div class="shead"><span class="sno">11</span><span class="sans">모범 답안</span><span class="slink">개념 2·3</span></div>
-        <p>핵 안에서 DNA의 유전 정보를 <b>전사</b>하여 <b>RNA</b>라는 복사본을 만들고, 이 RNA가 핵 밖으로 나가 리보솜에 유전 정보를 전달하기 때문이다. 따라서 DNA 원본이 나가지 않아도 리보솜은 RNA의 정보대로 단백질을 만들 수 있다.</p>
-        <div class="wrongbox"><div class="wt">채점 기준 (감점 포인트)</div>
-          <p>① 핵 안에서 전사가 일어남 ② RNA가 정보의 복사본으로 핵 밖으로 나감 ③ 리보솜이 RNA의 정보로 단백질을 합성함 — 세 요소 모두 서술해야 만점.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">10</span><span class="sans">④</span><span class="slink">개념 2</span></div>
+        <p><b>B (옳음)</b> 효소·케라틴·헤모글로빈은 모두 단백질 — 형질의 실행자다. <b>C (옳음)</b> 염기 서열 →(전사) RNA 서열 →(번역) 아미노산 서열. 결국 DNA가 정한다.</p>
+        <div class="wrongbox"><div class="wt">바로알기</div>
+          <p><b>A</b> (틀림 →) 형질을 실제로 나타내는 일꾼은 <b>단백질</b>이다. DNA는 그 단백질의 정보를 담은 설계도다.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">11</span><span class="sans">②</span><span class="slink">개념 3</span></div>
+        <p><b>ㄷ (옳음)</b> A는 T와, G는 C와만 결합(상보결합)하므로 한 가닥의 서열이 반대 가닥을 정한다.</p>
+        <div class="wrongbox"><div class="wt">바로알기</div>
+          <p><b>ㄱ</b> (틀림 →) 두 가닥 중 <b>한 가닥만</b> 틀이 되어 <b>한 가닥짜리</b> RNA가 만들어진다. <b>ㄴ</b> (틀림 →) 틀 가닥의 A에는 RNA의 <b>유라실(U)</b>이 붙는다 — RNA에는 T가 없다.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">12</span><span class="sans">⑤</span><span class="slink">개념 3</span></div>
+        <p>짝을 하나씩 붙인다: T→A, A→U, C→G | G→C, G→C, A→U | T→A, T→A, C→G → <b>AUG&nbsp;–&nbsp;CCU&nbsp;–&nbsp;AAG</b>.</p>
+        <div class="wrongbox"><div class="wt">바로알기</div>
+          <p><b>①</b> RNA에는 T가 없다 — 틀 가닥 A의 짝은 T가 아니라 U이다. <b>②</b> 전사는 틀 가닥을 그대로 옮기는 것이 아니라 짝이 맞는 염기를 붙이는 일이다. <b>③</b> 틀 가닥에서 T만 U로 바꾸면 안 되고, 짝을 먼저 찾아야 한다. <b>④</b> 여섯 번째 자리(틀 가닥 A)에도 T가 아닌 U가 붙는다.</p></div></div>
     </div>
     <div>
-      <div class="sol"><div class="shead"><span class="sno">12</span><span class="sans">④</span><span class="slink">개념 2 | 2점</span></div>
-        <p><b>ㄱ (옳음)</b> DNA → RNA가 전사, 핵 안의 일. <b>ㄴ (옳음)</b> RNA → 단백질이 번역, 리보솜의 일. <b>ㄷ (틀림)</b> 세포 내 정보는 DNA → RNA → 단백질 한 방향으로 흐른다.</p>
+      <div class="sol"><div class="shead"><span class="sno">13</span><span class="sans">④</span><span class="slink">개념 4</span></div>
+        <p>코돈 1개(염기 3개) = 아미노산 1개 → 150&nbsp;×&nbsp;3&nbsp;=&nbsp;450개.</p>
+        <div class="wrongbox"><div class="wt">바로알기</div>
+          <p><b>①</b> 50은 150&nbsp;÷&nbsp;3 — 아미노산 수에는 3을 곱해야 염기 수가 된다. <b>②</b> 염기 1개가 아니라 염기 3개가 아미노산 1개를 지정한다. <b>③</b> 300은 2염기씩 센 값 — 코돈은 3염기다. <b>⑤</b> 600은 4염기씩 센 값 — 코돈은 3염기다.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">14</span><span class="sans">⑤</span><span class="slink">개념 4 | 탐구</span></div>
+        <p><b>ㄱ (옳음)</b> 자리마다 4가지씩: 4&nbsp;×&nbsp;4&nbsp;×&nbsp;4&nbsp;=&nbsp;64. <b>ㄴ (옳음)</b> 2장이면 4&nbsp;×&nbsp;4&nbsp;=&nbsp;16가지 &lt; 20 — 모자란다. <b>ㄷ (옳음)</b> 3장이면 64가지 ≥ 20 — 그래서 코돈은 염기 3개다.</p>
         <div class="wrongbox"><div class="wt">함정 체크</div>
-          <p>㉠·㉡ 이름은 맞히고 '장소'에서 틀리는 경우가 많다 — 이름과 장소를 한 세트로 외워라.</p></div></div>
-      <div class="sol"><div class="shead"><span class="sno">13</span><span class="sans">③</span><span class="slink">개념 5 | 2.5점</span></div>
-        <p><b>ㄱ (옳음)</b> GAG와 GUG — 가운데 염기 하나(A→U 자리)만 다르다. <b>ㄴ (옳음)</b> 그 결과 글루탐산이 발린으로 — 코돈 하나가 아미노산 하나를 지정하니까. <b>ㄷ (틀림)</b> 아미노산 하나로도 접히는 모양이 달라져 기능이 크게 변한다 — 그것이 이 병의 전부다.</p>
-        <div class="wrongbox"><div class="wt">함정 체크</div>
-          <p>'겨우 하나쯤'이라는 직관을 버려라 — 서열의 세계에서는 <b>한 글자가 형질을 바꾼다.</b></p></div></div>
+          <p>㉠을 4&nbsp;×&nbsp;3&nbsp;=&nbsp;12로 세면 틀린다. 자리 수만큼 4를 <b>곱한다</b>(4<sup>3</sup>).</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">15</span><span class="sans">①</span><span class="slink">개념 4 | 개념 3 연계</span></div>
+        <p><b>ㄱ (옳음)</b> 염기 12개 ÷ 3 = 코돈 4개 → 발린–타이로신–히스티딘–글루탐산, 아미노산 4개.</p>
+        <div class="wrongbox"><div class="wt">바로알기</div>
+          <p><b>ㄴ</b> (틀림 →) 표에서 히스티딘은 <b>CAU와 CAC 두 코돈</b>이 지정한다 — 조합(64)이 아미노산(20)보다 많아 한 아미노산을 여러 코돈이 지정하기도 한다. <b>ㄷ</b> (틀림 →) GUG의 짝을 찾으면 틀 가닥은 <b>CAC</b>이다. GTG는 RNA의 U를 T로 바꾼 것일 뿐이다.</p></div></div>
+    </div>
+  </div>
+  <div class="folio"><span>알짜 해설</span><span class="num">208</span></div>
+</div>
 
-      <div class="gist" style="margin-top:5mm;">
+<!-- ═════════════ 해설 3 ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag" style="color:var(--brand);">알짜 해설</span><span class="lesson-tag">06. 유전자에서 단백질까지</span></div>
+  <div class="solcols">
+    <div>
+      <div class="sol"><div class="shead"><span class="sno">16</span><span class="sans">③</span><span class="slink">개념 5</span></div>
+        <p>원인은 헤모글로빈 유전자의 염기 단 하나의 변화다 — 그 결과 아미노산 하나가 바뀌고, 헤모글로빈의 모양이 달라진다.</p>
+        <div class="wrongbox"><div class="wt">바로알기</div>
+          <p><b>①</b> 아미노산 수는 같고, 그중 하나가 다른 아미노산으로 바뀐다. <b>②</b> 아미노산 하나가 글루탐산에서 발린으로 바뀐다. <b>④</b> 낫 모양 적혈구는 산소를 잘 나르지 못하고 모세혈관을 막는다. <b>⑤</b> 헤모글로빈은 다른 모양으로 접혀 엉겨 붙고, 그 결과 적혈구가 낫 모양이 된다.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">17</span><span class="sans">①</span><span class="slink">개념 5 | 개념 4 연계</span></div>
+        <p><b>ㄱ (옳음)</b> (가)는 세 번째 염기(U→C), (나)는 네 번째 염기(G→A) — 각각 하나만 다르다.</p>
+        <div class="analysis"><div class="at">꼼꼼 자료 분석</div>
+          <svg width="300" height="80" viewBox="0 0 300 80" font-family="PC Sans">
+            <rect x="1" y="1" width="176" height="78" fill="none" stroke="#B8C2CA" stroke-width="0.9"/>
+            <g stroke="#B8C2CA" stroke-width="0.8"><line x1="1" y1="27" x2="177" y2="27"/><line x1="1" y1="53" x2="177" y2="53"/><line x1="40" y1="1" x2="40" y2="79"/></g>
+            <g font-size="7.8" font-weight="800" fill="#22303A" text-anchor="middle"><text x="20.5" y="17.5">정상</text><text x="20.5" y="43.5">(가)</text><text x="20.5" y="69.5">(나)</text></g>
+            <g font-size="8.4" font-weight="800" fill="#22303A" text-anchor="middle">
+              <text x="62" y="17.5">CAU</text><text x="108" y="17.5">GUG</text><text x="154" y="17.5">GAA</text>
+              <text x="62" y="43.5">CA<tspan fill="#D6455D">C</tspan></text><text x="108" y="43.5">GUG</text><text x="154" y="43.5">GAA</text>
+              <text x="62" y="69.5">CAU</text><text x="108" y="69.5"><tspan fill="#D6455D">A</tspan>UG</text><text x="154" y="69.5">GAA</text>
+            </g>
+            <g font-size="6.4" fill="#5B6B77" text-anchor="middle"><text x="62" y="24.5">히스티딘</text><text x="108" y="24.5">발린</text><text x="154" y="24.5">글루탐산</text>
+              <text x="62" y="52" fill="#2E6B3A" font-weight="700">히스티딘</text><text x="108" y="78" fill="#D6455D" font-weight="700">메싸이오닌</text></g>
+            <circle cx="69" cy="40.2" r="5.4" fill="none" stroke="#D6455D" stroke-width="1"/>
+            <circle cx="100.5" cy="66.2" r="5.4" fill="none" stroke="#D6455D" stroke-width="1"/>
+            <text x="184" y="38" font-size="6.8" font-weight="700" fill="#2E6B3A">CAU → CAC</text>
+            <text x="184" y="47" font-size="6.8" font-weight="700" fill="#2E6B3A">둘 다 히스티딘 = 변화 없음</text>
+            <text x="184" y="64" font-size="6.8" font-weight="700" fill="#D6455D">GUG → AUG</text>
+            <text x="184" y="73" font-size="6.8" font-weight="700" fill="#D6455D">발린 → 메싸이오닌</text>
+          </svg></div>
+        <div class="wrongbox"><div class="wt">바로알기</div>
+          <p><b>ㄴ</b> (틀림 →) (가)의 CAC도 히스티딘을 지정하므로 아미노산 서열은 정상과 <b>같다</b> — 돌연변이가 형질에 영향을 주지 않을 수도 있다. <b>ㄷ</b> (틀림 →) (나)에서는 두 번째 아미노산이 <b>발린에서 메싸이오닌으로</b> 바뀐다. 히스티딘은 그대로다.</p></div></div>
+    </div>
+    <div>
+      <div class="sol"><div class="shead"><span class="sno">18</span><span class="sans">모범 답안</span><span class="slink">개념 3</span></div>
+        <p>RNA의 염기 서열은 <b>GUA – CAU</b>이다. 전사에서는 DNA 틀 가닥의 염기와 <b>상보결합</b>하는 염기가 하나씩 붙어 RNA가 만들어진다. C에는 G, G에는 C, T에는 A가 붙고, A에는 T 대신 <b>유라실(U)</b>이 붙기 때문이다.</p>
+        <table class="rubric">
+          <tr><th>채점 요소</th><th>배점</th></tr>
+          <tr><td>① RNA 서열을 GUA – CAU로 썼다.</td><td>2점</td></tr>
+          <tr><td>② 틀 가닥의 염기와 상보결합하는 염기가 붙는다고 썼다.</td><td>2점</td></tr>
+          <tr><td>③ 틀 가닥의 A에는 T 대신 유라실(U)이 붙는다고 썼다.</td><td>2점</td></tr>
+        </table>
+        <div class="wrongbox"><div class="wt">이렇게 쓰면 0점</div>
+          <p>"GTA – CAT" — 짝은 찾았지만 RNA에 T를 쓴 답. 또는 틀 가닥을 그대로 옮겨 쓴 답.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">19</span><span class="sans">모범 답안</span><span class="slink">개념 5</span></div>
+        <p>염기 하나가 바뀌면 그 코돈이 지정하는 <b>아미노산</b>이 글루탐산에서 발린으로 바뀐다. 아미노산 서열이 달라진 헤모글로빈은 다른 모양으로 접혀(<b>헤모글로빈의 모양</b> 변화) 서로 엉겨 붙고, <b>적혈구</b>가 낫 모양으로 찌그러져 산소를 잘 나르지 못하고 모세혈관을 막아 빈혈이 나타난다.</p>
+        <table class="rubric">
+          <tr><th>채점 요소</th><th>배점</th></tr>
+          <tr><td>① 헤모글로빈의 아미노산 하나가 바뀐다(글루탐산 → 발린)고 썼다.</td><td>2점</td></tr>
+          <tr><td>② 헤모글로빈이 다른 모양으로 접힌다고 썼다.</td><td>2점</td></tr>
+          <tr><td>③ 적혈구가 낫 모양이 되어 산소 운반이 어려워진다(빈혈)고 썼다.</td><td>2점</td></tr>
+        </table>
+        <div class="wrongbox"><div class="wt">이렇게 쓰면 0점</div>
+          <p>"염기가 바뀌어 적혈구가 바로 찌그러진다." — 아미노산·단백질(헤모글로빈) 단계를 빠뜨린 답.</p></div></div>
+    </div>
+  </div>
+  <div class="folio"><span>알짜 해설</span><span class="num">?</span></div>
+</div>
+
+<!-- ═════════════ 해설 4 ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag" style="color:var(--brand);">알짜 해설</span><span class="lesson-tag">06. 유전자에서 단백질까지</span></div>
+  <div class="solcols">
+    <div>
+      <div class="sol"><div class="shead"><span class="sno">20</span><span class="sans">모범 답안</span><span class="slink">개념 2·3</span></div>
+        <p>핵 안에서 DNA의 유전 정보를 <b>전사</b>하여 <b>RNA</b>라는 복사본을 만들고, 이 RNA가 핵 밖으로 나가 <b>리보솜</b>에 유전 정보를 전달한다. 리보솜은 RNA의 정보대로 아미노산을 연결하므로, DNA 원본이 나가지 않아도 단백질이 만들어진다.</p>
+        <table class="rubric">
+          <tr><th>채점 요소</th><th>배점</th></tr>
+          <tr><td>① 핵 안에서 DNA의 정보가 RNA로 전사된다고 썼다.</td><td>2점</td></tr>
+          <tr><td>② RNA가 핵 밖(리보솜)으로 나가 정보를 전달한다고 썼다.</td><td>2점</td></tr>
+          <tr><td>③ 리보솜이 RNA의 정보로 단백질을 합성한다(번역)고 썼다.</td><td>2점</td></tr>
+        </table>
+        <div class="wrongbox"><div class="wt">이렇게 쓰면 0점</div>
+          <p>"DNA가 조금씩 핵 밖으로 나가 리보솜과 결합한다." — 원본(DNA)은 핵 밖으로 나가지 않는다.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">21</span><span class="sans">③</span><span class="slink">개념 2 | 2점</span></div>
+        <p><b>ㄱ (옳음)</b> DNA → RNA가 전사, 핵 안의 일. <b>ㄴ (옳음)</b> RNA → 단백질이 번역, 리보솜의 일.</p>
+        <div class="wrongbox"><div class="wt">바로알기</div>
+          <p><b>ㄷ</b> (틀림 →) 세포 내 유전 정보는 DNA → RNA → 단백질 <b>한 방향</b>으로 흐른다.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">22</span><span class="sans">③</span><span class="slink">개념 5 | 2.5점</span></div>
+        <p><b>ㄱ (옳음)</b> GAG와 GUG — 가운데 염기(A → U) 하나만 다르다. <b>ㄴ (옳음)</b> 코돈 하나가 아미노산 하나를 지정하므로 글루탐산이 발린으로 바뀌었고, 그 결과 적혈구 모양까지 달라졌다.</p>
+        <div class="wrongbox"><div class="wt">바로알기</div>
+          <p><b>ㄷ</b> (틀림 →) 환자 RNA GUG의 짝을 찾으면 틀 가닥은 <b>···CAC···</b>이다. ···CTC···는 정상 RNA(GAG)의 틀 가닥이다.</p></div></div>
+    </div>
+    <div>
+      <div class="sol"><div class="shead"><span class="sno">23</span><span class="sans">⑤</span><span class="slink">개념 3·4 | 2.5점</span></div>
+        <p><b>ㄱ (옳음)</b> Ⅱ(TAC GTG CTT)의 짝은 AUG CAC GAA = X. Ⅰ을 틀로 하면 UAC GUG CUU가 된다. <b>ㄴ (옳음)</b> X와 Ⅰ은 모두 Ⅱ의 짝이므로 순서가 같고, Ⅰ의 T 자리에 U만 들어간다. <b>ㄷ (옳음)</b> AUG – CAC – GAA → 메싸이오닌 – 히스티딘 – 글루탐산.</p>
+        <div class="analysis"><div class="at">꼼꼼 자료 분석</div>
+          <svg width="300" height="112" viewBox="0 0 300 112" font-family="PC Sans">
+            <g font-size="8" font-weight="900" fill="#6B46C8" text-anchor="middle"><text x="10" y="16">Ⅰ</text><text x="10" y="44">Ⅱ</text></g>
+            <text x="10" y="76" text-anchor="middle" font-size="8" font-weight="900" fill="#D6455D">X</text>
+            <g font-size="8.4" font-weight="800" fill="#22303A" text-anchor="middle">
+              <text x="26" y="16">A</text><text x="40" y="16">T</text><text x="54" y="16">G</text><text x="68" y="16">C</text><text x="82" y="16">A</text><text x="96" y="16">C</text><text x="110" y="16">G</text><text x="124" y="16">A</text><text x="138" y="16">A</text>
+            </g>
+            <rect x="18" y="33" width="128" height="15" rx="3" fill="#F5F1FC" stroke="#6B46C8" stroke-width="1"/>
+            <g font-size="8.4" font-weight="800" fill="#22303A" text-anchor="middle">
+              <text x="26" y="44">T</text><text x="40" y="44">A</text><text x="54" y="44">C</text><text x="68" y="44">G</text><text x="82" y="44">T</text><text x="96" y="44">G</text><text x="110" y="44">C</text><text x="124" y="44">T</text><text x="138" y="44">T</text>
+            </g>
+            <g font-size="8.4" font-weight="800" fill="#D6455D" text-anchor="middle">
+              <text x="26" y="76">A</text><text x="40" y="76">U</text><text x="54" y="76">G</text><text x="68" y="76">C</text><text x="82" y="76">A</text><text x="96" y="76">C</text><text x="110" y="76">G</text><text x="124" y="76">A</text><text x="138" y="76">A</text>
+            </g>
+            <g stroke="#D6455D" stroke-width="0.9" stroke-dasharray="2 1.6"><line x1="26" y1="50" x2="26" y2="67"/><line x1="40" y1="50" x2="40" y2="67"/><line x1="124" y1="50" x2="124" y2="67"/><line x1="138" y1="50" x2="138" y2="67"/></g>
+            <g stroke="#E8940A" stroke-width="1.1" fill="none"><path d="M20,81 v4 h40 v-4"/><path d="M62,81 v4 h40 v-4"/><path d="M104,81 v4 h40 v-4"/></g>
+            <g font-size="6.4" font-weight="700" fill="#B4560E" text-anchor="middle"><text x="40" y="95">메싸이오닌</text><text x="82" y="95">히스티딘</text><text x="124" y="95">글루탐산</text></g>
+            <text x="156" y="44" font-size="6.8" font-weight="700" fill="#6B46C8">← 틀 가닥 (X의 짝)</text>
+            <text x="156" y="62" font-size="6.8" font-weight="700" fill="#D6455D">T↔A, A↔U, C↔G</text>
+            <text x="156" y="14" font-size="6.8" font-weight="700" fill="#5B6B77">Ⅰ의 T → U로 바꾸면 X</text>
+            <text x="156" y="94" font-size="6.8" font-weight="700" fill="#B4560E">3염기씩 끊어 표에서 찾기</text>
+            <text x="150" y="108" text-anchor="middle" font-size="6.8" font-weight="700" fill="#5B6B77">Ⅱ의 TAC를 표에서 찾으면 '타이로신' — 표는 RNA 기준이다</text>
+          </svg></div>
+        <div class="wrongbox"><div class="wt">함정 체크</div>
+          <p>코돈표는 <b>RNA 서열</b>로 찾는다. DNA 가닥(Ⅱ의 TAC)을 그대로 대입하면 UAC(타이로신)로 잘못 읽는다.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">24</span><span class="sans">②</span><span class="slink">개념 5 | III-05 연계 | 2점</span></div>
+        <p><b>ㄷ (옳음)</b> 아미노산 서열이 달라지면 효소가 다른 모양으로 접히고, 입체 구조가 맞는 기질하고만 결합하는 효소(기질 특이성)는 무색 물질과 결합하지 못한다 → 붉은 색소가 만들어지지 않아 흰 꽃.</p>
+        <div class="wrongbox"><div class="wt">바로알기</div>
+          <p><b>ㄱ</b> (틀림 →) 효소 A(단백질)는 <b>세포질의 리보솜</b>에서 번역되어 만들어진다. <b>ㄴ</b> (틀림 →) 효소는 반응 후에도 <b>소모되지 않는다</b>. Ⅱ가 흰 꽃인 것은 효소 A가 무색 물질과 결합하지 못하기 때문이다.</p></div></div>
+      <div class="gist" style="margin-top:3mm;">
         <div class="boxtitle"><span class="ico">알</span>이 소단원, 이것만은!</div>
         <ul>
           <li><b>염색체 ⊃ DNA ⊃ 유전자</b> — 정보 = 염기 서열 (A·G·C·T)</li>
@@ -964,12 +1391,22 @@
       </div>
     </div>
   </div>
-  <div class="folio"><span>알짜 해설</span><span class="num">208</span></div>
+  <div class="folio"><span>알짜 해설</span><span class="num">?</span></div>
 </div>
 
 <!-- ═════════════ p.154 MEMO ═════════════ -->
 <div class="page">
   <div class="runhead"><span class="unit-tag">III. 시스템과 상호작용</span><span class="lesson-tag">III단원 완주 — 통합과학 1 마무리</span></div>
+  <div class="spaced">
+    <div class="st">간격 두고 다시 꺼내기 — 책을 덮고 답한다</div>
+    <ol>
+      <li>염색체, DNA, 유전자를 큰 것부터 차례로 쓰면?</li>
+      <li>DNA 틀 가닥의 염기 A에 짝지어 붙는 RNA의 염기는?</li>
+      <li>아미노산 1개를 지정하는 RNA의 연속된 염기는 몇 개인가?</li>
+    </ol>
+    <div class="when"><span>□ 1일 뒤</span><span>□ 1주 뒤</span><span>□ 시험 전</span></div>
+    <div class="ans">정답 1 염색체 ⊃ DNA ⊃ 유전자 2 유라실(U) 3 3개(코돈)</div>
+  </div>
   <div class="memo-head"><span class="mt">MEMO</span><span class="ms">헷갈린 개념, 다시 틀린 문제 번호, 나만의 암기법을 남겨 두는 자리</span></div>
   <div class="memo-area"></div>
   <div class="memo-pen">"III단원 완주! 지구시스템부터 유전자까지 — '시스템'이라는 한 단어로 여섯 소단원을 이어서 설명해 보자. 막히는 고리가 네 약점이다. — 박찬쌤"</div>

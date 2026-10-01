@@ -229,6 +229,29 @@
   /* 화학식 첨자 — 본문 폰트를 그대로 축소해 자형이 어긋나지 않게 한다 */
   sub,sup{ font-size:0.68em; line-height:0; font-weight:inherit; }
   sub{ vertical-align:-0.14em; } sup{ vertical-align:0.34em; }
+  /* ── 2026-10-02 보강: 중요 표시 · 채점 기준 · 꼼꼼 자료 분석 · 간격 두고 다시 꺼내기 ── */
+  .must{ display:inline-block; font-size:7pt; font-weight:900; color:#fff; background:#D9534F; border-radius:1.6mm; padding:0.2mm 1.4mm; margin-right:1.2mm; vertical-align:1pt; }
+  table.rubric{ border-collapse:collapse; width:100%; font-size:7.6pt; margin:1mm 0 0.5mm; }
+  table.rubric th, table.rubric td{ border:0.25mm solid var(--line); padding:0.8mm 1.4mm; text-align:left; vertical-align:top; }
+  table.rubric th{ background:#F4F1EA; font-weight:800; white-space:nowrap; }
+  .analysis{ border:0.35mm dashed #C9A36A; border-radius:2.5mm; padding:1.6mm 2mm 1.2mm; margin:1.5mm 0; background:#FFFCF5; }
+  .analysis .at{ font-size:7.6pt; font-weight:900; color:#9C6503; margin-bottom:0.8mm; }
+  .analysis svg{ max-width:100%; height:auto; display:block; }
+  .spaced{ border:0.4mm solid var(--line); border-radius:3mm; padding:3mm 4mm 2.6mm; margin:0 0 4mm; position:relative; background:#FAFBFC; }
+  .spaced .st{ font-size:9.5pt; font-weight:900; color:var(--unit); margin-bottom:1.6mm; }
+  .spaced ol{ margin:0; padding-left:5mm; font-size:8.8pt; line-height:1.75; }
+  .spaced .when{ display:flex; gap:5mm; font-size:8pt; color:var(--sub); margin-top:1.8mm; }
+  .spaced .ans{ position:absolute; right:4mm; bottom:2.4mm; transform:rotate(180deg); font-size:6.8pt; color:var(--sub); }
+  /* 2단 문항 쪽 간격 · 발문 안 탐구 과정 상자 (합격본 chapter-08 에서) */
+  .qg2 .q{ margin-bottom:6mm; }
+  .qg2 > div > .q:last-child{ margin-bottom:0; }
+  .qg2 .choices.inline{ gap:0 4mm; }
+  .qg2 .choices{ margin-top:1.8mm; line-height:1.78; }
+  .qg2 .bogi-box{ margin-top:2mm; padding:1.8mm 2.8mm; font-size:9pt; line-height:1.72; }
+  .qg2 .bogi-box .bt{ margin-bottom:0.3mm; }
+  .qg2 .q figure{ margin:1.6mm 0 0.6mm 8.4mm !important; }
+  .exp{ border:0.35mm solid #B8C2CA; border-radius:1.6mm; background:#FAFBFC; padding:1.6mm 2.6mm; margin:1.4mm 0 1.6mm; font-size:8.9pt; line-height:1.7; }
+  .exp b{ font-family:'PC Sans'; font-size:7.8pt; font-weight:900; color:var(--brand); }
 </style>
 </head>
 <body>
@@ -793,7 +816,7 @@
             <line x1="36" y1="112" x2="446" y2="112" stroke="#5B6B77" stroke-width="1.2" marker-end="url(#arrP)"/>
             <line x1="36" y1="112" x2="36" y2="14" stroke="#5B6B77" stroke-width="1.2" marker-end="url(#arrP)"/>
             <text x="444" y="124" text-anchor="end" fill="#5B6B77">시간 →</text>
-            <text x="42" y="12" fill="#5B6B77">생물다양성(종 수)</text>
+            <text x="42" y="12" fill="#5B6B77">생물다양성(과의 수)</text>
             <!-- 다양성 곡선: 높이 = 과의 수 비례 (고생대 말 낙폭 최대·약 절반 / 중생대 말은 그보다 작게 / 현재가 역대 최고) -->
             <line x1="36" y1="62" x2="444" y2="62" stroke="#C9BA9B" stroke-width="0.7" stroke-dasharray="3 2.5"/>
             <text x="443" y="59" text-anchor="end" font-size="6" fill="#7A6A45">고생대 최고 수준 (비교 기준선)</text>
@@ -922,7 +945,7 @@
   <div class="folio"><span>I. 변화와 다양성</span><span class="num">15</span></div>
 </div>
 
-<!-- ═════════════ p.16 STEP 1 + STEP 2 시작 ═════════════ -->
+<!-- ═════════════ p.16 STEP 1 + STEP 2 시작 (7~10) ═════════════ -->
 <div class="page">
   <div class="runhead"><span class="unit-tag">I. 변화와 다양성</span><span class="lesson-tag">01. 지질시대와 생물의 변천 | 문제</span></div>
 
@@ -944,163 +967,433 @@
 
   <div class="step-head s2"><span class="stepno">STEP 2</span><span class="steptt">내신 완성</span><span class="stepdesc">학교 시험 유형 그대로 — 서술형까지 한 번에</span></div>
 
-  <div class="q">
-    <div class="qhead"><span class="qno">7</span><div class="stem">지질시대에 대한 설명으로 옳은 것은? <span class="difficulty">●●○</span>
-    <div class="tags">10통과2-01-01 | 개념 1</div></div></div>
-    <ul class="choices">
-      <li>① 지질시대는 같은 시간 간격으로 나눈 것이다.</li>
-      <li>② 구분 기준은 지층 속 생물계(화석)의 급격한 변화다.</li>
-      <li>③ 고생대가 지구 역사의 대부분을 차지한다.</li>
-      <li>④ 시대 순서는 신생대 → 중생대 → 고생대이다.</li>
-      <li>⑤ 선캄브리아 시대에는 생물이 전혀 없었다.</li>
-    </ul>
-  </div>
+  <div class="qgrid qg2">
+    <div>
+      <div class="q">
+        <div class="qhead"><span class="qno">7</span><div class="stem">지질시대에 대한 설명으로 옳은 것은? <span class="difficulty">●○○</span>
+        <div class="tags">10통과2-01-01 | 개념 1</div></div></div>
+        <ul class="choices">
+          <li>① 지질시대는 같은 시간 간격으로 나눈 것이다.</li>
+          <li>② 구분 기준은 지층 속 생물계(화석)의 급격한 변화다.</li>
+          <li>③ 고생대가 지구 역사의 대부분을 차지한다.</li>
+          <li>④ 시대 순서는 신생대 → 중생대 → 고생대이다.</li>
+          <li>⑤ 선캄브리아 시대에는 생물이 전혀 없었다.</li>
+        </ul>
+      </div>
 
-  <div class="q">
-    <div class="qhead"><span class="qno">8</span><div class="stem">표준 화석과 시상 화석에 대한 설명으로 옳은 것은? <span class="difficulty">●●●</span>
-    <div class="tags">10통과2-01-01 | 개념 2</div></div></div>
-    <ul class="choices">
-      <li>① 표준 화석은 오랜 기간 생존한 생물일수록 좋다.</li>
-      <li>② 시상 화석은 지층의 생성 시대를 알려 준다.</li>
-      <li>③ 산호 화석은 당시 그곳이 따뜻하고 얕은 바다였음을 알려 준다.</li>
-      <li>④ 매머드는 중생대의 표준 화석이다.</li>
-      <li>⑤ 표준 화석은 좁은 지역에만 분포할수록 좋다.</li>
-    </ul>
+      <div class="q">
+        <div class="qhead"><span class="qno">8</span><div class="stem"><span class="badge-data">자료</span>그림은 지구의 역사 46억 년을 실제 비율대로 나타낸 띠와, 그중 마지막 약 5.41억 년을 늘려 나타낸 띠이다. A~D는 각각 하나의 지질시대이다. 옳은 것만을 &lt;보기&gt;에서 있는 대로 고른 것은? <span class="difficulty">●●○</span>
+        <div class="tags">10통과2-01-01 | 개념 1 (개념 2 연계)</div></div></div>
+        <figure style="margin:2mm 0 1mm 8.4mm;">
+          <svg width="280" height="84" viewBox="0 0 280 84" font-family="PC Sans">
+            <text x="10" y="8" font-size="7" font-weight="800" fill="#7A6A45">46억 년 전체 (실제 비율)</text>
+            <rect x="10" y="12" width="229.4" height="15" fill="#E8D5C4"/>
+            <rect x="239.4" y="12" width="16.3" height="15" fill="#E0A57E"/>
+            <rect x="255.7" y="12" width="10.6" height="15" fill="#D98A5B"/>
+            <rect x="266.3" y="12" width="3.7" height="15" fill="#C1521E"/>
+            <text x="124.7" y="23" text-anchor="middle" font-size="8.6" font-weight="900" fill="#7A6A45">A</text>
+            <text x="10" y="36" font-size="7" fill="#5B6B77">46억 년 전</text>
+            <path d="M239.4,27 L10,44 M270,27 L270,44" stroke="#C9BA9B" stroke-width="0.9" stroke-dasharray="2.5 2" fill="none"/>
+            <rect x="10" y="44" width="138.9" height="16" fill="#E0A57E"/>
+            <rect x="148.9" y="44" width="89.4" height="16" fill="#D98A5B"/>
+            <rect x="238.3" y="44" width="31.7" height="16" fill="#C1521E"/>
+            <g font-size="8.6" font-weight="900" text-anchor="middle">
+              <text x="79.5" y="55.5" fill="#7A3E14">B</text>
+              <text x="193.6" y="55.5" fill="#fff">C</text>
+              <text x="254.2" y="55.5" fill="#fff">D</text>
+            </g>
+            <g stroke="#5B6B77" stroke-width="0.8"><line x1="10" y1="60" x2="10" y2="64"/><line x1="148.9" y1="60" x2="148.9" y2="64"/><line x1="238.3" y1="60" x2="238.3" y2="64"/><line x1="270" y1="60" x2="270" y2="64"/></g>
+            <g font-size="7" fill="#5B6B77">
+              <text x="10" y="72">5.41억 년 전</text>
+              <text x="238.3" y="72" text-anchor="middle">6600만 년 전</text>
+              <text x="148.9" y="81" text-anchor="middle">2.52억 년 전</text>
+              <text x="270" y="81" text-anchor="end">현재</text>
+            </g>
+          </svg>
+        </figure>
+        <div class="bogi-box">
+          <div class="bt">보기</div>
+          ㄱ. A는 지구 역사의 약 88&nbsp;%를 차지한다.<br>
+          ㄴ. 삼엽충과 공룡은 각각 B와 C의 표준 화석이다.<br>
+          ㄷ. 시대의 경계는 생물계(화석)가 급변한 시기이다.
+        </div>
+        <ul class="choices inline">
+          <li>① ㄱ</li><li>② ㄷ</li><li>③ ㄱ, ㄴ</li><li>④ ㄴ, ㄷ</li><li>⑤ ㄱ, ㄴ, ㄷ</li>
+        </ul>
+      </div>
+    </div>
+    <div>
+      <div class="q">
+        <div class="qhead"><span class="qno">9</span><div class="stem"><span class="must">중요</span>표준 화석과 시상 화석에 대한 설명으로 옳은 것은? <span class="difficulty">●●○</span>
+        <div class="tags">10통과2-01-01 | 개념 2</div></div></div>
+        <ul class="choices">
+          <li>① 표준 화석은 오랜 기간 생존한 생물일수록 좋다.</li>
+          <li>② 시상 화석은 지층의 생성 시대를 알려 준다.</li>
+          <li>③ 산호 화석은 따뜻하고 얕은 바다였음을 알려 준다.</li>
+          <li>④ 매머드는 중생대의 표준 화석이다.</li>
+          <li>⑤ 표준 화석은 좁은 지역에만 분포할수록 좋다.</li>
+        </ul>
+      </div>
+
+      <div class="q">
+        <div class="qhead"><span class="qno">10</span><div class="stem"><span class="badge-data">자료</span>그림은 생물 A~C가 살았던 기간과 분포 지역을 나타낸 것이다. 옳은 것만을 &lt;보기&gt;에서 있는 대로 고른 것은? <span class="difficulty">●●○</span>
+        <div class="tags">10통과2-01-01 | 개념 2</div></div></div>
+        <figure style="margin:2mm 0 1mm 8.4mm;">
+          <svg width="280" height="98" viewBox="0 0 280 98" font-family="PC Sans">
+            <rect x="0.5" y="0.5" width="279" height="16" fill="#FBEFE7"/>
+            <rect x="0.5" y="0.5" width="279" height="86" fill="none" stroke="#B8C2CA" stroke-width="0.9"/>
+            <g stroke="#B8C2CA" stroke-width="0.8">
+              <line x1="0.5" y1="16.5" x2="279.5" y2="16.5"/><line x1="0.5" y1="40.5" x2="279.5" y2="40.5"/><line x1="0.5" y1="63.5" x2="279.5" y2="63.5"/>
+              <line x1="30" y1="0.5" x2="30" y2="86.5"/><line x1="196" y1="0.5" x2="196" y2="86.5"/>
+            </g>
+            <g stroke="#D8CFC0" stroke-width="0.7" stroke-dasharray="2 1.6"><line x1="85.3" y1="0.5" x2="85.3" y2="86.5"/><line x1="140.7" y1="0.5" x2="140.7" y2="86.5"/></g>
+            <g font-size="7.4" font-weight="800" fill="#C1521E" text-anchor="middle"><text x="15" y="11.5">생물</text><text x="57.6" y="11.5">고생대</text><text x="113" y="11.5">중생대</text><text x="168.3" y="11.5">신생대</text><text x="238" y="11.5">분포 지역</text></g>
+            <g font-size="8" font-weight="900" fill="#22303A" text-anchor="middle"><text x="15" y="31.5">A</text><text x="15" y="55">B</text><text x="15" y="78">C</text></g>
+            <g fill="#C1521E">
+              <rect x="44" y="25" width="24" height="7" rx="3.5"/>
+              <rect x="34" y="48.5" width="162" height="7" rx="3.5"/>
+              <rect x="101" y="71.5" width="22" height="7" rx="3.5"/>
+            </g>
+            <g text-anchor="middle" fill="#22303A">
+              <text x="238" y="27.5" font-size="7.4" font-weight="800">넓음</text><text x="238" y="36.5" font-size="6.8" fill="#5B6B77">(전 세계의 바다)</text>
+              <text x="238" y="50.5" font-size="7.4" font-weight="800">좁음</text><text x="238" y="59.5" font-size="6.8" fill="#5B6B77">(따뜻하고 얕은 바다)</text>
+              <text x="238" y="73.5" font-size="7.4" font-weight="800">좁음</text><text x="238" y="82.5" font-size="6.8" fill="#5B6B77">(한 지역)</text>
+            </g>
+            <text x="1" y="96" font-size="6.4" fill="#5B6B77">막대 = 살았던 기간(오른쪽 끝 = 현재) · 시대 칸의 폭은 실제 비율과 다름</text>
+          </svg>
+        </figure>
+        <div class="bogi-box">
+          <div class="bt">보기</div>
+          ㄱ. 표준 화석으로 가장 알맞은 것은 C이다.<br>
+          ㄴ. B의 화석으로 지층의 시대를 좁혀 알 수 있다.<br>
+          ㄷ. B의 화석이 나온 곳은 따뜻하고 얕은 바다였다.
+        </div>
+        <ul class="choices inline">
+          <li>① ㄱ</li><li>② ㄷ</li><li>③ ㄱ, ㄴ</li><li>④ ㄴ, ㄷ</li><li>⑤ ㄱ, ㄴ, ㄷ</li>
+        </ul>
+      </div>
+    </div>
   </div>
 
   <div class="folio"><span>I. 변화와 다양성</span><span class="num">16</span></div>
 </div>
 
-<!-- ═════════════ p.17 STEP 2 계속 ═════════════ -->
+<!-- ═════════════ STEP 2 계속 (11~15) ═════════════ -->
 <div class="page">
   <div class="runhead"><span class="unit-tag">I. 변화와 다양성</span><span class="lesson-tag">01. 지질시대와 생물의 변천 | 문제</span></div>
 
-  <div class="q">
-    <div class="qhead"><span class="qno">9</span><div class="stem"><span class="badge-data">자료</span>지구의 역사 46억 년을 1년 달력으로 환산하면 하루는 약 1260만 년이 된다. 약 6600만 년 전에 일어난 중생대 말 대멸종은 달력에서 언제쯤인가? <span class="difficulty">●●●</span>
-    <div class="tags">10통과2-01-01 | 개념 4·자료</div></div></div>
-    <ul class="choices inline">
-      <li>① 11월 초</li>
-      <li>② 12월 26일경</li>
-      <li>③ 12월 1일경</li>
-      <li>④ 12월 31일 자정 직전</li>
-      <li>⑤ 10월 중순</li>
-    </ul>
-  </div>
+  <div class="qgrid qg2">
+    <div>
+      <div class="q">
+        <div class="qhead"><span class="qno">11</span><div class="stem">지질시대와 그 시대를 대표하는 생물을 옳게 짝 지은 것은? <span class="difficulty">●○○</span>
+        <div class="tags">10통과2-01-01 | 개념 3</div></div></div>
+        <ul class="choices">
+          <li>① 중생대 – 겉씨식물</li>
+          <li>② 고생대 – 속씨식물</li>
+          <li>③ 신생대 – 암모나이트</li>
+          <li>④ 선캄브리아 시대 – 양서류</li>
+          <li>⑤ 중생대 – 매머드</li>
+        </ul>
+      </div>
 
-  <div class="q">
-    <div class="qhead"><span class="qno">10</span><div class="stem">지질시대 생물의 변천에 대한 설명으로 옳은 것만을 고른 것은? <span class="difficulty">●●●</span>
-    <div class="tags">10통과2-01-01 | 개념 3·5</div></div></div>
-    <div class="bogi-box" style="background:#fff;">
-      (가) 고생대에는 삼엽충이 번성했고 생물의 육상 진출이 일어났다.<br>
-      (나) 포유류가 크게 번성한 것은 공룡이 멸종한 신생대부터이다.<br>
-      (다) 속씨식물은 고생대를 대표하는 식물이다.
+      <div class="q">
+        <div class="qhead"><span class="qno">12</span><div class="stem"><span class="badge-data">탐구</span>다음은 지구의 역사를 종이 띠에 나타내는 활동이다.
+          <div class="exp"><b>[과정]</b> (가) 길이 4.6&nbsp;m인 종이 띠의 한쪽 끝을 '현재', 다른 쪽 끝을 '지구 탄생(46억 년 전)'으로 정한다.<br>(나) 1&nbsp;cm를 1000만 년으로 하여, 주요 사건이 일어난 때를 '현재' 쪽 끝에서부터 잰 거리에 표시한다.<br><b>[결과]</b> 고생대 시작: 54.1&nbsp;cm, 중생대 시작: ㉠, 공룡 멸종: 6.6&nbsp;cm</div>
+          이에 대한 설명으로 옳은 것만을 &lt;보기&gt;에서 있는 대로 고른 것은? <span class="difficulty">●●●</span>
+        <div class="tags">10통과2-01-01 | 개념 1, 탐구</div></div></div>
+        <div class="bogi-box">
+          <div class="bt">보기</div>
+          ㄱ. ㉠은 2.52&nbsp;cm이다.<br>
+          ㄴ. 종이 띠에서 선캄브리아 시대에 해당하는 길이는 4&nbsp;m보다 길다.<br>
+          ㄷ. 종이 띠에서 고생대에 해당하는 길이는 중생대에 해당하는 길이보다 길다.
+        </div>
+        <ul class="choices inline">
+          <li>① ㄱ</li><li>② ㄷ</li><li>③ ㄱ, ㄴ</li><li>④ ㄴ, ㄷ</li><li>⑤ ㄱ, ㄴ, ㄷ</li>
+        </ul>
+      </div>
     </div>
-    <ul class="choices inline">
-      <li>① (가)</li><li>② (가), (나)</li><li>③ (나)</li><li>④ (나), (다)</li><li>⑤ (가), (나), (다)</li>
-    </ul>
-  </div>
+    <div>
+      <div class="q">
+        <div class="qhead"><span class="qno">13</span><div class="stem"><span class="badge-data">자료</span>지구의 역사 46억 년을 1년 달력으로 환산하면 하루는 약 1260만 년이다. 약 6600만 년 전의 중생대 말 대멸종은 달력에서 언제쯤인가? <span class="difficulty">●●○</span>
+        <div class="tags">10통과2-01-01 | 개념 4, 자료 파헤치기</div></div></div>
+        <ul class="choices inline">
+          <li>① 11월 초</li>
+          <li>② 12월 26일경</li>
+          <li>③ 12월 1일경</li>
+          <li>④ 12월 31일 자정 직전</li>
+          <li>⑤ 10월 중순</li>
+        </ul>
+      </div>
 
-  <div class="q">
-    <div class="qhead"><span class="qno">11</span><div class="stem"><span class="badge-essay">서술형</span>고생대에 생물이 육지로 진출할 수 있었던 까닭을 <b>'광합성'과 '오존층'</b>이라는 말을 포함하여 서술하시오. <span class="difficulty">●●●●</span>
-    <div class="tags">10통과2-01-01 | 개념 3</div></div></div>
-    <div class="essay-lines"><div></div><div></div><div></div></div>
+      <div class="q">
+        <div class="qhead"><span class="qno">14</span><div class="stem"><span class="must">중요</span><span class="badge-data">자료</span>표는 지질시대에 있었던 두 번의 대멸종 (가)와 (나)를 비교한 것이다. 옳은 것만을 &lt;보기&gt;에서 있는 대로 고른 것은? <span class="difficulty">●●○</span>
+        <div class="tags">10통과2-01-01 | 개념 4</div></div></div>
+        <figure style="margin:2mm 0 1mm 8.4mm;">
+          <svg width="280" height="76" viewBox="0 0 280 76" font-family="PC Sans">
+            <rect x="1" y="1" width="278" height="24" fill="#FBEFE7"/>
+            <rect x="1" y="1" width="278" height="74" fill="none" stroke="#B8C2CA" stroke-width="0.9"/>
+            <g stroke="#B8C2CA" stroke-width="0.8"><line x1="1" y1="25" x2="279" y2="25"/><line x1="1" y1="50" x2="279" y2="50"/><line x1="78" y1="1" x2="78" y2="75"/><line x1="178" y1="1" x2="178" y2="75"/></g>
+            <g font-size="8.4" font-weight="800" fill="#C1521E" text-anchor="middle"><text x="39.5" y="16.5">구분</text><text x="128" y="16.5">(가)</text><text x="228.5" y="16.5">(나)</text></g>
+            <g font-size="8.6" fill="#22303A" text-anchor="middle">
+              <text x="39.5" y="41" font-weight="800">유력한 원인</text><text x="128" y="41">거대한 화산 분출</text><text x="228.5" y="41">소행성 충돌</text>
+              <text x="39.5" y="66" font-weight="800">사라진 생물</text><text x="128" y="66">삼엽충</text><text x="228.5" y="66">공룡, 암모나이트</text>
+            </g>
+          </svg>
+        </figure>
+        <div class="bogi-box">
+          <div class="bt">보기</div>
+          ㄱ. (가)는 (나)보다 먼저 일어났다.<br>
+          ㄴ. 바다 생물 종이 사라진 비율은 (나)가 더 컸다.<br>
+          ㄷ. (나)에서는 충돌로 생긴 먼지가 햇빛을 가려 지구의 기온이 높아졌다.
+        </div>
+        <ul class="choices inline">
+          <li>① ㄱ</li><li>② ㄷ</li><li>③ ㄱ, ㄴ</li><li>④ ㄴ, ㄷ</li><li>⑤ ㄱ, ㄴ, ㄷ</li>
+        </ul>
+      </div>
+
+      <div class="q">
+        <div class="qhead"><span class="qno">15</span><div class="stem">대멸종과 생물다양성에 대해 옳은 것은? <span class="difficulty">●○○</span>
+        <div class="tags">10통과2-01-01 | 개념 5</div></div></div>
+        <ul class="choices">
+          <li>① 대멸종 뒤 생존자가 빈자리로 퍼져 다양해졌다.</li>
+          <li>② 줄어든 생물다양성은 수십 년 안에 회복된다.</li>
+          <li>③ 포유류의 다양화는 공룡 멸종 전에 일어났다.</li>
+          <li>④ 생물다양성은 대멸종 때마다 줄어들기만 했다.</li>
+          <li>⑤ 여섯 번째 대멸종의 원인은 화산 분출이다.</li>
+        </ul>
+      </div>
+    </div>
   </div>
 
   <div class="folio"><span>I. 변화와 다양성</span><span class="num">17</span></div>
 </div>
 
-<!-- ═════════════ p.18 STEP 3 ═════════════ -->
+<!-- ═════════════ STEP 2 계속 (16~17) + 서술형 (18~20) ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag">I. 변화와 다양성</span><span class="lesson-tag">01. 지질시대와 생물의 변천 | 문제</span></div>
+
+  <div class="qgrid qg2">
+    <div>
+      <div class="q">
+        <div class="qhead"><span class="qno">16</span><div class="stem"><span class="must">중요</span>다음은 대멸종에 대한 학생 A~C의 대화이다. 옳게 말한 학생만을 있는 대로 고른 것은? <span class="difficulty">●●○</span>
+        <div class="tags">10통과2-01-01 | 개념 4·5</div></div></div>
+        <div class="bogi-box">
+          <b>학생 A</b> : 대멸종은 환경 변화가 없어도 생물이 수명을 다해 한꺼번에 사라진 사건이야.<br>
+          <b>학생 B</b> : 지질시대의 경계에서는 대멸종의 흔적이 발견되는 경우가 많아.<br>
+          <b>학생 C</b> : 공룡이 사라진 빈자리에서 포유류가 다양해졌으니, 대멸종은 생물다양성이 재편되는 계기이기도 해.
+        </div>
+        <ul class="choices inline">
+          <li>① A</li><li>② C</li><li>③ A, B</li><li>④ B, C</li><li>⑤ A, B, C</li>
+        </ul>
+      </div>
+
+      <div class="q">
+        <div class="qhead"><span class="qno">17</span><div class="stem">지질시대 생물의 변천에 대해 옳은 것만을 &lt;보기&gt;에서 있는 대로 고른 것은? <span class="difficulty">●●○</span>
+        <div class="tags">10통과2-01-01 | 개념 3 (개념 5 연계)</div></div></div>
+        <div class="bogi-box">
+          <div class="bt">보기</div>
+          ㄱ. 고생대에는 삼엽충이 번성했고 생물의 육상 진출이 일어났다.<br>
+          ㄴ. 포유류가 크게 번성한 것은 공룡이 멸종한 신생대부터이다.<br>
+          ㄷ. 속씨식물은 고생대를 대표하는 식물이다.
+        </div>
+        <ul class="choices inline">
+          <li>① ㄱ</li><li>② ㄷ</li><li>③ ㄱ, ㄴ</li><li>④ ㄴ, ㄷ</li><li>⑤ ㄱ, ㄴ, ㄷ</li>
+        </ul>
+      </div>
+
+      <div class="q">
+        <div class="qhead"><span class="qno">18</span><div class="stem"><span class="badge-essay">서술형</span>고생대에 생물이 육지로 진출할 수 있었던 까닭을 <b>'광합성'</b>, <b>'오존층'</b>, <b>'자외선'</b>을 모두 포함하여 서술하시오. <span class="difficulty">●●○</span>
+        <div class="tags">10통과2-01-01 | 개념 3</div></div></div>
+        <div class="essay-lines"><div></div><div></div><div></div><div></div><div></div></div>
+      </div>
+    </div>
+    <div>
+      <div class="q">
+        <div class="qhead"><span class="qno">19</span><div class="stem"><span class="must">중요</span><span class="badge-essay">서술형</span>삼엽충 화석은 표준 화석으로 쓰인다. 표준 화석으로 알맞은 생물의 조건을 <b>'생존 기간'</b>, <b>'분포 지역'</b>을 모두 포함하여 쓰고, 각 조건이 필요한 까닭을 서술하시오. <span class="difficulty">●●●</span>
+        <div class="tags">10통과2-01-01 | 개념 2</div></div></div>
+        <div class="essay-lines"><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>
+      </div>
+
+      <div class="q">
+        <div class="qhead"><span class="qno">20</span><div class="stem"><span class="badge-essay">서술형</span>대멸종 뒤 생물다양성이 회복되고 오히려 이전보다 높아질 수 있었던 까닭을 <b>'빈자리'</b>, <b>'살아남은 생물'</b>을 모두 포함하여 서술하시오. <span class="difficulty">●●○</span>
+        <div class="tags">10통과2-01-01 | 개념 5</div></div></div>
+        <div class="essay-lines"><div></div><div></div><div></div><div></div><div></div><div></div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="folio"><span>I. 변화와 다양성</span><span class="num">?</span></div>
+</div>
+
+<!-- ═════════════ STEP 3 (21~24) ═════════════ -->
 <div class="page">
   <div class="runhead"><span class="unit-tag">I. 변화와 다양성</span><span class="lesson-tag">01. 지질시대와 생물의 변천 | 문제</span></div>
   <div class="step-head s3"><span class="stepno">STEP 3</span><span class="steptt">수능 도전</span><span class="stepdesc">2028 수능 규격 — ㄱㄴㄷ 합답형·자료 해석</span></div>
 
-  <div class="q">
-    <div class="qhead"><span class="qno">12</span><div class="stem"><span class="badge-data">자료</span>그림은 서로 다른 지역의 지층 (가)와 (나)에서 발견된 화석을 나타낸 것이다. (가)에서는 삼엽충 화석이, (나)에서는 공룡 알 화석과 고사리 화석이 발견되었다. 옳은 것만을 &lt;보기&gt;에서 있는 대로 고른 것은? <span class="difficulty">[2점]</span>
-    <div class="tags">10통과2-01-01</div></div></div>
-    <figure style="margin:2mm 0 1.5mm 8.6mm;">
-      <svg width="280" height="86" viewBox="0 0 280 86" font-family="PC Sans">
-        <!-- (가) 지층 -->
-        <g>
-          <rect x="14" y="16" width="110" height="18" fill="#EBE3D8" stroke="#B9AC99" stroke-width="0.8"/>
-          <rect x="14" y="34" width="110" height="20" fill="#DFD4C4" stroke="#B9AC99" stroke-width="0.8"/>
-          <rect x="14" y="54" width="110" height="16" fill="#D2C4AE" stroke="#B9AC99" stroke-width="0.8"/>
-          <!-- 삼엽충 -->
-          <g transform="translate(69,44)">
-            <ellipse cx="0" cy="0" rx="9" ry="6.5" fill="#8A7A63"/>
-            <line x1="-9" y1="-2" x2="9" y2="-2" stroke="#EFE8DC" stroke-width="0.9"/>
-            <line x1="-9" y1="1" x2="9" y2="1" stroke="#EFE8DC" stroke-width="0.9"/>
-            <line x1="0" y1="-6.5" x2="0" y2="6.5" stroke="#EFE8DC" stroke-width="0.9"/>
-          </g>
-          <text x="69" y="80" text-anchor="middle" font-size="7.4" font-weight="800" fill="#4A5964">(가) 삼엽충 화석</text>
-        </g>
-        <!-- (나) 지층 -->
-        <g>
-          <rect x="156" y="16" width="110" height="18" fill="#EAE0E0" stroke="#B9A4A4" stroke-width="0.8"/>
-          <rect x="156" y="34" width="110" height="20" fill="#E0D0CC" stroke="#B9A4A4" stroke-width="0.8"/>
-          <rect x="156" y="54" width="110" height="16" fill="#D4BFB8" stroke="#B9A4A4" stroke-width="0.8"/>
-          <!-- 공룡 알 -->
-          <ellipse cx="192" cy="44" rx="7" ry="9" fill="#CFC5B4" stroke="#8A7A63" stroke-width="1"/>
-          <ellipse cx="203" cy="46" rx="6" ry="8" fill="#DED5C6" stroke="#8A7A63" stroke-width="1"/>
-          <!-- 고사리 잎 -->
-          <g stroke="#5E7D57" stroke-width="1.1" fill="none">
-            <path d="M238,54 q2,-14 4,-22"/>
-            <path d="M240,40 q-6,-2 -9,-6"/><path d="M240,40 q6,-2 9,-6"/>
-            <path d="M239,47 q-6,-1 -10,-4"/><path d="M239,47 q7,-1 10,-4"/>
-          </g>
-          <text x="211" y="80" text-anchor="middle" font-size="7.4" font-weight="800" fill="#4A5964">(나) 공룡 알 화석 + 고사리 화석</text>
-        </g>
-      </svg>
-    </figure>
-    <div class="bogi-box">
-      <div class="bt">보기</div>
-      ㄱ. (가)는 고생대, (나)는 중생대에 쌓인 지층이다.<br>
-      ㄴ. (나)의 고사리 화석으로 당시 그곳이 따뜻하고 습했음을 알 수 있다.<br>
-      ㄷ. (가)의 지층이 (나)의 지층보다 나중에 쌓였다.
-    </div>
-    <ul class="choices inline">
-      <li>① ㄱ</li><li>② ㄷ</li><li>③ ㄱ, ㄴ</li><li>④ ㄴ, ㄷ</li><li>⑤ ㄱ, ㄴ, ㄷ</li>
-    </ul>
-  </div>
+  <div class="qgrid qg2">
+    <div>
+      <div class="q">
+        <div class="qhead"><span class="qno">21</span><div class="stem"><span class="badge-data">자료</span>그림은 서로 다른 지역의 지층 (가)와 (나)에서 발견된 화석을 나타낸 것이다. (가)에서는 삼엽충 화석이, (나)에서는 공룡 알 화석과 고사리 화석이 발견되었다. 옳은 것만을 &lt;보기&gt;에서 있는 대로 고른 것은? <span class="difficulty">●●○ [2점]</span>
+        <div class="tags">10통과2-01-01 | 개념 2</div></div></div>
+        <figure style="margin:2mm 0 1.5mm 8.6mm;">
+          <svg width="280" height="86" viewBox="0 0 280 86" font-family="PC Sans">
+            <!-- (가) 지층 -->
+            <g>
+              <rect x="14" y="16" width="110" height="18" fill="#EBE3D8" stroke="#B9AC99" stroke-width="0.8"/>
+              <rect x="14" y="34" width="110" height="20" fill="#DFD4C4" stroke="#B9AC99" stroke-width="0.8"/>
+              <rect x="14" y="54" width="110" height="16" fill="#D2C4AE" stroke="#B9AC99" stroke-width="0.8"/>
+              <!-- 삼엽충 -->
+              <g transform="translate(69,44)">
+                <ellipse cx="0" cy="0" rx="9" ry="6.5" fill="#8A7A63"/>
+                <line x1="-9" y1="-2" x2="9" y2="-2" stroke="#EFE8DC" stroke-width="0.9"/>
+                <line x1="-9" y1="1" x2="9" y2="1" stroke="#EFE8DC" stroke-width="0.9"/>
+                <line x1="0" y1="-6.5" x2="0" y2="6.5" stroke="#EFE8DC" stroke-width="0.9"/>
+              </g>
+              <text x="69" y="80" text-anchor="middle" font-size="7.4" font-weight="800" fill="#4A5964">(가) 삼엽충 화석</text>
+            </g>
+            <!-- (나) 지층 -->
+            <g>
+              <rect x="156" y="16" width="110" height="18" fill="#EAE0E0" stroke="#B9A4A4" stroke-width="0.8"/>
+              <rect x="156" y="34" width="110" height="20" fill="#E0D0CC" stroke="#B9A4A4" stroke-width="0.8"/>
+              <rect x="156" y="54" width="110" height="16" fill="#D4BFB8" stroke="#B9A4A4" stroke-width="0.8"/>
+              <!-- 공룡 알 -->
+              <ellipse cx="192" cy="44" rx="7" ry="9" fill="#CFC5B4" stroke="#8A7A63" stroke-width="1"/>
+              <ellipse cx="203" cy="46" rx="6" ry="8" fill="#DED5C6" stroke="#8A7A63" stroke-width="1"/>
+              <!-- 고사리 잎 -->
+              <g stroke="#5E7D57" stroke-width="1.1" fill="none">
+                <path d="M238,54 q2,-14 4,-22"/>
+                <path d="M240,40 q-6,-2 -9,-6"/><path d="M240,40 q6,-2 9,-6"/>
+                <path d="M239,47 q-6,-1 -10,-4"/><path d="M239,47 q7,-1 10,-4"/>
+              </g>
+              <text x="211" y="80" text-anchor="middle" font-size="7.4" font-weight="800" fill="#4A5964">(나) 공룡 알 화석 + 고사리 화석</text>
+            </g>
+          </svg>
+        </figure>
+        <div class="bogi-box">
+          <div class="bt">보기</div>
+          ㄱ. (가)는 고생대, (나)는 중생대에 쌓인 지층이다.<br>
+          ㄴ. (나)의 고사리 화석으로 당시 그곳이 따뜻하고 습했음을 알 수 있다.<br>
+          ㄷ. (가)의 지층이 (나)의 지층보다 나중에 쌓였다.
+        </div>
+        <ul class="choices inline">
+          <li>① ㄱ</li><li>② ㄷ</li><li>③ ㄱ, ㄴ</li><li>④ ㄴ, ㄷ</li><li>⑤ ㄱ, ㄴ, ㄷ</li>
+        </ul>
+      </div>
 
-  <div class="q">
-    <div class="qhead"><span class="qno">13</span><div class="stem"><span class="badge-data">자료</span>그림은 지질시대 동안 생물다양성(과의 수)의 변화를 나타낸 것으로, A와 B는 각각 고생대 말과 중생대 말의 대멸종 시기이다. 옳은 것만을 &lt;보기&gt;에서 있는 대로 고른 것은? <span class="difficulty">[2.5점]</span>
-    <div class="tags">10통과2-01-01</div></div></div>
-    <figure style="margin:2mm 0 1mm 8.6mm;">
-      <svg width="280" height="92" viewBox="0 0 280 92" font-family="PC Sans">
-        <line x1="26" y1="76" x2="270" y2="76" stroke="#5B6B77" stroke-width="1.1" marker-end="url(#arrP)"/>
-        <line x1="26" y1="76" x2="26" y2="8" stroke="#5B6B77" stroke-width="1.1" marker-end="url(#arrP)"/>
-        <text x="268" y="88" text-anchor="end" font-size="6.6" fill="#5B6B77">시간</text>
-        <text x="30" y="8" font-size="6.6" fill="#5B6B77">다양성</text>
-        <path d="M34,70 C52,66 80,58 100,52 L108,64 C128,60 150,54 168,50 L176,56 C204,50 234,38 258,26" fill="none" stroke="#C1521E" stroke-width="2"/>
-        <g stroke="#D6455D" stroke-width="1.1" stroke-dasharray="2.5 2">
-          <line x1="100" y1="52" x2="100" y2="76"/><line x1="168" y1="50" x2="168" y2="76"/>
-        </g>
-        <text x="100" y="86" text-anchor="middle" font-size="7" font-weight="800" fill="#A9556A">A</text>
-        <text x="168" y="86" text-anchor="middle" font-size="7" font-weight="800" fill="#C1521E">B</text>
-      </svg>
-    </figure>
-    <div class="bogi-box">
-      <div class="bt">보기</div>
-      ㄱ. A 이후 삼엽충 화석은 더 이상 발견되지 않는다.<br>
-      ㄴ. B의 유력한 원인은 소행성 충돌에 따른 급격한 환경 변화다.<br>
-      ㄷ. 대멸종 이후 생물다양성은 회복되지 못하고 계속 감소했다.
+      <div class="q">
+        <div class="qhead"><span class="qno">22</span><div class="stem"><span class="badge-data">자료</span>그림은 지질시대 동안 생물다양성(과의 수)의 변화를 나타낸 것으로, A와 B는 각각 고생대 말과 중생대 말의 대멸종 시기이다. 옳은 것만을 &lt;보기&gt;에서 있는 대로 고른 것은? <span class="difficulty">●●● [2.5점]</span>
+        <div class="tags">10통과2-01-01 | 개념 4·5</div></div></div>
+        <figure style="margin:2mm 0 1mm 8.6mm;">
+          <svg width="280" height="92" viewBox="0 0 280 92" font-family="PC Sans">
+            <line x1="26" y1="76" x2="270" y2="76" stroke="#5B6B77" stroke-width="1.1" marker-end="url(#arrP)"/>
+            <line x1="26" y1="76" x2="26" y2="8" stroke="#5B6B77" stroke-width="1.1" marker-end="url(#arrP)"/>
+            <text x="268" y="88" text-anchor="end" font-size="6.6" fill="#5B6B77">시간</text>
+            <text x="30" y="8" font-size="6.6" fill="#5B6B77">다양성</text>
+            <path d="M34,70 C52,66 80,58 100,52 L108,64 C128,60 150,54 168,50 L176,56 C204,50 234,38 258,26" fill="none" stroke="#C1521E" stroke-width="2"/>
+            <g stroke="#D6455D" stroke-width="1.1" stroke-dasharray="2.5 2">
+              <line x1="100" y1="52" x2="100" y2="76"/><line x1="168" y1="50" x2="168" y2="76"/>
+            </g>
+            <text x="100" y="86" text-anchor="middle" font-size="7" font-weight="800" fill="#A9556A">A</text>
+            <text x="168" y="86" text-anchor="middle" font-size="7" font-weight="800" fill="#C1521E">B</text>
+          </svg>
+        </figure>
+        <div class="bogi-box">
+          <div class="bt">보기</div>
+          ㄱ. A 이후 삼엽충 화석은 더 이상 발견되지 않는다.<br>
+          ㄴ. B의 유력한 원인은 소행성 충돌에 따른 급격한 환경 변화다.<br>
+          ㄷ. B 이후 다양성이 다시 높아진 데에는 공룡의 빈자리로 퍼져 나간 포유류의 다양화가 포함된다.
+        </div>
+        <ul class="choices inline">
+          <li>① ㄱ</li><li>② ㄷ</li><li>③ ㄱ, ㄴ</li><li>④ ㄴ, ㄷ</li><li>⑤ ㄱ, ㄴ, ㄷ</li>
+        </ul>
+      </div>
     </div>
-    <ul class="choices inline">
-      <li>① ㄱ</li><li>② ㄷ</li><li>③ ㄴ, ㄷ</li><li>④ ㄱ, ㄴ</li><li>⑤ ㄱ, ㄴ, ㄷ</li>
-    </ul>
+    <div>
+      <div class="q">
+        <div class="qhead"><span class="qno">23</span><div class="stem"><span class="badge-data">자료</span>그림 (가)는 어느 지역의 지층 단면과 각 층에서 발견된 화석을, (나)는 지구의 역사 46억 년을 1년 달력으로 나타냈을 때 11~12월 부분을 나타낸 것이다. 옳은 것만을 &lt;보기&gt;에서 있는 대로 고른 것은? (단, 지층은 역전되지 않았다.) <span class="difficulty">●●● [2.5점]</span>
+        <div class="tags">10통과2-01-01 | 개념 2·4, 자료 파헤치기 (자료 두 개 엮기)</div></div></div>
+        <figure style="margin:2mm 0 1mm 8.4mm;">
+          <svg width="290" height="108" viewBox="0 0 290 108" font-family="PC Sans">
+            <g stroke="#B9AC99" stroke-width="0.8">
+              <rect x="4" y="4" width="108" height="20" fill="#EFE6D6"/>
+              <rect x="4" y="24" width="108" height="22" fill="#E3D6C0"/>
+              <rect x="4" y="46" width="108" height="24" fill="#D6C6AA"/>
+              <rect x="4" y="70" width="108" height="22" fill="#C8B592"/>
+            </g>
+            <g font-size="7.2" font-weight="900" fill="#5B6B77" text-anchor="middle"><text x="13" y="17">IV</text><text x="13" y="38">III</text><text x="13" y="61">II</text><text x="13" y="84">I</text></g>
+            <g font-size="6.8" font-weight="700" fill="#22303A"><text x="26" y="17">화폐석</text><text x="26" y="38">암모나이트</text><text x="26" y="61">삼엽충, 산호</text><text x="26" y="84">스트로마톨라이트</text></g>
+            <text x="58" y="104" text-anchor="middle" font-size="6.8" font-weight="800" fill="#4A5964">(가) 지층 단면과 화석</text>
+            <rect x="126" y="40" width="160" height="14" fill="#F6F3EC" stroke="#C9BA9B" stroke-width="0.9"/>
+            <g stroke="#D6455D" stroke-width="1"><line x1="171.2" y1="36" x2="171.2" y2="58"/><line x1="231.5" y1="36" x2="231.5" y2="58"/><line x1="268.3" y1="36" x2="268.3" y2="58"/></g>
+            <g font-size="6.8" font-weight="800" fill="#D6455D" text-anchor="middle"><text x="171.2" y="32">11/19경</text><text x="231.5" y="32">12/12경</text><text x="268.3" y="32">12/26경</text></g>
+            <g font-size="6.8" fill="#5B6B77" text-anchor="middle"><text x="171.2" y="66">고생대 시작</text><text x="231.5" y="66">중생대 시작</text><text x="268.3" y="66">신생대 시작</text></g>
+            <g font-size="6.2" fill="#5B6B77"><text x="126" y="78">11/1</text><text x="286" y="78" text-anchor="end">12/31 (현재)</text></g>
+            <text x="206" y="104" text-anchor="middle" font-size="6.8" font-weight="800" fill="#4A5964">(나) 지구 역사 1년 달력의 11~12월</text>
+          </svg>
+        </figure>
+        <div class="bogi-box">
+          <div class="bt">보기</div>
+          ㄱ. II층은 (나)에서 11월 19일경과 12월 12일경 사이에 해당하는 시대에 쌓였다.<br>
+          ㄴ. II층은 따뜻하고 얕은 바다에서 쌓였다.<br>
+          ㄷ. III층이 쌓인 뒤 IV층이 쌓이기 전에 (나)의 12월 26일경에 해당하는 대멸종이 있었다.
+        </div>
+        <ul class="choices inline">
+          <li>① ㄱ</li><li>② ㄷ</li><li>③ ㄱ, ㄴ</li><li>④ ㄴ, ㄷ</li><li>⑤ ㄱ, ㄴ, ㄷ</li>
+        </ul>
+      </div>
+
+      <div class="q">
+        <div class="qhead"><span class="qno">24</span><div class="stem"><span class="badge-data">자료</span>그림 (가)와 (나)는 지질시대에 있었던 두 가지 변화 과정을 나타낸 것이다. 옳은 것만을 &lt;보기&gt;에서 있는 대로 고른 것은? <span class="difficulty">●●○ [2점]</span>
+        <div class="tags">10통과2-01-01 | 개념 3·4 (통합과학 1 지구시스템 연계)</div></div></div>
+        <figure style="margin:2mm 0 1mm 8.4mm;">
+          <svg width="290" height="86" viewBox="0 0 290 86" font-family="PC Sans">
+            <g font-size="7.6" font-weight="900" fill="#22303A"><text x="1" y="26">(가)</text><text x="1" y="70">(나)</text></g>
+            <g fill="#EAF6EC" stroke="#5FA86A" stroke-width="0.9">
+              <rect x="22" y="8" width="57" height="30" rx="4"/><rect x="92" y="8" width="57" height="30" rx="4"/><rect x="162" y="8" width="57" height="30" rx="4"/><rect x="232" y="8" width="57" height="30" rx="4"/>
+            </g>
+            <g fill="#FBEBEE" stroke="#E3A0AC" stroke-width="0.9">
+              <rect x="22" y="52" width="57" height="30" rx="4"/><rect x="92" y="52" width="57" height="30" rx="4"/><rect x="162" y="52" width="57" height="30" rx="4"/><rect x="232" y="52" width="57" height="30" rx="4"/>
+            </g>
+            <g font-size="6.6" font-weight="700" fill="#22303A" text-anchor="middle">
+              <text x="50.5" y="20">남세균의</text><text x="50.5" y="31">광합성</text>
+              <text x="120.5" y="20">대기 중</text><text x="120.5" y="31">산소 증가</text>
+              <text x="190.5" y="20">오존층 형성</text><text x="190.5" y="31">자외선 차단</text>
+              <text x="260.5" y="20">생물의</text><text x="260.5" y="31">육상 진출</text>
+              <text x="50.5" y="64">소행성</text><text x="50.5" y="75">충돌</text>
+              <text x="120.5" y="64">먼지가</text><text x="120.5" y="75">햇빛을 가림</text>
+              <text x="190.5" y="64">광합성</text><text x="190.5" y="75">정지</text>
+              <text x="260.5" y="64">먹이 사슬 붕괴</text><text x="260.5" y="75">대멸종</text>
+            </g>
+            <g stroke="#C1521E" stroke-width="1.2"><line x1="81" y1="23" x2="86" y2="23"/><line x1="151" y1="23" x2="156" y2="23"/><line x1="221" y1="23" x2="226" y2="23"/><line x1="81" y1="67" x2="86" y2="67"/><line x1="151" y1="67" x2="156" y2="67"/><line x1="221" y1="67" x2="226" y2="67"/></g>
+            <g fill="#C1521E"><path d="M86,20 L90.5,23 L86,26 Z"/><path d="M156,20 L160.5,23 L156,26 Z"/><path d="M226,20 L230.5,23 L226,26 Z"/><path d="M86,64 L90.5,67 L86,70 Z"/><path d="M156,64 L160.5,67 L156,70 Z"/><path d="M226,64 L230.5,67 L226,70 Z"/></g>
+          </svg>
+        </figure>
+        <div class="bogi-box">
+          <div class="bt">보기</div>
+          ㄱ. (가)의 육상 진출은 중생대에 일어났다.<br>
+          ㄴ. (가)는 생물권의 변화가 기권을 변화시킨 예이다.<br>
+          ㄷ. (나)는 외권에서 온 물체가 기권과 생물권에 영향을 준 예이다.
+        </div>
+        <ul class="choices inline">
+          <li>① ㄱ</li><li>② ㄷ</li><li>③ ㄱ, ㄴ</li><li>④ ㄴ, ㄷ</li><li>⑤ ㄱ, ㄴ, ㄷ</li>
+        </ul>
+      </div>
+    </div>
   </div>
 
   <div class="folio"><span>I. 변화와 다양성</span><span class="num">18</span></div>
 </div>
 
-<!-- ═════════════ p.19 해설 1 ═════════════ -->
+<!-- ═════════════ 해설 1 ═════════════ -->
 <div class="page">
   <div class="runhead"><span class="unit-tag" style="color:var(--brand);">알짜 해설</span><span class="lesson-tag">01. 지질시대와 생물의 변천</span></div>
-  <div class="sol-head"><span class="stt">알짜 해설</span><span class="sub">전 문항 해설 + 오답 선지 분석 — 맞힌 문제도 해설로 한 번 더!</span></div>
+  <div class="sol-head"><span class="stt">알짜 해설</span><span class="sub">전 문항 해설 + 바로알기(틀린 선지를 옳게 고친 문장) — 맞힌 문제도 해설로 한 번 더!</span></div>
 
   <table class="anstable">
-    <tr><th>문항</th><td>1</td><td>2</td><td>3</td><td>4</td><td>5</td><td>6</td><td>7</td><td>8</td><td>9</td><td>10</td><td>11</td><td>12</td><td>13</td></tr>
-    <tr><th>정답</th><td class="a">O</td><td class="a">X</td><td class="a">O</td><td class="a">선캄브리아</td><td class="a">고, 중</td><td class="a">소행성</td><td class="a">②</td><td class="a">③</td><td class="a">②</td><td class="a">②</td><td class="a">서술형</td><td class="a">③</td><td class="a">④</td></tr>
+    <tr><th>문항</th><td>1</td><td>2</td><td>3</td><td>4</td><td>5</td><td>6</td><td>7</td><td>8</td><td>9</td><td>10</td><td>11</td><td>12</td></tr>
+    <tr><th>정답</th><td class="a">O</td><td class="a">X</td><td class="a">O</td><td class="a">선캄브리아</td><td class="a">고, 중</td><td class="a">소행성</td><td class="a">②</td><td class="a">⑤</td><td class="a">③</td><td class="a">②</td><td class="a">①</td><td class="a">④</td></tr>
+    <tr><th>문항</th><td>13</td><td>14</td><td>15</td><td>16</td><td>17</td><td>18</td><td>19</td><td>20</td><td>21</td><td>22</td><td>23</td><td>24</td></tr>
+    <tr><th>정답</th><td class="a">②</td><td class="a">①</td><td class="a">①</td><td class="a">④</td><td class="a">③</td><td class="a">서술형</td><td class="a">서술형</td><td class="a">서술형</td><td class="a">③</td><td class="a">⑤</td><td class="a">⑤</td><td class="a">④</td></tr>
   </table>
 
   <div class="solcols">
@@ -1112,7 +1405,7 @@
       <div class="sol"><div class="shead"><span class="sno">3</span><span class="sans">O</span><span class="slink">개념 3</span></div>
         <p>오존층이 자외선을 막아 준 뒤에야 육상 진출이 가능했다.</p></div>
       <div class="sol"><div class="shead"><span class="sno">4</span><span class="sans">선캄브리아</span><span class="slink">개념 1</span></div>
-        <p>지구 역사의 약 88 % — 이름 없는 긴 밤.</p></div>
+        <p>지구 역사의 약 88&nbsp;% — 이름 없는 긴 밤.</p></div>
       <div class="sol"><div class="shead"><span class="sno">5</span><span class="sans">고, 중</span><span class="slink">개념 2</span></div>
         <p>삼엽충-고생대, 암모나이트-중생대. 매머드·화폐석은 신생대.</p></div>
       <div class="sol"><div class="shead"><span class="sno">6</span><span class="sans">소행성</span><span class="slink">개념 4</span></div>
@@ -1121,62 +1414,213 @@
     <div>
       <div class="sol"><div class="shead"><span class="sno">7</span><span class="sans">②</span><span class="slink">개념 1</span></div>
         <p>구분 기준 = 화석의 급격한 변화. 정의 그대로다.</p>
-        <div class="wrongbox"><div class="wt">오답 왜 틀렸나</div>
-          <p><b>①</b> 균등 분할이 아니다. <b>③</b> 대부분은 선캄브리아. <b>④</b> 순서 반대. <b>⑤</b> 최초 생명·남세균·다세포 생물이 있었다.</p></div></div>
-      <div class="sol"><div class="shead"><span class="sno">8</span><span class="sans">③</span><span class="slink">개념 2</span></div>
+        <div class="wrongbox"><div class="wt">바로알기</div>
+          <p><b>①</b> 지질시대는 생물계의 급변을 기준으로 나누므로 시대마다 길이가 다르다. <b>③</b> 지구 역사의 대부분(약 88&nbsp;%)을 차지하는 것은 선캄브리아 시대이다. <b>④</b> 시대 순서는 선캄브리아 시대 → 고생대 → 중생대 → 신생대이다. <b>⑤</b> 선캄브리아 시대에도 최초의 생명·남세균·다세포 생물이 있었다.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">8</span><span class="sans">⑤</span><span class="slink">개념 1 | 개념 2 연계</span></div>
+        <p><b>ㄱ&nbsp;(옳음)</b> A = 선캄브리아 시대: (46 − 5.41) ÷ 46 ≈ 0.88 → 약 88&nbsp;%. <b>ㄴ&nbsp;(옳음)</b> B = 고생대(삼엽충), C = 중생대(공룡), D&nbsp;=&nbsp;신생대. <b>ㄷ&nbsp;(옳음)</b> 지질시대는 화석이 확 바뀌는 곳에서 끊는다.</p>
+        <div class="wrongbox"><div class="wt">함정 체크</div>
+          <p>아래 띠는 '늘려 그린 것'이다. B~D를 다 합쳐도 실제로는 약 12&nbsp;% — 비율은 위 띠로 읽는다.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">9</span><span class="sans">③</span><span class="slink">개념 2</span></div>
         <p>산호 = 따뜻하고 얕은 바다의 시상 화석.</p>
-        <div class="wrongbox"><div class="wt">오답 왜 틀렸나</div>
-          <p><b>①·⑤</b> 표준 화석은 짧게 살고 넓게 퍼질수록 좋다. <b>②</b> 시대는 표준 화석의 몫. <b>④</b> 매머드는 신생대.</p></div></div>
-      <div class="sol"><div class="shead"><span class="sno">9</span><span class="sans">②</span><span class="slink">개념 4·자료</span></div>
-        <p>6600만 ÷ 1260만 ≈ 5.2일 → 연말에서 5일쯤 앞 = 12월 26일경.</p>
-        <div class="wrongbox"><div class="wt">오답 왜 틀렸나</div>
-          <p><b>④</b> 자정 직전은 인류의 자리다. 비례식 검산 습관이 답을 지킨다.</p></div></div>
+        <div class="wrongbox"><div class="wt">바로알기</div>
+          <p><b>①</b> 표준 화석은 짧은 기간에만 산 생물일수록 좋다. <b>②</b> 지층의 생성 시대를 알려 주는 것은 표준 화석이다. <b>④</b> 매머드는 신생대의 표준 화석이다. <b>⑤</b> 표준 화석은 넓은 지역에 분포할수록 좋다.</p></div></div>
     </div>
   </div>
 
   <div class="folio"><span>알짜 해설</span><span class="num">19</span></div>
 </div>
 
-<!-- ═════════════ p.20 해설 2 ═════════════ -->
+<!-- ═════════════ 해설 2 ═════════════ -->
 <div class="page">
   <div class="runhead"><span class="unit-tag" style="color:var(--brand);">알짜 해설</span><span class="lesson-tag">01. 지질시대와 생물의 변천</span></div>
   <div class="solcols">
     <div>
-      <div class="sol"><div class="shead"><span class="sno">10</span><span class="sans">②</span><span class="slink">개념 3·5</span></div>
-        <p>(가) 고생대의 두 사건 — 삼엽충 번성과 육상 진출. (나) 공룡의 빈자리를 포유류가 채웠다 — 둘 다 옳다.</p>
-        <div class="wrongbox"><div class="wt">오답 왜 틀렸나</div>
-          <p><b>(다)</b> 속씨식물은 신생대의 대표 — 고생대는 양치식물이다.</p></div></div>
-      <div class="sol"><div class="shead"><span class="sno">11</span><span class="sans">모범 답안</span><span class="slink">개념 3</span></div>
-        <p>바다 생물의 <b>광합성</b>으로 대기 중 산소가 많아졌고, 그 일부가 상공에서 오존이 되어 <b>오존층</b>을 이루었다. 오존층이 생물에게 해로운 자외선을 막아 주면서 생물이 육지로 진출할 수 있게 되었다.</p>
-        <div class="wrongbox"><div class="wt">채점 기준 (감점 포인트)</div>
-          <p>① 광합성으로 산소 증가 ② 산소로부터 오존층 형성 ③ 자외선 차단으로 육상 진출 가능 — 세 요소 모두 서술해야 만점.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">10</span><span class="sans">②</span><span class="slink">개념 2</span></div>
+        <p><b>ㄷ&nbsp;(옳음)</b> B는 따뜻하고 얕은 바다에서만 살았다 → 시상 화석. B의 화석이 나오면 그 지층이 쌓인 '환경'을 안다.</p>
+        <div class="analysis"><div class="at">꼼꼼 자료 분석</div>
+          <svg width="300" height="132" viewBox="0 0 300 132" font-family="PC Sans">
+            <rect x="0.5" y="0.5" width="279" height="16" fill="#FBEFE7"/>
+            <rect x="0.5" y="0.5" width="279" height="86" fill="none" stroke="#B8C2CA" stroke-width="0.9"/>
+            <g stroke="#B8C2CA" stroke-width="0.8">
+              <line x1="0.5" y1="16.5" x2="279.5" y2="16.5"/><line x1="0.5" y1="40.5" x2="279.5" y2="40.5"/><line x1="0.5" y1="63.5" x2="279.5" y2="63.5"/>
+              <line x1="30" y1="0.5" x2="30" y2="86.5"/><line x1="196" y1="0.5" x2="196" y2="86.5"/>
+            </g>
+            <g stroke="#D8CFC0" stroke-width="0.7" stroke-dasharray="2 1.6"><line x1="85.3" y1="0.5" x2="85.3" y2="86.5"/><line x1="140.7" y1="0.5" x2="140.7" y2="86.5"/></g>
+            <g font-size="7.4" font-weight="800" fill="#C1521E" text-anchor="middle"><text x="15" y="11.5">생물</text><text x="57.6" y="11.5">고생대</text><text x="113" y="11.5">중생대</text><text x="168.3" y="11.5">신생대</text><text x="238" y="11.5">분포 지역</text></g>
+            <g font-size="8" font-weight="900" fill="#22303A" text-anchor="middle"><text x="15" y="31.5">A</text><text x="15" y="55">B</text><text x="15" y="78">C</text></g>
+            <g fill="#C1521E">
+              <rect x="44" y="25" width="24" height="7" rx="3.5"/>
+              <rect x="34" y="48.5" width="162" height="7" rx="3.5"/>
+              <rect x="101" y="71.5" width="22" height="7" rx="3.5"/>
+            </g>
+            <g text-anchor="middle" fill="#22303A">
+              <text x="238" y="27.5" font-size="7.4" font-weight="800">넓음</text><text x="238" y="36.5" font-size="6.8" fill="#5B6B77">(전 세계의 바다)</text>
+              <text x="238" y="50.5" font-size="7.4" font-weight="800">좁음</text><text x="238" y="59.5" font-size="6.8" fill="#5B6B77">(따뜻하고 얕은 바다)</text>
+              <text x="238" y="73.5" font-size="7.4" font-weight="800">좁음</text><text x="238" y="82.5" font-size="6.8" fill="#5B6B77">(한 지역)</text>
+            </g>
+            <rect x="2" y="18" width="276" height="21" rx="3" fill="none" stroke="#D6455D" stroke-width="1.3"/>
+            <rect x="2" y="42" width="276" height="20" rx="3" fill="none" stroke="#2E7A54" stroke-width="1.3" stroke-dasharray="3 2"/>
+            <text x="74" y="31.5" font-size="6.6" font-weight="800" fill="#D6455D">← 짧게</text>
+            <g font-size="6.8" font-weight="700">
+              <text x="2" y="100" fill="#D6455D">A: 짧게 살고 넓게 분포 → 표준 화석으로 가장 알맞다</text>
+              <text x="2" y="113" fill="#2E7A54">B: 오래 살아 시대는 못 좁히지만, 특정 환경 → 시상 화석</text>
+              <text x="2" y="126" fill="#5B6B77">C: 짧게 살았지만 한 지역에만 → 다른 지역과 비교가 어렵다</text>
+            </g>
+          </svg></div>
+        <div class="wrongbox"><div class="wt">바로알기</div>
+          <p><b>ㄱ</b> (틀림 →) 표준 화석으로 가장 알맞은 것은 생존 기간이 짧고 분포 지역이 <b>넓은 A</b>이다 — C는 분포 지역이 좁다. <b>ㄴ</b> (틀림 →) B는 고생대부터 현재까지 오래 살아 <b>시대를 좁혀 알기 어렵다</b>.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">11</span><span class="sans">①</span><span class="slink">개념 3</span></div>
+        <p>겉씨식물(소철·은행)은 공룡과 함께 중생대를 대표한다.</p>
+        <div class="wrongbox"><div class="wt">바로알기</div>
+          <p><b>②</b> 속씨식물은 신생대, 고생대는 양치식물이다. <b>③</b> 암모나이트는 중생대의 생물이다. <b>④</b> 양서류는 고생대에 번성했다. <b>⑤</b> 매머드는 신생대의 생물이다.</p></div></div>
     </div>
     <div>
-      <div class="sol"><div class="shead"><span class="sno">12</span><span class="sans">③</span><span class="slink">개념 2 | 2점</span></div>
-        <p><b>ㄱ (옳음)</b> 삼엽충 = 고생대, 공룡 알 = 중생대의 표준 화석. <b>ㄴ (옳음)</b> 고사리는 시상 화석 — 따뜻하고 습한 환경. <b>ㄷ (틀림)</b> 고생대 지층인 (가)가 먼저 쌓였다.</p>
-        <div class="wrongbox"><div class="wt">함정 체크</div>
-          <p>한 지층에서 표준 화석과 시상 화석이 함께 나오면 — <b>시대와 환경을 동시에</b> 읽어 낼 수 있다.</p></div></div>
-      <div class="sol"><div class="shead"><span class="sno">13</span><span class="sans">④</span><span class="slink">개념 4·5 | 2.5점</span></div>
-        <p><b>ㄱ (옳음)</b> 삼엽충은 고생대 말(A) 대멸종으로 사라졌다. <b>ㄴ (옳음)</b> B = 중생대 말, 소행성 충돌이 유력한 원인. <b>ㄷ (틀림)</b> 그래프가 보여 주듯 다양성은 회복하며 더 높이 올라갔다.</p>
+      <div class="sol"><div class="shead"><span class="sno">12</span><span class="sans">④</span><span class="slink">개념 1 | 탐구</span></div>
+        <p>1&nbsp;cm = 1000만 년이므로 (거리) = (몇 년 전) ÷ 1000만 년.</p>
+        <p><b>ㄴ&nbsp;(옳음)</b> 선캄브리아 시대 = 460 − 54.1 = 405.9&nbsp;cm로 4&nbsp;m보다 길다. <b>ㄷ&nbsp;(옳음)</b> 고생대 = 54.1 − 25.2 = 28.9&nbsp;cm, 중생대 = 25.2 − 6.6 = 18.6&nbsp;cm → 고생대가 더 길다.</p>
+        <div class="wrongbox"><div class="wt">바로알기</div>
+          <p><b>ㄱ</b> (틀림 →) ㉠은 <b>25.2&nbsp;cm</b>이다. 2.52억 년 = 25200만 년이고, 25200만 ÷ 1000만 = 25.2이다.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">13</span><span class="sans">②</span><span class="slink">개념 4 | 자료 파헤치기</span></div>
+        <p>6600만 ÷ 1260만 ≈ 5.2일 → 12월 31일 자정에서 약 5일 앞&nbsp;=&nbsp;12월 26일경.</p>
+        <div class="wrongbox"><div class="wt">바로알기</div>
+          <p><b>①</b> 11월 초는 자정에서 약 61일 앞, 61 × 1260만 ≈ 7.7억 년 전이다. <b>③</b> 12월 1일경은 약 31일 앞, 약 3.9억 년 전(고생대)이다. <b>④</b> 12월 31일 자정 직전은 인류가 등장한 때다. <b>⑤</b> 10월 중순은 고생대 시작(11월 19일경)보다도 앞이다.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">14</span><span class="sans">①</span><span class="slink">개념 4</span></div>
+        <p><b>ㄱ&nbsp;(옳음)</b> 삼엽충은 고생대 말, 공룡·암모나이트는 중생대 말에 사라졌다 → (가)가 먼저다.</p>
+        <div class="wrongbox"><div class="wt">바로알기</div>
+          <p><b>ㄴ</b> (틀림 →) 규모가 가장 컸던 것은 <b>(가)</b>이다 — 바다 생물 종의 약 90&nbsp;%가 사라졌다. <b>ㄷ</b> (틀림 →) 먼지가 햇빛을 가려 기온이 <b>낮아지고</b> 광합성이 멎었다.</p></div></div>
+    </div>
+  </div>
+  <div class="folio"><span>알짜 해설</span><span class="num">20</span></div>
+</div>
+
+<!-- ═════════════ 해설 3 ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag" style="color:var(--brand);">알짜 해설</span><span class="lesson-tag">01. 지질시대와 생물의 변천</span></div>
+  <div class="solcols">
+    <div>
+      <div class="sol"><div class="shead"><span class="sno">15</span><span class="sans">①</span><span class="slink">개념 5</span></div>
+        <p>멸종은 끝이 아니라 재편 — 빈자리로 퍼진 생존자가 새로운 종으로 다양해졌다.</p>
+        <div class="wrongbox"><div class="wt">바로알기</div>
+          <p><b>②</b> 생물다양성의 회복에는 수백만 년이 걸렸다. <b>③</b> 포유류가 하늘·바다·초원으로 퍼지며 다양해진 것은 공룡이 사라진 뒤(신생대)이다. <b>④</b> 생물다양성은 멸종으로 꺾인 뒤 회복하며 더 높이 올랐다. <b>⑤</b> 여섯 번째 대멸종 경고의 원인은 서식지 파괴·기후변화 같은 인간 활동이다.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">16</span><span class="sans">④</span><span class="slink">개념 4·5</span></div>
+        <p><b>B&nbsp;(옳음)</b> 지질시대의 경계는 대부분 대멸종의 자리다. <b>C&nbsp;(옳음)</b> 공룡의 빈자리를 포유류가 채웠다 — 멸종은 재편의 계기다.</p>
+        <div class="wrongbox"><div class="wt">바로알기</div>
+          <p><b>A</b> (틀림 →) 대멸종은 거대한 화산 분출·소행성 충돌 같은 <b>급격한 환경 변화</b>가 원인이다. 원인 없이 결과만 말하는 선지는 함정이다.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">17</span><span class="sans">③</span><span class="slink">개념 3·5</span></div>
+        <p><b>ㄱ&nbsp;(옳음)</b> 고생대의 두 사건 — 삼엽충 번성과 육상 진출. <b>ㄴ&nbsp;(옳음)</b> 공룡의 빈자리를 포유류가 채웠다.</p>
+        <div class="wrongbox"><div class="wt">바로알기</div>
+          <p><b>ㄷ</b> (틀림 →) 속씨식물은 <b>신생대</b>를 대표하는 식물이다 — 고생대는 양치식물이다.</p></div></div>
+    </div>
+    <div>
+      <div class="sol"><div class="shead"><span class="sno">18</span><span class="sans">모범 답안</span><span class="slink">개념 3</span></div>
+        <p>바다 생물(남세균 등)의 <b>광합성</b>으로 대기 중 산소가 많아졌고, 그 일부가 상공에서 오존이 되어 <b>오존층</b>을 이루었다. 오존층이 생물에게 해로운 <b>자외선</b>을 막아 주면서 생물이 육지로 진출할 수 있게 되었다.</p>
+        <table class="rubric">
+          <tr><th>채점 요소</th><th>배점</th></tr>
+          <tr><td>① 광합성으로 대기 중 산소가 많아졌다고 썼다.</td><td>2점</td></tr>
+          <tr><td>② 산소로부터 오존층이 만들어졌다고 썼다.</td><td>2점</td></tr>
+          <tr><td>③ 오존층이 자외선을 막아 육상 진출이 가능해졌다고 썼다.</td><td>2점</td></tr>
+        </table>
+        <div class="wrongbox"><div class="wt">이렇게 쓰면 0점</div>
+          <p>"산소가 많아져 육지에서도 숨을 쉴 수 있게 되었기 때문이다." — 오존층과 자외선 차단이 빠진 답.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">19</span><span class="sans">모범 답안</span><span class="slink">개념 2</span></div>
+        <p>표준 화석은 <b>생존 기간</b>이 짧고 <b>분포 지역</b>이 넓은 생물의 화석이어야 한다. 생존 기간이 짧아야 화석이 나온 지층의 시대를 좁게 짚을 수 있고, 분포 지역이 넓아야 여러 지역의 지층에서 발견되어 그 지층들의 시대를 판단할 수 있다.</p>
+        <table class="rubric">
+          <tr><th>채점 요소</th><th>배점</th></tr>
+          <tr><td>① 생존 기간이 짧아야 한다고 썼다.</td><td>2점</td></tr>
+          <tr><td>② 분포 지역이 넓어야 한다고 썼다.</td><td>2점</td></tr>
+          <tr><td>③ 각 조건의 까닭(시대를 좁힘 · 여러 지역에서 발견)을 썼다.</td><td>2점</td></tr>
+        </table>
+        <div class="wrongbox"><div class="wt">이렇게 쓰면 0점</div>
+          <p>"오래 살았고 좁은 지역에만 살아야 한다." — 시상 화석에 가까운 조건과 혼동한 답.</p></div></div>
+    </div>
+  </div>
+  <div class="folio"><span>알짜 해설</span><span class="num">?</span></div>
+</div>
+
+<!-- ═════════════ 해설 4 ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag" style="color:var(--brand);">알짜 해설</span><span class="lesson-tag">01. 지질시대와 생물의 변천</span></div>
+  <div class="solcols">
+    <div>
+      <div class="sol"><div class="shead"><span class="sno">20</span><span class="sans">모범 답안</span><span class="slink">개념 5</span></div>
+        <p>대멸종으로 지배적이던 생물이 사라지면 생태계에 큰 <b>빈자리</b>가 생긴다. <b>살아남은 생물</b>이 그 빈자리로 퍼져 나가며 새로운 종으로 다양해지므로, 수백만 년에 걸쳐 생물다양성이 회복되고 이전보다 높아질 수 있었다.</p>
+        <table class="rubric">
+          <tr><th>채점 요소</th><th>배점</th></tr>
+          <tr><td>① 멸종으로 생물이 사라져 빈자리가 생긴다고 썼다.</td><td>2점</td></tr>
+          <tr><td>② 살아남은 생물이 빈자리로 퍼져 다양해진다고 썼다.</td><td>2점</td></tr>
+          <tr><td>③ 그 결과 다양성이 회복되어 더 높아진다고 연결했다.</td><td>2점</td></tr>
+        </table>
+        <div class="wrongbox"><div class="wt">이렇게 쓰면 0점</div>
+          <p>"대멸종 때 사라진 생물이 다시 살아났기 때문이다." — 멸종한 종은 되살아나지 않는다.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">21</span><span class="sans">③</span><span class="slink">개념 2 | 2점</span></div>
+        <p><b>ㄱ&nbsp;(옳음)</b> 삼엽충 = 고생대, 공룡 알 = 중생대의 표준 화석. <b>ㄴ&nbsp;(옳음)</b> 고사리는 시상 화석 — 따뜻하고 습한 환경.</p>
+        <div class="wrongbox"><div class="wt">바로알기</div>
+          <p><b>ㄷ</b> (틀림 →) 고생대 지층인 (가)가 중생대 지층인 (나)보다 <b>먼저</b> 쌓였다. 한 지층에서 표준 화석과 시상 화석이 함께 나오면 시대와 환경을 동시에 읽는다.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">22</span><span class="sans">⑤</span><span class="slink">개념 4·5 | 2.5점</span></div>
+        <p><b>ㄱ&nbsp;(옳음)</b> 삼엽충은 고생대 말(A) 대멸종으로 사라졌다. <b>ㄴ&nbsp;(옳음)</b> B = 중생대 말, 소행성 충돌이 유력한 원인. <b>ㄷ&nbsp;(옳음)</b> 공룡이 사라진 빈자리로 포유류가 퍼져 나가 다양해졌다 — 그래프의 회복이 그 모습이다.</p>
         <div class="wrongbox"><div class="wt">함정 체크</div>
           <p>대멸종 그래프의 포인트는 '꺾임'이 아니라 <b>'꺾인 뒤의 회복'</b>이다 — 빈자리 재편까지 읽어야 만점.</p></div></div>
-
-      <div class="gist" style="margin-top:5mm;">
+    </div>
+    <div>
+      <div class="sol"><div class="shead"><span class="sno">23</span><span class="sans">⑤</span><span class="slink">개념 2·4 | 2.5점</span></div>
+        <p><b>ㄱ&nbsp;(옳음)</b> II층의 삼엽충 = 고생대 → (나)의 11월 19일경(고생대 시작)~12월 12일경(중생대 시작). <b>ㄴ&nbsp;(옳음)</b> 산호 = 따뜻하고 얕은 바다의 시상 화석. <b>ㄷ&nbsp;(옳음)</b> III층(암모나이트) = 중생대, IV층(화폐석) = 신생대 → 그 사이에 중생대 말 대멸종(6600만 ÷ 1260만 ≈ 5.2일 → 12월 26일경)이 있었다.</p>
+        <div class="analysis"><div class="at">꼼꼼 자료 분석</div>
+          <svg width="300" height="124" viewBox="0 0 300 124" font-family="PC Sans">
+            <text x="196" y="9" text-anchor="middle" font-size="6.6" font-weight="800" fill="#D6455D">중생대 말 대멸종 (12/26경)</text>
+            <g transform="translate(0,14)">
+              <g stroke="#B9AC99" stroke-width="0.8">
+                <rect x="4" y="4" width="108" height="20" fill="#EFE6D6"/>
+                <rect x="4" y="24" width="108" height="22" fill="#E3D6C0"/>
+                <rect x="4" y="46" width="108" height="24" fill="#D6C6AA"/>
+                <rect x="4" y="70" width="108" height="22" fill="#C8B592"/>
+              </g>
+              <g font-size="7.2" font-weight="900" fill="#5B6B77" text-anchor="middle"><text x="13" y="17">IV</text><text x="13" y="38">III</text><text x="13" y="61">II</text><text x="13" y="84">I</text></g>
+              <g font-size="6.8" font-weight="700" fill="#22303A"><text x="26" y="17">화폐석</text><text x="26" y="38">암모나이트</text><text x="26" y="61">삼엽충, 산호</text><text x="26" y="84">스트로마톨라이트</text></g>
+              <g font-size="6.4" font-weight="800" fill="#D6455D" text-anchor="end"><text x="109" y="17">신생대</text><text x="109" y="38">중생대</text><text x="109" y="61">고생대</text></g>
+              <rect x="126" y="40" width="160" height="14" fill="#F6F3EC" stroke="#C9BA9B" stroke-width="0.9"/>
+              <rect x="171.2" y="40" width="60.3" height="14" fill="#FBEBEE"/>
+              <rect x="231.5" y="40" width="36.8" height="14" fill="#EAF6EC"/>
+              <g font-size="6.4" font-weight="800" text-anchor="middle"><text x="201.4" y="49.6" fill="#A9556A">고생대</text><text x="249.9" y="49.6" fill="#2E7A54">중생대</text></g>
+              <g stroke="#D6455D" stroke-width="1"><line x1="171.2" y1="36" x2="171.2" y2="58"/><line x1="231.5" y1="36" x2="231.5" y2="58"/><line x1="268.3" y1="36" x2="268.3" y2="58"/></g>
+              <g font-size="6.8" font-weight="800" fill="#D6455D" text-anchor="middle"><text x="171.2" y="32">11/19경</text><text x="231.5" y="32">12/12경</text><text x="268.3" y="32">12/26경</text></g>
+              <g font-size="6.8" fill="#5B6B77" text-anchor="middle"><text x="171.2" y="66">고생대 시작</text><text x="231.5" y="66">중생대 시작</text><text x="268.3" y="66">신생대 시작</text></g>
+              <path d="M112,58 C140,58 154,56 175,51" fill="none" stroke="#A9556A" stroke-width="1.1" stroke-dasharray="3 2"/>
+              <path d="M112,24 C150,4 236,2 266,21" fill="none" stroke="#D6455D" stroke-width="1.1" stroke-dasharray="3 2"/>
+              <text x="206" y="86" text-anchor="middle" font-size="6.6" font-weight="700" fill="#5B6B77">II층(삼엽충) → 고생대 구간에 쌓였다</text>
+              <text x="206" y="97" text-anchor="middle" font-size="6.6" font-weight="700" fill="#5B6B77">III·IV 경계 = 중생대/신생대 경계</text>
+            </g>
+          </svg></div>
+      </div>
+      <div class="sol"><div class="shead"><span class="sno">24</span><span class="sans">④</span><span class="slink">개념 3·4 | 2점</span></div>
+        <p><b>ㄴ&nbsp;(옳음)</b> 남세균(생물권)의 광합성이 대기(기권)의 산소를 늘리고 오존층을 만들었다. <b>ㄷ&nbsp;(옳음)</b> 소행성(외권)의 충돌 먼지가 기권에 퍼져 햇빛을 가리고, 생물권의 먹이 사슬을 무너뜨렸다 — 통합과학 1에서 배운 권역의 상호작용이다.</p>
+        <div class="wrongbox"><div class="wt">바로알기</div>
+          <p><b>ㄱ</b> (틀림 →) (가)의 육상 진출은 <b>고생대</b>에 일어났다.</p></div></div>
+      <div class="gist" style="margin-top:3mm;">
         <div class="boxtitle"><span class="ico">알</span>이 소단원, 이것만은!</div>
         <ul>
-          <li>지질시대 구분 기준 = <b>생물(화석)의 급변</b> — 선캄브리아(88 %) → 고 → 중 → 신</li>
+          <li>지질시대 구분 기준 = <b>생물(화석)의 급변</b> — 선캄브리아(88&nbsp;%) → 고 → 중 → 신</li>
           <li><b>표준 화석</b>(짧고 넓게 — 언제) vs <b>시상 화석</b>(좁고 길게 — 어떤 환경)</li>
           <li>대멸종의 공통 구조: <b>급격한 환경 변화 → 멸종 → 빈자리 재편</b> — 다양성의 계단</li>
         </ul>
       </div>
     </div>
   </div>
-  <div class="folio"><span>알짜 해설</span><span class="num">20</span></div>
+  <div class="folio"><span>알짜 해설</span><span class="num">?</span></div>
 </div>
 
-<!-- ═════════════ p.21 MEMO ═════════════ -->
+<!-- ═════════════ MEMO ═════════════ -->
 <div class="page">
   <div class="runhead"><span class="unit-tag">I. 변화와 다양성</span><span class="lesson-tag">01 ▸ 02 넘어가기 전에</span></div>
+  <div class="spaced">
+    <div class="st">간격 두고 다시 꺼내기 — 책을 덮고 답한다</div>
+    <ol>
+      <li>지질시대를 나누는 기준은 무엇인가?</li>
+      <li>생존 기간이 짧고 분포 지역이 넓은 생물의 화석을 무엇이라고 하는가?</li>
+      <li>중생대 말 대멸종의 유력한 원인은 무엇인가?</li>
+    </ol>
+    <div class="when"><span>□ 1일 뒤</span><span>□ 1주 뒤</span><span>□ 시험 전</span></div>
+    <div class="ans">정답 1 생물계(화석)의 급격한 변화 2 표준 화석 3 소행성 충돌</div>
+  </div>
   <div class="memo-head"><span class="mt">MEMO</span><span class="ms">헷갈린 개념, 다시 틀린 문제 번호, 나만의 암기법을 남겨 두는 자리</span></div>
   <div class="memo-area"></div>
   <div class="memo-pen">"'삼엽충-공룡-매머드'를 시대 순서로, 각 시대의 식물과 짝지어 말해 보자. 막히면 12쪽으로! — 박찬쌤"</div>

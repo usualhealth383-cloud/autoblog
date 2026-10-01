@@ -229,6 +229,29 @@
   /* 화학식 첨자 — 본문 폰트를 그대로 축소해 자형이 어긋나지 않게 한다 */
   sub,sup{ font-size:0.68em; line-height:0; font-weight:inherit; }
   sub{ vertical-align:-0.14em; } sup{ vertical-align:0.34em; }
+/* ── 2026-10-02 보강: 중요 표시 · 채점 기준 · 꼼꼼 자료 분석 · 간격 두고 다시 꺼내기 ── */
+.must{ display:inline-block; font-size:7pt; font-weight:900; color:#fff; background:#D9534F; border-radius:1.6mm; padding:0.2mm 1.4mm; margin-right:1.2mm; vertical-align:1pt; }
+table.rubric{ border-collapse:collapse; width:100%; font-size:7.6pt; margin:1mm 0 0.5mm; }
+table.rubric th, table.rubric td{ border:0.25mm solid var(--line); padding:0.8mm 1.4mm; text-align:left; vertical-align:top; }
+table.rubric th{ background:#F4F1EA; font-weight:800; white-space:nowrap; }
+.analysis{ border:0.35mm dashed #C9A36A; border-radius:2.5mm; padding:1.6mm 2mm 1.2mm; margin:1.5mm 0; background:#FFFCF5; }
+.analysis .at{ font-size:7.6pt; font-weight:900; color:#9C6503; margin-bottom:0.8mm; }
+.analysis svg{ max-width:100%; height:auto; display:block; }
+.spaced{ border:0.4mm solid var(--line); border-radius:3mm; padding:3mm 4mm 2.6mm; margin:0 0 4mm; position:relative; background:#FAFBFC; }
+.spaced .st{ font-size:9.5pt; font-weight:900; color:var(--unit); margin-bottom:1.6mm; }
+.spaced ol{ margin:0; padding-left:5mm; font-size:8.8pt; line-height:1.75; }
+.spaced .when{ display:flex; gap:5mm; font-size:8pt; color:var(--sub); margin-top:1.8mm; }
+.spaced .ans{ position:absolute; right:4mm; bottom:2.4mm; transform:rotate(180deg); font-size:6.8pt; color:var(--sub); }
+/* 2단 문항 쪽 간격 · 발문 안 탐구 과정 상자 (합격본 chapter-08 에서) */
+.qg2 .q{ margin-bottom:6mm; }
+.qg2 > div > .q:last-child{ margin-bottom:0; }
+.qg2 .choices.inline{ gap:0 4mm; }
+.qg2 .choices{ margin-top:1.8mm; line-height:1.78; }
+.qg2 .bogi-box{ margin-top:2mm; padding:1.8mm 2.8mm; font-size:9pt; line-height:1.72; }
+.qg2 .bogi-box .bt{ margin-bottom:0.3mm; }
+.qg2 .q figure{ margin:1.6mm 0 0.6mm 8.4mm !important; }
+.exp{ border:0.35mm solid #B8C2CA; border-radius:1.6mm; background:#FAFBFC; padding:1.6mm 2.6mm; margin:1.4mm 0 1.6mm; font-size:8.9pt; line-height:1.7; }
+.exp b{ font-family:'PC Sans'; font-size:7.8pt; font-weight:900; color:var(--brand); }
 </style>
 </head>
 <body>
@@ -360,7 +383,7 @@
           <g transform="translate(390,10)">
             <rect x="-62" y="0" width="124" height="74" rx="6" fill="#ECF1FC" stroke="#7A97E8" stroke-width="1"/>
             <g fill="#9AA7B1"><circle cx="-42" cy="18" r="5"/><circle cx="-14" cy="16" r="5"/><circle cx="14" cy="18" r="5"/><circle cx="42" cy="16" r="5"/><circle cx="-42" cy="46" r="5"/><circle cx="-14" cy="48" r="5"/><circle cx="14" cy="46" r="5"/><circle cx="42" cy="48" r="5"/></g>
-            <g fill="#D6455D"><circle cx="-28" cy="31" r="2.4"/><circle cx="30" cy="31" r="2.4"/></g>
+            <g fill="#D6455D"><circle cx="-50" cy="31" r="2.4"/><circle cx="50" cy="31" r="2.4"/></g>
             <g fill="none" stroke="#5B6B77" stroke-width="0.9"><circle cx="-14" cy="16" r="8.5"/><circle cx="14" cy="46" r="8.5"/></g>
             <text x="0" y="36" text-anchor="middle" font-size="8" font-weight="800" fill="#2E5BDA">조건에 따라 변신!</text>
             <text y="90" text-anchor="middle" font-size="9.5" font-weight="800">반도체 (규소·저마늄)</text>
@@ -373,7 +396,7 @@
 
       <div class="saem">
         <div class="avatar">박찬<br>쌤</div>
-        <div class="bubble"><span class="pen">"소단원 04의 자료 파헤치기에서 '구리는 고체인데도 통한다'고 했지? 그 복선을 지금 회수한다 — 금속의 비밀은 자유 전자였어."</span></div>
+        <div class="bubble"><span class="pen">"소단원 03의 자료 파헤치기에서 '구리는 고체인데도 통한다'고 했지? 그 복선을 지금 회수한다 — 금속의 비밀은 자유 전자였어."</span></div>
       </div>
     </div>
 
@@ -495,7 +518,7 @@
             <line x1="-8" y1="46" x2="-8" y2="60" stroke="#9AA7B1" stroke-width="1.6"/><line x1="0" y1="46" x2="0" y2="60" stroke="#9AA7B1" stroke-width="1.6"/><line x1="8" y1="46" x2="8" y2="60" stroke="#9AA7B1" stroke-width="1.6"/>
             <path d="M-34,35 h12" stroke="#D6455D" stroke-width="1.6"/>
             <path d="M22,30 h16 M22,35 h20 M22,40 h16" stroke="#D6455D" stroke-width="1.6"/>
-            <text x="-28" y="28" font-size="6.4" fill="#D6455D">작은 신호</text>
+            <text x="-48" y="28" font-size="6.4" fill="#D6455D">작은 신호</text>
             <text x="30" y="22" font-size="6.4" fill="#D6455D">크게!</text>
             <text x="0" y="84" text-anchor="middle" font-size="8.6" font-weight="800">트랜지스터</text>
             <text x="0" y="96" text-anchor="middle" font-size="7" fill="#5B6B77">증폭 + 스위치(켜고 끄기)</text>
@@ -647,7 +670,7 @@
       <p class="body">한편 <span class="kw">액정</span>은 <b>액체처럼 흐르면서 고체 결정처럼 분자가 규칙적으로 배열되는</b> 중간 상태의 물질이다. 전압을 걸면 분자의 배열 방향이 바뀌어 <b>빛을 통과시키거나 차단</b>할 수 있다 — 이 성질로 만든 것이 LCD(액정 디스플레이)다. 도체도 부도체도 아닌 어중간함(반도체), 고체도 액체도 아닌 어중간함(액정) — <b>'중간'의 성질을 읽어 낸 것이 곧 기술이 되었다.</b></p>
 
       <figure>
-        <svg width="470" height="150" viewBox="0 0 470 150" font-family="PC Sans">
+        <svg width="470" height="156" viewBox="0 0 470 156" font-family="PC Sans">
           <!-- 저항-온도 그래프 -->
           <g transform="translate(112,14)">
             <line x1="-70" y1="86" x2="70" y2="86" stroke="#5B6B77" stroke-width="1.2" marker-end="url(#arrC)"/>
@@ -677,7 +700,7 @@
           <!-- 액정 -->
           <g transform="translate(412,14)">
             <rect x="-34" y="8" width="30" height="52" rx="3" fill="#F3F6FA" stroke="#B8C2CA" stroke-width="0.9"/>
-            <g fill="#2E5BDA"><ellipse cx="-26" cy="18" rx="2" ry="5"/><ellipse cx="-19" cy="30" rx="2" ry="5" transform="rotate(30 -19 30)"/><ellipse cx="-25" cy="44" rx="2" ry="5" transform="rotate(-25 -25 44)"/><ellipse cx="-13" cy="16" rx="2" ry="5" transform="rotate(60 -13 16)"/><ellipse cx="-11" cy="46" rx="2" ry="5" transform="rotate(10 -11 46)"/></g>
+            <g fill="#2E5BDA"><ellipse cx="-25" cy="16" rx="5" ry="2"/><ellipse cx="-13" cy="16" rx="5" ry="2"/><ellipse cx="-25" cy="32" rx="5" ry="2"/><ellipse cx="-13" cy="32" rx="5" ry="2"/><ellipse cx="-25" cy="48" rx="5" ry="2"/><ellipse cx="-13" cy="48" rx="5" ry="2"/></g>
             <rect x="4" y="8" width="30" height="52" rx="3" fill="#ECF1FC" stroke="#7A97E8" stroke-width="0.9"/>
             <g fill="#2E5BDA"><ellipse cx="12" cy="16" rx="2" ry="5"/><ellipse cx="19" cy="16" rx="2" ry="5"/><ellipse cx="26" cy="16" rx="2" ry="5"/><ellipse cx="12" cy="32" rx="2" ry="5"/><ellipse cx="19" cy="32" rx="2" ry="5"/><ellipse cx="26" cy="32" rx="2" ry="5"/><ellipse cx="12" cy="48" rx="2" ry="5"/><ellipse cx="19" cy="48" rx="2" ry="5"/><ellipse cx="26" cy="48" rx="2" ry="5"/></g>
             <text x="-19" y="70" text-anchor="middle" font-size="6.4" fill="#5B6B77">전압 X</text>
@@ -685,7 +708,7 @@
             <text x="0" y="94" text-anchor="middle" font-size="6.8" fill="#5B6B77">배열이 바뀌어 빛을 조절</text>
             <text x="0" y="122" text-anchor="middle" font-size="8.4" font-weight="800">액정 → LCD</text>
           </g>
-          <text x="235" y="146" text-anchor="middle" font-size="8.8" font-weight="800" fill="#E8940A">물질의 성질을 정확히 읽으면, 그 성질이 그대로 기술이 된다</text>
+          <text x="235" y="152" text-anchor="middle" font-size="8.8" font-weight="800" fill="#E8940A">물질의 성질을 정확히 읽으면, 그 성질이 그대로 기술이 된다</text>
         </svg>
         <figcaption>그림 5 | 초전도체와 액정 — 저항 0의 그래프, 떠오르는 자석, 전압으로 줄 세운 분자</figcaption>
       </figure>
@@ -777,143 +800,446 @@
 
   <div class="step-head s2"><span class="stepno">STEP 2</span><span class="steptt">내신 완성</span><span class="stepdesc">학교 시험 유형 그대로 — 서술형까지 한 번에</span></div>
 
-  <div class="q">
-    <div class="qhead"><span class="qno">7</span><div class="stem">물질을 전기적 성질에 따라 분류한 것으로 옳은 것은? <span class="difficulty">●●○</span>
-    <div class="tags">10통과1-02-06 | 개념 1</div></div></div>
-    <ul class="choices inline">
-      <li>① 구리 — 부도체</li>
-      <li>② 유리 — 도체</li>
-      <li>③ 규소 — 반도체</li>
-      <li>④ 고무 — 도체</li>
-      <li>⑤ 알루미늄 — 부도체</li>
-    </ul>
-  </div>
+  <div class="qgrid qg2">
+    <div>
+      <div class="q">
+        <div class="qhead"><span class="qno">7</span><div class="stem">물질과 그 분류를 옳게 짝 지은 것은? <span class="difficulty">●○○</span>
+        <div class="tags">10통과1-02-06 | 개념 1</div></div></div>
+        <ul class="choices inline">
+          <li>① 구리 — 부도체</li>
+          <li>② 규소 — 반도체</li>
+          <li>③ 유리 — 도체</li>
+          <li>④ 고무 — 반도체</li>
+          <li>⑤ 알루미늄 — 부도체</li>
+        </ul>
+      </div>
 
-  <div class="q">
-    <div class="qhead"><span class="qno">8</span><div class="stem">반도체에 대한 설명으로 옳은 것은? <span class="difficulty">●●●</span>
-    <div class="tags">10통과1-02-06 | 개념 2·3</div></div></div>
-    <ul class="choices">
-      <li>① 순수한 규소는 금속보다 전기가 잘 통한다.</li>
-      <li>② 소량의 불순물을 첨가하는 방법으로 전기 전도성을 제어할 수 있다.</li>
-      <li>③ 온도가 높아지면 전기 전도성이 작아진다.</li>
-      <li>④ 발광 다이오드(LED)는 전류를 증폭하는 소자이다.</li>
-      <li>⑤ 반도체로는 빛을 전기로 바꾸는 소자를 만들 수 없다.</li>
-    </ul>
-  </div>
+      <div class="q">
+        <div class="qhead"><span class="qno">8</span><div class="stem"><span class="badge-data">자료</span>그림 (가)와 (나)는 두 고체 물질 속 원자와 전자의 모습을 모형으로 나타낸 것이다. 옳은 것만을 &lt;보기&gt;에서 있는 대로 고른 것은? <span class="difficulty">●●○</span>
+        <div class="tags">10통과1-02-06 | 개념 1</div></div></div>
+        <figure style="margin:2mm 0 1mm 8.4mm;">
+          <svg width="272" height="98" viewBox="0 0 272 98" font-family="PC Sans">
+            <g transform="translate(70,4)">
+              <rect x="-60" y="0" width="120" height="62" rx="5" fill="#FBF3E8" stroke="#D98E4A" stroke-width="1"/>
+              <g fill="#9AA7B1"><circle cx="-42" cy="16" r="5"/><circle cx="-14" cy="16" r="5"/><circle cx="14" cy="16" r="5"/><circle cx="42" cy="16" r="5"/><circle cx="-42" cy="46" r="5"/><circle cx="-14" cy="46" r="5"/><circle cx="14" cy="46" r="5"/><circle cx="42" cy="46" r="5"/></g>
+              <g fill="#D6455D"><circle cx="-28" cy="31" r="2.4"/><circle cx="0" cy="27" r="2.4"/><circle cx="28" cy="33" r="2.4"/><circle cx="-50" cy="31" r="2.4"/><circle cx="50" cy="29" r="2.4"/><circle cx="-28" cy="8" r="2.4"/><circle cx="28" cy="54" r="2.4"/></g>
+              <text y="77" text-anchor="middle" font-size="8.6" font-weight="900" fill="#22303A">(가)</text>
+            </g>
+            <g transform="translate(202,4)">
+              <rect x="-60" y="0" width="120" height="62" rx="5" fill="#F3F6FA" stroke="#9AA7B1" stroke-width="1"/>
+              <g fill="#9AA7B1"><circle cx="-42" cy="16" r="5"/><circle cx="-14" cy="16" r="5"/><circle cx="14" cy="16" r="5"/><circle cx="42" cy="16" r="5"/><circle cx="-42" cy="46" r="5"/><circle cx="-14" cy="46" r="5"/><circle cx="14" cy="46" r="5"/><circle cx="42" cy="46" r="5"/></g>
+              <g fill="none" stroke="#5B6B77" stroke-width="0.9"><circle cx="-42" cy="16" r="9"/><circle cx="-14" cy="16" r="9"/><circle cx="14" cy="16" r="9"/><circle cx="42" cy="16" r="9"/><circle cx="-42" cy="46" r="9"/><circle cx="-14" cy="46" r="9"/><circle cx="14" cy="46" r="9"/><circle cx="42" cy="46" r="9"/></g>
+              <g fill="#D6455D"><circle cx="-35.6" cy="9.6" r="2.2"/><circle cx="-7.6" cy="9.6" r="2.2"/><circle cx="20.4" cy="9.6" r="2.2"/><circle cx="48.4" cy="9.6" r="2.2"/><circle cx="-35.6" cy="39.6" r="2.2"/><circle cx="-7.6" cy="39.6" r="2.2"/><circle cx="20.4" cy="39.6" r="2.2"/><circle cx="48.4" cy="39.6" r="2.2"/></g>
+              <text y="77" text-anchor="middle" font-size="8.6" font-weight="900" fill="#22303A">(나)</text>
+            </g>
+            <g font-size="7.2" fill="#5B6B77"><circle cx="104" cy="92" r="4" fill="#9AA7B1"/><text x="111" y="94.6">원자</text><circle cx="148" cy="92" r="2.4" fill="#D6455D"/><text x="154" y="94.6">전자</text></g>
+          </svg>
+        </figure>
+        <div class="bogi-box">
+          <div class="bt">보기</div>
+          ㄱ. (가)에는 자유롭게 움직이는 전자가 있다.<br>
+          ㄴ. (나)는 전기가 거의 통하지 않는다.<br>
+          ㄷ. 전선의 피복으로는 (가)와 같은 물질이 적합하다.
+        </div>
+        <ul class="choices inline">
+          <li>① ㄱ</li><li>② ㄷ</li><li>③ ㄱ, ㄴ</li><li>④ ㄴ, ㄷ</li><li>⑤ ㄱ, ㄴ, ㄷ</li>
+        </ul>
+      </div>
+    </div>
+    <div>
+      <div class="q">
+        <div class="qhead"><span class="qno">9</span><div class="stem"><span class="must">중요</span>반도체에 대한 설명으로 옳은 것은? <span class="difficulty">●●○</span>
+        <div class="tags">10통과1-02-06 | 개념 2·3</div></div></div>
+        <ul class="choices">
+          <li>① 순수한 규소는 금속보다 전기가 잘 통한다.</li>
+          <li>② 불순물을 소량 첨가해 전도성을 조절할 수 있다.</li>
+          <li>③ 온도가 높아지면 전기 전도성이 작아진다.</li>
+          <li>④ 발광 다이오드(LED)는 전류를 증폭하는 소자이다.</li>
+          <li>⑤ 빛을 전기로 바꾸는 반도체 소자는 없다.</li>
+        </ul>
+      </div>
 
-  <div class="q">
-    <div class="qhead"><span class="qno">9</span><div class="stem">반도체 소자와 그 기능을 옳게 짝 지은 것은? <span class="difficulty">●●●</span>
-    <div class="tags">10통과1-02-06 | 개념 3</div></div></div>
-    <ul class="choices">
-      <li>① 다이오드 — 전류를 증폭한다.</li>
-      <li>② 트랜지스터 — 전류를 한 방향으로만 흐르게 한다.</li>
-      <li>③ 발광 다이오드(LED) — 전기 에너지를 빛으로 바꾼다.</li>
-      <li>④ 태양 전지 — 전기 에너지를 빛으로 바꾼다.</li>
-      <li>⑤ 집적 회로 — 전기를 오랫동안 저장한다.</li>
-    </ul>
+      <div class="q">
+        <div class="qhead"><span class="qno">10</span><div class="stem">다음은 반도체에 대한 학생 A~C의 대화이다. 옳게 말한 학생만을 있는 대로 고른 것은? <span class="difficulty">●●○</span>
+        <div class="tags">10통과1-02-06 | 개념 2·3</div></div></div>
+        <div class="bogi-box">
+          <b>학생 A</b> : 반도체는 온도가 높아지면 전도성이 작아져. 그 변화를 읽어 온도 센서로 써.<br>
+          <b>학생 B</b> : 어두워지면 저절로 켜지는 가로등에는 빛에 반응하는 반도체 센서가 들어 있어.<br>
+          <b>학생 C</b> : '반도체'는 전도성이 도체의 절반이라는 뜻이 아니라, 도체와 부도체의 중간이라는 뜻이야.
+        </div>
+        <ul class="choices inline">
+          <li>① A</li><li>② C</li><li>③ A, B</li><li>④ B, C</li><li>⑤ A, B, C</li>
+        </ul>
+      </div>
+    </div>
   </div>
 
   <div class="folio"><span>II. 물질과 규칙성</span><span class="num">123</span></div>
 </div>
 
-<!-- ═════════════ p.71 STEP 2 계속 ═════════════ -->
+<!-- ═════════════ STEP 2 계속 (11~15) ═════════════ -->
 <div class="page">
   <div class="runhead"><span class="unit-tag">II. 물질과 규칙성</span><span class="lesson-tag">05. 물질의 전기적 성질과 신소재 | 문제</span></div>
 
-  <div class="q">
-    <div class="qhead"><span class="qno">10</span><div class="stem">신소재에 대한 설명으로 옳은 것만을 고른 것은? <span class="difficulty">●●●</span>
-    <div class="tags">10통과1-02-06 | 개념 4·5</div></div></div>
-    <div class="bogi-box" style="background:#fff;">
-      (가) 그래핀은 전기가 잘 통하고 투명하며 잘 휘어진다.<br>
-      (나) 탄소 나노 튜브는 가벼우면서도 강도가 매우 크다.<br>
-      (다) 초전도체는 상온에서도 항상 전기 저항이 0이다.
-    </div>
-    <ul class="choices inline">
-      <li>① (가)</li><li>② (나)</li><li>③ (가), (나)</li><li>④ (나), (다)</li><li>⑤ (가), (나), (다)</li>
-    </ul>
-  </div>
+  <div class="qgrid qg2">
+    <div>
+      <div class="q">
+        <div class="qhead"><span class="qno">11</span><div class="stem"><span class="must">중요</span><span class="badge-data">탐구</span>다음은 규소의 전기 전도성을 알아보는 실험이다.
+          <div class="exp"><b>[과정]</b> 크기가 같은 규소 조각에 전지·전류계를 연결하고, 같은 온도에서 전류의 세기를 측정한다.<br>(가) 순수한 규소 — 어두운 곳에 둔다.<br>(나) 순수한 규소 — 빛을 비춘다.<br>(다) 불순물을 첨가한 규소 — 어두운 곳에 둔다.<br><b>[결과]</b> 전류의 세기: (다) &gt; (나) &gt; (가)</div>
+          이에 대한 설명으로 옳은 것만을 &lt;보기&gt;에서 있는 대로 고른 것은? <span class="difficulty">●●○</span>
+        <div class="tags">10통과1-02-06 | 개념 2, 탐구</div></div></div>
+        <figure style="margin:1.6mm 0 0.6mm 8.4mm;">
+          <svg width="270" height="84" viewBox="0 0 270 84" font-family="PC Sans">
+            <path d="M110,30 H20 V66 H76 M84,66 H250 V30 H160" fill="none" stroke="#5B6B77" stroke-width="1.3"/>
+            <rect x="110" y="24" width="50" height="12" rx="2" fill="#8FA8EC" stroke="#2E5BDA" stroke-width="0.8"/>
+            <rect x="106" y="26" width="6" height="8" fill="#22303A"/><rect x="158" y="26" width="6" height="8" fill="#22303A"/>
+            <text x="135" y="49" text-anchor="middle" font-size="7.6" font-weight="700" fill="#2E5BDA">규소 조각</text>
+            <circle cx="206" cy="9" r="6" fill="#F4CE3D" stroke="#E8940A" stroke-width="0.8"/>
+            <g stroke="#E8940A" stroke-width="1.2" stroke-dasharray="2.5 1.8" marker-end="url(#arrC)"><line x1="199" y1="13" x2="170" y2="22"/></g>
+            <text x="216" y="12" font-size="7.4" font-weight="700" fill="#B4560E">빛 ((나)에서만)</text>
+            <line x1="76" y1="58" x2="76" y2="74" stroke="#22303A" stroke-width="1.6"/>
+            <line x1="84" y1="62" x2="84" y2="70" stroke="#22303A" stroke-width="3"/>
+            <text x="80" y="83" text-anchor="middle" font-size="7.4" fill="#5B6B77">전지</text>
+            <circle cx="250" cy="48" r="9" fill="#fff" stroke="#22303A" stroke-width="1.1"/>
+            <text x="250" y="51.4" text-anchor="middle" font-size="9" font-weight="900" fill="#22303A">A</text>
+            <text x="237" y="51" text-anchor="end" font-size="7.4" fill="#5B6B77">전류계</text>
+          </svg>
+        </figure>
+        <div class="bogi-box">
+          <div class="bt">보기</div>
+          ㄱ. (가)와 (다)를 비교하면 불순물 첨가가 전기 전도성에 미치는 영향을 알 수 있다.<br>
+          ㄴ. 순수한 규소는 빛을 받으면 전도성이 커진다.<br>
+          ㄷ. (나)에서 확인한 성질은 광센서에 이용된다.
+        </div>
+        <ul class="choices inline">
+          <li>① ㄱ</li><li>② ㄷ</li><li>③ ㄱ, ㄴ</li><li>④ ㄴ, ㄷ</li><li>⑤ ㄱ, ㄴ, ㄷ</li>
+        </ul>
+      </div>
 
-  <div class="q">
-    <div class="qhead"><span class="qno">11</span><div class="stem"><span class="badge-essay">서술형</span>반도체가 현대 전자 기술의 핵심 소재가 된 까닭을 <b>'불순물'과 '전기 전도성'</b>이라는 말을 포함하여 서술하시오. <span class="difficulty">●●●●</span>
-    <div class="tags">10통과1-02-06 | 개념 2</div></div></div>
-    <div class="essay-lines"><div></div><div></div><div></div></div>
+      <div class="q">
+        <div class="qhead"><span class="qno">12</span><div class="stem"><span class="must">중요</span><span class="badge-data">자료</span>그림은 반도체 소자 (가)~(다)에 들어가는 것과 나오는 것을 나타낸 것이다. 옳은 것만을 &lt;보기&gt;에서 있는 대로 고른 것은? <span class="difficulty">●●○</span>
+        <div class="tags">10통과1-02-06 | 개념 3</div></div></div>
+        <figure style="margin:2mm 0 1mm 8.4mm;">
+          <svg width="280" height="90" viewBox="0 0 280 90" font-family="PC Sans">
+            <g font-size="8.2" font-weight="700" fill="#22303A" text-anchor="middle">
+              <text x="46" y="10">전기 에너지</text><text x="140" y="10">빛에너지</text><text x="234" y="10">작은 전기 신호</text>
+              <text x="46" y="86">빛에너지</text><text x="140" y="86">전기 에너지</text><text x="234" y="86">큰 전기 신호</text>
+            </g>
+            <g stroke="#2E5BDA" stroke-width="1.2" marker-end="url(#arrC)">
+              <line x1="46" y1="15" x2="46" y2="26"/><line x1="140" y1="15" x2="140" y2="26"/><line x1="234" y1="15" x2="234" y2="26"/>
+              <line x1="46" y1="56" x2="46" y2="67"/><line x1="140" y1="56" x2="140" y2="67"/><line x1="234" y1="56" x2="234" y2="67"/>
+            </g>
+            <g fill="#ECF1FC" stroke="#7A97E8" stroke-width="1"><rect x="16" y="32" width="60" height="22" rx="3"/><rect x="110" y="32" width="60" height="22" rx="3"/><rect x="204" y="32" width="60" height="22" rx="3"/></g>
+            <g font-size="9" font-weight="900" fill="#2E5BDA" text-anchor="middle"><text x="46" y="46.5">(가)</text><text x="140" y="46.5">(나)</text><text x="234" y="46.5">(다)</text></g>
+          </svg>
+        </figure>
+        <div class="bogi-box">
+          <div class="bt">보기</div>
+          ㄱ. (가)는 발광 다이오드(LED)이다.<br>
+          ㄴ. (나)는 지붕 위 태양광 패널에 쓰인다.<br>
+          ㄷ. (다)를 수십억 개 모은 칩이 집적 회로이다.
+        </div>
+        <ul class="choices inline">
+          <li>① ㄱ</li><li>② ㄷ</li><li>③ ㄱ, ㄴ</li><li>④ ㄴ, ㄷ</li><li>⑤ ㄱ, ㄴ, ㄷ</li>
+        </ul>
+      </div>
+    </div>
+    <div>
+      <div class="q">
+        <div class="qhead"><span class="qno">13</span><div class="stem">반도체 소자와 그 기능을 옳게 짝 지은 것은? <span class="difficulty">●○○</span>
+        <div class="tags">10통과1-02-06 | 개념 3</div></div></div>
+        <ul class="choices">
+          <li>① 발광 다이오드(LED) — 전기를 빛으로 바꾼다.</li>
+          <li>② 다이오드 — 작은 신호를 크게 증폭한다.</li>
+          <li>③ 트랜지스터 — 전류를 한 방향으로만 흐르게 한다.</li>
+          <li>④ 태양 전지 — 전기를 빛으로 바꾼다.</li>
+          <li>⑤ 집적 회로 — 전기를 오랫동안 저장한다.</li>
+        </ul>
+      </div>
+
+      <div class="q">
+        <div class="qhead"><span class="qno">14</span><div class="stem">신소재에 대한 설명으로 옳은 것은? <span class="difficulty">●○○</span>
+        <div class="tags">10통과1-02-06 | 개념 4</div></div></div>
+        <ul class="choices">
+          <li>① 그래핀은 구리보다 전기가 잘 통한다.</li>
+          <li>② 그래핀은 불투명해 디스플레이에 못 쓴다.</li>
+          <li>③ 탄소 나노 튜브는 무겁고 잘 부서진다.</li>
+          <li>④ 흑연과 다이아몬드는 구성 원소가 다르다.</li>
+          <li>⑤ 신소재는 자연의 재료를 그대로 쓴 것이다.</li>
+        </ul>
+      </div>
+
+      <div class="q">
+        <div class="qhead"><span class="qno">15</span><div class="stem"><span class="badge-data">자료</span>그림은 탄소로 이루어진 물질 (가)~(다)의 구조를 모형으로 나타낸 것이다. 옳은 것만을 &lt;보기&gt;에서 있는 대로 고른 것은? <span class="difficulty">●●○</span>
+        <div class="tags">10통과1-02-06 | 개념 4</div></div></div>
+        <figure style="margin:2mm 0 1mm 8.4mm;">
+          <svg width="280" height="80" viewBox="0 0 280 80" font-family="PC Sans">
+            <g transform="translate(46,14)">
+              <g fill="none" stroke="#22303A" stroke-width="1.2">
+                <polyline points="-30,0 -20,5 -10,0 0,5 10,0 20,5 30,0"/>
+                <polyline points="-30,16 -20,21 -10,16 0,21 10,16 20,21 30,16"/>
+                <polyline points="-30,32 -20,37 -10,32 0,37 10,32 20,37 30,32"/>
+              </g>
+              <g fill="#22303A">
+                <circle cx="-30" cy="0" r="1.9"/><circle cx="-20" cy="5" r="1.9"/><circle cx="-10" cy="0" r="1.9"/><circle cx="0" cy="5" r="1.9"/><circle cx="10" cy="0" r="1.9"/><circle cx="20" cy="5" r="1.9"/><circle cx="30" cy="0" r="1.9"/>
+                <circle cx="-30" cy="16" r="1.9"/><circle cx="-20" cy="21" r="1.9"/><circle cx="-10" cy="16" r="1.9"/><circle cx="0" cy="21" r="1.9"/><circle cx="10" cy="16" r="1.9"/><circle cx="20" cy="21" r="1.9"/><circle cx="30" cy="16" r="1.9"/>
+                <circle cx="-30" cy="32" r="1.9"/><circle cx="-20" cy="37" r="1.9"/><circle cx="-10" cy="32" r="1.9"/><circle cx="0" cy="37" r="1.9"/><circle cx="10" cy="32" r="1.9"/><circle cx="20" cy="37" r="1.9"/><circle cx="30" cy="32" r="1.9"/>
+              </g>
+            </g>
+            <g transform="translate(137.8,19) scale(0.72)">
+              <g fill="none" stroke="#22303A" stroke-width="1.5">
+                <path d="M-42,26 L-32,10 L-12,10 L-2,26 L-12,42 L-32,42 Z"/>
+                <path d="M-2,26 L8,10 L28,10 L38,26 L28,42 L8,42 Z"/>
+                <path d="M-32,10 L-22,-6 L-2,-6 L8,10"/>
+                <path d="M8,10 L18,-6 L38,-6 L48,10 L38,26"/>
+              </g>
+              <g fill="#22303A"><circle cx="-42" cy="26" r="2.8"/><circle cx="-32" cy="10" r="2.8"/><circle cx="-12" cy="10" r="2.8"/><circle cx="-2" cy="26" r="2.8"/><circle cx="-12" cy="42" r="2.8"/><circle cx="-32" cy="42" r="2.8"/><circle cx="8" cy="10" r="2.8"/><circle cx="28" cy="10" r="2.8"/><circle cx="38" cy="26" r="2.8"/><circle cx="28" cy="42" r="2.8"/><circle cx="8" cy="42" r="2.8"/><circle cx="-22" cy="-6" r="2.8"/><circle cx="-2" cy="-6" r="2.8"/><circle cx="18" cy="-6" r="2.8"/><circle cx="38" cy="-6" r="2.8"/><circle cx="48" cy="10" r="2.8"/></g>
+            </g>
+            <g transform="translate(234,14) scale(0.8)">
+              <ellipse cx="0" cy="4" rx="22" ry="7" fill="none" stroke="#22303A" stroke-width="1.5"/>
+              <line x1="-22" y1="4" x2="-22" y2="44" stroke="#22303A" stroke-width="1.5"/>
+              <line x1="22" y1="4" x2="22" y2="44" stroke="#22303A" stroke-width="1.5"/>
+              <path d="M-22,44 a22,7 0 0 0 44,0" fill="none" stroke="#22303A" stroke-width="1.5"/>
+              <g stroke="#9AA7B1" stroke-width="1" fill="none">
+                <path d="M-22,14 a22,7 0 0 0 44,0 M-22,24 a22,7 0 0 0 44,0 M-22,34 a22,7 0 0 0 44,0"/>
+                <line x1="-11" y1="8" x2="-11" y2="47"/><line x1="0" y1="10" x2="0" y2="48"/><line x1="11" y1="8" x2="11" y2="47"/>
+              </g>
+            </g>
+            <g font-size="8.6" font-weight="900" fill="#22303A" text-anchor="middle"><text x="46" y="74">(가)</text><text x="140" y="74">(나)</text><text x="234" y="74">(다)</text></g>
+          </svg>
+        </figure>
+        <div class="bogi-box">
+          <div class="bt">보기</div>
+          ㄱ. (가)~(다)는 구성 원소가 서로 다르다.<br>
+          ㄴ. (나)는 투명하고 유연하며 전기가 잘 통한다.<br>
+          ㄷ. (다)는 (나)를 말아 만든 것으로, 강도가 크다.
+        </div>
+        <ul class="choices inline">
+          <li>① ㄱ</li><li>② ㄷ</li><li>③ ㄱ, ㄴ</li><li>④ ㄴ, ㄷ</li><li>⑤ ㄱ, ㄴ, ㄷ</li>
+        </ul>
+      </div>
+    </div>
   </div>
 
   <div class="folio"><span>II. 물질과 규칙성</span><span class="num">124</span></div>
 </div>
 
-<!-- ═════════════ p.72 STEP 3 ═════════════ -->
+<!-- ═════════════ STEP 2 계속 (16~17) + 서술형 (18~20) ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag">II. 물질과 규칙성</span><span class="lesson-tag">05. 물질의 전기적 성질과 신소재 | 문제</span></div>
+
+  <div class="qgrid qg2">
+    <div>
+      <div class="q">
+        <div class="qhead"><span class="qno">16</span><div class="stem"><span class="badge-data">자료</span>표는 신소재의 성질과 활용을 정리한 것이다. ㉠~㉢에 들어갈 내용에 대한 설명으로 옳은 것만을 <span style="white-space:nowrap">&lt;보기&gt;에서</span> 있는 대로 고른 것은? <span class="difficulty">●●○</span>
+        <div class="tags">10통과1-02-06 | 개념 4·5</div></div></div>
+        <figure style="margin:2mm 0 1mm 8.4mm;">
+          <svg width="280" height="76" viewBox="0 0 280 76" font-family="PC Sans">
+            <rect x="1" y="1" width="278" height="20" fill="#ECF1FC"/>
+            <rect x="1" y="1" width="278" height="74" fill="none" stroke="#B8C2CA" stroke-width="0.9"/>
+            <g stroke="#B8C2CA" stroke-width="0.8"><line x1="1" y1="21" x2="279" y2="21"/><line x1="1" y1="39" x2="279" y2="39"/><line x1="1" y1="57" x2="279" y2="57"/><line x1="61" y1="1" x2="61" y2="75"/><line x1="185" y1="1" x2="185" y2="75"/></g>
+            <g font-size="8.6" font-weight="800" fill="#2E5BDA" text-anchor="middle"><text x="31" y="14.5">신소재</text><text x="123" y="14.5">성질</text><text x="232" y="14.5">활용</text></g>
+            <g font-size="8.6" fill="#22303A" text-anchor="middle">
+              <text x="31" y="33.5" font-weight="800">그래핀</text><text x="123" y="33.5" font-weight="900">㉠</text><text x="232" y="33.5">휘는 디스플레이</text>
+              <text x="31" y="51.5" font-weight="800">초전도체</text><text x="123" y="51.5">임계 온도 이하에서 저항 0</text><text x="232" y="51.5" font-weight="900">㉡</text>
+              <text x="31" y="69.5" font-weight="800">액정</text><text x="123" y="69.5" font-weight="900">㉢</text><text x="232" y="69.5">LCD</text>
+            </g>
+          </svg>
+        </figure>
+        <div class="bogi-box">
+          <div class="bt">보기</div>
+          ㄱ. '투명하고 잘 휘어진다'는 ㉠에 해당한다.<br>
+          ㄴ. '자기 공명 영상 장치(MRI)'는 ㉡에 해당한다.<br>
+          ㄷ. '빛을 받으면 전기를 만든다'는 ㉢에 해당한다.
+        </div>
+        <ul class="choices inline">
+          <li>① ㄱ</li><li>② ㄷ</li><li>③ ㄱ, ㄴ</li><li>④ ㄴ, ㄷ</li><li>⑤ ㄱ, ㄴ, ㄷ</li>
+        </ul>
+      </div>
+
+      <div class="q">
+        <div class="qhead"><span class="qno">17</span><div class="stem">액정에 대한 설명으로 옳은 것은? <span class="difficulty">●●○</span>
+        <div class="tags">10통과1-02-06 | 개념 5</div></div></div>
+        <ul class="choices">
+          <li>① 고체처럼 모양이 일정하고 흐르지 않는다.</li>
+          <li>② 분자들이 아무 규칙 없이 흩어져 있다.</li>
+          <li>③ 임계 온도 이하로 냉각하면 전기 저항이 0이 된다.</li>
+          <li>④ 전류가 흐르면 스스로 빛을 내는 반도체 소자이다.</li>
+          <li>⑤ 전압으로 분자 배열을 바꾸어 빛을 조절한다.</li>
+        </ul>
+      </div>
+
+      <div class="q">
+        <div class="qhead"><span class="qno">18</span><div class="stem"><span class="badge-essay">서술형</span>전선은 속을 구리로, 겉을 고무로 만든다. 그 까닭을 <b>'자유 전자'</b>, <b>'전류'</b>, <b>'감전'</b>을 모두 포함하여 서술하시오. <span class="difficulty">●●○</span>
+        <div class="tags">10통과1-02-06 | 개념 1</div></div></div>
+        <div class="essay-lines"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>
+      </div>
+
+      
+    </div>
+    <div>
+      <div class="q">
+        <div class="qhead"><span class="qno">19</span><div class="stem"><span class="must">중요</span><span class="badge-essay">서술형</span>반도체가 현대 전자 기술의 핵심 소재가 된 까닭을 <b>'불순물'</b>, <b>'전기 전도성'</b>, <b>'스위치'</b>를 모두 포함하여 서술하시오. <span class="difficulty">●●●</span>
+        <div class="tags">10통과1-02-06 | 개념 2</div></div></div>
+        <div class="essay-lines"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>
+      </div>
+
+      <div class="q">
+        <div class="qhead"><span class="qno">20</span><div class="stem"><span class="badge-essay">서술형</span>MRI는 초전도 전자석으로 강한 자기장을 만들고, 장치를 늘 극저온으로 냉각한다. 이 두 가지의 까닭을 <b>'저항'</b>, <b>'열'</b>, <b>'임계 온도'</b>를 모두 포함하여 서술하시오. <span class="difficulty">●●●</span>
+        <div class="tags">10통과1-02-06 | 개념 5</div></div></div>
+        <div class="essay-lines"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="folio"><span>II. 물질과 규칙성</span><span class="num">?</span></div>
+</div>
+
+<!-- ═════════════ STEP 3 (21~24) ═════════════ -->
 <div class="page">
   <div class="runhead"><span class="unit-tag">II. 물질과 규칙성</span><span class="lesson-tag">05. 물질의 전기적 성질과 신소재 | 문제</span></div>
   <div class="step-head s3"><span class="stepno">STEP 3</span><span class="steptt">수능 도전</span><span class="stepdesc">2028 수능 규격 — ㄱㄴㄷ 합답형·자료 해석</span></div>
 
-  <div class="q">
-    <div class="qhead"><span class="qno">12</span><div class="stem"><span class="badge-data">자료</span>그림은 물질 A~D의 상대적인 전기 전도성을 나타낸 것이다. A는 구리, B는 불순물을 첨가한 규소, C는 순수한 규소, D는 유리이다. 옳은 것만을 &lt;보기&gt;에서 있는 대로 고른 것은? <span class="difficulty">[2점]</span>
-    <div class="tags">10통과1-02-06</div></div></div>
-    <figure style="margin:2mm 0 1mm 8.6mm;">
-      <svg width="300" height="104" viewBox="0 0 300 104" font-family="PC Sans">
-        <line x1="34" y1="84" x2="290" y2="84" stroke="#5B6B77" stroke-width="1.2"/>
-        <line x1="34" y1="84" x2="34" y2="6" stroke="#5B6B77" stroke-width="1.2" marker-end="url(#arrC)"/>
-        <text x="40" y="12" font-size="7" fill="#5B6B77">전기 전도성(상대값)</text>
-        <rect x="54" y="14" width="34" height="70" fill="#D98E4A"/>
-        <rect x="116" y="40" width="34" height="44" fill="#2E5BDA"/>
-        <rect x="178" y="66" width="34" height="18" fill="#8FA8EC"/>
-        <rect x="240" y="80" width="34" height="4" fill="#B8C2CA"/>
-        <text x="71" y="96" text-anchor="middle" font-size="8" font-weight="800">A</text>
-        <text x="133" y="96" text-anchor="middle" font-size="8" font-weight="800">B</text>
-        <text x="195" y="96" text-anchor="middle" font-size="8" font-weight="800">C</text>
-        <text x="257" y="96" text-anchor="middle" font-size="8" font-weight="800">D</text>
-      </svg>
-    </figure>
-    <div class="bogi-box">
-      <div class="bt">보기</div>
-      ㄱ. A는 자유 전자가 많은 도체이다.<br>
-      ㄴ. B와 C를 비교하면, 불순물 첨가로 규소의 전기 전도성이 커졌음을 알 수 있다.<br>
-      ㄷ. D는 자유 전자가 많아 전기가 통하지 않는다.
-    </div>
-    <ul class="choices inline">
-      <li>① ㄱ</li><li>② ㄷ</li><li>③ ㄴ, ㄷ</li><li>④ ㄱ, ㄴ</li><li>⑤ ㄱ, ㄴ, ㄷ</li>
-    </ul>
-  </div>
+  <div class="qgrid qg2">
+    <div>
+      <div class="q">
+        <div class="qhead"><span class="qno">21</span><div class="stem"><span class="badge-data">자료</span>그림은 물질 A~D의 상대적인 전기 전도성을 나타낸 것이다. A~D는 구리, 유리, 순수한 규소, 불순물을 첨가한 규소 중 하나이고, B와 C는 같은 원소로 이루어져 있다. 옳은 것만을 &lt;보기&gt;에서 있는 대로 고른 것은? <span class="difficulty">●●○ [2점]</span>
+        <div class="tags">10통과1-02-06 | 개념 1·2</div></div></div>
+        <figure style="margin:2mm 0 1mm 8.4mm;">
+          <svg width="280" height="97" viewBox="0 0 300 104" font-family="PC Sans">
+            <line x1="34" y1="84" x2="290" y2="84" stroke="#5B6B77" stroke-width="1.2"/>
+            <line x1="34" y1="84" x2="34" y2="6" stroke="#5B6B77" stroke-width="1.2" marker-end="url(#arrC)"/>
+            <text x="40" y="12" font-size="7.4" fill="#5B6B77">전기 전도성(상대값)</text>
+            <rect x="54" y="14" width="34" height="70" fill="#D98E4A"/>
+            <rect x="116" y="40" width="34" height="44" fill="#2E5BDA"/>
+            <rect x="178" y="66" width="34" height="18" fill="#8FA8EC"/>
+            <rect x="240" y="80" width="34" height="4" fill="#B8C2CA"/>
+            <text x="71" y="97" text-anchor="middle" font-size="8.6" font-weight="800">A</text>
+            <text x="133" y="97" text-anchor="middle" font-size="8.6" font-weight="800">B</text>
+            <text x="195" y="97" text-anchor="middle" font-size="8.6" font-weight="800">C</text>
+            <text x="257" y="97" text-anchor="middle" font-size="8.6" font-weight="800">D</text>
+          </svg>
+        </figure>
+        <div class="bogi-box">
+          <div class="bt">보기</div>
+          ㄱ. A는 자유 전자가 많은 도체이다.<br>
+          ㄴ. B와 C를 비교하면, 불순물 첨가로 규소의 전기 전도성이 커졌음을 알 수 있다.<br>
+          ㄷ. D는 자유 전자가 많아 전기가 통하지 않는다.
+        </div>
+        <ul class="choices inline">
+          <li>① ㄱ</li><li>② ㄷ</li><li>③ ㄱ, ㄴ</li><li>④ ㄴ, ㄷ</li><li>⑤ ㄱ, ㄴ, ㄷ</li>
+        </ul>
+      </div>
 
-  <div class="q">
-    <div class="qhead"><span class="qno">13</span><div class="stem"><span class="badge-data">자료</span>그림은 어떤 초전도체의 온도에 따른 전기 저항을 나타낸 것이다. T<sub>0</sub>는 임계 온도이다. 옳은 것만을 &lt;보기&gt;에서 있는 대로 고른 것은? <span class="difficulty">[2.5점]</span>
-    <div class="tags">10통과1-02-06</div></div></div>
-    <figure style="margin:2mm 0 1mm 8.6mm;">
-      <svg width="280" height="104" viewBox="0 0 280 104" font-family="PC Sans">
-        <line x1="40" y1="84" x2="270" y2="84" stroke="#5B6B77" stroke-width="1.2" marker-end="url(#arrC)"/>
-        <line x1="40" y1="84" x2="40" y2="6" stroke="#5B6B77" stroke-width="1.2" marker-end="url(#arrC)"/>
-        <text x="272" y="96" text-anchor="end" font-size="7" fill="#5B6B77">온도</text>
-        <text x="36" y="4" text-anchor="end" font-size="7" fill="#5B6B77">저항</text>
-        <line x1="40" y1="84" x2="120" y2="84" stroke="#D6455D" stroke-width="3"/>
-        <path d="M120,84 L120,34 Q180,26 258,20" fill="none" stroke="#2E5BDA" stroke-width="2.2"/>
-        <line x1="120" y1="84" x2="120" y2="92" stroke="#5B6B77" stroke-width="0.8" stroke-dasharray="2 1.5"/>
-        <text x="120" y="101" text-anchor="middle" font-size="7.6" font-weight="800">T<tspan dy="0.14em" font-size="68%">0</tspan></text>
-        <text x="80" y="76" text-anchor="middle" font-size="7" font-weight="800" fill="#D6455D">저항 0</text>
-      </svg>
-    </figure>
-    <div class="bogi-box">
-      <div class="bt">보기</div>
-      ㄱ. T<sub>0</sub>보다 낮은 온도에서 이 물질의 전기 저항은 0이다.<br>
-      ㄴ. 저항이 0인 상태에서는 전류가 흘러도 열 손실이 없다.<br>
-      ㄷ. 이 성질은 온도와 관계없이 항상 유지된다.
+      <div class="q">
+        <div class="qhead"><span class="qno">22</span><div class="stem"><span class="badge-data">자료</span>그림은 초전도체의 온도에 따른 저항을 나타낸 것이다. T<sub>0</sub>는 임계 온도이다. 옳은 것만을 &lt;보기&gt;에서 있는 대로 고른 것은? <span class="difficulty">●●● [2.5점]</span>
+        <div class="tags">10통과1-02-06 | 개념 5</div></div></div>
+        <figure style="margin:2mm 0 1mm 8.4mm;">
+          <svg width="280" height="104" viewBox="0 0 280 104" font-family="PC Sans">
+            <line x1="40" y1="84" x2="270" y2="84" stroke="#5B6B77" stroke-width="1.2" marker-end="url(#arrC)"/>
+            <line x1="40" y1="84" x2="40" y2="6" stroke="#5B6B77" stroke-width="1.2" marker-end="url(#arrC)"/>
+            <text x="272" y="96" text-anchor="end" font-size="7.4" fill="#5B6B77">온도</text>
+            <text x="36" y="9" text-anchor="end" font-size="7.4" fill="#5B6B77">저항</text>
+            <line x1="40" y1="84" x2="120" y2="84" stroke="#D6455D" stroke-width="3"/>
+            <path d="M120,84 L120,34 Q180,26 258,20" fill="none" stroke="#2E5BDA" stroke-width="2.2"/>
+            <line x1="120" y1="84" x2="120" y2="92" stroke="#5B6B77" stroke-width="0.8" stroke-dasharray="2 1.5"/>
+            <text x="120" y="101" text-anchor="middle" font-size="8" font-weight="800">T<tspan dy="0.14em" font-size="68%">0</tspan></text>
+            <text x="80" y="76" text-anchor="middle" font-size="7.4" font-weight="800" fill="#D6455D">저항 0</text>
+          </svg>
+        </figure>
+        <div class="bogi-box">
+          <div class="bt">보기</div>
+          ㄱ. T<sub>0</sub> 이상에서는 온도가 높을수록 저항이 작다.<br>
+          ㄴ. T<sub>0</sub> 이하에서는 전류가 흘러도 열 손실이 없다.<br>
+          ㄷ. 이 물질로 MRI의 전자석을 만들려면 T<sub>0</sub>보다 낮은 온도로 냉각해야 한다.
+        </div>
+        <ul class="choices inline">
+          <li>① ㄱ</li><li>② ㄷ</li><li>③ ㄱ, ㄴ</li><li>④ ㄴ, ㄷ</li><li>⑤ ㄱ, ㄴ, ㄷ</li>
+        </ul>
+      </div>
     </div>
-    <ul class="choices inline">
-      <li>① ㄱ</li><li>② ㄴ</li><li>③ ㄷ</li><li>④ ㄱ, ㄴ</li><li>⑤ ㄱ, ㄴ, ㄷ</li>
-    </ul>
+    <div>
+      <div class="q">
+        <div class="qhead"><span class="qno">23</span><div class="stem"><span class="badge-data">자료</span>표는 고체 물질 A~C의 전기적 성질을 조사한 결과이다. A~C는 구리, 염화 나트륨, 순수한 규소 중 하나이다. 옳은 것만을 &lt;보기&gt;에서 있는 대로 고른 것은? <span class="difficulty">●●● [2.5점]</span>
+        <div class="tags">10통과1-02-06 | 개념 1·2 (소단원 03 연계)</div></div></div>
+        <figure style="margin:2mm 0 1mm 8.4mm;">
+          <svg width="280" height="82" viewBox="0 0 280 82" font-family="PC Sans">
+            <rect x="1" y="1" width="278" height="20" fill="#ECF1FC"/>
+            <rect x="1" y="1" width="278" height="80" fill="none" stroke="#B8C2CA" stroke-width="0.9"/>
+            <g stroke="#B8C2CA" stroke-width="0.8"><line x1="1" y1="21" x2="279" y2="21"/><line x1="1" y1="41" x2="279" y2="41"/><line x1="1" y1="61" x2="279" y2="61"/><line x1="37" y1="1" x2="37" y2="81"/><line x1="107" y1="1" x2="107" y2="81"/></g>
+            <g font-size="8.6" font-weight="800" fill="#2E5BDA" text-anchor="middle"><text x="19" y="14.5">물질</text><text x="72" y="14.5">고체의 전도성</text><text x="193" y="14.5">추가 관찰</text></g>
+            <g font-size="8.6" fill="#22303A" text-anchor="middle">
+              <text x="19" y="34.5" font-weight="900">A</text><text x="72" y="34.5">매우 큼</text><text x="193" y="34.5">온도를 높이면 전도성이 조금 작아짐</text>
+              <text x="19" y="54.5" font-weight="900">B</text><text x="72" y="54.5">거의 없음</text><text x="193" y="54.5">물에 녹이면 전기가 잘 통함</text>
+              <text x="19" y="74.5" font-weight="900">C</text><text x="72" y="74.5">작음</text><text x="193" y="74.5">빛을 비추면 전도성이 커짐</text>
+            </g>
+          </svg>
+        </figure>
+        <div class="bogi-box">
+          <div class="bt">보기</div>
+          ㄱ. A에서 전하를 운반하는 입자는 이온이다.<br>
+          ㄴ. 고체 B 속에는 이온이 존재하지 않는다.<br>
+          ㄷ. C에 불순물을 소량 첨가하면 고체 상태의 전기 전도성이 커진다.
+        </div>
+        <ul class="choices inline">
+          <li>① ㄱ</li><li>② ㄷ</li><li>③ ㄱ, ㄴ</li><li>④ ㄴ, ㄷ</li><li>⑤ ㄱ, ㄴ, ㄷ</li>
+        </ul>
+      </div>
+
+      <div class="q">
+        <div class="qhead"><span class="qno">24</span><div class="stem"><span class="badge-data">자료</span>그림은 같은 발광 다이오드(LED)를 전지에 연결하는 방향만 바꾸어 꾸민 회로 (가)와 (나)를 나타낸 것이다. (가)에서는 LED가 켜졌고, (나)에서는 켜지지 않았다. 옳은 것만을 &lt;보기&gt;에서 있는 대로 고른 것은? <span class="difficulty">●●○ [2점]</span>
+        <div class="tags">10통과1-02-06 | 개념 3</div></div></div>
+        <figure style="margin:2mm 0 1mm 8.4mm;">
+          <svg width="280" height="108" viewBox="0 0 280 108" font-family="PC Sans">
+            <g transform="translate(70,0)">
+              <circle cx="0" cy="26" r="19" fill="url(#gGlow5)"/>
+              <path d="M-4,38 V48 H-44 V84 H-4 M4,38 V48 H44 V84 H4" fill="none" stroke="#5B6B77" stroke-width="1.3"/>
+              <path d="M-8,36 V26 A8,8 0 0 1 8,26 V36 Z" fill="#F4CE3D" stroke="#E8940A" stroke-width="1"/>
+              <rect x="-10" y="35" width="20" height="3" rx="1" fill="#E8940A"/>
+              <line x1="-4" y1="74" x2="-4" y2="94" stroke="#22303A" stroke-width="1.6"/>
+              <line x1="4" y1="79" x2="4" y2="89" stroke="#22303A" stroke-width="3"/>
+              <g font-size="8" font-weight="900" fill="#22303A" text-anchor="middle"><text x="-11" y="73">+</text><text x="11" y="73">−</text></g>
+              <g font-size="7.4" font-weight="800" fill="#2E5BDA" text-anchor="middle"><text x="-11" y="45">a</text><text x="11" y="45">b</text></g>
+              <text x="0" y="105" text-anchor="middle" font-size="8.4" font-weight="900" fill="#22303A">(가) 켜짐</text>
+            </g>
+            <g transform="translate(210,0)">
+              <path d="M-4,38 V48 H-44 V84 H-4 M4,38 V48 H44 V84 H4" fill="none" stroke="#5B6B77" stroke-width="1.3"/>
+              <path d="M-8,36 V26 A8,8 0 0 1 8,26 V36 Z" fill="#E6EAEE" stroke="#9AA7B1" stroke-width="1"/>
+              <rect x="-10" y="35" width="20" height="3" rx="1" fill="#9AA7B1"/>
+              <line x1="-4" y1="79" x2="-4" y2="89" stroke="#22303A" stroke-width="3"/>
+              <line x1="4" y1="74" x2="4" y2="94" stroke="#22303A" stroke-width="1.6"/>
+              <g font-size="8" font-weight="900" fill="#22303A" text-anchor="middle"><text x="-11" y="73">−</text><text x="11" y="73">+</text></g>
+              <g font-size="7.4" font-weight="800" fill="#2E5BDA" text-anchor="middle"><text x="-11" y="45">a</text><text x="11" y="45">b</text></g>
+              <text x="0" y="105" text-anchor="middle" font-size="8.4" font-weight="900" fill="#22303A">(나) 꺼짐</text>
+            </g>
+          </svg>
+        </figure>
+        <div class="bogi-box">
+          <div class="bt">보기</div>
+          ㄱ. LED는 전류를 한 방향으로만 흐르게 한다.<br>
+          ㄴ. (나)에서도 LED에 전류가 잘 흐른다.<br>
+          ㄷ. LED는 빛을 받으면 전기를 만드는 소자이다.
+        </div>
+        <ul class="choices inline">
+          <li>① ㄱ</li><li>② ㄷ</li><li>③ ㄱ, ㄴ</li><li>④ ㄴ, ㄷ</li><li>⑤ ㄱ, ㄴ, ㄷ</li>
+        </ul>
+      </div>
+    </div>
   </div>
 
   <div class="folio"><span>II. 물질과 규칙성</span><span class="num">125</span></div>
 </div>
 
-<!-- ═════════════ p.73 해설 1 ═════════════ -->
+<!-- ═════════════ 해설 1 ═════════════ -->
 <div class="page">
   <div class="runhead"><span class="unit-tag" style="color:var(--brand);">알짜 해설</span><span class="lesson-tag">05. 물질의 전기적 성질과 신소재</span></div>
-  <div class="sol-head"><span class="stt">알짜 해설</span><span class="sub">전 문항 해설 + 오답 선지 분석 — 맞힌 문제도 해설로 한 번 더!</span></div>
+  <div class="sol-head"><span class="stt">알짜 해설</span><span class="sub">전 문항 해설 + 바로알기(틀린 선지를 옳게 고친 문장) — 맞힌 문제도 해설로 한 번 더!</span></div>
 
   <table class="anstable">
-    <tr><th>문항</th><td>1</td><td>2</td><td>3</td><td>4</td><td>5</td><td>6</td><td>7</td><td>8</td><td>9</td><td>10</td><td>11</td><td>12</td><td>13</td></tr>
-    <tr><th>정답</th><td class="a">O</td><td class="a">X</td><td class="a">O</td><td class="a">도체, 부도체</td><td class="a">반도체</td><td class="a">그래핀</td><td class="a">③</td><td class="a">②</td><td class="a">③</td><td class="a">③</td><td class="a">서술형</td><td class="a">④</td><td class="a">④</td></tr>
+    <tr><th>문항</th><td>1</td><td>2</td><td>3</td><td>4</td><td>5</td><td>6</td><td>7</td><td>8</td><td>9</td><td>10</td><td>11</td><td>12</td></tr>
+    <tr><th>정답</th><td class="a">O</td><td class="a">X</td><td class="a">O</td><td class="a">도체, 부도체</td><td class="a">반도체</td><td class="a">그래핀</td><td class="a">②</td><td class="a">③</td><td class="a">②</td><td class="a">④</td><td class="a">⑤</td><td class="a">⑤</td></tr>
+    <tr><th>문항</th><td>13</td><td>14</td><td>15</td><td>16</td><td>17</td><td>18</td><td>19</td><td>20</td><td>21</td><td>22</td><td>23</td><td>24</td></tr>
+    <tr><th>정답</th><td class="a">①</td><td class="a">①</td><td class="a">④</td><td class="a">③</td><td class="a">⑤</td><td class="a">서술형</td><td class="a">서술형</td><td class="a">서술형</td><td class="a">③</td><td class="a">④</td><td class="a">②</td><td class="a">①</td></tr>
   </table>
 
   <div class="solcols">
@@ -930,61 +1256,191 @@
         <p>핵심은 '중간'이 아니라 '조절 가능'. 불순물·온도·빛으로 전도성이 달라진다.</p></div>
       <div class="sol"><div class="shead"><span class="sno">6</span><span class="sans">그래핀</span><span class="slink">개념 4</span></div>
         <p>탄소 한 층의 벌집 구조. 전기 잘 통함·투명·유연·튼튼 — 4대 성질로 기억.</p></div>
+      <div class="sol"><div class="shead"><span class="sno">7</span><span class="sans">②</span><span class="slink">개념 1</span></div>
+        <p>규소·저마늄 = 반도체. 금속은 도체, 유리·고무는 부도체다.</p>
+        <div class="wrongbox"><div class="wt">바로알기</div>
+          <p><b>①</b>&nbsp;구리는 자유 전자가 많은 도체이다. <b>③</b>&nbsp;유리는 부도체이다. <b>④</b>&nbsp;고무는 부도체이다 — 그래서 전선 피복이 된다. <b>⑤</b>&nbsp;알루미늄은 도체이다.</p></div></div>
     </div>
     <div>
-      <div class="sol"><div class="shead"><span class="sno">7</span><span class="sans">③</span><span class="slink">개념 1</span></div>
-        <p>규소·저마늄 = 반도체. 금속은 도체, 유리·고무는 부도체다.</p>
-        <div class="wrongbox"><div class="wt">오답 왜 틀렸나</div>
-          <p><b>①·⑤</b> 구리·알루미늄은 전선 재료 — 도체다.</p>
-          <p><b>②·④</b> 유리·고무는 부도체. 고무가 피복인 이유다.</p></div></div>
-      <div class="sol"><div class="shead"><span class="sno">8</span><span class="sans">②</span><span class="slink">개념 2·3</span></div>
-        <p>반도체의 본질 = 불순물 첨가로 전도성을 제어할 수 있다는 것.</p>
-        <div class="wrongbox"><div class="wt">오답 왜 틀렸나</div>
-          <p><b>①</b> 순수 규소는 잘 통하지 않는다.</p>
-          <p><b>③</b> 온도가 높아지면 전도성이 '커진다' — 온도 센서의 원리.</p>
-          <p><b>④</b> LED는 빛을 내는 다이오드. 증폭은 트랜지스터.</p>
-          <p><b>⑤</b> 태양 전지가 빛→전기 소자다.</p></div></div>
-      <div class="sol"><div class="shead"><span class="sno">9</span><span class="sans">③</span><span class="slink">개념 3</span></div>
-        <p>LED = 전기 에너지 → 빛. 소자는 동사로: 다이오드 '거른다', 트랜지스터 '키우고 끈다', 칩 '모은다', 태양 전지 '바꾼다'.</p>
-        <div class="wrongbox"><div class="wt">오답 왜 틀렸나</div>
-          <p><b>①·②</b> 다이오드와 트랜지스터의 기능이 서로 바뀌었다.</p>
-          <p><b>④</b> 태양 전지는 빛→전기(방향 반대).</p>
-          <p><b>⑤</b> 집적 회로는 저장 장치가 아니라 초소형 전자 회로다.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">8</span><span class="sans">③</span><span class="slink">개념 1</span></div>
+        <p><b>ㄱ&nbsp;(옳음)</b> (가)에는 원자 사이를 자유롭게 돌아다니는 전자(자유 전자)가 있다 — 금속 같은 도체의 모형. <b>ㄴ&nbsp;(옳음)</b> (나)는 전자가 원자에 붙들려 있는 부도체 — 전압을 걸어도 전류가 거의 흐르지 않는다.</p>
+        <div class="wrongbox"><div class="wt">바로알기</div>
+          <p><b>ㄷ</b>&nbsp;(틀림&nbsp;→) 전선의 피복으로는 전기가 통하지 않는 <b>(나)와 같은 부도체</b>가 적합하다. (가)와 같은 도체는 전선의 속에 쓴다.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">9</span><span class="sans">②</span><span class="slink">개념 2·3</span></div>
+        <p>반도체의 본질 = 불순물을 소량 첨가해 전도성을 조절할 수 있다는 것.</p>
+        <div class="wrongbox"><div class="wt">바로알기</div>
+          <p><b>①</b>&nbsp;순수한 규소는 전기가 잘 통하지 않는다. <b>③</b>&nbsp;온도가 높아지면 전기 전도성이 <b>커진다</b> — 온도 센서의 원리. <b>④</b>&nbsp;LED는 전기 에너지를 빛으로 바꾸는 다이오드이다. 증폭은 트랜지스터의 일. <b>⑤</b>&nbsp;반도체로 빛을 전기로 바꾸는 태양 전지를 만든다.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">10</span><span class="sans">④</span><span class="slink">개념 2·3</span></div>
+        <p><b>B&nbsp;(옳음)</b> 어두워지면 켜지는 가로등 = 빛에 반응하는 반도체 광센서. <b>C&nbsp;(옳음)</b> '반(半)'은 도체와 부도체의 '사이'라는 뜻이다. 반도체의 핵심은 중간값이 아니라 조절 가능성이다.</p>
+        <div class="wrongbox"><div class="wt">바로알기</div>
+          <p><b>A</b>&nbsp;(틀림&nbsp;→) 반도체는 온도가 높아지면 전기 전도성이 <b>커진다</b>. 이 변화를 읽어 온도 센서로 쓴다.</p></div></div>
     </div>
   </div>
 
   <div class="folio"><span>알짜 해설</span><span class="num">126</span></div>
 </div>
 
-<!-- ═════════════ p.74 해설 2 ═════════════ -->
+<!-- ═════════════ 해설 2 ═════════════ -->
 <div class="page">
   <div class="runhead"><span class="unit-tag" style="color:var(--brand);">알짜 해설</span><span class="lesson-tag">05. 물질의 전기적 성질과 신소재</span></div>
   <div class="solcols">
     <div>
-      <div class="sol"><div class="shead"><span class="sno">10</span><span class="sans">③</span><span class="slink">개념 4·5</span></div>
-        <p>(가) 그래핀의 4대 성질. (옳음) (나) 탄소 나노 튜브 = 초경량·고강도. (옳음)</p>
-        <div class="wrongbox"><div class="wt">오답 왜 틀렸나</div>
-          <p><b>(다)</b> 저항 0은 '임계 온도 이하'라는 조건부다. 상온 초전도체는 아직 없다 — 조건을 지운 선지가 함정.</p></div></div>
-      <div class="sol"><div class="shead"><span class="sno">11</span><span class="sans">모범 답안</span><span class="slink">개념 2</span></div>
-        <p>순수한 반도체는 전기가 잘 통하지 않지만, <b>소량의 불순물을 첨가하면 전기 전도성이 크게 커진다.</b> 이처럼 불순물로 전도성을 원하는 대로 <b>제어</b>할 수 있어, 전류를 켜고 끄거나 조절하는 다양한 소자를 만들 수 있기 때문이다.</p>
-        <div class="wrongbox"><div class="wt">채점 기준 (감점 포인트)</div>
-          <p>① 순수 반도체는 전도성이 작음 ② 불순물 첨가 → 전도성 증가 ③ 제어 가능성 → 소자 제작 — 세 요소 모두 서술해야 만점. 접합 원리(n형·p형)까지 쓸 필요 없다(교육과정 밖).</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">11</span><span class="sans">⑤</span><span class="slink">개념 2 | 탐구</span></div>
+        <p><b>ㄱ&nbsp;(옳음)</b> (가)와 (다)는 온도·빛 조건이 같고 불순물 첨가만 다르다 → (다)의 전류가 훨씬 크다 → 불순물 첨가로 전도성이 커진다. <b>ㄴ&nbsp;(옳음)</b> (가)와 (나)는 같은 순수한 규소에서 빛만 다르다 → 빛을 비춘 (나)의 전류가 더 크다. <b>ㄷ&nbsp;(옳음)</b> 빛에 따라 전도성이 변하는 성질을 읽으면 광센서(자동으로 켜지는 가로등)가 된다.</p>
+        <div class="wrongbox"><div class="wt">함정 체크</div>
+          <p>비교 실험은 '하나만 다르게'. (나)와 (다)는 빛과 불순물이 함께 달라서 어느 쪽의 효과인지 가릴 수 없다.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">12</span><span class="sans">⑤</span><span class="slink">개념 3</span></div>
+        <p>(가) 전기 → 빛 = 발광 다이오드(LED), (나) 빛 → 전기 = 태양 전지, (다) 작은 신호 → 큰 신호(증폭) = 트랜지스터.</p>
+        <p><b>ㄱ&nbsp;(옳음)</b> <b>ㄴ&nbsp;(옳음)</b> 지붕 위 태양광 패널이 바로 반도체 판이다. <b>ㄷ&nbsp;(옳음)</b> 트랜지스터 수십억 개를 칩 하나에 새긴 것이 집적 회로(반도체 칩)다.</p>
+        <div class="wrongbox"><div class="wt">함정 체크</div>
+          <p>들어가는 것과 나오는 것의 방향만 보면 된다. LED(전기 → 빛)와 태양 전지(빛 → 전기)는 방향이 정반대인 짝이다.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">13</span><span class="sans">①</span><span class="slink">개념 3</span></div>
+        <p>LED = 전류가 흐를 때 빛을 내도록 만든 다이오드(전기 → 빛). 소자는 동사로: 다이오드 '거른다', 트랜지스터 '키우고 끈다', 칩 '모은다', 태양 전지 '바꾼다'.</p>
+        <div class="wrongbox"><div class="wt">바로알기</div>
+          <p><b>②</b>&nbsp;다이오드는 전류를 한 방향으로만 흐르게 한다. <b>③</b>&nbsp;트랜지스터는 신호를 증폭하고 전류를 켜고 끈다. <b>④</b>&nbsp;태양 전지는 빛에너지를 전기 에너지로 바꾼다. <b>⑤</b>&nbsp;집적 회로는 수많은 소자를 칩 하나에 모은 초소형 전자 회로이다.</p></div></div>
     </div>
     <div>
-      <div class="sol"><div class="shead"><span class="sno">12</span><span class="sans">④</span><span class="slink">개념 1·2 | 2점</span></div>
-        <p><b>ㄱ (옳음)</b> 전도성 1위 A(구리)는 자유 전자가 많은 도체.</p>
-        <p><b>ㄴ (옳음)</b> 같은 규소인데 B(첨가) &gt; C(순수) — 불순물 효과의 직접 증거.</p>
-        <p><b>ㄷ (틀림)</b> 유리가 안 통하는 이유는 자유 전자가 '거의 없어서'다.</p>
-        <div class="wrongbox"><div class="wt">함정 체크</div>
-          <p>결과(안 통함)는 맞고 이유(전자 많음)를 바꾼 선지 — 전도성 문제는 항상 '이유'까지 검산하자.</p></div></div>
-      <div class="sol"><div class="shead"><span class="sno">13</span><span class="sans">④</span><span class="slink">개념 5 | 2.5점</span></div>
-        <p><b>ㄱ (옳음)</b> 그래프에서 T<sub>0</sub> 이하 구간의 저항은 0이다.</p>
-        <p><b>ㄴ (옳음)</b> 저항이 없으면 열 손실이 없다 — 강력한 전자석(MRI·자기 부상)의 비결.</p>
-        <p><b>ㄷ (틀림)</b> T<sub>0</sub>를 넘으면 저항이 되살아난다. 초전도는 조건부 현상이다.</p>
-        <div class="wrongbox"><div class="wt">함정 체크</div>
-          <p>그래프 문제는 '꺾이는 지점(T<sub>0</sub>)'이 곧 출제 포인트. 조건을 지우는 선지(ㄷ 유형)를 반사적으로 의심하라.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">14</span><span class="sans">①</span><span class="slink">개념 4</span></div>
+        <p>그래핀은 두께가 원자 하나뿐인데 전기가 구리보다 잘 통하고, 투명하며 잘 휘어진다.</p>
+        <div class="wrongbox"><div class="wt">바로알기</div>
+          <p><b>②</b>&nbsp;그래핀은 투명하여 휘는 디스플레이의 재료로 주목받는다. <b>③</b>&nbsp;탄소 나노 튜브는 가벼우면서 강도가 커서 스포츠 장비·구조재에 쓰인다. <b>④</b>&nbsp;흑연과 다이아몬드는 모두 탄소로 이루어져 있다 — 배열이 다를 뿐이다. <b>⑤</b>&nbsp;신소재는 기존 재료에 없는 성질을 갖도록 설계·합성한 재료이다.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">15</span><span class="sans">④</span><span class="slink">개념 4</span></div>
+        <p>(가) 탄소 층이 쌓인 흑연, (나) 탄소 한 층의 그래핀, (다) 그래핀을 만 탄소 나노 튜브.</p>
+        <p><b>ㄴ&nbsp;(옳음)</b> 그래핀은 투명하고 유연하며 전기가 잘 통한다 → 휘는 디스플레이·웨어러블. <b>ㄷ&nbsp;(옳음)</b> 탄소 나노 튜브 = 그래핀을 둥글게 만 모양, 초경량·고강도.</p>
+        <div class="analysis"><div class="at">꼼꼼 자료 분석</div>
+          <svg width="300" height="112" viewBox="0 0 300 112" font-family="PC Sans">
+            <g transform="translate(46,14)">
+              <g fill="none" stroke="#22303A" stroke-width="1.2">
+                <polyline points="-30,0 -20,5 -10,0 0,5 10,0 20,5 30,0"/>
+                <polyline points="-30,16 -20,21 -10,16 0,21 10,16 20,21 30,16"/>
+                <polyline points="-30,32 -20,37 -10,32 0,37 10,32 20,37 30,32"/>
+              </g>
+              <rect x="-34" y="-5" width="68" height="14" rx="2" fill="none" stroke="#E8940A" stroke-width="1.2" stroke-dasharray="3 2"/>
+            </g>
+            <g transform="translate(147.8,19) scale(0.72)">
+              <g fill="none" stroke="#22303A" stroke-width="1.5">
+                <path d="M-42,26 L-32,10 L-12,10 L-2,26 L-12,42 L-32,42 Z"/>
+                <path d="M-2,26 L8,10 L28,10 L38,26 L28,42 L8,42 Z"/>
+                <path d="M-32,10 L-22,-6 L-2,-6 L8,10"/>
+                <path d="M8,10 L18,-6 L38,-6 L48,10 L38,26"/>
+              </g>
+            </g>
+            <g transform="translate(254,14) scale(0.8)">
+              <ellipse cx="0" cy="4" rx="22" ry="7" fill="none" stroke="#22303A" stroke-width="1.5"/>
+              <line x1="-22" y1="4" x2="-22" y2="44" stroke="#22303A" stroke-width="1.5"/>
+              <line x1="22" y1="4" x2="22" y2="44" stroke="#22303A" stroke-width="1.5"/>
+              <path d="M-22,44 a22,7 0 0 0 44,0" fill="none" stroke="#22303A" stroke-width="1.5"/>
+            </g>
+            <g stroke="#E8940A" stroke-width="1.6" marker-end="url(#arrC)"><line x1="82" y1="32" x2="106" y2="32"/><line x1="188" y1="32" x2="222" y2="32"/></g>
+            <g font-size="6.6" font-weight="800" fill="#B4560E" text-anchor="middle"><text x="94" y="25">한 층만</text><text x="205" y="25">둥글게 말면</text></g>
+            <g font-size="7.8" font-weight="900" fill="#22303A" text-anchor="middle"><text x="46" y="68">(가) 흑연</text><text x="150" y="68">(나) 그래핀</text><text x="254" y="68">(다) 탄소 나노 튜브</text></g>
+            <text x="150" y="84" text-anchor="middle" font-size="6.8" font-weight="700" fill="#2E5BDA">(나) 탄소 한 층 → 투명·유연·전기 잘 통함 → 휘는 디스플레이 (ㄴ)</text>
+            <text x="150" y="95" text-anchor="middle" font-size="6.8" font-weight="700" fill="#B4560E">(다) (나)를 만 것 → 가볍고 강도가 크다 (ㄷ)</text>
+            <text x="150" y="106" text-anchor="middle" font-size="6.8" font-weight="700" fill="#5B6B77">셋 다 탄소 — 원소가 아니라 배열이 다르다 (ㄱ ✕)</text>
+          </svg></div>
+        <div class="wrongbox"><div class="wt">바로알기</div>
+          <p><b>ㄱ</b>&nbsp;(틀림&nbsp;→) (가)~(다)는 <b>모두 탄소</b>로만 이루어져 있다. 성질이 다른 것은 탄소 원자의 <b>배열</b>이 다르기 때문이다.</p></div></div>
+    </div>
+  </div>
+  <div class="folio"><span>알짜 해설</span><span class="num">127</span></div>
+</div>
 
-      <div class="gist" style="margin-top:5mm;">
+<!-- ═════════════ 해설 3 ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag" style="color:var(--brand);">알짜 해설</span><span class="lesson-tag">05. 물질의 전기적 성질과 신소재</span></div>
+  <div class="solcols">
+    <div>
+      <div class="sol"><div class="shead"><span class="sno">16</span><span class="sans">③</span><span class="slink">개념 4·5</span></div>
+        <p><b>ㄱ&nbsp;(옳음)</b> ㉠ 그래핀의 성질 — 투명하고 잘 휘어지며 전기가 잘 통한다 → 휘는 디스플레이. <b>ㄴ&nbsp;(옳음)</b> ㉡ 저항 0 → 강한 전류 → 강력한 초전도 전자석 → MRI·자기 부상 열차.</p>
+        <div class="wrongbox"><div class="wt">바로알기</div>
+          <p><b>ㄷ</b>&nbsp;(틀림&nbsp;→) ㉢에는 '전압을 걸면 분자 배열이 바뀌어 빛의 통과를 조절한다'가 들어간다. 빛을 받아 전기를 만드는 것은 반도체 소자인 <b>태양 전지</b>이다.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">17</span><span class="sans">⑤</span><span class="slink">개념 5</span></div>
+        <p>액정 = 액체처럼 흐르면서 고체 결정처럼 분자가 규칙적으로 배열된 중간 상태. 전압을 걸면 배열 방향이 바뀌어 빛을 통과시키거나 차단한다 → LCD.</p>
+        <div class="wrongbox"><div class="wt">바로알기</div>
+          <p><b>①</b>&nbsp;액정은 액체처럼 흐른다. <b>②</b>&nbsp;액정 분자는 고체 결정처럼 규칙적으로 배열되어 있다. <b>③</b>&nbsp;임계 온도 이하에서 저항이 0이 되는 것은 초전도체이다. <b>④</b>&nbsp;전류가 흐르면 빛을 내는 반도체 소자는 발광 다이오드(LED)이다 — 액정은 빛을 통과시키거나 막을 뿐이다.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">18</span><span class="sans">모범 답안</span><span class="slink">개념 1</span></div>
+        <p>구리는 <b>자유 전자</b>가 많은 도체여서, 전압을 걸면 자유 전자가 이동하여 <b>전류</b>가 잘 흐르므로 전선의 속으로 쓴다. 고무는 전자가 원자에 붙들려 있어 자유 전자가 거의 없는 부도체여서 전류가 흐르지 않으므로, 겉을 감싸 <b>감전</b>을 막는다.</p>
+        <table class="rubric">
+          <tr><th>채점 요소</th><th>배점</th></tr>
+          <tr><td>① 구리는 자유 전자가 많아 전류가 잘 흐른다고 썼다.</td><td>2점</td></tr>
+          <tr><td>② 고무는 자유 전자가 거의 없어 전류가 흐르지 않는다고 썼다.</td><td>2점</td></tr>
+          <tr><td>③ 고무로 겉을 감싸 감전을 막는다고 썼다.</td><td>2점</td></tr>
+        </table>
+        <div class="wrongbox"><div class="wt">이렇게 쓰면 0점</div>
+          <p>"구리는 단단하고 고무는 말랑해서 쥐기 편하기 때문이다." — 전기적 성질(자유 전자)이 아닌 다른 성질로 답했다.</p></div></div>
+    </div>
+    <div>
+      <div class="sol"><div class="shead"><span class="sno">19</span><span class="sans">모범 답안</span><span class="slink">개념 2</span></div>
+        <p>순수한 반도체는 전기가 잘 통하지 않지만, 소량의 <b>불순물</b>을 첨가하면 <b>전기 전도성</b>이 크게 커진다. 불순물의 종류와 양으로 전도성을 조절할 수 있으므로, 전류를 흐르게 할지 말지 정하는 <b>스위치</b>를 만들 수 있고, 이 스위치를 모아 컴퓨터 같은 전자 기기를 만든다.</p>
+        <table class="rubric">
+          <tr><th>채점 요소</th><th>배점</th></tr>
+          <tr><td>① 불순물을 첨가하면 전기 전도성이 커진다고 썼다.</td><td>2점</td></tr>
+          <tr><td>② 불순물의 종류·양으로 전도성을 조절할 수 있다고 썼다.</td><td>2점</td></tr>
+          <tr><td>③ 전류를 켜고 끄는 스위치(소자)를 만들 수 있다고 썼다.</td><td>2점</td></tr>
+        </table>
+        <div class="wrongbox"><div class="wt">이렇게 쓰면 0점</div>
+          <p>"반도체는 전기가 반만 통하기 때문이다." — 핵심은 중간값이 아니라 조절 가능성이다. 접합 원리(n형·p형)까지 쓸 필요는 없다(교육과정 밖).</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">20</span><span class="sans">모범 답안</span><span class="slink">개념 5</span></div>
+        <p>초전도체는 <b>임계 온도</b> 이하에서 전기 <b>저항</b>이 0이 되어 전류가 흘러도 <b>열</b> 손실이 없으므로, 아주 강한 전류를 흘려 강력한 전자석을 만들 수 있다. 저항이 0인 상태는 임계 온도 이하에서만 나타나므로, 이 상태를 유지하려고 장치를 극저온으로 냉각한다.</p>
+        <table class="rubric">
+          <tr><th>채점 요소</th><th>배점</th></tr>
+          <tr><td>① 임계 온도 이하에서 저항이 0이 된다고 썼다.</td><td>2점</td></tr>
+          <tr><td>② 열 손실이 없어 강한 전류를 흘릴 수 있다고 썼다.</td><td>2점</td></tr>
+          <tr><td>③ 임계 온도 이하를 유지하려고 냉각한다고 썼다.</td><td>2점</td></tr>
+        </table>
+        <div class="wrongbox"><div class="wt">이렇게 쓰면 0점</div>
+          <p>"온도가 낮으면 자석의 힘이 세지기 때문이다." — 저항 0과 임계 온도라는 조건을 쓰지 않았다.</p></div></div>
+    </div>
+  </div>
+  <div class="folio"><span>알짜 해설</span><span class="num">?</span></div>
+</div>
+
+<!-- ═════════════ 해설 4 ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag" style="color:var(--brand);">알짜 해설</span><span class="lesson-tag">05. 물질의 전기적 성질과 신소재</span></div>
+  <div class="solcols">
+    <div>
+      <div class="sol"><div class="shead"><span class="sno">21</span><span class="sans">③</span><span class="slink">개념 1·2 | 2점</span></div>
+        <p>같은 원소인 B·C가 규소다. 전도성이 큰 B가 불순물을 첨가한 규소, C가 순수한 규소. 남은 A(가장&nbsp;큼)&nbsp;=&nbsp;구리, D(가장&nbsp;작음)&nbsp;=&nbsp;유리.</p>
+        <p><b>ㄱ&nbsp;(옳음)</b> 전도성 1위 A(구리)는 자유 전자가 많은 도체. <b>ㄴ&nbsp;(옳음)</b> 같은 규소인데 B(첨가) &gt; C(순수) — 불순물 효과의 직접 증거.</p>
+        <div class="wrongbox"><div class="wt">바로알기</div>
+          <p><b>ㄷ</b>&nbsp;(틀림&nbsp;→) D(유리)는 자유 전자가 <b>거의 없어서</b> 전기가 통하지 않는다. 결과(안 통함)는 맞고 이유를 바꾼 선지 — 전도성 문제는 항상 '이유'까지 검산하자.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">22</span><span class="sans">④</span><span class="slink">개념 5 | 2.5점</span></div>
+        <p><b>ㄴ&nbsp;(옳음)</b> T<sub>0</sub> 이하에서 저항이 0 → 전류가 흘러도 열 손실이 없다. <b>ㄷ&nbsp;(옳음)</b> 저항 0은 T<sub>0</sub> 이하에서만 나타난다. 그래서 MRI의 초전도 전자석은 T<sub>0</sub>보다 낮게 늘 냉각한다.</p>
+        <div class="analysis"><div class="at">꼼꼼 자료 분석</div>
+          <svg width="300" height="118" viewBox="0 0 300 118" font-family="PC Sans">
+            <rect x="40" y="60" width="80" height="24" fill="#FBEBEE"/>
+            <line x1="40" y1="84" x2="270" y2="84" stroke="#5B6B77" stroke-width="1.2" marker-end="url(#arrC)"/>
+            <line x1="40" y1="84" x2="40" y2="6" stroke="#5B6B77" stroke-width="1.2" marker-end="url(#arrC)"/>
+            <text x="272" y="96" text-anchor="end" font-size="7.4" fill="#5B6B77">온도</text>
+            <text x="36" y="9" text-anchor="end" font-size="7.4" fill="#5B6B77">저항</text>
+            <line x1="40" y1="84" x2="120" y2="84" stroke="#D6455D" stroke-width="3"/>
+            <path d="M120,84 L120,34 Q180,26 258,20" fill="none" stroke="#2E5BDA" stroke-width="2.2"/>
+            <line x1="120" y1="84" x2="120" y2="92" stroke="#5B6B77" stroke-width="0.8" stroke-dasharray="2 1.5"/>
+            <text x="120" y="101" text-anchor="middle" font-size="8" font-weight="800">T<tspan dy="0.14em" font-size="68%">0</tspan></text>
+            <text x="80" y="70" text-anchor="middle" font-size="6.8" font-weight="800" fill="#D6455D">저항 0</text>
+            <text x="80" y="79" text-anchor="middle" font-size="6.6" font-weight="700" fill="#D6455D">→ 열 손실 없음 (ㄴ)</text>
+            <path d="M170,40 L232,30" fill="none" stroke="#E8940A" stroke-width="1.4" marker-end="url(#arrC)"/>
+            <text x="200" y="52" text-anchor="middle" font-size="6.8" font-weight="800" fill="#B4560E">온도↑ → 저항↑ (ㄱ ✕)</text>
+            <text x="150" y="113" text-anchor="middle" font-size="6.8" font-weight="700" fill="#2E5BDA">초전도는 T<tspan dy="0.14em" font-size="68%">0</tspan><tspan dy="-0.14em"> 아래에서만 → MRI 전자석은 극저온으로 냉각 (ㄷ)</tspan></text>
+          </svg></div>
+        <div class="wrongbox"><div class="wt">바로알기</div>
+          <p><b>ㄱ</b>&nbsp;(틀림&nbsp;→) T<sub>0</sub>보다 높은 온도에서는 온도가 높을수록 저항이 <b>커진다</b>(그래프가 오른쪽 위로 오른다).</p></div></div>
+    </div>
+    <div>
+      <div class="sol"><div class="shead"><span class="sno">23</span><span class="sans">②</span><span class="slink">개념 1·2 | 소단원 03 연계 | 2.5점</span></div>
+        <p>A: 고체에서 매우 잘 통하고 온도가 오르면 조금 덜 통함 → 금속(구리). B: 고체에서는 안 통하고 수용액에서 통함 → 이온 결합 물질(염화 나트륨). C: 빛에 반응 → 순수한 규소.</p>
+        <p><b>ㄷ&nbsp;(옳음)</b> 규소에 불순물을 첨가하면 전도성이 커진다.</p>
+        <div class="wrongbox"><div class="wt">바로알기</div>
+          <p><b>ㄱ</b>&nbsp;(틀림&nbsp;→) A(구리)에서 전하를 운반하는 입자는 <b>자유 전자</b>이다. 이온이 전하를 운반하는 것은 B의 수용액이다. <b>ㄴ</b>&nbsp;(틀림&nbsp;→) 고체 B 속에도 이온(Na<sup>+</sup>, Cl<sup>−</sup>)은 <b>있다</b> — 제자리에 붙들려 이동할 수 없어서 전기가 통하지 않을 뿐이다.</p></div>
+        <div class="wrongbox"><div class="wt">함정 체크</div>
+          <p>기준은 언제나 하나 — "움직일 수 있는 전하 운반 입자가 있는가?" 금속은 자유 전자, 이온 결합 물질의 수용액은 이온이 그 입자다.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">24</span><span class="sans">①</span><span class="slink">개념 3 | 2점</span></div>
+        <p><b>ㄱ&nbsp;(옳음)</b> (가)와 (나)는 같은 LED에 연결 방향만 다르다. 한 방향(a가 (+)극 쪽)으로만 켜졌으므로 LED는 전류를 한 방향으로만 흐르게 하는 다이오드다.</p>
+        <div class="wrongbox"><div class="wt">바로알기</div>
+          <p><b>ㄴ</b>&nbsp;(틀림&nbsp;→) (나)에서는 LED에 전류가 <b>거의 흐르지 않아</b> 켜지지 않는다 — 방향이 반대이기 때문이다. <b>ㄷ</b>&nbsp;(틀림&nbsp;→) LED는 전기 에너지를 <b>빛에너지로</b> 바꾸는 소자이다. 빛을 받아 전기를 만드는 것은 태양 전지이다.</p></div></div>
+
+      <div class="gist" style="margin-top:3mm;">
         <div class="boxtitle"><span class="ico">알</span>이 소단원, 이것만은!</div>
         <ul>
           <li>구분 기준: <b>자유 전자</b> — 도체(많다)·부도체(없다)·반도체(<b>조절된다</b>: 불순물↑·온도↑·빛↑ → 전도성↑)</li>
@@ -994,12 +1450,22 @@
       </div>
     </div>
   </div>
-  <div class="folio"><span>알짜 해설</span><span class="num">127</span></div>
+  <div class="folio"><span>알짜 해설</span><span class="num">?</span></div>
 </div>
 
 <!-- ═════════════ p.75 MEMO ═════════════ -->
 <div class="page">
   <div class="runhead"><span class="unit-tag">II. 물질과 규칙성</span><span class="lesson-tag">II 단원 완결 — III 단원으로 가기 전에</span></div>
+  <div class="spaced">
+    <div class="st">간격 두고 다시 꺼내기 — 책을 덮고 답한다</div>
+    <ol>
+      <li>순수한 반도체에 불순물을 소량 첨가하면 전기 전도성은 어떻게 되는가?</li>
+      <li>전류를 한 방향으로만 흐르게 하는 반도체 소자는?</li>
+      <li>초전도체의 전기 저항이 0이 되는 조건을 한 마디로 답하면?</li>
+    </ol>
+    <div class="when"><span>□ 1일 뒤</span><span>□ 1주 뒤</span><span>□ 시험 전</span></div>
+    <div class="ans">정답 1 커진다 2 다이오드 3 임계 온도 이하</div>
+  </div>
   <div class="memo-head"><span class="mt">MEMO</span><span class="ms">헷갈린 개념, 다시 틀린 문제 번호, 나만의 암기법을 남겨 두는 자리</span></div>
   <div class="memo-area"></div>
   <div class="memo-pen">"빅뱅에서 반도체까지 — 원소의 여정 다섯 정거장을 한 줄씩 말할 수 있으면, II 단원 완주다. — 박찬쌤"</div>
