@@ -50,7 +50,7 @@ async def main():
         await s.fill('#fbBody', '두 번째 포인트의 단위가 m/s 가 아니라 m/s² 같아요'); await s.dispatch_event('#fbBody', 'input')
         assert await s.inner_text('#fbN') == str(len('두 번째 포인트의 단위가 m/s 가 아니라 m/s² 같아요'))
         await s.screenshot(path=f'{SC}/f01_{TAG}_sheet.png')
-        await s.click('#fbSend'); await s.locator('.toast', has_text='원장님께 보냈어요').wait_for(timeout=4000)
+        await s.click('#fbSend'); await s.locator('.toast', has_text='원장님께 보냈습니다').wait_for(timeout=4000)
         # ③ 문제 은행 문제에서 · ④ 내 정보에서(종류 바꾸기) · 힘든 마음이 담긴 글
         bid = await s.evaluate("(() => { const q = BANK.find(x => x.type === 'ox' && CONCEPTS.findIndex(c => c.lessonId === x.lessonId) === dayIndex()) || BANK.find(x => x.type === 'ox'); bs = { items:[q], i:0, pick:null, right:0, wrong:[] }; show('bank'); renderBankSession(); return q.id; })()")
         await s.click('[data-ox="O"]'); await s.wait_for_timeout(300)

@@ -2,7 +2,9 @@
 
 ## 빌드·배포
 - 앱 원본은 `app/app-shell.html` 한 파일. `cd app && python3 build.py` → `docs/parkchan/index.html`(GitHub Pages). 빌드는 `node --check` 문법 관문을 통과해야 쓴다.
-- 커밋마다 `docs/parkchan/sw.js` 의 `CACHE` 판을 올린다(옛 캐시가 새 앱을 가리지 않게).
+- `docs/parkchan/sw.js` 의 `CACHE`·`DATA` 줄은 빌드가 앱 지문으로 고쳐 쓴다(손으로 올리지 않는다). sw.js 를 고친 커밋은 빌드를 한 번 더 돌려 확인.
+- 문제 은행·자료 탐구·그림은 `more-지문.json` 으로 따로 나간다(첫 화면 뒤에 받음). 이 셋을 쓰는 화면·버튼은 `MORE.ok` 전이면 자리 표시·`afterMore()` 로 기다린다 — 새 화면을 만들면 `MORE_VIEWS`·클릭 관문에 넣고 `tools/e2e_lazy.py` 로 확인.
+- 앱 안 파일 저장은 `saveFile()` 하나로(안드로이드 WebView 에는 다운로드·Web Share 가 없다 — Filesystem+Share 플러그인).
 - 안드로이드: `app-native/`(Capacitor, targetSdk 36) · CI `.github/workflows/android-apk.yml`.
 - 서버: `app/server/schema.sql`(Supabase·RLS) · `functions.sql` · `functions/*`(Edge Function, Deno).
 

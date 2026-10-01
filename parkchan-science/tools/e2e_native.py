@@ -14,7 +14,7 @@ from _ui import signup, NO_INTRO, auto_yes
 SC = sys.argv[sys.argv.index('--shots')+1] if '--shots' in sys.argv[:-1] else '/tmp/e2e_native'; os.makedirs(SC, exist_ok=True)
 GW = tf.GW
 STUB = """
-window.__iap = { next: '', purchases: [], calls: [] }; window.__push = { asked: 0, registered: 0 }; window.__secure = []; window.__toasts = [];
+window.__iap = { next: '', purchases: [], calls: [] }; window.__push = { asked: 0, registered: 0 }; window.__secure = []; window.__toasts = []; window.__files = []; window.__shared = [];
 document.addEventListener('DOMContentLoaded', () => new MutationObserver(ms => ms.forEach(m => m.addedNodes.forEach(n => n.classList && n.classList.contains('toast') && window.__toasts.push(n.textContent)))).observe(document.body, { childList: true }));
 const L = {};
 window.Capacitor = { isNativePlatform: () => true, getPlatform: () => 'android', Plugins: {
@@ -25,6 +25,8 @@ window.Capacitor = { isNativePlatform: () => true, getPlatform: () => 'android',
     getPurchases: async () => ({ purchases: window.__iap.purchases }),
   },
   SecureScreen: { set: async ({ on }) => { window.__secure.push(on); } },
+  Filesystem: { writeFile: async (o) => { window.__files.push(o); return { uri:'file:///data/cache/' + o.path }; } },
+  Share: { share: async (o) => { window.__shared.push(o); if (window.__shareCancel) throw new Error('Share canceled'); return {}; } },
   PushNotifications: {
     addListener: (ev, fn) => { L[ev] = fn; return { remove(){} }; },
     checkPermissions: async () => ({ receive: window.__push.asked ? 'granted' : 'prompt' }),
@@ -120,6 +122,15 @@ async def main():
             await s.click('.tab[data-v="me"]'); await s.wait_for_timeout(300); assert await sec() is False
             n = await s.evaluate('__secure.length'); await s.click('.tab[data-v="plan"]'); await s.wait_for_timeout(200)
             assert await s.evaluate('__secure.length') == n, '같은 상태면 다시 부르지 않아야 함'
+            # ⑤-3 '내 기록 내려받기' — 앱(WebView)엔 다운로드·Web Share 가 없다 → 앱 캐시에 쓰고 공유 창으로
+            await s.click('.tab[data-v="me"]'); await s.wait_for_timeout(300); await s.click('#myExport'); await s.wait_for_timeout(1500)
+            f = (await s.evaluate('__files'))[-1]; sh = (await s.evaluate('__shared'))[-1]
+            assert f['directory'] == 'CACHE' and f['encoding'] == 'utf8' and f['path'].endswith('.json') and '/' not in f['path'], f
+            d = json.loads(f['data']); assert d['계정']['email'] == 'app@t.kr' and d['학원']['코드'] == 'NAT001', list(d)
+            assert sh['files'] == ['file:///data/cache/' + f['path']], sh
+            nt = len(await s.evaluate('__toasts')); await s.evaluate('window.__shareCancel = true'); await s.click('#myExport'); await s.wait_for_timeout(1500)
+            assert not any('만들지 못했' in t for t in (await s.evaluate('__toasts'))[nt:]), '공유 창을 닫았을 뿐인데 오류 알림'
+            await s.evaluate('window.__shareCancel = false')
             # ⑥ 로그아웃하면 이 기기 푸시 등록을 지운다(다음 사람이 앞사람 알림을 받지 않게)
             await s.click('.tab[data-v="me"]'); await s.wait_for_timeout(300); await s.click('#logout'); await s.wait_for_timeout(900)
             assert svc('push_tokens?select=token') == [], '로그아웃했는데 푸시 등록이 남음'

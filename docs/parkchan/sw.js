@@ -9,10 +9,13 @@
       — 예전엔 주소마다 3MB 사본이 쌓였고, 보호자 동의 링크(consent.html?t=…)의 토큰까지 캐시에 남았다(2026-10-01 점검).
    3. 네트워크를 먼저 보되 3.5초 안에 안 오면 저장본으로 연다(약한 망에서 한참 기다리지 않게). 받아 오면 저장본을 새로 바꾼다.
    4. 보호자 동의 페이지는 저장하지 않는다(늘 새로, 토큰을 남기지 않게).
-   5. 웹 글꼴(Google Fonts)은 따로 오래 두는 캐시에 — 오프라인에서도 제 글꼴로 보이게. 판이 바뀌어도 지우지 않는다. */
-const CACHE = 'pcs-2026-10-02b';
+   5. 문제 은행·탐구·그림 파일(more-지문.json)은 설치할 때 미리 받는다. 이름에 지문이 있어 판이 바뀌면 새 이름이 된다.
+   6. 웹 글꼴(Google Fonts)은 따로 오래 두는 캐시에 — 오프라인에서도 제 글꼴로 보이게. 판이 바뀌어도 지우지 않는다. */
+// CACHE·DATA 두 줄은 app/build.py 가 빌드할 때마다 고쳐 쓴다(앱 내용 지문) — 손으로 올리지 않아도 새 판이 옛 캐시에 가리지 않는다.
+const CACHE = 'pcs-a123e5fa28';
+const DATA = './more-967f64b97b.json';   // 문제 은행·자료 탐구·그림 — 앱이 첫 화면 뒤에 받는 파일. 미리 받아 두어 오프라인에서도 열리게
 const FONTS = 'pcs-fonts-v1';
-const ASSETS = ['./index.html', './manifest.webmanifest', './icon-192.png', './icon-512.png', './icon-180.png'];
+const ASSETS = ['./index.html', DATA, './manifest.webmanifest', './icon-192.png', './icon-512.png', './icon-180.png'];
 
 self.addEventListener('install', (e) => {
   e.waitUntil(caches.open(CACHE).then((c) => c.addAll(ASSETS)).then(() => self.skipWaiting()));

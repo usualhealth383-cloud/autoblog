@@ -247,13 +247,16 @@ s, _ = call('POST', '/rest/v1/notes', {'id': str(_uuid.uuid4()), 'date': '2026-0
 K5, K5_ID = signup('kid5@test.kr', '동의전', under14=True, guardian='최보호 01077778888')
 s, _ = call('POST', '/rest/v1/notes', {'id': str(_uuid.uuid4()), 'date': '2026-09-30', 'title': '동의 전', 'body': '', 'cids': []}, K5); check('보호자 동의 전에는 노트를 서버에 못 남김', s >= 400, s)
 # 나중에 고친 쪽이 이긴다 — 옛 기기가 늦게 올린 더 오래된 수정은 버린다
-s, _ = call('POST', '/rest/v1/notes?on_conflict=id', {'id': nid, 'date': '2026-09-30', 'title': '새 제목', 'body': '나만 봄', 'cids': [], 'updated_at': '2026-10-01T10:05:00+09:00'}, N1, UP)
-s, _ = call('POST', '/rest/v1/notes?on_conflict=id', {'id': nid, 'date': '2026-09-30', 'title': '옛 제목', 'body': '나만 봄', 'cids': [], 'updated_at': '2026-10-01T10:00:00+09:00'}, N1, UP)
+# (시각은 지금 기준으로 — 고정 시각을 쓰면 그 시각이 지난 뒤엔 '새 수정'도 처음 만든 시각보다 옛것이 되어 시험이 틀렸다, 2026-10-01)
+import datetime as _dt
+_t = lambda m: (_dt.datetime.now(_dt.timezone.utc) + _dt.timedelta(minutes=m)).isoformat()
+s, _ = call('POST', '/rest/v1/notes?on_conflict=id', {'id': nid, 'date': '2026-09-30', 'title': '새 제목', 'body': '나만 봄', 'cids': [], 'updated_at': _t(10)}, N1, UP)
+s, _ = call('POST', '/rest/v1/notes?on_conflict=id', {'id': nid, 'date': '2026-09-30', 'title': '옛 제목', 'body': '나만 봄', 'cids': [], 'updated_at': _t(5)}, N1, UP)
 s, j = call('GET', f'/rest/v1/notes?id=eq.{nid}&select=title', tok=N1); check('더 오래된 수정은 새 수정을 덮지 않음', j and j[0]['title'] == '새 제목', (s, j))
-call('PATCH', f'/rest/v1/notes?id=eq.{nid}', {'title': '비밀 메모', 'updated_at': '2026-10-01T11:00:00+09:00'}, N1)
+call('PATCH', f'/rest/v1/notes?id=eq.{nid}', {'title': '비밀 메모', 'updated_at': _t(20)}, N1)
 # 3,000개 제한: 가득 차도 이미 있는 노트는 고칠 수 있고, 새로 넣기만 막힌다
 cur.execute("insert into notes (id, uid, date, title) select gen_random_uuid(), %s, date '2026-01-01', 'bulk' from generate_series(1, 2999)", (N1_ID,)); cur.connection.commit()
-s, _ = call('POST', '/rest/v1/notes?on_conflict=id', {'id': nid, 'date': '2026-09-30', 'title': '비밀 메모', 'body': '가득 차도 고침', 'cids': [], 'updated_at': '2026-10-01T12:00:00+09:00'}, N1, UP); check('3,000개가 차도 기존 노트 고치기는 됨', s in (200, 201), s)
+s, _ = call('POST', '/rest/v1/notes?on_conflict=id', {'id': nid, 'date': '2026-09-30', 'title': '비밀 메모', 'body': '가득 차도 고침', 'cids': [], 'updated_at': _t(30)}, N1, UP); check('3,000개가 차도 기존 노트 고치기는 됨', s in (200, 201), s)
 s, _ = call('POST', '/rest/v1/notes?on_conflict=id', {'id': str(_uuid.uuid4()), 'date': '2026-09-30', 'title': '하나 더', 'body': '', 'cids': []}, N1, UP); check('3,000개를 넘는 새 노트는 거절', s >= 400, s)
 cur.execute("delete from notes where uid = %s and title = 'bulk'", (N1_ID,)); cur.connection.commit()
 cur.execute('select count(*) from notes where title = %s', ('비밀 메모',)); before = cur.fetchone()[0]

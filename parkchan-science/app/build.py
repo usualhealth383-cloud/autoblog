@@ -32,12 +32,21 @@ if not _parts: print('! 학원 연락처(CFG.phone·CFG.email)가 비어 있습�
 legal = {k: v.replace('<!--CONTACT-->', CONTACT) for k, v in legal.items()}
 for k, v in legal.items():
     shell = shell.replace(f'<!--LEGAL_{k.upper()}-->', v.replace('`', '&#96;').replace('${', '&#36;{'))
+# 문제 은행·자료 탐구·그림(약 1.5MB)은 앱 파일과 따로 — 첫 화면을 그린 뒤 받는다(느린 4G 에서 첫 화면 10초+ → 2026-10-02).
+# 파일 이름에 내용 지문을 붙여, 앱과 데이터의 판이 어긋나지 않게 한다(옛 앱은 옛 파일, 새 앱은 새 파일).
+import hashlib
+more = json.dumps({'bank': bank, 'labs': labs, 'figs': figs}, ensure_ascii=False, separators=(',', ':'))
+MORE_NAME = 'more-' + hashlib.sha1(more.encode('utf-8')).hexdigest()[:10] + '.json'
+_vb = lambda svg: (re.search(r'viewBox="0 0 ([\d.]+) ([\d.]+)"', svg) or [None, '600', '300'])
+meta = {'url': MORE_NAME, 'bank': len(bank), 'labs': len(labs),
+        'bl': {L: sum(1 for q in bank if q['lessonId'] == L) for L in sorted({q['lessonId'] for q in bank})},
+        'll': sorted({l['lessonId'] for l in labs}),
+        'fv': {k: f"{_vb(v)[1]} {_vb(v)[2]}" for k, v in figs.items()}}
 out = (shell.replace('<!--CONCEPTS-->', j(concepts))
             .replace('<!--QUIZZES-->', j(quizzes))
-            .replace('<!--BANK-->', j(bank))
-            .replace('<!--LABS-->', j(labs))
-            .replace('<!--QUOTES-->', j(quotes))
-            .replace('<!--FIGS-->', j(figs)))
+            .replace('<!--MORE_META-->', j(meta))
+            .replace('<!--QUOTES-->', j(quotes)))
+for _k in ('<!--BANK-->', '<!--LABS-->', '<!--FIGS-->'): assert _k not in out
 
 # GitHub Pages 로 나가는 PWA 배포본 — manifest·service worker 가 함께 있어야 앱처럼 동작한다
 pages = ROOT.parent / 'docs' / 'parkchan'
@@ -54,10 +63,20 @@ if shutil.which('node'):
     if r.returncode: raise SystemExit('✗ 앱 스크립트 문법 오류 — 배포하지 않습니다\n' + r.stderr[-1500:])
 if pages.exists():
     (pages / 'index.html').write_text(out, encoding='utf-8')
+    for old in pages.glob('more-*.json'):
+        if old.name != MORE_NAME: old.unlink()
+    (pages / MORE_NAME).write_text(more, encoding='utf-8')
+    # 서비스 워커: 캐시 판 = 앱+데이터 지문(손으로 올리다 잊으면 옛 앱이 새 앱을 가린다), 미리 받을 데이터 파일 이름
+    sw_p = pages / 'sw.js'; sw = sw_p.read_text(encoding='utf-8')
+    ver = 'pcs-' + hashlib.sha1((out + more).encode('utf-8')).hexdigest()[:10]
+    sw2 = re.sub(r"^const CACHE = '[^']*';", f"const CACHE = '{ver}';", sw, count=1, flags=re.M)
+    sw2 = re.sub(r"^const DATA = '[^']*';", f"const DATA = './{MORE_NAME}';", sw2, count=1, flags=re.M)
+    assert sw2.count(ver) == 1 and MORE_NAME in sw2, 'sw.js 의 CACHE·DATA 줄을 찾지 못했습니다'
+    if sw2 != sw: sw_p.write_text(sw2, encoding='utf-8')
     for k, t, fn in (('terms', '이용약관', 'terms.html'), ('privacy', '개인정보처리방침', 'privacy.html'), ('delete', '계정·데이터 삭제 안내', 'delete-account.html')):
         (pages / fn).write_text(PAGE.format(t=t, b=legal[k]), encoding='utf-8')
     # 보호자 동의 페이지(자녀가 보낸 링크로 열림) — 서버 연결값만 심는다
     consent = (ROOT / 'app' / 'consent.html').read_text(encoding='utf-8').replace('__SB_URL__', cfg.get('url', '')).replace('__SB_KEY__', cfg.get('anonKey', ''))
     (pages / 'consent.html').write_text(consent, encoding='utf-8')
     print(f'배포본 → {pages}/index.html')
-print(f'{len(out)//1024} KB · 개념 {len(concepts)} · 문항 {len(quizzes)} · 은행 {len(bank)} · 탐구 {len(labs)} · 글귀 {len(quotes["quotes"])} · 그림 {len(figs)}')
+print(f'{len(out.encode())//1024} KB(+ 나중에 받는 {MORE_NAME} {len(more.encode())//1024} KB) · 개념 {len(concepts)} · 문항 {len(quizzes)} · 은행 {len(bank)} · 탐구 {len(labs)} · 글귀 {len(quotes["quotes"])} · 그림 {len(figs)}')
