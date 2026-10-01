@@ -229,6 +229,29 @@
   /* 화학식 첨자 — 본문 폰트를 그대로 축소해 자형이 어긋나지 않게 한다 */
   sub,sup{ font-size:0.68em; line-height:0; font-weight:inherit; }
   sub{ vertical-align:-0.14em; } sup{ vertical-align:0.34em; }
+  /* ── 2026-10-02 보강: 중요 표시 · 채점 기준 · 꼼꼼 자료 분석 · 간격 두고 다시 꺼내기 ── */
+  .must{ display:inline-block; font-size:7pt; font-weight:900; color:#fff; background:#D9534F; border-radius:1.6mm; padding:0.2mm 1.4mm; margin-right:1.2mm; vertical-align:1pt; }
+  table.rubric{ border-collapse:collapse; width:100%; font-size:7.6pt; margin:1mm 0 0.5mm; }
+  table.rubric th, table.rubric td{ border:0.25mm solid var(--line); padding:0.8mm 1.4mm; text-align:left; vertical-align:top; }
+  table.rubric th{ background:#F4F1EA; font-weight:800; white-space:nowrap; }
+  .analysis{ border:0.35mm dashed #C9A36A; border-radius:2.5mm; padding:1.6mm 2mm 1.2mm; margin:1.5mm 0; background:#FFFCF5; }
+  .analysis .at{ font-size:7.6pt; font-weight:900; color:#9C6503; margin-bottom:0.8mm; }
+  .analysis svg{ max-width:100%; height:auto; display:block; }
+  .spaced{ border:0.4mm solid var(--line); border-radius:3mm; padding:3mm 4mm 2.6mm; margin:0 0 4mm; position:relative; background:#FAFBFC; }
+  .spaced .st{ font-size:9.5pt; font-weight:900; color:var(--unit); margin-bottom:1.6mm; }
+  .spaced ol{ margin:0; padding-left:5mm; font-size:8.8pt; line-height:1.75; }
+  .spaced .when{ display:flex; gap:5mm; font-size:8pt; color:var(--sub); margin-top:1.8mm; }
+  .spaced .ans{ position:absolute; right:4mm; bottom:2.4mm; transform:rotate(180deg); font-size:6.8pt; color:var(--sub); }
+  /* 2단 문항 쪽 간격 · 발문 안 탐구 과정 상자 (합격본 chapter-08 에서) */
+  .qg2 .q{ margin-bottom:6mm; }
+  .qg2 > div > .q:last-child{ margin-bottom:0; }
+  .qg2 .choices.inline{ gap:0 4mm; }
+  .qg2 .choices{ margin-top:1.8mm; line-height:1.78; }
+  .qg2 .bogi-box{ margin-top:2mm; padding:1.8mm 2.8mm; font-size:9pt; line-height:1.72; }
+  .qg2 .bogi-box .bt{ margin-bottom:0.3mm; }
+  .qg2 .q figure{ margin:1.6mm 0 0.6mm 8.4mm !important; }
+  .exp{ border:0.35mm solid #B8C2CA; border-radius:1.6mm; background:#FAFBFC; padding:1.6mm 2.6mm; margin:1.4mm 0 1.6mm; font-size:8.9pt; line-height:1.7; }
+  .exp b{ font-family:'PC Sans'; font-size:7.8pt; font-weight:900; color:var(--brand); }
 </style>
 </head>
 <body>
@@ -379,10 +402,10 @@
       <line x1="500" y1="90" x2="548" y2="70" stroke="#2E7A54" stroke-width="3" marker-end="url(#p21031_arrBG)"/>
       <line x1="504" y1="112" x2="556" y2="108" stroke="#2E7A54" stroke-width="3" marker-end="url(#p21031_arrBG)"/>
       <g font-size="11" font-weight="800" fill="#fff" text-anchor="middle">
-        <g transform="translate(572,60)"><circle cx="-11" r="12" fill="#4C86B0"/><circle cx="11" r="12" fill="#4C86B0"/><text y="4">O<tspan dy="0.14em" font-size="68%">2</tspan></text></g>
-        <g transform="translate(586,110)"><circle cx="-11" r="12" fill="#4C86B0"/><circle cx="11" r="12" fill="#4C86B0"/><text y="4">O<tspan dy="0.14em" font-size="68%">2</tspan></text></g>
+        <g transform="translate(572,60)"><circle r="15" fill="#5B6B77"/><text y="4">CO<tspan dy="0.14em" font-size="68%">2</tspan></text></g>
+        <g transform="translate(586,110)"><circle r="15" fill="#5B6B77"/><text y="4">CO<tspan dy="0.14em" font-size="68%">2</tspan></text></g>
       </g>
-      <text x="612" y="146" text-anchor="end" font-size="11" font-weight="800" fill="#2E7A54">산소가 빠져나간다</text>
+      <text x="612" y="146" text-anchor="end" font-size="11" font-weight="800" fill="#2E7A54">산소는 탄소와 함께</text><text x="612" y="160" text-anchor="end" font-size="11" font-weight="800" fill="#2E7A54">CO<tspan dy="0.14em" font-size="68%">2</tspan><tspan dy="-0.14em">로 빠져나간다</tspan></text>
       <path d="M508,186 h50 q10,0 12,8 v12 h-14 v-10 h-48 z" fill="#F3A03A"/>
       <ellipse cx="582" cy="204" rx="26" ry="5" fill="#F3A03A"/>
       <text x="586" y="178" text-anchor="middle" font-size="11" font-weight="800" fill="#B4560E">쇳물 → 철 Fe</text>
@@ -548,8 +571,9 @@
                   <text x="8" y="41" font-size="5.6" font-weight="800" fill="#7A3E14">e<tspan dy="-0.34em" font-size="68%">−</tspan></text>
                 </g>
                 <g transform="translate(60,38)">
-                  <circle r="17" fill="#8A8F98"/><text y="3" fill="#fff" font-weight="800">Ag<tspan dy="-0.34em" font-size="68%">+</tspan></text>
-                  <text y="30" font-size="6.2" fill="#2E7A54" font-weight="800">전자 얻음 → 환원</text>
+                  <circle cx="-6" cy="-12" r="12" fill="#8A8F98"/><text x="-6" y="-9" fill="#fff" font-weight="800">Ag<tspan dy="-0.34em" font-size="68%">+</tspan></text>
+                  <circle cx="18" cy="6" r="12" fill="#8A8F98"/><text x="18" y="9" fill="#fff" font-weight="800">Ag<tspan dy="-0.34em" font-size="68%">+</tspan></text>
+                  <text y="30" font-size="6.2" fill="#2E7A54" font-weight="800">전자 1개씩 얻음 → 환원</text>
                 </g>
               </g>
             </g>
@@ -593,7 +617,7 @@
     <div class="main">
       <h3 class="sec"><span class="n">4</span>생활 속 산화·환원 — 우리 곁의 반응들</h3>
       <p class="body">이제 같은 눈으로 일상을 둘러보자. 우리 몸속에서는 <span class="kw">세포 호흡</span>이 쉼 없이 돌아간다 — 포도당이 산소를 얻어 이산화 탄소와 물이 되며 에너지를 내놓는 <b>산화</b> 반응이다. 광합성의 정확한 반대 방향이라는 점을 눈여겨보라. 겨울 주머니 속 <b>손난로</b>는 철가루가 공기 중 산소와 천천히 결합(산화)하며 열을 내는 것 — 녹슬기를 난방으로 바꾼 발명품이다.</p>
-      <p class="body">깎아 둔 사과가 갈색이 되는 <b>갈변</b>도 과일 속 물질이 산소와 반응하는 산화이고, 반대로 이 반응을 늦추려 설탕물·레몬즙을 바르는 것은 산소와의 접촉을 줄이는 지혜다. 이렇게 <span class="u-amber">타고, 녹슬고, 숨 쉬고, 데우는 일상의 변화</span>가 전부 산소·전자의 이동이라는 <b>하나의 규칙</b>으로 읽힌다 — 이것이 성취기준이 말하는 '생활 주변의 변화 분석'이다.</p>
+      <p class="body">깎아 둔 사과가 갈색이 되는 <b>갈변</b>도 과일 속 물질이 산소와 반응하는 산화이고, 반대로 이 반응을 늦추려 설탕물에 담그는 것은 산소와의 접촉을 줄이는 지혜이고, 레몬즙을 바르면 그 속의 비타민 C가 먼저 산화되어 과일을 지킨다. 이렇게 <span class="u-amber">타고, 녹슬고, 숨 쉬고, 데우는 일상의 변화</span>가 전부 산소·전자의 이동이라는 <b>하나의 규칙</b>으로 읽힌다 — 이것이 성취기준이 말하는 '생활 주변의 변화 분석'이다.</p>
 
       <figure>
         <svg width="468" height="196" viewBox="0 0 620 260" font-family="PC Sans">
@@ -673,7 +697,7 @@
     <div class="wing">
       <div class="wtitle">날개 노트</div>
       <div class="term"><b>세포 호흡</b>포도당 + 산소 → 이산화 탄소 + 물 + 에너지. 몸속에서 일어나는 조용한 연소다.</div>
-      <div class="term"><b>갈변 늦추기</b>레몬즙·설탕물은 산소와의 접촉을 줄여 산화를 늦춘다 — 부엌의 화학.</div>
+      <div class="term"><b>갈변 늦추기</b>설탕물은 산소와의 접촉을 줄이고, 레몬즙의 비타민 C는 대신 산화되어 갈변을 늦춘다 — 부엌의 화학.</div>
       <div class="wsep"></div>
       <div class="wtitle">한눈에 암기</div>
       <div class="wing-pen">호흡 = 포도당 산화<br>광합성 = CO<sub>2</sub> 환원<br>손난로·갈변 = 산화</div>
@@ -878,15 +902,15 @@
   <div class="folio"><span>I. 변화와 다양성</span><span class="num">43</span></div>
 </div>
 
-<!-- ═════════════ p.44 STEP 1 + STEP 2 시작 ═════════════ -->
+<!-- ═════════════ p.44 STEP 1 + STEP 2 시작 (7~10) ═════════════ -->
 <div class="page">
   <div class="runhead"><span class="unit-tag">I. 변화와 다양성</span><span class="lesson-tag">03. 산화와 환원 | 문제</span></div>
   <div class="step-head"><span class="stepno">STEP 1</span><span class="steptt">개념 확인</span><span class="stepdesc">OX와 빈칸으로 개념 점검 — 막히면 알짜 정리로!</span></div>
   <div class="qgrid">
     <div>
-      <div class="q"><div class="qhead"><span class="qno">1</span><div class="stem">물질이 산소를 잃는 반응을 산화라 한다. <span class="ox-answer">( O , X )</span></div></div></div>
-      <div class="q"><div class="qhead"><span class="qno">2</span><div class="stem">산화와 환원은 한 반응 안에서 항상 동시에 일어난다. <span class="ox-answer">( O , X )</span></div></div></div>
-      <div class="q"><div class="qhead"><span class="qno">3</span><div class="stem">광합성에서 이산화 탄소는 산소를 얻어 산화된다. <span class="ox-answer">( O , X )</span></div></div></div>
+      <div class="q"><div class="qhead"><span class="qno">1</span><div class="stem">물질이 산소를 잃는 반응을 산화라 한다. <span class="ox-answer" style="white-space:nowrap;">( O , X )</span></div></div></div>
+      <div class="q"><div class="qhead"><span class="qno">2</span><div class="stem">산화와 환원은 한 반응 안에서 항상 동시에 일어난다. <span class="ox-answer" style="white-space:nowrap;">( O , X )</span></div></div></div>
+      <div class="q"><div class="qhead"><span class="qno">3</span><div class="stem">광합성에서 이산화 탄소는 산소를 얻어 산화된다. <span class="ox-answer" style="white-space:nowrap;">( O , X )</span></div></div></div>
     </div>
     <div>
       <div class="q"><div class="qhead"><span class="qno">4</span><div class="stem">철이 녹스는 것처럼 물질이 산소를 얻는 반응을 <span class="blankline" style="min-width:12mm;"></span>라 한다.</div></div></div>
@@ -896,119 +920,383 @@
   </div>
   <div style="border-top:0.5mm solid var(--line); margin:2mm 0 4mm;"></div>
   <div class="step-head s2"><span class="stepno">STEP 2</span><span class="steptt">내신 완성</span><span class="stepdesc">학교 시험 유형 그대로 — 서술형까지 한 번에</span></div>
-  <div class="q">
-    <div class="qhead"><span class="qno">7</span><div class="stem">산화와 환원에 대한 설명으로 옳은 것은? <span class="difficulty">●●○</span>
-    <div class="tags">10통과2-01-03 | 개념 1·3</div></div></div>
-    <ul class="choices">
-      <li>① 산화는 물질이 산소를 잃는 반응이다.</li>
-      <li>② 환원은 물질이 전자를 잃는 반응이다.</li>
-      <li>③ 산화가 일어날 때 환원은 일어나지 않을 수 있다.</li>
-      <li>④ 연소는 환원의 대표적인 예다.</li>
-      <li>⑤ 물질이 산소를 얻거나 전자를 잃으면 산화되었다고 한다.</li>
-    </ul>
-  </div>
-  <div class="q">
-    <div class="qhead"><span class="qno">8</span><div class="stem">광합성, 화석 연료의 연소, 철의 제련에 대한 설명으로 옳은 것은? <span class="difficulty">●●●</span>
-    <div class="tags">10통과2-01-03 | 개념 2</div></div></div>
-    <ul class="choices">
-      <li>① 광합성에서 이산화 탄소는 산화된다.</li>
-      <li>② 철의 제련에서 코크스(탄소)는 산소를 얻어 산화된다.</li>
-      <li>③ 화석 연료의 연소에서 연료는 환원된다.</li>
-      <li>④ 철의 제련에서 산화 철은 산소를 얻는다.</li>
-      <li>⑤ 세 반응에는 산화·환원이 일어나지 않는다.</li>
-    </ul>
+
+  <div class="qgrid qg2">
+    <div>
+      <div class="q">
+        <div class="qhead"><span class="qno">7</span><div class="stem">산화와 환원에 대한 설명으로 옳은 것은? <span class="difficulty">●○○</span>
+        <div class="tags">10통과2-01-03 | 개념 1·3</div></div></div>
+        <ul class="choices">
+          <li>① 산화는 물질이 산소를 잃는 반응이다.</li>
+          <li>② 환원은 물질이 전자를 잃는 반응이다.</li>
+          <li>③ 산화가 일어나도 환원은 일어나지 않을 수 있다.</li>
+          <li>④ 연소는 환원의 대표적인 예다.</li>
+          <li>⑤ 산소를 얻거나 전자를 잃으면 산화되었다고 한다.</li>
+        </ul>
+      </div>
+
+      <div class="q">
+        <div class="qhead"><span class="qno">8</span><div class="stem">광합성, 화석 연료의 연소, 철의 제련에 대한 설명으로 옳은 것은? <span class="difficulty">●●○</span>
+        <div class="tags">10통과2-01-03 | 개념 2</div></div></div>
+        <ul class="choices">
+          <li>① 광합성에서 이산화 탄소는 산화된다.</li>
+          <li>② 제련에서 코크스(탄소)는 산소를 얻어 산화된다.</li>
+          <li>③ 화석 연료의 연소에서 연료는 환원된다.</li>
+          <li>④ 철의 제련에서 산화 철은 산소를 얻는다.</li>
+          <li>⑤ 세 반응에서는 산화·환원이 일어나지 않는다.</li>
+        </ul>
+      </div>
+    </div>
+    <div>
+      <div class="q">
+        <div class="qhead"><span class="qno">9</span><div class="stem"><span class="must">중요</span><span class="badge-data">자료</span>구리선을 질산 은 수용액에 넣었더니 구리선 표면에 은이 석출되고 용액이 점점 푸르게 변하였다. 이에 대한 설명으로 옳은 것은? <span class="difficulty">●●○</span>
+        <div class="tags">10통과2-01-03 | 개념 3</div></div></div>
+        <ul class="choices">
+          <li>① 구리는 전자를 잃고 산화되었다.</li>
+          <li>② 은 이온은 전자를 잃고 환원되었다.</li>
+          <li>③ 용액의 푸른색은 은 이온 때문이다.</li>
+          <li>④ 이 반응에서는 산화만 일어났다.</li>
+          <li>⑤ 구리는 전자를 얻어 이온이 되었다.</li>
+        </ul>
+      </div>
+
+      <div class="q">
+        <div class="qhead"><span class="qno">10</span><div class="stem">생활 속 산화·환원에 대해 옳은 것만을 &lt;보기&gt;에서 있는 대로 고른 것은? <span class="difficulty">●○○</span>
+        <div class="tags">10통과2-01-03 | 개념 4</div></div></div>
+        <div class="bogi-box">
+          <div class="bt">보기</div>
+          ㄱ. 손난로의 열은 철가루의 산화에서 나온다.<br>
+          ㄴ. 사과의 갈변은 과일 속 물질과 산소의 반응이다.<br>
+          ㄷ. 세포 호흡에서 포도당은 환원된다.
+        </div>
+        <ul class="choices inline">
+          <li>① ㄱ</li><li>② ㄷ</li><li>③ ㄱ, ㄴ</li><li>④ ㄴ, ㄷ</li><li>⑤ ㄱ, ㄴ, ㄷ</li>
+        </ul>
+      </div>
+    </div>
   </div>
   <div class="folio"><span>I. 변화와 다양성</span><span class="num">44</span></div>
 </div>
 
-<!-- ═════════════ p.45 STEP 2 계속 ═════════════ -->
+<!-- ═════════════ STEP 2 계속 (11~15) ═════════════ -->
 <div class="page">
   <div class="runhead"><span class="unit-tag">I. 변화와 다양성</span><span class="lesson-tag">03. 산화와 환원 | 문제</span></div>
-  <div class="q">
-    <div class="qhead"><span class="qno">9</span><div class="stem"><span class="badge-data">자료</span>구리선을 질산 은 수용액에 넣었더니 구리선 표면에 은이 석출되고 용액이 점점 푸르게 변하였다. 이에 대한 설명으로 옳은 것은? <span class="difficulty">●●●</span>
-    <div class="tags">10통과2-01-03 | 개념 3</div></div></div>
-    <ul class="choices">
-      <li>① 구리는 전자를 잃고 산화되었다.</li>
-      <li>② 은 이온은 전자를 잃고 환원되었다.</li>
-      <li>③ 용액의 푸른색은 은 이온 때문이다.</li>
-      <li>④ 이 반응에서는 산화만 일어났다.</li>
-      <li>⑤ 구리는 전자를 얻어 이온이 되었다.</li>
-    </ul>
-  </div>
-  <div class="q">
-    <div class="qhead"><span class="qno">10</span><div class="stem">생활 속 산화·환원에 대한 설명으로 옳은 것만을 고른 것은? <span class="difficulty">●●●</span>
-    <div class="tags">10통과2-01-03 | 개념 4</div></div></div>
-    <div class="bogi-box" style="background:#fff;">
-      (가) 손난로가 따뜻해지는 것은 철가루의 산화 때문이다.<br>
-      (나) 깎아 둔 사과의 갈변은 과일 속 물질과 산소의 반응이다.<br>
-      (다) 세포 호흡에서 포도당은 환원된다.
+
+  <div class="qgrid qg2">
+    <div>
+      <div class="q">
+        <div class="qhead"><span class="qno">11</span><div class="stem"><span class="badge-data">자료</span>그림은 금속 M과 산소가 결합한 물질 MO를 탄소(C)와 함께 가열할 때의 반응 모형이다. 옳은 것만을 &lt;보기&gt;에서 있는 대로 고른 것은? <span class="difficulty">●●○</span>
+        <div class="tags">10통과2-01-03 | 개념 1·2</div></div></div>
+        <figure style="margin:2mm 0 1mm 8.4mm;">
+          <svg width="280" height="78" viewBox="0 0 280 78" font-family="PC Sans">
+            <rect x="2" y="3" width="94" height="58" rx="5" fill="#F6F3EC" stroke="#D8CFC0" stroke-width="0.8"/>
+            <rect x="130" y="3" width="96" height="58" rx="5" fill="#F6F3EC" stroke="#D8CFC0" stroke-width="0.8"/>
+            <g font-weight="800" text-anchor="middle" fill="#fff">
+              <circle cx="24" cy="19" r="10" fill="#8A8F98"/><circle cx="37" cy="19" r="6.5" fill="#4C86B0"/>
+              <text x="21" y="22" font-size="8">M</text><text x="37.5" y="21.4" font-size="6.4">O</text>
+              <circle cx="24" cy="45" r="10" fill="#8A8F98"/><circle cx="37" cy="45" r="6.5" fill="#4C86B0"/>
+              <text x="21" y="48" font-size="8">M</text><text x="37.5" y="47.4" font-size="6.4">O</text>
+              <circle cx="72" cy="32" r="8" fill="#3D4C58"/><text x="72" y="34.6" font-size="7.4">C</text>
+              <circle cx="150" cy="19" r="10" fill="#8A8F98"/><text x="150" y="22" font-size="8">M</text>
+              <circle cx="150" cy="45" r="10" fill="#8A8F98"/><text x="150" y="48" font-size="8">M</text>
+              <circle cx="193" cy="32" r="8" fill="#3D4C58"/>
+              <circle cx="180" cy="32" r="6.5" fill="#4C86B0"/><circle cx="206" cy="32" r="6.5" fill="#4C86B0"/>
+              <text x="193" y="34.6" font-size="7">C</text><text x="179.5" y="34.4" font-size="6.4">O</text><text x="206.5" y="34.4" font-size="6.4">O</text>
+            </g>
+            <line x1="100" y1="32" x2="124" y2="32" stroke="#C1521E" stroke-width="1.4" marker-end="url(#arrP)"/>
+            <text x="111" y="26" text-anchor="middle" font-size="6.6" font-weight="700" fill="#5B6B77">가열</text>
+            <g font-size="7" font-weight="800" fill="#4A5964" text-anchor="middle"><text x="49" y="72">반응 전</text><text x="178" y="72">반응 후</text></g>
+            <g font-size="6.6" fill="#22303A">
+              <circle cx="240" cy="14" r="5" fill="#8A8F98"/><text x="248" y="16.4">금속 M</text>
+              <circle cx="240" cy="32" r="4" fill="#4C86B0"/><text x="248" y="34.4">산소 O</text>
+              <circle cx="240" cy="50" r="4.6" fill="#3D4C58"/><text x="248" y="52.4">탄소 C</text>
+            </g>
+          </svg>
+        </figure>
+        <div class="bogi-box">
+          <div class="bt">보기</div>
+          ㄱ. MO는 산소를 얻어 산화된다.<br>
+          ㄴ. C는 산소를 얻어 산화된다.<br>
+          ㄷ. 반응 전과 후에 산소 원자의 수는 같다.
+        </div>
+        <ul class="choices inline">
+          <li>① ㄱ</li><li>② ㄷ</li><li>③ ㄱ, ㄴ</li><li>④ ㄴ, ㄷ</li><li>⑤ ㄱ, ㄴ, ㄷ</li>
+        </ul>
+      </div>
+
+      <div class="q">
+        <div class="qhead"><span class="qno">12</span><div class="stem"><span class="must">중요</span>산화·환원 반응에 대한 학생 A~C의 대화이다. 옳게 말한 학생만을 있는 대로 고른 것은? <span class="difficulty">●●○</span>
+        <div class="tags">10통과2-01-03 | 개념 3·5</div></div></div>
+        <div class="bogi-box">
+          <b>학생 A</b> : 철이 녹슬 때는 철만 산소를 얻으니까, 이 반응에서는 산화만 일어나고 환원은 일어나지 않아.<br>
+          <b>학생 B</b> : 광합성에서 이산화 탄소가 환원될 때, 같은 반응 안에서 산화되는 물질도 함께 있어.<br>
+          <b>학생 C</b> : 산소가 오가지 않아도 전자가 이동하면 산화·환원 반응이라고 할 수 있어.
+        </div>
+        <ul class="choices inline">
+          <li>① A</li><li>② C</li><li>③ A, B</li><li>④ B, C</li><li>⑤ A, B, C</li>
+        </ul>
+      </div>
+
+
+      <div class="q">
+        <div class="qhead"><span class="qno">13</span><div class="stem">다음은 금속 X와 Y 이온이 반응할 때 일어나는 두 변화이다.
+          <div class="exp">(가) X → X 이온 + 전자<br>(나) Y 이온 + 전자 → Y</div>
+          이에 대한 설명으로 옳은 것은? <span class="difficulty">●●○</span>
+        <div class="tags">10통과2-01-03 | 개념 3·5</div></div></div>
+        <ul class="choices">
+          <li>① (가)에서 X는 환원된다.</li>
+          <li>② (나)에서 Y 이온은 전자를 얻어 환원된다.</li>
+          <li>③ (가)에서 X가 잃은 전자는 용액 속에서 사라진다.</li>
+          <li>④ (가)와 (나)는 산소가 이동하는 반응이다.</li>
+          <li>⑤ (나)는 (가)가 모두 끝난 뒤에 일어난다.</li>
+        </ul>
+      </div>
     </div>
-    <ul class="choices inline">
-      <li>① (가)</li><li>② (다)</li><li>③ (가), (다)</li><li>④ (가), (나)</li><li>⑤ (가), (나), (다)</li>
-    </ul>
+    <div>
+      <div class="q">
+        <div class="qhead"><span class="qno">14</span><div class="stem"><span class="must">중요</span><span class="badge-data">탐구</span>다음은 금속과 이온 수용액의 반응을 알아보는 실험이다.
+          <div class="exp"><b>[과정]</b> 비커 Ⅰ의 질산 은 수용액에 구리판을, 비커 Ⅱ의 푸른색 황산 구리(Ⅱ) 수용액에 아연판을 넣고, 일정 시간 뒤 금속판과 수용액을 관찰한다.<br><b>[결과]</b> Ⅰ: 구리판에 은색 고체가 생기고, 수용액이 점점 푸르게 변한다. Ⅱ: 아연판에 붉은색 고체가 생기고, 수용액의 푸른색이 옅어진다.</div>
+          이에 대한 설명으로 옳은 것만을 &lt;보기&gt;에서 있는 대로 고른 것은? <span class="difficulty">●●○</span>
+        <div class="tags">10통과2-01-03 | 개념 3, 탐구</div></div></div>
+        <div class="bogi-box">
+          <div class="bt">보기</div>
+          ㄱ. Ⅰ에서 구리는 전자를 얻어 환원된다.<br>
+          ㄴ. Ⅱ의 붉은색 고체는 아연 이온이 환원된 것이다.<br>
+          ㄷ. Ⅰ과 Ⅱ에서 넣어 준 금속은 모두 산화된다.
+        </div>
+        <ul class="choices inline">
+          <li>① ㄱ</li><li>② ㄷ</li><li>③ ㄱ, ㄴ</li><li>④ ㄴ, ㄷ</li><li>⑤ ㄱ, ㄴ, ㄷ</li>
+        </ul>
+      </div>
+
+      <div class="q">
+        <div class="qhead"><span class="qno">15</span><div class="stem"><span class="badge-data">자료</span>그림은 질산 은 수용액에 구리판을 넣기 전과 일정 시간 뒤, 수용액 속 양이온의 수를 나타낸 것이다. 구리 원자 1개는 전자 2개를 잃고 구리 이온이 되며, 은 이온 1개는 전자 1개를 얻어 은이 된다. 옳은 것만을 &lt;보기&gt;에서 있는 대로 고른 것은? <span class="difficulty">●●●</span>
+        <div class="tags">10통과2-01-03 | 개념 3</div></div></div>
+        <figure style="margin:2mm 0 1mm 8.4mm;">
+          <svg width="280" height="98" viewBox="0 0 280 98" font-family="PC Sans">
+            <g stroke="#E1E6EA" stroke-width="0.7" stroke-dasharray="2 2"><line x1="40" y1="14" x2="262" y2="14"/><line x1="40" y1="30" x2="262" y2="30"/><line x1="40" y1="46" x2="262" y2="46"/><line x1="40" y1="62" x2="262" y2="62"/></g>
+            <line x1="40" y1="78" x2="264" y2="78" stroke="#5B6B77" stroke-width="1.1"/>
+            <line x1="40" y1="78" x2="40" y2="6" stroke="#5B6B77" stroke-width="1.1"/>
+            <g font-size="6.8" fill="#5B6B77" text-anchor="end"><text x="36" y="80.4">0</text><text x="36" y="64.4">2N</text><text x="36" y="48.4">4N</text><text x="36" y="32.4">6N</text><text x="36" y="16.4">8N</text></g>
+            <text x="44" y="8" font-size="6.6" fill="#5B6B77">양이온 수</text>
+            <rect x="74" y="14" width="22" height="64" fill="#8A8F98"/>
+            <text x="85" y="10" text-anchor="middle" font-size="6.6" font-weight="800" fill="#4A5964">8N</text>
+            <text x="113" y="75" text-anchor="middle" font-size="6.6" font-weight="800" fill="#4C86B0">0</text>
+            <rect x="178" y="62" width="22" height="16" fill="#8A8F98"/>
+            <rect x="204" y="54" width="22" height="24" fill="#4C86B0"/>
+            <text x="189" y="58" text-anchor="middle" font-size="6.6" font-weight="800" fill="#4A5964">2N</text>
+            <text x="215" y="50" text-anchor="middle" font-size="6.6" font-weight="800" fill="#4C86B0">3N</text>
+            <g font-size="7" font-weight="800" fill="#4A5964" text-anchor="middle"><text x="98" y="89">반응 전</text><text x="202" y="89">일정 시간 후</text></g>
+            <g font-size="6.6" fill="#22303A">
+              <rect x="150" y="10" width="8" height="8" fill="#8A8F98"/><text x="161" y="17">은 이온</text>
+              <rect x="200" y="10" width="8" height="8" fill="#4C86B0"/><text x="211" y="17">구리 이온</text>
+            </g>
+          </svg>
+        </figure>
+        <div class="bogi-box">
+          <div class="bt">보기</div>
+          ㄱ. 일정 시간 동안 구리 원자 3N개가 산화되었다.<br>
+          ㄴ. 양이온의 총수는 반응 전보다 많아졌다.<br>
+          ㄷ. 반응이 진행될수록 수용액의 푸른색은 옅어진다.
+        </div>
+        <ul class="choices inline">
+          <li>① ㄱ</li><li>② ㄷ</li><li>③ ㄱ, ㄴ</li><li>④ ㄴ, ㄷ</li><li>⑤ ㄱ, ㄴ, ㄷ</li>
+        </ul>
+      </div>
+    </div>
   </div>
-  <div class="q">
-    <div class="qhead"><span class="qno">11</span><div class="stem"><span class="badge-essay">서술형</span>용광로에서 철이 만들어질 때 일어나는 산화와 환원을 <b>'산소'</b>라는 말을 포함하여 각각 서술하시오. <span class="difficulty">●●●●</span>
-    <div class="tags">10통과2-01-03 | 개념 2·자료</div></div></div>
-    <div class="essay-lines"><div></div><div></div><div></div></div>
-  </div>
+
   <div class="folio"><span>I. 변화와 다양성</span><span class="num">45</span></div>
 </div>
 
-<!-- ═════════════ p.46 STEP 3 ═════════════ -->
+<!-- ═════════════ STEP 2 계속 (16~17) + 서술형 (18~20) ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag">I. 변화와 다양성</span><span class="lesson-tag">03. 산화와 환원 | 문제</span></div>
+
+  <div class="qgrid qg2">
+    <div>
+      <div class="q">
+        <div class="qhead"><span class="qno">16</span><div class="stem">생활 속 산화·환원 반응에 대한 설명으로 옳은 것만을 &lt;보기&gt;에서 있는 대로 고른 것은? <span class="difficulty">●●○</span>
+        <div class="tags">10통과2-01-03 | 개념 2·4</div></div></div>
+        <div class="bogi-box">
+          <div class="bt">보기</div>
+          ㄱ. 세포 호흡과 광합성은 반응물과 생성물이 서로 뒤바뀐 관계이다.<br>
+          ㄴ. 손난로 속 철가루는 열을 내며 산소를 잃는다.<br>
+          ㄷ. 사과는 공기 중에 오래 둘수록 갈변이 늦어진다.
+        </div>
+        <ul class="choices inline">
+          <li>① ㄱ</li><li>② ㄷ</li><li>③ ㄱ, ㄴ</li><li>④ ㄴ, ㄷ</li><li>⑤ ㄱ, ㄴ, ㄷ</li>
+        </ul>
+      </div>
+
+      <div class="q">
+        <div class="qhead"><span class="qno">17</span><div class="stem"><span class="badge-data">자료</span>표는 세 가지 산화·환원 반응에서 이동한 것과 산화되는 물질을 정리한 것이다. 옳은 것만을 &lt;보기&gt;에서 있는 대로 고른 것은? <span class="difficulty">●●○</span>
+        <div class="tags">10통과2-01-03 | 개념 2·3·4</div></div></div>
+        <figure style="margin:2mm 0 1mm 8.4mm;">
+          <svg width="280" height="86" viewBox="0 0 280 86" font-family="PC Sans">
+            <rect x="1" y="1" width="278" height="20" fill="#FBEFE7"/>
+            <rect x="1" y="1" width="278" height="84" fill="none" stroke="#B8C2CA" stroke-width="0.9"/>
+            <g stroke="#B8C2CA" stroke-width="0.8"><line x1="1" y1="21" x2="279" y2="21"/><line x1="1" y1="42.3" x2="279" y2="42.3"/><line x1="1" y1="63.6" x2="279" y2="63.6"/><line x1="104" y1="1" x2="104" y2="85"/><line x1="184" y1="1" x2="184" y2="85"/></g>
+            <g font-size="8" font-weight="800" fill="#C1521E" text-anchor="middle"><text x="52.5" y="14.5">반응</text><text x="144" y="14.5">이동한 것</text><text x="231.5" y="14.5">산화되는 물질</text></g>
+            <g font-size="8.2" fill="#22303A" text-anchor="middle">
+              <text x="52.5" y="35.4">(가) 철의 제련</text><text x="144" y="35.4">산소</text><text x="231.5" y="35.4">탄소(코크스)</text>
+              <text x="52.5" y="56.7">(나) 세포 호흡</text><text x="144" y="56.7">산소</text><text x="231.5" y="56.7" font-weight="800">㉠</text>
+              <text x="52.5" y="78">(다) 구리 + 은 이온</text><text x="144" y="78" font-weight="800">㉡</text><text x="231.5" y="78">구리</text>
+            </g>
+          </svg>
+        </figure>
+        <div class="bogi-box">
+          <div class="bt">보기</div>
+          ㄱ. ㉠은 포도당이다.<br>
+          ㄴ. ㉡은 전자이다.<br>
+          ㄷ. (가)에서 산화 철은 산소를 얻는다.
+        </div>
+        <ul class="choices inline">
+          <li>① ㄱ</li><li>② ㄷ</li><li>③ ㄱ, ㄴ</li><li>④ ㄴ, ㄷ</li><li>⑤ ㄱ, ㄴ, ㄷ</li>
+        </ul>
+      </div>
+
+
+      <div class="q">
+        <div class="qhead"><span class="qno">18</span><div class="stem"><span class="badge-essay">서술형</span>용광로에서 철이 만들어질 때 일어나는 산화와 환원을 <b>'산화 철'</b>, <b>'탄소'</b>, <b>'산소'</b>를 모두 포함하여 각각 서술하시오. <span class="difficulty">●●○</span>
+        <div class="tags">10통과2-01-03 | 개념 2, 자료 파헤치기</div></div></div>
+        <div class="essay-lines"><div></div><div></div><div></div><div></div></div>
+      </div>
+    </div>
+    <div>
+      <div class="q">
+        <div class="qhead"><span class="qno">19</span><div class="stem"><span class="must">중요</span><span class="badge-essay">서술형</span>구리선을 질산 은 수용액에 넣으면 구리선 표면에 은이 석출되고 용액이 푸르게 변한다. 그 까닭을 <b>'전자'</b>, <b>'구리 이온'</b>, <b>'은 이온'</b>을 모두 포함하여 서술하시오. <span class="difficulty">●●●</span>
+        <div class="tags">10통과2-01-03 | 개념 3</div></div></div>
+        <div class="essay-lines"><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>
+      </div>
+
+      <div class="q">
+        <div class="qhead"><span class="qno">20</span><div class="stem"><span class="badge-essay">서술형</span>세포 호흡과 광합성에서 각각 산화되거나 환원되는 물질을 <b>'포도당'</b>, <b>'이산화 탄소'</b>를 포함하여 쓰고, 두 반응의 관계를 <b>'반대'</b>라는 말을 넣어 서술하시오. <span class="difficulty">●●○</span>
+        <div class="tags">10통과2-01-03 | 개념 2·4</div></div></div>
+        <div class="essay-lines"><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="folio"><span>I. 변화와 다양성</span><span class="num">?</span></div>
+</div>
+
+<!-- ═════════════ STEP 3 (21~24) ═════════════ -->
 <div class="page">
   <div class="runhead"><span class="unit-tag">I. 변화와 다양성</span><span class="lesson-tag">03. 산화와 환원 | 문제</span></div>
   <div class="step-head s3"><span class="stepno">STEP 3</span><span class="steptt">수능 도전</span><span class="stepdesc">2028 수능 규격 — ㄱㄴㄷ 합답형·자료 해석</span></div>
-  <div class="q">
-    <div class="qhead"><span class="qno">12</span><div class="stem"><span class="badge-data">자료</span>그림은 용광로에서 일어나는 반응을 나타낸 것이다. 옳은 것만을 &lt;보기&gt;에서 있는 대로 고른 것은? <span class="difficulty">[2점]</span>
-    <div class="tags">10통과2-01-03</div></div></div>
-    <figure style="margin:2mm 0 1.5mm 8.6mm;">
-      <svg width="300" height="70" viewBox="0 0 300 70" font-family="PC Sans">
-        <g font-size="7" text-anchor="middle">
-          <rect x="10" y="16" width="280" height="40" rx="6" fill="#FBEFE7" stroke="#EBC4AB" stroke-width="1"/>
-          <text x="150" y="34" font-size="8.6" font-weight="800" fill="#3D4C58">산화 철 + 탄소 → 철 + 이산화 탄소</text>
-          <path d="M78,42 q48,18 102,6" stroke="#C1521E" stroke-width="1.3" fill="none" marker-end="url(#arrP)"/>
-          <text x="130" y="64" font-size="6.4" fill="#C1521E" font-weight="800">산소의 이동</text>
-        </g>
-      </svg>
-    </figure>
-    <div class="bogi-box">
-      <div class="bt">보기</div>
-      ㄱ. 산화 철은 산소를 잃고 철로 환원된다.<br>
-      ㄴ. 탄소는 산소를 얻어 산화된다.<br>
-      ㄷ. 이 반응에서 산화와 환원은 서로 다른 시점에 일어난다.
+
+  <div class="qgrid qg2">
+    <div>
+      <div class="q">
+        <div class="qhead"><span class="qno">21</span><div class="stem"><span class="badge-data">자료</span>그림은 용광로에서 일어나는 반응을 나타낸 것이다. 옳은 것만을 &lt;보기&gt;에서 있는 대로 고른 것은? <span class="difficulty">●○○ [2점]</span>
+        <div class="tags">10통과2-01-03 | 개념 2·5, 자료 파헤치기</div></div></div>
+        <figure style="margin:2mm 0 1mm 8.4mm;">
+          <svg width="280" height="70" viewBox="0 0 280 70" font-family="PC Sans">
+            <g font-size="7" text-anchor="middle">
+              <rect x="4" y="16" width="272" height="40" rx="6" fill="#FBEFE7" stroke="#EBC4AB" stroke-width="1"/>
+              <text x="140" y="34" font-size="8.6" font-weight="800" fill="#3D4C58">산화 철 + 탄소 → 철 + 이산화 탄소</text>
+              <path d="M68,42 q48,18 102,6" stroke="#C1521E" stroke-width="1.3" fill="none" marker-end="url(#arrP)"/>
+              <text x="120" y="64" font-size="6.4" fill="#C1521E" font-weight="800">산소의 이동</text>
+            </g>
+          </svg>
+        </figure>
+        <div class="bogi-box">
+          <div class="bt">보기</div>
+          ㄱ. 산화 철은 산소를 잃고 철로 환원된다.<br>
+          ㄴ. 탄소는 산소를 얻어 산화된다.<br>
+          ㄷ. 산화와 환원은 서로 다른 시점에 일어난다.
+        </div>
+        <ul class="choices inline">
+          <li>① ㄱ</li><li>② ㄷ</li><li>③ ㄱ, ㄴ</li><li>④ ㄴ, ㄷ</li><li>⑤ ㄱ, ㄴ, ㄷ</li>
+        </ul>
+      </div>
+
+      <div class="q">
+        <div class="qhead"><span class="qno">22</span><div class="stem"><span class="badge-data">자료</span>다음은 생명 활동의 두 반응이다. 옳은 것만을 &lt;보기&gt;에서 있는 대로 고른 것은? <span class="difficulty">●●○ [2.5점]</span>
+        <div class="tags">10통과2-01-03 | 개념 2·4·5</div></div></div>
+        <div class="exp" style="margin-left:8.4mm;">(가) 광합성: 이산화 탄소 + 물 → 포도당 + 산소<br>(나) 세포 호흡: 포도당 + 산소 → 이산화 탄소 + 물</div>
+        <div class="bogi-box">
+          <div class="bt">보기</div>
+          ㄱ. (가)에서 이산화 탄소는 환원된다.<br>
+          ㄴ. (나)에서 포도당은 산화된다.<br>
+          ㄷ. (가)와 (나) 모두 산화·환원이 동시에 일어난다.
+        </div>
+        <ul class="choices inline">
+          <li>① ㄱ</li><li>② ㄷ</li><li>③ ㄱ, ㄴ</li><li>④ ㄴ, ㄷ</li><li>⑤ ㄱ, ㄴ, ㄷ</li>
+        </ul>
+      </div>
     </div>
-    <ul class="choices inline">
-      <li>① ㄱ</li><li>② ㄷ</li><li>③ ㄱ, ㄴ</li><li>④ ㄴ, ㄷ</li><li>⑤ ㄱ, ㄴ, ㄷ</li>
-    </ul>
+    <div>
+      <div class="q">
+        <div class="qhead"><span class="qno">23</span><div class="stem"><span class="badge-data">자료</span>그림은 지구 대기 중 산소량의 변화를 개략적으로 나타낸 것이다. A는 광합성을 하는 생물(남세균)이 처음 나타난 시기, B는 생물이 처음 육지로 진출한 시기이다. 옳은 것만을 &lt;보기&gt;에서 있는 대로 고른 것은? <span class="difficulty">●●● [2.5점]</span>
+        <div class="tags">10통과2-01-03 | 개념 2 (01 지질시대와 생물의 변천 연계)</div></div></div>
+        <figure style="margin:2mm 0 1mm 8.4mm;">
+          <svg width="280" height="94" viewBox="0 0 280 94" font-family="PC Sans">
+            <g stroke="#D8CFC0" stroke-width="0.7" stroke-dasharray="2 1.6"><line x1="190" y1="12" x2="190" y2="72"/><line x1="220" y1="12" x2="220" y2="72"/><line x1="245" y1="12" x2="245" y2="72"/></g>
+            <line x1="30" y1="72" x2="272" y2="72" stroke="#5B6B77" stroke-width="1.1" marker-end="url(#arrGy)"/>
+            <line x1="30" y1="72" x2="30" y2="6" stroke="#5B6B77" stroke-width="1.1" marker-end="url(#arrGy)"/>
+            <text x="35" y="9" font-size="6.6" fill="#5B6B77">대기 중 산소량</text>
+            <path d="M31,66 L84,66 C102,66 106,46 122,45 L160,45 C174,45 178,26 194,24 L266,22" fill="none" stroke="#C1521E" stroke-width="2"/>
+            <circle cx="58" cy="66" r="2.8" fill="#2E7A54"/><text x="58" y="60" text-anchor="middle" font-size="7.4" font-weight="900" fill="#2E7A54">A</text>
+            <circle cx="196" cy="23.8" r="2.8" fill="#2E7A54"/><text x="196" y="17" text-anchor="middle" font-size="7.4" font-weight="900" fill="#2E7A54">B</text>
+            <g font-size="6.4" fill="#5B6B77" text-anchor="middle"><text x="110" y="81">선캄브리아 시대</text><text x="205" y="81">고생대</text><text x="232.5" y="81">중생대</text><text x="258" y="81">신생대</text></g>
+            <text x="272" y="91" text-anchor="end" font-size="6" fill="#5B6B77">시간 → (시대 칸의 폭은 실제 비율과 다름)</text>
+          </svg>
+        </figure>
+        <div class="bogi-box">
+          <div class="bt">보기</div>
+          ㄱ. A~B 동안 대기 중 산소량이 늘어난 것은 생물의 세포 호흡 때문이다.<br>
+          ㄴ. 산소를 늘린 반응에서 CO<sub>2</sub>는 환원된다.<br>
+          ㄷ. B 이전에 오존층이 자외선을 막아 주었다.
+        </div>
+        <ul class="choices inline">
+          <li>① ㄱ</li><li>② ㄷ</li><li>③ ㄱ, ㄴ</li><li>④ ㄴ, ㄷ</li><li>⑤ ㄱ, ㄴ, ㄷ</li>
+        </ul>
+      </div>
+
+      <div class="q">
+        <div class="qhead"><span class="qno">24</span><div class="stem"><span class="badge-data">자료</span>그림은 공기가 통하지 않는 포장에 든 철가루 손난로를 t<sub>1</sub>에 뜯은 뒤의 온도 변화이다. 옳은 것만을 &lt;보기&gt;에서 있는 대로 고른 것은? <span class="difficulty">●●○ [2점]</span>
+        <div class="tags">10통과2-01-03 | 개념 4·5</div></div></div>
+        <figure style="margin:2mm 0 1mm 8.4mm;">
+          <svg width="280" height="86" viewBox="0 0 280 86" font-family="PC Sans">
+            <line x1="30" y1="70" x2="272" y2="70" stroke="#5B6B77" stroke-width="1.1" marker-end="url(#arrGy)"/>
+            <line x1="30" y1="70" x2="30" y2="6" stroke="#5B6B77" stroke-width="1.1" marker-end="url(#arrGy)"/>
+            <text x="35" y="9" font-size="6.6" fill="#5B6B77">온도</text>
+            <text x="270" y="82" text-anchor="end" font-size="6.6" fill="#5B6B77">시간</text>
+            <line x1="27" y1="56" x2="30" y2="56" stroke="#5B6B77" stroke-width="1"/>
+            <text x="25" y="58.4" text-anchor="end" font-size="6.4" fill="#5B6B77">실온</text>
+            <line x1="90" y1="14" x2="90" y2="70" stroke="#D6455D" stroke-width="1" stroke-dasharray="3 2"/>
+            <text x="94" y="20" font-size="6.4" font-weight="800" fill="#D6455D">포장을 뜯음</text>
+            <text x="90" y="80" text-anchor="middle" font-size="7" font-weight="800" fill="#D6455D">t<tspan dy="0.14em" font-size="68%">1</tspan></text>
+            <path d="M31,56 L90,56 C104,56 108,26 132,24 L204,24 C224,24 242,36 266,42" fill="none" stroke="#C1521E" stroke-width="2"/>
+          </svg>
+        </figure>
+        <div class="bogi-box">
+          <div class="bt">보기</div>
+          ㄱ. t<sub>1</sub> 이후 철가루는 산소를 얻어 산화된다.<br>
+          ㄴ. t<sub>1</sub> 이전에는 철가루가 산소와 만나지 못했다.<br>
+          ㄷ. 깎은 사과를 랩으로 싸 두면 갈변이 늦어진다.
+        </div>
+        <ul class="choices inline">
+          <li>① ㄱ</li><li>② ㄷ</li><li>③ ㄱ, ㄴ</li><li>④ ㄴ, ㄷ</li><li>⑤ ㄱ, ㄴ, ㄷ</li>
+        </ul>
+      </div>
+    </div>
   </div>
-  <div class="q">
-    <div class="qhead"><span class="qno">13</span><div class="stem"><span class="badge-data">자료</span>다음은 생명 활동의 두 반응을 나타낸 것이다. 옳은 것만을 &lt;보기&gt;에서 있는 대로 고른 것은? <span class="difficulty">[2.5점]</span>
-    <div class="tags">10통과2-01-03</div></div></div>
-    <div class="bogi-box" style="background:#fff;">
-      (가) 광합성: 이산화 탄소 + 물 <b>→(빛에너지)→</b> 포도당 + 산소<br>
-      (나) 세포 호흡: 포도당 + 산소 → 이산화 탄소 + 물 + 에너지
-    </div>
-    <div class="bogi-box">
-      <div class="bt">보기</div>
-      ㄱ. (가)에서 이산화 탄소는 환원된다.<br>
-      ㄴ. (나)에서 포도당은 산화된다.<br>
-      ㄷ. (가)와 (나) 모두 산화와 환원이 동시에 일어나는 반응이다.
-    </div>
-    <ul class="choices inline">
-      <li>① ㄱ</li><li>② ㄷ</li><li>③ ㄱ, ㄴ</li><li>④ ㄴ, ㄷ</li><li>⑤ ㄱ, ㄴ, ㄷ</li>
-    </ul>
-  </div>
+
   <div class="folio"><span>I. 변화와 다양성</span><span class="num">46</span></div>
 </div>
 
-<!-- ═════════════ p.47 해설 1 ═════════════ -->
+<!-- ═════════════ 해설 1 ═════════════ -->
 <div class="page">
   <div class="runhead"><span class="unit-tag" style="color:var(--brand);">알짜 해설</span><span class="lesson-tag">03. 산화와 환원</span></div>
-  <div class="sol-head"><span class="stt">알짜 해설</span><span class="sub">전 문항 해설 + 오답 선지 분석 — 맞힌 문제도 해설로 한 번 더!</span></div>
+  <div class="sol-head"><span class="stt">알짜 해설</span><span class="sub">전 문항 해설 + 바로알기(틀린 선지를 옳게 고친 문장) — 맞힌 문제도 해설로 한 번 더!</span></div>
   <table class="anstable">
-    <tr><th>문항</th><td>1</td><td>2</td><td>3</td><td>4</td><td>5</td><td>6</td><td>7</td><td>8</td><td>9</td><td>10</td><td>11</td><td>12</td><td>13</td></tr>
-    <tr><th>정답</th><td class="a">X</td><td class="a">O</td><td class="a">X</td><td class="a">산화</td><td class="a">환원</td><td class="a">전자</td><td class="a">⑤</td><td class="a">②</td><td class="a">①</td><td class="a">④</td><td class="a">서술형</td><td class="a">③</td><td class="a">⑤</td></tr>
+    <tr><th>문항</th><td>1</td><td>2</td><td>3</td><td>4</td><td>5</td><td>6</td><td>7</td><td>8</td><td>9</td><td>10</td><td>11</td><td>12</td></tr>
+    <tr><th>정답</th><td class="a">X</td><td class="a">O</td><td class="a">X</td><td class="a">산화</td><td class="a">환원</td><td class="a">전자</td><td class="a">⑤</td><td class="a">②</td><td class="a">①</td><td class="a">③</td><td class="a">④</td><td class="a">④</td></tr>
+    <tr><th>문항</th><td>13</td><td>14</td><td>15</td><td>16</td><td>17</td><td>18</td><td>19</td><td>20</td><td>21</td><td>22</td><td>23</td><td>24</td></tr>
+    <tr><th>정답</th><td class="a">②</td><td class="a">②</td><td class="a">①</td><td class="a">①</td><td class="a">③</td><td class="a">서술형</td><td class="a">서술형</td><td class="a">서술형</td><td class="a">③</td><td class="a">⑤</td><td class="a">④</td><td class="a">⑤</td></tr>
   </table>
   <div class="solcols">
     <div>
@@ -1028,61 +1316,202 @@
     <div>
       <div class="sol"><div class="shead"><span class="sno">7</span><span class="sans">⑤</span><span class="slink">개념 1·3</span></div>
         <p>산소 얻음 = 산화, 전자 잃음 = 산화 — 두 정의를 한 문장으로 묶었다.</p>
-        <div class="wrongbox"><div class="wt">오답 왜 틀렸나</div>
-          <p><b>①</b> 산소를 잃는 건 환원. <b>②</b> 전자를 잃는 건 산화. <b>③</b> 동시성 위반. <b>④</b> 연소는 격렬한 산화다.</p></div></div>
+        <div class="wrongbox"><div class="wt">바로알기</div>
+          <p><b>①</b> 산화는 물질이 산소를 얻는 반응이다. <b>②</b> 환원은 물질이 전자를 얻는 반응이다. <b>③</b> 산화가 일어나면 환원도 반드시 동시에 일어난다. <b>④</b> 연소는 물질이 산소와 빠르게 결합하는 산화의 대표적인 예다.</p></div></div>
       <div class="sol"><div class="shead"><span class="sno">8</span><span class="sans">②</span><span class="slink">개념 2</span></div>
         <p>코크스는 산화 철의 산소를 빼앗아 이산화 탄소가 된다 — 산화.</p>
-        <div class="wrongbox"><div class="wt">오답 왜 틀렸나</div>
-          <p><b>①</b> CO<sub>2</sub>는 환원된다. <b>③</b> 연료는 산화된다. <b>④</b> 산화 철은 산소를 잃는다. <b>⑤</b> 셋 다 산화·환원 반응이다.</p></div></div>
+        <div class="wrongbox"><div class="wt">바로알기</div>
+          <p><b>①</b> 광합성에서 이산화 탄소는 산소를 잃고 포도당으로 환원된다. <b>③</b> 화석 연료의 연소에서 연료는 산소를 얻어 산화된다. <b>④</b> 철의 제련에서 산화 철은 산소를 잃는다. <b>⑤</b> 세 반응은 모두 산소가 이동하는 산화·환원 반응이다.</p></div></div>
       <div class="sol"><div class="shead"><span class="sno">9</span><span class="sans">①</span><span class="slink">개념 3</span></div>
         <p>구리는 전자를 잃고(산화) 구리 이온이 되어 용액을 푸르게 만든다.</p>
-        <div class="wrongbox"><div class="wt">오답 왜 틀렸나</div>
-          <p><b>②</b> 은 이온은 전자를 <b>얻어</b> 환원. <b>③</b> 푸른색은 <b>구리 이온</b>. <b>④</b> 산화·환원 동시. <b>⑤</b> 잃었다.</p></div></div>
+        <div class="wrongbox"><div class="wt">바로알기</div>
+          <p><b>②</b> 은 이온은 전자를 <b>얻어</b> 환원되었다. <b>③</b> 용액의 푸른색은 <b>구리 이온</b> 때문이다. <b>④</b> 구리가 산화될 때 은 이온의 환원이 동시에 일어났다. <b>⑤</b> 구리는 전자를 <b>잃어</b> 구리 이온이 되었다.</p></div></div>
     </div>
   </div>
   <div class="folio"><span>알짜 해설</span><span class="num">47</span></div>
 </div>
 
-<!-- ═════════════ p.48 해설 2 ═════════════ -->
+<!-- ═════════════ 해설 2 ═════════════ -->
 <div class="page">
   <div class="runhead"><span class="unit-tag" style="color:var(--brand);">알짜 해설</span><span class="lesson-tag">03. 산화와 환원</span></div>
   <div class="solcols">
     <div>
-      <div class="sol"><div class="shead"><span class="sno">10</span><span class="sans">④</span><span class="slink">개념 4</span></div>
-        <p>(가) 철가루의 느린 산화가 손난로의 열원. (나) 갈변 = 과일 속 물질 + 산소 — 둘 다 옳다.</p>
-        <div class="wrongbox"><div class="wt">오답 왜 틀렸나</div>
-          <p><b>(다)</b> 호흡에서 포도당은 산소를 얻어 <b>산화</b>된다 — 방향 뒤집기 함정.</p></div></div>
-      <div class="sol"><div class="shead"><span class="sno">11</span><span class="sans">모범 답안</span><span class="slink">개념 2·자료</span></div>
-        <p>산화 철은 <b>산소</b>를 잃고 환원되어 철이 되고, 코크스(탄소)는 그 <b>산소</b>를 얻어 산화되어 이산화 탄소가 된다.</p>
-        <div class="wrongbox"><div class="wt">채점 기준 (감점 포인트)</div>
-          <p>① 산화 철: 산소 잃음 → 환원 ② 탄소: 산소 얻음 → 산화 — 두 방향을 <b>각각</b> 서술해야 만점. 주어 바꿔치기(코크스가 환원)에 주의.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">10</span><span class="sans">③</span><span class="slink">개념 4</span></div>
+        <p><b>ㄱ&nbsp;(옳음)</b> 철가루의 느린 산화가 손난로의 열원이다. <b>ㄴ&nbsp;(옳음)</b> 갈변 = 과일 속 물질 + 산소, 산화다.</p>
+        <div class="wrongbox"><div class="wt">바로알기</div>
+          <p><b>ㄷ</b> (틀림 →) 세포 호흡에서 포도당은 산소를 얻어 <b>산화</b>된다 — 방향 뒤집기 함정.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">11</span><span class="sans">④</span><span class="slink">개념 1·2</span></div>
+        <p><b>ㄴ&nbsp;(옳음)</b> C는 MO의 산소를 얻어 CO<sub>2</sub>가 된다 — 산화. <b>ㄷ&nbsp;(옳음)</b> 반응 전 O는 MO 2개 속에 2개, 반응 후 CO<sub>2</sub> 1개 속에 2개 — 원자는 사라지지 않고 자리만 옮긴다.</p>
+        <div class="analysis"><div class="at">꼼꼼 자료 분석</div>
+          <svg width="300" height="112" viewBox="0 0 300 112" font-family="PC Sans">
+            <rect x="2" y="13" width="94" height="58" rx="5" fill="#F6F3EC" stroke="#D8CFC0" stroke-width="0.8"/>
+            <rect x="130" y="13" width="96" height="58" rx="5" fill="#F6F3EC" stroke="#D8CFC0" stroke-width="0.8"/>
+            <path d="M40,22 C70,-2 150,-2 177,34" fill="none" stroke="#D6455D" stroke-width="1.1" stroke-dasharray="3 2" marker-end="url(#arrR)"/>
+            <path d="M40,64 C80,88 170,88 205,48" fill="none" stroke="#D6455D" stroke-width="1.1" stroke-dasharray="3 2" marker-end="url(#arrR)"/>
+            <g font-weight="800" text-anchor="middle" fill="#fff">
+              <circle cx="24" cy="29" r="10" fill="#8A8F98"/><circle cx="37" cy="29" r="6.5" fill="#4C86B0"/>
+              <text x="21" y="32" font-size="8">M</text><text x="37.5" y="31.4" font-size="6.4">O</text>
+              <circle cx="24" cy="55" r="10" fill="#8A8F98"/><circle cx="37" cy="55" r="6.5" fill="#4C86B0"/>
+              <text x="21" y="58" font-size="8">M</text><text x="37.5" y="57.4" font-size="6.4">O</text>
+              <circle cx="72" cy="42" r="8" fill="#3D4C58"/><text x="72" y="44.6" font-size="7.4">C</text>
+              <circle cx="150" cy="29" r="10" fill="#8A8F98"/><text x="150" y="32" font-size="8">M</text>
+              <circle cx="150" cy="55" r="10" fill="#8A8F98"/><text x="150" y="58" font-size="8">M</text>
+              <circle cx="193" cy="42" r="8" fill="#3D4C58"/>
+              <circle cx="180" cy="42" r="6.5" fill="#4C86B0"/><circle cx="206" cy="42" r="6.5" fill="#4C86B0"/>
+              <text x="193" y="44.6" font-size="7">C</text><text x="179.5" y="44.4" font-size="6.4">O</text><text x="206.5" y="44.4" font-size="6.4">O</text>
+            </g>
+            <line x1="100" y1="42" x2="124" y2="42" stroke="#C1521E" stroke-width="1.4" marker-end="url(#arrP)"/>
+                        <g font-size="6.8" font-weight="800">
+              <text x="232" y="31" fill="#2E7A54">MO: 산소 잃음</text><text x="232" y="41" fill="#2E7A54">→ 환원</text>
+              <text x="232" y="55" fill="#C1521E">C: 산소 얻음</text><text x="232" y="65" fill="#C1521E">→ 산화</text>
+            </g>
+            <text x="2" y="96" font-size="6.8" font-weight="700" fill="#D6455D">O 원자는 M에서 C로 옮겨 갈 뿐 — 반응 전 2개 = 반응 후 2개</text>
+            <text x="2" y="108" font-size="6.8" font-weight="700" fill="#5B6B77">철의 제련(산화 철 + 탄소 → 철 + 이산화 탄소)과 같은 틀</text>
+          </svg></div>
+        <div class="wrongbox"><div class="wt">바로알기</div>
+          <p><b>ㄱ</b> (틀림 →) MO는 산소를 <b>잃고</b> M으로 <b>환원</b>된다.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">12</span><span class="sans">④</span><span class="slink">개념 3·5</span></div>
+        <p><b>B&nbsp;(옳음)</b> 산화와 환원은 언제나 동시에 — 이산화 탄소가 환원될 때 산화되는 물질도 함께 있다. <b>C&nbsp;(옳음)</b> 구리와 은 이온처럼 전자만 오가도 산화·환원 반응이다.</p>
+        <div class="wrongbox"><div class="wt">바로알기</div>
+          <p><b>A</b> (틀림 →) 철이 산소를 얻어 산화될 때 같은 반응에서 <b>환원도 함께</b> 일어난다 — 산화만 일어나는 반응은 없다.</p></div></div>
     </div>
     <div>
-      <div class="sol"><div class="shead"><span class="sno">12</span><span class="sans">③</span><span class="slink">개념 2·자료 | 2점</span></div>
-        <p><b>ㄱ (옳음)</b> 산소를 잃은 산화 철 → 철, 환원. <b>ㄴ (옳음)</b> 산소를 얻은 탄소 → 이산화 탄소, 산화. <b>ㄷ (틀림)</b> 산화와 환원은 한 반응에서 동시에 일어난다.</p>
-        <div class="wrongbox"><div class="wt">함정 체크</div>
-          <p>화살표 하나(산소의 이동)만 그리면 ㄱ·ㄴ이 저절로 판정된다 — 그림을 그리는 사람이 이긴다.</p></div></div>
-      <div class="sol"><div class="shead"><span class="sno">13</span><span class="sans">⑤</span><span class="slink">개념 2·4 | 2.5점</span></div>
-        <p><b>ㄱ (옳음)</b> CO<sub>2</sub>가 산소를 잃고 포도당으로 — 환원. <b>ㄴ (옳음)</b> 포도당이 산소를 얻어 — 산화. <b>ㄷ (옳음)</b> 어느 반응이든 잃는 자와 얻는 자가 함께 있다 — 동시성.</p>
-        <div class="wrongbox"><div class="wt">함정 체크</div>
-          <p>광합성과 호흡은 <b>정확히 반대 방향</b>의 한 쌍 — 한쪽만 외우면 다른 쪽은 뒤집으면 된다.</p></div></div>
-
-      <div class="gist" style="margin-top:5mm;">
-        <div class="boxtitle"><span class="ico">알</span>이 소단원, 이것만은!</div>
-        <ul>
-          <li>산소: <b>얻으면 산화, 잃으면 환원</b> / 전자: <b>잃으면 산화, 얻으면 환원</b>(잃산얻환)</li>
-          <li>광합성 = CO<sub>2</sub> <b>환원</b> · 연소 = 연료 <b>산화</b> · 제련 = 산화 철 <b>환원</b></li>
-          <li>산화와 환원은 <b>언제나 동시</b> — '무엇이 이동했나'부터 찾아라</li>
-        </ul>
-      </div>
+      <div class="sol"><div class="shead"><span class="sno">13</span><span class="sans">②</span><span class="slink">개념 3·5</span></div>
+        <p>(나)에서 Y 이온은 전자를 얻어 금속 Y가 된다 — 환원.</p>
+        <div class="wrongbox"><div class="wt">바로알기</div>
+          <p><b>①</b> (가)에서 X는 전자를 잃고 산화된다. <b>③</b> X가 잃은 전자는 Y 이온이 얻는다 — 전자는 사라지지 않는다. <b>④</b> (가)와 (나)는 전자가 이동하는 반응이다. <b>⑤</b> (가)와 (나)는 동시에 일어난다.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">14</span><span class="sans">②</span><span class="slink">개념 3 | 탐구</span></div>
+        <p><b>ㄷ&nbsp;(옳음)</b> Ⅰ의 구리, Ⅱ의 아연 모두 전자를 잃고 이온이 되어 수용액으로 녹아 들어간다 — 산화.</p>
+        <div class="wrongbox"><div class="wt">바로알기</div>
+          <p><b>ㄱ</b> (틀림 →) Ⅰ에서 구리는 전자를 <b>잃고 산화</b>되며, 전자를 얻어 환원되는 것은 은 이온이다. <b>ㄴ</b> (틀림 →) 붉은색 고체는 <b>구리 이온</b>이 전자를 얻어 생긴 구리이다 — 구리 이온이 줄어 푸른색이 옅어진다.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">15</span><span class="sans">①</span><span class="slink">개념 3</span></div>
+        <p><b>ㄱ&nbsp;(옳음)</b> 은 이온이 8N → 2N, 6N개 줄었다 → 은 이온 6N개가 전자 6N개를 얻었다. 구리 원자 1개가 전자 2개를 내놓으므로 산화된 구리는 6N ÷ 2 = 3N개 — 그래프의 구리 이온 3N개와 맞는다.</p>
+        <div class="analysis"><div class="at">꼼꼼 자료 분석</div>
+          <svg width="300" height="118" viewBox="0 0 300 118" font-family="PC Sans">
+            <g stroke="#E1E6EA" stroke-width="0.7" stroke-dasharray="2 2"><line x1="40" y1="14" x2="262" y2="14"/><line x1="40" y1="30" x2="262" y2="30"/><line x1="40" y1="46" x2="262" y2="46"/><line x1="40" y1="62" x2="262" y2="62"/></g>
+            <line x1="40" y1="78" x2="264" y2="78" stroke="#5B6B77" stroke-width="1.1"/>
+            <line x1="40" y1="78" x2="40" y2="6" stroke="#5B6B77" stroke-width="1.1"/>
+            <g font-size="6.8" fill="#5B6B77" text-anchor="end"><text x="36" y="80.4">0</text><text x="36" y="64.4">2N</text><text x="36" y="48.4">4N</text><text x="36" y="32.4">6N</text><text x="36" y="16.4">8N</text></g>
+            <rect x="74" y="14" width="22" height="64" fill="#8A8F98"/>
+            <rect x="178" y="62" width="22" height="16" fill="#8A8F98"/>
+            <rect x="204" y="54" width="22" height="24" fill="#4C86B0"/>
+            <rect x="178" y="14" width="22" height="48" fill="none" stroke="#D6455D" stroke-width="1" stroke-dasharray="3 2"/>
+            <text x="189" y="40" text-anchor="middle" font-size="6.6" font-weight="900" fill="#D6455D">−6N</text>
+            <text x="215" y="50" text-anchor="middle" font-size="6.6" font-weight="900" fill="#4C86B0">+3N</text>
+            <text x="230" y="24" font-size="6.6" font-weight="800" fill="#D6455D">은 이온 6N개가</text>
+            <text x="230" y="33" font-size="6.6" font-weight="800" fill="#D6455D">전자 6N개 얻음</text>
+            <text x="230" y="62" font-size="6.6" font-weight="800" fill="#4C86B0">구리 3N개가</text>
+            <text x="230" y="71" font-size="6.6" font-weight="800" fill="#4C86B0">전자 6N개 잃음</text>
+            <g font-size="7" font-weight="800" fill="#4A5964" text-anchor="middle"><text x="85" y="89">반응 전</text><text x="202" y="89">일정 시간 후</text></g>
+            <text x="2" y="104" font-size="6.8" font-weight="700" fill="#5B6B77">양이온 총수: 8N → 2N + 3N = 5N (줄어든다)</text>
+            <text x="2" y="115" font-size="6.8" font-weight="700" fill="#5B6B77">잃은 전자 수 = 얻은 전자 수 — 산화와 환원은 함께 일어난다</text>
+          </svg></div>
+        <div class="wrongbox"><div class="wt">바로알기</div>
+          <p><b>ㄴ</b> (틀림 →) 양이온 총수는 8N → 2N + 3N = 5N으로 <b>줄었다</b>. <b>ㄷ</b> (틀림 →) 구리 이온이 늘어나므로 푸른색은 점점 <b>진해진다</b>.</p></div></div>
     </div>
   </div>
   <div class="folio"><span>알짜 해설</span><span class="num">48</span></div>
 </div>
 
-<!-- ═════════════ p.49 MEMO ═════════════ -->
+<!-- ═════════════ 해설 3 ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag" style="color:var(--brand);">알짜 해설</span><span class="lesson-tag">03. 산화와 환원</span></div>
+  <div class="solcols">
+    <div>
+      <div class="sol"><div class="shead"><span class="sno">16</span><span class="sans">①</span><span class="slink">개념 2·4</span></div>
+        <p><b>ㄱ&nbsp;(옳음)</b> 호흡: 포도당 + 산소 → 이산화 탄소 + 물, 광합성: 이산화 탄소 + 물 → 포도당 + 산소 — 거울 반응이다.</p>
+        <div class="wrongbox"><div class="wt">바로알기</div>
+          <p><b>ㄴ</b> (틀림 →) 손난로 속 철가루는 산소를 <b>얻어</b> 산화되며 열을 낸다. <b>ㄷ</b> (틀림 →) 공기 중에 오래 둘수록 산소와 오래 만나 갈변이 <b>더 진행된다</b>.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">17</span><span class="sans">③</span><span class="slink">개념 2·3·4</span></div>
+        <p><b>ㄱ&nbsp;(옳음)</b> 세포 호흡에서 산소를 얻어 산화되는 것은 포도당이다. <b>ㄴ&nbsp;(옳음)</b> 구리와 은 이온의 반응에서는 산소 없이 전자가 이동한다.</p>
+        <div class="wrongbox"><div class="wt">바로알기</div>
+          <p><b>ㄷ</b> (틀림 →) (가)에서 산화 철은 산소를 <b>잃고</b> 철로 환원된다.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">18</span><span class="sans">모범 답안</span><span class="slink">개념 2 | 자료 파헤치기</span></div>
+        <p><b>산화 철</b>은 <b>산소</b>를 잃고 환원되어 철이 되고, <b>탄소</b>(코크스)는 그 <b>산소</b>를 얻어 산화되어 이산화 탄소가 된다.</p>
+        <table class="rubric">
+          <tr><th>채점 요소</th><th>배점</th></tr>
+          <tr><td>① 산화 철이 산소를 잃고 환원된다고 썼다.</td><td>3점</td></tr>
+          <tr><td>② 탄소가 산소를 얻어 산화된다고 썼다.</td><td>3점</td></tr>
+        </table>
+        <div class="wrongbox"><div class="wt">이렇게 쓰면 0점</div>
+          <p>"산화 철이 산소를 얻어 산화되고, 탄소가 환원된다." — 산소가 이동하는 방향을 거꾸로 쓴 답.</p></div></div>
+    </div>
+    <div>
+      <div class="sol"><div class="shead"><span class="sno">19</span><span class="sans">모범 답안</span><span class="slink">개념 3</span></div>
+        <p>구리는 <b>전자</b>를 잃고 <b>구리 이온</b>이 되어 용액에 녹아 들어가므로 용액이 푸르게 변한다(산화). 구리가 잃은 전자를 <b>은 이온</b>이 얻어 은이 되므로 구리선 표면에 은이 석출된다(환원).</p>
+        <table class="rubric">
+          <tr><th>채점 요소</th><th>배점</th></tr>
+          <tr><td>① 구리가 전자를 잃고 구리 이온(푸른색)이 된다고 썼다.</td><td>2점</td></tr>
+          <tr><td>② 은 이온이 전자를 얻어 은으로 석출된다고 썼다.</td><td>2점</td></tr>
+          <tr><td>③ 구리는 산화, 은 이온은 환원된다고 이름 붙였다.</td><td>2점</td></tr>
+        </table>
+        <div class="wrongbox"><div class="wt">이렇게 쓰면 0점</div>
+          <p>"은 이온 때문에 용액이 푸르게 변한다." — 푸른색은 구리 이온의 색이다.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">20</span><span class="sans">모범 답안</span><span class="slink">개념 2·4</span></div>
+        <p>세포 호흡에서는 <b>포도당</b>이 산소를 얻어 산화되어 이산화 탄소와 물이 되고, 광합성에서는 <b>이산화 탄소</b>가 산소를 잃고 포도당으로 환원된다. 두 반응은 반응물과 생성물이 서로 뒤바뀐, 정확히 <b>반대</b> 방향의 반응이다.</p>
+        <table class="rubric">
+          <tr><th>채점 요소</th><th>배점</th></tr>
+          <tr><td>① 세포 호흡에서 포도당이 산화된다고 썼다.</td><td>2점</td></tr>
+          <tr><td>② 광합성에서 이산화 탄소가 환원된다고 썼다.</td><td>2점</td></tr>
+          <tr><td>③ 두 반응이 반대 방향의 관계라고 썼다.</td><td>2점</td></tr>
+        </table>
+        <div class="wrongbox"><div class="wt">이렇게 쓰면 0점</div>
+          <p>"호흡에서 포도당이 환원되고, 광합성에서 이산화 탄소가 산화된다." — 두 방향을 모두 뒤집은 답.</p></div></div>
+    </div>
+  </div>
+  <div class="folio"><span>알짜 해설</span><span class="num">?</span></div>
+</div>
+
+<!-- ═════════════ 해설 4 ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag" style="color:var(--brand);">알짜 해설</span><span class="lesson-tag">03. 산화와 환원</span></div>
+  <div class="solcols">
+    <div>
+      <div class="sol"><div class="shead"><span class="sno">21</span><span class="sans">③</span><span class="slink">개념 2·5 | 2점</span></div>
+        <p><b>ㄱ&nbsp;(옳음)</b> 산소를 잃은 산화 철 → 철, 환원. <b>ㄴ&nbsp;(옳음)</b> 산소를 얻은 탄소 → 이산화 탄소, 산화.</p>
+        <div class="wrongbox"><div class="wt">바로알기</div>
+          <p><b>ㄷ</b> (틀림 →) 산화와 환원은 한 반응 안에서 <b>동시에</b> 일어난다. 화살표 하나(산소의 이동)만 그리면 ㄱ·ㄴ이 저절로 판정된다.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">22</span><span class="sans">⑤</span><span class="slink">개념 2·4·5 | 2.5점</span></div>
+        <p><b>ㄱ&nbsp;(옳음)</b> CO<sub>2</sub>가 산소를 잃고 포도당으로 — 환원. <b>ㄴ&nbsp;(옳음)</b> 포도당이 산소를 얻어 — 산화. <b>ㄷ&nbsp;(옳음)</b> 어느 반응이든 잃는 자와 얻는 자가 함께 있다 — 동시성.</p>
+        <div class="wrongbox"><div class="wt">함정 체크</div>
+          <p>광합성과 호흡은 <b>정확히 반대 방향</b>의 한 쌍 — 한쪽만 외우면 다른 쪽은 뒤집으면 된다.</p></div></div>
+    </div>
+    <div>
+      <div class="sol"><div class="shead"><span class="sno">23</span><span class="sans">④</span><span class="slink">개념 2 | 01 연계 | 2.5점</span></div>
+        <p><b>ㄴ&nbsp;(옳음)</b> 산소를 늘린 반응은 광합성 — CO<sub>2</sub>가 산소를 잃고 포도당이 된다(환원). <b>ㄷ&nbsp;(옳음)</b> 광합성이 늘린 산소로 오존층이 생겨 자외선을 막은 뒤에야 육상 진출(B)이 가능했다 — 01 소단원에서 배운 순서다.</p>
+        <div class="wrongbox"><div class="wt">바로알기</div>
+          <p><b>ㄱ</b> (틀림 →) A~B 동안 대기 중 산소를 늘린 것은 <b>광합성</b>이다. 세포 호흡은 산소를 소모하는 반응이다.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">24</span><span class="sans">⑤</span><span class="slink">개념 4·5 | 2점</span></div>
+        <p><b>ㄱ&nbsp;(옳음)</b> 포장을 뜯자 철가루가 공기 중 산소를 얻어 산화되며 열을 낸다. <b>ㄴ&nbsp;(옳음)</b> 공기가 통하지 않는 포장 속에서는 산소가 없어 산화가 일어나지 않는다. <b>ㄷ&nbsp;(옳음)</b> 갈변도 산소와의 반응(산화)이므로, 랩으로 산소와의 접촉을 막으면 늦어진다 — 뜯기 전 손난로와 같은 원리.</p>
+        <div class="wrongbox"><div class="wt">함정 체크</div>
+          <p>손난로·갈변·연소는 모두 산소를 얻는 산화 — '산소를 막으면 반응이 멈추거나 늦어진다'는 한 원리로 생활 사례를 함께 분석한다.</p></div></div>
+
+      <div class="gist" style="margin-top:3mm;">
+        <div class="boxtitle"><span class="ico">알</span>이 소단원, 이것만은!</div>
+        <ul>
+          <li>산소: <b>얻으면 산화, 잃으면 환원</b> / 전자: <b>잃으면 산화, 얻으면 환원</b>(잃산얻환)</li>
+          <li>광합성 = CO<sub>2</sub> <b>환원</b> · 연소 = 연료 <b>산화</b> · 제련 = 산화&nbsp;철&nbsp;<b>환원</b></li>
+          <li>산화와 환원은 <b>언제나 동시</b> — '무엇이 이동했나'부터 찾아라</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div class="folio"><span>알짜 해설</span><span class="num">?</span></div>
+</div>
+
+<!-- ═════════════ MEMO ═════════════ -->
 <div class="page">
   <div class="runhead"><span class="unit-tag">I. 변화와 다양성</span><span class="lesson-tag">03 ▸ 04 넘어가기 전에</span></div>
+  <div class="spaced">
+    <div class="st">간격 두고 다시 꺼내기 — 책을 덮고 답한다</div>
+    <ol>
+      <li>전자를 잃는 반응을 무엇이라고 하는가?</li>
+      <li>철의 제련에서 산소를 잃고 환원되는 물질은 무엇인가?</li>
+      <li>구리선을 질산 은 수용액에 넣었을 때 용액을 푸르게 만드는 이온은 무엇인가?</li>
+    </ol>
+    <div class="when"><span>□ 1일 뒤</span><span>□ 1주 뒤</span><span>□ 시험 전</span></div>
+    <div class="ans">정답 1 산화 2 산화 철 3 구리 이온</div>
+  </div>
   <div class="memo-head"><span class="mt">MEMO</span><span class="ms">헷갈린 개념, 다시 틀린 문제 번호, 나만의 암기법을 남겨 두는 자리</span></div>
   <div class="memo-area"></div>
   <div class="memo-pen">"광합성·연소·제련 셋을 놓고 '산소가 어디서 어디로 갔는지' 화살표만 그려 보자. 막히면 37쪽으로! — 박찬쌤"</div>

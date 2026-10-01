@@ -229,6 +229,29 @@
   /* 화학식 첨자 — 본문 폰트를 그대로 축소해 자형이 어긋나지 않게 한다 */
   sub,sup{ font-size:0.68em; line-height:0; font-weight:inherit; }
   sub{ vertical-align:-0.14em; } sup{ vertical-align:0.34em; }
+  /* ── 2026-10-02 보강: 중요 표시 · 채점 기준 · 꼼꼼 자료 분석 · 간격 두고 다시 꺼내기 ── */
+  .must{ display:inline-block; font-size:7pt; font-weight:900; color:#fff; background:#D9534F; border-radius:1.6mm; padding:0.2mm 1.4mm; margin-right:1.2mm; vertical-align:1pt; }
+  table.rubric{ border-collapse:collapse; width:100%; font-size:7.6pt; margin:1mm 0 0.5mm; }
+  table.rubric th, table.rubric td{ border:0.25mm solid var(--line); padding:0.8mm 1.4mm; text-align:left; vertical-align:top; }
+  table.rubric th{ background:#F4F1EA; font-weight:800; white-space:nowrap; }
+  .analysis{ border:0.35mm dashed #C9A36A; border-radius:2.5mm; padding:1.6mm 2mm 1.2mm; margin:1.5mm 0; background:#FFFCF5; }
+  .analysis .at{ font-size:7.6pt; font-weight:900; color:#9C6503; margin-bottom:0.8mm; }
+  .analysis svg{ max-width:100%; height:auto; display:block; }
+  .spaced{ border:0.4mm solid var(--line); border-radius:3mm; padding:3mm 4mm 2.6mm; margin:0 0 4mm; position:relative; background:#FAFBFC; }
+  .spaced .st{ font-size:9.5pt; font-weight:900; color:var(--unit); margin-bottom:1.6mm; }
+  .spaced ol{ margin:0; padding-left:5mm; font-size:8.8pt; line-height:1.75; }
+  .spaced .when{ display:flex; gap:5mm; font-size:8pt; color:var(--sub); margin-top:1.8mm; }
+  .spaced .ans{ position:absolute; right:4mm; bottom:2.4mm; transform:rotate(180deg); font-size:6.8pt; color:var(--sub); }
+  /* 2단 문항 쪽 간격 · 발문 안 탐구 과정 상자 (합격본 chapter-08 에서) */
+  .qg2 .q{ margin-bottom:6mm; }
+  .qg2 > div > .q:last-child{ margin-bottom:0; }
+  .qg2 .choices.inline{ gap:0 4mm; }
+  .qg2 .choices{ margin-top:1.8mm; line-height:1.78; }
+  .qg2 .bogi-box{ margin-top:2mm; padding:1.8mm 2.8mm; font-size:9pt; line-height:1.72; }
+  .qg2 .bogi-box .bt{ margin-bottom:0.3mm; }
+  .qg2 .q figure{ margin:1.6mm 0 0.6mm 8.4mm !important; }
+  .exp{ border:0.35mm solid #B8C2CA; border-radius:1.6mm; background:#FAFBFC; padding:1.6mm 2.6mm; margin:1.4mm 0 1.6mm; font-size:8.9pt; line-height:1.7; }
+  .exp b{ font-family:'PC Sans'; font-size:7.8pt; font-weight:900; color:var(--brand); }
 </style>
 </head>
 <body>
@@ -886,7 +909,7 @@
         <li><b>생물 → 환경까지 본다</b> — 나무가 돌아오자 비버가 둑을 짓고 물길이 안정되었다 — 01에서 배운 <b>생물이 환경을 바꾸는</b> 화살표가 실제 강 지형에서 확인된 것이다.</li>
       </ol>
       <h4>결론</h4>
-      <p>옐로스톤은 '평형·복원력·먹이 그물'이 교과서 밖에서 실제로 작동한 거대한 실험이다. <b>최상위 포식자는 그물 전체의 버팀목</b>이며, 복원은 가능하다 — 다만 70년이 걸렸다.</p>
+      <p>옐로스톤은 '평형·복원력·먹이 그물'이 교과서 밖에서 실제로 작동한 거대한 실험이다. <b>최상위 포식자는 그물 전체의 버팀목</b>이며, 복원은 가능하다 — 다만 늑대가 돌아오기까지 70년이 걸렸다.</p>
       <div class="expoint">
         <div class="boxtitle"><span class="ico">!</span>시험엔 이렇게</div>
         <p>연쇄 문제는 화살표 방향만 따라가면 된다 — 늑대 ▲ → 엘크 ▼ → 식물 ▲ → 하위 생물 ▲. "늑대 증가로 식물이 감소한다"처럼 <b>한 칸 건너뛴 방향 착오</b>가 대표 함정.</p>
@@ -896,7 +919,7 @@
   <div class="folio"><span>II. 환경과 에너지</span><span class="num">99</span></div>
 </div>
 
-<!-- ═════════════ p.100 STEP 1 + STEP 2 시작 ═════════════ -->
+<!-- ═════════════ p.100 STEP 1 + STEP 2 시작 (7~10) ═════════════ -->
 <div class="page">
   <div class="runhead"><span class="unit-tag">II. 환경과 에너지</span><span class="lesson-tag">02. 생태계 평형 | 문제</span></div>
   <div class="step-head"><span class="stepno">STEP 1</span><span class="steptt">개념 확인</span><span class="stepdesc">OX와 빈칸으로 개념 점검 — 막히면 알짜 정리로!</span></div>
@@ -912,120 +935,394 @@
       <div class="q"><div class="qhead"><span class="qno">6</span><div class="stem">생태 통로는 도로 등으로 끊긴 <span class="blankline" style="min-width:14mm;"></span>를 이어 주는 시설이다.</div></div></div>
     </div>
   </div>
+
   <div style="border-top:0.5mm solid var(--line); margin:2mm 0 4mm;"></div>
+
   <div class="step-head s2"><span class="stepno">STEP 2</span><span class="steptt">내신 완성</span><span class="stepdesc">학교 시험 유형 그대로 — 서술형까지 한 번에</span></div>
-  <div class="q">
-    <div class="qhead"><span class="qno">7</span><div class="stem">먹이 관계에 대한 설명으로 옳은 것은? <span class="difficulty">●●○</span>
-    <div class="tags">10통과2-02-02 | 개념 1</div></div></div>
-    <ul class="choices">
-      <li>① 먹이 사슬의 화살표는 먹는 생물에서 먹히는 생물로 향한다.</li>
-      <li>② 실제 생태계의 먹이 관계는 대부분 한 줄의 사슬이다.</li>
-      <li>③ 먹이 그물이 복잡한 생태계일수록 평형이 잘 유지된다.</li>
-      <li>④ 먹이 그물에서 한 종이 사라지면 생태계는 반드시 붕괴한다.</li>
-      <li>⑤ 먹이 사슬의 출발점은 1차 소비자다.</li>
-    </ul>
+
+  <div class="qgrid qg2">
+    <div>
+      <div class="q">
+        <div class="qhead"><span class="qno">7</span><div class="stem">먹이 관계에 대한 설명으로 옳은 것은? <span class="difficulty">●○○</span>
+        <div class="tags">10통과2-02-02 | 개념 1</div></div></div>
+        <ul class="choices">
+          <li>① 먹이 그물이 복잡할수록 평형이 잘 유지된다.</li>
+          <li>② 화살표는 먹는 생물에서 먹히는 생물로 향한다.</li>
+          <li>③ 실제 먹이 관계는 대부분 한 줄의 사슬이다.</li>
+          <li>④ 그물에서 한 종이 사라지면 반드시 붕괴한다.</li>
+          <li>⑤ 먹이 사슬의 출발점은 1차 소비자다.</li>
+        </ul>
+      </div>
+
+      <div class="q">
+        <div class="qhead"><span class="qno">8</span><div class="stem"><span class="badge-data">자료</span>그림은 어느 초원 생태계의 먹이 그물을 나타낸 것이다. 옳은 것만을 &lt;보기&gt;에서 있는 대로 고른 것은? <span class="difficulty">●●○</span>
+        <div class="tags">10통과2-02-02 | 개념 1</div></div></div>
+        <figure style="margin:2mm 0 1mm 8.4mm;">
+          <svg width="280" height="118" viewBox="0 0 280 118" font-family="PC Sans">
+            <g stroke="#147D6F" stroke-width="1.1" fill="none" marker-end="url(#arrP)">
+              <line x1="122" y1="96" x2="93" y2="86"/>
+              <line x1="158" y1="96" x2="187" y2="86"/>
+              <line x1="64" y1="68" x2="64" y2="59"/>
+              <line x1="87" y1="42" x2="111" y2="35"/>
+              <line x1="204" y1="68" x2="163" y2="41"/>
+              <line x1="226" y1="68" x2="231" y2="25"/>
+              <line x1="163" y1="26" x2="203" y2="15"/>
+            </g>
+            <g font-size="7.8" font-weight="800" text-anchor="middle">
+              <rect x="117" y="96" width="46" height="16" rx="3" fill="#E7F5F1" stroke="#147D6F" stroke-width="1"/><text x="140" y="107" fill="#0F6357">풀</text>
+              <rect x="41" y="68" width="46" height="16" rx="3" fill="#EFF8F5" stroke="#A9D9CE" stroke-width="1"/><text x="64" y="79" fill="#3D4C58">메뚜기</text>
+              <rect x="193" y="68" width="46" height="16" rx="3" fill="#EFF8F5" stroke="#A9D9CE" stroke-width="1"/><text x="216" y="79" fill="#3D4C58">들쥐</text>
+              <rect x="41" y="38" width="46" height="16" rx="3" fill="#EFF8F5" stroke="#A9D9CE" stroke-width="1"/><text x="64" y="49" fill="#3D4C58">개구리</text>
+              <rect x="117" y="22" width="46" height="16" rx="3" fill="#EFF8F5" stroke="#A9D9CE" stroke-width="1"/><text x="140" y="33" fill="#3D4C58">뱀</text>
+              <rect x="209" y="4" width="46" height="16" rx="3" fill="#EFF8F5" stroke="#A9D9CE" stroke-width="1"/><text x="232" y="15" fill="#3D4C58">매</text>
+            </g>
+            <text x="2" y="12" font-size="7.2" fill="#5B6B77">화살표: 먹히는 생물 → 먹는 생물</text>
+          </svg>
+        </figure>
+        <div class="bogi-box">
+          <div class="bt">보기</div>
+          ㄱ. 개구리는 1차 소비자이다.<br>
+          ㄴ. 메뚜기가 사라지면 뱀은 먹이를 모두 잃는다.<br>
+          ㄷ. 풀이 사라지면 모든 소비자가 먹이를 잃는다.
+        </div>
+        <ul class="choices inline">
+          <li>① ㄱ</li><li>② ㄷ</li><li>③ ㄱ, ㄴ</li><li>④ ㄴ, ㄷ</li><li>⑤ ㄱ, ㄴ, ㄷ</li>
+        </ul>
+      </div>
+    </div>
+    <div>
+      <div class="q">
+        <div class="qhead"><span class="qno">9</span><div class="stem"><span class="must">중요</span>생태 피라미드에 대해 옳은 것은? <span class="difficulty">●○○</span>
+        <div class="tags">10통과2-02-02 | 개념 2</div></div></div>
+        <ul class="choices">
+          <li>① 위 영양 단계로 갈수록 개체 수는 많아진다.</li>
+          <li>② 위 영양 단계로 갈수록 에너지양이 줄어든다.</li>
+          <li>③ 각 단계는 받은 에너지를 전부 위 단계로 전달한다.</li>
+          <li>④ 생산자의 에너지양이 가장 적다.</li>
+          <li>⑤ 먹이 사슬은 제한 없이 길어질 수 있다.</li>
+        </ul>
+      </div>
+
+      <div class="q">
+        <div class="qhead"><span class="qno">10</span><div class="stem"><span class="badge-data">자료</span>그림은 어느 생태계의 영양 단계별 에너지양을 상댓값으로 나타낸 것이다. 옳은 것만을 &lt;보기&gt;에서 있는 대로 고른 것은? <span class="difficulty">●●●</span>
+        <div class="tags">10통과2-02-02 | 개념 2</div></div></div>
+        <figure style="margin:2mm 0 1mm 8.4mm;">
+          <svg width="270" height="94" viewBox="0 0 270 94" font-family="PC Sans">
+            <text x="238" y="9" text-anchor="middle" font-size="6.6" font-weight="800" fill="#5B6B77">에너지양(상댓값)</text>
+            <g font-size="7" font-weight="800" text-anchor="middle">
+              <rect x="80" y="14" width="50" height="17" rx="2.5" fill="#A9D9CE"/><text x="105" y="25.5" fill="#0F6357">3차 소비자</text>
+              <rect x="57" y="34" width="96" height="17" rx="2.5" fill="#6FB8AA"/><text x="105" y="45.5" fill="#fff">2차 소비자</text>
+              <rect x="33" y="54" width="144" height="17" rx="2.5" fill="#4BA394"/><text x="105" y="65.5" fill="#fff">1차 소비자</text>
+              <rect x="7" y="74" width="196" height="17" rx="2.5" fill="#147D6F"/><text x="105" y="85.5" fill="#fff">생산자</text>
+            </g>
+            <g font-size="8" font-weight="900" fill="#22303A" text-anchor="middle">
+              <text x="238" y="26">4</text><text x="238" y="46">30</text><text x="238" y="66">240</text><text x="238" y="86">2000</text>
+            </g>
+            <g stroke="#D8E0E5" stroke-width="0.8" stroke-dasharray="2 2">
+              <line x1="133" y1="22.5" x2="226" y2="22.5"/><line x1="156" y1="42.5" x2="222" y2="42.5"/><line x1="180" y1="62.5" x2="220" y2="62.5"/><line x1="206" y1="82.5" x2="216" y2="82.5"/>
+            </g>
+          </svg>
+        </figure>
+        <div class="bogi-box">
+          <div class="bt">보기</div>
+          ㄱ. 1차 소비자 에너지의 1/8이 위로 전달된다.<br>
+          ㄴ. 1차 소비자 에너지 중 210은 위로 가지 않는다.<br>
+          ㄷ. 3차 소비자의 에너지양은 생산자의 2&nbsp;%이다.
+        </div>
+        <ul class="choices inline">
+          <li>① ㄱ</li><li>② ㄷ</li><li>③ ㄱ, ㄴ</li><li>④ ㄴ, ㄷ</li><li>⑤ ㄱ, ㄴ, ㄷ</li>
+        </ul>
+      </div>
+    </div>
   </div>
-  <div class="q">
-    <div class="qhead"><span class="qno">8</span><div class="stem">생태 피라미드에 대한 설명으로 옳은 것은? <span class="difficulty">●●●</span>
-    <div class="tags">10통과2-02-02 | 개념 2</div></div></div>
-    <ul class="choices">
-      <li>① 위 영양 단계로 갈수록 에너지양이 줄어든다.</li>
-      <li>② 위 영양 단계로 갈수록 개체 수는 많아진다.</li>
-      <li>③ 각 단계는 받은 에너지를 전부 위 단계로 전달한다.</li>
-      <li>④ 생산자의 에너지양이 가장 적다.</li>
-      <li>⑤ 먹이 사슬은 제한 없이 길어질 수 있다.</li>
-    </ul>
-  </div>
+
   <div class="folio"><span>II. 환경과 에너지</span><span class="num">100</span></div>
 </div>
 
-<!-- ═════════════ p.101 STEP 2 계속 ═════════════ -->
+<!-- ═════════════ p.101 STEP 2 계속 (11~15) ═════════════ -->
 <div class="page">
   <div class="runhead"><span class="unit-tag">II. 환경과 에너지</span><span class="lesson-tag">02. 생태계 평형 | 문제</span></div>
-  <div class="q">
-    <div class="qhead"><span class="qno">9</span><div class="stem"><span class="badge-data">자료</span>안정된 생태계에서 1차 소비자가 갑자기 늘어났다. 이후 일어나는 변화로 옳은 것은? <span class="difficulty">●●●</span>
-    <div class="tags">10통과2-02-02 | 개념 3</div></div></div>
-    <ul class="choices">
-      <li>① 생산자가 일시적으로 증가한다.</li>
-      <li>② 2차 소비자가 일시적으로 감소한다.</li>
-      <li>③ 1차 소비자는 계속 늘어나기만 한다.</li>
-      <li>④ 생태계 평형은 영원히 회복되지 않는다.</li>
-      <li>⑤ 생산자는 줄고 2차 소비자는 늘어나, 1차 소비자가 다시 감소한다.</li>
-    </ul>
-  </div>
-  <div class="q">
-    <div class="qhead"><span class="qno">10</span><div class="stem">생태계 평형을 깨뜨리는 인간 활동으로 옳은 것만을 고른 것은? <span class="difficulty">●●○</span>
-    <div class="tags">10통과2-02-02 | 개념 4</div></div></div>
-    <div class="bogi-box" style="background:#fff;">
-      (가) 도로 건설로 서식지가 단절된다.<br>
-      (나) 무분별한 남획으로 한 종이 급감한다.<br>
-      (다) 외래종을 들여와 기존 먹이 그물이 교란된다.
+
+  <div class="qgrid qg2">
+    <div>
+      <div class="q">
+        <div class="qhead"><span class="qno">11</span><div class="stem"><span class="must">중요</span>안정된 생태계에서 1차 소비자가 갑자기 늘어났다. 이후 일어나는 변화로 옳은 것은? <span class="difficulty">●●○</span>
+        <div class="tags">10통과2-02-02 | 개념 3</div></div></div>
+        <ul class="choices">
+          <li>① 생산자가 일시적으로 증가한다.</li>
+          <li>② 2차 소비자가 일시적으로 감소한다.</li>
+          <li>③ 1차 소비자는 계속 늘어나기만 한다.</li>
+          <li>④ 생태계 평형은 영원히 회복되지 않는다.</li>
+          <li>⑤ 생산자는 줄고 2차 소비자는 늘어나, 1차 소비자가 다시 감소한다.</li>
+        </ul>
+      </div>
+
+      <div class="q">
+        <div class="qhead"><span class="qno">12</span><div class="stem"><span class="badge-data">탐구</span>다음은 먹이 관계의 안정성을 알아보는 모형 활동이다.
+          <div class="exp"><b>[과정]</b> (가) 생물 카드를 놓고, 먹히는 생물과 먹는 생물을 실로 잇는다. 모형 A는 풀–메뚜기–개구리–뱀–매를 한 줄로 이은 먹이 사슬, 모형 B는 여기에 들쥐 카드를 더해 여러 갈래로 이은 먹이 그물이다.<br>(나) 두 모형에서 메뚜기 카드를 빼고, 이어진 먹이가 하나도 남지 않은 소비자 카드를 차례로 뺀다.<br><b>[결과]</b> 남은 카드 — A: 풀 / B: 풀, 들쥐, 뱀, 매</div>
+          이에 대한 설명으로 옳은 것만을 &lt;보기&gt;에서 있는 대로 고른 것은? <span class="difficulty">●●○</span>
+        <div class="tags">10통과2-02-02 | 개념 1, 탐구</div></div></div>
+        <div class="bogi-box">
+          <div class="bt">보기</div>
+          ㄱ. 메뚜기 외에 더 뺀 카드는 A가 B보다 많다.<br>
+          ㄴ. B의 뱀에게는 개구리 말고도 먹이가 있다.<br>
+          ㄷ. 먹이 그물이 단순할수록 안정함을 보여 준다.
+        </div>
+        <ul class="choices inline">
+          <li>① ㄱ</li><li>② ㄷ</li><li>③ ㄱ, ㄴ</li><li>④ ㄴ, ㄷ</li><li>⑤ ㄱ, ㄴ, ㄷ</li>
+        </ul>
+      </div>
     </div>
-    <ul class="choices inline">
-      <li>① (가)</li><li>② (나)</li><li>③ (가), (나)</li><li>④ (가), (나), (다)</li><li>⑤ (나), (다)</li>
-    </ul>
+    <div>
+      <div class="q">
+        <div class="qhead"><span class="qno">13</span><div class="stem"><span class="must">중요</span>다음은 생태계 평형이 깨지는 원인에 대한 학생 A~C의 대화이다. 옳게 말한 학생만을 있는 대로 고른 것은? <span class="difficulty">●●○</span>
+        <div class="tags">10통과2-02-02 | 개념 4</div></div></div>
+        <div class="bogi-box">
+          <b>학생 A</b> : 생태계에는 복원력이 있으니 어떤 충격을 받아도 결국 원래대로 돌아와.<br>
+          <b>학생 B</b> : 도로 건설로 서식지가 나뉘는 것도 평형을 깨뜨리는 원인이 될 수 있어.<br>
+          <b>학생 C</b> : 공장 폐수 같은 환경 오염은 생물이 사는 환경 자체를 바꿔 평형을 흔들어.
+        </div>
+        <ul class="choices inline">
+          <li>① A</li><li>② C</li><li>③ A, B</li><li>④ B, C</li><li>⑤ A, B, C</li>
+        </ul>
+      </div>
+
+      <div class="q">
+        <div class="qhead"><span class="qno">14</span><div class="stem">생태계 평형이 깨지는 원인에 대한 설명으로 옳은 것만을 &lt;보기&gt;에서 있는 대로 고른 것은? <span class="difficulty">●●○</span>
+        <div class="tags">10통과2-02-02 | 개념 4</div></div></div>
+        <div class="bogi-box">
+          <div class="bt">보기</div>
+          ㄱ. 자연재해(홍수·산불)도 평형을 깰 수 있다.<br>
+          ㄴ. 남획은 먹이 그물에서 한 종을 통째로 없애 그물을 약하게 만든다.<br>
+          ㄷ. 최상위 포식자가 사라지면 초식 동물이 급증해 식물이 황폐해질 수 있다.
+        </div>
+        <ul class="choices inline">
+          <li>① ㄱ</li><li>② ㄷ</li><li>③ ㄱ, ㄴ</li><li>④ ㄴ, ㄷ</li><li>⑤ ㄱ, ㄴ, ㄷ</li>
+        </ul>
+      </div>
+
+      <div class="q">
+        <div class="qhead"><span class="qno">15</span><div class="stem">평형을 지키는 노력으로 옳지 <b>않은</b> 것은? <span class="difficulty">●○○</span>
+        <div class="tags">10통과2-02-02 | 개념 5</div></div></div>
+        <ul class="choices">
+          <li>① 도로 위에 생태 통로를 설치한다.</li>
+          <li>② 훼손이 심한 지역을 보호 구역으로 지정한다.</li>
+          <li>③ 사라진 반달가슴곰을 다시 들여와 복원한다.</li>
+          <li>④ 해충을 없애려고 천적이 없는 외래종을 들여온다.</li>
+          <li>⑤ 콘크리트로 덮인 하천을 생태 하천으로 되살린다.</li>
+        </ul>
+      </div>
+    </div>
   </div>
-  <div class="q">
-    <div class="qhead"><span class="qno">11</span><div class="stem"><span class="badge-essay">서술형</span>안정된 생태계에서 1차 소비자가 급증했을 때 평형이 회복되는 과정을 <b>'생산자'와 '2차 소비자'</b>라는 말을 포함하여 순서대로 서술하시오. <span class="difficulty">●●●●</span>
-    <div class="tags">10통과2-02-02 | 개념 3</div></div></div>
-    <div class="essay-lines"><div></div><div></div><div></div></div>
-  </div>
+
   <div class="folio"><span>II. 환경과 에너지</span><span class="num">101</span></div>
 </div>
 
-<!-- ═════════════ p.102 STEP 3 ═════════════ -->
+<!-- ═════════════ STEP 2 계속 (16~17) + 서술형 (18~20) ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag">II. 환경과 에너지</span><span class="lesson-tag">02. 생태계 평형 | 문제</span></div>
+
+  <div class="qgrid qg2">
+    <div>
+      <div class="q">
+        <div class="qhead"><span class="qno">16</span><div class="stem"><span class="badge-data">자료</span>그림은 도로로 나뉜 두 숲 A와 B 사이에 설치한 시설을 나타낸 것이다. 옳은 것만을 &lt;보기&gt;에서 있는 대로 고른 것은? <span class="difficulty">●○○</span>
+        <div class="tags">10통과2-02-02 | 개념 5</div></div></div>
+        <figure style="margin:2mm 0 1mm 8.4mm;">
+          <svg width="280" height="100" viewBox="0 0 280 100" font-family="PC Sans">
+            <rect x="1" y="1" width="278" height="98" rx="5" fill="#EEF6E6"/>
+            <rect x="118" y="1" width="44" height="98" fill="#8A949E"/>
+            <line x1="140" y1="1" x2="140" y2="99" stroke="#F4F7F9" stroke-width="1.4" stroke-dasharray="6 5"/>
+            <g fill="#4F9A3F">
+              <circle cx="18" cy="22" r="9"/><circle cx="44" cy="16" r="10"/><circle cx="74" cy="24" r="9"/><circle cx="100" cy="18" r="8"/>
+              <circle cx="24" cy="76" r="10"/><circle cx="54" cy="84" r="9"/><circle cx="86" cy="78" r="10"/>
+              <circle cx="180" cy="20" r="8"/><circle cx="206" cy="14" r="10"/><circle cx="236" cy="22" r="9"/><circle cx="262" cy="16" r="9"/>
+              <circle cx="192" cy="80" r="10"/><circle cx="224" cy="84" r="9"/><circle cx="256" cy="76" r="10"/>
+            </g>
+            <rect x="104" y="38" width="72" height="24" rx="3" fill="#9CCB86" stroke="#5E9C57" stroke-width="1.2"/>
+            <g transform="translate(152,61)">
+              <path d="M-7,0 l0,-7 M-3,0 l0,-7 M3,0 l0,-7 M7,0 l0,-7" stroke="#8B5A2B" stroke-width="1.6" stroke-linecap="round"/>
+              <ellipse cy="-10" rx="10" ry="5" fill="#B8804A"/>
+              <path d="M8,-12 l5,-7" stroke="#B8804A" stroke-width="4" stroke-linecap="round"/>
+              <ellipse cx="14" cy="-20" rx="4" ry="2.6" fill="#B8804A"/>
+            </g>
+            <text x="124" y="53.5" text-anchor="middle" font-size="7.6" font-weight="900" fill="#1F5F3A">이 시설</text>
+            <g font-size="8" font-weight="900" fill="#22303A" text-anchor="middle">
+              <text x="58" y="54">숲 A</text><text x="222" y="54">숲 B</text>
+            </g>
+            <rect x="128" y="81" width="24" height="12" fill="#8A949E"/><text x="140" y="90" text-anchor="middle" font-size="7.4" font-weight="800" fill="#fff">도로</text>
+          </svg>
+        </figure>
+        <div class="bogi-box">
+          <div class="bt">보기</div>
+          ㄱ. 끊긴 서식지를 이어 동물이 오가게 한다.<br>
+          ㄴ. 이 시설은 외래종의 유입을 막으려고 설치한다.<br>
+          ㄷ. 이런 시설은 과학 기술만으로 정하므로 주민과의 소통은 필요 없다.
+        </div>
+        <ul class="choices inline">
+          <li>① ㄱ</li><li>② ㄷ</li><li>③ ㄱ, ㄴ</li><li>④ ㄴ, ㄷ</li><li>⑤ ㄱ, ㄴ, ㄷ</li>
+        </ul>
+      </div>
+
+      <div class="q">
+        <div class="qhead"><span class="qno">17</span><div class="stem">생태계 평형에 대한 설명으로 옳은 것은? <span class="difficulty">●●○</span>
+        <div class="tags">10통과2-02-02 | 개념 3</div></div></div>
+        <ul class="choices">
+          <li>① 평형 상태에서는 개체 수가 전혀 변하지 않는다.</li>
+          <li>② 깨진 평형은 어떤 경우에도 회복되지 않는다.</li>
+          <li>③ 먹이 관계로 개체 수가 서로 조절되며 유지된다.</li>
+          <li>④ 생산자가 늘어도 소비자 수는 변하지 않는다.</li>
+          <li>⑤ 천적은 먹이 생물의 수를 늘려 평형을 지킨다.</li>
+        </ul>
+      </div>
+
+      <div class="q">
+        <div class="qhead"><span class="qno">18</span><div class="stem"><span class="badge-essay">서술형</span>생태 피라미드에서 위 영양 단계로 갈수록 에너지양이 줄어드는 까닭을 <b>'호흡'</b>, <b>'일부'</b>를 모두 포함하여 서술하시오. <span class="difficulty">●●○</span>
+        <div class="tags">10통과2-02-02 | 개념 2</div></div></div>
+        <div class="essay-lines"><div></div><div></div><div></div><div></div><div></div><div></div></div>
+      </div>
+    </div>
+    <div>
+      <div class="q">
+        <div class="qhead"><span class="qno">19</span><div class="stem"><span class="must">중요</span><span class="badge-essay">서술형</span>1차 소비자가 급증했을 때 평형이 회복되는 과정을 <b>'생산자'</b>, <b>'2차 소비자'</b>를 모두 포함하여 순서대로 서술하시오. <span class="difficulty">●●●</span>
+        <div class="tags">10통과2-02-02 | 개념 3</div></div></div>
+        <div class="essay-lines"><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>
+      </div>
+
+      <div class="q">
+        <div class="qhead"><span class="qno">20</span><div class="stem"><span class="badge-essay">서술형</span>천적이 없는 외래종이 들어오면 생태계 평형이 깨질 수 있는 까닭을 <b>'천적'</b>, <b>'먹이 그물'</b>을 모두 포함하여 서술하시오. <span class="difficulty">●●○</span>
+        <div class="tags">10통과2-02-02 | 개념 4</div></div></div>
+        <div class="essay-lines"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="folio"><span>II. 환경과 에너지</span><span class="num">?</span></div>
+</div>
+
+<!-- ═════════════ p.102 STEP 3 (21~24) ═════════════ -->
 <div class="page">
   <div class="runhead"><span class="unit-tag">II. 환경과 에너지</span><span class="lesson-tag">02. 생태계 평형 | 문제</span></div>
   <div class="step-head s3"><span class="stepno">STEP 3</span><span class="steptt">수능 도전</span><span class="stepdesc">2028 수능 규격 — ㄱㄴㄷ 합답형·자료 해석</span></div>
-  <div class="q">
-    <div class="qhead"><span class="qno">12</span><div class="stem"><span class="badge-data">자료</span>그림은 어느 안정된 생태계의 생태 피라미드를 나타낸 것이다. A~C는 각각 생산자, 1차 소비자, 2차 소비자 중 하나이다. 옳은 것만을 &lt;보기&gt;에서 있는 대로 고른 것은? <span class="difficulty">[2점]</span>
-    <div class="tags">10통과2-02-02</div></div></div>
-    <figure style="margin:2mm 0 1.5mm 8.6mm;">
-      <svg width="240" height="86" viewBox="0 0 240 86" font-family="PC Sans">
-        <g font-size="6.8" text-anchor="middle" transform="translate(120,6)">
-          <rect x="-90" y="52" width="180" height="20" fill="#147D6F" rx="3"/><text y="66" fill="#fff" font-weight="800">C</text>
-          <rect x="-58" y="28" width="116" height="20" fill="#4BA394" rx="3"/><text y="42" fill="#fff" font-weight="800">B</text>
-          <rect x="-30" y="4" width="60" height="20" fill="#A9D9CE" rx="3"/><text y="18" fill="#0F6357" font-weight="800">A</text>
-        </g>
-      </svg>
-    </figure>
-    <div class="bogi-box">
-      <div class="bt">보기</div>
-      ㄱ. C는 생산자이다.<br>
-      ㄴ. 에너지양은 A가 C보다 많다.<br>
-      ㄷ. B가 급증하면 C는 일시적으로 감소하고 A는 일시적으로 증가한다.
+
+  <div class="qgrid qg2">
+    <div>
+      <div class="q">
+        <div class="qhead"><span class="qno">21</span><div class="stem"><span class="badge-data">자료</span>그림은 어느 안정된 생태계의 생태 피라미드를 나타낸 것이다. A~C는 각각 생산자, 1차 소비자, 2차 소비자 중 하나이다. 옳은 것만을 &lt;보기&gt;에서 있는 대로 고른 것은? <span class="difficulty">●●○ [2점]</span>
+        <div class="tags">10통과2-02-02 | 개념 2·3</div></div></div>
+        <figure style="margin:2mm 0 1.5mm 8.6mm;">
+          <svg width="240" height="86" viewBox="0 0 240 86" font-family="PC Sans">
+            <g font-size="6.8" text-anchor="middle" transform="translate(120,6)">
+              <rect x="-90" y="52" width="180" height="20" fill="#147D6F" rx="3"/><text y="66" fill="#fff" font-weight="800">C</text>
+              <rect x="-58" y="28" width="116" height="20" fill="#4BA394" rx="3"/><text y="42" fill="#fff" font-weight="800">B</text>
+              <rect x="-30" y="4" width="60" height="20" fill="#A9D9CE" rx="3"/><text y="18" fill="#0F6357" font-weight="800">A</text>
+            </g>
+          </svg>
+        </figure>
+        <div class="bogi-box">
+          <div class="bt">보기</div>
+          ㄱ. C는 생산자이다.<br>
+          ㄴ. 에너지양은 C가 A보다 많다.<br>
+          ㄷ. B가 급증하면 C는 일시적으로 감소하고 A는 일시적으로 증가한다.
+        </div>
+        <ul class="choices inline">
+          <li>① ㄱ</li><li>② ㄷ</li><li>③ ㄱ, ㄴ</li><li>④ ㄴ, ㄷ</li><li>⑤ ㄱ, ㄴ, ㄷ</li>
+        </ul>
+      </div>
+
+      <div class="q">
+        <div class="qhead"><span class="qno">22</span><div class="stem"><span class="badge-data">자료</span>다음은 옐로스톤 국립공원의 사례이다.
+          <div class="exp">1920년대 늑대가 사라지자 엘크(사슴)가 급증해 강가의 어린 나무가 크게 줄었다. 1995년 늑대를 다시 방사하자 엘크가 줄고 행동이 바뀌면서 나무가 회복되었고, 비버가 늘어 물길까지 안정되었다.</div>
+          이에 대한 설명으로 옳은 것만을 &lt;보기&gt;에서 있는 대로 고른 것은? <span class="difficulty">●●○ [2.5점]</span>
+        <div class="tags">10통과2-02-02 | 개념 4, 자료 파헤치기</div></div></div>
+        <div class="bogi-box">
+          <div class="bt">보기</div>
+          ㄱ. 늑대가 사라진 뒤 엘크가 급증한 것은 먹이인 어린 나무가 늘었기 때문이다.<br>
+          ㄴ. 최상위 포식자의 변화는 여러 영양 단계에 연쇄적으로 영향을 준다.<br>
+          ㄷ. 비버가 물길을 바꾼 것은 생물이 환경에 영향을 준 예이다.
+        </div>
+        <ul class="choices inline">
+          <li>① ㄱ</li><li>② ㄷ</li><li>③ ㄱ, ㄴ</li><li>④ ㄴ, ㄷ</li><li>⑤ ㄱ, ㄴ, ㄷ</li>
+        </ul>
+      </div>
     </div>
-    <ul class="choices inline">
-      <li>① ㄱ</li><li>② ㄴ</li><li>③ ㄴ, ㄷ</li><li>④ ㄱ, ㄷ</li><li>⑤ ㄱ, ㄴ, ㄷ</li>
-    </ul>
+    <div>
+      <div class="q">
+        <div class="qhead"><span class="qno">23</span><div class="stem"><span class="must">중요</span><span class="badge-data">자료</span>그림 (가)는 어느 초원 생태계의 영양 단계별 생물량을, (나)는 이 생태계에서 1차 소비자의 개체 수 변화를 나타낸 것이다. t<sub>1</sub>에는 가뭄으로 풀이 일시적으로 줄었고, t<sub>2</sub>에는 개발로 서식지 대부분이 파괴되었다. 옳은 것만을 &lt;보기&gt;에서 있는 대로 고른 것은? <span class="difficulty">●●● [2.5점]</span>
+        <div class="tags">10통과2-02-02 | 개념 2·4 (II-01 비생물적 요인 연계, 자료 두 개 엮기)</div></div></div>
+        <figure style="margin:2mm 0 1mm 8.4mm;">
+          <svg width="290" height="100" viewBox="0 0 290 100" font-family="PC Sans">
+            <g font-size="6.8" font-weight="800" text-anchor="middle">
+              <rect x="38" y="16" width="40" height="17" rx="2.5" fill="#A9D9CE"/><text x="58" y="27.5" fill="#0F6357">2차 · 16</text>
+              <rect x="20" y="36" width="76" height="17" rx="2.5" fill="#4BA394"/><text x="58" y="47.5" fill="#fff">1차 소비자 · 120</text>
+              <rect x="2" y="56" width="112" height="17" rx="2.5" fill="#147D6F"/><text x="58" y="67.5" fill="#fff">생산자 · 800</text>
+            </g>
+            <text x="58" y="9" text-anchor="middle" font-size="6.4" fill="#5B6B77">생물량(상댓값)</text>
+            <text x="58" y="94" text-anchor="middle" font-size="7" font-weight="800" fill="#4A5964">(가)</text>
+            <line x1="140" y1="72" x2="284" y2="72" stroke="#5B6B77" stroke-width="1" marker-end="url(#arrGy)"/>
+            <line x1="140" y1="72" x2="140" y2="6" stroke="#5B6B77" stroke-width="1" marker-end="url(#arrGy)"/>
+            <text x="144" y="9" font-size="6.4" fill="#5B6B77">개체 수</text>
+            <text x="284" y="84" text-anchor="end" font-size="6.4" fill="#5B6B77">시간</text>
+            <g stroke="#D6455D" stroke-width="0.9" stroke-dasharray="2.5 2"><line x1="168" y1="14" x2="168" y2="72"/><line x1="232" y1="14" x2="232" y2="72"/></g>
+            <path d="M142,28 L168,28 C176,30 180,50 186,51 C192,52 198,30 208,28 L232,28 C238,30 242,58 250,61 L280,62" fill="none" stroke="#147D6F" stroke-width="2"/>
+            <g font-size="7" font-weight="800" fill="#A9556A" text-anchor="middle"><text x="168" y="82">t₁</text><text x="232" y="82">t₂</text></g>
+            <text x="212" y="94" text-anchor="middle" font-size="7" font-weight="800" fill="#4A5964">(나)</text>
+          </svg>
+        </figure>
+        <div class="bogi-box">
+          <div class="bt">보기</div>
+          ㄱ. t<sub>1</sub> 이후 1차 소비자의 감소는 비생물적 요인의 변화가 먹이 관계를 따라 전달된 결과이다.<br>
+          ㄴ. t<sub>2</sub>의 충격은 복원력의 한계 안에 있었다.<br>
+          ㄷ. 생산자의 생물량은 2차 소비자의 10배이다.
+        </div>
+        <ul class="choices inline">
+          <li>① ㄱ</li><li>② ㄷ</li><li>③ ㄱ, ㄴ</li><li>④ ㄴ, ㄷ</li><li>⑤ ㄱ, ㄴ, ㄷ</li>
+        </ul>
+      </div>
+
+      <div class="q">
+        <div class="qhead"><span class="qno">24</span><div class="stem"><span class="badge-data">자료</span>표는 어느 도시 하천에서 생태 하천 복원 사업 전후를 비교한 것이다. 옳은 것만을 &lt;보기&gt;에서 있는 대로 고른 것은? <span class="difficulty">●●○ [2점]</span>
+        <div class="tags">10통과2-02-02 | 개념 1·5 (II-01 생물과 환경 연계)</div></div></div>
+        <figure style="margin:2mm 0 1mm 8.4mm;">
+          <svg width="280" height="76" viewBox="0 0 280 76" font-family="PC Sans">
+            <rect x="1" y="1" width="278" height="18" fill="#E7F5F1"/>
+            <rect x="1" y="1" width="278" height="73" fill="none" stroke="#B8C2CA" stroke-width="0.9"/>
+            <g stroke="#B8C2CA" stroke-width="0.8"><line x1="1" y1="19" x2="279" y2="19"/><line x1="1" y1="37.5" x2="279" y2="37.5"/><line x1="1" y1="56" x2="279" y2="56"/><line x1="86" y1="1" x2="86" y2="74"/><line x1="170" y1="1" x2="170" y2="74"/></g>
+            <g font-size="7.8" font-weight="800" fill="#147D6F" text-anchor="middle"><text x="43.5" y="13">구분</text><text x="128" y="13">복원 전</text><text x="224.5" y="13">복원 후</text></g>
+            <g font-size="7.6" fill="#22303A" text-anchor="middle">
+              <text x="43.5" y="31.5" font-weight="800">바닥과 물가</text><text x="128" y="31.5">콘크리트</text><text x="224.5" y="31.5">자갈·모래, 물가 식물</text>
+              <text x="43.5" y="50" font-weight="800">물고기 종 수</text><text x="128" y="50">3</text><text x="224.5" y="50">11</text>
+              <text x="43.5" y="68.5" font-weight="800">물새 종 수</text><text x="128" y="68.5">2</text><text x="224.5" y="68.5">9</text>
+            </g>
+          </svg>
+        </figure>
+        <div class="bogi-box">
+          <div class="bt">보기</div>
+          ㄱ. 복원 뒤 먹이 관계가 복원 전보다 단순해졌다.<br>
+          ㄴ. 복원 전 물고기 종 수가 적었던 것은 생물이 비생물적 요인에 영향을 준 예이다.<br>
+          ㄷ. 물가 식물(생산자)이 자라 먹이 그물의 바탕이 넓어지면서 소비자의 종류가 늘었다.
+        </div>
+        <ul class="choices inline">
+          <li>① ㄱ</li><li>② ㄷ</li><li>③ ㄱ, ㄴ</li><li>④ ㄴ, ㄷ</li><li>⑤ ㄱ, ㄴ, ㄷ</li>
+        </ul>
+      </div>
+    </div>
   </div>
-  <div class="q">
-    <div class="qhead"><span class="qno">13</span><div class="stem"><span class="badge-data">자료</span>다음은 옐로스톤 국립공원의 사례다. 옳은 것만을 &lt;보기&gt;에서 있는 대로 고른 것은? <span class="difficulty">[2.5점]</span>
-    <div class="tags">10통과2-02-02</div></div></div>
-    <div class="bogi-box" style="background:#fff;">
-      1920년대 늑대가 사라지자 엘크(사슴)가 급증해 강가의 어린 나무가 크게 줄었다. 1995년 늑대를 다시 방사하자 엘크가 줄고 행동이 바뀌면서 나무가 회복되었고, 비버가 늘어 물길까지 안정되었다.
-    </div>
-    <div class="bogi-box">
-      <div class="bt">보기</div>
-      ㄱ. 늑대가 사라진 뒤 엘크의 급증은 천적이 없어졌기 때문이다.<br>
-      ㄴ. 최상위 포식자의 변화는 여러 영양 단계에 연쇄적으로 영향을 준다.<br>
-      ㄷ. 나무 회복 이후 비버가 물길을 바꾼 것은 생물이 환경에 영향을 준 예다.
-    </div>
-    <ul class="choices inline">
-      <li>① ㄱ</li><li>② ㄷ</li><li>③ ㄱ, ㄴ, ㄷ</li><li>④ ㄱ, ㄴ</li><li>⑤ ㄴ, ㄷ</li>
-    </ul>
-  </div>
+
   <div class="folio"><span>II. 환경과 에너지</span><span class="num">102</span></div>
 </div>
 
 <!-- ═════════════ p.103 해설 1 ═════════════ -->
 <div class="page">
   <div class="runhead"><span class="unit-tag" style="color:var(--brand);">알짜 해설</span><span class="lesson-tag">02. 생태계 평형</span></div>
-  <div class="sol-head"><span class="stt">알짜 해설</span><span class="sub">전 문항 해설 + 오답 선지 분석 — 맞힌 문제도 해설로 한 번 더!</span></div>
+  <div class="sol-head"><span class="stt">알짜 해설</span><span class="sub">전 문항 해설 + 바로알기(틀린 선지를 옳게 고친 문장) — 맞힌 문제도 해설로 한 번 더!</span></div>
+
   <table class="anstable">
-    <tr><th>문항</th><td>1</td><td>2</td><td>3</td><td>4</td><td>5</td><td>6</td><td>7</td><td>8</td><td>9</td><td>10</td><td>11</td><td>12</td><td>13</td></tr>
-    <tr><th>정답</th><td class="a">O</td><td class="a">X</td><td class="a">O</td><td class="a">먹이 사슬</td><td class="a">피라미드</td><td class="a">서식지</td><td class="a">③</td><td class="a">①</td><td class="a">⑤</td><td class="a">④</td><td class="a">서술형</td><td class="a">④</td><td class="a">③</td></tr>
+    <tr><th>문항</th><td>1</td><td>2</td><td>3</td><td>4</td><td>5</td><td>6</td><td>7</td><td>8</td><td>9</td><td>10</td><td>11</td><td>12</td></tr>
+    <tr><th>정답</th><td class="a">O</td><td class="a">X</td><td class="a">O</td><td class="a">먹이 사슬</td><td class="a">피라미드</td><td class="a">서식지</td><td class="a">①</td><td class="a">②</td><td class="a">②</td><td class="a">③</td><td class="a">⑤</td><td class="a">③</td></tr>
+    <tr><th>문항</th><td>13</td><td>14</td><td>15</td><td>16</td><td>17</td><td>18</td><td>19</td><td>20</td><td>21</td><td>22</td><td>23</td><td>24</td></tr>
+    <tr><th>정답</th><td class="a">④</td><td class="a">⑤</td><td class="a">④</td><td class="a">①</td><td class="a">③</td><td class="a">서술형</td><td class="a">서술형</td><td class="a">서술형</td><td class="a">⑤</td><td class="a">④</td><td class="a">①</td><td class="a">②</td></tr>
   </table>
+
   <div class="solcols">
     <div>
       <div class="sol"><div class="shead"><span class="sno">1</span><span class="sans">O</span><span class="slink">개념 1</span></div>
@@ -1040,20 +1337,50 @@
         <p>개체 수·생물량·에너지 — 셋 다 피라미드형.</p></div>
       <div class="sol"><div class="shead"><span class="sno">6</span><span class="sans">서식지</span><span class="slink">개념 5</span></div>
         <p>끊긴 서식지를 잇는 야생동물의 다리.</p></div>
+      <div class="sol"><div class="shead"><span class="sno">7</span><span class="sans">①</span><span class="slink">개념 1</span></div>
+        <p>복잡한 그물 = 튼튼한 안전망 — 한 줄이 끊겨도 다른 줄이 받친다.</p>
+        <div class="wrongbox"><div class="wt">바로알기</div>
+          <p><b>②</b> 화살표는 먹히는 생물에서 먹는 생물로 향한다. <b>③</b> 실제 생태계의 먹이 관계는 여러 사슬이 얽힌 먹이 그물이다. <b>④</b> 한 종이 사라져도 포식자가 다른 먹이로 갈아탈 수 있어 충격이 분산된다. <b>⑤</b> 먹이 사슬의 출발점은 생산자다.</p></div></div>
     </div>
     <div>
-      <div class="sol"><div class="shead"><span class="sno">7</span><span class="sans">③</span><span class="slink">개념 1</span></div>
-        <p>복잡한 그물 = 튼튼한 안전망.</p>
-        <div class="wrongbox"><div class="wt">오답 왜 틀렸나</div>
-          <p><b>①</b> 화살표는 먹히는 → 먹는. <b>②</b> 실제는 그물. <b>④</b> 다른 줄이 받칠 수 있다. <b>⑤</b> 출발점은 생산자.</p></div></div>
-      <div class="sol"><div class="shead"><span class="sno">8</span><span class="sans">①</span><span class="slink">개념 2</span></div>
+      <div class="sol"><div class="shead"><span class="sno">8</span><span class="sans">②</span><span class="slink">개념 1</span></div>
+        <p><b>ㄷ&nbsp;(옳음)</b> 이 그물의 생산자는 풀 하나뿐이다. 모든 화살표를 거슬러 가면 풀에 닿으므로, 풀이 사라지면 모든 소비자가 먹이를 잃는다.</p>
+        <div class="analysis"><div class="at">꼼꼼 자료 분석</div>
+          <svg width="300" height="154" viewBox="0 0 300 154" font-family="PC Sans">
+            <g stroke="#147D6F" stroke-width="1.1" fill="none" marker-end="url(#arrP)">
+              <line x1="122" y1="96" x2="93" y2="86"/>
+              <line x1="158" y1="96" x2="187" y2="86"/>
+              <line x1="64" y1="68" x2="64" y2="59"/>
+              <line x1="87" y1="42" x2="111" y2="35"/>
+              <line x1="226" y1="68" x2="231" y2="25"/>
+              <line x1="163" y1="26" x2="203" y2="15"/>
+            </g>
+            <line x1="204" y1="68" x2="163" y2="41" stroke="#2E7A54" stroke-width="1.7" marker-end="url(#arrP)"/>
+            <g font-size="7.8" font-weight="800" text-anchor="middle">
+              <rect x="117" y="96" width="46" height="16" rx="3" fill="#E7F5F1" stroke="#147D6F" stroke-width="1"/><text x="140" y="107" fill="#0F6357">풀</text>
+              <rect x="41" y="68" width="46" height="16" rx="3" fill="#EFF8F5" stroke="#A9D9CE" stroke-width="1"/><text x="64" y="79" fill="#3D4C58">메뚜기</text>
+              <rect x="193" y="68" width="46" height="16" rx="3" fill="#EFF8F5" stroke="#A9D9CE" stroke-width="1"/><text x="216" y="79" fill="#3D4C58">들쥐</text>
+              <rect x="41" y="38" width="46" height="16" rx="3" fill="#EFF8F5" stroke="#A9D9CE" stroke-width="1"/><text x="64" y="49" fill="#3D4C58">개구리</text>
+              <rect x="117" y="22" width="46" height="16" rx="3" fill="#EFF8F5" stroke="#A9D9CE" stroke-width="1"/><text x="140" y="33" fill="#3D4C58">뱀</text>
+              <rect x="209" y="4" width="46" height="16" rx="3" fill="#EFF8F5" stroke="#A9D9CE" stroke-width="1"/><text x="232" y="15" fill="#3D4C58">매</text>
+            </g>
+            <rect x="113" y="92" width="54" height="24" rx="4" fill="none" stroke="#D6455D" stroke-width="1.3" stroke-dasharray="3 2"/>
+            <path d="M44,70 L84,82 M84,70 L44,82" stroke="#D6455D" stroke-width="1.6" stroke-linecap="round"/>
+            <text x="2" y="98" font-size="6.6" font-weight="800" fill="#D6455D">메뚜기 ✕</text>
+            <text x="2" y="108" font-size="6.6" font-weight="700" fill="#5B6B77">→ 개구리만 굶는다</text>
+            <text x="174" y="58" text-anchor="end" font-size="6.8" font-weight="800" fill="#2E7A54">뱀의 다른 먹이</text>
+            <g font-size="6.8" font-weight="700">
+              <text x="2" y="128" fill="#D6455D">ㄷ 풀 = 유일한 생산자 → 모든 화살표의 출발점</text>
+              <text x="2" y="139" fill="#2E7A54">ㄴ 메뚜기가 없어도 뱀은 들쥐를 먹는다</text>
+              <text x="2" y="150" fill="#5B6B77">ㄱ 개구리는 1차 소비자(메뚜기)를 먹는 2차 소비자</text>
+            </g>
+          </svg></div>
+        <div class="wrongbox"><div class="wt">바로알기</div>
+          <p><b>ㄱ</b> (틀림 →) 개구리는 1차 소비자인 메뚜기를 먹으므로 <b>2차 소비자</b>이다. <b>ㄴ</b> (틀림 →) 메뚜기가 사라져도 뱀은 <b>들쥐를 먹을 수 있다</b> — 그물이 충격을 나눈다.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">9</span><span class="sans">②</span><span class="slink">개념 2</span></div>
         <p>위로 갈수록 에너지 ↓ — 피라미드의 기본 법칙.</p>
-        <div class="wrongbox"><div class="wt">오답 왜 틀렸나</div>
-          <p><b>②</b> 개체 수도 줄어든다. <b>③</b> 대부분은 호흡 등으로 소비. <b>④</b> 생산자가 가장 많다. <b>⑤</b> 에너지 한계로 길이 제한.</p></div></div>
-      <div class="sol"><div class="shead"><span class="sno">9</span><span class="sans">⑤</span><span class="slink">개념 3</span></div>
-        <p>급증 → 생산자 ▼·2차 소비자 ▲ → 1차 소비자 ▼ → 회복.</p>
-        <div class="wrongbox"><div class="wt">오답 왜 틀렸나</div>
-          <p><b>①·②</b> 방향 반대. <b>③·④</b> 조절 장치가 작동해 회복된다(한계 내에서).</p></div></div>
+        <div class="wrongbox"><div class="wt">바로알기</div>
+          <p><b>①</b> 위 영양 단계로 갈수록 개체 수도 줄어든다. <b>③</b> 각 단계는 받은 에너지의 대부분을 호흡 등 생명 활동에 쓰고 일부만 전달한다. <b>④</b> 생산자의 에너지양이 가장 많다. <b>⑤</b> 단계마다 에너지가 크게 줄어 먹이 사슬의 길이에는 한계가 있다.</p></div></div>
     </div>
   </div>
   <div class="folio"><span>알짜 해설</span><span class="num">103</span></div>
@@ -1064,26 +1391,133 @@
   <div class="runhead"><span class="unit-tag" style="color:var(--brand);">알짜 해설</span><span class="lesson-tag">02. 생태계 평형</span></div>
   <div class="solcols">
     <div>
-      <div class="sol"><div class="shead"><span class="sno">10</span><span class="sans">④</span><span class="slink">개념 4</span></div>
-        <p>서식지 단절·남획·외래종 — 셋 모두 평형 파괴의 대표 사례다.</p>
-        <div class="wrongbox"><div class="wt">함정 체크</div>
-          <p>넷째 손은 환경 오염 — '파괴 4적'으로 묶어 암기하라.</p></div></div>
-      <div class="sol"><div class="shead"><span class="sno">11</span><span class="sans">모범 답안</span><span class="slink">개념 3</span></div>
-        <p>1차 소비자가 급증하면 먹이인 <b>생산자</b>는 줄고, 1차 소비자를 먹는 <b>2차 소비자</b>는 늘어난다. 먹이 부족과 천적 증가로 1차 소비자가 다시 감소하면, 생산자와 2차 소비자도 원래 수준으로 돌아와 평형이 회복된다.</p>
-        <div class="wrongbox"><div class="wt">채점 기준 (감점 포인트)</div>
-          <p>① 생산자 감소 + 2차 소비자 증가 ② 그로 인한 1차 소비자 감소 ③ 전체 회복 — 순서대로 서술해야 만점.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">10</span><span class="sans">③</span><span class="slink">개념 2</span></div>
+        <p><b>ㄱ&nbsp;(옳음)</b> 30 ÷ 240 = 1/8 (12.5&nbsp;%). <b>ㄴ&nbsp;(옳음)</b> 240 − 30 = 210 — 호흡 등 생명 활동에 쓰여 위로 전달되지 않은 몫이다.</p>
+        <div class="wrongbox"><div class="wt">바로알기</div>
+          <p><b>ㄷ</b> (틀림 →) 4 ÷ 2000 = 0.002이므로 3차 소비자의 에너지양은 생산자의 <b>0.2&nbsp;%</b>이다. 단계를 오를 때마다 크게 줄어, 세 단계 위에는 1&nbsp;%도 남지 않는다.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">11</span><span class="sans">⑤</span><span class="slink">개념 3</span></div>
+        <p>급증 → 생산자 ▼·2차 소비자 ▲ → 1차 소비자 ▼ → 회복.</p>
+        <div class="wrongbox"><div class="wt">바로알기</div>
+          <p><b>①</b> 먹히는 쪽인 생산자는 일시적으로 감소한다. <b>②</b> 먹이가 많아진 2차 소비자는 일시적으로 증가한다. <b>③</b> 먹이 부족과 천적 증가로 1차 소비자는 다시 감소한다. <b>④</b> 한계를 넘지 않는 변화라면 먹이 관계의 자동 조절로 평형이 회복된다.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">12</span><span class="sans">③</span><span class="slink">개념 1 | 탐구</span></div>
+        <p>A(5장)에서 메뚜기를 빼면 개구리 → 뱀 → 매가 차례로 먹이를 잃어 풀만 남는다. B(6장)에서는 개구리만 함께 빠지고 뱀·매는 들쥐로 이어져 남는다.</p>
+        <p><b>ㄱ&nbsp;(옳음)</b> 더 뺀 카드: A는 3장(개구리·뱀·매), B는 1장(개구리). <b>ㄴ&nbsp;(옳음)</b> 개구리 카드가 빠졌는데도 뱀이 남았으니, B의 뱀에게는 다른 먹이(들쥐)가 있다.</p>
+        <div class="wrongbox"><div class="wt">바로알기</div>
+          <p><b>ㄷ</b> (틀림 →) 이 활동은 먹이 그물이 <b>복잡할수록</b> 한 종이 사라져도 충격이 분산되어 안정함을 보여 준다.</p></div></div>
     </div>
     <div>
-      <div class="sol"><div class="shead"><span class="sno">12</span><span class="sans">④</span><span class="slink">개념 2·3 | 2점</span></div>
-        <p><b>ㄱ (옳음)</b> 피라미드 맨 아래 C = 생산자. <b>ㄴ (틀림)</b> 에너지양은 C &gt; B &gt; A — 위층 A가 가장 적다. <b>ㄷ (옳음)</b> B(1차 소비자)가 급증하면 먹이인 C는 일시 감소, B를 먹는 A는 일시 증가한다.</p>
+      <div class="sol"><div class="shead"><span class="sno">13</span><span class="sans">④</span><span class="slink">개념 4</span></div>
+        <p><b>B&nbsp;(옳음)</b> 서식지 파괴·단절은 평형을 깨는 대표적 인간 활동이다. <b>C&nbsp;(옳음)</b> 오염은 생물이 아니라 무대(환경) 자체를 바꾼다.</p>
+        <div class="wrongbox"><div class="wt">바로알기</div>
+          <p><b>A</b> (틀림 →) 복원력에는 <b>한계</b>가 있어, 그 한계를 넘는 충격을 받으면 평형이 깨진다.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">14</span><span class="sans">⑤</span><span class="slink">개념 4</span></div>
+        <p><b>ㄱ&nbsp;(옳음)</b> 홍수·가뭄·산불·화산 폭발도 원인이다. <b>ㄴ&nbsp;(옳음)</b> 남획은 그물의 매듭(종)을 통째로 뽑는다. <b>ㄷ&nbsp;(옳음)</b> 천적이 사라진 초식 동물이 급증해 식물을 먹어 치운다.</p>
         <div class="wrongbox"><div class="wt">함정 체크</div>
-          <p>ㄴ은 비교 방향을 뒤집은 함정 — 그림 없이 글만 읽으면 넘어간다. <b>"위층은 언제나 아래층보다 적다"</b>를 기준선으로 삼아 판정하라.</p></div></div>
-      <div class="sol"><div class="shead"><span class="sno">13</span><span class="sans">③</span><span class="slink">개념 4·자료 | 2.5점</span></div>
-        <p><b>ㄱ (옳음)</b> 천적 소멸 → 급증. <b>ㄴ (옳음)</b> 늑대 → 엘크 → 나무 → 비버 — 여러 단계의 연쇄. <b>ㄷ (옳음)</b> 비버의 둑 짓기 = 생물 → 환경의 화살표.</p>
-        <div class="wrongbox"><div class="wt">함정 체크</div>
-          <p>세 진술이 모두 옳은 '전부 정답'형 — 하나쯤 틀렸겠지 하는 심리를 노린다. 각 진술을 독립적으로 판정하라.</p></div></div>
+          <p>평형을 깨는 원인은 인간 활동만이 아니다 — 자연재해도 들어간다. 최상위 포식자 제거는 <b>위에서 아래로</b> 무너지는 순서로 읽는다.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">15</span><span class="sans">④</span><span class="slink">개념 5</span></div>
+        <p>①·②·③·⑤는 잇고(생태 통로) 지키고(보호 구역) 되살리는(복원) 보전 기술이다. ④만 평형을 깨는 쪽이다.</p>
+        <div class="wrongbox"><div class="wt">바로알기</div>
+          <p><b>④</b> 천적이 없는 외래종을 들여오면 외래종이 급증해 오히려 먹이 그물을 교란할 수 있다.</p></div></div>
+    </div>
+  </div>
+  <div class="folio"><span>알짜 해설</span><span class="num">104</span></div>
+</div>
 
-      <div class="gist" style="margin-top:5mm;">
+<!-- ═════════════ 해설 3 ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag" style="color:var(--brand);">알짜 해설</span><span class="lesson-tag">02. 생태계 평형</span></div>
+  <div class="solcols">
+    <div>
+      <div class="sol"><div class="shead"><span class="sno">16</span><span class="sans">①</span><span class="slink">개념 5</span></div>
+        <p><b>ㄱ&nbsp;(옳음)</b> 도로 위를 가로지르는 이 시설이 생태 통로다 — 끊긴 두 숲을 하나의 서식지로 다시 잇는다.</p>
+        <div class="wrongbox"><div class="wt">바로알기</div>
+          <p><b>ㄴ</b> (틀림 →) 생태 통로는 도로로 <b>끊긴 서식지를 잇기</b> 위해 설치한다. <b>ㄷ</b> (틀림 →) 생태계 보전은 개발·보전·생계가 얽힌 사회적 결정이어서 주민 등과의 <b>협력적 소통</b>이 필요하다.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">17</span><span class="sans">③</span><span class="slink">개념 3</span></div>
+        <p>평형은 정지가 아니라 조절 — 먹이 관계의 위아래 층이 시소처럼 서로를 받친다.</p>
+        <div class="wrongbox"><div class="wt">바로알기</div>
+          <p><b>①</b> 평형 상태에서도 개체 수는 늘고 줄며, 크게 변하지 않는 범위에서 유지된다. <b>②</b> 한계 안의 충격이면 회복되고, 옐로스톤처럼 복원도 가능하다. <b>④</b> 생산자가 늘면 그것을 먹는 1차 소비자도 늘어난다. <b>⑤</b> 천적은 먹이 생물의 개체 수를 줄여 급증을 막는 브레이크다.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">18</span><span class="sans">모범 답안</span><span class="slink">개념 2</span></div>
+        <p>각 영양 단계의 생물은 먹이로 얻은 에너지의 대부분을 <b>호흡</b> 등 생명 활동에 쓰고, 그중 <b>일부</b>만 위 영양 단계로 전달한다. 그래서 단계를 오를 때마다 에너지양이 줄어든다.</p>
+        <table class="rubric">
+          <tr><th>채점 요소</th><th>배점</th></tr>
+          <tr><td>① 에너지의 대부분을 호흡 등 생명 활동에 쓴다고 썼다.</td><td>2점</td></tr>
+          <tr><td>② 일부만 위 영양 단계로 전달된다고 썼다.</td><td>2점</td></tr>
+          <tr><td>③ 그래서 위로 갈수록 에너지양이 줄어든다고 연결했다.</td><td>2점</td></tr>
+        </table>
+        <div class="wrongbox"><div class="wt">이렇게 쓰면 0점</div>
+          <p>"위 단계의 생물은 개체 수가 적어서 에너지가 적다." — 결과(개체 수 감소)를 원인으로 뒤바꾼 답.</p></div></div>
+    </div>
+    <div>
+      <div class="sol"><div class="shead"><span class="sno">19</span><span class="sans">모범 답안</span><span class="slink">개념 3</span></div>
+        <p>1차 소비자가 급증하면 먹이인 <b>생산자</b>는 줄고, 1차 소비자를 먹는 <b>2차 소비자</b>는 늘어난다. 먹이 부족과 천적 증가로 1차 소비자가 다시 감소하면, 생산자와 2차 소비자도 원래 수준으로 돌아와 평형이 회복된다.</p>
+        <table class="rubric">
+          <tr><th>채점 요소</th><th>배점</th></tr>
+          <tr><td>① 생산자 감소와 2차 소비자 증가를 썼다.</td><td>2점</td></tr>
+          <tr><td>② 먹이 부족·천적 증가로 1차 소비자가 다시 감소한다고 썼다.</td><td>2점</td></tr>
+          <tr><td>③ 생산자·2차 소비자도 원래대로 돌아와 평형이 회복된다고 썼다.</td><td>2점</td></tr>
+        </table>
+        <div class="wrongbox"><div class="wt">이렇게 쓰면 0점</div>
+          <p>"생태계는 스스로 회복하는 힘이 있기 때문이다." — 누가 늘고 누가 주는지 과정이 빠진 답.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">20</span><span class="sans">모범 답안</span><span class="slink">개념 4</span></div>
+        <p>새로 들어온 외래종은 그곳에 <b>천적</b>이 없어 개체 수를 줄여 주는 조절 장치가 작동하지 않으므로 급증할 수 있다. 급증한 외래종이 토종 생물을 잡아먹어 줄어들게 하면, 그 생물과 이어진 다른 생물까지 영향을 받아 기존 <b>먹이 그물</b>이 교란되므로 평형이 깨진다.</p>
+        <table class="rubric">
+          <tr><th>채점 요소</th><th>배점</th></tr>
+          <tr><td>① 천적이 없어 외래종이 급증한다고 썼다.</td><td>2점</td></tr>
+          <tr><td>② 외래종 때문에 토종 생물이 줄어든다고 썼다.</td><td>2점</td></tr>
+          <tr><td>③ 먹이 그물이 교란되어 평형이 깨진다고 연결했다.</td><td>2점</td></tr>
+        </table>
+        <div class="wrongbox"><div class="wt">이렇게 쓰면 0점</div>
+          <p>"외래종은 원래 해로운 생물이기 때문이다." — 천적 부재와 먹이 그물의 연쇄가 빠진 답.</p></div></div>
+    </div>
+  </div>
+  <div class="folio"><span>알짜 해설</span><span class="num">?</span></div>
+</div>
+
+<!-- ═════════════ 해설 4 ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag" style="color:var(--brand);">알짜 해설</span><span class="lesson-tag">02. 생태계 평형</span></div>
+  <div class="solcols">
+    <div>
+      <div class="sol"><div class="shead"><span class="sno">21</span><span class="sans">⑤</span><span class="slink">개념 2·3 | 2점</span></div>
+        <p><b>ㄱ&nbsp;(옳음)</b> 피라미드 맨 아래 C&nbsp;=&nbsp;생산자, B&nbsp;=&nbsp;1차 소비자, A&nbsp;=&nbsp;2차 소비자. <b>ㄴ&nbsp;(옳음)</b> 에너지양은 C&nbsp;&gt;&nbsp;B&nbsp;&gt;&nbsp;A. <b>ㄷ&nbsp;(옳음)</b> B가 급증하면 먹이인 C는 일시 감소, B를 먹는 A는 일시 증가.</p>
+        <div class="wrongbox"><div class="wt">함정 체크</div>
+          <p>"위층은 언제나 아래층보다 적다"를 기준선으로 삼고, 급증 문제는 <b>아래(먹이) ▼ · 위(천적) ▲</b>로 판정한다.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">22</span><span class="sans">④</span><span class="slink">개념 4·자료 | 2.5점</span></div>
+        <p><b>ㄴ&nbsp;(옳음)</b> 늑대 → 엘크 → 나무 → 비버 — 여러 단계의 연쇄. <b>ㄷ&nbsp;(옳음)</b> 비버의 둑 짓기 = 생물 → 환경의 화살표.</p>
+        <div class="wrongbox"><div class="wt">바로알기</div>
+          <p><b>ㄱ</b> (틀림 →) 엘크가 급증한 것은 <b>천적인 늑대가 사라졌기</b> 때문이며, 그 결과 어린 나무는 오히려 크게 줄었다.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">24</span><span class="sans">②</span><span class="slink">개념 1·5 | 2점</span></div>
+        <p><b>ㄷ&nbsp;(옳음)</b> 생산자(물가 식물)가 회복되면 그 위 단계를 떠받치는 바탕이 넓어진다 — 물고기 3&nbsp;→&nbsp;11종, 물새 2&nbsp;→&nbsp;9종.</p>
+        <div class="wrongbox"><div class="wt">바로알기</div>
+          <p><b>ㄱ</b> (틀림 →) 종 수가 늘어 먹이 관계는 <b>복잡해졌고</b>, 그만큼 평형이 잘 유지된다. <b>ㄴ</b> (틀림 →) 콘크리트 바닥(비생물적 요인)이 <b>생물에 영향을 준</b> 예이다.</p></div></div>
+    </div>
+    <div>
+      <div class="sol"><div class="shead"><span class="sno">23</span><span class="sans">①</span><span class="slink">개념 2·4 | 2.5점</span></div>
+        <p><b>ㄱ&nbsp;(옳음)</b> 가뭄 = 물(비생물적 요인)의 변화 → 생산자(풀) 감소 → 먹이가 줄어 1차 소비자 감소. 01에서 배운 '환경 → 생물'의 화살표가 먹이 관계를 타고 전달되었다.</p>
+        <div class="analysis"><div class="at">꼼꼼 자료 분석</div>
+          <svg width="300" height="104" viewBox="0 0 300 104" font-family="PC Sans">
+            <g transform="translate(-132,6)">
+              <line x1="140" y1="72" x2="284" y2="72" stroke="#5B6B77" stroke-width="1" marker-end="url(#arrGy)"/>
+              <line x1="140" y1="72" x2="140" y2="6" stroke="#5B6B77" stroke-width="1" marker-end="url(#arrGy)"/>
+              <text x="144" y="9" font-size="6.4" fill="#5B6B77">개체 수</text>
+              <g stroke="#D6455D" stroke-width="0.9" stroke-dasharray="2.5 2"><line x1="168" y1="14" x2="168" y2="72"/><line x1="232" y1="14" x2="232" y2="72"/></g>
+              <line x1="142" y1="28" x2="280" y2="28" stroke="#A9D9CE" stroke-width="0.9" stroke-dasharray="3 2"/>
+              <path d="M142,28 L168,28 C176,30 180,50 186,51 C192,52 198,30 208,28 L232,28 C238,30 242,58 250,61 L280,62" fill="none" stroke="#147D6F" stroke-width="2"/>
+              <g font-size="7" font-weight="800" fill="#A9556A" text-anchor="middle"><text x="168" y="82">t₁</text><text x="232" y="82">t₂</text></g>
+              <path d="M200,40 q4,-8 8,-11" fill="none" stroke="#2E7A54" stroke-width="1.1" marker-end="url(#arrP)"/>
+            </g>
+            <g font-size="6.8" font-weight="700">
+              <text x="162" y="14" fill="#2E7A54">t₁ 가뭄 → 풀 ▼ → 일시 감소</text>
+              <text x="162" y="25" fill="#2E7A54">→ 원래 수준 회복 = 한계 안</text>
+              <text x="162" y="48" fill="#D6455D">t₂ 서식지 파괴 → 회복 없음</text>
+              <text x="162" y="59" fill="#D6455D">= 복원력의 한계를 넘음 (ㄴ ✕)</text>
+              <text x="162" y="82" fill="#5B6B77">(가) 800 ÷ 16 = 50배 (ㄷ ✕)</text>
+              <text x="162" y="93" fill="#5B6B77">점선 = 처음 수준</text>
+            </g>
+          </svg></div>
+        <div class="wrongbox"><div class="wt">바로알기</div>
+          <p><b>ㄴ</b> (틀림 →) t<sub>2</sub> 이후 개체 수가 회복되지 않으므로 <b>복원력의 한계를 넘은</b> 충격이다. <b>ㄷ</b> (틀림 →) 800 ÷ 16 = 50이므로 <b>50배</b>이다.</p></div></div>
+      <div class="gist" style="margin-top:3mm;">
         <div class="boxtitle"><span class="ico">알</span>이 소단원, 이것만은!</div>
         <ul>
           <li>그물 복잡 = 안정 / 피라미드는 위로 갈수록 ↓ (<b>에너지가 새므로</b>)</li>
@@ -1093,12 +1527,22 @@
       </div>
     </div>
   </div>
-  <div class="folio"><span>알짜 해설</span><span class="num">104</span></div>
+  <div class="folio"><span>알짜 해설</span><span class="num">?</span></div>
 </div>
 
 <!-- ═════════════ p.105 MEMO ═════════════ -->
 <div class="page">
   <div class="runhead"><span class="unit-tag">II. 환경과 에너지</span><span class="lesson-tag">02 ▸ 03 넘어가기 전에</span></div>
+  <div class="spaced">
+    <div class="st">간격 두고 다시 꺼내기 — 책을 덮고 답한다</div>
+    <ol>
+      <li>생태 피라미드에서 위 영양 단계로 갈수록 에너지양이 줄어드는 까닭은?</li>
+      <li>1차 소비자가 급증하면 생산자와 2차 소비자는 처음에 각각 어떻게 변하는가?</li>
+      <li>도로 등으로 끊긴 서식지를 이어 야생동물이 오가게 만든 시설은?</li>
+    </ol>
+    <div class="when"><span>□ 1일 뒤</span><span>□ 1주 뒤</span><span>□ 시험 전</span></div>
+    <div class="ans">정답 1 에너지 대부분을 호흡 등에 쓰고 일부만 전달 2 생산자 감소, 2차 소비자 증가 3 생태 통로</div>
+  </div>
   <div class="memo-head"><span class="mt">MEMO</span><span class="ms">헷갈린 개념, 다시 틀린 문제 번호, 나만의 암기법을 남겨 두는 자리</span></div>
   <div class="memo-area"></div>
   <div class="memo-pen">"'메뚜기 급증' 시나리오를 ▲▼ 화살표만으로 3막까지 그려 보자. 막히면 96쪽으로! — 박찬쌤"</div>

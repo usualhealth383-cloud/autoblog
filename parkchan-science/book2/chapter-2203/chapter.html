@@ -229,6 +229,29 @@
   /* 화학식 첨자 — 본문 폰트를 그대로 축소해 자형이 어긋나지 않게 한다 */
   sub,sup{ font-size:0.68em; line-height:0; font-weight:inherit; }
   sub{ vertical-align:-0.14em; } sup{ vertical-align:0.34em; }
+  /* ── 2026-10-02 보강: 중요 표시 · 채점 기준 · 꼼꼼 자료 분석 · 간격 두고 다시 꺼내기 ── */
+  .must{ display:inline-block; font-size:7pt; font-weight:900; color:#fff; background:#D9534F; border-radius:1.6mm; padding:0.2mm 1.4mm; margin-right:1.2mm; vertical-align:1pt; }
+  table.rubric{ border-collapse:collapse; width:100%; font-size:7.6pt; margin:1mm 0 0.5mm; }
+  table.rubric th, table.rubric td{ border:0.25mm solid var(--line); padding:0.8mm 1.4mm; text-align:left; vertical-align:top; }
+  table.rubric th{ background:#F4F1EA; font-weight:800; white-space:nowrap; }
+  .analysis{ border:0.35mm dashed #C9A36A; border-radius:2.5mm; padding:1.6mm 2mm 1.2mm; margin:1.5mm 0; background:#FFFCF5; }
+  .analysis .at{ font-size:7.6pt; font-weight:900; color:#9C6503; margin-bottom:0.8mm; }
+  .analysis svg{ max-width:100%; height:auto; display:block; }
+  .spaced{ border:0.4mm solid var(--line); border-radius:3mm; padding:3mm 4mm 2.6mm; margin:0 0 4mm; position:relative; background:#FAFBFC; }
+  .spaced .st{ font-size:9.5pt; font-weight:900; color:var(--unit); margin-bottom:1.6mm; }
+  .spaced ol{ margin:0; padding-left:5mm; font-size:8.8pt; line-height:1.75; }
+  .spaced .when{ display:flex; gap:5mm; font-size:8pt; color:var(--sub); margin-top:1.8mm; }
+  .spaced .ans{ position:absolute; right:4mm; bottom:2.4mm; transform:rotate(180deg); font-size:6.8pt; color:var(--sub); }
+  /* 2단 문항 쪽 간격 · 발문 안 탐구 과정 상자 (합격본 chapter-08 에서) */
+  .qg2 .q{ margin-bottom:6mm; }
+  .qg2 > div > .q:last-child{ margin-bottom:0; }
+  .qg2 .choices.inline{ gap:0 4mm; }
+  .qg2 .choices{ margin-top:1.8mm; line-height:1.78; }
+  .qg2 .bogi-box{ margin-top:2mm; padding:1.8mm 2.8mm; font-size:9pt; line-height:1.72; }
+  .qg2 .bogi-box .bt{ margin-bottom:0.3mm; }
+  .qg2 .q figure{ margin:1.6mm 0 0.6mm 8.4mm !important; }
+  .exp{ border:0.35mm solid #B8C2CA; border-radius:1.6mm; background:#FAFBFC; padding:1.6mm 2.6mm; margin:1.4mm 0 1.6mm; font-size:8.9pt; line-height:1.7; }
+  .exp b{ font-family:'PC Sans'; font-size:7.8pt; font-weight:900; color:var(--brand); }
 </style>
 </head>
 <body>
@@ -931,7 +954,7 @@
   <div class="folio"><span>II. 환경과 에너지</span><span class="num">114</span></div>
 </div>
 
-<!-- ═════════════ p.115 STEP 1 + STEP 2 시작 ═════════════ -->
+<!-- ═════════════ p.115 STEP 1 + STEP 2 시작 (7~10) ═════════════ -->
 <div class="page">
   <div class="runhead"><span class="unit-tag">II. 환경과 에너지</span><span class="lesson-tag">03. 지구온난화와 기후변화 | 문제</span></div>
   <div class="step-head"><span class="stepno">STEP 1</span><span class="steptt">개념 확인</span><span class="stepdesc">OX와 빈칸으로 개념 점검 — 막히면 알짜 정리로!</span></div>
@@ -939,7 +962,7 @@
     <div>
       <div class="q"><div class="qhead"><span class="qno">1</span><div class="stem">온실 기체가 없다면 지구 평균 기온은 지금보다 훨씬 낮을 것이다. <span class="ox-answer">( O , X )</span></div></div></div>
       <div class="q"><div class="qhead"><span class="qno">2</span><div class="stem">온실 기체는 태양에서 오는 가시광선을 주로 흡수한다. <span class="ox-answer">( O , X )</span></div></div></div>
-      <div class="q"><div class="qhead"><span class="qno">3</span><div class="stem">엘니뇨는 무역풍이 평소보다 강해질 때 발생한다. <span class="ox-answer">( O , X )</span></div></div></div>
+      <div class="q"><div class="qhead"><span class="qno">3</span><div class="stem">엘니뇨는 무역풍이 평소보다 강해질 때 발생한다. <span class="ox-answer" style="white-space:nowrap;">( O , X )</span></div></div></div>
     </div>
     <div>
       <div class="q"><div class="qhead"><span class="qno">4</span><div class="stem">지표가 내보내는 <span class="blankline" style="min-width:12mm;"></span>을 온실 기체가 흡수했다가 재방출한다.</div></div></div>
@@ -949,144 +972,424 @@
   </div>
   <div style="border-top:0.5mm solid var(--line); margin:2mm 0 4mm;"></div>
   <div class="step-head s2"><span class="stepno">STEP 2</span><span class="steptt">내신 완성</span><span class="stepdesc">학교 시험 유형 그대로 — 서술형까지 한 번에</span></div>
-  <div class="q">
-    <div class="qhead"><span class="qno">7</span><div class="stem">온실효과와 지구온난화에 대한 설명으로 옳은 것은? <span class="difficulty">●●○</span>
-    <div class="tags">10통과2-02-03 | 개념 1·2</div></div></div>
-    <ul class="choices">
-      <li>① 온실효과가 없으면 지구는 지금보다 따뜻하다.</li>
-      <li>② 온실 기체는 가시광선을 흡수해 지구를 데운다.</li>
-      <li>③ 지구온난화는 태양이 뜨거워져 생긴 현상이다.</li>
-      <li>④ 대기 중 이산화 탄소 농도는 산업혁명 이후 감소해 왔다.</li>
-      <li>⑤ 강화된 온실효과로 지구의 평균 기온이 높아지고 있다.</li>
-    </ul>
-  </div>
-  <div class="q">
-    <div class="qhead"><span class="qno">8</span><div class="stem">지구온난화의 영향에 대한 설명으로 옳은 것은? <span class="difficulty">●●●</span>
-    <div class="tags">10통과2-02-03 | 개념 3</div></div></div>
-    <ul class="choices">
-      <li>① 해수면 상승은 빙하의 융해와는 무관하다.</li>
-      <li>② 온난화가 진행되면 극한 기상은 줄어든다.</li>
-      <li>③ 바닷물이 데워져 부피가 커지는 것도 해수면 상승의 원인이다.</li>
-      <li>④ 우리나라의 사과 재배지는 남쪽으로 이동하고 있다.</li>
-      <li>⑤ 온난화는 생물의 서식지에 영향을 주지 않는다.</li>
-    </ul>
+
+  <div class="qgrid qg2">
+    <div>
+      <div class="q">
+        <div class="qhead"><span class="qno">7</span><div class="stem">온실효과와 지구온난화에 대해 옳은 것은? <span class="difficulty">●○○</span>
+        <div class="tags">10통과2-02-03 | 개념 1·2</div></div></div>
+        <ul class="choices">
+          <li>① 온실효과가 없으면 지구는 지금보다 따뜻하다.</li>
+          <li>② 온실효과의 강화로 평균 기온이 오르고 있다.</li>
+          <li>③ 온실 기체는 가시광선을 흡수해 지구를 데운다.</li>
+          <li>④ 지구온난화는 태양이 뜨거워져 생긴 현상이다.</li>
+          <li>⑤ 대기 중 이산화 탄소 농도는 산업혁명 이후 줄었다.</li>
+        </ul>
+      </div>
+
+      <div class="q">
+        <div class="qhead"><span class="qno">8</span><div class="stem"><span class="must">중요</span><span class="badge-data">자료</span>그림은 지구의 온실효과를 나타낸 것이다. 옳은 것만을 &lt;보기&gt;에서 있는 대로 고른 것은? <span class="difficulty">●●○</span>
+        <div class="tags">10통과2-02-03 | 개념 1</div></div></div>
+        <figure style="margin:2mm 0 1mm 8.4mm;">
+          <svg width="280" height="86" viewBox="0 0 280 86" font-family="PC Sans">
+            <rect x="1" y="1" width="278" height="70" rx="4" fill="#EAF4F8"/>
+            <rect x="1" y="66" width="278" height="18" rx="4" fill="#B8946F"/>
+            <text x="140" y="78.5" text-anchor="middle" font-size="7.2" font-weight="800" fill="#fff">지표</text>
+            <g transform="translate(20,15)">
+              <circle r="7.5" fill="#F3C24E"/>
+              <g stroke="#F3C24E" stroke-width="1.6" stroke-linecap="round"><line y1="-10" y2="-13"/><line y1="10" y2="13"/><line x1="-10" x2="-13"/><line x1="10" x2="13"/></g>
+            </g>
+            <rect x="6" y="30" width="268" height="13" rx="6.5" fill="#A9D9CE"/>
+            <text x="268" y="39.2" text-anchor="end" font-size="6.6" font-weight="800" fill="#0F6357">온실 기체층</text>
+            <!-- A 태양 복사 -->
+            <line x1="28" y1="22" x2="56" y2="63" stroke="#E8940A" stroke-width="2.2" marker-end="url(#arrY)"/>
+            <circle cx="50" cy="20" r="5.6" fill="#E8940A"/><text x="50" y="22.5" text-anchor="middle" font-size="7.2" font-weight="900" fill="#fff">A</text>
+            <text x="58" y="22.5" font-size="6.6" font-weight="800" fill="#B4830A">태양 복사</text>
+            <!-- B 지표가 내보내는 복사 -->
+            <path d="M120,65 C124,61 116,57 120,53 C124,49 116,47 120,44" fill="none" stroke="#D6455D" stroke-width="2" stroke-linecap="round" marker-end="url(#arrR)"/>
+            <circle cx="108" cy="55" r="5.6" fill="#D6455D"/><text x="108" y="57.5" text-anchor="middle" font-size="7.2" font-weight="900" fill="#fff">B</text>
+            <text x="129" y="57.5" font-size="6.6" font-weight="800" fill="#D6455D">지표 복사</text>
+            <!-- C 대기의 재방출 -->
+            <path d="M190,44 C194,48 186,52 190,56 C194,60 186,61 190,64" fill="none" stroke="#B4560E" stroke-width="2" stroke-linecap="round" marker-end="url(#arrB)"/>
+            <circle cx="174" cy="55" r="5.6" fill="#B4560E"/><text x="174" y="57.5" text-anchor="middle" font-size="7.2" font-weight="900" fill="#fff">C</text>
+            <text x="201" y="57.5" font-size="6.6" font-weight="800" fill="#B4560E">대기의 재방출</text>
+            <!-- 일부는 우주로 -->
+            <line x1="214" y1="29" x2="224" y2="8" stroke="#8A949E" stroke-width="1.3" stroke-dasharray="3 2" marker-end="url(#arrGy)"/>
+            <text x="230" y="15" font-size="6.4" fill="#5B6B77">일부는 우주로</text>
+          </svg>
+        </figure>
+        <div class="bogi-box">
+          <div class="bt">보기</div>
+          ㄱ. A는 주로 가시광선이다.<br>
+          ㄴ. 온실 기체는 A보다 B를 잘 흡수한다.<br>
+          ㄷ. 대기 중 온실 기체가 늘어나면 C가 증가한다.
+        </div>
+        <ul class="choices inline">
+          <li>① ㄱ</li><li>② ㄷ</li><li>③ ㄱ, ㄴ</li><li>④ ㄴ, ㄷ</li><li>⑤ ㄱ, ㄴ, ㄷ</li>
+        </ul>
+      </div>
+    </div>
+    <div>
+      <div class="q">
+        <div class="qhead"><span class="qno">9</span><div class="stem"><span class="badge-data">자료</span>그림 (가)와 (나)는 1850년 이후 대기 중 CO<sub>2</sub> 농도와 지구 평균 기온 편차를 나타낸 것이다. 옳은 것만을 &lt;보기&gt;에서 있는 대로 고른 것은? <span class="difficulty">●●○</span>
+        <div class="tags">10통과2-02-03 | 개념 2</div></div></div>
+        <figure style="margin:2mm 0 1mm 8.4mm;">
+          <svg width="280" height="92" viewBox="0 0 280 92" font-family="PC Sans">
+            <g transform="translate(22,6)">
+              <line x1="0" y1="66" x2="112" y2="66" stroke="#5B6B77" stroke-width="1" marker-end="url(#arrP)"/>
+              <line x1="0" y1="66" x2="0" y2="4" stroke="#5B6B77" stroke-width="1" marker-end="url(#arrP)"/>
+              <text x="5" y="7" font-size="6.6" fill="#5B6B77">CO<tspan dy="0.14em" font-size="68%">2</tspan><tspan dy="-0.14em"> 농도 (ppm)</tspan></text>
+              <g stroke="#C9BA9B" stroke-width="0.7" stroke-dasharray="2.5 2"><line x1="0" y1="56" x2="100" y2="56"/><line x1="0" y1="18" x2="100" y2="18"/></g>
+              <text x="-3" y="58.4" text-anchor="end" font-size="6.4" fill="#5B6B77">280</text>
+              <text x="-3" y="20.4" text-anchor="end" font-size="6.4" fill="#5B6B77">430</text>
+              <path d="M4,56 C40,55 62,50 76,40 C86,32 94,24 100,18" fill="none" stroke="#B0483A" stroke-width="2"/>
+              <text x="2" y="76" font-size="6.4" fill="#5B6B77">1850</text><text x="104" y="76" text-anchor="end" font-size="6.4" fill="#5B6B77">현재</text>
+              <text x="56" y="86" text-anchor="middle" font-size="7" font-weight="800" fill="#22303A">(가)</text>
+            </g>
+            <g transform="translate(160,6)">
+              <line x1="0" y1="66" x2="112" y2="66" stroke="#5B6B77" stroke-width="1" marker-end="url(#arrP)"/>
+              <line x1="0" y1="66" x2="0" y2="4" stroke="#5B6B77" stroke-width="1" marker-end="url(#arrP)"/>
+              <text x="5" y="7" font-size="6.6" fill="#5B6B77">기온 편차 (℃)</text>
+              <g stroke="#C9BA9B" stroke-width="0.7" stroke-dasharray="2.5 2"><line x1="0" y1="56" x2="100" y2="56"/><line x1="0" y1="18" x2="100" y2="18"/></g>
+              <text x="-3" y="58.4" text-anchor="end" font-size="6.4" fill="#5B6B77">0</text>
+              <text x="54" y="15" text-anchor="middle" font-size="6.4" fill="#D6455D" font-weight="800">약 +1.1~1.2</text>
+              <path d="M4,57 C24,59 40,56 56,53 C74,48 88,32 100,18" fill="none" stroke="#D6455D" stroke-width="2"/>
+              <text x="2" y="76" font-size="6.4" fill="#5B6B77">1850</text><text x="104" y="76" text-anchor="end" font-size="6.4" fill="#5B6B77">현재</text>
+              <text x="56" y="86" text-anchor="middle" font-size="7" font-weight="800" fill="#22303A">(나)</text>
+            </g>
+          </svg>
+        </figure>
+        <div class="bogi-box">
+          <div class="bt">보기</div>
+          ㄱ. CO<sub>2</sub> 농도는 약 150&nbsp;ppm 늘었다.<br>
+          ㄴ. (나)의 기온 상승은 태양이 뜨거워졌기 때문이다.<br>
+          ㄷ. CO<sub>2</sub>가 늘면 지표의 적외선이 덜 흡수된다.
+        </div>
+        <ul class="choices inline">
+          <li>① ㄱ</li><li>② ㄷ</li><li>③ ㄱ, ㄴ</li><li>④ ㄴ, ㄷ</li><li>⑤ ㄱ, ㄴ, ㄷ</li>
+        </ul>
+      </div>
+
+      <div class="q">
+        <div class="qhead"><span class="qno">10</span><div class="stem">지구온난화의 영향으로 옳은 것은? <span class="difficulty">●○○</span>
+        <div class="tags">10통과2-02-03 | 개념 3</div></div></div>
+        <ul class="choices">
+          <li>① 해수면 상승은 빙하의 융해와는 무관하다.</li>
+          <li>② 온난화가 진행되면 극한 기상은 줄어든다.</li>
+          <li>③ 우리나라 사과 재배지는 남쪽으로 옮겨 간다.</li>
+          <li>④ 온난화는 생물의 서식지에 영향을 주지 않는다.</li>
+          <li>⑤ 바닷물의 열팽창도 해수면 상승의 원인이다.</li>
+        </ul>
+      </div>
+    </div>
   </div>
   <div class="folio"><span>II. 환경과 에너지</span><span class="num">115</span></div>
 </div>
 
-<!-- ═════════════ p.116 STEP 2 계속 ═════════════ -->
+<!-- ═════════════ STEP 2 계속 (11~15) ═════════════ -->
 <div class="page">
   <div class="runhead"><span class="unit-tag">II. 환경과 에너지</span><span class="lesson-tag">03. 지구온난화와 기후변화 | 문제</span></div>
-  <div class="q">
-    <div class="qhead"><span class="qno">9</span><div class="stem">엘니뇨에 대한 설명으로 옳은 것은? <span class="difficulty">●●●</span>
-    <div class="tags">10통과2-02-03 | 개념 4</div></div></div>
-    <ul class="choices">
-      <li>① 엘니뇨 시기에는 평상시보다 무역풍이 약하다.</li>
-      <li>② 엘니뇨 시기 동태평양의 표층 수온은 낮아진다.</li>
-      <li>③ 엘니뇨는 대기와 해양이 서로 무관함을 보여 주는 현상이다.</li>
-      <li>④ 엘니뇨 시기 페루 연안의 어획량은 늘어난다.</li>
-      <li>⑤ 엘니뇨의 영향은 태평양 한 지역에만 국한된다.</li>
-    </ul>
-  </div>
-  <div class="q">
-    <div class="qhead"><span class="qno">10</span><div class="stem">사막화에 대한 설명으로 옳은 것만을 고른 것은? <span class="difficulty">●●○</span>
-    <div class="tags">10통과2-02-03 | 개념 5</div></div></div>
-    <div class="bogi-box" style="background:#fff;">
-      (가) 사막화는 오직 자연적인 가뭄만으로 일어난다.<br>
-      (나) 과도한 방목과 삼림 벌채는 사막화를 가속한다.<br>
-      (다) 동아시아의 사막화가 심해지면 우리나라 황사가 심해질 수 있다.
+
+  <div class="qgrid qg2">
+    <div>
+      <div class="q">
+        <div class="qhead"><span class="qno">11</span><div class="stem"><span class="must">중요</span>다음은 지구온난화가 일어나는 과정을 순서 없이 나열한 것이다. 일어나는 순서대로 옳게 나열한 것은? <span class="difficulty">●○○</span>
+        <div class="tags">10통과2-02-03 | 개념 2</div></div></div>
+        <div class="bogi-box">
+          (가) 온실효과 강화 &nbsp;&nbsp;&nbsp;(나) 화석 연료 연소<br>
+          (다) 평균 기온 상승 &nbsp;&nbsp;&nbsp;(라) 온실 기체 증가
+        </div>
+        <ul class="choices">
+          <li>① (가) → (나) → (라) → (다)</li>
+          <li>② (나) → (가) → (라) → (다)</li>
+          <li>③ (라) → (나) → (가) → (다)</li>
+          <li>④ (나) → (라) → (가) → (다)</li>
+          <li>⑤ (나) → (라) → (다) → (가)</li>
+        </ul>
+      </div>
+
+      <div class="q">
+        <div class="qhead"><span class="qno">12</span><div class="stem"><span class="badge-data">탐구</span>다음은 해수면 상승의 원리를 알아보는 실험이다.
+          <div class="exp"><b>[과정]</b> (가) 둥근바닥 플라스크에 물을 가득 채우고, 가는 유리관을 꽂은 고무마개로 막은 뒤 유리관 속 물의 높이를 표시한다.<br>(나) 플라스크를 따뜻한 물이 담긴 수조에 넣고 유리관 속 물의 높이 변화를 관찰한다.<br><b>[결과]</b> 유리관 속 물의 높이가 처음보다 올라갔다.</div>
+          이에 대한 설명으로 옳은 것만을 &lt;보기&gt;에서 있는 대로 고른 것은? <span class="difficulty">●●○</span>
+        <div class="tags">10통과2-02-03 | 개념 3, 탐구</div></div></div>
+        <div class="bogi-box">
+          <div class="bt">보기</div>
+          ㄱ. 데운 물은 질량이 늘어 물 높이가 올라간다.<br>
+          ㄴ. 바닷물의 열팽창 원리를 보여 준다.<br>
+          ㄷ. 빙하 융해의 효과는 나타나 있지 않다.
+        </div>
+        <ul class="choices inline">
+          <li>① ㄱ</li><li>② ㄷ</li><li>③ ㄱ, ㄴ</li><li>④ ㄴ, ㄷ</li><li>⑤ ㄱ, ㄴ, ㄷ</li>
+        </ul>
+      </div>
     </div>
-    <ul class="choices inline">
-      <li>① (가)</li><li>② (나), (다)</li><li>③ (가), (나)</li><li>④ (다)</li><li>⑤ (가), (나), (다)</li>
-    </ul>
-  </div>
-  <div class="q">
-    <div class="qhead"><span class="qno">11</span><div class="stem"><span class="badge-essay">서술형</span>화석 연료 사용이 지구온난화로 이어지는 과정을 <b>'온실 기체'와 '적외선'</b>이라는 말을 포함하여 서술하시오. <span class="difficulty">●●●●</span>
-    <div class="tags">10통과2-02-03 | 개념 1·2</div></div></div>
-    <div class="essay-lines"><div></div><div></div><div></div></div>
+    <div>
+      <div class="q">
+        <div class="qhead"><span class="qno">13</span><div class="stem">엘니뇨에 대한 설명으로 옳은 것은? <span class="difficulty">●●○</span>
+        <div class="tags">10통과2-02-03 | 개념 4</div></div></div>
+        <ul class="choices">
+          <li>① 엘니뇨 시기에는 평상시보다 무역풍이 약하다.</li>
+          <li>② 엘니뇨 시기 동태평양의 표층 수온은 낮아진다.</li>
+          <li>③ 엘니뇨는 대기와 해양이 서로 무관함을 보여 준다.</li>
+          <li>④ 엘니뇨 시기 페루 연안의 어획량은 늘어난다.</li>
+          <li>⑤ 엘니뇨의 영향은 태평양 한 지역에만 국한된다.</li>
+        </ul>
+      </div>
+
+      <div class="q">
+        <div class="qhead"><span class="qno">14</span><div class="stem"><span class="must">중요</span><span class="badge-data">자료</span>그림은 적도 부근 동태평양의 표층 수온 편차(관측 수온 − 평년 수온)를 나타낸 것이다. A와 B는 각각 엘니뇨와 라니냐 시기 중 하나이다. 옳은 것만을 &lt;보기&gt;에서 있는 대로 고른 것은? <span class="difficulty">●●○</span>
+        <div class="tags">10통과2-02-03 | 개념 4</div></div></div>
+        <figure style="margin:2mm 0 1mm 8.4mm;">
+          <svg width="280" height="86" viewBox="0 0 280 86" font-family="PC Sans">
+            <rect x="80" y="8" width="56" height="64" fill="#FBEBEE"/>
+            <rect x="170" y="8" width="56" height="64" fill="#E3F0F7"/>
+            <line x1="26" y1="72" x2="26" y2="6" stroke="#5B6B77" stroke-width="1"/>
+            <line x1="26" y1="40" x2="270" y2="40" stroke="#5B6B77" stroke-width="1" marker-end="url(#arrP)"/>
+            <text x="268" y="50" text-anchor="end" font-size="6.6" fill="#5B6B77">시간</text>
+            <g font-size="6.6" fill="#5B6B77" text-anchor="end"><text x="22" y="16">+2</text><text x="22" y="42.4">0</text><text x="22" y="68">−2</text></g>
+            <g stroke="#5B6B77" stroke-width="0.8"><line x1="26" y1="14" x2="29" y2="14"/><line x1="26" y1="66" x2="29" y2="66"/></g>
+            <text x="30" y="6" font-size="6.4" fill="#5B6B77" dy="2">수온 편차 (℃)</text>
+            <path d="M30,42 C42,38 54,44 66,40 C78,36 86,22 100,17 C112,13 124,24 136,38 C146,46 156,44 168,46 C180,52 192,62 204,60 C214,58 222,48 232,41 C244,37 256,42 264,39" fill="none" stroke="#2E6690" stroke-width="1.8"/>
+            <text x="108" y="82" text-anchor="middle" font-size="8" font-weight="900" fill="#B0483A">A</text>
+            <text x="198" y="82" text-anchor="middle" font-size="8" font-weight="900" fill="#2E6690">B</text>
+          </svg>
+        </figure>
+        <div class="bogi-box">
+          <div class="bt">보기</div>
+          ㄱ. A 시기에는 무역풍이 평소보다 강했다.<br>
+          ㄴ. A 시기 페루 연안에는 찬물 상승이 활발했다.<br>
+          ㄷ. B는 라니냐 시기이다.
+        </div>
+        <ul class="choices inline">
+          <li>① ㄱ</li><li>② ㄷ</li><li>③ ㄱ, ㄴ</li><li>④ ㄴ, ㄷ</li><li>⑤ ㄱ, ㄴ, ㄷ</li>
+        </ul>
+      </div>
+
+      <div class="q">
+        <div class="qhead"><span class="qno">15</span><div class="stem">사막화에 대한 설명으로 옳은 것만을 &lt;보기&gt;에서 있는 대로 고른 것은? <span class="difficulty">●○○</span>
+        <div class="tags">10통과2-02-03 | 개념 5</div></div></div>
+        <div class="bogi-box">
+          <div class="bt">보기</div>
+          ㄱ. 사막화는 오직 자연적인 가뭄만으로 일어난다.<br>
+          ㄴ. 과도한 방목과 삼림 벌채는 사막화를 가속한다.<br>
+          ㄷ. 동아시아 사막화로 우리나라 황사가 심해진다.
+        </div>
+        <ul class="choices inline">
+          <li>① ㄱ</li><li>② ㄷ</li><li>③ ㄱ, ㄴ</li><li>④ ㄴ, ㄷ</li><li>⑤ ㄱ, ㄴ, ㄷ</li>
+        </ul>
+      </div>
+    </div>
   </div>
   <div class="folio"><span>II. 환경과 에너지</span><span class="num">116</span></div>
 </div>
 
-<!-- ═════════════ p.117 STEP 3 ═════════════ -->
+<!-- ═════════════ STEP 2 계속 (16~17) + 서술형 (18~20) ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag">II. 환경과 에너지</span><span class="lesson-tag">03. 지구온난화와 기후변화 | 문제</span></div>
+
+  <div class="qgrid qg2">
+    <div>
+      <div class="q">
+        <div class="qhead"><span class="qno">16</span><div class="stem">다음은 기후변화 대처에 대한 학생 A~C의 대화이다. 옳게 말한 학생만을 있는 대로 고른 것은? <span class="difficulty">●●○</span>
+        <div class="tags">10통과2-02-03 | 개념 5</div></div></div>
+        <div class="bogi-box">
+          <b>학생 A</b> : 변화는 이미 시작됐으니 방파제를 쌓고 가뭄에 강한 작물을 기르는 적응만 하면 충분해.<br>
+          <b>학생 B</b> : 숲을 지키고 되살리는 것은 이미 온 변화에 대비하는 적응에 해당해.<br>
+          <b>학생 C</b> : 화석 연료 대신 신재생 에너지를 쓰는 것은 원인을 줄이는 완화야.
+        </div>
+        <ul class="choices inline">
+          <li>① A</li><li>② C</li><li>③ A, B</li><li>④ B, C</li><li>⑤ A, B, C</li>
+        </ul>
+      </div>
+
+      <div class="q">
+        <div class="qhead"><span class="qno">17</span><div class="stem">기후변화 대처 중 '적응'에 해당하는 것은? <span class="difficulty">●○○</span>
+        <div class="tags">10통과2-02-03 | 개념 5</div></div></div>
+        <ul class="choices">
+          <li>① 화석 연료 사용을 줄인다.</li>
+          <li>② 태양광·풍력 발전을 늘린다.</li>
+          <li>③ 가뭄에 강한 작물을 개발한다.</li>
+          <li>④ 숲을 가꾸어 되살린다.</li>
+          <li>⑤ 온실 기체 배출을 줄이는 국제 협약을 맺는다.</li>
+        </ul>
+      </div>
+
+      <div class="q">
+        <div class="qhead"><span class="qno">18</span><div class="stem"><span class="must">중요</span><span class="badge-essay">서술형</span>화석 연료 사용이 지구온난화로 이어지는 과정을 <b>'온실 기체'</b>, <b>'적외선'</b>을 모두 포함하여 서술하시오. <span class="difficulty">●●○</span>
+        <div class="tags">10통과2-02-03 | 개념 1·2</div></div></div>
+        <div class="essay-lines"><div></div><div></div><div></div><div></div><div></div><div></div></div>
+      </div>
+    </div>
+    <div>
+      <div class="q">
+        <div class="qhead"><span class="qno">19</span><div class="stem"><span class="badge-essay">서술형</span>엘니뇨 시기에 페루 연안의 어획량이 줄어드는 까닭을 <b>'무역풍'</b>, <b>'찬물'</b>을 모두 포함하여 서술하시오. <span class="difficulty">●●●</span>
+        <div class="tags">10통과2-02-03 | 개념 4</div></div></div>
+        <div class="essay-lines"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>
+      </div>
+
+      <div class="q">
+        <div class="qhead"><span class="qno">20</span><div class="stem"><span class="badge-essay">서술형</span>온난화로 해수면이 오르는 까닭 두 가지를 <b>'빙하'</b>, <b>'열팽창'</b>을 넣어 서술하시오. <span class="difficulty">●●○</span>
+        <div class="tags">10통과2-02-03 | 개념 3</div></div></div>
+        <div class="essay-lines"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>
+      </div>
+    </div>
+  </div>
+  <div class="folio"><span>II. 환경과 에너지</span><span class="num">?</span></div>
+</div>
+
+<!-- ═════════════ STEP 3 (21~24) ═════════════ -->
 <div class="page">
   <div class="runhead"><span class="unit-tag">II. 환경과 에너지</span><span class="lesson-tag">03. 지구온난화와 기후변화 | 문제</span></div>
   <div class="step-head s3"><span class="stepno">STEP 3</span><span class="steptt">수능 도전</span><span class="stepdesc">2028 수능 규격 — ㄱㄴㄷ 합답형·자료 해석</span></div>
-  <div class="q">
-    <div class="qhead"><span class="qno">12</span><div class="stem"><span class="badge-data">자료</span>그림은 1958년부터 하와이 마우나로아에서 관측한 대기 중 이산화 탄소 농도를 나타낸 것이다(킬링 곡선 — 해마다 오르내리는 톱니와 장기 상승 추세가 함께 나타난다). 옳은 것만을 &lt;보기&gt;에서 있는 대로 고른 것은? <span class="difficulty">[2점]</span>
-    <div class="tags">10통과2-02-03</div></div></div>
-    <figure style="margin:2mm 0 1.5mm 8.6mm;">
-      <svg width="280" height="80" viewBox="0 0 280 80" font-family="PC Sans">
-        <line x1="26" y1="64" x2="270" y2="64" stroke="#5B6B77" stroke-width="1.1" marker-end="url(#arrP)"/>
-        <line x1="26" y1="64" x2="26" y2="8" stroke="#5B6B77" stroke-width="1.1" marker-end="url(#arrP)"/>
-        <text x="268" y="76" text-anchor="end" font-size="6.4" fill="#5B6B77">연도</text>
-        <text x="30" y="8" font-size="6.4" fill="#5B6B77">CO<tspan dy="0.14em" font-size="68%">2</tspan><tspan dy="-0.14em"> (ppm)</tspan></text>
-        <path d="M38,56 l6,-3 l6,1 l6,-4 l6,1 l6,-4 l6,1 l6,-4 l6,1 l6,-4 l6,1 l6,-4 l6,1 l6,-5 l6,1 l6,-4 l6,1 l6,-5 l6,1 l6,-5 l6,1 l6,-5 l6,1 l6,-5 l6,1 l6,-5 l6,1 l6,-5 l6,1 l6,-5 l6,1 l6,-5 l6,1 l6,-5 l6,1 l6,-5 l6,1"
-          fill="none" stroke="#B0483A" stroke-width="1.5"/>
-      </svg>
-    </figure>
-    <div class="bogi-box">
-      <div class="bt">보기</div>
-      ㄱ. 이산화 탄소 농도는 장기적으로 상승하는 추세다.<br>
-      ㄴ. 톱니 모양의 오르내림은 광합성량의 계절 변화 때문이다.<br>
-      ㄷ. 이 곡선은 대기 중 온실 기체가 줄고 있음을 보여 준다.
+
+  <div class="qgrid qg2">
+    <div>
+      <div class="q">
+        <div class="qhead"><span class="qno">21</span><div class="stem"><span class="badge-data">자료</span>그림은 1958년부터 마우나로아에서 관측한 대기 중 CO<sub>2</sub> 농도를 나타낸 것이다. 옳은 것만을 <span style="white-space:nowrap;">&lt;보기&gt;에서</span> 있는 대로 고른 것은? <span class="difficulty">●●○ [2점]</span>
+        <div class="tags">10통과2-02-03 | 개념 2, 자료 파헤치기</div></div></div>
+        <figure style="margin:2mm 0 1.5mm 8.6mm;">
+          <svg width="280" height="80" viewBox="0 0 280 80" font-family="PC Sans">
+            <line x1="26" y1="64" x2="270" y2="64" stroke="#5B6B77" stroke-width="1.1" marker-end="url(#arrP)"/>
+            <line x1="26" y1="64" x2="26" y2="8" stroke="#5B6B77" stroke-width="1.1" marker-end="url(#arrP)"/>
+            <text x="268" y="76" text-anchor="end" font-size="6.4" fill="#5B6B77">연도</text>
+            <text x="30" y="8" font-size="6.4" fill="#5B6B77">CO<tspan dy="0.14em" font-size="68%">2</tspan><tspan dy="-0.14em"> (ppm)</tspan></text>
+            <path d="M38,56 l6,-3 l6,1 l6,-4 l6,1 l6,-4 l6,1 l6,-4 l6,1 l6,-4 l6,1 l6,-4 l6,1 l6,-5 l6,1 l6,-4 l6,1 l6,-5 l6,1 l6,-5 l6,1 l6,-5 l6,1 l6,-5 l6,1 l6,-5 l6,1 l6,-5 l6,1 l6,-5 l6,1 l6,-5 l6,1 l6,-5 l6,1 l6,-5 l6,1"
+              fill="none" stroke="#B0483A" stroke-width="1.5"/>
+          </svg>
+        </figure>
+        <div class="bogi-box">
+          <div class="bt">보기</div>
+          ㄱ. CO<sub>2</sub> 농도는 장기적으로 상승하는 추세다.<br>
+          ㄴ. 톱니 모양은 광합성량의 계절 변화 때문이다.<br>
+          ㄷ. 대기 중 온실 기체가 줄고 있음을 보여 준다.
+        </div>
+        <ul class="choices inline">
+          <li>① ㄱ</li><li>② ㄷ</li><li>③ ㄱ, ㄴ</li><li>④ ㄴ, ㄷ</li><li>⑤ ㄱ, ㄴ, ㄷ</li>
+        </ul>
+      </div>
+
+      <div class="q">
+        <div class="qhead"><span class="qno">22</span><div class="stem"><span class="badge-data">자료</span>그림 (가)는 평상시, (나)는 엘니뇨 시기의 적도 태평양 단면을 나타낸 것이다. 옳은 것만을 &lt;보기&gt;에서 있는 대로 고른 것은? <span class="difficulty">●●○ [2.5점]</span>
+        <div class="tags">10통과2-02-03 | 개념 4</div></div></div>
+        <figure style="margin:2mm 0 1.5mm 8.6mm;">
+          <svg width="280" height="78" viewBox="0 0 300 84" font-family="PC Sans">
+            <g font-size="6.2">
+              <g transform="translate(8,6)">
+                <rect width="136" height="60" rx="5" fill="#F4F8FB" stroke="#A9C9DE" stroke-width="0.9"/>
+                <text x="68" y="13" text-anchor="middle" font-size="7" font-weight="800" fill="#2E6690">(가) 평상시</text>
+                <line x1="100" y1="27" x2="46" y2="27" stroke="#147D6F" stroke-width="1.4" marker-end="url(#arrP)"/>
+                <text x="73" y="23.5" text-anchor="middle" font-size="6.2" fill="#0F6357">무역풍</text>
+                <path d="M8,32 h56 q10,0 16,6 h48 v16 h-120 z" fill="#E8945E"/>
+                <path d="M80,38 h48 v16 h-48 z" fill="#7FB8DE"/>
+                <text x="10" y="74" font-size="6.2" fill="#5B6B77">서 — 따뜻한 물</text>
+                <text x="128" y="74" text-anchor="end" font-size="6.2" fill="#1F4E70">동 — 찬물 상승</text>
+              </g>
+              <g transform="translate(156,6)">
+                <rect width="136" height="60" rx="5" fill="#FDF3F0" stroke="#E5B8AC" stroke-width="0.9"/>
+                <text x="68" y="13" text-anchor="middle" font-size="7" font-weight="800" fill="#B0483A">(나) 엘니뇨</text>
+                <line x1="88" y1="28" x2="62" y2="28" stroke="#8A949E" stroke-width="1" stroke-dasharray="2.5 2" marker-end="url(#arrP)"/>
+                <text x="75" y="24.5" text-anchor="middle" font-size="6.2" fill="#8A949E">무역풍 약화</text>
+                <path d="M8,34 h120 v20 h-120 z" fill="#E8945E"/>
+                <text x="68" y="74" text-anchor="middle" font-size="6.2" fill="#7A3E14">따뜻한 물이 동쪽까지</text>
+              </g>
+            </g>
+          </svg>
+        </figure>
+        <div class="bogi-box">
+          <div class="bt">보기</div>
+          ㄱ. 동태평양 표층 수온은 (나)가 (가)보다 높다.<br>
+          ㄴ. 엘니뇨는 대기와 해양의 상호작용으로 일어난다.<br>
+          ㄷ. (나) 때 인도네시아 쪽에는 폭우가 잦아진다.
+        </div>
+        <ul class="choices inline">
+          <li>① ㄱ</li><li>② ㄷ</li><li>③ ㄱ, ㄴ</li><li>④ ㄴ, ㄷ</li><li>⑤ ㄱ, ㄴ, ㄷ</li>
+        </ul>
+      </div>
     </div>
-    <ul class="choices inline">
-      <li>① ㄴ</li><li>② ㄱ, ㄴ</li><li>③ ㄱ, ㄷ</li><li>④ ㄴ, ㄷ</li><li>⑤ ㄱ, ㄴ, ㄷ</li>
-    </ul>
-  </div>
-  <div class="q">
-    <div class="qhead"><span class="qno">13</span><div class="stem"><span class="badge-data">자료</span>그림 (가)는 평상시, (나)는 엘니뇨 시기의 적도 태평양 단면을 나타낸 것이다. 옳은 것만을 &lt;보기&gt;에서 있는 대로 고른 것은? <span class="difficulty">[2.5점]</span>
-    <div class="tags">10통과2-02-03</div></div></div>
-    <figure style="margin:2mm 0 1.5mm 8.6mm;">
-      <svg width="300" height="74" viewBox="0 0 300 74" font-family="PC Sans">
-        <g font-size="6.2">
-          <g transform="translate(8,6)">
-            <rect width="136" height="60" rx="5" fill="#F4F8FB" stroke="#A9C9DE" stroke-width="0.9"/>
-            <text x="68" y="12" text-anchor="middle" font-weight="800" fill="#2E6690">(가) 평상시</text>
-            <line x1="100" y1="20" x2="46" y2="20" stroke="#147D6F" stroke-width="1.4" marker-end="url(#arrP)"/>
-            <text x="73" y="17" text-anchor="middle" font-size="5.4" fill="#0F6357">무역풍</text>
-            <path d="M8,32 h56 q10,0 16,6 h48 v16 h-120 z" fill="#E8945E"/>
-            <path d="M80,38 h48 v16 h-48 z" fill="#7FB8DE"/>
-            <text x="10" y="70" font-size="5.4" fill="#5B6B77">서 — 따뜻한 물</text>
-            <text x="128" y="70" text-anchor="end" font-size="5.4" fill="#1F4E70">동 — 찬물 상승</text>
-          </g>
-          <g transform="translate(156,6)">
-            <rect width="136" height="60" rx="5" fill="#FDF3F0" stroke="#E5B8AC" stroke-width="0.9"/>
-            <text x="68" y="12" text-anchor="middle" font-weight="800" fill="#B0483A">(나) 엘니뇨</text>
-            <line x1="88" y1="20" x2="62" y2="20" stroke="#8A949E" stroke-width="1" stroke-dasharray="2.5 2" marker-end="url(#arrP)"/>
-            <text x="75" y="17" text-anchor="middle" font-size="5.4" fill="#8A949E">약화</text>
-            <path d="M8,34 h120 v20 h-120 z" fill="#E8945E"/>
-            <text x="68" y="70" text-anchor="middle" font-size="5.4" fill="#7A3E14">따뜻한 물이 동쪽까지</text>
-          </g>
-        </g>
-      </svg>
-    </figure>
-    <div class="bogi-box">
-      <div class="bt">보기</div>
-      ㄱ. (나) 시기 동태평양의 표층 수온은 (가) 시기보다 높다.<br>
-      ㄴ. 엘니뇨는 대기(무역풍)와 해양(수온)의 상호작용으로 일어난다.<br>
-      ㄷ. (나) 시기 인도네시아 쪽에는 평소보다 폭우가 잦아진다.
+    <div>
+      <div class="q">
+        <div class="qhead"><span class="qno">23</span><div class="stem"><span class="badge-data">자료</span>그림 (가)는 대기 중 이산화 탄소 농도를, (나)는 같은 기간 바닷물 표층의 수소 이온(H<sup>+</sup>) 농도를 상댓값으로 나타낸 것이다. 옳은 것만을 &lt;보기&gt;에서 있는 대로 고른 것은? <span class="difficulty">●●● [2.5점]</span>
+        <div class="tags">10통과2-02-03 | 개념 3 (통합과학2 I-04 산·염기 연계)</div></div></div>
+        <figure style="margin:2mm 0 1mm 8.4mm;">
+          <svg width="280" height="84" viewBox="0 0 280 84" font-family="PC Sans">
+            <g transform="translate(14,4)">
+              <line x1="0" y1="62" x2="116" y2="62" stroke="#5B6B77" stroke-width="1" marker-end="url(#arrP)"/>
+              <line x1="0" y1="62" x2="0" y2="4" stroke="#5B6B77" stroke-width="1" marker-end="url(#arrP)"/>
+              <text x="5" y="8" font-size="6.6" fill="#5B6B77">CO<tspan dy="0.14em" font-size="68%">2</tspan><tspan dy="-0.14em"> 농도</tspan></text>
+              <path d="M6,54 C30,50 56,42 80,32 C92,27 100,22 106,18" fill="none" stroke="#B0483A" stroke-width="2"/>
+              <text x="112" y="72" text-anchor="end" font-size="6.4" fill="#5B6B77">연도</text>
+              <text x="58" y="80" text-anchor="middle" font-size="7" font-weight="800" fill="#22303A">(가) 대기</text>
+            </g>
+            <g transform="translate(152,4)">
+              <rect x="0" y="4" width="116" height="58" fill="#EAF3F9"/>
+              <line x1="0" y1="62" x2="116" y2="62" stroke="#5B6B77" stroke-width="1" marker-end="url(#arrP)"/>
+              <line x1="0" y1="62" x2="0" y2="4" stroke="#5B6B77" stroke-width="1" marker-end="url(#arrP)"/>
+              <text x="5" y="12" font-size="6.6" fill="#2E6690">H<tspan dy="-0.34em" font-size="68%">+</tspan><tspan dy="0.34em"> 농도 (상댓값)</tspan></text>
+              <path d="M6,54 C30,51 56,44 80,35 C92,30 100,26 106,22" fill="none" stroke="#2E6690" stroke-width="2"/>
+              <text x="112" y="72" text-anchor="end" font-size="6.4" fill="#5B6B77">연도</text>
+              <text x="58" y="80" text-anchor="middle" font-size="7" font-weight="800" fill="#22303A">(나) 바닷물 표층</text>
+            </g>
+          </svg>
+        </figure>
+        <div class="bogi-box">
+          <div class="bt">보기</div>
+          ㄱ. (나)의 변화는 바다가 대기 중의 이산화 탄소를 흡수하는 것과 관련 있다.<br>
+          ㄴ. 바닷물이 점점 산성 쪽으로 기울고 있다.<br>
+          ㄷ. 탄산 칼슘은 산과 반응하므로, 탄산 칼슘으로 껍데기를 만드는 생물에게 (나)의 변화는 불리하다.
+        </div>
+        <ul class="choices inline">
+          <li>① ㄱ</li><li>② ㄷ</li><li>③ ㄱ, ㄴ</li><li>④ ㄴ, ㄷ</li><li>⑤ ㄱ, ㄴ, ㄷ</li>
+        </ul>
+      </div>
+
+      <div class="q">
+        <div class="qhead"><span class="qno">24</span><div class="stem"><span class="badge-data">자료</span>그림은 지구에 들어오는 태양 복사 에너지를 100이라 할 때 에너지의 출입을 나타낸 것이다. 지구는 복사 평형 상태이다. 옳은 것만을 &lt;보기&gt;에서 있는 대로 고른 것은? <span class="difficulty">●●● [2점]</span>
+        <div class="tags">10통과2-02-03 | 개념 1·2, 집중 훈련</div></div></div>
+        <figure style="margin:2mm 0 1mm 8.4mm;">
+          <svg width="280" height="74" viewBox="0 0 280 74" font-family="PC Sans">
+            <text x="1" y="21" font-size="6.8" font-weight="800" fill="#5B6B77">태양 복사</text>
+            <text x="1" y="30" font-size="6.8" font-weight="800" fill="#5B6B77">100</text>
+            <rect x="36" y="10" width="72" height="22" rx="3" fill="#B9C3CC"/>
+            <rect x="110" y="10" width="46" height="22" rx="3" fill="#6FB8AA"/>
+            <rect x="158" y="10" width="120" height="22" rx="3" fill="#147D6F"/>
+            <g font-size="7" font-weight="800" fill="#fff" text-anchor="middle">
+              <text x="72" y="24">반사 30</text><text x="133" y="24">대기 흡수 20</text><text x="218" y="24">지표 흡수 B</text>
+            </g>
+            <rect x="110" y="44" width="168" height="22" rx="3" fill="#E8940A"/>
+            <text x="194" y="58" text-anchor="middle" font-size="7" font-weight="800" fill="#fff">지구가 우주로 내보내는 복사 C</text>
+            <text x="72" y="58" text-anchor="middle" font-size="6.4" fill="#5B6B77">(막대 길이 ∝ 에너지)</text>
+          </svg>
+        </figure>
+        <div class="bogi-box">
+          <div class="bt">보기</div>
+          ㄱ. B는 50이다.<br>
+          ㄴ. 반사량이 늘면 평균 기온은 올라간다.<br>
+          ㄷ. 반사량이 그대로일 때 온실 기체가 늘어 새로운 평형에 이르면, C는 70보다 작은 값으로 유지된다.
+        </div>
+        <ul class="choices inline">
+          <li>① ㄱ</li><li>② ㄷ</li><li>③ ㄱ, ㄴ</li><li>④ ㄴ, ㄷ</li><li>⑤ ㄱ, ㄴ, ㄷ</li>
+        </ul>
+      </div>
     </div>
-    <ul class="choices inline">
-      <li>① ㄱ</li><li>② ㄷ</li><li>③ ㄱ, ㄷ</li><li>④ ㄱ, ㄴ</li><li>⑤ ㄱ, ㄴ, ㄷ</li>
-    </ul>
   </div>
   <div class="folio"><span>II. 환경과 에너지</span><span class="num">117</span></div>
 </div>
 
-<!-- ═════════════ p.118 해설 1 ═════════════ -->
+<!-- ═════════════ 해설 1 ═════════════ -->
 <div class="page">
   <div class="runhead"><span class="unit-tag" style="color:var(--brand);">알짜 해설</span><span class="lesson-tag">03. 지구온난화와 기후변화</span></div>
-  <div class="sol-head"><span class="stt">알짜 해설</span><span class="sub">전 문항 해설 + 오답 선지 분석 — 맞힌 문제도 해설로 한 번 더!</span></div>
+  <div class="sol-head"><span class="stt">알짜 해설</span><span class="sub">전 문항 해설 + 바로알기(틀린 선지를 옳게 고친 문장) — 맞힌 문제도 해설로 한 번 더!</span></div>
   <table class="anstable">
-    <tr><th>문항</th><td>1</td><td>2</td><td>3</td><td>4</td><td>5</td><td>6</td><td>7</td><td>8</td><td>9</td><td>10</td><td>11</td><td>12</td><td>13</td></tr>
-    <tr><th>정답</th><td class="a">O</td><td class="a">X</td><td class="a">X</td><td class="a">적외선</td><td class="a">엘니뇨</td><td class="a">사막화</td><td class="a">⑤</td><td class="a">③</td><td class="a">①</td><td class="a">②</td><td class="a">서술형</td><td class="a">②</td><td class="a">④</td></tr>
+    <tr><th>문항</th><td>1</td><td>2</td><td>3</td><td>4</td><td>5</td><td>6</td><td>7</td><td>8</td><td>9</td><td>10</td><td>11</td><td>12</td></tr>
+    <tr><th>정답</th><td class="a">O</td><td class="a">X</td><td class="a">X</td><td class="a">적외선</td><td class="a">엘니뇨</td><td class="a">사막화</td><td class="a">②</td><td class="a">⑤</td><td class="a">①</td><td class="a">⑤</td><td class="a">④</td><td class="a">④</td></tr>
+    <tr><th>문항</th><td>13</td><td>14</td><td>15</td><td>16</td><td>17</td><td>18</td><td>19</td><td>20</td><td>21</td><td>22</td><td>23</td><td>24</td></tr>
+    <tr><th>정답</th><td class="a">①</td><td class="a">②</td><td class="a">④</td><td class="a">②</td><td class="a">③</td><td class="a">서술형</td><td class="a">서술형</td><td class="a">서술형</td><td class="a">③</td><td class="a">③</td><td class="a">⑤</td><td class="a">①</td></tr>
   </table>
   <div class="solcols">
     <div>
       <div class="sol"><div class="shead"><span class="sno">1</span><span class="sans">O</span><span class="slink">개념 1</span></div>
-        <p>담요가 없으면 약 −18 ℃ — 온실효과는 생명의 조건이다.</p></div>
+        <p>담요가 없으면 약 −18&nbsp;℃ — 온실효과는 생명의 조건이다.</p></div>
       <div class="sol"><div class="shead"><span class="sno">2</span><span class="sans">X</span><span class="slink">개념 1</span></div>
         <p>흡수 대상은 지표가 내보내는 적외선이다.</p></div>
       <div class="sol"><div class="shead"><span class="sno">3</span><span class="sans">X</span><span class="slink">개념 4</span></div>
@@ -1099,63 +1402,194 @@
         <p>가뭄 위에 사람의 손이 얹힌 현상.</p></div>
     </div>
     <div>
-      <div class="sol"><div class="shead"><span class="sno">7</span><span class="sans">⑤</span><span class="slink">개념 1·2</span></div>
+      <div class="sol"><div class="shead"><span class="sno">7</span><span class="sans">②</span><span class="slink">개념 1·2</span></div>
         <p>온난화 = '강화된' 온실효과의 결과.</p>
-        <div class="wrongbox"><div class="wt">오답 왜 틀렸나</div>
-          <p><b>①</b> 없으면 −18 ℃. <b>②</b> 적외선을 흡수. <b>③</b> 태양 탓이 아니라 담요 탓. <b>④</b> 280 → 430 ppm으로 증가.</p></div></div>
-      <div class="sol"><div class="shead"><span class="sno">8</span><span class="sans">③</span><span class="slink">개념 3</span></div>
-        <p>해수면 상승 = 빙하 융해 + 열팽창, 두 원인의 합.</p>
-        <div class="wrongbox"><div class="wt">오답 왜 틀렸나</div>
-          <p><b>②</b> 극한 기상은 잦아진다. <b>④</b> 사과 재배지는 북상. <b>⑤</b> 서식지·개화 시기가 흔들린다.</p></div></div>
-      <div class="sol"><div class="shead"><span class="sno">9</span><span class="sans">①</span><span class="slink">개념 4</span></div>
-        <p>엘니뇨의 방아쇠 = 무역풍 약화.</p>
-        <div class="wrongbox"><div class="wt">오답 왜 틀렸나</div>
-          <p><b>②</b> 수온은 높아진다. <b>③</b> 대기·해양 상호작용의 대표 사례다. <b>④</b> 찬물이 못 올라와 어획량 감소. <b>⑤</b> 전 지구의 날씨에 영향.</p></div></div>
+        <div class="wrongbox"><div class="wt">바로알기</div>
+          <p><b>①</b> 온실효과가 없으면 지구는 약 −18&nbsp;℃로 지금보다 훨씬 춥다. <b>③</b> 온실 기체는 지표가 내보내는 적외선을 흡수한다. <b>④</b> 지구온난화는 온실 기체가 늘어 온실효과가 강화되어 생긴 현상이다. <b>⑤</b> 이산화 탄소 농도는 약 280 → 430&nbsp;ppm으로 늘었다.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">8</span><span class="sans">⑤</span><span class="slink">개념 1</span></div>
+        <p><b>ㄱ&nbsp;(옳음)</b> 태양 복사(A)는 주로 가시광선 — 대부분 대기를 통과해 지표를 데운다. <b>ㄴ&nbsp;(옳음)</b> 온실 기체는 가시광선(A)보다 지표의 적외선(B)을 잘 흡수한다. <b>ㄷ&nbsp;(옳음)</b> 담요가 두꺼워지면 흡수·재방출이 늘어 지표로 되돌아오는 열(C)이 많아진다.</p>
+        <div class="wrongbox"><div class="wt">함정 체크</div>
+          <p>A와 B를 바꿔 묻는다 — 들어올 땐 가시광선, 나갈 땐 적외선.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">9</span><span class="sans">①</span><span class="slink">개념 2</span></div>
+        <p><b>ㄱ&nbsp;(옳음)</b> 430 − 280 = 150 → 약 150&nbsp;ppm 증가.</p>
+        <div class="wrongbox"><div class="wt">바로알기</div>
+          <p><b>ㄴ</b> (틀림 →) 기온 상승은 온실 기체가 늘어 <b>온실효과가 강화</b>되었기 때문이다. <b>ㄷ</b> (틀림 →) 이산화 탄소가 많아질수록 적외선이 대기에 <b>더 많이</b> 흡수된다.</p></div></div>
     </div>
   </div>
   <div class="folio"><span>알짜 해설</span><span class="num">118</span></div>
 </div>
 
-<!-- ═════════════ p.119 해설 2 ═════════════ -->
+<!-- ═════════════ 해설 2 ═════════════ -->
 <div class="page">
   <div class="runhead"><span class="unit-tag" style="color:var(--brand);">알짜 해설</span><span class="lesson-tag">03. 지구온난화와 기후변화</span></div>
   <div class="solcols">
     <div>
-      <div class="sol"><div class="shead"><span class="sno">10</span><span class="sans">②</span><span class="slink">개념 5</span></div>
-        <p>(나) 방목·벌채의 인위적 가속, (다) 사막화 → 황사 심화 — 둘 다 옳다.</p>
-        <div class="wrongbox"><div class="wt">오답 왜 틀렸나</div>
-          <p><b>(가)</b> 자연적 가뭄 '위에' 인위적 원인이 얹힌다 — '오직'이 함정 단어다.</p></div></div>
-      <div class="sol"><div class="shead"><span class="sno">11</span><span class="sans">모범 답안</span><span class="slink">개념 1·2</span></div>
-        <p>화석 연료를 태우면 이산화 탄소 같은 <b>온실 기체</b>가 늘어난다. 늘어난 온실 기체가 지표에서 나가는 <b>적외선</b>을 더 많이 흡수했다가 지표로 재방출하므로(온실효과 강화), 지구의 평균 기온이 높아진다.</p>
-        <div class="wrongbox"><div class="wt">채점 기준 (감점 포인트)</div>
-          <p>① 연소 → 온실 기체 증가 ② 적외선 흡수·재방출 증가 ③ 평균 기온 상승 — 사슬의 세 고리를 순서대로.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">10</span><span class="sans">⑤</span><span class="slink">개념 3</span></div>
+        <p>해수면 상승 = 빙하 융해 + 열팽창, 두 원인의 합.</p>
+        <div class="wrongbox"><div class="wt">바로알기</div>
+          <p><b>①</b> 빙하가 녹아 바다로 들어가는 것도 해수면 상승의 원인이다. <b>②</b> 폭염·집중호우·가뭄·태풍 같은 극한 기상은 잦아진다. <b>③</b> 우리나라 사과 재배지는 북쪽으로 옮겨 가고 있다. <b>④</b> 서식지가 북상하고 개화 시기가 어긋나는 등 생태계가 흔들린다.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">11</span><span class="sans">④</span><span class="slink">개념 2</span></div>
+        <p>연소(나) → 온실 기체 증가(라) → 온실효과 강화(가) → 기온 상승(다). 원인에서 결과로, 사슬의 고리를 하나씩 건넌다.</p>
+        <div class="wrongbox"><div class="wt">바로알기</div>
+          <p><b>①</b> 사슬의 출발점은 화석 연료 연소(나)이다. <b>②</b> 온실 기체가 먼저 늘어야(라) 온실효과가 강화된다(가). <b>③</b> 온실 기체 증가(라)는 연소(나)의 결과이다. <b>⑤</b> 기온 상승(다)은 온실효과 강화(가)의 결과이므로 맨 끝에 온다.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">12</span><span class="sans">④</span><span class="slink">개념 3 | 탐구</span></div>
+        <p><b>ㄴ&nbsp;(옳음)</b> 데워진 물의 부피가 커져 유리관 속 물이 밀려 올라갔다 — 바닷물 열팽창의 모형. <b>ㄷ&nbsp;(옳음)</b> 플라스크에는 얼음(빙하)이 없으므로 융해 효과는 나타나지 않는다.</p>
+        <div class="wrongbox"><div class="wt">바로알기</div>
+          <p><b>ㄱ</b> (틀림 →) 물을 데워도 <b>질량은 그대로</b>이고 <b>부피가 커져</b> 물 높이가 올라간다.</p></div></div>
     </div>
     <div>
-      <div class="sol"><div class="shead"><span class="sno">12</span><span class="sans">②</span><span class="slink">개념 2·자료 | 2점</span></div>
-        <p><b>ㄱ (옳음)</b> 315 → 430 ppm의 장기 상승. <b>ㄴ (옳음)</b> 여름 광합성 ↑ → 농도 ↓, 겨울 반대 — 톱니의 정체. <b>ㄷ (틀림)</b> 곡선은 증가를 보여 준다.</p>
-        <div class="wrongbox"><div class="wt">함정 체크</div>
-          <p>무늬마다 원인을 따로 — <b>톱니 = 계절(광합성), 추세 = 연소</b>. 원인을 서로 바꿔 묻는다.</p></div></div>
-      <div class="sol"><div class="shead"><span class="sno">13</span><span class="sans">④</span><span class="slink">개념 4 | 2.5점</span></div>
-        <p><b>ㄱ (옳음)</b> 따뜻한 물이 동쪽으로 되밀려 온다. <b>ㄴ (옳음)</b> 바람과 수온의 합작 — 상호작용의 정의 그대로. <b>ㄷ (틀림)</b> 인도네시아 쪽은 가뭄·산불이 잦아진다 — 폭우는 페루 쪽.</p>
-        <div class="wrongbox"><div class="wt">함정 체크</div>
-          <p>동·서를 바꿔치는 것이 엘니뇨 문제의 전부다 — 단면도를 그려 놓고 판정하라.</p></div></div>
-
-      <div class="gist" style="margin-top:5mm;">
-        <div class="boxtitle"><span class="ico">알</span>이 소단원, 이것만은!</div>
-        <ul>
-          <li>사슬 암기: <b>연소 → 온실 기체 ↑ → 적외선 더 붙잡힘 → 기온 ↑</b> (온실효과 자체는 무죄)</li>
-          <li>해수면 = 융해 + <b>열팽창</b> / 킬링 곡선: 톱니 = 계절, 추세 = 인류</li>
-          <li>엘니뇨 = 무역풍 약화 + 동태평양 ↑ / 대처 = <b>완화 + 적응</b>(파리 협정 1.5 ℃)</li>
-        </ul>
-      </div>
+      <div class="sol"><div class="shead"><span class="sno">13</span><span class="sans">①</span><span class="slink">개념 4</span></div>
+        <p>엘니뇨의 방아쇠 = 무역풍 약화.</p>
+        <div class="wrongbox"><div class="wt">바로알기</div>
+          <p><b>②</b> 엘니뇨 시기 동태평양의 표층 수온은 높아진다. <b>③</b> 엘니뇨는 대기와 해양이 상호작용하는 대표 사례다. <b>④</b> 찬물이 올라오지 못해 페루 연안의 어획량은 줄어든다. <b>⑤</b> 엘니뇨는 지구 반대편의 날씨까지 바꾼다.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">14</span><span class="sans">②</span><span class="slink">개념 4</span></div>
+        <p><b>ㄷ&nbsp;(옳음)</b> B는 수온이 평년보다 낮은 시기 → 무역풍이 강해진 라니냐.</p>
+        <div class="analysis"><div class="at">꼼꼼 자료 분석</div>
+          <svg width="300" height="112" viewBox="0 0 300 112" font-family="PC Sans">
+            <rect x="80" y="8" width="56" height="64" fill="#FBEBEE"/>
+            <rect x="170" y="8" width="56" height="64" fill="#E3F0F7"/>
+            <line x1="26" y1="72" x2="26" y2="6" stroke="#5B6B77" stroke-width="1"/>
+            <line x1="26" y1="40" x2="270" y2="40" stroke="#5B6B77" stroke-width="1" marker-end="url(#arrP)"/>
+            <g font-size="6.6" fill="#5B6B77" text-anchor="end"><text x="22" y="16">+2</text><text x="22" y="42.4">0</text><text x="22" y="68">−2</text></g>
+            <path d="M30,42 C42,38 54,44 66,40 C78,36 86,22 100,17 C112,13 124,24 136,38 C146,46 156,44 168,46 C180,52 192,62 204,60 C214,58 222,48 232,41 C244,37 256,42 264,39" fill="none" stroke="#2E6690" stroke-width="1.8"/>
+            <text x="108" y="82" text-anchor="middle" font-size="8" font-weight="900" fill="#B0483A">A</text>
+            <text x="198" y="82" text-anchor="middle" font-size="8" font-weight="900" fill="#2E6690">B</text>
+            <text x="140" y="16" font-size="6.6" font-weight="800" fill="#B0483A">← 평년보다 높음</text>
+            <text x="166" y="66" text-anchor="end" font-size="6.6" font-weight="800" fill="#2E6690">평년보다 낮음 →</text>
+            <g font-size="6.8" font-weight="700">
+              <text x="2" y="96" fill="#B0483A">A: 따뜻한 물이 동쪽까지 → 엘니뇨(무역풍 약화, 용승 약함)</text>
+              <text x="2" y="108" fill="#2E6690">B: 찬물이 더 많이 올라옴 → 라니냐(무역풍 강화)</text>
+            </g>
+          </svg></div>
+        <div class="wrongbox"><div class="wt">바로알기</div>
+          <p><b>ㄱ</b> (틀림 →) A(엘니뇨) 시기에는 무역풍이 평소보다 <b>약했다</b>. <b>ㄴ</b> (틀림 →) A 시기 페루 연안에서는 찬물이 <b>올라오지 못해</b> 어획량이 줄었다.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">15</span><span class="sans">④</span><span class="slink">개념 5</span></div>
+        <p><b>ㄴ&nbsp;(옳음)</b> 방목·벌채가 사막화를 인위적으로 가속한다. <b>ㄷ&nbsp;(옳음)</b> 동아시아의 사막화 → 우리나라 황사 심화.</p>
+        <div class="wrongbox"><div class="wt">바로알기</div>
+          <p><b>ㄱ</b> (틀림 →) 사막화는 자연적 가뭄 <b>위에</b> 과도한 방목·경작, 삼림 벌채 같은 <b>인위적 원인</b>이 얹혀 일어난다 — '오직'이 함정 단어다.</p></div></div>
     </div>
   </div>
   <div class="folio"><span>알짜 해설</span><span class="num">119</span></div>
 </div>
 
-<!-- ═════════════ p.120 MEMO ═════════════ -->
+<!-- ═════════════ 해설 3 ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag" style="color:var(--brand);">알짜 해설</span><span class="lesson-tag">03. 지구온난화와 기후변화</span></div>
+  <div class="solcols">
+    <div>
+      <div class="sol"><div class="shead"><span class="sno">16</span><span class="sans">②</span><span class="slink">개념 5</span></div>
+        <p><b>C&nbsp;(옳음)</b> 신재생 에너지로 바꾸면 온실 기체 배출 자체가 줄어든다 — 완화.</p>
+        <div class="wrongbox"><div class="wt">바로알기</div>
+          <p><b>A</b> (틀림 →) 기후변화 대처에는 원인을 줄이는 <b>완화와 적응이 모두</b> 필요하다. <b>B</b> (틀림 →) 숲을 지키고 되살리는 것은 이산화 탄소 흡수원을 늘려 원인을 줄이는 <b>완화</b>이다.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">17</span><span class="sans">③</span><span class="slink">개념 5</span></div>
+        <p>가뭄에 강한 작물 = 이미 온 변화에 대비하는 적응.</p>
+        <div class="wrongbox"><div class="wt">바로알기</div>
+          <p><b>①·②·④·⑤</b> 화석 연료 줄이기, 태양광·풍력 발전, 숲 가꾸기, 배출 감축 협약은 모두 원인을 줄이는 <b>완화</b>에 해당한다.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">18</span><span class="sans">모범 답안</span><span class="slink">개념 1·2</span></div>
+        <p>화석 연료를 태우면 이산화 탄소 같은 <b>온실 기체</b>가 늘어난다. 늘어난 온실 기체가 지표에서 나가는 <b>적외선</b>을 더 많이 흡수했다가 지표로 재방출하므로(온실효과 강화), 지구의 평균 기온이 높아진다.</p>
+        <table class="rubric">
+          <tr><th>채점 요소</th><th>배점</th></tr>
+          <tr><td>① 연소로 대기 중 온실 기체가 늘어난다고 썼다.</td><td>2점</td></tr>
+          <tr><td>② 온실 기체가 적외선을 더 많이 흡수·재방출한다고 썼다.</td><td>2점</td></tr>
+          <tr><td>③ 그 결과 지구 평균 기온이 오른다고 연결했다.</td><td>2점</td></tr>
+        </table>
+        <div class="wrongbox"><div class="wt">이렇게 쓰면 0점</div>
+          <p>"온실 기체가 태양의 빛을 흡수해 지구가 더워진다." — 흡수 대상(적외선)을 가시광선과 혼동한 답.</p></div></div>
+    </div>
+    <div>
+      <div class="sol"><div class="shead"><span class="sno">19</span><span class="sans">모범 답안</span><span class="slink">개념 4</span></div>
+        <p>엘니뇨 시기에는 <b>무역풍</b>이 약해져 따뜻한 표층수가 동쪽으로 되밀려 온다. 그래서 페루 연안에서 아래의 <b>찬물</b>이 올라오지 못하고, 찬물이 실어 오던 영양분이 줄어 어획량이 줄어든다.</p>
+        <table class="rubric">
+          <tr><th>채점 요소</th><th>배점</th></tr>
+          <tr><td>① 무역풍이 약해진다고 썼다.</td><td>2점</td></tr>
+          <tr><td>② 페루 연안에서 찬물이 올라오지 못한다고 썼다.</td><td>2점</td></tr>
+          <tr><td>③ 찬물이 실어 오던 영양분이 줄어 어획량이 준다고 연결했다.</td><td>2점</td></tr>
+        </table>
+        <div class="wrongbox"><div class="wt">이렇게 쓰면 0점</div>
+          <p>"무역풍이 강해져 찬물이 너무 많이 올라오기 때문이다." — 라니냐와 뒤바꾼 답.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">20</span><span class="sans">모범 답안</span><span class="slink">개념 3</span></div>
+        <p>첫째, 기온이 오르면 육지의 <b>빙하</b>가 녹아 바다로 흘러 들어간다. 둘째, 데워진 바닷물의 부피가 커지는 <b>열팽창</b>이 일어난다. 이 두 가지가 함께 해수면을 높인다.</p>
+        <table class="rubric">
+          <tr><th>채점 요소</th><th>배점</th></tr>
+          <tr><td>① 빙하가 녹아 바다로 들어간다고 썼다.</td><td>3점</td></tr>
+          <tr><td>② 바닷물이 데워져 부피가 커진다(열팽창)고 썼다.</td><td>3점</td></tr>
+        </table>
+        <div class="wrongbox"><div class="wt">이렇게 쓰면 0점</div>
+          <p>"비가 많이 와서 바닷물이 늘어나기 때문이다." — 빙하 융해와 열팽창이 모두 빠진 답.</p></div></div>
+    </div>
+  </div>
+  <div class="folio"><span>알짜 해설</span><span class="num">?</span></div>
+</div>
+
+<!-- ═════════════ 해설 4 ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag" style="color:var(--brand);">알짜 해설</span><span class="lesson-tag">03. 지구온난화와 기후변화</span></div>
+  <div class="solcols">
+    <div>
+      <div class="sol"><div class="shead"><span class="sno">21</span><span class="sans">③</span><span class="slink">개념 2·자료 | 2점</span></div>
+        <p><b>ㄱ&nbsp;(옳음)</b> 315 → 430&nbsp;ppm의 장기 상승. <b>ㄴ&nbsp;(옳음)</b> 여름 광합성 ↑ → 농도 ↓, 겨울엔 반대 — 톱니의 정체.</p>
+        <div class="wrongbox"><div class="wt">바로알기</div>
+          <p><b>ㄷ</b> (틀림 →) 이 곡선은 대기 중 온실 기체가 <b>늘고 있음</b>을 보여 준다. 무늬마다 원인을 따로 — 톱니 = 계절(광합성), 추세 = 화석 연료 연소.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">22</span><span class="sans">③</span><span class="slink">개념 4 | 2.5점</span></div>
+        <p><b>ㄱ&nbsp;(옳음)</b> 따뜻한 물이 동쪽으로 되밀려 온다. <b>ㄴ&nbsp;(옳음)</b> 바람과 수온의 합작 — 상호작용의 정의 그대로.</p>
+        <div class="wrongbox"><div class="wt">바로알기</div>
+          <p><b>ㄷ</b> (틀림 →) 엘니뇨 시기 인도네시아 쪽에는 <b>가뭄과 산불</b>이 잦아진다 — 폭우는 페루 쪽. 동·서를 바꿔치는 것이 엘니뇨 문제의 단골 함정이다.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">23</span><span class="sans">⑤</span><span class="slink">개념 3 | I-04 연계 | 2.5점</span></div>
+        <p><b>ㄱ&nbsp;(옳음)</b> 대기의 이산화 탄소가 늘수록 바다가 녹여 흡수하는 양도 늘어난다. <b>ㄴ&nbsp;(옳음)</b> 산성을 나타내는 것은 수소 이온<span style="white-space:nowrap;">(I-04)</span> — H<sup>+</sup>가 늘면 산성 쪽으로 기운다(해양 산성화). <b>ㄷ&nbsp;(옳음)</b> 탄산 칼슘은 산과 반응해 이산화 탄소를 내며 녹는다<span style="white-space:nowrap;">(I-04)</span> — 산호·조개처럼 껍데기를 만드는 생물이 타격을 입는다.</p>
+        <div class="wrongbox"><div class="wt">함정 체크</div>
+          <p>해양 산성화는 '기온'이 아니라 <b>이산화 탄소 자체</b>가 일으키는 변화다 — 대기와 바다의 그래프를 한 원인으로 묶어 읽는다.</p></div></div>
+    </div>
+    <div>
+      <div class="sol"><div class="shead"><span class="sno">24</span><span class="sans">①</span><span class="slink">개념 1·2 | 집중 훈련 | 2점</span></div>
+        <p><b>ㄱ&nbsp;(옳음)</b> B = 100 − 30 − 20 = 50.</p>
+        <div class="analysis"><div class="at">꼼꼼 자료 분석</div>
+          <svg width="300" height="104" viewBox="0 0 300 104" font-family="PC Sans">
+            <text x="1" y="21" font-size="6.8" font-weight="800" fill="#5B6B77">태양 복사</text>
+            <text x="1" y="30" font-size="6.8" font-weight="800" fill="#5B6B77">100</text>
+            <rect x="36" y="10" width="72" height="22" rx="3" fill="#B9C3CC"/>
+            <rect x="110" y="10" width="46" height="22" rx="3" fill="#6FB8AA"/>
+            <rect x="158" y="10" width="120" height="22" rx="3" fill="#147D6F"/>
+            <g font-size="7" font-weight="800" fill="#fff" text-anchor="middle">
+              <text x="72" y="24">반사 30</text><text x="133" y="24">대기 흡수 20</text><text x="218" y="24">지표 흡수 B = 50</text>
+            </g>
+            <line x1="110" y1="37" x2="278" y2="37" stroke="#D6455D" stroke-width="1"/>
+            <line x1="110" y1="34" x2="110" y2="40" stroke="#D6455D" stroke-width="1"/><line x1="278" y1="34" x2="278" y2="40" stroke="#D6455D" stroke-width="1"/>
+            <text x="194" y="47" text-anchor="middle" font-size="6.6" font-weight="800" fill="#D6455D">흡수 합계 20 + 50 = 70</text>
+            <rect x="110" y="52" width="168" height="20" rx="3" fill="#E8940A"/>
+            <text x="194" y="65" text-anchor="middle" font-size="7" font-weight="800" fill="#fff">C = 70 (흡수 = 방출, 복사 평형)</text>
+            <g font-size="6.8" font-weight="700" fill="#5B6B77">
+              <text x="2" y="86">반사 ↑ → 흡수 ↓ → 기온 ↓ (ㄴ은 반대)</text>
+              <text x="2" y="99">온실 기체 ↑ → 잠시 C &lt; 70 → 기온 ↑ → 새 평형에서 다시 C = 70</text>
+            </g>
+          </svg></div>
+        <div class="wrongbox"><div class="wt">바로알기</div>
+          <p><b>ㄴ</b> (틀림 →) 반사되는 양이 늘면 흡수량이 줄어 평균 기온은 <b>내려간다</b>. <b>ㄷ</b> (틀림 →) 새로운 평형은 더 높은 온도에서 다시 흡수 70 = 방출 70이 된 상태이므로 C는 <b>70</b>이다.</p></div></div>
+      <div class="gist" style="margin-top:3mm;">
+        <div class="boxtitle"><span class="ico">알</span>이 소단원, 이것만은!</div>
+        <ul>
+          <li>사슬 암기: <b>연소 → 온실 기체 ↑ → 적외선 더 붙잡힘 → 기온 ↑</b> (온실효과 자체는 무죄)</li>
+          <li>해수면 = 융해 + <b>열팽창</b> / 킬링 곡선: 톱니 = 계절, 추세 = 인류</li>
+          <li>엘니뇨 = 무역풍 약화 + 동태평양 ↑ / 대처 = <b>완화 + 적응</b>(파리 협정 1.5&nbsp;℃)</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div class="folio"><span>알짜 해설</span><span class="num">?</span></div>
+</div>
+
+<!-- ═════════════ MEMO ═════════════ -->
 <div class="page">
   <div class="runhead"><span class="unit-tag">II. 환경과 에너지</span><span class="lesson-tag">03 ▸ 04 넘어가기 전에</span></div>
+  <div class="spaced">
+    <div class="st">간격 두고 다시 꺼내기 — 책을 덮고 답한다</div>
+    <ol>
+      <li>온실 기체가 주로 흡수하는 복사는 무엇인가?</li>
+      <li>엘니뇨 시기에 무역풍과 동태평양의 표층 수온은 각각 어떻게 변하는가?</li>
+      <li>지구온난화로 해수면이 상승하는 두 가지 원인은 무엇인가?</li>
+    </ol>
+    <div class="when"><span>□ 1일 뒤</span><span>□ 1주 뒤</span><span>□ 시험 전</span></div>
+    <div class="ans">정답 1 지표가 내보내는 적외선 2 무역풍 약화, 수온 상승 3 빙하 융해, 바닷물의 열팽창</div>
+  </div>
   <div class="memo-head"><span class="mt">MEMO</span><span class="ms">헷갈린 개념, 다시 틀린 문제 번호, 나만의 암기법을 남겨 두는 자리</span></div>
   <div class="memo-area"></div>
   <div class="memo-pen">"'연소 → 온실 기체 → 적외선 → 기온'의 사슬을 안 보고 말해 보고, 엘니뇨 단면도를 손으로 그려 보자. 막히면 108·110쪽으로! — 박찬쌤"</div>
