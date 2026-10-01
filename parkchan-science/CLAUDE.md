@@ -1,5 +1,7 @@
 # 박찬 과학 · 하루 한 개념 — 작업 규칙
 
+> **이어서 작업할 때 먼저 `docs/13-로드맵-인수인계.md` 를 읽는다** — 지금 상태·다음 작업·원장님 결정 대기 목록.
+
 ## 빌드·배포
 - 앱 원본은 `app/app-shell.html` 한 파일. `cd app && python3 build.py` → `docs/parkchan/index.html`(GitHub Pages). 빌드는 `node --check` 문법 관문을 통과해야 쓴다.
 - `docs/parkchan/sw.js` 의 `CACHE`·`DATA` 줄은 빌드가 앱 지문으로 고쳐 쓴다(손으로 올리지 않는다). sw.js 를 고친 커밋은 빌드를 한 번 더 돌려 확인.
