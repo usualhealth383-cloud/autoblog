@@ -81,7 +81,7 @@ SLIM = {
     'supplements': ['id', 'name', 'en', 'tags', 'brands', 'evidence'],
     'classes':     ['id', 'name', 'short', 'icon'],
 }
-CORE_KEYS = ['sources', 'ingredients', 'interactions', 'kids', 'productImages', 'suppRules', 'myths', 'recalls']
+CORE_KEYS = ['sources', 'ingredients', 'interactions', 'kids', 'productImages', 'suppRules', 'myths', 'recalls', 'drugRep']   # drugRep: 약 화면(본문 받은 뒤)에서만 씀 — 첫 화면 220 KB 예산
 inline, core = {}, {}
 for k, v in data.items():
     if k in SLIM:
