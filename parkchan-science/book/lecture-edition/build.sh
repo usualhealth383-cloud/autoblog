@@ -2,6 +2,7 @@
 # 박찬 과학 통합과학1 강의용 교재 빌드 (L-XXXX.html → PDF → 합본)
 # 폴리오: 각 챕터 body의 --pg-start 를 순서대로 자동 계산해 연속 번호 부여
 set -euo pipefail
+python3 "$(dirname "$0")/../../tools/make_static_fonts.py" >/dev/null   # 고정 굵기 글꼴(가변 글꼴은 PDF 를 키우고 인쇄를 실패시킨다)
 cd "$(dirname "$0")"
 CHROME="${CHROME:-/opt/pw-browsers/chromium}"
 

@@ -8,6 +8,15 @@
 - 안드로이드: `app-native/`(Capacitor, targetSdk 36) · CI `.github/workflows/android-apk.yml`.
 - 서버: `app/server/schema.sql`(Supabase·RLS) · `functions.sql` · `functions/*`(Edge Function, Deno).
 
+## 본책(교재 PDF)
+- 빌드: `bash book/build.sh` · `bash book2/build.sh` (둘을 **동시에 돌리지 않는다** — 합본 만들기가 메모리를 넘겨 죽는다). 소단원 하나: `bash tools/check_chapter.sh 08|i01|sample|2101`.
+- 문제 짜임은 `docs/12-본책-보강-브리프.md`(소단원 24문항·바로알기·채점 기준표·간격 두고 다시 꺼내기). 합격본 `book/chapter-08`.
+- 쪽을 더하거나 빼면 새 쪽 폴리오를 `?` 로 두고 `python3 tools/renumber_book.py book|book2` — 전권 폴리오·차례·'N쪽'('66·67쪽' 포함) 참조를 다시 매긴다. 손으로 고치지 않는다.
+- 정답표·해설이 바뀌면 `python3 tools/make_answer_index.py book|book2` 로 부록 '정답 한눈에 보기'를 다시 만든다(앱 추출기와 같은지 검사 포함). 그다음 `python3 tools/extract_bank.py` → 앱 빌드.
+- 글꼴은 **고정 굵기**(`~/.fonts/static/`, `tools/make_static_fonts.py`)를 쓴다. 2026-10-02: 가변 글꼴이 소단원 PDF 를 9 MB 로 키우고(고정 굵기 1 MB) 굵기·크기 조합이 많으면 인쇄가 'Printing failed' 로 멈췄다.
+- 실행 중인 build.sh 를 고치지 않는다(bash 는 스크립트를 읽어 가며 돈다). `pkill -f` 에 스크립트 이름을 쓰면 내 셸도 죽는다.
+- `qa_check.py` 는 하한선을 '완전히' 넘어간 요소를 못 잡는다 — 넘친 쪽은 PNG 로 직접 본다.
+
 ## 시험 — "완료"는 이것이 다 통과했을 때만
 - 시험대: `bash tools/testbed_up.sh`(Postgres :54329 · PostgREST :3001 · 게이트웨이 :8767, 스키마 새로 깖) · 앱: `cd docs/parkchan && python3 -m http.server 8765 --bind 127.0.0.1`
 - 서버: `tools/testbed_security.py` · `tools/testbed_functions.py`
@@ -27,3 +36,5 @@
 - **교재를 다시 추출하면** `tools/check_content.py`(빌드가 자동으로 부름)가 지수·첨자 보존을 확인한다. 2026-10-01: 추출기가 `<sup>`·`<sub>` 를 걷어 '10⁻¹⁰ m'가 '10−10 m', 'H₂O'가 'H2O'로 학생에게 보이고 있었다 — 원본 대비 개수와 흔적(10−10 m)을 함께 본다.
 - **웹판과 앱(APK)은 같은 `data/` 를 싣는다.** CI 에서 데이터를 다시 만들지 않는다 — 2026-10-01: CI 가 옛 `make_quotes.py` 로 글귀를 덮어써 앱에만 옛 글귀 39개가 들어가 있었다(지금은 막아 둠).
 - 스타일은 부모 범위(`.stu .mini` 같은)에만 두지 말고 새 자리에서 쓰는지 화면으로 확인한다 — 스크린샷을 직접 본다.
+- **셸 조건에 `cmd | grep -q` 를 `set -o pipefail` 과 같이 쓰지 않는다.** 2026-10-02: build.sh 의 `fc-list | grep -q` 가 늘 실패로 보여 빌드마다 글꼴 34 MB 를 다시 받고 있었다 → 파일 존재(`[ -s 파일 ]`)로 판정.
+- 문제를 쓰다 보면 개념 쪽 오류가 보인다 — 2026-10-02 보강에서 맨틀 대류 방향, 불의 고리 지도 좌우, 힘-시간 그래프 넓이, 용광로 O₂, 은 이온 전자 수 같은 그림 오류가 나왔다. 그림도 '수치·방향이 본문과 맞는가'로 검수한다.

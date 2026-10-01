@@ -12,7 +12,7 @@ import re, sys, pathlib
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 FOLIO = re.compile(r'(<div class="folio">.*?<span class="num">)([^<]*)(</span>)', re.S)
-PAGEREF = re.compile(r'(?<![\d.])(\d{1,3})(\s?쪽)')
+PAGEREF = re.compile(r'(?<![\d.])(\d{1,3}(?:\s?[·,~–]\s?\d{1,3})*)(\s?쪽)')   # '66·67쪽', '108~110쪽' 처럼 여러 쪽도
 TOCPG = re.compile(r'(<span class="tr-pg">)(\d+)(</span>)')
 
 
@@ -44,14 +44,17 @@ def main():
         s = FOLIO.sub(lambda m: m.group(1) + str(next(it)) + m.group(3), s)
         def ref(m, node=''):
             nonlocal changed
-            o = int(m.group(1))
-            if not (lo <= o <= hi) or o not in old2new or old2new[o] == o: return m.group(0)
+            nums = re.findall(r'\d+', m.group(1))
+            if not all(lo <= int(x) <= hi and int(x) in old2new for x in nums): return m.group(0)
+            out = re.sub(r'\d+', lambda d: str(old2new[int(d.group(0))]), m.group(1))
+            if out == m.group(1): return m.group(0)
             ctx = m.string[max(0, m.start() - 28):m.end() + 8].replace('\n', ' ')
-            print(f'  {f.parent.name}: {o}쪽 → {old2new[o]}쪽   …{ctx}…'); changed += 1
-            return str(old2new[o]) + m.group(2)
+            print(f'  {f.parent.name}: {m.group(1)}쪽 → {out}쪽   …{ctx}…'); changed += 1
+            return out + m.group(2)
         # 태그 안(속성·주석)은 건드리지 않는다 — 글자 부분만
         s = re.sub(r'>([^<]+)<', lambda t: '>' + PAGEREF.sub(ref, t.group(1)) + '<', s)
-        s = TOCPG.sub(lambda m: m.group(1) + str(old2new.get(int(m.group(2)), int(m.group(2)))) + m.group(3), s)
+        tail = lambda o: n + 1 if o == hi + 1 else old2new.get(o, o)   # 폴리오 없는 권말(모의고사) = 마지막 쪽 + 1
+        s = TOCPG.sub(lambda m: m.group(1) + str(tail(int(m.group(2)))) + m.group(3), s)
         if s != texts[f] and not dry: f.write_text(s, encoding='utf-8')
     print(f'{book}: 폴리오 {n}쪽 · 본문 참조 {changed}곳 고침' + (' (시험 실행)' if dry else ''))
 

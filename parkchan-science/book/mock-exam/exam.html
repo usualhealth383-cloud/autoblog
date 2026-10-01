@@ -2,13 +2,13 @@
 <html lang="ko">
 <head>
 <meta charset="utf-8">
-<title>박찬 과학 실전 모의고사 — 통합과학</title>
+<title>박찬 과학 실전 모의고사 — 통합과학 1</title>
 <style>
-  @font-face { font-family:'PC Serif'; src:url('file:///root/.fonts/NotoSerifKR.ttf'); font-weight:100 900; }
-  @font-face { font-family:'PC Sans'; src:url('file:///root/.fonts/NotoSansKR.ttf'); font-weight:100 900; }
+  @font-face { font-family:'PC Serif'; src:url('file:///root/.fonts/static/NotoSerifKR-400.ttf'); font-weight:400; } @font-face { font-family:'PC Serif'; src:url('file:///root/.fonts/static/NotoSerifKR-500.ttf'); font-weight:500; } @font-face { font-family:'PC Serif'; src:url('file:///root/.fonts/static/NotoSerifKR-600.ttf'); font-weight:600; } @font-face { font-family:'PC Serif'; src:url('file:///root/.fonts/static/NotoSerifKR-700.ttf'); font-weight:700; } @font-face { font-family:'PC Serif'; src:url('file:///root/.fonts/static/NotoSerifKR-800.ttf'); font-weight:800; } @font-face { font-family:'PC Serif'; src:url('file:///root/.fonts/static/NotoSerifKR-900.ttf'); font-weight:900; }
+  @font-face { font-family:'PC Sans'; src:url('file:///root/.fonts/static/NotoSansKR-400.ttf'); font-weight:400; } @font-face { font-family:'PC Sans'; src:url('file:///root/.fonts/static/NotoSansKR-500.ttf'); font-weight:500; } @font-face { font-family:'PC Sans'; src:url('file:///root/.fonts/static/NotoSansKR-600.ttf'); font-weight:600; } @font-face { font-family:'PC Sans'; src:url('file:///root/.fonts/static/NotoSansKR-700.ttf'); font-weight:700; } @font-face { font-family:'PC Sans'; src:url('file:///root/.fonts/static/NotoSansKR-800.ttf'); font-weight:800; } @font-face { font-family:'PC Sans'; src:url('file:///root/.fonts/static/NotoSansKR-900.ttf'); font-weight:900; }
   *{ box-sizing:border-box; margin:0; padding:0; -webkit-print-color-adjust:exact; print-color-adjust:exact; }
   @page{ size:210mm 297mm; margin:0; }
-  body{ font-family:'PC Serif',serif; color:#000; }
+  body{ font-family:'PC Serif',serif; color:#000; word-break:keep-all; }
   .sheet{ width:210mm; height:297mm; overflow:hidden; page-break-after:always; padding:10mm 11mm 12mm; position:relative; display:flex; flex-direction:column;}
 
   /* ── 1면 헤더 ── */
@@ -28,18 +28,25 @@
   /* ── 2단 본문 ── */
   .twocol{ flex:1; display:grid; grid-template-columns:1fr 1fr; column-gap:8mm; position:relative; min-height:0; padding-top:2mm;}
   .twocol::before{ content:""; position:absolute; left:50%; top:0; bottom:0; width:0.25mm; background:#000; }
-  .col{ min-width:0; padding:0 1mm; }
+  .col{ min-width:0; padding:0 1mm; display:flex; flex-direction:column; justify-content:space-between; }
+  .col > .qq:last-child{ margin-bottom:0; }
 
-  .qq{ margin-bottom:7mm; }
-  .qq .stem{ font-size:9.6pt; line-height:1.68; text-align:justify; }
+  .qq{ margin-bottom:5mm; }
+  .qq .stem{ font-size:9.6pt; line-height:1.56; text-align:justify; }
   .qq .stem b.qn{ font-weight:900; font-size:10.5pt; margin-right:1.2mm;}
   .qq .pts{ font-weight:700; }
-  .bogi{ border:0.35mm solid #000; margin:2.5mm 2mm 2.5mm 2mm; padding:2mm 3mm; font-size:9.4pt; line-height:1.72;}
+  .bogi{ border:0.35mm solid #000; margin:2mm; padding:1.5mm 3mm; font-size:9pt; line-height:1.58;}
   .bogi .bt{ text-align:center; letter-spacing:0.5em; font-weight:700; font-size:9pt; margin-bottom:0.8mm;}
-  .ch{ list-style:none; font-size:9.5pt; line-height:1.8; margin:1.5mm 0 0 1mm;}
+  .bogi .it{ padding-left:1.15em; text-indent:-1.15em; }
+  .dta{ border:0.35mm solid #000; margin:2mm; padding:1.5mm 3mm; font-size:9pt; line-height:1.58; text-align:left;}
+  .dta .dt{ font-weight:700; }
+  .dta .it{ padding-left:1.6em; text-indent:-1.6em; }
+  .ch{ list-style:none; font-size:9.5pt; line-height:1.7; margin:1.2mm 0 0 1mm;}
   .ch.row{ display:flex; flex-wrap:wrap; gap:0 5.5mm;}
+  .ch:not(.row) li{ padding-left:1.25em; text-indent:-1.25em; }
   .paren{ font-size:9pt; }
-  figure{ margin:2.5mm auto; text-align:center;}
+  figure{ margin:2mm auto; text-align:center;}
+  figure svg{ display:block; margin:0 auto; }
   figure .cap{ font-size:8.6pt; margin-top:1mm; }
 
   /* ── 풋 ── */
@@ -48,6 +55,32 @@
   .cont-note{ text-align:right; font-size:8.8pt; font-weight:700; margin-top:1mm;}
   .runsubj{ display:flex; justify-content:space-between; align-items:center; border-bottom:0.5mm solid #000; padding-bottom:1.6mm; margin-bottom:3mm; font-size:10pt; }
   .runsubj .s{ font-weight:800; letter-spacing:0.1em; }
+  .runsubj .r{ font-size:8.6pt; }
+
+  /* ── 정답과 해설 (본책 '알짜 해설'과 같은 얼개) ── */
+  .sol-sheet{ --brand:#0E5A6B; --brand-lt:#E3F0F3; --point:#D6455D; --sub:#5B6B77; --line:#C9D3D9; color:#22303A; }
+  .sol-sheet .runsubj{ border-bottom-color:var(--brand); }
+  .sol-sheet .runsubj .s{ color:var(--brand); }
+  .sol-head{ display:flex; align-items:baseline; gap:3mm; margin-bottom:3mm;}
+  .sol-head .stt{ font-size:15pt; font-weight:900; color:var(--brand);}
+  .sol-head .sub{ font-size:8.6pt; color:var(--sub);}
+  .anstable{ width:100%; border-collapse:collapse; margin-bottom:2mm; }
+  .anstable th,.anstable td{ border:0.3mm solid var(--line); font-size:8.8pt; padding:1mm 0; text-align:center; }
+  .anstable th{ background:var(--brand-lt); color:var(--brand); font-weight:800; width:11mm; }
+  .anstable td.a{ font-weight:900; color:var(--brand); }
+  .anstable td.p{ color:var(--sub); }
+  .pts-sum{ font-size:8.6pt; color:var(--sub); text-align:right; margin-bottom:3.5mm; }
+  .solcols{ display:grid; grid-template-columns:1fr 1fr; gap:0 8mm; flex:1; min-height:0; align-content:start; }
+  .sol{ margin-bottom:2.6mm; break-inside:avoid; }
+  .sol .shead{ display:flex; align-items:center; gap:2mm; margin-bottom:0.8mm;}
+  .sol .sno{ background:var(--brand); color:#fff; min-width:6mm; height:5.2mm; border-radius:1.2mm; font-size:8.6pt; font-weight:900; line-height:1; display:flex; align-items:center; justify-content:center; padding:0.4mm 1.4mm 0;}
+  .sol .sans{ font-weight:900; color:var(--brand); font-size:9.6pt;}
+  .sol .slink{ font-size:8.6pt; color:var(--sub); margin-left:auto;}
+  .sol p{ font-size:9pt; line-height:1.52; text-align:left; }
+  .wrongbox{ border-left:0.7mm solid #E3A0AC; padding:0.2mm 0 0.2mm 2.6mm; margin-top:0.8mm;}
+  .wrongbox .wt{ font-size:8.6pt; font-weight:900; color:var(--point); }
+  .wrongbox p{ font-size:8.6pt; line-height:1.5; text-align:left; }
+  .nw{ white-space:nowrap; }
 
   /* 화학식 첨자 — 본문 폰트를 그대로 축소해 자형이 어긋나지 않게 한다 */
   sub,sup{ font-size:0.68em; line-height:0; font-weight:inherit; }
@@ -56,14 +89,14 @@
 </head>
 <body>
 
-<!-- ════════ 1면 ════════ -->
+<!-- ════════ 1면 (1~4번) ════════ -->
 <div class="sheet">
   <div class="exam-top">
     <span class="lead">2029학년도 대학수학능력시험 대비 · 제1회</span>
     <span class="gyosi">제 4 교 시</span>
   </div>
   <h1 class="exam-title">박찬 과학 실전 모의고사 문제지</h1>
-  <div class="subject-line"><span class="subj">과학탐구 영역 ( 통합과학 )</span></div>
+  <div class="subject-line"><span class="subj">과학탐구 영역 ( 통합과학 1 )</span></div>
   <div class="idbox">
     <span class="cell"><span class="lab">성명</span><span class="fill"></span></span>
     <span class="cell"><span class="lab">수험 번호</span><span class="fill"></span></span>
@@ -71,92 +104,122 @@
   <div class="rule2"></div>
   <div class="notice">
     <span>◦ 문제지의 해당란에 성명과 수험 번호를 정확히 쓰시오.<br>◦ 답안지의 해당란에 성명과 수험 번호를 쓰고, 또 수험 번호와 답을 정확히 표시하시오.</span>
-    <span style="text-align:right;">◦ 문항수 : 25문항<br>◦ 시험 시간 : 40분</span>
+    <span style="text-align:right;">◦ 문항수 : 25문항 (총 50점)<br>◦ 시험 시간 : 40분</span>
   </div>
 
   <div class="twocol">
     <div class="col">
+      <!-- 1. I-01 -->
       <div class="qq">
-        <p class="stem"><b class="qn">1.</b>빅뱅 이후 우주에서 입자가 생성된 순서를 옳게 나열한 것은? <span class="pts">[1.5점]</span></p>
-        <ul class="ch">
-          <li>① 기본 입자 → 원자핵 → 양성자 → 원자</li>
-          <li>② 기본 입자 → 양성자·중성자 → 헬륨 원자핵 → 원자</li>
-          <li>③ 양성자·중성자 → 기본 입자 → 원자 → 헬륨 원자핵</li>
-          <li>④ 원자 → 원자핵 → 양성자·중성자 → 기본 입자</li>
-          <li>⑤ 헬륨 원자핵 → 양성자·중성자 → 기본 입자 → 원자</li>
-        </ul>
-      </div>
-
-      <div class="qq">
-        <p class="stem"><b class="qn">2.</b>스펙트럼에 대한 설명으로 옳은 것은? <span class="pts">[2점]</span></p>
-        <ul class="ch">
-          <li>① 고온의 별 표면에서 나온 빛만 프리즘에 통과시키면 밝은 선 몇 개만 나타난다.</li>
-          <li>② 고온·저밀도 기체가 내는 빛에서는 연속 스펙트럼이 나타난다.</li>
-          <li>③ 연속 스펙트럼의 빛이 저온의 기체를 통과하면 특정 파장이 흡수되어 검은 선이 나타난다.</li>
-          <li>④ 같은 원소라도 방출선과 흡수선의 파장은 서로 다르다.</li>
-          <li>⑤ 흡수 스펙트럼으로는 기체의 종류를 알 수 없다.</li>
-        </ul>
-      </div>
-
-      <div class="qq">
-        <p class="stem"><b class="qn">3.</b>다음은 빅뱅 우주론에 대한 세 학생의 대화이다. <span class="pts">[2점]</span></p>
-        <div class="bogi" style="border:0.35mm solid #000;">
-          <span style="font-weight:700;">학생 A :</span> 우주 배경 복사는 빅뱅 우주론의 증거야.<br>
-          <span style="font-weight:700;">학생 B :</span> 우주 전체에서 수소와 헬륨의 질량비가 약 3 : 1로 관측되는 것도 증거가 되지.<br>
-          <span style="font-weight:700;">학생 C :</span> 지구에 철이 풍부한 것도 빅뱅 우주론의 증거야.
+        <p class="stem"><b class="qn">1.</b>그림은 공중에 정지해 있는 드론이 바로 아래 지면을 향해 레이저를 쏜 뒤, 지면에서 반사되어 돌아온 레이저를 감지하는 모습을 나타낸 것이다. 레이저를 쏜 순간부터 감지할 때까지 걸린 시간은 4&nbsp;×&nbsp;10<sup>−7</sup>&nbsp;s이다.</p>
+        <figure>
+          <svg width="250" height="104" viewBox="0 0 250 104" font-family="PC Serif, PC Sans, serif">
+            <defs><marker id="m1r" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="#D6303B"/></marker></defs>
+            <line x1="94" y1="16" x2="156" y2="16" stroke="#000" stroke-width="1.6"/>
+            <line x1="94" y1="11" x2="94" y2="16" stroke="#000" stroke-width="1.2"/>
+            <line x1="156" y1="11" x2="156" y2="16" stroke="#000" stroke-width="1.2"/>
+            <ellipse cx="94" cy="10" rx="13" ry="2.6" fill="#888"/>
+            <ellipse cx="156" cy="10" rx="13" ry="2.6" fill="#888"/>
+            <rect x="108" y="16" width="34" height="12" rx="3" fill="#3A3A3A"/>
+            <text x="174" y="26" font-size="9" font-weight="700">드론</text>
+            <line x1="119" y1="30" x2="119" y2="82" stroke="#D6303B" stroke-width="1.4" stroke-dasharray="4 2.5" marker-end="url(#m1r)"/>
+            <line x1="131" y1="86" x2="131" y2="34" stroke="#D6303B" stroke-width="1.4" stroke-dasharray="4 2.5" marker-end="url(#m1r)"/>
+            <text x="112" y="60" text-anchor="end" font-size="8.6">쏜 레이저</text>
+            <text x="138" y="60" font-size="8.6">반사된 레이저</text>
+            <line x1="20" y1="88" x2="232" y2="88" stroke="#000" stroke-width="1.4"/>
+            <g stroke="#000" stroke-width="0.8">
+              <line x1="30" y1="88" x2="24" y2="95"/><line x1="44" y1="88" x2="38" y2="95"/><line x1="58" y1="88" x2="52" y2="95"/><line x1="72" y1="88" x2="66" y2="95"/><line x1="86" y1="88" x2="80" y2="95"/><line x1="100" y1="88" x2="94" y2="95"/><line x1="114" y1="88" x2="108" y2="95"/><line x1="128" y1="88" x2="122" y2="95"/><line x1="142" y1="88" x2="136" y2="95"/><line x1="156" y1="88" x2="150" y2="95"/><line x1="170" y1="88" x2="164" y2="95"/><line x1="184" y1="88" x2="178" y2="95"/><line x1="198" y1="88" x2="192" y2="95"/><line x1="212" y1="88" x2="206" y2="95"/><line x1="226" y1="88" x2="220" y2="95"/>
+            </g>
+            <text x="22" y="82" font-size="8.6">지면</text>
+          </svg>
+        </figure>
+        <p class="stem">이에 대한 설명으로 옳은 것만을 &lt;보기&gt;에서 있는 대로 고른 것은? (단, 빛의 속력은 3&nbsp;×&nbsp;10<sup>8</sup>&nbsp;m/s이다.) <span class="pts">[1.5점]</span></p>
+        <div class="bogi">
+          <div class="bt">&lt; 보 기 &gt;</div>
+          <div class="it">ㄱ. 드론의 지면으로부터의 높이는 60&nbsp;m이다.</div>
+          <div class="it">ㄴ. 레이저가 드론에서 지면에 도달하는 데 걸린 시간은 2&nbsp;×&nbsp;10<sup>−7</sup>&nbsp;s이다.</div>
+          <div class="it">ㄷ. 현재 1&nbsp;m의 기준은 백금 막대(미터원기)의 길이이다.</div>
         </div>
-        <p class="stem" style="margin-top:1.5mm;">제시한 내용이 옳은 학생만을 있는 대로 고른 것은?</p>
         <ul class="ch row">
-          <li>① A</li><li>② C</li><li>③ A, B</li><li>④ B, C</li><li>⑤ A, B, C</li>
+          <li>① ㄱ</li><li>② ㄷ</li><li>③ ㄱ, ㄴ</li><li>④ ㄴ, ㄷ</li><li>⑤ ㄱ, ㄴ, ㄷ</li>
+        </ul>
+      </div>
+
+      <!-- 2. I-02 -->
+      <div class="qq">
+        <p class="stem"><b class="qn">2.</b>표는 국제단위계(SI)의 기본량 일부와 그 기본단위를 나타낸 것이다.</p>
+        <figure>
+          <svg width="300" height="48" viewBox="0 0 300 48" font-family="PC Serif, PC Sans, serif">
+            <rect x="1" y="2" width="64" height="44" fill="#EDEDED"/>
+            <rect x="1" y="2" width="298" height="44" fill="none" stroke="#000" stroke-width="1"/>
+            <line x1="1" y1="24" x2="299" y2="24" stroke="#000" stroke-width="0.8"/>
+            <g stroke="#000" stroke-width="0.8"><line x1="65" y1="2" x2="65" y2="46"/><line x1="111.8" y1="2" x2="111.8" y2="46"/><line x1="158.6" y1="2" x2="158.6" y2="46"/><line x1="205.4" y1="2" x2="205.4" y2="46"/><line x1="252.2" y1="2" x2="252.2" y2="46"/></g>
+            <g font-size="9" text-anchor="middle">
+              <text x="33" y="17" font-weight="700">기본량</text><text x="88.4" y="17">길이</text><text x="135.2" y="17">질량</text><text x="182" y="17">시간</text><text x="228.8" y="17">온도</text><text x="275.6" y="17">전류</text>
+              <text x="33" y="39" font-weight="700">기본단위</text><text x="88.4" y="39">m</text><text x="135.2" y="39">㉠</text><text x="182" y="39">s</text><text x="228.8" y="39">㉡</text><text x="275.6" y="39">A</text>
+            </g>
+          </svg>
+        </figure>
+        <p class="stem">이에 대한 설명으로 옳은 것만을 &lt;보기&gt;에서 있는 대로 고른 것은? <span class="pts">[1.5점]</span></p>
+        <div class="bogi">
+          <div class="bt">&lt; 보 기 &gt;</div>
+          <div class="it">ㄱ. ㉠은 g이다.</div>
+          <div class="it">ㄴ. ㉡은 K이다.</div>
+          <div class="it">ㄷ. 운동량의 단위 kg·m/s는 질량, 길이, 시간의 기본단위를 조합하여 나타낸 것이다.</div>
+        </div>
+        <ul class="ch row">
+          <li>① ㄱ</li><li>② ㄷ</li><li>③ ㄱ, ㄴ</li><li>④ ㄴ, ㄷ</li><li>⑤ ㄱ, ㄴ, ㄷ</li>
         </ul>
       </div>
     </div>
 
     <div class="col">
+      <!-- 3. I-03 탐구 -->
       <div class="qq">
-        <p class="stem"><b class="qn">4.</b>그림은 원소 A, B의 방출 스펙트럼과 어떤 별 S의 흡수 스펙트럼을 나타낸 것이다. <span class="pts">[2점]</span></p>
-        <figure>
-          <svg width="300" height="88" viewBox="0 0 300 88" font-family="PC Serif, PC Sans, serif">
-            <defs>
-              <linearGradient id="rb" x1="0" y1="0" x2="1" y2="0">
-                <stop offset="0" stop-color="#7B2FBE"/><stop offset="0.18" stop-color="#2C58C9"/><stop offset="0.38" stop-color="#1FA34A"/>
-                <stop offset="0.56" stop-color="#E8D02A"/><stop offset="0.75" stop-color="#E8792A"/><stop offset="1" stop-color="#D6303B"/>
-              </linearGradient>
-            </defs>
-            <text x="0" y="17" font-size="9" font-weight="700">A</text>
-            <rect x="22" y="4" width="270" height="18" fill="#14181F"/><rect x="70" y="4" width="3" height="18" fill="#4A6FE8"/><rect x="204" y="4" width="3" height="18" fill="#E85B4A"/>
-            <text x="0" y="47" font-size="9" font-weight="700">B</text>
-            <rect x="22" y="34" width="270" height="18" fill="#14181F"/><rect x="104" y="34" width="3" height="18" fill="#8A5CE8"/><rect x="154" y="34" width="3" height="18" fill="#35C46A"/><rect x="250" y="34" width="3" height="18" fill="#E8A23A"/>
-            <text x="0" y="77" font-size="9" font-weight="700">S</text>
-            <rect x="22" y="64" width="270" height="18" fill="url(#rb)"/><rect x="70" y="64" width="3" height="18" fill="#14181F"/><rect x="204" y="64" width="3" height="18" fill="#14181F"/>
-          </svg>
-        </figure>
-        <p class="stem">별 S의 대기에 대한 설명으로 가장 적절한 것은?</p>
-        <ul class="ch">
-          <li>① 원소 A만 포함되어 있다.</li>
-          <li>② 원소 B만 포함되어 있다.</li>
-          <li>③ 원소 A와 B가 모두 포함되어 있다.</li>
-          <li>④ 원소 A와 B가 모두 포함되어 있지 않다.</li>
-          <li>⑤ 스펙트럼만으로는 알 수 없다.</li>
+        <p class="stem"><b class="qn">3.</b>다음은 학생 A가 운동장에 내린 빗물의 질량을 어림한 과정이다.</p>
+        <div class="dta">
+          <div class="dt">[탐구 과정]</div>
+          <div class="it">(가) 빗물의 질량을 ‘부피 × 물의 밀도’로 쪼갠다.</div>
+          <div class="it">(나) 운동장 가로 약 100&nbsp;m, 세로 약 50&nbsp;m, 강수량 10&nbsp;mm, 물의 밀도 1000&nbsp;kg/m<sup>3</sup>를 대입한다.</div>
+          <div class="it">(다) 빗물의 부피는 약 ㉠ m<sup>3</sup>, 질량은 약 ㉡ kg이다.</div>
+        </div>
+        <p class="stem">이에 대한 설명으로 옳은 것만을 &lt;보기&gt;에서 있는 대로 고른 것은? <span class="pts">[2점]</span></p>
+        <div class="bogi">
+          <div class="bt">&lt; 보 기 &gt;</div>
+          <div class="it">ㄱ. ㉠은 50이다.</div>
+          <div class="it">ㄴ. ㉡은 5&nbsp;×&nbsp;10<sup>5</sup>이다.</div>
+          <div class="it">ㄷ. 지역마다 강수량 측정 기구의 눈금 기준이 달라도 강수량을 비교하는 데 문제가 없다.</div>
+        </div>
+        <ul class="ch row">
+          <li>① ㄱ</li><li>② ㄷ</li><li>③ ㄱ, ㄴ</li><li>④ ㄴ, ㄷ</li><li>⑤ ㄱ, ㄴ, ㄷ</li>
         </ul>
       </div>
 
+      <!-- 4. I-04 -->
       <div class="qq">
-        <p class="stem"><b class="qn">5.</b>그림 (가)는 고온의 기체 A가 내는 빛의 스펙트럼을, (나)는 광원에서 나온 빛이 저온의 기체 B를 통과한 뒤의 스펙트럼을 나타낸 것이다. (가)의 밝은 선과 (나)의 검은 선은 같은 위치에 나타났다.</p>
+        <p class="stem"><b class="qn">4.</b>그림은 온도 센서의 아날로그 신호(곡선)를 1초 간격으로 표본화하여 0~3의 4단계 중 가장 가까운 단계로 수치화한 결과(점)이다.</p>
         <figure>
-          <svg width="300" height="60" viewBox="0 0 300 60" font-family="PC Serif, PC Sans, serif">
-            <text x="0" y="16" font-size="9" font-weight="700">(가)</text>
-            <rect x="30" y="3" width="262" height="18" fill="#14181F"/><rect x="92" y="3" width="3" height="18" fill="#4A6FE8"/><rect x="198" y="3" width="3" height="18" fill="#35C46A"/>
-            <text x="0" y="49" font-size="9" font-weight="700">(나)</text>
-            <rect x="30" y="36" width="262" height="18" fill="url(#rb)"/><rect x="92" y="36" width="3" height="18" fill="#14181F"/><rect x="198" y="36" width="3" height="18" fill="#14181F"/>
+          <svg width="300" height="104" viewBox="0 0 300 104" font-family="PC Serif, PC Sans, serif">
+            <g stroke="#999" stroke-width="0.6" stroke-dasharray="2 2">
+              <line x1="36" y1="66" x2="262" y2="66"/><line x1="36" y1="44" x2="262" y2="44"/><line x1="36" y1="22" x2="262" y2="22"/>
+              <line x1="80" y1="88" x2="80" y2="16"/><line x1="124" y1="88" x2="124" y2="16"/><line x1="168" y1="88" x2="168" y2="16"/><line x1="212" y1="88" x2="212" y2="16"/><line x1="256" y1="88" x2="256" y2="16"/>
+            </g>
+            <line x1="36" y1="88" x2="268" y2="88" stroke="#000" stroke-width="1.1"/>
+            <line x1="36" y1="88" x2="36" y2="12" stroke="#000" stroke-width="1.1"/>
+            <polyline fill="none" stroke="#666" stroke-width="1.4" points="36.0,62.7 40.4,60.4 44.8,57.9 49.2,55.5 53.6,53.0 58.0,50.6 62.4,48.2 66.8,45.9 71.2,43.7 75.6,41.6 80.0,39.6 84.4,37.8 88.8,36.0 93.2,34.2 97.6,32.6 102.0,31.1 106.4,29.6 110.8,28.3 115.2,27.2 119.6,26.2 124.0,25.3 128.4,24.5 132.8,23.8 137.2,23.2 141.6,22.7 146.0,22.3 150.4,22.2 154.8,22.3 159.2,22.6 163.6,23.2 168.0,24.2 172.4,25.6 176.8,27.3 181.2,29.4 185.6,31.7 190.0,34.2 194.4,37.0 198.8,39.8 203.2,42.7 207.6,45.6 212.0,48.4 216.4,51.3 220.8,54.3 225.2,57.4 229.6,60.6 234.0,63.9 238.4,67.2 242.8,70.5 247.2,73.8 251.6,77.1 256.0,80.3"/>
+            <g fill="#000"><circle cx="36" cy="66" r="3.2"/><circle cx="80" cy="44" r="3.2"/><circle cx="124" cy="22" r="3.2"/><circle cx="168" cy="22" r="3.2"/><circle cx="212" cy="44" r="3.2"/><circle cx="256" cy="88" r="3.2"/></g>
+            <g font-size="8.6" text-anchor="end"><text x="30" y="91">0</text><text x="30" y="69">1</text><text x="30" y="47">2</text><text x="30" y="25">3</text></g>
+            <g font-size="8.6" text-anchor="middle"><text x="36" y="99">0</text><text x="80" y="99">1</text><text x="124" y="99">2</text><text x="168" y="99">3</text><text x="212" y="99">4</text><text x="256" y="99">5</text></g>
+            <text x="44" y="11" font-size="8.6">단계</text>
+            <text x="298" y="99" text-anchor="end" font-size="8.6">시간(s)</text>
           </svg>
         </figure>
         <p class="stem">이에 대한 설명으로 옳은 것만을 &lt;보기&gt;에서 있는 대로 고른 것은? <span class="pts">[2점]</span></p>
         <div class="bogi">
           <div class="bt">&lt; 보 기 &gt;</div>
-          ㄱ. (가)는 방출 스펙트럼이다.<br>
-          ㄴ. A와 B는 같은 종류의 원소일 수 있다.<br>
-          ㄷ. (나)의 검은 선 위치에서 B는 빛을 방출한다.
+          <div class="it">ㄱ. 수치화한 값은 차례로 1, 2, 3, 3, 2, 0이다.</div>
+          <div class="it">ㄴ. 수치화한 각 값은 0과 1 두 자리로 나타낼 수 있다.</div>
+          <div class="it">ㄷ. 0.5초 간격으로 표본화하면 데이터의 양이 늘어난다.</div>
         </div>
         <ul class="ch row">
           <li>① ㄱ</li><li>② ㄷ</li><li>③ ㄱ, ㄴ</li><li>④ ㄴ, ㄷ</li><li>⑤ ㄱ, ㄴ, ㄷ</li>
@@ -169,42 +232,705 @@
   <div class="exam-foot"><span>이 문제지의 저작권은 박찬 과학학원에 있습니다.</span><span class="pg">1</span><span>박찬 과학 앱에서 전 문항 해설 제공</span></div>
 </div>
 
-<!-- ════════ 2면 ════════ -->
+<!-- ════════ 2면 (5~8번) ════════ -->
 <div class="sheet">
-  <div class="runsubj"><span class="s">과학탐구 영역 ( 통합과학 )</span><span style="font-size:8.6pt;">박찬 과학 실전 모의고사 · 제1회</span></div>
+  <div class="runsubj"><span class="s">과학탐구 영역 ( 통합과학 1 )</span><span class="r">박찬 과학 실전 모의고사 · 제1회</span></div>
   <div class="twocol">
     <div class="col">
+      <!-- 5. I-01 + I-04 -->
       <div class="qq">
-        <p class="stem"><b class="qn">6.</b>그림은 빅뱅 이후 시간에 따라 우주에서 일어난 사건 A, B를 나타낸 것이다. A는 헬륨 원자핵 생성, B는 원자 생성이다.</p>
+        <p class="stem"><b class="qn">5.</b>그림은 지진 조기 경보 시스템에서 관측소의 지진계가 기록한 땅의 흔들림이 디지털 신호로 바뀌어, 300&nbsp;km 떨어진 상황실로 전송되는 과정을 나타낸 것이다.</p>
         <figure>
-          <svg width="290" height="52" viewBox="0 0 290 52" font-family="PC Serif, PC Sans, serif">
-            <defs><marker id="ar2" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="#000"/></marker></defs>
-            <line x1="10" y1="27" x2="280" y2="27" stroke="#000" stroke-width="1.4" marker-end="url(#ar2)"/>
-            <circle cx="18" cy="27" r="3.4" fill="#000"/><text x="18" y="46" text-anchor="middle" font-size="8.6" font-weight="700">빅뱅</text>
-            <circle cx="105" cy="27" r="3" fill="#000"/><text x="105" y="15" text-anchor="middle" font-size="9.4" font-weight="800">A</text><text x="105" y="46" text-anchor="middle" font-size="8.2">약 3분 후</text>
-            <circle cx="195" cy="27" r="3" fill="#000"/><text x="195" y="15" text-anchor="middle" font-size="9.4" font-weight="800">B</text><text x="195" y="46" text-anchor="middle" font-size="8.2">약 38만 년 후</text>
-            <text x="272" y="46" text-anchor="middle" font-size="8.2">현재</text>
+          <svg width="300" height="90" viewBox="0 0 300 90" font-family="PC Serif, PC Sans, serif">
+            <defs>
+              <marker id="m5" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="#000"/></marker>
+              <marker id="m5s" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto-start-reverse"><path d="M0,0 L7,3 L0,6 Z" fill="#000"/></marker>
+            </defs>
+            <g fill="#fff" stroke="#000" stroke-width="1"><rect x="2" y="20" width="66" height="36" rx="2"/><rect x="96" y="20" width="74" height="36" rx="2"/><rect x="232" y="20" width="66" height="36" rx="2"/></g>
+            <g font-size="9" text-anchor="middle">
+              <text x="35" y="35" font-weight="700">지진계</text><text x="35" y="49" font-size="8.6">(관측소)</text>
+              <text x="133" y="35" font-weight="700">변환 장치</text><text x="133" y="49" font-size="8.2">표본화·수치화</text>
+              <text x="265" y="35" font-weight="700">상황실</text><text x="265" y="49" font-size="8.6">경보 발령</text>
+            </g>
+            <path d="M70,38 q2.5,-8 5,0 t5,0 t5,0" fill="none" stroke="#000" stroke-width="1.1"/>
+            <line x1="85" y1="38" x2="92" y2="38" stroke="#000" stroke-width="1.1" marker-end="url(#m5)"/>
+            <line x1="172" y1="38" x2="226" y2="38" stroke="#000" stroke-width="1.1" marker-end="url(#m5)"/>
+            <text x="199" y="31" text-anchor="middle" font-size="8.2">0 1 1 0 1 …</text>
+            <g stroke="#000" stroke-width="0.7"><line x1="35" y1="60" x2="35" y2="74"/><line x1="265" y1="60" x2="265" y2="74"/></g>
+            <line x1="38" y1="69" x2="262" y2="69" stroke="#000" stroke-width="0.9" marker-start="url(#m5s)" marker-end="url(#m5)"/>
+            <text x="150" y="84" text-anchor="middle" font-size="9">300 km</text>
           </svg>
         </figure>
-        <p class="stem">이에 대한 설명으로 옳은 것만을 &lt;보기&gt;에서 있는 대로 고른 것은? <span class="pts">[2.5점]</span></p>
+        <p class="stem">이에 대한 설명으로 옳은 것만을 &lt;보기&gt;에서 있는 대로 고른 것은? (단, 신호의 속력은 3&nbsp;×&nbsp;10<sup>8</sup>&nbsp;m/s이다.) <span class="pts">[2.5점]</span></p>
         <div class="bogi">
           <div class="bt">&lt; 보 기 &gt;</div>
-          ㄱ. A 시기에 양성자 2개와 중성자 2개가 결합하였다.<br>
-          ㄴ. B 시기 이후 우주는 투명해졌다.<br>
-          ㄷ. A와 B 사이 시기에 별과 은하가 활발하게 만들어졌다.
+          <div class="it">ㄱ. 변환 장치에 들어가기 전의 신호는 0과 1로 이루어진 불연속적인 신호이다.</div>
+          <div class="it">ㄴ. 디지털 신호는 아날로그 신호보다 전송 도중 끼어든 잡음의 영향을 크게 받는다.</div>
+          <div class="it">ㄷ. 신호가 관측소에서 상황실까지 전달되는 데 걸리는 시간은 1&nbsp;×&nbsp;10<sup>−3</sup>&nbsp;s이다.</div>
         </div>
         <ul class="ch row">
           <li>① ㄱ</li><li>② ㄷ</li><li>③ ㄱ, ㄴ</li><li>④ ㄴ, ㄷ</li><li>⑤ ㄱ, ㄴ, ㄷ</li>
         </ul>
       </div>
-      <p style="text-align:center; font-size:9pt; margin-top:10mm; letter-spacing:0.2em;">※ 7번부터 25번까지는 실제 회차에서 이어집니다. (템플릿)</p>
+
+      <!-- 6. II-01 -->
+      <div class="qq">
+        <p class="stem"><b class="qn">6.</b>표는 우리은하에서 관측한 외부 은하 A~C까지의 거리와, A~C가 우리은하로부터 멀어지는 속력을 상댓값으로 나타낸 것이다.</p>
+        <figure>
+          <svg width="300" height="70" viewBox="0 0 300 70" font-family="PC Serif, PC Sans, serif">
+            <rect x="1" y="2" width="298" height="22" fill="#EDEDED"/>
+            <rect x="1" y="2" width="298" height="66" fill="none" stroke="#000" stroke-width="1"/>
+            <g stroke="#000" stroke-width="0.8"><line x1="1" y1="24" x2="299" y2="24"/><line x1="1" y1="46" x2="299" y2="46"/><line x1="121" y1="2" x2="121" y2="68"/><line x1="180.3" y1="2" x2="180.3" y2="68"/><line x1="239.7" y1="2" x2="239.7" y2="68"/></g>
+            <g font-size="9" text-anchor="middle">
+              <text x="61" y="17" font-weight="700">은하</text><text x="150.7" y="17" font-weight="700">A</text><text x="210" y="17" font-weight="700">B</text><text x="269.3" y="17" font-weight="700">C</text>
+              <text x="61" y="39" font-size="8.6">거리(상댓값)</text><text x="150.7" y="39">1</text><text x="210" y="39">3</text><text x="269.3" y="39">5</text>
+              <text x="61" y="61" font-size="8.6">멀어지는 속력(상댓값)</text><text x="150.7" y="61">1</text><text x="210" y="61">3</text><text x="269.3" y="61">5</text>
+            </g>
+          </svg>
+        </figure>
+        <p class="stem">이에 대한 설명으로 옳은 것만을 &lt;보기&gt;에서 있는 대로 고른 것은? <span class="pts">[1.5점]</span></p>
+        <div class="bogi">
+          <div class="bt">&lt; 보 기 &gt;</div>
+          <div class="it">ㄱ. 거리가 3배인 은하는 멀어지는 속력도 3배이다.</div>
+          <div class="it">ㄴ. 이 관측 결과는 우주가 팽창하고 있다는 증거가 된다.</div>
+          <div class="it">ㄷ. 과거로 갈수록 은하 사이의 거리는 멀었다.</div>
+        </div>
+        <ul class="ch row">
+          <li>① ㄱ</li><li>② ㄷ</li><li>③ ㄱ, ㄴ</li><li>④ ㄴ, ㄷ</li><li>⑤ ㄱ, ㄴ, ㄷ</li>
+        </ul>
+      </div>
     </div>
+
     <div class="col">
-      <p style="text-align:center; font-size:9pt; margin-top:40mm; letter-spacing:0.3em; color:#333;">— 여백 —</p>
+      <!-- 7. II-01 -->
+      <div class="qq">
+        <p class="stem"><b class="qn">7.</b>그림은 실험실에서 얻은 수소와 헬륨의 방출 스펙트럼과, 별 P, Q의 흡수 스펙트럼을 나타낸 것이다.</p>
+        <figure>
+          <svg width="300" height="124" viewBox="0 0 300 124" font-family="PC Serif, PC Sans, serif">
+            <defs>
+              <linearGradient id="g7" x1="0" y1="0" x2="1" y2="0">
+                <stop offset="0" stop-color="#7B2FBE"/><stop offset="0.18" stop-color="#2C58C9"/><stop offset="0.38" stop-color="#1FA34A"/>
+                <stop offset="0.56" stop-color="#E8D02A"/><stop offset="0.75" stop-color="#E8792A"/><stop offset="1" stop-color="#D6303B"/>
+              </linearGradient>
+            </defs>
+            <g font-size="9" font-weight="700"><text x="0" y="17">수소</text><text x="0" y="45">헬륨</text><text x="0" y="73">별 P</text><text x="0" y="101">별 Q</text></g>
+            <rect x="44" y="4" width="252" height="18" fill="#14181F"/>
+            <rect x="78.5" y="4" width="3" height="18" fill="#4A62E8"/><rect x="138.5" y="4" width="3" height="18" fill="#35C46A"/><rect x="248.5" y="4" width="3" height="18" fill="#F0703A"/>
+            <rect x="44" y="32" width="252" height="18" fill="#14181F"/>
+            <rect x="108.5" y="32" width="3" height="18" fill="#3A8FE0"/><rect x="203.5" y="32" width="3" height="18" fill="#F0C030"/>
+            <rect x="44" y="60" width="252" height="18" fill="url(#g7)"/>
+            <rect x="78.5" y="60" width="3" height="18" fill="#14181F"/><rect x="138.5" y="60" width="3" height="18" fill="#14181F"/><rect x="248.5" y="60" width="3" height="18" fill="#14181F"/>
+            <rect x="44" y="88" width="252" height="18" fill="url(#g7)"/>
+            <rect x="78.5" y="88" width="3" height="18" fill="#14181F"/><rect x="108.5" y="88" width="3" height="18" fill="#14181F"/><rect x="138.5" y="88" width="3" height="18" fill="#14181F"/><rect x="203.5" y="88" width="3" height="18" fill="#14181F"/><rect x="248.5" y="88" width="3" height="18" fill="#14181F"/>
+            <text x="44" y="120" font-size="8.2">← 파장 짧음</text><text x="296" y="120" text-anchor="end" font-size="8.2">파장 긺 →</text>
+          </svg>
+        </figure>
+        <p class="stem">이에 대한 설명으로 옳은 것만을 &lt;보기&gt;에서 있는 대로 고른 것은? <span class="pts">[2점]</span></p>
+        <div class="bogi">
+          <div class="bt">&lt; 보 기 &gt;</div>
+          <div class="it">ㄱ. P와 Q의 스펙트럼은 모두 연속 스펙트럼 위에 검은 선이 나타난 흡수 스펙트럼이다.</div>
+          <div class="it">ㄴ. 헬륨은 P와 Q 중 Q의 대기에서만 검출된다.</div>
+          <div class="it">ㄷ. P에서 헬륨이 검출되지 않는 것은 헬륨의 방출선과 같은 위치에 P의 흡수선이 없기 때문이다.</div>
+        </div>
+        <ul class="ch row">
+          <li>① ㄱ</li><li>② ㄷ</li><li>③ ㄱ, ㄴ</li><li>④ ㄴ, ㄷ</li><li>⑤ ㄱ, ㄴ, ㄷ</li>
+        </ul>
+      </div>
+
+      <!-- 8. II-02 -->
+      <div class="qq">
+        <p class="stem"><b class="qn">8.</b>다음은 태양계와 지구가 형성되는 과정에서 일어난 사건 (가)~(라)를 순서 없이 나타낸 것이다.</p>
+        <div class="dta">
+          <div class="it">(가) 원반의 티끌이 뭉쳐 미행성체가 되고, 미행성체들이 충돌·합체하며 행성으로 성장하였다.</div>
+          <div class="it">(나) 성운이 수축하며 회전이 빨라져 납작한 원반이 되었고, 중심부에서 원시 태양이 자랐다.</div>
+          <div class="it">(다) 이전 세대의 별들이 만든 원소가 섞인 성운이 수축하기 시작하였다.</div>
+          <div class="it">(라) 마그마 바다 상태였던 지구에서 무거운 철이 중심으로 가라앉아 핵이 되었다.</div>
+        </div>
+        <p class="stem">(가)~(라)를 일어난 순서대로 옳게 나열한 것은? <span class="pts">[1.5점]</span></p>
+        <ul class="ch">
+          <li>① (다) → (나) → (가) → (라)</li>
+          <li>② (다) → (가) → (나) → (라)</li>
+          <li>③ (나) → (다) → (가) → (라)</li>
+          <li>④ (나) → (가) → (다) → (라)</li>
+          <li>⑤ (라) → (다) → (나) → (가)</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div class="cont-note">▶ 다음 면에 계속</div>
+  <div class="exam-foot"><span>이 문제지의 저작권은 박찬 과학학원에 있습니다.</span><span class="pg">2</span><span>박찬 과학 앱에서 전 문항 해설 제공</span></div>
+</div>
+
+<!-- ════════ 3면 (9~12번) ════════ -->
+<div class="sheet">
+  <div class="runsubj"><span class="s">과학탐구 영역 ( 통합과학 1 )</span><span class="r">박찬 과학 실전 모의고사 · 제1회</span></div>
+  <div class="twocol">
+    <div class="col">
+      <!-- 9. II-02 -->
+      <div class="qq">
+        <p class="stem"><b class="qn">9.</b>그림 (가)와 (나)는 질량이 태양 정도인 별과 태양의 10배 이상인 별의 진화 후기 내부 구조를 순서 없이 단순하게 나타낸 것이다.</p>
+        <figure>
+          <svg width="300" height="100" viewBox="0 0 300 100" font-family="PC Serif, PC Sans, serif">
+            <g stroke="#000" stroke-width="0.8">
+              <path d="M9,80 A66,66 0 0 1 141,80 Z" fill="#F4F4F4"/>
+              <path d="M27,80 A48,48 0 0 1 123,80 Z" fill="#DCDCDC"/>
+              <path d="M45,80 A30,30 0 0 1 105,80 Z" fill="#BEBEBE"/>
+              <path d="M157,80 A68,68 0 0 1 293,80 Z" fill="#F4F4F4"/>
+              <path d="M169,80 A56,56 0 0 1 281,80 Z" fill="#E4E4E4"/>
+              <path d="M181,80 A44,44 0 0 1 269,80 Z" fill="#D0D0D0"/>
+              <path d="M197,80 A28,28 0 0 1 253,80 Z" fill="#BBBBBB"/>
+              <path d="M209,80 A16,16 0 0 1 241,80 Z" fill="#9A9A9A"/>
+            </g>
+            <g font-size="8.2" text-anchor="middle">
+              <text x="75" y="27">수소</text><text x="75" y="45">헬륨</text><text x="75" y="72">탄소·산소</text>
+              <text x="225" y="22">수소</text><text x="225" y="34">헬륨</text><text x="225" y="50">탄소·산소</text><text x="225" y="62">규소</text><text x="225" y="76" font-weight="700">철</text>
+            </g>
+            <g font-size="9.4" font-weight="800" text-anchor="middle"><text x="75" y="96">(가)</text><text x="225" y="96">(나)</text></g>
+          </svg>
+        </figure>
+        <p class="stem">이에 대한 설명으로 옳은 것만을 &lt;보기&gt;에서 있는 대로 고른 것은? <span class="pts">[2.5점]</span></p>
+        <div class="bogi">
+          <div class="bt">&lt; 보 기 &gt;</div>
+          <div class="it">ㄱ. (가)는 질량이 태양의 10배 이상인 별이다.</div>
+          <div class="it">ㄴ. (가)의 중심부에 있는 탄소는 헬륨 원자핵이 융합하여 만들어졌다.</div>
+          <div class="it">ㄷ. (나)의 별이 최후에 초신성 폭발을 일으킬 때 철보다 무거운 원소가 만들어진다.</div>
+        </div>
+        <ul class="ch row">
+          <li>① ㄱ</li><li>② ㄷ</li><li>③ ㄱ, ㄴ</li><li>④ ㄴ, ㄷ</li><li>⑤ ㄱ, ㄴ, ㄷ</li>
+        </ul>
+      </div>
+
+      <!-- 10. II-03 -->
+      <div class="qq">
+        <p class="stem"><b class="qn">10.</b>그림은 원자 A~D의 전자 배치를 모형으로 나타낸 것이다.</p>
+        <figure>
+          <svg width="300" height="94" viewBox="0 0 300 94" font-family="PC Serif, PC Sans, serif">
+<g><circle cx="38" cy="42" r="13" fill="none" stroke="#000" stroke-width="0.8"/><circle cx="38" cy="42" r="23" fill="none" stroke="#000" stroke-width="0.8"/><circle cx="38" cy="42" r="5" fill="#555"/><g fill="#000"><circle cx="51.0" cy="42.0" r="2.3"/><circle cx="25.0" cy="42.0" r="2.3"/><circle cx="38.0" cy="19.0" r="2.3"/><circle cx="56.0" cy="27.7" r="2.3"/><circle cx="60.4" cy="47.1" r="2.3"/><circle cx="48.0" cy="62.7" r="2.3"/><circle cx="28.0" cy="62.7" r="2.3"/><circle cx="15.6" cy="47.1" r="2.3"/><circle cx="20.0" cy="27.7" r="2.3"/></g><text x="38" y="91" text-anchor="middle" font-size="9.4" font-weight="800">A</text></g>
+<g><circle cx="113" cy="42" r="13" fill="none" stroke="#000" stroke-width="0.8"/><circle cx="113" cy="42" r="23" fill="none" stroke="#000" stroke-width="0.8"/><circle cx="113" cy="42" r="33" fill="none" stroke="#000" stroke-width="0.8"/><circle cx="113" cy="42" r="5" fill="#555"/><g fill="#000"><circle cx="126.0" cy="42.0" r="2.3"/><circle cx="100.0" cy="42.0" r="2.3"/><circle cx="113.0" cy="19.0" r="2.3"/><circle cx="129.3" cy="25.7" r="2.3"/><circle cx="136.0" cy="42.0" r="2.3"/><circle cx="129.3" cy="58.3" r="2.3"/><circle cx="113.0" cy="65.0" r="2.3"/><circle cx="96.7" cy="58.3" r="2.3"/><circle cx="90.0" cy="42.0" r="2.3"/><circle cx="96.7" cy="25.7" r="2.3"/><circle cx="113.0" cy="9.0" r="2.3"/><circle cx="138.8" cy="21.4" r="2.3"/><circle cx="145.2" cy="49.3" r="2.3"/><circle cx="127.3" cy="71.7" r="2.3"/><circle cx="98.7" cy="71.7" r="2.3"/><circle cx="80.8" cy="49.3" r="2.3"/><circle cx="87.2" cy="21.4" r="2.3"/></g><text x="113" y="91" text-anchor="middle" font-size="9.4" font-weight="800">B</text></g>
+<g><circle cx="188" cy="42" r="13" fill="none" stroke="#000" stroke-width="0.8"/><circle cx="188" cy="42" r="23" fill="none" stroke="#000" stroke-width="0.8"/><circle cx="188" cy="42" r="5" fill="#555"/><g fill="#000"><circle cx="201.0" cy="42.0" r="2.3"/><circle cx="175.0" cy="42.0" r="2.3"/><circle cx="188.0" cy="19.0" r="2.3"/><circle cx="207.9" cy="30.5" r="2.3"/><circle cx="207.9" cy="53.5" r="2.3"/><circle cx="188.0" cy="65.0" r="2.3"/><circle cx="168.1" cy="53.5" r="2.3"/><circle cx="168.1" cy="30.5" r="2.3"/></g><text x="188" y="91" text-anchor="middle" font-size="9.4" font-weight="800">C</text></g>
+<g><circle cx="262" cy="42" r="13" fill="none" stroke="#000" stroke-width="0.8"/><circle cx="262" cy="42" r="23" fill="none" stroke="#000" stroke-width="0.8"/><circle cx="262" cy="42" r="33" fill="none" stroke="#000" stroke-width="0.8"/><circle cx="262" cy="42" r="5" fill="#555"/><g fill="#000"><circle cx="275.0" cy="42.0" r="2.3"/><circle cx="249.0" cy="42.0" r="2.3"/><circle cx="262.0" cy="19.0" r="2.3"/><circle cx="278.3" cy="25.7" r="2.3"/><circle cx="285.0" cy="42.0" r="2.3"/><circle cx="278.3" cy="58.3" r="2.3"/><circle cx="262.0" cy="65.0" r="2.3"/><circle cx="245.7" cy="58.3" r="2.3"/><circle cx="239.0" cy="42.0" r="2.3"/><circle cx="245.7" cy="25.7" r="2.3"/><circle cx="262.0" cy="9.0" r="2.3"/></g><text x="262" y="91" text-anchor="middle" font-size="9.4" font-weight="800">D</text></g>
+          </svg>
+        </figure>
+        <p class="stem">이에 대한 설명으로 옳은 것만을 &lt;보기&gt;에서 있는 대로 고른 것은? (단, A~D는 임의의 원소 기호이다.) <span class="pts">[2.5점]</span></p>
+        <div class="bogi">
+          <div class="bt">&lt; 보 기 &gt;</div>
+          <div class="it">ㄱ. A와 D는 같은 족 원소이다.</div>
+          <div class="it">ㄴ. B와 D가 결합할 때 B는 전자를 잃어 양이온이 된다.</div>
+          <div class="it">ㄷ. C 원자 2개가 결합하여 분자를 만들 때, 두 원자는 전자쌍 2개를 공유한다.</div>
+        </div>
+        <ul class="ch row">
+          <li>① ㄱ</li><li>② ㄷ</li><li>③ ㄱ, ㄴ</li><li>④ ㄴ, ㄷ</li><li>⑤ ㄱ, ㄴ, ㄷ</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="col">
+      <!-- 11. II-03 -->
+      <div class="qq">
+        <p class="stem"><b class="qn">11.</b>그림 (가)는 물 분자의 결합 모형을, (나)는 염화 나트륨 결정 속 이온의 배열을 모형으로 나타낸 것이다. (나)에서 +는 Na<sup>+</sup>을, −는 Cl<sup>−</sup>을 나타낸다.</p>
+        <figure>
+          <svg width="290" height="104" viewBox="0 0 290 104" font-family="PC Serif, PC Sans, serif">
+            <g fill="none" stroke="#000" stroke-width="0.9"><circle cx="72" cy="44" r="24"/><circle cx="50" cy="62" r="13"/><circle cx="94" cy="62" r="13"/></g>
+            <g fill="#000"><circle cx="58.6" cy="58.8" r="1.9"/><circle cx="54.8" cy="54.2" r="1.9"/><circle cx="85.4" cy="58.8" r="1.9"/><circle cx="89.2" cy="54.2" r="1.9"/><circle cx="66" cy="21" r="1.9"/><circle cx="78" cy="21" r="1.9"/><circle cx="67" cy="67.5" r="1.9"/><circle cx="77" cy="67.5" r="1.9"/></g>
+            <g font-size="9.4" font-weight="800" text-anchor="middle"><text x="72" y="44">O</text><text x="47" y="68">H</text><text x="97" y="68">H</text></g>
+            <g stroke="#000" stroke-width="0.8">
+              <circle cx="186" cy="22" r="12" fill="#D9D9D9"/><circle cx="216" cy="22" r="8" fill="#fff"/><circle cx="246" cy="22" r="12" fill="#D9D9D9"/>
+              <circle cx="186" cy="50" r="8" fill="#fff"/><circle cx="216" cy="50" r="12" fill="#D9D9D9"/><circle cx="246" cy="50" r="8" fill="#fff"/>
+              <circle cx="186" cy="78" r="12" fill="#D9D9D9"/><circle cx="216" cy="78" r="8" fill="#fff"/><circle cx="246" cy="78" r="12" fill="#D9D9D9"/>
+            </g>
+            <g font-size="9" font-weight="700" text-anchor="middle">
+              <text x="186" y="25">−</text><text x="216" y="25">+</text><text x="246" y="25">−</text>
+              <text x="186" y="53">+</text><text x="216" y="53">−</text><text x="246" y="53">+</text>
+              <text x="186" y="81">−</text><text x="216" y="81">+</text><text x="246" y="81">−</text>
+            </g>
+            <g font-size="9.4" font-weight="800" text-anchor="middle"><text x="72" y="100">(가)</text><text x="216" y="100">(나)</text></g>
+          </svg>
+        </figure>
+        <p class="stem">이에 대한 설명으로 옳은 것만을 &lt;보기&gt;에서 있는 대로 고른 것은? <span class="pts">[2점]</span></p>
+        <div class="bogi">
+          <div class="bt">&lt; 보 기 &gt;</div>
+          <div class="it">ㄱ. (가)에서 수소 원자는 전자를 잃고 양이온이 되어 산소와 결합한다.</div>
+          <div class="it">ㄴ. (나)에서 Na<sup>+</sup>과 Cl<sup>−</sup>은 정전기적 인력으로 결합한다.</div>
+          <div class="it">ㄷ. (가)의 산소 원자와 (나)의 Cl<sup>−</sup>은 모두 비활성 기체와 같은 전자 배치를 이룬다.</div>
+        </div>
+        <ul class="ch row">
+          <li>① ㄱ</li><li>② ㄷ</li><li>③ ㄱ, ㄴ</li><li>④ ㄴ, ㄷ</li><li>⑤ ㄱ, ㄴ, ㄷ</li>
+        </ul>
+      </div>
+
+      <!-- 12. II-03 + II-05 탐구 -->
+      <div class="qq">
+        <p class="stem"><b class="qn">12.</b>다음은 물질의 전기 전도성을 알아보는 실험이다.</p>
+        <div class="dta">
+          <div class="dt">[실험 과정]</div>
+          <div class="it">(가) 전지, 발광 다이오드(LED), 전극을 연결하여 전기 전도성 측정 장치를 만든다.</div>
+          <div class="it">(나) 고체 물질 A~C에 각각 전극을 대고 LED가 켜지는지 관찰한다.</div>
+          <div class="it">(다) A~C 중 물에 녹는 물질은 증류수에 녹인 뒤, 수용액에 전극을 넣고 LED가 켜지는지 관찰한다.</div>
+          <div class="dt" style="margin-top:1.2mm;">[실험 결과]</div>
+          <svg width="290" height="78" viewBox="0 0 290 78" font-family="PC Serif, PC Sans, serif" style="display:block; margin:1mm auto 0;">
+            <rect x="1" y="2" width="288" height="20" fill="#EDEDED"/>
+            <rect x="1" y="2" width="288" height="74" fill="none" stroke="#000" stroke-width="1"/>
+            <g stroke="#000" stroke-width="0.8"><line x1="1" y1="22" x2="289" y2="22"/><line x1="1" y1="40" x2="289" y2="40"/><line x1="1" y1="58" x2="289" y2="58"/><line x1="57" y1="2" x2="57" y2="76"/><line x1="173" y1="2" x2="173" y2="76"/></g>
+            <g font-size="9" text-anchor="middle">
+              <text x="29" y="16" font-weight="700">물질</text><text x="115" y="16" font-weight="700" font-size="8.6">고체에 전극을 댈 때</text><text x="231" y="16" font-weight="700" font-size="8.6">수용액에 전극을 넣을 때</text>
+              <text x="29" y="35">A</text><text x="115" y="35">켜짐</text><text x="231" y="35">물에 녹지 않음</text>
+              <text x="29" y="53">B</text><text x="115" y="53">꺼짐</text><text x="231" y="53">켜짐</text>
+              <text x="29" y="71">C</text><text x="115" y="71">꺼짐</text><text x="231" y="71">꺼짐</text>
+            </g>
+          </svg>
+        </div>
+        <p class="stem">A~C는 구리, 염화 나트륨, 설탕을 순서 없이 나타낸 것이다. 이에 대한 설명으로 옳은 것만을 &lt;보기&gt;에서 있는 대로 고른 것은? <span class="pts">[2.5점]</span></p>
+        <div class="bogi">
+          <div class="bt">&lt; 보 기 &gt;</div>
+          <div class="it">ㄱ. A는 자유 전자가 많아 전기가 잘 통하는 도체이다.</div>
+          <div class="it">ㄴ. B의 수용액에서 LED가 켜진 것은 B가 물에 녹을 때 이온이 새로 만들어졌기 때문이다.</div>
+          <div class="it">ㄷ. C는 수용액에서 이온으로 나뉘어 존재한다.</div>
+        </div>
+        <ul class="ch row">
+          <li>① ㄱ</li><li>② ㄷ</li><li>③ ㄱ, ㄴ</li><li>④ ㄴ, ㄷ</li><li>⑤ ㄱ, ㄴ, ㄷ</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div class="cont-note">▶ 다음 면에 계속</div>
+  <div class="exam-foot"><span>이 문제지의 저작권은 박찬 과학학원에 있습니다.</span><span class="pg">3</span><span>박찬 과학 앱에서 전 문항 해설 제공</span></div>
+</div>
+
+<!-- ════════ 4면 (13~18번) ════════ -->
+<div class="sheet">
+  <div class="runsubj"><span class="s">과학탐구 영역 ( 통합과학 1 )</span><span class="r">박찬 과학 실전 모의고사 · 제1회</span></div>
+  <div class="twocol">
+    <div class="col">
+      <!-- 13. II-04 -->
+      <div class="qq">
+        <p class="stem"><b class="qn">13.</b>지각과 생명체를 이루는 물질에 대한 설명으로 옳은 것은? <span class="pts">[1.5점]</span></p>
+        <ul class="ch">
+          <li>① 단백질은 규산염 사면체가 반복 결합하여 만들어진다.</li>
+          <li>② 흑운모는 사면체가 사방으로 연결된 망상 구조이다.</li>
+          <li>③ 핵산의 기본 단위체는 아미노산이다.</li>
+          <li>④ 단백질의 기능은 아미노산 배열 순서와 무관하다.</li>
+          <li>⑤ 석영과 감람석은 규산염 사면체의 결합 방식이 다르다.</li>
+        </ul>
+      </div>
+
+      <!-- 14. II-04 -->
+      <div class="qq">
+        <p class="stem"><b class="qn">14.</b>그림은 어떤 DNA 조각을 이루는 두 가닥 Ⅰ, Ⅱ의 염기 서열과 염기 사이의 짝을 나타낸 것이다.</p>
+        <figure>
+          <svg width="300" height="82" viewBox="0 0 300 82" font-family="PC Serif, PC Sans, serif">
+            <g stroke="#000" stroke-width="1.2"><line x1="50" y1="16" x2="282" y2="16"/><line x1="50" y1="64" x2="282" y2="64"/></g>
+            <g stroke="#000" stroke-width="0.9" stroke-dasharray="3 2"><line x1="70" y1="26" x2="70" y2="54"/><line x1="108" y1="26" x2="108" y2="54"/><line x1="146" y1="26" x2="146" y2="54"/><line x1="184" y1="26" x2="184" y2="54"/><line x1="222" y1="26" x2="222" y2="54"/><line x1="260" y1="26" x2="260" y2="54"/></g>
+            <g fill="#fff" stroke="#000" stroke-width="0.9">
+              <rect x="57" y="6" width="26" height="20" rx="2"/><rect x="95" y="6" width="26" height="20" rx="2"/><rect x="133" y="6" width="26" height="20" rx="2"/><rect x="171" y="6" width="26" height="20" rx="2"/><rect x="209" y="6" width="26" height="20" rx="2"/><rect x="247" y="6" width="26" height="20" rx="2"/>
+              <rect x="57" y="54" width="26" height="20" rx="2"/><rect x="95" y="54" width="26" height="20" rx="2"/><rect x="133" y="54" width="26" height="20" rx="2"/><rect x="171" y="54" width="26" height="20" rx="2"/><rect x="209" y="54" width="26" height="20" rx="2"/><rect x="247" y="54" width="26" height="20" rx="2"/>
+            </g>
+            <g font-size="9.4" font-weight="800" text-anchor="middle">
+              <text x="70" y="20">T</text><text x="108" y="20">G</text><text x="146" y="20">A</text><text x="184" y="20">C</text><text x="222" y="20">G</text><text x="260" y="20">A</text>
+              <text x="70" y="68">㉠</text><text x="108" y="68">C</text><text x="146" y="68">㉡</text><text x="184" y="68">G</text><text x="222" y="68">㉢</text><text x="260" y="68">T</text>
+              <text x="30" y="20">Ⅰ</text><text x="30" y="68">Ⅱ</text>
+            </g>
+          </svg>
+        </figure>
+        <p class="stem">이에 대한 설명으로 옳은 것만을 &lt;보기&gt;에서 있는 대로 고른 것은? <span class="pts">[2점]</span></p>
+        <div class="bogi">
+          <div class="bt">&lt; 보 기 &gt;</div>
+          <div class="it">ㄱ. ㉠은 아데닌(A)이다.</div>
+          <div class="it">ㄴ. Ⅰ과 Ⅱ의 염기 12개 중 구아닌(G)은 3개이다.</div>
+          <div class="it">ㄷ. Ⅱ에서 사이토신(C)은 1개이다.</div>
+        </div>
+        <ul class="ch row">
+          <li>① ㄱ</li><li>② ㄷ</li><li>③ ㄱ, ㄴ</li><li>④ ㄴ, ㄷ</li><li>⑤ ㄱ, ㄴ, ㄷ</li>
+        </ul>
+      </div>
+
+      <!-- 15. II-05 대화 -->
+      <div class="qq">
+        <p class="stem"><b class="qn">15.</b>다음은 물질의 전기적 성질과 신소재에 대해 학생 A, B, C가 나눈 대화이다. <span class="pts">[2점]</span></p>
+        <div class="bogi">
+          <div class="it"><b>학생 A :</b> 탄소 나노 튜브는 그래핀을 둥글게 만 모양으로, 가벼우면서 강도가 커.</div>
+          <div class="it"><b>학생 B :</b> 발광 다이오드(LED)는 전류를 한 방향으로만 흐르게 하면서 빛을 내는 반도체 소자야.</div>
+          <div class="it"><b>학생 C :</b> 초전도체는 임계 온도보다 높은 온도에서 전기 저항이 0이 돼.</div>
+        </div>
+        <p class="stem" style="margin-top:1.5mm;">제시한 내용이 옳은 학생만을 있는 대로 고른 것은?</p>
+        <ul class="ch row">
+          <li>① A</li><li>② C</li><li>③ A, B</li><li>④ B, C</li><li>⑤ A, B, C</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="col">
+      <!-- 16. III-01 -->
+      <div class="qq">
+        <p class="stem"><b class="qn">16.</b>지구시스템의 에너지원과 그 에너지원이 주로 일으키는 현상을 옳게 짝지은 것은? <span class="pts">[1.5점]</span></p>
+        <ul class="ch">
+          <li>① 태양 에너지 — 화산 활동</li>
+          <li>② 지구 내부 에너지 — 판의 이동</li>
+          <li>③ 조력 에너지 — 광합성</li>
+          <li>④ 지구 내부 에너지 — 밀물과 썰물</li>
+          <li>⑤ 조력 에너지 — 태풍의 발생</li>
+        </ul>
+      </div>
+
+      <!-- 17. III-01 -->
+      <div class="qq">
+        <p class="stem"><b class="qn">17.</b>그림은 나무 한 그루와 주변 권역 사이에서 일어나는 물질의 이동 (가)~(다)를 나타낸 것이다.</p>
+        <figure>
+          <svg width="300" height="122" viewBox="0 0 300 122" font-family="PC Serif, PC Sans, serif">
+            <defs><marker id="m17" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="#000"/></marker></defs>
+            <rect x="4" y="86" width="292" height="32" fill="#EEEEEE"/>
+            <line x1="4" y1="86" x2="296" y2="86" stroke="#000" stroke-width="1.2"/>
+            <g stroke="#8B6B4A" stroke-width="2" fill="none"><path d="M148,86 L128,108"/><path d="M148,86 L148,112"/><path d="M148,86 L170,106"/></g>
+            <rect x="141" y="52" width="14" height="34" fill="#8B6B4A"/>
+            <ellipse cx="148" cy="36" rx="50" ry="28" fill="#CFE3C8" stroke="#4E7D45" stroke-width="1"/>
+            <line x1="64" y1="104" x2="122" y2="104" stroke="#000" stroke-width="1.2" marker-end="url(#m17)"/>
+            <line x1="106" y1="26" x2="68" y2="11" stroke="#000" stroke-width="1.2" marker-end="url(#m17)"/>
+            <line x1="240" y1="10" x2="199" y2="25" stroke="#000" stroke-width="1.2" marker-end="url(#m17)"/>
+            <g font-size="8.6"><text x="8" y="108">토양 속 양분</text><text x="62" y="15" text-anchor="end">수증기</text><text x="244" y="14">이산화 탄소</text></g>
+            <g font-size="9" font-weight="700"><text x="88" y="99">(가)</text><text x="80" y="33">(나)</text><text x="210" y="33">(다)</text></g>
+          </svg>
+        </figure>
+        <p class="stem">이에 대한 설명으로 옳은 것만을 &lt;보기&gt;에서 있는 대로 고른 것은? <span class="pts">[2점]</span></p>
+        <div class="bogi">
+          <div class="bt">&lt; 보 기 &gt;</div>
+          <div class="it">ㄱ. (가)는 지권과 생물권 사이의 상호작용이다.</div>
+          <div class="it">ㄴ. (나)에 의해 물이 생물권에서 기권으로 이동한다.</div>
+          <div class="it">ㄷ. (나)와 (다)는 모두 생물권과 기권 사이의 이동이다.</div>
+        </div>
+        <ul class="ch row">
+          <li>① ㄱ</li><li>② ㄷ</li><li>③ ㄱ, ㄴ</li><li>④ ㄴ, ㄷ</li><li>⑤ ㄱ, ㄴ, ㄷ</li>
+        </ul>
+      </div>
+
+      <!-- 18. III-02 -->
+      <div class="qq">
+        <p class="stem"><b class="qn">18.</b>그림은 어느 지역의 판 경계 X, Y, Z와 판의 이동 방향(화살표)을 위에서 본 모습으로 나타낸 것이다.</p>
+        <figure>
+          <svg width="300" height="130" viewBox="0 0 300 130" font-family="PC Serif, PC Sans, serif">
+            <defs><marker id="m18" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="#000"/></marker></defs>
+            <rect x="2" y="4" width="234" height="122" fill="#F2F2F2"/>
+            <rect x="236" y="4" width="62" height="122" fill="#D5D5D5"/>
+            <rect x="2" y="4" width="296" height="122" fill="none" stroke="#000" stroke-width="0.8"/>
+            <g stroke="#000" stroke-width="1.3"><line x1="76" y1="4" x2="76" y2="64"/><line x1="81" y1="4" x2="81" y2="64"/><line x1="150" y1="64" x2="150" y2="126"/><line x1="155" y1="64" x2="155" y2="126"/></g>
+            <line x1="81" y1="64" x2="150" y2="64" stroke="#000" stroke-width="1.6"/>
+            <line x1="236" y1="4" x2="236" y2="126" stroke="#000" stroke-width="2"/>
+            <g stroke="#000" stroke-width="1.3" marker-end="url(#m18)">
+              <line x1="58" y1="32" x2="26" y2="32"/><line x1="132" y1="98" x2="100" y2="98"/>
+              <line x1="104" y1="32" x2="136" y2="32"/><line x1="182" y1="32" x2="214" y2="32"/><line x1="176" y1="98" x2="208" y2="98"/>
+            </g>
+            <g font-size="9.4" font-weight="800" text-anchor="middle"><text x="93" y="17">X</text><text x="115" y="58">Y</text><text x="226" y="17">Z</text></g>
+            <g font-size="8.6" text-anchor="middle"><text x="40" y="86">해양판</text><text x="196" y="66">해양판</text><text x="267" y="69">대륙판</text></g>
+          </svg>
+        </figure>
+        <p class="stem">이에 대한 설명으로 옳은 것만을 &lt;보기&gt;에서 있는 대로 고른 것은? <span class="pts">[2.5점]</span></p>
+        <div class="bogi">
+          <div class="bt">&lt; 보 기 &gt;</div>
+          <div class="it">ㄱ. X에는 해령이 발달한다.</div>
+          <div class="it">ㄴ. Y에서는 마그마가 만들어져 화산 활동이 활발하다.</div>
+          <div class="it">ㄷ. Z에서는 X에서처럼 새로운 판이 만들어진다.</div>
+        </div>
+        <ul class="ch row">
+          <li>① ㄱ</li><li>② ㄷ</li><li>③ ㄱ, ㄴ</li><li>④ ㄴ, ㄷ</li><li>⑤ ㄱ, ㄴ, ㄷ</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div class="cont-note">▶ 다음 면에 계속</div>
+  <div class="exam-foot"><span>이 문제지의 저작권은 박찬 과학학원에 있습니다.</span><span class="pg">4</span><span>박찬 과학 앱에서 전 문항 해설 제공</span></div>
+</div>
+
+<!-- ════════ 5면 (19~22번) ════════ -->
+<div class="sheet">
+  <div class="runsubj"><span class="s">과학탐구 영역 ( 통합과학 1 )</span><span class="r">박찬 과학 실전 모의고사 · 제1회</span></div>
+  <div class="twocol">
+    <div class="col">
+      <!-- 19. III-02 -->
+      <div class="qq">
+        <p class="stem"><b class="qn">19.</b>그림은 판 경계 부근의 지권에서 일어난 변동이 지구시스템에 영향을 미치는 사례 (가)~(다)를 나타낸 것이다.</p>
+        <figure>
+          <svg width="300" height="104" viewBox="0 0 300 104" font-family="PC Serif, PC Sans, serif">
+            <defs><marker id="m19" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="#000"/></marker></defs>
+            <g fill="#fff" stroke="#000" stroke-width="1"><rect x="20" y="2" width="62" height="30" rx="2"/><rect x="100" y="2" width="86" height="30" rx="2"/><rect x="202" y="2" width="96" height="30" rx="2"/><rect x="20" y="36" width="62" height="30" rx="2"/><rect x="100" y="36" width="86" height="30" rx="2"/><rect x="202" y="36" width="96" height="30" rx="2"/><rect x="20" y="70" width="62" height="30" rx="2"/><rect x="100" y="70" width="86" height="30" rx="2"/><rect x="202" y="70" width="96" height="30" rx="2"/></g>
+            <g stroke="#000" stroke-width="1.1" marker-end="url(#m19)"><line x1="84" y1="17" x2="96" y2="17"/><line x1="188" y1="17" x2="198" y2="17"/><line x1="84" y1="51" x2="96" y2="51"/><line x1="188" y1="51" x2="198" y2="51"/><line x1="84" y1="85" x2="96" y2="85"/><line x1="188" y1="85" x2="198" y2="85"/></g>
+            <g font-size="8.6" text-anchor="middle"><text x="9" y="21" font-size="9" font-weight="700">(가)</text><text x="51" y="21" font-weight="700">해저 지진</text><text x="143" y="21">지진 해일</text><text x="250" y="14">해안 마을·농경지</text><text x="250" y="27">침수</text><text x="9" y="55" font-size="9" font-weight="700">(나)</text><text x="51" y="55" font-weight="700">화산 분출</text><text x="143" y="48">화산재·화산 기체</text><text x="143" y="61">대기로 확산</text><text x="250" y="48">햇빛 차단</text><text x="250" y="61">기온 일시 하강</text><text x="9" y="89" font-size="9" font-weight="700">(다)</text><text x="51" y="89" font-weight="700">화산 지대</text><text x="143" y="89">땅속의 높은 열</text><text x="250" y="89">지열 발전</text></g>
+          </svg>
+        </figure>
+        <p class="stem">이에 대한 설명으로 옳은 것만을 &lt;보기&gt;에서 있는 대로 고른 것은? <span class="pts">[2점]</span></p>
+        <div class="bogi">
+          <div class="bt">&lt; 보 기 &gt;</div>
+          <div class="it">ㄱ. (가)와 (나)는 모두 지권에서 변화가 시작되었다.</div>
+          <div class="it">ㄴ. (다)는 지권의 에너지를 이롭게 이용한 예이다.</div>
+          <div class="it">ㄷ. (가)~(다)의 근본 에너지원은 태양 에너지이다.</div>
+        </div>
+        <ul class="ch row">
+          <li>① ㄱ</li><li>② ㄷ</li><li>③ ㄱ, ㄴ</li><li>④ ㄴ, ㄷ</li><li>⑤ ㄱ, ㄴ, ㄷ</li>
+        </ul>
+      </div>
+
+      <!-- 20. III-03 대화 -->
+      <div class="qq">
+        <p class="stem"><b class="qn">20.</b>다음은 중력과 운동에 대해 학생 A, B, C가 나눈 대화이다. (단, 공기 저항은 무시한다.) <span class="pts">[1.5점]</span></p>
+        <div class="bogi">
+          <div class="it"><b>학생 A :</b> 자유 낙하 하는 공은 떨어지는 동안 일정한 속력으로 움직여.</div>
+          <div class="it"><b>학생 B :</b> 지구에서 가만히 놓은 공은 3초 뒤 속력이 약 29.4&nbsp;m/s가 돼.</div>
+          <div class="it"><b>학생 C :</b> 질량 60&nbsp;kg인 사람이 달에 가면 질량은 그대로이고, 무게는 지구에서의 약 1/6이 돼.</div>
+        </div>
+        <p class="stem" style="margin-top:1.5mm;">제시한 내용이 옳은 학생만을 있는 대로 고른 것은?</p>
+        <ul class="ch row">
+          <li>① A</li><li>② C</li><li>③ A, B</li><li>④ B, C</li><li>⑤ A, B, C</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="col">
+      <!-- 21. III-03 -->
+      <div class="qq">
+        <p class="stem"><b class="qn">21.</b>그림 (가)와 (나)는 수평면으로부터 일정한 높이에서 수평으로 던진 공의 수평 방향 속력과 연직 방향 속력을 시간에 따라 각각 나타낸 것이다. 공은 던진 지 3초 만에 수평면에 닿았다.</p>
+        <figure>
+          <svg width="300" height="122" viewBox="0 0 300 122" font-family="PC Serif, PC Sans, serif">
+            <g stroke="#000" stroke-width="1.1"><line x1="26" y1="94" x2="140" y2="94"/><line x1="26" y1="94" x2="26" y2="8"/><line x1="180" y1="94" x2="296" y2="94"/><line x1="180" y1="94" x2="180" y2="6"/></g>
+            <g stroke="#888" stroke-width="0.7" stroke-dasharray="2 2"><line x1="104" y1="62" x2="104" y2="94"/><line x1="180" y1="67.3" x2="208" y2="67.3"/><line x1="208" y1="67.3" x2="208" y2="94"/><line x1="180" y1="40.7" x2="236" y2="40.7"/><line x1="236" y1="40.7" x2="236" y2="94"/><line x1="180" y1="14" x2="264" y2="14"/><line x1="264" y1="14" x2="264" y2="94"/></g>
+            <line x1="26" y1="62" x2="104" y2="62" stroke="#000" stroke-width="1.8"/>
+            <line x1="180" y1="94" x2="264" y2="14" stroke="#000" stroke-width="1.8"/>
+            <g font-size="8.6" text-anchor="middle"><text x="52" y="104">1</text><text x="78" y="104">2</text><text x="104" y="104">3</text><text x="208" y="104">1</text><text x="236" y="104">2</text><text x="264" y="104">3</text></g>
+            <g font-size="8.6" text-anchor="end"><text x="22" y="104">0</text><text x="22" y="65">4</text><text x="176" y="104">0</text><text x="176" y="70.3">9.8</text><text x="176" y="43.7">19.6</text><text x="176" y="17">29.4</text></g>
+            <g font-size="8.2"><text x="30" y="11">속력(m/s)</text><text x="184" y="9">속력(m/s)</text><text x="140" y="89" text-anchor="end">시간(s)</text><text x="296" y="89" text-anchor="end">시간(s)</text></g>
+            <g font-size="9" font-weight="700" text-anchor="middle"><text x="79" y="119">(가) 수평 방향</text><text x="238" y="119">(나) 연직 방향</text></g>
+          </svg>
+        </figure>
+        <p class="stem">이에 대한 설명으로 옳은 것만을 &lt;보기&gt;에서 있는 대로 고른 것은? (단, 공기 저항은 무시한다.) <span class="pts">[2.5점]</span></p>
+        <div class="bogi">
+          <div class="bt">&lt; 보 기 &gt;</div>
+          <div class="it">ㄱ. 공은 수평 방향으로 일정하게 빨라지는 운동을 한다.</div>
+          <div class="it">ㄴ. 공이 수평면에 닿을 때까지 수평 방향으로 이동한 거리는 12&nbsp;m이다.</div>
+          <div class="it">ㄷ. 같은 높이에서 공을 더 빠르게 수평으로 던져도, 수평면에 닿을 때까지 3초가 걸린다.</div>
+        </div>
+        <ul class="ch row">
+          <li>① ㄱ</li><li>② ㄷ</li><li>③ ㄱ, ㄴ</li><li>④ ㄴ, ㄷ</li><li>⑤ ㄱ, ㄴ, ㄷ</li>
+        </ul>
+      </div>
+
+      <!-- 22. III-04 -->
+      <div class="qq">
+        <p class="stem"><b class="qn">22.</b>그림은 마찰이 없는 수평면에 정지해 있던 질량 2&nbsp;kg인 물체에 수평 방향으로 작용한 힘의 크기를 시간에 따라 나타낸 것이다. 힘의 방향은 일정하다.</p>
+        <figure>
+          <svg width="230" height="116" viewBox="0 0 230 116" font-family="PC Serif, PC Sans, serif">
+            <rect x="34" y="32" width="120" height="64" fill="#E2E2E2"/>
+            <g stroke="#000" stroke-width="1.1"><line x1="34" y1="96" x2="214" y2="96"/><line x1="34" y1="96" x2="34" y2="12"/></g>
+            <polyline points="34,32 154,32 154,96" fill="none" stroke="#000" stroke-width="1.8"/>
+            <line x1="34" y1="64" x2="154" y2="64" stroke="#888" stroke-width="0.7" stroke-dasharray="2 2"/>
+            <g font-size="8.6" text-anchor="middle"><text x="74" y="108">1</text><text x="114" y="108">2</text><text x="154" y="108">3</text><text x="194" y="108">4</text></g>
+            <g font-size="8.6" text-anchor="end"><text x="29" y="108">0</text><text x="29" y="67">2</text><text x="29" y="35">4</text></g>
+            <g font-size="8.2"><text x="38" y="15">힘(N)</text><text x="228" y="90" text-anchor="end">시간(s)</text></g>
+          </svg>
+        </figure>
+        <p class="stem">이에 대한 설명으로 옳은 것만을 &lt;보기&gt;에서 있는 대로 고른 것은? <span class="pts">[2.5점]</span></p>
+        <div class="bogi">
+          <div class="bt">&lt; 보 기 &gt;</div>
+          <div class="it">ㄱ. 0~3초 동안 물체의 운동량 변화량의 크기는 12&nbsp;kg·m/s이다.</div>
+          <div class="it">ㄴ. 3초일 때 물체의 속력은 6&nbsp;m/s이다.</div>
+          <div class="it">ㄷ. 정지해 있던 이 물체에 2&nbsp;N의 힘을 6초 동안 작용해도 나중 속력은 3초일 때와 같다.</div>
+        </div>
+        <ul class="ch row">
+          <li>① ㄱ</li><li>② ㄷ</li><li>③ ㄱ, ㄴ</li><li>④ ㄴ, ㄷ</li><li>⑤ ㄱ, ㄴ, ㄷ</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div class="cont-note">▶ 다음 면에 계속</div>
+  <div class="exam-foot"><span>이 문제지의 저작권은 박찬 과학학원에 있습니다.</span><span class="pg">5</span><span>박찬 과학 앱에서 전 문항 해설 제공</span></div>
+</div>
+
+<!-- ════════ 6면 (23~25번) ════════ -->
+<div class="sheet">
+  <div class="runsubj"><span class="s">과학탐구 영역 ( 통합과학 1 )</span><span class="r">박찬 과학 실전 모의고사 · 제1회</span></div>
+  <div class="twocol">
+    <div class="col">
+      <!-- 23. III-05 탐구 -->
+      <div class="qq">
+        <p class="stem"><b class="qn">23.</b>다음은 간을 이용한 실험이다. 간에는 과산화 수소를 물과 산소로 분해하는 효소가 들어 있다.</p>
+        <div class="dta">
+          <div class="dt">[실험 과정]</div>
+          <div class="it">(가) 시험관 Ⅰ, Ⅱ에 과산화 수소수를 같은 양 넣는다.</div>
+          <div class="it">(나) Ⅰ에는 생 간 조각을, Ⅱ에는 충분히 삶은 간 조각을 같은 양 넣고 거품의 발생을 관찰한다.</div>
+          <div class="it">(다) Ⅰ에서 거품 발생이 멈추면, Ⅰ에 과산화 수소수를 같은 양 더 넣고 거품의 발생을 관찰한다.</div>
+          <div class="dt" style="margin-top:1.2mm;">[실험 결과]</div>
+          <div class="it">◦ (나) : Ⅰ에서는 거품이 활발하게 발생하였고, Ⅱ에서는 거품이 거의 발생하지 않았다.</div>
+          <div class="it">◦ (다) : Ⅰ에서 거품이 다시 활발하게 발생하였다.</div>
+        </div>
+        <p class="stem">이에 대한 설명으로 옳은 것만을 &lt;보기&gt;에서 있는 대로 고른 것은? <span class="pts">[2점]</span></p>
+        <div class="bogi">
+          <div class="bt">&lt; 보 기 &gt;</div>
+          <div class="it">ㄱ. 발생한 거품은 이산화 탄소 기체이다.</div>
+          <div class="it">ㄴ. 삶은 간 조각에는 효소가 들어 있지 않다.</div>
+          <div class="it">ㄷ. (다)의 결과는 효소가 반응 후에도 소모되지 않고 다시 작용할 수 있음을 보여 준다.</div>
+        </div>
+        <ul class="ch row">
+          <li>① ㄱ</li><li>② ㄷ</li><li>③ ㄱ, ㄴ</li><li>④ ㄴ, ㄷ</li><li>⑤ ㄱ, ㄴ, ㄷ</li>
+        </ul>
+      </div>
+
+      <!-- 24. III-05 -->
+      <div class="qq">
+        <p class="stem"><b class="qn">24.</b>생명 시스템에서 일어나는 화학 반응과 물질 출입에 대한 설명으로 옳은 것만을 &lt;보기&gt;에서 있는 대로 고른 것은? <span class="pts">[1.5점]</span></p>
+        <div class="bogi">
+          <div class="bt">&lt; 보 기 &gt;</div>
+          <div class="it">ㄱ. 세포 호흡은 연소와 달리 체온 정도의 온도에서 여러 단계로 나뉘어 일어난다.</div>
+          <div class="it">ㄴ. 광합성은 크고 복잡한 물질을 작고 간단한 물질로 분해하는 이화 작용이다.</div>
+          <div class="it">ㄷ. 포도당은 막단백질을 거치지 않고 인지질 2중층 사이를 직접 통과한다.</div>
+        </div>
+        <ul class="ch row">
+          <li>① ㄱ</li><li>② ㄷ</li><li>③ ㄱ, ㄴ</li><li>④ ㄴ, ㄷ</li><li>⑤ ㄱ, ㄴ, ㄷ</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="col">
+      <!-- 25. III-06 -->
+      <div class="qq">
+        <p class="stem"><b class="qn">25.</b>그림은 어떤 유전자의 DNA 틀 가닥 일부가 전사와 번역을 거쳐 아미노산 서열로 바뀌는 과정을, 표는 코돈 일부와 그 코돈이 지정하는 아미노산을 나타낸 것이다. 그림의 숫자는 틀 가닥 염기의 순서이다.</p>
+        <figure>
+          <svg width="300" height="104" viewBox="0 0 300 104" font-family="PC Serif, PC Sans, serif">
+            <defs><marker id="m25" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="#000"/></marker></defs>
+            <g font-size="8.2" fill="#555" text-anchor="middle"><text x="96" y="11">1</text><text x="112" y="11">2</text><text x="128" y="11">3</text><text x="152" y="11">4</text><text x="168" y="11">5</text><text x="184" y="11">6</text><text x="208" y="11">7</text><text x="224" y="11">8</text><text x="240" y="11">9</text></g>
+            <g font-size="9.4" font-weight="800" text-anchor="middle"><text x="96" y="27">T</text><text x="112" y="27">A</text><text x="128" y="27">C</text><text x="152" y="27">C</text><text x="168" y="27">T</text><text x="184" y="27">T</text><text x="208" y="27">G</text><text x="224" y="27">T</text><text x="240" y="27">A</text></g>
+            <g font-size="8.6" font-weight="700"><text x="2" y="27">DNA 틀 가닥</text><text x="2" y="64">RNA</text><text x="2" y="98">아미노산</text></g>
+            <g stroke="#000" stroke-width="1.1" marker-end="url(#m25)"><line x1="168" y1="33" x2="168" y2="48"/><line x1="168" y1="68" x2="168" y2="83"/></g>
+            <g font-size="8.6"><text x="176" y="45">전사</text><text x="176" y="80">번역</text></g>
+            <text x="168" y="64" text-anchor="middle" font-size="9.4" font-weight="800">㉠</text>
+            <text x="168" y="98" text-anchor="middle" font-size="9">메싸이오닌 − ㉡ − 히스티딘</text>
+          </svg>
+          <svg width="300" height="64" viewBox="0 0 300 64" font-family="PC Serif, PC Sans, serif" style="margin-top:2mm;">
+            <rect x="1" y="2" width="298" height="20" fill="#EDEDED"/>
+            <rect x="1" y="2" width="298" height="60" fill="none" stroke="#000" stroke-width="1"/>
+            <g stroke="#000" stroke-width="0.8"><line x1="1" y1="22" x2="299" y2="22"/><line x1="1" y1="42" x2="299" y2="42"/><line x1="41" y1="2" x2="41" y2="62"/><line x1="100.3" y1="2" x2="100.3" y2="62"/><line x1="140.3" y1="2" x2="140.3" y2="62"/><line x1="199.7" y1="2" x2="199.7" y2="62"/><line x1="239.7" y1="2" x2="239.7" y2="62"/></g>
+            <g font-size="8.6" text-anchor="middle">
+              <text x="21" y="16" font-weight="700">코돈</text><text x="70.7" y="16" font-weight="700">아미노산</text><text x="120.3" y="16" font-weight="700">코돈</text><text x="170" y="16" font-weight="700">아미노산</text><text x="219.7" y="16" font-weight="700">코돈</text><text x="269.3" y="16" font-weight="700">아미노산</text>
+              <text x="21" y="36">AUG</text><text x="70.7" y="36">메싸이오닌</text><text x="120.3" y="36">GAA</text><text x="170" y="36">글루탐산</text><text x="219.7" y="36">GAG</text><text x="269.3" y="36">글루탐산</text>
+              <text x="21" y="56">CAU</text><text x="70.7" y="56">히스티딘</text><text x="120.3" y="56">GUG</text><text x="170" y="56">발린</text><text x="219.7" y="56">UAC</text><text x="269.3" y="56">타이로신</text>
+            </g>
+          </svg>
+        </figure>
+        <p class="stem">이에 대한 설명으로 옳은 것만을 &lt;보기&gt;에서 있는 대로 고른 것은? <span class="pts">[2.5점]</span></p>
+        <div class="bogi">
+          <div class="bt">&lt; 보 기 &gt;</div>
+          <div class="it">ㄱ. ㉡은 발린이다.</div>
+          <div class="it">ㄴ. ㉠에서 유라실(U)은 3개이다.</div>
+          <div class="it">ㄷ. 틀 가닥의 6번째 염기 T가 C로 바뀌어도 ㉡은 같다.</div>
+        </div>
+        <ul class="ch row">
+          <li>① ㄱ</li><li>② ㄷ</li><li>③ ㄱ, ㄴ</li><li>④ ㄴ, ㄷ</li><li>⑤ ㄱ, ㄴ, ㄷ</li>
+        </ul>
+      </div>
     </div>
   </div>
   <div class="cont-note" style="font-weight:800;">◈ 확인 사항<span style="font-weight:400;"> — 답안지의 해당란에 필요한 내용을 정확히 기입(표기)했는지 확인하시오.</span></div>
-  <div class="exam-foot"><span>이 문제지의 저작권은 박찬 과학학원에 있습니다.</span><span class="pg">2</span><span>박찬 과학 앱에서 전 문항 해설 제공</span></div>
+  <div class="exam-foot"><span>이 문제지의 저작권은 박찬 과학학원에 있습니다.</span><span class="pg">6</span><span>박찬 과학 앱에서 전 문항 해설 제공</span></div>
+</div>
+
+<!-- ════════ 7면 정답과 해설 1 ════════ -->
+<div class="sheet sol-sheet">
+  <div class="runsubj"><span class="s">정답과 해설</span><span class="r">박찬 과학 실전 모의고사 · 제1회 ( 통합과학 1 )</span></div>
+  <div class="sol-head"><span class="stt">정답과 해설</span><span class="sub">틀린 선지는 바로알기로 고쳐 읽고, 화살표(→)의 소단원으로 돌아가 개념부터 다시!</span></div>
+  <table class="anstable">
+    <tr><th>번호</th><td>1</td><td>2</td><td>3</td><td>4</td><td>5</td><td>6</td><td>7</td><td>8</td><td>9</td><td>10</td><td>11</td><td>12</td><td>13</td></tr>
+    <tr><th>정답</th><td class="a">③</td><td class="a">④</td><td class="a">①</td><td class="a">⑤</td><td class="a">②</td><td class="a">③</td><td class="a">⑤</td><td class="a">①</td><td class="a">④</td><td class="a">②</td><td class="a">④</td><td class="a">①</td><td class="a">⑤</td></tr>
+    <tr><th>배점</th><td class="p">1.5</td><td class="p">1.5</td><td class="p">2</td><td class="p">2</td><td class="p">2.5</td><td class="p">1.5</td><td class="p">2</td><td class="p">1.5</td><td class="p">2.5</td><td class="p">2.5</td><td class="p">2</td><td class="p">2.5</td><td class="p">1.5</td></tr>
+    <tr><th>번호</th><td>14</td><td>15</td><td>16</td><td>17</td><td>18</td><td>19</td><td>20</td><td>21</td><td>22</td><td>23</td><td>24</td><td>25</td><td>계</td></tr>
+    <tr><th>정답</th><td class="a">③</td><td class="a">③</td><td class="a">②</td><td class="a">⑤</td><td class="a">①</td><td class="a">③</td><td class="a">④</td><td class="a">④</td><td class="a">⑤</td><td class="a">②</td><td class="a">①</td><td class="a">②</td><td class="p">—</td></tr>
+    <tr><th>배점</th><td class="p">2</td><td class="p">2</td><td class="p">1.5</td><td class="p">2</td><td class="p">2.5</td><td class="p">2</td><td class="p">1.5</td><td class="p">2.5</td><td class="p">2.5</td><td class="p">2</td><td class="p">1.5</td><td class="p">2.5</td><td class="a">50</td></tr>
+  </table>
+  <div class="pts-sum">배점 1.5점 8문항 · 2점 9문항 · 2.5점 8문항 = 총 50점 / 정답 ①~⑤ 각 5문항</div>
+
+  <div class="solcols">
+    <div>
+      <div class="sol"><div class="shead"><span class="sno">1</span><span class="sans">③</span><span class="slink">→ I-01 자연을 재는 눈 — 시간과 공간</span></div>
+        <p>4&nbsp;×&nbsp;10<sup>−7</sup>&nbsp;s는 왕복 시간이므로 편도는 2&nbsp;×&nbsp;10<sup>−7</sup>&nbsp;s(ㄴ). 높이 = 3&nbsp;×&nbsp;10<sup>8</sup>&nbsp;m/s × 2&nbsp;×&nbsp;10<sup>−7</sup>&nbsp;s = 60&nbsp;m(ㄱ).</p>
+        <div class="wrongbox"><div class="wt">바로알기</div><p><b>ㄷ</b> 현재 1&nbsp;m는 빛이 진공에서 1/299&nbsp;792&nbsp;458초 동안 나아간 거리로 정의된다. 미터원기는 과거의 기준이다.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">2</span><span class="sans">④</span><span class="slink">→ I-02 기본량과 단위</span></div>
+        <p>온도의 SI 기본단위는 K(ㄴ). 운동량의 단위 kg·m/s는 kg·m·s를 조합한 유도단위다(ㄷ).</p>
+        <div class="wrongbox"><div class="wt">바로알기</div><p><b>ㄱ</b> ㉠은 kg이다. 질량의 SI 기본단위는 g이 아니라 kg이다.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">3</span><span class="sans">①</span><span class="slink">→ I-03 측정과 어림, 측정 표준</span></div>
+        <p>강수량 10&nbsp;mm = 0.01&nbsp;m이므로 부피 = 100&nbsp;×&nbsp;50&nbsp;×&nbsp;0.01 = 50&nbsp;m<sup>3</sup>(ㄱ).</p>
+        <div class="wrongbox"><div class="wt">바로알기</div><p><b>ㄴ</b> ㉡ = 50&nbsp;m<sup>3</sup> × 1000&nbsp;kg/m<sup>3</sup> = 5&nbsp;×&nbsp;10<sup>4</sup>이다. <b>ㄷ</b> 기준이 다르면 같은 양의 비도 다른 값으로 기록된다. 지역 간 비교에는 공통의 측정 표준이 필요하다.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">4</span><span class="sans">⑤</span><span class="slink">→ I-04 정보와 신호, 디지털 문명</span></div>
+        <p>점의 단계는 1, 2, 3, 3, 2, 0(ㄱ). 4단계는 00·01·10·11의 두 자리로 적는다(ㄴ). 표본화 간격을 좁히면 원래 신호에 가까워지는 대신 데이터의 양이 늘어난다(ㄷ). 모두 옳다.</p></div>
+      <div class="sol"><div class="shead"><span class="sno">5</span><span class="sans">②</span><span class="slink">→ I-01 + I-04 (두 성취기준 통합)</span></div>
+        <p>시간 = 거리 ÷ 속력 = 3&nbsp;×&nbsp;10<sup>5</sup>&nbsp;m ÷ 3&nbsp;×&nbsp;10<sup>8</sup>&nbsp;m/s = 1&nbsp;×&nbsp;10<sup>−3</sup>&nbsp;s(ㄷ).</p>
+        <div class="wrongbox"><div class="wt">바로알기</div><p><b>ㄱ</b> 땅의 흔들림은 연속적으로 변하는 아날로그 신호이다. 변환 장치를 거쳐야 0과 1이 된다. <b>ㄴ</b> 디지털 신호는 0과 1만 구별하면 되므로 잡음에 강하다.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">6</span><span class="sans">③</span><span class="slink">→ II-01 우주의 시작과 원소의 탄생</span></div>
+        <p>거리와 멀어지는 속력이 비례한다(ㄱ). 멀리 있는 은하일수록 빨리 멀어지는 것은 우주가 팽창하고 있다는 증거다(ㄴ).</p>
+        <div class="wrongbox"><div class="wt">바로알기</div><p><b>ㄷ</b> 우주는 팽창하고 있으므로, 과거로 갈수록 은하 사이의 거리는 가까웠다.</p></div></div>
+    </div>
+    <div>
+      <div class="sol"><div class="shead"><span class="sno">7</span><span class="sans">⑤</span><span class="slink">→ II-01 우주의 시작과 원소의 탄생</span></div>
+        <p>P, Q는 연속 스펙트럼 위에 검은 선(흡수선)이 있다(ㄱ). 같은 원소의 방출선과 흡수선은 위치가 같으므로 P에는 수소만, Q에는 수소와 헬륨이 있다(ㄴ, ㄷ). 모두 옳다.</p></div>
+      <div class="sol"><div class="shead"><span class="sno">8</span><span class="sans">①</span><span class="slink">→ II-02 별에서 만들어지는 원소</span></div>
+        <p>성운 수축 시작(다) → 회전 원반과 원시 태양(나) → 미행성체 충돌·성장(가) → 마그마 바다에서 핵 분리(라).</p>
+        <div class="wrongbox"><div class="wt">바로알기</div><p>미행성체는 원반의 티끌이 뭉친 것이므로 (나) 뒤에 생긴다. 핵의 분리는 지구가 행성으로 자란 뒤의 일이다.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">9</span><span class="sans">④</span><span class="slink">→ II-02 별에서 만들어지는 원소</span></div>
+        <p>중심에 철이 있는 양파 구조의 (나)가 태양의 10배 이상인 별이다. (가) 중심의 탄소는 헬륨 핵융합으로 만들어졌다(ㄴ). 철보다 무거운 원소는 초신성 폭발 때 만들어진다(ㄷ).</p>
+        <div class="wrongbox"><div class="wt">바로알기</div><p><b>ㄱ</b> (가)는 질량이 태양 정도인 별이다. 중심부의 핵융합이 탄소·산소에서 멈췄다.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">10</span><span class="sans">②</span><span class="slink">→ II-03 원소의 주기성과 화학 결합</span></div>
+        <p>원자가 전자는 A<span class="nw">(2, 7)</span>와 B<span class="nw">(2, 8, 7)</span>가 7개, C<span class="nw">(2, 6)</span>가 6개, D<span class="nw">(2, 8, 1)</span>가 1개다. C는 전자 2개가 모자라므로 C 원자 2개가 전자쌍 2개를 공유한다(ㄷ).</p>
+        <div class="wrongbox"><div class="wt">바로알기</div><p><b>ㄱ</b> A는 원자가 전자가 7개, D는 1개로 족이 다르다. <b>ㄴ</b> B는 전자 1개를 얻어 음이온, D는 전자를 잃어 양이온이 된다.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">11</span><span class="sans">④</span><span class="slink">→ II-03 원소의 주기성과 화학 결합</span></div>
+        <p>(나)는 Na<sup>+</sup>과 Cl<sup>−</sup>이 정전기적 인력으로 결합한 이온 결합이다(ㄴ). 물의 산소는 네온과, Cl<sup>−</sup>은 아르곤과 같은 전자 배치다(ㄷ).</p>
+        <div class="wrongbox"><div class="wt">바로알기</div><p><b>ㄱ</b> (가)는 공유 결합이다. 수소와 산소는 전자쌍을 공유하며, 이온이 되지 않는다.</p></div></div>
+    </div>
+  </div>
+  <div class="exam-foot"><span>이 문제지의 저작권은 박찬 과학학원에 있습니다.</span><span class="pg">7</span><span>박찬 과학 앱에서 전 문항 해설 제공</span></div>
+</div>
+
+<!-- ════════ 8면 정답과 해설 2 ════════ -->
+<div class="sheet sol-sheet">
+  <div class="runsubj"><span class="s">정답과 해설</span><span class="r">박찬 과학 실전 모의고사 · 제1회 ( 통합과학 1 )</span></div>
+  <div class="solcols">
+    <div>
+      <div class="sol"><div class="shead"><span class="sno">12</span><span class="sans">①</span><span class="slink">→ II-03 + II-05 (두 성취기준 통합)</span></div>
+        <p>A(고체 ○)는 구리, B(고체 ×·수용액 ○)는 염화 나트륨, C(모두 ×)는 설탕이다. 금속은 자유 전자가 전하를 나르는 도체다(ㄱ).</p>
+        <div class="wrongbox"><div class="wt">바로알기</div><p><b>ㄴ</b> 이온은 고체 B에도 원래 있었다. 고체에서는 제자리에 붙들려 있다가 물에 녹으며 움직일 수 있게 되었을 뿐이다. <b>ㄷ</b> C(설탕)는 분자 그대로 녹아 이온이 생기지 않는다.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">13</span><span class="sans">⑤</span><span class="slink">→ II-04 지각과 생명체를 이루는 물질</span></div>
+        <p>같은 규산염 사면체라도 독립형(감람석), 망상 구조(석영)처럼 결합 방식이 달라 서로 다른 광물이 된다.</p>
+        <div class="wrongbox"><div class="wt">바로알기</div><p><b>①</b> 단백질의 단위체는 아미노산이다(사면체는 규산염 광물). <b>②</b> 흑운모는 판 모양이다(망상 구조는 석영). <b>③</b> 핵산의 단위체는 뉴클레오타이드다. <b>④</b> 배열 순서가 입체 구조와 기능을 결정한다.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">14</span><span class="sans">③</span><span class="slink">→ II-04 지각과 생명체를 이루는 물질</span></div>
+        <p>A는 T와, G는 C와 짝지으므로 ㉠ = A, ㉡ = T, ㉢ = C이다(ㄱ). G는 Ⅰ에 2개, Ⅱ에 1개로 모두 3개다(ㄴ).</p>
+        <div class="wrongbox"><div class="wt">바로알기</div><p><b>ㄷ</b> Ⅱ의 서열은 A−C−T−G−C−T로, 사이토신(C)은 2개다.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">15</span><span class="sans">③</span><span class="slink">→ II-05 물질의 전기적 성질과 신소재</span></div>
+        <p>탄소 나노 튜브(A)와 발광 다이오드(B)에 대한 설명은 옳다.</p>
+        <div class="wrongbox"><div class="wt">바로알기</div><p><b>C</b> 초전도체는 임계 온도 <b>이하</b>에서 저항이 0이 된다. 그래서 MRI는 늘 극저온으로 냉각한다.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">16</span><span class="sans">②</span><span class="slink">→ III-01 지구시스템과 에너지·물질 순환</span></div>
+        <p>판의 이동과 지진·화산은 지구 내부 에너지가 일으킨다.</p>
+        <div class="wrongbox"><div class="wt">바로알기</div><p><b>①</b> 화산 활동은 지구 내부 에너지. <b>③</b> 광합성은 태양 에너지. <b>④</b> 밀물과 썰물은 조력 에너지. <b>⑤</b> 태풍은 태양 에너지(따뜻한 바다의 증발)가 일으킨다.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">17</span><span class="sans">⑤</span><span class="slink">→ III-01 지구시스템과 에너지·물질 순환</span></div>
+        <p>(가) 양분 흡수는 지권 → 생물권, (나) 증산 작용은 생물권 → 기권, (다) 광합성의 이산화 탄소 흡수는 기권 → 생물권이다. 모두 옳다.</p></div>
+      <div class="sol"><div class="shead"><span class="sno">18</span><span class="sans">①</span><span class="slink">→ III-02 판구조론과 지권의 변화</span></div>
+        <p>X는 두 판이 멀어지는 발산형 경계로 해령이 발달한다(ㄱ). Y는 판이 반대 방향으로 스치는 보존형, Z는 해양판이 대륙판 쪽으로 모여드는 수렴형 경계다.</p>
+        <div class="wrongbox"><div class="wt">바로알기</div><p><b>ㄴ</b> Y(보존형, 변환 단층)에서는 화산 활동이 거의 없고 지진이 잦다. <b>ㄷ</b> Z에서는 밀도가 큰 해양판이 섭입하여 판이 소멸한다.</p></div></div>
+    </div>
+    <div>
+      <div class="sol"><div class="shead"><span class="sno">19</span><span class="sans">③</span><span class="slink">→ III-02 판구조론과 지권의 변화</span></div>
+        <p>(가) 해저 지진과 (나) 화산 분출은 모두 지권에서 시작되어 수권·생물권, 기권으로 번졌다(ㄱ). (다) 지열 발전은 지권의 열을 이롭게 쓴 예다(ㄴ).</p>
+        <div class="wrongbox"><div class="wt">바로알기</div><p><b>ㄷ</b> 지진·화산과 땅속의 열은 지구 내부 에너지(맨틀 대류의 원동력)에서 비롯된다.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">20</span><span class="sans">④</span><span class="slink">→ III-03 중력과 운동</span></div>
+        <p>자유 낙하 하는 물체의 속력은 1초에 약 9.8&nbsp;m/s씩 커지므로 3초 뒤 약 29.4&nbsp;m/s다(B). 질량은 그대로이고 무게는 달에서 약 1/6이 된다(C).</p>
+        <div class="wrongbox"><div class="wt">바로알기</div><p><b>A</b> 자유 낙하는 속력이 일정하게 <b>빨라지는</b> 운동이다.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">21</span><span class="sans">④</span><span class="slink">→ III-03 중력과 운동</span></div>
+        <p>수평 속력이 4&nbsp;m/s로 일정하므로 3초 동안 4 × 3 = 12&nbsp;m를 간다(ㄴ). 떨어지는 시간은 높이로만 정해지므로 더 빠르게 던져도 3초다(ㄷ).</p>
+        <div class="wrongbox"><div class="wt">바로알기</div><p><b>ㄱ</b> 수평 방향으로는 힘을 받지 않아 등속 운동을 한다. 1초에 9.8&nbsp;m/s씩 빨라지는 것은 연직 방향이다.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">22</span><span class="sans">⑤</span><span class="slink">→ III-04 운동량과 충격량</span></div>
+        <p>충격량 = 4&nbsp;N × 3&nbsp;s(그래프 아래 넓이) = 운동량 변화량 12&nbsp;kg·m/s(ㄱ). 속력 = 12 ÷ 2 = 6&nbsp;m/s(ㄴ). 2&nbsp;N으로 같은 변화를 주려면 12 ÷ 2 = 6초(ㄷ). 모두 옳다.</p></div>
+      <div class="sol"><div class="shead"><span class="sno">23</span><span class="sans">②</span><span class="slink">→ III-05 생명 시스템과 화학 반응</span></div>
+        <p>과산화 수소수를 더 넣자 거품이 다시 활발해졌다. 효소는 반응 뒤에도 소모되지 않고 다시 작용한다(ㄷ).</p>
+        <div class="wrongbox"><div class="wt">바로알기</div><p><b>ㄱ</b> 거품은 과산화 수소가 분해되며 생긴 산소이다. <b>ㄴ</b> 삶은 간에도 효소는 있지만, 열로 단백질의 입체 구조가 변해 기능을 잃었다.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">24</span><span class="sans">①</span><span class="slink">→ III-05 생명 시스템과 화학 반응</span></div>
+        <p>세포 호흡은 효소의 도움으로 체온 정도에서 여러 단계로 진행되어 세포가 타지 않는다(ㄱ).</p>
+        <div class="wrongbox"><div class="wt">바로알기</div><p><b>ㄴ</b> 광합성은 이산화 탄소와 물로 포도당을 합성하는 동화 작용이다. <b>ㄷ</b> 포도당처럼 큰 분자는 막단백질 통로로 드나든다. 인지질 2중층을 직접 지나는 것은 산소처럼 작은 분자다.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">25</span><span class="sans">②</span><span class="slink">→ III-06 유전자에서 단백질까지</span></div>
+        <p>틀 가닥 <span class="nw">TAC−CTT−GTA</span>를 전사하면 ㉠은 <span class="nw">AUG−GAA−CAU</span>, 번역하면 <span class="nw">메싸이오닌−글루탐산−히스티딘</span>이다. 6번째 T가 C로 바뀌면 GAA가 GAG가 되지만 GAG도 글루탐산이다(ㄷ).</p>
+        <div class="wrongbox"><div class="wt">바로알기</div><p><b>ㄱ</b> ㉡은 GAA가 지정하는 글루탐산이다. <b>ㄴ</b> ㉠의 U는 틀 가닥의 A(2개)와 짝지으므로 2개다.</p></div></div>
+    </div>
+  </div>
+  <div class="exam-foot"><span>이 문제지의 저작권은 박찬 과학학원에 있습니다.</span><span class="pg">8</span><span>박찬 과학 앱에서 전 문항 해설 제공</span></div>
 </div>
 
 </body>

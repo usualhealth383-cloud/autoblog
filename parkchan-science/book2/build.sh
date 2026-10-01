@@ -5,7 +5,7 @@ set -euo pipefail
 cd "$(dirname "$0")"
 
 # 1) 한글 폰트 (없으면 설치)
-if ! fc-list | grep -q "Noto Sans KR"; then
+if [ ! -s ~/.fonts/NotoSansKR.ttf ] || [ ! -s ~/.fonts/NotoSerifKR.ttf ]; then   # fc-list|grep -q 는 pipefail 에서 늘 실패로 보여 매번 다시 받았다
   mkdir -p ~/.fonts && cd ~/.fonts
   curl -sSL -o NotoSansKR.ttf  "https://raw.githubusercontent.com/google/fonts/main/ofl/notosanskr/NotoSansKR%5Bwght%5D.ttf"
   curl -sSL -o NotoSerifKR.ttf "https://raw.githubusercontent.com/google/fonts/main/ofl/notoserifkr/NotoSerifKR%5Bwght%5D.ttf"
@@ -13,6 +13,9 @@ if ! fc-list | grep -q "Noto Sans KR"; then
   curl -sSL -o YeonSung-Regular.ttf "https://raw.githubusercontent.com/google/fonts/main/ofl/yeonsung/YeonSung-Regular.ttf"
   fc-cache -f ~/.fonts; cd -
 fi
+
+# 1-1) 고정 굵기 글꼴 — 가변 글꼴은 PDF 를 9배 키우고 인쇄를 실패시킨다(tools/make_static_fonts.py)
+python3 ../tools/make_static_fonts.py
 
 # 2) Chromium
 CHROME="${CHROME:-/opt/pw-browsers/chromium}"
@@ -99,10 +102,6 @@ for f in ["front-matter/front.pdf",
           "mock-exam/exam.pdf"]:
     with pymupdf.open(f) as d:
         out.insert_pdf(d)
-try:
-    out.subset_fonts()
-except Exception:
-    pass
 out.save("통합과학2_합본.pdf", garbage=4, deflate=True)
 print(f"OK: 통합과학2_합본.pdf ({out.page_count}쪽)")
 PYEOF
