@@ -169,6 +169,9 @@ def fix_form(e, ids):
     if f == 'skin' and '네오마이신황산염' in e.get('i', []) and not (out - {'hemorrhoid-topical'}): out.discard('hemorrhoid-topical'); out.add('neomycin-combo')
     # 리도카인 단일제 중 허가 효능이 «남성 성기 촉각의 예민성 감소»인 것만 — 이름으로는 화상용 겔과 못 가른다(원문 효능을 본다)
     if e.get('i') == ['리도카인'] and not out and '성기' in label(e['id']).get('e', ''): out.add('lidocaine-pe')
+    # 먹는 기미약(트라넥삼산 + 비타민 C·B6) — 비타민 화면이 아니라 혈전 금기가 있는 약 화면으로(2026-10-01)
+    if '트라넥삼산' in e.get('i', []) and f in ORAL and '기미' in label(e['id']).get('e', ''):
+        out = {x for x in out if not x.startswith('supp:')}; out.add('tranexamic-melasma')
     # 눈물 대용 성분만으로 된 점안액(식염·전해질·점도 성분) → 인공눈물. 약효 성분이 하나라도 있으면 붙이지 않는다
     if f == 'eye' and not out and e.get('i') and all(i in LUBE for i in e['i']): out.add('artificial-tears')   # 장 청소용 가루의 탄산수소나트륨은 전해질이지 제산제가 아니다
     return out
