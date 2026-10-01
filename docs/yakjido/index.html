@@ -3337,6 +3337,12 @@ function vKids(){
     const tooYoung = m != null && m < D.minMonths;
     let label = '';
     if (k === 'apap') { const row = (K.apapLabelTable || []).find(([lo, hi]) => w >= lo && w <= hi); if (row) label = `<div class="kid-line">${I.check}<span>약병 표시 기준으로는 <b>${row[3]} mL</b>(${row[2]} mg) 한 번 — 어린이 타이레놀 용량표 ${row[0]}~${row[1] > 900 ? '' : row[1]} kg(${row[4]}) 칸. 위 범위 안이라 어느 쪽으로 드셔도 돼요.</span></div>`; else if (w < 7) label = `<div class="kid-line">${I.info}<span>약병 표시 용량표는 7 kg부터 있어요. 그보다 작은 아기는 몸무게 계산값을 쓰되 진료에서 확인하세요.</span></div>`; }
+    /* 이부프로펜 시럽 설명서는 2026-03 통일조정으로 «나이별» 1회·1일 최대가 정해졌다(식약처).
+       계산식(몸무게 기준)은 그대로 두고 설명서 칸을 나란히 보인다 — 계산이 설명서보다 많으면 그렇다고 말한다. */
+    if (k === 'ibu' && m != null) { const row = (K.ibuLabelTable || []).find(([a, b]) => m >= a && m <= b);
+      if (row) { const over = r.hi / conc.mgPerMl > row[4] + .05 || r.day / conc.mgPerMl > row[5] + .05;
+        label = `<div class="kid-line">${over ? I.info : I.check}<span>약병 설명서(2026년 3월 개정) 기준으로는 ${row[2]} <b>1회 ${row[3]}~${row[4]} mL</b>, <b>하루 ${row[5]} mL까지</b>예요. ${over ? '위 몸무게 계산의 윗부분은 이보다 많아요 — <b>설명서 양을 넘겨 먹일 때는 소아과·약국과 상의하세요.</b>' : '위 범위와 겹쳐요.'}</span></div>`; }
+      else if (m < 12) label = `<div class="kid-line">${I.info}<span>약병 설명서 용량표는 만 1세부터 있어요. 그보다 어린 아기는 진료에서 양을 확인하세요.</span></div>`; }
     /* 나이가 안 되는 약은 「숫자」를 먼저 보여 주면 안 된다.
        새벽에 당황한 부모는 큰 글씨부터 읽는다 — 경고를 그 자리에 놓고 숫자는 접어 둔다. */
     if (tooYoung) return `<div class="dose-card young"><div class="eyebrow">${esc(D.name)} · ${esc(D.brand)}</div>
