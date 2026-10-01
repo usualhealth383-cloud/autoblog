@@ -19,7 +19,7 @@ ROMAN = {'I': '1', 'II': '2', 'III': '3'}
 MARKS = '①②③④⑤'
 
 import sys as _sys; _sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
-from _extract_common import txt as _txt, defs_map, selfcontain, strip_tags, plain_text
+from _extract_common import txt as _txt, defs_map, selfcontain, strip_tags, plain_text, supsub_uni
 
 
 def txt(node, keep_bold=True):
@@ -273,11 +273,308 @@ def auto_from_lecture(concepts):
     return items
 
 
+# ══════════ 대단원 마무리 · 실전 모의고사 (2026-10) ══════════
+# 소단원 문항과 같은 필드 + step('unit'|'mock'|'recap') · lessons(이어지는 소단원들, 첫째가 lessonId) · book · unit · points(모의고사 배점)
+# 그림 밖 자료: data(탐구 과정·조건 줄, '\n' 으로 줄 나눔) · table(표: 줄마다 [['h'|'d', 글자], …]) · ask(그림·자료 뒤의 발문)
+# 문제 은행 보통 풀이(bankPool)에는 나오지 않는다 — 앱의 '대단원 마무리'·'실전 모의고사'에서만
+LESSON_SET = None
+ROMAN_IDX = {'I': 1, 'II': 2, 'III': 3}
+
+
+def lesson_refs(text, book, unit=None):
+    """'→ I-03 (I-02 · I-04)'·'II-01 + II-03'·'▶ I-01 개념 2' → ['1103','1102','1104'] (적힌 순서, 중복 없이, 있는 소단원만)
+    unit 을 주면 로마 숫자 없는 '01·03' 도 그 단원의 소단원으로 읽는다"""
+    out = []
+    for m in re.finditer(r'(?<![A-Za-z])(III|II|I)-(\d{2})(?!\d)', text):
+        out.append(f'{book}{ROMAN[m.group(1)]}{m.group(2)}')
+    if unit:
+        bare = re.sub(r'(?<![A-Za-z])(III|II|I)-\d{2}', ' ', text)
+        for m in re.finditer(r'(?<![\d.])(0\d)(?![\d.])', bare): out.append(f'{book}{ROMAN[unit]}{m.group(1)}')
+    seen = []
+    for l in out:
+        if l not in seen and (LESSON_SET is None or l in LESSON_SET): seen.append(l)
+    return seen
+
+
+def frag_txt(h):
+    """HTML 조각 → txt(<b>·<sup>·<sub> 만 남김)"""
+    return txt(BeautifulSoup(h, 'html.parser'))
+
+
+def br_lines(node):
+    """<br> 로 나눈 줄 — 줄마다 <b>·<sup>·<sub> 를 남긴다"""
+    return [t for t in (frag_txt(p) for p in re.split(r'<br\s*/?>', node.decode_contents())) if t]
+
+
+def block_lines(node, skip=('bt',)):
+    """자료·보기 상자 → 줄 목록. 안에 줄 div(it·bl·dt·tg)가 있으면 그것을, 아니면 <br> 로 나눈다. 표는 따로(block_tables)"""
+    divs = [d for d in node.find_all('div', recursive=False) if not set(d.get('class', [])) & set(skip)]
+    if divs:
+        out = []
+        for d in divs:
+            t = txt(d)
+            if set(d.get('class', [])) & {'dt', 'tg'}: t = f'<b>{t}</b>'
+            if t: out.append(t)
+        return out
+    n = __import__('copy').copy(node)
+    for s in n.select('.' + ', .'.join(skip)): s.extract()
+    for s in n.select('table'): s.extract()
+    return br_lines(n)
+
+
+def table_rows(tb):
+    return [[['h' if c.name == 'th' else 'd', txt(c)] for c in tr.find_all(['th', 'td'], recursive=False)] for tr in tb.select('tr')]
+
+
+def answer_table(soup):
+    """정답표(문항/번호 · 정답 · 배점 줄) → {번호: (정답, 배점)}"""
+    out = {}
+    for tbl in soup.select('table.anstable, table.anst'):
+        nums = []
+        for tr in tbl.select('tr'):
+            th = tr.find('th'); lab = txt(th, False) if th else ''
+            vals = [txt(td, False) for td in tr.find_all('td')]
+            if lab.startswith(('문항', '번호')): nums = vals
+            elif lab.startswith('정답'):
+                for n, v in zip(nums, vals):
+                    if n.isdigit(): out.setdefault(int(n), ['', None])[0] = v
+            elif lab.startswith('배점'):
+                for n, v in zip(nums, vals):
+                    if n.isdigit() and re.fullmatch(r'\d+(\.\d+)?', v): out.setdefault(int(n), ['', None])[1] = float(v)
+    return out
+
+
+def solutions(soup):
+    """해설 → {번호: {explain, wrong, link}} — 대단원 마무리·모의고사 1회(.sno·.sans·.slink·.wrongbox·.rubric)와
+    모의고사 2회(.n·.a·.rv, 본문 안 '<b>바로알기</b>') 두 짜임"""
+    sols = {}
+    for sol in soup.select('.sol'):
+        sno = sol.select_one('.sno') or sol.select_one('b.n')
+        n = txt(sno, False) if sno else ''
+        if not n.isdigit(): continue
+        n = int(n)
+        link = ' '.join(txt(x, False) for x in sol.select('.slink, .rv'))
+        if sol.select_one('.shead'):
+            ps = sol.find_all('p', recursive=False)
+            explain = ' '.join(txt(p) for p in ps)
+            wb = sol.select_one('.wrongbox')
+            wrong = ' '.join(txt(p) for p in wb.select('p')) if wb else ''
+            rub = sol.select_one('table.rubric')
+            if rub:                                    # 서술형: 채점 요소 + '이렇게 쓰면 0점'
+                rows = [[txt(td) for td in tr.find_all('td')] for tr in rub.select('tr')]
+                crit = ' '.join(f'{r[0]} ({r[1]})' for r in rows if len(r) >= 2)
+                wt = txt(wb.select_one('.wt'), False) if wb and wb.select_one('.wt') else ''
+                wrong = crit + (f' — {wt}: {wrong}' if wrong else '')
+        else:
+            n2 = __import__('copy').copy(sol)
+            for s in n2.select('b.n, span.a, span.rv, .analysis'): s.extract()
+            h = txt(n2)
+            parts = re.split(r'<b>\s*바로알기\s*</b>', h, maxsplit=1)
+            explain = parts[0].strip(); wrong = parts[1].strip() if len(parts) > 1 else ''
+        sols[n] = {'explain': explain, 'wrong': wrong, 'link': link}
+    return sols
+
+
+def item_common(el, stem_sel):
+    """문항 상자에서 그림·자료·표·보기·선지를 읽는다"""
+    fig = el.find('svg')                                # 그림은 figure 안에, 모의고사 몇 문항은 자료 상자(.dta) 안에 있다
+    data, table = [], []
+    for x in el.select('.exp, .dta'): data += block_lines(x, ('bt',))
+    for tb in el.select('table.qtab, table.xt'): table += [table_rows(tb)]
+    bogi = el.select_one('.bogi-box, .bogi')
+    source = '\n'.join(block_lines(bogi)) if bogi else ''
+    choices = [re.sub(r'^[①②③④⑤]\s*', '', txt(li)) for li in el.select('ul.choices li, ul.ch li')]
+    after = False
+    if fig is not None:                                # 자료·표가 그림보다 앞에 있으면 앱도 그 차례로(figAfter)
+        order = el.find_all(True); fi = order.index(fig)
+        first = min((order.index(x) for x in el.select('.exp, .dta, table.qtab, table.xt')), default=None)
+        after = first is not None and first < fi
+    return fig, data, table, source, choices, after
+
+
+def parse_summary(path, markers=None):
+    """book/summary-2/summary.html → 대단원 마무리 16문항(마무리 12 · 고난도 4) + 핵심 정리 빈칸(되살리기)"""
+    src = path.read_text(encoding='utf-8')
+    book = '1' if path.parts[-3] == 'book' else '2'
+    ui = int(path.parent.name.split('-')[1]); unit = ['I', 'II', 'III'][ui - 1]
+    markers = defs_map(src); soup = BeautifulSoup(src, 'html.parser')
+    ans = answer_table(soup); sols = solutions(soup)
+    items, warn = [], []
+    for el in soup.select('.q'):
+        qno = el.select_one('.qno'); n = int(txt(qno, False)) if qno and txt(qno, False).isdigit() else None
+        if n is None: continue
+        stem_el = el.select_one('.stem')
+        diff = stem_el.select_one('.difficulty'); difficulty = re.sub(r'\s*\[.*?\]\s*', '', txt(diff, False)) if diff else ''
+        tags = stem_el.select_one('.tags'); tag = txt(tags, False) if tags else ''
+        must = bool(stem_el.select_one('.must'))
+        for s in stem_el.select('.difficulty, .tags, .badge-data, .badge-essay, .must'): s.extract()
+        for s in stem_el.select('.blankline'): s.replace_with('＿＿＿')
+        stem = txt(stem_el)
+        fig, data, table, source, choices, after = item_common(el, '.stem')
+        a = (ans.get(n) or ['', None])[0]; sol = sols.get(n, {})
+        if el.select_one('.essay-lines') or '서술' in a: typ, answer = 'essay', ''
+        elif choices and source: typ, answer = 'multi', (MARKS.index(a) + 1 if a in MARKS else None)
+        elif choices: typ, answer = 'mc', (MARKS.index(a) + 1 if a in MARKS else None)
+        else: warn.append(f'{path.parent.name} {n}: 유형을 모름'); continue
+        lessons = lesson_refs(sol.get('link', '') + ' ' + tag.split('|')[-1], book)
+        if not lessons: warn.append(f'{path.parent.name} {n}: 소단원 연결 없음')
+        cid = f'U{book}{ui}q{n}'
+        it = {'id': f'U{book}-{ui}-q{n}', 'lessonId': lessons[0] if lessons else f'{book}{ui}01', 'lessons': lessons, 'book': book, 'unit': unit,
+              'concept': 0, 'step': 'unit', 'type': typ, 'stem': stem, 'source': source, 'choices': choices, 'answer': answer,
+              'explain': sol.get('explain', ''), 'wrong': sol.get('wrong', ''), 'figure': selfcontain(str(fig), markers, cid) if fig else '',
+              'difficulty': difficulty or ('●●●' if n > 12 else '●●○')}
+        if data: it['data'] = '\n'.join(data)
+        if table: it['table'] = table
+        if after: it['figAfter'] = True
+        if must: it['must'] = True
+        items.append(it)
+    recap, rw = parse_recap(soup, book, ui, unit)
+    return items, recap, warn + rw
+
+
+SEN = '\u2063'                                         # 채운 답 뒤 표시(띄어쓰기 손질용, 남지 않는다)
+PARTICLE = re.compile(SEN + r'\s+((?:의|을|를|은|는|이|가|에|에서|로|으로|와|과|해|도|만)(?=[\s,.)·]|$))')
+
+
+def parse_recap(soup, book, ui, unit):
+    """핵심 정리 '빈칸으로 다시 쓰기' → 빈칸(blank) 되살리기 문항. 정답 수와 빈칸 수가 맞고 모든 빈칸이 문장 안에 있을 때만 낸다"""
+    import copy
+    page = next((p for p in soup.select('.page') if p.select_one('.rc-grid')), None)
+    if page is None: return [], [f'{book}-{unit}: 핵심 정리 쪽 없음']
+    ae = page.select_one('.rc-ans .ra') or page.select_one('.rc-ans')
+    at = re.sub(r'^\s*정답\s*', '', txt(ae)) if ae else ''
+    blanks = page.select('span.blk, span.bl')
+    num = lambda sp: txt(sp.find(['b', 'i']) or sp, False)
+    nums = [int(num(s)) for s in blanks if num(s).isdigit()]
+    N = len(nums)
+    if not N or sorted(nums) != list(range(1, N + 1)): return [], [f'{book}-{unit}: 빈칸 번호가 1~N 이 아님 {nums}']
+    answers, pos = {}, 0
+    for k in range(1, N + 1):
+        m = re.compile(rf'(?:^|(?<=\s)){k}\s').search(at, pos)
+        if not m: return [], [f'{book}-{unit}: 빈칸 정답 {k} 를 못 찾음']
+        if k > 1: answers[k - 1] = at[start:m.start()].strip()
+        start, pos = m.end(), m.end()
+    answers[N] = at[start:].strip()
+    if any(not v or len(re.sub(r'<[^>]+>', '', v)) > 30 for v in answers.values()): return [], [f'{book}-{unit}: 빈칸 정답이 비었거나 너무 김']
+    uni = lambda h: re.sub(r'<[^>]+>', '', supsub_uni(h)).strip()
+    items = []
+    for sp in blanks:
+        k = int(num(sp)); box = sp.find_parent(class_=['rc-box', 'rc'])
+        hno = box.select_one('.rc-h .no, .rc-h .rc-no') if box else None; ht = box.select_one('.rc-h .t, .rc-h .rc-t') if box else None
+        box_no = txt(hno, False) if hno else ''; title = txt(ht, False) if ht else ''
+        cont = sp.find_parent(['td', 'th', 'p', 'li']) or sp.find_parent(class_='rc-line')
+        if cont is None: return [], [f'{book}-{unit}: 빈칸 {k} 의 문장을 못 찾음']
+        def filled(node):
+            c = copy.copy(node)
+            for b in c.select('span.blk, span.bl'):
+                bk = int(num(b)); b.replace_with('＿＿＿' if bk == k else BeautifulSoup(answers[bk] + SEN, 'html.parser'))
+            return c
+        lead = ''
+        if cont.name in ('td', 'th'):
+            tr = cont.find_parent('tr'); tbl = cont.find_parent('table'); rows = tbl.find_all('tr')
+            cells = tr.find_all(['th', 'td'], recursive=False); ci = cells.index(cont)
+            head = rows[0] if rows and not rows[0].find('td') else None
+            if tr is head:                             # 머리 줄의 빈칸 — 머리 줄 전체 + 바로 아래 칸
+                ctx = ' · '.join(t for t in (txt(filled(c)) for c in cells) if t)
+                below = rows[1].find_all(['th', 'td'], recursive=False) if len(rows) > 1 else []
+                if ci < len(below) and txt(below[ci]): ctx += f' ({txt(filled(cells[ci]))}: {txt(filled(below[ci]))})'
+            else:
+                rh = next((c for c in reversed(cells[:ci]) if c.name == 'th'), None)   # 같은 줄에서 바로 앞의 머리 칸
+                hc = head.find_all(['th', 'td'], recursive=False) if head is not None else []
+                ch = hc[ci] if ci < len(hc) else None
+                lab = ' · '.join(t for t in (txt(rh, False) if rh else '', txt(ch, False) if ch is not None else '') if t)
+                lead = txt(rh, False) if rh else ''
+                ctx = (f'{lab}: ' if lab else '') + txt(filled(cont))
+                if head is None and len([c for c in cells if c.name == 'td']) >= 2 and [c.name for c in cells].count('th') == 1:     # 머리 줄 없는 여러 칸 표 — 같은 칸의 다른 줄을 곁들인다
+                    for r in rows:
+                        if r is tr: continue
+                        rc = r.find_all(['th', 'td'], recursive=False)
+                        if ci < len(rc) and rc[0].name == 'th' and txt(rc[ci]): ctx += f' ({txt(rc[0], False)}: {txt(filled(rc[ci]))})'
+        else:
+            ls = br_lines(filled(cont)); at_ = next((i for i, s in enumerate(ls) if '＿＿＿' in s), None)
+            if at_ is None: return [], [f'{book}-{unit}: 빈칸 {k} 의 줄을 못 찾음']
+            ctx = ls[at_]
+            if ctx.startswith('→') and at_: ctx = ls[at_ - 1] + ' ' + ctx      # '→ 자연선택 → …' 처럼 앞 줄에 이어지는 줄
+            m = re.match(r'^<b>([\dI·\-]+)</b>\s*', ctx)
+            if m: lead = m.group(1); ctx = ctx[m.end():]
+        # 소단원: 상자 번호(01) — '잇기'·'01~04' 상자는 그 줄의 머리(01 ⇄ 02 · 01·I-02)
+        if re.fullmatch(r'0\d', box_no): lessons = lesson_refs(box_no, book, unit)
+        else: lessons = lesson_refs(lead, book, unit) or lesson_refs(box_no.split('~')[0], book, unit)
+        if not lessons: lessons = [f'{book}{ui}01']
+        a = answers[k]
+        tidy = lambda t: PARTICLE.sub(r'\1', t).replace(SEN, '')     # 교재의 빈칸 상자 뒤 띄어쓰기('집단 의') — 답을 채우면 붙인다
+        expl = tidy(ctx.replace('＿＿＿', f'<b>{a}</b>{SEN}')); ctx = tidy(ctx)
+        stem = (f'[{title}] ' if title else '') + ctx
+        items.append({'id': f'U{book}-{ui}-b{k}', 'lessonId': lessons[0], 'lessons': lessons, 'book': book, 'unit': unit, 'concept': 0,
+                      'step': 'recap', 'type': 'blank', 'stem': stem, 'source': '', 'choices': [], 'answer': uni(a),
+                      'explain': expl, 'wrong': '', 'figure': '', 'difficulty': '●○○'})
+    items.sort(key=lambda x: int(x['id'].split('-b')[1]))
+    return items, []
+
+
+def parse_mock(path):
+    """book/mock-exam/exam.html → 실전 모의고사 25문항(배점 합 50)"""
+    from bs4 import Comment
+    src = path.read_text(encoding='utf-8')
+    book = '1' if path.parts[-3] == 'book' else '2'
+    markers = defs_map(src); soup = BeautifulSoup(src, 'html.parser')
+    ans = answer_table(soup); sols = solutions(soup)
+    items, warn = [], []
+    for el in soup.select('.qq'):
+        qn = el.select_one('b.qn'); n = re.sub(r'\D', '', txt(qn, False)) if qn else ''
+        if not n: continue
+        n = int(n)
+        com = el.find_previous(string=lambda t: isinstance(t, Comment) and re.match(rf'\s*{n}\.\s', t))
+        pts_el = el.select_one('.pts'); pts_txt = txt(pts_el, False) if pts_el else ''
+        for s in el.select('b.qn, .pts'): s.extract()
+        stems = [txt(p) for p in el.select('p.stem')]
+        fig, data, table, source, choices, after = item_common(el, 'p.stem')
+        a, p = ans.get(n) or ['', None]
+        if p is None:
+            m = re.search(r'([\d.]+)\s*점', pts_txt); p = float(m.group(1)) if m else None
+        sol = sols.get(n, {})
+        lessons = lesson_refs(sol.get('link', '') + ' ' + (str(com) if com else ''), book)
+        if not lessons: warn.append(f'모의고사 {book} {n}: 소단원 연결 없음')
+        typ = 'multi' if source else 'mc'
+        it = {'id': f'M{book}-q{n}', 'lessonId': lessons[0] if lessons else f'{book}101', 'lessons': lessons, 'book': book,
+              'unit': next((k for k, v in ROMAN.items() if lessons and lessons[0][1] == v), ''),
+              'concept': 0, 'step': 'mock', 'type': typ, 'stem': stems[0] if stems else '', 'source': source, 'choices': choices,
+              'answer': MARKS.index(a) + 1 if a in MARKS else None, 'explain': sol.get('explain', ''), 'wrong': sol.get('wrong', ''),
+              'figure': selfcontain(str(fig), markers, f'M{book}q{n}') if fig else '', 'difficulty': '', 'points': p}
+        if len(stems) > 1: it['ask'] = ' '.join(stems[1:])
+        if data: it['data'] = '\n'.join(data)
+        if table: it['table'] = table
+        if after: it['figAfter'] = True
+        items.append(it)
+    tot = sum(i['points'] or 0 for i in items)
+    if len(items) != 25 or abs(tot - 50) > 1e-9: warn.append(f'모의고사 {book}: {len(items)}문항 · 배점 합 {tot}')
+    return items, warn
+
+
+def unit_mock():
+    """대단원 마무리 6 + 모의고사 2 — (문항, 경고)"""
+    items, warns = [], []
+    for b in ('book', 'book2'):
+        for k in (1, 2, 3):
+            p = ROOT / b / f'summary-{k}' / 'summary.html'
+            if not p.exists(): warns.append(f'{p} 없음'); continue
+            its, rc, w = parse_summary(p); items += its + rc; warns += w
+            print(f'{b}/summary-{k}: 마무리 {len(its)} · 핵심 정리 빈칸 {len(rc)}' + (f' · ! {"; ".join(w)}' if w else ''))
+            if len(its) != 16: warns.append(f'{b}/summary-{k}: 문항 {len(its)} (16 이어야)')
+        p = ROOT / b / 'mock-exam' / 'exam.html'
+        if p.exists():
+            its, w = parse_mock(p); items += its; warns += w
+            print(f'{b}/mock-exam: {len(its)}문항 · 배점 합 {sum(i["points"] or 0 for i in its):g}' + (f' · ! {"; ".join(w)}' if w else ''))
+    return items, warns
+
+
 def main():
+    global LESSON_SET
     out = OUT
     if '--out' in _sys.argv[1:-1]:
         out = pathlib.Path(_sys.argv[_sys.argv.index('--out') + 1]).resolve(); out.mkdir(parents=True, exist_ok=True)
     concepts = json.loads((OUT / 'concepts.json').read_text(encoding='utf-8'))
+    LESSON_SET = {c['lessonId'] for c in concepts}
     items, labs = [], []
     for path in sorted(list((ROOT / 'book').glob('chapter-*/chapter.html')) + [ROOT / 'book' / 'sample-chapter' / 'chapter.html'] + list((ROOT / 'book2').glob('chapter-*/chapter.html'))):
         its, lbs = parse_chapter(path); items += its; labs += lbs
@@ -297,6 +594,7 @@ def main():
         if k: seen.add(k)
         keep.append(it)
     print(f'  같은 OX 문장 중복 {len(items) - len(keep)}개 뺌'); items = keep
+    um, um_warn = unit_mock(); items += um
     # 개념 번호 없는 STEP 문항은 소단원 전체(0)로 둔다
     bad = [i['id'] for i in items if i['type'] in ('mc', 'multi') and not i['answer']]
     dropped = [i for i in items if i['type'] != 'essay' and not str(i.get('answer', '')).strip()]
@@ -310,6 +608,9 @@ def main():
     na = sum(1 for i in items if i['step'] == 'auto')
     print(f'\n합계 문항 {len(items)} (본책 {len(items) - na} · 자동 {na}) · 탐구 {len(labs)} · 유형 {dict(Counter(i["type"] for i in items))}')
     if bad: print('정답 못 읽은 문항:', bad)
+    st = Counter(str(i['step']) for i in items)
+    print(f"대단원 마무리 {st['unit']} · 핵심 정리 빈칸 {st['recap']} · 모의고사 {st['mock']} (문제 은행 보통 풀이에는 나오지 않음)")
+    for w in um_warn: print('  !', w)
 
 
 if __name__ == '__main__':

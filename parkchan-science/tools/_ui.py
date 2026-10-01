@@ -63,6 +63,15 @@ async def audit_extra(pg, look):
     """접근성·대비 점검용 화면 더 보기(학생 로그인 상태에서 부름): 문제 풀기(확신도 칩을 고른 채) · 채점(해설 없는 문항의
     '이 개념 다시 보기' · 확신했는데 틀림) · 원장 '처리할 것'(출석만 하고 공부 기록 없는 학생 · 안 읽은 공지). 끝나면 원장으로 로그인된 채"""
     await pg.evaluate('loadMore()'); await pg.wait_for_function('MORE.ok', timeout=15000)
+    if await pg.evaluate("BANK.some(q => q.step === 'mock')"):      # 대단원 마무리 · 실전 모의고사 · 시험처럼(2026-10)
+        await pg.evaluate("umPick = 'unit'; show('bank')"); await pg.wait_for_timeout(250); await look('대단원 고르기')
+        await pg.evaluate("umPick = 'mock'; renderBank()"); await pg.wait_for_timeout(150); await look('모의고사 고르기')
+        await pg.evaluate("startMock('1')"); await pg.wait_for_timeout(250); await pg.click('[data-mxp="2"]'); await pg.wait_for_timeout(100); await look('모의고사 풀기')
+        await pg.click('#mxPause'); await pg.wait_for_timeout(100); await look('모의고사 멈춤'); await pg.click('#mxResume'); await pg.wait_for_timeout(100)
+        await pg.evaluate("mockSubmit(false)"); await pg.wait_for_timeout(250); await look('모의고사 결과')
+        await pg.click('[data-mxr="0"]'); await pg.wait_for_timeout(150); await look('모의고사 해설')
+        await pg.evaluate("mx = null; umPick = null; S.bt = true; startBank(pickBank(1), '', true)"); await pg.wait_for_timeout(250); await look('시험처럼')
+        await pg.evaluate("S.bt = false; bs = null; show('bank')"); await pg.wait_for_timeout(150)
     await pg.evaluate("startBank([BANK.find(q => q.type === 'ox' && openLessons().some(l => l.id === q.lessonId))], '')"); await pg.wait_for_timeout(300)
     await pg.click('[data-conf="s"]'); await pg.wait_for_timeout(100); await look('문제 풀기(확신)')
     await pg.evaluate("bs.items[0] = { ...bs.items[0], explain:'', wrong:'' }")

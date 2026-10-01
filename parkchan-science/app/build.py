@@ -39,7 +39,8 @@ more = json.dumps({'bank': bank, 'labs': labs, 'figs': figs}, ensure_ascii=False
 MORE_NAME = 'more-' + hashlib.sha1(more.encode('utf-8')).hexdigest()[:10] + '.json'
 _vb = lambda svg: (re.search(r'viewBox="0 0 ([\d.]+) ([\d.]+)"', svg) or [None, '600', '300'])
 meta = {'url': MORE_NAME, 'bank': len(bank), 'labs': len(labs),
-        'bl': {L: sum(1 for q in bank if q['lessonId'] == L) for L in sorted({q['lessonId'] for q in bank})},
+        # 소단원별 문항 수('이 소단원 문제 풀기 N문항') — 대단원 마무리·모의고사·핵심 정리 빈칸은 보통 풀이에 안 나오므로 뺀다
+        'bl': {L: sum(1 for q in bank if q['lessonId'] == L and str(q.get('step')) not in ('unit', 'mock', 'recap')) for L in sorted({q['lessonId'] for q in bank})},
         'll': sorted({l['lessonId'] for l in labs}),
         'fv': {k: f"{_vb(v)[1]} {_vb(v)[2]}" for k, v in figs.items()}}
 out = (shell.replace('<!--CONCEPTS-->', j(concepts))
