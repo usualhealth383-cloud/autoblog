@@ -110,6 +110,7 @@ BY_FORM = {'클로트리마졸': {'insert':'clotrimazole-vag', 'skin':'clotrimaz
            # 산화아연은 알약(종합비타민)에서는 아연 보충, 연고·파스에서는 피부 보호제 — 알약만 아연 화면으로
            '산화아연': {'solid':'supp:zinc'}, '황산아연': {'solid':'supp:zinc'}, '황산아연일수화물': {'solid':'supp:zinc'},
            '테트라히드로졸린염산염': {'eye':'eye-decongestant'},
+           '덱스판테놀': {'skin':'dexpanthenol', 'solid':'dexpanthenol'}, 'D-판테놀': {'skin':'dexpanthenol'},
            '케토티펜푸마르산염': {'eye':'allergy-eyedrop'}, '크로몰린나트륨': {'eye':'allergy-eyedrop'}, '크로모글리크산나트륨': {'eye':'allergy-eyedrop'},
            '시클로피록스': {'nail':'ciclopirox-nail', 'liquid':'ciclopirox-nail'}, '시클로피록스올아민': {'liquid':'ciclopirox-shampoo'},
            '설파메톡사졸': {'eye':'antibiotic-eyedrop'}, '설파메톡사졸나트륨': {'eye':'antibiotic-eyedrop'},

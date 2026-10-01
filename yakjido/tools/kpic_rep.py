@@ -44,6 +44,7 @@ MANUAL = {
     'neomycin-combo': ('바네포', '바네포연고', 'neomycin'),
     'hydroquinone': ('도미나크림', '도미나크림', 'hydroquinone'),
     'aluminium-chloride': ('드라이언', '드라이언액', 'aluminum'),
+    'dexpanthenol': ('비판텐', '비판텐연고', 'dexpanthenol'),
     'vitamin-d-rx': ('디맥', '디맥정7000IU', 'cholecalciferol'),
 }
 
