@@ -218,7 +218,7 @@ for _m in _MY: jargon(_m, '', '그런줄 ' + _m['id'])
 # 카페인·이소프로필안티피린·에텐자미드에 «어르신 조심» 뜻으로 ach=1 이 붙어 있었다.
 # 게보린 한 알이 그것만으로 2점을 만들어, 진짜 항콜린제의 신호를 묽게 하고 있었다.
 _ING = json.load(open(C / 'ingredients.json', encoding='utf-8'))
-_OKSRC = {'ACB', 'ADS', 'KABS', '확인 필요'}   # ADS = 항콜린 약물 척도(Carnahan 2006)
+_OKSRC = {'ACB', 'ADS', 'KABS', '확인 필요', '의사 검수'}   # 의사 검수 = 척도에 이름이 없는 1세대 항히스타민(현욱님 2026-10-01)   # ADS = 항콜린 약물 척도(Carnahan 2006)
 for _e in _ING.get('ing', []):
     if _e.get('ach'):
         if _e.get('achSrc') not in _OKSRC:

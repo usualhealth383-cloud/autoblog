@@ -835,6 +835,19 @@ main > .answer + *, main > .sec + .care, main > .card + .care, main > .rx-card +
 .care .go .gl a,.care .go .gl button{display:inline-flex;align-items:center;gap:6px;min-height:44px;padding:0 14px;border-radius:10px;border:1px solid var(--hairline);background:var(--card);color:var(--body);font:inherit;font-size:.875rem;font-weight:700;text-decoration:none;cursor:pointer}
 .recall-chip{display:inline-flex;align-items:center;gap:4px;margin-top:6px;min-height:44px;padding:0 10px;border-radius:8px;border:1px solid var(--hairline);background:var(--card);color:var(--body);font-size:.75rem;font-weight:700;text-decoration:none}
 .recall-chip .i{width:14px;height:14px}
+.kid-rev{margin-top:10px;padding-top:8px;border-top:1px dashed var(--hairline);font-size:.8125rem;color:var(--muted);line-height:1.55;word-break:keep-all}
+.rf{margin-top:var(--s3);padding:var(--s3) var(--s4);border-radius:var(--r-card);border:1px solid var(--hairline);background:var(--card)}
+.rf-h{display:flex;align-items:center;gap:8px;font-size:.9375rem;color:var(--alert)}
+.rf-list{display:flex;flex-direction:column;gap:2px;margin-top:6px}
+.rf-i{display:flex;align-items:flex-start;gap:10px;min-height:44px;padding:8px 0;font-size:.9rem;line-height:1.5;color:var(--body);cursor:pointer;word-break:keep-all}
+.rf-i input{flex:none;width:22px;height:22px;margin-top:1px;accent-color:var(--alert)}
+.rf-hit{display:none;margin-top:8px;padding:12px;border-radius:12px;background:var(--alert-tint)}
+.rf-hit p{font-size:.9rem;line-height:1.6}
+.rf-hit .gl{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+.rf-hit .call{display:inline-flex;align-items:center;gap:6px;min-height:44px;padding:0 16px;border-radius:10px;background:var(--alert);color:var(--on-alert);font-weight:700;text-decoration:none}
+.rf-hit .gl a:not(.call){display:inline-flex;align-items:center;gap:6px;min-height:44px;padding:0 14px;border-radius:10px;border:1px solid var(--hairline);background:var(--card);color:var(--body);font-weight:700;text-decoration:none;font-size:.875rem}
+.rf.hit .rf-hit{display:block} .rf.hit .rf-no{display:none}
+.rf-no{margin-top:4px;font-size:.8125rem;color:var(--muted)}
 .mo-grid{display:grid;grid-template-columns:1fr;gap:12px;margin-top:20px}
 @media (min-width:560px){.mo-grid{grid-template-columns:1fr 1fr}}
 .mo{padding:var(--s4);border-radius:var(--r-card);border:1px solid var(--hairline);background:var(--card)}
@@ -2307,6 +2320,8 @@ function achPanel(extra, opts){
         `<p class="ach-ask">${I.cart}<span>약국에서 이렇게 물어보세요 — <b>“이 약들에 항콜린 성분이 겹치나요?”</b></span></p>`,
         items.some(x => x.prn) ? `<p class="small muted">‘도움될 수 있어요’·‘며칠만’ 드시는 약은 <b>절반</b>으로 셌어요. 점수는 용량·기간을 보지 못하니, 매일 드시는 약이 많을수록 실제 부담은 더 큽니다.</p>` : '',
         /* 척도 원문에서 확인하지 못한 성분은 그렇다고 적는다 — 점수는 판정이 아니라 상의할 거리다 */
+        (() => { const dr = items.filter(x => x.e.achSrc === '의사 검수'); return dr.length
+          ? `<p class="small muted">${esc(dr.map(x => x.e.n).join(' · '))}${josa(dr[dr.length - 1].e.n, '은', '는')} 척도 목록에 이름이 없지만 <b>같은 1세대 항히스타민</b>이라 의사 검수로 높음(3점)으로 셌어요.</p>` : ''; })(),
         (() => { const ck = items.filter(x => x.e.achSrc === '확인 필요'); return ck.length
           ? `<p class="small muted">${esc(ck.map(x => x.e.n).join(' · '))}${josa(ck[ck.length - 1].e.n, '은', '는')} 척도 원문에서 직접 확인하지 못하고 <b>같은 계열 약의 점수를 따랐어요.</b> 점수에는 넣었지만 <b>확실하지 않습니다</b>.</p>` : ''; })(),
       ].filter(Boolean).join('');
@@ -3144,6 +3159,19 @@ function otcAltCard(d){
 }
 /* 증상 맨 위 세 줄 — 병원에서는 / 약국에서는 / 이럴 땐 병원으로.
    현욱님 지시(2026-09-17): 약을 보여 주기 전에 "이 증상을 어떻게 보는지"를 먼저 알려 준다. */
+/* 위험 신호 먼저(현욱님 2026-10-01 「위험 신호만 먼저」, healthdirect·Ada 방식) — 문진 벽이 아니라 한 줄 체크.
+   하나라도 체크하면 그 자리에서 «약보다 진료가 먼저» + 119·응급실 찾기를 연다. 체크는 저장하지 않는다. */
+function redflagCheck(s){
+  const er = (s.care?.er || []).slice(0, 4); if (!er.length) return '';
+  const clean = t => String(t).replace(/\*\*/g, '');
+  return `<section class="rf" aria-label="위험 신호 먼저 확인">
+    <b class="rf-h">${I.alert}먼저 확인 — 이 중 하나라도 있나요?</b>
+    <div class="rf-list">${er.map((t, i) => `<label class="rf-i" for="rf-${esc(s.id)}-${i}"><input type="checkbox" id="rf-${esc(s.id)}-${i}" onchange="const r=this.closest('.rf');r.classList.toggle('hit',!!r.querySelector('input:checked'))"><span>${esc(clean(t))}</span></label>`).join('')}</div>
+    <div class="rf-hit"><p><b>약보다 진료가 먼저예요.</b> 지금 119에 전화하거나 응급실로 가세요. 직접 운전하지 마세요.</p>
+      <div class="gl"><a class="call" href="tel:119">${I.alert} 119 전화</a>${goA('er')}</div></div>
+    <p class="rf-no">없으면 아래 안내대로 하시면 돼요.</p>
+  </section>`;
+}
 function triageCard(s){
   const t = s.triage; if (!t) return '';
   const rows = [
@@ -3255,6 +3283,7 @@ function vSymptom(id){
   return `${topBar({ back:'증상', unreviewed:s.reviewed === false })}
   <div class="${gcls(s.group)}"><div class="eyebrow" style="color:var(--gfg,var(--primary))"><span class="gdot"></span>${esc(s.group)}</div>
   <h1>${esc(s.name)}</h1></div>
+  ${redflagCheck(s)}
   ${triageCard(s)}
   ${workedCard(s)}
   ${fitChips(s)}
@@ -3374,14 +3403,15 @@ function vKids(){
   const sane = kidWeightSanity(w, m);
   const doseCard = (k) => { const r = kidDose(k, w, m); if (!r) return ''; const D = r.D; const conc = D.conc[0]; const mlLo = (r.lo / conc.mgPerMl).toFixed(1), mlHi = (r.hi / conc.mgPerMl).toFixed(1);
     const tooYoung = m != null && m < D.minMonths;
-    let label = '';
+    let label = '', rev = '';
     if (k === 'apap') { const row = (K.apapLabelTable || []).find(([lo, hi]) => w >= lo && w <= hi); if (row) label = `<div class="kid-line">${I.check}<span>약병 표시 기준으로는 <b>${row[3]} mL</b>(${row[2]} mg) 한 번 — 어린이 타이레놀 용량표 ${row[0]}~${row[1] > 900 ? '' : row[1]} kg(${row[4]}) 칸. 위 범위 안이라 어느 쪽으로 드셔도 돼요.</span></div>`; else if (w < 7) label = `<div class="kid-line">${I.info}<span>약병 표시 용량표는 7 kg부터 있어요. 그보다 작은 아기는 몸무게 계산값을 쓰되 진료에서 확인하세요.</span></div>`; }
     /* 이부프로펜 시럽 설명서는 2026-03 통일조정으로 «나이별» 1회·1일 최대가 정해졌다(식약처).
        계산식(몸무게 기준)은 그대로 두고 설명서 칸을 나란히 보인다 — 계산이 설명서보다 많으면 그렇다고 말한다. */
     if (k === 'ibu' && m != null) { const row = (K.ibuLabelTable || []).find(([a, b]) => m >= a && m <= b);
       if (row) { const over = r.hi / conc.mgPerMl > row[4] + .05 || r.day / conc.mgPerMl > row[5] + .05;
-        label = `<div class="kid-line">${over ? I.info : I.check}<span>약병 설명서(2026년 3월 개정) 기준으로는 ${row[2]} <b>1회 ${row[3]}~${row[4]} mL</b>, <b>하루 ${row[5]} mL까지</b>예요. ${over ? '위 몸무게 계산의 윗부분은 이보다 많아요 — <b>설명서 양을 넘겨 먹일 때는 소아과·약국과 상의하세요.</b>' : '위 범위와 겹쳐요.'}</span></div>`; }
-      else if (m < 12) label = `<div class="kid-line">${I.info}<span>약병 설명서 용량표는 만 1세부터 있어요. 그보다 어린 아기는 진료에서 양을 확인하세요.</span></div>`; }
+        /* 현욱님 2026-10-01: 계산은 그대로, 카드 맨 아래에 「최근 개정: ~」으로 짧게 */
+        rev = `<p class="kid-rev">최근 개정(2026년 3월 약병 설명서): ${row[2]} 1회 ${row[3]}~${row[4]} mL · 하루 ${row[5]} mL까지${over ? ' — 위 계산이 이보다 많으면 소아과·약국과 상의' : ''}</p>`; }
+      else if (m < 12) rev = `<p class="kid-rev">최근 개정(2026년 3월 약병 설명서): 용량표는 만 1세부터 — 그보다 어린 아기는 진료에서 확인</p>`; }
     /* 나이가 안 되는 약은 「숫자」를 먼저 보여 주면 안 된다.
        새벽에 당황한 부모는 큰 글씨부터 읽는다 — 경고를 그 자리에 놓고 숫자는 접어 둔다. */
     if (tooYoung) return `<div class="dose-card young"><div class="eyebrow">${esc(D.name)} · ${esc(D.brand)}</div>
@@ -3400,6 +3430,7 @@ function vKids(){
       ${r.capped ? `<div class="note" style="margin-top:10px">${I.info}<span>몸무게로만 곱하면 1회 ${r.rawHi} mg·하루 ${r.rawDay} mg이지만, 어른 상한(1회 ${D.capDose}·하루 ${D.capDay} mg)에서 멈춰요.</span></div>` : ''}
       ${k === 'apap' && m != null && m < 24 ? `<p class="small muted" style="margin-top:8px">두 돌 전이라 하루 한도를 60 mg/kg으로 봤어요(그 뒤 75 mg/kg).</p>` : ''}
       <p class="small muted" style="margin-top:8px">${esc(D.note)}</p>
+      ${rev}
       <a class="link small" href="#/drug/${D.drugId}">성분 자세히 ›</a></div>`; };
   return `${topBar({ back:'홈' })}
   <div class="eyebrow">소아 용량</div><h1>아이 해열제, 몇 mL 먹이지?</h1>${art('kids-dose', 'spot')}
