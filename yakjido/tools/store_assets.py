@@ -11,7 +11,9 @@ from PIL import Image
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 DOCS = ROOT.parent / 'docs' / 'yakjido'
 OUT = ROOT / 'store'; OUT.mkdir(exist_ok=True)
+import os
 CHROME = '/opt/pw-browsers/chromium-1194/chrome-linux/chrome'
+LAUNCH = {'executable_path': CHROME} if os.path.exists(CHROME) else {}   # 다른 컴퓨터에서는 Playwright 기본 브라우저
 
 SENIOR = {'age': 'senior', 'easy': False, 'taking': ['cls:bp.ccb', 'acetaminophen', 'magnesium-oxide'], 'prn': {'acetaminophen': True},
           'sched': {'cls:bp.ccb': ['08:00'], 'magnesium-oxide': ['08:00', '19:00']},
@@ -48,7 +50,7 @@ def main():
     from playwright.sync_api import sync_playwright
     url = serve()
     with sync_playwright() as pw:
-        br = pw.chromium.launch(executable_path=CHROME)
+        br = pw.chromium.launch(**LAUNCH)
         for name, route, me, h, p, *focus in SHOTS:
             pg = br.new_page(viewport={'width': 360, 'height': 700}, device_scale_factor=3)
             pg.clock.install(time='2026-09-29T09:30:00')

@@ -11,7 +11,9 @@ import argparse, functools, http.server, json, pathlib, socketserver, threading
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 DOCS = ROOT.parent / 'docs' / 'yakjido'
+import os
 CHROME = '/opt/pw-browsers/chromium-1194/chrome-linux/chrome'
+LAUNCH = {'executable_path': CHROME} if os.path.exists(CHROME) else {}   # 다른 컴퓨터에서는 Playwright 기본 브라우저
 
 JS = """async (files) => {
   await lexLoad?.(true);
@@ -40,7 +42,7 @@ def main():
     srv = socketserver.TCPServer(('127.0.0.1', 0), h); threading.Thread(target=srv.serve_forever, daemon=True).start()
     from playwright.sync_api import sync_playwright
     with sync_playwright() as pw:
-        br = pw.chromium.launch(executable_path=CHROME); pg = br.new_page()
+        br = pw.chromium.launch(**LAUNCH); pg = br.new_page()
         pg.goto(f'http://127.0.0.1:{srv.server_address[1]}/index.html#/home'); pg.wait_for_selector('.app'); pg.wait_for_timeout(1500)
         res = pg.evaluate(JS, files); br.close()
     for f, r in res.items():

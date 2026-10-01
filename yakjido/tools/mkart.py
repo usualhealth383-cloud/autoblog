@@ -1,7 +1,10 @@
 import re, json, base64, pathlib, sys
-ROOT = pathlib.Path('/home/user/autoblog/docs/yakjido')
-OUT  = pathlib.Path('/tmp/claude-0/-home-user-autoblog/cf2f6625-dcb1-56a6-b544-ead87bbf0fa1/scratchpad/artifact/yakson.html')
-s = (ROOT/'index.html').read_text()
+import os
+ROOT = pathlib.Path(__file__).resolve().parents[2] / 'docs' / 'yakjido'
+# 결과 위치: YAKJIDO_ART 환경변수 → 클라우드 작업 폴더(있으면) → 저장소 안 .build/(깃에 안 올라감)
+_CLOUD = pathlib.Path('/tmp/claude-0/-home-user-autoblog/cf2f6625-dcb1-56a6-b544-ead87bbf0fa1/scratchpad')
+OUT = pathlib.Path(os.environ['YAKJIDO_ART']) if os.environ.get('YAKJIDO_ART') else (_CLOUD if _CLOUD.exists() else pathlib.Path(__file__).resolve().parents[1] / '.build') / 'artifact' / 'yakson.html'
+s = (ROOT/'index.html').read_text(encoding='utf-8')
 # 1) strip the outer document wrapper (Artifact adds its own)
 s = re.sub(r'^<!doctype html>\s*|^<html[^>]*>\s*|</html>\s*$', '', s, flags=re.I|re.M)
 s = re.sub(r'</?(head|body)[^>]*>\s*', '', s, flags=re.I)
@@ -40,19 +43,19 @@ brandmark = 'data:image/png;base64,' + base64.b64encode(_b.getvalue()).decode()
 inject = ('<script>const ART_DATA = ' + json.dumps(art) + ';\n'
           "window.__BRANDMARK__ = " + json.dumps(brandmark) + ';\n'
           "window.__NOWX = true;\n"  # 아티팩트에서는 날씨를 못 받으니 실패 줄도 두지 않는다(2026-09-29)
-          "window.__CORE__ = " + (ROOT/'data/core.json').read_text() + ';\n'
-          "window.__PILLS__ = " + (ROOT/'data/pills.json').read_text() + ';\n'
-          "window.__EASY__ = "  + (ROOT/'data/easy-index.json').read_text() + ';\n'
-          "window.__LEX__ = {ing:" + (ROOT/'data/lexicon.json').read_text()
-          + ",brand:" + (ROOT/'data/brands.json').read_text()
-          + ",qa:" + (ROOT/'data/qa.json').read_text()
-          + ",nut:" + (ROOT/'data/nutrients.json').read_text()
-          + ",mix:" + (ROOT/'data/mixes.json').read_text() + '};</script>\n')
+          "window.__CORE__ = " + (ROOT/'data/core.json').read_text(encoding='utf-8') + ';\n'
+          "window.__PILLS__ = " + (ROOT/'data/pills.json').read_text(encoding='utf-8') + ';\n'
+          "window.__EASY__ = "  + (ROOT/'data/easy-index.json').read_text(encoding='utf-8') + ';\n'
+          "window.__LEX__ = {ing:" + (ROOT/'data/lexicon.json').read_text(encoding='utf-8')
+          + ",brand:" + (ROOT/'data/brands.json').read_text(encoding='utf-8')
+          + ",qa:" + (ROOT/'data/qa.json').read_text(encoding='utf-8')
+          + ",nut:" + (ROOT/'data/nutrients.json').read_text(encoding='utf-8')
+          + ",mix:" + (ROOT/'data/mixes.json').read_text(encoding='utf-8') + '};</script>\n')
 # 낱알·제품 사진 판(tools/pill_sprites.py)과 약학정보원 그림 표시·복약정보 조각을 함께 싣는다 — 아티팩트는 바깥 사진을 막아서(2026-09-30)
 SP = OUT.parent.parent / 'sprites'
 files = {}
 if (SP / 'ps.json').exists():
-    inject += '<script>window.__PS = ' + (SP / 'ps.json').read_text() + ';window.__PICTO_LOCAL = true;</script>\n'
+    inject += '<script>window.__PS = ' + (SP / 'ps.json').read_text(encoding='utf-8') + ';window.__PICTO_LOCAL = true;</script>\n'
     for f in sorted((SP / 'ps').glob('*.jpg')): files['ps/' + f.name] = str(f)
     # 그림 표시(픽토그램) — 복약정보에 나오는 것만 받아 둔다
     kgp = ROOT / 'data' / 'kpic-guide.json'
@@ -71,7 +74,7 @@ for f in sorted((ROOT / 'data' / 'kg').glob('*.json')): files['data/kg/' + f.nam
 print('함께 싣는 파일', len(files), '개 ·', round(sum(pathlib.Path(v).stat().st_size for v in files.values()) / 1e6, 1), 'MB → files.json')
 i = s.index('<div class="app">')
 s = s[:i] + inject + s[i:]
-OUT.parent.mkdir(parents=True, exist_ok=True); OUT.write_text(s)
+OUT.parent.mkdir(parents=True, exist_ok=True); OUT.write_text(s, encoding='utf-8')
 print('wrote', OUT, round(len(s.encode())/1e6, 2), 'MB · art', len(art))
 assert "'icon-192.png'" not in s.split('window.__BRANDMARK__')[0] or 'window.__BRANDMARK__ = "data:' in s, '앱 표시 그림이 파일 경로로 남았습니다'
 for bad in ['serviceWorker.register', 'rel="manifest"', '<!doctype', '<body']:

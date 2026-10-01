@@ -1,6 +1,8 @@
 import functools,http.server,socketserver,threading,pathlib,json
 from playwright.sync_api import sync_playwright
-DOCS=pathlib.Path('/home/user/autoblog/docs/yakjido')
+DOCS=pathlib.Path(__file__).resolve().parents[2]/'docs'/'yakjido'
+import os
+_CH='/opt/pw-browsers/chromium-1194/chrome-linux/chrome'; LAUNCH={'executable_path':_CH} if os.path.exists(_CH) else {}
 class Q(http.server.SimpleHTTPRequestHandler):
     def log_message(self,*a,**k):pass
 srv=socketserver.TCPServer(('127.0.0.1',0),functools.partial(Q,directory=str(DOCS)))
@@ -14,7 +16,7 @@ CASES=[('폭염+이뇨제+NSAID',['cls:bp.diur','ibuprofen'],fc(34,25),{"pm10":3
        ('미세먼지+천식플래그',[],fc(20,12),{"pm10":120,"pm2_5":60},'흡입기'),
        ('빈 약통 무난',[],fc(22,16),{"pm10":20,"pm2_5":8},'무난')]
 with sync_playwright() as p:
-    br=p.chromium.launch(executable_path='/opt/pw-browsers/chromium-1194/chrome-linux/chrome')
+    br=p.chromium.launch(**LAUNCH)
     pg=br.new_page(viewport={'width':390,'height':844}); errs=[]
     pg.on('pageerror',lambda e:errs.append(str(e)))
     cur={}
