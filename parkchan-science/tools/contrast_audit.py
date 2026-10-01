@@ -4,7 +4,7 @@
 """
 import asyncio, sys
 import sys as _s, os as _o; _s.path.insert(0, _o.path.dirname(_o.path.abspath(__file__)))
-from _ui import auto_yes
+from _ui import auto_yes, audit_extra
 from playwright.async_api import async_playwright
 
 JS = r"""
@@ -82,6 +82,7 @@ async def run(theme):
         await pg.fill('#nedTitle', '대비 점검'); await pg.fill('#nedBody', '점검 메모'); await pg.wait_for_timeout(700); await sweep(pg, '노트 쓰기', bad)
         await pg.click('#nedDone'); await pg.wait_for_timeout(300); await sweep(pg, '공부 노트', bad)
         await pg.click('#noteBack'); await pg.wait_for_timeout(300); await pg.click('.tab[data-v="today"]'); await pg.wait_for_timeout(500); await sweep(pg, '오늘(노트 카드)', bad)
+        await audit_extra(pg, look)
         await b.close(); return bad
 
 async def main():

@@ -4,7 +4,7 @@
 """
 import asyncio, json, sys
 import sys as _s, os as _o; _s.path.insert(0, _o.path.dirname(_o.path.abspath(__file__)))
-from _ui import auto_yes
+from _ui import auto_yes, audit_extra
 from playwright.async_api import async_playwright
 
 JS = r"""
@@ -78,6 +78,7 @@ async def main():
         await pg.click('#noteNew'); await pg.wait_for_timeout(300); await pg.fill('#nedBody', '점검 메모'); await pg.wait_for_timeout(700); await check('노트 쓰기')
         await pg.click('#nedAddC'); await pg.wait_for_timeout(300); await check('개념 붙이기'); await pg.click('#sheetClose'); await pg.wait_for_timeout(200)
         await pg.click('#nedDone'); await pg.wait_for_timeout(300); await check('노트 달력')
+        await pg.click('#noteBack'); await pg.wait_for_timeout(300); await audit_extra(pg, check)
         await b.close()
         print('\n지적 합계', bad)
         sys.exit(1 if bad else 0)

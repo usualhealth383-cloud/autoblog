@@ -241,7 +241,7 @@ button,.tab,.btn,.chip,.chipbar button,.seg button{-webkit-user-select:none;user
 /* 문제 */
 .qhead{display:flex;align-items:center;justify-content:space-between;margin-bottom:13px}
 .qhead .l{font-size:14px;font-weight:900}
-.tag{font-size:11px;font-weight:800;padding:4px 10px;border-radius:999px;background:var(--u-soft);color:var(--u)}
+.tag{font-size:11px;font-weight:800;padding:4px 10px;border-radius:999px;background:var(--u-soft);color:var(--u-dark)}   /* --u 는 연한 바탕 위에서 4.47:1 — AA 미달(2026-10 점검) */
 .stem{font-family:var(--serif);font-size:15px;line-height:1.85;margin-bottom:13px}
 .bogi{border:1px solid var(--u-line);background:var(--u-soft);border-radius:11px;padding:12px 14px;margin-bottom:13px;font-size:13.5px;line-height:1.8}
 .ask{font-size:14px;line-height:1.75;margin-bottom:12px;font-weight:500}
@@ -609,6 +609,22 @@ select.sel{font-family:inherit;font-size:14px;font-weight:700;color:var(--u);bac
 .blankin{display:flex;gap:8px;margin-bottom:14px}
 .blankin input{flex:1;border:1.5px solid var(--line);border-radius:12px;padding:13px 14px;font-size:16px;font-family:inherit;background:var(--card);color:var(--ink);min-width:0}
 .blankin button{background:var(--u);color:var(--on-color);border:none;border-radius:12px;padding:12px 18px;font-size:14px;font-weight:800;cursor:pointer}
+/* 확신도 한 탭 · 해설 없는 문항의 개념 카드 링크 */
+.conf{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:2px 0 12px}
+.conf .k{font-size:12px;font-weight:700;color:var(--faint);margin-right:2px}
+.conf button{min-height:44px;min-width:84px;padding:0 16px;border-radius:999px;border:1.5px solid var(--line);background:var(--card);color:var(--muted);font-family:inherit;font-size:13.5px;font-weight:800;cursor:pointer}
+.conf button[aria-pressed="true"]{border-color:var(--brand);background:var(--brand-soft);color:var(--brand-dark)}
+.confnote{font-size:13px;font-weight:700;color:var(--u-dark);margin:0 0 6px;line-height:1.6;word-break:keep-all}
+.verdict .cgo{background:var(--card);border:1px solid var(--u-line);color:var(--u-dark);margin-top:6px;padding:12px;font-size:14px}
+/* 원장 '처리할 것' — 학생 탭 맨 위 */
+.todo summary{display:flex;align-items:center;gap:8px;min-height:44px;flex-wrap:wrap}
+.todo summary .none{font-weight:600;font-size:13px;color:var(--muted)}
+.todo-row{display:flex;align-items:center;gap:10px;padding:10px 0;border-top:1px solid var(--hair)}
+.todo-row .b{flex:1;min-width:0}
+.todo-row .nm{display:block;font-weight:800;font-size:14px;color:var(--ink)}
+.todo-row .nm small{font-weight:600;font-size:12px;color:var(--faint);margin-left:4px}
+.todo-row .why{display:block;font-size:12.5px;line-height:1.65;color:var(--body);margin-top:2px;word-break:keep-all}
+.todo-act{flex:0 0 auto;min-height:44px;padding:0 14px;border-radius:12px;border:1px solid var(--brand-line);background:var(--card);color:var(--brand-dark);font-family:inherit;font-size:13px;font-weight:800;display:inline-flex;align-items:center;text-decoration:none;cursor:pointer;white-space:nowrap}
 .wrongbox{background:var(--no-soft);border-left:4px solid var(--no);border-radius:0 12px 12px 0;padding:11px 14px;margin-bottom:11px;font-size:13px;line-height:1.7;color:var(--body)}
 .wrongbox .h{font-size:12px;font-weight:900;color:var(--no);margin-bottom:3px}
 .result{background:var(--card);border:1.5px solid var(--u);border-radius:16px;padding:18px;text-align:center;margin-bottom:13px}
@@ -1284,6 +1300,8 @@ const DB = (() => {
       const i = L.findIndex(x => x.id === n.id); if (i < 0) L.push(r); else L[i] = r; w(); },
     noteDel: async id => { const a = me(); if (!a || !d.notes || !d.notes[a.id]) return; d.notes[a.id] = d.notes[a.id].filter(x => x.id !== id); w(); },
     progressAll: async () => Object.entries(d.progress).filter(([k])=>!k.startsWith('u:')).map(([code, state]) => ({ code, state })),
+    /* 원장 '처리할 것'용 — 학습한 날·오답 상자·날짜별 정답 수만 */
+    progressBrief: async () => Object.entries(d.progress).filter(([k])=>!k.startsWith('u:')).map(([code, st]) => ({ code, days:(st&&st.days)||[], wrong:(st&&st.wrong)||[], dq:(st&&st.dq)||{} })),
     /* 이용권 */
     redeemPass: async code => {
       const p = d.passes.find(x => x.code === code); if (!p) return { ok:false, why:'없는 이용권 코드입니다.' };
@@ -1444,6 +1462,8 @@ const serverDB = () => {
     saveProgress: async (key, state) => { const r = await api('/rest/v1/progress?on_conflict=code&select=state', { method:'POST', prefer:'resolution=merge-duplicates,return=representation', body:{ code:key, state, at:new Date().toISOString() } });
       return { at: r && r[0] && r[0].state && r[0].state.at }; },   // 서버가 적은 저장 시각
     progressAll: async () => (await api('/rest/v1/progress?select=code,state,at&code=not.like.u:*')).map(r => ({ code:r.code, state:r.state })),
+    /* 원장 '처리할 것'용 — 진도 JSON 에서 세 칸만(원장 읽기 정책 owner_read 그대로, 받는 양만 줄인다) */
+    progressBrief: async () => (await api('/rest/v1/progress?select=code,days:state->days,wrong:state->wrong,dq:state->dq&code=not.like.u:*')).map(r => ({ code:r.code, days:r.days||[], wrong:r.wrong||[], dq:r.dq||{} })),
     redeemPass: async code => { const r = await api('/rest/v1/rpc/redeem_pass', { method:'POST', body:{ p_code: code } }); if (r && r.ok){ meCache = null; } return r; },
     issuePass: async days => { const r = await api('/rest/v1/passes', { method:'POST', prefer:'return=representation', body:{ code:genCode('pass'), days } }); return r[0]; },
     passes: async () => (await api('/rest/v1/passes?select=*&order=issued.desc')).map(p => ({ code:p.code, days:p.days, issued:p.issued, usedBy:p.used_by||'', usedAt:p.used_at||'' })),
@@ -1481,7 +1501,7 @@ const load = () => { let raw = null; try { raw = localStorage.getItem(KEY); } ca
   try { const v = JSON.parse(raw); if (v && typeof v === 'object' && !Array.isArray(v)) return v; } catch {}
   try { localStorage.setItem(KEY + '.broken', raw.slice(0, 2e6)); } catch {} storeWarn = '이 기기의 공부 기록을 읽지 못해 새로 시작합니다. 로그인하면 서버에 남은 기록을 다시 받아 옵니다.'; return {}; };
 const fixS = S => { const arr = k => { if (!Array.isArray(S[k])) S[k] = []; }, obj = (o, k) => { if (!o[k] || typeof o[k] !== 'object' || Array.isArray(o[k])) o[k] = {}; };
-  ['done','wrong','read','days','bm','qkeep','blocked'].forEach(arr); obj(S, 'bh'); obj(S, 'seenC');
+  ['done','wrong','read','days','bm','qkeep','blocked'].forEach(arr); obj(S, 'bh'); obj(S, 'seenC'); obj(S, 'dq');
   if (!S.stats || typeof S.stats !== 'object') S.stats = { a:0, c:0 }; S.stats.a = +S.stats.a || 0; S.stats.c = +S.stats.c || 0;
   if (typeof S.start !== 'string' || !/^\d{4}-\d\d-\d\d$/.test(S.start)) S.start = '';
   if (!S.sched || typeof S.sched !== 'object' || Array.isArray(S.sched)) S.sched = {}; ['fixed','events','ddays'].forEach(k => { if (!Array.isArray(S.sched[k])) S.sched[k] = []; });
@@ -1491,7 +1511,7 @@ let syncT = null;
 /* 만 14세 미만은 보호자 동의를 확인하기 전까지 진도를 서버에 올리지 않는다(이 기기에만) */
 const consentPending = () => !!(ACC && ACC.under14 && !ACC.guardianOk);
 const progressKey = () => consentPending() ? null : (S.auth && S.auth.code) || (ACC ? 'u:'+ACC.id : null);
-const snapshot = () => ({ start:S.start, done:S.done, wrong:S.wrong, read:S.read, days:S.days, bm:S.bm, stats:S.stats, bh:S.bh||{}, qkeep:S.qkeep||[], blocked:S.blocked||[], seenC:S.seenC||{}, sched:S.sched, notifyAt:S.notifyAt, at:new Date().toISOString() });
+const snapshot = () => ({ start:S.start, done:S.done, wrong:S.wrong, read:S.read, days:S.days, bm:S.bm, stats:S.stats, dq:S.dq||{}, bh:S.bh||{}, qkeep:S.qkeep||[], blocked:S.blocked||[], seenC:S.seenC||{}, sched:S.sched, notifyAt:S.notifyAt, at:new Date().toISOString() });
 /* 기기 여러 대(폰·태블릿): 저장한 스냅숏 시각(syncAt)을 기억해 두고, 앱으로 돌아올 때 서버가 더 새 것이면 받아 합친다 */
 let quotaWarned = false;
 const quotaFail = () => { if (quotaWarned) return; quotaWarned = true; setTimeout(() => toast('기기 저장 공간이 가득 차 방금 기록을 저장하지 못했습니다. 저장 공간을 비우거나 로그인해 서버에 남겨 주세요.'), 50); };
@@ -1516,6 +1536,7 @@ const mergeProgress = p => { if (!p) return;
   S.bm = pick(p.bm, S.bm);
   /* 통계는 더하지 않는다 — 같은 기록이 기기와 서버에 모두 있어 더하면 켤 때마다 두 배가 된다. 더 많이 푼 쪽을 취한다 */
   if (p.stats && (p.stats.a||0) > (S.stats.a||0)) S.stats = { a:p.stats.a||0, c:p.stats.c||0 };
+  if (p.dq && typeof p.dq === 'object'){ S.dq ||= {}; Object.entries(p.dq).forEach(([d, v]) => { if (Array.isArray(v) && (!S.dq[d] || (v[0]||0) > (S.dq[d][0]||0))) S.dq[d] = [v[0]||0, v[1]||0]; }); }   // 날짜별도 더 많이 푼 쪽
   S.bh = newer ? { ...(S.bh||{}), ...(p.bh||{}) } : { ...(p.bh||{}), ...(S.bh||{}) };
   S.qkeep = pick(p.qkeep, S.qkeep);
   S.blocked = pick(p.blocked, S.blocked);
@@ -1539,7 +1560,7 @@ setInterval(() => { if (document.visibilityState === 'visible') dayRoll(); }, 60
 document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') dayRoll(); });
 document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible'){ pullProgress(); syncNotes().then(() => { if (view === 'note') renderNote(); else refreshNoteCard(); }).catch(()=>{}); } else if (view === 'noted') nedCommit(); });
 /* 새 진도(로그아웃·계정 삭제 뒤) — 화면 설정만 남기고 비운다. 한 기기를 여럿이 쓸 때 진도가 섞이지 않게 */
-const freshS = () => ({ start:todayISO(), done:[], wrong:[], read:[], days:[], bm:[], stats:{a:0,c:0}, bh:{}, qkeep:[], qskip:0, blocked:[], seenC:{},
+const freshS = () => ({ start:todayISO(), done:[], wrong:[], read:[], days:[], bm:[], stats:{a:0,c:0}, dq:{}, bh:{}, qkeep:[], qskip:0, blocked:[], seenC:{},
   sched:{ fixed:[], events:[], ddays:[] }, syncAt:'', fs:S.fs||'보통', theme:S.theme||'시스템', notifyAt:S.notifyAt||'안 받음', onboarded:true });
 const flushProgress = async () => { clearTimeout(syncT); const k = progressKey(); if (k) try { await pushProgress(k); } catch {} };
 let S = fixS(load());
@@ -1574,7 +1595,10 @@ const quizFor = c => { const pool = QUIZZES.filter(q=>q.lessonId===c.lessonId); 
    7일 넘게 띄운 복습에서 두 번 잇달아 맞혀야 '정리됨'. 범위에 든 시험이 다가오면 간격을 남은 날의 20 %(최소 1일)로 줄인다.
    하루 복습은 10문항까지(밀린 것부터) — 넘치는 것은 다음 날로. 6번 넘게 틀린 문제는 다시 묻지 않고 개념 카드로 돌려보낸다.
    기록(오답 하나): b(문제 은행 id) 또는 l·n(오늘의 문제) · p 내 답 · iso 처음 틀린 날 · a 마지막으로 푼 날 · d 다음 복습 날
-                    · x 상자(1–5) · k 틀린 횟수 · g 7일 넘는 간격에서 잇달아 맞힌 수 · rd 개념 카드로 돌아가 읽은 날 · cleared 정리됨 */
+                    · x 상자(1–5) · k 틀린 횟수 · g 7일 넘는 간격에서 잇달아 맞힌 수 · rd 개념 카드로 돌아가 읽은 날 · cleared 정리됨
+                    · c 마지막으로 풀 때 고른 확신('s' 확신 · 'u' 헷갈림, 고르지 않았으면 없음)
+   확신도 한 탭(2026-10): 헷갈렸는데 맞힌 것은 '아직 덜 익음' — 상자 2(3일)를 넘지 않고 정리되지 않는다(처음이면 상자 2로 담는다, k 0).
+   확신했는데 틀린 것은 평소대로 상자 1 — 화면에 '이런 문제가 가장 잘 고쳐집니다' 한 줄(초교정 효과) */
 const SRS = [1, 3, 7, 14, 30], SRS_CAP = 10, LEECH = 6;
 const wKey = w => w.b ? 'b:'+w.b : w.l+':'+w.n;
 const lessonOfW = w => w.l || String(w.b||'').split('-')[0];
@@ -1601,9 +1625,17 @@ const rvToday = () => (S.rv && S.rv.d === todayISO()) ? S.rv : (S.rv = { d:today
 const dueAll = () => S.wrong.filter(isDueW).sort((a, b) => a.d < b.d ? -1 : a.d > b.d ? 1 : (a.iso < b.iso ? -1 : a.iso > b.iso ? 1 : 0));
 const dueToday = () => dueAll().slice(0, Math.max(0, SRS_CAP - rvToday().n));
 /* 채점 결과를 상자에 반영 — 돌려주는 st: new(새로 담음) · reset(상자 1로) · up(다음 상자) · clear(정리됨) · early(기한 전이라 그대로) · null */
-function srsMark(ref, ok, p){
+function srsMark(ref, ok, p, conf){
   const t = todayISO(); let w = findW(ref);
   if (isDueW(w)) rvToday().n++;
+  const tag = r => { if (r && r.w){ if (conf) r.w.c = conf; else delete r.w.c; } return r; };
+  if (ok && conf === 'u'){   // 헷갈렸지만 맞힘 — 상자 2를 넘지 않는다
+    if (!w || w.cleared){ if (!w){ w = ref.b ? { b:ref.b } : { l:ref.l, n:ref.n }; Object.assign(w, { iso:t, k:0 }); S.wrong.push(w); }
+      delete w.cleared; w.p = p; w.a = t; w.x = 2; delete w.g; w.d = addDays(t, srsGap(2, lessonOfW(w))); return tag({ st:'hold', d:w.d, w }); }
+    const due = w.d <= t; w.x = Math.min(2, due ? (w.x||1) + 1 : (w.x||1)); delete w.g; w.a = t;
+    const nd = addDays(t, srsGap(w.x, lessonOfW(w))); w.d = due || nd < w.d ? nd : w.d; return tag({ st:'hold', d:w.d, w }); }
+  return tag(srsMark0(w, ref, ok, p, t)); }
+function srsMark0(w, ref, ok, p, t){
   if (!ok){
     if (!w){ w = ref.b ? { b:ref.b } : { l:ref.l, n:ref.n }; Object.assign(w, { p, iso:t, a:t, x:1, k:1 }); w.d = addDays(t, srsGap(1, lessonOfW(w))); S.wrong.push(w); return { st:'new', d:w.d, w }; }
     delete w.cleared; delete w.rd; delete w.g; w.p = p; w.a = t; w.x = 1; w.k = (w.k||1) + 1; w.d = addDays(t, srsGap(1, lessonOfW(w))); return { st:'reset', d:w.d, w }; }
@@ -1613,11 +1645,26 @@ function srsMark(ref, ok, p){
   if (w.g >= 2){ w.cleared = true; delete w.g; return { st:'clear', w }; }
   if (!w.g) delete w.g;
   w.d = addDays(t, srsGap(w.x, lessonOfW(w))); return { st:'up', d:w.d, w }; }
+/* 확신도 한 탭 — 답을 고르기 전에 '확신 / 헷갈림'(선택, 다시 누르면 풀림). 채점에는 쓰지 않고 상자 규칙에만 쓴다 */
+const confRow = cur => `<div class="conf" role="group" aria-label="답을 고르기 전에 얼마나 확신하는지 고를 수 있습니다(선택)"><span class="k">고르기 전에 · 선택</span>${[['s','확신'],['u','헷갈림']].map(([k, l]) => `<button type="button" data-conf="${k}" aria-pressed="${cur === k}">${l}</button>`).join('')}</div>`;
+const confNote = (conf, ok) => conf === 's' && !ok ? `<p class="confnote">확신했는데 틀렸습니다 — 이런 문제가 가장 잘 고쳐집니다</p>` : '';
+/* 날짜별 푼 수·맞힌 수(최근 28일만, 진도 JSON 을 작게) — 원장 '처리할 것'의 정답률 급락 판정용. dq: { 'YYYY-MM-DD': [푼 수, 맞힌 수] } */
+const statDay = ok => { const t = todayISO(); if (!S.dq || typeof S.dq !== 'object' || Array.isArray(S.dq)) S.dq = {}; const r = S.dq[t] ||= [0, 0]; r[0]++; if (ok) r[1]++;
+  const cut = addDays(t, -27); Object.keys(S.dq).forEach(d => { if (d < cut) delete S.dq[d]; }); };
+/* 해설도 선지별 해설도 없는 문항 — 빈 상자 대신 그 개념 카드로 */
+const conceptIdOfQ = q => { let c = null;
+  if (q._qz) c = CONCEPTS.find(x => x.lessonId === q.lessonId && (quizFor(x)||{}).no === q._qz.no);
+  else if (!q.id && q.no) c = CONCEPTS.find(x => x.lessonId === q.lessonId && (quizFor(x)||{}).no === q.no);
+  else if (+q.concept) c = CONCEPTS.find(x => x.lessonId === q.lessonId && +x.no === +q.concept);
+  return (c || CONCEPTS.find(x => x.lessonId === q.lessonId) || {}).id || ''; };
+const conceptGo = q => { const id = conceptIdOfQ(q); return id ? `<button class="btn soft cgo" data-cgo="${esc(id)}">이 개념 다시 보기</button>` : ''; };
+let detailBack = null;   // 문제 화면에서 '이 개념 다시 보기'로 왔으면 그 화면으로 돌아간다
 const dueWord = d => { const n = daysBetween(todayISO(), d); return n <= 0 ? '오늘' : n === 1 ? '내일' : `${kdate(d)}(${n}일 뒤)`; };
 const srsLine = r => !r ? '' : r.st === 'new' ? `↻ 오답 노트에 담았습니다 · <b>${dueWord(r.d)}</b> 한 번 더 묻습니다`
   : r.st === 'reset' ? `↻ 한 번 더 담아 둡니다 · <b>${dueWord(r.d)}</b> 다시 묻습니다`
   : r.st === 'up' ? `✓ 간격을 넓힙니다 · 다음 복습은 <b>${dueWord(r.d)}</b>입니다`
   : r.st === 'clear' ? '✓ 이제 됐습니다 — 오답 노트에서 정리됩니다'
+  : r.st === 'hold' ? `헷갈렸다면 아직 익는 중입니다 · <b>${dueWord(r.d)}</b> 한 번 더 묻습니다`
   : r.st === 'early' ? `맞혔습니다 · 복습 날짜는 그대로 <b>${dueWord(r.d)}</b>입니다` : '';
 /* 개념 카드 자리 — 오답 문제가 나온 개념(문제 은행은 concept 번호, 오늘의 문제는 그 문제를 내는 개념) */
 const conceptIdxOfW = w => { const l = lessonOfW(w); let i = -1;
@@ -2035,11 +2082,12 @@ function renderQuiz(){
       ${graded ? `<div class="verdict"><div class="h">이렇게 쓰면 됩니다</div><p>${rich(q.gradeNote || q.answerLine)}</p></div>` : ''}
       <button class="btn" id="grade">${graded ? (mode==='review'?'다음 복습 문제':'오늘 개념으로 돌아가기') : '답 확인하기'}</button>
     ` : `
+      ${graded ? '' : confRow(qState.conf)}
       <div class="opts">${q.choices.map((t,i)=>{ const n=i+1; let cls='', mk=''; if (graded){ if (n===q.answer){cls='ok';mk='정답';} else if (n===pick){cls='bad';mk='내 답';} }
         return `<button class="opt ${cls}" data-p="${n}" ${graded?'disabled':''}><span class="m">${MARKS[i]}</span><span class="tx">${rich(t)}</span>${mk?`<span class="mk">${mk}</span>`:''}</button>`; }).join('')}</div>
       ${graded ? `
         <div class="verdict" tabindex="-1" role="status"><div class="h">${pick===q.answer ? '맞혔습니다' : `아쉬워요 · 정답은 ${MARKS[q.answer-1]}`}</div>
-          <p>${rich(q.explain || (pick===q.answer ? '정답입니다.' : `정답은 ${MARKS[q.answer-1]}입니다. 개념의 포인트를 다시 읽어 보세요.`))}</p></div>
+          ${confNote(qState.conf, pick===q.answer)}${q.explain ? `<p>${rich(q.explain)}</p>` : conceptGo(q)}</div>
         ${srsLine(qState.srs) ? `<div class="again">${srsLine(qState.srs)}</div>` : ''}
         <button class="btn" id="grade">${mode==='review' ? '다음 복습 문제' : (retry ? '오늘의 문제로' : '오늘 개념으로 돌아가기')}</button>
         <button class="flag" data-report="quiz:${esc(q.lessonId)}#${q.no}">문제·해설에 틀린 곳이 있나요?</button>
@@ -2054,9 +2102,9 @@ function startReview(){
 }
 function gradePick(pick){
   const {q, retry, mode} = qState; qState.pick = pick; touchDay();
-  S.stats.a++; if (pick===q.answer) S.stats.c++;
+  S.stats.a++; if (pick===q.answer) S.stats.c++; statDay(pick===q.answer);
   if (mode==='today'){ const c = todayConcept(); if (!S.done.includes(c.id)) S.done.push(c.id); }
-  qState.srs = srsMark({ l:q.lessonId, n:q.no }, pick===q.answer, pick);   // 오늘의 문제·다시 풀기·복습 모두 같은 상자 규칙
+  qState.srs = srsMark({ l:q.lessonId, n:q.no }, pick===q.answer, pick, qState.conf);   // 오늘의 문제·다시 풀기·복습 모두 같은 상자 규칙
   save(S); renderQuiz(); document.querySelector('#v-quiz .verdict')?.focus({ preventScroll:true });   // 채점 결과를 화면낭독기가 읽게
 }
 
@@ -2092,7 +2140,7 @@ let detailIdx = 0;
 function renderDetail(){
   const c = CONCEPTS[detailIdx]; setUnit(c.unit); const q = quizFor(c); touchDay();
   document.getElementById('v-detail').innerHTML = `
-    <button class="back" id="backList"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg>교재</button>
+    <button class="back" id="backList"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg>${detailBack ? '문제로 돌아가기' : '교재'}</button>
     ${conceptCard(c)}
     <div class="sec"><h2>확인 문제</h2>
       <p class="stem" style="font-size:14px;margin-bottom:8px">${rich(q.stem)}</p>
@@ -2127,13 +2175,13 @@ function renderWrong(){
       return `<div class="sec"><h2><span>${date}${when(w)}</span>${act(w, `<button class="more" data-bretry="${q.id}">지금 다시 풀기</button>`)}</h2>
       ${isLeech(w) ? `<p class="leech">${LEECH_NOTE}</p>` : ''}
       <p class="stem" style="font-size:14px;margin-bottom:9px">${rich(q.stem)}</p>
-      <div class="myth" style="margin:0"><span class="x">내 답 ${esc(String(w.p))}</span> &nbsp; <span class="o">정답 ${esc(q.type==='mc'||q.type==='multi'?MARKS[q.answer-1]:String(q.answer))}</span>${q.explain?`<br><span style="color:var(--body)">${rich(q.explain)}</span>`:''}</div>
+      <div class="myth" style="margin:0">${w.k === 0 ? '<span class="o">헷갈렸지만 맞힘</span> &nbsp; ' : `<span class="x">내 답 ${esc(String(w.p))}</span> &nbsp; `}<span class="o">정답 ${esc(q.type==='mc'||q.type==='multi'?MARKS[q.answer-1]:String(q.answer))}</span>${q.explain?`<br><span style="color:var(--body)">${rich(q.explain)}</span>`:''}</div>
       ${c ? foot(w, `${c.name} · 문제 은행`) : ''}</div>`; }
     const q=QUIZZES.find(x=>x.lessonId===w.l && x.no===w.n); if(!q) return ''; const c = CONCEPTS.find(x=>x.lessonId===w.l);
     return `<div class="sec"><h2><span>${date}${when(w)}</span>${act(w, `<button class="more" data-retry="${w.l}:${w.n}">지금 다시 풀기</button>`)}</h2>
       ${isLeech(w) ? `<p class="leech">${LEECH_NOTE}</p>` : ''}
       <p class="stem" style="font-size:14px;margin-bottom:9px">${rich(q.stem)}</p>
-      <div class="myth" style="margin:0"><span class="x">내 답 ${MARKS[w.p-1]||esc(String(w.p))}</span> &nbsp; <span class="o">정답 ${MARKS[q.answer-1]}</span>${q.explain?`<br><span style="color:var(--body)">${rich(q.explain)}</span>`:''}</div>
+      <div class="myth" style="margin:0">${w.k === 0 ? '<span class="o">헷갈렸지만 맞힘</span> &nbsp; ' : `<span class="x">내 답 ${MARKS[w.p-1]||esc(String(w.p))}</span> &nbsp; `}<span class="o">정답 ${MARKS[q.answer-1]}</span>${q.explain?`<br><span style="color:var(--body)">${rich(q.explain)}</span>`:''}</div>
       ${c ? foot(w, c.lessonName) : ''}</div>`; };
   v.innerHTML = `<h1 class="h-page">오답 노트</h1>
     <p class="fine" style="text-align:left;padding:0 0 6px">${live.length}문제가 담겨 있습니다${cleared.length?` · ${cleared.length}문제는 다시 풀어 정리했습니다`:''}.</p>
@@ -2589,9 +2637,10 @@ function renderBankSession(){
     ${q.figure ? `<div class="qfig" data-zoomsvg="${bs.i}">${q.figure}</div>` : ''}
     ${q.source ? `<div class="bogi">${rich(q.source).replace(/\n/g,'<br>')}</div>` : ''}
     ${q.ask ? `<p class="ask">${rich(q.ask)}</p>` : ''}
+    ${graded || q.type === 'essay' ? '' : confRow(bs.conf)}
     ${body}
     ${graded ? '' : `<p class="qhint">${HINT}<br>틀려도 괜찮습니다 — 오답은 <b>내일</b> 다시 나오고, 맞힐수록 간격이 늘어납니다.</p>`}
-    ${graded ? `<div class="verdict" tabindex="-1" role="status"><div class="h">${q.type==='essay' ? '모범 답안' : ok ? '맞혔습니다' : '아쉽습니다'}${q.type!=='essay' && (q.type==='mc'||q.type==='multi') ? ` · 정답 ${MARKS[q.answer-1]}` : q.type==='ox'||q.type==='blank' ? ` · 정답 ${esc(q.answer)}` : ''}</div><p>${rich(q.explain||'개념 카드의 포인트를 다시 읽어 보세요.')}</p></div>
+    ${graded ? `<div class="verdict" tabindex="-1" role="status"><div class="h">${q.type==='essay' ? '모범 답안' : ok ? '맞혔습니다' : '아쉽습니다'}${q.type!=='essay' && (q.type==='mc'||q.type==='multi') ? ` · 정답 ${MARKS[q.answer-1]}` : q.type==='ox'||q.type==='blank' ? ` · 정답 ${esc(q.answer)}` : ''}</div>${q.type === 'essay' ? '' : confNote((bs.cf||[])[bs.i], ok)}${q.explain ? `<p>${rich(q.explain)}</p>` : q.wrong ? '' : conceptGo(q)}</div>
       ${q.wrong ? `<div class="wrongbox"><div class="h">${q.type==='essay'?'채점 기준':'오답 왜 틀렸나'}</div>${rich(q.wrong)}</div>` : ''}
       ${srsLine((bs.res||[])[bs.i]) ? `<div class="again">${srsLine(bs.res[bs.i])}</div>` : ''}
       ${q.type==='essay' && bs.pick==='?' ? `<div class="oxrow"><button data-ess="맞음" class="">맞게 썼다</button><button data-ess="틀림">부족했다</button></div>` : `<button class="btn" id="bankNext">${bs.i+1<bs.items.length?'다음 문제':'결과 보기'}</button>`}
@@ -2602,10 +2651,11 @@ function bankAnswer(pick){
   const q = bs.items[bs.i]; if (bs.pick !== null && bs.pick !== '?') return;
   bs.pick = pick; touchDay(); S.bh ||= {};
   if (pick === '?'){ renderBankSession(); return; }             // 서술형: 모범 답안 먼저 보여 주고 자가 채점
-  const ok = bankCorrect(q, pick); S.stats.a++; if (ok) S.stats.c++; if (!q._qz) S.bh[q.id] = ok ? 'o' : 'x';
+  const ok = bankCorrect(q, pick); S.stats.a++; if (ok) S.stats.c++; statDay(ok); if (!q._qz) S.bh[q.id] = ok ? 'o' : 'x';
+  const conf = q.type === 'essay' ? '' : (bs.conf || ''); (bs.cf ||= [])[bs.i] = conf;
   if (ok) bs.right++; else bs.wrong.push(q);
   /* 간격 복습 — 문제 은행 오답도 같은 상자에(예전엔 담기만 하고 다시 나오지 않았다) */
-  (bs.res ||= [])[bs.i] = q._qz ? srsMark({ l:q._qz.lessonId, n:q._qz.no }, ok, +pick) : srsMark({ b:q.id }, ok, (q.type==='mc'||q.type==='multi')?MARKS[+pick-1]:String(pick));
+  (bs.res ||= [])[bs.i] = q._qz ? srsMark({ l:q._qz.lessonId, n:q._qz.no }, ok, +pick, conf) : srsMark({ b:q.id }, ok, (q.type==='mc'||q.type==='multi')?MARKS[+pick-1]:String(pick), conf);
   save(S); renderBankSession(); window.scrollTo(0, 0); document.querySelector('#v-bank .verdict')?.focus({ preventScroll:true });
 }
 function pickBank(n){ const pool = bankPool(); const arr = pool.slice(); for (let i=arr.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [arr[i],arr[j]]=[arr[j],arr[i]]; } return arr.slice(0, n); }
@@ -3010,6 +3060,44 @@ function parseBulk(text, classes, taken){
     seen.add(name+'|'+cls); return r; });
 }
 let admTab='students', issued=null, admCls='', attTimer=null, admMonth=todayISO().slice(0,7), issuedPass=null;
+/* ═══ 원장 '처리할 것' — 학생 탭 맨 위. 원장이 이미 읽을 수 있는 것만 쓴다(출석 · 공지 읽음 · 학생 진도) ═══
+   ① 최근 7일에 출석했는데 7일 동안 앱 공부 기록(학습한 날)이 없음
+   ② 정답률이 그 전 7일보다 20%p 이상 떨어짐(두 주 모두 5문제 이상 풀었을 때만 — 몇 문제로 흔들리지 않게)
+   ③ 그 학생에게 간 가장 최근 공지(보낸 지 3시간~14일)를 아직 안 읽음 → 공지 보내기(문자)
+   ④ 기한이 지난 다시 볼 문제가 30개 넘게 밀림(개념 카드로 돌려보낸 문제는 빼고)
+   한 학생은 한 줄 — 이유를 모아 적고, 할 일은 하나(공지만 안 읽었으면 '공지 보내기', 나머지는 '학생 보기') */
+const TODO_DROP = 20, TODO_MIN = 5, TODO_BACKLOG = 30;
+let todoOpen = true; try { todoOpen = localStorage.getItem('pcs.todoOpen') !== '0'; } catch {}
+document.addEventListener('toggle', e => { if (e.target && e.target.id === 'todoBox'){ todoOpen = e.target.open; try { localStorage.setItem('pcs.todoOpen', todoOpen ? '1' : '0'); } catch {} } }, true);   // 접어 둔 채로 기억(이 기기만)
+async function ownerTodo(st){
+  const t = todayISO(), from = addDays(t, -6), live = st.filter(s => !s.until || s.until >= t);
+  let att = [], prog = [], ns = [];
+  await Promise.all([DBX.attendanceRange(from, t).then(r => { att = r; }).catch(() => {}),
+    DBX.progressBrief().then(r => { prog = r; }).catch(() => {}),
+    DBX.allNotices().then(r => { ns = r; }).catch(() => {})]);
+  const now = Date.now(), recent = ns.filter(n => { const a = Date.parse(n.at); return a && now - a >= 3 * 36e5 && now - a <= 14 * 864e5; });
+  const latestFor = cls => recent.find(n => n.cls === '전체' || n.cls === cls);
+  const unread = new Map();
+  await Promise.all([...new Set(live.map(s => latestFor(s.cls)).filter(Boolean))].map(n => DBX.noticeStats(n.id)
+    .then(r => { unread.set(n.id, new Set(((r && r.unread) || []).map(u => u.code))); }).catch(() => {})));
+  const rate = (dq, a, b) => { let n = 0, c = 0; for (let i = a; i <= b; i++){ const v = (dq || {})[addDays(t, -i)]; if (Array.isArray(v)){ n += +v[0] || 0; c += +v[1] || 0; } } return { n, r: n ? Math.round(c / n * 100) : 0 }; };
+  const rows = [];
+  live.forEach(s => { const p = prog.find(x => x.code === s.code) || {}, why = []; let nt = null;
+    const a = att.filter(x => x.code === s.code).length;
+    if (a && !(p.days || []).some(d => d >= from && d <= t)) why.push(`최근 7일 출석 ${a}번 · 앱 공부 기록 없음`);
+    const now7 = rate(p.dq, 0, 6), prev7 = rate(p.dq, 7, 13);
+    if (now7.n >= TODO_MIN && prev7.n >= TODO_MIN && prev7.r - now7.r >= TODO_DROP) why.push(`정답률 지난주 ${prev7.r}% → 이번 주 ${now7.r}%`);
+    const late = (p.wrong || []).filter(w => w && typeof w === 'object' && isDueW(w) && !isLeech(w)).length;
+    if (late > TODO_BACKLOG) why.push(`기한 지난 다시 볼 문제 ${late}개`);
+    const n = latestFor(s.cls); if (n && unread.has(n.id) && unread.get(n.id).has(s.code)){ why.push(`공지 ‘${n.t}’ 아직 안 읽음`); nt = n; }
+    if (why.length) rows.push({ s, why, nt: why.length === 1 ? nt : null }); });
+  rows.sort((x, y) => y.why.length - x.why.length || (x.s.cls + x.s.name).localeCompare(y.s.cls + y.s.name));
+  const ios = /iphone|ipad/i.test(navigator.userAgent) ? '&' : '?';
+  const act = r => r.nt ? (tel(r.s.phone) ? `<a class="todo-act" href="sms:${tel(r.s.phone)}${ios}body=${encodeURIComponent(`[${CFG.academy}] ${r.nt.t}${r.nt.d ? ' — ' + r.nt.d : ''}`)}">공지 보내기</a>` : `<button class="todo-act" data-adm="notice">공지 보내기</button>`)
+    : `<button class="todo-act" data-stu="${esc(r.s.code)}">학생 보기</button>`;
+  return `<details class="stuedit todo" id="todoBox" ${todoOpen ? 'open' : ''}><summary>처리할 것 ${rows.length ? `<span class="cst wait">${rows.length}명</span>` : `<span class="none">· 오늘 챙길 학생이 없습니다</span>`}</summary>
+    ${rows.map(r => `<div class="todo-row"><span class="b"><span class="nm">${esc(r.s.name)}<small>${esc(r.s.cls)}</small></span><span class="why">${r.why.map(esc).join('<br>')}</span></span>${act(r)}</div>`).join('')}
+    <p class="tip" style="margin:${rows.length ? '8px' : '0'} 0 0">출석했는데 7일 동안 앱 공부가 없는 학생 · 정답률이 지난주보다 ${TODO_DROP}%p 이상 떨어진 학생 · 최근 공지를 안 읽은 학생 · 다시 볼 문제가 ${TODO_BACKLOG}개 넘게 밀린 학생을 모읍니다.</p></details>`; }
 async function renderAdmin(){
   const v = document.getElementById('v-admin');
   const seg = `<div class="seg">${[['students','학생'],['attend','출석'],['notice','공지'],['sched','일정'],['talk','이야기'],['stats','통계'],['settings','설정']].map(([k,l])=>`<button data-adm="${k}" class="${admTab===k?'on':''}">${l}</button>`).join('')}</div>`;
@@ -3019,11 +3107,11 @@ async function renderAdmin(){
   const CL = classes.map(c=>c.cls); if (!admCls) admCls = CL[0]||'전체';
 
   if (admTab==='students'){
-    const st = await DBX.students();
-    v.innerHTML = head + `
+    const st = await DBX.students(); const todo = await ownerTodo(st).catch(() => '');
+    v.innerHTML = head + todo + `
       <div class="form"><h3>수강생 등록 → 코드 발급</h3>
-        <div class="g"><input id="stName" placeholder="이름"><select id="stCls">${CL.map(c=>`<option>${esc(c)}</option>`).join('')}</select></div>
-        <div class="g"><input id="stPhone" placeholder="연락처(문자 발송용)" inputmode="tel"><input id="stUntil" type="date" value="${new Date().getFullYear()+1}-02-28"></div>
+        <div class="g"><input id="stName" placeholder="이름" aria-label="이름"><select id="stCls" aria-label="반">${CL.map(c=>`<option>${esc(c)}</option>`).join('')}</select></div>
+        <div class="g"><input id="stPhone" placeholder="연락처(문자 발송용)" aria-label="연락처(문자 발송용)" inputmode="tel"><input id="stUntil" type="date" aria-label="수강 만료일" value="${new Date().getFullYear()+1}-02-28"></div>
         <button class="btn" id="stAdd">코드 만들기</button>
         ${issued ? `<div class="issued">${esc(issued.name)} 학생 · ${esc(issued.cls)} · ${kdate(issued.until)}까지<br>코드 <code>${issued.code}</code>
           <br><a href="sms:${tel(issued.phone)}${/iphone|ipad/i.test(navigator.userAgent)?'&':'?'}body=${encodeURIComponent(`[${CFG.academy}] ${issued.name} 학생 앱 코드: ${issued.code} — 앱 > 내 정보에서 등록하면 전 범위가 열립니다. 보호자도 같은 코드로 자녀를 연결할 수 있습니다.`)}">문자로 보내기 →</a></div>` : ''}</div>
@@ -3287,7 +3375,7 @@ const LEGAL = {
 <h4>1. 개인정보의 처리 목적</h4>
 <p>① 회원 가입·관리: 본인 확인, 계정 유지, 만 14세 미만 아동의 법정대리인 동의 확인, 부정 이용 방지<br>② 학습 서비스 제공: 개념·문제 제공, 진도·오답·북마크·통계와 공부 노트의 저장 및 기기 간 동기화, 알림 발송<br>③ 학원 운영: 수강생 인증(학원 코드), 출석 기록, 반별 공지와 확인 여부 관리, 보호자에게 자녀의 출석·진도 제공<br>④ 유료 서비스: 이용권 개통·기간 관리(결제 자체는 앱 마켓이 처리하며 회사는 결제 정보를 저장하지 않습니다)<br>⑤ 고충 처리: 문의 응대, 분쟁 조정, 공지 전달</p>
 <h4>2. 처리하는 개인정보의 항목</h4>
-<p>① 회원가입 시(필수): 이메일, 비밀번호(암호화 저장), 이름, 역할(학생/보호자/교사) / (선택): 연락처<br>② 만 14세 미만 아동: 법정대리인의 성명·연락처(동의 확인용)<br>③ 학원 수강생: 학원 코드, 반, 수강 기간, 출석 일시, 공지 확인 여부<br>④ 보호자: 연결한 자녀의 학원 코드<br>⑤ 커뮤니티('이야기') 이용 시: 닉네임, 작성한 글·댓글의 내용과 작성 일시, 도움됨·채택 기록, 신고한 내역과 신고받은 내역, 차단한 이용자 목록. 글·댓글에 자해·자살 신호로 보이는 말이 있는지 자동으로 확인한 결과(학원이 먼저 살펴보고 필요하면 연락하기 위한 목적)<br>⑥ 일정 기능 이용 시: 이용자가 직접 넣은 시간표(수업 이름·장소·요일·시각), 일정, D-day. 학원이 반에 보낸 일정<br>⑦ 공부 노트 기능 이용 시: 이용자가 직접 쓴 노트(날짜, 제목, 내용, 노트에 붙인 개념). 노트는 작성자 본인만 볼 수 있으며 학원(원장)과 보호자에게도 제공하지 않습니다<br>⑧ 서비스 이용 중 자동 생성: 학습 기록(공부한 개념, 문제 풀이 결과, 오답, 북마크, 학습 일자), 이용권 만료일, 알림 설정<br>⑨ 이용권을 앱 마켓에서 구매한 경우: 상품, 주문번호, 결제 확인 토큰, 결제·반영 일시(카드번호 등 결제 수단 정보는 마켓이 처리하며 회사는 받지 않습니다)<br>⑩ 푸시 알림을 켠 경우: 알림을 받을 기기의 알림 토큰<br>⑪ 앱 오류가 났을 때 자동으로: 오류 내용, 앱 버전, 화면 이름, 기기·브라우저 종류(오류 진단용)<br>⑪의2 학원 코드·출석 코드·이용권 코드를 틀리게 입력한 경우 자동으로: 입력 시각과 접속 IP 주소(남의 코드를 추측해 넣는 부정 이용을 막기 위한 목적 · 위치 파악에는 쓰지 않음)<br>⑪의3 ‘의견 보내기·오류 신고’를 이용한 경우: 보낸 내용과 종류, 관련 개념·문제, 앱 버전과 보낸 화면, 보낸 시각(학원만 읽으며, 교재·앱을 고치고 답하는 데만 씀)<br>⑫ 회사는 주민등록번호, 위치 정보, 사진, 연락처 목록을 수집하지 않습니다.</p>
+<p>① 회원가입 시(필수): 이메일, 비밀번호(암호화 저장), 이름, 역할(학생/보호자/교사) / (선택): 연락처<br>② 만 14세 미만 아동: 법정대리인의 성명·연락처(동의 확인용)<br>③ 학원 수강생: 학원 코드, 반, 수강 기간, 출석 일시, 공지 확인 여부<br>④ 보호자: 연결한 자녀의 학원 코드<br>⑤ 커뮤니티('이야기') 이용 시: 닉네임, 작성한 글·댓글의 내용과 작성 일시, 도움됨·채택 기록, 신고한 내역과 신고받은 내역, 차단한 이용자 목록. 글·댓글에 자해·자살 신호로 보이는 말이 있는지 자동으로 확인한 결과(학원이 먼저 살펴보고 필요하면 연락하기 위한 목적)<br>⑥ 일정 기능 이용 시: 이용자가 직접 넣은 시간표(수업 이름·장소·요일·시각), 일정, D-day. 학원이 반에 보낸 일정<br>⑦ 공부 노트 기능 이용 시: 이용자가 직접 쓴 노트(날짜, 제목, 내용, 노트에 붙인 개념). 노트는 작성자 본인만 볼 수 있으며 학원(원장)과 보호자에게도 제공하지 않습니다<br>⑧ 서비스 이용 중 자동 생성: 학습 기록(공부한 개념, 문제 풀이 결과와 최근 28일의 날짜별 푼 수·맞힌 수, 답하기 전에 고른 확신 정도(선택), 오답, 북마크, 학습 일자), 이용권 만료일, 알림 설정<br>⑨ 이용권을 앱 마켓에서 구매한 경우: 상품, 주문번호, 결제 확인 토큰, 결제·반영 일시(카드번호 등 결제 수단 정보는 마켓이 처리하며 회사는 받지 않습니다)<br>⑩ 푸시 알림을 켠 경우: 알림을 받을 기기의 알림 토큰<br>⑪ 앱 오류가 났을 때 자동으로: 오류 내용, 앱 버전, 화면 이름, 기기·브라우저 종류(오류 진단용)<br>⑪의2 학원 코드·출석 코드·이용권 코드를 틀리게 입력한 경우 자동으로: 입력 시각과 접속 IP 주소(남의 코드를 추측해 넣는 부정 이용을 막기 위한 목적 · 위치 파악에는 쓰지 않음)<br>⑪의3 ‘의견 보내기·오류 신고’를 이용한 경우: 보낸 내용과 종류, 관련 개념·문제, 앱 버전과 보낸 화면, 보낸 시각(학원만 읽으며, 교재·앱을 고치고 답하는 데만 씀)<br>⑫ 회사는 주민등록번호, 위치 정보, 사진, 연락처 목록을 수집하지 않습니다.</p>
 <h4>3. 개인정보의 처리 및 보유 기간</h4>
 <p>① 회원 정보와 학습 기록(진도·오답·보관한 글귀·일정·시간표·공부 노트 포함): 회원 탈퇴 시 즉시 파기. 공부 노트는 이용자가 지우면 그때 바로 파기<br>② 커뮤니티 게시물·댓글: 회원 탈퇴 시 삭제하거나 작성자를 알 수 없도록 처리. 다만 다른 이용자의 답변이 달린 질문은 학습 자료로서의 맥락을 위해 작성자 정보를 지운 뒤 남길 수 있습니다<br>③ 신고 접수·처리 기록과 원장이 지운 글·댓글: 반복 위반 확인과 분쟁 대응을 위해 지운 뒤 <b>6개월</b>간 보관 후 파기(신고된 글이 지워지지 않으면 그 글이 남아 있는 동안 신고 수만 보관)<br>④ 출석 기록·수강생 정보: 학원 운영과 수강료 정산의 근거로 수강 종료 후 1년까지 보관 후 파기(학원의 설립·운영 및 과외교습에 관한 법률에 따른 장부 관리)<br>⑤ 이용권 구매·개통 기록(마켓 결제 기록 포함): 「전자상거래 등에서의 소비자보호에 관한 법률」에 따라 5년<br>⑥ 소비자 불만·분쟁 처리 기록: 같은 법에 따라 3년<br>⑦ 서비스 접속 기록(서버 로그): 「통신비밀보호법」에 따라 3개월<br>⑧ 앱 오류 기록: 수집 후 90일이 지나면 파기<br>⑨ 푸시 알림 토큰: 로그아웃·회원 탈퇴 시 즉시 삭제, 앱을 지운 기기의 토큰은 알림 전송이 실패하는 즉시 삭제<br>⑩ 코드 입력 기록(입력 시각·접속 IP 주소): 수집 후 하루가 지나면 매일 새벽 자동 파기<br>⑪ 의견·오류 신고: 보낸 날부터 1년이 지나면 자동 파기(회원 탈퇴 시 즉시 파기)</p>
 <h4>3의2. 커뮤니티에서 다른 이용자에게 보이는 정보</h4>
@@ -3446,7 +3534,7 @@ let view = 'today';
 const SKEL = `<div class="skel" aria-hidden="true"><i style="height:30px;width:42%"></i><i style="height:118px"></i><i style="height:64px"></i><i style="height:64px"></i><i style="height:64px;width:80%"></i></div>`;
 let renderSeq = 0;
 function show(v){
-  view = v; const seq = ++renderSeq;
+  view = v; const seq = ++renderSeq; if (v !== 'detail') detailBack = null;
   /* 단원 색(테라코타·딥틸·인디고)은 그 단원을 펼친 화면에서만 쓴다.
      교재 목록·문제 은행·통계·내 정보에서는 브랜드 색으로 돌려놓아 앱이 한 색으로 읽히게 한다. */
   if (!['today','quiz','detail','lab'].includes(v)) setUnit('');
@@ -3523,7 +3611,7 @@ document.addEventListener('click', async e => {
   /* 오늘의 복습 */
   if (T('#revStart')){ startTodayReview(); return; }
   if (T('#leechSkip') && bs){ const k = (bs.recs||[])[bs.i], w = k && S.wrong.find(x => !x.cleared && wKey(x) === k); if (w){ if (isDueW(w)) rvToday().n++; w.d = addDays(todayISO(), 1); save(S); }
-    bs.i++; bs.pick=null; bs.ess=null; renderBankSession(); window.scrollTo(0,0); return; }
+    bs.i++; bs.pick=null; bs.ess=null; bs.conf=null; renderBankSession(); window.scrollTo(0,0); return; }
   const lch = T('[data-leech]'); if (lch){ const w = S.wrong.find(x => !x.cleared && wKey(x) === lch.dataset.leech); if (!w) return;
     const i = conceptIdxOfW(w); if (i < 0 || !isOpen(i)){ toast('이 개념은 지금 열려 있지 않습니다'); return; }
     if (isDueW(w)) rvToday().n++;
@@ -3532,12 +3620,17 @@ document.addEventListener('click', async e => {
     detailIdx = i; show('detail'); return; }
   if (T('#bankAgain')){ startBank(pickBank(bankSel.n), ''); return; }
   if (T('#bankRetryWrong')){ startBank(bs.wrong.slice(), '틀린 문제'); return; }
+  const cf = T('[data-conf]'); if (cf){ const st = view === 'quiz' ? qState : bs; if (!st) return;   // 다시 그리지 않는다(적던 빈칸 답이 지워지지 않게)
+    st.conf = st.conf === cf.dataset.conf ? null : cf.dataset.conf;
+    cf.parentElement.querySelectorAll('[data-conf]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.conf === st.conf))); return; }
+  const cg = T('[data-cgo]'); if (cg){ const i = CONCEPTS.findIndex(c => c.id === cg.dataset.cgo); if (i < 0 || !isOpen(i)){ toast('이 개념은 지금 열려 있지 않습니다'); return; }
+    detailBack = view; detailIdx = i; show('detail'); window.scrollTo(0, 0); return; }
   const oxb = T('[data-ox]'); if (oxb && bs){ bankAnswer(oxb.dataset.ox); return; }
   const bp = T('[data-bp]'); if (bp && bs && !bp.disabled){ bankAnswer(bp.dataset.bp); return; }
   if (T('#blankGo') && bs){ bankAnswer((document.getElementById('blankIn').value||'').trim()); return; }
   if (T('#essayShow') && bs){ bs.ess = document.getElementById('essayIn').value; bankAnswer('?'); return; }
   const essb = T('[data-ess]'); if (essb && bs){ bs.pick = null; bankAnswer(essb.dataset.ess); return; }
-  if (T('#bankNext') && bs){ bs.i++; bs.pick=null; bs.ess=null; renderBankSession(); window.scrollTo(0,0); return; }
+  if (T('#bankNext') && bs){ bs.i++; bs.pick=null; bs.ess=null; bs.conf=null; renderBankSession(); window.scrollTo(0,0); return; }
   const bre = T('[data-bretry]'); if (bre){ const q = BANK.find(x=>x.id===bre.dataset.bretry); if (q) startBank([q], '오답 다시'); return; }
   const go = T('[data-go]'); if (go){ show(go.dataset.go); return; }
 
@@ -3791,7 +3884,7 @@ document.addEventListener('click', async e => {
     else openSheet(`<h3>아직 잠긴 개념입니다</h3><p>최근 ${FREE_DAYS}일치만 열려 있습니다. <b>학원 코드</b>나 <b>이용권</b>을 등록하면 전 범위가 열립니다.</p><button class="btn" id="goMe">내 정보로 가기</button><button class="btn ghost" id="sheetClose">닫기</button>`);
     return; }
   if (T('#goMe')){ closeSheet(); show('me'); return; }
-  if (T('#backList')){ show('list'); return; }
+  if (T('#backList')){ show(detailBack || 'list'); return; }
   if (T('#markDone')){ const c = CONCEPTS[detailIdx]; if (!S.done.includes(c.id)) S.done.push(c.id); touchDay(); save(S); renderDetail(); toast('공부했음으로 표시했습니다'); return; }
   if (T('#prevC')){ detailIdx=Math.max(0,detailIdx-1); renderDetail(); window.scrollTo(0,0); return; }
   if (T('#nextC')){ detailIdx=Math.min(CONCEPTS.length-1,detailIdx+1); renderDetail(); window.scrollTo(0,0); return; }
@@ -3828,7 +3921,7 @@ document.addEventListener('click', async e => {
     const acc = { ...ACC }; delete acc.id;
     const out = { 안내: `${CFG.academy} '하루 한 개념' 앱이 이 계정에 대해 가진 기록입니다(개인정보 보호법 제35조 열람). 내려받은 날: ${todayISO()}`,
       계정: acc, 학원: S.auth ? { 코드:S.auth.code, 반:S.auth.cls, 수강_만료일:S.auth.until } : null,
-      학습: { 시작일:S.start, 공부한_개념:S.done.length, 개념_목록:S.done, 문제_풀이:S.stats, 오답:S.wrong, 북마크:S.bm, 학습한_날:S.days, 문제은행_기록:S.bh, 보관한_글귀:S.qkeep },
+      학습: { 시작일:S.start, 공부한_개념:S.done.length, 개념_목록:S.done, 문제_풀이:S.stats, 날짜별_풀이:S.dq||{}, 오답:S.wrong, 북마크:S.bm, 학습한_날:S.days, 문제은행_기록:S.bh, 보관한_글귀:S.qkeep },
       일정: S.sched, 공부_노트: liveNotes().map(n => ({ 날짜:n.date, 제목:n.title, 내용:n.body, 개념:(n.cids||[]).map(id => cName(cById(id))), 고친_시각:n.at })), 출석: att, 이야기: { 글:wr.posts, 댓글:wr.comments }, 차단한_사용자_수:(S.blocked||[]).length };
     const name = `${CFG.academy}_내기록_${todayISO()}.json`;
     if (await saveFile(name, JSON.stringify(out, null, 2), 'application/json') && !isNative) toast(`${name} 을(를) 내려받았습니다`); return; }

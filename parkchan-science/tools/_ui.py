@@ -57,3 +57,23 @@ async def approve_child(pg, code, gw='http://127.0.0.1:8767'):
         U.urlopen(U.Request(gw + '/rest/v1/rpc/guardian_decide', data=json.dumps({'p_uid': uid, 'p_code': code, 'p_ok': True}).encode(), headers={'Content-Type': 'application/json', 'apikey': anon, 'Authorization': 'Bearer ' + tok}, method='POST')).read()
         await pg.evaluate("(async () => { ACC = await DBX.me(); })()")
     await pg.evaluate("show('parent')"); await pg.wait_for_timeout(900)
+
+
+async def audit_extra(pg, look):
+    """접근성·대비 점검용 화면 더 보기(학생 로그인 상태에서 부름): 문제 풀기(확신도 칩을 고른 채) · 채점(해설 없는 문항의
+    '이 개념 다시 보기' · 확신했는데 틀림) · 원장 '처리할 것'(출석만 하고 공부 기록 없는 학생 · 안 읽은 공지). 끝나면 원장으로 로그인된 채"""
+    await pg.evaluate('loadMore()'); await pg.wait_for_function('MORE.ok', timeout=15000)
+    await pg.evaluate("startBank([BANK.find(q => q.type === 'ox' && openLessons().some(l => l.id === q.lessonId))], '')"); await pg.wait_for_timeout(300)
+    await pg.click('[data-conf="s"]'); await pg.wait_for_timeout(100); await look('문제 풀기(확신)')
+    await pg.evaluate("bs.items[0] = { ...bs.items[0], explain:'', wrong:'' }")
+    await pg.click(f'[data-ox="{"X" if await pg.evaluate("bs.items[0].answer") == "O" else "O"}"]'); await pg.wait_for_timeout(300); await look('채점(개념 링크)')
+    await pg.click('#bankQuit'); await pg.wait_for_timeout(200)
+    await pg.click('.tab[data-v="me"]'); await pg.wait_for_timeout(300); await auto_yes(pg); await pg.click('#logout'); await pg.wait_for_timeout(600)
+    await pg.evaluate("""(() => { const d = JSON.parse(localStorage.getItem('pcs.db.v2'));
+      d.attendance.push({ code:'TUE456', date:todayISO(), time:'18:00', late:false, manual:true });
+      d.notices.unshift({ id:'n-audit', cls:'전체', t:'점검 공지', d:'', at:new Date(Date.now() - 5 * 36e5).toISOString(), read:[] });
+      localStorage.setItem('pcs.db.v2', JSON.stringify(d)); })()""")
+    await pg.reload(); await pg.wait_for_timeout(800)
+    await pg.evaluate("authMode = 'login'; authErr = ''; show('auth')"); await pg.wait_for_timeout(300)   # 로그아웃 뒤에는 손님 '오늘' 화면이다
+    await pg.click('[data-demo^="owner"]'); await pg.click('#lgGo'); await pg.wait_for_timeout(1200)
+    await pg.wait_for_selector('#todoBox .todo-row', timeout=8000); await look('원장 처리할 것')

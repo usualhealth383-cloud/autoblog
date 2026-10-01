@@ -5,7 +5,10 @@
 산출물: data/bank.json  (문항)  ·  data/labs.json (자료 탐구·집에서 실험)
 문항 형식: {id, lessonId, concept, step('qc'|1|2|3|'auto'), type('ox'|'blank'|'mc'|'multi'|'essay'), stem, source, choices, answer, explain, wrong, figure, difficulty}
   answer: ox → 'O'/'X' · blank → 정답 문자열 · mc/multi → 1~5 · essay → 모범 답안(explain에)
-사용: python3 tools/extract_bank.py
+해설 공백 메우기(2026-10, 벤치마크 ★2) — 지어내지 않고 교재에 이미 있는 문장만 옮긴다(결정적·유료 API 없음)
+  · 바로바로 체크 OX: qc-ans 괄호 → 없으면 알짜 정리 줄 → 그 쪽의 날개 노트 용어 → 그 쪽 본문 문장(글자 겹침이 충분할 때만)
+  · 자동 OX(오해✗): '오해: … → 진실: …' · 자동 빈칸 4지선다: 답을 채운 원문 + 용어표 정의, 오답 보기마다 그 말이 원래 채우는 문장
+사용: python3 tools/extract_bank.py [--out 폴더]   (--out: data/ 대신 그 폴더에 bank.json·labs.json 을 쓴다 — 시험용)
 """
 import json, re, pathlib, random
 from bs4 import BeautifulSoup
@@ -33,12 +36,44 @@ def lesson_code(path):
     return f'12{n:02d}' if n <= 5 else f'13{n-5:02d}'
 
 
+# 근거 문장 고르기 — 한글·영숫자 두 글자 묶음(bigram)이 문항 문장과 얼마나 겹치는가. 흔한 어미는 뺀다
+_STOP = {'이다', '한다', '된다', '있다', '없다', '는다', '에서', '으로', '하는', '되는', '에는', '이며', '하고'}
+def _bigrams(t):
+    t = re.sub(r'[^가-힣A-Za-z0-9]', '', re.sub(r'<[^>]+>', '', t))
+    return {t[i:i + 2] for i in range(len(t) - 1)} - _STOP
+def _overlap(stem, line):
+    a = _bigrams(stem); s = len(a & _bigrams(line))
+    return (s / len(a) if a else 0), s
+EV_MIN, EV_SHARED = 0.4, 5          # 문항 bigram 의 40 % 이상, 5개 이상 겹쳐야 근거로 쓴다(낮추면 엉뚱한 줄이 붙는다 — 2026-10 점검)
+
+
+def qc_evidence(stem, page, gist):
+    """바로바로 체크 OX 의 해설 근거: 알짜 정리 줄(가산점) → 그 쪽 날개 노트 용어 → 그 쪽 본문 문장. 없으면 ''"""
+    cands = [(g, 0.08, '알짜 정리: ' + g) for g in gist]
+    if page is not None:
+        for t in page.select('.wing .term'):
+            b = t.find('b'); k = txt(b, False) if b else ''
+            v = re.sub(r'^<b>.*?</b>\s*', '', txt(t)) if k else txt(t)
+            cands.append((k + ' ' + v, 0, (f'<b>{k}</b>: ' if k else '') + v))
+        for p in page.select('.main p'):
+            if p.find_parent(class_='quickcheck') or p.find_parent(class_='gist'): continue
+            for x in re.split(r'(?<=[.!?])\s+', txt(p)):
+                bare = re.sub(r'<[^>]+>', '', x)
+                if 8 <= len(bare) <= 160 and not TIPS.search(bare) and not re.search(r'(보자|볼까)[.!?]?$|\?$', bare): cands.append((x, 0, '교재: ' + x))   # '…담가 보자.' 같은 권유·물음은 근거가 아니다
+    best, top = '', 0
+    for line, bonus, out in cands:
+        r, s = _overlap(stem, line)
+        if r >= EV_MIN and s >= EV_SHARED and r + bonus > top: best, top = out, r + bonus
+    return best
+
+
 def parse_chapter(path):
     src = path.read_text(encoding='utf-8')
     code = lesson_code(path)
     markers = defs_map(src)
     soup = BeautifulSoup(src, 'html.parser')
     items, labs = [], []
+    gist = [txt(li) for li in soup.select('.gist li')]
 
     # ── 바로바로 체크: 개념 순서대로 ──
     for ci, qc in enumerate(soup.select('.quickcheck'), 1):
@@ -51,8 +86,9 @@ def parse_chapter(path):
             stem = re.sub(r'\(\s*O\s*,\s*X\s*\)\s*$', '', txt(li)).strip()
             a = answers.get(n)
             if not a: continue
+            explain = a[1] or qc_evidence(stem, qc.find_parent(class_='page'), gist)   # 괄호 풀이가 없으면 교재의 근거 줄
             items.append({'id': f'{code}-c{ci}-{n}', 'lessonId': code, 'concept': int(ci), 'step': 'qc', 'type': 'ox', 'stem': stem,
-                          'source': '', 'choices': [], 'answer': a[0], 'explain': a[1], 'wrong': '', 'figure': '', 'difficulty': '●○○'})
+                          'source': '', 'choices': [], 'answer': a[0], 'explain': explain, 'wrong': '', 'figure': '', 'difficulty': '●○○'})
 
     # ── 정답표 · 해설 ──
     ans = {}
@@ -165,9 +201,33 @@ def auto_from_lecture(concepts):
     """강의용 교재에서 자동 생성: 오해✗ 문장 → X, 진실✓ 문장 → O · 빈칸 ㉠㉡㉢ → 4지선다(같은 종류의 다른 빈칸 정답이 오답 보기)"""
     items = []
     pool = []                                   # (값, 소단원, 단원) — 같은 값은 한 번만
+    origin = {}                                 # 값 → (개념, 빈칸) — 오답 보기 해설: 그 말이 원래 채우는 문장
     for c in concepts:
-        for v in c['blanks'].values():
-            if 1 <= len(re.sub(r'<[^>]+>', '', v)) <= 12 and v not in [p[0] for p in pool]: pool.append((v, c['lessonId'], c['lessonId'][:2]))
+        for k, v in c['blanks'].items():
+            if 1 <= len(re.sub(r'<[^>]+>', '', v)) <= 12 and v not in [p[0] for p in pool]: pool.append((v, c['lessonId'], c['lessonId'][:2])); origin[v] = (c, k)
+    bare_of = lambda t: re.sub(r'<[^>]+>', '', t).strip()
+
+    def filled(c, k):
+        """빈칸 k 가 든 원문 문장 — 모든 빈칸을 답으로 채우고 k 의 답은 굵게"""
+        for t in [s['d'] for s in c['steps']] + c['body']:
+            if '{{' + k + '}}' not in t: continue
+            sent = next((x for x in re.split(r'(?<=[.!?])\s+', strip_tags(t)) if '{{' + k + '}}' in x), '')
+            def fill(mm):
+                val = c['blanks'].get(mm.group(1), '')
+                if mm.group(1) != k: return val
+                before = mm.string[:mm.start()]
+                return val if before.count('<b>') > before.count('</b>') else f'<b>{bare_of(val)}</b>'   # 이미 굵은 자리면 겹쳐 굵게 하지 않는다
+            return re.sub(r'\{\{([㉠㉡㉢])\}\}', fill, sent).strip()
+        return ''
+
+    def term_def(word, c):
+        """용어표에서 그 말의 뜻 — 같은 개념 → 같은 소단원 → 전체. '라이다(LiDAR)'처럼 괄호가 붙은 용어도 찾는다"""
+        same = [c] + [x for x in concepts if x['lessonId'] == c['lessonId'] and x is not c] + [x for x in concepts if x['lessonId'] != c['lessonId']]
+        for x in same:
+            for t in x.get('terms', []):
+                k = bare_of(t['k'])
+                if word and (k == word or re.sub(r'\s*\(.*?\)\s*', '', k) == word): return t['v']
+        return ''
     rnd = random.Random(7)
     for c in concepts:
         code, no = c['lessonId'], int(c['no'])
@@ -175,7 +235,7 @@ def auto_from_lecture(concepts):
             x = strip_tags(m['x']).strip(); o = strip_tags(m['o']).strip()
             if x.endswith('.') and standalone(x):
                 items.append({'id': f'{code}-m{no}-{i}x', 'lessonId': code, 'concept': no, 'step': 'auto', 'type': 'ox', 'stem': x,
-                              'source': '', 'choices': [], 'answer': 'X', 'explain': o, 'wrong': '', 'figure': '', 'difficulty': '●○○'})
+                              'source': '', 'choices': [], 'answer': 'X', 'explain': f'오해: {x} → 진실: {o}', 'wrong': '', 'figure': '', 'difficulty': '●○○'})
             if False and o.endswith('.') and standalone(o):   # 진실(✓) 문장은 오해 없이 홀로 읽으면 뜻이 비는 것이 많아(2026-10-01 점검 77건+) 문제로 내지 않고 X 문항의 해설로만 쓴다
                 items.append({'id': f'{code}-m{no}-{i}o', 'lessonId': code, 'concept': no, 'step': 'auto', 'type': 'ox', 'stem': o,
                               'source': '', 'choices': [], 'answer': 'O', 'explain': '교재 개념 카드의 설명 그대로입니다.', 'wrong': '', 'figure': '', 'difficulty': '●○○'})
@@ -198,13 +258,25 @@ def auto_from_lecture(concepts):
                 near = list(dict.fromkeys(near))
                 if len(near) < 3: break
                 ch = rnd.sample(near[:12], 3) + [v]; rnd.shuffle(ch)
+                # 해설: 답을 채운 원문 + 용어표 정의(없으면 개념 포인트) · 오답 보기: 그 말의 뜻이나 그 말이 원래 채우는 문장
+                d = term_def(bare, c)
+                explain = filled(c, k) + (f' — <b>{bare}</b>: {d}' if d else (' ' + c['point'] if c['point'] else ''))
+                wl = []
+                for j, b in enumerate(ch):
+                    if b == v: continue
+                    oc = origin.get(b); bb = bare_of(b)
+                    why = term_def(bb, oc[0] if oc else c) or (filled(*oc) if oc else '')
+                    if why: wl.append(f'<b>{MARKS[j]}</b> {bb} — {why}')
                 items.append({'id': f'{code}-b{no}-{k}', 'lessonId': code, 'concept': no, 'step': 'auto', 'type': 'mc', 'stem': '빈칸에 들어갈 말은? ' + stem,
-                              'source': '', 'choices': ch, 'answer': ch.index(v) + 1, 'explain': c['point'], 'wrong': '', 'figure': '', 'difficulty': '●○○'})
+                              'source': '', 'choices': ch, 'answer': ch.index(v) + 1, 'explain': explain.strip(), 'wrong': ' '.join(wl), 'figure': '', 'difficulty': '●○○'})
                 break
     return items
 
 
 def main():
+    out = OUT
+    if '--out' in _sys.argv[1:-1]:
+        out = pathlib.Path(_sys.argv[_sys.argv.index('--out') + 1]).resolve(); out.mkdir(parents=True, exist_ok=True)
     concepts = json.loads((OUT / 'concepts.json').read_text(encoding='utf-8'))
     items, labs = [], []
     for path in sorted(list((ROOT / 'book').glob('chapter-*/chapter.html')) + [ROOT / 'book' / 'sample-chapter' / 'chapter.html'] + list((ROOT / 'book2').glob('chapter-*/chapter.html'))):
@@ -231,8 +303,9 @@ def main():
     if dropped:
         print(f"  ! 정답이 없어 제외한 문항 {len(dropped)}개: " + ', '.join(d['id'] for d in dropped[:8]))
         items = [i for i in items if i not in dropped]
-    (OUT / 'bank.json').write_text(json.dumps(items, ensure_ascii=False, indent=0), encoding='utf-8')
-    (OUT / 'labs.json').write_text(json.dumps(labs, ensure_ascii=False, indent=0), encoding='utf-8')
+    (out / 'bank.json').write_text(json.dumps(items, ensure_ascii=False, indent=0), encoding='utf-8')
+    (out / 'labs.json').write_text(json.dumps(labs, ensure_ascii=False, indent=0), encoding='utf-8')
+    if out != OUT: print(f'  → {out} 에 썼습니다(data/ 는 그대로)')
     from collections import Counter
     na = sum(1 for i in items if i['step'] == 'auto')
     print(f'\n합계 문항 {len(items)} (본책 {len(items) - na} · 자동 {na}) · 탐구 {len(labs)} · 유형 {dict(Counter(i["type"] for i in items))}')

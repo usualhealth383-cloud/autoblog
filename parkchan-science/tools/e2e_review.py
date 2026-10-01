@@ -298,6 +298,80 @@ window.Capacitor = { isNativePlatform: () => true, getPlatform: () => 'android',
         assert await n3.evaluate('!S.nPause') and await n3.locator('.pausenote').count() == 0
         await n3.context.close()
 
+        # ───────── 11) 확신도 한 탭 — 고르기 전에(선택) · 확신했는데 틀림 · 헷갈렸지만 맞힘은 상자 2를 넘지 않음 ─────────
+        st0 = {'introSeen': True, 'onboarded': True, 'start': iso(D0), 'days': [], 'done': [], 'wrong': []}
+        for color in ('light', 'dark'):
+            c = await page(color=color, init=f"localStorage.setItem('pcs.v2', {json.dumps(json.dumps(st0, ensure_ascii=False))})")
+            await c.evaluate('loadMore()'); await c.wait_for_function('MORE.ok', timeout=15000)
+            L = await c.evaluate('todayConcept().lessonId')
+            oxs = await c.evaluate(f"BANK.filter(q => q.lessonId === '{L}' && q.type === 'ox').slice(0, 4).map(q => q.id)")
+            await c.evaluate(f"startBank([BANK.find(q => q.id === '{oxs[0]}')], '')"); await c.wait_for_timeout(200)
+            cb = c.locator('#v-bank .conf button')
+            assert await cb.count() == 2 and [await x.get_attribute('aria-pressed') for x in await cb.all()] == ['false', 'false'], '확신도 칩이 없거나 미리 골라져 있음'
+            hs = [(await x.bounding_box())['height'] for x in await cb.all()]; assert min(hs) >= 44, hs
+            await c.click('[data-conf="s"]'); await c.click('[data-conf="s"]')
+            assert await c.evaluate('bs.conf') is None, '다시 누르면 풀려야 함'
+            await c.click('[data-conf="s"]'); assert await c.get_attribute('[data-conf="s"]', 'aria-pressed') == 'true' and await c.get_attribute('[data-conf="u"]', 'aria-pressed') == 'false'
+            await c.screenshot(path=f'{SC}/r11_conf_pick_{color}.png')
+            await c.locator('#v-bank .conf').screenshot(path=f'{SC}/r11b_conf_chips_{color}.png')
+            if color == 'dark':
+                await c.context.close(); continue
+            # (가) 확신했는데 틀림 → 한 줄 안내 · 평소대로 상자 1(내일) · 기록에 c:'s'
+            await answer(c, False)
+            assert '확신했는데 틀렸습니다 — 이런 문제가 가장 잘 고쳐집니다' in await c.locator('#v-bank .verdict').inner_text()
+            assert await c.locator('#v-bank .conf').count() == 0, '채점 뒤에도 확신도 칩이 남음'
+            w = await c.evaluate(f"findW({{ b:'{oxs[0]}' }})"); assert w['x'] == 1 and w['d'] == iso(D0 + dt.timedelta(1)) and w.get('c') == 's', w
+            await c.screenshot(path=f'{SC}/r11c_conf_sure_wrong.png', full_page=True)
+            # (나) 헷갈렸지만 맞힘(처음 푸는 문제) → 상자 2(3일 뒤)로 담는다 · k 0 · 오답 노트에 '헷갈렸지만 맞힘'
+            await c.evaluate(f"startBank([BANK.find(q => q.id === '{oxs[1]}')], '')"); await c.wait_for_timeout(150)
+            await c.click('[data-conf="u"]'); await answer(c, True)
+            assert '확신했는데' not in await c.locator('#v-bank .verdict').inner_text()
+            assert '헷갈렸다면 아직 익는 중입니다' in await c.locator('#v-bank .again').inner_text()
+            w = await c.evaluate(f"findW({{ b:'{oxs[1]}' }})"); assert w['x'] == 2 and w['k'] == 0 and w.get('c') == 'u' and w['d'] == iso(D0 + dt.timedelta(3)), w
+            await c.evaluate("show('wrong')"); await c.wait_for_timeout(200); assert '헷갈렸지만 맞힘' in await c.locator('#v-wrong').inner_text()
+            # (다) 기한 된 상자 3 문제를 헷갈렸지만 맞힘 → 상자 2에 머묾 · 정리 사슬(g) 끊김 · 정리되지 않음
+            await c.evaluate(f"""(() => {{ S.wrong.push({{ b:'{oxs[2]}', p:'O', iso:'{iso(D0 - dt.timedelta(20))}', a:'{iso(D0 - dt.timedelta(7))}', d:'{iso(D0)}', x:4, k:1, g:1 }}); save(S); }})()""")
+            r = await c.evaluate(f"srsMark({{ b:'{oxs[2]}' }}, true, 'O', 'u')"); assert r['st'] == 'hold', r
+            w = await c.evaluate(f"findW({{ b:'{oxs[2]}' }})"); assert w['x'] == 2 and not w.get('g') and not w.get('cleared') and w['d'] == iso(D0 + dt.timedelta(3)), w
+            await goto_day(c, D0 + dt.timedelta(3))
+            assert (await c.evaluate(f"srsMark({{ b:'{oxs[2]}' }}, true, 'O', 'u')"))['st'] == 'hold' and await c.evaluate(f"findW({{ b:'{oxs[2]}' }}).x") == 2, '헷갈림인데 상자 2를 넘음'
+            await goto_day(c, D0 + dt.timedelta(6))
+            assert (await c.evaluate(f"srsMark({{ b:'{oxs[2]}' }}, true, 'O')"))['st'] == 'up' and (await c.evaluate(f"findW({{ b:'{oxs[2]}' }})"))['x'] == 3, '확신도 없이 맞히면 평소대로 올라가야 함'
+            assert 'c' not in await c.evaluate(f"findW({{ b:'{oxs[2]}' }})"), '고르지 않았는데 확신 기록이 남음(진도 JSON 을 작게)'
+            # (라) 빈칸: 적던 답이 칩을 눌러도 지워지지 않는다
+            blank = await c.evaluate(f"(BANK.find(q => q.lessonId === '{L}' && q.type === 'blank') || BANK.find(q => q.type === 'blank')).id")
+            await c.evaluate(f"startBank([BANK.find(q => q.id === '{blank}')], '')"); await c.wait_for_timeout(150)
+            await c.fill('#blankIn', '적던 답'); await c.click('[data-conf="u"]'); assert await c.input_value('#blankIn') == '적던 답', '칩을 누르니 빈칸 답이 지워짐'
+            # (마) 서술형은 칩이 없다(스스로 채점)
+            ess = await c.evaluate("BANK.find(q => q.type === 'essay').id")
+            await c.evaluate(f"startBank([BANK.find(q => q.id === '{ess}')], '')"); await c.wait_for_timeout(150)
+            assert await c.locator('#v-bank .conf').count() == 0, '서술형에 확신도 칩'
+            # (바) 오늘의 문제에서도 — 확신 + 틀림
+            await c.evaluate("bs = null; qState = null; show('quiz')"); await c.wait_for_timeout(200)
+            assert await c.locator('#v-quiz .conf button').count() == 2
+            qa = await c.evaluate('qState.q.answer'); qn = await c.evaluate('qState.q.no'); ql = await c.evaluate('qState.q.lessonId')
+            await c.click('#v-quiz [data-conf="s"]'); await c.click(f'#v-quiz .opt[data-p="{1 if qa != 1 else 2}"]'); await c.wait_for_timeout(200)
+            assert '확신했는데 틀렸습니다' in await c.locator('#v-quiz .verdict').inner_text()
+            assert await c.evaluate(f"findW({{ l:'{ql}', n:{qn} }}).c") == 's'
+            await c.screenshot(path=f'{SC}/r11d_quiz_sure_wrong.png', full_page=True)
+            # (사) 날짜별 푼 수·맞힌 수(원장 '처리할 것'용) — 28일만 남긴다
+            dq = await c.evaluate('S.dq'); assert dq == {iso(D0): [2, 1], iso(D0 + dt.timedelta(6)): [1, 0]}, dq
+            await c.evaluate(f"S.dq['{iso(D0 - dt.timedelta(60))}'] = [3, 1]; statDay(true)"); assert iso(D0 - dt.timedelta(60)) not in await c.evaluate('S.dq'), '28일 넘은 날짜가 남음'
+            # (아) 해설도 선지별 해설도 없는 문항 → 빈 상자 대신 '이 개념 다시 보기' → 개념 카드 → 문제로 돌아가기
+            await c.evaluate(f"startBank([{{ ...BANK.find(q => q.id === '{oxs[3]}'), explain:'', wrong:'' }}], '')"); await c.wait_for_timeout(150)
+            await answer(c, True)
+            vt = c.locator('#v-bank .verdict'); assert await vt.locator('[data-cgo]').count() == 1 and await vt.locator('p').count() == 0, await vt.inner_html()
+            assert (await vt.locator('[data-cgo]').inner_text()).strip() == '이 개념 다시 보기'
+            assert (await vt.locator('[data-cgo]').bounding_box())['height'] >= 44
+            await c.screenshot(path=f'{SC}/r11e_concept_link.png', full_page=True)
+            await vt.locator('[data-cgo]').click(); await c.wait_for_timeout(300)
+            assert await c.evaluate('view') == 'detail' and '문제로 돌아가기' in await c.locator('#backList').inner_text()
+            await c.click('#backList'); await c.wait_for_timeout(300)
+            assert await c.evaluate('view') == 'bank' and await c.locator('#bankNext').count() == 1, '개념 카드에서 문제로 돌아오지 않음'
+            await c.click('.tab[data-v="list"]'); await c.wait_for_timeout(200); await c.click('.tab[data-v="today"]'); await c.wait_for_timeout(200)
+            await c.evaluate("detailIdx = 0; show('detail')"); await c.wait_for_timeout(200); assert '교재' in await c.locator('#backList').inner_text(), '다른 길로 연 개념 카드에 "문제로 돌아가기"가 남음'
+            await c.context.close()
+
         # ───────── 10) 어두운 화면 스크린샷(오늘의 복습 카드 · 이번 주 리듬) ─────────
         dk = {'introSeen': True, 'onboarded': True, 'start': iso(D0 + dt.timedelta(2)), 'days': [iso(D0 - dt.timedelta(1)), iso(D0)],
               'done': [], 'wrong': [{'l': '1101', 'n': 1, 'p': 2, 'iso': '2026-10-01', 'a': '2026-10-01', 'd': iso(D0), 'x': 1, 'k': 1}]}
