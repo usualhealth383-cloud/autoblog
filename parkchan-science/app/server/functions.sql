@@ -3,6 +3,7 @@
 --  ② 환불 정리: 매일 새벽 verify-purchase 를 불러 Google Play 에서 환불·취소된 결제만큼 이용 기간을 되돌린다(pg_cron)
 -- 바꿀 값: <PROJECT-REF>(Project Settings → General → Reference ID) · <PUSH_SECRET>·<CRON_SECRET>(함수 비밀값과 같게) · <ANON_KEY>(Project Settings → API)
 create extension if not exists pg_net;
+create extension if not exists pg_cron;
 create or replace function private.call_push() returns trigger language plpgsql security definer set search_path = public, private as $$
 begin
   perform net.http_post(
@@ -18,10 +19,19 @@ drop trigger if exists push_comments on comments;     create trigger push_commen
 -- 도움이 필요해 보이는 글 → 원장 폰('먼저 살펴볼 글', 잠금화면에는 내용을 싣지 않는다)
 drop trigger if exists push_care_posts on posts;       create trigger push_care_posts after insert on posts      for each row when (new.care) execute function private.call_push();
 -- 고쳐 쓰다가 도움이 필요해 보이게 된 글도(처음 한 번만 — care 가 false→true 로 바뀔 때)
+-- '친구가 걱정돼요' 신고 → 원장 폰(1건이어도 · 글은 가리지 않는다)
+drop trigger if exists push_worry on reports;          create trigger push_worry      after insert on reports for each row when (new.reason = 'worry') execute function private.call_push();
 drop trigger if exists push_care_edit on posts;        create trigger push_care_edit  after update on posts for each row when (new.care and not old.care) execute function private.call_push();
 
+-- ①-2 밤(22~07시)에 미룬 학생 댓글 알림 → 아침 07:00(KST)에 한 번 '밤사이 새 댓글이 있어요'
+select cron.schedule('pcs-push-morning', '0 22 * * *', $$
+  select net.http_post(
+    url := 'https://<PROJECT-REF>.supabase.co/functions/v1/push',
+    headers := jsonb_build_object('Content-Type', 'application/json', 'x-push-secret', '<PUSH_SECRET>'),
+    body := '{"action":"morning"}'::jsonb)
+$$);
+
 -- ② 환불·취소 정리 — 매일 04:10(KST). Database → Extensions 에서 pg_cron · pg_net 을 켠 뒤 실행
-create extension if not exists pg_cron;
 select cron.schedule('pcs-voided-purchases', '10 19 * * *', $$
   select net.http_post(
     url := 'https://<PROJECT-REF>.supabase.co/functions/v1/verify-purchase',

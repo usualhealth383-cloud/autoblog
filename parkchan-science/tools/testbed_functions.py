@@ -168,10 +168,14 @@ def main():
       check('  └ Firebase 범위로 따로 인증', any('firebase.messaging' in x for x in SCOPES))
       # 이야기 댓글 → 글쓴이에게만(자기 댓글은 알리지 않음)
       pid = call('POST', '/rest/v1/posts?select=id', {'board': 'qna', 'title': '충격량 질문', 'body': '넓이가 왜 충격량인가요'}, S1, headers={'Prefer': 'return=representation'})[1][0]['id']
-      SENT.clear(); call('POST', '/functions/v1/push', {'type': 'INSERT', 'table': 'comments', 'record': {'post_id': pid, 'author': 'someone-else', 'body': '힘-시간 그래프의 넓이는 F×Δt 입니다', 'staff': True}}, headers=PH)
+      DAY = '2026-10-01T15:00:00+09:00'   # 낮(한국 시각) — 밤 22~07시 댓글 알림은 아침으로 미룬다(아래)
+      SENT.clear(); call('POST', '/functions/v1/push', {'type': 'INSERT', 'table': 'comments', 'record': {'post_id': pid, 'author': 'someone-else', 'body': '힘-시간 그래프의 넓이는 F×Δt 입니다', 'staff': True, 'at': DAY}}, headers=PH)
       check('댓글 → 글쓴이 폰에만 · "선생님이 답을 달았어요"', [m['token'] for m in SENT] == ['tok-stu1'] and '선생님이 답을' in SENT[0]['notification']['title'] and SENT[0]['data'].get('post') == pid, SENT)
+      blob = json.dumps(SENT[:1], ensure_ascii=False)
+      check('  └ 잠금화면에 댓글 내용·글 제목을 싣지 않음("새 댓글이 있어요")', SENT and '새 댓글이 있어요' in SENT[0]['notification']['body'] and 'F×Δt' not in blob and '충격량 질문' not in blob, SENT[:1])
+      check('  └ 안드로이드 잠금화면 공개 범위 PRIVATE', SENT and SENT[0]['android']['notification'].get('visibility') == 'PRIVATE', SENT[:1])
       s1_uid = call('GET', '/auth/v1/user', tok=S1)[1]['id']
-      SENT.clear(); call('POST', '/functions/v1/push', {'type': 'INSERT', 'table': 'comments', 'record': {'post_id': pid, 'author': s1_uid, 'body': '고맙습니다'}}, headers=PH)
+      SENT.clear(); call('POST', '/functions/v1/push', {'type': 'INSERT', 'table': 'comments', 'record': {'post_id': pid, 'author': s1_uid, 'body': '고맙습니다', 'at': DAY}}, headers=PH)
       check('  └ 자기 글에 자기가 단 댓글은 알리지 않음', SENT == [], SENT)
       # 도움이 필요해 보이는 글·댓글 → 원장 폰에만, 잠금화면에 내용은 싣지 않는다
       call('POST', '/rest/v1/rpc/register_push', {'p_token': 'tok-own', 'p_platform': 'android'}, OWN)
@@ -180,9 +184,35 @@ def main():
       check('  └ 알림에 글 내용은 싣지 않음', SENT and '살고 싶' not in json.dumps(SENT[0], ensure_ascii=False) and '지쳐요' not in json.dumps(SENT[0], ensure_ascii=False), SENT[:1])
       SENT.clear(); call('POST', '/functions/v1/push', {'type': 'INSERT', 'table': 'posts', 'record': {'id': pid, 'author': s1_uid, 'title': '질문', 'body': '충격량', 'care': False}}, headers=PH)
       check('  └ 보통 글은 원장에게 알리지 않음', SENT == [], SENT)
-      SENT.clear(); call('POST', '/functions/v1/push', {'type': 'INSERT', 'table': 'comments', 'record': {'post_id': pid, 'author': 'someone-else', 'body': '자해하고 싶어', 'care': True}}, headers=PH)
+      SENT.clear(); call('POST', '/functions/v1/push', {'type': 'INSERT', 'table': 'comments', 'record': {'post_id': pid, 'author': 'someone-else', 'body': '자해하고 싶어', 'care': True, 'at': DAY}}, headers=PH)
       check('힘든 마음의 댓글 → 원장 + 글쓴이(보통 댓글 알림)', sorted(m['token'] for m in SENT) == ['tok-own', 'tok-stu1'], [m['token'] for m in SENT])
       check('  └ 글쓴이 폰 알림에도 댓글 내용은 싣지 않음', all('자해' not in json.dumps(m, ensure_ascii=False) for m in SENT), SENT)
+      print('▸ 밤 22시~아침 7시 — 학생 댓글 알림은 아침으로 · 원장 위기 알림은 바로')
+      import psycopg2; db = psycopg2.connect('host=127.0.0.1 port=54329 user=postgres dbname=pcs'); db.autocommit = True; cur = db.cursor()
+      cur.execute('delete from push_later')
+      for at, body in (('2026-10-01T23:30:00+09:00', '밤 댓글 하나'), ('2026-10-02T05:10:00+09:00', '새벽 댓글 둘'), ('2026-10-01T22:00:00+09:00', '딱 22시')):
+          SENT.clear(); call('POST', '/functions/v1/push', {'type': 'INSERT', 'table': 'comments', 'record': {'post_id': pid, 'author': 'someone-else', 'body': body, 'at': at}}, headers=PH)
+          if SENT: break
+      check('밤(22:00·23:30·05:10)에 달린 댓글은 바로 보내지 않음', SENT == [], SENT)
+      cur.execute('select count(*) from push_later where uid = %s', (s1_uid,)); check('  └ 아침에 보낼 것으로 모아 둠(3건)', cur.fetchone()[0] == 3)
+      SENT.clear(); call('POST', '/functions/v1/push', {'type': 'INSERT', 'table': 'comments', 'record': {'post_id': pid, 'author': 'someone-else', 'body': '아침 7시 댓글', 'at': '2026-10-02T07:00:00+09:00'}}, headers=PH)
+      check('  └ 아침 7시부터는 다시 바로 보냄', [m['token'] for m in SENT] == ['tok-stu1'], SENT)
+      SENT.clear(); call('POST', '/functions/v1/push', {'type': 'INSERT', 'table': 'comments', 'record': {'post_id': pid, 'author': 'someone-else', 'body': '죽고 싶어', 'care': True, 'at': '2026-10-01T23:50:00+09:00'}}, headers=PH)
+      check('밤에도 원장 "먼저 살펴볼 글" 알림은 바로(학생 댓글 알림만 미룸)', [m['token'] for m in SENT] == ['tok-own'] and SENT[0]['data']['kind'] == 'care', [m['token'] for m in SENT])
+      s, j = call('POST', '/functions/v1/push', {'action': 'morning'}); check('아침 알림도 웹훅 비밀값 없으면 거절', s == 403, (s, j))
+      SENT.clear(); s, j = call('POST', '/functions/v1/push', {'action': 'morning'}, headers=PH)
+      check('아침 7시 → 밤사이 댓글을 사람마다 한 번 "새 댓글 4개"', s == 200 and [m['token'] for m in SENT] == ['tok-stu1'] and '밤사이' in SENT[0]['notification']['title'] and '4개' in SENT[0]['notification']['body'], (s, j, SENT))
+      check('  └ 아침 알림에도 댓글 내용 없음', SENT and all(w not in json.dumps(SENT[0], ensure_ascii=False) for w in ('밤 댓글', '새벽 댓글', '죽고')), SENT[:1])
+      cur.execute('select count(*) from push_later'); check('  └ 보낸 뒤 모아 둔 것은 지움', cur.fetchone()[0] == 0)
+      SENT.clear(); s, j = call('POST', '/functions/v1/push', {'action': 'morning'}, headers=PH); check('  └ 다시 불러도 두 번 보내지 않음', SENT == [] and j.get('sent') == 0, (j, SENT))
+      print("▸ '친구가 걱정돼요' 신고 → 원장 폰")
+      SENT.clear(); call('POST', '/functions/v1/push', {'type': 'INSERT', 'table': 'reports', 'record': {'id': 1, 'post_id': pid, 'comment_id': None, 'uid': 'x', 'reason': 'worry'}}, headers=PH)
+      check('걱정돼요 신고 1건 → 원장 폰에만 "먼저 살펴볼 글"', [m['token'] for m in SENT] == ['tok-own'] and '걱정' in SENT[0]['notification']['body'] and SENT[0]['data'].get('post') == pid, SENT)
+      cid = call('POST', '/rest/v1/comments?select=id', {'post_id': pid, 'body': '댓글 하나'}, S2, headers={'Prefer': 'return=representation'})[1][0]['id']
+      SENT.clear(); call('POST', '/functions/v1/push', {'type': 'INSERT', 'table': 'reports', 'record': {'id': 2, 'post_id': None, 'comment_id': cid, 'uid': 'x', 'reason': 'worry'}}, headers=PH)
+      check('  └ 댓글에 대한 걱정돼요도 그 글로 이어짐', [m['data'].get('post') for m in SENT] == [pid], SENT)
+      SENT.clear(); call('POST', '/functions/v1/push', {'type': 'INSERT', 'table': 'reports', 'record': {'id': 3, 'post_id': pid, 'comment_id': None, 'uid': 'x', 'reason': 'bully'}}, headers=PH)
+      check('  └ 다른 사유의 신고는 원장 폰에 알리지 않음(매일 목록으로)', SENT == [], SENT)
   finally:
       for p in procs: p.terminate()
 

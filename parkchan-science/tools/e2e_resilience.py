@@ -6,7 +6,7 @@
 import asyncio, sys, os, json, urllib.request as U
 from playwright.async_api import async_playwright
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from _ui import signup, NO_INTRO, auto_yes
+from _ui import signup, NO_INTRO, auto_yes, member
 GW = 'http://127.0.0.1:8767'; ANON = json.loads(U.urlopen(GW + '/__anon').read())['anon']
 APP = f'http://127.0.0.1:8765/index.html?server={GW}&key={ANON}'
 SC = sys.argv[sys.argv.index('--shots')+1] if '--shots' in sys.argv[:-1] else '/tmp/e2e_resilience'; os.makedirs(SC, exist_ok=True)
@@ -28,6 +28,7 @@ async def main():
         # 가입 → 이야기 글 하나
         await signup(s, '끊김학생', 'net@t.kr')
         await s.evaluate("DBX.setNick('끊김닉').then(a => ACC = a)"); await s.wait_for_timeout(300)
+        await member(s)   # 이야기 쓰기는 학원 코드·이용권 계정만
         await s.evaluate("DBX.addPost({ board:'talk', title:'연결 시험', body:'연결 시험 글입니다' })"); await s.wait_for_timeout(300)
         await s.click('.tab[data-v="talk"]'); await s.wait_for_timeout(700); await s.click('.pcard'); await s.wait_for_timeout(700)
         # ② 버튼을 눌렀는데 서버가 끊김 → 조용히 묻히지 않고 알림

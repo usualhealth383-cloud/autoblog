@@ -68,7 +68,7 @@ def parse_lesson(path):
     unit, unit_name = UNIT_OF[code[:2]]
     book = code[0]
     band = txt(soup.select_one('.tagband span'))          # "II. 환경과 에너지 · 03 지구온난화와 기후변화"
-    lesson_name = band.split('·')[-1].strip()
+    lesson_name = re.split(r'\s·\s', band, maxsplit=1)[-1].strip()   # 단원·소단원 사이는 ' · '(띄어 씀) — 이름 속 '에너지·물질'의 ·에서 자르지 않는다
     lesson_name = re.sub(r'^\d+\s*', '', lesson_name)
 
     concepts, cur = [], None

@@ -100,6 +100,25 @@ async def main():
         await logout(); await login(*OWNER); await o.click('[data-adm="settings"]'); await o.wait_for_timeout(900)
         assert '시험용 오류' in await o.locator('#v-admin').inner_text(), '오류 기록이 원장에게 안 보임'
         await o.screenshot(path=f'{SC}/a03_settings_errors.png', full_page=True)
+        # ⑧ 이야기 이용 제한 — 학원 코드로(보호자 요청 · 중지) → 학생은 읽기만, 서버도 막음 → 기록 · 풀기 (약관 제8조의3 ②④)
+        await o.click('[data-adm="talk"]'); await o.wait_for_timeout(900)
+        await o.click('#limSec details:has(#limCode) summary'); await o.fill('#limCode', code); await o.click('#limByCode'); await o.wait_for_timeout(400)
+        await o.click('[data-lmd="-1"]'); await o.select_option('#lmR', '보호자가 요청했어요'); await o.check('#lmG'); await o.fill('#lmM', '어머니 전화 요청')
+        await o.click('#lmGo'); await o.wait_for_timeout(900)
+        t = await o.inner_text('#limSec'); assert '1명' in t and '중지' in t and '보호자 요청' in t and '어머니 전화 요청' in t, t
+        await o.screenshot(path=f'{SC}/a05_talk_limit.png', full_page=True)
+        r = await o.evaluate("DBX.talkLimit(ACC.id, 7)"); assert not r['ok'] and '원장 계정' in r['why'], r
+        r = await o.evaluate("DBX.talkLimit(null, 7, '', '', false, 'NOPE99')"); assert not r['ok'], r
+        await logout(); await login('kb@t.kr', 'pass1234'); await o.click('.tab[data-v="talk"]'); await o.wait_for_timeout(900)
+        assert '멈춰 있어요' in await o.inner_text('#talkGate') and await o.locator('#postNew').count() == 0, '중지된 학생에게 글쓰기가 보임'
+        assert '보호자와 먼저 이야기' in await o.inner_text('#talkGate') and await o.locator('#talkAppeal').count() == 0, '보호자 요청 제한에 이의 제기 단추가 보임'
+        r = await o.evaluate("DBX.addPost({ board:'talk', title:'중지 중', body:'써지면 안 됩니다' }).then(() => 'ok', e => e.message)"); assert '멈춰' in r, r
+        await o.screenshot(path=f'{SC}/a06_student_stopped.png')
+        await logout(); await login(*OWNER); await o.click('[data-adm="talk"]'); await o.wait_for_timeout(900)
+        await o.click('[data-admlift]'); await o.wait_for_timeout(900)
+        t = await o.inner_text('#limSec'); assert '0명' in t and '최근 처리 기록 2건' in t, t
+        await logout(); await login('kb@t.kr', 'pass1234'); await o.click('.tab[data-v="talk"]'); await o.wait_for_timeout(900)
+        assert await o.locator('#postNew').count() == 1, '풀었는데 글쓰기가 안 열림'
         assert not errs, errs
         print(('SERVER ' if SRV else 'LOCAL ') + 'ADMIN E2E OK · 콘솔 오류', errs); await b.close()
 

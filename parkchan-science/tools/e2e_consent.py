@@ -8,7 +8,7 @@ import asyncio, sys, os, json, re, urllib.request as U
 from urllib.parse import unquote
 from playwright.async_api import async_playwright
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from _ui import signup, NO_INTRO, auto_yes
+from _ui import signup, NO_INTRO, auto_yes, member
 GW = 'http://127.0.0.1:8767'; ANON = json.loads(U.urlopen(GW + '/__anon').read())['anon']; SERVICE = json.loads(U.urlopen(GW + '/__anon').read())['service']
 APP = f'http://127.0.0.1:8765/index.html?server={GW}&key={ANON}'
 SC = sys.argv[sys.argv.index('--shots')+1] if '--shots' in sys.argv[:-1] else '/tmp/e2e_consent'; os.makedirs(SC, exist_ok=True)
@@ -76,6 +76,7 @@ async def main():
         # 첫째 아이 앱: 이제 열림 · 진도가 서버에 올라감
         await k.reload(); await k.wait_for_timeout(1300)
         assert await k.evaluate('consentPending()') is False and await k.locator('.consent').count() == 0
+        await member(k)   # 이야기 쓰기는 학원 코드·이용권 계정만(docs/11 §12-9) — 동의 잠금이 풀렸는지만 본다
         await k.click('.tab[data-v="talk"]'); await k.wait_for_timeout(600); assert await k.locator('#postNew').count() == 1, '확인 문자 뒤에도 이야기가 잠김'
         kkey = await k.evaluate('progressKey()'); await k.evaluate('save(S)'); await k.wait_for_timeout(1600)
         assert kkey and kkey in [x['code'] for x in svc('progress?select=code')], '동의 뒤 진도가 서버에 안 올라감'
