@@ -654,7 +654,8 @@ select.sel{font-family:inherit;font-size:14px;font-weight:700;color:var(--u);bac
 .umcard .umrow{border-bottom:none}
 .umsub{display:block;width:100%;min-height:44px;padding:0 2px 2px 52px;border:none;border-top:1px dashed var(--hair);background:none;text-align:left;font-family:inherit;font-size:13px;font-weight:800;color:var(--brand-dark);cursor:pointer}
 .umcard.mock{padding:14px 15px 2px}
-.umcard.mock .mh{display:flex;align-items:baseline;justify-content:space-between;gap:8px;margin-bottom:6px}
+.umcard.mock .mh{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:2px 8px;margin-bottom:6px}
+.umcard.mock.hard{border-color:var(--ink)}
 .umcard.mock .mh .t{font-size:16px;font-weight:900}
 .umcard.mock .mh .s{font-size:12.5px;color:var(--muted)}
 .mhist{font-size:12.5px;color:var(--muted);margin:0 0 10px;line-height:1.6}
@@ -2651,10 +2652,10 @@ function renderBank(){
     <button class="btn" id="bankStart" ${pool.length?'':'disabled'}>${pool.length ? `${Math.min(bankSel.n,pool.length)}문제 시작 · 고를 수 있는 문항 ${pool.length.toLocaleString('ko-KR')}개` : '이 조건에 맞는 문항이 없습니다'}</button>
     ${fullAccess() ? '' : `<p class="fine">무료 범위(최근 ${FREE_DAYS}일치 소단원)의 문제만 나옵니다. 학원 코드·이용권으로 전 범위가 열립니다.</p>`}
     ${(() => { const fa = fullAccess(), lock = fa ? '<svg class="chev" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg>' : '<span class="lockb">이용권</span>';
-      const mk = S.mk || {}, last = ['1','2'].map(b => (mk[b]||[]).slice(-1)[0]).filter(Boolean);
+      const mk = S.mk || {}, last = MOCKS.map(m => (mk[m.k]||[]).slice(-1)[0]).filter(Boolean);
       return `<div class="sec umsec"><h2>실전처럼 풀기</h2>
         <button class="umrow" data-um="unit" ${fa ? '' : 'aria-describedby="umLockNote"'}><span class="n">단원</span><span class="b"><span class="t">대단원 마무리</span><span class="s">단원마다 16문항 · 마무리 12 + 고난도 4</span></span>${lock}</button>
-        <button class="umrow" data-um="mock" ${fa ? '' : 'aria-describedby="umLockNote"'}><span class="n">모의</span><span class="b"><span class="t">실전 모의고사</span><span class="s">통합과학 1 · 2 · 25문항 · 50점 · ${MOCK_MIN}분${fa && last.length ? ` · 최근 ${fmtPt(last[last.length - 1].s)}점` : ''}</span></span>${lock}</button>
+        <button class="umrow" data-um="mock" ${fa ? '' : 'aria-describedby="umLockNote"'}><span class="n">모의</span><span class="b"><span class="t">실전 모의고사</span><span class="s">학력평가형 2회 · 수능형 1회 · 25문항 · ${MOCK_MIN}분${fa && last.length ? ` · 최근 ${fmtPt(last[last.length - 1].s)}점` : ''}</span></span>${lock}</button>
         ${fa ? '' : `<p class="fine" id="umLockNote" style="text-align:left;padding:6px 0 0">여러 소단원을 엮어 묻는 문제라 전 범위(학원 코드·이용권)에서 열립니다.</p>`}</div>`; })()}
     <div class="sec"><h2><span>오답 노트</span><button class="more" data-go="wrong">${S.wrong.filter(w=>!w.cleared).length}문제 보기 ›</button></h2><p class="fine" style="text-align:left;padding:0">틀린 문제는 오답 노트에 모이고, 내일부터 간격을 넓혀 가며 오늘 화면의 <b>오늘의 복습</b>에 다시 나옵니다.</p></div>
     <div class="sec lab-list"><h2>자료 탐구 · 집에서 실험 <span style="font-weight:600;color:var(--faint);letter-spacing:0">${LABS_N}편</span></h2>
@@ -2798,7 +2799,10 @@ let mx = null;              // 진행 중 모의고사
 const MOCK_MIN = 40, QSEC = 96;
 const unitList = () => { const m = new Map(); LESSONS.forEach(l => { const k = l.book + '-' + l.unit; if (!m.has(k)) m.set(k, { key:k, book:l.book, unit:l.unit, name:l.unitName, bookName:l.bookName }); }); return [...m.values()]; };
 const umNo = q => +String(q.id).replace(/^.*-[qb]/, '');
-const umItems = (step, book, unit) => BANK.filter(q => q.step === step && q.book === book && (!unit || q.unit === unit)).sort((a, b) => umNo(a) - umNo(b));
+/* 모의고사 세 갈래 — 학평형(권별, 그때까지 배운 범위)과 수능형(두 권 전 범위, 융합·자료 해석이 많다). 기록 S.mk 의 열쇠 = k */
+const MOCKS = [{ k:'1', book:'1', t:'통합과학 1', s:'고1 학력평가 대비 · 제1회' }, { k:'2', book:'2', t:'통합과학 2', s:'고1 학력평가 대비 · 제1회' }, { k:'s', book:'1+2', t:'수능 대비', s:'통합과학 1 · 2 전 범위 · 제1회', hard:true }];
+const mockOf = k => MOCKS.find(m => m.k === k) || MOCKS[0];
+const umItems = (step, book, unit) => BANK.filter(q => q.step === step && q.book === (step === 'mock' ? mockOf(book).book : book) && (!unit || q.unit === unit)).sort((a, b) => umNo(a) - umNo(b));
 const umLock = what => openSheet(`<h3>${what}는 전 범위에서 열립니다</h3><p>여러 소단원을 엮어 묻는 문제라 전 범위가 열려 있을 때 풀 수 있습니다. <b>학원 코드</b>나 <b>이용권</b>을 등록하면 바로 열립니다.</p><button class="btn" id="goMe">내 정보로 가기</button><button class="btn ghost" id="sheetClose">닫기</button>`);
 function startUnit(key, recap){
   const u = unitList().find(x => x.key === key); if (!u) return;
@@ -2818,12 +2822,12 @@ function renderMockPick(v){
   const mt = S.mt !== false;
   v.innerHTML = `<button class="back" id="umBack"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg>문제 풀기</button>
     <h1 class="h-page">실전 모의고사</h1>
-    <p class="fine lead">수능처럼 25문항 · 50점 · ${MOCK_MIN}분입니다. 다 풀고 제출하기 전까지는 채점하지 않습니다. 제출하면 문항별 해설과 다시 볼 소단원을 보여 드립니다.</p>
+    <p class="fine lead">모두 25문항 · 50점 · ${MOCK_MIN}분입니다. 다 풀고 제출하기 전까지는 채점하지 않습니다. 제출하면 문항별 해설과 다시 볼 소단원을 보여 드립니다.</p>
     <div class="pick"><span class="k">시간</span><button class="tgl" id="mockTimer" aria-pressed="${mt}"><span class="sw" aria-hidden="true"></span><span>${MOCK_MIN}분 타이머 ${mt ? '켬' : '끔'}</span></button><p class="fine" style="text-align:left;padding:6px 0 0">도중에 잠시 멈출 수 있습니다. 시간이 다 되면 그때까지 고른 답으로 제출합니다.</p></div>
-    ${['1','2'].map(b => { const n = umItems('mock', b).length, hist = ((S.mk||{})[b] || []).slice(-3).reverse();
-      return `<div class="umcard mock"><div class="mh"><span class="t">통합과학 ${b}</span><span class="s">제1회 · ${n}문항 · 50점</span></div>
+    ${MOCKS.map(m => { const n = umItems('mock', m.k).length, hist = ((S.mk||{})[m.k] || []).slice(-3).reverse();
+      return `${m.hard ? `<h2 class="umbook">수능형</h2><p class="fine" style="text-align:left;padding:0 0 8px">두 권 전 범위에서 단원을 엮어 묻고, 실험·자료 해석이 많습니다. 두 권을 다 배운 뒤에 풀어 보세요.</p>` : m.k === '1' ? `<h2 class="umbook">고1 학력평가형</h2>` : ''}<div class="umcard mock ${m.hard ? 'hard' : ''}"><div class="mh"><span class="t">${m.t}</span><span class="s">${m.s} · ${n}문항 · 50점</span></div>
         ${hist.length ? `<p class="mhist">지난 기록 · ${hist.map(a => `${fmtPt(a.s)}점 (${esc(kdate(a.d))})`).join(' · ')}</p>` : ''}
-        <button class="btn" data-mstart="${b}" ${n ? '' : 'disabled'}>${n ? `통합과학 ${b} 시작` : '문항 준비 중'}</button></div>`; }).join('')}`;
+        <button class="btn" data-mstart="${m.k}" ${n ? '' : 'disabled'}>${n ? `${m.t} 시작` : '문항 준비 중'}</button></div>`; }).join('')}`;
 }
 /* ── 모의고사 진행 ── */
 const mxUsed = () => mx ? mx.used + (mx.paused || mx.done || !mx.t0 ? 0 : Date.now() - mx.t0) : 0;
@@ -2855,7 +2859,7 @@ function renderMock(){
   const q = mx.items[mx.i], n = mx.items.length, answered = mx.picks.filter(Boolean).length;
   const clock = mx.timer ? `<span class="mxclock" id="mxClock" role="timer" aria-label="남은 시간">${clockText(mxLeft())}</span>${mx.paused ? '' : '<button class="mxbtn" id="mxPause">잠시 멈춤</button>'}` : `<span class="mxclock off">타이머 끔</span>`;
   const head = `<button class="back" id="mockQuit"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg>그만두기</button>
-    <div class="mxbar"><span class="mxt">통합과학 ${mx.b} 실전 모의고사</span>${clock}</div>`;
+    <div class="mxbar"><span class="mxt">${mockOf(mx.b).t} 실전 모의고사</span>${clock}</div>`;
   if (mx.paused){ v.innerHTML = head + `<div class="mxpaused" role="status"><b>잠시 멈췄습니다</b><p>멈춘 동안에는 시간이 흐르지 않고 문제를 가려 둡니다. 남은 시간은 ${clockText(mxLeft())}입니다.</p><button class="btn" id="mxResume">다시 시작</button></div>`; return; }
   v.innerHTML = head + `<div class="qbar"><span>${mx.i + 1} / ${n}</span><span class="bar"><i style="width:${Math.round(answered / n * 100)}%"></i></span><span>답함 ${answered}</span></div>
     <div class="qhead"><span class="l">${mx.i + 1}번</span><span class="tag">${fmtPt(q.points)}점</span></div>
@@ -2872,7 +2876,7 @@ function renderMockResult(v){
   const hist = ((S.mk||{})[mx.b] || []).slice(0, -1).slice(-1)[0];
   v.innerHTML = `<button class="back" id="mockClose"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg>문제 풀기</button>
     <div class="result" tabindex="-1"><div class="big">${fmtPt(score)}<small style="font-size:18px;color:var(--muted)"> / 50</small></div>
-      <p class="sub">통합과학 ${mx.b} 실전 모의고사 · ${n}문항 중 ${right}문항을 맞혔습니다${mx.timer || mins ? ` · ${Math.max(1, mins)}분` : ''}</p>
+      <p class="sub">${mockOf(mx.b).t} 실전 모의고사 · ${n}문항 중 ${right}문항을 맞혔습니다${mx.timer || mins ? ` · ${Math.max(1, mins)}분` : ''}</p>
       ${hist ? `<p class="sub">지난번 ${fmtPt(hist.s)}점 (${esc(kdate(hist.d))})</p>` : ''}</div>
     ${mx.res.auto ? `<p class="again" role="status">${MOCK_MIN}분이 지나 그때까지 고른 답으로 제출했습니다.</p>` : ''}
     ${wrongs.length ? `<p class="again">틀린 ${wrongs.length}문항은 오답 노트에 담겨 내일부터 간격을 두고 다시 나옵니다.</p>` : ''}

@@ -38,6 +38,16 @@ def main():
         if len(news) != len(FOLIO.findall(texts[f])): print(f'! {f.relative_to(ROOT)}: 쪽 밖에 폴리오가 있다'); sys.exit(1)
         plan[f] = news
     lo, hi = (min(old2new), max(old2new)) if old2new else (0, 0)
+    # 폴리오 없는 권말 쪽(모의고사 — 학평형·수능형, 빌드 순서대로 이어 붙는다): 쪽 수는 <div class="sheet"> 수.
+    # 차례의 옛 번호가 hi+1 … hi+T(T = 권말 쪽 합) 사이면 같은 자리(마지막 쪽 + 1 + 앞 권말 쪽 수)로 옮긴다
+    last = max((i for i, f in enumerate(files) if plan[f]), default=-1)
+    tails = [(f, len(re.findall(r'<div class="sheet[ "]', texts[f]))) for f in files[last + 1:]]
+    T = sum(k for _, k in tails)
+    tail = lambda o: o - hi + n if hi < o <= hi + T else old2new.get(o, o)
+    if tails:
+        at = n + 1
+        for f, k in tails:
+            print(f'  권말 {f.relative_to(ROOT)}: {k}쪽 → {at}~{at + k - 1}쪽 (폴리오 없음)'); at += k
     changed = 0
     for f in files:
         s = texts[f]; it = iter(plan[f])
@@ -53,7 +63,6 @@ def main():
             return out + m.group(2)
         # 태그 안(속성·주석)은 건드리지 않는다 — 글자 부분만
         s = re.sub(r'>([^<]+)<', lambda t: '>' + PAGEREF.sub(ref, t.group(1)) + '<', s)
-        tail = lambda o: n + 1 if o == hi + 1 else old2new.get(o, o)   # 폴리오 없는 권말(모의고사) = 마지막 쪽 + 1
         s = TOCPG.sub(lambda m: m.group(1) + str(tail(int(m.group(2)))) + m.group(3), s)
         if s != texts[f] and not dry: f.write_text(s, encoding='utf-8')
     print(f'{book}: 폴리오 {n}쪽 · 본문 참조 {changed}곳 고침' + (' (시험 실행)' if dry else ''))

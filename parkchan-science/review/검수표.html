@@ -1,0 +1,1001 @@
+<!DOCTYPE html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>내용 보강 검수표</title>
+<style>@font-face{font-family:'PC Sans';src:url('file:///root/.fonts/static/NotoSansKR-400.ttf');font-weight:400}
+@font-face{font-family:'PC Sans';src:url('file:///root/.fonts/static/NotoSansKR-500.ttf');font-weight:500}
+@font-face{font-family:'PC Sans';src:url('file:///root/.fonts/static/NotoSansKR-700.ttf');font-weight:700}
+:root{
+  --brand:#147D6F; --brand-dk:#0E5A6B; --brand-lt:#E6F2F0; --brand-md:#BFDDD8;
+  --ink:#22303A; --sub:#5B6B77; --line:#D8E0E5; --line-lt:#EAEFF2;
+  --amber:#B4690E; --amber-lt:#FDF4E3; --amber-md:#F0D9AE;
+  --diff:#B3402F; --diff-lt:#FBECE9;
+  --gray-lt:#F1F4F6; --blue:#3D5A80; --blue-lt:#E9EEF5;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+@page{size:A4;margin:13mm 14mm 15mm 14mm}
+html,body{background:#fff}
+body{text-wrap:pretty;font-family:'PC Sans',sans-serif;color:var(--ink);font-size:8.6pt;line-height:1.55;word-break:keep-all;overflow-wrap:break-word;font-variant-numeric:tabular-nums}
+b{font-weight:700}
+a{color:inherit;text-decoration:none}
+.muted{color:var(--sub)}
+.sub{color:var(--sub);font-size:7.4pt;font-weight:400}
+
+/* 꼬리표 */
+.chip{display:inline-block;font-size:7.2pt;font-weight:500;padding:0.2mm 1.6mm;border-radius:1mm;line-height:1.45;white-space:nowrap}
+.lv-w{background:var(--brand-lt);color:var(--brand-dk)}
+.lv-s{background:var(--amber-lt);color:var(--amber)}
+.lv-k{background:var(--gray-lt);color:var(--sub)}
+.lv-c{background:var(--blue-lt);color:var(--blue)}
+.tag{display:inline-block;font-size:6.9pt;font-weight:500;padding:0 1.4mm;border:0.25mm solid var(--line);border-radius:1mm;color:var(--sub);margin-right:1.2mm;line-height:1.5;white-space:nowrap;vertical-align:0.2mm}
+.tag-new{border-color:var(--brand-md);color:var(--brand-dk);background:#fff}
+.tag-diff{border-color:var(--diff);color:var(--diff);background:var(--diff-lt);font-weight:700}
+.cb{display:inline-block;width:3.4mm;height:3.4mm;border:0.35mm solid #8A9AA5;border-radius:0.6mm;background:#fff;vertical-align:-0.6mm;flex:0 0 auto}
+
+/* 표지 */
+.cover{height:265mm;display:flex;flex-direction:column;padding:22mm 6mm 0;break-after:page}
+.cover .brand{font-size:9pt;color:var(--brand);font-weight:700;letter-spacing:0.08em}
+.cover h1{font-size:30pt;font-weight:700;color:var(--brand-dk);margin-top:6mm;letter-spacing:-0.01em}
+.cover .date{font-size:13pt;color:var(--sub);margin-top:2mm;font-weight:500}
+.cover .scope{display:grid;grid-template-columns:22mm 1fr;gap:3mm 4mm;margin-top:16mm;border-top:0.5mm solid var(--brand);padding-top:6mm;font-size:9.4pt}
+.cover dt{font-weight:700;color:var(--brand-dk)}
+.cover .howto{margin-top:14mm;background:var(--brand-lt);border-radius:2mm;padding:6mm 7mm}
+.cover .howto h3{font-size:10.5pt;color:var(--brand-dk);margin-bottom:2.5mm}
+.cover .howto ol{padding-left:5mm;font-size:9.4pt;display:grid;gap:1.8mm}
+.cover .legend{margin-top:auto;margin-bottom:8mm;display:grid;grid-template-columns:1fr 1fr;gap:2.2mm 6mm;font-size:8pt;color:var(--sub)}
+.cover .legend span .chip{margin-right:1.5mm}
+
+/* 쪽 제목 */
+.ph{font-size:15pt;font-weight:700;color:var(--brand-dk);border-bottom:0.5mm solid var(--brand);padding-bottom:1.6mm;margin-bottom:2.5mm}
+.ph2{margin-top:3.6mm;font-size:12.5pt}
+.lead{color:var(--sub);margin-bottom:3mm;font-size:8.6pt}
+.lead b{color:var(--ink)}
+.foot{color:var(--sub);font-size:7.2pt;margin-top:1.2mm}
+.summary{break-after:page}
+.resid{break-before:page}
+.h2sub{font-size:7.8pt;color:var(--sub);font-weight:400;margin-left:2mm}
+
+/* 표 공통 */
+table.t{width:100%;border-collapse:collapse;table-layout:fixed}
+table.t thead{display:table-header-group}
+table.t th{background:var(--brand-lt);color:var(--brand-dk);font-weight:700;font-size:7.6pt;text-align:left;padding:1.3mm 1.6mm;border-bottom:0.35mm solid var(--brand-md)}
+table.t td{padding:1.3mm 1.6mm;border-bottom:0.25mm solid var(--line);vertical-align:top}
+table.t tr{break-inside:avoid}
+td.n,td.no,td.ans{font-variant-numeric:tabular-nums;white-space:nowrap}
+td.pg{font-variant-numeric:tabular-nums}
+td.n{text-align:center}
+td.ans{font-weight:700;color:var(--brand-dk);font-size:9.5pt}
+td.no{font-weight:700}
+td.cbcell{text-align:center;padding-top:2mm}
+.c-cb{width:9mm}
+
+/* 요약표 */
+table.sumt td{padding:0.3mm 1.6mm;font-size:7.8pt;line-height:1.35}
+table.sumt th{padding:0.8mm 1.2mm;font-size:7pt;line-height:1.25}
+.sumt th{font-size:7.4pt;text-align:center}
+.sumt th:nth-child(2){text-align:left}
+.sumt td.code{font-weight:700;color:var(--brand-dk)}
+.sumt td.n.hi{color:var(--amber);font-weight:700}
+.sumt tbody tr:nth-child(15) td{border-bottom:0.45mm solid var(--brand-md)}
+.s-code{width:13mm}.s-nm{width:auto}.s-pg{width:17mm}.s-n1{width:15mm}.s-n{width:14.5mm}
+
+/* Top 10 */
+.toplist{list-style:none;display:grid;grid-template-columns:1fr 1fr;gap:1.2mm 2.4mm}
+.toplist li{display:flex;gap:2mm;align-items:flex-start;border:0.3mm solid var(--line);border-left:1.2mm solid var(--amber);border-radius:1.2mm;padding:1mm 2.2mm;break-inside:avoid}
+.toplist .rk{flex:0 0 4mm;font-weight:700;color:var(--amber);font-size:10pt;line-height:1.3}
+.toplist .tb{flex:1}
+.toplist .tt{display:flex;flex-wrap:nowrap;gap:1.6mm;align-items:baseline}
+.toplist .tt b{white-space:nowrap}
+.toplist .tt b{font-size:8.8pt}
+.toplist .tu{font-weight:700;color:var(--brand-dk);font-size:8pt}
+.toplist .why{font-size:7.2pt;color:var(--amber);border:0.25mm solid var(--amber-md);border-radius:1mm;padding:0 1.3mm}
+.toplist .tp{font-size:7.2pt;color:var(--sub);margin-left:auto;white-space:nowrap}
+.toplist .td{font-size:7.6pt;margin-top:0.4mm;line-height:1.5}
+.toplist .cb{margin-top:1mm}
+table.rest td{font-size:8pt}
+.r-w{width:40mm}.r-p{width:25mm}.r-o{width:auto}.r-n{width:42mm}
+
+/* 소단원 */
+.unit{break-before:page}
+.uhead{border-bottom:0.6mm solid var(--brand);padding-bottom:2mm;margin-bottom:3mm;display:grid;grid-template-columns:auto 1fr;grid-template-rows:auto auto;column-gap:4mm;align-items:end}
+.uhead .ucode{grid-row:1 / span 2;display:flex;flex-direction:column;align-items:flex-start;gap:0.8mm}
+.uhead .code{background:var(--brand);color:#fff;font-weight:700;font-size:13pt;padding:0.6mm 3mm;border-radius:1.2mm;line-height:1.35}
+.uhead .long{font-size:7.2pt;color:var(--sub)}
+.uhead h2{font-size:15pt;font-weight:700;color:var(--brand-dk);line-height:1.3}
+.uhead .umeta{display:flex;flex-wrap:wrap;gap:0.5mm 5mm;font-size:8.2pt;color:var(--sub)}
+.uhead .umeta b{color:var(--ink)}
+h3{font-size:9.6pt;font-weight:700;color:var(--brand-dk);margin:3mm 0 1.2mm;display:flex;align-items:center;gap:1.8mm;break-after:avoid}
+h3 .num{display:inline-flex;width:4.6mm;height:4.6mm;border-radius:50%;background:var(--brand);color:#fff;font-size:7.4pt;align-items:center;justify-content:center}
+h3 .h3sub{font-size:7.4pt;color:var(--sub);font-weight:400}
+.facts .c-what{width:auto}.facts .c-pg{width:21mm}.facts .c-src{width:39mm}.facts .c-lv{width:17mm}
+.facts .before{color:var(--sub)}
+.facts .after{margin-top:0.6mm}
+.facts .lab{display:inline-block;font-size:6.8pt;font-weight:700;width:4.2mm;color:var(--sub)}
+.facts .after .lab{color:var(--brand)}
+.facts tr.keep .after{color:var(--sub)}
+.facts .src{font-size:7.6pt;color:var(--sub)}
+.facts .tags{margin-top:0.8mm}
+.diffnote{margin-top:0.8mm;font-size:7.6pt;color:var(--diff);background:var(--diff-lt);padding:0.6mm 1.6mm;border-radius:0.8mm}
+.new .c-pg2{width:15mm}.new .c-desc{width:auto}.new .c-ex{width:34mm}
+.qs .c-no{width:13mm}.qs .c-ask{width:auto}.qs .c-ans{width:12mm}.qs .c-qpg{width:24mm}
+.issues{margin-top:3mm;background:var(--amber-lt);border-left:1.2mm solid var(--amber);border-radius:1.2mm;padding:0.4mm 4mm 2.4mm;break-inside:avoid}
+.issues h3{color:var(--amber);margin-top:2mm}
+.issues h3 .num{background:var(--amber)}
+.issues ul{list-style:none;display:grid;gap:1.2mm}
+.issues li{display:flex;gap:2.4mm;align-items:flex-start;font-size:8.3pt}
+.issues li .cb{margin-top:0.7mm;border-color:#C9A266}
+.issues li.ref{color:var(--sub);font-size:7.6pt;padding-left:5.8mm}
+
+/* 모의고사 */
+.exam{break-before:page}
+table.examt td{font-size:7.5pt;padding:0.6mm 1.4mm;line-height:1.42}
+table.examt td.cbcell{padding-top:1.1mm}
+.examt tr.pri td{background:#F7FBFA}
+.e-no{width:9mm}.e-ans{width:10mm}.e-pt{width:10mm}.e-un{width:24mm}.e-note{width:auto}.e-pg{width:8mm}
+.examt td.un{font-size:7.4pt;color:var(--sub)}
+.examt td.ans{font-size:9pt}
+
+.nw{white-space:nowrap}
+.new td .chip{white-space:normal}
+</style></head>
+<body>
+<section class="cover">
+  <div class="brand">박찬 과학 · 통합과학 교재</div>
+  <h1>내용 보강 검수표</h1>
+  <div class="date">2026-10-02</div>
+  <dl class="scope">
+    <dt>범위</dt><dd>통합과학1 15개 소단원(I-01 ~ III-06) · 통합과학2 13개 소단원(2101 ~ 2303) · 수능형 모의고사 제1회</dd>
+    <dt>쪽 번호</dt><dd>합본 PDF의 쪽 번호와 같습니다 — <b>book/통합과학1_합본.pdf</b>, <b>book2/통합과학2_합본.pdf</b>(2026-10-01 쪽 번호 다시 매김 반영)</dd>
+    <dt>대조 방법</dt><dd>담당자 보고서 28건을 지금 본책 HTML과 한 줄씩 대조했습니다. 보강 직전 판(2026-10-01 오후)과 비교해 쪽 수·문항·정답을 읽었고, 보고서와 파일이 다르면 <span class="tag tag-diff">보고와 다름</span>으로 표시했습니다.</dd>
+  </dl>
+  <div class="howto">
+    <h3>쓰는 법</h3>
+    <ol>
+      <li>다음 쪽 <b>먼저 보실 것 Top 10</b>부터 — 의학·법률·최신 수치, 2차 자료로만 확인한 것입니다.</li>
+      <li>소단원 쪽에서 <b>본책 쪽</b>을 합본 PDF로 열어 보고, 맞으면 왼쪽 칸에 ✓. <span class="chip lv-s">2차 자료</span>·<span class="chip lv-k">교과 지식</span>은 출처를 한 번 더 보아 주세요.</li>
+      <li>노란 칸 <b>확인 못 한 것 · 원장님 판단 필요</b>에 결정을 적어 주시면 그대로 반영합니다.</li>
+    </ol>
+  </div>
+  <div class="legend">
+    <span><span class="chip lv-w">원문 확인</span> 기관 원문을 담당자가 직접 열어 확인</span>
+    <span><span class="chip lv-s">2차 자료</span> 언론·위키·교재 등 2차 자료로만 확인</span>
+    <span><span class="chip lv-k">교과 지식</span> 출처 대조 없이 표준 교과 지식으로 씀</span>
+    <span><span class="chip lv-c">직접 계산</span> 담당자가 직접 계산</span>
+  </div>
+</section>
+
+<section class="summary">
+  <h2 class="ph">전체 요약</h2>
+  <p class="lead">28개 소단원 · 본책 <b>+27쪽</b> · 바뀐 사실 <b>65</b> · 새 쪽 <b>28</b> · 바꾼 문항 <b>53</b>(손봄 11) · 확인 못 한 것 <b>78</b> · 보고와 다름 <b>2</b></p>
+  <table class="t sumt"><colgroup><col class="s-code"><col class="s-nm"><col class="s-pg"><col class="s-n1"><col class="s-n"><col class="s-n"><col class="s-n"><col class="s-n"><col class="s-n"></colgroup>
+  <thead><tr><th>코드</th><th>소단원</th><th>본책 쪽</th><th>쪽 수</th><th>바뀐 사실</th><th>새 쪽</th><th>바꾼 문항</th><th>확인 못<br>한 것</th><th>보고와<br>다름</th></tr></thead>
+  <tbody><tr><td class="code"><a href="#u-I-01">I-01</a></td><td class="nm">자연을 재는 눈 — 시간과 공간</td><td class="pg">9~25</td><td class="n">16 → 17</td><td class="n">3</td><td class="n">1</td><td class="n">2</td><td class="n hi">3</td><td class="n ">—</td></tr><tr><td class="code"><a href="#u-I-02">I-02</a></td><td class="nm">기본량과 단위</td><td class="pg">26~41</td><td class="n">16 → 16</td><td class="n">4</td><td class="n">—</td><td class="n">2<span class=sub> +1</span></td><td class="n hi">4</td><td class="n ">—</td></tr><tr><td class="code"><a href="#u-I-03">I-03</a></td><td class="nm">측정과 어림, 측정 표준</td><td class="pg">42~58</td><td class="n">16 → 17</td><td class="n">4</td><td class="n">1</td><td class="n">2</td><td class="n hi">3</td><td class="n ">—</td></tr><tr><td class="code"><a href="#u-I-04">I-04</a></td><td class="nm">정보와 신호, 디지털 문명</td><td class="pg">59~76</td><td class="n">16 → 18</td><td class="n">2</td><td class="n">2</td><td class="n">2</td><td class="n hi">3</td><td class="n ">—</td></tr><tr><td class="code"><a href="#u-II-01">II-01</a></td><td class="nm">우주의 시작과 원소의 탄생</td><td class="pg">85~100</td><td class="n">15 → 16</td><td class="n">2</td><td class="n">1</td><td class="n">2</td><td class="n hi">3</td><td class="n ">—</td></tr><tr><td class="code"><a href="#u-II-02">II-02</a></td><td class="nm">별에서 만들어지는 원소</td><td class="pg">101~117</td><td class="n">16 → 17</td><td class="n">1</td><td class="n">1</td><td class="n">1</td><td class="n hi">4</td><td class="n ">—</td></tr><tr><td class="code"><a href="#u-II-03">II-03</a></td><td class="nm">원소의 주기성과 화학 결합</td><td class="pg">118~136</td><td class="n">18 → 19</td><td class="n">0</td><td class="n">1</td><td class="n">2</td><td class="n hi">2</td><td class="n ">—</td></tr><tr><td class="code"><a href="#u-II-04">II-04</a></td><td class="nm">지각과 생명체를 이루는 물질의 규칙성</td><td class="pg">137~153</td><td class="n">16 → 17</td><td class="n">2</td><td class="n">1</td><td class="n">2<span class=sub> +1</span></td><td class="n hi">1</td><td class="n ">—</td></tr><tr><td class="code"><a href="#u-II-05">II-05</a></td><td class="nm">물질의 전기적 성질과 신소재</td><td class="pg">154~169</td><td class="n">16 → 16</td><td class="n">3</td><td class="n">1</td><td class="n">2</td><td class="n hi">2</td><td class="n ">—</td></tr><tr><td class="code"><a href="#u-III-01">III-01</a></td><td class="nm">지구시스템과 에너지·물질 순환</td><td class="pg">178~195</td><td class="n">17 → 18</td><td class="n">1</td><td class="n">1</td><td class="n">2</td><td class="n hi">2</td><td class="n ">—</td></tr><tr><td class="code"><a href="#u-III-02">III-02</a></td><td class="nm">판구조론과 지권의 변화</td><td class="pg">196~212</td><td class="n">16 → 17</td><td class="n">2</td><td class="n">1</td><td class="n">2</td><td class="n hi">3</td><td class="n ">—</td></tr><tr><td class="code"><a href="#u-III-03">III-03</a></td><td class="nm">중력과 운동</td><td class="pg">213~229</td><td class="n">16 → 17</td><td class="n">1</td><td class="n">1</td><td class="n">2<span class=sub> +1</span></td><td class="n hi">1</td><td class="n ">—</td></tr><tr><td class="code"><a href="#u-III-04">III-04</a></td><td class="nm">운동량과 충격량</td><td class="pg">230~245</td><td class="n">16 → 16</td><td class="n">2</td><td class="n">—</td><td class="n">2</td><td class="n hi">2</td><td class="n ">—</td></tr><tr><td class="code"><a href="#u-III-05">III-05</a></td><td class="nm">생명 시스템과 화학 반응</td><td class="pg">246~262</td><td class="n">16 → 17</td><td class="n">1</td><td class="n">1</td><td class="n">2</td><td class="n hi">3</td><td class="n ">—</td></tr><tr><td class="code"><a href="#u-III-06">III-06</a></td><td class="nm">유전자에서 단백질까지</td><td class="pg">263~278</td><td class="n">16 → 16</td><td class="n">2</td><td class="n">—</td><td class="n">1</td><td class="n hi">1</td><td class="n ">—</td></tr><tr><td class="code"><a href="#u-2101">2101</a></td><td class="nm">지질시대와 생물의 변천</td><td class="pg">9~26</td><td class="n">16 → 18</td><td class="n">1</td><td class="n">2</td><td class="n">2</td><td class="n hi">3</td><td class="n ">—</td></tr><tr><td class="code"><a href="#u-2102">2102</a></td><td class="nm">진화와 생물다양성</td><td class="pg">27~44</td><td class="n">16 → 18</td><td class="n">1</td><td class="n">2</td><td class="n">1<span class=sub> +1</span></td><td class="n hi">3</td><td class="n ">—</td></tr><tr><td class="code"><a href="#u-2103">2103</a></td><td class="nm">산화와 환원</td><td class="pg">45~62</td><td class="n">18 → 18</td><td class="n">3</td><td class="n">—</td><td class="n">2<span class=sub> +2</span></td><td class="n hi">3</td><td class="n ">—</td></tr><tr><td class="code"><a href="#u-2104">2104</a></td><td class="nm">산·염기와 중화 반응</td><td class="pg">63~81</td><td class="n">18 → 19</td><td class="n">3</td><td class="n">1</td><td class="n">2</td><td class="n hi">3</td><td class="n ">—</td></tr><tr><td class="code"><a href="#u-2105">2105</a></td><td class="nm">물질 변화와 에너지 출입</td><td class="pg">82~99</td><td class="n">16 → 18</td><td class="n">3</td><td class="n">2</td><td class="n">2</td><td class="n hi">4</td><td class="n ">—</td></tr><tr><td class="code"><a href="#u-2201">2201</a></td><td class="nm">생태계의 구성과 상호 관계</td><td class="pg">108~123</td><td class="n">16 → 16</td><td class="n">1</td><td class="n">—</td><td class="n">2<span class=sub> +1</span></td><td class="n hi">2</td><td class="n ">—</td></tr><tr><td class="code"><a href="#u-2202">2202</a></td><td class="nm">생태계 평형</td><td class="pg">124~140</td><td class="n">16 → 17</td><td class="n">1</td><td class="n">1</td><td class="n">2</td><td class="n hi">4</td><td class="n hi">1</td></tr><tr><td class="code"><a href="#u-2203">2203</a></td><td class="nm">지구온난화와 기후변화</td><td class="pg">141~159</td><td class="n">18 → 19</td><td class="n">5</td><td class="n">1</td><td class="n">2<span class=sub> +2</span></td><td class="n hi">5</td><td class="n ">—</td></tr><tr><td class="code"><a href="#u-2204">2204</a></td><td class="nm">태양 에너지와 에너지 전환</td><td class="pg">160~174</td><td class="n">15 → 15</td><td class="n">3</td><td class="n">—</td><td class="n">2<span class=sub> +1</span></td><td class="n hi">2</td><td class="n ">—</td></tr><tr><td class="code"><a href="#u-2205">2205</a></td><td class="nm">발전과 에너지의 효율적 이용</td><td class="pg">175~193</td><td class="n">16 → 19</td><td class="n">4</td><td class="n">3</td><td class="n">2</td><td class="n hi">3</td><td class="n ">—</td></tr><tr><td class="code"><a href="#u-2301">2301</a></td><td class="nm">감염병과 과학의 유용성</td><td class="pg">202~218</td><td class="n">16 → 17</td><td class="n">3</td><td class="n">1</td><td class="n">2<span class=sub> +1</span></td><td class="n hi">3</td><td class="n ">—</td></tr><tr><td class="code"><a href="#u-2302">2302</a></td><td class="nm">빅데이터와 인공지능·로봇</td><td class="pg">219~236</td><td class="n">16 → 18</td><td class="n">3</td><td class="n">2</td><td class="n">2</td><td class="n hi">3</td><td class="n hi">1</td></tr><tr><td class="code"><a href="#u-2303">2303</a></td><td class="nm">과학기술과 윤리</td><td class="pg">237~252</td><td class="n">16 → 16</td><td class="n">4</td><td class="n">—</td><td class="n">2</td><td class="n hi">3</td><td class="n ">—</td></tr></tbody></table>
+  <p class="foot">바뀐 사실 = 고치거나 새로 넣은 사실(확인만 하고 그대로 둔 것은 빼고 셈). 바꾼 문항 = 새로 바꾼 문항, <span class="sub">+N</span>은 발문·용어·그림만 손본 문항.</p>
+  <h2 class="ph ph2">먼저 보실 것 Top 10 <span class="h2sub">틀리면 위험한 것(의학·법률·최신 수치)과 2차 자료로만 확인한 것</span></h2>
+  <ol class="toplist"><li><span class="rk">1</span><div class="tb"><div class="tt"><b>의료·환경 기준값</b><span class="tu">I-03</span><span class="why">의학</span><span class="tp">47·49·52쪽</span></div><div class="td">공복 혈당 126 mg/dL 이상 = 당뇨병 진단, 초미세먼지 75 μg/m³ 2시간 → 주의보. 그림에 "2026년 확인".</div></div><span class="cb" aria-hidden="true"></span></li><li><span class="rk">2</span><div class="tb"><div class="tt"><b>삼투와 생리식염수</b><span class="tu">III-05</span><span class="why">의학</span><span class="tp">250·253·257쪽</span></div><div class="td">적혈구가 증류수에서 터지고 진한 소금물에서 쭈그러듦, 생리식염수 0.9 %. 탐구의 감자 값은 예시값.</div></div><span class="cb" aria-hidden="true"></span></li><li><span class="rk">3</span><div class="tb"><div class="tt"><b>감염병 진단 검사</b><span class="tu">2301</span><span class="why">의학</span><span class="tp">204·207·209·213쪽</span></div><div class="td">진단 3종 표, 증폭 모형("검출선에 닿지 않으면 핵산 없음"), WHO 팬데믹 협정. 수능형 24번도 같은 논리.</div></div><span class="cb" aria-hidden="true"></span></li><li><span class="rk">4</span><div class="tb"><div class="tt"><b>유전자 편집 치료 연표</b><span class="tu">2303</span><span class="why">의학·법률</span><span class="tp">240·243·246쪽</span></div><div class="td">CRISPR 치료제 승인(영국·미국 2023), 2025 염기 편집. 2018·줄기세포 사건은 웹 검색(2차), IRB 조문 미확인.</div></div><span class="cb" aria-hidden="true"></span></li><li><span class="rk">5</span><div class="tb"><div class="tt"><b>최신 기후 수치</b><span class="tu">2203</span><span class="why">최신 수치</span><span class="tp">143·145·146쪽</span></div><div class="td">427 ppm(2025)·432 ppm(2026-05)·1.26 ℃, ONI 2026년 6~8월 +1.8·9월 엘니뇨 주의보, 파리 협정 196(2차).</div></div><span class="cb" aria-hidden="true"></span></li><li><span class="rk">6</span><div class="tb"><div class="tt"><b>AI 기본법 조문</b><span class="tu">2302·2303</span><span class="why">법률</span><span class="tp">225·241·245쪽</span></div><div class="td">2025-01-21 공포, 2026-01-22 시행. 제31조(결과물 표시)·제34조(고영향 AI)를 시험 선지에도 씀.</div></div><span class="cb" aria-hidden="true"></span></li><li><span class="rk">7</span><div class="tb"><div class="tt"><b>에너지 법·통계</b><span class="tu">2205</span><span class="why">법률·2차</span><span class="tp">178·180·182·186쪽</span></div><div class="td">신·재생에너지 법적 분류는 법령 원문 못 엶(2차), LNG 출력 조절도 정부 문서 아님. 2024 발전 비중은 원문.</div></div><span class="cb" aria-hidden="true"></span></li><li><span class="rk">8</span><div class="tb"><div class="tt"><b>냉각 팩 재분류</b><span class="tu">2105</span><span class="why">답이 바뀜·2차</span><span class="tp">84·87·89쪽</span></div><div class="td">질산 암모늄 냉각 팩을 흡열 "반응" → "용해(물리 변화)"로. 근거는 Wikipedia. 대단원 마무리는 아직 옛 분류.</div></div><span class="cb" aria-hidden="true"></span></li><li><span class="rk">9</span><div class="tb"><div class="tt"><b>옐로스톤 늑대 논쟁</b><span class="tu">2202</span><span class="why">학계 논쟁·2차</span><span class="tp">130·135쪽</span></div><div class="td">"정설" → "효과 크기는 논쟁 중". Hobbs 외(2024)는 발표·기사로만 확인, 22번 정답이 이 해석에 달림.</div></div><span class="cb" aria-hidden="true"></span></li><li><span class="rk">10</span><div class="tb"><div class="tt"><b>보전 관련 최신 수치</b><span class="tu">2102</span><span class="why">최신·2차</span><span class="tp">30·33쪽</span></div><div class="td">반달가슴곰 2022년 79마리·쿤밍-몬트리올 30 %는 보도(2차). 282종, WHO 2025 "6건 중 1건 내성"은 원문.</div></div><span class="cb" aria-hidden="true"></span></li></ol>
+</section>
+
+<section class="unit" id="u-I-01">
+<header class="uhead">
+  <div class="ucode"><span class="code">I-01</span><span class="long"></span></div>
+  <h2>자연을 재는 눈 — 시간과 공간</h2>
+  <div class="umeta"><span><b>본책 9~25쪽</b> · 통합과학1 합본</span><span>쪽 수 16 → <b>17쪽</b> (+1)</span><span>강의용 L-1101 12쪽 그대로</span></div>
+</header>
+<h3><span class="num">1</span>바뀐 사실</h3>
+<table class="t facts"><colgroup><col class="c-cb"><col class="c-what"><col class="c-pg"><col class="c-src"><col class="c-lv"></colgroup><thead><tr><th>확인</th><th>무엇 (전 → 후)</th><th>본책 쪽</th><th>출처</th><th>확인 수준</th></tr></thead><tbody>
+<tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td><div class="before"><span class="lab">전</span>1초의 기준: "세슘 원자가 내는 빛"</div><div class="after"><span class="lab">후</span>"세슘-133 원자가 내는 전자기파(마이크로파)", 날개에 약 9.19 GHz</div><div class=tags><span class="tag">강의용도 고침</span></div></td><td class="pg">14·<wbr>23</td><td class="src">NIST SP 330 §2 · NIST SI 재정의 "second"</td><td><span class="chip lv-w">원문 확인</span></td></tr>
+<tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td><div class="before"><span class="lab">전</span>길이 기준의 변천: 몸 → 미터원기 → 빛</div><div class="after"><span class="lab">후</span>몸 → 지구 자오선(북극~적도의 1/10 000 000, 18세기 말) → 미터원기 → 빛</div><div class=tags><span class="tag">강의용도 고침</span></div></td><td class="pg">13·<wbr>14·<wbr>20·<wbr>24</td><td class="src">NIST SI 재정의 "meter"</td><td><span class="chip lv-w">원문 확인</span></td></tr>
+<tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td><div class="before"><span class="lab">전</span>미터원기 = "백금 막대"</div><div class="after"><span class="lab">후</span>금속 막대, 1889년부터 백금·이리듐 합금(날개에 1889~1960)</div><div class=tags><span class="tag">강의용도 고침</span></div></td><td class="pg">13</td><td class="src">NIST SI 재정의 "meter"</td><td><span class="chip lv-w">원문 확인</span></td></tr>
+<tr class="keep"><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td><div class="before"><span class="lab">전</span>"원자시계는 수천만 년에 1초도 안 틀린다"</div><div class="after"><span class="lab">후</span>그대로 둠</div></td><td class="pg">14</td><td class="src">NIST(상용 세슘 시계 연 1/3 000 000초)</td><td><span class="chip lv-w">원문 확인</span></td></tr>
+</tbody></table>
+<h3><span class="num">2</span>새로 넣은 것 <span class="h3sub">새 쪽·탐구·날개·그림</span></h3>
+<table class="t new"><colgroup><col class="c-cb"><col class="c-pg2"><col class="c-desc"><col class="c-ex"></colgroup><thead><tr><th>확인</th><th>본책 쪽</th><th>내용</th><th>예시 결과</th></tr></thead><tbody>
+<tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td class="pg">9</td><td>도입 쪽 "답할 수 있는 질문"에 교과서 탐구 항목 추가</td><td><span class="muted">—</span></td></tr>
+<tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td class="pg">11</td><td>개념 2: 미시·거시 세계 정의, 도구 띠 4칸 → 6칸, 날개에 연주 시차·1 AU·1광년·1 pc</td><td><span class="muted">—</span></td></tr>
+<tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td class="pg">14</td><td>개념 5: 시계의 진화(앙부일구 → 자격루 → 진자 시계 → 원자시계)</td><td><span class="muted">—</span></td></tr>
+<tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td class="pg">16</td><td><span class="tag tag-new">새 쪽</span>교과서 탐구 1쪽 신설 — "잘게 쪼개면 무엇이 달라질까"(각설탕 모형 겉면 비율 표·로그 그래프, 금 나노 입자·연잎·자외선 차단제)</td><td><span class="chip lv-s">모형 계산값</span></td></tr>
+</tbody></table>
+<h3><span class="num">3</span>바꾼 문항 <span class="h3sub">정답은 지금 파일에서 읽은 값</span></h3>
+<table class="t qs"><colgroup><col class="c-cb"><col class="c-no"><col class="c-ask"><col class="c-ans"><col class="c-qpg"></colgroup><thead><tr><th>확인</th><th>번호</th><th>무엇을 묻나</th><th>정답</th><th>문제 · 해설 쪽</th></tr></thead><tbody>
+<tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td class="no">15번</td><td><span class="tag tag-new">교체</span>각설탕 모형 탐구 합답형 — 크기와 겉면 비율</td><td class="ans">④</td><td class="pg">18 · 22</td></tr>
+<tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td class="no">21번</td><td><span class="tag tag-new">교체</span>금 나노 입자·적혈구·가까운 별의 크기와 관찰·측정 방법</td><td class="ans">③</td><td class="pg">20 · 24</td></tr>
+</tbody></table>
+<div class="issues"><h3><span class="num">4</span>확인 못 한 것 · 원장님 판단 필요</h3><ul>
+<li><span class="cb" aria-hidden="true"></span><span>세슘 원자시계가 1초의 기준이 된 해(1967)는 BIPM 원문으로 확인하지 못해 연도를 쓰지 않았습니다.</span></li>
+<li><span class="cb" aria-hidden="true"></span><span>앙부일구·자격루·진자 시계의 연도는 넣지 않았습니다.</span></li>
+<li><span class="cb" aria-hidden="true"></span><span>I-02 24번 (가)에는 아직 "세슘 원자가 내는 빛"이 남아 있습니다(본책 36쪽) — I-02 표 참고.</span></li>
+</ul></div></section>
+<section class="unit" id="u-I-02">
+<header class="uhead">
+  <div class="ucode"><span class="code">I-02</span><span class="long"></span></div>
+  <h2>기본량과 단위</h2>
+  <div class="umeta"><span><b>본책 26~41쪽</b> · 통합과학1 합본</span><span>쪽 수 16 → <b>16쪽</b> (그대로)</span><span>강의용 L-1102 12쪽 그대로</span></div>
+</header>
+<h3><span class="num">1</span>바뀐 사실</h3>
+<table class="t facts"><colgroup><col class="c-cb"><col class="c-what"><col class="c-pg"><col class="c-src"><col class="c-lv"></colgroup><thead><tr><th>확인</th><th>무엇 (전 → 후)</th><th>본책 쪽</th><th>출처</th><th>확인 수준</th></tr></thead><tbody>
+<tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td><div class="before"><span class="lab">전</span>℃ = "K·J에서 환산되는 관용 단위"</div><div class="after"><span class="lab">후</span>℃는 SI 유도단위, T(K) = t(℃) + 273.15 · L는 SI와 함께 쓰는 단위 · kcal는 비SI</div><div class=tags><span class="tag">강의용도 고침</span></div></td><td class="pg">31·<wbr>37·<wbr>38 외</td><td class="src">NIST SP 330 §2 Table 4, §4 Table 8</td><td><span class="chip lv-w">원문 확인</span></td></tr>
+<tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td><div class="before"><span class="lab">전</span>화성 기후 궤도선: "추진력(힘) 데이터", 뉴턴 ↔ 파운드힘</div><div class="after"><span class="lab">후</span>추진기 분사의 충격량(힘 × 시간), 파운드힘·초 ↔ 뉴턴·초, 약 1/4.45로 작게, 9개월 누적</div><div class=tags><span class="tag">강의용도 고침</span></div></td><td class="pg">27·<wbr>32·<wbr>35·<wbr>39</td><td class="src">NASA MCO 사고 조사 보고서(1999)</td><td><span class="chip lv-w">원문 확인</span></td></tr>
+<tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td><div class="before"><span class="lab">전</span>비용 "수천억 원"</div><div class="after"><span class="lab">후</span>"탐사선 한 대를 통째로 잃은 교훈"(숫자 뺌)</div></td><td class="pg">27</td><td class="src">NASA NSSDC(계획 전체 3억 2760만 달러만 확인)</td><td><span class="chip lv-w">원문 확인</span></td></tr>
+<tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td><div class="before"><span class="lab">전</span>강의용 03 B면 "III단원에서 만난 양들을 다시 보자"</div><div class="after"><span class="lab">후</span>"만날 … 미리 보자"(시제)</div></td><td class="pg"><span class="nw">강의용 L-1102</span><br><span class="sub">본책 29쪽과 같은 표현</span></td><td class="src">—</td><td><span class="chip lv-k">교과 지식</span></td></tr>
+</tbody></table>
+<h3><span class="num">2</span>새로 넣은 것 <span class="h3sub">새 쪽·탐구·날개·그림</span></h3>
+<table class="t new"><colgroup><col class="c-cb"><col class="c-pg2"><col class="c-desc"><col class="c-ex"></colgroup><thead><tr><th>확인</th><th>본책 쪽</th><th>내용</th><th>예시 결과</th></tr></thead><tbody>
+<tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td class="pg">29</td><td>개념 3: 농도 한 문단, 그림 3을 3칸 → 4칸(g/L), 날개 "농도의 단위"</td><td><span class="muted">—</span></td></tr>
+<tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td class="pg">31</td><td>개념 5 날개: "섭씨와 켈빈", "생활 단위 3분류"</td><td><span class="muted">—</span></td></tr>
+<tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td class="pg">32</td><td>자료 파헤치기 "단위 환산 3종"(95 마일/h ≈ 153 km/h, 35000 ft ≈ 10.7 km, 86 ℉ = 30 ℃ ≈ 303 K)</td><td><span class="muted">—</span></td></tr>
+<tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td class="pg">41</td><td>MEMO 띠 3번: "0 ℃는 몇 K, ℃는 어떤 단위"</td><td><span class="muted">—</span></td></tr>
+</tbody></table>
+<h3><span class="num">3</span>바꾼 문항 <span class="h3sub">정답은 지금 파일에서 읽은 값</span></h3>
+<table class="t qs"><colgroup><col class="c-cb"><col class="c-no"><col class="c-ask"><col class="c-ans"><col class="c-qpg"></colgroup><thead><tr><th>확인</th><th>번호</th><th>무엇을 묻나</th><th>정답</th><th>문제 · 해설 쪽</th></tr></thead><tbody>
+<tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td class="no">9번</td><td><span class="tag tag-new">교체</span>온도 단위 — 25 ℃ ≈ 298 K</td><td class="ans">②</td><td class="pg">33 · 37</td></tr>
+<tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td class="no">17번</td><td><span class="tag">손봄</span>화성 궤도선 자료(충격량·단위)로 고침</td><td class="ans">③</td><td class="pg">35 · 39</td></tr>
+<tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td class="no">21번</td><td><span class="tag tag-new">교체</span>소금물 표 — 농도 2배, 밀도, 묽힌 뒤 농도</td><td class="ans">③</td><td class="pg">36 · 40</td></tr>
+</tbody></table>
+<div class="issues"><h3><span class="num">4</span>확인 못 한 것 · 원장님 판단 필요</h3><ul>
+<li><span class="cb" aria-hidden="true"></span><span>24번 (가) "세슘 원자가 내는 빛이 9 192 631 770번 진동하는 시간"이 그대로입니다(본책 36쪽). I-01은 "세슘-133 원자가 내는 전자기파"로 고쳤으니 맞출지 정해 주세요.</span></li>
+<li><span class="cb" aria-hidden="true"></span><span>궤도선 한 대 값(1억 2500만 달러)은 확인하지 못해 숫자를 쓰지 않았습니다.</span></li>
+<li><span class="cb" aria-hidden="true"></span><span>대단원 마무리(본책 83쪽) 해설에 "℃는 관용 단위"가 남아 있습니다.</span></li>
+<li><span class="cb" aria-hidden="true"></span><span>도입 쪽 플랑크 인용 "(1899)"가 다음 줄로 혼자 떨어져 있습니다(본책 26쪽, 원래부터).</span></li>
+</ul></div></section>
+<section class="unit" id="u-I-03">
+<header class="uhead">
+  <div class="ucode"><span class="code">I-03</span><span class="long"></span></div>
+  <h2>측정과 어림, 측정 표준</h2>
+  <div class="umeta"><span><b>본책 42~58쪽</b> · 통합과학1 합본</span><span>쪽 수 16 → <b>17쪽</b> (+1)</span><span>강의용 L-1103 12쪽 그대로</span></div>
+</header>
+<h3><span class="num">1</span>바뀐 사실</h3>
+<table class="t facts"><colgroup><col class="c-cb"><col class="c-what"><col class="c-pg"><col class="c-src"><col class="c-lv"></colgroup><thead><tr><th>확인</th><th>무엇 (전 → 후)</th><th>본책 쪽</th><th>출처</th><th>확인 수준</th></tr></thead><tbody>
+<tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td><div class="before"><span class="lab">전</span>2019년 재정의: "마지막 주자가 질량 → 전부 상수 기반"</div><div class="after"><span class="lab">후</span>2019년 5월 20일 시행, kg·A·K·mol 4개를 함께 재정의(플랑크 상수·기본 전하·볼츠만 상수·아보가드로 수)</div><div class=tags><span class="tag">강의용도 고침</span></div></td><td class="pg">46·<wbr>47</td><td class="src">BIPM SI defining constants · 이투데이 2019(KRISS)</td><td><span class="chip lv-w">원문 확인</span></td></tr>
+<tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td><div class="before"><span class="lab">전</span>원기 보관 장소 "파리"</div><div class="after"><span class="lab">후</span>"파리 근교 세브르의 국제도량형국(BIPM)"</div><div class=tags><span class="tag">강의용도 고침</span></div></td><td class="pg">46</td><td class="src">BIPM history-si/kilogram</td><td><span class="chip lv-w">원문 확인</span></td></tr>
+<tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td><div class="before"><span class="lab">전</span>"수치화"(측정해 수로 나타내기)</div><div class="after"><span class="lab">후</span>"기준과 비교 / 수치와 단위로 나타내기"로 풀어 씀(양자화로 바꾸지 않음)</div></td><td class="pg">43·<wbr>44</td><td class="src">ROHM TechWeb(A/D 용어 확인)</td><td><span class="chip lv-w">원문 확인</span></td></tr>
+<tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td><div class="before"><span class="lab">전</span>1 m 정의의 자오선 단계 없음</div><div class="after"><span class="lab">후</span>날개: 자오선의 1000만분의 1(1790년대) → 미터원기(1889) → 빛(1983)</div></td><td class="pg">46</td><td class="src">NIST</td><td><span class="chip lv-w">원문 확인</span></td></tr>
+</tbody></table>
+<h3><span class="num">2</span>새로 넣은 것 <span class="h3sub">새 쪽·탐구·날개·그림</span></h3>
+<table class="t new"><colgroup><col class="c-cb"><col class="c-pg2"><col class="c-desc"><col class="c-ex"></colgroup><thead><tr><th>확인</th><th>본책 쪽</th><th>내용</th><th>예시 결과</th></tr></thead><tbody>
+<tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td class="pg">43</td><td>개념 1: 측정의 정의, 날개 "정밀도"</td><td><span class="muted">—</span></td></tr>
+<tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td class="pg">44</td><td>개념 2: 어림이 측정 계획을 돕는다, 날개 "에라토스테네스"(7.2°)</td><td><span class="muted">—</span></td></tr>
+<tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td class="pg">45</td><td>개념 3: 측정 표준의 4요소(단위·방법·도구·표준 물질), 날개 "표준 물질"</td><td><span class="muted">—</span></td></tr>
+<tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td class="pg">47</td><td>개념 5 그림 교체 — 전력량계 kWh · 초미세먼지 75 μg/m³ 2시간 → 주의보 · 공복 혈당 126 mg/dL 이상 → 당뇨병 진단(그림 안에 "2026년 확인")</td><td><span class="muted">—</span></td></tr>
+<tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td class="pg">49</td><td><span class="tag tag-new">새 쪽</span>교과서 탐구 1쪽 신설 — 측정 표준의 네 요소 찾기(거래·전기·대기·의료 4분야 표, 초미세먼지·공복 혈당 구간 막대)</td><td><span class="muted">—</span></td></tr>
+</tbody></table>
+<h3><span class="num">3</span>바꾼 문항 <span class="h3sub">정답은 지금 파일에서 읽은 값</span></h3>
+<table class="t qs"><colgroup><col class="c-cb"><col class="c-no"><col class="c-ask"><col class="c-ans"><col class="c-qpg"></colgroup><thead><tr><th>확인</th><th>번호</th><th>무엇을 묻나</th><th>정답</th><th>문제 · 해설 쪽</th></tr></thead><tbody>
+<tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td class="no">13번</td><td><span class="tag tag-new">교체</span>측정 표준의 4요소·표준 물질·측정 방법</td><td class="ans">③</td><td class="pg">51 · 55</td></tr>
+<tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td class="no">17번</td><td><span class="tag tag-new">교체</span>kWh·초미세먼지·공복 혈당 기준 표</td><td class="ans">②</td><td class="pg">52 · 56</td></tr>
+</tbody></table>
+<div class="issues"><h3><span class="num">4</span>확인 못 한 것 · 원장님 판단 필요</h3><ul>
+<li><span class="cb" aria-hidden="true"></span><span>백신 보관 온도 2~8 ℃는 질병관리청·WHO 원문에서 찾지 못해 넣지 않았습니다.</span></li>
+<li><span class="cb" aria-hidden="true"></span><span>대기 측정기 "정도 검사" 같은 세부 절차는 확인하지 못해 "측정기 교정"으로만 썼습니다.</span></li>
+<li><span class="cb" aria-hidden="true"></span><span>의료 기준값(공복 혈당 126 mg/dL)과 대기 기준(75 μg/m³·2시간 주의보)은 원장님이 직접 보실 항목입니다.</span></li>
+</ul></div></section>
+<section class="unit" id="u-I-04">
+<header class="uhead">
+  <div class="ucode"><span class="code">I-04</span><span class="long"></span></div>
+  <h2>정보와 신호, 디지털 문명</h2>
+  <div class="umeta"><span><b>본책 59~76쪽</b> · 통합과학1 합본</span><span>쪽 수 16 → <b>18쪽</b> (+2)</span><span>강의용 L-1104 12쪽 그대로</span></div>
+</header>
+<h3><span class="num">1</span>바뀐 사실</h3>
+<table class="t facts"><colgroup><col class="c-cb"><col class="c-what"><col class="c-pg"><col class="c-src"><col class="c-lv"></colgroup><thead><tr><th>확인</th><th>무엇 (전 → 후)</th><th>본책 쪽</th><th>출처</th><th>확인 수준</th></tr></thead><tbody>
+<tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td><div class="before"><span class="lab">전</span>디지털 변환 용어 "수치화"</div><div class="after"><span class="lab">후</span>"양자화"(본책 21곳·강의용 9곳), 0과 1로 적는 마지막 단계에 "부호화"</div><div class=tags><span class="tag">강의용도 고침</span></div></td><td class="pg">62·<wbr>63·<wbr>65 외</td><td class="src">ROHM TechWeb(sampling → quantization → coding)</td><td><span class="chip lv-w">원문 확인</span></td></tr>
+<tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td><div class="before"><span class="lab">전</span>신호 = "측정된 변화를 담아 나르는 형식"</div><div class="after"><span class="lab">후</span>"자연계의 변화가 전달되면 신호, 이를 측정·분석하면 정보"</div><div class=tags><span class="tag">강의용도 고침</span></div></td><td class="pg">61·<wbr>63</td><td class="src">교육과정 원문(10통과1-01-04 해설, 저장소 reference/)</td><td><span class="chip lv-w">원문 확인</span></td></tr>
+</tbody></table>
+<h3><span class="num">2</span>새로 넣은 것 <span class="h3sub">새 쪽·탐구·날개·그림</span></h3>
+<table class="t new"><colgroup><col class="c-cb"><col class="c-pg2"><col class="c-desc"><col class="c-ex"></colgroup><thead><tr><th>확인</th><th>본책 쪽</th><th>내용</th><th>예시 결과</th></tr></thead><tbody>
+<tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td class="pg">62</td><td><span class="tag tag-new">새 쪽</span>개념 2 이어서 1쪽 신설 — "자연의 신호를 전기 신호로 — 센서"(흐름도, 센서 6종, 날개 3개, 바로바로 체크 3)</td><td><span class="muted">—</span></td></tr>
+<tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td class="pg">66</td><td>자료 파헤치기: 이진수 적기를 "(심화) 직접 해보기"로 내림</td><td><span class="muted">—</span></td></tr>
+<tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td class="pg">67</td><td><span class="tag tag-new">새 쪽</span>교과서 탐구 1쪽 신설 — 스마트폰 조도 센서로 진자 왕복 시간 재기(실 1.00 m → 왕복 2.01 s)</td><td><span class="chip lv-s">예시 결과</span></td></tr>
+</tbody></table>
+<h3><span class="num">3</span>바꾼 문항 <span class="h3sub">정답은 지금 파일에서 읽은 값</span></h3>
+<table class="t qs"><colgroup><col class="c-cb"><col class="c-no"><col class="c-ask"><col class="c-ans"><col class="c-qpg"></colgroup><thead><tr><th>확인</th><th>번호</th><th>무엇을 묻나</th><th>정답</th><th>문제 · 해설 쪽</th></tr></thead><tbody>
+<tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td class="no">13번</td><td><span class="tag tag-new">교체</span>조도 센서 그래프로 진자 왕복 시간 구하기</td><td class="ans">①</td><td class="pg">69 · 73</td></tr>
+<tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td class="no">16번</td><td><span class="tag tag-new">교체</span>디지털 체온계 과정(온도 센서 → 디지털 변환)</td><td class="ans">③</td><td class="pg">70 · 74</td></tr>
+</tbody></table>
+<div class="issues"><h3><span class="num">4</span>확인 못 한 것 · 원장님 판단 필요</h3><ul>
+<li><span class="cb" aria-hidden="true"></span><span>지학사 교과서 33·34쪽 원문은 열지 않았고, 신호 정의는 교육과정 원문으로만 대조했습니다.</span></li>
+<li><span class="cb" aria-hidden="true"></span><span>교과서들이 실제로 "양자화"라고 쓰는지는 원문으로 보지 못했습니다(TTA 용어사전도 미확인).</span></li>
+<li><span class="cb" aria-hidden="true"></span><span>대단원 마무리(본책 77~82쪽)와 강의용 요약(L-sum1)에 "표본화 + 수치화"가 남아 있습니다.</span></li>
+</ul></div></section>
+<section class="unit" id="u-II-01">
+<header class="uhead">
+  <div class="ucode"><span class="code">II-01</span><span class="long"></span></div>
+  <h2>우주의 시작과 원소의 탄생</h2>
+  <div class="umeta"><span><b>본책 85~100쪽</b> · 통합과학1 합본</span><span>쪽 수 15 → <b>16쪽</b> (+1)</span><span>강의용 L-1201 12쪽 그대로</span></div>
+</header>
+<h3><span class="num">1</span>바뀐 사실</h3>
+<table class="t facts"><colgroup><col class="c-cb"><col class="c-what"><col class="c-pg"><col class="c-src"><col class="c-lv"></colgroup><thead><tr><th>확인</th><th>무엇 (전 → 후)</th><th>본책 쪽</th><th>출처</th><th>확인 수준</th></tr></thead><tbody>
+<tr class="keep"><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td><div class="before"><span class="lab">전</span>수치(38만 년·약 3000 K, 2.7 K, H 74 %·He 24 %)</div><div class="after"><span class="lab">후</span>틀린 것 없음 — 그대로 둠</div></td><td class="pg">86·<wbr>87·<wbr>94 외</td><td class="src">Wikipedia CMB·BBN 문서</td><td><span class="chip lv-s">2차 자료</span></td></tr>
+<tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td><div class="before"><span class="lab">전</span>용어 "빅뱅 우주론"</div><div class="after"><span class="lab">후</span>"빅뱅 우주론(대폭발 우주론)" 병기</div><div class=tags><span class="tag">강의용도 고침</span></div></td><td class="pg">86</td><td class="src">보고서가 든 비상 활동지·학평 원문은 열지 못함</td><td><span class="chip lv-s">2차 자료</span></td></tr>
+<tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td><div class="before"><span class="lab">전</span>쿼크 조성(업·다운)</div><div class="after"><span class="lab">후</span>"(심화)" 표시</div></td><td class="pg">86</td><td class="src">—</td><td><span class="chip lv-k">교과 지식</span></td></tr>
+</tbody></table>
+<h3><span class="num">2</span>새로 넣은 것 <span class="h3sub">새 쪽·탐구·날개·그림</span></h3>
+<table class="t new"><colgroup><col class="c-cb"><col class="c-pg2"><col class="c-desc"><col class="c-ex"></colgroup><thead><tr><th>확인</th><th>본책 쪽</th><th>내용</th><th>예시 결과</th></tr></thead><tbody>
+<tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td class="pg">89</td><td>개념 5: 양성자 : 중성자 ≈ 7 : 1, 그림 4를 "입자 16개로 3 : 1 만들기"로 다시 그림</td><td><span class="muted">—</span></td></tr>
+<tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td class="pg">90</td><td>자료 파헤치기: 별 S에 짝 없는 흡수선 추가, 해석 ④ "남는 선 확인"</td><td><span class="muted">—</span></td></tr>
+<tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td class="pg">91</td><td><span class="tag tag-new">새 쪽</span>교과서 탐구 1쪽 신설 — 분광기로 수소 선스펙트럼 관찰(H 410·434·486·656 nm, He 선 6개는 위치로만 그림)</td><td><span class="chip lv-s">별 S는 예시 결과</span></td></tr>
+</tbody></table>
+<h3><span class="num">3</span>바꾼 문항 <span class="h3sub">정답은 지금 파일에서 읽은 값</span></h3>
+<table class="t qs"><colgroup><col class="c-cb"><col class="c-no"><col class="c-ask"><col class="c-ans"><col class="c-qpg"></colgroup><thead><tr><th>확인</th><th>번호</th><th>무엇을 묻나</th><th>정답</th><th>문제 · 해설 쪽</th></tr></thead><tbody>
+<tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td class="no">13번</td><td><span class="tag tag-new">교체</span>수소 방전관과 별 S 스펙트럼 비교(남는 선 1개)</td><td class="ans">①</td><td class="pg">93 · 97</td></tr>
+<tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td class="no">22번</td><td><span class="tag tag-new">교체</span>입자 16개 모형 — 7 : 1, 12 : 1 함정, 중성자 4개면 He 50 %</td><td class="ans">①</td><td class="pg">95 · 99</td></tr>
+</tbody></table>
+<div class="issues"><h3><span class="num">4</span>확인 못 한 것 · 원장님 판단 필요</h3><ul>
+<li><span class="cb" aria-hidden="true"></span><span>우주 배경 복사 발견: 관측 1964년, 논문 1965년 — 교과서 관례대로 "1965년"을 유지했습니다.</span></li>
+<li><span class="cb" aria-hidden="true"></span><span>헬륨 선 6개(447·471·492·502·588·668 nm)는 그림 위치로만 있고 숫자 라벨은 없습니다(91쪽).</span></li>
+<li><span class="cb" aria-hidden="true"></span><span>개념 5 쪽은 말풍선을 날개로 옮기면서 아래 여백이 약 20 mm 생겼습니다.</span></li>
+</ul></div></section>
+<section class="unit" id="u-II-02">
+<header class="uhead">
+  <div class="ucode"><span class="code">II-02</span><span class="long"></span></div>
+  <h2>별에서 만들어지는 원소</h2>
+  <div class="umeta"><span><b>본책 101~117쪽</b> · 통합과학1 합본</span><span>쪽 수 16 → <b>17쪽</b> (+1)</span><span>강의용 L-1202 12쪽 그대로</span></div>
+</header>
+<h3><span class="num">1</span>바뀐 사실</h3>
+<table class="t facts"><colgroup><col class="c-cb"><col class="c-what"><col class="c-pg"><col class="c-src"><col class="c-lv"></colgroup><thead><tr><th>확인</th><th>무엇 (전 → 후)</th><th>본책 쪽</th><th>출처</th><th>확인 수준</th></tr></thead><tbody>
+<tr class="keep"><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td><div class="before"><span class="lab">전</span>금·은·우라늄 = 초신성 폭발(시험 답)</div><div class="after"><span class="lab">후</span>그대로 두고, 날개에 "금의 또 다른 고향 — 중성자별 충돌(GW170817, 2017)" 추가</div><div class=tags><span class="tag">강의용도 고침</span></div></td><td class="pg">104</td><td class="src">UC Berkeley 2017-10-16 · arXiv:1710.05463(Kasen 외)</td><td><span class="chip lv-w">원문 확인</span></td></tr>
+<tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td><div class="before"><span class="lab">전</span>개념 4 "원시 태양" 형성 문장</div><div class="after"><span class="lab">후</span>"중심부는 밀도와 온도가 점점 높아지며 원시 태양으로 자라났다"</div></td><td class="pg">105</td><td class="src">보고서 (a)2</td><td><span class="chip lv-k">교과 지식</span></td></tr>
+</tbody></table>
+<h3><span class="num">2</span>새로 넣은 것 <span class="h3sub">새 쪽·탐구·날개·그림</span></h3>
+<table class="t new"><colgroup><col class="c-cb"><col class="c-pg2"><col class="c-desc"><col class="c-ex"></colgroup><thead><tr><th>확인</th><th>본책 쪽</th><th>내용</th><th>예시 결과</th></tr></thead><tbody>
+<tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td class="pg">106</td><td>개념 5 날개 "지구 전체의 철"(약 32 %로 1위, 핵에 모여 지각에는 적음)</td><td><span class="muted">—</span></td></tr>
+<tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td class="pg">108</td><td><span class="tag tag-new">새 쪽</span>교과서 탐구 1쪽 신설 — 우주·지구 전체·지각·사람 몸의 원소 질량비 4막대(막대 길이 값에 비례)</td><td><span class="muted">—</span></td></tr>
+</tbody></table>
+<h3><span class="num">3</span>바꾼 문항 <span class="h3sub">정답은 지금 파일에서 읽은 값</span></h3>
+<table class="t qs"><colgroup><col class="c-cb"><col class="c-no"><col class="c-ask"><col class="c-ans"><col class="c-qpg"></colgroup><thead><tr><th>확인</th><th>번호</th><th>무엇을 묻나</th><th>정답</th><th>문제 · 해설 쪽</th></tr></thead><tbody>
+<tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td class="no">15번</td><td><span class="tag tag-new">교체</span>원소 질량비 그래프 — 지구 전체 최다 = 철, 지각·몸 최다 = 산소, 핵 분리</td><td class="ans">⑤</td><td class="pg">110 · 114</td></tr>
+</tbody></table>
+<div class="issues"><h3><span class="num">4</span>확인 못 한 것 · 원장님 판단 필요</h3><ul>
+<li><span class="cb" aria-hidden="true"></span><span>지구 전체 값(철 32·산소 30·규소 15·마그네슘 14)은 Morgan·Anders(1980) 원문이 막혀(403) 이를 인용한 Wikipedia 표로 확인했습니다 — 2차.</span></li>
+<li><span class="cb" aria-hidden="true"></span><span>지각 값(산소 47·규소 28·알루미늄 8·철 5)은 Sandatlas·UNLV 통용값으로 확인했고 Mason·Moore(1982) 원문 대조는 못 했습니다 — 2차.</span></li>
+<li><span class="cb" aria-hidden="true"></span><span>사람 몸 65·18·10·3은 Wikipedia(Remick·Helmann 2023 인용)로 확인 — 2차. 그림 안 출처는 "통용값"으로 적었습니다.</span></li>
+<li><span class="cb" aria-hidden="true"></span><span>강의용 05 B 오해 카드 "지구·생명의 역사는 우주와 무관"이 빠졌습니다(본문·포인트에는 남음).</span></li>
+</ul></div></section>
+<section class="unit" id="u-II-03">
+<header class="uhead">
+  <div class="ucode"><span class="code">II-03</span><span class="long"></span></div>
+  <h2>원소의 주기성과 화학 결합</h2>
+  <div class="umeta"><span><b>본책 118~136쪽</b> · 통합과학1 합본</span><span>쪽 수 18 → <b>19쪽</b> (+1)</span><span>강의용 L-1203 12쪽 그대로</span></div>
+</header>
+<h3><span class="num">1</span>바뀐 사실</h3>
+<table class="t facts"><colgroup><col class="c-cb"><col class="c-what"><col class="c-pg"><col class="c-src"><col class="c-lv"></colgroup><thead><tr><th>확인</th><th>무엇 (전 → 후)</th><th>본책 쪽</th><th>출처</th><th>확인 수준</th></tr></thead><tbody>
+<tr class="keep"><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td><div class="before"><span class="lab">전</span>(고친 사실 없음 — 보고서 판정 "문제 없음")</div><div class="after"><span class="lab">후</span>새로 넣은 사실: 할로젠 상온 상태(F₂·Cl₂ 기체, Br₂ 액체, I₂ 고체), 알칼리 금속 + 물 → 수소 + 염기성</div></td><td class="pg">120·<wbr>127·<wbr>128·<wbr>133</td><td class="src">Wikipedia Halogen·Alkali metal</td><td><span class="chip lv-s">2차 자료</span></td></tr>
+</tbody></table>
+<h3><span class="num">2</span>새로 넣은 것 <span class="h3sub">새 쪽·탐구·날개·그림</span></h3>
+<table class="t new"><colgroup><col class="c-cb"><col class="c-pg2"><col class="c-desc"><col class="c-ex"></colgroup><thead><tr><th>확인</th><th>본책 쪽</th><th>내용</th><th>예시 결과</th></tr></thead><tbody>
+<tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td class="pg">120</td><td>개념 2: 물 반응(수소, 페놀프탈레인 붉게), 그림 2·날개 "할로젠의 상온 상태"</td><td><span class="muted">—</span></td></tr>
+<tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td class="pg">123</td><td>개념 5: 전하 합 0으로 화학식 정하기(MgO·MgCl₂), 이온 결합 모형 갤러리(LiF·MgO·MgCl₂)</td><td><span class="muted">—</span></td></tr>
+<tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td class="pg">124</td><td>개념 6: 공유 전자쌍 수 갤러리(H₂ 1·O₂ 2·N₂ 3·H₂O 2·CO₂ 4·CH₄ 4), 날개 "단일·2중·3중 결합"</td><td><span class="muted">—</span></td></tr>
+<tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td class="pg">127</td><td><span class="tag tag-new">새 쪽</span>교과서 탐구 1쪽 신설 — 같은 족 원소 유사성 실험 설계(리튬·나트륨 + 물, 교사 시연 안전 주의, 변인 표)</td><td><span class="chip lv-s">교과서 수준의 대표 관찰</span></td></tr>
+</tbody></table>
+<h3><span class="num">3</span>바꾼 문항 <span class="h3sub">정답은 지금 파일에서 읽은 값</span></h3>
+<table class="t qs"><colgroup><col class="c-cb"><col class="c-no"><col class="c-ask"><col class="c-ans"><col class="c-qpg"></colgroup><thead><tr><th>확인</th><th>번호</th><th>무엇을 묻나</th><th>정답</th><th>문제 · 해설 쪽</th></tr></thead><tbody>
+<tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td class="no">10번</td><td><span class="tag tag-new">교체</span>리튬·나트륨 + 물 탐구 — 수용액은 염기성</td><td class="ans">②</td><td class="pg">128 · 133</td></tr>
+<tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td class="no">15번</td><td><span class="tag tag-new">교체</span>전자 배치 A(2,8,2)·B(2,6)·C(2,8,7) — 결합·화학식 AC₂</td><td class="ans">④</td><td class="pg">129 · 133</td></tr>
+</tbody></table>
+<div class="issues"><h3><span class="num">4</span>확인 못 한 것 · 원장님 판단 필요</h3><ul>
+<li><span class="cb" aria-hidden="true"></span><span>"BTB는 염기성에서 파란색", "칼륨은 더 격렬하게 반응"은 표준 교과 지식으로 넣었고 출처 대조는 하지 않았습니다.</span></li>
+<li><span class="cb" aria-hidden="true"></span><span>탐구 쪽은 알칼리 금속과 물(교사 시연)입니다. 안전 문구(127쪽)를 원장님 기준으로 한 번 봐 주세요.</span></li>
+</ul></div></section>
+<section class="unit" id="u-II-04">
+<header class="uhead">
+  <div class="ucode"><span class="code">II-04</span><span class="long"></span></div>
+  <h2>지각과 생명체를 이루는 물질의 규칙성</h2>
+  <div class="umeta"><span><b>본책 137~153쪽</b> · 통합과학1 합본</span><span>쪽 수 16 → <b>17쪽</b> (+1)</span><span>강의용 L-1204 12쪽 그대로</span></div>
+</header>
+<h3><span class="num">1</span>바뀐 사실</h3>
+<table class="t facts"><colgroup><col class="c-cb"><col class="c-what"><col class="c-pg"><col class="c-src"><col class="c-lv"></colgroup><thead><tr><th>확인</th><th>무엇 (전 → 후)</th><th>본책 쪽</th><th>출처</th><th>확인 수준</th></tr></thead><tbody>
+<tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td><div class="before"><span class="lab">전</span>강의용 "지각의 나머지 원소: 다 합쳐도 4분의 1이 안 된다"</div><div class="after"><span class="lab">후</span>"4분의 1 정도뿐이다"(100 − 47 − 28 = 25 %, 본책과 맞춤)</div><div class=tags><span class="tag">강의용도 고침</span></div></td><td class="pg"><span class="nw">강의용 L-1204</span><br><span class="sub">본책 139쪽과 같은 표현</span></td><td class="src">계산</td><td><span class="chip lv-c">직접 계산</span></td></tr>
+<tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td><div class="before"><span class="lab">전</span>강의용 "소단원 02에서 본 별이 만든 원소"</div><div class="after"><span class="lab">후</span>"소단원 01·02에서 본, 빅뱅과 별이 만든 원소"(수소는 빅뱅)</div><div class=tags><span class="tag">강의용도 고침</span></div></td><td class="pg"><span class="nw">강의용 L-1204</span><br><span class="sub">본책 138쪽과 같은 표현</span></td><td class="src">—</td><td><span class="chip lv-k">교과 지식</span></td></tr>
+</tbody></table>
+<h3><span class="num">2</span>새로 넣은 것 <span class="h3sub">새 쪽·탐구·날개·그림</span></h3>
+<table class="t new"><colgroup><col class="c-cb"><col class="c-pg2"><col class="c-desc"><col class="c-ex"></colgroup><thead><tr><th>확인</th><th>본책 쪽</th><th>내용</th><th>예시 결과</th></tr></thead><tbody>
+<tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td class="pg">139</td><td>개념 2: 규산염 결합 방식을 2022 명칭으로(독립형·단사슬·복사슬·판상·망상), Si–O 공유 결합, 그림 2를 5종으로</td><td><span class="muted">—</span></td></tr>
+<tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td class="pg">140</td><td>개념 3: 펩타이드 결합 하나마다 물 1분자(아미노산 n개 → 결합 n−1개)</td><td><span class="muted">—</span></td></tr>
+<tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td class="pg">141</td><td>개념 4: 인산 : 당 : 염기 = 1 : 1 : 1, 디옥시라이보스, A = T·G = C, 날개(라이보스·구성 원소·염기쌍 n개 → 2n)</td><td><span class="muted">—</span></td></tr>
+<tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td class="pg">144</td><td><span class="tag tag-new">새 쪽</span>교과서 탐구 1쪽 신설 — DNA 모형 만들기(A−T−G−C−G−G 6쌍, 부품 개수표)</td><td><span class="chip lv-s">정해 둔 서열로 만든 모형</span></td></tr>
+</tbody></table>
+<h3><span class="num">3</span>바꾼 문항 <span class="h3sub">정답은 지금 파일에서 읽은 값</span></h3>
+<table class="t qs"><colgroup><col class="c-cb"><col class="c-no"><col class="c-ask"><col class="c-ans"><col class="c-qpg"></colgroup><thead><tr><th>확인</th><th>번호</th><th>무엇을 묻나</th><th>정답</th><th>문제 · 해설 쪽</th></tr></thead><tbody>
+<tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td class="no">13번</td><td><span class="tag tag-new">교체</span>염기쌍 10개·A−T 4쌍 → 당 20, G 6</td><td class="ans">⑤</td><td class="pg">146 · 150</td></tr>
+<tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td class="no">21번</td><td><span class="tag">손봄</span>용어만 바꿈(단사슬형, Si–O 공유 결합)</td><td class="ans">③</td><td class="pg">148 · 152</td></tr>
+<tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td class="no">23번</td><td><span class="tag tag-new">교체</span>X = 디옥시라이보스, ㉠ = 물, 인산 수 ≠ 염기쌍 수</td><td class="ans">③</td><td class="pg">148 · 152</td></tr>
+</tbody></table>
+<div class="issues"><h3><span class="num">4</span>확인 못 한 것 · 원장님 판단 필요</h3><ul>
+<li><span class="cb" aria-hidden="true"></span><span>보고서상 확인 못 한 것은 없습니다. 탐구 결과는 실측이 아니라 정한 서열로 만든 모형의 개수입니다.</span></li>
+</ul></div></section>
+<section class="unit" id="u-II-05">
+<header class="uhead">
+  <div class="ucode"><span class="code">II-05</span><span class="long"></span></div>
+  <h2>물질의 전기적 성질과 신소재</h2>
+  <div class="umeta"><span><b>본책 154~169쪽</b> · 통합과학1 합본</span><span>쪽 수 16 → <b>16쪽</b> (그대로)</span><span>강의용 L-1205 12쪽 그대로</span></div>
+</header>
+<h3><span class="num">1</span>바뀐 사실</h3>
+<table class="t facts"><colgroup><col class="c-cb"><col class="c-what"><col class="c-pg"><col class="c-src"><col class="c-lv"></colgroup><thead><tr><th>확인</th><th>무엇 (전 → 후)</th><th>본책 쪽</th><th>출처</th><th>확인 수준</th></tr></thead><tbody>
+<tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td><div class="before"><span class="lab">전</span>"MRI·자기 부상 열차가 초전도 전자석의 작품"</div><div class="after"><span class="lab">후</span>MRI·일본의 초전도 방식. 인천공항 열차는 상전도 전자석 흡인식(약 8 mm 부상)</div><div class=tags><span class="tag">강의용도 고침</span></div></td><td class="pg">158·<wbr>167</td><td class="src">인천공항 브로슈어 · JR Central SCMaglev</td><td><span class="chip lv-w">원문 확인</span></td></tr>
+<tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td><div class="before"><span class="lab">전</span>"접합 원리·n형/p형 구분은 교육과정 밖 — 출제되지 않는다"</div><div class="after"><span class="lab">후</span>명칭·접합 원리는 다루지 않음. 단 규소 원자가 전자 4·공유 결합, 불순물 원소의 족(13·15족)은 묻는다</div></td><td class="pg">156·<wbr>158·<wbr>160 외</td><td class="src">경기도교육청 자료집 문항 7 · 학26-9 #13 해설 · 교육과정 해설</td><td><span class="chip lv-w">원문 확인</span></td></tr>
+<tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td><div class="before"><span class="lab">전</span>"그래핀은 구리보다 잘 통한다"</div><div class="after"><span class="lab">후</span>본책에서 뺌(확인 안 됨)</div></td><td class="pg">154·<wbr>158</td><td class="src">보고서도 미검증</td><td><span class="chip lv-s">2차 자료</span></td></tr>
+</tbody></table>
+<h3><span class="num">2</span>새로 넣은 것 <span class="h3sub">새 쪽·탐구·날개·그림</span></h3>
+<table class="t new"><colgroup><col class="c-cb"><col class="c-pg2"><col class="c-desc"><col class="c-ex"></colgroup><thead><tr><th>확인</th><th>본책 쪽</th><th>내용</th><th>예시 결과</th></tr></thead><tbody>
+<tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td class="pg">156</td><td>개념 2: 순수 규소와 15족·13족 불순물, 그림 2를 규소 결정 모형 3칸으로, 날개 "불순물로 쓰는 원소"</td><td><span class="muted">—</span></td></tr>
+<tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td class="pg">158</td><td>개념 4·5(2쪽) → "4 더 알아보기 — 성질을 설계한 신소재" 1쪽으로 합침</td><td><span class="muted">—</span></td></tr>
+<tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td class="pg">160</td><td><span class="tag tag-new">새 쪽</span>교과서 탐구 1쪽 신설 — 전구와 전류계로 다섯 물질의 전기 전도성 비교</td><td><span class="chip lv-s">예시 결과</span></td></tr>
+</tbody></table>
+<h3><span class="num">3</span>바꾼 문항 <span class="h3sub">정답은 지금 파일에서 읽은 값</span></h3>
+<table class="t qs"><colgroup><col class="c-cb"><col class="c-no"><col class="c-ask"><col class="c-ans"><col class="c-qpg"></colgroup><thead><tr><th>확인</th><th>번호</th><th>무엇을 묻나</th><th>정답</th><th>문제 · 해설 쪽</th></tr></thead><tbody>
+<tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td class="no">14번</td><td><span class="tag tag-new">교체</span>규소 결정 모형 — X의 족, 원자가 전자, 전도성</td><td class="ans">①</td><td class="pg">162 · 166</td></tr>
+<tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td class="no">17번</td><td><span class="tag tag-new">교체</span>전도성 비교 탐구 합답형 — 가열로 순수 규소 가리기</td><td class="ans">⑤</td><td class="pg">163 · 167</td></tr>
+</tbody></table>
+<div class="issues"><h3><span class="num">4</span>확인 못 한 것 · 원장님 판단 필요</h3><ul>
+<li><span class="cb" aria-hidden="true"></span><span>강의용(L-1205)과 대단원 마무리(본책 176쪽 해설)에는 "그래핀은 전기가 구리보다 잘 통한다"가 남아 있습니다. 본책 소단원에서는 뺐습니다.</span></li>
+<li><span class="cb" aria-hidden="true"></span><span>경기도교육청 자료집은 다시 받지 못해 저장해 둔 사본으로 대조했습니다.</span></li>
+</ul></div></section>
+<section class="unit" id="u-III-01">
+<header class="uhead">
+  <div class="ucode"><span class="code">III-01</span><span class="long"></span></div>
+  <h2>지구시스템과 에너지·물질 순환</h2>
+  <div class="umeta"><span><b>본책 178~195쪽</b> · 통합과학1 합본</span><span>쪽 수 17 → <b>18쪽</b> (+1)</span><span>강의용 L-1301 12쪽 그대로</span></div>
+</header>
+<h3><span class="num">1</span>바뀐 사실</h3>
+<table class="t facts"><colgroup><col class="c-cb"><col class="c-what"><col class="c-pg"><col class="c-src"><col class="c-lv"></colgroup><thead><tr><th>확인</th><th>무엇 (전 → 후)</th><th>본책 쪽</th><th>출처</th><th>확인 수준</th></tr></thead><tbody>
+<tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td><div class="before"><span class="lab">전</span>지구 내부 에너지 = "주로 방사성 원소 붕괴열(탄생 때 열도 일부)"</div><div class="after"><span class="lab">후</span>"방사성 원소의 붕괴열과 지구 탄생 때 남은 열, 대략 절반씩"</div><div class=tags><span class="tag">강의용도 고침</span></div></td><td class="pg">183</td><td class="src">KamLAND 2011, Nature Geoscience 초록(44.2 TW 중 약 절반)</td><td><span class="chip lv-w">원문 확인</span></td></tr>
+<tr class="keep"><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td><div class="before"><span class="lab">전</span>"맨틀은 지권 부피의 약 80 %"</div><div class="after"><span class="lab">후</span>그대로 둠(실제 약 83 %, 범위 안 근사)</div></td><td class="pg">182·<wbr>191·<wbr>194</td><td class="src">보고서 판정</td><td><span class="chip lv-s">2차 자료</span></td></tr>
+</tbody></table>
+<h3><span class="num">2</span>새로 넣은 것 <span class="h3sub">새 쪽·탐구·날개·그림</span></h3>
+<table class="t new"><colgroup><col class="c-cb"><col class="c-pg2"><col class="c-desc"><col class="c-ex"></colgroup><thead><tr><th>확인</th><th>본책 쪽</th><th>내용</th><th>예시 결과</th></tr></thead><tbody>
+<tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td class="pg">181</td><td><span class="tag tag-new">새 쪽</span>개념 2 이어서 1쪽 신설 — 해수의 층상 구조(혼합층·수온 약층·심해층, 약 1000 m, 위도별 비교)</td><td><span class="chip lv-s">모식도</span></td></tr>
+<tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td class="pg">185</td><td>개념 6 탄소 순환: 수권(탄산 이온)·화산 화살표, 날개 "해양 산성화"·"물의 수지(증발량 = 강수량)"</td><td><span class="muted">—</span></td></tr>
+</tbody></table>
+<h3><span class="num">3</span>바꾼 문항 <span class="h3sub">정답은 지금 파일에서 읽은 값</span></h3>
+<table class="t qs"><colgroup><col class="c-cb"><col class="c-no"><col class="c-ask"><col class="c-ans"><col class="c-qpg"></colgroup><thead><tr><th>확인</th><th>번호</th><th>무엇을 묻나</th><th>정답</th><th>문제 · 해설 쪽</th></tr></thead><tbody>
+<tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td class="no">7번</td><td><span class="tag tag-new">교체</span>해수 수온–깊이 자료</td><td class="ans">②</td><td class="pg">187 · 191</td></tr>
+<tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td class="no">21번</td><td><span class="tag tag-new">교체</span>기권과 해수의 층상 구조를 엮은 합답형</td><td class="ans">③</td><td class="pg">190 · 194</td></tr>
+</tbody></table>
+<div class="issues"><h3><span class="num">4</span>확인 못 한 것 · 원장님 판단 필요</h3><ul>
+<li><span class="cb" aria-hidden="true"></span><span>"바람이 강한 중위도는 혼합층이 두껍다"와 계절 차이는 교과서 수준 서술로 썼고 공개 원문 대조는 못 했습니다.</span></li>
+<li><span class="cb" aria-hidden="true"></span><span>III-02 강의용 그림 1에는 아직 "동력 = 지구 내부 에너지(방사성 원소의 붕괴열)"이 남아 있습니다(L-1302).</span></li>
+</ul></div></section>
+<section class="unit" id="u-III-02">
+<header class="uhead">
+  <div class="ucode"><span class="code">III-02</span><span class="long"></span></div>
+  <h2>판구조론과 지권의 변화</h2>
+  <div class="umeta"><span><b>본책 196~212쪽</b> · 통합과학1 합본</span><span>쪽 수 16 → <b>17쪽</b> (+1)</span><span>강의용 L-1302 12쪽 그대로</span></div>
+</header>
+<h3><span class="num">1</span>바뀐 사실</h3>
+<table class="t facts"><colgroup><col class="c-cb"><col class="c-what"><col class="c-pg"><col class="c-src"><col class="c-lv"></colgroup><thead><tr><th>확인</th><th>무엇 (전 → 후)</th><th>본책 쪽</th><th>출처</th><th>확인 수준</th></tr></thead><tbody>
+<tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td><div class="before"><span class="lab">전</span>불의 고리: "활화산의 절반 이상", "지진의 대부분"</div><div class="after"><span class="lab">후</span>"전 세계 지진의 약 90%, 활화산의 약 75%"</div><div class=tags><span class="tag">강의용도 고침</span></div></td><td class="pg">200</td><td class="src">National Geographic Education "Ring of Fire"</td><td><span class="chip lv-w">원문 확인</span></td></tr>
+<tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td><div class="before"><span class="lab">전</span>23번 ㄴ "화산재가 햇빛을 가려"</div><div class="after"><span class="lab">후</span>"분출물이 기권으로 퍼져 햇빛을 가려"(1~3년 냉각은 이산화 황)</div></td><td class="pg">207</td><td class="src">USGS</td><td><span class="chip lv-w">원문 확인</span></td></tr>
+<tr class="keep"><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td><div class="before"><span class="lab">전</span>판의 원동력 = 맨틀 대류</div><div class="after"><span class="lab">후</span>그대로 두고 날개 "(심화) 판을 끌어당기는 힘" 추가 — 시험 답은 맨틀 대류</div></td><td class="pg">197</td><td class="src">보고서 권고</td><td><span class="chip lv-k">교과 지식</span></td></tr>
+</tbody></table>
+<h3><span class="num">2</span>새로 넣은 것 <span class="h3sub">새 쪽·탐구·날개·그림</span></h3>
+<table class="t new"><colgroup><col class="c-cb"><col class="c-pg2"><col class="c-desc"><col class="c-ex"></colgroup><thead><tr><th>확인</th><th>본책 쪽</th><th>내용</th><th>예시 결과</th></tr></thead><tbody>
+<tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td class="pg">199</td><td>개념 3 그림 3 교체 — 수렴형 단면 4칸(안데스·마리아나 호상 열도·히말라야·보존형), 날개 "호상 열도"</td><td><span class="muted">—</span></td></tr>
+<tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td class="pg">200</td><td>개념 4 그림 4 교체 — 실데이터 세계 판 경계 지도(Bird 2003 PB2002 + Natural Earth), 한반도 = 유라시아판 안쪽</td><td><span class="muted">—</span></td></tr>
+<tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td class="pg">201</td><td>개념 5: 피해 → 전조 → 대책 3단 정리, 날개 "화산 가스"(USGS)</td><td><span class="muted">—</span></td></tr>
+<tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td class="pg">203</td><td><span class="tag tag-new">새 쪽</span>교과서 탐구 1쪽 신설 — 1991 피나투보 피해 조사와 대책(최소 5000명 구조, 이산화 황 약 2000만 t, 약 0.5 ℃ 하강)</td><td><span class="chip lv-s">전조 그래프는 가상 자료</span></td></tr>
+</tbody></table>
+<h3><span class="num">3</span>바꾼 문항 <span class="h3sub">정답은 지금 파일에서 읽은 값</span></h3>
+<table class="t qs"><colgroup><col class="c-cb"><col class="c-no"><col class="c-ask"><col class="c-ans"><col class="c-qpg"></colgroup><thead><tr><th>확인</th><th>번호</th><th>무엇을 묻나</th><th>정답</th><th>문제 · 해설 쪽</th></tr></thead><tbody>
+<tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td class="no">12번</td><td><span class="tag tag-new">교체</span>판 경계 세계 지도 — 지점 A~E와 경계 짝짓기</td><td class="ans">③</td><td class="pg">205 · 209</td></tr>
+<tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td class="no">16번</td><td><span class="tag tag-new">교체</span>화산 전조·이산화 황·화산 가스 성분 합답형</td><td class="ans">③</td><td class="pg">206 · 209</td></tr>
+</tbody></table>
+<div class="issues"><h3><span class="num">4</span>확인 못 한 것 · 원장님 판단 필요</h3><ul>
+<li><span class="cb" aria-hidden="true"></span><span>"호상 열도"가 2022 통합과학 교과서 본문 용어인지는 확인하지 못했습니다.</span></li>
+<li><span class="cb" aria-hidden="true"></span><span>강의용(L-1302) 그림에 "화산재가 햇빛을 가려 기온 하강", 대단원 마무리 서술형 채점(본책 286쪽)에 같은 문구가 남아 있습니다.</span></li>
+<li><span class="cb" aria-hidden="true"></span><span>강의용 그림 1 "동력 = 방사성 원소의 붕괴열"은 III-01 고침(절반씩)과 아직 맞지 않습니다.</span></li>
+</ul></div></section>
+<section class="unit" id="u-III-03">
+<header class="uhead">
+  <div class="ucode"><span class="code">III-03</span><span class="long"></span></div>
+  <h2>중력과 운동</h2>
+  <div class="umeta"><span><b>본책 213~229쪽</b> · 통합과학1 합본</span><span>쪽 수 16 → <b>17쪽</b> (+1)</span><span>강의용 L-1303 12쪽 그대로</span></div>
+</header>
+<h3><span class="num">1</span>바뀐 사실</h3>
+<table class="t facts"><colgroup><col class="c-cb"><col class="c-what"><col class="c-pg"><col class="c-src"><col class="c-lv"></colgroup><thead><tr><th>확인</th><th>무엇 (전 → 후)</th><th>본책 쪽</th><th>출처</th><th>확인 수준</th></tr></thead><tbody>
+<tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td><div class="before"><span class="lab">전</span>날개 "중력 가속도: 1초마다 늘어나는 속력, 약 9.8 m/s"</div><div class="after"><span class="lab">후</span>"…약 9.8 m/s — 곧 가속도 약 9.8 m/s²"</div><div class=tags><span class="tag">강의용도 고침</span></div></td><td class="pg">215·<wbr>218·<wbr>220 외</td><td class="src">NIST CODATA 2022(9.80665 m s⁻²)</td><td><span class="chip lv-w">원문 확인</span></td></tr>
+<tr class="keep"><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td><div class="before"><span class="lab">전</span>달 중력 1.62 m/s²·0.165배, 아폴로 15호 망치·깃털</div><div class="after"><span class="lab">후</span>맞음 — 그대로</div></td><td class="pg">215</td><td class="src">NASA Moon Fact Sheet · NASA NSSDC</td><td><span class="chip lv-w">원문 확인</span></td></tr>
+</tbody></table>
+<h3><span class="num">2</span>새로 넣은 것 <span class="h3sub">새 쪽·탐구·날개·그림</span></h3>
+<table class="t new"><colgroup><col class="c-cb"><col class="c-pg2"><col class="c-desc"><col class="c-ex"></colgroup><thead><tr><th>확인</th><th>본책 쪽</th><th>내용</th><th>예시 결과</th></tr></thead><tbody>
+<tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td class="pg">215</td><td>개념 2: 가속도 정의(m/s²), 속력–시간 그래프(기울기 = 가속도, 넓이 = 거리), 낙하 거리 1 : 4 : 9, 그림 2를 3패널로</td><td><span class="muted">—</span></td></tr>
+<tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td class="pg">217</td><td>개념 4: 위성의 원운동도 가속도 운동(지구 중심 쪽)</td><td><span class="muted">—</span></td></tr>
+<tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td class="pg">220</td><td><span class="tag tag-new">새 쪽</span>교과서 탐구 1쪽 신설 — 슬로 모션 영상으로 자유 낙하 가속도 구하기(기울기 ≈ 9.8 m/s²)</td><td><span class="chip lv-s">예시 결과</span></td></tr>
+</tbody></table>
+<h3><span class="num">3</span>바꾼 문항 <span class="h3sub">정답은 지금 파일에서 읽은 값</span></h3>
+<table class="t qs"><colgroup><col class="c-cb"><col class="c-no"><col class="c-ask"><col class="c-ans"><col class="c-qpg"></colgroup><thead><tr><th>확인</th><th>번호</th><th>무엇을 묻나</th><th>정답</th><th>문제 · 해설 쪽</th></tr></thead><tbody>
+<tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td class="no">10번</td><td><span class="tag tag-new">교체</span>속력–시간 그래프 — 가속도 9.8 m/s²</td><td class="ans">②</td><td class="pg">222 · 226</td></tr>
+<tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td class="no">12번</td><td><span class="tag">손봄</span>발문만 다듬음(내용 같음)</td><td class="ans">③</td><td class="pg">222 · 226</td></tr>
+<tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td class="no">21번</td><td><span class="tag tag-new">교체</span>0.1초 간격 영상 자료(4.9·14.7·24.5·34.3 cm) — 가속도, 4배 거리</td><td class="ans">④</td><td class="pg">224 · 228</td></tr>
+</tbody></table>
+<div class="issues"><h3><span class="num">4</span>확인 못 한 것 · 원장님 판단 필요</h3><ul>
+<li><span class="cb" aria-hidden="true"></span><span>보고서상 사실 항목은 모두 확인. 탐구 결과 수치는 "예시 결과"입니다.</span></li>
+</ul></div></section>
+<section class="unit" id="u-III-04">
+<header class="uhead">
+  <div class="ucode"><span class="code">III-04</span><span class="long"></span></div>
+  <h2>운동량과 충격량</h2>
+  <div class="umeta"><span><b>본책 230~245쪽</b> · 통합과학1 합본</span><span>쪽 수 16 → <b>16쪽</b> (그대로)</span><span>강의용 L-1304 12쪽 그대로</span></div>
+</header>
+<h3><span class="num">1</span>바뀐 사실</h3>
+<table class="t facts"><colgroup><col class="c-cb"><col class="c-what"><col class="c-pg"><col class="c-src"><col class="c-lv"></colgroup><thead><tr><th>확인</th><th>무엇 (전 → 후)</th><th>본책 쪽</th><th>출처</th><th>확인 수준</th></tr></thead><tbody>
+<tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td><div class="before"><span class="lab">전</span>"이 한 줄이 모든 안전 설계의 원리다"</div><div class="after"><span class="lab">후</span>"충돌을 부드럽게 하는 안전장치의 원리다"</div><div class=tags><span class="tag">강의용도 고침</span></div></td><td class="pg">234</td><td class="src">보고서 (c)</td><td><span class="chip lv-k">교과 지식</span></td></tr>
+<tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td><div class="before"><span class="lab">전</span>한눈에 암기 "안전장치의 일 = 딱 하나, 시간 벌기"</div><div class="after"><span class="lab">후</span>"에어백·범퍼의 일 = 시간 벌기"</div></td><td class="pg">234</td><td class="src">보고서 (c)</td><td><span class="chip lv-k">교과 지식</span></td></tr>
+</tbody></table>
+<h3><span class="num">2</span>새로 넣은 것 <span class="h3sub">새 쪽·탐구·날개·그림</span></h3>
+<table class="t new"><colgroup><col class="c-cb"><col class="c-pg2"><col class="c-desc"><col class="c-ex"></colgroup><thead><tr><th>확인</th><th>본책 쪽</th><th>내용</th><th>예시 결과</th></tr></thead><tbody>
+<tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td class="pg">233</td><td>개념 3 그림 4 "멈출 때와 되튈 때"(mv vs 2mv), 날개 N·s = kg·m/s, "되튀는 충돌"</td><td><span class="muted">—</span></td></tr>
+<tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td class="pg">234</td><td>개념 4 안전장치 원리별 3칸 표(관성 대비·충돌 시간 늘리기·마찰 키우기), "안전띠는 조금 늘어나며 시간도 번다"</td><td><span class="muted">—</span></td></tr>
+<tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td class="pg">236</td><td>자료 파헤치기 "직접 해보기 — 달걀 받기" → "직접 설계하기 — 종이 구조물로 과자 지키기"</td><td><span class="muted">—</span></td></tr>
+</tbody></table>
+<h3><span class="num">3</span>바꾼 문항 <span class="h3sub">정답은 지금 파일에서 읽은 값</span></h3>
+<table class="t qs"><colgroup><col class="c-cb"><col class="c-no"><col class="c-ask"><col class="c-ans"><col class="c-qpg"></colgroup><thead><tr><th>확인</th><th>번호</th><th>무엇을 묻나</th><th>정답</th><th>문제 · 해설 쪽</th></tr></thead><tbody>
+<tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td class="no">15번</td><td><span class="tag tag-new">교체</span>안전띠·에어백·미끄럼 방지 테이프의 원리 구분</td><td class="ans">③</td><td class="pg">238 · 242</td></tr>
+<tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td class="no">22번</td><td><span class="tag tag-new">교체</span>벽에 부딪치는 공 A(멈춤)·B(되튐) — N·s, 충격량 2배, 평균 힘 40 N</td><td class="ans">④</td><td class="pg">240 · 244</td></tr>
+</tbody></table>
+<div class="issues"><h3><span class="num">4</span>확인 못 한 것 · 원장님 판단 필요</h3><ul>
+<li><span class="cb" aria-hidden="true"></span><span>팔로스루의 실제 효과가 "접촉 시간 증가"보다 "채 속도 유지"라는 지적은 출처가 없어 교과서 관행 서술을 유지했습니다.</span></li>
+<li><span class="cb" aria-hidden="true"></span><span>학평 26-9 고2 #6(안전띠 = 관성, 미끄럼 방지 = 마찰) 원문은 열람하지 않았습니다.</span></li>
+</ul></div></section>
+<section class="unit" id="u-III-05">
+<header class="uhead">
+  <div class="ucode"><span class="code">III-05</span><span class="long"></span></div>
+  <h2>생명 시스템과 화학 반응</h2>
+  <div class="umeta"><span><b>본책 246~262쪽</b> · 통합과학1 합본</span><span>쪽 수 16 → <b>17쪽</b> (+1)</span><span>강의용 L-1305 12쪽 그대로</span></div>
+</header>
+<h3><span class="num">1</span>바뀐 사실</h3>
+<table class="t facts"><colgroup><col class="c-cb"><col class="c-what"><col class="c-pg"><col class="c-src"><col class="c-lv"></colgroup><thead><tr><th>확인</th><th>무엇 (전 → 후)</th><th>본책 쪽</th><th>출처</th><th>확인 수준</th></tr></thead><tbody>
+<tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td><div class="before"><span class="lab">전</span>구성 단계 "세포 → 조직 → 기관 → 개체"</div><div class="after"><span class="lab">후</span>동물: 세포 → 조직 → 기관 → 기관계 → 개체 / 식물: 세포 → 조직 → 조직계 → 기관 → 개체</div><div class=tags><span class="tag">강의용도 고침</span></div></td><td class="pg">247·<wbr>251·<wbr>254·<wbr>258</td><td class="src">비상 통합과학1 "이전 학습 내용" 활동지(교과서 128쪽 QR) PDF</td><td><span class="chip lv-w">원문 확인</span></td></tr>
+</tbody></table>
+<h3><span class="num">2</span>새로 넣은 것 <span class="h3sub">새 쪽·탐구·날개·그림</span></h3>
+<table class="t new"><colgroup><col class="c-cb"><col class="c-pg2"><col class="c-desc"><col class="c-ex"></colgroup><thead><tr><th>확인</th><th>본책 쪽</th><th>내용</th><th>예시 결과</th></tr></thead><tbody>
+<tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td class="pg">247</td><td>개념 1 그림 1: 동물·식물 세포 나란히(식물만 세포벽·엽록체·큰 액포), 구성 단계 두 줄</td><td><span class="muted">—</span></td></tr>
+<tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td class="pg">249</td><td>개념 3 날개 "기질 특이성 확인 실험"(아밀레이스·아이오딘), 시험엔 이렇게(끓인 효소 = 변성)</td><td><span class="muted">—</span></td></tr>
+<tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td class="pg">250</td><td>개념 4: 삼투(적혈구가 부풀어 터지거나 쭈그러듦), 날개 "생리식염수 0.9 %"</td><td><span class="muted">—</span></td></tr>
+<tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td class="pg">253</td><td><span class="tag tag-new">새 쪽</span>교과서 탐구 1쪽 신설 — 감자와 적혈구로 보는 삼투(감자 질량 변화율 +8/+3/−1/−6/−10 %, 원형질 분리)</td><td><span class="chip lv-s">예시 결과</span></td></tr>
+</tbody></table>
+<h3><span class="num">3</span>바꾼 문항 <span class="h3sub">정답은 지금 파일에서 읽은 값</span></h3>
+<table class="t qs"><colgroup><col class="c-cb"><col class="c-no"><col class="c-ask"><col class="c-ans"><col class="c-qpg"></colgroup><thead><tr><th>확인</th><th>번호</th><th>무엇을 묻나</th><th>정답</th><th>문제 · 해설 쪽</th></tr></thead><tbody>
+<tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td class="no">8번</td><td><span class="tag tag-new">교체</span>동물·식물 구성 단계(기관계·조직계)와 세포 구조</td><td class="ans">②</td><td class="pg">254 · 258</td></tr>
+<tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td class="no">22번</td><td><span class="tag tag-new">교체</span>적혈구·양파 표피를 증류수 / 3 % 소금물에 — 삼투와 세포벽</td><td class="ans">⑤</td><td class="pg">257 · 261</td></tr>
+</tbody></table>
+<div class="issues"><h3><span class="num">4</span>확인 못 한 것 · 원장님 판단 필요</h3><ul>
+<li><span class="cb" aria-hidden="true"></span><span>대단원 마무리(본책 281쪽)와 강의용 요약(L-sum3)에는 "세포 → 조직 → 기관 → 개체"가 남아 있습니다.</span></li>
+<li><span class="cb" aria-hidden="true"></span><span>감자 질량 변화율 값과 0이 되는 점 약 0.9 %는 실측이 아닌 예시값입니다 — 생리식염수 0.9 %와 맞춘 것이니 의학적으로 무리 없는지 봐 주세요.</span></li>
+<li><span class="cb" aria-hidden="true"></span><span>첫 등장 병기 "마이토콘드리아(미토콘드리아)"는 넣지 않았습니다(2022 표기로 이미 통일).</span></li>
+</ul></div></section>
+<section class="unit" id="u-III-06">
+<header class="uhead">
+  <div class="ucode"><span class="code">III-06</span><span class="long"></span></div>
+  <h2>유전자에서 단백질까지</h2>
+  <div class="umeta"><span><b>본책 263~278쪽</b> · 통합과학1 합본</span><span>쪽 수 16 → <b>16쪽</b> (그대로)</span><span>강의용 L-1306 12쪽 그대로</span></div>
+</header>
+<h3><span class="num">1</span>바뀐 사실</h3>
+<table class="t facts"><colgroup><col class="c-cb"><col class="c-what"><col class="c-pg"><col class="c-src"><col class="c-lv"></colgroup><thead><tr><th>확인</th><th>무엇 (전 → 후)</th><th>본책 쪽</th><th>출처</th><th>확인 수준</th></tr></thead><tbody>
+<tr class="keep"><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td><div class="before"><span class="lab">전</span>낫 모양 적혈구 GAG → GUG, 글루탐산 → 발린</div><div class="after"><span class="lab">후</span>맞음 — 그대로</div></td><td class="pg">267·<wbr>268·<wbr>269 외</td><td class="src">MedlinePlus HBB(Glu6Val)</td><td><span class="chip lv-w">원문 확인</span></td></tr>
+<tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td><div class="before"><span class="lab">전</span>"주형 가닥" 첫 등장</div><div class="after"><span class="lab">후</span>"주형 가닥(틀 가닥)" 병기, 날개 항목 신설</div><div class=tags><span class="tag">강의용도 고침</span></div></td><td class="pg">266</td><td class="src">—</td><td><span class="chip lv-k">교과 지식</span></td></tr>
+<tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td><div class="before"><span class="lab">전</span>RNA의 당 언급 없음</div><div class="after"><span class="lab">후</span>"당은 라이보스(DNA는 디옥시라이보스)" — II-04와 같은 표기</div><div class=tags><span class="tag">강의용도 고침</span></div></td><td class="pg">264·<wbr>265</td><td class="src">II-04 표기</td><td><span class="chip lv-k">교과 지식</span></td></tr>
+</tbody></table>
+<h3><span class="num">2</span>새로 넣은 것 <span class="h3sub">새 쪽·탐구·날개·그림</span></h3>
+<table class="t new"><colgroup><col class="c-cb"><col class="c-pg2"><col class="c-desc"><col class="c-ex"></colgroup><thead><tr><th>확인</th><th>본책 쪽</th><th>내용</th><th>예시 결과</th></tr></thead><tbody>
+<tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td class="pg">264</td><td>개념 1 날개 "II-04 복습 — DNA 당 디옥시라이보스, RNA 당 라이보스"</td><td><span class="muted">—</span></td></tr>
+<tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td class="pg">269</td><td>자료 파헤치기 "해석 더하기 — 어느 가닥이 주형인가, 염기는 몇 개인가"(반대 가닥·주형·RNA 서열과 A·T·U·G·C 개수 표)</td><td><span class="muted">—</span></td></tr>
+</tbody></table>
+<h3><span class="num">3</span>바꾼 문항 <span class="h3sub">정답은 지금 파일에서 읽은 값</span></h3>
+<table class="t qs"><colgroup><col class="c-cb"><col class="c-no"><col class="c-ask"><col class="c-ans"><col class="c-qpg"></colgroup><thead><tr><th>확인</th><th>번호</th><th>무엇을 묻나</th><th>정답</th><th>문제 · 해설 쪽</th></tr></thead><tbody>
+<tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td class="no">16번</td><td><span class="tag tag-new">교체</span>염기 개수 표 합답형 — Ⅱ의 T 5개, X의 주형은 Ⅰ, X의 G는 3개(ㄷ 틀림)</td><td class="ans">③</td><td class="pg">272 · 276</td></tr>
+</tbody></table>
+<div class="issues"><h3><span class="num">4</span>확인 못 한 것 · 원장님 판단 필요</h3><ul>
+<li><span class="cb" aria-hidden="true"></span><span>개시·종결 코돈의 교과서 수록 여부는 미확인이라 넣지 않았습니다.</span></li>
+</ul></div></section>
+<section class="unit" id="u-2101">
+<header class="uhead">
+  <div class="ucode"><span class="code">2101</span><span class="long">통합과학2 I-01</span></div>
+  <h2>지질시대와 생물의 변천</h2>
+  <div class="umeta"><span><b>본책 9~26쪽</b> · 통합과학2 합본</span><span>쪽 수 16 → <b>18쪽</b> (+2)</span><span>강의용 L-2101 12쪽 그대로</span></div>
+</header>
+<h3><span class="num">1</span>바뀐 사실</h3>
+<table class="t facts"><colgroup><col class="c-cb"><col class="c-what"><col class="c-pg"><col class="c-src"><col class="c-lv"></colgroup><thead><tr><th>확인</th><th>무엇 (전 → 후)</th><th>본책 쪽</th><th>출처</th><th>확인 수준</th></tr></thead><tbody>
+<tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td><div class="before"><span class="lab">전</span>고생대 시작 5.41억 년 전</div><div class="after"><span class="lab">후</span>약 5.388억 년 전(약 5억 3900만 년 전, 국제층서위원회 2024)</div><div class=tags><span class="tag">강의용도 고침</span></div></td><td class="pg">10·<wbr>16</td><td class="src">ICS 국제 연대층서표 v2024/12(538.8 ± 0.6 Ma)</td><td><span class="chip lv-w">원문 확인</span></td></tr>
+<tr class="keep"><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td><div class="before"><span class="lab">전</span>12번 [결과] 54.1 cm</div><div class="after"><span class="lab">후</span>53.9 cm(해설 406.1, 28.7 cm, 정답 ④ 그대로)</div></td><td class="pg">19·<wbr>23</td><td class="src">계산</td><td><span class="chip lv-c">직접 계산</span></td></tr>
+<tr class="keep"><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td><div class="before"><span class="lab">전</span>자료 파헤치기 검산 43일</div><div class="after"><span class="lab">후</span>약 42.8일(11월 19일경은 그대로)</div></td><td class="pg">16</td><td class="src">계산</td><td><span class="chip lv-c">직접 계산</span></td></tr>
+<tr class="keep"><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td><div class="before"><span class="lab">전</span>페름기 말 "바다 생물 종 약 90 %"</div><div class="after"><span class="lab">후</span>그대로 둠(문헌 범위 80~96 %)</div></td><td class="pg">14·<wbr>23</td><td class="src">보고서 판단</td><td><span class="chip lv-s">2차 자료</span></td></tr>
+</tbody></table>
+<h3><span class="num">2</span>새로 넣은 것 <span class="h3sub">새 쪽·탐구·날개·그림</span></h3>
+<table class="t new"><colgroup><col class="c-cb"><col class="c-pg2"><col class="c-desc"><col class="c-ex"></colgroup><thead><tr><th>확인</th><th>본책 쪽</th><th>내용</th><th>예시 결과</th></tr></thead><tbody>
+<tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td class="pg">12</td><td>개념 3: 에디아카라 동물군, 캄브리아기 대폭발, 날개 "선캄브리아 화석이 드문 까닭"</td><td><span class="muted">—</span></td></tr>
+<tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td class="pg">13</td><td><span class="tag tag-new">새 쪽</span>개념 쪽 1쪽 신설 — "3 땅과 기후도 바뀌었다"(판게아 지도 모식도 3칸, 시대 카드, 시대 길이 88.2/6.3/4.1/1.4 %)</td><td><span class="chip lv-s">모식도</span></td></tr>
+<tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td class="pg">14</td><td>개념 4: 5대 대멸종 이름, 원인 = "가장 유력한 원인"(시베리아 화산 분출), 날개 "원인은 가설"</td><td><span class="muted">—</span></td></tr>
+<tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td class="pg">15</td><td>개념 5 그림 5 교체 — Sepkoski(2002) 해양 동물 "속의 수" 실데이터 곡선(담당자가 직접 셈)</td><td><span class="muted">—</span></td></tr>
+<tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td class="pg">17</td><td><span class="tag tag-new">새 쪽</span>교과서 탐구 1쪽 신설 — "대멸종 가설 법정"(증거 카드 7장: 이리듐층·충격 석영·칙술루브 등, 판정표)</td><td><span class="chip lv-s">판정표는 예시 결과</span></td></tr>
+</tbody></table>
+<h3><span class="num">3</span>바꾼 문항 <span class="h3sub">정답은 지금 파일에서 읽은 값</span></h3>
+<table class="t qs"><colgroup><col class="c-cb"><col class="c-no"><col class="c-ask"><col class="c-ans"><col class="c-qpg"></colgroup><thead><tr><th>확인</th><th>번호</th><th>무엇을 묻나</th><th>정답</th><th>문제 · 해설 쪽</th></tr></thead><tbody>
+<tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td class="no">13번</td><td><span class="tag tag-new">교체</span>시대별 수륙 분포·기후 표 → 시대 순서</td><td class="ans">②</td><td class="pg">19 · 23</td></tr>
+<tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td class="no">22번</td><td><span class="tag tag-new">교체</span>실데이터 속의 수 그래프 A~E + 이리듐·충격 석영</td><td class="ans">⑤</td><td class="pg">21 · 25</td></tr>
+</tbody></table>
+<div class="issues"><h3><span class="num">4</span>확인 못 한 것 · 원장님 판단 필요</h3><ul>
+<li><span class="cb" aria-hidden="true"></span><span>Raup &amp; Sepkoski(1982) "과"의 수 원자료는 구하지 못해 "속" 자료로 그렸습니다. "과로 세어도 다섯 골짜기 자리는 같다"는 설명은 Raup &amp; Sepkoski의 결론에 기댄 것입니다.</span></li>
+<li><span class="cb" aria-hidden="true"></span><span>속 곡선에는 고르지 않은 시대 구분 때문에 작은 출렁임(4.85억·1.45억 년 전 부근)이 있습니다.</span></li>
+<li><span class="cb" aria-hidden="true"></span><span>대단원 마무리 해설(본책 107쪽)에 "24 × 5.41 ÷ 46"이 남아 있습니다(5.388로 바꿔도 답 2시간 49분은 같음).</span></li>
+</ul></div></section>
+<section class="unit" id="u-2102">
+<header class="uhead">
+  <div class="ucode"><span class="code">2102</span><span class="long">통합과학2 I-02</span></div>
+  <h2>진화와 생물다양성</h2>
+  <div class="umeta"><span><b>본책 27~44쪽</b> · 통합과학2 합본</span><span>쪽 수 16 → <b>18쪽</b> (+2)</span><span>강의용 L-2102 12쪽 그대로</span></div>
+</header>
+<h3><span class="num">1</span>바뀐 사실</h3>
+<table class="t facts"><colgroup><col class="c-cb"><col class="c-what"><col class="c-pg"><col class="c-src"><col class="c-lv"></colgroup><thead><tr><th>확인</th><th>무엇 (전 → 후)</th><th>본책 쪽</th><th>출처</th><th>확인 수준</th></tr></thead><tbody>
+<tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td><div class="before"><span class="lab">전</span>핀치 부리 "약 9.4 → 9.7 mm"</div><div class="after"><span class="lab">후</span>"다음 세대 평균 부리 깊이가 가뭄 전보다 약 4 % 커졌다"(mm 값 뺌)</div><div class=tags><span class="tag">강의용도 고침</span></div></td><td class="pg">34</td><td class="src">HHMI BioInteractive "The Beak of the Finch" 교사용 PDF</td><td><span class="chip lv-w">원문 확인</span></td></tr>
+</tbody></table>
+<h3><span class="num">2</span>새로 넣은 것 <span class="h3sub">새 쪽·탐구·날개·그림</span></h3>
+<table class="t new"><colgroup><col class="c-cb"><col class="c-pg2"><col class="c-desc"><col class="c-ex"></colgroup><thead><tr><th>확인</th><th>본책 쪽</th><th>내용</th><th>예시 결과</th></tr></thead><tbody>
+<tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td class="pg">30</td><td>개념 3: WHO(2025) "2023년 세균 감염 6건 중 1건이 항생제 내성", 날개 "낫 모양 적혈구"(말라리아 연계)</td><td><span class="muted">—</span></td></tr>
+<tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td class="pg">32</td><td>개념 5: 감소 원인 5가지와 예(외래종: 황소개구리·뉴트리아·큰입배스)</td><td><span class="muted">—</span></td></tr>
+<tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td class="pg">33</td><td><span class="tag tag-new">새 쪽</span>개념 쪽 1쪽 신설 — "다양성을 지키려면"(멸종위기 282종, 반달가슴곰 6 → 79마리, 시드볼트, CBD 1992, 쿤밍-몬트리올 30 %)</td><td><span class="muted">—</span></td></tr>
+<tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td class="pg">34</td><td>자료 파헤치기 그래프 다시 그림(평균 이동 실제 비율, 그림 안 출처)</td><td><span class="muted">—</span></td></tr>
+<tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td class="pg">35</td><td><span class="tag tag-new">새 쪽</span>교과서 탐구 1쪽 신설 — "색종이 숲의 포식자"(갈색 비율 25 → 50 → 65 → 80 %)</td><td><span class="chip lv-s">예시 결과</span></td></tr>
+</tbody></table>
+<h3><span class="num">3</span>바꾼 문항 <span class="h3sub">정답은 지금 파일에서 읽은 값</span></h3>
+<table class="t qs"><colgroup><col class="c-cb"><col class="c-no"><col class="c-ask"><col class="c-ans"><col class="c-qpg"></colgroup><thead><tr><th>확인</th><th>번호</th><th>무엇을 묻나</th><th>정답</th><th>문제 · 해설 쪽</th></tr></thead><tbody>
+<tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td class="no">13번</td><td><span class="tag">손봄</span>태그만 "교과서 탐구"로</td><td class="ans">①</td><td class="pg">37 · 41</td></tr>
+<tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td class="no">17번</td><td><span class="tag tag-new">교체</span>보전 방법으로 옳지 않은 것 — 외래종을 풀어 종 수 늘리기</td><td class="ans">②</td><td class="pg">38 · 42</td></tr>
+</tbody></table>
+<div class="issues"><h3><span class="num">4</span>확인 못 한 것 · 원장님 판단 필요</h3><ul>
+<li><span class="cb" aria-hidden="true"></span><span>반달가슴곰 2022년 79마리는 보도(데일리벳)로 확인 — 2차. 쿤밍-몬트리올 "2030년까지 30 %"도 보도로 확인 — 2차.</span></li>
+<li><span class="cb" aria-hidden="true"></span><span>생태계교란 생물 "1속 39종"(2024)은 2차 자료뿐이라 숫자 없이 예시 종만 썼습니다.</span></li>
+<li><span class="cb" aria-hidden="true"></span><span>핀치 부리 mm 절댓값은 원 논문(Boag &amp; Grant 1981)을 열지 못해 쓰지 않았습니다.</span></li>
+</ul></div></section>
+<section class="unit" id="u-2103">
+<header class="uhead">
+  <div class="ucode"><span class="code">2103</span><span class="long">통합과학2 I-03</span></div>
+  <h2>산화와 환원</h2>
+  <div class="umeta"><span><b>본책 45~62쪽</b> · 통합과학2 합본</span><span>쪽 수 18 → <b>18쪽</b> (그대로)</span><span>강의용 L-2103 12쪽 그대로</span></div>
+</header>
+<h3><span class="num">1</span>바뀐 사실</h3>
+<table class="t facts"><colgroup><col class="c-cb"><col class="c-what"><col class="c-pg"><col class="c-src"><col class="c-lv"></colgroup><thead><tr><th>확인</th><th>무엇 (전 → 후)</th><th>본책 쪽</th><th>출처</th><th>확인 수준</th></tr></thead><tbody>
+<tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td><div class="before"><span class="lab">전</span>용광로: "산화 철 + 탄소 → 철 + CO₂", 코크스 = "산소 도둑"</div><div class="after"><span class="lab">후</span>C + O₂ → CO₂ → CO₂ + C → 2CO → Fe₂O₃ + 3CO → 2Fe + 3CO₂, "산소 도둑의 정체는 코크스가 만든 일산화 탄소"</div><div class=tags><span class="tag">강의용도 고침</span></div></td><td class="pg">47·<wbr>51·<wbr>52 외</td><td class="src">chemguide "Extraction of iron" · Britannica "blast furnace"</td><td><span class="chip lv-w">원문 확인</span></td></tr>
+<tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td><div class="before"><span class="lab">전</span>집중 훈련 판정표 기준 섞임(광합성의 물 산화, 산소 분자 환원)</div><div class="after"><span class="lab">후</span>ⓔ 표시·각주 — 전자 기준으로만 판정, 날개 "전자로만 보이는 짝"</div></td><td class="pg">48·<wbr>52</td><td class="src">—</td><td><span class="chip lv-k">교과 지식</span></td></tr>
+<tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td><div class="before"><span class="lab">전</span>강의용 갈변: 레몬즙도 "산소 접촉을 줄인다"</div><div class="after"><span class="lab">후</span>"레몬즙의 비타민 C가 먼저 산화된다"(본책과 맞춤)</div><div class=tags><span class="tag">강의용도 고침</span></div></td><td class="pg"><span class="nw">강의용 L-2103</span><br><span class="sub">본책 49쪽과 같은 표현</span></td><td class="src">본책 서술</td><td><span class="chip lv-k">교과 지식</span></td></tr>
+</tbody></table>
+<h3><span class="num">2</span>새로 넣은 것 <span class="h3sub">새 쪽·탐구·날개·그림</span></h3>
+<table class="t new"><colgroup><col class="c-cb"><col class="c-pg2"><col class="c-desc"><col class="c-ex"></colgroup><thead><tr><th>확인</th><th>본책 쪽</th><th>내용</th><th>예시 결과</th></tr></thead><tbody>
+<tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td class="pg">47</td><td>그림 2에 반응식 3개, 판정표 여섯 줄 화학식, 날개 "용광로 속 3단계"</td><td><span class="muted">—</span></td></tr>
+<tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td class="pg">48</td><td>개념 3 본문 Cu + 2Ag⁺ → Cu²⁺ + 2Ag</td><td><span class="muted">—</span></td></tr>
+<tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td class="pg">49</td><td>개념 4 날개: 세포 호흡 반응식, 녹 막기(도금·페인트·아연 도금 강판)</td><td><span class="muted">—</span></td></tr>
+<tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td class="pg">51</td><td>자료 파헤치기 보조 상자 — 산화 구리(Ⅱ) + 탄소 가열(석회수로 CO₂ 확인, 2CuO + C → 2Cu + CO₂)</td><td><span class="muted">—</span></td></tr>
+<tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td class="pg">52</td><td>집중 훈련 A: "금속과 금속 이온" 이온 수 2장면(Cu + 2Ag⁺는 2 : 1, Zn + Cu²⁺는 1 : 1)</td><td><span class="muted">—</span></td></tr>
+</tbody></table>
+<h3><span class="num">3</span>바꾼 문항 <span class="h3sub">정답은 지금 파일에서 읽은 값</span></h3>
+<table class="t qs"><colgroup><col class="c-cb"><col class="c-no"><col class="c-ask"><col class="c-ans"><col class="c-qpg"></colgroup><thead><tr><th>확인</th><th>번호</th><th>무엇을 묻나</th><th>정답</th><th>문제 · 해설 쪽</th></tr></thead><tbody>
+<tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td class="no">14번</td><td><span class="tag">손봄</span>ㄴ만 수정 — Zn–Cu²⁺ 양이온 수 일정</td><td class="ans">②</td><td class="pg">55 · 59</td></tr>
+<tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td class="no">16번</td><td><span class="tag tag-new">교체</span>산화 구리(Ⅱ) + 탄소 탐구 — 계수 틀린 반응식 판정</td><td class="ans">①</td><td class="pg">56 · 60</td></tr>
+<tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td class="no">21번</td><td><span class="tag tag-new">교체</span>용광로 3단계 (가)~(다) — CO 산화, (나)의 CO₂ 환원</td><td class="ans">③</td><td class="pg">57 · 61</td></tr>
+<tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td class="no">22번</td><td><span class="tag">손봄</span>화학식 병기</td><td class="ans">⑤</td><td class="pg">57 · 61</td></tr>
+</tbody></table>
+<div class="issues"><h3><span class="num">4</span>확인 못 한 것 · 원장님 판단 필요</h3><ul>
+<li><span class="cb" aria-hidden="true"></span><span>보고서 (a) "남세균 산소 → 호상 철광층"은 출처가 하나뿐이라 넣지 않았습니다.</span></li>
+<li><span class="cb" aria-hidden="true"></span><span>산화 구리(Ⅱ) + 탄소 실험이 교과서에 실렸는지는 확인하지 못해 탐구 쪽이 아닌 보조 상자로 넣었습니다.</span></li>
+<li><span class="cb" aria-hidden="true"></span><span>대단원 마무리(본책 101쪽)에 "산소 도둑 코크스"가 남아 있습니다.</span></li>
+</ul></div></section>
+<section class="unit" id="u-2104">
+<header class="uhead">
+  <div class="ucode"><span class="code">2104</span><span class="long">통합과학2 I-04</span></div>
+  <h2>산·염기와 중화 반응</h2>
+  <div class="umeta"><span><b>본책 63~81쪽</b> · 통합과학2 합본</span><span>쪽 수 18 → <b>19쪽</b> (+1)</span><span>강의용 L-2104 12쪽 그대로</span></div>
+</header>
+<h3><span class="num">1</span>바뀐 사실</h3>
+<table class="t facts"><colgroup><col class="c-cb"><col class="c-what"><col class="c-pg"><col class="c-src"><col class="c-lv"></colgroup><thead><tr><th>확인</th><th>무엇 (전 → 후)</th><th>본책 쪽</th><th>출처</th><th>확인 수준</th></tr></thead><tbody>
+<tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td><div class="before"><span class="lab">전</span>"염기는 금속과 반응하지 않는다"</div><div class="after"><span class="lab">후</span>"대부분의 금속과 반응하지 않는다"(날개: 알루미늄·아연 예외), 그림 아래 "마그네슘과 반응 ✗"</div><div class=tags><span class="tag">강의용도 고침</span></div></td><td class="pg">65·<wbr>77</td><td class="src">Wikipedia "Sodium hydroxide"·"Aluminium"(2Al + 2NaOH + 6H₂O 반응식)</td><td><span class="chip lv-s">2차 자료</span></td></tr>
+<tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td><div class="before"><span class="lab">전</span>암모니아가 염기인 까닭 없음</div><div class="after"><span class="lab">후</span>NH₃ + H₂O → NH₄⁺ + OH⁻ 한 줄(날개·강의용 용어표)</div></td><td class="pg">65</td><td class="src">—</td><td><span class="chip lv-k">교과 지식</span></td></tr>
+<tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td><div class="before"><span class="lab">전</span>집중 훈련 A(이온 수 모형) = 최다 빈출</div><div class="after"><span class="lab">후</span>"심화(학평 빈출)" 표지·교육과정 경계 각주, "반응하지 않는 이온(구경꾼 이온)"</div></td><td class="pg">71·<wbr>72·<wbr>79</td><td class="src">교육과정(온도·지시약 색 변화만)</td><td><span class="chip lv-w">원문 확인</span></td></tr>
+</tbody></table>
+<h3><span class="num">2</span>새로 넣은 것 <span class="h3sub">새 쪽·탐구·날개·그림</span></h3>
+<table class="t new"><colgroup><col class="c-cb"><col class="c-pg2"><col class="c-desc"><col class="c-ex"></colgroup><thead><tr><th>확인</th><th>본책 쪽</th><th>내용</th><th>예시 결과</th></tr></thead><tbody>
+<tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td class="pg">66</td><td>개념 3: pH 한 문단, pH 띠 그림(위산 1~2, 레몬즙 2, 빗물 5.6, 물 7, 바닷물 8.1, 비누 물 9~10, 세정제 13~14), 날개 "pH와 해양 산성화"</td><td><span class="muted">—</span></td></tr>
+<tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td class="pg">70</td><td><span class="tag tag-new">새 쪽</span>교과서 탐구 1쪽 신설 — 섞는 비율을 바꾸며 온도 재기(전체 30 mL, 비율 5가지)</td><td><span class="chip lv-s">예시 결과</span></td></tr>
+</tbody></table>
+<h3><span class="num">3</span>바꾼 문항 <span class="h3sub">정답은 지금 파일에서 읽은 값</span></h3>
+<table class="t qs"><colgroup><col class="c-cb"><col class="c-no"><col class="c-ask"><col class="c-ans"><col class="c-qpg"></colgroup><thead><tr><th>확인</th><th>번호</th><th>무엇을 묻나</th><th>정답</th><th>문제 · 해설 쪽</th></tr></thead><tbody>
+<tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td class="no">16번</td><td><span class="tag tag-new">교체</span>pH 단일 선택</td><td class="ans">①</td><td class="pg">75 · 79</td></tr>
+<tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td class="no">22번</td><td><span class="tag tag-new">교체</span>pH 표 자료 합답형 — 2203 해양 산성화와 엮음</td><td class="ans">③</td><td class="pg">76 · 80</td></tr>
+</tbody></table>
+<div class="issues"><h3><span class="num">4</span>확인 못 한 것 · 원장님 판단 필요</h3><ul>
+<li><span class="cb" aria-hidden="true"></span><span>레몬즙 약 2, 비누 물 약 9~10, 세정제 약 13~14는 기관 원문을 못 찾아 "대략값"으로 표시했습니다.</span></li>
+<li><span class="cb" aria-hidden="true"></span><span>아연이 NaOH와 반응해 수소를 내는 반응식은 원문 확인을 못 했습니다(알루미늄만 확인).</span></li>
+<li><span class="cb" aria-hidden="true"></span><span>위 "염기와 금속" 출처는 Wikipedia라 2차로 적었습니다.</span></li>
+<li class="ref"><span>참고: 이 소단원의 '중요' 표시는 3개입니다(다른 소단원은 4개, 보강 전부터 같음).</span></li>
+</ul></div></section>
+<section class="unit" id="u-2105">
+<header class="uhead">
+  <div class="ucode"><span class="code">2105</span><span class="long">통합과학2 I-05</span></div>
+  <h2>물질 변화와 에너지 출입</h2>
+  <div class="umeta"><span><b>본책 82~99쪽</b> · 통합과학2 합본</span><span>쪽 수 16 → <b>18쪽</b> (+2)</span><span>강의용 L-2105 12쪽 그대로</span></div>
+</header>
+<h3><span class="num">1</span>바뀐 사실</h3>
+<table class="t facts"><colgroup><col class="c-cb"><col class="c-what"><col class="c-pg"><col class="c-src"><col class="c-lv"></colgroup><thead><tr><th>확인</th><th>무엇 (전 → 후)</th><th>본책 쪽</th><th>출처</th><th>확인 수준</th></tr></thead><tbody>
+<tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td><div class="before"><span class="lab">전</span>소단원 이름 "화학 변화와 에너지 출입"</div><div class="after"><span class="lab">후</span>"물질 변화와 에너지 출입"(본책 19곳·강의용 12곳)</div><div class=tags><span class="tag">강의용도 고침</span></div></td><td class="pg">82·<wbr>83·<wbr>84 외</td><td class="src">교육과정 내용 요소 "물질 변화에서 에너지 출입" · 시중 교재 10종 중 8종(보고서 표)</td><td><span class="chip lv-w">원문 확인</span></td></tr>
+<tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td><div class="before"><span class="lab">전</span>질산 암모늄 냉각 팩 = "흡열 반응(화학 변화)"</div><div class="after"><span class="lab">후</span>"질산 암모늄이 물에 녹는 용해(물리 변화)에서 열을 흡수"; 흡열 반응 예는 수산화 바륨 + 염화 암모늄으로</div></td><td class="pg">83·<wbr>84·<wbr>86 외</td><td class="src">Wikipedia "Ammonium nitrate"·"Enthalpy change of solution"(+25.69 kJ/mol)</td><td><span class="chip lv-s">2차 자료</span></td></tr>
+<tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td><div class="before"><span class="lab">전</span>9번 ① 질산 암모늄</div><div class="after"><span class="lab">후</span>탄산수소 나트륨 열분해로 바꿈. 11·13·14·16·19·24번 "반응" → "변화/용해", 19번 모범 답안·채점 기준</div></td><td class="pg">84·<wbr>86·<wbr>91 외</td><td class="src">—</td><td><span class="chip lv-k">교과 지식</span></td></tr>
+</tbody></table>
+<h3><span class="num">2</span>새로 넣은 것 <span class="h3sub">새 쪽·탐구·날개·그림</span></h3>
+<table class="t new"><colgroup><col class="c-cb"><col class="c-pg2"><col class="c-desc"><col class="c-ex"></colgroup><thead><tr><th>확인</th><th>본책 쪽</th><th>내용</th><th>예시 결과</th></tr></thead><tbody>
+<tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td class="pg">84</td><td>개념 2 날개: 정성적 에너지 도표(엔탈피·ΔH 없이)</td><td><span class="muted">—</span></td></tr>
+<tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td class="pg">87</td><td><span class="tag tag-new">새 쪽</span>개념 5 쪽 신설 — "물리 변화의 열 출입 — 상태 변화와 용해"(염화 칼슘 제설제·땀 증발·응결열과 태풍), 옛 개념 5는 개념 6으로</td><td><span class="muted">—</span></td></tr>
+<tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td class="pg">89</td><td>자료 파헤치기 "자료 2 — 세 가지 소금의 용해" 막대(NaCl 19 ℃, CaCl₂ 36 ℃, NH₄NO₃ 13 ℃)</td><td><span class="chip lv-s">예시 결과(문헌값 어림)</span></td></tr>
+<tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td class="pg">90</td><td><span class="tag tag-new">새 쪽</span>교과서 탐구 1쪽 신설 — 산화 칼슘 조리 설계(세 조건 그래프)</td><td><span class="chip lv-s">예시 결과</span></td></tr>
+</tbody></table>
+<h3><span class="num">3</span>바꾼 문항 <span class="h3sub">정답은 지금 파일에서 읽은 값</span></h3>
+<table class="t qs"><colgroup><col class="c-cb"><col class="c-no"><col class="c-ask"><col class="c-ans"><col class="c-qpg"></colgroup><thead><tr><th>확인</th><th>번호</th><th>무엇을 묻나</th><th>정답</th><th>문제 · 해설 쪽</th></tr></thead><tbody>
+<tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td class="no">17번</td><td><span class="tag tag-new">교체</span>상태 변화의 열 출입 5지</td><td class="ans">①</td><td class="pg">93 · 97</td></tr>
+<tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td class="no">21번</td><td><span class="tag tag-new">교체</span>고체 A~C 용해 온도 표 — 물리 변화인지 묻는 ㄷ 포함</td><td class="ans">③</td><td class="pg">94 · 98</td></tr>
+</tbody></table>
+<div class="issues"><h3><span class="num">4</span>확인 못 한 것 · 원장님 판단 필요</h3><ul>
+<li><span class="cb" aria-hidden="true"></span><span>보고서가 "옛 이름이 남은 곳"으로 든 파일(front·summary·data 등)은 그 뒤 고쳐져, 지금은 강의용 시안 파일(_시안_보완.html) 한 곳에만 남아 있습니다.</span></li>
+<li><span class="cb" aria-hidden="true"></span><span>대단원 마무리(본책 100~106쪽)는 아직 질산 암모늄을 흡열 "반응"으로 다룹니다 — 101쪽 OX 5번 "순간 냉각 팩은 발열 반응을 이용한 도구다"(정답 X), 106쪽 해설 "질산 암모늄과 물의 반응". 소단원과 맞춰야 합니다.</span></li>
+<li><span class="cb" aria-hidden="true"></span><span>CaCl₂ 용해열 −81.3 kJ/mol은 Wikipedia에서 수치를 찾지 못해 CRC 기준 값으로 어림했습니다.</span></li>
+<li><span class="cb" aria-hidden="true"></span><span>시중 교재 10종 가운데 8종은 직접 열지 않고 보고서 표를 따랐습니다.</span></li>
+</ul></div></section>
+<section class="unit" id="u-2201">
+<header class="uhead">
+  <div class="ucode"><span class="code">2201</span><span class="long">통합과학2 II-01</span></div>
+  <h2>생태계의 구성과 상호 관계</h2>
+  <div class="umeta"><span><b>본책 108~123쪽</b> · 통합과학2 합본</span><span>쪽 수 16 → <b>16쪽</b> (그대로)</span><span>강의용 L-2201 12쪽 그대로</span></div>
+</header>
+<h3><span class="num">1</span>바뀐 사실</h3>
+<table class="t facts"><colgroup><col class="c-cb"><col class="c-what"><col class="c-pg"><col class="c-src"><col class="c-lv"></colgroup><thead><tr><th>확인</th><th>무엇 (전 → 후)</th><th>본책 쪽</th><th>출처</th><th>확인 수준</th></tr></thead><tbody>
+<tr class="keep"><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td><div class="before"><span class="lab">전</span>(고친 사실 없음 — 보고서 판정 "오류 없음")</div><div class="after"><span class="lab">후</span>숲 바닥 빛 "수 %"는 일반적인 값이라 그대로</div></td><td class="pg">114·<wbr>118</td><td class="src">보고서 판정</td><td><span class="chip lv-s">2차 자료</span></td></tr>
+<tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td><div class="before"><span class="lab">전</span>용어 "생물적 요인"</div><div class="after"><span class="lab">후</span>"생물적 요인(생물요소)", "비생물적 요인(비생물요소)" 병기, 날개 항목 신설</div><div class=tags><span class="tag">강의용도 고침</span></div></td><td class="pg">110·<wbr>111·<wbr>113 외</td><td class="src">—</td><td><span class="chip lv-k">교과 지식</span></td></tr>
+</tbody></table>
+<h3><span class="num">2</span>새로 넣은 것 <span class="h3sub">새 쪽·탐구·날개·그림</span></h3>
+<table class="t new"><colgroup><col class="c-cb"><col class="c-pg2"><col class="c-desc"><col class="c-ex"></colgroup><thead><tr><th>확인</th><th>본책 쪽</th><th>내용</th><th>예시 결과</th></tr></thead><tbody>
+<tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td class="pg">113</td><td>개념 5: 상호작용 3방향(비생물 → 생물 = 적응, 생물 → 비생물 = 개조, 생물 ↔ 생물 = 먹이·경쟁) 판별 그림 5</td><td><span class="muted">—</span></td></tr>
+<tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td class="pg">114</td><td>자료 파헤치기 보조 "자료 하나 더" — 토양 미생물(그대로 둔 흙과 가열한 흙에 거름종이)</td><td><span class="chip lv-s">예시 결과</span></td></tr>
+</tbody></table>
+<h3><span class="num">3</span>바꾼 문항 <span class="h3sub">정답은 지금 파일에서 읽은 값</span></h3>
+<table class="t qs"><colgroup><col class="c-cb"><col class="c-no"><col class="c-ask"><col class="c-ans"><col class="c-qpg"></colgroup><thead><tr><th>확인</th><th>번호</th><th>무엇을 묻나</th><th>정답</th><th>문제 · 해설 쪽</th></tr></thead><tbody>
+<tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td class="no">9번</td><td><span class="tag tag-new">교체</span>상호작용 사례와 방향(생물 ↔ 생물 포함) 짝짓기</td><td class="ans">②</td><td class="pg">115 · 119</td></tr>
+<tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td class="no">13번</td><td><span class="tag tag-new">교체</span>토양 미생물 탐구</td><td class="ans">④</td><td class="pg">116 · 120</td></tr>
+<tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td class="no">22번</td><td><span class="tag">손봄</span>그림에 (다) 생물 ↔ 생물 추가, ㄴ 바꿈</td><td class="ans">①</td><td class="pg">118 · 122</td></tr>
+</tbody></table>
+<div class="issues"><h3><span class="num">4</span>확인 못 한 것 · 원장님 판단 필요</h3><ul>
+<li><span class="cb" aria-hidden="true"></span><span>보고서 (a) "빛의 파장과 해조류 수심 분포, 장일·단일 식물"은 2022판 교과서 수록을 확인하지 못해 넣지 않았습니다.</span></li>
+<li><span class="cb" aria-hidden="true"></span><span>14번 ㄷ을 지면 때문에 "(다)는 층상 구조를 만든 요인에 적응했다."로 줄였습니다(정답 ⑤ 같음).</span></li>
+</ul></div></section>
+<section class="unit" id="u-2202">
+<header class="uhead">
+  <div class="ucode"><span class="code">2202</span><span class="long">통합과학2 II-02</span></div>
+  <h2>생태계 평형</h2>
+  <div class="umeta"><span><b>본책 124~140쪽</b> · 통합과학2 합본</span><span>쪽 수 16 → <b>17쪽</b> (+1)</span><span>강의용 L-2202 12쪽 그대로</span></div>
+</header>
+<h3><span class="num">1</span>바뀐 사실</h3>
+<table class="t facts"><colgroup><col class="c-cb"><col class="c-what"><col class="c-pg"><col class="c-src"><col class="c-lv"></colgroup><thead><tr><th>확인</th><th>무엇 (전 → 후)</th><th>본책 쪽</th><th>출처</th><th>확인 수준</th></tr></thead><tbody>
+<tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td><div class="before"><span class="lab">전</span>옐로스톤 늑대 효과를 정설처럼("늑대 몇 마리가 강의 물길을 바꿨다", "약 70년 만의 복원")</div><div class="after"><span class="lab">후</span>"연쇄의 방향은 대체로 일치하지만 효과의 크기는 논쟁 중" — 세 연구 비교표</div><div class=tags><span class="tag">강의용도 고침</span></div></td><td class="pg">128·<wbr>130·<wbr>139</td><td class="src">Hobbs·Cooper 외 2024(Ecol. Monogr., ESA·CSU 발표·Gazette 기사) · Ripple 외 2025(GEC e03428 초록) · MacNulty 외 2025 · Brice 외 2021</td><td><span class="chip lv-s">2차 자료</span></td></tr>
+<tr class="keep"><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td><div class="before"><span class="lab">전</span>늑대 사라진 해·재도입 해</div><div class="after"><span class="lab">후</span>1920년대 / 1995~96년 — 맞아서 그대로</div><div class=tags><span class="tag tag-diff">보고와 다름</span></div><div class="diffnote">보고서는 "사라진 해(1926)를 그대로 두었다"고 했지만, 본책·강의용에는 1926이 없고 "1920년대"로 적혀 있습니다(보강 전부터 같음).</div></td><td class="pg">130·<wbr>135</td><td class="src">보고서</td><td><span class="chip lv-s">2차 자료</span></td></tr>
+</tbody></table>
+<h3><span class="num">2</span>새로 넣은 것 <span class="h3sub">새 쪽·탐구·날개·그림</span></h3>
+<table class="t new"><colgroup><col class="c-cb"><col class="c-pg2"><col class="c-desc"><col class="c-ex"></colgroup><thead><tr><th>확인</th><th>본책 쪽</th><th>내용</th><th>예시 결과</th></tr></thead><tbody>
+<tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td class="pg">126</td><td>개념 2 날개: 에너지 효율 계산(240 → 30이면 12.5 %), "대략 10 % 안팎"</td><td><span class="muted">—</span></td></tr>
+<tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td class="pg">128</td><td>개념 4: "기후 변화도 먹이 그물을 타고 번진다"(개화 시기, 아열대 어종, 산호 백화, 사과 재배지 북상)</td><td><span class="muted">—</span></td></tr>
+<tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td class="pg">130</td><td>자료 파헤치기 전면 개편 — "연쇄는 얼마나 강했나"(널리 알려진 사슬, 세 연구 비교표)</td><td><span class="muted">—</span></td></tr>
+<tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td class="pg">131</td><td><span class="tag tag-new">새 쪽</span>교과서 탐구 1쪽 신설 — 종이 들판의 토끼와 스라소니(12세대 모의 결과, 눈금 두 개)</td><td><span class="chip lv-s">예시 결과</span></td></tr>
+</tbody></table>
+<h3><span class="num">3</span>바꾼 문항 <span class="h3sub">정답은 지금 파일에서 읽은 값</span></h3>
+<table class="t qs"><colgroup><col class="c-cb"><col class="c-no"><col class="c-ask"><col class="c-ans"><col class="c-qpg"></colgroup><thead><tr><th>확인</th><th>번호</th><th>무엇을 묻나</th><th>정답</th><th>문제 · 해설 쪽</th></tr></thead><tbody>
+<tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td class="no">17번</td><td><span class="tag tag-new">교체</span>모의실험 그래프 합답형(꼼꼼 자료 분석)</td><td class="ans">③</td><td class="pg">134 · 138</td></tr>
+<tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td class="no">22번</td><td><span class="tag tag-new">교체</span>두 연구 비교 합답형 — II-01 비생물적 요인과 엮음</td><td class="ans">④</td><td class="pg">135 · 139</td></tr>
+</tbody></table>
+<div class="issues"><h3><span class="num">4</span>확인 못 한 것 · 원장님 판단 필요</h3><ul>
+<li><span class="cb" aria-hidden="true"></span><span>Hobbs 외(2024)는 학회·대학 발표와 기사로 확인했습니다 — 논문 본문은 아님.</span></li>
+<li><span class="cb" aria-hidden="true"></span><span>Gazette 기사 수치(사람 사냥이 엘크 사망의 54.8 %, 퓨마 포식률 늑대의 2배)는 원 논문에서 확인하지 못해 쓰지 않았습니다.</span></li>
+<li><span class="cb" aria-hidden="true"></span><span>사과 재배지 북상·아열대 어종 증가는 원문을 열지 않아 수치 없이 정성적으로만 썼습니다.</span></li>
+<li><span class="cb" aria-hidden="true"></span><span>눈신토끼–스라소니 원자료는 쓰지 않고 모의실험 예시 결과로 대신했습니다.</span></li>
+<li class="ref"><span>참고: 이 소단원의 '중요' 표시는 5개입니다(다른 소단원은 4개, 보강 전부터 같음).</span></li>
+</ul></div></section>
+<section class="unit" id="u-2203">
+<header class="uhead">
+  <div class="ucode"><span class="code">2203</span><span class="long">통합과학2 II-03</span></div>
+  <h2>지구온난화와 기후변화</h2>
+  <div class="umeta"><span><b>본책 141~159쪽</b> · 통합과학2 합본</span><span>쪽 수 18 → <b>19쪽</b> (+1)</span><span>강의용 L-2203 12쪽 그대로</span></div>
+</header>
+<h3><span class="num">1</span>바뀐 사실</h3>
+<table class="t facts"><colgroup><col class="c-cb"><col class="c-what"><col class="c-pg"><col class="c-src"><col class="c-lv"></colgroup><thead><tr><th>확인</th><th>무엇 (전 → 후)</th><th>본책 쪽</th><th>출처</th><th>확인 수준</th></tr></thead><tbody>
+<tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td><div class="before"><span class="lab">전</span>CO₂ "오늘날 430 ppm을 넘었다", "2026년 약 430 ppm"</div><div class="after"><span class="lab">후</span>"2025년 연평균 427 ppm(마우나로아, NOAA)", 월평균 최고 "2026년 5월 432 ppm", 킬링 곡선 822개 월값으로 다시 그림</div><div class=tags><span class="tag">강의용도 고침</span></div></td><td class="pg">143·<wbr>146·<wbr>147 외</td><td class="src">NOAA GML 연평균·월평균 파일</td><td><span class="chip lv-w">원문 확인</span></td></tr>
+<tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td><div class="before"><span class="lab">전</span>기온 상승 "1.1~1.2 ℃"(강의용 "1 ℃ 남짓")</div><div class="after"><span class="lab">후</span>"2016~2025년 평균 1.26 ℃"(산업화 이전 대비)</div><div class=tags><span class="tag">강의용도 고침</span></div></td><td class="pg">143</td><td class="src">IGCC 2025(ESSD 18:3889, 2026-06-11)</td><td><span class="chip lv-w">원문 확인</span></td></tr>
+<tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td><div class="before"><span class="lab">전</span>파리 협정 "195개국이 함께 서명"</div><div class="after"><span class="lab">후</span>"2015년 COP21에서 196개 당사국이 채택"</div><div class=tags><span class="tag">강의용도 고침</span></div></td><td class="pg">146</td><td class="src">UN 공식(채택일만) · "196"은 2차 검색 · UNFCCC 원문 못 엶</td><td><span class="chip lv-s">2차 자료</span></td></tr>
+<tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td><div class="before"><span class="lab">전</span>강의용 확인 문제: 톱니 "봄에 내려갔다가 겨울에 올라간다"</div><div class="after"><span class="lab">후</span>"여름에 내려갔다가 겨울에 다시 올라간다"</div><div class=tags><span class="tag">강의용도 고침</span></div></td><td class="pg"><span class="nw">강의용 L-2203</span></td><td class="src">NOAA 월평균</td><td><span class="chip lv-w">원문 확인</span></td></tr>
+<tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td><div class="before"><span class="lab">전</span>지구 열수지 "반사 30·흡수 70"</div><div class="after"><span class="lab">후</span>NASA 전체 열수지: 반사 29 · 대기 23 · 지표 48 / 지표 복사 117 · 재복사 100 · 증발 25 · 대류 5 · 대기의 창 12 · 우주로 59</div></td><td class="pg">149·<wbr>150·<wbr>154·<wbr>158</td><td class="src">NASA Earth Observatory</td><td><span class="chip lv-w">원문 확인</span></td></tr>
+</tbody></table>
+<h3><span class="num">2</span>새로 넣은 것 <span class="h3sub">새 쪽·탐구·날개·그림</span></h3>
+<table class="t new"><colgroup><col class="c-cb"><col class="c-pg2"><col class="c-desc"><col class="c-ex"></colgroup><thead><tr><th>확인</th><th>본책 쪽</th><th>내용</th><th>예시 결과</th></tr></thead><tbody>
+<tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td class="pg">145</td><td>개념 4 그림 5 — NOAA ONI 실측(1995~2026년 6~8월 +1.8), 2026년 9월 NOAA 엘니뇨 주의보, 날개 "수온 편차"(±0.5 ℃)</td><td><span class="muted">—</span></td></tr>
+<tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td class="pg">148</td><td><span class="tag tag-new">새 쪽</span>교과서 탐구 1쪽 신설 — 페트병 온실 모형(모형의 한계 포함)</td><td><span class="chip lv-s">예시 결과</span></td></tr>
+<tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td class="pg">149</td><td>집중 훈련 A를 전체 열수지로 다시 씀(화살표 굵기 비례, 반올림 1씩 어긋남 명시)</td><td><span class="muted">—</span></td></tr>
+</tbody></table>
+<h3><span class="num">3</span>바꾼 문항 <span class="h3sub">정답은 지금 파일에서 읽은 값</span></h3>
+<table class="t qs"><colgroup><col class="c-cb"><col class="c-no"><col class="c-ask"><col class="c-ans"><col class="c-qpg"></colgroup><thead><tr><th>확인</th><th>번호</th><th>무엇을 묻나</th><th>정답</th><th>문제 · 해설 쪽</th></tr></thead><tbody>
+<tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td class="no">9번</td><td><span class="tag">손봄</span>그래프 눈금 427, 해설 427 − 280 = 147 → 약 150</td><td class="ans">①</td><td class="pg">151 · 155</td></tr>
+<tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td class="no">12번</td><td><span class="tag tag-new">교체</span>페트병 온실 모형 탐구</td><td class="ans">④</td><td class="pg">152 · 156</td></tr>
+<tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td class="no">14번</td><td><span class="tag">손봄</span>NOAA ONI 실측(2008~2017) — A 2015~16 엘니뇨, B 2010~11 라니냐</td><td class="ans">②</td><td class="pg">152 · 156</td></tr>
+<tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td class="no">24번</td><td><span class="tag tag-new">교체</span>NASA 전체 열수지 — 대기의 창 A = 12, 온실 기체 증가 시 변화</td><td class="ans">①</td><td class="pg">154 · 158</td></tr>
+</tbody></table>
+<div class="issues"><h3><span class="num">4</span>확인 못 한 것 · 원장님 판단 필요</h3><ul>
+<li><span class="cb" aria-hidden="true"></span><span>최신 수치(2025 연평균 427 ppm, 2026년 5월 432 ppm, 1.26 ℃, ONI 2026년 6~8월 +1.8, 2026년 9월 엘니뇨 주의보)는 출간 직전 원자료로 한 번 더 보셔야 합니다.</span></li>
+<li><span class="cb" aria-hidden="true"></span><span>파리 협정 "196개 당사국"은 2차 검색으로만 확인했습니다.</span></li>
+<li><span class="cb" aria-hidden="true"></span><span>미국 파리 협정 탈퇴 발효(2026-01-27), 해수면 상승 수치, 한반도 SSP·NDC는 원문 확인 실패로 넣지 않았습니다.</span></li>
+<li><span class="cb" aria-hidden="true"></span><span>NOAA는 지금 RONI를 공식 지표로 쓰지만 그래프는 ONI 원자료로 그리고 "ONI"라고 적었습니다.</span></li>
+<li><span class="cb" aria-hidden="true"></span><span>대단원 마무리(본책 194·195쪽)와 강의용 요약(L-sum2)에 "280 → 430 ppm", "+1.1~1.2 ℃"가 남아 있습니다.</span></li>
+</ul></div></section>
+<section class="unit" id="u-2204">
+<header class="uhead">
+  <div class="ucode"><span class="code">2204</span><span class="long">통합과학2 II-04</span></div>
+  <h2>태양 에너지와 에너지 전환</h2>
+  <div class="umeta"><span><b>본책 160~174쪽</b> · 통합과학2 합본</span><span>쪽 수 15 → <b>15쪽</b> (그대로)</span><span>강의용 L-2204 12쪽 그대로</span></div>
+</header>
+<h3><span class="num">1</span>바뀐 사실</h3>
+<table class="t facts"><colgroup><col class="c-cb"><col class="c-what"><col class="c-pg"><col class="c-src"><col class="c-lv"></colgroup><thead><tr><th>확인</th><th>무엇 (전 → 후)</th><th>본책 쪽</th><th>출처</th><th>확인 수준</th></tr></thead><tbody>
+<tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td><div class="before"><span class="lab">전</span>태양 표면 온도 "약 6000 ℃"</div><div class="after"><span class="lab">후</span>"약 5500 ℃"(강의용 용어표에 "약 5800 K" 함께)</div><div class=tags><span class="tag">강의용도 고침</span></div></td><td class="pg">161·<wbr>173</td><td class="src">NASA Sun Fact Sheet(유효 온도 5772 K)</td><td><span class="chip lv-w">원문 확인</span></td></tr>
+<tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td><div class="before"><span class="lab">전</span>9번 흡수·방출 곡선 교차점 48°</div><div class="after"><span class="lab">후</span>약 38°(문제 그림·해설 분석 그림 모두, 다시 계산한 교차점 38.0°)</div></td><td class="pg">162·<wbr>171</td><td class="src">LibreTexts Coastal Dynamics 4.2.1("about 37°")</td><td><span class="chip lv-w">원문 확인</span></td></tr>
+<tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td><div class="before"><span class="lab">전</span>(새 사실) 지구계 에너지원 비율</div><div class="after"><span class="lab">후</span>태양 약 99.97 %, 지구 내부 약 0.03 %, 조력 약 0.002 %(어림값)</div></td><td class="pg">164·<wbr>168</td><td class="src">담당자 계산(태양 174 000 TW·지열 47 TW·조석 3.7 TW, climatepuzzles.org)</td><td><span class="chip lv-c">직접 계산</span></td></tr>
+</tbody></table>
+<h3><span class="num">2</span>새로 넣은 것 <span class="h3sub">새 쪽·탐구·날개·그림</span></h3>
+<table class="t new"><colgroup><col class="c-cb"><col class="c-pg2"><col class="c-desc"><col class="c-ex"></colgroup><thead><tr><th>확인</th><th>본책 쪽</th><th>내용</th><th>예시 결과</th></tr></thead><tbody>
+<tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td class="pg">162</td><td>개념 2: "1년 평균 위도 약 38° 부근에서 흡수 = 방출", 한눈에 암기 "경계는 약 38°"</td><td><span class="muted">—</span></td></tr>
+<tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td class="pg">164</td><td>개념 4 날개 "통합과학 1 연계 — 지구계 에너지원의 비율"</td><td><span class="muted">—</span></td></tr>
+<tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td class="pg">165</td><td>개념 5: 태양광(빛 → 전기, 터빈 없음) vs 태양열(빛 → 열 → 운동 → 전기)</td><td><span class="muted">—</span></td></tr>
+</tbody></table>
+<h3><span class="num">3</span>바꾼 문항 <span class="h3sub">정답은 지금 파일에서 읽은 값</span></h3>
+<table class="t qs"><colgroup><col class="c-cb"><col class="c-no"><col class="c-ask"><col class="c-ans"><col class="c-qpg"></colgroup><thead><tr><th>확인</th><th>번호</th><th>무엇을 묻나</th><th>정답</th><th>문제 · 해설 쪽</th></tr></thead><tbody>
+<tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td class="no">9번</td><td><span class="tag">손봄</span>교차점을 약 38°로 고친 그림</td><td class="ans">①</td><td class="pg">167 · 171</td></tr>
+<tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td class="no">10번</td><td><span class="tag tag-new">교체</span>에너지원 A~C 비율 표</td><td class="ans">⑤</td><td class="pg">168 · 171</td></tr>
+<tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td class="no">17번</td><td><span class="tag tag-new">교체</span>태양광 vs 태양열 발전</td><td class="ans">②</td><td class="pg">169 · 172</td></tr>
+</tbody></table>
+<div class="issues"><h3><span class="num">4</span>확인 못 한 것 · 원장님 판단 필요</h3><ul>
+<li><span class="cb" aria-hidden="true"></span><span>에너지원 비율은 교과서마다 다릅니다(흔히 99.985/0.013/0.002, 보고서는 99.98/0.02/0.002). 2022판 교과서 값은 확인하지 못했습니다 — 어느 값을 쓸지 정해 주세요.</span></li>
+<li><span class="cb" aria-hidden="true"></span><span>9번 그래프는 개략도라 그림 안에 출처를 적지 않았습니다.</span></li>
+</ul></div></section>
+<section class="unit" id="u-2205">
+<header class="uhead">
+  <div class="ucode"><span class="code">2205</span><span class="long">통합과학2 II-05</span></div>
+  <h2>발전과 에너지의 효율적 이용</h2>
+  <div class="umeta"><span><b>본책 175~193쪽</b> · 통합과학2 합본</span><span>쪽 수 16 → <b>19쪽</b> (+3)</span><span>강의용 L-2205 12쪽 그대로</span></div>
+</header>
+<h3><span class="num">1</span>바뀐 사실</h3>
+<table class="t facts"><colgroup><col class="c-cb"><col class="c-what"><col class="c-pg"><col class="c-src"><col class="c-lv"></colgroup><thead><tr><th>확인</th><th>무엇 (전 → 후)</th><th>본책 쪽</th><th>출처</th><th>확인 수준</th></tr></thead><tbody>
+<tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td><div class="before"><span class="lab">전</span>그림 3 화력 장점 "출력 조절이 빠르다"</div><div class="after"><span class="lab">후</span>"대량·안정 생산, 가스(LNG)는 출력 조절이 빠르다", 석탄·핵은 주로 일정하게 돌림</div><div class=tags><span class="tag">강의용도 고침</span></div></td><td class="pg">178·<wbr>182·<wbr>186·<wbr>190</td><td class="src">EIA Today in Energy 2013-09-16 · 국내 보도(정부 1차 문서 아님)</td><td><span class="chip lv-s">2차 자료</span></td></tr>
+<tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td><div class="before"><span class="lab">전</span>(새 사실) 2024년 발전원별 비중</div><div class="after"><span class="lab">후</span>원자력 31.7 %(188.8 TWh), 석탄·가스 각 28.1 %, 신재생 10.6 %, 총 595.6 TWh, 기타 1.5 %(계산값)</div><div class=tags><span class="tag">강의용도 고침</span></div></td><td class="pg">182·<wbr>186·<wbr>190</td><td class="src">정책브리핑(산업통상자원부, 2025-05-12)</td><td><span class="chip lv-w">원문 확인</span></td></tr>
+<tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td><div class="before"><span class="lab">전</span>(새 사실) 발전소 효율</div><div class="after"><span class="lab">후</span>석탄·핵 약 30~40 %, 열병합, 효율의 곱셈(40 % × 30 % = 12 %)</div></td><td class="pg">179</td><td class="src">EIA 2024 평균 열소비율로 계산(석탄 32·핵 33·가스 44 %)</td><td><span class="chip lv-c">직접 계산</span></td></tr>
+<tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td><div class="before"><span class="lab">전</span>(새 사실) 신에너지·재생에너지 법적 분류</div><div class="after"><span class="lab">후</span>날개 "신에너지 · 재생에너지"</div></td><td class="pg">180</td><td class="src">위키문헌 사본·검색 요약(law.go.kr 못 엶)</td><td><span class="chip lv-s">2차 자료</span></td></tr>
+</tbody></table>
+<h3><span class="num">2</span>새로 넣은 것 <span class="h3sub">새 쪽·탐구·날개·그림</span></h3>
+<table class="t new"><colgroup><col class="c-cb"><col class="c-pg2"><col class="c-desc"><col class="c-ex"></colgroup><thead><tr><th>확인</th><th>본책 쪽</th><th>내용</th><th>예시 결과</th></tr></thead><tbody>
+<tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td class="pg">176</td><td>개념 1: 자기장이 변할 때, 유도 전류 정의, 세기·방향 두 줄</td><td><span class="muted">—</span></td></tr>
+<tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td class="pg">180</td><td>개념 5: ESS, 스마트 그리드, 회생 제동, 단열 건물</td><td><span class="muted">—</span></td></tr>
+<tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td class="pg">181</td><td>자료 파헤치기 "한 걸음 더 — 발전소 연료까지"(같은 빛 5: 연료 250 → 약 38)</td><td><span class="muted">—</span></td></tr>
+<tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td class="pg">182</td><td><span class="tag tag-new">새 쪽</span>자료 파헤치기 2: 2024년 발전원별 비중(100 % 띠 + 비례 막대), 조사·발표 과제</td><td><span class="muted">—</span></td></tr>
+<tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td class="pg">183</td><td><span class="tag tag-new">새 쪽</span>교과서 탐구 "간이 발전기 만들기"(결과표 A~E)</td><td><span class="chip lv-s">예시 결과</span></td></tr>
+<tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td class="pg">184</td><td><span class="tag tag-new">새 쪽</span>집중 훈련 "검류계 바늘 판정 8장면", 코일 속 낙하 자석</td><td><span class="muted">—</span></td></tr>
+</tbody></table>
+<h3><span class="num">3</span>바꾼 문항 <span class="h3sub">정답은 지금 파일에서 읽은 값</span></h3>
+<table class="t qs"><colgroup><col class="c-cb"><col class="c-no"><col class="c-ask"><col class="c-ans"><col class="c-qpg"></colgroup><thead><tr><th>확인</th><th>번호</th><th>무엇을 묻나</th><th>정답</th><th>문제 · 해설 쪽</th></tr></thead><tbody>
+<tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td class="no">11번</td><td><span class="tag tag-new">교체</span>2024년 발전 비중 그래프 — 합치기 계산, LNG 출력 조절</td><td class="ans">⑤</td><td class="pg">186 · 190</td></tr>
+<tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td class="no">21번</td><td><span class="tag tag-new">교체</span>검류계 결과표 탐구 합답형</td><td class="ans">③</td><td class="pg">188 · 192</td></tr>
+</tbody></table>
+<div class="issues"><h3><span class="num">4</span>확인 못 한 것 · 원장님 판단 필요</h3><ul>
+<li><span class="cb" aria-hidden="true"></span><span>신에너지·재생에너지 법 조문은 law.go.kr가 열리지 않아 2차로만 확인했고, 수소·연료 전지 개정 움직임도 확인하지 못했습니다.</span></li>
+<li><span class="cb" aria-hidden="true"></span><span>LNG 출력 조절은 국내 정부 1차 문서로 확인하지 못했습니다(EIA·보도).</span></li>
+<li><span class="cb" aria-hidden="true"></span><span>본책 181쪽은 LED 효율을 약 33 %로, 수능형 모의고사 23번은 40 %(예시 자료)로 씁니다 — 통일할지 정해 주세요.</span></li>
+</ul></div></section>
+<section class="unit" id="u-2301">
+<header class="uhead">
+  <div class="ucode"><span class="code">2301</span><span class="long">통합과학2 III-01</span></div>
+  <h2>감염병과 과학의 유용성</h2>
+  <div class="umeta"><span><b>본책 202~218쪽</b> · 통합과학2 합본</span><span>쪽 수 16 → <b>17쪽</b> (+1)</span><span>강의용 L-2301 12쪽 그대로</span></div>
+</header>
+<h3><span class="num">1</span>바뀐 사실</h3>
+<table class="t facts"><colgroup><col class="c-cb"><col class="c-what"><col class="c-pg"><col class="c-src"><col class="c-lv"></colgroup><thead><tr><th>확인</th><th>무엇 (전 → 후)</th><th>본책 쪽</th><th>출처</th><th>확인 수준</th></tr></thead><tbody>
+<tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td><div class="before"><span class="lab">전</span>존 스노우 "펌프 손잡이를 제거하자 유행이 잦아들었다"</div><div class="after"><span class="lab">후</span>9월 8일 손잡이 제거 때 새 발병은 이미 정점(9월 1일 143명)에서 크게 줄어 있었음 — 결정적 증거는 사망자 분포와 예외</div><div class=tags><span class="tag">강의용도 고침</span></div></td><td class="pg">208</td><td class="src">Snow(1855) 2판 날짜별 표(HistData Snow.dates) · MSU John Snow Archive</td><td><span class="chip lv-w">원문 확인</span></td></tr>
+<tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td><div class="before"><span class="lab">전</span>(새 사실) mRNA 백신 2023 노벨 생리의학상</div><div class="after"><span class="lab">후</span>개념 4 날개</div><div class=tags><span class="tag">강의용도 고침</span></div></td><td class="pg">206</td><td class="src">Karolinska Institutet 발표(nobelprize.org 403)</td><td><span class="chip lv-w">원문 확인</span></td></tr>
+<tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td><div class="before"><span class="lab">전</span>(새 사실) WHO 팬데믹 협정</div><div class="after"><span class="lab">후</span>2025-05-20 세계보건총회 채택, 60개국 비준 시 발효</div><div class=tags><span class="tag">강의용도 고침</span></div></td><td class="pg">207</td><td class="src">WHO 원문</td><td><span class="chip lv-w">원문 확인</span></td></tr>
+</tbody></table>
+<h3><span class="num">2</span>새로 넣은 것 <span class="h3sub">새 쪽·탐구·날개·그림</span></h3>
+<table class="t new"><colgroup><col class="c-cb"><col class="c-pg2"><col class="c-desc"><col class="c-ex"></colgroup><thead><tr><th>확인</th><th>본책 쪽</th><th>내용</th><th>예시 결과</th></tr></thead><tbody>
+<tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td class="pg">204</td><td>개념 2: 바이러스 = 핵산 + 단백질 껍질, 진단 3종 비교표(항원·항체·유전자 증폭 — 단백질 기반/핵산 기반), 날개 "항체 검사"</td><td><span class="muted">—</span></td></tr>
+<tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td class="pg">208</td><td>자료 파헤치기: 실데이터 막대(8/28~9/15 날짜별 발병 수, 9월 8일 표시선, 출처)</td><td><span class="muted">—</span></td></tr>
+<tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td class="pg">209</td><td><span class="tag tag-new">새 쪽</span>교과서 탐구 1쪽 신설 — 핵산과 단백질을 이용한 진단 체험(모의 항원 검사, 증폭 모형 640·10·0개 → 14·20주기·미도달)</td><td><span class="chip lv-s">예시 결과</span></td></tr>
+</tbody></table>
+<h3><span class="num">3</span>바꾼 문항 <span class="h3sub">정답은 지금 파일에서 읽은 값</span></h3>
+<table class="t qs"><colgroup><col class="c-cb"><col class="c-no"><col class="c-ask"><col class="c-ans"><col class="c-qpg"></colgroup><thead><tr><th>확인</th><th>번호</th><th>무엇을 묻나</th><th>정답</th><th>문제 · 해설 쪽</th></tr></thead><tbody>
+<tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td class="no">9번</td><td><span class="tag tag-new">교체</span>진단 검사가 찾는 물질(핵산·단백질·항체)</td><td class="ans">②</td><td class="pg">210 · 214</td></tr>
+<tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td class="no">21번</td><td><span class="tag tag-new">교체</span>증폭 그래프 합답형 — 64배, 민감도, ㄷ 틀림</td><td class="ans">③</td><td class="pg">213 · 217</td></tr>
+<tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td class="no">23번</td><td><span class="tag">손봄</span>발문 상자·해설 고침(함정 체크)</td><td class="ans">④</td><td class="pg">213 · 217</td></tr>
+</tbody></table>
+<div class="issues"><h3><span class="num">4</span>확인 못 한 것 · 원장님 판단 필요</h3><ul>
+<li><span class="cb" aria-hidden="true"></span><span>팬데믹 협정 부속서(PABS)가 2026년 5월 제79차 총회에서도 채택되지 않았다는 내용은 2차로만 확인되어, "서명 개시 여부"는 쓰지 않았습니다.</span></li>
+<li><span class="cb" aria-hidden="true"></span><span>엠폭스 PHEIC 기간·감염병 데이터 윤리·백신 종류 4가지는 넣지 않았습니다(엠폭스는 출처도 2차).</span></li>
+<li><span class="cb" aria-hidden="true"></span><span>진단 검사 표와 증폭 모형("도달하지 않으면 핵산이 없다")은 모형 가정(매 주기 2배) 위의 설명입니다. 실제 검사의 "검출 한계 미만 = 음성" 표현과 어긋나지 않는지 봐 주세요.</span></li>
+</ul></div></section>
+<section class="unit" id="u-2302">
+<header class="uhead">
+  <div class="ucode"><span class="code">2302</span><span class="long">통합과학2 III-02</span></div>
+  <h2>빅데이터와 인공지능·로봇</h2>
+  <div class="umeta"><span><b>본책 219~236쪽</b> · 통합과학2 합본</span><span>쪽 수 16 → <b>18쪽</b> (+2)</span><span>강의용 L-2302 12쪽 그대로</span></div>
+</header>
+<h3><span class="num">1</span>바뀐 사실</h3>
+<table class="t facts"><colgroup><col class="c-cb"><col class="c-what"><col class="c-pg"><col class="c-src"><col class="c-lv"></colgroup><thead><tr><th>확인</th><th>무엇 (전 → 후)</th><th>본책 쪽</th><th>출처</th><th>확인 수준</th></tr></thead><tbody>
+<tr class="keep"><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td><div class="before"><span class="lab">전</span>(고친 사실 없음) 서울 심야버스 노선 = 통화 데이터 분석</div><div class="after"><span class="lab">후</span>맞음 — 그대로(KT 통화 데이터 30억 건, 2013)</div></td><td class="pg">221·<wbr>228</td><td class="src">서울시 자료</td><td><span class="chip lv-w">원문 확인</span></td></tr>
+<tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td><div class="before"><span class="lab">전</span>(새 사실) AI 기본법</div><div class="after"><span class="lab">후</span>2025-01-21 공포(법률 제20676호), 2026-01-22 시행, 생성형 AI 결과물 표시(제31조 ②)</div><div class=tags><span class="tag">강의용도 고침</span></div></td><td class="pg">225</td><td class="src">law.go.kr 법령 원문 XML</td><td><span class="chip lv-w">원문 확인</span></td></tr>
+<tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td><div class="before"><span class="lab">전</span>(새 사실) 2024 노벨 화학상</div><div class="after"><span class="lab">후</span>하사비스·점퍼(단백질 구조 예측)</div></td><td class="pg">223</td><td class="src">수상 보도(nobelprize.org 403)</td><td><span class="chip lv-s">2차 자료</span></td></tr>
+<tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td><div class="before"><span class="lab">전</span>(새 사실) 교실 CO₂ 기준</div><div class="after"><span class="lab">후</span>1,000 ppm(기계 환기 교실 1,500 ppm), 바깥 공기 2025 연평균 427 ppm</div><div class=tags><span class="tag tag-diff">보고와 다름</span></div><div class="diffnote">보고서는 "그림 안에 바깥 공기 427 ppm(NOAA, 2025)"이라 했지만, 227쪽 그래프 기준선 이름은 "약 430 ppm"(괄호에 427)이고 16번 그림·해설(230·234쪽)은 "430 ppm"입니다. 1,500 ppm 기준은 본문에 없고 16번 눈금에만 있습니다.</div></td><td class="pg">227·<wbr>230·<wbr>234</td><td class="src">학교보건법 시행규칙 원문 · NOAA</td><td><span class="chip lv-w">원문 확인</span></td></tr>
+</tbody></table>
+<h3><span class="num">2</span>새로 넣은 것 <span class="h3sub">새 쪽·탐구·날개·그림</span></h3>
+<table class="t new"><colgroup><col class="c-cb"><col class="c-pg2"><col class="c-desc"><col class="c-ex"></colgroup><thead><tr><th>확인</th><th>본책 쪽</th><th>내용</th><th>예시 결과</th></tr></thead><tbody>
+<tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td class="pg">221</td><td>개념 2: 과학 연구의 빅데이터(유전체 약 30억 염기쌍, 신약 후보), 날개 "유전체 분석"</td><td><span class="muted">—</span></td></tr>
+<tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td class="pg">223</td><td>개념 4: AI와 과학 탐구(단백질 구조 예측 2024 노벨 화학상, 기상 예보 AI, 은하 분류)</td><td><span class="muted">—</span></td></tr>
+<tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td class="pg">224</td><td><span class="tag tag-new">새 쪽</span>개념 4 이어서 "로봇 해부"(센서·제어 장치·구동 장치, 청소 로봇 그림, 개선안 표)</td><td><span class="muted">—</span></td></tr>
+<tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td class="pg">225</td><td>개념 5: AI 기본법 시행(2026-01-22), 날개</td><td><span class="muted">—</span></td></tr>
+<tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td class="pg">227</td><td><span class="tag tag-new">새 쪽</span>교과서 탐구 "교실 공기, 언제 창문을 열어야 할까?"(CO₂ 실시간 그래프)</td><td><span class="chip lv-s">예시 결과(계산 어림값)</span></td></tr>
+</tbody></table>
+<h3><span class="num">3</span>바꾼 문항 <span class="h3sub">정답은 지금 파일에서 읽은 값</span></h3>
+<table class="t qs"><colgroup><col class="c-cb"><col class="c-no"><col class="c-ask"><col class="c-ans"><col class="c-qpg"></colgroup><thead><tr><th>확인</th><th>번호</th><th>무엇을 묻나</th><th>정답</th><th>문제 · 해설 쪽</th></tr></thead><tbody>
+<tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td class="no">9번</td><td><span class="tag tag-new">교체</span>로봇 세 요소 짝짓기</td><td class="ans">①</td><td class="pg">228 · 232</td></tr>
+<tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td class="no">16번</td><td><span class="tag tag-new">교체</span>교실 CO₂ 실시간 측정 그래프</td><td class="ans">①</td><td class="pg">230 · 234</td></tr>
+</tbody></table>
+<div class="issues"><h3><span class="num">4</span>확인 못 한 것 · 원장님 판단 필요</h3><ul>
+<li><span class="cb" aria-hidden="true"></span><span>223쪽 "단백질 구조를 예측하는 AI는 … 2024년 노벨 화학상을 받았고(하사비스·점퍼)"는 AI가 상을 받은 것처럼 읽힙니다 — 상은 개발자가 받았습니다. 문장을 고칠지 봐 주세요.</span></li>
+<li><span class="cb" aria-hidden="true"></span><span>바깥 공기를 그림·16번(227·230·234쪽)은 "430 ppm", 그림 설명은 "2025년 연평균 427 ppm"으로 씁니다. 2203은 427로 통일했습니다.</span></li>
+<li><span class="cb" aria-hidden="true"></span><span>2024 노벨 화학상은 nobelprize.org가 막혀 수상 보도로 확인했습니다.</span></li>
+</ul></div></section>
+<section class="unit" id="u-2303">
+<header class="uhead">
+  <div class="ucode"><span class="code">2303</span><span class="long">통합과학2 III-03</span></div>
+  <h2>과학기술과 윤리</h2>
+  <div class="umeta"><span><b>본책 237~252쪽</b> · 통합과학2 합본</span><span>쪽 수 16 → <b>16쪽</b> (그대로)</span><span>강의용 L-2303 12쪽 그대로</span></div>
+</header>
+<h3><span class="num">1</span>바뀐 사실</h3>
+<table class="t facts"><colgroup><col class="c-cb"><col class="c-what"><col class="c-pg"><col class="c-src"><col class="c-lv"></colgroup><thead><tr><th>확인</th><th>무엇 (전 → 후)</th><th>본책 쪽</th><th>출처</th><th>확인 수준</th></tr></thead><tbody>
+<tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td><div class="before"><span class="lab">전</span>(새 사실) 첫 CRISPR 치료제 승인</div><div class="after"><span class="lab">후</span>영국 MHRA 2023-11-16, 미국 FDA 2023-12-08(낫 모양 적혈구 빈혈증)</div></td><td class="pg">243</td><td class="src">gov.uk 원문 · FDA 보도자료</td><td><span class="chip lv-w">원문 확인</span></td></tr>
+<tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td><div class="before"><span class="lab">전</span>(새 사실) 맞춤형 염기 편집(2025)</div><div class="after"><span class="lab">후</span>NEJM 392:2235(2025-05-15), CPS1 결핍 영아</div></td><td class="pg">243</td><td class="src">PubMed 40373211 초록(NIH 보도자료 403)</td><td><span class="chip lv-w">원문 확인</span></td></tr>
+<tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td><div class="before"><span class="lab">전</span>(새 사실) AI 기본법 조문</div><div class="after"><span class="lab">후</span>2025-01-21 공포, 2026-01-22 시행, 제31조(표시), 제34조(고영향 AI 관리·감독), 제2조 4호(고영향 영역)</div><div class=tags><span class="tag">강의용도 고침</span></div></td><td class="pg">241·<wbr>249</td><td class="src">law.go.kr 원문</td><td><span class="chip lv-w">원문 확인</span></td></tr>
+<tr class="keep"><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td><div class="before"><span class="lab">전</span>하버 1918년 노벨 화학상</div><div class="after"><span class="lab">후</span>맞음 — 그대로</div></td><td class="pg">238</td><td class="src">보고서</td><td><span class="chip lv-w">원문 확인</span></td></tr>
+<tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td><div class="before"><span class="lab">전</span>(새 사실) 2018 배아 편집 아기, 2020 노벨상, 2004·2005 줄기세포 논문 위조·2006 철회</div><div class="after"><span class="lab">후</span>연표·날개</div></td><td class="pg">240·<wbr>243</td><td class="src">웹 검색(2020 노벨상은 MHRA 원문에도 언급)</td><td><span class="chip lv-s">2차 자료</span></td></tr>
+</tbody></table>
+<h3><span class="num">2</span>새로 넣은 것 <span class="h3sub">새 쪽·탐구·날개·그림</span></h3>
+<table class="t new"><colgroup><col class="c-cb"><col class="c-pg2"><col class="c-desc"><col class="c-ex"></colgroup><thead><tr><th>확인</th><th>본책 쪽</th><th>내용</th><th>예시 결과</th></tr></thead><tbody>
+<tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td class="pg">240</td><td>개념 3: IRB 한 문장, 날개 "IRB"·"실제 사례"(줄기세포 논문 위조·철회, 난자 제공 동의)</td><td><span class="muted">—</span></td></tr>
+<tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td class="pg">241</td><td>개념 4 "AI 시대의 이용 윤리" 상자(자율주행 책임·AI 의료 판단·AI 기본법), 날개 "AI 기본법"·"고영향 AI"</td><td><span class="muted">—</span></td></tr>
+<tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td class="pg">243</td><td>자료 파헤치기: 사실 연표 5칸(2012 → 2018 → 2020 → 2023 → 2025), 그림 안 출처, "연표는 사실, 허용 범위는 연표에 없다"</td><td><span class="muted">—</span></td></tr>
+</tbody></table>
+<h3><span class="num">3</span>바꾼 문항 <span class="h3sub">정답은 지금 파일에서 읽은 값</span></h3>
+<table class="t qs"><colgroup><col class="c-cb"><col class="c-no"><col class="c-ask"><col class="c-ans"><col class="c-qpg"></colgroup><thead><tr><th>확인</th><th>번호</th><th>무엇을 묻나</th><th>정답</th><th>문제 · 해설 쪽</th></tr></thead><tbody>
+<tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td class="no">13번</td><td><span class="tag tag-new">교체</span>AI 윤리·제도 합답형 — ㄷ AI 기본법 결과물 표시</td><td class="ans">②</td><td class="pg">245 · 249</td></tr>
+<tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td class="no">16번</td><td><span class="tag tag-new">교체</span>유전자 편집 연표 합답형 — ㄱ "2012 → 2023이 11년"(틀림)</td><td class="ans">④</td><td class="pg">246 · 250</td></tr>
+</tbody></table>
+<div class="issues"><h3><span class="num">4</span>확인 못 한 것 · 원장님 판단 필요</h3><ul>
+<li><span class="cb" aria-hidden="true"></span><span>「생명윤리 및 안전에 관한 법률」의 IRB 조문 번호는 law.go.kr 연결이 끊겨 원문으로 확인하지 못해, 조문 번호 없이 썼습니다.</span></li>
+<li><span class="cb" aria-hidden="true"></span><span>2018 배아 편집·줄기세포 논문 사건 연도는 웹 검색으로만 확인했습니다 — 2차.</span></li>
+<li><span class="cb" aria-hidden="true"></span><span>유전체 분석 윤리(유전 정보 차별·동의)는 지면 때문에 넣지 않았습니다.</span></li>
+</ul></div></section>
+
+<section class="resid">
+  <h2 class="ph">보강 밖에 남은 옛 서술</h2>
+  <p class="lead">이번에 소단원에서 고친 사실이 대단원 마무리·강의용 요약 같은 다른 곳에는 아직 옛 표현으로 남아 있습니다(검수표를 만들며 전권을 검색해 찾음). 고칠지 정해 주세요.</p>
+  <table class="t rest"><colgroup><col class="c-cb"><col class="r-w"><col class="r-p"><col class="r-o"><col class="r-n"></colgroup>
+  <thead><tr><th>확인</th><th>어디</th><th>본책 쪽</th><th>남은 표현</th><th>소단원에서 고친 것</th></tr></thead><tbody><tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td>통합과학1 대단원 마무리 I</td><td class="pg">83쪽</td><td>"℃는 관용 단위"</td><td>I-02: ℃는 SI 유도단위</td></tr><tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td>통합과학1 대단원 마무리 I</td><td class="pg">77~82쪽</td><td>"표본화 + 수치화"</td><td>I-04: 양자화</td></tr><tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td>통합과학1 I-02 24번</td><td class="pg">36쪽</td><td>"세슘 원자가 내는 빛"</td><td>I-01: 세슘-133 전자기파</td></tr><tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td>통합과학1 대단원 마무리 II</td><td class="pg">176쪽</td><td>"그래핀은 전기가 구리보다 잘 통한다"</td><td>II-05: 본책에서 뺌</td></tr><tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td>통합과학1 대단원 마무리 III</td><td class="pg">281쪽</td><td>"세포 → 조직 → 기관 → 개체"</td><td>III-05: 기관계·조직계</td></tr><tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td>통합과학1 대단원 마무리 III</td><td class="pg">286쪽</td><td>채점 기준 "화산재가 햇빛을 가려"</td><td>III-02: 분출물·이산화 황</td></tr><tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td>통합과학2 대단원 마무리 I</td><td class="pg">101쪽</td><td>"산소 도둑 코크스"</td><td>2103: 코크스가 만든 일산화 탄소</td></tr><tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td>통합과학2 대단원 마무리 I</td><td class="pg">100~106쪽</td><td>질산 암모늄 = 흡열 "반응"(101쪽 OX 5번, 103쪽 3번, 106쪽 해설)</td><td>2105: 용해(물리 변화)</td></tr><tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td>통합과학2 대단원 마무리 I</td><td class="pg">107쪽</td><td>해설 "24 × 5.41 ÷ 46"</td><td>2101: 5.388억 년(답은 같음)</td></tr><tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td>통합과학2 대단원 마무리 II</td><td class="pg">194·195쪽</td><td>"280 → 430 ppm"</td><td>2203: 427 ppm</td></tr><tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td>통합과학2 2302</td><td class="pg">227·230·234쪽</td><td>바깥 공기 "430 ppm"</td><td>2203: 427 ppm</td></tr><tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td>강의용 L-1205</td><td class="pg">—</td><td>"그래핀은 전기가 구리보다 잘 통한다"</td><td>II-05 본책</td></tr><tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td>강의용 L-1302</td><td class="pg">—</td><td>"화산재가 햇빛을 가려", "동력 = 방사성 원소의 붕괴열"</td><td>III-02·III-01 본책</td></tr><tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td>강의용 요약 L-sum1·2·3</td><td class="pg">—</td><td>"수치화", "430 ppm · +1.1~1.2 ℃", "세포 → 조직 → 기관 → 개체"</td><td>I-04·2203·III-05 본책</td></tr></tbody></table>
+</section>
+
+<section class="exam">
+  <header class="uhead">
+    <div class="ucode"><span class="code">수능형</span></div>
+    <h2>수능형 모의고사 제1회</h2>
+    <div class="umeta"><span>25문항 · 40분 · <b>50점</b></span><span>배점 1.5점 8 · 2점 9 · 2.5점 8</span><span>정답 ①~⑤ 각 5개</span></div>
+  </header>
+  <p class="lead">book2/mock-exam-suneung/exam.pdf(2026-10-01 21시 판, 아직 합본 전 — "면"은 이 PDF의 면 번호). 형식은 평가원 예시 문제지 분류(reference/benchmark/수능형-모의고사-조사.md)와 같습니다. 계산 문항 11개는 검수표를 만들며 다시 계산했고 모두 정답과 맞았습니다. 색칠한 줄(계산·실데이터·의학)을 먼저 보아 주세요.</p>
+  <table class="t examt"><colgroup><col class="c-cb"><col class="e-no"><col class="e-ans"><col class="e-pt"><col class="e-un"><col class="e-note"><col class="e-pg"></colgroup>
+  <thead><tr><th>확인</th><th>번호</th><th>정답</th><th>배점</th><th>단원</th><th>원장님 확인할 것</th><th>면</th></tr></thead>
+  <tbody><tr class="pri"><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td class="no">1</td><td class="ans">③</td><td class="n">1.5</td><td class="un">I-02</td><td><span class="tag tag-new">계산</span>3.2 km = 3.2×10³ m(ㄱ 옳음), 33.5 ℃ ≈ 306.7 K라 ㄷ(240 K) 틀림 — 다시 셈</td><td class="n">1</td></tr><tr class="pri"><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td class="no">2</td><td class="ans">④</td><td class="n">2</td><td class="un">I-01 + I-03</td><td><span class="tag tag-new">계산</span>0.072 s × 3×10⁸ m/s = 2.16×10⁷ m → ㄱ(10⁶) 틀림, 10⁻⁶ s × 빛의 속력 = 300 m — 다시 셈. 신호 시간은 실제 GPS 범위(약 0.07 s)</td><td class="n">1</td></tr><tr class="pri"><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td class="no">3</td><td class="ans">②</td><td class="n">2.5</td><td class="un">I-04 + I-02</td><td><span class="tag tag-new">계산</span>1000표본 × 3비트 = 3000비트 = 375 B → ㄴ(3000 B) 틀림. 그림의 3 ms 값이 7에 가장 가까운지(→ 111) 눈금 확인</td><td class="n">2</td></tr><tr class="pri"><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td class="no">4</td><td class="ans">⑤</td><td class="n">2.5</td><td class="un">II-01 + II-02</td><td><span class="tag tag-new">실데이터</span>수소 선 410·434·486·656 nm(본책 값). Z의 선 3개가 별 P에서 모두 겹치는지 그림으로 확인</td><td class="n">2</td></tr><tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td class="no">5</td><td class="ans">①</td><td class="n">1.5</td><td class="un">II-02 + II-01</td><td>(다) 금 = "무거운 별이 폭발할 때"(시험 답). 본책 II-02 날개는 중성자별 충돌도 소개 — 충돌하지 않는지</td><td class="n">2</td></tr><tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td class="no">6</td><td class="ans">④</td><td class="n">2</td><td class="un">II-03</td><td>X(2,8,2)·Y(2,8,7) → XY₂라 ㄱ 틀림, H₂Z(물)에서 Z는 네온 배치</td><td class="n">2</td></tr><tr class="pri"><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td class="no">7</td><td class="ans">③</td><td class="n">2.5</td><td class="un">II-04 + III-06</td><td><span class="tag tag-new">계산</span>Ⅰ = T30·A40·C35·G45 → 이중 가닥 G+C 160, A+T 140(차 20) — 다시 셈</td><td class="n">3</td></tr><tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td class="no">8</td><td class="ans">②</td><td class="n">1.5</td><td class="un">II-05</td><td>해설 "MRI·일부 자기 부상 열차"가 II-05 고침(인천공항은 상전도)과 맞음. 반도체는 온도↑ 전도성↑</td><td class="n">3</td></tr><tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td class="no">9</td><td class="ans">①</td><td class="n">1.5</td><td class="un">III-01</td><td>ㄷ "태양 ≫ 지구 내부 &gt; 조력"이 2204 날개(99.97·0.03·0.002 %)와 맞음</td><td class="n">3</td></tr><tr class="pri"><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td class="no">10</td><td class="ans">④</td><td class="n">2</td><td class="un">III-02</td><td><span class="tag tag-new">계산</span>100 km = 10⁷ cm ÷ 200만 년 = 5 cm/년 — 다시 셈(예시 자료)</td><td class="n">3</td></tr><tr class="pri"><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td class="no">11</td><td class="ans">⑤</td><td class="n">2.5</td><td class="un">III-03</td><td><span class="tag tag-new">계산</span>19.6 m → 2 s, 4.9 m → 1 s, 수평 거리 20 m로 같음, 연직 속력 19.6 : 9.8 — 다시 셈</td><td class="n">4</td></tr><tr class="pri"><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td class="no">12</td><td class="ans">①</td><td class="n">2</td><td class="un">III-04</td><td><span class="tag tag-new">계산</span>(가) 2×(3+2) = 10 N·s, (나) 6 N·s, 평균 힘 100 N : 20 N = 5배 → ㄴ(4배) 틀림 — 다시 셈</td><td class="n">4</td></tr><tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td class="no">13</td><td class="ans">④</td><td class="n">2</td><td class="un">III-05 + II-04</td><td>온도(37 ℃)는 통제 변인이라 ㄱ 틀림, B가 대조군 — 탐구 설계 용어</td><td class="n">4</td></tr><tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td class="no">14</td><td class="ans">②</td><td class="n">1.5</td><td class="un">2101</td><td>겉씨식물 번성 = 중생대, 매머드 = 신생대, 중생대 말 대멸종</td><td class="n">4</td></tr><tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td class="no">15</td><td class="ans">③</td><td class="n">2</td><td class="un">2102</td><td>종 수 같고 고르게 분포한 (가)가 종 다양성 높음. 한 종 안의 꽃 색 차이 = 유전적 다양성</td><td class="n">5</td></tr><tr class="pri"><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td class="no">16</td><td class="ans">④</td><td class="n">2.5</td><td class="un">2103</td><td><span class="tag tag-new">계산</span>Y²⁺ 6N(전자 12N) ↔ X 4N → X³⁺, X 2N일 때 3N + 2N = 5N — 다시 셈</td><td class="n">5</td></tr><tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td class="no">17</td><td class="ans">⑤</td><td class="n">2</td><td class="un">2104</td><td>㉠ Cl⁻ 일정, ㉡ H⁺ 감소, ㉢ Na⁺ 증가, ㉣ OH⁻(20 mL 뒤) — 그래프 선 모양과 맞음</td><td class="n">5</td></tr><tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td class="no">18</td><td class="ans">③</td><td class="n">1.5</td><td class="un">2105 + III-05</td><td>질산 암모늄을 "변화(용해)"로 씀 — 2105 고침과 맞음. 온도는 예시 결과</td><td class="n">5</td></tr><tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td class="no">19</td><td class="ans">①</td><td class="n">1.5</td><td class="un">2202 + 2201</td><td>해달–성게–켈프 예시 자료. ㄴ은 생물 사이 관계라 틀림</td><td class="n">6</td></tr><tr class="pri"><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td class="no">20</td><td class="ans">⑤</td><td class="n">2.5</td><td class="un">2203 + 2103 + III-01</td><td><span class="tag tag-new">실데이터</span>NOAA 316.91·338.76·369.71·414.21 ppm, GISTEMP −0.02·0.26·0.39·1.01 ℃(2026-10-01 내려받음). ㄱ은 1.03 ℃로 1 ℃를 0.03 넘는 판정 — GISTEMP는 해마다 값이 조금씩 바뀌므로 출간 전 다시 대조</td><td class="n">6</td></tr><tr class="pri"><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td class="no">21</td><td class="ans">②</td><td class="n">2</td><td class="un">2204 + II-02</td><td><span class="tag tag-new">실데이터</span>NIST CODATA: 4.001506 ÷ (4 × 1.007276) = 0.99315 → 줄어든 질량 약 0.7 % → ㄱ(7 %) 틀림 — 다시 셈</td><td class="n">6</td></tr><tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td class="no">22</td><td class="ans">②</td><td class="n">1.5</td><td class="un">2205</td><td>들어갈 때·나올 때 전류 방향 반대, 나올 때 더 빠르므로 더 셈</td><td class="n">6</td></tr><tr class="pri"><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td class="no">23</td><td class="ans">①</td><td class="n">2.5</td><td class="un">2205 + 2204</td><td><span class="tag tag-new">계산</span>1000 × 0.4 × 0.9 × 0.4 = 144 J, 0.4 ÷ 0.05 = 8배 — 다시 셈. 본책 2205(181쪽)는 LED 약 33 %라 숫자가 다름</td><td class="n">7</td></tr><tr class="pri"><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td class="no">24</td><td class="ans">③</td><td class="n">2.5</td><td class="un">2301</td><td><span class="tag tag-new">계산</span><span class="tag tag-diff">의학</span>2³ = 8배, 2²⁴ ≈ 1678만 — 다시 셈. ㄴ "C에는 핵산이 없었다"는 매 주기 2배 모형 안에서만 참. 실제 검사는 "검출 한계 미만(음성)" — 의학 표현 판단</td><td class="n">7</td></tr><tr><td class="cbcell"><span class="cb" aria-hidden="true"></span></td><td class="no">25</td><td class="ans">⑤</td><td class="n">2</td><td class="un">2302 + 2303 + I-04</td><td>밸브가 7시·15시 30분 무렵 수분 30 %에서 열림 — 그래프 확인</td><td class="n">7</td></tr></tbody></table>
+  <div class="issues"><h3><span class="num">!</span>원장님 판단 필요</h3><ul>
+    <li><span class="cb" aria-hidden="true"></span><span>24번 ㄴ "핵산이 없었다고 볼 수 있다" — 모형(매 주기 2배)에서는 맞지만 실제 검사는 "검출 한계 미만(음성)". 표현을 그대로 둘지.</span></li>
+    <li><span class="cb" aria-hidden="true"></span><span>20번 ㄱ은 1 ℃를 0.03 ℃ 넘는 판정 — GISTEMP 개정에 흔들리지 않게 기준을 바꿀지.</span></li>
+    <li><span class="cb" aria-hidden="true"></span><span>23번 LED 효율 40 %(예시 자료)와 본책 2205(181쪽) 약 33 % — 맞출지. · 행동 영역 "문제 인식 및 가설 설정"은 이번 회에 없음.</span></li>
+  </ul></div>
+</section>
+</body></html>
