@@ -848,6 +848,13 @@ main > .answer + *, main > .sec + .care, main > .card + .care, main > .rx-card +
 .rf-hit .gl a:not(.call){display:inline-flex;align-items:center;gap:6px;min-height:44px;padding:0 14px;border-radius:10px;border:1px solid var(--hairline);background:var(--card);color:var(--body);font-weight:700;text-decoration:none;font-size:.875rem}
 .rf.hit .rf-hit{display:block} .rf.hit .rf-no{display:none}
 .rf-no{margin-top:4px;font-size:.8125rem;color:var(--muted)}
+.pshare h1{word-break:keep-all}
+.ps-note{margin-top:10px;font-size:1.125rem;line-height:1.6;color:var(--body)}
+.ps-list{display:flex;flex-direction:column;gap:10px}
+.ps-item{display:flex;align-items:center;gap:12px;padding:14px;border-radius:var(--r-card);border:1px solid var(--hairline);background:var(--card)}
+.ps-item b{display:block;font-size:1.25rem;line-height:1.4;word-break:keep-all}
+.ps-item span{display:block;margin-top:2px;font-size:.9375rem;color:var(--muted)}
+.ps-ask{margin-top:10px;font-size:1rem;color:var(--body)}
 .mo-grid{display:grid;grid-template-columns:1fr;gap:12px;margin-top:20px}
 @media (min-width:560px){.mo-grid{grid-template-columns:1fr 1fr}}
 .mo{padding:var(--s4);border-radius:var(--r-card);border:1px solid var(--hairline);background:var(--card)}
@@ -1881,7 +1888,7 @@ function route(){
   if (path !== LASTPATH) { SCROLL[LASTPATH] = window.scrollY; GQ = ''; LASTPATH = path; }
   const seg = path.split('/');
   const q = Object.fromEntries(new URLSearchParams(qs || ''));
-  const tab = { show:'home', check:'home', home:'home', symptom:'home', drugs:'drugs', drug:'drugs', class:'drugs', search:'drugs', pub:'drugs', pill:'drugs', guide:'home', kids:'home', tips:'home', myths:'home', schedule:'me', photo:'drugs', pillinfo:'drugs', supp:'supp', compare:'supp', me:'me', about:'me', ingr:'drugs', brand:'drugs', nut:'supp', hello:'home', mix:'drugs', together:'me', kinds:'me', rxout:'drugs', senior:'drugs', askdoc:'home' }[seg[0]] || 'home';
+  const tab = { send:'home', p:'home', show:'home', check:'home', home:'home', symptom:'home', drugs:'drugs', drug:'drugs', class:'drugs', search:'drugs', pub:'drugs', pill:'drugs', guide:'home', kids:'home', tips:'home', myths:'home', schedule:'me', photo:'drugs', pillinfo:'drugs', supp:'supp', compare:'supp', me:'me', about:'me', ingr:'drugs', brand:'drugs', nut:'supp', hello:'home', mix:'drugs', together:'me', kinds:'me', rxout:'drugs', senior:'drugs', askdoc:'home' }[seg[0]] || 'home';
   document.querySelectorAll('nav.tabbar button').forEach(b => b.classList.toggle('on', b.dataset.tab === tab));
   /* 본문 자료가 아직이면 — 첫 화면과 인사만 먼저 그리고, 나머지는 받은 뒤에 다시 그린다.
      기다리는 동안에도 상단 바와 뒤로 가기는 살아 있어야 한다. */
@@ -1894,7 +1901,7 @@ function route(){
     ensureCore().then(route);
     return;
   }
-  const R = { show:vShow, check:vCheck, home:vHome, symptom:vSymptom, drugs:vDrugs, drug:vDrug, class:vClass, search:vSearch, pub:vPub, pill:vPill, guide:vGuide, kids:vKids, tips:vTips, myths:vMyths, schedule:vSchedule, photo:vPhoto, pillinfo:vPillInfo, supp:vSupp, compare:vCompare, me:vMe, about:vAbout, ingr:vIngr, brand:vBrand, nut:vNut, hello:vHello, mix:vMix, together:vTogether, kinds:vKinds, bag:vBag, rxout:vRxOut, senior:vSenior, askdoc:vAskDoc, vitals:vVitals, visits:vVisits };
+  const R = { send:vSend, p:vParentShare, show:vShow, check:vCheck, home:vHome, symptom:vSymptom, drugs:vDrugs, drug:vDrug, class:vClass, search:vSearch, pub:vPub, pill:vPill, guide:vGuide, kids:vKids, tips:vTips, myths:vMyths, schedule:vSchedule, photo:vPhoto, pillinfo:vPillInfo, supp:vSupp, compare:vCompare, me:vMe, about:vAbout, ingr:vIngr, brand:vBrand, nut:vNut, hello:vHello, mix:vMix, together:vTogether, kinds:vKinds, bag:vBag, rxout:vRxOut, senior:vSenior, askdoc:vAskDoc, vitals:vVitals, visits:vVisits };
   const html = (R[seg[0]] || vHome)(seg[1], q);
   const panel = gqPanel();
   view.innerHTML = panel ? insertPanel(html, panel) : html;
@@ -4255,7 +4262,7 @@ function vGuide(step, q){
     <div class="eyebrow">약을 누르면 복용법이 나와요</div>
     <div class="buy">${planRows(s)}</div>
     ${kidLine()}
-    <div class="memo-actions"><button class="btn" onclick="shareMemo('${s.id}')">${I.cart} 약국에 보여줄 메모 만들기</button></div>
+    <div class="memo-actions"><button class="btn" onclick="shareMemo('${s.id}')">${I.cart} 약국에 보여줄 메모 만들기</button><button class="btn line" onclick="go('/send?s=${s.id}')">${I.family} 부모님께 보내기</button></div>
   </section>
   <section class="sec" id="care"><h2>어디까지 약국, 어디부터 병원인가요</h2>${careCards(s.care)}</section>
   <div class="actions"><button class="btn line" onclick="go('/symptom/${s.id}')">왜 이 조합인지 자세히 보기</button><button class="btn ghost" onclick="go('/guide/1')">다른 증상 고르기</button></div>
@@ -5252,6 +5259,81 @@ function photoResult(R){
 
 /* ───────── 약국에서 보여드리기 ───────── */
 /* 어르신이 카운터에서 화면째 내밀 수 있도록 큰 글씨로. 상품명이 주인공이고 성분은 근거로 붙는다. */
+/* ───────── 부모님께 약 보내기 (현욱님 2026-10-01, 설계: yakjido/설계-가족연결.md) ─────────
+   자녀가 고른 약을 부모님께 링크로 보낸다 → 부모님은 큰 글씨 화면을 약사님께 보여 드리고 근처 약국에서 산다.
+   서버(D.meta.share.fn)가 아직 없으면 같은 내용을 «글로» 보낸다. 서버로 가는 것은 이 목록 하나뿐(이름·전화·위치 없음, 7일 뒤 삭제). */
+const SHARE = () => D.meta?.share || {};
+function sendItems(q){
+  if (q?.s) { const sy = byId(D.symptoms, q.s); if (!sy) return [];
+    const all = basket(sy).filter(x => !x.blocked && x.d); const core = all.filter(x => !x.optional);   /* 부모님께는 «꼭 필요한 것»만 — 필요할 때만 쓰는 칸은 뺀다 */
+    return (core.length ? core : all).map(x => ({ id: x.d.id, name: x.d.name, product: x.product || '' })); }
+  if (q?.d) { const d = drug(q.d); return d ? [{ id: d.id, name: d.name, product: d.products?.[0]?.name || '' }] : []; }
+  return [];
+}
+function sendText(items, label, note, link){
+  const who = label ? label + ', ' : '';
+  return `[약지도] ${who}약국에서 이 약 좀 사 주세요\n${items.map(x => '· ' + (x.product ? x.product + ' (' + x.name + ')' : x.name)).join('\n')}${note ? '\n\n' + note : ''}\n\n약사님께 이 목록을 보여 주시고, 앓고 계신 병과 드시는 약을 꼭 말씀하세요.${link ? '\n' + link : '\n가까운 문 연 약국: ' + GO_LINK.open[0]}`;
+}
+let SEND_Q = null;
+function vSend(_, q){
+  SEND_Q = q; const items = sendItems(q); const srv = !!SHARE().fn;
+  const sy = q?.s ? byId(D.symptoms, q.s) : null;
+  return `${topBar({ back:'이전' })}<div class="eyebrow">${sy ? esc(sy.name) : '약 보내기'}</div><h1>부모님께 보내기</h1>
+  <p style="margin-top:6px">고른 약을 카카오톡·문자로 보내 드려요. 부모님은 받은 화면을 <b>약사님께 그대로 보여 주시면</b> 근처 약국에서 사실 수 있어요.</p>
+  ${items.length ? `<section class="sec card"><h2>보낼 약 <small>${items.length}가지</small></h2>${list(items.map(x => (x.product ? '**' + x.product + '** — ' : '') + x.name))}</section>` : `<section class="sec"><div class="empty">보낼 약이 없어요. 증상 화면에서 약을 고른 뒤 눌러 주세요.</div></section>`}
+  <section class="sec card"><h2>받는 분</h2>
+    <div class="chips" role="group" aria-label="받는 분 호칭">${['엄마', '아빠', '할머니', '할아버지'].map(t => `<button class="chip" onclick="document.getElementById('send-label').value='${t}'">${t}</button>`).join('')}</div>
+    <div class="ae-form" style="margin-top:10px"><label class="ae-lbl" for="send-label">호칭 <small>(선택)</small></label>
+    <input id="send-label" class="ae-inp" type="text" maxlength="20" placeholder="예: 엄마" autocomplete="off">
+    <label class="ae-lbl" for="send-note">한 줄 메모 <small>(선택)</small></label>
+    <input id="send-note" class="ae-inp" type="text" maxlength="100" placeholder="예: 기침이 심하시면 이걸로요" autocomplete="off"></div>
+    ${srv ? `<label class="rf-i" for="send-ok" style="margin-top:12px"><input type="checkbox" id="send-ok"><span><b>민감정보 처리에 동의해요(필수)</b> — 보낸 약 목록·호칭·메모를 링크로 열 수 있게 서버에 <b>7일 동안</b> 보관한 뒤 지워요. 이름·전화번호·위치는 받지 않아요. 만 14세 미만은 보호자와 함께 써 주세요. <a class="link" href="#/about">자세히</a></span></label>` : `<p class="small muted" style="margin-top:10px">지금은 <b>글로 보내요</b>(서버에 저장하지 않음). 사진이 담긴 링크 보내기는 준비 중이에요.</p>`}
+  </section>
+  ${items.length ? `<div class="actions"><button class="btn" onclick="doSend()">${I.family} 보내기</button></div>` : ''}
+  ${disclaimer()}`;
+}
+async function doSend(){
+  const items = sendItems(SEND_Q); if (!items.length) return;
+  const label = (document.getElementById('send-label')?.value || '').trim().slice(0, 20);
+  const note = (document.getElementById('send-note')?.value || '').trim().slice(0, 100);
+  const S = SHARE(); let link = '';
+  if (S.fn) {
+    if (!document.getElementById('send-ok')?.checked) { toast('동의에 체크해 주셔야 링크로 보낼 수 있어요'); return; }
+    try {
+      const r = await fetch(S.fn, { method:'POST', headers:{ 'Content-Type':'application/json' }, body: JSON.stringify({ action:'create', items, label, note, consent:true }) });
+      const j = await r.json(); if (!r.ok || !j.code) throw new Error(j.error || r.status);
+      link = (S.app || location.href.split('#')[0]) + '#/p/' + j.code;
+    } catch (e) { toast('링크를 만들지 못해 글로 보내요'); }
+  }
+  const t = sendText(items, label, note, link);
+  try { if (navigator.share) { await navigator.share({ title: '약지도 · 약 좀 사 주세요', text: t }); return; } } catch (e) { return; }
+  try { await navigator.clipboard.writeText(t); toast('복사했어요 — 카카오톡이나 문자에 붙여 넣으세요'); } catch (e) { prompt('아래 내용을 복사해 보내세요', t); }
+}
+/* 부모님 화면 — 큰 글씨, 약 사진, «약사님께 보여 주세요», 근처 약국 */
+const PSHARE = {};
+function vParentShare(code){
+  const S = SHARE(); const st = PSHARE[code];
+  if (!S.fn) return `${topBar({ back:'처음으로', nosearch:true })}<section class="sec"><div class="empty card"><b>이 링크를 열 수 없어요</b>앱의 보내기 서버가 아직 준비되지 않았어요.</div></section>`;
+  if (!st) { PSHARE[code] = { loading: true };
+    fetch(S.fn, { method:'POST', headers:{ 'Content-Type':'application/json' }, body: JSON.stringify({ action:'get', code }) })
+      .then(r => r.json().then(j => ({ ok: r.ok, status: r.status, j }))).then(({ ok, status, j }) => { PSHARE[code] = ok ? { data: j } : { err: status }; route(); })
+      .catch(() => { PSHARE[code] = { err: 0 }; route(); });
+    return `${topBar({ back:'처음으로', nosearch:true })}<section class="sec"><p class="loading">받은 약을 불러오는 중이에요…</p></section>`; }
+  if (st.loading) return `${topBar({ back:'처음으로', nosearch:true })}<section class="sec"><p class="loading">받은 약을 불러오는 중이에요…</p></section>`;
+  if (st.err) return `${topBar({ back:'처음으로', nosearch:true })}<section class="sec"><div class="empty card"><b>${st.err === 410 ? '기간이 지난 링크예요' : '받은 약을 불러오지 못했어요'}</b>${st.err === 410 ? '보낸 지 7일이 지나 지워졌어요. 다시 보내 달라고 해 주세요.' : '인터넷 연결을 확인하고 다시 열어 주세요.'}</div></section>`;
+  const x = st.data;
+  return `<div class="pshare">${topBar({ back:'처음으로', nosearch:true })}
+  <div class="eyebrow">${x.label ? esc(x.label) + '께 온 부탁' : '받은 약'}</div>
+  <h1 style="font-size:1.625rem">이 화면을 약사님께 보여 주세요</h1>
+  ${x.note ? `<p class="ps-note">“${esc(x.note)}”</p>` : ''}
+  <section class="sec"><div class="ps-list">${(x.items || []).map(it => { const d = drug(it.id); const nm = it.product || (d ? d.name : it.name);
+    return `<div class="ps-item">${prodArt(pimg(it.product || ''), nm)}<div><b>${esc(nm)}</b><span>${esc(it.product ? (d ? ingrName(d) : it.name) : '')}</span></div></div>`; }).join('')}</div>
+    <p class="ps-ask">같은 성분이면 다른 제품도 괜찮습니다.</p></section>
+  <div class="note" style="margin-top:12px">${I.alert}<span><b>약사님께 앓고 계신 병과 드시는 약을 꼭 말씀하세요.</b> 혈압약·당뇨약·피 묽게 하는 약을 드시면 특히요.</span></div>
+  <div class="actions"><a class="btn" href="${GO_LINK.open[0]}" target="_blank" rel="noopener">${I.pin || I.search} 가까운 문 연 약국 찾기</a>${x.bought_at ? `<span class="badge otc">샀어요 표시함</span>` : `<button class="btn line" onclick="psBought('${esc(code)}')">${I.check} 샀어요</button>`}</div>
+  ${disclaimer()}</div>`;
+}
+async function psBought(code){ try { await fetch(SHARE().fn, { method:'POST', headers:{ 'Content-Type':'application/json' }, body: JSON.stringify({ action:'bought', code }) }); if (PSHARE[code]?.data) PSHARE[code].data.bought_at = new Date().toISOString(); toast('보낸 분께 「샀어요」가 표시돼요'); route(); } catch (e) { toast('표시하지 못했어요'); } }
 function vShow(sid){
   const s = byId(D.symptoms, sid); if (!s) return vHome();
   const bk = basket(s); const f = activeFlags();
