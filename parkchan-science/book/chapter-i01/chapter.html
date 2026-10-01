@@ -229,6 +229,30 @@
   /* 화학식 첨자 — 본문 폰트를 그대로 축소해 자형이 어긋나지 않게 한다 */
   sub,sup{ font-size:0.68em; line-height:0; font-weight:inherit; }
   sub{ vertical-align:-0.14em; } sup{ vertical-align:0.34em; }
+
+/* ── 2026-10-02 보강: 중요 표시 · 채점 기준 · 꼼꼼 자료 분석 · 간격 두고 다시 꺼내기 ── */
+.must{ display:inline-block; font-size:7pt; font-weight:900; color:#fff; background:#D9534F; border-radius:1.6mm; padding:0.2mm 1.4mm; margin-right:1.2mm; vertical-align:1pt; }
+table.rubric{ border-collapse:collapse; width:100%; font-size:7.6pt; margin:1mm 0 0.5mm; }
+table.rubric th, table.rubric td{ border:0.25mm solid var(--line); padding:0.8mm 1.4mm; text-align:left; vertical-align:top; }
+table.rubric th{ background:#F4F1EA; font-weight:800; white-space:nowrap; }
+.analysis{ border:0.35mm dashed #C9A36A; border-radius:2.5mm; padding:1.6mm 2mm 1.2mm; margin:1.5mm 0; background:#FFFCF5; }
+.analysis .at{ font-size:7.6pt; font-weight:900; color:#9C6503; margin-bottom:0.8mm; }
+.analysis svg{ max-width:100%; height:auto; display:block; }
+.spaced{ border:0.4mm solid var(--line); border-radius:3mm; padding:3mm 4mm 2.6mm; margin:0 0 4mm; position:relative; background:#FAFBFC; }
+.spaced .st{ font-size:9.5pt; font-weight:900; color:var(--unit); margin-bottom:1.6mm; }
+.spaced ol{ margin:0; padding-left:5mm; font-size:8.8pt; line-height:1.75; }
+.spaced .when{ display:flex; gap:5mm; font-size:8pt; color:var(--sub); margin-top:1.8mm; }
+.spaced .ans{ position:absolute; right:4mm; bottom:2.4mm; transform:rotate(180deg); font-size:6.8pt; color:var(--sub); }
+/* 2단 문항 쪽 간격 · 발문 안 탐구 과정 상자 (합격본 chapter-08 에서) */
+.qg2 .q{ margin-bottom:6mm; }
+.qg2 > div > .q:last-child{ margin-bottom:0; }
+.qg2 .choices.inline{ gap:0 4mm; }
+.qg2 .choices{ margin-top:1.8mm; line-height:1.78; }
+.qg2 .bogi-box{ margin-top:2mm; padding:1.8mm 2.8mm; font-size:9pt; line-height:1.72; }
+.qg2 .bogi-box .bt{ margin-bottom:0.3mm; }
+.qg2 .q figure{ margin:1.6mm 0 0.6mm 8.4mm !important; }
+.exp{ border:0.35mm solid #B8C2CA; border-radius:1.6mm; background:#FAFBFC; padding:1.6mm 2.6mm; margin:1.4mm 0 1.6mm; font-size:8.9pt; line-height:1.7; }
+.exp b{ font-family:'PC Sans'; font-size:7.8pt; font-weight:900; color:var(--brand); }
 </style>
 </head>
 <body>
@@ -310,7 +334,7 @@
     <div class="main">
       <h3 class="sec"><span class="n">1</span>모든 사건에는 주소가 있다 — 시간과 공간</h3>
       <p class="body">"운동장에서 공이 날아갔다"는 말로는 과학이 시작되지 않는다. <b>언제</b>(오후 3시 12분), <b>어디서</b>(골대에서 20 m 지점), <b>얼마나</b>(초속 15 m로) — 이렇게 적는 순간 비로소 자연은 분석할 수 있는 대상이 된다. 자연에서 일어나는 모든 사건은 <span class="u-amber">시간과 공간이라는 두 축 위에서 기술된다</span>. 시간과 공간은 과학이 자연을 담는 좌표이자, 이 단원 전체의 출발점이다.</p>
-      <p class="body">그래서 과학의 역사는 곧 <b>측정의 역사</b>였다. 별의 위치를 재면서 달력이 나왔고, 진자의 흔들림을 재면서 정밀한 시계가 나왔다. 갈릴레이는 떨어지는 공의 <b>거리와 시간</b>을 재어 낙하 법칙을 찾았다 — III단원에서 배운 자유 낙하가 바로 그 유산이다. <span class="kw">측정</span> 없이는 법칙도, 예측도, 기술도 없다.</p>
+      <p class="body">그래서 과학의 역사는 곧 <b>측정의 역사</b>였다. 별의 위치를 재면서 달력이 나왔고, 진자의 흔들림을 재면서 정밀한 시계가 나왔다. 갈릴레이는 떨어지는 공의 <b>거리와 시간</b>을 재어 낙하 법칙을 찾았다 — III단원에서 배울 자유 낙하가 바로 그 유산이다. <span class="kw">측정</span> 없이는 법칙도, 예측도, 기술도 없다.</p>
 
       <figure>
         <svg width="470" height="148" viewBox="0 0 470 148" font-family="PC Sans">
@@ -345,7 +369,7 @@
 
       <div class="saem">
         <div class="avatar">박찬<br>쌤</div>
-        <div class="bubble"><span class="pen">"통합과학 첫 단추가 왜 '측정'인지 궁금했지? II·III단원의 스펙트럼도, 지진계도, F-t 그래프도 전부 측정 이야기였다 — 이 단원은 그 모든 것의 문법이다."</span></div>
+        <div class="bubble"><span class="pen">"통합과학 첫 단추가 왜 '측정'인지 궁금했지? II·III단원에서 만날 스펙트럼도, 지진계도, F-t 그래프도 전부 측정 이야기다 — 이 단원은 그 모든 것의 문법이다."</span></div>
       </div>
     </div>
 
@@ -373,7 +397,7 @@
   <div class="cols">
     <div class="main">
       <h3 class="sec"><span class="n">2</span>공간의 규모 — 원자에서 우주까지</h3>
-      <p class="body">자연의 크기는 상상을 뛰어넘게 다양하다. 원자는 약 10<sup>-10</sup> m, 그 속의 원자핵은 10<sup>-15</sup> m — 원자가 잠실야구장이라면 핵은 그 가운데 놓인 콩알이다. 반대쪽 끝, 관측 가능한 우주의 크기는 약 10<sup>26</sup> m에 이른다. 이렇게 넓은 범위를 다루기 위해 과학은 <span class="kw">10의 거듭제곱</span>으로 크기를 표기한다 — 0을 스물여섯 개 쓰는 대신 지수 하나로 끝내는 것이다.</p>
+      <p class="body">자연의 크기는 상상을 뛰어넘게 다양하다. 원자는 약 10<sup>−10</sup> m, 그 속의 원자핵은 10<sup>−15</sup> m — 원자가 잠실야구장이라면 핵은 그 가운데 놓인 콩알이다. 반대쪽 끝, 관측 가능한 우주의 크기는 약 10<sup>26</sup> m에 이른다. 이렇게 넓은 범위를 다루기 위해 과학은 <span class="kw">10의 거듭제곱</span>으로 크기를 표기한다 — 0을 스물여섯 개 쓰는 대신 지수 하나로 끝내는 것이다.</p>
       <p class="body">거듭제곱 표기의 진짜 힘은 <b>비교</b>에 있다. 사람(10<sup>0</sup> m ≈ 1 m)은 원자보다 10<sup>10</sup>배 크고, 지구(10<sup>7</sup> m)보다 10<sup>7</sup>배 작다 — 우리는 <span class="u-amber">미시 세계와 거시 세계의 중간쯤에 서서</span> 양쪽을 관측하는 존재다. 각 규모마다 그 세계를 보는 도구도 다르다. 원자는 전자 현미경으로, 세포는 광학 현미경으로, 별과 은하는 망원경으로 — 도구의 역사가 곧 인류가 볼 수 있는 공간의 확장사였다.</p>
 
       <figure>
@@ -442,7 +466,7 @@
 
       <div class="saem">
         <div class="avatar">박찬<br>쌤</div>
-        <div class="bubble"><span class="pen">"규모 감각이 안 잡히면 이 비유 하나 — 사과 속 원자 하나를 사과 크기로 키우면, 사과는 지구만 해진다. 10<sup>10</sup>배가 그 정도 차이다."</span></div>
+        <div class="bubble"><span class="pen">"규모 감각이 안 잡히면 이 비유 하나 — 사과 속 원자 하나를 사과 크기로 키우면, 사과는 지구만 해진다. 약 10<sup>9</sup>배가 그 정도 차이다."</span></div>
       </div>
     </div>
 
@@ -458,8 +482,8 @@
   <div class="quickcheck">
     <span class="qc-title">바로바로 체크</span>
     <ol>
-      <li><span class="no">1</span>원자의 크기는 대략 10<sup>−10</sup> m이다. ( O , X )</li>
-      <li><span class="no">2</span>10<sup>−</sup><sup>5</sup> m는 10<sup>−10</sup> m보다 작다. ( O , X )</li>
+      <li><span class="no">1</span><span>원자의 크기는 대략 10<sup>−10</sup> m이다. ( O , X )</span></li>
+      <li><span class="no">2</span><span>10<sup>−</sup><sup>5</sup> m는 10<sup>−10</sup> m보다 작다. ( O , X )</span></li>
       <li><span class="no">3</span>매우 크거나 작은 수는 10의 거듭제곱으로 나타내면 편리하다. ( O , X )</li>
     </ol>
     <div class="qc-ans">정답 1 O 2 X (지수가 크면 크다) 3 O</div>
@@ -473,8 +497,8 @@
   <div class="cols">
     <div class="main">
       <h3 class="sec"><span class="n">3</span>시간의 규모 — 찰나에서 138억 년까지</h3>
-      <p class="body">시간의 사다리도 공간 못지않게 아찔하다. 화학 결합이 만들어지고 끊어지는 데는 약 10<sup>-15</sup>초(펨토초) — 눈 깜박임(약 0.1초)조차 이 세계에서는 영겁이다. 심장은 약 1초에 한 번 뛰고, 지구는 약 3 × 10<sup>7</sup>초(1년)에 태양을 한 바퀴 돈다. 그리고 가장 긴 끝에는 <span class="u-amber">우주의 나이, 약 138억 년(10<sup>17</sup>초)</span>이 있다 — II단원에서 만난 빅뱅이 바로 그 출발점이었다.</p>
-      <p class="body">규모가 다르면 재는 방법도 다르다. 짧은 쪽 끝의 초고속 현상은 초정밀 레이저를 극히 짧게 쏘아 순간순간을 사진 찍듯 포착하고, 긴 쪽 끝의 지질시대와 우주의 역사는 <b>방사성 동위 원소의 붕괴</b>나 <b>별빛</b>처럼 자연이 남긴 시계를 읽어 알아낸다. 인간이 직접 체감하는 시간은 초에서 년 사이의 좁은 창문뿐이지만, 측정 기술은 그 창문을 양쪽으로 10<sup>17</sup>배씩 넓혀 놓았다.</p>
+      <p class="body">시간의 사다리도 공간 못지않게 아찔하다. 화학 결합이 만들어지고 끊어지는 데는 약 10<sup>−15</sup>초(펨토초) — 눈 깜박임(약 0.1초)조차 이 세계에서는 영겁이다. 심장은 약 1초에 한 번 뛰고, 지구는 약 3 × 10<sup>7</sup>초(1년)에 태양을 한 바퀴 돈다. 그리고 가장 긴 끝에는 <span class="u-amber">우주의 나이, 약 138억 년(10<sup>17</sup>초)</span>이 있다 — II단원에서 만날 빅뱅이 바로 그 출발점이다.</p>
+      <p class="body">규모가 다르면 재는 방법도 다르다. 짧은 쪽 끝의 초고속 현상은 초정밀 레이저를 극히 짧게 쏘아 순간순간을 사진 찍듯 포착하고, 긴 쪽 끝의 지질시대와 우주의 역사는 <b>방사성 동위 원소의 붕괴</b>나 <b>별빛</b>처럼 자연이 남긴 시계를 읽어 알아낸다. 인간이 직접 체감하는 시간은 초에서 년 사이의 좁은 창문뿐이지만, 측정 기술은 그 창문을 짧은 쪽으로 10<sup>15</sup>배, 긴 쪽으로 약 10<sup>10</sup>배나 넓혀 놓았다.</p>
 
       <figure>
         <svg width="470" height="188" viewBox="0 0 470 188" font-family="PC Sans">
@@ -682,7 +706,7 @@
 
     <div class="wing">
       <div class="wtitle">날개 노트</div>
-      <div class="term"><b>세슘(Cs)</b>주기율표 1족의 알칼리 금속 — II단원에서 본 그 가족이다. 원자시계의 심장.</div>
+      <div class="term"><b>세슘(Cs)</b>주기율표 1족의 알칼리 금속 — II단원에서 만날 그 가족이다. 원자시계의 심장.</div>
       <div class="term"><b>시간 오차와 위치 오차</b>빛은 100만분의 1초에 약 300 m를 간다 — GPS에 원자시계가 필요한 이유.</div>
       <div class="wsep"></div>
       <div class="wtitle">한눈에 암기</div>
@@ -767,117 +791,377 @@
 
   <div class="step-head s2"><span class="stepno">STEP 2</span><span class="steptt">내신 완성</span><span class="stepdesc">학교 시험 유형 그대로 — 서술형까지 한 번에</span></div>
 
-  <div class="q">
-    <div class="qhead"><span class="qno">7</span><div class="stem">다음 중 크기가 작은 것부터 순서대로 옳게 나열한 것은? <span class="difficulty">●●○</span>
-    <div class="tags">10통과1-01-01 | 개념 2</div></div></div>
-    <ul class="choices">
-      <li>① 원자 &lt; 원자핵 &lt; 세포 &lt; 지구</li>
-      <li>② 원자핵 &lt; 원자 &lt; 세포 &lt; 지구</li>
-      <li>③ 세포 &lt; 원자 &lt; 원자핵 &lt; 지구</li>
-      <li>④ 원자핵 &lt; 세포 &lt; 원자 &lt; 지구</li>
-      <li>⑤ 원자 &lt; 세포 &lt; 원자핵 &lt; 지구</li>
-    </ul>
-  </div>
+  <div class="qgrid qg2">
+    <div>
+      <div class="q">
+        <div class="qhead"><span class="qno">7</span><div class="stem">다음 중 사건을 '언제'와 '어디서'가 모두 수치로 드러나게 기술한 것은? <span class="difficulty">●○○</span>
+        <div class="tags">10통과1-01-01 | 개념 1</div></div></div>
+        <ul class="choices">
+          <li>① 운동장에서 공이 아주 빠르게 날아갔다.</li>
+          <li>② 오후 늦게 비가 많이 내렸다.</li>
+          <li>③ 오후 2시 정각에 공이 높이 날아올랐다.</li>
+          <li>④ 골대에서 10&nbsp;m 떨어진 곳에 공이 떨어졌다.</li>
+          <li>⑤ 오전 10시 정각, 출발선에서 50&nbsp;m 떨어진 지점을 자전거가 지나갔다.</li>
+        </ul>
+      </div>
 
-  <div class="q">
-    <div class="qhead"><span class="qno">8</span><div class="stem">길이와 시간의 현대적 측정에 대한 설명으로 옳은 것은? <span class="difficulty">●●●</span>
-    <div class="tags">10통과1-01-01 | 개념 4·5</div></div></div>
-    <ul class="choices">
-      <li>① 1 m는 지금도 백금 미터원기의 길이로 정의된다.</li>
-      <li>② 1초는 지구의 자전 주기를 쪼개 정의된다.</li>
-      <li>③ 빛의 속력은 장소에 따라 달라지므로 기준이 될 수 없다.</li>
-      <li>④ 1 m는 빛이 진공에서 일정 시간 동안 나아간 거리로 정의된다.</li>
-      <li>⑤ 원자시계는 하루에 1초씩 오차가 쌓인다.</li>
-    </ul>
+      <div class="q">
+        <div class="qhead"><span class="qno">8</span><div class="stem">다음 중 크기가 작은 것부터 순서대로 옳게 나열한 것은? <span class="difficulty">●○○</span>
+        <div class="tags">10통과1-01-01 | 개념 2</div></div></div>
+        <ul class="choices">
+          <li>① 원자 &lt; 원자핵 &lt; 세포 &lt; 지구</li>
+          <li>② 원자핵 &lt; 원자 &lt; 세포 &lt; 지구</li>
+          <li>③ 세포 &lt; 원자 &lt; 원자핵 &lt; 지구</li>
+          <li>④ 원자핵 &lt; 세포 &lt; 원자 &lt; 지구</li>
+          <li>⑤ 원자 &lt; 세포 &lt; 원자핵 &lt; 지구</li>
+        </ul>
+      </div>
+    </div>
+    <div>
+      <div class="q">
+        <div class="qhead"><span class="qno">9</span><div class="stem"><span class="must">중요</span><span class="badge-data">자료</span>표는 원자, 세포, 지구를 순서 없이 A~C로 나타내고 대략적인 크기를 적은 것이다. 옳은 것만을 &lt;보기&gt;에서 있는 대로 고른 것은? <span class="difficulty">●●○</span>
+        <div class="tags">10통과1-01-01 | 개념 2</div></div></div>
+        <figure style="margin:2mm 0 1mm 8.6mm;">
+          <svg width="250" height="78" viewBox="0 0 250 78" font-family="PC Sans">
+            <rect x="1" y="1" width="248" height="19" fill="#EAF6EC"/>
+            <rect x="1" y="1" width="248" height="76" fill="none" stroke="#B8C2CA" stroke-width="0.9"/>
+            <g stroke="#B8C2CA" stroke-width="0.8"><line x1="1" y1="20" x2="249" y2="20"/><line x1="1" y1="39" x2="249" y2="39"/><line x1="1" y1="58" x2="249" y2="58"/><line x1="90" y1="1" x2="90" y2="77"/></g>
+            <g font-size="8.8" font-weight="800" fill="#2E7A54" text-anchor="middle"><text x="45.5" y="14">대상</text><text x="169.5" y="14">대략적인 크기</text></g>
+            <g font-size="8.8" fill="#22303A" text-anchor="middle">
+              <text x="45.5" y="33" font-weight="800">A</text><text x="169.5" y="33">10<tspan dy="-3.2" font-size="6.2">−5</tspan><tspan dy="3.2"> m</tspan></text>
+              <text x="45.5" y="52" font-weight="800">B</text><text x="169.5" y="52">10<tspan dy="-3.2" font-size="6.2">7</tspan><tspan dy="3.2"> m</tspan></text>
+              <text x="45.5" y="71" font-weight="800">C</text><text x="169.5" y="71">10<tspan dy="-3.2" font-size="6.2">−10</tspan><tspan dy="3.2"> m</tspan></text>
+            </g>
+          </svg>
+        </figure>
+        <div class="bogi-box">
+          <div class="bt">보기</div>
+          ㄱ. C는 원자이다.<br>
+          ㄴ. A는 C보다 10<sup>5</sup>배 크다.<br>
+          ㄷ. B는 사람(약 10<sup>0</sup>&nbsp;m)보다 10<sup>7</sup>배 작다.
+        </div>
+        <ul class="choices inline">
+          <li>① ㄱ</li><li>② ㄷ</li><li>③ ㄱ, ㄴ</li><li>④ ㄴ, ㄷ</li><li>⑤ ㄱ, ㄴ, ㄷ</li>
+        </ul>
+      </div>
+
+      <div class="q">
+        <div class="qhead"><span class="qno">10</span><div class="stem">자연을 기술하고 비교하는 방법에 대한 설명으로 옳은 것만을 &lt;보기&gt;에서 있는 대로 고른 것은? <span class="difficulty">●●○</span>
+        <div class="tags">10통과1-01-01 | 개념 1·2</div></div></div>
+        <div class="bogi-box">
+          <div class="bt">보기</div>
+          ㄱ. "공이 날아갔다."만으로 운동을 분석할 수 있다.<br>
+          ㄴ. 10<sup>−2</sup>&nbsp;m는 10<sup>2</sup>&nbsp;m의 1/100이다.<br>
+          ㄷ. 10<sup>26</sup>은 1 뒤에 0을 26개 붙인 수이다.
+        </div>
+        <ul class="choices inline">
+          <li>① ㄱ</li><li>② ㄷ</li><li>③ ㄱ, ㄴ</li><li>④ ㄴ, ㄷ</li><li>⑤ ㄱ, ㄴ, ㄷ</li>
+        </ul>
+      </div>
+    </div>
   </div>
 
   <div class="folio"><span>I. 과학의 기초</span><span class="num">16</span></div>
 </div>
 
-<!-- ═════════════ p.17 STEP 2 계속 ═════════════ -->
+<!-- ═════════════ p.17 STEP 2 계속 (10~14) ═════════════ -->
 <div class="page">
   <div class="runhead"><span class="unit-tag">I. 과학의 기초</span><span class="lesson-tag">01. 자연을 재는 눈 | 문제</span></div>
 
-  <div class="q">
-    <div class="qhead"><span class="qno">9</span><div class="stem"><span class="badge-data">자료</span>달을 향해 쏜 레이저가 반사되어 돌아오는 데 2.56초가 걸렸다. 빛의 속력을 3 × 10<sup>8</sup> m/s라 할 때, 지구에서 달까지의 거리는? <span class="difficulty">●●●</span>
-    <div class="tags">10통과1-01-01 | 개념 4·자료</div></div></div>
-    <ul class="choices inline">
-      <li>① 1.92 × 10<sup>8</sup> m</li>
-      <li>② 2.56 × 10<sup>8</sup> m</li>
-      <li>③ 3.00 × 10<sup>8</sup> m</li>
-      <li>④ 7.68 × 10<sup>8</sup> m</li>
-      <li>⑤ 3.84 × 10<sup>8</sup> m</li>
-    </ul>
-  </div>
+  <div class="qgrid qg2">
+    <div>
+      <div class="q">
+        <div class="qhead"><span class="qno">11</span><div class="stem">시간의 규모와 그 측정에 대한 설명으로 옳은 것만을 &lt;보기&gt;에서 있는 대로 고른 것은? <span class="difficulty">●●○</span>
+        <div class="tags">10통과1-01-01 | 개념 3</div></div></div>
+        <div class="bogi-box">
+          <div class="bt">보기</div>
+          ㄱ. 화학 결합이 만들어지는 데 걸리는 시간은 눈 깜박임보다 길다.<br>
+          ㄴ. 암석의 나이는 방사성 동위 원소의 붕괴를 이용해 알아낸다.<br>
+          ㄷ. 우주의 나이는 약 138억 년으로, 1년의 약 10<sup>10</sup>배이다.
+        </div>
+        <ul class="choices inline">
+          <li>① ㄱ</li><li>② ㄷ</li><li>③ ㄱ, ㄴ</li><li>④ ㄴ, ㄷ</li><li>⑤ ㄱ, ㄴ, ㄷ</li>
+        </ul>
+      </div>
 
-  <div class="q">
-    <div class="qhead"><span class="qno">10</span><div class="stem">시간·공간의 측정에 대한 설명으로 옳은 것만을 고른 것은? <span class="difficulty">●●●</span>
-    <div class="tags">10통과1-01-01 | 개념 3·5</div></div></div>
-    <div class="bogi-box" style="background:#fff;">
-      (가) 암석의 나이는 방사성 동위 원소의 붕괴를 이용해 알아낸다.<br>
-      (나) GPS는 위성 신호의 도착 시간 차이로 위치를 계산한다.<br>
-      (다) 우주의 나이는 약 138만 년이다.
+      <div class="q">
+        <div class="qhead"><span class="qno">12</span><div class="stem"><span class="badge-data">자료</span>그림은 시간 규모의 사다리 위에 세 시간 A~C를 나타낸 것이다. A~C 규모의 현상을 재는 방법을 순서대로 옳게 짝지은 것은? <span class="difficulty">●●○</span>
+        <div class="tags">10통과1-01-01 | 개념 3</div></div></div>
+        <figure style="margin:2mm 0 1mm 8.6mm;">
+          <svg width="270" height="64" viewBox="0 0 270 64" font-family="PC Sans">
+            <line x1="14" y1="30" x2="262" y2="30" stroke="#3E9C6E" stroke-width="1.6" marker-end="url(#arrP)"/>
+            <g fill="#E8940A"><circle cx="36" cy="30" r="3.4"/><circle cx="129" cy="30" r="3.4"/><circle cx="234" cy="30" r="3.4"/></g>
+            <g font-size="8.4" font-weight="900" fill="#22303A" text-anchor="middle"><text x="36" y="19">A</text><text x="129" y="19">B</text><text x="234" y="19">C</text></g>
+            <g font-size="8" fill="#5B6B77" text-anchor="middle">
+              <text x="36" y="46">10<tspan dy="-3" font-size="5.8">−15</tspan><tspan dy="3"> s</tspan></text>
+              <text x="129" y="46">10<tspan dy="-3" font-size="5.8">0</tspan><tspan dy="3"> s</tspan></text>
+              <text x="234" y="46">10<tspan dy="-3" font-size="5.8">17</tspan><tspan dy="3"> s</tspan></text>
+            </g>
+            <g font-size="6.8" fill="#5B6B77"><text x="14" y="60">← 짧다</text><text x="262" y="60" text-anchor="end">길다 →</text></g>
+          </svg>
+        </figure>
+        <ul class="choices">
+          <li>① 초고속 레이저, 시계, 별빛</li>
+          <li>② 시계, 초고속 레이저, 별빛</li>
+          <li>③ 초고속 레이저, 별빛, 시계</li>
+          <li>④ 방사성 동위 원소, 시계, 초고속 레이저</li>
+          <li>⑤ 시계, 방사성 동위 원소, 초고속 레이저</li>
+        </ul>
+      </div>
+
+      <div class="q">
+        <div class="qhead"><span class="qno">13</span><div class="stem"><span class="must">중요</span><span class="badge-data">자료</span>달을 향해 쏜 레이저가 반사되어 돌아오는 데 2.56초가 걸렸다. 빛의 속력이 3&nbsp;×&nbsp;10<sup>8</sup>&nbsp;m/s일 때, 달까지의 거리는? <span class="difficulty">●●○</span>
+        <div class="tags">10통과1-01-01 | 개념 4, 자료 파헤치기</div></div></div>
+        <ul class="choices inline">
+          <li>① 1.92&nbsp;×&nbsp;10<sup>8</sup>&nbsp;m</li>
+          <li>② 2.56&nbsp;×&nbsp;10<sup>8</sup>&nbsp;m</li>
+          <li>③ 3.00&nbsp;×&nbsp;10<sup>8</sup>&nbsp;m</li>
+          <li>④ 7.68&nbsp;×&nbsp;10<sup>8</sup>&nbsp;m</li>
+          <li>⑤ 3.84&nbsp;×&nbsp;10<sup>8</sup>&nbsp;m</li>
+        </ul>
+      </div>
     </div>
-    <ul class="choices inline">
-      <li>① (가)</li><li>② (가), (나)</li><li>③ (나)</li><li>④ (나), (다)</li><li>⑤ (가), (나), (다)</li>
-    </ul>
-  </div>
+    <div>
+      <div class="q">
+        <div class="qhead"><span class="qno">14</span><div class="stem"><span class="badge-data">탐구</span>다음은 천둥소리로 번개까지의 거리를 알아보는 활동이다.
+          <div class="exp"><b>[과정]</b> (가) 번개가 보이는 순간 초시계를 누르고, 천둥소리가 들리는 순간 멈춘다.<br>(나) 같은 자리에서 세 사람이 같은 번개에 대해 (가)를 한다.<br><b>[결과]</b> 세 사람이 잰 시간은 4.9초, 5.0초, 5.1초였다.</div>
+          이에 대한 설명으로 옳은 것만을 &lt;보기&gt;에서 있는 대로 고른 것은? (단, 소리의 속력은 340&nbsp;m/s이고, 빛이 오는 데 걸리는 시간은 무시한다.) <span class="difficulty">●●○</span>
+        <div class="tags">10통과1-01-01 | 개념 4, 자료 파헤치기</div></div></div>
+        <div class="bogi-box">
+          <div class="bt">보기</div>
+          ㄱ. 번개가 친 곳까지의 거리는 약 1.7&nbsp;km이다.<br>
+          ㄴ. 레이저로 달까지의 거리를 잴 때처럼 잰 시간을 2로 나누어야 한다.<br>
+          ㄷ. 번개가 더 멀리서 치면 잰 시간은 짧아진다.
+        </div>
+        <ul class="choices inline">
+          <li>① ㄱ</li><li>② ㄷ</li><li>③ ㄱ, ㄴ</li><li>④ ㄴ, ㄷ</li><li>⑤ ㄱ, ㄴ, ㄷ</li>
+        </ul>
+      </div>
 
-  <div class="q">
-    <div class="qhead"><span class="qno">11</span><div class="stem"><span class="badge-essay">서술형</span>길이의 기준이 백금 막대(미터원기)에서 빛으로 바뀐 까닭을 <b>'변하지 않는다'</b>는 말을 포함하여 서술하시오. <span class="difficulty">●●●●</span>
-    <div class="tags">10통과1-01-01 | 개념 4</div></div></div>
-    <div class="essay-lines"><div></div><div></div><div></div></div>
+      <div class="q">
+        <div class="qhead"><span class="qno">15</span><div class="stem">길이와 시간의 현대적 측정에 대한 설명으로 옳은 것은? <span class="difficulty">●○○</span>
+        <div class="tags">10통과1-01-01 | 개념 4·5</div></div></div>
+        <ul class="choices">
+          <li>① 1 m는 지금도 백금 미터원기의 길이로 정의된다.</li>
+          <li>② 1초는 지구의 자전 주기를 쪼개 정의된다.</li>
+          <li>③ 빛의 속력은 장소에 따라 달라 기준이 될 수 없다.</li>
+          <li>④ 1 m는 빛이 진공에서 일정 시간 동안 간 거리이다.</li>
+          <li>⑤ 원자시계는 하루에 1초씩 오차가 쌓인다.</li>
+        </ul>
+      </div>
+    </div>
   </div>
 
   <div class="folio"><span>I. 과학의 기초</span><span class="num">17</span></div>
 </div>
 
-<!-- ═════════════ p.18 STEP 3 ═════════════ -->
+<!-- ═════════════ STEP 2 계속 (15~17) + 서술형 (18~20) ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag">I. 과학의 기초</span><span class="lesson-tag">01. 자연을 재는 눈 | 문제</span></div>
+
+  <div class="qgrid qg2">
+    <div>
+      <div class="q">
+        <div class="qhead"><span class="qno">16</span><div class="stem"><span class="must">중요</span><span class="badge-data">자료</span>그림은 GPS 수신기가 위성 A~C의 신호를 받는 모습을 나타낸 것이다. 위성 A가 보낸 신호가 수신기에 도달하는 데 걸린 시간은 0.07초였다. 옳은 것만을 &lt;보기&gt;에서 있는 대로 고른 것은? (단, 빛의 속력은 3&nbsp;×&nbsp;10<sup>8</sup>&nbsp;m/s이다.) <span class="difficulty">●●○</span>
+        <div class="tags">10통과1-01-01 | 개념 5</div></div></div>
+        <figure style="margin:2mm 0 1mm 8.6mm;">
+          <svg width="250" height="100" viewBox="0 0 250 100" font-family="PC Sans">
+            <path d="M6,96 Q125,72 244,96" fill="#EAF6EC" stroke="#8CCBA8" stroke-width="1"/>
+            <g stroke="#9AA7B1" stroke-width="1" stroke-dasharray="3 2">
+              <line x1="44" y1="22" x2="122" y2="78"/><line x1="125" y1="16" x2="125" y2="77"/><line x1="206" y1="24" x2="128" y2="78"/>
+            </g>
+            <g fill="#3E9C6E">
+              <rect x="36" y="14" width="16" height="9" rx="2"/><rect x="117" y="8" width="16" height="9" rx="2"/><rect x="198" y="16" width="16" height="9" rx="2"/>
+            </g>
+            <g stroke="#3E9C6E" stroke-width="1.4">
+              <line x1="28" y1="18.5" x2="36" y2="18.5"/><line x1="52" y1="18.5" x2="60" y2="18.5"/>
+              <line x1="109" y1="12.5" x2="117" y2="12.5"/><line x1="133" y1="12.5" x2="141" y2="12.5"/>
+              <line x1="190" y1="20.5" x2="198" y2="20.5"/><line x1="214" y1="20.5" x2="222" y2="20.5"/>
+            </g>
+            <g font-size="8" font-weight="900" fill="#22303A"><text x="18" y="12">A</text><text x="146" y="10">B</text><text x="226" y="14">C</text></g>
+            <text x="58" y="56" font-size="7.4" font-weight="800" fill="#D6455D">0.07초</text>
+            <circle cx="125" cy="81" r="5" fill="#F6C98E" stroke="#E8940A" stroke-width="1.2"/>
+            <text x="137" y="88" font-size="7.2" font-weight="800" fill="#B4560E">수신기</text>
+          </svg>
+        </figure>
+        <div class="bogi-box">
+          <div class="bt">보기</div>
+          ㄱ. 위성 A에서 수신기까지의 거리는 2.1&nbsp;×&nbsp;10<sup>6</sup>&nbsp;m이다.<br>
+          ㄴ. 수신기가 시간을 100만분의 1초 잘못 재면 거리는 약 300&nbsp;m 틀어진다.<br>
+          ㄷ. 위성에 원자시계를 싣는 것은 시간을 정확히 재야 위치를 정확히 구할 수 있기 때문이다.
+        </div>
+        <ul class="choices inline">
+          <li>① ㄱ</li><li>② ㄷ</li><li>③ ㄱ, ㄴ</li><li>④ ㄴ, ㄷ</li><li>⑤ ㄱ, ㄴ, ㄷ</li>
+        </ul>
+      </div>
+
+      <div class="q">
+        <div class="qhead"><span class="qno">17</span><div class="stem">다음은 길이와 시간의 기준에 대해 학생 A, B, C가 나눈 대화이다. 옳게 말한 학생만을 있는 대로 고른 것은? <span class="difficulty">●●○</span>
+        <div class="tags">10통과1-01-01 | 개념 4·5</div></div></div>
+        <div class="bogi-box">
+          <b>학생 A</b> : 지구의 자전은 조금도 흔들리지 않으니까 지금도 1초의 기준으로 쓰여.<br>
+          <b>학생 B</b> : 1 m를 정의하는 데에는 시간의 단위가 전혀 필요 없어.<br>
+          <b>학생 C</b> : 1초는 세슘 원자가 내는 빛이 9&nbsp;192&nbsp;631&nbsp;770번 진동하는 데 걸리는 시간이야.
+        </div>
+        <ul class="choices inline">
+          <li>① A</li><li>② C</li><li>③ A, B</li><li>④ B, C</li><li>⑤ A, B, C</li>
+        </ul>
+      </div>
+
+    </div>
+    <div>
+      <div class="q">
+        <div class="qhead"><span class="qno">18</span><div class="stem"><span class="badge-essay">서술형</span>길이의 기준이 백금 막대(미터원기)에서 빛으로 바뀐 까닭을 <b>'미터원기'</b>, <b>'빛의 속력'</b>, <b>'변하지 않는다'</b>를 모두 포함하여 서술하시오. <span class="difficulty">●●○</span>
+        <div class="tags">10통과1-01-01 | 개념 4</div></div></div>
+        <div class="essay-lines"><div></div><div></div><div></div><div></div><div></div><div></div></div>
+      </div>
+
+      <div class="q">
+        <div class="qhead"><span class="qno">19</span><div class="stem"><span class="must">중요</span><span class="badge-essay">서술형</span>GPS 위성에 원자시계를 싣는 까닭을 <b>'빛의 속력'</b>, <b>'거리'</b>, <b>'시간 오차'</b>를 모두 포함하여 서술하시오. <span class="difficulty">●●●</span>
+        <div class="tags">10통과1-01-01 | 개념 5</div></div></div>
+        <div class="essay-lines"><div></div><div></div><div></div><div></div><div></div><div></div></div>
+      </div>
+
+      <div class="q">
+        <div class="qhead"><span class="qno">20</span><div class="stem"><span class="badge-essay">서술형</span>암석의 나이를 시계나 달력으로 직접 잴 수 없는 까닭과, 대신 암석의 나이를 알아내는 방법을 <b>'방사성 동위 원소'</b>, <b>'일정한 빠르기'</b>를 모두 포함하여 서술하시오. <span class="difficulty">●●○</span>
+        <div class="tags">10통과1-01-01 | 개념 3</div></div></div>
+        <div class="essay-lines"><div></div><div></div><div></div><div></div><div></div><div></div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="folio"><span>I. 과학의 기초</span><span class="num">?</span></div>
+</div>
+
+<!-- ═════════════ p.18 STEP 3 (21~24) ═════════════ -->
 <div class="page">
   <div class="runhead"><span class="unit-tag">I. 과학의 기초</span><span class="lesson-tag">01. 자연을 재는 눈 | 문제</span></div>
   <div class="step-head s3"><span class="stepno">STEP 3</span><span class="steptt">수능 도전</span><span class="stepdesc">2028 수능 규격 — ㄱㄴㄷ 합답형·자료 해석</span></div>
 
-  <div class="q">
-    <div class="qhead"><span class="qno">12</span><div class="stem"><span class="badge-data">자료</span>그림은 자연의 여러 대상을 공간 규모의 사다리 위에 나타낸 것이다. 옳은 것만을 &lt;보기&gt;에서 있는 대로 고른 것은? <span class="difficulty">[2점]</span>
-    <div class="tags">10통과1-01-01</div></div></div>
-    <figure style="margin:2mm 0 1mm 8.6mm;">
-      <svg width="300" height="64" viewBox="0 0 300 64" font-family="PC Sans">
-        <line x1="16" y1="34" x2="290" y2="34" stroke="#3E9C6E" stroke-width="1.6" marker-end="url(#arrP)"/>
-        <g font-size="6.6" text-anchor="middle" font-weight="800">
-          <circle cx="46" cy="34" r="3" fill="#D6455D"/><text x="46" y="18">원자핵</text><text x="46" y="52" fill="#5B6B77">10<tspan dy="-0.34em" font-size="68%">−1</tspan><tspan dy="0.34em"><tspan dy="-0.34em" font-size="68%">5</tspan><tspan dy="0.34em"> m</tspan></tspan></text>
-          <circle cx="110" cy="34" r="3" fill="#3E9C6E"/><text x="110" y="18">원자</text><text x="110" y="52" fill="#5B6B77">10<tspan dy="-0.34em" font-size="68%">−10</tspan><tspan dy="0.34em"> m</tspan></text>
-          <circle cx="174" cy="34" r="3" fill="#E8940A"/><text x="174" y="18">사람</text><text x="174" y="52" fill="#5B6B77">10<tspan dy="-0.34em" font-size="68%">0</tspan><tspan dy="0.34em"> m</tspan></text>
-          <circle cx="238" cy="34" r="3" fill="#4A8FD0"/><text x="238" y="18">지구</text><text x="238" y="52" fill="#5B6B77">10<tspan dy="-0.34em" font-size="68%">7</tspan><tspan dy="0.34em"> m</tspan></text>
-        </g>
-      </svg>
-    </figure>
-    <div class="bogi-box">
-      <div class="bt">보기</div>
-      ㄱ. 원자는 원자핵보다 10<sup>5</sup>배 크다.<br>
-      ㄴ. 사람의 크기는 원자와 지구의 크기 사이에 있다.<br>
-      ㄷ. 지수가 작을수록 더 큰 대상이다.
-    </div>
-    <ul class="choices inline">
-      <li>① ㄱ</li><li>② ㄷ</li><li>③ ㄱ, ㄴ</li><li>④ ㄴ, ㄷ</li><li>⑤ ㄱ, ㄴ, ㄷ</li>
-    </ul>
-  </div>
+  <div class="qgrid qg2">
+    <div>
+      <div class="q">
+        <div class="qhead"><span class="qno">21</span><div class="stem"><span class="badge-data">자료</span>그림은 자연의 여러 대상을 공간 규모의 사다리 위에 나타낸 것이다. 옳은 것만을 &lt;보기&gt;에서 있는 대로 고른 것은? <span class="difficulty">●●○ [2점]</span>
+        <div class="tags">10통과1-01-01 | 개념 2</div></div></div>
+        <figure style="margin:2mm 0 1mm 8.6mm;">
+          <svg width="290" height="64" viewBox="0 0 300 64" font-family="PC Sans">
+            <line x1="16" y1="34" x2="290" y2="34" stroke="#3E9C6E" stroke-width="1.6" marker-end="url(#arrP)"/>
+            <g font-size="6.6" text-anchor="middle" font-weight="800">
+              <circle cx="46" cy="34" r="3" fill="#D6455D"/><text x="46" y="18">원자핵</text><text x="46" y="52" fill="#5B6B77">10<tspan dy="-0.34em" font-size="68%">−1</tspan><tspan dy="0.34em"><tspan dy="-0.34em" font-size="68%">5</tspan><tspan dy="0.34em"> m</tspan></tspan></text>
+              <circle cx="110" cy="34" r="3" fill="#3E9C6E"/><text x="110" y="18">원자</text><text x="110" y="52" fill="#5B6B77">10<tspan dy="-0.34em" font-size="68%">−10</tspan><tspan dy="0.34em"> m</tspan></text>
+              <circle cx="174" cy="34" r="3" fill="#E8940A"/><text x="174" y="18">사람</text><text x="174" y="52" fill="#5B6B77">10<tspan dy="-0.34em" font-size="68%">0</tspan><tspan dy="0.34em"> m</tspan></text>
+              <circle cx="238" cy="34" r="3" fill="#4A8FD0"/><text x="238" y="18">지구</text><text x="238" y="52" fill="#5B6B77">10<tspan dy="-0.34em" font-size="68%">7</tspan><tspan dy="0.34em"> m</tspan></text>
+            </g>
+          </svg>
+        </figure>
+        <div class="bogi-box">
+          <div class="bt">보기</div>
+          ㄱ. 원자는 원자핵보다 10<sup>5</sup>배 크다.<br>
+          ㄴ. 사람의 크기는 원자와 지구의 크기 사이에 있다.<br>
+          ㄷ. 지수가 작을수록 더 큰 대상이다.
+        </div>
+        <ul class="choices inline">
+          <li>① ㄱ</li><li>② ㄷ</li><li>③ ㄱ, ㄴ</li><li>④ ㄴ, ㄷ</li><li>⑤ ㄱ, ㄴ, ㄷ</li>
+        </ul>
+      </div>
 
-  <div class="q">
-    <div class="qhead"><span class="qno">13</span><div class="stem"><span class="badge-data">자료</span>표는 길이와 시간의 기준이 변해 온 과정을 나타낸 것이다. 옳은 것만을 &lt;보기&gt;에서 있는 대로 고른 것은? <span class="difficulty">[2.5점]</span>
-    <div class="tags">10통과1-01-01</div></div></div>
-    <div class="bogi-box" style="background:#fff; margin-bottom:2mm;">
-      길이: 몸(뼘·발) → 백금 미터원기 → <b>빛이 진공에서 나아간 거리</b><br>
-      시간: 지구의 자전 → <b>세슘 원자의 진동</b>
+      <div class="q">
+        <div class="qhead"><span class="qno">22</span><div class="stem"><span class="badge-data">자료</span>그림은 라이다가 레이저를 쏘아 물체까지의 거리를 잴 때, 왕복 시간과 거리의 관계를 나타낸 것이다. 옳은 것만을 &lt;보기&gt;에서 있는 대로 고른 것은? <span class="difficulty">●●● [2점]</span>
+        <div class="tags">10통과1-01-01 | 개념 4</div></div></div>
+        <figure style="margin:2mm 0 1mm 8.6mm;">
+          <svg width="236" height="132" viewBox="0 0 260 146" font-family="PC Sans">
+            <g stroke="#E3E8EC" stroke-width="0.8">
+              <line x1="92" y1="28" x2="92" y2="118"/><line x1="140" y1="28" x2="140" y2="118"/><line x1="188" y1="28" x2="188" y2="118"/><line x1="236" y1="28" x2="236" y2="118"/>
+              <line x1="44" y1="95.5" x2="236" y2="95.5"/><line x1="44" y1="73" x2="236" y2="73"/><line x1="44" y1="50.5" x2="236" y2="50.5"/><line x1="44" y1="28" x2="236" y2="28"/>
+            </g>
+            <line x1="44" y1="118" x2="250" y2="118" stroke="#5B6B77" stroke-width="1.2" marker-end="url(#arrP)"/>
+            <line x1="44" y1="118" x2="44" y2="14" stroke="#5B6B77" stroke-width="1.2" marker-end="url(#arrP)"/>
+            <line x1="44" y1="118" x2="236" y2="28" stroke="#D6455D" stroke-width="1.8"/>
+            <g font-size="7.4" fill="#5B6B77" text-anchor="middle"><text x="44" y="129">0</text><text x="92" y="129">1</text><text x="140" y="129">2</text><text x="188" y="129">3</text><text x="236" y="129">4</text></g>
+            <g font-size="7.4" fill="#5B6B77" text-anchor="end"><text x="39" y="98">15</text><text x="39" y="75.5">30</text><text x="39" y="53">45</text><text x="39" y="30.5">60</text></g>
+            <text x="50" y="14" font-size="7.4" font-weight="800" fill="#22303A">거리(m)</text>
+            <text x="252" y="142" font-size="7.4" font-weight="800" fill="#22303A" text-anchor="end">왕복 시간(×10<tspan dy="-2.8" font-size="5.4">−7</tspan><tspan dy="2.8"> s)</tspan></text>
+          </svg>
+        </figure>
+        <div class="bogi-box">
+          <div class="bt">보기</div>
+          ㄱ. 왕복 시간이 2&nbsp;×&nbsp;10<sup>−7</sup>&nbsp;s이면 거리는 30&nbsp;m이다.<br>
+          ㄴ. 그래프의 기울기는 빛의 속력과 같다.<br>
+          ㄷ. 거리가 2배가 되면 왕복 시간은 1/2배가 된다.
+        </div>
+        <ul class="choices inline">
+          <li>① ㄱ</li><li>② ㄷ</li><li>③ ㄱ, ㄴ</li><li>④ ㄴ, ㄷ</li><li>⑤ ㄱ, ㄴ, ㄷ</li>
+        </ul>
+      </div>
     </div>
-    <div class="bogi-box">
-      <div class="bt">보기</div>
-      ㄱ. 기준은 점점 '변하지 않는 자연 현상' 쪽으로 옮겨 왔다.<br>
-      ㄴ. 미터원기는 닳거나 변형될 수 있다는 한계가 있었다.<br>
-      ㄷ. 세슘 원자의 진동수는 시계마다 달라서 표준이 될 수 없다.
+    <div>
+      <div class="q">
+        <div class="qhead"><span class="qno">23</span><div class="stem"><span class="badge-data">자료</span>표는 길이와 시간의 기준이 변해 온 과정을 나타낸 것이다. 옳은 것만을 &lt;보기&gt;에서 있는 대로 고른 것은? <span class="difficulty">●●○ [2.5점]</span>
+        <div class="tags">10통과1-01-01 | 개념 4·5</div></div></div>
+        <figure style="margin:2mm 0 1mm 8.6mm;">
+          <svg width="290" height="60" viewBox="0 0 290 60" font-family="PC Sans">
+            <rect x="1" y="1" width="288" height="19" fill="#EAF6EC"/>
+            <rect x="1" y="1" width="288" height="58" fill="none" stroke="#B8C2CA" stroke-width="0.9"/>
+            <g stroke="#B8C2CA" stroke-width="0.8"><line x1="1" y1="20" x2="289" y2="20"/><line x1="1" y1="40" x2="289" y2="40"/><line x1="40" y1="1" x2="40" y2="59"/></g>
+            <g font-size="7.6" font-weight="800" fill="#2E7A54" text-anchor="middle"><text x="20.5" y="14">구분</text><text x="164.5" y="14">기준의 변화</text></g>
+            <g font-size="7.6" fill="#22303A">
+              <text x="20.5" y="33.5" text-anchor="middle" font-weight="800">길이</text><text x="48" y="33.5">몸(뼘·발) → 백금 미터원기 → <tspan font-weight="800">빛이 진공에서 나아간 거리</tspan></text>
+              <text x="20.5" y="53.5" text-anchor="middle" font-weight="800">시간</text><text x="48" y="53.5">지구의 자전 → <tspan font-weight="800">세슘 원자의 진동</tspan></text>
+            </g>
+          </svg>
+        </figure>
+        <div class="bogi-box">
+          <div class="bt">보기</div>
+          ㄱ. 기준은 변하지 않는 자연 현상으로 바뀌었다.<br>
+          ㄴ. 미터원기는 닳거나 변형될 수 있었다.<br>
+          ㄷ. 세슘 원자의 진동수는 시계마다 다르다.
+        </div>
+        <ul class="choices inline">
+          <li>① ㄱ</li><li>② ㄷ</li><li>③ ㄱ, ㄴ</li><li>④ ㄴ, ㄷ</li><li>⑤ ㄱ, ㄴ, ㄷ</li>
+        </ul>
+      </div>
+
+      <div class="q">
+        <div class="qhead"><span class="qno">24</span><div class="stem"><span class="badge-data">자료</span>표 (가)는 자연의 여러 대상의 크기를, (나)는 여러 현상의 시간 규모를 나타낸 것이다. 옳은 것만을 &lt;보기&gt;에서 있는 대로 고른 것은? (단, 빛의 속력은 3&nbsp;×&nbsp;10<sup>8</sup>&nbsp;m/s이다.) <span class="difficulty">●●● [2.5점]</span>
+        <div class="tags">10통과1-01-01 | 개념 2·3 (개념 4 연계)</div></div></div>
+        <figure style="margin:2mm 0 1mm 8.6mm;">
+          <svg width="290" height="106" viewBox="0 0 290 106" font-family="PC Sans">
+            <text x="1" y="8" font-size="7.6" font-weight="900" fill="#22303A">(가)</text>
+            <rect x="1" y="12" width="128" height="16" fill="#EAF6EC"/>
+            <rect x="1" y="12" width="128" height="91" fill="none" stroke="#B8C2CA" stroke-width="0.9"/>
+            <g stroke="#B8C2CA" stroke-width="0.8"><line x1="1" y1="28" x2="129" y2="28"/><line x1="1" y1="43" x2="129" y2="43"/><line x1="1" y1="58" x2="129" y2="58"/><line x1="1" y1="73" x2="129" y2="73"/><line x1="1" y1="88" x2="129" y2="88"/><line x1="62" y1="12" x2="62" y2="103"/></g>
+            <g font-size="7.4" font-weight="800" fill="#2E7A54" text-anchor="middle"><text x="31.5" y="23">대상</text><text x="95.5" y="23">크기(m)</text></g>
+            <g font-size="7.4" fill="#22303A" text-anchor="middle">
+              <text x="31.5" y="38.5">원자핵</text><text x="95.5" y="38.5">10<tspan dy="-2.8" font-size="5.4">−15</tspan></text>
+              <text x="31.5" y="53.5">원자</text><text x="95.5" y="53.5">10<tspan dy="-2.8" font-size="5.4">−10</tspan></text>
+              <text x="31.5" y="68.5">지구</text><text x="95.5" y="68.5">10<tspan dy="-2.8" font-size="5.4">7</tspan></text>
+              <text x="31.5" y="83.5">태양계</text><text x="95.5" y="83.5">10<tspan dy="-2.8" font-size="5.4">13</tspan></text>
+              <text x="31.5" y="98.5">우주</text><text x="95.5" y="98.5">10<tspan dy="-2.8" font-size="5.4">26</tspan></text>
+            </g>
+            <text x="141" y="8" font-size="7.6" font-weight="900" fill="#22303A">(나)</text>
+            <rect x="141" y="12" width="148" height="16" fill="#EAF6EC"/>
+            <rect x="141" y="12" width="148" height="76" fill="none" stroke="#B8C2CA" stroke-width="0.9"/>
+            <g stroke="#B8C2CA" stroke-width="0.8"><line x1="141" y1="28" x2="289" y2="28"/><line x1="141" y1="43" x2="289" y2="43"/><line x1="141" y1="58" x2="289" y2="58"/><line x1="141" y1="73" x2="289" y2="73"/><line x1="226" y1="12" x2="226" y2="88"/></g>
+            <g font-size="7.4" font-weight="800" fill="#2E7A54" text-anchor="middle"><text x="183.5" y="23">현상</text><text x="257.5" y="23">시간(s)</text></g>
+            <g font-size="7.4" fill="#22303A" text-anchor="middle">
+              <text x="183.5" y="38.5">화학 결합의 생성</text><text x="257.5" y="38.5">10<tspan dy="-2.8" font-size="5.4">−15</tspan></text>
+              <text x="183.5" y="53.5">눈 깜박임</text><text x="257.5" y="53.5">10<tspan dy="-2.8" font-size="5.4">−1</tspan></text>
+              <text x="183.5" y="68.5">1년(지구 공전)</text><text x="257.5" y="68.5">3 × 10<tspan dy="-2.8" font-size="5.4">7</tspan></text>
+              <text x="183.5" y="83.5">우주의 나이</text><text x="257.5" y="83.5">10<tspan dy="-2.8" font-size="5.4">17</tspan></text>
+            </g>
+          </svg>
+        </figure>
+        <div class="bogi-box">
+          <div class="bt">보기</div>
+          ㄱ. (가)에서 가장 큰 대상은 가장 작은 대상보다 10<sup>41</sup>배 크다.<br>
+          ㄴ. 빛이 화학 결합의 생성 시간 동안 나아가는 거리는 원자의 크기보다 크다.<br>
+          ㄷ. 빛이 1년 동안 나아가는 거리는 태양계의 크기보다 크다.
+        </div>
+        <ul class="choices inline">
+          <li>① ㄱ</li><li>② ㄷ</li><li>③ ㄱ, ㄴ</li><li>④ ㄴ, ㄷ</li><li>⑤ ㄱ, ㄴ, ㄷ</li>
+        </ul>
+      </div>
     </div>
-    <ul class="choices inline">
-      <li>① ㄱ</li><li>② ㄷ</li><li>③ ㄴ, ㄷ</li><li>④ ㄱ, ㄴ</li><li>⑤ ㄱ, ㄴ, ㄷ</li>
-    </ul>
   </div>
 
   <div class="folio"><span>I. 과학의 기초</span><span class="num">18</span></div>
@@ -886,11 +1170,13 @@
 <!-- ═════════════ p.19 해설 1 ═════════════ -->
 <div class="page">
   <div class="runhead"><span class="unit-tag" style="color:var(--brand);">알짜 해설</span><span class="lesson-tag">01. 자연을 재는 눈 — 시간과 공간</span></div>
-  <div class="sol-head"><span class="stt">알짜 해설</span><span class="sub">전 문항 해설 + 오답 선지 분석 — 맞힌 문제도 해설로 한 번 더!</span></div>
+  <div class="sol-head"><span class="stt">알짜 해설</span><span class="sub">전 문항 해설 + 바로알기(틀린 선지를 옳게 고친 문장) — 맞힌 문제도 해설로 한 번 더!</span></div>
 
   <table class="anstable">
-    <tr><th>문항</th><td>1</td><td>2</td><td>3</td><td>4</td><td>5</td><td>6</td><td>7</td><td>8</td><td>9</td><td>10</td><td>11</td><td>12</td><td>13</td></tr>
-    <tr><th>정답</th><td class="a">O</td><td class="a">X</td><td class="a">O</td><td class="a">빛</td><td class="a">거듭제곱</td><td class="a">2</td><td class="a">②</td><td class="a">④</td><td class="a">⑤</td><td class="a">②</td><td class="a">서술형</td><td class="a">③</td><td class="a">④</td></tr>
+    <tr><th>문항</th><td>1</td><td>2</td><td>3</td><td>4</td><td>5</td><td>6</td><td>7</td><td>8</td><td>9</td><td>10</td><td>11</td><td>12</td></tr>
+    <tr><th>정답</th><td class="a">O</td><td class="a">X</td><td class="a">O</td><td class="a">빛</td><td class="a">거듭제곱</td><td class="a">2</td><td class="a">⑤</td><td class="a">②</td><td class="a">③</td><td class="a">②</td><td class="a">④</td><td class="a">①</td></tr>
+    <tr><th>문항</th><td>13</td><td>14</td><td>15</td><td>16</td><td>17</td><td>18</td><td>19</td><td>20</td><td>21</td><td>22</td><td>23</td><td>24</td></tr>
+    <tr><th>정답</th><td class="a">⑤</td><td class="a">①</td><td class="a">④</td><td class="a">④</td><td class="a">②</td><td class="a">서술형</td><td class="a">서술형</td><td class="a">서술형</td><td class="a">③</td><td class="a">①</td><td class="a">③</td><td class="a">⑤</td></tr>
   </table>
 
   <div class="solcols">
@@ -909,18 +1195,18 @@
         <p>왕복 시간이므로 반드시 2로 나눈다.</p></div>
     </div>
     <div>
-      <div class="sol"><div class="shead"><span class="sno">7</span><span class="sans">②</span><span class="slink">개념 2</span></div>
+      <div class="sol"><div class="shead"><span class="sno">7</span><span class="sans">⑤</span><span class="slink">개념 1</span></div>
+        <p>사건의 주소 = 언제(오전 10시 정각) + 어디서(출발선에서 50&nbsp;m). 시간과 공간이 모두 수치로 적힌 것은 ⑤뿐이다.</p>
+        <div class="wrongbox"><div class="wt">바로알기</div>
+          <p><b>①·②</b> '운동장', '오후 늦게'처럼 막연하다 — 언제·어디서를 수로 적어야 한다. <b>③</b> 시간(오후 2시)만 있다 — 어디서(공간 좌표)를 더해야 한다. <b>④</b> 공간(골대에서 10&nbsp;m)만 있다 — 언제(시간 좌표)를 더해야 한다.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">8</span><span class="sans">②</span><span class="slink">개념 2</span></div>
         <p>원자핵(10<sup>−1</sup><sup>5</sup>) &lt; 원자(10<sup>−10</sup>) &lt; 세포(10<sup>−</sup><sup>5</sup>) &lt; 지구(10<sup>7</sup>).</p>
-        <div class="wrongbox"><div class="wt">오답 왜 틀렸나</div>
-          <p><b>①</b> 원자핵이 원자 속에 있다 — 핵이 더 작다. <b>③·④·⑤</b> 음수 지수 비교 실수 — 지수가 작을수록 작다.</p></div></div>
-      <div class="sol"><div class="shead"><span class="sno">8</span><span class="sans">④</span><span class="slink">개념 4·5</span></div>
-        <p>현대의 1 m = 빛 기준. 정의의 핵심어는 빛·진공·1/299 792 458초.</p>
-        <div class="wrongbox"><div class="wt">오답 왜 틀렸나</div>
-          <p><b>①·②</b> 과거의 방식이다. <b>③</b> 빛의 속력은 진공에서 불변이라 기준이 됐다. <b>⑤</b> 원자시계는 수천만 년에 1초도 안 틀린다.</p></div></div>
-      <div class="sol"><div class="shead"><span class="sno">9</span><span class="sans">⑤</span><span class="slink">개념 4·자료</span></div>
-        <p>편도 시간 = 2.56 ÷ 2 = 1.28초. 거리 = 3 × 10<sup>8</sup> × 1.28 = 3.84 × 10<sup>8</sup> m.</p>
-        <div class="wrongbox"><div class="wt">오답 왜 틀렸나</div>
-          <p><b>④</b> ÷2를 빠뜨린 값(7.68 × 10<sup>8</sup>) — 이 유형 최대 함정. <b>①</b> ÷2를 두 번 한 값.</p></div></div>
+        <div class="wrongbox"><div class="wt">바로알기</div>
+          <p><b>①</b> 원자핵은 원자 속에 있으므로 원자보다 작다. <b>③</b> 세포(10<sup>−5</sup>&nbsp;m)가 원자(10<sup>−10</sup>&nbsp;m)보다 크다. <b>④</b> 세포는 원자보다 크다. <b>⑤</b> 원자핵(10<sup>−15</sup>&nbsp;m)이 가장 작다.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">9</span><span class="sans">③</span><span class="slink">개념 2</span></div>
+        <p>크기로 정체를 가린다: A(10<sup>−5</sup>&nbsp;m) = 세포, B(10<sup>7</sup>&nbsp;m) = 지구, C(10<sup>−10</sup>&nbsp;m) = 원자. <b>ㄱ (옳음)</b> C는 원자. <b>ㄴ (옳음)</b> 10<sup>−5</sup> ÷ 10<sup>−10</sup> = 10<sup>(−5)−(−10)</sup> = 10<sup>5</sup>배.</p>
+        <div class="wrongbox"><div class="wt">바로알기</div>
+          <p><b>ㄷ</b> (틀림 →) B(지구, 10<sup>7</sup>&nbsp;m)는 사람(10<sup>0</sup>&nbsp;m)보다 10<sup>7</sup>배 <b>크다</b>.</p></div></div>
     </div>
   </div>
 
@@ -932,26 +1218,156 @@
   <div class="runhead"><span class="unit-tag" style="color:var(--brand);">알짜 해설</span><span class="lesson-tag">01. 자연을 재는 눈 — 시간과 공간</span></div>
   <div class="solcols">
     <div>
-      <div class="sol"><div class="shead"><span class="sno">10</span><span class="sans">②</span><span class="slink">개념 3·5</span></div>
-        <p>(가) 방사성 동위 원소 = 자연의 시계, (나) GPS = 시간 차 × 빛의 속력 — 둘 다 옳다.</p>
-        <div class="wrongbox"><div class="wt">오답 왜 틀렸나</div>
-          <p><b>(다)</b> 우주의 나이는 약 138<b>억</b> 년이다 — '만'과 '억'을 바꿔치기하는 선지에 속지 말 것.</p></div></div>
-      <div class="sol"><div class="shead"><span class="sno">11</span><span class="sans">모범 답안</span><span class="slink">개념 4</span></div>
-        <p>미터원기는 물체이므로 닳거나 온도에 따라 변형되어 기준이 흔들릴 수 있다. 반면 빛의 속력은 진공에서 <b>변하지 않는</b> 자연의 값이므로, 언제 어디서 재어도 같은 1 m를 얻을 수 있어 길이의 기준을 빛으로 바꾸었다.</p>
-        <div class="wrongbox"><div class="wt">채점 기준 (감점 포인트)</div>
-          <p>① 물체(원기)는 변할 수 있다는 한계 ② 빛의 속력은 불변 ③ 그래서 언제 어디서나 같은 기준이 됨 — 세 요소 모두 서술해야 만점.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">10</span><span class="sans">②</span><span class="slink">개념 1·2</span></div>
+        <p><b>ㄷ (옳음)</b> 10<sup>26</sup> = 1 뒤에 0이 26개. 지수 하나로 끝내는 것이 거듭제곱 표기의 힘이다.</p>
+        <div class="wrongbox"><div class="wt">바로알기</div>
+          <p><b>ㄱ</b> (틀림 →) 언제·어디서·얼마나를 수치로 적어야(시간·공간의 좌표) 공의 운동을 분석할 수 있다. <b>ㄴ</b> (틀림 →) 10<sup>−2</sup> ÷ 10<sup>2</sup> = 10<sup>−4</sup> — 10<sup>−2</sup>&nbsp;m는 10<sup>2</sup>&nbsp;m의 <b>1/10&nbsp;000</b>이다.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">11</span><span class="sans">④</span><span class="slink">개념 3</span></div>
+        <p><b>ㄴ (옳음)</b> 방사성 동위 원소는 일정한 빠르기로 붕괴하는 '자연의 시계'다. <b>ㄷ (옳음)</b> 138억 년 = 1.38&nbsp;×&nbsp;10<sup>10</sup>년 → 1년의 약 10<sup>10</sup>배.</p>
+        <div class="wrongbox"><div class="wt">바로알기</div>
+          <p><b>ㄱ</b> (틀림 →) 화학 결합이 만들어지는 시간(약 10<sup>−15</sup>초)은 눈 깜박임(약 0.1초)보다 <b>훨씬 짧다</b>.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">12</span><span class="sans">①</span><span class="slink">개념 3</span></div>
+        <p>지수부터 읽는다. A(10<sup>−15</sup>&nbsp;s)는 찰나 → 초고속 레이저, B(10<sup>0</sup>&nbsp;s)는 사람이 체감하는 시간 → 시계, C(10<sup>17</sup>&nbsp;s)는 우주의 나이 규모 → 별빛.</p>
+        <div class="analysis"><div class="at">꼼꼼 자료 분석</div>
+          <svg width="300" height="86" viewBox="0 0 300 86" font-family="PC Sans">
+            <line x1="14" y1="30" x2="276" y2="30" stroke="#3E9C6E" stroke-width="1.6" marker-end="url(#arrP)"/>
+            <g fill="#E8940A"><circle cx="40" cy="30" r="3.4"/><circle cx="140" cy="30" r="3.4"/><circle cx="252" cy="30" r="3.4"/></g>
+            <g font-size="8.4" font-weight="900" fill="#22303A" text-anchor="middle"><text x="40" y="19">A</text><text x="140" y="19">B</text><text x="252" y="19">C</text></g>
+            <g font-size="7.6" fill="#5B6B77" text-anchor="middle">
+              <text x="40" y="45">10<tspan dy="-3" font-size="5.6">−15</tspan><tspan dy="3"> s</tspan></text>
+              <text x="140" y="45">10<tspan dy="-3" font-size="5.6">0</tspan><tspan dy="3"> s</tspan></text>
+              <text x="252" y="45">10<tspan dy="-3" font-size="5.6">17</tspan><tspan dy="3"> s</tspan></text>
+            </g>
+            <g stroke="#8CCBA8" stroke-width="1.2" fill="none"><path d="M14,52 v4 h52 v-4"/><path d="M96,52 v4 h88 v-4"/><path d="M216,52 v4 h72 v-4"/></g>
+            <g font-size="7" font-weight="800" fill="#D6455D" text-anchor="middle">
+              <text x="40" y="68">초고속 레이저</text><text x="140" y="68">시계 · 달력</text><text x="252" y="68">별빛 · 방사성</text>
+            </g>
+            <g font-size="6.6" fill="#5B6B77" text-anchor="middle">
+              <text x="40" y="79">찰나를 포착</text><text x="140" y="79">사람이 체감하는 창문</text><text x="252" y="79">동위 원소 — 자연의 시계</text>
+            </g>
+          </svg></div>
+        <div class="wrongbox"><div class="wt">바로알기</div>
+          <p><b>②</b> A는 초고속 레이저, B는 시계로 잰다. <b>③</b> B는 시계, C는 별빛으로 잰다. <b>④·⑤</b> 방사성 동위 원소는 C처럼 아주 긴 시간을, 초고속 레이저는 A처럼 아주 짧은 시간을 잰다.</p></div></div>
     </div>
     <div>
-      <div class="sol"><div class="shead"><span class="sno">12</span><span class="sans">③</span><span class="slink">개념 2 | 2점</span></div>
-        <p><b>ㄱ (옳음)</b> 10<sup>−10</sup> ÷ 10<sup>−1</sup><sup>5</sup> = 10<sup>5</sup> — 10만 배. <b>ㄴ (옳음)</b> 10<sup>−10</sup> &lt; 10<sup>0</sup> &lt; 10<sup>7</sup>. <b>ㄷ (틀림)</b> 지수가 클수록 크다.</p>
-        <div class="wrongbox"><div class="wt">함정 체크</div>
-          <p>'배수'는 지수의 뺄셈이다 — (-10) - (-15) = 5, 곧 10<sup>5</sup>배.</p></div></div>
-      <div class="sol"><div class="shead"><span class="sno">13</span><span class="sans">④</span><span class="slink">개념 4·5 | 2.5점</span></div>
-        <p><b>ㄱ (옳음)</b> 몸 → 물체 → 자연 상수(빛·원자)로, 더 변하지 않는 쪽으로 진화했다. <b>ㄴ (옳음)</b> 그것이 원기를 버린 이유다. <b>ㄷ (틀림)</b> 같은 종류의 원자는 어디서나 같은 진동수를 가진다 — 그래서 표준이 될 수 있었다.</p>
-        <div class="wrongbox"><div class="wt">함정 체크</div>
-          <p>기준의 조건은 단 하나 — <b>'누가 언제 재도 같을 것'</b>. 이 잣대로 ㄱ~ㄷ을 다시 읽어 보라.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">13</span><span class="sans">⑤</span><span class="slink">개념 4 | 자료 파헤치기</span></div>
+        <p>편도 시간 = 2.56 ÷ 2 = 1.28초. 거리 = 3&nbsp;×&nbsp;10<sup>8</sup>&nbsp;m/s × 1.28&nbsp;s = 3.84&nbsp;×&nbsp;10<sup>8</sup>&nbsp;m(약 38만 4천 km).</p>
+        <div class="wrongbox"><div class="wt">바로알기</div>
+          <p><b>④</b> 7.68&nbsp;×&nbsp;10<sup>8</sup>&nbsp;m는 왕복 시간을 그대로 곱한 값이다 — 편도 시간(1.28초)을 곱해야 한다. <b>①</b> 2로 두 번 나눈 값이다. <b>②·③</b> 시간(2.56)이나 빛의 속력(3)의 숫자를 옮긴 값일 뿐이다 — 거리 = 속력 × 편도 시간.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">14</span><span class="sans">①</span><span class="slink">개념 4 | 탐구</span></div>
+        <p><b>ㄱ (옳음)</b> 평균 시간 = (4.9 + 5.0 + 5.1) ÷ 3 = 5.0초. 거리 = 340&nbsp;m/s × 5.0&nbsp;s = 1700&nbsp;m ≈ 1.7&nbsp;km.</p>
+        <div class="wrongbox"><div class="wt">바로알기</div>
+          <p><b>ㄴ</b> (틀림 →) 천둥소리는 번개에서 관측자까지 <b>한 번만(편도)</b> 오므로 2로 나누지 않는다. <b>ㄷ</b> (틀림 →) 번개가 멀수록 소리가 오는 데 걸리는 시간은 <b>더 길어진다</b>.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">15</span><span class="sans">④</span><span class="slink">개념 4·5</span></div>
+        <p>현대의 1 m = 빛 기준. 정의의 핵심어는 빛, 진공, 1/299&nbsp;792&nbsp;458초.</p>
+        <div class="wrongbox"><div class="wt">바로알기</div>
+          <p><b>①</b> 지금 1 m는 빛이 진공에서 나아간 거리로 정의한다(미터원기는 과거의 기준). <b>②</b> 1초는 세슘 원자의 진동으로 정의한다. <b>③</b> 빛의 속력은 진공에서 변하지 않아 기준이 된다. <b>⑤</b> 원자시계는 수천만 년이 지나도 1초도 어긋나지 않는다.</p></div></div>
+    </div>
+  </div>
+  <div class="folio"><span>알짜 해설</span><span class="num">20</span></div>
+</div>
 
-      <div class="gist" style="margin-top:5mm;">
+<!-- ═════════════ 해설 3 ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag" style="color:var(--brand);">알짜 해설</span><span class="lesson-tag">01. 자연을 재는 눈 — 시간과 공간</span></div>
+  <div class="solcols">
+    <div>
+      <div class="sol"><div class="shead"><span class="sno">16</span><span class="sans">④</span><span class="slink">개념 5</span></div>
+        <p><b>ㄴ (옳음)</b> 거리 오차 = 3&nbsp;×&nbsp;10<sup>8</sup>&nbsp;m/s × 10<sup>−6</sup>&nbsp;s = 300&nbsp;m. <b>ㄷ (옳음)</b> 정확한 시간이 곧 정확한 공간 — 그래서 위성마다 원자시계를 싣는다.</p>
+        <div class="wrongbox"><div class="wt">바로알기</div>
+          <p><b>ㄱ</b> (틀림 →) 거리 = 3&nbsp;×&nbsp;10<sup>8</sup>&nbsp;m/s × 0.07&nbsp;s = <b>2.1&nbsp;×&nbsp;10<sup>7</sup>&nbsp;m</b>(2만 1천 km)이다. 신호는 위성에서 수신기로 한 번만 오므로 2로 나누지 않는다.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">17</span><span class="sans">②</span><span class="slink">개념 4·5</span></div>
+        <p><b>C (옳음)</b> 현재 1초 = 세슘 원자가 내는 빛의 진동 9&nbsp;192&nbsp;631&nbsp;770번.</p>
+        <div class="wrongbox"><div class="wt">바로알기</div>
+          <p><b>A</b> (틀림 →) 지구의 자전은 <b>미세하게 흔들려서</b>, 1초의 기준을 세슘 원자의 진동으로 바꾸었다. <b>B</b> (틀림 →) 1 m는 빛이 1/299&nbsp;792&nbsp;458<b>초</b> 동안 간 거리이므로, 정의에 시간의 단위가 들어 있다 — 길이 측정은 결국 시간 측정이다.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">18</span><span class="sans">모범 답안</span><span class="slink">개념 4</span></div>
+        <p><b>미터원기</b>는 물체이므로 닳거나 온도에 따라 늘어나 기준이 흔들릴 수 있다. 반면 진공에서 <b>빛의 속력</b>은 언제 어디서나 <b>변하지 않는다</b>. 그래서 누가 언제 재어도 같은 1 m를 얻을 수 있도록 길이의 기준을 빛으로 바꾸었다.</p>
+        <table class="rubric">
+          <tr><th>채점 요소</th><th>배점</th></tr>
+          <tr><td>① 미터원기(물체)는 닳거나 변형될 수 있다는 한계를 썼다.</td><td>2점</td></tr>
+          <tr><td>② 진공에서 빛의 속력은 변하지 않는다고 썼다.</td><td>2점</td></tr>
+          <tr><td>③ 그래서 언제 어디서나 같은 기준이 된다고 썼다.</td><td>2점</td></tr>
+        </table>
+        <div class="wrongbox"><div class="wt">이렇게 쓰면 0점</div>
+          <p>"빛이 가장 빠르기 때문이다." — 빠르기가 아니라 '변하지 않는다'는 것이 기준의 조건이다.</p></div></div>
+
+    </div>
+    <div>
+
+      <div class="sol"><div class="shead"><span class="sno">19</span><span class="sans">모범 답안</span><span class="slink">개념 5</span></div>
+        <p>GPS 수신기는 위성 신호가 오는 데 걸린 시간에 <b>빛의 속력</b>을 곱해 위성까지의 <b>거리</b>를 구하고, 이로부터 위치를 계산한다. 빛의 속력이 매우 커서 <b>시간 오차</b>가 100만분의 1초만 나도 거리는 약 300&nbsp;m 틀어지므로, 시간을 매우 정밀하게 재는 원자시계가 필요하다.</p>
+        <table class="rubric">
+          <tr><th>채점 요소</th><th>배점</th></tr>
+          <tr><td>① 신호가 오는 데 걸린 시간 × 빛의 속력 = 거리(→ 위치)라고 썼다.</td><td>2점</td></tr>
+          <tr><td>② 작은 시간 오차도 큰 거리 오차가 된다고 썼다(300&nbsp;m 예시 또는 빛의 속력이 매우 큼).</td><td>2점</td></tr>
+          <tr><td>③ 그래서 정밀한 원자시계가 필요하다고 썼다.</td><td>2점</td></tr>
+        </table>
+        <div class="wrongbox"><div class="wt">이렇게 쓰면 0점</div>
+          <p>"원자시계가 위성의 위치를 직접 알려 주기 때문이다." — 시계는 시간을 잴 뿐, 위치는 시간 × 빛의 속력으로 계산한다.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">20</span><span class="sans">모범 답안</span><span class="slink">개념 3</span></div>
+        <p>암석의 나이는 사람이 시계·달력으로 직접 재는 시간(초~년)보다 훨씬 길어서 지켜보며 잴 수 없다. 대신 암석 속 <b>방사성 동위 원소</b>가 <b>일정한 빠르기</b>로 붕괴하는 성질을 이용해, 붕괴한 정도로부터 흐른 시간을 알아낸다.</p>
+        <table class="rubric">
+          <tr><th>채점 요소</th><th>배점</th></tr>
+          <tr><td>① 암석의 나이는 시계·달력으로 재기에는 너무 긴 시간이라고 썼다.</td><td>2점</td></tr>
+          <tr><td>② 방사성 동위 원소가 일정한 빠르기로 붕괴한다고 썼다.</td><td>2점</td></tr>
+          <tr><td>③ 붕괴한 정도로 흐른 시간을 안다(자연이 남긴 시계)고 썼다.</td><td>2점</td></tr>
+        </table>
+        <div class="wrongbox"><div class="wt">이렇게 쓰면 0점</div>
+          <p>"방사성 동위 원소로 암석의 크기를 재기 때문이다." — 재는 것은 크기가 아니라 흐른 시간이다.</p></div></div>
+    </div>
+  </div>
+  <div class="folio"><span>알짜 해설</span><span class="num">?</span></div>
+</div>
+
+<!-- ═════════════ 해설 4 ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag" style="color:var(--brand);">알짜 해설</span><span class="lesson-tag">01. 자연을 재는 눈 — 시간과 공간</span></div>
+  <div class="solcols">
+    <div>
+
+      <div class="sol"><div class="shead"><span class="sno">21</span><span class="sans">③</span><span class="slink">개념 2 | 2점</span></div>
+        <p><b>ㄱ (옳음)</b> 10<sup>−10</sup> ÷ 10<sup>−1</sup><sup>5</sup> = 10<sup>5</sup> — 10만 배. <b>ㄴ (옳음)</b> 10<sup>−10</sup> &lt; 10<sup>0</sup> &lt; 10<sup>7</sup>.</p>
+        <div class="wrongbox"><div class="wt">바로알기</div>
+          <p><b>ㄷ</b> (틀림 →) 지수가 <b>클수록</b> 더 큰 대상이다. '배수'는 지수의 뺄셈 — (−10) − (−15) = 5, 곧 10<sup>5</sup>배.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">22</span><span class="sans">①</span><span class="slink">개념 4 | 2점</span></div>
+        <p><b>ㄱ (옳음)</b> 거리 = 3&nbsp;×&nbsp;10<sup>8</sup>&nbsp;m/s × 2&nbsp;×&nbsp;10<sup>−7</sup>&nbsp;s ÷ 2 = 30&nbsp;m — 그래프에서도 30&nbsp;m.</p>
+        <div class="analysis"><div class="at">꼼꼼 자료 분석</div>
+          <svg width="300" height="146" viewBox="0 0 300 146" font-family="PC Sans">
+            <g stroke="#E3E8EC" stroke-width="0.8">
+              <line x1="92" y1="28" x2="92" y2="118"/><line x1="140" y1="28" x2="140" y2="118"/><line x1="188" y1="28" x2="188" y2="118"/><line x1="236" y1="28" x2="236" y2="118"/>
+              <line x1="44" y1="95.5" x2="236" y2="95.5"/><line x1="44" y1="73" x2="236" y2="73"/><line x1="44" y1="50.5" x2="236" y2="50.5"/><line x1="44" y1="28" x2="236" y2="28"/>
+            </g>
+            <line x1="44" y1="118" x2="250" y2="118" stroke="#5B6B77" stroke-width="1.2" marker-end="url(#arrP)"/>
+            <line x1="44" y1="118" x2="44" y2="14" stroke="#5B6B77" stroke-width="1.2" marker-end="url(#arrP)"/>
+            <line x1="44" y1="118" x2="236" y2="28" stroke="#D6455D" stroke-width="1.8"/>
+            <g stroke="#E8940A" stroke-width="1" stroke-dasharray="3 2"><line x1="140" y1="118" x2="140" y2="73"/><line x1="44" y1="73" x2="140" y2="73"/></g>
+            <circle cx="140" cy="73" r="3.4" fill="#E8940A"/>
+            <circle cx="236" cy="28" r="3.4" fill="#D6455D"/>
+            <g font-size="7.4" fill="#5B6B77" text-anchor="middle"><text x="44" y="129">0</text><text x="92" y="129">1</text><text x="140" y="129">2</text><text x="188" y="129">3</text><text x="236" y="129">4</text></g>
+            <g font-size="7.4" fill="#5B6B77" text-anchor="end"><text x="39" y="98">15</text><text x="39" y="75.5">30</text><text x="39" y="53">45</text><text x="39" y="30.5">60</text></g>
+            <text x="50" y="14" font-size="7.4" font-weight="800" fill="#22303A">거리(m)</text>
+            <text x="252" y="142" font-size="7.4" font-weight="800" fill="#22303A" text-anchor="end">왕복 시간(×10<tspan dy="-2.8" font-size="5.4">−7</tspan><tspan dy="2.8"> s)</tspan></text>
+            <g font-size="6.8" font-weight="700" fill="#B4560E"><text x="146" y="84">ㄱ: 2 → 30 m</text></g>
+            <g font-size="6.8" font-weight="700" fill="#D6455D">
+              <text x="52" y="38">기울기 = 60 ÷ (4 × 10<tspan dy="-2.6" font-size="5">−7</tspan><tspan dy="2.6">)</tspan></text>
+              <text x="52" y="48">= 1.5 × 10<tspan dy="-2.6" font-size="5">8</tspan><tspan dy="2.6"> m/s</tspan></text>
+              <text x="52" y="58">= 빛의 속력의 1/2 (왕복이라서)</text>
+            </g>
+            <text x="150" y="108" font-size="6.8" font-weight="700" fill="#5B6B77">원점을 지나는 직선 = 비례</text>
+          </svg></div>
+        <div class="wrongbox"><div class="wt">바로알기</div>
+          <p><b>ㄴ</b> (틀림 →) 기울기는 1.5&nbsp;×&nbsp;10<sup>8</sup>&nbsp;m/s로 <b>빛의 속력의 1/2</b>이다 — 레이저가 왕복하기 때문이다. <b>ㄷ</b> (틀림 →) 거리와 왕복 시간은 비례하므로 거리가 2배면 왕복 시간도 <b>2배</b>가 된다.</p></div></div>
+    </div>
+    <div>
+      <div class="sol"><div class="shead"><span class="sno">23</span><span class="sans">③</span><span class="slink">개념 4·5 | 2.5점</span></div>
+        <p><b>ㄱ (옳음)</b> 몸 → 물체 → 자연 현상(빛·원자)으로, 더 변하지 않는 쪽으로 바뀌었다. <b>ㄴ (옳음)</b> 닳고 온도에 따라 늘어나는 한계 — 그것이 원기를 버린 이유다.</p>
+        <div class="wrongbox"><div class="wt">바로알기</div>
+          <p><b>ㄷ</b> (틀림 →) 같은 종류의 원자는 어디서나 같은 진동수를 가진다 — 그래서 <b>표준이 될 수 있었다</b>. 기준의 조건은 '누가 언제 재도 같을 것'.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">24</span><span class="sans">⑤</span><span class="slink">개념 2·3 | 2.5점</span></div>
+        <p><b>ㄱ (옳음)</b> 10<sup>26</sup> ÷ 10<sup>−15</sup> = 10<sup>26−(−15)</sup> = 10<sup>41</sup>배. <b>ㄴ (옳음)</b> 3&nbsp;×&nbsp;10<sup>8</sup> × 10<sup>−15</sup> = 3&nbsp;×&nbsp;10<sup>−7</sup>&nbsp;m &gt; 10<sup>−10</sup>&nbsp;m(원자의 약 3000배). <b>ㄷ (옳음)</b> 3&nbsp;×&nbsp;10<sup>8</sup> × 3&nbsp;×&nbsp;10<sup>7</sup> = 9&nbsp;×&nbsp;10<sup>15</sup>&nbsp;m &gt; 10<sup>13</sup>&nbsp;m(태양계의 약 900배).</p>
+        <div class="wrongbox"><div class="wt">함정 체크</div>
+          <p>거듭제곱끼리 곱하면 지수를 더하고, 나누면 뺀다. 음수 지수의 뺄셈(26 − (−15))에서 부호를 놓치지 말 것.</p></div></div>
+      <div class="gist" style="margin-top:3mm;">
         <div class="boxtitle"><span class="ico">알</span>이 소단원, 이것만은!</div>
         <ul>
           <li>사건의 주소 = <b>시간 + 공간</b> / 규모는 <b>10의 거듭제곱</b>으로 (원자 10<sup>−10</sup> m, 우주 10<sup>2</sup><sup>6</sup> m)</li>
@@ -961,12 +1377,22 @@
       </div>
     </div>
   </div>
-  <div class="folio"><span>알짜 해설</span><span class="num">20</span></div>
+  <div class="folio"><span>알짜 해설</span><span class="num">?</span></div>
 </div>
 
 <!-- ═════════════ p.21 MEMO ═════════════ -->
 <div class="page">
   <div class="runhead"><span class="unit-tag">I. 과학의 기초</span><span class="lesson-tag">01 ▸ 02 넘어가기 전에</span></div>
+  <div class="spaced">
+    <div class="st">간격 두고 다시 꺼내기 — 책을 덮고 답한다</div>
+    <ol>
+      <li>원자의 크기는 약 몇 m인가? (10의 거듭제곱으로)</li>
+      <li>현재 1 m와 1초의 기준은 각각 무엇인가?</li>
+      <li>레이저의 왕복 시간으로 거리를 구하는 식은?</li>
+    </ol>
+    <div class="when"><span>□ 1일 뒤</span><span>□ 1주 뒤</span><span>□ 시험 전</span></div>
+    <div class="ans">정답 1 약 10<sup>−10</sup> m 2 빛(진공에서 나아간 거리), 세슘 원자의 진동 3 빛의 속력 × 시간 ÷ 2</div>
+  </div>
   <div class="memo-head"><span class="mt">MEMO</span><span class="ms">헷갈린 개념, 다시 틀린 문제 번호, 나만의 암기법을 남겨 두는 자리</span></div>
   <div class="memo-area"></div>
   <div class="memo-pen">"1 m와 1초의 현대적 정의를 한 문장씩 말해 보자. '빛'과 '세슘'이 바로 안 나오면 13쪽으로! — 박찬쌤"</div>
