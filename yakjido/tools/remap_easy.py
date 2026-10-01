@@ -74,7 +74,7 @@ INGR = {
   # ── 2026-09-21 보강 ②: 새로 넣은 약 6종 ──
   '에르도스테인':'erdosteine', '암브록솔염산염':'ambroxol', '암브록솔':'ambroxol',
   '포비돈요오드':'povidone-iodine', '알벤다졸':'albendazole',
-  '에티닐에스트라디올':'oral-contraceptive', '클로닉신리시네이트':'clonixin', '나프티핀염산염':'naftifine',
+  '에티닐에스트라디올':'oral-contraceptive', '클로닉신리시네이트':'clonixin', '나프티핀염산염':'naftifine', '히드로퀴논':'hydroquinone', '염화알루미늄':'aluminium-chloride',
   '겐타마이신황산염':'genta-steroid-cream',
   '바실루스리케니포르미스균':'probiotic-otc', '바실루스서브틸리스균':'probiotic-otc',
   '사카로마이세스보울라디':'probiotic-otc', '락토바실루스아시도필루스':'probiotic-otc',
@@ -159,6 +159,13 @@ def fix_form(e, ids):
     # 헤파린 + 알란토인 바르는 겔은 흉터 연고(벤트락스·노스카나 계열) — 에스신이 든 멍·부기 겔과 다르다
     if f == 'skin' and '헤파린나트륨' in e.get('i', []) and '알란토인' in e.get('i', []): out.add('scar-gel')
     if f == 'skin' and '헤파린나트륨' in e.get('i', []) and '무정형에스신' in e.get('i', []): out.add('bruise-gel')
+    # 허가 효능 원문으로 가르는 것 — 같은 성분이 치질약·상처약, 티눈약·여드름약으로 갈린다(2026-10-01)
+    if not out and e.get('i'):
+        eff = label(e['id']).get('e', '')
+        ii = set(e['i'])
+        if '프라목신염산염' in ii and re.search(r'치질|치핵|치열', eff): out.add('hemorrhoid-topical')
+        if ii & {'살리실산'} and re.search(r'티눈|굳은살', eff): out.add('salicylic-corn')
+    if f == 'skin' and '네오마이신황산염' in e.get('i', []) and not (out - {'hemorrhoid-topical'}): out.discard('hemorrhoid-topical'); out.add('neomycin-combo')
     # 리도카인 단일제 중 허가 효능이 «남성 성기 촉각의 예민성 감소»인 것만 — 이름으로는 화상용 겔과 못 가른다(원문 효능을 본다)
     if e.get('i') == ['리도카인'] and not out and '성기' in label(e['id']).get('e', ''): out.add('lidocaine-pe')
     # 눈물 대용 성분만으로 된 점안액(식염·전해질·점도 성분) → 인공눈물. 약효 성분이 하나라도 있으면 붙이지 않는다

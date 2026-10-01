@@ -41,6 +41,9 @@ MANUAL = {
     'scar-gel': ('노스카나', '노스카나겔', 'heparin'),
     'bruise-gel': ('베노플러스', '베노플러스겔', 'heparin'),
     'lidocaine-pe': ('엠디카인', '엠디카인크림', 'lidocaine'),
+    'neomycin-combo': ('바네포', '바네포연고', 'neomycin'),
+    'hydroquinone': ('도미나크림', '도미나크림', 'hydroquinone'),
+    'aluminium-chloride': ('드라이언', '드라이언액', 'aluminum'),
     'vitamin-d-rx': ('디맥', '디맥정7000IU', 'cholecalciferol'),
 }
 
@@ -50,7 +53,7 @@ def manual(k, out, rep):
         if did in rep: continue
         try: res = k.search(word)
         except Exception as e: print(did, '검색 실패', e); continue
-        hit = [r for r in res if pick in str(r.get('drug_name', '')) and str(r.get('kfda_code', '')).strip()]
+        hit = [r for r in res if pick in str(r.get('drug_name', '')) and '수출용' not in str(r.get('drug_name', '')) and str(r.get('kfda_code', '')).strip()]   # 수출용은 국내에 없다
         time.sleep(0.4)
         if not hit: print(did, '— 제품 없음', word); continue
         seq = str(hit[0]['kfda_code']).strip()
