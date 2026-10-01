@@ -63,9 +63,10 @@ def parse_chapter(path):
     if tbl is None: tbl = soup.select_one('table.anstable')
     if tbl:
         rows = tbl.select('tr')
-        nums = [txt(td, False) for td in rows[0].select('td')]
-        vals = [txt(td, False) for td in rows[1].select('td')]
-        ans = {int(n): v for n, v in zip(nums, vals) if n.isdigit()}
+        for i in range(0, len(rows) - 1, 2):          # 문항 줄·정답 줄이 짝 — 24문항은 두 짝(1~12 / 13~24)
+            nums = [txt(td, False) for td in rows[i].select('td')]
+            vals = [txt(td, False) for td in rows[i + 1].select('td')]
+            ans.update({int(n): v for n, v in zip(nums, vals) if n.isdigit()})
     sols = {}
     for sol in soup.select('.sol'):
         sno = sol.select_one('.sno'); n = int(txt(sno, False)) if sno and txt(sno, False).isdigit() else None
@@ -88,7 +89,8 @@ def parse_chapter(path):
         stem_el = el.select_one('.stem')
         diff = stem_el.select_one('.difficulty'); difficulty = txt(diff, False) if diff else ''
         tags = stem_el.select_one('.tags'); tag = txt(tags, False) if tags else ''
-        for s in stem_el.select('.difficulty, .tags, .badge-data, .badge-essay'): s.extract()
+        must = bool(stem_el.select_one('.must'))          # '중요' 표시 — 발문 글자에서는 뺀다
+        for s in stem_el.select('.difficulty, .tags, .badge-data, .badge-essay, .must'): s.extract()
         is_ox = bool(stem_el.select_one('.ox-answer'))
         for s in stem_el.select('.ox-answer'): s.extract()
         for s in stem_el.select('.blankline'): s.replace_with('＿＿＿')
@@ -112,7 +114,7 @@ def parse_chapter(path):
         items.append({'id': f'{code}-q{n}', 'lessonId': code, 'concept': int(m.group(1)) if m else 0, 'step': step, 'type': typ,
                       'stem': stem, 'source': source, 'choices': choices, 'answer': answer,
                       'explain': sol.get('explain', ''), 'wrong': sol.get('wrong', ''), 'figure': figure,
-                      'difficulty': difficulty or {1: '●○○', 2: '●●○', 3: '●●●'}[step]})
+                      'difficulty': difficulty or {1: '●○○', 2: '●●○', 3: '●●●'}[step], **({'must': True} if must else {})})
         qi += 1
 
     # ── 자료 파헤치기 · 직접 해보기 ──
