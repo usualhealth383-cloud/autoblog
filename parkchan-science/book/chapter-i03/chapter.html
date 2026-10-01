@@ -229,6 +229,31 @@
   /* 화학식 첨자 — 본문 폰트를 그대로 축소해 자형이 어긋나지 않게 한다 */
   sub,sup{ font-size:0.68em; line-height:0; font-weight:inherit; }
   sub{ vertical-align:-0.14em; } sup{ vertical-align:0.34em; }
+
+/* ── 2026-10-02 보강: 중요 표시 · 채점 기준 · 꼼꼼 자료 분석 · 간격 두고 다시 꺼내기 ── */
+.must{ display:inline-block; font-size:7pt; font-weight:900; color:#fff; background:#D9534F; border-radius:1.6mm; padding:0.2mm 1.4mm; margin-right:1.2mm; vertical-align:1pt; }
+table.rubric{ border-collapse:collapse; width:100%; font-size:7.6pt; margin:1mm 0 0.5mm; }
+table.rubric th, table.rubric td{ border:0.25mm solid var(--line); padding:0.8mm 1.4mm; text-align:left; vertical-align:top; }
+table.rubric th{ background:#F4F1EA; font-weight:800; white-space:nowrap; }
+.analysis{ border:0.35mm dashed #C9A36A; border-radius:2.5mm; padding:1.6mm 2mm 1.2mm; margin:1.5mm 0; background:#FFFCF5; }
+.analysis .at{ font-size:7.6pt; font-weight:900; color:#9C6503; margin-bottom:0.8mm; }
+.analysis svg{ max-width:100%; height:auto; display:block; }
+.spaced{ border:0.4mm solid var(--line); border-radius:3mm; padding:3mm 4mm 2.6mm; margin:0 0 4mm; position:relative; background:#FAFBFC; }
+.spaced .st{ font-size:9.5pt; font-weight:900; color:var(--unit); margin-bottom:1.6mm; }
+.spaced ol{ margin:0; padding-left:5mm; font-size:8.8pt; line-height:1.75; }
+.spaced .when{ display:flex; gap:5mm; font-size:8pt; color:var(--sub); margin-top:1.8mm; }
+.spaced .ans{ position:absolute; right:4mm; bottom:2.4mm; transform:rotate(180deg); font-size:6.8pt; color:var(--sub); }
+/* 2단 문항 쪽 간격 · 발문 안 탐구 과정 상자 (합격본 chapter-08 에서) */
+.qg2 .q{ margin-bottom:6mm; }
+.qg2 > div > .q:last-child{ margin-bottom:0; }
+.qg2 .choices.inline{ gap:0 4mm; }
+.qg2 .choices{ margin-top:1.8mm; line-height:1.78; }
+.qg2 .bogi-box{ margin-top:2mm; padding:1.8mm 2.8mm; font-size:9pt; line-height:1.72; }
+.qg2 .bogi-box .bt{ margin-bottom:0.3mm; }
+.qg2 .q figure{ margin:1.6mm 0 0.6mm 8.4mm !important; }
+.exp{ border:0.35mm solid #B8C2CA; border-radius:1.6mm; background:#FAFBFC; padding:1.6mm 2.6mm; margin:1.4mm 0 1.6mm; font-size:8.9pt; line-height:1.7; }
+.exp b{ font-family:'PC Sans'; font-size:7.8pt; font-weight:900; color:var(--brand); }
+.ox-answer{ white-space:nowrap; }
 </style>
 </head>
 <body>
@@ -328,7 +353,7 @@
               </g>
               <rect x="-80" y="58" width="118" height="10" rx="2" fill="#6FBE93"/>
               <line x1="38" y1="52" x2="38" y2="76" stroke="#D6455D" stroke-width="1.4" stroke-dasharray="3 2"/>
-              <text x="0" y="92" text-anchor="middle" font-weight="800" fill="#B4560E">읽은 값: 11.8 cm — 수치와 단위로 기록</text>
+              <text x="0" y="92" text-anchor="middle" font-weight="800" fill="#B4560E">읽은 값: 3.7 cm — 수치와 단위로 기록</text>
             </g>
             <g transform="translate(352,8)">
               <rect x="-104" y="0" width="208" height="114" rx="6" fill="#FDF9F0" stroke="#EBCB9C" stroke-width="1"/>
@@ -748,110 +773,392 @@
 
   <div class="step-head s2"><span class="stepno">STEP 2</span><span class="steptt">내신 완성</span><span class="stepdesc">학교 시험 유형 그대로 — 서술형까지 한 번에</span></div>
 
-  <div class="q">
-    <div class="qhead"><span class="qno">7</span><div class="stem">다음 중 '어림'에 해당하는 활동으로 가장 적절한 것은? <span class="difficulty">●●○</span>
-    <div class="tags">10통과1-01-03 | 개념 1·2</div></div></div>
-    <ul class="choices">
-      <li>① 자로 책상의 가로 길이를 재어 120.5 cm를 얻었다.</li>
-      <li>② 체중계에 올라가 몸무게 58.2 kg을 읽었다.</li>
-      <li>③ 행사장 인파를 보고 참가자를 약 2천 명으로 헤아렸다.</li>
-      <li>④ 온도계로 물의 온도 36.5 ℃를 측정했다.</li>
-      <li>⑤ 초시계로 100 m 달리기 기록 15.3초를 쟀다.</li>
-    </ul>
-  </div>
+  <div class="qgrid qg2">
+    <div>
+      <div class="q">
+        <div class="qhead"><span class="qno">7</span><div class="stem">다음 중 '어림'에 해당하는 활동으로 가장 적절한 것은? <span class="difficulty">●○○</span>
+        <div class="tags">10통과1-01-03 | 개념 1·2</div></div></div>
+        <ul class="choices">
+          <li>① 자로 책상의 가로 길이를 재어 120.5&nbsp;cm를 얻었다.</li>
+          <li>② 체중계에 올라가 몸무게 58.2&nbsp;kg을 읽었다.</li>
+          <li>③ 인파를 보고 참가자 수를 약 2천 명으로 헤아렸다.</li>
+          <li>④ 온도계로 물의 온도 36.5&nbsp;℃를 측정했다.</li>
+          <li>⑤ 초시계로 100&nbsp;m 달리기 기록 15.3초를 쟀다.</li>
+        </ul>
+      </div>
 
-  <div class="q">
-    <div class="qhead"><span class="qno">8</span><div class="stem">측정 표준에 대한 설명으로 옳은 것은? <span class="difficulty">●●●</span>
-    <div class="tags">10통과1-01-03 | 개념 3·4</div></div></div>
-    <ul class="choices">
-      <li>① 나라마다 1 kg의 기준이 달라도 무역에는 문제가 없다.</li>
-      <li>② 측정 표준은 언제 어디서 재어도 같은 값이 나오게 하는 공통 기준이다.</li>
-      <li>③ 킬로그램 원기는 지금도 1 kg의 정의로 사용된다.</li>
-      <li>④ 병원의 혈압계는 교정 없이 사용해도 신뢰할 수 있다.</li>
-      <li>⑤ 측정 표준은 실험실에서만 필요하다.</li>
-    </ul>
+      <div class="q">
+        <div class="qhead"><span class="qno">8</span><div class="stem"><span class="must">중요</span><span class="badge-data">탐구</span>다음은 막대의 길이를 재는 활동이다.
+          <div class="exp"><b>[과정]</b> (가) 5명이 같은 자로 막대 하나를 잰다.<br>(나) 다섯 측정값의 평균을 구한다.<br><b>[결과]</b> 12.3, 12.5, 12.2, 12.4, 12.6 (단위: cm)</div>
+          이에 대한 설명으로 옳은 것만을 &lt;보기&gt;에서 있는 대로 고른 것은? <span class="difficulty">●●○</span>
+        <div class="tags">10통과1-01-03 | 개념 1, 탐구</div></div></div>
+        <div class="bogi-box">
+          <div class="bt">보기</div>
+          ㄱ. 측정값의 평균은 12.4&nbsp;cm이다.<br>
+          ㄴ. 측정값이 서로 다른 것은 오차 때문이다.<br>
+          ㄷ. 정밀한 도구로 여러 번 재면 오차가 줄어든다.
+        </div>
+        <ul class="choices inline">
+          <li>① ㄱ</li><li>② ㄷ</li><li>③ ㄱ, ㄴ</li><li>④ ㄴ, ㄷ</li><li>⑤ ㄱ, ㄴ, ㄷ</li>
+        </ul>
+      </div>
+    </div>
+    <div>
+      <div class="q">
+        <div class="qhead"><span class="qno">9</span><div class="stem"><span class="badge-data">자료</span>그림은 같은 연필의 길이를 눈금 간격이 다른 두 자 (가), (나)로 재는 모습을 나타낸 것이다. 옳은 것만을 &lt;보기&gt;에서 있는 대로 고른 것은? <span class="difficulty">●●○</span>
+        <div class="tags">10통과1-01-03 | 개념 1</div></div></div>
+        <figure style="margin:2mm 0 1mm 8.6mm;">
+          <svg width="272" height="88" viewBox="0 0 272 88" font-family="PC Sans">
+            <g font-size="7.6" font-weight="900" fill="#22303A"><text x="0" y="31">(가)</text><text x="0" y="75">(나)</text></g>
+            <g fill="#6FBE93" stroke="#3E9C6E" stroke-width="0.8"><path d="M36,5 h195 l12.2,4 l-12.2,4 h-195 Z"/><path d="M36,49 h195 l12.2,4 l-12.2,4 h-195 Z"/></g>
+            <rect x="28" y="17" width="242" height="22" rx="1.5" fill="#FDF3E0" stroke="#E8940A" stroke-width="0.9"/>
+            <rect x="28" y="61" width="242" height="22" rx="1.5" fill="#FDF3E0" stroke="#E8940A" stroke-width="0.9"/>
+            <g stroke="#B4560E" stroke-width="0.9"><line x1="36.0" y1="17" x2="36.0" y2="25"/><line x1="64.0" y1="17" x2="64.0" y2="25"/><line x1="92.0" y1="17" x2="92.0" y2="25"/><line x1="120.0" y1="17" x2="120.0" y2="25"/><line x1="148.0" y1="17" x2="148.0" y2="25"/><line x1="176.0" y1="17" x2="176.0" y2="25"/><line x1="204.0" y1="17" x2="204.0" y2="25"/><line x1="232.0" y1="17" x2="232.0" y2="25"/><line x1="260.0" y1="17" x2="260.0" y2="25"/><line x1="36.0" y1="61" x2="36.0" y2="69"/><line x1="64.0" y1="61" x2="64.0" y2="69"/><line x1="92.0" y1="61" x2="92.0" y2="69"/><line x1="120.0" y1="61" x2="120.0" y2="69"/><line x1="148.0" y1="61" x2="148.0" y2="69"/><line x1="176.0" y1="61" x2="176.0" y2="69"/><line x1="204.0" y1="61" x2="204.0" y2="69"/><line x1="232.0" y1="61" x2="232.0" y2="69"/><line x1="260.0" y1="61" x2="260.0" y2="69"/><line x1="38.8" y1="61" x2="38.8" y2="64.5" stroke-width="0.55"/><line x1="41.6" y1="61" x2="41.6" y2="64.5" stroke-width="0.55"/><line x1="44.4" y1="61" x2="44.4" y2="64.5" stroke-width="0.55"/><line x1="47.2" y1="61" x2="47.2" y2="64.5" stroke-width="0.55"/><line x1="50.0" y1="61" x2="50.0" y2="66.5" stroke-width="0.8"/><line x1="52.8" y1="61" x2="52.8" y2="64.5" stroke-width="0.55"/><line x1="55.6" y1="61" x2="55.6" y2="64.5" stroke-width="0.55"/><line x1="58.4" y1="61" x2="58.4" y2="64.5" stroke-width="0.55"/><line x1="61.2" y1="61" x2="61.2" y2="64.5" stroke-width="0.55"/><line x1="66.8" y1="61" x2="66.8" y2="64.5" stroke-width="0.55"/><line x1="69.6" y1="61" x2="69.6" y2="64.5" stroke-width="0.55"/><line x1="72.4" y1="61" x2="72.4" y2="64.5" stroke-width="0.55"/><line x1="75.2" y1="61" x2="75.2" y2="64.5" stroke-width="0.55"/><line x1="78.0" y1="61" x2="78.0" y2="66.5" stroke-width="0.8"/><line x1="80.8" y1="61" x2="80.8" y2="64.5" stroke-width="0.55"/><line x1="83.6" y1="61" x2="83.6" y2="64.5" stroke-width="0.55"/><line x1="86.4" y1="61" x2="86.4" y2="64.5" stroke-width="0.55"/><line x1="89.2" y1="61" x2="89.2" y2="64.5" stroke-width="0.55"/><line x1="94.8" y1="61" x2="94.8" y2="64.5" stroke-width="0.55"/><line x1="97.6" y1="61" x2="97.6" y2="64.5" stroke-width="0.55"/><line x1="100.4" y1="61" x2="100.4" y2="64.5" stroke-width="0.55"/><line x1="103.2" y1="61" x2="103.2" y2="64.5" stroke-width="0.55"/><line x1="106.0" y1="61" x2="106.0" y2="66.5" stroke-width="0.8"/><line x1="108.8" y1="61" x2="108.8" y2="64.5" stroke-width="0.55"/><line x1="111.6" y1="61" x2="111.6" y2="64.5" stroke-width="0.55"/><line x1="114.4" y1="61" x2="114.4" y2="64.5" stroke-width="0.55"/><line x1="117.2" y1="61" x2="117.2" y2="64.5" stroke-width="0.55"/><line x1="122.8" y1="61" x2="122.8" y2="64.5" stroke-width="0.55"/><line x1="125.6" y1="61" x2="125.6" y2="64.5" stroke-width="0.55"/><line x1="128.4" y1="61" x2="128.4" y2="64.5" stroke-width="0.55"/><line x1="131.2" y1="61" x2="131.2" y2="64.5" stroke-width="0.55"/><line x1="134.0" y1="61" x2="134.0" y2="66.5" stroke-width="0.8"/><line x1="136.8" y1="61" x2="136.8" y2="64.5" stroke-width="0.55"/><line x1="139.6" y1="61" x2="139.6" y2="64.5" stroke-width="0.55"/><line x1="142.4" y1="61" x2="142.4" y2="64.5" stroke-width="0.55"/><line x1="145.2" y1="61" x2="145.2" y2="64.5" stroke-width="0.55"/><line x1="150.8" y1="61" x2="150.8" y2="64.5" stroke-width="0.55"/><line x1="153.6" y1="61" x2="153.6" y2="64.5" stroke-width="0.55"/><line x1="156.4" y1="61" x2="156.4" y2="64.5" stroke-width="0.55"/><line x1="159.2" y1="61" x2="159.2" y2="64.5" stroke-width="0.55"/><line x1="162.0" y1="61" x2="162.0" y2="66.5" stroke-width="0.8"/><line x1="164.8" y1="61" x2="164.8" y2="64.5" stroke-width="0.55"/><line x1="167.6" y1="61" x2="167.6" y2="64.5" stroke-width="0.55"/><line x1="170.4" y1="61" x2="170.4" y2="64.5" stroke-width="0.55"/><line x1="173.2" y1="61" x2="173.2" y2="64.5" stroke-width="0.55"/><line x1="178.8" y1="61" x2="178.8" y2="64.5" stroke-width="0.55"/><line x1="181.6" y1="61" x2="181.6" y2="64.5" stroke-width="0.55"/><line x1="184.4" y1="61" x2="184.4" y2="64.5" stroke-width="0.55"/><line x1="187.2" y1="61" x2="187.2" y2="64.5" stroke-width="0.55"/><line x1="190.0" y1="61" x2="190.0" y2="66.5" stroke-width="0.8"/><line x1="192.8" y1="61" x2="192.8" y2="64.5" stroke-width="0.55"/><line x1="195.6" y1="61" x2="195.6" y2="64.5" stroke-width="0.55"/><line x1="198.4" y1="61" x2="198.4" y2="64.5" stroke-width="0.55"/><line x1="201.2" y1="61" x2="201.2" y2="64.5" stroke-width="0.55"/><line x1="206.8" y1="61" x2="206.8" y2="64.5" stroke-width="0.55"/><line x1="209.6" y1="61" x2="209.6" y2="64.5" stroke-width="0.55"/><line x1="212.4" y1="61" x2="212.4" y2="64.5" stroke-width="0.55"/><line x1="215.2" y1="61" x2="215.2" y2="64.5" stroke-width="0.55"/><line x1="218.0" y1="61" x2="218.0" y2="66.5" stroke-width="0.8"/><line x1="220.8" y1="61" x2="220.8" y2="64.5" stroke-width="0.55"/><line x1="223.6" y1="61" x2="223.6" y2="64.5" stroke-width="0.55"/><line x1="226.4" y1="61" x2="226.4" y2="64.5" stroke-width="0.55"/><line x1="229.2" y1="61" x2="229.2" y2="64.5" stroke-width="0.55"/><line x1="234.8" y1="61" x2="234.8" y2="64.5" stroke-width="0.55"/><line x1="237.6" y1="61" x2="237.6" y2="64.5" stroke-width="0.55"/><line x1="240.4" y1="61" x2="240.4" y2="64.5" stroke-width="0.55"/><line x1="243.2" y1="61" x2="243.2" y2="64.5" stroke-width="0.55"/><line x1="246.0" y1="61" x2="246.0" y2="66.5" stroke-width="0.8"/><line x1="248.8" y1="61" x2="248.8" y2="64.5" stroke-width="0.55"/><line x1="251.6" y1="61" x2="251.6" y2="64.5" stroke-width="0.55"/><line x1="254.4" y1="61" x2="254.4" y2="64.5" stroke-width="0.55"/><line x1="257.2" y1="61" x2="257.2" y2="64.5" stroke-width="0.55"/></g>
+            <g font-size="6.4" fill="#B4560E" text-anchor="middle"><text x="36" y="35">0</text><text x="64" y="35">1</text><text x="92" y="35">2</text><text x="120" y="35">3</text><text x="148" y="35">4</text><text x="176" y="35">5</text><text x="204" y="35">6</text><text x="232" y="35">7</text><text x="260" y="35">8</text><text x="36" y="79">0</text><text x="64" y="79">1</text><text x="92" y="79">2</text><text x="120" y="79">3</text><text x="148" y="79">4</text><text x="176" y="79">5</text><text x="204" y="79">6</text><text x="232" y="79">7</text><text x="260" y="79">8</text></g>
+          </svg>
+        </figure>
+        <div class="bogi-box">
+          <div class="bt">보기</div>
+          ㄱ. (나)는 (가)보다 더 정밀한 도구이다.<br>
+          ㄴ. (나)로 재면 오차가 없는 참값을 얻을 수 있다.<br>
+          ㄷ. (가)로 잰 값은 단위 없이 수치만 적어도 된다.
+        </div>
+        <ul class="choices inline">
+          <li>① ㄱ</li><li>② ㄷ</li><li>③ ㄱ, ㄴ</li><li>④ ㄴ, ㄷ</li><li>⑤ ㄱ, ㄴ, ㄷ</li>
+        </ul>
+      </div>
+
+      <div class="q">
+        <div class="qhead"><span class="qno">10</span><div class="stem">측정 표준에 대한 설명으로 옳은 것은? <span class="difficulty">●○○</span>
+        <div class="tags">10통과1-01-03 | 개념 3·4</div></div></div>
+        <ul class="choices">
+          <li>① 1&nbsp;kg의 기준은 나라마다 달라도 된다.</li>
+          <li>② 누가 언제 재어도 같은 값을 얻게 하는 기준이다.</li>
+          <li>③ 킬로그램 원기가 지금도 1&nbsp;kg의 정의이다.</li>
+          <li>④ 병원 혈압계는 교정 없이 써도 믿을 수 있다.</li>
+          <li>⑤ 측정 표준은 실험실에서만 필요하다.</li>
+        </ul>
+      </div>
+    </div>
   </div>
 
   <div class="folio"><span>I. 과학의 기초</span><span class="num">42</span></div>
 </div>
 
-<!-- ═════════════ p.43 STEP 2 계속 ═════════════ -->
+<!-- ═════════════ p.43 STEP 2 계속 (11~16) ═════════════ -->
 <div class="page">
   <div class="runhead"><span class="unit-tag">I. 과학의 기초</span><span class="lesson-tag">03. 측정과 어림, 측정 표준 | 문제</span></div>
 
-  <div class="q">
-    <div class="qhead"><span class="qno">9</span><div class="stem"><span class="badge-data">자료</span>가로 10 m, 세로 8 m, 높이 3 m인 교실 안 공기의 질량을 어림하려 한다. 공기의 밀도를 약 1.2 kg/m<sup>3</sup>라 할 때, 가장 적절한 어림값은? <span class="difficulty">●●●</span>
-    <div class="tags">10통과1-01-03 | 개념 2·자료</div></div></div>
-    <ul class="choices inline">
-      <li>① 약 3 kg</li>
-      <li>② 약 30 kg</li>
-      <li>③ 약 90 kg</li>
-      <li>④ 약 300 kg</li>
-      <li>⑤ 약 3000 kg</li>
-    </ul>
-  </div>
+  <div class="qgrid qg2">
+    <div>
+      <div class="q">
+        <div class="qhead"><span class="qno">11</span><div class="stem">어림에 대한 설명으로 옳은 것만을 &lt;보기&gt;에서 있는 대로 고른 것은? <span class="difficulty">●○○</span>
+        <div class="tags">10통과1-01-03 | 개념 2</div></div></div>
+        <div class="bogi-box">
+          <div class="bt">보기</div>
+          ㄱ. 어림은 정확한 값을 얻지 못하므로 과학 탐구에서는 쓰지 않는다.<br>
+          ㄴ. 페르미 추정은 큰 문제를 아는 조각으로 쪼개고, 조각마다 합리적인 값을 넣어 곱하는 방법이다.<br>
+          ㄷ. 계산기로 구한 답이 어림한 규모와 100배 다르면 계산 과정을 다시 확인해야 한다.
+        </div>
+        <ul class="choices inline">
+          <li>① ㄱ</li><li>② ㄷ</li><li>③ ㄱ, ㄴ</li><li>④ ㄴ, ㄷ</li><li>⑤ ㄱ, ㄴ, ㄷ</li>
+        </ul>
+      </div>
 
-  <div class="q">
-    <div class="qhead"><span class="qno">10</span><div class="stem">측정 표준의 유용성에 대한 설명으로 옳은 것만을 고른 것은? <span class="difficulty">●●●</span>
-    <div class="tags">10통과1-01-03 | 개념 3·5</div></div></div>
-    <div class="bogi-box" style="background:#fff;">
-      (가) 표준이 있어야 시장의 저울과 병원의 저울이 같은 1 kg을 가리킨다.<br>
-      (나) 혈압·시력 같은 건강 지표도 표준화된 방법으로 재어야 비교할 수 있다.<br>
-      (다) 측정 표준은 과학 연구에는 필요하지만 일상생활과는 무관하다.
+      <div class="q">
+        <div class="qhead"><span class="qno">12</span><div class="stem"><span class="must">중요</span><span class="badge-data">자료</span>그림과 같은 체육관 안 공기의 질량을 어림하려 한다. 가장 적절한 어림값은? <span class="difficulty">●●○</span>
+        <div class="tags">10통과1-01-03 | 개념 2</div></div></div>
+        <figure style="margin:2mm 0 1mm 8.6mm;">
+          <svg width="262" height="100" viewBox="0 0 262 100" font-family="PC Sans">
+            <path d="M34,30 L64,12 L184,12 L154,30 Z" fill="#EAF6EC" stroke="#3E9C6E" stroke-width="1"/>
+            <path d="M154,30 L184,12 L184,66 L154,84 Z" fill="#D6EEDF" stroke="#3E9C6E" stroke-width="1"/>
+            <rect x="34" y="30" width="120" height="54" fill="#F0F8F3" stroke="#3E9C6E" stroke-width="1"/>
+            <rect x="84" y="62" width="20" height="22" fill="#fff" stroke="#3E9C6E" stroke-width="0.9"/>
+            <text x="94" y="50" font-size="7.6" font-weight="800" fill="#2E7A54" text-anchor="middle">체육관</text>
+            <g font-size="7.4" font-weight="800" fill="#22303A">
+              <text x="94" y="96" text-anchor="middle">가로 20&#160;m</text>
+              <text x="28" y="60" text-anchor="end">높이</text><text x="28" y="70" text-anchor="end">10&#160;m</text>
+              <text x="172" y="86">세로 15&#160;m</text>
+            </g>
+            <g font-size="7.2" fill="#B4560E" font-weight="800">
+              <text x="196" y="38">공기의 밀도</text>
+              <text x="196" y="52">≈ 1.2&#160;kg/m<tspan dy="-2.6" font-size="5.2">3</tspan></text>
+            </g>
+          </svg>
+        </figure>
+        <ul class="choices inline">
+          <li>① 약 3.6&nbsp;kg</li><li>② 약 36&nbsp;kg</li><li>③ 약 360&nbsp;kg</li><li>④ 약 3600&nbsp;kg</li><li>⑤ 약 36000&nbsp;kg</li>
+        </ul>
+      </div>
+
+      <div class="q">
+        <div class="qhead"><span class="qno">13</span><div class="stem">측정 표준의 유용성으로 옳은 것만을 &lt;보기&gt;에서 있는 대로 고른 것은? <span class="difficulty">●●○</span>
+        <div class="tags">10통과1-01-03 | 개념 3·5</div></div></div>
+        <div class="bogi-box">
+          <div class="bt">보기</div>
+          ㄱ. 표준이 있어야 시장의 저울과 병원의 저울이 같은 1&nbsp;kg을 가리킨다.<br>
+          ㄴ. 혈압·시력 같은 건강 지표도 표준화된 방법으로 재어야 비교할 수 있다.<br>
+          ㄷ. 측정 표준은 과학 연구에는 필요하지만 일상생활과는 무관하다.
+        </div>
+        <ul class="choices inline">
+          <li>① ㄱ</li><li>② ㄷ</li><li>③ ㄱ, ㄴ</li><li>④ ㄴ, ㄷ</li><li>⑤ ㄱ, ㄴ, ㄷ</li>
+        </ul>
+      </div>
     </div>
-    <ul class="choices inline">
-      <li>① (가)</li><li>② (나)</li><li>③ (나), (다)</li><li>④ (가), (나)</li><li>⑤ (가), (나), (다)</li>
-    </ul>
-  </div>
+    <div>
+      <div class="q">
+        <div class="qhead"><span class="qno">14</span><div class="stem">다음은 측정 표준에 대한 학생 A~C의 대화이다. 옳게 말한 학생만을 있는 대로 고른 것은? <span class="difficulty">●●○</span>
+        <div class="tags">10통과1-01-03 | 개념 3</div></div></div>
+        <div class="bogi-box">
+          <b>학생 A</b> : 측정 표준은 과학자들이 실험실 안에서만 쓰는 약속이야.<br>
+          <b>학생 B</b> : 표준은 한 번 정해 두면 따로 지키고 관리할 필요가 없어.<br>
+          <b>학생 C</b> : 병원 혈압계의 눈금을 표준과 비교해 바로잡는 일을 교정이라고 해.
+        </div>
+        <ul class="choices inline">
+          <li>① A</li><li>② C</li><li>③ A, B</li><li>④ B, C</li><li>⑤ A, B, C</li>
+        </ul>
+      </div>
 
-  <div class="q">
-    <div class="qhead"><span class="qno">11</span><div class="stem"><span class="badge-essay">서술형</span>1 kg의 기준이 금속 원기에서 플랑크 상수로 바뀐 까닭을 <b>'변한다'</b>와 <b>'자연 상수'</b>라는 말을 포함하여 서술하시오. <span class="difficulty">●●●●</span>
-    <div class="tags">10통과1-01-03 | 개념 4</div></div></div>
-    <div class="essay-lines"><div></div><div></div><div></div></div>
+      <div class="q">
+        <div class="qhead"><span class="qno">15</span><div class="stem"><span class="must">중요</span><span class="badge-data">자료</span>그림은 2019년 전후 1&nbsp;kg의 기준을 정하는 방식을 나타낸 것이다. 옳은 것만을 <span style="white-space:nowrap">&lt;보기&gt;에서</span> 있는 대로 고른 것은? <span class="difficulty">●●○</span>
+        <div class="tags">10통과1-01-03 | 개념 4</div></div></div>
+        <figure style="margin:2mm 0 1mm 8.6mm;">
+          <svg width="288" height="112" viewBox="0 0 288 112" font-family="PC Sans">
+            <g font-size="7.2" text-anchor="middle">
+              <rect x="1" y="1" width="138" height="110" rx="5" fill="#FBEBEE" stroke="#E3A0AC" stroke-width="0.9"/>
+              <text x="70" y="13" font-size="7.6" font-weight="900" fill="#A9556A">(가) 2019년 이전</text>
+              <rect x="22" y="20" width="96" height="17" rx="3" fill="#fff" stroke="#A9556A" stroke-width="0.9"/>
+              <text x="70" y="31.5" font-weight="800" fill="#A9556A">킬로그램 원기(금고)</text>
+              <g stroke="#D998A4" stroke-width="1.2" marker-end="url(#arrR)"><line x1="58" y1="38" x2="30" y2="52"/><line x1="70" y1="38" x2="70" y2="52"/><line x1="82" y1="38" x2="110" y2="52"/></g>
+              <g fill="#fff" stroke="#D998A4" stroke-width="0.8"><rect x="8" y="56" width="40" height="15" rx="2"/><rect x="50" y="56" width="40" height="15" rx="2"/><rect x="92" y="56" width="40" height="15" rx="2"/></g>
+              <g fill="#5B6B77" font-size="6.8"><text x="28" y="66.5">복제 원기</text><text x="70" y="66.5">복제 원기</text><text x="112" y="66.5">복제 원기</text></g>
+              <text x="70" y="88" fill="#22303A">각국의 1&#160;kg은 원기와</text>
+              <text x="70" y="99" fill="#22303A">비교해서 정했다</text>
+
+              <rect x="149" y="1" width="138" height="110" rx="5" fill="#F0F8F3" stroke="#BFE0CD" stroke-width="0.9"/>
+              <text x="218" y="13" font-size="7.6" font-weight="900" fill="#3E9C6E">(나) 2019년 이후</text>
+              <rect x="170" y="20" width="96" height="17" rx="3" fill="#fff" stroke="#3E9C6E" stroke-width="0.9"/>
+              <text x="218" y="31.5" font-weight="800" fill="#3E9C6E">플랑크 상수 h</text>
+              <g stroke="#6FBE93" stroke-width="1.2" marker-end="url(#arrP)"><line x1="206" y1="38" x2="178" y2="52"/><line x1="218" y1="38" x2="218" y2="52"/><line x1="230" y1="38" x2="258" y2="52"/></g>
+              <g fill="#fff" stroke="#8CCBA8" stroke-width="0.8"><rect x="156" y="56" width="40" height="15" rx="2"/><rect x="198" y="56" width="40" height="15" rx="2"/><rect x="240" y="56" width="40" height="15" rx="2"/></g>
+              <g fill="#5B6B77" font-size="6.8"><text x="176" y="66.5">실험실</text><text x="218" y="66.5">실험실</text><text x="260" y="66.5">실험실</text></g>
+              <text x="218" y="88" fill="#22303A">장비를 갖춘 실험실에서</text>
+              <text x="218" y="99" fill="#22303A">1&#160;kg을 직접 구현한다</text>
+            </g>
+          </svg>
+        </figure>
+        <div class="bogi-box">
+          <div class="bt">보기</div>
+          ㄱ. (가)에서 원기의 질량이 조금 변해도 각국의 1&nbsp;kg은 영향을 받지 않았다.<br>
+          ㄴ. (나)에서는 원기를 참조하지 않고도 1&nbsp;kg을 구현할 수 있다.<br>
+          ㄷ. (가) → (나)는 기준을 변할 수 있는 물체에서 변하지 않는 자연 상수로 옮긴 것이다.
+        </div>
+        <ul class="choices inline">
+          <li>① ㄱ</li><li>② ㄷ</li><li>③ ㄱ, ㄴ</li><li>④ ㄴ, ㄷ</li><li>⑤ ㄱ, ㄴ, ㄷ</li>
+        </ul>
+      </div>
+
+      <div class="q">
+        <div class="qhead"><span class="qno">16</span><div class="stem">길이, 시간, 질량의 현재 기준을 순서대로 옳게 짝지은 것은? <span class="difficulty">●○○</span>
+        <div class="tags">10통과1-01-03 | 개념 4</div></div></div>
+        <ul class="choices">
+          <li>① 빛 — 세슘 원자 — 플랑크 상수</li>
+          <li>② 빛 — 지구의 자전 — 플랑크 상수</li>
+          <li>③ 미터원기 — 세슘 원자 — 킬로그램 원기</li>
+          <li>④ 미터원기 — 지구의 자전 — 플랑크 상수</li>
+          <li>⑤ 빛 — 세슘 원자 — 킬로그램 원기</li>
+        </ul>
+      </div>
+    </div>
   </div>
 
   <div class="folio"><span>I. 과학의 기초</span><span class="num">43</span></div>
 </div>
 
-<!-- ═════════════ p.44 STEP 3 ═════════════ -->
+<!-- ═════════════ STEP 2 계속 (16~17) + 서술형 (18~20) ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag">I. 과학의 기초</span><span class="lesson-tag">03. 측정과 어림, 측정 표준 | 문제</span></div>
+
+  <div class="qgrid qg2">
+    <div>
+      <div class="q">
+        <div class="qhead"><span class="qno">17</span><div class="stem"><span class="badge-data">자료</span>그림 (가)~(다)는 생활 속 측정 표준의 예를 나타낸 것이다. 옳은 것만을 &lt;보기&gt;에서 있는 대로 고른 것은? <span class="difficulty">●●○</span>
+        <div class="tags">10통과1-01-03 | 개념 5</div></div></div>
+        <figure style="margin:2mm 0 1mm 8.6mm;">
+          <svg width="292" height="86.5" viewBox="0 0 270 80" font-family="PC Sans">
+            <g font-size="7" text-anchor="middle">
+              <rect x="1" y="1" width="86" height="76" rx="5" fill="#F0F8F3" stroke="#BFE0CD" stroke-width="0.9"/>
+              <circle cx="44" cy="27" r="14" fill="#fff" stroke="#3E9C6E" stroke-width="1.5"/>
+              <circle cx="39" cy="27" r="2.4" fill="#3E9C6E"/><circle cx="49" cy="27" r="2.4" fill="#3E9C6E"/>
+              <text x="44" y="56" font-size="8" font-weight="900" fill="#22303A">220&#160;V</text>
+              <text x="44" y="70" font-size="7" fill="#5B6B77">(가) 가정용 전압</text>
+
+              <rect x="92" y="1" width="86" height="76" rx="5" fill="#FDF9F0" stroke="#EBCB9C" stroke-width="0.9"/>
+              <circle cx="135" cy="27" r="11" fill="none" stroke="#B4560E" stroke-width="3.2"/>
+              <rect x="141" y="25" width="8" height="4" fill="#FDF9F0"/>
+              <text x="135" y="56" font-size="8" font-weight="900" fill="#22303A">시력 1.0</text>
+              <text x="135" y="70" font-size="7" fill="#5B6B77">(나) 시력 검사표</text>
+
+              <rect x="183" y="1" width="86" height="76" rx="5" fill="#EAF6EC" stroke="#5FA86A" stroke-width="0.9"/>
+              <path d="M214,10 h16 l8,8 v24 h-24 Z" fill="#fff" stroke="#2E6B3A" stroke-width="1.1"/>
+              <path d="M230,10 v8 h8" fill="none" stroke="#2E6B3A" stroke-width="0.9"/>
+              <text x="226" y="32" font-size="6.6" font-weight="800" fill="#2E6B3A">A4</text>
+              <text x="226" y="56" font-size="8" font-weight="900" fill="#22303A">A4 규격</text>
+              <text x="226" y="70" font-size="7" fill="#5B6B77">(다) 종이 크기</text>
+            </g>
+          </svg>
+        </figure>
+        <div class="bogi-box">
+          <div class="bt">보기</div>
+          ㄱ. (가)의 220&nbsp;V는 지역마다 다르다.<br>
+          ㄴ. (나)의 시력 1.0은 검사 거리와 고리 크기를 병원마다 다르게 해도 같은 의미이다.<br>
+          ㄷ. (가)~(다)는 모두 정해진 기준이 있어 서로 비교하거나 맞춰 쓸 수 있다.
+        </div>
+        <ul class="choices inline">
+          <li>① ㄱ</li><li>② ㄷ</li><li>③ ㄱ, ㄴ</li><li>④ ㄴ, ㄷ</li><li>⑤ ㄱ, ㄴ, ㄷ</li>
+        </ul>
+      </div>
+
+      <div class="q">
+        <div class="qhead"><span class="qno">18</span><div class="stem"><span class="badge-essay">서술형</span>1&nbsp;kg의 기준이 금속 원기에서 플랑크 상수로 바뀐 까닭을 <b>'복제 원기'</b>, <b>'변한다'</b>, <b>'자연 상수'</b>를 모두 포함하여 서술하시오. <span class="difficulty">●●○</span>
+        <div class="tags">10통과1-01-03 | 개념 4</div></div></div>
+        <div class="essay-lines"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>
+      </div>
+    </div>
+    <div>
+      <div class="q">
+        <div class="qhead"><span class="qno">19</span><div class="stem"><span class="must">중요</span><span class="badge-essay">서술형</span>시장의 저울이나 병원의 혈압계가 서로 다른 기준으로 값을 나타낼 때 생기는 문제를 한 가지 쓰고, 이를 막는 방법을 <b>'측정 표준'</b>, <b>'교정'</b>, <b>'같은 값'</b>을 모두 포함하여 서술하시오. <span class="difficulty">●●○</span>
+        <div class="tags">10통과1-01-03 | 개념 3</div></div></div>
+        <div class="essay-lines"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>
+      </div>
+
+      <div class="q">
+        <div class="qhead"><span class="qno">20</span><div class="stem"><span class="badge-essay">서술형</span>가로 100&nbsp;m, 세로 60&nbsp;m인 운동장에 학생들이 빽빽이 서 있다. 한 사람이 차지하는 넓이를 약 0.5&nbsp;m<sup>2</sup>로 볼 때, 학생 수를 어림하는 과정을 <b>'쪼갠다'</b>, <b>'자릿수'</b>를 모두 포함하여 서술하고 어림값을 쓰시오. <span class="difficulty">●●●</span>
+        <div class="tags">10통과1-01-03 | 개념 2</div></div></div>
+        <div class="essay-lines"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="folio"><span>I. 과학의 기초</span><span class="num">?</span></div>
+</div>
+
+<!-- ═════════════ p.44 STEP 3 (21~24) ═════════════ -->
 <div class="page">
   <div class="runhead"><span class="unit-tag">I. 과학의 기초</span><span class="lesson-tag">03. 측정과 어림, 측정 표준 | 문제</span></div>
   <div class="step-head s3"><span class="stepno">STEP 3</span><span class="steptt">수능 도전</span><span class="stepdesc">2028 수능 규격 — ㄱㄴㄷ 합답형·자료 해석</span></div>
 
-  <div class="q">
-    <div class="qhead"><span class="qno">12</span><div class="stem"><span class="badge-data">자료</span>표는 학생 A~C의 활동을 나타낸 것이다. 옳은 것만을 &lt;보기&gt;에서 있는 대로 고른 것은? <span class="difficulty">[2점]</span>
-    <div class="tags">10통과1-01-03</div></div></div>
-    <div class="bogi-box" style="background:#fff; margin-bottom:2mm;">
-      A: 줄자로 운동장 한 변의 길이를 재어 85.4 m를 기록했다.<br>
-      B: 도서관 장서 수를 서가 수 × 칸 수 × 칸당 권수로 약 3만 권이라 헤아렸다.<br>
-      C: 온도계 없이 손을 담가 보고 물이 '약 40 ℃쯤'이라고 판단했다.
-    </div>
-    <div class="bogi-box">
-      <div class="bt">보기</div>
-      ㄱ. A의 활동은 측정이다.<br>
-      ㄴ. B와 C의 활동은 어림이다.<br>
-      ㄷ. B의 방식은 큰 문제를 쪼개어 곱하는 어림 전략이다.
-    </div>
-    <ul class="choices inline">
-      <li>① ㄱ</li><li>② ㄴ</li><li>③ ㄱ, ㄷ</li><li>④ ㄴ, ㄷ</li><li>⑤ ㄱ, ㄴ, ㄷ</li>
-    </ul>
-  </div>
+  <div class="qgrid qg2">
+    <div>
+      <div class="q">
+        <div class="qhead"><span class="qno">21</span><div class="stem"><span class="badge-data">자료</span>다음은 학생 A~C의 활동이다.
+          <div class="exp"><b>A</b> 줄자로 운동장 한 변을 재어 85.4&nbsp;m를 기록했다.<br><b>B</b> 도서관 장서 수를 '서가 수 × 칸 수 × 칸당 권수'로 계산해 약 3만 권이라 헤아렸다.<br><b>C</b> 손을 물에 담가 보고 '약 40&nbsp;℃쯤'이라고 판단했다.</div>
+          이에 대한 설명으로 옳은 것만을 &lt;보기&gt;에서 있는 대로 고른 것은? <span class="difficulty">●●○ [2점]</span>
+        <div class="tags">10통과1-01-03 | 개념 1·2</div></div></div>
+        <div class="bogi-box">
+          <div class="bt">보기</div>
+          ㄱ. A의 활동은 측정이다.<br>
+          ㄴ. B와 C의 활동은 어림이다.<br>
+          ㄷ. B는 큰 문제를 쪼개어 곱하는 어림 전략을 썼다.
+        </div>
+        <ul class="choices inline">
+          <li>① ㄱ</li><li>② ㄷ</li><li>③ ㄱ, ㄴ</li><li>④ ㄴ, ㄷ</li><li>⑤ ㄱ, ㄴ, ㄷ</li>
+        </ul>
+      </div>
 
-  <div class="q">
-    <div class="qhead"><span class="qno">13</span><div class="stem"><span class="badge-data">자료</span>표는 세 물리량의 기준이 변해 온 과정이다. 옳은 것만을 &lt;보기&gt;에서 있는 대로 고른 것은? <span class="difficulty">[2.5점]</span>
-    <div class="tags">10통과1-01-03</div></div></div>
-    <div class="bogi-box" style="background:#fff; margin-bottom:2mm;">
-      길이: 미터원기 → 빛(01 참고) / 시간: 지구 자전 → 세슘 원자 / 질량: 킬로그램 원기 → 플랑크 상수(2019)
+      <div class="q">
+        <div class="qhead"><span class="qno">22</span><div class="stem"><span class="badge-data">자료</span>표는 세 물리량의 기준이 변해 온 과정을 나타낸 것이다. 옳은 것만을 &lt;보기&gt;에서 있는 대로 고른 것은? <span class="difficulty">●●○ [2.5점]</span>
+        <div class="tags">10통과1-01-03 | 개념 4</div></div></div>
+        <figure style="margin:2mm 0 1mm 8.6mm;">
+          <svg width="290" height="80" viewBox="0 0 290 80" font-family="PC Sans">
+            <rect x="1" y="1" width="288" height="19" fill="#EAF6EC"/>
+            <rect x="1" y="1" width="288" height="78" fill="none" stroke="#B8C2CA" stroke-width="0.9"/>
+            <g stroke="#B8C2CA" stroke-width="0.8"><line x1="1" y1="20" x2="289" y2="20"/><line x1="1" y1="40" x2="289" y2="40"/><line x1="1" y1="60" x2="289" y2="60"/><line x1="40" y1="1" x2="40" y2="79"/></g>
+            <g font-size="7.6" font-weight="800" fill="#2E7A54" text-anchor="middle"><text x="20.5" y="14">물리량</text><text x="164.5" y="14">기준의 변화</text></g>
+            <g font-size="7.6" fill="#22303A">
+              <text x="20.5" y="33.5" text-anchor="middle" font-weight="800">길이</text><text x="48" y="33.5">미터원기 → <tspan font-weight="800">빛이 진공에서 나아간 거리</tspan></text>
+              <text x="20.5" y="53.5" text-anchor="middle" font-weight="800">시간</text><text x="48" y="53.5">지구의 자전 → <tspan font-weight="800">세슘 원자의 진동</tspan></text>
+              <text x="20.5" y="73.5" text-anchor="middle" font-weight="800">질량</text><text x="48" y="73.5">킬로그램 원기 → <tspan font-weight="800">플랑크 상수</tspan>(2019년)</text>
+            </g>
+          </svg>
+        </figure>
+        <div class="bogi-box">
+          <div class="bt">보기</div>
+          ㄱ. 세 경우 모두 '물체나 천체'에서 '자연 상수·원자'로 기준이 옮겨 갔다.<br>
+          ㄴ. 기준을 바꾼 공통 이유는 이전 기준이 변할 수 있다는 것이었다.<br>
+          ㄷ. 새 기준으로는 장비를 갖춘 어느 실험실에서든 단위를 구현할 수 있다.
+        </div>
+        <ul class="choices inline">
+          <li>① ㄱ</li><li>② ㄷ</li><li>③ ㄱ, ㄴ</li><li>④ ㄴ, ㄷ</li><li>⑤ ㄱ, ㄴ, ㄷ</li>
+        </ul>
+      </div>
     </div>
-    <div class="bogi-box">
-      <div class="bt">보기</div>
-      ㄱ. 세 경우 모두 '물체나 천체'에서 '자연 상수·원자'로 기준이 옮겨 갔다.<br>
-      ㄴ. 기준 변경의 공통 이유는 이전 기준이 변할 수 있다는 것이었다.<br>
-      ㄷ. 새 기준으로는 장비를 갖춘 어느 실험실에서든 단위를 구현할 수 있다.
+    <div>
+      <div class="q">
+        <div class="qhead"><span class="qno">23</span><div class="stem"><span class="badge-data">자료</span>표는 1&nbsp;kg 표준 추를 전자저울 (가), (나)에 네 번씩 올려 읽은 값이다. 옳은 것만을 &lt;보기&gt;에서 있는 대로 고른 것은? <span class="difficulty">●●● [2점]</span>
+        <div class="tags">10통과1-01-03 | 개념 1·3</div></div></div>
+        <figure style="margin:2mm 0 1mm 8.6mm;">
+          <svg width="292" height="67" viewBox="0 0 270 62" font-family="PC Sans">
+            <rect x="1" y="1" width="268" height="19" fill="#EAF6EC"/>
+            <rect x="1" y="1" width="268" height="59" fill="none" stroke="#B8C2CA" stroke-width="0.9"/>
+            <g stroke="#B8C2CA" stroke-width="0.8"><line x1="1" y1="20" x2="269" y2="20"/><line x1="1" y1="40" x2="269" y2="40"/><line x1="50" y1="1" x2="50" y2="60"/><line x1="105" y1="1" x2="105" y2="60"/><line x1="160" y1="1" x2="160" y2="60"/><line x1="215" y1="1" x2="215" y2="60"/></g>
+            <g font-size="7.6" font-weight="800" fill="#2E7A54" text-anchor="middle"><text x="25.5" y="14">저울</text><text x="77.5" y="14">1회</text><text x="132.5" y="14">2회</text><text x="187.5" y="14">3회</text><text x="242" y="14">4회</text></g>
+            <g font-size="7.8" fill="#22303A" text-anchor="middle">
+              <text x="25.5" y="33.5" font-weight="800">(가)</text><text x="77.5" y="33.5">1.002&#160;kg</text><text x="132.5" y="33.5">0.999&#160;kg</text><text x="187.5" y="33.5">1.001&#160;kg</text><text x="242" y="33.5">0.998&#160;kg</text>
+              <text x="25.5" y="53.5" font-weight="800">(나)</text><text x="77.5" y="53.5">1.049&#160;kg</text><text x="132.5" y="53.5">1.051&#160;kg</text><text x="187.5" y="53.5">1.050&#160;kg</text><text x="242" y="53.5">1.050&#160;kg</text>
+            </g>
+          </svg>
+        </figure>
+        <div class="bogi-box">
+          <div class="bt">보기</div>
+          ㄱ. (가)로 잰 값의 평균은 1.000&nbsp;kg이다.<br>
+          ㄴ. (나)는 눈금을 바로잡는 교정이 필요하다.<br>
+          ㄷ. (가)를 교정하면 오차를 0으로 만들 수 있다.
+        </div>
+        <ul class="choices inline">
+          <li>① ㄱ</li><li>② ㄷ</li><li>③ ㄱ, ㄴ</li><li>④ ㄴ, ㄷ</li><li>⑤ ㄱ, ㄴ, ㄷ</li>
+        </ul>
+      </div>
+
+      <div class="q">
+        <div class="qhead"><span class="qno">24</span><div class="stem"><span class="badge-data">자료</span>그림 (가)는 물탱크에 가득 찬 물의 질량을 어림하는 데 쓸 자료를, (나)는 SI 기본량 세 가지와 그 현재 기준을 나타낸 것이다. 옳은 것만을 &lt;보기&gt;에서 있는 대로 고른 것은? <span class="difficulty">●●● [2.5점]</span>
+        <div class="tags">10통과1-01-03 | 개념 2·4 (I-01·I-02 연계)</div></div></div>
+        <figure style="margin:2mm 0 1mm 8.6mm;">
+          <svg width="290" height="94" viewBox="0 0 290 94" font-family="PC Sans">
+            <text x="1" y="9" font-size="7.6" font-weight="900" fill="#22303A">(가)</text>
+            <path d="M30,32 L48,20 L112,20 L94,32 Z" fill="#D6EBF8" stroke="#4A8FD0" stroke-width="1"/>
+            <path d="M94,32 L112,20 L112,60 L94,72 Z" fill="#9FCBEB" stroke="#4A8FD0" stroke-width="1"/>
+            <rect x="30" y="32" width="64" height="40" fill="#BFE3F5" stroke="#4A8FD0" stroke-width="1"/>
+            <g font-size="7.2" font-weight="800" fill="#1E4E8C">
+              <text x="62" y="82" text-anchor="middle">2&#160;m</text>
+              <text x="26" y="55" text-anchor="end">1.5&#160;m</text>
+              <text x="106" y="73">2&#160;m</text>
+            </g>
+            <text x="62" y="92" font-size="6.8" fill="#5B6B77" text-anchor="middle">물의 밀도 ≈ 1000&#160;kg/m<tspan dy="-2.4" font-size="4.8">3</tspan></text>
+
+            <text x="128" y="9" font-size="7.6" font-weight="900" fill="#22303A">(나)</text>
+            <rect x="128" y="13" width="161" height="17" fill="#EAF6EC"/>
+            <rect x="128" y="13" width="161" height="68" fill="none" stroke="#B8C2CA" stroke-width="0.9"/>
+            <g stroke="#B8C2CA" stroke-width="0.8"><line x1="128" y1="30" x2="289" y2="30"/><line x1="128" y1="47" x2="289" y2="47"/><line x1="128" y1="64" x2="289" y2="64"/><line x1="172" y1="13" x2="172" y2="81"/></g>
+            <g font-size="7.4" font-weight="800" fill="#2E7A54" text-anchor="middle"><text x="150" y="25">기본량</text><text x="230.5" y="25">현재의 기준</text></g>
+            <g font-size="7.4" fill="#22303A" text-anchor="middle">
+              <text x="150" y="42" font-weight="800">길이(m)</text><text x="230.5" y="42">빛이 진공에서 나아간 거리</text>
+              <text x="150" y="59" font-weight="800">시간(s)</text><text x="230.5" y="59">세슘 원자의 진동</text>
+              <text x="150" y="76" font-weight="800">질량(kg)</text><text x="230.5" y="76">플랑크 상수</text>
+            </g>
+          </svg>
+        </figure>
+        <div class="bogi-box">
+          <div class="bt">보기</div>
+          ㄱ. (가)의 물의 질량은 약 6&nbsp;×&nbsp;10<sup>3</sup>&nbsp;kg이다.<br>
+          ㄴ. (가)에서 쓴 밀도는 (나)와 같은 기본량이다.<br>
+          ㄷ. (나)에서 1&nbsp;m는 시간과 무관하게 정의된다.
+        </div>
+        <ul class="choices inline">
+          <li>① ㄱ</li><li>② ㄷ</li><li>③ ㄱ, ㄴ</li><li>④ ㄴ, ㄷ</li><li>⑤ ㄱ, ㄴ, ㄷ</li>
+        </ul>
+      </div>
     </div>
-    <ul class="choices inline">
-      <li>① ㄱ</li><li>② ㄷ</li><li>③ ㄱ, ㄴ</li><li>④ ㄴ, ㄷ</li><li>⑤ ㄱ, ㄴ, ㄷ</li>
-    </ul>
   </div>
 
   <div class="folio"><span>I. 과학의 기초</span><span class="num">44</span></div>
@@ -860,11 +1167,13 @@
 <!-- ═════════════ p.45 해설 1 ═════════════ -->
 <div class="page">
   <div class="runhead"><span class="unit-tag" style="color:var(--brand);">알짜 해설</span><span class="lesson-tag">03. 측정과 어림, 측정 표준</span></div>
-  <div class="sol-head"><span class="stt">알짜 해설</span><span class="sub">전 문항 해설 + 오답 선지 분석 — 맞힌 문제도 해설로 한 번 더!</span></div>
+  <div class="sol-head"><span class="stt">알짜 해설</span><span class="sub">전 문항 해설 + 바로알기(틀린 선지를 옳게 고친 문장) — 맞힌 문제도 해설로 한 번 더!</span></div>
 
   <table class="anstable">
-    <tr><th>문항</th><td>1</td><td>2</td><td>3</td><td>4</td><td>5</td><td>6</td><td>7</td><td>8</td><td>9</td><td>10</td><td>11</td><td>12</td><td>13</td></tr>
-    <tr><th>정답</th><td class="a">O</td><td class="a">X</td><td class="a">O</td><td class="a">표준</td><td class="a">오차</td><td class="a">표준과학</td><td class="a">③</td><td class="a">②</td><td class="a">④</td><td class="a">④</td><td class="a">서술형</td><td class="a">⑤</td><td class="a">⑤</td></tr>
+    <tr><th>문항</th><td>1</td><td>2</td><td>3</td><td>4</td><td>5</td><td>6</td><td>7</td><td>8</td><td>9</td><td>10</td><td>11</td><td>12</td></tr>
+    <tr><th>정답</th><td class="a">O</td><td class="a">X</td><td class="a">O</td><td class="a">표준</td><td class="a">오차</td><td class="a">표준과학</td><td class="a">③</td><td class="a">⑤</td><td class="a">①</td><td class="a">②</td><td class="a">④</td><td class="a">④</td></tr>
+    <tr><th>문항</th><td>13</td><td>14</td><td>15</td><td>16</td><td>17</td><td>18</td><td>19</td><td>20</td><td>21</td><td>22</td><td>23</td><td>24</td></tr>
+    <tr><th>정답</th><td class="a">③</td><td class="a">②</td><td class="a">④</td><td class="a">①</td><td class="a">②</td><td class="a">서술형</td><td class="a">서술형</td><td class="a">서술형</td><td class="a">⑤</td><td class="a">⑤</td><td class="a">③</td><td class="a">①</td></tr>
   </table>
 
   <div class="solcols">
@@ -881,20 +1190,36 @@
         <p>참값과 측정값의 차이. 피할 수 없는 동반자다.</p></div>
       <div class="sol"><div class="shead"><span class="sno">6</span><span class="sans">표준과학</span><span class="slink">개념 3</span></div>
         <p>한국표준과학연구원(KRISS) — 국가의 자를 지키는 곳.</p></div>
-    </div>
-    <div>
       <div class="sol"><div class="shead"><span class="sno">7</span><span class="sans">③</span><span class="slink">개념 2</span></div>
         <p>도구 없이 경험으로 '약 2천 명' — 어림의 전형이다.</p>
-        <div class="wrongbox"><div class="wt">오답 왜 틀렸나</div>
-          <p><b>①·②·④·⑤</b> 모두 도구(자·체중계·온도계·초시계)로 수치를 읽었다 — 측정이다.</p></div></div>
-      <div class="sol"><div class="shead"><span class="sno">8</span><span class="sans">②</span><span class="slink">개념 3·4</span></div>
-        <p>측정 표준의 정의 그대로 — 시간·장소·사람과 무관하게 같은 값.</p>
-        <div class="wrongbox"><div class="wt">오답 왜 틀렸나</div>
-          <p><b>①</b> 기준이 다르면 거래 분쟁이 난다. <b>③</b> 2019년부터 플랑크 상수 기준. <b>④</b> 교정이 있어야 신뢰된다. <b>⑤</b> 거래·의료·산업 — 일상 전체에 필요하다.</p></div></div>
-      <div class="sol"><div class="shead"><span class="sno">9</span><span class="sans">④</span><span class="slink">개념 2·자료</span></div>
-        <p>부피 = 10 × 8 × 3 = 240 m<sup>3</sup>, 질량 ≈ 240 × 1.2 ≈ 288 ≈ 300 kg.</p>
-        <div class="wrongbox"><div class="wt">오답 왜 틀렸나</div>
-          <p><b>②·⑤</b> 자릿수(10의 거듭제곱) 계산 실수 — 어림의 생명은 자릿수다.</p></div></div>
+        <div class="wrongbox"><div class="wt">바로알기</div>
+          <p><b>①·②·④·⑤</b> 자·체중계·온도계·초시계의 눈금을 읽어 수치와 단위로 나타냈으므로 모두 측정이다.</p></div></div>
+    </div>
+    <div>
+      <div class="sol"><div class="shead"><span class="sno">8</span><span class="sans">⑤</span><span class="slink">개념 1 | 탐구</span></div>
+        <p><b>ㄱ&nbsp;(옳음)</b> (12.3 + 12.5 + 12.2 + 12.4 + 12.6)&nbsp;÷&nbsp;5 = 62.0&nbsp;÷&nbsp;5 = 12.4&nbsp;cm. <b>ㄴ&nbsp;(옳음)</b> 읽는 각도·눈금의 한계 때문에 같은 막대도 값이 흩어진다 — 오차다. <b>ㄷ&nbsp;(옳음)</b> 정밀한 도구와 반복 측정은 오차를 줄이는 두 무기다.</p>
+        <div class="wrongbox"><div class="wt">함정 체크</div>
+          <p>'오차를 줄일 수 있다'는 옳고, '오차를 0으로 만들 수 있다'는 틀리다 — 선지의 끝말까지 읽을 것.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">9</span><span class="sans">①</span><span class="slink">개념 1</span></div>
+        <p><b>ㄱ&nbsp;(옳음)</b> (가)는 1&nbsp;cm 간격, (나)는 1&nbsp;mm 간격 — 눈금이 촘촘할수록 오차의 방이 좁아진다.</p>
+        <div class="analysis"><div class="at">꼼꼼 자료 분석</div>
+          <svg width="300" height="126" viewBox="0 0 300 126" font-family="PC Sans">
+            <g font-size="7.6" font-weight="900" fill="#22303A"><text x="0" y="31">(가)</text><text x="0" y="87">(나)</text></g>
+            <g fill="#6FBE93" stroke="#3E9C6E" stroke-width="0.8"><path d="M36,5 h195 l12.2,4 l-12.2,4 h-195 Z"/><path d="M36,61 h195 l12.2,4 l-12.2,4 h-195 Z"/></g>
+            <rect x="28" y="17" width="242" height="22" rx="1.5" fill="#FDF3E0" stroke="#E8940A" stroke-width="0.9"/>
+            <rect x="28" y="73" width="242" height="22" rx="1.5" fill="#FDF3E0" stroke="#E8940A" stroke-width="0.9"/>
+            <g stroke="#B4560E" stroke-width="0.9"><line x1="36.0" y1="17" x2="36.0" y2="25"/><line x1="64.0" y1="17" x2="64.0" y2="25"/><line x1="92.0" y1="17" x2="92.0" y2="25"/><line x1="120.0" y1="17" x2="120.0" y2="25"/><line x1="148.0" y1="17" x2="148.0" y2="25"/><line x1="176.0" y1="17" x2="176.0" y2="25"/><line x1="204.0" y1="17" x2="204.0" y2="25"/><line x1="232.0" y1="17" x2="232.0" y2="25"/><line x1="260.0" y1="17" x2="260.0" y2="25"/><line x1="36.0" y1="73" x2="36.0" y2="81"/><line x1="64.0" y1="73" x2="64.0" y2="81"/><line x1="92.0" y1="73" x2="92.0" y2="81"/><line x1="120.0" y1="73" x2="120.0" y2="81"/><line x1="148.0" y1="73" x2="148.0" y2="81"/><line x1="176.0" y1="73" x2="176.0" y2="81"/><line x1="204.0" y1="73" x2="204.0" y2="81"/><line x1="232.0" y1="73" x2="232.0" y2="81"/><line x1="260.0" y1="73" x2="260.0" y2="81"/><line x1="38.8" y1="73" x2="38.8" y2="76.5" stroke-width="0.55"/><line x1="41.6" y1="73" x2="41.6" y2="76.5" stroke-width="0.55"/><line x1="44.4" y1="73" x2="44.4" y2="76.5" stroke-width="0.55"/><line x1="47.2" y1="73" x2="47.2" y2="76.5" stroke-width="0.55"/><line x1="50.0" y1="73" x2="50.0" y2="78.5" stroke-width="0.8"/><line x1="52.8" y1="73" x2="52.8" y2="76.5" stroke-width="0.55"/><line x1="55.6" y1="73" x2="55.6" y2="76.5" stroke-width="0.55"/><line x1="58.4" y1="73" x2="58.4" y2="76.5" stroke-width="0.55"/><line x1="61.2" y1="73" x2="61.2" y2="76.5" stroke-width="0.55"/><line x1="66.8" y1="73" x2="66.8" y2="76.5" stroke-width="0.55"/><line x1="69.6" y1="73" x2="69.6" y2="76.5" stroke-width="0.55"/><line x1="72.4" y1="73" x2="72.4" y2="76.5" stroke-width="0.55"/><line x1="75.2" y1="73" x2="75.2" y2="76.5" stroke-width="0.55"/><line x1="78.0" y1="73" x2="78.0" y2="78.5" stroke-width="0.8"/><line x1="80.8" y1="73" x2="80.8" y2="76.5" stroke-width="0.55"/><line x1="83.6" y1="73" x2="83.6" y2="76.5" stroke-width="0.55"/><line x1="86.4" y1="73" x2="86.4" y2="76.5" stroke-width="0.55"/><line x1="89.2" y1="73" x2="89.2" y2="76.5" stroke-width="0.55"/><line x1="94.8" y1="73" x2="94.8" y2="76.5" stroke-width="0.55"/><line x1="97.6" y1="73" x2="97.6" y2="76.5" stroke-width="0.55"/><line x1="100.4" y1="73" x2="100.4" y2="76.5" stroke-width="0.55"/><line x1="103.2" y1="73" x2="103.2" y2="76.5" stroke-width="0.55"/><line x1="106.0" y1="73" x2="106.0" y2="78.5" stroke-width="0.8"/><line x1="108.8" y1="73" x2="108.8" y2="76.5" stroke-width="0.55"/><line x1="111.6" y1="73" x2="111.6" y2="76.5" stroke-width="0.55"/><line x1="114.4" y1="73" x2="114.4" y2="76.5" stroke-width="0.55"/><line x1="117.2" y1="73" x2="117.2" y2="76.5" stroke-width="0.55"/><line x1="122.8" y1="73" x2="122.8" y2="76.5" stroke-width="0.55"/><line x1="125.6" y1="73" x2="125.6" y2="76.5" stroke-width="0.55"/><line x1="128.4" y1="73" x2="128.4" y2="76.5" stroke-width="0.55"/><line x1="131.2" y1="73" x2="131.2" y2="76.5" stroke-width="0.55"/><line x1="134.0" y1="73" x2="134.0" y2="78.5" stroke-width="0.8"/><line x1="136.8" y1="73" x2="136.8" y2="76.5" stroke-width="0.55"/><line x1="139.6" y1="73" x2="139.6" y2="76.5" stroke-width="0.55"/><line x1="142.4" y1="73" x2="142.4" y2="76.5" stroke-width="0.55"/><line x1="145.2" y1="73" x2="145.2" y2="76.5" stroke-width="0.55"/><line x1="150.8" y1="73" x2="150.8" y2="76.5" stroke-width="0.55"/><line x1="153.6" y1="73" x2="153.6" y2="76.5" stroke-width="0.55"/><line x1="156.4" y1="73" x2="156.4" y2="76.5" stroke-width="0.55"/><line x1="159.2" y1="73" x2="159.2" y2="76.5" stroke-width="0.55"/><line x1="162.0" y1="73" x2="162.0" y2="78.5" stroke-width="0.8"/><line x1="164.8" y1="73" x2="164.8" y2="76.5" stroke-width="0.55"/><line x1="167.6" y1="73" x2="167.6" y2="76.5" stroke-width="0.55"/><line x1="170.4" y1="73" x2="170.4" y2="76.5" stroke-width="0.55"/><line x1="173.2" y1="73" x2="173.2" y2="76.5" stroke-width="0.55"/><line x1="178.8" y1="73" x2="178.8" y2="76.5" stroke-width="0.55"/><line x1="181.6" y1="73" x2="181.6" y2="76.5" stroke-width="0.55"/><line x1="184.4" y1="73" x2="184.4" y2="76.5" stroke-width="0.55"/><line x1="187.2" y1="73" x2="187.2" y2="76.5" stroke-width="0.55"/><line x1="190.0" y1="73" x2="190.0" y2="78.5" stroke-width="0.8"/><line x1="192.8" y1="73" x2="192.8" y2="76.5" stroke-width="0.55"/><line x1="195.6" y1="73" x2="195.6" y2="76.5" stroke-width="0.55"/><line x1="198.4" y1="73" x2="198.4" y2="76.5" stroke-width="0.55"/><line x1="201.2" y1="73" x2="201.2" y2="76.5" stroke-width="0.55"/><line x1="206.8" y1="73" x2="206.8" y2="76.5" stroke-width="0.55"/><line x1="209.6" y1="73" x2="209.6" y2="76.5" stroke-width="0.55"/><line x1="212.4" y1="73" x2="212.4" y2="76.5" stroke-width="0.55"/><line x1="215.2" y1="73" x2="215.2" y2="76.5" stroke-width="0.55"/><line x1="218.0" y1="73" x2="218.0" y2="78.5" stroke-width="0.8"/><line x1="220.8" y1="73" x2="220.8" y2="76.5" stroke-width="0.55"/><line x1="223.6" y1="73" x2="223.6" y2="76.5" stroke-width="0.55"/><line x1="226.4" y1="73" x2="226.4" y2="76.5" stroke-width="0.55"/><line x1="229.2" y1="73" x2="229.2" y2="76.5" stroke-width="0.55"/><line x1="234.8" y1="73" x2="234.8" y2="76.5" stroke-width="0.55"/><line x1="237.6" y1="73" x2="237.6" y2="76.5" stroke-width="0.55"/><line x1="240.4" y1="73" x2="240.4" y2="76.5" stroke-width="0.55"/><line x1="243.2" y1="73" x2="243.2" y2="76.5" stroke-width="0.55"/><line x1="246.0" y1="73" x2="246.0" y2="78.5" stroke-width="0.8"/><line x1="248.8" y1="73" x2="248.8" y2="76.5" stroke-width="0.55"/><line x1="251.6" y1="73" x2="251.6" y2="76.5" stroke-width="0.55"/><line x1="254.4" y1="73" x2="254.4" y2="76.5" stroke-width="0.55"/><line x1="257.2" y1="73" x2="257.2" y2="76.5" stroke-width="0.55"/></g>
+            <g font-size="6.4" fill="#B4560E" text-anchor="middle"><text x="36" y="35">0</text><text x="64" y="35">1</text><text x="92" y="35">2</text><text x="120" y="35">3</text><text x="148" y="35">4</text><text x="176" y="35">5</text><text x="204" y="35">6</text><text x="232" y="35">7</text><text x="260" y="35">8</text><text x="36" y="91">0</text><text x="64" y="91">1</text><text x="92" y="91">2</text><text x="120" y="91">3</text><text x="148" y="91">4</text><text x="176" y="91">5</text><text x="204" y="91">6</text><text x="232" y="91">7</text><text x="260" y="91">8</text></g>
+            <rect x="232" y="15" width="28" height="13" fill="none" stroke="#D6455D" stroke-width="1.2" stroke-dasharray="3 2"/>
+            <rect x="240.4" y="71" width="5.6" height="12" fill="none" stroke="#D6455D" stroke-width="1.2" stroke-dasharray="2 1.5"/>
+            <g font-size="7.6" font-weight="800" fill="#D6455D">
+              <text x="30" y="51">끝이 7과 8 사이 — 1&#160;cm 칸 안을 눈으로 어림</text>
+              <text x="30" y="107">1&#160;mm 칸까지 좁혀 7.4&#160;cm로 읽는다 → 더 정밀</text>
+            </g>
+            <text x="30" y="120" font-size="7.4" font-weight="800" fill="#5B6B77">어느 자도 오차 0은 아니다 — 줄어들 뿐이다</text>
+          </svg></div>
+        <div class="wrongbox"><div class="wt">바로알기</div>
+          <p><b>ㄴ</b> (틀림 →) (나)로 재도 오차는 0이 되지 않는다 — 더 정밀한 도구는 오차를 <b>줄일</b> 뿐이다. <b>ㄷ</b> (틀림 →) 어느 자로 재든 측정값은 <b>수치와 단위(cm)</b>로 함께 기록한다.</p></div></div>
     </div>
   </div>
 
@@ -906,26 +1231,128 @@
   <div class="runhead"><span class="unit-tag" style="color:var(--brand);">알짜 해설</span><span class="lesson-tag">03. 측정과 어림, 측정 표준</span></div>
   <div class="solcols">
     <div>
-      <div class="sol"><div class="shead"><span class="sno">10</span><span class="sans">④</span><span class="slink">개념 3·5</span></div>
-        <p>(가) 표준의 존재 이유 그 자체, (나) 방법까지 표준이어야 비교된다 — 둘 다 옳다.</p>
-        <div class="wrongbox"><div class="wt">오답 왜 틀렸나</div>
-          <p><b>(다)</b> 저울 검정, 혈압·시력, 220 V, A4 — 표준은 일상 그 자체다.</p></div></div>
-      <div class="sol"><div class="shead"><span class="sno">11</span><span class="sans">모범 답안</span><span class="slink">개념 4</span></div>
-        <p>금속 원기는 물체이므로 시간이 지나면서 질량이 미세하게 <b>변한다</b>는 사실이 복제 원기와의 비교에서 드러났다. 기준 자체가 변하면 측정의 신뢰가 무너지므로, 언제 어디서나 값이 같은 <b>자연 상수</b>(플랑크 상수)에 1 kg을 붙들어 다시 정의하였다.</p>
-        <div class="wrongbox"><div class="wt">채점 기준 (감점 포인트)</div>
-          <p>① 원기(물체)는 변할 수 있음 ② 기준이 변하면 안 됨 ③ 자연 상수는 불변이라 새 기준이 됨 — 세 요소 모두 서술해야 만점.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">10</span><span class="sans">②</span><span class="slink">개념 3·4</span></div>
+        <p>측정 표준의 정의 그대로다. 시간·장소·사람이 달라도 같은 값이 나오게 하는 공통 기준이다.</p>
+        <div class="wrongbox"><div class="wt">바로알기</div>
+          <p><b>①</b> 1&nbsp;kg의 기준이 나라마다 다르면 무역에서 거래 다툼이 생긴다 — 기준은 하나여야 한다. <b>③</b> 킬로그램 원기는 은퇴했고, 2019년부터 1&nbsp;kg은 플랑크 상수로 정의한다. <b>④</b> 병원의 혈압계도 정기적으로 교정받아야 신뢰할 수 있다. <b>⑤</b> 측정 표준은 거래·의료·산업 등 일상 곳곳에 필요하다.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">11</span><span class="sans">④</span><span class="slink">개념 2</span></div>
+        <p><b>ㄴ&nbsp;(옳음)</b> 쪼개기 → 대입 → 곱하기, 페르미 추정의 구조다. <b>ㄷ&nbsp;(옳음)</b> 어림은 검산 도구 — 규모가 100배 다르면 틀린 쪽은 대개 계산기 입력이다.</p>
+        <div class="wrongbox"><div class="wt">바로알기</div>
+          <p><b>ㄱ</b> (틀림 →) 어림은 실험 전 예상값의 규모를 잡고 결과를 검산하는 데 쓰이므로 <b>과학 탐구에 꼭 필요하다</b>.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">12</span><span class="sans">④</span><span class="slink">개념 2</span></div>
+        <p>쪼갠다: 질량 = 부피 × 밀도. 부피 = 20 × 15 × 10 = 3000&nbsp;m<sup>3</sup>. 질량 ≈ 3000&nbsp;m<sup>3</sup> × 1.2&nbsp;kg/m<sup>3</sup> = 3600&nbsp;kg(약 3.6&nbsp;×&nbsp;10<sup>3</sup>&nbsp;kg).</p>
+        <div class="wrongbox"><div class="wt">바로알기</div>
+          <p><b>③</b> 360&nbsp;kg은 높이를 1&nbsp;m로 넣은 값이다 — 세 길이를 모두 곱해야 한다. <b>①·②·⑤</b> 자릿수가 1000배·100배·10배 어긋난 값이다 — 어림의 생명은 자릿수다.</p></div></div>
     </div>
     <div>
-      <div class="sol"><div class="shead"><span class="sno">12</span><span class="sans">⑤</span><span class="slink">개념 1·2 | 2점</span></div>
-        <p><b>ㄱ (옳음)</b> 줄자 + 수치 — 측정. <b>ㄴ (옳음)</b> B는 계산형 어림, C는 감각형 어림 — 둘 다 도구 눈금 없이 헤아렸다. <b>ㄷ (옳음)</b> 쪼개기 → 대입 → 곱하기, 페르미 추정의 구조 그대로다.</p>
+      <div class="sol"><div class="shead"><span class="sno">13</span><span class="sans">③</span><span class="slink">개념 3·5</span></div>
+        <p><b>ㄱ&nbsp;(옳음)</b> 표준이 존재하는 이유 그 자체. <b>ㄴ&nbsp;(옳음)</b> 재는 방법까지 표준이어야 값이 비교된다.</p>
+        <div class="wrongbox"><div class="wt">바로알기</div>
+          <p><b>ㄷ</b> (틀림 →) 측정 표준은 저울 검정, 혈압·시력, 220&nbsp;V, A4처럼 <b>일상생활 곳곳</b>에 쓰인다.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">14</span><span class="sans">②</span><span class="slink">개념 3</span></div>
+        <p><b>C&nbsp;(옳음)</b> 도구의 눈금을 표준과 비교해 바로잡는 일이 교정이다.</p>
+        <div class="wrongbox"><div class="wt">바로알기</div>
+          <p><b>A</b> (틀림 →) 측정 표준은 시장·병원·공장 등 <b>사회 전체</b>가 따르는 기준이다. <b>B</b> (틀림 →) 표준은 정하는 것으로 끝나지 않고 <b>지켜져야</b> 한다 — KRISS가 국가 측정 표준을 유지하고 교정 체계를 운영한다.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">15</span><span class="sans">④</span><span class="slink">개념 4</span></div>
+        <p><b>ㄴ&nbsp;(옳음)</b> 플랑크 상수는 어디서나 같은 값이므로 금고 속 원기가 필요 없다. <b>ㄷ&nbsp;(옳음)</b> 물체는 변하고, 자연 상수는 변하지 않는다.</p>
+        <div class="wrongbox"><div class="wt">바로알기</div>
+          <p><b>ㄱ</b> (틀림 →) (가)에서는 각국의 1&nbsp;kg이 원기와의 비교로 정해졌으므로, 원기의 질량이 변하면 <b>세계의 1&nbsp;kg 기준이 함께 흔들린다</b>.</p></div></div>
+    </div>
+  </div>
+  <div class="folio"><span>알짜 해설</span><span class="num">46</span></div>
+</div>
+
+<!-- ═════════════ 해설 3 ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag" style="color:var(--brand);">알짜 해설</span><span class="lesson-tag">03. 측정과 어림, 측정 표준</span></div>
+  <div class="solcols">
+    <div>
+      <div class="sol"><div class="shead"><span class="sno">16</span><span class="sans">①</span><span class="slink">개념 4</span></div>
+        <p>길이는 빛, 시간은 세슘 원자, 질량은 플랑크 상수 — 셋 다 변하지 않는 자연이 기준이다.</p>
+        <div class="wrongbox"><div class="wt">바로알기</div>
+          <p><b>②·④</b> 지구의 자전은 과거의 시간 기준이고, 지금 1초는 세슘 원자의 진동으로 정한다. <b>③·④</b> 미터원기는 과거의 길이 기준이고, 지금 1&nbsp;m는 빛으로 정한다. <b>③·⑤</b> 킬로그램 원기는 2019년에 플랑크 상수로 바뀌었다.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">17</span><span class="sans">②</span><span class="slink">개념 5</span></div>
+        <p><b>ㄷ&nbsp;(옳음)</b> 표준이 있어야 비교가 되고, 비교가 되어야 판단이 선다 — 플러그·시력·종이가 어디서나 맞는 이유다.</p>
+        <div class="wrongbox"><div class="wt">바로알기</div>
+          <p><b>ㄱ</b> (틀림 →) 220&nbsp;V는 <b>전국 어디서나 같은</b> 전압이라는 약속이다. <b>ㄴ</b> (틀림 →) 시력 1.0은 <b>정해진 거리에서 정해진 크기</b>의 고리를 구별하는 기준이므로, 거리와 고리 크기가 같아야 같은 의미가 된다.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">18</span><span class="sans">모범 답안</span><span class="slink">개념 4</span></div>
+        <p>킬로그램 원기는 물체이므로 시간이 지나며 질량이 미세하게 <b>변한다</b>는 사실이 <b>복제 원기</b>와 비교할 때마다 수십&nbsp;μg씩 어긋나는 것으로 드러났다. 기준 자체가 변하면 측정을 믿을 수 없으므로, 언제 어디서나 값이 같은 <b>자연 상수</b>인 플랑크 상수로 1&nbsp;kg을 다시 정의하였다.</p>
+        <table class="rubric">
+          <tr><th>채점 요소</th><th>배점</th></tr>
+          <tr><td>① 원기(물체)의 질량이 변한다는 것이 복제 원기와의 비교에서 드러났다고 썼다.</td><td>2점</td></tr>
+          <tr><td>② 기준이 변하면 측정을 믿을 수 없다고 썼다.</td><td>2점</td></tr>
+          <tr><td>③ 변하지 않는 자연 상수(플랑크 상수)로 다시 정의했다고 썼다.</td><td>2점</td></tr>
+        </table>
+        <div class="wrongbox"><div class="wt">이렇게 쓰면 0점</div>
+          <p>"원기가 너무 무거워서 옮기기 힘들기 때문이다." — 문제는 무게가 아니라 '기준이 변한다'는 것이다.</p></div></div>
+    </div>
+    <div>
+      <div class="sol"><div class="shead"><span class="sno">19</span><span class="sans">모범 답안</span><span class="slink">개념 3</span></div>
+        <p>저울마다 기준이 다르면 같은 물건의 질량이 가게마다 다르게 나와 거래 다툼이 생긴다(혈압계가 다르면 병원마다 진단을 믿을 수 없다). 이를 막으려면 국가가 <b>측정 표준</b>을 정해 유지하고, 시중의 저울·혈압계를 표준과 비교해 눈금을 바로잡는 <b>교정</b>을 정기적으로 해야 한다. 그러면 언제 어디서 누가 재어도 <b>같은 값</b>을 얻는다.</p>
+        <table class="rubric">
+          <tr><th>채점 요소</th><th>배점</th></tr>
+          <tr><td>① 기준이 다를 때의 문제(거래 다툼, 진단 불신 등)를 썼다.</td><td>2점</td></tr>
+          <tr><td>② 측정 표준을 정하고 도구를 표준에 맞추어 교정한다고 썼다.</td><td>2점</td></tr>
+          <tr><td>③ 그 결과 누가 재어도 같은 값을 얻는다고 썼다.</td><td>2점</td></tr>
+        </table>
+        <div class="wrongbox"><div class="wt">이렇게 쓰면 0점</div>
+          <p>"더 비싼 저울을 사면 된다." — 비싼 도구도 표준과 맞추는 교정이 없으면 다른 저울과 같은 값을 보장하지 못한다.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">20</span><span class="sans">모범 답안</span><span class="slink">개념 2</span></div>
+        <p>문제를 '학생 수 = 운동장 넓이&nbsp;÷&nbsp;한 사람이 차지하는 넓이'로 <b>쪼갠다</b>. 넓이 = 100&nbsp;m × 60&nbsp;m = 6000&nbsp;m<sup>2</sup>이므로 6000&nbsp;÷&nbsp;0.5 = 12&nbsp;000, 약 <b>1만 명</b>이다. 어림에서 중요한 것은 정확한 값이 아니라 10<sup>4</sup>명이라는 <b>자릿수</b>다.</p>
+        <table class="rubric">
+          <tr><th>채점 요소</th><th>배점</th></tr>
+          <tr><td>① 넓이&nbsp;÷&nbsp;1인당 넓이로 쪼개는 식을 세웠다.</td><td>2점</td></tr>
+          <tr><td>② 6000&nbsp;m<sup>2</sup>&nbsp;÷&nbsp;0.5&nbsp;m<sup>2</sup> ≈ 1만 명(10<sup>4</sup>명)을 구했다.</td><td>2점</td></tr>
+          <tr><td>③ 어림의 목표가 자릿수(규모)라고 썼다.</td><td>2점</td></tr>
+        </table>
+        <div class="wrongbox"><div class="wt">이렇게 쓰면 0점</div>
+          <p>"한 명씩 세어 봐야 정확히 알 수 있다." — 직접 세는 것은 어림이 아니다. 과정 없이 숫자만 쓴 답도 0점.</p></div></div>
+    </div>
+  </div>
+  <div class="folio"><span>알짜 해설</span><span class="num">?</span></div>
+</div>
+
+<!-- ═════════════ 해설 4 ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag" style="color:var(--brand);">알짜 해설</span><span class="lesson-tag">03. 측정과 어림, 측정 표준</span></div>
+  <div class="solcols">
+    <div>
+      <div class="sol"><div class="shead"><span class="sno">21</span><span class="sans">⑤</span><span class="slink">개념 1·2 | 2점</span></div>
+        <p><b>ㄱ&nbsp;(옳음)</b> 줄자의 눈금 + 수치와 단위 — 측정. <b>ㄴ&nbsp;(옳음)</b> B는 계산형 어림, C는 감각형 어림 — 둘 다 도구의 눈금 없이 헤아렸다. <b>ㄷ&nbsp;(옳음)</b> 쪼개기 → 대입 → 곱하기, 페르미 추정의 구조 그대로다.</p>
         <div class="wrongbox"><div class="wt">함정 체크</div>
-          <p>B처럼 계산이 들어가도 도구 측정이 아니면 어림이다 — '계산 여부'가 아니라 <b>'도구·눈금 여부'</b>로 가른다.</p></div></div>
-      <div class="sol"><div class="shead"><span class="sno">13</span><span class="sans">⑤</span><span class="slink">개념 4 | 2.5점</span></div>
-        <p><b>ㄱ (옳음)</b> 원기·자전 → 빛·원자·상수. <b>ㄴ (옳음)</b> 원기는 변하고 자전은 흔들린다 — 공통 결함. <b>ㄷ (옳음)</b> 자연 상수는 어디에나 있으므로 금고 참조가 필요 없다.</p>
+          <p>B처럼 계산이 들어가도 도구로 잰 것이 아니면 어림이다 — '계산 여부'가 아니라 <b>'도구·눈금 여부'</b>로 가른다.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">22</span><span class="sans">⑤</span><span class="slink">개념 4 | 2.5점</span></div>
+        <p><b>ㄱ&nbsp;(옳음)</b> 원기·자전 → 빛·원자·상수. <b>ㄴ&nbsp;(옳음)</b> 원기는 변하고 자전은 흔들린다 — 공통 결함. <b>ㄷ&nbsp;(옳음)</b> 자연 상수는 어디에나 있으므로 금고를 참조할 필요가 없다.</p>
         <div class="wrongbox"><div class="wt">함정 체크</div>
           <p>ㄱㄴㄷ 전부 옳은 문항도 실제로 출제된다 — '⑤는 답이 안 될 것'이라는 편견을 버릴 것.</p></div></div>
-
-      <div class="gist" style="margin-top:5mm;">
+      <div class="sol"><div class="shead"><span class="sno">23</span><span class="sans">③</span><span class="slink">개념 1·3 | 2점</span></div>
+        <p><b>ㄱ&nbsp;(옳음)</b> (1.002 + 0.999 + 1.001 + 0.998)&nbsp;÷&nbsp;4 = 4.000&nbsp;÷&nbsp;4 = 1.000&nbsp;kg. <b>ㄴ&nbsp;(옳음)</b> (나)의 평균은 (1.049 + 1.051 + 1.050 + 1.050)&nbsp;÷&nbsp;4 = 4.200&nbsp;÷&nbsp;4 = 1.050&nbsp;kg — 1&nbsp;kg 추를 늘 약 0.050&nbsp;kg 크게 읽으므로 표준과 비교해 눈금을 바로잡는 교정이 필요하다.</p>
+        <div class="wrongbox"><div class="wt">바로알기</div>
+          <p><b>ㄷ</b> (틀림 →) 교정은 눈금을 표준에 맞출 뿐이다 — 오차는 <b>줄일 수 있지만 0으로 만들 수는 없다</b>.</p></div></div>
+    </div>
+    <div>
+      <div class="analysis"><div class="at">꼼꼼 자료 분석 — 23번</div>
+        <svg width="300" height="104" viewBox="0 0 300 104" font-family="PC Sans">
+          <rect x="1" y="1" width="298" height="19" fill="#EAF6EC"/>
+          <rect x="1" y="1" width="298" height="59" fill="none" stroke="#B8C2CA" stroke-width="0.9"/>
+          <g stroke="#B8C2CA" stroke-width="0.8"><line x1="1" y1="20" x2="299" y2="20"/><line x1="1" y1="40" x2="299" y2="40"/><line x1="36" y1="1" x2="36" y2="60"/><line x1="82" y1="1" x2="82" y2="60"/><line x1="128" y1="1" x2="128" y2="60"/><line x1="174" y1="1" x2="174" y2="60"/><line x1="220" y1="1" x2="220" y2="60"/></g>
+          <rect x="220.5" y="20.5" width="78" height="39" fill="#FDF3E0"/>
+          <g font-size="7.2" font-weight="800" fill="#2E7A54" text-anchor="middle"><text x="18.5" y="14">저울</text><text x="59" y="14">1회</text><text x="105" y="14">2회</text><text x="151" y="14">3회</text><text x="197" y="14">4회</text><text x="259.5" y="14" fill="#B4560E">평균</text></g>
+          <g font-size="7.2" fill="#22303A" text-anchor="middle">
+            <text x="18.5" y="33.5" font-weight="800">(가)</text><text x="59" y="33.5">1.002</text><text x="105" y="33.5">0.999</text><text x="151" y="33.5">1.001</text><text x="197" y="33.5">0.998</text><text x="259.5" y="33.5" font-weight="900" fill="#B4560E">1.000&#160;kg</text>
+            <text x="18.5" y="53.5" font-weight="800">(나)</text><text x="59" y="53.5">1.049</text><text x="105" y="53.5">1.051</text><text x="151" y="53.5">1.050</text><text x="197" y="53.5">1.050</text><text x="259.5" y="53.5" font-weight="900" fill="#D6455D">1.050&#160;kg</text>
+          </g>
+          <g font-size="6.8" font-weight="700">
+            <text x="4" y="74" fill="#3E9C6E">(가) 1&#160;kg 둘레에 ±0.002&#160;kg 안으로 흩어짐 → 오차(피할 수 없음)</text>
+            <text x="4" y="87" fill="#D6455D">(나) 네 번 모두 약 0.050&#160;kg 크게 읽음 → 표준에 맞추는 교정 필요</text>
+            <text x="4" y="100" fill="#5B6B77">반복·평균은 흩어짐을 줄이고, 교정은 기준과의 어긋남을 바로잡는다</text>
+          </g>
+        </svg></div>
+      <div class="sol"><div class="shead"><span class="sno">24</span><span class="sans">①</span><span class="slink">개념 2·4 | 2.5점</span></div>
+        <p><b>ㄱ&nbsp;(옳음)</b> 부피 = 2 × 2 × 1.5 = 6&nbsp;m<sup>3</sup>, 질량 ≈ 6&nbsp;m<sup>3</sup> × 1000&nbsp;kg/m<sup>3</sup> = 6000&nbsp;kg = 6&nbsp;×&nbsp;10<sup>3</sup>&nbsp;kg.</p>
+        <div class="wrongbox"><div class="wt">바로알기</div>
+          <p><b>ㄴ</b> (틀림 →) 밀도는 질량을 부피로 나눈 <b>유도량</b>이다(단위 kg/m<sup>3</sup>, 소단원 02). <b>ㄷ</b> (틀림 →) 1&nbsp;m는 <b>시간의 단위(초)를 써서</b> 정의된다 — 빛이 진공에서 1/299&nbsp;792&nbsp;458초 동안 나아간 거리다(소단원 01).</p></div></div>
+      <div class="gist" style="margin-top:3mm;">
         <div class="boxtitle"><span class="ico">알</span>이 소단원, 이것만은!</div>
         <ul>
           <li><b>측정</b>(도구·수치+단위·오차) vs <b>어림</b>(쪼개기→대입→곱하기, 목표는 자릿수)</li>
@@ -935,12 +1362,22 @@
       </div>
     </div>
   </div>
-  <div class="folio"><span>알짜 해설</span><span class="num">46</span></div>
+  <div class="folio"><span>알짜 해설</span><span class="num">?</span></div>
 </div>
 
 <!-- ═════════════ p.47 MEMO ═════════════ -->
 <div class="page">
   <div class="runhead"><span class="unit-tag">I. 과학의 기초</span><span class="lesson-tag">03 ▸ 04 넘어가기 전에</span></div>
+  <div class="spaced">
+    <div class="st">간격 두고 다시 꺼내기 — 책을 덮고 답한다</div>
+    <ol>
+      <li>참값과 측정값의 차이를 무엇이라 하는가?</li>
+      <li>어림의 세 단계를 순서대로 말하면?</li>
+      <li>2019년부터 1 kg을 정의하는 데 쓰는 자연 상수는?</li>
+    </ol>
+    <div class="when"><span>□ 1일 뒤</span><span>□ 1주 뒤</span><span>□ 시험 전</span></div>
+    <div class="ans">정답 1 오차 2 쪼갠다 → 대입한다 → 곱한다 3 플랑크 상수</div>
+  </div>
   <div class="memo-head"><span class="mt">MEMO</span><span class="ms">헷갈린 개념, 다시 틀린 문제 번호, 나만의 암기법을 남겨 두는 자리</span></div>
   <div class="memo-area"></div>
   <div class="memo-pen">"'측정과 어림의 차이'를 예시 하나씩 들어 설명해 보자. 도구·눈금이라는 말이 안 나오면 36쪽으로! — 박찬쌤"</div>

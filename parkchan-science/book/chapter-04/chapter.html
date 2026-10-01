@@ -229,6 +229,31 @@
   /* 화학식 첨자 — 본문 폰트를 그대로 축소해 자형이 어긋나지 않게 한다 */
   sub,sup{ font-size:0.68em; line-height:0; font-weight:inherit; }
   sub{ vertical-align:-0.14em; } sup{ vertical-align:0.34em; }
+
+  /* ── 2026-10-02 보강: 중요 표시 · 채점 기준 · 꼼꼼 자료 분석 · 간격 두고 다시 꺼내기 ── */
+  .must{ display:inline-block; font-size:7pt; font-weight:900; color:#fff; background:#D9534F; border-radius:1.6mm; padding:0.2mm 1.4mm; margin-right:1.2mm; vertical-align:1pt; }
+  table.rubric{ border-collapse:collapse; width:100%; font-size:7.6pt; margin:1mm 0 0.5mm; }
+  table.rubric th, table.rubric td{ border:0.25mm solid var(--line); padding:0.8mm 1.4mm; text-align:left; vertical-align:top; }
+  table.rubric th{ background:#F4F1EA; font-weight:800; white-space:nowrap; }
+  .analysis{ border:0.35mm dashed #C9A36A; border-radius:2.5mm; padding:1.6mm 2mm 1.2mm; margin:1.5mm 0; background:#FFFCF5; }
+  .analysis .at{ font-size:7.6pt; font-weight:900; color:#9C6503; margin-bottom:0.8mm; }
+  .analysis svg{ max-width:100%; height:auto; display:block; }
+  .spaced{ border:0.4mm solid var(--line); border-radius:3mm; padding:3mm 4mm 2.6mm; margin:0 0 4mm; position:relative; background:#FAFBFC; }
+  .spaced .st{ font-size:9.5pt; font-weight:900; color:var(--unit); margin-bottom:1.6mm; }
+  .spaced ol{ margin:0; padding-left:5mm; font-size:8.8pt; line-height:1.75; }
+  .spaced .when{ display:flex; gap:5mm; font-size:8pt; color:var(--sub); margin-top:1.8mm; }
+  .spaced .ans{ position:absolute; right:4mm; bottom:2.4mm; transform:rotate(180deg); font-size:6.8pt; color:var(--sub); }
+  /* 2단 문항 쪽 간격 · 발문 안 탐구 과정 상자 (합격본 chapter-08 에서) */
+  .qg2 .q{ margin-bottom:6mm; }
+  .qg2 > div > .q:last-child{ margin-bottom:0; }
+  .qg2 .choices.inline{ gap:0 4mm; }
+  .qg2 .choices{ margin-top:1.8mm; line-height:1.78; }
+  .qg2 .bogi-box{ margin-top:2mm; padding:1.8mm 2.8mm; font-size:9pt; line-height:1.72; }
+  .qg2 .bogi-box .bt{ margin-bottom:0.3mm; }
+  .qg2 .q figure{ margin:1.6mm 0 0.6mm 8.4mm !important; }
+  .exp{ border:0.35mm solid #B8C2CA; border-radius:1.6mm; background:#FAFBFC; padding:1.6mm 2.6mm; margin:1.4mm 0 1.6mm; font-size:8.9pt; line-height:1.7; }
+  .ox-answer{ white-space:nowrap; }
+  .exp b{ font-family:'PC Sans'; font-size:7.8pt; font-weight:900; color:var(--brand); }
 </style>
 </head>
 <body>
@@ -391,7 +416,7 @@
     <div class="wing">
       <div class="wtitle">날개 노트</div>
       <div class="term"><b>기본 단위체</b>큰 물질을 만들 때 반복해서 사용되는 기본 재료. 레고의 블록 한 개에 해당한다.</div>
-      <div class="term"><b>지각 vs 생명체의 원소</b>지각: 산소 &gt; 규소.<br>생명체: 산소·탄소·수소·질소. (소단원 02에서 본 '별이 만든 원소'들이다.)</div>
+      <div class="term"><b>지각 vs 생명체의 원소</b>지각: 산소 &gt; 규소.<br>생명체: 산소·탄소·수소·질소. (소단원 01·02에서 본, 빅뱅과 별이 만든 원소들이다.)</div>
       <div class="wsep"></div>
       <div class="wtitle">한눈에 암기</div>
       <div class="wing-pen">사면체 → 광물<br>아미노산 → 단백질<br>뉴클레오타이드 → 핵산<br>"단위체 다르고 원리 같다!"</div>
@@ -412,7 +437,7 @@
   <div class="cols">
     <div class="main">
       <h3 class="sec"><span class="n">2</span>지각의 재료 — 규산염 광물</h3>
-      <p class="body">지각의 원소는 <b>산소(약 47 %)</b>와 <b>규소(약 28 %)</b>가 압도적이다 — 나머지(알루미늄·철·칼슘 등)를 다 합쳐도 4분의 1이 안 된다. 그래서 지각의 광물 대부분은 이 둘을 기본으로 하는 <span class="kw">규산염 광물</span>이다. 감람석, 휘석, 각섬석, 흑운모, 석영, 장석 — 모두 규산염 가족이다.</p>
+      <p class="body">지각의 원소는 <b>산소(약 47 %)</b>와 <b>규소(약 28 %)</b>가 압도적이다 — 나머지(알루미늄·철·칼슘 등)를 다 합쳐도 4분의 1 정도뿐이다. 그래서 지각의 광물 대부분은 이 둘을 기본으로 하는 <span class="kw">규산염 광물</span>이다. 감람석, 휘석, 각섬석, 흑운모, 석영, 장석 — 모두 규산염 가족이다.</p>
       <p class="body">규산염 광물의 기본 단위체는 <span class="u-amber">규소 1개를 중심으로 산소 4개가 결합한</span> <span class="kw">규산염 사면체</span>다. 사면체들은 <b>이웃 사면체와 산소를 공유하며</b> 연결되고, 어떻게 연결되느냐에 따라 전혀 다른 광물이 된다.</p>
       <p class="body">사면체가 <b>하나씩 독립</b>해 있으면 감람석, <b>한 줄 사슬</b>이면 휘석, <b>얇은 판</b>이면 잘 벗겨지는 흑운모, 사방으로 이어진 <b>그물(망상) 구조</b>면 단단한 석영이 된다. <b>단위체는 하나인데, 결합 방식이 광물의 다양성을 만드는 것이다.</b></p>
 
@@ -846,158 +871,431 @@
 
   <div class="step-head s2"><span class="stepno">STEP 2</span><span class="steptt">내신 완성</span><span class="stepdesc">학교 시험 유형 그대로 — 서술형까지 한 번에</span></div>
 
-  <div class="q">
-    <div class="qhead"><span class="qno">7</span><div class="stem">규산염 광물에 대한 설명으로 옳은 것은? <span class="difficulty">●●○</span>
-    <div class="tags">10통과1-02-05 | 개념 1·2</div></div></div>
-    <ul class="choices">
-      <li>① 지각에서 매우 드물게 발견된다.</li>
-      <li>② 기본 단위체는 규소 4개와 산소 1개로 이루어진 사면체이다.</li>
-      <li>③ 사면체들이 산소를 공유하며 결합하는 방식에 따라 다양한 광물이 된다.</li>
-      <li>④ 기본 단위체는 아미노산이다.</li>
-      <li>⑤ 생명체에서만 발견되는 물질이다.</li>
-    </ul>
-  </div>
+  <div class="qgrid qg2">
+    <div>
+      <div class="q">
+        <div class="qhead"><span class="qno">7</span><div class="stem">기본 단위체와, 그 단위체가 반복 결합하여 만들어지는 물질을 옳게 짝지은 것은? <span class="difficulty">●○○</span>
+        <div class="tags">10통과1-02-05 | 개념 1</div></div></div>
+        <ul class="choices inline">
+          <li>① 아미노산 — 핵산</li>
+          <li>② 아미노산 — 단백질</li>
+          <li>③ 규산염 사면체 — 단백질</li>
+          <li>④ 뉴클레오타이드 — 석영</li>
+          <li>⑤ 뉴클레오타이드 — 감람석</li>
+        </ul>
+      </div>
 
-  <div class="q">
-    <div class="qhead"><span class="qno">8</span><div class="stem">단백질에 대한 설명으로 옳은 것은? <span class="difficulty">●●●</span>
-    <div class="tags">10통과1-02-05 | 개념 3</div></div></div>
-    <ul class="choices">
-      <li>① 기본 단위체는 뉴클레오타이드이다.</li>
-      <li>② 아미노산의 배열 순서가 달라져도 같은 단백질이 만들어진다.</li>
-      <li>③ 단백질을 이루는 아미노산은 수천 종류이다.</li>
-      <li>④ 아미노산의 수와 배열 순서에 따라 단백질의 종류와 기능이 달라진다.</li>
-      <li>⑤ 단백질의 주된 역할은 유전 정보의 저장이다.</li>
-    </ul>
+      <div class="q">
+        <div class="qhead"><span class="qno">8</span><div class="stem"><span class="must">중요</span><span class="badge-data">자료</span>그림은 지각을 이루는 원소의 질량 비율을 나타낸 것이다. 이에 대한 설명으로 옳은 것만을 &lt;보기&gt;에서 있는 대로 고른 것은? <span class="difficulty">●●○</span>
+        <div class="tags">10통과1-02-05 | 개념 1·2</div></div></div>
+        <figure style="margin:2mm 0 1mm 8.4mm;">
+          <svg width="282" height="94" viewBox="0 0 282 94" font-family="PC Sans">
+            <g stroke="#E3E8EC" stroke-width="0.7"><line x1="104" y1="4" x2="104" y2="70"/><line x1="144" y1="4" x2="144" y2="70"/><line x1="184" y1="4" x2="184" y2="70"/><line x1="224" y1="4" x2="224" y2="70"/><line x1="264" y1="4" x2="264" y2="70"/></g>
+            <line x1="64" y1="4" x2="64" y2="70" stroke="#B8C2CA" stroke-width="1"/>
+            <line x1="64" y1="70" x2="266" y2="70" stroke="#B8C2CA" stroke-width="1"/>
+            <rect x="64" y="9" width="188" height="13" fill="#2E5BDA"/>
+            <rect x="64" y="31" width="112" height="13" fill="#7A97E8"/>
+            <rect x="64" y="53" width="100" height="13" fill="#BCCDF3"/>
+            <g font-size="8" font-weight="800" fill="#22303A" text-anchor="end"><text x="58" y="19">산소</text><text x="58" y="41">규소</text><text x="58" y="63">기타*</text></g>
+            <g font-size="7.6" font-weight="800" fill="#2E5BDA"><text x="256" y="19">47</text><text x="180" y="41">28</text><text x="168" y="63">25</text></g>
+            <g font-size="6.6" fill="#5B6B77" text-anchor="middle"><text x="64" y="79">0</text><text x="104" y="79">10</text><text x="144" y="79">20</text><text x="184" y="79">30</text><text x="224" y="79">40</text><text x="264" y="79">50</text></g>
+            <text x="56" y="79" font-size="6.6" fill="#5B6B77" text-anchor="end">(%)</text>
+            <text x="64" y="91" font-size="6.6" fill="#5B6B77">* 기타: 알루미늄·철·칼슘 등</text>
+          </svg>
+        </figure>
+        <div class="bogi-box">
+          <div class="bt">보기</div>
+          ㄱ. 지각에서 질량 비율이 가장 큰 원소는 산소이다.<br>
+          ㄴ. '기타' 원소를 모두 합하면 지각의 절반이 넘는다.<br>
+          ㄷ. 탄소는 지각에서 두 번째로 많은 원소이다.
+        </div>
+        <ul class="choices inline">
+          <li>① ㄱ</li><li>② ㄷ</li><li>③ ㄱ, ㄴ</li><li>④ ㄴ, ㄷ</li><li>⑤ ㄱ, ㄴ, ㄷ</li>
+        </ul>
+      </div>
+    </div>
+    <div>
+      <div class="q">
+        <div class="qhead"><span class="qno">9</span><div class="stem">규산염 광물에 대한 설명으로 옳은 것은? <span class="difficulty">●●○</span>
+        <div class="tags">10통과1-02-05 | 개념 2</div></div></div>
+        <ul class="choices">
+          <li>① 지각에서 매우 드물게 발견되는 광물이다.</li>
+          <li>② 기본 단위체는 규소 4개와 산소 1개로 이루어진다.</li>
+          <li>③ 석영은 사면체가 한 줄로 이어진 사슬 구조이다.</li>
+          <li>④ 사면체들이 산소를 공유하는 결합 방식에 따라 다양한 광물이 된다.</li>
+          <li>⑤ 흑운모가 얇게 벗겨지는 것은 사면체가 독립되어 있기 때문이다.</li>
+        </ul>
+      </div>
+
+      <div class="q">
+        <div class="qhead"><span class="qno">10</span><div class="stem">단백질에 대한 설명으로 옳은 것은? <span class="difficulty">●●○</span>
+        <div class="tags">10통과1-02-05 | 개념 3</div></div></div>
+        <ul class="choices">
+          <li>① 아미노산의 배열 순서가 단백질의 기능을 결정한다.</li>
+          <li>② 기본 단위체는 뉴클레오타이드이다.</li>
+          <li>③ 배열 순서가 달라져도 같은 단백질이 만들어진다.</li>
+          <li>④ 단백질을 이루는 아미노산은 수천 종류이다.</li>
+          <li>⑤ 단백질의 주된 역할은 유전 정보의 저장이다.</li>
+        </ul>
+      </div>
+    </div>
   </div>
 
   <div class="folio"><span>II. 물질과 규칙성</span><span class="num">110</span></div>
 </div>
 
-<!-- ═════════════ p.58 STEP 2 계속 ═════════════ -->
+<!-- ═════════════ p.58 STEP 2 계속 (11~15) ═════════════ -->
 <div class="page">
   <div class="runhead"><span class="unit-tag">II. 물질과 규칙성</span><span class="lesson-tag">04. 지각과 생명체를 이루는 물질의 규칙성 | 문제</span></div>
 
-  <div class="q">
-    <div class="qhead"><span class="qno">9</span><div class="stem"><span class="badge-data">자료</span>그림은 DNA 이중 나선의 일부를 나타낸 것이다. 한쪽 가닥의 염기 서열이 A−G−C−T일 때, 마주 보는 가닥의 염기 서열로 옳은 것은? <span class="difficulty">●●●</span>
-    <div class="tags">10통과1-02-05 | 개념 4</div></div></div>
-    <figure style="margin:2mm 0 1mm 8.4mm;">
-      <svg width="260" height="74" viewBox="0 0 260 74" font-family="PC Sans">
-        <path d="M20,14 q30,16 60,0 q30,-16 60,0 q30,16 60,0" fill="none" stroke="#2E5BDA" stroke-width="2.2"/>
-        <path d="M20,58 q30,-16 60,0 q30,16 60,0 q30,-16 60,0" fill="none" stroke="#7A97E8" stroke-width="2.2"/>
-        <g stroke="#B8C2CA" stroke-width="1.4">
-          <line x1="40" y1="22" x2="40" y2="50"/><line x1="90" y1="18" x2="90" y2="54"/><line x1="140" y1="22" x2="140" y2="50"/><line x1="190" y1="18" x2="190" y2="54"/>
-        </g>
-        <text x="40" y="12" text-anchor="middle" font-size="8.5" font-weight="900" fill="#2E5BDA">A</text>
-        <text x="90" y="12" text-anchor="middle" font-size="8.5" font-weight="900" fill="#3E9C6E">G</text>
-        <text x="140" y="12" text-anchor="middle" font-size="8.5" font-weight="900" fill="#E8940A">C</text>
-        <text x="190" y="12" text-anchor="middle" font-size="8.5" font-weight="900" fill="#D6455D">T</text>
-        <text x="40" y="70" text-anchor="middle" font-size="8.5" font-weight="900" fill="#5B6B77">?</text>
-        <text x="90" y="70" text-anchor="middle" font-size="8.5" font-weight="900" fill="#5B6B77">?</text>
-        <text x="140" y="70" text-anchor="middle" font-size="8.5" font-weight="900" fill="#5B6B77">?</text>
-        <text x="190" y="70" text-anchor="middle" font-size="8.5" font-weight="900" fill="#5B6B77">?</text>
-      </svg>
-    </figure>
-    <ul class="choices inline">
-      <li>① A−G−C−T</li><li>② T−C−G−A</li><li>③ G−A−T−C</li><li>④ C−T−A−G</li><li>⑤ T−G−C−A</li>
-    </ul>
-  </div>
+  <div class="qgrid qg2">
+    <div>
+      <div class="q">
+        <div class="qhead"><span class="qno">11</span><div class="stem"><span class="badge-data">탐구</span>다음은 흑운모와 석영으로 한 실험이다.
+          <div class="exp"><b>[과정]</b> (가) 흑운모 조각과 석영 조각에 각각 투명 테이프를 붙였다가 떼어 낸다.<br>(나) 쇠못 끝으로 두 광물의 표면을 각각 긁어 본다.<br><b>[결과]</b> 흑운모는 얇은 판 조각이 테이프에 묻어 나왔고, 쇠못에 긁혔다. 석영은 테이프에 묻어 나온 것이 없었고, 쇠못에 긁히지 않았다.</div>
+          이에 대한 설명으로 옳은 것만을 &lt;보기&gt;에서 있는 대로 고른 것은? <span class="difficulty">●●○</span>
+        <div class="tags">10통과1-02-05 | 개념 2, 탐구</div></div></div>
+        <div class="bogi-box">
+          <div class="bt">보기</div>
+          ㄱ. 흑운모가 얇게 벗겨지는 것은 사면체가 판 모양으로 결합했기 때문이다.<br>
+          ㄴ. 석영은 사면체가 사방으로 이어진 망상 구조여서 단단하다.<br>
+          ㄷ. 두 광물은 기본 단위체가 같지만, 결합 방식이 달라 성질이 다르다.
+        </div>
+        <ul class="choices inline">
+          <li>① ㄱ</li><li>② ㄷ</li><li>③ ㄱ, ㄴ</li><li>④ ㄴ, ㄷ</li><li>⑤ ㄱ, ㄴ, ㄷ</li>
+        </ul>
+      </div>
 
-  <div class="q">
-    <div class="qhead"><span class="qno">10</span><div class="stem">지각과 생명체를 구성하는 물질의 규칙성에 대한 설명으로 옳은 것만을 고른 것은? <span class="difficulty">●●●</span>
-    <div class="tags">10통과1-02-05 | 개념 1·5</div></div></div>
-    <div class="bogi-box" style="background:#fff;">
-      (가) 지각과 생명체의 물질은 모두 기본 단위체의 결합으로 만들어진다.<br>
-      (나) 적은 종류의 단위체로도 배열에 따라 매우 다양한 물질이 만들어진다.<br>
-      (다) 단백질을 만드는 아미노산은 4종류이다.
+      <div class="q">
+        <div class="qhead"><span class="qno">12</span><div class="stem"><span class="must">중요</span><span class="badge-data">자료</span>그림은 아미노산 5개가 결합하여 만들어진 두 사슬 P와 Q를 모식적으로 나타낸 것이다. 옳은 것만을 &lt;보기&gt;에서 있는 대로 고른 것은? (단, ○ 안의 글자는 아미노산의 종류이다.) <span class="difficulty">●●○</span>
+        <div class="tags">10통과1-02-05 | 개념 3</div></div></div>
+        <figure style="margin:2mm 0 1mm 8.4mm;">
+          <svg width="250" height="68" viewBox="0 0 250 68" font-family="PC Sans">
+            <text x="6" y="21.5" font-size="9.5" font-weight="900" fill="#22303A">P</text>
+            <text x="6" y="54.5" font-size="9.5" font-weight="900" fill="#22303A">Q</text>
+            <line x1="34" y1="18" x2="150" y2="18" stroke="#B8C2CA" stroke-width="2"/>
+            <line x1="34" y1="51" x2="150" y2="51" stroke="#B8C2CA" stroke-width="2"/>
+            <g font-size="7.4" font-weight="800" text-anchor="middle" fill="#fff">
+              <circle cx="36" cy="18" r="9.5" fill="#F4A62A"/><text x="36" y="21">글</text>
+              <circle cx="64" cy="18" r="9.5" fill="#5B7FE4"/><text x="64" y="21">알</text>
+              <circle cx="92" cy="18" r="9.5" fill="#3E9C6E"/><text x="92" y="21">발</text>
+              <circle cx="120" cy="18" r="9.5" fill="#D6455D"/><text x="120" y="21">라</text>
+              <circle cx="148" cy="18" r="9.5" fill="#8A5CE8"/><text x="148" y="21">류</text>
+              <circle cx="36" cy="51" r="9.5" fill="#8A5CE8"/><text x="36" y="54">류</text>
+              <circle cx="64" cy="51" r="9.5" fill="#D6455D"/><text x="64" y="54">라</text>
+              <circle cx="92" cy="51" r="9.5" fill="#3E9C6E"/><text x="92" y="54">발</text>
+              <circle cx="120" cy="51" r="9.5" fill="#5B7FE4"/><text x="120" y="54">알</text>
+              <circle cx="148" cy="51" r="9.5" fill="#F4A62A"/><text x="148" y="54">글</text>
+            </g>
+            <g font-size="7" fill="#5B6B77"><text x="168" y="21">아미노산 5개</text><text x="168" y="54">아미노산 5개</text></g>
+          </svg>
+        </figure>
+        <div class="bogi-box">
+          <div class="bt">보기</div>
+          ㄱ. P와 Q는 아미노산이 사슬처럼 이어진 것이다.<br>
+          ㄴ. P와 Q를 이루는 아미노산의 종류와 수는 같다.<br>
+          ㄷ. P와 Q는 입체 구조와 기능이 같다.
+        </div>
+        <ul class="choices inline">
+          <li>① ㄱ</li><li>② ㄷ</li><li>③ ㄱ, ㄴ</li><li>④ ㄴ, ㄷ</li><li>⑤ ㄱ, ㄴ, ㄷ</li>
+        </ul>
+      </div>
     </div>
-    <ul class="choices inline">
-      <li>① (가)</li><li>② (나)</li><li>③ (가), (나)</li><li>④ (나), (다)</li><li>⑤ (가), (나), (다)</li>
-    </ul>
-  </div>
+    <div>
+      <div class="q">
+        <div class="qhead"><span class="qno">13</span><div class="stem"><span class="badge-data">자료</span>그림은 DNA 이중 나선의 일부를 나타낸 것이다. 한쪽 가닥의 염기 서열이 A−G−C−T일 때, 마주 보는 가닥의 염기 서열로 옳은 것은? <span class="difficulty">●●○</span>
+        <div class="tags">10통과1-02-05 | 개념 4</div></div></div>
+        <figure style="margin:2mm 0 1mm 8.4mm;">
+          <svg width="260" height="82" viewBox="0 0 260 82" font-family="PC Sans">
+            <g transform="translate(0,8)">
+            <path d="M20,14 q30,16 60,0 q30,-16 60,0 q30,16 60,0" fill="none" stroke="#2E5BDA" stroke-width="2.2"/>
+            <path d="M20,58 q30,-16 60,0 q30,16 60,0 q30,-16 60,0" fill="none" stroke="#7A97E8" stroke-width="2.2"/>
+            <g stroke="#B8C2CA" stroke-width="1.4">
+              <line x1="40" y1="22" x2="40" y2="50"/><line x1="90" y1="18" x2="90" y2="54"/><line x1="140" y1="22" x2="140" y2="50"/><line x1="190" y1="18" x2="190" y2="54"/>
+            </g>
+            </g>
+            <text x="40" y="12" text-anchor="middle" font-size="8.5" font-weight="900" fill="#2E5BDA">A</text>
+            <text x="90" y="12" text-anchor="middle" font-size="8.5" font-weight="900" fill="#3E9C6E">G</text>
+            <text x="140" y="12" text-anchor="middle" font-size="8.5" font-weight="900" fill="#E8940A">C</text>
+            <text x="190" y="12" text-anchor="middle" font-size="8.5" font-weight="900" fill="#D6455D">T</text>
+            <text x="40" y="79" text-anchor="middle" font-size="8.5" font-weight="900" fill="#5B6B77">?</text>
+            <text x="90" y="79" text-anchor="middle" font-size="8.5" font-weight="900" fill="#5B6B77">?</text>
+            <text x="140" y="79" text-anchor="middle" font-size="8.5" font-weight="900" fill="#5B6B77">?</text>
+            <text x="190" y="79" text-anchor="middle" font-size="8.5" font-weight="900" fill="#5B6B77">?</text>
+          </svg>
+        </figure>
+        <ul class="choices inline">
+          <li>① A−G−C−T</li><li>② G−A−T−C</li><li>③ C−T−A−G</li><li>④ T−G−C−A</li><li>⑤ T−C−G−A</li>
+        </ul>
+      </div>
 
-  <div class="q">
-    <div class="qhead"><span class="qno">11</span><div class="stem"><span class="badge-essay">서술형</span>아미노산은 약 20종류뿐이지만 단백질의 종류는 수만 가지가 넘는다. 그 까닭을 <b>'배열 순서'</b>라는 말을 포함하여 서술하시오. <span class="difficulty">●●●●</span>
-    <div class="tags">10통과1-02-05 | 개념 3·5</div></div></div>
-    <div class="essay-lines"><div></div><div></div><div></div></div>
+      <div class="q">
+        <div class="qhead"><span class="qno">14</span><div class="stem"><span class="badge-data">자료</span>그림은 DNA 이중 나선의 일부를 펼쳐서 나타낸 것이다. (가)와 (나)는 염기이다. 옳은 것만을 &lt;보기&gt;에서 있는 대로 고른 것은? <span class="difficulty">●●●</span>
+        <div class="tags">10통과1-02-05 | 개념 4</div></div></div>
+        <figure style="margin:2mm 0 1mm 8.4mm;">
+          <svg width="250" height="80" viewBox="0 0 250 80" font-family="PC Sans">
+            <line x1="16" y1="20" x2="244" y2="20" stroke="#2E5BDA" stroke-width="2.4"/>
+            <line x1="16" y1="58" x2="244" y2="58" stroke="#7A97E8" stroke-width="2.4"/>
+            <g stroke="#B8C2CA" stroke-width="1.6"><line x1="40" y1="22" x2="40" y2="56"/><line x1="85" y1="22" x2="85" y2="56"/><line x1="130" y1="22" x2="130" y2="56"/><line x1="175" y1="22" x2="175" y2="56"/><line x1="220" y1="22" x2="220" y2="56"/></g>
+            <g font-size="8.6" font-weight="900" text-anchor="middle">
+              <text x="40" y="13" fill="#2E5BDA">A</text><text x="85" y="13" fill="#3E9C6E">G</text><text x="130" y="13" fill="#E8940A">C</text><text x="175" y="13" fill="#D6455D">T</text><text x="220" y="13" fill="#2E5BDA">A</text>
+              <text x="40" y="73" fill="#22303A" font-size="8">(가)</text><text x="85" y="73" fill="#E8940A">C</text><text x="130" y="73" fill="#3E9C6E">G</text><text x="175" y="73" fill="#22303A" font-size="8">(나)</text><text x="220" y="73" fill="#D6455D">T</text>
+            </g>
+          </svg>
+        </figure>
+        <div class="bogi-box">
+          <div class="bt">보기</div>
+          ㄱ. (가)와 (나)는 같은 염기이다.<br>
+          ㄴ. 이 조각에서 G의 개수는 A의 개수보다 많다.<br>
+          ㄷ. 이 DNA 조각의 두 가닥 전체에서 A의 개수와 T의 개수는 같다.
+        </div>
+        <ul class="choices inline">
+          <li>① ㄱ</li><li>② ㄷ</li><li>③ ㄱ, ㄴ</li><li>④ ㄴ, ㄷ</li><li>⑤ ㄱ, ㄴ, ㄷ</li>
+        </ul>
+      </div>
+
+      <div class="q">
+        <div class="qhead"><span class="qno">15</span><div class="stem">DNA 한 가닥에서 염기 4개가 차례로 늘어선 서열은 모두 몇 가지인가? (단, 같은 염기가 반복되어도 되고, 순서가 다르면 다른 서열로 본다.) <span class="difficulty">●●○</span>
+        <div class="tags">10통과1-02-05 | 개념 5</div></div></div>
+        <ul class="choices inline">
+          <li>① 4</li><li>② 16</li><li>③ 24</li><li>④ 64</li><li>⑤ 256</li>
+        </ul>
+      </div>
+    </div>
   </div>
 
   <div class="folio"><span>II. 물질과 규칙성</span><span class="num">111</span></div>
 </div>
 
-<!-- ═════════════ p.59 STEP 3 ═════════════ -->
+<!-- ═════════════ STEP 2 계속 (16~17) + 서술형 (18~20) ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag">II. 물질과 규칙성</span><span class="lesson-tag">04. 지각과 생명체를 이루는 물질의 규칙성 | 문제</span></div>
+
+  <div class="qgrid qg2">
+    <div>
+      <div class="q">
+        <div class="qhead"><span class="qno">16</span><div class="stem">다음은 지각과 생명체를 이루는 물질의 다양성에 대해 학생 A, B, C가 나눈 대화이다. 옳게 말한 학생만을 있는 대로 고른 것은? <span class="difficulty">●●○</span>
+        <div class="tags">10통과1-02-05 | 개념 1·5</div></div></div>
+        <div class="bogi-box">
+          <b>학생 A</b> : 규산염 광물이 수백 가지나 되는 건 규산염 사면체의 종류가 수백 가지이기 때문이야.<br>
+          <b>학생 B</b> : DNA의 염기는 약 20종이라서 많은 유전 정보를 담을 수 있어.<br>
+          <b>학생 C</b> : 아미노산은 약 20종뿐이지만, 수와 배열 순서를 달리하면 수만 가지 단백질을 만들 수 있어.
+        </div>
+        <ul class="choices inline">
+          <li>① A</li><li>② C</li><li>③ A, B</li><li>④ B, C</li><li>⑤ A, B, C</li>
+        </ul>
+      </div>
+
+      <div class="q">
+        <div class="qhead"><span class="qno">17</span><div class="stem"><span class="must">중요</span><span class="badge-data">자료</span>표는 지각과 생명체를 이루는 세 물질을 비교한 것이다. 옳은 것만을 &lt;보기&gt;에서 있는 대로 고른 것은? (단, DNA의 단위체 종류 수는 염기의 종류 수로 센다.) <span class="difficulty">●●○</span>
+        <div class="tags">10통과1-02-05 | 개념 5, 자료 파헤치기</div></div></div>
+        <figure style="margin:2mm 0 1mm 8.4mm;">
+          <svg width="288" height="102" viewBox="0 0 288 102" font-family="PC Sans">
+            <rect x="1" y="1" width="286" height="24" fill="#ECF1FC"/>
+            <rect x="1" y="1" width="286" height="100" fill="none" stroke="#B8C2CA" stroke-width="0.9"/>
+            <g stroke="#B8C2CA" stroke-width="0.8"><line x1="1" y1="25" x2="287" y2="25"/><line x1="1" y1="50" x2="287" y2="50"/><line x1="1" y1="75" x2="287" y2="75"/><line x1="66" y1="1" x2="66" y2="101"/><line x1="136" y1="1" x2="136" y2="101"/><line x1="206" y1="1" x2="206" y2="101"/></g>
+            <g font-size="8.2" font-weight="800" fill="#2E5BDA" text-anchor="middle"><text x="33.5" y="16.5">구분</text><text x="101" y="16.5">규산염 광물</text><text x="171" y="16.5">단백질</text><text x="246.5" y="16.5">DNA</text></g>
+            <g font-size="7.8" font-weight="700" fill="#22303A" text-anchor="middle"><text x="33.5" y="41">기본 단위체</text><text x="33.5" y="66">단위체 종류 수</text><text x="33.5" y="91">다양성의 비결</text></g>
+            <g font-size="8.2" fill="#22303A" text-anchor="middle">
+              <text x="101" y="41" font-weight="800">㉠</text><text x="171" y="41">아미노산</text><text x="246.5" y="41">뉴클레오타이드</text>
+              <text x="101" y="66">1</text><text x="171" y="66" font-weight="800">㉡</text><text x="246.5" y="66">4</text>
+              <text x="101" y="91">결합 방식</text><text x="171" y="91">배열 순서</text><text x="246.5" y="91" font-weight="800">㉢</text>
+            </g>
+          </svg>
+        </figure>
+        <div class="bogi-box">
+          <div class="bt">보기</div>
+          ㄱ. ㉠은 규소 4개와 산소 1개로 이루어진다.<br>
+          ㄴ. ㉡은 약 20이다.<br>
+          ㄷ. ㉢은 염기 서열이다.
+        </div>
+        <ul class="choices inline">
+          <li>① ㄱ</li><li>② ㄷ</li><li>③ ㄱ, ㄴ</li><li>④ ㄴ, ㄷ</li><li>⑤ ㄱ, ㄴ, ㄷ</li>
+        </ul>
+      </div>
+    </div>
+    <div>
+      <div class="q">
+        <div class="qhead"><span class="qno">18</span><div class="stem"><span class="must">중요</span><span class="badge-essay">서술형</span>아미노산은 약 20종류뿐이지만 단백질의 종류는 수만 가지가 넘는다. 그 까닭을 <b>'배열 순서'</b>, <b>'입체 구조'</b>, <b>'기능'</b>을 모두 포함하여 서술하시오. <span class="difficulty">●●○</span>
+        <div class="tags">10통과1-02-05 | 개념 3·5</div></div></div>
+        <div class="essay-lines"><div></div><div></div><div></div><div></div><div></div><div></div></div>
+      </div>
+
+      <div class="q">
+        <div class="qhead"><span class="qno">19</span><div class="stem"><span class="badge-essay">서술형</span>감람석, 흑운모, 석영은 모두 규산염 광물이지만 서로 다른 광물이다. 그 까닭을 <b>'규산염 사면체'</b>, <b>'산소'</b>, <b>'결합 방식'</b>을 모두 포함하여 서술하시오. <span class="difficulty">●●○</span>
+        <div class="tags">10통과1-02-05 | 개념 2</div></div></div>
+        <div class="essay-lines"><div></div><div></div><div></div><div></div><div></div></div>
+      </div>
+
+      <div class="q">
+        <div class="qhead"><span class="qno">20</span><div class="stem"><span class="badge-essay">서술형</span>DNA 이중 나선에서 한쪽 가닥의 염기 서열이 A−A−G−C−T일 때, 마주 보는 가닥의 염기 서열을 쓰고, 그렇게 정해지는 까닭을 <b>'이중 나선'</b>, <b>'짝'</b>을 모두 포함하여 서술하시오. <span class="difficulty">●●●</span>
+        <div class="tags">10통과1-02-05 | 개념 4</div></div></div>
+        <div class="essay-lines"><div></div><div></div><div></div><div></div><div></div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="folio"><span>II. 물질과 규칙성</span><span class="num">?</span></div>
+</div>
+
+<!-- ═════════════ p.59 STEP 3 (21~24) ═════════════ -->
 <div class="page">
   <div class="runhead"><span class="unit-tag">II. 물질과 규칙성</span><span class="lesson-tag">04. 지각과 생명체를 이루는 물질의 규칙성 | 문제</span></div>
   <div class="step-head s3"><span class="stepno">STEP 3</span><span class="steptt">수능 도전</span><span class="stepdesc">2028 수능 규격 — ㄱㄴㄷ 합답형·자료 해석</span></div>
 
-  <div class="q">
-    <div class="qhead"><span class="qno">12</span><div class="stem"><span class="badge-data">자료</span>그림은 규산염 광물의 기본 단위체 ㉠과, ㉠이 결합하는 서로 다른 방식 (가), (나)를 나타낸 것이다. 옳은 것만을 &lt;보기&gt;에서 있는 대로 고른 것은? <span class="difficulty">[2점]</span>
-    <div class="tags">10통과1-02-05</div></div></div>
-    <figure style="margin:2mm 0 1mm 8.6mm;">
-      <svg width="330" height="88" viewBox="0 0 330 88" font-family="PC Sans">
-        <g transform="translate(52,36)">
-          <line x1="0" y1="0" x2="7" y2="-7" stroke="#9AB0E0" stroke-width="2"/><circle cx="7" cy="-7" r="5.5" fill="url(#gO)" opacity="0.85"/>
-          <line x1="0" y1="0" x2="0" y2="-21" stroke="#9AB0E0" stroke-width="2.2"/>
-          <line x1="0" y1="0" x2="-15" y2="12" stroke="#9AB0E0" stroke-width="2.2"/>
-          <line x1="0" y1="0" x2="15" y2="12" stroke="#9AB0E0" stroke-width="2.2"/>
-          <circle cx="0" cy="0" r="6.5" fill="url(#gSi)"/>
-          <circle cx="0" cy="-21" r="7" fill="url(#gO)"/><circle cx="-15" cy="12" r="7.5" fill="url(#gO)"/><circle cx="15" cy="12" r="7.5" fill="url(#gO)"/>
-          <text x="0" y="34" text-anchor="middle" font-size="8.5" font-weight="900">㉠</text>
-        </g>
-        <g transform="translate(160,38)">
-          <path d="M0,-14 L12,8 L-12,8 Z" fill="#BCCDF3" stroke="#7A97E8" stroke-width="1"/>
-          <text x="0" y="34" text-anchor="middle" font-size="8" font-weight="700">(가) 독립형</text>
-        </g>
-        <g transform="translate(262,38)">
-          <g fill="#BCCDF3" stroke="#7A97E8" stroke-width="1">
-            <path d="M-28,-14 L-16,8 L-40,8 Z"/><path d="M0,8 L12,-14 L-12,-14 Z" transform="scale(1,-1) translate(0,-6)"/><path d="M28,-14 L40,8 L16,8 Z"/>
-          </g>
-          <text x="0" y="34" text-anchor="middle" font-size="8" font-weight="700">(나) 사슬 모양</text>
-        </g>
-      </svg>
-    </figure>
-    <div class="bogi-box">
-      <div class="bt">보기</div>
-      ㄱ. ㉠은 규소 1개와 산소 4개로 이루어진다.<br>
-      ㄴ. 사면체들은 이웃 사면체와 산소를 공유하며 결합한다.<br>
-      ㄷ. (가)와 (나)처럼 결합 방식이 달라도 만들어지는 광물은 한 종류이다.
-    </div>
-    <ul class="choices inline">
-      <li>① ㄱ</li><li>② ㄷ</li><li>③ ㄱ, ㄴ</li><li>④ ㄴ, ㄷ</li><li>⑤ ㄱ, ㄴ, ㄷ</li>
-    </ul>
-  </div>
+  <div class="qgrid qg2">
+    <div>
+      <div class="q">
+        <div class="qhead"><span class="qno">21</span><div class="stem"><span class="badge-data">자료</span>그림은 규산염 광물의 단위체 ㉠과 그 결합 방식 (가), (나)를 나타낸 것이다. 옳은 것만을 &lt;보기&gt;에서 있는 대로 고른 것은? <span class="difficulty">●●○ [2점]</span>
+        <div class="tags">10통과1-02-05 | 개념 2</div></div></div>
+        <figure style="margin:2mm 0 1mm 8.4mm;">
+          <svg width="282" height="88" viewBox="0 0 282 88" font-family="PC Sans">
+            <g transform="translate(40,36)">
+              <line x1="0" y1="0" x2="7" y2="-7" stroke="#9AB0E0" stroke-width="2"/><circle cx="7" cy="-7" r="5.5" fill="url(#gO)" opacity="0.85"/>
+              <line x1="0" y1="0" x2="0" y2="-21" stroke="#9AB0E0" stroke-width="2.2"/>
+              <line x1="0" y1="0" x2="-15" y2="12" stroke="#9AB0E0" stroke-width="2.2"/>
+              <line x1="0" y1="0" x2="15" y2="12" stroke="#9AB0E0" stroke-width="2.2"/>
+              <circle cx="0" cy="0" r="6.5" fill="url(#gSi)"/>
+              <circle cx="0" cy="-21" r="7" fill="url(#gO)"/><circle cx="-15" cy="12" r="7.5" fill="url(#gO)"/><circle cx="15" cy="12" r="7.5" fill="url(#gO)"/>
+              <text x="0" y="34" text-anchor="middle" font-size="8.5" font-weight="900">㉠</text>
+            </g>
+            <g transform="translate(124,38)">
+              <path d="M0,-14 L12,8 L-12,8 Z" fill="#BCCDF3" stroke="#7A97E8" stroke-width="1"/>
+              <text x="0" y="34" text-anchor="middle" font-size="8" font-weight="700">(가) 독립형</text>
+            </g>
+            <g transform="translate(222,38)">
+              <g fill="#BCCDF3" stroke="#7A97E8" stroke-width="1">
+                <path d="M-28,-14 L-16,8 L-40,8 Z"/><path d="M0,8 L12,-14 L-12,-14 Z" transform="scale(1,-1) translate(0,-6)"/><path d="M28,-14 L40,8 L16,8 Z"/>
+              </g>
+              <text x="0" y="34" text-anchor="middle" font-size="8" font-weight="700">(나) 사슬 모양</text>
+            </g>
+          </svg>
+        </figure>
+        <div class="bogi-box">
+          <div class="bt">보기</div>
+          ㄱ. ㉠은 규소 1개와 산소 4개로 이루어진다.<br>
+          ㄴ. 사면체들은 이웃 사면체와 산소를 공유하며 결합한다.<br>
+          ㄷ. (가)와 (나)처럼 결합 방식이 달라도 만들어지는 광물은 한 종류이다.
+        </div>
+        <ul class="choices inline">
+          <li>① ㄱ</li><li>② ㄷ</li><li>③ ㄱ, ㄴ</li><li>④ ㄴ, ㄷ</li><li>⑤ ㄱ, ㄴ, ㄷ</li>
+        </ul>
+      </div>
 
-  <div class="q">
-    <div class="qhead"><span class="qno">13</span><div class="stem"><span class="badge-data">자료</span>그림 (가)는 단백질이, (나)는 DNA가 만들어지는 과정을 모식적으로 나타낸 것이다. 옳은 것만을 &lt;보기&gt;에서 있는 대로 고른 것은? <span class="difficulty">[2.5점]</span>
-    <div class="tags">10통과1-02-05</div></div></div>
-    <figure style="margin:2mm 0 1mm 8.6mm;">
-      <svg width="380" height="86" viewBox="0 0 380 86" font-family="PC Sans">
-        <text x="0" y="24" font-size="8.5" font-weight="800">(가)</text>
-        <g stroke="#E8940A" stroke-width="1">
-          <circle cx="40" cy="20" r="6" fill="#F6C98E"/><circle cx="54" cy="20" r="6" fill="#F4A62A"/><circle cx="68" cy="20" r="6" fill="#FDE9C8"/><circle cx="82" cy="20" r="6" fill="#E8B25A"/>
-        </g>
-        <line x1="100" y1="20" x2="126" y2="20" stroke="#7A97E8" stroke-width="1.8" marker-end="url(#arrC)"/>
-        <path d="M142,26 q4,-14 14,-8 q4,-10 14,-4 q12,-4 14,6 q8,4 2,12 q-8,8 -16,2 q-12,4 -28,-8 Z" fill="#F6C98E" stroke="#E8940A" stroke-width="1"/>
-        <text x="160" y="46" text-anchor="middle" font-size="7.6" fill="#5B6B77">단백질</text>
-        <text x="0" y="70" font-size="8.5" font-weight="800">(나)</text>
-        <g stroke="#7A97E8" stroke-width="1" fill="#D9E2F8">
-          <rect x="34" y="60" width="12" height="14" rx="2.5"/><rect x="50" y="60" width="12" height="14" rx="2.5"/><rect x="66" y="60" width="12" height="14" rx="2.5"/><rect x="82" y="60" width="12" height="14" rx="2.5"/>
-        </g>
-        <line x1="100" y1="67" x2="126" y2="67" stroke="#7A97E8" stroke-width="1.8" marker-end="url(#arrC)"/>
-        <path d="M138,60 q12,10 24,0 q12,-10 24,0 q12,10 24,0" fill="none" stroke="#2E5BDA" stroke-width="2"/>
-        <path d="M138,74 q12,-10 24,0 q12,10 24,0 q12,-10 24,0" fill="none" stroke="#7A97E8" stroke-width="2"/>
-        <line x1="150" y1="63" x2="150" y2="71" stroke="#B8C2CA" stroke-width="1.4"/><line x1="174" y1="62" x2="174" y2="72" stroke="#B8C2CA" stroke-width="1.4"/><line x1="198" y1="63" x2="198" y2="71" stroke="#B8C2CA" stroke-width="1.4"/>
-        <text x="240" y="71" font-size="7.6" fill="#5B6B77">DNA (이중 나선)</text>
-      </svg>
-    </figure>
-    <div class="bogi-box">
-      <div class="bt">보기</div>
-      ㄱ. (가)의 단위체는 아미노산, (나)의 단위체는 뉴클레오타이드이다.<br>
-      ㄴ. (가)에서 아미노산의 배열 순서가 달라지면 단백질의 종류와 기능이 달라진다.<br>
-      ㄷ. (나)의 염기는 약 20종류이다.
+      <div class="q">
+        <div class="qhead"><span class="qno">22</span><div class="stem"><span class="badge-data">자료</span>표는 단백질과 DNA 한 가닥을 이루는 단위체의 종류 수와, 단위체 2개를 이어 만들 수 있는 배열의 가짓수를 나타낸 것이다. 옳은 것만을 &lt;보기&gt;에서 있는 대로 고른 것은? (단, 아미노산은 20종으로 계산하고, 같은 단위체가 반복되어도 되며, 순서가 다르면 다른 배열로 본다.) <span class="difficulty">●●● [2.5점]</span>
+        <div class="tags">10통과1-02-05 | 개념 5 (개념 3·4 연계)</div></div></div>
+        <figure style="margin:2mm 0 1mm 8.4mm;">
+          <svg width="288" height="77" viewBox="0 0 288 77" font-family="PC Sans">
+            <rect x="1" y="1" width="286" height="25" fill="#ECF1FC"/>
+            <rect x="1" y="1" width="286" height="75" fill="none" stroke="#B8C2CA" stroke-width="0.9"/>
+            <g stroke="#B8C2CA" stroke-width="0.8"><line x1="1" y1="26" x2="287" y2="26"/><line x1="1" y1="51" x2="287" y2="51"/><line x1="66" y1="1" x2="66" y2="76"/><line x1="146" y1="1" x2="146" y2="76"/><line x1="196" y1="1" x2="196" y2="76"/></g>
+            <g font-size="7.8" font-weight="800" fill="#2E5BDA" text-anchor="middle"><text x="33.5" y="17">물질</text><text x="106" y="17">단위체</text><text x="171" y="17">종류 수</text><text x="241.5" y="17">2개를 이은 배열 수</text></g>
+            <g font-size="8.2" fill="#22303A" text-anchor="middle">
+              <text x="33.5" y="42">단백질</text><text x="106" y="42">아미노산</text><text x="171" y="42">20</text><text x="241.5" y="42" font-weight="800">(가)</text>
+              <text x="33.5" y="67">DNA 한 가닥</text><text x="106" y="67">뉴클레오타이드</text><text x="171" y="67">4</text><text x="241.5" y="67" font-weight="800">(나)</text>
+            </g>
+          </svg>
+        </figure>
+        <div class="bogi-box">
+          <div class="bt">보기</div>
+          ㄱ. (가)는 40이다.<br>
+          ㄴ. (나)는 16이다.<br>
+          ㄷ. 단위체를 3개씩 이을 때 배열의 가짓수는 단백질이 DNA 한 가닥의 125배이다.
+        </div>
+        <ul class="choices inline">
+          <li>① ㄱ</li><li>② ㄷ</li><li>③ ㄱ, ㄴ</li><li>④ ㄴ, ㄷ</li><li>⑤ ㄱ, ㄴ, ㄷ</li>
+        </ul>
+      </div>
     </div>
-    <ul class="choices inline">
-      <li>① ㄱ</li><li>② ㄱ, ㄴ</li><li>③ ㄴ</li><li>④ ㄴ, ㄷ</li><li>⑤ ㄱ, ㄴ, ㄷ</li>
-    </ul>
+    <div>
+      <div class="q">
+        <div class="qhead"><span class="qno">23</span><div class="stem"><span class="badge-data">자료</span>그림 (가)와 (나)는 각각 단백질과 DNA가 만들어지는 과정을 나타낸 것이다. 옳은 것만을 <span style="white-space:nowrap;">&lt;보기&gt;에서</span> 있는 대로 고른 것은? <span class="difficulty">●●○ [2점]</span>
+        <div class="tags">10통과1-02-05 | 개념 3·4</div></div></div>
+        <figure style="margin:2mm 0 1mm 8.4mm;">
+          <svg width="280" height="86" viewBox="0 0 280 86" font-family="PC Sans">
+            <text x="0" y="24" font-size="8.5" font-weight="800">(가)</text>
+            <g stroke="#E8940A" stroke-width="1">
+              <circle cx="34" cy="20" r="6" fill="#F6C98E"/><circle cx="48" cy="20" r="6" fill="#F4A62A"/><circle cx="62" cy="20" r="6" fill="#FDE9C8"/><circle cx="76" cy="20" r="6" fill="#E8B25A"/>
+            </g>
+            <line x1="90" y1="20" x2="114" y2="20" stroke="#7A97E8" stroke-width="1.8" marker-end="url(#arrC)"/>
+            <path d="M128,26 q4,-14 14,-8 q4,-10 14,-4 q12,-4 14,6 q8,4 2,12 q-8,8 -16,2 q-12,4 -28,-8 Z" fill="#F6C98E" stroke="#E8940A" stroke-width="1"/>
+            <text x="148" y="46" text-anchor="middle" font-size="7.6" fill="#5B6B77">단백질</text>
+            <text x="0" y="70" font-size="8.5" font-weight="800">(나)</text>
+            <g stroke="#7A97E8" stroke-width="1" fill="#D9E2F8">
+              <rect x="28" y="60" width="12" height="14" rx="2.5"/><rect x="44" y="60" width="12" height="14" rx="2.5"/><rect x="60" y="60" width="12" height="14" rx="2.5"/><rect x="76" y="60" width="12" height="14" rx="2.5"/>
+            </g>
+            <line x1="96" y1="67" x2="120" y2="67" stroke="#7A97E8" stroke-width="1.8" marker-end="url(#arrC)"/>
+            <path d="M128,60 q12,10 24,0 q12,-10 24,0 q12,10 24,0" fill="none" stroke="#2E5BDA" stroke-width="2"/>
+            <path d="M128,74 q12,-10 24,0 q12,10 24,0 q12,-10 24,0" fill="none" stroke="#7A97E8" stroke-width="2"/>
+            <line x1="140" y1="63" x2="140" y2="71" stroke="#B8C2CA" stroke-width="1.4"/><line x1="164" y1="62" x2="164" y2="72" stroke="#B8C2CA" stroke-width="1.4"/><line x1="188" y1="63" x2="188" y2="71" stroke="#B8C2CA" stroke-width="1.4"/>
+            <text x="208" y="71" font-size="7.6" fill="#5B6B77">DNA (이중 나선)</text>
+          </svg>
+        </figure>
+        <div class="bogi-box">
+          <div class="bt">보기</div>
+          ㄱ. (가)의 단위체는 아미노산, (나)의 단위체는 뉴클레오타이드이다.<br>
+          ㄴ. (가)에서 아미노산의 배열 순서가 달라지면 단백질의 종류와 기능이 달라진다.<br>
+          ㄷ. (나)의 염기는 약 20종류이다.
+        </div>
+        <ul class="choices inline">
+          <li>① ㄱ</li><li>② ㄷ</li><li>③ ㄱ, ㄴ</li><li>④ ㄴ, ㄷ</li><li>⑤ ㄱ, ㄴ, ㄷ</li>
+        </ul>
+      </div>
+
+      <div class="q">
+        <div class="qhead"><span class="qno">24</span><div class="stem"><span class="badge-data">자료</span>그림 (가)는 탄소와 규소의 전자 배치를, (나)는 규산염 사면체를 나타낸 것이다. 옳은 것만을 &lt;보기&gt;에서 있는 대로 고른 것은? <span class="difficulty">●●● [2.5점]</span>
+        <div class="tags">10통과1-02-05 | 개념 2 (소단원 03 연계)</div></div></div>
+        <figure style="margin:2mm 0 1mm 8.4mm;">
+          <svg width="286" height="116" viewBox="0 0 286 116" font-family="PC Sans">
+            <text x="1" y="9" font-size="7.8" font-weight="900" fill="#22303A">(가)</text>
+            <g transform="translate(46,52)">
+              <circle r="5.5" fill="#2E5BDA"/>
+              <circle r="14" fill="none" stroke="#8FA8EC" stroke-width="1"/><text x="0" y="-16.5" font-size="6.6" fill="#5B6B77" text-anchor="middle">2</text>
+              <circle r="27" fill="none" stroke="#8FA8EC" stroke-width="1"/>
+              <circle cx="19.1" cy="-19.1" r="2.8" fill="#E8940A"/><circle cx="19.1" cy="19.1" r="2.8" fill="#E8940A"/><circle cx="-19.1" cy="19.1" r="2.8" fill="#E8940A"/><circle cx="-19.1" cy="-19.1" r="2.8" fill="#E8940A"/>
+              <text y="44" text-anchor="middle" font-size="8.4" font-weight="800">탄소 C</text>
+              <text y="55" text-anchor="middle" font-size="7.2" fill="#5B6B77">2, 4</text>
+            </g>
+            <g transform="translate(130,52)">
+              <circle r="5.5" fill="#2E5BDA"/>
+              <circle r="12" fill="none" stroke="#8FA8EC" stroke-width="1"/><text x="0" y="-14.3" font-size="6.6" fill="#5B6B77" text-anchor="middle">2</text>
+              <circle r="23" fill="none" stroke="#8FA8EC" stroke-width="1"/><text x="0" y="-25.3" font-size="6.6" fill="#5B6B77" text-anchor="middle">8</text>
+              <circle r="34" fill="none" stroke="#8FA8EC" stroke-width="1"/>
+              <circle cx="24" cy="-24" r="2.8" fill="#E8940A"/><circle cx="24" cy="24" r="2.8" fill="#E8940A"/><circle cx="-24" cy="24" r="2.8" fill="#E8940A"/><circle cx="-24" cy="-24" r="2.8" fill="#E8940A"/>
+              <text y="47" text-anchor="middle" font-size="8.4" font-weight="800">규소 Si</text>
+              <text y="58" text-anchor="middle" font-size="7.2" fill="#5B6B77">2, 8, 4</text>
+            </g>
+            <line x1="178" y1="8" x2="178" y2="108" stroke="#D8E0E5" stroke-width="1"/>
+            <text x="186" y="9" font-size="7.8" font-weight="900" fill="#22303A">(나)</text>
+            <g transform="translate(232,56)">
+              <line x1="0" y1="-1" x2="9" y2="-9" stroke="#9AB0E0" stroke-width="2.6"/>
+              <circle cx="9" cy="-9" r="7.5" fill="url(#gO)" opacity="0.85"/>
+              <line x1="0" y1="-1" x2="0" y2="-28" stroke="#9AB0E0" stroke-width="3"/>
+              <line x1="0" y1="-1" x2="-20" y2="16" stroke="#9AB0E0" stroke-width="3"/>
+              <line x1="0" y1="-1" x2="20" y2="16" stroke="#9AB0E0" stroke-width="3"/>
+              <circle cx="0" cy="-1" r="8.5" fill="url(#gSi)"/>
+              <circle cx="0" cy="-28" r="9.5" fill="url(#gO)"/>
+              <circle cx="-20" cy="16" r="10" fill="url(#gO)"/>
+              <circle cx="20" cy="16" r="10" fill="url(#gO)"/>
+              <line x1="8" y1="-31" x2="22" y2="-36" stroke="#5B6B77" stroke-width="0.7"/>
+              <text x="24" y="-34" font-size="6.8" fill="#5B6B77">산소</text>
+              <text x="0" y="44" text-anchor="middle" font-size="7.6" font-weight="800">규산염 사면체</text>
+            </g>
+            <g font-size="6.6" fill="#5B6B77"><text x="186" y="112">진한 파랑 = 규소</text></g>
+          </svg>
+        </figure>
+        <div class="bogi-box">
+          <div class="bt">보기</div>
+          ㄱ. 탄소와 규소는 원자가 전자 수가 4개로 같아, 주기율표에서 같은 족에 속한다.<br>
+          ㄴ. 전자껍질 수는 탄소가 규소보다 많다.<br>
+          ㄷ. (나)에서 규소 1개와 결합한 산소는 3개이다.
+        </div>
+        <ul class="choices inline">
+          <li>① ㄱ</li><li>② ㄷ</li><li>③ ㄱ, ㄴ</li><li>④ ㄴ, ㄷ</li><li>⑤ ㄱ, ㄴ, ㄷ</li>
+        </ul>
+      </div>
+    </div>
   </div>
 
   <div class="folio"><span>II. 물질과 규칙성</span><span class="num">112</span></div>
@@ -1006,11 +1304,13 @@
 <!-- ═════════════ p.60 해설 1 ═════════════ -->
 <div class="page">
   <div class="runhead"><span class="unit-tag" style="color:var(--brand);">알짜 해설</span><span class="lesson-tag">04. 지각과 생명체를 이루는 물질의 규칙성</span></div>
-  <div class="sol-head"><span class="stt">알짜 해설</span><span class="sub">전 문항 해설 + 오답 선지 분석 — 맞힌 문제도 해설로 한 번 더!</span></div>
+  <div class="sol-head"><span class="stt">알짜 해설</span><span class="sub">전 문항 해설 + 바로알기(틀린 선지를 옳게 고친 문장) — 맞힌 문제도 해설로 한 번 더!</span></div>
 
   <table class="anstable">
-    <tr><th>문항</th><td>1</td><td>2</td><td>3</td><td>4</td><td>5</td><td>6</td><td>7</td><td>8</td><td>9</td><td>10</td><td>11</td><td>12</td><td>13</td></tr>
-    <tr><th>정답</th><td class="a">O</td><td class="a">X</td><td class="a">O</td><td class="a">산소</td><td class="a">아미노산</td><td class="a">뉴클레오타이드</td><td class="a">③</td><td class="a">④</td><td class="a">②</td><td class="a">③</td><td class="a">서술형</td><td class="a">③</td><td class="a">②</td></tr>
+    <tr><th>문항</th><td>1</td><td>2</td><td>3</td><td>4</td><td>5</td><td>6</td><td>7</td><td>8</td><td>9</td><td>10</td><td>11</td><td>12</td></tr>
+    <tr><th>정답</th><td class="a">O</td><td class="a">X</td><td class="a">O</td><td class="a">산소</td><td class="a">아미노산</td><td class="a">뉴클레오타이드</td><td class="a">②</td><td class="a">①</td><td class="a">④</td><td class="a">①</td><td class="a">⑤</td><td class="a">③</td></tr>
+    <tr><th>문항</th><td>13</td><td>14</td><td>15</td><td>16</td><td>17</td><td>18</td><td>19</td><td>20</td><td>21</td><td>22</td><td>23</td><td>24</td></tr>
+    <tr><th>정답</th><td class="a">⑤</td><td class="a">②</td><td class="a">⑤</td><td class="a">②</td><td class="a">④</td><td class="a">서술형</td><td class="a">서술형</td><td class="a">서술형</td><td class="a">③</td><td class="a">④</td><td class="a">③</td><td class="a">①</td></tr>
   </table>
 
   <div class="solcols">
@@ -1018,7 +1318,7 @@
       <div class="sol"><div class="shead"><span class="sno">1</span><span class="sans">O</span><span class="slink">개념 1</span></div>
         <p>사면체→광물, 아미노산→단백질, 뉴클레오타이드→핵산. 재료는 달라도 '단위체의 반복 결합'이라는 원리는 같다.</p></div>
       <div class="sol"><div class="shead"><span class="sno">2</span><span class="sans">X</span><span class="slink">개념 2</span></div>
-        <p>최다 원소는 산소(약 47 %). 규소(약 28 %)는 2위다.</p></div>
+        <p>최다 원소는 산소(약 47&nbsp;%). 규소(약 28&nbsp;%)는 2위다.</p></div>
       <div class="sol"><div class="shead"><span class="sno">3</span><span class="sans">O</span><span class="slink">개념 4</span></div>
         <p>염기 A·G·C·T의 배열 순서(염기 서열)가 곧 유전 정보다.</p></div>
       <div class="sol"><div class="shead"><span class="sno">4</span><span class="sans">산소</span><span class="slink">개념 2</span></div>
@@ -1029,23 +1329,20 @@
         <p>인산·당·염기로 이루어진 뉴클레오타이드가 핵산(DNA·RNA)의 단위체다.</p></div>
     </div>
     <div>
-      <div class="sol"><div class="shead"><span class="sno">7</span><span class="sans">③</span><span class="slink">개념 1·2</span></div>
-        <p>사면체들이 산소를 공유하며 독립·사슬·판·망상 등으로 결합 → 결합 방식에 따라 다양한 광물이 된다.</p>
-        <div class="wrongbox"><div class="wt">오답 왜 틀렸나</div>
-          <p><b>①</b> 규산염 광물은 지각 광물의 대부분이다.</p>
-          <p><b>②</b> 규소 1 + 산소 4다. 숫자 바꿔치기.</p>
-          <p><b>④</b> 아미노산은 단백질의 단위체.</p>
-          <p><b>⑤</b> 지각(암석)의 물질이다.</p></div></div>
-      <div class="sol"><div class="shead"><span class="sno">8</span><span class="sans">④</span><span class="slink">개념 3</span></div>
-        <p>아미노산의 수·배열 순서 → 접히는 모양(입체 구조) → 기능. '순서 = 정체성'이다.</p>
-        <div class="wrongbox"><div class="wt">오답 왜 틀렸나</div>
-          <p><b>①</b> 뉴클레오타이드는 핵산의 단위체.</p>
-          <p><b>②</b> 순서가 다르면 다른 단백질이다.</p>
-          <p><b>③</b> 아미노산은 약 20종뿐이다.</p>
-          <p><b>⑤</b> 유전 정보 저장은 DNA의 몫이다.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">7</span><span class="sans">②</span><span class="slink">개념 1</span></div>
+        <p>세 쌍을 짝짓는다 — 규산염 사면체 → 규산염 광물, 아미노산 → 단백질, 뉴클레오타이드 → 핵산.</p>
+        <div class="wrongbox"><div class="wt">바로알기</div>
+          <p><b>①</b> 아미노산이 결합하면 단백질이 된다 — 핵산의 단위체는 뉴클레오타이드이다. <b>③</b> 규산염 사면체가 결합하면 규산염 광물이 된다. <b>④·⑤</b> 석영과 감람석은 규산염 사면체가 결합한 규산염 광물이다.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">8</span><span class="sans">①</span><span class="slink">개념 1·2</span></div>
+        <p><b>ㄱ (옳음)</b> 산소가 약 47&nbsp;%로 가장 길다.</p>
+        <div class="wrongbox"><div class="wt">바로알기</div>
+          <p><b>ㄴ</b> (틀림 →) '기타' 원소를 모두 합해도 100&nbsp;−&nbsp;(47&nbsp;+&nbsp;28)&nbsp;=&nbsp;25&nbsp;%로, 지각의 <b>약 4분의 1</b>이다. <b>ㄷ</b> (틀림 →) 지각에서 두 번째로 많은 원소는 <b>규소</b>(약 28&nbsp;%)이다. 탄소는 '기타'에 들어간다.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">9</span><span class="sans">④</span><span class="slink">개념 2</span></div>
+        <p>단위체(규산염 사면체)는 하나, 결합 방식(독립·사슬·판·망상)은 여럿 → 다양한 광물.</p>
+        <div class="wrongbox"><div class="wt">바로알기</div>
+          <p><b>①</b> 규산염 광물은 지각 광물의 대부분을 차지한다. <b>②</b> 기본 단위체는 규소 1개와 산소 4개로 이루어진다. <b>③</b> 석영은 사면체가 사방으로 이어진 망상 구조이다. <b>⑤</b> 흑운모는 사면체가 판 모양으로 결합해 얇게 벗겨진다.</p></div></div>
     </div>
   </div>
-
   <div class="folio"><span>알짜 해설</span><span class="num">113</span></div>
 </div>
 
@@ -1054,35 +1351,162 @@
   <div class="runhead"><span class="unit-tag" style="color:var(--brand);">알짜 해설</span><span class="lesson-tag">04. 지각과 생명체를 이루는 물질의 규칙성</span></div>
   <div class="solcols">
     <div>
-      <div class="sol"><div class="shead"><span class="sno">9</span><span class="sans">②</span><span class="slink">개념 4</span></div>
-        <p>DNA에서 염기는 A↔T, G↔C로만 짝을 이룬다. A−G−C−T의 상대 가닥은 자리마다 짝을 대응시켜 T−C−G−A.</p>
-        <div class="wrongbox"><div class="wt">오답 왜 틀렸나</div>
-          <p><b>①</b> 같은 서열이 아니라 '짝 서열'이 마주 본다.</p>
-          <p><b>③·④·⑤</b> 한 자리씩 A↔T·G↔C 규칙으로 검산하면 어긋나는 자리가 나온다.</p></div></div>
-      <div class="sol"><div class="shead"><span class="sno">10</span><span class="sans">③</span><span class="slink">개념 1·5</span></div>
-        <p>(가) 단위체 결합이라는 공통 원리. (옳음) (나) 적은 단위체 + 배열의 다양성 = 무한한 물질. (옳음)</p>
-        <div class="wrongbox"><div class="wt">오답 왜 틀렸나</div>
-          <p><b>(다)</b> 4종류는 DNA의 염기. 아미노산은 약 20종류다 — 두 숫자 바꿔치기가 단골 함정.</p></div></div>
-      <div class="sol"><div class="shead"><span class="sno">11</span><span class="sans">모범 답안</span><span class="slink">개념 3·5</span></div>
-        <p>단백질은 아미노산이 결합하여 만들어지는데, <b>결합하는 아미노산의 수와 배열 순서가 달라지면 서로 다른 단백질</b>이 만들어진다. 따라서 20종류의 아미노산만으로도 배열 순서의 경우의 수만큼 매우 다양한 단백질이 만들어질 수 있다.</p>
-        <div class="wrongbox"><div class="wt">채점 기준 (감점 포인트)</div>
-          <p>① 단백질 = 아미노산의 결합 ② 수·배열 순서의 다양성 ③ 배열에 따라 종류(기능)가 달라짐 — 세 요소 모두 서술해야 만점. "종류가 많아서"처럼 배열 순서 언급 없이 쓰면 감점.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">10</span><span class="sans">①</span><span class="slink">개념 3</span></div>
+        <p>아미노산의 수·배열 순서 → 접히는 모양(입체 구조) → 기능. '순서 = 정체성'이다.</p>
+        <div class="wrongbox"><div class="wt">바로알기</div>
+          <p><b>②</b> 단백질의 기본 단위체는 아미노산이다. <b>③</b> 배열 순서가 달라지면 다르게 접혀 다른 단백질이 된다. <b>④</b> 단백질을 이루는 아미노산은 약 20종류이다. <b>⑤</b> 유전 정보의 저장은 핵산(DNA)이 맡고, 단백질은 효소·항체처럼 몸속의 여러 일을 한다.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">11</span><span class="sans">⑤</span><span class="slink">개념 2 | 탐구</span></div>
+        <p><b>ㄱ (옳음)</b> 흑운모는 사면체가 얇은 판 모양으로 결합해 판 방향으로 잘 벗겨진다 — 테이프에 판 조각이 묻어 나온 까닭. <b>ㄴ (옳음)</b> 석영은 사면체가 사방으로 이어진 망상 구조라 단단하다 — 쇠못에 긁히지 않았다. <b>ㄷ (옳음)</b> 두 광물 모두 규산염 사면체가 단위체다. 결합 방식(구조)이 성질을 만든다.</p>
+        <div class="wrongbox"><div class="wt">함정 체크</div>
+          <p>'성질이 다르니 단위체도 다르다'고 생각하면 ㄷ을 놓친다. 단위체는 같고, 구조가 다르다.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">12</span><span class="sans">③</span><span class="slink">개념 3</span></div>
+        <p><b>ㄱ (옳음)</b> 아미노산이 사슬처럼 이어진 것이 단백질 사슬이다. <b>ㄴ (옳음)</b> P와 Q 모두 글·알·발·라·류 5개 — 종류와 수가 같다. 다른 것은 순서뿐(거꾸로)이다.</p>
+        <div class="wrongbox"><div class="wt">바로알기</div>
+          <p><b>ㄷ</b> (틀림 →) P와 Q는 배열 순서가 달라 <b>서로 다른 입체 구조</b>로 접히고, <b>다른 기능</b>을 한다. 재료(종류·수)가 같아도 정체성을 정하는 것은 순서다.</p></div></div>
     </div>
     <div>
-      <div class="sol"><div class="shead"><span class="sno">12</span><span class="sans">③</span><span class="slink">개념 2 | 2점</span></div>
-        <p><b>ㄱ (옳음)</b> ㉠ = 규소 1개 + 산소 4개의 규산염 사면체.</p>
-        <p><b>ㄴ (옳음)</b> 사면체들은 산소를 공유하며 연결된다.</p>
-        <p><b>ㄷ (틀림)</b> 결합 방식이 다르면 감람석·휘석·흑운모·석영처럼 서로 다른 광물이 된다.</p>
-        <div class="wrongbox"><div class="wt">함정 체크</div>
-          <p>'단위체는 하나, 광물은 여럿' — 결합 방식이 다양성을 만든다는 것이 이 자료의 핵심이다.</p></div></div>
-      <div class="sol"><div class="shead"><span class="sno">13</span><span class="sans">②</span><span class="slink">개념 3·4 | 2.5점</span></div>
-        <p><b>ㄱ (옳음)</b> 단백질의 단위체 = 아미노산, DNA의 단위체 = 뉴클레오타이드.</p>
-        <p><b>ㄴ (옳음)</b> 배열 순서가 단백질의 구조와 기능을 결정한다.</p>
-        <p><b>ㄷ (틀림)</b> DNA의 염기는 A·G·C·T 4종. 20종은 아미노산이다.</p>
-        <div class="wrongbox"><div class="wt">함정 체크</div>
-          <p><b>20종 = 아미노산 / 4종 = DNA 염기.</b> 이 두 숫자의 바꿔치기가 이 소단원 최다 빈출 함정 — 표로 정리해 두자.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">13</span><span class="sans">⑤</span><span class="slink">개념 4</span></div>
+        <p>DNA에서 염기는 A−T, G−C로만 짝을 이룬다. A−G−C−T의 자리마다 짝을 대응시키면 T−C−G−A.</p>
+        <div class="wrongbox"><div class="wt">바로알기</div>
+          <p><b>①</b> 마주 보는 가닥에는 같은 서열이 아니라 짝 염기의 서열(T−C−G−A)이 온다. <b>②·③·④</b> 자리마다 A↔T, G↔C로 바꾸면 답은 T−C−G−A 하나뿐이다.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">14</span><span class="sans">②</span><span class="slink">개념 4</span></div>
+        <p><b>ㄷ (옳음)</b> A는 반드시 T와 짝을 이루므로, 두 가닥 전체에서 A의 수와 T의 수는 언제나 같다(여기서는 각 3개).</p>
+        <div class="analysis"><div class="at">꼼꼼 자료 분석</div>
+          <svg width="300" height="112" viewBox="0 0 300 112" font-family="PC Sans">
+            <line x1="16" y1="20" x2="244" y2="20" stroke="#2E5BDA" stroke-width="2.4"/>
+            <line x1="16" y1="58" x2="244" y2="58" stroke="#7A97E8" stroke-width="2.4"/>
+            <g stroke="#B8C2CA" stroke-width="1.6"><line x1="40" y1="22" x2="40" y2="56"/><line x1="85" y1="22" x2="85" y2="56"/><line x1="130" y1="22" x2="130" y2="56"/><line x1="175" y1="22" x2="175" y2="56"/><line x1="220" y1="22" x2="220" y2="56"/></g>
+            <g font-size="8.6" font-weight="900" text-anchor="middle">
+              <text x="40" y="13" fill="#2E5BDA">A</text><text x="85" y="13" fill="#3E9C6E">G</text><text x="130" y="13" fill="#E8940A">C</text><text x="175" y="13" fill="#D6455D">T</text><text x="220" y="13" fill="#2E5BDA">A</text>
+              <text x="85" y="72" fill="#E8940A">C</text><text x="130" y="72" fill="#3E9C6E">G</text><text x="220" y="72" fill="#D6455D">T</text>
+            </g>
+            <circle cx="40" cy="69" r="7" fill="none" stroke="#D6455D" stroke-width="1.1"/><text x="40" y="72" text-anchor="middle" font-size="8.6" font-weight="900" fill="#D6455D">T</text>
+            <circle cx="175" cy="69" r="7" fill="none" stroke="#D6455D" stroke-width="1.1"/><text x="175" y="72" text-anchor="middle" font-size="8.6" font-weight="900" fill="#D6455D">A</text>
+            <text x="49" y="84" font-size="6.8" font-weight="700" fill="#D6455D">(가) = A의 짝 T</text>
+            <text x="184" y="84" font-size="6.8" font-weight="700" fill="#D6455D">(나) = T의 짝 A</text>
+            <text x="250" y="23" font-size="6.8" font-weight="700" fill="#5B6B77">가닥 1</text>
+            <text x="250" y="61" font-size="6.8" font-weight="700" fill="#5B6B77">가닥 2</text>
+            <text x="16" y="98" font-size="6.8" font-weight="700" fill="#D6455D">A: 2 + 1 = 3개 = T: 1 + 2 = 3개</text>
+            <text x="16" y="109" font-size="6.8" font-weight="700" fill="#5B6B77">G: 1 + 1 = 2개 = C: 1 + 1 = 2개 → G(2) &lt; A(3)</text>
+          </svg></div>
+        <div class="wrongbox"><div class="wt">바로알기</div>
+          <p><b>ㄱ</b> (틀림 →) (가)는 A와 짝인 <b>타이민(T)</b>, (나)는 T와 짝인 <b>아데닌(A)</b>으로 서로 다른 염기이다. <b>ㄴ</b> (틀림 →) G는 2개, A는 3개로 G의 개수가 A보다 <b>적다</b>.</p></div></div>
+    </div>
+  </div>
+  <div class="folio"><span>알짜 해설</span><span class="num">114</span></div>
+</div>
 
-      <div class="gist" style="margin-top:5mm;">
+<!-- ═════════════ 해설 3 ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag" style="color:var(--brand);">알짜 해설</span><span class="lesson-tag">04. 지각과 생명체를 이루는 물질의 규칙성</span></div>
+  <div class="solcols">
+    <div>
+      <div class="sol"><div class="shead"><span class="sno">15</span><span class="sans">⑤</span><span class="slink">개념 5</span></div>
+        <p>자리마다 A·G·C·T 4가지가 올 수 있으므로 4&nbsp;×&nbsp;4&nbsp;×&nbsp;4&nbsp;×&nbsp;4&nbsp;=&nbsp;256가지. 자료 파헤치기의 4<sup>10</sup>(약 105만)과 같은 계산이다.</p>
+        <div class="wrongbox"><div class="wt">바로알기</div>
+          <p><b>①</b> 4가지는 염기의 종류 수일 뿐이다. <b>②</b> 16가지(4&nbsp;×&nbsp;4)는 염기 2개일 때이다. <b>③</b> 24가지(4&nbsp;×&nbsp;3&nbsp;×&nbsp;2&nbsp;×&nbsp;1)는 같은 염기를 반복하지 않을 때이다. <b>④</b> 64가지(4&nbsp;×&nbsp;4&nbsp;×&nbsp;4)는 염기 3개일 때이다.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">16</span><span class="sans">②</span><span class="slink">개념 1·5</span></div>
+        <p><b>C (옳음)</b> 약 20종의 아미노산도 수와 배열 순서를 달리하면 수만 가지 단백질이 된다.</p>
+        <div class="wrongbox"><div class="wt">바로알기</div>
+          <p><b>A</b> (틀림 →) 규산염 광물의 단위체는 규산염 사면체 <b>한 종류</b>뿐이다. 광물이 다양한 것은 사면체의 <b>결합 방식</b>이 다양하기 때문이다. <b>B</b> (틀림 →) DNA의 염기는 <b>A·G·C·T 4종</b>이다. 4종뿐이어도 염기 서열이 다양해 생명의 설계도를 모두 담는다.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">17</span><span class="sans">④</span><span class="slink">개념 5 | 자료 파헤치기</span></div>
+        <p><b>ㄴ (옳음)</b> ㉡은 아미노산의 종류 수, 약 20이다. <b>ㄷ (옳음)</b> ㉢은 DNA 다양성의 비결인 염기 서열이다.</p>
+        <div class="wrongbox"><div class="wt">바로알기</div>
+          <p><b>ㄱ</b> (틀림 →) ㉠ 규산염 사면체는 <b>규소 1개와 산소 4개</b>로 이루어진다. 비교표는 '1·20·4'와 '규소 1 + 산소 4'를 뒤집어 내는 것이 단골 함정이다.</p></div></div>
+    </div>
+    <div>
+      <div class="sol"><div class="shead"><span class="sno">18</span><span class="sans">모범 답안</span><span class="slink">개념 3·5</span></div>
+        <p>단백질은 아미노산이 사슬처럼 결합하여 만들어지는데, 결합하는 아미노산의 수와 <b>배열 순서</b>가 달라지면 사슬이 서로 다르게 접혀 다른 <b>입체 구조</b>가 된다. 입체 구조가 단백질의 <b>기능</b>을 결정하므로, 약 20종의 아미노산만으로도 배열 순서의 경우의 수만큼 수만 가지 단백질이 만들어진다.</p>
+        <table class="rubric">
+          <tr><th>채점 요소</th><th>배점</th></tr>
+          <tr><td>① 결합하는 아미노산의 수와 배열 순서가 다양하게 달라질 수 있다고 썼다.</td><td>2점</td></tr>
+          <tr><td>② 배열 순서에 따라 서로 다른 입체 구조로 접힌다고 썼다.</td><td>2점</td></tr>
+          <tr><td>③ 입체 구조가 기능을 결정하므로 서로 다른 단백질이 된다고 썼다.</td><td>2점</td></tr>
+        </table>
+        <div class="wrongbox"><div class="wt">이렇게 쓰면 0점</div>
+          <p>"아미노산의 종류가 많기 때문이다." — 아미노산은 약 20종뿐이다. 배열 순서를 뺀 답.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">19</span><span class="sans">모범 답안</span><span class="slink">개념 2</span></div>
+        <p>세 광물은 모두 규소 1개와 <b>산소</b> 4개로 이루어진 <b>규산염 사면체</b>를 기본 단위체로 한다. 그러나 사면체들이 이웃 사면체와 산소를 공유하며 연결되는 <b>결합 방식</b>이 서로 달라(감람석은 독립형, 흑운모는 판 모양, 석영은 망상 구조) 서로 다른 광물이 된다.</p>
+        <table class="rubric">
+          <tr><th>채점 요소</th><th>배점</th></tr>
+          <tr><td>① 세 광물의 기본 단위체가 규산염 사면체(규소 1 + 산소 4)로 같다고 썼다.</td><td>2점</td></tr>
+          <tr><td>② 사면체들이 산소를 공유하며 연결된다고 썼다.</td><td>2점</td></tr>
+          <tr><td>③ 결합 방식이 달라 서로 다른 광물이 된다고 썼다.</td><td>2점</td></tr>
+        </table>
+        <div class="wrongbox"><div class="wt">이렇게 쓰면 0점</div>
+          <p>"세 광물은 기본 단위체가 서로 다르기 때문이다." — 단위체는 같고 결합 방식이 다르다.</p></div></div>
+    </div>
+  </div>
+  <div class="folio"><span>알짜 해설</span><span class="num">?</span></div>
+</div>
+
+<!-- ═════════════ 해설 4 ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag" style="color:var(--brand);">알짜 해설</span><span class="lesson-tag">04. 지각과 생명체를 이루는 물질의 규칙성</span></div>
+  <div class="solcols">
+    <div>
+      <div class="sol"><div class="shead"><span class="sno">20</span><span class="sans">모범 답안</span><span class="slink">개념 4</span></div>
+        <p>마주 보는 가닥의 염기 서열은 <b>T−T−C−G−A</b>이다. DNA는 두 가닥이 마주 보며 꼬인 <b>이중 나선</b> 구조이고, 두 가닥의 염기는 A는 T와, G는 C와만 <b>짝</b>을 이룬다. 따라서 한쪽 가닥의 염기 서열이 정해지면 반대쪽 가닥의 서열도 저절로 정해진다.</p>
+        <table class="rubric">
+          <tr><th>채점 요소</th><th>배점</th></tr>
+          <tr><td>① 마주 보는 가닥의 서열을 T−T−C−G−A로 썼다.</td><td>2점</td></tr>
+          <tr><td>② 이중 나선의 두 가닥 염기가 마주 보며 짝을 이룬다고 썼다.</td><td>2점</td></tr>
+          <tr><td>③ A는 T와, G는 C와만 짝을 이루므로 한쪽 서열이 반대쪽을 정한다고 썼다.</td><td>2점</td></tr>
+        </table>
+        <div class="wrongbox"><div class="wt">이렇게 쓰면 0점</div>
+          <p>"A−A−G−C−T, 두 가닥은 같은 서열이다." — 같은 서열이 아니라 짝 염기의 서열이 마주 본다.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">21</span><span class="sans">③</span><span class="slink">개념 2 | 2점</span></div>
+        <p><b>ㄱ (옳음)</b> ㉠ = 규소 1개 + 산소 4개의 규산염 사면체. <b>ㄴ (옳음)</b> 사면체들은 이웃과 산소를 공유하며 연결된다.</p>
+        <div class="wrongbox"><div class="wt">바로알기</div>
+          <p><b>ㄷ</b> (틀림 →) 결합 방식이 다르면 (가) 감람석, (나) 휘석처럼 <b>서로 다른 광물</b>이 된다. '단위체는 하나, 광물은 여럿'.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">22</span><span class="sans">④</span><span class="slink">개념 5 | 2.5점</span></div>
+        <p><b>ㄴ (옳음)</b> (나)&nbsp;=&nbsp;4&nbsp;×&nbsp;4&nbsp;=&nbsp;16. <b>ㄷ (옳음)</b> 3개씩: 단백질 20&nbsp;×&nbsp;20&nbsp;×&nbsp;20&nbsp;=&nbsp;8000, DNA 한 가닥 4&nbsp;×&nbsp;4&nbsp;×&nbsp;4&nbsp;=&nbsp;64 → 8000&nbsp;÷&nbsp;64&nbsp;=&nbsp;125배.</p>
+        <div class="wrongbox"><div class="wt">바로알기</div>
+          <p><b>ㄱ</b> (틀림 →) (가)는 20&nbsp;+&nbsp;20이 아니라 20&nbsp;×&nbsp;20&nbsp;=&nbsp;<b>400</b>이다 — 자리마다 20가지씩 곱한다.</p></div></div>
+    </div>
+    <div>
+      <div class="sol"><div class="shead"><span class="sno">23</span><span class="sans">③</span><span class="slink">개념 3·4 | 2점</span></div>
+        <p><b>ㄱ (옳음)</b> 단백질의 단위체 = 아미노산, DNA의 단위체 = 뉴클레오타이드. <b>ㄴ (옳음)</b> 배열 순서가 단백질의 구조와 기능을 결정한다.</p>
+        <div class="wrongbox"><div class="wt">바로알기</div>
+          <p><b>ㄷ</b> (틀림 →) DNA의 염기는 <b>A·G·C·T 4종</b>이다. 약 20종은 아미노산이다 — 이 소단원 최다 빈출 함정.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">24</span><span class="sans">①</span><span class="slink">개념 2 | 소단원 03 연계 | 2.5점</span></div>
+        <p><b>ㄱ (옳음)</b> 탄소(2, 4)와 규소(2, 8, 4)는 모두 가장 바깥 껍질에 전자가 4개 — 원자가 전자 수가 같으면 같은 족이다(소단원 03).</p>
+        <div class="analysis"><div class="at">꼼꼼 자료 분석</div>
+          <svg width="300" height="122" viewBox="0 0 300 122" font-family="PC Sans">
+            <g transform="translate(40,50)">
+              <circle r="5.5" fill="#2E5BDA"/>
+              <circle r="14" fill="none" stroke="#8FA8EC" stroke-width="1"/><text x="0" y="-16.5" font-size="6.6" fill="#5B6B77" text-anchor="middle">2</text>
+              <circle r="27" fill="none" stroke="#8FA8EC" stroke-width="1"/>
+              <circle cx="19.1" cy="-19.1" r="2.8" fill="#E8940A"/><circle cx="19.1" cy="19.1" r="2.8" fill="#E8940A"/><circle cx="-19.1" cy="19.1" r="2.8" fill="#E8940A"/><circle cx="-19.1" cy="-19.1" r="2.8" fill="#E8940A"/>
+              <text y="42" text-anchor="middle" font-size="7.6" font-weight="800">탄소: 껍질 2개</text>
+            </g>
+            <g transform="translate(126,50)">
+              <circle r="5.5" fill="#2E5BDA"/>
+              <circle r="12" fill="none" stroke="#8FA8EC" stroke-width="1"/><text x="0" y="-14.3" font-size="6.6" fill="#5B6B77" text-anchor="middle">2</text>
+              <circle r="23" fill="none" stroke="#8FA8EC" stroke-width="1"/><text x="0" y="-25.3" font-size="6.6" fill="#5B6B77" text-anchor="middle">8</text>
+              <circle r="34" fill="none" stroke="#8FA8EC" stroke-width="1"/>
+              <circle cx="24" cy="-24" r="2.8" fill="#E8940A"/><circle cx="24" cy="24" r="2.8" fill="#E8940A"/><circle cx="-24" cy="24" r="2.8" fill="#E8940A"/><circle cx="-24" cy="-24" r="2.8" fill="#E8940A"/>
+              <text y="47" text-anchor="middle" font-size="7.6" font-weight="800">규소: 껍질 3개</text>
+            </g>
+            <text x="83" y="117" text-anchor="middle" font-size="6.8" font-weight="700" fill="#D6455D">주황 점 = 원자가 전자 4개로 같다 → 같은 족</text>
+            <g transform="translate(232,52)">
+              <line x1="0" y1="-1" x2="9" y2="-9" stroke="#9AB0E0" stroke-width="2.6"/>
+              <circle cx="9" cy="-9" r="7.5" fill="url(#gO)" opacity="0.85"/>
+              <circle cx="9" cy="-9" r="10" fill="none" stroke="#D6455D" stroke-width="1.1" stroke-dasharray="2 1.5"/>
+              <line x1="0" y1="-1" x2="0" y2="-28" stroke="#9AB0E0" stroke-width="3"/>
+              <line x1="0" y1="-1" x2="-20" y2="16" stroke="#9AB0E0" stroke-width="3"/>
+              <line x1="0" y1="-1" x2="20" y2="16" stroke="#9AB0E0" stroke-width="3"/>
+              <circle cx="0" cy="-1" r="8.5" fill="url(#gSi)"/>
+              <circle cx="0" cy="-28" r="9.5" fill="url(#gO)"/>
+              <circle cx="-20" cy="16" r="10" fill="url(#gO)"/>
+              <circle cx="20" cy="16" r="10" fill="url(#gO)"/>
+                            <text x="0" y="40" text-anchor="middle" font-size="6.8" font-weight="700" fill="#D6455D">뒤에 가려진 산소 1개</text>
+              <text x="0" y="51" text-anchor="middle" font-size="6.8" font-weight="700" fill="#D6455D">→ 산소는 모두 4개</text>
+            </g>
+          </svg></div>
+        <div class="wrongbox"><div class="wt">바로알기</div>
+          <p><b>ㄴ</b> (틀림 →) 전자껍질 수는 탄소 2개, 규소 3개로 <b>규소가 더 많다</b>. <b>ㄷ</b> (틀림 →) 규소 1개에 결합한 산소는 <b>4개</b>이다 — 앞쪽 3개 뒤에 1개가 가려져 있다.</p></div></div>
+      <div class="gist" style="margin-top:3mm;">
         <div class="boxtitle"><span class="ico">알</span>이 소단원, 이것만은!</div>
         <ul>
           <li>세 쌍부터: <b>사면체(규소 1+산소 4) → 광물 / 아미노산(20종) → 단백질 / 뉴클레오타이드(염기 4종) → 핵산</b>.</li>
@@ -1092,12 +1516,22 @@
       </div>
     </div>
   </div>
-  <div class="folio"><span>알짜 해설</span><span class="num">114</span></div>
+  <div class="folio"><span>알짜 해설</span><span class="num">?</span></div>
 </div>
 
 <!-- ═════════════ p.62 MEMO ═════════════ -->
 <div class="page">
   <div class="runhead"><span class="unit-tag">II. 물질과 규칙성</span><span class="lesson-tag">04 ▸ 05 넘어가기 전에</span></div>
+  <div class="spaced">
+    <div class="st">간격 두고 다시 꺼내기 — 책을 덮고 답한다</div>
+    <ol>
+      <li>규산염 사면체는 규소 몇 개와 산소 몇 개로 이루어지는가?</li>
+      <li>단백질의 기본 단위체는 무엇이며, 그 종류는 약 몇 가지인가?</li>
+      <li>DNA에서 A와 G는 각각 어떤 염기와 짝을 이루는가?</li>
+    </ol>
+    <div class="when"><span>□ 1일 뒤</span><span>□ 1주 뒤</span><span>□ 시험 전</span></div>
+    <div class="ans">정답 1 규소 1개, 산소 4개 2 아미노산, 약 20가지 3 A는 T와, G는 C와</div>
+  </div>
   <div class="memo-head"><span class="mt">MEMO</span><span class="ms">헷갈린 개념, 다시 틀린 문제 번호, 나만의 암기법을 남겨 두는 자리</span></div>
   <div class="memo-area"></div>
   <div class="memo-pen">"3×3 표를 그려 봐 — 단위체 셋, 물질 셋, 다양성의 비결 셋. 못 채우면 108쪽으로! — 박찬쌤"</div>

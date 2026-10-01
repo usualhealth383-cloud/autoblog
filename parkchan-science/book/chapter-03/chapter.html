@@ -131,7 +131,7 @@
   .choices.inline{ display:flex; flex-wrap:wrap; gap:0 6mm; }
   .bogi-box{ border:0.35mm solid #B8C2CA; border-radius:0; margin:2.5mm 0 0 8.6mm; padding:2.4mm 3.2mm; font-family:'PC Serif','PC Sans',serif; font-size:9.2pt; line-height:1.8; background:none;}
   .bogi-box .bt{ text-align:center; font-weight:800; color:var(--sub); font-size:8.4pt; margin-bottom:0.8mm; letter-spacing:0.3em;}
-  .ox-answer{ margin-left:2mm; color:var(--sub); font-size:9pt; }
+  .ox-answer{ margin-left:2mm; color:var(--sub); font-size:9pt; white-space:nowrap; }
   .blankline{ display:inline-block; min-width:14mm; border-bottom:0.4mm solid var(--ink); }
   .qgrid{ display:grid; grid-template-columns:1fr 1fr; gap:0 9mm; }
   .essay-lines{ margin:2mm 0 0 8.4mm; }
@@ -229,6 +229,29 @@
   /* 화학식 첨자 — 본문 폰트를 그대로 축소해 자형이 어긋나지 않게 한다 */
   sub,sup{ font-size:0.68em; line-height:0; font-weight:inherit; }
   sub{ vertical-align:-0.14em; } sup{ vertical-align:0.34em; }
+/* ── 2026-10-02 보강: 중요 표시 · 채점 기준 · 꼼꼼 자료 분석 · 간격 두고 다시 꺼내기 ── */
+.must{ display:inline-block; font-size:7pt; font-weight:900; color:#fff; background:#D9534F; border-radius:1.6mm; padding:0.2mm 1.4mm; margin-right:1.2mm; vertical-align:1pt; }
+table.rubric{ border-collapse:collapse; width:100%; font-size:7.6pt; margin:1mm 0 0.5mm; }
+table.rubric th, table.rubric td{ border:0.25mm solid var(--line); padding:0.8mm 1.4mm; text-align:left; vertical-align:top; }
+table.rubric th{ background:#F4F1EA; font-weight:800; white-space:nowrap; }
+.analysis{ border:0.35mm dashed #C9A36A; border-radius:2.5mm; padding:1.6mm 2mm 1.2mm; margin:1.5mm 0; background:#FFFCF5; }
+.analysis .at{ font-size:7.6pt; font-weight:900; color:#9C6503; margin-bottom:0.8mm; }
+.analysis svg{ max-width:100%; height:auto; display:block; }
+.spaced{ border:0.4mm solid var(--line); border-radius:3mm; padding:3mm 4mm 2.6mm; margin:0 0 4mm; position:relative; background:#FAFBFC; }
+.spaced .st{ font-size:9.5pt; font-weight:900; color:var(--unit); margin-bottom:1.6mm; }
+.spaced ol{ margin:0; padding-left:5mm; font-size:8.8pt; line-height:1.75; }
+.spaced .when{ display:flex; gap:5mm; font-size:8pt; color:var(--sub); margin-top:1.8mm; }
+.spaced .ans{ position:absolute; right:4mm; bottom:2.4mm; transform:rotate(180deg); font-size:6.8pt; color:var(--sub); }
+/* 2단 문항 쪽 간격 · 발문 안 탐구 과정 상자 (합격본 chapter-08 에서) */
+.qg2 .q{ margin-bottom:6mm; }
+.qg2 > div > .q:last-child{ margin-bottom:0; }
+.qg2 .choices.inline{ gap:0 4mm; }
+.qg2 .choices{ margin-top:1.8mm; line-height:1.78; }
+.qg2 .bogi-box{ margin-top:2mm; padding:1.8mm 2.8mm; font-size:9pt; line-height:1.72; }
+.qg2 .bogi-box .bt{ margin-bottom:0.3mm; }
+.qg2 .q figure{ margin:1.6mm 0 0.6mm 8.4mm !important; }
+.exp{ border:0.35mm solid #B8C2CA; border-radius:1.6mm; background:#FAFBFC; padding:1.6mm 2.6mm; margin:1.4mm 0 1.6mm; font-size:8.9pt; line-height:1.7; }
+.exp b{ font-family:'PC Sans'; font-size:7.8pt; font-weight:900; color:var(--brand); }
 </style>
 </head>
 <body>
@@ -239,7 +262,7 @@
     <div class="ghost-txt">03</div>
     <div class="kicker"><span class="kt">통합과학 1 · II. 물질과 규칙성</span></div>
     <h1><span class="tick"></span>원소의 주기성과 화학 결합</h1>
-    <p class="opener-lede">우주가 만든 원소는 118가지 — 놀랍게도 그 성질에는 규칙이 있다.<br>
+    <p class="opener-lede">지금까지 알려진 원소는 118가지 — 놀랍게도 그 성질에는 규칙이 있다.<br>
     규칙을 읽으면, 원자들이 왜·어떻게 손을 잡는지 보인다.</p>
   </div>
 
@@ -317,7 +340,7 @@
   <div class="cols">
     <div class="main">
       <h3 class="sec"><span class="n">1</span>주기율표 — 원소를 정리하는 지도</h3>
-      <p class="body">별들이 만들어 낸 원소는 자연에 약 90가지, 인공 원소까지 더하면 <b>118가지</b>다. 과학자들은 이 원소들을 <span class="kw">원자 번호</span>(양성자 수) 순으로 늘어놓다가 놀라운 사실을 발견했다 — <span class="u-amber">성질이 비슷한 원소가 일정한 간격으로 반복해서 나타난다</span>는 것이다. 이 규칙성을 <span class="kw">주기성</span>이라 하고, 성질이 비슷한 원소가 같은 세로줄에 오도록 배열한 표가 <span class="kw">주기율표</span>다.</p>
+      <p class="body">별들이 만들어 낸 원소는 자연에 약 90가지, 인공 원소까지 더하면 <b>118가지</b>다. 과학자들은 이 원소들을 원자량 순으로 늘어놓다가 놀라운 사실을 발견했다 — <span class="u-amber">성질이 비슷한 원소가 일정한 간격으로 반복해서 나타난다</span>는 것이다. 이 규칙성을 <span class="kw">주기성</span>이라 하고, 성질이 비슷한 원소가 같은 세로줄에 오도록 배열한 표가 <span class="kw">주기율표</span>다. 오늘날에는 원소를 <span class="kw">원자 번호</span>(양성자 수) 순으로 배열한다.</p>
       <p class="body">주기율표의 <b>세로줄</b>을 <span class="kw">족</span>(1~18족), <b>가로줄</b>을 <span class="kw">주기</span>(1~7주기)라고 한다. 핵심은 이것이다 — <b>같은 족 원소들은 화학적 성질이 비슷하다.</b> 그래서 주기율표는 외우는 표가 아니라, 원소의 성격을 위치로 읽어 내는 <b>지도</b>가 된다. 왼쪽과 가운데는 대부분 <b>금속</b>, 오른쪽 위는 <b>비금속</b> 원소의 구역이다.</p>
 
       <figure>
@@ -341,13 +364,13 @@
           <!-- 2주기 -->
           <rect x="36" y="38" width="22" height="20" fill="#DCE6FA" stroke="#D8E0E5"/><text x="47" y="51.5" text-anchor="middle" font-size="8.5" font-weight="900" fill="#2E5BDA">Li</text>
           <rect x="58" y="38" width="22" height="20" fill="#F3F6FA" stroke="#D8E0E5"/>
-          <rect x="278" y="38" width="22" height="20" fill="#F3F6FA" stroke="#D8E0E5"/><rect x="300" y="38" width="22" height="20" fill="#F3F6FA" stroke="#D8E0E5"/><rect x="322" y="38" width="22" height="20" fill="#F3F6FA" stroke="#D8E0E5"/><rect x="344" y="38" width="22" height="20" fill="#F3F6FA" stroke="#D8E0E5"/><rect x="366" y="38" width="22" height="20" fill="#F3F6FA" stroke="#D8E0E5"/>
+          <rect x="300" y="38" width="22" height="20" fill="#F3F6FA" stroke="#D8E0E5"/><rect x="322" y="38" width="22" height="20" fill="#F3F6FA" stroke="#D8E0E5"/><rect x="344" y="38" width="22" height="20" fill="#F3F6FA" stroke="#D8E0E5"/><rect x="366" y="38" width="22" height="20" fill="#F3F6FA" stroke="#D8E0E5"/>
           <rect x="388" y="38" width="22" height="20" fill="#FBEBEE" stroke="#D8E0E5"/><text x="399" y="51.5" text-anchor="middle" font-size="8.5" font-weight="900" fill="#D6455D">F</text>
           <rect x="410" y="38" width="22" height="20" fill="#EEF0F2" stroke="#D8E0E5"/><text x="421" y="51.5" text-anchor="middle" font-size="8.5" font-weight="900" fill="#5B6B77">Ne</text>
           <!-- 3주기 -->
           <rect x="36" y="58" width="22" height="20" fill="#DCE6FA" stroke="#D8E0E5"/><text x="47" y="71.5" text-anchor="middle" font-size="8.5" font-weight="900" fill="#2E5BDA">Na</text>
           <rect x="58" y="58" width="22" height="20" fill="#F3F6FA" stroke="#D8E0E5"/>
-          <rect x="278" y="58" width="22" height="20" fill="#F3F6FA" stroke="#D8E0E5"/><rect x="300" y="58" width="22" height="20" fill="#F3F6FA" stroke="#D8E0E5"/><rect x="322" y="58" width="22" height="20" fill="#F3F6FA" stroke="#D8E0E5"/><rect x="344" y="58" width="22" height="20" fill="#F3F6FA" stroke="#D8E0E5"/><rect x="366" y="58" width="22" height="20" fill="#F3F6FA" stroke="#D8E0E5"/>
+          <rect x="300" y="58" width="22" height="20" fill="#F3F6FA" stroke="#D8E0E5"/><rect x="322" y="58" width="22" height="20" fill="#F3F6FA" stroke="#D8E0E5"/><rect x="344" y="58" width="22" height="20" fill="#F3F6FA" stroke="#D8E0E5"/><rect x="366" y="58" width="22" height="20" fill="#F3F6FA" stroke="#D8E0E5"/>
           <rect x="388" y="58" width="22" height="20" fill="#FBEBEE" stroke="#D8E0E5"/><text x="399" y="71.5" text-anchor="middle" font-size="8.5" font-weight="900" fill="#D6455D">Cl</text>
           <rect x="410" y="58" width="22" height="20" fill="#EEF0F2" stroke="#D8E0E5"/><text x="421" y="71.5" text-anchor="middle" font-size="8.5" font-weight="900" fill="#5B6B77">Ar</text>
           <!-- 4주기: 18칸 전부 -->
@@ -772,7 +795,7 @@
     <ol>
       <li><span class="no">1</span>물 분자에서 수소와 산소는 전자쌍을 공유하고 있다. ( O , X )</li>
       <li><span class="no">2</span>공유 결합은 주로 비금속 원소들 사이에 형성된다. ( O , X )</li>
-      <li><span class="no">3</span>산소 기체(O<sub>2</sub>)는 이온 결합 물질이다. ( O , X )</li>
+      <li><span class="no">3</span><span>산소 기체(O<sub>2</sub>)는 이온 결합 물질이다. ( O , X )</span></li>
     </ol>
     <div class="qc-ans">정답 1 O 2 O 3 X (산소 원자끼리의 공유 결합)</div>
   </div>
@@ -876,7 +899,7 @@
       <ol>
         <li><b>구성 원소부터 확인</b> — 금속+비금속이면 <b>이온 결합</b>, 비금속끼리면 <b>공유 결합</b>부터 예상한다. (다)처럼 금속 단독이면 결합 판정 대상이 아니라 금속 그 자체다.</li>
         <li><b>상태별 전도성 대조</b> — (가)는 고체 X·수용액 O: 이온이 있으나 고체에선 못 움직이다가 물에서 풀려난 것 → <b>이온 결합 물질(염화 나트륨)</b>. (나)는 어느 상태로도 X: 녹아도 이온이 안 생긴 것 → <b>공유 결합 물질(설탕)</b>.</li>
-        <li><b>예외 확인</b> — (다) 구리는 고체인데도 통한다. 금속은 이온·분자가 아니라 <b>자유롭게 움직이는 전자</b>가 전하를 운반하기 때문이다(다음 소단원 05에서 자세히).</li>
+        <li><b>예외 확인</b> — (다) 구리는 고체인데도 통한다. 금속은 이온·분자가 아니라 <b>자유롭게 움직이는 전자</b>가 전하를 운반하기 때문이다(소단원 05에서 자세히).</li>
       </ol>
       <h4>결론</h4>
       <p>전기 전도성 실험만으로 눈에 보이지 않는 결합의 종류를 판정할 수 있다. 기준은 언제나 하나 — <b>움직일 수 있는 전하 운반 입자(이온 또는 전자)가 그 상태에 존재하는가?</b></p>
@@ -913,161 +936,432 @@
 
   <div class="step-head s2"><span class="stepno">STEP 2</span><span class="steptt">내신 완성</span><span class="stepdesc">학교 시험 유형 그대로 — 서술형까지 한 번에</span></div>
 
-  <div class="q">
-    <div class="qhead"><span class="qno">7</span><div class="stem">리튬, 나트륨, 칼륨의 공통된 성질로 옳은 것은? <span class="difficulty">●●○</span>
-    <div class="tags">10통과1-02-03 | 개념 2</div></div></div>
-    <ul class="choices">
-      <li>① 물과 반응하지 않는다.</li>
-      <li>② 칼로 자를 수 없을 만큼 단단하다.</li>
-      <li>③ 원자가 전자가 7개이다.</li>
-      <li>④ 주기율표의 17족 원소이다.</li>
-      <li>⑤ 물과 격렬하게 반응하며, 반응성이 매우 크다.</li>
-    </ul>
-  </div>
+  <div class="qgrid qg2">
+    <div>
+      <div class="q">
+        <div class="qhead"><span class="qno">7</span><div class="stem">주기율표에 대한 설명으로 옳은 것은? <span class="difficulty">●○○</span>
+        <div class="tags">10통과1-02-03 | 개념 1</div></div></div>
+        <ul class="choices">
+          <li>① 가로줄을 족, 세로줄을 주기라고 한다.</li>
+          <li>② 같은 주기 원소들은 화학적 성질이 비슷하다.</li>
+          <li>③ 원소를 원자 번호 순으로 배열한다.</li>
+          <li>④ 주기율표의 오른쪽 위에는 주로 금속 원소가 있다.</li>
+          <li>⑤ 18족 원소는 반응성이 매우 크다.</li>
+        </ul>
+      </div>
 
-  <div class="q">
-    <div class="qhead"><span class="qno">8</span><div class="stem"><span class="badge-data">자료</span>그림은 나트륨(Na)과 칼륨(K)의 전자 배치를 나타낸 것이다. 두 원소의 화학적 성질이 비슷한 까닭으로 가장 적절한 것은? <span class="difficulty">●●●</span>
-    <div class="tags">10통과1-02-03 | 개념 3</div></div></div>
-    <figure style="margin:1mm 0 0.5mm 8.4mm;">
-      <svg width="240" height="98" viewBox="0 0 240 98" font-family="PC Sans">
-        <g transform="translate(58,44)">
-          <circle r="5" fill="#2E5BDA"/>
-          <circle r="12" fill="none" stroke="#8FA8EC" stroke-width="1"/><text x="0" y="-14" font-size="6.5" fill="#5B6B77" text-anchor="middle">2</text>
-          <circle r="22" fill="none" stroke="#8FA8EC" stroke-width="1"/><text x="0" y="-24.5" font-size="6.5" fill="#5B6B77" text-anchor="middle">8</text>
-          <circle r="32" fill="none" stroke="#8FA8EC" stroke-width="1"/>
-          <circle cx="0" cy="-32" r="2.6" fill="#E8940A"/>
-          <text y="48" text-anchor="middle" font-size="8.5" font-weight="800">Na (2, 8, 1)</text>
-        </g>
-        <g transform="translate(170,44)">
-          <circle r="5" fill="#2E5BDA"/>
-          <circle r="11" fill="none" stroke="#8FA8EC" stroke-width="1"/><text x="0" y="-13" font-size="6.5" fill="#5B6B77" text-anchor="middle">2</text>
-          <circle r="19" fill="none" stroke="#8FA8EC" stroke-width="1"/><text x="0" y="-21" font-size="6.5" fill="#5B6B77" text-anchor="middle">8</text>
-          <circle r="27" fill="none" stroke="#8FA8EC" stroke-width="1"/><text x="0" y="-29" font-size="6.5" fill="#5B6B77" text-anchor="middle">8</text>
-          <circle r="35" fill="none" stroke="#8FA8EC" stroke-width="1"/>
-          <circle cx="0" cy="-35" r="2.6" fill="#E8940A"/>
-          <text y="48" text-anchor="middle" font-size="8.5" font-weight="800">K (2, 8, 8, 1)</text>
-        </g>
-      </svg>
-    </figure>
-    <ul class="choices">
-      <li>① 전자껍질 수가 같기 때문이다.</li>
-      <li>② 원자가 전자 수가 1개로 같기 때문이다.</li>
-      <li>③ 전체 전자 수가 같기 때문이다.</li>
-      <li>④ 같은 주기 원소이기 때문이다.</li>
-      <li>⑤ 둘 다 비금속 원소이기 때문이다.</li>
-    </ul>
+      <div class="q">
+        <div class="qhead"><span class="qno">8</span><div class="stem"><span class="must">중요</span><span class="badge-data">자료</span>그림은 주기율표의 일부에 A~E를 나타낸 것이다. 옳은 것만을 &lt;보기&gt;에서 있는 대로 고른 것은? (단, A~E는 임의의 기호이다.) <span class="difficulty">●●○</span>
+        <div class="tags">10통과1-02-03 | 개념 1·2</div></div></div>
+        <figure style="margin:2mm 0 1mm 8.4mm;">
+          <svg width="272" height="64" viewBox="0 0 272 64" font-family="PC Sans">
+            <g font-size="6.6" font-weight="800" fill="#5B6B77" text-anchor="middle">
+              <text x="45" y="10">1족</text><text x="75" y="10">2족</text><text x="105" y="10">13족</text><text x="135" y="10">14족</text><text x="165" y="10">15족</text><text x="195" y="10">16족</text><text x="225" y="10">17족</text><text x="255" y="10">18족</text>
+              <text x="15" y="24.5">1주기</text><text x="15" y="40.5">2주기</text><text x="15" y="56.5">3주기</text>
+            </g>
+            <g fill="#F3F6FA" stroke="#C9D3DB" stroke-width="0.8">
+              <rect x="30" y="14" width="30" height="16"/><rect x="240" y="14" width="30" height="16"/>
+              <rect x="30" y="30" width="30" height="16"/><rect x="60" y="30" width="30" height="16"/><rect x="90" y="30" width="30" height="16"/><rect x="120" y="30" width="30" height="16"/><rect x="150" y="30" width="30" height="16"/><rect x="180" y="30" width="30" height="16"/><rect x="210" y="30" width="30" height="16"/><rect x="240" y="30" width="30" height="16"/>
+              <rect x="30" y="46" width="30" height="16"/><rect x="60" y="46" width="30" height="16"/><rect x="90" y="46" width="30" height="16"/><rect x="120" y="46" width="30" height="16"/><rect x="150" y="46" width="30" height="16"/><rect x="180" y="46" width="30" height="16"/><rect x="210" y="46" width="30" height="16"/><rect x="240" y="46" width="30" height="16"/>
+            </g>
+            <g fill="#fff" stroke="#7A97E8" stroke-width="1">
+              <rect x="30" y="30" width="30" height="16"/><rect x="30" y="46" width="30" height="16"/><rect x="210" y="30" width="30" height="16"/><rect x="210" y="46" width="30" height="16"/><rect x="240" y="46" width="30" height="16"/>
+            </g>
+            <g font-size="9" font-weight="900" fill="#2E5BDA" text-anchor="middle">
+              <text x="45" y="41.2">A</text><text x="45" y="57.2">B</text><text x="225" y="41.2">C</text><text x="225" y="57.2">D</text><text x="255" y="57.2">E</text>
+            </g>
+          </svg>
+        </figure>
+        <div class="bogi-box">
+          <div class="bt">보기</div>
+          ㄱ. A와 B는 화학적 성질이 비슷하다.<br>
+          ㄴ. B와 D는 같은 주기 원소이다.<br>
+          ㄷ. E는 반응성이 커서 금속과 잘 반응한다.
+        </div>
+        <ul class="choices inline">
+          <li>① ㄱ</li><li>② ㄷ</li><li>③ ㄱ, ㄴ</li><li>④ ㄴ, ㄷ</li><li>⑤ ㄱ, ㄴ, ㄷ</li>
+        </ul>
+      </div>
+    </div>
+    <div>
+      <div class="q">
+        <div class="qhead"><span class="qno">9</span><div class="stem">리튬, 나트륨, 칼륨의 공통 성질로 옳은 것은? <span class="difficulty">●○○</span>
+        <div class="tags">10통과1-02-03 | 개념 2</div></div></div>
+        <ul class="choices">
+          <li>① 물과 격렬하게 반응한다.</li>
+          <li>② 칼로 자를 수 없을 만큼 단단하다.</li>
+          <li>③ 원자가 전자가 7개이다.</li>
+          <li>④ 주기율표의 17족 원소이다.</li>
+          <li>⑤ 공기 중에 두어도 광택을 잃지 않는다.</li>
+        </ul>
+      </div>
+
+      <div class="q">
+        <div class="qhead"><span class="qno">10</span><div class="stem"><span class="badge-data">자료</span>그림은 Na과 K의 전자 배치이다. 두 원소의 화학적 성질이 비슷한 까닭으로 옳은 것은? <span class="difficulty">●●○</span>
+        <div class="tags">10통과1-02-03 | 개념 3</div></div></div>
+        <figure style="margin:1mm 0 0.5mm 8.4mm;">
+          <svg width="240" height="98" viewBox="0 0 240 98" font-family="PC Sans">
+            <g transform="translate(58,44)">
+              <circle r="5" fill="#2E5BDA"/>
+              <circle r="12" fill="none" stroke="#8FA8EC" stroke-width="1"/><text x="0" y="-14" font-size="6.5" fill="#5B6B77" text-anchor="middle">2</text>
+              <circle r="22" fill="none" stroke="#8FA8EC" stroke-width="1"/><text x="0" y="-24.5" font-size="6.5" fill="#5B6B77" text-anchor="middle">8</text>
+              <circle r="32" fill="none" stroke="#8FA8EC" stroke-width="1"/>
+              <circle cx="0" cy="-32" r="2.6" fill="#E8940A"/>
+              <text y="48" text-anchor="middle" font-size="8.5" font-weight="800">Na (2, 8, 1)</text>
+            </g>
+            <g transform="translate(170,44)">
+              <circle r="5" fill="#2E5BDA"/>
+              <circle r="11" fill="none" stroke="#8FA8EC" stroke-width="1"/><text x="0" y="-13" font-size="6.5" fill="#5B6B77" text-anchor="middle">2</text>
+              <circle r="19" fill="none" stroke="#8FA8EC" stroke-width="1"/><text x="0" y="-21" font-size="6.5" fill="#5B6B77" text-anchor="middle">8</text>
+              <circle r="27" fill="none" stroke="#8FA8EC" stroke-width="1"/><text x="0" y="-29" font-size="6.5" fill="#5B6B77" text-anchor="middle">8</text>
+              <circle r="35" fill="none" stroke="#8FA8EC" stroke-width="1"/>
+              <circle cx="0" cy="-35" r="2.6" fill="#E8940A"/>
+              <text y="48" text-anchor="middle" font-size="8.5" font-weight="800">K (2, 8, 8, 1)</text>
+            </g>
+          </svg>
+        </figure>
+        <ul class="choices">
+          <li>① 전자껍질 수가 같기 때문이다.</li>
+          <li>② 원자가 전자 수가 1개로 같기 때문이다.</li>
+          <li>③ 전체 전자 수가 같기 때문이다.</li>
+          <li>④ 같은 주기 원소이기 때문이다.</li>
+          <li>⑤ 둘 다 비금속 원소이기 때문이다.</li>
+        </ul>
+      </div>
+    </div>
   </div>
 
   <div class="folio"><span>II. 물질과 규칙성</span><span class="num">97</span></div>
 </div>
 
-<!-- ═════════════ p.45 STEP 2 계속 ═════════════ -->
+<!-- ═════════════ STEP 2 계속 (11~16) ═════════════ -->
 <div class="page">
   <div class="runhead"><span class="unit-tag">II. 물질과 규칙성</span><span class="lesson-tag">03. 원소의 주기성과 화학 결합 | 문제</span></div>
 
-  <div class="q">
-    <div class="qhead"><span class="qno">9</span><div class="stem">염화 나트륨(NaCl)과 물(H<sub>2</sub>O)의 결합에 대한 설명으로 옳은 것은? <span class="difficulty">●●●</span>
-    <div class="tags">10통과1-02-04 | 개념 5·6</div></div></div>
-    <ul class="choices">
-      <li>① 둘 다 전자쌍을 공유하여 만들어진다.</li>
-      <li>② 둘 다 양이온과 음이온의 정전기적 인력으로 만들어진다.</li>
-      <li>③ 염화 나트륨은 전자쌍 공유로, 물은 이온 사이의 인력으로 만들어진다.</li>
-      <li>④ 염화 나트륨은 양이온과 음이온의 정전기적 인력으로, 물은 전자쌍 공유로 만들어진다.</li>
-      <li>⑤ 두 물질의 결합 방식은 구별할 수 없다.</li>
-    </ul>
-  </div>
+  <div class="qgrid qg2">
+    <div>
+      <div class="q">
+        <div class="qhead"><span class="qno">11</span><div class="stem">17족 원소인 플루오린, 염소, 브로민, 아이오딘에 대한 설명으로 옳은 것만을 &lt;보기&gt;에서 있는 대로 고른 것은? <span class="difficulty">●●○</span>
+        <div class="tags">10통과1-02-03 | 개념 2 (개념 4 연계)</div></div></div>
+        <div class="bogi-box">
+          <div class="bt">보기</div>
+          ㄱ. 반응성이 커서 금속과 잘 반응한다.<br>
+          ㄴ. 원자가 전자가 1개이다.<br>
+          ㄷ. 염소는 나트륨과 반응할 때 전자를 잃는다.
+        </div>
+        <ul class="choices inline">
+          <li>① ㄱ</li><li>② ㄷ</li><li>③ ㄱ, ㄴ</li><li>④ ㄴ, ㄷ</li><li>⑤ ㄱ, ㄴ, ㄷ</li>
+        </ul>
+      </div>
 
-  <div class="q">
-    <div class="qhead"><span class="qno">10</span><div class="stem">원자가 화학 결합을 형성하는 이유에 대한 설명으로 옳은 것만을 고른 것은? <span class="difficulty">●●●</span>
-    <div class="tags">10통과1-02-03 | 개념 4</div></div></div>
-    <div class="bogi-box" style="background:#fff;">
-      (가) 원자들은 비활성 기체와 같은 안정한 전자 배치를 이루려고 결합한다.<br>
-      (나) 나트륨은 전자 1개를 잃으면 네온과 같은 전자 배치의 양이온이 된다.<br>
-      (다) 염소는 전자 1개를 잃으면 아르곤과 같은 전자 배치가 된다.
+      <div class="q">
+        <div class="qhead"><span class="qno">12</span><div class="stem"><span class="badge-data">자료</span>표는 원자 A~D의 전자 배치를 나타낸 것이다. 옳은 것만을 &lt;보기&gt;에서 있는 대로 고른 것은? (단, A~D는 임의의 원소 기호이다.) <span class="difficulty">●●○</span>
+        <div class="tags">10통과1-02-03 | 개념 3·4</div></div></div>
+        <figure style="margin:2mm 0 1mm 8.4mm;">
+          <svg width="280" height="52" viewBox="0 0 280 52" font-family="PC Sans">
+            <rect x="1" y="1" width="278" height="25" fill="#ECF1FC"/>
+            <rect x="1" y="1" width="278" height="50" fill="none" stroke="#B8C2CA" stroke-width="0.9"/>
+            <g stroke="#B8C2CA" stroke-width="0.8"><line x1="1" y1="26" x2="279" y2="26"/><line x1="71" y1="1" x2="71" y2="51"/><line x1="123" y1="1" x2="123" y2="51"/><line x1="175" y1="1" x2="175" y2="51"/><line x1="227" y1="1" x2="227" y2="51"/></g>
+            <g font-size="8.8" font-weight="800" fill="#2E5BDA" text-anchor="middle"><text x="36" y="17">원자</text><text x="97" y="17">A</text><text x="149" y="17">B</text><text x="201" y="17">C</text><text x="253" y="17">D</text></g>
+            <g font-size="8.6" fill="#22303A" text-anchor="middle"><text x="36" y="42" font-weight="800" fill="#2E5BDA">전자 배치</text><text x="97" y="42">2, 1</text><text x="149" y="42">2, 8, 1</text><text x="201" y="42">2, 8, 7</text><text x="253" y="42">2, 8, 8</text></g>
+          </svg>
+        </figure>
+        <div class="bogi-box">
+          <div class="bt">보기</div>
+          ㄱ. A와 B는 같은 주기 원소이다.<br>
+          ㄴ. B와 C는 전자껍질 수가 같다.<br>
+          ㄷ. D는 가장 바깥 전자껍질이 가득 차 안정하다.
+        </div>
+        <ul class="choices inline">
+          <li>① ㄱ</li><li>② ㄷ</li><li>③ ㄱ, ㄴ</li><li>④ ㄴ, ㄷ</li><li>⑤ ㄱ, ㄴ, ㄷ</li>
+        </ul>
+      </div>
+
+      <div class="q">
+        <div class="qhead"><span class="qno">13</span><div class="stem"><span class="must">중요</span>원자가 화학 결합을 형성하는 이유에 대한 설명으로 옳은 것만을 &lt;보기&gt;에서 있는 대로 고른 것은? <span class="difficulty">●●○</span>
+        <div class="tags">10통과1-02-03 | 개념 4</div></div></div>
+        <div class="bogi-box">
+          <div class="bt">보기</div>
+          ㄱ. 원자들은 비활성 기체와 같은 안정한 전자 배치를 이루려고 결합한다.<br>
+          ㄴ. 나트륨은 전자 1개를 잃으면 네온과 같은 전자 배치의 양이온이 된다.<br>
+          ㄷ. 염소는 전자 1개를 잃으면 아르곤과 같은 전자 배치가 된다.
+        </div>
+        <ul class="choices inline">
+          <li>① ㄱ</li><li>② ㄷ</li><li>③ ㄱ, ㄴ</li><li>④ ㄴ, ㄷ</li><li>⑤ ㄱ, ㄴ, ㄷ</li>
+        </ul>
+      </div>
     </div>
-    <ul class="choices inline">
-      <li>① (가)</li><li>② (나)</li><li>③ (가), (나)</li><li>④ (나), (다)</li><li>⑤ (가), (나), (다)</li>
-    </ul>
-  </div>
+    <div>
+      <div class="q">
+        <div class="qhead"><span class="qno">14</span><div class="stem">다음은 화학 결합에 대한 학생 A~C의 대화이다. 옳게 말한 학생만을 있는 대로 고른 것은? <span class="difficulty">●●○</span>
+        <div class="tags">10통과1-02-04 | 개념 4~6</div></div></div>
+        <div class="bogi-box">
+          <b>학생 A</b> : 이온 결합에서 금속 원자는 전자를 얻어 음이온이 돼.<br>
+          <b>학생 B</b> : 비금속 원자끼리는 전자를 내놓아 쌍으로 함께 써.<br>
+          <b>학생 C</b> : 두 결합 모두 원자들이 비활성 기체와 같은 전자 배치를 이뤄.
+        </div>
+        <ul class="choices inline">
+          <li>① A</li><li>② C</li><li>③ A, B</li><li>④ B, C</li><li>⑤ A, B, C</li>
+        </ul>
+      </div>
 
-  <div class="q" style="margin-bottom:0;">
-    <div class="qhead"><span class="qno">11</span><div class="stem"><span class="badge-essay">서술형</span>고체 염화 나트륨은 전기가 통하지 않지만, 염화 나트륨 수용액은 전기가 잘 통한다. 그 까닭을 <b>'이온의 이동'</b>과 관련지어 서술하시오. <span class="difficulty">●●●●</span>
-    <div class="tags">10통과1-02-04 | 개념 5·7</div></div></div>
-    <div class="essay-lines" style="margin-top:1mm;"><div></div><div></div><div></div></div>
+      <div class="q">
+        <div class="qhead"><span class="qno">15</span><div class="stem">염화 나트륨(NaCl)과 물(H<sub>2</sub>O)의 결합에 대한 설명으로 옳은 것은? <span class="difficulty">●●○</span>
+        <div class="tags">10통과1-02-04 | 개념 5·6</div></div></div>
+        <ul class="choices">
+          <li>① 둘 다 전자쌍을 공유하여 만들어진다.</li>
+          <li>② 둘 다 이온 사이의 정전기적 인력으로 만들어진다.</li>
+          <li>③ 염화 나트륨은 공유 결합, 물은 이온 결합 물질이다.</li>
+          <li>④ 염화 나트륨은 양이온과 음이온의 정전기적 인력으로, 물은 전자쌍 공유로 만들어진다.</li>
+          <li>⑤ 두 물질의 결합 방식은 구별할 수 없다.</li>
+        </ul>
+      </div>
+
+      <div class="q">
+        <div class="qhead"><span class="qno">16</span><div class="stem"><span class="must">중요</span><span class="badge-data">탐구</span>다음은 염화 나트륨의 전기 전도성을 알아보는 실험이다.
+          <div class="exp"><b>[과정]</b> 건전지·LED와 연결한 두 전극을 (가) 고체 염화 나트륨, (나) 염화 나트륨 수용액, (다) 증류수에 각각 대고 LED를 관찰한다.<br><b>[결과]</b> LED는 (나)에서만 켜졌다.</div>
+          이에 대한 설명으로 옳은 것만을 &lt;보기&gt;에서 있는 대로 고른 것은? <span class="difficulty">●●○</span>
+        <div class="tags">10통과1-02-04 | 개념 7, 탐구</div></div></div>
+        <div class="bogi-box">
+          <div class="bt">보기</div>
+          ㄱ. (가)에서 고체 속의 이온은 이동할 수 없다.<br>
+          ㄴ. (나)에서는 이온이 이동하며 전하를 운반한다.<br>
+          ㄷ. (다)는 (나)에서 LED가 켜진 원인이 물 자체가 아님을 확인하는 과정이다.
+        </div>
+        <ul class="choices inline">
+          <li>① ㄱ</li><li>② ㄷ</li><li>③ ㄱ, ㄴ</li><li>④ ㄴ, ㄷ</li><li>⑤ ㄱ, ㄴ, ㄷ</li>
+        </ul>
+      </div>
+    </div>
   </div>
 
   <div class="folio"><span>II. 물질과 규칙성</span><span class="num">98</span></div>
 </div>
 
-<!-- ═════════════ p.46 STEP 3 ═════════════ -->
+<!-- ═════════════ STEP 2 계속 (17) + 서술형 (18~20) ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag">II. 물질과 규칙성</span><span class="lesson-tag">03. 원소의 주기성과 화학 결합 | 문제</span></div>
+
+  <div class="qgrid qg2">
+    <div>
+      <div class="q">
+        <div class="qhead"><span class="qno">17</span><div class="stem"><span class="badge-data">자료</span>그림은 분자 (가)와 (나)의 결합 모형을 나타낸 것이다. 옳은 것만을 &lt;보기&gt;에서 있는 대로 고른 것은? (단, X, Y는 임의의 원소 기호이고, 그림에는 공유한 전자만 나타내었다.) <span class="difficulty">●●○</span>
+        <div class="tags">10통과1-02-04 | 개념 6 (개념 7 연계)</div></div></div>
+        <figure style="margin:2mm 0 1mm 8.4mm;">
+          <svg width="280" height="86" viewBox="0 0 280 86" font-family="PC Sans">
+            <g transform="translate(70,36) scale(0.8)">
+              <circle cx="-20" cy="0" r="24" fill="#ECF1FC" stroke="#2E5BDA" stroke-width="1.4"/><text x="-30" y="4.5" text-anchor="middle" font-size="11" font-weight="900" fill="#2E5BDA">X</text>
+              <circle cx="20" cy="0" r="24" fill="#ECF1FC" stroke="#2E5BDA" stroke-width="1.4"/><text x="30" y="4.5" text-anchor="middle" font-size="11" font-weight="900" fill="#2E5BDA">X</text>
+              <ellipse cx="0" cy="0" rx="8" ry="16" fill="none" stroke="#E8940A" stroke-width="1.4"/>
+              <circle cx="-2.6" cy="-8" r="2.4" fill="#E8940A"/><circle cx="2.6" cy="-8" r="2.4" fill="#2E5BDA"/>
+              <circle cx="-2.6" cy="8" r="2.4" fill="#E8940A"/><circle cx="2.6" cy="8" r="2.4" fill="#2E5BDA"/>
+            </g>
+            <g transform="translate(210,40) scale(0.8)">
+              <circle cx="-42" cy="20" r="16" fill="#FDF3E0" stroke="#E8940A" stroke-width="1.2"/><text x="-42" y="24.5" text-anchor="middle" font-size="11" font-weight="900" fill="#B4560E">Y</text>
+              <circle cx="42" cy="20" r="16" fill="#FDF3E0" stroke="#E8940A" stroke-width="1.2"/><text x="42" y="24.5" text-anchor="middle" font-size="11" font-weight="900" fill="#B4560E">Y</text>
+              <circle cx="0" cy="-8" r="24" fill="#ECF1FC" stroke="#2E5BDA" stroke-width="1.4"/><text y="-6" text-anchor="middle" font-size="11" font-weight="900" fill="#2E5BDA">X</text>
+              <ellipse cx="-23" cy="9" rx="7" ry="10" fill="none" stroke="#E8940A" stroke-width="1.4" transform="rotate(40 -23 9)"/>
+              <circle cx="-25" cy="6" r="2.4" fill="#E8940A"/><circle cx="-20" cy="12" r="2.4" fill="#2E5BDA"/>
+              <ellipse cx="23" cy="9" rx="7" ry="10" fill="none" stroke="#E8940A" stroke-width="1.4" transform="rotate(-40 23 9)"/>
+              <circle cx="25" cy="6" r="2.4" fill="#E8940A"/><circle cx="20" cy="12" r="2.4" fill="#2E5BDA"/>
+            </g>
+            <g font-size="7.8" font-weight="900" fill="#22303A" text-anchor="middle"><text x="70" y="80">(가)</text><text x="210" y="80">(나)</text></g>
+          </svg>
+        </figure>
+        <div class="bogi-box">
+          <div class="bt">보기</div>
+          ㄱ. (가)에서 두 원자는 전자쌍 1개를 공유한다.<br>
+          ㄴ. (나)에서 X는 전자를 잃어 양이온이 되었다.<br>
+          ㄷ. (가)와 (나)는 모두 공유 결합 물질이다.
+        </div>
+        <ul class="choices inline">
+          <li>① ㄱ</li><li>② ㄷ</li><li>③ ㄱ, ㄴ</li><li>④ ㄴ, ㄷ</li><li>⑤ ㄱ, ㄴ, ㄷ</li>
+        </ul>
+      </div>
+
+      <div class="q">
+        <div class="qhead"><span class="qno">18</span><div class="stem"><span class="badge-essay">서술형</span>고체 염화 나트륨은 전기가 통하지 않지만 수용액은 전기가 잘 통한다. 그 까닭을 <b>'이온'</b>, <b>'이동'</b>, <b>'전하'</b>를 모두 포함하여 서술하시오. <span class="difficulty">●●○</span>
+        <div class="tags">10통과1-02-04 | 개념 7</div></div></div>
+        <div class="essay-lines"><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>
+      </div>
+    </div>
+    <div>
+      <div class="q">
+        <div class="qhead"><span class="qno">19</span><div class="stem"><span class="must">중요</span><span class="badge-essay">서술형</span>나트륨(Na)과 염소(Cl)가 반응하여 염화 나트륨이 만들어지는 과정을 <b>'전자'</b>, <b>'양이온'</b>, <b>'음이온'</b>, <b>'정전기적 인력'</b>을 모두 포함하여 서술하시오. <span class="difficulty">●●●</span>
+        <div class="tags">10통과1-02-04 | 개념 5</div></div></div>
+        <div class="essay-lines"><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>
+      </div>
+
+      <div class="q">
+        <div class="qhead"><span class="qno">20</span><div class="stem"><span class="badge-essay">서술형</span>18족 원소인 네온(Ne)이 다른 원소와 거의 반응하지 않는 까닭을 <b>'가장 바깥 전자껍질'</b>을 포함하여 쓰고, 이를 바탕으로 원자들이 화학 결합을 형성하는 까닭을 <b>'비활성 기체'</b>를 포함하여 서술하시오. <span class="difficulty">●●●</span>
+        <div class="tags">10통과1-02-03 | 개념 4</div></div></div>
+        <div class="essay-lines"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="folio"><span>II. 물질과 규칙성</span><span class="num">?</span></div>
+</div>
+
+<!-- ═════════════ STEP 3 (21~24) ═════════════ -->
 <div class="page">
   <div class="runhead"><span class="unit-tag">II. 물질과 규칙성</span><span class="lesson-tag">03. 원소의 주기성과 화학 결합 | 문제</span></div>
   <div class="step-head s3"><span class="stepno">STEP 3</span><span class="steptt">수능 도전</span><span class="stepdesc">2028 수능 규격 — ㄱㄴㄷ 합답형·자료 해석</span></div>
 
-  <div class="q">
-    <div class="qhead"><span class="qno">12</span><div class="stem"><span class="badge-data">자료</span>그림은 원자 A와 B의 전자 배치를 나타낸 것이다. A, B는 각각 리튬과 플루오린 중 하나이다. 옳은 것만을 &lt;보기&gt;에서 있는 대로 고른 것은? (단, A, B는 임의의 원소 기호이다.) <span class="difficulty">[2점]</span>
-    <div class="tags">10통과1-02-03</div></div></div>
-    <figure style="margin:2mm 0 1mm 8.6mm;">
-      <svg width="230" height="92" viewBox="0 0 230 92" font-family="PC Sans">
-        <g transform="translate(58,42)">
-          <circle r="5" fill="#2E5BDA"/>
-          <circle r="13" fill="none" stroke="#8FA8EC" stroke-width="1"/>
-          <circle cx="9.2" cy="-9.2" r="2.2" fill="#5B6B77"/><circle cx="-9.2" cy="9.2" r="2.2" fill="#5B6B77"/>
-          <circle r="24" fill="none" stroke="#8FA8EC" stroke-width="1"/>
-          <circle cx="0" cy="-24" r="2.6" fill="#E8940A"/>
-          <text y="42" text-anchor="middle" font-size="9" font-weight="900">A</text>
-        </g>
-        <g transform="translate(165,42)">
-          <circle r="5" fill="#D6455D"/>
-          <circle r="13" fill="none" stroke="#E3A0AC" stroke-width="1"/>
-          <circle cx="9.2" cy="-9.2" r="2.2" fill="#5B6B77"/><circle cx="-9.2" cy="9.2" r="2.2" fill="#5B6B77"/>
-          <circle r="24" fill="none" stroke="#E3A0AC" stroke-width="1"/>
-          <circle cx="24" cy="0" r="2.4" fill="#5B6B77"/><circle cx="17" cy="17" r="2.4" fill="#5B6B77"/><circle cx="0" cy="24" r="2.4" fill="#5B6B77"/><circle cx="-17" cy="17" r="2.4" fill="#5B6B77"/><circle cx="-24" cy="0" r="2.4" fill="#5B6B77"/><circle cx="-17" cy="-17" r="2.4" fill="#5B6B77"/><circle cx="17" cy="-17" r="2.4" fill="#5B6B77"/>
-          <text y="42" text-anchor="middle" font-size="9" font-weight="900">B</text>
-        </g>
-      </svg>
-    </figure>
-    <div class="bogi-box">
-      <div class="bt">보기</div>
-      ㄱ. A의 원자가 전자는 1개이다.<br>
-      ㄴ. A와 B가 결합할 때 A는 전자를 얻어 음이온이 된다.<br>
-      ㄷ. B가 전자 1개를 얻으면 네온과 같은 전자 배치가 된다.
-    </div>
-    <ul class="choices inline">
-      <li>① ㄱ</li><li>② ㄷ</li><li>③ ㄱ, ㄷ</li><li>④ ㄴ, ㄷ</li><li>⑤ ㄱ, ㄴ, ㄷ</li>
-    </ul>
-  </div>
+  <div class="qgrid qg2">
+    <div>
+      <div class="q">
+        <div class="qhead"><span class="qno">21</span><div class="stem"><span class="badge-data">자료</span>그림은 원자 A와 B의 전자 배치를 나타낸 것이다. A, B는 각각 리튬과 플루오린 중 하나이다. 옳은 것만을 &lt;보기&gt;에서 있는 대로 고른 것은? (단, A, B는 임의의 원소 기호이다.) <span class="difficulty">●●○ [2점]</span>
+        <div class="tags">10통과1-02-03 | 개념 3·4</div></div></div>
+        <figure style="margin:2mm 0 1mm 8.6mm;">
+          <svg width="230" height="92" viewBox="0 0 230 92" font-family="PC Sans">
+            <g transform="translate(58,42)">
+              <circle r="5" fill="#2E5BDA"/>
+              <circle r="13" fill="none" stroke="#8FA8EC" stroke-width="1"/>
+              <circle cx="9.2" cy="-9.2" r="2.2" fill="#5B6B77"/><circle cx="-9.2" cy="9.2" r="2.2" fill="#5B6B77"/>
+              <circle r="24" fill="none" stroke="#8FA8EC" stroke-width="1"/>
+              <circle cx="0" cy="-24" r="2.6" fill="#E8940A"/>
+              <text y="42" text-anchor="middle" font-size="9" font-weight="900">A</text>
+            </g>
+            <g transform="translate(165,42)">
+              <circle r="5" fill="#D6455D"/>
+              <circle r="13" fill="none" stroke="#E3A0AC" stroke-width="1"/>
+              <circle cx="9.2" cy="-9.2" r="2.2" fill="#5B6B77"/><circle cx="-9.2" cy="9.2" r="2.2" fill="#5B6B77"/>
+              <circle r="24" fill="none" stroke="#E3A0AC" stroke-width="1"/>
+              <circle cx="24" cy="0" r="2.4" fill="#5B6B77"/><circle cx="17" cy="17" r="2.4" fill="#5B6B77"/><circle cx="0" cy="24" r="2.4" fill="#5B6B77"/><circle cx="-17" cy="17" r="2.4" fill="#5B6B77"/><circle cx="-24" cy="0" r="2.4" fill="#5B6B77"/><circle cx="-17" cy="-17" r="2.4" fill="#5B6B77"/><circle cx="17" cy="-17" r="2.4" fill="#5B6B77"/>
+              <text y="42" text-anchor="middle" font-size="9" font-weight="900">B</text>
+            </g>
+          </svg>
+        </figure>
+        <div class="bogi-box">
+          <div class="bt">보기</div>
+          ㄱ. A의 원자가 전자는 1개이다.<br>
+          ㄴ. A와 B가 결합할 때 A는 양이온이 된다.<br>
+          ㄷ. B는 전자 1개를 얻으면 네온형 배치가 된다.
+        </div>
+        <ul class="choices inline">
+          <li>① ㄱ</li><li>② ㄷ</li><li>③ ㄱ, ㄴ</li><li>④ ㄴ, ㄷ</li><li>⑤ ㄱ, ㄴ, ㄷ</li>
+        </ul>
+      </div>
 
-  <div class="q">
-    <div class="qhead"><span class="qno">13</span><div class="stem"><span class="badge-data">자료</span>표는 고체 물질 X, Y의 전기 전도성을 상태별로 조사한 결과이다. X, Y는 각각 염화 나트륨과 설탕 중 하나이다. 옳은 것만을 &lt;보기&gt;에서 있는 대로 고른 것은? <span class="difficulty">[2.5점]</span>
-    <div class="tags">10통과1-02-04</div></div></div>
-    <table class="anstable" style="width:calc(100% - 8.6mm); margin:2.5mm 0 1mm 8.6mm;">
-      <tr><th style="width:22mm;">물질</th><th>고체 상태</th><th>수용액</th></tr>
-      <tr><td><b>X</b></td><td>통하지 않음</td><td class="a">잘 통함</td></tr>
-      <tr><td><b>Y</b></td><td>통하지 않음</td><td>통하지 않음</td></tr>
-    </table>
-    <div class="bogi-box">
-      <div class="bt">보기</div>
-      ㄱ. X는 이온 결합 물질인 염화 나트륨이다.<br>
-      ㄴ. Y의 수용액에는 전하를 운반하는 입자가 많이 들어 있다.<br>
-      ㄷ. X가 고체 상태에서 전기가 통하지 않는 것은 이온이 이동할 수 없기 때문이다.
+      <div class="q">
+        <div class="qhead"><span class="qno">22</span><div class="stem"><span class="badge-data">자료</span>표는 고체 물질 X, Y의 전기 전도성을 상태별로 조사한 결과이다. X, Y는 각각 염화 나트륨과 설탕 중 하나이다. 옳은 것만을 &lt;보기&gt;에서 있는 대로 고른 것은? <span class="difficulty">●●○ [2점]</span>
+        <div class="tags">10통과1-02-04 | 개념 5~7</div></div></div>
+        <figure style="margin:2mm 0 1mm 8.4mm;">
+          <svg width="270" height="68" viewBox="0 0 270 68" font-family="PC Sans">
+            <rect x="1" y="1" width="268" height="22" fill="#ECF1FC"/>
+            <rect x="1" y="1" width="268" height="66" fill="none" stroke="#B8C2CA" stroke-width="0.9"/>
+            <g stroke="#B8C2CA" stroke-width="0.8"><line x1="1" y1="23" x2="269" y2="23"/><line x1="1" y1="45" x2="269" y2="45"/><line x1="71" y1="1" x2="71" y2="67"/><line x1="171" y1="1" x2="171" y2="67"/></g>
+            <g font-size="8.6" font-weight="800" fill="#2E5BDA" text-anchor="middle"><text x="36" y="15.5">물질</text><text x="121" y="15.5">고체 상태</text><text x="220" y="15.5">수용액</text></g>
+            <g font-size="8.6" fill="#22303A" text-anchor="middle">
+              <text x="36" y="37.5" font-weight="900">X</text><text x="121" y="37.5">통하지 않음</text><text x="220" y="37.5" font-weight="800" fill="#2E5BDA">잘 통함</text>
+              <text x="36" y="59.5" font-weight="900">Y</text><text x="121" y="59.5">통하지 않음</text><text x="220" y="59.5">통하지 않음</text>
+            </g>
+          </svg>
+        </figure>
+        <div class="bogi-box">
+          <div class="bt">보기</div>
+          ㄱ. X는 이온 결합 물질인 염화 나트륨이다.<br>
+          ㄴ. Y의 수용액에는 전하를 운반하는 입자가 많다.<br>
+          ㄷ. X가 고체 상태에서 전기가 통하지 않는 것은 고체 X 속에 이온이 없기 때문이다.
+        </div>
+        <ul class="choices inline">
+          <li>① ㄱ</li><li>② ㄷ</li><li>③ ㄱ, ㄴ</li><li>④ ㄴ, ㄷ</li><li>⑤ ㄱ, ㄴ, ㄷ</li>
+        </ul>
+      </div>
     </div>
-    <ul class="choices inline">
-      <li>① ㄱ</li><li>② ㄴ</li><li>③ ㄷ</li><li>④ ㄱ, ㄷ</li><li>⑤ ㄱ, ㄴ, ㄷ</li>
-    </ul>
+    <div>
+      <div class="q">
+        <div class="qhead"><span class="qno">23</span><div class="stem"><span class="badge-data">자료</span>그림 (가)는 주기율표의 일부에 원소 A~D를, (나)는 물질 A<sub>2</sub>B와 CD의 결합 모형을 나타낸 것이다. 옳은 것만을 &lt;보기&gt;에서 있는 대로 고른 것은? (단, A~D는 임의의 원소 기호이다.) <span class="difficulty">●●● [2.5점]</span>
+        <div class="tags">10통과1-02-04 | 개념 2·4·5 (개념 7 연계)</div></div></div>
+        <figure style="margin:2mm 0 1mm 8.4mm;">
+          <svg width="272" height="148" viewBox="0 0 272 148" font-family="PC Sans">
+            <text x="2" y="9" font-size="7.8" font-weight="900" fill="#22303A">(가)</text>
+            <g transform="translate(0,10)">
+              <g font-size="6.6" font-weight="800" fill="#5B6B77" text-anchor="middle">
+                <text x="45" y="10">1족</text><text x="75" y="10">2족</text><text x="105" y="10">13족</text><text x="135" y="10">14족</text><text x="165" y="10">15족</text><text x="195" y="10">16족</text><text x="225" y="10">17족</text><text x="255" y="10">18족</text>
+                <text x="15" y="24.5">1주기</text><text x="15" y="40.5">2주기</text><text x="15" y="56.5">3주기</text>
+              </g>
+              <g fill="#F3F6FA" stroke="#C9D3DB" stroke-width="0.8">
+                <rect x="30" y="14" width="30" height="16"/><rect x="240" y="14" width="30" height="16"/>
+                <rect x="30" y="30" width="30" height="16"/><rect x="60" y="30" width="30" height="16"/><rect x="90" y="30" width="30" height="16"/><rect x="120" y="30" width="30" height="16"/><rect x="150" y="30" width="30" height="16"/><rect x="180" y="30" width="30" height="16"/><rect x="210" y="30" width="30" height="16"/><rect x="240" y="30" width="30" height="16"/>
+                <rect x="30" y="46" width="30" height="16"/><rect x="60" y="46" width="30" height="16"/><rect x="90" y="46" width="30" height="16"/><rect x="120" y="46" width="30" height="16"/><rect x="150" y="46" width="30" height="16"/><rect x="180" y="46" width="30" height="16"/><rect x="210" y="46" width="30" height="16"/><rect x="240" y="46" width="30" height="16"/>
+              </g>
+              <g fill="#fff" stroke="#7A97E8" stroke-width="1">
+                <rect x="30" y="14" width="30" height="16"/><rect x="180" y="30" width="30" height="16"/><rect x="30" y="46" width="30" height="16"/><rect x="210" y="46" width="30" height="16"/>
+              </g>
+              <g font-size="9" font-weight="900" fill="#2E5BDA" text-anchor="middle">
+                <text x="45" y="25.2">A</text><text x="195" y="41.2">B</text><text x="45" y="57.2">C</text><text x="225" y="57.2">D</text>
+              </g>
+            </g>
+            <text x="2" y="86" font-size="7.8" font-weight="900" fill="#22303A">(나)</text>
+            <g transform="translate(84,110) scale(0.62)">
+              <circle cx="-42" cy="20" r="16" fill="#FDF3E0" stroke="#E8940A" stroke-width="1.4"/><text x="-42" y="25" text-anchor="middle" font-size="13" font-weight="900" fill="#B4560E">A</text>
+              <circle cx="42" cy="20" r="16" fill="#FDF3E0" stroke="#E8940A" stroke-width="1.4"/><text x="42" y="25" text-anchor="middle" font-size="13" font-weight="900" fill="#B4560E">A</text>
+              <circle cx="0" cy="-8" r="24" fill="#ECF1FC" stroke="#2E5BDA" stroke-width="1.6"/><text y="-6" text-anchor="middle" font-size="13" font-weight="900" fill="#2E5BDA">B</text>
+              <ellipse cx="-23" cy="9" rx="7" ry="10" fill="none" stroke="#E8940A" stroke-width="1.6" transform="rotate(40 -23 9)"/>
+              <circle cx="-25" cy="6" r="2.6" fill="#E8940A"/><circle cx="-20" cy="12" r="2.6" fill="#2E5BDA"/>
+              <ellipse cx="23" cy="9" rx="7" ry="10" fill="none" stroke="#E8940A" stroke-width="1.6" transform="rotate(-40 23 9)"/>
+              <circle cx="25" cy="6" r="2.6" fill="#E8940A"/><circle cx="20" cy="12" r="2.6" fill="#2E5BDA"/>
+            </g>
+            <circle cx="182" cy="110" r="16" fill="#DCE6FA" stroke="#2E5BDA" stroke-width="1.3"/><text x="182" y="113.5" text-anchor="middle" font-size="9.5" font-weight="900" fill="#2E5BDA">C<tspan dy="-0.34em" font-size="68%">+</tspan></text>
+            <circle cx="222" cy="110" r="20" fill="#FBEBEE" stroke="#D6455D" stroke-width="1.3"/><text x="222" y="113.5" text-anchor="middle" font-size="9.5" font-weight="900" fill="#D6455D">D<tspan dy="-0.34em" font-size="68%">−</tspan></text>
+            <g font-size="8" font-weight="800" fill="#22303A" text-anchor="middle"><text x="84" y="144">A<tspan dy="0.14em" font-size="68%">2</tspan><tspan dy="-0.14em">B</tspan></text><text x="202" y="144">CD</text></g>
+          </svg>
+        </figure>
+        <div class="bogi-box">
+          <div class="bt">보기</div>
+          ㄱ. A와 C는 같은 족이므로 둘 다 알칼리 금속이다.<br>
+          ㄴ. C<sup>+</sup>은 아르곤과 같은 전자 배치를 이룬다.<br>
+          ㄷ. CD는 고체 상태에서는 전기가 통하지 않지만, 물에 녹이면 전기가 통한다.
+        </div>
+        <ul class="choices inline">
+          <li>① ㄱ</li><li>② ㄷ</li><li>③ ㄱ, ㄴ</li><li>④ ㄴ, ㄷ</li><li>⑤ ㄱ, ㄴ, ㄷ</li>
+        </ul>
+      </div>
+
+      <div class="q">
+        <div class="qhead"><span class="qno">24</span><div class="stem"><span class="badge-data">자료</span>그래프는 원자 번호 1~20인 원소의 가장 바깥 전자껍질의 전자 수를 나타낸 것이다. 옳은 것만을 <span style="white-space:nowrap">&lt;보기&gt;에서</span> 있는 대로 고른 것은? (단, A~D는 임의의 원소 기호이다.) <span class="difficulty">●●● [2.5점]</span>
+        <div class="tags">10통과1-02-03 | 개념 1·3</div></div></div>
+        <figure style="margin:2mm 0 1mm 8.4mm;">
+          <svg width="282" height="120" viewBox="0 0 282 120" font-family="PC Sans">
+<text x="26" y="9" font-size="6.8" font-weight="700" fill="#5B6B77">가장 바깥 전자껍질의 전자 수(개)</text>
+<line x1="26" y1="14" x2="26" y2="94" stroke="#8A97A3" stroke-width="1"/>
+<line x1="26" y1="94" x2="279" y2="94" stroke="#8A97A3" stroke-width="1"/>
+<g stroke="#D8E0E5" stroke-width="0.7" stroke-dasharray="2 1.8"><line x1="26" y1="76" x2="279" y2="76"/><line x1="26" y1="58" x2="279" y2="58"/><line x1="26" y1="40" x2="279" y2="40"/><line x1="26" y1="22" x2="279" y2="22"/></g>
+<g font-size="6.8" fill="#5B6B77" text-anchor="end"><text x="22" y="96.5">0</text><text x="22" y="78.5">2</text><text x="22" y="60.5">4</text><text x="22" y="42.5">6</text><text x="22" y="24.5">8</text></g>
+<g><rect x="30.0" y="85" width="8" height="9" fill="#BCCDF3"/><rect x="42.6" y="76" width="8" height="18" fill="#BCCDF3"/><rect x="55.2" y="85" width="8" height="9" fill="#E8940A"/><rect x="67.8" y="76" width="8" height="18" fill="#BCCDF3"/><rect x="80.4" y="67" width="8" height="27" fill="#BCCDF3"/><rect x="93.0" y="58" width="8" height="36" fill="#BCCDF3"/><rect x="105.6" y="49" width="8" height="45" fill="#BCCDF3"/><rect x="118.2" y="40" width="8" height="54" fill="#BCCDF3"/><rect x="130.8" y="31" width="8" height="63" fill="#E8940A"/><rect x="143.4" y="22" width="8" height="72" fill="#BCCDF3"/><rect x="156.0" y="85" width="8" height="9" fill="#E8940A"/><rect x="168.6" y="76" width="8" height="18" fill="#BCCDF3"/><rect x="181.2" y="67" width="8" height="27" fill="#BCCDF3"/><rect x="193.8" y="58" width="8" height="36" fill="#BCCDF3"/><rect x="206.4" y="49" width="8" height="45" fill="#BCCDF3"/><rect x="219.0" y="40" width="8" height="54" fill="#BCCDF3"/><rect x="231.6" y="31" width="8" height="63" fill="#E8940A"/><rect x="244.2" y="22" width="8" height="72" fill="#BCCDF3"/><rect x="256.8" y="85" width="8" height="9" fill="#BCCDF3"/><rect x="269.4" y="76" width="8" height="18" fill="#BCCDF3"/></g>
+<g font-size="7.6" font-weight="900" fill="#B4560E" text-anchor="middle"><text x="59.2" y="82">A</text><text x="134.8" y="28">B</text><text x="160.0" y="82">C</text><text x="235.6" y="28">D</text></g>
+<g font-size="6.8" fill="#5B6B77" text-anchor="middle"><text x="34.0" y="104">1</text><text x="84.4" y="104">5</text><text x="147.4" y="104">10</text><text x="210.4" y="104">15</text><text x="273.4" y="104">20</text></g>
+<text x="279" y="116" text-anchor="end" font-size="6.8" font-weight="700" fill="#5B6B77">원자 번호</text>
+</svg>
+        </figure>
+        <div class="bogi-box">
+          <div class="bt">보기</div>
+          ㄱ. A와 C는 화학적 성질이 비슷하다.<br>
+          ㄴ. B와 D는 같은 족 원소이다.<br>
+          ㄷ. C와 D는 전자껍질 수가 같다.
+        </div>
+        <ul class="choices inline">
+          <li>① ㄱ</li><li>② ㄷ</li><li>③ ㄱ, ㄴ</li><li>④ ㄴ, ㄷ</li><li>⑤ ㄱ, ㄴ, ㄷ</li>
+        </ul>
+      </div>
+    </div>
   </div>
 
   <div class="folio"><span>II. 물질과 규칙성</span><span class="num">99</span></div>
 </div>
 
-<!-- ═════════════ p.47 해설 1 ═════════════ -->
+<!-- ═════════════ 해설 1 ═════════════ -->
 <div class="page">
   <div class="runhead"><span class="unit-tag" style="color:var(--brand);">알짜 해설</span><span class="lesson-tag">03. 원소의 주기성과 화학 결합</span></div>
-  <div class="sol-head"><span class="stt">알짜 해설</span><span class="sub">전 문항 해설 + 오답 선지 분석 — 맞힌 문제도 해설로 한 번 더!</span></div>
+  <div class="sol-head"><span class="stt">알짜 해설</span><span class="sub">전 문항 해설 + 바로알기(틀린 선지를 옳게 고친 문장) — 맞힌 문제도 해설로 한 번 더!</span></div>
 
   <table class="anstable">
-    <tr><th>문항</th><td>1</td><td>2</td><td>3</td><td>4</td><td>5</td><td>6</td><td>7</td><td>8</td><td>9</td><td>10</td><td>11</td><td>12</td><td>13</td></tr>
-    <tr><th>정답</th><td class="a">O</td><td class="a">X</td><td class="a">X</td><td class="a">원자가 전자</td><td class="a">비활성 기체</td><td class="a">이온, 공유</td><td class="a">⑤</td><td class="a">②</td><td class="a">④</td><td class="a">③</td><td class="a">서술형</td><td class="a">③</td><td class="a">④</td></tr>
+    <tr><th>문항</th><td>1</td><td>2</td><td>3</td><td>4</td><td>5</td><td>6</td><td>7</td><td>8</td><td>9</td><td>10</td><td>11</td><td>12</td></tr>
+    <tr><th>정답</th><td class="a">O</td><td class="a">X</td><td class="a">X</td><td class="a">원자가 전자</td><td class="a">비활성 기체</td><td class="a">이온, 공유</td><td class="a">③</td><td class="a">③</td><td class="a">①</td><td class="a">②</td><td class="a">①</td><td class="a">④</td></tr>
+    <tr><th>문항</th><td>13</td><td>14</td><td>15</td><td>16</td><td>17</td><td>18</td><td>19</td><td>20</td><td>21</td><td>22</td><td>23</td><td>24</td></tr>
+    <tr><th>정답</th><td class="a">③</td><td class="a">④</td><td class="a">④</td><td class="a">⑤</td><td class="a">②</td><td class="a">서술형</td><td class="a">서술형</td><td class="a">서술형</td><td class="a">⑤</td><td class="a">①</td><td class="a">②</td><td class="a">⑤</td></tr>
   </table>
 
   <div class="solcols">
@@ -1084,64 +1378,184 @@
         <p>He·Ne·Ar 등 18족. 바깥 껍질이 가득 차 있어 결합하지 않아도 안정하다.</p></div>
       <div class="sol"><div class="shead"><span class="sno">6</span><span class="sans">이온, 공유</span><span class="slink">개념 5·6</span></div>
         <p>금속+비금속 = 전자 이동 → 이온 결합. 비금속끼리 = 전자쌍 공유 → 공유 결합.</p></div>
+      <div class="sol"><div class="shead"><span class="sno">7</span><span class="sans">③</span><span class="slink">개념 1</span></div>
+        <p>현대 주기율표의 배열 기준은 원자 번호(양성자 수)다.</p>
+        <div class="wrongbox"><div class="wt">바로알기</div>
+          <p><b>①</b> 세로줄이 족, 가로줄이 주기이다. <b>②</b> 성질이 비슷한 것은 같은 족 원소들이다. <b>④</b> 오른쪽 위에는 주로 비금속 원소가 있다. <b>⑤</b> 18족은 거의 반응하지 않는 비활성 기체이다.</p></div></div>
     </div>
     <div>
-      <div class="sol"><div class="shead"><span class="sno">7</span><span class="sans">⑤</span><span class="slink">개념 2</span></div>
+      <div class="sol"><div class="shead"><span class="sno">8</span><span class="sans">③</span><span class="slink">개념 1·2</span></div>
+        <p><b>ㄱ (옳음)</b> A(2주기)와 B(3주기)는 같은 1족 — 같은 족 원소는 화학적 성질이 비슷하다. <b>ㄴ (옳음)</b> B와 D는 같은 가로줄(3주기)에 있다.</p>
+        <div class="analysis"><div class="at">꼼꼼 자료 분석</div>
+          <svg width="300" height="102" viewBox="0 0 300 102" font-family="PC Sans">
+            <g font-size="6.6" font-weight="800" fill="#5B6B77" text-anchor="middle">
+              <text x="45" y="10">1족</text><text x="75" y="10">2족</text><text x="105" y="10">13족</text><text x="135" y="10">14족</text><text x="165" y="10">15족</text><text x="195" y="10">16족</text><text x="225" y="10">17족</text><text x="255" y="10">18족</text>
+              <text x="15" y="24.5">1주기</text><text x="15" y="40.5">2주기</text><text x="15" y="56.5">3주기</text>
+            </g>
+            <g fill="#F3F6FA" stroke="#C9D3DB" stroke-width="0.8">
+              <rect x="30" y="14" width="30" height="16"/><rect x="240" y="14" width="30" height="16"/>
+              <rect x="30" y="30" width="30" height="16"/><rect x="60" y="30" width="30" height="16"/><rect x="90" y="30" width="30" height="16"/><rect x="120" y="30" width="30" height="16"/><rect x="150" y="30" width="30" height="16"/><rect x="180" y="30" width="30" height="16"/><rect x="210" y="30" width="30" height="16"/><rect x="240" y="30" width="30" height="16"/>
+              <rect x="30" y="46" width="30" height="16"/><rect x="60" y="46" width="30" height="16"/><rect x="90" y="46" width="30" height="16"/><rect x="120" y="46" width="30" height="16"/><rect x="150" y="46" width="30" height="16"/><rect x="180" y="46" width="30" height="16"/><rect x="210" y="46" width="30" height="16"/><rect x="240" y="46" width="30" height="16"/>
+            </g>
+            <g fill="#fff" stroke="#7A97E8" stroke-width="1">
+              <rect x="30" y="30" width="30" height="16"/><rect x="30" y="46" width="30" height="16"/><rect x="210" y="30" width="30" height="16"/><rect x="210" y="46" width="30" height="16"/><rect x="240" y="46" width="30" height="16"/>
+            </g>
+            <g font-size="9" font-weight="900" fill="#2E5BDA" text-anchor="middle">
+              <text x="45" y="41.2">A</text><text x="45" y="57.2">B</text><text x="225" y="41.2">C</text><text x="225" y="57.2">D</text><text x="255" y="57.2">E</text>
+            </g>
+            <rect x="28" y="44" width="244" height="20" rx="2" fill="none" stroke="#E8940A" stroke-width="1.3" stroke-dasharray="3 2"/>
+            <rect x="32.5" y="32" width="25" height="28" rx="2" fill="none" stroke="#2E5BDA" stroke-width="1.3" stroke-dasharray="3 2"/>
+            <circle cx="255" cy="54" r="9.5" fill="none" stroke="#5B6B77" stroke-width="1.2"/>
+            <text x="4" y="76" font-size="6.8" font-weight="700" fill="#2E5BDA">파란 틀 A·B: 같은 1족 → 원자가 전자 1개 → 성질 비슷 (ㄱ)</text>
+            <text x="4" y="87" font-size="6.8" font-weight="700" fill="#B4560E">주황 틀 B·D·E: 같은 3주기 → 전자껍질 수가 같다 (ㄴ)</text>
+            <text x="4" y="98" font-size="6.8" font-weight="700" fill="#5B6B77">E: 18족 비활성 기체 → 다른 원소와 거의 반응하지 않는다 (ㄷ ✕)</text>
+          </svg></div>
+        <div class="wrongbox"><div class="wt">바로알기</div>
+          <p><b>ㄷ</b> (틀림 →) E는 18족 <b>비활성 기체</b>로, 가장 바깥 전자껍질이 가득 차 있어 다른 원소와 <b>거의 반응하지 않는다</b>. 금속과 잘 반응하는 것은 17족 할로젠(C, D)이다.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">9</span><span class="sans">①</span><span class="slink">개념 2</span></div>
         <p>리튬·나트륨·칼륨은 1족 알칼리 금속 — 무르고, 반응성이 매우 커서 물과 격렬히 반응한다.</p>
-        <div class="wrongbox"><div class="wt">오답 왜 틀렸나</div>
-          <p><b>①</b> 물과 '너무 잘' 반응해서 석유에 보관할 정도다.</p>
-          <p><b>②</b> 칼로 쉽게 잘리는 무른 금속이다.</p>
-          <p><b>③·④</b> 원자가 전자 7개·17족은 할로젠의 특징. 알칼리 금속은 1족, 원자가 전자 1개.</p></div></div>
-      <div class="sol"><div class="shead"><span class="sno">8</span><span class="sans">②</span><span class="slink">개념 3</span></div>
-        <p>Na(2, 8, 1)와 K(2, 8, 8, 1)는 원자가 전자가 1개로 같다. 성질을 결정하는 것은 가장 바깥 전자다.</p>
-        <div class="wrongbox"><div class="wt">오답 왜 틀렸나</div>
-          <p><b>①</b> 전자껍질은 Na 3개, K 4개로 다르다 — 껍질 수가 같은 것은 같은 '주기'.</p>
-          <p><b>③</b> 전체 전자는 11개 vs 19개로 다르다.</p>
-          <p><b>④</b> Na는 3주기, K는 4주기 — 같은 '족'이다.</p>
-          <p><b>⑤</b> 둘 다 금속(알칼리 금속)이다.</p></div></div>
+        <div class="wrongbox"><div class="wt">바로알기</div>
+          <p><b>②</b> 칼로 잘릴 만큼 무르다. <b>③</b> 원자가 전자가 1개이다. <b>④</b> 1족 원소이다(17족은 할로젠). <b>⑤</b> 산소와 빠르게 반응해 광택을 잃는다 — 그래서 석유 속에 보관한다.</p></div></div>
     </div>
   </div>
 
   <div class="folio"><span>알짜 해설</span><span class="num">100</span></div>
 </div>
 
-<!-- ═════════════ p.48 해설 2 ═════════════ -->
+<!-- ═════════════ 해설 2 ═════════════ -->
 <div class="page">
   <div class="runhead"><span class="unit-tag" style="color:var(--brand);">알짜 해설</span><span class="lesson-tag">03. 원소의 주기성과 화학 결합</span></div>
   <div class="solcols">
     <div>
-      <div class="sol"><div class="shead"><span class="sno">9</span><span class="sans">④</span><span class="slink">개념 5·6</span></div>
-        <p>염화 나트륨은 금속(Na)+비금속(Cl) → 전자가 이동해 Na<sup>+</sup>·Cl<sup>−</sup>이 되고 정전기적 인력으로 붙는 <b>이온 결합</b>. 물은 비금속(H·O)끼리 전자쌍을 공유하는 <b>공유 결합</b>이다.</p>
-        <div class="wrongbox"><div class="wt">오답 왜 틀렸나</div>
-          <p><b>①·②</b> 두 물질의 결합 방식은 서로 다르다. '금속이 끼면 이온, 비금속끼리면 공유'부터 판정.</p>
-          <p><b>③</b> 두 물질의 결합을 서로 바꿔 설명했다.</p>
-          <p><b>⑤</b> 구성 원소의 종류(금속/비금속)로 판정할 수 있다.</p></div></div>
-      <div class="sol"><div class="shead"><span class="sno">10</span><span class="sans">③</span><span class="slink">개념 4</span></div>
-        <p>(가) 결합의 목적 = 비활성 기체형 배치. (옳음) (나) Na(2, 8, 1)는 전자 1개를 잃어 Ne형(2, 8)의 Na<sup>+</sup>이 된다. (옳음)</p>
-        <div class="wrongbox"><div class="wt">오답 왜 틀렸나</div>
-          <p><b>(다)</b> 염소(2, 8, 7)는 전자 1개를 '얻어야' Ar형(2, 8, 8)이 된다. 잃다/얻다 바꿔치기 함정.</p></div></div>
-      <div class="sol"><div class="shead"><span class="sno">11</span><span class="sans">모범 답안</span><span class="slink">개념 5·7</span></div>
-        <p>고체 상태에서는 Na<sup>+</sup>과 Cl<sup>−</sup>이 정전기적 인력으로 제자리에 단단히 붙들려 있어 <b>이동할 수 없으므로</b> 전기가 통하지 않는다. 물에 녹으면 이온들이 <b>자유롭게 이동하며 전하를 운반</b>하므로 전기가 잘 통한다.</p>
-        <div class="wrongbox"><div class="wt">채점 기준 (감점 포인트)</div>
-          <p>① 고체: 이온이 이동 불가 ② 수용액: 이온이 자유롭게 이동 ③ 이온의 이동이 전하를 운반 — 세 요소 모두 서술해야 만점. <b>"고체에는 이온이 없어서"라고 쓰면 오답</b>(이온은 있으나 못 움직일 뿐).</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">10</span><span class="sans">②</span><span class="slink">개념 3</span></div>
+        <p>Na(2,&nbsp;8,&nbsp;1)와 K(2,&nbsp;8,&nbsp;8,&nbsp;1)는 원자가 전자가 1개로 같다. 화학적 성질을 결정하는 것은 가장 바깥 껍질의 전자다.</p>
+        <div class="wrongbox"><div class="wt">바로알기</div>
+          <p><b>①</b> 전자껍질은 Na 3개, K 4개로 다르다 — 껍질 수가 같은 것은 같은 주기 원소이다. <b>③</b> 전체 전자 수는 Na 11개, K 19개로 다르다. <b>④</b> Na는 3주기, K는 4주기 원소로, 둘은 같은 족(1족) 원소이다. <b>⑤</b> 둘 다 금속(알칼리 금속)이다.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">11</span><span class="sans">①</span><span class="slink">개념 2 | 개념 4 연계</span></div>
+        <p><b>ㄱ (옳음)</b> 할로젠은 반응성이 커서 금속이나 수소와 잘 반응해 화합물을 만든다.</p>
+        <div class="wrongbox"><div class="wt">바로알기</div>
+          <p><b>ㄴ</b> (틀림 →) 할로젠의 원자가 전자는 <b>7개</b>이다(1개는 알칼리 금속). <b>ㄷ</b> (틀림 →) 염소(2,&nbsp;8,&nbsp;7)는 나트륨과 반응할 때 전자 1개를 <b>얻어</b> 음이온 Cl<sup>−</sup>이 된다.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">12</span><span class="sans">④</span><span class="slink">개념 3·4</span></div>
+        <p>껍질 수 = 주기, 원자가 전자 수 = 족. A(껍질 2개, 원자가 전자 1), B(3개, 1), C(3개, 7), D(3개, 바깥 껍질 8개로 가득).</p>
+        <p><b>ㄴ (옳음)</b> B와 C는 전자껍질이 3개로 같다(같은 3주기). <b>ㄷ (옳음)</b> D(2,&nbsp;8,&nbsp;8)는 아르곤과 같은 배치 — 바깥 껍질이 가득 차 안정하다.</p>
+        <div class="wrongbox"><div class="wt">바로알기</div>
+          <p><b>ㄱ</b> (틀림 →) A와 B는 원자가 전자 수가 1개로 같은 <b>같은 족</b> 원소이고, 전자껍질 수(2개, 3개)가 달라 <b>주기는 다르다</b>.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">13</span><span class="sans">③</span><span class="slink">개념 4</span></div>
+        <p><b>ㄱ (옳음)</b> 결합의 목적 = 비활성 기체형 배치. <b>ㄴ (옳음)</b> Na(2,&nbsp;8,&nbsp;1)는 전자 1개를 잃어 Ne형(2,&nbsp;8)의 Na<sup>+</sup>이 된다.</p>
+        <div class="wrongbox"><div class="wt">바로알기</div>
+          <p><b>ㄷ</b> (틀림 →) 염소(2,&nbsp;8,&nbsp;7)는 전자 1개를 <b>얻어야</b> Ar형(2,&nbsp;8,&nbsp;8)이 된다. 잃다/얻다 바꿔치기 함정.</p></div></div>
     </div>
     <div>
-      <div class="sol"><div class="shead"><span class="sno">12</span><span class="sans">③</span><span class="slink">개념 3·4 | 2점</span></div>
-        <p>A(2, 1)는 리튬, B(2, 7)는 플루오린이다.</p>
-        <p><b>ㄱ (옳음)</b> A의 가장 바깥 껍질 전자는 1개다.</p>
-        <p><b>ㄴ (틀림)</b> A(리튬)는 금속 — 전자 1개를 '잃어' 양이온이 된다.</p>
-        <p><b>ㄷ (옳음)</b> B(2, 7)가 1개를 얻으면 (2, 8) = 네온형 배치.</p>
+      <div class="sol"><div class="shead"><span class="sno">14</span><span class="sans">④</span><span class="slink">개념 4~6</span></div>
+        <p><b>B (옳음)</b> 비금속끼리는 어느 쪽도 전자를 내주지 않으므로 전자를 내놓아 쌍으로 함께 쓴다 — 공유 결합. <b>C (옳음)</b> Na<sup>+</sup>은 Ne형, Cl<sup>−</sup>은 Ar형, 물의 O는 Ne형·H는 He형 — 결합의 목표는 늘 비활성 기체형 배치다.</p>
+        <div class="wrongbox"><div class="wt">바로알기</div>
+          <p><b>A</b> (틀림 →) 이온 결합에서 금속 원자는 전자를 <b>잃어 양이온</b>이 되고, 비금속 원자가 전자를 얻어 음이온이 된다.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">15</span><span class="sans">④</span><span class="slink">개념 5·6</span></div>
+        <p>염화 나트륨은 금속(Na)+비금속(Cl) → 전자가 이동해 Na<sup>+</sup>·Cl<sup>−</sup>이 되고 정전기적 인력으로 붙는 <b>이온 결합</b>. 물은 비금속(H·O)끼리 전자쌍을 공유하는 <b>공유 결합</b>이다.</p>
+        <div class="wrongbox"><div class="wt">바로알기</div>
+          <p><b>①</b> 전자쌍을 공유하여 만들어지는 것은 물뿐이다. <b>②</b> 이온 사이의 정전기적 인력으로 만들어지는 것은 염화 나트륨뿐이다. <b>③</b> 염화 나트륨은 이온 결합 물질, 물은 공유 결합 물질이다. <b>⑤</b> 금속+비금속인지, 비금속끼리인지로 구별할 수 있다.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">16</span><span class="sans">⑤</span><span class="slink">개념 7 | 탐구</span></div>
+        <p><b>ㄱ (옳음)</b> 고체에서는 이온이 정전기적 인력으로 제자리에 붙들려 이동할 수 없다 → LED가 꺼진다. <b>ㄴ (옳음)</b> 물에 녹으면 Na<sup>+</sup>·Cl<sup>−</sup>이 자유롭게 이동하며 전하를 운반한다 → LED가 켜진다. <b>ㄷ (옳음)</b> 증류수만으로는 LED가 켜지지 않으므로, (나)에서 LED가 켜진 원인은 물 자체가 아니라 녹아 있는 이온임을 비교해 확인할 수 있다.</p>
+        <div class="wrongbox"><div class="wt">함정 체크</div>
+          <p>"물에 녹아야 이온이 생긴다"가 아니다 — 이온은 고체에도 있었고, 물속에서 <b>움직일 수 있게</b> 되었을 뿐이다.</p></div></div>
+    </div>
+  </div>
+  <div class="folio"><span>알짜 해설</span><span class="num">101</span></div>
+</div>
+
+<!-- ═════════════ 해설 3 ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag" style="color:var(--brand);">알짜 해설</span><span class="lesson-tag">03. 원소의 주기성과 화학 결합</span></div>
+  <div class="solcols">
+    <div>
+      <div class="sol"><div class="shead"><span class="sno">17</span><span class="sans">②</span><span class="slink">개념 6 | 개념 7 연계</span></div>
+        <p><b>ㄷ (옳음)</b> (가)는 X 원자 2개가, (나)는 X 1개와 Y 2개가 전자쌍을 공유한 분자 — 모두 공유 결합 물질이다. (가)는 산소 기체 O<sub>2</sub>, (나)는 물 H<sub>2</sub>O와 같은 짜임이다.</p>
+        <div class="wrongbox"><div class="wt">바로알기</div>
+          <p><b>ㄱ</b> (틀림 →) (가)의 겹친 자리에는 전자가 4개 — 두 원자는 전자쌍 <b>2개</b>를 공유한다. <b>ㄴ</b> (틀림 →) (나)에서 X는 Y와 각각 <b>전자쌍 1개씩을 공유</b>할 뿐, 이온이 되지 않는다.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">18</span><span class="sans">모범 답안</span><span class="slink">개념 7</span></div>
+        <p>고체 상태에서는 Na<sup>+</sup>과 Cl<sup>−</sup>이 정전기적 인력으로 제자리에 붙들려 있어 <b>이온</b>이 <b>이동</b>할 수 없으므로 전기가 통하지 않는다. 물에 녹으면 이온들이 자유롭게 <b>이동</b>하면서 <b>전하</b>를 운반하므로 전기가 잘 통한다.</p>
+        <table class="rubric">
+          <tr><th>채점 요소</th><th>배점</th></tr>
+          <tr><td>① 고체에서는 이온이 이동할 수 없다고 썼다.</td><td>2점</td></tr>
+          <tr><td>② 수용액에서는 이온이 자유롭게 이동할 수 있다고 썼다.</td><td>2점</td></tr>
+          <tr><td>③ 이동하는 이온이 전하를 운반하여 전기가 통한다고 썼다.</td><td>2점</td></tr>
+        </table>
+        <div class="wrongbox"><div class="wt">이렇게 쓰면 0점</div>
+          <p>"고체에는 이온이 없고, 물에 녹아야 이온이 생기기 때문이다." — 이온은 고체에도 있다. 움직이지 못할 뿐이다.</p></div></div>
+    </div>
+    <div>
+      <div class="sol"><div class="shead"><span class="sno">19</span><span class="sans">모범 답안</span><span class="slink">개념 5</span></div>
+        <p>나트륨(2,&nbsp;8,&nbsp;1)은 원자가 <b>전자</b> 1개를 염소에게 내주어 <b>양이온</b>(Na<sup>+</sup>)이 되고, 염소(2,&nbsp;8,&nbsp;7)는 그 전자 1개를 얻어 <b>음이온</b>(Cl<sup>−</sup>)이 된다. 이렇게 생긴 양이온과 음이온이 <b>정전기적 인력</b>으로 결합하여 염화 나트륨이 된다.</p>
+        <table class="rubric">
+          <tr><th>채점 요소</th><th>배점</th></tr>
+          <tr><td>① 나트륨이 전자 1개를 잃어 양이온이 된다고 썼다.</td><td>2점</td></tr>
+          <tr><td>② 염소가 전자 1개를 얻어 음이온이 된다고 썼다.</td><td>2점</td></tr>
+          <tr><td>③ 양이온과 음이온이 정전기적 인력으로 결합한다고 썼다.</td><td>2점</td></tr>
+        </table>
+        <div class="wrongbox"><div class="wt">이렇게 쓰면 0점</div>
+          <p>"나트륨과 염소가 전자쌍을 공유하여 결합한다." — 전자가 이동하는 이온 결합을 공유 결합으로 쓴 답.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">20</span><span class="sans">모범 답안</span><span class="slink">개념 4</span></div>
+        <p>네온(2,&nbsp;8)은 <b>가장 바깥 전자껍질</b>이 전자로 가득 차 있어 안정하므로 다른 원소와 거의 반응하지 않는다. 다른 원자들도 이처럼 <b>비활성 기체</b>와 같은 안정한 전자 배치를 이루려고 전자를 잃거나, 얻거나, 공유하며 화학 결합을 형성한다.</p>
+        <table class="rubric">
+          <tr><th>채점 요소</th><th>배점</th></tr>
+          <tr><td>① 네온은 가장 바깥 전자껍질이 가득 차 있어 안정하다고 썼다.</td><td>2점</td></tr>
+          <tr><td>② 비활성 기체형 전자 배치를 이루려고 결합한다고 썼다.</td><td>2점</td></tr>
+          <tr><td>③ 그 방법으로 전자를 잃거나 얻거나 공유한다고 썼다.</td><td>2점</td></tr>
+        </table>
+        <div class="wrongbox"><div class="wt">이렇게 쓰면 0점</div>
+          <p>"네온은 기체라서 반응하지 않는다." — 상태가 아니라 전자 배치(가득 찬 바깥 껍질)가 까닭이다.</p></div></div>
+    </div>
+  </div>
+  <div class="folio"><span>알짜 해설</span><span class="num">?</span></div>
+</div>
+
+<!-- ═════════════ 해설 4 ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag" style="color:var(--brand);">알짜 해설</span><span class="lesson-tag">03. 원소의 주기성과 화학 결합</span></div>
+  <div class="solcols">
+    <div>
+      <div class="sol"><div class="shead"><span class="sno">21</span><span class="sans">⑤</span><span class="slink">개념 3·4 | 2점</span></div>
+        <p>A(2,&nbsp;1)는 리튬, B(2,&nbsp;7)는 플루오린이다.</p>
+        <p><b>ㄱ (옳음)</b> A의 가장 바깥 껍질 전자는 1개다. <b>ㄴ (옳음)</b> A(리튬)는 금속 — 전자 1개를 잃어 헬륨형(2)의 양이온이 된다. <b>ㄷ (옳음)</b> B(2,&nbsp;7)가 1개를 얻으면 (2,&nbsp;8) = 네온형 배치.</p>
         <div class="wrongbox"><div class="wt">함정 체크</div>
           <p>잃을지 얻을지는 <b>원자가 전자 수</b>로 판정 — 1~2개면 잃는 쪽, 6~7개면 얻는 쪽이 쉽다.</p></div></div>
-      <div class="sol"><div class="shead"><span class="sno">13</span><span class="sans">④</span><span class="slink">개념 5~7 | 2.5점</span></div>
+      <div class="sol"><div class="shead"><span class="sno">22</span><span class="sans">①</span><span class="slink">개념 5~7 | 2점</span></div>
         <p>수용액에서 통하는 X = 염화 나트륨(이온 결합), 어느 상태로도 안 통하는 Y = 설탕(공유 결합)이다.</p>
         <p><b>ㄱ (옳음)</b> 고체 X·수용액 O 패턴은 이온 결합 물질의 지문이다.</p>
-        <p><b>ㄴ (틀림)</b> 설탕은 분자 그대로 녹아 이온이 생기지 않는다 — 전하 운반 입자가 없다.</p>
-        <p><b>ㄷ (옳음)</b> 고체에서 이온은 존재하지만 정전기적 인력에 붙들려 이동하지 못한다.</p>
+        <div class="wrongbox"><div class="wt">바로알기</div>
+          <p><b>ㄴ</b> (틀림 →) Y(설탕)는 분자 그대로 녹아 이온이 생기지 않으므로, 수용액에 <b>전하를 운반하는 입자가 없다</b>. <b>ㄷ</b> (틀림 →) 고체 X 속에도 이온은 <b>존재한다</b> — 정전기적 인력에 붙들려 이동하지 못할 뿐이다.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">23</span><span class="sans">②</span><span class="slink">개념 2·4·5 | 2.5점</span></div>
+        <p>(가)에서 A = 1주기 1족(수소), B = 2주기 16족(산소), C = 3주기 1족(나트륨), D = 3주기 17족(염소). 따라서 (나)의 A<sub>2</sub>B는 물, CD는 염화 나트륨이다.</p>
+        <p><b>ㄷ (옳음)</b> CD는 금속+비금속의 이온 결합 물질 — 고체에서는 이온이 움직이지 못하고, 수용액에서는 이온이 이동해 전기가 통한다.</p>
+        <div class="wrongbox"><div class="wt">바로알기</div>
+          <p><b>ㄱ</b> (틀림 →) A(수소)는 1족이지만 <b>알칼리 금속이 아니다</b> — 알칼리 금속은 수소를 제외한 1족 금속으로, C만 알칼리 금속이다. <b>ㄴ</b> (틀림 →) C(2,&nbsp;8,&nbsp;1)는 전자 1개를 잃어 C<sup>+</sup>(2,&nbsp;8)이 되므로 <b>네온</b>과 같은 전자 배치를 이룬다.</p></div></div>
+    </div>
+    <div>
+      <div class="sol"><div class="shead"><span class="sno">24</span><span class="sans">⑤</span><span class="slink">개념 1·3 | 2.5점</span></div>
+        <p>그래프에서 A = 원자 번호 3(바깥 전자 1개), B = 9(7개), C = 11(1개), D = 17(7개)이다.</p>
+        <p><b>ㄱ (옳음)</b> A와 C는 가장 바깥 전자가 1개로 같은 1족 — 화학적 성질이 비슷하다. <b>ㄴ (옳음)</b> B와 D는 바깥 전자가 7개로 같은 17족이다. <b>ㄷ (옳음)</b> 값이 1로 떨어진 뒤 다시 8까지 오르는 구간이 한 주기다. C(11)와 D(17)는 같은 구간(11~18)에 있으므로 같은 3주기 — 전자껍질 수가 3개로 같다.</p>
+        <div class="analysis"><div class="at">꼼꼼 자료 분석</div>
+          <svg width="300" height="146" viewBox="0 0 300 146" font-family="PC Sans">
+<rect x="53.2" y="12" width="100.2" height="82" fill="#ECF1FC"/>
+<rect x="154.0" y="12" width="100.2" height="82" fill="#FDF3E0"/>
+<text x="103.3" y="9" text-anchor="middle" font-size="6.8" font-weight="800" fill="#2E5BDA">2주기 (껍질 2개)</text>
+<text x="204.1" y="9" text-anchor="middle" font-size="6.8" font-weight="800" fill="#B4560E">3주기 (껍질 3개)</text>
+<line x1="26" y1="14" x2="26" y2="94" stroke="#8A97A3" stroke-width="1"/>
+<line x1="26" y1="94" x2="279" y2="94" stroke="#8A97A3" stroke-width="1"/>
+<g stroke="#D8E0E5" stroke-width="0.7" stroke-dasharray="2 1.8"><line x1="26" y1="76" x2="279" y2="76"/><line x1="26" y1="58" x2="279" y2="58"/><line x1="26" y1="40" x2="279" y2="40"/><line x1="26" y1="22" x2="279" y2="22"/></g>
+<g font-size="6.8" fill="#5B6B77" text-anchor="end"><text x="22" y="96.5">0</text><text x="22" y="78.5">2</text><text x="22" y="60.5">4</text><text x="22" y="42.5">6</text><text x="22" y="24.5">8</text></g>
+<g><rect x="30.0" y="85" width="8" height="9" fill="#BCCDF3"/><rect x="42.6" y="76" width="8" height="18" fill="#BCCDF3"/><rect x="55.2" y="85" width="8" height="9" fill="#E8940A"/><rect x="67.8" y="76" width="8" height="18" fill="#BCCDF3"/><rect x="80.4" y="67" width="8" height="27" fill="#BCCDF3"/><rect x="93.0" y="58" width="8" height="36" fill="#BCCDF3"/><rect x="105.6" y="49" width="8" height="45" fill="#BCCDF3"/><rect x="118.2" y="40" width="8" height="54" fill="#BCCDF3"/><rect x="130.8" y="31" width="8" height="63" fill="#E8940A"/><rect x="143.4" y="22" width="8" height="72" fill="#BCCDF3"/><rect x="156.0" y="85" width="8" height="9" fill="#E8940A"/><rect x="168.6" y="76" width="8" height="18" fill="#BCCDF3"/><rect x="181.2" y="67" width="8" height="27" fill="#BCCDF3"/><rect x="193.8" y="58" width="8" height="36" fill="#BCCDF3"/><rect x="206.4" y="49" width="8" height="45" fill="#BCCDF3"/><rect x="219.0" y="40" width="8" height="54" fill="#BCCDF3"/><rect x="231.6" y="31" width="8" height="63" fill="#E8940A"/><rect x="244.2" y="22" width="8" height="72" fill="#BCCDF3"/><rect x="256.8" y="85" width="8" height="9" fill="#BCCDF3"/><rect x="269.4" y="76" width="8" height="18" fill="#BCCDF3"/></g>
+<g font-size="7.6" font-weight="900" fill="#B4560E" text-anchor="middle"><text x="59.2" y="82">A</text><text x="134.8" y="28">B</text><text x="160.0" y="82">C</text><text x="235.6" y="28">D</text></g>
+<g font-size="6.8" fill="#5B6B77" text-anchor="middle"><text x="34.0" y="104">1</text><text x="84.4" y="104">5</text><text x="147.4" y="104">10</text><text x="210.4" y="104">15</text><text x="273.4" y="104">20</text></g>
+<g stroke="#D6455D" stroke-width="0.9" stroke-dasharray="2.5 2" fill="none"><path d="M59.2,97 L59.2,108 L160.0,108 L160.0,97"/><path d="M134.8,21 L134.8,17 L235.6,17 L235.6,21"/></g>
+<text x="150" y="118" text-anchor="middle" font-size="6.8" font-weight="700" fill="#D6455D">A·C 바깥 전자 1개, B·D 7개 → 각각 같은 족 → 성질 비슷</text>
+<text x="150" y="129" text-anchor="middle" font-size="6.8" font-weight="700" fill="#5B6B77">값이 1로 뚝 떨어질 때마다 새 주기(껍질 하나 추가) 시작</text>
+<text x="150" y="140" text-anchor="middle" font-size="6.8" font-weight="700" fill="#B4560E">C와 D는 같은 구간(11~18) = 같은 3주기 = 껍질 수 같음</text>
+</svg></div>
         <div class="wrongbox"><div class="wt">함정 체크</div>
-          <p>"물에 녹는다 = 이온이 생긴다"가 아니다. 전도성 판정 기준은 언제나 <b>'움직일 수 있는 전하 운반 입자'</b>의 존재다.</p></div></div>
+          <p>그래프가 톱니처럼 반복되는 것 자체가 <b>주기성</b>이다. 같은 높이(같은 값) = 같은 족, 같은 톱니 한 구간 = 같은 주기.</p></div></div>
 
-      <div class="gist" style="margin-top:5mm;">
+      <div class="gist" style="margin-top:3mm;">
         <div class="boxtitle"><span class="ico">알</span>이 소단원, 이것만은!</div>
         <ul>
           <li>주기율표: <b>세로줄(족) = 원자가 전자 수 = 성질</b>. 1족 알칼리 금속·17족 할로젠·18족 비활성 기체 세 기둥부터.</li>
@@ -1151,12 +1565,22 @@
       </div>
     </div>
   </div>
-  <div class="folio"><span>알짜 해설</span><span class="num">101</span></div>
+  <div class="folio"><span>알짜 해설</span><span class="num">?</span></div>
 </div>
 
 <!-- ═════════════ p.49 MEMO ═════════════ -->
 <div class="page">
   <div class="runhead"><span class="unit-tag">II. 물질과 규칙성</span><span class="lesson-tag">03 ▸ 04 넘어가기 전에</span></div>
+  <div class="spaced">
+    <div class="st">간격 두고 다시 꺼내기 — 책을 덮고 답한다</div>
+    <ol>
+      <li>같은 족 원소들의 화학적 성질이 비슷한 것은 무엇의 수가 같기 때문인가?</li>
+      <li>금속 원소와 비금속 원소 사이에 주로 형성되는 화학 결합은?</li>
+      <li>고체 염화 나트륨에 전기가 통하지 않는 까닭을 한 문장으로 답하면?</li>
+    </ol>
+    <div class="when"><span>□ 1일 뒤</span><span>□ 1주 뒤</span><span>□ 시험 전</span></div>
+    <div class="ans">정답 1 원자가 전자 2 이온 결합 3 이온이 있지만 이동할 수 없어서</div>
+  </div>
   <div class="memo-head"><span class="mt">MEMO</span><span class="ms">헷갈린 개념, 다시 틀린 문제 번호, 나만의 암기법을 남겨 두는 자리</span></div>
   <div class="memo-area"></div>
   <div class="memo-pen">"이온 결합은 주고받기, 공유 결합은 같이 쓰기 — 이 한 줄을 못 외우면 94쪽으로! — 박찬쌤"</div>
