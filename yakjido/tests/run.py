@@ -839,7 +839,7 @@ def main():
             const t=maxLine(mx,rule).replace(/<[^>]+>/g,''); return (/하루 최대 하루/.test(t) || /^하루 최대 [^\d약]/.test(t) || /^하루 최대 [\d.,~\s]+(일|주|개월|달|시간|년)/.test(t) || /하루 최대 [^·]*\/일/.test(t)) ? d.id+': '+t : null; }).filter(Boolean)""")
         if r8f: fails.append(f'「하루 최대」가 어색하게 붙은 약 {len(r8f)}개: {r8f[:4]}')
         # 8g. 안약·크림에 «먹는 약»이라고 쓰지 않는다
-        r8g = pg.evaluate("()=>['eye-decongestant','allergy-eyedrop','urea-cream','scar-gel','artificial-tears','naftifine','ciclopirox-nail'].filter(id=>isOral(drug(id))).concat(['ibuprofen','udca','oral-contraceptive'].filter(id=>!isOral(drug(id))).map(x=>'!'+x))")
+        r8g = pg.evaluate("()=>['eye-decongestant','allergy-eyedrop','urea-cream','scar-gel','artificial-tears','naftifine','ciclopirox-nail'].filter(id=>isOral(drug(id))).concat(['ibuprofen','udca','oral-contraceptive','tranexamic-melasma','diosmin'].filter(id=>!isOral(drug(id))).map(x=>'!'+x))")
         if r8g: fails.append(f'먹는 약/바르는 약 구분이 틀림: {r8g}')
         br.close()
     print(f'화면 {len(routes)}개 검사 완료')

@@ -829,6 +829,20 @@ main > .answer + *, main > .sec + .care, main > .card + .care, main > .rx-card +
 .care .bd{padding:var(--s3) var(--s4) var(--s4)}
 .care .bd ul.plain li{margin-bottom:4px;font-size:.9rem}
 .care.er .bd ul.plain li::before{background:var(--alert)} .care.clinic .bd ul.plain li::before{background:var(--caution)} .care.ok .bd ul.plain li::before{background:var(--normal)}
+.care .go{margin-top:12px;padding-top:12px;border-top:1px solid var(--hairline)}
+.care .go p{font-size:.875rem;color:var(--body);line-height:1.6}
+.care .go .gl{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+.care .go .gl a,.care .go .gl button{display:inline-flex;align-items:center;gap:6px;min-height:44px;padding:0 14px;border-radius:10px;border:1px solid var(--hairline);background:var(--card);color:var(--body);font:inherit;font-size:.875rem;font-weight:700;text-decoration:none;cursor:pointer}
+.recall-chip{display:inline-flex;align-items:center;gap:4px;margin-top:6px;min-height:44px;padding:0 10px;border-radius:8px;border:1px solid var(--hairline);background:var(--card);color:var(--body);font-size:.75rem;font-weight:700;text-decoration:none}
+.recall-chip .i{width:14px;height:14px}
+.mo-grid{display:grid;grid-template-columns:1fr;gap:12px;margin-top:20px}
+@media (min-width:560px){.mo-grid{grid-template-columns:1fr 1fr}}
+.mo{padding:var(--s4);border-radius:var(--r-card);border:1px solid var(--hairline);background:var(--card)}
+.mo>b{display:flex;align-items:center;gap:8px;font-size:.9375rem}
+.mo p{margin-top:6px;font-size:.875rem;line-height:1.65;color:var(--body);word-break:keep-all}
+.mo.od{border-color:rgba(182,54,41,.3);background:var(--alert-tint)}
+.mo .call{display:inline-flex;align-items:center;gap:6px;margin-top:10px;min-height:44px;padding:0 16px;border-radius:10px;background:var(--alert);color:var(--on-alert);font-weight:700;text-decoration:none;font-size:.9rem}
+.mo .src{display:block;margin-top:8px;font-size:.75rem;color:var(--muted)}
 .care .call{display:inline-flex;align-items:center;gap:6px;margin-top:8px;min-height:44px;padding:0 16px;border-radius:10px;background:var(--alert);color:var(--on-alert);font-weight:700;text-decoration:none;font-size:.9rem}
 /* 복약 픽토그램 */
 .picts{display:flex;flex-wrap:wrap;gap:6px;margin-top:var(--s3)}
@@ -2020,10 +2034,22 @@ I.cloud='<svg class="i" viewBox="0 0 24 24"><path d="M7.5 19h9.8a3.7 3.7 0 0 0 .
 I.refresh='<svg class="i" viewBox="0 0 24 24"><path d="M20 12a8 8 0 1 1-2.6-5.9"/><path d="M20 4v4.6h-4.6"/></svg>';
 I.no='<svg class="i" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M6 6l12 12"/></svg>';
 const picts = arr => arr?.length ? `<div class="picts">${arr.map(k => { const p = PICT[k] || ['info', k]; return `<span class="pict ${k === '음주금지' ? 'no' : ''}">${icon(p[0])}${esc(p[1])}</span>`; }).join('')}</div>` : '';
-const careCards = c => c ? `
-  ${c.pharmacy?.length ? `<div class="care ok"><div class="hd">${I.check}약국에서 해결해도 괜찮아요</div><div class="bd">${list(c.pharmacy)}</div></div>` : ''}
-  ${c.clinic?.length ? `<div class="care clinic"><div class="hd">${I.clock}이럴 땐 병원 진료를 받으세요</div><div class="bd">${list(c.clinic)}</div></div>` : ''}
-  ${c.er?.length ? `<div class="care er"><div class="hd">${I.alert}지금 바로 응급실·119</div><div class="bd">${list(c.er)}<a class="call" href="tel:119">${I.alert} 119 전화</a></div></div>` : ''}` : '';
+/* 「어디로 가나」 — 카드가 «언제»만 말하고 «어디로»를 안 말하던 자리(2026-10-01 NHS·healthdirect 벤치마크).
+   주소는 모두 국가 공식 서비스: e-gen(국립중앙의료원), 휴일지킴이약국(대한약사회), 아이안심톡(국립중앙의료원 소아 상담). */
+const GO_LINK = {
+  er:    ['https://www.e-gen.or.kr/egen/search_emergency_room.do', '가까운 응급실 찾기'],
+  open:  ['https://www.e-gen.or.kr/egen/search_pharmacy.do', '지금 문 연 약국 찾기'],
+  hday:  ['https://www.pharm114.or.kr', '휴일지킴이약국'],
+  moon:  ['https://www.e-gen.or.kr/moonlight/main.do', '달빛어린이병원(밤·휴일 소아)'],
+  kidtalk: ['https://icaretok.nemc.or.kr', '아이안심톡(24시간 소아 상담)'],
+};
+const goA = k => `<a href="${GO_LINK[k][0]}" target="_blank" rel="noopener">${esc(GO_LINK[k][1])}${I.chev || ''}</a>`;
+const careCards = (c, kid) => { if (!c) return ''; kid = kid || ME.age === 'child';
+  const mine = (typeof takingItems === 'function' && takingItems().length) ? `<button onclick="go('/bag')">${I.pill || ''} 내 약 목록 보이기</button>` : '';
+  return `
+  ${c.pharmacy?.length ? `<div class="care ok"><div class="hd">${I.check}약국에서 해결해도 괜찮아요</div><div class="bd">${list(c.pharmacy)}<div class="go"><p>밤·주말에도 문 연 약국이 있어요.</p><div class="gl">${goA('open')}${goA('hday')}</div></div></div></div>` : ''}
+  ${c.clinic?.length ? `<div class="care clinic"><div class="hd">${I.clock}이럴 땐 병원 진료를 받으세요</div><div class="bd">${list(c.clinic)}${kid ? `<div class="go"><p>밤·휴일이라 소아과가 닫혀 있다면 — 늦게까지 여는 <b>달빛어린이병원</b>이 있고, 갈지 말지 헷갈리면 <b>아이안심톡</b>에 물어볼 수 있어요.</p><div class="gl">${goA('moon')}${goA('kidtalk')}</div></div>` : ''}</div></div>` : ''}
+  ${c.er?.length ? `<div class="care er"><div class="hd">${I.alert}지금 바로 응급실·119</div><div class="bd">${list(c.er)}<a class="call" href="tel:119">${I.alert} 119 전화</a><div class="go"><p><b>직접 운전해서 가지 마세요.</b> 드시는 약 상자나 목록을 챙기면 진료가 빨라져요. 119는 병원 안내·의료 상담도 해 드려요.</p><div class="gl">${goA('er')}${mine}</div></div></div></div>` : ''}`; };
 /* 내 약통: 지금 먹는 약과 겹치는 성분 */
 /* 한 조합 안에서 같은 제품 하나로 두 자리가 채워지면 두 번 사서 겹쳐 드시게 된다 */
 const prodKey = n => String(n || '').replace(/\s*(내복액|현탁액|연질캡슐|캡슐|정제|정|액|시럽|과립|산|겔|크림|연고|패치|파프)\s*$/, '').replace(/\s+/g, '').trim();
@@ -2915,6 +2941,19 @@ function memoText(s){
 }
 async function shareMemo(id){ const s = byId(D.symptoms, id); const t = memoText(s); try { if (navigator.share) { await navigator.share({ title: '약국 메모 · ' + s.name, text: t }); return; } } catch (e) { return; } try { await navigator.clipboard.writeText(t); toast('약국 메모를 복사했어요'); } catch (e) { prompt('복사해서 쓰세요', t); } }
 function prodSeq(name){ return D.productImages?.[name]?.seq || ''; }
+/* 회수 공지 — tools/mfds_recalls.py 가 식약처 «회수·폐기» 목록을 품목코드로 받아 둔 것(content/recalls.json).
+   회수는 «특정 제조번호»만이라 제품에 빨간 딱지를 붙이지 않는다. 제조번호를 적어 «집에 있는 약을 확인»하게 한다. */
+function recallNote(seq, compact, name){
+  const nm = t => String(t || '').replace(/\(.*?\)|<.*?>|\s/g, '');
+  let xs = (seq && D.recalls?.[seq]) || [];
+  if (!xs.length && name && D.recalls) { const k = nm(name); xs = Object.values(D.recalls).find(v => v.some(x => nm(x.n) === k)) || []; }   /* 품목코드가 없는 e약은요 항목 */
+  if (!xs.length) return '';
+  const x = xs[0]; const lots = (x.lots || []).slice(0, 4).join(', ') + ((x.lots || []).length > 4 ? ' 등' : '');
+  const href = x.id ? `https://nedrug.mfds.go.kr/pbp/CCBAI01/getItem?targetItemSeq=${esc(x.id)}` : 'https://nedrug.mfds.go.kr/pbp/CCBAI01';
+  const body = lots ? `<b>제조번호 ${esc(lots)}</b>만 해당해요 — 집에 있는 약 상자의 제조번호(Lot·제조번호 칸)를 확인하시고, 같으면 쓰지 마시고 산 약국에 가져가세요.` : '공지에 제조번호가 따로 적혀 있지 않아요 — 집에 있는 약은 쓰기 전에 약국에 한 번 확인해 주세요.';
+  if (compact) return `<a class="recall-chip" href="${href}" target="_blank" rel="noopener">${I.info}${esc((x.d || '').slice(0, 7))} 회수 공지(일부 제조번호)</a>`;
+  return `<div class="note recall" style="margin-top:12px">${I.info}<span><b>식약처 회수 공지 ${esc(x.d || '')}</b> — ${esc(x.why || '')}<br>${body} <a class="link" href="${href}" target="_blank" rel="noopener">공지 원문</a></span></div>`;
+}
 function prodLinks(d, product){
   const seq = product ? prodSeq(product) : '';
   /* 약학정보원은 검색어를 주소로 받는 방식을 확인하지 못했다(health.kr 접속 차단).
@@ -3376,7 +3415,7 @@ function vKids(){
   ${m != null && m < 3 ? `<div class="flag" style="margin-top:16px">${I.alert}<div><b>생후 ${m}개월이에요</b><p>3개월 미만 아기가 열이 나면 해열제를 먹이지 말고 <b>바로 진료</b>를 받으세요. 열을 낮추면 원인을 찾기 어려워져요.</p><a class="call" href="tel:119">${I.alert} 119</a></div></div>` : ''}
   ${w > 0 ? `<section class="sec"><h2>한 번에 이만큼 <small>몸무게 ${w} kg 기준</small></h2>${doseCard('apap')}${doseCard('ibu')}<div class="note" style="margin-top:12px">${I.info}<span>${esc(K.dexibuNote || '')}</span></div></section>` : `<section class="sec"><div class="empty"><b>몸무게를 넣으면 바로 계산해 드려요</b>아세트아미노펜·이부프로펜 시럽 mL, 간격, 하루 한도까지.</div></section>`}
   ${acc('이렇게 먹이세요', list(K.rules, 'steps'), '교차·중복·계량', true)}
-  <section class="sec"><h2>병원에 가야 할 때</h2>${careCards({ clinic: K.care?.clinic, er: K.care?.er })}</section>
+  <section class="sec"><h2>병원에 가야 할 때</h2>${careCards({ clinic: K.care?.clinic, er: K.care?.er }, true)}</section>
   ${srcChips(K.sources)}
   ${disclaimer('용량은 식약처 허가사항과 소아과 교과서 기준으로 계산한 참고값이에요. 약병 표시와 소아과 의사의 지시가 우선이에요.')}`;
 }
@@ -3766,7 +3805,9 @@ function icsText(){
   const pad = n => String(n).padStart(2, '0'); const d0 = new Date(); const ds = `${d0.getFullYear()}${pad(d0.getMonth() + 1)}${pad(d0.getDate())}`;
   let out = ['BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//yakjido//ko', 'CALSCALE:GREGORIAN'];
   for (const id in (ME.sched || {})) for (const t of ME.sched[id]) { const d = takingItems().find(x => x.id === id); if (!d) continue; const [h, m] = t.split(':');
-    out.push('BEGIN:VEVENT', `UID:yakjido-${id}-${t}@yakjido`, `DTSTAMP:${ds}T000000`, `DTSTART:${ds}T${h}${m}00`, `DURATION:PT10M`, 'RRULE:FREQ=DAILY', `SUMMARY:💊 ${d.name} 드실 시간`, `DESCRIPTION:${(d.simple || '').replace(/,/g, '\\,')}`, 'BEGIN:VALARM', 'TRIGGER:PT0M', 'ACTION:DISPLAY', `DESCRIPTION:${d.name}`, 'END:VALARM', 'END:VEVENT'); }
+    out.push('BEGIN:VEVENT', `UID:yakjido-${id}-${t}@yakjido`, `DTSTAMP:${ds}T000000`, `DTSTART:${ds}T${h}${m}00`, `DURATION:PT10M`, 'RRULE:FREQ=DAILY', `SUMMARY:💊 ${d.name} 드실 시간`, `DESCRIPTION:${(d.simple || '').replace(/,/g, '\\,')}`, 'BEGIN:VALARM', 'TRIGGER:PT0M', 'ACTION:DISPLAY', `DESCRIPTION:${d.name}`, 'END:VALARM',
+      /* 30분 뒤 한 번 더(애플 건강 «복용 기록이 없으면 30분 뒤 다시 알림»과 같은 자리). 달력은 드셨는지 모르니 문구로 가른다 */
+      'BEGIN:VALARM', 'TRIGGER:PT30M', 'ACTION:DISPLAY', `DESCRIPTION:${d.name} — 아직 안 드셨다면 지금(이미 드셨으면 넘기세요)`, 'END:VALARM', 'END:VEVENT'); }
   out.push('END:VCALENDAR'); return out.join('\r\n');
 }
 /* ── 파일 드리기 ──
@@ -3936,7 +3977,7 @@ function vSchedule(_, q){
   return `${topBar({ back:'내 정보' })}<div class="eyebrow">복용 시간 알림</div><h1>오늘 약, 잊지 않게</h1>${art('schedule', 'banner')}
   <p style="margin-top:6px">먹는 약마다 시간을 고르면 오늘 할 일이 체크 목록으로 나오고, 시간이 되면 알려드려요. 약마다 <b>허가 용법대로 시간을 미리 골라</b> 두었으니, 다르시면 눌러서 바꾸시면 돼요.</p>
   ${!taking.length ? `<section class="sec card"><div class="empty"><b>아직 등록한 약이 없어요</b>약 사전에서 약을 찾아 ‘지금 먹는 약으로 등록’을 누르면 여기 나와요.</div><div class="actions"><button class="btn ghost" onclick="go('/drugs')">${I.search} 약 찾기</button></div></section>` : ''}
-  ${todays.length ? `<section class="sec"><h2>오늘 <small>${now.getMonth() + 1}월 ${now.getDate()}일 · ${todays.filter(x => x.done).length}/${todays.length} 완료</small></h2><div class="dose-list">${todays.map(x => `<button class="dose-tick ${x.done ? 'done' : (x.min < nowMin - 60 ? 'late' : '')}" onclick="tick('${x.d.id}','${x.t}')"><span class="t">${x.t}</span><span class="n"><b>${esc(x.d.name)}</b><small>${fmt((x.d.simple || '').split('.')[0])}</small></span><span class="bx">${x.done ? I.check : ''}</span></button>`).join('')}</div></section>` : ''}
+  ${todays.length ? `<section class="sec"><h2>오늘 <small>${now.getMonth() + 1}월 ${now.getDate()}일 · ${todays.filter(x => x.done).length}/${todays.length} 완료</small></h2><div class="dose-list">${todays.map(x => `<button class="dose-tick ${x.done ? 'done' : (x.min < nowMin - 60 ? 'late' : '')}" onclick="tick('${x.d.id}','${x.t}')"><span class="t">${x.t}</span><span class="n"><b>${esc(x.d.name)}</b><small>${fmt((x.d.simple || '').split('.')[0])}</small></span><span class="bx">${x.done ? I.check : ''}</span></button>`).join('')}</div>${todays.some(x => !x.done && x.min < nowMin - 60) ? `<details class="why-more" style="margin-top:10px"><summary>드셨는지 기억이 안 나요</summary><div class="why" style="margin-top:6px"><p>확실하지 않으면 <b>이번 회는 건너뛰고</b> 다음 시간부터 원래대로 드세요. 대부분의 약은 <b>두 번 드시는 쪽이 더 위험</b>해요. 피임약·항생제처럼 놓치면 곤란한 약은 약사에게 물어보세요. 앞으로는 드시자마자 위 칸을 눌러 두시면 헷갈리지 않아요.</p></div></details>` : ''}</section>` : ''}
   ${taking.filter(d => isPrn(d.id)).length ? `<section class="sec card"><h2>필요할 때 드신 약</h2>
     <p class="small muted" style="margin-top:4px">아플 때만 드시는 약은 드실 때마다 눌러 적어 두세요. <b>다음은 몇 시부터</b>인지, 오늘 몇 번째인지 알려 드려요.</p>
     ${taking.filter(d => isPrn(d.id)).map(d => { const st = prnState(d); return `<div class="sched-row prn-row"><div class="nm"><span>${esc(d.name)}</span>${st.count ? `<b class="${st.full ? 'stockwarn' : 'stockok'}">오늘 ${st.count}번${st.max ? ` / ${st.max}번` : ''}</b>` : ''}</div>
@@ -4640,9 +4681,44 @@ function maxLine(mx, rule){
 }
 /* 먹는 약인가 — 안약·크림·파스·샴푸에 「먹는 약으로 등록」·「먹고 불편했어요」라고 쓰지 않으려고 */
 const TOPICAL_CLS = new Set(['skin', 'topical', 'antifungal', 'hemorrhoid']);
+/* 「깜빡 잊었을 때 · 너무 많이 드셨을 때」 — NHS·MedlinePlus 약 화면에 늘 있고 우리에겐 없던 두 칸(2026-10-01 벤치마크).
+   문구 근거: NHS 파라세타몰(«설명서보다 많이 드셨으면 상담 — 간 손상»)·NHS 중독(«토하게 하지 말 것·포장을 가져갈 것·증상은 몇 시간~며칠 뒤»).
+   약마다 다르게 쓸 곳은 d.missed / d.overdose 로 덮어쓴다. */
+function routeOf(d){ const n = d.name || '';
+  if (/안약|점안|안연고|인공눈물/.test(n)) return 'eye';
+  if (/비강|코 뚫|스프레이|분무/.test(n) && !/가글|벤지다민/.test(n)) return 'nose';
+  if (/가글|트로키|잇몸|오라메디|알보칠|구강/.test(n)) return 'mouth';
+  return 'skin'; }
+const COURSE_CLS = new Set(['antibiotic', 'antiviral', 'bone', 'gout', 'urology', 'women', 'quit']);
+function missedText(d){
+  if (d.missed) return d.missed;
+  if (d.id === 'oral-contraceptive') return '피임약은 잊은 지 **12시간 안인지 넘었는지**에 따라 규칙이 달라요 — 「복용법」의 팁을 보시고, 헷갈리면 약사에게 바로 물어보세요.';
+  if (!isOral(d)) { const r = routeOf(d);
+    return r === 'eye' ? '생각났을 때 넣으세요. 다음 차례가 가까우면 그때 한 번만 — **두 배로 넣지 마세요.**'
+      : r === 'nose' ? '생각났을 때 뿌리세요. 다음 차례가 가까우면 그때 한 번만 — **몰아서 더 뿌리지 마세요.**'
+      : r === 'mouth' ? '생각났을 때 쓰세요. 다음 차례가 가까우면 그때 한 번만 — **두 번 몰아 쓰지 마세요.**'
+      : '생각났을 때 바르세요(붙이세요). 다음 차례가 가까우면 그때 한 번만 — **두 배로 바르거나 두 장 붙이지 마세요.**'; }
+  if (COURSE_CLS.has(d.class)) return '생각나는 대로 바로 드세요. 다음 드실 때가 가깝다면 잊은 것은 건너뛰고 원래 시간에 — **두 번 몰아 드시지 마세요.** 자주 잊으시면 「복약 알림」을 켜 두세요.';
+  return '**필요할 때 드시는 약**이면 「밀린 것」이 없어요 — 다시 필요할 때 마지막으로 드신 때부터 간격만 지키세요. **매일 정해 드시는 중**이면 생각난 때 바로 드시되, 다음 때가 가까우면 건너뛰세요. 어느 쪽이든 **두 번 몰아 드시지 마세요.**';
+}
+function overdoseText(d){
+  if (d.overdose) return d.overdose;
+  if (!isOral(d)) { const r = routeOf(d);
+    const what = r === 'eye' ? '안약을' : r === 'nose' ? '코에 뿌리는 약을' : r === 'mouth' ? '가글·입안 약을' : '바르는 약을';
+    const extra = r === 'eye' || r === 'nose' ? ' 충혈을 빼거나 코를 뚫는 성분은 **어린아이가 삼키면 특히 위험**할 수 있어요.' : r === 'skin' ? ' 너무 넓게·많이 발랐다면 물로 씻어 내세요.' : '';
+    return `${what} **삼켰거나 아이가 먹었다면** 양이 적어 보여도 **아래 버튼으로 바로 상담**하세요.${extra}`; }
+  const apap = /아세트아미노펜/.test(d.name + JSON.stringify(d.products || [])) || d.id === 'acetaminophen';
+  return (apap ? '**아세트아미노펜**은 많이 드셔도 처음엔 멀쩡할 수 있어요 — 간 손상은 **몇 시간~며칠 뒤**에 드러납니다. ' : '')
+    + '설명서보다 많이 드셨다면 **괜찮아 보여도 아래 버튼으로 상담**하세요 — 병원 안내·의료 상담을 해 줘요. **억지로 토하게 하지 마시고**, 직접 운전해서 가지 마세요. **약 상자와 남은 약**을 챙겨 가세요. 아이가 몰래 먹었다면 양이 적어 보여도 바로 전화하세요.';
+}
+const missOdCards = d => `<div class="mo-grid">
+  <div class="mo"><b>${I.clock}깜빡 잊었을 때</b><p>${fmt(missedText(d))}</p></div>
+  <div class="mo od"><b>${I.alert}너무 많이 드셨을 때</b><p>${fmt(overdoseText(d))}</p><a class="call" href="tel:119">${I.alert} 119 상담</a><span class="src">근거: 영국 국민보건서비스(NHS) 중독·파라세타몰 안내</span></div></div>`;
 function isOral(d){
   if (!d) return true;
   if ((d.pict || []).some(x => x === '바르는약' || x === '넣는약')) return false;
+  /* 계열이 피부·치질이어도 이름이 «먹는»이면 먹는 약 — 먹는 기미약(트라넥삼산)·디오스민(먹는 치질약)이 «쓰는 양»으로 나오던 자리(2026-10-01) */
+  if (/^[^(]*먹는|\(먹는|먹는 [^)]*\)/.test(d.name || '')) return true;
   if (/안약|점안|크림|연고|겔|파스|패치|샴푸|스프레이|분무|가글|네일|좌약|질정/.test(d.name || '')) return false;
   return !TOPICAL_CLS.has(d.class);
 }
@@ -4694,9 +4770,10 @@ function vDrug(id){
     ${d.caution?.length ? `<h2 style="margin-top:20px">주의해서 드셔야 하는 경우</h2>${list(d.caution.map(a => a.text || a))}` : ''}
     ${d.sideEffects?.length ? `<h2 style="margin-top:20px">흔한 부작용</h2>${list(d.sideEffects)}` : ''}
     ${d.stop?.length ? `<div style="margin-top:20px">${flagBox('이런 증상이 나타나면 바로 중단하고 진료', d.stop)}</div>` : ''}
+    ${missOdCards(d)}
   </section></div>
   <div class="pane" id="p3"><section class="card"><h2>이 성분이 든 제품</h2><p class="small muted" style="margin-top:4px">제품명이 달라도 성분이 같으면 같은 약이에요. 함량을 확인하세요.</p>
-    <div class="products">${(d.products || []).map(p => `<div class="prod" style="flex-wrap:wrap">${prodArt(pimg(p.name), p.name)}<div style="flex:1;min-width:0"><b>${esc(p.name)}</b><span>${esc(p.maker || '')} · ${esc(p.amount || '')}${p.note ? ' · ' + esc(p.note) : ''}</span>${formTag(p.name)}</div>${badge(p.rx || d.rx)}<div class="links" style="display:flex;gap:6px;flex-wrap:wrap;width:100%;margin-top:8px">${prodSeq(p.name) ? `<a class="plink" href="https://nedrug.mfds.go.kr/pbp/CCBBB01/getItemDetail?itemSeq=${esc(prodSeq(p.name))}" target="_blank" rel="noopener">${I.link}식약처 허가정보</a>` : ''}<a class="plink" href="https://www.health.kr/searchDrug/search_detail.asp" target="_blank" rel="noopener" onclick="copyName('${esc(p.name.split('·')[0]).replace(/'/g, "\\'")}')">${I.search}약학정보원에서 찾기</a></div></div>`).join('') || '<p class="small muted">대표 제품 정보를 준비 중이에요.</p>'}</div>
+    <div class="products">${(d.products || []).map(p => `<div class="prod" style="flex-wrap:wrap">${prodArt(pimg(p.name), p.name)}<div style="flex:1;min-width:0"><b>${esc(p.name)}</b><span>${esc(p.maker || '')} · ${esc(p.amount || '')}${p.note ? ' · ' + esc(p.note) : ''}</span>${formTag(p.name)}${recallNote(prodSeq(p.name), true, p.name)}</div>${badge(p.rx || d.rx)}<div class="links" style="display:flex;gap:6px;flex-wrap:wrap;width:100%;margin-top:8px">${prodSeq(p.name) ? `<a class="plink" href="https://nedrug.mfds.go.kr/pbp/CCBBB01/getItemDetail?itemSeq=${esc(prodSeq(p.name))}" target="_blank" rel="noopener">${I.link}식약처 허가정보</a>` : ''}<a class="plink" href="https://www.health.kr/searchDrug/search_detail.asp" target="_blank" rel="noopener" onclick="copyName('${esc(p.name.split('·')[0]).replace(/'/g, "\\'")}')">${I.search}약학정보원에서 찾기</a></div></div>`).join('') || '<p class="small muted">대표 제품 정보를 준비 중이에요.</p>'}</div>
     ${pubHtml}
   </section></div>
   <div class="pane" id="p4"><section class="card"><h2>같이 먹으면 안 되거나 조심할 것</h2>
@@ -4704,7 +4781,7 @@ function vDrug(id){
       <div class="actions" style="margin-top:10px"><button class="btn" onclick="go('/together')">${I.scale} 내 약통 전부와 함께 확인하기</button></div>`}
   </section></div>
   ${same.length ? `<div class="pane" id="p5"><section class="sec" style="margin-top:0"><h2>같은 계열 다른 성분 <small>비교해서 고르기</small></h2><div class="card rows">${same.map(x => `<button class="row" onclick="go('/drug/${x.id}')"><div class="body"><b>${esc(x.name)}</b><span>${esc(x.tagline || (x.for || []).join(' · '))}</span>${useTag(x)}</div>${badge(x.rx)}</button>`).join('')}</div>${c ? `<a class="btn ghost" style="margin-top:12px" href="#/class/${c.id}">${I.scale} ${esc(c.name)} 한눈에 비교</a>` : ''}</section></div>` : ''}
-  ${(d.sources || []).length ? `<div class="pane" id="p6"><section class="card"><h2>이 화면의 근거 <small>${d.sources.length}건</small></h2>${srcChips(d.sources)}</section></div>` : ''}
+  ${(d.sources || []).length ? `<div class="pane" id="p6"><section class="card"><h2>이 화면의 근거 <small>${d.sources.length}건</small></h2>${srcChips(d.sources)}${D.meta?.labelCheck ? `<p class="small muted" style="margin-top:10px">식약처 허가사항 변경명령과 대조한 날: <b>${esc(D.meta.labelCheck)}</b> — 그 뒤 바뀐 설명서가 있으면 약 상자 설명서가 우선이에요.</p>` : ''}</section></div>` : ''}
   ${(() => { const rep = drugRepKg(d); return rep ? `<div class="pane" id="p7">${kgCard(rep[0])}<p class="small muted" style="margin-top:8px">대표 제품 <b>${esc(rep[1])}</b> 기준이에요.${rep[2] > 1 && !(d.contains || []).length ? ` 이 제품은 <b>${rep[2]}가지 성분이 든 복합제</b>라 안내에 다른 성분 이야기도 섞여 있어요.` : ''} 같은 성분이라도 제품마다 함량·첨가물이 다를 수 있어요.</p></div>` : ''; })()}
   ${aeDrugCard(d)}
   ${disclaimer()}`;
@@ -4780,6 +4857,7 @@ function vPub(id){
   return `${topBar({ back:'약 사전' })}
   <div class="pub-hero">${ix.img ? `<img class="pillimg" src="${esc(ix.img)}" alt="${esc(ix.n)} 낱알 사진" onerror="this.remove()">` : ''}<div><div class="eyebrow">식약처 e약은요</div><h1 style="font-size:1.25rem">${esc(ix.n)}</h1><p class="small muted">${esc(ix.m)} ${ix.cvs ? '<span class="badge cvs">편의점 가능</span>' : '<span class="badge otc">약국 구입</span>'}</p></div></div>
   <div class="chips" style="margin-top:12px">${ix.i.map(x => `<span class="chip" style="min-height:32px;font-size:.8125rem">${esc(x)}</span>`).join('')}</div>
+  ${recallNote(ix.seq, false, ix.n)}
   ${(() => { const kf = pubKeyFacts(det); return kf.length ? `<section class="sec"><h2>먼저 보실 것</h2>
     <div class="card keyfacts">${kf.map(f => `<div class="kf"><b>${esc(f.k)}</b><span>${esc(f.v)}</span></div>`).join('')}</div>
     <p class="small muted" style="margin-top:8px">식약처 허가 용법에 적힌 그대로예요. 아래 원문에서 다시 확인하실 수 있어요.</p></section>` : ''; })()}
@@ -5193,7 +5271,11 @@ function vBag(){
   ${aeCard()}
   ${vitalsCard()}
   ${nextVisit() ? `<p class="small muted" style="margin-top:10px">다음 진료 — ${esc(visitWord(nextVisit()))}</p>` : ''}
-  <div class="actions"><button class="btn ghost" onclick="shareBag()">${I.cart} 메모로 복사·전송</button><button class="btn ghost" onclick="window.print()">${I.book} 종이로 뽑기</button><button class="btn ghost" onclick="go('/together')">${I.shield} 자세한 판정 보기</button></div>`}
+  <div class="actions"><button class="btn ghost" onclick="shareBag()">${I.cart} 메모로 복사·전송</button><button class="btn ghost" onclick="window.print()">${I.book} 종이로 뽑기</button><button class="btn ghost" onclick="go('/together')">${I.shield} 자세한 판정 보기</button></div>
+  <details class="why-more" style="margin-top:12px"><summary>병원·약국에서 받은 약까지 한 번에 보려면 — 나라 서비스</summary><div class="why" style="margin-top:8px">
+    <p>이 약통은 <b>직접 담으신 약</b>만 봐요. <b>건강보험심사평가원 「내가 먹는 약! 한눈에」</b>에서는 지난 1년 동안 병원·약국에서 받은 약을 볼 수 있고(간편인증 로그인), <b>「의약품 안전사용 서비스(DUR) 국민 체험관」</b>에서는 약 이름을 넣어 함께 먹으면 안 되는 조합을 직접 확인해 볼 수 있어요.</p>
+    <div class="gl" style="display:flex;flex-wrap:wrap;gap:8px;margin-top:8px"><a class="btn line" href="https://www.hira.or.kr/rb/dur/form.do?pgmid=HIRAA050300000100" target="_blank" rel="noopener">내가 먹는 약! 한눈에</a><a class="btn line" href="https://www.hira.or.kr/ra/medi/form.do?pgmid=HIRAA030029000000" target="_blank" rel="noopener">DUR 국민 체험관</a></div>
+    <p class="small muted" style="margin-top:6px">심평원 1644-2000 · 이 앱은 그 기록을 가져오지 않아요(내 정보는 휴대폰에만).</p></div></details>`}
   ${disclaimer('이 한 장은 참고용이에요. 약을 스스로 끊거나 바꾸지 마시고, 약사·의사의 판단을 따르세요.')}`;
 }
 /* ── 약 먹고 불편했던 일 ──
@@ -5264,6 +5346,8 @@ function aeCard(){
     <p>약을 정해진 대로 드셨는데 <b>사망·장애·입원</b> 같은 중대한 피해를 입으셨다면, <b>의약품 부작용 피해구제</b>를 신청하실 수 있어요. 식약처가 주관하고 한국의약품안전관리원이 조사합니다. 사망일시보상금·장애일시보상금·진료비·장례비가 있고, <b>사망·장애는 그날부터 5년 안에</b> 신청하셔야 해요.</p>
     <p style="margin-top:8px">가벼운 부작용도 신고해 두시면 다른 분들이 같은 일을 겪지 않게 됩니다. 신고는 <b>의무가 아니고</b>, 진료를 대신하지도 않아요.</p>
     <p style="margin-top:8px"><b>한국의약품안전관리원</b><br><a class="call-in" href="tel:1644-6223">1644-6223</a> <span class="muted small">(또는 14-3330)</span></p>
+    <p style="margin-top:8px">전화 대신 식약처 <b>「국내 이상사례 보고(일반인)」</b> 화면에서 <b>온라인으로 직접 신고</b>할 수도 있고, 식약처가 정리한 <b>부작용이 생겼을 때 대처법</b>도 있어요.</p>
+    <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:8px"><a class="btn line" href="https://nedrug.mfds.go.kr/CCCBA03F010/getReport" target="_blank" rel="noopener">온라인 부작용 신고</a><a class="btn line" href="https://nedrug.mfds.go.kr/cntnts/43" target="_blank" rel="noopener">부작용 대처법(식약처)</a></div>
     </div></details>
   </section>`;
 }
