@@ -47,6 +47,7 @@ render summary-3/summary.html summary-3/summary.pdf
 render back-matter/back.html back-matter/back.pdf
 render mock-exam/exam.html mock-exam/exam.pdf
 render mock-exam-suneung/exam.html mock-exam-suneung/exam.pdf   # 수능형(통합과학 1·2 전 범위) — 학평형 뒤
+render mock-exam-suneung-2/exam.html mock-exam-suneung-2/exam.pdf   # 수능형 제2회 — 제1회 뒤
 
 # 3) 조판 QA
 python3 ../tools/qa_check.py front-matter/front.html
@@ -89,6 +90,7 @@ python3 ../tools/pdf_text_check.py summary-3/summary.html summary-3/summary.pdf
 python3 ../tools/pdf_text_check.py back-matter/back.html back-matter/back.pdf
 python3 ../tools/pdf_text_check.py mock-exam/exam.html mock-exam/exam.pdf
 python3 ../tools/pdf_text_check.py mock-exam-suneung/exam.html mock-exam-suneung/exam.pdf
+python3 ../tools/pdf_text_check.py mock-exam-suneung-2/exam.html mock-exam-suneung-2/exam.pdf
 
 # 5) 합본 PDF (지금까지 완성된 챕터 축적분)
 python3 - <<'PYEOF'
@@ -101,7 +103,7 @@ for f in ["front-matter/front.pdf",
           "chapter-2204/chapter.pdf", "chapter-2205/chapter.pdf", "summary-2/summary.pdf",
           "chapter-2301/chapter.pdf", "chapter-2302/chapter.pdf", "chapter-2303/chapter.pdf",
           "summary-3/summary.pdf", "back-matter/back.pdf",
-          "mock-exam/exam.pdf", "mock-exam-suneung/exam.pdf"]:
+          "mock-exam/exam.pdf", "mock-exam-suneung/exam.pdf", "mock-exam-suneung-2/exam.pdf"]:
     with pymupdf.open(f) as d:
         out.insert_pdf(d)
 out.save("통합과학2_합본.pdf", garbage=4, deflate=True)

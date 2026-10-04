@@ -22,6 +22,11 @@ import sys as _sys; _sys.path.insert(0, str(pathlib.Path(__file__).resolve().par
 from _extract_common import txt as _txt, defs_map, selfcontain, strip_tags, plain_text, supsub_uni
 
 
+def mark_no(a):
+    """'③' → 3. 빈칸·여러 글자는 None — ('' in MARKS 가 참이라 빈 정답이 ①로 읽히던 것)"""
+    return MARKS.index(a) + 1 if len(a) == 1 and a in MARKS else None
+
+
 def txt(node, keep_bold=True):
     return _txt(node, keep_bold)
 
@@ -130,6 +135,22 @@ def parse_chapter(path):
         is_ox = bool(stem_el.select_one('.ox-answer'))
         for s in stem_el.select('.ox-answer'): s.extract()
         for s in stem_el.select('.blankline'): s.replace_with('＿＿＿')
+        # 그림 밖 자료(2026-10): 탐구 과정·조건 줄(.exp)과 표(.qtab·.exptab)를 대단원·모의고사와 같은 data(줄)·table(표)로.
+        # 예전엔 .exp 가 발문 글자에 이어 붙고(표는 칸이 뭉개져 '원소산소탄소…'), 발문 밖 .exp 는 통째로 빠졌다(2103-q21 반응식)
+        fig = el.select_one('figure svg')
+        exps = el.select('.exp')
+        tabs = [tb for tb in el.select('table.qtab, table.exptab') if not tb.find_parent('figure')]
+        data = []
+        for x in exps:
+            xc = __import__('copy').copy(x)
+            for f in xc.select('figure, table'): f.extract()      # 그림은 figure 로, 표는 table 로 따로
+            data += block_lines(xc)
+        table = [table_rows(tb) for tb in tabs]
+        order = el.find_all(True)
+        first = min((order.index(x) for x in exps + tabs), default=None)
+        fig_after = fig is not None and first is not None and first < order.index(fig)
+        for x in exps + tabs: x.extract()
+        for f in stem_el.select('figure'): f.extract()         # 발문 안에 든 그림의 글자(svg text)가 발문에 섞이지 않게
         stem = txt(stem_el)
         bogi = el.select_one('.bogi-box')
         if bogi:
@@ -139,18 +160,19 @@ def parse_chapter(path):
             source = re.sub(r'[ \t]+', ' ', plain_text(bogi, '')).strip(); source = re.sub(r'\n\s*\n+', '\n', source)
         else: source = ''
         choices = [re.sub(r'^[①②③④⑤]\s*', '', txt(li)) for li in el.select('ul.choices li')]
-        fig = el.select_one('figure svg'); figure = selfcontain(str(fig), markers, f'{code}q{n}') if fig else ''
+        figure = selfcontain(str(fig), markers, f'{code}q{n}') if fig else ''
         a = ans.get(n, ''); sol = sols.get(n, {})
         if is_ox: typ, answer = 'ox', a
         elif el.select_one('.essay-lines') or '서술' in a or a == '서술형': typ, answer = 'essay', ''
-        elif choices and bogi: typ, answer = 'multi', (MARKS.index(a) + 1 if a in MARKS else None)
-        elif choices: typ, answer = 'mc', (MARKS.index(a) + 1 if a in MARKS else None)
+        elif choices and bogi: typ, answer = 'multi', (mark_no(a))
+        elif choices: typ, answer = 'mc', (mark_no(a))
         else: typ, answer = 'blank', a
         m = re.search(r'개념\s*(\d)', tag) or re.search(r'개념\s*(\d)', sol.get('concept', ''))
         items.append({'id': f'{code}-q{n}', 'lessonId': code, 'concept': int(m.group(1)) if m else 0, 'step': step, 'type': typ,
                       'stem': stem, 'source': source, 'choices': choices, 'answer': answer,
                       'explain': sol.get('explain', ''), 'wrong': sol.get('wrong', ''), 'figure': figure,
-                      'difficulty': difficulty or {1: '●○○', 2: '●●○', 3: '●●●'}[step], **({'must': True} if must else {})})
+                      'difficulty': difficulty or {1: '●○○', 2: '●●○', 3: '●●●'}[step], **({'must': True} if must else {}),
+                      **({'data': '\n'.join(data)} if data else {}), **({'table': table} if table else {}), **({'figAfter': True} if fig_after else {})})
         qi += 1
 
     # ── 자료 파헤치기 · 직접 해보기 ──
@@ -275,7 +297,8 @@ def auto_from_lecture(concepts):
 
 # ══════════ 대단원 마무리 · 실전 모의고사 (2026-10) ══════════
 # 소단원 문항과 같은 필드 + step('unit'|'mock'|'recap') · lessons(이어지는 소단원들, 첫째가 lessonId) · book · unit · points(모의고사 배점)
-# 모의고사는 exam: 'hakpyeong'(고1 학평형, M{권}-q{번호}) | 'suneung'(수능형, MS-q{번호}, book '1+2', area 행동 영역 · tags 융합/고난도)
+# 모의고사는 exam: 'hakpyeong'(고1 학평형, M{권}-q{번호}) | 'suneung'(수능형, 제1회 MS-q{번호} · 제2회 MS2-q{번호}, book '1+2', area 행동 영역 · tags 융합/고난도)
+# · round: 회차(1, 2 …) — 같은 exam·book 안에서 회차를 가른다(수능형은 두 회가 모두 book '1+2')
 # 그림 밖 자료: data(탐구 과정·조건 줄, '\n' 으로 줄 나눔) · table(표: 줄마다 [['h'|'d', 글자], …]) · ask(그림·자료 뒤의 발문)
 # 문제 은행 보통 풀이(bankPool)에는 나오지 않는다 — 앱의 '대단원 마무리'·'실전 모의고사'에서만
 LESSON_SET = None
@@ -429,8 +452,8 @@ def parse_summary(path, markers=None):
         fig, data, table, source, choices, after = item_common(el, '.stem')
         a = (ans.get(n) or ['', None])[0]; sol = sols.get(n, {})
         if el.select_one('.essay-lines') or '서술' in a: typ, answer = 'essay', ''
-        elif choices and source: typ, answer = 'multi', (MARKS.index(a) + 1 if a in MARKS else None)
-        elif choices: typ, answer = 'mc', (MARKS.index(a) + 1 if a in MARKS else None)
+        elif choices and source: typ, answer = 'multi', (mark_no(a))
+        elif choices: typ, answer = 'mc', (mark_no(a))
         else: warn.append(f'{path.parent.name} {n}: 유형을 모름'); continue
         lessons = lesson_refs(sol.get('link', '') + ' ' + tag.split('|')[-1], book)
         if not lessons: warn.append(f'{path.parent.name} {n}: 소단원 연결 없음')
@@ -529,12 +552,15 @@ def parse_recap(soup, book, ui, unit):
 
 
 def parse_mock(path):
-    """book/mock-exam/exam.html → 실전 모의고사 25문항(배점 합 50) — 학평형(exam 'hakpyeong', id M{권}-q{번호})
-    book2/mock-exam-suneung/exam.html → 수능형(exam 'suneung', id MS-q{번호}, 통합과학 1·2 전 범위 — book '1+2')"""
+    """book/mock-exam/exam.html → 실전 모의고사 25문항(배점 합 50) — 학평형(exam 'hakpyeong', id M{권}-q{번호}, round 1)
+    book2/mock-exam-suneung/exam.html → 수능형 제1회(exam 'suneung', id MS-q{번호}, 통합과학 1·2 전 범위 — book '1+2', round 1)
+    book2/mock-exam-suneung-2/exam.html → 수능형 제2회(id MS2-q{번호}, round 2) — 폴더 이름 끝의 '-N' 이 회차"""
     from bs4 import Comment
     src = path.read_text(encoding='utf-8')
     book = '1' if path.parts[-3] == 'book' else '2'
-    sn = path.parent.name == 'mock-exam-suneung'
+    sn = path.parent.name.startswith('mock-exam-suneung')
+    rm = re.search(r'-(\d+)$', path.parent.name); rnd = int(rm.group(1)) if rm else 1
+    tag = (f'수능형 제{rnd}회' if sn else f'{book}권 제{rnd}회')
     markers = defs_map(src); soup = BeautifulSoup(src, 'html.parser')
     ans = answer_table(soup); sols = solutions(soup)
     items, warn = [], []
@@ -553,37 +579,45 @@ def parse_mock(path):
         sol = sols.get(n, {})
         refs = sol.get('link', '') + ' ' + (str(com) if com else '')
         lessons = lesson_refs_books(refs, book) if sn else lesson_refs(refs, book)
-        if not lessons: warn.append(f'모의고사 {"수능형" if sn else book} {n}: 소단원 연결 없음')
+        if not lessons: warn.append(f'모의고사 {tag} {n}: 소단원 연결 없음')
         typ = 'multi' if source else 'mc'
-        qid = f'MS-q{n}' if sn else f'M{book}-q{n}'
+        qid = (f'MS-q{n}' if rnd == 1 else f'MS{rnd}-q{n}') if sn else (f'M{book}-q{n}' if rnd == 1 else f'M{book}r{rnd}-q{n}')
         it = {'id': qid, 'lessonId': lessons[0] if lessons else f'{book}101', 'lessons': lessons, 'book': '1+2' if sn else book,
               'unit': next((k for k, v in ROMAN.items() if lessons and lessons[0][1] == v), ''),
               'concept': 0, 'step': 'mock', 'type': typ, 'stem': stems[0] if stems else '', 'source': source, 'choices': choices,
-              'answer': MARKS.index(a) + 1 if a in MARKS else None, 'explain': sol.get('explain', ''), 'wrong': sol.get('wrong', ''),
-              'figure': selfcontain(str(fig), markers, f'MS{n}' if sn else f'M{book}q{n}') if fig else '', 'difficulty': '', 'points': p,
-              'exam': 'suneung' if sn else 'hakpyeong'}
+              'answer': mark_no(a), 'explain': sol.get('explain', ''), 'wrong': sol.get('wrong', ''),
+              'figure': selfcontain(str(fig), markers, (f'MS{n}' if rnd == 1 else f'MS{rnd}n{n}') if sn else (f'M{book}q{n}' if rnd == 1 else f'M{book}r{rnd}q{n}')) if fig else '', 'difficulty': '', 'points': p,
+              'exam': 'suneung' if sn else 'hakpyeong', 'round': rnd}
         if sn:
             if sol.get('area'): it['area'] = sol['area']           # 행동 영역(평가원 8가지)
             if sol.get('tags'): it['tags'] = sol['tags']           # '융합' · '고난도'
-        if a not in MARKS: warn.append(f'모의고사 {qid}: 정답표에 정답 없음')
+        if mark_no(a) is None: warn.append(f'모의고사 {qid}: 정답표에 정답 없음')
         if p not in (1.5, 2.0, 2.5): warn.append(f'모의고사 {qid}: 배점 {p}')
-        if pts_txt and p is not None and f'{p:g}' not in pts_txt: warn.append(f'모의고사 {qid}: 문제지 배점 {pts_txt} ≠ 정답표 {p:g}')
+        mp = re.search(r'([\d.]+)\s*점', pts_txt)
+        if mp and p is not None and float(mp.group(1)) != p: warn.append(f'모의고사 {qid}: 문제지 배점 {pts_txt} ≠ 정답표 {p:g}')   # 글자 포함 비교는 '2' ⊂ '[2.5점]' 을 놓쳤다
         if len(stems) > 1: it['ask'] = ' '.join(stems[1:])
         if data: it['data'] = '\n'.join(data)
         if table: it['table'] = table
         if after: it['figAfter'] = True
         items.append(it)
     tot = sum(i['points'] or 0 for i in items)
-    if len(items) != 25 or abs(tot - 50) > 1e-9: warn.append(f'모의고사 {"수능형" if sn else book}: {len(items)}문항 · 배점 합 {tot}')
+    if len(items) != 25 or abs(tot - 50) > 1e-9: warn.append(f'모의고사 {tag}: {len(items)}문항 · 배점 합 {tot}')
     nums = sorted(int(i['id'].split('-q')[1]) for i in items)
-    if nums != list(range(1, len(items) + 1)): warn.append(f'모의고사 {"수능형" if sn else book}: 문항 번호 {nums}')
+    if nums != list(range(1, len(items) + 1)): warn.append(f'모의고사 {tag}: 문항 번호 {nums}')
     miss = [n for n in nums if n not in sols]
-    if miss: warn.append(f'모의고사 {"수능형" if sn else book}: 해설 없는 문항 {miss}')
+    if miss: warn.append(f'모의고사 {tag}: 해설 없는 문항 {miss}')
+    empty = [i['id'] for i in items if not i['explain'] and not i['wrong']]
+    if empty: warn.append(f'모의고사 {tag}: 해설이 빈 문항 {empty}')
+    extra = sorted(set(sols) - set(nums)) + sorted(k for k in ans if k not in nums)
+    if extra: warn.append(f'모의고사 {tag}: 문제지에 없는 번호의 정답·해설 {extra}')
+    if sn:
+        noarea = [i['id'] for i in items if not i.get('area')]
+        if noarea: warn.append(f'모의고사 {tag}: 행동 영역 없는 해설 {noarea}')
     return items, warn
 
 
 def unit_mock():
-    """대단원 마무리 6 + 모의고사(학평형 2 · 수능형 1) — (문항, 경고)"""
+    """대단원 마무리 6 + 모의고사(학평형 2 · 수능형 2) — (문항, 경고)"""
     items, warns = [], []
     for b in ('book', 'book2'):
         for k in (1, 2, 3):
@@ -592,7 +626,7 @@ def unit_mock():
             its, rc, w = parse_summary(p); items += its + rc; warns += w
             print(f'{b}/summary-{k}: 마무리 {len(its)} · 핵심 정리 빈칸 {len(rc)}' + (f' · ! {"; ".join(w)}' if w else ''))
             if len(its) != 16: warns.append(f'{b}/summary-{k}: 문항 {len(its)} (16 이어야)')
-        for d in ('mock-exam', 'mock-exam-suneung'):               # 학평형 · 수능형(book2 에만)
+        for d in ('mock-exam', 'mock-exam-suneung', 'mock-exam-suneung-2'):   # 학평형 · 수능형 제1·2회(book2 에만)
             p = ROOT / b / d / 'exam.html'
             if p.exists():
                 its, w = parse_mock(p); items += its; warns += w
@@ -642,7 +676,8 @@ def main():
     if bad: print('정답 못 읽은 문항:', bad)
     st = Counter(str(i['step']) for i in items)
     ex = Counter(i.get('exam') for i in items if i['step'] == 'mock')
-    print(f"대단원 마무리 {st['unit']} · 핵심 정리 빈칸 {st['recap']} · 모의고사 {st['mock']} (학평형 {ex['hakpyeong']} · 수능형 {ex['suneung']}) (문제 은행 보통 풀이에는 나오지 않음)")
+    rd = Counter((i.get('exam'), i.get('round')) for i in items if i['step'] == 'mock')
+    print(f"대단원 마무리 {st['unit']} · 핵심 정리 빈칸 {st['recap']} · 모의고사 {st['mock']} (학평형 {ex['hakpyeong']} · 수능형 {ex['suneung']} = " + ' · '.join(f'제{r}회 {k}' for (e, r), k in sorted(rd.items()) if e == 'suneung') + ") (문제 은행 보통 풀이에는 나오지 않음)")
     for w in um_warn: print('  !', w)
 
 
