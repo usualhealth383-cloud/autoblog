@@ -264,6 +264,20 @@ create table if not exists talk_log (
   at       timestamptz not null default now()
 );
 create index if not exists talk_log_uid on talk_log (uid, at desc);
+-- 처리 기록(운영 일지, docs/11 §12-11) — 이용 제한만 적던 표를 넓힌다: 원장이 남의 글·댓글 지우기(del) · 신고 되돌리기(keep) ·
+--  첫 글 승인/거절(approve·reject) · 선생님 확인(check·uncheck) · 보호자가 자녀 이야기 끄기/켜기(g_write·g_all·g_on).
+--  uid = 그 일을 당한 계정(글쓴이·학생) · actor = 한 사람(원장·보호자) · target = 'post:<id>'·'comment:<id>'. 원장만 함수로 30일치를 본다 · 6개월 뒤 파기(purge_old)
+alter table talk_log add column if not exists actor  uuid references auth.users(id) on delete set null;
+alter table talk_log add column if not exists target text check (target is null or target ~ '^(post|comment):[0-9a-f-]{36}$');
+alter table talk_log drop constraint if exists talk_log_action_check;
+alter table talk_log add constraint talk_log_action_check check (action in ('d7','d30','stop','lift','del','keep','approve','reject','check','uncheck','g_write','g_all','g_on'));
+create index if not exists talk_log_at on talk_log (at desc);
+-- 새 가입자 첫 글 사전 검토(docs/11 §12-6) — 학생 계정은 원장이 첫 글을 한 번 승인하기 전까지 새 글이 '검토 중'(쓴 사람·원장만 봄)
+alter table profiles add column if not exists first_ok_at timestamptz;          -- 원장이 첫 글을 승인한 때(그 뒤 글은 바로 공개)
+-- 보호자가 직접 '이야기 끄기'(docs/11 §12-15) — 'write' 쓰기만 끔 · 'all' 쓰기와 읽기 모두 끔. 원장의 이용 제한(talk_until)과는 따로 둔다(서로 덮지 않게)
+alter table profiles add column if not exists guard_talk text check (guard_talk in ('write','all'));
+alter table profiles add column if not exists guard_by   uuid references auth.users(id) on delete set null;
+alter table profiles add column if not exists guard_at   timestamptz;
 
 -- 밤(22~07시) 동안 미룬 댓글 알림 — 아침 7시에 '밤사이 새 댓글이 있어요'로 한 번 보내고 지운다(push 함수 · 서비스 키 전용)
 create table if not exists push_later (
@@ -400,7 +414,8 @@ create or replace function guardian_decide(p_uid uuid, p_code text, p_ok boolean
 begin
   if not is_owner() then raise exception 'owner only' using errcode = '42501'; end if;
   if p_ok then update guardian_links set approved = true, decided_at = now() where uid = p_uid and code = p_code;
-  else delete from guardian_links where uid = p_uid and code = p_code; end if;
+  else delete from guardian_links where uid = p_uid and code = p_code;
+    update profiles set guard_talk = null, guard_by = null, guard_at = null where guard_by = p_uid and student_code = p_code; end if;
 end $$;
 -- 학생: 내 코드에 연결된(확인된) 보호자 — 누가 내 출석·진도를 보는지 학생도 안다
 create or replace function my_guardians() returns json language sql stable security definer set search_path = public as $$
@@ -409,7 +424,9 @@ create or replace function my_guardians() returns json language sql stable secur
    where g.approved and g.code = (select student_code from profiles where id = auth.uid() and role = 'student') $$;
 
 -- 보호자: 자녀 한 명만 연결 해제
+--  그 보호자가 꺼 둔 자녀 이야기 설정도 함께 푼다(연결이 끊긴 보호자의 설정이 남지 않게)
 create or replace function unlink_child(p_code text) returns void language sql security definer set search_path = public as $$
+  update profiles set guard_talk = null, guard_by = null, guard_at = null where guard_by = auth.uid() and student_code = upper(trim(coalesce(p_code, '')));
   delete from guardian_links where uid = auth.uid() and code = upper(trim(coalesce(p_code, ''))) $$;
 
 -- ═══ 출석 ═══
@@ -503,6 +520,24 @@ alter table posts    add column if not exists care boolean not null default fals
 alter table posts add column if not exists deleted_at timestamptz;
 alter table comments add column if not exists deleted_at timestamptz;
 alter table comments add column if not exists care boolean not null default false;
+-- 첫 글 검토: null = 공개 · 'wait' = 검토 중(쓴 사람·원장만 봄) · 'no' = 공개하지 않음(쓴 사람에게 짧은 사유)
+alter table posts add column if not exists review      text check (review in ('wait','no'));
+alter table posts add column if not exists review_why  text not null default '' check (char_length(review_why) <= 40);
+alter table posts add column if not exists reviewed_at timestamptz;
+create index if not exists posts_review_idx on posts (at) where review is not null;
+-- 선생님 확인 답변(docs/11 §12-7) — 원장이 학생 댓글에 다는 표시. 글쓴이의 '채택'과 따로
+alter table comments add column if not exists checked boolean not null default false;
+-- 이 칸들이 생기기 전에 글을 공개해 온 학생은 이미 '첫 글을 지난' 것으로 본다(여러 번 돌려도 같다)
+update profiles p set first_ok_at = now() where p.first_ok_at is null and p.role = 'student'
+   and exists (select 1 from posts x where x.author = p.id and x.review is null and not x.staff);
+-- 욕설·비하 — 앱(ABUSE_SOFT·ABUSE_HARD)과 같은 목록. 1 = 올리기 전에 '친구에게 상처가 될 수 있어요' 한 번 더 묻기(막지 않음) · 2 = 아주 심한 욕(서버도 거절)
+--  과학 용어·일상어를 피한다: 시발점·씨 발라·씹어 먹다·미친 듯이·위기가 닥쳐오다·등신대·애자(절연체)·기생충·고자질·보지 못했다·자지 않고·허리띠를 졸라 —
+--  tools/testbed_security.py '규칙 맞춤'이 같은 문장 묶음을 앱과 서버에 넣어 본다. 아주 심한 욕은 띄어쓰기·점을 빼고 본다(느 금 마)
+create or replace function private.abuse_level(t text) returns int language sql immutable as $$
+  select case
+    when regexp_replace(lower(coalesce(t, '')), '[\s._\-·*]', '', 'g') ~ '(느금|니애미|니에미|니미럴|니미랄|애미(뒤|없|뒈)|애비(뒤|없|뒈)|엠창|좆|씹(새|년|창|할)|창녀)' then 2
+    when lower(coalesce(t, '')) ~ '((?<![가-힣])시발(?!점|역|택시|차)|씨발|씨빨|씨팔|시팔|ㅅㅂ|ㅆㅂ|ㅂㅅ|ㅄ|병신|븅신|빙신|병싄|(?<![가-힣])존나|개새(끼|기|키)|개색(기|히|끼)|개세(끼|기)|개쉐(이|키)|지랄|미친\s*(놈|년|새끼|새기|새키|것|넘)|닥쳐(?!오|올|온|와|옴)|닥치라|또라이|돌아이|등신(?!대)|찐따|썅|틀딱|급식충|한남충|맘충|김치녀|짱깨|쪽바리|(?<![a-z])(fuck|shit|bitch|asshole|wtf))' then 1
+    else 0 end $$;
 -- 개인정보 — 앱(PII_SRC)과 같은 규칙(같은 글자). 앱을 거치지 않고 들어온 글도 서버가 본다(docs/11 §12-3).
 --  주민등록번호 → 거절 · 휴대전화 → 가운데를 가려(010-****-5678) 저장 · 이메일·SNS 아이디·○동 ○호·'○○중 2학년 김○○' → 앱이 올리기 전에 한 번 더 묻는다(닉네임은 모두 거절)
 create or replace function private.pii_hard(t text) returns boolean language sql immutable as $$
@@ -523,6 +558,8 @@ begin
   if tg_table_name = 'posts' then t := coalesce(new.title, '') || ' ' || coalesce(new.body, ''); else t := coalesce(new.body, ''); end if;   -- 댓글에는 제목 칸이 없다
   if private.pii_hard(t) then
     raise exception '주민등록번호로 보이는 내용은 올릴 수 없습니다. 지우고 다시 올려 주세요.' using errcode = '22023'; end if;
+  if not is_owner() and private.abuse_level(t) >= 2 then   -- 아주 심한 욕은 서버도 거절(보통 거친 말은 앱이 한 번 더 묻기만) · 원장 안내 글은 예외
+    raise exception '아주 심한 욕설이 들어 있어 올릴 수 없습니다. 고쳐서 다시 올려 주세요.' using errcode = '22023'; end if;
   if not is_owner() then   -- 학원 연락처를 적는 원장 글은 그대로
     if tg_table_name = 'posts' then new.title := private.pii_mask(new.title); end if;
     new.body := private.pii_mask(new.body); end if;
@@ -536,6 +573,7 @@ create or replace function private.talk_block(u uuid) returns text language sql 
               when p.role = 'owner' and is_owner() then null
               when p.under14 and not p.guardian_ok then 'consent'
               when p.talk_until >= kst_today() then 'limit'
+              when p.guard_talk is not null then 'guardian'   -- 보호자가 끔(원장 제한이 함께 있으면 제한 안내가 먼저 — 이의 제기 길이 보이게)
               when p.role <> 'student' then 'parent'
               when p.pass_until >= kst_today() or exists (select 1 from students s where s.code = p.student_code and s.until >= kst_today()) then null
               else 'member' end
@@ -544,19 +582,27 @@ create or replace function private.talk_msg(b text, u uuid) returns text languag
   select case b
     when 'limit' then (select case when talk_until = 'infinity' then '이야기 쓰기가 멈춰 있습니다. 읽기는 그대로 할 수 있어요.'
                                    else '이야기 쓰기가 ' || to_char(talk_until, 'FMMM"월" FMDD"일"') || '까지 쉬는 중입니다. 읽기는 그대로 할 수 있어요.' end from profiles where id = u)
+    when 'guardian' then (select case when guard_talk = 'all' then '보호자와 정한 대로 이야기를 잠시 쉬고 있어요.'
+                                      else '보호자와 정한 대로 이야기 쓰기를 잠시 쉬고 있어요. 읽기는 그대로 할 수 있어요.' end from profiles where id = u)
     when 'parent'  then '보호자 계정은 이야기를 읽기만 할 수 있습니다.'
     when 'member'  then '이야기 글쓰기는 학원 코드나 이용권을 등록한 계정에서 할 수 있습니다.'
     when 'consent' then '보호자 동의가 끝난 뒤에 쓸 수 있습니다.'
     else '로그인이 필요합니다.' end $$;
 create or replace function talk_ok() returns boolean language sql stable security definer set search_path = public, private as $$
   select private.talk_block(auth.uid()) is null $$;
+-- 이야기를 읽어도 되는가 — 보호자가 '읽기까지 끔'이면 아니다(원장 · 보통 학생 · 보호자 계정은 된다). 읽기 정책이 부른다
+create or replace function talk_read_ok() returns boolean language sql stable security definer set search_path = public as $$
+  select not exists (select 1 from profiles where id = auth.uid() and guard_talk = 'all') $$;
+revoke execute on function talk_read_ok() from public, anon; grant execute on function talk_read_ok() to authenticated;
 -- 내 이야기 상태(앱이 글쓰기 단추 대신 차분한 안내를 그릴 때) — 제한이면 언제까지·사유, 이의 제기 기한(제한 뒤 7일, 약관 제8조의3 ④)
 create or replace function my_talk() returns json language sql stable security definer set search_path = public, private as $$
   select json_build_object('ok', b is null, 'block', b, 'msg', case when b is null then null else private.talk_msg(b, auth.uid()) end,
            'until', case when b = 'limit' then (select case when talk_until = 'infinity' then 'stop' else talk_until::text end from profiles where id = auth.uid()) end,
            'reason', case when b = 'limit' then (select nullif(talk_reason, '') from profiles where id = auth.uid()) end,
-           'appeal_until', case when b = 'limit' then (select (at at time zone 'Asia/Seoul')::date + 7 from talk_log where uid = auth.uid() and action <> 'lift' order by at desc limit 1) end,
-           'guardian', case when b = 'limit' then coalesce((select guardian from talk_log where uid = auth.uid() and action <> 'lift' order by at desc limit 1), false) end)   -- 보호자 요청이면 이의 제기 대신 '보호자와 이야기'
+           'appeal_until', case when b = 'limit' then (select (at at time zone 'Asia/Seoul')::date + 7 from talk_log where uid = auth.uid() and action in ('d7','d30','stop') order by at desc limit 1) end,
+           'guardian', case when b = 'limit' then coalesce((select guardian from talk_log where uid = auth.uid() and action in ('d7','d30','stop') order by at desc limit 1), false) end,   -- 보호자 요청이면 이의 제기 대신 '보호자와 이야기'
+           'read', talk_read_ok(),                                                     -- false = 보호자가 읽기까지 꺼 둠(목록 대신 차분한 안내)
+           'review', (select role = 'student' and first_ok_at is null from profiles where id = auth.uid()))   -- 다음 글이 첫 글 검토를 거치는가(쓰기 창에 한 줄)
     from (select private.talk_block(auth.uid()) as b) z $$;
 -- 제한 중·읽기 전용 계정은 지금 글을 고치지도 못한다(지우기는 된다)
 create or replace function private.talk_edit_guard() returns trigger language plpgsql security definer set search_path = public, private as $$
@@ -565,7 +611,8 @@ begin
   if auth.uid() is null or is_owner() then return new; end if;
   if new.title is distinct from old.title or new.body is distinct from old.body or new.attach is distinct from old.attach or new.board is distinct from old.board then
     b := private.talk_block(auth.uid());
-    if b is not null then raise exception '%', private.talk_msg(b, auth.uid()) using errcode = '42501'; end if; end if;
+    if b is not null then raise exception '%', private.talk_msg(b, auth.uid()) using errcode = '42501'; end if;
+    if old.review = 'no' then new.review := 'wait'; new.review_why := ''; new.reviewed_at := null; end if; end if;   -- 공개하지 않은 첫 글을 고치면 다시 검토로
   return new;
 end $$;
 drop trigger if exists posts_talk_guard on posts; create trigger posts_talk_guard before update on posts for each row execute function private.talk_edit_guard();
@@ -582,7 +629,9 @@ begin
   new.likes := '{}'; new.report_n := 0; new.deleted := false; new.at := now();
   if tg_table_name = 'posts' then
     new.care := private.care_hit(coalesce(new.title, '') || ' ' || coalesce(new.body, ''));
-    new.comment_n := 0; new.solved := false;
+    new.comment_n := 0; new.solved := false; new.review_why := ''; new.reviewed_at := null;
+    -- 첫 글 검토: 원장이 아직 첫 글을 승인하지 않은 학생 계정의 글은 '검토 중'으로(쓴 사람·원장만 봄). 댓글은 바로 공개(속도 제한만)
+    new.review := case when not is_owner() and exists (select 1 from profiles where id = new.author and role = 'student' and first_ok_at is null) then 'wait' end;
     select count(*) into n from posts where author = new.author and at > now() - interval '10 minutes';
     if n >= 5 and not is_owner() then raise exception '글은 10분에 5개까지 올릴 수 있습니다. 잠시 뒤에 올려 주세요.' using errcode = 'P0001'; end if;
   else
@@ -646,8 +695,9 @@ declare u uuid := auth.uid();
 begin
   if u is null then raise exception '로그인이 필요합니다' using errcode = '42501'; end if;
   if not talk_ok() then raise exception '%', private.talk_msg(private.talk_block(u), u) using errcode = '42501'; end if;   -- 도움됨도 '쓰기' — 보호자·손님·제한 중에는 읽기만
-  if p_kind = 'post' then update posts set likes = case when u = any(likes) then array_remove(likes, u) else likes || u end where id = p_id and not deleted and report_n < 3;
-  else update comments set likes = case when u = any(likes) then array_remove(likes, u) else likes || u end where id = p_id and not deleted and report_n < 3; end if;
+  if p_kind = 'post' then update posts set likes = case when u = any(likes) then array_remove(likes, u) else likes || u end where id = p_id and not deleted and report_n < 3 and review is null;   -- 검토 중인 첫 글은 아직 남에게 안 보인다
+  else update comments c set likes = case when u = any(likes) then array_remove(likes, u) else likes || u end where id = p_id and not deleted and report_n < 3
+         and exists (select 1 from posts p where p.id = c.post_id and not p.deleted and p.review is null); end if;
 end $$;
 -- 신고 — 사유를 고른다. 가림(3건)은 '열린' 신고 중 걱정돼요를 뺀 것만 센다(private.recount)
 drop function if exists report_item(text, uuid);
@@ -664,7 +714,7 @@ begin
     raise exception '가입하고 하루가 지나면 신고할 수 있습니다. 급한 일은 내 정보 › 의견 보내기로 원장님께 알려 주세요.' using errcode = 'P0001'; end if;
   if (select count(*) from private.attempts where uid = u and kind = 'report' and at > now() - interval '1 day') >= 20 then
     raise exception '오늘은 신고를 너무 많이 했습니다. 원장님께 직접 알려 주세요.' using errcode = '54000'; end if;
-  if p_kind = 'post' then select author, staff into au, stf from posts where id = p_id and not deleted; pid := p_id;
+  if p_kind = 'post' then select author, staff into au, stf from posts where id = p_id and not deleted and (review is null or is_owner()); pid := p_id;   -- 검토 중인 첫 글은 남에게 안 보인다
   elsif p_kind = 'comment' then select author, staff into au, stf from comments where id = p_id and not deleted; cid := p_id;
   else raise exception '잘못된 요청입니다.' using errcode = '22023'; end if;
   if au is null then return json_build_object('ok', false, 'why', '지워졌거나 없는 글입니다.'); end if;
@@ -678,15 +728,18 @@ begin
   n := private.recount(pid, cid);
   return json_build_object('ok', true, 'n', n, 'hidden', n >= 3, 'worry', w);
 end $$;
--- 신고 수(가림 기준) = 열린 신고 중 걱정돼요를 뺀 수
+-- 신고가 자주 되돌려진 계정(30일에 '그대로 둠' 3번 이상, docs/11 §12-8) — 그 사람의 열린 신고는 가림 수에 넣지 않고 원장 목록에만 보인다
+create or replace function private.rep_muted(u uuid) returns boolean language sql stable security definer set search_path = public as $$
+  select (select count(*) from reports where uid = u and state = 'kept' and reason <> 'worry' and resolved_at > now() - interval '30 days') >= 3 $$;
+-- 신고 수(가림 기준) = 열린 신고 중 걱정돼요와 '신고가 자주 되돌려진 계정'의 것을 뺀 수
 create or replace function private.recount(p_post uuid, p_comment uuid) returns int language plpgsql security definer set search_path = public as $$
 declare n int;
 begin
   if p_post is not null then
-    select count(*) into n from reports where post_id = p_post and state = 'open' and reason <> 'worry';
+    select count(*) into n from reports r where r.post_id = p_post and r.state = 'open' and r.reason <> 'worry' and not private.rep_muted(r.uid);
     update posts set report_n = n where id = p_post and report_n is distinct from n;
   else
-    select count(*) into n from reports where comment_id = p_comment and state = 'open' and reason <> 'worry';
+    select count(*) into n from reports r where r.comment_id = p_comment and r.state = 'open' and r.reason <> 'worry' and not private.rep_muted(r.uid);
     update comments set report_n = n where id = p_comment and report_n is distinct from n;
   end if;
   return coalesce(n, 0);
@@ -710,11 +763,20 @@ end $$;
 drop trigger if exists posts_reports_done on posts;       create trigger posts_reports_done    after update of deleted on posts    for each row execute function private.reports_on_delete();
 drop trigger if exists comments_reports_done on comments; create trigger comments_reports_done after update of deleted on comments for each row execute function private.reports_on_delete();
 -- 원장: 잘못된 신고 되돌리기(가려진 글·댓글을 다시 보이게) — 그 신고들은 '그대로 둠'으로 끝나고, 같은 학생이 다시 눌러도 다시 가려지지 않는다
+--  처리 기록(keep)을 남기고, 이번 일로 '신고가 자주 되돌려진 계정'이 된 사람의 다른 열린 신고도 가림 수에서 뺀다
 create or replace function clear_reports(p_kind text, p_id uuid) returns void language plpgsql security definer set search_path = public, private as $$
+declare n int; au uuid; who uuid[];
 begin
   if not is_owner() then raise exception 'owner only' using errcode = '42501'; end if;
-  if p_kind = 'post' then update reports set state = 'kept', resolved_at = now() where post_id = p_id and state = 'open' and reason <> 'worry';
-  else update reports set state = 'kept', resolved_at = now() where comment_id = p_id and state = 'open' and reason <> 'worry'; end if;
+  if p_kind = 'post' then
+    with x as (update reports set state = 'kept', resolved_at = now() where post_id = p_id and state = 'open' and reason <> 'worry' returning uid) select array_agg(uid) into who from x;
+    select author into au from posts where id = p_id;
+  else
+    with x as (update reports set state = 'kept', resolved_at = now() where comment_id = p_id and state = 'open' and reason <> 'worry' returning uid) select array_agg(uid) into who from x;
+    select author into au from comments where id = p_id; end if;
+  if who is null then return; end if;
+  if au is not null then insert into talk_log(uid, action, actor, target) values (au, 'keep', auth.uid(), p_kind || ':' || p_id); end if;
+  perform private.recount(r.post_id, r.comment_id) from (select distinct post_id, comment_id from reports where state = 'open' and uid = any(who)) r;
 end $$;
 -- 원장: '친구가 걱정돼요'를 살펴봤다(먼저 살펴볼 목록에서 내려감 · 신고한 학생에게 '원장님이 살펴봤어요')
 create or replace function care_done(p_kind text, p_id uuid) returns void language plpgsql security definer set search_path = public as $$
@@ -730,12 +792,14 @@ begin
   return coalesce((select json_agg(x order by x.report_n desc, x.at desc) from (
     select 'post' as kind, p.id, p.id as post_id, p.title, left(p.body, 140) as body, p.nick, p.author as uid, p.at, p.report_n,
            (select json_object_agg(reason, n) from (select reason, count(*) as n from reports r where r.post_id = p.id and r.state = 'open' and r.reason <> 'worry' group by reason) z) as reasons,
-           (select count(*) from reports r where r.post_id = p.id and r.state = 'kept' and r.reason <> 'worry') as kept
+           (select count(*) from reports r where r.post_id = p.id and r.state = 'kept' and r.reason <> 'worry') as kept,
+           (select count(*) from reports r where r.post_id = p.id and r.state = 'open' and r.reason <> 'worry' and private.rep_muted(r.uid)) as muted
       from posts p where not p.deleted and exists (select 1 from reports r where r.post_id = p.id and r.state = 'open' and r.reason <> 'worry')
     union all
     select 'comment', c.id, c.post_id, null, left(c.body, 140), c.nick, c.author, c.at, c.report_n,
            (select json_object_agg(reason, n) from (select reason, count(*) as n from reports r where r.comment_id = c.id and r.state = 'open' and r.reason <> 'worry' group by reason) z),
-           (select count(*) from reports r where r.comment_id = c.id and r.state = 'kept' and r.reason <> 'worry')
+           (select count(*) from reports r where r.comment_id = c.id and r.state = 'kept' and r.reason <> 'worry'),
+           (select count(*) from reports r where r.comment_id = c.id and r.state = 'open' and r.reason <> 'worry' and private.rep_muted(r.uid))
       from comments c where not c.deleted and exists (select 1 from reports r where r.comment_id = c.id and r.state = 'open' and r.reason <> 'worry')) x), '[]'::json);
 end $$;
 -- 신고한 사람: 원장이 처리한 내 신고(아직 안 본 것) · 봤다고 표시. 글 내용은 주지 않는다
@@ -759,21 +823,112 @@ begin
   t := case p_days when 0 then null when -1 then 'infinity'::date else kst_today() + p_days end;
   a := case p_days when 0 then 'lift' when -1 then 'stop' when 7 then 'd7' else 'd30' end;
   update profiles set talk_until = t, talk_reason = case when p_days = 0 then '' else left(trim(coalesce(p_reason, '')), 40) end where id = u;
-  insert into talk_log(uid, action, reason, memo, guardian, until) values (u, a, left(trim(coalesce(p_reason, '')), 40), left(trim(coalesce(p_memo, '')), 300), coalesce(p_guardian, false), t);
+  insert into talk_log(uid, action, reason, memo, guardian, until, actor) values (u, a, left(trim(coalesce(p_reason, '')), 40), left(trim(coalesce(p_memo, '')), 300), coalesce(p_guardian, false), t, auth.uid());
   return json_build_object('ok', true, 'until', t);
 end $$;
--- 원장: 지금 제한 중인 학생 + 최근 처리 기록 30건(누가 · 언제 · 무엇을 · 메모)
+-- 원장: 지금 제한 중인 학생 · 보호자가 이야기를 꺼 둔 학생 · 최근 30일 처리 기록(누가 · 언제 · 무엇을 · 메모 — 지우기·신고 되돌리기·첫 글 승인·선생님 확인 포함)
 create or replace function talk_limits() returns json language plpgsql stable security definer set search_path = public as $$
 begin
-  if not is_owner() then return json_build_object('active', '[]'::json, 'log', '[]'::json); end if;
+  if not is_owner() then return json_build_object('active', '[]'::json, 'log', '[]'::json, 'guard', '[]'::json); end if;
   return json_build_object(
     'active', coalesce((select json_agg(x order by x.until) from (
         select p.id as uid, p.name, p.student_code as code, p.nick, p.role, p.talk_until as until, p.talk_reason as reason, l.memo, l.guardian, l.at as since
-          from profiles p left join lateral (select memo, guardian, at from talk_log where uid = p.id order by at desc limit 1) l on true
+          from profiles p left join lateral (select memo, guardian, at from talk_log where uid = p.id and action in ('d7','d30','stop') order by at desc limit 1) l on true
          where p.talk_until >= kst_today()) x), '[]'::json),
+    'guard', coalesce((select json_agg(x order by x.at desc) from (
+        select p.id as uid, p.name, p.student_code as code, p.nick, p.guard_talk as mode, p.guard_at as at, g.name as by_name
+          from profiles p left join profiles g on g.id = p.guard_by where p.guard_talk is not null) x), '[]'::json),
     'log', coalesce((select json_agg(x order by x.at desc) from (
-        select l.uid, l.at, l.action, l.reason, l.memo, l.guardian, l.until, p.name, p.nick, p.student_code as code
-          from talk_log l join profiles p on p.id = l.uid order by l.at desc limit 30) x), '[]'::json));
+        select l.uid, l.at, l.action, l.reason, l.memo, l.guardian, l.until, l.target, p.name, p.nick, p.student_code as code,
+               a.name as actor_name, a.role as actor_role,
+               case when l.target like 'post:%' then (select left(title, 40) from posts where id = substr(l.target, 6)::uuid)
+                    when l.target like 'comment:%' then (select left(body, 40) from comments where id = substr(l.target, 9)::uuid) end as what
+          from talk_log l join profiles p on p.id = l.uid left join profiles a on a.id = l.actor
+         where l.at > now() - interval '30 days' order by l.at desc limit 300) x), '[]'::json));
+end $$;
+-- ═══ 첫 글 검토(docs/11 §12-6) — 원장: 검토할 글 목록 · 승인(공개 + 그 학생의 다음 글부터 바로 공개) · 공개하지 않음(쓴 사람에게 짧은 사유) ═══
+create or replace function review_list() returns json language plpgsql stable security definer set search_path = public as $$
+begin
+  if not is_owner() then return '[]'::json; end if;
+  return coalesce((select json_agg(x order by x.at) from (
+    select p.id, p.board, p.title, left(p.body, 300) as body, p.nick, p.at, p.care, p.attach, p.author as uid, pr.name, pr.student_code as code, pr.created_at as joined,
+           (select count(*) from posts q where q.author = p.author and q.review = 'no' and not q.deleted) as rejected
+      from posts p join profiles pr on pr.id = p.author where p.review = 'wait' and not p.deleted order by p.at limit 100) x), '[]'::json);
+end $$;
+create or replace function review_post(p_id uuid, p_ok boolean, p_why text default '') returns json language plpgsql security definer set search_path = public as $$
+declare p posts; w text := left(trim(coalesce(p_why, '')), 40);
+begin
+  if not is_owner() then raise exception 'owner only' using errcode = '42501'; end if;
+  select * into p from posts where id = p_id and not deleted and review = 'wait' for update;
+  if not found then return json_build_object('ok', false, 'why', '이미 처리했거나 지워진 글입니다.'); end if;
+  if coalesce(p_ok, false) then
+    update posts set review = null, review_why = '', reviewed_at = now() where id = p_id;
+    update profiles set first_ok_at = now() where id = p.author and first_ok_at is null;
+    insert into talk_log(uid, action, actor, target) values (p.author, 'approve', auth.uid(), 'post:' || p_id);
+  else
+    if w = '' then w := '이야기 규칙에 맞지 않아요'; end if;
+    update posts set review = 'no', review_why = w, reviewed_at = now() where id = p_id;
+    insert into talk_log(uid, action, reason, actor, target) values (p.author, 'reject', w, auth.uid(), 'post:' || p_id);
+  end if;
+  return json_build_object('ok', true);
+end $$;
+-- ═══ 선생님 확인 답변(docs/11 §12-7) — 원장이 학생 댓글에 '선생님 확인'(초록 체크, 댓글 맨 위로). 글쓴이의 채택과 따로 ═══
+create or replace function check_comment(p_id uuid, p_on boolean default true) returns json language plpgsql security definer set search_path = public as $$
+declare c comments;
+begin
+  if not is_owner() then raise exception 'owner only' using errcode = '42501'; end if;
+  select * into c from comments where id = p_id and not deleted;
+  if not found then return json_build_object('ok', false, 'why', '지워졌거나 없는 댓글입니다.'); end if;
+  if c.staff then return json_build_object('ok', false, 'why', '선생님 댓글에는 이미 선생님 표시가 있습니다.'); end if;
+  update comments set checked = coalesce(p_on, true) where id = p_id and checked is distinct from coalesce(p_on, true);
+  if found then insert into talk_log(uid, action, actor, target) values (c.author, case when coalesce(p_on, true) then 'check' else 'uncheck' end, auth.uid(), 'comment:' || p_id); end if;
+  return json_build_object('ok', true, 'checked', coalesce(p_on, true));
+end $$;
+-- 원장: 답이 없는 질문 — 질문 게시판 · 48시간이 지났는데 글쓴이 말고는 아무도 답하지 않음 · 해결 안 됨 · 30일 안(주간 확인용, docs/11 §0)
+create or replace function unanswered_list() returns json language plpgsql stable security definer set search_path = public as $$
+begin
+  if not is_owner() then return '[]'::json; end if;
+  return coalesce((select json_agg(x order by x.at) from (
+    select p.id, p.title, left(p.body, 100) as body, p.nick, p.at, pr.name, pr.student_code as code
+      from posts p join profiles pr on pr.id = p.author
+     where p.board = 'qna' and not p.deleted and p.review is null and not p.solved and not p.staff and p.report_n < 3
+       and p.at < now() - interval '48 hours' and p.at > now() - interval '30 days'
+       and not exists (select 1 from comments c where c.post_id = p.id and not c.deleted and c.author <> p.author)
+     order by p.at limit 50) x), '[]'::json);
+end $$;
+-- 원장: 신고가 자주 되돌려진 계정(30일에 3번 이상) — 이 사람의 신고는 지금 가림 수에 들어가지 않는다
+create or replace function muted_reporters() returns json language plpgsql stable security definer set search_path = public, private as $$
+begin
+  if not is_owner() then return '[]'::json; end if;
+  return coalesce((select json_agg(x order by x.kept desc) from (
+    select r.uid, pr.name, pr.nick, pr.student_code as code, count(*) as kept, max(r.resolved_at) as last,
+           (select count(*) from reports o where o.uid = r.uid and o.state = 'open' and o.reason <> 'worry') as open
+      from reports r join profiles pr on pr.id = r.uid
+     where r.state = 'kept' and r.reason <> 'worry' and r.resolved_at > now() - interval '30 days'
+     group by r.uid, pr.name, pr.nick, pr.student_code having count(*) >= 3) x), '[]'::json);
+end $$;
+-- ═══ 보호자가 직접 '이야기 끄기'(docs/11 §12-15, 약관 제8조의3 ②) — 확인된(원장 승인) 보호자만, 자기 자녀만 ═══
+--  p_mode: 'on' 켜기 · 'write' 쓰기만 끄기(읽기는 됨) · 'all' 쓰기와 읽기 모두 끄기. 원장이 건 이용 제한과는 따로라 서로 덮지 않는다
+create or replace function child_talk(p_code text) returns json language plpgsql stable security definer set search_path = public as $$
+declare c text := upper(trim(coalesce(p_code, ''))); s profiles;
+begin
+  if not exists (select 1 from guardian_links where uid = auth.uid() and code = c and approved) then return json_build_object('ok', false, 'why', '연결된 자녀가 아닙니다.'); end if;
+  select * into s from profiles where student_code = c and role = 'student';
+  if not found then return json_build_object('ok', true, 'linked', false); end if;
+  return json_build_object('ok', true, 'linked', true, 'mode', s.guard_talk, 'at', s.guard_at, 'mine', s.guard_by = auth.uid(),
+    'by', (select name from profiles where id = s.guard_by), 'limit', s.talk_until >= kst_today());
+end $$;
+create or replace function guardian_talk(p_code text, p_mode text) returns json language plpgsql security definer set search_path = public as $$
+declare c text := upper(trim(coalesce(p_code, ''))); s profiles; m text := nullif(p_mode, 'on');
+begin
+  if p_mode is null or p_mode not in ('on','write','all') then return json_build_object('ok', false, 'why', '잘못된 요청입니다.'); end if;
+  if not exists (select 1 from guardian_links where uid = auth.uid() and code = c and approved) then return json_build_object('ok', false, 'why', '원장님이 확인한 자녀만 설정할 수 있습니다.'); end if;
+  select * into s from profiles where student_code = c and role = 'student' for update;
+  if not found then return json_build_object('ok', false, 'why', '자녀가 아직 앱에 학원 코드를 등록하지 않았습니다. 등록한 뒤에 설정할 수 있어요.'); end if;
+  if s.guard_talk is not distinct from m then return json_build_object('ok', true, 'mode', m); end if;
+  update profiles set guard_talk = m, guard_by = case when m is null then null else auth.uid() end, guard_at = case when m is null then null else now() end where id = s.id;
+  insert into talk_log(uid, action, guardian, actor) values (s.id, 'g_' || p_mode, true, auth.uid());
+  return json_build_object('ok', true, 'mode', m);
 end $$;
 create or replace function pick_comment(p_post uuid, p_comment uuid) returns void language plpgsql security definer set search_path = public as $$
 begin
@@ -798,6 +953,7 @@ begin
   -- 남의 글에 남은 내 흔적도 지운다 — 도움됨은 여기서, 신고는 계정과 함께 연쇄 삭제되고 신고 수가 다시 맞춰진다(탈퇴한 계정의 신고로 글이 계속 가려지지 않게)
   update posts set likes = array_remove(likes, u) where u = any(likes);
   update comments set likes = array_remove(likes, u) where u = any(likes);
+  update profiles set guard_talk = null, guard_by = null, guard_at = null where guard_by = u;   -- 보호자가 탈퇴하면 그가 꺼 둔 자녀 이야기도 다시 켠다
   delete from client_errors where uid = u; delete from private.attempts where uid = u; delete from private.consent_links where uid = u;
   delete from progress where code = 'u:' || u::text;
   delete from progress where code = (select student_code from profiles where id = u);
@@ -909,8 +1065,8 @@ grant insert (id, role, name, phone, under14, guardian, terms_ver) on profiles t
 grant update (name, phone, nick) on profiles to authenticated;
 
 revoke select, insert, update on posts, comments from anon, authenticated;
-grant select (id, author, nick, board, title, body, attach, likes, report_n, comment_n, staff, solved, deleted, at, edited, care) on posts to authenticated;
-grant select (id, post_id, author, nick, body, likes, report_n, staff, picked, deleted, at, care) on comments to authenticated;
+grant select (id, author, nick, board, title, body, attach, likes, report_n, comment_n, staff, solved, deleted, at, edited, care, review, review_why) on posts to authenticated;
+grant select (id, post_id, author, nick, body, likes, report_n, staff, picked, deleted, at, care, checked) on comments to authenticated;
 grant insert (board, title, body, attach) on posts to authenticated;
 grant insert (post_id, body) on comments to authenticated;
 grant update (board, title, body, attach, edited, deleted) on posts to authenticated;
@@ -919,9 +1075,11 @@ grant update (deleted) on comments to authenticated;
 revoke all on purchases from anon, authenticated; grant select on purchases to authenticated;
 revoke all on reports, talk_log, push_later from anon, authenticated;   -- 신고·제한 기록·밤 알림은 함수로만(누가 신고했는지 API 로 안 보인다)
 revoke execute on function report_item(text, uuid, text), clear_reports(text, uuid), care_done(text, uuid), reported_list(), my_reports(), my_reports_seen(),
-  talk_limit(uuid, int, text, text, boolean, text), talk_limits(), talk_ok(), my_talk() from public, anon;
+  talk_limit(uuid, int, text, text, boolean, text), talk_limits(), talk_ok(), my_talk(),
+  review_list(), review_post(uuid, boolean, text), check_comment(uuid, boolean), unanswered_list(), muted_reporters(), child_talk(text), guardian_talk(text, text) from public, anon;
 grant execute on function report_item(text, uuid, text), clear_reports(text, uuid), care_done(text, uuid), reported_list(), my_reports(), my_reports_seen(),
-  talk_limit(uuid, int, text, text, boolean, text), talk_limits(), talk_ok(), my_talk() to authenticated;   -- 원장 함수는 안에서 원장만 결과를 받는다
+  talk_limit(uuid, int, text, text, boolean, text), talk_limits(), talk_ok(), my_talk(),
+  review_list(), review_post(uuid, boolean, text), check_comment(uuid, boolean), unanswered_list(), muted_reporters(), child_talk(text), guardian_talk(text, text) to authenticated;   -- 원장 함수는 안에서 원장만 결과를 받는다 · 보호자 함수는 안에서 확인된 자녀만
 revoke all on push_tokens from anon, authenticated; grant select, delete on push_tokens to authenticated;
 revoke all on feedback from anon, authenticated; grant select, insert (kind, body, ref, ver) on feedback to authenticated;
 grant usage on sequence feedback_id_seq to authenticated;
@@ -1000,10 +1158,12 @@ create policy note_del on notes for delete to authenticated using (uid = (select
 create policy fb_sel on feedback for select to authenticated using (uid = (select auth.uid()));
 create policy fb_ins on feedback for insert to authenticated with check (uid = (select auth.uid()) and (select consent_ok()));
 -- 이야기: 로그인한 사람은 지워지지 않았고 신고 3건 미만인 글을 본다(자기 글은 늘 보인다). 자기 글만 고치고 지운다(되살리기는 안 됨)
-create policy read_posts on posts for select to authenticated using (not deleted and (report_n < 3 or author = (select auth.uid())) and (select consent_ok()));
+create policy read_posts on posts for select to authenticated using (not deleted and (report_n < 3 or author = (select auth.uid())) and (select consent_ok())
+  and (review is null or author = (select auth.uid()))   -- 검토 중·공개하지 않은 첫 글은 쓴 사람만(원장은 owner_all)
+  and (select talk_read_ok()));                          -- 보호자가 읽기까지 꺼 두면 안 보인다
 create policy write_posts on posts for insert to authenticated with check (author = (select auth.uid()) and (select consent_ok()) and (select talk_ok()));   -- 보호자·손님·이용 제한 중은 못 쓴다
 create policy edit_posts on posts for update to authenticated using (author = (select auth.uid()) and not deleted) with check (author = (select auth.uid()));
-create policy read_comments on comments for select to authenticated using (not deleted and (report_n < 3 or author = (select auth.uid())) and (select consent_ok())
+create policy read_comments on comments for select to authenticated using (not deleted and (report_n < 3 or author = (select auth.uid())) and (select consent_ok()) and (select talk_read_ok())
   and exists (select 1 from posts p where p.id = post_id));   -- 가려진 글의 댓글도 가린다(글 정책이 그대로 걸림)
 create policy write_comments on comments for insert to authenticated
   with check (author = (select auth.uid()) and (select consent_ok()) and (select talk_ok()) and exists (select 1 from posts p where p.id = post_id and not p.deleted));
@@ -1020,6 +1180,8 @@ begin
       raise exception '선생님·원장·관리자로 보이는 닉네임은 쓸 수 없습니다.' using errcode = 'P0001'; end if;
     if cardinality(private.pii_kinds(coalesce(new.nick, ''))) > 0 then
       raise exception '닉네임에 연락처나 아이디를 넣지 마세요.' using errcode = 'P0001'; end if;
+    if private.abuse_level(new.nick) >= 1 then   -- 닉네임은 계속 보이므로 거친 말도 안 된다(글은 한 번 더 묻기만)
+      raise exception '닉네임에 욕설이나 남을 낮추는 말은 쓸 수 없습니다.' using errcode = 'P0001'; end if;
   end if;
   return new;
 end $$;
@@ -1041,7 +1203,9 @@ create or replace function private.purge_old() returns void language sql securit
   delete from comments where deleted and deleted_at < now() - interval '6 months';
   delete from posts where deleted and deleted_at < now() - interval '6 months';
   delete from reports where state <> 'open' and resolved_at < now() - interval '6 months';   -- 처리 끝난 신고 기록 6개월(처리방침 3③)
-  delete from talk_log where at < now() - interval '6 months';                               -- 이용 제한 기록 6개월
+  delete from talk_log where at < now() - interval '6 months';                               -- 처리 기록(이용 제한·지우기·신고 되돌리기·첫 글 승인·선생님 확인·보호자 끄기) 6개월
+  delete from posts where review = 'no' and reviewed_at < now() - interval '6 months';      -- 공개하지 않은 첫 글도 6개월 뒤(쓴 사람이 먼저 지우면 지운 글 규칙대로)
+  select private.recount(post_id, comment_id) from (select distinct post_id, comment_id from reports where state = 'open') x;   -- 30일이 지나 '자주 되돌려진 계정'에서 벗어난 신고를 다시 센다
   update profiles set talk_until = null, talk_reason = '' where talk_until < kst_today();   -- 끝난 제한은 사유까지 지운다
   delete from push_later where at < now() - interval '2 days';                               -- 못 보낸 밤 알림(보통은 아침에 보내고 바로 지운다)
   delete from auth.users where id in (select id from profiles where under14 and not guardian_ok
@@ -1067,9 +1231,13 @@ end $$;
 drop trigger if exists client_errors_cap on client_errors;
 create trigger client_errors_cap before insert on client_errors for each row execute function private.errors_cap();
 -- 지운 글·댓글은 6개월 뒤 실제로 지운다(처리방침 3③) — 지운 시각을 서버가 적는다
+--  원장이 남의 글·댓글을 지우면 처리 기록(del)도 남긴다(앱의 delete_item 이든 원장 직접 수정이든)
 create or replace function private.mark_deleted() returns trigger language plpgsql security definer set search_path = public as $$
 begin
-  if new.deleted and not coalesce(old.deleted, false) then new.deleted_at := now(); end if;
+  if new.deleted and not coalesce(old.deleted, false) then new.deleted_at := now();
+    if auth.uid() is not null and new.author <> auth.uid() and is_owner() then
+      insert into talk_log(uid, action, actor, target) values (new.author, 'del', auth.uid(), case when tg_table_name = 'posts' then 'post:' else 'comment:' end || new.id); end if;
+  end if;
   return new;
 end $$;
 drop trigger if exists posts_deleted_at on posts;
@@ -1098,6 +1266,7 @@ begin
   if u = auth.uid() then return json_build_object('ok', false, 'why', '원장 계정은 여기서 지울 수 없습니다.'); end if;
   update posts set likes = array_remove(likes, u) where u = any(likes);
   update comments set likes = array_remove(likes, u) where u = any(likes);   -- 신고는 계정과 함께 연쇄 삭제(신고 수는 트리거가 다시 맞춘다)
+  update profiles set guard_talk = null, guard_by = null, guard_at = null where guard_by = u;
   delete from progress where code = 'u:' || u::text;
   delete from progress where code = (select student_code from profiles where id = u);
   delete from client_errors where uid = u; delete from private.attempts where uid = u; delete from private.consent_links where uid = u;
