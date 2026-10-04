@@ -373,13 +373,22 @@ SENT = ['제 번호 010-1234-5678 로 연락', '01012345678로 문자', '010 123
         '죽고 싶다', '세포 자살(아폽토시스)', '세포의 자살', '자살 예방 포스터', '자살률 통계', '유서 깊은 실험', '유서를 썼어', '자해하고 싶어',
         '시험 망해서 뒤지고 싶다', '서랍을 뒤져 보니', '이번엔 진짜 죽어야겠다', '배고파 죽겠다', '태어나지 말았어야 했어', '살 의미가 없어', '살기 싫어', '그만 살고 싶어',
         '수학쌤', '선 생 님', 'ADMIN_박', 'Teacher', '운영진', '과학러버', '원장', '관리', 'staff1', '물리하는가', '매니저', 'o.f.f.i.c.i.a.l']
-_js = _blk + "\nconst out = " + json.dumps(SENT, ensure_ascii=False) + ".map(t => ({ k: PII.filter(([re]) => re.test(t)).map(x => x[3]), c: careCheck(t), n: nickBad(t), m: piiMask(t) }));\nprocess.stdout.write(JSON.stringify(out));"
+# 욕설·비하(docs/11 §12-14): 0 = 그냥 · 1 = 한 번 더 묻기 · 2 = 서버도 거절. 과학 용어·일상어 오탐을 함께 본다
+ABUSE = {'아 씨발 망했다': 1, 'ㅅㅂ 진짜': 1, '병신같이': 1, '존나 어렵다': 1, '개새끼': 1, '지랄하네': 1, '미친놈아': 1, '닥쳐': 1, '등신아': 1, '찐따': 1, '급식충': 1, 'Fuck this': 1, 'WTF': 1, '썅': 1,
+         '느금마': 2, '느 금 마': 2, '니애미': 2, '니.애.미': 2, '좆같네': 2, '씹새끼': 2, '애미 없는': 2, '엠창': 2,
+         '벡터의 시발점': 0, '시발역에서 출발': 0, '수박 씨 발라 먹기': 0, '음식을 씹어 먹으면 소화가 잘 된다': 0, '미친 듯이 공부했다': 0, '위기가 닥쳐온다': 0, '닥쳐올 시험': 0,
+         '등신대 판넬': 0, '전기 애자는 절연체': 0, '기생충과 곤충': 0, '고자질하지 마': 0, '보지 못했다': 0, '잠을 자지 못했다': 0, '허리띠를 졸라 맨다': 0, '보존나무': 0,
+         '개의 새끼는 강아지': 0, '살이 찐다': 0, '호모 사피엔스': 0, '자위권': 0, '시발점탐험': 0, 'shift 키': 0, '니 엄마가 부르셔': 0}
+SENT += list(ABUSE)
+_js = _blk + "\nconst out = " + json.dumps(SENT, ensure_ascii=False) + ".map(t => ({ k: PII.filter(([re]) => re.test(t)).map(x => x[3]), c: careCheck(t), n: nickBad(t), m: piiMask(t), a: abuseLevel(t) }));\nprocess.stdout.write(JSON.stringify(out));"
 _app = json.loads(_sp.run(['node', '-e', _js], capture_output=True, text=True, check=True).stdout)
 _bad = []
 for t, a in zip(SENT, _app):
-    cur.execute('select private.pii_kinds(%s), private.care_hit(%s), private.nick_bad(%s), private.pii_mask(%s)', (t, t, t, t)); k, c, n, m = cur.fetchone()
-    if (list(k), c, n, m) != (a['k'], a['c'], a['n'], a['m']): _bad.append((t, a, (k, c, n, m)))
-check(f'같은 {len(SENT)}문장에서 앱(PII·CARE_RE·NICK_BAN·가림)과 서버 판정이 같음', not _bad, _bad[:3])
+    cur.execute('select private.pii_kinds(%s), private.care_hit(%s), private.nick_bad(%s), private.pii_mask(%s), private.abuse_level(%s)', (t, t, t, t, t)); k, c, n, m, ab = cur.fetchone()
+    if (list(k), c, n, m, ab) != (a['k'], a['c'], a['n'], a['m'], a['a']): _bad.append((t, a, (k, c, n, m, ab)))
+check(f'같은 {len(SENT)}문장에서 앱(PII·CARE_RE·NICK_BAN·가림·욕설)과 서버 판정이 같음', not _bad, _bad[:3])
+_ab = {t: x['a'] for t, x in zip(SENT, _app)}; _miss = [(t, _ab[t], v) for t, v in ABUSE.items() if _ab[t] != v]
+check(f'  └ 욕설 {sum(1 for v in ABUSE.values() if v)}문장은 걸리고(아주 심한 욕은 띄어 써도 2), 과학 용어·일상어 {sum(1 for v in ABUSE.values() if not v)}문장은 안 걸림', not _miss, _miss)
 _by = dict(zip(SENT, _app))
 check('  └ 은어(뒤지고 싶·죽어야겠·태어나지 말았·살 의미가 없)는 걸리고, 뒤져 보니·죽겠다·세포 자살은 안 걸림',
       all(_by[t]['c'] for t in ('시험 망해서 뒤지고 싶다', '이번엔 진짜 죽어야겠다', '태어나지 말았어야 했어', '살 의미가 없어'))

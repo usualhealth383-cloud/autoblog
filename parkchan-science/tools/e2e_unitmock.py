@@ -37,12 +37,13 @@ def check_extract():
         ms = [q for q in mock if q['book'] == b]
         assert len(ms) == 25 and abs(sum(q['points'] for q in ms) - 50) < 1e-9, (b, len(ms), sum(q['points'] for q in ms))
         assert all(q['id'] == f'M{b}-q{int(q["id"].split("-q")[1])}' for q in ms)
-    ss = [q for q in mock if q.get('exam') == 'suneung']                                   # 수능형(두 권 전 범위)
-    assert len(ss) == 25 and abs(sum(q['points'] for q in ss) - 50) < 1e-9 and all(q['book'] == '1+2' and q['id'] == f'MS-q{int(q["id"].split("-q")[1])}' for q in ss)
-    assert {q['lessonId'][0] for q in ss} == {'1', '2'}, '수능형이 두 권을 다 덮지 않음'
-    assert sorted(sum(q['answer'] == k for q in ss) for k in range(1, 6)) == [5] * 5
+    for rd, pre in ((1, 'MS'), (2, 'MS2')):                                                    # 수능형(두 권 전 범위) 두 회
+        ss = [q for q in mock if q.get('exam') == 'suneung' and q.get('round') == rd]
+        assert len(ss) == 25 and abs(sum(q['points'] for q in ss) - 50) < 1e-9 and all(q['book'] == '1+2' and q['id'] == f'{pre}-q{int(q["id"].split("-q")[1])}' for q in ss), (rd, len(ss))
+        assert {q['lessonId'][0] for q in ss} == {'1', '2'}, ('수능형이 두 권을 다 덮지 않음', rd)
+        assert sorted(sum(q['answer'] == k for q in ss) for k in range(1, 6)) == [5] * 5, rd
     assert all(q.get('exam') == 'hakpyeong' for q in mock if q['book'] in '12' and q['book'] != '1+2')
-    assert len(unit) == 96 and len(mock) == 75
+    assert len(unit) == 96 and len(mock) == 100
     for q in unit + mock:
         assert q['lessons'] and all(l in lessons for l in q['lessons']) and q['lessonId'] == q['lessons'][0], q['id']
         assert q['type'] == 'essay' or q['answer'] in (1, 2, 3, 4, 5), q['id']
@@ -54,7 +55,7 @@ def check_extract():
     assert any(q.get('table') for q in unit) and any(q.get('data') for q in mock) and any(q.get('ask') for q in mock)
     assert len(recap) == 120 and all(q['type'] == 'blank' and q['answer'] and '＿＿＿' in q['stem'] for q in recap)
     assert next(q for q in recap if q['id'] == 'U1-1-b1')['answer'] == '10⁻¹⁰ m'
-    print(f'추출 OK · 대단원 {len(unit)} · 모의고사 {len(mock)} (배점 50 × 3: 학평형 2 · 수능형 1) · 핵심 정리 빈칸 {len(recap)}')
+    print(f'추출 OK · 대단원 {len(unit)} · 모의고사 {len(mock)} (배점 50 × 4: 학평형 2 · 수능형 2) · 핵심 정리 빈칸 {len(recap)}')
     return bank
 
 
@@ -94,7 +95,7 @@ async def main():
         # ───────── 1) 학생 — 보통 풀이에 섞이지 않는다 · 대단원 마무리 ─────────
         s = await page()
         await login(s)
-        assert await s.evaluate("BANK.filter(isUM).length") == 291
+        assert await s.evaluate("BANK.filter(isUM).length") == 316
         assert await s.evaluate("bankPool().every(q => !isUM(q)) && bankPool().length > 1000"), '보통 풀이에 대단원·모의고사 문항이 섞임'
         await s.evaluate("bankSel = { ...bankSel, lesson:'1103' }"); assert await s.evaluate("bankPool().every(q => !isUM(q))")
         await s.evaluate("bankSel = { book:'전체', unit:'전체', lesson:'전체', type:'전체', n:10, only:'전체' }"); await s.evaluate("renderBank()")
@@ -135,7 +136,7 @@ async def main():
         await s.click('.tab[data-v="bank"]'); await s.wait_for_timeout(200)
         await s.click('[data-um="mock"]'); await s.wait_for_timeout(200)
         assert '40분 타이머 켬' in await s.inner_text('#mockTimer')
-        assert await s.locator('[data-mstart]').count() == 3 and '수능형' in await s.inner_text('#v-bank') and '고1 학력평가형' in await s.inner_text('#v-bank')
+        assert await s.locator('[data-mstart]').count() == 4 and '수능형' in await s.inner_text('#v-bank') and '고1 학력평가형' in await s.inner_text('#v-bank')
         await s.screenshot(path=f'{SC}/m01_mock_pick.png'); await big(s, '모의고사 고르기')
         await s.click('[data-mstart="1"]'); await s.wait_for_timeout(250)
         assert await s.evaluate("mx && mx.items.length === 25 && mx.items.reduce((a, q) => a + q.points, 0) === 50")
@@ -194,10 +195,15 @@ async def main():
         await s.click('#bankQuit'); await s.wait_for_timeout(150)
         # 수능형(두 권 전 범위) — 같은 흐름, 기록 열쇠 's'
         await s.click('[data-um="mock"]'); await s.wait_for_timeout(150); await s.click('[data-mstart="s"]'); await s.wait_for_timeout(200)
-        assert '수능 대비 실전 모의고사' in await s.inner_text('.mxbar') and await s.evaluate('mx.items.length') == 25
+        assert '수능 대비 제1회 실전 모의고사' in await s.inner_text('.mxbar') and await s.evaluate('mx.items.length') == 25
         await s.screenshot(path=f'{SC}/m07_suneung_q1.png', full_page=True); await big(s, '수능형 풀기')
         await s.evaluate('mockSubmit(false)'); await s.wait_for_timeout(250)
-        assert len(await s.evaluate("S.mk['s']")) == 1 and '수능 대비 실전 모의고사' in await s.inner_text('#v-bank')
+        assert len(await s.evaluate("S.mk['s']")) == 1 and '수능 대비 제1회 실전 모의고사' in await s.inner_text('#v-bank')
+        await s.click('#mockClose2'); await s.wait_for_timeout(100)
+        await s.click('[data-um="mock"]'); await s.wait_for_timeout(150); await s.click('[data-mstart="s2"]'); await s.wait_for_timeout(200)
+        assert '수능 대비 제2회' in await s.inner_text('.mxbar') and await s.evaluate("mx.items.length === 25 && mx.items.every(q => q.round === 2)"), '제2회가 제1회와 섞임'
+        await s.screenshot(path=f'{SC}/m08_suneung2_q1.png', full_page=True)
+        await s.evaluate('mockSubmit(false)'); await s.wait_for_timeout(250); assert len(await s.evaluate("S.mk['s2']")) == 1
         await s.click('#mockClose2'); await s.wait_for_timeout(100)
         # 40분이 다 되면 저절로 제출 · 그만두기는 기록하지 않는다
         await s.click('[data-um="mock"]'); await s.wait_for_timeout(150); await s.click('[data-mstart="2"]'); await s.wait_for_timeout(200)

@@ -2930,7 +2930,7 @@ function renderBank(){
       const mk = S.mk || {}, last = MOCKS.map(m => (mk[m.k]||[]).slice(-1)[0]).filter(Boolean);
       return `<div class="sec umsec"><h2>실전처럼 풀기</h2>
         <button class="umrow" data-um="unit" ${fa ? '' : 'aria-describedby="umLockNote"'}><span class="n">단원</span><span class="b"><span class="t">대단원 마무리</span><span class="s">단원마다 16문항 · 마무리 12 + 고난도 4</span></span>${lock}</button>
-        <button class="umrow" data-um="mock" ${fa ? '' : 'aria-describedby="umLockNote"'}><span class="n">모의</span><span class="b"><span class="t">실전 모의고사</span><span class="s">학력평가형 2회 · 수능형 1회 · 25문항 · ${MOCK_MIN}분${fa && last.length ? ` · 최근 ${fmtPt(last[last.length - 1].s)}점` : ''}</span></span>${lock}</button>
+        <button class="umrow" data-um="mock" ${fa ? '' : 'aria-describedby="umLockNote"'}><span class="n">모의</span><span class="b"><span class="t">실전 모의고사</span><span class="s">학력평가형 2회 · 수능형 2회 · 25문항 · ${MOCK_MIN}분${fa && last.length ? ` · 최근 ${fmtPt(last[last.length - 1].s)}점` : ''}</span></span>${lock}</button>
         ${fa ? '' : `<p class="fine" id="umLockNote" style="text-align:left;padding:6px 0 0">여러 소단원을 엮어 묻는 문제라 전 범위(학원 코드·이용권)에서 열립니다.</p>`}</div>`; })()}
     <div class="sec"><h2><span>오답 노트</span><button class="more" data-go="wrong">${S.wrong.filter(w=>!w.cleared).length}문제 보기 ›</button></h2><p class="fine" style="text-align:left;padding:0">틀린 문제는 오답 노트에 모이고, 내일부터 간격을 넓혀 가며 오늘 화면의 <b>오늘의 복습</b>에 다시 나옵니다.</p></div>
     <div class="sec lab-list"><h2>자료 탐구 · 집에서 실험 <span style="font-weight:600;color:var(--faint);letter-spacing:0">${LABS_N}편</span></h2>
@@ -3096,9 +3096,10 @@ const MOCK_MIN = 40, QSEC = 96;
 const unitList = () => { const m = new Map(); LESSONS.forEach(l => { const k = l.book + '-' + l.unit; if (!m.has(k)) m.set(k, { key:k, book:l.book, unit:l.unit, name:l.unitName, bookName:l.bookName }); }); return [...m.values()]; };
 const umNo = q => +String(q.id).replace(/^.*-[qb]/, '');
 /* 모의고사 세 갈래 — 학평형(권별, 그때까지 배운 범위)과 수능형(두 권 전 범위, 융합·자료 해석이 많다). 기록 S.mk 의 열쇠 = k */
-const MOCKS = [{ k:'1', book:'1', t:'통합과학 1', s:'고1 학력평가 대비 · 제1회' }, { k:'2', book:'2', t:'통합과학 2', s:'고1 학력평가 대비 · 제1회' }, { k:'s', book:'1+2', t:'수능 대비', s:'통합과학 1 · 2 전 범위 · 제1회', hard:true }];
+const MOCKS = [{ k:'1', book:'1', t:'통합과학 1', s:'고1 학력평가 대비 · 제1회' }, { k:'2', book:'2', t:'통합과학 2', s:'고1 학력평가 대비 · 제1회' }, { k:'s', book:'1+2', round:1, t:'수능 대비 제1회', s:'통합과학 1 · 2 전 범위', hard:true }, { k:'s2', book:'1+2', round:2, t:'수능 대비 제2회', s:'통합과학 1 · 2 전 범위', hard:true }];
 const mockOf = k => MOCKS.find(m => m.k === k) || MOCKS[0];
-const umItems = (step, book, unit) => BANK.filter(q => q.step === step && q.book === (step === 'mock' ? mockOf(book).book : book) && (!unit || q.unit === unit)).sort((a, b) => umNo(a) - umNo(b));
+const umItems = (step, book, unit) => { const m = step === 'mock' ? mockOf(book) : null;   // 모의고사는 권·회차로 가른다(수능형 두 회가 같은 book '1+2')
+  return BANK.filter(q => q.step === step && q.book === (m ? m.book : book) && (!m || !m.round || (q.round || 1) === m.round) && (!unit || q.unit === unit)).sort((a, b) => umNo(a) - umNo(b)); };
 const umLock = what => openSheet(`<h3>${what}는 전 범위에서 열립니다</h3><p>여러 소단원을 엮어 묻는 문제라 전 범위가 열려 있을 때 풀 수 있습니다. <b>학원 코드</b>나 <b>이용권</b>을 등록하면 바로 열립니다.</p><button class="btn" id="goMe">내 정보로 가기</button><button class="btn ghost" id="sheetClose">닫기</button>`);
 function startUnit(key, recap){
   const u = unitList().find(x => x.key === key); if (!u) return;
@@ -3121,7 +3122,7 @@ function renderMockPick(v){
     <p class="fine lead">모두 25문항 · 50점 · ${MOCK_MIN}분입니다. 다 풀고 제출하기 전까지는 채점하지 않습니다. 제출하면 문항별 해설과 다시 볼 소단원을 보여 드립니다.</p>
     <div class="pick"><span class="k">시간</span><button class="tgl" id="mockTimer" aria-pressed="${mt}"><span class="sw" aria-hidden="true"></span><span>${MOCK_MIN}분 타이머 ${mt ? '켬' : '끔'}</span></button><p class="fine" style="text-align:left;padding:6px 0 0">도중에 잠시 멈출 수 있습니다. 시간이 다 되면 그때까지 고른 답으로 제출합니다.</p></div>
     ${MOCKS.map(m => { const n = umItems('mock', m.k).length, hist = ((S.mk||{})[m.k] || []).slice(-3).reverse();
-      return `${m.hard ? `<h2 class="umbook">수능형</h2><p class="fine" style="text-align:left;padding:0 0 8px">두 권 전 범위에서 단원을 엮어 묻고, 실험·자료 해석이 많습니다. 두 권을 다 배운 뒤에 풀어 보세요.</p>` : m.k === '1' ? `<h2 class="umbook">고1 학력평가형</h2>` : ''}<div class="umcard mock ${m.hard ? 'hard' : ''}"><div class="mh"><span class="t">${m.t}</span><span class="s">${m.s} · ${n}문항 · 50점</span></div>
+      return `${m.k === 's' ? `<h2 class="umbook">수능형</h2><p class="fine" style="text-align:left;padding:0 0 8px">두 권 전 범위에서 단원을 엮어 묻고, 실험·자료 해석이 많습니다. 두 권을 다 배운 뒤에 풀어 보세요.</p>` : m.k === '1' ? `<h2 class="umbook">고1 학력평가형</h2>` : ''}<div class="umcard mock ${m.hard ? 'hard' : ''}"><div class="mh"><span class="t">${m.t}</span><span class="s">${m.s} · ${n}문항 · 50점</span></div>
         ${hist.length ? `<p class="mhist">지난 기록 · ${hist.map(a => `${fmtPt(a.s)}점 (${esc(kdate(a.d))})`).join(' · ')}</p>` : ''}
         <button class="btn" data-mstart="${m.k}" ${n ? '' : 'disabled'}>${n ? `${m.t} 시작` : '문항 준비 중'}</button></div>`; }).join('')}`;
 }
@@ -3783,7 +3784,7 @@ async function renderAdmin(){
     const total = rep.posts.length + rep.comments.length;
     const tags = x => Object.entries(x.reasons||{}).map(([k, n]) => `<span class="rtag">${esc(REASON_KO[k]||k)} ${n}</span>`).join('') + (x.kept ? `<span class="rtag q">되돌린 신고 ${x.kept}</span>` : '')
       + (x.muted ? `<span class="rtag q">자주 되돌려진 계정의 신고 ${x.muted} · 가림 수에서 뺌</span>` : '');
-    /* 검토할 첫 글(맨 위) — 처음 글을 쓴 학생의 글. 공개하면 그 학생의 다음 글부터 바로 올라간다 */
+    /* 검토할 첫 글(위기 글 '먼저 살펴볼 글' 바로 아래 — 안전이 먼저) — 처음 글을 쓴 학생의 글. 공개하면 그 학생의 다음 글부터 바로 올라간다 */
     const rvHtml = rv.length ? `<div class="sec" id="rvSec"><h2>검토할 첫 글 ${rv.length}건</h2>
         <p class="fine" style="text-align:left;padding:0 0 8px">처음 글을 쓴 학생의 글은 원장님이 공개할 때까지 쓴 학생에게만 보입니다. 댓글은 바로 올라갑니다.</p>
         ${rv.map(x => `<div class="setrow" style="align-items:flex-start"><span class="l">${esc(x.title)}<small>${esc(x.name || '')}${x.code ? ` · ${esc(x.code)}` : ''} · 닉네임 ${esc(x.nick||'익명')} · ${ago(x.at)}${x.rejected ? ` · 공개 안 한 글 ${x.rejected}` : ''}<br>${esc(String(x.body||'').slice(0, 90))}</small>${x.care ? '<span class="rtag">먼저 살펴볼 말</span>' : ''}</span>
@@ -3793,7 +3794,7 @@ async function renderAdmin(){
         ${una.map(x => `<div class="setrow" style="align-items:flex-start"><span class="l">${esc(x.title)}<small>${esc(x.nick||'익명')} · ${ago(x.at)}<br>${esc(String(x.body||'').slice(0, 70))}</small></span><button class="more" data-admcare="${esc(x.id)}">답 달기</button></div>`).join('')}
         <p class="tip" style="margin:${una.length ? '8px' : '0'} 0 0">질문 게시판에서 48시간이 지나도 글쓴이 말고는 아무도 답하지 않은 질문(최근 30일)입니다. 학생 답에는 댓글의 <b>선생님 확인</b>을 눌러 맞는 답을 맨 위로 올릴 수 있습니다.</p></details>`;
     const mutHtml = mut.length ? `<div class="sec" id="mutSec"><h2>신고가 자주 되돌려진 계정 ${mut.length}명</h2>
-        <p class="fine" style="text-align:left;padding:0 0 8px">최근 30일에 원장님이 '신고 되돌리기'를 3번 넘게 한 신고를 낸 계정입니다. 이 계정의 신고는 지금 글을 가리는 수에 넣지 않고 이 목록에만 모읍니다. 장난 신고인지 학생과 이야기해 보세요.</p>
+        <p class="fine" style="text-align:left;padding:0 0 8px">최근 30일에 원장님이 '신고 되돌리기'를 한 신고가 3번 이상인 계정입니다. 이 계정의 신고는 지금 글을 가리는 수에 넣지 않고 이 목록에만 모읍니다. 장난 신고인지 학생과 이야기해 보세요.</p>
         ${mut.map(m => `<div class="setrow"><span class="l">${esc(m.name || m.nick || '이름 없음')}${m.code ? ` <small style="display:inline">${esc(m.code)}</small>` : ''}<small>되돌린 신고 ${m.kept}번 · 아직 열린 신고 ${m.open || 0}건${m.nick ? ` · 닉네임 ${esc(m.nick)}` : ''}</small></span></div>`).join('')}</div>` : '';
     const limBtn = x => x.uid && !x.staff ? `<button class="more" data-admlim="${esc(x.uid)}" data-nick="${esc(x.nick||'')}">이용 제한</button>` : '';
     const careHtml = care.length ? `<div class="sec carerow"><h2 style="color:var(--warn)">먼저 살펴볼 글 ${care.length}건</h2>
@@ -3804,8 +3805,8 @@ async function renderAdmin(){
     const ACT = { d7:'7일 제한', d30:'30일 제한', stop:'중지', lift:'풀기' };
     v.innerHTML = head + `<div class="tsafe"><b>이야기 운영</b><br>학생이 신고한 글·댓글이 여기 모입니다. 신고가 ${REPORT_HIDE}건 쌓이면 학생 화면에서는 이미 가려져 있고, 원장님만 원문을 봅니다. 처리하면 신고한 학생에게 결과(지움·그대로 둠)가 짧게 전해집니다.<br>
         개인정보·비방·기출 원문이 올라온 글은 지워 주세요. 지운 글은 되돌릴 수 없습니다. 되풀이하는 학생은 <b>이용 제한</b>(7일 → 30일 → 중지).</div>
-      ${rvHtml}
       ${careHtml}
+      ${rvHtml}
       ${unaHtml}
       <div class="sec"><h2>신고된 글 ${rep.posts.length}건</h2>
         ${rep.posts.length ? rep.posts.map(x=>`<div class="setrow" style="align-items:flex-start">

@@ -46,6 +46,25 @@ async def main():
         await pg.click('[data-bsel="type"][data-val="multi"]'); await pg.click('#bankStart'); await pg.wait_for_timeout(300); assert await pg.locator('.bogi').count()==1
         if await pg.locator('.qfig').count(): await pg.click('.qfig'); await pg.wait_for_timeout(200); assert await pg.locator('#fv').count()==1; await pg.screenshot(path=f'{SC}/b5_zoom.png'); await pg.click('#fvClose')
         await pg.click('#bankQuit'); await pg.wait_for_timeout(200)
+        # 합답형 ㄱㄴㄷ 판정 한 줄 — 해설 문장의 'ㄱ (옳음) …'·'ㄴ (틀림 →) …'을 보기마다 나눠 그린다(나뉘지 않는 문항은 지금처럼)
+        st = await pg.evaluate("(() => { const m = BANK.filter(q => q.type === 'multi'); const sp = m.filter(q => multiSplit(q)); return [m.length, sp.length, sp.filter(q => q.wrong).length]; })()")
+        print(f'  합답형 {st[0]}문항 중 보기별로 나뉨 {st[1]}')
+        assert st[1] >= st[0] * 0.6, ('나뉘는 문항이 너무 적음 — 해설 모양이 바뀌었나', st)
+        bad = await pg.evaluate("BANK.filter(q => q.type === 'multi').map(q => [q, multiSplit(q)]).filter(([q, sp]) => sp && sp.rows.some(r => r.ok !== new Set(String(q.choices[q.answer-1]).match(/[ㄱ-ㄹ]/g)).has(r.k))).length")
+        assert bad == 0, '판정이 정답 선지와 다른 줄이 있음'
+        qid = await pg.evaluate("(BANK.find(q => q.id === '1202-q8' && multiSplit(q) && openLessons().some(l => l.id === q.lessonId)) || BANK.find(q => q.type === 'multi' && multiSplit(q) && q.explain && q.wrong && openLessons().some(l => l.id === q.lessonId))).id")
+        await pg.evaluate(f"startBank([BANK.find(q => q.id === '{qid}')], '')"); await pg.wait_for_timeout(300)
+        ans = await pg.evaluate('bs.items[0].answer'); await pg.click(f'[data-bp="{ans % 5 + 1}"]'); await pg.wait_for_timeout(250)
+        rows = await pg.locator('.verdict .jd').all_inner_texts(); keys = await pg.evaluate("[...bs.items[0].source.matchAll(/(?:^|\\n)\\s*([ㄱ-ㄹ])\\s*\\./g)].map(m => m[1])")
+        assert len(rows) == len(keys) >= 3 and all(r.startswith(k) for r, k in zip(rows, keys)), (rows, keys)
+        assert any('틀림' in r for r in rows) and any('옳음' in r for r in rows) and await pg.locator('.wrongbox').count() == 0, rows
+        await pg.screenshot(path=f'{SC}/b5b_multi_judge.png', full_page=True)
+        nid = await pg.evaluate("BANK.find(q => q.type === 'multi' && !multiSplit(q) && q.explain && openLessons().some(l => l.id === q.lessonId)).id")
+        await pg.click('#bankQuit'); await pg.wait_for_timeout(200)
+        await pg.evaluate(f"startBank([BANK.find(q => q.id === '{nid}')], '')"); await pg.wait_for_timeout(300)
+        ans = await pg.evaluate('bs.items[0].answer'); await pg.click(f'[data-bp="{ans}"]'); await pg.wait_for_timeout(250)
+        assert await pg.locator('.verdict .jd').count() == 0 and await pg.locator('.verdict p').count() >= 1, '나뉘지 않는 문항이 지금처럼 그려지지 않음'
+        await pg.click('#bankQuit'); await pg.wait_for_timeout(200)
         await pg.click('[data-bsel="type"][data-val="essay"]'); await pg.click('#bankStart'); await pg.wait_for_timeout(300)
         await pg.fill('#essayIn','충돌 시간이 길어져 힘이 작아진다'); await pg.click('#essayShow'); await pg.wait_for_timeout(200); assert '모범 답안' in await pg.locator('.verdict').inner_text(); await pg.screenshot(path=f'{SC}/b6_essay.png', full_page=True)
         await pg.click('[data-ess="맞음"]'); await pg.wait_for_timeout(200); assert await pg.evaluate('S.stats.c')>=7

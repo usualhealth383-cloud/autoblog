@@ -120,7 +120,7 @@ async def main():
         await logout(); await login('kb@t.kr', 'pass1234'); await o.click('.tab[data-v="talk"]'); await o.wait_for_timeout(900)
         assert await o.locator('#postNew').count() == 1, '풀었는데 글쓰기가 안 열림'
         # ⑨ 첫 글 검토 → 원장 공개 · 신고가 자주 되돌려진 계정 · 처리 기록(지우기·신고 되돌리기·첫 글 공개) (docs/11 §12-6·8·11)
-        await o.evaluate("DBX.setNick('운영닉').then(a => ACC = a)"); await o.wait_for_timeout(300)
+        await o.evaluate("DBX.setNick('새벽공부').then(a => ACC = a)"); await o.wait_for_timeout(300)
         await o.evaluate("DBX.addPost({ board:'qna', title:'처음 쓰는 글', body:'첫 글은 원장님이 확인해요' })"); await o.click('.tab[data-v="me"]'); await o.click('.tab[data-v="talk"]'); await o.wait_for_timeout(900)
         assert '검토 중' in await o.locator('.pcard', has_text='처음 쓰는 글').inner_text(), '첫 글에 검토 중 표시가 없음'
         await logout(); await login(*OWNER); await o.click('[data-adm="talk"]'); await o.wait_for_timeout(900)
