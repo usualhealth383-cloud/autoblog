@@ -44,6 +44,7 @@ inject = ('<script>const ART_DATA = ' + json.dumps(art) + ';\n'
           "window.__BRANDMARK__ = " + json.dumps(brandmark) + ';\n'
           "window.__NOWX = true;\n"  # 아티팩트에서는 날씨를 못 받으니 실패 줄도 두지 않는다(2026-09-29)
           "window.__CORE__ = " + (ROOT/'data/core.json').read_text(encoding='utf-8') + ';\n'
+          "window.__DETAIL__ = " + (ROOT/'data/detail.json').read_text(encoding='utf-8') + ';\n'
           "window.__PILLS__ = " + (ROOT/'data/pills.json').read_text(encoding='utf-8') + ';\n'
           "window.__EASY__ = "  + (ROOT/'data/easy-index.json').read_text(encoding='utf-8') + ';\n'
           "window.__LEX__ = {ing:" + (ROOT/'data/lexicon.json').read_text(encoding='utf-8')

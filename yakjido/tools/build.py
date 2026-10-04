@@ -82,6 +82,12 @@ SLIM = {
     'classes':     ['id', 'name', 'short', 'icon'],
 }
 CORE_KEYS = ['sources', 'ingredients', 'interactions', 'kids', 'productImages', 'suppRules', 'myths', 'recalls', 'drugRep']   # drugRep: 약 화면(본문 받은 뒤)에서만 씀 — 첫 화면 220 KB 예산
+# 약 화면에서만 쓰는 칸(자주 묻는 질문·부작용 빈도)은 data/detail.json 으로 한 번 더 뺀다.
+# 본문과 «동시에» 받기 시작하고, 약 화면만 이것까지 기다린다 — core.json 400 KB 예산(2026-10-04)
+DETAIL = {'drugs': ['faq', 'sideFreq']}
+detail = {k: [{'id': o['id'], **{f: o[f] for f in fs if f in o}} for o in data[k] if any(f in o for f in fs)] for k, fs in DETAIL.items()}
+for k, fs in DETAIL.items():
+    data[k] = [{f: v for f, v in o.items() if f not in fs} for o in data[k]]
 inline, core = {}, {}
 for k, v in data.items():
     if k in SLIM:
@@ -103,6 +109,7 @@ pages.mkdir(parents=True, exist_ok=True)
 (pages / 'index.html').write_text(out, encoding='utf-8')
 (pages / 'data').mkdir(parents=True, exist_ok=True)
 (pages / 'data' / 'core.json').write_text(jc, encoding='utf-8')
+(pages / 'data' / 'detail.json').write_text(json.dumps(detail, ensure_ascii=False, separators=(',', ':')), encoding='utf-8')
 print(f'첫 화면 {len(out)/1024:.0f} KB · 본문 data/core.json {len(jc)/1024:.0f} KB')
 # 서비스워커 캐시 이름을 빌드마다 갱신
 sw = ROOT / 'sw.js'

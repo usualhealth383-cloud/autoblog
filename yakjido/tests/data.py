@@ -263,6 +263,18 @@ if _idx.exists():
         _ckb = len(_gz.compress(_core.read_bytes(), 6)) / 1024
         if _ckb > 400:
             fails.append(f'본문이 무겁습니다 — core.json 압축 {_ckb:.0f} KB (한계 400 KB)')
+    # 약 화면에서만 쓰는 칸(자주 묻는 질문·부작용 빈도)은 data/detail.json — 본문에 다시 섞이면 위 예산이 깨진다
+    _det = _core.parent / 'detail.json'
+    if not _det.exists():
+        fails.append('docs/yakjido/data/detail.json 이 없습니다 — 빌드를 다시 돌리세요')
+    else:
+        _dj = json.loads(_det.read_text(encoding='utf-8'))
+        if not any(o.get('sideFreq') for o in _dj.get('drugs', [])): fails.append('detail.json 에 부작용 빈도가 없습니다')
+        if _core.exists() and any('faq' in o or 'sideFreq' in o for o in json.loads(_core.read_text(encoding='utf-8')).get('drugs', [])):
+            fails.append('core.json 에 약 화면 칸(faq·sideFreq)이 다시 들어갔습니다')
+        _dkb = len(_gz.compress(_det.read_bytes(), 6)) / 1024
+        if _dkb > 120:
+            fails.append(f'약 화면 칸이 무겁습니다 — detail.json 압축 {_dkb:.0f} KB (한계 120 KB)')
 
 # ── PubMed 을 근거로 쓴 출처에는 DOI 링크를 단다 ─────────────────────────
 # 현욱님 규칙. DOI 가 아예 없는 옛 논문도 있어서, 그때는 「DOI 가 등록돼 있지 않다」고

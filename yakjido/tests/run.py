@@ -250,7 +250,7 @@ def main():
         pg.route('**/air-quality-api.open-meteo.com/**', lambda rt: rt.fulfill(status=200, content_type='application/json', body=AQ))
         def ready(ms=8000):
             # 본문 자료(data/core.json)는 첫 화면이 뜬 뒤에 받는다 — 다 받을 때까지 기다린다
-            try: pg.wait_for_function('window.__READY__===true', timeout=ms)
+            try: pg.wait_for_function('window.__READY__===true && (typeof DETAIL==="undefined" || DETAIL===2)', timeout=ms)   # 약 화면 칸(detail.json)까지
             except Exception: fails.append('본문 자료(core.json)를 못 받았습니다 — ' + pg.url)
         pg.goto(url); ready(); pg.wait_for_timeout(1200)
         pg.evaluate("localStorage.setItem('yakjido.hello.v1','1');localStorage.setItem('yakjido.me.v1',JSON.stringify({age:'senior',taking:['cls:bp.arb'],pub:{}}))")
@@ -844,6 +844,9 @@ def main():
         # 8g. 안약·크림에 «먹는 약»이라고 쓰지 않는다
         r8g = pg.evaluate("()=>['eye-decongestant','allergy-eyedrop','urea-cream','scar-gel','artificial-tears','naftifine','ciclopirox-nail'].filter(id=>isOral(drug(id))).concat(['ibuprofen','udca','oral-contraceptive','tranexamic-melasma','diosmin'].filter(id=>!isOral(drug(id))).map(x=>'!'+x))")
         if r8g: fails.append(f'먹는 약/바르는 약 구분이 틀림: {r8g}')
+        # 8h. 부작용 빈도의 「이렇게 하세요」 — 먹는 약 발진에 「그 자리는 쉬게」를 붙이지 않는다(2026-10-04)
+        r8h = pg.evaluate("()=>{const t=id=>{const d=document.createElement('div');d.innerHTML=sideFreqHtml(drug(id));return [...d.querySelectorAll('.sf-tip')].map(x=>x.textContent).join('|')};const o=['cetirizine','domperidone','carbocisteine'].filter(id=>/그 자리/.test(t(id)));const s=['terbinafine','benzoyl-peroxide'].filter(id=>!/그 자리/.test(t(id))).map(x=>'!'+x);return o.concat(s)}")
+        if r8h: fails.append(f'부작용 팁이 약 모양과 안 맞음: {r8h}')
         br.close()
     print(f'화면 {len(routes)}개 검사 완료')
     if fails:
