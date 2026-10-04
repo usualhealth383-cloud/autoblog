@@ -4113,6 +4113,15 @@ function vitalSave(){
   saveMe(); toast('적어 두었어요'); route();
 }
 /* 진료실 한 장에 붙는 «집에서 잰 숫자» — 아침·저녁을 나눠 보여야 약 시간을 바꿀 근거가 된다 */
+/* 내 약 한 장에 「지난 30일 복용」 — 진료실 「요즘 잘 드셨어요?」의 답을 같은 종이에(벤치마크 #5, 2026-10-04).
+   메모로 보내기(bagText)에는 이미 있던 줄이라, 화면·인쇄에도 같은 말로 */
+function adhCard(){
+  const a = adherence(30); if (!a.days) return '';
+  const sm = slotMiss().filter(r => r.miss);
+  return `<div class="show-card"><div class="show-head">어제까지 30일 복용</div>
+    <p class="show-big info">${I.clock}<span>드시기로 한 ${a.days}일 중 ${a.full}일은 빠짐없이<small>전체 ${a.doses}번 중 ${a.took}번${sm.length ? ' · 못 드신 횟수: ' + sm.map(r => `${esc(SLOT_WORD[r.t] || r.t)} ${r.want}번 중 ${r.miss}번`).join(', ') : ''}</small></span></p>
+    <p class="small" style="margin-top:6px"><a class="link" href="#/schedule?t=sc3">달력으로 보기 ›</a></p></div>`;
+}
 function vitalsCard(){
   const a = bpAvg(14), cut = dayBefore(13);
   const part = w => { const L = vitals().filter(x => x.k === 'bp' && x.w === w && x.t.slice(0, 10) >= cut); return L.length ? `${w} ${Math.round(L.reduce((n, x) => n + x.s, 0) / L.length)}/${Math.round(L.reduce((n, x) => n + x.d, 0) / L.length)}` : ''; };
@@ -5427,6 +5436,7 @@ function vBag(){
     ${res.unknown.length ? `<p class="small muted" style="margin-top:8px">성분을 확인하지 못한 약 ${res.unknown.length}가지는 판정에서 빠져 있어요.</p>` : ''}
   </div>
   ${aeCard()}
+  ${adhCard()}
   ${vitalsCard()}
   ${nextVisit() ? `<p class="small muted" style="margin-top:10px">다음 진료 — ${esc(visitWord(nextVisit()))}</p>` : ''}
   <div class="actions"><button class="btn ghost" onclick="shareBag()">${I.cart} 메모로 복사·전송</button><button class="btn ghost" onclick="window.print()">${I.book} 종이로 뽑기</button><button class="btn ghost" onclick="go('/together')">${I.shield} 자세한 판정 보기</button></div>
@@ -5520,6 +5530,7 @@ function bagText(){
   if (a.days) { L.push('', '[어제까지 30일 복용]', `· 드시기로 한 ${a.days}일 중 ${a.full}일은 빠짐없이 (전체 ${a.doses}번 중 ${a.took}번)`);
     const sm = slotMiss().filter(r => r.miss);
     if (sm.length) L.push('· 시간대별로 못 드신 횟수: ' + sm.map(r => `${SLOT_WORD[r.t] || r.t} ${r.want}번 중 ${r.miss}번`).join(', ')); }
+  const bp = bpAvg(14); if (bp) L.push('', '[집에서 잰 혈압]', `· 최근 2주 평균 ${bp.s}/${bp.d} mmHg (${bp.days}일 ${bp.n}번)`);
   const ae = aeList(); if (ae.length) { L.push('', '[약 먹고 불편했던 일]'); ae.slice(0, 10).forEach(x => L.push(`· ${dateWord(x.at)} ${x.n} — ${x.t}`)); }
   L.push('앱이 미리 본 것이라 참고용이에요. 약사·의사 판단이 우선입니다.');
   return L.join('\n');
