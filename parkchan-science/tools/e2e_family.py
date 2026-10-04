@@ -7,7 +7,7 @@
 import asyncio, sys, os, json, urllib.request as U
 from playwright.async_api import async_playwright
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from _ui import signup, NO_INTRO, auto_yes, approve_child
+from _ui import signup, NO_INTRO, auto_yes, approve_child, member
 SRV = '--server' in sys.argv; GW = 'http://127.0.0.1:8767'
 APP = 'http://127.0.0.1:8765/index.html' + (f"?server={GW}&key={json.loads(U.urlopen(GW + '/__anon').read())['anon']}" if SRV else '?server=')
 SC = sys.argv[sys.argv.index('--shots')+1] if '--shots' in sys.argv[:-1] else '/tmp/e2e_family'; os.makedirs(SC, exist_ok=True)
@@ -78,4 +78,52 @@ async def main():
         assert not errs, errs
         print(('SERVER ' if SRV else 'LOCAL ') + 'FAMILY E2E OK · 콘솔 오류', errs); await b.close()
 
-asyncio.run(main())
+async def guardian_talk():
+    """보호자가 직접 '이야기 끄기'(docs/11 §12-15) — 쓰기만 끄기 → 자녀는 읽기만(서버도 막음) → 읽기까지 끄기 → 자녀 화면은 차분한 안내 한 장 → 다시 켜기"""
+    if SRV: U.urlopen(U.Request(GW + '/__reset', method='POST')).read()
+    async with async_playwright() as p:
+        b = await p.chromium.launch(executable_path='/opt/pw-browsers/chromium'); errs = []
+        ctx = await b.new_context(viewport={'width': 400, 'height': 820}); await ctx.add_init_script(NO_INTRO); pg = await ctx.new_page()
+        pg.on('pageerror', lambda e: errs.append(str(e)))
+        pg.on('console', lambda m: errs.append(m.text) if m.type == 'error' and 'ERR_' not in m.text and 'status of 4' not in m.text else None)
+        await auto_yes(pg); await pg.goto(APP); await pg.wait_for_timeout(700)
+        async def login(em, pw):
+            await pg.click('#goLogin'); await pg.fill('#lgEmail', em); await pg.fill('#lgPw', pw); await pg.click('#lgGo'); await pg.wait_for_timeout(1000)
+        async def logout():
+            await pg.click('.tab[data-v="me"]'); await pg.wait_for_timeout(300); await pg.click('#logout'); await pg.wait_for_timeout(700)
+        async def as_student():
+            await logout(); await login('gt-kid@t.kr', 'pass1234'); await pg.click('.tab[data-v="talk"]'); await pg.wait_for_timeout(900)
+        async def as_parent(mode):
+            await logout(); await login('gt-mom@t.kr', 'pass1234'); await pg.click('.tab[data-v="parent"]'); await pg.wait_for_timeout(900)
+            await pg.click('#ptTalk'); await pg.wait_for_timeout(300); await pg.click(f'[data-ptm="{mode}"]')
+            if mode == 'write': await pg.screenshot(path=f'{SC}/g02_talk_sheet.png')
+            await pg.click('#ptGo'); await pg.wait_for_timeout(900)
+        await login(*OWNER); await pg.fill('#stName', '이야기학생'); await pg.select_option('#stCls', '월목반'); await pg.fill('#stUntil', '2099-12-31'); await pg.click('#stAdd'); await pg.wait_for_timeout(700)
+        code = await pg.evaluate('issued.code')
+        await logout(); await signup(pg, '이야기학생', 'gt-kid@t.kr', code=code); await member(pg)
+        await pg.evaluate("DBX.setNick('이야기꾼').then(a => ACC = a)"); await pg.wait_for_timeout(300)
+        await pg.evaluate("DBX.addPost({ board:'talk', title:'보이는 글', body:'보호자 설정 전에 쓴 글' })"); await pg.wait_for_timeout(300)
+        await logout(); await signup(pg, '이야기보호자', 'gt-mom@t.kr', role='parent', child=code); await approve_child(pg, code)
+        t = await pg.inner_text('#ptTalkSec'); assert '켜 둠' in t and await pg.locator('#ptTalk').count() == 1, t
+        await pg.screenshot(path=f'{SC}/g01_parent_talk.png', full_page=True)
+        await as_parent('write'); t = await pg.inner_text('#ptTalkSec'); assert '쓰기 꺼 둠' in t, t
+        await as_student()
+        g = await pg.inner_text('#talkGate'); assert '보호자와 정한' in g and await pg.locator('#postNew').count() == 0 and await pg.locator('.pcard').count() >= 1, g
+        await pg.screenshot(path=f'{SC}/g03_kid_write_off.png')
+        r = await pg.evaluate("DBX.addPost({ board:'talk', title:'우회', body:'써지면 안 됩니다' }).then(() => 'ok', e => e.message)"); assert '보호자와 정한' in r, ('쓰기를 서버·기기가 막아야 함', r)
+        await as_parent('all'); assert '쓰기·읽기 꺼 둠' in await pg.inner_text('#ptTalkSec')
+        await as_student()
+        assert await pg.locator('#talkRest').count() == 1 and await pg.locator('.pcard').count() == 0, '읽기까지 껐는데 글이 보임'
+        assert '보호자와 정한' in await pg.inner_text('#talkRest')
+        n = await pg.evaluate("DBX.posts('전체','').then(l => l.length)"); assert n == 0, ('서버도 글을 주지 않아야 함', n)
+        await pg.screenshot(path=f'{SC}/g04_kid_read_off.png')
+        await as_parent('on'); assert '켜 둠' in await pg.inner_text('#ptTalkSec')
+        await as_student(); assert await pg.locator('#postNew').count() == 1 and await pg.locator('.pcard').count() >= 1, '다시 켰는데 글쓰기가 안 열림'
+        # 원장 화면: 보호자가 끈 학생 · 처리 기록(보호자)
+        await as_parent('write'); await logout(); await login(*OWNER); await pg.click('[data-adm="talk"]'); await pg.wait_for_timeout(900)
+        t = await pg.inner_text('#guardList'); assert '이야기학생' in t and '쓰기만 끔' in t and '이야기보호자' in t, t
+        await pg.click('#logBox summary'); await pg.wait_for_timeout(200); t = await pg.inner_text('#logBox'); assert '보호자가 쓰기 끔' in t and '보호자 이야기보호자' in t, t
+        assert not errs, errs
+        print(('SERVER ' if SRV else 'LOCAL ') + 'GUARDIAN TALK E2E OK'); await b.close()
+
+asyncio.run(main()); asyncio.run(guardian_talk())

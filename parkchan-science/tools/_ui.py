@@ -88,15 +88,16 @@ async def audit_extra(pg, look):
     await pg.wait_for_selector('#todoBox .todo-row', timeout=8000); await look('원장 처리할 것')
 
 
-async def member(pg, days=30, gw='http://127.0.0.1:8767', aged=False):
+async def member(pg, days=30, gw='http://127.0.0.1:8767', aged=False, trust=True):
     """이야기 글쓰기는 학원 코드나 이용권이 있는 학생 계정만(2026-10, docs/11 §12-9) — 시험용 학생에게 이용권 기간을 넣는다.
     로컬 모드: 같은 기기 저장소에서 이용권 코드를 만들어 등록 · 서버 모드: 서비스 키로 profiles.pass_until
-    aged=True: 가입 이틀 전으로(서버는 가입 하루가 지나야 신고를 받는다)"""
+    aged=True: 가입 이틀 전으로(서버는 가입 하루가 지나야 신고를 받는다)
+    trust=True: 첫 글 검토(docs/11 §12-6)를 이미 지난 학생으로 — 검토 흐름 자체는 trust=False 로 따로 시험한다"""
     if await pg.evaluate('DBX.mode') == 'local':
-        await pg.evaluate(f"(async () => {{ const p = await DBX.issuePass({days}); await DBX.redeemPass(p.code); ACC = await DBX.me(); talkSt = null; }})()")
+        await pg.evaluate(f"(async () => {{ const p = await DBX.issuePass({days}); await DBX.redeemPass(p.code); {'await DBX._trust();' if trust else ''} ACC = await DBX.me(); talkSt = null; }})()")
         return
     import json, urllib.request as U, datetime
     svc = json.loads(U.urlopen(gw + '/__anon').read())['service']
     uid = await pg.evaluate('ACC.id'); until = (datetime.date.today() + datetime.timedelta(days=days)).isoformat()
-    U.urlopen(U.Request(f'{gw}/rest/v1/profiles?id=eq.{uid}', data=json.dumps({'pass_until': until, **({'created_at': (datetime.datetime.now(datetime.timezone.utc) - datetime.timedelta(days=2)).isoformat()} if aged else {})}).encode(), headers={'Content-Type': 'application/json', 'apikey': svc, 'Authorization': 'Bearer ' + svc}, method='PATCH')).read()
+    U.urlopen(U.Request(f'{gw}/rest/v1/profiles?id=eq.{uid}', data=json.dumps({'pass_until': until, **({'created_at': (datetime.datetime.now(datetime.timezone.utc) - datetime.timedelta(days=2)).isoformat()} if aged else {}), **({'first_ok_at': datetime.datetime.now(datetime.timezone.utc).isoformat()} if trust else {})}).encode(), headers={'Content-Type': 'application/json', 'apikey': svc, 'Authorization': 'Bearer ' + svc}, method='PATCH')).read()
     await pg.evaluate("(async () => { ACC = await DBX.me(); talkSt = null; })()")

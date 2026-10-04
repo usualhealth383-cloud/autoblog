@@ -493,12 +493,16 @@ def ago(sql_interval, table, idv, col='at'):
 def pass_only(*uids):   # 이용권만(첫 글 검토는 아직)
     for u in uids: cur.execute("update profiles set pass_until = current_date + 30, created_at = now() - interval '2 days' where id = %s", (u,))
     cur.connection.commit()
+def mkpost(tok, uid, title, body, board='talk'):   # 도배 제한(10분에 5개)에 걸리지 않게 그 사람의 최근 글 시각을 11분 앞으로
+    cur.execute("update posts set at = at - interval '11 minutes' where author = %s and at > now() - interval '10 minutes'", (uid,)); cur.connection.commit()
+    s_, j_ = call('POST', '/rest/v1/posts?select=id,review', {'board': board, 'title': title, 'body': body}, tok, 'return=representation')
+    assert s_ == 201, (s_, j_); return j_[0]['id']
 def get_post(pid, tok): return call('GET', f'/rest/v1/posts?id=eq.{pid}&select=id,review,review_why,likes,report_n', tok=tok)[1]
 
 print('▸ 첫 글 사전 검토(docs/11 §12-6) — 학생 첫 글은 쓴 사람·원장만 · 원장 승인 뒤 공개 · 댓글은 바로')
 R1, R1_ID = signup('r1@test.kr', '새학생'); R2, R2_ID = signup('r2@test.kr', '헌학생'); R3, R3_ID = signup('r3@test.kr', '댓글학생')
 RP, RP_ID = signup('rp@test.kr', '읽는보호자', role='parent'); RG, RG_ID = signup('rg@test.kr', '손님학생')
-pass_only(R1_ID, R3_ID); member(R2_ID)
+pass_only(R1_ID, R2_ID, R3_ID); member(R2_ID)
 s, j = rpc('my_talk', {}, R1); check('새 학생: 다음 글이 첫 글 검토를 거친다고 앎(review)', j.get('ok') and j.get('review') is True, j)
 s, j = rpc('my_talk', {}, R2); check('  └ 첫 글을 지난 학생은 review 아님', j.get('review') is False, j)
 s, j = call('POST', '/rest/v1/posts?select=id,review', {'board': 'qna', 'title': '첫 질문', 'body': '반응 속도 질문입니다'}, R1, 'return=representation')
@@ -538,7 +542,8 @@ cur.execute("select action, actor from talk_log where uid = %s and action in ('a
 check('처리 기록: 공개하지 않음 · 승인(누가 했는지까지)', [r[0] for r in rows] == ['reject', 'approve'] and all(r[1] == OWN_ID for r in rows), rows)
 
 print('▸ 선생님 확인 답변(docs/11 §12-7) · 답이 없는 질문(48시간)')
-q1 = call('POST', '/rest/v1/posts?select=id', {'board': 'qna', 'title': '확인받을 질문', 'body': '전자기 유도 질문'}, R2, 'return=representation')[1][0]['id']
+cur.execute('update profiles set first_ok_at = now() where id = %s', (R3_ID,)); cur.connection.commit()   # 아래는 첫 글을 지난 학생으로
+q1 = mkpost(R2, R2_ID, '확인받을 질문', '전자기 유도 질문', 'qna')
 c1 = call('POST', '/rest/v1/comments?select=id', {'post_id': q1, 'body': '자석을 움직이면 유도 전류가 흘러요'}, R3, 'return=representation')[1][0]['id']
 c0 = call('POST', '/rest/v1/comments?select=id', {'post_id': q1, 'body': '먼저 단 다른 답'}, R1, 'return=representation')[1][0]['id']
 for nm, t in (('학생', R2), ('댓글 쓴 학생', R3), ('보호자', RP), ('손님', RG), ('비로그인', ANON)):
@@ -551,13 +556,13 @@ sc = call('POST', '/rest/v1/comments?select=id', {'post_id': q1, 'body': '선생
 s, j = rpc('check_comment', {'p_id': sc, 'p_on': True}, OWN); check('  └ 선생님 댓글에는 따로 달지 않음', j.get('ok') is False, j)
 rpc('check_comment', {'p_id': c1, 'p_on': False}, OWN); rpc('check_comment', {'p_id': c1, 'p_on': True}, OWN)
 cur.execute("select action from talk_log where target = %s order by at", (f'comment:{c1}',)); check('  └ 처리 기록: 확인·풀기·확인', [r[0] for r in cur.fetchall()] == ['check', 'uncheck', 'check'])
-u_old = call('POST', '/rest/v1/posts?select=id', {'board': 'qna', 'title': '답 없는 옛 질문', 'body': '사흘째 답이 없어요'}, R2, 'return=representation')[1][0]['id']
-u_self = call('POST', '/rest/v1/posts?select=id', {'board': 'qna', 'title': '혼자 단 댓글', 'body': '내가 덧붙임'}, R2, 'return=representation')[1][0]['id']
+u_old = mkpost(R2, R2_ID, '답 없는 옛 질문', '사흘째 답이 없어요', 'qna')
+u_self = mkpost(R2, R2_ID, '혼자 단 댓글', '내가 덧붙임', 'qna')
 call('POST', '/rest/v1/comments', {'post_id': u_self, 'body': '덧붙입니다'}, R2)
-u_ans = call('POST', '/rest/v1/posts?select=id', {'board': 'qna', 'title': '답 달린 질문', 'body': '답이 있어요'}, R2, 'return=representation')[1][0]['id']
+u_ans = mkpost(R2, R2_ID, '답 달린 질문', '답이 있어요', 'qna')
 call('POST', '/rest/v1/comments', {'post_id': u_ans, 'body': '답'}, R3)
-u_new = call('POST', '/rest/v1/posts?select=id', {'board': 'qna', 'title': '방금 질문', 'body': '하루도 안 됨'}, R2, 'return=representation')[1][0]['id']
-u_talk = call('POST', '/rest/v1/posts?select=id', {'board': 'talk', 'title': '잡담', 'body': '질문 아님'}, R2, 'return=representation')[1][0]['id']
+u_new = mkpost(R2, R2_ID, '방금 질문', '하루도 안 됨', 'qna')
+u_talk = mkpost(R2, R2_ID, '잡담', '질문 아님', 'talk')
 for x in (u_old, u_self, u_ans, u_talk): ago('3 days', 'posts', x)
 s, j = rpc('unanswered_list', {}, OWN); ids = {x['id'] for x in j}
 check('원장: 48시간 지난 답 없는 질문(글쓴이 댓글만 있어도 포함)', u_old in ids and u_self in ids, j)
@@ -568,14 +573,14 @@ for nm, t in (('학생', R2), ('보호자', RP), ('손님', RG)):
 print('▸ 신고 남용 — 되돌려진 신고가 30일에 3번인 계정의 신고는 가림 수에 안 들어감(docs/11 §12-8)')
 M, M_ID = signup('m@test.kr', '자주신고'); V1, V1_ID = signup('v1@test.kr', '신고1'); V2, V2_ID = signup('v2@test.kr', '신고2')
 member(M_ID, V1_ID, V2_ID); cur.execute("update profiles set created_at = now() - interval '2 days' where id in (%s, %s, %s)", (M_ID, V1_ID, V2_ID)); cur.connection.commit()
-tgt = [call('POST', '/rest/v1/posts?select=id', {'board': 'talk', 'title': f'멀쩡한 글{i}', 'body': '문제 없는 글'}, R2, 'return=representation')[1][0]['id'] for i in range(3)]
-py = call('POST', '/rest/v1/posts?select=id', {'board': 'talk', 'title': '먼저 신고된 글', 'body': '신고 대상'}, R3, 'return=representation')[1][0]['id']
+tgt = [mkpost(R2, R2_ID, f'멀쩡한 글{i}', '문제 없는 글', 'talk') for i in range(3)]
+py = mkpost(R3, R3_ID, '먼저 신고된 글', '신고 대상', 'talk')
 for t in tgt[:2]: rpc('report_item', {'p_kind': 'post', 'p_id': t, 'p_reason': 'bully'}, M); rpc('clear_reports', {'p_kind': 'post', 'p_id': t}, OWN)
 for tk in (M, V1, V2): rpc('report_item', {'p_kind': 'post', 'p_id': py, 'p_reason': 'bully'}, tk)
 check('  (되돌림 2번까지는 그대로 셈 — 3건이면 가림)', get_post(py, R2) == [])
 rpc('report_item', {'p_kind': 'post', 'p_id': tgt[2], 'p_reason': 'bully'}, M); rpc('clear_reports', {'p_kind': 'post', 'p_id': tgt[2]}, OWN)
 cur.execute('select report_n from posts where id = %s', (py,)); check('세 번째 되돌림 뒤 그 계정의 다른 열린 신고도 가림 수에서 빠짐(3 → 2, 다시 보임)', cur.fetchone()[0] == 2 and len(get_post(py, R2)) == 1)
-px = call('POST', '/rest/v1/posts?select=id', {'board': 'talk', 'title': '새 글', 'body': '새로 신고될 글'}, R3, 'return=representation')[1][0]['id']
+px = mkpost(R3, R3_ID, '새 글', '새로 신고될 글', 'talk')
 for tk in (M, V1, V2): rpc('report_item', {'p_kind': 'post', 'p_id': px, 'p_reason': 'privacy'}, tk)
 cur.execute('select report_n from posts where id = %s', (px,)); check('  └ 새 신고도 가림 수에 안 들어감(3명 신고 → 2, 가려지지 않음)', cur.fetchone()[0] == 2 and len(get_post(px, R2)) == 1)
 s, j = rpc('reported_list', {}, OWN); r = [x for x in j if x['id'] == px]; check('  └ 원장 목록에는 남음(신고 3 · 그중 되돌림 많은 계정 1)', r and r[0]['muted'] == 1 and r[0]['reasons'] == {'privacy': 3}, r)
@@ -587,8 +592,8 @@ cur.execute("update reports set resolved_at = now() - interval '31 days' where u
 cur.execute('select report_n from posts where id = %s', (px,)); check('  └ 30일이 지나면 다시 셈(새벽 정리 때 맞춤 → 3, 가림)', cur.fetchone()[0] == 3 and get_post(px, R2) == [])
 
 print('▸ 처리 기록(운영 일지, docs/11 §12-11) — 원장이 지운 것 · 30일치 · 6개월 뒤 파기')
-dp = call('POST', '/rest/v1/posts?select=id', {'board': 'talk', 'title': '지울 글', 'body': '원장이 지움'}, R3, 'return=representation')[1][0]['id']
-mp = call('POST', '/rest/v1/posts?select=id', {'board': 'talk', 'title': '내가 지울 글', 'body': '스스로 지움'}, R3, 'return=representation')[1][0]['id']
+dp = mkpost(R3, R3_ID, '지울 글', '원장이 지움', 'talk')
+mp = mkpost(R3, R3_ID, '내가 지울 글', '스스로 지움', 'talk')
 rpc('delete_item', {'p_kind': 'post', 'p_id': dp}, OWN); rpc('delete_item', {'p_kind': 'post', 'p_id': mp}, R3)
 call('PATCH', f'/rest/v1/comments?id=eq.{c0}', {'deleted': True}, OWN)
 cur.execute("select target from talk_log where action = 'del' and uid in (%s, %s) and actor = %s", (R3_ID, R1_ID, OWN_ID)); dl = {r[0] for r in cur.fetchall()}

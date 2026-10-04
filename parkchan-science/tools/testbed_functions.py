@@ -167,6 +167,8 @@ def main():
       check('출석 → 보호자에게만 "푸시학생 학생 지각 · 18:02"', [m['token'] for m in SENT] == ['tok-par1'] and '푸시학생 학생 지각' in SENT[0]['notification']['title'] and '18:02' in SENT[0]['notification']['body'], SENT)
       check('  └ Firebase 범위로 따로 인증', any('firebase.messaging' in x for x in SCOPES))
       # 이야기 댓글 → 글쓴이에게만(자기 댓글은 알리지 않음)
+      import psycopg2 as _pg; _c = _pg.connect('host=127.0.0.1 port=54329 user=postgres dbname=pcs'); _c.autocommit = True
+      _c.cursor().execute("update profiles set first_ok_at = now() where role = 'student'"); _c.close()   # 첫 글 검토를 지난 학생으로(검토는 testbed_security 에서)
       pid = call('POST', '/rest/v1/posts?select=id', {'board': 'qna', 'title': '충격량 질문', 'body': '넓이가 왜 충격량인가요'}, S1, headers={'Prefer': 'return=representation'})[1][0]['id']
       DAY = '2026-10-01T15:00:00+09:00'   # 낮(한국 시각) — 밤 22~07시 댓글 알림은 아침으로 미룬다(아래)
       SENT.clear(); call('POST', '/functions/v1/push', {'type': 'INSERT', 'table': 'comments', 'record': {'post_id': pid, 'author': 'someone-else', 'body': '힘-시간 그래프의 넓이는 F×Δt 입니다', 'staff': True, 'at': DAY}}, headers=PH)

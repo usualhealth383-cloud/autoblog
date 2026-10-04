@@ -119,6 +119,34 @@ async def main():
         t = await o.inner_text('#limSec'); assert '0명' in t and '최근 처리 기록 2건' in t, t
         await logout(); await login('kb@t.kr', 'pass1234'); await o.click('.tab[data-v="talk"]'); await o.wait_for_timeout(900)
         assert await o.locator('#postNew').count() == 1, '풀었는데 글쓰기가 안 열림'
+        # ⑨ 첫 글 검토 → 원장 공개 · 신고가 자주 되돌려진 계정 · 처리 기록(지우기·신고 되돌리기·첫 글 공개) (docs/11 §12-6·8·11)
+        await o.evaluate("DBX.setNick('운영닉').then(a => ACC = a)"); await o.wait_for_timeout(300)
+        await o.evaluate("DBX.addPost({ board:'qna', title:'처음 쓰는 글', body:'첫 글은 원장님이 확인해요' })"); await o.click('.tab[data-v="me"]'); await o.click('.tab[data-v="talk"]'); await o.wait_for_timeout(900)
+        assert '검토 중' in await o.locator('.pcard', has_text='처음 쓰는 글').inner_text(), '첫 글에 검토 중 표시가 없음'
+        await logout(); await login(*OWNER); await o.click('[data-adm="talk"]'); await o.wait_for_timeout(900)
+        assert '검토할 첫 글 1건' in await o.inner_text('#rvSec'); await o.click('[data-rvok]'); await o.wait_for_timeout(900)
+        assert await o.locator('#rvSec').count() == 0, '공개했는데 검토 목록이 남음'
+        await logout(); await login('kb@t.kr', 'pass1234')
+        for i in range(3): await o.evaluate(f"DBX.addPost({{ board:'talk', title:'멀쩡한 글 {i}', body:'문제 없는 글입니다' }})")
+        await o.evaluate("DBX.addPost({ board:'talk', title:'새로 신고될 글', body:'신고 대상 글입니다' })"); await o.wait_for_timeout(300)
+        assert await o.evaluate("DBX.posts('전체','').then(l => l.filter(x => !x.review).length)") >= 5, '첫 글 공개 뒤 새 글이 바로 공개되지 않음'
+        await logout(); await login('ka@t.kr', 'pass1234')
+        if SRV:   # 서버는 가입 하루가 지나야 신고를 받는다 — 이틀 전으로
+            keys = json.loads(U.urlopen(GW + '/__anon').read()); uid = await o.evaluate('ACC.id')
+            U.urlopen(U.Request(f'{GW}/rest/v1/profiles?id=eq.{uid}', data=json.dumps({'created_at': (dt.datetime.now(dt.timezone.utc) - dt.timedelta(days=2)).isoformat()}).encode(), method='PATCH',
+                                headers={'Content-Type': 'application/json', 'apikey': keys['service'], 'Authorization': 'Bearer ' + keys['service']})).read()
+        r = await o.evaluate("DBX.posts('전체','').then(l => Promise.all(l.filter(x => /멀쩡한 글|새로 신고될 글/.test(x.title)).map(x => DBX.reportItem('post', x.id, 'bully'))))")
+        assert len(r) == 4 and all(x.get('ok') for x in r), r
+        await logout(); await login(*OWNER); await o.click('[data-adm="talk"]'); await o.wait_for_timeout(900)
+        for i in range(3):
+            await o.locator('.setrow', has_text=f'멀쩡한 글 {i}').locator('[data-admclr]').click(); await o.wait_for_timeout(900)
+        t = await o.inner_text('#mutSec'); assert '신고가 자주 되돌려진 계정 1명' in t and '되돌린 신고 3번' in t, t
+        row = o.locator('.setrow', has_text='새로 신고될 글'); assert '자주 되돌려진 계정의 신고 1' in await row.inner_text(), await row.inner_text()
+        await o.screenshot(path=f'{SC}/a07_muted.png', full_page=True)
+        await row.locator('[data-admpdel]').click(); await o.wait_for_timeout(900)
+        await o.click('#logBox summary'); await o.wait_for_timeout(200); t = await o.inner_text('#logBox')
+        assert '지우기' in t and '새로 신고될 글' in t and t.count('— 신고 되돌리기') == 3 and '— 첫 글 공개' in t, t
+        await o.screenshot(path=f'{SC}/a08_log.png', full_page=True)
         assert not errs, errs
         print(('SERVER ' if SRV else 'LOCAL ') + 'ADMIN E2E OK · 콘솔 오류', errs); await b.close()
 

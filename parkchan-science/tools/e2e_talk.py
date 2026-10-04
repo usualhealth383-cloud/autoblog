@@ -281,6 +281,93 @@ async def server_safety():
         assert not errs, errs
         print('SERVER TALK SAFETY OK'); await b.close()
 
+async def server_review():
+    """2026-10 docs/11 §12-6·7·11·14 — 첫 글 검토(검토 중 → 공개 안 함 → 고쳐 다시 → 공개) · 선생님 확인(맨 위·초록 체크) ·
+    답이 없는 질문(48시간) · 처리 기록 · 욕설 미리 경고(한 번 더 묻기 · 아주 심한 욕은 막음)"""
+    keys = _j.loads(_u.urlopen(GW + '/__anon').read()); SVC = keys['service']
+    def svc(path, body, m='PATCH'):
+        _u.urlopen(_u.Request(GW + '/rest/v1/' + path, data=_j.dumps(body).encode(), method=m, headers={'Content-Type': 'application/json', 'apikey': SVC, 'Authorization': 'Bearer ' + SVC})).read()
+    async with async_playwright() as p:
+        b = await p.chromium.launch(executable_path='/opt/pw-browsers/chromium'); errs = []
+        async def page():
+            c = await b.new_context(viewport={'width': 390, 'height': 844}); await c.add_init_script(NO_INTRO); pg = await c.new_page()
+            pg.on('pageerror', lambda e: errs.append(str(e))); await auto_yes(pg); await pg.goto(APP); await pg.wait_for_timeout(700); return c, pg
+        async def talk(pg):
+            await pg.click('.tab[data-v="me"]'); await pg.wait_for_timeout(200); await pg.click('.tab[data-v="talk"]'); await pg.wait_for_timeout(800)
+        _u.urlopen(_u.Request(GW + '/__reset', method='POST')).read()
+        # 새 학생 N — 첫 글은 '검토 중'(쓴 사람만 봄)
+        cn, n = await page(); await signup(n, '새로온학생', 'rv1@demo.kr'); await member(n, trust=False)
+        await talk(n); await n.click('#postNew'); await n.wait_for_timeout(300)
+        await n.fill('#nkIn', '병신같은닉'); await n.click('#nkSave'); await n.wait_for_timeout(300)
+        assert '욕설' in await n.inner_text('#nkWarn'), '앱이 욕설 닉네임을 통과시킴'
+        await n.fill('#nkIn', '새싹과학'); await n.click('#nkSave'); await n.wait_for_timeout(700)
+        assert await n.locator('#poFirst').count() == 1, '첫 글 안내 한 줄이 없음'
+        await n.fill('#poT', '광합성 질문이요'); await n.fill('#poX', '빛 반응이 어디서 일어나는지 헷갈려요. 틸라코이드 맞나요?')
+        await n.screenshot(path=f'{SC}/r0_first_sheet.png'); await n.click('#poSave'); await n.wait_for_timeout(1000)
+        assert await n.locator('.pcard .rvw').count() == 1 and '검토 중' in await n.inner_text('.pcard .rvw'), '내 글에 검토 중 표시가 없음'
+        await n.screenshot(path=f'{SC}/r1_pending_list.png')
+        await n.click('.pcard'); await n.wait_for_timeout(700); assert '원장님이 확인하고 있어요' in await n.inner_text('#rvNote')
+        await n.screenshot(path=f'{SC}/r2_pending_post.png', full_page=True)
+        pid = await n.evaluate('postId')
+        # 다른 학생 B — 안 보임 · 욕설 미리 경고
+        cb, bb = await page(); await signup(bb, '헌학생', 'rv2@demo.kr'); await member(bb); await bb.evaluate("DBX.setNick('오래된친구').then(a => ACC = a)"); await bb.wait_for_timeout(300)
+        await talk(bb); assert await bb.locator('.pcard').count() == 0, '검토 중인 첫 글이 다른 학생에게 보임'
+        await bb.click('#postNew'); await bb.wait_for_timeout(300)
+        await bb.fill('#poT', '시험 망함'); await bb.fill('#poX', '아 진짜 씨발 이번 시험 망했다 다들 어땠어')
+        await bb.evaluate('window.__askManual = true'); await bb.click('#poSave'); await bb.wait_for_timeout(400)
+        assert '상처가 될 수 있어요' in await bb.inner_text('#askMsg') and await bb.inner_text('#askNo') == '고쳐 쓸게요', '욕설 경고가 안 뜸'
+        await bb.screenshot(path=f'{SC}/r3_abuse_ask.png'); await bb.click('#askNo'); await bb.wait_for_timeout(300)
+        assert await bb.locator('#poT').count() == 1, '고쳐 쓸게요를 눌렀는데 창이 닫힘'
+        await bb.fill('#poX', '느 금 마 진짜'); await bb.click('#poSave'); await bb.wait_for_timeout(400)
+        assert '아주 심한 욕설' in await bb.inner_text('#poWarn'), '아주 심한 욕을 앱이 막지 않음'
+        r = await bb.evaluate("DBX.addPost({ board:'talk', title:'우회', body:'니애미' }).then(() => 'ok', e => e.message)"); assert '심한 욕설' in r, ('서버도 거절', r)
+        await bb.fill('#poX', '이번 시험 망했다 다들 어땠어'); await bb.click('#poSave'); await bb.wait_for_timeout(900)
+        await bb.evaluate('window.__askManual = false')
+        # 원장 — 맨 위 '검토할 첫 글' · 공개 안 함(사유)
+        co, o = await page(); await o.click('#goLogin'); await o.fill('#lgEmail', 'owner@parkchan.kr'); await o.fill('#lgPw', 'owner-pass'); await o.click('#lgGo'); await o.wait_for_timeout(1000)
+        await o.click('[data-adm="talk"]'); await o.wait_for_timeout(900)
+        first_sec = await o.evaluate("document.querySelector('#v-admin .sec')?.id")
+        assert first_sec == 'rvSec' and '검토할 첫 글 1건' in await o.inner_text('#rvSec') and '새로온학생' in await o.inner_text('#rvSec'), (first_sec, await o.inner_text('#v-admin'))
+        await o.screenshot(path=f'{SC}/r4_owner_review.png', full_page=True)
+        await o.click('[data-rvno]'); await o.wait_for_timeout(400); await o.select_option('#rjR', '이야기 규칙에 맞지 않아요'); await o.fill('#rjF', '제목을 조금 더 구체적으로 적어 주세요')
+        await o.screenshot(path=f'{SC}/r5_reject_sheet.png'); await o.click('#rjGo'); await o.wait_for_timeout(900)
+        assert await o.locator('#rvSec').count() == 0, '처리했는데 검토 목록이 남음'
+        await n.reload(); await n.wait_for_timeout(1300); await talk(n); assert '공개 안 됨' in await n.locator('.pcard', has_text='광합성').locator('.rvw').inner_text()
+        await n.locator('.pcard', has_text='광합성').click(); await n.wait_for_timeout(700); t = await n.inner_text('#rvNote'); assert '공개하지 않았어요' in t and '구체적으로' in t, t
+        await n.screenshot(path=f'{SC}/r6_rejected_author.png', full_page=True)
+        await n.click('#pEdit'); await n.wait_for_timeout(400); await n.fill('#poT', '광합성 빛 반응이 일어나는 장소 질문'); await n.click('#poSave'); await n.wait_for_timeout(900)
+        assert '원장님이 확인하고 있어요' in await n.inner_text('#rvNote'), '고쳐 쓰면 다시 검토 중이어야 함'
+        # 원장 — 글 화면에서 공개 → B 에게 보임 · N 의 다음 글은 바로
+        await o.click('.tab[data-v="talk"]'); await o.wait_for_timeout(700); await o.locator('.pcard', has_text='광합성').click(); await o.wait_for_timeout(700)
+        await o.click('#pRvOk'); await o.wait_for_timeout(900); assert await o.locator('#rvNote').count() == 0
+        await talk(bb); assert await bb.locator('.pcard', has_text='광합성').count() == 1, '공개했는데 다른 학생에게 안 보임'
+        await talk(n); await n.click('#postNew'); await n.wait_for_timeout(300); assert await n.locator('#poFirst').count() == 0, '공개 뒤에도 첫 글 안내가 남음'
+        await n.fill('#poT', '두 번째 질문'); await n.fill('#poX', '이번엔 바로 올라가나요? 궁금합니다'); await n.click('#poSave'); await n.wait_for_timeout(900)
+        await talk(bb); assert await bb.locator('.pcard', has_text='두 번째 질문').count() == 1, '공개 뒤 새 글이 바로 안 보임'
+        # 선생님 확인 — 학생 답 둘 중 늦게 단 것을 확인하면 맨 위 · 초록 체크
+        await bb.locator('.pcard', has_text='광합성').click(); await bb.wait_for_timeout(700)
+        await bb.fill('#cIn', '엽록체 바깥쪽 막에서 일어나요'); await bb.click('#cGo'); await bb.wait_for_timeout(800)
+        await bb.fill('#cIn', '틸라코이드 막에서 일어나요. 스트로마는 탄소 고정!'); await bb.click('#cGo'); await bb.wait_for_timeout(800)
+        await o.click('#talkBack'); await o.wait_for_timeout(600); await o.locator('.pcard', has_text='광합성').click(); await o.wait_for_timeout(700)
+        await o.locator('.cm', has_text='틸라코이드 막에서').locator('[data-cchk]').click(); await o.wait_for_timeout(900)
+        await bb.reload(); await bb.wait_for_timeout(1300); await talk(bb); await bb.locator('.pcard', has_text='광합성').click(); await bb.wait_for_timeout(800)
+        first = bb.locator('.cm').first; assert '틸라코이드 막에서' in await first.inner_text() and await first.locator('.chk').count() == 1, '선생님 확인 답이 맨 위·체크가 아님'
+        await bb.screenshot(path=f'{SC}/r7_checked.png', full_page=True)
+        # 답이 없는 질문(48시간) — 질문을 사흘 전으로 돌린다
+        qid = await bb.evaluate("DBX.addPost({ board:'qna', title:'아무도 안 답한 질문', body:'산화 환원 질문입니다' }).then(x => x.id)")
+        import datetime as _d; svc(f'posts?id=eq.{qid}', {'at': (_d.datetime.now(_d.timezone.utc) - _d.timedelta(days=3)).isoformat()})
+        await o.click('.tab[data-v="admin"]'); await o.wait_for_timeout(500); await o.click('[data-adm="talk"]'); await o.wait_for_timeout(900)
+        u = await o.inner_text('#unaBox'); assert '아무도 안 답한 질문' in u and '광합성' not in u, u
+        await o.click('#logBox summary'); await o.wait_for_timeout(200)
+        lg = await o.inner_text('#logBox'); assert all(w in lg for w in ('첫 글 공개', '첫 글 공개 안 함', '선생님 확인', '원장')), lg
+        await o.screenshot(path=f'{SC}/r8_owner_log.png', full_page=True)
+        await o.click('#unaBox [data-admcare]'); await o.wait_for_timeout(700); assert await o.evaluate('view') == 'post'
+        await o.fill('#cIn', '산화는 전자를 잃는 것입니다.'); await o.click('#cGo'); await o.wait_for_timeout(800)
+        await o.click('.tab[data-v="admin"]'); await o.wait_for_timeout(700)
+        assert '아무도 안 답한 질문' not in await o.inner_text('#unaBox'), '선생님이 답했는데 답 없는 질문에 남음'
+        assert not errs, errs
+        print('SERVER TALK REVIEW OK'); await b.close()
+
 if '--server' in sys.argv:
-    asyncio.run(server_mode()); asyncio.run(server_safety())
+    asyncio.run(server_mode()); asyncio.run(server_safety()); asyncio.run(server_review())
 else: asyncio.run(main())

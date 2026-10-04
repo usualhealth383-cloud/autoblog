@@ -380,6 +380,26 @@ button,.tab,.btn,.chip,.chipbar button,.seg button{-webkit-user-select:none;user
 .rsn button.worry[aria-checked="true"]{border-color:var(--brand)}
 .rtag{display:inline-block;font-size:10.5px;font-weight:800;color:var(--warn);background:var(--warn-soft);border-radius:5px;padding:1px 6px;margin:4px 4px 0 0}
 .rtag.q{color:var(--muted);background:var(--ground)}
+/* 첫 글 검토 표시(쓴 사람·원장만 봄) · 선생님 확인 답(초록 체크, 맨 위) — 글 목록·글 화면·댓글 어디서나 같은 모양 */
+.rvw{display:inline-block;font-size:10.5px;font-weight:900;color:var(--warn);background:var(--warn-soft);border-radius:5px;padding:2px 7px}
+.rvw.no{color:var(--muted);background:var(--ground)}
+.rvnote{font-size:12.5px;color:var(--body);background:var(--warn-soft);border-radius:12px;padding:10px 13px;margin:10px 0 0;line-height:1.7;word-break:keep-all}
+.rvnote.no{background:var(--ground)}
+.chk{display:inline-flex;align-items:center;gap:3px;font-size:10.5px;font-weight:900;color:var(--on-color);background:var(--brand);border-radius:5px;padding:2px 7px 2px 5px}
+.chk svg{width:12px;height:12px;fill:none;stroke:currentColor;stroke-width:3;stroke-linecap:round;stroke-linejoin:round}
+.cm.chkc{background:var(--brand-soft);border-radius:12px;border-top-color:transparent;padding:12px 12px;margin:4px 0}
+.cm.chkc + .cm{border-top:none}
+.stuedit summary .none{font-weight:600;font-size:13px;color:var(--muted)}
+.stuedit summary .cst{margin-left:4px}
+/* 합답형 ㄱㄴㄷ 판정 한 줄(해설 문장에서 'ㄱ (옳음) …' · 'ㄴ (틀림 →) …'을 나눠 그린다) */
+.jdl{margin:6px 0 0}
+.jd{display:flex;gap:8px;align-items:flex-start;padding:7px 0;border-top:1px solid var(--u-line);font-size:13.5px;line-height:1.7;color:var(--body)}
+.jd:first-child{border-top:none;padding-top:2px}
+.jd .k{flex:0 0 auto;font-weight:900;color:var(--ink);min-width:15px}
+.jd .v{flex:0 0 auto;font-size:11px;font-weight:900;border-radius:5px;padding:1px 7px;margin-top:3px;white-space:nowrap}
+.jd .v.o{color:var(--on-color);background:var(--u)}
+.jd .v.x{color:var(--no);background:var(--card);box-shadow:inset 0 0 0 1px var(--no)}
+.jd .t{flex:1;min-width:0}
 .ckrow{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--body);margin:2px 0 12px;min-height:40px;cursor:pointer}
 .sheet .ckrow input{width:20px;height:20px;min-height:0;flex:0 0 auto;padding:0;margin:0;border:none;accent-color:var(--brand)}
 .setrow>span>button.more{font-size:12px;font-weight:800;color:var(--brand-dark);background:var(--brand-soft);border:none;border-radius:999px;padding:0 13px;min-height:34px;cursor:pointer;font-family:inherit;white-space:nowrap}
@@ -1227,7 +1247,7 @@ const DB = (() => {
     ],
     accounts: [   // 시연용 계정
       { id:'a-owner',   email:'owner@parkchan.kr',  pw:h32('2580'), role:'owner',   name:'원장', phone:'', created:'2026-09-01' },
-      { id:'a-student', email:'student@demo.kr',    pw:h32('1234'), role:'student', name:'박○○', phone:'', studentCode:'DEMO01', created:'2026-09-01' },
+      { id:'a-student', email:'student@demo.kr',    pw:h32('1234'), role:'student', name:'박○○', phone:'', studentCode:'DEMO01', created:'2026-09-01', firstOk:'2026-09-01T00:00:00.000Z' },   // 시연 학생은 첫 글 검토를 지난 계정
       { id:'a-parent',  email:'parent@demo.kr',     pw:h32('1234'), role:'parent',  name:'박○○ 보호자', phone:'', childCodes:['DEMO01'], created:'2026-09-01' },
     ],
     attendance: [], notices: [], sched: [], posts: [], comments: [], passes: [], progress: {},
@@ -1240,22 +1260,36 @@ const DB = (() => {
   d.accounts.forEach(a => { if (a.childCode && !a.childCodes){ a.childCodes = [a.childCode]; } delete a.childCode; });   // 자녀 여러 명으로 옮김
   /* 신고 — 서버 reports 표와 같은 모양(누가 · 사유 · 열림/그대로 둠/지움). 가림 수는 열린 신고 중 '걱정돼요'를 뺀 것 */
   const repOf = x => (x.reports = (x.reports||[]).map(r => typeof r === 'string' ? { uid:r, reason:'other', state:'open', at:x.at } : r));
-  const recount = x => (x.report_n = repOf(x).filter(r => r.state === 'open' && r.reason !== 'worry').length);
+  /* 신고가 자주 되돌려진 계정(30일에 '그대로 둠' 3번 이상) — 서버 private.rep_muted 와 같다. 그 사람의 열린 신고는 가림 수에 넣지 않는다 */
+  const keptN = u => { const since = new Date(Date.now() - 30*864e5).toISOString(); return [...(d.posts||[]), ...(d.comments||[])].reduce((n, x) => n + repOf(x).filter(r => r.uid === u && r.state === 'kept' && r.reason !== 'worry' && (r.resolved_at||'') > since).length, 0); };
+  const muted = u => keptN(u) >= 3;
+  const recount = x => (x.report_n = repOf(x).filter(r => r.state === 'open' && r.reason !== 'worry' && !muted(r.uid)).length);
   [...(d.posts||[]), ...(d.comments||[])].forEach(recount);
+  /* 처리 기록(운영 일지) — 서버 talk_log 와 같은 모양: 누구에게(uid) · 무엇을(action) · 누가(actor) · 어디(target) */
+  const logAct = (uid, action, extra = {}) => { d.talkLog ||= []; d.talkLog.push({ uid, action, reason:'', memo:'', guardian:false, until:null, actor:(me()||{}).id || null, target:null, at:new Date().toISOString(), ...extra }); };
+  /* 첫 글을 지난 학생 — 옛 기록에서 이미 공개된 글이 있는 학생도(서버 마이그레이션과 같다) */
+  d.accounts.forEach(a => { if (a.role === 'student' && !a.firstOk && (d.posts||[]).some(x => x.uid === a.id && !x.review && !x.staff)) a.firstOk = new Date().toISOString(); });
+  const seeAll = () => { const a = me(); return !!a && a.role === 'owner'; };
+  const visible = x => !x.review || seeAll() || (me() && x.uid === me().id);   // 검토 중·공개 안 한 첫 글은 쓴 사람·원장만
+  const readOff = () => { const a = me(); return !!a && a.guardTalk === 'all'; };
   const resolve = (x, pick, state) => { const t = new Date().toISOString(); repOf(x).forEach(r => { if (r.state === 'open' && pick(r)){ r.state = state; r.resolved_at = t; } }); recount(x); };
   /* 이야기에 쓸 수 있는가 — 서버 private.talk_block 과 같은 순서(원장 · 동의 · 이용 제한 · 보호자 · 학원 코드나 이용권) */
   const talkBlock = a => { if (!a) return 'login'; if (a.role === 'owner') return null; if (a.under14 && !a.guardianOk) return 'consent';
     if (a.talkUntil && (a.talkUntil === 'stop' || a.talkUntil >= todayISO())) return 'limit';
+    if (a.guardTalk) return 'guardian';
     if (a.role !== 'student') return 'parent';
     if ((a.passUntil && a.passUntil >= todayISO()) || d.students.some(x => x.code === a.studentCode && x.until >= todayISO())) return null; return 'member'; };
-  const talkGuard = () => { const a = me(), b = talkBlock(a); if (b) throw new Error(talkMsg(b, a && a.talkUntil)); return a; };
+  const talkGuard = () => { const a = me(), b = talkBlock(a); if (b) throw new Error(talkMsg(b, a && a.talkUntil, a && a.guardTalk)); return a; };
   /* 개인정보 — 서버 pii_guard 와 같다: 주민등록번호는 거절, 휴대전화는 가운데를 가려 저장(원장 글은 그대로) */
-  const piiGuard = (a, t) => { if (PII[0][0].test(t)) throw new Error('주민등록번호로 보이는 내용은 올릴 수 없습니다. 지우고 다시 올려 주세요.'); return a && a.role === 'owner' ? (v => v) : piiMask; };
+  const piiGuard = (a, t) => { if (PII[0][0].test(t)) throw new Error('주민등록번호로 보이는 내용은 올릴 수 없습니다. 지우고 다시 올려 주세요.');
+    if (!(a && a.role === 'owner') && abuseLevel(t) >= 2) throw new Error('아주 심한 욕설이 들어 있어 올릴 수 없습니다. 고쳐서 다시 올려 주세요.');   // 서버 pii_guard 와 같다
+    return a && a.role === 'owner' ? (v => v) : piiMask; };
   CLASSES_CACHE = d.classes.slice();
   const w = () => { try { localStorage.setItem(DBKEY, JSON.stringify(d)); } catch {} };
   let sid = null; try { sid = localStorage.getItem('pcs.local.sid'); } catch {}
   const pub = a => a ? { id:a.id, email:a.email, role:a.role, name:a.name, phone:a.phone||'', studentCode:a.studentCode||'', childCodes:(a.childCodes||[]).slice(), childPending:(a.childPending||[]).slice(), childCode:(a.childCodes||[])[0]||'', passUntil:a.passUntil||'', nick:a.nick||'', under14:!!a.under14, guardian:a.guardian||'', guardianOk:!!a.guardianOk, guardianHow:a.guardianHow||'', guardianAt:a.guardianAt||'', talkUntil:a.talkUntil||'', created:a.created } : null;
   const me = () => d.accounts.find(a => a.id === sid) || null;
+  const nameOf = id => (d.accounts.find(z => z.id === id) || {}).name || '';
   const stateOf = code => d.progress[code] || null;
   const attend = (s, manual) => {
     const date = todayISO(); let a = d.attendance.find(x=>x.code===s.code && x.date===date);
@@ -1299,17 +1333,22 @@ const DB = (() => {
         if (!a.childCodes.includes(c)){ if (a.childCodes.length + a.childPending.length >= 5 && !a.childPending.includes(c)) return { ok:false, why:'자녀는 다섯 명까지 연결할 수 있습니다.' };
           if (!a.childPending.includes(c)) a.childPending.push(c); a.pendingAt ||= {}; a.pendingAt[c] ||= new Date().toISOString(); w(); return { ok:true, pending:true }; } }
       w(); return { ok:true, student:{ code:s.code, name:s.name, cls:s.cls, until:s.until } }; },
-    clearReports: async (kind, id) => { const arr = kind === 'post' ? (d.posts||[]) : (d.comments||[]); const x = arr.find(y => y.id === id); if (x){ resolve(x, r => r.reason !== 'worry', 'kept'); w(); } },
+    clearReports: async (kind, id) => { const arr = kind === 'post' ? (d.posts||[]) : (d.comments||[]); const x = arr.find(y => y.id === id); if (!x) return;
+      const who = repOf(x).filter(r => r.state === 'open' && r.reason !== 'worry').map(r => r.uid); if (!who.length) return;
+      resolve(x, r => r.reason !== 'worry', 'kept'); logAct(x.uid, 'keep', { target:kind + ':' + x.id });
+      [...(d.posts||[]), ...(d.comments||[])].forEach(y => { if (repOf(y).some(r => r.state === 'open' && who.includes(r.uid))) recount(y); }); w(); },   // 이번 일로 '자주 되돌려진 계정'이 된 사람의 다른 신고도 다시 센다
     deleteUser: async email => { const a = d.accounts.find(x => x.email === String(email).trim().toLowerCase()); if (!a) return { ok:false, why:'그 이메일로 가입한 계정이 없습니다.' };
-      if (a.role === 'owner') return { ok:false, why:'원장 계정은 여기서 지울 수 없습니다.' }; d.accounts = d.accounts.filter(x => x !== a); delete d.progress['u:'+a.id]; if (d.notes) delete d.notes[a.id]; w(); return { ok:true }; },
+      if (a.role === 'owner') return { ok:false, why:'원장 계정은 여기서 지울 수 없습니다.' }; d.accounts.forEach(k => { if (k.guardBy === a.id){ k.guardTalk = null; k.guardBy = null; k.guardAt = null; } }); d.accounts = d.accounts.filter(x => x !== a); delete d.progress['u:'+a.id]; if (d.notes) delete d.notes[a.id]; w(); return { ok:true }; },
     guardianRequests: async () => d.accounts.filter(a => a.role==='parent' && (a.childPending||[]).length).flatMap(a => a.childPending.map(c => { const s = d.students.find(x => x.code === c) || {};
       return { uid:a.id, code:c, at:(a.pendingAt||{})[c] || a.created, name:a.name, phone:a.phone||'', email:a.email, student:s.name||'', cls:s.cls||'' }; })),
     guardianDecide: async (uid, code, ok) => { const a = d.accounts.find(x => x.id === uid); if (!a) return;
       a.childPending = (a.childPending||[]).filter(x => x !== code);
-      if (ok){ a.childCodes ||= []; if (!a.childCodes.includes(code)) a.childCodes.push(code); } else a.childCodes = (a.childCodes||[]).filter(x => x !== code); w(); },
+      if (ok){ a.childCodes ||= []; if (!a.childCodes.includes(code)) a.childCodes.push(code); } else { a.childCodes = (a.childCodes||[]).filter(x => x !== code);
+        d.accounts.forEach(k => { if (k.guardBy === a.id && k.studentCode === code){ k.guardTalk = null; k.guardBy = null; k.guardAt = null; } }); } w(); },
     myGuardians: async () => { const a = me(); if (!a || !a.studentCode) return []; return d.accounts.filter(x => x.role==='parent' && (x.childCodes||[]).includes(a.studentCode)).map(x => ({ name:x.name })); },
-    unlinkChild: async code => { const a = me(); if (a){ a.childCodes = (a.childCodes||[]).filter(x => x !== code); w(); } },
-    deleteAccount: async () => { const a = me(); if (!a) return; d.accounts = d.accounts.filter(x => x.id !== a.id); delete d.progress['u:'+a.id]; if (d.notes) delete d.notes[a.id]; sid = null; try { localStorage.removeItem('pcs.local.sid'); } catch {} w(); },
+    unlinkChild: async code => { const a = me(); if (a){ a.childCodes = (a.childCodes||[]).filter(x => x !== code);
+      d.accounts.forEach(k => { if (k.guardBy === a.id && k.studentCode === code){ k.guardTalk = null; k.guardBy = null; k.guardAt = null; } }); w(); } },   // 그 보호자가 꺼 둔 자녀 이야기도 함께 푼다
+    deleteAccount: async () => { const a = me(); if (!a) return; d.accounts.forEach(k => { if (k.guardBy === a.id){ k.guardTalk = null; k.guardBy = null; k.guardAt = null; } }); d.accounts = d.accounts.filter(x => x.id !== a.id); delete d.progress['u:'+a.id]; if (d.notes) delete d.notes[a.id]; sid = null; try { localStorage.removeItem('pcs.local.sid'); } catch {} w(); },
     /* 학원 코드 · 자녀 연결 */
     verifyCode: async code => {
       const s = d.students.find(x => x.code === code);
@@ -1342,36 +1381,40 @@ const DB = (() => {
     notices: async cls => d.notices.filter(n => n.cls===cls || n.cls==='전체').sort((a,b)=>b.at.localeCompare(a.at)),
     allNotices: async () => d.notices.slice().sort((a,b)=>b.at.localeCompare(a.at)),
     /* 이야기 — 글과 댓글. 신고가 REPORT_HIDE 건 쌓이면 자동으로 가려지고 원장이 확인한다 */
-    posts: async (board, q) => { d.posts ||= [];
+    posts: async (board, q) => { d.posts ||= []; if (readOff()) return [];
       const kw = (q||'').trim();
-      return d.posts.filter(x => (board === '전체' || x.board === board) && !x.deleted
+      return d.posts.filter(x => (board === '전체' || x.board === board) && !x.deleted && visible(x)
           && (!kw || (x.title + x.body).includes(kw)))
         .map(x => ({ ...x, comments: (d.comments||[]).filter(c => c.postId === x.id && !c.deleted).length }))
         .sort((a, b) => b.at.localeCompare(a.at)); },
-    post: async id => { const x = (d.posts||[]).find(y => y.id === id && !y.deleted); if (!x) return null;
+    post: async id => { const x = (d.posts||[]).find(y => y.id === id && !y.deleted); if (!x || !visible(x) || readOff()) return null;
       return { ...x, comments: (d.comments||[]).filter(c => c.postId === id && !c.deleted).sort((a,b)=>a.at.localeCompare(b.at)) }; },
     addPost: async body => { d.posts ||= []; const a = talkGuard(); const mk = piiGuard(a, (body.title||'') + ' ' + (body.body||''));
       body = { ...body, title: mk(body.title), body: mk(body.body) };
       const x = { id: uid(), uid: a ? a.id : '', nick: (a && a.nick) || (a && a.role==='owner' ? '원장님' : '익명'), cls: (a && a.studentCode) ? (d.students.find(s=>s.code===a.studentCode)||{}).cls || '' : '',
         at: new Date().toISOString(), likes: [], reports: [], solved: false, deleted: false, ...body, staff: !!(a && a.role==='owner') };
+      x.review = a && a.role === 'student' && !a.firstOk ? 'wait' : null; x.review_why = '';   // 첫 글 검토(서버 stamp_author 와 같다)
       x.care = careCheck(x.title + ' ' + x.body); d.posts.unshift(x); w(); return x; },
     editPost: async (id, body) => { const x = (d.posts||[]).find(y=>y.id===id); const a = me(); if (a && a.role !== 'owner') talkGuard();
       const mk = piiGuard(a, (body.title||'') + ' ' + (body.body||'')); body = { ...body, title: mk(body.title), body: mk(body.body) };
-      if (x){ Object.assign(x, body, { edited:new Date().toISOString() }); x.care = careCheck(x.title + ' ' + x.body); w(); } return x; },
-    delPost: async id => { const x = (d.posts||[]).find(y=>y.id===id); if (x){ x.deleted = true; resolve(x, () => true, 'removed'); w(); } },
+      if (x){ Object.assign(x, body, { edited:new Date().toISOString() }); x.care = careCheck(x.title + ' ' + x.body);
+        if (x.review === 'no' && !(a && a.role === 'owner')){ x.review = 'wait'; x.review_why = ''; } w(); } return x; },   // 공개하지 않은 첫 글을 고치면 다시 검토로
+    delPost: async id => { const x = (d.posts||[]).find(y=>y.id===id); if (x){ x.deleted = true; resolve(x, () => true, 'removed'); if (seeAll() && x.uid !== me().id) logAct(x.uid, 'del', { target:'post:' + x.id }); w(); } },
     addComment: async (postId, text) => { d.comments ||= []; const a = talkGuard(); text = piiGuard(a, text)(text);
+      const host = (d.posts||[]).find(x => x.id === postId && !x.deleted); if (!host || !visible(host)) throw new Error('지워졌거나 없는 글입니다.');
       const c = { id: uid(), postId, uid: a ? a.id : '', nick: (a && a.nick) || (a && a.role==='owner' ? '원장님' : '익명'), body: text,
         at: new Date().toISOString(), likes: [], reports: [], picked: false, deleted: false, staff: !!(a && a.role==='owner') };
       c.care = careCheck(text); d.comments.push(c); w(); return c; },
-    delComment: async id => { const c = (d.comments||[]).find(x=>x.id===id); if (c){ c.deleted = true; resolve(c, () => true, 'removed'); w(); } },
+    delComment: async id => { const c = (d.comments||[]).find(x=>x.id===id); if (c){ c.deleted = true; resolve(c, () => true, 'removed'); if (seeAll() && c.uid !== me().id) logAct(c.uid, 'del', { target:'comment:' + c.id }); w(); } },
     pickComment: async (postId, cid) => { (d.comments||[]).filter(c=>c.postId===postId).forEach(c => c.picked = (c.id === cid));
       const p = (d.posts||[]).find(x=>x.id===postId); if (p) p.solved = true; w(); },
     likeToggle: async (kind, id) => { const a = talkGuard(); if (!a) return;
       const arr = kind === 'post' ? d.posts : d.comments, x = (arr||[]).find(y=>y.id===id); if (!x) return;
+      const host = kind === 'post' ? x : (d.posts||[]).find(p => p.id === x.postId); if (!host || host.review) return;   // 검토 중인 첫 글은 아직 남에게 안 보인다
       x.likes ||= []; const i = x.likes.indexOf(a.id); i < 0 ? x.likes.push(a.id) : x.likes.splice(i,1); w(); },
     /* 서버 report_item 과 같은 답: 같은 사람은 한 번(걱정돼요는 따로 한 번) · 원장이 살펴본 신고는 다시 눌러도 다시 세지 않는다 */
     reportItem: async (kind, id, reason = 'other') => { const a = me(); if (!a) return { ok:false, why:'로그인이 필요합니다.' };
-      const arr = kind === 'post' ? d.posts : d.comments, x = (arr||[]).find(y=>y.id===id && !y.deleted); if (!x) return { ok:false, why:'지워졌거나 없는 글입니다.' };
+      const arr = kind === 'post' ? d.posts : d.comments, x = (arr||[]).find(y=>y.id===id && !y.deleted); if (!x || (kind === 'post' && !visible(x))) return { ok:false, why:'지워졌거나 없는 글입니다.' };
       if (x.staff) return { ok:false, why:'선생님 글은 신고 대신 원장님께 직접 말해 주세요.' };
       if (x.uid === a.id) return { ok:false, why:'내 글은 신고할 수 없습니다. 지우려면 지우기를 눌러 주세요.' };
       const wo = reason === 'worry', pv = repOf(x).find(r => r.uid === a.id && (r.reason === 'worry') === wo);
@@ -1385,10 +1428,11 @@ const DB = (() => {
       [...(d.posts||[]), ...(d.comments||[])].forEach(x => repOf(x).forEach(r => { if (r.uid === a.id && r.state !== 'open' && !r.seen_at) r.seen_at = t; })); w(); },
     careDone: async (kind, id) => { const x = ((kind === 'post' ? d.posts : d.comments)||[]).find(y => y.id === id); if (x){ resolve(x, r => r.reason === 'worry', 'kept'); w(); } },
     /* 이야기 이용 제한(원장) — 서버 talk_limit · talk_limits · my_talk 과 같은 답 */
-    talkStatus: async () => { const a = me(), b = talkBlock(a); if (!b) return { ok:true, block:null };
-      const last = (d.talkLog||[]).filter(l => a && l.uid === a.id && l.action !== 'lift').sort((p, q) => p.at < q.at ? 1 : -1)[0];
-      return { ok:false, block:b, msg:talkMsg(b, a && a.talkUntil), until: b === 'limit' ? a.talkUntil : null, reason: b === 'limit' ? (a.talkReason || null) : null,
-        appeal_until: b === 'limit' && last ? addDays(last.at.slice(0, 10), 7) : null, guardian: b === 'limit' && !!(last && last.guardian) }; },
+    talkStatus: async () => { const a = me(), b = talkBlock(a), more = { read: !readOff(), review: !!(a && a.role === 'student' && !a.firstOk) };
+      if (!b) return { ok:true, block:null, ...more };
+      const last = (d.talkLog||[]).filter(l => a && l.uid === a.id && ['d7','d30','stop'].includes(l.action)).sort((p, q) => p.at < q.at ? 1 : -1)[0];
+      return { ok:false, block:b, msg:talkMsg(b, a && a.talkUntil, a && a.guardTalk), until: b === 'limit' ? a.talkUntil : null, reason: b === 'limit' ? (a.talkReason || null) : null,
+        appeal_until: b === 'limit' && last ? addDays(last.at.slice(0, 10), 7) : null, guardian: b === 'limit' && !!(last && last.guardian), ...more }; },
     talkLimit: async (uid0, days, reason = '', memo = '', guardian = false, code = '') => { const o = me(); if (!o || o.role !== 'owner') throw new Error('owner only');
       const a = uid0 ? d.accounts.find(x => x.id === uid0) : d.accounts.find(x => x.role === 'student' && x.studentCode && x.studentCode === String(code||'').trim().toUpperCase());
       if (!a) return { ok:false, why:'학생 계정을 찾을 수 없습니다. 학생이 앱에 학원 코드를 등록했는지 확인해 주세요.' };
@@ -1396,12 +1440,47 @@ const DB = (() => {
       if (![0, 7, 30, -1].includes(days)) return { ok:false, why:'7일 · 30일 · 중지 · 풀기 중에서 골라 주세요.' };
       const until = days === 0 ? '' : days === -1 ? 'stop' : addDays(todayISO(), days);
       a.talkUntil = until; a.talkReason = days === 0 ? '' : String(reason||'').trim().slice(0, 40);
-      d.talkLog ||= []; d.talkLog.push({ uid:a.id, action: days === 0 ? 'lift' : days === -1 ? 'stop' : 'd' + days, reason:String(reason||'').trim().slice(0, 40), memo:String(memo||'').trim().slice(0, 300), guardian:!!guardian, until: until || null, at:new Date().toISOString() });
+      logAct(a.id, days === 0 ? 'lift' : days === -1 ? 'stop' : 'd' + days, { reason:String(reason||'').trim().slice(0, 40), memo:String(memo||'').trim().slice(0, 300), guardian:!!guardian, until: until || null });
       w(); return { ok:true, until: until || null }; },
-    talkLimits: async () => { const o = me(); if (!o || o.role !== 'owner') return { active:[], log:[] };
-      const last = id => (d.talkLog||[]).filter(l => l.uid === id).sort((p, q) => p.at < q.at ? 1 : -1)[0] || {};
+    talkLimits: async () => { const o = me(); if (!o || o.role !== 'owner') return { active:[], log:[], guard:[] };
+      const last = id => (d.talkLog||[]).filter(l => l.uid === id && ['d7','d30','stop'].includes(l.action)).sort((p, q) => p.at < q.at ? 1 : -1)[0] || {};
+      const since = new Date(Date.now() - 30*864e5).toISOString();
+      const what = t => { const [k, id] = String(t||'').split(':'); const x = k === 'post' ? (d.posts||[]).find(y => y.id === id) : k === 'comment' ? (d.comments||[]).find(y => y.id === id) : null;
+        return x ? String(k === 'post' ? x.title : x.body).slice(0, 40) : null; };
       return { active: d.accounts.filter(a => a.talkUntil && (a.talkUntil === 'stop' || a.talkUntil >= todayISO())).map(a => ({ uid:a.id, name:a.name, code:a.studentCode||'', nick:a.nick||'', role:a.role, until:a.talkUntil === 'stop' ? 'infinity' : a.talkUntil, reason:a.talkReason||'', memo:last(a.id).memo||'', guardian:!!last(a.id).guardian, since:last(a.id).at })),
-        log: (d.talkLog||[]).slice().sort((p, q) => p.at < q.at ? 1 : -1).slice(0, 30).map(l => { const a = d.accounts.find(x => x.id === l.uid) || {}; return { ...l, until: l.until === 'stop' ? 'infinity' : l.until, name:a.name||'', nick:a.nick||'', code:a.studentCode||'' }; }) }; },
+        guard: d.accounts.filter(a => a.guardTalk).map(a => ({ uid:a.id, name:a.name, code:a.studentCode||'', nick:a.nick||'', mode:a.guardTalk, at:a.guardAt, by_name:nameOf(a.guardBy) })),
+        log: (d.talkLog||[]).filter(l => l.at > since).sort((p, q) => p.at < q.at ? 1 : -1).slice(0, 300).map(l => { const a = d.accounts.find(x => x.id === l.uid) || {}, ac = d.accounts.find(x => x.id === l.actor) || {};
+          return { ...l, until: l.until === 'stop' ? 'infinity' : l.until, name:a.name||'', nick:a.nick||'', code:a.studentCode||'', actor_name:ac.name||'', actor_role:ac.role||'', what:what(l.target) }; }) }; },
+    /* 첫 글 검토 · 선생님 확인 · 답이 없는 질문 · 신고가 자주 되돌려진 계정 · 보호자 이야기 끄기 — 서버 review_* · check_comment · unanswered_list · muted_reporters · child_talk · guardian_talk 와 같은 답 */
+    reviewList: async () => { if (!seeAll()) return [];
+      return (d.posts||[]).filter(x => x.review === 'wait' && !x.deleted).sort((p, q) => p.at < q.at ? -1 : 1).map(x => { const u = d.accounts.find(z => z.id === x.uid) || {};
+        return { id:x.id, board:x.board, title:x.title, body:String(x.body||'').slice(0, 300), nick:x.nick, at:x.at, care:!!x.care, attach:x.attach||null, uid:x.uid, name:u.name||'', code:u.studentCode||'', joined:u.created,
+          rejected:(d.posts||[]).filter(y => y.uid === x.uid && y.review === 'no' && !y.deleted).length }; }); },
+    reviewPost: async (id, ok, why = '') => { if (!seeAll()) throw new Error('owner only'); const x = (d.posts||[]).find(y => y.id === id && !y.deleted && y.review === 'wait');
+      if (!x) return { ok:false, why:'이미 처리했거나 지워진 글입니다.' };
+      if (ok){ x.review = null; x.review_why = ''; const u = d.accounts.find(z => z.id === x.uid); if (u && !u.firstOk) u.firstOk = new Date().toISOString(); logAct(x.uid, 'approve', { target:'post:' + x.id }); }
+      else { const r = String(why||'').trim().slice(0, 40) || '이야기 규칙에 맞지 않아요'; x.review = 'no'; x.review_why = r; logAct(x.uid, 'reject', { reason:r, target:'post:' + x.id }); }
+      x.reviewed_at = new Date().toISOString(); w(); return { ok:true }; },
+    checkComment: async (id, on = true) => { if (!seeAll()) throw new Error('owner only'); const c = (d.comments||[]).find(y => y.id === id && !y.deleted);
+      if (!c) return { ok:false, why:'지워졌거나 없는 댓글입니다.' }; if (c.staff) return { ok:false, why:'선생님 댓글에는 이미 선생님 표시가 있습니다.' };
+      if (!!c.checked !== !!on){ c.checked = !!on; logAct(c.uid, on ? 'check' : 'uncheck', { target:'comment:' + c.id }); w(); } return { ok:true, checked:!!on }; },
+    unanswered: async () => { if (!seeAll()) return []; const t = Date.now();
+      return (d.posts||[]).filter(x => x.board === 'qna' && !x.deleted && !x.review && !x.solved && !x.staff && (x.report_n||0) < REPORT_HIDE && t - new Date(x.at) > 48*36e5 && t - new Date(x.at) < 30*864e5
+          && !(d.comments||[]).some(c => c.postId === x.id && !c.deleted && c.uid !== x.uid))
+        .sort((p, q) => p.at < q.at ? -1 : 1).map(x => { const u = d.accounts.find(z => z.id === x.uid) || {}; return { id:x.id, title:x.title, body:String(x.body||'').slice(0, 100), nick:x.nick, at:x.at, name:u.name||'', code:u.studentCode||'' }; }); },
+    mutedReporters: async () => { if (!seeAll()) return [];
+      return d.accounts.filter(a => muted(a.id)).map(a => ({ uid:a.id, name:a.name||'', nick:a.nick||'', code:a.studentCode||'', kept:keptN(a.id),
+        open:[...(d.posts||[]), ...(d.comments||[])].reduce((n, x) => n + repOf(x).filter(r => r.uid === a.id && r.state === 'open' && r.reason !== 'worry').length, 0) })); },
+    childTalk: async code => { const g = me(), c = String(code||'').trim().toUpperCase(); if (!g || g.role !== 'parent' || !(g.childCodes||[]).includes(c)) return { ok:false, why:'연결된 자녀가 아닙니다.' };
+      const k = d.accounts.find(a => a.role === 'student' && a.studentCode === c); if (!k) return { ok:true, linked:false };
+      return { ok:true, linked:true, mode:k.guardTalk || null, at:k.guardAt || null, mine:k.guardBy === g.id, by:nameOf(k.guardBy) || null, limit:!!(k.talkUntil && (k.talkUntil === 'stop' || k.talkUntil >= todayISO())) }; },
+    guardianTalk: async (code, mode) => { const g = me(), c = String(code||'').trim().toUpperCase(); if (!['on','write','all'].includes(mode)) return { ok:false, why:'잘못된 요청입니다.' };
+      if (!g || g.role !== 'parent' || !(g.childCodes||[]).includes(c)) return { ok:false, why:'원장님이 확인한 자녀만 설정할 수 있습니다.' };
+      const k = d.accounts.find(a => a.role === 'student' && a.studentCode === c); if (!k) return { ok:false, why:'자녀가 아직 앱에 학원 코드를 등록하지 않았습니다. 등록한 뒤에 설정할 수 있어요.' };
+      const m = mode === 'on' ? null : mode; if ((k.guardTalk || null) === m) return { ok:true, mode:m };
+      k.guardTalk = m; k.guardBy = m ? g.id : null; k.guardAt = m ? new Date().toISOString() : null; logAct(k.id, 'g_' + mode, { guardian:true }); w(); return { ok:true, mode:m }; },
+    /* 시연·시험용 — 이 기기의 시연 계정을 '첫 글 검토를 지난' 학생으로(로컬 저장소는 원래 이 기기에서 다 고칠 수 있다. 서버에는 이런 길이 없다) */
+    _trust: async () => { const a = me(); if (a && !a.firstOk){ a.firstOk = new Date().toISOString(); w(); } },
     careList: async () => { const a = me(); if (!a || a.role !== 'owner') return []; const since = new Date(Date.now() - 30*864e5).toISOString();
       const who = uid => { const u = d.accounts.find(z => z.id === uid) || {}; return { name:u.name||'', code:u.studentCode||'', role:u.role||'' }; };
       const wy = x => repOf(x).filter(r => r.reason === 'worry' && r.state === 'open').length, pick = x => !x.deleted && !x.staff && ((x.care && x.at > since) || wy(x) > 0);
@@ -1409,7 +1488,7 @@ const DB = (() => {
               ...(d.comments||[]).filter(pick).map(c => ({ kind:'comment', id:c.id, post_id:c.postId, title:null, body:String(c.body||'').slice(0,140), nick:c.nick, at:c.at, uid:c.uid, care:!!c.care, worry:wy(c), ...who(c.uid) }))]
         .sort((p, q) => (q.worry > 0) - (p.worry > 0) || (p.at < q.at ? 1 : -1)); },
     reported: async () => { const open = x => repOf(x).filter(r => r.state === 'open' && r.reason !== 'worry');
-      const row = x => ({ ...x, reasons: open(x).reduce((o, r) => (o[r.reason] = (o[r.reason]||0) + 1, o), {}), kept: repOf(x).filter(r => r.state === 'kept' && r.reason !== 'worry').length });
+      const row = x => ({ ...x, reasons: open(x).reduce((o, r) => (o[r.reason] = (o[r.reason]||0) + 1, o), {}), kept: repOf(x).filter(r => r.state === 'kept' && r.reason !== 'worry').length, muted: open(x).filter(r => muted(r.uid)).length });
       return { posts: (d.posts||[]).filter(x => !x.deleted && open(x).length).map(row), comments: (d.comments||[]).filter(c => !c.deleted && open(c).length).map(row) }; },
     setNick: async nick => { const a = me(); if (!a) return null; a.nick = nick; w(); return pub(a); },
     /* 학원 일정 — 원장이 반에 보내면 학생·보호자 일정 화면에 자동으로 들어온다 */
@@ -1579,7 +1658,14 @@ const serverDB = () => {
       return { posts: rows.filter(r => r.kind === 'post'), comments: rows.filter(r => r.kind === 'comment') }; },
     talkStatus: async () => (await api('/rest/v1/rpc/my_talk', { method:'POST', body:{} })) || { ok:true, block:null },
     talkLimit: async (uid, days, reason = '', memo = '', guardian = false, code = '') => (await api('/rest/v1/rpc/talk_limit', { method:'POST', body:{ p_uid: uid || null, p_days: days, p_reason: reason, p_memo: memo, p_guardian: !!guardian, p_code: code || null } })) || { ok:false, why:'처리하지 못했습니다.' },
-    talkLimits: async () => (await api('/rest/v1/rpc/talk_limits', { method:'POST', body:{} })) || { active:[], log:[] },
+    talkLimits: async () => (await api('/rest/v1/rpc/talk_limits', { method:'POST', body:{} })) || { active:[], log:[], guard:[] },
+    reviewList: async () => (await api('/rest/v1/rpc/review_list', { method:'POST', body:{} })) || [],
+    reviewPost: async (id, ok, why = '') => (await api('/rest/v1/rpc/review_post', { method:'POST', body:{ p_id:id, p_ok:!!ok, p_why:why || '' } })) || { ok:false, why:'처리하지 못했습니다.' },
+    checkComment: async (id, on = true) => (await api('/rest/v1/rpc/check_comment', { method:'POST', body:{ p_id:id, p_on:!!on } })) || { ok:false, why:'처리하지 못했습니다.' },
+    unanswered: async () => (await api('/rest/v1/rpc/unanswered_list', { method:'POST', body:{} })) || [],
+    mutedReporters: async () => (await api('/rest/v1/rpc/muted_reporters', { method:'POST', body:{} })) || [],
+    childTalk: async code => (await api('/rest/v1/rpc/child_talk', { method:'POST', body:{ p_code:code } })) || { ok:false },
+    guardianTalk: async (code, mode) => (await api('/rest/v1/rpc/guardian_talk', { method:'POST', body:{ p_code:code, p_mode:mode } })) || { ok:false, why:'처리하지 못했습니다.' },
     setNick: async nick => { await api(`/rest/v1/profiles?id=eq.${SESSION.user.id}`, { method:'PATCH', prefer:'return=minimal', body:{ nick } }); meCache = null; return await myProfile(); },
     schedule: async cls => await api(`/rest/v1/sched?or=(cls.eq.전체,cls.eq.${encodeURIComponent(cls)})&select=*&order=date.asc`),
     allSchedule: async () => await api('/rest/v1/sched?select=*&order=date.asc'),
@@ -1631,8 +1717,8 @@ const serverDB = () => {
     reset: () => {},
   };
 };
-const POST_COLS = 'id,author,nick,board,title,body,attach,likes,report_n,comment_n,staff,solved,deleted,at,edited,care';
-const CM_COLS = 'id,post_id,author,nick,body,likes,report_n,staff,picked,deleted,at,care';
+const POST_COLS = 'id,author,nick,board,title,body,attach,likes,report_n,comment_n,staff,solved,deleted,at,edited,care,review,review_why';
+const CM_COLS = 'id,post_id,author,nick,body,likes,report_n,staff,picked,deleted,at,care,checked';
 const DBX = SRV ? serverDB() : DB;
 
 /* ═══ 계정 · 내 진도 ═══ */
@@ -2421,6 +2507,12 @@ const careCheck = t => CARE_RE.test(String(t||'').replace(CARE_SKIP, ''));
 /* 닉네임 사칭 금지어 — 띄어쓰기·점·밑줄은 빼고 본다(서버 check_nick 과 같은 목록) */
 const NICK_BAN = new RegExp('(선생|쌤|원장|관리|운영|매니저|교사|강사|admin|teacher|staff|manager|official)');
 const nickBad = nk => NICK_BAN.test(String(nk||'').replace(/[\s._\-·]/g, '').toLowerCase());
+/* 욕설·비하(docs/11 §12-14) — 서버 private.abuse_level 과 같은 목록. 1 = 올리기 전에 한 번 더 묻기(막지 않음) · 2 = 아주 심한 욕(서버도 거절)
+   과학 용어·일상어는 걸리지 않게: 시발점·씨 발라·씹어 먹다·미친 듯이·위기가 닥쳐오다·등신대·애자(절연체)·기생충·고자질·보지 못했다·허리띠를 졸라.
+   아주 심한 욕은 띄어쓰기·점을 빼고 본다(느 금 마) */
+const ABUSE_HARD = new RegExp('(느금|니애미|니에미|니미럴|니미랄|애미(뒤|없|뒈)|애비(뒤|없|뒈)|엠창|좆|씹(새|년|창|할)|창녀)');
+const ABUSE_SOFT = new RegExp('((?<![가-힣])시발(?!점|역|택시|차)|씨발|씨빨|씨팔|시팔|ㅅㅂ|ㅆㅂ|ㅂㅅ|ㅄ|병신|븅신|빙신|병싄|(?<![가-힣])존나|개새(끼|기|키)|개색(기|히|끼)|개세(끼|기)|개쉐(이|키)|지랄|미친\\s*(놈|년|새끼|새기|새키|것|넘)|닥쳐(?!오|올|온|와|옴)|닥치라|또라이|돌아이|등신(?!대)|찐따|썅|틀딱|급식충|한남충|맘충|김치녀|짱깨|쪽바리|(?<![a-z])(fuck|shit|bitch|asshole|wtf))');
+const abuseLevel = t => { const s = String(t||'').toLowerCase(); return ABUSE_HARD.test(s.replace(/[\s._\-·*]/g, '')) ? 2 : ABUSE_SOFT.test(s) ? 1 : 0; };
 /* @rules-end */
 /* 신고 사유 — 서버 reports.reason 과 같은 값(docs/11 §12-2). '친구가 걱정돼요'는 가리지 않고 원장님께 먼저 알린다 */
 const REASONS = [['privacy','개인정보가 있어요','실명·전화번호·주소·학교·SNS 아이디'],['bully','놀리거나 괴롭혀요','욕설·비방·따돌림·협박'],['harm','부적절한 내용이에요','성적인 내용·술·담배·도박'],
@@ -2430,7 +2522,8 @@ const REASON_KO = { privacy:'개인정보', bully:'괴롭힘', harm:'부적절',
 const LIMIT_WHY = ['이야기 규칙을 여러 번 어겼어요','개인정보를 올렸어요','친구를 놀리거나 괴롭혔어요','부적절한 내용을 올렸어요','광고·도배를 했어요','문제집·기출 원문을 올렸어요','보호자가 요청했어요'];
 const mdKo = iso => { const [, m, dd] = String(iso||'').split('-'); return `${+m}월 ${+dd}일`; };
 const talkStop = u => !u || u === 'stop' || u === 'infinity';
-const talkMsg = (b, until) => b === 'limit' ? (talkStop(until) ? '이야기 쓰기가 멈춰 있습니다. 읽기는 그대로 할 수 있어요.' : `이야기 쓰기가 ${mdKo(until)}까지 쉬는 중입니다. 읽기는 그대로 할 수 있어요.`)
+const talkMsg = (b, until, gt) => b === 'limit' ? (talkStop(until) ? '이야기 쓰기가 멈춰 있습니다. 읽기는 그대로 할 수 있어요.' : `이야기 쓰기가 ${mdKo(until)}까지 쉬는 중입니다. 읽기는 그대로 할 수 있어요.`)
+  : b === 'guardian' ? (gt === 'all' ? '보호자와 정한 대로 이야기를 잠시 쉬고 있어요.' : '보호자와 정한 대로 이야기 쓰기를 잠시 쉬고 있어요. 읽기는 그대로 할 수 있어요.')
   : b === 'parent' ? '보호자 계정은 이야기를 읽기만 할 수 있습니다.' : b === 'member' ? '이야기 글쓰기는 학원 코드나 이용권을 등록한 계정에서 할 수 있습니다.'
   : b === 'consent' ? '보호자 동의가 끝난 뒤에 쓸 수 있습니다.' : '로그인이 필요합니다.';
 /* 받침에 맞는 '로/으로' — '전화번호로' · '표현으로' */
@@ -2474,7 +2567,8 @@ function talkGate(t){
       <p>${t.reason ? `사유: ${esc(t.reason)} · ` : ''}글 읽기는 그대로 할 수 있어요.</p>
       ${open ? `<p class="s">원장님 판단이 잘못됐다고 생각하면 ${t.appeal_until ? `${mdKo(t.appeal_until)}까지` : '7일 안에'} 한 번, 다시 살펴봐 달라고 할 수 있어요(이용약관 제8조의3 ④).</p>
       <button class="btn soft" id="talkAppeal">다시 살펴봐 달라고 하기</button>` : t.guardian ? `<p class="s">보호자 요청으로 쉬는 것이라, 다시 쓰고 싶으면 보호자와 먼저 이야기해 주세요.</p>` : ''}</div>`; }
-  if (t.block === 'parent') return `<div class="tgate" id="talkGate"><b>보호자 계정은 읽기만 할 수 있어요</b><p>이야기는 학생들이 묻고 답하는 곳이라 글과 댓글은 학생 계정으로만 씁니다. 자녀의 글을 지우거나 이야기를 멈추고 싶으시면 학원으로 알려 주세요(이용약관 제8조의3 ②).</p></div>`;
+  if (t.block === 'guardian') return `<div class="tgate" id="talkGate"><b>보호자와 정한 대로 이야기 쓰기를 쉬고 있어요</b><p>글 읽기는 그대로 할 수 있어요. 다시 쓰고 싶으면 보호자와 먼저 이야기해 보세요.</p></div>`;
+  if (t.block === 'parent') return `<div class="tgate" id="talkGate"><b>보호자 계정은 읽기만 할 수 있어요</b><p>이야기는 학생들이 묻고 답하는 곳이라 글과 댓글은 학생 계정으로만 씁니다. 자녀의 이야기 쓰기·읽기는 <b>자녀</b> 탭에서 직접 끄고 켤 수 있어요. 글을 지워야 하면 학원으로 알려 주세요(이용약관 제8조의3 ②).</p></div>`;
   if (t.block === 'member') return `<div class="tgate" id="talkGate"><b>글쓰기는 학원 코드나 이용권이 있는 계정에서 할 수 있어요</b><p>같은 교재로 공부하는 학생들끼리 묻고 답하는 곳이라서요. 글 읽기는 지금도 할 수 있어요.</p><button class="btn soft" id="goMe">내 정보에서 코드 등록</button></div>`;
   return `<div class="tgate" id="talkGate"><p>${esc(t.msg || '')}</p></div>`;
 }
@@ -2494,7 +2588,7 @@ const worrySheet = () => openSheet(`<h3>알려 줘서 고마워요</h3>
 let lmState = null, admLim = null;
 function sheetLimit(o){
   const act = ((admLim||{}).active||[]).find(a => o.uid && a.uid === o.uid);
-  const past = ((admLim||{}).log||[]).filter(l => o.uid && l.uid === o.uid && l.action !== 'lift').length;
+  const past = ((admLim||{}).log||[]).filter(l => o.uid && l.uid === o.uid && ['d7','d30','stop'].includes(l.action)).length;
   lmState = { ...o, days: past >= 2 ? -1 : past === 1 ? 30 : 7 };
   openSheet(`<h3>이야기 이용 제한</h3>
     <p class="fine" style="text-align:left;padding:0 0 10px">${o.code ? `학원 코드 <b>${esc(o.code)}</b> 학생` : `닉네임 <b>${esc(o.nick || '익명')}</b>`}${act ? ` · 지금 ${talkStop(act.until) ? '중지' : `${mdKo(act.until)}까지 제한`} 중` : ''}${past ? ` · 지난 제한 ${past}번` : ''}<br>
@@ -2507,6 +2601,19 @@ function sheetLimit(o){
     ${act ? `<button class="btn soft" id="lmLift">제한 풀기</button>` : ''}
     <button class="btn ghost" id="sheetClose">닫기</button>`); }
 const mine = x => ACC && x.uid === ACC.id;
+/* 첫 글 검토(docs/11 §12-6) — 쓴 사람·원장에게만 보이는 표시 */
+const rvTag = x => x.review === 'wait' ? '<span class="rvw">검토 중</span>' : x.review === 'no' ? '<span class="rvw no">공개 안 됨</span>' : '';
+const REJECT_WHY = ['개인정보가 들어 있어요','친구를 놀리거나 상처 주는 말이 있어요','공부와 상관없는 광고·도배예요','문제집·기출 원문이에요','이야기 규칙에 맞지 않아요'];
+const ABUSE_ASK = '이 말은 친구에게 상처가 될 수 있어요. 그래도 올릴까요?';
+let rjId = null;
+function sheetReject(id){ rjId = id;
+  openSheet(`<h3>이 글은 공개하지 않기</h3>
+    <p class="fine" style="text-align:left;padding:0 0 10px">글쓴 학생에게만 아래 사유가 짧게 보입니다. 학생이 고쳐서 다시 올리면 한 번 더 확인합니다.</p>
+    <div class="fld"><label for="rjR">학생에게 보일 사유</label><select id="rjR">${REJECT_WHY.map(x => `<option>${esc(x)}</option>`).join('')}</select></div>
+    <div class="fld"><label for="rjF">직접 적기 (선택 · 40자)</label><input id="rjF" maxlength="40" placeholder="예: 제목에 이름을 빼고 다시 올려 주세요"></div>
+    <button class="btn" id="rjGo">공개하지 않기</button><button class="btn ghost" id="sheetClose">닫기</button>`); }
+/* 처리 기록에 보일 이름 */
+const LOG_ACT = { d7:'7일 제한', d30:'30일 제한', stop:'중지', lift:'제한 풀기', del:'지우기', keep:'신고 되돌리기', approve:'첫 글 공개', reject:'첫 글 공개 안 함', check:'선생님 확인', uncheck:'선생님 확인 풀기', g_write:'보호자가 쓰기 끔', g_all:'보호자가 쓰기·읽기 끔', g_on:'보호자가 다시 켬' };
 const isOwner = () => ACC && ACC.role === 'owner';
 const STAFF = x => x.staff ? '<span class="staff">선생님</span>' : '';
 /* 내 글에 새로 달린 댓글 수(마지막으로 연 뒤) */
@@ -2542,6 +2649,9 @@ async function renderTalk(){
   try { [list] = await Promise.all([DBX.posts(talkBoard, talkQ), loadTalkSt()]); setNet(false); } catch { failed = true; setNet(true); }
   try { myRep = await DBX.myReports(); } catch {}
   list = list.filter(x => !blocked(x));
+  /* 보호자가 읽기까지 꺼 두었으면 목록 대신 차분한 안내 한 장(서버도 글을 주지 않는다) */
+  if (talkSt && talkSt.read === false){ v.innerHTML = `<h1 class="h-page">이야기</h1>
+      <div class="tgate" id="talkRest"><b>보호자와 정한 대로 이야기를 잠시 쉬고 있어요</b><p>오늘의 개념·문제·노트는 그대로 할 수 있어요. 다시 보고 싶으면 보호자와 먼저 이야기해 보세요.</p></div>`; return; }
   const gate = talkBlocked();
   /* 내가 신고한 글을 원장님이 처리했으면 짧게 한 번 알린다(Samaritans 신고자 안내 · 정보통신망법 제44조의2 ② 취지) */
   const repHtml = myRep.length ? (() => { const n = st => myRep.filter(r => r.state === st && r.reason !== 'worry').length, wv = myRep.filter(r => r.reason === 'worry').length;
@@ -2558,7 +2668,7 @@ async function renderTalk(){
     ${list.length ? list.map(x => {
       const hid = !shown(x), at = attachName(x.attach);
       return `<button class="pcard ${hid?'hidden':''}" data-post="${esc(x.id)}">
-        <div class="h"><span class="bd ${x.board}">${BOARDS[x.board]||''}</span>${x.solved?'<span class="ok">해결됨</span>':''}</div>
+        <div class="h"><span class="bd ${x.board}">${BOARDS[x.board]||''}</span>${x.solved?'<span class="ok">해결됨</span>':''}${rvTag(x)}</div>
         <div class="t">${hid ? '신고가 쌓여 가려진 글입니다' : esc(x.title)}</div>
         ${hid ? '' : `<div class="x">${esc(String(x.body||'').replace(/\s+/g,' '))}</div>`}
         ${newC(x) ? `<span class="newc">새 댓글 ${newC(x)}</span>` : ''}
@@ -2577,16 +2687,18 @@ async function renderPost(){
   let x = null; try { [x] = await Promise.all([DBX.post(postId), loadTalkSt()]); } catch {}
   if (!x){ v.innerHTML = `<button class="back" id="talkBack"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg>이야기</button><p class="planempty">지워졌거나 없는 글입니다.</p>`; return; }
   const at = attachName(x.attach), liked = ACC && (x.likes||[]).includes(ACC.id), hid = !shown(x);
-  const cms = (x.comments||[]).filter(c => !blocked(c));
+  const cms = (x.comments||[]).filter(c => !blocked(c)).sort((a, b) => (!!b.checked - !!a.checked));   // 선생님 확인 답은 맨 위로(나머지는 시간 순 그대로)
   if (mine(x) && (S.seenC||{})[x.id] !== (x.comments||[]).length){ S.seenC = { ...(S.seenC||{}), [x.id]: (x.comments||[]).length }; save(S);
     if (talkNew){ talkNew = 0; renderTabs(); document.querySelectorAll('.tab').forEach(t => t.classList.toggle('on', t.dataset.v==='talk')); setTimeout(checkTalkNew, 300); } }
   v.innerHTML = `<button class="back" id="talkBack"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg>이야기</button>
     <div class="pfull">
       <div class="meta"><span class="bd ${x.board}" style="font-size:10.5px;font-weight:900;color:var(--on-color);border-radius:5px;padding:2px 7px;background:${x.board==='qna'?'#4053B8':x.board==='share'?'#C1521E':'var(--brand)'}">${BOARDS[x.board]||''}</span>
         ${x.solved?'<span class="ok" style="font-size:10.5px;font-weight:900;color:var(--brand-dark);background:var(--brand-soft);border-radius:5px;padding:2px 7px">해결됨</span>':''}
-        <span>${esc(nickOf(x))}${STAFF(x)}</span><span>${ago(x.at)}</span>${repN(x)?`<span style="color:var(--warn)">신고 ${repN(x)}</span>`:''}</div>
+        <span>${esc(nickOf(x))}${STAFF(x)}</span><span>${ago(x.at)}</span>${repN(x)?`<span style="color:var(--warn)">신고 ${repN(x)}</span>`:''}${rvTag(x)}</div>
       <h2>${hid ? '신고가 쌓여 가려진 글입니다' : esc(x.title)}</h2>
       ${hid ? `<p class="body" style="color:var(--muted)">원장님이 확인할 때까지 다른 학생에게는 보이지 않습니다.</p>` : `<div class="body">${esc(x.body)}</div>`}
+      ${x.review === 'wait' ? `<div class="rvnote" id="rvNote">${isOwner() && !mine(x) ? '처음 글을 쓴 학생의 글이에요. 공개하면 모두에게 보이고, 이 학생의 다음 글부터는 바로 올라가요.' : '원장님이 확인하고 있어요. 확인이 끝나면 다른 학생들에게도 보여요. 첫 글만 이렇게 확인해요.'}</div>`
+        : x.review === 'no' ? `<div class="rvnote no" id="rvNote">${isOwner() && !mine(x) ? `공개하지 않은 글이에요 · ${esc(x.review_why || '')}` : `원장님이 이 글은 공개하지 않았어요${x.review_why ? ` · ${esc(x.review_why)}` : ''}. 고쳐서 다시 올리면 한 번 더 확인해요.`}</div>` : ''}
       ${x.care && !hid ? `<div class="carenote">${mine(x) ? '털어놓아 줘서 고마워요. 혼자 견디지 않아도 됩니다.' : '힘든 마음을 꺼낸 글이에요. 따뜻한 말 한마디가 큰 힘이 됩니다.'} <button class="linkbtn" id="openHelp">도움받을 곳 · 109 · 1388</button></div>` : ''}
       ${at ? `<button class="attachcard" data-openatt="${esc(x.attach.kind)}:${esc(x.attach.id)}">
         <span style="flex:1;min-width:0"><span class="k">${esc(at.k)}</span><b>${esc(at.t)}</b><small>${esc(at.s)}</small></span>
@@ -2595,15 +2707,16 @@ async function renderPost(){
     <div class="prow">
       <button id="pLike" class="${liked?'on':''}"><svg viewBox="0 0 24 24"><path d="M12 20.5 4.5 13a4.6 4.6 0 0 1 6.5-6.5l1 1 1-1A4.6 4.6 0 0 1 19.5 13z"/></svg>도움이 됐어요 ${(x.likes||[]).length}</button>
       ${mine(x) ? `<button id="pEdit">고치기</button><button id="pDel">지우기</button>`
-        : isOwner() ? `<button id="pLimit" data-u="${esc(x.uid||'')}" data-nick="${esc(x.nick||'')}">이용 제한</button><button id="pDel">삭제(원장)</button>`
+        : isOwner() ? `${x.review === 'wait' ? `<button id="pRvOk" data-rv="${esc(x.id)}">공개하기</button><button id="pRvNo" data-rv="${esc(x.id)}">공개 안 함</button>` : ''}<button id="pLimit" data-u="${esc(x.uid||'')}" data-nick="${esc(x.nick||'')}">이용 제한</button><button id="pDel">삭제(원장)</button>`
         : `<button id="pReport">신고</button><button id="pBlock" data-u="${esc(x.uid||'')}">${(S.blocked||[]).includes(x.uid)?'차단 해제':'차단'}</button>`}
     </div>
     <div class="sec"><h2>댓글 ${cms.length}</h2>
       ${cms.length ? cms.map(c => { const ch = !shown(c), cl = ACC && (c.likes||[]).includes(ACC.id);
-        return `<div class="cm ${c.staff?'staffc':''}"><div class="h"><b>${esc(nickOf(c))}</b>${STAFF(c)}<span>${ago(c.at)}</span>${c.picked?'<span class="picked">채택</span>':''}${repN(c)?`<span style="color:var(--warn)">신고 ${repN(c)}</span>`:''}</div>
+        return `<div class="cm ${c.staff?'staffc':''} ${c.checked?'chkc':''}"><div class="h"><b>${esc(nickOf(c))}</b>${STAFF(c)}<span>${ago(c.at)}</span>${c.checked?`<span class="chk"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.2 4.2L19 7"/></svg>선생님 확인</span>`:''}${c.picked?'<span class="picked">채택</span>':''}${repN(c)?`<span style="color:var(--warn)">신고 ${repN(c)}</span>`:''}</div>
           <div class="body" ${ch?'style="color:var(--muted)"':''}>${ch ? '신고가 쌓여 가려진 댓글입니다.' : esc(c.body)}</div>
           <div class="a"><button data-clike="${esc(c.id)}" class="${cl?'on':''}">도움됨 ${(c.likes||[]).length}</button>
             ${mine(x) && x.board==='qna' && !c.picked ? `<button data-cpick="${esc(c.id)}">채택하기</button>` : ''}
+            ${isOwner() && !c.staff ? `<button data-cchk="${esc(c.id)}" data-on="${c.checked ? '0' : '1'}">${c.checked ? '확인 풀기' : '선생님 확인'}</button>` : ''}
             ${mine(c) || isOwner() ? `<button data-cdel="${esc(c.id)}">지우기</button>${isOwner() && !mine(c) && !c.staff ? `<button data-climit="${esc(c.uid||'')}" data-nick="${esc(c.nick||'')}">이용 제한</button>` : ''}` : `<button data-creport="${esc(c.id)}">신고</button><button data-cblock="${esc(c.uid||'')}">차단</button>`}</div></div>`; }).join('')
         : `<p class="planempty">아직 댓글이 없습니다. 아는 만큼만 알려 줘도 큰 도움이 됩니다.</p>`}
       ${talkErr ? `<div class="piiwarn">${esc(talkErr)}</div>` : ''}
@@ -2625,6 +2738,7 @@ function sheetPost(ed){
       ${CONCEPTS.map(c=>`<option value="concept:${c.id}" ${e.attach&&e.attach.kind==='concept'&&e.attach.id===c.id?'selected':''}>${esc(c.bookName)} ${c.unit}-${c.lessonId.slice(2)} · ${esc(c.title)}</option>`).join('')}</select></div>
     ${at ? `<p class="fine" style="text-align:left;padding:4px 0 10px">지금 붙어 있는 것 · ${esc(at.k)} — ${esc(at.t)}</p>` : ''}
     <div class="tsafe">시중 문제집·기출의 <b>원문을 그대로 올리지 마세요</b>(저작권). 실명·전화번호·주소·SNS 아이디도 적지 않습니다.</div>
+    ${!ed && talkSt && talkSt.review ? `<p class="fine" id="poFirst" style="text-align:left;padding:2px 0 10px">첫 글은 원장님이 한 번 확인한 뒤 모두에게 보여요. 그다음 글부터는 바로 올라가요.</p>` : ''}
     <div id="poWarn"></div>
     <button class="btn" id="poSave" data-id="${esc(e.id)}">${ed?'고치기':'올리기'}</button>
     <button class="btn ghost" id="sheetClose">닫기</button>`);
@@ -2868,7 +2982,7 @@ function renderBankSession(){
       ${bs.wrong.length ? `<button class="btn" id="bankRetryWrong">틀린 문제만 다시 풀기</button>` : ''}
       <button class="btn ${bs.wrong.length?'soft':''}" id="bankAgain">${unit ? '같은 단원 처음부터 다시' : '같은 조건으로 새 세트'}</button><button class="btn ghost" id="bankQuit2">${unit ? '단원 고르기로' : '문제 풀기로'}</button>`; return;
   }
-  const graded = bs.pick !== null, L = LESSONS.find(x=>x.id===q.lessonId);
+  const graded = bs.pick !== null, L = LESSONS.find(x=>x.id===q.lessonId), jd = graded ? multiSplit(q) : null;
   const rk = (bs.recs||[])[bs.i], rw = rk ? S.wrong.find(w => !w.cleared && wKey(w) === rk) : null;
   const bar = `<button class="back" id="bankQuit"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg>그만 풀기</button>
     <div class="qbar"><span>${bs.i+1} / ${bs.items.length}</span><span class="bar"><i style="width:${Math.round(bs.i/bs.items.length*100)}%"></i></span><span>맞힘 ${bs.right}</span></div>`;
@@ -2900,13 +3014,34 @@ function renderBankSession(){
     ${graded || q.type === 'essay' ? '' : confRow(bs.conf)}
     ${body}
     ${graded ? '' : `<p class="qhint">${HINT}<br>틀려도 괜찮습니다 — 오답은 <b>내일</b> 다시 나오고, 맞힐수록 간격이 늘어납니다.</p>`}
-    ${graded ? `<div class="verdict" tabindex="-1" role="status"><div class="h">${q.type==='essay' ? '모범 답안' : ok ? '맞혔습니다' : '아쉽습니다'}${q.type!=='essay' && (q.type==='mc'||q.type==='multi') ? ` · 정답 ${MARKS[q.answer-1]}` : q.type==='ox'||q.type==='blank' ? ` · 정답 ${esc(q.answer)}` : ''}</div>${q.type === 'essay' ? '' : confNote((bs.cf||[])[bs.i], ok)}${q.explain ? `<p>${rich(q.explain)}</p>` : q.wrong ? '' : conceptGo(q)}</div>
-      ${q.wrong ? `<div class="wrongbox"><div class="h">${q.type==='essay'?'채점 기준':'오답 왜 틀렸나'}</div>${rich(q.wrong)}</div>` : ''}
+    ${graded ? `<div class="verdict" tabindex="-1" role="status"><div class="h">${q.type==='essay' ? '모범 답안' : ok ? '맞혔습니다' : '아쉽습니다'}${q.type!=='essay' && (q.type==='mc'||q.type==='multi') ? ` · 정답 ${MARKS[q.answer-1]}` : q.type==='ox'||q.type==='blank' ? ` · 정답 ${esc(q.answer)}` : ''}</div>${q.type === 'essay' ? '' : confNote((bs.cf||[])[bs.i], ok)}${jd ? jdHtml(jd) : q.explain ? `<p>${rich(q.explain)}</p>` : q.wrong ? '' : conceptGo(q)}</div>
+      ${q.wrong && !jd ? `<div class="wrongbox"><div class="h">${q.type==='essay'?'채점 기준':'오답 왜 틀렸나'}</div>${rich(q.wrong)}</div>` : ''}
       ${srsLine((bs.res||[])[bs.i]) ? `<div class="again">${srsLine(bs.res[bs.i])}</div>` : ''}
       ${q.type==='essay' && bs.pick==='?' ? `<div class="oxrow"><button data-ess="맞음" class="">맞게 썼다</button><button data-ess="틀림">부족했다</button></div>` : `<button class="btn" id="bankNext">${bs.i+1<bs.items.length?'다음 문제':'결과 보기'}</button>`}
       <button class="flag" data-report="bank:${esc(q.id)}">문제·해설에 틀린 곳이 있나요?</button>` : ''}`;
   if (!graded && q.type==='blank') setTimeout(()=>document.getElementById('blankIn')?.focus(), 50);
 }
+/* 합답형 ㄱㄴㄷ 판정 한 줄 — 해설·바로알기 문장의 'ㄱ (옳음) …' · 'ㄴ (틀림 →) …'을 보기마다 나눈다(데이터는 그대로).
+   보기 판정은 정답 선지(예: 'ㄱ, ㄴ')에서 다시 맞춰 보고, 보기마다 이유가 하나씩 있고 판정이 정답과 맞을 때만 나눈다 — 아니면 지금처럼 문단으로 */
+const JD_MARK = /<b>\s*([ㄱ-ㄹ])\s*\((옳음|틀림)[^)<]*\)\s*<\/b>|<b>\s*([ㄱ-ㄹ])\s*<\/b>\s*\((옳음|틀림)[^)]*\)/g;
+function multiSplit(q){
+  if (!q || q.type !== 'multi' || !q.answer || !Array.isArray(q.choices)) return null;
+  const keys = [...String(q.source||'').matchAll(/(?:^|\n)\s*([ㄱ-ㄹ])\s*\./g)].map(m => m[1]);
+  if (keys.length < 2) return null;
+  const right = new Set(String(q.choices[q.answer - 1] || '').match(/[ㄱ-ㄹ]/g) || []);
+  const seg = {}, lead = [];
+  for (const txt of [q.explain || '', q.wrong || '']){
+    const ms = [...txt.matchAll(JD_MARK)];
+    lead.push(txt.slice(0, ms.length ? ms[0].index : txt.length).trim());
+    ms.forEach((m, i) => { const k = m[1] || m[3], ok = (m[2] || m[4]) === '옳음';
+      const why = txt.slice(m.index + m[0].length, i + 1 < ms.length ? ms[i + 1].index : txt.length).trim();
+      if (seg[k]) seg[k].dup = true; else seg[k] = { ok, why }; });
+  }
+  if (!keys.every(k => seg[k] && !seg[k].dup && seg[k].why && seg[k].ok === right.has(k))) return null;
+  return { lead: lead.filter(Boolean), rows: keys.map(k => ({ k, ...seg[k] })) };
+}
+/* 해설 칸 — 나뉘면 보기마다 한 줄, 아니면 지금처럼(해설 문단 + 바로알기 상자) */
+const jdHtml = sp => `${sp.lead.map(t => `<p>${rich(t)}</p>`).join('')}<div class="jdl" role="list">${sp.rows.map(r => `<div class="jd" role="listitem"><span class="k">${r.k}</span><span class="v ${r.ok ? 'o' : 'x'}">${r.ok ? '옳음' : '틀림'}</span><span class="t">${rich(r.why)}</span></div>`).join('')}</div>`;
 function bankAnswer(pick){
   const q = bs.items[bs.i]; if (bs.pick !== null && bs.pick !== '?') return;
   bs.pick = pick; touchDay(); S.bh ||= {};
@@ -3046,15 +3181,15 @@ function renderMockResult(v){
     <button class="btn soft" data-mstart="${mx.b}">같은 모의고사 다시 풀기</button><button class="btn ghost" id="mockClose2">문제 풀기로</button>`;
 }
 function renderMockReview(v){
-  const i = mx.rv, q = mx.items[i], ok = mx.res.ok[i], pk = mx.picks[i];
+  const i = mx.rv, q = mx.items[i], ok = mx.res.ok[i], pk = mx.picks[i], jd = multiSplit(q);
   v.innerHTML = `<button class="back" id="mxBackRes"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg>결과로</button>
     <div class="qbar"><span>${i + 1} / ${mx.items.length}</span><span class="bar"><i style="width:${Math.round((i + 1) / mx.items.length * 100)}%"></i></span><span>${fmtPt(q.points)}점</span></div>
     <div class="qhead"><span class="l">${i + 1}번 · ${esc(lessonLabel(q.lessonId))}</span><span class="tag">${TYPE_NAME[q.type]}</span></div>
     ${qBody(q, `data-mxzoom="${i}"`)}
     <div class="opts">${q.choices.map((t, j) => { const n = j + 1; const cls = n === q.answer ? 'ok' : n === pk ? 'bad' : ''; const mk = n === q.answer ? '정답' : n === pk ? '내 답' : '';
       return `<div class="opt ${cls}"><span class="m">${MARKS[j]}</span><span class="tx">${rich(t)}</span>${mk ? `<span class="mk">${mk}</span>` : ''}</div>`; }).join('')}</div>
-    <div class="verdict" tabindex="-1" role="status"><div class="h">${ok ? '맞혔습니다' : pk ? '아쉽습니다' : '답하지 않았습니다'} · 정답 ${MARKS[q.answer - 1]}</div>${q.explain ? `<p>${rich(q.explain)}</p>` : conceptGo(q)}</div>
-    ${q.wrong ? `<div class="wrongbox"><div class="h">바로알기</div>${rich(q.wrong)}</div>` : ''}
+    <div class="verdict" tabindex="-1" role="status"><div class="h">${ok ? '맞혔습니다' : pk ? '아쉽습니다' : '답하지 않았습니다'} · 정답 ${MARKS[q.answer - 1]}</div>${jd ? jdHtml(jd) : q.explain ? `<p>${rich(q.explain)}</p>` : conceptGo(q)}</div>
+    ${q.wrong && !jd ? `<div class="wrongbox"><div class="h">바로알기</div>${rich(q.wrong)}</div>` : ''}
     ${(q.lessons||[]).length ? `<p class="fine" style="text-align:left;padding:0 0 12px">이어지는 소단원 · ${q.lessons.map(l => esc(lessonLabel(l))).join(' · ')}</p>` : ''}
     <div class="mxnav"><button class="btn ghost" id="mxRvPrev" ${i ? '' : 'disabled'}>이전 문항</button><button class="btn soft" id="mxRvNext" ${i + 1 < mx.items.length ? '' : 'disabled'}>다음 문항</button></div>
     <button class="flag" data-report="bank:${esc(q.id)}">문제·해설에 틀린 곳이 있나요?</button>`;
@@ -3443,6 +3578,7 @@ async function renderParent(){
   let wkAtt = [], acad = []; const wdays = weekDays();
   try { wkAtt = await DBX.attendanceRange(wdays[0], wdays[6], code); } catch {}
   try { acad = (await DBX.schedule(st.cls)).filter(e => e.date >= todayISO()).slice(0, 3); } catch {}
+  let ct = null; try { ct = await DBX.childTalk(code); } catch {}   // 보호자가 직접 '이야기 끄기'(docs/11 §12-15)
   const dset = new Set(days), aset = new Set(wkAtt.map(a => a.date));
   const wk = wdays.map(iso => ({ iso, st:dset.has(iso), at:aset.has(iso), today:iso === todayISO(), later:iso > todayISO() }));
   const retry = prog ? (prog.wrong||[]).filter(w => !w.cleared).length : 0, fixedN = prog ? (prog.wrong||[]).filter(w => w.cleared).length : 0;
@@ -3460,11 +3596,23 @@ async function renderParent(){
       ${acad.length ? `<div class="pnext">${acad.map(e => `<div class="kv"><span class="k">${kdate(e.date)} ${WD[wdOf(e.date)]}</span><span class="v">${esc(e.title)} <b style="color:${dLeft(e.date)<=3?'var(--no)':'var(--brand-dark)'}">${ddayText(dLeft(e.date))}</b></span></div>`).join('')}</div>` : ''}</div>
     <div class="sec"><h2>이달 출석</h2>${month.length ? month.map(a=>`<div class="kv"><span class="k">${kdate(a.date)}</span><span class="v" style="color:${a.late?'var(--warn)':'var(--u)'}">${a.time} ${a.late?'지각':'출석'}${a.manual?' (수동)':''}</span></div>`).join('') : `<p class="fine" style="text-align:left;padding:0">이달 출석 기록이 아직 없습니다.</p>`}</div>
     <div class="sec"><h2>학원 공지 · ${esc(st.cls)}</h2>${ns.length ? ns.slice(0,5).map(n=>`<div class="kv" style="flex-direction:column;align-items:flex-start;gap:2px"><span class="v">${esc(n.t)}</span><span class="k">${kAt(n.at)} · ${esc(n.cls)}${n.d?` · ${esc(n.d)}`:''}</span></div>`).join('') : `<p class="fine" style="text-align:left;padding:0">최근 공지가 없습니다.</p>`}</div>
+    ${ct && ct.ok ? `<div class="sec" id="ptTalkSec"><h2>이야기</h2>
+      <div class="kv"><span class="k">${esc(st.name)} 학생</span><span class="v">${!ct.linked ? '앱 연결 전' : ct.mode === 'all' ? '쓰기·읽기 꺼 둠' : ct.mode === 'write' ? '쓰기 꺼 둠 · 읽기는 됨' : '켜 둠'}</span></div>
+      <p class="fine" style="text-align:left;padding:6px 2px 0">${!ct.linked ? '자녀가 앱에 학원 코드를 등록하면 여기서 이야기 쓰기·읽기를 끄고 켤 수 있어요.'
+        : `같은 교재로 공부하는 학생들이 묻고 답하는 곳이에요. 필요하면 보호자님이 직접 잠시 꺼 둘 수 있어요${ct.mode && ct.by && !ct.mine ? ` · ${esc(ct.by)} 님이 꺼 둠` : ''}.${ct.limit ? ' 지금은 학원에서 건 이용 제한도 있어요.' : ''}`}</p>
+      ${ct.linked ? `<button class="btn soft" id="ptTalk" data-code="${esc(code)}" data-mode="${esc(ct.mode || 'on')}" style="margin-top:10px">이야기 설정</button>` : ''}</div>` : ''}
     ${CFG.phone ? `<a class="btn ghost" href="tel:${esc(CFG.phone)}" style="text-decoration:none">학원에 전화 ${esc(CFG.phone)}</a>` : ''}
     <button class="btn soft" id="childAdd">자녀 한 명 더 연결 <small style="font-weight:600">· 형제·자매가 같은 학원에 다닐 때</small></button>
     <button class="linkbtn" id="unlinkChild" data-code="${esc(code)}">${esc(st.name)} 학생 연결 해제</button>`;
 }
 let parentSel = '';
+let ptState = null;
+const PT_MODES = [['on','켜 두기','자녀가 글·댓글을 쓰고 읽을 수 있어요'],['write','쓰기만 끄기','글·댓글은 못 쓰고, 읽기는 할 수 있어요'],['all','쓰기·읽기 모두 끄기','이야기 탭에 글이 보이지 않아요. 공부 기능은 그대로예요']];
+function sheetParentTalk(code, mode){ ptState = { code, mode };
+  openSheet(`<h3>이야기 설정</h3>
+    <p class="fine" style="text-align:left;padding:0 0 10px">바꾸면 바로 적용돼요. 자녀 화면에는 '보호자와 정한 대로 쉬고 있어요'라는 짧은 안내만 보이고, 다시 켜면 그대로 돌아와요.</p>
+    <div class="rsn" role="radiogroup" aria-label="이야기 설정">${PT_MODES.map(([k, l, dd]) => `<button role="radio" aria-checked="${mode === k}" data-ptm="${k}">${l}<small>${dd}</small></button>`).join('')}</div>
+    <button class="btn" id="ptGo">저장</button><button class="btn ghost" id="sheetClose">닫기</button>`); }
 
 /* ═══ 원장 ═══ */
 /* 여러 명 등록: 붙여 넣은 줄 → 미리 보기(rows) → 발급 결과(done) */
@@ -3628,11 +3776,25 @@ async function renderAdmin(){
     return;
   }
   if (admTab==='talk'){
-    let rep = { posts:[], comments:[] }, care = [], lim = { active:[], log:[] };
-    await Promise.all([DBX.reported().then(r => { rep = r; }).catch(() => {}), DBX.careList().then(r => { care = r; }).catch(() => {}), DBX.talkLimits().then(r => { lim = r; }).catch(() => {})]);
-    admLim = lim;
+    let rep = { posts:[], comments:[] }, care = [], lim = { active:[], log:[], guard:[] }, rv = [], una = [], mut = [];
+    await Promise.all([DBX.reported().then(r => { rep = r; }).catch(() => {}), DBX.careList().then(r => { care = r; }).catch(() => {}), DBX.talkLimits().then(r => { lim = r; }).catch(() => {}),
+      DBX.reviewList().then(r => { rv = r; }).catch(() => {}), DBX.unanswered().then(r => { una = r; }).catch(() => {}), DBX.mutedReporters().then(r => { mut = r; }).catch(() => {})]);
+    admLim = lim; lim.guard ||= [];
     const total = rep.posts.length + rep.comments.length;
-    const tags = x => Object.entries(x.reasons||{}).map(([k, n]) => `<span class="rtag">${esc(REASON_KO[k]||k)} ${n}</span>`).join('') + (x.kept ? `<span class="rtag q">되돌린 신고 ${x.kept}</span>` : '');
+    const tags = x => Object.entries(x.reasons||{}).map(([k, n]) => `<span class="rtag">${esc(REASON_KO[k]||k)} ${n}</span>`).join('') + (x.kept ? `<span class="rtag q">되돌린 신고 ${x.kept}</span>` : '')
+      + (x.muted ? `<span class="rtag q">자주 되돌려진 계정의 신고 ${x.muted} · 가림 수에서 뺌</span>` : '');
+    /* 검토할 첫 글(맨 위) — 처음 글을 쓴 학생의 글. 공개하면 그 학생의 다음 글부터 바로 올라간다 */
+    const rvHtml = rv.length ? `<div class="sec" id="rvSec"><h2>검토할 첫 글 ${rv.length}건</h2>
+        <p class="fine" style="text-align:left;padding:0 0 8px">처음 글을 쓴 학생의 글은 원장님이 공개할 때까지 쓴 학생에게만 보입니다. 댓글은 바로 올라갑니다.</p>
+        ${rv.map(x => `<div class="setrow" style="align-items:flex-start"><span class="l">${esc(x.title)}<small>${esc(x.name || '')}${x.code ? ` · ${esc(x.code)}` : ''} · 닉네임 ${esc(x.nick||'익명')} · ${ago(x.at)}${x.rejected ? ` · 공개 안 한 글 ${x.rejected}` : ''}<br>${esc(String(x.body||'').slice(0, 90))}</small>${x.care ? '<span class="rtag">먼저 살펴볼 말</span>' : ''}</span>
+          <span style="display:flex;flex-direction:column;gap:6px"><button class="more" data-rvok="${esc(x.id)}">공개</button><button class="more" data-rvno="${esc(x.id)}">공개 안 함</button><button class="more" data-admcare="${esc(x.id)}">글 보기</button></span></div>`).join('')}</div>` : '';
+    /* 답이 없는 질문(48시간) — 주간 확인: 선생님 댓글을 달면 목록에서 내려간다 */
+    const unaHtml = `<details class="stuedit" id="unaBox" ${una.length ? 'open' : ''}><summary>답이 없는 질문 · 48시간 ${una.length ? `<span class="cst wait">${una.length}건</span>` : '<span class="none">· 없습니다</span>'}</summary>
+        ${una.map(x => `<div class="setrow" style="align-items:flex-start"><span class="l">${esc(x.title)}<small>${esc(x.nick||'익명')} · ${ago(x.at)}<br>${esc(String(x.body||'').slice(0, 70))}</small></span><button class="more" data-admcare="${esc(x.id)}">답 달기</button></div>`).join('')}
+        <p class="tip" style="margin:${una.length ? '8px' : '0'} 0 0">질문 게시판에서 48시간이 지나도 글쓴이 말고는 아무도 답하지 않은 질문(최근 30일)입니다. 학생 답에는 댓글의 <b>선생님 확인</b>을 눌러 맞는 답을 맨 위로 올릴 수 있습니다.</p></details>`;
+    const mutHtml = mut.length ? `<div class="sec" id="mutSec"><h2>신고가 자주 되돌려진 계정 ${mut.length}명</h2>
+        <p class="fine" style="text-align:left;padding:0 0 8px">최근 30일에 원장님이 '신고 되돌리기'를 3번 넘게 한 신고를 낸 계정입니다. 이 계정의 신고는 지금 글을 가리는 수에 넣지 않고 이 목록에만 모읍니다. 장난 신고인지 학생과 이야기해 보세요.</p>
+        ${mut.map(m => `<div class="setrow"><span class="l">${esc(m.name || m.nick || '이름 없음')}${m.code ? ` <small style="display:inline">${esc(m.code)}</small>` : ''}<small>되돌린 신고 ${m.kept}번 · 아직 열린 신고 ${m.open || 0}건${m.nick ? ` · 닉네임 ${esc(m.nick)}` : ''}</small></span></div>`).join('')}</div>` : '';
     const limBtn = x => x.uid && !x.staff ? `<button class="more" data-admlim="${esc(x.uid)}" data-nick="${esc(x.nick||'')}">이용 제한</button>` : '';
     const careHtml = care.length ? `<div class="sec carerow"><h2 style="color:var(--warn)">먼저 살펴볼 글 ${care.length}건</h2>
         <p class="fine" style="text-align:left;padding:0 0 8px">힘든 마음(자해·자살 신호로 보이는 말)이 담긴 최근 30일의 글·댓글과, 친구가 걱정된다고 알려 온 글입니다. 글은 그대로 두었고, 쓴 학생과 알려 준 학생에게는 상담 창구(109·1388)를 안내했습니다. 학생을 알고 계시면 따로 안부를 물어 주세요. 위급해 보이면 112·119.</p>
@@ -3642,7 +3804,9 @@ async function renderAdmin(){
     const ACT = { d7:'7일 제한', d30:'30일 제한', stop:'중지', lift:'풀기' };
     v.innerHTML = head + `<div class="tsafe"><b>이야기 운영</b><br>학생이 신고한 글·댓글이 여기 모입니다. 신고가 ${REPORT_HIDE}건 쌓이면 학생 화면에서는 이미 가려져 있고, 원장님만 원문을 봅니다. 처리하면 신고한 학생에게 결과(지움·그대로 둠)가 짧게 전해집니다.<br>
         개인정보·비방·기출 원문이 올라온 글은 지워 주세요. 지운 글은 되돌릴 수 없습니다. 되풀이하는 학생은 <b>이용 제한</b>(7일 → 30일 → 중지).</div>
+      ${rvHtml}
       ${careHtml}
+      ${unaHtml}
       <div class="sec"><h2>신고된 글 ${rep.posts.length}건</h2>
         ${rep.posts.length ? rep.posts.map(x=>`<div class="setrow" style="align-items:flex-start">
             <span class="l">${esc(x.title)}<small>${esc(x.nick||'익명')} · ${ago(x.at)} · 신고 ${repN(x)}건<br>${esc(String(x.body||'').slice(0,70))}</small>${tags(x)}</span>
@@ -3652,6 +3816,7 @@ async function renderAdmin(){
             <span class="l">${esc(String(c.body||'').slice(0,70))}<small>${esc(c.nick||'익명')} · ${ago(c.at)} · 신고 ${repN(c)}건</small>${tags(c)}</span>
             <span style="display:flex;flex-direction:column;gap:6px"><button class="more" data-admcdel="${esc(c.id)}">지우기</button><button class="more" data-admclr="comment:${esc(c.id)}">신고 되돌리기</button>${limBtn(c)}</span></div>`).join('') : `<p class="planempty">신고된 댓글이 없습니다.</p>`}</div>
       ${total ? '' : `<p class="fine">신고가 없다고 안심하지 마시고, 가끔 <b>이야기</b> 탭을 직접 둘러봐 주세요.</p>`}
+      ${mutHtml}
       <div class="sec" id="limSec"><h2>이야기 이용 제한 ${lim.active.length}명</h2>
         <p class="fine" style="text-align:left;padding:0 0 8px">제한 중에도 글 읽기는 됩니다. 학생 화면에는 기간·사유와, 7일 안에 한 번 다시 살펴봐 달라고 하는 방법(의견 보내기)이 보입니다(약관 제8조의3 ④). 글·댓글의 <b>이용 제한</b> 단추나 아래 학원 코드로 겁니다.</p>
         ${lim.active.length ? lim.active.map(a => `<div class="setrow" style="align-items:flex-start"><span class="l">${esc(a.name || a.nick || '이름 없음')}${a.code ? ` <small style="display:inline">${esc(a.code)}</small>` : ''}<small>${until(a)} · ${esc(a.reason || '사유 없음')}${a.guardian ? ' · 보호자 요청' : ''}${a.nick ? ` · 닉네임 ${esc(a.nick)}` : ''}${a.memo ? `<br>메모: ${esc(a.memo)}` : ''}</small></span>
@@ -3659,9 +3824,11 @@ async function renderAdmin(){
         <details class="stuedit"><summary>학원 코드로 제한 걸기 · 보호자 요청</summary>
           <p class="tip" style="margin:0 0 8px">글을 쓴 적 없는 학생도 학원 코드로 막을 수 있습니다. 보호자가 자녀의 이야기 이용 중지를 요청하면 여기서 '중지'로 거세요(약관 제8조의3 ②).</p>
           <div class="g"><input id="limCode" class="code" aria-label="학생의 학원 코드" placeholder="학원 코드" maxlength="8" autocapitalize="characters" autocomplete="off"><button class="btn soft" id="limByCode" style="margin:0">제한 걸기</button></div></details>
-        ${lim.log.length ? `<details class="stuedit"><summary>최근 처리 기록 ${lim.log.length}건</summary>
-          ${lim.log.map(l => `<div class="kv" style="flex-direction:column;align-items:flex-start;gap:2px"><span class="v" style="font-size:12.5px">${esc(l.name || l.nick || '')}${l.code ? ` · ${esc(l.code)}` : ''} — ${esc(ACT[l.action] || l.action)}${l.reason ? ` · ${esc(l.reason)}` : ''}${l.guardian ? ' · 보호자 요청' : ''}</span><span class="k">${esc(String(l.at||'').slice(0,16).replace('T',' '))}${l.memo ? ` · ${esc(l.memo)}` : ''}</span></div>`).join('')}
-          <p class="tip" style="margin:8px 0 0">기록은 6개월 뒤 지워집니다(개인정보처리방침 3③).</p></details>` : ''}</div>`;
+        ${lim.guard.length ? `<div id="guardList"><p class="fine" style="text-align:left;padding:10px 0 4px"><b>보호자가 이야기를 꺼 둔 학생 ${lim.guard.length}명</b> · 보호자 앱 › 자녀에서 보호자가 직접 끄고 켭니다.</p>
+          ${lim.guard.map(a => `<div class="setrow"><span class="l">${esc(a.name || a.nick || '이름 없음')}${a.code ? ` <small style="display:inline">${esc(a.code)}</small>` : ''}<small>${a.mode === 'all' ? '쓰기·읽기 모두 끔' : '쓰기만 끔'}${a.by_name ? ` · ${esc(a.by_name)} 님` : ''}${a.at ? ` · ${ago(a.at)}` : ''}</small></span></div>`).join('')}</div>` : ''}
+        ${lim.log.length ? `<details class="stuedit" id="logBox"><summary>최근 처리 기록 ${lim.log.length}건</summary>
+          ${lim.log.map(l => `<div class="kv" style="flex-direction:column;align-items:flex-start;gap:2px"><span class="v" style="font-size:12.5px">${esc(l.name || l.nick || '')}${l.code ? ` · ${esc(l.code)}` : ''} — ${esc(LOG_ACT[l.action] || ACT[l.action] || l.action)}${l.reason ? ` · ${esc(l.reason)}` : ''}${l.guardian && /^d|stop/.test(l.action) ? ' · 보호자 요청' : ''}${l.what ? ` · ‘${esc(l.what)}’` : ''}</span><span class="k">${esc(kAt(l.at))} · ${esc(l.actor_role === 'parent' ? `보호자 ${l.actor_name || ''}` : l.actor_role === 'owner' ? '원장' : (l.actor_name || '—'))}${l.memo ? ` · ${esc(l.memo)}` : ''}</span></div>`).join('')}
+          <p class="tip" style="margin:8px 0 0">최근 30일의 지우기·신고 되돌리기·이용 제한·첫 글 공개·선생님 확인·보호자 설정이 누가 언제 했는지와 함께 모입니다. 기록은 6개월 뒤 지워집니다(개인정보처리방침 3③).</p></details>` : ''}</div>`;
     return;
   }
   if (admTab==='stats'){
@@ -3950,9 +4117,9 @@ function trapTab(e, root){ const f = [...root.querySelectorAll('button,a[href],i
   if (e.shiftKey && (i <= 0)){ e.preventDefault(); f[f.length-1].focus(); } else if (!e.shiftKey && (i === f.length-1 || i < 0)){ e.preventDefault(); f[0].focus(); } }
 // 확인 묻기: await ask('지울까요?', '지우기', true) → true/false. 바깥·취소·뒤로가기·Esc 는 false
 let askDone = null;
-function ask(msg, ok='확인', danger=false){ return new Promise(res => { askDone && askDone(false);
+function ask(msg, ok='확인', danger=false, no='취소'){ return new Promise(res => { askDone && askDone(false);
   const el = document.getElementById('ask'); const back = document.activeElement;
-  el.innerHTML = `<div class="sheet-bg yn-bg" id="askBg"><div class="sheet yn" role="alertdialog" aria-modal="true" aria-labelledby="askMsg"><div class="grab"></div><p id="askMsg">${esc(msg)}</p><div class="ynb"><button class="btn ghost" id="askNo">취소</button><button class="btn${danger?' danger':''}" id="askYes">${esc(ok)}</button></div></div></div>`;
+  el.innerHTML = `<div class="sheet-bg yn-bg" id="askBg"><div class="sheet yn" role="alertdialog" aria-modal="true" aria-labelledby="askMsg"><div class="grab"></div><p id="askMsg">${esc(msg)}</p><div class="ynb"><button class="btn ghost" id="askNo">${esc(no)}</button><button class="btn${danger?' danger':''}" id="askYes">${esc(ok)}</button></div></div></div>`;
   askDone = v => { askDone = null; el.innerHTML = ''; el.onclick = null; try { back && back.focus && back.focus({ preventScroll:true }); } catch {} res(v); };
   el.onclick = e => { e.stopPropagation(); const id = e.target.closest('button')?.id || e.target.id; if (id==='askYes') askDone(true); else if (id==='askNo' || id==='askBg') askDone(false); };
   setTimeout(() => document.getElementById('askNo')?.focus(), 30); }); }
@@ -4138,6 +4305,7 @@ document.addEventListener('click', async e => {
     if (nk.length < 2 || nk.length > 12){ w.innerHTML = `<div class="piiwarn">닉네임은 2~12자로 정해 주세요.</div>`; return; }
     if (!isOwner() && piiCheck(nk).length){ w.innerHTML = `<div class="piiwarn">닉네임에 연락처나 아이디를 넣지 마세요.</div>`; return; }
     if (!isOwner() && nickBad(nk)){ w.innerHTML = `<div class="piiwarn">선생님·원장·관리자로 보이는 닉네임은 쓸 수 없습니다. 진짜 선생님 글에는 <b>선생님</b> 표시가 따로 붙습니다.</div>`; return; }
+    if (!isOwner() && abuseLevel(nk)){ w.innerHTML = `<div class="piiwarn">닉네임에 욕설이나 남을 낮추는 말은 쓸 수 없습니다.</div>`; return; }
     const nx = T('#nkSave').dataset.next;
     try { ACC = await DBX.setNick(nk); } catch (e){ w.innerHTML = `<div class="piiwarn">${esc(e.message)}</div>`; return; }
     closeSheet(); toast('닉네임을 정했습니다');
@@ -4149,16 +4317,29 @@ document.addEventListener('click', async e => {
     const hits = piiCheck(title + '\n' + body);
     const hard = hits.find(h => h.hard);
     if (hard){ w.innerHTML = `<div class="piiwarn"><b>${esc(ro(hard.label))} 보이는 내용이 있습니다.</b><br>이런 정보는 올릴 수 없습니다. 지우고 다시 올려 주세요.</div>`; return; }
+    const ab = isOwner() ? 0 : abuseLevel(title + ' ' + body);
+    if (ab === 2){ w.innerHTML = `<div class="piiwarn"><b>아주 심한 욕설이 들어 있어요.</b><br>이런 말은 올릴 수 없어요. 고쳐서 다시 올려 주세요.</div>`; return; }
     if (hits.length && !poiOk){ poiOk = true;
       w.innerHTML = `<div class="piiwarn"><b>${esc(piiWarnText(hits))}</b><br>모르는 사람도 볼 수 있는 글입니다.${piiMaskNote(hits)} 그래도 올리려면 <b>올리기</b>를 한 번 더 누르세요.</div>`; return; }
     poiOk = false;
+    if (ab === 1 && !await ask(ABUSE_ASK, '그래도 올리기', false, '고쳐 쓸게요')) return;   // 막지 않고 한 번 더 묻기(docs/11 §12-14)
     if (careCheck(title + ' ' + body) && !isOwner() && await careAsk() !== 'post') return;
     const av = g('poA'), attach = av ? { kind: av.split(':')[0], id: av.slice(av.indexOf(':')+1) } : null;
     const id = T('#poSave').dataset.id;
     try { if (id) await DBX.editPost(id, { board:g('poB'), title, body, attach });
       else await DBX.addPost({ board:g('poB'), title, body, attach }); }
     catch (e){ const ww = document.getElementById('poWarn'); if (ww) ww.innerHTML = `<div class="piiwarn">${esc(e.message)}</div>`; else toast(e.message); return; }
-    closeSheet(); toast(id ? '고쳤습니다' : '올렸습니다'); if (id) renderPost(); else { talkBoard='전체'; show('talk'); } return; }
+    const first = !id && talkSt && talkSt.review;
+    closeSheet(); toast(id ? '고쳤습니다' : first ? '올렸어요. 원장님이 확인하면 모두에게 보여요' : '올렸습니다'); if (id) renderPost(); else { talkBoard='전체'; show('talk'); } return; }
+  /* 원장: 첫 글 공개 · 공개 안 함(사유) — 글 화면과 원장 › 이야기 둘 다 */
+  const rvo = T('#pRvOk') || T('[data-rvok]'); if (rvo){ const r = await DBX.reviewPost(rvo.dataset.rv || rvo.dataset.rvok, true).catch(e => ({ ok:false, why:e.message }));
+    toast(r.ok ? '공개했어요. 이 학생의 다음 글부터는 바로 올라가요' : (r.why || '처리하지 못했습니다')); if (view === 'post') renderPost(); else renderAdmin(); return; }
+  const rvn = T('#pRvNo') || T('[data-rvno]'); if (rvn){ sheetReject(rvn.dataset.rv || rvn.dataset.rvno); return; }
+  if (T('#rjGo') && rjId){ const g = document.getElementById('rjR').value, f = (document.getElementById('rjF').value || '').trim();
+    const r = await DBX.reviewPost(rjId, false, f || g).catch(e => ({ ok:false, why:e.message })); rjId = null;
+    if (!r.ok){ toast(r.why || '처리하지 못했습니다'); return; } closeSheet(); toast('공개하지 않았어요. 글쓴 학생에게 사유가 보여요'); if (view === 'post') renderPost(); else renderAdmin(); return; }
+  const chk = T('[data-cchk]'); if (chk){ const on = chk.dataset.on === '1'; const r = await DBX.checkComment(chk.dataset.cchk, on).catch(e => ({ ok:false, why:e.message }));
+    toast(r.ok ? (on ? '선생님 확인을 달았어요' : '선생님 확인을 풀었어요') : (r.why || '처리하지 못했습니다')); renderPost(); return; }
   if (T('#pEdit')){ const x = await DBX.post(postId); if (x) sheetPost(x); return; }
   if (T('#pDel')){ if (!await ask('이 글을 지울까요?', '지우기',true)) return; await DBX.delPost(postId); toast('지웠습니다'); show('talk'); return; }
   if (T('#pLike')){ if (talkBlocked()){ toast(talkBlocked().msg || talkMsg(talkBlocked().block, talkBlocked().until)); return; } await DBX.likeToggle('post', postId); renderPost(); return; }
@@ -4174,6 +4355,12 @@ document.addEventListener('click', async e => {
     if (view === 'post') renderPost(); return; }
   if (T('#repSeen')){ try { await DBX.myReportsSeen(); } catch {} renderTalk(); return; }
   if (T('#talkAppeal')){ sheetFeedback('talk:appeal', 'other'); return; }
+  /* 보호자: 자녀 이야기 끄기·켜기 */
+  const ptt = T('#ptTalk'); if (ptt){ sheetParentTalk(ptt.dataset.code, ptt.dataset.mode); return; }
+  const ptm = T('[data-ptm]'); if (ptm && ptState){ ptState.mode = ptm.dataset.ptm; document.querySelectorAll('[data-ptm]').forEach(b => b.setAttribute('aria-checked', b === ptm ? 'true' : 'false')); return; }
+  if (T('#ptGo') && ptState){ const { code, mode } = ptState; const r = await DBX.guardianTalk(code, mode).catch(e => ({ ok:false, why:e.message }));
+    if (!r.ok){ toast(r.why || '바꾸지 못했습니다'); return; } ptState = null; closeSheet();
+    toast(mode === 'on' ? '이야기를 다시 켰어요' : mode === 'all' ? '이야기 쓰기·읽기를 꺼 두었어요' : '이야기 쓰기를 꺼 두었어요'); renderParent(); return; }
   /* 원장: 이야기 이용 제한 */
   const lmo = T('#pLimit') || T('[data-climit]') || T('[data-admlim]'); if (lmo){ const u = lmo.dataset.u || lmo.dataset.climit || lmo.dataset.admlim; if (!u) return;
     try { admLim = await DBX.talkLimits(); } catch {} sheetLimit({ uid:u, nick:lmo.dataset.nick || '' }); return; }
@@ -4196,7 +4383,10 @@ document.addEventListener('click', async e => {
     if (body.length < 2){ talkErr = '댓글을 조금 더 적어 주세요.'; renderPost(); return; }
     const hits = piiCheck(body), hard = hits.find(h => h.hard);
     if (hard){ talkErr = `${ro(hard.label)} 보이는 내용이 있어 올릴 수 없습니다.`; renderPost(); return; }
+    const ab = isOwner() ? 0 : abuseLevel(body);
+    if (ab === 2){ talkErr = '아주 심한 욕설이 들어 있어 올릴 수 없어요. 고쳐서 다시 올려 주세요.'; renderPost(); return; }
     if (hits.length && !poiOk){ poiOk = true; talkErr = `${piiWarnText(hits)}${piiMaskNote(hits)} 그래도 올리려면 등록을 한 번 더 누르세요.`; renderPost(); return; }
+    if (ab === 1 && !await ask(ABUSE_ASK, '그래도 올리기', false, '고쳐 쓸게요')) return;
     if (careCheck(body) && !isOwner() && await careAsk() !== 'post') return;
     poiOk = false; talkErr = ''; try { await DBX.addComment(postId, body); } catch (e){ talkErr = e.message; } renderPost(); return; }
   const bk = T('#pBlock'); if (bk){ const u = bk.dataset.u; if (!u) return;
