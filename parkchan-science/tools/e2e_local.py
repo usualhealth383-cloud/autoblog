@@ -7,7 +7,7 @@ import asyncio, sys, os
 from playwright.async_api import async_playwright
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from _ui import signup, NO_INTRO, auto_yes, approve_child
-APP = 'http://127.0.0.1:8765/index.html'
+APP = __import__('os').environ.get('PCS_APP', 'http://127.0.0.1:8765/index.html')
 SC = (sys.argv[sys.argv.index('--shots')+1] if '--shots' in sys.argv[:-1] else (sys.argv[1] if len(sys.argv) > 1 and not sys.argv[1].startswith('-') else '/tmp/e2e_local')); os.makedirs(SC, exist_ok=True)
 
 

@@ -55,7 +55,7 @@ async def main():
     async with async_playwright() as p:
         b = await p.chromium.launch(executable_path='/opt/pw-browsers/chromium')
         pg = await (await b.new_context(viewport={'width':390,'height':844})).new_page()
-        await pg.goto('http://127.0.0.1:8765/index.html'); await pg.wait_for_timeout(700)
+        await pg.goto(_o.environ.get('PCS_APP', 'http://127.0.0.1:8765/index.html')); await pg.wait_for_timeout(700)
         bad = 0
         async def check(label):
             nonlocal bad
@@ -75,9 +75,14 @@ async def main():
             await pg.click(f'.tab[data-v="{v}"]'); await pg.wait_for_timeout(500); await check(n)
         await pg.click('#goStats'); await pg.wait_for_timeout(500); await check('통계')
         await pg.click('.tab[data-v="me"]'); await pg.wait_for_timeout(300); await pg.click('#goNoteMe'); await pg.wait_for_timeout(400); await check('공부 노트')
-        await pg.click('#noteNew'); await pg.wait_for_timeout(300); await pg.fill('#nedBody', '점검 메모'); await pg.wait_for_timeout(700); await check('노트 쓰기')
+        await pg.click('#noteNew'); await pg.wait_for_timeout(300); await pg.fill('#nedF0', '점검 메모'); await pg.click('[data-nmood="calm"]'); await pg.wait_for_timeout(700); await check('노트 쓰기(세 줄)')
+        await pg.click('#nedMore'); await pg.wait_for_timeout(200); await check('노트 쓰기(더 쓰기)')
+        await pg.click('#nedCheck'); await pg.wait_for_timeout(300); await check('교재와 견주기'); await pg.click('#sheetClose'); await pg.wait_for_timeout(200)
+        await pg.click('[data-ntpl="free"]'); await pg.wait_for_timeout(300); await pg.fill('#nedBody', '점검 메모'); await pg.wait_for_timeout(700); await check('노트 쓰기(자유)')
         await pg.click('#nedAddC'); await pg.wait_for_timeout(300); await check('개념 붙이기'); await pg.click('#sheetClose'); await pg.wait_for_timeout(200)
         await pg.click('#nedDone'); await pg.wait_for_timeout(300); await check('노트 달력')
+        await pg.click('[data-nmode="sum"]'); await pg.wait_for_timeout(300); await pg.click('[data-ncover]'); await pg.wait_for_timeout(200); await check('시험 전 다시 읽기')
+        await pg.click('[data-ncover]'); await pg.click('[data-nmode="cal"]'); await pg.wait_for_timeout(200)
         await pg.click('#noteBack'); await pg.wait_for_timeout(300); await audit_extra(pg, check)
         await b.close()
         print('\n지적 합계', bad)

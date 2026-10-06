@@ -10,10 +10,9 @@ if _chk.returncode != 0:
 shell = (ROOT / 'app' / 'app-shell.html').read_text(encoding='utf-8')
 concepts = json.loads((ROOT / 'data/concepts.json').read_text(encoding='utf-8'))
 # 개념마다 '생각해 보기'(왜?) · 계산 개념의 예제→따라 풀기 — 손으로 만든 원본(data/concept_extras.json, 검사는 check_content). 학생에게 필요 없는 근거 위치(src)는 뺀다
+# 2026-10-07: 앱 파일 한도(1,700 KB) 때문에 나중에 받는 more-*.json 으로 옮겼다 — 본문을 펼친 안쪽에만 보이므로 첫 화면에 필요 없다(앱이 받으면 CONCEPTS[i].x 로 붙인다)
 _ex = json.loads((ROOT / 'data/concept_extras.json').read_text(encoding='utf-8'))
-for c in concepts:
-    x = _ex.get(c['id'])
-    if x: c['x'] = {k: ({kk: vv for kk, vv in v.items() if kk != 'src'} if isinstance(v, dict) else v) for k, v in x.items()}
+extras = {c['id']: {k: ({kk: vv for kk, vv in v.items() if kk != 'src'} if isinstance(v, dict) else v) for k, v in _ex[c['id']].items()} for c in concepts if _ex.get(c['id'])}
 quizzes = json.loads((ROOT / 'data/quizzes.json').read_text(encoding='utf-8'))
 bank = json.loads((ROOT / 'data/bank.json').read_text(encoding='utf-8'))
 labs = json.loads((ROOT / 'data/labs.json').read_text(encoding='utf-8'))
@@ -40,7 +39,7 @@ for k, v in legal.items():
 # 문제 은행·자료 탐구·그림(약 1.5MB)은 앱 파일과 따로 — 첫 화면을 그린 뒤 받는다(느린 4G 에서 첫 화면 10초+ → 2026-10-02).
 # 파일 이름에 내용 지문을 붙여, 앱과 데이터의 판이 어긋나지 않게 한다(옛 앱은 옛 파일, 새 앱은 새 파일).
 import hashlib
-more = json.dumps({'bank': bank, 'labs': labs, 'figs': figs}, ensure_ascii=False, separators=(',', ':'))
+more = json.dumps({'bank': bank, 'labs': labs, 'figs': figs, 'extras': extras}, ensure_ascii=False, separators=(',', ':'))
 MORE_NAME = 'more-' + hashlib.sha1(more.encode('utf-8')).hexdigest()[:10] + '.json'
 _vb = lambda svg: (re.search(r'viewBox="0 0 ([\d.]+) ([\d.]+)"', svg) or [None, '600', '300'])
 meta = {'url': MORE_NAME, 'bank': len(bank), 'labs': len(labs),

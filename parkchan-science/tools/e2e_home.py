@@ -13,11 +13,12 @@
 전제: docs/parkchan 이 :8765 에 떠 있다.   사용: python3 tools/e2e_home.py [--shots 폴더]
 """
 import asyncio, sys, os, json, datetime as dt
+import os as _o
 from zoneinfo import ZoneInfo
 from playwright.async_api import async_playwright
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from _ui import NO_INTRO, auto_yes, signup
-APP = 'http://127.0.0.1:8765/index.html?server='
+APP = _o.environ.get('PCS_APP', 'http://127.0.0.1:8765/index.html') + '?server='   # 다른 포트(작업 공간 따로): PCS_APP=http://127.0.0.1:8776/index.html
 SC = sys.argv[sys.argv.index('--shots')+1] if '--shots' in sys.argv[:-1] else '/tmp/e2e_home'; os.makedirs(SC, exist_ok=True)
 KST = ZoneInfo('Asia/Seoul')
 D0 = dt.date(2026, 10, 6)
