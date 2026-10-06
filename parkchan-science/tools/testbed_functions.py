@@ -215,6 +215,33 @@ def main():
       check('  └ 댓글에 대한 걱정돼요도 그 글로 이어짐', [m['data'].get('post') for m in SENT] == [pid], SENT)
       SENT.clear(); call('POST', '/functions/v1/push', {'type': 'INSERT', 'table': 'reports', 'record': {'id': 3, 'post_id': pid, 'comment_id': None, 'uid': 'x', 'reason': 'bully'}}, headers=PH)
       check('  └ 다른 사유의 신고는 원장 폰에 알리지 않음(매일 목록으로)', SENT == [], SENT)
+      print('▸ 보호자 주간 요약(★5) — 일요일 저녁 · 확인된 보호자에게 자녀마다 한 줄 · 밤에는 보내지 않음')
+      mon = today - dt.timedelta(days=today.isoweekday() - 1); D = lambda n: (mon + dt.timedelta(days=n)).isoformat()
+      cur.execute("insert into progress(code, state) values ('PUSH01', %s) on conflict (code) do update set state = excluded.state",
+                  (json.dumps({'days': [D(-1), D(0), D(1)], 'dq': {D(-1): [9, 9], D(0): [6, 5], D(1): [4, 2]}}),))
+      aid = call('POST', '/rest/v1/rpc/assign_create', {'p_kind': 'bank', 'p_title': '1-01 문제', 'p_ref': '1101', 'p_items': ['1101-q1', '1101-q2'], 'p_cls': '월목반', 'p_codes': None, 'p_due': D(6)}, OWN)[1]['id']
+      call('POST', '/rest/v1/rpc/assign_save', {'p_id': aid, 'p_done': 2, 'p_right': 2, 'p_secs': 50, 'p_wrong': [], 'p_submit': True}, S1)
+      call('POST', '/rest/v1/rpc/link_code', {'p_kind': 'child', 'p_code': 'PUSH02'}, P1); call('POST', '/rest/v1/rpc/guardian_decide', {'p_uid': P1_ID, 'p_code': 'PUSH02', 'p_ok': True}, OWN)
+      P2, P2_ID = signup('pp2@t.kr', 'parent'); call('POST', '/rest/v1/rpc/link_code', {'p_kind': 'child', 'p_code': 'PUSH01'}, P2)   # 원장 확인 전
+      call('POST', '/rest/v1/rpc/register_push', {'p_token': 'tok-par2', 'p_platform': 'android'}, P2)
+      SUN = (mon + dt.timedelta(days=6)).isoformat()
+      s, j = call('POST', '/functions/v1/push', {'action': 'weekly', 'at': SUN + 'T19:00:00+09:00'}); check('주간 요약도 웹훅 비밀값 없으면 거절', s == 403, (s, j))
+      SENT.clear(); s, j = call('POST', '/functions/v1/push', {'action': 'weekly', 'at': SUN + 'T19:00:00+09:00'}, headers=PH)
+      to = sorted((m['token'], m['data'].get('code')) for m in SENT)
+      check('일요일 19시 → 확인된 보호자에게만, 자녀마다 한 번(학생·확인 전 보호자는 안 받음)', s == 200 and to == [('tok-par1', 'PUSH01'), ('tok-par1', 'PUSH02')], (s, j, to))
+      m1 = next((m for m in SENT if m['data'].get('code') == 'PUSH01'), {}); m2 = next((m for m in SENT if m['data'].get('code') == 'PUSH02'), {})
+      check('  └ "푸시학생 학생의 이번 주" · 공부한 날 2일 · 푼 문제 10개 · 과제 1/1 제출(지난주 것은 세지 않음)', m1 and '푸시학생 학생의 이번 주' in m1['notification']['title']
+            and '공부한 날 2일' in m1['notification']['body'] and '푼 문제 10개' in m1['notification']['body'] and '과제 1/1 제출' in m1['notification']['body'], m1)
+      check('  └ 공부 기록이 없는 주는 탓하지 않는 말("쉬어 갔어요")', m2 and '쉬어 갔어요' in m2['notification']['body'] and all(w not in json.dumps(SENT, ensure_ascii=False) for w in ('안 했', '못 했', '순위', '평균', '친구')), m2)
+      check('  └ 자녀별로 따로 남음(tag) · 잠금화면 공개 범위 PRIVATE · kind weekly', m1 and m2 and m1['android']['notification']['tag'] != m2['android']['notification']['tag']
+            and m1['android']['notification'].get('visibility') == 'PRIVATE' and m1['data']['kind'] == 'weekly', SENT)
+      for at in (SUN + 'T22:00:00+09:00', SUN + 'T23:30:00+09:00', SUN + 'T06:59:00+09:00'):
+          SENT.clear(); s, j = call('POST', '/functions/v1/push', {'action': 'weekly', 'at': at}, headers=PH)
+          if SENT: break
+      check('밤 22시~아침 7시에 불리면 보내지 않음', SENT == [] and j.get('skipped') == 'night', (j, SENT))
+      cur.execute("update guardian_links set approved = false where uid = %s and code = 'PUSH02'", (P1_ID,))
+      SENT.clear(); call('POST', '/functions/v1/push', {'action': 'weekly', 'at': SUN + 'T19:00:00+09:00'}, headers=PH)
+      check('  └ 확인이 풀린 자녀는 빠짐', sorted(m['data'].get('code') for m in SENT) == ['PUSH01'], [m['data'] for m in SENT])
   finally:
       for p in procs: p.terminate()
 

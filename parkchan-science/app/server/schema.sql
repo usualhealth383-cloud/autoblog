@@ -957,6 +957,7 @@ begin
   delete from client_errors where uid = u; delete from private.attempts where uid = u; delete from private.consent_links where uid = u;
   delete from progress where code = 'u:' || u::text;
   delete from progress where code = (select student_code from profiles where id = u);
+  delete from submissions where code = (select student_code from profiles where id = u);   -- 과제 제출 기록도 학습 기록과 함께
   delete from auth.users where id = u;      -- 프로필·글·댓글·푸시 기기는 연쇄 삭제, 결제 기록은 계정 연결만 끊고 5년 보관
 end $$;
 -- 푸시 받을 기기 목록(서비스 키 전용 · push 함수가 부른다): 공지/일정 → 그 반 학생·보호자, 출석 → 그 학생의 보호자
@@ -1040,6 +1041,149 @@ begin
     update profiles set guardian_how = 'reset', guardian_at = now() where id = p_uid and under14 and not guardian_ok and guardian_how = 'web';
   end if;
 end $$;
+
+-- ═══ 학원 과제(벤치마크 ★4) — 원장이 반이나 학생 몇 명에게 내고, 학생이 풀면 결과(맞힌 수·걸린 시간·제출 시각)가 남는다 ═══
+--  종류: bank(소단원 문제 N개 — 낼 때 문항을 골라 모두 같은 문항을 푼다) · unit(대단원 마무리) · mock(모의고사 회차) · read(개념 읽기)
+--  대상은 낸 때의 학생으로 못 박는다(나중에 들어온 학생에게 옛 과제가 '미제출'로 쌓이지 않게) · 마감은 그날 23:59(한국 시간) · 마감 뒤 제출은 '늦은 제출'
+--  표는 API 로 열지 않는다 — 읽기·쓰기 모두 함수로(대상 학생 코드 목록이 반 친구에게 보이지 않게 · 상태를 바꾸는 쓰기는 함수로, CLAUDE.md)
+--  보관: 마감일부터 1년 뒤 파기(purge_old) · 학생 코드를 지우면 그 제출도 · 학생이 탈퇴하면 그 코드의 제출도 지운다
+create table if not exists assignments (
+  id    uuid primary key default gen_random_uuid(),
+  kind  text not null check (kind in ('bank','unit','mock','read')),
+  title text not null check (char_length(title) between 1 and 80),
+  ref   text not null default '' check (char_length(ref) <= 40),                  -- 소단원 id · 대단원 '1-I' · 모의고사 '1'·'s2'
+  items text[] not null check (cardinality(items) between 1 and 40),            -- 문항 id(개념 읽기는 개념 id)
+  cls   text,                                                                    -- 반에 냈으면 반 이름('전체' 포함), 학생을 골랐으면 null
+  codes text[] not null check (cardinality(codes) between 1 and 400),           -- 낸 때의 대상 학생
+  due   date not null,
+  at    timestamptz not null default now()
+);
+create index if not exists assignments_codes on assignments using gin (codes);
+create index if not exists assignments_due on assignments (due);
+create table if not exists submissions (
+  aid          uuid not null references assignments(id) on delete cascade,
+  code         text not null references students(code) on delete cascade,
+  done         int not null default 0 check (done >= 0),
+  right_n      int not null default 0 check (right_n >= 0),
+  secs         int not null default 0 check (secs between 0 and 86400),
+  wrong        text[] not null default '{}',          -- 틀린 문항 id(원장 화면 '많이 틀린 문항')
+  submitted_at timestamptz,                            -- 서버 시계
+  late         boolean not null default false,         -- 마감 뒤 제출
+  updated_at   timestamptz not null default now(),
+  primary key (aid, code)
+);
+alter table assignments enable row level security; alter table submissions enable row level security;
+revoke all on assignments, submissions from anon, authenticated;
+
+-- 한 과제의 요약(대상 · 제출 · 늦은 제출 · 정답률 · 아직 안 낸 학생)
+create or replace function private.asg_row(a assignments) returns json language sql stable security definer set search_path = public as $$
+  select json_build_object('id', a.id, 'kind', a.kind, 'title', a.title, 'ref', a.ref, 'n', cardinality(a.items), 'cls', a.cls, 'due', a.due, 'at', a.at,
+    'target', cardinality(a.codes),
+    'submitted', (select count(*) from submissions s where s.aid = a.id and s.submitted_at is not null),
+    'late', (select count(*) from submissions s where s.aid = a.id and s.late),
+    'rate', (select case when sum(cardinality(a.items)) > 0 and a.kind <> 'read' then round(100.0 * sum(s.right_n) / sum(cardinality(a.items))) end from submissions s where s.aid = a.id and s.submitted_at is not null),
+    'missing', coalesce((select json_agg(c) from unnest(a.codes) c where not exists (select 1 from submissions s where s.aid = a.id and s.code = c and s.submitted_at is not null)), '[]'::json)) $$;
+-- 원장: 과제 내기
+create or replace function assign_create(p_kind text, p_title text, p_ref text, p_items text[], p_cls text, p_codes text[], p_due date) returns json
+language plpgsql security definer set search_path = public as $$
+declare cs text[]; it text[]; t text := trim(coalesce(p_title, '')); r assignments;
+begin
+  if not is_owner() then raise exception 'owner only' using errcode = '42501'; end if;
+  if p_kind is null or p_kind not in ('bank','unit','mock','read') then return json_build_object('ok', false, 'why', '과제 종류를 골라 주세요.'); end if;
+  if char_length(t) < 1 or char_length(t) > 80 then return json_build_object('ok', false, 'why', '과제 이름을 확인해 주세요.'); end if;
+  it := array(select x from (select x, min(o) as o from unnest(coalesce(p_items, '{}')) with ordinality u(x, o) where x ~ '^[A-Za-z0-9_:#.-]{1,40}$' group by x) z order by o);   -- 순서는 그대로 · 같은 문항은 한 번
+  if cardinality(it) < 1 or cardinality(it) > 40 then return json_build_object('ok', false, 'why', '문항은 1~40개로 내 주세요.'); end if;
+  if p_due is null or p_due < kst_today() or p_due > kst_today() + 60 then return json_build_object('ok', false, 'why', '마감일은 오늘부터 60일 안으로 골라 주세요.'); end if;
+  if coalesce(p_cls, '') <> '' then cs := array(select code from students where (p_cls = '전체' or cls = p_cls) and until >= kst_today() order by code);
+  else cs := array(select code from students where code = any(coalesce(p_codes, '{}')) and until >= kst_today() order by code); end if;
+  if cardinality(cs) = 0 then return json_build_object('ok', false, 'why', '과제를 받을 학생이 없습니다. 반이나 학생을 확인해 주세요.'); end if;
+  insert into assignments(kind, title, ref, items, cls, codes, due) values (p_kind, t, left(coalesce(p_ref, ''), 40), it, nullif(p_cls, ''), cs, p_due) returning * into r;
+  return json_build_object('ok', true, 'id', r.id, 'target', cardinality(cs));
+end $$;
+create or replace function assign_delete(p_id uuid) returns void language plpgsql security definer set search_path = public as $$
+begin
+  if not is_owner() then raise exception 'owner only' using errcode = '42501'; end if;
+  delete from assignments where id = p_id;
+end $$;
+-- 원장: 과제 목록(마감이 60일 안에 지난 것까지) · 아직 안 낸 학생 코드(원장 '처리할 것'의 '마감 지난 미제출')
+create or replace function assign_list() returns json language plpgsql stable security definer set search_path = public, private as $$
+begin
+  if not is_owner() then return '[]'::json; end if;
+  return coalesce((select json_agg(private.asg_row(a) order by a.due desc, a.at desc) from assignments a where a.id in (select id from assignments where due >= kst_today() - 60 order by due desc, at desc limit 60)), '[]'::json);
+end $$;
+-- 원장: 한 과제의 제출 현황 — 학생별(제출·늦은 제출·맞힌 수·걸린 시간·제출 시각) · 많이 틀린 문항 3개
+create or replace function assign_report(p_id uuid) returns json language plpgsql stable security definer set search_path = public, private as $$
+declare a assignments;
+begin
+  if not is_owner() then return json_build_object('ok', false); end if;
+  select * into a from assignments where id = p_id; if not found then return json_build_object('ok', false, 'why', '지워진 과제입니다.'); end if;
+  return json_build_object('ok', true, 'a', private.asg_row(a), 'items', a.items,
+    'rows', coalesce((select json_agg(json_build_object('code', c, 'name', st.name, 'cls', st.cls, 'phone', st.phone, 'done', coalesce(s.done, 0), 'right', coalesce(s.right_n, 0),
+        'secs', coalesce(s.secs, 0), 'submitted_at', s.submitted_at, 'late', coalesce(s.late, false)) order by s.submitted_at is null, st.cls, st.name)
+      from unnest(a.codes) c left join students st on st.code = c left join submissions s on s.aid = a.id and s.code = c where st.code is not null), '[]'::json),
+    'top', coalesce((select json_agg(json_build_object('id', w, 'n', n) order by n desc, o) from (
+        select w, count(*) as n, min(array_position(a.items, w)) as o from submissions s, unnest(s.wrong) w where s.aid = a.id and s.submitted_at is not null group by w order by count(*) desc, min(array_position(a.items, w)) limit 3) x), '[]'::json));
+end $$;
+-- 학생: 내게 온 과제(마감 14일 지난 것까지) — 대상 학생 목록은 주지 않는다
+create or replace function my_assignments() returns json language sql stable security definer set search_path = public as $$
+  select coalesce(json_agg(json_build_object('id', a.id, 'kind', a.kind, 'title', a.title, 'ref', a.ref, 'items', a.items, 'n', cardinality(a.items), 'due', a.due, 'at', a.at,
+      'done', coalesce(s.done, 0), 'right', coalesce(s.right_n, 0), 'secs', coalesce(s.secs, 0), 'submitted_at', s.submitted_at, 'late', coalesce(s.late, false)) order by a.due, a.at), '[]'::json)
+    from assignments a left join submissions s on s.aid = a.id and s.code = my_student_code()
+   where my_student_code() is not null and my_student_code() = any(a.codes) and a.due >= kst_today() - 14 $$;
+-- 학생: 진행 저장 · 제출(p_submit). 서버가 문항 수 안으로 맞추고, 제출 시각·늦은 제출은 서버 시계로. 한 번 낸 과제는 다시 바뀌지 않는다
+create or replace function assign_save(p_id uuid, p_done int, p_right int, p_secs int, p_wrong text[], p_submit boolean default false) returns json
+language plpgsql security definer set search_path = public as $$
+declare c text := my_student_code(); a assignments; s submissions; n int; d int; w text[];
+begin
+  if c is null then return json_build_object('ok', false, 'why', '학원 코드를 등록한 학생만 과제를 낼 수 있습니다.'); end if;
+  if not consent_ok() then return json_build_object('ok', false, 'consent', true, 'why', '보호자 동의가 끝나면 과제가 학원에 제출됩니다. 그때까지 이 기기에 남겨 둘게요.'); end if;
+  select * into a from assignments where id = p_id and c = any(codes); if not found then return json_build_object('ok', false, 'why', '받은 과제가 아닙니다.'); end if;
+  n := cardinality(a.items); d := least(greatest(coalesce(p_done, 0), 0), n);
+  w := array(select distinct x from unnest(coalesce(p_wrong, '{}')) x where x = any(a.items));
+  select * into s from submissions where aid = a.id and code = c for update;
+  if found and s.submitted_at is not null then return json_build_object('ok', true, 'already', true, 'submitted_at', s.submitted_at, 'late', s.late); end if;
+  if coalesce(p_submit, false) and d < n then return json_build_object('ok', false, 'why', '아직 다 풀지 않았어요. 끝까지 풀면 제출됩니다.'); end if;
+  if found and d < s.done and not coalesce(p_submit, false) then return json_build_object('ok', true, 'done', s.done); end if;   -- 다른 기기의 더 앞선 진행은 덮지 않는다
+  insert into submissions as x (aid, code, done, right_n, secs, wrong, submitted_at, late, updated_at)
+  values (a.id, c, d, least(greatest(coalesce(p_right, 0), 0), d), least(greatest(coalesce(p_secs, 0), 0), 86400), w,
+          case when p_submit then now() end, coalesce(p_submit, false) and kst_today() > a.due, now())
+  on conflict (aid, code) do update set done = excluded.done, right_n = excluded.right_n, secs = excluded.secs, wrong = excluded.wrong,
+    submitted_at = excluded.submitted_at, late = excluded.late, updated_at = now()
+  returning * into s;
+  return json_build_object('ok', true, 'done', s.done, 'submitted_at', s.submitted_at, 'late', s.late);
+end $$;
+-- 보호자: 원장이 확인한 자녀의 과제(이번 주 요약 '과제 제출') — 문항·점수 대신 낸 것만
+create or replace function child_assignments(p_code text) returns json language plpgsql stable security definer set search_path = public as $$
+declare c text := upper(trim(coalesce(p_code, '')));
+begin
+  if not exists (select 1 from guardian_links where uid = auth.uid() and code = c and approved) then return json_build_object('ok', false, 'why', '연결된 자녀가 아닙니다.'); end if;
+  return json_build_object('ok', true, 'list', coalesce((select json_agg(json_build_object('id', a.id, 'kind', a.kind, 'title', a.title, 'n', cardinality(a.items), 'due', a.due, 'at', a.at,
+      'done', coalesce(s.done, 0), 'submitted_at', s.submitted_at, 'late', coalesce(s.late, false)) order by a.due, a.at)
+    from assignments a left join submissions s on s.aid = a.id and s.code = c where c = any(a.codes) and a.due >= kst_today() - 14), '[]'::json));
+end $$;
+
+-- ═══ 보호자 주간 요약 알림(벤치마크 ★5) — 일요일 저녁 push 함수({action:'weekly'})가 부른다(서비스 키 전용) ═══
+--  원장이 확인한 보호자 · 수강 중인 자녀만. 이번 주(월~일) 공부한 날 · 푼 문제 수 · 이번 주 마감 과제 중 낸 것 — 따로 저장하지 않고 그때 계산한다
+create or replace function weekly_digest() returns table(token text, uid uuid, code text, name text, days int, solved int, asg_due int, asg_done int)
+language sql stable security definer set search_path = public as $$
+  with wk as (select kst_today() - (extract(isodow from kst_today())::int - 1) as mon),
+  kids as (select g.uid, s.code, s.name from guardian_links g join students s on s.code = g.code join profiles p on p.id = g.uid
+            where g.approved and p.role = 'parent' and s.until >= kst_today())
+  select t.token, k.uid, k.code, k.name,
+    (select count(distinct d)::int from progress pr, jsonb_array_elements_text(case when jsonb_typeof(pr.state->'days') = 'array' then pr.state->'days' else '[]'::jsonb end) d, wk
+      where pr.code = k.code and d ~ '^\d{4}-\d\d-\d\d$' and d::date between wk.mon and wk.mon + 6),
+    (select coalesce(sum(case when jsonb_typeof(e.value) = 'array' and (e.value->>0) ~ '^\d+$' then (e.value->>0)::int else 0 end), 0)::int
+       from progress pr, jsonb_each(case when jsonb_typeof(pr.state->'dq') = 'object' then pr.state->'dq' else '{}'::jsonb end) e, wk
+      where pr.code = k.code and e.key ~ '^\d{4}-\d\d-\d\d$' and e.key::date between wk.mon and wk.mon + 6),
+    (select count(*)::int from assignments a, wk where k.code = any(a.codes) and a.due between wk.mon and wk.mon + 6),
+    (select count(*)::int from assignments a join submissions s on s.aid = a.id and s.code = k.code and s.submitted_at is not null, wk where k.code = any(a.codes) and a.due between wk.mon and wk.mon + 6)
+  from kids k join push_tokens t on t.uid = k.uid
+$$;
+revoke execute on function assign_create(text, text, text, text[], text, text[], date), assign_delete(uuid), assign_list(), assign_report(uuid), my_assignments(),
+  assign_save(uuid, int, int, int, text[], boolean), child_assignments(text) from public, anon;
+grant execute on function assign_create(text, text, text, text[], text, text[], date), assign_delete(uuid), assign_list(), assign_report(uuid), my_assignments(),
+  assign_save(uuid, int, int, int, text[], boolean), child_assignments(text) to authenticated;   -- 원장 함수는 안에서 원장만 · 학생 함수는 내 코드만 · 보호자 함수는 확인된 자녀만
+revoke execute on function weekly_digest() from public, anon, authenticated; grant execute on function weekly_digest() to service_role;
 
 -- ═══ 앱 운영 스위치(로그인 없이 읽음) — 새 APK 없이 '업데이트 필요'·'점검 중'을 알린다 ═══
 -- 값은 private.config 에 넣는다: min_version(이보다 낮으면 업데이트해야 씀) · latest_version(권장) · notice(점검·안내 한 줄)
@@ -1194,7 +1338,7 @@ begin delete from progress where code = old.code; return old; end $$;
 drop trigger if exists students_drop_progress on students;
 create trigger students_drop_progress after delete on students for each row execute function private.drop_progress();
 
--- ═══ 보관 기간이 지난 기록 지우기(개인정보처리방침 3항) — 오류 기록 90일 · 틀린 입력 기록 1일 · 처리 끝난 신고·이용 제한 기록 6개월 · 보호자 동의가 7일 안에 없는 만 14세 미만 계정 ═══
+-- ═══ 보관 기간이 지난 기록 지우기(개인정보처리방침 3항) — 오류 기록 90일 · 틀린 입력 기록 1일 · 처리 끝난 신고·이용 제한 기록 6개월 · 과제 제출 1년 · 보호자 동의가 7일 안에 없는 만 14세 미만 계정 ═══
 create or replace function private.purge_old() returns void language sql security definer set search_path = public, private as $$
   delete from client_errors where at < now() - interval '90 days';
   delete from private.attempts where at < now() - interval '1 day';
@@ -1208,6 +1352,7 @@ create or replace function private.purge_old() returns void language sql securit
   select private.recount(post_id, comment_id) from (select distinct post_id, comment_id from reports where state = 'open') x;   -- 30일이 지나 '자주 되돌려진 계정'에서 벗어난 신고를 다시 센다
   update profiles set talk_until = null, talk_reason = '' where talk_until < kst_today();   -- 끝난 제한은 사유까지 지운다
   delete from push_later where at < now() - interval '2 days';                               -- 못 보낸 밤 알림(보통은 아침에 보내고 바로 지운다)
+  delete from assignments where due < kst_today() - 365;                                     -- 학원 과제·제출 기록은 마감일부터 1년(처리방침 3⑭)
   delete from auth.users where id in (select id from profiles where under14 and not guardian_ok
     and ((guardian_at is null and created_at < now() - interval '7 days') or (guardian_how = 'reset' and guardian_at < now() - interval '7 days')));   -- 보호자가 동의를 표시했고 학원 확인만 남은 계정은 두고 원장 목록에 남긴다 · '번호 다름'으로 되돌린 계정은 그때부터 7일
 $$;
@@ -1269,6 +1414,7 @@ begin
   update profiles set guard_talk = null, guard_by = null, guard_at = null where guard_by = u;
   delete from progress where code = 'u:' || u::text;
   delete from progress where code = (select student_code from profiles where id = u);
+  delete from submissions where code = (select student_code from profiles where id = u);
   delete from client_errors where uid = u; delete from private.attempts where uid = u; delete from private.consent_links where uid = u;
   delete from auth.users where id = u;
   return json_build_object('ok', true);

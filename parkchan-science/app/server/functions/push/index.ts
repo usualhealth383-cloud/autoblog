@@ -5,6 +5,9 @@
 //   · 잠금화면에 댓글 내용·글 제목을 싣지 않는다("새 댓글이 있어요") — 험한 댓글·힘든 마음의 글이 잠금화면에 뜨지 않게
 //   · 밤 22시~아침 7시(한국 시간)에 달린 댓글은 보내지 않고 push_later 에 모았다가, 아침 7시 cron({action:'morning'})이 한 번에 "밤사이 새 댓글"로
 //   · 원장 폰의 '먼저 살펴볼 글'(힘든 마음의 글·'친구가 걱정돼요' 신고)은 밤에도 바로 간다 — 원장님이 폰 설정으로 직접 정한다
+//  보호자 주간 요약(벤치마크 ★5) — 일요일 저녁 cron({action:'weekly'})이 부른다. 받을 사람·숫자는 DB 함수 weekly_digest()(서비스 키 전용)
+//   · 원장이 확인한 보호자 · 수강 중인 자녀마다 한 번(자녀 둘이면 알림 둘 — 서로 덮지 않게 자녀별 tag)
+//   · 밤 22시~아침 7시에 불리면 보내지 않는다(다음 주에 다시) · 비교·순위 없이 그 주 숫자만, 잠금화면 공개 범위 PRIVATE
 // 비밀값: FIREBASE_SA_JSON(Firebase 서비스 계정 JSON, project_id 포함), PUSH_SECRET(웹훅 헤더 x-push-secret 값), ACADEMY(학원명, 선택)
 import { googleToken, rpc, rest, json, CORS } from '../_shared/google.ts';
 
@@ -15,8 +18,8 @@ const md = (d: string) => { const [, m, dd] = d.split('-'); return `${+m}/${+dd}
 const kstHour = (iso?: string) => { let t = iso ? new Date(iso) : new Date(); if (Number.isNaN(t.getTime())) t = new Date(); return (t.getUTCHours() + 9) % 24; };
 const isNight = (iso?: string) => { const h = kstHour(iso); return h >= 22 || h < 7; };
 
-type Msg = { title: string; body: string; kind: string; post?: string; quiet?: boolean };
-type Job = { args: any; uid?: string; msg: Msg };
+type Msg = { title: string; body: string; kind: string; post?: string; quiet?: boolean; tag?: string; code?: string };
+type Job = { args: any; uid?: string; tokens?: { token: string; uid: string }[]; msg: Msg };
 // 도움이 필요해 보이는 글·댓글(서버가 care 로 표시) · '친구가 걱정돼요' 신고 → 원장 폰. 잠금화면에 보일 수 있으니 내용은 싣지 않는다
 const careJob = (A: string, post: string, worry = false): Job => ({ args: { p_kind: 'care', p_cls: null, p_code: null },
   msg: { kind: 'care', post, quiet: true, title: `[${A}] 먼저 살펴볼 글이 있어요`,
@@ -69,6 +72,22 @@ async function morningJobs(): Promise<{ jobs: Job[]; upto: string | null }> {
   return { jobs, upto: rows[rows.length - 1].at };
 }
 
+// 일요일 저녁: 보호자마다(자녀별) 이번 주 요약 한 줄 — 앱의 '이번 주 요약' 카드로 이어진다
+type Dig = { token: string; uid: string; code: string; name: string; days: number; solved: number; asg_due: number; asg_done: number };
+async function weeklyJobs(): Promise<Job[]> {
+  const A = Deno.env.get('ACADEMY') || '박찬 과학';
+  const rows: Dig[] = await rpc('weekly_digest', {});
+  const by = new Map<string, { d: Dig; tokens: { token: string; uid: string }[] }>();
+  for (const r of rows || []) { const k = r.uid + '|' + r.code; const o = by.get(k) || { d: r, tokens: [] }; o.tokens.push({ token: r.token, uid: r.uid }); by.set(k, o); }
+  return [...by.values()].map(({ d, tokens }) => {
+    const parts = d.days ? [`공부한 날 ${d.days}일`] : ['이번 주는 쉬어 갔어요'];
+    if (d.solved) parts.push(`푼 문제 ${d.solved}개`);
+    if (d.asg_due) parts.push(`과제 ${d.asg_done}/${d.asg_due} 제출`);
+    return { args: null, tokens, msg: { kind: 'weekly', tag: 'weekly-' + d.code, code: d.code, quiet: true,
+      title: `[${A}] ${d.name} 학생의 이번 주`, body: `${parts.join(' · ')} — 앱에서 이번 주 요약을 볼 수 있어요` } };
+  });
+}
+
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: CORS });
   if (!Deno.env.get('PUSH_SECRET') || req.headers.get('x-push-secret') !== Deno.env.get('PUSH_SECRET')) return json({ ok: false }, 403);
@@ -76,13 +95,16 @@ Deno.serve(async (req) => {
     const ev = await req.json();
     let jobs: Job[] = [], upto: string | null = null;
     if (ev.action === 'morning') ({ jobs, upto } = await morningJobs());
-    else {
+    else if (ev.action === 'weekly') {
+      if (isNight(ev.at)) return json({ ok: true, skipped: 'night', sent: 0 });   // 밤 22~07시에는 보내지 않는다(ev.at: 시험용 시각, 없으면 지금)
+      jobs = await weeklyJobs();
+    } else {
       if (ev.type !== 'INSERT' || !ev.record) return json({ ok: true, skipped: 'not insert' });
       jobs = await composeAll(ev.table, ev.record);
     }
     const clear = async () => { if (upto) await rest(`push_later?at=lte.${encodeURIComponent(upto)}`, { method: 'DELETE' }); };
     if (!jobs.length) { await clear(); return json({ ok: true, skipped: ev.table || ev.action, sent: 0 }); }
-    const plan: { c: Job; targets: { token: string; uid: string; who?: string }[] }[] = await Promise.all(jobs.map(async (c) => ({ c, targets: c.uid
+    const plan: { c: Job; targets: { token: string; uid: string; who?: string }[] }[] = await Promise.all(jobs.map(async (c) => ({ c, targets: c.tokens ? c.tokens : c.uid
       ? await rest(`push_tokens?uid=eq.${encodeURIComponent(c.uid)}&select=token,uid`)
       : await rpc('push_targets', c.args) })));
     const total = plan.reduce((a, x) => a + x.targets.length, 0);
@@ -95,8 +117,8 @@ Deno.serve(async (req) => {
       const r = await fetch(`${FCM()}/v1/projects/${pid}/messages:send`, {
         method: 'POST', headers: { Authorization: `Bearer ${at}`, 'Content-Type': 'application/json' },
         body: JSON.stringify({ message: { token: t.token, notification: { title: c.msg.title, body: c.msg.body },
-          data: { kind: c.msg.kind, ...(c.msg.post ? { post: c.msg.post } : {}) },
-          android: { priority: 'HIGH', notification: { channel_id: 'academy', tag: c.msg.kind, ...(c.msg.quiet ? { visibility: 'PRIVATE' } : {}) } } } }),
+          data: { kind: c.msg.kind, ...(c.msg.post ? { post: c.msg.post } : {}), ...(c.msg.code ? { code: c.msg.code } : {}) },
+          android: { priority: 'HIGH', notification: { channel_id: 'academy', tag: c.msg.tag || c.msg.kind, ...(c.msg.quiet ? { visibility: 'PRIVATE' } : {}) } } } }),
       });
       if (r.ok) { sent++; return; }
       const j = await r.json().catch(() => ({}));

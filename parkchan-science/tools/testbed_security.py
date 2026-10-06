@@ -674,5 +674,84 @@ cur.execute('select guard_talk from profiles where id = %s', (GS_ID,)); check('�
 rpc('link_code', {'p_kind': 'child', 'p_code': 'GRD001'}, GP); rpc('guardian_decide', {'p_uid': GP_ID, 'p_code': 'GRD001', 'p_ok': True}, OWN); rpc('guardian_talk', {'p_code': 'GRD001', 'p_mode': 'all'}, GP)
 rpc('delete_my_account', {}, GP); cur.execute('select guard_talk, guard_by from profiles where id = %s', (GS_ID,)); check('  └ 보호자가 탈퇴해도 풀림', cur.fetchone() == (None, None))
 
+print('▸ 학원 과제(★4) — 원장만 내고 보고 · 학생은 내 과제만 · 보호자는 확인된 자녀만 · 표는 API 로 안 열림')
+T0 = dt.datetime.now(ZoneInfo('Asia/Seoul')).date(); DUE = (T0 + dt.timedelta(days=3)).isoformat()
+for c, n, k, u in (('ASG001', '과제학생', '과제반', '2099-02-28'), ('ASG002', '안낸학생', '과제반', '2099-02-28'), ('ASG003', '화금학생', '화금반', '2099-02-28'), ('ASG004', '끝난학생', '과제반', '2020-02-28'), ('ASG005', '어린학생', '어린반', '2099-02-28')):
+    call('POST', '/rest/v1/students', {'code': c, 'name': n, 'cls': k, 'until': u, 'phone': '01055556666'}, OWN)
+SA, SA_ID = signup('asa@test.kr', '과제학생'); rpc('link_code', {'p_kind': 'student', 'p_code': 'ASG001'}, SA)
+SB, SB_ID = signup('asb@test.kr', '화금학생'); rpc('link_code', {'p_kind': 'student', 'p_code': 'ASG003'}, SB)
+SG, SG_ID = signup('asg@test.kr', '손님학생')
+SK, SK_ID = signup('ask@test.kr', '어린학생', under14=True, guardian='보호 01012341234'); rpc('link_code', {'p_kind': 'student', 'p_code': 'ASG005'}, SK)
+PA, PA_ID = signup('apa@test.kr', '과제엄마', role='parent'); rpc('link_code', {'p_kind': 'child', 'p_code': 'ASG001'}, PA); rpc('guardian_decide', {'p_uid': PA_ID, 'p_code': 'ASG001', 'p_ok': True}, OWN)
+PQ, PQ_ID = signup('apq@test.kr', '확인전', role='parent'); rpc('link_code', {'p_kind': 'child', 'p_code': 'ASG001'}, PQ)
+PZ, PZ_ID = signup('apz@test.kr', '남의엄마', role='parent'); rpc('link_code', {'p_kind': 'child', 'p_code': 'ASG003'}, PZ); rpc('guardian_decide', {'p_uid': PZ_ID, 'p_code': 'ASG003', 'p_ok': True}, OWN)
+ITEMS = ['1101-q1', '1101-q2', '1101-q3', '1101-q4']
+mk = lambda tok, **kw: rpc('assign_create', {'p_kind': 'bank', 'p_title': '1-01 문제 4개', 'p_ref': '1101', 'p_items': ITEMS, 'p_cls': '과제반', 'p_codes': None, 'p_due': DUE, **kw}, tok)
+s, j = mk(OWN); check('원장이 반에 과제를 냄 → 수강 중인 학생만(끝난 학생 빼고 2명)', s == 200 and j['ok'] and j['target'] == 2, (s, j)); A1 = j['id']
+for nm, t in (('학생', SA), ('보호자', PA), ('손님', SG)):
+    s, j = mk(t); check(f'  └ {nm}은 과제를 못 냄', s >= 400, (s, j))
+s, j = mk(ANON); check('  └ 비로그인은 못 부름', s >= 400, (s, j))
+s, j = mk(OWN, p_due=(T0 - dt.timedelta(days=1)).isoformat()); check('  └ 지난 날짜 마감은 거절', j.get('ok') is False and '마감일' in j['why'], j)
+s, j = mk(OWN, p_items=[]); check('  └ 문항 0개 거절', j.get('ok') is False, j)
+s, j = mk(OWN, p_items=[f'1101-q{i}' for i in range(41)]); check('  └ 41문항 거절(40개까지)', j.get('ok') is False, j)
+s, j = mk(OWN, p_cls='없는반'); check('  └ 받을 학생이 없으면 안내', j.get('ok') is False and '학생이 없' in j['why'], j)
+s, j = mk(OWN, p_cls=None, p_codes=['ASG003', 'NOPE01', 'ASG004'], p_items=['1101-q1', '1101-q1', 'x;drop', '1101-q2'], p_title='화금 개별')
+check('학생을 골라 냄 → 있는·수강 중인 코드만 · 같은 문항 한 번 · 이상한 id 뺌', j.get('ok') and j['target'] == 1, j); A2 = j['id']
+cur.execute('select items, codes, cls from assignments where id = %s', (A2,)); r = cur.fetchone(); check('  └ 저장: 문항 순서 그대로 · 대상 고정 · 반 없음', r == (['1101-q1', '1101-q2'], ['ASG003'], None), r)
+for nm, t in (('원장', OWN), ('학생', SA), ('보호자', PA)):
+    s, j = call('GET', '/rest/v1/assignments?select=*', tok=t); s2, j2 = call('GET', '/rest/v1/submissions?select=*', tok=t)
+    check(f'  └ 과제·제출 표는 API 로 안 열림({nm})', s >= 400 and s2 >= 400, (s, s2))
+s, j = call('POST', '/rest/v1/submissions', {'aid': A1, 'code': 'ASG001', 'done': 4, 'right_n': 4, 'submitted_at': '2020-01-01T00:00:00Z'}, SA); check('  └ 학생이 제출 줄을 직접 못 넣음(함수로만)', s >= 400, (s, j))
+s, j = rpc('my_assignments', {}, SA); check('학생: 내 반 과제만 보임(대상 학생 목록은 안 줌)', [x['id'] for x in j] == [A1] and 'codes' not in j[0] and j[0]['n'] == 4 and j[0]['items'] == ITEMS, j)
+s, j = rpc('my_assignments', {}, SB); check('  └ 골라 낸 학생은 그 과제만', [x['id'] for x in j] == [A2], j)
+for nm, t in (('손님', SG), ('보호자', PA), ('원장', OWN)):
+    s, j = rpc('my_assignments', {}, t); check(f'  └ {nm}은 빈 목록', j == [], j)
+s, j = rpc('my_assignments', {}, ANON); check('  └ 비로그인은 못 부름', s >= 400, (s, j))
+sv = lambda tok, aid=A1, **kw: rpc('assign_save', {'p_id': aid, 'p_done': 2, 'p_right': 1, 'p_secs': 40, 'p_wrong': ['1101-q2'], 'p_submit': False, **kw}, tok)
+s, j = sv(SA); check('학생: 진행 저장(2/4)', j.get('ok') and j['done'] == 2 and j['submitted_at'] is None, j)
+s, j = sv(SB); check('  └ 남의 반 과제에는 못 씀', j.get('ok') is False and '받은 과제가 아닙' in j['why'], j)
+for nm, t in (('보호자', PA), ('손님', SG), ('원장', OWN)):
+    s, j = sv(t); check(f'  └ {nm}은 못 씀', j.get('ok') is False, j)
+s, j = sv(ANON); check('  └ 비로그인은 못 부름', s >= 400, (s, j))
+s, j = sv(SA, p_done=1); check('  └ 더 앞선 진행을 옛 기기가 덮지 않음', j.get('ok') and j['done'] == 2, j)
+s, j = sv(SA, p_done=3, p_submit=True); check('  └ 다 풀기 전에는 제출 안 됨', j.get('ok') is False and '다 풀지' in j['why'], j)
+s, j = sv(SA, p_done=99, p_right=99, p_secs=10 ** 7, p_wrong=['1101-q3', 'ZZZ-q9', '1101-q3'], p_submit=True)
+cur.execute("select done, right_n, secs, wrong, late, submitted_at is not null from submissions where aid = %s and code = 'ASG001'", (A1,)); r = cur.fetchone()
+check('제출: 서버가 문항 수 안으로 맞춤(4/4 · 하루 넘는 시간 자름 · 과제 밖 문항 뺌) · 제출 시각은 서버', j.get('ok') and r == (4, 4, 86400, ['1101-q3'], False, True), (j, r))
+s, j = sv(SA, p_done=4, p_right=0, p_submit=True); cur.execute("select right_n from submissions where aid = %s and code = 'ASG001'", (A1,))
+check('  └ 한 번 낸 과제는 다시 바뀌지 않음', j.get('already') and cur.fetchone()[0] == 4, j)
+cur.execute('update profiles set guardian_ok = false where id = %s', (SK_ID,)); cur.connection.commit()
+A3 = mk(OWN, p_cls='어린반', p_title='어린반 과제')[1]['id']
+s, j = sv(SK, aid=A3, p_done=4, p_submit=True); check('만 14세 미만 보호자 동의 전: 서버에 제출하지 않고 안내(기기에 남김)', j.get('ok') is False and j.get('consent'), j)
+cur.execute('select count(*) from submissions where aid = %s', (A3,)); check('  └ 제출 줄이 생기지 않음', cur.fetchone()[0] == 0)
+cur.execute("update assignments set due = current_date - 2 where id = %s", (A2,)); cur.connection.commit()
+s, j = sv(SB, aid=A2, p_done=2, p_right=1, p_wrong=['1101-q1'], p_submit=True); check('마감 지난 뒤 제출 → 늦은 제출', j.get('ok') and j['late'] is True, j)
+s, j = rpc('my_assignments', {}, SB); check('  └ 학생 화면에도 늦은 제출 · 마감 14일 안의 지난 과제는 보임', j and j[0]['late'] is True and j[0]['submitted_at'], j)
+s, j = rpc('assign_list', {}, OWN); a1 = next(x for x in j if x['id'] == A1)
+check('원장 목록: 대상 2 · 제출 1 · 정답률 100% · 아직 안 낸 학생', a1['target'] == 2 and a1['submitted'] == 1 and a1['rate'] == 100 and a1['missing'] == ['ASG002'], a1)
+a2 = next(x for x in j if x['id'] == A2); check('  └ 늦은 제출 수', a2['late'] == 1 and a2['missing'] == [], a2)
+for nm, t in (('학생', SA), ('보호자', PA), ('손님', SG)):
+    s, j = rpc('assign_list', {}, t); check(f'  └ {nm}은 목록을 못 받음', j == [], j)
+    s, j = rpc('assign_report', {'p_id': A1}, t); check(f'  └ {nm}은 제출 현황을 못 받음', j.get('ok') is False, j)
+s, j = rpc('assign_list', {}, ANON); check('  └ 비로그인은 못 부름', s >= 400, s)
+sv(SA, aid=A1)   # (이미 냄 — 그대로)
+s, j = rpc('assign_report', {'p_id': A1}, OWN); rows = {r['code']: r for r in j['rows']}
+check('원장 제출 현황: 학생별 맞힌 수·걸린 시간·제출 시각 · 안 낸 학생도 줄로', j['ok'] and rows['ASG001']['right'] == 4 and rows['ASG001']['submitted_at'] and rows['ASG002']['submitted_at'] is None and 'ASG004' not in rows, j)
+check('  └ 많이 틀린 문항(틀린 학생 수)', j['top'] == [{'id': '1101-q3', 'n': 1}], j['top'])
+s, j = rpc('child_assignments', {'p_code': 'ASG001'}, PA); check('보호자(확인됨): 자녀 과제 · 낸 것 표시(문항 목록은 안 줌)', j.get('ok') and j['list'][0]['submitted_at'] and 'items' not in j['list'][0] and 'right' not in j['list'][0], j)
+for nm, t, c in (('확인 전 보호자', PQ, 'ASG001'), ('다른 집 보호자', PZ, 'ASG001'), ('학생 본인', SA, 'ASG001'), ('원장', OWN, 'ASG001'), ('손님', SG, 'ASG001')):
+    s, j = rpc('child_assignments', {'p_code': c}, t); check(f'  └ {nm}은 못 봄', j.get('ok') is False, j)
+s, j = rpc('child_assignments', {'p_code': 'ASG001'}, ANON); check('  └ 비로그인은 못 부름', s >= 400, s)
+for nm, t in (('원장', OWN), ('학생', SA), ('보호자', PA), ('비로그인', ANON)):
+    s, j = rpc('weekly_digest', {}, t); check(f'주간 요약 원본(weekly_digest)은 서비스 키 전용 — {nm} 거절', s >= 400, (s, j))
+for nm, t in (('학생', SA), ('보호자', PA)):
+    s, _ = rpc('assign_delete', {'p_id': A1}, t); check(f'  └ {nm}은 과제를 못 지움', s >= 400)
+cur.execute('select count(*) from assignments where id = %s', (A1,)); check('  └ (그대로 있음)', cur.fetchone()[0] == 1)
+rpc('delete_my_account', {}, SA); cur.execute("select count(*) from submissions where code = 'ASG001'"); check('학생이 탈퇴하면 그 코드의 제출 기록도 지움', cur.fetchone()[0] == 0)
+call('DELETE', '/rest/v1/students?code=eq.ASG003', tok=OWN); cur.execute("select count(*) from submissions where code = 'ASG003'"); check('학생 코드를 지우면 제출도 지움', cur.fetchone()[0] == 0)
+cur.execute("update assignments set due = current_date - 366 where id = %s", (A2,)); cur.execute("update assignments set due = current_date - 300 where id = %s", (A3,)); cur.execute('select private.purge_old()'); cur.connection.commit()
+cur.execute('select count(*) from assignments where id in (%s, %s)', (A2, A3)); check('마감 1년 지난 과제는 새벽 정리로 파기(1년 안은 남김)', cur.fetchone()[0] == 1)
+rpc('assign_delete', {'p_id': A1}, OWN); cur.execute('select count(*) from assignments where id = %s', (A1,)); check('원장은 과제를 지움', cur.fetchone()[0] == 0)
+
 print(f'\n보안 시험 {len(OK)}/{len(OK) + len(BAD)} 통과')
 sys.exit(1 if BAD else 0)

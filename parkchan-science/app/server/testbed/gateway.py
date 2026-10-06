@@ -62,7 +62,7 @@ def session(uid, email):
 
 def reset():
     q("""truncate auth.users, students, attendance, notices, notice_reads, sched, progress, passes, purchases,
-         posts, comments, push_tokens, client_errors, guardian_links, profiles cascade""")
+         posts, comments, push_tokens, client_errors, guardian_links, profiles, assignments, submissions cascade""")
     q("delete from private.attempts"); q("delete from classes")
     q("insert into classes values ('월목반','18:00'),('화금반','18:00'),('수토반','14:00')")
     q("insert into private.config values ('owner_email', %s) on conflict (k) do update set v = excluded.v", OWNER[0])
