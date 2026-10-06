@@ -1085,6 +1085,8 @@ details.ix-how .bd p:last-child{margin-bottom:0}
 .products{display:flex;flex-direction:column;gap:var(--s2);margin-top:var(--s3)}
 .prod{display:flex;align-items:center;justify-content:space-between;gap:var(--s3);padding:10px 12px;border:1px solid var(--hairline);border-radius:12px;font-size:.875rem}
 .prod b{font-weight:700;overflow-wrap:anywhere}
+.pain-note{display:block;font-size:.8125rem;color:var(--muted);margin-top:3px;line-height:1.45}
+.pain-row{margin-top:4px}
 .prod span{display:block;color:var(--muted);font-size:.75rem;overflow-wrap:anywhere}   /* 「알릴이소프로필아세틸우레아」처럼 긴 성분명 한 낱말이 사진 옆 좁은 칸을 넘었다(2026-10-06) */
 .tabs{display:flex;gap:6px;margin:var(--s4) 0 var(--s3);overflow-x:auto;scrollbar-width:none;padding-bottom:2px}
 .tabs::-webkit-scrollbar{display:none}
@@ -4057,7 +4059,7 @@ function vSchedule(_, q){
   ${todays.length ? `<section class="sec"><h2>오늘 <small>${now.getMonth() + 1}월 ${now.getDate()}일 · ${todays.filter(x => x.done).length}/${todays.length} 완료</small></h2><div class="dose-list">${todays.map(x => `<button class="dose-tick ${x.done ? 'done' : (x.min < nowMin - 60 ? 'late' : '')}" onclick="tick('${x.d.id}','${x.t}')"><span class="t">${x.t}</span><span class="n"><b>${esc(x.d.name)}</b><small>${fmt((x.d.simple || '').split('.')[0])}</small></span><span class="bx">${x.done ? I.check : ''}</span></button>`).join('')}</div>${todays.some(x => !x.done && x.min < nowMin - 60) ? `<details class="why-more" style="margin-top:10px"><summary>드셨는지 기억이 안 나요</summary><div class="why" style="margin-top:6px"><p>확실하지 않으면 <b>이번 회는 건너뛰고</b> 다음 시간부터 원래대로 드세요. 대부분의 약은 <b>두 번 드시는 쪽이 더 위험</b>해요. 피임약·항생제처럼 놓치면 곤란한 약은 약사에게 물어보세요. 앞으로는 드시자마자 위 칸을 눌러 두시면 헷갈리지 않아요.</p></div></details>` : ''}</section>` : ''}
   ${taking.filter(d => isPrn(d.id)).length ? `<section class="sec card"><h2>필요할 때 드신 약</h2>
     <p class="small muted" style="margin-top:4px">아플 때만 드시는 약은 드실 때마다 눌러 적어 두세요. <b>다음은 몇 시부터</b>인지, 오늘 몇 번째인지 알려 드려요.</p>
-    ${taking.filter(d => isPrn(d.id)).map(d => { const st = prnState(d); return `<div class="sched-row prn-row"><div class="nm"><span>${esc(d.name)}</span>${st.count ? `<b class="${st.full ? 'stockwarn' : 'stockok'}">오늘 ${st.count}번${st.max ? ` / ${st.max}번` : ''}</b>` : ''}</div>
+    ${taking.filter(d => isPrn(d.id)).map(d => { const st = prnState(d); return `<div class="sched-row prn-row"><div class="nm"><span>${esc(d.name)}</span>${st.count ? `<b class="${st.full ? 'stockwarn' : 'stockok'}">오늘 ${st.count}번${st.max ? ` / ${st.max}번` : ''}</b>` : ''}</div>${painBadge(d) ? `<div class="pain-row">${painBadge(d)}</div>` : ''}
       <div class="small" style="margin-top:4px">${st.last ? `마지막 <b>${hhmm(st.last)}</b>${st.last.getDate() !== new Date().getDate() ? '(어제)' : ''}` : '오늘은 아직 안 드셨어요'}${st.early ? ` · <b>${hhmm(st.next)}부터</b> 다시 드실 수 있어요` : ''}${st.gap ? `<span class="muted"> · ${st.gap}시간 간격${st.max ? `, 하루 ${st.max}번까지` : ''}(허가 용법)</span>` : ''}</div>
       ${st.full ? `<div class="note" style="margin-top:8px">${I.alert}<span><b>오늘 드실 만큼 드셨어요.</b> 더 아프시면 더 드시기보다 약사·의사와 상의하세요.</span></div>` : ''}
       <div class="prn-qty" role="group" aria-label="한 번에 몇 알"><span>한 번에</span>${[1, 2].map(k => `<button class="${prnQty(d.id) === k ? 'on' : ''}" aria-pressed="${prnQty(d.id) === k}" onclick="setPrnQty('${d.id}',${k})">${k}알</button>`).join('')}</div>
@@ -4792,6 +4794,9 @@ function sideFreqHtml(d){
   <p class="small muted" style="margin-top:6px">대표 제품의 설명서에서 몸으로 느낄 수 있는 것만 골랐어요(검사 수치는 뺐어요). 「때때로·드물게」에 숫자가 없는 것은 설명서가 그렇게 적고 있어서예요.</p>`;
 }
 /* 아이 용량 계산기가 있는 약 — 어른 용량 아래에 「어린이는 몸무게로」 띠(NHS 약 화면 맨 위 안내, 2026-10-06) */
+/* 약국 소염진통제 화면 — NHS 「If you can take paracetamol, it's a good idea to try it before taking ibuprofen」(현욱님 2026-10-06 「둔다」).
+   아스피린(심장 예방으로 드시는 분)·처방 소염제는 「바꾸라」로 읽힐 수 있어 뺀다 */
+const APAP_FIRST = new Set(['ibuprofen', 'dexibuprofen', 'naproxen', 'clonixin', 'loxoprofen']);
 const KID_DRUG = new Set(['acetaminophen', 'ibuprofen', 'dexibuprofen']);
 /* 보관·버리기 — MedlinePlus 「Storage and disposal」·healthdirect 자리. 문구는 앱 팁(storage·expiry·dispose)과 같은 말로 */
 function keepToss(d){
@@ -4804,6 +4809,25 @@ function keepToss(d){
       <li>남은 약·날짜 지난 약은 쓰레기통이 아니라 <b>약국·보건소 폐의약품 수거함</b>으로.</li>
     </ul>
     <p class="small" style="margin-top:4px"><a class="link" href="#/tips?open=dispose">어떻게 담아 버리나요 ›</a></p></div>`;
+}
+/* 진통·해열제 「며칠째」 — 설명서 「의사 또는 약사의 지시없이 통증에 10일 이상(성인) 또는 5일 이상(소아) 복용하지 않고
+   발열에 3일 이상 복용하지 않는다」(게보린정 등 아세트아미노펜 설명서; 현욱님 2026-10-06 「단다」).
+   담은 날이 아니라 «실제로 드신 날»이 이어진 수 — 약통에 오래 두고 가끔 드시는 분을 놀라게 하지 않는다.
+   처방받은 약은 의사 지시대로라 세지 않는다. 기록이 없으면 아무것도 안 보인다 */
+const PAINDAY = new Set(['acetaminophen', 'ibuprofen', 'dexibuprofen', 'naproxen', 'clonixin', 'loxoprofen', 'ipa', 'ethenzamide']);
+function isPainItem(x){ const d = x.d; if (!d || x.approx || x.pub?.rx) return false;
+  if (x.pub && /전문/.test(String(x.pub.rx || ''))) return false;
+  return PAINDAY.has(d.id) || (d.contains || []).some(c => PAINDAY.has(c)); }
+function tookOn(id, k){ return ((ME.prnLog || {})[k] || []).some(e => e.id === id) || ((ME.taken || {})[k] || []).some(e => e.startsWith(id + '@')); }
+function painStreak(id){ let n = 0;
+  for (let i = 0; i < 40; i++) { const k = dayBefore(i); if (tookOn(id, k)) n++; else if (i > 0) break; }   /* 오늘 아직 안 드셨어도 어제까지 이어진 날은 센다 */
+  return n; }
+function painBadge(x){
+  if (!isPainItem(x)) return '';
+  const n = painStreak(x.id); if (n < 2) return '';
+  const lim = ME.age === 'child' ? 5 : 10;
+  if (n >= lim) return `<span class="badge stop" style="margin-top:4px">${n}일째 · 진료 받아 보세요</span><small class="pain-note">설명서: 통증에 ${lim}일, 열에 3일 넘게 혼자 드시지 마세요</small>`;
+  return `<span class="badge warn" style="margin-top:4px">${n}일째 드시는 중</span>${n >= 3 ? `<small class="pain-note">열 때문이면 3일 넘으면 진료 · 통증엔 ${lim}일을 넘기지 마세요</small>` : ''}`;
 }
 const COURSE_CLS = new Set(['antibiotic', 'antiviral', 'bone', 'gout', 'urology', 'women', 'quit']);
 function missedText(d){
@@ -4867,6 +4891,7 @@ function vDrug(id){
   })()}
   ${d.dose ? (() => { const mx = d.dose.max || '[확인 필요]'; const rule = /세요|따르|달라져|줄이/.test(mx); /* 파스·연고는 「하루 최대 몇 개」가 없다 — 그럴 땐 그 말을 붙이지 않는다 */
     return `<div class="dose-hero"><small>${isOral(d) ? '성인 1회 용량' : '쓰는 양'}</small><div class="big">${fmt(d.dose.adult || '')}</div><small>${maxLine(mx, rule)}${d.dose.interval ? ` · 간격 ${fmt(d.dose.interval)}` : ''}</small>${d.dose.child ? `<small style="margin-top:6px">소아: ${fmt(d.dose.child)}</small>` : ''}</div>`; })() : ''}
+  ${APAP_FIRST.has(d.id) ? `<div class="rows-l" style="margin-top:12px">${lrow(I.shield, `위가 약하거나 ${ME.age === 'senior' ? '<b>65세 이상이시면</b>' : '65세 이상이면'} — 아세트아미노펜을 먼저`, '위·콩팥 부담이 적어요. 그래도 안 들으면 그때 소염제를', "go('/drug/acetaminophen')")}</div>` : ''}
   ${KID_DRUG.has(d.id) && ME.age !== 'child' ? `<div class="kid-line">${I.user}<span>위 용량은 <b>어른 기준</b>이에요. 어린이는 몸무게로 따로 정해요 — <a class="link" href="#/kids">아이 약 용량 계산 ›</a></span></div>` : ''}
   ${(() => { /* 2026-09-29 — ClinicScore 문법: 아래로 이어 붙던 「같은 계열」·출처 7개도 탭 안으로. 한 번에 한 칸만 */
     const rep = drugRepKg(d);
@@ -5451,7 +5476,7 @@ function vBag(){
   ${!items.length ? `<div class="empty">${I.pill}<p><b>아직 담아 두신 약이 없어요.</b><br>약봉투 이름이나 약 사진으로 담으시면 여기 한 장으로 정리돼요.</p><div class="ix-cta"><a class="btn" href="#/photo">${I.eye}약봉투·약 사진으로 담기</a><a class="btn line" href="#/pill">${I.search}이름으로 찾아 담기</a><a class="btn line" href="#/kinds">${I.pill}이름을 모르면 — 종류만 고르기</a></div></div>`
   : `<div class="show-card">
     <div class="show-head">지금 먹는 약 ${items.length}가지${f.length ? ' · ' + f.map(k => esc(FLAG_LABEL[k])).join(' · ') : ''}</div>
-    <ol class="show-list">${items.map((x, i) => `<li><span class="n">${i + 1}</span><div><b>${esc(x.name)}</b><small>${esc(x.approx ? '종류만 알아요 — 이름은 약봉투에' : x.pub?.ingr ? '성분: ' + x.pub.ingr : x.simple || '')}</small>${x.short ? '<span class="badge warn" style="margin-top:4px">며칠만</span>' : ''}</div></li>`).join('')}</ol>
+    <ol class="show-list">${items.map((x, i) => `<li><span class="n">${i + 1}</span><div><b>${esc(x.name)}</b><small>${esc(x.approx ? '종류만 알아요 — 이름은 약봉투에' : x.pub?.ingr ? '성분: ' + x.pub.ingr : x.simple || '')}</small>${x.short ? '<span class="badge warn" style="margin-top:4px">며칠만</span>' : ''}${painBadge(x)}</div></li>`).join('')}</ol>
     <p class="show-ask">새로 주시는 약과 같이 먹어도 되는지 봐 주세요.</p>
   </div>
   <div class="show-card tone-${tone}">
@@ -5558,6 +5583,8 @@ function bagText(){
     const sm = slotMiss().filter(r => r.miss);
     if (sm.length) L.push('· 시간대별로 못 드신 횟수: ' + sm.map(r => `${SLOT_WORD[r.t] || r.t} ${r.want}번 중 ${r.miss}번`).join(', ')); }
   const bp = bpAvg(14); if (bp) L.push('', '[집에서 잰 혈압]', `· 최근 2주 평균 ${bp.s}/${bp.d} mmHg (${bp.days}일 ${bp.n}번)`);
+  const ps = items.filter(isPainItem).map(x => [x, painStreak(x.id)]).filter(([, n]) => n >= 2);
+  if (ps.length) L.push('', '[진통·해열제 이어 드신 날]', ...ps.map(([x, n]) => `· ${x.name} ${n}일째`));
   const ae = aeList(); if (ae.length) { L.push('', '[약 먹고 불편했던 일]'); ae.slice(0, 10).forEach(x => L.push(`· ${dateWord(x.at)} ${x.n} — ${x.t}`)); }
   L.push('앱이 미리 본 것이라 참고용이에요. 약사·의사 판단이 우선입니다.');
   return L.join('\n');
