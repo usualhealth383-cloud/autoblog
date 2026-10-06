@@ -2023,6 +2023,7 @@ function meWarningsMany(list){
   for (const dr of list) {
     (dr.avoid || []).forEach(a => { if (a.flags?.some(x => f.includes(x))) rows.push(['stop', dr, a.text || a]); });
     (dr.caution || []).forEach(a => { if (a.flags?.some(x => f.includes(x))) rows.push(['warn', dr, a.text || a]); });
+    if (f.includes('pregnant') && dr.lact?.lv === 'avoid') rows.push(['warn', dr, '수유 중이시면 — ' + dr.lact.t]);
   }
   if (!rows.length) return '';
   return `<ul class="plain mew">${rows.map(([lv, dr, t]) => `<li class="${lv}"><b>${esc(ingrName(dr))}</b> — ${fmt(t)}</li>`).join('')}</ul><p class="small muted" style="margin-top:6px">내 정보 탭에서 표시한 상태를 기준으로 골라낸 항목이에요. 최종 판단은 약사·의사와 함께 하세요.</p>`;
@@ -2032,6 +2033,8 @@ function meWarnings(dr){
   const hits = [];
   (dr.avoid || []).forEach(a => { if (a.flags?.some(x => f.includes(x))) hits.push({ lv:'stop', t:a.text || a }); });
   (dr.caution || []).forEach(a => { if (a.flags?.some(x => f.includes(x))) hits.push({ lv:'warn', t:a.text || a }); });
+  /* 수유 칸이 「피하기」면 위 상자에도 — 「임신·수유 중」을 켜신 분이 탭을 열지 않아도 보이게(2026-10-06, LactMed) */
+  if (f.includes('pregnant') && dr.lact?.lv === 'avoid') hits.push({ lv:'warn', t:'수유 중이시면 — ' + dr.lact.t });
   if (!hits.length) return '';
   return `<div class="card" style="border-color:rgba(182,54,41,.25)"><div class="eyebrow" style="color:var(--alert)">내 정보 기준 확인</div>${hits.map(h => `<div class="note" style="${h.lv === 'stop' ? 'background:var(--alert-tint);color:var(--alert)' : ''};margin-bottom:8px">${I.alert}<span>${fmt(h.t)}</span></div>`).join('')}<p class="small muted">내 정보 탭에서 표시한 상태를 기준으로 골라낸 항목이에요. 최종 판단은 약사·의사와 함께 하세요.</p></div>`;
 }
