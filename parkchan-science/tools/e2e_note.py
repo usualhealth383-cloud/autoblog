@@ -28,6 +28,11 @@ def rest(path, tok, method='GET', body=None):
     except U.HTTPError as e: return e.code, e.read().decode()[:200]
 
 
+
+async def full(pg):
+    '''가볍게 쓰기(기본 한 칸) → '+ 더 쓰기'로 틀·칸·이해도가 다 보이는 화면으로(2026-10-07 원장님: 너무 자세하면 부담)'''
+    if await pg.locator('#nedFull').count(): await pg.click('#nedFull'); await pg.wait_for_timeout(200)
+
 async def layout_ok(pg, where):
     """가로 넘침 · 말줄임(text-overflow·line-clamp) · 잘린 글자 없음 — 노트 화면 안에서"""
     r = await pg.evaluate("""(() => { const root = document.querySelector(view === 'noted' ? '#v-noted' : '#v-note');
@@ -59,6 +64,11 @@ async def main():
         await s.screenshot(path=f'{SC}/n01_calendar_empty.png', full_page=True)
         # 기본 틀은 '세 줄 요약', 첫 칸 안내는 오늘의 개념 이름으로(빈 칸 공포 없애기) · 빈 새 노트는 저장하지 않는다
         await s.click('#noteNew'); await s.wait_for_timeout(200); assert await s.evaluate('view') == 'noted'
+        # 처음엔 가볍게: 한 칸 + 오늘 기분 + 완료 — 틀·이해도·날짜·교재와 견주기는 '더 쓰기' 안에
+        assert await s.locator('.ned.lite').count() == 1 and await s.locator('.ned textarea').count() == 1 and await s.locator('.ntpl, [data-ngrasp], #nedCheck, #nedDate').count() == 0, '첫 쓰기 화면이 가볍지 않음'
+        assert await s.locator('[data-nmood]').count() == 5 and await s.locator('#nedFull').count() == 1
+        await s.screenshot(path=f'{SC}/n00_write_lite.png')
+        await full(s)
         assert await s.get_attribute('[data-ntpl="line3"]', 'aria-pressed') == 'true', '기본 틀이 세 줄 요약이 아님'
         tc = await s.evaluate('todayConcept().title')
         assert tc in (await s.get_attribute('#nedF0', 'placeholder')), '첫 칸 안내에 오늘의 개념이 없음'
@@ -66,7 +76,7 @@ async def main():
         await s.click('#nedBack'); await s.wait_for_timeout(300)
         assert await s.locator('.ncard').count() == 0, '빈 노트가 저장됨'
         # 자유 틀(옛 쓰기 화면) → 세 줄 요약으로 바꾸면 쓴 글이 첫 칸으로
-        await s.click('#noteNew'); await s.wait_for_timeout(200); await s.click('[data-ntpl="free"]'); await s.wait_for_timeout(200)
+        await s.click('#noteNew'); await s.wait_for_timeout(200); await full(s); await s.click('[data-ntpl="free"]'); await s.wait_for_timeout(200)
         await s.fill('#nedTitle', '밀도와 부피'); await s.fill('#nedBody', '같은 질량이면 부피가 클수록 밀도가 작다.'); await s.wait_for_timeout(800)
         assert '저장됨' in await s.inner_text('#nedSaved'), '쓰는 대로 저장되지 않음'
         await s.click('[data-ntpl="line3"]'); await s.wait_for_timeout(300)
@@ -76,7 +86,7 @@ async def main():
         assert '남겨 뒀어요' in await s.inner_text('.ndone'), '저장한 뒤 차분한 완료 한 줄이 없음'
 
         # ② 끼워 넣기 칩 · 틀 바꾸기 · 마음/이해 · 쓰는 대로 저장(다시 열어도 남음)
-        await s.click('#noteNew'); await s.wait_for_timeout(200)
+        await s.click('#noteNew'); await s.wait_for_timeout(200); await full(s)
         await s.click('[data-nins^="c:"]'); await s.wait_for_timeout(300)
         assert tc in await s.input_value('#nedF0') and tc in await s.inner_text('#nedCs'), '개념 칩을 눌러도 첫 칸·개념에 안 들어감'
         await s.click('#nedF1'); await s.keyboard.type('시간과 공간이 있어야 사건을 적는다'); await s.wait_for_timeout(100)
@@ -107,7 +117,7 @@ async def main():
         # 다른 날(어제)에 개인 메모 — 마지막에 고른 틀(코넬)이 기본이므로 자유로
         y = await s.evaluate('addDays(todayISO(), -1)')
         if y[:7] != today[:7]: await s.click('[data-nmon="-1"]'); await s.wait_for_timeout(200)
-        await s.click(f'[data-nday="{y}"]'); await s.wait_for_timeout(200); await s.click('#noteNew'); await s.wait_for_timeout(200)
+        await s.click(f'[data-nday="{y}"]'); await s.wait_for_timeout(200); await s.click('#noteNew'); await s.wait_for_timeout(200); await full(s)
         assert await s.get_attribute('[data-ntpl="cornell"]', 'aria-pressed') == 'true', '마지막에 고른 틀을 기억하지 않음'
         assert await s.input_value('#nedDate') == y
         await s.click('[data-ntpl="free"]'); await s.fill('#nedBody', '엄마 생신 선물 사기 — 개인 메모'); await s.wait_for_timeout(700); await s.click('#nedDone'); await s.wait_for_timeout(300)
@@ -138,7 +148,7 @@ async def main():
         await s.click('#noteThis'); await s.wait_for_timeout(300)
         assert await s.evaluate('view') == 'noted' and ctitle in await s.inner_text('#nedCs'), '개념이 붙지 않음'
         assert ctitle in (await s.get_attribute('#nedF0', 'placeholder')), '개념에서 연 노트의 첫 칸 안내가 그 개념이 아님'
-        await s.click('[data-ntpl="line3"]'); await s.fill('#nedF0', '이 개념 핵심: 사건 = 언제 + 어디서'); await s.click('[data-ngrasp="3"]'); await s.wait_for_timeout(700)
+        await full(s); await s.click('[data-ntpl="line3"]'); await s.fill('#nedF0', '이 개념 핵심: 사건 = 언제 + 어디서'); await s.click('[data-ngrasp="3"]'); await s.wait_for_timeout(700)
         await s.click('#nedAddC'); await s.wait_for_timeout(200); await s.fill('#cpickQ', '원소'); await s.wait_for_timeout(150)
         n_pick = await s.locator('[data-ncpick]').count(); assert n_pick >= 1, '개념 찾기가 안 됨'
         await s.locator('[data-ncpick]').first.click(); await s.wait_for_timeout(700)
@@ -309,7 +319,7 @@ async def main():
             await s.locator('.npast').scroll_into_view_if_needed(); await s.wait_for_timeout(100)
             await s.screenshot(path=f'{SC}/{tag}_13_past.png')
             for k in ('line3', 'cornell', 'mix', 'free'):
-                await s.click('#noteNew'); await s.wait_for_timeout(250); await s.click(f'[data-ntpl="{k}"]'); await s.wait_for_timeout(250)
+                await s.click('#noteNew'); await s.wait_for_timeout(250); await full(s); await s.click(f'[data-ntpl="{k}"]'); await s.wait_for_timeout(250)
                 await layout_ok(s, f'{tag} 쓰기 {k}'); await s.evaluate(HIDE_TABS)
                 await s.screenshot(path=f'{SC}/{tag}_2{"0123"[["line3","cornell","mix","free"].index(k)]}_write_{k}.png', full_page=True)
                 if k == 'mix':
