@@ -845,8 +845,24 @@ def main():
         r8g = pg.evaluate("()=>['eye-decongestant','allergy-eyedrop','urea-cream','scar-gel','artificial-tears','naftifine','ciclopirox-nail'].filter(id=>isOral(drug(id))).concat(['ibuprofen','udca','oral-contraceptive','tranexamic-melasma','diosmin'].filter(id=>!isOral(drug(id))).map(x=>'!'+x))")
         if r8g: fails.append(f'먹는 약/바르는 약 구분이 틀림: {r8g}')
         # 8h. 부작용 빈도의 「이렇게 하세요」 — 먹는 약 발진에 「그 자리는 쉬게」를 붙이지 않는다(2026-10-04)
-        r8h = pg.evaluate("()=>{const t=id=>{const d=document.createElement('div');d.innerHTML=sideFreqHtml(drug(id));return [...d.querySelectorAll('.sf-tip')].map(x=>x.textContent).join('|')};const o=['cetirizine','domperidone','carbocisteine'].filter(id=>/그 자리/.test(t(id)));const s=['terbinafine','benzoyl-peroxide'].filter(id=>!/그 자리/.test(t(id))).map(x=>'!'+x);return o.concat(s)}")
+        r8h = pg.evaluate("()=>{const t=id=>{const d=document.createElement('div');d.innerHTML=sideFreqHtml(drug(id));return [...d.querySelectorAll('.sf-tip')].map(x=>x.textContent).join('|')};const o=['cetirizine','domperidone','carbocisteine','antibiotic-eyedrop'].filter(id=>/그 자리/.test(t(id)));const s=['terbinafine','benzoyl-peroxide'].filter(id=>!/그 자리/.test(t(id))).map(x=>'!'+x);return o.concat(s)}")
         if r8h: fails.append(f'부작용 팁이 약 모양과 안 맞음: {r8h}')
+        # 9a. 바깥 사진이 «뜬» 상태 — 샌드박스에선 식약처 사진이 안 떠서 사진 칸 규칙이 숨어 있었다(2026-10-06 글자가 44px 칸에 갇힘)
+        import io as _io
+        from PIL import Image as _Im
+        _b = _io.BytesIO(); _Im.new('RGB', (140, 76), (200, 220, 230)).save(_b, 'PNG'); _PNG = _b.getvalue()
+        _fake = lambda rt: rt.fulfill(status=200, content_type='image/png', body=_PNG) if rt.request.resource_type == 'image' and 'localhost' not in rt.request.url and '127.0.0.1' not in rt.request.url else rt.continue_()
+        pg.route('**/*', _fake)
+        for _r in ['/symptom/headache', '/symptom/cold', '/symptom/heartburn']:
+            pg.goto(url + '#' + _r); pg.reload(); ready(); pg.wait_for_timeout(1500)
+            _w = pg.evaluate("()=>[...document.querySelectorAll('.answer .buy>.buy-item.has-img .bi-t')].map(e=>Math.round(e.getBoundingClientRect().width))")
+            if any(x < 120 for x in _w): fails.append(f'사진이 뜨면 약 카드 글자가 좁아집니다 {_r}: {_w}')
+        for _r in ['/drug/gnalen', '/drug/topical-steroid']:
+            pg.goto(url + '#' + _r); pg.reload(); ready(); pg.wait_for_timeout(800)
+            pg.click('button.tab[data-p=p3]'); pg.wait_for_timeout(400)
+            _o = pg.evaluate(OVERFLOW_JS)
+            if _o['clip'] or _o['ov']: fails.append(f'사진이 뜨면 제품 칸 글자가 잘립니다 {_r}: {_o["clip"][:2]}{_o["ov"][:2]}')
+        pg.unroute('**/*', _fake)
         br.close()
     print(f'화면 {len(routes)}개 검사 완료')
     if fails:

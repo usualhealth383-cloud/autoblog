@@ -80,6 +80,7 @@ SLIM = {
     'drugs':       ['id', 'name', 'en', 'class', 'rx', 'tagline', 'simple', 'for'],
     'supplements': ['id', 'name', 'en', 'tags', 'brands', 'evidence'],
     'classes':     ['id', 'name', 'short', 'icon'],
+    'tips':        ['id', 'group', 'icon', 'title'],   # 홈은 제목만 쓴다 — 본문은 팁 화면(본문 받은 뒤)에서(2026-10-06 첫 화면 220 KB)
 }
 CORE_KEYS = ['sources', 'ingredients', 'interactions', 'kids', 'productImages', 'suppRules', 'myths', 'recalls', 'drugRep']   # drugRep: 약 화면(본문 받은 뒤)에서만 씀 — 첫 화면 220 KB 예산
 # 약 화면에서만 쓰는 칸(자주 묻는 질문·부작용 빈도)은 data/detail.json 으로 한 번 더 뺀다.

@@ -651,6 +651,15 @@ details.acc .bd{padding:0 var(--s4) var(--s4)}
 .buy .buy-item .badge::before,.slot h3 .badge::before{content:'· '}
 .buy .buy-item{border-width:1.5px}
 .buy .buy-item+.buy-item{margin-top:var(--s3)}   /* 손가락 간격 12px 이상 */
+/* 2026-10-06 — 간격이 세 군데서 더해져(flex gap 8 + 위 12 + 아래 8) 카드 사이가 28px로 벌어지고, 펼친 설명은 카드에서 14px 떨어져 따로 놀았다.
+   간격은 gap 하나(12px)로만, 펼친 카드와 설명은 한 장으로 붙인다 */
+.answer .buy{gap:var(--s3)}
+.answer .buy>.buy-item,.answer .buy>.buy-item+.buy-item{margin:0}
+.answer .buy>.buy-item.open{border-bottom-left-radius:0;border-bottom-right-radius:0}
+/* 제품 사진이 실제로 뜨면(폰) 옛 4칸 규칙(.buy-item.has-img 52px 44px 1fr auto)이 이겨 글자가 44px 칸에 갇혔다 — 지금 카드는 글·사진·화살표 3칸.
+   샌드박스에서는 바깥 사진이 안 떠서 검사가 못 잡았다(2026-10-06). 검사 9a 가 사진을 흉내 내서 본다 */
+.answer .buy .buy-item.has-img{grid-template-columns:1fr auto auto}   /* 「둘 중 하나」 묶음(.either) 안의 카드도 */
+.answer .buy>.buy-more{margin:calc(-1 * var(--s3)) 0 0;border:1.5px solid var(--primary);border-top:0;border-radius:0 0 var(--r-card) var(--r-card)}
 .opt-pill{border:1.5px solid var(--hairline)}
 
 /* 「자세히」 — 긴 설명을 접어 둔다 */
@@ -1076,10 +1085,10 @@ details.ix-how .bd p:last-child{margin-bottom:0}
 .products{display:flex;flex-direction:column;gap:var(--s2);margin-top:var(--s3)}
 .prod{display:flex;align-items:center;justify-content:space-between;gap:var(--s3);padding:10px 12px;border:1px solid var(--hairline);border-radius:12px;font-size:.875rem}
 .prod b{font-weight:700;overflow-wrap:anywhere}
-.prod span{display:block;color:var(--muted);font-size:.75rem}
+.prod span{display:block;color:var(--muted);font-size:.75rem;overflow-wrap:anywhere}   /* 「알릴이소프로필아세틸우레아」처럼 긴 성분명 한 낱말이 사진 옆 좁은 칸을 넘었다(2026-10-06) */
 .tabs{display:flex;gap:6px;margin:var(--s4) 0 var(--s3);overflow-x:auto;scrollbar-width:none;padding-bottom:2px}
 .tabs::-webkit-scrollbar{display:none}
-.tab{flex:none;padding:9px 15px;border-radius:var(--r-pill);font-size:.9375rem;font-weight:600;color:var(--muted);background:var(--tint2);min-height:44px}
+.tab{flex:none;padding:9px 15px;border-radius:var(--r-pill);font-size:.9375rem;font-weight:600;color:var(--muted);background:var(--tint2);min-height:46px}   /* 44 딱 맞추면 소수점 배치에서 43.9999 로 재져 손가락 기준에 걸렸다(2026-10-06) — 다른 단추처럼 46 */
 .tab.on{background:var(--text);color:var(--card)}
 .pane{display:none}.pane.on{display:block}
 
@@ -1514,12 +1523,12 @@ const BRANDMARK = (typeof window !== 'undefined' && window.__BRANDMARK__) || 'ic
    아티팩트(파일 하나로 여는 판)는 서버가 없어 window.__CORE__ 에 심어 둔다. */
 let CORE = 0, CORE_P = null;          /* 0 아직 · 1 받는 중 · 2 준비됨 · 3 실패 */
 function mergeCore(c){
-  for (const k of ['symptoms', 'drugs', 'supplements', 'classes']) {
+  for (const k of ['symptoms', 'drugs', 'supplements', 'classes', 'tips']) {
     const by = new Map((D[k] || []).map(x => [x.id, x]));
     (c[k] || []).forEach(o => { const t = by.get(o.id); if (t) Object.assign(t, o); else (D[k] = D[k] || []).push(o); });
   }
   /* 나머지 칸은 통째로 받는다 — 새 자료를 core 로 빼도 여기를 또 고칠 필요가 없게 */
-  for (const k of Object.keys(c)) if (!['symptoms', 'drugs', 'supplements', 'classes'].includes(k)) D[k] = c[k];
+  for (const k of Object.keys(c)) if (!['symptoms', 'drugs', 'supplements', 'classes', 'tips'].includes(k)) D[k] = c[k];
   CORE = 2; window.__READY__ = true;
   /* 첫 화면을 이미 그린 뒤에 자료가 왔다면 — 약통 개수처럼 본문이 있어야 맞는 것들을 다시 그린다 */
   try { if (typeof route === 'function' && document.getElementById('view')?.innerHTML) route(); } catch (e) {}
@@ -4774,11 +4783,27 @@ function sideFreqHtml(d){
   const oral = isOral(d);
   const tipOf = t => { const head = String(t).split(' — ')[0];   /* 「변비 — 급성 설사에서…」의 설사에 걸리지 않게 앞 이름만 */
     const i = SIDE_TIP.findIndex(([re]) => re.test(head)); if (i < 0) return '';
-    return oral && i === SIDE_TIP.length - 1 ? '먹던 약을 멈추고 약사·의사와 상의' : SIDE_TIP[i][1]; };   /* 먹는 약의 발진에 「그 자리는 쉬게」는 맞지 않다(2026-10-04) */
+    if (i === SIDE_TIP.length - 1 && oral) return '먹던 약을 멈추고 약사·의사와 상의';
+    if (i === SIDE_TIP.length - 1 && routeOf(d) === 'eye') return '심하거나 계속되면 넣지 말고 상의';   /* 안약에 「그 자리는 쉬게」는 어색하다 */
+    return SIDE_TIP[i][1]; };   /* 먹는 약의 발진에 「그 자리는 쉬게」는 맞지 않다(2026-10-04) */
   return `<h2 style="margin-top:20px">부작용 — 설명서에 적힌 빈도</h2>
   <div class="sf">${sf.tiers.map((t, i) => `<div class="sf-t ${i === 0 ? 'sf-first' : ''}"><div class="sf-h"><b>${esc(t.w)}</b><span>${t.n ? esc(t.n) : /임상시험|조사/.test(t.w) ? '설명서의 시험 결과' : '설명서에 숫자 없이'}</span></div>
     <ul class="plain">${(() => { const seen = new Set(); return t.items.map(x => { let tip = /드물게|0\.1%/.test(t.w) ? '' : tipOf(x); if (tip && seen.has(tip)) tip = ''; else if (tip) seen.add(tip); return `<li>${fmt(x)}${tip ? `<small class="sf-tip">→ ${esc(tip)}</small>` : ''}</li>`; }).join(''); })()}</ul></div>`).join('')}</div>
   <p class="small muted" style="margin-top:6px">대표 제품의 설명서에서 몸으로 느낄 수 있는 것만 골랐어요(검사 수치는 뺐어요). 「때때로·드물게」에 숫자가 없는 것은 설명서가 그렇게 적고 있어서예요.</p>`;
+}
+/* 아이 용량 계산기가 있는 약 — 어른 용량 아래에 「어린이는 몸무게로」 띠(NHS 약 화면 맨 위 안내, 2026-10-06) */
+const KID_DRUG = new Set(['acetaminophen', 'ibuprofen', 'dexibuprofen']);
+/* 보관·버리기 — MedlinePlus 「Storage and disposal」·healthdirect 자리. 문구는 앱 팁(storage·expiry·dispose)과 같은 말로 */
+function keepToss(d){
+  const r = routeOf(d), liquid = r === 'eye' || /시럽|물약|현탁|내복액/.test(d.name + (d.products || []).map(p => p.name).join(' '));
+  return `<div class="keep" style="margin-top:20px"><h2>보관하고 버리기</h2>
+    <ul class="plain">
+      <li>서늘하고 건조한 곳에 <b>원래 상자째</b> — 화장실 선반은 습기 때문에 피하세요. 아이 손이 닿지 않게.</li>
+      ${/인공눈물/.test(d.name) ? `<li><b>일회용</b>은 뜯은 그날 버리고, 여러 번 쓰는 병은 뜯은 뒤 대개 <b>한 달</b>이에요.</li>`
+        : liquid ? `<li>${r === 'eye' ? '안약은' : '물약·시럽은'} 뜯은 뒤 대개 <b>한 달</b>이면 버려요(상자 날짜는 뜯기 전 기준).</li>` : ''}
+      <li>남은 약·날짜 지난 약은 쓰레기통이 아니라 <b>약국·보건소 폐의약품 수거함</b>으로.</li>
+    </ul>
+    <p class="small" style="margin-top:4px"><a class="link" href="#/tips?open=dispose">어떻게 담아 버리나요 ›</a></p></div>`;
 }
 const COURSE_CLS = new Set(['antibiotic', 'antiviral', 'bone', 'gout', 'urology', 'women', 'quit']);
 function missedText(d){
@@ -4842,6 +4867,7 @@ function vDrug(id){
   })()}
   ${d.dose ? (() => { const mx = d.dose.max || '[확인 필요]'; const rule = /세요|따르|달라져|줄이/.test(mx); /* 파스·연고는 「하루 최대 몇 개」가 없다 — 그럴 땐 그 말을 붙이지 않는다 */
     return `<div class="dose-hero"><small>${isOral(d) ? '성인 1회 용량' : '쓰는 양'}</small><div class="big">${fmt(d.dose.adult || '')}</div><small>${maxLine(mx, rule)}${d.dose.interval ? ` · 간격 ${fmt(d.dose.interval)}` : ''}</small>${d.dose.child ? `<small style="margin-top:6px">소아: ${fmt(d.dose.child)}</small>` : ''}</div>`; })() : ''}
+  ${KID_DRUG.has(d.id) && ME.age !== 'child' ? `<div class="kid-line">${I.user}<span>위 용량은 <b>어른 기준</b>이에요. 어린이는 몸무게로 따로 정해요 — <a class="link" href="#/kids">아이 약 용량 계산 ›</a></span></div>` : ''}
   ${(() => { /* 2026-09-29 — ClinicScore 문법: 아래로 이어 붙던 「같은 계열」·출처 7개도 탭 안으로. 한 번에 한 칸만 */
     const rep = drugRepKg(d);
     const T = [['p1', '복용법'], ['p2', '주의·부작용'], ['p4', '같이 먹으면', (d.interactions || []).length], ...(rep ? [['p7', '약사 안내']] : []), ['p3', '제품', (d.products || []).length], ...(same.length ? [['p5', '같은 계열', same.length]] : []), ...((d.sources || []).length ? [['p6', '근거', d.sources.length]] : [])];
@@ -4850,15 +4876,16 @@ function vDrug(id){
   <div class="pane on" id="p1"><section class="card">
     ${d.simple ? `<div class="dose-hero" style="margin-top:0;margin-bottom:16px"><small>간단히 — 약국 구입 기준</small><div style="font-size:1.0625rem;font-weight:700;line-height:1.5;margin-top:4px">${fmt(d.simple)}</div></div>` : ''}
     ${d.how?.length ? `<h2>알아 두실 것</h2>${list(d.how)}` : ''}
-    ${d.tips?.length ? `<h2${d.how?.length ? ' style="margin-top:20px"' : ''}>이렇게 드세요</h2>${list(d.tips)}` : ''}
+    ${d.tips?.length ? `<h2${d.how?.length ? ' style="margin-top:20px"' : ''}>${isOral(d) ? '어떻게 먹나요?' : '어떻게 쓰나요?'}</h2>${list(d.tips)}` : ''}
     ${d.faq?.length ? `<h2 style="margin-top:20px">자주 묻는 질문</h2>${faqList(d.faq)}` : ''}
+    ${keepToss(d)}
   </section></div>
   <div class="pane" id="p2"><section class="card">
     ${d.risk ? `<h2>부담 정도 <small class="muted" style="font-weight:500;font-size:.8125rem">같은 계열 안에서 상대 비교</small></h2><div class="risk-bars">${riskBar('위장', d.risk.gi, d.riskNote?.gi)}${riskBar('심혈관', d.risk.cv, d.riskNote?.cv)}${riskBar('신장', d.risk.renal, d.riskNote?.renal)}${riskBar('간', d.risk.liver, d.riskNote?.liver)}</div>` : ''}
     ${d.pregnancy || d.children ? `<div class="kv" style="grid-template-columns:1fr">${d.pregnancy ? `<div><small>임신·수유</small><b>${fmt(d.pregnancy)}</b></div>` : ''}${d.children ? `<div><small>소아</small><b>${fmt(d.children)}</b></div>` : ''}</div>` : ''}
     ${d.risk || d.pregnancy || d.children ? '<div style="height:20px"></div>' : ''}
-    ${d.avoid?.length ? `<h2>드시면 안 되는 경우</h2>${list(d.avoid.map(a => a.text || a), 'plain x')}` : ''}
-    ${d.caution?.length ? `<h2 style="margin-top:20px">주의해서 드셔야 하는 경우</h2>${list(d.caution.map(a => a.text || a))}` : ''}
+    ${d.avoid?.length ? `<h2>${isOral(d) ? '누가 먹으면 안 되나요?' : '누가 쓰면 안 되나요?'}</h2>${list(d.avoid.map(a => a.text || a), 'plain x')}` : ''}
+    ${d.caution?.length ? `<h2 style="margin-top:20px">누가 먼저 상의해야 하나요?</h2>${list(d.caution.map(a => a.text || a))}` : ''}
     ${sideFreqHtml(d)}
     ${d.sideEffects?.length ? `<h2 style="margin-top:20px">${d.sideFreq ? '알아 두실 것' : '흔한 부작용'}</h2>${list(d.sideEffects)}` : ''}
     ${d.stop?.length ? `<div style="margin-top:20px">${flagBox('이런 증상이 나타나면 바로 중단하고 진료', d.stop)}</div>` : ''}
@@ -4873,7 +4900,7 @@ function vDrug(id){
       <div class="actions" style="margin-top:10px"><button class="btn" onclick="go('/together')">${I.scale} 내 약통 전부와 함께 확인하기</button></div>`}
   </section></div>
   ${same.length ? `<div class="pane" id="p5"><section class="sec" style="margin-top:0"><h2>같은 계열 다른 성분 <small>비교해서 고르기</small></h2><div class="card rows">${same.map(x => `<button class="row" onclick="go('/drug/${x.id}')"><div class="body"><b>${esc(x.name)}</b><span>${esc(x.tagline || (x.for || []).join(' · '))}</span>${useTag(x)}</div>${badge(x.rx)}</button>`).join('')}</div>${c ? `<a class="btn ghost" style="margin-top:12px" href="#/class/${c.id}">${I.scale} ${esc(c.name)} 한눈에 비교</a>` : ''}</section></div>` : ''}
-  ${(d.sources || []).length ? `<div class="pane" id="p6"><section class="card"><h2>이 화면의 근거 <small>${d.sources.length}건</small></h2>${srcChips(d.sources)}${D.meta?.labelCheck ? `<p class="small muted" style="margin-top:10px">식약처 허가사항 변경명령과 대조한 날: <b>${esc(D.meta.labelCheck)}</b> — 그 뒤 바뀐 설명서가 있으면 약 상자 설명서가 우선이에요.</p>` : ''}</section></div>` : ''}
+  ${(d.sources || []).length ? `<div class="pane" id="p6"><section class="card"><h2>이 화면의 근거 <small>${d.sources.length}건</small></h2>${srcChips(d.sources)}${D.meta?.labelCheck ? `<p class="small muted" style="margin-top:10px">식약처 허가사항 변경명령과 대조한 날: <b>${esc(D.meta.labelCheck)}</b> · 매달 1일 다시 대조해요. 그 사이 바뀐 설명서가 있으면 약 상자 설명서가 우선이에요.</p>` : ''}</section></div>` : ''}
   ${(() => { const rep = drugRepKg(d); return rep ? `<div class="pane" id="p7">${kgCard(rep[0])}<p class="small muted" style="margin-top:8px">대표 제품 <b>${esc(rep[1])}</b> 기준이에요.${rep[2] > 1 && !(d.contains || []).length ? ` 이 제품은 <b>${rep[2]}가지 성분이 든 복합제</b>라 안내에 다른 성분 이야기도 섞여 있어요.` : ''} 같은 성분이라도 제품마다 함량·첨가물이 다를 수 있어요.</p></div>` : ''; })()}
   ${aeDrugCard(d)}
   ${disclaimer()}`;
