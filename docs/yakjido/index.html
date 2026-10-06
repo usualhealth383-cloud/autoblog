@@ -4801,7 +4801,7 @@ function sideFreqHtml(d){
 const APAP_FIRST = new Set(['ibuprofen', 'dexibuprofen', 'naproxen', 'clonixin', 'loxoprofen']);
 /* 수유 — 미국 국립보건원 LactMed(Drugs and Lactation Database) 요약을 한 줄로(현욱님 검수 뒤에만 d.lact 를 채운다).
    내 정보에 「임신·수유 중」을 켜신 분께는 그 칸을 강조한다 */
-const LACT_LV = { ok: ['수유 중 괜찮은 편', 'otc'], caution: ['수유 중 주의', 'warn'], avoid: ['수유 중 피하기', 'stop'] };
+const LACT_LV = { ok: ['수유 중 괜찮은 편', 'otc'], caution: ['수유 중 주의', 'warn'], avoid: ['수유 중 피하기', 'stop'], none: ['수유 자료 없음', 'soft'] };
 function lactCell(d){
   const l = d.lact; if (!l || !LACT_LV[l.lv]) return '';
   const [w, c] = LACT_LV[l.lv]; const me = activeFlags().includes('pregnant');

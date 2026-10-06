@@ -85,7 +85,7 @@ SLIM = {
 CORE_KEYS = ['sources', 'ingredients', 'interactions', 'kids', 'productImages', 'suppRules', 'myths', 'recalls', 'drugRep']   # drugRep: 약 화면(본문 받은 뒤)에서만 씀 — 첫 화면 220 KB 예산
 # 약 화면에서만 쓰는 칸(자주 묻는 질문·부작용 빈도)은 data/detail.json 으로 한 번 더 뺀다.
 # 본문과 «동시에» 받기 시작하고, 약 화면만 이것까지 기다린다 — core.json 400 KB 예산(2026-10-04)
-DETAIL = {'drugs': ['faq', 'sideFreq']}
+DETAIL = {'drugs': ['faq', 'sideFreq', 'lact']}
 detail = {k: [{'id': o['id'], **{f: o[f] for f in fs if f in o}} for o in data[k] if any(f in o for f in fs)] for k, fs in DETAIL.items()}
 for k, fs in DETAIL.items():
     data[k] = [{f: v for f, v in o.items() if f not in fs} for o in data[k]]
