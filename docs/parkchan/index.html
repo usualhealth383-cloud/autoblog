@@ -188,6 +188,10 @@ button{font-family:inherit;color:inherit}
 .sheet .bkin input{flex:1;min-width:0;font-size:var(--t-stem)}
 .sheet p.bkr{display:flex;align-items:flex-start;gap:6px;margin:0;font-size:var(--t-small);line-height:1.6;color:var(--body)}
 .bkr b{color:var(--ink)}
+.sheet p.bkr{justify-content:space-between;align-items:center;gap:10px}
+.bkt{flex:0 0 auto;display:inline-flex;align-items:center;gap:5px;min-height:40px;padding:0 12px;border-radius:var(--r-pill,999px);border:1.5px solid var(--line);background:var(--card);font:inherit;font-size:var(--t-cap);font-weight:700;color:var(--muted);cursor:pointer}
+.bkt.ok{border-color:var(--ok);background:var(--ok-soft);color:var(--ok-dark)}
+.bkt svg{width:14px;height:14px}
 .bkr.ok{color:var(--ok-dark)}
 .bkr svg{flex:0 0 16px;width:16px;height:16px;margin-top:3px;stroke:var(--ok);stroke-width:2.6;fill:none;stroke-linecap:round;stroke-linejoin:round}
 /* 경로 아래 작은 카드 — '이번 주'(리듬 · 일정 · 공부 노트 · 진도)를 한 장에 줄로 */
@@ -2290,7 +2294,8 @@ const hasPass = () => !!(ACC && ACC.passUntil && ACC.passUntil >= todayISO());
 const authLive = () => !!(S.auth && (!S.auth.until || S.auth.until >= todayISO()));
 const fullAccess = () => !!(authLive() || hasPass() || (ACC && ACC.role==='owner'));
 const isOpen = i => fullAccess() || (i <= Math.max(dayIndex(), FREE_DAYS - 1) && i > dayIndex() - FREE_DAYS);   // 첫날부터 7개를 열어 '최근 7일치 무료' 약속을 지킨다(첫날 1개만 열리던 것 — 2026-10-01)
-const quizFor = c => { const pool = QUIZZES.filter(q=>q.lessonId===c.lessonId); return pool[(+c.no-1)%pool.length] || pool[0]; };
+/* 오늘의 문제 — 고르는 문제(오개념·자료 해석)만. 서술형은 스스로 채점이라 하루 한 문제로는 맞지 않다(원장님 2026-10-06) — 소단원 문제 풀기에서 */
+const quizFor = c => { const all = QUIZZES.filter(q=>q.lessonId===c.lessonId), pool = all.filter(q => !q.essay).length ? all.filter(q => !q.essay) : all; return pool[(+c.no-1)%pool.length] || pool[0]; };
 
 /* ═══ 간격을 넓혀 가는 복습(라이트너 상자) — 오늘의 문제·문제 은행·복습에서 틀린 것 모두 ═══
    상자 1→5 = 1·3·7·14·30일. 기한이 된 문제를 맞히면 다음 상자, 틀리면 상자 1(내일).
@@ -2792,12 +2797,12 @@ async function startAsg(id){
 const tpToday = () => { const t = todayISO(), id = todayConcept().id; if (!S.tp || S.tp.d !== t || S.tp.c !== id) S.tp = { d:t, c:id }; return S.tp; };
 const PATH_KEYS = ['read', 'blank', 'quiz', 'review'];
 const markRead = id => { if (id && !S.read.includes(id)) S.read.push(id); };
-/* 개념 상세를 '포인트'(본문 끝)까지 내려 읽으면 읽은 개념으로 — 상세 화면 그리기(renderDetail)는 건드리지 않고 스크롤만 본다 */
+/* (쓰지 않음) 개념 상세를 '포인트'까지 내려 읽으면 읽은 개념으로 — 원장님 결정으로 '공부했음' 누름만 인정 */
 let readT = null;
 const readCheck = () => { if (view !== 'detail') return; const c = CONCEPTS[detailIdx]; if (!c || S.read.includes(c.id)) return;
   const el = document.getElementById('v-detail'), end = el && (el.querySelector('.point') || el.querySelector('.nextup')); if (!end) return;
   if (end.getBoundingClientRect().top < innerHeight - 60){ markRead(c.id); touchDay(); save(S); } };
-addEventListener('scroll', () => { clearTimeout(readT); readT = setTimeout(readCheck, 120); }, { passive:true });
+/* 2026-10-06 원장님 결정: 읽기 완료는 '공부했음'을 눌러야만 — 스크롤 판정은 쓰지 않는다(readCheck 는 남겨 둠) */
 let pathLast = null;   // 마지막으로 그린 '지금' 단계 — 앞으로 넘어갔을 때만 다음 카드를 펼친다
 function pathState(){
   const c = todayConcept(), tp = tpToday(), cur = revCur(), plan = cur ? null : reviewPlan(false), rv = rvToday();
@@ -2818,10 +2823,10 @@ function pathHtml(){
   const revSub = cur ? `이어서 풀기 · ${cur.i} / ${cur.items.length}` : [dn ? `다시 볼 문제 ${dn}` : '', xn ? `지난 소단원 ${xn}` : ''].filter(Boolean).join(' · ');
   /* 단계마다: 작은 카드(이름 · 상태 한 줄) · 지금이면 큰 카드(제목 · 한 줄 설명 · 버튼) */
   const D = {
-    read: { btnId:'pRead', name:`개념 읽기 · ${c.title}`, todo:`${tag} · 개념 ${+c.no || c.no}`, done:'다 읽었어요',
+    read: { btnId:'pRead', name:`개념 읽기 · ${c.title}`, todo:`${tag} · 개념 ${+c.no || c.no} · 다 읽으면 '공부했음'`, done:'다 읽었어요',
       h:c.title, p:c.subtitle || c.lessonName, m:`${c.bookName ? c.bookName + ' · ' : ''}${tag} · 개념 ${+c.no || c.no}`, btn:'읽기 시작' },
-    blank: { btnId:'pBlank', name:`빈칸 ${Object.keys(c.blanks || {}).join(' ')}`, todo:`읽은 내용으로 ${bN}칸 채우기`, done: bOk ? `${bN}칸 가운데 ${bOk}칸 맞혔어요` : '채워 보고 답을 확인했어요',
-      h:`빈칸 ${bN}개 채우기`, p:'읽은 내용을 떠올려 ㉠ ㉡ ㉢을 채워 봐요. 모르면 비워 두고 확인해도 돼요.', m:'', btn:'채우기' },
+    blank: { btnId:'pBlank', name:`빈칸 ${Object.keys(c.blanks || {}).join(' ')}`, todo:`읽은 내용으로 ${bN}칸 떠올리기`, done: bOk === bN ? `${bN}칸 모두 떠올렸어요` : `${bN}칸 가운데 ${bOk}칸 떠올렸어요`,
+      h:`빈칸 ${bN}개 떠올리기`, p:'읽은 내용을 떠올려 ㉠ ㉡ ㉢에 들어갈 말을 말해 본 뒤 답을 확인해요.', m:'', btn:'떠올리기' },
     quiz: { btnId:'goQuiz', name:'오늘의 문제 1개', todo:`${tag} ${c.lessonName}`, done: tp.q === 'o' ? '맞았어요' : tp.q === 'x' ? '틀렸어요 · 내일 다시 나와요' : '답을 써 봤어요',
       h:'오늘의 문제 1개', p: q.essay ? '문장으로 써 보고 모범 답안과 견줘 봐요.' : '고르면 바로 채점하고, 왜 갈렸는지 알려 줘요.', m:`${tag} ${c.lessonName}`, btn:'풀기' },
     review: { btnId:'revStart', name: st.review === 'done' ? '오늘의 복습을 마쳤어요' : st.review === 'none' ? '다시 볼 문제 없음' : `오늘의 복습 ${n}`,
@@ -2899,14 +2904,13 @@ function blankItems(c){
 const bkLine = s => rich(String(s).replace(/\{\{(.+?)\}\}/g, '\u0001$1\u0002')).replace(/\u0001(.+?)\u0002/g, (_, m) => `<span class="bkx">${m}</span>`);
 let bkMode = 'input', bkVals = [];
 function sheetBlank(){
+  /* 2026-10-06 원장님 결정: 적지 않고 떠올려 본 뒤 답 보기 — 'input'(떠올리기) → 'result'(답 · 칸마다 떠올림 여부, 누르면 바뀜) */
   const c = todayConcept(), items = blankItems(c), tp = tpToday(), res = bkMode === 'result' && Array.isArray(tp.b) ? tp.b : null;
-  openSheet(`<h3>빈칸 채우기</h3><p class="bklead">「${esc(c.title)}」에서 나온 빈칸이에요. 떠오르는 말을 적어 봐요.</p>
+  openSheet(`<h3>빈칸 떠올리기</h3><p class="bklead">「${esc(c.title)}」에서 나온 빈칸이에요. ${res ? '떠올린 말과 같았나요? 헷갈린 칸은 눌러서 바꿔 주세요.' : '들어갈 말을 머릿속으로 떠올려 본 뒤 답을 확인해요.'}</p>
     <ol class="bkl">${items.map((it, i) => `<li><p class="bks">${bkLine(it.s)}</p>
-      ${res ? `<p class="bkr ${res[i] ? 'ok' : 'no'}">${res[i] ? `${IC_CHK}<span>맞았어요 · <b>${esc(it.a)}</b></span>` : `<span>${bkVals[i] ? `내 답 ${esc(bkVals[i])} · ` : ''}정답 <b>${esc(it.a)}</b></span>`}</p>`
-        : `<div class="bkin"><label class="k" for="bk${i}">${it.k}</label><input id="bk${i}" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="${it.k}에 들어갈 말" value="${esc(bkVals[i] || '')}"></div>`}</li>`).join('')}</ol>
-    ${res ? `<button class="btn" id="bkDone">다 했어요</button><button class="btn ghost" id="bkAgain">다시 채우기</button>`
-      : `<button class="btn" id="bkGo">확인</button><button class="btn ghost" id="sheetClose">나중에</button>`}`);
-  if (!res) setTimeout(() => document.getElementById('bk0')?.focus(), 60); }
+      ${res ? `<p class="bkr"><span>${it.k} <b>${esc(it.a)}</b></span><button type="button" class="bkt ${res[i] ? 'ok' : 'no'}" data-bkt="${i}" aria-pressed="${!!res[i]}">${res[i] ? `${IC_CHK}떠올렸어요` : '헷갈렸어요'}</button></p>` : ''}</li>`).join('')}</ol>
+    ${res ? `<button class="btn" id="bkDone">다 했어요</button>` : `<button class="btn" id="bkGo">답 보기</button><button class="btn ghost" id="sheetClose">나중에</button>`}`);
+  if (res) setTimeout(() => document.getElementById('bkDone')?.focus({ preventScroll:true }), 60); }
 
 /* ═══ 문제 (오늘 · 다시 보기 · 복습) ═══ */
 let qState = null;
@@ -3024,10 +3028,11 @@ function renderDetail(){
       const IC = { ok:'<path d="M4.5 12.5l5 5L19.5 7"/>', note:'<path d="M5 4h10l4 4v12H5z"/><path d="M8.5 12h7M8.5 15.5h5"/>', lab:'<path d="M9 3h6M10 3v6l-5 9a2 2 0 001.8 3h10.4A2 2 0 0019 18l-5-9V3"/><path d="M7.5 15h9"/>', drill:'<path d="M4 5h16v14H4z"/><path d="M8 9h8M8 13h5"/>' };
       const ic = k => `<svg viewBox="0 0 24 24" aria-hidden="true">${IC[k]}</svg>`;
       return `<div class="nextup dact">
-        ${rOn ? '' : `<button class="btn dgo" data-drill="${c.lessonId}"><span class="t">이 소단원 문제 풀기</span><span class="d">${nq}문항</span></button>`}
+        ${rOn ? '' : done ? `<button class="btn dgo" data-drill="${c.lessonId}"><span class="t">이 소단원 문제 풀기</span><span class="d">${nq}문항</span></button>`
+          : `<button class="btn dgo" id="markDone"><span class="t">다 읽었어요 · 공부했음</span></button>`}
         <div class="dsub">
           ${rOn ? `<button data-drill="${c.lessonId}">${ic('drill')}<span>문제 풀기<small>${nq}문항</small></span></button>`
-            : done ? `<span class="dchip">${ic('ok')}<span>공부한 개념</span></span>` : `<button id="markDone">${ic('ok')}<span>공부했음</span></button>`}
+            : done ? `<span class="dchip">${ic('ok')}<span>공부한 개념</span></span>` : `<button data-drill="${c.lessonId}">${ic('drill')}<span>문제 풀기<small>${nq}문항</small></span></button>`}
           <button id="noteThis">${ic('note')}<span>노트에 적기</span></button>
           ${lab ? `<button data-lab="${c.lessonId}">${ic('lab')}<span>자료 탐구</span></button>` : ''}
         </div></div>`; })()}
@@ -5587,11 +5592,10 @@ document.addEventListener('click', async e => {
   /* 오늘 경로 — 개념 읽기 · 빈칸 · 손님/무료 범위 한 줄 */
   if (T('#pRead')){ detailBack = 'today'; detailIdx = dayIndex(); show('detail'); return; }
   if (T('#pBlank')){ bkMode = Array.isArray(tpToday().b) ? 'result' : 'input'; if (bkMode === 'input') bkVals = []; sheetBlank(); return; }
-  if (T('#bkGo')){ const c = todayConcept(), items = blankItems(c), tp = tpToday();
-    bkVals = items.map((_, i) => (document.getElementById('bk' + i)?.value || '').trim());
-    tp.b = items.map((it, i) => blankCorrect(it.a, bkVals[i]) ? 1 : 0); touchDay(); save(S); bkMode = 'result'; sheetBlank();
-    document.querySelector('.bkl')?.setAttribute('aria-live', 'polite'); document.getElementById('bkDone')?.focus({ preventScroll:true }); return; }
-  if (T('#bkAgain')){ bkMode = 'input'; bkVals = []; sheetBlank(); return; }
+  if (T('#bkGo')){ const items = blankItems(todayConcept()), tp = tpToday();
+    tp.b = items.map(() => 1); touchDay(); save(S); bkMode = 'result'; sheetBlank();   // 답을 보면 끝 — 처음엔 모두 '떠올렸어요', 헷갈린 칸만 눌러 바꾼다
+    document.querySelector('.bkl')?.setAttribute('aria-live', 'polite'); return; }
+  const bkt = T('[data-bkt]'); if (bkt){ const tp = tpToday(), i = +bkt.dataset.bkt; if (Array.isArray(tp.b)){ tp.b[i] = tp.b[i] ? 0 : 1; save(S); sheetBlank(); document.querySelector(`[data-bkt="${i}"]`)?.focus({ preventScroll:true }); } return; }
   if (T('#bkDone')){ closeSheet(); if (view === 'today'){ await renderToday(); document.querySelector('#v-today .ps.now button')?.focus({ preventScroll:true }); } return; }
   if (T('#pfootGo')){ if (!ACC){ authMode = 'start'; show('auth'); return; } show('plans'); return; }
   if (T('#goStats') || T('#goStatsRing')){ show('stats'); return; }

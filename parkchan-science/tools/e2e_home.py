@@ -77,7 +77,10 @@ async def main():
         assert await g.evaluate('view') == 'detail' and await g.evaluate('detailIdx === dayIndex()'), '읽기 단계가 오늘 개념 상세로 가지 않음'
         assert await g.evaluate('S.read.length') == 0, '열기만 했는데 읽음'
         await g.evaluate("document.querySelector('#v-detail .point').scrollIntoView({ block:'center' })"); await g.wait_for_timeout(500)
-        assert await g.evaluate('S.read.includes(todayConcept().id)'), '포인트까지 내려 읽었는데 읽기 끝이 아님'
+        assert not await g.evaluate('S.read.includes(todayConcept().id)'), '스크롤만으로 읽음 처리됨(원장님 결정: 공부했음을 눌러야만)'
+        assert await g.locator('#v-detail .dact .btn#markDone').count() == 1, "안 읽은 개념의 주 버튼이 '공부했음'이 아님"
+        await g.click('#markDone'); await g.wait_for_timeout(300)
+        assert await g.evaluate('S.read.includes(todayConcept().id)'), '공부했음을 눌렀는데 읽기 끝이 아님'
         await g.click('#backList'); await g.wait_for_timeout(120)
         st = await state(g); assert st['now'] == 'ps-blank' and st['cls']['ps-read'] == 'done' and st['head'] == '1 / 3', st
         assert await g.locator('#ps-blank.unfold').count() == 1, '다음 단계가 펼쳐지지 않음'
@@ -91,17 +94,18 @@ async def main():
         assert all('{{' + it['k'] + '}}' in it['s'] for it in items), items
         bad = await g.evaluate("CONCEPTS.filter(c => { const it = blankItems(c); return it.length !== 3 || it.some(x => !x.s.includes('{{' + x.k + '}}') || plain(x.s).length < 20); }).map(c => c.id)")
         assert not bad, f'빈칸 문장을 못 꺼낸 개념: {bad}'
-        assert await g.evaluate("document.activeElement.id") == 'bk0'
-        await g.fill('#bk0', items[0]['a']); await g.press('#bk0', 'Enter'); assert await g.evaluate("document.activeElement.id") == 'bk1', 'Enter 로 다음 칸에 가지 않음'
-        await g.fill('#bk1', '모르겠음')
+        # 떠올려 본 뒤 답 보기(원장님 결정 2026-10-06) — 입력칸 없음, 답을 본 뒤 헷갈린 칸만 눌러 바꾼다
+        assert await g.locator('.bkl input').count() == 0 and items[0]['a'] not in await g.inner_text('.bkl'), '답 보기 전에 답이 보이거나 입력칸이 있음'
         await g.screenshot(path=f'{SC}/h03_blank_sheet_light.png')
         await g.click('#bkGo'); await g.wait_for_timeout(250)
+        assert await g.evaluate('S.tp.b') == [1, 1, 1] and await g.locator('.bkt.ok').count() == 3 and items[1]['a'] in await g.inner_text('.bkl')
+        await g.click('[data-bkt="1"]'); await g.wait_for_timeout(120); await g.click('[data-bkt="2"]'); await g.wait_for_timeout(120)
         assert await g.evaluate('S.tp.b') == [1, 0, 0], await g.evaluate('S.tp')
-        assert await g.locator('.bkr.ok').count() == 1 and await g.locator('.bkr.no').count() == 2 and items[1]['a'] in await g.inner_text('.bkl')
+        assert await g.locator('.bkt.ok').count() == 1 and await g.locator('.bkt.no').count() == 2 and await g.get_attribute('[data-bkt="1"]', 'aria-pressed') == 'false'
         await g.screenshot(path=f'{SC}/h04_blank_result_light.png')
         await g.click('#bkDone'); await g.wait_for_timeout(150)
         st = await state(g); assert st['now'] == 'ps-quiz' and st['cls']['ps-blank'] == 'done', st
-        assert '3칸 가운데 1칸 맞혔어요' in await g.inner_text('#ps-blank')
+        assert '3칸 가운데 1칸 떠올렸어요' in await g.inner_text('#ps-blank')
         assert await g.evaluate("document.activeElement.id") == 'goQuiz', '빈칸을 마친 뒤 초점이 다음 단계로 가지 않음'
         # 오늘의 문제 — 발문 고딕 16px · 선지 ≥ 발문
         await g.click('#goQuiz'); await g.wait_for_timeout(300)

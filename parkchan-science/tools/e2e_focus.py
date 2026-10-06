@@ -239,11 +239,12 @@ async def run(b, theme, errs):
 
     # ── 개념 상세 아래: 주 버튼 하나 + 보조 한 줄 + 이전/다음 글 버튼
     await s.evaluate("detailIdx = CONCEPTS.findIndex(c => c.lessonId === '1304' && !S.done.includes(c.id)); show('detail')"); await s.wait_for_timeout(400)
-    assert await s.locator('#v-detail .dact .btn').count() == 1 and await s.locator('#v-detail .dact .btn[data-drill]').count() == 1
-    assert await s.locator('#v-detail .dsub #markDone').count() == 1 and await s.locator('#v-detail .dsub #noteThis').count() == 1 and await s.locator('#v-detail .dsub [data-lab]').count() == 1
+    # 안 읽은 개념: 주 버튼 = '다 읽었어요 · 공부했음'(원장님 결정 — 읽기 완료는 이 버튼으로만), 문제 풀기는 보조 줄로
+    assert await s.locator('#v-detail .dact .btn').count() == 1 and await s.locator('#v-detail .dact .btn#markDone').count() == 1
+    assert await s.locator('#v-detail .dsub [data-drill]').count() == 1 and await s.locator('#v-detail .dsub #noteThis').count() == 1 and await s.locator('#v-detail .dsub [data-lab]').count() == 1
     assert await s.locator('#v-detail .dnav #prevC').count() == 1 and await s.locator('#v-detail #prevC.btn, #v-detail #nextC.btn').count() == 0
     await s.locator('#v-detail .dact').scroll_into_view_if_needed(); await a11y(s, '개념 상세 아래', '#v-detail .dact button, #v-detail .dnav button'); await shot('f13_detail_bottom')
-    await s.click('#markDone'); await s.wait_for_timeout(200); assert await s.locator('#v-detail .dsub .dchip').count() == 1
+    await s.click('#markDone'); await s.wait_for_timeout(200); assert await s.locator('#v-detail .dsub .dchip').count() == 1 and await s.locator('#v-detail .dact .btn[data-drill]').count() == 1
     await ctx.close()
 
 
