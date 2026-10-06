@@ -12,8 +12,8 @@
    5. 문제 은행·탐구·그림 파일(more-지문.json)은 설치할 때 미리 받는다. 이름에 지문이 있어 판이 바뀌면 새 이름이 된다.
    6. 웹 글꼴(Google Fonts)은 따로 오래 두는 캐시에 — 오프라인에서도 제 글꼴로 보이게. 판이 바뀌어도 지우지 않는다. */
 // CACHE·DATA 두 줄은 app/build.py 가 빌드할 때마다 고쳐 쓴다(앱 내용 지문) — 손으로 올리지 않아도 새 판이 옛 캐시에 가리지 않는다.
-const CACHE = 'pcs-635445e00a';
-const DATA = './more-abf4581e16.json';   // 문제 은행·자료 탐구·그림 — 앱이 첫 화면 뒤에 받는 파일. 미리 받아 두어 오프라인에서도 열리게
+const CACHE = 'pcs-9676a8a050';
+const DATA = './more-eadcfef48e.json';   // 문제 은행·자료 탐구·그림 — 앱이 첫 화면 뒤에 받는 파일. 미리 받아 두어 오프라인에서도 열리게
 const FONTS = 'pcs-fonts-v1';
 const ASSETS = ['./index.html', DATA, './manifest.webmanifest', './icon-192.png', './icon-512.png', './icon-180.png'];
 

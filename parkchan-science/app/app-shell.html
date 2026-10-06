@@ -17,8 +17,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" media="print" crossorigin="anonymous" onload="this.media='all';this.onload=null"
-      href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&family=Noto+Serif+KR:wght@400;700&display=swap">
-<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&family=Noto+Serif+KR:wght@400;700&display=swap"></noscript>
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;800;900&family=Noto+Serif+KR:wght@400;700&display=swap">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;800;900&family=Noto+Serif+KR:wght@400;700&display=swap"></noscript>
 <style>
 :root{
   --paper:#FAF8F4; --ground:#EFECE6; --card:#FFFFFF;
@@ -30,6 +30,10 @@
   /* 색이 깔린 자리에 얹는 글자 — 밝은 모드는 흰색, 어두운 모드는 브랜드 색이 밝아지므로 짙은 색 */
   --on-color:#FFFFFF; color-scheme:light;
   --no:#C0392B; --no-soft:#FBECEA; --warn:#8A6408; --warn-soft:#FFF7E0;
+  /* 정답 색 — 단원 색(--u)과 따로. I단원 테라코타가 오답 빨강과 닮아 정답이 오답처럼 보였다(2026-10-06 디자인 감사) */
+  --ok:#147D6F; --ok-soft:#E7F5F1; --ok-dark:#0F6357;
+  /* 그림 받침 — 그림 SVG 는 진한 글자를 투명 바탕에 얹는다. 어두운 화면에서는 밝은 종이를 깔아 글자가 보이게 */
+  --figplate:transparent;
   --shadow:0 4px 20px rgba(30,42,46,.07);
   /* 웹폰트가 늦거나 막혀도 한글이 바탕체로 떨어지지 않도록 기기 고딕을 명시한다 */
   /* 화면 가장자리 안전 영역 — Android 15·16(API 35·36)은 앱을 상태바·제스처 막대 밑까지 그린다(끌 수 없음).
@@ -52,6 +56,7 @@
     --brand:#4FBFAC; --brand-soft:#122724; --brand-line:#1D3D38; --brand-dark:#7FD6C6;
     --on-color:#0B1614; color-scheme:dark;
     --no:#E4776A; --no-soft:#2C1A18; --warn:#D9A73C; --warn-soft:#2A2314;
+    --ok:#4FBFAC; --ok-soft:#122724; --ok-dark:#7FD6C6; --figplate:#E4E0D8;
     --shadow:0 4px 20px rgba(0,0,0,.45);
   }
   :root:not([data-theme="light"])[data-unit="I"]{ --u:#E4885A; --u-soft:#2A1D16; --u-line:#412A1E; --u-dark:#F0A275; }
@@ -66,6 +71,7 @@
   --brand:#4FBFAC; --brand-soft:#122724; --brand-line:#1D3D38; --brand-dark:#7FD6C6;
   --on-color:#0B1614; color-scheme:dark;
   --no:#E4776A; --no-soft:#2C1A18; --warn:#D9A73C; --warn-soft:#2A2314;
+  --ok:#4FBFAC; --ok-soft:#122724; --ok-dark:#7FD6C6; --figplate:#E4E0D8;
   --shadow:0 4px 20px rgba(0,0,0,.45);
 }
 :root[data-theme="dark"][data-unit="I"]{ --u:#E4885A; --u-soft:#2A1D16; --u-line:#412A1E; --u-dark:#F0A275; }
@@ -182,7 +188,7 @@ h1{font-size:23px;font-weight:900;letter-spacing:-.025em;line-height:1.3;margin-
 .step .t{grid-column:2;font-size:14.5px;font-weight:800;margin:0;line-height:1.4;letter-spacing:-.01em}
 .step .d{grid-column:2;font-size:13.5px;color:var(--body);line-height:1.75;margin-top:4px}
 figure{background:var(--u-soft);border-radius:11px;padding:12px 8px 8px;text-align:center;margin-bottom:15px}
-figure svg{max-width:100%;height:auto}
+figure svg{max-width:100%;height:auto;background:var(--figplate);border-radius:8px}
 figcaption{font-size:11.5px;color:var(--u-dark);font-weight:700;margin-top:7px;padding:0 6px;line-height:1.5}
 .howto{background:#FFFDF6;border:1px solid #EBDDB8;border-radius:11px;padding:11px 14px;margin-bottom:15px}
 @media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) .howto{background:#221E12;border-color:#3B3320} } :root[data-theme="dark"] .howto{background:#221E12;border-color:#3B3320}   /* 어두운 화면에서만(밝은 화면에 새던 것 — 2026-10-01) */
@@ -211,6 +217,8 @@ button.blank.open{background:transparent;color:var(--u-dark)}
 .myth:last-child{margin-bottom:0}
 .myth .x{color:var(--no);font-weight:900}
 .myth .o{color:var(--u-dark);font-weight:900}
+.myth .w{color:var(--muted);font-weight:900}
+.myth .why{display:block;margin-top:3px;color:var(--body)}
 .point{background:var(--u-soft);border-left:4px solid var(--u);border-radius:0 13px 13px 0;padding:14px 17px;margin-bottom:13px}
 .point .k{font-size:11.5px;font-weight:900;color:var(--u-dark);letter-spacing:.13em;display:block;margin-bottom:6px}
 .point p{font-size:14.5px;font-weight:700;line-height:1.78}
@@ -263,8 +271,8 @@ button,.tab,.btn,.chip,.chipbar button,.seg button{-webkit-user-select:none;user
 .opt .m{font-weight:800;color:var(--faint);flex:0 0 auto}
 .opt .tx{flex:1}
 .opt .mk{margin-left:auto;font-size:11px;font-weight:800;align-self:center;flex:0 0 auto}
-.opt.ok{border-color:var(--u);background:var(--u-soft);color:var(--ink)}
-.opt.ok .m,.opt.ok .mk{color:var(--u-dark)}   /* --u 는 연한 바탕 위에서 4.47:1 — AA 미달(2026-10 모의고사 해설 점검) */
+.opt.ok{border-color:var(--ok);background:var(--ok-soft);color:var(--ink)}
+.opt.ok .m,.opt.ok .mk{color:var(--ok-dark)}   /* --u 는 연한 바탕 위에서 4.47:1 — AA 미달(2026-10 모의고사 해설 점검) */
 .opt.bad{border-color:var(--no);background:var(--no-soft);color:var(--ink)}
 .opt.bad .m,.opt.bad .mk{color:var(--no)}
 .verdict{background:var(--u-soft);border-left:4px solid var(--u);border-radius:0 12px 12px 0;padding:13px 16px;margin-bottom:11px}
@@ -678,7 +686,7 @@ select.sel{font-family:inherit;font-size:14px;font-weight:700;color:var(--u);bac
 .qbar .bar i{display:block;height:100%;background:var(--u)}
 .oxrow{display:flex;gap:10px;margin-bottom:14px}
 .oxrow button{flex:1;font-size:26px;font-weight:900;padding:18px;border-radius:14px;border:1.5px solid var(--line);background:var(--card);color:var(--body);cursor:pointer}
-.oxrow button.ok{border-color:var(--u);background:var(--u-soft);color:var(--u-dark)}
+.oxrow button.ok{border-color:var(--ok);background:var(--ok-soft);color:var(--ok-dark)}
 .oxrow button.bad{border-color:var(--no);background:var(--no-soft);color:var(--no)}
 .oxrow button:disabled{cursor:default}
 .blankin{display:flex;gap:8px;margin-bottom:14px}
@@ -778,7 +786,8 @@ select.sel{font-family:inherit;font-size:14px;font-weight:700;color:var(--u);bac
 .labcard ol{padding-left:18px}
 .labcard figure{margin:10px 0}
 .qfig{background:var(--u-soft);border-radius:11px;padding:10px 6px;margin-bottom:12px;text-align:center;cursor:zoom-in}
-.qfig svg{max-width:100%;height:auto}
+.qfig svg{max-width:100%;height:auto;background:var(--figplate);border-radius:8px}
+.fv .stage svg{background:var(--figplate);border-radius:8px}
 figure.zoomable{cursor:zoom-in}
 /* 그림 확대 보기 */
 .fv{position:fixed;inset:0;background:var(--paper);z-index:50;display:flex;flex-direction:column;padding:var(--sat) var(--sar) 0 var(--sal)}
@@ -905,8 +914,9 @@ figure.zoomable{cursor:zoom-in}
 .fbrow .kd.care{background:var(--warn-soft,rgba(138,100,8,.1));color:var(--warn)}
 sup,sub{font-size:.72em;line-height:0;position:relative;vertical-align:baseline}sup{top:-.5em}sub{bottom:-.2em}
 figure svg,.qfig svg,.fv .stage svg{font-family:var(--sans,'Noto Sans KR',sans-serif)}   /* 그림 속 글자 — 정의 안 된 'PC Sans' 대신 앱 글꼴(바탕체로 떨어지던 것) */
-@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) figure svg, :root:not([data-theme="light"]) .qfig svg{filter:brightness(.86) saturate(.95)} }
-:root[data-theme="dark"] figure svg,:root[data-theme="dark"] .qfig svg{filter:brightness(.86) saturate(.95)}
+/* 어두운 화면: 그림 밑에 밝은 종이(--figplate)를 깔았으니, 앱 글자색을 따라가는 그림 글자(currentColor·var(--ink))도 종이 위 진한 색으로 */
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) figure svg, :root:not([data-theme="light"]) .qfig svg, :root:not([data-theme="light"]) .fv .stage svg{filter:brightness(.92) saturate(.95);color:#1E2A2E;--ink:#1E2A2E;--body:#3A484D;--muted:#566268;--faint:#5E6B70;--line:#E2DED6} }
+:root[data-theme="dark"] figure svg,:root[data-theme="dark"] .qfig svg,:root[data-theme="dark"] .fv .stage svg{filter:brightness(.92) saturate(.95);color:#1E2A2E;--ink:#1E2A2E;--body:#3A484D;--muted:#566268;--faint:#5E6B70;--line:#E2DED6}
 figure.zoomable{position:relative}
 figure.zoomable .zbtn{position:absolute;right:8px;top:8px;display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:800;padding:7px 11px;min-height:34px;border-radius:999px;background:var(--card);color:var(--ink);border:1px solid var(--line);box-shadow:var(--shadow);pointer-events:none}
 /* 누르는 자리 넓히기 — 보이는 크기는 그대로, 손가락이 닿는 범위만 44px 가까이(2026-10-01 점검: 출석 체크 29px · 빈칸 27px 등) */
@@ -2087,7 +2097,7 @@ function conceptCard(c, opts={}){
       <div class="prose">${c.body.map(p=>`<p>${rich(p)}</p>`).join('')}</div>
     </article>
     ${c.terms.length ? `<div class="sec"><h2>용어</h2><dl class="terms">${c.terms.map(t=>`<dt>${esc(t.k)}</dt><dd>${esc(t.v)}</dd>`).join('')}</dl></div>`:''}
-    ${c.myths.length ? `<div class="sec"><h2>자주 하는 오해</h2>${c.myths.map(m=>`<div class="myth"><span class="x">✗ 오해</span> ${rich(m.x)}<br><span class="o">✓ 진실</span> ${rich(m.o)}</div>`).join('')}</div>`:''}
+    ${c.myths.length ? `<div class="sec"><h2>자주 하는 오해</h2>${c.myths.map(m=>`<div class="myth"><span class="x">✗ 오해</span> ${rich(m.x)}<br><span class="o">✓ 진실</span> ${rich(m.o)}${m.why ? `<span class="why"><span class="w">왜?</span> ${rich(m.why)}</span>` : ''}</div>`).join('')}</div>`:''}
     <div class="point"><span class="k">포인트</span><p>${rich(c.point)}</p></div>`;
 }
 
@@ -2114,7 +2124,7 @@ const AUTH_HERO = `<svg class="hero" viewBox="0 0 320 116" role="img" aria-label
 </svg>`;
 const INTRO = [
   { t:'하루 한 개념,<br>5분이면 됩니다', d:'박찬 과학 강의 교재를 그대로 옮겼습니다. 매일 개념 하나를 읽고, 빈칸을 채우고, 문제 하나를 풉니다.', art:() => AUTH_HERO.replace('class="hero"', '') },
-  { t:'시험 날까지<br>이어지는 연습', d:`문제 은행 ${BANK_N.toLocaleString()}문항. 틀린 문제는 3일 뒤 다시 나오고, 시험 일정에 범위를 걸면 그 범위 문제로 바로 갑니다.`,
+  { t:'시험 날까지<br>이어지는 연습', d:`문제 은행 ${BANK_N.toLocaleString()}문항. 틀린 문제는 내일 다시, 맞히면 3·7·14·30일 간격으로 다시 나오고, 시험 일정에 범위를 걸면 그 범위 문제로 바로 갑니다.`,
     art:() => `<svg viewBox="0 0 320 200" role="img" aria-label="문제 카드와 정답률 막대"><rect width="320" height="200" rx="22" fill="var(--brand-soft)"/>
       <g transform="rotate(-7 118 104)"><rect x="46" y="44" width="150" height="110" rx="14" fill="var(--card)" stroke="var(--brand-line)"/></g>
       <rect x="62" y="40" width="150" height="116" rx="14" fill="var(--card)" stroke="var(--brand-line)" stroke-width="1.5"/>

@@ -267,7 +267,7 @@ def auto_from_lecture(concepts):
             x = strip_tags(m['x']).strip(); o = strip_tags(m['o']).strip()
             if x.endswith('.') and standalone(x):
                 items.append({'id': f'{code}-m{no}-{i}x', 'lessonId': code, 'concept': no, 'step': 'auto', 'type': 'ox', 'stem': x,
-                              'source': '', 'choices': [], 'answer': 'X', 'explain': f'오해: {x} → 진실: {o}', 'wrong': '', 'figure': '', 'difficulty': '●○○'})
+                              'source': '', 'choices': [], 'answer': 'X', 'explain': f'오해: {x} → 진실: {o}' + (f' (왜? {strip_tags(m["why"]).strip()})' if m.get('why') else ''), 'wrong': '', 'figure': '', 'difficulty': '●○○'})
             if False and o.endswith('.') and standalone(o):   # 진실(✓) 문장은 오해 없이 홀로 읽으면 뜻이 비는 것이 많아(2026-10-01 점검 77건+) 문제로 내지 않고 X 문항의 해설로만 쓴다
                 items.append({'id': f'{code}-m{no}-{i}o', 'lessonId': code, 'concept': no, 'step': 'auto', 'type': 'ox', 'stem': o,
                               'source': '', 'choices': [], 'answer': 'O', 'explain': '교재 개념 카드의 설명 그대로입니다.', 'wrong': '', 'figure': '', 'difficulty': '●○○'})
