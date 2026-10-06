@@ -1060,6 +1060,65 @@ button.pill::before,.notice button::before,.mini::before,.chipbar button::before
 .kv .v{font-weight:700;font-variant-numeric:tabular-nums}
 .toast{pointer-events:none;position:fixed;left:50%;bottom:calc(92px + var(--sab));transform:translateX(-50%);background:var(--ink);color:var(--paper);font-size:13px;font-weight:700;padding:10px 16px;border-radius:999px;z-index:40;box-shadow:var(--shadow);animation:tst 2.4s forwards;max-width:86%;text-align:center}
 @keyframes tst{0%{opacity:0;transform:translate(-50%,8px)}12%{opacity:1;transform:translate(-50%,0)}80%{opacity:1}100%{opacity:0}}
+/* ═══ 개념 상세 — 읽기 전에 O/X · ①②③→그림→포인트→[본문 펼치기] · 용어 말풍선 · 확인 문제(그 개념 OX) · 풀이 화면 그림 단서
+   (2026-10-06 개념 학습 콘텐츠 감사 보완안 2·3·4·10·11). 이 블록의 이름은 개념 상세·풀이 단서에서만 쓴다 ═══ */
+.ox2{display:flex;gap:8px;align-items:stretch}
+.ox2 button{flex:1;min-height:46px;font-family:inherit;font-size:19px;font-weight:900;border-radius:12px;border:1.5px solid var(--line);background:var(--card);color:var(--body);cursor:pointer}
+.ox2 button.ok{border-color:var(--ok);background:var(--ok-soft);color:var(--ok-dark)}
+.ox2 button.bad{border-color:var(--no);background:var(--no-soft);color:var(--no)}
+.ox2 button:disabled{cursor:default}
+.ox2 button:focus-visible{outline:2px solid var(--u);outline-offset:2px}
+.pre{border:1.5px dashed var(--u-line);border-radius:13px;padding:12px 14px 13px;margin:0 0 14px;background:var(--card)}
+.pre .k{display:block;font-size:11.5px;font-weight:900;color:var(--u-dark);letter-spacing:.06em;margin-bottom:5px}
+.pre .q{font-size:14.5px;font-weight:700;line-height:1.62;color:var(--ink);margin-bottom:10px}
+.pre .ox2 .skip{flex:0 0 auto;font-size:12.5px;font-weight:800;color:var(--muted);border-color:transparent;background:none;padding:0 8px;min-width:64px}
+.pre.done{border-style:solid;border-color:var(--u-line);background:var(--u-soft);padding:10px 13px}
+.pre.done .r{font-size:13px;line-height:1.65;color:var(--body)}
+.pre.done .r b{font-weight:900;color:var(--u-dark)}
+.pre.done .r b.no{color:var(--no)}
+.pre.done .q2{font-size:12.5px;line-height:1.6;color:var(--muted);margin-top:3px}
+.dcard .point{margin:0}
+.dmore-t{display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%;min-height:54px;margin:14px 0 0;padding:10px 14px;border:1.5px solid var(--u-line);border-radius:12px;background:var(--card);color:var(--u-dark);font-family:inherit;text-align:left;cursor:pointer}
+.dmore-t b{display:block;font-size:14px;font-weight:800;line-height:1.4}
+.dmore-t small{display:block;font-size:12px;font-weight:600;color:var(--muted);line-height:1.45;margin-top:1px}
+.dmore-t svg{width:18px;height:18px;stroke:currentColor;stroke-width:2.4;fill:none;stroke-linecap:round;stroke-linejoin:round;flex:0 0 auto;transition:transform .2s ease}
+.dmore-t[aria-expanded="true"] svg{transform:rotate(180deg)}
+.dmore-t:focus-visible{outline:2px solid var(--u);outline-offset:2px}
+.dmyth .myth{font-size:13.5px;line-height:1.72;padding:12px 14px;border:1px solid var(--u-line);margin-bottom:9px}
+.dmyth .myth p+p{margin-top:4px}
+.dmyth .myth .why{margin-top:8px;padding-top:8px;border-top:1px dashed var(--u-line)}
+.dmyth .myth .w{color:var(--u-dark)}
+/* 용어는 진짜 글자처럼 줄을 넘겨 이어지게 span(role=button) — <button>은 한 덩어리라 '결합(' 뒤에서 줄이 끊겼다 */
+.tterm{cursor:pointer;color:inherit;text-decoration:underline dotted var(--u);text-decoration-thickness:1.5px;text-underline-offset:4px;border-radius:4px;padding:3px 0;-webkit-tap-highlight-color:transparent}
+.tterm[aria-expanded="true"]{background:var(--u-soft);color:var(--u-dark)}
+.tterm:focus-visible{outline:2px solid var(--u);outline-offset:1px}
+.ttip{position:absolute;z-index:35;width:max-content;max-width:min(300px,calc(100vw - 24px));background:var(--ink);color:var(--paper);border-radius:12px;padding:10px 13px 11px;font-size:13px;line-height:1.62;box-shadow:0 8px 28px rgba(0,0,0,.22)}
+.ttip b.h{display:block;font-size:12px;font-weight:900;margin-bottom:2px}
+.ttip b{color:inherit}
+.ttip .ar{position:absolute;top:-5px;width:10px;height:10px;background:var(--ink);transform:rotate(45deg)}
+.ttip.up .ar{top:auto;bottom:-5px}
+.dqc .lead{font-size:12.5px;color:var(--muted);line-height:1.6;margin:-4px 0 4px}
+.dqc h2 .n{font-size:11px;font-weight:800;letter-spacing:0;color:var(--u-dark);background:var(--u-soft);border-radius:999px;padding:2px 9px}
+.dqc .qi{padding:12px 0 2px;border-top:1px solid var(--hair);margin-top:10px}
+.dqc .lead+.qi{border-top:none;margin-top:0}
+.dqc .qs{display:flex;gap:8px;font-size:14px;line-height:1.65;color:var(--ink);margin-bottom:9px}
+.dqc .qs .no{flex:0 0 auto;font-size:12px;font-weight:900;color:var(--u-dark);background:var(--u-soft);border-radius:7px;min-width:22px;height:22px;display:grid;place-items:center;margin-top:1px}
+.dqc .fb{margin-top:9px;font-size:13px;line-height:1.7;color:var(--body);background:var(--u-soft);border-radius:10px;padding:9px 12px}
+.dqc .fb:focus{outline:none}
+.dqc .fb b.r{font-weight:900;color:var(--ok-dark);margin-right:4px}
+.dqc .fb b.r.no{color:var(--no)}
+.dqc .fb .sl{display:block;font-size:12px;color:var(--muted);margin-top:4px}
+.dqc .fb .sl b{color:var(--u-dark)}
+.dqc .wait{font-size:12.5px;color:var(--muted);margin-top:8px}
+.cuefig{margin:0 0 12px}
+.cuefig summary{display:inline-flex;align-items:center;gap:6px;min-height:36px;padding:5px 13px;border:1px solid var(--u-line);border-radius:999px;background:var(--u-soft);color:var(--u-dark);font-size:12.5px;font-weight:800;cursor:pointer;list-style:none}
+.cuefig summary::-webkit-details-marker{display:none}
+.cuefig summary svg{width:15px;height:15px;stroke:currentColor;stroke-width:2.2;fill:none;stroke-linecap:round;stroke-linejoin:round;flex:0 0 auto}
+.cuefig summary span{font-weight:600;color:var(--muted)}
+.cuefig[open] summary{margin-bottom:8px}
+.cuefig figure{margin:0;padding:8px 8px 6px}
+.cuefig figure svg{max-height:150px;width:auto}
+.cuefig figcaption{font-size:11.5px}
 </style>
 </head>
 <body>
@@ -1185,6 +1244,7 @@ function loadMore(){
 const MORE_VIEWS = ['bank','lab','wrong','stats','note','noted'];
 function moreArrived(){
   document.querySelectorAll('.figslot[data-fig]').forEach(el => { const f = figOf(el.dataset.fig); if (f) el.outerHTML = f; });
+  dqcFill();   // 개념 상세의 확인 문제 칸(그 개념 OX)
   if (!MORE_VIEWS.includes(view) || document.getElementById('sheetBg')) return;
   const a = document.activeElement; if (a && a.matches && a.matches('input,textarea,select')) return;
   const y = window.scrollY;
@@ -2560,22 +2620,15 @@ function renderList(){
 /* ═══ 개념 상세 ═══ */
 let detailIdx = 0;
 function renderDetail(){
-  const c = CONCEPTS[detailIdx]; setUnit(c.unit); const q = quizFor(c); touchDay();
+  const c = CONCEPTS[detailIdx]; setUnit(c.unit); touchDay(); ttClose();
   /* 학원 과제 '개념 읽기' — 위에 몇 번째인지, 아래에 '읽었어요 · 다음 개념'(마지막은 '과제 내기') */
   const ra = asgRead && ASG.find(x => x.id === asgRead.id), rOn = !!(ra && ra.items[asgRead.i] === c.id), rLast = rOn && asgRead.i >= ra.n - 1;
   document.getElementById('v-detail').innerHTML = `
     <button class="back" id="backList"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg>${detailBack === 'today' ? '오늘' : detailBack ? '문제로 돌아가기' : '교재'}</button>
     ${rOn ? `<div class="asgbar" role="status"><span class="k">학원 과제 · 개념 읽기</span><span class="t">${esc(ra.title)}</span><span class="n">${asgRead.i + 1}<small> / ${ra.n}</small></span></div>` : ''}
-    ${conceptCard(c)}
+    ${detailCard(c)}
     ${rOn ? `<button class="btn" id="asgReadNext">${rLast ? '다 읽었어요 · 과제 내기' : '읽었어요 · 다음 개념'}</button>` : ''}
-    <div class="sec"><h2>확인 문제</h2>
-      <p class="stem" style="font-size:14px;margin-bottom:8px">${rich(q.stem)}</p>
-      ${q.source ? `<div class="bogi" style="font-size:13px">${rich(q.source)}</div>`:''}
-      ${q.ask ? `<p class="ask" style="font-size:13.5px">${rich(q.ask)}</p>`:''}
-      ${q.essay ? '' : `<div class="opts">${q.choices.map((t,i)=>`<div class="opt" style="cursor:default"><span class="m">${MARKS[i]}</span><span class="tx">${rich(t)}</span></div>`).join('')}</div>`}
-      <details><summary style="font-size:13px;font-weight:800;color:var(--u);cursor:pointer">정답 보기</summary>
-        <div class="verdict" style="margin-top:10px"><div class="h">${q.answer ? `정답 ${MARKS[q.answer-1]}` : '예시 답안'}</div><p>${rich(q.explain || q.gradeNote || q.answerLine)}</p></div></details>
-    </div>
+    ${dqcHtml(c)}
     ${rOn ? '' : S.done.includes(c.id) ? `<div class="donebar">✓ 공부한 개념입니다</div>` : `<button class="btn" id="markDone">이 개념 공부했음으로 표시</button>`}
     <div class="nextup ${MORE_META.ll.includes(c.lessonId)?'':'one'}">
       <button data-drill="${c.lessonId}"><span class="t">이 소단원 문제 풀기</span><span class="d">${MORE_META.bl[c.lessonId]||0}문항</span></button>
@@ -2585,6 +2638,145 @@ function renderDetail(){
     <div class="seg"><button id="prevC" ${detailIdx===0?'disabled':''}>← 이전 개념</button><button id="nextC" ${detailIdx>=CONCEPTS.length-1?'disabled':''}>다음 개념 →</button></div>
     <button class="flag" data-report="concept:${esc(c.id)}">이 개념·확인 문제에 틀린 곳이 있나요?</button>`;
 }
+/* 개념 상세 카드 — 첫 화면은 ①②③ → 그림(+읽는 법) → 포인트 → [본문 자세히 읽기]. 본문·자주 하는 오해·용어는 펼친 뒤.
+   오늘 화면은 conceptCard() 그대로(이 함수는 상세 전용). 2026-10-06 개념 학습 감사 보완안 3·4·10 */
+function detailCard(c){
+  const bm = S.bm.includes(c.id), open = dOpenOf(c.id), keys = termKeys(c), u1 = new Set(), u2 = new Set();
+  return `
+    <article class="card dcard">
+      <div class="loc"><span>${c.bookName?esc(c.bookName)+' · ':''}${c.unit}-${c.lessonId.slice(2)} · 개념 ${c.no}</span>
+        <span class="acts">
+          <button data-bm="${c.id}" class="${bm?'on':''}" title="북마크" aria-label="북마크"><svg viewBox="0 0 24 24"><path d="M6 4h12v16l-6-4-6 4z"/></svg></button>
+          <button data-share="${c.id}" title="공유" aria-label="공유"><svg viewBox="0 0 24 24"><circle cx="18" cy="5" r="2.5"/><circle cx="6" cy="12" r="2.5"/><circle cx="18" cy="19" r="2.5"/><path d="M8.2 10.8l7.6-4.6M8.2 13.2l7.6 4.6"/></svg></button>
+        </span></div>
+      <h1>${esc(c.title)}</h1>
+      <div class="sub">${esc(c.subtitle||c.lessonName)}</div>
+      ${preHtml(c)}
+      <div class="steps">${c.steps.map(s=>`<div class="step"><div class="n">${s.n}</div><div class="t">${esc(s.t)}</div><div class="d">${termify(rich(s.d), keys, u1)}</div></div>`).join('')}</div>
+      ${c.figure ? `<figure class="zoomable" data-zoom="${c.id}" tabindex="0" role="button" aria-label="그림 크게 보기: ${esc(c.figure.caption)}"><span class="zbtn" aria-hidden="true">⤢ 크게 보기</span>${figSlot(c.id)}<figcaption>${esc(c.figure.caption)} · 누르면 크게</figcaption></figure>` : ''}
+      ${c.howto.length ? `<div class="howto"><span class="k">그림 읽는 법</span><ul>${c.howto.map((h,i)=>`<li><b class="n">${i+1}</b>${rich(h)}</li>`).join('')}</ul></div>`:''}
+      <div class="point"><span class="k">포인트</span><p>${rich(c.point)}</p></div>
+      <button type="button" class="dmore-t" id="dMoreBtn" aria-expanded="${open}" aria-controls="dMore">${dMoreLabel(c, open)}</button>
+    </article>
+    <div class="dmore" id="dMore" ${open ? '' : 'hidden'}>
+      <div class="sec dbody"><h2>본문</h2><div class="prose">${c.body.map(p=>`<p>${termify(rich(p), keys, u2)}</p>`).join('')}</div></div>
+      ${c.myths.length ? `<div class="sec dmyth"><h2>자주 하는 오해</h2>${c.myths.map(m=>`<div class="myth"><p><span class="x">✗ 오해</span> ${rich(m.x)}</p><p><span class="o">✓ 진실</span> ${rich(m.o)}</p>${m.why ? `<p class="why"><span class="w">왜?</span> ${rich(m.why)}</p>` : ''}</div>`).join('')}</div>`:''}
+      ${c.terms.length ? `<div class="sec"><h2>용어</h2><dl class="terms">${c.terms.map(t=>`<dt>${esc(t.k)}</dt><dd>${esc(t.v)}</dd>`).join('')}</dl></div>`:''}
+    </div>`;
+}
+const dMoreLabel = (c, open) => `<span><b>${open ? '본문 접기' : '본문 자세히 읽기'}</b><small>본문 ${c.body.length}문단${c.myths.length ? ` · 자주 하는 오해 ${c.myths.length}` : ''}${c.terms.length ? ` · 용어 ${c.terms.length}` : ''}</small></span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>`;
+/* 이 기기에만 두는 작은 기록 — 진도(S)·서버로 보내지 않는다 */
+const dLoad = k => { try { const v = JSON.parse(localStorage.getItem(k)); return v && typeof v === 'object' && !Array.isArray(v) ? v : null; } catch { return null; } };
+const dKeep = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} };
+/* 본문을 펼쳐 둔 개념(개념별) */
+const dOpenOf = id => !!(dLoad('pcs.dopen') || {})[id];
+const dOpenSet = (id, on) => { const o = dLoad('pcs.dopen') || {}; if (on) o[id] = 1; else delete o[id]; dKeep('pcs.dopen', o); };
+/* 읽기 전에 — 오늘 고른 답만 남긴다(날짜가 바뀌면 새로). 'O' · 'X' · 's'(건너뜀) */
+const preOf = id => { const p = dLoad('pcs.pre'); return p && p.d === todayISO() && p.a && typeof p.a === 'object' ? p.a[id] || '' : ''; };
+const preSet = (id, v) => { let p = dLoad('pcs.pre'); if (!p || p.d !== todayISO() || !p.a || typeof p.a !== 'object') p = { d:todayISO(), a:{} }; p.a[id] = v; dKeep('pcs.pre', p); };
+/* 읽기 전에 먼저 풀어 보기 — 그 개념의 첫 오해 문장(늘 틀린 말이라 정답은 X). 이미 공부한 개념에는 띄우지 않는다 */
+function preHtml(c){
+  const m = c.myths && c.myths[0]; if (!m || S.done.includes(c.id)) return '';
+  const a = preOf(c.id); if (a === 's') return '';
+  if (!a) return `<div class="pre" id="dPre" role="group" aria-labelledby="dPreK dPreQ"><span class="k" id="dPreK">읽기 전에 — 맞는 말일까요?</span><p class="q" id="dPreQ">${rich(m.x)}</p>
+      <div class="ox2"><button type="button" data-pre="O" aria-label="O · 맞는 말">O</button><button type="button" data-pre="X" aria-label="X · 틀린 말">X</button><button type="button" class="skip" data-pre="s">건너뛰기</button></div></div>`;
+  return `<div class="pre done" id="dPre" tabindex="-1" role="status"><span class="k">읽기 전에 · 내 답 ${a}</span>
+      <p class="r">${a === 'X' ? '<b>맞아요</b> — 흔한 오해예요. 아래 단계에서 확인해 봐요.' : '<b class="no">아니에요</b> — 흔한 오해예요. 읽으면서 이유를 찾아봐요.'}</p><p class="q2">${rich(m.x)}</p></div>`;
+}
+/* 본문 용어 눌러 뜻 보기 — 용어표의 말이 처음 나오는 곳 하나에만(단계 · 본문 따로). '효소 · 촉매'·'세균 / 바이러스'는 나눠 찾고,
+   '라이다(LiDAR)'는 바깥 말과 괄호 속 영문을 따로 찾는다. 가운뎃점만 있는 말('대기·해수의 순환')은 나누지 않는다 */
+const termKeys = c => { const out = [];
+  (c.terms || []).forEach((t, i) => String(t.k || '').split(/ · | \/ /).forEach(part => {
+    const m = part.trim().match(/^(.+?)\s*\((.+?)\)$/), cand = m ? [m[1].trim(), /^[A-Za-z]{2,}$/.test(m[2]) ? m[2] : ''] : [part.trim()];
+    cand.forEach(k => { if (k && k.length >= 2 && !/[→=⊃]/.test(k)) out.push({ k:esc(k), i }); }); }));
+  return out.sort((a, b) => b.k.length - a.k.length); };
+function termify(html, keys, used){
+  if (!keys.length) return html; let inBtn = 0;
+  return html.split(/(<[^>]+>)/).map(seg => {
+    if (seg.startsWith('<')){ if (/^<button\b/.test(seg)) inBtn++; else if (/^<\/button>/.test(seg)) inBtn = Math.max(0, inBtn - 1); return seg; }
+    if (inBtn || !seg) return seg;
+    let out = '', rest = seg;
+    for (;;){ let best = null;
+      for (const t of keys){ if (used.has(t.i)) continue; const at = rest.indexOf(t.k); if (at >= 0 && (!best || at < best.at)) best = { at, t }; }
+      if (!best) break; used.add(best.t.i);
+      out += rest.slice(0, best.at) + `<span class="tterm" role="button" tabindex="0" data-tt="${best.t.i}" aria-expanded="false">${best.t.k}</span>`; rest = rest.slice(best.at + best.t.k.length); }
+    return out + rest; }).join('');
+}
+let ttBtn = null;
+function ttClose(back){ document.getElementById('ttip')?.remove(); if (ttBtn){ ttBtn.setAttribute('aria-expanded', 'false'); if (back && ttBtn.isConnected) ttBtn.focus({ preventScroll:true }); } ttBtn = null; }
+function ttOpen(btn){
+  const c = CONCEPTS[detailIdx], t = c && c.terms[+btn.dataset.tt]; ttClose(); if (!t) return;
+  const el = document.createElement('div'); el.id = 'ttip'; el.className = 'ttip'; el.setAttribute('role', 'status');
+  el.innerHTML = `<b class="h">${esc(t.k)}</b>${rich(t.v)}<i class="ar" aria-hidden="true"></i>`;
+  document.body.appendChild(el); ttBtn = btn; btn.setAttribute('aria-expanded', 'true'); ttPlace();
+}
+/* 말풍선 자리 — 화면 양옆 12px 안, 아래 자리가 모자라면(탭 막대까지) 위로 */
+function ttPlace(){
+  const el = document.getElementById('ttip'); if (!el || !ttBtn) return;
+  const r = ttBtn.getBoundingClientRect(), W = document.documentElement.clientWidth, w = el.offsetWidth, h = el.offsetHeight, M = 12;
+  const tb = document.getElementById('tabs'), floor = tb && !tb.classList.contains('hide') ? tb.getBoundingClientRect().top : window.innerHeight;
+  const left = Math.max(M, Math.min(r.left + r.width / 2 - w / 2, W - w - M)), below = r.bottom + 9 + h <= floor - 8 || r.top - 9 - h < 8;
+  el.classList.toggle('up', !below);
+  el.style.left = (left + window.scrollX) + 'px'; el.style.top = ((below ? r.bottom + 9 : r.top - 9 - h) + window.scrollY) + 'px';
+  el.querySelector('.ar').style.left = Math.max(10, Math.min(w - 20, r.left + r.width / 2 - left - 5)) + 'px';
+}
+/* 확인 문제 — 문제 은행에서 이 개념(소단원·개념 번호가 같은)의 바로바로 체크 OX 3개, 모자라면 같은 개념 자동 OX로 채운다.
+   맞힘·틀림은 문제 은행과 같은 복습 상자(srsMark). 문제 은행은 첫 화면 뒤에 받으므로 그 전엔 자리 표시 → 받으면 이 칸만 채운다 */
+let dqc = null;   // { id: 개념 id, pk: { 문항 id: 'O'|'X' }, rs: { 문항 id: srsMark 결과 } }
+const dqcItems = c => { const same = q => q.lessonId === c.lessonId && +q.concept === +c.no && q.type === 'ox' && (q.answer === 'O' || q.answer === 'X');
+  return [...BANK.filter(q => same(q) && q.step === 'qc'), ...BANK.filter(q => same(q) && q.step === 'auto')].slice(0, 3); };
+function dqcHtml(c){
+  const h2 = n => `<h2><span>확인 문제</span>${n ? `<span class="n">OX ${n}</span>` : ''}</h2>`;
+  if (!MORE.ok) return `<div class="sec dqc" id="dqcBox" aria-busy="${!MORE.err}">${h2(0)}${MORE.err
+    ? `<p class="wait" role="status">문제를 아직 받지 못했어요. 인터넷에 연결되면 자동으로 받아요.</p><button class="btn soft sm" data-moreretry style="margin:10px 0 0">지금 다시 받기</button>`
+    : `<div class="skel" aria-hidden="true"><i style="height:18px;width:88%"></i><i style="height:46px"></i><i style="height:18px;width:72%"></i><i style="height:46px"></i></div><p class="wait" role="status">이 개념의 OX 문제를 받는 중이에요…</p>`}</div>`;
+  if (!dqc || dqc.id !== c.id) dqc = { id:c.id, pk:{}, rs:{} };
+  const qs = dqcItems(c);
+  if (!qs.length) return `<div class="sec dqc" id="dqcBox">${h2(0)}<p class="lead">이 개념의 OX 문제는 아직 없어요. 아래 '이 소단원 문제 풀기'로 이어서 풀어 보세요.</p></div>`;
+  return `<div class="sec dqc" id="dqcBox">${h2(qs.length)}<p class="lead">방금 읽은 개념을 바로 확인해요. 틀린 문제는 내일 다시 나와요.</p>${qs.map((q, i) => dqcRow(q, i)).join('')}</div>`;
+}
+function dqcRow(q, i){
+  const pk = dqc && dqc.pk[q.id], g = !!pk, ok = g && pk === q.answer, sl = g ? srsLine(dqc.rs[q.id]) : '';
+  return `<div class="qi" data-qi="${esc(q.id)}"><p class="qs"><span class="no" aria-hidden="true">${i + 1}</span><span>${rich(q.stem)}</span></p>
+    <div class="ox2" role="group" aria-label="${i + 1}번 — O 또는 X">${['O','X'].map(o => `<button type="button" data-dqc="${esc(q.id)}" data-v="${o}" ${g ? 'disabled' : ''} class="${g ? (o === q.answer ? 'ok' : o === pk ? 'bad' : '') : ''}" aria-label="${i + 1}번 ${o}${g && o === pk ? ' · 내 답' : ''}">${o}</button>`).join('')}</div>
+    ${g ? `<div class="fb" tabindex="-1" role="status"><b class="r ${ok ? '' : 'no'}">${ok ? '맞혔어요' : `아쉬워요 · 정답 ${q.answer}`}</b>${q.explain ? rich(q.explain) : ''}${sl ? `<span class="sl">${sl}</span>` : ''}</div>` : ''}</div>`;
+}
+function dqcAnswer(id, v){
+  const q = BANK.find(x => x.id === id); if (!q || !dqc || dqc.pk[id]) return;
+  const ok = v === q.answer; dqc.pk[id] = v; touchDay();
+  S.stats.a++; if (ok) S.stats.c++; statDay(ok); (S.bh ||= {})[q.id] = ok ? 'o' : 'x';
+  dqc.rs[id] = srsMark({ b:q.id }, ok, v, ''); save(S);
+  const row = [...document.querySelectorAll('#dqcBox .qi')].find(r => r.dataset.qi === id); if (!row) return;
+  const i = [...row.parentNode.querySelectorAll('.qi')].indexOf(row); row.outerHTML = dqcRow(q, i);
+  [...document.querySelectorAll('#dqcBox .qi')].find(r => r.dataset.qi === id)?.querySelector('.fb')?.focus({ preventScroll:true });
+}
+/* 문제 은행이 도착하면(또는 받기 실패) 열린 개념 상세의 확인 문제 칸만 새로 — 화면 전체를 다시 그리지 않는다 */
+const dqcFill = () => { const b = document.getElementById('dqcBox'); if (b && view === 'detail' && CONCEPTS[detailIdx]) b.outerHTML = dqcHtml(CONCEPTS[detailIdx]); };
+/* 시각 단서 — 오늘의 복습·문제 은행 풀이에서 그림 없는 문항이면, 배울 때 본 그 개념의 그림을 접어 둔다(눌러 펼침 · 그림은 눌러 크게).
+   개념이 하나로 정해지는 문항만(대단원 마무리·핵심 정리·모의고사 제외), 시험처럼 풀 때는 띄우지 않는다. 2026-10-06 보완안 11 */
+function cueFig(q){
+  if (!q || q.figure || !MORE.ok || (bs && bs.timed) || ['unit','recap','mock'].includes(q.step)) return '';
+  const id = q._qz ? conceptIdOfQ(q) : +q.concept ? `${q.lessonId}-${String(+q.concept).padStart(2, '0')}` : '';
+  const c = id && CONCEPTS.find(x => x.id === id); if (!c || !c.figure || !figOf(c.id)) return '';
+  return `<details class="cuefig"><summary><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="5" width="17" height="14" rx="2.5"/><path d="M3.5 16l5-5 4 4 3-3 5 5"/><circle cx="15.5" cy="9" r="1.4"/></svg>개념 그림 보기 <span>· ${esc(c.title)}</span></summary>
+    <figure class="zoomable" data-zoom="${c.id}" tabindex="0" role="button" aria-label="그림 크게 보기: ${esc(c.figure.caption)}">${figOf(c.id)}<figcaption>${esc(c.figure.caption)} · 누르면 크게</figcaption></figure></details>`;
+}
+/* 개념 상세 전용 클릭·키 — 큰 이벤트 처리기와 따로 둔다 */
+document.addEventListener('click', e => {
+  const T = sel => e.target.closest(sel);
+  const tt = T('.tterm'); if (tt){ if (ttBtn === tt) ttClose(); else ttOpen(tt); return; }
+  if (ttBtn && !T('#ttip')) ttClose();
+  const pre = T('[data-pre]'); if (pre && view === 'detail'){ const c = CONCEPTS[detailIdx], box = document.getElementById('dPre'); preSet(c.id, pre.dataset.pre);
+    if (box){ const h = preHtml(c); if (h){ box.outerHTML = h; document.getElementById('dPre')?.focus({ preventScroll:true }); } else { box.remove(); document.querySelector('#v-detail .steps button')?.focus({ preventScroll:true }); } } return; }
+  if (T('#dMoreBtn') && view === 'detail'){ const c = CONCEPTS[detailIdx], b = document.getElementById('dMoreBtn'), box = document.getElementById('dMore'), on = b.getAttribute('aria-expanded') !== 'true';
+    box.hidden = !on; b.setAttribute('aria-expanded', String(on)); b.innerHTML = dMoreLabel(c, on); dOpenSet(c.id, on); return; }
+  const q = T('[data-dqc]'); if (q && view === 'detail'){ dqcAnswer(q.dataset.dqc, q.dataset.v); return; }
+  if (T('[data-moreretry]')){ MORE.err = false; dqcFill(); loadMore(); return; }
+});
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape' && ttBtn){ e.stopPropagation(); ttClose(true); return; }
+  if ((e.key === 'Enter' || e.key === ' ') && e.target.classList && e.target.classList.contains('tterm')){ e.preventDefault(); e.stopPropagation(); e.target.click(); } }, true);
+window.addEventListener('resize', () => ttPlace());
 
 /* ═══ 오답 노트 ═══ */
 const LEECH_NOTE = '여러 번 갈린 문제입니다. 문제를 또 풀기보다 개념 카드를 먼저 다시 읽어 보세요.';
@@ -3204,6 +3396,7 @@ function renderBankSession(){
   v.innerHTML = `${qclock ? bar.replace('<span>맞힘', qclock + '<span>맞힘') : bar}
     <div class="qhead"><span class="l">${kindTag}${esc(L?L.unit+'-'+L.id.slice(2)+' '+L.name:'')}</span><span class="tag">${TYPE_NAME[q.type]}${q.difficulty ? ` · ${esc(q.difficulty)}` : ''}</span></div>
     ${qBody(q, `data-zoomsvg="${bs.i}"`)}
+    ${cueFig(q)}
     ${graded || q.type === 'essay' ? '' : confRow(bs.conf)}
     ${body}
     ${graded ? '' : `<p class="qhint">${HINT}<br>틀려도 괜찮습니다 — 오답은 <b>내일</b> 다시 나오고, 맞힐수록 간격이 늘어납니다.</p>`}
