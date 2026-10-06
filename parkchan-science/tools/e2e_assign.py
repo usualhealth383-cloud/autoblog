@@ -92,7 +92,8 @@ async def main():
         s4 = await give('bank', D(0), lesson='1102', n='5')          # 마감 지남으로 만들 과제
         lst = await pg.inner_text('#v-admin'); assert '낸 과제 4개' in lst and lst.count('제출 0 / 2명') == 4, lst
         # 학생 고르기 — 다른 반 학생 한 명에게만
-        await pg.click('#asgForm [data-af="kind"][data-val="bank"]'); await pg.select_option('#afCls', '학생 고르기'); await pg.wait_for_timeout(250)
+        await pg.click('#asgForm [data-af="kind"][data-val="bank"]'); await pg.select_option('#afLesson', '1103'); await pg.wait_for_timeout(150)
+        await pg.select_option('#afCls', '학생 고르기'); await pg.wait_for_timeout(250)
         assert await pg.locator('#asgForm [data-apick]').count() >= 3, '학생 고르기 목록이 없음'
         other = 'E2EA03' if SRV else 'TUE456'
         await pg.check(f'#asgForm [data-apick][value="{other}"]'); await pg.wait_for_timeout(200)
@@ -193,7 +194,7 @@ async def main():
         sh = await pg.inner_text('.sheet')
         assert '많이 틀린 문항' in sh and '1명 틀림' in sh and '3/5' in sh and '아직' in sh and '냄' in sh, sh
         assert await pg.locator('.sheet .asgtop .kv').count() == 2, '틀린 문항 2개(학생 1명이 2문항 틀림)'
-        nophone = await pg.locator('.sheet a[href^="sms:"]').count(); assert nophone == 1, '아직 안 낸 학생에게 문자'
+        nophone = await pg.locator('.sheet a[href^="sms:"]').count(); assert nophone == (1 if SRV else 0), '아직 안 낸 학생에게 문자(연락처 있을 때만)'
         await pg.screenshot(path=f'{SC}/a06_report_light.png', full_page=True)
         await pg.click('#sheetClose'); await pg.wait_for_timeout(300)
         await pg.locator('.asgsentrow', has_text=L2).locator('[data-asgrep]').click(); await pg.wait_for_timeout(700)

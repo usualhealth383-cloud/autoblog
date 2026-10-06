@@ -61,7 +61,8 @@ async def approve_child(pg, code, gw='http://127.0.0.1:8767'):
 
 async def audit_extra(pg, look):
     """접근성·대비 점검용 화면 더 보기(학생 로그인 상태에서 부름): 문제 풀기(확신도 칩을 고른 채) · 채점(해설 없는 문항의
-    '이 개념 다시 보기' · 확신했는데 틀림) · 원장 '처리할 것'(출석만 하고 공부 기록 없는 학생 · 안 읽은 공지). 끝나면 원장으로 로그인된 채"""
+    '이 개념 다시 보기' · 확신했는데 틀림) · 원장 '처리할 것'(출석만 하고 공부 기록 없는 학생 · 안 읽은 공지) · 원장 과제·제출 현황 · 학생 과제 카드 ·
+    보호자 이번 주 요약. 끝나면 원장으로 로그인된 채"""
     await pg.evaluate('loadMore()'); await pg.wait_for_function('MORE.ok', timeout=15000)
     if await pg.evaluate("BANK.some(q => q.step === 'mock')"):      # 대단원 마무리 · 실전 모의고사 · 시험처럼(2026-10)
         await pg.evaluate("umPick = 'unit'; show('bank')"); await pg.wait_for_timeout(250); await look('대단원 고르기')
@@ -86,6 +87,16 @@ async def audit_extra(pg, look):
     await pg.evaluate("authMode = 'login'; authErr = ''; show('auth')"); await pg.wait_for_timeout(300)   # 로그아웃 뒤에는 손님 '오늘' 화면이다
     await pg.click('[data-demo^="owner"]'); await pg.click('#lgGo'); await pg.wait_for_timeout(1200)
     await pg.wait_for_selector('#todoBox .todo-row', timeout=8000); await look('원장 처리할 것')
+    # 학원 과제(★4) — 원장 과제 탭 · 제출 현황 · 학생 오늘 카드 · 보호자 이번 주 요약(★5). 끝나면 다시 원장으로
+    await pg.click('[data-adm="asg"]'); await pg.wait_for_selector('#asgForm'); await pg.wait_for_timeout(300); await look('원장 과제')
+    await pg.evaluate("(async () => { const d = asgDraft(); await DBX.assignCreate({ kind:d.kind, title:d.title, ref:d.ref, items:d.items, cls:'월목반', due:addDays(todayISO(), 2) }); await renderAdmin(); })()"); await pg.wait_for_timeout(500)
+    await pg.click('[data-asgrep]'); await pg.wait_for_timeout(500); await look('과제 제출 현황'); await pg.click('#sheetClose'); await pg.wait_for_timeout(200)
+    for who in ('student', 'parent', 'owner'):
+        await pg.click('.tab[data-v="me"]'); await pg.wait_for_timeout(300); await pg.click('#logout'); await pg.wait_for_timeout(600)
+        await pg.evaluate("authMode = 'login'; authErr = ''; show('auth')"); await pg.wait_for_timeout(300)
+        await pg.click(f'[data-demo^="{who}"]'); await pg.click('#lgGo'); await pg.wait_for_timeout(1200)
+        if who == 'student': await pg.wait_for_selector('.asgcard', timeout=8000); await look('학원 과제 카드')
+        if who == 'parent': await pg.wait_for_selector('#weekSum', timeout=8000); await look('보호자 이번 주 요약')
 
 
 async def member(pg, days=30, gw='http://127.0.0.1:8767', aged=False, trust=True):

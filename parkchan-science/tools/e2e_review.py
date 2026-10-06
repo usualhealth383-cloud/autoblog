@@ -234,7 +234,7 @@ async def main():
         await s.click('#goLogin'); await s.fill('#lgEmail', 'parent@demo.kr'); await s.fill('#lgPw', '1234'); await s.click('#lgGo'); await s.wait_for_timeout(1200)
         if await s.evaluate('view') != 'parent': await s.evaluate("show('parent')"); await s.wait_for_timeout(800)
         pw = await s.locator('.pweek').inner_text()
-        assert '이번 주 리듬' in pw and '3/7일' in pw.replace('\n', ''), pw
+        assert '이번 주 요약' in pw and '공부한 날' in pw and '3/7일' in pw.replace('\n', ''), pw
         assert not STREAK.search(await visible_text(s)), '보호자 화면에 연속 일수'
         assert await s.locator('.pweek .week .d.later').count() == 3, '보호자 주간 띠가 이번 주(월–일)가 아님'
         await s.screenshot(path=f'{SC}/r08_parent_week.png', full_page=True)

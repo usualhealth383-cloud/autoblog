@@ -152,13 +152,14 @@ p.leech{font-size:12.5px;color:var(--muted);line-height:1.6;margin:-4px 0 8px}
 .notice{display:flex;gap:10px;background:#FBEFE7;border:1px solid #F0D9C7;
   border-radius:13px;padding:11px 13px;margin-bottom:13px;align-items:flex-start}
 @media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) .notice{background:#2A1D16;border-color:#412A1E} } :root[data-theme="dark"] .notice{background:#2A1D16;border-color:#412A1E}   /* 어두운 화면에서만(밝은 화면에 새던 것 — 2026-10-01) */
-.notice .ic{width:21px;height:21px;border-radius:50%;background:#C1521E;flex:0 0 auto;
+.notice .ic{width:21px;height:21px;border-radius:50%;background:#A64516;flex:0 0 auto;
   display:grid;place-items:center;margin-top:1px;color:var(--on-color);font-size:12px;font-weight:900}
 .notice .b{flex:1;min-width:0}
-.notice .t{font-size:12.5px;font-weight:800;color:#C1521E;line-height:1.45}
+.notice .t{font-size:12.5px;font-weight:800;color:#A64516;line-height:1.45}   /* 대비 AA(2026-10-06 — #C1521E 는 4.1)*/
 @media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) .notice .t{color:#E4885A} } :root[data-theme="dark"] .notice .t{color:#E4885A}   /* 어두운 화면에서만(밝은 화면에 새던 것 — 2026-10-01) */
 .notice .d{font-size:11.5px;color:var(--body);line-height:1.5;margin-top:2px}
-.notice button{font-size:11px;font-weight:800;color:#C1521E;border:1px solid #F0D9C7;
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) .notice .ic{background:#E4885A} :root:not([data-theme="light"]) .notice button{color:#E4885A;border-color:#412A1E} } :root[data-theme="dark"] .notice .ic{background:#E4885A} :root[data-theme="dark"] .notice button{color:#E4885A;border-color:#412A1E}
+.notice button{font-size:11px;font-weight:800;color:#A64516;border:1px solid #F0D9C7;
   background:var(--card);border-radius:8px;padding:6px 11px;flex:0 0 auto;align-self:center;cursor:pointer}
 
 /* 개념 카드 */
@@ -2362,7 +2363,7 @@ function openQuoteKeep(){
    S.aq[과제 id] = { i 푼 수, r 맞힌 수, w 틀린 문항 id, s 걸린 초, sub 다 풀어 낼 차례, ok 서버에 낸 시각, late 늦은 제출, wait 'net'·'consent' } — 진도 스냅숏에는 넣지 않는다(서버 제출이 원본)
    걸린 시간은 문항 사이 간격을 더하되 한 번에 10분까지만(앱을 켜 둔 채 자리를 비운 시간이 들어가지 않게) */
 let ASG = [], asgRead = null, asgBusy = false;
-const ASG_KIND = { bank:'문제', unit:'대단원 마무리', mock:'모의고사', read:'개념 읽기' };
+const ASG_KIND = { bank:'소단원 문제', unit:'대단원 마무리', mock:'모의고사', read:'개념 읽기' };
 const ASG_GAP = 600;
 const aqOf = id => { S.aq ||= {}; return S.aq[id] ||= { i:0, r:0, w:[], s:0 }; };
 const asgDueText = due => { const n = dLeft(due); return n < 0 ? '마감 지남' : n === 0 ? '오늘 마감' : `마감 D-${n}`; };
@@ -3361,7 +3362,7 @@ function renderMockResult(v){
       <p class="sub">${mockOf(mx.b).t} 실전 모의고사 · ${n}문항 중 ${right}문항을 맞혔습니다${mx.timer || mins ? ` · ${Math.max(1, mins)}분` : ''}</p>
       ${hist ? `<p class="sub">지난번 ${fmtPt(hist.s)}점 (${esc(kdate(hist.d))})</p>` : ''}</div>
     ${mx.res.auto ? `<p class="again" role="status">${MOCK_MIN}분이 지나 그때까지 고른 답으로 제출했습니다.</p>` : ''}
-    ${mx.asg ? `<p class="again asgsent" id="asgSent" role="status">학원 과제 · ${esc(asgSentText(aqOf(mx.asg)))}</p>` : ''}
+    ${mx.asg ? `<p class="again asgsent" role="status"><span>학원 과제 · <span id="asgSent">${esc(asgSentText(aqOf(mx.asg)))}</span></span></p>` : ''}
     ${wrongs.length ? `<p class="again">틀린 ${wrongs.length}문항은 오답 노트에 담겨 내일부터 간격을 두고 다시 나옵니다.</p>` : ''}
     ${rxHtml(wrongs, q => +q.points || 0)}
     <div class="sec"><h2>문항별 해설</h2><div class="mxlist">${mx.items.map((q, i) => `<button class="mxr ${ok[i] ? 'o' : 'x'}" data-mxr="${i}"><span class="n">${i + 1}</span><span class="b">${ok[i] ? '맞음' : mx.picks[i] ? `내 답 ${MARKS[mx.picks[i] - 1]} · 정답 ${MARKS[q.answer - 1]}` : `답 안 함 · 정답 ${MARKS[q.answer - 1]}`}</span><span class="p">${fmtPt(q.points)}점</span><span class="mk" aria-hidden="true">${ok[i] ? '○' : '✕'}</span></button>`).join('')}</div></div>
@@ -3928,7 +3929,7 @@ function asgRedraw(focusId){ const el = document.getElementById('asgForm'); if (
 function asgListHtml(list){
   if (!list.length) return `<div class="empty" style="padding:30px"><p>아직 낸 과제가 없습니다.</p></div>`;
   return list.map(a => { const over = dLeft(a.due) < 0;
-    return `<div class="sent asgsentrow"><div class="t">${esc(a.title)}</div><div class="d">${esc(a.cls || `학생 ${a.target}명`)} · ${esc(ASG_KIND[a.kind] || '')} ${a.n}${a.kind === 'read' ? '개' : '문항'} · 마감 ${esc(kdate(a.due))} · ${esc(asgDueText(a.due))}</div>
+    return `<div class="sent asgsentrow"><div class="t">${esc(a.title)}</div><div class="d">${esc(a.cls || `학생 ${a.target}명`)} · ${esc(ASG_KIND[a.kind] || '')} ${a.n}${a.kind === 'read' ? '개' : '문항'} · ${esc(kdate(a.due))}까지 · ${esc(asgDueText(a.due))}</div>
       <div class="r"><span>제출 <b>${a.submitted}</b> / ${a.target}명${a.rate != null ? ` · 정답률 <b>${a.rate}%</b>` : ''}${a.late ? ` · 늦은 제출 ${a.late}` : ''}${over && a.missing.length ? ` · <em class="miss">아직 ${a.missing.length}명</em>` : ''}</span><button class="mini" data-asgrep="${esc(a.id)}">제출 현황</button></div></div>`; }).join(''); }
 const mmss = n => { n = Math.round(+n || 0); return n >= 60 ? `${Math.floor(n / 60)}분${n % 60 ? ` ${n % 60}초` : ''}` : `${n}초`; };
 async function openAsgReport(id){
@@ -4341,7 +4342,7 @@ function show(v){
   VIEWS.forEach(k => document.getElementById('v-'+k).classList.toggle('hide', k!==v));
   guardScreen(v);
   document.getElementById('tabs').classList.toggle('hide', v==='auth');
-  const tabOf = {quiz: qState&&qState.mode==='review'?'me':'today', bank: bs&&(bs.kind==='review'||bs.kind==='asg')||mx&&mx.asg?'today':'bank', detail:'list', plans:'me', wrong:'bank', lab:'bank', stats:'me', post:'talk', note:noteTab(), noted:noteTab()}[v] || v;
+  const tabOf = {quiz: qState&&qState.mode==='review'?'me':'today', bank: bs&&(bs.kind==='review'||bs.kind==='asg')||mx&&mx.asg?'today':'bank', detail: detailBack==='today'?'today':'list', plans:'me', wrong:'bank', lab:'bank', stats:'me', post:'talk', note:noteTab(), noted:noteTab()}[v] || v;
   renderTabs(); document.querySelectorAll('.tab').forEach(t => { t.classList.toggle('on', t.dataset.v===tabOf); if (t.dataset.v===tabOf) t.setAttribute('aria-current', 'page'); else t.removeAttribute('aria-current'); });
   const el = document.getElementById('v-'+v); el.classList.remove('vin'); void el.offsetWidth; el.classList.add('vin');
   const r = ({auth:renderAuth, today:renderToday, quiz:renderQuiz, list:renderList, detail:renderDetail, wrong:renderWrong, stats:renderStats, me:renderMe, plans:renderPlans, parent:renderParent, admin:renderAdmin, bank:renderBank, lab:renderLab, plan:renderPlan, talk:renderTalk, post:renderPost, note:renderNote, noted:renderNoted})[v]();

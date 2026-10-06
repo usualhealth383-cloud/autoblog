@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """형제·자매 E2E — 보호자 한 계정에 자녀 둘을 잇고, 이름을 눌러 바꿔 보고, 한 명만 연결 해제한다.
++ 보호자 '이번 주 요약'(벤치마크 ★5) — 공부한 날·개념·문제·정답률 4주·과제·다시 볼 소단원 2 · 확인 전 보호자는 못 봄 · 비교·순위 말 없음
 
 전제: docs/parkchan 이 :8765 에 떠 있다. --server 면 tools/testbed_up.sh 시험대(:8767)에 붙는다.
 사용: python3 tools/e2e_family.py [--server] [--shots 폴더]
@@ -53,9 +54,9 @@ async def main():
         await pg.screenshot(path=f'{SC}/f01_two_kids.png', full_page=True)
         await pg.click(f'[data-kid="{codes[0]}"]'); await pg.wait_for_timeout(900)
         body = await pg.locator('#v-parent').inner_text(); assert '형학생 학생' in body and '아직 출석 전' in body, body[:200]
-        # 이번 주 한눈에: 최근 7일 띠 · 세 가지 수 · 노트는 보이지 않음
-        assert await pg.locator('.pweek .week .d').count() == 7 and await pg.locator('.pweek .pstat > div').count() == 3, '이번 주 한눈에가 없음'
-        assert '이번 주 리듬' in await pg.locator('.pweek').inner_text() and '연속' not in await pg.locator('.pweek').inner_text() and '공부 노트' not in (t := await pg.locator('.pweek').inner_text()) and '메모' not in t
+        # 이번 주 요약: 최근 7일 띠 · 세 가지 수 · 노트는 보이지 않음
+        assert await pg.locator('.pweek .week .d').count() == 7 and await pg.locator('.pweek .pstat > div').count() == 3, '이번 주 요약이 없음'
+        assert '공부한 날' in await pg.locator('.pweek').inner_text() and '연속' not in await pg.locator('.pweek').inner_text() and '공부 노트' not in (t := await pg.locator('.pweek').inner_text()) and '메모' not in t
         await pg.click('.tab[data-v="me"]'); await pg.wait_for_timeout(300); assert '2명' in await pg.locator('#v-me').inner_text()
         # 보호자 일정 화면에 동생 반 일정이 이름과 함께
         await pg.evaluate("planDay = '2099-10-15'"); await pg.click('.tab[data-v="plan"]'); await pg.wait_for_timeout(900)
@@ -126,4 +127,66 @@ async def guardian_talk():
         assert not errs, errs
         print(('SERVER ' if SRV else 'LOCAL ') + 'GUARDIAN TALK E2E OK'); await b.close()
 
-asyncio.run(main()); asyncio.run(guardian_talk())
+async def weekly():
+    """보호자 '이번 주 요약'(★5) — 자녀 진도(dq·dc·wrong)와 과제 제출로 계산. 확인 전 보호자에게는 열리지 않는다."""
+    import datetime as dt
+    from zoneinfo import ZoneInfo
+    T = dt.datetime.now(ZoneInfo('Asia/Seoul')).date(); mon = T - dt.timedelta(days=T.isoweekday() - 1); D = lambda n: (mon + dt.timedelta(days=n)).isoformat()
+    days = sorted({mon.isoformat(), T.isoformat()})
+    prog = {'days': [D(-9)] + days, 'done': ['x'], 'dq': {D(0): [10, 7], D(-7): [10, 6], D(-14): [5, 4]}, 'dc': {D(0): 3, D(-7): 5},
+            'wrong': [{'l': '1102', 'n': i, 'iso': D(-3), 'a': D(-3), 'd': D(1), 'x': 1, 'k': 1} for i in (1, 2, 3)] + [{'l': '1101', 'n': 1, 'iso': D(-3), 'a': D(-3), 'd': D(2), 'x': 1, 'k': 1},
+                      {'l': '1103', 'n': 1, 'iso': D(-3), 'a': D(-3), 'd': D(2), 'x': 1, 'k': 1, 'cleared': True}], 'stats': {'a': 25, 'c': 17}}
+    if SRV:
+        U.urlopen(U.Request(GW + '/__reset', method='POST')).read()
+        keys = json.loads(U.urlopen(GW + '/__anon').read())
+        def rest(path, body, method='POST', tok=None, prefer='return=minimal'):
+            h = {'Content-Type': 'application/json', 'apikey': keys['anon'], 'Authorization': 'Bearer ' + (tok or keys['service']), 'Prefer': prefer}
+            r = U.urlopen(U.Request(GW + path, data=json.dumps(body).encode(), headers=h, method=method)).read(); return json.loads(r) if r else None
+        rest('/rest/v1/students', [{'code': 'WEEK01', 'name': '요약학생', 'cls': '월목반', 'until': '2099-02-28'}])
+        rest('/rest/v1/progress', {'code': 'WEEK01', 'state': prog})
+        own = json.loads(U.urlopen(U.Request(GW + '/auth/v1/token?grant_type=password', data=json.dumps({'email': 'owner@parkchan.kr', 'password': 'owner-pass'}).encode(), headers={'Content-Type': 'application/json', 'apikey': keys['anon']}, method='POST')).read())['access_token']
+        aid = rest('/rest/v1/rpc/assign_create', {'p_kind': 'bank', 'p_title': '이번 주 과제', 'p_ref': '1101', 'p_items': ['1101-q1', '1101-q2'], 'p_cls': '월목반', 'p_codes': None, 'p_due': D(6)}, tok=own)['id']
+        import psycopg2; c = psycopg2.connect('host=127.0.0.1 port=54329 user=postgres dbname=pcs'); c.autocommit = True
+        c.cursor().execute("insert into submissions(aid, code, done, right_n, secs, submitted_at) values (%s, 'WEEK01', 2, 2, 40, now())", (aid,)); c.close()
+        code = 'WEEK01'
+    async with async_playwright() as p:
+        b = await p.chromium.launch(executable_path='/opt/pw-browsers/chromium'); errs = []
+        shots = []
+        for color in ('light', 'dark'):
+            ctx = await b.new_context(viewport={'width': 400, 'height': 1600}, color_scheme=color); await ctx.add_init_script(NO_INTRO); pg = await ctx.new_page()
+            pg.on('pageerror', lambda e: errs.append(str(e)))
+            pg.on('console', lambda m: errs.append(m.text) if m.type == 'error' and 'ERR_' not in m.text and 'status of 4' not in m.text else None)
+            await auto_yes(pg); await pg.goto(APP); await pg.wait_for_timeout(700)
+            if not SRV:
+                code = 'DEMO01'
+                await pg.evaluate("""([prog, due]) => { if (!localStorage.getItem('pcs.db.v2')) DBX.removeClass('__없음__'); const d = JSON.parse(localStorage.getItem('pcs.db.v2'));
+                  d.progress.DEMO01 = { ...prog, at:new Date().toISOString() };
+                  d.asg = [{ id:'a-week', kind:'bank', title:'이번 주 과제', ref:'1101', items:['1101-q1','1101-q2'], cls:'월목반', codes:['DEMO01','MON123'], due, at:new Date().toISOString() }];
+                  d.subs = [{ aid:'a-week', code:'DEMO01', done:2, right:2, secs:40, wrong:[], submitted_at:new Date().toISOString(), late:false }];
+                  localStorage.setItem('pcs.db.v2', JSON.stringify(d)); }""", [prog, D(6)])
+                await pg.reload(); await pg.wait_for_timeout(700)
+                await pg.click('#goLogin'); await pg.fill('#lgEmail', 'parent@demo.kr'); await pg.fill('#lgPw', '1234'); await pg.click('#lgGo'); await pg.wait_for_timeout(1300)
+            elif color == 'light':
+                # 확인 전 보호자: 요약이 열리지 않는다
+                await signup(pg, '요약보호자', 'wk-mom@t.kr', role='parent', child=code)
+                assert '원장님 확인을 기다리고' in await pg.inner_text('#v-parent') and await pg.locator('#weekSum').count() == 0, '확인 전인데 요약이 보임'
+                n = await pg.evaluate("DBX.childAssignments('WEEK01').then(r => r.ok)"); assert n is False, '확인 전 보호자가 과제를 받음'
+                await approve_child(pg, code)
+            else:
+                await pg.click('#goLogin'); await pg.fill('#lgEmail', 'wk-mom@t.kr'); await pg.fill('#lgPw', 'pass1234'); await pg.click('#lgGo'); await pg.wait_for_timeout(1300)
+            assert await pg.evaluate('view') == 'parent', await pg.evaluate('view')
+            await pg.wait_for_selector('#weekSum')
+            w = await pg.inner_text('#weekSum')
+            assert '이번 주 요약' in w and f'{len(days)}/7일' in w.replace('\n', '') and '3개' in w and '10문제' in w.replace('\n', ''), w
+            lab = await pg.get_attribute('#weekSum .tbars', 'aria-label')
+            assert '이번 주 70%' in lab and '60%' in lab and '80%' in lab and '푼 문제 없음' in lab and await pg.locator('#weekSum .tb').count() == 4, lab
+            assert '1개 중 1개 냈어요' in w and '이번 주 과제' in w, w
+            ag = await pg.locator('#weekSum .wl').all_inner_texts()
+            assert len(ag) == 2 and 'I-02' in ag[0] and '다시 볼 문제 3' in ag[0] and 'I-01' in ag[1], ag
+            assert all(x not in w for x in ('연속', '순위', '평균', '등수', '반에서')) and '견주지 않고' in w, w
+            await pg.wait_for_timeout(2500); await pg.locator('#weekSum').screenshot(path=f'{SC}/w01_week_{color}.png'); shots.append(color)
+            await ctx.close()
+        assert not errs, errs
+        print(('SERVER ' if SRV else 'LOCAL ') + 'WEEKLY SUMMARY E2E OK', shots); await b.close()
+
+asyncio.run(main()); asyncio.run(guardian_talk()); asyncio.run(weekly())

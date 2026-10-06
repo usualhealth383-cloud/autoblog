@@ -43,6 +43,7 @@
 3. Firebase → 프로젝트 설정 → 서비스 계정 → **새 비공개 키** → Supabase Secrets `FIREBASE_SA_JSON` 에 넣고, `PUSH_SECRET`(아무 긴 문자열) · `ACADEMY`=`박찬 과학`.
 4. 배포: `npx supabase functions deploy push --no-verify-jwt --project-ref <REF>` (DB 가 부르므로 로그인 토큰 검사를 끄고, 대신 `x-push-secret` 으로 막습니다).
 5. `functions.sql` 의 ① 부분(푸시)을 값 바꿔 실행.
+   ①-3(보호자 주간 요약)도 함께 — 매주 일요일 19:00(KST)에 원장이 확인한 보호자에게 자녀마다 '이번 주' 한 줄(공부한 날·푼 문제·과제 제출)을 보냅니다. 밤 22~07시에 불리면 보내지 않습니다. 확인: `select jobname, schedule from cron.job;` 에 `pcs-push-weekly`.
 
 알림은 학원과 연결된 사람(학원 코드를 등록한 학생 · 자녀를 연결한 보호자 · 원장)에게만, 연결하는 순간 한 번 묻습니다. 로그아웃하면 그 폰의 알림 등록을 지웁니다.
 
