@@ -39,5 +39,65 @@ for k in ('bank', 'labs'):
 # '<보기>' 같은 글자가 태그로 오인돼 지워진 흔적
 for it in data['bank']:
     if it['type'] == 'multi' and re.search(r'옳은 것만을\s+에서', it['stem']): bad.append(f'bank {it["id"]}: "<보기>" 가 지워진 듯함')
+# 개념 덧붙임(data/concept_extras.json — 손으로 만든 원본, 추출기가 덮어쓰지 않음): '왜?' 정교화 질문 + 계산형 예제 → 따라 풀기
+# · 키 = 실제 개념 id · why 는 개념마다 1개(q·a·src) · a 는 그 개념의 src 문단/용어 글과 겹쳐야 한다(새 사실 금지)
+# · example 과 follow 는 짝으로 · 첨자는 <sup>·<sub> 태그로(유니코드 첨자·'H2O'·'10−6' 흔적 금지)
+_ex_p = ROOT / 'data' / 'concept_extras.json'
+if not _ex_p.exists(): bad.append('data/concept_extras.json 이 없음')
+else:
+    extras = json.loads(_ex_p.read_text(encoding='utf-8')); cmap = {c['id']: c for c in data['concepts']}
+    _plain = lambda s: re.sub(r'<[^>]+>', '', s)
+    _sub = str.maketrans('⁰¹²³⁴⁵⁶⁷⁸⁹⁺⁻₀₁₂₃₄₅₆₇₈₉₊₋', '0123456789+−0123456789+−')
+    _norm = lambda s: re.sub(r'[\s·,.\'"‘’“”()\-—–~:;!?/]', '', _plain(s).translate(_sub))
+    def _src(c, src):
+        out = []
+        for p in src.split('+'):
+            m = re.fullmatch(r'(body|steps|terms)\[(\d+)\]|point', p.strip())
+            if not m: return None
+            if p.strip() == 'point': t = c['point']
+            else:
+                arr = c[m[1]]; i = int(m[2])
+                if i >= len(arr): return None
+                t = arr[i]['d'] if m[1] == 'steps' else (arr[i]['k'] + ' ' + arr[i]['v'] if m[1] == 'terms' else arr[i])
+            for k, v in c['blanks'].items(): t = t.replace('{{%s}}' % k, v)
+            out.append(t)
+        return ' '.join(out)
+    def _strs(x):
+        if isinstance(x, str): yield x
+        elif isinstance(x, list):
+            for y in x: yield from _strs(y)
+        elif isinstance(x, dict):
+            for y in x.values(): yield from _strs(y)
+    n_why = n_ex = 0
+    for cid, x in extras.items():
+        if cid not in cmap: bad.append(f'extras {cid}: 없는 개념 id'); continue
+        w = x.get('why') or {}
+        if not all(isinstance(w.get(k), str) and w[k].strip() for k in ('q', 'a', 'src')): bad.append(f'extras {cid}: why 의 q·a·src 가 비어 있음')
+        else:
+            n_why += 1
+            if not re.search(r'(왜|어떻게)[^?]*\?$', w['q']): bad.append(f'extras {cid}: why.q 가 "왜/어떻게 …?" 꼴이 아님')
+            if not 20 <= len(_plain(w['a'])) <= 60: bad.append(f'extras {cid}: why.a 길이 {len(_plain(w["a"]))}자(20~60)')
+            st = _src(cmap[cid], w['src'])
+            if st is None: bad.append(f'extras {cid}: why.src "{w["src"]}" 를 찾을 수 없음(body[i]·steps[i]·terms[i]·point, + 로 잇기)')
+            else:
+                a = re.sub(r'(이)?기때문이다|때문이다|기때문', '', _norm(w['a'])); s = _norm(st)
+                bg = [a[i:i + 2] for i in range(len(a) - 1)]
+                cov = sum(b in s for b in bg) / max(1, len(bg))
+                if cov < 0.7: bad.append(f'extras {cid}: why.a 가 근거({w["src"]}) 글과 {cov:.0%}만 겹침 — 본문 문장으로 답한다')
+        ex, fo = x.get('example'), x.get('follow')
+        if bool(ex) != bool(fo): bad.append(f'extras {cid}: example 과 follow 는 짝으로 둔다')
+        if ex:
+            n_ex += 1
+            if not (isinstance(ex.get('title'), str) and ex['title'].strip() and isinstance(ex.get('answer'), str) and ex['answer'].strip()): bad.append(f'extras {cid}: example.title·answer 가 비어 있음')
+            if not (isinstance(ex.get('steps'), list) and 2 <= len(ex['steps']) <= 4 and all(isinstance(s, str) and s.strip() for s in ex['steps'])): bad.append(f'extras {cid}: example.steps 는 2~4줄')
+        if fo and not all(isinstance(fo.get(k), str) and fo[k].strip() for k in ('q', 'answer', 'explain')): bad.append(f'extras {cid}: follow 의 q·answer·explain 이 비어 있음')
+        for t in _strs(x):
+            if t.count('<sup>') != t.count('</sup>') or t.count('<sub>') != t.count('</sub>'): bad.append(f'extras {cid}: 첨자 태그 짝이 안 맞음 · {t[:40]}')
+            if re.search('[' + UNI + ']', t): bad.append(f'extras {cid}: 유니코드 첨자 대신 <sup>·<sub> 를 쓴다 · {t[:40]}')
+            bare = re.sub(r'<(su[pb])>.*?</\1>', '', t)
+            if re.search(r'(?<![\d.])10\s?[−-]\d', bare) or re.search(r'(?<![A-Za-z0-9])(?:[A-Z][a-z]?)+\d+(?![\d.,:])', _plain(bare)): bad.append(f'extras {cid}: 첨자가 사라진 듯함 · {_plain(bare)[:50]}')
+            if re.search(r'\d(?:%|℃|J|N|kg|K|W)(?![A-Za-z])', _plain(t)): bad.append(f'extras {cid}: 숫자와 단위 사이 빈칸(교재처럼 "5 %"·"100 J") · {_plain(t)[:40]}')
+    if n_why != len(cmap): bad.append(f'extras: why 가 {n_why}개 — 개념 {len(cmap)}개 모두에 하나씩')
+    print(f'개념 덧붙임 why {n_why}개 · 예제→따라 풀기 {n_ex}개')
 for b in bad[:30]: print('✗', b)
 print('교재 데이터 점검', '통과' if not bad else f'실패 {len(bad)}건'); sys.exit(1 if bad else 0)
