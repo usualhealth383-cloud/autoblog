@@ -4790,7 +4790,7 @@ function sideFreqHtml(d){
     return SIDE_TIP[i][1]; };   /* 먹는 약의 발진에 「그 자리는 쉬게」는 맞지 않다(2026-10-04) */
   return `<h2 style="margin-top:20px">부작용 — 설명서에 적힌 빈도</h2>
   <div class="sf">${sf.tiers.map((t, i) => `<div class="sf-t ${i === 0 ? 'sf-first' : ''}"><div class="sf-h"><b>${esc(t.w)}</b><span>${t.n ? esc(t.n) : /임상시험|조사/.test(t.w) ? '설명서의 시험 결과' : '설명서에 숫자 없이'}</span></div>
-    <ul class="plain">${(() => { const seen = new Set(); return t.items.map(x => { let tip = /드물게|0\.1%/.test(t.w) ? '' : tipOf(x); if (tip && seen.has(tip)) tip = ''; else if (tip) seen.add(tip); return `<li>${fmt(x)}${tip ? `<small class="sf-tip">→ ${esc(tip)}</small>` : ''}</li>`; }).join(''); })()}</ul></div>`).join('')}</div>
+    <ul class="plain">${(() => { const seen = new Set(); return t.items.map(x => { let tip = /드물게|드묾|0\.1%/.test(t.w) ? '' : tipOf(x); if (tip && seen.has(tip)) tip = ''; else if (tip) seen.add(tip); return `<li>${fmt(x)}${tip ? `<small class="sf-tip">→ ${esc(tip)}</small>` : ''}</li>`; }).join(''); })()}</ul></div>`).join('')}</div>
   <p class="small muted" style="margin-top:6px">대표 제품의 설명서에서 몸으로 느낄 수 있는 것만 골랐어요(검사 수치는 뺐어요). 「때때로·드물게」에 숫자가 없는 것은 설명서가 그렇게 적고 있어서예요.</p>`;
 }
 /* 아이 용량 계산기가 있는 약 — 어른 용량 아래에 「어린이는 몸무게로」 띠(NHS 약 화면 맨 위 안내, 2026-10-06) */
