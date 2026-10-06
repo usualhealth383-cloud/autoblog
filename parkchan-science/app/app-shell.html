@@ -34,6 +34,8 @@
   --ok:#147D6F; --ok-soft:#E7F5F1; --ok-dark:#0F6357;
   /* 그림 받침 — 그림 SVG 는 진한 글자를 투명 바탕에 얹는다. 어두운 화면에서는 밝은 종이를 깔아 글자가 보이게 */
   --figplate:transparent;
+  /* 그림 읽는 법 번호(금빛) — 글자 · 바탕 · 테두리 */
+  --hzk:#8A6200; --hzs:#FFF6DC; --hzl:#E2C77E;
   --shadow:0 4px 20px rgba(30,42,46,.07);
   /* 웹폰트가 늦거나 막혀도 한글이 바탕체로 떨어지지 않도록 기기 고딕을 명시한다 */
   /* 화면 가장자리 안전 영역 — Android 15·16(API 35·36)은 앱을 상태바·제스처 막대 밑까지 그린다(끌 수 없음).
@@ -63,7 +65,7 @@
     --brand:#4FBFAC; --brand-soft:#122724; --brand-line:#1D3D38; --brand-dark:#7FD6C6;
     --on-color:#0B1614; color-scheme:dark;
     --no:#E4776A; --no-soft:#2C1A18; --warn:#D9A73C; --warn-soft:#2A2314;
-    --ok:#4FBFAC; --ok-soft:#122724; --ok-dark:#7FD6C6; --figplate:#E4E0D8;
+    --ok:#4FBFAC; --ok-soft:#122724; --ok-dark:#7FD6C6; --figplate:#E4E0D8; --hzk:#E2B85A; --hzs:#2C2614; --hzl:#5A4A22;
     --shadow:0 4px 20px rgba(0,0,0,.45);
   }
   :root:not([data-theme="light"])[data-unit="I"]{ --u:#E4885A; --u-soft:#2A1D16; --u-line:#412A1E; --u-dark:#F0A275; }
@@ -78,7 +80,7 @@
   --brand:#4FBFAC; --brand-soft:#122724; --brand-line:#1D3D38; --brand-dark:#7FD6C6;
   --on-color:#0B1614; color-scheme:dark;
   --no:#E4776A; --no-soft:#2C1A18; --warn:#D9A73C; --warn-soft:#2A2314;
-  --ok:#4FBFAC; --ok-soft:#122724; --ok-dark:#7FD6C6; --figplate:#E4E0D8;
+  --ok:#4FBFAC; --ok-soft:#122724; --ok-dark:#7FD6C6; --figplate:#E4E0D8; --hzk:#E2B85A; --hzs:#2C2614; --hzl:#5A4A22;
   --shadow:0 4px 20px rgba(0,0,0,.45);
 }
 :root[data-theme="dark"][data-unit="I"]{ --u:#E4885A; --u-soft:#2A1D16; --u-line:#412A1E; --u-dark:#F0A275; }
@@ -790,11 +792,10 @@ select.sel{font-family:inherit;font-size:var(--t-small);font-weight:700;color:va
 .auth label.agree input{width:24px;height:24px;flex:0 0 auto;margin:0;accent-color:var(--brand);cursor:pointer}
 .auth label.agree u{cursor:pointer;color:var(--brand)}
 .auth .fine{padding-top:10px}
-.auth .hero{width:100%;height:auto;display:block;margin:0 0 18px;border-radius:var(--r-l)}
-.auth .facts{display:flex;gap:7px;margin:0 0 18px}
-.auth .facts div{flex:1;background:var(--card);border:1px solid var(--hair);border-radius:var(--r-m);padding:10px 6px;text-align:center}
-.auth .facts b{display:block;font-size:var(--t-h2);font-weight:900;color:var(--brand);letter-spacing:-.02em;font-variant-numeric:tabular-nums}
-.auth .facts span{display:block;font-size:var(--t-tab);color:var(--muted);font-weight:700;margin-top:1px}
+.auth .facts{font-size:14px;color:var(--muted);margin:0 0 22px;font-variant-numeric:tabular-nums;word-break:keep-all}
+.auth.start .art{height:clamp(170px,28vh,250px);display:flex;align-items:center;justify-content:center;background:var(--brand-soft);border-radius:var(--r-l);overflow:hidden;margin:2px 0 22px}
+.auth.start .art svg{height:100%;width:auto;display:block}
+.auth.start .lead{margin-bottom:6px}
 .auth .lab{display:block;font-size:var(--t-cap);font-weight:700;color:var(--muted);margin:0 0 5px 2px}
 .auth .lab.grp{margin:2px 0 7px 2px;color:var(--faint);font-weight:700}
 .auth .fld{margin-bottom:11px}
@@ -837,10 +838,12 @@ select.sel{font-family:inherit;font-size:var(--t-small);font-weight:700;color:va
 .rules .ok{color:var(--brand-dark)}
 .intro{min-height:calc(100vh - 4px);display:flex;flex-direction:column;padding:12px 6px calc(20px + var(--sab))}
 .intro .skip{align-self:flex-end;background:none;border:0;color:var(--muted);font-size:var(--t-small);font-weight:700;min-height:44px;padding:0 6px;cursor:pointer}
-.intro .art{flex:1;display:flex;align-items:center;justify-content:center;min-height:220px}
-.intro .art svg{width:100%;max-width:340px;height:auto}
-.intro h1{font-size:var(--t-hero);line-height:1.35;margin:10px 0 8px}
-.intro p{font-size:var(--t-body);line-height:1.8;color:var(--body);margin:0 0 22px;word-break:keep-all}
+/* 그림 판은 화면 높이의 46% — 세 장 같은 높이, 제목 바로 위(빈 공간은 글 아래로) */
+.intro .art{flex:0 0 auto;height:clamp(240px,46vh,420px);display:flex;align-items:center;justify-content:center;background:var(--brand-soft);border-radius:var(--r-l);overflow:hidden;margin:2px 0 22px}
+.intro .art svg{width:100%;height:100%;max-width:400px;display:block}
+.intro h1{font-size:var(--t-hero);line-height:1.35;margin:0 0 8px;word-break:keep-all}
+.intro p{font-size:var(--t-body);line-height:1.75;color:var(--body);margin:0;word-break:keep-all}
+.intro .sp{flex:1;min-height:20px}
 .intro .dots{display:flex;gap:7px;justify-content:center;margin:0 0 16px}
 .intro .dots i{width:7px;height:7px;border-radius:var(--r-pill);background:var(--line);transition:all .25s}
 .intro .dots i.on{width:22px;background:var(--brand)}
@@ -993,6 +996,26 @@ figure.zoomable{cursor:zoom-in}
 .fv .stage{flex:1;overflow:hidden;touch-action:none;position:relative;display:grid;place-items:center;background:var(--card)}
 .fv .stage svg{max-width:100%;height:auto;transform-origin:0 0;user-select:none}
 .fv .cap{padding:10px 16px max(14px,var(--sab));font-size:var(--t-cap);color:var(--muted);line-height:1.6;border-top:1px solid var(--hair)}
+.fv .cap.hz{color:var(--body);font-size:var(--t-small)}
+.fvhz{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:6px}
+.fvhz button{min-width:36px;min-height:36px;border-radius:var(--r-pill);border:1.5px solid var(--line);background:var(--card);color:var(--body);font-family:inherit;font-size:var(--t-small);font-weight:700;cursor:pointer}
+.fvhz button[aria-pressed="true"]{border-color:var(--hzk);background:var(--hzs);color:var(--hzk)}
+.fvt{line-height:1.65;word-break:keep-all;max-height:30vh;overflow:auto}
+.fvt b{color:var(--ink)}
+.fvmark{position:absolute;width:56px;height:56px;margin:-28px 0 0 -28px;border-radius:50%;border:3px solid var(--hzk);box-shadow:0 0 0 4px rgba(217,167,60,.25);pointer-events:none;animation:fvm 1.3s ease-out 2;opacity:0}
+@keyframes fvm{0%{opacity:0;transform:scale(1.5)}25%{opacity:1;transform:scale(1)}80%{opacity:1}100%{opacity:0;transform:scale(1)}}
+@media (prefers-reduced-motion: reduce){ .fvmark{animation:none;opacity:1} }
+/* 개념 상세 그림 — 카드 좌우 여백 없이(300 → 약 352 px, 보완안 6) */
+.dcard figure{margin:0 -18px 15px;padding:10px 0 8px;border-radius:0}
+.dcard figure svg{width:100%;border-radius:0}
+.dcard figure figcaption{padding:0 18px}
+.dcard figure.zoomable .zbtn{right:12px;top:14px}
+/* 그림 읽는 법 — 번호를 누르면 크게 보기가 그 자리로 */
+.howto.hz li{display:grid;grid-template-columns:26px 1fr;column-gap:8px;align-items:start;padding-left:0;text-indent:0;margin-bottom:7px}
+.howto.hz li .n{display:grid;place-items:center;width:24px;height:24px;margin:1px 0 0;border-radius:var(--r-pill);font-size:12px;font-weight:900;color:var(--hzk)}
+.howto.hz li button.n{border:1.5px solid var(--hzl);background:var(--hzs);cursor:pointer;font-family:inherit;padding:0}
+.howto.hz li button.n:focus-visible{outline:2px solid var(--hzk);outline-offset:2px}
+.howto .k .hint{font-size:11.5px;font-weight:600;letter-spacing:0;color:var(--muted);margin-left:8px}
 
 /* 탭바 */
 .tabs{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:440px;display:flex;border-top:1px solid var(--hair);background:var(--card);
@@ -1054,6 +1077,19 @@ figure.zoomable{cursor:zoom-in}
 .loadfail p{font-size:var(--t-small);color:var(--muted);line-height:1.8;margin-bottom:12px}
 .tsafe{background:var(--brand-soft);border-radius:var(--r-m);padding:11px 13px;margin-bottom:12px;font-size:var(--t-tab);line-height:1.7;color:var(--brand-dark)}
 .tsafe b{font-weight:900}
+.tempty{text-align:center;padding:26px 8px 18px}
+.tempty svg{width:150px;height:auto;display:block;margin:0 auto 12px}
+.tempty p{font-size:var(--t-small);line-height:1.7;color:var(--muted);word-break:keep-all}
+.tempty p b{display:block;font-size:var(--t-body);font-weight:700;color:var(--ink);margin-bottom:2px}
+.trule{margin:4px 0 12px;border-radius:var(--r-m);background:var(--brand-soft)}
+.trule summary{display:flex;align-items:center;gap:6px;min-height:44px;padding:0 14px;font-size:var(--t-small);font-weight:700;color:var(--brand-dark);cursor:pointer;list-style:none}
+.trule summary::-webkit-details-marker{display:none}
+.trule summary::after{content:'';margin-left:auto;width:7px;height:7px;border-right:2px solid currentColor;border-bottom:2px solid currentColor;transform:rotate(-45deg)}
+.trule[open] summary::after{transform:rotate(45deg);margin-top:-4px}
+.trule summary:focus-visible{outline:2px solid var(--brand);outline-offset:2px}
+.trule ul{margin:0;padding:0 14px 12px 30px;font-size:var(--t-cap);line-height:1.7;color:var(--brand-dark)}
+.trule li{margin:2px 0;word-break:keep-all}
+.trule li b{font-weight:700}
 .pcard{display:block;width:100%;text-align:left;background:var(--card);border:1px solid var(--hair);border-radius:var(--r-l);padding:14px 15px;margin-bottom:9px;cursor:pointer}
 .pcard .h{display:flex;align-items:center;gap:6px;margin-bottom:6px;flex-wrap:wrap}
 .pcard .bd{font-size:var(--t-tab);font-weight:700;letter-spacing:0;color:var(--on-color);background:var(--u);border-radius:var(--r-s);padding:2px 7px}
@@ -2581,43 +2617,42 @@ const SU0 = () => ({ step:1, role:'student', age:'', terms:false, privacy:false,
 let SU = SU0(), introIdx = 0, lgShow = false;
 const SU_STEPS = () => SU.role === 'owner' ? 4 : 5;     // 원장은 학원 코드 단계가 없다
 const MARK = `<svg viewBox="0 0 100 100" fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round"><ellipse cx="50" cy="50" rx="38" ry="15" transform="rotate(-30 50 50)"/><circle cx="50" cy="50" r="18" fill="#147D6F"/><circle cx="19" cy="66" r="5" fill="#fff" stroke="none"/><circle cx="82" cy="34" r="5" fill="#fff" stroke="none"/></svg>`;
-const AUTH_HERO = `<svg class="hero" viewBox="0 0 320 116" role="img" aria-label="궤도를 도는 행성 — 자연을 재는 눈">
-  <defs>
-    <linearGradient id="ahSky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="var(--brand-soft)"/><stop offset="1" stop-color="var(--card)"/></linearGradient>
-    <radialGradient id="ahOrb" cx="36%" cy="32%"><stop offset="0" stop-color="var(--brand)"/><stop offset="1" stop-color="var(--brand-dark)"/></radialGradient>
-  </defs>
-  <rect width="320" height="116" rx="20" fill="url(#ahSky)"/>
-  <g fill="var(--brand-line)"><circle cx="40" cy="26" r="2.2"/><circle cx="272" cy="21" r="1.8"/><circle cx="294" cy="60" r="2.4"/><circle cx="27" cy="66" r="1.6"/><circle cx="88" cy="15" r="1.4"/><circle cx="238" cy="88" r="1.5"/></g>
-  <ellipse cx="160" cy="54" rx="106" ry="33" fill="none" stroke="var(--brand-line)" stroke-width="1.6" stroke-dasharray="4 5" transform="rotate(-13 160 54)"/>
-  <ellipse cx="160" cy="54" rx="47" ry="14" fill="none" stroke="var(--brand)" stroke-width="3" opacity=".45" transform="rotate(-13 160 54)"/>
-  <circle cx="160" cy="54" r="25" fill="url(#ahOrb)"/>
-  <path d="M113 54a47 14 0 0 0 94 0" fill="none" stroke="var(--brand)" stroke-width="3" opacity=".8" transform="rotate(-13 160 54)"/>
-  <circle cx="254" cy="30" r="4.5" fill="var(--brand-dark)"/>
-  <g stroke="var(--brand)" opacity=".38" stroke-linecap="round"><path d="M46 100h228" stroke-width="1.4"/><g stroke-width="1.6"><path d="M46 100v-7"/><path d="M84 100v-4"/><path d="M122 100v-7"/><path d="M160 100v-4"/><path d="M198 100v-7"/><path d="M236 100v-4"/><path d="M274 100v-7"/></g></g>
-</svg>`;
+/* 첫 실행 소개 3장(2026-10-07 디자인 감사 #15 '첫 진입 가볍게') — 그림 크게(화면 높이 46%, 세 장 같은 높이), 글은 한 장에 한 문장.
+   그림은 정사각에 가까운 판(300×300)에 그려 판(.art)의 높이를 채운다 */
 const INTRO = [
-  { t:'하루 한 개념,<br>5분이면 됩니다', d:'박찬 과학 강의 교재를 그대로 옮겼습니다. 매일 개념 하나를 읽고, 빈칸을 채우고, 문제 하나를 풉니다.', art:() => AUTH_HERO.replace('class="hero"', '') },
-  { t:'시험 날까지<br>이어지는 연습', d:`문제 은행 ${BANK_N.toLocaleString()}문항. ${SRS_RULE} 시험 일정에 범위를 걸면 그 범위 문제로 바로 가요.`,
-    art:() => `<svg viewBox="0 0 320 200" role="img" aria-label="문제 카드와 정답률 막대"><rect width="320" height="200" rx="22" fill="var(--brand-soft)"/>
-      <g transform="rotate(-7 118 104)"><rect x="46" y="44" width="150" height="110" rx="14" fill="var(--card)" stroke="var(--brand-line)"/></g>
-      <rect x="62" y="40" width="150" height="116" rx="14" fill="var(--card)" stroke="var(--brand-line)" stroke-width="1.5"/>
-      <rect x="78" y="58" width="80" height="9" rx="4.5" fill="var(--brand)" opacity=".85"/><rect x="78" y="75" width="112" height="7" rx="3.5" fill="var(--line)"/>
-      ${[0,1,2].map(i=>`<rect x="78" y="${94+i*18}" width="112" height="13" rx="6.5" fill="${i===1?'var(--brand-soft)':'var(--ground)'}" stroke="${i===1?'var(--brand)':'var(--hair)'}"/><circle cx="87" cy="${100.5+i*18}" r="3.2" fill="${i===1?'var(--brand)':'var(--line)'}"/>`).join('')}
-      <path d="M170 113l5 5 9-10" fill="none" stroke="var(--brand)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
-      ${[42,64,53,80].map((h,i)=>`<rect x="${230+i*18}" y="${150-h}" width="11" height="${h}" rx="4" fill="var(--brand)" opacity="${.45+i*.15}"/>`).join('')}
-      <path d="M224 152h76" stroke="var(--brand-line)" stroke-width="2" stroke-linecap="round"/></svg>` },
-  { t:'학원과<br>한 앱에서', d:'출석은 입구 화면의 30초 코드로, 공지는 바로 받고, 보호자는 자녀의 출석과 공부를 함께 봅니다.',
-    art:() => `<svg viewBox="0 0 320 200" role="img" aria-label="학원 건물과 알림"><rect width="320" height="200" rx="22" fill="var(--brand-soft)"/>
-      <path d="M70 150V92l62-38 62 38v58" fill="var(--card)" stroke="var(--brand)" stroke-width="3" stroke-linejoin="round"/>
-      <rect x="116" y="112" width="32" height="38" rx="5" fill="var(--brand-soft)" stroke="var(--brand)" stroke-width="2.5"/>
-      <rect x="86" y="100" width="18" height="16" rx="3" fill="var(--brand-soft)" stroke="var(--brand-line)" stroke-width="2"/><rect x="160" y="100" width="18" height="16" rx="3" fill="var(--brand-soft)" stroke="var(--brand-line)" stroke-width="2"/>
-      <path d="M52 150h160" stroke="var(--brand-line)" stroke-width="3" stroke-linecap="round"/>
-      <rect x="206" y="44" width="92" height="46" rx="14" fill="var(--card)" stroke="var(--brand-line)" stroke-width="1.5"/>
-      <circle cx="226" cy="67" r="9" fill="var(--brand)"/><path d="M222 67l3 3 6-6" fill="none" stroke="var(--on-color)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
-      <rect x="242" y="59" width="44" height="6" rx="3" fill="var(--brand)" opacity=".8"/><rect x="242" y="70" width="32" height="5" rx="2.5" fill="var(--line)"/>
-      <rect x="214" y="104" width="84" height="40" rx="14" fill="var(--card)" stroke="var(--brand-line)" stroke-width="1.5"/>
-      <path d="M232 131c0-6 3-11 7-11s7 5 7 11" fill="none" stroke="var(--brand)" stroke-width="2.4" stroke-linecap="round"/><circle cx="239" cy="116" r="4" fill="var(--brand)"/>
-      <rect x="254" y="116" width="34" height="6" rx="3" fill="var(--brand)" opacity=".7"/><rect x="254" y="127" width="24" height="5" rx="2.5" fill="var(--line)"/></svg>` },
+  { t:'하루 한 개념,<br>5분이면 돼요', d:'강의 교재 그대로, 매일 개념 하나를 읽고 풀어요.',
+    art:() => `<svg viewBox="0 0 300 300" role="img" aria-label="궤도를 도는 행성 — 하루 한 개념">
+      <defs><radialGradient id="inOrb" cx="36%" cy="32%"><stop offset="0" stop-color="var(--brand)"/><stop offset="1" stop-color="var(--brand-dark)"/></radialGradient></defs>
+      <g fill="var(--brand-line)"><circle cx="46" cy="54" r="3"/><circle cx="250" cy="40" r="2.4"/><circle cx="272" cy="150" r="3.2"/><circle cx="28" cy="160" r="2.2"/><circle cx="98" cy="30" r="1.8"/><circle cx="230" cy="214" r="2"/><circle cx="70" cy="206" r="1.6"/></g>
+      <ellipse cx="150" cy="138" rx="130" ry="44" fill="none" stroke="var(--brand-line)" stroke-width="2" stroke-dasharray="5 6" transform="rotate(-14 150 138)"/>
+      <ellipse cx="150" cy="138" rx="66" ry="19" fill="none" stroke="var(--brand)" stroke-width="4.5" opacity=".45" transform="rotate(-14 150 138)"/>
+      <circle cx="150" cy="138" r="40" fill="url(#inOrb)"/>
+      <path d="M84 138a66 19 0 0 0 132 0" fill="none" stroke="var(--brand)" stroke-width="4.5" opacity=".85" transform="rotate(-14 150 138)"/>
+      <circle cx="254" cy="89" r="7.5" fill="var(--brand-dark)"/>
+      <g stroke="var(--brand)" opacity=".4" stroke-linecap="round"><path d="M50 250h200" stroke-width="2"/><g stroke-width="2.2">${[0,1,2,3,4,5,6,7,8].map(i => `<path d="M${50 + i * 25} 250v-${i % 2 ? 6 : 11}"/>`).join('')}</g></g></svg>` },
+  { t:'시험 날까지<br>이어지는 연습', d:SRS_RULE,
+    art:() => `<svg viewBox="0 0 300 300" role="img" aria-label="문제 카드와 넓어지는 복습 간격 — 내일, 3일, 7일, 14일, 30일">
+      <g transform="rotate(-7 132 118)"><rect x="54" y="52" width="160" height="130" rx="16" fill="var(--card)" stroke="var(--brand-line)"/></g>
+      <rect x="68" y="44" width="164" height="140" rx="16" fill="var(--card)" stroke="var(--brand-line)" stroke-width="1.5"/>
+      <rect x="86" y="64" width="88" height="10" rx="5" fill="var(--brand)" opacity=".85"/><rect x="86" y="83" width="124" height="8" rx="4" fill="var(--line)"/>
+      ${[0,1,2].map(i=>`<rect x="86" y="${104+i*24}" width="124" height="16" rx="8" fill="${i===1?'var(--brand-soft)':'var(--ground)'}" stroke="${i===1?'var(--brand)':'var(--hair)'}"/><circle cx="96" cy="${112+i*24}" r="3.6" fill="${i===1?'var(--brand)':'var(--line)'}"/>`).join('')}
+      <path d="M188 136l6 6 11-12" fill="none" stroke="var(--brand)" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M34 236H268" stroke="var(--brand-line)" stroke-width="2" stroke-linecap="round"/>
+      ${[[44,'1'],[76,'3'],[120,'7'],[180,'14'],[256,'30']].map(([x, l], i, a) => `${i ? `<path d="M${a[i-1][0]} 226Q${(a[i-1][0] + x) / 2} ${214 - i * 6} ${x} 226" fill="none" stroke="var(--brand)" stroke-width="1.8" stroke-dasharray="3 4" opacity=".55"/>` : ''}
+        <circle cx="${x}" cy="236" r="${7 + i}" fill="var(--brand)" opacity="${.45 + i * .13}"/><text x="${x}" y="${270}" text-anchor="middle" font-size="14" font-weight="700" fill="var(--brand-dark)">${l}${i === 4 ? '일' : ''}</text>`).join('')}</svg>` },
+  { t:'학원과<br>한 앱에서', d:'출석·공지·보호자 소식이 한곳에 모여요.',
+    art:() => `<svg viewBox="0 0 300 300" role="img" aria-label="학원 건물과 알림">
+      <path d="M34 236V142l80-50 80 50v94" fill="var(--card)" stroke="var(--brand)" stroke-width="3.5" stroke-linejoin="round"/>
+      <rect x="94" y="180" width="40" height="56" rx="6" fill="var(--brand-soft)" stroke="var(--brand)" stroke-width="3"/>
+      <rect x="54" y="158" width="24" height="20" rx="4" fill="var(--brand-soft)" stroke="var(--brand-line)" stroke-width="2.4"/><rect x="150" y="158" width="24" height="20" rx="4" fill="var(--brand-soft)" stroke="var(--brand-line)" stroke-width="2.4"/>
+      <path d="M16 236h196" stroke="var(--brand-line)" stroke-width="3.5" stroke-linecap="round"/>
+      <rect x="166" y="40" width="118" height="58" rx="17" fill="var(--card)" stroke="var(--brand-line)" stroke-width="1.5"/>
+      <circle cx="192" cy="69" r="11.5" fill="var(--brand)"/><path d="M187 69l3.6 3.6 7.4-7.4" fill="none" stroke="var(--on-color)" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
+      <rect x="212" y="60" width="58" height="7" rx="3.5" fill="var(--brand)" opacity=".8"/><rect x="212" y="73" width="40" height="6" rx="3" fill="var(--line)"/>
+      <rect x="182" y="118" width="104" height="52" rx="17" fill="var(--card)" stroke="var(--brand-line)" stroke-width="1.5"/>
+      <path d="M200 152c0-7 3.6-12.5 8.5-12.5s8.5 5.5 8.5 12.5" fill="none" stroke="var(--brand)" stroke-width="2.6" stroke-linecap="round"/><circle cx="208.5" cy="134" r="5" fill="var(--brand)"/>
+      <rect x="228" y="134" width="44" height="7" rx="3.5" fill="var(--brand)" opacity=".7"/><rect x="228" y="147" width="30" height="6" rx="3" fill="var(--line)"/>
+      <g fill="var(--brand-line)"><circle cx="40" cy="64" r="2.6"/><circle cx="88" cy="40" r="2"/><circle cx="252" cy="206" r="2.4"/></g></svg>` },
 ];
 const ROLE_IC = {
   student:'<path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v15H6.5A2.5 2.5 0 0 0 4 20.5z"/><path d="M20 18v3H6.5"/>',
@@ -2631,22 +2666,18 @@ function renderAuth(){
   const K = {}; ['lgEmail','lgPw','suName','suEmail','suPw','suPhone','suCode','suChild','fgEmail','suAge','suGName','suGPhone','npPw','npPw2'].forEach(id => { const el=document.getElementById(id); if (el) K[id]=el.value; });
   const agree = !!(document.getElementById('suAgree') && document.getElementById('suAgree').checked);
   const val = id => ` value="${esc(K[id]||'')}"`;
+  /* 시작 화면(감사 #15) — 히어로는 그림 + 헤드라인 하나. 숫자는 한 줄로, 안내는 한 문장 */
   if (authMode==='start') v.innerHTML = `
     <div class="auth start">
-      <div class="mark">${MARK}</div>
+      <div class="art">${INTRO[0].art()}</div>
       <h1>하루 한 개념,<br>통합과학</h1>
-      <p class="lead">${esc(CFG.academy)} 강의 교재를 <b>매일 한 개념</b>씩 배달합니다. 읽고, 빈칸을 채우고, 문제를 풉니다.</p>
-      ${AUTH_HERO}
-      <div class="facts">
-        <div><b>${CONCEPTS.length}</b><span>개념</span></div>
-        <div><b>${BANK_N.toLocaleString()}</b><span>문제</span></div>
-        <div><b>${LABS_N}</b><span>자료 탐구</span></div>
-      </div>
+      <p class="lead">${esc(CFG.academy)} 강의 교재를 매일 한 개념씩 배달해요.</p>
+      <p class="facts">개념 ${CONCEPTS.length} · 문제 ${BANK_N.toLocaleString()} · 자료 탐구 ${LABS_N}</p>
       <button class="btn" id="goLogin">로그인</button>
       <button class="btn soft" id="goSignup">회원가입</button>
       <div class="or">또는</div>
       <button class="btn ghost" id="goGuest">가입 없이 둘러보기 · 최근 ${FREE_DAYS}일치 무료</button>
-      <p class="fine">학원 수강생·보호자·원장님 모두 같은 앱을 씁니다.<br>가입 뒤 <b>학원 코드</b>를 등록하면 전 범위와 출석·공지가 열립니다.</p>
+      <p class="fine">학원 코드를 넣으면 전 범위와 출석·공지가 열려요.</p>
     </div>`;
   if (authMode==='login') v.innerHTML = `
     <div class="auth">
@@ -2670,7 +2701,7 @@ function renderAuth(){
     v.innerHTML = `<div class="intro" aria-roledescription="소개">
       ${last ? `<span class="skip" aria-hidden="true"></span>` : `<button class="skip" id="introSkip">건너뛰기</button>`}
       <div class="art">${it.art()}</div>
-      <h1>${it.t}</h1><p>${it.d}</p>
+      <h1>${it.t}</h1><p>${it.d}</p><div class="sp"></div>
       <div class="dots" aria-label="${introIdx+1} / ${INTRO.length}">${INTRO.map((_,i)=>`<i class="${i===introIdx?'on':''}"></i>`).join('')}</div>
       <button class="btn" id="introNext">${last?'시작하기':'다음'}</button></div>`; return; }
   if (authMode==='signup'){
@@ -2735,12 +2766,12 @@ function renderAuth(){
   if (authMode==='welcome'){ const r = ACC ? ACC.role : 'student', nm = ACC ? esc(ACC.name) : '';
     const steps = r==='parent' ? ['자녀 화면에서 오늘 출석과 이번 달 기록을 봅니다', '학원 공지와 시험 일정이 자녀별로 들어옵니다', '자녀가 둘이면 <b>자녀 한 명 더 연결</b>로 함께 봅니다']
       : r==='owner' ? ['<b>학생</b>에서 수강생을 등록하고 코드를 보냅니다(엑셀 붙여 넣기 가능)', '수업 전 <b>출석</b>에서 30초 코드를 띄웁니다', '<b>공지</b>·<b>일정</b>은 반별로 보내면 학생·보호자에게 바로 갑니다']
-      : ['홈의 <b>오늘 할 일</b>을 위에서부터 하나씩 해 보세요 — 개념 읽기, 빈칸, 문제 하나', SRS_RULE, '시험 날짜는 <b>일정</b>에 D-day로 넣어 두세요'];
+      : [];   // 학생은 한 문장(감사 #15 — 첫 만남은 가볍게): 아래 lead
     const LN = plug('LocalNotifications');
     v.innerHTML = `<div class="auth welcome"><div class="grow">
       <div class="big"><svg width="38" height="38" viewBox="0 0 24 24" fill="none" stroke="var(--brand)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 12.5l5 5L19.5 7"/></svg></div>
-      <h1 class="q">${nm}님, 준비됐어요</h1><p class="lead">${r==='owner'?'학원 운영은 세 가지면 됩니다.':'이렇게 시작해 보세요.'}</p>
-      <div class="next">${steps.map((t,i)=>`<div><i class="no">${i+1}</i><span>${t}</span></div>`).join('')}</div>
+      <h1 class="q">${nm}님, 준비됐어요</h1><p class="lead">${r==='owner'?'학원 운영은 세 가지면 됩니다.':r==='parent'?'이렇게 시작해 보세요.':'홈의 <b>오늘 할 일</b>을 위에서부터 하나씩 해 보세요.'}</p>
+      ${steps.length ? `<div class="next">${steps.map((t,i)=>`<div><i class="no">${i+1}</i><span>${t}</span></div>`).join('')}</div>` : ''}
       ${isNative && LN && r!=='owner' ? `<div class="permcard"><div class="t">매일 공부 알림 받기</div><div class="d">정한 시각에 하루 한 번 "오늘의 개념"과 다시 볼 문제 수를 알려 드립니다. 3일 동안 앱을 열지 않으면 알림을 스스로 멈춥니다. 시각은 내 정보에서 바꿀 수 있어요.</div><button class="btn soft" id="welcomeNotify" style="margin:0">알림 받기</button></div>` : ''}
       </div><div class="cta"><button class="btn" id="welcomeGo">시작하기</button></div></div>`; return; }
   if (authMode==='forgot') v.innerHTML = `
@@ -3169,7 +3200,7 @@ function detailCard(c){
       ${preHtml(c)}
       <div class="steps">${c.steps.map(s=>`<div class="step"><div class="n">${s.n}</div><div class="t">${esc(s.t)}</div><div class="d">${termify(rich(s.d), keys, u1)}</div></div>`).join('')}</div>
       ${c.figure ? `<figure class="zoomable" data-zoom="${c.id}" tabindex="0" role="button" aria-label="그림 크게 보기: ${esc(c.figure.caption)}"><span class="zbtn" aria-hidden="true">⤢ 크게 보기</span>${figSlot(c.id)}<figcaption>${esc(c.figure.caption)} · 누르면 크게</figcaption></figure>` : ''}
-      ${c.howto.length ? `<div class="howto"><span class="k">그림 읽는 법</span><ul>${c.howto.map((h,i)=>`<li><b class="n">${i+1}</b>${rich(h)}</li>`).join('')}</ul></div>`:''}
+      ${c.howto.length ? `<div class="howto hz"><span class="k">그림 읽는 법${c.figure ? '<span class="hint">번호를 누르면 그 자리를 크게 봐요</span>' : ''}</span><ul>${c.howto.map((h,i)=>`<li>${c.figure ? `<button type="button" class="n" data-hz="${i}" aria-label="그림에서 ${i+1}번 자리 크게 보기">${i+1}</button>` : `<b class="n">${i+1}</b>`}<span>${rich(h)}</span></li>`).join('')}</ul></div>`:''}
       <div class="point"><span class="k">포인트</span><p>${rich(c.point)}</p></div>
       <button type="button" class="dmore-t" id="dMoreBtn" aria-expanded="${open}" aria-controls="dMore">${dMoreLabel(c, open)}</button>
     </article>
@@ -3543,6 +3574,9 @@ const attachName = a => { if (!a) return null;
     return q && { k:'문제 은행', t:[...plain(q.stem)].slice(0,44).join(''), s:`${TYPE_NAME[q.type]||''}${L?` · ${L.unit}-${L.id.slice(2)} ${L.name}`:''}` }; }
   return null; };
 
+/* 이야기 첫 진입(감사 #15) — 규칙 상자 대신 빈 상태 그림 + 한 줄, 규칙은 접힌 한 줄(글쓰기 시트 안에는 그대로) */
+const TALK_EMPTY_ART = `<svg viewBox="0 0 160 96" aria-hidden="true"><rect x="14" y="14" width="88" height="46" rx="16" fill="var(--brand-soft)" stroke="var(--brand-line)" stroke-width="1.5"/><path d="M34 60l-6 14 18-14" fill="var(--brand-soft)" stroke="var(--brand-line)" stroke-width="1.5" stroke-linejoin="round"/><path d="M33 34h50M33 44h32" stroke="var(--brand)" stroke-width="4" stroke-linecap="round" opacity=".7"/>
+  <rect x="70" y="42" width="76" height="40" rx="15" fill="var(--card)" stroke="var(--brand)" stroke-width="1.8"/><path d="M128 82l6 11-16-11" fill="var(--card)" stroke="var(--brand)" stroke-width="1.8" stroke-linejoin="round"/><circle cx="92" cy="62" r="3.4" fill="var(--brand)"/><circle cx="108" cy="62" r="3.4" fill="var(--brand)" opacity=".7"/><circle cx="124" cy="62" r="3.4" fill="var(--brand)" opacity=".45"/></svg>`;
 async function renderTalk(){
   const v = document.getElementById('v-talk');
   if (!ACC){
@@ -3585,10 +3619,11 @@ async function renderTalk(){
           <span><svg viewBox="0 0 24 24"><path d="M20.5 12c0 4-3.8 7.2-8.5 7.2-1 0-2-.15-2.9-.42L4 20.5l1.5-3.6C4.2 15.6 3.5 13.9 3.5 12c0-4 3.8-7.2 8.5-7.2s8.5 3.2 8.5 7.2z"/></svg>${x.comments||0}</span>
           <span><svg viewBox="0 0 24 24"><path d="M12 20.5 4.5 13a4.6 4.6 0 0 1 6.5-6.5l1 1 1-1A4.6 4.6 0 0 1 19.5 13z"/></svg>${(x.likes||[]).length}</span>
           ${at?`<span>· ${esc(at.k)} 첨부</span>`:''}</div></button>`; }).join('')
-      : (failed ? '' : `<p class="planempty">${talkQ ? '찾는 글이 없습니다.' : '아직 글이 없습니다. 첫 질문을 올려 보세요.'}</p>`)}
-    <div class="tsafe"><b>함께 쓰는 규칙</b><br>· 닉네임으로 활동합니다. 실명·전화번호·주소·SNS 아이디는 적지 않습니다.<br>
-      · 시중 문제집이나 기출 문제의 <b>원문을 그대로 올리지 않습니다</b>(저작권). 어디가 막히는지 자기 말로 적어 주세요.<br>
-      · 비방·욕설은 신고해 주세요. 신고가 ${REPORT_HIDE}건 쌓이면 자동으로 가려지고 원장님이 확인합니다.</div>`;
+      : (failed ? '' : talkQ ? `<p class="planempty">찾는 글이 없어요.</p>` : `<div class="tempty">${TALK_EMPTY_ART}<p><b>첫 질문을 올려 보세요</b>막힌 곳을 자기 말로 적으면 함께 풀어 봐요.</p></div>`)}
+    <details class="trule"><summary>함께 쓰는 규칙 3가지</summary><ul>
+      <li>닉네임으로 활동해요. 실명·전화번호·주소·SNS 아이디는 적지 않아요.</li>
+      <li>시중 문제집이나 기출 문제의 <b>원문은 그대로 올리지 않아요</b>(저작권). 어디가 막히는지 자기 말로 적어 주세요.</li>
+      <li>비방·욕설은 신고해 주세요. 신고가 ${REPORT_HIDE}건 쌓이면 자동으로 가려지고 원장님이 확인해요.</li></ul></details>`;
 }
 
 async function renderPost(){
@@ -4263,30 +4298,80 @@ function renderLab(){
 /* ═══ 그림 확대 보기 — 두 손가락으로 키우고 끌어서 본다 ═══ */
 let fvFrom = null;
 function closeFigure(){ document.getElementById('fv')?.remove(); if (!document.getElementById('sheet').innerHTML) document.querySelector('.app')?.removeAttribute('inert'); const f = fvFrom; fvFrom = null; if (f && document.contains(f)) f.focus({ preventScroll:true }); }
-function openFigure(svg, caption){
+/* '그림 읽는 법' 한 줄이 가리키는 그림 속 자리 — 그림의 글자(<text>)에서 찾는다(데이터를 고치지 않고 앱에서, 2026-10-07 콘텐츠 감사 보완안 6).
+   ① 읽는 법에 ①②③이 있으면 그 번호가 적힌 글자 ② 읽는 법에 그대로 나오는 그림 글자(짧을수록 · 낱말이 많이 겹칠수록)
+   ③ '왼쪽·오른쪽·위쪽·아래쪽'만 있으면 그쪽 가운데 ④ 못 찾으면 null(평소처럼 연다). 돌려주는 x·y 는 그림 폭·높이에 대한 비율 */
+const HZ_JOSA = /(에서는|에서|으로는|으로|에는|에게|까지|부터|이다|이고|이며|이면|하고|처럼|보다|은|는|이|가|을|를|의|에|로|와|과|도|만|다)$/;
+const HZ_STOP = new Set(['그림','오른쪽','왼쪽','위쪽','아래쪽','아래','가운데','부분','하나','모두','같은','다른','있다','없다','것이','것은','때문','된다','한다','되어','뜻이다','보면','따라','각각','안쪽','바깥쪽','처음','나중','막대','상자','화살표','쪽','위','곳']);
+function hzTarget(sv, html){
+  const nz = t => String(t || '').replace(/\s+/g, '').toLowerCase(), h = plain(html), hn = nz(h), R = sv.getBoundingClientRect(); if (!R.width || !R.height) return null;
+  const T = [...sv.querySelectorAll('text')].map(t => { const r = t.getBoundingClientRect(); return { s:nz(t.textContent), x:(r.left + r.width / 2 - R.left) / R.width, y:(r.top + r.height / 2 - R.top) / R.height, w:r.width }; }).filter(t => t.s && t.w > 0);
+  const circ = h.match(/[①-⑳]/);
+  if (circ){ const hit = T.filter(t => t.s.includes(circ[0])).sort((a, b) => a.s.length - b.s.length)[0]; if (hit) return hit; }
+  const toks = [...new Set(h.split(/[^0-9A-Za-z가-힣⁺⁻₀-₉]+/).map(w => w.replace(HZ_JOSA, '')).filter(w => w.length >= 2 && !HZ_STOP.has(w) && !/^\d+$/.test(w)))];
+  const side = { x: /왼쪽|서쪽/.test(h) ? .25 : /오른쪽|동쪽/.test(h) ? .75 : null, y: /위쪽|맨 위|위의/.test(h) ? .3 : /아래쪽|맨 아래|아래 /.test(h) ? .7 : null };
+  let best = null;
+  T.forEach(t => { let sc = 0;
+    if (t.s.length >= 2 && t.s.length <= 14 && /[A-Za-z가-힣]{2}/.test(t.s) && hn.includes(t.s)) sc += t.s.length * 1.5;   // 그림 글자가 읽는 법에 그대로
+    toks.forEach(k => { if (t.s.includes(nz(k))) sc += k.length; });
+    sc /= 1 + t.s.length / 24;   // 긴 제목·설명 줄보다 짧은 이름표
+    if (sc && side.x !== null && Math.abs(t.x - side.x) < .25) sc *= 1.4;
+    if (sc && side.y !== null && Math.abs(t.y - side.y) < .25) sc *= 1.2;
+    if (!best || sc > best.sc) best = { ...t, sc }; });
+  if (best && best.sc >= 2) return best;
+  return side.x !== null || side.y !== null ? { x:side.x ?? .5, y:side.y ?? .5 } : null; }
+/* 그림 크게 보기 — 처음부터 가로 1.8배(폰 폭에 맞추면 그림 글자가 약 5.5 px — 보완안 6), 끌어서·두 손가락으로·휠로 본다.
+   hz: { list:'그림 읽는 법' 줄들, i 몇 번째 } — 그 줄이 가리키는 자리를 가운데에 두고 잠깐 표시, 아래에 그 줄과 번호들 */
+function openFigure(svg, caption, hz){
   const el = document.createElement('div'); el.className='fv'; el.id='fv'; el.setAttribute('role', 'dialog'); el.setAttribute('aria-modal', 'true'); el.setAttribute('aria-label', '그림 크게 보기');
   fvFrom = document.activeElement; document.querySelector('.app')?.setAttribute('inert', '');
-  el.innerHTML = `<div class="bar"><span>그림 크게 보기</span><span><button id="fvMinus" aria-label="그림 작게">−</button><button id="fvPlus" aria-label="그림 크게">＋</button><button id="fvClose">닫기</button></span></div><div class="stage" id="fvStage">${svg}</div><div class="cap">${esc(caption||'')} · 두 손가락으로 키우고 끌어서 봅니다</div>`;
+  const capOf = i => hz ? `<div class="fvhz" role="group" aria-label="그림 읽는 법">${hz.list.map((_, k) => `<button type="button" data-fvhz="${k}" aria-pressed="${k === i}" aria-label="그림 읽는 법 ${k + 1}">${k + 1}</button>`).join('')}</div><p class="fvt" id="fvT" aria-live="polite">${rich(hz.list[i])}</p>`
+    : `${esc(caption||'')}${caption ? ' · ' : ''}끌거나 두 손가락으로 키워 봐요`;
+  el.innerHTML = `<div class="bar"><span>그림 크게 보기</span><span><button id="fvMinus" aria-label="그림 작게">−</button><button id="fvPlus" aria-label="그림 크게">＋</button><button id="fvClose">닫기</button></span></div><div class="stage" id="fvStage">${svg}</div><div class="cap${hz ? ' hz' : ''}" id="fvCap">${capOf(hz ? hz.i : 0)}</div>`;
   document.body.appendChild(el);
   const st = el.querySelector('#fvStage'), sv = st.querySelector('svg'); if (!sv) return;
   sv.removeAttribute('width'); sv.removeAttribute('height'); sv.style.width = '100%';
-  let sc=1, tx=0, ty=0; const apply = () => { sv.style.transform = `translate(${tx}px,${ty}px) scale(${sc})`; };
-  /* 처음부터 글자가 읽히는 배율로 연다 — 폰 폭에 맞추면 그림 글자가 3~5px 이었다(2026-10-01). 끌어서 둘러본다 */
-  requestAnimationFrame(() => { const vb = sv.viewBox && sv.viewBox.baseVal, W = sv.getBoundingClientRect().width || 1, f = W / ((vb && vb.width) || W);
+  let sc = 1, tx = 0, ty = 0, B = null;
+  /* B: 1배일 때 그림 자리(무대 기준) — 키운 그림이 무대보다 크면 가장자리가 무대 안으로 들어오지 않게, 작으면 가운데에 */
+  const measure = () => { const t0 = sv.style.transform; sv.style.transform = 'none'; const r = sv.getBoundingClientRect(), q = st.getBoundingClientRect(); sv.style.transform = t0; B = { L:r.left - q.left, T:r.top - q.top, W:r.width || 1, H:r.height || 1 }; };
+  const clamp = () => { const Sw = st.clientWidth, Sh = st.clientHeight, w = B.W * sc, h = B.H * sc;
+    tx = w <= Sw ? (Sw - w) / 2 - B.L : Math.min(-B.L, Math.max(Sw - w - B.L, tx));
+    ty = h <= Sh ? (Sh - h) / 2 - B.T : Math.min(-B.T, Math.max(Sh - h - B.T, ty)); };
+  const apply = () => { if (!B) return; clamp(); sv.style.transform = `translate(${tx}px,${ty}px) scale(${sc})`; };
+  const zoomAt = (ns, cx, cy) => { ns = Math.min(6, Math.max(1, ns)); const k = ns / sc; tx = cx - B.L - (cx - B.L - tx) * k; ty = cy - B.T - (cy - B.T - ty) * k; sc = ns; apply(); };
+  const unmark = () => st.querySelector('.fvmark')?.remove();
+  /* 그 줄이 가리키는 자리로 — 가운데에 두고 고리를 잠깐 띄운다(줄임 설정이면 움직임 없이) */
+  const goTo = i => { unmark(); const p = hzTarget(sv, hz.list[i]); if (!p) return false;   // 비율이라 키운 상태에서 재도 같다
+    tx = st.clientWidth / 2 - B.L - p.x * B.W * sc; ty = st.clientHeight / 2 - B.T - p.y * B.H * sc; apply();
+    const m = document.createElement('span'); m.className = 'fvmark'; m.setAttribute('aria-hidden', 'true');
+    m.style.left = `${B.L + tx + p.x * B.W * sc}px`; m.style.top = `${B.T + ty + p.y * B.H * sc}px`; st.appendChild(m); setTimeout(() => m.remove(), 2600); el.dataset.at = `${i}:${p.x.toFixed(3)},${p.y.toFixed(3)}`; return true; };
+  requestAnimationFrame(() => { measure();
+    const vb = sv.viewBox && sv.viewBox.baseVal, f = B.W / ((vb && vb.width) || B.W);
     const fs = [...sv.querySelectorAll('text')].map(t => parseFloat(t.getAttribute('font-size')) || 0).filter(Boolean).sort((a, b) => a - b), med = fs[Math.floor(fs.length / 2)] || 10;
-    sc = Math.min(4, Math.max(1, 11 / (med * f))); apply(); });
+    sc = Math.min(1.8, Math.max(1, 11 / (med * f)));   // 글자가 이미 11 px 넘으면 그대로, 아니면 1.8배까지
+    const at = !!hz && goTo(hz.i);
+    if (!at){ tx = -B.L; ty = 0; apply(); }   // 왼쪽부터 읽는다(세로는 가운데)
+    el.dataset.sc = sc.toFixed(2); });
   const pts = new Map(); let last = null;
-  st.addEventListener('pointerdown', e => { pts.set(e.pointerId, [e.clientX, e.clientY]); st.setPointerCapture(e.pointerId); last = null; });
-  st.addEventListener('pointermove', e => { if (!pts.has(e.pointerId)) return; pts.set(e.pointerId, [e.clientX, e.clientY]); const p = [...pts.values()];
-    if (p.length===1){ if (last){ tx += p[0][0]-last[0]; ty += p[0][1]-last[1]; } last = p[0]; }
-    else if (p.length>=2){ const d = Math.hypot(p[0][0]-p[1][0], p[0][1]-p[1][1]); if (st._d){ sc = Math.min(6, Math.max(1, sc * d / st._d)); } st._d = d; }
-    apply(); });
-  const up = e => { pts.delete(e.pointerId); if (pts.size<2) st._d = null; last = null; if (!pts.size && sc<=1){ tx=ty=0; apply(); } };
+  const rel = (x, y) => { const q = st.getBoundingClientRect(); return [x - q.left, y - q.top]; };
+  st.addEventListener('pointerdown', e => { unmark(); pts.set(e.pointerId, [e.clientX, e.clientY]); st.setPointerCapture(e.pointerId); last = null; });
+  st.addEventListener('pointermove', e => { if (!pts.has(e.pointerId) || !B) return; pts.set(e.pointerId, [e.clientX, e.clientY]); const p = [...pts.values()];
+    if (p.length===1){ if (last){ tx += p[0][0]-last[0]; ty += p[0][1]-last[1]; } last = p[0]; apply(); }
+    else if (p.length>=2){ const d = Math.hypot(p[0][0]-p[1][0], p[0][1]-p[1][1]), [cx, cy] = rel((p[0][0]+p[1][0]) / 2, (p[0][1]+p[1][1]) / 2); if (st._d) zoomAt(sc * d / st._d, cx, cy); st._d = d; } });
+  const up = e => { pts.delete(e.pointerId); if (pts.size<2) st._d = null; last = null; };
   st.addEventListener('pointerup', up); st.addEventListener('pointercancel', up);
-  st.addEventListener('dblclick', () => { sc = sc>1 ? 1 : 2.2; if (sc===1){ tx=ty=0; } apply(); });
-  el.querySelector('#fvPlus').onclick = () => { sc = Math.min(6, sc*1.4); apply(); };
-  el.querySelector('#fvMinus').onclick = () => { sc = Math.max(1, sc/1.4); if (sc===1){ tx=ty=0; } apply(); };
-  el.querySelector('#fvClose').onclick = () => closeFigure(); setTimeout(() => el.querySelector('#fvClose')?.focus(), 30);
+  st.addEventListener('wheel', e => { if (!B) return; e.preventDefault(); unmark(); if (e.ctrlKey){ const [cx, cy] = rel(e.clientX, e.clientY); zoomAt(sc * (e.deltaY < 0 ? 1.12 : 1 / 1.12), cx, cy); } else { tx -= e.shiftKey ? e.deltaY : e.deltaX; ty -= e.shiftKey ? 0 : e.deltaY; apply(); } }, { passive:false });
+  st.addEventListener('dblclick', e => { const [cx, cy] = rel(e.clientX, e.clientY); zoomAt(sc > 1.8 ? 1 : 2.6, cx, cy); });
+  const mid = () => [st.clientWidth / 2, st.clientHeight / 2];
+  el.querySelector('#fvPlus').onclick = () => { unmark(); zoomAt(sc * 1.4, ...mid()); };
+  el.querySelector('#fvMinus').onclick = () => { unmark(); zoomAt(sc / 1.4, ...mid()); };
+  el.querySelector('#fvClose').onclick = () => closeFigure();
+  if (hz) el.querySelector('#fvCap').addEventListener('click', e => { const b = e.target.closest('[data-fvhz]'); if (!b || !B) return; const i = +b.dataset.fvhz;
+    el.querySelectorAll('[data-fvhz]').forEach(x => x.setAttribute('aria-pressed', String(x === b))); el.querySelector('#fvT').innerHTML = rich(hz.list[i]);
+    sc = Math.max(sc, 1.8); if (!goTo(i)) apply(); });
+  el._re = () => { if (!document.contains(el)) return removeEventListener('resize', el._re); measure(); apply(); }; addEventListener('resize', el._re);
+  el.addEventListener('keydown', e => { const k = { ArrowLeft:[40, 0], ArrowRight:[-40, 0], ArrowUp:[0, 40], ArrowDown:[0, -40] }[e.key]; if (!k || !B || e.target.closest('.fvhz')) return; e.preventDefault(); tx += k[0]; ty += k[1]; apply(); });
+  setTimeout(() => el.querySelector('#fvClose')?.focus(), 30);
 }
 
 /* ═══ 공부 노트 · 달력 — 나만 보는 메모장 ═══
@@ -5458,9 +5543,10 @@ document.addEventListener('click', async e => {
   const lg = T('[data-legal]'); if (lg){ openLegal(lg.dataset.legal); return; }
   if (T('#moreRetry')){ MORE.err = false; moreArrived(); loadMore(); return; }
   /* 문제·탐구·그림을 쓰는 버튼 — 아직 못 받았으면 받은 뒤 다시 누른다 */
-  if (!MORE.ok){ const need = T('[data-drill],[data-lab],[data-zoom],[data-zoomlab],[data-bretry],[data-leech],#bankStart,#bankRec,#bankAgain,#revStart,[data-ustart],[data-urecap],[data-mstart]'); if (need){ afterMore(need); return; } }
+  if (!MORE.ok){ const need = T('[data-drill],[data-lab],[data-zoom],[data-hz],[data-zoomlab],[data-bretry],[data-leech],#bankStart,#bankRec,#bankAgain,#revStart,[data-ustart],[data-urecap],[data-mstart]'); if (need){ afterMore(need); return; } }
   /* 그림 확대 */
   const zf = T('[data-zoom]'); if (zf){ const c = CONCEPTS.find(x=>x.id===zf.dataset.zoom); openFigure(figOf(c.id), c.figure.caption); return; }
+  const hzb = T('[data-hz]'); if (hzb && view === 'detail'){ const c = CONCEPTS[detailIdx]; if (c && c.figure) openFigure(figOf(c.id), c.figure.caption, { list:c.howto, i:+hzb.dataset.hz }); return; }
   const zl = T('[data-zoomlab]'); if (zl){ const l = LABS.find(x=>x.lessonId===zl.dataset.zoomlab); openFigure(l.figure, l.title); return; }
   const zq = T('[data-zoomsvg]'); if (zq && bs){ openFigure(bs.items[+zq.dataset.zoomsvg].figure, ''); return; }
   const zm = T('[data-mxzoom]'); if (zm && mx){ openFigure(mx.items[+zm.dataset.mxzoom].figure, `${+zm.dataset.mxzoom + 1}번`); return; }

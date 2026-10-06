@@ -47,7 +47,9 @@ meta = {'url': MORE_NAME, 'bank': len(bank), 'labs': len(labs),
         'bl': {L: sum(1 for q in bank if q['lessonId'] == L and str(q.get('step')) not in ('unit', 'mock', 'recap')) for L in sorted({q['lessonId'] for q in bank})},
         'll': sorted({l['lessonId'] for l in labs}),
         'fv': {k: f"{_vb(v)[1]} {_vb(v)[2]}" for k, v in figs.items()}}
-out = (shell.replace('<!--CONCEPTS-->', j(concepts))
+# 앱이 쓰지 않는 칸(answers — blanks 와 같은 내용, warning — 화면에 안 쓰임)은 앱 파일에서 뺀다(2026-10-07, 앱 파일 한도 1,700 KB). data/ 는 그대로
+APP_DROP = ('answers', 'warning')
+out = (shell.replace('<!--CONCEPTS-->', j([{k: v for k, v in c.items() if k not in APP_DROP} for c in concepts]))
             .replace('<!--QUIZZES-->', j(quizzes))
             .replace('<!--MORE_META-->', j(meta))
             .replace('<!--QUOTES-->', j(quotes)))
