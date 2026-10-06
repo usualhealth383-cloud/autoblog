@@ -1085,6 +1085,8 @@ details.ix-how .bd p:last-child{margin-bottom:0}
 .products{display:flex;flex-direction:column;gap:var(--s2);margin-top:var(--s3)}
 .prod{display:flex;align-items:center;justify-content:space-between;gap:var(--s3);padding:10px 12px;border:1px solid var(--hairline);border-radius:12px;font-size:.875rem}
 .prod b{font-weight:700;overflow-wrap:anywhere}
+.kv .lact.me{box-shadow:inset 3px 0 0 var(--caution)}
+.kv .lact .badge{display:inline-flex;width:auto}
 .pain-note{display:block;font-size:.8125rem;color:var(--muted);margin-top:3px;line-height:1.45}
 .pain-row{margin-top:4px}
 .prod span{display:block;color:var(--muted);font-size:.75rem;overflow-wrap:anywhere}   /* 「알릴이소프로필아세틸우레아」처럼 긴 성분명 한 낱말이 사진 옆 좁은 칸을 넘었다(2026-10-06) */
@@ -4797,6 +4799,14 @@ function sideFreqHtml(d){
 /* 약국 소염진통제 화면 — NHS 「If you can take paracetamol, it's a good idea to try it before taking ibuprofen」(현욱님 2026-10-06 「둔다」).
    아스피린(심장 예방으로 드시는 분)·처방 소염제는 「바꾸라」로 읽힐 수 있어 뺀다 */
 const APAP_FIRST = new Set(['ibuprofen', 'dexibuprofen', 'naproxen', 'clonixin', 'loxoprofen']);
+/* 수유 — 미국 국립보건원 LactMed(Drugs and Lactation Database) 요약을 한 줄로(현욱님 검수 뒤에만 d.lact 를 채운다).
+   내 정보에 「임신·수유 중」을 켜신 분께는 그 칸을 강조한다 */
+const LACT_LV = { ok: ['수유 중 괜찮은 편', 'otc'], caution: ['수유 중 주의', 'warn'], avoid: ['수유 중 피하기', 'stop'] };
+function lactCell(d){
+  const l = d.lact; if (!l || !LACT_LV[l.lv]) return '';
+  const [w, c] = LACT_LV[l.lv]; const me = activeFlags().includes('pregnant');
+  return `<div class="lact${me ? ' me' : ''}"><small>수유</small><span class="badge ${c}" style="margin:2px 0 4px">${w}</span><b>${fmt(l.t)}</b></div>`;
+}
 const KID_DRUG = new Set(['acetaminophen', 'ibuprofen', 'dexibuprofen']);
 /* 보관·버리기 — MedlinePlus 「Storage and disposal」·healthdirect 자리. 문구는 앱 팁(storage·expiry·dispose)과 같은 말로 */
 function keepToss(d){
@@ -4907,8 +4917,8 @@ function vDrug(id){
   </section></div>
   <div class="pane" id="p2"><section class="card">
     ${d.risk ? `<h2>부담 정도 <small class="muted" style="font-weight:500;font-size:.8125rem">같은 계열 안에서 상대 비교</small></h2><div class="risk-bars">${riskBar('위장', d.risk.gi, d.riskNote?.gi)}${riskBar('심혈관', d.risk.cv, d.riskNote?.cv)}${riskBar('신장', d.risk.renal, d.riskNote?.renal)}${riskBar('간', d.risk.liver, d.riskNote?.liver)}</div>` : ''}
-    ${d.pregnancy || d.children ? `<div class="kv" style="grid-template-columns:1fr">${d.pregnancy ? `<div><small>임신·수유</small><b>${fmt(d.pregnancy)}</b></div>` : ''}${d.children ? `<div><small>소아</small><b>${fmt(d.children)}</b></div>` : ''}</div>` : ''}
-    ${d.risk || d.pregnancy || d.children ? '<div style="height:20px"></div>' : ''}
+    ${d.pregnancy || d.children || d.lact ? `<div class="kv" style="grid-template-columns:1fr">${d.pregnancy ? `<div><small>${d.lact ? '임신' : '임신·수유'}</small><b>${fmt(d.pregnancy)}</b></div>` : ''}${lactCell(d)}${d.children ? `<div><small>소아</small><b>${fmt(d.children)}</b></div>` : ''}</div>` : ''}
+    ${d.risk || d.pregnancy || d.children || d.lact ? '<div style="height:20px"></div>' : ''}
     ${d.avoid?.length ? `<h2>${isOral(d) ? '누가 먹으면 안 되나요?' : '누가 쓰면 안 되나요?'}</h2>${list(d.avoid.map(a => a.text || a), 'plain x')}` : ''}
     ${d.caution?.length ? `<h2 style="margin-top:20px">누가 먼저 상의해야 하나요?</h2>${list(d.caution.map(a => a.text || a))}` : ''}
     ${sideFreqHtml(d)}
