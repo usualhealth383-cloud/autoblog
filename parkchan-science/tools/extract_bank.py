@@ -72,6 +72,12 @@ def qc_evidence(stem, page, gist):
     return best
 
 
+# 본책 개념 번호 → 강의용(앱 '오늘의 개념') 번호. 본책이 개념을 더 잘게 나눈 소단원만 — 나머지는 같다.
+#  1203: 본책 7(같은 족·결합 성질을 따로) → 강의용 5 / 1301: 본책 6(해수 층상 구조 쪽은 '2' 이어서) → 강의용 5
+BOOK2LEC = {'1203': {1: 1, 2: 1, 3: 2, 4: 3, 5: 4, 6: 5, 7: 5}, '1301': {1: 1, 2: 2, 3: 3, 4: 4, 5: 5, 6: 5}}
+def lec_no(code, n): return BOOK2LEC.get(code, {}).get(n, n)
+
+
 def parse_chapter(path):
     src = path.read_text(encoding='utf-8')
     code = lesson_code(path)
@@ -80,8 +86,12 @@ def parse_chapter(path):
     items, labs = [], []
     gist = [txt(li) for li in soup.select('.gist li')]
 
-    # ── 바로바로 체크: 개념 순서대로 ──
+    # ── 바로바로 체크: 그 체크가 놓인 개념 쪽(바로 앞 .sec 머리 번호) → 강의용 개념 번호 ──
+    #  예전엔 체크 상자 순서로 매겨, 개념 1에 체크가 없는 소단원 18개에서 번호가 하나씩 밀렸다(효소 OX → 물질대사 카드, 2026-10-06 콘텐츠 감사).
+    #  문항 id(c{순서}-n)는 그대로 둔다 — 학생 복습 기록이 이어지게.
     for ci, qc in enumerate(soup.select('.quickcheck'), 1):
+        sec = qc.find_previous(class_='sec'); sm = re.match(r'\s*(\d+)', txt(sec, False)) if sec else None
+        cno = lec_no(code, int(sm.group(1))) if sm else ci
         ans_line = txt(qc.select_one('.qc-ans'), keep_bold=False).replace('정답', '', 1)
         answers = {int(m.group(1)): (m.group(2), (m.group(3) or '').strip(' ()'))
                    for m in re.finditer(r'(\d)\s*([OX])\s*(\([^)]*\))?', ans_line)}
@@ -92,7 +102,7 @@ def parse_chapter(path):
             a = answers.get(n)
             if not a: continue
             explain = a[1] or qc_evidence(stem, qc.find_parent(class_='page'), gist)   # 괄호 풀이가 없으면 교재의 근거 줄
-            items.append({'id': f'{code}-c{ci}-{n}', 'lessonId': code, 'concept': int(ci), 'step': 'qc', 'type': 'ox', 'stem': stem,
+            items.append({'id': f'{code}-c{ci}-{n}', 'lessonId': code, 'concept': cno, 'step': 'qc', 'type': 'ox', 'stem': stem,
                           'source': '', 'choices': [], 'answer': a[0], 'explain': explain, 'wrong': '', 'figure': '', 'difficulty': '●○○'})
 
     # ── 정답표 · 해설 ──
@@ -168,7 +178,7 @@ def parse_chapter(path):
         elif choices: typ, answer = 'mc', (mark_no(a))
         else: typ, answer = 'blank', a
         m = re.search(r'개념\s*(\d)', tag) or re.search(r'개념\s*(\d)', sol.get('concept', ''))
-        items.append({'id': f'{code}-q{n}', 'lessonId': code, 'concept': int(m.group(1)) if m else 0, 'step': step, 'type': typ,
+        items.append({'id': f'{code}-q{n}', 'lessonId': code, 'concept': lec_no(code, int(m.group(1))) if m else 0, 'step': step, 'type': typ,
                       'stem': stem, 'source': source, 'choices': choices, 'answer': answer,
                       'explain': sol.get('explain', ''), 'wrong': sol.get('wrong', ''), 'figure': figure,
                       'difficulty': difficulty or {1: '●○○', 2: '●●○', 3: '●●●'}[step], **({'must': True} if must else {}),
