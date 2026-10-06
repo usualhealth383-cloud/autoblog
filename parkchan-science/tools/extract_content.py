@@ -130,12 +130,24 @@ def parse_lesson(path):
         for tr in page.select('table.terms tr'):
             cur['terms'].append({'k': txt(tr.find('th')), 'v': txt(tr.find('td'))})
         for m in page.select('.myth .m'):
+            why = ''
+            w = m.select_one('span.w')               # '왜?' 표지 — 그 뒤 글은 이유(반박 텍스트의 설명)
+            if w:
+                box = soup.new_tag('span')
+                for sib in list(w.next_siblings):
+                    box.append(sib.extract())
+                why = txt(box, keep_bold=True)
+                br = w.find_previous_sibling('br')   # 진실과 이유 사이 줄바꿈
+                if br:
+                    br.extract()
+                w.extract()
             raw = txt(m, keep_bold=True)
             parts = re.split(r'✓\s*진실', raw)
             if len(parts) == 2:
                 cur['myths'].append({
                     'x': re.sub(r'^✗\s*오해\s*', '', parts[0]).strip(),
-                    'o': parts[1].strip()})
+                    'o': parts[1].strip(),
+                    'why': why})
         pt = page.select_one('.point p')
         if pt:
             cur['point'] = txt(pt, keep_bold=True)
