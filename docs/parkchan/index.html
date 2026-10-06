@@ -409,12 +409,6 @@ button,.tab,.btn,.chip,.chipbar button,.seg button{-webkit-user-select:none;user
 .empty p{font-size:var(--t-small);line-height:1.8}
 
 /* 진도 · 통계 */
-.prog{display:flex;align-items:center;gap:15px;background:var(--card);border:1px solid var(--hair);border-radius:var(--r-m);padding:15px 17px;margin-bottom:13px;cursor:pointer;width:100%;text-align:left}
-.prog svg.ring{width:52px;height:52px;flex:0 0 auto}
-.prog .lab{font-size:var(--t-cap);color:var(--muted)}
-.prog .val{font-size:var(--t-h2);font-weight:900;letter-spacing:-.02em;font-variant-numeric:tabular-nums;line-height:1.25}
-.prog .val small{font-size:var(--t-small);color:var(--muted);font-weight:700}
-.prog .r{margin-left:auto;text-align:right}
 .week{display:flex;gap:6px;justify-content:space-between;margin:2px 0 13px}
 .week .d{flex:1;text-align:center;font-size:var(--t-tab);color:var(--faint);font-weight:700}
 .week .d i{display:grid;place-items:center;width:100%;aspect-ratio:1;border-radius:var(--r-s);background:var(--hair);
@@ -931,12 +925,6 @@ figure.zoomable{cursor:zoom-in}
 .cst{font-size:var(--t-tab);font-weight:700;border-radius:var(--r-pill);padding:3px 9px;white-space:nowrap}
 .cst.wait{color:var(--warn);background:var(--warn-soft,rgba(138,100,8,.1))}
 .cst.ok{color:var(--brand-dark);background:var(--brand-soft)}
-.todaysched{display:flex;align-items:center;gap:10px;width:100%;background:var(--card);border:1px solid var(--hair);border-radius:var(--r-m);
-  padding:12px 14px;margin-bottom:12px;cursor:pointer;text-align:left}
-.todaysched .l{flex:1;min-width:0;font-size:var(--t-cap);font-weight:700;color:var(--body);line-height:1.5;
-  overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
-.todaysched .l i{font-style:normal;color:var(--faint);font-weight:700}
-.todaysched .dd{flex:0 0 auto;font-size:var(--t-cap);font-weight:900;color:var(--brand);background:var(--brand-soft);border-radius:var(--r-pill);padding:5px 10px;font-variant-numeric:tabular-nums}
 .qbridge{background:var(--u-soft);border-radius:var(--r-m);padding:12px 14px;margin:14px 0 0;font-size:var(--t-small);line-height:1.75;color:var(--body)}
 .qbridge b{display:block;font-size:var(--t-cap);font-weight:700;letter-spacing:0;color:var(--u-dark);margin-bottom:5px}
 .qlist blockquote{font-family:var(--serif);font-size:var(--t-body);line-height:1.8;color:var(--ink);margin:0 0 6px}
@@ -2563,7 +2551,7 @@ function pathHtml(){
   const D = {
     read: { btnId:'pRead', name:`개념 읽기 · ${c.title}`, todo:`${tag} · 개념 ${+c.no || c.no}`, done:'다 읽었어요',
       h:c.title, p:c.subtitle || c.lessonName, m:`${c.bookName ? c.bookName + ' · ' : ''}${tag} · 개념 ${+c.no || c.no}`, btn:'읽기 시작' },
-    blank: { btnId:'pBlank', name:`빈칸 ${Object.keys(c.blanks || {}).join(' ')}`, todo:`읽은 내용으로 ${bN}칸 채우기`, done:`${bN}칸 가운데 ${bOk}칸 맞혔어요`,
+    blank: { btnId:'pBlank', name:`빈칸 ${Object.keys(c.blanks || {}).join(' ')}`, todo:`읽은 내용으로 ${bN}칸 채우기`, done: bOk ? `${bN}칸 가운데 ${bOk}칸 맞혔어요` : '채워 보고 답을 확인했어요',
       h:`빈칸 ${bN}개 채우기`, p:'읽은 내용을 떠올려 ㉠ ㉡ ㉢을 채워 봐요. 모르면 비워 두고 확인해도 돼요.', m:'', btn:'채우기' },
     quiz: { btnId:'goQuiz', name:'오늘의 문제 1개', todo:`${tag} ${c.lessonName}`, done: tp.q === 'o' ? '맞았어요' : tp.q === 'x' ? '틀렸어요 · 내일 다시 나와요' : '답을 써 봤어요',
       h:'오늘의 문제 1개', p: q.essay ? '문장으로 써 보고 모범 답안과 견줘 봐요.' : '고르면 바로 채점하고, 왜 갈렸는지 알려 줘요.', m:`${tag} ${c.lessonName}`, btn:'풀기' },
@@ -2634,10 +2622,10 @@ async function renderToday(){
 /* 빈칸 ㉠㉡㉢ — 오늘 개념의 빈칸이 든 문장만 꺼내 적어 보게 한다(개념 상세의 '누르면 답' 빈칸은 그대로).
    문장이 짧으면(넷째, ㉢다.) 다음 문장까지 붙여 뜻이 서게 · 단계 제목에 든 빈칸은 '제목 — 설명'으로 */
 function blankItems(c){
-  const src = [...(c.steps || []).map(s => String(s.t || '').includes('{{') ? `${s.t} — ${s.d}` : s.d), ...(c.body || [])].map(String);
+  const src = [...(c.steps || []).map(s => String(s.t || '').includes('{{') || plain(s.d).length < 28 ? `${s.t} — ${s.d}` : s.d), ...(c.body || [])].map(String);
   return Object.keys(c.blanks || {}).map(k => { const tok = `{{${k}}}`, para = src.find(x => x.includes(tok)) || '';
     const ss = para.split(/(?<=[.?!])\s+/), i = Math.max(0, ss.findIndex(x => x.includes(tok)));
-    let s = ss[i] || para; if (plain(s).length < 28 && ss[i + 1]) s += ' ' + ss[i + 1];
+    let s = ss[i] || para; if (plain(s).length < 28){ if (ss[i + 1]) s += ' ' + ss[i + 1]; else if (i > 0) s = ss[i - 1] + ' ' + s; }
     return { k, a:c.blanks[k], s }; }); }
 const bkLine = s => rich(String(s).replace(/\{\{(.+?)\}\}/g, '\u0001$1\u0002')).replace(/\u0001(.+?)\u0002/g, (_, m) => `<span class="bkx">${m}</span>`);
 let bkMode = 'input', bkVals = [];
@@ -2645,7 +2633,7 @@ function sheetBlank(){
   const c = todayConcept(), items = blankItems(c), tp = tpToday(), res = bkMode === 'result' && Array.isArray(tp.b) ? tp.b : null;
   openSheet(`<h3>빈칸 채우기</h3><p class="bklead">「${esc(c.title)}」에서 나온 빈칸이에요. 떠오르는 말을 적어 봐요.</p>
     <ol class="bkl">${items.map((it, i) => `<li><p class="bks">${bkLine(it.s)}</p>
-      ${res ? `<p class="bkr ${res[i] ? 'ok' : 'no'}">${res[i] ? `${IC_CHK}<span>맞았어요 · <b>${esc(it.a)}</b></span>` : `<span>${bkVals[i] ? `내 답 ${esc(bkVals[i])} · ` : ''}정답은 <b>${esc(it.a)}</b>이에요</span>`}</p>`
+      ${res ? `<p class="bkr ${res[i] ? 'ok' : 'no'}">${res[i] ? `${IC_CHK}<span>맞았어요 · <b>${esc(it.a)}</b></span>` : `<span>${bkVals[i] ? `내 답 ${esc(bkVals[i])} · ` : ''}정답 <b>${esc(it.a)}</b></span>`}</p>`
         : `<div class="bkin"><label class="k" for="bk${i}">${it.k}</label><input id="bk${i}" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="${it.k}에 들어갈 말" value="${esc(bkVals[i] || '')}"></div>`}</li>`).join('')}</ol>
     ${res ? `<button class="btn" id="bkDone">다 했어요</button><button class="btn ghost" id="bkAgain">다시 채우기</button>`
       : `<button class="btn" id="bkGo">확인</button><button class="btn ghost" id="sheetClose">나중에</button>`}`);
@@ -2659,7 +2647,7 @@ function renderQuiz(){
   const {q, pick, retry, mode} = qState; const graded = pick !== null;
   const label = mode==='review' ? '복습 문제' : (retry ? '다시 볼 문제' : '오늘의 문제');
   document.getElementById('v-quiz').innerHTML = `
-    <button class="back" id="backToday"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg>${mode==='review'?'통계':'오늘 개념'}</button>
+    <button class="back" id="backToday"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg>${mode==='review'?'통계':'오늘'}</button>
     <h1 class="sr">${mode==='review'?'복습 문제':'오늘의 문제'}</h1>
     <div class="qhead"><span class="l">${label}${mode==='review'?` · ${esc(qState.lessonName||'')}`:''}</span>
       <span class="tag">${retry ? `${kdate(retry.iso)}에 틀림` : (graded && pick!==q.answer ? '다시 볼 문제' : (q.type||'확인'))}</span></div>
@@ -2670,7 +2658,7 @@ function renderQuiz(){
     ${q.essay ? `
       <textarea class="essay" placeholder="문장으로 답을 써 보세요"></textarea>
       ${graded ? `<div class="verdict"><div class="h">이렇게 쓰면 돼요</div><p>${rich(q.gradeNote || q.answerLine)}</p></div>` : ''}
-      <button class="btn" id="grade">${graded ? (mode==='review'?'다음 복습 문제':'오늘 개념으로 돌아가기') : '답 확인하기'}</button>
+      <button class="btn" id="grade">${graded ? (mode==='review'?'다음 복습 문제':'오늘로 돌아가기') : '답 확인하기'}</button>
     ` : `
       ${graded ? '' : confRow(qState.conf)}
       <div class="opts">${q.choices.map((t,i)=>{ const n=i+1; let cls='', mk=''; if (graded){ if (n===q.answer){cls='ok';mk='정답';} else if (n===pick){cls='bad';mk='내 답';} }
@@ -2679,7 +2667,7 @@ function renderQuiz(){
         <div class="verdict" tabindex="-1" role="status"><div class="h">${pick===q.answer ? '맞았어요' : `정답은 ${MARKS[q.answer-1]}이에요`}</div>
           ${confNote(qState.conf, pick===q.answer)}${q.explain ? `<p>${rich(q.explain)}</p>` : conceptGo(q)}</div>
         ${srsLine(qState.srs) ? `<div class="again">${srsLine(qState.srs)}</div>` : ''}
-        <button class="btn" id="grade">${mode==='review' ? '다음 복습 문제' : (retry ? '오늘의 문제로' : '오늘 개념으로 돌아가기')}</button>
+        <button class="btn" id="grade">${mode==='review' ? '다음 복습 문제' : (retry ? '오늘의 문제로' : '오늘로 돌아가기')}</button>
         <button class="flag" data-report="quiz:${esc(q.lessonId)}#${q.no}">문제·해설에 틀린 곳이 있나요?</button>
       ` : `<p class="qhint">고르면 바로 채점하고, 왜 갈렸는지 알려 줘요.<br>틀려도 괜찮아요. ${SRS_RULE}</p>`}
     `}`;
@@ -3442,7 +3430,7 @@ function rxList(wrongs, ptsOf){
 }
 function rxHtml(wrongs, ptsOf){
   const rx = rxList(wrongs, ptsOf); if (!rx.length) return '';
-  return `<div class="sec rx"><h2>다시 볼 소단원</h2><p class="fine" style="text-align:left;padding:0 0 6px">틀린 문항이 이어지는 소단원입니다. 많이 놓친 곳부터 개념 카드를 다시 읽고, 그 소단원 문제를 풀어 보세요.</p>
+  return `<div class="sec rx"><h2>다시 볼 소단원</h2><p class="fine" style="text-align:left;padding:0 0 6px">틀린 문항이 이어지는 소단원이에요. 많이 놓친 곳부터 개념 카드를 다시 읽고, 그 소단원 문제를 풀어 보세요.</p>
     ${rx.map(e => { const c = CONCEPTS.find(x => x.lessonId === e.l);
       return `<div class="rxrow"><div class="b"><span class="t">${esc(lessonLabel(e.l))}</span><span class="s">${e.n.map(n => n + '번').join(' · ')}${ptsOf ? ` · ${fmtPt(e.p)}점` : ''}</span></div>
         <div class="acts">${c ? `<button class="rxbtn" data-cgo="${esc(c.id)}">개념 카드</button>` : ''}<button class="rxbtn" data-drill="${esc(e.l)}">문제 풀기</button></div></div>`; }).join('')}</div>`;
@@ -3473,7 +3461,7 @@ function renderUnitPick(v){
   const ux = S.ux || {};
   v.innerHTML = `<button class="back" id="umBack"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg>문제 풀기</button>
     <h1 class="h-page">대단원 마무리</h1>
-    <p class="fine lead">단원 전체를 엮어 묻는 16문항입니다. 마무리 12문항 다음에 고난도 4문항이 이어집니다. 틀린 문제는 오답 노트에 담겨 간격을 두고 다시 나옵니다.</p>
+    <p class="fine lead">단원 전체를 엮어 묻는 16문항이에요. 마무리 12문항 다음에 고난도 4문항이 이어져요. ${SRS_RULE}</p>
     ${['1','2'].map(b => `<h2 class="umbook">통합과학 ${b}</h2>${unitList().filter(u => u.book === b).map(u => { const r = ux[u.key], n = umItems('unit', u.book, u.unit).length, nr = umItems('recap', u.book, u.unit).length;
       return `<div class="umcard"><button class="umrow" data-ustart="${u.key}" ${n ? '' : 'disabled'}><span class="n">${u.unit}</span><span class="b"><span class="t">${esc(u.name)}</span><span class="s">${n ? `${n}문항` : '문항 준비 중'}${r ? ` · 지난번 ${r[0]}/${r[1]} (${esc(kdate(r[2]))})` : ''}</span></span><svg class="chev" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg></button>
         ${nr ? `<button class="umsub" data-urecap="${u.key}">핵심 정리 빈칸 ${nr}개 먼저 꺼내 보기</button>` : ''}</div>`; }).join('')}`).join('')}`;
@@ -3538,11 +3526,11 @@ function renderMockResult(v){
   const hist = ((S.mk||{})[mx.b] || []).slice(0, -1).slice(-1)[0];
   v.innerHTML = `<button class="back" id="mockClose"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg>문제 풀기</button>
     <div class="result" tabindex="-1"><div class="big">${fmtPt(score)}<small style="font-size:var(--t-h2);color:var(--muted)"> / 50</small></div>
-      <p class="sub">${mockOf(mx.b).t} 실전 모의고사 · ${n}문항 중 ${right}문항을 맞혔습니다${mx.timer || mins ? ` · ${Math.max(1, mins)}분` : ''}</p>
+      <p class="sub">${mockOf(mx.b).t} 실전 모의고사 · ${n}문항 가운데 ${right}문항 맞힘${mx.timer || mins ? ` · ${Math.max(1, mins)}분` : ''}</p>
       ${hist ? `<p class="sub">지난번 ${fmtPt(hist.s)}점 (${esc(kdate(hist.d))})</p>` : ''}</div>
     ${mx.res.auto ? `<p class="again" role="status">${MOCK_MIN}분이 지나 그때까지 고른 답으로 제출했습니다.</p>` : ''}
     ${mx.asg ? `<p class="again asgsent" role="status"><span>학원 과제 · <span id="asgSent">${esc(asgSentText(aqOf(mx.asg)))}</span></span></p>` : ''}
-    ${wrongs.length ? `<p class="again">틀린 ${wrongs.length}문항은 오답 노트에 담겨 내일부터 간격을 두고 다시 나옵니다.</p>` : ''}
+    ${wrongs.length ? `<p class="again">틀린 ${wrongs.length}문항은 오답 노트에 담겼어요. ${SRS_RULE}</p>` : ''}
     ${rxHtml(wrongs, q => +q.points || 0)}
     <div class="sec"><h2>문항별 해설</h2><div class="mxlist">${mx.items.map((q, i) => `<button class="mxr ${ok[i] ? 'o' : 'x'}" data-mxr="${i}"><span class="n">${i + 1}</span><span class="b">${ok[i] ? '맞음' : mx.picks[i] ? `내 답 ${MARKS[mx.picks[i] - 1]} · 정답 ${MARKS[q.answer - 1]}` : `답 안 함 · 정답 ${MARKS[q.answer - 1]}`}</span><span class="p">${fmtPt(q.points)}점</span><span class="mk" aria-hidden="true">${ok[i] ? '○' : '✕'}</span></button>`).join('')}</div></div>
     <button class="btn soft" data-mstart="${mx.b}">같은 모의고사 다시 풀기</button><button class="btn ghost" id="mockClose2">문제 풀기로</button>`;
@@ -3555,7 +3543,7 @@ function renderMockReview(v){
     ${qBody(q, `data-mxzoom="${i}"`)}
     <div class="opts">${q.choices.map((t, j) => { const n = j + 1; const cls = n === q.answer ? 'ok' : n === pk ? 'bad' : ''; const mk = n === q.answer ? '정답' : n === pk ? '내 답' : '';
       return `<div class="opt ${cls}"><span class="m">${MARKS[j]}</span><span class="tx">${rich(t)}</span>${mk ? `<span class="mk">${mk}</span>` : ''}</div>`; }).join('')}</div>
-    <div class="verdict" tabindex="-1" role="status"><div class="h">${ok ? '맞혔습니다' : pk ? '아쉽습니다' : '답하지 않았습니다'} · 정답 ${MARKS[q.answer - 1]}</div>${jd ? jdHtml(jd) : q.explain ? `<p>${rich(q.explain)}</p>` : conceptGo(q)}</div>
+    <div class="verdict" tabindex="-1" role="status"><div class="h">${ok ? '맞았어요' : pk ? '틀렸어요' : '답하지 않았어요'} · 정답 ${MARKS[q.answer - 1]}</div>${jd ? jdHtml(jd) : q.explain ? `<p>${rich(q.explain)}</p>` : conceptGo(q)}</div>
     ${q.wrong && !jd ? `<div class="wrongbox"><div class="h">바로알기</div>${rich(q.wrong)}</div>` : ''}
     ${(q.lessons||[]).length ? `<p class="fine" style="text-align:left;padding:0 0 12px">이어지는 소단원 · ${q.lessons.map(l => esc(lessonLabel(l))).join(' · ')}</p>` : ''}
     <div class="mxnav"><button class="btn ghost" id="mxRvPrev" ${i ? '' : 'disabled'}>이전 문항</button><button class="btn soft" id="mxRvNext" ${i + 1 < mx.items.length ? '' : 'disabled'}>다음 문항</button></div>

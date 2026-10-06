@@ -71,7 +71,7 @@ async def main():
         await pg.click('#bankQuit'); await pg.wait_for_timeout(200)
         await pg.click('[data-lab="1304"]'); await pg.wait_for_timeout(400); t = await pg.locator('#v-lab').inner_text(); assert '해석의 3단계' in t and '직접 해보기' in t; await pg.screenshot(path=f'{SC}/b7_lab.png', full_page=True)
         await pg.click('[data-zoomlab]'); await pg.wait_for_timeout(200); assert await pg.locator('#fv').count()==1; await pg.click('#fvClose')
-        await pg.click('.tab[data-v="today"]'); await pg.wait_for_timeout(400); await pg.click('[data-zoom]'); await pg.wait_for_timeout(200); assert await pg.locator('#fv').count()==1; await pg.click('#fvPlus'); await pg.click('#fvClose')
+        await pg.click('.tab[data-v="today"]'); await pg.wait_for_timeout(400); await pg.click('#pRead'); await pg.wait_for_timeout(300); await pg.click('[data-zoom]'); await pg.wait_for_timeout(200); assert await pg.locator('#fv').count()==1; await pg.click('#fvPlus'); await pg.click('#fvClose')
         await pg.click('.tab[data-v="list"]'); await pg.wait_for_timeout(300); i = await pg.evaluate("CONCEPTS.findIndex(c=>c.id==='1304-05')"); await pg.click(f'.row[data-i="{i}"]'); await pg.wait_for_timeout(400)
         assert await pg.locator('#v-detail [data-lab="1304"]').count()==1 and await pg.locator('#v-detail [data-drill="1304"]').count()==1
         await pg.click('#v-detail [data-drill="1304"]'); await pg.wait_for_timeout(300); assert await pg.evaluate('bs && bs.items.every(q=>q.lessonId==="1304")')
