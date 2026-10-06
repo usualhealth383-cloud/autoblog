@@ -21,6 +21,6 @@ revoke all on table public.shares from anon, authenticated;
 create index if not exists shares_expires_idx on public.shares (expires_at);
 
 -- 매일 새벽 만료분 삭제
-create extension if not exists pg_cron;
+create extension if not exists pg_cron with schema pg_catalog;   -- Supabase 문서 방식(2026-10-06 확인)
 select cron.schedule('yakjido-shares-expire', '17 18 * * *',   -- UTC 18:17 = 한국 03:17
   $$delete from public.shares where expires_at < now()$$);

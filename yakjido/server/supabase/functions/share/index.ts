@@ -2,7 +2,8 @@
 //   POST {action:'create', items:[{id,name}], label?, note?, consent:true}  → {code, expires_at}
 //   POST {action:'get', code}                                               → {items, label, note, expires_at, bought_at}
 //   POST {action:'bought', code}                                            → {ok:true}
-// 서버 키는 Supabase 가 함수 실행 환경에 자동으로 넣어 준다(SUPABASE_SERVICE_ROLE_KEY) — 저장소에 적지 않는다.
+// 서버 키는 Supabase 가 함수 실행 환경에 자동으로 넣어 준다 — 저장소에 적지 않는다.
+// 새 키 체계(publishable·secret) 프로젝트는 SUPABASE_SECRET_KEYS(JSON, 'default'), 옛 프로젝트는 SUPABASE_SERVICE_ROLE_KEY(2026-10-06 문서 확인)
 import { createClient } from 'npm:@supabase/supabase-js@2';
 
 const ORIGINS = [
@@ -19,7 +20,11 @@ const cors = (origin: string | null) => ({
 const json = (body: unknown, status: number, origin: string | null) =>
   new Response(JSON.stringify(body), { status, headers: { 'Content-Type': 'application/json; charset=utf-8', ...cors(origin) } });
 
-const db = createClient(Deno.env.get('SUPABASE_URL')!, Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!, { auth: { persistSession: false } });
+function serverKey(): string {
+  try { const k = JSON.parse(Deno.env.get('SUPABASE_SECRET_KEYS') || '{}')['default']; if (k) return k; } catch (_) { /* 옛 프로젝트 */ }
+  return Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+}
+const db = createClient(Deno.env.get('SUPABASE_URL')!, serverKey(), { auth: { persistSession: false } });
 
 // 추측 불가능한 코드(128비트, 주소에 쓰기 좋은 글자)
 const newCode = () => {
