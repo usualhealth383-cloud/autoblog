@@ -79,8 +79,9 @@ async def run(theme):
         for v, n in [('list','교재'),('bank','문제'),('talk','이야기'),('plan','일정'),('me','내 정보')]:
             await pg.click(f'.tab[data-v="{v}"]'); await pg.wait_for_timeout(500); await sweep(pg, n, bad)
         await pg.click('#goNoteMe'); await pg.wait_for_timeout(400); await pg.click('#noteNew'); await pg.wait_for_timeout(300)
-        await sweep(pg, '노트 쓰기(빈 세 줄 · 안내 문구)', bad)
-        await pg.fill('#nedF0', '대비 점검'); await pg.click('[data-nmood="calm"]'); await pg.click('[data-ngrasp="2"]'); await pg.wait_for_timeout(700); await sweep(pg, '노트 쓰기(세 줄)', bad)
+        await sweep(pg, '노트 쓰기(가볍게 · 안내 문구)', bad)
+        await pg.fill('#nedF0', '대비 점검'); await pg.click('[data-nmood="calm"]'); await pg.click('#nedInsT'); await pg.wait_for_timeout(200); await sweep(pg, '노트 쓰기(가볍게 · 불러오기)', bad)
+        await pg.click('#nedFull'); await pg.wait_for_timeout(300); await pg.click('[data-ngrasp="2"]'); await pg.wait_for_timeout(700); await sweep(pg, '노트 쓰기(세 줄)', bad)
         await pg.click('#nedCheck'); await pg.wait_for_timeout(300); await sweep(pg, '교재와 견주기', bad); await pg.click('#sheetClose'); await pg.wait_for_timeout(200)
         await pg.click('[data-ntpl="cornell"]'); await pg.wait_for_timeout(300); await pg.fill('#nedF1', '핵심 점검'); await pg.wait_for_timeout(600); await sweep(pg, '노트 쓰기(코넬)', bad)
         await pg.click('#nedDone'); await pg.wait_for_timeout(300); await sweep(pg, '공부 노트', bad)
