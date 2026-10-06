@@ -254,6 +254,18 @@ K5, K5_ID = signup('kid5@test.kr', '동의전', under14=True, guardian='최보�
 s, _ = call('POST', '/rest/v1/notes', {'id': str(_uuid.uuid4()), 'date': '2026-09-30', 'title': '동의 전', 'body': '', 'cids': []}, K5); check('보호자 동의 전에는 노트를 서버에 못 남김', s >= 400, s)
 # 나중에 고친 쪽이 이긴다 — 옛 기기가 늦게 올린 더 오래된 수정은 버린다
 # (시각은 지금 기준으로 — 고정 시각을 쓰면 그 시각이 지난 뒤엔 '새 수정'도 처음 만든 시각보다 옛것이 되어 시험이 틀렸다, 2026-10-01)
+# 노트 틀·칸·마음·이해(2026-10-07) — 선택 칸. 값은 정해진 것만, 남은 못 읽는다
+s, _ = call('POST', '/rest/v1/notes?on_conflict=id', {'id': nid, 'date': '2026-09-30', 'title': '', 'body': '질문\n왜?\n\n핵심\n그래서', 'cids': [], 'tpl': 'cornell', 'parts': ['왜?', '그래서'], 'mood': 'calm', 'grasp': 2}, N1, UP)
+check('틀·칸·마음·이해를 같이 저장', s in (200, 201), s)
+s, j = call('GET', f'/rest/v1/notes?id=eq.{nid}&select=tpl,parts,mood,grasp', tok=N1); check('  └ 내가 읽음', j == [{'tpl': 'cornell', 'parts': ['왜?', '그래서'], 'mood': 'calm', 'grasp': 2}], j)
+s, j = call('GET', '/rest/v1/notes?select=mood,grasp,parts', tok=N2); check('  └ 다른 학생은 마음·이해·칸을 못 읽음', j == [], j)
+s, j = call('GET', '/rest/v1/notes?select=mood,grasp', tok=OWN); check('  └ 원장도 마음·이해를 못 읽음', j == [], j)
+for bad, why in [({'tpl': 'diary'}, '없는 틀'), ({'mood': 'angry'}, '없는 마음'), ({'grasp': 4}, '이해 4단계'), ({'parts': ['a', 'b', 'c', 'd', 'e']}, '칸 5개'),
+                 ({'parts': {'a': 1}}, '칸이 목록이 아님'), ({'parts': ['a', 3]}, '칸에 글이 아닌 값'), ({'parts': ['가' * 12001]}, '칸 글이 너무 김')]:
+    s, _ = call('POST', '/rest/v1/notes', {'id': str(_uuid.uuid4()), 'date': '2026-09-30', 'title': 'x', 'body': '', 'cids': [], **bad}, N1); check(f'  └ {why}이면 거절', s >= 400, s)
+s, _ = call('POST', '/rest/v1/notes?on_conflict=id', {'id': nid, 'date': '2026-09-30', 'title': '비밀 메모', 'body': '나만 봄', 'cids': []}, N1, UP)
+s, j = call('GET', f'/rest/v1/notes?id=eq.{nid}&select=body,tpl,parts', tok=N1); check('옛 앱처럼 새 칸 없이 올려도 됨(새 칸은 그대로 — 앱이 본문과 어긋나면 본문을 씀)', s == 200 and j and j[0]['body'] == '나만 봄' and j[0]['tpl'] == 'cornell', j)
+call('PATCH', f'/rest/v1/notes?id=eq.{nid}', {'tpl': '', 'parts': [], 'mood': '', 'grasp': 0}, N1)
 import datetime as _dt
 _t = lambda m: (_dt.datetime.now(_dt.timezone.utc) + _dt.timedelta(minutes=m)).isoformat()
 s, _ = call('POST', '/rest/v1/notes?on_conflict=id', {'id': nid, 'date': '2026-09-30', 'title': '새 제목', 'body': '나만 봄', 'cids': [], 'updated_at': _t(10)}, N1, UP)

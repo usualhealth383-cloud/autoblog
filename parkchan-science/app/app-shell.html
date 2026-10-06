@@ -560,11 +560,68 @@ button,.tab,.btn,.chip,.chipbar button,.seg button{-webkit-user-select:none;user
 .nday b{font-size:var(--t-h2);font-weight:900;letter-spacing:-.01em}
 .nday small{display:block;font-size:var(--t-cap);color:var(--muted);font-weight:700;margin-top:2px;word-break:keep-all}
 .nday .more{font-size:var(--t-cap);font-weight:700;color:var(--muted);background:none;border:none;cursor:pointer;min-height:40px;padding:0 6px}
-.ncard{display:block;width:100%;text-align:left;background:var(--card);border:1px solid var(--hair);border-radius:var(--r-m);padding:14px 16px;margin-bottom:10px;cursor:pointer;font-family:inherit;color:var(--ink)}
-.ncard .t{display:block;font-size:var(--t-body);font-weight:700;margin-bottom:4px;word-break:keep-all;overflow-wrap:anywhere}
-.ncard .b{font-size:var(--t-small);color:var(--body);line-height:1.7;white-space:pre-wrap;word-break:keep-all;overflow-wrap:anywhere;display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden}
-.ncard .m{display:flex;flex-wrap:wrap;gap:6px;margin-top:9px;align-items:center}
+/* 노트 카드(2026-10-07) — 틀마다 모양: 세 줄(번호) · 코넬(질문 | 핵심, 아래 요약) · 헷갈린 것(→ 이제 아는 것) · 자유. 말줄임 없이 다 보인다 */
+.ncard{background:var(--card);border:1px solid var(--hair);border-radius:var(--r-l);margin-bottom:10px;color:var(--ink);overflow:hidden}
+.ncard .nbody{display:block;width:100%;text-align:left;background:none;border:none;padding:14px 16px 4px;cursor:pointer;font-family:inherit;color:inherit}
+.ncard div.nbody{cursor:default}
+.ncard .t{display:block;font-size:var(--t-body);font-weight:700;margin-bottom:6px;word-break:keep-all;overflow-wrap:anywhere}
+.ncard .b{display:block;font-size:var(--t-small);color:var(--body);line-height:1.75;white-space:pre-wrap;word-break:keep-all;overflow-wrap:anywhere}
+.ncard .b.mute{color:var(--muted)}
+.ncard .rd{color:var(--brand-dark);font-weight:700;white-space:nowrap}
+.ncard .nps{display:block}
+.ncard .np{display:block;margin:0 0 8px}
+.ncard .nl{display:flex;align-items:center;gap:6px;font-size:var(--t-cap);font-weight:700;color:var(--muted);margin-bottom:1px}
+.ncard .nl i{font-style:normal;display:inline-grid;place-items:center;width:18px;height:18px;border-radius:50%;background:var(--brand-soft);color:var(--brand-dark);font-size:var(--t-tab);font-weight:700;font-variant-numeric:tabular-nums}
+.ncard .nt{display:block;font-size:var(--t-body);line-height:1.7;color:var(--ink);white-space:pre-wrap;word-break:keep-all;overflow-wrap:anywhere}
+.ncard.t-line3 .np .nt{padding-left:24px}
+.ncard.t-cornell .nps{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.8fr);column-gap:12px}
+.ncard.t-cornell .np.i0{grid-column:1;border-right:1px solid var(--hair);padding-right:10px}
+.ncard.t-cornell .np.i0 .nt{color:var(--brand-dark);font-weight:700;font-size:var(--t-small)}
+.ncard.t-cornell .np.i1{grid-column:2}
+.ncard.t-cornell .np.i0:last-child,.ncard.t-cornell .np.i0:has(+ .np.i2){grid-column:1 / -1;border-right:none;padding-right:0}
+.ncard.t-cornell .np.i1:first-child{grid-column:1 / -1}
+.ncard.t-cornell .np.i2{grid-column:1 / -1;border-top:1px solid var(--hair);padding-top:8px;margin-top:2px}
+.ncard.t-cornell .np.i2:first-child{border-top:none;padding-top:0}
+.ncard.t-mix .np.i0 .nt{color:var(--body)}
+.ncard.t-mix .np.i1{background:var(--brand-soft);border-radius:var(--r-s);padding:8px 10px}
+.ncard.t-mix .np.i1 .nl{color:var(--brand-dark)}
+.ncard.t-mix .np.i1 .nl::before{content:'';width:12px;height:12px;flex:0 0 12px;background:currentColor;-webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M4 12h14M13 6l6 6-6 6' fill='none' stroke='black' stroke-width='2.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center/contain no-repeat;mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M4 12h14M13 6l6 6-6 6' fill='none' stroke='black' stroke-width='2.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center/contain no-repeat}
+.ncard .np.i3{border-top:1px dashed var(--line);padding-top:8px}
+.ncard .np.i3 .nt{font-size:var(--t-small);color:var(--body)}
+.ncard [hidden]{display:none!important}
+.ncard .ncov{display:block;width:100%;text-align:left;font-family:inherit;font-size:var(--t-small);font-weight:700;color:var(--brand-dark);background:var(--paper);border:1px dashed var(--brand-line);border-radius:var(--r-s);padding:9px 12px;min-height:44px;cursor:pointer;margin-top:2px}
+.ncard .m{display:flex;flex-wrap:wrap;gap:6px 8px;align-items:center;padding:4px 16px 12px}
+.ncard .m .ccp{border:none;cursor:pointer;font-family:inherit;min-height:32px}
+.ncard .m .ccp>span{padding:5px 10px}
+.ncard .nmd{font-size:var(--t-cap);color:var(--muted);font-weight:700}
 .ncard .when{font-size:var(--t-tab);color:var(--faint);margin-left:auto;font-variant-numeric:tabular-nums}
+.ncard .m .more{font-size:var(--t-cap);font-weight:700;color:var(--brand-dark);background:none;border:none;cursor:pointer;min-height:36px;padding:0 4px;font-family:inherit}
+.ngr{display:inline-flex;align-items:center;gap:3px;font-size:var(--t-cap);color:var(--muted);font-weight:700}
+.ngr i{display:block;width:5px;height:12px;border-radius:2px;background:var(--line)}
+.ngr i.on{background:var(--brand)}
+.ngr span{margin-left:4px}
+.ndone{display:flex;align-items:center;gap:8px;font-size:var(--t-small);font-weight:700;color:var(--brand-dark);background:var(--brand-soft);border-radius:var(--r-m);padding:10px 14px;margin:0 0 10px;animation:ndIn .3s ease-out}
+.ndone svg{width:18px;height:18px;flex:0 0 18px;stroke:currentColor;stroke-width:2.4;fill:none;stroke-linecap:round;stroke-linejoin:round}
+@keyframes ndIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){.ndone{animation:none}}
+.nmode{margin-bottom:12px}
+.npast{margin:18px 0 6px}
+.npast .ph{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:0 2px 8px}
+.npast .ph b{display:block;font-size:var(--t-small);font-weight:700;color:var(--ink)}
+.npast .ph small{display:block;font-size:var(--t-cap);color:var(--muted)}
+.npast .ph .more{font-size:var(--t-cap);font-weight:700;color:var(--brand-dark);background:var(--brand-soft);border:none;border-radius:var(--r-pill);padding:0 14px;min-height:36px;cursor:pointer;font-family:inherit;flex:0 0 auto}
+.npast .ncard{background:var(--paper);border-style:dashed;border-color:var(--line)}
+.nsumlead{font-size:var(--t-small);color:var(--body);line-height:1.7;margin:0 2px 10px;word-break:keep-all}
+.nsumbar{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px}
+.nsumbar button,.nfeel .nch button{font-size:var(--t-cap);font-weight:700;padding:0 14px;min-height:40px;border-radius:var(--r-pill);border:1px solid var(--line);background:var(--card);color:var(--body);cursor:pointer;font-family:inherit}
+.nsumbar button[aria-pressed="true"],.nfeel .nch button[aria-pressed="true"]{background:var(--brand-soft);border-color:var(--brand);color:var(--brand-dark)}
+.nsumbar button[aria-pressed="true"]::before,.nfeel .nch [data-nmood][aria-pressed="true"]::before{content:'✓ '}
+.nall{margin:-6px 0 10px;font-weight:700;color:var(--brand-dark)}
+.nsg{margin-bottom:18px}
+.nsg h2{display:flex;align-items:baseline;flex-wrap:wrap;gap:4px 8px;font-size:var(--t-body);font-weight:700;margin:0 2px 8px;color:var(--ink)}
+.nsg h2 .ntag{font-size:var(--t-cap);font-weight:700;color:var(--brand-dark);background:var(--brand-soft);border-radius:var(--r-pill);padding:2px 9px;font-variant-numeric:tabular-nums}
+.nsg h2 .nm{word-break:keep-all}
+.nsg h2 small{font-size:var(--t-cap);color:var(--muted);font-weight:700;margin-left:auto}
 .ccp{display:inline-flex;align-items:center;gap:2px;font-size:var(--t-cap);font-weight:700;border-radius:var(--r-pill);background:var(--brand-soft);color:var(--brand-dark);max-width:100%}
 .ccp>span,.ccp>button{padding:5px 10px;border:none;background:none;color:inherit;font:inherit;cursor:pointer;min-width:0;overflow-wrap:anywhere;text-align:left}
 .ccp>button.x{padding:5px 10px 5px 2px;font-size:var(--t-small);line-height:1}
@@ -583,7 +640,50 @@ button,.tab,.btn,.chip,.chipbar button,.seg button{-webkit-user-select:none;user
 .ned input.ti:focus,.ned textarea.bd:focus{outline:none}
 .ned input.ti::placeholder,.ned textarea.bd::placeholder{color:var(--faint);font-weight:400}
 .ned .cnt{font-size:var(--t-tab);color:var(--faint);text-align:right;font-variant-numeric:tabular-nums}
-.ned .tools{display:flex;flex-wrap:wrap;gap:6px;margin:12px 0 8px}
+.ned .tools{display:flex;flex-wrap:wrap;gap:6px;margin:14px 0 8px}
+/* 쓰기 화면(2026-10-07) — 틀 고르기 · 끼워 넣기 칩 · 칸 · 교재와 견주기 · 마음/이해(선택) */
+.ntpl{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;margin:0 0 12px}
+.ntpl button{display:flex;flex-direction:column;align-items:flex-start;gap:1px;text-align:left;min-height:52px;padding:8px 12px;border-radius:var(--r-m);border:1px solid var(--line);background:var(--card);color:var(--ink);cursor:pointer;font-family:inherit}
+.ntpl b{font-size:var(--t-small);font-weight:700;word-break:keep-all}
+.ntpl small{font-size:var(--t-cap);color:var(--muted);word-break:keep-all}
+.ntpl button[aria-pressed="true"]{border-color:var(--brand);background:var(--brand-soft);box-shadow:inset 0 0 0 1px var(--brand)}
+.ntpl button[aria-pressed="true"] b{color:var(--brand-dark)}
+.nins{margin:0 0 10px}
+.nins .k{display:block;font-size:var(--t-cap);font-weight:700;color:var(--muted);margin:0 2px 6px}
+.nins .nrow{display:flex;flex-wrap:wrap;gap:6px}
+.nins button{font-size:var(--t-cap);font-weight:700;padding:0 12px;min-height:36px;border-radius:var(--r-pill);border:1px dashed var(--brand-line);background:var(--card);color:var(--brand-dark);cursor:pointer;font-family:inherit;text-align:left;word-break:keep-all;max-width:100%}
+.ned .paper .nf{padding:10px 0 6px;border-bottom:1px solid var(--hair)}
+.ned .paper .nf:last-of-type{border-bottom:none}
+.ned .paper .nf label{display:flex;align-items:center;gap:7px;font-size:var(--t-cap);font-weight:700;color:var(--muted)}
+.ned .paper .nf label i{font-style:normal;display:inline-grid;place-items:center;width:20px;height:20px;border-radius:50%;background:var(--brand-soft);color:var(--brand-dark);font-size:var(--t-tab);font-weight:700}
+.ned .paper .nf.cue label{color:var(--brand-dark)}
+.ned .paper .nf textarea{display:block;width:100%;border:none;background:none;font-size:var(--t-body);line-height:1.75;color:var(--ink);font-family:inherit;resize:none;padding:4px 0 2px;min-height:56px;word-break:keep-all;overflow-wrap:anywhere;overflow:hidden}
+.ned .paper.t-line3 .nf textarea{padding-left:27px}
+.ned .paper .nf textarea:focus{outline:none}
+.ned .paper .nf textarea::placeholder{color:var(--faint)}
+.ned .paper .nf:focus-within label{color:var(--brand-dark)}
+.ned .paper .nmore{border-top:1px solid var(--hair);margin-top:4px}
+.ned input.ti.sm{font-size:var(--t-body);font-weight:700;padding:10px 0 8px}
+.ned .nmorebtn{display:block;margin:6px 0 2px;min-height:40px;font-size:var(--t-cap);font-weight:700;color:var(--brand-dark)}
+.ncheck{display:flex;align-items:center;gap:10px;width:100%;text-align:left;margin:10px 0 0;padding:12px 14px;border-radius:var(--r-m);border:1px solid var(--brand-line);background:var(--brand-soft);color:var(--brand-dark);cursor:pointer;font-family:inherit;min-height:56px}
+.ncheck span{flex:1;min-width:0}
+.ncheck b{display:block;font-size:var(--t-small);font-weight:700}
+.ncheck small{display:block;font-size:var(--t-cap);color:var(--body)}
+.ncheck svg{width:18px;height:18px;flex:0 0 18px;stroke:currentColor;stroke-width:2.2;fill:none;stroke-linecap:round}
+.nfeel{background:var(--card);border:1px solid var(--hair);border-radius:var(--r-l);padding:12px 14px 8px;margin:12px 0 0}
+.nfeel .r{margin-bottom:10px}
+.nfeel .k{display:block;font-size:var(--t-cap);font-weight:700;color:var(--muted);margin-bottom:6px}
+.nfeel .nch{display:flex;flex-wrap:wrap;gap:6px}
+.nfeel .nch button{display:inline-flex;align-items:center;gap:6px;padding:0 12px}
+.nfeel .nch .ngr{gap:2px}
+.nfeel .nopt{font-size:var(--t-cap);color:var(--faint);margin:0;line-height:1.6}
+.nchk{border-top:1px solid var(--hair);padding:12px 0 4px}
+.nchk b{display:block;font-size:var(--t-body);font-weight:700}
+.nchk small{display:block;font-size:var(--t-cap);color:var(--muted);margin-bottom:6px}
+.nchk ol{list-style:none;padding:0;margin:0 0 8px}
+.nchk li{display:flex;gap:8px;font-size:var(--t-small);line-height:1.65;color:var(--body);margin-bottom:2px;word-break:keep-all}
+.nchk li span{color:var(--brand-dark);font-weight:700;flex:0 0 auto}
+.nchk .pt{font-size:var(--t-small);line-height:1.75;color:var(--ink);background:var(--brand-soft);border-radius:var(--r-s);padding:10px 12px;margin:0;word-break:keep-all}
 .ned .tools button{font-size:var(--t-cap);font-weight:700;padding:9px 13px;border-radius:var(--r-pill);border:1px solid var(--line);background:var(--card);color:var(--body);cursor:pointer;font-family:inherit;min-height:40px}
 .ned .cs{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px}
 .ned .sug{font-size:var(--t-cap);color:var(--muted);margin:-2px 0 12px;display:flex;flex-wrap:wrap;gap:6px;align-items:center}
@@ -1518,7 +1618,9 @@ function loadMore(){
       try {
         const r = await fetch(MORE_META.url); if (!r.ok) throw new Error('HTTP ' + r.status);
         const d = await r.json();
-        BANK.push(...d.bank); LABS.push(...d.labs); FIGMAP = d.figs || {}; MORE.ok = true; moreArrived(); return true;
+        BANK.push(...d.bank); LABS.push(...d.labs); FIGMAP = d.figs || {};
+        if (d.extras) CONCEPTS.forEach(c => { if (d.extras[c.id]) c.x = d.extras[c.id]; });   // 생각해 보기·예제(2026-10-07 앱 파일 한도로 옮김)
+        MORE.ok = true; moreArrived(); return true;
       } catch (e) {
         if (i >= 1){ MORE.err = true; moreArrived(); }
         await new Promise(ok => { MORE.kick = ok; setTimeout(ok, Math.min(4000 * 2 ** i, 60000)); });
@@ -1532,6 +1634,7 @@ const MORE_VIEWS = ['bank','lab','wrong','stats','note','noted'];
 function moreArrived(){
   document.querySelectorAll('.figslot[data-fig]').forEach(el => { const f = figOf(el.dataset.fig); if (f) el.outerHTML = f; });
   dqcFill();   // 개념 상세의 확인 문제 칸(그 개념 OX)
+  if (view === 'detail') dThinkFill();   // 본문 펼친 안쪽의 생각해 보기·예제
   if (!MORE_VIEWS.includes(view) || document.getElementById('sheetBg')) return;
   const a = document.activeElement; if (a && a.matches && a.matches('input,textarea,select')) return;
   const y = window.scrollY;
@@ -1922,9 +2025,10 @@ const DB = (() => {
     loadProgress: async key => stateOf(key),
     saveProgress: async (key, state) => { d.progress[key] = state; w(); },
     /* 공부 노트 — 계정별, 본인만 */
-    notesAll: async () => { const a = me(); return a ? ((d.notes||{})[a.id]||[]).map(n => ({ ...n, cids:(n.cids||[]).slice() })) : []; },
+    notesAll: async () => { const a = me(); return a ? ((d.notes||{})[a.id]||[]).map(n => ({ ...n, cids:(n.cids||[]).slice(), parts:(n.parts||[]).slice() })) : []; },
     noteSave: async n => { const a = me(); if (!a) throw new Error('로그인이 필요합니다.'); d.notes ||= {}; const L = d.notes[a.id] ||= [];
-      const r = { id:n.id, date:n.date, title:(n.title||'').slice(0,80), body:(n.body||'').slice(0,NOTE_MAX), cids:(n.cids||[]).slice(0,12), at:n.at };
+      const r = { id:n.id, date:n.date, title:(n.title||'').slice(0,80), body:(n.body||'').slice(0,NOTE_MAX), cids:(n.cids||[]).slice(0,12),
+        tpl:n.tpl||'', parts:(n.parts||[]).slice(0,4), mood:n.mood||'', grasp:n.grasp||0, at:n.at };
       const i = L.findIndex(x => x.id === n.id); if (i < 0) L.push(r); else L[i] = r; w(); },
     noteDel: async id => { const a = me(); if (!a || !d.notes || !d.notes[a.id]) return; d.notes[a.id] = d.notes[a.id].filter(x => x.id !== id); w(); },
     progressAll: async () => Object.entries(d.progress).filter(([k])=>!k.startsWith('u:')).map(([code, state]) => ({ code, state })),
@@ -2134,11 +2238,13 @@ const serverDB = () => {
     removeClass: async cls => { await api(`/rest/v1/classes?cls=eq.${encodeURIComponent(cls)}`, { method:'DELETE' }); },
     notesAll: async () => { const out = [];   // 서버가 한 번에 주는 줄 수 상한(기본 1,000) 때문에 나눠 받는다
       for (let off = 0; off < 6000; off += 1000){
-        const r = await api(`/rest/v1/notes?select=id,date,title,body,cids,updated_at&order=date.desc,updated_at.desc,id.asc&limit=1000&offset=${off}`);
+        const r = await api(`/rest/v1/notes?select=id,date,title,body,cids,tpl,parts,mood,grasp,updated_at&order=date.desc,updated_at.desc,id.asc&limit=1000&offset=${off}`);
         out.push(...r); if (r.length < 1000) break; }
-      return out.map(n => ({ id:n.id, date:n.date, title:n.title||'', body:n.body||'', cids:n.cids||[], at:n.updated_at })); },
+      return out.map(n => ({ id:n.id, date:n.date, title:n.title||'', body:n.body||'', cids:n.cids||[], tpl:n.tpl||'', parts:Array.isArray(n.parts) ? n.parts : [], mood:n.mood||'', grasp:n.grasp||0, at:n.updated_at })); },
+    /* 틀·칸·마음·이해(2026-10-07)는 선택 칸 — 옛 노트는 빈 값 그대로 */
     noteSave: async n => { await api('/rest/v1/notes?on_conflict=id', { method:'POST', prefer:'resolution=merge-duplicates,return=minimal',
-      body:{ id:n.id, date:n.date, title:(n.title||'').slice(0,80), body:(n.body||'').slice(0,NOTE_MAX), cids:(n.cids||[]).slice(0,12), updated_at:n.at } }); },
+      body:{ id:n.id, date:n.date, title:(n.title||'').slice(0,80), body:(n.body||'').slice(0,NOTE_MAX), cids:(n.cids||[]).slice(0,12),
+        tpl:n.tpl||'', parts:(n.parts||[]).slice(0,4), mood:n.mood||'', grasp:n.grasp||0, updated_at:n.at } }); },
     noteDel: async id => { await api(`/rest/v1/notes?id=eq.${encodeURIComponent(id)}`, { method:'DELETE' }); },
     loadProgress: async key => { const r = await api(`/rest/v1/progress?code=eq.${encodeURIComponent(key)}&select=state`); return r.length ? r[0].state : null; },
     saveProgress: async (key, state) => { const r = await api('/rest/v1/progress?on_conflict=code&select=state', { method:'POST', prefer:'resolution=merge-duplicates,return=representation', body:{ code:key, state, at:new Date().toISOString() } });
@@ -3056,7 +3162,7 @@ function detailCard(c){
     </article>
     <div class="dmore" id="dMore" ${open ? '' : 'hidden'}>
       <div class="sec dbody"><h2>본문</h2><div class="prose">${c.body.map(p=>`<p>${termify(rich(p), keys, u2)}</p>`).join('')}</div></div>
-      ${dThinkHtml(c)}
+      <div id="dThink">${dThinkHtml(c)}</div>
       ${c.myths.length ? `<div class="sec dmyth"><h2>자주 하는 오해</h2>${c.myths.map(m=>`<div class="myth"><p><span class="x">✗ 오해</span> ${rich(m.x)}</p><p><span class="o">✓ 진실</span> ${rich(m.o)}</p>${m.why ? `<p class="why"><span class="w">왜?</span> ${rich(m.why)}</p>` : ''}</div>`).join('')}</div>`:''}
       ${c.terms.length ? `<div class="sec"><h2>용어</h2><dl class="terms">${c.terms.map(t=>`<dt>${esc(t.k)}</dt><dd>${esc(t.v)}</dd>`).join('')}</dl></div>`:''}
     </div>`;
@@ -3073,6 +3179,9 @@ function dThinkHtml(c){
         <details class="reveal"><summary>답 보기</summary><p><b>${rich(x.follow.answer)}</b>${x.follow.explain ? ` — ${rich(x.follow.explain)}` : ''}</p></details></div>` : ''}</div>`;
   return h;
 }
+/* 생각해 보기·예제는 나중에 받는 데이터에 있다 — 받으면 그 칸과 '본문 자세히 읽기' 안내만 고친다 */
+function dThinkFill(){ const c = CONCEPTS[detailIdx], el = document.getElementById('dThink'), b = document.getElementById('dMoreBtn'); if (!c || !el) return;
+  if (!el.innerHTML.trim()) el.innerHTML = dThinkHtml(c); if (b) b.innerHTML = dMoreLabel(c, b.getAttribute('aria-expanded') === 'true'); }
 const dMoreLabel = (c, open) => `<span><b>${open ? '본문 접기' : '본문 자세히 읽기'}</b><small>본문 ${c.body.length}문단${c.x && c.x.why ? ' · 생각해 보기' : ''}${c.x && c.x.example ? ' · 예제' : ''}${c.myths.length ? ` · 자주 하는 오해 ${c.myths.length}` : ''}${c.terms.length ? ` · 용어 ${c.terms.length}` : ''}</small></span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>`;
 /* 이 기기에만 두는 작은 기록 — 진도(S)·서버로 보내지 않는다 */
 const dLoad = k => { try { const v = JSON.parse(localStorage.getItem(k)); return v && typeof v === 'object' && !Array.isArray(v) ? v : null; } catch { return null; } };
@@ -4170,11 +4279,48 @@ function openFigure(svg, caption){
 /* ═══ 공부 노트 · 달력 — 나만 보는 메모장 ═══
    기기 안(localStorage)에 먼저 쓰고, 계정이 있으면 서버와 맞춘다. 서버에서도 본인만 읽는다(원장·보호자도 못 본다 — 진도와 다르다).
    지운 노트는 서버에서 지울 때까지 표시(del)만 남긴다. 두 기기에서 같은 노트를 고치면 나중에 고친 쪽이 이긴다. */
-const NOTE_MAX = 5000;
+const NOTE_MAX = 5000, PART_MAX = 1200, NFADE = 8;
+/* 노트 틀(2026-10-07, 조사 reference/benchmark/공부노트-조사.md) — 빈 칸 공포를 없애는 짧은 틀이 기본, '자유'는 언제나.
+   틀 노트는 칸(parts)을 따로 두고, 본문(body)은 '칸 이름 + 내용'을 이어 붙인 글로 같이 저장한다 — 검색·내보내기·옛 앱이 본문을 그대로 읽는다.
+   옛 앱이 본문만 고쳐 칸과 본문이 어긋나면 본문이 이긴다(그 노트는 '자유'로 보인다). 같은 틀로 NFADE 번 넘게 쓰면 안내 문구를 걷어 낸다(Nückles 외 2010 '프롬프트 걷어 내기') */
+const NTPL = {
+  line3: { name:'세 줄 요약', sub:'1분이면 돼요', f:[
+    { k:'오늘 배운 것', ph:c => c ? `「${c.title}」에서 떠오르는 것 하나 — 책을 덮고 먼저 써 봐요` : '오늘 배운 것 하나 — 책을 덮고 먼저 써 봐요' },
+    { k:'왜 그런지, 내 말로', ph:() => '친구에게 설명하듯 한 줄' },
+    { k:'아직 헷갈리는 것', ph:() => '없으면 비워 둬도 돼요' } ] },
+  cornell: { name:'코넬 노트', sub:'질문 · 핵심 · 요약', f:[
+    { k:'질문', cue:true, ph:c => c ? `「${c.title}」에서 시험에 나올 질문 하나` : '시험에 나올 것 같은 질문 하나' },
+    { k:'핵심', ph:() => '질문의 답 — 책을 덮고 먼저 떠올려 써 봐요' },
+    { k:'요약', ph:() => '한두 문장으로, 내 말로' } ] },
+  mix: { name:'헷갈린 것 하나', sub:'틀린 문제에서', f:[
+    { k:'헷갈렸던 것', ph:(c, w) => w ? '오늘 틀린 문제에서 어디서 갈렸는지' : '어디서 갈렸는지 한 줄' },
+    { k:'이제 아는 것', ph:() => '바르게 고친 생각 한 줄' },
+    { k:'다음엔 이렇게', ph:() => '비슷한 문제를 만나면 먼저 볼 것 (선택)' } ] },
+  free: { name:'자유', sub:'제목 · 내용', f:[] } };
+const NTPL_KEYS = ['line3', 'cornell', 'mix', 'free'], MEMO = '메모';
+const NMOOD = [['proud','뿌듯'], ['calm','차분'], ['meh','그럭저럭'], ['tired','지침'], ['stuck','막막']];
+const NGRASP = ['', '아직 흐려요', '반쯤 잡혔어요', '설명할 수 있어요'];
+const isTpl = t => !!NTPL[t] && t !== 'free';
+const tplOf = n => isTpl(n && n.tpl) ? n.tpl : 'free';
+const moodName = k => (NMOOD.find(m => m[0] === k) || [])[1] || '';
+const noteCompose = (tpl, parts) => { const f = NTPL[tpl].f;
+  return (parts || []).map((p, i) => { const t = String(p ?? '').trim(); return t ? `${i < f.length ? f[i].k : MEMO}\n${t}` : ''; }).filter(Boolean).join('\n\n'); };
+/* 기기·서버에서 읽은 노트를 고르게 — 옛 노트(틀 없음)는 '자유' */
+function normNote(n){ if (!n || n.del) return n;
+  if (!NTPL[n.tpl]) n.tpl = '';
+  if (isTpl(n.tpl)){ const p = Array.isArray(n.parts) ? n.parts.slice(0, 4).map(x => String(x ?? '').slice(0, PART_MAX)) : [];
+    if (noteCompose(n.tpl, p) !== (n.body || '')){ n.tpl = 'free'; n.parts = []; } else n.parts = p; }
+  else n.parts = [];
+  if (!moodName(n.mood)) n.mood = '';
+  n.grasp = [1, 2, 3].includes(+n.grasp) ? +n.grasp : 0;
+  return n; }
+const lastTpl = () => { try { const t = localStorage.getItem('pcs.ntpl'); if (NTPL[t]) return t; } catch {} return 'line3'; };
+const keepTpl = t => { if (isTpl(t)) try { localStorage.setItem('pcs.ntpl', t); } catch {} };   // 새 노트의 기본 틀 = 마지막에 쓴 '틀'(자유는 기억하지 않는다 — 첫 화면이 빈 종이가 되지 않게)
 let noteSyncErr = '';
 let NOTES = [], notesOwner = null, noteDay = '', noteMonth = '', noteQ = '', noteEd = null, noteFrom = 'today', noteSyncing = null, noteT = null, noteSyncT = null;
+let noteMode = 'cal', noteLesson = '', noteCover = false, noteWeak = false, noteDone = null, nedFocus = '';
 const notesKey = () => 'pcs.notes.' + (ACC ? ACC.id : 'guest');
-function notesLoad(){ const k = notesKey(); if (notesOwner === k) return; notesOwner = k; try { NOTES = JSON.parse(localStorage.getItem(k)) || []; } catch { NOTES = []; } if (!Array.isArray(NOTES)) NOTES = []; NOTES = NOTES.filter(n => n && typeof n === 'object' && n.id); }
+function notesLoad(){ const k = notesKey(); if (notesOwner === k) return; notesOwner = k; try { NOTES = JSON.parse(localStorage.getItem(k)) || []; } catch { NOTES = []; } if (!Array.isArray(NOTES)) NOTES = []; NOTES = NOTES.filter(n => n && typeof n === 'object' && n.id); NOTES.forEach(normNote); }
 function notesSave(){ try { localStorage.setItem(notesOwner || notesKey(), JSON.stringify(NOTES)); } catch { quotaFail(); } }
 const liveNotes = () => { notesLoad(); return NOTES.filter(n => !n.del); };
 const newId = () => { try { if (crypto.randomUUID) return crypto.randomUUID(); } catch {} return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, ch => { const r = Math.random()*16|0; return (ch==='x' ? r : (r&3|8)).toString(16); }); };
@@ -4191,37 +4337,68 @@ async function syncNotes(){
       catch (e) { fails++; noteSyncErr = e && e.message || '저장 실패'; if (++netFails >= 3 || (navigator.onLine === false)) break; } }
     if (owner !== notesOwner) return;
     NOTES = NOTES.filter(n => !(n.del && !n.dirty));
-    try { const srv = await DBX.notesAll(); const m = new Map(srv.map(n => [n.id, n]));
+    try { const srv = await DBX.notesAll(); const m = new Map(srv.map(n => [n.id, normNote(n)]));
       NOTES.filter(n => n.dirty).forEach(n => m.set(n.id, n)); NOTES = [...m.values()]; } catch {}
     notesSave(); })().finally(() => { noteSyncing = null; });
   return noteSyncing; }
 const syncNotesSoon = () => { clearTimeout(noteSyncT); noteSyncT = setTimeout(() => syncNotes().catch(()=>{}), 1500); };
 /* 로그인 전에 쓴 노트는 로그인한 계정으로 옮긴다 */
 function adoptGuestNotes(){ let g = []; try { g = JSON.parse(localStorage.getItem('pcs.notes.guest')) || []; } catch {}
-  notesOwner = null; notesLoad(); g = g.filter(n => !n.del);
+  notesOwner = null; notesLoad(); g = g.filter(n => n && n.id && !n.del).map(normNote);
   if (g.length){ const have = new Set(NOTES.map(n => n.id)); g.forEach(n => { if (!have.has(n.id)) NOTES.push({ ...n, dirty:true }); }); notesSave(); }
   try { localStorage.removeItem('pcs.notes.guest'); } catch {} }
 /* 로그아웃: 다 올라간 노트는 기기에서 지운다(한 기기를 여럿이 쓸 때). 못 올린 것이 있으면 남겨 둔다 */
 function dropNotesCache(all){ notesLoad(); if (all || !NOTES.some(n => n.dirty)){ try { localStorage.removeItem(notesOwner); } catch {} } NOTES = []; notesOwner = null; }
-function putNote(n){ notesLoad(); const i = NOTES.findIndex(x => x.id === n.id); const r = { id:n.id, date:n.date, title:n.title||'', body:n.body||'', cids:(n.cids||[]).slice(0,12), at:new Date().toISOString(), dirty:true };
+function putNote(n){ notesLoad(); const i = NOTES.findIndex(x => x.id === n.id); const tk = tplOf(n);
+  const parts = isTpl(tk) ? [0, 1, 2, 3].map(j => String((n.parts || [])[j] ?? '').slice(0, PART_MAX)) : [];
+  const r = { id:n.id, date:n.date, title:n.title||'', body: isTpl(tk) ? noteCompose(tk, parts) : (n.body||''), cids:(n.cids||[]).slice(0,12),
+    tpl: n.tpl === '' && tk === 'free' ? '' : tk, parts, mood: moodName(n.mood) ? n.mood : '', grasp: [1, 2, 3].includes(+n.grasp) ? +n.grasp : 0, at:new Date().toISOString(), dirty:true };
+  while (r.parts.length && !r.parts[r.parts.length - 1].trim()) r.parts.pop();   // 끝의 빈 칸은 싣지 않는다
   if (i < 0) NOTES.push(r); else NOTES[i] = r; notesSave(); syncNotesSoon(); return r; }
 function removeNote(id){ notesLoad(); const i = NOTES.findIndex(x => x.id === id); if (i < 0) return;
   NOTES[i] = { ...NOTES[i], del:true, dirty:true, at:new Date().toISOString() };   // 새 사본으로 — 올리는 중이던 저장이 끝나며 dirty 를 지우지 않게
   notesSave(); syncNotesSoon(); }
-const noteBlank = n => !(n.title||'').trim() && !(n.body||'').trim() && !(n.cids||[]).length;
+/* 빈 노트 — 글도 마음·이해도 없으면 저장하지 않는다(개념만 붙인 채 나가면 남지 않는다) */
+const noteBlank = n => !(n.title||'').trim() && !(isTpl(tplOf(n)) ? (n.parts||[]).some(p => String(p||'').trim()) : (n.body||'').trim()) && !n.mood && !n.grasp;
 const cById = id => CONCEPTS.find(c => c.id === id);
 const cName = c => c ? `${c.title}` : '';
 const noteWhen = iso => { if (!iso) return ''; const d = new Date(iso); return `${pad(d.getHours())}:${pad(d.getMinutes())}`; };
-const noteItem = n => `<button class="ncard" data-nopen="${n.id}">
-    ${n.title ? `<span class="t">${esc(n.title)}</span>` : ''}
-    ${n.body ? `<div class="b">${esc(n.body)}</div>` : (!n.title ? `<div class="b" style="color:var(--faint)">(내용 없음)</div>` : '')}
-    <span class="m">${(n.cids||[]).map(id => { const c = cById(id); return c ? `<span class="ccp"><span>${esc(cName(c))}</span></span>` : ''; }).join('')}
-      <span class="when">${noteQ ? kdate(n.date) + ' · ' : ''}${noteWhen(n.at)}</span></span></button>`;
-function openNotes(from, day){ noteFrom = from || view || 'today'; noteDay = day || noteDay || todayISO(); noteMonth = noteDay.slice(0,7); noteQ = ''; show('note'); syncNotes().then(() => { if (view === 'note') renderNote(); }).catch(()=>{}); }
-function openNote(id, preset){ notesLoad(); const n = id ? NOTES.find(x => x.id === id && !x.del) : null;
-  noteEd = n ? { ...n, cids:[...(n.cids||[])], fresh:false }
-             : { id:newId(), date:(preset && preset.date) || noteDay || todayISO(), title:'', body:'', cids:(preset && preset.cids) ? [...preset.cids] : [], fresh:true };
+const notePreview = n => (n.title || '').trim() || (isTpl(tplOf(n)) ? (n.parts || []).map(p => String(p||'').trim()).find(Boolean) : (n.body || '').split('\n').find(l => l.trim())) || '';
+const lessonTag = l => l ? `${l.unit}-${String(l.id).slice(2)}` : '';
+/* 노트 카드 — 틀마다 모양이 다르다(세 줄 번호 · 코넬 질문|핵심 + 요약 · 헷갈림 → 앎 · 자유). 말줄임 없이 다 보이고, 긴 자유 노트만 앞부분 + '이어서 읽기'.
+   o.cover: 가리고 떠올리기(첫 칸만 보이고 나머지는 눌러서) · o.date: 날짜를 붙여 보인다(검색·모아보기·지난 기록) */
+function noteItem(n, o = {}){
+  const tk = tplOf(n), T = NTPL[tk], open = !o.cover;
+  const blk = (i, t) => { const lab = i < T.f.length ? T.f[i].k : MEMO, hide = o.cover && i > 0 && i < 3;
+    return `<span class="np i${i}"><span class="nl">${tk === 'line3' && i < 3 ? `<i>${i + 1}</i>` : ''}${esc(lab)}</span>${hide
+      ? `<button type="button" class="ncov" data-nrev aria-label="${esc(lab)} 보기">눌러서 보기</button><span class="nt" hidden tabindex="-1">${esc(t)}</span>` : `<span class="nt">${esc(t)}</span>`}</span>`; };
+  let inner = n.title ? `<span class="t">${esc(n.title)}</span>` : '';
+  if (isTpl(tk)){ const ps = (n.parts || []).map((p, i) => [i, String(p||'').trim()]).filter(x => x[1]);
+    inner += ps.length ? `<span class="nps">${ps.filter(x => x[0] < 3).map(x => blk(...x)).join('')}</span>${ps.filter(x => x[0] === 3).map(x => blk(...x)).join('')}` : ''; }
+  else if (n.body){ const b = n.body, long = b.length > 280, cut = long ? b.slice(0, 260).replace(/\s+\S*$/, '') : b;
+    inner += o.cover && n.title ? `<button type="button" class="ncov" data-nrev>내용 보기</button><span class="b" hidden tabindex="-1">${esc(cut)}</span>`
+      : `<span class="b">${esc(cut)}${long ? `<span class="rd"> 이어서 읽기</span>` : ''}</span>`; }
+  if (!inner) inner = `<span class="b mute">${n.mood || n.grasp ? '마음만 남긴 날' : '(내용 없음)'}</span>`;
+  const g = n.grasp ? `<span class="ngr" role="img" aria-label="이해 · ${NGRASP[n.grasp]}">${[1, 2, 3].map(k => `<i class="${k <= n.grasp ? 'on' : ''}"></i>`).join('')}<span>${NGRASP[n.grasp]}</span></span>` : '';
+  const meta = `<span class="m">${(n.cids||[]).map(id => { const c = cById(id); return c ? `<button type="button" class="ccp" data-cgo="${id}" aria-label="개념 ${esc(cName(c))} 보기"><span>${esc(cName(c))}</span></button>` : ''; }).join('')}
+      ${n.mood ? `<span class="nmd">마음 · ${moodName(n.mood)}</span>` : ''}${g}
+      <span class="when">${o.date ? kdate(n.date) + ' · ' : ''}${noteWhen(n.at)}</span>${open ? '' : `<button type="button" class="more" data-nopen="${n.id}">고치기</button>`}</span>`;
+  const lab = `${kdate(n.date)} ${NTPL[tk].name} 노트${n.title ? ' · ' + n.title : ''} 열기`;
+  return `<article class="ncard t-${tk}">${open ? `<button type="button" class="nbody" data-nopen="${n.id}" aria-label="${esc(lab)}">${inner}</button>` : `<div class="nbody">${inner}</div>`}${meta}</article>`; }
+function openNotes(from, day){ noteFrom = from || view || 'today'; noteDay = day || noteDay || todayISO(); noteMonth = noteDay.slice(0,7); noteQ = ''; noteMode = 'cal'; noteLesson = ''; show('note'); syncNotes().then(() => { if (view === 'note') renderNote(); }).catch(()=>{}); }
+function openNote(id, preset){ notesLoad(); const n = id ? NOTES.find(x => x.id === id && !x.del) : null; nedFocus = '';
+  noteEd = n ? { ...n, cids:[...(n.cids||[])], parts:[0, 1, 2, 3].map(j => (n.parts||[])[j] || ''), fresh:false, more: !!(n.title || (n.parts||[])[3]) }
+             : { id:newId(), date:(preset && preset.date) || noteDay || todayISO(), title:'', body:'', cids:(preset && preset.cids) ? [...preset.cids] : [], tpl:(preset && preset.tpl) || lastTpl(), parts:['', '', '', ''], mood:'', grasp:0, fresh:true, more:false };
   if (!noteDay) noteDay = noteEd.date; show('noted'); }
+/* 지난 기록 한 장 — 지난주 오늘 → 2주 전 오늘 → 한 달 전 오늘 가운데 노트가 있는 첫 날(Day One 'On This Day'를 학기 길이에 맞춰) */
+function pastNote(){ const t = todayISO(), live = liveNotes(), d0 = new Date(t + 'T00:00:00');
+  const pm = new Date(d0.getFullYear(), d0.getMonth() - 1, d0.getDate()), mAgo = pm.getDate() === d0.getDate() ? `${pm.getFullYear()}-${pad(pm.getMonth()+1)}-${pad(pm.getDate())}` : '';
+  for (const [d, lab] of [[addDays(t, -7), '지난주 오늘'], [addDays(t, -14), '2주 전 오늘'], [mAgo, '한 달 전 오늘']]){
+    if (!d) continue; const ns = live.filter(n => n.date === d).sort((a,b) => a.at < b.at ? 1 : -1); if (ns.length) return { d, lab, n:ns[0], k:ns.length }; }
+  return null; }
+const pastHtml = p => !p ? '' : `<section class="npast" aria-label="지난 기록">
+    <div class="ph"><span><b>${p.lab}</b><small>${kdate(p.d)} ${WD[wdOf(p.d)]}요일${p.k > 1 ? ` · 노트 ${p.k}개` : ''}</small></span><button class="more" data-nday="${p.d}" data-ngo="1">그날 보기</button></div>
+    ${noteItem(p.n)}</section>`;
 function renderNote(){
   const v = document.getElementById('v-note'); const today = todayISO();
   noteDay ||= today; noteMonth ||= noteDay.slice(0,7);
@@ -4237,10 +4414,9 @@ function renderNote(){
   const q = noteQ.trim().toLowerCase();
   const hits = q ? noteSearch(q) : [];
   const monthN = live.filter(n => n.date.startsWith(noteMonth)).length;
-  v.innerHTML = `<button class="back" id="noteBack"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg>${({plan:'일정',me:'내 정보',detail:'개념'})[noteFrom]||'오늘'}</button>
-    <h1 class="h-page">공부 노트</h1>
-    <div class="search"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="M20 20l-4-4"/></svg><input id="noteQ" type="search" placeholder="노트 검색 · 제목·내용·개념" value="${esc(noteQ)}" aria-label="노트 검색"></div>
-    <div id="noteBody">${q ? noteHits(hits) : `
+  const done = noteDone && live.find(n => n.id === noteDone.id); noteDone = null;
+  const doneLine = done ? `<p class="ndone" role="status">${IC_CHK}<span>남겨 뒀어요 · ${+done.date.slice(5,7)}월의 ${live.filter(n => n.date.slice(0,7) === done.date.slice(0,7)).length}번째 기록</span></p>` : '';
+  const calHtml = `
     <div class="ncal">
       <div class="mh"><button data-nmon="-1" aria-label="지난달"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg></button>
         <b>${y}년 ${m}월</b>
@@ -4249,64 +4425,156 @@ function renderNote(){
       <div class="lg"><span><i></i>노트</span><span><i class="st"></i>공부한 날</span><span><i class="ev"></i>일정</span>${monthN?`<span style="margin-left:auto">이달 노트 ${monthN}개</span>`:''}</div>
     </div>
     <div class="nday"><span><b>${kdate(noteDay)} ${WD[wdOf(noteDay)]}요일${noteDay===today?' · 오늘':''}</b>
-      <small>${S.days.includes(noteDay) ? '이 날 공부했습니다' : (noteDay > today ? '앞으로의 날' : '공부 기록이 없는 날')}${dayNotes.length ? ` · 노트 ${dayNotes.length}개` : ''}</small></span>
+      <small>${S.days.includes(noteDay) ? '이 날 공부했어요' : (noteDay > today ? '앞으로의 날' : '공부 기록이 없는 날')}${dayNotes.length ? ` · 노트 ${dayNotes.length}개` : ''}</small></span>
       ${noteDay!==today ? `<button class="more" id="noteToday">오늘로</button>` : ''}</div>
+    ${doneLine}
     ${onDay.length ? `<div class="nsched"><b>일정</b>${onDay.map(x => esc(x.title) + (x.from ? ` ${esc(x.from)}` : '')).join(' · ')}</div>` : ''}
-    ${dayNotes.length ? dayNotes.map(noteItem).join('') : `<div class="nempty">${noteDay===today ? '오늘 공부한 것을 세 줄로 남겨 두면<br>시험 전날 다시 읽을 나만의 요약이 됩니다.' : '이 날의 노트가 없습니다.'}</div>`}
-    <button class="btn" id="noteNew">${noteDay===today ? '오늘 노트 쓰기' : `${kdate(noteDay)} 노트 쓰기`}</button>`}</div>
-    ${noteSyncErr && NOTES.some(n => n.dirty) ? `<p class="fine" style="color:var(--warn)">일부 노트를 서버에 아직 올리지 못했습니다(${esc(noteSyncErr)}). 이 기기에는 그대로 남아 있고, 다음에 다시 올립니다.</p>` : ''}
-    <p class="fine">노트는 나만 봅니다 — 원장님·보호자도 볼 수 없습니다.${noteLocalOnly() ? (ACC ? ' 보호자 동의 전이라 지금은 이 기기에만 저장됩니다.' : ' 로그인하면 다른 기기에서도 이어서 봅니다.') : ''}</p>`;
+    ${dayNotes.length ? dayNotes.map(n => noteItem(n)).join('') : `<div class="nempty">${noteDay===today ? '오늘 배운 것을 세 줄로 남겨 두면<br>시험 전날 다시 읽을 나만의 요약이 돼요.' : '이 날의 노트가 없어요.'}</div>`}
+    <button class="btn" id="noteNew">${noteDay===today ? '오늘 노트 쓰기' : `${kdate(noteDay)} 노트 쓰기`}</button>
+    ${noteDay === today ? pastHtml(pastNote()) : ''}`;
+  v.innerHTML = `<button class="back" id="noteBack"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg>${({plan:'일정',me:'내 정보',detail:'개념'})[noteFrom]||'오늘'}</button>
+    <h1 class="h-page">공부 노트</h1>
+    <div class="search"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="M20 20l-4-4"/></svg><input id="noteQ" type="search" placeholder="노트 검색 · 제목·내용·개념" value="${esc(noteQ)}" aria-label="노트 검색"></div>
+    <div id="noteBody">${q ? noteHits(hits) : `
+    <div class="seg nmode" role="group" aria-label="노트 보기">${[['cal','달력'], ['sum','시험 전 다시 읽기']].map(([k, l]) => `<button type="button" data-nmode="${k}" class="${noteMode === k ? 'on' : ''}" aria-pressed="${noteMode === k}">${l}</button>`).join('')}</div>
+    ${noteMode === 'sum' ? noteSumHtml() : calHtml}`}</div>
+    ${noteSyncErr && NOTES.some(n => n.dirty) ? `<p class="fine" style="color:var(--warn)">일부 노트를 서버에 아직 올리지 못했어요(${esc(noteSyncErr)}). 이 기기에는 그대로 남아 있고, 다음에 다시 올려요.</p>` : ''}
+    <p class="fine">노트는 나만 봐요 — 원장님·보호자도 볼 수 없어요.${noteLocalOnly() ? (ACC ? ' 보호자 동의 전이라 지금은 이 기기에만 저장돼요.' : ' 로그인하면 다른 기기에서도 이어서 봐요.') : ''}</p>`;
 }
+/* 시험 전 다시 읽기 — 붙인 개념의 소단원별로 모은다(교재 순서). 가리고 떠올리기: 첫 칸(질문·배운 것)만 보고 떠올린 뒤 눌러서 확인(코넬 '암송') */
+function noteSumHtml(){
+  const live = liveNotes(), groups = new Map(), none = [];
+  const pick = noteWeak ? live.filter(n => n.grasp === 1) : live;
+  pick.forEach(n => { const ls = [...new Set((n.cids||[]).map(id => (cById(id) || {}).lessonId).filter(Boolean))];
+    if (!ls.length) none.push(n); ls.forEach(l => { if (!groups.has(l)) groups.set(l, []); groups.get(l).push(n); }); });
+  const order = LESSONS.filter(L => groups.has(L.id) && (!noteLesson || L.id === noteLesson));
+  const byDate = (a, b) => a.date < b.date ? -1 : a.date > b.date ? 1 : (a.at < b.at ? -1 : 1);
+  const anyWeak = live.some(n => n.grasp === 1);
+  const bar = `<div class="nsumbar"><button type="button" data-ncover aria-pressed="${noteCover}">가리고 떠올리기</button>${anyWeak || noteWeak ? `<button type="button" data-nweak aria-pressed="${noteWeak}">'아직 흐려요'만</button>` : ''}</div>`;
+  const grp = (id, title, tag, ns) => `<section class="nsg" aria-label="${esc(title)}"><h2>${tag ? `<span class="ntag">${tag}</span>` : ''}<span class="nm">${esc(title)}</span><small>노트 ${ns.length}</small></h2>
+      ${ns.sort(byDate).map(n => noteItem(n, { cover:noteCover, date:true })).join('')}</section>`;
+  const body = order.map(L => grp(L.id, L.name, lessonTag(L), groups.get(L.id))).join('') + (!noteLesson && none.length ? grp('', '개념을 붙이지 않은 노트', '', none) : '');
+  return `<p class="nsumlead">${noteCover ? '첫 칸만 보고 먼저 떠올려 본 뒤 눌러서 확인해요.' : '노트를 소단원별로 모았어요. 시험 전날 이 순서로 읽어요.'}</p>${bar}
+    ${noteLesson ? `<button type="button" class="linkbtn nall" data-nlesson="">모든 소단원 보기</button>` : ''}
+    ${body || `<div class="nempty">${noteWeak ? "'아직 흐려요'로 남긴 노트가 없어요." : '아직 모아 볼 노트가 없어요.<br>노트에 개념을 붙이면 소단원별로 모여요.'}</div>`}`; }
 /* 노트 검색 — 제목·내용·붙인 개념 이름, 최근 날짜부터 */
 const noteSearch = q => liveNotes().filter(n => (n.title + '\n' + n.body + '\n' + (n.cids||[]).map(id => cName(cById(id))).join(' ')).toLowerCase().includes(q))
   .sort((a,b) => a.date < b.date ? 1 : a.date > b.date ? -1 : (a.at < b.at ? 1 : -1));
-const noteHits = hits => hits.length ? `<p class="fine" style="text-align:left;padding:0 2px 10px">${hits.length}개 찾음</p>${hits.map(noteItem).join('')}`
-  : `<div class="nempty">‘${esc(noteQ)}’가 들어간 노트가 없습니다.</div>`;
+const noteHits = hits => hits.length ? `<p class="fine" style="text-align:left;padding:0 2px 10px">${hits.length}개 찾음</p>${hits.map(n => noteItem(n, { date:true })).join('')}`
+  : `<div class="nempty">‘${esc(noteQ)}’가 들어간 노트가 없어요.</div>`;
+/* 오늘 틀린 문제(오늘의 문제·문제 은행·복습) — 끼워 넣기 칩 */
+const todayWrongs = () => { const t = todayISO(); return S.wrong.filter(w => w.a === t && !w.cleared && (w.k||0) > 0 && (w.x||1) === 1).slice(-3).reverse(); };
+const wrongQ = w => w.b ? BANK.find(x => x.id === w.b) : QUIZZES.find(x => x.lessonId === w.l && x.no === w.n);
+function wrongText(w){ const q = wrongQ(w); if (!q) return '';
+  let s = plain(q.stem).replace(/\s+/g, ' ').trim(); if (s.length > 120) s = s.slice(0, 118).replace(/\s+\S*$/, '') + '…';
+  const a = q.type === 'mc' || q.type === 'multi' || !w.b ? MARKS[q.answer - 1] : String(q.answer ?? '');
+  return `틀린 문제 — ${s}${a ? ` (정답 ${a})` : ''}`; }
+/* 노트에 쓸 개념(붙인 것 → 오늘 노트면 오늘의 개념) */
+const nedConcept = n => cById((n.cids||[])[0]) || (n.date === todayISO() ? todayConcept() : null);
 function renderNoted(){
   const v = document.getElementById('v-noted'); const n = noteEd; if (!n){ v.innerHTML = ''; setTimeout(() => show('note')); return; }
+  const tk = tplOf(n), T = NTPL[tk], c0 = nedConcept(n), today = n.date === todayISO();
   const tc = todayConcept(); const sug = [tc, ...S.done.slice(-4).reverse().map(cById)].filter((c, i, a) => c && !n.cids.includes(c.id) && a.findIndex(x => x && x.id === c.id) === i).slice(0, 3);
+  const ws = today ? todayWrongs().filter(w => wrongQ(w)) : [];
+  const fade = isTpl(tk) && liveNotes().filter(x => x.tpl === tk && x.id !== n.id).length >= NFADE;
+  const ph = (f, i) => fade ? (i === 0 && c0 ? `「${c0.title}」` : '') : f.ph(c0, ws.length);
+  const bl = c0 ? Object.keys(c0.blanks || {}) : [];
+  const ins = [...(c0 ? [`<button type="button" data-nins="c:${c0.id}">개념 · ${esc(c0.title)}</button>`] : []),
+    ...bl.map(k => `<button type="button" data-nins="b:${c0.id}:${k}" aria-label="빈칸 ${k} 문장 끼워 넣기">빈칸 ${k}</button>`),
+    ...ws.map(w => { const L = LESSONS.find(x => x.id === lessonOfW(w)); return `<button type="button" data-nins="w:${esc(wKey(w))}">틀린 문제${L ? ` · ${esc(L.name)}` : ''}</button>`; })];
+  const sameL = c0 && n.cids.length ? liveNotes().filter(x => x.id !== n.id && (x.cids||[]).some(id => (cById(id)||{}).lessonId === c0.lessonId)).length : 0;
+  const field = (f, i) => `<div class="nf${f.cue ? ' cue' : ''}"><label for="nedF${i}">${tk === 'line3' ? `<i>${i + 1}</i>` : ''}${esc(f.k)}</label>
+      <textarea id="nedF${i}" rows="1" maxlength="${PART_MAX}" placeholder="${esc(ph(f, i))}">${esc(n.parts[i] || '')}</textarea></div>`;
   v.innerHTML = `<div class="ned">
     <div class="top"><button class="back" id="nedBack"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg>노트</button><span class="saved" id="nedSaved" aria-live="polite">${n.fresh ? '' : '저장됨'}</span></div>
-    <div class="paper">
+    <div class="ntpl" role="group" aria-label="노트 틀 고르기">${NTPL_KEYS.map(k => `<button type="button" data-ntpl="${k}" aria-pressed="${k === tk}"><b>${NTPL[k].name}</b><small>${NTPL[k].sub}</small></button>`).join('')}</div>
+    ${ins.length ? `<div class="nins"><span class="k" id="ninsK">눌러서 끼워 넣기</span><div class="nrow" role="group" aria-labelledby="ninsK">${ins.join('')}</div></div>` : ''}
+    <div class="paper t-${tk}">
       <label class="date">날짜 <input type="date" id="nedDate" value="${n.date}" max="${addDays(todayISO(), 400)}"></label>
-      <input class="ti" id="nedTitle" maxlength="80" placeholder="제목 (없어도 됩니다)" value="${esc(n.title)}" aria-label="제목" autocomplete="off">
-      <textarea class="bd" id="nedBody" maxlength="${NOTE_MAX}" placeholder="오늘 배운 것, 헷갈린 것, 떠오른 생각… 무엇이든 적어 두세요." aria-label="노트 내용">${esc(n.body)}</textarea>
-      <div class="cnt" id="nedCnt">${n.body.length.toLocaleString()} / ${NOTE_MAX.toLocaleString()}</div>
+      ${isTpl(tk) ? `${T.f.map(field).join('')}
+      <div class="nmore" id="nedMoreBox" ${n.more ? '' : 'hidden'}>
+        <input class="ti sm" id="nedTitle" maxlength="80" placeholder="제목 (없어도 돼요)" value="${esc(n.title)}" aria-label="제목" autocomplete="off">
+        <div class="nf"><label for="nedF3">${MEMO}</label><textarea id="nedF3" rows="2" maxlength="${PART_MAX}" placeholder="더 적어 두고 싶은 것">${esc(n.parts[3] || '')}</textarea></div></div>
+      <button type="button" class="linkbtn nmorebtn" id="nedMore" aria-expanded="${!!n.more}" aria-controls="nedMoreBox">${n.more ? '제목·메모 접기' : '+ 제목·메모 더 쓰기'}</button>`
+      : `<input class="ti" id="nedTitle" maxlength="80" placeholder="제목 (없어도 돼요)" value="${esc(n.title)}" aria-label="제목" autocomplete="off">
+      <textarea class="bd" id="nedBody" maxlength="${NOTE_MAX}" placeholder="오늘 배운 것, 헷갈린 것, 떠오른 생각… 무엇이든 적어 두세요." aria-label="노트 내용">${esc(n.body)}</textarea>`}
     </div>
-    <div class="tools"><button id="nedTpl">3줄 정리 틀</button><button id="nedAddC">＋ 개념 붙이기</button></div>
+    ${c0 || n.cids.length ? `<button type="button" class="ncheck" id="nedCheck"><span><b>다 썼으면 교재와 견주기</b><small>먼저 안 보고 쓴 다음에 열어 봐요</small></span>${IC_GO}</button>` : ''}
+    <div class="nfeel">
+      <div class="r"><span class="k" id="nmoodK">오늘의 마음</span><div class="nch" role="group" aria-labelledby="nmoodK">${NMOOD.map(([k, l]) => `<button type="button" data-nmood="${k}" aria-pressed="${n.mood === k}">${l}</button>`).join('')}</div></div>
+      <div class="r"><span class="k" id="ngraspK">얼마나 이해했나</span><div class="nch" role="group" aria-labelledby="ngraspK">${[1, 2, 3].map(g => `<button type="button" data-ngrasp="${g}" aria-pressed="${n.grasp === g}"><span class="ngr" aria-hidden="true">${[1, 2, 3].map(k => `<i class="${k <= g ? 'on' : ''}"></i>`).join('')}</span>${NGRASP[g]}</button>`).join('')}</div></div>
+      <p class="nopt">둘 다 고르지 않아도 돼요 · 다시 누르면 풀려요</p>
+    </div>
+    <div class="tools"><button id="nedAddC">＋ 개념 붙이기</button>${sameL ? `<button id="nedSame" data-lesson="${c0.lessonId}">같은 소단원 노트 ${sameL}개</button>` : ''}</div>
     <div class="cs" id="nedCs">${nedChips()}</div>
     ${sug.length ? `<div class="sug" id="nedSug">붙일까요? ${sug.map(c => `<button data-csug="${c.id}">${esc(cName(c))}</button>`).join('')}</div>` : ''}
     <button class="btn" id="nedDone">완료</button>
     ${n.fresh ? '' : `<button class="btn ghost" id="nedDel">이 노트 지우기</button>`}
-    <p class="priv">노트는 나만 봅니다 · 쓰는 대로 저장됩니다${noteLocalOnly() ? (ACC ? ' · 보호자 동의 전이라 이 기기에만' : ' · 로그인 전이라 이 기기에만') : ''}</p>
+    <p class="priv">노트는 나만 봐요 · 쓰는 대로 저장돼요${noteLocalOnly() ? (ACC ? ' · 보호자 동의 전이라 이 기기에만' : ' · 로그인 전이라 이 기기에만') : ''}</p>
   </div>`;
-  const ta = document.getElementById('nedBody'); const grow = () => { ta.style.height = 'auto'; ta.style.height = Math.max(ta.scrollHeight, 200) + 'px'; }; grow(); ta.addEventListener('input', grow);
+  v.querySelectorAll('.ned textarea').forEach(nedGrow);
 }
+/* 칸 높이는 글에 맞춰 — 세 줄 틀은 한 줄로 시작, 자유는 넉넉하게 */
+function nedGrow(ta){ if (!ta) return; const min = ta.id === 'nedBody' ? 200 : 0; ta.style.height = 'auto'; ta.style.height = Math.max(ta.scrollHeight + 2, min) + 'px'; }
 const nedChips = () => noteEd.cids.map(id => { const c = cById(id); return c ? `<span class="ccp"><button data-copen="${id}" title="개념 보기">${esc(cName(c))}</button><button class="x" data-cx="${id}" aria-label="${esc(cName(c))} 떼기">×</button></span>` : ''; }).join('');
 /* 쓰는 대로 저장(0.5초 쉬면) — 빈 새 노트는 저장하지 않는다 */
 function nedChanged(){ clearTimeout(noteT); const s = document.getElementById('nedSaved'); if (s) s.textContent = '저장 중…'; noteT = setTimeout(nedCommit, 500); }
 function nedCommit(){ clearTimeout(noteT); const n = noteEd; if (!n) return;
-  if (noteBlank(n)){ if (!n.fresh){ removeNote(n.id); n.fresh = true; } const s = document.getElementById('nedSaved'); if (s) s.textContent = ''; return; }
-  const r = putNote(n); n.fresh = false; n.at = r.at; const s = document.getElementById('nedSaved'); if (s) s.textContent = `저장됨 · ${noteWhen(r.at)}`;
+  if (noteBlank(n)){ if (!n.fresh){ removeNote(n.id); n.fresh = true; n.saved = false; } const s = document.getElementById('nedSaved'); if (s) s.textContent = ''; return; }
+  const r = putNote(n); n.fresh = false; n.saved = true; n.at = r.at; const s = document.getElementById('nedSaved'); if (s) s.textContent = `저장됨 · ${noteWhen(r.at)}`;
   if (!document.getElementById('nedDel') && view === 'noted'){ document.getElementById('nedDone')?.insertAdjacentHTML('afterend', `<button class="btn ghost" id="nedDel">이 노트 지우기</button>`); } }
-function nedLeave(){ nedCommit(); const d = noteEd && noteEd.date; noteEd = null; if (d){ noteDay = d; noteMonth = d.slice(0,7); } noteQ = ''; show('note'); }
+function nedLeave(){ nedCommit(); const d = noteEd && noteEd.date; if (noteEd && noteEd.saved) noteDone = { id:noteEd.id }; noteEd = null; if (d){ noteDay = d; noteMonth = d.slice(0,7); } noteQ = ''; show('note'); }
+/* 틀 바꾸기 — 쓴 글은 옮긴다: 틀 ↔ 틀은 칸 순서대로, 틀 → 자유는 본문(칸 이름 포함)으로, 자유 → 틀은 본문을 첫 칸으로 */
+function nedSwitch(k){ const n = noteEd, from = tplOf(n); if (!n || !NTPL[k] || k === from) return;
+  if (isTpl(from) && k === 'free'){ n.body = noteCompose(from, n.parts); n.parts = ['', '', '', '']; if (n.title) n.more = true; }
+  else if (from === 'free' && isTpl(k)){ const b = (n.body || '').trim(); if (b.length > PART_MAX){ toast('글이 길어서 자유 틀에 그대로 둘게요'); return; } n.parts = [b, '', '', '']; n.more = !!n.title; }
+  n.tpl = k; if (isTpl(k)) n.body = noteCompose(k, n.parts); keepTpl(k); nedFocus = '';
+  if (!noteBlank(n)) nedCommit(); renderNoted();
+  document.querySelector(`[data-ntpl="${k}"]`)?.focus({ preventScroll:true }); }
+/* 끼워 넣기 — 마지막에 쓰던 칸(없으면 첫 빈 칸)의 커서 자리에. 코넬 '질문' 칸에 빈칸을 넣으면 ( ㉠ ) 질문 꼴로 */
+function nedInsert(key){ const n = noteEd; if (!n) return; const tk = tplOf(n);
+  const ids = isTpl(tk) ? [0, 1, 2].map(i => 'nedF' + i).concat(n.more ? ['nedF3'] : []) : ['nedBody'];
+  let id = ids.includes(nedFocus) ? nedFocus : (ids.find(x => !(document.getElementById(x) || {}).value) || ids[0]);
+  const ta = document.getElementById(id); if (!ta) return;
+  const kind = key[0], rest = key.slice(2), [a, b] = kind === 'b' ? rest.split(':') : [rest];
+  const cue = isTpl(tk) && /^nedF[0-2]$/.test(id) && !!NTPL[tk].f[+id.slice(-1)].cue;
+  let text = '';
+  if (kind === 'c'){ const c = cById(a); if (!c) return; text = c.title; nedAddConcept(c.id, true); }
+  else if (kind === 'b'){ const c = cById(a); const it = c && blankItems(c).find(x => x.k === b); if (!it) return;
+    text = plain(String(it.s).replace(/\{\{(.+?)\}\}/g, (_, m) => m === b && cue ? `( ${b} )` : ((c.blanks || {})[m] || m))).replace(/\s+/g, ' ').trim();
+    if (cue) text += ` — ${b}에 들어갈 말은?`; }
+  else if (kind === 'w'){ const w = S.wrong.find(x => wKey(x) === a); text = w ? wrongText(w) : ''; }
+  if (!text) return;
+  const s = ta.selectionStart ?? ta.value.length, e = ta.selectionEnd ?? s, before = ta.value.slice(0, s), after = ta.value.slice(e);
+  const pre = before && !/\s$/.test(before) ? (after.trim() ? ' ' : '\n') : '', max = +ta.maxLength > 0 ? +ta.maxLength : NOTE_MAX;
+  const v2 = (before + pre + text + after).slice(0, max); ta.value = v2; const pos = Math.min(v2.length, (before + pre + text).length);
+  ta.focus({ preventScroll:false }); ta.setSelectionRange(pos, pos); nedFocus = id;
+  ta.dispatchEvent(new Event('input', { bubbles:true })); }
+/* 교재와 견주기 — 안 보고 쓴 뒤에 그 개념의 ①②③ 제목과 포인트를 본다(인출 → 확인) */
+function nedCheckSheet(){ const n = noteEd; if (!n) return;
+  const cs = [...new Set([...(n.cids||[]), ...(n.date === todayISO() && !(n.cids||[]).length ? [todayConcept().id] : [])])].map(cById).filter(Boolean).slice(0, 3);
+  openSheet(`<h3>교재와 견주기</h3><p>내가 쓴 것과 견줘 보고, 빠뜨린 것은 노트에 한 줄 더해요.</p>
+    ${cs.map(c => `<div class="nchk"><b>${esc(c.title)}</b><small>${esc(lessonTag(LESSONS.find(L => L.id === c.lessonId)))} ${esc(c.lessonName)}</small>
+      ${(c.steps||[]).length ? `<ol>${c.steps.map(s => `<li><span>${esc(s.n || '')}</span>${rich(String(s.t || '').replace(/\{\{(.+?)\}\}/g, (_, m) => (c.blanks || {})[m] || m))}</li>`).join('')}</ol>` : ''}
+      ${c.point ? `<p class="pt">${rich(c.point)}</p>` : ''}</div>`).join('')}
+    <button class="btn" id="sheetClose">닫고 이어 쓰기</button>`); }
 function openConceptPicker(){
   const list = q => { const s = q.trim(); return CONCEPTS.filter(c => !s || (c.title + ' ' + c.lessonName + ' ' + c.unitName).includes(s)).slice(0, s ? 60 : 30); };
-  const rows = q => list(q).map(c => `<button data-ncpick="${c.id}" class="${noteEd.cids.includes(c.id)?'on':''}"><b>${esc(c.title)}</b><small>${esc(c.bookName)} · ${esc(c.unit)}. ${esc(c.unitName)} · ${esc(c.lessonName)}</small></button>`).join('') || '<p class="fine">찾는 개념이 없습니다.</p>';
-  openSheet(`<h3>개념 붙이기</h3><p>노트에 붙인 개념은 눌러서 바로 교재로 갈 수 있습니다. (최대 12개)</p>
+  const rows = q => list(q).map(c => `<button data-ncpick="${c.id}" class="${noteEd.cids.includes(c.id)?'on':''}"><b>${esc(c.title)}</b><small>${esc(c.bookName)} · ${esc(c.unit)}. ${esc(c.unitName)} · ${esc(c.lessonName)}</small></button>`).join('') || '<p class="fine">찾는 개념이 없어요.</p>';
+  openSheet(`<h3>개념 붙이기</h3><p>노트에 붙인 개념은 눌러서 바로 교재로 갈 수 있고, '시험 전 다시 읽기'에서 소단원별로 모여요. (최대 12개)</p>
     <div class="search"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="M20 20l-4-4"/></svg><input id="cpickQ" type="search" placeholder="개념 이름으로 찾기" aria-label="개념 찾기"></div>
     <div class="cpick" id="cpickList">${rows('')}</div><button class="btn ghost" id="sheetClose">닫기</button>`);
   const inp = document.getElementById('cpickQ'); inp.addEventListener('input', () => { document.getElementById('cpickList').innerHTML = rows(inp.value); }); }
-function nedAddConcept(id){ const n = noteEd; if (!n || n.cids.includes(id)) return; if (n.cids.length >= 12){ toast('개념은 12개까지 붙일 수 있습니다'); return; }
-  n.cids.push(id); document.getElementById('nedCs').innerHTML = nedChips(); document.querySelector(`#nedSug [data-csug="${id}"]`)?.remove(); nedCommit(); }
+function nedAddConcept(id, quiet){ const n = noteEd; if (!n || n.cids.includes(id)) return; if (n.cids.length >= 12){ if (!quiet) toast('개념은 12개까지 붙일 수 있어요'); return; }
+  n.cids.push(id); document.getElementById('nedCs').innerHTML = nedChips(); document.querySelector(`#nedSug [data-csug="${id}"]`)?.remove(); const sg = document.getElementById('nedSug'); if (sg && !sg.querySelector('button')) sg.remove(); if (!quiet) nedCommit(); }
 const refreshNoteCard = () => { const el = document.getElementById('goNote'); if (el) el.outerHTML = noteCard(); };
-/* 오늘 화면 카드 — 일력 한 장 + 오늘 노트 */
+/* 오늘 화면 카드 — 일력 한 장 + 오늘 노트(없으면 지난 기록 한 줄) */
 function noteCard(){ const t = todayISO(), d = new Date(t + 'T00:00:00'); const ns = liveNotes().filter(n => n.date === t).sort((a,b) => a.at < b.at ? 1 : -1);
-  const first = ns[0]; const preview = first ? (first.title || first.body.split('\n').find(l => l.trim()) || '') : '';
+  const preview = ns[0] ? notePreview(ns[0]) : ''; const past = ns.length ? null : pastNote();
   return `<button class="tnote" id="goNote" aria-label="공부 노트 · 달력">
     <span class="pg" aria-hidden="true"><small>${d.getMonth()+1}월</small><b>${d.getDate()}</b><i>${WD[d.getDay()]}요일</i></span>
     <span class="tx"><b>${ns.length ? `오늘의 공부 노트 ${ns.length}개` : '오늘의 공부 노트'}</b>
-      <span>${ns.length ? esc(preview) : '오늘 배운 것을 세 줄로 정리해 두세요. 개인 메모장으로 써도 좋습니다.'}</span>
+      <span>${ns.length ? esc(preview) : past ? `${past.lab} 쓴 노트가 있어요 — ${esc(notePreview(past.n))}` : '오늘 배운 것을 세 줄로 남겨 두세요. 1분이면 돼요.'}</span>
       <em>달력에서 지난 노트 보기</em></span>
     <svg viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg></button>`; }
 
@@ -5119,6 +5387,8 @@ const PTR_VIEWS = { today:()=>renderToday(), talk:()=>renderTalk(), post:()=>ren
     busy = true; ptr.classList.add('spin'); set(34, 1);
     try { await pullProgress(true); await PTR_VIEWS[view](); } catch {} finally { busy = false; ptr.classList.remove('spin'); set(-50, 0); } }, { passive:true });
 })();
+/* 노트: 마지막에 쓰던 칸 — 끼워 넣기 칩이 그 칸의 커서 자리에 넣는다 */
+document.addEventListener('focusin', e => { if (view === 'noted' && /^(nedF[0-3]|nedBody)$/.test(e.target.id || '')) nedFocus = e.target.id; });
 /* 입력칸을 누르면 키보드에 가리지 않게 가운데로 */
 document.addEventListener('focusin', e => { if (!e.target.matches('input:not([type=checkbox]):not([type=radio]),textarea')) return;
   if (!isNative && innerWidth > 700) return; setTimeout(() => { try { e.target.scrollIntoView({ block:'center', behavior:'smooth' }); } catch {} }, 320); });
@@ -5235,16 +5505,29 @@ document.addEventListener('click', async e => {
   if (T('#noteThis')){ const c = CONCEPTS[detailIdx]; noteFrom = 'detail'; noteDay = todayISO(); noteMonth = noteDay.slice(0,7);
     const ex = liveNotes().find(n => n.date === noteDay && (n.cids||[]).includes(c.id)); openNote(ex ? ex.id : null, { date:noteDay, cids:[c.id] }); return; }
   if (T('#noteBack')){ noteQ = ''; show(noteFrom === 'detail' ? 'detail' : (noteFrom || home())); return; }
-  const ndy = T('[data-nday]'); if (ndy){ noteDay = ndy.dataset.nday; renderNote(); return; }
+  const ndy = T('[data-nday]'); if (ndy){ noteDay = ndy.dataset.nday; noteMonth = noteDay.slice(0,7); noteMode = 'cal'; renderNote(); if (ndy.dataset.ngo) document.querySelector('.nday')?.scrollIntoView({ block:'start' }); return; }
+  const nmd = T('[data-nmode]'); if (nmd){ noteMode = nmd.dataset.nmode; noteLesson = ''; renderNote(); return; }
+  if (T('[data-ncover]')){ noteCover = !noteCover; renderNote(); return; }
+  if (T('[data-nweak]')){ noteWeak = !noteWeak; renderNote(); return; }
+  const nls = T('[data-nlesson]'); if (nls){ noteLesson = nls.dataset.nlesson; renderNote(); return; }
+  const nrv = T('[data-nrev]'); if (nrv){ const t = nrv.nextElementSibling; nrv.hidden = true; if (t){ t.hidden = false; t.focus({ preventScroll:true }); } return; }
   const nmo = T('[data-nmon]'); if (nmo){ const [yy, mm] = noteMonth.split('-').map(Number); const dt = new Date(yy, mm - 1 + (+nmo.dataset.nmon), 1); noteMonth = `${dt.getFullYear()}-${pad(dt.getMonth()+1)}`;
     noteDay = noteMonth === todayISO().slice(0,7) ? todayISO() : `${noteMonth}-01`; renderNote(); return; }
   if (T('#noteToday')){ noteDay = todayISO(); noteMonth = noteDay.slice(0,7); renderNote(); return; }
   if (T('#noteNew')){ openNote(null, { date:noteDay || todayISO() }); return; }
   const nop = T('[data-nopen]'); if (nop){ openNote(nop.dataset.nopen); return; }
   if (T('#nedBack') || T('#nedDone')){ nedLeave(); return; }
-  if (T('#nedTpl')){ const ta = document.getElementById('nedBody'); const tpl = '오늘 배운 것\n· \n\n헷갈린 것\n· \n\n다음에 할 것\n· ';
-    ta.value = ta.value.trim() ? ta.value.replace(/\s+$/, '') + '\n\n' + tpl : tpl; noteEd.body = ta.value.slice(0, NOTE_MAX); ta.dispatchEvent(new Event('input', { bubbles:true }));
-    ta.focus(); const pos = ta.value.indexOf('· ', Math.max(0, ta.value.length - tpl.length)) + 2; ta.setSelectionRange(pos, pos); return; }
+  const ntp = T('[data-ntpl]'); if (ntp && noteEd){ nedSwitch(ntp.dataset.ntpl); return; }
+  const nis = T('[data-nins]'); if (nis && noteEd){ nedInsert(nis.dataset.nins); return; }
+  const nmo2 = T('[data-nmood]'); if (nmo2 && noteEd){ noteEd.mood = noteEd.mood === nmo2.dataset.nmood ? '' : nmo2.dataset.nmood;
+    nmo2.parentElement.querySelectorAll('[data-nmood]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.nmood === noteEd.mood))); nedCommit(); return; }
+  const ngr = T('[data-ngrasp]'); if (ngr && noteEd){ const g = +ngr.dataset.ngrasp; noteEd.grasp = noteEd.grasp === g ? 0 : g;
+    ngr.parentElement.querySelectorAll('[data-ngrasp]').forEach(b => b.setAttribute('aria-pressed', String(+b.dataset.ngrasp === noteEd.grasp))); nedCommit(); return; }
+  if (T('#nedMore') && noteEd){ noteEd.more = !noteEd.more; const bx = document.getElementById('nedMoreBox'), bt = document.getElementById('nedMore');
+    bx.hidden = !noteEd.more; bt.setAttribute('aria-expanded', String(noteEd.more)); bt.textContent = noteEd.more ? '제목·메모 접기' : '+ 제목·메모 더 쓰기';
+    if (noteEd.more){ nedGrow(document.getElementById('nedF3')); document.getElementById('nedTitle').focus(); } return; }
+  if (T('#nedCheck') && noteEd){ nedCommit(); nedCheckSheet(); return; }
+  if (T('#nedSame') && noteEd){ const l = T('#nedSame').dataset.lesson; nedCommit(); noteEd = null; noteMode = 'sum'; noteLesson = l; noteQ = ''; show('note'); return; }
   if (T('#nedAddC')){ openConceptPicker(); return; }
   const cpk = T('[data-ncpick]'); if (cpk){ nedAddConcept(cpk.dataset.ncpick); closeSheet(); return; }
   const csg = T('[data-csug]'); if (csg){ nedAddConcept(csg.dataset.csug); return; }
@@ -5582,7 +5865,7 @@ document.addEventListener('click', async e => {
     const out = { 안내: `${CFG.academy} '하루 한 개념' 앱이 이 계정에 대해 가진 기록입니다(개인정보 보호법 제35조 열람). 내려받은 날: ${todayISO()}`,
       계정: acc, 학원: S.auth ? { 코드:S.auth.code, 반:S.auth.cls, 수강_만료일:S.auth.until } : null,
       학습: { 시작일:S.start, 공부한_개념:S.done.length, 개념_목록:S.done, 끝까지_읽은_개념:S.read||[], 오늘_할_일:S.tp||{}, 문제_풀이:S.stats, 날짜별_풀이:S.dq||{}, 오답:S.wrong, 북마크:S.bm, 학습한_날:S.days, 문제은행_기록:S.bh, 모의고사_기록:S.mk||{}, 대단원_마무리:S.ux||{}, 보관한_글귀:S.qkeep },
-      일정: S.sched, 공부_노트: liveNotes().map(n => ({ 날짜:n.date, 제목:n.title, 내용:n.body, 개념:(n.cids||[]).map(id => cName(cById(id))), 고친_시각:n.at })), 출석: att, 이야기: { 글:wr.posts, 댓글:wr.comments }, 차단한_사용자_수:(S.blocked||[]).length };
+      일정: S.sched, 공부_노트: liveNotes().map(n => ({ 날짜:n.date, 틀:NTPL[tplOf(n)].name, 제목:n.title, 내용:n.body, 개념:(n.cids||[]).map(id => cName(cById(id))), 마음:moodName(n.mood), 이해:NGRASP[n.grasp||0], 고친_시각:n.at })), 출석: att, 이야기: { 글:wr.posts, 댓글:wr.comments }, 차단한_사용자_수:(S.blocked||[]).length };
     const name = `${CFG.academy}_내기록_${todayISO()}.json`;
     if (await saveFile(name, JSON.stringify(out, null, 2), 'application/json') && !isNative) toast(`${name} 을(를) 내려받았습니다`); return; }
   if (T('#pwOpen')){ openSheet(`<h3>비밀번호 바꾸기</h3>
@@ -5680,9 +5963,11 @@ document.addEventListener('input', e => {
     if (el) el.innerHTML = `<span class="${r1?'ok':''}">${r1?'✓':'·'} 8자 이상</span><span class="${r2?'ok':''}">${r2?'✓':'·'} 글자와 숫자 함께</span>`; return; }
   if (e.target.id==='talkSearch'){ talkQ = e.target.value; const el=e.target; renderTalk().then(()=>{ const n=document.getElementById('talkSearch'); if (n){ n.focus(); n.setSelectionRange(el.value.length, el.value.length); } }); return; }
   if (e.target.id==='noteQ'){ noteQ = e.target.value; const b = document.getElementById('noteBody'); if (!noteQ.trim()){ renderNote(); const n = document.getElementById('noteQ'); n.focus(); } else if (b) { const q = noteQ.trim().toLowerCase(); b.innerHTML = noteHits(noteSearch(q)); } return; }
+  if (noteEd && /^nedF[0-3]$/.test(e.target.id)){ const i = +e.target.id.slice(-1); noteEd.parts[i] = e.target.value.slice(0, PART_MAX);
+    noteEd.body = noteCompose(tplOf(noteEd), noteEd.parts); nedGrow(e.target); nedChanged(); return; }
   if (noteEd && ['nedTitle','nedBody','nedDate'].includes(e.target.id)){ const f = { nedTitle:'title', nedBody:'body', nedDate:'date' }[e.target.id];
     if (f === 'date'){ if (!/^\d{4}-\d{2}-\d{2}$/.test(e.target.value)) return; } noteEd[f] = f === 'body' ? e.target.value.slice(0, NOTE_MAX) : e.target.value;
-    if (f === 'body'){ const c = document.getElementById('nedCnt'); if (c) c.textContent = `${noteEd.body.length.toLocaleString()} / ${NOTE_MAX.toLocaleString()}`; }
+    if (f === 'body') nedGrow(e.target);
     nedChanged(); return; }
   if (e.target.id==='listQ'){ listQ = e.target.value; const el=e.target; renderList(); const n=document.getElementById('listQ'); n.focus(); n.setSelectionRange(el.value.length, el.value.length); } });
 /* 접근성 뒷받침(2026-10-01 점검): 이름 없는 입력칸에는 안내 문구를 이름으로 · 고르는 단추(.seg·.chipbar)에는 눌림 상태를 알린다.

@@ -18,6 +18,7 @@ async def main():
             ctx = await b.new_context(viewport={'width': 390, 'height': 844}, color_scheme=scheme, service_workers='block'); await ctx.add_init_script(NO_INTRO)
             s = await ctx.new_page(); await auto_yes(s); s.on('pageerror', lambda e: errs.append(str(e)))
             await s.goto(APP); await s.wait_for_timeout(700); await s.click('#goGuest'); await s.wait_for_timeout(400)
+            await s.wait_for_function('MORE.ok', timeout=15000)   # 생각해 보기·예제는 나중에 받는 데이터에 있다(2026-10-07)
             n = await s.evaluate("[CONCEPTS.filter(c => c.x && c.x.why && c.x.why.q && c.x.why.a).length, CONCEPTS.filter(c => c.x && c.x.example && c.x.follow).length, CONCEPTS.some(c => c.x && c.x.why && 'src' in c.x.why)]")
             assert n[0] == 140 and n[1] >= 20 and n[2] is False, n
             for cid, ex in (('1305-03', False), ('2205-04', True)):

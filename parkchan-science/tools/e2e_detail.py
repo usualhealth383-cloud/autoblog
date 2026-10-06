@@ -53,6 +53,7 @@ async def run(b, theme, errs):
     if t == 'l': await s.locator('#dqcBox').scroll_into_view_if_needed(); await shot('d00_dqc_waiting')
     gate.set(); await s.wait_for_function('MORE.ok', timeout=8000); await s.wait_for_timeout(300)
     assert await s.locator('#dqcBox [data-dqc]').count() == 6, '받은 뒤 확인 문제 3개가 채워지지 않음'
+    assert await s.locator('#dThink .dthink').count() == 1 and '생각해 보기' in await s.inner_text('#dMoreBtn'), '받은 뒤 생각해 보기가 채워지지 않음(2026-10-07 나중에 받는 데이터로 옮김)'
     assert await s.evaluate("document.querySelector('#v-detail .dcard').dataset.keep") == '1', '확인 문제를 채우며 화면 전체를 다시 그림'
     await s.unroute('**/more-*.json')
 
@@ -125,7 +126,7 @@ async def run(b, theme, errs):
     assert await s.get_attribute('#dMoreBtn', 'aria-expanded') == 'true' and await s.locator('#v-detail .prose').is_visible()
     assert '본문 접기' in await s.inner_text('#dMoreBtn')
     assert await s.locator('#v-detail .dmyth .myth .why').first.is_visible(), "펼친 뒤 오해 카드의 '왜?'가 안 보임"
-    sec = await s.evaluate("[...document.querySelectorAll('#dMore > .sec h2')].map(h => h.textContent)")
+    sec = await s.evaluate("[...document.querySelectorAll('#dMore > .sec h2, #dThink > .sec h2')].map(h => h.textContent)")   # 생각해 보기·예제는 #dThink 안(나중에 받는 데이터)
     assert sec == ['본문', '생각해 보기', '자주 하는 오해', '용어'] or sec == ['본문', '생각해 보기', '예제', '자주 하는 오해', '용어'], sec   # 2026-10-06 생각해 보기·예제(보완안 8·9)
     assert await s.evaluate(f"JSON.parse(localStorage.getItem('pcs.dopen'))['{CID}']") == 1
     await a11y(s, '본문 펼침')

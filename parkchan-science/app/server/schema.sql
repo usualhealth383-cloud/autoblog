@@ -139,6 +139,14 @@ create table if not exists notes (
   created_at timestamptz not null default now()
 );
 create index if not exists notes_uid_date on notes (uid, date);
+-- 노트 틀·칸·마음·이해(2026-10-07, 조사 reference/benchmark/공부노트-조사.md) — 모두 선택 칸. 옛 노트는 빈 값('' · [] · 0) 그대로.
+-- body 는 틀 노트에서도 '칸 이름 + 내용'을 이어 붙인 글로 같이 저장한다(검색·내보내기·옛 앱). 읽기·쓰기 권한은 위 노트와 같다 — 본인만
+alter table notes add column if not exists tpl text not null default '' check (tpl in ('', 'line3', 'cornell', 'mix', 'free'));
+alter table notes add column if not exists parts jsonb not null default '[]'::jsonb
+  check (jsonb_typeof(parts) = 'array' and jsonb_array_length(parts) <= 4 and char_length(parts::text) <= 12000
+         and not jsonb_path_exists(parts, '$[*] ? (@.type() != "string")'));
+alter table notes add column if not exists mood text not null default '' check (mood in ('', 'proud', 'calm', 'meh', 'tired', 'stuck'));
+alter table notes add column if not exists grasp smallint not null default 0 check (grasp between 0 and 3);
 create or replace function private.note_guard() returns trigger language plpgsql security definer set search_path = public as $$
 begin
   if auth.uid() is not null then new.uid := auth.uid(); end if;   -- 앱에서 오는 요청은 늘 본인 것으로(남의 계정으로 넣기 막기) · 관리용 SQL 은 그대로
@@ -1229,7 +1237,7 @@ revoke all on feedback from anon, authenticated; grant select, insert (kind, bod
 grant usage on sequence feedback_id_seq to authenticated;
 revoke execute on function feedback_list(), feedback_done(bigint, boolean) from public, anon; grant execute on function feedback_list(), feedback_done(bigint, boolean) to authenticated;
 revoke all on notes from anon, authenticated; grant select, delete on notes to authenticated;
-grant insert (id, date, title, body, cids, updated_at), update (id, date, title, body, cids, updated_at) on notes to authenticated;   -- 올리기(upsert)가 id 도 SET 한다 · 남의 행은 RLS 가 막는다
+grant insert (id, date, title, body, cids, tpl, parts, mood, grasp, updated_at), update (id, date, title, body, cids, tpl, parts, mood, grasp, updated_at) on notes to authenticated;   -- 올리기(upsert)가 id 도 SET 한다 · 남의 행은 RLS 가 막는다
 revoke all on guardian_links from anon, authenticated; grant select on guardian_links to authenticated;   -- 연결·해제는 link_code()·unlink_child()·guardian_decide() 로만
 revoke execute on function guardian_requests(), guardian_decide(uuid, text, boolean), my_guardians() from public, anon;
 grant execute on function guardian_requests(), guardian_decide(uuid, text, boolean), my_guardians() to authenticated;

@@ -69,7 +69,7 @@ async def run(theme):
     async with async_playwright() as p:
         b = await p.chromium.launch(executable_path='/opt/pw-browsers/chromium')
         pg = await (await b.new_context(viewport={'width':390,'height':844}, color_scheme=theme)).new_page()
-        await pg.goto('http://127.0.0.1:8765/index.html'); await pg.wait_for_timeout(800)
+        await pg.goto(_o.environ.get('PCS_APP', 'http://127.0.0.1:8765/index.html')); await pg.wait_for_timeout(800)
         bad = []
         print(f'── {"어둡게" if theme=="dark" else "밝게"} ──')
         async def look(n): await sweep(pg, n, bad)
@@ -79,8 +79,13 @@ async def run(theme):
         for v, n in [('list','교재'),('bank','문제'),('talk','이야기'),('plan','일정'),('me','내 정보')]:
             await pg.click(f'.tab[data-v="{v}"]'); await pg.wait_for_timeout(500); await sweep(pg, n, bad)
         await pg.click('#goNoteMe'); await pg.wait_for_timeout(400); await pg.click('#noteNew'); await pg.wait_for_timeout(300)
-        await pg.fill('#nedTitle', '대비 점검'); await pg.fill('#nedBody', '점검 메모'); await pg.wait_for_timeout(700); await sweep(pg, '노트 쓰기', bad)
+        await sweep(pg, '노트 쓰기(빈 세 줄 · 안내 문구)', bad)
+        await pg.fill('#nedF0', '대비 점검'); await pg.click('[data-nmood="calm"]'); await pg.click('[data-ngrasp="2"]'); await pg.wait_for_timeout(700); await sweep(pg, '노트 쓰기(세 줄)', bad)
+        await pg.click('#nedCheck'); await pg.wait_for_timeout(300); await sweep(pg, '교재와 견주기', bad); await pg.click('#sheetClose'); await pg.wait_for_timeout(200)
+        await pg.click('[data-ntpl="cornell"]'); await pg.wait_for_timeout(300); await pg.fill('#nedF1', '핵심 점검'); await pg.wait_for_timeout(600); await sweep(pg, '노트 쓰기(코넬)', bad)
         await pg.click('#nedDone'); await pg.wait_for_timeout(300); await sweep(pg, '공부 노트', bad)
+        await pg.click('[data-nmode="sum"]'); await pg.wait_for_timeout(300); await pg.click('[data-ncover]'); await pg.wait_for_timeout(200); await sweep(pg, '시험 전 다시 읽기', bad)
+        await pg.click('[data-ncover]'); await pg.click('[data-nmode="cal"]'); await pg.wait_for_timeout(200)
         await pg.click('#noteBack'); await pg.wait_for_timeout(300); await pg.click('.tab[data-v="today"]'); await pg.wait_for_timeout(500); await sweep(pg, '오늘(노트 카드)', bad)
         await audit_extra(pg, look)
         await b.close(); return bad
