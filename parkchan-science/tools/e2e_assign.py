@@ -116,9 +116,9 @@ async def main():
         cards = await pg.locator('.asgcard').all_inner_texts()
         assert len(cards) == 2 and '마감 지남' in cards[0] and '늦게 내도 받아요' in cards[0] and '0/5' in cards[0], cards
         assert '오늘 마감' in cards[1] or 'D-2' in cards[1], cards
-        assert '학원 과제가 2개 더 있습니다' in await pg.inner_text('#v-today'), '두 개 넘으면 한 줄로 알림'
+        assert '학원 과제가 2개 더 있어요' in await pg.inner_text('#v-today'), '두 개 넘으면 한 줄로 알림'
         assert '다른 반' not in ''.join(cards) and await pg.evaluate("ASG.length") == 4, ('골라 낸 다른 반 과제는 안 보임', await pg.evaluate('ASG.map(a=>a.title)'))
-        order = await pg.evaluate("(() => { const a = document.querySelector('.asgcard'), r = document.querySelector('#v-today .rhythm'), c = document.querySelector('#v-today .card'); return !!(a && r && c && (a.compareDocumentPosition(r) & 4) && (a.compareDocumentPosition(c) & 4)); })()")
+        order = await pg.evaluate("(() => { const a = document.querySelector('.asgcard'), r = document.querySelector('#v-today .rhythm'), c = document.querySelector('#v-today .path'); return !!(a && r && c && (a.compareDocumentPosition(r) & 4) && (a.compareDocumentPosition(c) & 4)); })()")
         assert order, '과제 카드는 리듬·오늘 개념보다 위'
         hs = await pg.evaluate("[...document.querySelectorAll('.asgcard')].map(e => e.getBoundingClientRect().height)"); assert min(hs) >= 44, hs
         await pg.screenshot(path=f'{SC}/a03_student_today_light.png')

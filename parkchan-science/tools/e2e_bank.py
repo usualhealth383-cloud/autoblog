@@ -38,10 +38,10 @@ async def main():
         assert await pg.evaluate("S.wrong.filter(w=>w.b).every(w => w.x===1 && w.d===addDays(todayISO(),1))"), '문제 은행 오답의 다음 복습이 내일이 아님'
         await pg.click('#bankQuit2'); await pg.wait_for_timeout(200)
         await pg.select_option('#bankLesson','1304'); await pg.wait_for_timeout(200); await pg.click('[data-bsel="type"][data-val="mc"]'); await pg.click('#bankStart'); await pg.wait_for_timeout(300)
-        ans = await pg.evaluate('bs.items[bs.i].answer'); await pg.click(f'[data-bp="{ans}"]'); await pg.wait_for_timeout(150); assert '맞혔습니다' in await pg.locator('.verdict').inner_text(); await pg.screenshot(path=f'{SC}/b4_mc.png', full_page=True)
+        ans = await pg.evaluate('bs.items[bs.i].answer'); await pg.click(f'[data-bp="{ans}"]'); await pg.wait_for_timeout(150); assert '맞았어요' in await pg.locator('.verdict').inner_text(); await pg.screenshot(path=f'{SC}/b4_mc.png', full_page=True)
         await pg.click('#bankQuit'); await pg.wait_for_timeout(200)
         await pg.click('[data-bsel="type"][data-val="blank"]'); await pg.click('#bankStart'); await pg.wait_for_timeout(300)
-        ans = await pg.evaluate('bs.items[bs.i].answer'); await pg.fill('#blankIn', ans); await pg.click('#blankGo'); await pg.wait_for_timeout(150); assert '맞혔습니다' in await pg.locator('.verdict').inner_text()
+        ans = await pg.evaluate('bs.items[bs.i].answer'); await pg.fill('#blankIn', ans); await pg.click('#blankGo'); await pg.wait_for_timeout(150); assert '맞았어요' in await pg.locator('.verdict').inner_text()
         await pg.click('#bankQuit'); await pg.wait_for_timeout(200)
         await pg.click('[data-bsel="type"][data-val="multi"]'); await pg.click('#bankStart'); await pg.wait_for_timeout(300); assert await pg.locator('.bogi').count()==1
         if await pg.locator('.qfig').count(): await pg.click('.qfig'); await pg.wait_for_timeout(200); assert await pg.locator('#fv').count()==1; await pg.screenshot(path=f'{SC}/b5_zoom.png'); await pg.click('#fvClose')

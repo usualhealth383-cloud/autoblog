@@ -26,10 +26,10 @@ async def main():
         B = await device()
         await B.click('#goLogin'); await B.fill('#lgEmail', 'two@t.kr'); await B.fill('#lgPw', 'pass1234'); await B.click('#lgGo'); await B.wait_for_timeout(1200)
         # ① A 에서 북마크 → B 로 돌아오면 보인다
-        await A.click('#v-today [data-bm]'); await A.wait_for_timeout(1600)
+        await A.click('#pRead'); await A.wait_for_timeout(250); await A.click('#v-detail [data-bm]'); await A.click('#backList'); await A.wait_for_timeout(1600)
         await resume(B); assert await B.evaluate('S.bm.length') == 1, 'A 의 북마크가 B 에 안 옴'
         # ② B 에서 그 북마크를 지움 → A 로 돌아오면 사라지고, A 가 다른 걸 저장해도 되살아나지 않는다
-        await B.click('#v-today [data-bm]'); await B.wait_for_timeout(1600); assert await B.evaluate('S.bm.length') == 0
+        await B.click('#pRead'); await B.wait_for_timeout(250); await B.click('#v-detail [data-bm]'); await B.click('#backList'); await B.wait_for_timeout(1600); assert await B.evaluate('S.bm.length') == 0
         await resume(A); assert await A.evaluate('S.bm.length') == 0, 'B 에서 지운 북마크가 A 에 남음'
         await A.click('#goQuiz'); await A.wait_for_timeout(300); ans = await A.evaluate('qState.q.answer'); await A.click(f'.opt[data-p="{ans}"]'); await A.wait_for_timeout(1700)
         await resume(B); assert await B.evaluate('S.bm.length') == 0, '지운 북마크가 되살아남'

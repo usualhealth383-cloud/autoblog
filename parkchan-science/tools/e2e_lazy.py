@@ -38,7 +38,7 @@ async def main():
         await s.goto(APP); await s.wait_for_timeout(700)
         await s.click('#goGuest'); await s.wait_for_timeout(500)
         assert held and await s.evaluate('MORE.ok') is False
-        assert await s.locator('#v-today .card h1').count() == 1, '데이터를 기다리느라 오늘 화면이 안 그려짐'
+        assert await s.locator('#v-today .path .ps').count() == 4 and await s.locator('#v-today .ps.now #pRead').count() == 1, '데이터를 기다리느라 오늘 화면이 안 그려짐'
         # 교재 상세(그림 있는 개념) — 그림 자리는 같은 비율로
         fi = await s.evaluate("CONCEPTS.findIndex((c, i) => c.figure && isOpen(i))")
         await s.evaluate(f"detailIdx = {fi}; show('detail')"); await s.wait_for_timeout(300)

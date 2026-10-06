@@ -47,7 +47,8 @@ async def main():
         # 출석 (로컬 코드) · 문제 · 북마크 · 공유
         att = await s.evaluate('attCode(attWindow())')
         await s.click('#attOpen'); await s.fill('#attIn', att); await s.click('#attGo'); await s.wait_for_timeout(400); assert '출석' in await txt(s, '.pill')
-        await s.click('[data-bm]'); await s.wait_for_timeout(100); assert await s.evaluate('S.bm.length') == 1
+        await s.click('#pRead'); await s.wait_for_timeout(250); await s.click('#v-detail [data-bm]'); await s.wait_for_timeout(100); assert await s.evaluate('S.bm.length') == 1
+        await s.click('#backList'); await s.wait_for_timeout(250); assert await s.evaluate('view') == 'today'
         await s.click('#goQuiz'); await s.wait_for_timeout(300); ans = await s.evaluate('qState.q.answer'); await s.click(f'.opt[data-p="{1 if ans != 1 else 2}"]'); await s.wait_for_timeout(300)
         assert await s.evaluate('S.done.length') == 1 and await s.evaluate('S.wrong.length') == 1 and await s.evaluate('S.stats.a') == 1
         await shot(s, 'l06_quiz_wrong'); await s.click('#grade'); await s.wait_for_timeout(200)

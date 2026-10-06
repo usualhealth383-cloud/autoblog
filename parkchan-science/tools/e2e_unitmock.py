@@ -124,7 +124,7 @@ async def main():
         await s.click('[data-urecap="1-I"]'); await s.wait_for_timeout(200)
         assert await s.evaluate("bs.kind === 'recap' && bs.items.length === 20 && bs.items[0].id === 'U1-1-b1'")
         await s.fill('#blankIn', '10^-10 m'); await s.click('#blankGo'); await s.wait_for_timeout(120)
-        assert '맞혔습니다' in await s.inner_text('.verdict')
+        assert '맞았어요' in await s.inner_text('.verdict')
         await s.click('#bankQuit'); await s.wait_for_timeout(150); await s.click('#umBack'); await s.wait_for_timeout(150)
         # 다음 날 오늘의 복습: 대단원 오답이 기한으로 나오고, 덤 문항(다른 소단원)에는 섞이지 않는다
         await s.clock.fast_forward(24 * 3600 * 1000)

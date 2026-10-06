@@ -73,7 +73,7 @@ async def main():
         await s.click('#goLogin'); await s.fill('#lgEmail', 'student@demo.kr'); await s.fill('#lgPw', '1234'); await s.click('#lgGo'); await s.wait_for_timeout(900)
         assert await s.evaluate('view') == 'today'
         await s.evaluate('loadMore()'); await s.wait_for_function('MORE.ok', timeout=15000)
-        assert await s.locator('#revStart').count() == 0 and await s.locator('.revcard').count() == 0, '아무것도 안 배웠는데 오늘의 복습이 보임'
+        assert await s.locator('#revStart').count() == 0 and await s.locator('#ps-review.none').count() == 1, '아무것도 안 배웠는데 오늘의 복습이 보임'
         L1 = await s.evaluate('todayConcept().lessonId')
         qid = await s.evaluate(f"BANK.find(q => q.lessonId === '{L1}' && q.type === 'ox').id")
         await s.evaluate(f"startBank([BANK.find(q => q.id === '{qid}')], '')"); await s.wait_for_timeout(200)
@@ -86,9 +86,9 @@ async def main():
         # 다음 날: 기한 → 오늘 화면에 '오늘의 복습'
         await goto_day(s, D0 + dt.timedelta(1))
         assert await s.evaluate('dueAll().map(w => w.b)') == [qid], '문제 은행 오답이 다음 날 돌아오지 않음(!w.b 버그)'
-        card = await s.locator('#revStart').inner_text(); assert '오늘의 복습' in card and '다시 볼 문제 1' in card, card
+        card = await s.locator('#ps-review').inner_text(); assert await s.locator('#revStart').count() == 1 and '오늘의 복습' in card and '다시 볼 문제 1' in card, card
         await s.screenshot(path=f'{SC}/r01_today_review_light.png', full_page=True)
-        await s.locator('.revcard').screenshot(path=f'{SC}/r01b_card_light.png')
+        await s.locator('#ps-review').screenshot(path=f'{SC}/r01b_card_light.png')
         await s.locator('.rhythm.home').screenshot(path=f'{SC}/r01c_rhythm_light.png')
 
         # ───────── 2) 상자 오르기 · 기한 전에는 그대로 · 정리됨 규칙 ─────────
@@ -101,12 +101,12 @@ async def main():
             await answer(s, True)
             if mine: assert '다음 복습은' in await s.locator('#v-bank .again').inner_text()
             await s.click('#bankNext'); await s.wait_for_timeout(120)
-        assert '오늘의 복습을 마쳤습니다' in await s.locator('#v-bank').inner_text()
+        assert '오늘의 복습을 마쳤어요' in await s.locator('#v-bank').inner_text()
         assert await s.locator('.revnext').count() == 1, '끝나고 "다음 복습" 한 줄이 없음'
         await s.screenshot(path=f'{SC}/r02_review_done.png', full_page=True)
         w = await s.evaluate(f"findW({{ b:'{qid}' }})"); assert w['x'] == 2 and w['d'] == iso(D0 + dt.timedelta(4)), w
         await s.click('#bankQuit2'); await s.wait_for_timeout(200)
-        assert '오늘의 복습을 마쳤습니다' in await s.locator('.revcard.done').inner_text(), '마친 뒤 오늘 화면 한 줄이 없음'
+        assert '오늘의 복습을 마쳤어요' in await s.locator('#ps-review.done').inner_text(), '마친 뒤 오늘 화면 한 줄이 없음'
         # 기한 전(이틀 뒤)에 미리 맞힘 → 그대로
         await goto_day(s, D0 + dt.timedelta(2))
         r = await s.evaluate(f"srsMark({{ b:'{qid}' }}, true, 'O').st"); assert r == 'early'
@@ -187,7 +187,7 @@ async def main():
         await s.evaluate(f"""(() => {{ S.wrong = {json.dumps(dueA)}.map((id, i) => ({{ b:id, p:'O', iso:'2026-10-01', a:'{iso(D - dt.timedelta(3))}', d:'{iso(D - dt.timedelta(3 - i))}', x:2, k:1 }}));
             S.done = CONCEPTS.filter(c => {json.dumps(ls)}.includes(c.lessonId) || c.lessonId === '{T}').map(c => c.id); S.bh = {{}}; S.rv = null; bs = null; save(S); }})()""")
         await s.evaluate("show('today')"); await s.wait_for_timeout(200)
-        card = await s.locator('#revStart').inner_text(); assert '오늘의 복습' in card and '5' in card and '다시 볼 문제 3' in card and '지난 소단원 2' in card, card
+        card = await s.locator('#ps-review').inner_text(); assert '오늘의 복습' in card and '5' in card and '다시 볼 문제 3' in card and '지난 소단원 2' in card, card
         for _ in range(12):
             plan = await s.evaluate("reviewPlan(true).items.map(e => ({ l:e.lesson, due:!!e.w, q:(e.q||reviewItem(e.w)).lessonId }))")
             seq = [x['l'] for x in plan]
@@ -202,14 +202,14 @@ async def main():
         # 문제 탭으로 가면 문제 은행 첫 화면, 오늘로 돌아오면 이어서 풀기
         await answer(s, True); await s.click('#bankNext'); await s.wait_for_timeout(100)
         await s.click('.tab[data-v="bank"]'); await s.wait_for_timeout(300); assert await s.locator('#bankStart').count() == 1, '문제 탭이 오늘의 복습에 묶임'
-        await s.click('.tab[data-v="today"]'); await s.wait_for_timeout(300); assert '이어서 풀기 · 1 / 5' in await s.locator('#revStart').inner_text()
+        await s.click('.tab[data-v="today"]'); await s.wait_for_timeout(300); assert '이어서 풀기 · 1 / 5' in await s.locator('#ps-review').inner_text()
         await s.click('#revStart'); await s.wait_for_timeout(200); assert await s.evaluate('bs.i') == 1
         # 다른 소단원이 없고 기한 문제가 모두 한 소단원이면 붙지 않게 1문제만
         await s.evaluate(f"(() => {{ bs = null; S.done = CONCEPTS.filter(c => c.lessonId === '{T}').map(c => c.id); S.bh = {{}}; S.rv = null; save(S); }})()")
         assert await s.evaluate("reviewPlan(true).items.length") == 1
         # 기한 문제도, 배운 다른 소단원도 없으면 카드를 숨긴다(기한 문제만 있으면 그것만)
         await s.evaluate("S.wrong = []; S.bh = {}; S.rv = null; save(S); show('today')"); await s.wait_for_timeout(200)
-        assert await s.locator('.revcard').count() == 0, '복습할 것이 없는데 카드가 보임'
+        assert await s.locator('#revStart').count() == 0 and await s.locator('#ps-review.none').count() == 1, '복습할 것이 없는데 카드가 보임'
 
         # ───────── 7) 이번 주 리듬 — 점 7개, 연속 일수는 어디에도 없음 ─────────
         D = dt.date(2026, 12, 3)      # 목요일
@@ -318,7 +318,7 @@ window.Capacitor = { isNativePlatform: () => true, getPlatform: () => 'android',
                 await c.context.close(); continue
             # (가) 확신했는데 틀림 → 한 줄 안내 · 평소대로 상자 1(내일) · 기록에 c:'s'
             await answer(c, False)
-            assert '확신했는데 틀렸습니다 — 이런 문제가 가장 잘 고쳐집니다' in await c.locator('#v-bank .verdict').inner_text()
+            assert '확신했는데 틀렸어요 — 이런 문제가 가장 잘 고쳐져요' in await c.locator('#v-bank .verdict').inner_text()
             assert await c.locator('#v-bank .conf').count() == 0, '채점 뒤에도 확신도 칩이 남음'
             w = await c.evaluate(f"findW({{ b:'{oxs[0]}' }})"); assert w['x'] == 1 and w['d'] == iso(D0 + dt.timedelta(1)) and w.get('c') == 's', w
             await c.screenshot(path=f'{SC}/r11c_conf_sure_wrong.png', full_page=True)
@@ -326,7 +326,7 @@ window.Capacitor = { isNativePlatform: () => true, getPlatform: () => 'android',
             await c.evaluate(f"startBank([BANK.find(q => q.id === '{oxs[1]}')], '')"); await c.wait_for_timeout(150)
             await c.click('[data-conf="u"]'); await answer(c, True)
             assert '확신했는데' not in await c.locator('#v-bank .verdict').inner_text()
-            assert '헷갈렸다면 아직 익는 중입니다' in await c.locator('#v-bank .again').inner_text()
+            assert '헷갈렸다면 아직 익는 중이에요' in await c.locator('#v-bank .again').inner_text()
             w = await c.evaluate(f"findW({{ b:'{oxs[1]}' }})"); assert w['x'] == 2 and w['k'] == 0 and w.get('c') == 'u' and w['d'] == iso(D0 + dt.timedelta(3)), w
             await c.evaluate("show('wrong')"); await c.wait_for_timeout(200); assert '헷갈렸지만 맞힘' in await c.locator('#v-wrong').inner_text()
             # (다) 기한 된 상자 3 문제를 헷갈렸지만 맞힘 → 상자 2에 머묾 · 정리 사슬(g) 끊김 · 정리되지 않음
@@ -351,7 +351,7 @@ window.Capacitor = { isNativePlatform: () => true, getPlatform: () => 'android',
             assert await c.locator('#v-quiz .conf button').count() == 2
             qa = await c.evaluate('qState.q.answer'); qn = await c.evaluate('qState.q.no'); ql = await c.evaluate('qState.q.lessonId')
             await c.click('#v-quiz [data-conf="s"]'); await c.click(f'#v-quiz .opt[data-p="{1 if qa != 1 else 2}"]'); await c.wait_for_timeout(200)
-            assert '확신했는데 틀렸습니다' in await c.locator('#v-quiz .verdict').inner_text()
+            assert '확신했는데 틀렸어요' in await c.locator('#v-quiz .verdict').inner_text()
             assert await c.evaluate(f"findW({{ l:'{ql}', n:{qn} }}).c") == 's'
             await c.screenshot(path=f'{SC}/r11d_quiz_sure_wrong.png', full_page=True)
             # (사) 날짜별 푼 수·맞힌 수(원장 '처리할 것'용) — 28일만 남긴다
@@ -380,7 +380,7 @@ window.Capacitor = { isNativePlatform: () => true, getPlatform: () => 'android',
             await d.evaluate("S.days.push(todayISO()); S.done = CONCEPTS.slice(0, 7).map(c => c.id); save(S); show('today')"); await d.wait_for_timeout(400)
             assert await d.locator('#revStart').count() == 1
             await d.screenshot(path=f'{SC}/r10_today_{color}.png')
-            await d.locator('.revcard').screenshot(path=f'{SC}/r10b_card_{color}.png')
+            await d.locator('#ps-review').screenshot(path=f'{SC}/r10b_card_{color}.png')
             await d.locator('.rhythm.home').screenshot(path=f'{SC}/r10c_rhythm_{color}.png')
             await d.context.close()
 

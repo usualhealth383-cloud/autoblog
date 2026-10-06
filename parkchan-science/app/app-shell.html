@@ -2098,8 +2098,8 @@ function srsMark0(w, ref, ok, p, t){
   if (!w.g) delete w.g;
   w.d = addDays(t, srsGap(w.x, lessonOfW(w))); return { st:'up', d:w.d, w }; }
 /* 확신도 한 탭 — 답을 고르기 전에 '확신 / 헷갈림'(선택, 다시 누르면 풀림). 채점에는 쓰지 않고 상자 규칙에만 쓴다 */
-const confRow = cur => `<div class="conf" role="group" aria-label="답을 고르기 전에 얼마나 확신하는지 고를 수 있습니다(선택)"><span class="k">고르기 전에 · 선택</span>${[['s','확신'],['u','헷갈림']].map(([k, l]) => `<button type="button" data-conf="${k}" aria-pressed="${cur === k}">${l}</button>`).join('')}</div>`;
-const confNote = (conf, ok) => conf === 's' && !ok ? `<p class="confnote">확신했는데 틀렸습니다 — 이런 문제가 가장 잘 고쳐집니다</p>` : '';
+const confRow = cur => `<div class="conf" role="group" aria-label="답을 고르기 전에 얼마나 확신하는지 고를 수 있어요(선택)"><span class="k">고르기 전에 · 선택</span>${[['s','확신'],['u','헷갈림']].map(([k, l]) => `<button type="button" data-conf="${k}" aria-pressed="${cur === k}">${l}</button>`).join('')}</div>`;
+const confNote = (conf, ok) => conf === 's' && !ok ? `<p class="confnote">확신했는데 틀렸어요 — 이런 문제가 가장 잘 고쳐져요</p>` : '';
 /* 날짜별 푼 수·맞힌 수(최근 28일만, 진도 JSON 을 작게) — 원장 '처리할 것'의 정답률 급락 판정용. dq: { 'YYYY-MM-DD': [푼 수, 맞힌 수] } */
 const statDay = ok => { const t = todayISO(); if (!S.dq || typeof S.dq !== 'object' || Array.isArray(S.dq)) S.dq = {}; const r = S.dq[t] ||= [0, 0]; r[0]++; if (ok) r[1]++;
   const cut = addDays(t, -27); Object.keys(S.dq).forEach(d => { if (d < cut) delete S.dq[d]; }); };
@@ -2116,12 +2116,12 @@ const conceptIdOfQ = q => { let c = null;
 const conceptGo = q => { const id = conceptIdOfQ(q); return id ? `<button class="btn soft cgo" data-cgo="${esc(id)}">이 개념 다시 보기</button>` : ''; };
 let detailBack = null;   // 문제 화면에서 '이 개념 다시 보기'로 왔으면 그 화면으로 돌아간다
 const dueWord = d => { const n = daysBetween(todayISO(), d); return n <= 0 ? '오늘' : n === 1 ? '내일' : `${kdate(d)}(${n}일 뒤)`; };
-const srsLine = r => !r ? '' : r.st === 'new' ? `↻ 오답 노트에 담았습니다 · <b>${dueWord(r.d)}</b> 한 번 더 묻습니다`
-  : r.st === 'reset' ? `↻ 한 번 더 담아 둡니다 · <b>${dueWord(r.d)}</b> 다시 묻습니다`
-  : r.st === 'up' ? `✓ 간격을 넓힙니다 · 다음 복습은 <b>${dueWord(r.d)}</b>입니다`
-  : r.st === 'clear' ? '✓ 이제 됐습니다 — 오답 노트에서 정리됩니다'
-  : r.st === 'hold' ? `헷갈렸다면 아직 익는 중입니다 · <b>${dueWord(r.d)}</b> 한 번 더 묻습니다`
-  : r.st === 'early' ? `맞혔습니다 · 복습 날짜는 그대로 <b>${dueWord(r.d)}</b>입니다` : '';
+const srsLine = r => !r ? '' : r.st === 'new' ? `↻ 오답 노트에 담았어요 · <b>${dueWord(r.d)}</b> 한 번 더 물어볼게요`
+  : r.st === 'reset' ? `↻ 한 번 더 담아 둘게요 · <b>${dueWord(r.d)}</b> 다시 물어볼게요`
+  : r.st === 'up' ? `✓ 간격을 넓혀요 · 다음 복습은 <b>${dueWord(r.d)}</b>이에요`
+  : r.st === 'clear' ? '✓ 이제 됐어요 — 오답 노트에서 정리돼요'
+  : r.st === 'hold' ? `헷갈렸다면 아직 익는 중이에요 · <b>${dueWord(r.d)}</b> 한 번 더 물어볼게요`
+  : r.st === 'early' ? `맞았어요 · 복습 날짜는 그대로 <b>${dueWord(r.d)}</b>이에요` : '';
 /* 개념 카드 자리 — 오답 문제가 나온 개념(문제 은행은 concept 번호, 오늘의 문제는 그 문제를 내는 개념) */
 const conceptIdxOfW = w => { const l = lessonOfW(w); let i = -1;
   if (w.b){ const q = BANK.find(x => x.id === w.b); if (q && +q.concept) i = CONCEPTS.findIndex(c => c.lessonId === l && +c.no === +q.concept); }
@@ -2159,7 +2159,7 @@ const quizAsBank = q => ({ id:`q:${q.lessonId}:${q.no}`, lessonId:q.lessonId, ty
   explain:q.explain || '', wrong:'', figure:'', difficulty:'', _qz:q });
 const reviewItem = w => { if (w.b) return BANK.find(q => q.id === w.b) || null; const q = QUIZZES.find(x => x.lessonId === w.l && x.no === w.n); return q && !q.essay ? quizAsBank(q) : null; };
 const nextDueText = () => { const left = dueToday().length; if (left) return `오늘 다시 볼 문제가 ${left}개 더 있어요`;
-  const ds = S.wrong.filter(w => !w.cleared && w.d > todayISO()).map(w => w.d).sort(); return ds.length ? `다음 복습은 ${dueWord(ds[0])}입니다` : '기한이 다가온 복습이 없습니다'; };
+  const ds = S.wrong.filter(w => !w.cleared && w.d > todayISO()).map(w => w.d).sort(); return ds.length ? `다음 복습은 ${dueWord(ds[0])}이에요` : '기한이 다가온 복습이 없어요'; };
 let revHold = null;   // 문제 탭으로 옮겨 가며 잠시 내려 둔 오늘의 복습
 const revCur = () => { const r = bs && bs.kind === 'review' ? bs : revHold; return r && r.i < r.items.length && r.day === todayISO() ? r : null; };
 function startTodayReview(){
@@ -2221,7 +2221,7 @@ const AUTH_HERO = `<svg class="hero" viewBox="0 0 320 116" role="img" aria-label
 </svg>`;
 const INTRO = [
   { t:'하루 한 개념,<br>5분이면 됩니다', d:'박찬 과학 강의 교재를 그대로 옮겼습니다. 매일 개념 하나를 읽고, 빈칸을 채우고, 문제 하나를 풉니다.', art:() => AUTH_HERO.replace('class="hero"', '') },
-  { t:'시험 날까지<br>이어지는 연습', d:`문제 은행 ${BANK_N.toLocaleString()}문항. 틀린 문제는 내일 다시, 맞히면 3·7·14·30일 간격으로 다시 나오고, 시험 일정에 범위를 걸면 그 범위 문제로 바로 갑니다.`,
+  { t:'시험 날까지<br>이어지는 연습', d:`문제 은행 ${BANK_N.toLocaleString()}문항. ${SRS_RULE} 시험 일정에 범위를 걸면 그 범위 문제로 바로 가요.`,
     art:() => `<svg viewBox="0 0 320 200" role="img" aria-label="문제 카드와 정답률 막대"><rect width="320" height="200" rx="22" fill="var(--brand-soft)"/>
       <g transform="rotate(-7 118 104)"><rect x="46" y="44" width="150" height="110" rx="14" fill="var(--card)" stroke="var(--brand-line)"/></g>
       <rect x="62" y="40" width="150" height="116" rx="14" fill="var(--card)" stroke="var(--brand-line)" stroke-width="1.5"/>
@@ -2359,7 +2359,7 @@ function renderAuth(){
   if (authMode==='welcome'){ const r = ACC ? ACC.role : 'student', nm = ACC ? esc(ACC.name) : '';
     const steps = r==='parent' ? ['자녀 화면에서 오늘 출석과 이번 달 기록을 봅니다', '학원 공지와 시험 일정이 자녀별로 들어옵니다', '자녀가 둘이면 <b>자녀 한 명 더 연결</b>로 함께 봅니다']
       : r==='owner' ? ['<b>학생</b>에서 수강생을 등록하고 코드를 보냅니다(엑셀 붙여 넣기 가능)', '수업 전 <b>출석</b>에서 30초 코드를 띄웁니다', '<b>공지</b>·<b>일정</b>은 반별로 보내면 학생·보호자에게 바로 갑니다']
-      : ['홈의 <b>오늘의 개념</b>을 읽고 문제 하나를 풀어 보세요', '틀린 문제는 오답 노트에 담겨 내일, 3일, 7일… 간격을 넓혀 가며 다시 나옵니다', '시험 날짜는 <b>일정</b>에 D-day로 넣어 두세요'];
+      : ['홈의 <b>오늘 할 일</b>을 위에서부터 하나씩 해 보세요 — 개념 읽기, 빈칸, 문제 하나', SRS_RULE, '시험 날짜는 <b>일정</b>에 D-day로 넣어 두세요'];
     const LN = plug('LocalNotifications');
     v.innerHTML = `<div class="auth welcome"><div class="grow">
       <div class="big"><svg width="38" height="38" viewBox="0 0 24 24" fill="none" stroke="var(--brand)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 12.5l5 5L19.5 7"/></svg></div>
@@ -2448,12 +2448,12 @@ function quoteCard(q, c){
       <div class="by"><span class="who">${esc(q.who||'')}</span>${q.role?`<span class="role">${esc(q.role)}</span>`:''}</div>
       ${q.src ? `<div class="src">출처 · ${esc(q.src)}</div>` : ''}
       ${q.note ? `<div class="note">${esc(q.note)}</div>` : ''}
+      ${br ? `<div class="qbridge"><b>과학으로 잇기</b>${esc(br)}</div>` : ''}
       <div class="acts">
         <button id="qNext"><svg viewBox="0 0 24 24"><path d="M21 12a9 9 0 1 1-2.6-6.4"/><path d="M21 4v5h-5"/></svg>다른 한 마디</button>
         <button id="qKeep" class="${kept?'on':''}"><svg viewBox="0 0 24 24"><path d="M12 20.5 4.5 13a4.6 4.6 0 0 1 6.5-6.5l1 1 1-1A4.6 4.6 0 0 1 19.5 13z"/></svg>${kept?'보관함에 있음':'보관하기'}</button>
       </div>
-    </div>
-    ${br ? `<div class="qbridge"><b>과학으로 잇기</b>${esc(br)}</div>` : ''}`;
+    </div>`;
 }
 function openQuoteKeep(){
   const keep = QUOTES.filter(q => (S.qkeep||[]).includes(q.id));
@@ -2510,7 +2510,7 @@ function asgCard(){
     return `<button class="revcard asgcard ${late ? 'late' : ''}" data-asg="${esc(a.id)}" aria-label="학원 과제 ${esc(a.title)}, ${esc(line)}">${ic}
       <span class="tx"><b>학원 과제 <span class="k">${ASG_KIND[a.kind] || ''}</span></b><span class="t">${esc(a.title)}</span><span>${esc(line)}</span></span>
       <svg class="chev" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg></button>`; }).join('')
-    + (open.length > 2 ? `<p class="fine asgmore">학원 과제가 ${open.length - 2}개 더 있습니다 · 앞의 것을 내면 이어서 보입니다</p>` : ''); }
+    + (open.length > 2 ? `<p class="fine asgmore">학원 과제가 ${open.length - 2}개 더 있어요 · 앞의 것을 내면 이어서 보여요</p>` : ''); }
 async function startAsg(id){
   const a = ASG.find(x => x.id === id); if (!a) return; const q = aqOf(a.id);
   if (q.sub && !q.ok){ await flushAsg(); toast(asgSentText(q)); renderToday(); return; }
@@ -2663,30 +2663,30 @@ function renderQuiz(){
     <h1 class="sr">${mode==='review'?'복습 문제':'오늘의 문제'}</h1>
     <div class="qhead"><span class="l">${label}${mode==='review'?` · ${esc(qState.lessonName||'')}`:''}</span>
       <span class="tag">${retry ? `${kdate(retry.iso)}에 틀림` : (graded && pick!==q.answer ? '다시 볼 문제' : (q.type||'확인'))}</span></div>
-    ${retry ? `<p class="again">↻ 전에 갈렸던 문제입니다. 이번엔 어디서 갈리는지 보세요.</p>` : ''}
+    ${retry ? `<p class="again">↻ 전에 갈렸던 문제예요. 이번엔 어디서 갈리는지 봐요.</p>` : ''}
     <p class="stem">${rich(q.stem)}</p>
     ${q.source ? `<div class="bogi">${rich(q.source)}</div>`:''}
     ${q.ask ? `<p class="ask">${rich(q.ask)}</p>`:''}
     ${q.essay ? `
       <textarea class="essay" placeholder="문장으로 답을 써 보세요"></textarea>
-      ${graded ? `<div class="verdict"><div class="h">이렇게 쓰면 됩니다</div><p>${rich(q.gradeNote || q.answerLine)}</p></div>` : ''}
+      ${graded ? `<div class="verdict"><div class="h">이렇게 쓰면 돼요</div><p>${rich(q.gradeNote || q.answerLine)}</p></div>` : ''}
       <button class="btn" id="grade">${graded ? (mode==='review'?'다음 복습 문제':'오늘 개념으로 돌아가기') : '답 확인하기'}</button>
     ` : `
       ${graded ? '' : confRow(qState.conf)}
       <div class="opts">${q.choices.map((t,i)=>{ const n=i+1; let cls='', mk=''; if (graded){ if (n===q.answer){cls='ok';mk='정답';} else if (n===pick){cls='bad';mk='내 답';} }
         return `<button class="opt ${cls}" data-p="${n}" ${graded?'disabled':''}><span class="m">${MARKS[i]}</span><span class="tx">${rich(t)}</span>${mk?`<span class="mk">${mk}</span>`:''}</button>`; }).join('')}</div>
       ${graded ? `
-        <div class="verdict" tabindex="-1" role="status"><div class="h">${pick===q.answer ? '맞혔습니다' : `아쉬워요 · 정답은 ${MARKS[q.answer-1]}`}</div>
+        <div class="verdict" tabindex="-1" role="status"><div class="h">${pick===q.answer ? '맞았어요' : `정답은 ${MARKS[q.answer-1]}이에요`}</div>
           ${confNote(qState.conf, pick===q.answer)}${q.explain ? `<p>${rich(q.explain)}</p>` : conceptGo(q)}</div>
         ${srsLine(qState.srs) ? `<div class="again">${srsLine(qState.srs)}</div>` : ''}
         <button class="btn" id="grade">${mode==='review' ? '다음 복습 문제' : (retry ? '오늘의 문제로' : '오늘 개념으로 돌아가기')}</button>
         <button class="flag" data-report="quiz:${esc(q.lessonId)}#${q.no}">문제·해설에 틀린 곳이 있나요?</button>
-      ` : `<p class="qhint">고르면 바로 채점하고, 왜 갈렸는지 알려 드립니다.<br>틀려도 괜찮습니다 — 오답은 <b>내일</b> 다시 나오고, 맞힐수록 간격이 늘어납니다.</p>`}
+      ` : `<p class="qhint">고르면 바로 채점하고, 왜 갈렸는지 알려 줘요.<br>틀려도 괜찮아요. ${SRS_RULE}</p>`}
     `}`;
 }
 function startReview(){
   const pool = QUIZZES.filter(q => !q.essay && CONCEPTS.some((c,i) => c.lessonId===q.lessonId && isOpen(i)));
-  if (!pool.length){ toast('풀 수 있는 문제가 아직 없습니다'); return; }
+  if (!pool.length){ toast('풀 수 있는 문제가 아직 없어요'); return; }
   const q = pool[Math.floor(Math.random()*pool.length)]; const c = CONCEPTS.find(x=>x.lessonId===q.lessonId);
   qState = { q, pick:null, retry:null, mode:'review', lessonName:c?c.lessonName:'' }; show('quiz');
 }
@@ -2756,11 +2756,11 @@ function renderDetail(){
 }
 
 /* ═══ 오답 노트 ═══ */
-const LEECH_NOTE = '여러 번 갈린 문제입니다. 문제를 또 풀기보다 개념 카드를 먼저 다시 읽어 보세요.';
+const LEECH_NOTE = '여러 번 갈린 문제예요. 문제를 또 풀기보다 개념 카드를 먼저 다시 읽어 봐요.';
 function renderWrong(){
   const v = document.getElementById('v-wrong');
   const live = S.wrong.filter(w=>!w.cleared).sort((a,b) => (a.d||'') < (b.d||'') ? -1 : (a.d||'') > (b.d||'') ? 1 : 0), cleared = S.wrong.filter(w=>w.cleared);
-  if (!S.wrong.length){ v.innerHTML = `<h1 class="h-page">오답 노트</h1><div class="empty"><svg viewBox="0 0 24 24"><path d="M6 4h12v16l-6-4-6 4z"/></svg><p>아직 담긴 문제가 없습니다.<br>틀린 문제는 여기 모이고, 내일 · 3일 · 7일 · 14일 · 30일로 간격을 넓혀 가며 다시 나옵니다.</p></div>
+  if (!S.wrong.length){ v.innerHTML = `<h1 class="h-page">오답 노트</h1><div class="empty"><svg viewBox="0 0 24 24"><path d="M6 4h12v16l-6-4-6 4z"/></svg><p>아직 담긴 문제가 없어요.<br>${SRS_RULE}</p></div>
     <button class="btn soft" id="goReview">복습 문제 풀기</button>`; return; }
   const when = w => { if (w.cleared) return ' · 정리됨'; if (isLeech(w)) return ' · 개념부터 다시'; const n = daysBetween(todayISO(), w.d || todayISO()); return n > 0 ? ` · ${n}일 뒤 다시` : ' · 오늘 다시'; };
   const act = (w, retry) => w.cleared ? '' : isLeech(w) ? `<button class="more" data-leech="${esc(wKey(w))}">개념 카드부터 다시</button>` : retry;
@@ -2779,8 +2779,8 @@ function renderWrong(){
       <div class="myth" style="margin:0">${w.k === 0 ? '<span class="o">헷갈렸지만 맞힘</span> &nbsp; ' : `<span class="x">내 답 ${MARKS[w.p-1]||esc(String(w.p))}</span> &nbsp; `}<span class="o">정답 ${MARKS[q.answer-1]}</span>${q.explain?`<br><span style="color:var(--body)">${rich(q.explain)}</span>`:''}</div>
       ${c ? foot(w, c.lessonName) : ''}</div>`; };
   v.innerHTML = `<h1 class="h-page">오답 노트</h1>
-    <p class="fine" style="text-align:left;padding:0 0 6px">${live.length}문제가 담겨 있습니다${cleared.length?` · ${cleared.length}문제는 다시 풀어 정리했습니다`:''}.</p>
-    <p class="fine" style="text-align:left;padding:0 0 14px">틀린 문제는 내일 다시 나오고, 맞힐 때마다 3일 · 7일 · 14일 · 30일로 간격이 늘어납니다. 7일 넘게 띄워 두 번 잇달아 맞히면 정리됩니다. 하루에 10문제까지만 나옵니다.</p>
+    <p class="fine" style="text-align:left;padding:0 0 6px">${live.length}문제가 담겨 있어요${cleared.length?` · ${cleared.length}문제는 다시 풀어 정리했어요`:''}.</p>
+    <p class="fine" style="text-align:left;padding:0 0 14px">${SRS_RULE} 7일 넘게 띄워 두 번 잇달아 맞히면 정리되고, 하루에 10문제까지만 나와요.</p>
     ${live.map(item).join('')}${cleared.map(item).join('')}<button class="btn soft" id="goReview">복습 문제 풀기</button>`;
 }
 
@@ -3286,7 +3286,7 @@ function renderBank(){
         <button class="umrow" data-um="unit" ${fa ? '' : 'aria-describedby="umLockNote"'}><span class="n">단원</span><span class="b"><span class="t">대단원 마무리</span><span class="s">단원마다 16문항 · 마무리 12 + 고난도 4</span></span>${lock}</button>
         <button class="umrow" data-um="mock" ${fa ? '' : 'aria-describedby="umLockNote"'}><span class="n">모의</span><span class="b"><span class="t">실전 모의고사</span><span class="s">학력평가형 2회 · 수능형 2회 · 25문항 · ${MOCK_MIN}분${fa && last.length ? ` · 최근 ${fmtPt(last[last.length - 1].s)}점` : ''}</span></span>${lock}</button>
         ${fa ? '' : `<p class="fine" id="umLockNote" style="text-align:left;padding:6px 0 0">여러 소단원을 엮어 묻는 문제라 전 범위(학원 코드·이용권)에서 열립니다.</p>`}</div>`; })()}
-    <div class="sec"><h2><span>오답 노트</span><button class="more" data-go="wrong">${S.wrong.filter(w=>!w.cleared).length}문제 보기 ›</button></h2><p class="fine" style="text-align:left;padding:0">틀린 문제는 오답 노트에 모이고, 내일부터 간격을 넓혀 가며 오늘 화면의 <b>오늘의 복습</b>에 다시 나옵니다.</p></div>
+    <div class="sec"><h2><span>오답 노트</span><button class="more" data-go="wrong">${S.wrong.filter(w=>!w.cleared).length}문제 보기 ›</button></h2><p class="fine" style="text-align:left;padding:0">${SRS_RULE} 오늘 화면의 <b>오늘의 복습</b>에서 풀어요.</p></div>
     <div class="sec lab-list"><h2>자료 탐구 · 집에서 실험 <span style="font-weight:700;color:var(--faint);letter-spacing:0">${LABS_N}편</span></h2>
       ${LABS.filter(l=>openLessons().some(x=>x.id===l.lessonId)).map(l=>{ const L=LESSONS.find(x=>x.id===l.lessonId); return `<button class="row" data-lab="${l.lessonId}"><span class="n">탐구</span><span class="b"><span class="t">${esc(l.title)}</span><span class="s">${esc(L?L.bookName+' '+L.unit+'-'+L.id.slice(2)+' '+L.name:'')}${l.tryTitle?` · 실험: ${esc(l.tryTitle)}`:''}</span></span><span class="st"><svg viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg></span></button>`; }).join('') || '<p class="fine" style="text-align:left;padding:0">열린 범위에 탐구가 아직 없습니다.</p>'}</div>`;
 }
@@ -3320,7 +3320,7 @@ function renderBankSession(){
   if (!q && bs.kind === 'review'){ // 오늘의 복습 결과 — 점수와 '다음 복습' 한 줄만
     if (!bs.fin){ bs.fin = true; rvToday().s++; save(S); }
     v.innerHTML = `<button class="back" id="bankQuit"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg>오늘</button>
-      <div class="result"><div class="big">${bs.right}<small style="font-size:var(--t-h2);color:var(--muted)"> / ${bs.items.length}</small></div><p class="sub">오늘의 복습을 마쳤습니다.</p></div>
+      <div class="result"><div class="big">${bs.right}<small style="font-size:var(--t-h2);color:var(--muted)"> / ${bs.items.length}</small></div><p class="sub">오늘의 복습을 마쳤어요.</p></div>
       <p class="again revnext" role="status">${esc(nextDueText())}</p>
       <button class="btn" id="bankQuit2">오늘로 돌아가기</button>`; return;
   }
@@ -3337,7 +3337,7 @@ function renderBankSession(){
     if (bs.kind === 'unit' && !bs.fin){ bs.fin = true; (S.ux ||= {})[bs.uk] = [bs.right, n, todayISO()]; save(S); }   // 대단원 마무리 최근 결과(단원마다 하나)
     const skip = bs.skip || [], wr = bs.wrong.filter(w => !skip.includes(w));
     v.innerHTML = `<button class="back" id="bankQuit"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg>${unit ? '대단원 마무리' : '문제 풀기'}</button>
-      <div class="result"><div class="big">${bs.right}<small style="font-size:var(--t-h2);color:var(--muted)"> / ${n}</small></div>${U ? `<p class="sub">통합과학 ${U.book} ${U.unit}. ${esc(U.name)} · ${bs.kind === 'recap' ? '핵심 정리 빈칸' : '대단원 마무리'}</p>` : ''}<p class="sub">${pct>=90?'훌륭합니다 — 이 범위는 잡혔습니다.':pct>=70?'좋습니다. 틀린 것만 한 번 더 보면 됩니다.':'개념 카드로 돌아가 포인트를 다시 읽어 보세요.'}</p></div>
+      <div class="result"><div class="big">${bs.right}<small style="font-size:var(--t-h2);color:var(--muted)"> / ${n}</small></div>${U ? `<p class="sub">통합과학 ${U.book} ${U.unit}. ${esc(U.name)} · ${bs.kind === 'recap' ? '핵심 정리 빈칸' : '대단원 마무리'}</p>` : ''}<p class="sub">${pct===100?'전부 맞았어요. 이 범위는 잡혔어요.':pct>=70?'거의 다 왔어요. 틀린 것만 한 번 더 봐요.':'괜찮아요. 틀린 문제는 내일 다시 나와요 — 개념 카드의 포인트부터 다시 읽어 봐요.'}</p></div>
       ${unit ? rxHtml(bs.wrong.map(q => ({ q, n:umNo(q) }))) : ''}
       ${skip.length ? `<div class="sec"><h2>시간을 넘긴 문제 ${skip.length} · 오답 노트에 담김</h2>${skip.map(w=>`<p class="stem" style="font-size:var(--t-small);margin-bottom:8px">${rich(w.stem)}</p>`).join('')}</div>` : ''}
       ${wr.length ? `<div class="sec"><h2>틀린 문제 ${wr.length} · 오답 노트에 담김</h2>${wr.map(w=>`<p class="stem" style="font-size:var(--t-small);margin-bottom:8px">${rich(w.stem)}</p>`).join('')}</div>` : ''}
@@ -3367,16 +3367,16 @@ function renderBankSession(){
   else body = `<textarea class="essay" id="essayIn" placeholder="문장으로 답을 써 보세요" ${graded?'disabled':''}>${esc(bs.ess||'')}</textarea>${graded ? '' : `<button class="btn soft" id="essayShow">모범 답안 보기 · 스스로 채점</button>`}`;
   const ok = graded && bankCorrect(q, bs.pick);
   /* 아직 안 풀었을 때 화면 아래가 비어 보이지 않도록, 유형에 맞는 한 줄 안내를 둔다 */
-  const HINT = { ox:'맞으면 O, 틀리면 X를 고르세요.', mc:'하나만 고르면 바로 채점합니다.',
-    multi:'자료와 보기를 함께 보고 하나를 고르세요.', blank:'정답만 짧게 적으면 됩니다 — 띄어쓰기·가운뎃점은 무시합니다.',
-    essay:'문장으로 써 본 뒤 모범 답안과 견주어 스스로 채점합니다.' }[q.type] || '';
+  const HINT = { ox:'맞으면 O, 틀리면 X를 골라요.', mc:'하나만 고르면 바로 채점해요.',
+    multi:'자료와 보기를 함께 보고 하나를 골라요.', blank:'정답만 짧게 적으면 돼요 — 띄어쓰기·가운뎃점은 보지 않아요.',
+    essay:'문장으로 써 본 뒤 모범 답안과 견주어 스스로 채점해요.' }[q.type] || '';
   v.innerHTML = `${qclock ? bar.replace('<span>맞힘', qclock + '<span>맞힘') : bar}
     <div class="qhead"><span class="l">${kindTag}${esc(L?L.unit+'-'+L.id.slice(2)+' '+L.name:'')}</span><span class="tag">${TYPE_NAME[q.type]}${q.difficulty ? ` · ${esc(q.difficulty)}` : ''}</span></div>
     ${qBody(q, `data-zoomsvg="${bs.i}"`)}
     ${graded || q.type === 'essay' ? '' : confRow(bs.conf)}
     ${body}
-    ${graded ? '' : `<p class="qhint">${HINT}<br>틀려도 괜찮습니다 — 오답은 <b>내일</b> 다시 나오고, 맞힐수록 간격이 늘어납니다.</p>`}
-    ${graded ? `<div class="verdict" tabindex="-1" role="status"><div class="h">${q.type==='essay' ? '모범 답안' : ok ? '맞혔습니다' : '아쉽습니다'}${q.type!=='essay' && (q.type==='mc'||q.type==='multi') ? ` · 정답 ${MARKS[q.answer-1]}` : q.type==='ox'||q.type==='blank' ? ` · 정답 ${esc(q.answer)}` : ''}</div>${q.type === 'essay' ? '' : confNote((bs.cf||[])[bs.i], ok)}${jd ? jdHtml(jd) : q.explain ? `<p>${rich(q.explain)}</p>` : q.wrong ? '' : conceptGo(q)}</div>
+    ${graded ? '' : `<p class="qhint">${HINT}<br>틀려도 괜찮아요. ${SRS_RULE}</p>`}
+    ${graded ? `<div class="verdict" tabindex="-1" role="status"><div class="h">${q.type==='essay' ? '모범 답안' : ok ? '맞았어요' : '틀렸어요'}${q.type!=='essay' && (q.type==='mc'||q.type==='multi') ? ` · 정답 ${MARKS[q.answer-1]}` : q.type==='ox'||q.type==='blank' ? ` · 정답 ${esc(q.answer)}` : ''}</div>${q.type === 'essay' ? '' : confNote((bs.cf||[])[bs.i], ok)}${jd ? jdHtml(jd) : q.explain ? `<p>${rich(q.explain)}</p>` : q.wrong ? '' : conceptGo(q)}</div>
       ${q.wrong && !jd ? `<div class="wrongbox"><div class="h">${q.type==='essay'?'채점 기준':'오답 왜 틀렸나'}</div>${rich(q.wrong)}</div>` : ''}
       ${srsLine((bs.res||[])[bs.i]) ? `<div class="again">${srsLine(bs.res[bs.i])}</div>` : ''}
       ${q.type==='essay' && bs.pick==='?' ? `<div class="oxrow"><button data-ess="맞음" class="">맞게 썼다</button><button data-ess="틀림">부족했다</button></div>` : `<button class="btn" id="bankNext">${bs.i+1<bs.items.length?'다음 문제':'결과 보기'}</button>`}

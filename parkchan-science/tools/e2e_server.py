@@ -52,7 +52,7 @@ async def main():
         await s.click('#attOpen'); await s.fill('#attIn', '0000'); await s.click('#attGo'); await s.wait_for_timeout(500); assert '맞지' in await txt(s, '#attErr')
         await s.fill('#attIn', att); await s.click('#attGo'); await s.wait_for_timeout(900); assert '출석' in await txt(s, '.pill')
         await s.click('#okNotice'); await s.wait_for_timeout(600); assert await s.locator('.notice').count() == 0
-        await s.click('[data-bm]'); await s.click('#goQuiz'); await s.wait_for_timeout(400); ans = await s.evaluate('qState.q.answer'); await s.click(f'.opt[data-p="{1 if ans != 1 else 2}"]'); await s.wait_for_timeout(1800)
+        await s.click('#pRead'); await s.wait_for_timeout(250); await s.click('#v-detail [data-bm]'); await s.click('#backList'); await s.wait_for_timeout(300); await s.click('#goQuiz'); await s.wait_for_timeout(400); ans = await s.evaluate('qState.q.answer'); await s.click(f'.opt[data-p="{1 if ans != 1 else 2}"]'); await s.wait_for_timeout(1800)
         await shot(s, 's03_student_quiz')
         # 새 폰: 로그인만 하면 진도·북마크·코드가 따라온다
         s2ctx, s2 = await page()
