@@ -228,7 +228,7 @@ button{font-family:inherit;color:inherit}
 .asgbar .n{font-weight:900;font-size:15px;color:var(--ink);font-variant-numeric:tabular-nums}
 .asgbar .n small{font-size:11.5px;color:var(--muted);font-weight:700}
 .asgsent{color:var(--brand-dark);font-weight:700}
-.qhead .rk{display:inline-block;font-size:var(--t-tab);font-weight:700;color:var(--u);background:var(--u-soft);border-radius:var(--r-pill);padding:1px 8px;margin-right:6px}
+.qhead .rk{display:inline-block;font-size:var(--t-tab);font-weight:700;color:var(--u-dark);background:var(--u-soft);border-radius:var(--r-pill);padding:1px 8px;margin-right:6px}
 .revnext{justify-content:center;font-size:var(--t-small);margin:0 0 14px}
 /* 여러 번 갈린 문제 — 다시 묻지 않고 개념 카드로 */
 .leechcard{background:var(--card);border:1px solid var(--hair);border-radius:var(--r-l);padding:16px;margin:4px 0 13px}
@@ -288,10 +288,10 @@ figure svg{max-width:100%;height:auto;background:var(--figplate);border-radius:8
 figcaption{font-size:11.5px;color:var(--u-dark);font-weight:700;margin-top:7px;padding:0 6px;line-height:1.5}
 .howto{background:#FFFDF6;border:1px solid #EBDDB8;border-radius:11px;padding:11px 14px;margin-bottom:15px}
 @media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) .howto{background:#221E12;border-color:#3B3320} } :root[data-theme="dark"] .howto{background:#221E12;border-color:#3B3320}   /* 어두운 화면에서만(밝은 화면에 새던 것 — 2026-10-01) */
-.howto .k{font-size:11px;font-weight:900;color:#B4830A;letter-spacing:.1em;display:block;margin-bottom:7px}
+.howto .k{font-size:11px;font-weight:900;color:var(--hzk);letter-spacing:.1em;display:block;margin-bottom:7px}
 @media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) .howto .k{color:#D9A73C} } :root[data-theme="dark"] .howto .k{color:#D9A73C}   /* 어두운 화면에서만(밝은 화면에 새던 것 — 2026-10-01) */
 .howto li{font-size:12.5px;line-height:1.7;color:var(--body);margin-bottom:5px;list-style:none;padding-left:15px;text-indent:-15px}
-.howto li b.n{color:#B4830A;font-weight:900;margin-right:6px}
+.howto li b.n{color:var(--hzk);font-weight:900;margin-right:6px}
 @media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) .howto li b.n{color:#D9A73C} } :root[data-theme="dark"] .howto li b.n{color:#D9A73C}   /* 어두운 화면에서만(밝은 화면에 새던 것 — 2026-10-01) */
 .prose p{font-family:var(--serif);font-size:15px;line-height:2;color:var(--body);margin-bottom:15px}
 .prose p:last-child{margin-bottom:0}
@@ -848,6 +848,8 @@ select.sel{font-family:inherit;font-size:var(--t-small);font-weight:700;color:va
 .intro .dots i{width:7px;height:7px;border-radius:var(--r-pill);background:var(--line);transition:all .25s}
 .intro .dots i.on{width:22px;background:var(--brand)}
 .welcome .big{width:72px;height:72px;border-radius:var(--r-l);background:var(--brand-soft);display:grid;place-items:center;margin:26px 0 16px}
+.welcome.solo .grow{display:flex;flex-direction:column;justify-content:center;padding-bottom:12vh}   /* 학생은 한 문장 — 화면 가운데에 */
+.welcome.solo .big{margin-top:0}
 .welcome .next{display:flex;flex-direction:column;gap:9px;margin:4px 0 16px}
 .welcome .next div{display:flex;gap:11px;align-items:flex-start;background:var(--card);border:1px solid var(--hair);border-radius:var(--r-m);padding:12px 14px;font-size:var(--t-small);color:var(--body);line-height:1.6;word-break:keep-all}
 .welcome .next .no{font-style:normal;flex:0 0 24px;height:24px;border-radius:var(--r-s);background:var(--brand);color:var(--on-color);display:grid;place-items:center;font-size:var(--t-cap);font-weight:900}
@@ -1195,6 +1197,21 @@ button.pill::before,.notice button::before,.mini::before,.chipbar button::before
 .fromacademy{display:inline-block;font-size:var(--t-tab);font-weight:700;color:var(--brand-dark);background:var(--brand-soft);border-radius:var(--r-s);padding:2px 6px;margin-left:6px;vertical-align:1px}
 .qhint{font-size:var(--t-cap);color:var(--faint);text-align:center;line-height:1.85;margin-top:18px;padding:14px 12px;border-top:1px solid var(--hair)}
 .qhint b{color:var(--muted)}
+/* 개념 카드 간격 복습 — 앞면(제목·실마리·질문) → 떠올린 뒤 포인트 → 기억났어요 / 흐려요(보완안 7) */
+.cscard{background:var(--card);border:1px solid var(--u-line);border-radius:var(--r-l);padding:18px 18px 16px;position:relative;overflow:hidden}
+.cscard::before{content:"";position:absolute;inset:0 0 auto 0;height:3px;background:var(--u)}
+.cscard .k{display:block;font-size:var(--t-cap);font-weight:700;color:var(--u-dark);margin-bottom:6px}
+.cscard .t{font-size:var(--t-h1);font-weight:900;line-height:1.3;letter-spacing:-.02em;margin:0 0 6px;word-break:keep-all}
+.cscard .cue{font-size:var(--t-small);color:var(--muted);line-height:1.6;word-break:keep-all}
+.cscard .q{font-size:var(--t-stem);font-weight:700;line-height:1.65;color:var(--ink);margin-top:14px;padding-top:14px;border-top:1px dashed var(--u-line);word-break:keep-all}
+.cscard .csback{margin-top:14px;background:var(--u-soft);border-radius:var(--r-m);padding:12px 14px}
+.cscard .csback:focus{outline:none}
+.cscard .csback p{font-size:var(--t-body);line-height:1.75;color:var(--body);word-break:keep-all}
+.cscard .csback p.a{margin-top:10px;padding-top:10px;border-top:1px dashed var(--u-line);font-size:var(--t-small)}
+.cscard .csback .k{margin-bottom:3px}
+.csrate{display:flex;gap:8px;margin-top:16px}
+.csrate .btn{flex:1;margin:0}
+#csFlip{margin-top:12px}
 .seg{display:flex;gap:6px;margin-bottom:14px}
 .seg button{flex:1;font-size:var(--t-cap);font-weight:700;padding:12px 4px;border-radius:var(--r-s);border:1px solid var(--line);background:var(--card);color:var(--muted);cursor:pointer;min-height:44px}
 .seg button.on{background:var(--brand);border-color:var(--brand);color:var(--on-color)}
@@ -2346,19 +2363,19 @@ const load = () => { let raw = null; try { raw = localStorage.getItem(KEY); } ca
   try { localStorage.setItem(KEY + '.broken', raw.slice(0, 2e6)); } catch {} storeWarn = '이 기기의 공부 기록을 읽지 못해 새로 시작합니다. 로그인하면 서버에 남은 기록을 다시 받아 옵니다.'; return {}; };
 const MK_KEEP = 10;   // 모의고사 응시 기록은 회차마다 최근 10회만(진도 JSON 을 작게)
 const fixS = S => { const arr = k => { if (!Array.isArray(S[k])) S[k] = []; }, obj = (o, k) => { if (!o[k] || typeof o[k] !== 'object' || Array.isArray(o[k])) o[k] = {}; };
-  ['done','wrong','read','days','bm','qkeep','blocked'].forEach(arr); obj(S, 'bh'); obj(S, 'seenC'); obj(S, 'dq'); obj(S, 'dc'); obj(S, 'aq'); obj(S, 'mk'); obj(S, 'ux');
+  ['done','wrong','cs','read','days','bm','qkeep','blocked'].forEach(arr); obj(S, 'bh'); obj(S, 'seenC'); obj(S, 'dq'); obj(S, 'dc'); obj(S, 'aq'); obj(S, 'mk'); obj(S, 'ux');
   Object.keys(S.mk).forEach(k => { S.mk[k] = (Array.isArray(S.mk[k]) ? S.mk[k] : []).filter(a => a && typeof a === 'object' && typeof a.d === 'string' && typeof a.s === 'number').slice(-MK_KEEP); });
   if (!S.stats || typeof S.stats !== 'object') S.stats = { a:0, c:0 }; S.stats.a = +S.stats.a || 0; S.stats.c = +S.stats.c || 0;
   if (typeof S.start !== 'string' || !/^\d{4}-\d\d-\d\d$/.test(S.start)) S.start = '';
   if (!S.sched || typeof S.sched !== 'object' || Array.isArray(S.sched)) S.sched = {}; ['fixed','events','ddays'].forEach(k => { if (!Array.isArray(S.sched[k])) S.sched[k] = []; });
   if (typeof S.qskip !== 'number') S.qskip = 0;
   if (!S.tp || typeof S.tp !== 'object' || Array.isArray(S.tp)) S.tp = {};
-  S.wrong = S.wrong.filter(w => w && typeof w === 'object'); return S; };
+  S.wrong = S.wrong.filter(w => w && typeof w === 'object'); S.cs = S.cs.filter(w => w && typeof w === 'object' && typeof w.ci === 'string'); return S; };
 let syncT = null;
 /* 만 14세 미만은 보호자 동의를 확인하기 전까지 진도를 서버에 올리지 않는다(이 기기에만) */
 const consentPending = () => !!(ACC && ACC.under14 && !ACC.guardianOk);
 const progressKey = () => consentPending() ? null : (S.auth && S.auth.code) || (ACC ? 'u:'+ACC.id : null);
-const snapshot = () => ({ start:S.start, done:S.done, wrong:S.wrong, read:S.read, tp:S.tp||{}, days:S.days, bm:S.bm, stats:S.stats, dq:S.dq||{}, dc:S.dc||{}, bh:S.bh||{}, mk:S.mk||{}, ux:S.ux||{}, qkeep:S.qkeep||[], blocked:S.blocked||[], seenC:S.seenC||{}, sched:S.sched, notifyAt:S.notifyAt, at:new Date().toISOString() });
+const snapshot = () => ({ start:S.start, done:S.done, wrong:S.wrong, cs:S.cs||[], read:S.read, tp:S.tp||{}, days:S.days, bm:S.bm, stats:S.stats, dq:S.dq||{}, dc:S.dc||{}, bh:S.bh||{}, mk:S.mk||{}, ux:S.ux||{}, qkeep:S.qkeep||[], blocked:S.blocked||[], seenC:S.seenC||{}, sched:S.sched, notifyAt:S.notifyAt, at:new Date().toISOString() });
 /* 기기 여러 대(폰·태블릿): 저장한 스냅숏 시각(syncAt)을 기억해 두고, 앱으로 돌아올 때 서버가 더 새 것이면 받아 합친다 */
 let quotaWarned = false;
 const quotaFail = () => { if (quotaWarned) return; quotaWarned = true; setTimeout(() => toast('기기 저장 공간이 가득 차 방금 기록을 저장하지 못했습니다. 저장 공간을 비우거나 로그인해 서버에 남겨 주세요.'), 50); };
@@ -2377,6 +2394,10 @@ const mergeProgress = p => { if (!p) return;
   const key = w => w.b ? 'b:'+w.b : w.l+':'+w.n;
   if (newer && !first){ const srv = new Map((p.wrong||[]).map(w => [key(w), w])); S.wrong = [...(p.wrong||[]), ...S.wrong.filter(w => !srv.has(key(w)))]; }
   else { const have = new Set(S.wrong.map(key)); (p.wrong||[]).forEach(w => { if (!have.has(key(w))) S.wrong.push(w); }); }
+  /* 개념 카드(S.cs)도 오답과 같은 규칙 — 더 새 스냅숏의 카드가 이기고, 한쪽에만 있는 카드는 남긴다. 그다음 공부한 개념인데 카드가 없으면 넣는다 */
+  { const pc = (Array.isArray(p.cs) ? p.cs : []).filter(w => w && typeof w === 'object' && typeof w.ci === 'string'); S.cs ||= [];
+    if (newer && !first){ const srv = new Set(pc.map(w => w.ci)); S.cs = [...pc, ...S.cs.filter(w => !srv.has(w.ci))]; }
+    else { const have = new Set(S.cs.map(w => w.ci)); pc.forEach(w => { if (!have.has(w.ci)) S.cs.push(w); }); } }
   S.read = [...new Set([...(p.read||[]), ...(S.read||[])])];
   /* 오늘 할 일(빈칸·오늘의 문제): 날짜가 늦은 쪽 · 같은 날 같은 개념이면 어느 기기에서든 끝낸 것을 남긴다 */
   if (p.tp && typeof p.tp === 'object' && p.tp.d){ const L = S.tp || {};
@@ -2403,6 +2424,7 @@ const mergeProgress = p => { if (!p) return;
     else if (newer) S.sched = { fixed:(p.sched.fixed||[]).slice(), events:(p.sched.events||[]).slice(), ddays:(p.sched.ddays||[]).slice() }; }
   if (p.notifyAt && !S.notifyAt) S.notifyAt = p.notifyAt;
   migrateWrong(S.wrong);   // 옛 앱이 올린 기록도 상자에 넣는다
+  csEnsure();
   if (p.at && (!S.syncAt || p.at > S.syncAt)) S.syncAt = p.at; };
 /* 앱으로 돌아왔을 때(다른 기기에서 공부했을 수 있다) — 서버가 더 새 것이면 받아 합치고 지금 화면을 다시 그린다 */
 let lastPull = 0;
@@ -2417,7 +2439,7 @@ setInterval(() => { if (document.visibilityState === 'visible') dayRoll(); }, 60
 document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') dayRoll(); });
 document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible'){ pullProgress(); syncNotes().then(() => { if (view === 'note') renderNote(); else refreshNoteCard(); }).catch(()=>{}); } else if (view === 'noted') nedCommit(); });
 /* 새 진도(로그아웃·계정 삭제 뒤) — 화면 설정만 남기고 비운다. 한 기기를 여럿이 쓸 때 진도가 섞이지 않게 */
-const freshS = () => ({ start:todayISO(), done:[], wrong:[], read:[], tp:{}, days:[], bm:[], stats:{a:0,c:0}, dq:{}, dc:{}, aq:{}, bh:{}, mk:{}, ux:{}, qkeep:[], qskip:0, blocked:[], seenC:{},
+const freshS = () => ({ start:todayISO(), done:[], wrong:[], cs:[], read:[], tp:{}, days:[], bm:[], stats:{a:0,c:0}, dq:{}, dc:{}, aq:{}, bh:{}, mk:{}, ux:{}, qkeep:[], qskip:0, blocked:[], seenC:{},
   sched:{ fixed:[], events:[], ddays:[] }, syncAt:'', fs:S.fs||'보통', theme:S.theme||'시스템', notifyAt:S.notifyAt||'안 받음', onboarded:true });
 const flushProgress = async () => { clearTimeout(syncT); const k = progressKey(); if (k) try { await pushProgress(k); } catch {} };
 let S = fixS(load());
@@ -2460,8 +2482,8 @@ const quizFor = c => { const all = QUIZZES.filter(q=>q.lessonId===c.lessonId), p
 const SRS = [1, 3, 7, 14, 30], SRS_CAP = 10, LEECH = 6;
 /* 복습 규칙 한 문장 — 소개·환영·문제 풀기·오답 노트·오늘 경로가 모두 이 문장을 쓴다(2026-10-06 감사 #13: 화면마다 4가지로 달랐다) */
 const SRS_RULE = '틀린 문제는 내일 다시 나오고, 맞힐 때마다 3·7·14·30일 뒤로 간격이 넓어져요.';
-const wKey = w => w.b ? 'b:'+w.b : w.l+':'+w.n;
-const lessonOfW = w => w.l || bankLesson(w.b);
+const wKey = w => w.ci ? 'c:'+w.ci : w.b ? 'b:'+w.b : w.l+':'+w.n;
+const lessonOfW = w => w.l || (w.ci ? String(w.ci).split('-')[0] : bankLesson(w.b));
 /* 문제 은행 id → 소단원. 대단원 마무리(U1-1-q5)·모의고사(M1-q12)는 id 에 소단원이 없어 문항의 lessonId 를 쓴다(받기 전엔 그 단원 첫 소단원) */
 const UM_STEPS = new Set(['unit', 'mock', 'recap']), isUM = q => !!q && UM_STEPS.has(q.step);
 const bankLesson = id => { id = String(id||''); if (!/^[UM]\d/.test(id)) return id.split('-')[0];
@@ -2484,10 +2506,10 @@ const srsGap = (x, lessonId) => { const base = SRS[Math.min(5, Math.max(1, x)) -
 const findW = ref => { const k = wKey(ref); return S.wrong.find(w => !w.cleared && wKey(w) === k) || S.wrong.find(w => wKey(w) === k) || null; };
 const isLeech = w => !!w && (w.k||0) >= LEECH && !w.rd;
 const isDueW = w => !!w && !w.cleared && (w.d || '') <= todayISO();
-const rvToday = () => (S.rv && S.rv.d === todayISO()) ? S.rv : (S.rv = { d:todayISO(), n:0, s:0 });
+const rvToday = () => (S.rv && S.rv.d === todayISO()) ? S.rv : (S.rv = { d:todayISO(), n:0, s:0, c:0 });   // n 기한 된 문제 · c 개념 카드 · s 마친 세트
 /* 오늘 기한인 복습 — 밀린 것부터, 오늘 이미 푼 만큼 빼고 10개까지 */
 const dueAll = () => S.wrong.filter(isDueW).sort((a, b) => a.d < b.d ? -1 : a.d > b.d ? 1 : (a.iso < b.iso ? -1 : a.iso > b.iso ? 1 : 0));
-const dueToday = () => dueAll().slice(0, Math.max(0, SRS_CAP - rvToday().n));
+const dueToday = () => dueAll().slice(0, Math.max(0, SRS_CAP - rvToday().n - (rvToday().c||0) - csToday().length));   // 오늘 떠올릴 개념 카드 몫은 남겨 둔다
 /* 채점 결과를 상자에 반영 — 돌려주는 st: new(새로 담음) · reset(상자 1로) · up(다음 상자) · clear(정리됨) · early(기한 전이라 그대로) · null */
 function srsMark(ref, ok, p, conf){
   const t = todayISO(); let w = findW(ref);
@@ -2509,6 +2531,56 @@ function srsMark0(w, ref, ok, p, t){
   if (w.g >= 2){ w.cleared = true; delete w.g; return { st:'clear', w }; }
   if (!w.g) delete w.g;
   w.d = addDays(t, srsGap(w.x, lessonOfW(w))); return { st:'up', d:w.d, w }; }
+/* ═══ 개념 카드 간격 복습(2026-10-07 콘텐츠 감사 보완안 7 — 앞면 회상) ═══
+   공부한 개념(S.done)마다 카드 한 장: 앞면(제목 + 한 줄 질문 — '생각해 보기' 질문, 받기 전이면 포인트를 가린 질문) → 떠올려 본 뒤 포인트 확인 → '기억났어요 / 흐려요'.
+   간격은 문제와 같은 규칙(내일 → 3·7·14·30일, SRS·srsGap — 범위에 든 시험이 다가오면 줄어듦): 기억났으면 다음 상자, 흐리면 상자 1(내일).
+   7일 넘게 띄워 두 번 잇달아 기억하면 쉰다(cleared). 오늘의 복습에 문제와 섞여 나오고, 하루 CS_DAY 장까지 · 문제와 합쳐 SRS_CAP 안에서.
+   기록 S.cs: 카드 하나 = 오답 기록과 같은 꼴에 ci(개념 id)만 — iso 넣은 날 · a 마지막으로 떠올린 날 · d 다음 날 · x 상자 · k 흐렸던 횟수 · g · cleared */
+const CS_DAY = 2;
+const csOpen = w => { const i = CONCEPTS.findIndex(c => c.id === w.ci); return i >= 0 && isOpen(i); };
+/* 공부한 개념인데 카드가 없으면 넣는다(첫 복습은 내일) — '공부했음'·오늘의 문제, 다른 기기에서 합친 기록, 이 기능 전에 공부한 개념 모두 */
+const csEnsure = () => { if (!Array.isArray(S.cs)) S.cs = []; const have = new Set(S.cs.map(w => w.ci)), t = todayISO(); let n = 0;
+  (S.done || []).forEach(id => { if (have.has(id) || !CONCEPTS.some(c => c.id === id)) return; S.cs.push({ ci:id, iso:t, a:t, d:addDays(t, 1), x:1, k:0 }); have.add(id); n++; }); return n; };
+/* 오늘 떠올릴 카드 — 낮은 상자(막 배웠거나 흐렸던 것)부터, 그다음 밀린 것부터 */
+const csDueAll = () => (S.cs || []).filter(w => isDueW(w) && csOpen(w)).sort((a, b) => (a.x||1) - (b.x||1) || (a.d < b.d ? -1 : a.d > b.d ? 1 : (a.iso < b.iso ? -1 : a.iso > b.iso ? 1 : 0)));
+const csToday = () => { const rv = rvToday(); return csDueAll().slice(0, Math.max(0, Math.min(CS_DAY - (rv.c||0), SRS_CAP - rv.n - (rv.c||0)))); };
+function csMark(ci, ok){
+  const w = (S.cs || []).find(x => x.ci === ci), t = todayISO(); if (!w) return null; const L = lessonOfW(w);
+  if (isDueW(w)){ const rv = rvToday(); rv.c = (rv.c||0) + 1; }
+  if (!ok){ delete w.cleared; delete w.g; w.a = t; w.x = 1; w.k = (w.k||0) + 1; w.d = addDays(t, srsGap(1, L)); return { st:'reset', d:w.d, w }; }
+  if (w.cleared) return null;
+  if (w.d > t) return { st:'early', d:w.d, w };
+  const gap = daysBetween(w.a || w.iso, t); w.g = gap >= 7 ? (w.g||0) + 1 : 0; w.a = t; w.x = Math.min(5, (w.x||1) + 1);
+  if (w.g >= 2){ w.cleared = true; delete w.g; return { st:'clear', w }; }
+  if (!w.g) delete w.g;
+  w.d = addDays(t, srsGap(w.x, L)); return { st:'up', d:w.d, w }; }
+const csLine = r => !r ? '' : r.st === 'reset' ? `<b>${dueWord(r.d)}</b> 다시 떠올려 볼게요` : r.st === 'up' ? `✓ 간격을 넓혀요 · 다음은 <b>${dueWord(r.d)}</b>이에요`
+  : r.st === 'clear' ? '✓ 이제 오래 기억할 거예요 — 이 카드는 쉬어요' : r.st === 'early' ? `다음은 그대로 <b>${dueWord(r.d)}</b>이에요` : '';
+/* 앞면 질문 — 그 개념의 '생각해 보기'(나중에 받는 데이터), 없으면 포인트를 가린 질문. 단계 제목은 실마리로(빈칸은 ㉠ 그대로) */
+const csFront = c => { const w = c.x && c.x.why;
+  return w ? { q:w.q, a:w.a } : { q:`「${c.title}」의 포인트를 한 문장으로 떠올려 볼까요?`, a:'' }; };
+const csItem = w => { const c = CONCEPTS.find(x => x.id === w.ci); return c ? { id:'c:' + c.id, _cs:c.id, lessonId:c.lessonId, type:'card' } : null; };
+function csHtml(q){
+  const c = CONCEPTS.find(x => x.id === q._cs); if (!c) return ''; const f = csFront(c), st = bs.pick, r = (bs.res || [])[bs.i];
+  const cue = c.steps.map(s => `${s.n} ${plain(s.t)}`).join(' · ');
+  return `<div class="cscard${st ? ' open' : ''}" id="csCard">
+      <span class="k">개념 카드 · 떠올려 보기</span>
+      <h2 class="t">${esc(c.title)}</h2>
+      <p class="cue">${esc(cue)}</p>
+      <p class="q">${rich(f.q)}</p>
+      ${st ? `<div class="csback" id="csBack" tabindex="-1"><span class="k">포인트</span><p>${rich(c.point)}</p>${f.a ? `<p class="a"><span class="k">생각해 보기</span>${rich(f.a)}</p>` : ''}</div>` : ''}
+    </div>
+    ${!st ? `<p class="qhint">책을 덮고 먼저 떠올려 본 뒤 확인해요.</p><button class="btn" id="csFlip">떠올렸어요 · 확인하기</button>`
+      : st === 'show' ? `<div class="csrate" role="group" aria-label="떠올린 정도"><button type="button" class="btn soft" data-csr="o">기억났어요</button><button type="button" class="btn ghost" data-csr="x">흐려요</button></div>`
+      : fbSheet({ ok: st === 'o' ? true : null, head: st === 'o' ? '기억났어요' : '흐려도 괜찮아요',   /* 흐림은 틀림(빨강)이 아니라 가운데 색 */ note:'', line: csLine(r), btns: `<button class="btn" id="bankNext" aria-describedby="fbH${csLine(r) ? ' fbL' : ''}">${bs.i+1<bs.items.length?'다음':'결과 보기'}</button>` })}`; }
+function csAnswer(v){
+  const q = bs && bs.items[bs.i]; if (!q || q.type !== 'card' || bs.pick !== 'show') return;
+  const ok = v === 'o'; bs.pick = v; touchDay();
+  const now = Date.now(); bs.sec = (bs.sec || 0) + Math.min(now - (bs.tl || now), ASG_GAP * 1000); bs.tl = now; (bs.pk ||= [])[bs.i] = v;
+  if (ok) bs.right++;
+  (bs.res ||= [])[bs.i] = csMark(q._cs, ok);
+  save(S); renderBankSession(); document.querySelector('#v-bank .verdict.fb .btn')?.focus({ preventScroll:true }); }
+if (csEnsure()) saveLocal();   // 이 기능 전에 공부한 개념도 카드로(첫 복습은 내일)
 /* 확신도 한 탭 — 답을 고르기 전에 '확신 / 헷갈림'(선택, 다시 누르면 풀림). 채점에는 쓰지 않고 상자 규칙에만 쓴다 */
 const confRow = cur => `<div class="conf" role="group" aria-label="답을 고르기 전에 얼마나 확신하는지 고를 수 있어요(선택)"><span class="k">고르기 전에 · 선택</span>${[['s','확신'],['u','헷갈림']].map(([k, l]) => `<button type="button" data-conf="${k}" aria-pressed="${cur === k}">${l}</button>`).join('')}</div>`;
 const confNote = (conf, ok) => conf === 's' && !ok ? `<p class="confnote">확신했는데 틀렸어요 — 이런 문제가 가장 잘 고쳐져요</p>` : '';
@@ -2516,7 +2588,7 @@ const confNote = (conf, ok) => conf === 's' && !ok ? `<p class="confnote">확신
 const statDay = ok => { const t = todayISO(); if (!S.dq || typeof S.dq !== 'object' || Array.isArray(S.dq)) S.dq = {}; const r = S.dq[t] ||= [0, 0]; r[0]++; if (ok) r[1]++;
   const cut = addDays(t, -27); Object.keys(S.dq).forEach(d => { if (d < cut) delete S.dq[d]; }); };
 /* 공부한 개념으로 표시 + 날짜별 개수(최근 28일, dc: { 'YYYY-MM-DD': n }) — 보호자 '이번 주 요약'의 개념 수 */
-const markConceptDone = id => { if (!id || S.done.includes(id)) return; S.done.push(id); const t = todayISO();
+const markConceptDone = id => { if (!id || S.done.includes(id)) return; S.done.push(id); csEnsure(); const t = todayISO();
   if (!S.dc || typeof S.dc !== 'object' || Array.isArray(S.dc)) S.dc = {}; S.dc[t] = (+S.dc[t] || 0) + 1;
   const cut = addDays(t, -27); Object.keys(S.dc).forEach(d => { if (d < cut) delete S.dc[d]; }); };
 /* 해설도 선지별 해설도 없는 문항 — 빈 상자 대신 그 개념 카드로 */
@@ -2565,19 +2637,20 @@ function reviewPlan(real){
       if (!real){ extra.push({ lesson:l }); continue; }
       const pool = BANK.filter(q => q.lessonId === l && q.type !== 'essay' && !isUM(q) && !live.has('b:'+q.id)), fresh = pool.filter(q => !(S.bh||{})[q.id]);
       const from = fresh.length ? fresh : pool; if (from.length) extra.push({ lesson:l, q: from[Math.floor(Math.random() * from.length)] }); } }
-  return { items: interleave([...due, ...extra]), t }; }
+  const cards = csToday().map(w => ({ cs:w, lesson:lessonOfW(w) }));   // 개념 카드(하루 CS_DAY 장) — 문제와 섞는다
+  return { items: interleave([...due, ...extra, ...cards]), t }; }
 /* 오늘의 문제(5지선다)를 문제 은행 화면에서 풀 수 있는 모양으로 */
 const quizAsBank = q => ({ id:`q:${q.lessonId}:${q.no}`, lessonId:q.lessonId, type:'mc', stem:q.stem, ask:q.ask, source:q.source, choices:q.choices, answer:q.answer,
   explain:q.explain || '', wrong:'', figure:'', difficulty:'', _qz:q });
 const reviewItem = w => { if (w.b) return BANK.find(q => q.id === w.b) || null; const q = QUIZZES.find(x => x.lessonId === w.l && x.no === w.n); return q && !q.essay ? quizAsBank(q) : null; };
-const nextDueText = () => { const left = dueToday().length; if (left) return `오늘 다시 볼 문제가 ${left}개 더 있어요`;
-  const ds = S.wrong.filter(w => !w.cleared && w.d > todayISO()).map(w => w.d).sort(); return ds.length ? `다음 복습은 ${dueWord(ds[0])}이에요` : '기한이 다가온 복습이 없어요'; };
+const nextDueText = () => { const left = dueToday().length, cl = csToday().length; if (left) return `오늘 다시 볼 문제가 ${left}개 더 있어요`; if (cl) return `오늘 떠올릴 개념 카드가 ${cl}장 더 있어요`;
+  const ds = [...S.wrong, ...(S.cs || [])].filter(w => !w.cleared && w.d > todayISO()).map(w => w.d).sort(); return ds.length ? `다음 복습은 ${dueWord(ds[0])}이에요` : '기한이 다가온 복습이 없어요'; };
 let revHold = null;   // 문제 탭으로 옮겨 가며 잠시 내려 둔 오늘의 복습
 const revCur = () => { const r = bs && bs.kind === 'review' ? bs : revHold; return r && r.i < r.items.length && r.day === todayISO() ? r : null; };
 function startTodayReview(){
   const cur = revCur(); if (cur){ bs = cur; revHold = null; show('bank'); return; }   // 하다 만 세트는 이어서
   const plan = reviewPlan(true); if (!plan.items.length){ toast('오늘은 복습할 문제가 없습니다'); renderToday(); return; }
-  revHold = null; bs = { items: plan.items.map(e => e.q || reviewItem(e.w)), recs: plan.items.map(e => e.w ? wKey(e.w) : ''), i:0, pick:null, right:0, wrong:[], label:'오늘의 복습', ess:null, kind:'review', res:[], day:todayISO() };
+  revHold = null; bs = { items: plan.items.map(e => e.cs ? csItem(e.cs) : e.q || reviewItem(e.w)), recs: plan.items.map(e => e.w ? wKey(e.w) : e.cs ? wKey(e.cs) : ''), i:0, pick:null, right:0, wrong:[], label:'오늘의 복습', ess:null, kind:'review', res:[], day:todayISO() };
   show('bank'); }
 /* 이번 주 리듬 — 월요일부터 일요일까지 공부한 날을 점 7개로(이어진 날은 세지 않는다) */
 const weekDays = () => { const t = todayISO(), mon = addDays(t, -((wdOf(t) + 6) % 7)); return [...Array(7)].map((_, i) => addDays(mon, i)); };
@@ -2768,7 +2841,7 @@ function renderAuth(){
       : r==='owner' ? ['<b>학생</b>에서 수강생을 등록하고 코드를 보냅니다(엑셀 붙여 넣기 가능)', '수업 전 <b>출석</b>에서 30초 코드를 띄웁니다', '<b>공지</b>·<b>일정</b>은 반별로 보내면 학생·보호자에게 바로 갑니다']
       : [];   // 학생은 한 문장(감사 #15 — 첫 만남은 가볍게): 아래 lead
     const LN = plug('LocalNotifications');
-    v.innerHTML = `<div class="auth welcome"><div class="grow">
+    v.innerHTML = `<div class="auth welcome${steps.length ? '' : ' solo'}"><div class="grow">
       <div class="big"><svg width="38" height="38" viewBox="0 0 24 24" fill="none" stroke="var(--brand)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 12.5l5 5L19.5 7"/></svg></div>
       <h1 class="q">${nm}님, 준비됐어요</h1><p class="lead">${r==='owner'?'학원 운영은 세 가지면 됩니다.':r==='parent'?'이렇게 시작해 보세요.':'홈의 <b>오늘 할 일</b>을 위에서부터 하나씩 해 보세요.'}</p>
       ${steps.length ? `<div class="next">${steps.map((t,i)=>`<div><i class="no">${i+1}</i><span>${t}</span></div>`).join('')}</div>` : ''}
@@ -2964,8 +3037,8 @@ function pathHtml(){
   const { c, tp, cur, plan, n, st } = pathState(), q = quizFor(c) || {};
   const tag = `${c.unit}-${c.lessonId.slice(2)}`;
   const bOk = Array.isArray(tp.b) ? tp.b.filter(Boolean).length : 0, bN = Object.keys(c.blanks || {}).length || 3;
-  const dn = plan ? plan.items.filter(e => e.w).length : 0, xn = plan ? n - dn : 0;
-  const revSub = cur ? `이어서 풀기 · ${cur.i} / ${cur.items.length}` : [dn ? `다시 볼 문제 ${dn}` : '', xn ? `지난 소단원 ${xn}` : ''].filter(Boolean).join(' · ');
+  const dn = plan ? plan.items.filter(e => e.w).length : 0, cn = plan ? plan.items.filter(e => e.cs).length : 0, xn = plan ? n - dn - cn : 0;
+  const revSub = cur ? `이어서 풀기 · ${cur.i} / ${cur.items.length}` : [dn ? `다시 볼 문제 ${dn}` : '', cn ? `개념 카드 ${cn}` : '', xn ? `지난 소단원 ${xn}` : ''].filter(Boolean).join(' · ');
   /* 단계마다: 작은 카드(이름 · 상태 한 줄) · 지금이면 큰 카드(제목 · 한 줄 설명 · 버튼) */
   const D = {
     read: { btnId:'pRead', name:`개념 읽기 · ${c.title}`, todo:`${tag} · 개념 ${+c.no || c.no} · 다 읽으면 '공부했음'`, done:'다 읽었어요',
@@ -2975,7 +3048,7 @@ function pathHtml(){
     quiz: { btnId:'goQuiz', name:'오늘의 문제 1개', todo:`${tag} ${c.lessonName}`, done: tp.q === 'o' ? '맞았어요' : tp.q === 'x' ? '틀렸어요 · 내일 다시 나와요' : '답을 써 봤어요',
       h:'오늘의 문제 1개', p: q.essay ? '문장으로 써 보고 모범 답안과 견줘 봐요.' : '고르면 바로 채점하고, 왜 갈렸는지 알려 줘요.', m:`${tag} ${c.lessonName}`, btn:'풀기' },
     review: { btnId:'revStart', name: st.review === 'done' ? '오늘의 복습을 마쳤어요' : st.review === 'none' ? '다시 볼 문제 없음' : `오늘의 복습 ${n}`,
-      todo: revSub, done: nextDueText(), none: S.wrong.some(w => !w.cleared) ? nextDueText() : '틀린 문제는 다음 날 여기에 다시 나와요',
+      todo: revSub, done: nextDueText(), none: S.wrong.some(w => !w.cleared) || (S.cs || []).some(w => !w.cleared) ? nextDueText() : '틀린 문제는 다음 날 여기에 다시 나와요',
       h:`오늘의 복습 ${n}`, p:revSub, m:SRS_RULE, btn: cur ? '이어서 풀기' : '복습 시작' } };
   const step = (k, i) => { const d = D[k], isNow = st.now === k;
     const state = k === 'review' && st.review === 'none' ? 'none' : isNow ? 'now' : (k === 'review' ? st.review === 'done' : st[k]) ? 'done' : 'todo';
@@ -2987,7 +3060,7 @@ function pathHtml(){
     const inner = `<span class="tx"><span class="t">${esc(d.name)}</span><span class="d">${esc(sub)}</span></span>`;
     if (k === 'review' && state !== 'todo') return `<li class="ps ${state}" id="ps-${k}"><div class="pc"><span class="sr">${lab} · </span>${inner}${state === 'done' ? IC_CHK : ''}</div></li>`;
     return `<li class="ps ${state}" id="ps-${k}"><button class="pc" id="${d.btnId}"><span class="sr">${lab} · </span>${inner}${state === 'done' ? IC_CHK : IC_GO}</button></li>`; };
-  const nx = CONCEPTS[(dayIndex() + 1) % CONCEPTS.length], live = S.wrong.some(w => !w.cleared);
+  const nx = CONCEPTS[(dayIndex() + 1) % CONCEPTS.length], live = S.wrong.some(w => !w.cleared) || (S.cs || []).some(w => !w.cleared);
   const fin = st.now !== 'fin' ? '' : `<li class="ps now fin" id="ps-fin" aria-current="step"><div class="pnow fin" role="status">
       <h3>오늘 할 일 끝 — 내일 만나요</h3>
       <div class="hb"><div><p>내일의 개념 · ${esc(nx.title)}</p>${live ? `<p class="m">${esc(nextDueText())}</p>` : ''}
@@ -4022,7 +4095,7 @@ function drawBankSession(){
       ${bs.wrong.length ? `<button class="btn" id="bankRetryWrong">틀린 문제 바로 다시 풀기</button>` : ''}
       <div class="rlinks">${bs.wrong.length ? '' : ''}<button class="${bs.wrong.length ? 'linkbtn' : 'btn'}" id="bankAgain">${unit ? '같은 단원 처음부터 다시' : bs.kind === 'rec' ? '추천 10문제 한 번 더' : '같은 조건으로 새 세트'}</button><button class="linkbtn" id="bankQuit2">${unit ? '단원 고르기로' : '문제 풀기로'}</button></div>`; return;
   }
-  const graded = bs.pick !== null, L = LESSONS.find(x=>x.id===q.lessonId), jd = graded ? multiSplit(q) : null;
+  const graded = bs.pick !== null && bs.pick !== 'show', L = LESSONS.find(x=>x.id===q.lessonId), jd = graded ? multiSplit(q) : null;   // show: 개념 카드 뒷면만 본 상태
   const rk = (bs.recs||[])[bs.i], rw = rk ? S.wrong.find(w => !w.cleared && wKey(w) === rk) : null;
   if (!bs.tl) bs.tl = Date.now();   // 걸린 시간: 문항 사이 10분까지만 센다(켜 두고 자리를 떠난 시간은 빼고)
   /* 시험처럼: 이 문제를 처음 그릴 때 시계를 건다(채점 전까지 96초) */
@@ -4033,6 +4106,7 @@ function drawBankSession(){
   const bar = qtop('bankQuit', '그만 풀기', bs, done, n, `${qclock}<span class="pcnt"><b>${bs.i + 1}</b> / ${n}</span>`);
   const kindTag = bs.kind === 'review' || (bs.kind === 'rec' && rk) ? `<span class="rk">${rk ? '다시 볼 문제' : '지난 소단원'}</span>`
     : q.step === 'unit' ? `<span class="rk">${umNo(q) > 12 ? '고난도' : '마무리'} ${umNo(q)}</span>` : q.step === 'recap' ? `<span class="rk">핵심 정리 ${umNo(q)}</span>` : q.step === 'mock' ? `<span class="rk">모의고사 ${umNo(q)}</span>` : '';
+  if (q.type === 'card'){ v.innerHTML = `${bar}<div class="qhead"><span class="l"><span class="rk">개념 카드</span>${esc(L?L.unit+'-'+L.id.slice(2)+' '+L.name:'')}</span></div>${csHtml(q)}`; return; }   // 개념 카드 간격 복습(보완안 7)
   if (rw && isLeech(rw) && !graded){   // 여러 번 갈린 문제 — 다시 묻지 않고 개념 카드로
     const ci = conceptIdxOfW(rw), c = CONCEPTS[ci];
     v.innerHTML = `${bar}<div class="qhead"><span class="l">${kindTag}${esc(L?L.unit+'-'+L.id.slice(2)+' '+L.name:'')}</span></div>
@@ -5611,6 +5685,8 @@ document.addEventListener('click', async e => {
   if (T('#blankGo') && bs){ bankAnswer((document.getElementById('blankIn').value||'').trim()); return; }
   if (T('#essayShow') && bs){ bs.ess = document.getElementById('essayIn').value; bankAnswer('?'); return; }
   const essb = T('[data-ess]'); if (essb && bs){ bs.pick = null; bankAnswer(essb.dataset.ess); return; }
+  if (T('#csFlip') && bs){ bs.pick = 'show'; renderBankSession(); document.querySelector('#v-bank [data-csr]')?.focus({ preventScroll:true }); return; }
+  const csr = T('[data-csr]'); if (csr && bs){ csAnswer(csr.dataset.csr); return; }
   if (T('#bankNext') && bs){ bs.i++; bs.pick=null; bs.ess=null; bs.conf=null; renderBankSession(); window.scrollTo(0,0); return; }
   const bre = T('[data-bretry]'); if (bre){ const q = BANK.find(x=>x.id===bre.dataset.bretry); if (q) startBank([q], '오답 다시'); return; }
   const go = T('[data-go]'); if (go){ show(go.dataset.go); return; }
@@ -5984,7 +6060,7 @@ document.addEventListener('click', async e => {
     const acc = { ...ACC }; delete acc.id;
     const out = { 안내: `${CFG.academy} '하루 한 개념' 앱이 이 계정에 대해 가진 기록입니다(개인정보 보호법 제35조 열람). 내려받은 날: ${todayISO()}`,
       계정: acc, 학원: S.auth ? { 코드:S.auth.code, 반:S.auth.cls, 수강_만료일:S.auth.until } : null,
-      학습: { 시작일:S.start, 공부한_개념:S.done.length, 개념_목록:S.done, 끝까지_읽은_개념:S.read||[], 오늘_할_일:S.tp||{}, 문제_풀이:S.stats, 날짜별_풀이:S.dq||{}, 오답:S.wrong, 북마크:S.bm, 학습한_날:S.days, 문제은행_기록:S.bh, 모의고사_기록:S.mk||{}, 대단원_마무리:S.ux||{}, 보관한_글귀:S.qkeep },
+      학습: { 시작일:S.start, 공부한_개념:S.done.length, 개념_목록:S.done, 끝까지_읽은_개념:S.read||[], 오늘_할_일:S.tp||{}, 문제_풀이:S.stats, 날짜별_풀이:S.dq||{}, 오답:S.wrong, 개념_카드_복습:S.cs||[], 북마크:S.bm, 학습한_날:S.days, 문제은행_기록:S.bh, 모의고사_기록:S.mk||{}, 대단원_마무리:S.ux||{}, 보관한_글귀:S.qkeep },
       일정: S.sched, 공부_노트: liveNotes().map(n => ({ 날짜:n.date, 틀:NTPL[tplOf(n)].name, 제목:n.title, 내용:n.body, 개념:(n.cids||[]).map(id => cName(cById(id))), 마음:moodName(n.mood), 이해:NGRASP[n.grasp||0], 고친_시각:n.at })), 출석: att, 이야기: { 글:wr.posts, 댓글:wr.comments }, 차단한_사용자_수:(S.blocked||[]).length };
     const name = `${CFG.academy}_내기록_${todayISO()}.json`;
     if (await saveFile(name, JSON.stringify(out, null, 2), 'application/json') && !isNative) toast(`${name} 을(를) 내려받았습니다`); return; }

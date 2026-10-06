@@ -85,6 +85,16 @@ async def audit_extra(pg, look):
         b = pg.locator(f'#dqcBox .qi:nth-of-type({k + 1}) [data-v="{v}"]')
         if await b.count(): await b.click(); await pg.wait_for_timeout(100)
     await look('확인 문제 채점')
+    # 그림 읽는 법 번호 → 크게 보기가 그 자리로(2026-10-07 보완안 6) · 개념 카드 간격 복습 앞면·뒷면·채점(보완안 7)
+    await pg.evaluate("(() => { detailIdx = CONCEPTS.findIndex((c, i) => isOpen(i) && c.figure && c.howto.length); show('detail'); })()"); await pg.wait_for_timeout(300)
+    if await pg.locator('#v-detail [data-hz]').count():
+        await look('개념 상세(그림 읽는 법)'); await pg.locator('#v-detail [data-hz]').first.click(); await pg.wait_for_timeout(300)
+        await look('그림 크게 보기(읽는 법)'); await pg.click('#fvClose'); await pg.wait_for_timeout(150)
+    await pg.evaluate("""(() => { const c = CONCEPTS.find((x, i) => isOpen(i)); S.cs ||= []; if (!S.cs.some(w => w.ci === c.id)) S.cs.push({ ci:c.id, iso:todayISO(), a:todayISO(), d:todayISO(), x:1, k:0 });
+      bs = { items:[csItem({ ci:c.id })], recs:['c:' + c.id], i:0, pick:null, right:0, wrong:[], label:'오늘의 복습', ess:null, kind:'review', res:[], day:todayISO() }; show('bank'); })()"""); await pg.wait_for_timeout(250)
+    await look('개념 카드 앞면'); await pg.click('#csFlip'); await pg.wait_for_timeout(120); await look('개념 카드 뒷면')
+    await pg.click('[data-csr="x"]'); await pg.wait_for_timeout(200); await look('개념 카드 채점')
+    await pg.evaluate("bs = null; S.cs = S.cs.filter(w => w.d !== todayISO() || w.k === 0); show('bank')"); await pg.wait_for_timeout(200)
     await pg.evaluate("startBank([BANK.find(q => q.type === 'ox' && openLessons().some(l => l.id === q.lessonId))], '')"); await pg.wait_for_timeout(300)
     if await pg.locator('#v-bank .cuefig summary').count(): await pg.click('#v-bank .cuefig summary'); await pg.wait_for_timeout(100)   # 그림 단서 펼친 채
     await pg.click('[data-conf="s"]'); await pg.wait_for_timeout(100); await look('문제 풀기(확신)')
