@@ -201,7 +201,8 @@ async def main():
         await s.screenshot(path=f'{SC}/r05_review_session.png', full_page=True)
         # 문제 탭으로 가면 문제 은행 첫 화면, 오늘로 돌아오면 이어서 풀기
         await answer(s, True); await s.click('#bankNext'); await s.wait_for_timeout(100)
-        await s.click('.tab[data-v="bank"]'); await s.wait_for_timeout(300); assert await s.locator('#bankStart').count() == 1, '문제 탭이 오늘의 복습에 묶임'
+        await s.click('#bankQuit'); await s.wait_for_timeout(200)   # 풀이 중엔 탭 바가 없다(집중 모드) — 그만 풀기로 나가면 하다 만 복습은 내려 둔다
+        await s.click('.tab[data-v="bank"]'); await s.wait_for_timeout(300); assert await s.locator('#bankRec').count() == 1, '문제 탭이 오늘의 복습에 묶임'
         await s.click('.tab[data-v="today"]'); await s.wait_for_timeout(300); assert '이어서 풀기 · 1 / 5' in await s.locator('#ps-review').inner_text()
         await s.click('#revStart'); await s.wait_for_timeout(200); assert await s.evaluate('bs.i') == 1
         # 다른 소단원이 없고 기한 문제가 모두 한 소단원이면 붙지 않게 1문제만
@@ -360,7 +361,7 @@ window.Capacitor = { isNativePlatform: () => true, getPlatform: () => 'android',
             # (아) 해설도 선지별 해설도 없는 문항 → 빈 상자 대신 '이 개념 다시 보기' → 개념 카드 → 문제로 돌아가기
             await c.evaluate(f"startBank([{{ ...BANK.find(q => q.id === '{oxs[3]}'), explain:'', wrong:'' }}], '')"); await c.wait_for_timeout(150)
             await answer(c, True)
-            vt = c.locator('#v-bank .verdict'); assert await vt.locator('[data-cgo]').count() == 1 and await vt.locator('p').count() == 0, await vt.inner_html()
+            vt = c.locator('#v-bank .expl'); assert await vt.locator('[data-cgo]').count() == 1 and await vt.locator('p').count() == 0, await vt.inner_html()
             assert (await vt.locator('[data-cgo]').inner_text()).strip() == '이 개념 다시 보기'
             assert (await vt.locator('[data-cgo]').bounding_box())['height'] >= 44
             await c.screenshot(path=f'{SC}/r11e_concept_link.png', full_page=True)
@@ -368,6 +369,7 @@ window.Capacitor = { isNativePlatform: () => true, getPlatform: () => 'android',
             assert await c.evaluate('view') == 'detail' and '문제로 돌아가기' in await c.locator('#backList').inner_text()
             await c.click('#backList'); await c.wait_for_timeout(300)
             assert await c.evaluate('view') == 'bank' and await c.locator('#bankNext').count() == 1, '개념 카드에서 문제로 돌아오지 않음'
+            await c.click('#bankQuit'); await c.wait_for_timeout(150)   # 풀이 중엔 탭 바가 없다(집중 모드)
             await c.click('.tab[data-v="list"]'); await c.wait_for_timeout(200); await c.click('.tab[data-v="today"]'); await c.wait_for_timeout(200)
             await c.evaluate("detailIdx = 0; show('detail')"); await c.wait_for_timeout(200); assert '교재' in await c.locator('#backList').inner_text(), '다른 길로 연 개념 카드에 "문제로 돌아가기"가 남음'
             await c.context.close()

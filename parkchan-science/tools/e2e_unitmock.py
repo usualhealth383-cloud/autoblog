@@ -100,7 +100,8 @@ async def main():
         await s.evaluate("bankSel = { ...bankSel, lesson:'1103' }"); assert await s.evaluate("bankPool().every(q => !isUM(q))")
         await s.evaluate("bankSel = { book:'전체', unit:'전체', lesson:'전체', type:'전체', n:10, only:'전체' }"); await s.evaluate("renderBank()")
         assert await s.evaluate("MORE_META.bl['1103']") == await s.evaluate("BANK.filter(q => q.lessonId === '1103' && !isUM(q)).length"), '소단원 문항 수에 대단원 문항이 섞임'
-        t = await s.inner_text('#v-bank'); assert '대단원 마무리' in t and '실전 모의고사' in t and '시험처럼' in t, t[:300]
+        t = await s.inner_text('#v-bank'); assert '대단원 마무리' in t and '실전 모의고사' in t, t[:300]
+        await s.click('#bankCustom'); await s.wait_for_timeout(150); assert '시험처럼' in await s.inner_text('#sheet'); await s.click('#sheetClose'); await s.wait_for_timeout(100)   # 시험처럼은 '직접 고르기' 시트 안
         await s.locator('.umsec').scroll_into_view_if_needed(); await s.screenshot(path=f'{SC}/u01_bank_entries.png')
         await s.click('[data-um="unit"]'); await s.wait_for_timeout(250)
         assert await s.locator('[data-ustart]').count() == 6 and await s.locator('[data-urecap]').count() == 6
@@ -221,6 +222,7 @@ async def main():
         await s.click('#umBack'); await s.wait_for_timeout(100)
 
         # ───────── 3) 시험처럼(문항당 96초) ─────────
+        await s.click('#bankCustom'); await s.wait_for_timeout(150)
         await s.click('#bankTimed'); await s.wait_for_timeout(100); assert await s.evaluate('S.bt') is True
         await s.click('[data-bsel="type"][data-val="ox"]'); await s.wait_for_timeout(80); await s.click('[data-bsel="n"][data-val="10"]')
         await s.click('#bankStart'); await s.wait_for_timeout(200)
@@ -240,7 +242,7 @@ async def main():
         assert await s.evaluate('bs.tm.length') == 10
         await s.screenshot(path=f'{SC}/t02_timed_result.png', full_page=True)
         await s.click('#bankQuit2'); await s.wait_for_timeout(100)
-        await s.click('#bankTimed'); await s.wait_for_timeout(80); await s.click('#bankStart'); await s.wait_for_timeout(150)
+        await s.click('#bankCustom'); await s.wait_for_timeout(150); await s.click('#bankTimed'); await s.wait_for_timeout(80); await s.click('#bankStart'); await s.wait_for_timeout(150)
         assert await s.evaluate('!bs.timed') and await s.locator('#qClock').count() == 0
 
         # ───────── 4) 손님 — 잠김 · 차분한 이용권 안내 ─────────

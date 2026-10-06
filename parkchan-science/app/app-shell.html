@@ -1162,6 +1162,20 @@ button.pill::before,.notice button::before,.mini::before,.chipbar button::before
 .dmore-t svg{width:18px;height:18px;stroke:currentColor;stroke-width:2.4;fill:none;stroke-linecap:round;stroke-linejoin:round;flex:0 0 auto;transition:transform .2s ease}
 .dmore-t[aria-expanded="true"] svg{transform:rotate(180deg)}
 .dmore-t:focus-visible{outline:2px solid var(--u);outline-offset:2px}
+.dthink .q,.dex .q{font-size:15px;font-weight:700;line-height:1.65;color:var(--ink)}
+.reveal{margin-top:8px;border:1px solid var(--u-line);border-radius:var(--r-s,10px);background:var(--card)}
+.reveal summary{min-height:44px;display:flex;align-items:center;padding:0 14px;font-size:13.5px;font-weight:700;color:var(--u-dark);cursor:pointer;list-style:none}
+.reveal summary::-webkit-details-marker{display:none}
+.reveal summary::after{content:'';margin-left:auto;width:8px;height:8px;border-right:2px solid currentColor;border-bottom:2px solid currentColor;transform:rotate(45deg);margin-top:-4px}
+.reveal[open] summary::after{transform:rotate(-135deg);margin-top:4px}
+.reveal summary:focus-visible{outline:2px solid var(--u);outline-offset:2px}
+.reveal p{padding:0 14px 12px;font-size:14px;line-height:1.7;color:var(--body)}
+.exsteps{margin:6px 0 0;padding-left:20px;font-size:14px;line-height:1.75;color:var(--body)}
+.exsteps li{margin:2px 0}
+.exans{margin-top:8px;font-size:14px;color:var(--ink)}
+.dex .k{display:inline-block;font-size:12.5px;font-weight:700;color:var(--u-dark);margin-right:6px}
+.follow{margin-top:14px;padding-top:12px;border-top:1px dashed var(--u-line)}
+.follow .k{display:block;font-size:12.5px;font-weight:700;color:var(--u-dark);margin-bottom:2px}
 .dmyth .myth{font-size:13.5px;line-height:1.72;padding:12px 14px;border:1px solid var(--u-line);margin-bottom:9px}
 .dmyth .myth p+p{margin-top:4px}
 .dmyth .myth .why{margin-top:8px;padding-top:8px;border-top:1px dashed var(--u-line)}
@@ -1189,7 +1203,7 @@ button.pill::before,.notice button::before,.mini::before,.chipbar button::before
 .dqc .fb .sl b{color:var(--u-dark)}
 .dqc .wait{font-size:12.5px;color:var(--muted);margin-top:8px}
 .cuefig{margin:0 0 12px}
-.cuefig summary{display:inline-flex;align-items:center;gap:6px;min-height:36px;padding:5px 13px;border:1px solid var(--u-line);border-radius:999px;background:var(--u-soft);color:var(--u-dark);font-size:12.5px;font-weight:800;cursor:pointer;list-style:none}
+.cuefig summary{display:inline-flex;align-items:center;gap:6px;min-height:44px;padding:5px 13px;border:1px solid var(--u-line);border-radius:999px;background:var(--u-soft);color:var(--u-dark);font-size:12.5px;font-weight:800;cursor:pointer;list-style:none}
 .cuefig summary::-webkit-details-marker{display:none}
 .cuefig summary svg{width:15px;height:15px;stroke:currentColor;stroke-width:2.2;fill:none;stroke-linecap:round;stroke-linejoin:round;flex:0 0 auto}
 .cuefig summary span{font-weight:600;color:var(--muted)}
@@ -3042,11 +3056,24 @@ function detailCard(c){
     </article>
     <div class="dmore" id="dMore" ${open ? '' : 'hidden'}>
       <div class="sec dbody"><h2>본문</h2><div class="prose">${c.body.map(p=>`<p>${termify(rich(p), keys, u2)}</p>`).join('')}</div></div>
+      ${dThinkHtml(c)}
       ${c.myths.length ? `<div class="sec dmyth"><h2>자주 하는 오해</h2>${c.myths.map(m=>`<div class="myth"><p><span class="x">✗ 오해</span> ${rich(m.x)}</p><p><span class="o">✓ 진실</span> ${rich(m.o)}</p>${m.why ? `<p class="why"><span class="w">왜?</span> ${rich(m.why)}</p>` : ''}</div>`).join('')}</div>`:''}
       ${c.terms.length ? `<div class="sec"><h2>용어</h2><dl class="terms">${c.terms.map(t=>`<dt>${esc(t.k)}</dt><dd>${esc(t.v)}</dd>`).join('')}</dl></div>`:''}
     </div>`;
 }
-const dMoreLabel = (c, open) => `<span><b>${open ? '본문 접기' : '본문 자세히 읽기'}</b><small>본문 ${c.body.length}문단${c.myths.length ? ` · 자주 하는 오해 ${c.myths.length}` : ''}${c.terms.length ? ` · 용어 ${c.terms.length}` : ''}</small></span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>`;
+/* 본문 다음: 생각해 보기(왜? — 답은 눌러서) · 계산 개념이면 예제 → 따라 풀기(답은 눌러서). 2026-10-06 콘텐츠 감사 보완안 8·9.
+   답에 빈칸 ㉠㉡㉢의 정답 낱말이 들어 있는 것이 많아 본문을 펼친 안쪽에, 그리고 늘 접어 둔다 */
+function dThinkHtml(c){
+  const x = c.x || {}; let h = '';
+  if (x.why) h += `<div class="sec dthink"><h2>생각해 보기</h2><p class="q">${rich(x.why.q)}</p>
+      <details class="reveal"><summary>답 보기</summary><p>${rich(x.why.a)}</p></details></div>`;
+  if (x.example) h += `<div class="sec dex"><h2>예제</h2><p class="q">${rich(x.example.title)}</p><ol class="exsteps">${x.example.steps.map(t => `<li>${rich(t)}</li>`).join('')}</ol>
+      <p class="exans"><span class="k">답</span> ${rich(x.example.answer)}</p>
+      ${x.follow ? `<div class="follow"><span class="k">따라 풀기</span><p class="q">${rich(x.follow.q)}</p>
+        <details class="reveal"><summary>답 보기</summary><p><b>${rich(x.follow.answer)}</b>${x.follow.explain ? ` — ${rich(x.follow.explain)}` : ''}</p></details></div>` : ''}</div>`;
+  return h;
+}
+const dMoreLabel = (c, open) => `<span><b>${open ? '본문 접기' : '본문 자세히 읽기'}</b><small>본문 ${c.body.length}문단${c.x && c.x.why ? ' · 생각해 보기' : ''}${c.x && c.x.example ? ' · 예제' : ''}${c.myths.length ? ` · 자주 하는 오해 ${c.myths.length}` : ''}${c.terms.length ? ` · 용어 ${c.terms.length}` : ''}</small></span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>`;
 /* 이 기기에만 두는 작은 기록 — 진도(S)·서버로 보내지 않는다 */
 const dLoad = k => { try { const v = JSON.parse(localStorage.getItem(k)); return v && typeof v === 'object' && !Array.isArray(v) ? v : null; } catch { return null; } };
 const dKeep = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} };
@@ -3696,8 +3723,11 @@ function recPlan(real){
     const fresh = pool.filter(q => !(S.bh || {})[q.id]), missed = pool.filter(q => (S.bh || {})[q.id] === 'x'), from = [...shuffleArr(fresh), ...shuffleArr(missed), ...shuffleArr(pool)];
     for (const q of from){ if (k <= 0) break; if (used.has(q.id)) continue; used.add(q.id); out.push({ lesson:l, q }); k--; } };
   weak.forEach(l => grab(l, 3));
-  for (let guard = 0; out.length < REC_N && guard < 40; guard++){ const before = out.length; grab(base[guard % base.length], 1); if (out.length === before && guard >= base.length * 3) break; }
-  return { items: interleave(out.slice(0, REC_N)), due:due.length, weak, base };
+  /* 나머지 — 배운 소단원을 돌아가며 하나씩. 한 소단원은 4문제까지(그래야 섞인다), 더 채울 곳이 없으면 그 한도를 푼다 */
+  const per = l => out.filter(e => e.lesson === l).length;
+  for (const cap of [4, REC_N]) for (let guard = 0; out.length < REC_N && guard < base.length * 12; guard++){ const l = base[guard % base.length]; if (per(l) < cap) grab(l, 1); }
+  const ten = out.slice(0, REC_N), mixed = interleave(ten);   // 섞다가 어쩔 수 없이 붙는 것은 뒤에 붙여 10문제를 채운다
+  return { items: [...mixed, ...ten.filter(e => !mixed.includes(e))], due:due.length, weak, base };
 }
 const shuffleArr = a => { a = a.slice(); for (let i = a.length - 1; i > 0; i--){ const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
 function startRec(){
@@ -4960,7 +4990,7 @@ function nativeInit(){ if (!isNative) return; const App = plug('App');
     if (view==='auth' && authMode==='intro' && introIdx > 0){ introIdx--; renderAuth(); return; }
     if (document.getElementById('fv')) return closeFigure();
     if (view==='noted') return nedLeave(); if (view==='note'){ noteQ=''; return show(noteFrom === 'detail' ? 'detail' : (noteFrom || home())); }
-    if (view==='detail') return show('list'); if (view==='quiz') { qState=null; return show(home()); } if (view==='plans') return show('me'); if (view==='lab' || view==='wrong') return show('bank'); if (view==='bank' && bs){ bs=null; return renderBank(); }
+    if (view==='detail') return show('list'); if (view==='quiz') { qState=null; return show(home()); } if (view==='plans') return show('me'); if (view==='lab' || view==='wrong') return show('bank'); if (view==='bank'){ const q = ['bankQuit','mockQuit','mxBackRes','mockClose','umBack'].map(id => document.getElementById(id)).find(Boolean); if (q){ q.click(); return; } }   // 화면 위 '그만 풀기'·뒤로와 같게(하다 만 복습은 내려 둔다)
     if (view!==home() && view!=='auth') return show(home());
     if (view==='auth' && authMode==='welcome'){ const g = document.getElementById('welcomeGo'); if (g){ g.click(); return; } }   // 가입 직후 환영 화면: 뒤로 = 시작하기(로그인한 채 '처음으로'가 뜨던 것)
     if (view==='auth' && authMode==='newpw'){ ask('새 비밀번호 정하기를 그만둘까요? 그만두면 로그아웃됩니다.', '그만두기', false).then(async ok => { if (!ok) return; await DBX.signOut(); ACC = null; authMode = 'start'; authErr = ''; renderAuth(); }); return; }

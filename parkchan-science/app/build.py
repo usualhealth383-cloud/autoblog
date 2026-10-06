@@ -9,6 +9,11 @@ if _chk.returncode != 0:
     print(_chk.stdout[-2000:]); raise SystemExit('✗ 교재 데이터 점검 실패 — tools/check_content.py 를 확인하세요. 배포본을 만들지 않았습니다.')
 shell = (ROOT / 'app' / 'app-shell.html').read_text(encoding='utf-8')
 concepts = json.loads((ROOT / 'data/concepts.json').read_text(encoding='utf-8'))
+# 개념마다 '생각해 보기'(왜?) · 계산 개념의 예제→따라 풀기 — 손으로 만든 원본(data/concept_extras.json, 검사는 check_content). 학생에게 필요 없는 근거 위치(src)는 뺀다
+_ex = json.loads((ROOT / 'data/concept_extras.json').read_text(encoding='utf-8'))
+for c in concepts:
+    x = _ex.get(c['id'])
+    if x: c['x'] = {k: ({kk: vv for kk, vv in v.items() if kk != 'src'} if isinstance(v, dict) else v) for k, v in x.items()}
 quizzes = json.loads((ROOT / 'data/quizzes.json').read_text(encoding='utf-8'))
 bank = json.loads((ROOT / 'data/bank.json').read_text(encoding='utf-8'))
 labs = json.loads((ROOT / 'data/labs.json').read_text(encoding='utf-8'))

@@ -58,10 +58,12 @@ async def main():
         ans = await s.evaluate('qState.q.answer'); await s.click(f'.opt[data-p="{ans}"]'); await s.wait_for_timeout(200); assert await s.evaluate('S.stats.c') == 1
         await s.click('#grade'); await s.wait_for_timeout(200); assert await s.evaluate('view') == 'quiz'
         # 오답 노트 · 지금 다시 풀기
+        await s.click('#backToday'); await s.wait_for_timeout(200)   # 풀이 중엔 탭 바가 없다(집중 모드) — 그만 풀기로
         await s.click('.tab[data-v="bank"]'); await s.wait_for_timeout(300); await s.click('[data-go="wrong"]'); await s.wait_for_timeout(300); assert await s.locator('[data-retry]').count() == 1; await shot(s, 'l08_wrong')
         await s.click('[data-retry]'); await s.wait_for_timeout(200); ans = await s.evaluate('qState.q.answer'); await s.click(f'.opt[data-p="{ans}"]'); await s.wait_for_timeout(200)
         assert await s.evaluate('S.wrong[0].cleared') is not True and await s.evaluate('S.wrong[0].x') == 1, '기한 전에 미리 맞혔는데 정리됨(간격 복습)'
         assert '복습 날짜는 그대로' in await s.locator('#v-quiz .again').last.inner_text()
+        await s.click('#backToday'); await s.wait_for_timeout(200)   # 집중 모드 — 그만 풀기로 나온 뒤 탭
         # 교재 필터: 북마크 1 · 공부함 ≥1
         await s.click('.tab[data-v="list"]'); await s.wait_for_timeout(200); await s.click('[data-lf="북마크"]'); await s.wait_for_timeout(200); assert await s.locator('#v-list .row').count() == 1
         await s.click('[data-lf="전체"]'); await s.wait_for_timeout(200); assert await s.locator('.row.locked').count() == 0, '수강생인데 잠긴 개념'

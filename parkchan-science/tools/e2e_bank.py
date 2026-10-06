@@ -21,7 +21,7 @@ async def main():
         assert [t for t in await pg.locator('.tab').all_inner_texts()]==['오늘','교재','문제','이야기','일정','내 정보']
         await pg.click('.tab[data-v="bank"]'); await pg.wait_for_timeout(400); await pg.screenshot(path=f'{SC}/b1_bank.png', full_page=True)
         t = await pg.locator('#v-bank').inner_text(); assert f"{await pg.evaluate('BANK.length'):,}" in t and '자료 탐구' in t, t[:200]
-        await pg.click('[data-bsel="type"][data-val="ox"]'); await pg.wait_for_timeout(200); await pg.click('#bankStart'); await pg.wait_for_timeout(400)
+        await pg.click('#bankCustom'); await pg.wait_for_timeout(150); await pg.click('[data-bsel="type"][data-val="ox"]'); await pg.wait_for_timeout(200); await pg.click('#bankStart'); await pg.wait_for_timeout(400)
         assert await pg.evaluate('bs && bs.items.length')==10 and await pg.evaluate('bs.items.every(q=>q.type==="ox")')
         for i in range(10):
             ans = await pg.evaluate('bs.items[bs.i].answer'); pick = ans if i%3 else ('X' if ans=='O' else 'O')
@@ -37,13 +37,13 @@ async def main():
         assert await pg.evaluate('S.wrong.filter(w=>w.b && !w.cleared).length')==4, '같은 날 다시 맞혔다고 정리됨'
         assert await pg.evaluate("S.wrong.filter(w=>w.b).every(w => w.x===1 && w.d===addDays(todayISO(),1))"), '문제 은행 오답의 다음 복습이 내일이 아님'
         await pg.click('#bankQuit2'); await pg.wait_for_timeout(200)
-        await pg.select_option('#bankLesson','1304'); await pg.wait_for_timeout(200); await pg.click('[data-bsel="type"][data-val="mc"]'); await pg.click('#bankStart'); await pg.wait_for_timeout(300)
+        await pg.click('#bankCustom'); await pg.wait_for_timeout(150); await pg.select_option('#bankLesson','1304'); await pg.wait_for_timeout(200); await pg.click('[data-bsel="type"][data-val="mc"]'); await pg.click('#bankStart'); await pg.wait_for_timeout(300)
         ans = await pg.evaluate('bs.items[bs.i].answer'); await pg.click(f'[data-bp="{ans}"]'); await pg.wait_for_timeout(150); assert '맞았어요' in await pg.locator('.verdict').inner_text(); await pg.screenshot(path=f'{SC}/b4_mc.png', full_page=True)
         await pg.click('#bankQuit'); await pg.wait_for_timeout(200)
-        await pg.click('[data-bsel="type"][data-val="blank"]'); await pg.click('#bankStart'); await pg.wait_for_timeout(300)
+        await pg.click('#bankCustom'); await pg.wait_for_timeout(150); await pg.click('[data-bsel="type"][data-val="blank"]'); await pg.click('#bankStart'); await pg.wait_for_timeout(300)
         ans = await pg.evaluate('bs.items[bs.i].answer'); await pg.fill('#blankIn', ans); await pg.click('#blankGo'); await pg.wait_for_timeout(150); assert '맞았어요' in await pg.locator('.verdict').inner_text()
         await pg.click('#bankQuit'); await pg.wait_for_timeout(200)
-        await pg.click('[data-bsel="type"][data-val="multi"]'); await pg.click('#bankStart'); await pg.wait_for_timeout(300); assert await pg.locator('.bogi').count()==1
+        await pg.click('#bankCustom'); await pg.wait_for_timeout(150); await pg.click('[data-bsel="type"][data-val="multi"]'); await pg.click('#bankStart'); await pg.wait_for_timeout(300); assert await pg.locator('.bogi').count()==1
         if await pg.locator('.qfig').count(): await pg.click('.qfig'); await pg.wait_for_timeout(200); assert await pg.locator('#fv').count()==1; await pg.screenshot(path=f'{SC}/b5_zoom.png'); await pg.click('#fvClose')
         await pg.click('#bankQuit'); await pg.wait_for_timeout(200)
         # 합답형 ㄱㄴㄷ 판정 한 줄 — 해설 문장의 'ㄱ (옳음) …'·'ㄴ (틀림 →) …'을 보기마다 나눠 그린다(나뉘지 않는 문항은 지금처럼)
@@ -55,7 +55,7 @@ async def main():
         qid = await pg.evaluate("(BANK.find(q => q.id === '1202-q8' && multiSplit(q) && openLessons().some(l => l.id === q.lessonId)) || BANK.find(q => q.type === 'multi' && multiSplit(q) && q.explain && q.wrong && openLessons().some(l => l.id === q.lessonId))).id")
         await pg.evaluate(f"startBank([BANK.find(q => q.id === '{qid}')], '')"); await pg.wait_for_timeout(300)
         ans = await pg.evaluate('bs.items[0].answer'); await pg.click(f'[data-bp="{ans % 5 + 1}"]'); await pg.wait_for_timeout(250)
-        rows = await pg.locator('.verdict .jd').all_inner_texts(); keys = await pg.evaluate("[...bs.items[0].source.matchAll(/(?:^|\\n)\\s*([ㄱ-ㄹ])\\s*\\./g)].map(m => m[1])")
+        rows = await pg.locator('.expl .jd').all_inner_texts(); keys = await pg.evaluate("[...bs.items[0].source.matchAll(/(?:^|\\n)\\s*([ㄱ-ㄹ])\\s*\\./g)].map(m => m[1])")
         assert len(rows) == len(keys) >= 3 and all(r.startswith(k) for r, k in zip(rows, keys)), (rows, keys)
         assert any('틀림' in r for r in rows) and any('옳음' in r for r in rows) and await pg.locator('.wrongbox').count() == 0, rows
         await pg.screenshot(path=f'{SC}/b5b_multi_judge.png', full_page=True)
@@ -63,18 +63,23 @@ async def main():
         await pg.click('#bankQuit'); await pg.wait_for_timeout(200)
         await pg.evaluate(f"startBank([BANK.find(q => q.id === '{nid}')], '')"); await pg.wait_for_timeout(300)
         ans = await pg.evaluate('bs.items[0].answer'); await pg.click(f'[data-bp="{ans}"]'); await pg.wait_for_timeout(250)
-        assert await pg.locator('.verdict .jd').count() == 0 and await pg.locator('.verdict p').count() >= 1, '나뉘지 않는 문항이 지금처럼 그려지지 않음'
+        assert await pg.locator('.expl .jd').count() == 0 and await pg.locator('.expl p').count() >= 1, '나뉘지 않는 문항이 지금처럼 그려지지 않음'
         await pg.click('#bankQuit'); await pg.wait_for_timeout(200)
-        await pg.click('[data-bsel="type"][data-val="essay"]'); await pg.click('#bankStart'); await pg.wait_for_timeout(300)
+        await pg.click('#bankCustom'); await pg.wait_for_timeout(150); await pg.click('[data-bsel="type"][data-val="essay"]'); await pg.click('#bankStart'); await pg.wait_for_timeout(300)
         await pg.fill('#essayIn','충돌 시간이 길어져 힘이 작아진다'); await pg.click('#essayShow'); await pg.wait_for_timeout(200); assert '모범 답안' in await pg.locator('.verdict').inner_text(); await pg.screenshot(path=f'{SC}/b6_essay.png', full_page=True)
         await pg.click('[data-ess="맞음"]'); await pg.wait_for_timeout(200); assert await pg.evaluate('S.stats.c')>=7
         await pg.click('#bankQuit'); await pg.wait_for_timeout(200)
+        if await pg.locator('#labMore').count(): await pg.click('#labMore'); await pg.wait_for_timeout(150)   # 탐구는 3편 + 모두 보기(감사 #6)
         await pg.click('[data-lab="1304"]'); await pg.wait_for_timeout(400); t = await pg.locator('#v-lab').inner_text(); assert '해석의 3단계' in t and '직접 해보기' in t; await pg.screenshot(path=f'{SC}/b7_lab.png', full_page=True)
         await pg.click('[data-zoomlab]'); await pg.wait_for_timeout(200); assert await pg.locator('#fv').count()==1; await pg.click('#fvClose')
         await pg.click('.tab[data-v="today"]'); await pg.wait_for_timeout(400); await pg.click('#pRead'); await pg.wait_for_timeout(300); await pg.click('[data-zoom]'); await pg.wait_for_timeout(200); assert await pg.locator('#fv').count()==1; await pg.click('#fvPlus'); await pg.click('#fvClose')
-        await pg.click('.tab[data-v="list"]'); await pg.wait_for_timeout(300); i = await pg.evaluate("CONCEPTS.findIndex(c=>c.id==='1304-05')"); await pg.click(f'.row[data-i="{i}"]'); await pg.wait_for_timeout(400)
+        await pg.click('.tab[data-v="list"]'); await pg.wait_for_timeout(300); i = await pg.evaluate("CONCEPTS.findIndex(c=>c.id==='1304-05')")
+        ug = pg.locator(f'.ugrp:has(.row[data-i="{i}"]) .ugh')   # 교재는 대단원별로 접힌다(감사 #7) — 그 단원을 펴고
+        if await ug.get_attribute('aria-expanded') != 'true': await ug.click(); await pg.wait_for_timeout(150)
+        await pg.click(f'.row[data-i="{i}"]'); await pg.wait_for_timeout(400)
         assert await pg.locator('#v-detail [data-lab="1304"]').count()==1 and await pg.locator('#v-detail [data-drill="1304"]').count()==1
         await pg.click('#v-detail [data-drill="1304"]'); await pg.wait_for_timeout(300); assert await pg.evaluate('bs && bs.items.every(q=>q.lessonId==="1304")')
+        await pg.click('#bankQuit'); await pg.wait_for_timeout(200)   # 풀이 중엔 탭 바가 없다(집중 모드) — 나가기로
         await pg.click('.tab[data-v="me"]'); await pg.wait_for_timeout(300); await pg.click('#goStats'); await pg.wait_for_timeout(800); assert '문제 은행 · 소단원별 정답률' in await pg.locator('#v-stats').inner_text()
         await b.close(); print('BANK OK', errs); assert not errs
 asyncio.run(main())

@@ -81,7 +81,7 @@ async def main():
         await s2.screenshot(path=f'{SC}/l03_bank_failed.png')
         fail['on'] = False; await s2.click('#moreRetry')
         await s2.wait_for_function('MORE.ok', timeout=5000); await s2.wait_for_timeout(300)
-        assert await s2.locator('#bankStart').count() == 1, '다시 받은 뒤 문제 은행이 안 그려짐'
+        assert await s2.locator('#bankRec').count() == 1, '다시 받은 뒤 문제 은행이 안 그려짐'
         await s2.screenshot(path=f'{SC}/l04_bank_loaded.png')
         assert not errs, errs
         print('LAZY E2E OK · 콘솔 오류', errs); await b.close()

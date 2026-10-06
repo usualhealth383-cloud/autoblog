@@ -56,6 +56,7 @@ async def main():
         await s.click('[data-ox="O"]'); await s.wait_for_timeout(300)
         await s.click('#v-bank [data-report]'); await s.wait_for_timeout(300); assert '문제 은행' in await s.inner_text('.fbref')
         await s.fill('#fbBody', '정답이 X 인 것 같아요'); await s.click('#fbSend'); await s.wait_for_timeout(700)
+        await s.click('#bankQuit'); await s.wait_for_timeout(200)   # 풀이 중엔 탭 바가 없다(집중 모드) — 그만 풀기로
         await s.click('.tab[data-v="me"]'); await s.wait_for_timeout(300); await s.click('#fbOpen'); await s.wait_for_timeout(300)
         assert await s.locator('.fbref').count() == 0
         await s.click('[data-fbk="idea"]'); assert '있으면 좋겠는' in await s.get_attribute('#fbBody', 'placeholder')

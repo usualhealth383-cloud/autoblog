@@ -35,6 +35,7 @@ async def main():
         await k.click('#goQuiz'); await k.wait_for_timeout(300); ans = await k.evaluate('qState.q.answer'); await k.click(f'.opt[data-p="{ans}"]'); await k.wait_for_timeout(1600)
         assert await k.evaluate('S.stats.a') == 1 and svc('progress?select=code') == [], '동의 전인데 진도가 서버에 올라감'
         # 이야기는 안내만
+        await k.click('#backToday'); await k.wait_for_timeout(200)   # 풀이 중엔 탭 바가 없다(집중 모드) — 그만 풀기로
         await k.click('.tab[data-v="talk"]'); await k.wait_for_timeout(500)
         assert await k.locator('#v-talk .consent').count() == 1 and await k.locator('#postNew').count() == 0; await k.screenshot(path=f'{SC}/c02_kid_talk.png')
         # ② 보호자에게 요청 → 문자 링크

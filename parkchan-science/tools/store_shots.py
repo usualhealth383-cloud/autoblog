@@ -96,7 +96,7 @@ async def capture():
         await fresh()
         await settle(pg); await pg.screenshot(path=RAW/'02.png')
         await pg.click('.tab[data-v="bank"]'); await settle(pg); await pg.screenshot(path=RAW/'03.png')
-        await pg.click('#bankStart'); await pg.wait_for_timeout(600)
+        await pg.click('#bankCustom'); await pg.wait_for_timeout(200); await pg.click('#bankStart'); await pg.wait_for_timeout(600)
         ans = await pg.evaluate('bs.items[bs.i].answer')
         wrong = 'X' if ans == 'O' else 'O'
         if await pg.locator('[data-ox]').count(): await pg.click(f'[data-ox="{wrong}"]')
