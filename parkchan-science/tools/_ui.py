@@ -73,7 +73,20 @@ async def audit_extra(pg, look):
         await pg.click('[data-mxr="0"]'); await pg.wait_for_timeout(150); await look('모의고사 해설')
         await pg.evaluate("mx = null; umPick = null; S.bt = true; startBank(pickBank(1), '', true)"); await pg.wait_for_timeout(250); await look('시험처럼')
         await pg.evaluate("S.bt = false; bs = null; show('bank')"); await pg.wait_for_timeout(150)
+    # 개념 상세(2026-10-06 보완안 2·3·4·10·11) — 읽기 전에 O/X · 본문 펼침(오해 '왜?') · 용어 말풍선 · 확인 문제(그 개념 OX) 채점
+    await pg.evaluate("(() => { detailIdx = CONCEPTS.findIndex((c, i) => isOpen(i) && !S.done.includes(c.id) && c.myths.length); show('detail'); })()"); await pg.wait_for_timeout(300)
+    await look('개념 상세')
+    if await pg.locator('#dPre [data-pre="O"]').count(): await pg.click('#dPre [data-pre="O"]'); await pg.wait_for_timeout(100)
+    if await pg.get_attribute('#dMoreBtn', 'aria-expanded') == 'false': await pg.click('#dMoreBtn'); await pg.wait_for_timeout(100)
+    await look('개념 상세(펼침)')
+    if await pg.locator('#v-detail .tterm').count():
+        await pg.locator('#v-detail .tterm').first.click(); await pg.wait_for_timeout(100); await look('용어 말풍선'); await pg.keyboard.press('Escape')
+    for k, v in ((0, 'O'), (1, 'X')):
+        b = pg.locator(f'#dqcBox .qi:nth-of-type({k + 1}) [data-v="{v}"]')
+        if await b.count(): await b.click(); await pg.wait_for_timeout(100)
+    await look('확인 문제 채점')
     await pg.evaluate("startBank([BANK.find(q => q.type === 'ox' && openLessons().some(l => l.id === q.lessonId))], '')"); await pg.wait_for_timeout(300)
+    if await pg.locator('#v-bank .cuefig summary').count(): await pg.click('#v-bank .cuefig summary'); await pg.wait_for_timeout(100)   # 그림 단서 펼친 채
     await pg.click('[data-conf="s"]'); await pg.wait_for_timeout(100); await look('문제 풀기(확신)')
     await pg.evaluate("bs.items[0] = { ...bs.items[0], explain:'', wrong:'' }")
     await pg.click(f'[data-ox="{"X" if await pg.evaluate("bs.items[0].answer") == "O" else "O"}"]'); await pg.wait_for_timeout(300); await look('채점(개념 링크)')
