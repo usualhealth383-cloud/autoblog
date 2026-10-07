@@ -918,6 +918,8 @@ select.sel{font-family:inherit;font-size:var(--t-small);font-weight:700;color:va
 .lab-list .row .n{background:var(--warn-soft);color:var(--warn)}
 /* 대단원 마무리 · 실전 모의고사 · 시험처럼(2026-10) — 손가락 목표 44px 이상, 조용한 색 */
 .tgl{display:flex;align-items:center;gap:10px;min-height:44px;width:100%;margin-top:10px;padding:0 12px;border:1px solid var(--line);border-radius:var(--r-m);background:var(--card);color:var(--body);font-family:inherit;font-size:var(--t-small);font-weight:700;cursor:pointer;text-align:left}
+.tnote{margin:12px 0 4px;padding:12px 14px;border-radius:var(--r-m);background:var(--u-soft);border:1px solid var(--u-line)}.tnote{display:block}.tnote .tk{display:block;font-size:var(--t-cap);font-weight:700;color:var(--u-dark);margin-bottom:4px}.tnote p{margin:0;font-size:var(--t-body);line-height:1.7;color:var(--ink);word-break:keep-all}
+.tnoteed h2 small{font-size:var(--t-cap);font-weight:600;color:var(--muted);margin-left:6px}
 .gsee h2{margin-top:6px}.gsee .gl{margin:4px 0 12px;padding-left:18px;font-size:var(--t-small);line-height:1.75;color:var(--body);word-break:keep-all}.gsee .gl.no{color:var(--muted)}
 .tgl .sw{position:relative;flex:0 0 36px;height:20px;border-radius:var(--r-pill);background:var(--line);transition:background-color .15s ease}
 .tgl .sw::after{content:'';position:absolute;left:3px;top:3px;width:14px;height:14px;border-radius:50%;background:var(--card);transition:transform .15s ease}
@@ -2146,6 +2148,12 @@ const DB = (() => {
       Object.assign(x, { done:dn, right:Math.min(Math.max(+right || 0, 0), dn), secs:Math.min(Math.max(Math.round(+secs || 0), 0), 86400), wrong:[...new Set((wrong||[]).filter(y => a.items.includes(y)))],
         submitted_at: submit ? new Date().toISOString() : null, late: !!submit && todayISO() > a.due, updated_at:new Date().toISOString() }); w();
       return { ok:true, done:x.done, submitted_at:x.submitted_at, late:x.late }; },
+    /* 선생님 한 마디(2026-10-07) — 서버 note_set·note_get 과 같은 답. 그 주 월요일 기준 학생마다 한 줄(120자) */
+    noteSet: async (code, body) => { if (!seeAll()) throw new Error('owner only'); const c = String(code||'').trim().toUpperCase(), b = String(body||'').trim(), wk = weekDays()[0];
+      if (!d.students.some(x => x.code === c)) return { ok:false, why:'학생을 찾을 수 없습니다.' }; if (b.length > 120) return { ok:false, why:'한 마디는 120자까지예요.' };
+      d.notes = (d.notes||[]).filter(n => !(n.code === c && n.wk === wk)); if (b) d.notes.push({ code:c, wk, body:b, at:new Date().toISOString() }); w(); return b ? { ok:true } : { ok:true, cleared:true }; },
+    noteGet: async code => { const a = me(), c = String(code||'').trim().toUpperCase(); if (!a || !(seeAll() || (a.role === 'student' && a.studentCode === c) || (a.role === 'parent' && (a.childCodes||[]).includes(c)))) return { ok:false };
+      const n = (d.notes||[]).find(x => x.code === c && x.wk === weekDays()[0]); return { ok:true, body: n ? n.body : null, at: n ? n.at : null }; },
     childAssignments: async code => { const g = me(), c = String(code||'').trim().toUpperCase(); if (!g || g.role !== 'parent' || !(g.childCodes||[]).includes(c)) return { ok:false, why:'연결된 자녀가 아닙니다.' };
       const cut = addDays(todayISO(), -14);
       return { ok:true, list:(d.asg||[]).filter(a => a.codes.includes(c) && a.due >= cut).sort((p, q) => p.due < q.due ? -1 : 1).map(a => { const x = (d.subs||[]).find(y => y.aid === a.id && y.code === c) || {};
@@ -2336,6 +2344,8 @@ const serverDB = () => {
     myAssignments: async () => (await api('/rest/v1/rpc/my_assignments', { method:'POST', body:{} })) || [],
     assignSave: async (id, done, right, secs, wrong, submit) => (await api('/rest/v1/rpc/assign_save', { method:'POST', body:{ p_id:id, p_done:done, p_right:right, p_secs:Math.round(secs||0), p_wrong:wrong||[], p_submit:!!submit } })) || { ok:false, why:'저장하지 못했습니다.' },
     childAssignments: async code => (await api('/rest/v1/rpc/child_assignments', { method:'POST', body:{ p_code:code } })) || { ok:false },
+    noteSet: async (code, body) => (await api('/rest/v1/rpc/note_set', { method:'POST', body:{ p_code:code, p_body:body } })) || { ok:false, why:'남기지 못했습니다.' },
+    noteGet: async code => (await api('/rest/v1/rpc/note_get', { method:'POST', body:{ p_code:code } })) || { ok:false },
     redeemPass: async code => { const r = await api('/rest/v1/rpc/redeem_pass', { method:'POST', body:{ p_code: code } }); if (r && r.ok){ meCache = null; } return r; },
     issuePass: async days => { const r = await api('/rest/v1/passes', { method:'POST', prefer:'return=representation', body:{ code:genCode('pass'), days } }); return r[0]; },
     passes: async () => (await api('/rest/v1/passes?select=*&order=issued.desc')).map(p => ({ code:p.code, days:p.days, issued:p.issued, usedBy:p.used_by||'', usedAt:p.used_at||'' })),
@@ -5037,6 +5047,7 @@ async function renderParent(){
   try { wkAtt = await DBX.attendanceRange(wdays[0], wdays[6], code); } catch {}
   try { acad = (await DBX.schedule(st.cls)).filter(e => e.date >= todayISO()).slice(0, 3); } catch {}
   let ct = null; try { ct = await DBX.childTalk(code); } catch {}   // 보호자가 직접 '이야기 끄기'(docs/11 §12-15)
+  let tn = null; try { const n = await DBX.noteGet(code); tn = n && n.ok && n.body ? n.body : null; } catch {}   // 선생님 한 마디
   let ca = []; try { const r = await DBX.childAssignments(code); ca = (r && r.ok && r.list) || []; } catch {}   // 학원 과제(★4) — 낸 것만
   const dset = new Set(days), aset = new Set(wkAtt.map(a => a.date));
   const wk = wdays.map(iso => ({ iso, st:dset.has(iso), at:aset.has(iso), today:iso === todayISO(), later:iso > todayISO() }));
@@ -5053,6 +5064,7 @@ async function renderParent(){
       <div class="pstat"><div><b>${weekCount(days)}<small>/7일</small></b><span>공부한 날</span></div><div><b>${wsum.concepts}<small>개</small></b><span>공부한 개념</span></div><div><b>${wsum.solved}<small>문제</small></b><span>푼 문제</span></div></div>
       <p class="fine" style="text-align:left;padding:8px 2px 2px">칸이 채워진 날은 앱으로 공부한 날, 아래 점은 학원에 출석한 날입니다.</p>
       ${weekSumRows(wsum)}
+      ${tn ? `<div class="tnote"><span class="tk">선생님 한 마디</span><p>${esc(tn)}</p></div>` : ''}
       <button class="tgl" id="wkPush" aria-pressed="${!(ACC && ACC.weeklyOff)}"><span class="sw" aria-hidden="true"></span><span>일요일 저녁 7시 이번 주 요약 알림 ${ACC && ACC.weeklyOff ? '끔' : '켬'}</span></button>
       <p class="fine" style="text-align:left;padding:6px 2px 0">앱(안드로이드)에서 알림을 허용했을 때만 옵니다. 꺼도 이 화면의 요약은 그대로 볼 수 있어요.</p>
       ${acad.length ? `<div class="pnext">${acad.map(e => `<div class="kv"><span class="k">${kdate(e.date)} ${WD[wdOf(e.date)]}</span><span class="v">${esc(e.title)} <b style="color:${dLeft(e.date)<=3?'var(--no)':'var(--brand-dark)'}">${ddayText(dLeft(e.date))}</b></span></div>`).join('')}</div>` : ''}</div>
@@ -5461,6 +5473,7 @@ async function openStudent(code){
   try { att = await DBX.attendanceRange(addDays(todayISO(),-60), todayISO(), code); } catch {}
   try { prog = await DBX.loadProgress(code); } catch {}
   try { lk = await DBX.linkedOf(code); } catch {}
+  let noteN = null; try { const n = await DBX.noteGet(code); noteN = n && n.ok ? n.body : null; } catch {}
   const gs = lk.guardians || [];
   const done = prog ? (prog.done||[]).length : 0, days = prog ? (prog.days||[]) : [];
   openSheet(`<h3>${esc(st.name)} 학생 <span style="font-size:var(--t-cap);color:var(--muted);font-weight:700">${esc(st.cls)} · ${st.code}</span></h3>
@@ -5468,6 +5481,9 @@ async function openStudent(code){
     ${gs.length ? `<div class="legal" style="max-height:none;margin-bottom:10px">${gs.map(g => `<div class="kv"><span class="k">${esc(g.name||'이름 없음')}${g.phone?` <small>${esc(g.phone)}</small>`:''}${g.approved===false?' <span class="cst wait">확인 전</span>':''}</span><span class="v">${g.uid ? `<button class="mini" data-gno="${esc(g.uid)}" data-code="${esc(st.code)}">${g.approved===false?'거절':'연결 해제'}</button>` : ''}</span></div>`).join('')}</div>` : ''}
     <div class="tiles"><div class="tile"><div class="v">${att.filter(a=>a.date.startsWith(ym)).length}<small>일</small></div><div class="l">이달 출석</div></div><div class="tile"><div class="v">${done}</div><div class="l">공부한 개념</div></div><div class="tile"><div class="v">${prog&&prog.stats&&prog.stats.a?Math.round(prog.stats.c/prog.stats.a*100):0}<small>%</small></div><div class="l">정답률</div></div></div>
     <div class="legal" style="max-height:30vh">${att.length ? att.slice(0,20).map(a=>`<div class="kv"><span class="k">${kdate(a.date)}</span><span class="v" style="color:${a.late?'var(--warn)':'var(--u)'}">${a.time} ${a.late?'지각':'출석'}${a.manual?' (수동)':''}${a.date>=addDays(todayISO(),-7)?` <button class="mini" data-attcancel="${esc(st.code)}|${a.date}" style="margin-left:6px">취소</button>`:''}</span></div>`).join('') : '최근 60일 출석 기록이 없습니다.'}${days.length?`<div class="kv"><span class="k">마지막 학습</span><span class="v">${kdate(days[days.length-1])}</span></div>`:''}</div>
+    <div class="sec tnoteed"><h2>이번 주 선생님 한 마디 <small>보호자와 학생에게 보여요 · ${noteN ? '남김' : '아직'}</small></h2>
+      <textarea id="noteIn" maxlength="120" rows="2" placeholder="예: 이번 주 원자 구조를 끝까지 붙잡았어요. 다음 주엔 오답 3개만 다시 봐요." style="width:100%;border:1.5px solid var(--line);border-radius:var(--r-m);padding:10px 12px;font-family:inherit;font-size:var(--t-small);background:var(--card);color:var(--ink);word-break:keep-all">${esc(noteN || '')}</textarea>
+      <button class="btn soft" id="noteSave" data-code="${esc(st.code)}" style="margin-top:8px">${noteN ? '고쳐 남기기' : '남기기'}</button><p class="fine" style="text-align:left;padding:4px 2px 0">비워서 남기면 지워집니다 · 다음 주 월요일에 새로 써요 · 1년 뒤 지웁니다</p></div>
     <details class="stuedit"><summary>학생 정보 고치기 · 수강 연장</summary>
       <div class="g"><input id="seName" value="${esc(st.name)}" aria-label="이름" placeholder="이름"><select id="seCls" aria-label="반">${[...new Set([...CLASSES_CACHE.map(c=>c.cls), st.cls])].map(c=>`<option ${c===st.cls?'selected':''}>${esc(c)}</option>`).join('')}</select></div>
       <div class="g"><input id="sePhone" value="${esc(st.phone||'')}" inputmode="tel" aria-label="연락처" placeholder="연락처"><input id="seUntil" type="date" value="${st.until}" aria-label="수강 만료일"></div>
@@ -6164,14 +6180,16 @@ document.addEventListener('click', async e => {
     if (pwProblem(a)){ e.textContent = pwProblem(a); return; } if (a !== b){ e.textContent = '두 비밀번호가 다릅니다.'; return; }
     try { await DBX.setPassword(a); closeSheet(); toast('비밀번호를 바꿨습니다'); } catch (err){ e.textContent = AUTH_KO(err.message); } return; }
   /* 학생: 보호자 화면에 무엇이 보이는지 미리(2026-10-07) — 보호자 화면(renderParent)과 같은 계산(weekSummary)으로, 내 기록 그대로 */
-  if (T('#guardSee')){ const w = weekSummary(snapshot(), ASG);
+  if (T('#guardSee')){ const w = weekSummary(snapshot(), ASG); let tn = null; try { const n = await DBX.noteGet(S.auth.code); tn = n && n.ok && n.body ? n.body : null; } catch {}
     openSheet(`<h3>보호자에게 보이는 것</h3><p>학원 원장님이 확인한 보호자만 볼 수 있어요. 지금 내 기록이라면 이렇게 보여요.</p>
       <div class="sec pweek"><h2><span>이번 주 요약</span><span class="wsd">${esc(w.range)}</span></h2>
         <div class="pstat"><div><b>${weekCount(S.days)}<small>/7일</small></b><span>공부한 날</span></div><div><b>${w.concepts}<small>개</small></b><span>공부한 개념</span></div><div><b>${w.solved}<small>문제</small></b><span>푼 문제</span></div></div>
-        ${weekSumRows(w)}</div>
-      <div class="sec gsee"><h2>보이는 것</h2><ul class="gl"><li>학원 출석(오늘 · 이달 · 지각)</li><li>공부한 날 · 공부한 개념 수 · 푼 문제 수 · 정답률(이번 주와 지난 3주)</li><li>다시 볼 문제가 많은 소단원 이름과 개수</li><li>학원 과제를 냈는지</li><li>학원 공지 · 일정 · 이야기를 켜고 끄는 설정</li></ul>
+        ${weekSumRows(w)}${tn ? `<div class="tnote"><span class="tk">선생님 한 마디</span><p>${esc(tn)}</p></div>` : ''}</div>
+      <div class="sec gsee"><h2>보이는 것</h2><ul class="gl"><li>학원 출석(오늘 · 이달 · 지각)</li><li>공부한 날 · 공부한 개념 수 · 푼 문제 수 · 정답률(이번 주와 지난 3주)</li><li>다시 볼 문제가 많은 소단원 이름과 개수</li><li>학원 과제를 냈는지</li><li>선생님이 남긴 이번 주 한 마디</li><li>학원 공지 · 일정 · 이야기를 켜고 끄는 설정</li></ul>
         <h2>보이지 않는 것</h2><ul class="gl no"><li>공부 노트와 오늘 기분</li><li>어떤 문제를 틀렸는지(문제 내용)</li><li>이야기에 쓴 글 · 댓글(보호자 화면에 따로 모아 보여 주지 않아요)</li><li>친구와 견준 순위 · 평균</li></ul></div>
       <button class="btn ghost" id="sheetClose">닫기</button>`); return; }
+  if (T('#noteSave')){ const r = await DBX.noteSet(T('#noteSave').dataset.code, (document.getElementById('noteIn') || {}).value || '').catch(e => ({ ok:false, why:e.message }));
+    if (!r || !r.ok){ toast((r && r.why) || '남기지 못했습니다'); return; } toast(r.cleared ? '한 마디를 지웠어요' : '한 마디를 남겼어요'); openStudent(T('#noteSave').dataset.code); return; }
   if (T('#wkPush')){ const off = !(ACC && ACC.weeklyOff); try { ACC = await DBX.updateMe({ weeklyOff:off }); } catch (e){ toast(e.message || '바꾸지 못했습니다'); return; } toast(off ? '주간 요약 알림을 껐어요' : '주간 요약 알림을 켰어요'); renderParent(); return; }
   if (T('#epSave')){ const name=(document.getElementById('epName').value||'').trim(), phone=(document.getElementById('epPhone').value||'').trim(); if (!name){ toast('이름을 넣어 주세요'); return; }
     ACC = await DBX.updateMe({ name, phone }); closeSheet(); renderMe(); toast('저장했습니다'); return; }

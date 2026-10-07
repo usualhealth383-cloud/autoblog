@@ -148,6 +148,7 @@ async def weekly():
         aid = rest('/rest/v1/rpc/assign_create', {'p_kind': 'bank', 'p_title': '이번 주 과제', 'p_ref': '1101', 'p_items': ['1101-q1', '1101-q2'], 'p_cls': '월목반', 'p_codes': None, 'p_due': D(6)}, tok=own)['id']
         import psycopg2; c = psycopg2.connect('host=127.0.0.1 port=54329 user=postgres dbname=pcs'); c.autocommit = True
         c.cursor().execute("insert into submissions(aid, code, done, right_n, secs, submitted_at) values (%s, 'WEEK01', 2, 2, 40, now())", (aid,)); c.close()
+        rest('/rest/v1/rpc/note_set', {'p_code': 'WEEK01', 'p_body': '이번 주 원자 구조를 끝까지 붙잡았어요'}, tok=own, prefer='return=representation')   # 선생님 한 마디(2026-10-07)
         code = 'WEEK01'
     async with async_playwright() as p:
         b = await p.chromium.launch(executable_path='/opt/pw-browsers/chromium'); errs = []
@@ -163,6 +164,7 @@ async def weekly():
                   d.progress.DEMO01 = { ...prog, at:new Date().toISOString() };
                   d.asg = [{ id:'a-week', kind:'bank', title:'이번 주 과제', ref:'1101', items:['1101-q1','1101-q2'], cls:'월목반', codes:['DEMO01','MON123'], due, at:new Date().toISOString() }];
                   d.subs = [{ aid:'a-week', code:'DEMO01', done:2, right:2, secs:40, wrong:[], submitted_at:new Date().toISOString(), late:false }];
+                  d.notes = [{ code:'DEMO01', wk:weekDays()[0], body:'이번 주 원자 구조를 끝까지 붙잡았어요', at:new Date().toISOString() }];   // 선생님 한 마디
                   localStorage.setItem('pcs.db.v2', JSON.stringify(d)); }""", [prog, D(6)])
                 await pg.reload(); await pg.wait_for_timeout(700)
                 await pg.click('#goLogin'); await pg.fill('#lgEmail', 'parent@demo.kr'); await pg.fill('#lgPw', '1234'); await pg.click('#lgGo'); await pg.wait_for_timeout(1300)
@@ -181,6 +183,7 @@ async def weekly():
             lab = await pg.get_attribute('#weekSum .tbars', 'aria-label')
             assert '이번 주 70%' in lab and '60%' in lab and '80%' in lab and '푼 문제 없음' in lab and await pg.locator('#weekSum .tb').count() == 4, lab
             assert '1개 중 1개 냈어요' in w and '이번 주 과제' in w, w
+            assert '선생님 한 마디' in w and '원자 구조를 끝까지' in w, ('선생님 한 마디가 안 보임', w)
             ag = await pg.locator('#weekSum .wl').all_inner_texts()
             assert len(ag) == 2 and 'I-02' in ag[0] and '다시 볼 문제 3' in ag[0] and 'I-01' in ag[1], ag
             assert all(x not in w for x in ('연속', '순위', '평균', '등수', '반에서')) and '견주지 않고' in w, w

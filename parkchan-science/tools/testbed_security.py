@@ -760,6 +760,19 @@ s, j = rpc('child_assignments', {'p_code': 'ASG001'}, PA); check('보호자(확�
 for nm, t, c in (('확인 전 보호자', PQ, 'ASG001'), ('다른 집 보호자', PZ, 'ASG001'), ('학생 본인', SA, 'ASG001'), ('원장', OWN, 'ASG001'), ('손님', SG, 'ASG001')):
     s, j = rpc('child_assignments', {'p_code': c}, t); check(f'  └ {nm}은 못 봄', j.get('ok') is False, j)
 s, j = rpc('child_assignments', {'p_code': 'ASG001'}, ANON); check('  └ 비로그인은 못 부름', s >= 400, s)
+print('▸ 선생님 한 마디(2026-10-07) — 원장만 쓰고, 학생 본인·확인된 보호자만 읽는다')
+s, j = rpc('note_set', {'p_code': 'ASG001', 'p_body': '이번 주 끝까지 잘 붙잡았어요'}, OWN); check('원장이 한 마디를 남김', s == 200 and j.get('ok'), (s, j))
+for nm, t in (('학생 본인', SA), ('확인된 보호자', PA)):
+    s, j = rpc('note_get', {'p_code': 'ASG001'}, t); check(f'  └ {nm}은 봄', j.get('ok') and j.get('body') == '이번 주 끝까지 잘 붙잡았어요', j)
+for nm, t in (('확인 전 보호자', PQ), ('다른 집 보호자', PZ), ('손님', SG)):
+    s, j = rpc('note_get', {'p_code': 'ASG001'}, t); check(f'  └ {nm}은 못 봄', j.get('ok') is False and 'body' not in j, j)
+s, j = rpc('note_get', {'p_code': 'ASG001'}, ANON); check('  └ 비로그인은 못 부름', s >= 400, s)
+for nm, t in (('학생', SA), ('보호자', PA)):
+    s, j = rpc('note_set', {'p_code': 'ASG001', 'p_body': '조작'}, t); check(f'  └ {nm}은 한 마디를 못 씀', s >= 400, (s, j))
+s, j = call('GET', '/rest/v1/weekly_notes?select=*', tok=SA); check('  └ 표를 API 로 바로 읽지 못함', s >= 400 or j == [], (s, j))
+s, j = rpc('note_set', {'p_code': 'ASG001', 'p_body': 'x' * 121}, OWN); check('  └ 120자 넘으면 거절', j.get('ok') is False, j)
+cur.execute("update weekly_notes set wk = wk - 366 where code = 'ASG001'"); cur.execute('select private.purge_old()'); cur.connection.commit()
+cur.execute("select count(*) from weekly_notes where code = 'ASG001'"); check('  └ 1년 지난 한 마디는 새벽 정리로 지움', cur.fetchone()[0] == 0)
 for nm, t in (('원장', OWN), ('학생', SA), ('보호자', PA), ('비로그인', ANON)):
     s, j = rpc('weekly_digest', {}, t); check(f'주간 요약 원본(weekly_digest)은 서비스 키 전용 — {nm} 거절', s >= 400, (s, j))
     s, j = rpc('asg_due_targets', {}, t); check(f'과제 알림 받을 기기 목록(asg_due_targets)은 서비스 키 전용 — {nm} 거절', s >= 400, (s, j))

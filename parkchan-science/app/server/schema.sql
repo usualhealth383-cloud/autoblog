@@ -1172,6 +1172,39 @@ begin
     from assignments a left join submissions s on s.aid = a.id and s.code = c where c = any(a.codes) and a.due >= kst_today() - 14), '[]'::json));
 end $$;
 
+-- ═══ 선생님 한 마디(2026-10-07) — 원장이 학생마다 그 주(월요일 기준) 한 줄. 확인된 보호자와 학생 본인이 본다 · 1년 뒤 파기(처리방침) ═══
+create table if not exists weekly_notes (
+  code text not null references students(code) on delete cascade,
+  wk   date not null,                                                      -- 그 주 월요일(한국 날짜)
+  body text not null check (char_length(body) between 1 and 120),
+  at   timestamptz not null default now(),
+  primary key (code, wk)
+);
+alter table weekly_notes enable row level security;   -- 정책 없음 = API 로 바로는 못 읽고 못 쓴다(아래 함수로만)
+revoke all on weekly_notes from anon, authenticated;
+create or replace function private.kst_monday() returns date language sql stable as $$ select kst_today() - (extract(isodow from kst_today())::int - 1) $$;
+create or replace function note_set(p_code text, p_body text) returns json language plpgsql security definer set search_path = public, private as $$
+declare c text := upper(trim(coalesce(p_code, ''))); b text := trim(coalesce(p_body, '')); w date := private.kst_monday();
+begin
+  if not is_owner() then raise exception 'owner only' using errcode = '42501'; end if;
+  if not exists (select 1 from students where code = c) then return json_build_object('ok', false, 'why', '학생을 찾을 수 없습니다.'); end if;
+  if b = '' then delete from weekly_notes where code = c and wk = w; return json_build_object('ok', true, 'cleared', true); end if;
+  if char_length(b) > 120 then return json_build_object('ok', false, 'why', '한 마디는 120자까지예요.'); end if;
+  insert into weekly_notes(code, wk, body) values (c, w, b) on conflict (code, wk) do update set body = excluded.body, at = now();
+  return json_build_object('ok', true);
+end $$;
+-- 이번 주 한 마디 — 원장 · 확인된 보호자(그 자녀만) · 학생 본인
+create or replace function note_get(p_code text) returns json language plpgsql stable security definer set search_path = public, private as $$
+declare c text := upper(trim(coalesce(p_code, ''))); n weekly_notes;
+begin
+  -- coalesce: 학생이 아니면 my_student_code() 가 null 이라 '= c' 가 null → not(null) 도 null 이 되어 막지 못했다(2026-10-07 보안 시험이 잡음)
+  if not coalesce(is_owner() or my_student_code() = c or exists (select 1 from guardian_links where uid = auth.uid() and code = c and approved), false) then return json_build_object('ok', false); end if;
+  select * into n from weekly_notes where code = c and wk = private.kst_monday();
+  return json_build_object('ok', true, 'body', n.body, 'at', n.at);
+end $$;
+revoke execute on function note_set(text, text), note_get(text) from public, anon;
+grant execute on function note_set(text, text), note_get(text) to authenticated;
+
 -- ═══ 보호자 주간 요약 알림(벤치마크 ★5) — 일요일 저녁 push 함수({action:'weekly'})가 부른다(서비스 키 전용) ═══
 --  원장이 확인한 보호자 · 수강 중인 자녀만. 이번 주(월~일) 공부한 날 · 푼 문제 수 · 이번 주 마감 과제 중 낸 것 — 따로 저장하지 않고 그때 계산한다
 create or replace function weekly_digest() returns table(token text, uid uuid, code text, name text, days int, solved int, asg_due int, asg_done int)
@@ -1379,6 +1412,7 @@ create or replace function private.purge_old() returns void language sql securit
   select private.recount(post_id, comment_id) from (select distinct post_id, comment_id from reports where state = 'open') x;   -- 30일이 지나 '자주 되돌려진 계정'에서 벗어난 신고를 다시 센다
   update profiles set talk_until = null, talk_reason = '' where talk_until < kst_today();   -- 끝난 제한은 사유까지 지운다
   delete from push_later where at < now() - interval '2 days';                               -- 못 보낸 밤 알림(보통은 아침에 보내고 바로 지운다)
+  delete from weekly_notes where wk < kst_today() - 365;                                     -- 선생님 한 마디 1년(처리방침)
   delete from assignments where due < kst_today() - 365;                                     -- 학원 과제·제출 기록은 마감일부터 1년(처리방침 3⑭)
   delete from auth.users where id in (select id from profiles where under14 and not guardian_ok
     and ((guardian_at is null and created_at < now() - interval '7 days') or (guardian_how = 'reset' and guardian_at < now() - interval '7 days')));   -- 보호자가 동의를 표시했고 학원 확인만 남은 계정은 두고 원장 목록에 남긴다 · '번호 다름'으로 되돌린 계정은 그때부터 7일
