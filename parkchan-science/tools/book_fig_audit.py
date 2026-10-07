@@ -39,8 +39,9 @@ JS = r"""
 """
 
 def serve():
-    h = functools.partial(http.server.SimpleHTTPRequestHandler, directory=ROOT)
-    h.log_message = lambda *a: None
+    class Q(http.server.SimpleHTTPRequestHandler):
+        def log_message(self, *a): pass
+    h = functools.partial(Q, directory=ROOT)
     s = socketserver.TCPServer(('127.0.0.1', 0), h); threading.Thread(target=s.serve_forever, daemon=True).start()
     return s
 
