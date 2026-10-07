@@ -3,8 +3,10 @@
 명암비(AA)·가로 넘침·글자 잘림·손가락 크기(44px)를 본다. run.py 는 첫 탭·접힌 상태만 보므로 놓치는 것이 있었다
 (2026-10-07: 수유 칩 4.0:1, 달력 날짜, 알림 방법 탭 단추 40px, 소수점 43.99px 등).
 사용: (docs/yakjido 를 8765 에 띄운 뒤) python3 yakjido/tests/sweep.py   — 약 20분
+      큰 글씨·좁은 화면: --fs 22px --w 320 --themes light
 """
-import re,ast,json
+import re,ast,json,argparse
+ap=argparse.ArgumentParser(); ap.add_argument('--w',type=int,default=390); ap.add_argument('--fs',default=''); ap.add_argument('--themes',default='light,dark'); A=ap.parse_args()
 from playwright.sync_api import sync_playwright
 import pathlib,os
 src=(pathlib.Path(__file__).parent/'run.py').read_text(encoding='utf-8')
@@ -17,12 +19,12 @@ def add(kind,key,where): res[kind].setdefault(key,[]).append(where)
 with sync_playwright() as p:
     _c='/opt/pw-browsers/chromium-1194/chrome-linux/chrome'
     b=p.chromium.launch(**({'executable_path':_c} if os.path.exists(_c) else {}))
-    pg=b.new_page(viewport={'width':390,'height':844})
+    pg=b.new_page(viewport={'width':A.w,'height':844})
     pg.goto('http://localhost:8765/index.html#/home'); pg.wait_for_timeout(2500)
-    pg.evaluate("localStorage.setItem('yakjido.hello.v1','1');localStorage.setItem('yakjido.me.v1',JSON.stringify({age:'senior',pregnant:true,taking:['acetaminophen','cls:bp.arb'],pub:{}}))")
+    pg.evaluate("localStorage.setItem('yakjido.hello.v1','1');localStorage.setItem('yakjido.me.v1',JSON.stringify({age:'senior',pregnant:true,taking:['acetaminophen','cls:bp.arb'],pub:{}}))" + (f";localStorage.setItem('yakjido.fs','{A.fs}')" if A.fs else ''))
     pg.reload(); pg.wait_for_timeout(2500)
     routes=pg.evaluate(ROUTE_JS)
-    for theme in ['light','dark']:
+    for theme in A.themes.split(','):
         pg.emulate_media(color_scheme=theme)
         for r in routes:
             pg.goto('http://localhost:8765/index.html#'+r); pg.wait_for_timeout(300)
