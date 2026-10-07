@@ -1120,7 +1120,7 @@ begin
   if not is_owner() then return '[]'::json; end if;
   return coalesce((select json_agg(private.asg_row(a) order by a.due desc, a.at desc) from assignments a where a.id in (select id from assignments where due >= kst_today() - 60 order by due desc, at desc limit 60)), '[]'::json);
 end $$;
--- 원장: 한 과제의 제출 현황 — 학생별(제출·늦은 제출·맞힌 수·걸린 시간·제출 시각) · 많이 틀린 문항 3개
+-- 원장: 한 과제의 제출 현황 — 학생별(제출·늦은 제출·맞힌 수·걸린 시간·제출 시각·틀린 문항 — '틀린 학생에게만 다시 내기'용) · 많이 틀린 문항 3개
 create or replace function assign_report(p_id uuid) returns json language plpgsql stable security definer set search_path = public, private as $$
 declare a assignments;
 begin
@@ -1128,7 +1128,7 @@ begin
   select * into a from assignments where id = p_id; if not found then return json_build_object('ok', false, 'why', '지워진 과제입니다.'); end if;
   return json_build_object('ok', true, 'a', private.asg_row(a), 'items', a.items,
     'rows', coalesce((select json_agg(json_build_object('code', c, 'name', st.name, 'cls', st.cls, 'phone', st.phone, 'done', coalesce(s.done, 0), 'right', coalesce(s.right_n, 0),
-        'secs', coalesce(s.secs, 0), 'submitted_at', s.submitted_at, 'late', coalesce(s.late, false)) order by s.submitted_at is null, st.cls, st.name)
+        'secs', coalesce(s.secs, 0), 'submitted_at', s.submitted_at, 'late', coalesce(s.late, false), 'wrong', coalesce(s.wrong, '{}')) order by s.submitted_at is null, st.cls, st.name)
       from unnest(a.codes) c left join students st on st.code = c left join submissions s on s.aid = a.id and s.code = c where st.code is not null), '[]'::json),
     'top', coalesce((select json_agg(json_build_object('id', w, 'n', n) order by n desc, o) from (
         select w, count(*) as n, min(array_position(a.items, w)) as o from submissions s, unnest(s.wrong) w where s.aid = a.id and s.submitted_at is not null group by w order by count(*) desc, min(array_position(a.items, w)) limit 3) x), '[]'::json));

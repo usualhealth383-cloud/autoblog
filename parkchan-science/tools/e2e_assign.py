@@ -95,6 +95,10 @@ async def main():
         await pg.click('#asgForm [data-af="kind"][data-val="bank"]'); await pg.select_option('#afLesson', '1103'); await pg.wait_for_timeout(150)
         await pg.select_option('#afCls', '학생 고르기'); await pg.wait_for_timeout(250)
         assert await pg.locator('#asgForm [data-apick]').count() >= 3, '학생 고르기 목록이 없음'
+        # 이름이 잘리지 않는다(2026-10-07: .form input 폭 100 % 가 체크 상자를 늘려 이름이 한 글자만 보였다)
+        cut = await pg.evaluate("[...document.querySelectorAll('#asgForm .apick label')].filter(l => l.scrollWidth > l.clientWidth + 1 || l.querySelector('input').getBoundingClientRect().width > 24).length")
+        assert cut == 0, ('학생 고르기 이름 잘림', cut)
+        await pg.locator('#asgForm .apick').screenshot(path=f'{SC}/a01b_pick.png')
         other = 'E2EA03' if SRV else 'TUE456'
         await pg.check(f'#asgForm [data-apick][value="{other}"]'); await pg.wait_for_timeout(200)
         assert '학생 1명' in await pg.inner_text('#afSum'), await pg.inner_text('#afSum')
@@ -196,6 +200,19 @@ async def main():
         assert await pg.locator('.sheet .asgtop .kv').count() == 2, '틀린 문항 2개(학생 1명이 2문항 틀림)'
         nophone = await pg.locator('.sheet a[href^="sms:"]').count(); assert nophone == (1 if SRV else 0), '아직 안 낸 학생에게 문자(연락처 있을 때만)'
         await pg.screenshot(path=f'{SC}/a06_report_light.png', full_page=True)
+        # 틀린 학생에게만 다시 내기(2026-10-07) — 틀린 1명에게, 틀린 2문항만
+        re_ = await pg.inner_text('.sheet .asgre'); assert '1명' in re_ and '2개' in re_, re_
+        await pg.click('#asgReGo'); await pg.wait_for_timeout(900)
+        assert await pg.locator('.sheet').count() == 0 or not await pg.locator('.sheet').is_visible(), '다시 낸 뒤 시트가 닫히지 않음'
+        lst2 = await pg.inner_text('#v-admin'); assert '다시 풀기 · ' in lst2 and '학생 1명' in lst2, lst2
+        if SRV:
+            row = sql("select items, codes from assignments where title like '다시 풀기 · %%' order by at desc limit 1")
+            got = row[0] if row else None
+        else:
+            got = await pg.evaluate("(() => { const a = (JSON.parse(localStorage.getItem('pcs.db.v2')).asg || []).filter(x => x.title.startsWith('다시 풀기 · ')).pop(); return a && [a.items, a.codes]; })()")
+        assert got and len(got[0]) == 2 and len(got[1]) == 1, ('다시 낸 과제 = 틀린 문항 2 · 틀린 학생 1', got)
+        await pg.locator('.asgsentrow', has_text='다시 풀기 · ').locator('[data-asgrep]').click(); await pg.wait_for_timeout(700)
+        assert await pg.locator('.sheet .asgre').count() == 0, '아직 아무도 안 낸 과제에 다시 내기'
         await pg.click('#sheetClose'); await pg.wait_for_timeout(300)
         await pg.locator('.asgsentrow', has_text=L2).locator('[data-asgrep]').click(); await pg.wait_for_timeout(700)
         assert '늦게 냄' in await pg.inner_text('.sheet'); await pg.click('#sheetClose')

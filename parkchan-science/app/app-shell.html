@@ -1017,6 +1017,12 @@ figure.zoomable{cursor:zoom-in}
 .howto.hz li .n{display:grid;place-items:center;width:24px;height:24px;margin:1px 0 0;border-radius:var(--r-pill);font-size:12px;font-weight:900;color:var(--hzk)}
 .howto.hz li button.n{border:1.5px solid var(--hzl);background:var(--hzs);cursor:pointer;font-family:inherit;padding:0}
 .howto.hz li button.n:focus-visible{outline:2px solid var(--hzk);outline-offset:2px}
+.phet{display:flex;align-items:center;gap:12px;margin:-4px 0 15px;padding:10px 12px;border:1px solid var(--line);border-radius:var(--r-m);background:var(--card);color:var(--ink);text-decoration:none;min-height:44px}
+.phet .ic{flex:0 0 auto;display:grid;place-items:center;width:32px;height:32px;border-radius:var(--r-pill);background:var(--u-soft)}
+.phet .ic svg,.phet svg.out{width:18px;height:18px;fill:none;stroke:var(--u);stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.phet svg.out{flex:0 0 auto;stroke:var(--muted)}
+.phet .tx{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px;word-break:keep-all}
+.phet .tx b{font-size:var(--t-small);font-weight:700}.phet .tx small{font-size:var(--t-cap);color:var(--muted)}
 .howto .k .hint{font-size:11.5px;font-weight:600;letter-spacing:0;color:var(--muted);margin-left:8px}
 
 /* 탭바 */
@@ -1228,7 +1234,8 @@ button.pill::before,.notice button::before,.mini::before,.chipbar button::before
 .apick{display:grid;grid-template-columns:1fr 1fr;gap:6px;max-height:220px;overflow:auto;padding:2px}
 .apick label{display:flex;align-items:center;gap:7px;font-size:var(--t-small);font-weight:700;color:var(--ink);border:1px solid var(--line);border-radius:var(--r-s);padding:8px 9px;min-height:44px;cursor:pointer;background:var(--paper)}
 .apick label small{font-size:var(--t-tab);color:var(--muted);font-weight:700;margin-left:auto}
-.apick input{width:18px;height:18px;flex:0 0 auto;accent-color:var(--brand)}
+.apick input,.form .apick input{width:18px;height:18px;flex:0 0 auto;padding:0;margin:0;border:none;min-width:0;accent-color:var(--brand)}   /* .form input(폭 100 %)이 이겨 이름이 잘리던 것(2026-10-07) */
+.apick label{min-width:0;word-break:keep-all}
 .asgsentrow .r em.miss{font-style:normal;color:var(--warn);font-weight:700}
 .asgsentrow .r .mini{min-height:36px}
 .asgrow{align-items:center;gap:10px}
@@ -2120,7 +2127,7 @@ const DB = (() => {
       const subs = (d.subs||[]).filter(x => x.aid === a.id), got = subs.filter(x => x.submitted_at), cnt = new Map();
       got.forEach(x => (x.wrong||[]).forEach(id => cnt.set(id, (cnt.get(id)||0) + 1)));
       const rows = a.codes.map(c => { const st = d.students.find(x => x.code === c), x = subs.find(y => y.code === c) || {};
-        return st ? { code:c, name:st.name, cls:st.cls, phone:st.phone||'', done:x.done||0, right:x.right||0, secs:x.secs||0, submitted_at:x.submitted_at||null, late:!!x.late } : null; }).filter(Boolean)
+        return st ? { code:c, name:st.name, cls:st.cls, phone:st.phone||'', done:x.done||0, right:x.right||0, secs:x.secs||0, submitted_at:x.submitted_at||null, late:!!x.late, wrong:(x.wrong||[]).slice() } : null; }).filter(Boolean)
         .sort((p, q) => (!p.submitted_at - !q.submitted_at) || (p.cls + p.name).localeCompare(q.cls + q.name));
       return { ok:true, a:asgRow(a), items:a.items.slice(), rows, top:[...cnt].sort((p, q) => q[1] - p[1] || a.items.indexOf(p[0]) - a.items.indexOf(q[0])).slice(0, 3).map(([id, n]) => ({ id, n })) }; },
     myAssignments: async () => { const m = me(), c = m && m.role === 'student' ? m.studentCode : ''; if (!c) return []; const cut = addDays(todayISO(), -14);
@@ -3323,7 +3330,7 @@ function detailCard(c){
       ${preHtml(c)}
       <div class="steps">${c.steps.map(s=>`<div class="step"><div class="n">${s.n}</div><div class="t">${esc(s.t)}</div><div class="d">${termify(rich(s.d), keys, u1)}</div></div>`).join('')}</div>
       ${c.figure ? `<figure class="zoomable" data-zoom="${c.id}" tabindex="0" role="button" aria-label="그림 크게 보기: ${esc(c.figure.caption)}"><span class="zbtn" aria-hidden="true">⤢ 크게 보기</span>${figSlot(c.id)}<figcaption>${esc(c.figure.caption)} · 누르면 크게</figcaption></figure>` : ''}
-      ${c.howto.length ? `<div class="howto hz"><span class="k">그림 읽는 법${c.figure ? '<span class="hint">번호를 누르면 그 자리를 크게 봐요</span>' : ''}</span><ul>${c.howto.map((h,i)=>`<li>${c.figure ? `<button type="button" class="n" data-hz="${i}" aria-label="그림에서 ${i+1}번 자리 크게 보기">${i+1}</button>` : `<b class="n">${i+1}</b>`}<span>${rich(h)}</span></li>`).join('')}</ul></div>`:''}
+      <div id="dHow">${howtoHtml(c)}</div>
       <div class="point"><span class="k">포인트</span><p>${rich(c.point)}</p></div>
       <button type="button" class="dmore-t" id="dMoreBtn" aria-expanded="${open}" aria-controls="dMore">${dMoreLabel(c, open)}</button>
     </article>
@@ -3334,6 +3341,13 @@ function detailCard(c){
       ${c.terms.length ? `<div class="sec"><h2>용어</h2><dl class="terms">${c.terms.map(t=>`<dt>${esc(t.k)}</dt><dd>${esc(t.v)}</dd>`).join('')}</dl></div>`:''}
     </div>`;
 }
+/* 그림 읽는 법 — 강의용 교재의 것이 먼저, 없으면 앱용 덧붙임(data/concept_extras.json howto, 2026-10-07 콘텐츠 감사 보완안 12).
+   PhET 시뮬레이션(콜로라도 대학교, 무료)이 그 개념에 꼭 맞으면 한 줄 링크 — 바깥 사이트로 나간다는 표시를 붙인다 */
+const howtoOf = c => (c.howto && c.howto.length) ? c.howto : ((c.x && c.x.howto) || []);
+function howtoHtml(c){
+  const hw = howtoOf(c), ph = c.x && c.x.phet;
+  return (hw.length ? `<div class="howto hz"><span class="k">그림 읽는 법${c.figure ? '<span class="hint">번호를 누르면 그 자리를 크게 봐요</span>' : ''}</span><ul>${hw.map((h,i)=>`<li>${c.figure ? `<button type="button" class="n" data-hz="${i}" aria-label="그림에서 ${i+1}번 자리 크게 보기">${i+1}</button>` : `<b class="n">${i+1}</b>`}<span>${rich(h)}</span></li>`).join('')}</ul></div>` : '')
+    + (ph && /^https:\/\/phet\.colorado\.edu\//.test(ph.url) ? `<a class="phet" href="${esc(ph.url)}" target="_blank" rel="noopener"><span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M9 3h6M10 3v6l-5 9a2 2 0 0 0 1.8 3h10.4a2 2 0 0 0 1.8-3l-5-9V3"/><path d="M7.5 15h9"/></svg></span><span class="tx"><b>직접 해 보기 · ${esc(ph.title)}</b><small>PhET 시뮬레이션(콜로라도 대학교, 무료) · 새 창</small></span><svg class="out" viewBox="0 0 24 24" aria-hidden="true"><path d="M14 5h5v5M19 5l-8 8M18 14v4a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h4"/></svg></a>` : ''); }
 /* 본문 다음: 생각해 보기(왜? — 답은 눌러서) · 계산 개념이면 예제 → 따라 풀기(답은 눌러서). 2026-10-06 콘텐츠 감사 보완안 8·9.
    답에 빈칸 ㉠㉡㉢의 정답 낱말이 들어 있는 것이 많아 본문을 펼친 안쪽에, 그리고 늘 접어 둔다 */
 function dThinkHtml(c){
@@ -3348,7 +3362,9 @@ function dThinkHtml(c){
 }
 /* 생각해 보기·예제는 나중에 받는 데이터에 있다 — 받으면 그 칸과 '본문 자세히 읽기' 안내만 고친다 */
 function dThinkFill(){ const c = CONCEPTS[detailIdx], el = document.getElementById('dThink'), b = document.getElementById('dMoreBtn'); if (!c || !el) return;
-  if (!el.innerHTML.trim()) el.innerHTML = dThinkHtml(c); if (b) b.innerHTML = dMoreLabel(c, b.getAttribute('aria-expanded') === 'true'); }
+  if (!el.innerHTML.trim()) el.innerHTML = dThinkHtml(c);
+  const hw = document.getElementById('dHow'); if (hw && !hw.innerHTML.trim()) hw.innerHTML = howtoHtml(c);
+  if (b) b.innerHTML = dMoreLabel(c, b.getAttribute('aria-expanded') === 'true'); }
 const dMoreLabel = (c, open) => `<span><b>${open ? '본문 접기' : '본문 자세히 읽기'}</b><small>본문 ${c.body.length}문단${c.x && c.x.why ? ' · 생각해 보기' : ''}${c.x && c.x.example ? ' · 예제' : ''}${c.myths.length ? ` · 자주 하는 오해 ${c.myths.length}` : ''}${c.terms.length ? ` · 용어 ${c.terms.length}` : ''}</small></span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>`;
 /* 이 기기에만 두는 작은 기록 — 진도(S)·서버로 보내지 않는다 */
 const dLoad = k => { try { const v = JSON.parse(localStorage.getItem(k)); return v && typeof v === 'object' && !Array.isArray(v) ? v : null; } catch { return null; } };
@@ -5168,10 +5184,18 @@ function asgListHtml(list){
     return `<div class="sent asgsentrow"><div class="t">${esc(a.title)}</div><div class="d">${esc(a.cls || `학생 ${a.target}명`)} · ${esc(ASG_KIND[a.kind] || '')} ${a.n}${a.kind === 'read' ? '개' : '문항'} · ${esc(kdate(a.due))}까지 · ${esc(asgDueText(a.due))}</div>
       <div class="r"><span>제출 <b>${a.submitted}</b> / ${a.target}명${a.rate != null ? ` · 정답률 <b>${a.rate}%</b>` : ''}${a.late ? ` · 늦은 제출 ${a.late}` : ''}${over && a.missing.length ? ` · <em class="miss">아직 ${a.missing.length}명</em>` : ''}</span><button class="mini" data-asgrep="${esc(a.id)}">제출 현황</button></div></div>`; }).join(''); }
 const mmss = n => { n = Math.round(+n || 0); return n >= 60 ? `${Math.floor(n / 60)}분${n % 60 ? ` ${n % 60}초` : ''}` : `${n}초`; };
+let asgRe = null;   // 보고서에서 '틀린 학생에게만 다시 내기'를 누를 때 쓸 묶음
 async function openAsgReport(id){
   const r = await DBX.assignReport(id).catch(e => ({ ok:false, why:e.message })); if (!r || !r.ok){ toast((r && r.why) || '열지 못했습니다'); return; }
   const a = r.a, ios = /iphone|ipad/i.test(navigator.userAgent) ? '&' : '?', miss = r.rows.filter(x => !x.submitted_at), ph = miss.map(x => tel(x.phone)).filter(Boolean);
   const qOf = qid => (MORE.ok ? BANK.find(q => q.id === qid) : null) || (CONCEPTS.find(c => c.id === qid) ? { stem: CONCEPTS.find(c => c.id === qid).title } : null);
+  /* 틀린 학생에게만 다시 내기(2026-10-07, Seneca 재배정) — 낸 학생 가운데 틀린 문항이 있는 학생에게, 누군가 틀린 문항만(원래 순서) 새 과제로.
+     소단원 문제 과제만(대단원·모의고사는 세트째 다시 푸는 게 맞다) */
+  const wr = a.kind === 'bank' ? r.rows.filter(x => x.submitted_at && (x.wrong || []).length) : [], reIt = r.items.filter(id => wr.some(x => x.wrong.includes(id)));
+  asgRe = wr.length && reIt.length ? { title:`다시 풀기 · ${a.title}`.slice(0, 80), ref:a.ref || '', items:reIt, codes:wr.map(x => x.code) } : null;
+  const reHtml = asgRe ? `<div class="sec asgre"><h2>틀린 학생에게만 다시 내기</h2><p class="tip" style="margin:0 0 10px">틀린 문항이 있는 <b>${wr.length}명</b>에게, 누군가 틀린 문항 <b>${reIt.length}개</b>만 새 과제로 냅니다. 다 맞힌 학생은 받지 않아요.</p>
+      <div class="g" style="display:flex;gap:8px;align-items:center"><label for="asgReDue" style="font-size:var(--t-small);color:var(--muted)">마감</label><input id="asgReDue" type="date" value="${addDays(todayISO(), 2)}" min="${todayISO()}" max="${addDays(todayISO(), 60)}"></div>
+      <button class="btn soft" id="asgReGo" style="margin-top:10px">${wr.length}명에게 ${reIt.length}문항 다시 내기</button></div>` : '';
   const st = x => x.submitted_at ? `<span class="cst ${x.late ? 'wait' : 'ok'}">${x.late ? '늦게 냄' : '냄'}</span>` : `<span class="cst none">아직${x.done ? ` ${x.done}/${a.n}` : ''}</span>`;
   openSheet(`<h3>${esc(a.title)}</h3>
     <p>${esc(a.cls || `학생 ${a.target}명`)} · ${esc(ASG_KIND[a.kind] || '')} ${a.n}${a.kind === 'read' ? '개' : '문항'} · 마감 ${esc(asgWhen(a.due))}${dLeft(a.due) < 0 ? ' · 마감 지남' : ''}</p>
@@ -5181,6 +5205,7 @@ async function openAsgReport(id){
         + '<p class="tip" style="margin:8px 0 0">수업 시작 5분에 같이 짚어 보기 좋은 문항입니다.</p>' : '<p class="tip" style="margin:0">아직 낸 학생이 없거나 틀린 문항이 없습니다.</p>'}</div>` : ''}
     <div class="sec"><h2>학생별 ${r.rows.length}명</h2>${r.rows.map(x => `<div class="kv asgrow"><span class="k"><b>${esc(x.name)}</b> <small>${esc(x.cls)}</small>${x.submitted_at ? `<br><small>${a.kind === 'read' ? '' : `${x.right}/${a.n} · `}${mmss(x.secs)} · ${esc(kAt(x.submitted_at))}</small>` : ''}</span><span class="v">${st(x)}</span></div>`).join('')}</div>
     ${miss.length && ph.length ? `<a class="btn soft" href="sms:${ph.join(',')}${ios}body=${encodeURIComponent(`[${CFG.academy}] 학원 과제 ‘${a.title}’ — ${asgWhen(a.due)}까지 앱 오늘 화면에서 낼 수 있습니다.`)}" style="text-decoration:none">아직 안 낸 ${miss.length}명에게 문자</a>` : ''}
+    ${reHtml}
     <button class="linkbtn" data-asgdel="${esc(a.id)}">이 과제 지우기</button><button class="btn ghost" id="sheetClose">닫기</button>`); }
 async function renderAdmin(){
   const v = document.getElementById('v-admin');
@@ -5680,7 +5705,7 @@ document.addEventListener('click', async e => {
   if (!MORE.ok){ const need = T('[data-drill],[data-lab],[data-zoom],[data-hz],[data-zoomlab],[data-bretry],[data-leech],#bankStart,#bankRec,#bankAgain,#revStart,[data-ustart],[data-urecap],[data-mstart]'); if (need){ afterMore(need); return; } }
   /* 그림 확대 */
   const zf = T('[data-zoom]'); if (zf){ const c = CONCEPTS.find(x=>x.id===zf.dataset.zoom); openFigure(figOf(c.id), c.figure.caption); return; }
-  const hzb = T('[data-hz]'); if (hzb && view === 'detail'){ const c = CONCEPTS[detailIdx]; if (c && c.figure) openFigure(figOf(c.id), c.figure.caption, { list:c.howto, i:+hzb.dataset.hz }); return; }
+  const hzb = T('[data-hz]'); if (hzb && view === 'detail'){ const c = CONCEPTS[detailIdx]; if (c && c.figure) openFigure(figOf(c.id), c.figure.caption, { list:howtoOf(c), i:+hzb.dataset.hz }); return; }
   const zl = T('[data-zoomlab]'); if (zl){ const l = LABS.find(x=>x.lessonId===zl.dataset.zoomlab); openFigure(l.figure, l.title); return; }
   const zq = T('[data-zoomsvg]'); if (zq && bs){ openFigure(bs.items[+zq.dataset.zoomsvg].figure, ''); return; }
   const zm = T('[data-mxzoom]'); if (zm && mx){ openFigure(mx.items[+zm.dataset.mxzoom].figure, `${+zm.dataset.mxzoom + 1}번`); return; }
@@ -6192,6 +6217,10 @@ document.addEventListener('click', async e => {
     const r = await DBX.assignCreate({ kind:d.kind, title:d.title, ref:d.ref, items:d.items, cls, codes: cls ? null : asgF.pick, due:asgF.due }).catch(e => ({ ok:false, why:e.message }));
     if (!r || !r.ok){ toast((r && r.why) || '내지 못했습니다'); return; } toast(`과제를 냈습니다 · ${r.target}명`); asgF.pick = []; renderAdmin(); return; }
   const arp = T('[data-asgrep]'); if (arp){ openAsgReport(arp.dataset.asgrep); return; }
+  if (T('#asgReGo') && asgRe){ const due = (document.getElementById('asgReDue') || {}).value || addDays(todayISO(), 2);
+    const r = await DBX.assignCreate({ kind:'bank', title:asgRe.title, ref:asgRe.ref, items:asgRe.items, cls:null, codes:asgRe.codes, due }).catch(e => ({ ok:false, why:e.message }));
+    if (!r || !r.ok){ toast((r && r.why) || '내지 못했습니다'); return; }
+    asgRe = null; closeSheet(); toast(`${r.target}명에게 다시 냈어요`); if (view === 'admin') renderAdmin(); return; }
   const adl = T('[data-asgdel]'); if (adl){ if (!await ask('이 과제를 지울까요? 학생 화면에서도 사라지고 제출 기록도 함께 지워집니다.', '지우기', true)) return;
     await DBX.assignDelete(adl.dataset.asgdel).catch(e => toast(e.message)); closeSheet(); toast('과제를 지웠습니다'); if (view === 'admin') renderAdmin(); return; }
   const adm = T('[data-adm]'); if (adm){ admTab=adm.dataset.adm; issued=null; issuedPass=null; renderAdmin(); return; }
