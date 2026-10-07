@@ -36,6 +36,18 @@ async def main():
                 over = await s.evaluate('document.documentElement.scrollWidth > innerWidth + 1'); assert not over, '가로 넘침'
                 await th.scroll_into_view_if_needed(); await s.screenshot(path=f'{SC}/{scheme}_{cid}.png')
                 await s.click('#dMoreBtn'); await s.wait_for_timeout(150)   # 다음 시험을 위해 접어 둔다(펼침은 기억된다)
+            # 그림 읽는 법(앱용 덧붙임)·PhET 링크(2026-10-07 보완안 12) — 강의용 것이 없는 개념에 · 번호를 누르면 그 자리
+            k = await s.evaluate("[CONCEPTS.filter(c => !c.howto.length && c.x && c.x.howto).length, CONCEPTS.filter(c => c.x && c.x.phet).length]")
+            assert k[0] >= 100 and k[1] >= 15, k
+            await s.evaluate("detailIdx = CONCEPTS.findIndex(c => c.id === '1102-03'); show('detail')"); await s.wait_for_timeout(400)
+            assert await s.locator('#v-detail .howto.hz li').count() >= 2, '앱용 그림 읽는 법이 안 보임'
+            ph = s.locator('#v-detail a.phet'); assert await ph.count() == 1 and (await ph.get_attribute('href')).startswith('https://phet.colorado.edu/ko/simulations/density') and await ph.get_attribute('target') == '_blank' and 'noopener' in await ph.get_attribute('rel')
+            assert '밀도' in await ph.inner_text() and '새 창' in await ph.inner_text()
+            await s.locator('#v-detail .howto.hz button.n').first.click(); await s.wait_for_timeout(500)
+            assert await s.locator('#fv').count() == 1 and (await s.get_attribute('#fv', 'data-at') or '') != '', '번호를 눌렀는데 그 자리를 못 찾음'
+            await s.screenshot(path=f'{SC}/{scheme}_hz_extra.png'); await s.keyboard.press('Escape'); await s.wait_for_timeout(200)
+            await s.evaluate("detailIdx = CONCEPTS.findIndex(c => c.id === '1102-03'); show('detail')"); await s.wait_for_timeout(300)
+            await s.locator('#v-detail a.phet').scroll_into_view_if_needed(); await s.screenshot(path=f'{SC}/{scheme}_phet.png')
             await ctx.close()
         assert not errs, errs
         print('EXTRAS E2E OK · 콘솔 오류 []'); await b.close()
