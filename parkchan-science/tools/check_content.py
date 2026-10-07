@@ -91,6 +91,14 @@ else:
             if not (isinstance(ex.get('title'), str) and ex['title'].strip() and isinstance(ex.get('answer'), str) and ex['answer'].strip()): bad.append(f'extras {cid}: example.title·answer 가 비어 있음')
             if not (isinstance(ex.get('steps'), list) and 2 <= len(ex['steps']) <= 4 and all(isinstance(s, str) and s.strip() for s in ex['steps'])): bad.append(f'extras {cid}: example.steps 는 2~4줄')
         if fo and not all(isinstance(fo.get(k), str) and fo[k].strip() for k in ('q', 'answer', 'explain')): bad.append(f'extras {cid}: follow 의 q·answer·explain 이 비어 있음')
+        # '그림 읽는 법'(앱 전용) — 2~4줄, 강의용 교재에 이미 있는 개념에는 두지 않는다 · PhET 링크는 공식 사이트만
+        if 'howto' in x:
+            hw = x['howto']
+            if not (isinstance(hw, list) and 2 <= len(hw) <= 4 and all(isinstance(s, str) and s.strip() for s in hw)): bad.append(f'extras {cid}: howto 는 비지 않은 2~4줄')
+            if cmap[cid].get('howto'): bad.append(f'extras {cid}: 강의용 교재에 그림 읽는 법이 이미 있음 — extras howto 를 두지 않는다')
+        if 'phet' in x:
+            ph = x['phet']
+            if not (isinstance(ph, dict) and isinstance(ph.get('title'), str) and ph['title'].strip() and isinstance(ph.get('url'), str) and ph['url'].startswith('https://phet.colorado.edu/')): bad.append(f'extras {cid}: phet 는 title + https://phet.colorado.edu/ 주소')
         for t in _strs(x):
             if t.count('<sup>') != t.count('</sup>') or t.count('<sub>') != t.count('</sub>'): bad.append(f'extras {cid}: 첨자 태그 짝이 안 맞음 · {t[:40]}')
             if re.search('[' + UNI + ']', t): bad.append(f'extras {cid}: 유니코드 첨자 대신 <sup>·<sub> 를 쓴다 · {t[:40]}')
