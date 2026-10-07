@@ -600,7 +600,8 @@ nav.gjump{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;margin-left:calc
 details.acc{background:var(--card);border:1px solid var(--hairline);border-radius:var(--r-card);box-shadow:var(--shadow-card);margin-top:var(--s3)}
 details.acc summary{list-style:none;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:16px var(--s4);font-size:1.0625rem;font-weight:700;min-height:56px}
 details.acc summary::-webkit-details-marker{display:none}
-details.acc summary small{font-weight:500;color:var(--muted);font-size:.8125rem;flex:1;text-align:left;min-width:0}
+details.acc summary small{font-weight:500;color:var(--muted);font-size:.8125rem;flex:1 1 7em;text-align:left;min-width:0}
+details.acc summary{flex-wrap:wrap}   /* 큰 글씨·좁은 화면에서 설명 글이 한 글자씩 세로로 쌓였다 — 모자라면 아랫줄로(2026-10-07) */
 details.acc summary svg.i{color:var(--faint);transition:transform .2s}
 details.acc[open] summary svg.i{transform:rotate(90deg)}
 details.acc .bd{padding:0 var(--s4) var(--s4)}
@@ -1069,7 +1070,7 @@ details.ix-how .bd p:last-child{margin-bottom:0}
 .drug-hero .cls{font-size:.8125rem;font-weight:600;color:var(--primary);display:inline-flex;align-items:center;min-height:32px}
 .drug-hero h1{font-size:1.625rem}
 .drug-hero .en{color:var(--muted);font-size:.9375rem;font-weight:500}
-.kv{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--s3);margin-top:var(--s4)}
+.kv{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(9.5em,100%),1fr));gap:var(--s3);margin-top:var(--s4)}
 .kv div{background:var(--tint2);border-radius:12px;padding:12px 14px}
 .kv div small{display:block;font-size:.6875rem;font-weight:700;letter-spacing:.06em;color:var(--muted);text-transform:uppercase}
 .kv div b{display:block;font-size:.9375rem;font-weight:700;margin-top:2px;line-height:1.35;overflow-wrap:anywhere}
@@ -1090,6 +1091,26 @@ details.ix-how .bd p:last-child{margin-bottom:0}
 .pain-note{display:block;font-size:.8125rem;color:var(--muted);margin-top:3px;line-height:1.45}
 .pain-row{margin-top:4px}
 .prod span{display:block;color:var(--muted);font-size:.75rem;overflow-wrap:anywhere}   /* 「알릴이소프로필아세틸우레아」처럼 긴 성분명 한 낱말이 사진 옆 좁은 칸을 넘었다(2026-10-06) */
+/* 영양제 상세 — 질문 세 개(2026-10-07) */
+.supp-role{margin:10px 0 0;font-size:1rem;line-height:1.65;color:var(--body)}
+.who{margin-top:16px;display:flex;flex-direction:column;gap:8px}.who>b{font-size:.875rem;color:var(--muted)}.who small{font-size:.8125rem;color:var(--muted);line-height:1.5}
+.who-seg{display:flex;flex-wrap:wrap;gap:6px}.who-seg button{min-height:46px;padding:0 12px;border-radius:var(--r-pill);border:1.5px solid var(--hairline);background:var(--card);color:var(--body);font-size:.9375rem;font-weight:600}
+.who-seg button.on{background:var(--primary);border-color:var(--primary);color:var(--on-primary)}
+.sq-h,.sec>h2.sq-h{display:flex;align-items:center;justify-content:flex-start;gap:8px;font-size:1.125rem}.qn{flex:none;width:28px;height:28px;border-radius:50%;background:var(--tint);color:var(--primary-deep);display:grid;place-items:center;font-size:.8125rem;font-weight:800}
+.sq-sub{margin:2px 0 0;font-size:.8125rem;color:var(--muted)}.sq-p{margin:10px 0 0;font-size:.9375rem;line-height:1.7;color:var(--body)}.sq-note{margin:12px 0 0;font-size:.875rem;line-height:1.65;color:var(--body)}
+.sq-h3{font-size:.9375rem;margin:18px 0 0;color:var(--text)}
+.fds{list-style:none;margin:14px 0 0;padding:0;display:flex;flex-direction:column;gap:14px}
+.fd{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:2px 10px;align-items:baseline}
+.fd-t b{font-size:1rem}.fd-t span{display:block;font-size:.8125rem;color:var(--muted)}
+.fd-a{font-size:.875rem;color:var(--muted);white-space:nowrap}.fd-a b{font-size:1.25rem;color:var(--text);font-variant-numeric:tabular-nums}
+.fd-bar{grid-column:1/-1;height:8px;border-radius:99px;background:var(--tint2);margin-top:4px}.fd-bar i{display:block;height:100%;border-radius:99px;background:var(--viz-1)}
+.fd-c{grid-column:1/-1;font-size:.8125rem;color:var(--body);line-height:1.5}
+.vrow2{border-radius:12px;padding:12px 14px;margin-top:10px}.vrow2 b{font-size:.875rem}.vrow2 p{margin:4px 0 0;font-size:.9375rem;line-height:1.65}
+.vrow2.yes{background:var(--normal-tint)}.vrow2.yes b{color:var(--normal)}.vrow2.no{background:var(--tint2)}.vrow2.no b{color:var(--muted)}
+.dose2{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(9.5em,100%),1fr));gap:10px;margin-top:12px}.dose2>div{background:var(--tint2);border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:2px}
+.dose2 small{font-size:.75rem;font-weight:700;color:var(--muted);line-height:1.4}.dose2 span{font-size:.75rem;color:var(--muted)}
+.dn{font-size:1.75rem;font-weight:800;font-variant-numeric:tabular-nums;line-height:1.2;overflow-wrap:anywhere}.dn i{font-style:normal;font-size:.875rem;font-weight:600;color:var(--muted);margin-left:3px}.dn.sm{font-size:.9375rem;line-height:1.5;margin-top:2px}
+.pick-more{margin-top:16px}.pick-more .bd>.sec.card{box-shadow:none;border:1px solid var(--hairline);margin-top:12px}
 .prod span.ftag{display:inline-flex;font-size:.75rem}   /* 위 줄의 display:block 이 「바르는 약」 꼬리표를 칸 너비로 늘렸다 */
 .tabs{display:flex;gap:6px;margin:var(--s4) 0 var(--s3);overflow-x:auto;scrollbar-width:none;padding-bottom:2px}
 .tabs::-webkit-scrollbar{display:none}
@@ -1941,7 +1962,7 @@ function route(){
     ensureCore().then(route);
     return;
   }
-  if (seg[0] === 'drug' && DETAIL < 2 && !window.__DETAIL_SKIP__) {
+  if ((seg[0] === 'drug' || (seg[0] === 'supp' && seg[1])) && DETAIL < 2 && !window.__DETAIL_SKIP__) {   /* 영양제 상세도 음식·필요량 칸이 detail.json 에 있다 */
     if (DETAIL === 3) { window.__DETAIL_SKIP__ = true; ensureDetail(); }   /* 실패했으면 두 칸 없이 그리고, 다음에 다시 받아 본다 */
     else { view.innerHTML = topBar({ back:'뒤로', nosearch:true }) + `<section class="sec"><p class="loading">자료를 불러오는 중이에요…</p></section>`; ensureDetail().then(route); return; }
   }
@@ -5746,7 +5767,7 @@ function vSupp(id, q){
   const R = D.suppRules, t = ['label', 'stack'].includes(q?.t) && R ? q.t : 'pick', S = D.supplements || [];
   const TABS = [['pick', '성분 고르기', S.length], ...(R ? [['label', '라벨 읽는 법', (R.label || []).length], ['stack', '조심할 조합', (R.stack || []).length]] : [])];
   return `${topBar()}
-  <h1>영양제, 성분으로 비교하기</h1><p style="margin-top:6px">브랜드가 아니라 <b>성분·제형·함량</b>이 효과를 정해요. 두 개 이상 고르면 겹치는 성분과 상한을 같이 확인해요.</p>
+  <h1>영양제, 음식부터 확인하기</h1><p style="margin-top:6px">성분마다 <b>어떤 음식에 많은지 · 뭐에 좋은지 · 하루에 얼마나 필요한지</b>를 먼저 보여 드려요. 두 개 이상 고르면 겹치는 성분과 상한을 같이 확인해요.</p>
   <div class="sec">${art('supp-label', 'spot')}<div class="rows-l">
     ${lrow(I.eye, '영양제 라벨 사진 찍어 확인', '성분·함량을 읽어 상한과 겹침을 봐 드려요', "go('/photo')")}
     ${lrow(I.book, '영양제 성분 사전', `${(D.public?.nutrients_count || 0)}가지 — 라벨 읽는 법·상한·같이 먹으면 안 되는 것`, "lexLoad();document.getElementById('gq')?.focus()")}
@@ -5759,28 +5780,71 @@ function vSupp(id, q){
 }
 function toggleCmp(id, on){ CMP = on ? [...new Set([...CMP, id])] : CMP.filter(x => x !== id); renderCmpBar(); }
 function renderCmpBar(){ const b = document.getElementById('cmpbar'); const onSupp = location.hash.startsWith('#/supp') && !location.hash.startsWith('#/supp/'); if (!onSupp || CMP.length < 1) { b.classList.add('hide'); return; } b.classList.remove('hide'); b.innerHTML = `<div><span>${CMP.length}개 선택 · ${CMP.map(i => esc(supp(i)?.name || i)).join(', ')}</span><button onclick="go('/compare?ids=${CMP.join(',')}')">비교하기</button></div>`; }
+/* 2026-10-07 — 「어르신은 황산제일철 같은 제형은 궁금해하지 않으신다. 어느 음식에 많고, 뭐에 좋고, 얼마나 먹으면
+   되는지가 궁금하다」(의사 검수). 미국 국립보건원·하버드 보건 안내문도 「필요량 → 음식 → 효과 → 과량」 순이고
+   제형은 맨 끝 한 칸이다. → 질문 세 개(어떤 음식에·뭐에 좋아요·하루에 얼마나)를 위로, 제형·라벨·계산기·가격은
+   「제품 고를 때」 접힌 칸으로. 음식은 국가표준식품성분표 × 1회 분량, 필요량은 2025 한국인 영양소 섭취기준(나이·성별). */
+const SW_AGES = ['19~29세', '30~49세', '50~64세', '65~74세', '75세 이상'];
+function suppWho(){ const w = ME.sw || {}; return { s: w.s || '', a: Number.isInteger(w.a) ? w.a : (ME.age === 'senior' ? 3 : 1) }; }
+function setSW(k, v){ ME.sw = { ...suppWho(), [k]: v }; saveMe(); const y = window.scrollY; route(); window.scrollTo({ top: y }); }
+/* 고른 사람의 값 — 성별을 아직 안 고르셨으면 큰 쪽(퍼센트가 부풀지 않게) */
+function needOf(n, w){ const pickv = arr => w.s === 'm' ? arr.m[w.a] : w.s === 'f' ? arr.f[w.a] : Math.max(arr.m[w.a], arr.f[w.a]);
+  const ul = n.ul == null ? null : typeof n.ul === 'number' ? n.ul : pickv(n.ul);
+  const both = !w.s && n.m[w.a] !== n.f[w.a];
+  return { v: pickv(n), ul, both, m: n.m[w.a], f: n.f[w.a] }; }
+const nfmt = v => (v >= 1000 ? v.toLocaleString('ko-KR') : String(v));
+function whoPick(w){ const b = (k, v, t) => `<button class="${w[k] === v ? 'on' : ''}" aria-pressed="${w[k] === v}" onclick="setSW('${k}',${typeof v === 'string' ? `'${v}'` : v})">${t}</button>`;
+  return `<div class="who" role="group" aria-label="누구 기준으로 볼까요"><b>누구 기준으로 볼까요?</b>
+    <div class="who-seg">${b('s', 'f', '여자')}${b('s', 'm', '남자')}</div>
+    <div class="who-seg ages">${SW_AGES.map((t, i) => b('a', i, t)).join('')}</div>
+    ${w.s ? '' : '<small>성별을 고르시면 더 정확해져요 — 지금은 둘 중 많이 필요한 쪽 기준이에요</small>'}</div>`; }
+function suppFoods(s, nd){
+  const f = s.foods; if (!f) return '';
+  const head = `<h2 class="sq-h"><span class="qn" aria-hidden="true">1</span>어떤 음식에 많아요?</h2>`;
+  if (f.none) return `<section class="sec card sq">${head}<p class="sq-p">${fmt(f.none)}</p>${srcChips(f.src)}</section>`;
+  const base = nd ? nd.v : f.base;
+  const rows = f.items.map(it => { const p = base ? Math.min(100, Math.round(it.a / base * 100)) : 0;
+    const cap = !base ? '' : it.a >= base ? (nd ? '이것만으로 하루치를 넘어요' : `이것만으로 ${esc(f.baseLabel)}을 넘어요`) : `${nd ? '하루 필요량' : esc(f.baseLabel)}의 ${p}%`;
+    return `<li class="fd"><div class="fd-t"><b>${esc(it.n)}</b><span>${esc(it.s)}</span></div><div class="fd-a"><b>${nfmt(it.a)}</b> ${esc(f.u)}</div>${base ? `<div class="fd-bar" aria-hidden="true"><i style="width:${Math.max(p, 2)}%"></i></div>` : ''}<small class="fd-c">${cap}${it.t ? `${cap ? ' · ' : ''}${esc(it.t)}` : ''}</small></li>`; }).join('');
+  return `<section class="sec card sq">${head}<p class="sq-sub">한 번 먹는 양에 든 ${esc(s.name.replace(/\s*[(/].*$/, ''))}</p><ul class="fds">${rows}</ul>${f.note ? `<p class="sq-note">${fmt(f.note)}</p>` : ''}${srcChips(f.src)}</section>`;
+}
+function suppNeed(s, nd, w){
+  const n = s.need; const ages = SW_AGES[w.a], sx = w.s === 'f' ? '여자' : w.s === 'm' ? '남자' : '';
+  const hi = nd.m >= nd.f ? ['남자', nd.m, '여자', nd.f] : ['여자', nd.f, '남자', nd.m];
+  const big = nd.both ? `<b class="dn">${nfmt(hi[1])}<i>${esc(n.u)}</i></b><span>${hi[0]} 기준 · ${hi[2]}는 ${nfmt(hi[3])} ${esc(n.u)}</span>` : `<b class="dn">${nfmt(nd.v)}<i>${esc(n.u)}</i></b>`;
+  const ulTile = nd.ul != null ? `<div><small>${s.id === 'mg' ? '영양제로 먹는 양만 따져' : '음식·영양제 합쳐'} 넘기지 말 선</small><b class="dn">${nfmt(nd.ul)}<i>${esc(n.u)}</i></b></div>`
+    : `<div><small>넘기지 말 선</small><b class="dn sm">따로 정해진 상한이 없어요</b></div>`;
+  const b6 = n.b6 ? (() => { const x = needOf(n.b6, w); return `<p class="sq-note">비타민 B6는 하루 ${x.both ? `남 ${x.m} · 여 ${x.f}` : x.v} mg이 필요하고, ${x.ul} mg을 넘기지 마세요(손발 저림).</p>`; })() : '';
+  return `<div class="dose2"><div><small>${esc(ages)}${sx ? ' ' + sx : ''} 하루 필요량</small>${big}<span>${esc(n.t)} · 음식과 영양제를 합친 양</span></div>${ulTile}</div>${b6}`;
+}
 function vSuppDetail(id){
   const s = supp(id); if (!s) return vSupp();
+  const w = suppWho(), nd = s.need ? needOf(s.need, w) : null;
   return `${topBar({ back:'영양제' })}
-  <div class="drug-hero"><span class="cls">영양제 성분</span><h1>${esc(s.name)}</h1><div class="en">${esc(s.en || '')} ${evTag(s.evidence)}</div></div>
-  ${s.plain ? `<section class="verdict" aria-label="드실 만한가요">
-    <div class="vrow is-yes"><b>드실 만해요</b><p>${fmt(s.plain.who)}</p></div>
-    <div class="vrow is-no"><b>값을 못 해요</b><p>${fmt(s.plain.no)}</p></div>
-    <div class="vrow is-watch"><b>이것만 조심</b><p>${fmt(s.plain.watch)}</p></div>
-  </section>` : `<p style="margin-top:10px">${fmt(s.lead || s.for || '')}</p>`}
+  <div class="drug-hero"><span class="cls">영양제 성분</span><h1>${esc(s.name)}</h1><div class="en">${esc(s.en || '')} ${evTag(s.evidence)}</div>${s.role ? `<p class="supp-role">${fmt(s.role)}</p>` : ''}</div>
+  ${nd ? whoPick(w) : ''}
+  ${suppFoods(s, nd)}
+  <section class="sec card sq"><h2 class="sq-h"><span class="qn" aria-hidden="true">${s.foods ? 2 : 1}</span>뭐에 좋아요?</h2>
+  ${s.plain ? `<div class="vrow2 yes"><b>도움 돼요</b><p>${fmt(s.plain.who)}</p></div><div class="vrow2 no"><b>도움 안 돼요</b><p>${fmt(s.plain.no)}</p></div>` : `<p class="sq-p">${fmt(s.lead || s.for || '')}</p>`}
   ${s.plain && (s.lead || s.evidenceNote) ? `<details class="acc" style="margin-top:12px"><summary>근거를 자세히<small>숫자와 시험 이름까지</small>${I.chev}</summary><div class="bd">
     ${s.lead ? `<p>${fmt(s.lead)}</p>` : ''}${s.evidenceNote ? `<p style="margin-top:10px">${fmt(s.evidenceNote)}</p>` : ''}</div></details>`
-   : (s.evidenceNote ? `<section class="sec card"><h2>어디까지 입증됐나</h2><p>${fmt(s.evidenceNote)}</p></section>` : '')}
+   : (s.evidenceNote ? `<details class="acc" style="margin-top:12px"><summary>어디까지 입증됐나${I.chev}</summary><div class="bd"><p>${fmt(s.evidenceNote)}</p></div></details>` : '')}
+  </section>
+  ${s.dose || nd ? `<section class="sec card sq"><h2 class="sq-h"><span class="qn" aria-hidden="true">${s.foods ? 3 : 2}</span>하루에 얼마나?</h2>
+    ${nd ? suppNeed(s, nd, w) : ''}
+    ${s.dose ? `<h3 class="sq-h3">영양제로 드신다면</h3><div class="kv" style="margin-top:8px"><div><small>흔히 쓰는 양</small><b>${fmt(s.dose.typical || '—')}</b></div><div><small>하루 상한</small><b>${fmt(s.dose.ul || '—')}</b></div></div>${s.dose.kr ? `<p class="small muted" style="margin-top:10px">${fmt(s.dose.kr)}</p>` : ''}${/확인 필요/.test(JSON.stringify(s.dose)) ? `<p class="small muted" style="margin-top:8px">「확인 필요」는 공식 문서 원문을 아직 확인하지 못했다는 뜻이에요. 라벨과 약사 안내를 따르세요.</p>` : ''}` : ''}
+    ${s.plain?.watch || s.timing ? `<h3 class="sq-h3">언제, 어떻게</h3>${s.plain?.watch ? `<p class="sq-p">${fmt(s.plain.watch)}</p>` : ''}${s.timing ? `<p class="sq-p">${fmt(s.timing)}</p>` : ''}` : ''}
+  </section>` : ''}
+  ${s.cautions?.length ? `<section class="sec card"><h2>이것만 조심</h2>${list(s.cautions, 'plain x')}</section>` : ''}
+  ${s.forms?.length || s.label?.length || s.calc || s.priceTip ? `<details class="acc pick-more"><summary>제품 고를 때<small>${[s.forms?.length && '제형', s.label?.length && '라벨', s.calc && '함량 계산', s.priceTip && '가격'].filter(Boolean).join(' · ')}</small>${I.chev}</summary><div class="bd">
   ${s.forms?.length ? `<section class="sec card"><h2>제형별 차이 <small>흡수·부작용</small></h2><div class="scroll-x"><table class="cmp"><thead><tr><th>제형</th><th>흡수</th><th>특징</th></tr></thead><tbody>${s.forms.map(f => `<tr><td>${esc(f.name)}</td><td>${esc(f.bio || '—')}</td><td>${fmt(f.note || '')}</td></tr>`).join('')}</tbody></table></div></section>` : ''}
-  ${s.dose ? `<section class="sec card"><h2>얼마나</h2><div class="kv"><div><small>하루 권장 범위</small><b>${fmt(s.dose.typical || '—')}</b></div><div><small>하루 상한</small><b>${fmt(s.dose.ul || '—')}</b></div></div>${s.dose.kr ? `<p class="small muted" style="margin-top:10px">${fmt(s.dose.kr)}</p>` : ''}${/확인 필요/.test(JSON.stringify(s.dose)) ? `<p class="small muted" style="margin-top:8px">「확인 필요」는 공식 문서 원문을 아직 확인하지 못했다는 뜻이에요. 라벨과 약사 안내를 따르세요.</p>` : ''}</section>` : ''}
+  ${s.label?.length ? `<section class="sec card"><h2>라벨에서 볼 것</h2>${list(s.label, 'steps')}</section>` : ''}
   ${s.calc ? `<section class="sec card"><h2>내 제품 계산해 보기 <small>유효용량 대비 %</small></h2><p class="small muted" style="margin-top:4px">라벨의 1회 함량과 가격을 넣으면 임상 유효용량 대비 몇 %인지, 유효용량 1회분당 가격이 얼마인지 보여드려요.</p>
     <div class="calc"><label>1회 함량 (${esc(s.calc.unit)})<input type="number" inputmode="decimal" id="c-amt" placeholder="예: ${esc(String(s.calc.typical))}"></label><label>1회 분량 (정·포)<input type="number" inputmode="numeric" id="c-per" value="1"></label><label>제품 가격 (원)<input type="number" inputmode="numeric" id="c-price" placeholder="예: 25000"></label><label>총 개수 (정·포)<input type="number" inputmode="numeric" id="c-n" placeholder="예: 90"></label></div>
     <div class="calc-out"><div><small>유효용량 대비</small><b id="c-pct">—</b><span class="small muted">기준 ${esc(String(s.calc.typical))} ${esc(s.calc.unit)}${s.calc.note ? ' · ' + esc(s.calc.note) : ''}</span></div><div><small>유효용량 1회분 가격</small><b id="c-won">—</b><span class="small muted">낮을수록 경제적</span></div></div>
     <p class="small muted" style="margin-top:8px">${esc(s.calc.caveat || '상한(UL)을 넘는 함량은 “많을수록 좋다”가 아니에요. 100%를 넘으면 과량 여부를 확인하세요.')}</p></section>` : ''}
-  ${s.label?.length ? `<section class="sec card"><h2>라벨에서 볼 것</h2>${list(s.label, 'steps')}</section>` : ''}
-  ${s.timing ? `<section class="sec card"><h2>언제, 어떻게</h2><p>${fmt(s.timing)}</p></section>` : ''}
-  ${s.cautions?.length ? `<section class="sec card"><h2>주의</h2>${list(s.cautions, 'plain x')}</section>` : ''}
   ${s.priceTip ? `<section class="sec card"><h2>가격 비교는 이렇게</h2><p>${fmt(s.priceTip)}</p></section>` : ''}
+  </div></details>` : ''}
   ${s.faq?.length ? `<section class="sec card"><h2>자주 묻는 질문</h2>${faqList(s.faq)}</section>` : ''}
   ${(() => { /* 비타민·미네랄은 「약」으로도 팔린다 — 같은 성분이 든 일반의약품을 이어 준다 */
     if (!PUB.index) { pubIndex().then(route); return ''; }   /* 아직 안 왔으면 받아 두고 다시 그린다 */

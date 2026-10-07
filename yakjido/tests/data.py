@@ -242,6 +242,28 @@ for _x in SUP:
             if abs(_v - _edge) > 0.01:
                 fails.append(f'영양제 {_x["id"]} — 계산기는 {_edge:g} mg 에서 경계인데 설명은 «{_v:g} mg 이 상한»이라고 합니다')
 
+# ── 영양제 「어떤 음식에 많아요?·하루에 얼마나?」 칸 (2026-10-07) ─────────────
+# 음식 함량은 국가표준식품성분표 × 1회 분량, 필요량은 2025 한국인 영양소 섭취기준. 출처가 끊기거나
+# 나이 칸(19~29·30~49·50~64·65~74·75 이상 5칸)이 어긋나면 화면이 엉뚱한 사람의 숫자를 보여 준다.
+for _x in SUP:
+    _fd = _x.get('foods')
+    if _fd:
+        src_ok('영양제 ' + _x['id'] + ' 음식', _fd.get('src'))
+        if not _fd.get('none'):
+            if not _fd.get('u') or not _fd.get('items'): fails.append(f'영양제 {_x["id"]} 음식 칸에 단위나 음식이 없습니다')
+            for _it in _fd.get('items') or []:
+                if not (_it.get('n') and _it.get('s') and isinstance(_it.get('a'), (int, float)) and _it['a'] > 0):
+                    fails.append(f'영양제 {_x["id"]} 음식 {_it} — 이름·분량·함량 중 빠진 것이 있습니다')
+    _nd = _x.get('need')
+    for _n in [_nd, (_nd or {}).get('b6')]:
+        if not _n: continue
+        if len(_n.get('m') or []) != 5 or len(_n.get('f') or []) != 5: fails.append(f'영양제 {_x["id"]} 필요량 — 남녀 각 5칸(나이대)이어야 합니다')
+        _ul = _n.get('ul')
+        if isinstance(_ul, dict) and (len(_ul.get('m') or []) != 5 or len(_ul.get('f') or []) != 5): fails.append(f'영양제 {_x["id"]} 상한 — 남녀 각 5칸이어야 합니다')
+    if _nd and isinstance(_nd.get('ul'), (int, float)):
+        _txt = json.dumps(_x.get('dose') or {}, ensure_ascii=False).replace(',', '')
+        if f'{_nd["ul"]:g}' not in _txt: fails.append(f'영양제 {_x["id"]} — 필요량 칸 상한 {_nd["ul"]:g} 이 「얼마나」 글에 없습니다(두 숫자가 다를 수 있음)')
+
 # ── 첫 화면이 가벼운지 — 어르신은 데이터가 느린 곳에서 여신다 ──────────────
 # 본문을 data/core.json 으로 뺀 뒤 첫 내려받기가 1.47 MB → 0.5 MB 가 됐다(v84).
 # 다시 통째로 심는 실수를 하면 여기서 걸린다.

@@ -869,11 +869,32 @@ def main():
             _o = pg.evaluate(OVERFLOW_JS)
             if _o['clip'] or _o['ov']: fails.append(f'사진이 뜨면 제품 칸 글자가 잘립니다 {_r}: {_o["clip"][:2]}{_o["ov"][:2]}')
         pg.unroute('**/*', _fake)
+        # 9b. 영양제 화면 — 질문 세 개(음식 → 효과 → 하루에 얼마나)가 위, 제형·계산기는 「제품 고를 때」 접힌 칸(2026-10-07)
+        pg.evaluate("localStorage.setItem('yakjido.me.v1',JSON.stringify({...JSON.parse(localStorage.getItem('yakjido.me.v1')||'{}'),sw:{s:'f',a:3}}))")
+        pg.goto(url + '#/supp/iron'); pg.reload(); ready(); pg.wait_for_timeout(900)
+        _sv = pg.evaluate("""()=>{const v=document.getElementById('view');const hs=[...v.querySelectorAll('h2.sq-h')].map(h=>h.textContent.replace(/^\\d/,''));
+          const forms=[...v.querySelectorAll('table.cmp')].map(t=>!!t.closest('details:not([open])'));const dn=v.querySelector('.dose2 .dn')?.textContent||'';
+          const fd=v.querySelectorAll('.fds .fd').length;return {hs,forms,dn,fd}}""")
+        if _sv['hs'][:3] != ['어떤 음식에 많아요?', '뭐에 좋아요?', '하루에 얼마나?']: fails.append(f'영양제 화면 질문 순서가 다릅니다: {_sv["hs"]}')
+        if not _sv['forms'] or not all(_sv['forms']): fails.append('철분 제형 표가 「제품 고를 때」 접힌 칸 밖에 나와 있습니다')
+        if not _sv['dn'].startswith('6') or _sv['fd'] < 5: fails.append(f'65~74세 여자 철분 하루 필요량(6 mg)·음식 칸이 아닙니다: {_sv}')
+        _y0 = pg.evaluate("()=>{const b=[...document.querySelectorAll('.who-seg button')].find(x=>x.textContent==='남자');b.scrollIntoView();window.scrollBy(0,-100);return Math.round(scrollY)}")
+        pg.click('.who-seg button:text-is("남자")'); pg.wait_for_timeout(400)
+        _sm = pg.evaluate("()=>({dn:document.querySelector('.dose2 .dn')?.textContent||'',y:Math.round(scrollY)})")
+        if not _sm['dn'].startswith('8'): fails.append(f'남자를 고르면 철분 필요량이 8 mg이어야 합니다: {_sm}')
+        if abs(_sm['y'] - _y0) > 40: fails.append(f'누구 기준을 고르면 화면이 튑니다: {_y0}→{_sm["y"]}')
+        pg.evaluate("()=>{document.querySelector('details.pick-more').open=true}")
+        pg.fill('#c-amt', '60'); pg.wait_for_timeout(200)
+        if pg.inner_text('#c-pct').strip() != '100%': fails.append(f'접힌 칸 안 함량 계산기가 듣지 않습니다: {pg.inner_text("#c-pct")}')
+        for _r in ['/supp/coq10', '/supp/lutein', '/supp/multi']:
+            pg.goto(url + '#' + _r); pg.reload(); ready(); pg.wait_for_timeout(600)
+            _o = pg.evaluate(OVERFLOW_JS)
+            if _o['clip'] or _o['ov'] or _o['len'] < 40: fails.append(f'영양제 화면 {_r}: 넘침·잘림·빈 화면 {_o["clip"][:1]}{_o["ov"][:1]}')
         br.close()
     print(f'화면 {len(routes)}개 검사 완료')
     if fails:
         print('실패', len(fails)); [print('  ✗', f) for f in fails]; sys.exit(1)
-    print('✓ 전부 통과 — JS 오류 0 · 넘침 0 · 잘림 0 · 명암비 AA · 조작 부품 3:1 · 44px · 단추 누르기 · 복용 간격 · 복약 달력 · 홈 오늘약 · 어르신 소염제 · 소아 한도 · 계열 경고 · 어근 오인 · 내 정보 칸 · 화면 밝기 · 아이콘 전수 · 약 알림 · 어르신 모드 · 320px · 병용 8건 · 겹침 규칙 53 · 입력칸 이름표 · 성분 해석 123 · 죽은 규칙 0 · 약통 판정 4건 · 자기중복 3건 · 바구니 겹침 · 이중계산 0 · 검색 8건 · 구어 30건 · 문장 16건 · 새 약 검색 12건 · 하루 최대 표기 · 먹는/바르는 구분')
+    print('✓ 전부 통과 — JS 오류 0 · 넘침 0 · 잘림 0 · 명암비 AA · 조작 부품 3:1 · 44px · 단추 누르기 · 복용 간격 · 복약 달력 · 홈 오늘약 · 어르신 소염제 · 소아 한도 · 계열 경고 · 어근 오인 · 내 정보 칸 · 화면 밝기 · 아이콘 전수 · 약 알림 · 어르신 모드 · 320px · 병용 8건 · 겹침 규칙 53 · 입력칸 이름표 · 성분 해석 123 · 죽은 규칙 0 · 약통 판정 4건 · 자기중복 3건 · 바구니 겹침 · 이중계산 0 · 검색 8건 · 구어 30건 · 문장 16건 · 새 약 검색 12건 · 하루 최대 표기 · 먹는/바르는 구분 · 영양제 질문 순서')
 
 if __name__ == '__main__':
     main()
