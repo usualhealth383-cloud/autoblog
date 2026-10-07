@@ -75,6 +75,9 @@ async def main():
         await s.click('[data-lf="전체"]'); await s.wait_for_timeout(200); assert await s.locator('.row.locked').count() == 0, '수강생인데 잠긴 개념'
         # 내 정보 · 프로필 수정 · 로그아웃
         await s.click('.tab[data-v="me"]'); await s.wait_for_timeout(200); assert '학원 수강생' in await txt(s, '.badge'); await shot(s, 'l09_me')
+        await s.click('#guardSee'); await s.wait_for_timeout(300); g = await s.inner_text('.sheet')   # 보호자에게 보이는 것(2026-10-07)
+        assert '보호자에게 보이는 것' in g and '보이지 않는 것' in g and '공부 노트' in g and '이번 주 요약' in g and '/7일' in g.replace('\n', ''), g
+        await shot(s, 'l09b_guardsee'); await s.click('#sheetClose'); await s.wait_for_timeout(200)
         await s.click('#editProfile'); await s.fill('#epPhone', '01011112222'); await s.click('#epSave'); await s.wait_for_timeout(200); assert await s.evaluate('ACC.phone') == '01011112222'
         await s.click('#logout'); await s.wait_for_timeout(300); assert await s.evaluate('view') == 'auth' and await s.evaluate('ACC') is None
         # 다시 로그인 → 진도 유지

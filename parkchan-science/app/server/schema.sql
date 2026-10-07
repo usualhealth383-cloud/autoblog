@@ -286,6 +286,7 @@ alter table profiles add column if not exists first_ok_at timestamptz;          
 alter table profiles add column if not exists guard_talk text check (guard_talk in ('write','all'));
 alter table profiles add column if not exists guard_by   uuid references auth.users(id) on delete set null;
 alter table profiles add column if not exists guard_at   timestamptz;
+alter table profiles add column if not exists weekly_off boolean not null default false;   -- 보호자가 '일요일 주간 요약 알림'을 끔(2026-10-07)
 
 -- 밤(22~07시) 동안 미룬 댓글 알림 — 아침 7시에 '밤사이 새 댓글이 있어요'로 한 번 보내고 지운다(push 함수 · 서비스 키 전용)
 create table if not exists push_later (
@@ -1177,7 +1178,7 @@ create or replace function weekly_digest() returns table(token text, uid uuid, c
 language sql stable security definer set search_path = public as $$
   with wk as (select kst_today() - (extract(isodow from kst_today())::int - 1) as mon),
   kids as (select g.uid, s.code, s.name from guardian_links g join students s on s.code = g.code join profiles p on p.id = g.uid
-            where g.approved and p.role = 'parent' and s.until >= kst_today())
+            where g.approved and p.role = 'parent' and not p.weekly_off and s.until >= kst_today())   -- 알림을 끈 보호자는 빼고
   select t.token, k.uid, k.code, k.name,
     (select count(distinct d)::int from progress pr, jsonb_array_elements_text(case when jsonb_typeof(pr.state->'days') = 'array' then pr.state->'days' else '[]'::jsonb end) d, wk
       where pr.code = k.code and d ~ '^\d{4}-\d\d-\d\d$' and d::date between wk.mon and wk.mon + 6),
@@ -1232,7 +1233,7 @@ grant execute on function grant_purchase(uuid, text, text, text, int, jsonb), re
 
 revoke insert, update on profiles from anon, authenticated;
 grant insert (id, role, name, phone, under14, guardian, terms_ver) on profiles to authenticated;   -- 트리거가 못 만든 옛 계정 대비
-grant update (name, phone, nick) on profiles to authenticated;
+grant update (name, phone, nick, weekly_off) on profiles to authenticated;   -- weekly_off: 보호자 주간 요약 알림 끄기(본인 줄만 — 아래 profiles 고치기 정책)
 
 revoke select, insert, update on posts, comments from anon, authenticated;
 grant select (id, author, nick, board, title, body, attach, likes, report_n, comment_n, staff, solved, deleted, at, edited, care, review, review_why) on posts to authenticated;

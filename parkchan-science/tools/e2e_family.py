@@ -185,6 +185,12 @@ async def weekly():
             assert len(ag) == 2 and 'I-02' in ag[0] and '다시 볼 문제 3' in ag[0] and 'I-01' in ag[1], ag
             assert all(x not in w for x in ('연속', '순위', '평균', '등수', '반에서')) and '견주지 않고' in w, w
             await pg.wait_for_timeout(2500); await pg.locator('#weekSum').screenshot(path=f'{SC}/w01_week_{color}.png'); shots.append(color)
+            if color == 'light':   # 주간 요약 알림 끄기·켜기(2026-10-07) — 보호자 본인 설정, 서버에 남는다
+                assert await pg.get_attribute('#wkPush', 'aria-pressed') == 'true'
+                await pg.click('#wkPush'); await pg.wait_for_timeout(900)
+                assert await pg.get_attribute('#wkPush', 'aria-pressed') == 'false' and '끔' in await pg.inner_text('#wkPush')
+                assert await pg.evaluate('DBX.me().then(a => a.weeklyOff)') is True, '끈 설정이 남지 않음'
+                await pg.click('#wkPush'); await pg.wait_for_timeout(900); assert await pg.get_attribute('#wkPush', 'aria-pressed') == 'true'
             await ctx.close()
         assert not errs, errs
         print(('SERVER ' if SRV else 'LOCAL ') + 'WEEKLY SUMMARY E2E OK', shots); await b.close()

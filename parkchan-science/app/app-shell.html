@@ -918,6 +918,7 @@ select.sel{font-family:inherit;font-size:var(--t-small);font-weight:700;color:va
 .lab-list .row .n{background:var(--warn-soft);color:var(--warn)}
 /* 대단원 마무리 · 실전 모의고사 · 시험처럼(2026-10) — 손가락 목표 44px 이상, 조용한 색 */
 .tgl{display:flex;align-items:center;gap:10px;min-height:44px;width:100%;margin-top:10px;padding:0 12px;border:1px solid var(--line);border-radius:var(--r-m);background:var(--card);color:var(--body);font-family:inherit;font-size:var(--t-small);font-weight:700;cursor:pointer;text-align:left}
+.gsee h2{margin-top:6px}.gsee .gl{margin:4px 0 12px;padding-left:18px;font-size:var(--t-small);line-height:1.75;color:var(--body);word-break:keep-all}.gsee .gl.no{color:var(--muted)}
 .tgl .sw{position:relative;flex:0 0 36px;height:20px;border-radius:var(--r-pill);background:var(--line);transition:background-color .15s ease}
 .tgl .sw::after{content:'';position:absolute;left:3px;top:3px;width:14px;height:14px;border-radius:50%;background:var(--card);transition:transform .15s ease}
 .tgl[aria-pressed="true"]{border-color:var(--brand-line);color:var(--brand-dark)}
@@ -1877,7 +1878,7 @@ const DB = (() => {
   CLASSES_CACHE = d.classes.slice();
   const w = () => { try { localStorage.setItem(DBKEY, JSON.stringify(d)); } catch {} };
   let sid = null; try { sid = localStorage.getItem('pcs.local.sid'); } catch {}
-  const pub = a => a ? { id:a.id, email:a.email, role:a.role, name:a.name, phone:a.phone||'', studentCode:a.studentCode||'', childCodes:(a.childCodes||[]).slice(), childPending:(a.childPending||[]).slice(), childCode:(a.childCodes||[])[0]||'', passUntil:a.passUntil||'', nick:a.nick||'', under14:!!a.under14, guardian:a.guardian||'', guardianOk:!!a.guardianOk, guardianHow:a.guardianHow||'', guardianAt:a.guardianAt||'', talkUntil:a.talkUntil||'', created:a.created } : null;
+  const pub = a => a ? { weeklyOff:!!a.weeklyOff, id:a.id, email:a.email, role:a.role, name:a.name, phone:a.phone||'', studentCode:a.studentCode||'', childCodes:(a.childCodes||[]).slice(), childPending:(a.childPending||[]).slice(), childCode:(a.childCodes||[])[0]||'', passUntil:a.passUntil||'', nick:a.nick||'', under14:!!a.under14, guardian:a.guardian||'', guardianOk:!!a.guardianOk, guardianHow:a.guardianHow||'', guardianAt:a.guardianAt||'', talkUntil:a.talkUntil||'', created:a.created } : null;
   const me = () => d.accounts.find(a => a.id === sid) || null;
   const nameOf = id => (d.accounts.find(z => z.id === id) || {}).name || '';
   const stateOf = code => d.progress[code] || null;
@@ -1903,7 +1904,7 @@ const DB = (() => {
     },
     signOut: async () => { sid = null; try { localStorage.removeItem('pcs.local.sid'); } catch {} },
     resetPassword: async email => { const a = d.accounts.find(x => x.email === email.trim().toLowerCase()); if (!a) throw new Error('가입되지 않은 이메일입니다.'); return { ok:true, note:'로컬 모드에서는 메일이 가지 않습니다. 서버 모드에서는 재설정 메일이 발송됩니다.' }; },
-    updateMe: async patch => { const a = me(); if (!a) throw new Error('로그인이 필요합니다.'); ['name','phone','nick'].forEach(k => { if (k in patch) a[k] = patch[k]; }); w(); return pub(a); },
+    updateMe: async patch => { const a = me(); if (!a) throw new Error('로그인이 필요합니다.'); ['name','phone','nick','weeklyOff'].forEach(k => { if (k in patch) a[k] = patch[k]; }); w(); return pub(a); },
     setPassword: async pw => { const a = me(); if (!a) throw new Error('로그인이 필요합니다.'); a.pw = h32(pw); w(); return { ok:true }; },
     /* 서버의 link_code 와 같은 규칙: 틀린 코드 1시간 10번 · 한 코드 한 학생 계정 · 만료 코드 거절 */
     linkCode: async (kind, code) => { const a = me(); if (!a) return { ok:false, why:'로그인이 필요합니다.' };
@@ -2191,7 +2192,7 @@ const DB = (() => {
 const serverDB = () => {
   const notice = (n, reads=[]) => ({ id:n.id, cls:n.cls, t:n.title, d:n.body||'', at:n.at, read: reads.filter(r=>r.notice_id===n.id).map(r=>r.code) });
   const att = a => ({ code:a.code, date:a.date, time:hhmm(a.time), late:!!a.late, manual:!!a.manual });
-  const prof = p => p ? { id:p.id, email:p.email||'', role:p.role, name:p.name, phone:p.phone||'', studentCode:p.student_code||'', childCodes:(p._children||[]).slice(), childPending:(p._pending||[]).slice(), childCode:(p._children||[])[0]||'', passUntil:p.pass_until||'', nick:p.nick||'', under14:!!p.under14, guardian:p.guardian||'', guardianOk:!!p.guardian_ok, guardianHow:p.guardian_how||'', guardianAt:p.guardian_at||'', created:p.created_at } : null;
+  const prof = p => p ? { weeklyOff:!!p.weekly_off, id:p.id, email:p.email||'', role:p.role, name:p.name, phone:p.phone||'', studentCode:p.student_code||'', childCodes:(p._children||[]).slice(), childPending:(p._pending||[]).slice(), childCode:(p._children||[])[0]||'', passUntil:p.pass_until||'', nick:p.nick||'', under14:!!p.under14, guardian:p.guardian||'', guardianOk:!!p.guardian_ok, guardianHow:p.guardian_how||'', guardianAt:p.guardian_at||'', created:p.created_at } : null;
   let attCache = null, meCache = null;
   const myProfile = async () => { if (!SESSION) return null; const r = await api(`/rest/v1/profiles?id=eq.${SESSION.user.id}&select=*`);
     if (!r.length){ meCache = null; return null; }
@@ -2227,7 +2228,7 @@ const serverDB = () => {
     /* 메일 링크로 돌아왔을 때(#access_token=…) 세션을 받는다 */
     linkUser: async at => { const r = await fetchT(SRV.url + '/auth/v1/user', { headers:{ apikey:SRV.key, Authorization:'Bearer '+at } }); if (!r.ok) throw new Error('링크가 만료되었습니다. 다시 요청해 주세요.'); return r.json(); },
     adoptSession: async (at, rt, u) => { u = u || await DBX.linkUser(at); SESSION = { access_token:at, refresh_token:rt, user:{ id:u.id, email:u.email } }; saveSession(); meCache = null; return myProfile(); },
-    updateMe: async patch => { const b = {}; if ('name' in patch) b.name = patch.name; if ('phone' in patch) b.phone = patch.phone; if ('nick' in patch) b.nick = patch.nick;
+    updateMe: async patch => { const b = {}; if ('name' in patch) b.name = patch.name; if ('phone' in patch) b.phone = patch.phone; if ('nick' in patch) b.nick = patch.nick; if ('weeklyOff' in patch) b.weekly_off = !!patch.weeklyOff;
       await api(`/rest/v1/profiles?id=eq.${SESSION.user.id}`, { method:'PATCH', prefer:'return=minimal', body:b }); return myProfile(); },
     /* 학원 코드·자녀 연결은 서버 함수 한 곳에서만(틀린 코드 제한 · 한 코드 한 학생 계정) */
     unlinkChild: async code => { await api('/rest/v1/rpc/unlink_child', { method:'POST', body:{ p_code: code } }); meCache = null; },
@@ -4906,6 +4907,7 @@ function renderMe(){
     <button class="setrow go" id="goHelp"><span class="l">마음이 힘들 때<small>24시간 상담 109 · 청소년 상담 1388</small></span><span class="v">보기</span></button>
     <button class="setrow go" id="goNoteMe"><span class="l">공부 노트 · 달력<small>${liveNotes().length ? `노트 ${liveNotes().length}개 · 나만 봅니다` : '오늘 공부한 내용을 정리하는 나만의 메모장'}</small></span><span class="v">열기</span></button>
     <button class="setrow go" id="goStats"><span class="l">학습 통계<small>이번 주 ${weekCount(S.days)}일 · 공부한 개념 ${S.done.length}/${CONCEPTS.length} · 정답률 ${S.stats.a?Math.round(S.stats.c/S.stats.a*100):0}%</small></span><span class="v">보기</span></button>
+    ${a && ACC && ACC.role === 'student' ? `<button class="setrow go" id="guardSee"><span class="l">보호자에게 보이는 것<small>학원이 확인한 보호자 화면 · 미리 보기</small></span><span class="v">보기</span></button>` : ''}
     <button class="setrow go" id="qKeepOpen"><span class="l">보관한 한 마디<small>${(S.qkeep||[]).length}개 · 오늘의 한 마디에서 담은 글</small></span><span class="v">보기</span></button>
     ${pauseNote()}
     <div class="sec"><h2>설정</h2>
@@ -5051,6 +5053,8 @@ async function renderParent(){
       <div class="pstat"><div><b>${weekCount(days)}<small>/7일</small></b><span>공부한 날</span></div><div><b>${wsum.concepts}<small>개</small></b><span>공부한 개념</span></div><div><b>${wsum.solved}<small>문제</small></b><span>푼 문제</span></div></div>
       <p class="fine" style="text-align:left;padding:8px 2px 2px">칸이 채워진 날은 앱으로 공부한 날, 아래 점은 학원에 출석한 날입니다.</p>
       ${weekSumRows(wsum)}
+      <button class="tgl" id="wkPush" aria-pressed="${!(ACC && ACC.weeklyOff)}"><span class="sw" aria-hidden="true"></span><span>일요일 저녁 7시 이번 주 요약 알림 ${ACC && ACC.weeklyOff ? '끔' : '켬'}</span></button>
+      <p class="fine" style="text-align:left;padding:6px 2px 0">앱(안드로이드)에서 알림을 허용했을 때만 옵니다. 꺼도 이 화면의 요약은 그대로 볼 수 있어요.</p>
       ${acad.length ? `<div class="pnext">${acad.map(e => `<div class="kv"><span class="k">${kdate(e.date)} ${WD[wdOf(e.date)]}</span><span class="v">${esc(e.title)} <b style="color:${dLeft(e.date)<=3?'var(--no)':'var(--brand-dark)'}">${ddayText(dLeft(e.date))}</b></span></div>`).join('')}</div>` : ''}</div>
     <div class="sec"><h2>이달 출석</h2>${month.length ? month.map(a=>`<div class="kv"><span class="k">${kdate(a.date)}</span><span class="v" style="color:${a.late?'var(--warn)':'var(--u)'}">${a.time} ${a.late?'지각':'출석'}${a.manual?' (수동)':''}</span></div>`).join('') : `<p class="fine" style="text-align:left;padding:0">이달 출석 기록이 아직 없습니다.</p>`}</div>
     <div class="sec"><h2>학원 공지 · ${esc(st.cls)}</h2>${ns.length ? ns.slice(0,5).map(n=>`<div class="kv" style="flex-direction:column;align-items:flex-start;gap:2px"><span class="v">${esc(n.t)}</span><span class="k">${kAt(n.at)} · ${esc(n.cls)}${n.d?` · ${esc(n.d)}`:''}</span></div>`).join('') : `<p class="fine" style="text-align:left;padding:0">최근 공지가 없습니다.</p>`}</div>
@@ -6159,6 +6163,16 @@ document.addEventListener('click', async e => {
   if (T('#pwSave')){ const a = document.getElementById('pwNew').value||'', b = document.getElementById('pwNew2').value||'', e = document.getElementById('pwErr');
     if (pwProblem(a)){ e.textContent = pwProblem(a); return; } if (a !== b){ e.textContent = '두 비밀번호가 다릅니다.'; return; }
     try { await DBX.setPassword(a); closeSheet(); toast('비밀번호를 바꿨습니다'); } catch (err){ e.textContent = AUTH_KO(err.message); } return; }
+  /* 학생: 보호자 화면에 무엇이 보이는지 미리(2026-10-07) — 보호자 화면(renderParent)과 같은 계산(weekSummary)으로, 내 기록 그대로 */
+  if (T('#guardSee')){ const w = weekSummary(snapshot(), ASG);
+    openSheet(`<h3>보호자에게 보이는 것</h3><p>학원 원장님이 확인한 보호자만 볼 수 있어요. 지금 내 기록이라면 이렇게 보여요.</p>
+      <div class="sec pweek"><h2><span>이번 주 요약</span><span class="wsd">${esc(w.range)}</span></h2>
+        <div class="pstat"><div><b>${weekCount(S.days)}<small>/7일</small></b><span>공부한 날</span></div><div><b>${w.concepts}<small>개</small></b><span>공부한 개념</span></div><div><b>${w.solved}<small>문제</small></b><span>푼 문제</span></div></div>
+        ${weekSumRows(w)}</div>
+      <div class="sec gsee"><h2>보이는 것</h2><ul class="gl"><li>학원 출석(오늘 · 이달 · 지각)</li><li>공부한 날 · 공부한 개념 수 · 푼 문제 수 · 정답률(이번 주와 지난 3주)</li><li>다시 볼 문제가 많은 소단원 이름과 개수</li><li>학원 과제를 냈는지</li><li>학원 공지 · 일정 · 이야기를 켜고 끄는 설정</li></ul>
+        <h2>보이지 않는 것</h2><ul class="gl no"><li>공부 노트와 오늘 기분</li><li>어떤 문제를 틀렸는지(문제 내용)</li><li>이야기에 쓴 글 · 댓글(보호자 화면에 따로 모아 보여 주지 않아요)</li><li>친구와 견준 순위 · 평균</li></ul></div>
+      <button class="btn ghost" id="sheetClose">닫기</button>`); return; }
+  if (T('#wkPush')){ const off = !(ACC && ACC.weeklyOff); try { ACC = await DBX.updateMe({ weeklyOff:off }); } catch (e){ toast(e.message || '바꾸지 못했습니다'); return; } toast(off ? '주간 요약 알림을 껐어요' : '주간 요약 알림을 켰어요'); renderParent(); return; }
   if (T('#epSave')){ const name=(document.getElementById('epName').value||'').trim(), phone=(document.getElementById('epPhone').value||'').trim(); if (!name){ toast('이름을 넣어 주세요'); return; }
     ACC = await DBX.updateMe({ name, phone }); closeSheet(); renderMe(); toast('저장했습니다'); return; }
   const st = T('[data-set]'); if (st){ S[st.dataset.set]=st.dataset.val; save(S); applyPrefs(); renderMe(); return; }

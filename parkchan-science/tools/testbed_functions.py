@@ -242,6 +242,10 @@ def main():
       cur.execute("update guardian_links set approved = false where uid = %s and code = 'PUSH02'", (P1_ID,))
       SENT.clear(); call('POST', '/functions/v1/push', {'action': 'weekly', 'at': SUN + 'T19:00:00+09:00'}, headers=PH)
       check('  └ 확인이 풀린 자녀는 빠짐', sorted(m['data'].get('code') for m in SENT) == ['PUSH01'], [m['data'] for m in SENT])
+      s, _ = call('PATCH', f'/rest/v1/profiles?id=eq.{P1_ID}', {'weekly_off': True}, P1, headers={'Prefer': 'return=minimal'}); check('보호자가 주간 요약 알림을 직접 끔(2026-10-07)', s in (200, 204), s)
+      SENT.clear(); call('POST', '/functions/v1/push', {'action': 'weekly', 'at': SUN + 'T19:00:00+09:00'}, headers=PH)
+      check('  └ 끈 보호자에게는 주간 요약이 가지 않음', not [m for m in SENT if m['token'] == 'tok-par1'], SENT)
+      call('PATCH', f'/rest/v1/profiles?id=eq.{P1_ID}', {'weekly_off': False}, P1, headers={'Prefer': 'return=minimal'})
       print('▸ 과제 알림(2026-10-07) — 새 과제 → 받는 학생 폰 · 마감 전날 저녁 → 아직 안 낸 학생 · 밤에는 보내지 않음')
       TOM = (today + dt.timedelta(days=1)).isoformat()
       r = call('POST', '/rest/v1/rpc/assign_create', {'p_kind': 'bank', 'p_title': '알림 시험 과제', 'p_ref': '1101', 'p_items': ['1101-q1'], 'p_cls': '월목반', 'p_codes': None, 'p_due': TOM}, OWN)[1]; aid2 = r['id']
