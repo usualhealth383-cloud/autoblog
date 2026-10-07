@@ -175,7 +175,7 @@ create table if not exists feedback (
   uid     uuid not null default auth.uid() references auth.users on delete cascade,
   kind    text not null check (kind in ('content','bug','idea','other')),   -- 교재·문제 오류 / 앱 오류 / 제안 / 기타
   body    text not null check (char_length(body) between 2 and 1000),
-  ref     text check (ref is null or ref ~ '^(concept|quiz|bank|lab):[A-Za-z0-9_#.-]{1,60}$'),   -- 어느 개념·문제에서 보냈는지
+  ref     text check (ref is null or ref ~ '^(concept|quiz|bank|lab):[A-Za-z0-9_#.㉠-㉭-]{1,60}$'),   -- 어느 개념·문제에서 보냈는지
   ver     text check (ver is null or char_length(ver) <= 40),
   care    boolean not null default false,                                    -- 힘든 마음이 담긴 글(이야기와 같은 규칙)
   at      timestamptz not null default now(),
@@ -184,7 +184,7 @@ create table if not exists feedback (
 create index if not exists feedback_open on feedback (at desc) where done_at is null;
 -- 어디서 보냈는지에 이야기('talk:appeal' — 이용 제한을 다시 봐 달라는 요청)도
 alter table feedback drop constraint if exists feedback_ref_check;
-alter table feedback add constraint feedback_ref_check check (ref is null or ref ~ '^(concept|quiz|bank|lab|talk):[A-Za-z0-9_#.-]{1,60}$');
+alter table feedback add constraint feedback_ref_check check (ref is null or ref ~ '^(concept|quiz|bank|lab|talk):[A-Za-z0-9_#.㉠-㉭-]{1,60}$');
 create or replace function private.feedback_guard() returns trigger language plpgsql security definer set search_path = public, private as $$
 begin
   new.uid := auth.uid(); new.at := now(); new.done_at := null; new.care := private.care_hit(new.body);
@@ -1099,7 +1099,8 @@ begin
   if not is_owner() then raise exception 'owner only' using errcode = '42501'; end if;
   if p_kind is null or p_kind not in ('bank','unit','mock','read') then return json_build_object('ok', false, 'why', '과제 종류를 골라 주세요.'); end if;
   if char_length(t) < 1 or char_length(t) > 80 then return json_build_object('ok', false, 'why', '과제 이름을 확인해 주세요.'); end if;
-  it := array(select x from (select x, min(o) as o from unnest(coalesce(p_items, '{}')) with ordinality u(x, o) where x ~ '^[A-Za-z0-9_:#.-]{1,40}$' group by x) z order by o);   -- 순서는 그대로 · 같은 문항은 한 번
+  -- 문항 id 에 ㉠㉡㉢이 든 것('빈칸에 들어갈 말은?' 선다형 298문항)도 받는다(2026-10-07 7일 점검 B1)
+  it := array(select x from (select x, min(o) as o from unnest(coalesce(p_items, '{}')) with ordinality u(x, o) where x ~ '^[A-Za-z0-9_:#.㉠-㉭-]{1,40}$' group by x) z order by o);   -- 순서는 그대로 · 같은 문항은 한 번
   if cardinality(it) < 1 or cardinality(it) > 40 then return json_build_object('ok', false, 'why', '문항은 1~40개로 내 주세요.'); end if;
   if p_due is null or p_due < kst_today() or p_due > kst_today() + 60 then return json_build_object('ok', false, 'why', '마감일은 오늘부터 60일 안으로 골라 주세요.'); end if;
   if coalesce(p_cls, '') <> '' then cs := array(select code from students where (p_cls = '전체' or cls = p_cls) and until >= kst_today() order by code);

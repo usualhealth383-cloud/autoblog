@@ -4484,7 +4484,7 @@ const NTPL = {
     { k:'다음엔 이렇게', ph:() => '비슷한 문제를 만나면 먼저 볼 것 (선택)' } ] },
   free: { name:'자유', sub:'제목 · 내용', f:[] } };
 const NTPL_KEYS = ['line3', 'cornell', 'mix', 'free'], MEMO = '메모';
-const NMOOD = [['proud','뿌듯'], ['calm','차분'], ['meh','그럭저럭'], ['tired','지침'], ['stuck','막막']];
+const NMOOD = [['proud','뿌듯'], ['calm','편안'], ['meh','그럭저럭'], ['tired','피곤'], ['stuck','어려움']];   // 2026-10-07 원장님: 더 부드럽게(저장 값은 그대로 — 옛 노트도 새 이름으로 보인다)
 const NGRASP = ['', '아직 흐려요', '반쯤 잡혔어요', '설명할 수 있어요'];
 const isTpl = t => !!NTPL[t] && t !== 'free';
 const tplOf = n => isTpl(n && n.tpl) ? n.tpl : 'free';
@@ -5083,7 +5083,7 @@ let asgF = { kind:'bank', lesson:'', type:'전체', diff:'전체', n:10, unit:''
 const ASG_DIFF = [['전체','난이도 전체'],['●○○','기본'],['●●○','실력'],['●●●','도전']];
 /* 과제에 담을 수 있는 문항 id — 서버 assign_create(와 로컬 흉내)가 이 꼴만 받아 '빈칸에 들어갈 말은?'(id 에 ㉠㉡㉢) 문항을 조용히 빼,
    제목은 '문제 5개'인데 학생에게 2문항만 가던 것(2026-10-07 7일 사용 점검). 서버 정규식을 넓히기 전까지는 고를 때부터 뺀다 */
-const ASG_ID = /^[A-Za-z0-9_:#.-]{1,40}$/;
+const ASG_ID = /^[A-Za-z0-9_:#.㉠-㉭-]{1,40}$/;   // 서버(assign_create)와 같은 규칙 — ㉠㉡㉢ 든 빈칸 선다형 id 도 받는다
 const asgPool = f => BANK.filter(q => ASG_ID.test(q.id) && q.lessonId === f.lesson && !isUM(q) && q.type !== 'essay' && (f.type === '전체' || q.type === f.type) && (f.diff === '전체' || String(q.difficulty||'').startsWith(f.diff)));
 const lessonName = id => { const L = LESSONS.find(l => l.id === id); return L ? `${L.unit}-${L.id.slice(2)} ${L.name}` : id; };
 function asgGrab(){ const g = id => document.getElementById(id); if (!g('asgForm')) return;

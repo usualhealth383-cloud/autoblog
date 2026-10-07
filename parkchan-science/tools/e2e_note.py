@@ -111,7 +111,7 @@ async def main():
         assert got and got[0] == 'cornell' and got[1] == 'calm' and got[2] == 1 and f'( {k2} )' in got[3] and got[4] == f1, f'다시 열었더니 쓰던 노트가 다름: {got}'
         assert got[5].startswith('질문\n'), '틀 노트의 본문(검색·내보내기용)이 칸 이름으로 이어지지 않음'
         await s.evaluate("openNotes('today', todayISO())"); await s.wait_for_timeout(400)
-        assert await s.locator('.ncard.t-cornell').count() == 1 and '마음 · 차분' in await s.inner_text('.ncard.t-cornell'), '코넬 카드·마음이 안 보임'
+        assert await s.locator('.ncard.t-cornell').count() == 1 and '마음 · 편안' in await s.inner_text('.ncard.t-cornell'), '코넬 카드·마음이 안 보임'
         assert await s.locator('.ncard.t-cornell .ngr i.on').count() == 1
         await layout_ok(s, '노트 목록')
         # 다른 날(어제)에 개인 메모 — 마지막에 고른 틀(코넬)이 기본이므로 자유로
@@ -208,7 +208,7 @@ async def main():
         await s.screenshot(path=f'{SC}/n05_today_card.png')
         # 내보내기에 틀·마음·이해가 들어간다
         ex = await s.evaluate("liveNotes().map(n => ({ 틀:NTPL[tplOf(n)].name, 마음:moodName(n.mood), 이해:NGRASP[n.grasp||0] }))")
-        assert any(e['틀'] == '코넬 노트' and e['마음'] == '차분' and e['이해'] == '아직 흐려요' for e in ex), ex
+        assert any(e['틀'] == '코넬 노트' and e['마음'] == '편안' and e['이해'] == '아직 흐려요' for e in ex), ex
 
         if SERVER:
             tok = await s.evaluate('SESSION.access_token')

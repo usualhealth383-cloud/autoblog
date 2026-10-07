@@ -299,6 +299,9 @@ print('▸ 의견 보내기 · 교재 오류 신고')
 FBP = 'return=minimal'
 F1, F1_ID = signup('fb1@test.kr', '의견하나'); F2, F2_ID = signup('fb2@test.kr', '의견둘')
 s, _ = call('POST', '/rest/v1/feedback', {'kind': 'content', 'body': '해설 단위가 틀린 것 같아요', 'ref': 'concept:1101-01', 'ver': '1.0'}, F1, FBP); check('학생이 의견 보냄', s == 201, s)
+F3, F3_ID = signup('fb3@test.kr', '의견셋')   # 아래 목록·도배 제한 시험을 흔들지 않도록 다른 계정으로
+s, _ = call('POST', '/rest/v1/feedback', {'kind': 'content', 'body': '빈칸 선다형 해설 확인', 'ref': 'bank:1101-b1-㉠', 'ver': '1.0'}, F3, FBP); check('  └ ㉠ 든 문항 id 로도 틀린 곳 알리기(B2)', s == 201, s)
+rpc('delete_my_account', {}, F3)
 s, j = call('GET', '/rest/v1/feedback?select=uid,kind,body,care,done_at', tok=F1); check('  └ 보낸 사람은 자기 의견을 봄 · 주인은 서버가 채움', len(j) == 1 and j[0]['uid'] == F1_ID and j[0]['done_at'] is None, j)
 s, j = call('GET', '/rest/v1/feedback?select=id', tok=F2); check('다른 학생은 남의 의견을 못 봄', j == [], j)
 s, _ = call('POST', '/rest/v1/feedback', {'kind': 'bug', 'body': '비로그인 도배'}, None, FBP); check('로그인 안 하면 못 보냄', s in (401, 403), s)
@@ -710,6 +713,9 @@ s, j = mk(OWN, p_cls='없는반'); check('  └ 받을 학생이 없으면 안�
 s, j = mk(OWN, p_cls=None, p_codes=['ASG003', 'NOPE01', 'ASG004'], p_items=['1101-q1', '1101-q1', 'x;drop', '1101-q2'], p_title='화금 개별')
 check('학생을 골라 냄 → 있는·수강 중인 코드만 · 같은 문항 한 번 · 이상한 id 뺌', j.get('ok') and j['target'] == 1, j); A2 = j['id']
 cur.execute('select items, codes, cls from assignments where id = %s', (A2,)); r = cur.fetchone(); check('  └ 저장: 문항 순서 그대로 · 대상 고정 · 반 없음', r == (['1101-q1', '1101-q2'], ['ASG003'], None), r)
+s, j = mk(OWN, p_items=['1101-b1-㉠', '1101-q1'], p_title='빈칸 선다형'); cur.execute('select items from assignments where id = %s', (j.get('id'),)); r = cur.fetchone()
+check("  └ ㉠㉡㉢ 든 빈칸 선다형 id 도 받음(2026-10-07 7일 점검 B1)", j.get('ok') and r and r[0] == ['1101-b1-㉠', '1101-q1'], (j, r))
+if j.get('ok'): rpc('assign_delete', {'p_id': j['id']}, OWN)
 for nm, t in (('원장', OWN), ('학생', SA), ('보호자', PA)):
     s, j = call('GET', '/rest/v1/assignments?select=*', tok=t); s2, j2 = call('GET', '/rest/v1/submissions?select=*', tok=t)
     check(f'  └ 과제·제출 표는 API 로 안 열림({nm})', s >= 400 and s2 >= 400, (s, s2))
