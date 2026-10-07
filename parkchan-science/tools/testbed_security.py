@@ -762,6 +762,8 @@ for nm, t, c in (('확인 전 보호자', PQ, 'ASG001'), ('다른 집 보호자'
 s, j = rpc('child_assignments', {'p_code': 'ASG001'}, ANON); check('  └ 비로그인은 못 부름', s >= 400, s)
 for nm, t in (('원장', OWN), ('학생', SA), ('보호자', PA), ('비로그인', ANON)):
     s, j = rpc('weekly_digest', {}, t); check(f'주간 요약 원본(weekly_digest)은 서비스 키 전용 — {nm} 거절', s >= 400, (s, j))
+    s, j = rpc('asg_due_targets', {}, t); check(f'과제 알림 받을 기기 목록(asg_due_targets)은 서비스 키 전용 — {nm} 거절', s >= 400, (s, j))
+    s, j = rpc('asg_push_targets', {'p_aid': '00000000-0000-0000-0000-000000000000'}, t); check(f'  └ asg_push_targets 도 — {nm} 거절', s >= 400, (s, j))
 for nm, t in (('학생', SA), ('보호자', PA)):
     s, _ = rpc('assign_delete', {'p_id': A1}, t); check(f'  └ {nm}은 과제를 못 지움', s >= 400)
 cur.execute('select count(*) from assignments where id = %s', (A1,)); check('  └ (그대로 있음)', cur.fetchone()[0] == 1)

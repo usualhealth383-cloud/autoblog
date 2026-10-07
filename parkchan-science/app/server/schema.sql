@@ -1193,6 +1193,23 @@ revoke execute on function assign_create(text, text, text, text[], text, text[],
 grant execute on function assign_create(text, text, text, text[], text, text[], date), assign_delete(uuid), assign_list(), assign_report(uuid), my_assignments(),
   assign_save(uuid, int, int, int, text[], boolean), child_assignments(text) to authenticated;   -- 원장 함수는 안에서 원장만 · 학생 함수는 내 코드만 · 보호자 함수는 확인된 자녀만
 revoke execute on function weekly_digest() from public, anon, authenticated; grant execute on function weekly_digest() to service_role;
+-- 과제 알림(2026-10-07, 벤치마크 ★4 남은 것) — 서비스 키 전용(push 함수가 부른다). 학생 본인 기기만(보호자에게는 주간 요약으로 충분)
+create or replace function asg_push_targets(p_aid uuid) returns table(token text, uid uuid)
+language sql stable security definer set search_path = public as $$
+  select t.token, t.uid from assignments a join profiles pr on pr.role = 'student' and pr.student_code = any(a.codes) join push_tokens t on t.uid = pr.id
+   where a.id = p_aid $$;
+-- 마감 전날 저녁: 내일 마감인데 아직 안 낸 과제가 있는 학생 기기 — 기기마다 한 번(과제 수 · 첫 과제 이름)
+create or replace function asg_due_targets() returns table(token text, uid uuid, n int, title text)
+language sql stable security definer set search_path = public as $$
+  select t.token, t.uid, count(distinct a.id)::int, min(a.title)
+    from assignments a cross join unnest(a.codes) c
+    join profiles pr on pr.role = 'student' and pr.student_code = c join push_tokens t on t.uid = pr.id
+   where a.due = kst_today() + 1
+     and not exists (select 1 from submissions s where s.aid = a.id and s.code = c and s.submitted_at is not null)
+   group by t.token, t.uid $$;
+revoke execute on function asg_push_targets(uuid), asg_due_targets() from public, anon, authenticated;
+grant execute on function asg_push_targets(uuid), asg_due_targets() to service_role;
+
 
 -- ═══ 앱 운영 스위치(로그인 없이 읽음) — 새 APK 없이 '업데이트 필요'·'점검 중'을 알린다 ═══
 -- 값은 private.config 에 넣는다: min_version(이보다 낮으면 업데이트해야 씀) · latest_version(권장) · notice(점검·안내 한 줄)

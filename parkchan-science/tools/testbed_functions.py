@@ -242,6 +242,24 @@ def main():
       cur.execute("update guardian_links set approved = false where uid = %s and code = 'PUSH02'", (P1_ID,))
       SENT.clear(); call('POST', '/functions/v1/push', {'action': 'weekly', 'at': SUN + 'T19:00:00+09:00'}, headers=PH)
       check('  └ 확인이 풀린 자녀는 빠짐', sorted(m['data'].get('code') for m in SENT) == ['PUSH01'], [m['data'] for m in SENT])
+      print('▸ 과제 알림(2026-10-07) — 새 과제 → 받는 학생 폰 · 마감 전날 저녁 → 아직 안 낸 학생 · 밤에는 보내지 않음')
+      TOM = (today + dt.timedelta(days=1)).isoformat()
+      r = call('POST', '/rest/v1/rpc/assign_create', {'p_kind': 'bank', 'p_title': '알림 시험 과제', 'p_ref': '1101', 'p_items': ['1101-q1'], 'p_cls': '월목반', 'p_codes': None, 'p_due': TOM}, OWN)[1]; aid2 = r['id']
+      rec = {'id': aid2, 'title': '알림 시험 과제', 'due': TOM}
+      s, j = call('POST', '/functions/v1/push', {'type': 'INSERT', 'table': 'assignments', 'record': {**rec, 'at': today.isoformat() + 'T15:00:00+09:00'}}); check('과제 알림도 웹훅 비밀값 없으면 거절', s == 403, (s, j))
+      SENT.clear(); call('POST', '/functions/v1/push', {'type': 'INSERT', 'table': 'assignments', 'record': {**rec, 'at': today.isoformat() + 'T15:00:00+09:00'}}, headers=PH)
+      check('새 과제 → 받는 반 학생 폰에만(다른 반 학생·보호자·원장은 안 받음)', [m['token'] for m in SENT] == ['tok-stu1'] and SENT[0]['data']['kind'] == 'asg' and '새 과제 · 알림 시험 과제' in SENT[0]['notification']['title'], SENT)
+      SENT.clear(); call('POST', '/functions/v1/push', {'type': 'INSERT', 'table': 'assignments', 'record': {**rec, 'at': today.isoformat() + 'T23:10:00+09:00'}}, headers=PH)
+      check('  └ 밤 23시에 낸 과제는 알리지 않음(아침에 오늘 화면 카드로)', SENT == [], SENT)
+      SENT.clear(); s, j = call('POST', '/functions/v1/push', {'action': 'asgdue', 'at': today.isoformat() + 'T19:00:00+09:00'}, headers=PH)
+      due1 = [m for m in SENT if m['token'] == 'tok-stu1']
+      check('저녁 7시 → 내일 마감인데 아직 안 낸 학생에게 한 번("내일 마감인 과제")', s == 200 and len(due1) == 1 and '내일 마감' in due1[0]['notification']['title'] and '알림 시험 과제' in due1[0]['notification']['body']
+            and all(m['token'] not in ('tok-par1', 'tok-own', 'tok-stu2') for m in SENT), (s, j, SENT))
+      call('POST', '/rest/v1/rpc/assign_save', {'p_id': aid2, 'p_done': 1, 'p_right': 1, 'p_secs': 20, 'p_wrong': [], 'p_submit': True}, S1)
+      SENT.clear(); call('POST', '/functions/v1/push', {'action': 'asgdue', 'at': today.isoformat() + 'T19:00:00+09:00'}, headers=PH)
+      check('  └ 내고 나면 마감 전날 알림이 오지 않음', not [m for m in SENT if m['token'] == 'tok-stu1'], SENT)
+      SENT.clear(); s, j = call('POST', '/functions/v1/push', {'action': 'asgdue', 'at': today.isoformat() + 'T22:30:00+09:00'}, headers=PH)
+      check('  └ 밤에 불리면 보내지 않음', SENT == [] and j.get('skipped') == 'night', (j, SENT))
   finally:
       for p in procs: p.terminate()
 

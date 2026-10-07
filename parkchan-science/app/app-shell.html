@@ -5518,10 +5518,10 @@ async function initPush(){ const PN = plug('PushNotifications'); if (!isNative |
     if (!pushWired){ pushWired = true;
       PN.addListener('registration', t => { pushToken = t.value; DBX.registerPush(t.value, 'android').catch(()=>{}); });
       PN.addListener('pushNotificationActionPerformed', a => { const dd = (a.notification||{}).data||{}, k = dd.kind;
-        if (k==='comment' && dd.post){ postId = dd.post; show('post'); } else { if (k==='weekly' && dd.code) parentSel = dd.code; show(k==='sched' ? 'plan' : home()); } }); }
+        if (k==='comment' && dd.post){ postId = dd.post; show('post'); } else { if (k==='weekly' && dd.code) parentSel = dd.code; show(k==='sched' ? 'plan' : home()); } }); }   // 과제(asg)는 오늘 화면 맨 위 카드로
     let p = await PN.checkPermissions(); if (p.receive === 'prompt' || p.receive === 'prompt-with-rationale') p = await PN.requestPermissions();
     if (p.receive !== 'granted') return;
-    try { await PN.createChannel({ id:'academy', name:'학원 알림', description:'공지 · 일정 · 등원', importance:4 }); } catch {}
+    try { await PN.createChannel({ id:'academy', name:'학원 알림', description:'공지 · 일정 · 등원 · 과제', importance:4 }); } catch {}
     await PN.register();
   } catch {} }
 async function dropPush(){ if (!pushToken || !SRV) return; try { await api(`/rest/v1/push_tokens?token=eq.${encodeURIComponent(pushToken)}`, { method:'DELETE' }); } catch {} pushToken = ''; }

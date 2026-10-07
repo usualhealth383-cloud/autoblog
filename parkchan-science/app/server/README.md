@@ -44,6 +44,7 @@
 4. 배포: `npx supabase functions deploy push --no-verify-jwt --project-ref <REF>` (DB 가 부르므로 로그인 토큰 검사를 끄고, 대신 `x-push-secret` 으로 막습니다).
 5. `functions.sql` 의 ① 부분(푸시)을 값 바꿔 실행.
    ①-3(보호자 주간 요약)도 함께 — 매주 일요일 19:00(KST)에 원장이 확인한 보호자에게 자녀마다 '이번 주' 한 줄(공부한 날·푼 문제·과제 제출)을 보냅니다. 밤 22~07시에 불리면 보내지 않습니다. 확인: `select jobname, schedule from cron.job;` 에 `pcs-push-weekly`.
+   ①-4(과제 알림)도 함께 — 원장이 과제를 내면 받는 학생 폰에 '새 과제', 매일 19:00(KST)에 내일 마감인데 아직 안 낸 학생에게 한 번. 밤 22~07시에는 보내지 않습니다. 확인: `cron.job` 에 `pcs-push-asgdue`.
 
 알림은 학원과 연결된 사람(학원 코드를 등록한 학생 · 자녀를 연결한 보호자 · 원장)에게만, 연결하는 순간 한 번 묻습니다. 로그아웃하면 그 폰의 알림 등록을 지웁니다.
 

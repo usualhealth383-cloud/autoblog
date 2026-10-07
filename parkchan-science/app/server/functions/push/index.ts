@@ -8,6 +8,8 @@
 //  보호자 주간 요약(벤치마크 ★5) — 일요일 저녁 cron({action:'weekly'})이 부른다. 받을 사람·숫자는 DB 함수 weekly_digest()(서비스 키 전용)
 //   · 원장이 확인한 보호자 · 수강 중인 자녀마다 한 번(자녀 둘이면 알림 둘 — 서로 덮지 않게 자녀별 tag)
 //   · 밤 22시~아침 7시에 불리면 보내지 않는다(다음 주에 다시) · 비교·순위 없이 그 주 숫자만, 잠금화면 공개 범위 PRIVATE
+//  과제 알림(2026-10-07) — 새 과제(assignments INSERT) → 대상 학생 본인 폰 · 매일 19시 cron({action:'asgdue'}) → 내일 마감인데 아직 안 낸 학생에게 한 번
+//   · 밤 22시~아침 7시에는 보내지 않는다(학생은 오늘 화면 맨 위 과제 카드로 본다) · 보호자에게는 보내지 않는다(주간 요약에 과제 제출이 있다)
 // 비밀값: FIREBASE_SA_JSON(Firebase 서비스 계정 JSON, project_id 포함), PUSH_SECRET(웹훅 헤더 x-push-secret 값), ACADEMY(학원명, 선택)
 import { googleToken, rpc, rest, json, CORS } from '../_shared/google.ts';
 
@@ -42,6 +44,11 @@ async function compose(table: string, r: Record<string, any>): Promise<Job | nul
   const A = Deno.env.get('ACADEMY') || '박찬 과학';
   if (table === 'notices') return { args: { p_kind: 'notice', p_cls: r.cls, p_code: null }, msg: { kind: 'notice', title: `[${A}] ${r.title}`, body: r.body || '공지를 확인해 주세요' } };
   if (table === 'sched') return { args: { p_kind: 'sched', p_cls: r.cls, p_code: null }, msg: { kind: 'sched', title: `[${A}] 일정 · ${md(r.date)} ${r.title}`, body: r.memo || '일정 화면에 들어갔습니다' } };
+  if (table === 'assignments') {   // 새 과제 → 대상 학생 본인 폰(밤에 낸 과제는 알리지 않는다 — 다음 날 오늘 화면 맨 위 카드로 본다)
+    if (isNight(r.at)) return null;
+    const tokens = await rpc('asg_push_targets', { p_aid: r.id });
+    return { args: null, tokens, msg: { kind: 'asg', tag: 'asg-' + r.id, title: `[${A}] 새 과제 · ${r.title}`, body: `${md(r.due)}까지 · 앱 오늘 화면 맨 위에서 풀 수 있어요` } };
+  }
   if (table === 'attendance') {
     const s = (await rest(`students?code=eq.${encodeURIComponent(r.code)}&select=name`))[0];
     if (!s) return null;
@@ -73,6 +80,13 @@ async function morningJobs(): Promise<{ jobs: Job[]; upto: string | null }> {
 }
 
 // 일요일 저녁: 보호자마다(자녀별) 이번 주 요약 한 줄 — 앱의 '이번 주 요약' 카드로 이어진다
+type Due = { token: string; uid: string; n: number; title: string };
+async function asgDueJobs(): Promise<Job[]> {
+  const A = Deno.env.get('ACADEMY') || '박찬 과학';
+  const rows: Due[] = await rpc('asg_due_targets', {});
+  return rows.map((d) => ({ args: null, tokens: [{ token: d.token, uid: d.uid }], msg: { kind: 'asg', tag: 'asg-due',
+    title: `[${A}] 내일 마감인 과제가 ${d.n}개 있어요`, body: `${d.title}${d.n > 1 ? ` 외 ${d.n - 1}개` : ''} · 오늘 저녁에 풀어 두면 마음이 가벼워요` } }));
+}
 type Dig = { token: string; uid: string; code: string; name: string; days: number; solved: number; asg_due: number; asg_done: number };
 async function weeklyJobs(): Promise<Job[]> {
   const A = Deno.env.get('ACADEMY') || '박찬 과학';
@@ -95,6 +109,10 @@ Deno.serve(async (req) => {
     const ev = await req.json();
     let jobs: Job[] = [], upto: string | null = null;
     if (ev.action === 'morning') ({ jobs, upto } = await morningJobs());
+    else if (ev.action === 'asgdue') {   // 매일 19:00(KST) cron — 내일 마감인데 아직 안 낸 학생에게 한 번
+      if (isNight(ev.at)) return json({ ok: true, skipped: 'night', sent: 0 });
+      jobs = await asgDueJobs();
+    }
     else if (ev.action === 'weekly') {
       if (isNight(ev.at)) return json({ ok: true, skipped: 'night', sent: 0 });   // 밤 22~07시에는 보내지 않는다(ev.at: 시험용 시각, 없으면 지금)
       jobs = await weeklyJobs();
