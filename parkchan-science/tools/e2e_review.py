@@ -205,9 +205,11 @@ async def main():
         await s.click('.tab[data-v="bank"]'); await s.wait_for_timeout(300); assert await s.locator('#bankRec').count() == 1, '문제 탭이 오늘의 복습에 묶임'
         await s.click('.tab[data-v="today"]'); await s.wait_for_timeout(300); assert '이어서 풀기 · 1 / 5' in await s.locator('#ps-review').inner_text()
         await s.click('#revStart'); await s.wait_for_timeout(200); assert await s.evaluate('bs.i') == 1
-        # 다른 소단원이 없고 기한 문제가 모두 한 소단원이면 붙지 않게 1문제만
-        await s.evaluate(f"(() => {{ bs = null; S.done = CONCEPTS.filter(c => c.lessonId === '{T}').map(c => c.id); S.bh = {{}}; S.rv = null; save(S); }})()")
-        assert await s.evaluate("reviewPlan(true).items.length") == 1
+        # 다른 소단원이 없고 기한 문제가 모두 한 소단원이어도 다 낸다(붙는 것은 뒤에) — 2026-10-07 7일 사용 점검: 첫 주 학생의
+        # 세트가 1문제씩 쪼개져 '마쳤어요' 뒤에 또 복습이 나오고, 뒤로 밀린 개념 카드는 한 번도 나오지 않았다
+        await s.evaluate(f"(() => {{ bs = null; S.done = CONCEPTS.filter(c => c.lessonId === '{T}').map(c => c.id); S.cs = []; S.bh = {{}}; S.rv = null; save(S); }})()")
+        nd = await s.evaluate("dueToday().length"); assert nd >= 2, nd
+        assert await s.evaluate("reviewPlan(true).items.length") == min(3, nd), '한 소단원뿐이라 1문제만 나옴'
         # 기한 문제도, 배운 다른 소단원도 없으면 카드를 숨긴다(기한 문제만 있으면 그것만)
         await s.evaluate("S.wrong = []; S.bh = {}; S.rv = null; save(S); show('today')"); await s.wait_for_timeout(200)
         assert await s.locator('#revStart').count() == 0 and await s.locator('#ps-review.none').count() == 1, '복습할 것이 없는데 카드가 보임'
@@ -275,9 +277,15 @@ window.Capacitor = { isNativePlatform: () => true, getPlatform: () => 'android',
         ln = await n1.evaluate('__ln'); assert ln['sched'], '알림을 걸지 않음'
         notes = ln['sched'][-1]['notifications']; assert len(notes) == 4 and [x['id'] for x in notes] == [1, 2, 3, 4], notes
         assert all(x.get('isExactNotification') is False for x in notes), '정확한 알람 권한 화면을 띄우는 설정'
-        assert '다시 볼 문제 1개' in notes[2]['body'] and '오늘의 개념' in notes[0]['body'], [x['body'] for x in notes]
+        assert '다시 볼 것 1개' in notes[2]['body'] and '오늘의 개념' in notes[0]['body'], [x['body'] for x in notes]
         assert await n1.evaluate('!S.nPause') and await n1.evaluate('S.lastOpen') == iso(D0)
         await n1.context.close()
+        # 개념 카드(S.cs)도 '다시 볼 것'으로 센다 — 카드만 기한인 날도 '오늘의 복습'(2026-10-07: 문제만 세어 '오늘의 개념'으로 나갔다)
+        n1b = await page(init=seed(iso(D0 - dt.timedelta(1)), {'wrong': [], 'start': iso(D0 - dt.timedelta(2)), 'done': ['1101-01', '1101-02', '1101-03'],
+            'cs': [{'ci': c, 'iso': '2026-10-01', 'a': '2026-10-01', 'd': iso(D0 + dt.timedelta(1)), 'x': 1, 'k': 0} for c in ('1101-01', '1101-02', '1101-03')]}), stub=STUB)
+        notes = (await n1b.evaluate('__ln'))['sched'][-1]['notifications']
+        assert '오늘의 개념' in notes[0]['title'] and '다시 볼 것 2개' in notes[1]['body'] and '오늘의 복습' in notes[1]['title'], [(x['title'], x['body']) for x in notes]
+        await n1b.context.close()
         # (나) 4일 전에 마지막으로 열었음 → 그 사이 3일 알림을 모두 지나침 → 멈춤, 걸지 않음
         n2 = await page(init=seed(iso(D0 - dt.timedelta(4))), stub=STUB)
         ln = await n2.evaluate('__ln'); assert not ln['sched'] and ln['cancel'], f'3일 무반응인데 또 알림을 걸었음: {ln}'

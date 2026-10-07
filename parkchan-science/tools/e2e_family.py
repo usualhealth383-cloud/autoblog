@@ -53,7 +53,7 @@ async def main():
         body = await pg.locator('#v-parent').inner_text(); assert '동생학생 학생' in body and '출석' in body, body[:200]
         await pg.screenshot(path=f'{SC}/f01_two_kids.png', full_page=True)
         await pg.click(f'[data-kid="{codes[0]}"]'); await pg.wait_for_timeout(900)
-        body = await pg.locator('#v-parent').inner_text(); assert '형학생 학생' in body and '아직 출석 전' in body, body[:200]
+        body = await pg.locator('#v-parent').inner_text(); assert '형학생 학생' in body and await pg.evaluate("offDay('월목반') ? '수업 없는 날' : '아직 출석 전'") in body, body[:200]   # 반 이름의 요일이 아니면 '수업 없는 날'(2026-10-07)
         # 이번 주 요약: 최근 7일 띠 · 세 가지 수 · 노트는 보이지 않음
         assert await pg.locator('.pweek .week .d').count() == 7 and await pg.locator('.pweek .pstat > div').count() == 3, '이번 주 요약이 없음'
         assert '공부한 날' in await pg.locator('.pweek').inner_text() and '연속' not in await pg.locator('.pweek').inner_text() and '공부 노트' not in (t := await pg.locator('.pweek').inner_text()) and '메모' not in t

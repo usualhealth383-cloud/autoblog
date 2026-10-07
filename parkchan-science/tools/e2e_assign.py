@@ -151,7 +151,7 @@ async def main():
             await answer(k != 1)
             await pg.click('#bankNext'); await pg.wait_for_timeout(250)
         await pg.wait_for_timeout(900)
-        res = await pg.inner_text('#v-bank'); assert '3 / 5' in res and '학원에 냈습니다' in res and '틀린 문제 2' in res, res
+        res = await pg.inner_text('#v-bank'); assert '3 / 5' in res and '학원에 냈어요' in res and '틀린 문제 2' in res, res
         await pg.screenshot(path=f'{SC}/a04_bank_result.png', full_page=True)
         await pg.click('#bankQuit2'); await pg.wait_for_timeout(900)
         assert await pg.locator('.asgcard', has_text=L1 + ' · 문제').count() == 0, '낸 과제가 카드에 남음'
@@ -182,7 +182,7 @@ async def main():
         assert await pg.evaluate('mx && mx.asg') and await pg.evaluate('mx.items.length') == 25
         await pg.evaluate("mx.items.forEach((q, i) => { mx.picks[i] = i < 20 ? q.answer : (q.answer % 5) + 1; }); renderMock()")
         await pg.click('#mxSubmit'); await pg.wait_for_timeout(1500)
-        t = await pg.inner_text('#v-bank'); assert '학원 과제 · 학원에 냈습니다' in t, t[:300]
+        t = await pg.inner_text('#v-bank'); assert '학원 과제 · 학원에 냈어요' in t, t[:300]
         await pg.click('#mockClose'); await pg.wait_for_timeout(900); assert await pg.evaluate('view') == 'today'
         assert await pg.locator('.asgcard').count() == 0, '모든 과제를 냈는데 카드가 남음'
         dark = await b.new_context(viewport={'width': 390, 'height': 844}, color_scheme='dark')
