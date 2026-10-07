@@ -2,7 +2,7 @@
 """그림을 폰에서 읽히게 E2E(2026-10-07 콘텐츠 감사 보완안 6).
 
 · 개념 상세 그림은 카드 좌우 여백 없이(390 폭에서 그림 350 px 이상 — 예전 약 300)
-· 그림 크게 보기(openFigure)는 처음부터 가로 1.8배(글자가 이미 11 px 넘는 그림만 그대로) · 왼쪽부터 · 무대 밖으로 끌려 나가지 않음
+· 그림 크게 보기(openFigure)는 처음부터 가장 작은 이름표가 12 px 되게 키움(1.8배까지) · 왼쪽부터 · 무대 밖으로 끌려 나가지 않음
 · 끌기(포인터)·휠·＋/−·두 번 누르기 그대로 · 닫으면 누른 자리로 초점
 · '그림 읽는 법' 번호 → 크게 보기가 그 줄이 가리키는 자리를 가운데에(그림 속 글자에서 찾음) · 고리 표시 · 아래에 그 줄과 번호들(번호를 바꾸면 자리도)
 · 그림 데이터를 받기 전에 번호를 누르면 받은 뒤 열림 · 밝은/어두운 스크린샷
@@ -74,11 +74,13 @@ async def main():
         await s.evaluate("document.querySelector('#v-detail .dcard figure').scrollIntoView({ block:'start' })"); await s.wait_for_timeout(150)
         await s.screenshot(path=f'{SC}/f01_detail_light.png')
 
-        # ───────── 3) 그림 크게 보기 — 1.8배 · 왼쪽부터 · 무대 안 ─────────
+        # ───────── 3) 그림 크게 보기 — 이름표 12 px · 왼쪽부터 · 무대 안 ─────────
         await s.click('#v-detail figure.zoomable'); await s.wait_for_timeout(400)
-        assert await s.get_attribute('#fv', 'data-sc') == '1.75' or float(await s.get_attribute('#fv', 'data-sc')) >= 1.7, await s.get_attribute('#fv', 'data-sc')
+        sc = float(await s.get_attribute('#fv', 'data-sc')); assert 1.4 <= sc <= 1.8, sc   # 가장 작은 이름표가 12 px 되게(그림 이름표 최소 13 뒤)
+        lo = await s.evaluate("Math.min(...[...document.querySelectorAll('#fv svg text')].filter(t => t.textContent.trim() && parseFloat(t.getAttribute('font-size')) >= 6).map(t => t.getBoundingClientRect().height))")
+        assert lo >= 11, ('크게 보기에서도 이름표가 작음', lo)
         e = await s.evaluate(EDGE)
-        assert abs(e['l']) < 1.5 and e['w'] > e['sw'] * 1.6, ('왼쪽부터 · 가로 1.8배가 아님', e)
+        assert abs(e['l']) < 1.5 and e['w'] > e['sw'] * 1.35, ('왼쪽부터 · 가로로 키워 보기가 아님', e)
         assert abs(e['t'] - e['b']) < 2, ('세로 가운데가 아님', e)
         await s.screenshot(path=f'{SC}/f02_fv_open_light.png')
         # 끌기(포인터) — 오른쪽 끝까지 끌어도 무대 밖으로 나가지 않음

@@ -4473,8 +4473,8 @@ function openFigure(svg, caption, hz){
     m.style.left = `${B.L + tx + p.x * B.W * sc}px`; m.style.top = `${B.T + ty + p.y * B.H * sc}px`; st.appendChild(m); setTimeout(() => m.remove(), 2600); el.dataset.at = `${i}:${p.x.toFixed(3)},${p.y.toFixed(3)}`; return true; };
   requestAnimationFrame(() => { measure();
     const vb = sv.viewBox && sv.viewBox.baseVal, f = B.W / ((vb && vb.width) || B.W);
-    const fs = [...sv.querySelectorAll('text')].map(t => parseFloat(t.getAttribute('font-size')) || 0).filter(Boolean).sort((a, b) => a - b), med = fs[Math.floor(fs.length / 2)] || 10;
-    sc = Math.min(1.8, Math.max(1, 11 / (med * f)));   // 글자가 이미 11 px 넘으면 그대로, 아니면 1.8배까지
+    const fs = [...sv.querySelectorAll('text')].map(t => parseFloat(t.getAttribute('font-size')) || 0).filter(x => x >= 6).sort((a, b) => a - b), lo = fs[0] || 10;
+    sc = Math.min(1.8, Math.max(1, 12 / (lo * f)));   // 가장 작은 이름표가 12 px 되게(2026-10-07 이름표 최소 13 뒤 — 폰 카드 약 7.5 px → 크게 보기 약 1.5배), 1.8배까지
     const at = !!hz && goTo(hz.i);
     if (!at){ tx = -B.L; ty = 0; apply(); }   // 왼쪽부터 읽는다(세로는 가운데)
     el.dataset.sc = sc.toFixed(2); });
