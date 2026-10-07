@@ -209,7 +209,10 @@ async def main():
         # 세트가 1문제씩 쪼개져 '마쳤어요' 뒤에 또 복습이 나오고, 뒤로 밀린 개념 카드는 한 번도 나오지 않았다
         await s.evaluate(f"(() => {{ bs = null; S.done = CONCEPTS.filter(c => c.lessonId === '{T}').map(c => c.id); S.cs = []; S.bh = {{}}; S.rv = null; save(S); }})()")
         nd = await s.evaluate("dueToday().length"); assert nd >= 2, nd
-        assert await s.evaluate("reviewPlan(true).items.length") == min(3, nd), '한 소단원뿐이라 1문제만 나옴'
+        # 2026-10-07 원장님 '같은 소단원 연달아 안 나오게 엄격히' — 기한 문제는 다 내고, 사이에 다른 소단원(오늘 소단원) 문제를 끼워 떼어 놓는다
+        pl = await s.evaluate("(() => { rpMemo = null; return reviewPlan(true).items.map(e => ({ l:e.lesson, due:!!e.w })); })()")
+        assert sum(x['due'] for x in pl) == min(3, nd), ('한 소단원뿐이라 1문제만 나옴', pl)
+        seq2 = [x['l'] for x in pl]; assert all(seq2[i] != seq2[i+1] for i in range(len(seq2) - 1)), ('같은 소단원이 잇달아 나옴', pl)
         # 기한 문제도, 배운 다른 소단원도 없으면 카드를 숨긴다(기한 문제만 있으면 그것만)
         await s.evaluate("S.wrong = []; S.bh = {}; S.rv = null; save(S); show('today')"); await s.wait_for_timeout(200)
         assert await s.locator('#revStart').count() == 0 and await s.locator('#ps-review.none').count() == 1, '복습할 것이 없는데 카드가 보임'
@@ -358,10 +361,10 @@ window.Capacitor = { isNativePlatform: () => true, getPlatform: () => 'android',
             # (바) 오늘의 문제에서도 — 확신 + 틀림
             await c.evaluate("bs = null; qState = null; show('quiz')"); await c.wait_for_timeout(200)
             assert await c.locator('#v-quiz .conf button').count() == 2
-            qa = await c.evaluate('qState.q.answer'); qn = await c.evaluate('qState.q.no'); ql = await c.evaluate('qState.q.lessonId')
+            qa = await c.evaluate('qState.q.answer'); qref = await c.evaluate("JSON.stringify(qState.q.id ? { b:qState.q.id } : { l:qState.q.lessonId, n:qState.q.no })")   # 오늘의 문제는 문제 은행 문항(2026-10-07)
             await c.click('#v-quiz [data-conf="s"]'); await c.click(f'#v-quiz .opt[data-p="{1 if qa != 1 else 2}"]'); await c.wait_for_timeout(200)
             assert '확신했는데 틀렸어요' in await c.locator('#v-quiz .verdict').inner_text()
-            assert await c.evaluate(f"findW({{ l:'{ql}', n:{qn} }}).c") == 's'
+            assert await c.evaluate(f"findW({qref}).c") == 's'
             await c.screenshot(path=f'{SC}/r11d_quiz_sure_wrong.png', full_page=True)
             # (사) 날짜별 푼 수·맞힌 수(원장 '처리할 것'용) — 28일만 남긴다
             dq = await c.evaluate('S.dq'); assert dq == {iso(D0): [2, 1], iso(D0 + dt.timedelta(6)): [1, 0]}, dq

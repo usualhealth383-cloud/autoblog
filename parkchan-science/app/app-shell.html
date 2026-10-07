@@ -2470,6 +2470,20 @@ const authLive = () => !!(S.auth && (!S.auth.until || S.auth.until >= todayISO()
 const fullAccess = () => !!(authLive() || hasPass() || (ACC && ACC.role==='owner'));
 const isOpen = i => fullAccess() || (i <= Math.max(dayIndex(), FREE_DAYS - 1) && i > dayIndex() - FREE_DAYS);   // 첫날부터 7개를 열어 '최근 7일치 무료' 약속을 지킨다(첫날 1개만 열리던 것 — 2026-10-01)
 /* 오늘의 문제 — 고르는 문제(오개념·자료 해석)만. 서술형은 스스로 채점이라 하루 한 문제로는 맞지 않다(원장님 2026-10-06) — 소단원 문제 풀기에서 */
+/* 오늘의 문제(2026-10-07 원장님: 문제 은행에서 꺼내기) — 강의용 확인 문제만 쓰면 I-01 처럼 개념이 적은 소단원에서 이틀마다 같은 문제가 되풀이됐다.
+   그 개념에 묶인 고르는 문제(선다·합답) 가운데 아직 안 푼 것 하나를 고른다 — 소단원 문제를 먼저, 다음 자동 문항, 다 풀었으면 강의용 확인 문제.
+   하루 동안 같은 문제(tp.qid)이고, 고르는 순서는 날짜·개념으로 정해져 기기마다 같다. 은행을 받기 전이면 강의용 확인 문제 */
+const qidOf = q => q ? (q.id || `q:${q.lessonId}:${q.no}`) : '';
+function todayQ(c){
+  const tp = tpToday(), fb = quizFor(c);
+  if (tp.qid){ if (tp.qid.startsWith('q:')) return fb; const k = MORE.ok && BANK.find(x => x.id === tp.qid); if (k) return k; if (!MORE.ok) return null; }
+  if (!MORE.ok) return fb;
+  const bh = S.bh || {}, fit = q => q.lessonId === c.lessonId && +q.concept === +c.no && (q.type === 'mc' || q.type === 'multi') && Array.isArray(q.choices) && q.answer && !isUM(q);
+  const all = BANK.filter(fit), fresh = all.filter(q => !bh[q.id] && !S.wrong.some(w => w.b === q.id && !w.cleared));
+  const pool = [fresh.filter(q => q.step !== 'auto'), fresh].find(a => a.length);
+  if (!pool) return fb;
+  let h = 0; for (const ch of todayISO() + c.id) h = (h * 31 + ch.charCodeAt(0)) >>> 0;
+  return pool[h % pool.length]; }
 const quizFor = c => { const all = QUIZZES.filter(q=>q.lessonId===c.lessonId), pool = all.filter(q => !q.essay).length ? all.filter(q => !q.essay) : all; return pool[(+c.no-1)%pool.length] || pool[0]; };
 
 /* ═══ 간격을 넓혀 가는 복습(라이트너 상자) — 오늘의 문제·문제 은행·복습에서 틀린 것 모두 ═══
@@ -2629,7 +2643,14 @@ function interleave(list){ const g = new Map(); list.forEach(e => { if (!g.has(e
     const [l, a] = cand[0]; out.push(a.shift()); prev = l; }
   return out; }
 /* 세트 짜기 — 문제 은행을 아직 못 받았으면 소단원만 정한다(개수 세기용). 받았으면 실제 문항까지 */
+/* 실제 세트(문항까지)는 같은 날·같은 기한 목록이면 한 번 짠 것을 쓴다 — 홈의 '오늘의 복습 n'과 들어가서 푸는 수가 같게(끼워 넣기·섞기는 무작위) */
+let rpMemo = null;
 function reviewPlan(real){
+  if (real){ const key = [todayISO(), todayConcept().lessonId, (rvToday().s || 0), dueToday().map(wKey).join(','), csToday().map(wKey).join(','), studiedLessons().join(',')].join('|');
+    if (!rpMemo || rpMemo.key !== key) rpMemo = { key, plan: reviewPlan0(true) };
+    return rpMemo.plan; }
+  return reviewPlan0(false); }
+function reviewPlan0(real){
   const t = todayISO(), rv = rvToday(), todayL = todayConcept().lessonId, open = new Set(openLessons().map(l => l.id));
   const due = dueToday().filter(w => open.has(lessonOfW(w)) && (!real || reviewItem(w))).slice(0, 3).map(w => ({ w, lesson:lessonOfW(w) }));
   let extra = [];
@@ -2643,8 +2664,18 @@ function reviewPlan(real){
   const cards = csToday().map(w => ({ cs:w, lesson:lessonOfW(w) }));   // 개념 카드(하루 CS_DAY 장) — 문제와 섞는다
   /* 섞다가 어쩔 수 없이 붙는 것은 뒤에 붙여 다 낸다(2026-10-07 7일 사용 점검: 첫 주 학생은 배운 소단원이 하나뿐이라
      세트가 1문제씩 쪼개져 '마쳤어요' 뒤에 또 복습이 나오고, 맨 뒤로 밀린 개념 카드는 한 번도 나오지 않았다) */
-  const all = [...due, ...extra, ...cards], mixed = interleave(all);
-  return { items: [...mixed, ...all.filter(e => !mixed.includes(e))], t }; }
+  const all = [...due, ...extra, ...cards]; let mixed = interleave(all), left = all.filter(e => !mixed.includes(e));
+  /* 같은 소단원은 잇달아 내지 않는다 — 엄격히(2026-10-07 원장님). 섞고 남은 것이 있으면 다른 소단원(배운 소단원·오늘 소단원) 문제를
+     사이에 끼워 떼어 놓는다(세트는 SRS_CAP 안). 배운 소단원이 하나뿐인 첫날처럼 끼울 것이 없을 때만 뒤에 붙인다 */
+  if (real && left.length){ const used = new Set([...all.map(e => e.q && e.q.id), S.tp && S.tp.qid].filter(Boolean)), live = new Set(S.wrong.filter(w => !w.cleared).map(wKey));
+    const others = [...new Set([...studiedLessons(), todayL])].filter(l => open.has(l));
+    while (left.length && all.length < SRS_CAP){
+      const ls = others.filter(l => !left.some(e => e.lesson === l)).sort(() => Math.random() - .5); let add = null;
+      for (const l of ls){ const pool = BANK.filter(q => q.lessonId === l && q.type !== 'essay' && !isUM(q) && !used.has(q.id) && !live.has('b:'+q.id)), fresh = pool.filter(q => !(S.bh||{})[q.id]);
+        const from = fresh.length ? fresh : pool; if (from.length){ add = { lesson:l, q: from[Math.floor(Math.random() * from.length)] }; break; } }
+      if (!add) break;
+      used.add(add.q.id); all.push(add); mixed = interleave(all); left = all.filter(e => !mixed.includes(e)); } }
+  return { items: [...mixed, ...left], t }; }
 /* 오늘의 문제(5지선다)를 문제 은행 화면에서 풀 수 있는 모양으로 */
 const quizAsBank = q => ({ id:`q:${q.lessonId}:${q.no}`, lessonId:q.lessonId, type:'mc', stem:q.stem, ask:q.ask, source:q.source, choices:q.choices, answer:q.answer,
   explain:q.explain || '', wrong:'', figure:'', difficulty:'', _qz:q });
@@ -3029,7 +3060,7 @@ const readCheck = () => { if (view !== 'detail') return; const c = CONCEPTS[deta
 /* 2026-10-06 원장님 결정: 읽기 완료는 '공부했음'을 눌러야만 — 스크롤 판정은 쓰지 않는다(readCheck 는 남겨 둠) */
 let pathLast = null;   // 마지막으로 그린 '지금' 단계 — 앞으로 넘어갔을 때만 다음 카드를 펼친다
 function pathState(){
-  const c = todayConcept(), tp = tpToday(), cur = revCur(), plan = cur ? null : reviewPlan(false), rv = rvToday();
+  const c = todayConcept(), tp = tpToday(), cur = revCur(), plan = cur ? null : reviewPlan(MORE.ok), rv = rvToday();
   const n = cur ? cur.items.length : plan.items.length;
   const st = { read: S.read.includes(c.id), blank: Array.isArray(tp.b), quiz: !!tp.q, review: cur ? 'doing' : n ? 'todo' : rv.s ? 'done' : 'none' };
   const ok = k => k === 'review' ? st.review === 'done' || st.review === 'none' : st[k];
@@ -3040,7 +3071,7 @@ function pathState(){
 const IC_CHK = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4.5 12.5l5 5L19.5 7"/></svg>';
 const IC_GO = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg>';
 function pathHtml(){
-  const { c, tp, cur, plan, n, st } = pathState(), q = quizFor(c) || {};
+  const { c, tp, cur, plan, n, st } = pathState(), q = todayQ(c) || {};
   const tag = `${c.unit}-${c.lessonId.slice(2)}`;
   const bOk = Array.isArray(tp.b) ? tp.b.filter(Boolean).length : 0, bN = Object.keys(c.blanks || {}).length || 3;
   const dn = plan ? plan.items.filter(e => e.w).length : 0, cn = plan ? plan.items.filter(e => e.cs).length : 0, xn = plan ? n - dn - cn : 0;
@@ -3071,10 +3102,14 @@ function pathHtml(){
       <h3>오늘 할 일 끝 — 내일 만나요</h3>
       <div class="hb"><div><p>내일의 개념 · ${esc(nx.title)}</p>
         ${!ACC || ACC.role === 'student' ? `<button class="linkbtn" data-go="bank">문제 더 풀어 보기 ›</button>` : ''}</div></div></div></li>`;
+  /* 어제 못 본 개념(2026-10-07 원장님: 조용한 한 줄) — 하루를 건너뛰면 그날 개념을 못 보고 지나갔다. 어제 개념을 읽지도 끝내지도 않았으면 한 줄만, 누르면 그 개념 */
+  const yi = daysBetween(S.start, todayISO()) >= 1 ? (dayIndex() + CONCEPTS.length - 1) % CONCEPTS.length : -1, yc = yi >= 0 ? CONCEPTS[yi] : null;
+  const miss = yc && isOpen(yi) && !S.done.includes(yc.id) && !S.read.includes(yc.id)
+    ? `<div class="pfoot pmiss"><span>어제 개념도 볼까요? · ${esc(yc.title)}</span><button class="linkbtn" id="pMiss" data-i="${yi}" aria-label="어제 개념 ${esc(yc.title)} 보기">볼래요</button></div>` : '';
   const foot = !ACC ? `<div class="pfoot"><span>둘러보는 중이에요 · 기록은 이 기기에만 남아요</span><button class="linkbtn" id="pfootGo">로그인</button></div>`
     : !fullAccess() && ACC.role === 'student' ? `<div class="pfoot"><span>최근 ${FREE_DAYS}일치 개념이 열려 있어요</span><button class="linkbtn" id="pfootGo">전 범위 열기</button></div>` : '';
   return { st, html: `<div class="phead"><h2 id="pathH">오늘 할 일</h2><span class="n" aria-label="${st.total}개 가운데 ${st.doneN}개 끝냄">${st.doneN} / ${st.total}</span></div>
-    <ol class="path" aria-labelledby="pathH">${PATH_KEYS.map(step).join('')}${fin}</ol>${foot}` }; }
+    <ol class="path" aria-labelledby="pathH">${PATH_KEYS.map(step).join('')}${fin}</ol>${miss}${foot}` }; }
 /* 경로 아래 작은 카드 한 장 — 이번 주 리듬 · 오늘 일정 · 공부 노트 · 내 공부 기록을 줄로 */
 function homeSum(){
   const iso = todayISO(), todayList = [...fixedOn(iso), ...myEvents().filter(e => e.date === iso)];
@@ -3101,7 +3136,7 @@ async function renderToday(){
   v.innerHTML = `
     <div class="top">
       <h1 class="hello">${ACC ? `${esc(ACC.name)}${ACC.role==='student'?' 학생':''}, 안녕하세요` : '안녕하세요'}<small>${d.getMonth()+1}월 ${d.getDate()}일 ${wd}요일</small></h1>
-      ${S.auth
+      ${S.auth && authLive()   // 출석은 수강생에게만(2026-10-07 원장님) — 수강 기간이 끝난 코드에도 뜨지 않게
         ? (myAtt ? `<span class="pill"><svg viewBox="0 0 24 24"><path d="M4 12.5l5.5 5.5L20 7"/></svg> ${myAtt.time} 출석${myAtt.late?' · 지각':''}</span>`
                  : `<button class="pill att-pill todo" id="attOpen"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="3"/><path d="M8 12h8M12 8v8"/></svg> 출석 체크</button>`)
         : (hasPass() ? `<span class="pill">이용권 ~${kdate(ACC.passUntil)}</span>` : trialLeft === null ? '' : `<button class="pill warn" id="goPlansPill">체험 ${trialLeft}일 남음</button>`)}
@@ -3140,7 +3175,7 @@ function sheetBlank(){
 let qState = null;
 function renderQuiz(){
   const c = todayConcept();
-  if (!qState) qState = { q: quizFor(c), pick:null, retry:null, mode:'today' };   // 기한 된 복습은 오늘 화면의 '오늘의 복습'에서 푼다
+  if (!qState){ qState = { q: todayQ(c) || quizFor(c), pick:null, retry:null, mode:'today' }; const tp = tpToday(); if (!tp.qid){ tp.qid = qidOf(qState.q); save(S); } }   // 연 문제를 오늘의 문제로 묶는다(은행을 늦게 받아도 바뀌지 않게)   // 기한 된 복습은 오늘 화면의 '오늘의 복습'에서 푼다
   const {q, pick, retry, mode} = qState; const graded = pick !== null;
   const label = mode==='review' ? '복습 문제' : (retry ? '다시 볼 문제' : '오늘의 문제');
   document.getElementById('v-quiz').innerHTML = `
@@ -3149,9 +3184,9 @@ function renderQuiz(){
     <div class="qhead"><span class="l">${label}${mode==='review'?` · ${esc(qState.lessonName||'')}`:''}</span>
       <span class="tag">${retry ? `${kdate(retry.iso)}에 틀림` : (graded && pick!==q.answer ? '다시 볼 문제' : (q.type||'확인'))}</span></div>
     ${retry ? `<p class="again">↻ 전에 갈렸던 문제예요. 이번엔 어디서 갈리는지 봐요.</p>` : ''}
-    <p class="stem">${rich(q.stem)}</p>
+    ${q.id ? qBody(q, '') : `<p class="stem">${rich(q.stem)}</p>
     ${q.source ? `<div class="bogi">${rich(q.source)}</div>`:''}
-    ${q.ask ? `<p class="ask">${rich(q.ask)}</p>`:''}
+    ${q.ask ? `<p class="ask">${rich(q.ask)}</p>`:''}`}
     ${q.essay ? `
       <textarea class="essay" placeholder="문장으로 답을 써 보세요"></textarea>
       ${graded ? `<div class="verdict"><div class="h">이렇게 쓰면 돼요</div><p>${rich(q.gradeNote || q.answerLine)}</p></div>` : ''}
@@ -3161,8 +3196,10 @@ function renderQuiz(){
       <div class="opts">${q.choices.map((t,i)=>{ const n=i+1; let cls='', mk=''; if (graded){ if (n===q.answer){cls='ok';mk='정답';} else if (n===pick){cls='bad';mk='내 답';} }
         return `<button class="opt ${cls}" data-p="${n}" ${graded?'disabled':''}><span class="m">${MARKS[i]}</span><span class="tx">${rich(t)}</span>${mk?`<span class="mk">${mk}</span>`:''}</button>`; }).join('')}</div>
       ${graded ? `
-        ${explBox('해설', q.explain ? `<p>${rich(q.explain)}</p>` : conceptGo(q))}
-        <button class="flag" data-report="quiz:${esc(q.lessonId)}#${q.no}">문제·해설에 틀린 곳이 있나요?</button>
+        ${q.id ? cueFig(q) : ''}
+        ${q.id ? (() => { const jd = multiSplit(q); return explBox('해설', (jd ? jdHtml(jd) : q.explain ? `<p>${rich(q.explain)}</p>` : q.wrong ? '' : conceptGo(q)) + (q.wrong && !jd ? `<div class="wrongbox"><div class="h">오답 왜 틀렸나</div>${rich(q.wrong)}</div>` : '')); })()
+          : explBox('해설', q.explain ? `<p>${rich(q.explain)}</p>` : conceptGo(q))}
+        <button class="flag" data-report="${q.id ? `bank:${esc(q.id)}` : `quiz:${esc(q.lessonId)}#${q.no}`}">문제·해설에 틀린 곳이 있나요?</button>
         ${fbSheet({ ok: pick===q.answer, head: pick===q.answer ? '맞았어요' : `정답은 ${MARKS[q.answer-1]}${[2, 4, 5].includes(+q.answer) ? '예요' : '이에요'}`, note: confNote(qState.conf, pick===q.answer), line: srsLine(qState.srs),
           btns: `<button class="btn" id="grade" aria-describedby="fbH${srsLine(qState.srs) ? ' fbL' : ''}">${mode==='review' ? '다음 복습 문제' : (retry ? '오늘의 문제로' : '오늘로 돌아가기')}</button>` })}
       ` : `<p class="qhint">고르면 바로 채점하고, 왜 갈렸는지 알려 줘요.<br>틀려도 괜찮아요. ${SRS_RULE}</p>`}
@@ -3179,8 +3216,9 @@ function gradePick(pick){
   const {q, retry, mode} = qState; qState.pick = pick; touchDay();
   S.stats.a++; if (pick===q.answer) S.stats.c++; statDay(pick===q.answer);
   if (mode==='today') markConceptDone(todayConcept().id);
-  if (mode==='today' && !retry && q === quizFor(todayConcept())){ const tp = tpToday(); tp.q = pick===q.answer ? 'o' : 'x'; tp.qp = pick; }   // 오늘 경로 '오늘의 문제' 끝
-  qState.srs = srsMark({ l:q.lessonId, n:q.no }, pick===q.answer, pick, qState.conf);   // 오늘의 문제·다시 풀기·복습 모두 같은 상자 규칙
+  if (mode==='today' && !retry && q === todayQ(todayConcept())){ const tp = tpToday(); tp.q = pick===q.answer ? 'o' : 'x'; tp.qp = pick; tp.qid = qidOf(q); }   // 오늘 경로 '오늘의 문제' 끝(다시 열면 같은 문제)
+  if (q.id){ (S.bh ||= {})[q.id] = pick===q.answer ? 'o' : 'x'; qState.srs = srsMark({ b:q.id }, pick===q.answer, MARKS[pick-1], qState.conf); }   // 문제 은행 문항 — 은행 기록·상자도 같이
+  else qState.srs = srsMark({ l:q.lessonId, n:q.no }, pick===q.answer, pick, qState.conf);   // 오늘의 문제·다시 풀기·복습 모두 같은 상자 규칙
   save(S); renderQuiz(); document.querySelector('#v-quiz .verdict.fb .btn')?.focus({ preventScroll:true });   // 채점 결과(시트 머리·한 마디)를 '다음' 버튼 설명으로 읽게
 }
 
@@ -5996,7 +6034,8 @@ document.addEventListener('click', async e => {
 
   /* 오늘 */
   if (T('#okNotice')){ await DBX.markRead(T('#okNotice').dataset.id, S.auth.code); renderToday(); return; }
-  if (T('#goQuiz')){ const tp = tpToday(); qState = tp.q && tp.qp != null ? { q:quizFor(todayConcept()), pick:tp.qp, retry:null, mode:'today' } : null; show('quiz'); return; }
+  if (T('#goQuiz')){ const tp = tpToday(), q = todayQ(todayConcept()); if (!q){ afterMore(T('#goQuiz')); return; }   // 은행 문제를 고른 날 — 받은 뒤에 연다
+    qState = tp.q && tp.qp != null ? { q, pick:tp.qp, retry:null, mode:'today' } : null; show('quiz'); return; }
   /* 오늘 경로 — 개념 읽기 · 빈칸 · 손님/무료 범위 한 줄 */
   if (T('#pRead')){ detailBack = 'today'; detailIdx = dayIndex(); show('detail'); return; }
   if (T('#pBlank')){ bkMode = Array.isArray(tpToday().b) ? 'result' : 'input'; if (bkMode === 'input') bkVals = []; sheetBlank(); return; }
@@ -6005,6 +6044,7 @@ document.addEventListener('click', async e => {
     document.querySelector('.bkl')?.setAttribute('aria-live', 'polite'); return; }
   const bkt = T('[data-bkt]'); if (bkt){ const tp = tpToday(), i = +bkt.dataset.bkt; if (Array.isArray(tp.b)){ tp.b[i] = tp.b[i] ? 0 : 1; save(S); sheetBlank(); document.querySelector(`[data-bkt="${i}"]`)?.focus({ preventScroll:true }); } return; }
   if (T('#bkDone')){ closeSheet(); if (view === 'today'){ await renderToday(); document.querySelector('#v-today .ps.now button')?.focus({ preventScroll:true }); } return; }
+  if (T('#pMiss')){ detailBack = 'today'; detailIdx = +T('#pMiss').dataset.i; show('detail'); return; }
   if (T('#pfootGo')){ if (!ACC){ authMode = 'start'; show('auth'); return; } show('plans'); return; }
   if (T('#goStats') || T('#goStatsRing')){ show('stats'); return; }
   if (T('#backMe3')){ show('me'); return; }
