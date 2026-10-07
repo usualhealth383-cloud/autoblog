@@ -6,7 +6,8 @@
 import os, pathlib
 import sys,re,io
 src=(pathlib.Path(__file__).parent/'run.py').read_text(encoding='utf-8')
-OV=re.search(r'OVERFLOW_JS = """(.*?)"""',src,re.S).group(1)
+import ast
+OV=ast.literal_eval(re.search(r'OVERFLOW_JS = (""".*?""")',src,re.S).group(1))   # 파이썬 문자열 그대로 풀어야 \\d 같은 것이 JS 에 맞게 들어간다
 from playwright.sync_api import sync_playwright
 from PIL import Image
 b_=io.BytesIO(); Image.new('RGB',(300,300),(200,220,230)).save(b_,'PNG'); PNG=b_.getvalue()

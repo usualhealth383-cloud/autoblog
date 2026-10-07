@@ -276,6 +276,12 @@ def main():
                 pg.goto(url + '#' + r); pg.wait_for_timeout(500)
                 bad += pg.evaluate(CONTRAST_JS); tap += pg.evaluate(TAP_JS)
                 for u in pg.evaluate(UICON_JS): fails.append(f'조작 부품 대비({theme}) {r}: {u} — 3:1 이 필요합니다')
+            # 4b. 약 화면은 탭 안(주의·부작용·수유·제품 칸)까지 — 첫 탭만 보던 검사가 「수유 자료 없음」 칩 4.0:1 을 놓쳤다(2026-10-07)
+            for r in ['/drug/loxoprofen', '/drug/coldaewon', '/drug/ibuprofen', '/drug/antibiotic-eyedrop']:
+                pg.goto(url + '#' + r); pg.wait_for_timeout(400)
+                for tb in pg.evaluate("()=>[...document.querySelectorAll('.dtabs .tab')].map(b=>b.dataset.p)"):
+                    pg.click(f'.dtabs .tab[data-p={tb}]'); pg.wait_for_timeout(150)
+                    bad += [dict(x, at=r + ':' + tb) for x in pg.evaluate(CONTRAST_JS)]; tap += pg.evaluate(TAP_JS)
             if bad: fails.append(f'명암비({theme}) {len(bad)}: {bad[:3]}')
             if tap: fails.append(f'44px 미만({theme}) {len(tap)}: {sorted(set(tap))[:5]}')
         pg.emulate_media(color_scheme='light')
