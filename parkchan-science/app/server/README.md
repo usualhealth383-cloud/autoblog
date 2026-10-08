@@ -21,10 +21,16 @@
 4. **Authentication → Sign In / Providers → Email**: "Confirm email" **켜기**(원장 이메일 사칭 방지 · 메일 인증을 해야 원장 화면이 열립니다).
    같은 화면에서 **비밀번호 규칙**: 최소 길이 **8**, "Lowercase, uppercase letters and digits" 가 아니라 **"Letters and digits"**, **Leaked password protection 켜기**(유출된 비밀번호 차단 · 앱도 8자+글자·숫자로 맞춰 둠).
    **Authentication → URL Configuration → Site URL / Redirect URLs** 에 `https://usualhealth383-cloud.github.io/autoblog/parkchan/` 추가(가입 확인·비밀번호 재설정 메일이 돌아올 주소).
+4-1. **메일 보내는 서버(SMTP) 꼭 연결** — Supabase 기본 메일은 **시간당 2통**뿐이라(공식 문서 Auth rate limits, 2026-10-08 확인) 한 반이 같은 저녁에 가입하면 확인 메일이 막힙니다.
+   가장 쉬운 길: 학원 Gmail 로 **앱 비밀번호** 만들기(구글 계정 → 보안 → 2단계 인증 켜기 → 앱 비밀번호 16자리) → Supabase **Project Settings → Authentication → SMTP Settings**: Host `smtp.gmail.com` · Port `465` · User 학원 Gmail · Pass 앱 비밀번호 · Sender 같은 Gmail · Sender name `박찬 과학`. Gmail 은 하루 약 500통까지(0원).
+   그다음 **Authentication → Rate Limits** 의 이메일 한도를 시간당 100 으로 올립니다. (도메인이 있으면 Resend 무료 월 3,000통도 가능 — 도메인 인증 필요)
+4-2. **Authentication → Email Templates**: `email/` 폴더의 한국어 문안(가입 확인·비밀번호 재설정·이메일 변경)을 제목·본문에 붙여 넣기(기본은 영어).
 5. 앱에서 원장님 이메일로 **회원가입** → 메일의 링크 누르기 → 원장 화면이 열립니다.
    **바로 이어서** `schema.sql` 맨 아래 ▼ 한 줄(`owner_uid`)의 `--` 를 지우고 실행 — 원장 계정을 id 로 못 박습니다. 이렇게 해 두면 누가 같은 이메일로 먼저 가입을 시도해도 원장이 될 수 없습니다(메일 인증을 실수로 꺼 둔 경우에도).
 6. **Project Settings → API** 의 `Project URL` 과 `anon public` 키를 `app/server/config.json` 에 넣습니다(`config.example.json` 참고).
 7. `python3 app/build.py` → `cd app-native && npm run sync` → APK 자동 빌드(Actions → android-apk).
+8. **점검(꼭)** — ① SQL Editor 에 `verify.sql` 을 통째로 붙여 Run → 1~11번이 모두 ✓(12~14번은 스토어 출시 때) ② 작업자가 `python3 tools/live_check.py --owner 원장이메일 --pages` → 끝 줄 `LIVE CHECK OK`.
+   손님 키로 표 23개가 한 줄도 안 읽히는지, 원장·학생 함수 25개가 막히는지, 메일 인증이 켜졌는지, 배포된 웹앱이 이 서버로 빌드됐는지를 봅니다(읽기만 — 실서버에 흔적을 남기지 않음).
 
 ## 결제 · 푸시 알림 (서버 연결 뒤, 한 번)
 앱 쪽 코드와 서버 함수(`functions/verify-purchase`, `functions/push`)는 다 되어 있습니다. 원장님 계정으로 켜는 일만 남았습니다.

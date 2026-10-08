@@ -20,13 +20,13 @@ BRAND, DARK, PAPER, INK, MUTED = (20,125,111), (15,99,87), (250,248,244), (30,42
 
 SHOTS = [
     ('01', '하루 한 개념, 5분이면 끝', '학원 교재 그대로 · 매일 다른 한 마디'),
-    ('02', '오늘 배울 개념 하나', '읽고, 빈칸을 채우고, 문제를 풉니다'),
-    ('03', '문제 은행 1,214문항', '범위와 유형을 골라 원하는 만큼'),
+    ('02', '오늘 할 일은 네 걸음', '읽고 · 떠올리고 · 풀고 · 다시 보기'),
+    ('03', '문제 은행 1,540문항', '범위와 유형을 골라 원하는 만큼'),
     ('04', '틀린 이유까지 알려 줍니다', '오답은 간격을 넓혀 다시'),
     ('05', '학원·학교·과외를 한 곳에', '시험 범위에서 바로 문제 풀기'),
     ('06', '서로 묻고 답하는 이야기', '닉네임으로, 안전하게'),
     ('07', '공부한 내용은 노트로', '달력에서 다시 보는 나만의 요약'),
-    ('08', '보호자도 원장님도 같은 앱', '출석·진도·공지를 한눈에'),
+    ('08', '보호자도 원장님도 같은 앱', '출석 · 과제 · 이번 주 요약을 한눈에'),
 ]
 
 def compose(raw_path, out_path, title, sub):
@@ -96,12 +96,11 @@ async def capture():
         await fresh()
         await settle(pg); await pg.screenshot(path=RAW/'02.png')
         await pg.click('.tab[data-v="bank"]'); await settle(pg); await pg.screenshot(path=RAW/'03.png')
-        await pg.click('#bankCustom'); await pg.wait_for_timeout(200); await pg.click('#bankStart'); await pg.wait_for_timeout(600)
-        ans = await pg.evaluate('bs.items[bs.i].answer')
-        wrong = 'X' if ans == 'O' else 'O'
-        if await pg.locator('[data-ox]').count(): await pg.click(f'[data-ox="{wrong}"]')
-        elif await pg.locator('[data-bp]').count(): await pg.click('[data-bp="1"]')
-        await settle(pg); await pg.screenshot(path=RAW/'04.png')
+        # 오답 화면: 선다형(충격량) 하나를 일부러 틀려 '왜 틀렸나'까지 보이게
+        await pg.wait_for_function('MORE.ok', timeout=15000)
+        await pg.evaluate("(() => { const q = BANK.find(x => x.lessonId === '1304' && x.type === 'mc' && x.wrong && x.explain) || BANK.find(x => x.type === 'mc' && x.wrong); startBank([q], ''); })()"); await pg.wait_for_timeout(500)
+        ans = await pg.evaluate('bs.items[bs.i].answer'); await pg.click(f'[data-bp="{1 if ans != 1 else 2}"]')
+        await settle(pg); await pg.evaluate("document.querySelector('#v-bank .expl, #v-bank .wrongbox')?.scrollIntoView({ block:'center' })"); await pg.wait_for_timeout(300); await pg.screenshot(path=RAW/'04.png')
         await pg.click('#bankQuit'); await pg.wait_for_timeout(300)
         # 일정: 시간표·D-day·시험을 채워 실제로 쓰는 화면을 보여 준다
         await pg.evaluate("""(()=>{ const u=()=>Math.random().toString(36).slice(2,8);
@@ -123,6 +122,7 @@ async def capture():
           mk(t, c.title + ' 정리', '오늘 배운 것\\n· 충격량 = 힘 × 시간 = 운동량의 변화량\\n\\n헷갈린 것\\n· 에어백은 힘을 줄이는 게 아니라 시간을 늘린다\\n\\n다음에 할 것\\n· 문제 은행 III-1 10문제', [c.id]);
         })()""")
         await pg.evaluate("openNotes('today', todayISO())"); await settle(pg, 500)
+        await pg.evaluate("(() => { const c = document.querySelector('.ncard'); if (c) c.scrollIntoView({ block:'start' }); window.scrollBy(0, -70); })()"); await pg.wait_for_timeout(300)
         await pg.screenshot(path=RAW/'07.png')
         await fresh('owner'); await settle(pg); await pg.screenshot(path=RAW/'08.png')
         await b.close()
