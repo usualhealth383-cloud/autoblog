@@ -914,7 +914,7 @@ def main():
         _t9 = pg.inner_text('#view')
         if '문제가 생겼어요' not in _t9 or '홈으로' not in _t9: fails.append('화면이 터졌을 때 안내 카드가 안 뜹니다')
         if _e9: fails.append(f'화면이 터졌을 때 오류가 밖으로 샙니다: {_e9[:1]}')
-        pg.evaluate("()=>{ vAbout = window.__vAboutKeep; }"); pg.goto(url + '#/about'); pg.wait_for_timeout(400)
+        pg.evaluate("()=>{ vAbout = window.__vAboutKeep; }"); pg.goto(url + '#/home'); pg.wait_for_timeout(200); pg.goto(url + '#/about'); pg.wait_for_timeout(400)   # 같은 주소로는 다시 그리지 않으니 홈을 거쳐 온다
         if '문제가 생겼어요' in pg.inner_text('#view'): fails.append('화면 오류 카드가 복구 뒤에도 남습니다')
         br.close()
     print(f'화면 {len(routes)}개 검사 완료')
