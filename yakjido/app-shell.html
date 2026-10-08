@@ -6067,7 +6067,9 @@ try { const fs = localStorage.getItem('yakjido.fs'); if (fs) document.documentEl
    안 보이는 분이 스스로 고를 칸이 없었다 — 앱 안에서 고르게 한다(2026-09-22). */
 try { const th = localStorage.getItem('yakjido.theme'); if (th === 'light' || th === 'dark') document.documentElement.dataset.theme = th; } catch (e) {}
 /* 제품·성분 사전(약 700 KB)은 첫 화면이 자리 잡은 뒤 조용히 미리 받는다 — "인사돌" 을 쳤을 때 제품이 증상보다 위에 오게(감사 #38). 데이터 절약 모드면 안 받는다 */
-setTimeout(() => { try { if (navigator.connection && navigator.connection.saveData) return; } catch (e) {} lexLoad(true); pubIndexSoon(); }, 3500);
+/* 2026-10-08 출시 점검: 3G 흉내(1.6 Mbps)에서 본문이 26초 걸렸다 — 사전 묶음이 3.5초 뒤 본문과 «같은 선을 나눠 쓰며» 내려와서다.
+   본문·약 칸이 다 온 «뒤에» 받고, 2G급 신호면 아예 받지 않는다(검색을 처음 쓸 때 받는다). */
+setTimeout(() => { try { const c = navigator.connection; if (c && (c.saveData || /2g/.test(c.effectiveType || ''))) return; } catch (e) {} Promise.all([ensureCore(), ensureDetail()]).then(() => setTimeout(() => { lexLoad(true); pubIndexSoon(); }, 800)); }, 3500);
 /* ───────── 시작 ───────── */
 try { if (!helloDone() && !location.hash) { location.hash = '#/hello/1'; } } catch (e) {}
 try { rollDay(); } catch (e) {}   /* 앱을 열 때 오늘 계획을 기록에 적고, 60일 지난 것을 치운다 */
@@ -6089,6 +6091,8 @@ if ('serviceWorker' in navigator && location.protocol.startsWith('http') && !NAT
      서비스워커의 fetch 처리가 응답을 캐시하므로 여기서는 「부르기만」 하면 된다. */
   const warm = () => { ['lexicon.json', 'brands.json', 'qa.json', 'mixes.json', 'nutrients.json', 'easy-index.json', 'pills.json']
     .forEach((f, i) => setTimeout(() => fetch('data/' + f, { cache:'force-cache' }).catch(() => {}), i * 1200)); };
-  if ('requestIdleCallback' in window) requestIdleCallback(warm, { timeout:8000 }); else setTimeout(warm, 4000);
+  /* 본문·약 칸이 다 온 뒤, 2G급이 아닐 때만(2026-10-08) — 17 MB 자료가 본문과 선을 나눠 쓰지 않게 */
+  const warmLater = () => { try { const c = navigator.connection; if (c && (c.saveData || /2g/.test(c.effectiveType || ''))) return; } catch (e) {} if ('requestIdleCallback' in window) requestIdleCallback(warm, { timeout:8000 }); else setTimeout(warm, 4000); };
+  Promise.all([ensureCore(), ensureDetail()]).then(() => setTimeout(warmLater, 1500));
 }
 </script>
