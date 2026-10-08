@@ -264,6 +264,17 @@ for _x in SUP:
         _txt = json.dumps(_x.get('dose') or {}, ensure_ascii=False).replace(',', '')
         if f'{_nd["ul"]:g}' not in _txt: fails.append(f'영양제 {_x["id"]} — 필요량 칸 상한 {_nd["ul"]:g} 이 「얼마나」 글에 없습니다(두 숫자가 다를 수 있음)')
 
+# ── 오래된 웹뷰 안내 — 본 묶음이 못 읽히면 흰 화면 대신 업데이트 안내(2026-10-08) ──────────────
+_ix = (pathlib.Path(__file__).resolve().parent.parent.parent / 'docs' / 'yakjido' / 'index.html')
+if _ix.exists():
+    _h = _ix.read_text(encoding='utf-8')
+    if 'window.__YAKJIDO_OK__ = true' not in _h or '인터넷 프로그램이 오래됐어요' not in _h:
+        fails.append('오래된 웹뷰 안내문 또는 읽힘 표식(__YAKJIDO_OK__)이 index.html 에 없습니다')
+    _head = _h.split('window.__YAKJIDO_OK__ = true')[0]
+    _guard = _head[_head.find('오래된 안드로이드 웹뷰'):]
+    if re.search(r'=>|`|\?\.|\?\?|\blet\b|\bconst\b', _guard):
+        fails.append('오래된 웹뷰 안내 조각에 새 문법(화살표·백틱·?.·let·const)이 섞였습니다 — 옛 브라우저에서 이 조각마저 못 읽습니다')
+
 # ── 첫 화면이 가벼운지 — 어르신은 데이터가 느린 곳에서 여신다 ──────────────
 # 본문을 data/core.json 으로 뺀 뒤 첫 내려받기가 1.47 MB → 0.5 MB 가 됐다(v84).
 # 다시 통째로 심는 실수를 하면 여기서 걸린다.
