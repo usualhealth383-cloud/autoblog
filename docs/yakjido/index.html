@@ -1209,7 +1209,8 @@ nav.tabbar button.on svg.i{stroke-width:2.2}
 .pillimg{width:64px;height:64px;border-radius:12px;object-fit:cover;background:var(--tint2);border:1px solid var(--hairline);flex:none}
 .pillimg.big{width:100%;height:auto;max-height:220px;object-fit:contain;background:#fff;margin-top:var(--s3)}
 .pub-hero{display:flex;gap:var(--s3);align-items:center}.pub-hero h1{overflow-wrap:anywhere}
-.qa h3{margin-top:var(--s4);font-size:.9375rem;color:var(--primary-deep)}
+.qa h3,.qa h2.qa-h{margin-top:var(--s4);font-size:.9375rem;color:var(--primary-deep)}
+.qa>h2.qa-h:first-child,.qa>h3:first-child{margin-top:0}
 .qa p{white-space:pre-line;font-size:.9375rem;line-height:1.7;margin-top:4px;overflow-wrap:anywhere;word-break:normal}
 .shape-row{display:flex;flex-wrap:wrap;gap:6px;margin-top:var(--s2)}
 .swatch{display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border-radius:var(--r-pill);border:1px solid var(--hairline);background:var(--card);font-size:.8125rem;font-weight:600;min-height:36px}
@@ -1758,7 +1759,7 @@ function doseHome(){
   else body = `<div class="dh-b">${I.clock}<span><b>다음은 ${next.t} · ${esc(next.d.name)}</b><small>오늘 ${left.length}번 남았어요</small></span></div>`;
   return `<section class="sec" aria-label="오늘 약">
     <div class="dh" role="group">
-      <button class="dh-go" onclick="go('/schedule')" aria-label="복용 시간 알림 열기">${head}</button>
+      <button class="dh-go" onclick="go('/schedule')" aria-label="오늘 약 ${esc(String(say).replace(/<[^>]+>/g, ''))} — 복용 시간 알림 열기">${head}</button>
       ${body}
       ${low.length ? `<div class="dh-low">${I.alert}<span><b>곧 떨어져요</b> — ${low.map(x => esc(x.n) + ' ' + x.days + '일치').join(' · ')}</span></div>` : ''}
     </div></section>`;
@@ -2053,7 +2054,7 @@ const srcShort = t => {
   }
   return x.length > 46 ? x.slice(0, 44).replace(/[\s,·]+$/, '') + '…' : x;
 };
-const srcChips = ids => (ids || []).length ? `<div class="srcs">${ids.map(id => { const s = D.sources?.[id]; if (!s) return `<span class="src-chip">${I.link}출처: ${esc(id)}</span>`; const full = String(s.label || '').replace(/\*\*/g, ''); return `<a class="src-chip" href="${esc(s.url)}" target="_blank" rel="noopener" title="${esc(full)}" aria-label="출처: ${esc(full)}">${I.link}출처: ${esc(srcShort(s.label))}</a>`; }).join('')}</div>` : '';
+const srcChips = ids => (ids || []).length ? `<div class="srcs">${ids.map(id => { const s = D.sources?.[id]; if (!s) return `<span class="src-chip">${I.link}출처: ${esc(id)}</span>`; const full = String(s.label || '').replace(/\*\*/g, ''); return `<a class="src-chip" href="${esc(s.url)}" target="_blank" rel="noopener" title="${esc(full)}" aria-label="출처: ${esc(srcShort(s.label))} — ${esc(full)}">${I.link}출처: ${esc(srcShort(s.label))}</a>`; }).join('')}</div>` : '';
 const disclaimer = txt => `<p class="disclaimer">${I.info}<span>${esc(txt || D.meta?.disclaimer || '이 정보는 참고용이에요. 약 선택이 어렵거나 증상이 계속되면 약사·의사와 상의하세요.')}</span></p>`;
 const badge = rx => rx === '안전상비' ? '<span class="badge cvs">편의점 가능</span>' : rx === '일반' ? '<span class="badge otc">약국 구입</span>' : rx === '전문' ? '<span class="badge rx">처방 필요</span>' : rx === '제품별' ? '<span class="badge warn">제품에 따라 처방</span>' : rx === '건기식' ? '<span class="badge otc">건강기능식품</span>' : '';
 const useTag = d => d?.useNote ? `<em class="unote">${I.alert}${fmt(d.useNote)}</em>` : '';
@@ -5045,7 +5046,7 @@ function kgCard(seq){
   return `<section class="sec card kg"><h2>약사가 알려 드리는 것 <small>약학정보원 복약정보</small></h2>
     ${g.t ? `<p class="kg-t">${esc(g.t)}</p>` : ''}
     ${(g.g || []).length ? `<ul class="plain kg-g">${g.g.map(x => `<li>${esc(x)}</li>`).join('')}</ul>` : ''}
-    ${(g.p || []).length ? `<div class="kg-p" aria-label="복약 그림 표시">${g.p.map(c => `<img src="${pictoSrc(c)}" alt="${esc(PICTO_LABEL[c] || '복약 그림 표시')}" loading="lazy" onerror="this.remove()">`).join('')}</div>` : ''}
+    ${(g.p || []).length ? `<div class="kg-p" role="group" aria-label="복약 그림 표시">${g.p.map(c => `<img src="${pictoSrc(c)}" alt="${esc(PICTO_LABEL[c] || '복약 그림 표시')}" loading="lazy" onerror="this.remove()">`).join('')}</div>` : ''}
     ${dur.length ? `<div class="kg-dur">${dur.map(([k, v]) => `<div><small>${esc(k)}</small><span>${esc(v)}</span></div>`).join('')}</div>` : ''}
     ${facts.length ? `<div class="kv" style="grid-template-columns:1fr;margin-top:12px">${facts.map(([k, v]) => `<div><small>${k}</small><b>${esc(v)}</b></div>`).join('')}</div>` : ''}
     <p class="small muted" style="margin-top:10px">출처: 약학정보원 복약정보${g.c ? ` · <a class="link" href="https://www.health.kr/searchDrug/result_drug.asp?drug_cd=${encodeURIComponent(g.c)}" target="_blank" rel="noopener">약학정보원에서 자세히</a>` : ''}</p></section>`;
@@ -5079,13 +5080,13 @@ function vPub(id){
   ${hasKg ? `<div class="pane on" id="pb1">${kgCard(ix.seq)}</div>` : ''}
   <div class="pane${hasKg ? '' : ' on'}" id="pb2">
   <section class="sec card qa">${det ? `
-    <h3>이 약의 효능은 무엇입니까?</h3><p>${esc(pubText(det.e))}</p>
-    <h3>이 약은 어떻게 사용합니까?</h3><p>${esc(pubText(det.u))}</p>
+    <h2 class="qa-h">이 약의 효능은 무엇입니까?</h2><p>${esc(pubText(det.e))}</p>
+    <h2 class="qa-h">이 약은 어떻게 사용합니까?</h2><p>${esc(pubText(det.u))}</p>
     <details class="pub-more"><summary>허가사항 원문 더 보기 — 주의사항 · 같이 쓰면 안 되는 것 · 부작용${I.chev}</summary><div class="bd">
-    <h3>사용상 주의사항</h3><p>${esc(pubText(det.c))}</p>
-    ${det.x ? `<h3>주의해야 할 약 또는 음식</h3><p>${esc(pubText(det.x))}</p>` : ''}
-    ${det.s ? `<h3>나타날 수 있는 이상반응</h3><p>${esc(pubText(det.s))}</p>` : ''}
-    ${det.k ? `<h3>보관 방법</h3><p>${esc(pubText(det.k))}</p>` : ''}
+    <h2 class="qa-h">사용상 주의사항</h2><p>${esc(pubText(det.c))}</p>
+    ${det.x ? `<h2 class="qa-h">주의해야 할 약 또는 음식</h2><p>${esc(pubText(det.x))}</p>` : ''}
+    ${det.s ? `<h2 class="qa-h">나타날 수 있는 이상반응</h2><p>${esc(pubText(det.s))}</p>` : ''}
+    ${det.k ? `<h2 class="qa-h">보관 방법</h2><p>${esc(pubText(det.k))}</p>` : ''}
     </div></details>` : '<p class="loading">허가사항 요약을 불러오는 중…</p>'}
     <div class="srcs"><span class="src-chip">${I.link}출처: 식품의약품안전처 e약은요(의약품개요정보) · 공공데이터포털</span>${ix.img ? `<span class="src-chip">${I.link}낱알 사진: 약학정보원·식약처</span>` : ''}</div>
   </section>
