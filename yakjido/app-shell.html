@@ -1751,7 +1751,7 @@ function doseHome(){
   const low = lowStock();
   /* 「1번 중 0번 드셨어요」처럼 읽히지 않게, 상황마다 말을 바꾼다 */
   const say = !done ? `오늘 ${rows.length}번 드실 차례예요` : !left.length ? `오늘 ${rows.length}번, 모두 드셨어요` : `${rows.length}번 중 ${done}번 드셨어요`;
-  const head = `<div class="dh-h"><span class="eb">오늘 약</span><b>${say}</b></div>`;
+  const head = `<div class="dh-h"><span class="eb">오늘 약</span> <b>${say}</b></div>`;   /* 사이 띄어쓰기: 읽어 주는 이름(aria-label)과 보이는 글자를 맞추려고 — 둘 다 블록이라 화면엔 영향 없음 */
   let body;
   if (!left.length) body = `<div class="dh-b ok">${I.check}<span><b>잘 챙기셨어요</b><small>내일 ${rows[0].t}에 다시 알려드릴게요</small></span></div>`;
   else if (due) body = `<div class="dh-b due">${I.clock}<span><b>${esc(due.d.name)}</b><small>${due.t} — ${due.min <= nowMin ? '드실 시간이 지났어요' : '곧 드실 시간이에요'}</small></span>
