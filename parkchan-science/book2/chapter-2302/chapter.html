@@ -4,8 +4,8 @@
 <meta charset="utf-8">
 <title>박찬 과학 통합과학2 — III-02 빅데이터와 인공지능·로봇</title>
 <style>
-  @font-face { font-family:'PC Sans'; src:url('file:///root/.fonts/NotoSansKR.ttf'); font-weight:100 900; }
-  @font-face { font-family:'PC Serif'; src:url('file:///root/.fonts/NotoSerifKR.ttf'); font-weight:100 900; }
+  @font-face { font-family:'PC Sans'; src:url('file:///root/.fonts/static/NotoSansKR-400.ttf'); font-weight:400; } @font-face { font-family:'PC Sans'; src:url('file:///root/.fonts/static/NotoSansKR-500.ttf'); font-weight:500; } @font-face { font-family:'PC Sans'; src:url('file:///root/.fonts/static/NotoSansKR-600.ttf'); font-weight:600; } @font-face { font-family:'PC Sans'; src:url('file:///root/.fonts/static/NotoSansKR-700.ttf'); font-weight:700; } @font-face { font-family:'PC Sans'; src:url('file:///root/.fonts/static/NotoSansKR-800.ttf'); font-weight:800; } @font-face { font-family:'PC Sans'; src:url('file:///root/.fonts/static/NotoSansKR-900.ttf'); font-weight:900; }
+  @font-face { font-family:'PC Serif'; src:url('file:///root/.fonts/static/NotoSerifKR-400.ttf'); font-weight:400; } @font-face { font-family:'PC Serif'; src:url('file:///root/.fonts/static/NotoSerifKR-500.ttf'); font-weight:500; } @font-face { font-family:'PC Serif'; src:url('file:///root/.fonts/static/NotoSerifKR-600.ttf'); font-weight:600; } @font-face { font-family:'PC Serif'; src:url('file:///root/.fonts/static/NotoSerifKR-700.ttf'); font-weight:700; } @font-face { font-family:'PC Serif'; src:url('file:///root/.fonts/static/NotoSerifKR-800.ttf'); font-weight:800; } @font-face { font-family:'PC Serif'; src:url('file:///root/.fonts/static/NotoSerifKR-900.ttf'); font-weight:900; }
   @font-face { font-family:'PC Pen'; src:url('file:///root/.fonts/YeonSung-Regular.ttf'); font-weight:400; }
 
   :root{
@@ -229,6 +229,29 @@
   /* 화학식 첨자 — 본문 폰트를 그대로 축소해 자형이 어긋나지 않게 한다 */
   sub,sup{ font-size:0.68em; line-height:0; font-weight:inherit; }
   sub{ vertical-align:-0.14em; } sup{ vertical-align:0.34em; }
+  /* ── 2026-10-02 보강: 중요 표시 · 채점 기준 · 꼼꼼 자료 분석 · 간격 두고 다시 꺼내기 ── */
+  .must{ display:inline-block; font-size:7pt; font-weight:900; color:#fff; background:#D9534F; border-radius:1.6mm; padding:0.2mm 1.4mm; margin-right:1.2mm; vertical-align:1pt; }
+  table.rubric{ border-collapse:collapse; width:100%; font-size:7.6pt; margin:1mm 0 0.5mm; }
+  table.rubric th, table.rubric td{ border:0.25mm solid var(--line); padding:0.8mm 1.4mm; text-align:left; vertical-align:top; }
+  table.rubric th{ background:#F4F1EA; font-weight:800; white-space:nowrap; }
+  .analysis{ border:0.35mm dashed #C9A36A; border-radius:2.5mm; padding:1.6mm 2mm 1.2mm; margin:1.5mm 0; background:#FFFCF5; }
+  .analysis .at{ font-size:7.6pt; font-weight:900; color:#9C6503; margin-bottom:0.8mm; }
+  .analysis svg{ max-width:100%; height:auto; display:block; }
+  .spaced{ border:0.4mm solid var(--line); border-radius:3mm; padding:3mm 4mm 2.6mm; margin:0 0 4mm; position:relative; background:#FAFBFC; }
+  .spaced .st{ font-size:9.5pt; font-weight:900; color:var(--unit); margin-bottom:1.6mm; }
+  .spaced ol{ margin:0; padding-left:5mm; font-size:8.8pt; line-height:1.75; }
+  .spaced .when{ display:flex; gap:5mm; font-size:8pt; color:var(--sub); margin-top:1.8mm; }
+  .spaced .ans{ position:absolute; right:4mm; bottom:2.4mm; transform:rotate(180deg); font-size:6.8pt; color:var(--sub); }
+  /* 2단 문항 쪽 간격 · 발문 안 탐구 과정 상자 (합격본 chapter-08 에서) */
+  .qg2 .q{ margin-bottom:6mm; }
+  .qg2 > div > .q:last-child{ margin-bottom:0; }
+  .qg2 .choices.inline{ gap:0 4mm; }
+  .qg2 .choices{ margin-top:1.8mm; line-height:1.78; }
+  .qg2 .bogi-box{ margin-top:2mm; padding:1.8mm 2.8mm; font-size:9pt; line-height:1.72; }
+  .qg2 .bogi-box .bt{ margin-bottom:0.3mm; }
+  .qg2 .q figure{ margin:1.6mm 0 0.6mm 8.4mm !important; }
+  .exp{ border:0.35mm solid #B8C2CA; border-radius:1.6mm; background:#FAFBFC; padding:1.6mm 2.6mm; margin:1.4mm 0 1.6mm; font-size:8.9pt; line-height:1.7; }
+  .exp b{ font-family:'PC Sans'; font-size:7.8pt; font-weight:900; color:var(--brand); }
 </style>
 </head>
 <body>
@@ -282,14 +305,16 @@
         <li>내비게이션은 어떻게 막히는 길을 미리 알까? <span class="qgo">자료</span></li>
         <li>데이터가 많아지면 무엇이 좋고, 무엇이 위험할까? <span class="qgo">개념 2·3</span></li>
         <li>인공지능은 어떻게 '배우는' 걸까? <span class="qgo">개념 4</span></li>
+        <li>로봇은 무엇으로 보고, 판단하고, 움직일까? <span class="qgo">개념 4</span></li>
         <li>냉장고가 인터넷에 연결되면 무슨 일이 생길까? <span class="qgo">개념 5</span></li>
+        <li>교실 공기, 언제 창문을 열어야 할까? <span class="qgo">교과서 탐구</span></li>
       </ul>
     </div>
 
     <div class="opener-quote" style="margin-top:2.4mm;">"측정할 수 없으면 개선할 수 없다."<span class="who">— 데이터 시대를 예고한 오래된 격언</span></div>
   </div>
 
-  <div class="folio"><span>박찬 과학 | 통합과학 2</span><span class="num">162</span></div>
+  <div class="folio"><span>박찬 과학 | 통합과학 2</span><span class="num">219</span></div>
 </div>
 
 <!-- ═════════════ p.163 개념 01 빅데이터란 ═════════════ -->
@@ -305,7 +330,7 @@
       <p class="body">중요한 것은 크기 자체가 아니라 <b>패턴</b>이다. 한 사람의 승하차 기록은 사소하지만, 천만 명의 기록이 모이면 도시의 출퇴근 리듬이 보이고, 버스 노선을 어디에 놓아야 할지가 <b>데이터에서</b> 나온다. 존 스노우가 지도의 점들에서 펌프를 찾아냈듯(01), 빅데이터 분석은 <b>점들 속에서 의미를 읽어 내는 과학</b>이다.</p>
 
       <figure>
-        <svg width="468" height="219" viewBox="0 0 620 290" font-family="PC Sans"><defs><linearGradient id="p23021_skyA" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#D8E4F6"/><stop offset="1" stop-color="#F2F4FC"/></linearGradient><g id="p23021_person"><circle r="11" fill="#F0C9A8"/><path d="M-13,14 q13,-10 26,0 v32 h-26 z" fill="#4053B8"/><rect x="-11" y="46" width="9" height="14" fill="#3D4C58"/><rect x="2" y="46" width="9" height="14" fill="#3D4C58"/></g><marker id="p23021_arrP" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="#4053B8"/></marker></defs>
+        <svg width="495" height="231.6" viewBox="0 0 620 290" font-family="PC Sans"><defs><linearGradient id="p23021_skyA" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#D8E4F6"/><stop offset="1" stop-color="#F2F4FC"/></linearGradient><g id="p23021_person"><circle r="11" fill="#F0C9A8"/><path d="M-13,14 q13,-10 26,0 v32 h-26 z" fill="#4053B8"/><rect x="-11" y="46" width="9" height="14" fill="#3D4C58"/><rect x="2" y="46" width="9" height="14" fill="#3D4C58"/></g><marker id="p23021_arrP" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="#4053B8"/></marker></defs>
       <rect x="0" y="0" width="620" height="290" rx="10" fill="url(#p23021_skyA)"/>
       <rect x="0" y="212" width="620" height="78" rx="10" fill="#E3DED2"/>
       <rect x="0" y="218" width="620" height="34" fill="#8A949E"/>
@@ -313,7 +338,7 @@
       <circle cx="40" cy="36" r="15" fill="#F3C24E"/>
 
       <!-- 데이터 센터 -->
-      <text x="310" y="22" text-anchor="middle" font-size="12.5" font-weight="900" fill="#2E3E96">빅데이터 — 방대하게 · 실시간으로 · 다양한 형태로</text>
+      <text x="310" y="22" text-anchor="middle" font-size="15" font-weight="900" fill="#2E3E96">빅데이터 — 방대하게 · 실시간으로 · 다양한 형태로</text>
       <rect x="250" y="30" width="120" height="80" rx="8" fill="#2E3E96"/>
       <g fill="#4053B8">
         <rect x="260" y="38" width="100" height="14" rx="3"/><rect x="260" y="56" width="100" height="14" rx="3"/><rect x="260" y="74" width="100" height="14" rx="3"/><rect x="260" y="92" width="100" height="12" rx="3"/>
@@ -321,24 +346,24 @@
       <g fill="#7FE0B0">
         <circle cx="268" cy="45" r="2.2"/><circle cx="276" cy="45" r="2.2"/><circle cx="268" cy="63" r="2.2"/><circle cx="276" cy="63" r="2.2"/><circle cx="268" cy="81" r="2.2"/><circle cx="276" cy="81" r="2.2"/><circle cx="268" cy="98" r="2.2"/><circle cx="276" cy="98" r="2.2"/>
       </g>
-      <text x="310" y="124" text-anchor="middle" font-size="11.5" font-weight="800" fill="#2E3E96">데이터 센터에 모인다</text>
+      <text x="242" y="50" text-anchor="end" font-size="13.6" font-weight="800" fill="#2E3E96">데이터 센터에 모인다</text>
 
       <!-- 패턴 패널 -->
       <line x1="372" y1="70" x2="396" y2="70" stroke="#4053B8" stroke-width="3" marker-end="url(#p23021_arrP)"/>
       <rect x="402" y="28" width="200" height="86" rx="8" fill="#fff" stroke="#C0C9EE" stroke-width="1"/>
-      <text x="502" y="46" text-anchor="middle" font-size="11.5" font-weight="900" fill="#2E3E96">패턴 읽기 — 도시의 출퇴근 흐름</text>
+      <text x="502" y="46" text-anchor="middle" font-size="13.6" font-weight="900" fill="#2E3E96">패턴 읽기 — 도시의 출퇴근 흐름</text>
       <line x1="420" y1="96" x2="592" y2="96" stroke="#5B6B77" stroke-width="1.2"/>
       <line x1="420" y1="96" x2="420" y2="54" stroke="#5B6B77" stroke-width="1.2"/>
       <path d="M422,94 C440,92 450,58 462,58 C474,58 486,88 505,88 C524,88 536,60 548,60 C560,60 572,92 590,94" fill="none" stroke="#147D6F" stroke-width="2.4"/>
-      <text x="462" y="110" text-anchor="middle" font-size="11.5" fill="#5B6B77">아침</text>
-      <text x="548" y="110" text-anchor="middle" font-size="11.5" fill="#5B6B77">저녁</text>
+      <text x="462" y="110" text-anchor="middle" font-size="13.6" fill="#5B6B77">아침</text>
+      <text x="548" y="110" text-anchor="middle" font-size="13.6" fill="#5B6B77">저녁</text>
 
       <!-- 원천 1: 검색·SNS -->
       <use href="#p23021_person" x="70" y="152"/>
       <rect x="44" y="176" width="12" height="18" rx="2" fill="#3D4C58"/>
       <rect x="36" y="104" width="68" height="26" rx="6" fill="#fff" stroke="#C0C9EE"/>
       <circle cx="54" cy="116" r="6" fill="none" stroke="#4053B8" stroke-width="2"/><line x1="58" y1="120" x2="64" y2="126" stroke="#4053B8" stroke-width="2.2"/>
-      <text x="86" y="121" text-anchor="middle" font-size="11.5" font-weight="800" fill="#2E3E96">검색</text>
+      <text x="86" y="121" text-anchor="middle" font-size="13.6" font-weight="800" fill="#2E3E96">검색</text>
       <!-- 원천 2: 카드 결제 -->
       <rect x="135" y="140" width="80" height="72" fill="#F7EFE3" stroke="#B8AFA0" stroke-width="1"/>
       <rect x="130" y="138" width="90" height="14" rx="3" fill="#D6456F"/>
@@ -370,7 +395,7 @@
       </g>
 
       <!-- 원천 이름 -->
-      <g text-anchor="middle" font-size="12" font-weight="800" fill="#2E3E96">
+      <g text-anchor="middle" font-size="13.8" font-weight="800" fill="#2E3E96">
         <text x="70" y="274">검색 · SNS</text><text x="175" y="274">카드 결제</text><text x="300" y="274">버스 승하차</text><text x="460" y="274">위치 · 이동</text><text x="560" y="274">센서 · 관측</text>
       </g>
     </svg>
@@ -406,7 +431,7 @@
     </ol>
     <div class="qc-ans">정답 1 O 2 X (글·사진·위치 등 다양) 3 O</div>
   </div>
-  <div class="folio"><span>III. 과학과 미래 사회</span><span class="num">163</span></div>
+  <div class="folio"><span>III. 과학과 미래 사회</span><span class="num">220</span></div>
 </div>
 
 <!-- ═════════════ p.164 개념 02 빅데이터의 활용 ═════════════ -->
@@ -417,13 +442,13 @@
       <h3 class="sec"><span class="n">2</span>데이터가 일하는 현장 — 활용의 갤러리</h3>
       <p class="body">빅데이터는 이미 일상 곳곳에서 일하고 있다. <b>교통</b> — 내비게이션은 수많은 차의 실시간 위치·속도 데이터로 정체를 예측해 더 빠른 길을 안내한다(자료 파헤치기에서 해부한다). <b>기상</b> — 위성·관측소·선박이 보내는 방대한 관측 데이터가 일기 예보의 재료다. <b>감염병</b> — 01에서 본 역학 조사와 확산 예측이 바로 빅데이터 위에서 돌아간다.</p>
       <p class="body"><b>의료</b> — 수많은 환자 데이터에서 질병의 위험 요인을 찾아내고, 의료 영상 판독을 보조한다. <b>생활</b> — 시청 기록이 다음 볼 영상을 추천하고, 심야버스 노선은 심야 통화·이동 데이터로 설계되었다. 공통 문법은 하나다 — <span class="u-amber">모아서(수집), 읽어서(분석), 내다본다(예측)</span>. 측정의 과학(통과1 I단원)이 사회의 크기로 자란 것이다.</p>
+      <p class="body"><b>과학 연구</b> — 빅데이터는 과학 자체도 바꾸었다. 실험 장치와 관측 위성이 쏟아 내는 측정값, 사람의 경우 약 30억 염기쌍에 이르는 DNA 염기 서열을 읽는 <span class="kw">유전체 분석</span>, 수많은 화합물 가운데 약이 될 후보를 컴퓨터로 먼저 걸러 내는 <b>신약 개발</b>까지 — 정보를 디지털로 바꾸어 대량으로 쌓을 수 있게 되자, 사람이 손으로는 다 볼 수 없던 패턴을 찾아내는 연구가 가능해졌다.</p>
 
       <figure>
-        <svg width="468" height="160" viewBox="0 0 620 212" font-family="PC Sans">
-      <text x="310" y="0" font-size="1" fill="none">.</text>
-      
+        <svg width="495" height="172.5" viewBox="0 0 620 216" font-family="PC Sans">
+            
       <g transform="translate(4,0)">
-        <text x="74" y="14" text-anchor="middle" font-size="11" font-weight="900" fill="#2E3E96">① 교통</text>
+        <text x="74" y="14" text-anchor="middle" font-size="14.5" font-weight="900" fill="#2E3E96">① 교통</text>
         <clipPath id="bd4"><rect x="0" y="20" width="148" height="118" rx="7"/></clipPath>
         <g clip-path="url(#bd4)">
         <rect x="0" y="20" width="148" height="118" fill="#EEF1FA"/>
@@ -434,21 +459,21 @@
         <g><rect x="46" y="119" width="22" height="10" rx="3" fill="#4053B8"/><circle cx="52" cy="130" r="2.4" fill="#3D4C58"/><circle cx="63" cy="130" r="2.4" fill="#3D4C58"/></g>
         <g><rect x="78" y="119" width="22" height="10" rx="3" fill="#E8940A"/><circle cx="84" cy="130" r="2.4" fill="#3D4C58"/><circle cx="95" cy="130" r="2.4" fill="#3D4C58"/></g>
         <g><rect x="24" y="87" width="22" height="10" rx="3" fill="#4BA394"/><circle cx="30" cy="98" r="2.4" fill="#3D4C58"/><circle cx="41" cy="98" r="2.4" fill="#3D4C58"/></g>
-        <text x="120" y="112" text-anchor="middle" font-size="9" font-weight="800" fill="#B0483A">정체</text>
+        <text x="120" y="112" text-anchor="middle" font-size="13.4" font-weight="800" fill="#B0483A">정체</text>
         <g transform="translate(96,30)">
           <rect width="40" height="52" rx="6" fill="#2E3E96"/><rect x="3" y="6" width="34" height="40" rx="3" fill="#fff"/>
           <path d="M8,40 q10,-16 24,-24" fill="none" stroke="#4BA394" stroke-width="3" stroke-linecap="round"/>
           <circle cx="8" cy="40" r="2.6" fill="#D6455D"/>
           
         </g>
-        <text x="10" y="40" font-size="9" font-weight="800" fill="#2E3E96">위치·속도 수집</text>
-        <text x="88" y="70" text-anchor="end" font-size="8.8" font-weight="800" fill="#0F6357">빠른 길 안내</text></g>
+        <text x="8" y="40" font-size="13.4" font-weight="800" fill="#2E3E96">위치·속도</text><text x="8" y="56" font-size="13.4" font-weight="800" fill="#2E3E96">수집</text>
+        <text x="90" y="76" text-anchor="end" font-size="13.4" font-weight="800" fill="#0F6357">빠른 길 안내</text></g>
         <rect x="0" y="20" width="148" height="118" rx="7" fill="none" stroke="#C0C9EE" stroke-width="1"/>
-        <text x="74" y="154" text-anchor="middle" font-size="9" font-weight="700" fill="#3A3A3A">실시간 위치·속도로 정체를 피한다</text>
+        <text x="74" y="156" text-anchor="middle" font-size="13.4" font-weight="700" fill="#3A3A3A">실시간 위치·속도로</text><text x="74" y="172" text-anchor="middle" font-size="13.4" font-weight="700" fill="#3A3A3A">정체를 피한다</text>
       </g>
       
       <g transform="translate(160,0)">
-        <text x="74" y="14" text-anchor="middle" font-size="11" font-weight="900" fill="#2E3E96">② 기상</text>
+        <text x="74" y="14" text-anchor="middle" font-size="14.5" font-weight="900" fill="#2E3E96">② 기상</text>
         <clipPath id="bd160"><rect x="0" y="20" width="148" height="118" rx="7"/></clipPath>
         <g clip-path="url(#bd160)">
         <rect x="0" y="20" width="148" height="118" fill="#E4EDF7"/>
@@ -463,58 +488,58 @@
         <g stroke="#4C86B0" stroke-width="1.8" stroke-linecap="round"><line x1="64" y1="88" x2="61" y2="102"/><line x1="76" y1="88" x2="73" y2="104"/><line x1="88" y1="88" x2="85" y2="102"/></g>
         <g transform="translate(104,86)">
           <rect width="38" height="34" rx="4" fill="#fff" stroke="#C0C9EE"/>
-          <text x="19" y="13" text-anchor="middle" font-size="8" font-weight="800" fill="#2E3E96">내일</text>
+          <text x="19" y="15" text-anchor="middle" font-size="13.4" font-weight="800" fill="#2E3E96">내일</text>
           <g fill="#B8C2CA"><ellipse cx="19" cy="23" rx="9" ry="5"/></g>
           <g stroke="#4C86B0" stroke-width="1.4"><line x1="15" y1="28" x2="14" y2="32"/><line x1="23" y1="28" x2="22" y2="32"/></g>
         </g>
-        <text x="10" y="112" font-size="9" font-weight="800" fill="#2E3E96">관측 데이터 → 예보</text></g>
+        <text x="8" y="134" font-size="13.4" font-weight="800" fill="#2E3E96">관측 데이터 → 예보</text></g>
         <rect x="0" y="20" width="148" height="118" rx="7" fill="none" stroke="#C0C9EE" stroke-width="1"/>
-        <text x="74" y="154" text-anchor="middle" font-size="9" font-weight="700" fill="#3A3A3A">관측 데이터로 내일을 내다본다</text>
+        <text x="74" y="156" text-anchor="middle" font-size="13.4" font-weight="700" fill="#3A3A3A">관측 데이터로</text><text x="74" y="172" text-anchor="middle" font-size="13.4" font-weight="700" fill="#3A3A3A">내일을 내다본다</text>
       </g>
       
       <g transform="translate(316,0)">
-        <text x="74" y="14" text-anchor="middle" font-size="11" font-weight="900" fill="#2E3E96">③ 감염병</text>
+        <text x="74" y="14" text-anchor="middle" font-size="14.5" font-weight="900" fill="#2E3E96">③ 감염병</text>
         <clipPath id="bd316"><rect x="0" y="20" width="148" height="118" rx="7"/></clipPath>
         <g clip-path="url(#bd316)">
         <rect x="0" y="20" width="148" height="118" fill="#F4F5FB"/>
         <path d="M16,44 q18,-10 34,-2 q16,8 30,0 q18,-8 34,4 q10,10 6,26 q-6,20 -26,26 q-24,8 -46,2 q-22,-6 -30,-22 q-8,-18 -2,-34 z" fill="#DCE6D8" stroke="#8FA86B" stroke-width="1"/>
         <g fill="#D6455D"><circle cx="56" cy="66" r="3.4"/><circle cx="66" cy="72" r="3"/><circle cx="50" cy="76" r="2.6"/><circle cx="62" cy="84" r="2.4"/><circle cx="78" cy="70" r="2.2"/><circle cx="44" cy="62" r="2"/></g>
         <circle cx="60" cy="74" r="20" fill="none" stroke="#D6455D" stroke-width="1.4" stroke-dasharray="4 3"/>
-        <text x="60" y="102" text-anchor="middle" font-size="8.4" font-weight="800" fill="#B0483A">확산 지점</text>
+        <text x="56" y="112" text-anchor="middle" font-size="13.4" font-weight="800" fill="#B0483A">확산 지점</text>
         <g transform="translate(96,96)">
           <line x1="0" y1="30" x2="46" y2="30" stroke="#5B6B77" stroke-width="1"/><line x1="0" y1="30" x2="0" y2="2" stroke="#5B6B77" stroke-width="1"/>
           <path d="M2,28 q14,-2 22,-14 q8,-10 20,-10" fill="none" stroke="#D6455D" stroke-width="1.8"/>
-          <text x="23" y="-4" text-anchor="middle" font-size="8" font-weight="800" fill="#B0483A">확산 예측</text>
+          <text x="23" y="-4" text-anchor="middle" font-size="13.4" font-weight="800" fill="#B0483A">확산 예측</text>
         </g>
-        <text x="10" y="40" font-size="9" font-weight="800" fill="#2E3E96">이동·검색 기록 분석</text></g>
+        <text x="8" y="38" font-size="13.4" font-weight="800" fill="#2E3E96">이동·검색 기록 분석</text></g>
         <rect x="0" y="20" width="148" height="118" rx="7" fill="none" stroke="#C0C9EE" stroke-width="1"/>
-        <text x="74" y="154" text-anchor="middle" font-size="9" font-weight="700" fill="#3A3A3A">이동 기록으로 확산을 예측한다</text>
+        <text x="74" y="156" text-anchor="middle" font-size="13.4" font-weight="700" fill="#3A3A3A">이동 기록으로</text><text x="74" y="172" text-anchor="middle" font-size="13.4" font-weight="700" fill="#3A3A3A">확산을 예측한다</text>
       </g>
       
       <g transform="translate(472,0)">
-        <text x="74" y="14" text-anchor="middle" font-size="11" font-weight="900" fill="#2E3E96">④ 의료</text>
+        <text x="74" y="14" text-anchor="middle" font-size="14.5" font-weight="900" fill="#2E3E96">④ 의료</text>
         <clipPath id="bd472"><rect x="0" y="20" width="148" height="118" rx="7"/></clipPath>
         <g clip-path="url(#bd472)">
         <rect x="0" y="20" width="148" height="118" fill="#EEF1FA"/>
-        <rect x="18" y="34" width="76" height="86" rx="4" fill="#1E2740"/>
+        <g transform="translate(-4.8,15.9) scale(0.71)"><rect x="18" y="34" width="76" height="86" rx="4" fill="#1E2740"/>
         <g fill="#5A6480" opacity="0.9">
           <path d="M56,44 q-16,10 -18,30 q-2,22 4,38 h28 q6,-16 4,-38 q-2,-20 -18,-30 z"/>
         </g>
         <g stroke="#8A93AE" stroke-width="1.2" fill="none"><path d="M42,60 q14,6 28,0"/><path d="M42,72 q14,6 28,0"/><path d="M42,84 q14,6 28,0"/></g>
-        <circle cx="66" cy="78" r="7" fill="none" stroke="#F3C24E" stroke-width="2"/>
-        <text x="56" y="130" text-anchor="middle" font-size="8.4" font-weight="800" fill="#2E3E96">의료 영상</text>
-        <text x="119" y="106" text-anchor="middle" font-size="8" fill="#5B6B77">판독 보조 —</text>
-        <text x="119" y="118" text-anchor="middle" font-size="8" fill="#5B6B77">확인은 의사가</text>
-        <g transform="translate(102,52)">
-          <rect width="38" height="26" rx="6" fill="#2E3E96"/><text x="19" y="18" text-anchor="middle" font-size="12" font-weight="900" fill="#fff">AI</text>
-          <path d="M-8,13 L-2,13" stroke="#4053B8" stroke-width="2.4"/>
+        <circle cx="66" cy="78" r="7" fill="none" stroke="#F3C24E" stroke-width="2.8"/></g>
+        <text x="8" y="35" font-size="13.4" font-weight="800" fill="#2E3E96">의료 영상</text>
+        <text x="74" y="119" text-anchor="middle" font-size="13.4" fill="#5B6B77">판독 보조 —</text>
+        <text x="74" y="134" text-anchor="middle" font-size="13.4" fill="#5B6B77">확인은 의사가</text>
+        <g transform="translate(84,40)">
+          <rect width="38" height="26" rx="6" fill="#2E3E96"/><text x="19" y="18" text-anchor="middle" font-size="13.8" font-weight="900" fill="#fff">AI</text>
+          <path d="M-21,13 L-2,13" stroke="#4053B8" stroke-width="2.4"/>
         </g>
-        <text x="121" y="92" text-anchor="middle" font-size="8.4" font-weight="800" fill="#B4830A">이상 부위 표시</text></g>
+        <text x="104" y="84" text-anchor="middle" font-size="13.4" font-weight="800" fill="#B4830A">이상 부위</text><text x="104" y="99" text-anchor="middle" font-size="13.4" font-weight="800" fill="#B4830A">표시</text></g>
         <rect x="0" y="20" width="148" height="118" rx="7" fill="none" stroke="#C0C9EE" stroke-width="1"/>
-        <text x="74" y="154" text-anchor="middle" font-size="9" font-weight="700" fill="#3A3A3A">AI가 영상 판독을 돕는다</text>
+        <text x="74" y="156" text-anchor="middle" font-size="13.4" font-weight="700" fill="#3A3A3A">AI가 영상 판독을</text><text x="74" y="172" text-anchor="middle" font-size="13.4" font-weight="700" fill="#3A3A3A">돕는다</text>
       </g>
-      <rect x="4" y="172" width="612" height="30" rx="6" fill="#ECEFFA"/>
-      <text x="310" y="191" text-anchor="middle" font-size="10.5" font-weight="900" fill="#2E3E96">공통 문법: 모아서(수집) → 읽어서(분석) → 내다본다(예측)</text>
+      <rect x="4" y="182" width="612" height="32" rx="6" fill="#ECEFFA"/>
+      <text x="310" y="203" text-anchor="middle" font-size="14" font-weight="900" fill="#2E3E96">공통 문법: 모아서(수집) → 읽어서(분석) → 내다본다(예측)</text>
     </svg>
         <figcaption>그림 2 | 빅데이터 활용의 현장 — 교통·기상·감염병·의료</figcaption>
       </figure>
@@ -529,9 +554,10 @@
       <div class="wtitle">날개 노트</div>
       <div class="term"><b>심야버스 노선</b>서울시가 심야 통화·이동 데이터를 분석해 수요가 많은 길로 노선을 설계한 실제 사례.</div>
       <div class="term"><b>판독 보조</b>AI가 의료 영상에서 의심 부위를 표시해 의사의 판독을 돕는 것 — 최종 판단은 의사의 몫.</div>
+      <div class="term"><b>유전체 분석</b>한 생물이 가진 DNA 염기 서열 전체를 읽고 비교하는 일. 질병 유전자 찾기, 병원체의 변이 추적에 쓰인다.</div>
       <div class="wsep"></div>
       <div class="wtitle">한눈에 암기</div>
-      <div class="wing-pen">수집 → 분석 → 예측<br>교통·기상·감염병·의료<br>분석이 없으면 그냥 더미!</div>
+      <div class="wing-pen">수집 → 분석 → 예측<br>교통·기상·감염병·의료<br>+ 과학 연구(유전체·신약)</div>
     </div>
   </div>
   <div class="quickcheck">
@@ -543,7 +569,7 @@
     </ol>
     <div class="qc-ans">정답 1 O 2 O 3 X (패턴을 읽는 분석이 핵심)</div>
   </div>
-  <div class="folio"><span>III. 과학과 미래 사회</span><span class="num">164</span></div>
+  <div class="folio"><span>III. 과학과 미래 사회</span><span class="num">221</span></div>
 </div>
 
 <!-- ═════════════ p.165 개념 03 빅데이터의 그림자 ═════════════ -->
@@ -556,9 +582,9 @@
       <p class="body">셋째, <span class="kw">데이터 편향</span> — 데이터 자체가 치우쳐 있으면 분석 결과도 치우친다. 특정 집단의 데이터만으로 학습한 시스템은 다른 집단에게 불공정한 판단을 내릴 수 있다. 넷째, <b>디지털 격차</b> — 데이터와 기술에 접근할 수 있는 사람과 없는 사람의 간격이 새로운 불평등이 된다. 그래서 빅데이터 시대의 시민에게는 <b>혜택을 누리는 능력과 문제를 알아채는 눈</b>이 함께 필요하다 — 성취기준의 말로 하면 '장점과 문제점의 추론'이다.</p>
 
       <figure>
-        <svg width="470" height="148" viewBox="0 0 470 148" font-family="PC Sans">
-          <g font-size="6.8">
-            <text x="235" y="13" text-anchor="middle" font-size="8.4" font-weight="800" fill="#4053B8">데이터의 저울 — 혜택과 그림자를 함께 단다</text>
+        <svg width="495" height="172.7" viewBox="0 0 470 164" font-family="PC Sans">
+          <g font-size="10.4">
+            <text x="235" y="15" text-anchor="middle" font-size="12" font-weight="800" fill="#4053B8">데이터의 저울 — 혜택과 그림자를 함께 단다</text>
             <g transform="translate(0,24)">
               <!-- 저울 -->
               <g transform="translate(235,10)" text-anchor="middle">
@@ -569,26 +595,26 @@
               </g>
               <!-- 왼쪽 접시: 혜택 -->
               <g transform="translate(115,56)" text-anchor="middle">
-                <path d="M-58,0 q58,26 116,0" fill="none" stroke="#5B6B77" stroke-width="1.4"/>
-                <line x1="-58" y1="0" x2="0" y2="-30" stroke="#8A949E" stroke-width="1"/>
-                <line x1="58" y1="0" x2="0" y2="-30" stroke="#8A949E" stroke-width="1"/>
-                <rect x="-52" y="2" width="104" height="34" rx="5" fill="#E7F5F1" stroke="#4BA394" stroke-width="1"/>
-                <text y="16" font-size="6.6" font-weight="800" fill="#147D6F">혜택</text>
-                <text y="28" font-size="5.8" fill="#3D4C58">예측 · 맞춤 서비스 · 안전 · 효율</text>
+                <path d="M-68,0 q68,28 136,0" fill="none" stroke="#5B6B77" stroke-width="1.4"/>
+                <line x1="-68" y1="0" x2="0" y2="-30" stroke="#8A949E" stroke-width="1"/>
+                <line x1="68" y1="0" x2="0" y2="-30" stroke="#8A949E" stroke-width="1"/>
+                <rect x="-66" y="3" width="132" height="50" rx="5" fill="#E7F5F1" stroke="#4BA394" stroke-width="1"/>
+                <text y="19" font-size="11.2" font-weight="800" fill="#147D6F">혜택</text>
+                <text y="34" font-size="10.4" fill="#3D4C58">예측 · 맞춤 서비스 ·</text><text y="47" font-size="10.4" fill="#3D4C58">안전 · 효율</text>
               </g>
               <!-- 오른쪽 접시: 그림자 -->
               <g transform="translate(355,64)" text-anchor="middle">
-                <path d="M-58,0 q58,26 116,0" fill="none" stroke="#5B6B77" stroke-width="1.4"/>
-                <line x1="-58" y1="0" x2="0" y2="-32" stroke="#8A949E" stroke-width="1"/>
-                <line x1="58" y1="0" x2="0" y2="-32" stroke="#8A949E" stroke-width="1"/>
-                <rect x="-52" y="2" width="104" height="42" rx="5" fill="#FDF3F0" stroke="#E5B8AC" stroke-width="1"/>
-                <text y="15" font-size="6.6" font-weight="800" fill="#B0483A">그림자</text>
-                <text y="26" font-size="5.8" fill="#3D4C58">개인 정보 침해 · 감시 우려</text>
-                <text y="36" font-size="5.8" fill="#3D4C58">데이터 편향 · 디지털 격차</text>
+                <path d="M-68,0 q68,28 136,0" fill="none" stroke="#5B6B77" stroke-width="1.4"/>
+                <line x1="-68" y1="0" x2="0" y2="-32" stroke="#8A949E" stroke-width="1"/>
+                <line x1="68" y1="0" x2="0" y2="-32" stroke="#8A949E" stroke-width="1"/>
+                <rect x="-66" y="3" width="132" height="50" rx="5" fill="#FDF3F0" stroke="#E5B8AC" stroke-width="1"/>
+                <text y="19" font-size="11.2" font-weight="800" fill="#B0483A">그림자</text>
+                <text y="34" font-size="10.4" fill="#3D4C58">개인 정보 침해 · 감시 우려</text>
+                <text y="47" font-size="10.4" fill="#3D4C58">데이터 편향 · 디지털 격차</text>
               </g>
             </g>
           </g>
-          <text x="235" y="144" text-anchor="middle" font-size="8.8" font-weight="800" fill="#E8940A">혜택만 보면 순진하고, 그림자만 보면 멈춘다 — 저울을 드는 것이 시민의 일</text>
+          <text x="235" y="158" text-anchor="middle" font-size="12" font-weight="800" fill="#E8940A">혜택만 보면 순진하고, 그림자만 보면 멈춘다 — 저울을 드는 것이 시민의 일</text>
         </svg>
         <figcaption>그림 3 | 빅데이터의 저울 — 장점과 문제점을 나란히 놓고 추론한다</figcaption>
       </figure>
@@ -603,6 +629,7 @@
       <div class="wtitle">날개 노트</div>
       <div class="term"><b>데이터 편향</b>치우친 데이터로 학습·분석하면 결과도 치우치는 현상 — '데이터도 틀릴 수 있다'.</div>
       <div class="term"><b>디지털 격차</b>정보 기술에 대한 접근·활용 능력의 차이가 만드는 불평등.</div>
+      <div class="term"><b>환각</b>생성형 AI가 그럴듯하지만 사실이 아닌 답을 지어내는 현상. 출처를 찾아 확인하고 비판적으로 따져 보는 것이 디지털 소양이다.</div>
       <div class="wsep"></div>
       <div class="wtitle">한눈에 암기</div>
       <div class="wing-pen">그림자 4종:<br>개인 정보 · 감시<br>편향 · 격차</div>
@@ -615,9 +642,9 @@
       <li><span class="no">2</span>데이터가 치우쳐 있으면 분석 결과도 치우칠 수 있다. ( O , X )</li>
       <li><span class="no">3</span>빅데이터 활용에는 아무런 문제점이 없다. ( O , X )</li>
     </ol>
-    <div class="qc-ans">정답 1 O 2 O 3 X (그림자 4종을 기억하라)</div>
+    <div class="qc-ans">정답 1 O (개인 정보 침해) 2 O 3 X (그림자 4종을 기억하라)</div>
   </div>
-  <div class="folio"><span>III. 과학과 미래 사회</span><span class="num">165</span></div>
+  <div class="folio"><span>III. 과학과 미래 사회</span><span class="num">222</span></div>
 </div>
 
 <!-- ═════════════ p.166 개념 04 인공지능과 로봇 ═════════════ -->
@@ -627,28 +654,29 @@
     <div class="main">
       <h3 class="sec"><span class="n">4</span>배우는 기계 — 인공지능과 로봇</h3>
       <p class="body"><span class="kw">인공지능(AI)</span>은 <span class="u-amber">데이터에서 스스로 규칙(패턴)을 학습하는</span> 기술이다. 규칙을 일일이 코드로 적어 주는 대신, 수만 장의 사진과 정답을 보여 주면 기계가 '고양이의 특징'을 스스로 찾아낸다 — 빅데이터(개념 1~2)가 AI의 교과서인 셈이다. 그래서 번역, 음성 비서, 의료 영상 판독 보조, 자율주행처럼 <b>규칙을 말로 적기 어려운 일</b>에서 힘을 낸다.</p>
-      <p class="body"><span class="kw">로봇</span>은 그 판단에 <b>몸</b>을 붙인 것이다. 사람이 가기 힘든 곳 — 재난 현장·심해·우주 — 의 위험 작업을 대신하고, 공장에서 정밀 조립을, 수술실에서는 의사의 손을 더 정밀하게 보조하며(수술 로봇), 물류 창고를 밤새 달린다. AI의 눈과 로봇의 몸이 만나면서, 기계는 '시키는 일'을 넘어 '상황을 보고 판단하는 일'로 영역을 넓히고 있다 — 그 한계는 다음 개념에서 정면으로 본다.</p>
+      <p class="body"><b>인공지능과 과학 탐구</b> — AI는 과학자의 도구가 되었다. 아미노산 서열만 보고 단백질의 입체 구조를 예측하는 AI를 만든 하사비스·점퍼는 50년 묵은 난제를 푼 공로로 <b>2024년 노벨 화학상</b>을 받았고, 기상 예보에서는 과거 관측 데이터로 배운 AI가 수치 예보를 돕고, 천문학에서는 망원경이 찍은 수많은 은하 사진을 AI가 분류한다. 다만 AI가 낸 답도 <span class="u-amber">실험과 관측으로 검증해야 과학</span>이 된다.</p>
+      <p class="body"><span class="kw">로봇</span>은 그 판단에 <b>몸</b>을 붙인 것이다. 재난 현장·심해·우주의 위험 작업을 대신하고, 공장에서 정밀 조립을, 수술실에서는 의사의 손을 더 정밀하게 보조하며(수술 로봇), 물류 창고를 밤새 달린다. 기계는 '시키는 일'을 넘어 '상황을 보고 판단하는 일'로 영역을 넓히고 있다 — 로봇이 무엇으로 이루어졌는지는 다음 쪽에서 해부한다.</p>
 
       <figure>
-        <svg width="470" height="148" viewBox="0 0 470 148" font-family="PC Sans">
-          <g font-size="6.8">
-            <text x="235" y="13" text-anchor="middle" font-size="8.4" font-weight="800" fill="#4053B8">AI는 어떻게 배우나 — 데이터가 교과서</text>
+        <svg width="495" height="155.9" viewBox="0 0 470 148" font-family="PC Sans">
+          <g font-size="10.4">
+            <text x="235" y="15" text-anchor="middle" font-size="12" font-weight="800" fill="#4053B8">AI는 어떻게 배우나 — 데이터가 교과서</text>
             <g transform="translate(0,26)" text-anchor="middle">
-              <g transform="translate(85,0)">
-                <rect x="-66" y="0" width="132" height="84" rx="6" fill="#ECEFFA" stroke="#C0C9EE" stroke-width="1"/>
-                <text y="15" font-size="7.2" font-weight="800" fill="#2E3E96">① 수많은 데이터</text>
+              <g transform="translate(78,0)">
+                <rect x="-71" y="0" width="142" height="84" rx="6" fill="#ECEFFA" stroke="#C0C9EE" stroke-width="1"/>
+                <text y="17" font-size="11.4" font-weight="800" fill="#2E3E96">① 수많은 데이터</text>
                 <g transform="translate(0,44)">
                   <g fill="#F4F6FC" stroke="#8E9ADF" stroke-width="0.9">
                     <rect x="-34" y="-14" width="22" height="18" rx="2"/><rect x="-8" y="-18" width="22" height="18" rx="2"/><rect x="16" y="-12" width="22" height="18" rx="2"/>
                     <rect x="-22" y="8" width="22" height="18" rx="2" transform="translate(0,-4)"/><rect x="4" y="6" width="22" height="18" rx="2" transform="translate(0,-4)"/>
                   </g>
                 </g>
-                <text y="78" fill="#5B6B77" font-size="6">사진 수만 장 + 정답표</text>
+                <text y="77" fill="#5B6B77" font-size="10.4">사진 수만 장 + 정답표</text>
               </g>
-              <line x1="153" y1="42" x2="167" y2="42" stroke="#4053B8" stroke-width="1.4" marker-end="url(#arrP)"/>
+              <line x1="151" y1="42" x2="159" y2="42" stroke="#4053B8" stroke-width="1.4" marker-end="url(#arrP)"/>
               <g transform="translate(235,0)">
-                <rect x="-66" y="0" width="132" height="84" rx="6" fill="#ECEFFA" stroke="#C0C9EE" stroke-width="1"/>
-                <text y="15" font-size="7.2" font-weight="800" fill="#2E3E96">② 스스로 규칙 학습</text>
+                <rect x="-71" y="0" width="142" height="84" rx="6" fill="#ECEFFA" stroke="#C0C9EE" stroke-width="1"/>
+                <text y="17" font-size="11.4" font-weight="800" fill="#2E3E96">② 스스로 규칙 학습</text>
                 <g transform="translate(0,46)" stroke="#4053B8" stroke-width="1.3" fill="none">
                   <circle cx="-24" cy="-10" r="4"/><circle cx="-24" cy="8" r="4"/>
                   <circle cx="0" cy="-14" r="4"/><circle cx="0" cy="0" r="4"/><circle cx="0" cy="14" r="4"/>
@@ -656,23 +684,23 @@
                   <line x1="-20" y1="-10" x2="-4" y2="-13"/><line x1="-20" y1="-9" x2="-4" y2="0"/><line x1="-20" y1="8" x2="-4" y2="1"/><line x1="-20" y1="9" x2="-4" y2="13"/>
                   <line x1="4" y1="-13" x2="19" y2="-2"/><line x1="4" y1="0" x2="19" y2="0"/><line x1="4" y1="13" x2="19" y2="2"/>
                 </g>
-                <text y="78" fill="#5B6B77" font-size="6">특징(패턴)을 찾아낸다</text>
+                <text y="77" fill="#5B6B77" font-size="10.4">특징(패턴)을 찾아낸다</text>
               </g>
-              <line x1="303" y1="42" x2="317" y2="42" stroke="#4053B8" stroke-width="1.4" marker-end="url(#arrP)"/>
-              <g transform="translate(385,0)">
-                <rect x="-66" y="0" width="132" height="84" rx="6" fill="#E7F5F1" stroke="#4BA394" stroke-width="1.1"/>
-                <text y="15" font-size="7.2" font-weight="800" fill="#147D6F">③ 새 문제에 적용</text>
+              <line x1="308" y1="42" x2="316" y2="42" stroke="#4053B8" stroke-width="1.4" marker-end="url(#arrP)"/>
+              <g transform="translate(392,0)">
+                <rect x="-71" y="0" width="142" height="84" rx="6" fill="#E7F5F1" stroke="#4BA394" stroke-width="1.1"/>
+                <text y="17" font-size="11.4" font-weight="800" fill="#147D6F">③ 새 문제에 적용</text>
                 <g transform="translate(0,44)">
-                  <rect x="-30" y="-14" width="24" height="20" rx="2" fill="#F4F6FC" stroke="#8E9ADF" stroke-width="1"/>
-                  <text x="-18" y="0" font-size="8" fill="#8A949E">?</text>
-                  <line x1="-2" y1="-4" x2="8" y2="-4" stroke="#147D6F" stroke-width="1.3" marker-end="url(#arrP)"/>
-                  <text x="22" y="0" font-size="6.4" font-weight="800" fill="#147D6F">"고양이!"</text>
+                  <rect x="-40" y="-15" width="24" height="22" rx="2" fill="#F4F6FC" stroke="#8E9ADF" stroke-width="1"/>
+                  <text x="-28" y="1" text-anchor="middle" font-size="12" fill="#8A949E">?</text>
+                  <line x1="-12" y1="-4" x2="-4" y2="-4" stroke="#147D6F" stroke-width="1.3" marker-end="url(#arrP)"/>
+                  <text x="24" y="0" font-size="10.6" font-weight="800" fill="#147D6F">"고양이!"</text>
                 </g>
-                <text y="78" fill="#5B6B77" font-size="6">번역·판독 보조·자율주행으로</text>
+                <text y="77" fill="#5B6B77" font-size="10.2">번역·판독 보조·자율주행으로</text>
               </g>
             </g>
           </g>
-          <text x="235" y="144" text-anchor="middle" font-size="8.8" font-weight="800" fill="#E8940A">규칙을 적어 주는 대신, 데이터로 배우게 한다 — AI의 문법</text>
+          <text x="235" y="142" text-anchor="middle" font-size="12" font-weight="800" fill="#E8940A">규칙을 적어 주는 대신, 데이터로 배우게 한다 — AI의 문법</text>
         </svg>
         <figcaption>그림 4 | 인공지능의 학습 — 데이터에서 패턴을 찾아 새 문제에 적용한다</figcaption>
       </figure>
@@ -687,9 +715,10 @@
       <div class="wtitle">날개 노트</div>
       <div class="term"><b>학습</b>데이터와 정답을 보며 기계가 판단 규칙을 스스로 조정해 가는 과정.</div>
       <div class="term"><b>수술 로봇</b>의사의 손 움직임을 더 정밀하게 옮기는 보조 장치 — 집도의는 여전히 사람이다.</div>
+      <div class="term"><b>단백질 구조 예측</b>아미노산 서열로부터 단백질이 접히는 입체 모양을 알아내는 일. 구조를 알면 기능과 약의 표적을 짐작할 수 있다.</div>
       <div class="wsep"></div>
       <div class="wtitle">한눈에 암기</div>
-      <div class="wing-pen">AI = 데이터로 배운다<br>로봇 = 판단 + 몸<br>빅데이터가 AI의 교과서!</div>
+      <div class="wing-pen">AI = 데이터로 배운다<br>로봇 = 판단 + 몸<br>AI의 답도 검증해야 과학!</div>
     </div>
   </div>
   <div class="quickcheck">
@@ -701,7 +730,111 @@
     </ol>
     <div class="qc-ans">정답 1 O 2 O 3 X (보조일 뿐 — 최종 판단은 사람)</div>
   </div>
-  <div class="folio"><span>III. 과학과 미래 사회</span><span class="num">166</span></div>
+  <div class="folio"><span>III. 과학과 미래 사회</span><span class="num">223</span></div>
+</div>
+
+<!-- ═════════════ 개념 04 이어서 — 로봇의 구성과 개선안 (2026-10 보강: 교육과정 탐구 '일상생활에 활용되는 로봇의 특징 분석 및 개선방안 고안하기') ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag">III. 과학과 미래 사회</span><span class="lesson-tag">02. 빅데이터와 인공지능·로봇</span></div>
+  <div class="cols">
+    <div class="main">
+      <h3 class="sec"><span class="n">4</span>로봇 해부 — 감지하고, 판단하고, 움직인다</h3>
+      <p class="body">어떤 로봇이든 세 부분으로 나누어 볼 수 있다. 주변을 재는 <span class="kw">센서</span>(감지), 잰 값을 받아 무엇을 할지 정하는 <span class="kw">제어 장치</span>(판단), 그 결정대로 몸을 움직이는 <span class="kw">구동 장치</span>(움직임)다. 청소 로봇이라면 범퍼의 충돌 센서·바닥을 보는 낙하 방지 센서·카메라가 감지를, 작은 컴퓨터인 <b>마이크로프로세서</b>가 판단을, 바퀴와 브러시를 돌리는 <b>모터</b>가 움직임을 맡는다.</p>
+      <p class="body">세 부분은 한 번 돌고 끝나지 않는다. 움직인 결과를 센서가 다시 재고, 제어 장치가 판단을 고친다 — <span class="u-amber">감지 → 판단 → 움직임 → 다시 감지</span>의 고리가 1초에도 여러 번 돈다. 통합과학 1에서 배운 '측정이 신호가 되고 정보가 된다'가 로봇 안에서는 몸을 움직이는 명령이 되는 것이다.</p>
+
+      <figure style="margin:3mm 0 2mm;">
+        <svg width="495" height="158" viewBox="0 0 470 150" font-family="PC Sans">
+          <text x="235" y="14" text-anchor="middle" font-size="12" font-weight="800" fill="#4053B8">청소 로봇의 세 요소 — 센서(감지) · 제어 장치(판단) · 구동 장치(움직임)</text>
+          <!-- 로봇 윗면 -->
+          <g transform="translate(111,92) scale(0.79)">
+            <circle r="48" fill="#F2F4FC" stroke="#8E9ADF" stroke-width="1.4"/>
+            <path d="M-40,-26 A48,48 0 0,1 40,-26" fill="none" stroke="#4053B8" stroke-width="5.6" stroke-linecap="round"/>
+            <circle cx="0" cy="-36" r="4.2" fill="#4053B8"/>
+            <rect x="-30" y="-22" width="7" height="7" rx="1" fill="#fff" stroke="#4053B8" stroke-width="1.4" stroke-dasharray="2 1.2"/>
+            <rect x="23" y="-22" width="7" height="7" rx="1" fill="#fff" stroke="#4053B8" stroke-width="1.4" stroke-dasharray="2 1.2"/>
+            <rect x="-17" y="-11" width="34" height="22" rx="2" fill="#FDF3E0" stroke="#E8940A" stroke-width="1.4"/>
+            <text y="4.6" text-anchor="middle" font-size="13" font-weight="800" fill="#9C6503">제어</text>
+            <rect x="-45" y="-11" width="8" height="22" rx="2" fill="#147D6F"/>
+            <rect x="37" y="-11" width="8" height="22" rx="2" fill="#147D6F"/>
+            <circle cx="0" cy="30" r="8" fill="none" stroke="#147D6F" stroke-width="2.4"/>
+            <path d="M-5,30 h10 M0,25 v10" stroke="#147D6F" stroke-width="1.6"/>
+          </g>
+          <!-- 이름표 -->
+          <g font-size="10.4" fill="#22303A">
+            <line x1="68" y1="45" x2="86" y2="64" stroke="#4053B8" stroke-width="0.8"/>
+            <text x="1" y="40" font-weight="800" fill="#4053B8">충돌 센서(범퍼)</text>
+            <line x1="74" y1="70" x2="88" y2="80" stroke="#4053B8" stroke-width="0.8"/>
+            <text x="1" y="73" font-weight="800" fill="#4053B8">낙하 방지 센서</text>
+            <text x="1" y="86" fill="#5B6B77">바닥·계단 감지</text>
+            <line x1="80" y1="121" x2="99" y2="100" stroke="#E8940A" stroke-width="0.8"/>
+            <text x="1" y="132" font-weight="800" fill="#9C6503">마이크로프로세서</text>
+            <text x="1" y="145" fill="#5B6B77">(작은 컴퓨터)</text>
+            <line x1="128" y1="45" x2="113" y2="62" stroke="#4053B8" stroke-width="0.8"/>
+            <text x="218" y="40" text-anchor="end" font-weight="800" fill="#4053B8">카메라·거리 센서</text>
+            <line x1="147" y1="92" x2="158" y2="92" stroke="#147D6F" stroke-width="0.8"/>
+            <text x="161" y="96" font-weight="800" fill="#147D6F">바퀴 모터</text>
+            <line x1="117" y1="119" x2="158" y2="132" stroke="#147D6F" stroke-width="0.8"/>
+            <text x="161" y="138" font-weight="800" fill="#147D6F">브러시 모터</text>
+          </g>
+          <!-- 흐름 -->
+          <g text-anchor="middle">
+            <rect x="226" y="26" width="74" height="80" rx="5" fill="#ECEFFA" stroke="#C0C9EE" stroke-width="1"/>
+            <text x="263" y="42" font-size="11.4" font-weight="800" fill="#2E3E96">① 센서</text>
+            <text x="263" y="56" font-size="10.6" font-weight="800" fill="#4053B8">감지</text>
+            <text x="263" y="73" font-size="10.2" fill="#5B6B77">충돌 · 거리 ·</text>
+            <text x="263" y="86" font-size="10.2" fill="#5B6B77">바닥을 잰다</text>
+            <rect x="310" y="26" width="74" height="80" rx="5" fill="#FDF3E0" stroke="#E8C98A" stroke-width="1"/>
+            <text x="347" y="42" font-size="11.4" font-weight="800" fill="#9C6503">② 제어 장치</text>
+            <text x="347" y="56" font-size="10.6" font-weight="800" fill="#9C6503">판단</text>
+            <text x="347" y="73" font-size="10.2" fill="#5B6B77">프로그램·AI가</text>
+            <text x="347" y="86" font-size="10.2" fill="#5B6B77">갈 길을 정한다</text>
+            <rect x="394" y="26" width="74" height="80" rx="5" fill="#E7F5F1" stroke="#4BA394" stroke-width="1"/>
+            <text x="431" y="42" font-size="11.4" font-weight="800" fill="#147D6F">③ 구동 장치</text>
+            <text x="431" y="56" font-size="10.6" font-weight="800" fill="#147D6F">움직임</text>
+            <text x="431" y="73" font-size="10.2" fill="#5B6B77">모터가</text>
+            <text x="431" y="86" font-size="10.2" fill="#5B6B77">바퀴·브러시를</text>
+            <text x="431" y="99" font-size="10.2" fill="#5B6B77">돌린다</text>
+          </g>
+          <g stroke="#4053B8" stroke-width="1.3"><line x1="301" y1="66" x2="307" y2="66" marker-end="url(#arrP)"/><line x1="385" y1="66" x2="391" y2="66" marker-end="url(#arrP)"/></g>
+          <path d="M431,108 v8 q0,6 -6,6 h-156 q-6,0 -6,-6 v-6" fill="none" stroke="#8A949E" stroke-width="1.1" stroke-dasharray="3 2.5" marker-end="url(#arrGy)"/>
+          <text x="347" y="140" text-anchor="middle" font-size="10.6" font-weight="800" fill="#5B6B77">움직인 결과를 다시 감지한다 — 고리가 계속 돈다</text>
+        </svg>
+        <figcaption>그림 5 | 로봇의 세 요소 — 청소 로봇의 부품을 감지·판단·움직임으로 나누어 본다</figcaption>
+      </figure>
+
+      <div class="lab" style="margin-top:2mm;">
+        <div class="lab-head" style="font-size:9.5pt; padding:1.6mm 3.4mm;">교과서 탐구 <span class="tag">분석 · 개선안 고안</span> <span style="font-weight:600; font-size:8.6pt; margin-left:auto;">우리 집 청소 로봇, 어떻게 고칠까?</span></div>
+        <div class="lab-body" style="padding:2.4mm 3.4mm;">
+          <p><b>① 관찰</b> 일상 로봇 하나(청소 로봇·서빙 로봇·무인 배달 로봇 등)를 골라 하는 일을 적는다. <b>② 해부</b> 부품을 센서·제어·구동으로 나눈다. <b>③ 불편 찾기</b> 사용 후기나 직접 써 본 경험에서 문제를 고른다. <b>④ 개선안</b> 세 요소 중 <b>어느 것을 바꿀지</b> 정하고, 그 개선이 새로 부를 수 있는 <b>한계</b>까지 적는다.</p>
+          <table class="rubric" style="font-size:7.6pt; margin-top:1.4mm;">
+            <tr><th>찾은 불편</th><th>바꿀 요소</th><th>개선안 (예시)</th><th>새로 생길 수 있는 한계</th></tr>
+            <tr><td>전선·양말을 빨아들여 멈춘다</td><td>센서·제어</td><td>카메라 영상으로 작은 물체를 알아보도록 AI를 학습시킨다</td><td>집 안 영상이 밖으로 새면 사생활 침해</td></tr>
+            <tr><td>문턱을 넘지 못한다</td><td>구동</td><td>바퀴를 키우고 모터의 힘을 늘린다</td><td>무게·소음·전력 소비 증가</td></tr>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div class="wing">
+      <div class="wtitle">날개 노트</div>
+      <div class="term"><b>센서</b>빛·소리·거리·온도·충돌 같은 바깥의 변화를 재어 전기 신호로 바꾸는 장치.</div>
+      <div class="term"><b>제어 장치</b>센서의 신호를 받아 무엇을 할지 정하고 명령을 내리는 부분. 마이크로프로세서 위에서 프로그램이나 AI가 돈다.</div>
+      <div class="term"><b>구동 장치</b>명령대로 실제 움직임을 만드는 부분 — 모터·바퀴·관절 등.</div>
+      <div class="wsep"></div>
+      <div class="wtitle">한눈에 암기</div>
+      <div class="wing-pen">로봇 = 센서 + 제어 + 구동<br>감지 → 판단 → 움직임<br>개선안엔 한계도 함께!</div>
+    </div>
+  </div>
+  <div class="quickcheck">
+    <span class="qc-title">바로바로 체크</span>
+    <ol>
+      <li><span class="no">1</span>청소 로봇의 충돌 센서는 로봇의 세 요소 가운데 감지를 맡는다. ( O , X )</li>
+      <li><span class="no">2</span>바퀴를 돌리는 모터는 로봇의 제어 장치에 해당한다. ( O , X )</li>
+      <li><span class="no">3</span>로봇의 개선안을 낼 때는 그 개선이 부를 수 있는 한계도 함께 따져야 한다. ( O , X )</li>
+    </ol>
+    <div class="qc-ans">정답 1 O 2 X (구동 장치) 3 O (바퀴를 키우면 무게·소음 증가)</div>
+  </div>
+  <div class="folio"><span>III. 과학과 미래 사회</span><span class="num">224</span></div>
 </div>
 
 <!-- ═════════════ p.167 개념 05 IoT와 한계 ═════════════ -->
@@ -710,15 +843,15 @@
   <div class="cols">
     <div class="main">
       <h3 class="sec"><span class="n">5</span>연결된 사물들, 그리고 한계를 보는 눈</h3>
-      <p class="body"><span class="kw">사물인터넷(IoT)</span>은 <span class="u-amber">사물들이 인터넷으로 연결되어 스스로 정보를 주고받는</span> 기술이다. 집을 나서면 조명이 꺼지고(스마트홈), 비닐하우스가 온도·습도를 스스로 조절하며(스마트팜 — II단원의 비생물 요인을 센서가 관리한다!), 손목의 워치가 심박을 재어 이상을 알린다(원격 건강 관리). 센서(측정) → 데이터 → AI(판단) → 사물(실행) — 이 소단원의 모든 기술이 한 사슬로 이어진 것이 IoT다.</p>
-      <p class="body">그러나 <b>한계와 숙제</b>를 함께 봐야 성취기준이 완성된다. 연결이 많아질수록 <b>해킹과 오작동</b>의 통로도 늘고, 자동화는 <b>일자리의 지형</b>을 바꾸며, AI의 판단이 틀렸을 때 <b>책임은 누구에게</b> 있는지(개발자? 사용자? 기계?)는 아직 사회가 답을 만드는 중이다. 기술의 유용성을 누리되 한계를 예측하는 것 — 그 '질문하는 자세'가 다음 소단원, 과학 윤리로 이어진다.</p>
+      <p class="body"><span class="kw">사물인터넷(IoT)</span>은 <span class="u-amber">사물들이 인터넷으로 연결되어 스스로 정보를 주고받는</span> 기술이다. 집을 나서면 조명이 꺼지고(스마트홈), 비닐하우스가 온도·습도를 스스로 조절하며(스마트팜 — II단원의 비생물적 요인을 센서가 관리한다!), 손목의 워치가 심박을 재어 이상을 알린다(원격 건강 관리). 센서(측정) → 데이터 → AI(판단) → 사물(실행) — 이 소단원의 모든 기술이 한 사슬로 이어진 것이 IoT다.</p>
+      <p class="body">그러나 <b>한계와 숙제</b>를 함께 봐야 성취기준이 완성된다. 연결이 많아질수록 <b>해킹과 오작동</b>의 통로도 늘고, 자동화는 <b>일자리의 지형</b>을 바꾸며, AI의 판단이 틀렸을 때 <b>책임은 누구에게</b> 있는지(개발자? 사용자? 기계?)는 아직 사회가 답을 만드는 중이다 — 우리나라는 2026년 1월 22일 <b>AI 기본법</b>을 시행해 그 규칙을 세우기 시작했다. 기술의 유용성을 누리되 한계를 예측하는 것 — 그 '질문하는 자세'가 다음 소단원, 과학 윤리로 이어진다.</p>
 
       <div class="gist" style="margin:2.8mm 0 4mm; padding:2.2mm 1.8mm 2mm;">
         <div class="boxtitle"><span class="ico">알</span>알짜 정리 — 빅데이터와 인공지능·로봇 한 장 요약</div>
         <ul>
           <li><b>빅데이터</b> 3박자(방대·실시간·다양) — 문법은 <b>수집 → 분석 → 예측</b></li>
           <li>활용: 교통·기상·감염병·의료 / 그림자 4종: <b>개인 정보·감시·편향·격차</b></li>
-          <li><b>AI</b> = 데이터에서 스스로 학습 · <b>로봇</b> = 판단+몸 · <b>IoT</b> = 연결된 사물</li>
+          <li><b>AI</b> = 데이터에서 스스로 학습 · <b>로봇</b> = 센서·제어·구동 · <b>IoT</b> = 연결된 사물</li>
           <li>한계: 해킹·오작동·일자리·<b>책임 소재</b> — 유용성과 한계를 함께 예측하라</li>
         </ul>
       </div>
@@ -733,9 +866,10 @@
       <div class="wtitle">날개 노트</div>
       <div class="term"><b>사물인터넷(IoT)</b>센서를 단 사물들이 인터넷으로 연결되어 정보를 주고받고 스스로 작동하는 기술.</div>
       <div class="term"><b>스마트팜</b>온도·습도·빛을 센서로 재고 자동 조절하는 농장 — 측정의 과학이 농사를 짓는다.</div>
+      <div class="term"><b>AI 기본법</b>「인공지능 발전과 신뢰 기반 조성 등에 관한 기본법」(2025년 1월 공포, 2026년 1월 22일 시행). 생성형 AI가 만든 결과물에는 그 사실을 표시하게 했다.</div>
       <div class="wsep"></div>
       <div class="wtitle">한눈에 암기</div>
-      <div class="wing-pen">IoT = 연결된 사물<br>센서 → 데이터 → AI → 실행<br>숙제: 해킹·일자리·책임</div>
+      <div class="wing-pen">IoT = 연결된 사물<br>센서 → 데이터<br>→ AI → 실행<br>숙제: 해킹·일자리·책임</div>
       <div class="wsep"></div>
       <div class="review">
         <div class="rv-title">다음 소단원 예고</div>
@@ -752,7 +886,7 @@
     </ol>
     <div class="qc-ans">정답 1 O 2 O 3 X (통로가 늘어난다)</div>
   </div>
-  <div class="folio"><span>III. 과학과 미래 사회</span><span class="num">167</span></div>
+  <div class="folio"><span>III. 과학과 미래 사회</span><span class="num">225</span></div>
 </div>
 
 <!-- ═════════════ p.168 자료 파헤치기 ═════════════ -->
@@ -764,37 +898,37 @@
       <h4>자료</h4>
       <p>퇴근길, 내비게이션이 평소 다니던 길 대신 낯선 길을 안내한다 — "15분 빠른 경로로 안내합니다." 이 한 문장 뒤에서 일어난 일을 해부해 보자.</p>
       <figure>
-        <svg width="430" height="100" viewBox="0 0 430 100" font-family="PC Sans">
-          <g font-size="6.6" text-anchor="middle">
-            <g transform="translate(58,34)">
-              <rect x="-44" y="-22" width="88" height="44" rx="5" fill="#ECEFFA" stroke="#C0C9EE" stroke-width="1"/>
-              <text y="-6" font-weight="800" fill="#2E3E96">① 수집</text>
-              <text y="6" font-size="5.8" fill="#5B6B77">수십만 대의 위치·속도가</text>
-              <text y="15" font-size="5.8" fill="#5B6B77">실시간으로 모인다</text>
+        <svg width="620" height="112" viewBox="0 0 620 112" font-family="PC Sans">
+          <g font-size="10.8" text-anchor="middle">
+            <g transform="translate(72,34)">
+              <rect x="-72" y="-27" width="144" height="54" rx="5" fill="#ECEFFA" stroke="#C0C9EE" stroke-width="1"/>
+              <text y="-9" font-size="11.6" font-weight="800" fill="#2E3E96">① 수집</text>
+              <text y="7" fill="#5B6B77">수십만 대의 위치·속도가</text>
+              <text y="21" fill="#5B6B77">실시간으로 모인다</text>
             </g>
-            <line x1="104" y1="34" x2="122" y2="34" stroke="#4053B8" stroke-width="1.3" marker-end="url(#arrP)"/>
-            <g transform="translate(168,34)">
-              <rect x="-44" y="-22" width="88" height="44" rx="5" fill="#ECEFFA" stroke="#C0C9EE" stroke-width="1"/>
-              <text y="-6" font-weight="800" fill="#2E3E96">② 분석</text>
-              <text y="6" font-size="5.8" fill="#5B6B77">구간별 평균 속도로</text>
-              <text y="15" font-size="5.8" fill="#5B6B77">정체 지도를 그린다</text>
+            <line x1="145" y1="34" x2="155" y2="34" stroke="#4053B8" stroke-width="1.3" marker-end="url(#arrP)"/>
+            <g transform="translate(230.7,34)">
+              <rect x="-72" y="-27" width="144" height="54" rx="5" fill="#ECEFFA" stroke="#C0C9EE" stroke-width="1"/>
+              <text y="-9" font-size="11.6" font-weight="800" fill="#2E3E96">② 분석</text>
+              <text y="7" fill="#5B6B77">구간별 평균 속도로</text>
+              <text y="21" fill="#5B6B77">정체 지도를 그린다</text>
             </g>
-            <line x1="214" y1="34" x2="232" y2="34" stroke="#4053B8" stroke-width="1.3" marker-end="url(#arrP)"/>
-            <g transform="translate(278,34)">
-              <rect x="-44" y="-22" width="88" height="44" rx="5" fill="#ECEFFA" stroke="#C0C9EE" stroke-width="1"/>
-              <text y="-6" font-weight="800" fill="#2E3E96">③ 예측</text>
-              <text y="6" font-size="5.8" fill="#5B6B77">과거 패턴 + 현재 흐름으로</text>
-              <text y="15" font-size="5.8" fill="#5B6B77">10분 뒤 도로를 내다본다</text>
+            <line x1="303.7" y1="34" x2="313.7" y2="34" stroke="#4053B8" stroke-width="1.3" marker-end="url(#arrP)"/>
+            <g transform="translate(389.3,34)">
+              <rect x="-72" y="-27" width="144" height="54" rx="5" fill="#ECEFFA" stroke="#C0C9EE" stroke-width="1"/>
+              <text y="-9" font-size="11.6" font-weight="800" fill="#2E3E96">③ 예측</text>
+              <text y="7" fill="#5B6B77">과거 패턴 + 현재 흐름으로</text>
+              <text y="21" fill="#5B6B77">10분 뒤 도로를 내다본다</text>
             </g>
-            <line x1="324" y1="34" x2="342" y2="34" stroke="#4053B8" stroke-width="1.3" marker-end="url(#arrP)"/>
-            <g transform="translate(388,34)">
-              <rect x="-44" y="-22" width="88" height="44" rx="5" fill="#E7F5F1" stroke="#4BA394" stroke-width="1.1"/>
-              <text y="-6" font-weight="800" fill="#147D6F">④ 안내</text>
-              <text y="6" font-size="5.8" fill="#5B6B77">가장 빠른 경로 제시 —</text>
-              <text y="15" font-size="5.8" fill="#5B6B77">그리고 내 차도 데이터가 된다</text>
+            <line x1="462.3" y1="34" x2="472.3" y2="34" stroke="#4053B8" stroke-width="1.3" marker-end="url(#arrP)"/>
+            <g transform="translate(548,34)">
+              <rect x="-72" y="-27" width="144" height="54" rx="5" fill="#E7F5F1" stroke="#4BA394" stroke-width="1.1"/>
+              <text y="-9" font-size="11.6" font-weight="800" fill="#147D6F">④ 안내</text>
+              <text y="7" fill="#5B6B77">가장 빠른 경로 제시 —</text>
+              <text y="21" fill="#5B6B77">그리고 내 차도 데이터가 된다</text>
             </g>
-            <path d="M388,60 q-2,22 -160,24 q-160,2 -170,-24" fill="none" stroke="#8A949E" stroke-width="1.1" stroke-dasharray="3 2.5" marker-end="url(#arrP)"/>
-            <text x="220" y="94" font-size="6" fill="#5B6B77" font-weight="800">안내받은 차들의 움직임이 다시 ①로 — 데이터의 순환</text>
+            <path d="M548,63 q-2,24 -238,26 q-238,2 -238,-26" fill="none" stroke="#8A949E" stroke-width="1.1" stroke-dasharray="3 2.5" marker-end="url(#arrP)"/>
+            <text x="310" y="107" fill="#5B6B77" font-weight="800">안내받은 차들의 움직임이 다시 ①로 — 데이터의 순환</text>
           </g>
         </svg>
       </figure>
@@ -812,10 +946,86 @@
       </div>
     </div>
   </div>
-  <div class="folio"><span>III. 과학과 미래 사회</span><span class="num">168</span></div>
+  <div class="folio"><span>III. 과학과 미래 사회</span><span class="num">226</span></div>
 </div>
 
-<!-- ═════════════ p.169 STEP 1 + STEP 2 시작 ═════════════ -->
+<!-- ═════════════ 교과서 탐구 (2026-10 보강: 교육과정 탐구 '디지털 탐구 도구를 활용한 실시간 생활 데이터 측정하기') ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag">III. 과학과 미래 사회</span><span class="lesson-tag">02. 빅데이터와 인공지능·로봇</span></div>
+  <div class="lab">
+    <div class="lab-head">교과서 탐구 <span class="tag">디지털 탐구 도구 · 실시간 측정</span> <span style="font-weight:600; font-size:9.5pt; margin-left:auto;">교실 공기, 언제 창문을 열어야 할까?</span></div>
+    <div class="lab-body">
+      <h4>목적</h4>
+      <p>디지털 이산화 탄소(CO₂) 센서로 교실 공기를 실시간으로 재어 그래프로 나타내고, 데이터를 근거로 언제 환기해야 하는지 판단한다.</p>
+      <h4>준비 · 과정</h4>
+      <p><b>준비</b> CO₂ 센서를 연결한 피지컬 컴퓨팅 기기(마이크로컨트롤러 보드), 그래프를 그릴 노트북이나 스마트폰</p>
+      <ol>
+        <li>센서를 교실 가운데, 학생들의 숨높이(바닥에서 약 1&nbsp;m)에 두고, 창문·문·사람의 입에서 떨어뜨린다.</li>
+        <li>등교 전 빈 교실에서 측정을 시작해 <b>1분마다 자동으로</b> 기록한다. 교시마다 창문을 연 시각과 닫은 시각, 교실 안 사람 수를 함께 적는다.</li>
+        <li>기록을 시각–농도 그래프로 나타내고, 학교 교실의 CO₂ 유지 기준(1,000&nbsp;ppm)과 비교한다.</li>
+      </ol>
+      <h4>결과 <span style="font-weight:600; font-size:8.2pt; color:var(--sub);">(예시 결과 — 사람이 내쉬는 CO₂ 양과 환기 정도를 가정해 어림한 값)</span></h4>
+      <figure style="margin:2mm 0 1.6mm;">
+<svg width="620" height="158" viewBox="0 0 620 158" font-family="PC Sans">
+<g font-size="10.8">
+<rect x="81.8" y="14" width="98.2" height="114" fill="#F2F4FC"/>
+<text x="130.9" y="23" text-anchor="middle" font-weight="800" fill="#4053B8">1교시 · 창문 닫음</text>
+<rect x="201.8" y="14" width="98.2" height="114" fill="#F2F4FC"/>
+<text x="250.9" y="23" text-anchor="middle" font-weight="800" fill="#4053B8">2교시 · 창문 닫음</text>
+<rect x="321.8" y="14" width="98.2" height="114" fill="#F2F4FC"/>
+<text x="377" y="23" text-anchor="middle" font-weight="800" fill="#4053B8">3교시 · 창문 조금 엶</text>
+<rect x="180.0" y="14" width="21.8" height="114" fill="#E7F5F1"/>
+<text x="190.9" y="124" text-anchor="middle" font-weight="800" fill="#147D6F">환기</text>
+<text x="310.9" y="124" text-anchor="middle" font-weight="800" fill="#B0483A">닫음</text>
+<line x1="60" y1="128" x2="428" y2="128" stroke="#5B6B77" stroke-width="1.1" marker-end="url(#arrP)"/>
+<line x1="60" y1="128" x2="60" y2="6" stroke="#5B6B77" stroke-width="1.1" marker-end="url(#arrP)"/>
+<text x="66" y="10" fill="#5B6B77">CO₂ 농도 (ppm)</text>
+<line x1="57" y1="128.0" x2="60" y2="128.0" stroke="#5B6B77" stroke-width="0.8"/><text x="54" y="130.4" text-anchor="end" fill="#5B6B77">400</text>
+<line x1="57" y1="105.2" x2="60" y2="105.2" stroke="#5B6B77" stroke-width="0.8"/><text x="54" y="107.6" text-anchor="end" fill="#5B6B77">800</text>
+<line x1="57" y1="82.4" x2="60" y2="82.4" stroke="#5B6B77" stroke-width="0.8"/><text x="54" y="84.8" text-anchor="end" fill="#5B6B77">1,200</text>
+<line x1="57" y1="59.6" x2="60" y2="59.6" stroke="#5B6B77" stroke-width="0.8"/><text x="54" y="62.0" text-anchor="end" fill="#5B6B77">1,600</text>
+<line x1="57" y1="36.8" x2="60" y2="36.8" stroke="#5B6B77" stroke-width="0.8"/><text x="54" y="39.2" text-anchor="end" fill="#5B6B77">2,000</text>
+<line x1="57" y1="14.0" x2="60" y2="14.0" stroke="#5B6B77" stroke-width="0.8"/><text x="54" y="16.4" text-anchor="end" fill="#5B6B77">2,400</text>
+<line x1="60.0" y1="128" x2="60.0" y2="131" stroke="#5B6B77" stroke-width="0.8"/><text x="60.0" y="140" text-anchor="middle" fill="#5B6B77">8:50</text>
+<line x1="81.8" y1="128" x2="81.8" y2="142" stroke="#5B6B77" stroke-width="0.8"/><text x="81.8" y="152" text-anchor="middle" fill="#5B6B77">9:00</text>
+<line x1="180.0" y1="128" x2="180.0" y2="131" stroke="#5B6B77" stroke-width="0.8"/><text x="180.0" y="140" text-anchor="middle" fill="#5B6B77">9:45</text>
+<line x1="201.8" y1="128" x2="201.8" y2="142" stroke="#5B6B77" stroke-width="0.8"/><text x="201.8" y="152" text-anchor="middle" fill="#5B6B77">9:55</text>
+<line x1="300.0" y1="128" x2="300.0" y2="131" stroke="#5B6B77" stroke-width="0.8"/><text x="300.0" y="140" text-anchor="middle" fill="#5B6B77">10:40</text>
+<line x1="321.8" y1="128" x2="321.8" y2="142" stroke="#5B6B77" stroke-width="0.8"/><text x="321.8" y="152" text-anchor="middle" fill="#5B6B77">10:50</text>
+<line x1="420.0" y1="128" x2="420.0" y2="131" stroke="#5B6B77" stroke-width="0.8"/><text x="420.0" y="140" text-anchor="middle" fill="#5B6B77">11:35</text>
+<text x="430" y="152" text-anchor="end" fill="#5B6B77">시각</text>
+<line x1="60" y1="93.8" x2="420" y2="93.8" stroke="#D6455D" stroke-width="0.9" stroke-dasharray="3 2.5"/>
+<line x1="60" y1="126.5" x2="420" y2="126.5" stroke="#C9BA9B" stroke-width="0.9" stroke-dasharray="3 2.5"/>
+<polyline points="60.0,125.2 70.9,125.2 81.8,125.2 92.7,114.3 103.6,104.1 114.5,93.8 125.5,84.1 136.4,75.0 147.3,66.4 158.2,57.9 169.1,49.9 180.0,41.9 190.9,82.4 201.8,102.3 212.7,92.1 223.6,83.0 234.5,73.8 245.5,64.7 256.4,56.8 267.3,48.2 278.2,40.8 289.1,33.4 300.0,26.0 310.9,24.8 321.8,23.7 332.7,56.2 343.6,76.1 354.5,87.5 365.5,94.4 376.4,98.4 387.3,100.6 398.2,101.8 409.1,102.9 420.0,103.5" fill="none" stroke="#C1521E" stroke-width="1.8" stroke-linejoin="round"/>
+<circle cx="60.0" cy="125.2" r="1.5" fill="#C1521E"/><circle cx="70.9" cy="125.2" r="1.5" fill="#C1521E"/><circle cx="81.8" cy="125.2" r="1.5" fill="#C1521E"/><circle cx="92.7" cy="114.3" r="1.5" fill="#C1521E"/><circle cx="103.6" cy="104.1" r="1.5" fill="#C1521E"/><circle cx="114.5" cy="93.8" r="1.5" fill="#C1521E"/><circle cx="125.5" cy="84.1" r="1.5" fill="#C1521E"/><circle cx="136.4" cy="75.0" r="1.5" fill="#C1521E"/><circle cx="147.3" cy="66.4" r="1.5" fill="#C1521E"/><circle cx="158.2" cy="57.9" r="1.5" fill="#C1521E"/><circle cx="169.1" cy="49.9" r="1.5" fill="#C1521E"/><circle cx="180.0" cy="41.9" r="1.5" fill="#C1521E"/><circle cx="190.9" cy="82.4" r="1.5" fill="#C1521E"/><circle cx="201.8" cy="102.3" r="1.5" fill="#C1521E"/><circle cx="212.7" cy="92.1" r="1.5" fill="#C1521E"/><circle cx="223.6" cy="83.0" r="1.5" fill="#C1521E"/><circle cx="234.5" cy="73.8" r="1.5" fill="#C1521E"/><circle cx="245.5" cy="64.7" r="1.5" fill="#C1521E"/><circle cx="256.4" cy="56.8" r="1.5" fill="#C1521E"/><circle cx="267.3" cy="48.2" r="1.5" fill="#C1521E"/><circle cx="278.2" cy="40.8" r="1.5" fill="#C1521E"/><circle cx="289.1" cy="33.4" r="1.5" fill="#C1521E"/><circle cx="300.0" cy="26.0" r="1.5" fill="#C1521E"/><circle cx="310.9" cy="24.8" r="1.5" fill="#C1521E"/><circle cx="321.8" cy="23.7" r="1.5" fill="#C1521E"/><circle cx="332.7" cy="56.2" r="1.5" fill="#C1521E"/><circle cx="343.6" cy="76.1" r="1.5" fill="#C1521E"/><circle cx="354.5" cy="87.5" r="1.5" fill="#C1521E"/><circle cx="365.5" cy="94.4" r="1.5" fill="#C1521E"/><circle cx="376.4" cy="98.4" r="1.5" fill="#C1521E"/><circle cx="387.3" cy="100.6" r="1.5" fill="#C1521E"/><circle cx="398.2" cy="101.8" r="1.5" fill="#C1521E"/><circle cx="409.1" cy="102.9" r="1.5" fill="#C1521E"/><circle cx="420.0" cy="103.5" r="1.5" fill="#C1521E"/>
+<line x1="440" y1="30" x2="456" y2="30" stroke="#C1521E" stroke-width="1.8"/><text x="460" y="34" font-weight="800" fill="#C1521E">교실 CO₂ 농도 (5분 간격 값)</text>
+<line x1="440" y1="50" x2="456" y2="50" stroke="#D6455D" stroke-width="0.9" stroke-dasharray="3 2.5"/><text x="460" y="54" fill="#B0483A">1,000 ppm — 교실 유지 기준</text>
+<text x="460" y="67" fill="#5B6B77">(학교보건법 시행규칙)</text>
+<line x1="440" y1="83" x2="456" y2="83" stroke="#C9BA9B" stroke-width="0.9" stroke-dasharray="3 2.5"/><text x="460" y="87" fill="#7A6A45">약 427 ppm — 바깥 공기</text>
+<text x="460" y="100" fill="#5B6B77">(2025년 연평균, NOAA)</text>
+<text x="440" y="120" fill="#5B6B77">학생 25명 · 교사 1명,</text><text x="440" y="133" fill="#5B6B77">교실 부피 약 180 m³</text>
+<text x="440" y="150" font-weight="800" fill="#5B6B77">예시 결과(어림값)</text>
+</g></svg>
+
+      </figure>
+      <h4>해석의 3단계</h4>
+      <ol>
+        <li><b>원인</b> — 빈 교실(8:50~9:00)은 바깥 공기와 비슷한 약 450&nbsp;ppm이다. 창문을 닫은 수업 중에는 농도가 쉬지 않고 오른다 — 사람이 내쉬는 숨(세포 호흡의 산물)에 CO₂가 들어 있기 때문이다.</li>
+        <li><b>기준과 비교</b> — 1교시 시작 약 15분 만에 1,000&nbsp;ppm을 넘었고, 2교시 뒤 창문을 닫은 채 보낸 쉬는 시간 끝(10:50)에는 약 2,230&nbsp;ppm까지 올랐다. 눈으로는 보이지 않는 변화를 <b>센서의 숫자</b>가 보여 준다.</li>
+        <li><b>판단과 행동</b> — 쉬는 시간에 창문을 활짝 열자 10분 만에 약 850&nbsp;ppm으로 떨어졌고, 3교시처럼 창문을 조금 열어 둔 채 수업하면 20분쯤 뒤 1,000&nbsp;ppm 아래로 내려가 그대로 유지되었다. 측정(센서) → 데이터 → 판단 → 행동(환기)은 개념 5의 사물인터넷 사슬 그대로다.</li>
+      </ol>
+      <div class="expoint">
+        <div class="boxtitle"><span class="ico">!</span>시험에서는 이렇게 바뀐다</div>
+        <p><b>① 사람 수 바꾸기</b> — 학생이 절반이면? 숨으로 나오는 CO₂가 줄어 오르는 기울기가 완만해진다.<br>
+        <b>② 측정 간격 바꾸기</b> — 9시·10시·11시에 한 번씩만 재면? 450 → 약 1,030 → 약 1,310&nbsp;ppm만 보여 10시 50분 무렵의 최고점(약 2,230&nbsp;ppm)을 놓친다 — <b>실시간 연속 측정</b>의 가치다.<br>
+        <b>③ 데이터 모으기</b> — 전교 교실의 센서 값을 한 서버에 모으면? 어느 교실·어느 시간대가 환기에 취약한지 패턴이 보이는 <b>빅데이터</b>가 되고, 기준을 넘을 때 알림을 보내는 장치로 이어진다.</p>
+      </div>
+    </div>
+  </div>
+  <div class="folio"><span>III. 과학과 미래 사회</span><span class="num">227</span></div>
+</div>
+
+<!-- ═════════════ p.169 STEP 1 + STEP 2 시작 (7~10) ═════════════ -->
 <div class="page">
   <div class="runhead"><span class="unit-tag">III. 과학과 미래 사회</span><span class="lesson-tag">02. 빅데이터와 인공지능·로봇 | 문제</span></div>
   <div class="step-head"><span class="stepno">STEP 1</span><span class="steptt">개념 확인</span><span class="stepdesc">OX와 빈칸으로 개념 점검 — 막히면 알짜 정리로!</span></div>
@@ -833,118 +1043,445 @@
   </div>
   <div style="border-top:0.5mm solid var(--line); margin:2mm 0 4mm;"></div>
   <div class="step-head s2"><span class="stepno">STEP 2</span><span class="steptt">내신 완성</span><span class="stepdesc">학교 시험 유형 그대로 — 서술형까지 한 번에</span></div>
-  <div class="q">
-    <div class="qhead"><span class="qno">7</span><div class="stem">빅데이터에 대한 설명으로 옳은 것은? <span class="difficulty">●●○</span>
-    <div class="tags">10통과2-03-02 | 개념 1</div></div></div>
-    <ul class="choices">
-      <li>① 빅데이터는 종이 문서 형태의 자료만을 말한다.</li>
-      <li>② 빅데이터는 한 종류의 데이터로만 이루어진다.</li>
-      <li>③ 검색 기록·카드 결제·위치 정보 등이 빅데이터의 원천이 된다.</li>
-      <li>④ 데이터의 양이 충분히 많으면 분석은 필요 없다.</li>
-      <li>⑤ 빅데이터는 과학과 무관한 상업 기술이다.</li>
-    </ul>
+
+  <div class="qgrid qg2">
+    <div>
+      <div class="q">
+        <div class="qhead"><span class="qno">7</span><div class="stem">빅데이터에 대한 설명으로 옳은 것은? <span class="difficulty">●○○</span>
+        <div class="tags">10통과2-03-02 | 개념 1</div></div></div>
+        <ul class="choices">
+          <li>① 빅데이터는 종이 문서 자료만을 말한다.</li>
+          <li>② 빅데이터는 한 가지 형태의 데이터뿐이다.</li>
+          <li>③ 데이터가 충분히 많으면 분석은 필요 없다.</li>
+          <li>④ 검색·결제·위치 기록은 빅데이터의 원천이다.</li>
+          <li>⑤ 빅데이터는 실시간으로 쌓이지 않는다.</li>
+        </ul>
+      </div>
+
+      <div class="q">
+        <div class="qhead"><span class="qno">8</span><div class="stem"><span class="must">중요</span><span class="badge-data">자료</span>그림은 어느 도시의 하루 교통카드 승차 기록 약 200만&nbsp;건을 시각별로 모은 것이다. 옳은 것만을 &lt;보기&gt;에서 있는 대로 고른 것은? <span class="difficulty">●●○</span>
+        <div class="tags">10통과2-03-02 | 개념 1</div></div></div>
+        <figure style="margin:2mm 0 1mm 8.4mm;">
+          <svg width="295" height="92.7" viewBox="0 0 280 88" font-family="PC Sans">
+            <text x="34" y="10" font-size="10.4" fill="#5B6B77">승차 인원 (만 명)</text>
+            <g stroke="#C9BA9B" stroke-width="0.7" stroke-dasharray="2.5 2"><line x1="30" y1="54.4" x2="268" y2="54.4"/><line x1="30" y1="36.8" x2="268" y2="36.8"/><line x1="30" y1="19.2" x2="268" y2="19.2"/></g>
+            <g font-size="10.4" fill="#5B6B77" text-anchor="end"><text x="26" y="56.6">8</text><text x="26" y="39">16</text><text x="26" y="21.4">24</text></g>
+            <g fill="#8E9ADF">
+              <rect x="36" y="61" width="9" height="11"/><rect x="49" y="36.8" width="9" height="35.2"/><rect x="62" y="19.2" width="9" height="52.8"/><rect x="75" y="41.2" width="9" height="30.8"/><rect x="88" y="52.2" width="9" height="19.8"/><rect x="101" y="54.4" width="9" height="17.6"/><rect x="114" y="52.2" width="9" height="19.8"/><rect x="127" y="52.2" width="9" height="19.8"/><rect x="140" y="54.4" width="9" height="17.6"/><rect x="153" y="52.2" width="9" height="19.8"/><rect x="166" y="47.8" width="9" height="24.2"/><rect x="179" y="36.8" width="9" height="35.2"/><rect x="192" y="28" width="9" height="44"/><rect x="205" y="41.2" width="9" height="30.8"/><rect x="218" y="50" width="9" height="22"/><rect x="231" y="54.4" width="9" height="17.6"/><rect x="244" y="56.6" width="9" height="15.4"/><rect x="257" y="63.2" width="9" height="8.8"/>
+            </g>
+            <line x1="30" y1="72" x2="272" y2="72" stroke="#5B6B77" stroke-width="1"/>
+            <line x1="30" y1="72" x2="30" y2="12" stroke="#5B6B77" stroke-width="1"/>
+            <g font-size="10.4" fill="#5B6B77" text-anchor="middle"><text x="40.5" y="83">6</text><text x="79.5" y="83">9</text><text x="118.5" y="83">12</text><text x="157.5" y="83">15</text><text x="196.5" y="83">18</text><text x="235.5" y="83">21</text></g>
+            <text x="276" y="83" text-anchor="end" font-size="10.4" fill="#5B6B77">(시)</text>
+          </svg>
+        </figure>
+        <div class="bogi-box">
+          <div class="bt">보기</div>
+          ㄱ. 출퇴근 시간대에 승차 인원이 많아진다.<br>
+          ㄴ. 8시의 승차 인원은 14시의 3배이다.<br>
+          ㄷ. 한 사람의 기록만으로도 이 패턴이 보인다.
+        </div>
+        <ul class="choices inline">
+          <li>① ㄱ</li><li>② ㄷ</li><li>③ ㄱ, ㄴ</li><li>④ ㄴ, ㄷ</li><li>⑤ ㄱ, ㄴ, ㄷ</li>
+        </ul>
+      </div>
+    </div>
+    <div>
+      <div class="q">
+        <div class="qhead"><span class="qno">9</span><div class="stem">로봇을 센서(감지)·제어 장치(판단)·구동 장치(움직임)로 나눌 때, 청소 로봇의 부품과 그 요소를 옳게 짝 지은 것은? <span class="difficulty">●○○</span>
+        <div class="tags">10통과2-03-03 | 개념 4</div></div></div>
+        <ul class="choices">
+          <li>① 범퍼의 충돌 센서 — 감지</li>
+          <li>② 바퀴를 돌리는 모터 — 판단</li>
+          <li>③ 마이크로프로세서 — 움직임</li>
+          <li>④ 바닥의 낙하 방지 센서 — 움직임</li>
+          <li>⑤ 브러시를 돌리는 모터 — 감지</li>
+        </ul>
+      </div>
+
+      <div class="q">
+        <div class="qhead"><span class="qno">10</span><div class="stem">다음은 심야버스 노선을 정하는 과정을 순서 없이 나열한 것이다. 순서대로 옳게 나열한 것은? <span class="difficulty">●○○</span>
+        <div class="tags">10통과2-03-02 | 개념 2, 자료 파헤치기</div></div></div>
+        <div class="bogi-box">
+          (가) 기록을 분석해 이동이 몰린 구간을 찾는다.<br>
+          (나) 심야 시간의 통화·이동 기록을 모은다.<br>
+          (다) 정한 노선으로 버스를 운행한다.<br>
+          (라) 앞으로 승객이 많을 노선을 내다본다.
+        </div>
+        <ul class="choices">
+          <li>① (가) → (나) → (라) → (다)</li>
+          <li>② (나) → (가) → (라) → (다)</li>
+          <li>③ (나) → (라) → (가) → (다)</li>
+          <li>④ (라) → (나) → (가) → (다)</li>
+          <li>⑤ (나) → (가) → (다) → (라)</li>
+        </ul>
+      </div>
+    </div>
   </div>
-  <div class="q">
-    <div class="qhead"><span class="qno">8</span><div class="stem">빅데이터의 활용 사례에 대한 설명으로 옳은 것은? <span class="difficulty">●●●</span>
-    <div class="tags">10통과2-03-02 | 개념 2</div></div></div>
-    <ul class="choices">
-      <li>① 빅데이터는 감염병 확산 예측에 쓸 수 없다.</li>
-      <li>② 내비게이션은 데이터 없이 경로를 안내한다.</li>
-      <li>③ 일기 예보는 관측 데이터와 무관하게 만들어진다.</li>
-      <li>④ 의료 영상 판독에는 AI를 보조로 쓸 수 없다.</li>
-      <li>⑤ 실시간 교통 데이터 분석으로 더 빠른 길을 안내할 수 있다.</li>
-    </ul>
-  </div>
-  <div class="folio"><span>III. 과학과 미래 사회</span><span class="num">169</span></div>
+  <div class="folio"><span>III. 과학과 미래 사회</span><span class="num">228</span></div>
 </div>
 
-<!-- ═════════════ p.170 STEP 2 계속 ═════════════ -->
+<!-- ═════════════ p.170 STEP 2 계속 (11~15) ═════════════ -->
 <div class="page">
   <div class="runhead"><span class="unit-tag">III. 과학과 미래 사회</span><span class="lesson-tag">02. 빅데이터와 인공지능·로봇 | 문제</span></div>
-  <div class="q">
-    <div class="qhead"><span class="qno">9</span><div class="stem">빅데이터 활용의 문제점에 대한 설명으로 옳은 것은? <span class="difficulty">●●●</span>
-    <div class="tags">10통과2-03-02 | 개념 3</div></div></div>
-    <ul class="choices">
-      <li>① 수집된 위치·소비 데이터는 개인의 사생활을 드러낼 수 있다.</li>
-      <li>② 데이터가 많으면 분석 결과는 항상 공정하다.</li>
-      <li>③ 빅데이터 활용에는 아무런 문제점이 없다.</li>
-      <li>④ 디지털 격차는 빅데이터 시대와 무관한 문제다.</li>
-      <li>⑤ 개인 정보는 본인 동의 없이 자유롭게 활용해도 된다.</li>
-    </ul>
-  </div>
-  <div class="q">
-    <div class="qhead"><span class="qno">10</span><div class="stem">인공지능과 로봇의 활용에 대한 설명으로 옳은 것만을 고른 것은? <span class="difficulty">●●●</span>
-    <div class="tags">10통과2-03-03 | 개념 4</div></div></div>
-    <div class="bogi-box" style="background:#fff;">
-      (가) AI는 의료 영상 판독을 보조할 수 있다.<br>
-      (나) 재난 현장의 위험한 작업을 로봇이 대신할 수 있다.<br>
-      (다) AI의 판단은 언제나 옳으므로 사람의 확인이 필요 없다.
+
+  <div class="qgrid qg2">
+    <div>
+      <div class="q">
+        <div class="qhead"><span class="qno">11</span><div class="stem">빅데이터 활용의 문제점으로 옳은 것은? <span class="difficulty">●●○</span>
+        <div class="tags">10통과2-03-02 | 개념 3</div></div></div>
+        <ul class="choices">
+          <li>① 공익을 위한 추적은 사생활 침해가 될 수 없다.</li>
+          <li>② 데이터 편향은 데이터 양만 늘리면 사라진다.</li>
+          <li>③ 디지털 격차는 빅데이터와 무관한 문제다.</li>
+          <li>④ 개인 정보는 동의 없이 활용해도 된다.</li>
+          <li>⑤ 위치·소비 기록이 모이면 사생활이 드러날 수 있다.</li>
+        </ul>
+      </div>
+
+      <div class="q">
+        <div class="qhead"><span class="qno">12</span><div class="stem"><span class="must">중요</span>빅데이터의 문제점에 대해 옳게 말한 학생만을 있는 대로 고른 것은? <span class="difficulty">●●○</span>
+        <div class="tags">10통과2-03-02 | 개념 3</div></div></div>
+        <div class="bogi-box">
+          <b>학생 A</b> : 서비스가 편리하다면 내 데이터를 누가 모아 어디에 쓰는지는 몰라도 괜찮아.<br>
+          <b>학생 B</b> : 특정 집단의 데이터만으로 학습한 시스템은 다른 집단에게 불공정한 판단을 할 수 있어.<br>
+          <b>학생 C</b> : 기술을 쓸 수 있는 사람과 그렇지 못한 사람의 차이가 새로운 불평등이 될 수 있어.
+        </div>
+        <ul class="choices inline">
+          <li>① A</li><li>② C</li><li>③ A, B</li><li>④ B, C</li><li>⑤ A, B, C</li>
+        </ul>
+      </div>
+
+      <div class="q">
+        <div class="qhead"><span class="qno">13</span><div class="stem">인공지능과 로봇에 대한 설명으로 옳은 것만을 <span style="white-space:nowrap;">&lt;보기&gt;에서</span> 있는 대로 고른 것은? <span class="difficulty">●●○</span>
+        <div class="tags">10통과2-03-03 | 개념 4</div></div></div>
+        <div class="bogi-box">
+          <div class="bt">보기</div>
+          ㄱ. AI는 데이터에서 스스로 규칙을 학습한다.<br>
+          ㄴ. 로봇은 공장의 정밀 조립 같은 일을 한다.<br>
+          ㄷ. 수술 로봇을 쓰면 집도의는 사람이 아니다.
+        </div>
+        <ul class="choices inline">
+          <li>① ㄱ</li><li>② ㄷ</li><li>③ ㄱ, ㄴ</li><li>④ ㄴ, ㄷ</li><li>⑤ ㄱ, ㄴ, ㄷ</li>
+        </ul>
+      </div>
     </div>
-    <ul class="choices inline">
-      <li>① (가)</li><li>② (가), (나)</li><li>③ (나), (다)</li><li>④ (다)</li><li>⑤ (가), (나), (다)</li>
-    </ul>
+    <div>
+      <div class="q">
+        <div class="qhead"><span class="qno">14</span><div class="stem"><span class="must">중요</span><span class="badge-data">탐구</span>다음은 학습 데이터에 따라 인공지능의 판단이 어떻게 달라지는지 알아보는 활동이다.
+          <div class="exp"><b>[과정]</b> (가) 사진 분류 인공지능 A에게 흰 고양이 사진 200장과 개 사진 200장을 정답과 함께 학습시킨다.<br>(나) 인공지능 B에게는 흰색·검은색·갈색 고양이 사진 200장과 개 사진 200장을 정답과 함께 학습시킨다.<br>(다) 학습에 쓰지 않은 검은 고양이 사진 10장을 A와 B에게 보여 주고 판단 결과를 센다.<br><b>[결과]</b> A는 고양이 3장·개 7장, B는 고양이 9장·개 1장으로 판단했다.</div>
+          이에 대한 설명으로 옳은 것만을 &lt;보기&gt;에서 있는 대로 고른 것은? <span class="difficulty">●●●</span>
+        <div class="tags">10통과2-03-03 | 개념 3·4, 탐구</div></div></div>
+        <div class="bogi-box">
+          <div class="bt">보기</div>
+          ㄱ. A와 B의 판단 규칙은 사람이 일일이 입력했다.<br>
+          ㄴ. B는 검은 고양이 사진을 모두 맞혔다.<br>
+          ㄷ. A의 결과는 데이터 편향의 영향을 보여 준다.
+        </div>
+        <ul class="choices inline">
+          <li>① ㄱ</li><li>② ㄷ</li><li>③ ㄱ, ㄴ</li><li>④ ㄴ, ㄷ</li><li>⑤ ㄱ, ㄴ, ㄷ</li>
+        </ul>
+      </div>
+
+      <div class="q">
+        <div class="qhead"><span class="qno">15</span><div class="stem"><span class="badge-data">자료</span>그림은 스마트 워치를 이용한 원격 건강 관리 과정을 나타낸 것이다. 옳은 것만을 &lt;보기&gt;에서 있는 대로 고른 것은? <span class="difficulty">●●○</span>
+        <div class="tags">10통과2-03-03 | 개념 5</div></div></div>
+        <figure style="margin:2mm 0 1mm 8.4mm;">
+          <svg width="295" height="56.9" viewBox="0 0 280 54" font-family="PC Sans">
+            <g text-anchor="middle">
+              <g transform="translate(0.5,3)">
+                <rect width="61.5" height="48" rx="4" fill="#ECEFFA" stroke="#C0C9EE" stroke-width="0.9"/>
+                <circle cx="9" cy="9" r="7" fill="#4053B8"/><text x="9" y="12.6" font-size="10.2" font-weight="900" fill="#fff">A</text>
+                <text x="30.75" y="30" font-size="10.2" font-weight="800" fill="#2E3E96">심박 측정</text>
+                <text x="30.75" y="43" font-size="10.2" fill="#5B6B77">손목의 센서</text>
+              </g>
+              <g transform="translate(73,3)">
+                <rect width="61.5" height="48" rx="4" fill="#ECEFFA" stroke="#C0C9EE" stroke-width="0.9"/>
+                <circle cx="9" cy="9" r="7" fill="#4053B8"/><text x="9" y="12.6" font-size="10.2" font-weight="900" fill="#fff">B</text>
+                <text x="30.75" y="30" font-size="10.2" font-weight="800" fill="#2E3E96">데이터 전송</text>
+                <text x="30.75" y="43" font-size="10.2" fill="#5B6B77">인터넷으로</text>
+              </g>
+              <g transform="translate(145.5,3)">
+                <rect width="61.5" height="48" rx="4" fill="#ECEFFA" stroke="#C0C9EE" stroke-width="0.9"/>
+                <circle cx="9" cy="9" r="7" fill="#4053B8"/><text x="9" y="12.6" font-size="10.2" font-weight="900" fill="#fff">C</text>
+                <text x="30.75" y="30" font-size="10.2" font-weight="800" fill="#2E3E96">이상 판단</text>
+                <text x="30.75" y="43" font-size="10.2" fill="#5B6B77">인공지능</text>
+              </g>
+              <g transform="translate(218,3)">
+                <rect width="61.5" height="48" rx="4" fill="#E7F5F1" stroke="#4BA394" stroke-width="0.9"/>
+                <circle cx="9" cy="9" r="7" fill="#147D6F"/><text x="9" y="12.6" font-size="10.2" font-weight="900" fill="#fff">D</text>
+                <text x="30.75" y="30" font-size="10.2" font-weight="800" fill="#147D6F">알림</text>
+                <text x="30.75" y="43" font-size="10.2" fill="#5B6B77">보호자에게</text>
+              </g>
+            </g>
+            <g stroke="#4053B8" stroke-width="1.2"><line x1="62.5" y1="27" x2="70.5" y2="27" marker-end="url(#arrP)"/><line x1="135" y1="27" x2="143" y2="27" marker-end="url(#arrP)"/><line x1="207.5" y1="27" x2="215.5" y2="27" marker-end="url(#arrP)"/></g>
+          </svg>
+        </figure>
+        <div class="bogi-box">
+          <div class="bt">보기</div>
+          ㄱ. A에서 잰 심박은 데이터가 되어 B로 간다.<br>
+          ㄴ. C에서는 학습한 AI가 이상 여부를 판단한다.<br>
+          ㄷ. 연결이 늘수록 해킹의 통로도 늘어난다.
+        </div>
+        <ul class="choices inline">
+          <li>① ㄱ</li><li>② ㄷ</li><li>③ ㄱ, ㄴ</li><li>④ ㄴ, ㄷ</li><li>⑤ ㄱ, ㄴ, ㄷ</li>
+        </ul>
+      </div>
+    </div>
   </div>
-  <div class="q">
-    <div class="qhead"><span class="qno">11</span><div class="stem"><span class="badge-essay">서술형</span>빅데이터 활용의 장점 한 가지와 문제점 한 가지를 <b>'개인 정보'</b>라는 말을 포함하여 서술하시오. <span class="difficulty">●●●●</span>
-    <div class="tags">10통과2-03-02 | 개념 2·3</div></div></div>
-    <div class="essay-lines"><div></div><div></div><div></div></div>
-  </div>
-  <div class="folio"><span>III. 과학과 미래 사회</span><span class="num">170</span></div>
+  <div class="folio"><span>III. 과학과 미래 사회</span><span class="num">229</span></div>
 </div>
 
-<!-- ═════════════ p.171 STEP 3 ═════════════ -->
+<!-- ═════════════ STEP 2 계속 (16~17) + 서술형 (18~20) ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag">III. 과학과 미래 사회</span><span class="lesson-tag">02. 빅데이터와 인공지능·로봇 | 문제</span></div>
+
+  <div class="qgrid qg2">
+    <div>
+      <div class="q">
+        <div class="qhead"><span class="qno">16</span><div class="stem"><span class="badge-data">자료</span>그림은 수업 중인 교실에서 센서로 1분마다 잰 CO₂ 농도이다. 40분에 창문을 열었다. 옳은 것만을 <span style="white-space:nowrap;">&lt;보기&gt;에서</span> 있는 대로 고른 것은? <span class="difficulty">●●○</span>
+        <div class="tags">10통과2-03-02·03 | 교과서 탐구, 개념 5</div></div></div>
+        <figure style="margin:2mm 0 1mm 8.4mm;">
+          <svg width="295" height="92.7" viewBox="0 0 280 88" font-family="PC Sans">
+          <rect x="206.0" y="12" width="43.0" height="60" fill="#E7F5F1"/>
+          <text x="227.5" y="10" text-anchor="middle" font-size="10.4" font-weight="800" fill="#147D6F">창문 엶</text>
+          <g stroke="#C9BA9B" stroke-width="0.7" stroke-dasharray="2.5 2"><line x1="30" y1="42.0" x2="249.0" y2="42.0"/><line x1="30" y1="27.0" x2="249.0" y2="27.0"/></g>
+          <g font-size="10.4" fill="#5B6B77" text-anchor="end"><text x="26" y="44.2">1,000</text><text x="26" y="29.2">1,500</text></g>
+          <line x1="30" y1="59.2" x2="249.0" y2="59.2" stroke="#8A949E" stroke-width="0.9" stroke-dasharray="1.2 1.8"/>
+          <text x="190" y="69" text-anchor="end" font-size="10.4" fill="#5B6B77">바깥 공기 (427 ppm)</text>
+          <text x="34" y="10" font-size="10.4" fill="#5B6B77">CO₂ 농도 (ppm)</text>
+          <polyline points="34.0,57.0 42.6,54.7 51.2,52.4 59.8,50.2 68.4,48.0 77.0,45.9 85.6,43.8 94.2,41.7 102.8,39.7 111.4,37.7 120.0,35.7 128.6,33.7 137.2,31.8 145.8,30.0 154.4,28.1 163.0,26.3 171.6,24.5 180.2,22.8 188.8,21.0 197.4,19.3 206.0,17.7 214.6,25.8 223.2,31.9 231.8,36.5 240.4,39.9 249.0,42.5" fill="none" stroke="#C1521E" stroke-width="1.8" stroke-linejoin="round"/>
+          <line x1="30" y1="72" x2="272" y2="72" stroke="#5B6B77" stroke-width="1"/><line x1="30" y1="72" x2="30" y2="12" stroke="#5B6B77" stroke-width="1"/>
+          <g font-size="10.4" fill="#5B6B77" text-anchor="middle"><text x="34.0" y="83">0</text><text x="77.0" y="83">10</text><text x="120.0" y="83">20</text><text x="163.0" y="83">30</text><text x="206.0" y="83">40</text><text x="249.0" y="83">50</text></g>
+          <text x="280" y="83" text-anchor="end" font-size="10.4" fill="#5B6B77">(분)</text>
+          </svg>
+        </figure>
+        <div class="bogi-box">
+          <div class="bt">보기</div>
+          ㄱ. 창문을 닫은 동안 CO₂ 농도는 계속 높아졌다.<br>
+          ㄴ. 1,000&nbsp;ppm을 처음 넘은 때는 30분 무렵이다.<br>
+          ㄷ. 창문을 열고 10분 안에 바깥 공기보다 낮아졌다.
+        </div>
+        <ul class="choices inline">
+          <li>① ㄱ</li><li>② ㄷ</li><li>③ ㄱ, ㄴ</li><li>④ ㄴ, ㄷ</li><li>⑤ ㄱ, ㄴ, ㄷ</li>
+        </ul>
+      </div>
+
+      <div class="q">
+        <div class="qhead"><span class="qno">17</span><div class="stem"><span class="badge-data">자료</span>그림은 첨단 기술이 활용되는 세 가지 사례를 나타낸 것이다. 옳은 것만을 &lt;보기&gt;에서 있는 대로 고른 것은? <span class="difficulty">●●○</span>
+        <div class="tags">10통과2-03-03 | 개념 4·5</div></div></div>
+        <figure style="margin:2mm 0 1mm 8.4mm;">
+          <svg width="295" height="73.7" viewBox="0 0 280 70" font-family="PC Sans">
+            <g text-anchor="middle">
+              <g transform="translate(0.5,2)">
+                <rect width="88" height="66" rx="4" fill="#ECEFFA" stroke="#C0C9EE" stroke-width="0.9"/>
+                <text x="44" y="15" font-size="10.4" font-weight="800" fill="#2E3E96">(가) 번역 앱</text>
+                <line x1="6" y1="21" x2="82" y2="21" stroke="#C0C9EE" stroke-width="0.8"/>
+                <text x="44" y="34" font-size="10.2" fill="#3D4C58">수많은 문장과</text>
+                <text x="44" y="47" font-size="10.2" fill="#3D4C58">번역문을 학습해</text>
+                <text x="44" y="60" font-size="10.2" fill="#3D4C58">문장을 번역한다</text>
+              </g>
+              <g transform="translate(90.5,2)">
+                <rect width="99" height="66" rx="4" fill="#FDF3F0" stroke="#E5B8AC" stroke-width="0.9"/>
+                <text x="49.5" y="15" font-size="10.2" font-weight="800" fill="#B0483A">(나) 재난 구조 로봇</text>
+                <line x1="6" y1="21" x2="93" y2="21" stroke="#E5B8AC" stroke-width="0.8"/>
+                <text x="49.5" y="34" font-size="10.2" fill="#3D4C58">무너진 건물 안에</text>
+                <text x="49.5" y="47" font-size="10.2" fill="#3D4C58">들어가</text>
+                <text x="49.5" y="60" font-size="10.2" fill="#3D4C58">생존자를 찾는다</text>
+              </g>
+              <g transform="translate(191.5,2)">
+                <rect width="88" height="66" rx="4" fill="#E7F5F1" stroke="#4BA394" stroke-width="0.9"/>
+                <text x="44" y="15" font-size="10.4" font-weight="800" fill="#147D6F">(다) 스마트홈</text>
+                <line x1="6" y1="21" x2="82" y2="21" stroke="#4BA394" stroke-width="0.8"/>
+                <text x="44" y="34" font-size="10.2" fill="#3D4C58">집을 나서면</text>
+                <text x="44" y="47" font-size="10.2" fill="#3D4C58">조명과 난방이</text>
+                <text x="44" y="60" font-size="10.2" fill="#3D4C58">저절로 꺼진다</text>
+              </g>
+            </g>
+          </svg>
+        </figure>
+        <div class="bogi-box">
+          <div class="bt">보기</div>
+          ㄱ. (가)는 학습한 적 없는 문장은 번역할 수 없다.<br>
+          ㄴ. (나)는 위험한 곳의 작업을 대신한다.<br>
+          ㄷ. (다)는 연결된 사물이 스스로 작동하는 예이다.
+        </div>
+        <ul class="choices inline">
+          <li>① ㄱ</li><li>② ㄷ</li><li>③ ㄱ, ㄴ</li><li>④ ㄴ, ㄷ</li><li>⑤ ㄱ, ㄴ, ㄷ</li>
+        </ul>
+      </div>
+
+    </div>
+    <div>
+      <div class="q">
+        <div class="qhead"><span class="qno">18</span><div class="stem"><span class="must">중요</span><span class="badge-essay">서술형</span>빅데이터 활용의 장점 한 가지와 문제점 한 가지를 <b>'예측'</b>, <b>'개인 정보'</b>를 모두 포함하여 서술하시오. <span class="difficulty">●●○</span>
+        <div class="tags">10통과2-03-02 | 개념 2·3</div></div></div>
+        <div class="essay-lines"><div></div><div></div><div></div><div></div><div></div></div>
+      </div>
+      <div class="q">
+        <div class="qhead"><span class="qno">19</span><div class="stem"><span class="badge-essay">서술형</span>인공지능이 판단 규칙을 얻는 방법을, 사람이 규칙을 일일이 입력하는 프로그램과 비교하여 <b>'데이터'</b>, <b>'규칙'</b>을 모두 포함하여 서술하시오. <span class="difficulty">●●○</span>
+        <div class="tags">10통과2-03-03 | 개념 4</div></div></div>
+        <div class="essay-lines"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>
+      </div>
+
+      <div class="q">
+        <div class="qhead"><span class="qno">20</span><div class="stem"><span class="badge-essay">서술형</span>사물인터넷과 인공지능 기술이 널리 쓰일 때 생길 수 있는 한계(숙제) 두 가지를 <b>'해킹'</b>, <b>'책임'</b>을 모두 포함하여 서술하시오. <span class="difficulty">●●●</span>
+        <div class="tags">10통과2-03-03 | 개념 5</div></div></div>
+        <div class="essay-lines"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>
+      </div>
+    </div>
+  </div>
+  <div class="folio"><span>III. 과학과 미래 사회</span><span class="num">230</span></div>
+</div>
+
+<!-- ═════════════ p.171 STEP 3 (21~24) ═════════════ -->
 <div class="page">
   <div class="runhead"><span class="unit-tag">III. 과학과 미래 사회</span><span class="lesson-tag">02. 빅데이터와 인공지능·로봇 | 문제</span></div>
   <div class="step-head s3"><span class="stepno">STEP 3</span><span class="steptt">수능 도전</span><span class="stepdesc">2028 수능 규격 — ㄱㄴㄷ 합답형·자료 해석</span></div>
-  <div class="q">
-    <div class="qhead"><span class="qno">12</span><div class="stem"><span class="badge-data">자료</span>그림은 내비게이션이 경로를 안내하는 과정을 나타낸 것이다. 옳은 것만을 &lt;보기&gt;에서 있는 대로 고른 것은? <span class="difficulty">[2점]</span>
-    <div class="tags">10통과2-03-02</div></div></div>
-    <figure style="margin:2mm 0 1.5mm 8.6mm;">
-      <svg width="300" height="44" viewBox="0 0 300 44" font-family="PC Sans">
-        <g font-size="6.2" text-anchor="middle">
-          <rect x="8" y="10" width="58" height="24" rx="4" fill="#ECEFFA" stroke="#C0C9EE" stroke-width="0.9"/><text x="37" y="25" font-weight="800" fill="#2E3E96">수집</text>
-          <line x1="68" y1="22" x2="80" y2="22" stroke="#4053B8" stroke-width="1.2" marker-end="url(#arrP)"/>
-          <rect x="82" y="10" width="58" height="24" rx="4" fill="#ECEFFA" stroke="#C0C9EE" stroke-width="0.9"/><text x="111" y="25" font-weight="800" fill="#2E3E96">분석</text>
-          <line x1="142" y1="22" x2="154" y2="22" stroke="#4053B8" stroke-width="1.2" marker-end="url(#arrP)"/>
-          <rect x="156" y="10" width="58" height="24" rx="4" fill="#ECEFFA" stroke="#C0C9EE" stroke-width="0.9"/><text x="185" y="25" font-weight="800" fill="#2E3E96">예측</text>
-          <line x1="216" y1="22" x2="228" y2="22" stroke="#4053B8" stroke-width="1.2" marker-end="url(#arrP)"/>
-          <rect x="230" y="10" width="58" height="24" rx="4" fill="#E7F5F1" stroke="#4BA394" stroke-width="0.9"/><text x="259" y="25" font-weight="800" fill="#147D6F">안내</text>
-        </g>
-      </svg>
-    </figure>
-    <div class="bogi-box">
-      <div class="bt">보기</div>
-      ㄱ. 수많은 차의 위치·속도 데이터가 실시간으로 수집된다.<br>
-      ㄴ. 분석 결과와 과거 패턴으로 정체를 예측해 더 빠른 길을 제안한다.<br>
-      ㄷ. 안내받은 차들의 움직임은 다시 수집 단계의 데이터가 된다.
+
+  <div class="qgrid qg2">
+    <div>
+      <div class="q">
+        <div class="qhead"><span class="qno">21</span><div class="stem"><span class="badge-data">자료</span>그림은 내비게이션이 경로를 안내하는 과정을 나타낸 것이다. 옳은 것만을 &lt;보기&gt;에서 있는 대로 고른 것은? <span class="difficulty">●●○ [2점]</span>
+        <div class="tags">10통과2-03-02 | 개념 2, 자료 파헤치기</div></div></div>
+        <figure style="margin:2mm 0 1.5mm 8.6mm;">
+          <svg width="295" height="37.9" viewBox="0 0 280 36" font-family="PC Sans">
+            <g font-size="10.8" font-weight="800" text-anchor="middle">
+              <rect x="2" y="6" width="56" height="24" rx="4" fill="#ECEFFA" stroke="#C0C9EE" stroke-width="0.9"/><text x="30" y="21.8" fill="#2E3E96">수집</text>
+              <rect x="75" y="6" width="56" height="24" rx="4" fill="#ECEFFA" stroke="#C0C9EE" stroke-width="0.9"/><text x="103" y="21.8" fill="#2E3E96">분석</text>
+              <rect x="148" y="6" width="56" height="24" rx="4" fill="#ECEFFA" stroke="#C0C9EE" stroke-width="0.9"/><text x="176" y="21.8" fill="#2E3E96">예측</text>
+              <rect x="221" y="6" width="56" height="24" rx="4" fill="#E7F5F1" stroke="#4BA394" stroke-width="0.9"/><text x="249" y="21.8" fill="#147D6F">안내</text>
+            </g>
+            <g stroke="#4053B8" stroke-width="1.2"><line x1="60" y1="18" x2="71" y2="18" marker-end="url(#arrP)"/><line x1="133" y1="18" x2="144" y2="18" marker-end="url(#arrP)"/><line x1="206" y1="18" x2="217" y2="18" marker-end="url(#arrP)"/></g>
+          </svg>
+        </figure>
+        <div class="bogi-box">
+          <div class="bt">보기</div>
+          ㄱ. 차들의 위치·속도가 실시간으로 수집된다.<br>
+          ㄴ. 과거 패턴도 함께 써서 정체를 예측한다.<br>
+          ㄷ. 안내받은 차의 움직임도 다시 데이터가 된다.
+        </div>
+        <ul class="choices inline">
+          <li>① ㄱ</li><li>② ㄷ</li><li>③ ㄱ, ㄴ</li><li>④ ㄴ, ㄷ</li><li>⑤ ㄱ, ㄴ, ㄷ</li>
+        </ul>
+      </div>
+
+      <div class="q">
+        <div class="qhead"><span class="qno">22</span><div class="stem"><span class="badge-data">자료</span>그림은 인공지능을 이용한 의료 영상 판독 보조 과정을 나타낸 것이다. 옳은 것만을 &lt;보기&gt;에서 있는 대로 고른 것은? <span class="difficulty">●●○ [2.5점]</span>
+        <div class="tags">10통과2-03-03 | 개념 3·4</div></div></div>
+        <figure style="margin:2mm 0 1.5mm 8.6mm;">
+          <svg width="295" height="69.5" viewBox="0 0 280 66" font-family="PC Sans">
+            <g text-anchor="middle">
+              <rect x="0.5" y="3" width="63" height="60" rx="4" fill="#ECEFFA" stroke="#C0C9EE" stroke-width="0.9"/>
+              <text x="32" y="18" font-size="10.4" font-weight="800" fill="#2E3E96">학습 데이터</text>
+              <text x="32" y="32" font-size="10.2" fill="#5B6B77">의료 영상 +</text><text x="32" y="45" font-size="10.2" fill="#5B6B77">진단 정답</text>
+              <rect x="72.5" y="3" width="63" height="60" rx="4" fill="#ECEFFA" stroke="#C0C9EE" stroke-width="0.9"/>
+              <text x="104" y="18" font-size="10.4" font-weight="800" fill="#2E3E96">AI 학습</text>
+              <text x="104" y="32" font-size="10.2" fill="#5B6B77">특징(패턴)을</text><text x="104" y="45" font-size="10.2" fill="#5B6B77">스스로</text><text x="104" y="58" font-size="10.2" fill="#5B6B77">찾는다</text>
+              <rect x="144.5" y="3" width="63" height="60" rx="4" fill="#ECEFFA" stroke="#C0C9EE" stroke-width="0.9"/>
+              <text x="176" y="18" font-size="10.4" font-weight="800" fill="#2E3E96">새 영상 판독</text>
+              <text x="176" y="32" font-size="10.2" fill="#5B6B77">의심 부위를</text><text x="176" y="45" font-size="10.2" fill="#5B6B77">표시한다</text>
+              <rect x="216.5" y="3" width="63" height="60" rx="4" fill="#E7F5F1" stroke="#4BA394" stroke-width="0.9"/>
+              <text x="248" y="18" font-size="10.4" font-weight="800" fill="#147D6F">의사</text>
+              <text x="248" y="32" font-size="10.2" fill="#5B6B77">결과를</text><text x="248" y="45" font-size="10.2" fill="#5B6B77">확인해</text><text x="248" y="58" font-size="10.2" fill="#5B6B77">최종 판단</text>
+            </g>
+            <g stroke="#4053B8" stroke-width="1.2"><line x1="64" y1="33" x2="69" y2="33" marker-end="url(#arrP)"/><line x1="136" y1="33" x2="141" y2="33" marker-end="url(#arrP)"/><line x1="208" y1="33" x2="213" y2="33" marker-end="url(#arrP)"/></g>
+          </svg>
+        </figure>
+        <div class="bogi-box">
+          <div class="bt">보기</div>
+          ㄱ. 학습 데이터가 치우치면 판독도 치우칠 수 있다.<br>
+          ㄴ. 오판의 책임 소재는 사회적 논의가 필요하다.<br>
+          ㄷ. AI가 발전하면 의사의 최종 판단은 없애도 된다.
+        </div>
+        <ul class="choices inline">
+          <li>① ㄱ</li><li>② ㄷ</li><li>③ ㄱ, ㄴ</li><li>④ ㄴ, ㄷ</li><li>⑤ ㄱ, ㄴ, ㄷ</li>
+        </ul>
+      </div>
     </div>
-    <ul class="choices inline">
-      <li>① ㄱ</li><li>② ㄷ</li><li>③ ㄱ, ㄴ</li><li>④ ㄴ, ㄷ</li><li>⑤ ㄱ, ㄴ, ㄷ</li>
-    </ul>
-  </div>
-  <div class="q">
-    <div class="qhead"><span class="qno">13</span><div class="stem">인공지능 기술의 유용성과 한계에 대한 설명으로 옳은 것만을 &lt;보기&gt;에서 있는 대로 고른 것은? <span class="difficulty">[2.5점]</span>
-    <div class="tags">10통과2-03-03</div></div></div>
-    <div class="bogi-box">
-      <div class="bt">보기</div>
-      ㄱ. AI는 학습한 데이터가 편향되면 판단도 편향될 수 있다.<br>
-      ㄴ. AI의 판단이 틀렸을 때의 책임 소재는 사회적 논의가 필요한 문제다.<br>
-      ㄷ. AI가 발전했으므로 인간의 판단과 윤리는 더 이상 필요 없다.
+    <div>
+      <div class="q">
+        <div class="qhead"><span class="qno">23</span><div class="stem"><span class="badge-data">자료</span>그림 (가)는 어느 지역의 감염병 유행 기간에 '발열·기침'의 주별 검색량을, (나)는 진단 검사로 확인된 주별 확진자 수를 나타낸 것이다. 옳은 것만을 &lt;보기&gt;에서 있는 대로 고른 것은? <span class="difficulty">●●● [2.5점]</span>
+        <div class="tags">10통과2-03-02 | 개념 2·3 (III-01 감염병 연계)</div></div></div>
+        <figure style="margin:2mm 0 1mm 8.4mm;">
+          <svg width="295" height="100.1" viewBox="0 0 280 95" font-family="PC Sans">
+            <g transform="translate(12,4)">
+              <line x1="0" y1="62" x2="106.2" y2="62" stroke="#5B6B77" stroke-width="1"/>
+              <line x1="0" y1="62" x2="0" y2="4" stroke="#5B6B77" stroke-width="1"/>
+              <text x="4.5" y="8" font-size="10.4" fill="#5B6B77">검색량 (상댓값)</text>
+              <polyline points="7.2,56 19.8,44 32.4,14 45,26 57.6,38 70.2,47 82.8,53 95.4,56" fill="none" stroke="#4053B8" stroke-width="1.8"/>
+              <g fill="#4053B8"><circle cx="7.2" cy="56" r="1.8"/><circle cx="19.8" cy="44" r="1.8"/><circle cx="32.4" cy="14" r="1.8"/><circle cx="45" cy="26" r="1.8"/><circle cx="57.6" cy="38" r="1.8"/><circle cx="70.2" cy="47" r="1.8"/><circle cx="82.8" cy="53" r="1.8"/><circle cx="95.4" cy="56" r="1.8"/></g>
+              <g font-size="10.4" fill="#5B6B77" text-anchor="middle"><text x="7.2" y="72">1</text><text x="19.8" y="72">2</text><text x="32.4" y="72">3</text><text x="45" y="72">4</text><text x="57.6" y="72">5</text><text x="70.2" y="72">6</text><text x="82.8" y="72">7</text><text x="95.4" y="72">8</text></g>
+              <text x="102" y="72" font-size="10.4" fill="#5B6B77">(주)</text>
+              <text x="54" y="87" text-anchor="middle" font-size="11" font-weight="800" fill="#22303A">(가) 검색량</text>
+            </g>
+            <g transform="translate(146,4)">
+              <line x1="0" y1="62" x2="106.2" y2="62" stroke="#5B6B77" stroke-width="1"/>
+              <line x1="0" y1="62" x2="0" y2="4" stroke="#5B6B77" stroke-width="1"/>
+              <text x="4.5" y="8" font-size="10.4" fill="#5B6B77">확진자 수 (명)</text>
+              <polyline points="7.2,58.5 19.8,55 32.4,44.5 45,27 57.6,13 70.2,30.5 82.8,48 95.4,55" fill="none" stroke="#D6455D" stroke-width="1.8"/>
+              <g fill="#D6455D"><circle cx="7.2" cy="58.5" r="1.8"/><circle cx="19.8" cy="55" r="1.8"/><circle cx="32.4" cy="44.5" r="1.8"/><circle cx="45" cy="27" r="1.8"/><circle cx="57.6" cy="13" r="1.8"/><circle cx="70.2" cy="30.5" r="1.8"/><circle cx="82.8" cy="48" r="1.8"/><circle cx="95.4" cy="55" r="1.8"/></g>
+              <g font-size="10.4" fill="#5B6B77" text-anchor="middle"><text x="7.2" y="72">1</text><text x="19.8" y="72">2</text><text x="32.4" y="72">3</text><text x="45" y="72">4</text><text x="57.6" y="72">5</text><text x="70.2" y="72">6</text><text x="82.8" y="72">7</text><text x="95.4" y="72">8</text></g>
+              <text x="102" y="72" font-size="10.4" fill="#5B6B77">(주)</text>
+              <text x="54" y="87" text-anchor="middle" font-size="11" font-weight="800" fill="#22303A">(나) 확진자 수</text>
+            </g>
+          </svg>
+        </figure>
+        <div class="bogi-box">
+          <div class="bt">보기</div>
+          ㄱ. (가)의 정점은 (나)의 정점보다 2주 앞선다.<br>
+          ㄴ. (가)만으로 누가 감염되었는지 확정된다.<br>
+          ㄷ. 검색 기록 수집에는 개인 정보 침해 우려가 없다.
+        </div>
+        <ul class="choices inline">
+          <li>① ㄱ</li><li>② ㄷ</li><li>③ ㄱ, ㄴ</li><li>④ ㄴ, ㄷ</li><li>⑤ ㄱ, ㄴ, ㄷ</li>
+        </ul>
+      </div>
+
+      <div class="q">
+        <div class="qhead"><span class="qno">24</span><div class="stem"><span class="badge-data">자료</span>그림은 사물인터넷을 이용한 스마트팜에서 하루 동안 잰 온실 안 온도와 환풍기가 켜진 구간을 나타낸 것이다. 옳은 것만을 &lt;보기&gt;에서 있는 대로 고른 것은? <span class="difficulty">●●○ [2점]</span>
+        <div class="tags">10통과2-03-03 | 개념 5 (II-01 비생물적 요인 연계)</div></div></div>
+        <figure style="margin:2mm 0 1mm 8.4mm;">
+          <svg width="295" height="96.9" viewBox="0 0 280 92" font-family="PC Sans">
+            <rect x="106" y="12" width="19" height="64" fill="#E3F0F7"/>
+            <rect x="144" y="12" width="38" height="64" fill="#E3F0F7"/>
+            <g stroke="#C9BA9B" stroke-width="0.7" stroke-dasharray="2.5 2"><line x1="16" y1="32" x2="266" y2="32"/><line x1="30" y1="23.2" x2="266" y2="23.2"/><line x1="30" y1="58.4" x2="266" y2="58.4"/></g>
+            <g font-size="10.4" fill="#5B6B77" text-anchor="end"><text x="27" y="26.9">28</text><text x="14" y="35.7">26</text><text x="27" y="62.1">20</text></g>
+            <text x="34" y="10" font-size="10.4" fill="#5B6B77">온도 (℃)</text>
+            <polyline points="30,67.2 49,58.4 68,45.2 87,33.8 106,23.2 115.5,27.6 125,32 134.5,27.6 144,23.2 163,27.6 182,32 201,30.2 220,36.4 239,47 258,58.4" fill="none" stroke="#D6455D" stroke-width="1.8" stroke-linejoin="round"/>
+            <line x1="30" y1="76" x2="270" y2="76" stroke="#5B6B77" stroke-width="1"/>
+            <line x1="30" y1="76" x2="30" y2="12" stroke="#5B6B77" stroke-width="1"/>
+            <g font-size="10.4" fill="#5B6B77" text-anchor="middle"><text x="30" y="87">6</text><text x="68" y="87">8</text><text x="106" y="87">10</text><text x="144" y="87">12</text><text x="182" y="87">14</text><text x="220" y="87">16</text><text x="258" y="87">18</text></g>
+            <text x="276" y="71" text-anchor="end" font-size="10.4" fill="#5B6B77">(시)</text>
+            <rect x="196" y="4" width="8" height="6" fill="#E3F0F7" stroke="#A9C9DE" stroke-width="0.6"/>
+            <text x="207" y="10.4" font-size="10.4" fill="#2E6690">환풍기 켜짐</text>
+          </svg>
+        </figure>
+        <div class="bogi-box">
+          <div class="bt">보기</div>
+          ㄱ. 환풍기는 온도가 26&nbsp;℃에 이르면 켜졌다.<br>
+          ㄴ. 환풍기가 켜진 시간은 모두 2시간이다.<br>
+          ㄷ. 이 스마트팜은 작물에 영향을 주는 비생물적 요인인 온도를 센서로 재어 조절한다.
+        </div>
+        <ul class="choices inline">
+          <li>① ㄱ</li><li>② ㄷ</li><li>③ ㄱ, ㄴ</li><li>④ ㄴ, ㄷ</li><li>⑤ ㄱ, ㄴ, ㄷ</li>
+        </ul>
+      </div>
     </div>
-    <ul class="choices inline">
-      <li>① ㄱ</li><li>② ㄷ</li><li>③ ㄱ, ㄷ</li><li>④ ㄱ, ㄴ</li><li>⑤ ㄱ, ㄴ, ㄷ</li>
-    </ul>
   </div>
-  <div class="folio"><span>III. 과학과 미래 사회</span><span class="num">171</span></div>
+  <div class="folio"><span>III. 과학과 미래 사회</span><span class="num">231</span></div>
 </div>
+
 
 <!-- ═════════════ p.172 해설 1 ═════════════ -->
 <div class="page">
   <div class="runhead"><span class="unit-tag" style="color:var(--brand);">알짜 해설</span><span class="lesson-tag">02. 빅데이터와 인공지능·로봇</span></div>
-  <div class="sol-head"><span class="stt">알짜 해설</span><span class="sub">전 문항 해설 + 오답 선지 분석 — 맞힌 문제도 해설로 한 번 더!</span></div>
+  <div class="sol-head"><span class="stt">알짜 해설</span><span class="sub">전 문항 해설 + 바로알기(틀린 선지를 옳게 고친 문장) — 맞힌 문제도 해설로 한 번 더!</span></div>
   <table class="anstable">
-    <tr><th>문항</th><td>1</td><td>2</td><td>3</td><td>4</td><td>5</td><td>6</td><td>7</td><td>8</td><td>9</td><td>10</td><td>11</td><td>12</td><td>13</td></tr>
-    <tr><th>정답</th><td class="a">O</td><td class="a">X</td><td class="a">O</td><td class="a">빅데이터</td><td class="a">인공지능</td><td class="a">사물인터넷</td><td class="a">③</td><td class="a">⑤</td><td class="a">①</td><td class="a">②</td><td class="a">서술형</td><td class="a">⑤</td><td class="a">④</td></tr>
+    <tr><th>문항</th><td>1</td><td>2</td><td>3</td><td>4</td><td>5</td><td>6</td><td>7</td><td>8</td><td>9</td><td>10</td><td>11</td><td>12</td></tr>
+    <tr><th>정답</th><td class="a">O</td><td class="a">X</td><td class="a">O</td><td class="a">빅데이터</td><td class="a">인공지능</td><td class="a">사물인터넷</td><td class="a">④</td><td class="a">③</td><td class="a">①</td><td class="a">②</td><td class="a">⑤</td><td class="a">④</td></tr>
+    <tr><th>문항</th><td>13</td><td>14</td><td>15</td><td>16</td><td>17</td><td>18</td><td>19</td><td>20</td><td>21</td><td>22</td><td>23</td><td>24</td></tr>
+    <tr><th>정답</th><td class="a">③</td><td class="a">②</td><td class="a">⑤</td><td class="a">①</td><td class="a">④</td><td class="a">서술형</td><td class="a">서술형</td><td class="a">서술형</td><td class="a">⑤</td><td class="a">③</td><td class="a">①</td><td class="a">②</td></tr>
   </table>
   <div class="solcols">
     <div>
@@ -960,23 +1497,45 @@
         <p>규칙을 적어 주는 대신, 데이터로 배우게 한다.</p></div>
       <div class="sol"><div class="shead"><span class="sno">6</span><span class="sans">사물인터넷</span><span class="slink">개념 5</span></div>
         <p>센서 → 데이터 → 판단 → 실행의 사슬.</p></div>
+      <div class="sol"><div class="shead"><span class="sno">7</span><span class="sans">④</span><span class="slink">개념 1</span></div>
+        <p>일상의 발자국(검색·결제·위치)이 곧 빅데이터의 원천이다.</p>
+        <div class="wrongbox"><div class="wt">바로알기</div>
+          <p><b>①</b> 빅데이터는 검색·결제·위치·센서 기록처럼 디지털로 쌓이는 데이터를 아우른다. <b>②</b> 빅데이터는 글·사진·위치·영상 등 형태가 다양하다. <b>③</b> 데이터가 많아도 패턴을 읽는 분석이 있어야 의미가 생긴다. <b>⑤</b> 빅데이터는 실시간으로 빠르게 쌓인다.</p></div></div>
     </div>
     <div>
-      <div class="sol"><div class="shead"><span class="sno">7</span><span class="sans">③</span><span class="slink">개념 1</span></div>
-        <p>일상의 발자국이 곧 원천이다.</p>
-        <div class="wrongbox"><div class="wt">오답 왜 틀렸나</div>
-          <p><b>①·②</b> 글·사진·위치·영상까지 다양하다. <b>④</b> 분석 없는 데이터는 더미일 뿐. <b>⑤</b> 측정 과학의 연장선이다.</p></div></div>
-      <div class="sol"><div class="shead"><span class="sno">8</span><span class="sans">⑤</span><span class="slink">개념 2</span></div>
-        <p>실시간 수집 + 분석 + 예측 = 더 빠른 길.</p>
-        <div class="wrongbox"><div class="wt">오답 왜 틀렸나</div>
-          <p><b>①</b> 감염병 예측은 대표 활용처(01 연계). <b>④</b> 판독 보조는 이미 현장에 있다 — 단, 최종 판단은 의사.</p></div></div>
-      <div class="sol"><div class="shead"><span class="sno">9</span><span class="sans">①</span><span class="slink">개념 3</span></div>
-        <p>발자국이 모이면 하루가 재구성된다 — 개인 정보의 문제.</p>
-        <div class="wrongbox"><div class="wt">오답 왜 틀렸나</div>
-          <p><b>②</b> 편향된 데이터 → 편향된 결과. <b>⑤</b> 동의는 개인 정보 활용의 기본 원칙이다.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">8</span><span class="sans">③</span><span class="slink">개념 1</span></div>
+        <p><b>ㄱ&nbsp;(옳음)</b> 7~8시와 17~18시에 막대가 솟는다 — 도시의 출퇴근 리듬이다. <b>ㄴ&nbsp;(옳음)</b> 8시 24만&nbsp;명, 14시 8만&nbsp;명 → 24&nbsp;÷&nbsp;8&nbsp;=&nbsp;3배.</p>
+        <div class="analysis"><div class="at">꼼꼼 자료 분석</div>
+          <svg width="312" height="116.5" viewBox="0 0 300 112" font-family="PC Sans">
+            <g stroke="#C9BA9B" stroke-width="0.7" stroke-dasharray="2.5 2"><line x1="30" y1="54.4" x2="268" y2="54.4"/><line x1="30" y1="36.8" x2="268" y2="36.8"/><line x1="30" y1="19.2" x2="268" y2="19.2"/></g>
+            <g font-size="10.4" fill="#5B6B77" text-anchor="end"><text x="26" y="56.6">8</text><text x="26" y="39">16</text><text x="26" y="21.4">24</text></g>
+            <rect x="44" y="10" width="32" height="64" rx="3" fill="#FDF3E0"/>
+            <rect x="174" y="10" width="32" height="64" rx="3" fill="#FDF3E0"/>
+            <g fill="#C0C9EE">
+              <rect x="36" y="61" width="9" height="11"/><rect x="49" y="36.8" width="9" height="35.2"/><rect x="75" y="41.2" width="9" height="30.8"/><rect x="88" y="52.2" width="9" height="19.8"/><rect x="101" y="54.4" width="9" height="17.6"/><rect x="114" y="52.2" width="9" height="19.8"/><rect x="127" y="52.2" width="9" height="19.8"/><rect x="153" y="52.2" width="9" height="19.8"/><rect x="166" y="47.8" width="9" height="24.2"/><rect x="179" y="36.8" width="9" height="35.2"/><rect x="192" y="28" width="9" height="44"/><rect x="205" y="41.2" width="9" height="30.8"/><rect x="218" y="50" width="9" height="22"/><rect x="231" y="54.4" width="9" height="17.6"/><rect x="244" y="56.6" width="9" height="15.4"/><rect x="257" y="63.2" width="9" height="8.8"/>
+            </g>
+            <rect x="62" y="19.2" width="9" height="52.8" fill="#D6455D"/>
+            <rect x="140" y="54.4" width="9" height="17.6" fill="#2E6690"/>
+            <line x1="30" y1="72" x2="272" y2="72" stroke="#5B6B77" stroke-width="1"/>
+            <line x1="30" y1="72" x2="30" y2="12" stroke="#5B6B77" stroke-width="1"/>
+            <g font-size="10.4" fill="#5B6B77" text-anchor="middle"><text x="40.5" y="83">6</text><text x="79.5" y="83">9</text><text x="118.5" y="83">12</text><text x="157.5" y="83">15</text><text x="196.5" y="83">18</text><text x="235.5" y="83">21</text></g>
+            <g font-size="10.4" font-weight="800">
+              <text x="60" y="9" text-anchor="middle" fill="#9C6503">출근</text>
+              <text x="190" y="9" text-anchor="middle" fill="#9C6503">퇴근</text>
+              <text x="76" y="18" fill="#D6455D">8시 = 24만 명</text>
+              <text x="144.5" y="45" text-anchor="middle" fill="#2E6690">14시 = 8만 명</text>
+            </g>
+            <text x="150" y="95" text-anchor="middle" font-size="10.4" font-weight="700" fill="#5B6B77">눈금선에 맞춰 읽기: 24 ÷ 8 = 3배 —</text><text x="150" y="108" text-anchor="middle" font-size="10.4" font-weight="700" fill="#5B6B77">한 사람이 아닌 약 200만 건이 만든 리듬</text>
+          </svg></div>
+        <div class="wrongbox"><div class="wt">바로알기</div>
+          <p><b>ㄷ</b> (틀림 →) 한 사람의 기록은 사소하다 — <b>수많은 사람의 기록이 모여야</b> 도시의 출퇴근 패턴이 보인다.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">9</span><span class="sans">①</span><span class="slink">개념 4</span></div>
+        <p>범퍼의 충돌 센서는 부딪힘을 재는 부품 — 감지(센서)다.</p>
+        <div class="wrongbox"><div class="wt">바로알기</div>
+          <p><b>②</b> 바퀴를 돌리는 모터는 움직임을 만드는 구동 장치다. <b>③</b> 마이크로프로세서는 센서의 신호를 받아 갈 길을 정하는 제어 장치(판단)다. <b>④</b> 낙하 방지 센서는 바닥과 계단을 재는 감지(센서)다. <b>⑤</b> 브러시를 돌리는 모터는 구동 장치(움직임)다.</p></div></div>
     </div>
   </div>
-  <div class="folio"><span>알짜 해설</span><span class="num">172</span></div>
+  <div class="folio"><span>알짜 해설</span><span class="num">232</span></div>
 </div>
 
 <!-- ═════════════ p.173 해설 2 ═════════════ -->
@@ -984,45 +1543,158 @@
   <div class="runhead"><span class="unit-tag" style="color:var(--brand);">알짜 해설</span><span class="lesson-tag">02. 빅데이터와 인공지능·로봇</span></div>
   <div class="solcols">
     <div>
-      <div class="sol"><div class="shead"><span class="sno">10</span><span class="sans">②</span><span class="slink">개념 4</span></div>
-        <p>(가) 판독 보조, (나) 위험 작업 대체 — 유용성의 대표 두 장면.</p>
-        <div class="wrongbox"><div class="wt">오답 왜 틀렸나</div>
-          <p><b>(다)</b> AI도 틀린다(편향·오작동) — 사람의 확인과 책임이 반드시 남는다.</p></div></div>
-      <div class="sol"><div class="shead"><span class="sno">11</span><span class="sans">모범 답안</span><span class="slink">개념 2·3</span></div>
-        <p>장점: 실시간 교통 데이터를 분석해 더 빠른 길을 안내하는 것처럼, 방대한 데이터에서 패턴을 읽어 미래를 예측하고 생활을 편리하게 한다. 문제점: 위치·소비 기록 같은 <b>개인 정보</b>가 수집·분석되는 과정에서 사생활이 침해될 수 있다.</p>
-        <div class="wrongbox"><div class="wt">채점 기준 (감점 포인트)</div>
-          <p>① 구체적 장점 1가지 ② '개인 정보'를 포함한 문제점 1가지 — 장점만 쓰거나 문제점만 쓰면 절반 점수.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">10</span><span class="sans">②</span><span class="slink">개념 2 | 자료 파헤치기</span></div>
+        <p>수집(나) → 분석(가) → 예측(라) → 활용(다). 데이터 활용의 공통 문법 그대로다.</p>
+        <div class="wrongbox"><div class="wt">바로알기</div>
+          <p><b>①</b> 출발점은 기록을 모으는 수집(나)이다. <b>③</b> 분석(가)을 해야 그 결과로 예측(라)할 수 있다. <b>④</b> 예측(라)은 수집(나)과 분석(가) 뒤에 온다. <b>⑤</b> 노선 운행(다)은 예측(라)으로 노선을 정한 뒤의 활용 단계이므로 맨 끝에 온다.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">11</span><span class="sans">⑤</span><span class="slink">개념 3</span></div>
+        <p>발자국이 모이면 하루·취향·건강까지 재구성된다 — 개인 정보 침해의 그림자.</p>
+        <div class="wrongbox"><div class="wt">바로알기</div>
+          <p><b>①</b> 공익을 위한 추적도 선을 넘으면 사생활 침해가 된다 — 공익과 사생활의 균형이 필요하다. <b>②</b> 같은 집단의 데이터만 더 모으면 편향은 그대로 남는다 — 양보다 고르게 모였는지가 중요하다. <b>③</b> 디지털 격차는 기술에 접근할 수 있는지에 따라 생기는 빅데이터 시대의 새로운 불평등이다. <b>④</b> 누가 내 데이터를 모아 어디에 쓰는지 알고 동의하는 것이 개인 정보 보호의 기본이다.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">12</span><span class="sans">④</span><span class="slink">개념 3</span></div>
+        <p><b>B&nbsp;(옳음)</b> 데이터 편향 — 치우친 데이터, 치우친 판단. <b>C&nbsp;(옳음)</b> 디지털 격차 — 접근의 차이가 새 불평등이 된다.</p>
+        <div class="wrongbox"><div class="wt">바로알기</div>
+          <p><b>A</b> (틀림 →) 편리한 만큼 <b>누가 내 데이터를 모아 어디에 쓰는지</b>를 알아야 한다 — 개인 정보 침해의 그림자다.</p></div></div>
     </div>
     <div>
-      <div class="sol"><div class="shead"><span class="sno">12</span><span class="sans">⑤</span><span class="slink">개념 2·자료 | 2점</span></div>
+      <div class="sol"><div class="shead"><span class="sno">13</span><span class="sans">③</span><span class="slink">개념 4</span></div>
+        <p><b>ㄱ&nbsp;(옳음)</b> AI = 데이터에서 스스로 규칙을 학습. <b>ㄴ&nbsp;(옳음)</b> 로봇 = 판단 + 몸 — 정밀 조립·물류·위험 작업.</p>
+        <div class="wrongbox"><div class="wt">바로알기</div>
+          <p><b>ㄷ</b> (틀림 →) 수술 로봇은 의사의 손 움직임을 더 정밀하게 옮기는 보조 장치이고, <b>집도의는 여전히 사람</b>이다.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">14</span><span class="sans">②</span><span class="slink">개념 3·4 | 탐구</span></div>
+        <p><b>ㄷ&nbsp;(옳음)</b> 흰 고양이만 배운 A는 검은 고양이 10장 중 7장을 개로 판단했다. 다양한 고양이로 배운 B는 9장을 맞혔다 — 두 AI의 차이는 학습 데이터뿐이므로, 치우친 교과서가 치우친 판단을 낳은 것이다(데이터 편향).</p>
+        <div class="wrongbox"><div class="wt">바로알기</div>
+          <p><b>ㄱ</b> (틀림 →) A와 B는 사진과 정답을 보며 특징(패턴)을 <b>스스로 학습</b>했다 — 규칙을 일일이 입력하지 않았다. <b>ㄴ</b> (틀림 →) B는 10장 중 <b>9장</b>을 고양이로 옳게 판단했고, 1장은 개로 잘못 판단했다.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">15</span><span class="sans">⑤</span><span class="slink">개념 5</span></div>
+        <p><b>ㄱ&nbsp;(옳음)</b> 센서(A)가 잰 심박이 데이터가 되어 인터넷(B)으로 간다. <b>ㄴ&nbsp;(옳음)</b> 판단(C)은 데이터로 학습한 AI의 몫. <b>ㄷ&nbsp;(옳음)</b> 연결이 늘수록 해킹·오작동의 통로도 늘어난다 — IoT의 숙제.</p>
+        <div class="wrongbox"><div class="wt">함정 체크</div>
+          <p>A~D를 <b>센서 → 데이터 → AI → 실행</b>의 사슬에 그대로 맞춰 읽는다. 편리함(ㄱ·ㄴ)과 한계(ㄷ)가 한 그림 안에 함께 있다.</p></div></div>
+    </div>
+  </div>
+  <div class="folio"><span>알짜 해설</span><span class="num">233</span></div>
+</div>
+
+<!-- ═════════════ 해설 3 ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag" style="color:var(--brand);">알짜 해설</span><span class="lesson-tag">02. 빅데이터와 인공지능·로봇</span></div>
+  <div class="solcols">
+    <div>
+      <div class="sol"><div class="shead"><span class="sno">16</span><span class="sans">①</span><span class="slink">교과서 탐구 | 개념 5</span></div>
+        <p><b>ㄱ&nbsp;(옳음)</b> 0~40분 동안 그래프가 쉬지 않고 오른다(약 500 → 1,800&nbsp;ppm) — 학생들이 내쉬는 숨의 CO₂가 쌓인 것이다.</p>
+        <div class="wrongbox"><div class="wt">바로알기</div>
+          <p><b>ㄴ</b> (틀림 →) 1,000&nbsp;ppm 눈금선을 처음 넘는 때는 <b>약 14분</b>이다 — 수업을 시작하고 얼마 안 되어 기준을 넘었다. <b>ㄷ</b> (틀림 →) 창문을 열자 10분 만에 약 1,000&nbsp;ppm까지 내려갔지만, 여전히 <b>바깥 공기(약 427&nbsp;ppm, 2025년 연평균)보다 높다</b>. 1분마다 재는 실시간 측정이어서 이런 변화를 놓치지 않는다.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">17</span><span class="sans">④</span><span class="slink">개념 4·5</span></div>
+        <p><b>ㄴ&nbsp;(옳음)</b> 로봇은 재난 현장처럼 위험한 곳의 작업을 대신한다. <b>ㄷ&nbsp;(옳음)</b> 연결된 사물이 스스로 작동 — 사물인터넷(스마트홈).</p>
+        <div class="wrongbox"><div class="wt">바로알기</div>
+          <p><b>ㄱ</b> (틀림 →) AI는 데이터에서 배운 패턴을 <b>학습한 적 없는 새 문장(새 문제)에도 적용</b>해 번역한다.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">18</span><span class="sans">모범 답안</span><span class="slink">개념 2·3</span></div>
+        <p>장점: 실시간 교통 데이터에서 패턴을 읽어 정체를 <b>예측</b>하고 더 빠른 길을 안내하는 것처럼, 방대한 데이터를 분석해 앞일을 내다보고 생활을 편리하게 한다. 문제점: 위치·소비·검색 기록 같은 <b>개인 정보</b>가 모이면 사생활이 드러나 침해될 수 있다.</p>
+        <table class="rubric">
+          <tr><th>채점 요소</th><th>배점</th></tr>
+          <tr><td>① '예측'을 넣어 장점 한 가지를 구체적으로 썼다.</td><td>3점</td></tr>
+          <tr><td>② '개인 정보'를 넣어 문제점 한 가지를 썼다.</td><td>3점</td></tr>
+        </table>
+        <div class="wrongbox"><div class="wt">이렇게 쓰면 0점</div>
+          <p>"빅데이터는 편리하지만 위험하다." — 무엇이 편리하고 무엇이 위험한지가 없는 답.</p></div></div>
+    </div>
+    <div>
+      <div class="sol"><div class="shead"><span class="sno">19</span><span class="sans">모범 답안</span><span class="slink">개념 4</span></div>
+        <p>규칙을 입력하는 프로그램은 사람이 판단 <b>규칙</b>을 하나하나 코드로 적어 주어야 한다. 인공지능은 수많은 <b>데이터</b>(사진과 정답 등)를 보며 그 속의 규칙(패턴)을 스스로 학습하고, 학습한 규칙을 새 문제에 적용한다.</p>
+        <table class="rubric">
+          <tr><th>채점 요소</th><th>배점</th></tr>
+          <tr><td>① 프로그램은 사람이 규칙을 일일이 입력한다고 썼다.</td><td>2점</td></tr>
+          <tr><td>② 인공지능은 데이터에서 규칙을 스스로 학습한다고 썼다.</td><td>3점</td></tr>
+          <tr><td>③ 학습한 규칙을 새 문제에 적용한다고 썼다.</td><td>1점</td></tr>
+        </table>
+        <div class="wrongbox"><div class="wt">이렇게 쓰면 0점</div>
+          <p>"인공지능은 사람보다 똑똑해서 스스로 생각한다." — 데이터에서 규칙을 학습한다는 핵심이 빠진 답.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">20</span><span class="sans">모범 답안</span><span class="slink">개념 5</span></div>
+        <p>첫째, 사물들이 인터넷으로 많이 연결될수록 <b>해킹</b>과 오작동의 통로가 늘어나, 정보가 새거나 기기가 잘못 작동할 수 있다. 둘째, AI의 판단이 틀렸을 때 그 <b>책임</b>이 개발자·사용자 중 누구에게 있는지가 아직 분명하지 않다.</p>
+        <table class="rubric">
+          <tr><th>채점 요소</th><th>배점</th></tr>
+          <tr><td>① 연결이 늘수록 해킹(오작동) 위험이 커진다고 썼다.</td><td>3점</td></tr>
+          <tr><td>② AI 판단의 책임 소재가 분명하지 않다고 썼다.</td><td>3점</td></tr>
+        </table>
+        <div class="wrongbox"><div class="wt">이렇게 쓰면 0점</div>
+          <p>"기술이 아직 느리고 비싸다." — 해킹과 책임이 모두 빠진 답.</p></div></div>
+    </div>
+  </div>
+  <div class="folio"><span>알짜 해설</span><span class="num">234</span></div>
+</div>
+
+<!-- ═════════════ 해설 4 ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag" style="color:var(--brand);">알짜 해설</span><span class="lesson-tag">02. 빅데이터와 인공지능·로봇</span></div>
+  <div class="solcols">
+    <div>
+      <div class="sol"><div class="shead"><span class="sno">21</span><span class="sans">⑤</span><span class="slink">개념 2·자료 | 2점</span></div>
         <p><b>ㄱ·ㄴ·ㄷ 모두 옳다</b> — 수집·분석·예측·안내, 그리고 다시 수집으로 도는 데이터의 순환까지.</p>
         <div class="wrongbox"><div class="wt">함정 체크</div>
-          <p>ㄷ이 낯설어 빼기 쉽다 — 이용자는 받는 사람이자 <b>주는 참여자</b>다. 순환 화살표를 기억하라.</p></div></div>
-      <div class="sol"><div class="shead"><span class="sno">13</span><span class="sans">④</span><span class="slink">개념 4·5 | 2.5점</span></div>
-        <p><b>ㄱ (옳음)</b> 편향된 교과서로 배우면 편향되게 판단한다. <b>ㄴ (옳음)</b> 책임 소재는 열린 사회적 질문. <b>ㄷ (틀림)</b> 기술이 클수록 인간의 판단과 윤리는 더 중요해진다.</p>
-        <div class="wrongbox"><div class="wt">함정 체크</div>
-          <p>ㄷ 같은 '기술 만능' 선지는 언제나 X — 다음 소단원(윤리)의 예고편이기도 하다.</p></div></div>
-
-      <div class="gist" style="margin-top:5mm;">
+          <p>그림에 되돌아오는 화살표가 없어 ㄷ을 빼기 쉽다 — 이용자는 받는 사람이자 <b>주는 참여자</b>다. 자료 파헤치기의 순환 화살표를 기억하라.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">22</span><span class="sans">③</span><span class="slink">개념 3·4 | 2.5점</span></div>
+        <p><b>ㄱ&nbsp;(옳음)</b> 편향된 교과서로 배우면 편향되게 판단한다 — 출발점인 학습 데이터가 고르게 모여야 한다. <b>ㄴ&nbsp;(옳음)</b> 책임 소재는 열린 사회적 질문이다.</p>
+        <div class="wrongbox"><div class="wt">바로알기</div>
+          <p><b>ㄷ</b> (틀림 →) AI는 판독을 <b>보조</b>할 뿐이다 — 기술이 발전할수록 최종 판단을 맡는 사람의 판단과 윤리는 더 중요해진다. '기술 만능' 선지는 언제나 X.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">23</span><span class="sans">①</span><span class="slink">개념 2·3 | 01 연계 | 2.5점</span></div>
+        <p><b>ㄱ&nbsp;(옳음)</b> (가)의 정점은 3주, (나)의 정점은 5주 → 5&nbsp;−&nbsp;3&nbsp;=&nbsp;2주 먼저. 증상을 검색하는 일이 진단보다 앞서므로, 검색 데이터는 유행을 미리 알리는 단서가 된다.</p>
+        <div class="wrongbox"><div class="wt">바로알기</div>
+          <p><b>ㄴ</b> (틀림 →) 검색량은 유행의 낌새를 알려 주는 단서일 뿐이다 — 누가 감염되었는지는 <b>진단 검사</b>(01)로 확인해야 한다. <b>ㄷ</b> (틀림 →) 검색 기록을 모으는 과정에는 <b>개인 정보 침해의 우려</b>가 따르므로 공익과 사생활의 균형이 필요하다.</p></div></div>
+    </div>
+    <div>
+      <div class="sol"><div class="shead"><span class="sno">24</span><span class="sans">②</span><span class="slink">개념 5 | II-01 연계 | 2점</span></div>
+        <p><b>ㄷ&nbsp;(옳음)</b> 온도는 빛·물·토양·공기와 함께 생물에 영향을 주는 비생물적 요인이다(II-01). 센서(측정) → 데이터 → 판단 → 환풍기(실행) — IoT가 농사를 짓는다.</p>
+        <div class="analysis"><div class="at">꼼꼼 자료 분석</div>
+          <svg width="312" height="112.3" viewBox="0 0 300 108" font-family="PC Sans">
+            <rect x="106" y="12" width="19" height="64" fill="#E3F0F7"/>
+            <rect x="144" y="12" width="38" height="64" fill="#E3F0F7"/>
+            <g stroke="#C9BA9B" stroke-width="0.7" stroke-dasharray="2.5 2"><line x1="16" y1="32" x2="266" y2="32"/><line x1="30" y1="23.2" x2="266" y2="23.2"/><line x1="30" y1="58.4" x2="266" y2="58.4"/></g>
+            <g font-size="10.4" fill="#5B6B77" text-anchor="end"><text x="27" y="26.9">28</text><text x="14" y="35.7">26</text><text x="27" y="62.1">20</text></g>
+            <polyline points="30,67.2 49,58.4 68,45.2 87,33.8 106,23.2 115.5,27.6 125,32 134.5,27.6 144,23.2 163,27.6 182,32 201,30.2 220,36.4 239,47 258,58.4" fill="none" stroke="#D6455D" stroke-width="1.8" stroke-linejoin="round"/>
+            <g fill="#D6455D"><circle cx="106" cy="23.2" r="2.2"/><circle cx="144" cy="23.2" r="2.2"/></g>
+            <g fill="#2E6690"><circle cx="125" cy="32" r="2.2"/><circle cx="182" cy="32" r="2.2"/></g>
+            <line x1="30" y1="76" x2="270" y2="76" stroke="#5B6B77" stroke-width="1"/>
+            <line x1="30" y1="76" x2="30" y2="12" stroke="#5B6B77" stroke-width="1"/>
+            <g font-size="10.4" fill="#5B6B77" text-anchor="middle"><text x="30" y="87">6</text><text x="68" y="87">8</text><text x="106" y="87">10</text><text x="144" y="87">12</text><text x="182" y="87">14</text><text x="220" y="87">16</text><text x="258" y="87">18</text></g>
+            <g font-size="10.4" font-weight="800">
+              <text x="125" y="10" text-anchor="middle" fill="#D6455D">28 ℃에 이르면 켬</text>
+              <text x="153" y="48" text-anchor="middle" fill="#2E6690">26 ℃로 내려가면 끔</text>
+              <text x="115.5" y="70" text-anchor="middle" fill="#2E6690">1시간</text>
+              <text x="163" y="70" text-anchor="middle" fill="#2E6690">2시간</text>
+            </g>
+            <text x="150" y="102" text-anchor="middle" font-size="10.4" font-weight="700" fill="#5B6B77">켜진 시간 = 1시간(10~11시) + 2시간(12~14시) = 3시간</text>
+          </svg></div>
+        <div class="wrongbox"><div class="wt">바로알기</div>
+          <p><b>ㄱ</b> (틀림 →) 환풍기는 온도가 <b>28&nbsp;℃에 이르면 켜지고</b>, 26&nbsp;℃로 내려가면 꺼졌다 — 9시 무렵 26&nbsp;℃를 지날 때는 켜지지 않았다. <b>ㄴ</b> (틀림 →) 켜져 있던 시간은 1시간 + 2시간 = <b>3시간</b>이다.</p></div></div>
+      <div class="gist" style="margin-top:3mm;">
         <div class="boxtitle"><span class="ico">알</span>이 소단원, 이것만은!</div>
         <ul>
           <li>빅데이터 = 방대·실시간·다양 — 문법은 <b>수집 → 분석 → 예측</b>(내비의 4상자)</li>
           <li>그림자 4종: <b>개인 정보·감시·편향·격차</b> — 장점과 쌍으로 서술하라</li>
-          <li>AI = 데이터로 학습 · 로봇 = 판단+몸 · IoT = 연결 — 한계(책임·해킹·일자리)까지 봐야 만점</li>
+          <li>AI = 데이터로 학습 · 로봇 = 센서·제어·구동 · IoT = 연결 — 한계(책임·해킹·일자리)까지 봐야 만점</li>
         </ul>
       </div>
     </div>
   </div>
-  <div class="folio"><span>알짜 해설</span><span class="num">173</span></div>
+  <div class="folio"><span>알짜 해설</span><span class="num">235</span></div>
 </div>
 
 <!-- ═════════════ p.174 MEMO ═════════════ -->
 <div class="page">
   <div class="runhead"><span class="unit-tag">III. 과학과 미래 사회</span><span class="lesson-tag">02 ▸ 03 넘어가기 전에</span></div>
+  <div class="spaced">
+    <div class="st">간격 두고 다시 꺼내기 — 책을 덮고 답한다</div>
+    <ol>
+      <li>빅데이터를 활용하는 공통 문법 세 단계는 무엇인가?</li>
+      <li>치우친 데이터로 학습·분석하면 결과도 치우치는 현상을 무엇이라 하는가?</li>
+      <li>인공지능은 판단 규칙을 어떻게 얻는가?</li>
+    </ol>
+    <div class="when"><span>□ 1일 뒤</span><span>□ 1주 뒤</span><span>□ 시험 전</span></div>
+    <div class="ans">정답 1 수집 → 분석 → 예측 2 데이터 편향 3 데이터에서 스스로 학습한다</div>
+  </div>
   <div class="memo-head"><span class="mt">MEMO</span><span class="ms">헷갈린 개념, 다시 틀린 문제 번호, 나만의 암기법을 남겨 두는 자리</span></div>
   <div class="memo-area"></div>
-  <div class="memo-pen">"오늘 내가 남긴 데이터 발자국 5개를 적고, 각각의 혜택과 그림자를 한 줄씩 달아 보자. 막히면 163·165쪽으로! — 박찬쌤"</div>
-  <div class="folio"><span>박찬 과학 | 통합과학 2</span><span class="num">174</span></div>
+  <div class="memo-pen">"오늘 내가 남긴 데이터 발자국 5개를 적고, 각각의 혜택과 그림자를 한 줄씩 달아 보자. 막히면 220·222쪽으로! — 박찬쌤"</div>
+  <div class="folio"><span>박찬 과학 | 통합과학 2</span><span class="num">236</span></div>
 </div>
 
 </body>

@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex">
+<title>보호자 동의 · 박찬 과학</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;600;700;900&display=swap">
+<style>
+:root{--bg:#FAF8F4;--card:#FFFFFF;--ink:#1E2A2E;--body:#3A484D;--muted:#566268;--line:#E2DED6;--brand:#147D6F;--brand-dark:#0F5C55;--brand-soft:#E6F2EF;--no:#B42318;--on:#FFFFFF}
+@media (prefers-color-scheme: dark){:root{--bg:#14191B;--card:#1C2326;--ink:#EEF2F1;--body:#CDD6D4;--muted:#9AA6A9;--line:#2D3739;--brand:#3FB3A2;--brand-dark:#7FD3C6;--brand-soft:#1D3431;--no:#F97066;--on:#0B1614}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:'Noto Sans KR',system-ui,-apple-system,sans-serif;line-height:1.7;word-break:keep-all;overflow-wrap:break-word}
+main{max-width:560px;margin:0 auto;padding:28px 16px 56px}
+.mark{width:44px;height:44px;border-radius:14px;background:var(--brand);display:grid;place-items:center;margin-bottom:14px}
+h1{font-size:23px;line-height:1.35;margin:0 0 6px;font-weight:900}
+.lead{color:var(--body);font-size:15px;margin:0 0 18px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:18px 18px 16px;margin:0 0 14px}
+.card h2{font-size:15px;margin:0 0 8px;font-weight:900}
+.card ul{margin:0;padding-left:18px;color:var(--body);font-size:14px}
+.card li{margin:3px 0}
+.card p{margin:0;color:var(--body);font-size:14px}
+label.f{display:block;font-size:13px;font-weight:700;color:var(--muted);margin:4px 0 6px}
+input[type=text]{width:100%;border:1.5px solid var(--line);border-radius:12px;padding:13px 14px;font-size:16px;font-family:inherit;background:var(--bg);color:var(--ink)}
+input[type=text]:focus{outline:2px solid var(--brand);outline-offset:1px}
+.agree{display:flex;gap:10px;align-items:flex-start;margin:14px 0 4px;font-size:14px;color:var(--body)}
+.agree input{width:20px;height:20px;margin-top:2px;accent-color:var(--brand);flex:0 0 auto}
+.btn{display:block;width:100%;border:0;border-radius:14px;background:var(--brand);color:var(--on);font:inherit;font-weight:900;font-size:16px;padding:15px;margin-top:14px;cursor:pointer}
+.btn:disabled{opacity:.55;cursor:default}
+.err{color:var(--no);font-size:13.5px;font-weight:700;margin-top:10px}
+.done{text-align:center;padding:30px 18px}
+.done .ok{width:56px;height:56px;border-radius:50%;background:var(--brand-soft);display:grid;place-items:center;margin:0 auto 12px}
+.fine{font-size:12.5px;color:var(--muted);margin-top:18px}
+.fine a{color:var(--brand-dark);font-weight:700}
+</style>
+</head>
+<body>
+<main id="app"><p class="lead">불러오는 중…</p></main>
+<script>
+/* 보호자 동의 페이지 — 개인정보 보호법 제22조의2(만 14세 미만 아동의 개인정보 처리).
+   자녀가 보낸 링크(?t=…)로 열리고, 보호자가 여기서 동의를 표시한다. 학원은 확인한 뒤 보호자에게 확인 문자를 보낸다. */
+const ACADEMY = '박찬 과학';
+const esc = t => String(t ?? '').replace(/[&<>"]/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;' }[c]));
+const token = new URLSearchParams(location.search).get('t') || '';
+let srv = null; if (/^(127\.0\.0\.1|localhost)$/.test(location.hostname)) { try { srv = JSON.parse(localStorage.getItem('pcs.server')); } catch {} }   // 개발 기기에서만(공개 주소에서는 빌드에 심은 서버만)
+const URL0 = '__SB_URL__', KEY0 = '__SB_KEY__';
+const SB = URL0.startsWith('http') ? { url: URL0, key: KEY0 } : (srv && srv.url ? srv : null);
+const app = document.getElementById('app');
+const MARK = '<div class="mark" aria-hidden="true"><svg width="26" height="26" viewBox="0 0 100 100" fill="none" stroke="#fff" stroke-width="6" stroke-linecap="round"><ellipse cx="50" cy="50" rx="38" ry="15" transform="rotate(-30 50 50)"/><circle cx="50" cy="50" r="17" fill="#fff" stroke="none"/></svg></div>';
+
+async function rpc(fn, body){
+  const r = await fetch(SB.url.replace(/\/$/, '') + '/rest/v1/rpc/' + fn, { method:'POST', headers:{ apikey:SB.key, Authorization:'Bearer ' + SB.key, 'Content-Type':'application/json' }, body: JSON.stringify(body) });
+  if (!r.ok) throw new Error('연결에 실패했습니다. 잠시 뒤 다시 열어 주세요.');
+  return r.json();
+}
+/* 로컬 시연(서버 없음): 같은 브라우저의 앱 저장소를 읽고 쓴다 */
+const LOCAL = {
+  db(){ try { return JSON.parse(localStorage.getItem('pcs.db.v2')) || {}; } catch { return {}; } },
+  info(t){ const d = this.db(), c = (d.consents||[]).find(x => x.token === t && Date.now() - x.at < 7*864e5); if (!c) return { ok:false, why:'만료된 링크입니다.' };
+    const a = (d.accounts||[]).find(x => x.id === c.uid); if (!a) return { ok:false, why:'계정을 찾을 수 없습니다.' };
+    const given = a.guardianOk || (a.guardianHow === 'web' && a.guardianAt);
+    if (c.used && !given) return { ok:false, why:'이미 사용한 링크입니다.' };
+    return { ok:true, child: a.name.slice(0,1) + '○'.repeat(Math.max(1, a.name.length-1)), done: !!given }; },
+  give(t, name){ const d = this.db(), c = (d.consents||[]).find(x => x.token === t && !x.used); if (!c) return { ok:false, why:'만료되었거나 이미 사용한 링크입니다.' };
+    const a = d.accounts.find(x => x.id === c.uid); c.used = Date.now(); a.guardianHow = 'web';   // 학원이 보호자 번호로 확인 문자를 보내야 열린다(guardianOk)
+    a.guardianAt = new Date().toISOString();
+    a.guardian = name + ' ' + String(a.guardian||'').replace(/^\S+\s*/, ''); localStorage.setItem('pcs.db.v2', JSON.stringify(d)); return { ok:true }; },
+};
+const info = t => SB ? rpc('consent_info', { p_token: t }) : Promise.resolve(LOCAL.info(t));
+const give = (t, n) => SB ? rpc('consent_give', { p_token: t, p_name: n }) : Promise.resolve(LOCAL.give(t, n));
+
+function fail(msg){ app.innerHTML = `${MARK}<h1>링크를 열 수 없습니다</h1><p class="lead">${esc(msg)}</p><p class="fine">자녀의 앱 <b>내 정보 › 보호자에게 동의 요청 보내기</b>로 새 링크를 받을 수 있습니다.</p>`; }
+function done(child){ app.innerHTML = `<div class="card done"><div class="ok"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--brand)" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 12.5l5 5L19.5 7"/></svg></div>
+  <h1>동의해 주셔서 고맙습니다</h1><p class="lead" style="margin:0">학원에서 보호자님 번호를 확인해 <b>확인 문자</b>를 보내 드리면<br>${esc(child)} 학생의 앱이 모두 열립니다.</p></div>
+  <p class="fine">동의를 철회하시려면 학원으로 연락하시거나, 자녀 앱의 <b>내 정보 › 계정 삭제</b>로 모든 정보를 지울 수 있습니다. <a href="privacy.html">개인정보처리방침</a></p>`; }
+
+(async () => {
+  if (!/^[0-9a-f]{36}$/.test(token)) return fail('링크 주소가 올바르지 않습니다.');
+  let r; try { r = await info(token); } catch (e){ return fail(e.message); }
+  if (!r.ok) return fail(r.why);
+  if (r.done) return done(r.child);
+  app.innerHTML = `${MARK}
+    <h1>${esc(r.child)} 학생의 가입에<br>보호자 동의를 부탁드립니다</h1>
+    <p class="lead">${esc(ACADEMY)} 학원의 통합과학 학습 앱 <b>‘하루 한 개념’</b>입니다. 만 14세 미만은 법에 따라 보호자 동의가 있어야 가입할 수 있습니다.</p>
+    <div class="card"><h2>앱이 처리하는 정보</h2><ul>
+      <li>가입 정보: 이메일, 이름, (선택) 연락처</li>
+      <li>보호자 정보: 성함과 연락처 — 동의 확인에만 씁니다</li>
+      <li>학습 기록: 공부한 개념, 문제 풀이, 오답, 일정</li>
+      <li>학원 수강생이면: 반, 출석 시각, 공지 확인 여부</li>
+      <li>커뮤니티(이야기)에 쓴 글과 댓글(닉네임으로만 보입니다)</li></ul></div>
+    <div class="card"><h2>이렇게 지킵니다</h2><ul>
+      <li>광고에 쓰지 않고, 다른 회사에 팔거나 넘기지 않습니다</li>
+      <li>실명·전화번호는 커뮤니티에 보이지 않고, 적으면 앱이 막거나 경고합니다</li>
+      <li>탈퇴하면 바로 지웁니다(법으로 보관해야 하는 결제 기록만 5년)</li>
+      <li>보호자는 언제든 열람·정정·삭제·처리 정지를 요구할 수 있습니다</li></ul></div>
+    <div class="card">
+      <label class="f" for="gName">보호자 성함</label><input type="text" id="gName" autocomplete="name" placeholder="예: 김보호">
+      <label class="agree"><input type="checkbox" id="gAgree"><span>위 내용과 <a href="privacy.html" target="_blank" style="color:var(--brand-dark);font-weight:700">개인정보처리방침</a>을 읽었고, 자녀의 가입과 개인정보 처리에 <b>법정대리인으로서 동의</b>합니다.</span></label>
+      <div class="err" id="gErr" role="alert"></div>
+      <button class="btn" id="gGo">동의합니다</button></div>
+    <p class="fine">동의하지 않으시면 이 페이지를 닫으시면 됩니다. 7일 안에 동의가 없으면 자녀의 계정은 자동으로 지워집니다. 이 링크는 ${esc(r.expires || '7일 뒤')}까지 한 번만 쓸 수 있습니다.</p>`;
+  document.getElementById('gGo').addEventListener('click', async ev => {
+    const n = document.getElementById('gName').value.trim(), e = document.getElementById('gErr');
+    if (n.length < 2){ e.textContent = '보호자 성함을 적어 주세요.'; return; }
+    if (!document.getElementById('gAgree').checked){ e.textContent = '동의 칸에 표시해 주세요.'; return; }
+    ev.target.disabled = true; e.textContent = '';
+    try { const g = await give(token, n); if (!g.ok){ e.textContent = g.why; ev.target.disabled = false; return; } done(r.child); }
+    catch (x){ e.textContent = x.message; ev.target.disabled = false; }
+  });
+})();
+</script>
+</body>
+</html>

@@ -2,6 +2,7 @@
 # 강의용 챕터 1개 렌더 + 검사 + 미리보기 PNG
 # 사용: bash render_one.sh L-2203     → L-2203.pdf, TEXT/OVERFLOW 검사, _previews/L-2203/pN.png
 set -euo pipefail
+python3 "$(dirname "$0")/../../tools/make_static_fonts.py" >/dev/null   # 고정 굵기 글꼴(가변 글꼴은 PDF 를 키우고 인쇄를 실패시킨다)
 cd "$(dirname "$0")"
 c="$1"
 CHROME="${CHROME:-/opt/pw-browsers/chromium}"

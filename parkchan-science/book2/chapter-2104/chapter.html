@@ -4,8 +4,8 @@
 <meta charset="utf-8">
 <title>박찬 과학 통합과학2 — I-04 산·염기와 중화 반응</title>
 <style>
-  @font-face { font-family:'PC Sans'; src:url('file:///root/.fonts/NotoSansKR.ttf'); font-weight:100 900; }
-  @font-face { font-family:'PC Serif'; src:url('file:///root/.fonts/NotoSerifKR.ttf'); font-weight:100 900; }
+  @font-face { font-family:'PC Sans'; src:url('file:///root/.fonts/static/NotoSansKR-400.ttf'); font-weight:400; } @font-face { font-family:'PC Sans'; src:url('file:///root/.fonts/static/NotoSansKR-500.ttf'); font-weight:500; } @font-face { font-family:'PC Sans'; src:url('file:///root/.fonts/static/NotoSansKR-600.ttf'); font-weight:600; } @font-face { font-family:'PC Sans'; src:url('file:///root/.fonts/static/NotoSansKR-700.ttf'); font-weight:700; } @font-face { font-family:'PC Sans'; src:url('file:///root/.fonts/static/NotoSansKR-800.ttf'); font-weight:800; } @font-face { font-family:'PC Sans'; src:url('file:///root/.fonts/static/NotoSansKR-900.ttf'); font-weight:900; }
+  @font-face { font-family:'PC Serif'; src:url('file:///root/.fonts/static/NotoSerifKR-400.ttf'); font-weight:400; } @font-face { font-family:'PC Serif'; src:url('file:///root/.fonts/static/NotoSerifKR-500.ttf'); font-weight:500; } @font-face { font-family:'PC Serif'; src:url('file:///root/.fonts/static/NotoSerifKR-600.ttf'); font-weight:600; } @font-face { font-family:'PC Serif'; src:url('file:///root/.fonts/static/NotoSerifKR-700.ttf'); font-weight:700; } @font-face { font-family:'PC Serif'; src:url('file:///root/.fonts/static/NotoSerifKR-800.ttf'); font-weight:800; } @font-face { font-family:'PC Serif'; src:url('file:///root/.fonts/static/NotoSerifKR-900.ttf'); font-weight:900; }
   @font-face { font-family:'PC Pen'; src:url('file:///root/.fonts/YeonSung-Regular.ttf'); font-weight:400; }
 
   :root{
@@ -229,6 +229,30 @@
   /* 화학식 첨자 — 본문 폰트를 그대로 축소해 자형이 어긋나지 않게 한다 */
   sub,sup{ font-size:0.68em; line-height:0; font-weight:inherit; }
   sub{ vertical-align:-0.14em; } sup{ vertical-align:0.34em; }
+  /* ── 2026-10-02 보강: 중요 표시 · 채점 기준 · 꼼꼼 자료 분석 · 간격 두고 다시 꺼내기 ── */
+  .must{ display:inline-block; font-size:7pt; font-weight:900; color:#fff; background:#D9534F; border-radius:1.6mm; padding:0.2mm 1.4mm; margin-right:1.2mm; vertical-align:1pt; }
+  table.rubric{ border-collapse:collapse; width:100%; font-size:7.6pt; margin:1mm 0 0.5mm; }
+  table.rubric th, table.rubric td{ border:0.25mm solid var(--line); padding:0.8mm 1.4mm; text-align:left; vertical-align:top; }
+  table.rubric th{ background:#F4F1EA; font-weight:800; white-space:nowrap; }
+  .analysis{ border:0.35mm dashed #C9A36A; border-radius:2.5mm; padding:1.6mm 2mm 1.2mm; margin:1.5mm 0; background:#FFFCF5; }
+  .analysis .at{ font-size:7.6pt; font-weight:900; color:#9C6503; margin-bottom:0.8mm; }
+  .analysis svg{ max-width:100%; height:auto; display:block; }
+  .spaced{ border:0.4mm solid var(--line); border-radius:3mm; padding:3mm 4mm 2.6mm; margin:0 0 4mm; position:relative; background:#FAFBFC; }
+  .spaced .st{ font-size:9.5pt; font-weight:900; color:var(--unit); margin-bottom:1.6mm; }
+  .spaced ol{ margin:0; padding-left:5mm; font-size:8.8pt; line-height:1.75; }
+  .spaced .when{ display:flex; gap:5mm; font-size:8pt; color:var(--sub); margin-top:1.8mm; }
+  .spaced .ans{ position:absolute; right:4mm; bottom:2.4mm; transform:rotate(180deg); font-size:6.8pt; color:var(--sub); }
+  /* 2단 문항 쪽 간격 · 발문 안 탐구 과정 상자 (합격본 chapter-08 에서) */
+  .qg2 .q{ margin-bottom:6mm; }
+  .qg2 > div > .q:last-child{ margin-bottom:0; }
+  .qg2 .choices.inline{ gap:0 4mm; }
+  .qg2 .choices{ margin-top:1.8mm; line-height:1.78; }
+  .qg2 .bogi-box{ margin-top:2mm; padding:1.8mm 2.8mm; font-size:9pt; line-height:1.72; }
+  .qg2 .bogi-box .bt{ margin-bottom:0.3mm; }
+  .qg2 .q figure{ margin:1.6mm 0 0.6mm 8.4mm !important; }
+  .exp{ border:0.35mm solid #B8C2CA; border-radius:1.6mm; background:#FAFBFC; padding:1.6mm 2.6mm; margin:1.4mm 0 1.6mm; font-size:8.9pt; line-height:1.7; }
+  .exp b{ font-family:'PC Sans'; font-size:7.8pt; font-weight:900; color:var(--brand); }
+  .qg2 .q .exp figure{ margin:0.8mm 0 0.2mm !important; }
 </style>
 </head>
 <body>
@@ -286,8 +310,8 @@
       </div>
       <div class="toc-item">
         <span class="tno">05</span>
-        <span class="tbody"><span class="ttt">화학 변화와 에너지 출입</span>
-        <span class="tdesc">발열·흡열 반응 — 손난로와 냉각 팩의 과학</span></span>
+        <span class="tbody"><span class="ttt">물질 변화와 에너지 출입</span>
+        <span class="tdesc">화학 변화·상태 변화·용해의 열 출입 — 손난로와 냉각 팩의 과학</span></span>
         <span class="tstd">10통과2-01-05</span>
       </div>
     </div>
@@ -305,7 +329,7 @@
     <div class="opener-quote" style="margin-top:2.4mm;">"모든 물질은 그 자체로 독도 약도 아니다 — 용량이 결정할 뿐."<span class="who">— 의화학의 선구자 파라켈수스</span></div>
   </div>
 
-  <div class="folio"><span>박찬 과학 | 통합과학 2</span><span class="num">50</span></div>
+  <div class="folio"><span>박찬 과학 | 통합과학 2</span><span class="num">63</span></div>
 </div>
 
 <!-- ═════════════ p.51 개념 01 산 ═════════════ -->
@@ -321,24 +345,24 @@
       <p class="body">종류가 달라도 성질이 같다면, 공통의 범인이 있다는 뜻이다. 아레니우스의 정의가 그 범인을 지목한다 — 산은 <span class="u-amber">물에 녹아 수소 이온(H<sup>+</sup>)을 내놓는 물질</span>이다. 신맛도, 금속과의 반응도, 전류가 흐르는 것도 모두 이 <b>H<sup>+</sup></b>의 작품이다. 수용액에 이온이 떠다니기에 전류가 흐른다는 것까지 한 번에 설명된다.</p>
 
       <figure>
-        <svg width="468" height="189" viewBox="0 0 620 250" font-family="PC Sans">
+        <svg width="492" height="198" viewBox="0 0 620 250" font-family="PC Sans">
       <defs><clipPath id="p21041_f1c"><rect width="620" height="250" rx="10"/></clipPath></defs>
       <g clip-path="url(#p21041_f1c)">
         <rect width="620" height="250" fill="#F6F2EA"/>
         <rect y="185" width="620" height="65" fill="#B8946F"/>
         <rect y="185" width="620" height="6" fill="#CBA379"/>
       </g>
-      <text x="310" y="22" text-anchor="middle" font-size="12" font-weight="900" fill="#B4560E">산 수용액 속에는 수소 이온(H<tspan dy="-0.34em" font-size="68%">+</tspan><tspan dy="0.34em">)이 떠다닌다 — 서로 다른 산이 같은 성질을 보이는 원인</tspan></text>
-      <g transform="translate(36,46)"><circle r="12" fill="#C1521E"/><text y="4" text-anchor="middle" font-size="10.5" font-weight="800" fill="#fff">H<tspan dy="-0.34em" font-size="68%">+</tspan></text></g>
-      <text x="54" y="50" font-size="10.5" font-weight="700" fill="#5B6B77">아레니우스의 정의 — 물에 녹아 H<tspan dy="-0.34em" font-size="68%">+</tspan><tspan dy="0.34em">를 내놓는 물질이 산이다</tspan></text>
+      <text x="16" y="22" font-size="14.1" font-weight="900" fill="#B4560E">산 수용액 속 수소 이온(H<tspan dy="-0.34em" font-size="76%">+</tspan><tspan dy="0.34em">) — 서로 다른 산이 같은 성질을 보이는 원인</tspan></text>
+      <g transform="translate(36,43)"><circle r="13" fill="#C1521E"/><text y="4" text-anchor="middle" font-size="13.9" font-weight="800" fill="#fff">H<tspan dy="-0.34em" font-size="76%">+</tspan></text></g>
+      <text x="54" y="47" font-size="13.7" font-weight="700" fill="#5B6B77">아레니우스의 정의 — 물에 녹아 H<tspan dy="-0.34em" font-size="76%">+</tspan><tspan dy="0.34em">를 내놓는 물질이 산</tspan></text>
 
       <!-- 1 신맛: 레몬 · 탄산음료 · 주스 잔 -->
       <g transform="translate(92,185)">
         <path d="M-25,-56 L-22,-2 L22,-2 L25,-56 Z" fill="#F8E19B"/>
         <path d="M-26,-72 L-22,0 L22,0 L26,-72" fill="none" stroke="#8FB2C9" stroke-width="1.8"/>
-        <g font-size="10" font-weight="800" fill="#fff" text-anchor="middle">
-          <circle cx="-6" cy="-38" r="10" fill="#C1521E"/><text x="-6" y="-34">H<tspan dy="-0.34em" font-size="68%">+</tspan></text>
-          <circle cx="8" cy="-16" r="10" fill="#C1521E"/><text x="8" y="-12">H<tspan dy="-0.34em" font-size="68%">+</tspan></text>
+        <g font-size="13.7" font-weight="800" fill="#fff" text-anchor="middle">
+          <circle cx="-6" cy="-38" r="11.5" fill="#C1521E"/><text x="-6" y="-34">H<tspan dy="-0.34em" font-size="76%">+</tspan></text>
+          <circle cx="8" cy="-16" r="11.5" fill="#C1521E"/><text x="8" y="-12">H<tspan dy="-0.34em" font-size="76%">+</tspan></text>
         </g>
         <g transform="translate(-52,-14)">
           <circle r="13" fill="#F3C24E"/><path d="M-13,0 a13,13 0 0,1 26,0 z" fill="#F8E19B"/>
@@ -352,11 +376,11 @@
       <g transform="translate(230,185)">
         <rect x="-43" y="-64" width="86" height="62" rx="3" fill="#FDE7D9"/>
         <rect x="-5" y="-104" width="10" height="80" rx="1" fill="#8A8F98" stroke="#6B7680" stroke-width="1" transform="rotate(-6)"/>
-        <text x="-12" y="-98" text-anchor="end" font-size="10.5" font-weight="700" fill="#5B6B77">마그네슘</text>
-        <g font-size="10" font-weight="800" fill="#fff" text-anchor="middle">
-          <circle cx="-28" cy="-22" r="10" fill="#C1521E"/><text x="-28" y="-18">H<tspan dy="-0.34em" font-size="68%">+</tspan></text>
-          <circle cx="26" cy="-20" r="10" fill="#C1521E"/><text x="26" y="-16">H<tspan dy="-0.34em" font-size="68%">+</tspan></text>
-          <circle cx="-30" cy="-50" r="10" fill="#C1521E"/><text x="-30" y="-46">H<tspan dy="-0.34em" font-size="68%">+</tspan></text>
+        <text x="-20" y="-100" text-anchor="end" font-size="13.9" font-weight="700" fill="#5B6B77">마그네슘</text>
+        <g font-size="13.7" font-weight="800" fill="#fff" text-anchor="middle">
+          <circle cx="-28" cy="-22" r="11.5" fill="#C1521E"/><text x="-28" y="-18">H<tspan dy="-0.34em" font-size="76%">+</tspan></text>
+          <circle cx="26" cy="-20" r="11.5" fill="#C1521E"/><text x="26" y="-16">H<tspan dy="-0.34em" font-size="76%">+</tspan></text>
+          <circle cx="-30" cy="-50" r="11.5" fill="#C1521E"/><text x="-30" y="-46">H<tspan dy="-0.34em" font-size="76%">+</tspan></text>
         </g>
         <g fill="#fff" stroke="#9AB8CC" stroke-width="0.9">
           <circle cx="-14" cy="-30" r="3"/><circle cx="14" cy="-34" r="3"/><circle cx="22" cy="-52" r="2.6"/>
@@ -364,7 +388,7 @@
           <circle cx="6" cy="-78" r="3.2"/><circle cx="-6" cy="-90" r="3.4"/><circle cx="10" cy="-102" r="3.6"/>
         </g>
         <path d="M-45,-88 L-45,-8 Q-45,0 -37,0 L37,0 Q45,0 45,-8 L45,-88 M-49,-88 L-45,-88 M45,-88 L49,-88" fill="none" stroke="#5B6B77" stroke-width="2"/>
-        <text y="-118" text-anchor="middle" font-size="10.5" font-weight="800" fill="#2E6690">수소 기체 발생</text>
+        <text y="-118" text-anchor="middle" font-size="13.9" font-weight="800" fill="#2E6690">수소 기체 발생</text>
       </g>
 
       <!-- 3 대리석과 반응 -->
@@ -373,17 +397,17 @@
         <g fill="#C7D0D6" stroke="#8A949E" stroke-width="1">
           <path d="M-32,-3 L-22,-17 L-8,-3 Z"/><path d="M-6,-3 L4,-19 L16,-3 Z"/><path d="M18,-3 L26,-15 L36,-3 Z"/>
         </g>
-        <g font-size="10" font-weight="800" fill="#fff" text-anchor="middle">
-          <circle cx="-26" cy="-40" r="10" fill="#C1521E"/><text x="-26" y="-36">H<tspan dy="-0.34em" font-size="68%">+</tspan></text>
-          <circle cx="24" cy="-44" r="10" fill="#C1521E"/><text x="24" y="-40">H<tspan dy="-0.34em" font-size="68%">+</tspan></text>
-          <circle cx="0" cy="-30" r="10" fill="#C1521E"/><text x="0" y="-26">H<tspan dy="-0.34em" font-size="68%">+</tspan></text>
+        <g font-size="13.7" font-weight="800" fill="#fff" text-anchor="middle">
+          <circle cx="-26" cy="-40" r="11.5" fill="#C1521E"/><text x="-26" y="-36">H<tspan dy="-0.34em" font-size="76%">+</tspan></text>
+          <circle cx="24" cy="-44" r="11.5" fill="#C1521E"/><text x="24" y="-40">H<tspan dy="-0.34em" font-size="76%">+</tspan></text>
+          <circle cx="0" cy="-30" r="11.5" fill="#C1521E"/><text x="0" y="-26">H<tspan dy="-0.34em" font-size="76%">+</tspan></text>
         </g>
         <g fill="#fff" stroke="#9AB8CC" stroke-width="0.9">
           <circle cx="-12" cy="-52" r="3"/><circle cx="12" cy="-58" r="3"/><circle cx="-2" cy="-70" r="3.2"/>
           <circle cx="8" cy="-84" r="3.4"/><circle cx="-6" cy="-96" r="3.6"/><circle cx="6" cy="-108" r="3.6"/>
         </g>
         <path d="M-45,-88 L-45,-8 Q-45,0 -37,0 L37,0 Q45,0 45,-8 L45,-88 M-49,-88 L-45,-88 M45,-88 L49,-88" fill="none" stroke="#5B6B77" stroke-width="2"/>
-        <text y="-118" text-anchor="middle" font-size="10.5" font-weight="800" fill="#2E6690">이산화 탄소 발생</text>
+        <text y="-118" text-anchor="middle" font-size="13.9" font-weight="800" fill="#2E6690">이산화 탄소 발생</text>
       </g>
 
       <!-- 4 전류 -->
@@ -391,9 +415,9 @@
         <rect x="-43" y="-64" width="86" height="62" rx="3" fill="#FDE7D9"/>
         <rect x="-30" y="-100" width="8" height="78" fill="#3A3A3A"/><rect x="22" y="-100" width="8" height="78" fill="#3A3A3A"/>
         <path d="M-26,-100 L-26,-128 L-12,-138 M26,-100 L26,-128 L12,-138" fill="none" stroke="#3A3A3A" stroke-width="1.8"/>
-        <g font-size="10" font-weight="800" fill="#fff" text-anchor="middle">
-          <circle cx="-4" cy="-30" r="10" fill="#C1521E"/><text x="-4" y="-26">H<tspan dy="-0.34em" font-size="68%">+</tspan></text>
-          <circle cx="4" cy="-56" r="10" fill="#C1521E"/><text x="4" y="-52">H<tspan dy="-0.34em" font-size="68%">+</tspan></text>
+        <g font-size="13.7" font-weight="800" fill="#fff" text-anchor="middle">
+          <circle cx="-4" cy="-30" r="11.5" fill="#C1521E"/><text x="-4" y="-26">H<tspan dy="-0.34em" font-size="76%">+</tspan></text>
+          <circle cx="4" cy="-56" r="11.5" fill="#C1521E"/><text x="4" y="-52">H<tspan dy="-0.34em" font-size="76%">+</tspan></text>
         </g>
         <path d="M-45,-88 L-45,-8 Q-45,0 -37,0 L37,0 Q45,0 45,-8 L45,-88 M-49,-88 L-45,-88 M45,-88 L49,-88" fill="none" stroke="#5B6B77" stroke-width="2"/>
         <g transform="translate(0,-146)">
@@ -404,14 +428,14 @@
           <circle r="12" fill="#F3C24E" stroke="#E8940A" stroke-width="1.2"/>
           <rect x="-5" y="10" width="10" height="6" fill="#8A949E"/>
         </g>
-        <text x="-26" y="-138" text-anchor="end" font-size="10.5" font-weight="800" fill="#B4830A">전구가 켜진다</text>
+        <text x="-26" y="-138" text-anchor="end" font-size="13.9" font-weight="800" fill="#B4830A">전구가 켜진다</text>
       </g>
 
       <g text-anchor="middle">
-        <g font-size="11" font-weight="900" fill="#fff">
+        <g font-size="14.1" font-weight="900" fill="#fff">
           <text x="92" y="207">신맛</text><text x="230" y="207">금속과 반응</text><text x="380" y="207">대리석과 반응</text><text x="530" y="207">전류가 흐른다</text>
         </g>
-        <g font-size="10.5" fill="#FBEFE7">
+        <g font-size="13.7" fill="#FBEFE7">
           <text x="92" y="225">레몬·식초·탄산음료</text><text x="230" y="225">마그네슘 → 수소 기체</text><text x="380" y="225">탄산 칼슘 → 이산화 탄소</text><text x="530" y="225">이온이 있다는 증거</text>
         </g>
       </g>
@@ -435,7 +459,7 @@
       <div class="wsep"></div>
       <div class="review">
         <div class="rv-title">중학 과학 다시보기</div>
-        <div class="term" style="margin-bottom:0;"><b>이온 (중3)</b>전하를 띤 입자. 산·염기의 성질은 결국 이온 이야기다 — 03의 전자에 이어 주인공이 이온으로.</div>
+        <div class="term" style="margin-bottom:0;"><b>이온 (중2)</b>전하를 띤 입자. 산·염기의 성질은 결국 이온 이야기다 — 03의 전자에 이어 주인공이 이온으로.</div>
       </div>
     </div>
   </div>
@@ -448,7 +472,7 @@
     </ol>
     <div class="qc-ans">정답 1 O 2 X (수소 이온 H<sup>+</sup>) 3 O</div>
   </div>
-  <div class="folio"><span>I. 변화와 다양성</span><span class="num">51</span></div>
+  <div class="folio"><span>I. 변화와 다양성</span><span class="num">64</span></div>
 </div>
 
 <!-- ═════════════ p.52 개념 02 염기 ═════════════ -->
@@ -457,18 +481,18 @@
   <div class="cols">
     <div class="main">
       <h3 class="sec"><span class="n">2</span>염기 — 미끈거림의 정체는 수산화 이온</h3>
-      <p class="body">이번엔 반대편이다. 비누·하수구 세정제·제산제의 주역인 <span class="kw">염기</span> — 수산화 나트륨·수산화 칼슘·암모니아 같은 물질이다. 염기 수용액은 <b>쓴맛</b>이 나고, 만지면 <b>미끈거린다</b> — 피부 표면의 단백질을 녹이기 때문인데, 그래서 진한 염기는 산 못지않게 위험하다. 산과 마찬가지로 수용액에 <b>전류가 흐르지만</b>, 금속이나 대리석과는 반응하지 않는다 — 산과 뚜렷이 갈리는 지점이다.</p>
+      <p class="body">이번엔 반대편이다. 비누·하수구 세정제·제산제의 주역인 <span class="kw">염기</span> — 수산화 나트륨·수산화 칼슘·암모니아 같은 물질이다. 염기 수용액은 <b>쓴맛</b>이 나고, 만지면 <b>미끈거린다</b> — 피부 표면의 단백질을 녹이기 때문인데, 그래서 진한 염기는 산 못지않게 위험하다. 산과 마찬가지로 수용액에 <b>전류가 흐르지만</b>, <b>대부분의 금속</b>이나 대리석과는 반응하지 않는다 — 산과 뚜렷이 갈리는 지점이다.</p>
       <p class="body">염기의 공통 범인은 <span class="u-amber">물에 녹아 내놓는 수산화 이온(OH<sup>−</sup>)</span>이다(아레니우스의 정의). 정리하면 산의 얼굴은 H<sup>+</sup>, 염기의 얼굴은 OH<sup>−</sup> — 두 이온이 이 소단원 전체의 두 주인공이다. 그리고 눈치챘겠지만, 이름부터 물(H<sub>2</sub>O)을 반씩 나눠 가진 듯한 이 두 이온이 만나면 무슨 일이 벌어질지 — 그것이 개념 4의 중화 반응이다.</p>
 
       <figure>
-        <svg width="468" height="189" viewBox="0 0 620 250" font-family="PC Sans">
+        <svg width="492" height="198" viewBox="0 0 620 250" font-family="PC Sans">
       <defs><clipPath id="p21042_f2c"><rect width="620" height="250" rx="10"/></clipPath></defs>
       <g clip-path="url(#p21042_f2c)">
         <rect width="620" height="250" fill="#F6F2EA"/>
         <rect y="185" width="620" height="65" fill="#B8946F"/>
         <rect y="185" width="620" height="6" fill="#CBA379"/>
       </g>
-      <text x="310" y="22" text-anchor="middle" font-size="12" font-weight="900" fill="#B4560E">같은 마그네슘 조각을 넣어도 산 수용액에서만 기체가 발생한다 — 전류는 둘 다 흐른다</text>
+      <text x="310" y="22" text-anchor="middle" font-size="14.7" font-weight="900" fill="#B4560E">같은 마그네슘 조각을 넣어도 산 수용액에서만 기체가 발생한다 — 전류는 둘 다 흐른다</text>
 
       <!-- 산 수용액 -->
       <g transform="translate(160,185)">
@@ -476,10 +500,10 @@
         <rect x="-37" y="-106" width="10" height="82" rx="1" fill="#8A8F98" stroke="#6B7680" stroke-width="1"/>
         <rect x="16" y="-100" width="8" height="78" fill="#3A3A3A"/><rect x="40" y="-100" width="8" height="78" fill="#3A3A3A"/>
         <path d="M20,-100 L20,-118 L26,-124 M44,-100 L44,-118 L38,-124" fill="none" stroke="#3A3A3A" stroke-width="1.8"/>
-        <g font-size="10" font-weight="800" fill="#fff" text-anchor="middle">
-          <circle cx="-14" cy="-22" r="10" fill="#C1521E"/><text x="-14" y="-18">H<tspan dy="-0.34em" font-size="68%">+</tspan></text>
-          <circle cx="-8" cy="-50" r="10" fill="#C1521E"/><text x="-8" y="-46">H<tspan dy="-0.34em" font-size="68%">+</tspan></text>
-          <circle cx="6" cy="-32" r="10" fill="#C1521E"/><text x="6" y="-28">H<tspan dy="-0.34em" font-size="68%">+</tspan></text>
+        <g font-size="13.9" font-weight="800" fill="#fff" text-anchor="middle">
+          <circle cx="-17" cy="-19" r="11.5" fill="#C1521E"/><text x="-17" y="-15">H<tspan dy="-0.34em" font-size="76%">+</tspan></text>
+          <circle cx="-8" cy="-50" r="11.5" fill="#C1521E"/><text x="-8" y="-46">H<tspan dy="-0.34em" font-size="76%">+</tspan></text>
+          <circle cx="8" cy="-35" r="11.5" fill="#C1521E"/><text x="8" y="-31">H<tspan dy="-0.34em" font-size="76%">+</tspan></text>
         </g>
         <g fill="#fff" stroke="#9AB8CC" stroke-width="0.9">
           <circle cx="-44" cy="-40" r="3"/><circle cx="-22" cy="-62" r="3"/><circle cx="-46" cy="-58" r="2.6"/>
@@ -490,8 +514,8 @@
           <g stroke="#F3C24E" stroke-width="2" stroke-linecap="round"><line y1="-14" y2="-19"/><line x1="14" x2="19"/><line x1="-14" x2="-19"/><line x1="10" y1="-10" x2="14" y2="-14"/><line x1="-10" y1="-10" x2="-14" y2="-14"/></g>
           <circle r="10" fill="#F3C24E" stroke="#E8940A" stroke-width="1.2"/><rect x="-4" y="8" width="8" height="5" fill="#8A949E"/>
         </g>
-        <text x="-32" y="-118" text-anchor="middle" font-size="10.5" font-weight="800" fill="#2E6690">수소 기체 발생</text>
-        <text x="52" y="-130" font-size="10.5" font-weight="800" fill="#B4830A">전류 O</text>
+        <text x="-32" y="-118" text-anchor="middle" font-size="14.1" font-weight="800" fill="#2E6690">수소 기체 발생</text>
+        <text x="57" y="-130" font-size="14.1" font-weight="800" fill="#B4830A">전류 O</text>
         <g transform="translate(-90,-14)">
           <circle r="13" fill="#F3C24E"/><path d="M-13,0 a13,13 0 0,1 26,0 z" fill="#F8E19B"/><line x1="-13" y1="0" x2="13" y2="0" stroke="#E8940A" stroke-width="1"/>
         </g>
@@ -504,35 +528,36 @@
         <rect x="-37" y="-106" width="10" height="82" rx="1" fill="#8A8F98" stroke="#6B7680" stroke-width="1"/>
         <rect x="16" y="-100" width="8" height="78" fill="#3A3A3A"/><rect x="40" y="-100" width="8" height="78" fill="#3A3A3A"/>
         <path d="M20,-100 L20,-118 L26,-124 M44,-100 L44,-118 L38,-124" fill="none" stroke="#3A3A3A" stroke-width="1.8"/>
-        <g font-size="9.5" font-weight="800" fill="#fff" text-anchor="middle">
-          <circle cx="-14" cy="-22" r="11" fill="#2E7A54"/><text x="-14" y="-18">OH<tspan dy="-0.34em" font-size="68%">−</tspan></text>
-          <circle cx="-8" cy="-52" r="11" fill="#2E7A54"/><text x="-8" y="-48">OH<tspan dy="-0.34em" font-size="68%">−</tspan></text>
-          <circle cx="8" cy="-34" r="11" fill="#2E7A54"/><text x="8" y="-30">OH<tspan dy="-0.34em" font-size="68%">−</tspan></text>
+        <g font-size="13.7" font-weight="800" fill="#fff" text-anchor="middle">
+          <circle cx="-14" cy="-20" r="14.5" fill="#2E7A54"/><text x="-14" y="-15.5">OH<tspan dy="-0.34em" font-size="76%">−</tspan></text>
+          <circle cx="-10" cy="-56" r="14.5" fill="#2E7A54"/><text x="-10" y="-51.5">OH<tspan dy="-0.34em" font-size="76%">−</tspan></text>
+          <circle cx="12" cy="-36" r="14.5" fill="#2E7A54"/><text x="12" y="-31.5">OH<tspan dy="-0.34em" font-size="76%">−</tspan></text>
         </g>
         <path d="M-55,-90 L-55,-8 Q-55,0 -47,0 L47,0 Q55,0 55,-8 L55,-90 M-59,-90 L-55,-90 M55,-90 L59,-90" fill="none" stroke="#5B6B77" stroke-width="2"/>
         <g transform="translate(32,-134)">
           <g stroke="#F3C24E" stroke-width="2" stroke-linecap="round"><line y1="-14" y2="-19"/><line x1="14" x2="19"/><line x1="-14" x2="-19"/><line x1="10" y1="-10" x2="14" y2="-14"/><line x1="-10" y1="-10" x2="-14" y2="-14"/></g>
           <circle r="10" fill="#F3C24E" stroke="#E8940A" stroke-width="1.2"/><rect x="-4" y="8" width="8" height="5" fill="#8A949E"/>
         </g>
-        <text x="-32" y="-118" text-anchor="middle" font-size="10.5" font-weight="800" fill="#D6455D">✗ 기체 발생 없음</text>
-        <text x="52" y="-130" font-size="10.5" font-weight="800" fill="#B4830A">전류 O</text>
+        <text x="-42" y="-118" text-anchor="middle" font-size="14.1" font-weight="800" fill="#D6455D">✗ 기체 발생 없음</text>
+        <text x="57" y="-130" font-size="14.1" font-weight="800" fill="#B4830A">전류 O</text>
         <rect x="-92" y="-20" width="32" height="20" rx="6" fill="#F4F7F9" stroke="#B8C2CA" stroke-width="1.2"/>
         <g fill="#fff" stroke="#9AB8CC" stroke-width="0.9"><circle cx="-88" cy="-28" r="3.4"/><circle cx="-78" cy="-36" r="4"/><circle cx="-68" cy="-27" r="3"/></g>
-        <text x="-76" y="-46" text-anchor="middle" font-size="10.5" font-weight="700" fill="#5B6B77">비누</text>
+        <text x="-76" y="-46" text-anchor="middle" font-size="14.1" font-weight="700" fill="#5B6B77">비누</text>
       </g>
 
       <!-- 가운데 공통점 -->
-      <rect x="252" y="86" width="116" height="84" rx="8" fill="#fff" opacity="0.85"/>
-      <text x="310" y="106" text-anchor="middle" font-size="14" font-weight="900" fill="#5B6B77">VS</text>
-      <text x="310" y="126" text-anchor="middle" font-size="10.5" font-weight="900" fill="#3A3A3A">공통점</text>
-      <text x="310" y="143" text-anchor="middle" font-size="10.5" fill="#5B6B77">수용액에 이온이 있어</text>
-      <text x="310" y="160" text-anchor="middle" font-size="10.5" fill="#5B6B77">전류가 흐른다</text>
+      <rect x="254" y="72" width="112" height="106" rx="8" fill="#fff" opacity="0.85"/>
+      <text x="310" y="93" text-anchor="middle" font-size="15.4" font-weight="900" fill="#5B6B77">VS</text>
+      <text x="310" y="114" text-anchor="middle" font-size="14.1" font-weight="900" fill="#3A3A3A">공통점</text>
+      <text x="310" y="133" text-anchor="middle" font-size="14.1" fill="#5B6B77">수용액에</text>
+      <text x="310" y="150" text-anchor="middle" font-size="14.1" fill="#5B6B77">이온이 있어</text>
+      <text x="310" y="167" text-anchor="middle" font-size="14.1" fill="#5B6B77">전류가 흐른다</text>
 
       <g text-anchor="middle">
-        <text x="160" y="207" font-size="11" font-weight="900" fill="#fff">산 수용액 — H<tspan dy="-0.34em" font-size="68%">+</tspan></text>
-        <text x="160" y="225" font-size="10.5" fill="#FBEFE7">신맛 · 금속과 반응(수소 기체) · 전류 O</text>
-        <text x="460" y="207" font-size="11" font-weight="900" fill="#fff">염기 수용액 — OH<tspan dy="-0.34em" font-size="68%">−</tspan></text>
-        <text x="460" y="225" font-size="10.5" fill="#FBEFE7">쓴맛 · 미끈거림 · 금속과 반응 ✗ · 전류 O</text>
+        <text x="160" y="207" font-size="14.3" font-weight="900" fill="#fff">산 수용액 — H<tspan dy="-0.34em" font-size="76%">+</tspan></text>
+        <text x="160" y="225" font-size="14.1" fill="#FBEFE7">신맛 · 금속과 반응(수소 기체) · 전류 O</text>
+        <text x="460" y="207" font-size="14.3" font-weight="900" fill="#fff">염기 수용액 — OH<tspan dy="-0.34em" font-size="76%">−</tspan></text>
+        <text x="460" y="225" font-size="14.1" fill="#FBEFE7">쓴맛 · 미끈거림 · 마그네슘과 반응 ✗ · 전류 O</text>
       </g>
     </svg>
         <figcaption>그림 2 | 산과 염기의 프로필 — 갈리는 성질과 공통점(전류)을 한 판에</figcaption>
@@ -540,17 +565,19 @@
 
       <div class="expoint">
         <div class="boxtitle"><span class="ico">!</span>시험엔 이렇게</div>
-        <p>성질 바꿔치기가 단골 — "염기는 금속과 반응해 수소 기체를 낸다"(X — 그건 산), "산이 미끈거린다"(X — 염기). <b>전류는 둘 다 흐른다</b>는 공통점도 함정 소재다(이온이 있으니까).</p>
+        <p>성질 바꿔치기가 단골 — "염기는 마그네슘과 반응해 수소 기체를 낸다"(X — 그건 산), "산이 미끈거린다"(X — 염기). <b>전류는 둘 다 흐른다</b>는 공통점도 함정 소재다(이온이 있으니까).</p>
       </div>
     </div>
 
     <div class="wing">
       <div class="wtitle">날개 노트</div>
       <div class="term"><b>염기의 예</b>수산화 나트륨(비누·세정제), 수산화 칼슘(석회수), 암모니아(청소·비료), 제산제 성분.</div>
+      <div class="term"><b>암모니아도 염기?</b>NH<sub>3</sub>는 물에 녹아 물과 반응하면서 OH<sup>−</sup>를 내놓는다.<br>NH<sub>3</sub>&nbsp;+&nbsp;H<sub>2</sub>O&nbsp;→ NH<sub>4</sub><sup>+</sup>&nbsp;+&nbsp;OH<sup>−</sup></div>
+      <div class="term"><b>'대부분'인 까닭</b>알루미늄·아연은 진한 수산화 나트륨 수용액에서도 수소 기체를 낸다 — 그래서 염기는 '대부분의' 금속과 반응하지 않는다고 쓴다.</div>
       <div class="term"><b>미끈거림</b>염기가 피부 단백질을 녹이는 느낌 — 진한 염기가 위험한 이유이기도 하다.</div>
       <div class="wsep"></div>
       <div class="wtitle">한눈에 암기</div>
-      <div class="wing-pen">염기 = OH<sup>−</sup>를 내놓는 물질<br>쓴맛 · 미끈 · 전류 O<br>금속·대리석 반응은 X!</div>
+      <div class="wing-pen">염기 = OH<sup>−</sup>를 내놓는 물질<br>쓴맛 · 미끈 · 전류 O<br>(대부분) 금속·대리석 반응 X!</div>
     </div>
   </div>
   <div class="quickcheck">
@@ -562,7 +589,7 @@
     </ol>
     <div class="qc-ans">정답 1 O 2 X (그것은 산의 성질) 3 O</div>
   </div>
-  <div class="folio"><span>I. 변화와 다양성</span><span class="num">52</span></div>
+  <div class="folio"><span>I. 변화와 다양성</span><span class="num">65</span></div>
 </div>
 
 <!-- ═════════════ p.53 개념 03 지시약 ═════════════ -->
@@ -574,43 +601,62 @@
       <p class="body">산·염기를 맛으로 확인할 수는 없다 — 위험하니까. 대신 <span class="kw">지시약</span>을 쓴다. 산성·염기성에 따라 <b>색이 변하는 물질</b>이다. 3대 지시약의 색 변화는 통째로 외워 둘 가치가 있다. <b>리트머스 종이</b>: 산성은 푸른 종이를 <b>붉게</b>, 염기성은 붉은 종이를 <b>푸르게</b>. <b>페놀프탈레인</b>: 산성에선 <b>무색</b>, 염기성에서만 <b>붉은색</b>. <b>BTB 용액</b>: 산성 <b>노란색</b> — 중성 <b>초록색</b> — 염기성 <b>파란색</b>.</p>
       <p class="body">지시약은 실험실에만 있지 않다. <b>자주색 양배추</b>를 우린 물은 산성에서 붉은 계열, 염기성에서 푸른·노란 계열로 변하는 <b>천연 지시약</b>이다 — 포도 껍질·검은콩 물도 마찬가지다. 부엌이 실험실이 되는 순간이다.</p>
 
-      <figure>
-        <svg width="470" height="150" viewBox="0 0 470 150" font-family="PC Sans">
-          <g font-size="6.8">
-            <text x="235" y="13" text-anchor="middle" font-size="8.4" font-weight="800" fill="#C1521E">3대 지시약 색 지도 — 이 판은 통암기</text>
-            <g transform="translate(0,24)">
-              <g font-weight="800" text-anchor="middle">
+      <figure style="margin:3mm 0;">
+        <svg width="492" height="142" viewBox="0 0 470 136" font-family="PC Sans">
+          <g font-size="10.6">
+            <text x="235" y="14" text-anchor="middle" font-size="12.5" font-weight="800" fill="#C1521E">3대 지시약 색 지도 — 이 판은 통암기</text>
+            <g transform="translate(0,20)">
+              <g font-weight="800" text-anchor="middle" font-size="11">
                 <text x="88" y="10" fill="#5B6B77">구분</text>
                 <text x="205" y="10" fill="#B0483A">산성</text>
                 <text x="305" y="10" fill="#5B7A50">중성</text>
                 <text x="405" y="10" fill="#2E5BAA">염기성</text>
               </g>
-              <g transform="translate(0,18)">
-                <rect x="28" y="0" width="414" height="26" rx="4" fill="#FBF3ED" stroke="#EBC4AB" stroke-width="0.8"/>
-                <text x="88" y="16" text-anchor="middle" font-weight="800" fill="#3D4C58">리트머스 종이</text>
-                <rect x="180" y="5" width="50" height="16" rx="3" fill="#D6455D"/><text x="205" y="16" text-anchor="middle" fill="#fff" font-size="6.2">푸른 → 붉게</text>
-                <text x="305" y="16" text-anchor="middle" fill="#8A949E" font-size="6.2">변화 없음</text>
-                <rect x="380" y="5" width="50" height="16" rx="3" fill="#3E6DBF"/><text x="405" y="16" text-anchor="middle" fill="#fff" font-size="6.2">붉은 → 푸르게</text>
+              <g transform="translate(0,15)">
+                <rect x="22" y="0" width="430" height="25" rx="4" fill="#FBF3ED" stroke="#EBC4AB" stroke-width="0.8"/>
+                <text x="88" y="16.6" text-anchor="middle" font-weight="800" fill="#3D4C58">리트머스 종이</text>
+                <rect x="166" y="3" width="78" height="19" rx="3" fill="#D6455D"/><text x="205" y="16.6" text-anchor="middle" fill="#fff">푸른 → 붉게</text>
+                <text x="305" y="16.6" text-anchor="middle" fill="#8A949E">변화 없음</text>
+                <rect x="366" y="3" width="78" height="19" rx="3" fill="#3E6DBF"/><text x="405" y="16.6" text-anchor="middle" fill="#fff">붉은 → 푸르게</text>
               </g>
-              <g transform="translate(0,50)">
-                <rect x="28" y="0" width="414" height="26" rx="4" fill="#FBF3ED" stroke="#EBC4AB" stroke-width="0.8"/>
-                <text x="88" y="16" text-anchor="middle" font-weight="800" fill="#3D4C58">페놀프탈레인</text>
-                <rect x="180" y="5" width="50" height="16" rx="3" fill="#F4F0EA" stroke="#C9BA9B" stroke-width="0.8"/><text x="205" y="16" text-anchor="middle" fill="#8A949E" font-size="6.2">무색</text>
-                <rect x="280" y="5" width="50" height="16" rx="3" fill="#F4F0EA" stroke="#C9BA9B" stroke-width="0.8"/><text x="305" y="16" text-anchor="middle" fill="#8A949E" font-size="6.2">무색</text>
-                <rect x="380" y="5" width="50" height="16" rx="3" fill="#D6456F"/><text x="405" y="16" text-anchor="middle" fill="#fff" font-size="6.2">붉은색</text>
+              <g transform="translate(0,42)">
+                <rect x="22" y="0" width="430" height="25" rx="4" fill="#FBF3ED" stroke="#EBC4AB" stroke-width="0.8"/>
+                <text x="88" y="16.6" text-anchor="middle" font-weight="800" fill="#3D4C58">페놀프탈레인</text>
+                <rect x="166" y="3" width="78" height="19" rx="3" fill="#F4F0EA" stroke="#C9BA9B" stroke-width="0.8"/><text x="205" y="16.6" text-anchor="middle" fill="#8A949E">무색</text>
+                <rect x="266" y="3" width="78" height="19" rx="3" fill="#F4F0EA" stroke="#C9BA9B" stroke-width="0.8"/><text x="305" y="16.6" text-anchor="middle" fill="#8A949E">무색</text>
+                <rect x="366" y="3" width="78" height="19" rx="3" fill="#D6456F"/><text x="405" y="16.6" text-anchor="middle" fill="#fff">붉은색</text>
               </g>
-              <g transform="translate(0,82)">
-                <rect x="28" y="0" width="414" height="26" rx="4" fill="#FBF3ED" stroke="#EBC4AB" stroke-width="0.8"/>
-                <text x="88" y="16" text-anchor="middle" font-weight="800" fill="#3D4C58">BTB 용액</text>
-                <rect x="180" y="5" width="50" height="16" rx="3" fill="#E8B90A"/><text x="205" y="16" text-anchor="middle" fill="#fff" font-size="6.2">노란색</text>
-                <rect x="280" y="5" width="50" height="16" rx="3" fill="#4E9A50"/><text x="305" y="16" text-anchor="middle" fill="#fff" font-size="6.2">초록색</text>
-                <rect x="380" y="5" width="50" height="16" rx="3" fill="#2E7ACC"/><text x="405" y="16" text-anchor="middle" fill="#fff" font-size="6.2">파란색</text>
+              <g transform="translate(0,69)">
+                <rect x="22" y="0" width="430" height="25" rx="4" fill="#FBF3ED" stroke="#EBC4AB" stroke-width="0.8"/>
+                <text x="88" y="16.6" text-anchor="middle" font-weight="800" fill="#3D4C58">BTB 용액</text>
+                <rect x="166" y="3" width="78" height="19" rx="3" fill="#E8B90A"/><text x="205" y="16.6" text-anchor="middle" fill="#fff">노란색</text>
+                <rect x="266" y="3" width="78" height="19" rx="3" fill="#4E9A50"/><text x="305" y="16.6" text-anchor="middle" fill="#fff">초록색</text>
+                <rect x="366" y="3" width="78" height="19" rx="3" fill="#2E7ACC"/><text x="405" y="16.6" text-anchor="middle" fill="#fff">파란색</text>
               </g>
             </g>
           </g>
-          <text x="235" y="144" text-anchor="middle" font-size="8.8" font-weight="800" fill="#E8940A">페놀프탈레인의 붉은색 = "염기 있음" 신호 — 산성에선 아무 말도 하지 않는다</text>
+          <text x="235" y="130" text-anchor="middle" font-size="12.5" font-weight="800" fill="#E8940A">페놀프탈레인의 붉은색 = "염기 있음" 신호 — 산성에선 아무 말도 하지 않는다</text>
         </svg>
         <figcaption>그림 3 | 3대 지시약 색 지도 — 자주색 양배추 물은 부엌의 천연 지시약</figcaption>
+      </figure>
+
+      <p class="body">액성의 세기는 수로도 나타낸다 — <span class="kw">pH</span>(0~14). <b>7이 중성</b>, 7보다 작으면 산성, 크면 염기성이고, <span class="u-amber">pH가 작을수록 H<sup>+</sup>가 많아 산성이 강하다</span>. pH 시험지나 pH 센서로 잰다.</p>
+      <figure style="margin:2.4mm 0 2.6mm;">
+        <svg width="492" height="100" viewBox="0 0 470 96" font-family="PC Sans">
+          <defs><linearGradient id="p2104ph" x1="0" x2="1" y1="0" y2="0">
+            <stop offset="0" stop-color="#D6455D"/><stop offset="0.22" stop-color="#E8940A"/><stop offset="0.38" stop-color="#E8B90A"/><stop offset="0.5" stop-color="#4E9A50"/><stop offset="0.68" stop-color="#2E7ACC"/><stop offset="1" stop-color="#5B3FA8"/>
+          </linearGradient></defs>
+          <rect x="30" y="27" width="410" height="18" rx="3" fill="url(#p2104ph)"/>
+          <g font-size="10.4" font-weight="800" fill="#fff" text-anchor="middle"><text x="43.7" y="40.6">0</text><text x="71.0" y="40.6">1</text><text x="98.3" y="40.6">2</text><text x="125.7" y="40.6">3</text><text x="153.0" y="40.6">4</text><text x="180.3" y="40.6">5</text><text x="207.7" y="40.6">6</text><text x="235.0" y="40.6">7</text><text x="262.3" y="40.6">8</text><text x="289.7" y="40.6">9</text><text x="317.0" y="40.6">10</text><text x="344.3" y="40.6">11</text><text x="371.7" y="40.6">12</text><text x="399.0" y="40.6">13</text><text x="426.3" y="40.6">14</text></g>
+          <g font-size="10.4" font-weight="700" fill="#3D4C58"><line x1="84.7" y1="21" x2="84.7" y2="27" stroke="#5B6B77" stroke-width="0.8"/><text x="84.7" y="18" text-anchor="middle">위산 약 1~2</text><line x1="98.3" y1="45" x2="98.3" y2="51" stroke="#5B6B77" stroke-width="0.8"/><text x="98.3" y="62" text-anchor="middle">레몬즙 약 2</text><line x1="196.7" y1="21" x2="196.7" y2="27" stroke="#5B6B77" stroke-width="0.8"/><text x="196.7" y="18" text-anchor="middle">빗물 약 5.6</text><line x1="235.0" y1="45" x2="235.0" y2="51" stroke="#5B6B77" stroke-width="0.8"/><text x="235.0" y="62" text-anchor="middle">순수한 물 7</text><line x1="265.1" y1="21" x2="265.1" y2="27" stroke="#5B6B77" stroke-width="0.8"/><text x="265.1" y="18" text-anchor="middle">바닷물 약 8.1</text><line x1="303.3" y1="45" x2="303.3" y2="51" stroke="#5B6B77" stroke-width="0.8"/><text x="314" y="62" text-anchor="middle">비누 물 약 9~10</text><line x1="412.7" y1="21" x2="412.7" y2="27" stroke="#5B6B77" stroke-width="0.8"/><text x="412.7" y="18" text-anchor="middle">하수구 세정제 약 13~14</text></g>
+          <g font-size="10.8" font-weight="800">
+            <text x="30" y="78" fill="#B0483A">← 산성 (pH &lt; 7, 작을수록 H<tspan dy="-0.34em" font-size="76%">+</tspan><tspan dy="0.34em"> 많음)</tspan></text>
+            <text x="235.0" y="78" text-anchor="middle" fill="#4E9A50">중성 7</text>
+            <text x="440" y="78" text-anchor="end" fill="#2E5BAA">염기성 (pH &gt; 7) →</text>
+          </g>
+          <text x="235" y="93" text-anchor="middle" font-size="10.4" fill="#8A949E">빗물 약 5.6: 미국 환경보호청(EPA) · 바닷물 약 8.1: 미국 해양대기청(NOAA) · 나머지는 대략값</text>
+        </svg>
+        <figcaption>pH 띠 | 생활 속 물질의 대략적인 pH — 왼쪽으로 갈수록 산성, 오른쪽으로 갈수록 염기성이 강하다</figcaption>
       </figure>
 
       <div class="expoint">
@@ -623,6 +669,8 @@
       <div class="wtitle">날개 노트</div>
       <div class="term"><b>지시약</b>용액의 액성(산성·중성·염기성)에 따라 색이 변하는 물질.</div>
       <div class="term"><b>천연 지시약</b>자주색 양배추·포도 껍질·검은콩 물 — 색소가 액성 따라 변한다.</div>
+      <div class="term"><b>pH</b>H<sup>+</sup>의 많고 적음을 0~14의 수로 나타낸 값. 7 중성, 7보다 작으면 산성, 크면 염기성.</div>
+      <div class="term"><b>pH와 해양 산성화</b>바닷물에 이산화 탄소가 더 녹으면 pH가 낮아진다(산업 혁명 뒤 약 8.2 → 약 8.1, NOAA). 바닷물은 여전히 염기성이지만 산성 쪽으로 옮겨 가는 것 — 2203에서 다시 만난다.</div>
       <div class="wsep"></div>
       <div class="wtitle">한눈에 암기</div>
       <div class="wing-pen">리트머스: 산붉 염푸<br>페놀프탈레인: 염기만 붉게<br>BTB: 노 초 파 (산중염)</div>
@@ -633,11 +681,11 @@
     <ol>
       <li><span class="no">1</span>페놀프탈레인 용액은 염기성에서 붉게 변한다. ( O , X )</li>
       <li><span class="no">2</span>BTB 용액은 산성에서 파란색을 띤다. ( O , X )</li>
-      <li><span class="no">3</span>자주색 양배추 물은 천연 지시약으로 쓸 수 있다. ( O , X )</li>
+      <li><span class="no">3</span><span>pH가 작을수록 용액 속 H<sup>+</sup>가 많아 산성이 강하다. ( O , X )</span></li>
     </ol>
     <div class="qc-ans">정답 1 O 2 X (노란색 — 파랑은 염기성) 3 O</div>
   </div>
-  <div class="folio"><span>I. 변화와 다양성</span><span class="num">53</span></div>
+  <div class="folio"><span>I. 변화와 다양성</span><span class="num">66</span></div>
 </div>
 
 <!-- ═════════════ p.54 개념 04 중화 반응 ═════════════ -->
@@ -650,38 +698,38 @@
       <p class="body">중화가 일어났는지는 두 가지 신호로 확인한다. 첫째, <span class="u-amber">온도가 올라간다</span> — 중화 반응은 열(중화열)을 내놓기 때문에, 산과 염기가 꼭 맞게 반응하는 지점에서 온도가 가장 높다. 둘째, <span class="u-amber">지시약의 색이 변한다</span> — BTB를 넣고 염산에 수산화 나트륨을 조금씩 부으면 노랑 → 초록(완전 중화) → 파랑으로, 용액의 액성 변화가 그대로 보인다.</p>
 
       <figure>
-        <svg width="470" height="150" viewBox="0 0 470 150" font-family="PC Sans">
-          <g font-size="6.8">
-            <text x="235" y="13" text-anchor="middle" font-size="8.4" font-weight="800" fill="#C1521E">중화 반응 — H<tspan dy="-0.34em" font-size="68%">+</tspan><tspan dy="0.34em">와 OH<tspan dy="-0.34em" font-size="68%">−</tspan><tspan dy="0.34em">가 만나 물이 된다</tspan></tspan></text>
+        <svg width="492" height="130" viewBox="0 0 470 124" font-family="PC Sans">
+          <g font-size="10.4">
+            <text x="235" y="16" text-anchor="middle" font-size="12.5" font-weight="800" fill="#C1521E">중화 반응 — H<tspan dy="-0.34em" font-size="76%">+</tspan><tspan dy="0.34em">와 OH<tspan dy="-0.34em" font-size="76%">−</tspan><tspan dy="0.34em">가 만나 물이 된다</tspan></tspan></text>
             <g transform="translate(0,30)" text-anchor="middle">
-              <g transform="translate(105,20)">
-                <circle cx="-28" cy="0" r="16" fill="#C1521E"/><text x="-28" y="4" fill="#fff" font-weight="800" font-size="7.6">H<tspan dy="-0.34em" font-size="68%">+</tspan></text>
-                <text x="0" y="4" font-size="10" font-weight="900" fill="#5B6B77">+</text>
-                <circle cx="30" cy="0" r="16" fill="#2E7A54"/><text x="30" y="4" fill="#fff" font-weight="800" font-size="7.2">OH<tspan dy="-0.34em" font-size="68%">−</tspan></text>
-                <text y="34" font-size="6.4" fill="#5B6B77">산의 얼굴 + 염기의 얼굴</text>
+              <g transform="translate(105,22)">
+                <circle cx="-30" cy="0" r="17" fill="#C1521E"/><text x="-30" y="4" fill="#fff" font-weight="800" font-size="10.8">H<tspan dy="-0.34em" font-size="76%">+</tspan></text>
+                <text x="0" y="5" font-size="13" font-weight="900" fill="#5B6B77">+</text>
+                <circle cx="31" cy="0" r="17" fill="#2E7A54"/><text x="31" y="4" fill="#fff" font-weight="800" font-size="10.8">OH<tspan dy="-0.34em" font-size="76%">−</tspan></text>
+                <text y="36" fill="#5B6B77">산의 얼굴 + 염기의 얼굴</text>
               </g>
-              <line x1="165" y1="20" x2="195" y2="20" stroke="#C1521E" stroke-width="1.6" marker-end="url(#arrP)"/>
-              <g transform="translate(240,20)">
-                <circle r="18" fill="#4C86B0"/><text y="4" fill="#fff" font-weight="800" font-size="7.6">H<tspan dy="0.14em" font-size="68%">2</tspan><tspan dy="-0.14em">O</tspan></text>
-                <text y="36" font-size="6.4" fill="#5B6B77">물 — 서로를 지운다</text>
+              <line x1="164" y1="22" x2="194" y2="22" stroke="#C1521E" stroke-width="1.6" marker-end="url(#arrP)"/>
+              <g transform="translate(236,22)">
+                <circle r="19" fill="#4C86B0"/><text y="4" fill="#fff" font-weight="800" font-size="10.8">H<tspan dy="0.14em" font-size="76%">2</tspan><tspan dy="-0.14em">O</tspan></text>
+                <text y="36" fill="#5B6B77">물 — 서로를 지운다</text>
               </g>
-              <g transform="translate(365,20)">
-                <rect x="-72" y="-24" width="144" height="52" rx="6" fill="#FBEFE7" stroke="#EBC4AB" stroke-width="1"/>
-                <text y="-8" font-size="7.2" font-weight="800" fill="#C1521E">확인 신호 두 가지</text>
-                <text y="4" fill="#5B6B77" font-size="6.2">① 온도 상승 (중화열)</text>
-                <text y="14" fill="#5B6B77" font-size="6.2">② 지시약 색 변화 (BTB: 노→초→파)</text>
-                <text y="40" font-size="6.6" font-weight="800" fill="#B4560E">산 + 염기 → 물 + 염</text>
+              <g transform="translate(373,22)">
+                <rect x="-89" y="-28" width="178" height="58" rx="6" fill="#FBEFE7" stroke="#EBC4AB" stroke-width="1"/>
+                <text y="-11" font-size="11" font-weight="800" fill="#C1521E">확인 신호 두 가지</text>
+                <text y="5" fill="#5B6B77">① 온도 상승 (중화열)</text>
+                <text y="20" fill="#5B6B77">② 지시약 색 변화 (BTB: 노→초→파)</text>
+                <text y="47" font-size="10.8" font-weight="800" fill="#B4560E">산 + 염기 → 물 + 염</text>
               </g>
             </g>
           </g>
-          <text x="235" y="144" text-anchor="middle" font-size="8.8" font-weight="800" fill="#E8940A">꼭 맞게 만난 지점이 완전 중화 — 온도는 최고, BTB는 초록</text>
+          <text x="235" y="117" text-anchor="middle" font-size="12.5" font-weight="800" fill="#E8940A">꼭 맞게 만난 지점이 완전 중화 — 온도는 최고, BTB는 초록</text>
         </svg>
         <figcaption>그림 4 | 중화 반응의 핵심 — 물이 생기고, 열이 나고, 색이 변한다</figcaption>
       </figure>
 
       <div class="expoint">
         <div class="boxtitle"><span class="ico">!</span>시험엔 이렇게</div>
-        <p>"산을 계속 넣으면 온도가 계속 올라간다"(X — <b>완전 중화점에서 최고</b>, 그 뒤엔 반응할 상대가 없어 내려간다). 염기를 넣는 동안 <b>H<sup>+</sup> 수는 줄어든다</b>는 이온 개수 추적도 단골이다.</p>
+        <p>"산을 계속 넣으면 온도가 계속 올라간다"(X — <b>완전 중화점에서 최고</b>, 그 뒤엔 반응할 상대가 없어 내려간다). 염기를 넣는 동안 <b>H<sup>+</sup> 수는 줄어든다</b>는 이온 개수 추적도 학평 단골이다(심화 — 뒤의 집중 훈련).</p>
       </div>
     </div>
 
@@ -703,7 +751,7 @@
     </ol>
     <div class="qc-ans">정답 1 O 2 X (중화열 — 올라간다) 3 O</div>
   </div>
-  <div class="folio"><span>I. 변화와 다양성</span><span class="num">54</span></div>
+  <div class="folio"><span>I. 변화와 다양성</span><span class="num">67</span></div>
 </div>
 
 <!-- ═════════════ p.55 개념 05 생활 속 중화 ═════════════ -->
@@ -719,7 +767,7 @@
         <div class="boxtitle"><span class="ico">알</span>알짜 정리 — 산·염기와 중화 반응 한 장 요약</div>
         <ul>
           <li><b>산</b> = H<sup>+</sup>를 내놓음(신맛·금속→수소·전류 O) / <b>염기</b> = OH<sup>−</sup>를 내놓음(쓴맛·미끈·전류 O)</li>
-          <li>지시약: 리트머스(산붉·염푸) · 페놀프탈레인(염기만 붉게) · BTB(노·초·파)</li>
+          <li>지시약: 리트머스(산붉·염푸) · 페놀프탈레인(염기만 붉게) · BTB(노·초·파) / <b>pH&nbsp;7&nbsp;=&nbsp;중성</b>, 작을수록 산성</li>
           <li><b>중화</b>: H<sup>+</sup> + OH<sup>−</sup> → 물 (산+염기 → 물+염) — 신호는 <b>온도 상승 + 색 변화</b></li>
           <li>생활 속: 제산제·레몬즙·석회·치약 — <b>넘친 쪽을 반대 이온으로 지운다</b></li>
         </ul>
@@ -754,7 +802,7 @@
     </ol>
     <div class="qc-ans">정답 1 O 2 O 3 X (중화 반응)</div>
   </div>
-  <div class="folio"><span>I. 변화와 다양성</span><span class="num">55</span></div>
+  <div class="folio"><span>I. 변화와 다양성</span><span class="num">68</span></div>
 </div>
 
 <!-- ═════════════ p.56 자료 파헤치기 ═════════════ -->
@@ -766,20 +814,20 @@
       <h4>자료</h4>
       <p>일정량의 묽은 염산(BTB 넣음, 노란색)에 같은 농도의 수산화 나트륨 수용액을 조금씩 넣으면서 온도와 색을 기록했다.</p>
       <figure>
-        <svg width="430" height="122" viewBox="0 0 430 122" font-family="PC Sans">
-          <g font-size="6.8">
+        <svg width="600" height="176" viewBox="0 0 430 126" font-family="PC Sans">
+          <g font-size="8">
             <line x1="46" y1="92" x2="400" y2="92" stroke="#5B6B77" stroke-width="1.1" marker-end="url(#arrP)"/>
             <line x1="46" y1="92" x2="46" y2="14" stroke="#5B6B77" stroke-width="1.1" marker-end="url(#arrP)"/>
-            <text x="398" y="104" text-anchor="end" fill="#5B6B77">넣어 준 수산화 나트륨 수용액의 부피</text>
-            <text x="52" y="14" fill="#5B6B77">혼합 용액의 온도</text>
+            <text x="398" y="123" text-anchor="end" fill="#5B6B77">넣어 준 수산화 나트륨 수용액의 부피</text>
+            <text x="52" y="15" fill="#5B6B77">혼합 용액의 온도</text>
             <path d="M60,80 L220,32 L370,58" fill="none" stroke="#C1521E" stroke-width="2"/>
             <line x1="220" y1="32" x2="220" y2="92" stroke="#D6455D" stroke-width="1" stroke-dasharray="2.5 2"/>
             <circle cx="220" cy="32" r="3.4" fill="#D6455D"/>
-            <text x="220" y="24" text-anchor="middle" font-weight="800" fill="#D6455D">완전 중화 — 온도 최고</text>
+            <text x="220" y="23" text-anchor="middle" font-weight="800" fill="#D6455D">완전 중화 — 온도 최고</text>
             <g transform="translate(0,104)" text-anchor="middle" font-weight="800">
-              <rect x="98" y="-6" width="46" height="13" rx="3" fill="#E8B90A"/><text x="121" y="4" fill="#fff" font-size="6.2">노란색</text>
-              <rect x="197" y="-6" width="46" height="13" rx="3" fill="#4E9A50"/><text x="220" y="4" fill="#fff" font-size="6.2">초록색</text>
-              <rect x="296" y="-6" width="46" height="13" rx="3" fill="#2E7ACC"/><text x="319" y="4" fill="#fff" font-size="6.2">파란색</text>
+              <rect x="98" y="-7" width="46" height="15" rx="3" fill="#E8B90A"/><text x="121" y="3.8" fill="#fff">노란색</text>
+              <rect x="197" y="-7" width="46" height="15" rx="3" fill="#4E9A50"/><text x="220" y="3.8" fill="#fff">초록색</text>
+              <rect x="296" y="-7" width="46" height="15" rx="3" fill="#2E7ACC"/><text x="319" y="3.8" fill="#fff">파란색</text>
             </g>
           </g>
         </svg>
@@ -798,90 +846,123 @@
       </div>
     </div>
   </div>
-  <div class="folio"><span>I. 변화와 다양성</span><span class="num">56</span></div>
+  <div class="folio"><span>I. 변화와 다양성</span><span class="num">69</span></div>
 </div>
 
+
+<!-- ═════════════ 교과서 탐구 — 혼합 비율을 바꾸며 온도 재기 (2026-10-02 내용 보강) ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag">I. 변화와 다양성</span><span class="lesson-tag">04. 산·염기와 중화 반응</span></div>
+  <div class="lab">
+    <div class="lab-head">교과서 탐구 <span class="tag">온도 측정 · 그래프</span> <span style="font-weight:600; font-size:9.5pt; margin-left:auto;">섞는 비율을 바꾸며 온도를 재어 반응 부피비 찾기</span></div>
+    <div class="lab-body">
+      <h4>목적</h4>
+      <p>농도가 같은 묽은 염산과 수산화 나트륨(NaOH) 수용액을 전체 부피가 같도록 여러 비율로 섞고, 가장 높은 온도를 그래프로 나타내어 두 용액이 완전히 중화하는 부피비를 찾는다.</p>
+      <h4>준비 · 과정</h4>
+      <ol>
+        <li>보안경을 쓰고 스타이로폼 컵 5개·눈금실린더·온도계(또는 온도 센서)를 준비한다(두 용액 모두 20.0&nbsp;°C).</li>
+        <li>컵 A~E에 묽은 염산을 25, 20, 15, 10, 5&nbsp;mL씩 넣고 BTB 용액을 2~3방울 떨어뜨린다.</li>
+        <li>NaOH 수용액을 5, 10, 15, 20, 25&nbsp;mL씩 부어 전체 부피를 <b>30&nbsp;mL로 똑같이</b> 맞추고, 저으며 최고 온도와 색을 적는다.</li>
+        <li>NaOH 수용액의 부피–가장 높은 온도 그래프에 점을 찍고, 양쪽 점들을 지나는 직선을 긋는다.</li>
+      </ol>
+      <h4>결과 <span style="font-size:7.6pt; font-weight:700; color:var(--sub);">(예시 결과)</span></h4>
+      <div style="display:grid; grid-template-columns:auto 1fr; gap:5mm; align-items:center;">
+        <svg width="343" height="168" viewBox="0 0 312 153" font-family="PC Sans">
+          <g stroke="#E1E8EC" stroke-width="0.7"><line x1="40" y1="98.0" x2="284" y2="98.0"/><line x1="40" y1="72.0" x2="284" y2="72.0"/><line x1="40" y1="46.0" x2="284" y2="46.0"/><line x1="40" y1="20.0" x2="284" y2="20.0"/></g>
+          <line x1="40" y1="124" x2="294" y2="124" stroke="#5B6B77" stroke-width="1.1" marker-end="url(#arrP)"/>
+          <line x1="40" y1="124" x2="40" y2="8" stroke="#5B6B77" stroke-width="1.1" marker-end="url(#arrP)"/>
+          <g font-size="9.8" fill="#5B6B77" text-anchor="end"><text x="36" y="127.4">20</text><text x="36" y="101.4">22</text><text x="36" y="75.4">24</text><text x="36" y="49.4">26</text><text x="36" y="23.4">28</text></g>
+          <g font-size="9.8" fill="#5B6B77" text-anchor="middle"><text x="40.0" y="136">0</text><text x="80.0" y="136">5</text><text x="120.0" y="136">10</text><text x="160.0" y="136">15</text><text x="200.0" y="136">20</text><text x="240.0" y="136">25</text><text x="280.0" y="136">30</text></g>
+          <text x="44" y="10" font-size="10" font-weight="800" fill="#22303A">최고 온도(°C)</text>
+          <text x="296" y="150" text-anchor="end" font-size="10" fill="#5B6B77">NaOH 수용액의 부피(mL) — 염산은 (30 − 이 값)</text>
+          <polyline points="40.0,124.0 161.4,39.2 280.0,124.0" fill="none" stroke="#C1521E" stroke-width="1.3" stroke-dasharray="4 2"/>
+          <g fill="#E8940A" stroke="#fff" stroke-width="0.8"><circle cx="80.0" cy="95.4" r="3.2"/><circle cx="120.0" cy="68.1" r="3.2"/><circle cx="160.0" cy="40.8" r="3.2"/><circle cx="200.0" cy="66.8" r="3.2"/><circle cx="240.0" cy="96.7" r="3.2"/></g>
+          <line x1="161.4" y1="39.2" x2="161.4" y2="124" stroke="#D6455D" stroke-width="1" stroke-dasharray="2.5 1.8"/>
+          <text x="168" y="29" font-size="10" font-weight="800" fill="#D6455D">두 직선이 만나는 곳 ≈ 15 mL</text>
+          <text x="168" y="42" font-size="9.8" fill="#D6455D">= 완전 중화(염산 : NaOH = 1 : 1)</text>
+          <g font-size="9.8" font-weight="800" text-anchor="middle"><text x="96" y="116" fill="#B0483A">산성(노란색)</text><text x="228" y="116" fill="#2E5BAA">염기성(파란색)</text></g>
+          <text x="310" y="10" text-anchor="end" font-size="9.8" fill="#5B6B77">예시 결과 · 처음 온도 20.0 °C</text>
+        </svg>
+        <table class="anstable" style="margin:0;">
+          <tr><th>컵</th><th>A</th><th>B</th><th>C</th><th>D</th><th>E</th></tr>
+          <tr><th>묽은 염산(mL)</th><td>25</td><td>20</td><td class="a">15</td><td>10</td><td>5</td></tr>
+          <tr><th>NaOH 수용액(mL)</th><td>5</td><td>10</td><td class="a">15</td><td>20</td><td>25</td></tr>
+          <tr><th>최고 온도(°C)</th><td>22.2</td><td>24.3</td><td class="a">26.4</td><td>24.4</td><td>22.1</td></tr>
+          <tr><th>온도 변화(°C)</th><td>+2.2</td><td>+4.3</td><td class="a">+6.4</td><td>+4.4</td><td>+2.1</td></tr>
+          <tr><th>BTB 색</th><td>노랑</td><td>노랑</td><td class="a">초록</td><td>파랑</td><td>파랑</td></tr>
+        </table>
+      </div>
+      <h4>해석의 3단계</h4>
+      <ol>
+        <li><b>꼭짓점을 찾는다</b> — 온도가 가장 많이 오른 C(염산 15&nbsp;mL&nbsp;+&nbsp;NaOH 15&nbsp;mL)에서 중화 반응이 가장 많이 일어났다. BTB도 C에서만 초록색(중성)이다 → 완전 중화.</li>
+        <li><b>양쪽 구간을 읽는다</b> — A·B는 NaOH가 모자라 H<sup>+</sup>가 남는 산성(노란색)으로, 온도 변화가 NaOH의 부피에 비례한다(+2.2 → +4.3). D·E는 OH<sup>−</sup>가 남는 염기성(파란색)으로, 온도 변화가 염산의 부피에 비례한다.</li>
+        <li><b>부피비로 정리한다</b> — 두 용액은 <b>1&nbsp;:&nbsp;1의 부피비</b>로 꼭 맞게 반응한다. 같은 부피 속 H<sup>+</sup> 수와 OH<sup>−</sup> 수가 같다는 뜻이다. 전체 부피를 30&nbsp;mL로 같게 한 것은 데워지는 용액의 양을 같게 하여 온도 변화로 반응한 양을 비교하기 위해서이다.</li>
+      </ol>
+      <h4>시험에서는 이렇게 바뀐다</h4>
+      <ul class="pts" style="font-size:9.3pt; line-height:1.8; margin-bottom:0;">
+        <li><b>NaOH 수용액의 농도만 2배로 한다</b> — 같은 부피 속 OH<sup>−</sup>가 2배이므로 꼭짓점이 염산 20&nbsp;mL&nbsp;:&nbsp;NaOH 10&nbsp;mL(2&nbsp;:&nbsp;1)로 옮겨 간다. 꼭짓점이 한가운데가 아니면 두 용액의 진하기가 다르다.</li>
+        <li><b>두 용액의 농도를 모두 2배로 한다</b> — 꼭짓점의 위치(1&nbsp;:&nbsp;1)는 그대로이고, 반응하는 양이 2배라 가장 큰 온도 변화도 약 2배가 된다.</li>
+        <li><b>비율은 그대로 두고 전체 부피를 60&nbsp;mL로 늘린다</b> — 반응하는 양과 데워야 할 용액의 양이 함께 2배라, 꼭짓점의 위치도 가장 높은 온도도 거의 같다.</li>
+      </ul>
+    </div>
+  </div>
+  <div class="folio"><span>I. 변화와 다양성</span><span class="num">70</span></div>
+</div>
 
 <!-- ═════════════ p.57 집중 훈련 A — 이온 개수 4장면 ═════════════ -->
 <div class="page">
   <div class="runhead"><span class="unit-tag">I. 변화와 다양성</span><span class="lesson-tag">04. 산·염기와 중화 반응 | 집중 훈련</span></div>
   <div class="lab">
-    <div class="lab-head">집중 훈련 <span class="tag">심화 · 빈출</span> <span style="font-weight:600; font-size:9.5pt; margin-left:auto;">이온 개수로 읽는 중화 — 비커 4장면</span></div>
+    <div class="lab-head">집중 훈련 <span class="tag">심화(학평 빈출)</span> <span style="font-weight:600; font-size:9.5pt; margin-left:auto;">이온 개수로 읽는 중화 — 비커 4장면</span></div>
     <div class="lab-body">
       <h4>장면 설정</h4>
       <p>H<sup>+</sup> 4개(Cl<sup>−</sup> 4개와 함께)가 들어 있는 묽은 염산에, 같은 농도의 수산화 나트륨 수용액을 <b>2개 단위(Na<sup>+</sup> 2 + OH<sup>−</sup> 2)</b>씩 넣는다. 넣은 OH<sup>−</sup>는 H<sup>+</sup>와 만나는 즉시 물이 되어 <b>이온 목록에서 사라진다</b>는 것 — 이 한 가지만 알면 네 장면이 전부 읽힌다.</p>
+      <p style="font-size:8.2pt; line-height:1.6; color:var(--sub); margin-top:1mm;">※ 심화 — 교육과정은 중화 반응에서 일어나는 변화를 <b>온도 변화와 지시약의 색 변화</b>로 다룬다. 이온 수 모형은 그 범위를 넘지만 학력평가에 거듭 나오므로 여기서 따로 연습한다.</p>
       <figure>
-        <svg width="470" height="158" viewBox="0 0 470 158" font-family="PC Sans">
-          <g font-size="6.2" text-anchor="middle">
-            <g transform="translate(68,66)">
-              <rect x="-27" y="2" width="54" height="28" rx="2" fill="#FBEFE7"/>
-              <path d="M-30,-34 L-30,24 Q-30,30 -24,30 L24,30 Q30,30 30,24 L30,-34" fill="none" stroke="#5B6B77" stroke-width="1.4"/>
-              <g font-size="5.4" font-weight="800">
-                <circle cx="-19.5" cy="9" r="6.2" fill="#C1521E"/><text x="-19.5" y="11" fill="#fff">H<tspan dy="-0.34em" font-size="68%">+</tspan></text>
-                <circle cx="-6.5" cy="9" r="6.2" fill="#C1521E"/><text x="-6.5" y="11" fill="#fff">H<tspan dy="-0.34em" font-size="68%">+</tspan></text>
-                <circle cx="6.5" cy="9" r="6.2" fill="#C1521E"/><text x="6.5" y="11" fill="#fff">H<tspan dy="-0.34em" font-size="68%">+</tspan></text>
-                <circle cx="19.5" cy="9" r="6.2" fill="#C1521E"/><text x="19.5" y="11" fill="#fff">H<tspan dy="-0.34em" font-size="68%">+</tspan></text>
-                <circle cx="-19.5" cy="23" r="6.2" fill="#8A949E"/><text x="-19.5" y="25" fill="#fff">Cl<tspan dy="-0.34em" font-size="68%">−</tspan></text>
-                <circle cx="-6.5" cy="23" r="6.2" fill="#8A949E"/><text x="-6.5" y="25" fill="#fff">Cl<tspan dy="-0.34em" font-size="68%">−</tspan></text>
-                <circle cx="6.5" cy="23" r="6.2" fill="#8A949E"/><text x="6.5" y="25" fill="#fff">Cl<tspan dy="-0.34em" font-size="68%">−</tspan></text>
-                <circle cx="19.5" cy="23" r="6.2" fill="#8A949E"/><text x="19.5" y="25" fill="#fff">Cl<tspan dy="-0.34em" font-size="68%">−</tspan></text>
+        <svg width="656" height="184" viewBox="0 0 470 132" font-family="PC Sans">
+          <g font-size="7.8" text-anchor="middle">
+            <g transform="translate(62,64)">
+              <rect x="-37" y="-2" width="74" height="36" rx="2" fill="#FBEFE7"/>
+              <path d="M-40,-44 L-40,30 Q-40,36 -34,36 L34,36 Q40,36 40,30 L40,-44" fill="none" stroke="#5B6B77" stroke-width="1.4"/>
+              <g font-size="7.8" font-weight="800">
+                <circle cx="-27.75" cy="7" r="8.8" fill="#C1521E"/><text x="-27.75" y="9.7" fill="#fff">H<tspan dy="-0.34em" font-size="76%">+</tspan></text><circle cx="-9.25" cy="7" r="8.8" fill="#C1521E"/><text x="-9.25" y="9.7" fill="#fff">H<tspan dy="-0.34em" font-size="76%">+</tspan></text><circle cx="9.25" cy="7" r="8.8" fill="#C1521E"/><text x="9.25" y="9.7" fill="#fff">H<tspan dy="-0.34em" font-size="76%">+</tspan></text><circle cx="27.75" cy="7" r="8.8" fill="#C1521E"/><text x="27.75" y="9.7" fill="#fff">H<tspan dy="-0.34em" font-size="76%">+</tspan></text>
+                <circle cx="-27.75" cy="25" r="8.8" fill="#8A949E"/><text x="-27.75" y="27.7" fill="#fff">Cl<tspan dy="-0.34em" font-size="76%">−</tspan></text><circle cx="-9.25" cy="25" r="8.8" fill="#8A949E"/><text x="-9.25" y="27.7" fill="#fff">Cl<tspan dy="-0.34em" font-size="76%">−</tspan></text><circle cx="9.25" cy="25" r="8.8" fill="#8A949E"/><text x="9.25" y="27.7" fill="#fff">Cl<tspan dy="-0.34em" font-size="76%">−</tspan></text><circle cx="27.75" cy="25" r="8.8" fill="#8A949E"/><text x="27.75" y="27.7" fill="#fff">Cl<tspan dy="-0.34em" font-size="76%">−</tspan></text>
               </g>
-              <text y="44" font-weight="800" fill="#3A3A3A">① 시작 — 염산만</text>
-              <text y="54" fill="#C1521E" font-weight="800">산성 · 총 8개</text>
+              <text y="51" font-weight="800" fill="#3A3A3A">① 시작 — 염산만</text>
+              <text y="63" fill="#C1521E" font-weight="800">산성 · 총 8개</text>
             </g>
-            <g transform="translate(182,66)">
-              <rect x="-27" y="-4" width="54" height="34" rx="2" fill="#FBEFE7"/>
-              <path d="M-30,-34 L-30,24 Q-30,30 -24,30 L24,30 Q30,30 30,24 L30,-34" fill="none" stroke="#5B6B77" stroke-width="1.4"/>
-              <g font-size="5.4" font-weight="800">
-                <circle cx="-19.5" cy="4" r="6.2" fill="#C1521E"/><text x="-19.5" y="6" fill="#fff">H<tspan dy="-0.34em" font-size="68%">+</tspan></text>
-                <circle cx="-6.5" cy="4" r="6.2" fill="#C1521E"/><text x="-6.5" y="6" fill="#fff">H<tspan dy="-0.34em" font-size="68%">+</tspan></text>
-                <circle cx="6.5" cy="4" r="6.2" fill="#4C86B0"/><text x="6.5" y="6" fill="#fff">Na<tspan dy="-0.34em" font-size="68%">+</tspan></text>
-                <circle cx="19.5" cy="4" r="6.2" fill="#4C86B0"/><text x="19.5" y="6" fill="#fff">Na<tspan dy="-0.34em" font-size="68%">+</tspan></text>
-                <circle cx="-19.5" cy="20" r="6.2" fill="#8A949E"/><text x="-19.5" y="22" fill="#fff">Cl<tspan dy="-0.34em" font-size="68%">−</tspan></text>
-                <circle cx="-6.5" cy="20" r="6.2" fill="#8A949E"/><text x="-6.5" y="22" fill="#fff">Cl<tspan dy="-0.34em" font-size="68%">−</tspan></text>
-                <circle cx="6.5" cy="20" r="6.2" fill="#8A949E"/><text x="6.5" y="22" fill="#fff">Cl<tspan dy="-0.34em" font-size="68%">−</tspan></text>
-                <circle cx="19.5" cy="20" r="6.2" fill="#8A949E"/><text x="19.5" y="22" fill="#fff">Cl<tspan dy="-0.34em" font-size="68%">−</tspan></text>
+            <g transform="translate(178,64)">
+              <rect x="-37" y="-10" width="74" height="44" rx="2" fill="#FBEFE7"/>
+              <path d="M-40,-44 L-40,30 Q-40,36 -34,36 L34,36 Q40,36 40,30 L40,-44" fill="none" stroke="#5B6B77" stroke-width="1.4"/>
+              <g font-size="7.8" font-weight="800">
+                <circle cx="-27.75" cy="1" r="8.8" fill="#C1521E"/><text x="-27.75" y="3.7" fill="#fff">H<tspan dy="-0.34em" font-size="76%">+</tspan></text><circle cx="-9.25" cy="1" r="8.8" fill="#C1521E"/><text x="-9.25" y="3.7" fill="#fff">H<tspan dy="-0.34em" font-size="76%">+</tspan></text><circle cx="9.25" cy="1" r="8.8" fill="#4C86B0"/><text x="9.25" y="3.7" fill="#fff">Na<tspan dy="-0.34em" font-size="76%">+</tspan></text><circle cx="27.75" cy="1" r="8.8" fill="#4C86B0"/><text x="27.75" y="3.7" fill="#fff">Na<tspan dy="-0.34em" font-size="76%">+</tspan></text>
+                <circle cx="-27.75" cy="20" r="8.8" fill="#8A949E"/><text x="-27.75" y="22.7" fill="#fff">Cl<tspan dy="-0.34em" font-size="76%">−</tspan></text><circle cx="-9.25" cy="20" r="8.8" fill="#8A949E"/><text x="-9.25" y="22.7" fill="#fff">Cl<tspan dy="-0.34em" font-size="76%">−</tspan></text><circle cx="9.25" cy="20" r="8.8" fill="#8A949E"/><text x="9.25" y="22.7" fill="#fff">Cl<tspan dy="-0.34em" font-size="76%">−</tspan></text><circle cx="27.75" cy="20" r="8.8" fill="#8A949E"/><text x="27.75" y="22.7" fill="#fff">Cl<tspan dy="-0.34em" font-size="76%">−</tspan></text>
               </g>
-              <text y="44" font-weight="800" fill="#3A3A3A">② 절반 중화 (NaOH 2단위)</text>
-              <text y="54" fill="#C1521E" font-weight="800">아직 산성 · 총 8개</text>
+              <text y="51" font-weight="800" fill="#3A3A3A">② 절반 중화 (NaOH 2단위)</text>
+              <text y="63" fill="#C1521E" font-weight="800">아직 산성 · 총 8개</text>
             </g>
-            <g transform="translate(296,66)">
-              <rect x="-27" y="-10" width="54" height="40" rx="2" fill="#E9F2EC"/>
-              <path d="M-30,-34 L-30,24 Q-30,30 -24,30 L24,30 Q30,30 30,24 L30,-34" fill="none" stroke="#5B6B77" stroke-width="1.4"/>
-              <g font-size="5.4" font-weight="800">
-                <circle cx="-19.5" cy="0" r="6.2" fill="#4C86B0"/><text x="-19.5" y="2" fill="#fff">Na<tspan dy="-0.34em" font-size="68%">+</tspan></text>
-                <circle cx="-6.5" cy="0" r="6.2" fill="#4C86B0"/><text x="-6.5" y="2" fill="#fff">Na<tspan dy="-0.34em" font-size="68%">+</tspan></text>
-                <circle cx="6.5" cy="0" r="6.2" fill="#4C86B0"/><text x="6.5" y="2" fill="#fff">Na<tspan dy="-0.34em" font-size="68%">+</tspan></text>
-                <circle cx="19.5" cy="0" r="6.2" fill="#4C86B0"/><text x="19.5" y="2" fill="#fff">Na<tspan dy="-0.34em" font-size="68%">+</tspan></text>
-                <circle cx="-19.5" cy="17" r="6.2" fill="#8A949E"/><text x="-19.5" y="19" fill="#fff">Cl<tspan dy="-0.34em" font-size="68%">−</tspan></text>
-                <circle cx="-6.5" cy="17" r="6.2" fill="#8A949E"/><text x="-6.5" y="19" fill="#fff">Cl<tspan dy="-0.34em" font-size="68%">−</tspan></text>
-                <circle cx="6.5" cy="17" r="6.2" fill="#8A949E"/><text x="6.5" y="19" fill="#fff">Cl<tspan dy="-0.34em" font-size="68%">−</tspan></text>
-                <circle cx="19.5" cy="17" r="6.2" fill="#8A949E"/><text x="19.5" y="19" fill="#fff">Cl<tspan dy="-0.34em" font-size="68%">−</tspan></text>
+            <g transform="translate(294,64)">
+              <rect x="-37" y="-18" width="74" height="52" rx="2" fill="#E9F2EC"/>
+              <path d="M-40,-44 L-40,30 Q-40,36 -34,36 L34,36 Q40,36 40,30 L40,-44" fill="none" stroke="#5B6B77" stroke-width="1.4"/>
+              <g font-size="7.8" font-weight="800">
+                <circle cx="-27.75" cy="-7" r="8.8" fill="#4C86B0"/><text x="-27.75" y="-4.3" fill="#fff">Na<tspan dy="-0.34em" font-size="76%">+</tspan></text><circle cx="-9.25" cy="-7" r="8.8" fill="#4C86B0"/><text x="-9.25" y="-4.3" fill="#fff">Na<tspan dy="-0.34em" font-size="76%">+</tspan></text><circle cx="9.25" cy="-7" r="8.8" fill="#4C86B0"/><text x="9.25" y="-4.3" fill="#fff">Na<tspan dy="-0.34em" font-size="76%">+</tspan></text><circle cx="27.75" cy="-7" r="8.8" fill="#4C86B0"/><text x="27.75" y="-4.3" fill="#fff">Na<tspan dy="-0.34em" font-size="76%">+</tspan></text>
+                <circle cx="-27.75" cy="17" r="8.8" fill="#8A949E"/><text x="-27.75" y="19.7" fill="#fff">Cl<tspan dy="-0.34em" font-size="76%">−</tspan></text><circle cx="-9.25" cy="17" r="8.8" fill="#8A949E"/><text x="-9.25" y="19.7" fill="#fff">Cl<tspan dy="-0.34em" font-size="76%">−</tspan></text><circle cx="9.25" cy="17" r="8.8" fill="#8A949E"/><text x="9.25" y="19.7" fill="#fff">Cl<tspan dy="-0.34em" font-size="76%">−</tspan></text><circle cx="27.75" cy="17" r="8.8" fill="#8A949E"/><text x="27.75" y="19.7" fill="#fff">Cl<tspan dy="-0.34em" font-size="76%">−</tspan></text>
               </g>
-              <text y="44" font-weight="800" fill="#3A3A3A">③ 완전 중화 (NaOH 4단위)</text>
-              <text y="54" fill="#2E7A54" font-weight="800">중성 · 총 8개 — 온도 최고</text>
+              <text y="51" font-weight="800" fill="#3A3A3A">③ 완전 중화 (NaOH 4단위)</text>
+              <text y="63" fill="#2E7A54" font-weight="800">중성 · 총 8개 — 온도 최고</text>
             </g>
-            <g transform="translate(410,66)">
-              <rect x="-27" y="-16" width="54" height="46" rx="2" fill="#E8EEF7"/>
-              <path d="M-30,-34 L-30,24 Q-30,30 -24,30 L24,30 Q30,30 30,24 L30,-34" fill="none" stroke="#5B6B77" stroke-width="1.4"/>
-              <g font-size="5.4" font-weight="800">
-                <circle cx="-19.5" cy="-7" r="6.2" fill="#4C86B0"/><text x="-19.5" y="-5" fill="#fff">Na<tspan dy="-0.34em" font-size="68%">+</tspan></text>
-                <circle cx="-6.5" cy="-7" r="6.2" fill="#4C86B0"/><text x="-6.5" y="-5" fill="#fff">Na<tspan dy="-0.34em" font-size="68%">+</tspan></text>
-                <circle cx="6.5" cy="-7" r="6.2" fill="#4C86B0"/><text x="6.5" y="-5" fill="#fff">Na<tspan dy="-0.34em" font-size="68%">+</tspan></text>
-                <circle cx="19.5" cy="-7" r="6.2" fill="#4C86B0"/><text x="19.5" y="-5" fill="#fff">Na<tspan dy="-0.34em" font-size="68%">+</tspan></text>
-                <circle cx="-19.5" cy="8" r="6.2" fill="#4C86B0"/><text x="-19.5" y="10" fill="#fff">Na<tspan dy="-0.34em" font-size="68%">+</tspan></text>
-                <circle cx="-6.5" cy="8" r="6.2" fill="#4C86B0"/><text x="-6.5" y="10" fill="#fff">Na<tspan dy="-0.34em" font-size="68%">+</tspan></text>
-                <circle cx="6.5" cy="8" r="6.2" fill="#2E7A54"/><text x="6.5" y="10" fill="#fff">OH<tspan dy="-0.34em" font-size="68%">−</tspan></text>
-                <circle cx="19.5" cy="8" r="6.2" fill="#2E7A54"/><text x="19.5" y="10" fill="#fff">OH<tspan dy="-0.34em" font-size="68%">−</tspan></text>
-                <circle cx="-19.5" cy="22" r="6.2" fill="#8A949E"/><text x="-19.5" y="24" fill="#fff">Cl<tspan dy="-0.34em" font-size="68%">−</tspan></text>
-                <circle cx="-6.5" cy="22" r="6.2" fill="#8A949E"/><text x="-6.5" y="24" fill="#fff">Cl<tspan dy="-0.34em" font-size="68%">−</tspan></text>
-                <circle cx="6.5" cy="22" r="6.2" fill="#8A949E"/><text x="6.5" y="24" fill="#fff">Cl<tspan dy="-0.34em" font-size="68%">−</tspan></text>
-                <circle cx="19.5" cy="22" r="6.2" fill="#8A949E"/><text x="19.5" y="24" fill="#fff">Cl<tspan dy="-0.34em" font-size="68%">−</tspan></text>
+            <g transform="translate(410,64)">
+              <rect x="-37" y="-28" width="74" height="62" rx="2" fill="#E8EEF7"/>
+              <path d="M-40,-44 L-40,30 Q-40,36 -34,36 L34,36 Q40,36 40,30 L40,-44" fill="none" stroke="#5B6B77" stroke-width="1.4"/>
+              <g font-size="7.8" font-weight="800">
+                <circle cx="-27.75" cy="-17" r="8.8" fill="#4C86B0"/><text x="-27.75" y="-14.3" fill="#fff">Na<tspan dy="-0.34em" font-size="76%">+</tspan></text><circle cx="-9.25" cy="-17" r="8.8" fill="#4C86B0"/><text x="-9.25" y="-14.3" fill="#fff">Na<tspan dy="-0.34em" font-size="76%">+</tspan></text><circle cx="9.25" cy="-17" r="8.8" fill="#4C86B0"/><text x="9.25" y="-14.3" fill="#fff">Na<tspan dy="-0.34em" font-size="76%">+</tspan></text><circle cx="27.75" cy="-17" r="8.8" fill="#4C86B0"/><text x="27.75" y="-14.3" fill="#fff">Na<tspan dy="-0.34em" font-size="76%">+</tspan></text>
+                <circle cx="-27.75" cy="2" r="8.8" fill="#4C86B0"/><text x="-27.75" y="4.7" fill="#fff">Na<tspan dy="-0.34em" font-size="76%">+</tspan></text><circle cx="-9.25" cy="2" r="8.8" fill="#4C86B0"/><text x="-9.25" y="4.7" fill="#fff">Na<tspan dy="-0.34em" font-size="76%">+</tspan></text><circle cx="9.25" cy="2" r="8.8" fill="#2E7A54"/><text x="9.25" y="4.7" fill="#fff">OH<tspan dy="-0.34em" font-size="76%">−</tspan></text><circle cx="27.75" cy="2" r="8.8" fill="#2E7A54"/><text x="27.75" y="4.7" fill="#fff">OH<tspan dy="-0.34em" font-size="76%">−</tspan></text>
+                <circle cx="-27.75" cy="21" r="8.8" fill="#8A949E"/><text x="-27.75" y="23.7" fill="#fff">Cl<tspan dy="-0.34em" font-size="76%">−</tspan></text><circle cx="-9.25" cy="21" r="8.8" fill="#8A949E"/><text x="-9.25" y="23.7" fill="#fff">Cl<tspan dy="-0.34em" font-size="76%">−</tspan></text><circle cx="9.25" cy="21" r="8.8" fill="#8A949E"/><text x="9.25" y="23.7" fill="#fff">Cl<tspan dy="-0.34em" font-size="76%">−</tspan></text><circle cx="27.75" cy="21" r="8.8" fill="#8A949E"/><text x="27.75" y="23.7" fill="#fff">Cl<tspan dy="-0.34em" font-size="76%">−</tspan></text>
               </g>
-              <text y="44" font-weight="800" fill="#3A3A3A">④ 과잉 (NaOH 6단위)</text>
-              <text y="54" fill="#4C86B0" font-weight="800">염기성 · 총 12개</text>
+              <text y="51" font-weight="800" fill="#3A3A3A">④ 과잉 (NaOH 6단위)</text>
+              <text y="63" fill="#4C86B0" font-weight="800">염기성 · 총 12개</text>
             </g>
-            <text x="235" y="12" font-size="8.2" font-weight="800" fill="#C1521E">넣은 OH<tspan dy="-0.34em" font-size="68%">−</tspan><tspan dy="0.34em">는 H<tspan dy="-0.34em" font-size="68%">+</tspan><tspan dy="0.34em">와 만나는 즉시 물이 된다 — 그래서 ③까지 총 이온 수는 그대로!</tspan></tspan></text>
+            <text x="235" y="11" font-size="9.5" font-weight="800" fill="#C1521E">넣은 OH<tspan dy="-0.34em" font-size="76%">−</tspan><tspan dy="0.34em">는 H<tspan dy="-0.34em" font-size="76%">+</tspan><tspan dy="0.34em">와 만나는 즉시 물이 된다 — 그래서 ③까지 총 이온 수는 그대로!</tspan></tspan></text>
           </g>
         </svg>
         <figcaption>집중 그림 | 이온 개수 4장면 — H<sup>+</sup>는 줄고 Na<sup>+</sup>는 늘고, Cl<sup>−</sup>는 끝까지 그대로</figcaption>
@@ -895,24 +976,24 @@
           <th style="border-bottom:0.3mm solid var(--line); padding:2mm;">④ 과잉 <span style="color:#D6455D; font-size:7.4pt;">✍ 셀프</span></th>
         </tr>
         <tr><td style="border-bottom:0.3mm solid var(--line); padding:2mm;"><b style="color:#C1521E;">H<sup>+</sup></b> — 줄어드는 주인공</td><td style="text-align:center; border-bottom:0.3mm solid var(--line); font-weight:800;">4</td><td style="text-align:center; border-bottom:0.3mm solid var(--line); font-weight:800;">2</td><td style="text-align:center; border-bottom:0.3mm solid var(--line); font-weight:800;">0</td><td style="text-align:center; border-bottom:0.3mm solid var(--line); color:#8A949E;">(&nbsp;&nbsp;&nbsp;)</td></tr>
-        <tr style="background:#FBF3ED;"><td style="border-bottom:0.3mm solid var(--line); padding:2mm;"><b style="color:#8A949E;">Cl<sup>−</sup></b> — 구경꾼 이온</td><td style="text-align:center; border-bottom:0.3mm solid var(--line); font-weight:800;">4</td><td style="text-align:center; border-bottom:0.3mm solid var(--line); font-weight:800;">4</td><td style="text-align:center; border-bottom:0.3mm solid var(--line); font-weight:800;">4</td><td style="text-align:center; border-bottom:0.3mm solid var(--line); color:#8A949E;">(&nbsp;&nbsp;&nbsp;)</td></tr>
-        <tr><td style="border-bottom:0.3mm solid var(--line); padding:2mm;"><b style="color:#4C86B0;">Na<sup>+</sup></b> — 늘어나는 구경꾼</td><td style="text-align:center; border-bottom:0.3mm solid var(--line); font-weight:800;">0</td><td style="text-align:center; border-bottom:0.3mm solid var(--line); font-weight:800;">2</td><td style="text-align:center; border-bottom:0.3mm solid var(--line); font-weight:800;">4</td><td style="text-align:center; border-bottom:0.3mm solid var(--line); color:#8A949E;">(&nbsp;&nbsp;&nbsp;)</td></tr>
+        <tr style="background:#FBF3ED;"><td style="border-bottom:0.3mm solid var(--line); padding:2mm;"><b style="color:#8A949E;">Cl<sup>−</sup></b> — 반응하지 않는 이온</td><td style="text-align:center; border-bottom:0.3mm solid var(--line); font-weight:800;">4</td><td style="text-align:center; border-bottom:0.3mm solid var(--line); font-weight:800;">4</td><td style="text-align:center; border-bottom:0.3mm solid var(--line); font-weight:800;">4</td><td style="text-align:center; border-bottom:0.3mm solid var(--line); color:#8A949E;">(&nbsp;&nbsp;&nbsp;)</td></tr>
+        <tr><td style="border-bottom:0.3mm solid var(--line); padding:2mm;"><b style="color:#4C86B0;">Na<sup>+</sup></b> — 반응하지 않고 늘어남</td><td style="text-align:center; border-bottom:0.3mm solid var(--line); font-weight:800;">0</td><td style="text-align:center; border-bottom:0.3mm solid var(--line); font-weight:800;">2</td><td style="text-align:center; border-bottom:0.3mm solid var(--line); font-weight:800;">4</td><td style="text-align:center; border-bottom:0.3mm solid var(--line); color:#8A949E;">(&nbsp;&nbsp;&nbsp;)</td></tr>
         <tr style="background:#FBF3ED;"><td style="border-bottom:0.45mm solid var(--brand); padding:2mm;"><b style="color:#2E7A54;">OH<sup>−</sup></b> — ③까지는 항상 0</td><td style="text-align:center; border-bottom:0.45mm solid var(--brand); font-weight:800;">0</td><td style="text-align:center; border-bottom:0.45mm solid var(--brand); font-weight:800;">0</td><td style="text-align:center; border-bottom:0.45mm solid var(--brand); font-weight:800;">0</td><td style="text-align:center; border-bottom:0.45mm solid var(--brand); color:#8A949E;">(&nbsp;&nbsp;&nbsp;)</td></tr>
       </table>
       <div style="font-size:7.4pt; color:var(--sub); transform:rotate(180deg); text-align:left; margin:1mm 0 2.6mm;">정답 ④ H<sup>+</sup> 0 / Cl<sup>−</sup> 4 / Na<sup>+</sup> 6 / OH<sup>−</sup> 2 — 총 12개. 완전 중화 뒤에 넣은 것은 반응 상대가 없어 그대로 쌓인다.</div>
       <div class="expoint">
         <div class="boxtitle"><span class="ico">!</span>표에서 읽어야 할 두 가지 패턴</div>
-        <p>㉠ <b>총 이온 수는 ③까지 8개로 일정</b> — H<sup>+</sup>가 1개 사라질 때마다 Na<sup>+</sup>가 1개 들어와 자리를 채우기 때문. ㉡ 반응에 끼지 않는 <b>구경꾼 이온(Cl<sup>−</sup>)은 처음 개수 그대로</b> — 그래프에서 수평선을 찾으면 그게 구경꾼이다.</p>
+        <p>㉠ <b>총 이온 수는 ③까지 8개로 일정</b> — H<sup>+</sup>가 1개 사라질 때마다 Na<sup>+</sup>가 1개 들어와 자리를 채우기 때문. ㉡ <b>반응하지 않는 이온(구경꾼 이온, Cl<sup>−</sup>)은 처음 개수 그대로</b> — 그래프에서 수평선을 찾으면 그것이 반응하지 않는 이온이다.</p>
       </div>
     </div>
   </div>
-  <div class="folio"><span>I. 변화와 다양성</span><span class="num">57</span></div>
+  <div class="folio"><span>I. 변화와 다양성</span><span class="num">71</span></div>
 </div>
 
 <!-- ═════════════ p.58 집중 훈련 B — 빈출 유형 3제 ═════════════ -->
 <div class="page">
   <div class="runhead"><span class="unit-tag">I. 변화와 다양성</span><span class="lesson-tag">04. 산·염기와 중화 반응 | 집중 훈련</span></div>
-  <div class="step-head s2"><span class="stepno">유형</span><span class="steptt">빈출 유형 집중 — 3제</span><span class="stepdesc">이온 개수 그래프는 통합과학 화학 파트 최다 빈출 — 즉답 해설로 바로 확인</span></div>
+  <div class="step-head s2"><span class="stepno">유형</span><span class="steptt">빈출 유형 집중 — 3제</span><span class="stepdesc">심화(학평 빈출) — 이온 개수 그래프, 즉답 해설로 바로 확인</span></div>
 
   <div class="q">
     <div class="qhead"><span class="qno">A</span><div class="stem"><b>[유형 1 — 이온 개수 추적]</b> 일정량의 묽은 염산에 수산화 나트륨 수용액을 완전 중화될 때까지 조금씩 넣을 때, 혼합 용액 속 이온 수 변화로 옳은 것은? <span class="difficulty">●●●</span></div></div>
@@ -953,23 +1034,23 @@
   <div class="gist" style="margin-top:4mm;">
     <div class="boxtitle"><span class="ico">알</span>이 훈련의 결론 — 세 문장</div>
     <ul>
-      <li>이온 그래프에서 <b>수평선은 구경꾼(Cl<sup>−</sup>)</b>, 내려가는 선은 H<sup>+</sup>, 올라가는 선은 Na<sup>+</sup>다</li>
+      <li>이온 그래프에서 <b>수평선은 반응하지 않는 이온(Cl<sup>−</sup>)</b>, 내려가는 선은 H<sup>+</sup>, 올라가는 선은 Na<sup>+</sup>다</li>
       <li><b>총 이온 수는 완전 중화까지 일정</b> — H<sup>+</sup>와 Na<sup>+</sup>가 1:1로 교대하기 때문</li>
       <li>OH<sup>−</sup>는 <b>완전 중화 전엔 0</b>, 그 뒤부터 쌓인다 — 온도 꼭짓점·BTB 초록과 같은 순간이다</li>
     </ul>
   </div>
-  <div class="folio"><span>I. 변화와 다양성</span><span class="num">58</span></div>
+  <div class="folio"><span>I. 변화와 다양성</span><span class="num">72</span></div>
 </div>
 
-<!-- ═════════════ p.59 STEP 1 + STEP 2 시작 ═════════════ -->
+<!-- ═════════════ p.59 STEP 1 + STEP 2 시작 (7~10) ═════════════ -->
 <div class="page">
   <div class="runhead"><span class="unit-tag">I. 변화와 다양성</span><span class="lesson-tag">04. 산·염기와 중화 반응 | 문제</span></div>
   <div class="step-head"><span class="stepno">STEP 1</span><span class="steptt">개념 확인</span><span class="stepdesc">OX와 빈칸으로 개념 점검 — 막히면 알짜 정리로!</span></div>
   <div class="qgrid">
     <div>
-      <div class="q"><div class="qhead"><span class="qno">1</span><div class="stem">산 수용액에 마그네슘을 넣으면 수소 기체가 발생한다. <span class="ox-answer">( O , X )</span></div></div></div>
-      <div class="q"><div class="qhead"><span class="qno">2</span><div class="stem">산의 공통 성질은 수산화 이온(OH<sup>−</sup>) 때문이다. <span class="ox-answer">( O , X )</span></div></div></div>
-      <div class="q"><div class="qhead"><span class="qno">3</span><div class="stem">산과 염기를 섞으면 혼합 용액의 온도가 내려간다. <span class="ox-answer">( O , X )</span></div></div></div>
+      <div class="q"><div class="qhead"><span class="qno">1</span><div class="stem">산 수용액에 마그네슘을 넣으면 수소 기체가 발생한다. <span class="ox-answer">(&nbsp;O&nbsp;,&nbsp;X&nbsp;)</span></div></div></div>
+      <div class="q"><div class="qhead"><span class="qno">2</span><div class="stem">산의 공통 성질은 수산화 이온(OH<sup>−</sup>) 때문이다. <span class="ox-answer">(&nbsp;O&nbsp;,&nbsp;X&nbsp;)</span></div></div></div>
+      <div class="q"><div class="qhead"><span class="qno">3</span><div class="stem">산과 염기를 섞으면 혼합 용액의 온도가 내려간다. <span class="ox-answer">(&nbsp;O&nbsp;,&nbsp;X&nbsp;)</span></div></div></div>
     </div>
     <div>
       <div class="q"><div class="qhead"><span class="qno">4</span><div class="stem">아레니우스 정의에서 산은 물에 녹아 <span class="blankline" style="min-width:16mm;"></span>을 내놓는 물질이다.</div></div></div>
@@ -977,125 +1058,462 @@
       <div class="q"><div class="qhead"><span class="qno">6</span><div class="stem">페놀프탈레인 용액은 <span class="blankline" style="min-width:10mm;"></span>성 용액에서 붉게 변한다.</div></div></div>
     </div>
   </div>
+
   <div style="border-top:0.5mm solid var(--line); margin:2mm 0 4mm;"></div>
+
   <div class="step-head s2"><span class="stepno">STEP 2</span><span class="steptt">내신 완성</span><span class="stepdesc">학교 시험 유형 그대로 — 서술형까지 한 번에</span></div>
-  <div class="q">
-    <div class="qhead"><span class="qno">7</span><div class="stem">산의 성질에 대한 설명으로 옳은 것은? <span class="difficulty">●●○</span>
-    <div class="tags">10통과2-01-04 | 개념 1</div></div></div>
-    <ul class="choices">
-      <li>① 산 수용액은 만지면 미끈거린다.</li>
-      <li>② 산의 신맛은 수산화 이온 때문이다.</li>
-      <li>③ 묽은 염산에 마그네슘 조각을 넣으면 수소 기체가 발생한다.</li>
-      <li>④ 산 수용액에는 전류가 흐르지 않는다.</li>
-      <li>⑤ 아세트산은 물에 녹아 수산화 이온을 내놓는다.</li>
-    </ul>
+
+  <div class="qgrid qg2">
+    <div>
+      <div class="q">
+        <div class="qhead"><span class="qno">7</span><div class="stem">산의 성질에 대한 설명으로 옳은 것은? <span class="difficulty">●○○</span>
+        <div class="tags">10통과2-01-04 | 개념 1</div></div></div>
+        <ul class="choices">
+          <li>① 산 수용액은 만지면 미끈거린다.</li>
+          <li>② 산의 신맛은 수산화 이온 때문이다.</li>
+          <li>③ 묽은 염산에 마그네슘을 넣으면 수소가 발생한다.</li>
+          <li>④ 산 수용액에는 전류가 흐르지 않는다.</li>
+          <li>⑤ 아세트산은 물에 녹아 수산화 이온을 내놓는다.</li>
+        </ul>
+      </div>
+
+      <div class="q">
+        <div class="qhead"><span class="qno">8</span><div class="stem">염기의 성질에 대한 설명으로 옳은 것은? <span class="difficulty">●○○</span>
+        <div class="tags">10통과2-01-04 | 개념 2</div></div></div>
+        <ul class="choices">
+          <li>① 염기 수용액은 신맛이 난다.</li>
+          <li>② 염기의 공통 성질은 수소 이온 때문이다.</li>
+          <li>③ 염기 수용액은 푸른 리트머스를 붉게 만든다.</li>
+          <li>④ 염기 수용액은 대리석과 반응해 기체를 낸다.</li>
+          <li>⑤ 염기 수용액은 단백질을 녹여 미끈거린다.</li>
+        </ul>
+      </div>
+    </div>
+    <div>
+      <div class="q">
+        <div class="qhead"><span class="qno">9</span><div class="stem">수산화 나트륨 수용액과 석회수(수산화 칼슘 수용액)의 공통점으로 옳은 것만을 &lt;보기&gt;에서 있는 대로 고른 것은? <span class="difficulty">●●○</span>
+        <div class="tags">10통과2-01-04 | 개념 2 (개념 3 연계)</div></div></div>
+        <div class="bogi-box">
+          <div class="bt">보기</div>
+          ㄱ. 마그네슘 조각을 넣으면 수소 기체가 발생한다.<br>
+          ㄴ. 페놀프탈레인 용액을 떨어뜨리면 붉게 변한다.<br>
+          ㄷ. 수용액 속에 이온이 있어 전류가 흐른다.
+        </div>
+        <ul class="choices inline">
+          <li>① ㄱ</li><li>② ㄷ</li><li>③ ㄱ, ㄴ</li><li>④ ㄴ, ㄷ</li><li>⑤ ㄱ, ㄴ, ㄷ</li>
+        </ul>
+      </div>
+
+      <div class="q">
+        <div class="qhead"><span class="qno">10</span><div class="stem">지시약에 대한 설명으로 옳은 것은? <span class="difficulty">●○○</span>
+        <div class="tags">10통과2-01-04 | 개념 3</div></div></div>
+        <ul class="choices">
+          <li>① 페놀프탈레인 용액은 산성 용액에서 붉은색을 띤다.</li>
+          <li>② BTB 용액은 중성 용액에서 노란색을 띤다.</li>
+          <li>③ 페놀프탈레인 용액이 무색이면 그 용액은 산성이다.</li>
+          <li>④ 자주색 양배추 즙은 지시약으로 쓸 수 있다.</li>
+          <li>⑤ 붉은 리트머스 종이는 산성에서 푸르게 변한다.</li>
+        </ul>
+      </div>
+    </div>
   </div>
-  <div class="q">
-    <div class="qhead"><span class="qno">8</span><div class="stem">염기의 성질에 대한 설명으로 옳은 것은? <span class="difficulty">●●○</span>
-    <div class="tags">10통과2-01-04 | 개념 2</div></div></div>
-    <ul class="choices">
-      <li>① 염기 수용액은 신맛이 난다.</li>
-      <li>② 염기의 공통 성질은 수소 이온 때문이다.</li>
-      <li>③ 수산화 나트륨 수용액은 푸른 리트머스 종이를 붉게 만든다.</li>
-      <li>④ 염기 수용액은 대리석과 반응해 이산화 탄소를 발생시킨다.</li>
-      <li>⑤ 염기 수용액이 미끈거리는 것은 단백질을 녹이기 때문이다.</li>
-    </ul>
-  </div>
-  <div class="folio"><span>I. 변화와 다양성</span><span class="num">59</span></div>
+
+  <div class="folio"><span>I. 변화와 다양성</span><span class="num">73</span></div>
 </div>
 
-<!-- ═════════════ p.60 STEP 2 계속 ═════════════ -->
+<!-- ═════════════ p.60 STEP 2 계속 (11~14) ═════════════ -->
 <div class="page">
   <div class="runhead"><span class="unit-tag">I. 변화와 다양성</span><span class="lesson-tag">04. 산·염기와 중화 반응 | 문제</span></div>
-  <div class="q">
-    <div class="qhead"><span class="qno">9</span><div class="stem"><span class="badge-data">자료</span>용액 A는 푸른 리트머스 종이를 붉게 만들고 BTB 용액에서 노란색을 띠었다. 용액 B는 페놀프탈레인 용액을 붉게 만들었다. 이에 대한 설명으로 옳은 것은? <span class="difficulty">●●●</span>
-    <div class="tags">10통과2-01-04 | 개념 1·2·3</div></div></div>
-    <ul class="choices">
-      <li>① A는 염기성 용액이다.</li>
-      <li>② A에는 수소 이온(H<sup>+</sup>)이 들어 있다.</li>
-      <li>③ B는 산성 용액이다.</li>
-      <li>④ B에 마그네슘을 넣으면 수소 기체가 발생한다.</li>
-      <li>⑤ A와 B를 섞으면 아무 반응도 일어나지 않는다.</li>
-    </ul>
-  </div>
-  <div class="q">
-    <div class="qhead"><span class="qno">10</span><div class="stem">생활 속에서 중화 반응을 이용한 예로 옳은 것만을 고른 것은? <span class="difficulty">●●●</span>
-    <div class="tags">10통과2-01-04 | 개념 5</div></div></div>
-    <div class="bogi-box" style="background:#fff;">
-      (가) 위산 과다에 제산제를 복용한다.<br>
-      (나) 산성화된 토양에 석회 가루를 뿌린다.<br>
-      (다) 생선 비린내를 없애려 레몬즙을 뿌린다.
+
+  <div class="qgrid qg2">
+    <div>
+      <div class="q">
+        <div class="qhead"><span class="qno">11</span><div class="stem"><span class="must">중요</span><span class="badge-data">자료</span>그림은 수용액 (가)와 (나)에 들어 있는 이온을 모형으로 나타낸 것이다. 옳은 것만을 &lt;보기&gt;에서 있는 대로 고른 것은? <span class="difficulty">●●○</span>
+        <div class="tags">10통과2-01-04 | 개념 1·2</div></div></div>
+        <figure style="margin:2mm 0 1mm 8.4mm;">
+          <svg width="295" height="107" viewBox="0 0 270 98" font-family="PC Sans">
+            <g transform="translate(10,0)">
+              <rect x="2" y="24" width="102" height="54" rx="2" fill="#FBEFE7"/>
+              <path d="M0,10 L0,74 Q0,80 6,80 L100,80 Q106,80 106,74 L106,10" fill="none" stroke="#5B6B77" stroke-width="1.3"/>
+              <g font-size="10" font-weight="800" fill="#fff" text-anchor="middle">
+                <circle cx="18" cy="40" r="11.5" fill="#C1521E"/><text x="18" y="43.5">H<tspan dy="-0.34em" font-size="76%">+</tspan></text>
+                <circle cx="74" cy="38" r="11.5" fill="#C1521E"/><text x="74" y="41.5">H<tspan dy="-0.34em" font-size="76%">+</tspan></text>
+                <circle cx="46" cy="64" r="11.5" fill="#C1521E"/><text x="46" y="67.5">H<tspan dy="-0.34em" font-size="76%">+</tspan></text>
+                <circle cx="46" cy="38" r="11.5" fill="#8A949E"/><text x="46" y="41.5">Cl<tspan dy="-0.34em" font-size="76%">−</tspan></text>
+                <circle cx="18" cy="65" r="11.5" fill="#8A949E"/><text x="18" y="68.5">Cl<tspan dy="-0.34em" font-size="76%">−</tspan></text>
+                <circle cx="86" cy="62" r="11.5" fill="#8A949E"/><text x="86" y="65.5">Cl<tspan dy="-0.34em" font-size="76%">−</tspan></text>
+              </g>
+              <text x="53" y="95" text-anchor="middle" font-size="11" font-weight="900" fill="#22303A">(가)</text>
+            </g>
+            <g transform="translate(150,0)">
+              <rect x="2" y="24" width="102" height="54" rx="2" fill="#E9F2EC"/>
+              <path d="M0,10 L0,74 Q0,80 6,80 L100,80 Q106,80 106,74 L106,10" fill="none" stroke="#5B6B77" stroke-width="1.3"/>
+              <g font-size="10" font-weight="800" fill="#fff" text-anchor="middle">
+                <circle cx="18" cy="40" r="11.5" fill="#4C86B0"/><text x="18" y="43.5">Na<tspan dy="-0.34em" font-size="76%">+</tspan></text>
+                <circle cx="74" cy="38" r="11.5" fill="#4C86B0"/><text x="74" y="41.5">Na<tspan dy="-0.34em" font-size="76%">+</tspan></text>
+                <circle cx="46" cy="64" r="11.5" fill="#4C86B0"/><text x="46" y="67.5">Na<tspan dy="-0.34em" font-size="76%">+</tspan></text>
+                <circle cx="46" cy="38" r="11.5" fill="#2E7A54"/><text x="46" y="41.5">OH<tspan dy="-0.34em" font-size="76%">−</tspan></text>
+                <circle cx="18" cy="65" r="11.5" fill="#2E7A54"/><text x="18" y="68.5">OH<tspan dy="-0.34em" font-size="76%">−</tspan></text>
+                <circle cx="86" cy="62" r="11.5" fill="#2E7A54"/><text x="86" y="65.5">OH<tspan dy="-0.34em" font-size="76%">−</tspan></text>
+              </g>
+              <text x="53" y="95" text-anchor="middle" font-size="11" font-weight="900" fill="#22303A">(나)</text>
+            </g>
+          </svg>
+        </figure>
+        <div class="bogi-box">
+          <div class="bt">보기</div>
+          ㄱ. (가)에 마그네슘을 넣으면 수소 기체가 발생한다.<br>
+          ㄴ. (나)는 푸른 리트머스 종이를 붉게 변화시킨다.<br>
+          ㄷ. (가)와 달리 (나)는 전류가 흐르지 않는다.
+        </div>
+        <ul class="choices inline">
+          <li>① ㄱ</li><li>② ㄷ</li><li>③ ㄱ, ㄴ</li><li>④ ㄴ, ㄷ</li><li>⑤ ㄱ, ㄴ, ㄷ</li>
+        </ul>
+      </div>
+
+      <div class="q">
+        <div class="qhead"><span class="qno">12</span><div class="stem"><span class="badge-data">자료</span>표는 용액 A와 B에 지시약을 넣거나 대어 본 결과이다. 이에 대한 설명으로 옳은 것은? <span class="difficulty">●●○</span>
+        <div class="tags">10통과2-01-04 | 개념 1·2·3</div></div></div>
+        <figure style="margin:2mm 0 1mm 8.4mm;">
+          <svg width="295" height="87" viewBox="0 0 276 81" font-family="PC Sans">
+            <rect x="0.5" y="0.5" width="275" height="32" fill="#FBEFE7"/>
+            <rect x="0.5" y="0.5" width="275" height="80" fill="none" stroke="#B8C2CA" stroke-width="0.9"/>
+            <g stroke="#B8C2CA" stroke-width="0.8">
+              <line x1="0.5" y1="32.5" x2="275.5" y2="32.5"/><line x1="0.5" y1="56.5" x2="275.5" y2="56.5"/>
+              <line x1="30" y1="0.5" x2="30" y2="80.5"/><line x1="112" y1="0.5" x2="112" y2="80.5"/><line x1="194" y1="0.5" x2="194" y2="80.5"/>
+            </g>
+            <g font-size="10.4" font-weight="800" fill="#C1521E" text-anchor="middle"><text x="15" y="20.5">용액</text><text x="71" y="14">푸른 리트머스</text><text x="71" y="27">종이</text><text x="153" y="14">페놀프탈레인</text><text x="153" y="27">용액</text><text x="235" y="20.5">BTB 용액</text></g>
+            <g font-size="10.4" fill="#22303A" text-anchor="middle">
+              <text x="15" y="48.5" font-weight="900" font-size="10.6">A</text><text x="71" y="48.5">붉게 변함</text><text x="153" y="48.5">무색</text><text x="235" y="48.5">노란색</text>
+              <text x="15" y="72.5" font-weight="900" font-size="10.6">B</text><text x="71" y="72.5">변화 없음</text><text x="153" y="72.5">붉은색</text><text x="235" y="72.5">파란색</text>
+            </g>
+          </svg>
+        </figure>
+        <ul class="choices">
+          <li>① A는 염기성 용액이다.</li>
+          <li>② A에는 수소 이온(H<sup>+</sup>)이 들어 있다.</li>
+          <li>③ B는 산성 용액이다.</li>
+          <li>④ B에 마그네슘을 넣으면 수소 기체가 발생한다.</li>
+          <li>⑤ A와 B를 섞으면 아무 반응도 일어나지 않는다.</li>
+        </ul>
+      </div>
     </div>
-    <ul class="choices inline">
-      <li>① (가)</li><li>② (나)</li><li>③ (가), (다)</li><li>④ (나), (다)</li><li>⑤ (가), (나), (다)</li>
-    </ul>
+    <div>
+      <div class="q">
+        <div class="qhead"><span class="qno">13</span><div class="stem">다음은 중화 반응에 대한 학생 A~C의 대화이다. 옳게 말한 학생만을 있는 대로 고른 것은? <span class="difficulty">●●○</span>
+        <div class="tags">10통과2-01-04 | 개념 4</div></div></div>
+        <div class="bogi-box">
+          <b>학생 A</b> : 중화 반응이 일어나면 열을 흡수해서 혼합 용액의 온도가 내려가.<br>
+          <b>학생 B</b> : 중화 반응에서는 H<sup>+</sup>와 OH<sup>−</sup>가 1&nbsp;:&nbsp;1의 개수 비로 만나 물이 돼.<br>
+          <b>학생 C</b> : 묽은 염산과 수산화 나트륨 수용액이 중화하면 물과 함께 염인 염화 나트륨이 생겨.
+        </div>
+        <ul class="choices inline">
+          <li>① A</li><li>② C</li><li>③ A, B</li><li>④ B, C</li><li>⑤ A, B, C</li>
+        </ul>
+      </div>
+
+      <div class="q">
+        <div class="qhead"><span class="qno">14</span><div class="stem"><span class="must">중요</span><span class="badge-data">탐구</span>다음은 산과 염기를 섞을 때의 온도와 지시약의 색을 알아보는 실험이다.
+          <div class="exp" style="font-size:9pt;"><b>[과정]</b> (가) 처음 온도가 20.0&nbsp;°C로 같은 묽은 염산과 수산화 나트륨(NaOH) 수용액을 준비한다.<br>(나) 비커 A~E에 두 용액을 전체 부피가 20&nbsp;mL가 되도록 표와 같이 섞고, BTB 용액을 2~3방울 떨어뜨린 뒤 가장 높은 온도와 색을 기록한다.<br><b>[결과]</b>
+            <figure>
+              <svg width="273" height="108" viewBox="0 0 265 105" font-family="PC Sans">
+                <rect x="0.5" y="0.5" width="264" height="20" fill="#FBEFE7"/>
+                <rect x="0.5" y="0.5" width="264" height="104" fill="#fff" fill-opacity="0" stroke="#B8C2CA" stroke-width="0.9"/>
+                <g stroke="#B8C2CA" stroke-width="0.8">
+                  <line x1="0.5" y1="20.5" x2="264.5" y2="20.5"/><line x1="0.5" y1="41.5" x2="264.5" y2="41.5"/><line x1="0.5" y1="62.5" x2="264.5" y2="62.5"/><line x1="0.5" y1="83.5" x2="264.5" y2="83.5"/>
+                  <line x1="94" y1="0.5" x2="94" y2="104.5"/><line x1="128" y1="0.5" x2="128" y2="104.5"/><line x1="162" y1="0.5" x2="162" y2="104.5"/><line x1="196" y1="0.5" x2="196" y2="104.5"/><line x1="230" y1="0.5" x2="230" y2="104.5"/>
+                </g>
+                <g font-size="10.8" font-weight="800" fill="#C1521E" text-anchor="middle"><text x="47" y="14.5">비커</text><text x="111" y="14.5">A</text><text x="145" y="14.5">B</text><text x="179" y="14.5">C</text><text x="213" y="14.5">D</text><text x="247" y="14.5">E</text></g>
+                <g font-size="10.6" font-weight="700" fill="#4A5964" text-anchor="middle"><text x="47" y="35.5">묽은 염산(mL)</text><text x="47" y="56.5">NaOH 수용액(mL)</text><text x="47" y="77.5">최고 온도(°C)</text><text x="47" y="98.5">BTB 색</text></g>
+                <g font-size="10.45" font-weight="400" fill="#22303A" text-anchor="middle">
+                  <text x="111" y="35.5">16</text><text x="145" y="35.5">14</text><text x="179" y="35.5">12</text><text x="213" y="35.5">10</text><text x="247" y="35.5">8</text>
+                  <text x="111" y="56.5">4</text><text x="145" y="56.5">6</text><text x="179" y="56.5">8</text><text x="213" y="56.5">10</text><text x="247" y="56.5">12</text>
+                  <text x="111" y="77.5">23.0</text><text x="145" y="77.5">24.5</text><text x="179" y="77.5">26.0</text><text x="213" y="77.5">25.0</text><text x="247" y="77.5">24.0</text>
+                  <text x="111" y="98.5">노란색</text><text x="145" y="98.5">노란색</text><text x="179" y="98.5" font-weight="800">㉠</text><text x="213" y="98.5">파란색</text><text x="247" y="98.5">파란색</text>
+                </g>
+              </svg>
+            </figure>
+          </div>
+          이에 대한 설명으로 옳은 것만을 &lt;보기&gt;에서 있는 대로 고른 것은? <span class="difficulty">●●●</span>
+        <div class="tags">10통과2-01-04 | 개념 3·4, 교과서 탐구</div></div></div>
+        <div class="bogi-box">
+          <div class="bt">보기</div>
+          ㄱ. ㉠은 초록색이다.<br>
+          ㄴ. 같은 부피에 들어 있는 이온 수는 묽은 염산 속 H<sup>+</sup>가 NaOH 수용액 속 OH<sup>−</sup>보다 적다.<br>
+          ㄷ. E의 혼합 용액에 마그네슘 리본을 넣으면 수소 기체가 발생한다.
+        </div>
+        <ul class="choices inline">
+          <li>① ㄱ</li><li>② ㄷ</li><li>③ ㄱ, ㄴ</li><li>④ ㄴ, ㄷ</li><li>⑤ ㄱ, ㄴ, ㄷ</li>
+        </ul>
+      </div>
+    </div>
   </div>
-  <div class="q">
-    <div class="qhead"><span class="qno">11</span><div class="stem"><span class="badge-essay">서술형</span>속이 쓰릴 때 염기성 물질이 든 제산제를 먹으면 증상이 나아지는 까닭을 <b>'위산'과 '중화'</b>라는 말을 포함하여 서술하시오. <span class="difficulty">●●●●</span>
-    <div class="tags">10통과2-01-04 | 개념 4·5</div></div></div>
-    <div class="essay-lines"><div></div><div></div><div></div></div>
-  </div>
-  <div class="folio"><span>I. 변화와 다양성</span><span class="num">60</span></div>
+
+  <div class="folio"><span>I. 변화와 다양성</span><span class="num">74</span></div>
 </div>
 
-<!-- ═════════════ p.61 STEP 3 ═════════════ -->
+<!-- ═════════════ STEP 2 계속 (15~17) + 서술형 (18~20) ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag">I. 변화와 다양성</span><span class="lesson-tag">04. 산·염기와 중화 반응 | 문제</span></div>
+
+  <div class="qgrid qg2">
+    <div>
+      <div class="q">
+        <div class="qhead"><span class="qno">15</span><div class="stem"><span class="must">중요</span><span class="badge-data">자료</span>그림은 묽은 염산에 NaOH 수용액을 넣을 때 이온 A~D의 수를 나타낸 것이다. 옳은 것만을 &lt;보기&gt;에서 있는 대로 고른 것은? <span class="difficulty">●●●</span>
+        <div class="tags">10통과2-01-04 | 개념 4, 집중 훈련(심화)</div></div></div>
+        <figure style="margin:2mm 0 1mm 8.4mm;">
+          <svg width="295" height="120" viewBox="0 0 276 112" font-family="PC Sans">
+            <line x1="36" y1="84" x2="266" y2="84" stroke="#5B6B77" stroke-width="1.1" marker-end="url(#arrP)"/>
+            <line x1="36" y1="84" x2="36" y2="8" stroke="#5B6B77" stroke-width="1.1" marker-end="url(#arrP)"/>
+            <text x="41" y="11" font-size="10.4" fill="#5B6B77">이온 수</text>
+            <text x="270" y="110" text-anchor="end" font-size="10.4" fill="#5B6B77">넣어 준 NaOH 수용액의 부피</text>
+            <g stroke="#B8C2CA" stroke-width="0.8" stroke-dasharray="2.5 2">
+              <line x1="144" y1="20" x2="144" y2="84"/><line x1="252" y1="20" x2="252" y2="84"/>
+              <line x1="36" y1="24" x2="252" y2="24"/>
+            </g>
+            <g font-size="10.4" fill="#5B6B77" text-anchor="end"><text x="32" y="57.6">N</text><text x="32" y="27.6">2N</text><text x="32" y="92">0</text></g>
+            <g font-size="10.4" fill="#5B6B77" text-anchor="middle"><text x="144" y="95">V(완전 중화점)</text><text x="252" y="95">2V</text></g>
+            <polyline points="36,54 144,84 252,84" fill="none" stroke="#C1521E" stroke-width="1.8"/>
+            <polyline points="36,54 252,54" fill="none" stroke="#8A949E" stroke-width="1.8"/>
+            <polyline points="36,84 252,24" fill="none" stroke="#4C86B0" stroke-width="1.8"/>
+            <polyline points="36,84 144,84 252,54" fill="none" stroke="#2E7A54" stroke-width="1.8" stroke-dasharray="4 2"/>
+            <g font-size="11" font-weight="900" text-anchor="middle">
+              <text x="62" y="76" fill="#C1521E">A</text>
+              <text x="96" y="50" fill="#8A949E">B</text>
+              <text x="214" y="32" fill="#4C86B0">C</text>
+              <text x="216" y="75" fill="#2E7A54">D</text>
+            </g>
+          </svg>
+        </figure>
+        <div class="bogi-box">
+          <div class="bt">보기</div>
+          ㄱ. A는 H<sup>+</sup>이다.<br>
+          ㄴ. B는 중화 반응에 참여하지 않는 이온이다.<br>
+          ㄷ. 넣어 준 부피가 2V일 때 혼합 용액 속 전체 이온 수는 처음의 2배이다.
+        </div>
+        <ul class="choices inline">
+          <li>① ㄱ</li><li>② ㄷ</li><li>③ ㄱ, ㄴ</li><li>④ ㄴ, ㄷ</li><li>⑤ ㄱ, ㄴ, ㄷ</li>
+        </ul>
+      </div>
+
+      <div class="q">
+        <div class="qhead"><span class="qno">16</span><div class="stem">pH에 대한 설명으로 옳은 것은? <span class="difficulty">●○○</span>
+        <div class="tags">10통과2-01-04 | 개념 3 (pH)</div></div></div>
+        <ul class="choices">
+          <li>① 순수한 물(pH 7)에서 BTB 용액은 초록색이다.</li>
+          <li>② pH가 작을수록 OH<sup>−</sup>가 많아 염기성이 강하다.</li>
+          <li>③ 바닷물(pH 약 8.1)은 약한 산성을 띤다.</li>
+          <li>④ 비누 물(pH 약 9~10)은 산성이다.</li>
+          <li>⑤ 위산에 제산제를 넣으면 pH가 점점 작아진다.</li>
+        </ul>
+      </div>
+
+      <div class="q">
+        <div class="qhead"><span class="qno">17</span><div class="stem">생활 속 중화 반응에 대해 옳은 것만을 &lt;보기&gt;에서 있는 대로 고른 것은? <span class="difficulty">●●○</span>
+        <div class="tags">10통과2-01-04 | 개념 5</div></div></div>
+        <div class="bogi-box">
+          <div class="bt">보기</div>
+          ㄱ. 넘친 H<sup>+</sup>는 H<sup>+</sup>를 내놓는 물질로 없앤다.<br>
+          ㄴ. 치약은 입안의 염기를 중화해 충치를 예방한다.<br>
+          ㄷ. 공장의 산성 배기가스를 염기성 물질로 걸러 내는 것은 중화를 이용한 것이다.
+        </div>
+        <ul class="choices inline">
+          <li>① ㄱ</li><li>② ㄷ</li><li>③ ㄱ, ㄴ</li><li>④ ㄴ, ㄷ</li><li>⑤ ㄱ, ㄴ, ㄷ</li>
+        </ul>
+      </div>
+    </div>
+    <div>
+      <div class="q">
+        <div class="qhead"><span class="qno">18</span><div class="stem"><span class="badge-essay">서술형</span>속이 쓰릴 때 제산제를 먹으면 증상이 나아지는 까닭을 <b>'위산'</b>, <b>'염기성'</b>, <b>'중화'</b>를 모두 포함하여 서술하시오. <span class="difficulty">●●○</span>
+        <div class="tags">10통과2-01-04 | 개념 4·5</div></div></div>
+        <div class="essay-lines"><div></div><div></div><div></div><div></div><div></div></div>
+      </div>
+
+      <div class="q">
+        <div class="qhead"><span class="qno">19</span><div class="stem"><span class="badge-essay">서술형</span>묽은 염산과 아세트산 수용액은 모두 신맛이 나고 마그네슘과 반응해 수소 기체를 낸다. 서로 다른 산이 같은 성질을 나타내는 까닭을 <b>'물에 녹아'</b>, <b>'수소 이온'</b>을 모두 포함하여 서술하시오. <span class="difficulty">●●○</span>
+        <div class="tags">10통과2-01-04 | 개념 1</div></div></div>
+        <div class="essay-lines"><div></div><div></div><div></div><div></div><div></div></div>
+      </div>
+
+      <div class="q">
+        <div class="qhead"><span class="qno">20</span><div class="stem"><span class="badge-essay">서술형</span>BTB 용액을 넣은 묽은 염산에 수산화 나트륨 수용액을 조금씩 넣으면 혼합 용액의 온도는 높아지다가 완전 중화점이 지나면 낮아진다. 완전 중화점이 지난 뒤 온도가 낮아지는 까닭을 <b>'수소 이온'</b>, <b>'중화열'</b>을 모두 포함하여 서술하시오. <span class="difficulty">●●●</span>
+        <div class="tags">10통과2-01-04 | 개념 4, 자료 파헤치기</div></div></div>
+        <div class="essay-lines"><div></div><div></div><div></div><div></div><div></div><div></div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="folio"><span>I. 변화와 다양성</span><span class="num">75</span></div>
+</div>
+
+<!-- ═════════════ p.61 STEP 3 (21~24) ═════════════ -->
 <div class="page">
   <div class="runhead"><span class="unit-tag">I. 변화와 다양성</span><span class="lesson-tag">04. 산·염기와 중화 반응 | 문제</span></div>
   <div class="step-head s3"><span class="stepno">STEP 3</span><span class="steptt">수능 도전</span><span class="stepdesc">2028 수능 규격 — ㄱㄴㄷ 합답형·자료 해석</span></div>
-  <div class="q">
-    <div class="qhead"><span class="qno">12</span><div class="stem"><span class="badge-data">자료</span>그림은 BTB 용액을 넣은 일정량의 묽은 염산에 수산화 나트륨 수용액을 조금씩 넣을 때 혼합 용액의 온도를 나타낸 것이다. 옳은 것만을 &lt;보기&gt;에서 있는 대로 고른 것은? <span class="difficulty">[2점]</span>
-    <div class="tags">10통과2-01-04</div></div></div>
-    <figure style="margin:2mm 0 1mm 8.6mm;">
-      <svg width="280" height="92" viewBox="0 0 280 92" font-family="PC Sans">
-        <line x1="26" y1="76" x2="270" y2="76" stroke="#5B6B77" stroke-width="1.1" marker-end="url(#arrP)"/>
-        <line x1="26" y1="76" x2="26" y2="8" stroke="#5B6B77" stroke-width="1.1" marker-end="url(#arrP)"/>
-        <text x="268" y="88" text-anchor="end" font-size="6.6" fill="#5B6B77">넣어 준 수산화 나트륨 수용액의 부피</text>
-        <text x="30" y="8" font-size="6.6" fill="#5B6B77">온도</text>
-        <path d="M40,66 L142,24 L240,46" fill="none" stroke="#C1521E" stroke-width="2"/>
-        <line x1="142" y1="24" x2="142" y2="76" stroke="#D6455D" stroke-width="1" stroke-dasharray="2.5 2"/>
-        <circle cx="142" cy="24" r="3" fill="#D6455D"/>
-        <text x="142" y="86" text-anchor="middle" font-size="7" font-weight="800" fill="#D6455D">P</text>
-      </svg>
-    </figure>
-    <div class="bogi-box">
-      <div class="bt">보기</div>
-      ㄱ. P에서 혼합 용액은 중성이고 BTB는 초록색이다.<br>
-      ㄴ. P 이전 구간에서 수산화 나트륨을 넣을수록 용액 속 H<sup>+</sup> 수는 증가한다.<br>
-      ㄷ. P 이후 더 넣으면 용액은 염기성이 되고 BTB는 파란색이 된다.
+
+  <div class="qgrid qg2">
+    <div>
+      <div class="q">
+        <div class="qhead"><span class="qno">21</span><div class="stem"><span class="badge-data">자료</span>그림은 BTB 용액을 넣은 일정량의 묽은 염산에 수산화 나트륨 수용액을 조금씩 넣을 때 혼합 용액의 온도를 나타낸 것이다. 옳은 것만을 &lt;보기&gt;에서 있는 대로 고른 것은? <span class="difficulty">●●○ [2점]</span>
+        <div class="tags">10통과2-01-04 | 개념 4, 자료 파헤치기</div></div></div>
+        <figure style="margin:2mm 0 1mm 8.6mm;">
+          <svg width="295" height="110" viewBox="0 0 280 104" font-family="PC Sans">
+            <line x1="26" y1="76" x2="270" y2="76" stroke="#5B6B77" stroke-width="1.1" marker-end="url(#arrP)"/>
+            <line x1="26" y1="76" x2="26" y2="8" stroke="#5B6B77" stroke-width="1.1" marker-end="url(#arrP)"/>
+            <text x="270" y="101" text-anchor="end" font-size="10.4" fill="#5B6B77">넣어 준 수산화 나트륨 수용액의 부피</text>
+            <text x="31" y="10" font-size="10.4" fill="#5B6B77">온도</text>
+            <path d="M40,66 L142,24 L240,46" fill="none" stroke="#C1521E" stroke-width="2"/>
+            <line x1="142" y1="24" x2="142" y2="76" stroke="#D6455D" stroke-width="1" stroke-dasharray="2.5 2"/>
+            <circle cx="142" cy="24" r="3" fill="#D6455D"/>
+            <text x="142" y="88" text-anchor="middle" font-size="11" font-weight="800" fill="#D6455D">P</text>
+          </svg>
+        </figure>
+        <div class="bogi-box">
+          <div class="bt">보기</div>
+          ㄱ. P 이전 구간에서 OH<sup>−</sup> 수는 점점 증가한다.<br>
+          ㄴ. 혼합 용액 속 Cl<sup>−</sup> 수는 P에서 가장 많다.<br>
+          ㄷ. P 이후 용액은 염기성이고 BTB는 파란색이다.
+        </div>
+        <ul class="choices inline">
+          <li>① ㄱ</li><li>② ㄷ</li><li>③ ㄱ, ㄴ</li><li>④ ㄴ, ㄷ</li><li>⑤ ㄱ, ㄴ, ㄷ</li>
+        </ul>
+      </div>
+
+      <div class="q">
+        <div class="qhead"><span class="qno">22</span><div class="stem"><span class="badge-data">자료</span>표는 생활 속 물질 (가)~(다)의 대략적인 pH이다. 옳은 것만을 &lt;보기&gt;에서 있는 대로 고른 것은? <span class="difficulty">●●○ [2점]</span>
+        <div class="tags">10통과2-01-04 | 개념 3·4 (2203 해양 산성화 연계)</div></div></div>
+        <figure style="margin:2mm 0 1mm 8.4mm;">
+          <svg width="295" height="47" viewBox="0 0 262 42" font-family="PC Sans">
+            <rect x="0.5" y="0.5" width="261" height="20" fill="#FBEFE7"/>
+            <rect x="0.5" y="0.5" width="261" height="40" fill="none" stroke="#B8C2CA" stroke-width="0.9"/>
+            <g stroke="#B8C2CA" stroke-width="0.8"><line x1="0.5" y1="20.5" x2="261.5" y2="20.5"/><line x1="38" y1="0.5" x2="38" y2="40.5"/><line x1="102" y1="0.5" x2="102" y2="40.5"/><line x1="174" y1="0.5" x2="174" y2="40.5"/></g>
+            <g font-size="9.8" font-weight="800" fill="#C1521E" text-anchor="middle"><text x="19" y="14">물질</text><text x="70" y="14">(가) 레몬즙</text><text x="138" y="14">(나) 순수한 물</text><text x="218" y="14">(다) 하수구 세정제</text></g>
+            <g font-size="10" fill="#22303A" text-anchor="middle"><text x="19" y="34.5" font-size="9.8" font-weight="800" fill="#C1521E">pH</text><text x="70" y="34.5">약 2</text><text x="138" y="34.5">7</text><text x="218" y="34.5">약 13</text></g>
+          </svg>
+        </figure>
+        <div class="bogi-box">
+          <div class="bt">보기</div>
+          ㄱ. (가)에 BTB 용액을 떨어뜨리면 노란색을 띤다.<br>
+          ㄴ. (다)에 (가)를 조금씩 넣으면 pH가 작아진다.<br>
+          ㄷ. 바닷물의 pH가 약 8.2에서 약 8.1로 낮아진 것은 바닷물이 산성 용액이 되었다는 뜻이다.
+        </div>
+        <ul class="choices inline">
+          <li>① ㄱ</li><li>② ㄷ</li><li>③ ㄱ, ㄴ</li><li>④ ㄴ, ㄷ</li><li>⑤ ㄱ, ㄴ, ㄷ</li>
+        </ul>
+      </div>
     </div>
-    <ul class="choices inline">
-      <li>① ㄱ</li><li>② ㄴ</li><li>③ ㄱ, ㄴ</li><li>④ ㄱ, ㄷ</li><li>⑤ ㄴ, ㄷ</li>
-    </ul>
+    <div>
+      <div class="q">
+        <div class="qhead"><span class="qno">23</span><div class="stem"><span class="badge-data">자료</span>그림은 묽은 염산을 이용한 실험 (가)와 (나)이다. (가)에서는 기체가 발생했고, (나)에서는 온도가 높아지며 BTB 용액의 색이 노란색에서 초록색으로 변했다. 옳은 것만을 &lt;보기&gt;에서 있는 대로 고른 것은? <span class="difficulty">●●● [2.5점]</span>
+        <div class="tags">10통과2-01-04 | 개념 1·4 (03 산화와 환원 연계)</div></div></div>
+        <figure style="margin:2mm 0 1mm 8.4mm;">
+          <svg width="295" height="108" viewBox="0 0 280 102" font-family="PC Sans">
+            <!-- (가) 묽은 염산 + 마그네슘 리본 -->
+            <g transform="translate(18,0)">
+              <rect x="2" y="44" width="92" height="40" rx="2" fill="#FDE7D9"/>
+              <rect x="40" y="16" width="7" height="64" rx="1" fill="#8A8F98" stroke="#6B7680" stroke-width="0.8" transform="rotate(-8 43 48)"/>
+              <g fill="#fff" stroke="#9AB8CC" stroke-width="0.9">
+                <circle cx="56" cy="74" r="2.4"/><circle cx="60" cy="64" r="2.4"/><circle cx="54" cy="56" r="2.6"/><circle cx="62" cy="48" r="2.6"/>
+                <circle cx="58" cy="36" r="2.8"/><circle cx="64" cy="26" r="3"/>
+              </g>
+              <g font-size="10.4" font-weight="800" fill="#fff" text-anchor="middle">
+                <circle cx="18" cy="60" r="10" fill="#C1521E"/><text x="17.5" y="63.7">H<tspan dy="-0.34em" font-size="76%">+</tspan></text>
+                <circle cx="78" cy="70" r="10" fill="#C1521E"/><text x="77.5" y="73.7">H<tspan dy="-0.34em" font-size="76%">+</tspan></text>
+              </g>
+              <path d="M0,30 L0,80 Q0,86 6,86 L90,86 Q96,86 96,80 L96,30" fill="none" stroke="#5B6B77" stroke-width="1.3"/>
+              <text x="24" y="22" text-anchor="end" font-size="10.4" font-weight="700" fill="#5B6B77">마그네슘</text>
+              <text x="70" y="16" font-size="10.4" font-weight="800" fill="#2E6690">기체</text>
+              <text x="48" y="99" text-anchor="middle" font-size="11" font-weight="900" fill="#22303A">(가)</text>
+            </g>
+            <!-- (나) 묽은 염산(BTB) + NaOH 수용액 -->
+            <g transform="translate(160,0)">
+              <rect x="2" y="44" width="92" height="40" rx="2" fill="#E3EFD9"/>
+              <path d="M40,2 L52,2 L52,18 L48,26 L44,26 L40,18 Z" fill="#E8EEF7" stroke="#5B6B77" stroke-width="1"/>
+              <circle cx="46" cy="33" r="2.4" fill="#4C86B0"/>
+              <rect x="74" y="10" width="5" height="70" rx="2.5" fill="#fff" stroke="#5B6B77" stroke-width="0.9"/>
+              <rect x="75.5" y="40" width="2" height="38" fill="#D6455D"/><circle cx="76.5" cy="79" r="3.6" fill="#D6455D"/>
+              <path d="M0,30 L0,80 Q0,86 6,86 L90,86 Q96,86 96,80 L96,30" fill="none" stroke="#5B6B77" stroke-width="1.3"/>
+              <text x="36" y="12" text-anchor="end" font-size="10.4" font-weight="700" fill="#5B6B77">NaOH 수용액</text>
+              <text x="83" y="22" font-size="10.4" font-weight="700" fill="#5B6B77">온도계</text>
+              <text x="48" y="99" text-anchor="middle" font-size="11" font-weight="900" fill="#22303A">(나)</text>
+            </g>
+          </svg>
+        </figure>
+        <div class="bogi-box">
+          <div class="bt">보기</div>
+          ㄱ. (가)에서 마그네슘은 전자를 잃고 산화된다.<br>
+          ㄴ. (가)와 (나)에서 H<sup>+</sup>는 모두 전자를 얻는다.<br>
+          ㄷ. (가)와 (나)는 모두 중화 반응이다.
+        </div>
+        <ul class="choices inline">
+          <li>① ㄱ</li><li>② ㄷ</li><li>③ ㄱ, ㄴ</li><li>④ ㄴ, ㄷ</li><li>⑤ ㄱ, ㄴ, ㄷ</li>
+        </ul>
+      </div>
+
+      <div class="q">
+        <div class="qhead"><span class="qno">24</span><div class="stem"><span class="badge-data">자료</span>그림은 묽은 염산 10&nbsp;mL에 수산화 나트륨 수용액 5&nbsp;mL를 넣은 혼합 용액 (가)의 이온 모형이고, 표는 혼합 용액 (가)~(다)이다. 옳은 것만을 &lt;보기&gt;에서 있는 대로 고른 것은? <span class="difficulty">●●● [2.5점]</span>
+        <div class="tags">10통과2-01-04 | 개념 3·4, 집중 훈련(심화) · 자료 두 개 엮기</div></div></div>
+        <figure style="margin:2mm 0 1mm 8.4mm;">
+          <svg width="295" height="98" viewBox="0 0 284 94" font-family="PC Sans">
+            <g transform="translate(2,0)">
+              <rect x="2" y="14" width="92" height="60" rx="2" fill="#FBEFE7"/>
+              <path d="M0,6 L0,70 Q0,76 6,76 L90,76 Q96,76 96,70 L96,6" fill="none" stroke="#5B6B77" stroke-width="1.3"/>
+              <g font-size="10.5" font-weight="800" fill="#fff" text-anchor="middle">
+                <circle cx="13" cy="30" r="10.5" fill="#C1521E"/><text x="13" y="33.7">H<tspan dy="-0.34em" font-size="76%">+</tspan></text>
+                <circle cx="36" cy="28" r="10.5" fill="#8A949E"/><text x="36" y="31.7">Cl<tspan dy="-0.34em" font-size="76%">−</tspan></text>
+                <circle cx="59" cy="33" r="10.5" fill="#4C86B0"/><text x="59" y="36.7">Na<tspan dy="-0.34em" font-size="76%">+</tspan></text>
+                <circle cx="82" cy="30" r="10.5" fill="#8A949E"/><text x="82" y="33.7">Cl<tspan dy="-0.34em" font-size="76%">−</tspan></text>
+                <circle cx="13" cy="57" r="10.5" fill="#8A949E"/><text x="13" y="60.7">Cl<tspan dy="-0.34em" font-size="76%">−</tspan></text>
+                <circle cx="36" cy="59" r="10.5" fill="#8A949E"/><text x="36" y="62.7">Cl<tspan dy="-0.34em" font-size="76%">−</tspan></text>
+                <circle cx="59" cy="57" r="10.5" fill="#C1521E"/><text x="59" y="60.7">H<tspan dy="-0.34em" font-size="76%">+</tspan></text>
+                <circle cx="82" cy="58" r="10.5" fill="#4C86B0"/><text x="82" y="61.7">Na<tspan dy="-0.34em" font-size="76%">+</tspan></text>
+              </g>
+              <text x="48" y="91" text-anchor="middle" font-size="10.6" font-weight="800" fill="#22303A">혼합 용액 (가)</text>
+            </g>
+            <g transform="translate(103,8)">
+              <rect x="0.5" y="0.5" width="180" height="20" fill="#FBEFE7"/>
+              <rect x="0.5" y="0.5" width="180" height="76" fill="none" stroke="#B8C2CA" stroke-width="0.9"/>
+              <g stroke="#B8C2CA" stroke-width="0.8">
+                <line x1="0.5" y1="20.5" x2="180.5" y2="20.5"/><line x1="0.5" y1="48.5" x2="180.5" y2="48.5"/>
+                <line x1="72" y1="0.5" x2="72" y2="76.5"/><line x1="108" y1="0.5" x2="108" y2="76.5"/><line x1="144" y1="0.5" x2="144" y2="76.5"/>
+              </g>
+              <g font-size="10.5" font-weight="800" fill="#C1521E" text-anchor="middle"><text x="36" y="14.5">혼합 용액</text><text x="90" y="14.5">(가)</text><text x="126" y="14.5">(나)</text><text x="162" y="14.5">(다)</text></g>
+              <g font-size="10.5" font-weight="700" fill="#4A5964" text-anchor="middle"><text x="36" y="32">묽은 염산</text><text x="36" y="44.5">(mL)</text><text x="36" y="60">NaOH 수용액</text><text x="36" y="72.5">(mL)</text></g>
+              <g font-size="10.6" fill="#22303A" text-anchor="middle">
+                <text x="90" y="38.5">10</text><text x="126" y="38.5">10</text><text x="162" y="38.5">10</text>
+                <text x="90" y="66.5">5</text><text x="126" y="66.5">10</text><text x="162" y="66.5">15</text>
+              </g>
+            </g>
+          </svg>
+        </figure>
+        <div class="bogi-box">
+          <div class="bt">보기</div>
+          ㄱ. 묽은 염산 10&nbsp;mL 속 H<sup>+</sup> 수와 NaOH 수용액 10&nbsp;mL 속 OH<sup>−</sup> 수는 같다.<br>
+          ㄴ. (다)에 BTB 용액을 떨어뜨리면 파란색을 띤다.<br>
+          ㄷ. 전체 이온 수는 (다)가 (나)의 1.5배이다.
+        </div>
+        <ul class="choices inline">
+          <li>① ㄱ</li><li>② ㄷ</li><li>③ ㄱ, ㄴ</li><li>④ ㄴ, ㄷ</li><li>⑤ ㄱ, ㄴ, ㄷ</li>
+        </ul>
+      </div>
+    </div>
   </div>
-  <div class="q">
-    <div class="qhead"><span class="qno">13</span><div class="stem"><span class="badge-data">자료</span>다음은 생활 속 산·염기 이용 사례다. 옳은 것만을 &lt;보기&gt;에서 있는 대로 고른 것은? <span class="difficulty">[2.5점]</span>
-    <div class="tags">10통과2-01-04</div></div></div>
-    <div class="bogi-box" style="background:#fff;">
-      ○ 속이 쓰릴 때 제산제를 복용한다.<br>
-      ○ 생선회에 레몬즙을 뿌려 비린내를 줄인다.<br>
-      ○ 산성비로 산성화된 호수에 석회를 뿌린다.
-    </div>
-    <div class="bogi-box">
-      <div class="bt">보기</div>
-      ㄱ. 제산제는 위산(염산)을 중화하는 염기성 물질이다.<br>
-      ㄴ. 비린내의 원인 물질은 염기성이므로 산인 레몬즙으로 중화된다.<br>
-      ㄷ. 호수에 석회를 뿌리는 것은 산화·환원 반응을 이용한 것이다.
-    </div>
-    <ul class="choices inline">
-      <li>① ㄱ, ㄴ</li><li>② ㄴ</li><li>③ ㄱ, ㄷ</li><li>④ ㄴ, ㄷ</li><li>⑤ ㄱ, ㄴ, ㄷ</li>
-    </ul>
-  </div>
-  <div class="folio"><span>I. 변화와 다양성</span><span class="num">61</span></div>
+
+  <div class="folio"><span>I. 변화와 다양성</span><span class="num">76</span></div>
 </div>
 
 <!-- ═════════════ p.62 해설 1 ═════════════ -->
 <div class="page">
   <div class="runhead"><span class="unit-tag" style="color:var(--brand);">알짜 해설</span><span class="lesson-tag">04. 산·염기와 중화 반응</span></div>
-  <div class="sol-head"><span class="stt">알짜 해설</span><span class="sub">전 문항 해설 + 오답 선지 분석 — 맞힌 문제도 해설로 한 번 더!</span></div>
+  <div class="sol-head"><span class="stt">알짜 해설</span><span class="sub">전 문항 해설 + 바로알기(틀린 선지를 옳게 고친 문장) — 맞힌 문제도 해설로 한 번 더!</span></div>
+
   <table class="anstable">
-    <tr><th>문항</th><td>1</td><td>2</td><td>3</td><td>4</td><td>5</td><td>6</td><td>7</td><td>8</td><td>9</td><td>10</td><td>11</td><td>12</td><td>13</td></tr>
-    <tr><th>정답</th><td class="a">O</td><td class="a">X</td><td class="a">X</td><td class="a">수소 이온</td><td class="a">물</td><td class="a">염기</td><td class="a">③</td><td class="a">⑤</td><td class="a">②</td><td class="a">⑤</td><td class="a">서술형</td><td class="a">④</td><td class="a">①</td></tr>
+    <tr><th>문항</th><td>1</td><td>2</td><td>3</td><td>4</td><td>5</td><td>6</td><td>7</td><td>8</td><td>9</td><td>10</td><td>11</td><td>12</td></tr>
+    <tr><th>정답</th><td class="a">O</td><td class="a">X</td><td class="a">X</td><td class="a">수소 이온</td><td class="a">물</td><td class="a">염기</td><td class="a">③</td><td class="a">⑤</td><td class="a">④</td><td class="a">④</td><td class="a">①</td><td class="a">②</td></tr>
+    <tr><th>문항</th><td>13</td><td>14</td><td>15</td><td>16</td><td>17</td><td>18</td><td>19</td><td>20</td><td>21</td><td>22</td><td>23</td><td>24</td></tr>
+    <tr><th>정답</th><td class="a">④</td><td class="a">③</td><td class="a">⑤</td><td class="a">①</td><td class="a">②</td><td class="a">서술형</td><td class="a">서술형</td><td class="a">서술형</td><td class="a">②</td><td class="a">③</td><td class="a">①</td><td class="a">⑤</td></tr>
   </table>
+
   <div class="solcols">
     <div>
       <div class="sol"><div class="shead"><span class="sno">1</span><span class="sans">O</span><span class="slink">개념 1</span></div>
@@ -1114,19 +1532,20 @@
     <div>
       <div class="sol"><div class="shead"><span class="sno">7</span><span class="sans">③</span><span class="slink">개념 1</span></div>
         <p>산 + 마그네슘 → 수소 기체. 정의 그대로다.</p>
-        <div class="wrongbox"><div class="wt">오답 왜 틀렸나</div>
-          <p><b>①</b> 미끈거림은 염기. <b>②·⑤</b> 산의 이온은 H<sup>+</sup>다. <b>④</b> 이온이 있으니 전류가 흐른다.</p></div></div>
+        <div class="wrongbox"><div class="wt">바로알기</div>
+          <p><b>①</b> 만지면 미끈거리는 것은 염기 수용액이다. <b>②</b> 산의 신맛은 수소 이온(H<sup>+</sup>) 때문이다. <b>④</b> 산 수용액에는 이온이 있어 전류가 흐른다. <b>⑤</b> 아세트산은 물에 녹아 수소 이온(H<sup>+</sup>)을 내놓는다.</p></div></div>
       <div class="sol"><div class="shead"><span class="sno">8</span><span class="sans">⑤</span><span class="slink">개념 2</span></div>
-        <p>미끈거림 = 단백질을 녹이는 염기의 성질.</p>
-        <div class="wrongbox"><div class="wt">오답 왜 틀렸나</div>
-          <p><b>①</b> 쓴맛. <b>②</b> 염기는 OH<sup>−</sup>. <b>③</b> 붉은 종이를 푸르게가 맞다. <b>④</b> 대리석 반응은 산의 성질.</p></div></div>
-      <div class="sol"><div class="shead"><span class="sno">9</span><span class="sans">②</span><span class="slink">개념 1·2·3</span></div>
-        <p>A: 리트머스 붉게 + BTB 노랑 = 산성 → H<sup>+</sup> 있음. B: 페놀프탈레인 붉게 = 염기성.</p>
-        <div class="wrongbox"><div class="wt">오답 왜 틀렸나</div>
-          <p><b>①</b> A는 산성. <b>③</b> B는 염기성. <b>④</b> 수소 기체는 산(A)의 몫. <b>⑤</b> 산+염기 = 중화 반응이 일어난다.</p></div></div>
+        <p>미끈거림 = 피부의 단백질을 녹이는 염기의 성질.</p>
+        <div class="wrongbox"><div class="wt">바로알기</div>
+          <p><b>①</b> 염기 수용액은 쓴맛이 난다. <b>②</b> 염기의 공통 성질은 수산화 이온(OH<sup>−</sup>) 때문이다. <b>③</b> 염기 수용액은 붉은 리트머스를 푸르게 만든다. <b>④</b> 대리석과 반응해 이산화 탄소 기체를 내는 것은 산 수용액이다.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">9</span><span class="sans">④</span><span class="slink">개념 2·3</span></div>
+        <p><b>ㄴ&nbsp;(옳음)</b> 두 용액 모두 OH<sup>−</sup>가 있는 염기성 → 페놀프탈레인이 붉어진다. <b>ㄷ&nbsp;(옳음)</b> 이온이 전하를 나르므로 전류가 흐른다.</p>
+        <div class="wrongbox"><div class="wt">바로알기</div>
+          <p><b>ㄱ</b> (틀림 →) 마그네슘과 반응해 수소 기체를 내는 것은 <b>산</b> 수용액이다 — 염기 수용액은 마그네슘 같은 대부분의 금속과 반응하지 않는다.</p></div></div>
     </div>
   </div>
-  <div class="folio"><span>알짜 해설</span><span class="num">62</span></div>
+
+  <div class="folio"><span>알짜 해설</span><span class="num">77</span></div>
 </div>
 
 <!-- ═════════════ p.63 해설 2 ═════════════ -->
@@ -1134,45 +1553,191 @@
   <div class="runhead"><span class="unit-tag" style="color:var(--brand);">알짜 해설</span><span class="lesson-tag">04. 산·염기와 중화 반응</span></div>
   <div class="solcols">
     <div>
-      <div class="sol"><div class="shead"><span class="sno">10</span><span class="sans">⑤</span><span class="slink">개념 5</span></div>
-        <p>(가) 염기(제산제)로 위산 중화. (나) 염기(석회)로 산성 토양 중화. (다) 산(레몬즙)으로 염기성 비린내 물질 중화 — 셋 다 중화의 기술이다.</p>
-        <div class="wrongbox"><div class="wt">함정 체크</div>
-          <p>방향이 반대일 뿐 원리는 하나 — <b>넘친 쪽을 반대 이온으로 지운다</b>.</p></div></div>
-      <div class="sol"><div class="shead"><span class="sno">11</span><span class="sans">모범 답안</span><span class="slink">개념 4·5</span></div>
-        <p>속쓰림은 <b>위산</b>(염산)이 과다하게 분비된 상태다. 염기성 물질인 제산제가 위산과 <b>중화</b> 반응을 일으켜 과다한 위산을 없애 주므로 증상이 나아진다.</p>
-        <div class="wrongbox"><div class="wt">채점 기준 (감점 포인트)</div>
-          <p>① 위산 = 산(염산) ② 제산제 = 염기성 ③ 둘의 중화로 위산 감소 — 세 요소를 모두 서술해야 만점.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">10</span><span class="sans">④</span><span class="slink">개념 3</span></div>
+        <p>자주색 양배추 즙은 산성에서 붉은 계열, 염기성에서 푸른·노란 계열로 변하는 천연 지시약이다.</p>
+        <div class="wrongbox"><div class="wt">바로알기</div>
+          <p><b>①</b> 페놀프탈레인 용액은 산성에서 무색이고 염기성에서만 붉은색을 띤다. <b>②</b> BTB 용액은 중성에서 초록색을 띤다. <b>③</b> 페놀프탈레인 용액이 무색이면 그 용액은 산성 또는 중성이다. <b>⑤</b> 붉은 리트머스 종이는 염기성에서 푸르게 변한다.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">11</span><span class="sans">①</span><span class="slink">개념 1·2</span></div>
+        <p>(가)에는 H<sup>+</sup>가 있으니 산(묽은 염산), (나)에는 OH<sup>−</sup>가 있으니 염기(수산화 나트륨 수용액)다. <b>ㄱ&nbsp;(옳음)</b> H<sup>+</sup>가 있는 (가)는 마그네슘과 반응해 수소 기체를 낸다.</p>
+        <div class="wrongbox"><div class="wt">바로알기</div>
+          <p><b>ㄴ</b> (틀림 →) 염기성인 (나)는 <b>붉은</b> 리트머스 종이를 <b>푸르게</b> 변화시킨다. <b>ㄷ</b> (틀림 →) (가)와 (나) 모두 이온이 들어 있어 <b>둘 다 전류가 흐른다</b>.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">12</span><span class="sans">②</span><span class="slink">개념 1·2·3</span></div>
+        <p>A: 푸른 리트머스 → 붉게, BTB 노란색 = 산성 → H<sup>+</sup> 있음. B: 페놀프탈레인 붉은색, BTB 파란색 = 염기성.</p>
+        <div class="wrongbox"><div class="wt">바로알기</div>
+          <p><b>①</b> A는 산성 용액이다. <b>③</b> B는 염기성 용액이다. <b>④</b> 마그네슘과 반응해 수소 기체를 내는 것은 산성인 A이다. <b>⑤</b> 산성인 A와 염기성인 B를 섞으면 중화 반응이 일어난다.</p></div></div>
     </div>
     <div>
-      <div class="sol"><div class="shead"><span class="sno">12</span><span class="sans">④</span><span class="slink">개념 4·자료 | 2점</span></div>
-        <p><b>ㄱ (옳음)</b> 온도 최고점 P = 완전 중화 = 중성, BTB 초록. <b>ㄴ (틀림)</b> OH<sup>−</sup>가 H<sup>+</sup>를 지우므로 H<sup>+</sup> 수는 <b>감소</b>한다. <b>ㄷ (옳음)</b> P 이후 남는 OH<sup>−</sup> — 염기성, 파란색.</p>
-        <div class="wrongbox"><div class="wt">함정 체크</div>
-          <p>꼭짓점 왼쪽 = 산성 / 꼭짓점 = 중성 / 오른쪽 = 염기성 — 그래프에 세 구역을 그려 두고 시작하라.</p></div></div>
-      <div class="sol"><div class="shead"><span class="sno">13</span><span class="sans">①</span><span class="slink">개념 5 | 2.5점</span></div>
-        <p><b>ㄱ (옳음)</b> 제산제 = 염기, 위산 = 염산. <b>ㄴ (옳음)</b> 염기성 비린내 물질 + 산 = 중화. <b>ㄷ (틀림)</b> 석회 뿌리기는 산화·환원이 아니라 <b>중화</b> 반응이다.</p>
-        <div class="wrongbox"><div class="wt">함정 체크</div>
-          <p>03(산화·환원)과 04(중화)를 섞는 선지가 단골 — <b>전자 이동이면 산화·환원, H<sup>+</sup>·OH<sup>−</sup> 만남이면 중화</b>.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">13</span><span class="sans">④</span><span class="slink">개념 4</span></div>
+        <p><b>B&nbsp;(옳음)</b> H<sup>+</sup> + OH<sup>−</sup> → H<sub>2</sub>O — 이온 1개씩 만나 물 1개가 된다. <b>C&nbsp;(옳음)</b> 남은 Na<sup>+</sup>와 Cl<sup>−</sup>가 염인 염화 나트륨(소금)을 이룬다.</p>
+        <div class="wrongbox"><div class="wt">바로알기</div>
+          <p><b>A</b> (틀림 →) 중화 반응은 열(중화열)을 <b>내놓으므로</b> 혼합 용액의 온도가 <b>올라간다</b>.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">14</span><span class="sans">③</span><span class="slink">개념 3·4 | 탐구</span></div>
+        <p><b>ㄱ&nbsp;(옳음)</b> 전체 부피가 20&nbsp;mL로 같으므로 반응이 많이 일어날수록 온도가 높다. 최고 온도(26.0&nbsp;°C)인 C가 완전 중화점 → 중성 → BTB 초록색. <b>ㄴ&nbsp;(옳음)</b> C에서 염산 12&nbsp;mL 속 H<sup>+</sup> 수 = NaOH 수용액 8&nbsp;mL 속 OH<sup>−</sup> 수. 같은 수를 담는 데 염산이 더 많은 부피가 필요하므로, 같은 부피 속 H<sup>+</sup>&nbsp;:&nbsp;OH<sup>−</sup>&nbsp;=&nbsp;8&nbsp;:&nbsp;12&nbsp;=&nbsp;2&nbsp;:&nbsp;3이다.</p>
+        <div class="analysis"><div class="at">꼼꼼 자료 분석</div>
+          <svg width="310" height="143" viewBox="0 0 300 138" font-family="PC Sans">
+            <g transform="translate(2,2)">
+              <rect x="0.5" y="0.5" width="295" height="20" fill="#FBEFE7"/>
+              <rect x="176" y="0.5" width="40" height="104" fill="#EAF6EC"/>
+              <rect x="0.5" y="0.5" width="295" height="104" fill="none" stroke="#B8C2CA" stroke-width="0.9"/>
+              <g stroke="#B8C2CA" stroke-width="0.8">
+                <line x1="0.5" y1="20.5" x2="295.5" y2="20.5"/><line x1="0.5" y1="41.5" x2="295.5" y2="41.5"/><line x1="0.5" y1="62.5" x2="295.5" y2="62.5"/><line x1="0.5" y1="83.5" x2="295.5" y2="83.5"/>
+                <line x1="96" y1="0.5" x2="96" y2="104.5"/><line x1="136" y1="0.5" x2="136" y2="104.5"/><line x1="176" y1="0.5" x2="176" y2="104.5"/><line x1="216" y1="0.5" x2="216" y2="104.5"/><line x1="256" y1="0.5" x2="256" y2="104.5"/>
+              </g>
+              <g font-size="10.8" font-weight="800" fill="#C1521E" text-anchor="middle"><text x="48" y="14.5">비커</text><text x="116" y="14.5">A</text><text x="156" y="14.5">B</text><text x="196" y="14.5">C</text><text x="236" y="14.5">D</text><text x="276" y="14.5">E</text></g>
+              <g font-size="10.6" font-weight="700" fill="#4A5964" text-anchor="middle"><text x="48" y="35.5">묽은 염산(mL)</text><text x="48" y="56.5">NaOH 수용액(mL)</text><text x="48" y="77.5">최고 온도(°C)</text><text x="48" y="98.5">BTB 색</text></g>
+              <g font-size="10.6" fill="#22303A" text-anchor="middle">
+                <text x="116" y="35.5">16</text><text x="156" y="35.5">14</text><text x="196" y="35.5" font-weight="900">12</text><text x="236" y="35.5">10</text><text x="276" y="35.5">8</text>
+                <text x="116" y="56.5">4</text><text x="156" y="56.5">6</text><text x="196" y="56.5" font-weight="900">8</text><text x="236" y="56.5">10</text><text x="276" y="56.5">12</text>
+                <text x="116" y="77.5">23.0</text><text x="156" y="77.5">24.5</text><text x="196" y="77.5" font-weight="900" fill="#D6455D">26.0</text><text x="236" y="77.5">25.0</text><text x="276" y="77.5">24.0</text>
+                <text x="116" y="98.5">노란색</text><text x="156" y="98.5">노란색</text><text x="196" y="98.5" font-weight="900" fill="#2E7A54">초록색</text><text x="236" y="98.5">파란색</text><text x="276" y="98.5">파란색</text>
+              </g>
+              <rect x="176" y="0.5" width="40" height="104" fill="none" stroke="#D6455D" stroke-width="1.4"/>
+            </g>
+            <g font-size="10.6" font-weight="800" text-anchor="middle">
+              <text x="198" y="120" fill="#D6455D">완전 중화</text>
+              <text x="138" y="134" fill="#C1521E">← H<tspan dy="-0.34em" font-size="76%">+</tspan><tspan dy="0.34em"> 남음 (산성)</tspan></text>
+              <text x="298" y="134" text-anchor="end" fill="#2E5BAA">OH<tspan dy="-0.34em" font-size="76%">−</tspan><tspan dy="0.34em"> 남음 (염기성) →</tspan></text>
+            </g>
+          </svg></div>
+        <div class="wrongbox"><div class="wt">바로알기</div>
+          <p><b>ㄷ</b> (틀림 →) E는 OH<sup>−</sup>가 남은 염기성(파란색) 용액이라 H<sup>+</sup>가 없으므로, 마그네슘 리본을 넣어도 수소 기체가 <b>발생하지 않는다</b>. 부피가 같은 D(10&nbsp;mL + 10&nbsp;mL)가 완전 중화점이 아니라는 것도 함정이다.</p></div></div>
+    </div>
+  </div>
+  <div class="folio"><span>알짜 해설</span><span class="num">78</span></div>
+</div>
 
-      <div class="gist" style="margin-top:5mm;">
+<!-- ═════════════ 해설 3 ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag" style="color:var(--brand);">알짜 해설</span><span class="lesson-tag">04. 산·염기와 중화 반응</span></div>
+  <div class="solcols">
+    <div>
+      <div class="sol"><div class="shead"><span class="sno">15</span><span class="sans">⑤</span><span class="slink">개념 4 | 집중 훈련</span></div>
+        <p><b>ㄱ&nbsp;(옳음)</b> A는 V까지 줄어 0이 된다 → OH<sup>−</sup>와 만나 물이 되는 H<sup>+</sup>. <b>ㄴ&nbsp;(옳음)</b> B는 끝까지 일정 → 반응하지 않는 이온(구경꾼 이온) Cl<sup>−</sup>. <b>ㄷ&nbsp;(옳음)</b> 2V에서 A 0, B N, C(Na<sup>+</sup>) 2N, D(OH<sup>−</sup>) N → 전체 4N. 처음은 A N + B N = 2N → 4N ÷ 2N = 2배.</p>
+        <div class="analysis"><div class="at">꼼꼼 자료 분석</div>
+          <svg width="310" height="103" viewBox="0 0 300 100" font-family="PC Sans">
+            <line x1="36" y1="84" x2="266" y2="84" stroke="#5B6B77" stroke-width="1.1" marker-end="url(#arrP)"/>
+            <line x1="36" y1="84" x2="36" y2="8" stroke="#5B6B77" stroke-width="1.1" marker-end="url(#arrP)"/>
+            <text x="41" y="11" font-size="10.6" fill="#5B6B77">이온 수</text>
+            <g stroke="#B8C2CA" stroke-width="0.8" stroke-dasharray="2.5 2">
+              <line x1="144" y1="20" x2="144" y2="84"/><line x1="252" y1="20" x2="252" y2="84"/>
+              <line x1="36" y1="24" x2="252" y2="24"/>
+            </g>
+            <g font-size="10.6" fill="#5B6B77" text-anchor="end"><text x="32" y="57.6">N</text><text x="32" y="27.6">2N</text><text x="32" y="92">0</text></g>
+            <g font-size="10.6" fill="#5B6B77" text-anchor="middle"><text x="144" y="97">V</text><text x="252" y="97">2V</text></g>
+            <polyline points="36,54 144,84 252,84" fill="none" stroke="#C1521E" stroke-width="1.8"/>
+            <polyline points="36,54 252,54" fill="none" stroke="#8A949E" stroke-width="1.8"/>
+            <polyline points="36,84 252,24" fill="none" stroke="#4C86B0" stroke-width="1.8"/>
+            <polyline points="36,84 144,84 252,54" fill="none" stroke="#2E7A54" stroke-width="1.8" stroke-dasharray="4 2"/>
+            <g font-size="10.6" font-weight="800" paint-order="stroke" stroke="#FFFCF5" stroke-width="3" stroke-linejoin="round">
+              <text x="54" y="79" fill="#C1521E">A = H<tspan dy="-0.34em" font-size="76%">+</tspan></text>
+              <text x="40" y="49" fill="#8A949E">B = Cl<tspan dy="-0.34em" font-size="76%">−</tspan><tspan dy="0.34em"> (반응 X)</tspan></text>
+              <text x="186" y="32" fill="#4C86B0">C = Na<tspan dy="-0.34em" font-size="76%">+</tspan></text>
+              <text x="196" y="79" fill="#2E7A54">D = OH<tspan dy="-0.34em" font-size="76%">−</tspan></text>
+            </g>
+            <circle cx="144" cy="84" r="3" fill="#D6455D"/>
+          </svg>
+          <p style="font-size:8.6pt; line-height:1.6; color:#B0483A; margin:0.6mm 0 0;">V까지: H<sup>+</sup> 1개 ↔ Na<sup>+</sup> 1개 교대 → 전체 2N 일정<br>V 이후: Na<sup>+</sup>·OH<sup>−</sup> 함께 증가 → 2V에서 4N</p></div>
+        <div class="wrongbox"><div class="wt">함정 체크</div>
+          <p>OH<sup>−</sup>(D)는 완전 중화점 <b>전에는 0</b>이다 — 넣는 즉시 H<sup>+</sup>와 만나 물이 되기 때문이다.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">16</span><span class="sans">①</span><span class="slink">개념 3 (pH)</span></div>
+        <p>pH 7 = 중성 → BTB 초록색. 순수한 물이 바로 그 기준점이다.</p>
+        <div class="wrongbox"><div class="wt">바로알기</div>
+          <p><b>②</b> pH가 작을수록 H<sup>+</sup>가 많아 <b>산성</b>이 강하다. <b>③</b> pH가 7보다 큰 바닷물은 약한 <b>염기성</b>이다. <b>④</b> pH가 7보다 큰 비누 물은 <b>염기성</b>이다(페놀프탈레인을 붉게 만든다). <b>⑤</b> 염기성인 제산제가 H<sup>+</sup>를 중화하므로 pH는 점점 <b>커진다</b>.</p></div></div>
+    </div>
+    <div>
+      <div class="sol"><div class="shead"><span class="sno">17</span><span class="sans">②</span><span class="slink">개념 5</span></div>
+        <p><b>ㄷ&nbsp;(옳음)</b> 산성 배기가스를 염기성 물질로 걸러 내는 것은 중화의 기술이다.</p>
+        <div class="wrongbox"><div class="wt">바로알기</div>
+          <p><b>ㄱ</b> (틀림 →) 넘친 H<sup>+</sup>는 <b>OH<sup>−</sup>를 내놓는 염기성 물질</b>로 없앤다. <b>ㄴ</b> (틀림 →) 치약은 입안의 <b>산</b>을 중화해 충치를 예방한다.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">18</span><span class="sans">모범 답안</span><span class="slink">개념 4·5</span></div>
+        <p>속쓰림은 <b>위산</b>(염산)이 지나치게 많이 분비되어 생긴다. 제산제 속 <b>염기성</b> 물질이 위산과 <b>중화</b> 반응하여 H<sup>+</sup>가 물이 되므로, 넘친 위산이 줄어 증상이 나아진다.</p>
+        <table class="rubric">
+          <tr><th>채점 요소</th><th>배점</th></tr>
+          <tr><td>① 위산(염산)이 지나치게 많다고 썼다.</td><td>2점</td></tr>
+          <tr><td>② 제산제가 염기성 물질이라고 썼다.</td><td>2점</td></tr>
+          <tr><td>③ 중화 반응으로 위산이 줄어든다고 연결했다.</td><td>2점</td></tr>
+        </table>
+        <div class="wrongbox"><div class="wt">이렇게 쓰면 0점</div>
+          <p>"제산제가 위벽을 감싸 보호하기 때문이다." — 염기성과 중화가 빠진 답.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">19</span><span class="sans">모범 답안</span><span class="slink">개념 1</span></div>
+        <p>염산과 아세트산은 모두 <b>물에 녹아</b> <b>수소 이온</b>(H<sup>+</sup>)을 내놓는다. 산의 공통 성질은 이 수소 이온 때문에 나타나므로, 종류가 다른 산도 같은 성질을 보인다.</p>
+        <table class="rubric">
+          <tr><th>채점 요소</th><th>배점</th></tr>
+          <tr><td>① 두 산 모두 물에 녹아 수소 이온(H<sup>+</sup>)을 내놓는다고 썼다.</td><td>3점</td></tr>
+          <tr><td>② 공통 성질의 원인이 수소 이온이라고 썼다.</td><td>3점</td></tr>
+        </table>
+        <div class="wrongbox"><div class="wt">이렇게 쓰면 0점</div>
+          <p>"둘 다 산이라서 신맛이 나기 때문이다." — 성질로 성질을 설명했을 뿐, 원인(H<sup>+</sup>)이 없다.</p></div></div>
+    </div>
+  </div>
+  <div class="folio"><span>알짜 해설</span><span class="num">79</span></div>
+</div>
+
+<!-- ═════════════ 해설 4 ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag" style="color:var(--brand);">알짜 해설</span><span class="lesson-tag">04. 산·염기와 중화 반응</span></div>
+  <div class="solcols">
+    <div>
+      <div class="sol"><div class="shead"><span class="sno">20</span><span class="sans">모범 답안</span><span class="slink">개념 4 | 자료 파헤치기</span></div>
+        <p>완전 중화점이 지나면 용액 속에 반응할 <b>수소 이온</b>(H<sup>+</sup>)이 남아 있지 않아 중화 반응이 더 일어나지 않으므로 <b>중화열</b>이 더 발생하지 않는다. 그런데 처음 온도의 수산화 나트륨 수용액이 계속 섞이므로 혼합 용액의 온도가 낮아진다.</p>
+        <table class="rubric">
+          <tr><th>채점 요소</th><th>배점</th></tr>
+          <tr><td>① 반응할 수소 이온이 없어 중화 반응이 일어나지 않는다고 썼다.</td><td>2점</td></tr>
+          <tr><td>② 중화열이 더 발생하지 않는다고 썼다.</td><td>2점</td></tr>
+          <tr><td>③ 온도가 낮은 용액이 섞여 온도가 낮아진다고 연결했다.</td><td>2점</td></tr>
+        </table>
+        <div class="wrongbox"><div class="wt">이렇게 쓰면 0점</div>
+          <p>"중화 반응이 이번에는 열을 빼앗기 때문이다." — 중화 반응은 언제나 열을 내놓는다.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">21</span><span class="sans">②</span><span class="slink">개념 4 | 2점</span></div>
+        <p><b>ㄷ&nbsp;(옳음)</b> 온도 최고점 P = 완전 중화. P 이후에는 남는 OH<sup>−</sup> 때문에 염기성 — BTB 파란색.</p>
+        <div class="wrongbox"><div class="wt">바로알기</div>
+          <p><b>ㄱ</b> (틀림 →) P 이전에는 넣은 OH<sup>−</sup>가 곧바로 H<sup>+</sup>와 만나 물이 되므로 OH<sup>−</sup> 수는 <b>0으로 유지</b>된다. <b>ㄴ</b> (틀림 →) Cl<sup>−</sup>는 반응에 참여하지 않으므로 그 수는 처음부터 끝까지 <b>일정</b>하다.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">22</span><span class="sans">③</span><span class="slink">개념 3·4 | 2점</span></div>
+        <p><b>ㄱ&nbsp;(옳음)</b> pH 약 2 → 7보다 작은 산성 → BTB 노란색. <b>ㄴ&nbsp;(옳음)</b> 염기성인 (다)에 산을 넣으면 중화 반응으로 OH<sup>−</sup>가 줄어 염기성이 약해지므로 pH가 작아진다(7에 가까워진다).</p>
+        <div class="wrongbox"><div class="wt">바로알기</div>
+          <p><b>ㄷ</b> (틀림 →) pH 약 8.1은 여전히 7보다 크므로 바닷물은 <b>염기성</b>이다. 해양 산성화는 바닷물이 산성이 된 것이 아니라 <b>산성 쪽으로 옮겨 간 것</b>(H<sup>+</sup>가 늘어난 것)이다.</p></div></div>
+    </div>
+    <div>
+      <div class="sol"><div class="shead"><span class="sno">23</span><span class="sans">①</span><span class="slink">개념 1·4 | 2.5점</span></div>
+        <p><b>ㄱ&nbsp;(옳음)</b> (가)에서 마그네슘은 전자를 잃고 마그네슘 이온이 된다 — 전자를 잃으면 산화(03). H<sup>+</sup>는 그 전자를 얻어 수소 기체가 된다.</p>
+        <div class="wrongbox"><div class="wt">바로알기</div>
+          <p><b>ㄴ</b> (틀림 →) (가)에서는 H<sup>+</sup>가 전자를 얻지만, (나)에서 H<sup>+</sup>는 전자를 얻지 않고 <b>OH<sup>−</sup>와 만나 물</b>이 된다. <b>ㄷ</b> (틀림 →) (가)는 전자가 이동하는 <b>산화·환원 반응</b>이고, 중화 반응은 (나)뿐이다.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">24</span><span class="sans">⑤</span><span class="slink">개념 3·4 | 2.5점</span></div>
+        <p>(가)의 모형: H<sup>+</sup> 2, Cl<sup>−</sup> 4, Na<sup>+</sup> 2. Cl<sup>−</sup>는 그대로이므로 염산 10&nbsp;mL 속 H<sup>+</sup>는 처음 4개, Na<sup>+</sup> 2개 → NaOH 수용액 5&nbsp;mL 속 OH<sup>−</sup>는 2개.</p>
+        <p><b>ㄱ&nbsp;(옳음)</b> NaOH 수용액 10&nbsp;mL 속 OH<sup>−</sup>&nbsp;=&nbsp;2&nbsp;×&nbsp;2&nbsp;=&nbsp;4개&nbsp;= 염산 10&nbsp;mL 속 H<sup>+</sup> 4개. <b>ㄴ&nbsp;(옳음)</b> (다) OH<sup>−</sup>&nbsp;6개&nbsp;−&nbsp;H<sup>+</sup>&nbsp;4개 = OH<sup>−</sup> 2개 남음 → 염기성, 파란색. <b>ㄷ&nbsp;(옳음)</b> (나) Na<sup>+</sup>&nbsp;4&nbsp;+&nbsp;Cl<sup>−</sup>&nbsp;4&nbsp;=&nbsp;8개, (다) Na<sup>+</sup>&nbsp;6&nbsp;+&nbsp;Cl<sup>−</sup>&nbsp;4&nbsp;+&nbsp;OH<sup>−</sup>&nbsp;2&nbsp;=&nbsp;12개 → 12&nbsp;÷&nbsp;8&nbsp;=&nbsp;1.5배.</p>
+        <div class="wrongbox"><div class="wt">함정 체크</div>
+          <p>모형에서 <b>반응하지 않는 Cl<sup>−</sup> 수로 처음 H<sup>+</sup> 수를 거꾸로 찾는 것</b>이 열쇠다 — 집중 훈련의 비커 4장면과 같은 방법이다.</p></div></div>
+
+      <div class="gist" style="margin-top:3mm;">
         <div class="boxtitle"><span class="ico">알</span>이 소단원, 이것만은!</div>
         <ul>
           <li>산 = <b>H<sup>+</sup></b>(신맛·금속→수소 기체) / 염기 = <b>OH<sup>−</sup></b>(쓴맛·미끈) — 전류는 둘 다 O</li>
-          <li>지시약 3종 세트: 리트머스 <b>산붉·염푸</b> · 페놀프탈레인 <b>염기만 붉게</b> · BTB <b>노초파</b></li>
+          <li>지시약 3종 세트: 리트머스 <b>산붉·염푸</b> · 페놀프탈레인 <b>염기만 붉게</b> · BTB <b>노초파</b> · <b>pH 7 = 중성</b></li>
           <li>중화: H<sup>+</sup>+OH<sup>−</sup>→물, 신호는 <b>온도 상승 + 색 변화</b> — 제산제·석회·레몬즙이 그 기술</li>
         </ul>
       </div>
     </div>
   </div>
-  <div class="folio"><span>알짜 해설</span><span class="num">63</span></div>
+  <div class="folio"><span>알짜 해설</span><span class="num">80</span></div>
 </div>
 
 <!-- ═════════════ p.64 MEMO ═════════════ -->
 <div class="page">
   <div class="runhead"><span class="unit-tag">I. 변화와 다양성</span><span class="lesson-tag">04 ▸ 05 넘어가기 전에</span></div>
+  <div class="spaced">
+    <div class="st">간격 두고 다시 꺼내기 — 책을 덮고 답한다</div>
+    <ol>
+      <li>아레니우스 정의에서 염기는 물에 녹아 무엇을 내놓는 물질인가?</li>
+      <li>BTB 용액은 산성·중성·염기성에서 각각 무슨 색을 띠는가?</li>
+      <li>산에 염기를 조금씩 넣을 때 혼합 용액의 온도가 가장 높은 지점은?</li>
+    </ol>
+    <div class="when"><span>□ 1일 뒤</span><span>□ 1주 뒤</span><span>□ 시험 전</span></div>
+    <div class="ans">정답 1 수산화 이온 2 노란색·초록색·파란색 3 완전 중화점</div>
+  </div>
   <div class="memo-head"><span class="mt">MEMO</span><span class="ms">헷갈린 개념, 다시 틀린 문제 번호, 나만의 암기법을 남겨 두는 자리</span></div>
   <div class="memo-area"></div>
-  <div class="memo-pen">"지시약 3종의 색 지도(53쪽)를 안 보고 그려 보자. BTB '노초파'가 3초 안에 나오면 통과! — 박찬쌤"</div>
-  <div class="folio"><span>박찬 과학 | 통합과학 2</span><span class="num">64</span></div>
+  <div class="memo-pen">"지시약 3종의 색 지도(66쪽)를 안 보고 그려 보자. BTB '노초파'가 3초 안에 나오면 통과! — 박찬쌤"</div>
+  <div class="folio"><span>박찬 과학 | 통합과학 2</span><span class="num">81</span></div>
 </div>
 
 </body>

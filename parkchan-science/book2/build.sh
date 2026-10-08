@@ -5,7 +5,7 @@ set -euo pipefail
 cd "$(dirname "$0")"
 
 # 1) 한글 폰트 (없으면 설치)
-if ! fc-list | grep -q "Noto Sans KR"; then
+if [ ! -s ~/.fonts/NotoSansKR.ttf ] || [ ! -s ~/.fonts/NotoSerifKR.ttf ]; then   # fc-list|grep -q 는 pipefail 에서 늘 실패로 보여 매번 다시 받았다
   mkdir -p ~/.fonts && cd ~/.fonts
   curl -sSL -o NotoSansKR.ttf  "https://raw.githubusercontent.com/google/fonts/main/ofl/notosanskr/NotoSansKR%5Bwght%5D.ttf"
   curl -sSL -o NotoSerifKR.ttf "https://raw.githubusercontent.com/google/fonts/main/ofl/notoserifkr/NotoSerifKR%5Bwght%5D.ttf"
@@ -13,6 +13,9 @@ if ! fc-list | grep -q "Noto Sans KR"; then
   curl -sSL -o YeonSung-Regular.ttf "https://raw.githubusercontent.com/google/fonts/main/ofl/yeonsung/YeonSung-Regular.ttf"
   fc-cache -f ~/.fonts; cd -
 fi
+
+# 1-1) 고정 굵기 글꼴 — 가변 글꼴은 PDF 를 9배 키우고 인쇄를 실패시킨다(tools/make_static_fonts.py)
+python3 ../tools/make_static_fonts.py
 
 # 2) Chromium
 CHROME="${CHROME:-/opt/pw-browsers/chromium}"
@@ -43,6 +46,8 @@ render chapter-2303/chapter.html chapter-2303/chapter.pdf
 render summary-3/summary.html summary-3/summary.pdf
 render back-matter/back.html back-matter/back.pdf
 render mock-exam/exam.html mock-exam/exam.pdf
+render mock-exam-suneung/exam.html mock-exam-suneung/exam.pdf   # 수능형(통합과학 1·2 전 범위) — 학평형 뒤
+render mock-exam-suneung-2/exam.html mock-exam-suneung-2/exam.pdf   # 수능형 제2회 — 제1회 뒤
 
 # 3) 조판 QA
 python3 ../tools/qa_check.py front-matter/front.html
@@ -84,6 +89,8 @@ python3 ../tools/pdf_text_check.py chapter-2303/chapter.html chapter-2303/chapte
 python3 ../tools/pdf_text_check.py summary-3/summary.html summary-3/summary.pdf
 python3 ../tools/pdf_text_check.py back-matter/back.html back-matter/back.pdf
 python3 ../tools/pdf_text_check.py mock-exam/exam.html mock-exam/exam.pdf
+python3 ../tools/pdf_text_check.py mock-exam-suneung/exam.html mock-exam-suneung/exam.pdf
+python3 ../tools/pdf_text_check.py mock-exam-suneung-2/exam.html mock-exam-suneung-2/exam.pdf
 
 # 5) 합본 PDF (지금까지 완성된 챕터 축적분)
 python3 - <<'PYEOF'
@@ -96,13 +103,9 @@ for f in ["front-matter/front.pdf",
           "chapter-2204/chapter.pdf", "chapter-2205/chapter.pdf", "summary-2/summary.pdf",
           "chapter-2301/chapter.pdf", "chapter-2302/chapter.pdf", "chapter-2303/chapter.pdf",
           "summary-3/summary.pdf", "back-matter/back.pdf",
-          "mock-exam/exam.pdf"]:
+          "mock-exam/exam.pdf", "mock-exam-suneung/exam.pdf", "mock-exam-suneung-2/exam.pdf"]:
     with pymupdf.open(f) as d:
         out.insert_pdf(d)
-try:
-    out.subset_fonts()
-except Exception:
-    pass
 out.save("통합과학2_합본.pdf", garbage=4, deflate=True)
 print(f"OK: 통합과학2_합본.pdf ({out.page_count}쪽)")
 PYEOF

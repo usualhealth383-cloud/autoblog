@@ -1,9 +1,11 @@
 #!/usr/bin/env bash
 # 본책 챕터 1개 렌더 + 전체 검사 + 그림 검수 시트
-# 사용: bash tools/check_chapter.sh 2101
+# 사용: bash tools/check_chapter.sh 2101   (통합과학1 은 08 · i01 · sample)
 set -euo pipefail
 cd "$(dirname "$0")/.."
-c="$1"; H="book2/chapter-$c/chapter.html"; P="book2/chapter-$c/chapter.pdf"
+c="$1"
+case "$c" in 2*) B=book2/chapter-$c;; sample) B=book/sample-chapter;; *) B=book/chapter-$c;; esac
+H="$B/chapter.html"; P="$B/chapter.pdf"
 /opt/pw-browsers/chromium --headless=new --no-sandbox --disable-gpu --no-pdf-header-footer \
   --print-to-pdf="$P" "file://$(realpath $H)" 2>/dev/null
 echo "OK: $P"

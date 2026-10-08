@@ -20,48 +20,46 @@ UNIT_OF = {'11': ('I', '과학의 기초'), '12': ('II', '물질과 규칙성'),
 BOOK_OF = {'1': '통합과학 1', '2': '통합과학 2'}
 MARKS = '①②③④⑤'
 
+import sys as _sys; _sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
+from _extract_common import txt as _txt, defs_map, selfcontain, strip_tags, supsub_uni, plain_text
+
 
 def txt(node, keep_bold=False):
-    """조판 태그를 걷어 낸 문자열. keep_bold 면 <b> 만 남긴다(앱에서 강조에 쓴다)."""
-    if node is None:
-        return ''
-    if keep_bold:
-        html = ''.join(str(c) for c in node.contents)
-        html = re.sub(r'<span class="blank">(.*?)</span>', r'{{\1}}', html)
-        html = re.sub(r'<b\b[^>]*>', '<b>', html)
-        html = re.sub(r'<(?!/?b>)[^>]+>', '', html)
-        return re.sub(r'\s+', ' ', html).strip()
-    return re.sub(r'\s+', ' ', node.get_text(' ')).strip()
+    """조판 태그를 걷어 낸 문자열. keep_bold 면 <b>·첨자를 남기고 빈칸을 {{㉠}} 로(앱에서 강조·빈칸에 쓴다)."""
+    return _txt(node, keep_bold, blanks=keep_bold)
 
 
-def file_markers(src_text):
-    """파일 상단 defs-only svg 의 마커들 — id → 마커 원문."""
-    m = re.search(r'<svg class="defs-only".*?<defs>(.*?)</defs>', src_text, re.S)
-    if not m:
-        return {}
-    return {mk.group(1): mk.group(0)
-            for mk in re.finditer(r'<marker id="([^"]+)".*?</marker>', m.group(1), re.S)}
-
-
-def selfcontain(svg, markers, cid):
-    """그림 하나를 독립 문서로: 쓰는 마커를 <defs> 로 넣고, 모든 id 에 개념 번호를 붙여
-    앱 한 문서 안에서 다른 그림과 id 가 부딪히지 않게 한다."""
-    used = set(re.findall(r'url\(#([^)]+)\)', svg)) | set(re.findall(r'href="#([^"]+)"', svg))
-    need = [markers[i] for i in used if i in markers]
-    if need:
-        svg = re.sub(r'(<svg\b[^>]*>)', lambda m: m.group(1) + '<defs>' + ''.join(need) + '</defs>', svg, count=1)
-    ids = set(re.findall(r'\bid="([^"]+)"', svg))
-    sfx = '-' + cid
-    for i in sorted(ids, key=len, reverse=True):
-        svg = svg.replace(f'id="{i}"', f'id="{i}{sfx}"')
-        svg = svg.replace(f'url(#{i})', f'url(#{i}{sfx})')
-        svg = svg.replace(f'href="#{i}"', f'href="#{i}{sfx}"')
-    return svg
+def parse_keyline(line, count):
+    """'정답 1 ③ (해설) 2 ② (… 3 × 10⁸ …) 3 서술형 모범 답안' 을 앞에서부터 차례로 읽는다.
+    예전에는 ' 3 ' 을 아무 데서나 찾아 괄호 속 식(3 × 10⁸)에서 잘렸다(2026-10-01 점검: 해설 5개가 잘리거나 섞임)."""
+    body = re.sub(r'^\s*정답\s*', '', line); out, pos = {}, 0
+    for i in range(1, count + 1):
+        m = re.compile(rf'\s*{i}\s+').match(body, pos)
+        if not m: break
+        pos = m.end(); mk = re.compile(r'([①②③④⑤])\s*').match(body, pos)
+        if mk and body[mk.end():mk.end() + 1] == '(':            # ③ (해설) — 괄호 짝을 세어 끝을 찾는다
+            depth, j = 0, mk.end()
+            while j < len(body):
+                if body[j] == '(': depth += 1
+                elif body[j] == ')':
+                    depth -= 1
+                    if depth == 0: break
+                j += 1
+            out[i] = (mk.group(1), body[mk.end() + 1:j].strip()); pos = j + 1
+        elif mk and ((i == count and not body[mk.end():].strip()) or (i < count and re.compile(rf'\s*{i + 1}\s').match(body, mk.end()))):
+            out[i] = (mk.group(1), ''); pos = mk.end()
+        else:                                                   # 서술형: 다음 번호(맨 끝이면 끝)까지
+            if i == count: end = len(body)
+            else:
+                n = re.compile(rf'\s{i + 1}\s').search(body, pos); end = n.start() if n else len(body)
+            m2 = mk.group(1) if mk else None
+            out[i] = (m2, body[(mk.end() if mk else pos):end].strip()); pos = end
+    return out
 
 
 def parse_lesson(path):
     src_text = path.read_text(encoding='utf-8')
-    markers = file_markers(src_text)
+    markers = defs_map(src_text)
     # 페이지 원문을 순서대로 들고 있다가, 그림은 여기서 원문 그대로 꺼낸다
     raw_pages = [seg for seg in re.split(r'(?=<div class="page lect")', src_text)
                  if seg.lstrip().startswith('<div class="page lect"')]
@@ -70,7 +68,7 @@ def parse_lesson(path):
     unit, unit_name = UNIT_OF[code[:2]]
     book = code[0]
     band = txt(soup.select_one('.tagband span'))          # "II. 환경과 에너지 · 03 지구온난화와 기후변화"
-    lesson_name = band.split('·')[-1].strip()
+    lesson_name = re.split(r'\s·\s', band, maxsplit=1)[-1].strip()   # 단원·소단원 사이는 ' · '(띄어 씀) — 이름 속 '에너지·물질'의 ·에서 자르지 않는다
     lesson_name = re.sub(r'^\d+\s*', '', lesson_name)
 
     concepts, cur = [], None
@@ -105,7 +103,7 @@ def parse_lesson(path):
             for st in page.select('.a-step'):
                 cur['steps'].append({
                     'n': txt(st.select_one('.n')),
-                    't': txt(st.select_one('.t')),
+                    't': txt(st.select_one('.t'), keep_bold=True),   # 제목에도 빈칸(㉠)이 있다(2303-01)
                     'd': txt(st.select_one('.d'), keep_bold=True)})
             fig = page.select_one('.a-fig')
             if fig and fig.find('svg'):
@@ -132,12 +130,24 @@ def parse_lesson(path):
         for tr in page.select('table.terms tr'):
             cur['terms'].append({'k': txt(tr.find('th')), 'v': txt(tr.find('td'))})
         for m in page.select('.myth .m'):
+            why = ''
+            w = m.select_one('span.w')               # '왜?' 표지 — 그 뒤 글은 이유(반박 텍스트의 설명)
+            if w:
+                box = soup.new_tag('span')
+                for sib in list(w.next_siblings):
+                    box.append(sib.extract())
+                why = txt(box, keep_bold=True)
+                br = w.find_previous_sibling('br')   # 진실과 이유 사이 줄바꿈
+                if br:
+                    br.extract()
+                w.extract()
             raw = txt(m, keep_bold=True)
             parts = re.split(r'✓\s*진실', raw)
             if len(parts) == 2:
                 cur['myths'].append({
                     'x': re.sub(r'^✗\s*오해\s*', '', parts[0]).strip(),
-                    'o': parts[1].strip()})
+                    'o': parts[1].strip(),
+                    'why': why})
         pt = page.select_one('.point p')
         if pt:
             cur['point'] = txt(pt, keep_bold=True)
@@ -159,7 +169,9 @@ def parse_lesson(path):
     if qpage:
         note = qpage.select_one('.qs-note p')
         keyline = txt(qpage.select_one('.ans-line'))
-        for i, qq in enumerate(qpage.select('.qq'), 1):
+        qqs = qpage.select('.qq')
+        keys = parse_keyline(txt(qpage.select_one('.ans-line'), keep_bold=True), len(qqs))
+        for i, qq in enumerate(qqs, 1):
             stems = qq.select('.stem')
             qn = qq.select_one('.qn')
             if qn:
@@ -176,11 +188,10 @@ def parse_lesson(path):
                  'essay': bool(qq.select_one('.write')),
                  'gradeNote': txt(note, keep_bold=True) if i == 3 and note else '',
                  'answerLine': keyline}
-            m = re.search(rf'\b{i} ([①②③④⑤])', keyline)
-            q['answer'] = MARKS.index(m.group(1)) + 1 if m else None
-            body = keyline.replace('정답 ', '', 1)
-            seg = re.search(rf'(?:^|\s){i} (.+?)(?=\s{i+1} |$)', body)
-            q['explain'] = re.sub(r'^[①②③④⑤]\s*', '', seg.group(1)).strip(' ()') if seg else ''
+            mk, ex = keys.get(i, (None, ''))
+            if q['essay']: mk, ex = None, (('' if not mk else mk + ' ') + ex).strip()   # 서술형 모범 답안이 ①로 시작해도 정답 ①이 아니다(1201 #3)
+            q['answer'] = MARKS.index(mk) + 1 if mk else None
+            q['explain'] = ex
             quizzes.append(q)
     return concepts, quizzes
 

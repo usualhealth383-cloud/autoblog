@@ -4,8 +4,8 @@
 <meta charset="utf-8">
 <title>박찬 과학 통합과학1 — I-02 기본량과 단위</title>
 <style>
-  @font-face { font-family:'PC Sans'; src:url('file:///root/.fonts/NotoSansKR.ttf'); font-weight:100 900; }
-  @font-face { font-family:'PC Serif'; src:url('file:///root/.fonts/NotoSerifKR.ttf'); font-weight:100 900; }
+  @font-face { font-family:'PC Sans'; src:url('file:///root/.fonts/static/NotoSansKR-400.ttf'); font-weight:400; } @font-face { font-family:'PC Sans'; src:url('file:///root/.fonts/static/NotoSansKR-500.ttf'); font-weight:500; } @font-face { font-family:'PC Sans'; src:url('file:///root/.fonts/static/NotoSansKR-600.ttf'); font-weight:600; } @font-face { font-family:'PC Sans'; src:url('file:///root/.fonts/static/NotoSansKR-700.ttf'); font-weight:700; } @font-face { font-family:'PC Sans'; src:url('file:///root/.fonts/static/NotoSansKR-800.ttf'); font-weight:800; } @font-face { font-family:'PC Sans'; src:url('file:///root/.fonts/static/NotoSansKR-900.ttf'); font-weight:900; }
+  @font-face { font-family:'PC Serif'; src:url('file:///root/.fonts/static/NotoSerifKR-400.ttf'); font-weight:400; } @font-face { font-family:'PC Serif'; src:url('file:///root/.fonts/static/NotoSerifKR-500.ttf'); font-weight:500; } @font-face { font-family:'PC Serif'; src:url('file:///root/.fonts/static/NotoSerifKR-600.ttf'); font-weight:600; } @font-face { font-family:'PC Serif'; src:url('file:///root/.fonts/static/NotoSerifKR-700.ttf'); font-weight:700; } @font-face { font-family:'PC Serif'; src:url('file:///root/.fonts/static/NotoSerifKR-800.ttf'); font-weight:800; } @font-face { font-family:'PC Serif'; src:url('file:///root/.fonts/static/NotoSerifKR-900.ttf'); font-weight:900; }
   @font-face { font-family:'PC Pen'; src:url('file:///root/.fonts/YeonSung-Regular.ttf'); font-weight:400; }
 
   :root{
@@ -229,6 +229,32 @@
   /* 화학식 첨자 — 본문 폰트를 그대로 축소해 자형이 어긋나지 않게 한다 */
   sub,sup{ font-size:0.68em; line-height:0; font-weight:inherit; }
   sub{ vertical-align:-0.14em; } sup{ vertical-align:0.34em; }
+
+/* ── 2026-10-02 보강: 중요 표시 · 채점 기준 · 꼼꼼 자료 분석 · 간격 두고 다시 꺼내기 ── */
+.must{ display:inline-block; font-size:7pt; font-weight:900; color:#fff; background:#D9534F; border-radius:1.6mm; padding:0.2mm 1.4mm; margin-right:1.2mm; vertical-align:1pt; }
+table.rubric{ border-collapse:collapse; width:100%; font-size:7.6pt; margin:1mm 0 0.5mm; }
+table.rubric th, table.rubric td{ border:0.25mm solid var(--line); padding:0.8mm 1.4mm; text-align:left; vertical-align:top; }
+table.rubric th{ background:#F4F1EA; font-weight:800; white-space:nowrap; }
+.analysis{ border:0.35mm dashed #C9A36A; border-radius:2.5mm; padding:1.6mm 2mm 1.2mm; margin:1.5mm 0; background:#FFFCF5; }
+.analysis .at{ font-size:7.6pt; font-weight:900; color:#9C6503; margin-bottom:0.8mm; }
+.analysis svg{ max-width:100%; height:auto; display:block; }
+.spaced{ border:0.4mm solid var(--line); border-radius:3mm; padding:3mm 4mm 2.6mm; margin:0 0 4mm; position:relative; background:#FAFBFC; }
+.spaced .st{ font-size:9.5pt; font-weight:900; color:var(--unit); margin-bottom:1.6mm; }
+.spaced ol{ margin:0; padding-left:5mm; font-size:8.8pt; line-height:1.75; }
+.spaced .when{ display:flex; gap:5mm; font-size:8pt; color:var(--sub); margin-top:1.8mm; }
+.spaced .ans{ position:absolute; right:4mm; bottom:2.4mm; transform:rotate(180deg); font-size:6.8pt; color:var(--sub); }
+/* 2단 문항 쪽 간격 · 발문 안 탐구 과정 상자 (합격본 chapter-08 에서) */
+.qg2 .q{ margin-bottom:6mm; }
+.qg2 > div > .q:last-child{ margin-bottom:0; }
+.qg2 .choices.inline{ gap:0 4mm; }
+.qg2 .choices{ margin-top:1.8mm; line-height:1.78; }
+.qg2 .bogi-box{ margin-top:2mm; padding:1.8mm 2.8mm; font-size:9pt; line-height:1.72; }
+.qg2 .bogi-box .bt{ margin-bottom:0.3mm; }
+.qg2 .q figure{ margin:1.6mm 0 0.6mm 8.4mm !important; }
+.exp{ border:0.35mm solid #B8C2CA; border-radius:1.6mm; background:#FAFBFC; padding:1.6mm 2.6mm; margin:1.4mm 0 1.6mm; font-size:8.9pt; line-height:1.7; }
+.exp b{ font-family:'PC Sans'; font-size:7.8pt; font-weight:900; color:var(--brand); }
+/* STEP 1 의 ( O , X ) 가 줄 끝에서 갈라지지 않게 */
+.ox-answer{ white-space:nowrap; }
 </style>
 </head>
 <body>
@@ -291,13 +317,14 @@
         <li>세상 모든 물리량의 '기본 재료'는 몇 가지일까? <span class="qgo">개념 2</span></li>
         <li>속도의 단위 m/s는 어디서 왔을까? <span class="qgo">개념 3</span></li>
         <li>나노 기술의 '나노'는 얼마나 작은 걸까? <span class="qgo">개념 4</span></li>
+        <li>일기 예보의 25&nbsp;℃는 켈빈으로 몇 K일까? <span class="qgo">개념 5</span></li>
       </ul>
     </div>
 
     <div class="opener-quote">"자연 상수로 세운 단위는 모든 시대, 모든 문명에게 그 의미를 유지할 것이다."<span class="who">— 막스 플랑크, 자연 단위를 제안하며(1899)</span></div>
   </div>
 
-  <div class="folio"><span>박찬 과학 | 통합과학 1</span><span class="num">22</span></div>
+  <div class="folio"><span>박찬 과학 | 통합과학 1</span><span class="num">26</span></div>
 </div>
 
 <!-- ═════════════ p.23 개념 01 단위가 없으면 ═════════════ -->
@@ -310,44 +337,44 @@
     <div class="main">
       <h3 class="sec"><span class="n">1</span>숫자만으로는 부족하다 — 단위의 힘</h3>
       <p class="body">"3만큼 가서 5만큼 기다려."라는 지시는 실행할 수 없다. 3 <b>m</b>인지 3 <b>km</b>인지, 5<b>초</b>인지 5<b>분</b>인지가 빠졌기 때문이다. 측정값은 반드시 <span class="u-amber">수치 + 단위</span>의 짝으로 쓴다. <span class="kw">단위</span>는 '무엇을 기준으로 몇 배인가'를 알려 주는 약속이며, 이 약속이 있어야 측정이 소통이 된다.</p>
-      <p class="body">약속이 어긋나면 대가는 혹독하다. 1999년 미국 항공우주국(NASA)의 <b>화성 기후 궤도선</b>은 화성에 도착하자마자 실종됐다. 조사 결과, 한 팀은 힘의 크기를 <b>미터법 단위(뉴턴 기준)</b>로, 다른 팀은 <b>야드파운드법 단위(파운드힘 기준)</b>로 계산해 주고받은 것이 원인이었다 — 숫자는 맞았지만 단위가 달랐고, 탐사선은 예정보다 화성에 너무 가깝게 진입해 파괴된 것으로 추정된다. 수천억 원짜리 교훈: <b>단위는 과학의 문법이다.</b></p>
+      <p class="body">약속이 어긋나면 대가는 혹독하다. 1999년 미국 항공우주국(NASA)의 <b>화성 기후 궤도선</b>은 화성에 도착하자마자 실종됐다. 조사 결과, 추진기를 분사한 효과(힘 × 시간) 데이터를 한 팀은 <b>야드파운드법 단위(파운드힘·초)</b>로 넘겼는데, 다른 팀은 이를 <b>미터법 단위(뉴턴·초)</b>로 받아 계산한 것이 원인이었다 — 숫자는 맞았지만 단위가 달랐고, 탐사선은 예정보다 화성에 너무 가깝게 진입해 파괴된 것으로 추정된다. 탐사선 한 대를 통째로 잃은 교훈: <b>단위는 과학의 문법이다.</b></p>
 
       <figure>
-        <svg width="470" height="146" viewBox="0 0 470 146" font-family="PC Sans">
+        <svg width="494" height="153.5" viewBox="0 0 470 146" font-family="PC Sans">
           <defs>
             <marker id="arrP" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="#3E9C6E"/></marker>
             <marker id="arrR" markerWidth="7" markerHeight="7" refX="5" refY="2.5" orient="auto"><path d="M0,0 L6,2.5 L0,5 Z" fill="#D6455D"/></marker>
           </defs>
-          <g font-size="6.8">
+          <g font-size="10.3">
             <g transform="translate(118,8)">
               <rect x="-102" y="0" width="204" height="102" rx="6" fill="#FBEBEE" stroke="#E3A0AC" stroke-width="1"/>
-              <text x="0" y="16" text-anchor="middle" font-size="8.4" font-weight="800" fill="#A9556A">1999년, 화성 기후 궤도선</text>
-              <g transform="translate(-40,52)">
-                <rect x="-30" y="-12" width="60" height="24" rx="4" fill="#fff" stroke="#9AA7B1"/>
+              <text x="0" y="16" text-anchor="middle" font-size="11.1" font-weight="800" fill="#A9556A">1999년, 화성 기후 궤도선</text>
+              <g transform="translate(-52,52)">
+                <rect x="-32" y="-12" width="64" height="24" rx="4" fill="#fff" stroke="#9AA7B1"/>
                 <text y="3" text-anchor="middle" font-weight="800" fill="#3E9C6E">뉴턴 기준</text>
                 <text y="26" text-anchor="middle" fill="#5B6B77">지상 관제팀</text>
               </g>
-              <g transform="translate(46,52)">
-                <rect x="-30" y="-12" width="60" height="24" rx="4" fill="#fff" stroke="#9AA7B1"/>
+              <g transform="translate(44,52)">
+                <rect x="-40" y="-12" width="80" height="24" rx="4" fill="#fff" stroke="#9AA7B1"/>
                 <text y="3" text-anchor="middle" font-weight="800" fill="#D6455D">파운드힘 기준</text>
                 <text y="26" text-anchor="middle" fill="#5B6B77">소프트웨어팀</text>
               </g>
-              <text x="3" y="55" text-anchor="middle" font-size="9" font-weight="900" fill="#A9556A">≠</text>
+              <text x="-6" y="56" text-anchor="middle" font-size="11.4" font-weight="900" fill="#A9556A">≠</text>
               <text x="0" y="94" text-anchor="middle" font-weight="800" fill="#A9556A">숫자는 맞았다 — 단위가 달랐다</text>
             </g>
             <g transform="translate(352,8)">
               <rect x="-104" y="0" width="208" height="102" rx="6" fill="#F0F8F3" stroke="#BFE0CD" stroke-width="1"/>
-              <text x="0" y="16" text-anchor="middle" font-size="8.4" font-weight="800" fill="#3E9C6E">측정값 = 수치 + 단위</text>
+              <text x="0" y="16" text-anchor="middle" font-size="11.1" font-weight="800" fill="#3E9C6E">측정값 = 수치 + 단위</text>
               <g text-anchor="middle" font-weight="800">
-                <rect x="-84" y="30" width="76" height="26" rx="4" fill="#EAF6EC" stroke="#6FBE93"/><text x="-46" y="47" font-size="10" fill="#3E9C6E">5.0</text>
-                <text x="0" y="47" font-size="9" fill="#5B6B77">+</text>
-                <rect x="8" y="30" width="76" height="26" rx="4" fill="#FDF3E0" stroke="#E8940A"/><text x="46" y="47" font-size="10" fill="#B4560E">m/s</text>
+                <rect x="-84" y="30" width="76" height="26" rx="4" fill="#EAF6EC" stroke="#6FBE93"/><text x="-46" y="47" font-size="11.9" fill="#3E9C6E">5.0</text>
+                <text x="0" y="47" font-size="11.4" fill="#5B6B77">+</text>
+                <rect x="8" y="30" width="76" height="26" rx="4" fill="#FDF3E0" stroke="#E8940A"/><text x="46" y="47" font-size="11.9" fill="#B4560E">m/s</text>
               </g>
               <text x="0" y="74" text-anchor="middle" fill="#5B6B77">'기준(단위)의 몇 배(수치)인가'를 함께 말해야</text>
               <text x="0" y="88" text-anchor="middle" fill="#5B6B77">측정이 비로소 소통이 된다</text>
             </g>
           </g>
-          <text x="235" y="134" text-anchor="middle" font-size="8.8" font-weight="800" fill="#E8940A">단위가 어긋나면 우주선도 떨어진다 — 단위는 선택이 아니라 문법이다</text>
+          <text x="235" y="134" text-anchor="middle" font-size="11.3" font-weight="800" fill="#E8940A">단위가 어긋나면 우주선도 떨어진다 — 단위는 선택이 아니라 문법이다</text>
         </svg>
         <figcaption>그림 1 | 단위의 힘 — 수치와 단위는 한 몸이다</figcaption>
       </figure>
@@ -368,7 +395,7 @@
     </div>
   </div>
 
-  <div class="folio"><span>I. 과학의 기초</span><span class="num">23</span></div>
+  <div class="folio"><span>I. 과학의 기초</span><span class="num">27</span></div>
 </div>
 
 <!-- ═════════════ p.24 개념 02 SI 기본량 7가지 ═════════════ -->
@@ -381,44 +408,44 @@
       <p class="body">일곱 개의 낯익은 얼굴들을 보라. 길이와 시간은 01에서 만났고, 물질량(mol)은 화학에서, 온도(K)와 전류(A)는 물리에서 계속 만나게 된다. 이 일곱이 자연의 '알파벳'인 이유는 단순하다 — <b>세상의 모든 물리량이 이 일곱 가지의 조합으로 표현되기 때문</b>이다. 마치 자음과 모음 몇 개로 모든 단어를 쓰듯이.</p>
 
       <figure>
-        <svg width="470" height="212" viewBox="0 0 470 212" font-family="PC Sans">
-          <g font-size="7" text-anchor="middle">
-            <text x="235" y="15" font-size="8.6" font-weight="800" fill="#3E9C6E">국제단위계(SI)의 기본량 7가지 — 자연을 쓰는 알파벳</text>
+        <svg width="494" height="227" viewBox="0 0 470 216" font-family="PC Sans">
+          <g font-size="10.3" text-anchor="middle">
+            <text x="235" y="15" font-size="11.1" font-weight="800" fill="#3E9C6E">국제단위계(SI)의 기본량 7가지 — 자연을 쓰는 알파벳</text>
             <g font-weight="800">
               <g transform="translate(70,28)">
                 <rect x="-44" y="0" width="88" height="56" rx="5" fill="#F0F8F3" stroke="#6FBE93" stroke-width="1.1"/>
-                <text y="24" font-size="12" fill="#3E9C6E">m</text><text y="44" font-size="7.6" fill="#22303A">길이</text>
+                <text y="24" font-size="12" fill="#3E9C6E">m</text><text y="44" font-size="10.6" fill="#22303A">길이</text>
               </g>
               <g transform="translate(180,28)">
                 <rect x="-44" y="0" width="88" height="56" rx="5" fill="#F0F8F3" stroke="#6FBE93" stroke-width="1.1"/>
-                <text y="24" font-size="12" fill="#3E9C6E">kg</text><text y="44" font-size="7.6" fill="#22303A">질량</text>
+                <text y="24" font-size="12" fill="#3E9C6E">kg</text><text y="44" font-size="10.6" fill="#22303A">질량</text>
               </g>
               <g transform="translate(290,28)">
                 <rect x="-44" y="0" width="88" height="56" rx="5" fill="#F0F8F3" stroke="#6FBE93" stroke-width="1.1"/>
-                <text y="24" font-size="12" fill="#3E9C6E">s</text><text y="44" font-size="7.6" fill="#22303A">시간</text>
+                <text y="24" font-size="12" fill="#3E9C6E">s</text><text y="44" font-size="10.6" fill="#22303A">시간</text>
               </g>
               <g transform="translate(400,28)">
                 <rect x="-44" y="0" width="88" height="56" rx="5" fill="#F0F8F3" stroke="#6FBE93" stroke-width="1.1"/>
-                <text y="24" font-size="12" fill="#3E9C6E">A</text><text y="44" font-size="7.6" fill="#22303A">전류</text>
+                <text y="24" font-size="12" fill="#3E9C6E">A</text><text y="44" font-size="10.6" fill="#22303A">전류</text>
               </g>
               <g transform="translate(125,94)">
                 <rect x="-44" y="0" width="88" height="56" rx="5" fill="#F0F8F3" stroke="#6FBE93" stroke-width="1.1"/>
-                <text y="24" font-size="12" fill="#3E9C6E">K</text><text y="44" font-size="7.6" fill="#22303A">온도</text>
+                <text y="24" font-size="12" fill="#3E9C6E">K</text><text y="44" font-size="10.6" fill="#22303A">온도</text>
               </g>
               <g transform="translate(235,94)">
                 <rect x="-44" y="0" width="88" height="56" rx="5" fill="#F0F8F3" stroke="#6FBE93" stroke-width="1.1"/>
-                <text y="24" font-size="12" fill="#3E9C6E">mol</text><text y="44" font-size="7.6" fill="#22303A">물질량</text>
+                <text y="24" font-size="12" fill="#3E9C6E">mol</text><text y="44" font-size="10.6" fill="#22303A">물질량</text>
               </g>
               <g transform="translate(345,94)">
                 <rect x="-44" y="0" width="88" height="56" rx="5" fill="#F0F8F3" stroke="#6FBE93" stroke-width="1.1"/>
-                <text y="24" font-size="12" fill="#3E9C6E">cd</text><text y="44" font-size="7.6" fill="#22303A">광도(빛의 세기)</text>
+                <text y="24" font-size="12" fill="#3E9C6E">cd</text><text y="44" font-size="10.6" fill="#22303A">광도(빛의 세기)</text>
               </g>
             </g>
             <line x1="235" y1="156" x2="235" y2="166" stroke="#3E9C6E" stroke-width="1.8" marker-end="url(#arrP)"/>
-            <rect x="60" y="170" width="350" height="24" rx="12" fill="#FDF3E0" stroke="#E8940A" stroke-width="1"/>
-            <text x="235" y="186" font-size="7.8" font-weight="800" fill="#B4560E">일곱을 곱하고 나누면 → 속도 m/s · 밀도 kg/m<tspan dy="-0.34em" font-size="68%">3</tspan><tspan dy="0.34em"> · 힘 N — 모든 물리량이 나온다</tspan></text>
+            <rect x="16" y="170" width="438" height="24" rx="12" fill="#FDF3E0" stroke="#E8940A" stroke-width="1"/>
+            <text x="235" y="186" font-size="10.7" font-weight="800" fill="#B4560E">일곱을 곱하고 나누면 → 속도 m/s · 밀도 kg/m<tspan dy="-0.34em" font-size="76%">3</tspan><tspan dy="0.34em"> · 힘 N — 모든 물리량이 나온다</tspan></text>
           </g>
-          <text x="235" y="206" text-anchor="middle" font-size="8.8" font-weight="800" fill="#E8940A">기본량 7가지 = 길이 · 질량 · 시간 · 전류 · 온도 · 물질량 · 광도</text>
+          <text x="235" y="212" text-anchor="middle" font-size="11.2" font-weight="800" fill="#E8940A">기본량 7가지 = 길이 · 질량 · 시간 · 전류 · 온도 · 물질량 · 광도</text>
         </svg>
         <figcaption>그림 2 | SI 기본량과 기본단위 — 일곱 개면 자연을 다 쓴다</figcaption>
       </figure>
@@ -452,7 +479,7 @@
     </ol>
     <div class="qc-ans">정답 1 O 2 X (kg이다) 3 X (길이와 시간에서 유도된다)</div>
   </div>
-  <div class="folio"><span>I. 과학의 기초</span><span class="num">24</span></div>
+  <div class="folio"><span>I. 과학의 기초</span><span class="num">28</span></div>
 </div>
 
 <!-- ═════════════ p.25 개념 03 유도량 ═════════════ -->
@@ -462,58 +489,74 @@
     <div class="main">
       <h3 class="sec"><span class="n">3</span>조합의 기술 — 유도량과 유도단위</h3>
       <p class="body">기본량을 곱하고 나누면 새로운 물리량이 태어난다. 이렇게 <b>기본량의 조합으로 정의되는 양</b>이 <span class="kw">유도량</span>이다. 속도는 거리(길이)를 시간으로 나눈 것이니 단위도 그대로 <span class="u-amber">m/s</span>가 되고, 부피는 길이를 세 번 곱해 m<sup>3</sup>, 밀도는 질량을 부피로 나눠 kg/m<sup>3</sup>가 된다. <b>단위를 보면 그 양이 어떻게 만들어졌는지가 보인다</b> — 단위는 정의의 요약본이다.</p>
-      <p class="body">III단원에서 만난 양들을 다시 보자. 운동량의 단위 kg·m/s는 '질량 × 속도'라는 정의를 그대로 읽은 것이고, 힘의 단위 <span class="kw">뉴턴(N)</span>도 풀어 쓰면 kg·m/s<sup>2</sup>이다. 이렇게 자주 쓰는 유도단위에는 과학자의 이름을 붙인 별명(N, J, W 등)을 주기도 한다. 별명이 있어도 <b>정체는 언제나 기본단위의 조합</b>이다.</p>
+      <p class="body">III단원에서 만날 양들을 미리 보자. 운동량의 단위 kg·m/s는 '질량 × 속도'라는 정의를 그대로 읽은 것이고, 힘의 단위 <span class="kw">뉴턴(N)</span>도 풀어 쓰면 kg·m/s<sup>2</sup>이다. 이렇게 자주 쓰는 유도단위에는 과학자의 이름을 붙인 별명(N, J, W 등)을 주기도 한다. 별명이 있어도 <b>정체는 언제나 기본단위의 조합</b>이다.</p>
+      <p class="body">화학에서 쓰는 <span class="kw">농도</span>도 유도량이다. 농도는 용액에 녹아 있는 용질의 양을 용액의 양으로 나눈 값(용질의 양 ÷ 용액의 양)이라 g/L, 혈액 검사의 mg/dL 같은 단위가 붙는다. 밀도와 같은 '질량 ÷ 부피' 꼴이지만, 밀도는 물질 전체의 질량을, 농도는 <b>녹아 있는 용질의 질량만</b> 센다는 점이 다르다.</p>
 
-      <figure>
-        <svg width="470" height="176" viewBox="0 0 470 176" font-family="PC Sans">
-          <g font-size="7" text-anchor="middle">
-            <g transform="translate(90,12)">
-              <rect x="-72" y="0" width="144" height="100" rx="6" fill="#F0F8F3" stroke="#BFE0CD" stroke-width="1"/>
-              <text y="18" font-size="8.2" font-weight="800" fill="#3E9C6E">속도 = 거리 ÷ 시간</text>
+      <figure style="margin-bottom:3mm">
+        <svg width="494" height="185" viewBox="0 0 470 176" font-family="PC Sans">
+          <g font-size="10.6" text-anchor="middle">
+            <g transform="translate(60,10)">
+              <rect x="-55" y="0" width="110" height="106" rx="6" fill="#F0F8F3" stroke="#BFE0CD" stroke-width="1"/>
+              <text y="18" font-size="11.2" font-weight="800" fill="#3E9C6E">속도 = 거리 ÷ 시간</text>
               <g font-weight="800">
-                <rect x="-56" y="30" width="42" height="22" rx="3" fill="#EAF6EC" stroke="#6FBE93"/><text x="-35" y="45" fill="#3E9C6E">m</text>
-                <text x="-6" y="45" font-size="9" fill="#5B6B77">÷</text>
-                <rect x="8" y="30" width="42" height="22" rx="3" fill="#EAF6EC" stroke="#6FBE93"/><text x="29" y="45" fill="#3E9C6E">s</text>
+                <rect x="-44" y="30" width="36" height="22" rx="3" fill="#EAF6EC" stroke="#6FBE93"/><text x="-26" y="45" fill="#3E9C6E">m</text>
+                <text x="0" y="45" font-size="11.6" fill="#5B6B77">÷</text>
+                <rect x="8" y="30" width="36" height="22" rx="3" fill="#EAF6EC" stroke="#6FBE93"/><text x="26" y="45" fill="#3E9C6E">s</text>
               </g>
-              <line x1="0" y1="60" x2="0" y2="70" stroke="#3E9C6E" stroke-width="1.6" marker-end="url(#arrP)"/>
-              <text y="86" font-size="9" font-weight="900" fill="#B4560E">m/s</text>
+              <line x1="0" y1="58" x2="0" y2="68" stroke="#3E9C6E" stroke-width="1.6" marker-end="url(#arrP)"/>
+              <text y="84" font-size="11.6" font-weight="900" fill="#B4560E">m/s</text>
+              <text y="98" font-size="10.3" fill="#5B6B77">생활에서는 km/h</text>
             </g>
-            <g transform="translate(240,12)">
-              <rect x="-64" y="0" width="128" height="100" rx="6" fill="#F0F8F3" stroke="#BFE0CD" stroke-width="1"/>
-              <text y="18" font-size="8.2" font-weight="800" fill="#3E9C6E">부피 = 길이<tspan dy="-0.34em" font-size="68%">3</tspan></text>
+            <g transform="translate(176,10)">
+              <rect x="-55" y="0" width="110" height="106" rx="6" fill="#F0F8F3" stroke="#BFE0CD" stroke-width="1"/>
+              <text y="18" font-size="11.2" font-weight="800" fill="#3E9C6E">부피 = 길이<tspan dy="-0.34em" font-size="76%">3</tspan></text>
               <g stroke="#6FBE93" stroke-width="1.2" fill="#EAF6EC">
-                <path d="M-20,38 h26 v26 h-26 Z"/><path d="M-20,38 l9,-8 h26 l-9,8 Z"/><path d="M6,38 l9,-8 v26 l-9,8 Z"/>
+                <path d="M-16,34 h22 v22 h-22 Z"/><path d="M-16,34 l8,-7 h22 l-8,7 Z"/><path d="M6,34 l8,-7 v22 l-8,7 Z"/>
               </g>
-              <line x1="0" y1="72" x2="0" y2="80" stroke="#3E9C6E" stroke-width="1.6" marker-end="url(#arrP)"/>
-              <text y="94" font-size="9" font-weight="900" fill="#B4560E">m<tspan dy="-0.34em" font-size="68%">3</tspan></text>
+              <line x1="0" y1="62" x2="0" y2="70" stroke="#3E9C6E" stroke-width="1.6" marker-end="url(#arrP)"/>
+              <text y="84" font-size="11.6" font-weight="900" fill="#B4560E">m<tspan dy="-0.34em" font-size="76%">3</tspan></text>
+              <text y="98" font-size="10.3" fill="#5B6B77">1&#160;L = 10<tspan dy="-0.34em" font-size="76%">−3</tspan><tspan dy="0.34em"> m</tspan><tspan dy="-0.34em" font-size="76%">3</tspan></text>
             </g>
-            <g transform="translate(382,12)">
-              <rect x="-76" y="0" width="152" height="100" rx="6" fill="#FDF9F0" stroke="#EBCB9C" stroke-width="1"/>
-              <text y="18" font-size="8.2" font-weight="800" fill="#B4560E">밀도 = 질량 ÷ 부피</text>
+            <g transform="translate(292,10)">
+              <rect x="-55" y="0" width="110" height="106" rx="6" fill="#FDF9F0" stroke="#EBCB9C" stroke-width="1"/>
+              <text y="18" font-size="11.2" font-weight="800" fill="#B4560E">밀도 = 질량 ÷ 부피</text>
               <g font-weight="800">
-                <rect x="-58" y="30" width="44" height="22" rx="3" fill="#EAF6EC" stroke="#6FBE93"/><text x="-36" y="45" fill="#3E9C6E">kg</text>
-                <text x="-7" y="45" font-size="9" fill="#5B6B77">÷</text>
-                <rect x="8" y="30" width="44" height="22" rx="3" fill="#EAF6EC" stroke="#6FBE93"/><text x="30" y="45" fill="#3E9C6E">m<tspan dy="-0.34em" font-size="68%">3</tspan></text>
+                <rect x="-44" y="30" width="36" height="22" rx="3" fill="#EAF6EC" stroke="#6FBE93"/><text x="-26" y="45" fill="#3E9C6E">kg</text>
+                <text x="0" y="45" font-size="11.6" fill="#5B6B77">÷</text>
+                <rect x="8" y="30" width="36" height="22" rx="3" fill="#EAF6EC" stroke="#6FBE93"/><text x="26" y="45" fill="#3E9C6E">m<tspan dy="-0.34em" font-size="76%">3</tspan></text>
               </g>
-              <line x1="0" y1="60" x2="0" y2="70" stroke="#3E9C6E" stroke-width="1.6" marker-end="url(#arrP)"/>
-              <text y="86" font-size="9" font-weight="900" fill="#B4560E">kg/m<tspan dy="-0.34em" font-size="68%">3</tspan></text>
+              <line x1="0" y1="58" x2="0" y2="68" stroke="#3E9C6E" stroke-width="1.6" marker-end="url(#arrP)"/>
+              <text y="84" font-size="11.6" font-weight="900" fill="#B4560E">kg/m<tspan dy="-0.34em" font-size="76%">3</tspan></text>
+              <text y="98" font-size="10.3" fill="#5B6B77">생활에서는 g/mL</text>
+            </g>
+            <g transform="translate(408,10)">
+              <rect x="-55" y="0" width="110" height="106" rx="6" fill="#FDF9F0" stroke="#EBCB9C" stroke-width="1"/>
+              <text y="18" font-size="11.2" font-weight="800" fill="#B4560E">농도 = 용질 ÷ 용액</text>
+              <g font-weight="800">
+                <rect x="-44" y="30" width="36" height="22" rx="3" fill="#FDF3E0" stroke="#E8940A"/><text x="-26" y="45" fill="#B4560E">g</text>
+                <text x="0" y="45" font-size="11.6" fill="#5B6B77">÷</text>
+                <rect x="8" y="30" width="36" height="22" rx="3" fill="#FDF3E0" stroke="#E8940A"/><text x="26" y="45" fill="#B4560E">L</text>
+              </g>
+              <line x1="0" y1="58" x2="0" y2="68" stroke="#3E9C6E" stroke-width="1.6" marker-end="url(#arrP)"/>
+              <text y="84" font-size="11.6" font-weight="900" fill="#B4560E">g/L</text>
+              <text y="98" font-size="10.3" fill="#5B6B77">혈액 검사에서는 mg/dL</text>
             </g>
           </g>
-          <g font-size="7" text-anchor="middle">
-              <rect x="60" y="122" width="350" height="24" rx="12" fill="#F0F8F3" stroke="#6FBE93" stroke-width="1"/>
-              <text x="235" y="138" font-weight="800" fill="#2E7A54">이름 붙은 유도단위 — 힘 N = kg·m/s<tspan dy="-0.34em" font-size="68%">2</tspan><tspan dy="0.34em"> · 운동량 kg·m/s (III단원 복습!)</tspan></text>
+          <g font-size="10.6" text-anchor="middle">
+              <rect x="60" y="126" width="350" height="22" rx="11" fill="#F0F8F3" stroke="#6FBE93" stroke-width="1"/>
+              <text x="235" y="140.5" font-weight="800" fill="#2E7A54">이름 붙은 유도단위 — 힘 N = kg·m/s<tspan dy="-0.34em" font-size="76%">2</tspan><tspan dy="0.34em"> · 운동량 kg·m/s (III단원 예고!)</tspan></text>
             </g>
-          <text x="235" y="166" text-anchor="middle" font-size="8.8" font-weight="800" fill="#E8940A">유도량의 단위는 정의의 요약본 — 단위를 읽으면 만든 방법이 보인다</text>
+          <text x="235" y="168" text-anchor="middle" font-size="11.5" font-weight="800" fill="#E8940A">유도량의 단위는 정의의 요약본 — 단위를 읽으면 만든 방법이 보인다</text>
         </svg>
-        <figcaption>그림 3 | 유도량 — 기본량을 곱하고 나누어 만드는 새 물리량</figcaption>
+        <figcaption>그림 3 | 유도량 — 기본량을 곱하고 나누어 만드는 새 물리량(농도도 유도량이다)</figcaption>
       </figure>
 
-      <div class="gist">
+      <div class="gist" style="margin-top:3.6mm">
         <div class="boxtitle"><span class="ico">알</span>알짜 정리 ① — 기본량과 유도량</div>
         <ul>
           <li><b>측정값 = 수치 + 단위</b> — 단위가 어긋나면 우주선도 떨어진다 (화성 기후 궤도선)</li>
           <li><b>기본량 7가지</b>: 길이 m · 질량 kg · 시간 s · 전류 A · 온도 K · 물질량 mol · 광도 cd</li>
-          <li><b>유도량</b> = 기본량의 조합: 속도 m/s, 부피 m<sup>3</sup>, 밀도 kg/m<sup>3</sup>, 힘 N(= kg·m/s<sup>2</sup>)</li>
+          <li><b>유도량</b> = 기본량의 조합: 속도 m/s, 부피 m<sup>3</sup>, 밀도 kg/m<sup>3</sup>, 농도 g/L, 힘 N(= kg·m/s<sup>2</sup>)</li>
         </ul>
       </div>
     </div>
@@ -522,6 +565,7 @@
       <div class="wtitle">날개 노트</div>
       <div class="term"><b>이름 붙은 유도단위</b>힘 N(뉴턴), 에너지 J(줄), 일률 W(와트) — 편의상의 별명일 뿐, 정체는 기본단위의 조합이다.</div>
       <div class="term"><b>단위 검산법</b>공식이 헷갈리면 단위를 계산해 보라 — 양변의 단위가 다르면 그 식은 무조건 틀렸다.</div>
+      <div class="term"><b>농도의 단위</b>g/L·mg/dL = 용질의 질량 ÷ 용액의 부피. 질량 백분율(%)은 같은 단위끼리 나눈 비율이라 단위가 없다.</div>
       <div class="wsep"></div>
       <div class="wtitle">한눈에 암기</div>
       <div class="wing-pen">유도량 = 기본량의 조합<br>속도 m/s, 밀도 kg/m<sup>3</sup><br>단위가 곧 정의!</div>
@@ -534,9 +578,9 @@
       <li><span class="no">2</span>밀도는 기본량이다. ( O , X )</li>
       <li><span class="no">3</span>힘의 단위 N은 기본단위의 조합으로 나타낼 수 있다. ( O , X )</li>
     </ol>
-    <div class="qc-ans">정답 1 O 2 X (질량÷부피로 유도) 3 O (kg·m/s<sup>2</sup>)</div>
+    <div class="qc-ans">정답 1 O (거리 ÷ 시간) 2 X (질량÷부피로 유도) 3 O (kg·m/s<sup>2</sup>)</div>
   </div>
-  <div class="folio"><span>I. 과학의 기초</span><span class="num">25</span></div>
+  <div class="folio"><span>I. 과학의 기초</span><span class="num">29</span></div>
 </div>
 
 <!-- ═════════════ p.26 개념 04 접두어 ═════════════ -->
@@ -546,48 +590,48 @@
     <div class="main">
       <h3 class="sec"><span class="n">4</span>크기의 옷 — 접두어</h3>
       <p class="body">단위 앞에 붙어 크기를 조절하는 말이 <span class="kw">접두어</span>다. 킬로(k)는 10<sup>3</sup>배, 밀리(m)는 10<sup>−3</sup>배 — 그래서 1 km는 1000 m, 1 mm는 0.001 m다. 더 작은 쪽으로 마이크로(μ, 10<sup>−</sup><sup>6</sup>)와 <span class="kw">나노</span>(n, 10<sup>−</sup><sup>9</sup>)가, 더 큰 쪽으로 메가(M, 10<sup>6</sup>)와 기가(G, 10<sup>9</sup>)가 있다. 01에서 배운 10의 거듭제곱에 <span class="u-amber">이름을 붙인 것</span>이라 보면 정확하다.</p>
-      <p class="body">접두어는 규모에 맞는 옷이다. 세균의 크기는 0.000002 m라 쓰는 대신 2 μm로, 반도체 회로 선폭은 몇 nm로, 데이터 용량은 GB(기가바이트)로 쓴다. '나노 기술'이라는 이름 자체가 <b>10<sup>−</sup><sup>9</sup> m 규모 — 원자 몇십 개 크기의 세계를 다루는 기술</b>이라는 뜻이다. II단원의 그래핀처럼 나노 세계의 신소재가 첨단 기술의 앞줄에 선 이유도, 그 규모에서 물질이 새로운 성질을 드러내기 때문이다.</p>
+      <p class="body">접두어는 규모에 맞는 옷이다. 세균의 크기는 0.000002 m라 쓰는 대신 2 μm로, 반도체 회로 선폭은 몇 nm로, 데이터 용량은 GB(기가바이트)로 쓴다. '나노 기술'이라는 이름 자체가 <b>10<sup>−</sup><sup>9</sup> m 규모 — 원자 몇십 개 크기의 세계를 다루는 기술</b>이라는 뜻이다. 앞으로 II단원에서 만날 그래핀처럼 나노 세계의 신소재가 첨단 기술의 앞줄에 선 이유도, 그 규모에서 물질이 새로운 성질을 드러내기 때문이다.</p>
 
       <figure>
-        <svg width="470" height="174" viewBox="0 0 470 174" font-family="PC Sans">
-          <g font-size="6.8">
+        <svg width="494" height="195.5" viewBox="0 0 470 186" font-family="PC Sans">
+          <g font-size="10.5">
             <line x1="30" y1="58" x2="446" y2="58" stroke="#3E9C6E" stroke-width="2" marker-end="url(#arrP)"/>
             <g text-anchor="middle" font-weight="800">
               <g transform="translate(66,58)">
                 <rect x="-30" y="-34" width="60" height="22" rx="4" fill="#EAF6EC" stroke="#6FBE93"/><text y="-19" fill="#3E9C6E">나노 n</text>
-                <text y="16">10<tspan dy="-0.34em" font-size="68%">−</tspan><tspan dy="0.34em"><tspan dy="-0.34em" font-size="68%">9</tspan><tspan dy="0.34em"></tspan></tspan></text><text y="28" font-weight="400" fill="#5B6B77">반도체 회로</text>
+                <text y="16">10<tspan dy="-0.34em" font-size="76%">−9</tspan><tspan dy="0.34em"></tspan></text><text y="28" font-weight="400" fill="#5B6B77">반도체 회로</text>
               </g>
               <g transform="translate(146,58)">
-                <rect x="-30" y="-34" width="60" height="22" rx="4" fill="#EAF6EC" stroke="#6FBE93"/><text y="-19" fill="#3E9C6E">마이크로 μ</text>
-                <text y="16">10<tspan dy="-0.34em" font-size="68%">−</tspan><tspan dy="0.34em"><tspan dy="-0.34em" font-size="68%">6</tspan><tspan dy="0.34em"></tspan></tspan></text><text y="28" font-weight="400" fill="#5B6B77">세균 크기</text>
+                <rect x="-35" y="-34" width="70" height="22" rx="4" fill="#EAF6EC" stroke="#6FBE93"/><text y="-19" fill="#3E9C6E">마이크로 μ</text>
+                <text y="16">10<tspan dy="-0.34em" font-size="76%">−6</tspan><tspan dy="0.34em"></tspan></text><text y="28" font-weight="400" fill="#5B6B77">세균 크기</text>
               </g>
               <g transform="translate(226,58)">
                 <rect x="-30" y="-34" width="60" height="22" rx="4" fill="#EAF6EC" stroke="#6FBE93"/><text y="-19" fill="#3E9C6E">밀리 m</text>
-                <text y="16">10<tspan dy="-0.34em" font-size="68%">−3</tspan></text><text y="28" font-weight="400" fill="#5B6B77">약 용량 mg</text>
+                <text y="16">10<tspan dy="-0.34em" font-size="76%">−3</tspan></text><text y="28" font-weight="400" fill="#5B6B77">약 용량 mg</text>
               </g>
               <g transform="translate(306,58)">
                 <rect x="-30" y="-34" width="60" height="22" rx="4" fill="#FDF3E0" stroke="#E8940A"/><text y="-19" fill="#B4560E">킬로 k</text>
-                <text y="16">10<tspan dy="-0.34em" font-size="68%">3</tspan></text><text y="28" font-weight="400" fill="#5B6B77">거리 km</text>
+                <text y="16">10<tspan dy="-0.34em" font-size="76%">3</tspan></text><text y="28" font-weight="400" fill="#5B6B77">거리 km</text>
               </g>
               <g transform="translate(386,58)">
-                <rect x="-30" y="-34" width="60" height="22" rx="4" fill="#FDF3E0" stroke="#E8940A"/><text y="-19" fill="#B4560E">메가·기가</text>
-                <text y="16">10<tspan dy="-0.34em" font-size="68%">6</tspan><tspan dy="0.34em"> · 10<tspan dy="-0.34em" font-size="68%">9</tspan></tspan></text><text y="28" font-weight="400" fill="#5B6B77">데이터 MB·GB</text>
+                <rect x="-35" y="-34" width="70" height="22" rx="4" fill="#FDF3E0" stroke="#E8940A"/><text y="-19" fill="#B4560E">메가·기가</text>
+                <text y="16">10<tspan dy="-0.34em" font-size="76%">6</tspan><tspan dy="0.34em"> · 10<tspan dy="-0.34em" font-size="76%">9</tspan></tspan></text><text y="28" font-weight="400" fill="#5B6B77">데이터 MB·GB</text>
               </g>
             </g>
-            <text x="235" y="104" text-anchor="middle" font-size="7.2" fill="#5B6B77">기준(10<tspan dy="-0.34em" font-size="68%">0</tspan><tspan dy="0.34em">)에서 왼쪽은 작아지는 옷, 오른쪽은 커지는 옷 — 세 자리(10<tspan dy="-0.34em" font-size="68%">3</tspan><tspan dy="0.34em">)씩 갈아입는다</tspan></tspan></text>
-            <g text-anchor="middle" font-size="6.4">
-              <rect x="30" y="114" width="410" height="26" rx="4" fill="#FDF9F0" stroke="#EBCB9C" stroke-width="0.9"/>
-              <text x="235" y="124" font-weight="800" fill="#B4560E" font-size="6.8">실물로 감 잡기</text>
+            <text x="235" y="104" text-anchor="middle" font-size="10.7" fill="#5B6B77">기준(10<tspan dy="-0.34em" font-size="76%">0</tspan><tspan dy="0.34em">)에서 왼쪽은 작아지는 옷, 오른쪽은 커지는 옷 — 세 자리(10<tspan dy="-0.34em" font-size="76%">3</tspan><tspan dy="0.34em">)씩 갈아입는다</tspan></tspan></text>
+            <g text-anchor="middle" font-size="10.3">
+              <rect x="22" y="114" width="426" height="46" rx="4" fill="#FDF9F0" stroke="#EBCB9C" stroke-width="0.9"/>
+              <text x="235" y="127" font-weight="800" fill="#B4560E" font-size="10.5">실물로 감 잡기</text>
               <g fill="#5B6B77">
-                <text x="86" y="135">반도체 공정 5 nm</text>
-                <text x="182" y="135">세균 2 μm</text>
-                <text x="262" y="135">알약 500 mg</text>
-                <text x="342" y="135">마라톤 42.195 km</text>
-                <text x="422" y="135">저장 용량 256 GB</text>
+                <text x="66" y="141">반도체 공정</text><text x="66" y="154">5 nm</text>
+                <text x="146" y="141">세균</text><text x="146" y="154">2 μm</text>
+                <text x="226" y="141">알약</text><text x="226" y="154">500 mg</text>
+                <text x="306" y="141">마라톤</text><text x="306" y="154">42.195 km</text>
+                <text x="386" y="141">저장 용량</text><text x="386" y="154">256 GB</text>
               </g>
             </g>
           </g>
-          <text x="235" y="164" text-anchor="middle" font-size="8.8" font-weight="800" fill="#E8940A">접두어 = 10의 거듭제곱에 붙인 이름 — n(10<tspan dy="-0.34em" font-size="68%">−</tspan><tspan dy="0.34em"><tspan dy="-0.34em" font-size="68%">9</tspan><tspan dy="0.34em">) μ(10<tspan dy="-0.34em" font-size="68%">−</tspan><tspan dy="0.34em"><tspan dy="-0.34em" font-size="68%">6</tspan><tspan dy="0.34em">) m(10<tspan dy="-0.34em" font-size="68%">−3</tspan><tspan dy="0.34em">) k(10<tspan dy="-0.34em" font-size="68%">3</tspan><tspan dy="0.34em">) M(10<tspan dy="-0.34em" font-size="68%">6</tspan><tspan dy="0.34em">) G(10<tspan dy="-0.34em" font-size="68%">9</tspan><tspan dy="0.34em">)</tspan></tspan></tspan></tspan></tspan></tspan></tspan></tspan></text>
+          <text x="235" y="178" text-anchor="middle" font-size="11.5" font-weight="800" fill="#E8940A">접두어 = 10의 거듭제곱에 붙인 이름 — n(10<tspan dy="-0.34em" font-size="76%">−9</tspan><tspan dy="0.34em">) μ(10<tspan dy="-0.34em" font-size="76%">−6</tspan><tspan dy="0.34em">) m(10<tspan dy="-0.34em" font-size="76%">−3</tspan><tspan dy="0.34em">) k(10<tspan dy="-0.34em" font-size="76%">3</tspan><tspan dy="0.34em">) M(10<tspan dy="-0.34em" font-size="76%">6</tspan><tspan dy="0.34em">) G(10<tspan dy="-0.34em" font-size="76%">9</tspan><tspan dy="0.34em">)</tspan></tspan></tspan></tspan></tspan></tspan></text>
         </svg>
         <figcaption>그림 4 | 접두어의 사다리 — 규모에 맞는 옷을 골라 입는다</figcaption>
       </figure>
@@ -616,12 +660,12 @@
     <span class="qc-title">바로바로 체크</span>
     <ol>
       <li><span class="no">1</span>1 km는 1000 m이다. ( O , X )</li>
-      <li><span class="no">2</span>1 nm는 10<sup>9</sup> m이다. ( O , X )</li>
+      <li><span class="no">2</span><span>1 nm는 10<sup>9</sup> m이다. ( O , X )</span></li>
       <li><span class="no">3</span>세균의 크기는 마이크로미터(μm) 단위로 나타내면 편리하다. ( O , X )</li>
     </ol>
-    <div class="qc-ans">정답 1 O 2 X (10<sup>−</sup><sup>9</sup> m) 3 O</div>
+    <div class="qc-ans">정답 1 O 2 X (10<sup>−</sup><sup>9</sup> m) 3 O (세균은 약 2&nbsp;μm)</div>
   </div>
-  <div class="folio"><span>I. 과학의 기초</span><span class="num">26</span></div>
+  <div class="folio"><span>I. 과학의 기초</span><span class="num">30</span></div>
 </div>
 
 <!-- ═════════════ p.27 개념 05 생활 속의 단위 ═════════════ -->
@@ -631,37 +675,37 @@
     <div class="main">
       <h3 class="sec"><span class="n">5</span>단위는 생활 속에서 일한다</h3>
       <p class="body">단위는 교과서 밖에서 더 바쁘다. 도로 표지판의 <b>km/h</b>는 속도위반의 기준이 되고, 처방전의 <b>mg</b>은 약효와 부작용의 경계가 되며, 식품 포장의 <b>g과 kcal</b>는 영양 관리의 잣대가 된다. 병원의 혈압(mmHg), 날씨의 기온(℃)과 강수량(mm), 전기 요금 고지서의 kWh — <span class="u-amber">일상은 온통 단위로 기술되고, 단위로 관리된다.</span></p>
-      <p class="body">생활 단위 중에는 SI 기본단위가 아닌 것도 많다. ℃는 K에서, kcal는 J에서 환산되는 <b>관용 단위</b>다. 편리해서 남아 있지만, 과학·산업의 최종 기준은 언제나 SI다. 국가 간 무역에서 저울이, 병원 간 이송에서 검사 수치가, 나라마다 다르면 어떻게 되겠는가 — <b>같은 단위 체계를 쓴다는 것</b>은 전 세계가 같은 자로 재고 같은 언어로 말한다는 뜻이다. 그 '같은 자'를 지키는 장치가 다음 소단원의 주제, 측정 표준이다.</p>
+      <p class="body">생활 단위가 모두 같은 자격은 아니다. 기온의 <b>℃(섭씨도)</b>는 기본단위 K(켈빈)에서 만든 <b>SI 유도단위</b>다. 두 온도는 <span class="u-amber" style="white-space:nowrap;">T(K)&nbsp;=&nbsp;t(℃)&nbsp;+&nbsp;273.15</span>의 관계여서, 출발점만 다르고 눈금 한 칸의 크기는 같다(1&nbsp;℃ 차이 = 1&nbsp;K 차이). 부피의 L(리터)는 SI는 아니지만 SI와 함께 쓰도록 허용된 단위(1&nbsp;L = 10<sup>−3</sup>&nbsp;m<sup>3</sup>)이고, 식품의 kcal는 SI가 아닌 단위라 J로 환산해 쓴다. 생활 단위가 편리해서 남아 있어도, 과학·산업의 최종 기준은 언제나 SI다. 국가 간 무역에서 저울이, 병원 간 이송에서 검사 수치가, 나라마다 다르면 어떻게 되겠는가 — <b>같은 단위 체계를 쓴다는 것</b>은 전 세계가 같은 자로 재고 같은 언어로 말한다는 뜻이다. 그 '같은 자'를 지키는 장치가 다음 소단원의 주제, 측정 표준이다.</p>
 
       <figure>
-        <svg width="470" height="128" viewBox="0 0 470 128" font-family="PC Sans">
-          <g font-size="7" text-anchor="middle">
+        <svg width="494" height="134.5" viewBox="0 0 470 128" font-family="PC Sans">
+          <g font-size="10.3" text-anchor="middle">
             <g transform="translate(64,8)">
               <rect x="-54" y="0" width="108" height="88" rx="6" fill="#FBEBEE" stroke="#E3A0AC" stroke-width="0.9"/>
               <circle cx="0" cy="34" r="20" fill="#fff" stroke="#D6455D" stroke-width="2"/>
-              <text y="39" font-size="9.5" font-weight="900" fill="#D6455D">60</text>
+              <text y="39" font-size="11.6" font-weight="900" fill="#D6455D">60</text>
               <text y="74" font-weight="800">도로 — km/h</text>
             </g>
             <g transform="translate(178,8)">
               <rect x="-54" y="0" width="108" height="88" rx="6" fill="#EAF6EC" stroke="#5FA86A" stroke-width="0.9"/>
               <rect x="-24" y="16" width="48" height="34" rx="4" fill="#fff" stroke="#5FA86A" stroke-width="1.2"/>
-              <text y="38" font-size="8.4" font-weight="900" fill="#2E6B3A">500 mg</text>
+              <text y="38" font-size="11" font-weight="900" fill="#2E6B3A">500 mg</text>
               <text y="74" font-weight="800">처방전 — mg</text>
             </g>
             <g transform="translate(292,8)">
               <rect x="-54" y="0" width="108" height="88" rx="6" fill="#FDF9F0" stroke="#EBCB9C" stroke-width="0.9"/>
               <path d="M-14,20 q-10,0 -10,10 v14 q0,10 10,10 h28 q10,0 10,-10 v-14 q0,-10 -10,-10 Z" fill="#fff" stroke="#E8940A" stroke-width="1.2"/>
-              <text y="38" font-size="7.6" font-weight="900" fill="#B4560E">210 kcal</text>
+              <text y="38" font-size="10.6" font-weight="900" fill="#B4560E">210 kcal</text>
               <text y="74" font-weight="800">식품 표시 — g·kcal</text>
             </g>
             <g transform="translate(406,8)">
               <rect x="-54" y="0" width="108" height="88" rx="6" fill="#F0F8F3" stroke="#BFE0CD" stroke-width="0.9"/>
               <path d="M-18,48 q-6,-26 12,-30 q4,-8 12,-4 l-6,12 h10 l-16,24 l4,-14 Z" fill="#3E9C6E" opacity="0.85"/>
-              <text x="14" y="30" font-size="7.6" font-weight="900" fill="#3E9C6E">kWh</text>
+              <text x="24" y="40" font-size="10.6" font-weight="900" fill="#3E9C6E">kWh</text>
               <text y="74" font-weight="800">전기 요금 — kWh</text>
             </g>
           </g>
-          <text x="235" y="118" text-anchor="middle" font-size="8.8" font-weight="800" fill="#E8940A">속도위반도, 약효도, 영양도, 요금도 — 일상의 판정 기준은 전부 단위 위에 서 있다</text>
+          <text x="235" y="118" text-anchor="middle" font-size="11.2" font-weight="800" fill="#E8940A">속도위반도, 약효도, 영양도, 요금도 — 일상의 판정 기준은 전부 단위 위에 서 있다</text>
         </svg>
         <figcaption>그림 5 | 생활 속의 단위 — 단위는 매일 우리를 판정하고 보호한다</figcaption>
       </figure>
@@ -671,14 +715,15 @@
         <ul>
           <li><b>측정값 = 수치 + 단위</b> / 기본량 7가지(m·kg·s·A·K·mol·cd)는 자연의 알파벳</li>
           <li><b>유도량</b> = 기본량의 조합(m/s, m<sup>3</sup>, kg/m<sup>3</sup>, N) / <b>접두어</b> = 크기의 옷(n·μ·m·k·M·G)</li>
-          <li>생활 단위(℃, kcal)도 뿌리는 SI — 전 세계가 <b>같은 자</b>로 재기에 과학·무역·의료가 통한다</li>
+          <li><b>℃는 SI 유도단위</b>(T = t + 273.15), L는 SI와 함께 쓰는 단위, kcal는 비SI — 모두 SI로 환산되어 <b>같은 자</b>로 통한다</li>
         </ul>
       </div>
     </div>
 
     <div class="wing">
       <div class="wtitle">날개 노트</div>
-      <div class="term"><b>관용 단위</b>℃(온도), kcal(에너지), L(부피)처럼 SI는 아니지만 널리 쓰이는 단위 — 모두 SI로 환산된다.</div>
+      <div class="term"><b>섭씨와 켈빈</b>T(K) = t(℃) + 273.15 — 보통 273으로 어림한다. 0&nbsp;℃ ≈ 273&nbsp;K, 0&nbsp;K = −273.15&nbsp;℃. 온도 차이 1&nbsp;℃ = 1&nbsp;K.</div>
+      <div class="term"><b>생활 단위 3분류</b>℃ = SI 유도단위 · L = SI와 함께 쓰는 단위 · kcal = 비SI 단위(J로 환산)</div>
       <div class="term"><b>kWh</b>일률(kW)에 시간(h)을 곱한 에너지의 단위 — 전기 요금은 '에너지를 얼마나 썼나'로 매긴다.</div>
       <div class="wsep"></div>
       <div class="wtitle">한눈에 암기</div>
@@ -692,9 +737,9 @@
       <li><span class="no">2</span>℃와 kcal는 SI 기본단위이다. ( O , X )</li>
       <li><span class="no">3</span>전 세계가 같은 단위 체계를 쓰면 과학과 무역에 유리하다. ( O , X )</li>
     </ol>
-    <div class="qc-ans">정답 1 O 2 X (관용 단위 — K·J에서 환산) 3 O</div>
+    <div class="qc-ans">정답 1 O 2 X (기본단위는 K — ℃는 SI 유도단위, kcal는 비SI) 3 O</div>
   </div>
-  <div class="folio"><span>I. 과학의 기초</span><span class="num">27</span></div>
+  <div class="folio"><span>I. 과학의 기초</span><span class="num">31</span></div>
 </div>
 
 <!-- ═════════════ p.28 자료 파헤치기 ═════════════ -->
@@ -704,31 +749,31 @@
     <div class="lab-head">자료 파헤치기 <span class="tag">탐구·자료 분석</span> <span style="font-weight:600; font-size:9.5pt; margin-left:auto;">단위가 다르면 우주선이 떨어진다</span></div>
     <div class="lab-body">
       <h4>자료</h4>
-      <p>1999년 9월, NASA의 화성 기후 궤도선이 화성 궤도 진입 중 실종되었다. 사고 조사 보고서의 요지: 탐사선의 궤도를 수정하는 추진력 데이터를 <b>소프트웨어팀은 야드파운드법 단위(파운드힘 기준)</b>로 산출했고, <b>항법팀은 이를 미터법 단위(뉴턴 기준)</b>로 받아 계산했다. 1 파운드힘 ≈ 4.45뉴턴 — 추진력이 약 4.45배 어긋난 채 항법 계산이 누적되었고, 탐사선은 계획보다 훨씬 낮은 고도로 화성 대기에 진입해 파괴된 것으로 추정된다.</p>
+      <p>1999년 9월, NASA의 화성 기후 궤도선이 화성 궤도 진입 중 실종되었다. 사고 조사 보고서(NASA, 1999)의 요지: 탐사선의 자세를 잡으려고 추진기를 분사할 때마다 생기는 충격량(힘 × 시간) 데이터를 <b>소프트웨어팀은 야드파운드법 단위(파운드힘·초)</b>로 산출했고, <b>항법팀은 이를 미터법 단위(뉴턴·초)</b>로 받아 계산했다. 1&nbsp;파운드힘 ≈ 4.45&nbsp;뉴턴 — 궤도 계산에 들어간 값이 실제의 약 1/4.45로 작게 잡힌 채 9개월 동안 오차가 누적되었고, 탐사선은 계획보다 훨씬 낮은 고도로 화성 대기에 진입해 파괴된 것으로 추정된다.</p>
       <figure>
-        <svg width="430" height="132" viewBox="0 0 430 132" font-family="PC Sans">
-          <g font-size="6.8" text-anchor="middle">
+        <svg width="600" height="132" viewBox="0 0 600 132" font-family="PC Sans">
+          <g font-size="11" text-anchor="middle">
             <g font-weight="800">
-              <rect x="14" y="14" width="108" height="44" rx="5" fill="#FBEBEE" stroke="#E3A0AC" stroke-width="1"/>
-              <text x="68" y="31" fill="#A9556A">소프트웨어팀</text>
-              <text x="68" y="46" font-size="6.4" fill="#5B6B77">파운드힘 기준으로 산출</text>
-              <rect x="176" y="14" width="108" height="44" rx="5" fill="#F0F8F3" stroke="#BFE0CD" stroke-width="1"/>
-              <text x="230" y="31" fill="#2E7A54">항법팀</text>
-              <text x="230" y="46" font-size="6.4" fill="#5B6B77">뉴턴 기준으로 해석</text>
-              <rect x="338" y="14" width="80" height="44" rx="5" fill="#FDF3E0" stroke="#E8940A" stroke-width="1"/>
-              <text x="378" y="31" fill="#B4560E">추진력</text>
-              <text x="378" y="46" font-size="6.4" fill="#B4560E">약 4.45배 오차</text>
+              <rect x="10" y="4" width="170" height="48" rx="5" fill="#FBEBEE" stroke="#E3A0AC" stroke-width="1"/>
+              <text x="95" y="23" fill="#A9556A">소프트웨어팀</text>
+              <text x="95" y="41" font-size="10.8" fill="#5B6B77">파운드힘·초 기준으로 산출</text>
+              <rect x="258" y="4" width="140" height="48" rx="5" fill="#F0F8F3" stroke="#BFE0CD" stroke-width="1"/>
+              <text x="328" y="23" fill="#2E7A54">항법팀</text>
+              <text x="328" y="41" font-size="10.8" fill="#5B6B77">뉴턴·초 기준으로 해석</text>
+              <rect x="460" y="4" width="130" height="48" rx="5" fill="#FDF3E0" stroke="#E8940A" stroke-width="1"/>
+              <text x="525" y="23" fill="#B4560E">충격량 값</text>
+              <text x="525" y="41" font-size="10.8" fill="#B4560E">약 4.45배 오차</text>
             </g>
-            <line x1="124" y1="36" x2="172" y2="36" stroke="#5B6B77" stroke-width="1.6" marker-end="url(#arrR)"/>
-            <text x="148" y="28" font-size="6" fill="#5B6B77">숫자만 전달</text>
-            <line x1="286" y1="36" x2="334" y2="36" stroke="#5B6B77" stroke-width="1.6" marker-end="url(#arrR)"/>
+            <line x1="183" y1="28" x2="252" y2="28" stroke="#5B6B77" stroke-width="1.6" marker-end="url(#arrR)"/>
+            <text x="217" y="20" font-size="10.6" fill="#5B6B77">숫자만 전달</text>
+            <line x1="401" y1="28" x2="454" y2="28" stroke="#5B6B77" stroke-width="1.6" marker-end="url(#arrR)"/>
             <!-- 궤도 결과 -->
-            <circle cx="96" cy="98" r="16" fill="#F6C98E" stroke="#E8940A" stroke-width="1.2"/>
-            <text x="96" y="124" font-size="6.4" fill="#5B6B77" font-weight="800">화성</text>
-            <path d="M170,74 q-40,4 -58,14" fill="none" stroke="#9AA7B1" stroke-width="1.3" stroke-dasharray="4 2.5"/>
-            <text x="216" y="76" font-size="6.2" fill="#5B6B77">계획 궤도 — 안전 고도</text>
-            <path d="M300,84 q-120,10 -190,22" fill="none" stroke="#D6455D" stroke-width="1.6" marker-end="url(#arrR)"/>
-            <text x="342" y="88" font-size="6.2" fill="#D6455D" font-weight="800">실제 — 너무 낮게 진입, 파괴</text>
+            <circle cx="96" cy="94" r="16" fill="#F6C98E" stroke="#E8940A" stroke-width="1.2"/>
+            <text x="96" y="126" font-size="10.8" fill="#5B6B77" font-weight="800">화성</text>
+            <path d="M190,72 q-50,4 -76,14" fill="none" stroke="#9AA7B1" stroke-width="1.3" stroke-dasharray="4 2.5"/>
+            <text x="198" y="76" font-size="10.6" fill="#5B6B77" text-anchor="start">계획 궤도 — 안전 고도</text>
+            <path d="M330,88 q-130,8 -218,12" fill="none" stroke="#D6455D" stroke-width="1.6" marker-end="url(#arrR)"/>
+            <text x="338" y="92" font-size="10.6" fill="#D6455D" font-weight="800" text-anchor="start">실제 — 너무 낮게 진입, 파괴</text>
           </g>
         </svg>
         <figcaption>그림 | 사고의 구조 — 숫자는 정확했지만 단위의 약속이 어긋났다</figcaption>
@@ -740,16 +785,21 @@
         <li><b>무엇이 재발을 막는가</b> — 계산서에 단위를 반드시 함께 쓰고, 주고받는 데이터의 단위를 계약처럼 명시하는 것. 국제단위계(SI)라는 공용어가 존재하는 이유가 이 사고 하나로 요약된다.</li>
       </ol>
       <h4>결론</h4>
-      <p>단위는 형식이 아니라 안전장치다. 숫자에 단위를 붙이는 습관은 시험 감점을 막는 기술이 아니라, <b>수천억 원짜리 실수를 막는 과학의 기본기</b>다.</p>
+      <p>단위는 형식이 아니라 안전장치다. 숫자에 단위를 붙이는 습관은 시험 감점을 막는 기술이 아니라, <b>탐사선 한 대를 통째로 잃는 실수를 막는 과학의 기본기</b>다.</p>
       <div class="expoint">
         <div class="boxtitle"><span class="ico">!</span>시험엔 이렇게</div>
         <p>이 사례는 <b>"단위(측정 표준)가 왜 필요한가"</b>의 근거 자료로 출제된다 — 03의 측정 표준과 이어지는 징검다리. "계산 실수가 원인이다"(X — 단위 혼동이 원인) 선지를 조심하라.</p>
       </div>
-      <h4>직접 해보기 — 단위 탐정</h4>
-      <p>오늘 하루 눈에 띄는 단위를 10개 수집해 보자(교통 표지판, 과자 봉지, 처방전, 일기예보, 충전기 표시…). 각각을 '기본단위의 조합'으로 풀어 보면 — 예: kWh = kW × h = 에너지 — 유도량 개념이 저절로 정리된다.</p>
+      <h4>직접 해보기 — 단위 환산 3종</h4>
+      <p>야드파운드법은 지금도 스포츠 중계·항공·해외 일기 예보에 남아 있다. 환산 관계를 써서 SI 쪽으로 바꿔 보자.</p>
+      <ol>
+        <li>투수의 공 95&nbsp;마일/h → km/h (1&nbsp;마일 ≈ 1.61&nbsp;km) &nbsp;<span style="color:var(--sub);">답 약 153&nbsp;km/h</span></li>
+        <li>여객기 순항 고도 35000&nbsp;ft → km (1&nbsp;ft = 0.3048&nbsp;m) &nbsp;<span style="color:var(--sub);">답 약 10.7&nbsp;km</span></li>
+        <li>해외 일기 예보 86&nbsp;℉ → ℃ (t<sub>℃</sub> = (t<sub>℉</sub> − 32) × 5/9) &nbsp;<span style="color:var(--sub);">답 30&nbsp;℃ ≈ 303&nbsp;K</span></li>
+      </ol>
     </div>
   </div>
-  <div class="folio"><span>I. 과학의 기초</span><span class="num">28</span></div>
+  <div class="folio"><span>I. 과학의 기초</span><span class="num">32</span></div>
 </div>
 
 <!-- ═════════════ p.29 STEP 1 + STEP 2 시작 ═════════════ -->
@@ -761,7 +811,7 @@
     <div>
       <div class="q"><div class="qhead"><span class="qno">1</span><div class="stem">측정값은 단위 없이 수치만 적어도 충분하다. <span class="ox-answer">( O , X )</span></div></div></div>
       <div class="q"><div class="qhead"><span class="qno">2</span><div class="stem">부피와 밀도는 기본량을 조합해 만든 유도량이다. <span class="ox-answer">( O , X )</span></div></div></div>
-      <div class="q"><div class="qhead"><span class="qno">3</span><div class="stem">1 nm는 10<sup>−</sup><sup>9</sup> m이다. <span class="ox-answer">( O , X )</span></div></div></div>
+      <div class="q"><div class="qhead"><span class="qno">3</span><div class="stem">1 nm는 10<sup>−9</sup> m이다. <span class="ox-answer">( O , X )</span></div></div></div>
     </div>
     <div>
       <div class="q"><div class="qhead"><span class="qno">4</span><div class="stem">국제단위계(SI)의 기본량은 모두 <span class="blankline" style="min-width:7mm;"></span>가지이다.</div></div></div>
@@ -774,130 +824,435 @@
 
   <div class="step-head s2"><span class="stepno">STEP 2</span><span class="steptt">내신 완성</span><span class="stepdesc">학교 시험 유형 그대로 — 서술형까지 한 번에</span></div>
 
-  <div class="q">
-    <div class="qhead"><span class="qno">7</span><div class="stem">국제단위계(SI)의 기본량과 기본단위를 옳게 짝 지은 것은? <span class="difficulty">●●○</span>
-    <div class="tags">10통과1-01-02 | 개념 2</div></div></div>
-    <ul class="choices">
-      <li>① 질량 — g</li>
-      <li>② 온도 — ℃</li>
-      <li>③ 속도 — m/s</li>
-      <li>④ 부피 — m<sup>3</sup></li>
-      <li>⑤ 물질량 — mol</li>
-    </ul>
+  <div class="qgrid qg2">
+    <div>
+      <div class="q">
+        <div class="qhead"><span class="qno">7</span><div class="stem">국제단위계(SI)의 기본량과 기본단위를 옳게 짝 지은 것은? <span class="difficulty">●○○</span>
+        <div class="tags">10통과1-01-02 | 개념 2</div></div></div>
+        <ul class="choices">
+          <li>① 질량 — g</li>
+          <li>② 온도 — ℃</li>
+          <li>③ 속도 — m/s</li>
+          <li>④ 부피 — m<sup>3</sup></li>
+          <li>⑤ 물질량 — mol</li>
+        </ul>
+      </div>
+
+      <div class="q">
+        <div class="qhead"><span class="qno">8</span><div class="stem">유도량과 그 단위에 대한 설명으로 옳은 것은? <span class="difficulty">●●○</span>
+        <div class="tags">10통과1-01-02 | 개념 3</div></div></div>
+        <ul class="choices">
+          <li>① 밀도의 단위 kg/m<sup>3</sup>는 kg과 m를 조합한 것이다.</li>
+          <li>② 유도량은 기본량과 관계없이 따로 정의된다.</li>
+          <li>③ 속도는 기본량이므로 m/s는 기본단위이다.</li>
+          <li>④ 힘의 단위 N은 기본단위로 풀어 쓸 수 없다.</li>
+          <li>⑤ 부피는 기본량이므로 m<sup>3</sup>는 기본단위이다.</li>
+        </ul>
+      </div>
+
+      <div class="q">
+        <div class="qhead"><span class="qno">9</span><div class="stem">온도의 단위에 대한 설명으로 옳은 것은? <span class="difficulty">●○○</span>
+        <div class="tags">10통과1-01-02 | 개념 2·5</div></div></div>
+        <ul class="choices">
+          <li>① 온도의 SI 기본단위는 ℃이다.</li>
+          <li>② 25&nbsp;℃를 켈빈 온도로 나타내면 약 298&nbsp;K이다.</li>
+          <li>③ 섭씨온도가 1&nbsp;℃ 오르면 켈빈 온도는 273&nbsp;K 오른다.</li>
+          <li>④ 0&nbsp;K와 0&nbsp;℃는 같은 온도이다.</li>
+          <li>⑤ ℃는 SI 단위로 바꿀 수 없는 비SI 단위이다.</li>
+        </ul>
+      </div>
+    </div>
+    <div>
+      <div class="q">
+        <div class="qhead"><span class="qno">10</span><div class="stem">단위의 쓰임에 대한 설명으로 옳은 것만을 &lt;보기&gt;에서 있는 대로 고른 것은? <span class="difficulty">●○○</span>
+        <div class="tags">10통과1-01-02 | 개념 1·5</div></div></div>
+        <div class="bogi-box">
+          <div class="bt">보기</div>
+          ㄱ. 화성 기후 궤도선은 단위 혼동으로 실종되었다.<br>
+          ㄴ. 처방전의 약 용량은 흔히 mg 단위로 나타낸다.<br>
+          ㄷ. ℃는 국제단위계의 기본단위이다.
+        </div>
+        <ul class="choices inline">
+          <li>① ㄱ</li><li>② ㄷ</li><li>③ ㄱ, ㄴ</li><li>④ ㄴ, ㄷ</li><li>⑤ ㄱ, ㄴ, ㄷ</li>
+        </ul>
+      </div>
+
+      <div class="q">
+        <div class="qhead"><span class="qno">11</span><div class="stem"><span class="must">중요</span><span class="badge-data">자료</span>표는 물리량 (가), (나)의 정의이다. (가), (나)의 SI 단위를 순서대로 옳게 나타낸 것은? <span class="difficulty">●●○</span>
+        <div class="tags">10통과1-01-02 | 개념 3</div></div></div>
+        <figure style="margin:2mm 0 1mm 8.6mm;">
+          <svg width="270" height="64.8" viewBox="0 0 250 60" font-family="PC Sans">
+            <rect x="1" y="1" width="248" height="19" fill="#EAF6EC"/>
+            <rect x="1" y="1" width="248" height="58" fill="none" stroke="#B8C2CA" stroke-width="0.9"/>
+            <g stroke="#B8C2CA" stroke-width="0.8"><line x1="1" y1="20" x2="249" y2="20"/><line x1="1" y1="40" x2="249" y2="40"/><line x1="78" y1="1" x2="78" y2="59"/></g>
+            <g font-size="10" font-weight="800" fill="#2E7A54" text-anchor="middle"><text x="39.5" y="14">물리량</text><text x="163.5" y="14">정의</text></g>
+            <g font-size="10" fill="#22303A" text-anchor="middle">
+              <text x="39.5" y="34" font-weight="800">(가) 넓이</text><text x="163.5" y="34">길이 × 길이</text>
+              <text x="39.5" y="54" font-weight="800">(나) 가속도</text><text x="163.5" y="54">속도의 변화량 ÷ 걸린 시간</text>
+            </g>
+          </svg>
+        </figure>
+        <ul class="choices inline">
+          <li>① m<sup>2</sup>, m/s</li>
+          <li>② m<sup>2</sup>, m/s<sup>2</sup></li>
+          <li>③ m<sup>3</sup>, m/s<sup>2</sup></li>
+          <li>④ m<sup>3</sup>, m/s</li>
+          <li>⑤ m, m·s</li>
+        </ul>
+      </div>
+    </div>
   </div>
 
-  <div class="q">
-    <div class="qhead"><span class="qno">8</span><div class="stem">유도량과 그 단위에 대한 설명으로 옳은 것은? <span class="difficulty">●●●</span>
-    <div class="tags">10통과1-01-02 | 개념 3</div></div></div>
-    <ul class="choices">
-      <li>① 유도량은 기본량과 무관하게 새로 정의된다.</li>
-      <li>② 속도의 단위 m/s는 기본량인 속도의 고유 단위이다.</li>
-      <li>③ 밀도의 단위 kg/m<sup>3</sup>는 질량과 길이의 기본단위에서 유도된 것이다.</li>
-      <li>④ 힘의 단위 N은 기본단위로 풀어 쓸 수 없다.</li>
-      <li>⑤ 부피는 기본량이므로 단위도 기본단위이다.</li>
-    </ul>
-  </div>
-
-  <div class="folio"><span>I. 과학의 기초</span><span class="num">29</span></div>
+  <div class="folio"><span>I. 과학의 기초</span><span class="num">33</span></div>
 </div>
 
-<!-- ═════════════ p.30 STEP 2 계속 ═════════════ -->
+<!-- ═════════════ p.30 STEP 2 계속 (11~15) ═════════════ -->
 <div class="page">
   <div class="runhead"><span class="unit-tag">I. 과학의 기초</span><span class="lesson-tag">02. 기본량과 단위 | 문제</span></div>
 
-  <div class="q">
-    <div class="qhead"><span class="qno">9</span><div class="stem"><span class="badge-data">자료</span>어떤 세균의 크기가 2 μm이다. 이를 10의 거듭제곱을 사용해 m 단위로 옳게 나타낸 것은? <span class="difficulty">●●●</span>
-    <div class="tags">10통과1-01-02 | 개념 4</div></div></div>
-    <ul class="choices inline">
-      <li>① 2 × 10<sup>−3</sup> m</li>
-      <li>② 2 × 10<sup>−</sup><sup>6</sup> m</li>
-      <li>③ 2 × 10<sup>−</sup><sup>9</sup> m</li>
-      <li>④ 2 × 10<sup>6</sup> m</li>
-      <li>⑤ 2 × 10<sup>9</sup> m</li>
-    </ul>
-  </div>
+  <div class="qgrid qg2">
+    <div>
+      <div class="q">
+        <div class="qhead"><span class="qno">12</span><div class="stem"><span class="must">중요</span><span class="badge-data">자료</span>그림은 여러 물리량을 두 가지 질문에 따라 A~C로 분류하는 과정을 나타낸 것이다. 옳은 것만을 &lt;보기&gt;에서 있는 대로 고른 것은? <span class="difficulty">●●○</span>
+        <div class="tags">10통과1-01-02 | 개념 2·3</div></div></div>
+        <figure style="margin:2mm 0 1mm 8.6mm;">
+          <svg width="294" height="97.3" viewBox="0 0 290 96" font-family="PC Sans">
+            <defs><marker id="arrQ" markerWidth="7" markerHeight="7" refX="5" refY="2.5" orient="auto"><path d="M0,0 L6,2.5 L0,5 Z" fill="#5B6B77"/></marker></defs>
+            <rect x="2" y="8" width="88" height="30" rx="5" fill="#F0F8F3" stroke="#6FBE93" stroke-width="1"/>
+            <text x="46" y="27" font-size="11.3" font-weight="800" fill="#22303A" text-anchor="middle">SI 기본량인가?</text>
+            <rect x="118" y="8" width="122" height="30" rx="5" fill="#F0F8F3" stroke="#6FBE93" stroke-width="1"/>
+            <text x="179" y="20.5" font-size="11" font-weight="800" fill="#22303A" text-anchor="middle">기본단위에 접두어가</text>
+            <text x="179" y="32" font-size="11" font-weight="800" fill="#22303A" text-anchor="middle">붙어 있는가?</text>
+            <g stroke="#5B6B77" stroke-width="1.2" fill="none">
+              <line x1="90" y1="23" x2="114" y2="23" marker-end="url(#arrQ)"/>
+              <line x1="240" y1="23" x2="258" y2="23" marker-end="url(#arrQ)"/>
+              <line x1="46" y1="38" x2="46" y2="62" marker-end="url(#arrQ)"/>
+              <line x1="179" y1="38" x2="179" y2="62" marker-end="url(#arrQ)"/>
+            </g>
+            <g font-size="10.7" fill="#B4560E" font-weight="800" text-anchor="middle">
+              <text x="102" y="18">예</text><text x="249" y="18">예</text>
+              <text x="62" y="54">아니요</text><text x="195" y="54">아니요</text>
+            </g>
+            <g font-size="11.4" font-weight="900" fill="#fff" text-anchor="middle">
+              <rect x="262" y="12" width="24" height="22" rx="4" fill="#0E5A6B"/><text x="274" y="26.5">B</text>
+              <rect x="34" y="66" width="24" height="22" rx="4" fill="#0E5A6B"/><text x="46" y="80.5">A</text>
+              <rect x="167" y="66" width="24" height="22" rx="4" fill="#0E5A6B"/><text x="179" y="80.5">C</text>
+            </g>
+          </svg>
+        </figure>
+        <div class="bogi-box">
+          <div class="bt">보기</div>
+          ㄱ. 속도는 A에 속한다.<br>
+          ㄴ. B에 속하는 물리량은 질량 하나뿐이다.<br>
+          ㄷ. C에 속하는 물리량은 6가지이다.
+        </div>
+        <ul class="choices inline">
+          <li>① ㄱ</li><li>② ㄷ</li><li>③ ㄱ, ㄴ</li><li>④ ㄴ, ㄷ</li><li>⑤ ㄱ, ㄴ, ㄷ</li>
+        </ul>
+      </div>
 
-  <div class="q">
-    <div class="qhead"><span class="qno">10</span><div class="stem">단위의 적용에 대한 설명으로 옳은 것만을 고른 것은? <span class="difficulty">●●●</span>
-    <div class="tags">10통과1-01-02 | 개념 1·5</div></div></div>
-    <div class="bogi-box" style="background:#fff;">
-      (가) 화성 기후 궤도선 사고의 원인은 두 팀이 서로 다른 단위 체계로 데이터를 주고받은 것이었다.<br>
-      (나) 처방전의 약 용량은 mg 단위로 표기된다.<br>
-      (다) ℃는 국제단위계의 기본단위이다.
+      <div class="q">
+        <div class="qhead"><span class="qno">13</span><div class="stem">다음은 힘의 단위 N에 대한 학생 A, B, C의 대화이다. 옳게 말한 학생만을 있는 대로 고른 것은? <span class="difficulty">●○○</span>
+        <div class="tags">10통과1-01-02 | 개념 3</div></div></div>
+        <div class="bogi-box">
+          <b>학생 A</b> : N은 과학자 뉴턴의 이름을 붙였으니 SI 기본단위 중 하나야.<br>
+          <b>학생 B</b> : N을 기본단위로 풀어 쓰면 kg·m/s<sup>2</sup>이야.<br>
+          <b>학생 C</b> : 운동량의 단위 kg·m/s처럼, 유도량의 단위를 보면 그 양을 어떻게 정의했는지 알 수 있어.
+        </div>
+        <ul class="choices inline">
+          <li>① A</li><li>② C</li><li>③ A, B</li><li>④ B, C</li><li>⑤ A, B, C</li>
+        </ul>
+      </div>
+
     </div>
-    <ul class="choices inline">
-      <li>① (가)</li><li>② (나)</li><li>③ (가), (나)</li><li>④ (나), (다)</li><li>⑤ (가), (나), (다)</li>
-    </ul>
+    <div>
+      <div class="q">
+        <div class="qhead"><span class="qno">14</span><div class="stem"><span class="badge-data">탐구</span>다음은 나무토막의 밀도를 구하는 활동이다.
+          <div class="exp"><b>[과정]</b> (가) 자로 정육면체 모양 나무토막의 한 모서리 길이를 잰다.<br>(나) 전자저울로 나무토막의 질량을 잰다.<br>(다) 밀도 = 질량 ÷ 부피로 밀도를 구한다.<br><b>[결과]</b> 한 모서리 길이: 0.1&nbsp;m, 질량: 0.6&nbsp;kg</div>
+          이에 대한 설명으로 옳은 것만을 &lt;보기&gt;에서 있는 대로 고른 것은? <span class="difficulty">●●○</span>
+        <div class="tags">10통과1-01-02 | 개념 3·4</div></div></div>
+        <div class="bogi-box">
+          <div class="bt">보기</div>
+          ㄱ. 나무토막의 부피는 0.3&nbsp;m<sup>3</sup>이다.<br>
+          ㄴ. 나무토막의 밀도는 600&nbsp;kg/m<sup>3</sup>이다.<br>
+          ㄷ. 질량을 g 단위로 바꾸어 밀도를 g/m<sup>3</sup>로 나타내면, 수치는 ㄴ의 1000배가 된다.
+        </div>
+        <ul class="choices inline">
+          <li>① ㄱ</li><li>② ㄷ</li><li>③ ㄱ, ㄴ</li><li>④ ㄴ, ㄷ</li><li>⑤ ㄱ, ㄴ, ㄷ</li>
+        </ul>
+      </div>
+
+      <div class="q">
+        <div class="qhead"><span class="qno">15</span><div class="stem"><span class="badge-data">자료</span>그림은 측정값 A~C를 접두어를 붙인 단위로 나타낸 것이다. 옳은 것만을 &lt;보기&gt;에서 있는 대로 고른 것은? <span class="difficulty">●●○</span>
+        <div class="tags">10통과1-01-02 | 개념 4</div></div></div>
+        <figure style="margin:2mm 0 1mm 8.6mm;">
+          <svg width="294" height="62.9" viewBox="0 0 290 62" font-family="PC Sans">
+            <g text-anchor="middle">
+              <rect x="2" y="2" width="90" height="56" rx="5" fill="#F0F8F3" stroke="#6FBE93" stroke-width="1"/>
+              <text x="47" y="17" font-size="10.7" font-weight="900" fill="#0E5A6B">A</text>
+              <text x="47" y="31" font-size="10.7" fill="#5B6B77">반도체 회로 선폭</text>
+              <text x="47" y="50" font-size="11" font-weight="900" fill="#3E9C6E">5 nm</text>
+              <rect x="100" y="2" width="90" height="56" rx="5" fill="#F0F8F3" stroke="#6FBE93" stroke-width="1"/>
+              <text x="145" y="17" font-size="10.7" font-weight="900" fill="#0E5A6B">B</text>
+              <text x="145" y="31" font-size="10.7" fill="#5B6B77">세균의 크기</text>
+              <text x="145" y="50" font-size="11" font-weight="900" fill="#3E9C6E">2 μm</text>
+              <rect x="198" y="2" width="90" height="56" rx="5" fill="#FDF9F0" stroke="#EBCB9C" stroke-width="1"/>
+              <text x="243" y="17" font-size="10.7" font-weight="900" fill="#0E5A6B">C</text>
+              <text x="243" y="31" font-size="10.7" fill="#5B6B77">알약 한 알의 질량</text>
+              <text x="243" y="50" font-size="11" font-weight="900" fill="#B4560E">500 mg</text>
+            </g>
+          </svg>
+        </figure>
+        <div class="bogi-box">
+          <div class="bt">보기</div>
+          ㄱ. B는 A의 400배이다.<br>
+          ㄴ. C를 kg 단위로 나타내면 0.5&nbsp;kg이다.<br>
+          ㄷ. A를 m 단위로 나타내면 5&nbsp;×&nbsp;10<sup>9</sup>&nbsp;m이다.
+        </div>
+        <ul class="choices inline">
+          <li>① ㄱ</li><li>② ㄷ</li><li>③ ㄱ, ㄴ</li><li>④ ㄴ, ㄷ</li><li>⑤ ㄱ, ㄴ, ㄷ</li>
+        </ul>
+      </div>
+    </div>
   </div>
 
-  <div class="q">
-    <div class="qhead"><span class="qno">11</span><div class="stem"><span class="badge-essay">서술형</span>측정값을 나타낼 때 수치와 함께 단위를 반드시 써야 하는 까닭을, 화성 기후 궤도선 사고를 예로 들어 <b>'약속'</b>이라는 말을 포함하여 서술하시오. <span class="difficulty">●●●●</span>
-    <div class="tags">10통과1-01-02 | 개념 1</div></div></div>
-    <div class="essay-lines"><div></div><div></div><div></div></div>
-  </div>
-
-  <div class="folio"><span>I. 과학의 기초</span><span class="num">30</span></div>
+  <div class="folio"><span>I. 과학의 기초</span><span class="num">34</span></div>
 </div>
 
-<!-- ═════════════ p.31 STEP 3 ═════════════ -->
+<!-- ═════════════ STEP 2 계속 (16~17) + 서술형 (18~20) ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag">I. 과학의 기초</span><span class="lesson-tag">02. 기본량과 단위 | 문제</span></div>
+
+  <div class="qgrid qg2">
+    <div>
+      <div class="q">
+        <div class="qhead"><span class="qno">16</span><div class="stem"><span class="badge-data">자료</span>그림 (가)~(라)는 생활 속에서 단위가 쓰인 예이다. 이에 대한 설명으로 옳은 것은? <span class="difficulty">●○○</span>
+        <div class="tags">10통과1-01-02 | 개념 5</div></div></div>
+        <figure style="margin:2mm 0 1mm 8.6mm;">
+          <svg width="294" height="97.3" viewBox="0 0 290 96" font-family="PC Sans">
+            <g text-anchor="middle">
+              <rect x="2" y="2" width="70" height="92" rx="5" fill="#FBEBEE" stroke="#E3A0AC" stroke-width="0.9"/>
+              <circle cx="37" cy="38" r="15" fill="#fff" stroke="#D6455D" stroke-width="2"/>
+              <text x="37" y="42.5" font-size="12.5" font-weight="900" fill="#D6455D">60</text>
+              <text x="37" y="71" font-size="11" font-weight="800" fill="#22303A">도로 표지판</text>
+              <text x="37" y="85" font-size="10.6" fill="#5B6B77">km/h</text>
+              <rect x="74" y="2" width="70" height="92" rx="5" fill="#EAF6EC" stroke="#5FA86A" stroke-width="0.9"/>
+              <rect x="80" y="25" width="58" height="26" rx="4" fill="#fff" stroke="#5FA86A" stroke-width="1.1"/>
+              <text x="109" y="42.5" font-size="11.5" font-weight="900" fill="#2E6B3A">500 mg</text>
+              <text x="109" y="71" font-size="11" font-weight="800" fill="#22303A">처방전</text>
+              <text x="109" y="85" font-size="10.6" fill="#5B6B77">1회 복용량</text>
+              <rect x="146" y="2" width="70" height="92" rx="5" fill="#F0F8F3" stroke="#BFE0CD" stroke-width="0.9"/>
+              <rect x="151" y="21" width="60" height="34" rx="2" fill="#fff" stroke="#3E9C6E" stroke-width="1.1"/>
+              <text x="181" y="34" font-size="10.6" fill="#5B6B77">사용량</text>
+              <text x="181" y="49" font-size="11.5" font-weight="900" fill="#3E9C6E">300 kWh</text>
+              <text x="181" y="71" font-size="11" font-weight="800" fill="#22303A">전기 요금</text>
+              <text x="181" y="85" font-size="10.6" fill="#5B6B77">고지서</text>
+              <rect x="218" y="2" width="70" height="92" rx="5" fill="#FDF9F0" stroke="#EBCB9C" stroke-width="0.9"/>
+              <circle cx="253" cy="32" r="9" fill="#F6C98E" stroke="#E8940A" stroke-width="1.1"/>
+              <text x="253" y="56" font-size="11.5" font-weight="900" fill="#B4560E">25 ℃</text>
+              <text x="253" y="71" font-size="11" font-weight="800" fill="#22303A">일기 예보</text>
+            </g>
+            <g font-size="11" font-weight="900" fill="#22303A"><text x="6" y="15">(가)</text><text x="78" y="15">(나)</text><text x="150" y="15">(다)</text><text x="222" y="15">(라)</text></g>
+          </svg>
+        </figure>
+        <ul class="choices">
+          <li>① (다)의 kWh(kW × h)는 에너지의 단위이다.</li>
+          <li>② (가)의 km/h는 기본량의 단위이다.</li>
+          <li>③ (나)의 mg에서 m은 10<sup>3</sup>배를 뜻한다.</li>
+          <li>④ (라)의 ℃는 SI 단위로 환산할 수 없다.</li>
+          <li>⑤ (가)~(라)의 단위는 모두 SI 기본단위이다.</li>
+        </ul>
+      </div>
+
+      <div class="q">
+        <div class="qhead"><span class="qno">17</span><div class="stem"><span class="must">중요</span><span class="badge-data">자료</span>다음은 화성 기후 궤도선 사고에 대한 자료이다.
+          <div class="exp"><b>[자료]</b> 소프트웨어팀은 추진기 분사의 충격량(힘 × 시간)을 파운드힘·초 단위로 계산해 수치 2만 넘겼고, 항법팀은 이 수치를 뉴턴·초 단위로 받아 2&nbsp;N·s로 계산했다. <span style="white-space:nowrap;">(단, 1&nbsp;파운드힘 ≈ 4.45&nbsp;N)</span></div>
+          이에 대한 설명으로 옳은 것만을 &lt;보기&gt;에서 있는 대로 고른 것은? <span class="difficulty">●●●</span>
+        <div class="tags">10통과1-01-02 | 개념 1, 자료 파헤치기</div></div></div>
+        <div class="bogi-box">
+          <div class="bt">보기</div>
+          ㄱ. 실제 충격량은 약 8.9&nbsp;N·s였다.<br>
+          ㄴ. 항법팀은 충격량을 실제보다 작게 계산했다.<br>
+          ㄷ. 사고의 원인은 두 팀의 계산 실수이다.
+        </div>
+        <ul class="choices inline">
+          <li>① ㄱ</li><li>② ㄷ</li><li>③ ㄱ, ㄴ</li><li>④ ㄴ, ㄷ</li><li>⑤ ㄱ, ㄴ, ㄷ</li>
+        </ul>
+      </div>
+    </div>
+    <div>
+      <div class="q">
+        <div class="qhead"><span class="qno">18</span><div class="stem"><span class="badge-essay">서술형</span>측정값에 수치와 함께 단위를 꼭 써야 하는 까닭을 화성 기후 궤도선 사고를 예로 들어 <b>'약속'</b>, <b>'수치'</b>를 모두 포함하여 서술하시오. <span class="difficulty">●●○</span>
+        <div class="tags">10통과1-01-02 | 개념 1</div></div></div>
+        <div class="essay-lines"><div></div><div></div><div></div><div></div><div></div><div></div></div>
+      </div>
+
+      <div class="q">
+        <div class="qhead"><span class="qno">19</span><div class="stem"><span class="must">중요</span><span class="badge-essay">서술형</span>'거리&nbsp;=&nbsp;속력&nbsp;÷&nbsp;시간'이라는 식이 틀렸음을 <b>'양변'</b>, <b>'단위'</b>, <b>'m/s'</b>를 모두 포함하여 서술하시오. <span class="difficulty">●●●</span>
+        <div class="tags">10통과1-01-02 | 개념 3</div></div></div>
+        <div class="essay-lines"><div></div><div></div><div></div><div></div><div></div><div></div></div>
+      </div>
+
+      <div class="q">
+        <div class="qhead"><span class="qno">20</span><div class="stem"><span class="badge-essay">서술형</span>처방전의 '500&nbsp;mg'을 '500&nbsp;μg'으로 잘못 읽고 약을 준비하면 어떤 문제가 생기는지 <b>'접두어'</b>, <b>'1000배'</b>를 모두 포함하여 서술하시오. <span class="difficulty">●●○</span>
+        <div class="tags">10통과1-01-02 | 개념 4·5</div></div></div>
+        <div class="essay-lines"><div></div><div></div><div></div><div></div><div></div><div></div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="folio"><span>I. 과학의 기초</span><span class="num">35</span></div>
+</div>
+
+<!-- ═════════════ p.31 STEP 3 (21~24) ═════════════ -->
 <div class="page">
   <div class="runhead"><span class="unit-tag">I. 과학의 기초</span><span class="lesson-tag">02. 기본량과 단위 | 문제</span></div>
   <div class="step-head s3"><span class="stepno">STEP 3</span><span class="steptt">수능 도전</span><span class="stepdesc">2028 수능 규격 — ㄱㄴㄷ 합답형·자료 해석</span></div>
 
-  <div class="q">
-    <div class="qhead"><span class="qno">12</span><div class="stem"><span class="badge-data">자료</span>표는 여러 물리량을 두 무리 (가), (나)로 분류한 것이다. 옳은 것만을 &lt;보기&gt;에서 있는 대로 고른 것은? <span class="difficulty">[2점]</span>
-    <div class="tags">10통과1-01-02</div></div></div>
-    <div class="bogi-box" style="background:#fff; margin-bottom:2mm;">
-      (가) 길이, 질량, 시간, 온도 / (나) 속도, 부피, 밀도
+  <div class="qgrid qg2">
+    <div>
+      <div class="q">
+        <div class="qhead"><span class="qno">21</span><div class="stem"><span class="badge-data">자료</span>표는 소금물 A, B의 자료이다. 옳은 것만을 <span style="white-space:nowrap;">&lt;보기&gt;에서</span> 있는 대로 고른 것은? <span class="difficulty">●●○ [2점]</span>
+        <div class="tags">10통과1-01-02 | 개념 3·4</div></div></div>
+        <figure style="margin:2mm 0 1mm 8.6mm;">
+          <svg width="283" height="65" viewBox="0 0 270 62" font-family="PC Sans">
+            <rect x="1" y="1" width="268" height="19" fill="#EAF6EC"/>
+            <rect x="1" y="1" width="268" height="60" fill="none" stroke="#B8C2CA" stroke-width="0.9"/>
+            <g stroke="#B8C2CA" stroke-width="0.8"><line x1="1" y1="20" x2="269" y2="20"/><line x1="1" y1="40.5" x2="269" y2="40.5"/><line x1="44" y1="1" x2="44" y2="61"/><line x1="119" y1="1" x2="119" y2="61"/><line x1="194" y1="1" x2="194" y2="61"/></g>
+            <g font-size="10.4" font-weight="800" fill="#2E7A54" text-anchor="middle"><text x="22.5" y="14">소금물</text><text x="156.5" y="14">용액의 부피</text><text x="81.5" y="14">녹인 소금</text><text x="231.5" y="14">용액의 질량</text></g>
+            <g font-size="10.7" fill="#22303A" text-anchor="middle">
+              <text x="22.5" y="34.5" font-weight="800">A</text><text x="81.5" y="34.5">10&#160;g</text><text x="156.5" y="34.5">100&#160;mL</text><text x="231.5" y="34.5">107&#160;g</text>
+              <text x="22.5" y="55" font-weight="800">B</text><text x="81.5" y="55">20&#160;g</text><text x="156.5" y="55">100&#160;mL</text><text x="231.5" y="55">113&#160;g</text>
+            </g>
+          </svg>
+        </figure>
+        <div class="bogi-box">
+          <div class="bt">보기</div>
+          ㄱ. 소금물의 농도(g/L)는 B가 A의 2배이다.<br>
+          ㄴ. A의 밀도는 1.07&nbsp;×&nbsp;10<sup>3</sup>&nbsp;kg/m<sup>3</sup>이다.<br>
+          ㄷ. B를 200&nbsp;mL로 묽히면 농도는 400&nbsp;g/L이다.
+        </div>
+        <ul class="choices inline">
+          <li>① ㄱ</li><li>② ㄷ</li><li>③ ㄱ, ㄴ</li><li>④ ㄴ, ㄷ</li><li>⑤ ㄱ, ㄴ, ㄷ</li>
+        </ul>
+      </div>
+
+      <div class="q">
+        <div class="qhead"><span class="qno">22</span><div class="stem"><span class="badge-data">자료</span>그림은 접두어를 10의 거듭제곱 축 위에 나타낸 것이다. 옳은 것만을 &lt;보기&gt;에서 있는 대로 고른 것은? <span class="difficulty">●●○ [2점]</span>
+        <div class="tags">10통과1-01-02 | 개념 4</div></div></div>
+        <figure style="margin:2mm 0 1mm 8.6mm;">
+          <svg width="294" height="56.8" viewBox="0 0 290 56" font-family="PC Sans">
+            <line x1="12" y1="30" x2="282" y2="30" stroke="#3E9C6E" stroke-width="1.6" marker-end="url(#arrP)"/>
+            <g font-size="11.9" text-anchor="middle" font-weight="800">
+              <circle cx="40" cy="30" r="3" fill="#3E9C6E"/><text x="40" y="18">n</text>
+              <circle cx="90" cy="30" r="3" fill="#3E9C6E"/><text x="90" y="18">μ</text>
+              <circle cx="140" cy="30" r="3" fill="#3E9C6E"/><text x="140" y="18">m</text>
+              <circle cx="190" cy="30" r="3" fill="#E8940A"/><text x="190" y="18">k</text>
+              <circle cx="240" cy="30" r="3" fill="#E8940A"/><text x="240" y="18">G</text>
+            </g>
+            <g font-size="11.7" text-anchor="middle" fill="#5B6B77">
+              <text x="40" y="49">10<tspan dy="-3" font-size="8.1">−9</tspan></text>
+              <text x="90" y="49">10<tspan dy="-3" font-size="8.1">−6</tspan></text>
+              <text x="140" y="49">10<tspan dy="-3" font-size="8.1">−3</tspan></text>
+              <text x="190" y="49">10<tspan dy="-3" font-size="8.1">3</tspan></text>
+              <text x="240" y="49">10<tspan dy="-3" font-size="8.1">9</tspan></text>
+            </g>
+          </svg>
+        </figure>
+        <div class="bogi-box">
+          <div class="bt">보기</div>
+          ㄱ. 1&nbsp;mm는 1&nbsp;km의 10<sup>6</sup>배이다.<br>
+          ㄴ. 나노 기술은 10<sup>−9</sup>&nbsp;m 규모를 다루는 기술이다.<br>
+          ㄷ. 1&nbsp;GB는 1&nbsp;kB의 10<sup>6</sup>배이다.
+        </div>
+        <ul class="choices inline">
+          <li>① ㄱ</li><li>② ㄷ</li><li>③ ㄱ, ㄴ</li><li>④ ㄴ, ㄷ</li><li>⑤ ㄱ, ㄴ, ㄷ</li>
+        </ul>
+      </div>
     </div>
-    <div class="bogi-box">
-      <div class="bt">보기</div>
-      ㄱ. (가)는 기본량, (나)는 유도량이다.<br>
-      ㄴ. (나)의 단위는 (가)의 단위를 조합해 만들 수 있다.<br>
-      ㄷ. 전류와 물질량은 (나)에 속한다.
+    <div>
+      <div class="q">
+        <div class="qhead"><span class="qno">23</span><div class="stem"><span class="badge-data">자료</span>그림은 물질 A, B의 부피에 따른 질량을 나타낸 것이다. 옳은 것만을 &lt;보기&gt;에서 있는 대로 고른 것은? <span class="difficulty">●●● [2.5점]</span>
+        <div class="tags">10통과1-01-02 | 개념 3·4</div></div></div>
+        <figure style="margin:2mm 0 1mm 8.6mm;">
+          <svg width="292" height="164" viewBox="0 0 260 146" font-family="PC Sans">
+            <g stroke="#E3E8EC" stroke-width="0.8">
+              <line x1="92" y1="28" x2="92" y2="118"/><line x1="140" y1="28" x2="140" y2="118"/><line x1="188" y1="28" x2="188" y2="118"/><line x1="236" y1="28" x2="236" y2="118"/>
+              <line x1="44" y1="95.5" x2="236" y2="95.5"/><line x1="44" y1="73" x2="236" y2="73"/><line x1="44" y1="50.5" x2="236" y2="50.5"/><line x1="44" y1="28" x2="236" y2="28"/>
+            </g>
+            <line x1="44" y1="118" x2="250" y2="118" stroke="#5B6B77" stroke-width="1.2" marker-end="url(#arrP)"/>
+            <line x1="44" y1="118" x2="44" y2="14" stroke="#5B6B77" stroke-width="1.2" marker-end="url(#arrP)"/>
+            <line x1="44" y1="118" x2="236" y2="28" stroke="#D6455D" stroke-width="1.8"/>
+            <line x1="44" y1="118" x2="236" y2="73" stroke="#0E5A6B" stroke-width="1.8"/>
+            <g font-size="11.2" font-weight="900"><text x="222" y="24" fill="#D6455D">A</text><text x="241" y="70" fill="#0E5A6B">B</text></g>
+            <g font-size="10.7" fill="#5B6B77" text-anchor="middle"><text x="44" y="129">0</text><text x="92" y="129">1</text><text x="140" y="129">2</text><text x="188" y="129">3</text><text x="236" y="129">4</text></g>
+            <g font-size="10.7" fill="#5B6B77" text-anchor="end"><text x="39" y="98">2</text><text x="39" y="75.5">4</text><text x="39" y="53">6</text><text x="39" y="30.5">8</text></g>
+            <text x="50" y="14" font-size="10.7" font-weight="800" fill="#22303A">질량(kg)</text>
+            <text x="252" y="142" font-size="10.7" font-weight="800" fill="#22303A" text-anchor="end">부피(×10<tspan dy="-2.8" font-size="7.3">−3</tspan><tspan dy="2.8"> m</tspan><tspan dy="-2.8" font-size="7.3">3</tspan><tspan dy="2.8">)</tspan></text>
+          </svg>
+        </figure>
+        <div class="bogi-box">
+          <div class="bt">보기</div>
+          ㄱ. A의 밀도는 2&nbsp;×&nbsp;10<sup>3</sup>&nbsp;kg/m<sup>3</sup>이다.<br>
+          ㄴ. 그래프 기울기의 단위는 kg/m<sup>3</sup>이다.<br>
+          ㄷ. 질량이 4&nbsp;kg일 때 부피는 B가 A의 2배이다.
+        </div>
+        <ul class="choices inline">
+          <li>① ㄱ</li><li>② ㄷ</li><li>③ ㄱ, ㄴ</li><li>④ ㄴ, ㄷ</li><li>⑤ ㄱ, ㄴ, ㄷ</li>
+        </ul>
+      </div>
+
+      <div class="q">
+        <div class="qhead"><span class="qno">24</span><div class="stem"><span class="badge-data">자료</span>(가)는 SI 기본단위 두 가지의 정의이고, (나)는 레이저로 목표물까지의 거리를 잰 결과이다. 옳은 것만을 &lt;보기&gt;에서 있는 대로 고른 것은? (단, 빛의 속력은 3&nbsp;×&nbsp;10<sup>8</sup>&nbsp;m/s이다.) <span class="difficulty">●●● [2.5점]</span>
+        <div class="tags">10통과1-01-02 | 개념 2·3·4 (01 소단원 연계)</div></div></div>
+        <figure style="margin:2mm 0 1mm 8.6mm;">
+          <svg width="294" height="125.7" viewBox="0 -4 290 124" font-family="PC Sans">
+            <text x="1" y="8" font-size="11.1" font-weight="900" fill="#22303A">(가)</text>
+            <rect x="1" y="12" width="32" height="54" fill="#EAF6EC"/>
+            <rect x="1" y="12" width="288" height="54" fill="none" stroke="#B8C2CA" stroke-width="0.9"/>
+            <g stroke="#B8C2CA" stroke-width="0.8"><line x1="1" y1="46" x2="289" y2="46"/><line x1="33" y1="12" x2="33" y2="66"/></g>
+            <g font-size="11.3" font-weight="800" fill="#2E7A54" text-anchor="middle"><text x="17" y="33">1 s</text><text x="17" y="60">1 m</text></g>
+            <g font-size="10.8" fill="#22303A">
+              <text x="40" y="26">세슘-133 원자가 내는 전자기파가</text>
+              <text x="40" y="40">9 192 631 770번 진동하는 시간</text>
+              <text x="40" y="60">빛이 진공에서 1/299 792 458 s 동안 나아간 거리</text>
+            </g>
+            <text x="1" y="81" font-size="11.1" font-weight="900" fill="#22303A">(나)</text>
+            <rect x="14" y="88" width="38" height="20" rx="3" fill="#F0F8F3" stroke="#6FBE93" stroke-width="1"/>
+            <text x="33" y="101" font-size="10.8" font-weight="800" fill="#2E7A54" text-anchor="middle">레이저</text>
+            <rect x="262" y="84" width="10" height="28" fill="#9AA7B1"/>
+            <text x="267" y="80" font-size="10.7" fill="#5B6B77" text-anchor="middle">목표물</text>
+            <line x1="54" y1="93" x2="258" y2="93" stroke="#D6455D" stroke-width="1.3" marker-end="url(#arrR)"/>
+            <line x1="260" y1="103" x2="58" y2="103" stroke="#D6455D" stroke-width="1.3" stroke-dasharray="4 2" marker-end="url(#arrR)"/>
+            <text x="158" y="116" font-size="11" font-weight="800" fill="#D6455D" text-anchor="middle">쏜 뒤 돌아오기까지 2 μs</text>
+          </svg>
+        </figure>
+        <div class="bogi-box">
+          <div class="bt">보기</div>
+          ㄱ. 1&nbsp;m는 다른 기본단위 없이 정의된다.<br>
+          ㄴ. (나)에서 목표물까지의 거리는 600&nbsp;m이다.<br>
+          ㄷ. 빛의 속력의 단위 m/s는 (가)의 두 기본단위를 조합한 유도단위이다.
+        </div>
+        <ul class="choices inline">
+          <li>① ㄱ</li><li>② ㄷ</li><li>③ ㄱ, ㄴ</li><li>④ ㄴ, ㄷ</li><li>⑤ ㄱ, ㄴ, ㄷ</li>
+        </ul>
+      </div>
     </div>
-    <ul class="choices inline">
-      <li>① ㄱ</li><li>② ㄷ</li><li>③ ㄴ, ㄷ</li><li>④ ㄱ, ㄴ</li><li>⑤ ㄱ, ㄴ, ㄷ</li>
-    </ul>
   </div>
 
-  <div class="q">
-    <div class="qhead"><span class="qno">13</span><div class="stem"><span class="badge-data">자료</span>그림은 접두어를 10의 거듭제곱 축 위에 나타낸 것이다. 옳은 것만을 &lt;보기&gt;에서 있는 대로 고른 것은? <span class="difficulty">[2.5점]</span>
-    <div class="tags">10통과1-01-02</div></div></div>
-    <figure style="margin:2mm 0 1mm 8.6mm;">
-      <svg width="300" height="56" viewBox="0 0 300 56" font-family="PC Sans">
-        <line x1="14" y1="32" x2="292" y2="32" stroke="#3E9C6E" stroke-width="1.6" marker-end="url(#arrP)"/>
-        <g font-size="6.8" text-anchor="middle" font-weight="800">
-          <circle cx="42" cy="32" r="3" fill="#3E9C6E"/><text x="42" y="18">n</text><text x="42" y="50" fill="#5B6B77">10<tspan dy="-0.34em" font-size="68%">−</tspan><tspan dy="0.34em"><tspan dy="-0.34em" font-size="68%">9</tspan><tspan dy="0.34em"></tspan></tspan></text>
-          <circle cx="94" cy="32" r="3" fill="#3E9C6E"/><text x="94" y="18">μ</text><text x="94" y="50" fill="#5B6B77">10<tspan dy="-0.34em" font-size="68%">−</tspan><tspan dy="0.34em"><tspan dy="-0.34em" font-size="68%">6</tspan><tspan dy="0.34em"></tspan></tspan></text>
-          <circle cx="146" cy="32" r="3" fill="#3E9C6E"/><text x="146" y="18">m</text><text x="146" y="50" fill="#5B6B77">10<tspan dy="-0.34em" font-size="68%">−3</tspan></text>
-          <circle cx="198" cy="32" r="3" fill="#E8940A"/><text x="198" y="18">k</text><text x="198" y="50" fill="#5B6B77">10<tspan dy="-0.34em" font-size="68%">3</tspan></text>
-          <circle cx="250" cy="32" r="3" fill="#E8940A"/><text x="250" y="18">G</text><text x="250" y="50" fill="#5B6B77">10<tspan dy="-0.34em" font-size="68%">9</tspan></text>
-        </g>
-      </svg>
-    </figure>
-    <div class="bogi-box">
-      <div class="bt">보기</div>
-      ㄱ. 1 km는 1 mm의 10<sup>6</sup>배이다.<br>
-      ㄴ. 나노 기술은 10<sup>−</sup><sup>9</sup> m 규모의 세계를 다루는 기술이다.<br>
-      ㄷ. 1 GB는 1 kB의 100배이다.
-    </div>
-    <ul class="choices inline">
-      <li>① ㄱ</li><li>② ㄱ, ㄷ</li><li>③ ㄷ</li><li>④ ㄴ, ㄷ</li><li>⑤ ㄱ, ㄴ</li>
-    </ul>
-  </div>
-
-  <div class="folio"><span>I. 과학의 기초</span><span class="num">31</span></div>
+  <div class="folio"><span>I. 과학의 기초</span><span class="num">36</span></div>
 </div>
 
 <!-- ═════════════ p.32 해설 1 ═════════════ -->
 <div class="page">
   <div class="runhead"><span class="unit-tag" style="color:var(--brand);">알짜 해설</span><span class="lesson-tag">02. 기본량과 단위</span></div>
-  <div class="sol-head"><span class="stt">알짜 해설</span><span class="sub">전 문항 해설 + 오답 선지 분석 — 맞힌 문제도 해설로 한 번 더!</span></div>
+  <div class="sol-head"><span class="stt">알짜 해설</span><span class="sub">전 문항 해설 + 바로알기(틀린 선지를 옳게 고친 문장) — 맞힌 문제도 해설로 한 번 더!</span></div>
 
   <table class="anstable">
-    <tr><th>문항</th><td>1</td><td>2</td><td>3</td><td>4</td><td>5</td><td>6</td><td>7</td><td>8</td><td>9</td><td>10</td><td>11</td><td>12</td><td>13</td></tr>
-    <tr><th>정답</th><td class="a">X</td><td class="a">O</td><td class="a">O</td><td class="a">7</td><td class="a">유도량</td><td class="a">s(초)</td><td class="a">⑤</td><td class="a">③</td><td class="a">②</td><td class="a">③</td><td class="a">서술형</td><td class="a">④</td><td class="a">⑤</td></tr>
+    <tr><th>문항</th><td>1</td><td>2</td><td>3</td><td>4</td><td>5</td><td>6</td><td>7</td><td>8</td><td>9</td><td>10</td><td>11</td><td>12</td></tr>
+    <tr><th>정답</th><td class="a">X</td><td class="a">O</td><td class="a">O</td><td class="a">7</td><td class="a">유도량</td><td class="a">s(초)</td><td class="a">⑤</td><td class="a">①</td><td class="a">②</td><td class="a">③</td><td class="a">②</td><td class="a">⑤</td></tr>
+    <tr><th>문항</th><td>13</td><td>14</td><td>15</td><td>16</td><td>17</td><td>18</td><td>19</td><td>20</td><td>21</td><td>22</td><td>23</td><td>24</td></tr>
+    <tr><th>정답</th><td class="a">④</td><td class="a">④</td><td class="a">①</td><td class="a">①</td><td class="a">③</td><td class="a">서술형</td><td class="a">서술형</td><td class="a">서술형</td><td class="a">③</td><td class="a">④</td><td class="a">⑤</td><td class="a">②</td></tr>
   </table>
 
   <div class="solcols">
@@ -907,7 +1262,7 @@
       <div class="sol"><div class="shead"><span class="sno">2</span><span class="sans">O</span><span class="slink">개념 2·3</span></div>
         <p>부피(m<sup>3</sup>)·밀도(kg/m<sup>3</sup>)는 기본량의 조합 — 유도량이 맞다. 기본량은 7가지뿐.</p></div>
       <div class="sol"><div class="shead"><span class="sno">3</span><span class="sans">O</span><span class="slink">개념 4</span></div>
-        <p>나노(n) = 10<sup>−</sup><sup>9</sup>. 지수 부호까지가 정답이다.</p></div>
+        <p>나노(n) = 10<sup>−9</sup>. 지수 부호까지가 정답이다.</p></div>
       <div class="sol"><div class="shead"><span class="sno">4</span><span class="sans">7</span><span class="slink">개념 2</span></div>
         <p>m·kg·s·A·K·mol·cd — 딱 일곱.</p></div>
       <div class="sol"><div class="shead"><span class="sno">5</span><span class="sans">유도량</span><span class="slink">개념 3</span></div>
@@ -917,21 +1272,21 @@
     </div>
     <div>
       <div class="sol"><div class="shead"><span class="sno">7</span><span class="sans">⑤</span><span class="slink">개념 2</span></div>
-        <p>물질량 — mol. 기본량·기본단위의 짝 그대로다.</p>
-        <div class="wrongbox"><div class="wt">오답 왜 틀렸나</div>
-          <p><b>①</b> 질량은 kg. <b>②</b> 온도의 기본단위는 K(℃는 관용 단위). <b>③·④</b> 속도·부피는 기본량이 아니라 유도량이다.</p></div></div>
-      <div class="sol"><div class="shead"><span class="sno">8</span><span class="sans">③</span><span class="slink">개념 3</span></div>
-        <p>밀도 = 질량 ÷ 부피 → kg ÷ m<sup>3</sup> = kg/m<sup>3</sup> — 유도의 정석.</p>
-        <div class="wrongbox"><div class="wt">오답 왜 틀렸나</div>
-          <p><b>①</b> 유도량은 기본량의 조합이다. <b>②·⑤</b> 속도·부피는 유도량. <b>④</b> N = kg·m/s<sup>2</sup>로 풀어 쓸 수 있다.</p></div></div>
-      <div class="sol"><div class="shead"><span class="sno">9</span><span class="sans">②</span><span class="slink">개념 4</span></div>
-        <p>μ = 10<sup>−</sup><sup>6</sup>이므로 2 μm = 2 × 10<sup>−</sup><sup>6</sup> m.</p>
-        <div class="wrongbox"><div class="wt">오답 왜 틀렸나</div>
-          <p><b>③</b> 나노와 혼동. <b>④·⑤</b> 지수 부호 실수 — 작아지는 접두어는 음수 지수다.</p></div></div>
+        <p>물질량의 기본단위는 mol — 기본량·기본단위의 짝 그대로다.</p>
+        <div class="wrongbox"><div class="wt">바로알기</div>
+          <p><b>①</b> 질량의 기본단위는 g이 아니라 <b>kg</b>이다. <b>②</b> 온도의 기본단위는 <b>K</b>이다(℃는 K에서 만든 SI 유도단위). <b>③</b> 속도는 유도량이고, m/s는 유도단위이다. <b>④</b> 부피는 유도량이고, m<sup>3</sup>는 유도단위이다.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">8</span><span class="sans">①</span><span class="slink">개념 3</span></div>
+        <p>밀도 = 질량 ÷ 부피 → kg ÷ m<sup>3</sup> = kg/m<sup>3</sup>. 질량(kg)과 길이(m)의 기본단위로 만든 유도단위다.</p>
+        <div class="wrongbox"><div class="wt">바로알기</div>
+          <p><b>②</b> 유도량은 기본량을 곱하고 나누어(조합하여) 정의한다. <b>③</b> 속도는 길이 ÷ 시간으로 만든 유도량이고, m/s는 유도단위이다. <b>④</b> N은 kg·m/s<sup>2</sup>으로 풀어 쓸 수 있다. <b>⑤</b> 부피는 길이를 세 번 곱한 유도량이고, m<sup>3</sup>는 유도단위이다.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">9</span><span class="sans">②</span><span class="slink">개념 2·5</span></div>
+        <p>T(K) = t(℃) + 273.15 → 25 + 273.15 = 298.15 ≈ 298&nbsp;K.</p>
+        <div class="wrongbox"><div class="wt">바로알기</div>
+          <p><b>①</b> 온도의 SI 기본단위는 <b>K</b>이다. <b>③</b> ℃와 K는 눈금 한 칸이 같다 — 1&nbsp;℃ 오르면 <b>1&nbsp;K</b> 오른다. <b>④</b> 0&nbsp;K = <b>−273.15&nbsp;℃</b>이다. <b>⑤</b> ℃는 K에서 만든 <b>SI 유도단위</b>이다.</p></div></div>
     </div>
   </div>
 
-  <div class="folio"><span>알짜 해설</span><span class="num">32</span></div>
+  <div class="folio"><span>알짜 해설</span><span class="num">37</span></div>
 </div>
 
 <!-- ═════════════ p.33 해설 2 ═════════════ -->
@@ -940,44 +1295,192 @@
   <div class="solcols">
     <div>
       <div class="sol"><div class="shead"><span class="sno">10</span><span class="sans">③</span><span class="slink">개념 1·5</span></div>
-        <p>(가) 단위 혼동이 사고의 원인 — 보고서의 결론 그대로. (나) 약 용량은 mg — 둘 다 옳다.</p>
-        <div class="wrongbox"><div class="wt">오답 왜 틀렸나</div>
-          <p><b>(다)</b> 온도의 SI 기본단위는 K이다. ℃는 널리 쓰이는 관용 단위일 뿐.</p></div></div>
-      <div class="sol"><div class="shead"><span class="sno">11</span><span class="sans">모범 답안</span><span class="slink">개념 1</span></div>
-        <p>단위는 '무엇을 기준으로 몇 배인가'를 정한 <b>약속</b>이다. 화성 기후 궤도선 사고에서는 두 팀이 서로 다른 단위(뉴턴 기준과 파운드힘 기준)로 데이터를 주고받아, 수치가 정확했는데도 힘의 크기가 어긋나 탐사선을 잃었다. 이처럼 약속(단위)이 없거나 어긋나면 수치는 의미를 잃으므로, 측정값에는 반드시 단위를 함께 써야 한다.</p>
-        <div class="wrongbox"><div class="wt">채점 기준 (감점 포인트)</div>
-          <p>① 단위 = 기준에 대한 약속 ② 사고 원인이 단위 불일치임 ③ 그래서 수치+단위를 함께 써야 함 — 세 요소 모두 서술해야 만점. "계산 실수 때문"은 감점.</p></div></div>
+        <p><b>ㄱ&nbsp;(옳음)</b> 수치는 정확했지만 단위가 달랐다 — 보고서의 결론 그대로. <b>ㄴ&nbsp;(옳음)</b> 약 용량은 mg(10<sup>−3</sup>&nbsp;g) 단위로 적는다.</p>
+        <div class="wrongbox"><div class="wt">바로알기</div>
+          <p><b>ㄷ</b> (틀림 →) 온도의 SI 기본단위는 <b>K</b>이다. ℃는 K에서 만든 SI 유도단위이다(T = t + 273.15).</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">11</span><span class="sans">②</span><span class="slink">개념 3</span></div>
+        <p>정의를 단위로 그대로 옮긴다. (가) 넓이 = 길이&nbsp;×&nbsp;길이 → m&nbsp;×&nbsp;m&nbsp;=&nbsp;m<sup>2</sup>. (나) 가속도 = 속도의 변화량&nbsp;÷&nbsp;시간 → (m/s)&nbsp;÷&nbsp;s&nbsp;=&nbsp;m/s<sup>2</sup>.</p>
+        <div class="wrongbox"><div class="wt">바로알기</div>
+          <p><b>①·④</b> m/s는 속도의 단위다 — (나)는 이것을 다시 시간(s)으로 나누므로 m/s<sup>2</sup>이다. <b>③·④</b> m<sup>3</sup>는 길이를 세 번 곱한 부피의 단위다 — 넓이는 m<sup>2</sup>이다. <b>⑤</b> 넓이는 m<sup>2</sup>이고, 시간으로 나누는 양은 곱(m·s)이 아니라 몫(m/s<sup>2</sup>)이다.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">12</span><span class="sans">⑤</span><span class="slink">개념 2·3</span></div>
+        <p><b>ㄱ&nbsp;(옳음)</b> 속도는 길이 ÷ 시간 — 기본량이 아니므로 A. <b>ㄴ&nbsp;(옳음)</b> 일곱 기본단위 중 접두어(k)가 붙은 것은 kg 하나뿐 — B는 질량. <b>ㄷ&nbsp;(옳음)</b> 나머지 m·s·A·K·mol·cd의 6가지가 C이다.</p>
+        <div class="analysis"><div class="at">꼼꼼 자료 분석</div>
+          <svg width="310" height="119.9" viewBox="0 0 300 116" font-family="PC Sans">
+            <defs><marker id="arrQ2" markerWidth="7" markerHeight="7" refX="5" refY="2.5" orient="auto"><path d="M0,0 L6,2.5 L0,5 Z" fill="#5B6B77"/></marker></defs>
+            <rect x="2" y="8" width="88" height="30" rx="5" fill="#F0F8F3" stroke="#6FBE93" stroke-width="1"/>
+            <text x="46" y="27" font-size="11" font-weight="800" fill="#22303A" text-anchor="middle">SI 기본량인가?</text>
+            <rect x="118" y="8" width="122" height="30" rx="5" fill="#F0F8F3" stroke="#6FBE93" stroke-width="1"/>
+            <text x="179" y="20.5" font-size="10.8" font-weight="800" fill="#22303A" text-anchor="middle">기본단위에 접두어가</text>
+            <text x="179" y="32" font-size="10.8" font-weight="800" fill="#22303A" text-anchor="middle">붙어 있는가?</text>
+            <g stroke="#5B6B77" stroke-width="1.2" fill="none">
+              <line x1="90" y1="23" x2="114" y2="23" marker-end="url(#arrQ2)"/>
+              <line x1="240" y1="23" x2="258" y2="23" marker-end="url(#arrQ2)"/>
+              <line x1="46" y1="38" x2="46" y2="58" marker-end="url(#arrQ2)"/>
+              <line x1="179" y1="38" x2="179" y2="58" marker-end="url(#arrQ2)"/>
+            </g>
+            <g font-size="10.5" fill="#B4560E" font-weight="800" text-anchor="middle">
+              <text x="102" y="18">예</text><text x="249" y="18">예</text>
+              <text x="62" y="51">아니요</text><text x="195" y="51">아니요</text>
+            </g>
+            <g font-size="11.5" font-weight="900" fill="#fff" text-anchor="middle">
+              <rect x="262" y="12" width="24" height="22" rx="4" fill="#0E5A6B"/><text x="274" y="26.5">B</text>
+              <rect x="34" y="62" width="24" height="22" rx="4" fill="#0E5A6B"/><text x="46" y="76.5">A</text>
+              <rect x="167" y="62" width="24" height="22" rx="4" fill="#0E5A6B"/><text x="179" y="76.5">C</text>
+            </g>
+            <g font-size="10.5" font-weight="700" fill="#D6455D" text-anchor="middle">
+              <text x="274" y="48">질량(kg)</text><text x="274" y="61">하나뿐</text>
+              <text x="2" y="98" text-anchor="start">유도량:</text><text x="2" y="111" text-anchor="start">속도·부피·밀도·힘</text>
+              <text x="179" y="98">m·s·A·K·mol·cd</text>
+              <text x="179" y="111">→ 6가지</text>
+            </g>
+          </svg></div>
+        <div class="wrongbox"><div class="wt">함정 체크</div>
+          <p>질량의 기본단위는 g이 아니라 kg — 일곱 기본단위 가운데 접두어가 붙은 유일한 단위다.</p></div></div>
     </div>
     <div>
-      <div class="sol"><div class="shead"><span class="sno">12</span><span class="sans">④</span><span class="slink">개념 2·3 | 2점</span></div>
-        <p><b>ㄱ (옳음)</b> (가)는 기본량 무리, (나)는 유도량 무리다. <b>ㄴ (옳음)</b> m/s, m<sup>3</sup>, kg/m<sup>3</sup> — 전부 기본단위의 조합. <b>ㄷ (틀림)</b> 전류(A)와 물질량(mol)은 기본량 — (가)에 속한다.</p>
-        <div class="wrongbox"><div class="wt">함정 체크</div>
-          <p>기본량 판별은 외운 7개 목록과 대조하는 것이 가장 빠르다 — m·kg·s·A·K·mol·cd.</p></div></div>
-      <div class="sol"><div class="shead"><span class="sno">13</span><span class="sans">⑤</span><span class="slink">개념 4 | 2.5점</span></div>
-        <p><b>ㄱ (옳음)</b> 10<sup>3</sup> ÷ 10<sup>−3</sup> = 10<sup>6</sup>배. <b>ㄴ (옳음)</b> 나노 = 10<sup>−</sup><sup>9</sup> — 이름이 곧 규모다. <b>ㄷ (틀림)</b> G(10<sup>9</sup>) ÷ k(10<sup>3</sup>) = 10<sup>6</sup>배, 100배가 아니다.</p>
-        <div class="wrongbox"><div class="wt">함정 체크</div>
-          <p>접두어 비교는 <b>지수의 뺄셈</b>이다 — 배수가 궁금하면 지수부터 빼라.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">13</span><span class="sans">④</span><span class="slink">개념 3</span></div>
+        <p><b>B&nbsp;(옳음)</b> N = kg·m/s<sup>2</sup>. <b>C&nbsp;(옳음)</b> 운동량 = 질량 × 속도 → kg·m/s. 단위는 정의의 요약본이다.</p>
+        <div class="wrongbox"><div class="wt">바로알기</div>
+          <p><b>A</b> (틀림 →) N은 뉴턴의 이름을 붙인 <b>유도단위</b>의 별명이다. 정체는 기본단위의 조합(kg·m/s<sup>2</sup>)이고, 기본단위는 m·kg·s·A·K·mol·cd의 7개뿐이다.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">14</span><span class="sans">④</span><span class="slink">개념 3·4 | 탐구</span></div>
+        <p><b>ㄴ&nbsp;(옳음)</b> 부피 = 0.1&nbsp;m × 0.1&nbsp;m × 0.1&nbsp;m = 1&nbsp;×&nbsp;10<sup>−3</sup>&nbsp;m<sup>3</sup>, 밀도 = 0.6&nbsp;kg ÷ (1&nbsp;×&nbsp;10<sup>−3</sup>&nbsp;m<sup>3</sup>) = 600&nbsp;kg/m<sup>3</sup>. <b>ㄷ&nbsp;(옳음)</b> 0.6&nbsp;kg = 600&nbsp;g → 600&nbsp;g ÷ (1&nbsp;×&nbsp;10<sup>−3</sup>&nbsp;m<sup>3</sup>) = 6&nbsp;×&nbsp;10<sup>5</sup>&nbsp;g/m<sup>3</sup>(600의 1000배). 같은 양도 단위가 바뀌면 수치가 바뀐다.</p>
+        <div class="wrongbox"><div class="wt">바로알기</div>
+          <p><b>ㄱ</b> (틀림 →) 부피는 길이를 세 번 <b>곱한다</b>: 0.1<sup>3</sup> = 1&nbsp;×&nbsp;10<sup>−3</sup>&nbsp;m<sup>3</sup>이다(0.1 × 3이 아니다).</p></div></div>
+    </div>
+  </div>
+  <div class="folio"><span>알짜 해설</span><span class="num">38</span></div>
+</div>
 
+<!-- ═════════════ 해설 3 ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag" style="color:var(--brand);">알짜 해설</span><span class="lesson-tag">02. 기본량과 단위</span></div>
+  <div class="solcols">
+    <div>
+      <div class="sol"><div class="shead"><span class="sno">15</span><span class="sans">①</span><span class="slink">개념 4</span></div>
+        <p><b>ㄱ&nbsp;(옳음)</b> B ÷ A = (2&nbsp;×&nbsp;10<sup>−6</sup>) ÷ (5&nbsp;×&nbsp;10<sup>−9</sup>) = 0.4&nbsp;×&nbsp;10<sup>3</sup> = 400배.</p>
+        <div class="wrongbox"><div class="wt">바로알기</div>
+          <p><b>ㄴ</b> (틀림 →) 500&nbsp;mg = 500&nbsp;×&nbsp;10<sup>−3</sup>&nbsp;g = 0.5&nbsp;g = <b>5&nbsp;×&nbsp;10<sup>−4</sup>&nbsp;kg</b>이다. <b>ㄷ</b> (틀림 →) 5&nbsp;nm = <b>5&nbsp;×&nbsp;10<sup>−9</sup>&nbsp;m</b>이다 — 나노는 작아지는 접두어다.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">16</span><span class="sans">①</span><span class="slink">개념 5</span></div>
+        <p>kWh = kW × h — 일률에 시간을 곱한 에너지의 단위. 전기 요금은 '에너지를 얼마나 썼나'로 매긴다.</p>
+        <div class="wrongbox"><div class="wt">바로알기</div>
+          <p><b>②</b> km/h는 거리 ÷ 시간, 곧 속도(유도량)의 단위이다. <b>③</b> 밀리(m)는 <b>10<sup>−3</sup>배</b>를 뜻한다. <b>④</b> ℃는 그 자체가 SI 유도단위이고 T(K) = t(℃) + 273.15로 바로 환산된다(25&nbsp;℃ ≈ 298&nbsp;K). <b>⑤</b> km/h·mg·kWh·℃는 모두 SI 기본단위가 아니다.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">17</span><span class="sans">③</span><span class="slink">개념 1 | 자료 파헤치기</span></div>
+        <p><b>ㄱ&nbsp;(옳음)</b> 실제 충격량 = 2&nbsp;파운드힘·초 ≈ 2 × 4.45&nbsp;N·s = 8.9&nbsp;N·s. <b>ㄴ&nbsp;(옳음)</b> 항법팀은 2&nbsp;N·s로 계산했다 — 실제(8.9&nbsp;N·s)의 약 1/4.45로 작게 잡았다.</p>
+        <div class="wrongbox"><div class="wt">바로알기</div>
+          <p><b>ㄷ</b> (틀림 →) 두 팀의 수치 계산은 정확했다. 사고의 원인은 <b>단위의 약속이 어긋난 것</b>(단위 혼동)이다.</p></div></div>
+    </div>
+    <div>
+      <div class="sol"><div class="shead"><span class="sno">18</span><span class="sans">모범 답안</span><span class="slink">개념 1</span></div>
+        <p>단위는 '무엇을 기준으로 몇 배인가'를 정한 <b>약속</b>이다. 화성 기후 궤도선 사고에서 두 팀은 같은 <b>수치</b>를 주고받았지만, 한 팀은 파운드힘·초, 다른 팀은 뉴턴·초로 해석해 추진기 데이터가 어긋났고 탐사선을 잃었다. 단위가 빠지거나 어긋나면 수치는 의미를 잃으므로 측정값에는 반드시 단위를 함께 써야 한다.</p>
+        <table class="rubric">
+          <tr><th>채점 요소</th><th>배점</th></tr>
+          <tr><td>① 단위는 기준에 대한 약속이라고 썼다.</td><td>2점</td></tr>
+          <tr><td>② 사고의 원인이 수치가 아니라 단위의 불일치라고 썼다.</td><td>2점</td></tr>
+          <tr><td>③ 그래서 수치와 단위를 함께 써야 한다고 썼다.</td><td>2점</td></tr>
+        </table>
+        <div class="wrongbox"><div class="wt">이렇게 쓰면 0점</div>
+          <p>"계산 실수로 숫자가 틀렸기 때문이다." — 수치는 정확했다. 어긋난 것은 단위다.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">19</span><span class="sans">모범 답안</span><span class="slink">개념 3</span></div>
+        <p>식이 옳다면 <b>양변</b>의 <b>단위</b>가 같아야 한다. 좌변(거리)의 단위는 m인데, 우변은 속력(<b>m/s</b>) ÷ 시간(s) = m/s<sup>2</sup>이 되어 양변의 단위가 다르므로 틀린 식이다. 옳은 식은 거리 = 속력 × 시간으로, (m/s) × s = m이 되어 단위가 맞는다.</p>
+        <table class="rubric">
+          <tr><th>채점 요소</th><th>배점</th></tr>
+          <tr><td>① 좌변(거리)의 단위가 m임을 썼다.</td><td>2점</td></tr>
+          <tr><td>② 우변의 단위가 (m/s) ÷ s = m/s<sup>2</sup>임을 썼다.</td><td>2점</td></tr>
+          <tr><td>③ 양변의 단위가 달라 틀린 식이라고 결론지었다.</td><td>2점</td></tr>
+        </table>
+        <div class="wrongbox"><div class="wt">이렇게 쓰면 0점</div>
+          <p>"공식을 외운 것과 다르기 때문이다." — 단위를 비교하지 않으면 근거가 없다.</p></div></div>
+    </div>
+  </div>
+  <div class="folio"><span>알짜 해설</span><span class="num">39</span></div>
+</div>
+
+<!-- ═════════════ 해설 4 ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag" style="color:var(--brand);">알짜 해설</span><span class="lesson-tag">02. 기본량과 단위</span></div>
+  <div class="solcols">
+    <div>
+      <div class="sol"><div class="shead"><span class="sno">20</span><span class="sans">모범 답안</span><span class="slink">개념 4·5</span></div>
+        <p>밀리(m)는 10<sup>−3</sup>, 마이크로(μ)는 10<sup>−6</sup>이므로 <b>접두어</b> 한 칸 차이로 양이 <b>1000배</b> 달라진다. 500&nbsp;μg은 500&nbsp;mg의 1/1000이므로, 필요한 약의 1/1000만 준비하게 되어 약효를 기대할 수 없다. 그래서 처방전의 단위는 반드시 확인해야 한다.</p>
+        <table class="rubric">
+          <tr><th>채점 요소</th><th>배점</th></tr>
+          <tr><td>① m = 10<sup>−3</sup>, μ = 10<sup>−6</sup>(접두어 한 칸)임을 썼다.</td><td>2점</td></tr>
+          <tr><td>② 두 양이 1000배 차이 난다고 썼다.</td><td>2점</td></tr>
+          <tr><td>③ 필요한 양보다 훨씬 적게(1/1000) 준비하게 된다고 썼다.</td><td>2점</td></tr>
+        </table>
+        <div class="wrongbox"><div class="wt">이렇게 쓰면 0점</div>
+          <p>"약이 1000배 많아져 위험하다." — μg이 mg보다 작은 단위이므로 양은 1/1000로 줄어든다.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">21</span><span class="sans">③</span><span class="slink">개념 3·4 | 2점</span></div>
+        <p><b>ㄱ&nbsp;(옳음)</b> 농도 = 용질 ÷ 용액: A&nbsp;10&nbsp;g&nbsp;÷&nbsp;0.1&nbsp;L&nbsp;=&nbsp;100&nbsp;g/L, B&nbsp;20&nbsp;g&nbsp;÷&nbsp;0.1&nbsp;L&nbsp;=&nbsp;200&nbsp;g/L → 2배. <b>ㄴ&nbsp;(옳음)</b> 밀도 = 용액 전체 질량 ÷ 부피 = 107&nbsp;g ÷ 100&nbsp;mL = 1.07&nbsp;g/mL = 1.07&nbsp;×&nbsp;10<sup>3</sup>&nbsp;kg/m<sup>3</sup>.</p>
+        <div class="wrongbox"><div class="wt">바로알기</div>
+          <p><b>ㄷ</b> (틀림 →) 물을 더해 묽혀도 용질은 20&nbsp;g 그대로다. 20&nbsp;g&nbsp;÷&nbsp;0.2&nbsp;L = <b>100&nbsp;g/L</b> — 부피가 2배가 되면 농도는 절반이 된다. 농도는 용질만, 밀도는 용액 전체의 질량을 센다.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">22</span><span class="sans">④</span><span class="slink">개념 4 | 2점</span></div>
+        <p><b>ㄴ&nbsp;(옳음)</b> 나노 = 10<sup>−9</sup> — 이름이 곧 규모다. <b>ㄷ&nbsp;(옳음)</b> G(10<sup>9</sup>)&nbsp;÷&nbsp;k(10<sup>3</sup>) = 10<sup>9−3</sup> = 10<sup>6</sup>배.</p>
+        <div class="wrongbox"><div class="wt">바로알기</div>
+          <p><b>ㄱ</b> (틀림 →) 10<sup>−3</sup> ÷ 10<sup>3</sup> = 10<sup>−6</sup> — 1&nbsp;mm는 1&nbsp;km의 <b>10<sup>−6</sup>배</b>이다(1&nbsp;km가 1&nbsp;mm의 10<sup>6</sup>배).</p></div></div>
+    </div>
+    <div>
+      <div class="sol"><div class="shead"><span class="sno">23</span><span class="sans">⑤</span><span class="slink">개념 3·4 | 2.5점</span></div>
+        <p><b>ㄱ&nbsp;(옳음)</b> A: 8&nbsp;kg ÷ (4&nbsp;×&nbsp;10<sup>−3</sup>&nbsp;m<sup>3</sup>) = 2&nbsp;×&nbsp;10<sup>3</sup>&nbsp;kg/m<sup>3</sup>. <b>ㄴ&nbsp;(옳음)</b> 기울기 = 질량 ÷ 부피 = 밀도 → kg/m<sup>3</sup>. <b>ㄷ&nbsp;(옳음)</b> 4&nbsp;kg일 때 A는 2&nbsp;×&nbsp;10<sup>−3</sup>&nbsp;m<sup>3</sup>, B는 4&nbsp;×&nbsp;10<sup>−3</sup>&nbsp;m<sup>3</sup> — B가 2배.</p>
+        <div class="analysis"><div class="at">꼼꼼 자료 분석</div>
+          <svg width="310" height="198.4" viewBox="0 0 300 192" font-family="PC Sans">
+            <g stroke="#E3E8EC" stroke-width="0.8">
+              <line x1="92" y1="28" x2="92" y2="118"/><line x1="140" y1="28" x2="140" y2="118"/><line x1="188" y1="28" x2="188" y2="118"/><line x1="236" y1="28" x2="236" y2="118"/>
+              <line x1="44" y1="95.5" x2="236" y2="95.5"/><line x1="44" y1="73" x2="236" y2="73"/><line x1="44" y1="50.5" x2="236" y2="50.5"/><line x1="44" y1="28" x2="236" y2="28"/>
+            </g>
+            <line x1="44" y1="118" x2="250" y2="118" stroke="#5B6B77" stroke-width="1.2" marker-end="url(#arrP)"/>
+            <line x1="44" y1="118" x2="44" y2="14" stroke="#5B6B77" stroke-width="1.2" marker-end="url(#arrP)"/>
+            <line x1="44" y1="118" x2="236" y2="28" stroke="#D6455D" stroke-width="1.8"/>
+            <line x1="44" y1="118" x2="236" y2="73" stroke="#0E5A6B" stroke-width="1.8"/>
+            <g stroke="#E8940A" stroke-width="1" stroke-dasharray="3 2"><line x1="44" y1="73" x2="236" y2="73"/><line x1="140" y1="73" x2="140" y2="118"/></g>
+            <circle cx="140" cy="73" r="3.2" fill="#D6455D"/><circle cx="236" cy="73" r="3.2" fill="#0E5A6B"/>
+            <g font-size="12.2" font-weight="900"><text x="222" y="24" fill="#D6455D">A</text><text x="241" y="70" fill="#0E5A6B">B</text></g>
+            <g font-size="11.7" fill="#5B6B77" text-anchor="middle"><text x="44" y="129">0</text><text x="92" y="129">1</text><text x="140" y="129">2</text><text x="188" y="129">3</text><text x="236" y="129">4</text></g>
+            <g font-size="11.7" fill="#5B6B77" text-anchor="end"><text x="39" y="98">2</text><text x="39" y="75.5">4</text><text x="39" y="53">6</text><text x="39" y="30.5">8</text></g>
+            <text x="50" y="14" font-size="11.7" font-weight="800" fill="#22303A">질량(kg)</text>
+            <text x="252" y="142" font-size="11.7" font-weight="800" fill="#22303A" text-anchor="end">부피(×10<tspan dy="-2.8" font-size="8.1">−3</tspan><tspan dy="2.8"> m</tspan><tspan dy="-2.8" font-size="8.1">3</tspan><tspan dy="2.8">)</tspan></text>
+            <g font-size="11.4" font-weight="700" fill="#D6455D">
+              <text x="8" y="162">기울기 = 질량 ÷ 부피 = 밀도</text>
+              <text x="8" y="175">A: 8 ÷ (4 × 10<tspan dy="-2.6" font-size="7.9">−3</tspan><tspan dy="2.6">) = 2 × 10</tspan><tspan dy="-2.6" font-size="7.9">3</tspan><tspan dy="2.6"> kg/m</tspan><tspan dy="-2.6" font-size="7.9">3</tspan></text>
+            </g>
+            <g font-size="11.4" font-weight="700" fill="#B4560E"><text x="8" y="188">4 kg일 때 부피: A 2, B 4 → B가 A의 2배</text></g>
+          </svg></div>
+        <div class="wrongbox"><div class="wt">함정 체크</div>
+          <p>부피 축의 '×10<sup>−3</sup>&nbsp;m<sup>3</sup>'를 빼먹고 8 ÷ 4 = 2&nbsp;kg/m<sup>3</sup>로 읽으면 ㄱ을 놓친다. 축의 단위까지 읽는 것이 자료 해석이다.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">24</span><span class="sans">②</span><span class="slink">개념 2·3·4 | 2.5점</span></div>
+        <p><b>ㄷ&nbsp;(옳음)</b> m/s = 길이(m) ÷ 시간(s) — (가)의 두 기본단위를 조합한 유도단위다.</p>
+        <div class="wrongbox"><div class="wt">바로알기</div>
+          <p><b>ㄱ</b> (틀림 →) 1&nbsp;m의 정의에는 시간의 기본단위 <b>s</b>가 쓰인다 — 길이의 기준이 시간의 기준에 기대고 있다. <b>ㄴ</b> (틀림 →) 2&nbsp;μs는 왕복 시간이므로 편도는 1&nbsp;×&nbsp;10<sup>−6</sup>&nbsp;s. 거리 = 3&nbsp;×&nbsp;10<sup>8</sup>&nbsp;m/s × 1&nbsp;×&nbsp;10<sup>−6</sup>&nbsp;s = <b>300&nbsp;m</b>이다(600&nbsp;m는 왕복 거리).</p></div></div>
       <div class="gist" style="margin-top:5mm;">
         <div class="boxtitle"><span class="ico">알</span>이 소단원, 이것만은!</div>
         <ul>
           <li><b>측정값 = 수치 + 단위</b> — 단위는 약속이자 안전장치 (화성 기후 궤도선)</li>
           <li><b>기본량 7</b>: m·kg·s·A·K·mol·cd / <b>유도량</b> = 조합 (m/s, kg/m<sup>3</sup>, N = kg·m/s<sup>2</sup>)</li>
-          <li><b>접두어</b>: n(10<sup>−</sup><sup>9</sup>) μ(10<sup>−</sup><sup>6</sup>) m(10<sup>−3</sup>) k(10<sup>3</sup>) M(10<sup>6</sup>) G(10<sup>9</sup>) — 비교는 지수 뺄셈</li>
+          <li><b>접두어</b>: n(10<sup>−9</sup>) μ(10<sup>−6</sup>) m(10<sup>−3</sup>) k(10<sup>3</sup>) M(10<sup>6</sup>) G(10<sup>9</sup>) — 비교는 지수 뺄셈</li>
         </ul>
       </div>
     </div>
   </div>
-  <div class="folio"><span>알짜 해설</span><span class="num">33</span></div>
+  <div class="folio"><span>알짜 해설</span><span class="num">40</span></div>
 </div>
 
 <!-- ═════════════ p.34 MEMO ═════════════ -->
 <div class="page">
   <div class="runhead"><span class="unit-tag">I. 과학의 기초</span><span class="lesson-tag">02 ▸ 03 넘어가기 전에</span></div>
+  <div class="spaced">
+    <div class="st">간격 두고 다시 꺼내기 — 책을 덮고 답한다</div>
+    <ol>
+      <li>SI 기본량 7가지의 기본단위를 모두 쓰면?</li>
+      <li>밀도의 단위 kg/m<sup>3</sup>는 어떤 정의에서 나왔나?</li>
+      <li>물이 어는 0&nbsp;℃는 몇 K인가? ℃는 SI의 어떤 단위인가?</li>
+    </ol>
+    <div class="when"><span>□ 1일 뒤</span><span>□ 1주 뒤</span><span>□ 시험 전</span></div>
+    <div class="ans">정답 1 m·kg·s·A·K·mol·cd 2 밀도 = 질량 ÷ 부피 3 약 273&nbsp;K(273.15), SI 유도단위</div>
+  </div>
   <div class="memo-head"><span class="mt">MEMO</span><span class="ms">헷갈린 개념, 다시 틀린 문제 번호, 나만의 암기법을 남겨 두는 자리</span></div>
   <div class="memo-area"></div>
-  <div class="memo-pen">"기본량 7가지를 단위와 짝지어 소리 내어 말해 보자. 하나라도 막히면 24쪽으로! — 박찬쌤"</div>
-  <div class="folio"><span>박찬 과학 | 통합과학 1</span><span class="num">34</span></div>
+  <div class="memo-pen">"기본량 7가지를 단위와 짝지어 소리 내어 말해 보자. 하나라도 막히면 28쪽으로! — 박찬쌤"</div>
+  <div class="folio"><span>박찬 과학 | 통합과학 1</span><span class="num">41</span></div>
 </div>
 
 </body>

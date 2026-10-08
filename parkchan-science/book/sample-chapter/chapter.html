@@ -4,8 +4,8 @@
 <meta charset="utf-8">
 <title>박찬 과학 통합과학1 — 샘플 챕터</title>
 <style>
-  @font-face { font-family:'PC Sans'; src:url('file:///root/.fonts/NotoSansKR.ttf'); font-weight:100 900; }
-  @font-face { font-family:'PC Serif'; src:url('file:///root/.fonts/NotoSerifKR.ttf'); font-weight:100 900; }
+  @font-face { font-family:'PC Sans'; src:url('file:///root/.fonts/static/NotoSansKR-400.ttf'); font-weight:400; } @font-face { font-family:'PC Sans'; src:url('file:///root/.fonts/static/NotoSansKR-500.ttf'); font-weight:500; } @font-face { font-family:'PC Sans'; src:url('file:///root/.fonts/static/NotoSansKR-600.ttf'); font-weight:600; } @font-face { font-family:'PC Sans'; src:url('file:///root/.fonts/static/NotoSansKR-700.ttf'); font-weight:700; } @font-face { font-family:'PC Sans'; src:url('file:///root/.fonts/static/NotoSansKR-800.ttf'); font-weight:800; } @font-face { font-family:'PC Sans'; src:url('file:///root/.fonts/static/NotoSansKR-900.ttf'); font-weight:900; }
+  @font-face { font-family:'PC Serif'; src:url('file:///root/.fonts/static/NotoSerifKR-400.ttf'); font-weight:400; } @font-face { font-family:'PC Serif'; src:url('file:///root/.fonts/static/NotoSerifKR-500.ttf'); font-weight:500; } @font-face { font-family:'PC Serif'; src:url('file:///root/.fonts/static/NotoSerifKR-600.ttf'); font-weight:600; } @font-face { font-family:'PC Serif'; src:url('file:///root/.fonts/static/NotoSerifKR-700.ttf'); font-weight:700; } @font-face { font-family:'PC Serif'; src:url('file:///root/.fonts/static/NotoSerifKR-800.ttf'); font-weight:800; } @font-face { font-family:'PC Serif'; src:url('file:///root/.fonts/static/NotoSerifKR-900.ttf'); font-weight:900; }
   @font-face { font-family:'PC Pen'; src:url('file:///root/.fonts/YeonSung-Regular.ttf'); font-weight:400; }
 
   :root{
@@ -221,6 +221,30 @@
     background-image:linear-gradient(to bottom, transparent calc(100% - 0.3mm), #DCE4E9 0);
     background-size:100% 9mm; background-position:0 4mm; padding:0 5mm; margin-bottom:4mm; }
   .memo-pen{ font-family:'PC Pen'; font-size:12.5pt; color:#B4560E; text-align:right; }
+/* ── 2026-10-02 보강: 중요 표시 · 채점 기준 · 꼼꼼 자료 분석 · 간격 두고 다시 꺼내기 ── */
+.must{ display:inline-block; font-size:7pt; font-weight:900; color:#fff; background:#D9534F; border-radius:1.6mm; padding:0.2mm 1.4mm; margin-right:1.2mm; vertical-align:1pt; }
+table.rubric{ border-collapse:collapse; width:100%; font-size:7.6pt; margin:1mm 0 0.5mm; }
+table.rubric th, table.rubric td{ border:0.25mm solid var(--line); padding:0.8mm 1.4mm; text-align:left; vertical-align:top; }
+table.rubric th{ background:#F4F1EA; font-weight:800; white-space:nowrap; }
+.analysis{ border:0.35mm dashed #C9A36A; border-radius:2.5mm; padding:1.6mm 2mm 1.2mm; margin:1.5mm 0; background:#FFFCF5; }
+.analysis .at{ font-size:7.6pt; font-weight:900; color:#9C6503; margin-bottom:0.8mm; }
+.analysis svg{ max-width:100%; height:auto; display:block; }
+.spaced{ border:0.4mm solid var(--line); border-radius:3mm; padding:3mm 4mm 2.6mm; margin:0 0 4mm; position:relative; background:#FAFBFC; }
+.spaced .st{ font-size:9.5pt; font-weight:900; color:var(--unit); margin-bottom:1.6mm; }
+.spaced ol{ margin:0; padding-left:5mm; font-size:8.8pt; line-height:1.75; }
+.spaced .when{ display:flex; gap:5mm; font-size:8pt; color:var(--sub); margin-top:1.8mm; }
+.spaced .ans{ position:absolute; right:4mm; bottom:2.4mm; transform:rotate(180deg); font-size:6.8pt; color:var(--sub); }
+/* 2단 문항 쪽 간격 · 발문 안 탐구 과정 상자 (합격본 chapter-08 에서) */
+.qg2 .q{ margin-bottom:6mm; }
+.qg2 > div > .q:last-child{ margin-bottom:0; }
+.qg2 .choices.inline{ gap:0 4mm; }
+.qg2 .choices{ margin-top:1.8mm; line-height:1.78; }
+.qg2 .bogi-box{ margin-top:2mm; padding:1.8mm 2.8mm; font-size:9pt; line-height:1.72; }
+.qg2 .bogi-box .bt{ margin-bottom:0.3mm; }
+.qg2 .q figure{ margin:1.6mm 0 0.6mm 8.4mm !important; }
+.exp{ border:0.35mm solid #B8C2CA; border-radius:1.6mm; background:#FAFBFC; padding:1.6mm 2.6mm; margin:1.4mm 0 1.6mm; font-size:8.9pt; line-height:1.7; }
+.exp b{ font-family:'PC Sans'; font-size:7.8pt; font-weight:900; color:var(--brand); }
+.ox-answer, .nw{ white-space:nowrap; }   /* ( O , X )·〈보기〉가 줄 끝에서 갈리지 않게 */
 </style>
 </head>
 <body>
@@ -302,7 +326,7 @@
     <div class="opener-quote">"우리는 별의 물질로 만들어졌다. 우리 몸의 모든 원자가 별을 거쳐 왔다."<span class="who">— 칼 세이건, 천문학자</span></div>
   </div>
 
-  <div class="folio"><span>박찬 과학 | 통합과학 1</span><span class="num">63</span></div>
+  <div class="folio"><span>박찬 과학 | 통합과학 1</span><span class="num">85</span></div>
 </div>
 
 <!-- ═════════════ p.2 개념 01 빅뱅 ═════════════ -->
@@ -319,10 +343,10 @@
 
       <div class="saem">
         <div class="avatar">박찬<br>쌤</div>
-        <div class="bubble"><span class="pen">"풍선에 스티커를 붙이고 불어 봐. 어느 스티커에서 봐도 다른 스티커가 다 멀어지지? 우주 팽창엔 '중심'이 따로 없다는 게 포인트!</span></div>
+        <div class="bubble"><span class="pen">"풍선에 스티커를 붙이고 불어 봐. 어느 스티커에서 봐도 다른 스티커가 다 멀어지지? 우주 팽창엔 '중심'이 따로 없다는 게 포인트!"</span></div>
       </div>
 
-      <h3 class="sec" style="margin-top:5.5mm;"><span class="n">2</span>온도가 낮아지며 입자가 태어나다</h3>
+      <h3 class="sec" style="margin-top:4mm;"><span class="n">2</span>온도가 낮아지며 입자가 태어나다</h3>
       <p class="body">빅뱅 직후의 우주는 너무 뜨거워서 어떤 물질도 온전한 형태를 유지할 수 없었다. 우주가 팽창하며 <b>식어 가는 순서대로</b>, 작은 입자들이 결합하여 점점 더 큰 입자가 만들어졌다.</p>
       <ul class="pts">
         <li><b>기본 입자 생성</b> — 빅뱅 직후, 더 쪼갤 수 없는 <span class="kw">쿼크</span>와 <span class="kw">전자</span> 등이 생겼다.</li>
@@ -393,9 +417,9 @@
 
     <div class="wing">
       <div class="wtitle">날개 노트</div>
-      <div class="term"><b>빅뱅 우주론</b>우주가 한 점에서 시작해 팽창하며 현재에 이르렀다는 이론. 조지 가모프가 체계화했다.</div>
-      <div class="term"><b>쿼크</b>물질을 이루는 가장 작은 기본 입자 중 하나. 업 쿼크 2개 + 다운 쿼크 1개 = 양성자, 업 1개 + 다운 2개 = 중성자.</div>
-      <div class="term"><b>K(켈빈)</b>절대 온도의 단위. 0 K = −273 °C. 우주 초기 온도를 나타낼 때 쓴다.</div>
+      <div class="term"><b>빅뱅 우주론(대폭발 우주론)</b>우주가 한 점에서 시작해 팽창하며 현재에 이르렀다는 이론. 조지 가모프가 체계화했다.</div>
+      <div class="term"><b>쿼크</b>물질을 이루는 가장 작은 기본 입자 중 하나.<br><span style="color:#B4560E">(심화)</span> 양성자 = 업 2 + 다운 1, 중성자 = 업 1 + 다운 2</div>
+      <div class="term"><b>K(켈빈)</b>절대 온도의 단위. 0&nbsp;K = −273&nbsp;°C. 우주 초기 온도를 나타낼 때 쓴다.</div>
       <div class="wsep"></div>
       <div class="wtitle">한눈에 암기</div>
       <div class="wing-pen">기본 입자 → 양·중성자<br>→ 원자핵(3분)<br>→ 원자(38만 년)<br>"작은 것부터 뭉친다!"</div>
@@ -408,7 +432,7 @@
     </div>
   </div>
 
-  <div class="folio"><span>II. 물질과 규칙성</span><span class="num">64</span></div>
+  <div class="folio"><span>II. 물질과 규칙성</span><span class="num">86</span></div>
 </div>
 
 <!-- ═════════════ p.3 개념 02 우주배경복사 + 알짜 ═════════════ -->
@@ -514,9 +538,9 @@
       <li><span class="no">2</span>우주 배경 복사는 원자 생성 무렵 우주로 퍼져 나간 빛의 흔적이다. ( O , X )</li>
       <li><span class="no">3</span>별과 은하는 헬륨 원자핵이 생성된 직후에 만들어졌다. ( O , X )</li>
     </ol>
-    <div class="qc-ans">정답 1 X (빛이 전자에 산란되어 불투명) 2 O 3 X (원자 생성 이후 수억 년 뒤)</div>
+    <div class="qc-ans">정답 1 X (빛이 전자에 산란되어 불투명) 2 O (약 38만 년에 퍼진 빛) 3 X (원자 생성 이후 수억 년 뒤)</div>
   </div>
-  <div class="folio"><span>II. 물질과 규칙성</span><span class="num">65</span></div>
+  <div class="folio"><span>II. 물질과 규칙성</span><span class="num">87</span></div>
 </div>
 
 <!-- ═════════════ p.4 개념 03 스펙트럼 ═════════════ -->
@@ -568,6 +592,7 @@
       </figure>
 
       <p class="body">원소의 종류에 따라 선이 나타나는 <b>파장(위치)이 정해져 있고</b>, 같은 원소의 방출선과 흡수선은 <span class="u-amber">항상 같은 위치</span>에 나타난다. 그래서 스펙트럼의 선은 사람의 지문처럼 <b>원소를 구별하는 표지</b>가 된다. 별빛의 흡수선 위치를 실험실에서 얻은 원소별 스펙트럼과 대조하면, <b>별의 대기에 어떤 원소가 얼마나 있는지</b> 알 수 있다.</p>
+      <p class="body">예를 들어 <b>수소 기체 방전관</b>의 빛을 분광기로 보면 가시광선 영역에 <b>보라·파랑·청록·빨강의 밝은 선 4개</b>가 언제나 같은 자리에 나타난다. 이 수소의 선과 헬륨의 선은 우주 곳곳의 별과 은하의 스펙트럼에 공통으로 나타난다 — 수소와 헬륨이 우주의 <span class="u-amber">주요 구성 원소</span>라는 단서다. 별의 흡수선이 수소·헬륨의 선을 다 짝지우고도 <b>남으면</b>, 남은 선은 <b>다른 원소</b>의 것이다. (→ 교과서 탐구)</p>
 
       <div class="saem">
         <div class="avatar">박찬<br>쌤</div>
@@ -579,12 +604,13 @@
       <div class="wtitle">날개 노트</div>
       <div class="term"><b>파장</b>빛(파동)의 골에서 골까지 거리. 가시광선은 파장이 짧을수록 보라, 길수록 빨강.</div>
       <div class="term"><b>분광기</b>빛을 파장별로 나누어 스펙트럼을 보여 주는 장치.</div>
+      <div class="term"><b>수소의 선스펙트럼</b>가시광선 영역의 밝은 선 4개 — 약 410·434·486·656&nbsp;nm(보라 → 빨강). 숫자보다 위치 대조가 핵심.</div>
       <div class="wsep"></div>
       <div class="wtitle">시험 단골 비교</div>
       <div class="term"><b>방출 vs 흡수</b>어두운 바탕 + 밝은 선 = 방출<br>무지개 바탕 + 검은 선 = 흡수<br><span style="color:#B4560E">"바탕이 무엇인지"부터 보기!</span></div>
     </div>
   </div>
-  <div class="folio"><span>II. 물질과 규칙성</span><span class="num">66</span></div>
+  <div class="folio"><span>II. 물질과 규칙성</span><span class="num">88</span></div>
 </div>
 
 <!-- ═════════════ p.5 개념 04 수소:헬륨 3:1 ═════════════ -->
@@ -594,25 +620,34 @@
     <div class="main">
       <h3 class="sec"><span class="n">5</span>우주의 조성 — 수소 : 헬륨 = 약 3 : 1</h3>
       <p class="body">별빛과 은하의 스펙트럼을 분석해 보면, 우주 어디를 보아도 구성 원소의 <b>질량비가 수소 약 74 %, 헬륨 약 24 %</b>로 거의 일정하다. 즉 <span class="kw">수소 : 헬륨 ≈ 3 : 1</span>이다.</p>
-      <p class="body">놀라운 점은, 빅뱅 우주론이 초기 우주의 양성자와 중성자 개수비로부터 <b>계산으로 예측한 값</b>이 바로 이 3 : 1이라는 것이다. <b>이론의 예측과 관측 결과가 일치</b>하므로, 수소·헬륨의 질량비는 앞서 <b>개념 3</b>에서 본 우주 배경 복사에 이어 빅뱅 우주론의 <span class="u-amber">두 번째 결정적 증거</span>가 된다.</p>
+      <p class="body">놀라운 점은, 빅뱅 우주론이 초기 우주의 양성자와 중성자 개수비로부터 <b>계산으로 예측한 값</b>이 바로 이 3 : 1이라는 것이다. 헬륨 원자핵이 만들어질 무렵 양성자 : 중성자는 약 <b>7&nbsp;:&nbsp;1</b>이었고, 중성자는 거의 모두 양성자와 짝을 지어 헬륨 원자핵이 되었다(그림 4 ①). <b>이론의 예측과 관측 결과가 일치</b>하므로, 수소·헬륨의 질량비는 앞서 <b>개념 3</b>에서 본 우주 배경 복사에 이어 빅뱅 우주론의 <span class="u-amber">두 번째 결정적 증거</span>가 된다.</p>
 
       <figure>
-        <svg width="440" height="134" viewBox="0 0 440 134" font-family="PC Sans">
-          <text x="10" y="18" font-size="9.5" font-weight="800" fill="#22303A">우주 전체의 원소 조성 (질량비)</text>
-          <rect x="10" y="32" width="315" height="30" rx="3" fill="#2E5BDA"/>
-          <rect x="325" y="32" width="105" height="30" rx="3" fill="#F4A62A"/>
-          <rect x="425" y="32" width="5" height="30" fill="#9AA7B1"/>
-          <text x="167" y="51" text-anchor="middle" font-size="11" font-weight="900" fill="#fff">수소 H  약 74 %</text>
-          <text x="377" y="51" text-anchor="middle" font-size="10" font-weight="900" fill="#fff">헬륨 He 24 %</text>
-          <text x="10" y="86" font-size="8.6" fill="#5B6B77">· 나머지 모든 원소를 합쳐도 약 2 % — 무거운 원소는 이후 별의 진화에서 만들어진다 (다음 소단원!)</text>
-          <text x="10" y="116" font-size="9.4" font-weight="800" fill="#0E5A6B">빅뱅 이론의 예측 = 3 : 1   ⇄   스펙트럼 관측 결과 = 3 : 1   →   빅뱅 우주론의 증거 ②</text>
+        <svg width="440" height="150" viewBox="0 0 440 150" font-family="PC Sans">
+          <text x="10" y="14" font-size="9.5" font-weight="800" fill="#22303A">① 예측 — 입자 16개로 3 : 1 만들기 <tspan font-size="8" font-weight="600" fill="#5B6B77">(빅뱅 후 약 3분, 헬륨 원자핵 생성)</tspan></text>
+          <circle cx="16" cy="40" r="5.2" fill="#2E5BDA"/><circle cx="29" cy="40" r="5.2" fill="#2E5BDA"/><circle cx="42" cy="40" r="5.2" fill="#2E5BDA"/><circle cx="55" cy="40" r="5.2" fill="#2E5BDA"/><circle cx="68" cy="40" r="5.2" fill="#B9CBF2"/><circle cx="81" cy="40" r="5.2" fill="#2E5BDA"/><circle cx="94" cy="40" r="5.2" fill="#2E5BDA"/><circle cx="107" cy="40" r="5.2" fill="#2E5BDA"/><circle cx="16" cy="53" r="5.2" fill="#2E5BDA"/><circle cx="29" cy="53" r="5.2" fill="#2E5BDA"/><circle cx="42" cy="53" r="5.2" fill="#2E5BDA"/><circle cx="55" cy="53" r="5.2" fill="#B9CBF2"/><circle cx="68" cy="53" r="5.2" fill="#2E5BDA"/><circle cx="81" cy="53" r="5.2" fill="#2E5BDA"/><circle cx="94" cy="53" r="5.2" fill="#2E5BDA"/><circle cx="107" cy="53" r="5.2" fill="#2E5BDA"/>
+          <text x="61.5" y="76" text-anchor="middle" font-size="7.6" font-weight="800" fill="#22303A">양성자 14 : 중성자 2 = 7 : 1</text>
+          <line x1="122" y1="46.5" x2="170" y2="46.5" stroke="#2E5BDA" stroke-width="1.8" marker-end="url(#arr)"/>
+          <text x="146" y="38" text-anchor="middle" font-size="7" font-weight="800" fill="#2E5BDA">결합</text>
+          <g transform="translate(193,46.5)"><circle cx="-4.4" cy="-4.4" r="4.6" fill="#2E5BDA"/><circle cx="4.4" cy="-4.4" r="4.6" fill="#B9CBF2"/><circle cx="-4.4" cy="4.4" r="4.6" fill="#B9CBF2"/><circle cx="4.4" cy="4.4" r="4.6" fill="#2E5BDA"/></g><circle cx="222" cy="40" r="5.2" fill="#2E5BDA"/><circle cx="235" cy="40" r="5.2" fill="#2E5BDA"/><circle cx="248" cy="40" r="5.2" fill="#2E5BDA"/><circle cx="261" cy="40" r="5.2" fill="#2E5BDA"/><circle cx="274" cy="40" r="5.2" fill="#2E5BDA"/><circle cx="287" cy="40" r="5.2" fill="#2E5BDA"/><circle cx="222" cy="53" r="5.2" fill="#2E5BDA"/><circle cx="235" cy="53" r="5.2" fill="#2E5BDA"/><circle cx="248" cy="53" r="5.2" fill="#2E5BDA"/><circle cx="261" cy="53" r="5.2" fill="#2E5BDA"/><circle cx="274" cy="53" r="5.2" fill="#2E5BDA"/><circle cx="287" cy="53" r="5.2" fill="#2E5BDA"/>
+          <text x="193" y="76" text-anchor="middle" font-size="7.6" font-weight="800" fill="#F4A62A">헬륨 원자핵 1</text>
+          <text x="254.5" y="76" text-anchor="middle" font-size="7.6" font-weight="800" fill="#2E5BDA">수소 원자핵 12</text>
+          <g font-size="8.4" font-weight="800" fill="#0E5A6B"><text x="308" y="38">질량 H : He</text><text x="308" y="51">= 12 : 4 = 3 : 1</text></g>
+          <text x="308" y="66" font-size="7.6" fill="#5B6B77">(개수는 12 : 1)</text>
+          <text x="10" y="100" font-size="9.5" font-weight="800" fill="#22303A">② 관측 — 우주 전체의 원소 조성 <tspan font-size="8" font-weight="600" fill="#5B6B77">(질량비, 별과 은하의 스펙트럼 분석)</tspan></text>
+          <rect x="10" y="108" width="315" height="28" rx="3" fill="#2E5BDA"/>
+          <rect x="325" y="108" width="105" height="28" rx="3" fill="#F4A62A"/>
+          <rect x="425" y="108" width="5" height="28" fill="#9AA7B1"/>
+          <text x="167" y="126" text-anchor="middle" font-size="11" font-weight="900" fill="#fff">수소 H  약 74 %</text>
+          <text x="377" y="126" text-anchor="middle" font-size="10" font-weight="900" fill="#fff">헬륨 He 24 %</text>
+          <text x="430" y="148" text-anchor="end" font-size="7.6" fill="#5B6B77">기타 원소 약 2 % — 별에서 만들어진다(다음 소단원)</text>
         </svg>
-        <figcaption>그림 4 | 우주의 원소 조성 — 어디를 관측해도 수소 : 헬륨 ≈ 3 : 1</figcaption>
+        <figcaption>그림 4 | 예측과 관측의 일치 — 양성자 : 중성자 ≈ 7 : 1에서 출발하면 수소 : 헬륨 ≈ 3 : 1(질량비)이 된다</figcaption>
       </figure>
 
       <div class="expoint">
         <div class="boxtitle"><span class="ico">!</span>시험엔 이렇게</div>
-        <p><b>질량비 3 : 1</b>과 <b>개수비 약 12 : 1</b>을 바꿔치기하는 선지가 출제된다. 헬륨 원자 1개의 질량이 수소의 약 4배이므로, 개수비 12 : 1 → 질량비 12 : 4 = 3 : 1. 문제가 어느 쪽을 묻는지 꼭 확인!</p>
+        <p><b>질량비 3 : 1</b>과 <b>개수비 약 12 : 1</b>을 바꿔치기하는 선지가 출제된다. 헬륨 원자 1개의 질량이 수소의 약 4배이므로, 개수비 12 : 1 → 질량비 12 : 4 = 3 : 1. 어느 쪽을 묻는지 꼭 확인!</p>
       </div>
 
       <div class="gist">
@@ -624,15 +659,15 @@
         </ul>
       </div>
 
-      <div class="saem">
-        <div class="avatar">박찬<br>쌤</div>
-        <div class="bubble"><span class="pen">"증거 두 개는 세트로 외워 — ① 우주 배경 복사, ② 수소 : 헬륨 = 3 : 1. 시험지에서 '빅뱅의 증거를 모두 고르면?'이 나오면 무조건 이 둘이다."</span></div>
-      </div>
+      
     </div>
 
     <div class="wing">
       <div class="wtitle">날개 노트</div>
       <div class="term"><b>질량비와 개수비</b>He 1개 질량 ≈ H 4개 질량.<br>개수비 H : He = 12 : 1<br>→ 질량비 = 12 : 4 = 3 : 1</div>
+      <div class="wsep"></div>
+      <div class="wtitle">한눈에 암기</div>
+      <div class="wing-pen">빅뱅의 증거는 세트!<br>① 우주 배경 복사<br>② H : He = 3 : 1<br>"증거를 모두 고르면?"<br>→ 무조건 이 둘</div>
       <div class="wsep"></div>
       <div class="wtitle">앱 연동</div>
       <div class="term"><b>앱에서 이어서!</b>박찬 과학 앱에서 소단원 01을 선택하면 알짜 요약과 추가 문제를 볼 수 있다. 오늘의 1일 1문제도 놓치지 말 것!</div>
@@ -645,9 +680,9 @@
       <li><span class="no">2</span>수소와 헬륨의 '개수비'가 약 3 : 1이다. ( O , X )</li>
       <li><span class="no">3</span>수소·헬륨 질량비의 관측값이 이론 예측값과 일치하는 것은 빅뱅 우주론의 증거이다. ( O , X )</li>
     </ol>
-    <div class="qc-ans">정답 1 O 2 X (질량비가 3 : 1, 개수비는 약 12 : 1) 3 O</div>
+    <div class="qc-ans">정답 1 O (질량비 약 74&nbsp;%) 2 X (질량비가 3 : 1, 개수비는 약 12 : 1) 3 O</div>
   </div>
-  <div class="folio"><span>II. 물질과 규칙성</span><span class="num">67</span></div>
+  <div class="folio"><span>II. 물질과 규칙성</span><span class="num">89</span></div>
 </div>
 
 <!-- ═════════════ p.6 자료 파헤치기 ═════════════ -->
@@ -657,43 +692,84 @@
     <div class="lab-head">자료 파헤치기 <span class="tag">탐구·자료 분석</span> <span style="font-weight:600; font-size:9.5pt; margin-left:auto;">스펙트럼으로 별의 구성 원소 알아내기</span></div>
     <div class="lab-body">
       <h4>자료</h4>
-      <p>그림은 원소 A, B의 방출 스펙트럼과 별 S의 흡수 스펙트럼을 나타낸 것이다.</p>
+      <p>그림은 원소 A, B의 방출 스펙트럼과 별 S의 흡수 스펙트럼을 나타낸 것이다. S의 흡수선은 3개이다.</p>
       <figure>
         <svg width="470" height="150" viewBox="0 0 470 150" font-family="PC Sans">
           <!-- A -->
           <text x="8" y="30" font-size="9.5" font-weight="800" fill="#22303A">원소 A</text>
           <rect x="90" y="14" width="360" height="24" rx="3" fill="#14181F"/>
-          <rect x="152" y="14" width="4" height="24" fill="#4A6FE8"/><rect x="330" y="14" width="4" height="24" fill="#E85B4A"/>
+          <rect x="152" y="14" width="4" height="24" fill="#4A6FE8"/><rect x="330" y="14" width="4" height="24" fill="#E8C62A"/>
           <!-- B -->
           <text x="8" y="72" font-size="9.5" font-weight="800" fill="#22303A">원소 B</text>
           <rect x="90" y="56" width="360" height="24" rx="3" fill="#14181F"/>
-          <rect x="196" y="56" width="4" height="24" fill="#8A5CE8"/><rect x="262" y="56" width="4" height="24" fill="#35C46A"/><rect x="398" y="56" width="4" height="24" fill="#E8A23A"/>
+          <rect x="196" y="56" width="4" height="24" fill="#2FA0B4"/><rect x="262" y="56" width="4" height="24" fill="#35C46A"/><rect x="398" y="56" width="4" height="24" fill="#E8A23A"/>
           <!-- S -->
           <text x="8" y="114" font-size="9.5" font-weight="800" fill="#22303A">별 S</text>
           <rect x="90" y="98" width="360" height="24" rx="3" fill="url(#rb)"/>
-          <rect x="152" y="98" width="4" height="24" fill="#14181F"/><rect x="330" y="98" width="4" height="24" fill="#14181F"/>
+          <rect x="152" y="98" width="4" height="24" fill="#14181F"/><rect x="228" y="98" width="4" height="24" fill="#14181F"/><rect x="330" y="98" width="4" height="24" fill="#14181F"/>
+          <text x="230" y="132" font-size="7.6" font-weight="800" fill="#D6455D" text-anchor="middle">?</text>
           <line x1="154" y1="38" x2="154" y2="98" stroke="#E8940A" stroke-width="1.2" stroke-dasharray="3 2"/>
           <line x1="332" y1="38" x2="332" y2="98" stroke="#E8940A" stroke-width="1.2" stroke-dasharray="3 2"/>
           <text x="240" y="140" font-size="8.4" fill="#5B6B77" text-anchor="middle">← 파장 짧음(보라)　　　　　　　　　　　　　　파장 긺(빨강) →</text>
         </svg>
       </figure>
-      <h4>해석의 3단계</h4>
+      <h4>해석의 4단계</h4>
       <ol>
         <li><b>별 S의 스펙트럼 종류 확인</b> — 연속 스펙트럼(별 표면의 빛) 위에 검은 선 → <b>흡수 스펙트럼</b>. 검은 선은 별의 <b>대기</b>가 특정 파장을 흡수한 자리다.</li>
         <li><b>선의 위치 대조</b> — S의 흡수선 위치가 <b>A의 방출선 위치와 일치</b>한다. 같은 원소의 방출선·흡수선은 같은 위치! → 별 S의 대기에 <b>원소 A가 있다</b>.</li>
         <li><b>없는 원소 확인</b> — B의 방출선 위치에는 S의 흡수선이 없다 → <b>B는 검출되지 않는다</b>.</li>
+        <li><b>남는 선 확인</b> — A의 선 2개를 짝지우고도 S의 흡수선이 <b>1개 남는다</b>(?). A·B 어느 쪽과도 위치가 맞지 않으므로 → S의 대기에는 <b>A, B 말고 다른 원소도 있다</b>.</li>
       </ol>
       <h4>결론</h4>
-      <p>별 S의 대기에는 원소 <b>A가 포함</b>되어 있고, 원소 B는 포함되어 있지 않다(또는 검출 한계 이하이다). 이런 방법으로 우주 전체의 수소·헬륨 비율(3 : 1)도 알아냈다.</p>
+      <p>별 S의 대기에는 원소 <b>A와 또 다른 원소</b>가 포함되어 있고, 원소 B는 포함되어 있지 않다(또는 검출 한계 이하이다). 실제 별빛에서 수소·헬륨의 선을 이렇게 찾아내고, 선의 세기까지 분석해 우주 전체의 수소·헬륨 비율(3 : 1)을 알아냈다.</p>
       <div class="expoint">
         <div class="boxtitle"><span class="ico">!</span>시험엔 이렇게</div>
-        <p>이 자료가 나오면 <b>①스펙트럼 종류 → ②선 위치 대조 → ③원소 판정</b> 순서로 접근한다. "흡수선 = 그 파장의 빛을 방출했다"로 바꿔 쓴 선지가 최다 빈출 함정.</p>
+        <p>이 자료가 나오면 <b>①스펙트럼 종류 → ②선 위치 대조 → ③없는 원소 → ④남는 선</b> 순서로 접근한다. "흡수선 = 그 파장의 빛을 방출했다", 남는 선을 놓친 "S에는 A만 있다"가 최다 빈출 함정.</p>
       </div>
       <h4>직접 해보기 — 간이 분광기로 '원소의 지문' 확인</h4>
       <p>간이 분광기(또는 CD 조각)로 여러 광원을 관찰해 보자. <b>형광등</b>을 보면 몇 개의 밝은 선(방출선)이 뜨고, <b>백열등이나 햇빛</b>을 보면 무지개처럼 이어진 연속 스펙트럼이 보인다. 형광등의 선 위치는 관 속에 든 기체의 종류에 따라 달라진다 — 방금 배운 '원소의 지문'을 내 눈으로 확인하는 셈이다. (주의: 태양을 직접 보지 말 것)</p>
     </div>
   </div>
-  <div class="folio"><span>II. 물질과 규칙성</span><span class="num">68</span></div>
+  <div class="folio"><span>II. 물질과 규칙성</span><span class="num">90</span></div>
+</div>
+
+<!-- ═════════════ 교과서 탐구 (2026-10 보강) ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag">II. 물질과 규칙성</span><span class="lesson-tag">01. 우주의 시작과 원소의 탄생</span></div>
+  <div class="lab">
+    <div class="lab-head">교과서 탐구 <span class="tag">분광기 관찰</span> <span style="font-weight:600; font-size:9.5pt; margin-left:auto;">수소의 선스펙트럼을 관찰하고 별빛과 비교하기</span></div>
+    <div class="lab-body">
+      <h4>목적</h4>
+      <p>수소·헬륨의 선스펙트럼을 분광기로 관찰하고 별빛과 비교해, 수소·헬륨이 우주의 주요 구성 원소임을 확인한다.</p>
+      <h4>준비 · 과정</h4>
+      <p><b>준비물</b> 분광기(또는 간이 분광기), 수소·헬륨 기체 방전관, 방전관 전원 장치, 백열등, 색연필</p>
+      <ol>
+        <li>분광기로 백열등의 빛을 보고 스펙트럼을 그린다.</li>
+        <li>수소 방전관, 헬륨 방전관을 차례로 켜고 밝은 선의 색과 눈금(파장, nm)을 기록한다.</li>
+        <li>별 S의 흡수 스펙트럼 자료에 2에서 얻은 선의 위치를 겹쳐 대조한다.</li>
+      </ol>
+      <p style="font-size:8.6pt; color:var(--sub);">주의: 전원 장치는 고전압 — 켜진 방전관·전극을 만지지 않고, 교체는 전원을 끄고 식힌 뒤 선생님과 한다.</p>
+      <h4>결과</h4>
+      <figure style="margin:2mm 0 1mm;">
+        <svg width="470" height="164" viewBox="0 0 470 164" font-family="PC Sans"><text x="100" y="10" font-size="7.6" font-weight="800" fill="#5B6B77">← 파장 짧음(보라)</text><text x="450" y="10" text-anchor="end" font-size="7.6" font-weight="800" fill="#5B6B77">파장 긺(빨강) →</text><text x="4" y="35" font-size="8.4" font-weight="800" fill="#22303A">(가) 백열등</text><text x="4" y="65" font-size="8.4" font-weight="800" fill="#22303A">(나) 수소 방전관</text><text x="4" y="95" font-size="8.4" font-weight="800" fill="#22303A">(다) 헬륨 방전관</text><text x="4" y="125" font-size="8.4" font-weight="800" fill="#22303A">(라) 별 S (예시)</text><rect x="100" y="22" width="350" height="20" rx="2" fill="url(#rb)"/><rect x="100" y="52" width="350" height="20" rx="2" fill="#14181F"/><rect x="110.5" y="52" width="2.8" height="20" fill="#7B3FD0"/><rect x="138.3" y="52" width="2.8" height="20" fill="#3A55E6"/><rect x="199.1" y="52" width="2.8" height="20" fill="#2FB5C9"/><rect x="397.6" y="52" width="2.8" height="20" fill="#E8392E"/><rect x="100" y="82" width="350" height="20" rx="2" fill="#14181F"/><rect x="153.6" y="82" width="2.8" height="20" fill="#2F68EA"/><rect x="181.8" y="82" width="2.8" height="20" fill="#2A8BDB"/><rect x="206.2" y="82" width="2.8" height="20" fill="#2FBFA8"/><rect x="217.1" y="82" width="2.8" height="20" fill="#35C46A"/><rect x="317.5" y="82" width="2.8" height="20" fill="#F2B21F"/><rect x="411.0" y="82" width="2.8" height="20" fill="#D6303B"/><rect x="100" y="112" width="350" height="20" rx="2" fill="url(#rb)"/><rect x="110.5" y="112" width="2.8" height="20" fill="#14181F"/><rect x="138.3" y="112" width="2.8" height="20" fill="#14181F"/><rect x="199.1" y="112" width="2.8" height="20" fill="#14181F"/><rect x="397.6" y="112" width="2.8" height="20" fill="#14181F"/><rect x="153.6" y="112" width="2.8" height="20" fill="#14181F"/><rect x="181.8" y="112" width="2.8" height="20" fill="#14181F"/><rect x="206.2" y="112" width="2.8" height="20" fill="#14181F"/><rect x="217.1" y="112" width="2.8" height="20" fill="#14181F"/><rect x="317.5" y="112" width="2.8" height="20" fill="#14181F"/><rect x="411.0" y="112" width="2.8" height="20" fill="#14181F"/><rect x="246.8" y="112" width="2.8" height="20" fill="#14181F"/><line x1="111.9" y1="72" x2="111.9" y2="112" stroke="#E8940A" stroke-width="0.9" stroke-dasharray="2.5 2"/><line x1="139.7" y1="72" x2="139.7" y2="112" stroke="#E8940A" stroke-width="0.9" stroke-dasharray="2.5 2"/><line x1="200.5" y1="72" x2="200.5" y2="112" stroke="#E8940A" stroke-width="0.9" stroke-dasharray="2.5 2"/><line x1="399.0" y1="72" x2="399.0" y2="112" stroke="#E8940A" stroke-width="0.9" stroke-dasharray="2.5 2"/><line x1="155.0" y1="102" x2="155.0" y2="112" stroke="#0E5A6B" stroke-width="0.9" stroke-dasharray="2.5 2"/><line x1="183.2" y1="102" x2="183.2" y2="112" stroke="#0E5A6B" stroke-width="0.9" stroke-dasharray="2.5 2"/><line x1="207.6" y1="102" x2="207.6" y2="112" stroke="#0E5A6B" stroke-width="0.9" stroke-dasharray="2.5 2"/><line x1="218.5" y1="102" x2="218.5" y2="112" stroke="#0E5A6B" stroke-width="0.9" stroke-dasharray="2.5 2"/><line x1="318.9" y1="102" x2="318.9" y2="112" stroke="#0E5A6B" stroke-width="0.9" stroke-dasharray="2.5 2"/><line x1="412.4" y1="102" x2="412.4" y2="112" stroke="#0E5A6B" stroke-width="0.9" stroke-dasharray="2.5 2"/><text x="111.9" y="49" text-anchor="middle" font-size="7" font-weight="800" fill="#2E5BDA">410</text><text x="139.7" y="49" text-anchor="middle" font-size="7" font-weight="800" fill="#2E5BDA">434</text><text x="200.5" y="49" text-anchor="middle" font-size="7" font-weight="800" fill="#2E5BDA">486</text><text x="399.0" y="49" text-anchor="middle" font-size="7" font-weight="800" fill="#2E5BDA">656</text><text x="248.2" y="109" text-anchor="middle" font-size="8.4" font-weight="900" fill="#D6455D">?</text><line x1="100" y1="136" x2="450" y2="136" stroke="#5B6B77" stroke-width="0.8"/><line x1="100.0" y1="136" x2="100.0" y2="139" stroke="#5B6B77" stroke-width="0.8"/><text x="100.0" y="147" text-anchor="middle" font-size="7" fill="#5B6B77">400</text><line x1="158.3" y1="136" x2="158.3" y2="139" stroke="#5B6B77" stroke-width="0.8"/><text x="158.3" y="147" text-anchor="middle" font-size="7" fill="#5B6B77">450</text><line x1="216.7" y1="136" x2="216.7" y2="139" stroke="#5B6B77" stroke-width="0.8"/><text x="216.7" y="147" text-anchor="middle" font-size="7" fill="#5B6B77">500</text><line x1="275.0" y1="136" x2="275.0" y2="139" stroke="#5B6B77" stroke-width="0.8"/><text x="275.0" y="147" text-anchor="middle" font-size="7" fill="#5B6B77">550</text><line x1="333.3" y1="136" x2="333.3" y2="139" stroke="#5B6B77" stroke-width="0.8"/><text x="333.3" y="147" text-anchor="middle" font-size="7" fill="#5B6B77">600</text><line x1="391.7" y1="136" x2="391.7" y2="139" stroke="#5B6B77" stroke-width="0.8"/><text x="391.7" y="147" text-anchor="middle" font-size="7" fill="#5B6B77">650</text><line x1="450.0" y1="136" x2="450.0" y2="139" stroke="#5B6B77" stroke-width="0.8"/><text x="450.0" y="147" text-anchor="middle" font-size="7" fill="#5B6B77">700</text><text x="456" y="147" font-size="7" fill="#5B6B77">nm</text><text x="450" y="160" text-anchor="end" font-size="6.8" fill="#5B6B77">선 위치(공기 중 파장): NIST 원자 분광 자료, 2026 열람 · 별 S는 예시 결과 · 가로축은 파장에 비례</text></svg>
+      </figure>
+      <h4>해석의 3단계</h4>
+      <ol>
+        <li><b>바탕 보기</b> — (가)는 <b>연속</b>, (나)·(다)는 어두운 바탕에 밝은 선 = <b>방출</b>, (라)는 무지개 바탕에 검은 선 = <b>흡수</b> 스펙트럼이다. 수소는 가시광선 영역에 선 <b>4개</b>, 헬륨은 이와 <b>다른 자리</b>에 선을 낸다.</li>
+        <li><b>짝짓기</b> — S의 검은 선 중 4개는 (나)의 수소 선과, 6개는 (다)의 헬륨 선과 위치가 같다 → S에 <b>수소·헬륨이 있다</b>.</li>
+        <li><b>남는 선</b> — 짝이 없는 검은 선 1개(?)가 남는다 → 수소·헬륨 말고 <b>다른 원소도 조금</b> 있다.</li>
+      </ol>
+      <h4>결론</h4>
+      <p>우주 곳곳의 별과 은하의 스펙트럼에서 수소와 헬륨의 선이 공통으로 나타난다. 우주 초기에 만들어진 수소와 헬륨이 지금도 우주의 <b>주요 구성 원소</b>이다. (질량비 약 3 : 1은 선의 세기까지 정밀하게 분석해 얻는다 — 개념 5)</p>
+      <div class="expoint">
+        <div class="boxtitle"><span class="ico">!</span>시험에서는 이렇게 바뀐다</div>
+        <p><b>① 광원 바꾸기</b> — 네온·나트륨 방전관 등으로 바꿔도 원소는 선의 <b>개수가 아니라 위치</b>로 가린다.<br>
+        <b>② 기체에 통과시키기</b> — 백열등 빛을 <b>저온</b>의 수소 기체에 통과시키면 (나)와 같은 자리에 <b>검은 선</b> 4개가 생긴다.<br>
+        <b>③ 별 바꾸기</b> — 헬륨 선 자리에 흡수선이 없으면 '헬륨은 검출되지 않는다', 짝 없는 선이 남으면 '다른 원소도 있다'.</p>
+      </div>
+    </div>
+  </div>
+  <div class="folio"><span>II. 물질과 규칙성</span><span class="num">91</span></div>
 </div>
 
 <!-- ═════════════ p.7 STEP 1 + STEP 2 시작 ═════════════ -->
@@ -718,142 +794,423 @@
 
   <div class="step-head s2"><span class="stepno">STEP 2</span><span class="steptt">내신 완성</span><span class="stepdesc">학교 시험 유형 그대로 — 서술형까지 한 번에</span></div>
 
-  <div class="q">
-    <div class="qhead"><span class="qno">7</span><div class="stem">빅뱅 이후 우주에서 입자가 생성된 순서를 옳게 나열한 것은? <span class="difficulty">●●○</span>
-    <div class="tags">10통과1-02-01 | 개념 2</div></div></div>
-    <ul class="choices">
-      <li>① 기본 입자 → 원자핵 → 양성자 → 원자</li>
-      <li>② 기본 입자 → 양성자·중성자 → 헬륨 원자핵 → 원자</li>
-      <li>③ 양성자·중성자 → 기본 입자 → 원자 → 헬륨 원자핵</li>
-      <li>④ 원자 → 원자핵 → 양성자·중성자 → 기본 입자</li>
-      <li>⑤ 헬륨 원자핵 → 양성자·중성자 → 기본 입자 → 원자</li>
-    </ul>
+  <div class="qgrid qg2">
+    <div>
+      <div class="q">
+        <div class="qhead"><span class="qno">7</span><div class="stem"><span class="must">중요</span>빅뱅 이후 우주에서 입자가 생성된 순서를 옳게 나열한 것은? <span class="difficulty">●○○</span>
+        <div class="tags">10통과1-02-01 | 개념 2</div></div></div>
+        <ul class="choices">
+          <li>① 기본 입자 → 원자핵 → 양성자 → 원자</li>
+          <li>② 기본 입자 → 양성자·중성자 → 헬륨 원자핵 → 원자</li>
+          <li>③ 양성자·중성자 → 기본 입자 → 원자 → 헬륨 원자핵</li>
+          <li>④ 원자 → 원자핵 → 양성자·중성자 → 기본 입자</li>
+          <li>⑤ 헬륨 원자핵 → 양성자·중성자 → 기본 입자 → 원자</li>
+        </ul>
+      </div>
+
+
+      <div class="q">
+        <div class="qhead"><span class="qno">8</span><div class="stem">빅뱅 우주론에 대한 설명으로 옳은 것은? <span class="difficulty">●○○</span>
+        <div class="tags">10통과1-02-01 | 개념 1</div></div></div>
+        <ul class="choices">
+          <li>① 빅뱅 이후 우주의 크기는 변하지 않았다.</li>
+          <li>② 팽창하는 동안 온도와 밀도는 점점 높아졌다.</li>
+          <li>③ 외부 은하는 대부분 우리 은하로 다가온다.</li>
+          <li>④ 멀리 있는 은하일수록 더 빨리 멀어진다.</li>
+          <li>⑤ 우주 팽창의 중심은 우리 은하이다.</li>
+        </ul>
+      </div>
+    </div>
+    <div>
+      <div class="q">
+        <div class="qhead"><span class="qno">9</span><div class="stem"><span class="badge-data">자료</span>그림은 풍선 표면에 스티커 A, B, C를 붙이고 풍선을 불기 전과 분 뒤의 모습을, 표는 A에서 B, C까지의 거리를 나타낸 것이다. 이 모형에 대한 설명으로 옳은 것만을 <span class="nw">&lt;보기&gt;에서</span> 있는 대로 고른 것은? <span class="difficulty">●●○</span>
+        <div class="tags">10통과1-02-01 | 개념 1</div></div></div>
+        <figure>
+          <svg width="280" height="150" viewBox="0 0 280 150" font-family="PC Sans">
+            <!-- 불기 전 -->
+            <circle cx="52" cy="52" r="22" fill="#ECF1FC" stroke="#7A97E8" stroke-width="1.1"/>
+            <path d="M52,74 L48,79 L56,79 Z" fill="#7A97E8"/>
+            <path d="M52,79 q-3,6 0,12" fill="none" stroke="#9AA7B1" stroke-width="0.8"/>
+            <g fill="#2E5BDA"><circle cx="37" cy="57" r="2.6"/><circle cx="49" cy="52" r="2.6"/><circle cx="57" cy="42" r="2.6"/></g>
+            <g font-size="7.6" font-weight="800" fill="#22303A"><text x="33" y="60" text-anchor="end">A</text><text x="48" y="47" text-anchor="middle">B</text><text x="61" y="41">C</text></g>
+            <!-- 화살표 -->
+            <line x1="84" y1="52" x2="132" y2="52" stroke="#2E5BDA" stroke-width="1.8" marker-end="url(#arr)"/>
+            <text x="108" y="45" text-anchor="middle" font-size="7.2" font-weight="800" fill="#2E5BDA">불기</text>
+            <!-- 분 뒤 -->
+            <circle cx="190" cy="52" r="44" fill="#ECF1FC" stroke="#7A97E8" stroke-width="1.1"/>
+            <path d="M190,96 L185,102 L195,102 Z" fill="#7A97E8"/>
+            <g fill="#2E5BDA"><circle cx="160" cy="62" r="2.6"/><circle cx="184" cy="52" r="2.6"/><circle cx="200" cy="32" r="2.6"/></g>
+            <g font-size="7.6" font-weight="800" fill="#22303A"><text x="155" y="65" text-anchor="end">A</text><text x="184" y="46" text-anchor="middle">B</text><text x="205" y="31">C</text></g>
+            <g font-size="7.6" font-weight="800" fill="#5B6B77" text-anchor="middle"><text x="52" y="104">(가) 불기 전</text><text x="236" y="104">(나) 분 뒤</text></g>
+            <!-- 거리 표 -->
+            <rect x="1" y="110" width="278" height="13" fill="#F4F6F8"/>
+            <rect x="1" y="110" width="278" height="39" fill="none" stroke="#B8C2CA" stroke-width="0.9"/>
+            <g stroke="#B8C2CA" stroke-width="0.8"><line x1="1" y1="123" x2="279" y2="123"/><line x1="1" y1="136" x2="279" y2="136"/><line x1="80" y1="110" x2="80" y2="149"/><line x1="180" y1="110" x2="180" y2="149"/></g>
+            <g font-size="7.8" text-anchor="middle" fill="#22303A">
+              <g font-weight="800" fill="#2E5BDA"><text x="40.5" y="119.5">구분</text><text x="130" y="119.5">A–B 거리</text><text x="229.5" y="119.5">A–C 거리</text></g>
+              <text x="40.5" y="132.5">(가) 불기 전</text><text x="130" y="132.5">1&#160;cm</text><text x="229.5" y="132.5">2&#160;cm</text>
+              <text x="40.5" y="145.5">(나) 분 뒤</text><text x="130" y="145.5">2&#160;cm</text><text x="229.5" y="145.5">4&#160;cm</text>
+            </g>
+          </svg>
+        </figure>
+        <div class="bogi-box">
+          <div class="bt">보기</div>
+          ㄱ. 풍선이 부풀면 B와 C는 모두 A에서 멀어진다.<br>
+          ㄴ. A에서 멀어진 거리는 C가 B보다 크다.<br>
+          ㄷ. 풍선 표면에서 팽창의 중심은 A이다.
+        </div>
+        <ul class="choices inline">
+          <li>① ㄱ</li><li>② ㄷ</li><li>③ ㄱ, ㄴ</li><li>④ ㄴ, ㄷ</li><li>⑤ ㄱ, ㄴ, ㄷ</li>
+        </ul>
+      </div>
+    </div>
   </div>
 
-  <div class="q">
-    <div class="qhead"><span class="qno">8</span><div class="stem">스펙트럼에 대한 설명으로 옳은 것은? <span class="difficulty">●●●</span>
-    <div class="tags">10통과1-02-01 | 개념 4</div></div></div>
-    <ul class="choices">
-      <li>① 고온의 별 표면에서 나온 빛만 프리즘에 통과시키면 밝은 선 몇 개만 나타난다.</li>
-      <li>② 고온·저밀도 기체가 내는 빛에서는 연속 스펙트럼이 나타난다.</li>
-      <li>③ 연속 스펙트럼의 빛이 저온의 기체를 통과하면 특정 파장이 흡수되어 검은 선이 나타난다.</li>
-      <li>④ 같은 원소라도 방출선과 흡수선의 파장(위치)은 서로 다르다.</li>
-      <li>⑤ 흡수 스펙트럼으로는 기체의 종류를 알 수 없다.</li>
-    </ul>
-  </div>
-
-  <div class="folio"><span>II. 물질과 규칙성</span><span class="num">69</span></div>
+  <div class="folio"><span>II. 물질과 규칙성</span><span class="num">92</span></div>
 </div>
 
-<!-- ═════════════ p.8 STEP 2 계속 ═════════════ -->
+<!-- ═════════════ STEP 2 계속 (10~14) ═════════════ -->
 <div class="page">
   <div class="runhead"><span class="unit-tag">II. 물질과 규칙성</span><span class="lesson-tag">01. 우주의 시작과 원소의 탄생 | 문제</span></div>
 
-  <div class="q">
-    <div class="qhead"><span class="qno">9</span><div class="stem"><span class="badge-data">자료</span>그림은 원소 A, B의 방출 스펙트럼과 어떤 별 S의 흡수 스펙트럼을 나타낸 것이다. 별 S의 대기에 대한 설명으로 가장 적절한 것은? <span class="difficulty">●●●</span>
-    <div class="tags">10통과1-02-01 | 개념 4·5, 자료 파헤치기</div></div></div>
-    <figure style="margin-left:8.4mm;">
-      <svg width="360" height="96" viewBox="0 0 360 96" font-family="PC Sans">
-        <text x="2" y="20" font-size="8.5" font-weight="800">A</text>
-        <rect x="30" y="6" width="320" height="20" rx="2" fill="#14181F"/><rect x="86" y="6" width="3.5" height="20" fill="#4A6FE8"/><rect x="244" y="6" width="3.5" height="20" fill="#E85B4A"/>
-        <text x="2" y="52" font-size="8.5" font-weight="800">B</text>
-        <rect x="30" y="38" width="320" height="20" rx="2" fill="#14181F"/><rect x="126" y="38" width="3.5" height="20" fill="#8A5CE8"/><rect x="186" y="38" width="3.5" height="20" fill="#35C46A"/><rect x="300" y="38" width="3.5" height="20" fill="#E8A23A"/>
-        <text x="2" y="84" font-size="8.5" font-weight="800">S</text>
-        <rect x="30" y="70" width="320" height="20" rx="2" fill="url(#rb)"/><rect x="86" y="70" width="3.5" height="20" fill="#14181F"/><rect x="244" y="70" width="3.5" height="20" fill="#14181F"/>
-      </svg>
-    </figure>
-    <ul class="choices inline">
-      <li>① 원소 A만 포함되어 있다.</li>
-      <li>② 원소 B만 포함되어 있다.</li>
-      <li>③ A와 B가 모두 포함되어 있다.</li>
-      <li>④ A와 B가 모두 포함되어 있지 않다.</li>
-      <li>⑤ 스펙트럼만으로는 알 수 없다.</li>
-    </ul>
-  </div>
+  <div class="qgrid qg2">
+    <div>
+      <div class="q">
+        <div class="qhead"><span class="qno">10</span><div class="stem"><span class="must">중요</span><span class="badge-data">자료</span>그림은 빅뱅 이후 서로 다른 두 시기 (가), (나)의 우주에서 빛이 나아가는 모습을 나타낸 것이다. 옳은 것만을 <span class="nw">&lt;보기&gt;에서</span> 있는 대로 고른 것은? <span class="difficulty">●●○</span>
+        <div class="tags">10통과1-02-01 | 개념 3</div></div></div>
+        <figure>
+          <svg width="280" height="104" viewBox="0 0 280 104" font-family="PC Sans">
+            <rect x="1" y="1" width="124" height="66" rx="5" fill="#ECF1FC" stroke="#BCCDF3" stroke-width="1"/>
+            <polyline points="6,22 34,30 58,14 84,36" fill="none" stroke="#E8940A" stroke-width="1.8"/>
+            <line x1="84" y1="36" x2="98" y2="25" stroke="#E8940A" stroke-width="1.8" marker-end="url(#arrO)"/>
+            <polyline points="6,52 30,46 54,60" fill="none" stroke="#E8940A" stroke-width="1.8"/>
+            <line x1="54" y1="60" x2="70" y2="52" stroke="#E8940A" stroke-width="1.8" marker-end="url(#arrO)"/>
+            <g fill="#D6455D"><circle cx="34" cy="30" r="2.6"/><circle cx="58" cy="14" r="2.6"/><circle cx="84" cy="36" r="2.6"/><circle cx="30" cy="46" r="2.6"/><circle cx="54" cy="60" r="2.6"/><circle cx="110" cy="56" r="2.6"/><circle cx="116" cy="12" r="2.6"/></g>
+            <g fill="#2E5BDA"><circle cx="18" cy="38" r="3.6"/><circle cx="96" cy="50" r="3.6"/><circle cx="112" cy="36" r="3.6"/></g>
+            <g transform="translate(140,34)"><line x1="-10" y1="0" x2="4" y2="0" stroke="#2E5BDA" stroke-width="2"/><path d="M3,-4.5 L10,0 L3,4.5 Z" fill="#2E5BDA"/></g>
+            <rect x="155" y="1" width="124" height="66" rx="5" fill="#E3F0F3" stroke="#9CC5CE" stroke-width="1"/>
+            <g stroke="#E8940A" stroke-width="1.8"><line x1="161" y1="16" x2="266" y2="16" marker-end="url(#arrO)"/><line x1="161" y1="34" x2="266" y2="34" marker-end="url(#arrO)"/><line x1="161" y1="52" x2="266" y2="52" marker-end="url(#arrO)"/></g>
+            <g transform="translate(186,25)"><circle r="6.5" fill="none" stroke="#7A97E8" stroke-width="0.9" stroke-dasharray="2 1.6"/><circle r="3" fill="#2E5BDA"/><circle cx="6.5" cy="0" r="1.8" fill="#D6455D"/></g>
+            <g transform="translate(226,43)"><circle r="6.5" fill="none" stroke="#7A97E8" stroke-width="0.9" stroke-dasharray="2 1.6"/><circle r="3" fill="#2E5BDA"/><circle cx="-6.5" cy="0" r="1.8" fill="#D6455D"/></g>
+            <g transform="translate(252,25)"><circle r="6.5" fill="none" stroke="#7A97E8" stroke-width="0.9" stroke-dasharray="2 1.6"/><circle r="3" fill="#2E5BDA"/><circle cx="0" cy="6.5" r="1.8" fill="#D6455D"/></g>
+            <g font-size="8.4" font-weight="900" fill="#22303A" text-anchor="middle"><text x="63" y="80">(가)</text><text x="217" y="80">(나)</text></g>
+            <g font-size="7" fill="#5B6B77">
+              <circle cx="20" cy="96" r="2.6" fill="#D6455D"/><text x="26" y="98.5">자유 전자</text>
+              <circle cx="80" cy="96" r="3.4" fill="#2E5BDA"/><text x="87" y="98.5">원자핵</text>
+              <g transform="translate(134,96)"><circle r="5.5" fill="none" stroke="#7A97E8" stroke-width="0.9" stroke-dasharray="2 1.6"/><circle r="2.6" fill="#2E5BDA"/><circle cx="5.5" cy="0" r="1.6" fill="#D6455D"/></g><text x="144" y="98.5">원자</text>
+              <line x1="184" y1="96" x2="198" y2="96" stroke="#E8940A" stroke-width="1.8"/><path d="M197,92.5 L203,96 L197,99.5 Z" fill="#E8940A"/><text x="207" y="98.5">빛</text>
+            </g>
+          </svg>
+        </figure>
+        <div class="bogi-box">
+          <div class="bt">보기</div>
+          ㄱ. (가)에서 빛이 멀리 나아가지 못하는 것은 빛이 원자에 흡수되기 때문이다.<br>
+          ㄴ. 우주가 (가)에서 (나)의 상태로 바뀐 것은 전자가 원자핵에 붙잡혔기 때문이다.<br>
+          ㄷ. (나) 시기에 퍼져 나간 빛은 현재 우주의 모든 방향에서 관측된다.
+        </div>
+        <ul class="choices inline">
+          <li>① ㄱ</li><li>② ㄷ</li><li>③ ㄱ, ㄴ</li><li>④ ㄴ, ㄷ</li><li>⑤ ㄱ, ㄴ, ㄷ</li>
+        </ul>
+      </div>
 
-  <div class="q">
-    <div class="qhead"><span class="qno">10</span><div class="stem">빅뱅 우주론의 증거로 옳은 것만을 고른 것은? <span class="difficulty">●●●</span>
-    <div class="tags">10통과1-02-01 | 개념 3·5</div></div></div>
-    <div class="bogi-box" style="background:#fff;">
-      (가) 우주 배경 복사가 관측된다.<br>
-      (나) 우주 전체에서 수소와 헬륨의 질량비가 약 3 : 1로 관측된다.<br>
-      (다) 지구에서 철이 가장 흔한 원소로 관측된다.
+      <div class="q">
+        <div class="qhead"><span class="qno">11</span><div class="stem">스펙트럼에 대한 설명으로 옳은 것은? <span class="difficulty">●●○</span>
+        <div class="tags">10통과1-02-01 | 개념 4</div></div></div>
+        <ul class="choices">
+          <li>① 연속 스펙트럼의 빛이 저온의 기체를 지나면 흡수선이 생긴다.</li>
+          <li>② 고온의 별 표면이 내는 빛은 방출 스펙트럼이다.</li>
+          <li>③ 고온·저밀도 기체는 연속 스펙트럼을 낸다.</li>
+          <li>④ 같은 원소의 방출선과 흡수선은 위치가 다르다.</li>
+          <li>⑤ 흡수 스펙트럼으로는 원소를 알 수 없다.</li>
+        </ul>
+      </div>
+
+      <div class="q">
+        <div class="qhead"><span class="qno">12</span><div class="stem">빅뱅 우주론의 증거로 옳은 것만을 <span class="nw">&lt;보기&gt;에서</span> 있는 대로 고른 것은? <span class="difficulty">●○○</span>
+        <div class="tags">10통과1-02-01 | 개념 3·5</div></div></div>
+        <div class="bogi-box">
+          <div class="bt">보기</div>
+          ㄱ. 우주 배경 복사가 관측된다.<br>
+          ㄴ. 수소와 헬륨의 질량비가 약&nbsp;3&nbsp;:&nbsp;1로 관측된다.<br>
+          ㄷ. 같은 원소의 방출선과 흡수선은 위치가 같다.
+        </div>
+        <ul class="choices inline">
+          <li>① ㄱ</li><li>② ㄷ</li><li>③ ㄱ, ㄴ</li><li>④ ㄴ, ㄷ</li><li>⑤ ㄱ, ㄴ, ㄷ</li>
+        </ul>
+      </div>
     </div>
-    <ul class="choices inline">
-      <li>① (가)</li><li>② (다)</li><li>③ (가), (나)</li><li>④ (나), (다)</li><li>⑤ (가), (나), (다)</li>
-    </ul>
+    <div>
+      <div class="q">
+        <div class="qhead"><span class="qno">13</span><div class="stem"><span class="badge-data">자료</span>그림 (가)는 수소 기체 방전관의 빛을, (나)는 별 S의 빛을 분광기로 관찰한 스펙트럼이다. 옳은 것만을 <span class="nw">&lt;보기&gt;에서</span> 있는 대로 고른 것은? <span class="difficulty">●●○</span>
+        <div class="tags">10통과1-02-01 | 개념 4, 교과서 탐구</div></div></div>
+        <figure>
+          <svg width="290" height="70" viewBox="0 0 290 70" font-family="PC Sans">
+            <g font-size="8.5" font-weight="800" fill="#22303A"><text x="0" y="17">(가)</text><text x="0" y="45">(나)</text></g>
+            <rect x="22" y="4" width="266" height="18" rx="2" fill="#14181F"/>
+            <rect x="29.54" y="4" width="3" height="18" fill="#7B3FD0"/><rect x="50.65" y="4" width="3" height="18" fill="#3A55E6"/><rect x="96.84" y="4" width="3" height="18" fill="#2FB5C9"/><rect x="247.75" y="4" width="3" height="18" fill="#E8392E"/>
+            <rect x="22" y="32" width="266" height="18" rx="2" fill="url(#rb)"/>
+            <rect x="29.54" y="32" width="3" height="18" fill="#14181F"/><rect x="50.65" y="32" width="3" height="18" fill="#14181F"/><rect x="96.84" y="32" width="3" height="18" fill="#14181F"/><rect x="247.75" y="32" width="3" height="18" fill="#14181F"/><rect x="133.11" y="32" width="3" height="18" fill="#14181F"/>
+            <line x1="22" y1="55" x2="288" y2="55" stroke="#5B6B77" stroke-width="0.8"/>
+            <g font-size="7" fill="#5B6B77" text-anchor="middle"><text x="22" y="66">400</text><text x="110.7" y="66">500</text><text x="199.3" y="66">600</text><text x="276" y="66">700&#160;nm</text></g>
+          </svg>
+        </figure>
+        <div class="bogi-box">
+          <div class="bt">보기</div>
+          ㄱ. 별 S의 대기에는 수소가 있다.<br>
+          ㄴ. (가)는 흡수 스펙트럼이다.<br>
+          ㄷ. 별 S의 흡수선은 모두 수소 때문에 생긴 것이다.
+        </div>
+        <ul class="choices inline">
+          <li>① ㄱ</li><li>② ㄷ</li><li>③ ㄱ, ㄴ</li><li>④ ㄴ, ㄷ</li><li>⑤ ㄱ, ㄴ, ㄷ</li>
+        </ul>
+      </div>
+
+      <div class="q">
+        <div class="qhead"><span class="qno">14</span><div class="stem"><span class="badge-data">탐구</span>다음은 간이 분광기로 여러 광원의 빛을 관찰한 실험이다.
+          <div class="exp"><b>[과정]</b> 간이 분광기로 (가) 백열등, (나) 기체 X가 든 방전관, (다) 기체 Y가 든 방전관의 빛을 차례로 관찰하고 스펙트럼을 그린다.<br><b>[결과]</b> (가)에서는 무지개처럼 모든 색이 이어진 띠가, (나)에서는 어두운 바탕에 밝은 선 3개가, (다)에서는 어두운 바탕에 밝은 선 2개가 보였다. (다)의 선은 (나)의 어느 선과도 위치가 겹치지 않았다.</div>
+          이에 대한 설명으로 옳은 것만을 <span class="nw">&lt;보기&gt;에서</span> 있는 대로 고른 것은? (단, X와 Y는 각각 한 가지 원소로 이루어진 기체이다.) <span class="difficulty">●●○</span>
+        <div class="tags">10통과1-02-01 | 개념 4, 탐구</div></div></div>
+        <div class="bogi-box">
+          <div class="bt">보기</div>
+          ㄱ. (가)는 연속 스펙트럼이다.<br>
+          ㄴ. X와 Y는 서로 다른 원소이다.<br>
+          ㄷ. 백열등의 빛을 저온의 기체 X에 통과시키면 <span class="nw">(나)의</span> 밝은 선과 같은 위치에 검은 선이 나타난다.
+        </div>
+        <ul class="choices inline">
+          <li>① ㄱ</li><li>② ㄷ</li><li>③ ㄱ, ㄴ</li><li>④ ㄴ, ㄷ</li><li>⑤ ㄱ, ㄴ, ㄷ</li>
+        </ul>
+      </div>
+
+    </div>
   </div>
 
-  <div class="q">
-    <div class="qhead"><span class="qno">11</span><div class="stem"><span class="badge-essay">서술형</span>별빛의 흡수 스펙트럼을 분석하면 별의 대기를 구성하는 원소를 알 수 있다. 그 까닭을 <b>'방출선과 흡수선의 위치'</b> 개념을 포함하여 서술하시오. <span class="difficulty">●●●●</span>
-    <div class="tags">10통과1-02-01 | 개념 4</div></div></div>
-    <div class="essay-lines"><div></div><div></div><div></div></div>
-  </div>
-
-  <div class="folio"><span>II. 물질과 규칙성</span><span class="num">70</span></div>
+  <div class="folio"><span>II. 물질과 규칙성</span><span class="num">93</span></div>
 </div>
 
-<!-- ═════════════ p.9 STEP 3 ═════════════ -->
+<!-- ═════════════ STEP 2 계속 (15~17) + 서술형 (18~20) ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag">II. 물질과 규칙성</span><span class="lesson-tag">01. 우주의 시작과 원소의 탄생 | 문제</span></div>
+
+  <div class="qgrid qg2">
+    <div>
+      <div class="q">
+        <div class="qhead"><span class="qno">15</span><div class="stem">다음은 우주의 수소와 헬륨에 대해 학생 A, B, C가 나눈 대화이다. 옳게 말한 학생만을 있는 대로 고른 것은? <span class="difficulty">●●○</span>
+        <div class="tags">10통과1-02-01 | 개념 5 (개념 2 연계)</div></div></div>
+        <div class="bogi-box">
+          <b>학생 A</b> : 우주에서 수소와 헬륨의 원자 개수비가 약&nbsp;3&nbsp;:&nbsp;1이야.<br>
+          <b>학생 B</b> : 헬륨 원자핵은 빅뱅 후 약 3분 무렵 양성자 2개와 중성자 2개가 결합해서 만들어졌어.<br>
+          <b>학생 C</b> : 질량비의 관측값이 빅뱅 우주론의 예측값과 일치해서 빅뱅의 증거가 돼.
+        </div>
+        <ul class="choices inline">
+          <li>① A</li><li>② C</li><li>③ A, B</li><li>④ B, C</li><li>⑤ A, B, C</li>
+        </ul>
+      </div>
+
+      <div class="q">
+        <div class="qhead"><span class="qno">16</span><div class="stem"><span class="must">중요</span>수소와 헬륨만으로 이루어진 어떤 기체 40&nbsp;g 속에 수소가 30&nbsp;g, 헬륨이 10&nbsp;g 들어 있다. 이 기체 속 수소 원자 수 : 헬륨 원자 수는? (단, 헬륨 원자 1개의 질량은 수소 원자 1개의 4배이다.) <span class="difficulty">●●●</span>
+        <div class="tags">10통과1-02-01 | 개념 5</div></div></div>
+        <ul class="choices inline">
+          <li>① 3&nbsp;:&nbsp;1</li><li>② 4&nbsp;:&nbsp;1</li><li>③ 6&nbsp;:&nbsp;1</li><li>④ 9&nbsp;:&nbsp;1</li><li>⑤ 12&nbsp;:&nbsp;1</li>
+        </ul>
+      </div>
+
+      <div class="q">
+        <div class="qhead"><span class="qno">17</span><div class="stem"><span class="badge-data">자료</span>그림은 빅뱅 이후 만들어진 입자 (가)~(다)를 모형으로 나타낸 것이다. 옳은 것만을 <span class="nw">&lt;보기&gt;에서</span> 있는 대로 고른 것은? <span class="difficulty">●●○</span>
+        <div class="tags">10통과1-02-01 | 개념 2</div></div></div>
+        <figure>
+          <svg width="270" height="80" viewBox="0 0 270 80" font-family="PC Sans">
+            <circle cx="45" cy="26" r="5.6" fill="#2E5BDA"/>
+            <g transform="translate(135,26)">
+              <circle cx="-5" cy="-4.5" r="5.6" fill="#2E5BDA"/><circle cx="5" cy="-4.5" r="5.6" fill="#B9CBF2"/><circle cx="-5" cy="5.5" r="5.6" fill="#B9CBF2"/><circle cx="5" cy="5.5" r="5.6" fill="#2E5BDA"/>
+            </g>
+            <g transform="translate(225,26)">
+              <circle r="14" fill="none" stroke="#7A97E8" stroke-width="1" stroke-dasharray="2.4 1.9"/>
+              <circle r="5.6" fill="#2E5BDA"/><circle cx="14" cy="0" r="2.6" fill="#D6455D"/>
+            </g>
+            <g font-size="8.4" font-weight="900" fill="#22303A" text-anchor="middle"><text x="45" y="58">(가)</text><text x="135" y="58">(나)</text><text x="225" y="58">(다)</text></g>
+            <g font-size="7" fill="#5B6B77">
+              <circle cx="72" cy="73" r="3" fill="#2E5BDA"/><text x="78" y="75.5">양성자</text>
+              <circle cx="122" cy="73" r="3" fill="#B9CBF2"/><text x="128" y="75.5">중성자</text>
+              <circle cx="172" cy="73" r="2.4" fill="#D6455D"/><text x="178" y="75.5">전자</text>
+            </g>
+          </svg>
+        </figure>
+        <div class="bogi-box">
+          <div class="bt">보기</div>
+          ㄱ. (가)는 더 이상 쪼갤 수 없는 기본 입자이다.<br>
+          ㄴ. (다)는 (나)보다 먼저 만들어졌다.<br>
+          ㄷ. (나)가 만들어진 시기의 우주 온도는 (다)가 만들어진 시기보다 높았다.
+        </div>
+        <ul class="choices inline">
+          <li>① ㄱ</li><li>② ㄷ</li><li>③ ㄱ, ㄴ</li><li>④ ㄴ, ㄷ</li><li>⑤ ㄱ, ㄴ, ㄷ</li>
+        </ul>
+      </div>
+    </div>
+    <div>
+      <div class="q">
+        <div class="qhead"><span class="qno">18</span><div class="stem"><span class="badge-essay">서술형</span>빅뱅 후 약 38만&nbsp;년 무렵 우주가 투명해진 까닭을 <b>'자유&nbsp;전자'</b>, <b>'원자핵'</b>, <b>'빛'</b>을 모두 포함하여 서술하시오. <span class="difficulty">●●○</span>
+        <div class="tags">10통과1-02-01 | 개념 3</div></div></div>
+        <div class="essay-lines"><div></div><div></div><div></div><div></div><div></div><div></div></div>
+      </div>
+
+      <div class="q">
+        <div class="qhead"><span class="qno">19</span><div class="stem"><span class="must">중요</span><span class="badge-essay">서술형</span>우주 전체에서 관측되는 수소와 헬륨의 질량비가 빅뱅 우주론의 증거가 되는 까닭을 <b>'예측'</b>, <b>'관측'</b>, <b>'3&nbsp;:&nbsp;1'</b>을 모두 포함하여 서술하시오. <span class="difficulty">●●○</span>
+        <div class="tags">10통과1-02-01 | 개념 5</div></div></div>
+        <div class="essay-lines"><div></div><div></div><div></div><div></div><div></div><div></div></div>
+      </div>
+
+      <div class="q">
+        <div class="qhead"><span class="qno">20</span><div class="stem"><span class="badge-essay">서술형</span>별빛의 흡수 스펙트럼을 분석하면 별의 대기를 구성하는 원소를 알 수 있다. 그 까닭을 <b>'방출선'</b>, <b>'흡수선'</b>, <b>'위치'</b>를 모두 포함하여 서술하시오. <span class="difficulty">●●●</span>
+        <div class="tags">10통과1-02-01 | 개념 4</div></div></div>
+        <div class="essay-lines"><div></div><div></div><div></div><div></div><div></div><div></div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="folio"><span>II. 물질과 규칙성</span><span class="num">94</span></div>
+</div>
+
+<!-- ═════════════ STEP 3 (21~24) ═════════════ -->
 <div class="page">
   <div class="runhead"><span class="unit-tag">II. 물질과 규칙성</span><span class="lesson-tag">01. 우주의 시작과 원소의 탄생 | 문제</span></div>
   <div class="step-head s3"><span class="stepno">STEP 3</span><span class="steptt">수능 도전</span><span class="stepdesc">2028 수능 규격 — ㄱㄴㄷ 합답형·자료 해석</span></div>
 
-  <div class="q">
-    <div class="qhead"><span class="qno">12</span><div class="stem"><span class="badge-data">자료</span>그림 (가)는 고온의 기체 A가 내는 빛의 스펙트럼을, (나)는 광원에서 나온 빛이 저온의 기체 B를 통과한 뒤의 스펙트럼을 나타낸 것이다. (가)의 밝은 선과 (나)의 검은 선은 같은 위치에 나타났다. 옳은 것만을 &lt;보기&gt;에서 있는 대로 고른 것은? <span class="difficulty">[2점]</span>
-    <div class="tags">10통과1-02-01</div></div></div>
-    <figure style="margin-left:8.6mm;">
-      <svg width="340" height="72" viewBox="0 0 340 72" font-family="PC Sans">
-        <text x="0" y="19" font-size="8.5" font-weight="800">(가)</text>
-        <rect x="36" y="4" width="298" height="22" rx="2" fill="#14181F"/><rect x="106" y="4" width="3.5" height="22" fill="#4A6FE8"/><rect x="224" y="4" width="3.5" height="22" fill="#35C46A"/>
-        <text x="0" y="61" font-size="8.5" font-weight="800">(나)</text>
-        <rect x="36" y="46" width="298" height="22" rx="2" fill="url(#rb)"/><rect x="106" y="46" width="3.5" height="22" fill="#14181F"/><rect x="224" y="46" width="3.5" height="22" fill="#14181F"/>
-      </svg>
-    </figure>
-    <div class="bogi-box">
-      <div class="bt">보기</div>
-      ㄱ. (가)는 방출 스펙트럼이다.<br>
-      ㄴ. A와 B는 같은 종류의 원소일 수 있다.<br>
-      ㄷ. (나)의 검은 선 위치에서 B는 빛을 방출한다.
+  <div class="qgrid qg2">
+    <div>
+      <div class="q">
+        <div class="qhead"><span class="qno">21</span><div class="stem"><span class="badge-data">자료</span>그림 (가)는 고온의 기체 A가 내는 빛의 스펙트럼을, (나)는 광원의 빛이 저온의 기체 B를 통과한 뒤의 스펙트럼을 나타낸 것이다. (가)의 밝은 선과 (나)의 검은 선은 위치가 같다. 옳은 것만을 <span class="nw">&lt;보기&gt;에서</span> 있는 대로 고른 것은? <span class="difficulty">●●○ [2점]</span>
+        <div class="tags">10통과1-02-01 | 개념 4</div></div></div>
+        <figure>
+          <svg width="290" height="64" viewBox="0 0 290 64" font-family="PC Sans">
+            <g font-size="8.5" font-weight="800" fill="#22303A"><text x="0" y="18">(가)</text><text x="0" y="54">(나)</text></g>
+            <rect x="30" y="4" width="258" height="20" rx="2" fill="#14181F"/>
+            <rect x="79.85" y="4" width="3.5" height="20" fill="#4A6FE8"/><rect x="131.45" y="4" width="3.5" height="20" fill="#35C46A"/>
+            <rect x="30" y="40" width="258" height="20" rx="2" fill="url(#rb)"/>
+            <rect x="79.85" y="40" width="3.5" height="20" fill="#14181F"/><rect x="131.45" y="40" width="3.5" height="20" fill="#14181F"/>
+          </svg>
+        </figure>
+        <div class="bogi-box">
+          <div class="bt">보기</div>
+          ㄱ. (가)는 방출 스펙트럼이다.<br>
+          ㄴ. A와 B는 같은 종류의 원소일 수 있다.<br>
+          ㄷ. (나)의 검은 선 위치에서 B는 빛을 방출한다.
+        </div>
+        <ul class="choices inline">
+          <li>① ㄱ</li><li>② ㄷ</li><li>③ ㄱ, ㄴ</li><li>④ ㄴ, ㄷ</li><li>⑤ ㄱ, ㄴ, ㄷ</li>
+        </ul>
+      </div>
+
+      <div class="q">
+        <div class="qhead"><span class="qno">22</span><div class="stem"><span class="badge-data">자료</span>그림은 빅뱅 후 약 3분 무렵 헬륨 원자핵이 만들어지기 전 (가)와 후 (나)의 입자 16개를 나타낸 모형이다. 옳은 것만을 <span class="nw">&lt;보기&gt;에서</span> 있는 대로 고른 것은? (단, 양성자와 중성자의 질량은 같고, 중성자는 모두 헬륨 원자핵을 이룬다.) <span class="difficulty">●●○ [2점]</span>
+        <div class="tags">10통과1-02-01 | 개념 5 (개념 2 연계)</div></div></div>
+        <figure>
+          <svg width="290" height="54" viewBox="0 0 290 54" font-family="PC Sans">
+            <circle cx="12" cy="8" r="4.2" fill="#2E5BDA"/><circle cx="22.5" cy="8" r="4.2" fill="#2E5BDA"/><circle cx="33" cy="8" r="4.2" fill="#2E5BDA"/><circle cx="43.5" cy="8" r="4.2" fill="#2E5BDA"/><circle cx="54" cy="8" r="4.2" fill="#B9CBF2"/><circle cx="64.5" cy="8" r="4.2" fill="#2E5BDA"/><circle cx="75" cy="8" r="4.2" fill="#2E5BDA"/><circle cx="85.5" cy="8" r="4.2" fill="#2E5BDA"/><circle cx="12" cy="18.5" r="4.2" fill="#2E5BDA"/><circle cx="22.5" cy="18.5" r="4.2" fill="#2E5BDA"/><circle cx="33" cy="18.5" r="4.2" fill="#2E5BDA"/><circle cx="43.5" cy="18.5" r="4.2" fill="#B9CBF2"/><circle cx="54" cy="18.5" r="4.2" fill="#2E5BDA"/><circle cx="64.5" cy="18.5" r="4.2" fill="#2E5BDA"/><circle cx="75" cy="18.5" r="4.2" fill="#2E5BDA"/><circle cx="85.5" cy="18.5" r="4.2" fill="#2E5BDA"/>
+            <line x1="100" y1="13.25" x2="156" y2="13.25" stroke="#2E5BDA" stroke-width="1.6" marker-end="url(#arr)"/>
+            <g transform="translate(176,13.25)"><circle cx="-3.6" cy="-3.6" r="3.6" fill="#2E5BDA"/><circle cx="3.6" cy="-3.6" r="3.6" fill="#B9CBF2"/><circle cx="-3.6" cy="3.6" r="3.6" fill="#B9CBF2"/><circle cx="3.6" cy="3.6" r="3.6" fill="#2E5BDA"/></g><circle cx="200" cy="8" r="4.2" fill="#2E5BDA"/><circle cx="210.5" cy="8" r="4.2" fill="#2E5BDA"/><circle cx="221" cy="8" r="4.2" fill="#2E5BDA"/><circle cx="231.5" cy="8" r="4.2" fill="#2E5BDA"/><circle cx="242" cy="8" r="4.2" fill="#2E5BDA"/><circle cx="252.5" cy="8" r="4.2" fill="#2E5BDA"/><circle cx="200" cy="18.5" r="4.2" fill="#2E5BDA"/><circle cx="210.5" cy="18.5" r="4.2" fill="#2E5BDA"/><circle cx="221" cy="18.5" r="4.2" fill="#2E5BDA"/><circle cx="231.5" cy="18.5" r="4.2" fill="#2E5BDA"/><circle cx="242" cy="18.5" r="4.2" fill="#2E5BDA"/><circle cx="252.5" cy="18.5" r="4.2" fill="#2E5BDA"/>
+            <g font-size="8.4" font-weight="900" fill="#22303A" text-anchor="middle"><text x="48.75" y="38">(가)</text><text x="214" y="38">(나)</text></g>
+            <g font-size="7" fill="#5B6B77">
+              <circle cx="92" cy="49" r="3" fill="#2E5BDA"/><text x="98" y="51.5">양성자</text>
+              <circle cx="142" cy="49" r="3" fill="#B9CBF2"/><text x="148" y="51.5">중성자</text>
+            </g>
+          </svg>
+        </figure>
+        <div class="bogi-box">
+          <div class="bt">보기</div>
+          ㄱ. (가)에서 양성자 수 : 중성자 수는 7&nbsp;:&nbsp;1이다.<br>
+          ㄴ. (나)에서 수소 원자핵 수 : 헬륨 원자핵 수는 3&nbsp;:&nbsp;1이다.<br>
+          ㄷ. (가)의 16개 중 중성자가 4개였다면, (나)에서 전체 질량 중 헬륨 원자핵의 비율은 25&nbsp;%보다 작았을 것이다.
+        </div>
+        <ul class="choices inline">
+          <li>① ㄱ</li><li>② ㄷ</li><li>③ ㄱ, ㄴ</li><li>④ ㄴ, ㄷ</li><li>⑤ ㄱ, ㄴ, ㄷ</li>
+        </ul>
+      </div>
     </div>
-    <ul class="choices inline">
-      <li>① ㄱ</li><li>② ㄷ</li><li>③ ㄱ, ㄴ</li><li>④ ㄴ, ㄷ</li><li>⑤ ㄱ, ㄴ, ㄷ</li>
-    </ul>
+    <div>
+      <div class="q">
+        <div class="qhead"><span class="qno">23</span><div class="stem"><span class="badge-data">자료</span>그림 (가)는 원소 X, Y의 방출 스펙트럼과 별 S의 흡수 스펙트럼을, (나)는 S 대기의 원소 질량비를 나타낸 것이다. X, Y는 수소와 헬륨을 순서 없이 나타낸 것이다. 옳은 것만을 <span class="nw">&lt;보기&gt;에서</span> 있는 대로 고른 것은? (단, 헬륨 원자 1개의 질량은 수소 원자의 약 4배이다.) <span class="difficulty">●●● [2.5점]</span>
+        <div class="tags">10통과1-02-01 | 개념 4·5 (자료 두 개 엮기)</div></div></div>
+        <figure>
+          <svg width="290" height="112" viewBox="0 0 290 112" font-family="PC Sans">
+            <text x="0" y="8" font-size="7.6" font-weight="900" fill="#22303A">(가)</text>
+            <g font-size="8.2" font-weight="800" fill="#22303A"><text x="4" y="23.5">X</text><text x="4" y="42.5">Y</text><text x="4" y="61.5">S</text></g>
+            <rect x="22" y="13" width="266" height="14" rx="2" fill="#14181F"/>
+            <rect x="46.85" y="13" width="3.5" height="14" fill="#6E5CE8"/><rect x="78.75" y="13" width="3.5" height="14" fill="#4A6FE8"/><rect x="249.05" y="13" width="3.5" height="14" fill="#E85B4A"/>
+            <rect x="22" y="32" width="266" height="14" rx="2" fill="#14181F"/>
+            <rect x="110.65" y="32" width="3.5" height="14" fill="#2FB58A"/><rect x="179.85" y="32" width="3.5" height="14" fill="#E8CC2A"/>
+            <rect x="22" y="51" width="266" height="14" rx="2" fill="url(#rb)"/>
+            <g fill="#14181F"><rect x="46.85" y="51" width="3.5" height="14"/><rect x="78.75" y="51" width="3.5" height="14"/><rect x="110.65" y="51" width="3.5" height="14"/><rect x="179.85" y="51" width="3.5" height="14"/><rect x="249.05" y="51" width="3.5" height="14"/></g>
+            <text x="0" y="80" font-size="7.6" font-weight="900" fill="#22303A">(나) <tspan font-weight="700" fill="#5B6B77">별 S 대기의 원소 질량비</tspan></text>
+            <rect x="22" y="85" width="196.8" height="15" fill="#2E5BDA"/>
+            <rect x="218.8" y="85" width="63.9" height="15" fill="#F4A62A"/>
+            <rect x="282.7" y="85" width="5.3" height="15" fill="#9AA7B1"/>
+            <text x="120.4" y="96" text-anchor="middle" font-size="8.4" font-weight="900" fill="#fff">X 74 %</text>
+            <text x="250.75" y="96" text-anchor="middle" font-size="8.4" font-weight="900" fill="#fff">Y 24 %</text>
+            <text x="288" y="110" text-anchor="end" font-size="7" fill="#5B6B77">기타 2 %</text>
+          </svg>
+        </figure>
+        <div class="bogi-box">
+          <div class="bt">보기</div>
+          ㄱ. S의 검은 선은 S 대기가 빛을 방출한 자리이다.<br>
+          ㄴ. S의 대기에서 Y의 원자 수는 X의 약 1/3이다.<br>
+          ㄷ. S의 대기에는 X와 Y가 모두 있다.
+        </div>
+        <ul class="choices inline">
+          <li>① ㄱ</li><li>② ㄷ</li><li>③ ㄱ, ㄴ</li><li>④ ㄴ, ㄷ</li><li>⑤ ㄱ, ㄴ, ㄷ</li>
+        </ul>
+      </div>
+
+      <div class="q">
+        <div class="qhead"><span class="qno">24</span><div class="stem"><span class="badge-data">자료</span>그림은 빅뱅 이후 우주의 온도 변화를 개략적으로 나타낸 것이다. A, B는 각각 헬륨 원자핵과 원자가 만들어진 시기이다. 옳은 것만을 <span class="nw">&lt;보기&gt;에서</span> 있는 대로 고른 것은? <span class="difficulty">●●● [2.5점]</span>
+        <div class="tags">10통과1-02-01 | 개념 3 (I-02 기본량과 단위 연계)</div></div></div>
+        <figure>
+          <svg width="290" height="108" viewBox="0 0 290 108" font-family="PC Sans">
+            <line x1="34" y1="84" x2="34" y2="3" stroke="#5B6B77" stroke-width="1.1"/>
+            <line x1="34" y1="84" x2="286" y2="84" stroke="#5B6B77" stroke-width="1.1"/>
+            <text x="38" y="8" font-size="7.4" font-weight="800" fill="#22303A">온도(K)</text>
+            <text x="286" y="80" text-anchor="end" font-size="7.4" font-weight="800" fill="#22303A">시간</text>
+            <g stroke="#B8C2CA" stroke-width="0.8" stroke-dasharray="2.4 1.8">
+              <line x1="34" y1="62" x2="176" y2="62"/><line x1="34" y1="76" x2="256" y2="76"/>
+              <line x1="92" y1="40" x2="92" y2="84"/><line x1="176" y1="62" x2="176" y2="84"/><line x1="256" y1="76" x2="256" y2="84"/>
+            </g>
+            <path d="M40,8 C58,26 74,35 92,40 S150,58 176,62 S236,74 256,76" fill="none" stroke="#2E5BDA" stroke-width="1.8"/>
+            <circle cx="92" cy="40" r="3.4" fill="#2E5BDA"/><circle cx="176" cy="62" r="3.4" fill="#2E5BDA"/><circle cx="256" cy="76" r="3.4" fill="#E8940A"/>
+            <g font-size="7.2" fill="#22303A" text-anchor="end"><text x="30" y="64.5">3000</text><text x="30" y="78.5">2.7</text></g>
+            <g font-size="7.2" text-anchor="middle" fill="#22303A">
+              <text x="40" y="94">빅뱅</text>
+              <text x="92" y="94"><tspan font-weight="900" fill="#2E5BDA">A</tspan> (약 3분)</text>
+              <text x="176" y="94"><tspan font-weight="900" fill="#2E5BDA">B</tspan> (약 38만 년)</text>
+              <text x="256" y="94">현재</text>
+            </g>
+            <text x="286" y="105" text-anchor="end" font-size="6.6" fill="#5B6B77">※ 가로축과 세로축의 눈금은 일정하지 않다.</text>
+          </svg>
+        </figure>
+        <div class="bogi-box">
+          <div class="bt">보기</div>
+          ㄱ. K(켈빈)는 SI 기본량인 온도의 단위이다.<br>
+          ㄴ. B 이후 빛은 자유 전자에 막힘 없이 직진하였다.<br>
+          ㄷ. B 시기의 온도는 현재 우주 배경 복사 온도의 1000배 이상이다.
+        </div>
+        <ul class="choices inline">
+          <li>① ㄱ</li><li>② ㄷ</li><li>③ ㄱ, ㄴ</li><li>④ ㄴ, ㄷ</li><li>⑤ ㄱ, ㄴ, ㄷ</li>
+        </ul>
+      </div>
+    </div>
   </div>
 
-  <div class="q">
-    <div class="qhead"><span class="qno">13</span><div class="stem"><span class="badge-data">자료</span>그림은 빅뱅 이후 시간에 따라 우주에서 일어난 사건 A, B를 나타낸 것이다. A는 헬륨 원자핵 생성, B는 원자 생성이다. 옳은 것만을 &lt;보기&gt;에서 있는 대로 고른 것은? <span class="difficulty">[2.5점]</span>
-    <div class="tags">10통과1-02-01</div></div></div>
-    <figure style="margin-left:8.4mm;">
-      <svg width="340" height="56" viewBox="0 0 340 56" font-family="PC Sans">
-        <line x1="12" y1="30" x2="328" y2="30" stroke="#2E5BDA" stroke-width="2.4" marker-end="url(#arr)"/>
-        <circle cx="20" cy="30" r="4.5" fill="#F4A62A"/><text x="20" y="50" text-anchor="middle" font-size="8.6" font-weight="800">빅뱅</text>
-        <circle cx="120" cy="30" r="4" fill="#2E5BDA"/><text x="120" y="18" text-anchor="middle" font-size="9" font-weight="900" fill="#2E5BDA">A</text><text x="120" y="50" text-anchor="middle" font-size="8" fill="#5B6B77">약 3분 후</text>
-        <circle cx="228" cy="30" r="4" fill="#2E5BDA"/><text x="228" y="18" text-anchor="middle" font-size="9" font-weight="900" fill="#2E5BDA">B</text><text x="228" y="50" text-anchor="middle" font-size="8" fill="#5B6B77">약 38만 년 후</text>
-        <text x="318" y="50" text-anchor="middle" font-size="8.6" fill="#5B6B77">현재</text>
-      </svg>
-    </figure>
-    <div class="bogi-box">
-      <div class="bt">보기</div>
-      ㄱ. A 시기에 양성자 2개와 중성자 2개가 결합하였다.<br>
-      ㄴ. B 시기 이후 우주는 투명해졌다.<br>
-      ㄷ. A와 B 사이 시기에 별과 은하가 활발하게 만들어졌다.
-    </div>
-    <ul class="choices inline">
-      <li>① ㄱ</li><li>② ㄷ</li><li>③ ㄱ, ㄴ</li><li>④ ㄴ, ㄷ</li><li>⑤ ㄱ, ㄴ, ㄷ</li>
-    </ul>
-  </div>
-
-  <div class="folio"><span>II. 물질과 규칙성</span><span class="num">71</span></div>
+  <div class="folio"><span>II. 물질과 규칙성</span><span class="num">95</span></div>
 </div>
 
-<!-- ═════════════ p.9 해설 1 ═════════════ -->
+<!-- ═════════════ 해설 1 ═════════════ -->
 <div class="page">
   <div class="runhead"><span class="unit-tag" style="color:var(--brand);">알짜 해설</span><span class="lesson-tag">01. 우주의 시작과 원소의 탄생</span></div>
-  <div class="sol-head"><span class="stt">알짜 해설</span><span class="sub">전 문항 해설 + 오답 선지 분석 — 맞힌 문제도 해설로 한 번 더!</span></div>
+  <div class="sol-head"><span class="stt">알짜 해설</span><span class="sub">전 문항 해설 + 바로알기(틀린 선지를 옳게 고친 문장) — 맞힌 문제도 해설로 한 번 더!</span></div>
 
   <table class="anstable">
-    <tr><th>문항</th><td>1</td><td>2</td><td>3</td><td>4</td><td>5</td><td>6</td><td>7</td><td>8</td><td>9</td><td>10</td><td>11</td><td>12</td><td>13</td></tr>
-    <tr><th>정답</th><td class="a">O</td><td class="a">X</td><td class="a">X</td><td class="a">헬륨</td><td class="a">3:1</td><td class="a">우주 배경 복사</td><td class="a">②</td><td class="a">③</td><td class="a">①</td><td class="a">③</td><td class="a">서술형</td><td class="a">③</td><td class="a">③</td></tr>
+    <tr><th>문항</th><td>1</td><td>2</td><td>3</td><td>4</td><td>5</td><td>6</td><td>7</td><td>8</td><td>9</td><td>10</td><td>11</td><td>12</td></tr>
+    <tr><th>정답</th><td class="a">O</td><td class="a">X</td><td class="a">X</td><td class="a">헬륨</td><td class="a">3:1</td><td class="a">우주 배경 복사</td><td class="a">②</td><td class="a">④</td><td class="a">③</td><td class="a">④</td><td class="a">①</td><td class="a">③</td></tr>
+    <tr><th>문항</th><td>13</td><td>14</td><td>15</td><td>16</td><td>17</td><td>18</td><td>19</td><td>20</td><td>21</td><td>22</td><td>23</td><td>24</td></tr>
+    <tr><th>정답</th><td class="a">①</td><td class="a">⑤</td><td class="a">④</td><td class="a">⑤</td><td class="a">②</td><td class="a">서술형</td><td class="a">서술형</td><td class="a">서술형</td><td class="a">③</td><td class="a">①</td><td class="a">②</td><td class="a">⑤</td></tr>
   </table>
 
   <div class="solcols">
@@ -869,64 +1226,173 @@
       <div class="sol"><div class="shead"><span class="sno">5</span><span class="sans">3 : 1</span><span class="slink">개념 5</span></div>
         <p>질량비 수소 : 헬륨 ≈ 3 : 1. 이론 예측과 관측이 일치해 빅뱅의 증거가 된다.</p></div>
       <div class="sol"><div class="shead"><span class="sno">6</span><span class="sans">우주 배경 복사</span><span class="slink">개념 3</span></div>
-        <p>원자 생성 → 우주 투명 → 그때 퍼진 빛이 식어 현재 약 2.7 K의 전파로 관측된다.</p></div>
+        <p>원자 생성 → 우주 투명 → 그때 퍼진 빛이 식어 현재 약 2.7&nbsp;K의 전파로 관측된다.</p></div>
     </div>
     <div>
       <div class="sol"><div class="shead"><span class="sno">7</span><span class="sans">②</span><span class="slink">개념 2</span></div>
-        <p>기본 입자(쿼크·전자) → 쿼크 3개 결합 = 양성자·중성자 → 양성자·중성자 결합 = 헬륨 원자핵(약 3분) → 원자핵 + 전자 = 원자(약 38만 년).</p>
-        <div class="wrongbox"><div class="wt">오답 왜 틀렸나</div>
-          <p><b>①</b> 원자핵(헬륨)은 양성자·중성자가 생긴 뒤에야 만들어진다.</p>
-          <p><b>③</b> 양성자·중성자는 기본 입자가 결합한 것 — 기본 입자보다 먼저일 수 없다.</p>
-          <p><b>④</b> 순서를 완전히 거꾸로 쓴 선지. 초기 우주일수록 작은 입자만 있다.</p>
-          <p><b>⑤</b> 헬륨 원자핵이 가장 먼저일 수 없다(재료가 아직 없다).</p></div></div>
-      <div class="sol"><div class="shead"><span class="sno">8</span><span class="sans">③</span><span class="slink">개념 4</span></div>
-        <p>연속 스펙트럼의 빛이 저온 기체를 지나면 특정 파장이 흡수되어 검은 선이 생긴다 = 흡수 스펙트럼.</p>
-        <div class="wrongbox"><div class="wt">오답 왜 틀렸나</div>
-          <p><b>①</b> 고온 광원 자체는 모든 파장이 이어진 <b>연속</b> 스펙트럼을 낸다.</p>
-          <p><b>②</b> 고온·저밀도 기체는 특정 파장만 내는 <b>방출</b> 스펙트럼이다.</p>
-          <p><b>④</b> 같은 원소의 방출선·흡수선은 <b>같은 위치</b> — 그래서 지문 역할을 한다.</p>
-          <p><b>⑤</b> 선 위치를 원소별 기준과 대조하면 종류를 알 수 있다.</p></div></div>
+        <p>기본 입자(쿼크·전자) → 쿼크 3개 결합 = 양성자·중성자 → 양성자·중성자 결합 = 헬륨 원자핵(약 3분) → 원자핵 + 전자 = 원자(약 38만&nbsp;년).</p>
+        <div class="wrongbox"><div class="wt">바로알기</div>
+          <p><b>①</b> 양성자가 먼저 생기고, 양성자·중성자가 결합해 원자핵이 되었다. <b>③</b> 기본 입자가 결합해 양성자·중성자가 되었으므로 기본 입자가 가장 먼저다. <b>④</b> 입자는 기본 입자부터 원자까지 작은 것부터 차례로 만들어졌다. <b>⑤</b> 헬륨 원자핵은 양성자·중성자가 생긴 뒤에 만들어졌다.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">8</span><span class="sans">④</span><span class="slink">개념 1</span></div>
+        <p>외부 은하는 대부분 멀어지고, 멀리 있는 은하일수록 더 빨리 멀어진다 — 우주가 팽창한다는 증거다.</p>
+        <div class="wrongbox"><div class="wt">바로알기</div>
+          <p><b>①</b> 빅뱅 이후 우주는 지금까지 계속 팽창하고 있다. <b>②</b> 팽창하는 동안 온도와 밀도는 점점 낮아졌다. <b>③</b> 외부 은하는 대부분 우리 은하에서 멀어지고 있다. <b>⑤</b> 우주 팽창에는 중심이 따로 없다.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">9</span><span class="sans">③</span><span class="slink">개념 1</span></div>
+        <p><b>ㄱ (옳음)</b> A–B는 1&nbsp;cm → 2&nbsp;cm, A–C는 2&nbsp;cm → 4&nbsp;cm로 모두 늘었다. <b>ㄴ (옳음)</b> 같은 시간 동안 B는 1&nbsp;cm, C는 2&nbsp;cm 멀어졌다 — 먼 은하일수록 빨리 멀어지는 것과 같다.</p>
+        <div class="wrongbox"><div class="wt">바로알기</div>
+          <p><b>ㄷ</b> (틀림 →) 풍선 표면에는 팽창의 <b>중심이 따로 없다</b> — B나 C에서 보아도 나머지 스티커가 모두 멀어진다. 우주 팽창도 마찬가지다.</p></div></div>
     </div>
   </div>
-
-  <div class="folio"><span>알짜 해설</span><span class="num">72</span></div>
+  <div class="folio"><span>알짜 해설</span><span class="num">96</span></div>
 </div>
 
-<!-- ═════════════ p.10 해설 2 ═════════════ -->
+<!-- ═════════════ 해설 2 ═════════════ -->
 <div class="page">
   <div class="runhead"><span class="unit-tag" style="color:var(--brand);">알짜 해설</span><span class="lesson-tag">01. 우주의 시작과 원소의 탄생</span></div>
   <div class="solcols">
     <div>
-      <div class="sol"><div class="shead"><span class="sno">9</span><span class="sans">①</span><span class="slink">자료 파헤치기</span></div>
-        <p>S는 연속 스펙트럼 + 검은 선 = 흡수 스펙트럼. 흡수선 위치가 <b>A의 방출선 위치와만 일치</b>하므로 별 S의 대기에는 A가 있다. B의 선 위치에는 흡수선이 없으므로 B는 검출되지 않는다.</p>
-        <div class="wrongbox"><div class="wt">오답 왜 틀렸나</div>
-          <p><b>②·③</b> B의 방출선 위치에 대응하는 흡수선이 S에 없다.</p>
-          <p><b>④</b> A의 위치와 일치하는 흡수선이 분명히 있다.</p>
-          <p><b>⑤</b> 선 위치 비교만으로 판정 가능 — 이것이 스펙트럼 분석의 핵심.</p></div></div>
-      <div class="sol"><div class="shead"><span class="sno">10</span><span class="sans">③</span><span class="slink">개념 3·5</span></div>
-        <p>빅뱅 우주론의 2대 증거 = (가) 우주 배경 복사 + (나) 수소 : 헬륨 질량비 약 3 : 1.</p>
-        <div class="wrongbox"><div class="wt">오답 왜 틀렸나</div>
-          <p><b>(다)</b> 지구에 철이 많은 것은 지구 형성 과정의 특징일 뿐이다. 우주 전체의 조성(수소 &gt; 헬륨 ≫ 나머지)과도 다르고 빅뱅의 증거도 아니다.</p></div></div>
-      <div class="sol"><div class="shead"><span class="sno">11</span><span class="sans">모범 답안</span><span class="slink">개념 4</span></div>
-        <p>원소의 종류에 따라 방출선과 흡수선이 나타나는 파장(위치)이 정해져 있고, <b>같은 원소의 방출선과 흡수선은 같은 위치에 나타난다.</b> 따라서 별빛의 흡수선 위치를 원소별 스펙트럼과 비교하면 별의 대기를 구성하는 원소를 알 수 있다.</p>
-        <div class="wrongbox"><div class="wt">채점 기준 (감점 포인트)</div>
-          <p>① 원소마다 선의 위치가 고유함 ② 같은 원소는 방출선·흡수선 위치가 같음 ③ 흡수선 위치를 기준 스펙트럼과 <b>비교</b>함 — 세 요소 모두 서술해야 만점. "빛을 분석하면 알 수 있다"처럼 비교 과정 없이 쓰면 감점.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">10</span><span class="sans">④</span><span class="slink">개념 3</span></div>
+        <p>(가)는 빛이 자유 전자와 부딪쳐 꺾이는 원자 생성 전, (나)는 빛이 곧게 나아가는 원자 생성 후다. <b>ㄴ (옳음)</b> 빅뱅 후 약 38만&nbsp;년, 전자가 원자핵에 붙잡혀 원자가 되자 빛을 가로막던 자유 전자가 사라졌다. <b>ㄷ (옳음)</b> 이때 퍼진 빛이 식어 지금 모든 방향에서 우주 배경 복사로 관측된다.</p>
+        <div class="wrongbox"><div class="wt">바로알기</div>
+          <p><b>ㄱ</b> (틀림 →) (가)에서 빛이 멀리 나아가지 못하는 것은 빛이 <b>자유 전자와 끊임없이 충돌</b>하기 때문이다. (가) 시기에는 아직 원자가 없다.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">11</span><span class="sans">①</span><span class="slink">개념 4</span></div>
+        <p>연속 스펙트럼의 빛이 저온 기체를 지나면 특정 파장이 흡수되어 검은 선이 생긴다 = 흡수 스펙트럼.</p>
+        <div class="wrongbox"><div class="wt">바로알기</div>
+          <p><b>②</b> 고온의 별 표면이 내는 빛은 모든 색이 이어진 <b>연속</b> 스펙트럼이다. <b>③</b> 고온·저밀도 기체가 내는 빛은 밝은 선이 나타나는 <b>방출</b> 스펙트럼이다. <b>④</b> 같은 원소의 방출선과 흡수선은 <b>같은 위치</b>에 나타난다. <b>⑤</b> 흡수선의 위치를 원소별 스펙트럼과 대조하면 원소를 알 수 있다.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">12</span><span class="sans">③</span><span class="slink">개념 3·5</span></div>
+        <p>빅뱅 우주론의 2대 증거 = <b>ㄱ</b> 우주 배경 복사 + <b>ㄴ</b> 수소 : 헬륨 질량비 약 3&nbsp;:&nbsp;1. 둘 다 예측과 관측이 일치했다.</p>
+        <div class="wrongbox"><div class="wt">바로알기</div>
+          <p><b>ㄷ</b> (틀림 →) 같은 원소의 방출선·흡수선 위치가 같은 것은 <b>스펙트럼으로 원소를 알아내는 원리</b>일 뿐, 빅뱅 우주론의 증거는 아니다.</p></div></div>
     </div>
     <div>
-      <div class="sol"><div class="shead"><span class="sno">12</span><span class="sans">③</span><span class="slink">개념 4 | 2점</span></div>
-        <p><b>ㄱ (옳음)</b> 고온 기체가 내는 빛 = 밝은 선의 방출 스펙트럼.</p>
-        <p><b>ㄴ (옳음)</b> 방출선과 흡수선의 위치가 일치하므로 A와 B는 같은 원소일 수 있다.</p>
-        <p><b>ㄷ (틀림)</b> (나)의 검은 선은 B가 그 파장의 빛을 <b>흡수</b>한 자리다. 방출이 아니다.</p>
+      <div class="sol"><div class="shead"><span class="sno">13</span><span class="sans">①</span><span class="slink">개념 4 | 교과서 탐구</span></div>
+        <p>(가)는 어두운 바탕에 밝은 선 4개 = 수소의 <b>방출</b> 스펙트럼, (나)는 무지개 바탕에 검은 선 = 별 S의 <b>흡수</b> 스펙트럼이다. <b>ㄱ (옳음)</b> S의 검은 선 4개가 수소의 선 4개와 위치가 같다 → S의 대기에 수소가 있다.</p>
+        <div class="analysis"><div class="at">꼼꼼 자료 분석</div>
+          <svg width="300" height="88" viewBox="0 0 300 88" font-family="PC Sans">
+            <g font-size="8.5" font-weight="800" fill="#22303A"><text x="0" y="16">(가)</text><text x="0" y="42">(나)</text></g>
+            <rect x="22" y="4" width="266" height="16" rx="2" fill="#14181F"/><rect x="29.54" y="4" width="3" height="16" fill="#7B3FD0"/><rect x="50.65" y="4" width="3" height="16" fill="#3A55E6"/><rect x="96.84" y="4" width="3" height="16" fill="#2FB5C9"/><rect x="247.75" y="4" width="3" height="16" fill="#E8392E"/>
+            <rect x="22" y="30" width="266" height="16" rx="2" fill="url(#rb)"/><rect x="29.54" y="30" width="3" height="16" fill="#14181F"/><rect x="50.65" y="30" width="3" height="16" fill="#14181F"/><rect x="96.84" y="30" width="3" height="16" fill="#14181F"/><rect x="247.75" y="30" width="3" height="16" fill="#14181F"/><rect x="133.11" y="30" width="3" height="16" fill="#14181F"/>
+            <line x1="31.04" y1="20" x2="31.04" y2="30" stroke="#D6455D" stroke-width="1.1" stroke-dasharray="3 2"/><line x1="52.15" y1="20" x2="52.15" y2="30" stroke="#D6455D" stroke-width="1.1" stroke-dasharray="3 2"/><line x1="98.34" y1="20" x2="98.34" y2="30" stroke="#D6455D" stroke-width="1.1" stroke-dasharray="3 2"/><line x1="249.25" y1="20" x2="249.25" y2="30" stroke="#D6455D" stroke-width="1.1" stroke-dasharray="3 2"/>
+            <text x="134.61" y="56" text-anchor="middle" font-size="8.4" font-weight="900" fill="#D6455D">?</text>
+            <g font-size="6.8" font-weight="700" fill="#D6455D">
+              <text x="22" y="66">① 어두운 바탕 + 밝은 선 → (가)는 방출, 무지개 + 검은 선 → (나)는 흡수</text>
+              <text x="22" y="76">② 수소 선 4개 = S의 검은 선 4개(점선) → 수소 있음</text>
+              <text x="22" y="86">③ 짝 없는 검은 선 1개(?) → 수소 말고 다른 원소도 있다</text>
+            </g>
+          </svg></div>
+        <div class="wrongbox"><div class="wt">바로알기</div>
+          <p><b>ㄴ</b> (틀림 →) (가)는 고온·저밀도의 수소 기체가 빛을 내어 생긴 <b>방출</b> 스펙트럼이다. <b>ㄷ</b> (틀림 →) S의 검은 선 5개 중 1개는 수소의 선과 위치가 맞지 않는다 → S의 대기에는 수소 말고 <b>다른 원소도</b> 있다.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">14</span><span class="sans">⑤</span><span class="slink">개념 4 | 탐구</span></div>
+        <p><b>ㄱ (옳음)</b> 백열등은 고온의 광원 → 모든 색이 이어진 연속 스펙트럼. <b>ㄴ (옳음)</b> 원소마다 선의 위치가 정해져 있다. 선이 하나도 겹치지 않으므로 X와 Y는 서로 다른 원소다. <b>ㄷ (옳음)</b> 같은 원소의 방출선과 흡수선은 같은 위치 → 저온의 X를 통과한 빛에는 (나)의 밝은 선 자리에 검은 선이 생긴다.</p>
         <div class="wrongbox"><div class="wt">함정 체크</div>
-          <p>"흡수선 자리에서 빛을 방출한다"는 방출·흡수를 뒤집는 최다 빈출 함정. <b>바탕이 무지개면 흡수, 바탕이 어두우면 방출</b>부터 판정하자.</p></div></div>
-      <div class="sol"><div class="shead"><span class="sno">13</span><span class="sans">③</span><span class="slink">개념 2·3 | 2.5점</span></div>
-        <p><b>ㄱ (옳음)</b> A(약 3분 후)는 양성자 2개 + 중성자 2개 → 헬륨 원자핵 생성.</p>
-        <p><b>ㄴ (옳음)</b> B(약 38만 년 후) 원자 생성 → 빛이 자유 전자의 방해 없이 직진 → 우주가 투명해짐(이때의 빛 = 우주 배경 복사).</p>
-        <p><b>ㄷ (틀림)</b> A~B 사이에는 아직 원자가 없다. 별은 수소·헬륨 <b>원자</b>로 된 기체 구름이 뭉쳐야 만들어지므로, 별·은하 형성은 B 이후 수억 년 뒤의 일이다.</p>
-        <div class="wrongbox"><div class="wt">함정 체크</div>
-          <p>타임라인 문제는 각 사건에 <b>숫자(3분 / 38만 년)와 생성물</b>을 즉시 붙이는 훈련이 답이다. 별의 형성 시점(원자 생성 이후)까지 세트로 암기!</p></div></div>
+          <p>(나)·(다)는 어두운 바탕 + 밝은 선 = 방출 스펙트럼. '선의 개수'가 아니라 <b>'선의 위치'</b>로 원소를 가린다.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">15</span><span class="sans">④</span><span class="slink">개념 5 | 개념 2 연계</span></div>
+        <p><b>B (옳음)</b> 빅뱅 후 약 3분, 양성자 2개 + 중성자 2개 → 헬륨 원자핵. <b>C (옳음)</b> 예측값과 관측값(질량비 약 3&nbsp;:&nbsp;1)이 일치하는 것이 빅뱅 우주론의 증거다.</p>
+        <div class="wrongbox"><div class="wt">바로알기</div>
+          <p><b>A</b> (틀림 →) 약 3&nbsp;:&nbsp;1은 <b>질량비</b>이다. 헬륨 원자 1개가 수소 원자보다 약 4배 무거우므로 원자 개수비는 약 12&nbsp;:&nbsp;1이다.</p></div></div>
+    </div>
+  </div>
+  <div class="folio"><span>알짜 해설</span><span class="num">97</span></div>
+</div>
 
-      <div class="gist" style="margin-top:5mm;">
+<!-- ═════════════ 해설 3 ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag" style="color:var(--brand);">알짜 해설</span><span class="lesson-tag">01. 우주의 시작과 원소의 탄생</span></div>
+  <div class="solcols">
+    <div>
+      <div class="sol"><div class="shead"><span class="sno">16</span><span class="sans">⑤</span><span class="slink">개념 5</span></div>
+        <p>원자 수 = 질량 ÷ 원자 1개의 질량. 수소 원자 1개의 질량을 <i>m</i>이라 하면 헬륨은 4<i>m</i>이다.</p>
+        <p>수소 : 헬륨 = (30 ÷ <i>m</i>) : (10 ÷ 4<i>m</i>) = 30 : 2.5 = <b>12&nbsp;:&nbsp;1</b>. 질량비는 3&nbsp;:&nbsp;1이지만 원자 수의 비는 12&nbsp;:&nbsp;1이다.</p>
+        <div class="wrongbox"><div class="wt">바로알기</div>
+          <p><b>①</b> 3&nbsp;:&nbsp;1은 질량비이고, 원자 수의 비는 12&nbsp;:&nbsp;1이다. <b>②</b> 4&nbsp;:&nbsp;1은 헬륨과 수소 원자 1개의 질량비(헬륨 : 수소)이다. <b>③·④</b> 헬륨 10&nbsp;g을 원자 1개의 질량(4배)으로 나누면 2.5이므로 30&nbsp;:&nbsp;2.5&nbsp;=&nbsp;12&nbsp;:&nbsp;1이다.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">17</span><span class="sans">②</span><span class="slink">개념 2</span></div>
+        <p>(가)는 양성자(= 수소 원자핵), (나)는 헬륨 원자핵, (다)는 수소 원자다. <b>ㄷ (옳음)</b> (나)는 약 3분, (다)는 약 38만&nbsp;년 무렵에 만들어졌다. 우주는 팽창하며 계속 식었으므로 (나)가 만들어진 시기의 온도가 더 높다.</p>
+        <div class="wrongbox"><div class="wt">바로알기</div>
+          <p><b>ㄱ</b> (틀림 →) (가) 양성자는 <b>쿼크 3개가 결합</b>한 입자이다. 더 쪼갤 수 없는 기본 입자는 쿼크와 전자이다. <b>ㄴ</b> (틀림 →) (다) 원자는 (나) 헬륨 원자핵보다 <b>나중에</b> 만들어졌다.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">18</span><span class="sans">모범 답안</span><span class="slink">개념 3</span></div>
+        <p>원자가 만들어지기 전에는 <b>빛</b>이 우주 공간의 <b>자유 전자</b>와 끊임없이 충돌하여 멀리 나아가지 못했다. 약 38만&nbsp;년 무렵 우주의 온도가 낮아져 자유 전자가 <b>원자핵</b>에 붙잡혀 원자가 되자, 빛을 가로막던 자유 전자가 사라져 빛이 직진할 수 있게 되었으므로 우주가 투명해졌다.</p>
+        <table class="rubric">
+          <tr><th>채점 요소</th><th>배점</th></tr>
+          <tr><td>① 원자 생성 전에는 빛이 자유 전자와 충돌해 멀리 나아가지 못했다고 썼다.</td><td>2점</td></tr>
+          <tr><td>② 자유 전자가 원자핵에 붙잡혀 원자가 만들어졌다고 썼다.</td><td>2점</td></tr>
+          <tr><td>③ 빛을 가로막던 자유 전자가 사라져 빛이 직진하게 되었다고 썼다.</td><td>2점</td></tr>
+        </table>
+        <div class="wrongbox"><div class="wt">이렇게 쓰면 0점</div>
+          <p>"우주가 팽창하면서 빛이 밝아졌기 때문이다." — 자유 전자와 원자 생성이 빠진 답.</p></div></div>
+    </div>
+    <div>
+      <div class="sol"><div class="shead"><span class="sno">19</span><span class="sans">모범 답안</span><span class="slink">개념 5</span></div>
+        <p>빅뱅 우주론은 초기 우주의 양성자와 중성자 개수비로부터 수소와 헬륨의 질량비가 약 <b>3&nbsp;:&nbsp;1</b>이 될 것이라고 <b>예측</b>하였다. 실제로 별빛과 은하의 스펙트럼을 분석해 <b>관측</b>한 값도 우주 어디서나 약 3&nbsp;:&nbsp;1이다. 이론의 예측과 관측 결과가 일치하므로 빅뱅 우주론의 증거가 된다.</p>
+        <table class="rubric">
+          <tr><th>채점 요소</th><th>배점</th></tr>
+          <tr><td>① 빅뱅 우주론이 질량비 약 3 : 1을 예측했다고 썼다.</td><td>2점</td></tr>
+          <tr><td>② 스펙트럼 관측 결과도 약 3 : 1이라고 썼다.</td><td>2점</td></tr>
+          <tr><td>③ 예측과 관측이 일치하므로 증거가 된다고 썼다.</td><td>2점</td></tr>
+        </table>
+        <div class="wrongbox"><div class="wt">이렇게 쓰면 0점</div>
+          <p>"우주에 수소가 가장 많기 때문이다." — 예측과 관측의 일치가 빠진 답.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">20</span><span class="sans">모범 답안</span><span class="slink">개념 4</span></div>
+        <p>원소의 종류에 따라 선이 나타나는 파장(<b>위치</b>)이 정해져 있고, 같은 원소의 <b>방출선</b>과 <b>흡수선</b>은 같은 위치에 나타난다. 따라서 별빛의 흡수선 위치를 실험실에서 얻은 원소별 스펙트럼과 비교하면 별의 대기를 구성하는 원소를 알 수 있다.</p>
+        <table class="rubric">
+          <tr><th>채점 요소</th><th>배점</th></tr>
+          <tr><td>① 원소마다 선이 나타나는 위치가 정해져 있다고 썼다.</td><td>2점</td></tr>
+          <tr><td>② 같은 원소의 방출선과 흡수선은 위치가 같다고 썼다.</td><td>2점</td></tr>
+          <tr><td>③ 흡수선 위치를 원소별 스펙트럼과 비교한다고 썼다.</td><td>2점</td></tr>
+        </table>
+        <div class="wrongbox"><div class="wt">이렇게 쓰면 0점</div>
+          <p>"별빛을 분석하면 알 수 있기 때문이다." — 선의 위치를 비교하는 과정이 없는 답.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">21</span><span class="sans">③</span><span class="slink">개념 4 | 2점</span></div>
+        <p><b>ㄱ (옳음)</b> 고온 기체가 내는 빛 = 어두운 바탕 + 밝은 선 = 방출 스펙트럼. <b>ㄴ (옳음)</b> 방출선과 흡수선의 위치가 일치하므로 A와 B는 같은 원소일 수 있다.</p>
+        <div class="wrongbox"><div class="wt">바로알기</div>
+          <p><b>ㄷ</b> (틀림 →) (나)의 검은 선은 B가 그 파장의 빛을 <b>흡수</b>한 자리다. '흡수선 자리에서 방출한다'는 최다 빈출 함정이다.</p></div></div>
+    </div>
+  </div>
+  <div class="folio"><span>알짜 해설</span><span class="num">98</span></div>
+</div>
+
+<!-- ═════════════ 해설 4 ═════════════ -->
+<div class="page">
+  <div class="runhead"><span class="unit-tag" style="color:var(--brand);">알짜 해설</span><span class="lesson-tag">01. 우주의 시작과 원소의 탄생</span></div>
+  <div class="solcols">
+    <div>
+      <div class="sol"><div class="shead"><span class="sno">22</span><span class="sans">①</span><span class="slink">개념 5 | 개념 2 연계 | 2점</span></div>
+        <p>(가)는 양성자 14개 + 중성자 2개. 중성자 2개가 양성자 2개와 결합해 (나)의 <b>헬륨 원자핵 1개</b>가 되고, 남은 양성자 12개가 <b>수소 원자핵</b>이다. <b>ㄱ (옳음)</b> 14&nbsp;:&nbsp;2&nbsp;=&nbsp;7&nbsp;:&nbsp;1.</p>
+        <div class="wrongbox"><div class="wt">바로알기</div>
+          <p><b>ㄴ</b> (틀림 →) 수소 원자핵 12개 : 헬륨 원자핵 1개 = <b>12&nbsp;:&nbsp;1</b>이다. 3&nbsp;:&nbsp;1은 질량비(12&nbsp;:&nbsp;4)이다. <b>ㄷ</b> (틀림 →) 중성자가 4개면 헬륨 원자핵 2개(질량 8)와 수소 원자핵 8개(질량 8)가 되어 헬륨의 비율은 8/16&nbsp;=&nbsp;50&nbsp;%로 25&nbsp;%보다 <b>크다</b>. 중성자가 많을수록 헬륨이 많아진다.</p></div></div>
+      <div class="sol"><div class="shead"><span class="sno">23</span><span class="sans">②</span><span class="slink">개념 4·5 | 2.5점</span></div>
+        <p><b>ㄷ (옳음)</b> S의 검은 선 5개는 X의 선 3개, Y의 선 2개와 위치가 모두 같다 → S의 대기에는 X와 Y가 모두 있다.</p>
+        <div class="analysis"><div class="at">꼼꼼 자료 분석</div>
+          <svg width="300" height="150" viewBox="0 0 300 150" font-family="PC Sans">
+            <g font-size="8.2" font-weight="800" fill="#22303A"><text x="4" y="15">X</text><text x="4" y="37">Y</text><text x="4" y="59">S</text></g>
+            <rect x="22" y="3" width="266" height="16" rx="2" fill="#14181F"/>
+            <rect x="46.85" y="3" width="3.5" height="16" fill="#6E5CE8"/><rect x="78.75" y="3" width="3.5" height="16" fill="#4A6FE8"/><rect x="249.05" y="3" width="3.5" height="16" fill="#E85B4A"/>
+            <rect x="22" y="25" width="266" height="16" rx="2" fill="#14181F"/>
+            <rect x="110.65" y="25" width="3.5" height="16" fill="#2FB58A"/><rect x="179.85" y="25" width="3.5" height="16" fill="#E8CC2A"/>
+            <rect x="22" y="47" width="266" height="16" rx="2" fill="url(#rb)"/>
+            <g fill="#14181F"><rect x="46.85" y="47" width="3.5" height="16"/><rect x="78.75" y="47" width="3.5" height="16"/><rect x="110.65" y="47" width="3.5" height="16"/><rect x="179.85" y="47" width="3.5" height="16"/><rect x="249.05" y="47" width="3.5" height="16"/></g>
+            <g stroke="#D6455D" stroke-width="1" stroke-dasharray="3 2"><line x1="48.6" y1="19" x2="48.6" y2="47"/><line x1="80.5" y1="19" x2="80.5" y2="47"/><line x1="251" y1="19" x2="251" y2="47"/></g>
+            <g stroke="#0E5A6B" stroke-width="1" stroke-dasharray="3 2"><line x1="112.4" y1="41" x2="112.4" y2="47"/><line x1="181.6" y1="41" x2="181.6" y2="47"/></g>
+            <text x="22" y="74" font-size="6.8" font-weight="700" fill="#D6455D">S의 검은 선 = X의 선 3개 + Y의 선 2개 → X, Y 모두 있다 (흡수)</text>
+            <rect x="22" y="82" width="196.8" height="15" fill="#2E5BDA"/>
+            <rect x="218.8" y="82" width="63.9" height="15" fill="#F4A62A"/>
+            <rect x="282.7" y="82" width="5.3" height="15" fill="#9AA7B1"/>
+            <text x="120.4" y="93" text-anchor="middle" font-size="7.8" font-weight="900" fill="#fff">X 74 % → 수소</text>
+            <text x="250.75" y="93" text-anchor="middle" font-size="7.8" font-weight="900" fill="#fff">Y 24 % → 헬륨</text>
+            <g font-size="6.8" font-weight="700" fill="#D6455D">
+              <text x="22" y="110">가장 많은 X가 수소, Y가 헬륨 (헬륨 원자 1개 ≈ 수소 4개 질량)</text>
+              <text x="22" y="122">원자 수 = 질량 ÷ 원자 1개 질량 → X 74 ÷ 1 = 74, Y 24 ÷ 4 = 6</text>
+              <text x="22" y="134">Y : X = 6 : 74 ≈ 1 : 12 (1/3은 질량비 24 : 74에 가깝다 — 함정)</text>
+            </g>
+          </svg></div>
+        <div class="wrongbox"><div class="wt">바로알기</div>
+          <p><b>ㄱ</b> (틀림 →) S의 검은 선은 S의 대기가 그 파장의 빛을 <b>흡수</b>하여 생긴 것이다. <b>ㄴ</b> (틀림 →) 원자 수는 X(수소) 74&nbsp;÷&nbsp;1&nbsp;=&nbsp;74, Y(헬륨) 24&nbsp;÷&nbsp;4&nbsp;=&nbsp;6이므로 Y는 X의 <b>약&nbsp;1/12</b>이다.</p></div></div>
+    </div>
+    <div>
+      <div class="sol"><div class="shead"><span class="sno">24</span><span class="sans">⑤</span><span class="slink">개념 3 | I-02 연계 | 2.5점</span></div>
+        <p><b>ㄱ (옳음)</b> 온도는 국제단위계(SI)의 기본량 7가지 중 하나이고, 그 단위가 K(켈빈)이다(I-02). <b>ㄴ (옳음)</b> B(원자 생성) 이후 자유 전자가 원자핵에 붙잡혀 빛이 직진하게 되었다. <b>ㄷ (옳음)</b> 3000 ÷ 2.7 ≈ 1100 → 1000배 이상.</p>
+        <div class="wrongbox"><div class="wt">함정 체크</div>
+          <p>약 3000&nbsp;K는 원자가 만들어질 무렵(B)의 온도, 약 2.7&nbsp;K는 그때 퍼진 빛이 팽창하는 우주에서 식은 지금의 온도다. 두 값을 바꿔 읽지 말자.</p></div></div>
+      <div class="gist" style="margin-top:4mm;">
         <div class="boxtitle"><span class="ico">알</span>이 소단원, 이것만은!</div>
         <ul>
           <li>입자는 <b>기본 입자 → 양성자·중성자 → 헬륨 원자핵(약 3분) → 원자(약 38만 년)</b> 순서로, 작은 것부터 차례대로 만들어졌다.</li>
@@ -936,16 +1402,26 @@
       </div>
     </div>
   </div>
-  <div class="folio"><span>알짜 해설</span><span class="num">73</span></div>
+  <div class="folio"><span>알짜 해설</span><span class="num">99</span></div>
 </div>
 
-<!-- ═════════════ p.11 MEMO ═════════════ -->
+<!-- ═════════════ MEMO ═════════════ -->
 <div class="page">
   <div class="runhead"><span class="unit-tag">II. 물질과 규칙성</span><span class="lesson-tag">01 ▸ 02 넘어가기 전에</span></div>
+  <div class="spaced">
+    <div class="st">간격 두고 다시 꺼내기 — 책을 덮고 답한다</div>
+    <ol>
+      <li>빅뱅 후 약 38만 년, 우주가 투명해진 것은 무엇이 만들어졌기 때문인가?</li>
+      <li>무지개 바탕에 검은 선이 나타나는 스펙트럼의 이름은?</li>
+      <li>빅뱅 우주론의 2대 증거 두 가지는?</li>
+    </ol>
+    <div class="when"><span>□ 1일 뒤</span><span>□ 1주 뒤</span><span>□ 시험 전</span></div>
+    <div class="ans">정답 1 원자 2 흡수 스펙트럼 3 우주 배경 복사, 수소 : 헬륨 질량비 약 3 : 1</div>
+  </div>
   <div class="memo-head"><span class="mt">MEMO</span><span class="ms">헷갈린 개념, 다시 틀린 문제 번호, 나만의 암기법을 남겨 두는 자리</span></div>
   <div class="memo-area"></div>
   <div class="memo-pen">"틀린 문제를 적어 두는 사람과 그냥 넘기는 사람의 차이가, 시험장에서의 차이가 된다. — 박찬쌤"</div>
-  <div class="folio"><span>박찬 과학 | 통합과학 1</span><span class="num">74</span></div>
+  <div class="folio"><span>박찬 과학 | 통합과학 1</span><span class="num">100</span></div>
 </div>
 
 </body>
