@@ -1581,6 +1581,14 @@ body.focus main{padding-bottom:calc(var(--fbh, var(--sab)) + 24px)}
 .dnav button{min-height:44px;padding:0 6px;border:none;background:none;font-family:inherit;font-size:var(--t-small);font-weight:700;color:var(--muted);cursor:pointer}
 .dnav button:disabled{opacity:.45;cursor:default}
 @media (prefers-reduced-motion: reduce){.pbar i,.ugh .chev{transition:none}.verdict.fb,.ck{animation:none}}
+/* 앱 안 브라우저(카카오톡·네이버 등) 안내 한 줄 — 막지 않는다 */
+#iab{display:flex;align-items:flex-start;gap:10px;margin:12px 18px 0;padding:12px 12px 12px 14px;border-radius:var(--r-m);background:var(--brand-soft);color:var(--brand-dark);font-size:var(--t-small);line-height:1.6;word-break:keep-all}
+#iab[hidden]{display:none}
+#iab .t{flex:1;min-width:0}#iab .t b{display:block;font-size:var(--t-body);margin-bottom:2px}
+#iab .a{display:flex;flex-wrap:wrap;gap:8px;margin-top:9px}
+#iab .a a,#iab .a button{display:inline-flex;align-items:center;min-height:40px;padding:0 14px;border-radius:var(--r-pill);font-family:inherit;font-size:var(--t-small);font-weight:700;text-decoration:none;cursor:pointer}
+#iab .a .go{background:var(--brand);color:var(--on-color);border:none}#iab .a .cp{background:none;color:var(--brand-dark);border:1.5px solid var(--brand-line)}
+#iab .x{flex:0 0 40px;height:40px;margin:-6px -4px 0 0;border:none;background:none;color:var(--brand-dark);font-size:20px;line-height:1;cursor:pointer;border-radius:var(--r-pill)}
 /* 폰에서 입력 칸 글자는 16px 이상 — 2026-10-08: 아이폰 사파리는 16px 보다 작은 칸을 누르면 화면을 저절로 확대하고 되돌리지 않는다(15·13.5px 칸이 많았다).
    손가락 기기에만 · 더 큰 칸(.big·제목 .ti)은 그대로 · 확대 막기(maximum-scale)는 쓰지 않는다(손가락 확대는 접근성) */
 @media (pointer:coarse){input:not([type=checkbox]):not([type=radio]):not([type=range]):not(.big):not(.ti),textarea,select,.ned input.ti.sm{font-size:16px!important}}
@@ -1590,6 +1598,7 @@ body.focus main{padding-bottom:calc(var(--fbh, var(--sab)) + 24px)}
 
 <div class="app">
   <div class="stripe"></div>
+  <div id="iab" role="note" hidden></div>
   <main>
     <section id="v-auth" class="hide"></section>
     <section id="v-today"></section>
@@ -6420,6 +6429,25 @@ async function checkAppMeta(){ if (!SRV) return;
     if (!seen){ openSheet(`<h3>알려 드립니다</h3><p>${esc(m.notice)}</p><button class="btn" id="sheetClose">확인</button>`); try { sessionStorage.setItem(k, '1'); } catch {} } }
   else if (isNative && m.latest_version && vcmp(CFG.version, m.latest_version) < 0) setTimeout(() => toast('새 버전이 있어요 · 스토어에서 업데이트할 수 있습니다'), 1500);
 }
+/* ═══ 앱 안 브라우저 — 2026-10-08: 학원 링크는 단톡방으로 오는데, 카카오톡 안 브라우저에서는 홈 화면 추가가 안 되고
+   (로그인 전) 기록도 그 앱 안에만 남는다. 막지 않고 위에 한 줄로 크롬·사파리로 여는 길을 준다 — 누를 때만 이동(사용자 동작 없이 넘기면 막힌다).
+   카카오톡: kakaotalk://web/openExternal?url= (기본 브라우저로) · 안드로이드 다른 앱: intent:// 로 크롬 · 아이폰 다른 앱: 메뉴 안내 + 주소 복사 */
+const IAB = (() => { if (isNative) return null; const u = navigator.userAgent || '';
+  const n = /KAKAOTALK/i.test(u) ? '카카오톡' : /NAVER\(inapp/i.test(u) ? '네이버 앱' : /Instagram/i.test(u) ? '인스타그램' : /FBAN|FBAV|FB_IAB/i.test(u) ? '페이스북'
+    : /\bLine\//i.test(u) ? '라인' : /BAND\//i.test(u) ? '밴드' : /DaumApps/i.test(u) ? '다음 앱' : /everytimeApp/i.test(u) ? '에브리타임' : '';
+  return n ? { n, kakao: n === '카카오톡', ios: /iPhone|iPad|iPod/i.test(u) } : null; })();
+function iabHint(){ const el = document.getElementById('iab'); if (!el || !IAB) return;
+  try { if (sessionStorage.getItem('pcs.iab') === '0') return; } catch {}
+  const url = location.href.split('#')[0], br = IAB.ios ? '사파리' : '크롬';
+  const go = IAB.kakao ? 'kakaotalk://web/openExternal?url=' + encodeURIComponent(url)
+    : !IAB.ios ? 'intent://' + url.replace(/^https?:\/\//, '') + '#Intent;scheme=https;package=com.android.chrome;end' : '';
+  el.innerHTML = `<div class="t"><b>${esc(IAB.n)} 안에서 열렸어요</b>홈 화면에 앱으로 두고 쓰려면 ${br}에서 여는 게 좋아요.${go ? '' : ` 오른쪽 위 <b style="display:inline;font-size:inherit">···</b> › '${ro(br)} 열기'를 눌러 주세요.`}
+    <div class="a">${go ? `<a class="go" id="iabGo" href="${esc(go)}">${ro(br)} 열기</a>` : ''}<button class="cp" id="iabCopy" type="button">주소 복사</button></div></div>
+    <button class="x" id="iabX" type="button" aria-label="안내 닫기">×</button>`;
+  el.hidden = false;
+  el.addEventListener('click', async e => {
+    if (e.target.closest('#iabX')){ el.hidden = true; try { sessionStorage.setItem('pcs.iab', '0'); } catch {} }
+    else if (e.target.closest('#iabCopy')){ try { await navigator.clipboard.writeText(url); toast('주소를 복사했어요 · ' + br + ' 주소창에 붙여 넣어 주세요'); } catch { toast(url); } } }); }
 /* ═══ 오류 기록 ═══ */
 const errSeen = new Set();
 function reportError(msg, stack){ const m = String(msg||'').slice(0, 480); if (!m || errSeen.has(m) || errSeen.size >= 5) return; errSeen.add(m);
@@ -6433,6 +6461,7 @@ window.addEventListener('unhandledrejection', e => { const r = e.reason || {};
 /* ═══ 시작 ═══ */
 (async () => {
   loadMore();   // 문제 은행·탐구·그림 — 첫 화면과 함께 받기 시작
+  iabHint();
   setTimeout(() => { const Sp = plug('SplashScreen'); Sp && Sp.hide(); }, 1500);   // 망이 느려도 첫 화면을 21초씩 가리지 않게
   if (storeWarn) setTimeout(() => toast(storeWarn), 900);
   /* 가입 확인·비밀번호 재설정 메일의 링크로 들어왔으면 그 세션을 받는다 */
