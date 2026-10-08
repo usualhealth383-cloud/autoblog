@@ -1,0 +1,20 @@
+{
+  "name": "yakjido",
+  "version": "0.1.0",
+  "private": true,
+  "description": "약지도 — 어르신을 위한 약 안내·복용 알림",
+  "scripts": {
+    "web": "python3 ../tools/build.py && rm -rf www && cp -r ../../docs/yakjido www && rm -f www/sw.js www/manifest.webmanifest && rm -f www/data/kpic-guide.json www/data/kpic-extra.json",
+    "sync": "npm run web && npx cap sync",
+    "android": "npm run sync && npx cap open android"
+  },
+  "dependencies": {
+    "@capacitor/android": "^8.5.1",
+    "@capacitor/app": "^8.1.1",
+    "@capacitor/cli": "^8.5.1",
+    "@capacitor/core": "^8.5.1",
+    "@capacitor/local-notifications": "^8.3.1",
+    "@capacitor/splash-screen": "^8.0.2",
+    "@capacitor/status-bar": "^8.0.3"
+  }
+}

@@ -1,0 +1,83 @@
+import re, json, base64, pathlib, sys
+import os
+ROOT = pathlib.Path(__file__).resolve().parents[2] / 'docs' / 'yakjido'
+# 결과 위치: YAKJIDO_ART 환경변수 → 클라우드 작업 폴더(있으면) → 저장소 안 .build/(깃에 안 올라감)
+_CLOUD = pathlib.Path('/tmp/claude-0/-home-user-autoblog/cf2f6625-dcb1-56a6-b544-ead87bbf0fa1/scratchpad')
+OUT = pathlib.Path(os.environ['YAKJIDO_ART']) if os.environ.get('YAKJIDO_ART') else (_CLOUD if _CLOUD.exists() else pathlib.Path(__file__).resolve().parents[1] / '.build') / 'artifact' / 'yakson.html'
+s = (ROOT/'index.html').read_text(encoding='utf-8')
+# 1) strip the outer document wrapper (Artifact adds its own)
+s = re.sub(r'^<!doctype html>\s*|^<html[^>]*>\s*|</html>\s*$', '', s, flags=re.I|re.M)
+s = re.sub(r'</?(head|body)[^>]*>\s*', '', s, flags=re.I)
+# 2) drop PWA-only bits (no manifest / icons / service worker on the artifact host)
+s = re.sub(r'^\s*<link rel="(manifest|apple-touch-icon|icon)"[^>]*>\s*$\n?', '', s, flags=re.M)
+# 아티팩트 CSP 는 Google Fonts 외 스타일시트를 막는다 — jsdelivr 의 Pretendard 링크는 빼고 Noto Sans KR 로 간다
+s = re.sub(r'^\s*<link rel="preconnect" href="https://cdn.jsdelivr.net"[^>]*>\s*$\n?', '', s, flags=re.M)
+s = re.sub(r'^\s*<link rel="stylesheet" href="https://cdn.jsdelivr.net[^"]*">\s*$\n?', '', s, flags=re.M)
+# 서비스워커 등록 블록 전체를 뺀다(아티팩트에는 워커가 없다). 여러 줄이라 중괄호를 세어 자른다.
+i = s.find("if ('serviceWorker' in navigator")
+if i >= 0:
+    j = s.index('{', i); depth = 0; k = j
+    while k < len(s):
+        if s[k] == '{': depth += 1
+        elif s[k] == '}':
+            depth -= 1
+            if depth == 0: break
+        k += 1
+    s = s[:i] + s[k+1:]
+# 3) inline the illustrations as data URIs
+art = {}
+for f in sorted((ROOT/'art').glob('*.webp')):
+    art[f.stem] = 'data:image/webp;base64,' + base64.b64encode(f.read_bytes()).decode()
+# 미리보기(아티팩트)에서는 파일 내려받기가 막혀 있어 달력 파일 버튼을 안내 문구로 바꾼다 — 설치한 앱에서는 그대로 동작
+s = s.replace("onclick=\"downloadIcs()\">${I.clock} 받기</button>", "onclick=\"toast('달력 파일은 설치한 약지도 앱에서 받을 수 있어요')\">${I.clock} 앱에서</button>")
+# 아티팩트에는 privacy.html 파일이 없다 — 깃허브 페이지의 방침으로 연다
+s = s.replace('''<a class="link" href="${NATIVE ? esc((D.meta?.share?.app || 'https://usualhealth383-cloud.github.io/autoblog/yakjido/') + 'privacy.html') : 'privacy.html'}"${NATIVE ? ' target="_blank" rel="noopener"' : ''}>개인정보처리방침</a>''', '<a class="link" href="https://usualhealth383-cloud.github.io/autoblog/yakjido/privacy.html" target="_blank" rel="noopener">개인정보처리방침</a>')
+s = s.replace('<img src="art/${n}.webp"', '<img src="${ART_DATA[n] || ("art/" + n + ".webp")}"')
+# 아티팩트는 파일 하나라 서버가 없다 — 본문 자료(core.json)도 같이 심는다
+# 첫 화면 머리의 앱 표시(34px) — 아티팩트 호스트에는 icon-192.png 파일이 없어 깨진 그림이 나왔다(2026-09-23 현욱님 캡처)
+import io
+from PIL import Image
+_im = Image.open(ROOT/'icon-192.png').convert('RGBA').resize((68, 68), Image.LANCZOS)
+_b = io.BytesIO(); _im.save(_b, 'PNG', optimize=True)
+brandmark = 'data:image/png;base64,' + base64.b64encode(_b.getvalue()).decode()
+inject = ('<script>const ART_DATA = ' + json.dumps(art) + ';\n'
+          "window.__BRANDMARK__ = " + json.dumps(brandmark) + ';\n'
+          "window.__NOWX = true;\n"  # 아티팩트에서는 날씨를 못 받으니 실패 줄도 두지 않는다(2026-09-29)
+          "window.__CORE__ = " + (ROOT/'data/core.json').read_text(encoding='utf-8') + ';\n'
+          "window.__DETAIL__ = " + (ROOT/'data/detail.json').read_text(encoding='utf-8') + ';\n'
+          "window.__PILLS__ = " + (ROOT/'data/pills.json').read_text(encoding='utf-8') + ';\n'
+          "window.__EASY__ = "  + (ROOT/'data/easy-index.json').read_text(encoding='utf-8') + ';\n'
+          "window.__LEX__ = {ing:" + (ROOT/'data/lexicon.json').read_text(encoding='utf-8')
+          + ",brand:" + (ROOT/'data/brands.json').read_text(encoding='utf-8')
+          + ",qa:" + (ROOT/'data/qa.json').read_text(encoding='utf-8')
+          + ",nut:" + (ROOT/'data/nutrients.json').read_text(encoding='utf-8')
+          + ",mix:" + (ROOT/'data/mixes.json').read_text(encoding='utf-8') + '};</script>\n')
+# 낱알·제품 사진 판(tools/pill_sprites.py)과 약학정보원 그림 표시·복약정보 조각을 함께 싣는다 — 아티팩트는 바깥 사진을 막아서(2026-09-30)
+SP = OUT.parent.parent / 'sprites'
+files = {}
+if (SP / 'ps.json').exists():
+    inject += '<script>window.__PS = ' + (SP / 'ps.json').read_text(encoding='utf-8') + ';window.__PICTO_LOCAL = true;</script>\n'
+    for f in sorted((SP / 'ps').glob('*.jpg')): files['ps/' + f.name] = str(f)
+    # 그림 표시(픽토그램) — 복약정보에 나오는 것만 받아 둔다
+    kgp = ROOT / 'data' / 'kpic-guide.json'
+    if kgp.exists():
+        import urllib.request
+        codes = sorted({c for v in json.loads(kgp.read_text()).values() for c in (v.get('p') or [])})
+        (SP / 'pg').mkdir(exist_ok=True)
+        for c in codes:
+            f = SP / 'pg' / (c + '.jpg')
+            if not f.exists():
+                try: f.write_bytes(urllib.request.urlopen(f'https://common.health.kr/shared/images/pictogram/black/kor/{c}.jpg', timeout=30).read())
+                except Exception as e: print('그림 표시 못 받음', c, e); continue
+            files['pg/' + f.name] = str(f)
+for f in sorted((ROOT / 'data' / 'kg').glob('*.json')): files['data/kg/' + f.name] = str(f)
+OUT.parent.mkdir(parents=True, exist_ok=True)   # 새 컨테이너에는 작업 폴더가 비어 있다(2026-10-04)
+(OUT.parent / 'files.json').write_text(json.dumps(files, ensure_ascii=False, indent=0))
+print('함께 싣는 파일', len(files), '개 ·', round(sum(pathlib.Path(v).stat().st_size for v in files.values()) / 1e6, 1), 'MB → files.json')
+i = s.index('<div class="app">')
+s = s[:i] + inject + s[i:]
+OUT.parent.mkdir(parents=True, exist_ok=True); OUT.write_text(s, encoding='utf-8')
+print('wrote', OUT, round(len(s.encode())/1e6, 2), 'MB · art', len(art))
+assert "'icon-192.png'" not in s.split('window.__BRANDMARK__')[0] or 'window.__BRANDMARK__ = "data:' in s, '앱 표시 그림이 파일 경로로 남았습니다'
+for bad in ['serviceWorker.register', 'rel="manifest"', '<!doctype', '<body']:
+    if bad in s: print('!! still present:', bad)
