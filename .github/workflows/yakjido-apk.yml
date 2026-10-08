@@ -1,0 +1,121 @@
+name: yakjido-apk
+
+# 약지도 — 안드로이드 APK 자동 빌드 (앱을 닫아도 울리는 복용 알림용)
+# 약지도 앱 코드가 바뀌어 이 브랜치에 올라가면 돌고, Actions 탭에서 손으로도 돌릴 수 있다.
+# 결과물: 폰에서 바로 받는 고정 링크 — https://github.com/usualhealth383-cloud/autoblog/releases/download/yakjido-latest/yakjido.apk
+#         (실행 화면 아래 Artifacts → yakjido-apk 에도 같은 파일)
+# 스토어 제출용 서명본은 Secrets 4개(YAKJIDO_KEYSTORE_B64 · _PASSWORD · _ALIAS · _KEY_PASSWORD)가 있을 때만 함께 만든다.
+on:
+  workflow_dispatch: {}
+  push:
+    branches: [main, claude/medicine-recommendation-app-na6x0m]
+    paths:
+      - 'yakjido/app-shell.html'
+      - 'yakjido/content/**'
+      - 'yakjido/app-native/**'
+      - 'yakjido/tools/build.py'
+      - '.github/workflows/yakjido-apk.yml'
+
+concurrency:
+  group: yakjido-apk-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: write   # 릴리스(yakjido-latest)에 APK 를 올리기 위해 — 코드는 건드리지 않는다
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    env:
+      KS: ${{ secrets.YAKJIDO_KEYSTORE_B64 }}
+    defaults:
+      run:
+        working-directory: yakjido/app-native
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: yakjido/app-native/package-lock.json
+
+      - uses: android-actions/setup-android@v3
+        with:
+          packages: 'platforms;android-36 build-tools;36.0.0 platform-tools'
+
+      - name: 웹 앱 빌드 → Capacitor 동기화
+        run: |
+          pip install --quiet pillow
+          npm ci
+          npm run web
+          npx cap sync android
+
+      - name: Gradle 캐시
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: gradle-yakjido-${{ runner.os }}-${{ hashFiles('yakjido/app-native/android/**/*.gradle', 'yakjido/app-native/android/gradle/wrapper/gradle-wrapper.properties') }}
+
+      - name: 시험용 APK
+        working-directory: yakjido/app-native/android
+        run: |
+          chmod +x gradlew
+          ./gradlew assembleDebug --no-daemon --stacktrace
+          cp app/build/outputs/apk/debug/app-debug.apk ../yakjido-debug.apk
+          ls -la ../yakjido-debug.apk
+
+      - name: 서명된 배포용 APK·AAB (Secrets 있을 때만)
+        if: ${{ env.KS != '' }}
+        env:
+          KS_PW: ${{ secrets.YAKJIDO_KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.YAKJIDO_KEY_ALIAS }}
+          KEY_PW: ${{ secrets.YAKJIDO_KEY_PASSWORD }}
+        working-directory: yakjido/app-native/android
+        run: |
+          echo "$KS" | base64 -d > /tmp/release.keystore
+          ./gradlew assembleRelease bundleRelease --no-daemon \
+            -Pandroid.injected.signing.store.file=/tmp/release.keystore \
+            -Pandroid.injected.signing.store.password="$KS_PW" \
+            -Pandroid.injected.signing.key.alias="$KEY_ALIAS" \
+            -Pandroid.injected.signing.key.password="$KEY_PW"
+          cp app/build/outputs/apk/release/app-release.apk ../yakjido-release.apk
+          cp app/build/outputs/bundle/release/app-release.aab ../yakjido-release.aab
+          rm -f /tmp/release.keystore
+
+      - name: 폰에서 바로 받는 링크(릴리스 yakjido-latest)에 올리기
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          cp yakjido-debug.apk yakjido.apk
+          NOTES="약지도 안드로이드 시험판 · 빌드 ${GITHUB_RUN_NUMBER} · $(date -u +%F) · ${GITHUB_SHA::7}
+
+          설치: 이 페이지 아래 yakjido.apk 를 눌러 받고 → 열기 → (처음 한 번) 출처를 알 수 없는 앱 허용.
+          새 빌드는 옛 앱 위에 그대로 덮어 설치됩니다(기록 유지).
+          시험판입니다 — 스토어 배포본이 아닙니다."
+          if gh release view yakjido-latest >/dev/null 2>&1; then
+            gh release upload yakjido-latest yakjido.apk --clobber
+            gh release edit yakjido-latest --notes "$NOTES"
+          else
+            gh release create yakjido-latest yakjido.apk --prerelease --target "$GITHUB_SHA" \
+              --title "약지도 안드로이드 시험판" --notes "$NOTES"
+          fi
+
+      - name: 결과물 올리기
+        uses: actions/upload-artifact@v4
+        with:
+          name: yakjido-apk
+          path: |
+            yakjido/app-native/yakjido-debug.apk
+            yakjido/app-native/yakjido-release.apk
+            yakjido/app-native/yakjido-release.aab
+          if-no-files-found: error
+          retention-days: 30
