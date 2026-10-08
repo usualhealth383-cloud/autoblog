@@ -890,11 +890,27 @@ def main():
             pg.goto(url + '#' + _r); pg.reload(); ready(); pg.wait_for_timeout(600)
             _o = pg.evaluate(OVERFLOW_JS)
             if _o['clip'] or _o['ov'] or _o['len'] < 40: fails.append(f'영양제 화면 {_r}: 넘침·잘림·빈 화면 {_o["clip"][:1]}{_o["ov"][:1]}')
+        # 9c. 인터넷 없이 — 서비스워커가 껍데기·core·detail 을 받아 둔 뒤 비행기 모드에서도 증상·약·영양제가 열려야 한다(2026-10-08 출시 점검)
+        _oc = br.new_context(viewport={'width': 390, 'height': 844}); _op = _oc.new_page(); _oerr = []; _op.on('pageerror', lambda e: _oerr.append(str(e)))
+        _op.goto(url + '#/home'); _op.wait_for_function('window.__READY__===true && DETAIL===2', timeout=15000)
+        _op.evaluate("localStorage.setItem('yakjido.hello.v1','1')")
+        try: _op.wait_for_function("navigator.serviceWorker.controller || (navigator.serviceWorker.getRegistration().then(r=>r&&r.active))", timeout=15000); _op.wait_for_timeout(2500)   # 설치·precache 끝날 때까지
+        except Exception: fails.append('서비스워커가 설치되지 않습니다')
+        _oc.set_offline(True)
+        for _r in ['/symptom/cold', '/drug/acetaminophen', '/supp/iron', '/schedule']:
+            _op.goto(url + '#' + _r); _op.reload()
+            try: _op.wait_for_function('window.__READY__===true && DETAIL===2', timeout=10000)
+            except Exception: fails.append(f'인터넷 없이 {_r}: 본문 자료가 안 뜹니다(서비스워커 캐시)'); continue
+            _op.wait_for_timeout(600)
+            _t = _op.inner_text('#view')
+            if len(_t) < 200 or '불러오는 중' in _t: fails.append(f'인터넷 없이 {_r}: 화면이 비었거나 「불러오는 중」에 멈춥니다')
+        if _oerr: fails.append(f'인터넷 없이 JS 오류: {_oerr[:2]}')
+        _oc.close()
         br.close()
     print(f'화면 {len(routes)}개 검사 완료')
     if fails:
         print('실패', len(fails)); [print('  ✗', f) for f in fails]; sys.exit(1)
-    print('✓ 전부 통과 — JS 오류 0 · 넘침 0 · 잘림 0 · 명암비 AA · 조작 부품 3:1 · 44px · 단추 누르기 · 복용 간격 · 복약 달력 · 홈 오늘약 · 어르신 소염제 · 소아 한도 · 계열 경고 · 어근 오인 · 내 정보 칸 · 화면 밝기 · 아이콘 전수 · 약 알림 · 어르신 모드 · 320px · 병용 8건 · 겹침 규칙 53 · 입력칸 이름표 · 성분 해석 123 · 죽은 규칙 0 · 약통 판정 4건 · 자기중복 3건 · 바구니 겹침 · 이중계산 0 · 검색 8건 · 구어 30건 · 문장 16건 · 새 약 검색 12건 · 하루 최대 표기 · 먹는/바르는 구분 · 영양제 질문 순서')
+    print('✓ 전부 통과 — JS 오류 0 · 넘침 0 · 잘림 0 · 명암비 AA · 조작 부품 3:1 · 44px · 단추 누르기 · 복용 간격 · 복약 달력 · 홈 오늘약 · 어르신 소염제 · 소아 한도 · 계열 경고 · 어근 오인 · 내 정보 칸 · 화면 밝기 · 아이콘 전수 · 약 알림 · 어르신 모드 · 320px · 병용 8건 · 겹침 규칙 53 · 입력칸 이름표 · 성분 해석 123 · 죽은 규칙 0 · 약통 판정 4건 · 자기중복 3건 · 바구니 겹침 · 이중계산 0 · 검색 8건 · 구어 30건 · 문장 16건 · 새 약 검색 12건 · 하루 최대 표기 · 먹는/바르는 구분 · 영양제 질문 순서 · 인터넷 없이')
 
 if __name__ == '__main__':
     main()
