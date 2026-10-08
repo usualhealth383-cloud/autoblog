@@ -117,6 +117,9 @@ async def main():
         await signup(g, '외부학생', 'out1@test.kr')
         assert await g.evaluate('fullAccess()') is False
         await g.click('.tab[data-v="me"]'); await g.wait_for_timeout(200); await g.click('#goPlans'); await g.wait_for_timeout(300); await shot(g, 'l15_plans')
+        await g.click('[data-buy="m1"]'); await g.wait_for_timeout(300); sh = await txt(g, '.sheet')   # 웹: 스토어 결제가 없으니 학원 상담 → 이용권 코드 안내(2026-10-08)
+        assert '이용권 코드' in sh and '학원에 문의' in sh and 'Google Play)에서 할 수' not in sh, sh
+        await g.click('#sheetClose'); await g.wait_for_timeout(200)
         await g.fill('#passIn', 'NOPE00'); await g.click('#passGo'); await g.wait_for_timeout(200); assert '없는' in await txt(g, '.err')
         await g.fill('#passIn', pcode); await g.click('#passGo'); await g.wait_for_timeout(400); assert await g.evaluate('fullAccess()') is True, '이용권 등록 후에도 잠김'
         await g.fill('#passIn', pcode); await g.click('#passGo'); await g.wait_for_timeout(200); assert '이미' in await txt(g, '.err')
