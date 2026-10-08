@@ -45,7 +45,8 @@
 ## 카테고리·연락처
 - 카테고리: 의료 (Medical)
 - 태그: 약, 복용 알림, 영양제, 증상
-- 이메일: [A1 확인 필요]
+- 이메일: usualhealth383@gmail.com
+- 개발자 이름(콘솔 표시): 박민욱
 - 웹사이트: https://usualhealth383-cloud.github.io/autoblog/yakjido/
 - 개인정보처리방침: https://usualhealth383-cloud.github.io/autoblog/yakjido/privacy.html
 

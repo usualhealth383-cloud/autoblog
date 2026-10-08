@@ -1994,7 +1994,7 @@ function route(){
   catch (err) {
     try { console.error('화면 오류', path, err); } catch (e) {}
     html = `${topBar({ back:'홈' })}<section class="sec card" role="alert"><h2>이 화면을 열다가 문제가 생겼어요</h2>
-      <p style="margin-top:8px">약지도의 다른 화면은 그대로 쓰실 수 있어요. 홈으로 가시거나, 잠시 뒤 다시 열어 주세요. 같은 일이 반복되면 내 정보 맨 아래 문의처로 알려 주시면 고칠게요.</p>
+      <p style="margin-top:8px">약지도의 다른 화면은 그대로 쓰실 수 있어요. 홈으로 가시거나, 잠시 뒤 다시 열어 주세요. 같은 일이 반복되면 ${D.meta?.contact?.email ? `<a class="link" href="mailto:${esc(D.meta.contact.email)}?subject=${encodeURIComponent('약지도 화면 오류 ' + path)}">${esc(D.meta.contact.email)}</a>로` : '내 정보 맨 아래 문의처로'} 알려 주시면 고칠게요.</p>
       <div class="actions" style="margin-top:14px"><button class="btn" onclick="go('/home')">홈으로</button><button class="btn ghost" onclick="route()">다시 열기</button></div>
       <p class="small muted" style="margin-top:10px">화면: ${esc(path)}</p></section>`;
   }
@@ -6023,7 +6023,7 @@ function vMe(_, q){
       <div class="actions"><button class="btn ghost" onclick="wipeMe()">${I.x} 모두 지우기</button></div>
     </details>
   </section>
-  <section class="sec card"><h2>이 앱에 대해</h2><p class="small" style="margin-top:6px">${esc(D.meta?.about || '')}</p><p class="small muted" style="margin-top:10px">기록은 이 휴대폰에만 있어요 · <a class="link" href="${NATIVE ? esc((D.meta?.share?.app || 'https://usualhealth383-cloud.github.io/autoblog/yakjido/') + 'privacy.html') : 'privacy.html'}"${NATIVE ? ' target="_blank" rel="noopener"' : ''}>개인정보처리방침</a></p></section>
+  <section class="sec card"><h2>이 앱에 대해</h2><p class="small" style="margin-top:6px">${esc(D.meta?.about || '')}</p><p class="small muted" style="margin-top:10px">기록은 이 휴대폰에만 있어요 · <a class="link" href="${NATIVE ? esc((D.meta?.share?.app || 'https://usualhealth383-cloud.github.io/autoblog/yakjido/') + 'privacy.html') : 'privacy.html'}"${NATIVE ? ' target="_blank" rel="noopener"' : ''}>개인정보처리방침</a>${D.meta?.contact?.email ? `<br>문의 · <a class="link" href="mailto:${esc(D.meta.contact.email)}">${esc(D.meta.contact.email)}</a>${D.meta.contact.operator ? ` <span class="muted">(운영 ${esc(D.meta.contact.operator)})</span>` : ''}` : ''}</p></section>
   ${(q?.admin || (() => { try { return !!localStorage.getItem('yakjido.photo'); } catch (e) { return false; } })()) ? `<details class="why-more" style="margin-top:16px"><summary>관리자용 — 사진 서버</summary>
     <p class="small" style="margin-top:6px">사진 읽기(Gemini) 서버 주소예요. yakjido/server 를 배포한 뒤 붙여 넣으세요. 비워 두면 기본값(${esc(D.meta?.photoEndpoint || '없음')}).</p><div class="search" style="margin-top:10px">${I.link}<input id="ep" aria-label="사진 서버 주소" placeholder="https://<워커이름>.workers.dev" value="${esc((() => { try { return localStorage.getItem('yakjido.photo') || ''; } catch (e) { return ''; } })())}" onchange="try{localStorage.setItem('yakjido.photo',this.value.trim())}catch(e){};toast('저장했어요')"></div></details>` : ''}
   <p class="small muted" style="margin-top:16px;text-align:center">약지도 v${esc(D.meta?.version || '')} · 빌드 ${BUILD}<br>식약처 공공데이터 — e약은요 ${esc(String(D.public?.easy_source || '').match(/\d{8}/)?.[0] || '')} · 낱알식별 ${esc(String(D.public?.pills_source || '').match(/\d{8}/)?.[0] || '')} 기준</p>`;
