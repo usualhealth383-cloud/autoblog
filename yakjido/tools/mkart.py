@@ -30,8 +30,8 @@ for f in sorted((ROOT/'art').glob('*.webp')):
     art[f.stem] = 'data:image/webp;base64,' + base64.b64encode(f.read_bytes()).decode()
 # 미리보기(아티팩트)에서는 파일 내려받기가 막혀 있어 달력 파일 버튼을 안내 문구로 바꾼다 — 설치한 앱에서는 그대로 동작
 s = s.replace("onclick=\"downloadIcs()\">${I.clock} 받기</button>", "onclick=\"toast('달력 파일은 설치한 약지도 앱에서 받을 수 있어요')\">${I.clock} 앱에서</button>")
-# 아티팩트에는 privacy.html 파일이 없다 — 설치한 앱·웹에서만 열린다
-s = s.replace('<a class="link" href="privacy.html">개인정보처리방침</a>', '<a class="link" href="#/me" onclick="toast(\'개인정보처리방침은 설치한 약지도 앱에서 볼 수 있어요\');return false">개인정보처리방침</a>')
+# 아티팩트에는 privacy.html 파일이 없다 — 깃허브 페이지의 방침으로 연다
+s = s.replace('''<a class="link" href="${NATIVE ? esc((D.meta?.share?.app || 'https://usualhealth383-cloud.github.io/autoblog/yakjido/') + 'privacy.html') : 'privacy.html'}"${NATIVE ? ' target="_blank" rel="noopener"' : ''}>개인정보처리방침</a>''', '<a class="link" href="https://usualhealth383-cloud.github.io/autoblog/yakjido/privacy.html" target="_blank" rel="noopener">개인정보처리방침</a>')
 s = s.replace('<img src="art/${n}.webp"', '<img src="${ART_DATA[n] || ("art/" + n + ".webp")}"')
 # 아티팩트는 파일 하나라 서버가 없다 — 본문 자료(core.json)도 같이 심는다
 # 첫 화면 머리의 앱 표시(34px) — 아티팩트 호스트에는 icon-192.png 파일이 없어 깨진 그림이 나왔다(2026-09-23 현욱님 캡처)

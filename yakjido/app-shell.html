@@ -11,6 +11,25 @@
 <meta name="apple-mobile-web-app-title" content="약지도">
 <link rel="apple-touch-icon" href="icon-180.png">
 <link rel="icon" href="icon-192.png">
+<script>
+/* 오래된 안드로이드 웹뷰·브라우저(크롬 80 미만)는 아래 큰 묶음을 읽다 멈춰 흰 화면만 남긴다(2026-10-08 출시 점검).
+   이 조각은 옛 문법만 써서 어디서나 돌고, 4초 안에 본 묶음이 읽히지 않으면 안내문을 띄운다. */
+(function(){
+  function show(){
+    if (window.__YAKJIDO_OK__) return;
+    var ua = navigator.userAgent || '', android = /Android/i.test(ua);
+    var b = document.body; if (!b) return;
+    b.innerHTML = '<div style="font-family:system-ui,sans-serif;padding:40px 24px;max-width:420px;margin:0 auto;line-height:1.7;color:#1E2A30;word-break:keep-all">'
+      + '<div style="font-size:22px;font-weight:800;margin-bottom:12px">휴대폰의 인터넷 프로그램이 오래됐어요</div>'
+      + '<p style="font-size:17px;margin:0 0 20px">약지도를 열려면 ' + (android ? '「Android System WebView」와 「Chrome」을' : '브라우저를') + ' 최신으로 업데이트해 주세요. 1~2분이면 돼요.</p>'
+      + (android ? '<a href="https://play.google.com/store/apps/details?id=com.google.android.webview" style="display:block;background:#0B6E8F;color:#fff;text-decoration:none;text-align:center;padding:14px;border-radius:12px;font-weight:700;font-size:17px;margin-bottom:10px">WebView 업데이트</a>'
+        + '<a href="https://play.google.com/store/apps/details?id=com.android.chrome" style="display:block;background:#DCEFF5;color:#08526B;text-decoration:none;text-align:center;padding:14px;border-radius:12px;font-weight:700;font-size:17px">Chrome 업데이트</a>' : '')
+      + '<p style="font-size:14px;color:#5B6770;margin-top:20px">업데이트한 뒤 약지도를 다시 열어 주세요. 그래도 안 되면 가족에게 이 화면을 보여 주세요.</p></div>';
+  }
+  if (document.readyState === 'complete') setTimeout(show, 4000);
+  else window.addEventListener('load', function(){ setTimeout(show, 4000); });
+})();
+</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700;800&display=swap">
@@ -1537,6 +1556,7 @@ main>*:nth-child(2){animation-delay:.04s} main>*:nth-child(3){animation-delay:.0
 
 <script id="data" type="application/json"><!--DATA--></script>
 <script>
+window.__YAKJIDO_OK__ = true;   /* 여기까지 읽혔다 = 이 브라우저가 아래 문법(?. ?? 등)을 안다. 못 읽으면 머리의 안내문이 뜬다 */
 /* ───────── 데이터·유틸 ───────── */
 const D = JSON.parse(document.getElementById('data').textContent || '{}');
 const BUILD = '__BUILD__';
@@ -5993,7 +6013,7 @@ function vMe(_, q){
       <div class="actions"><button class="btn ghost" onclick="wipeMe()">${I.x} 모두 지우기</button></div>
     </details>
   </section>
-  <section class="sec card"><h2>이 앱에 대해</h2><p class="small" style="margin-top:6px">${esc(D.meta?.about || '')}</p><p class="small muted" style="margin-top:10px">기록은 이 휴대폰에만 있어요 · <a class="link" href="privacy.html">개인정보처리방침</a></p></section>
+  <section class="sec card"><h2>이 앱에 대해</h2><p class="small" style="margin-top:6px">${esc(D.meta?.about || '')}</p><p class="small muted" style="margin-top:10px">기록은 이 휴대폰에만 있어요 · <a class="link" href="${NATIVE ? esc((D.meta?.share?.app || 'https://usualhealth383-cloud.github.io/autoblog/yakjido/') + 'privacy.html') : 'privacy.html'}"${NATIVE ? ' target="_blank" rel="noopener"' : ''}>개인정보처리방침</a></p></section>
   ${(q?.admin || (() => { try { return !!localStorage.getItem('yakjido.photo'); } catch (e) { return false; } })()) ? `<details class="why-more" style="margin-top:16px"><summary>관리자용 — 사진 서버</summary>
     <p class="small" style="margin-top:6px">사진 읽기(Gemini) 서버 주소예요. yakjido/server 를 배포한 뒤 붙여 넣으세요. 비워 두면 기본값(${esc(D.meta?.photoEndpoint || '없음')}).</p><div class="search" style="margin-top:10px">${I.link}<input id="ep" aria-label="사진 서버 주소" placeholder="https://<워커이름>.workers.dev" value="${esc((() => { try { return localStorage.getItem('yakjido.photo') || ''; } catch (e) { return ''; } })())}" onchange="try{localStorage.setItem('yakjido.photo',this.value.trim())}catch(e){};toast('저장했어요')"></div></details>` : ''}
   <p class="small muted" style="margin-top:16px;text-align:center">약지도 v${esc(D.meta?.version || '')} · 빌드 ${BUILD}<br>식약처 공공데이터 — e약은요 ${esc(String(D.public?.easy_source || '').match(/\d{8}/)?.[0] || '')} · 낱알식별 ${esc(String(D.public?.pills_source || '').match(/\d{8}/)?.[0] || '')} 기준</p>`;
