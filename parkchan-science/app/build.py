@@ -68,6 +68,11 @@ if shutil.which('node'):
     with tempfile.NamedTemporaryFile('w', suffix='.js', delete=False, encoding='utf-8') as f: f.write(js)
     r = subprocess.run(['node', '--check', f.name], capture_output=True, text=True)
     if r.returncode: raise SystemExit('✗ 앱 스크립트 문법 오류 — 배포하지 않습니다\n' + r.stderr[-1500:])
+# 옛 폰 관문 — 2026-10-08: 정규식 뒤돌아보기(lookbehind)는 iOS 16.3 이하 사파리에서 '문법 오류'라 앱 스크립트 전체가 안 돈다(흰 화면).
+# node 는 통과시키므로 따로 막는다. 같은 까닭으로 클래스 static 블록(사파리 16.4+)도 막는다
+_old = [(k, m.start()) for k, rx in (('정규식 뒤돌아보기 (?<= (?<!', r'\(\?<[=!]'), ('클래스 static 블록', r'\bstatic\s*\{'))
+        for m in re.finditer(rx, '\n'.join(re.findall(r'<script[^>]*>([\s\S]*?)</script>', out)))]
+if _old: raise SystemExit('✗ 옛 아이폰(iOS 16.3 이하)에서 앱이 안 열리는 문법 — 배포하지 않습니다: ' + ', '.join(sorted({k for k, _ in _old})))
 if pages.exists():
     (pages / 'index.html').write_text(out, encoding='utf-8')
     for old in pages.glob('more-*.json'):

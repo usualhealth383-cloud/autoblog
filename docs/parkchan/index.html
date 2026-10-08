@@ -1581,6 +1581,9 @@ body.focus main{padding-bottom:calc(var(--fbh, var(--sab)) + 24px)}
 .dnav button{min-height:44px;padding:0 6px;border:none;background:none;font-family:inherit;font-size:var(--t-small);font-weight:700;color:var(--muted);cursor:pointer}
 .dnav button:disabled{opacity:.45;cursor:default}
 @media (prefers-reduced-motion: reduce){.pbar i,.ugh .chev{transition:none}.verdict.fb,.ck{animation:none}}
+/* 폰에서 입력 칸 글자는 16px 이상 — 2026-10-08: 아이폰 사파리는 16px 보다 작은 칸을 누르면 화면을 저절로 확대하고 되돌리지 않는다(15·13.5px 칸이 많았다).
+   손가락 기기에만 · 더 큰 칸(.big·제목 .ti)은 그대로 · 확대 막기(maximum-scale)는 쓰지 않는다(손가락 확대는 접근성) */
+@media (pointer:coarse){input:not([type=checkbox]):not([type=radio]):not([type=range]):not(.big):not(.ti),textarea,select,.ned input.ti.sm{font-size:16px!important}}
 </style>
 </head>
 <body>
@@ -3175,7 +3178,7 @@ async function renderToday(){
 function blankItems(c){
   const src = [...(c.steps || []).map(s => String(s.t || '').includes('{{') || plain(s.d).length < 28 ? `${s.t} — ${s.d}` : s.d), ...(c.body || [])].map(String);
   return Object.keys(c.blanks || {}).map(k => { const tok = `{{${k}}}`, para = src.find(x => x.includes(tok)) || '';
-    const ss = para.split(/(?<=[.?!])\s+/), i = Math.max(0, ss.findIndex(x => x.includes(tok)));
+    const ss = para.replace(/([.?!])\s+/g, '$1\u0000').split('\u0000'), i = Math.max(0, ss.findIndex(x => x.includes(tok)));
     let s = ss[i] || para; if (plain(s).length < 28){ if (ss[i + 1]) s += ' ' + ss[i + 1]; else if (i > 0) s = ss[i - 1] + ' ' + s; }
     return { k, a:c.blanks[k], s }; }); }
 const bkLine = s => rich(String(s).replace(/\{\{(.+?)\}\}/g, '\u0001$1\u0002')).replace(/\u0001(.+?)\u0002/g, (_, m) => `<span class="bkx">${m}</span>`);
@@ -3572,20 +3575,21 @@ let talkBoard = '전체', talkQ = '', postId = null, talkErr = '', poiOk = false
    — tools/testbed_security.py '규칙 맞춤'이 이 블록을 node 로 돌려 같은 문장 묶음의 판정이 서버와 같은지 본다.
    글에 섞이면 위험한 것: 주민등록번호는 막고(서버도 거절), 휴대전화는 가운데를 가려(010-****-5678) 올리고(서버가 가림),
    나머지(이메일·SNS 아이디·○동 ○호·'○○중 2학년 김○○')는 알리고 한 번 더 확인받는다. 닉네임에는 모두 안 된다.
-   \b 대신 (?<![0-9]) 를 쓴다 — 한글 옆 숫자를 JS 와 Postgres 가 다르게 끊어 판정이 갈렸다 */
+   \b 대신 (^|[^0-9]) 를 쓴다 — 한글 옆 숫자를 JS 와 Postgres 가 다르게 끊어 판정이 갈렸다.
+   정규식 뒤돌아보기(lookbehind)는 쓰지 않는다 — iOS 16.3 이하 사파리에서 앱 전체가 안 열린다(build.py 가 막음) */
 const SURNAMES = '김이박최정강조윤장임한오서신권황안송류유전홍고문양손배백허남심노하곽성차주우구민진나지엄채원천방공현함변염여추도소석선설마길연위표명기반라왕금옥육인맹제모탁국어은편용예경봉사부가복태목형피두감음빈동온호범좌팽승간상시갈';
 const PII_SRC = [
-  ['rrn',    '(?<![0-9])[0-9]{6}\\s*[-–]\\s*[1-4][0-9]{6}(?![0-9])', '주민등록번호', true],
-  ['phone',  '(?<![0-9])(01[016-9])[-. ]?([0-9]{3,4})[-. ]?([0-9]{4})(?![0-9])', '전화번호', false],
+  ['rrn',    '(?:^|[^0-9])[0-9]{6}\\s*[-–]\\s*[1-4][0-9]{6}(?![0-9])', '주민등록번호', true],
+  ['phone',  '(^|[^0-9])(01[016-9])[-. ]?([0-9]{3,4})[-. ]?([0-9]{4})(?![0-9])', '전화번호', false],
   ['email',  '[A-Za-z0-9_.+-]+@[A-Za-z0-9_-]+\\.[A-Za-z0-9_.]{2,}', '이메일 주소', false],
   ['sns',    '(카톡|카카오톡|오픈챗|오픈카톡|인스타|텔레그램)\\s*(아이디|[Ii][Dd])?\\s*[:：]?\\s*@?[A-Za-z0-9_.-]{3,}', 'SNS·메신저 아이디', false],
-  ['addr',   '(?<![0-9])[0-9]{1,3}\\s*동\\s*[0-9]{1,4}\\s*호', '집 주소로 보이는 표현', false],
+  ['addr',   '(?:^|[^0-9])[0-9]{1,3}\\s*동\\s*[0-9]{1,4}\\s*호', '집 주소로 보이는 표현', false],
   ['school', '[가-힣]{1,10}(초등학교|중학교|고등학교|초|중|고)\\s*[1-6]\\s*학년(\\s*[0-9]{1,2}\\s*반)?\\s*[%SUR%][가-힣]{1,2}'.replace('%SUR%', SURNAMES), '학교·학년과 이름', false],
 ];
 const PII = PII_SRC.map(([k, src, label, hard]) => [new RegExp(src), label, hard, k]);
 const PHONE_G = new RegExp(PII_SRC[1][1], 'g');
 /* 휴대전화 가운데 가리기 — 서버 private.pii_mask 와 같다(로컬 모드에서도 같은 모양으로 저장) */
-const piiMask = t => String(t ?? '').replace(PHONE_G, (m, a, b, c) => `${a}-****-${c}`);
+const piiMask = t => String(t ?? '').replace(PHONE_G, (m, p, a, b, c) => `${p}${a}-****-${c}`);
 /* 도움이 필요해 보이는 글(자해·자살 신호) — 서버의 private.care_hit() 와 같은 목록.
    막지 않는다. 쓰는 사람에게는 올리기 전에 상담 창구를 조용히 보여 주고, 원장님은 '먼저 살펴볼 글'로 본다.
    2026-10 보강: 청소년 은어 '뒤지고 싶'·'죽어야겠'·'태어나지 말았'·'살 의미가 없'(docs/11 §12-4 · 오탐 시험 함께)
@@ -3601,7 +3605,7 @@ const nickBad = nk => NICK_BAN.test(String(nk||'').replace(/[\s._\-·]/g, '').to
    과학 용어·일상어는 걸리지 않게: 시발점·씨 발라·씹어 먹다·미친 듯이·위기가 닥쳐오다·등신대·애자(절연체)·기생충·고자질·보지 못했다·허리띠를 졸라.
    아주 심한 욕은 띄어쓰기·점을 빼고 본다(느 금 마) */
 const ABUSE_HARD = new RegExp('(느금|니애미|니에미|니미럴|니미랄|애미(뒤|없|뒈)|애비(뒤|없|뒈)|엠창|좆|씹(새|년|창|할)|창녀)');
-const ABUSE_SOFT = new RegExp('((?<![가-힣])시발(?!점|역|택시|차)|씨발|씨빨|씨팔|시팔|ㅅㅂ|ㅆㅂ|ㅂㅅ|ㅄ|병신|븅신|빙신|병싄|(?<![가-힣])존나|개새(끼|기|키)|개색(기|히|끼)|개세(끼|기)|개쉐(이|키)|지랄|미친\\s*(놈|년|새끼|새기|새키|것|넘)|닥쳐(?!오|올|온|와|옴)|닥치라|또라이|돌아이|등신(?!대)|찐따|썅|틀딱|급식충|한남충|맘충|김치녀|짱깨|쪽바리|(?<![a-z])(fuck|shit|bitch|asshole|wtf))');
+const ABUSE_SOFT = new RegExp('((?:^|[^가-힣])시발(?!점|역|택시|차)|씨발|씨빨|씨팔|시팔|ㅅㅂ|ㅆㅂ|ㅂㅅ|ㅄ|병신|븅신|빙신|병싄|(?:^|[^가-힣])존나|개새(끼|기|키)|개색(기|히|끼)|개세(끼|기)|개쉐(이|키)|지랄|미친\\s*(놈|년|새끼|새기|새키|것|넘)|닥쳐(?!오|올|온|와|옴)|닥치라|또라이|돌아이|등신(?!대)|찐따|썅|틀딱|급식충|한남충|맘충|김치녀|짱깨|쪽바리|(?:^|[^a-z])(fuck|shit|bitch|asshole|wtf))');
 const abuseLevel = t => { const s = String(t||'').toLowerCase(); return ABUSE_HARD.test(s.replace(/[\s._\-·*]/g, '')) ? 2 : ABUSE_SOFT.test(s) ? 1 : 0; };
 /* @rules-end */
 /* 신고 사유 — 서버 reports.reason 과 같은 값(docs/11 §12-2). '친구가 걱정돼요'는 가리지 않고 원장님께 먼저 알린다 */
