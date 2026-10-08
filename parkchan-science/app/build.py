@@ -83,6 +83,7 @@ if pages.exists():
     for k, t, fn in (('terms', '이용약관', 'terms.html'), ('privacy', '개인정보처리방침', 'privacy.html'), ('delete', '계정·데이터 삭제 안내', 'delete-account.html')):
         (pages / fn).write_text(PAGE.format(t=t, b=legal[k]), encoding='utf-8')
     # 보호자 동의 페이지(자녀가 보낸 링크로 열림) — 서버 연결값만 심는다
+    (pages / 'guide.html').write_text((ROOT / 'app' / 'guide.html').read_text(encoding='utf-8').replace('<!--CONTACT-->', CONTACT), encoding='utf-8')   # 수강생·보호자 시작 안내(2026-10-08) — 문자로 링크만 보내면 된다
     consent = (ROOT / 'app' / 'consent.html').read_text(encoding='utf-8').replace('__SB_URL__', cfg.get('url', '')).replace('__SB_KEY__', cfg.get('anonKey', ''))
     (pages / 'consent.html').write_text(consent, encoding='utf-8')
     print(f'배포본 → {pages}/index.html')
