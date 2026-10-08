@@ -16,7 +16,7 @@
 | 항목 | 값 |
 |---|---|
 | 앱 ID | `kr.yakjido.app` |
-| 웹 소스 | `www/` ← `docs/yakjido/` 복사본 (`npm run web`, 서비스워커·매니페스트는 뺌) |
+| 웹 소스 | `www/` ← `docs/yakjido/` 복사본 (`npm run web`, 서비스워커·매니페스트와, 앱이 읽지 않는 중간 자료 `kpic-guide.json`·`kpic-extra.json` 20 MB 는 뺌 — 제품 화면은 `data/kg/` 조각만 읽는다) |
 | 아이콘·스플래시·상태바 아이콘 | `python3 yakjido/tools/make_native_icons.py` 가 **정본 `art/icon-1024.png`** 에서 만든다 |
 | 알림 코드 | `app-shell.html` 의 `nativeArm()` — 웹에서는 `NATIVE` 가 거짓이라 건너뛴다 |
 | 검사 | `tests/run.py` 의 「앱 알람」 — 가짜 휴대폰 알람 장치로 무엇을 거는지 본다 |
