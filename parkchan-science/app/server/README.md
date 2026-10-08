@@ -29,6 +29,8 @@
    **바로 이어서** `schema.sql` 맨 아래 ▼ 한 줄(`owner_uid`)의 `--` 를 지우고 실행 — 원장 계정을 id 로 못 박습니다. 이렇게 해 두면 누가 같은 이메일로 먼저 가입을 시도해도 원장이 될 수 없습니다(메일 인증을 실수로 꺼 둔 경우에도).
 6. **Project Settings → API** 의 `Project URL` 과 `anon public` 키를 `app/server/config.json` 에 넣습니다(`config.example.json` 참고).
 7. `python3 app/build.py` → `cd app-native && npm run sync` → APK 자동 빌드(Actions → android-apk).
+8. **점검(꼭)** — ① SQL Editor 에 `verify.sql` 을 통째로 붙여 Run → 1~11번이 모두 ✓(12~14번은 스토어 출시 때) ② 작업자가 `python3 tools/live_check.py --owner 원장이메일 --pages` → 끝 줄 `LIVE CHECK OK`.
+   손님 키로 표 23개가 한 줄도 안 읽히는지, 원장·학생 함수 25개가 막히는지, 메일 인증이 켜졌는지, 배포된 웹앱이 이 서버로 빌드됐는지를 봅니다(읽기만 — 실서버에 흔적을 남기지 않음).
 
 ## 결제 · 푸시 알림 (서버 연결 뒤, 한 번)
 앱 쪽 코드와 서버 함수(`functions/verify-purchase`, `functions/push`)는 다 되어 있습니다. 원장님 계정으로 켜는 일만 남았습니다.
