@@ -17,14 +17,16 @@ LAUNCH = {'executable_path': CHROME} if os.path.exists(CHROME) else {}   # 다�
 
 SENIOR = {'age': 'senior', 'easy': False, 'taking': ['cls:bp.ccb', 'acetaminophen', 'magnesium-oxide'], 'prn': {'acetaminophen': True},
           'sched': {'cls:bp.ccb': ['08:00'], 'magnesium-oxide': ['08:00', '19:00']},
-          'prnLog': {'2026-09-29': [{'id': 'acetaminophen', 't': '08:10'}]}, 'taken': {'2026-09-29': ['cls:bp.ccb@08:00']}, 'pub': {}}
+          'prnLog': {'2026-10-08': [{'id': 'acetaminophen', 't': '08:10'}]}, 'taken': {'2026-10-08': ['cls:bp.ccb@08:00']}, 'pub': {}}
 SHOTS = [
     ('01-home', '/home', SENIOR, '어디가 불편하세요?', '증상을 고르면 약국에서 무엇을 찾을지 알려 드려요'),
     ('02-symptom', '/symptom/cold', SENIOR, '증상에 맞는 약, 의사가 고르듯', '성분·용량·주의할 점을 쉬운 말로'),
-    ('03-together', '/symptom/arthritis', {**SENIOR, 'taking': ['cls:blood.warf', 'cls:bp.ccb']}, '드시는 약과 겹치면 먼저 알려요', '와파린·혈압약과 진통제처럼 조심할 조합', '.ixline, .ix-h', 120),
-    ('04-schedule', '/schedule', SENIOR, '앱을 닫아도 약 시간에 울려요', '먹었어요 · 10분 뒤 다시 · 약 떨어지기 전 알림', '.dose-list', 70),
+    ('03-together', '/symptom/arthritis', {**SENIOR, 'taking': ['cls:blood.warf', 'cls:bp.ccb']}, '드시는 약과 겹치면 먼저 알려요', '와파린·혈압약과 진통제처럼 조심할 조합', '.ixline, .ix-h', 70),
+    ('04-schedule', '/schedule', SENIOR, '앱을 닫아도 약 시간에 울려요', '먹었어요 · 10분 뒤 다시 · 약 떨어지기 전 알림', 'h2:has-text("오늘")', 20),
     ('05-kids', '/kids', {'age': 'child', 'child': {'weight': '14', 'birth': '2023-03-01', 'name': '아이'}, 'taking': [], 'pub': {}}, '아이 해열제, 몸무게로 mL까지', '아세트아미노펜·이부프로펜 시럽 용량 계산', 'text=/mL · 한 번에/', 150),
     ('06-pill', '/pill', SENIOR, '모르는 알약, 모양으로 찾아요', '식약처 낱알식별 자료로 색·모양·글자 검색'),
+    ('07-supp', '/supp/iron', {**SENIOR, 'sw': {'s': 'f', 'a': 3}}, '영양제, 어떤 음식에 얼마나', '한 접시에 든 양과 나이·성별에 맞는 하루 필요량', '.sq', 225),
+    ('08-bag', '/bag', {**SENIOR, 'taking': ['cls:bp.ccb', 'acetaminophen', 'coldaewon']}, '내 약통 한 장, 겹치면 바로 알려요', '종합감기약 속 성분과 타이레놀이 겹치는 것까지', '.show-big.warn', 150),
 ]
 
 def serve():
@@ -53,7 +55,7 @@ def main():
         br = pw.chromium.launch(**LAUNCH)
         for name, route, me, h, p, *focus in SHOTS:
             pg = br.new_page(viewport={'width': 360, 'height': 700}, device_scale_factor=3)
-            pg.clock.install(time='2026-09-29T09:30:00')
+            pg.clock.install(time='2026-10-08T09:30:00')
             pg.add_init_script("localStorage.setItem('yakjido.hello.v1','1');localStorage.setItem('yakjido.me.v1'," + json.dumps(json.dumps(me)) + ")")
             pg.goto(url + '#' + route); pg.wait_for_selector('.app', timeout=15000); pg.wait_for_timeout(1800)
             if focus:                                        # 그 화면의 핵심(경고·오늘 목록·mL)이 첫 화면에 오게
