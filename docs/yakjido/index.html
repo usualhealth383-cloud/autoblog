@@ -1987,7 +1987,16 @@ function route(){
     else { view.innerHTML = topBar({ back:'뒤로', nosearch:true }) + `<section class="sec"><p class="loading">자료를 불러오는 중이에요…</p></section>`; ensureDetail().then(route); return; }
   }
   const R = { send:vSend, p:vParentShare, show:vShow, check:vCheck, home:vHome, symptom:vSymptom, drugs:vDrugs, drug:vDrug, class:vClass, search:vSearch, pub:vPub, pill:vPill, guide:vGuide, kids:vKids, tips:vTips, myths:vMyths, schedule:vSchedule, photo:vPhoto, pillinfo:vPillInfo, supp:vSupp, compare:vCompare, me:vMe, about:vAbout, ingr:vIngr, brand:vBrand, nut:vNut, hello:vHello, mix:vMix, together:vTogether, kinds:vKinds, bag:vBag, rxout:vRxOut, senior:vSenior, askdoc:vAskDoc, vitals:vVitals, visits:vVisits };
-  const html = (R[seg[0]] || vHome)(seg[1], q);
+  /* 한 화면이 그리다 터져도 앱 전체가 멈춘 것처럼 보이지 않게 — 자료 한 줄의 흠이 흰 화면이 되지 않도록(2026-10-08 출시 점검) */
+  let html;
+  try { html = (R[seg[0]] || vHome)(seg[1], q); }
+  catch (err) {
+    try { console.error('화면 오류', path, err); } catch (e) {}
+    html = `${topBar({ back:'홈' })}<section class="sec card" role="alert"><h2>이 화면을 열다가 문제가 생겼어요</h2>
+      <p style="margin-top:8px">약지도의 다른 화면은 그대로 쓰실 수 있어요. 홈으로 가시거나, 잠시 뒤 다시 열어 주세요. 같은 일이 반복되면 내 정보 맨 아래 문의처로 알려 주시면 고칠게요.</p>
+      <div class="actions" style="margin-top:14px"><button class="btn" onclick="go('/home')">홈으로</button><button class="btn ghost" onclick="route()">다시 열기</button></div>
+      <p class="small muted" style="margin-top:10px">화면: ${esc(path)}</p></section>`;
+  }
   const panel = gqPanel();
   view.innerHTML = panel ? insertPanel(html, panel) : html;
   psSwap(view);

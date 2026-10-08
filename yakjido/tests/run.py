@@ -906,11 +906,21 @@ def main():
             if len(_t) < 200 or '불러오는 중' in _t: fails.append(f'인터넷 없이 {_r}: 화면이 비었거나 「불러오는 중」에 멈춥니다')
         if _oerr: fails.append(f'인터넷 없이 JS 오류: {_oerr[:2]}')
         _oc.close()
+        # 9d. 한 화면이 그리다 터지면 흰 화면이 아니라 「문제가 생겼어요」 카드 + 홈으로 단추(2026-10-08)
+        pg.goto(url + '#/home'); pg.reload(); ready(); pg.wait_for_timeout(500); _e9 = []
+        pg.on('pageerror', lambda e: _e9.append(str(e)))
+        pg.evaluate("()=>{ window.__vAboutKeep = vAbout; vAbout = () => { throw new Error('시험용 오류'); }; }")
+        pg.goto(url + '#/about'); pg.wait_for_timeout(500)
+        _t9 = pg.inner_text('#view')
+        if '문제가 생겼어요' not in _t9 or '홈으로' not in _t9: fails.append('화면이 터졌을 때 안내 카드가 안 뜹니다')
+        if _e9: fails.append(f'화면이 터졌을 때 오류가 밖으로 샙니다: {_e9[:1]}')
+        pg.evaluate("()=>{ vAbout = window.__vAboutKeep; }"); pg.goto(url + '#/about'); pg.wait_for_timeout(400)
+        if '문제가 생겼어요' in pg.inner_text('#view'): fails.append('화면 오류 카드가 복구 뒤에도 남습니다')
         br.close()
     print(f'화면 {len(routes)}개 검사 완료')
     if fails:
         print('실패', len(fails)); [print('  ✗', f) for f in fails]; sys.exit(1)
-    print('✓ 전부 통과 — JS 오류 0 · 넘침 0 · 잘림 0 · 명암비 AA · 조작 부품 3:1 · 44px · 단추 누르기 · 복용 간격 · 복약 달력 · 홈 오늘약 · 어르신 소염제 · 소아 한도 · 계열 경고 · 어근 오인 · 내 정보 칸 · 화면 밝기 · 아이콘 전수 · 약 알림 · 어르신 모드 · 320px · 병용 8건 · 겹침 규칙 53 · 입력칸 이름표 · 성분 해석 123 · 죽은 규칙 0 · 약통 판정 4건 · 자기중복 3건 · 바구니 겹침 · 이중계산 0 · 검색 8건 · 구어 30건 · 문장 16건 · 새 약 검색 12건 · 하루 최대 표기 · 먹는/바르는 구분 · 영양제 질문 순서 · 인터넷 없이')
+    print('✓ 전부 통과 — JS 오류 0 · 넘침 0 · 잘림 0 · 명암비 AA · 조작 부품 3:1 · 44px · 단추 누르기 · 복용 간격 · 복약 달력 · 홈 오늘약 · 어르신 소염제 · 소아 한도 · 계열 경고 · 어근 오인 · 내 정보 칸 · 화면 밝기 · 아이콘 전수 · 약 알림 · 어르신 모드 · 320px · 병용 8건 · 겹침 규칙 53 · 입력칸 이름표 · 성분 해석 123 · 죽은 규칙 0 · 약통 판정 4건 · 자기중복 3건 · 바구니 겹침 · 이중계산 0 · 검색 8건 · 구어 30건 · 문장 16건 · 새 약 검색 12건 · 하루 최대 표기 · 먹는/바르는 구분 · 영양제 질문 순서 · 인터넷 없이 · 화면 오류 카드')
 
 if __name__ == '__main__':
     main()
