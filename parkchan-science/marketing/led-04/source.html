@@ -1,0 +1,28 @@
+<!doctype html><html lang="ko"><head><meta charset="utf-8"><style>
+@font-face{font-family:S;font-weight:800;src:url(file:///root/.fonts/static/NotoSansKR-800.ttf)}
+@font-face{font-family:S;font-weight:900;src:url(file:///root/.fonts/static/NotoSansKR-900.ttf)}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#333;font-family:S,sans-serif}
+.b{width:1800px;height:600px;background:#000;display:flex;flex-direction:column;overflow:hidden}
+.r{display:flex;align-items:center;justify-content:center;padding:0 36px}
+.r1{flex:0 0 312px;padding-top:14px}.r2{flex:0 0 150px}.r3{flex:1;padding-bottom:22px;padding-top:6px;gap:26px;justify-content:space-between}
+.fit{white-space:nowrap;font-weight:900;line-height:1}
+.nm{letter-spacing:-.045em;color:#FFE600}.nm b{color:#fff}.nm i{font-style:normal;font-size:.72em;letter-spacing:-.03em;margin-left:.04em}
+.rec{letter-spacing:-.03em;color:#fff}.rec em{font-style:normal;color:#FFE600}
+.chips{flex:1;display:flex;gap:18px;height:96px}
+.chips span{flex:1;display:grid;place-items:center;font-weight:900;font-size:52px;line-height:1;color:#FFE600;border:6px solid #FFE600;border-radius:14px;white-space:nowrap;letter-spacing:-.02em}
+.tel{color:#FFE600;letter-spacing:-.02em}.tel small{font-size:.86em;color:#fff;margin-right:.18em}
+</style></head><body>
+<section class="b" id="d1">
+  <div class="r r1"><div class="fit nm" data-w="1728" data-h="262"><b>박찬</b>통합과학<i>학원</i></div></div>
+  <div class="r r2"><div class="fit rec" data-w="1728" data-h="140">고1 예비 (현 중3) 수강생 <em>모집!</em></div></div>
+  <div class="r r3"><div class="chips"><span>중등부</span><span>고1 예비</span><span>고1 내신</span><span>고3 수능</span></div><div class="fit tel" data-w="640" data-h="112"><small>T.</small>213-3577</div></div>
+</section>
+<script>
+Promise.all([document.fonts.load('900 100px S'), document.fonts.load('800 100px S')]).then(() => {
+  document.querySelectorAll('.fit').forEach(el => { const W = +el.dataset.w, H = +el.dataset.h; let lo = 10, hi = 600;
+    for (let k = 0; k < 30; k++) { const m = (lo + hi) / 2; el.style.fontSize = m + 'px'; const r = el.getBoundingClientRect();
+      (r.width <= W && r.height <= H) ? lo = m : hi = m; }
+    el.style.fontSize = lo + 'px'; });
+  document.body.dataset.ok = 1; });
+</script></body></html>
