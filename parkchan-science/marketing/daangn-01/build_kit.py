@@ -20,6 +20,7 @@ PROFILE = [
  ("주소", "대구 달서구 조암로 25 그루빌딩 501호"),
  ("주소 상세 · 찾아오는 길", "월성 CGV 옆 그루빌딩 5층"),
  ("전화번호", "053-213-3577"),
+ ("홈페이지 · 블로그", "https://blog.naver.com/parkchan3577"),
  ("영업시간 · 상담 시간", "매일(월~일) 오후 2시 ~ 오후 10시"),
 ]
 PRICES = [
@@ -119,8 +120,8 @@ def cp(label, text, big=False):
 h = []
 h.append('<section class="box"><h2>① 비즈프로필 채우기</h2>' + ''.join(cp(k, v, k == "소개글") for k, v in PROFILE) +
          '<div class="fld"><div class="lab">가격(메뉴) — 네 줄 각각 등록</div>' + ''.join(f'<div class="price"><span>{html.escape(a)}</span><b>{b}</b><button class="cp" data-text="{html.escape(a)} {b}">복사</button></div>' for a, b in PRICES) + '</div>'
-         '<div class="fld"><div class="lab">프로필 사진 · 매장 사진</div><div class="imgs"><figure><img src="images/00_profile.png" alt="프로필 사진 — 박찬 통합과학 학원 글자 로고"><figcaption>프로필 사진(원형으로 잘림)</figcaption></figure><figure><img src="images/photo_sign.png" alt="학원 외벽 간판"><figcaption>매장 사진 · 간판</figcaption></figure><figure><img src="images/photo_banner.png" alt="학원 입구 배너"><figcaption>매장 사진 · 입구</figcaption></figure></div>'
-         '<p class="note">매장 사진은 5장 이상이 좋습니다 — 원장님 폰으로 <b>강의실 · 수업 영상 시청 공간 · 교재 책상</b> 3장을 더 찍어 넣어 주십시오(학생 얼굴은 나오지 않게).</p></div></section>')
+         '<div class="fld"><div class="lab">프로필 사진 · 매장 사진</div><div class="imgs"><figure><img src="images/00_profile.png" alt="프로필 사진 — 박찬 통합과학 글자 로고"><figcaption>프로필 사진(네이버 블로그와 같음)</figcaption></figure><figure><img src="images/photo_sign_front.jpg" alt="학원 간판과 고1 예비생 모집 현수막"><figcaption>매장 사진 · 간판 정면(첫 장으로)</figcaption></figure><figure><img src="images/photo_sign.png" alt="학원 외벽 간판"><figcaption>매장 사진 · 간판</figcaption></figure><figure><img src="images/photo_banner.png" alt="학원 입구 배너"><figcaption>매장 사진 · 입구</figcaption></figure></div>'
+         '<p class="note">매장 사진은 5장 이상이 좋습니다 — 간판 정면을 첫 장으로 두고, 원장님 폰으로 <b>강의실 · 수업 영상 시청 공간 · 교재 책상</b> 3장을 더 찍어 넣어 주십시오(학생 얼굴은 나오지 않게).</p></div></section>')
 h.append('<section class="box"><h2>② 쿠폰 만들기</h2>' + ''.join(cp(k, v) for k, v in COUPON) + '</section>')
 nh = ''.join(f'<article class="news"><div class="when">소식 {i} · {d}</div><div class="imgs">' + ''.join(f'<figure><img src="images/{im}" alt="소식 {i} 사진 {k+1}"></figure>' for k, im in enumerate(ims)) +
              f'</div>{cp("글", body + chr(10) + chr(10) + FEE, True)}</article>' for i, (d, ims, body) in enumerate(NEWS, 1))
