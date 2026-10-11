@@ -1,5 +1,20 @@
 import html, sys, re
 D = sys.argv[1]
+
+import re as _re
+_ALLOWED = set("~!@#$%^&*()<>-_+=\\₩:;,.?/\"' ")
+def safe(t):
+    # 당근 입력 칸은 ~!@#$%^&*()<>-_+=\₩:;,.?/"' 외 특수문자를 막는다
+    t = t.replace('①', '1)').replace('②', '2)').replace('③', '3)').replace('④', '4)')
+    t = t.replace(' — ', ' - ').replace('—', '-').replace('–', '-')
+    t = _re.sub(r'(?m)^(\s*)· ', r'\1- ', t)          # 줄머리 가운뎃점 → 하이픈
+    t = _re.sub(r'(\d)·(\d)', r'\1, \2', t)          # 1·2 → 1, 2
+    t = t.replace(' · ', ', ').replace('·', ', ')
+    t = t.replace('›', '>').replace('|', ',').replace('…', '...').replace('’', "'").replace('‘', "'").replace('“', '"').replace('”', '"')
+    return t
+def bad_chars(t):
+    return sorted({c for c in t if not (c.isalnum() or c in _ALLOWED or c in '\n\t' or '\uac00' <= c <= '\ud7a3')})
+
 FEE = "남교입 제2019-115호 · 고1 예비반 교습비 월 317,000원(주 2회 · 월 1,303분)"
 PROFILE = [
  ("업체 이름", "박찬 통합과학 학원"),
@@ -11,7 +26,7 @@ PROFILE = [
 · 개념과 원리 위주의 이해 중심 강의
 · 기초가 부족한 학생을 위한 특별 보충 수업
 · 사고력 · 응용력 향상을 돕는 문제 풀이
-· 동영상으로 보강하는 수업 — 결석한 날도 학원에서 보강
+· 동영상으로 보강하는 수업 (결석한 날도 학원에서 보강)
 
 반: 중등부 · 고1 예비 · 고1 내신 · 고3 수능
 일주일 무료 수강 후 등록을 결정하실 수 있습니다.
@@ -115,11 +130,12 @@ ADS = [
  ("ad_C_free.png", "먼저 일주일 들어 보십시오", "고1 예비반 무료 수강 · 11월 3일 · 4일 개강"),
 ]
 def cp(label, text, big=False):
+    text = safe(text)
     t = html.escape(text)
     return f'<div class="fld"><div class="lab">{html.escape(label)}<button class="cp" data-text="{html.escape(text, quote=True)}">복사</button></div><div class="val{" big" if big else ""}">{t}</div></div>'
 h = []
 h.append('<section class="box"><h2>① 비즈프로필 채우기</h2>' + ''.join(cp(k, v, k == "소개글") for k, v in PROFILE) +
-         '<div class="fld"><div class="lab">가격(메뉴) — 네 줄 각각 등록</div>' + ''.join(f'<div class="price"><span>{html.escape(a)}</span><b>{b}</b><button class="cp" data-text="{html.escape(a)} {b}">복사</button></div>' for a, b in PRICES) + '</div>'
+         '<div class="fld"><div class="lab">가격(메뉴) — 네 줄 각각 등록</div>' + ''.join(f'<div class="price"><span>{html.escape(safe(a))}</span><b>{b}</b><button class="cp" data-text="{html.escape(safe(a))} {b}">복사</button></div>' for a, b in PRICES) + '</div>'
          '<div class="fld"><div class="lab">프로필 사진 · 매장 사진</div><div class="imgs"><figure><img src="images/00_profile.png" alt="프로필 사진 — 박찬 통합과학 글자 로고"><figcaption>프로필 사진(네이버 블로그와 같음)</figcaption></figure><figure><img src="images/photo_sign_front.jpg" alt="학원 간판과 고1 예비생 모집 현수막"><figcaption>매장 사진 · 간판 정면(첫 장으로)</figcaption></figure><figure><img src="images/photo_sign.png" alt="학원 외벽 간판"><figcaption>매장 사진 · 간판</figcaption></figure><figure><img src="images/photo_banner.png" alt="학원 입구 배너"><figcaption>매장 사진 · 입구</figcaption></figure></div>'
          '<p class="note">매장 사진은 5장 이상이 좋습니다 — 간판 정면을 첫 장으로 두고, 원장님 폰으로 <b>강의실 · 수업 영상 시청 공간 · 교재 책상</b> 3장을 더 찍어 넣어 주십시오(학생 얼굴은 나오지 않게).</p></div></section>')
 h.append('<section class="box"><h2>② 쿠폰 만들기</h2>' + ''.join(cp(k, v) for k, v in COUPON) + '</section>')
@@ -141,3 +157,6 @@ for i, (d, ims, body) in enumerate(NEWS, 1): md += ['', f'### 소식 {i} · {d} 
 md += ['', '## 광고'] + [f'- {im} — 제목: {t} / 본문: {b}' for im, t, b in ADS]
 open(D + '/content.md', 'w', encoding='utf-8').write('\n'.join(md) + '\n')
 print('ok')
+_all = [safe(v) for _, v in PROFILE + COUPON] + [safe(a) for a, _ in PRICES] + [safe(n[2] + chr(10) + FEE) for n in NEWS] + [safe(x) for a in ADS for x in a[1:]]
+_bad = sorted({c for t in _all for c in bad_chars(t)})
+print('당근 금지 문자:', _bad if _bad else '없음')
