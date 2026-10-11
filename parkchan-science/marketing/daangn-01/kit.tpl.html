@@ -1,0 +1,37 @@
+<title>박찬 통합과학 당근 묶음</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap">
+<style>
+:root{--bg:#FFF6EE;--card:#FFFFFF;--ink:#2A2A2A;--body:#4C4C4C;--muted:#8A7E72;--line:#F0E1D2;--brand:#FF6F0F;--brand-ink:#FFFFFF;--soft:#FFF0E4;--navy:#24406F}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg:#17181B;--card:#212226;--ink:#EEE8E1;--body:#CFC7BE;--muted:#A59A8E;--line:#34353B;--brand:#FF8A3D;--brand-ink:#17181B;--soft:#2B2621;--navy:#C9D4EA;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#17181B;--card:#212226;--ink:#EEE8E1;--body:#CFC7BE;--muted:#A59A8E;--line:#34353B;--brand:#FF8A3D;--brand-ink:#17181B;--soft:#2B2621;--navy:#C9D4EA;color-scheme:dark}
+body{background:var(--bg);color:var(--ink);font-family:'Noto Sans KR',system-ui,sans-serif;word-break:keep-all;line-height:1.7;padding:0 16px}
+.wrap{max-width:680px;margin:0 auto;padding-block:26px 64px;display:grid;gap:18px}
+.box{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:22px 20px}
+h1{font-size:22px;line-height:1.45;margin:0 0 4px;color:var(--ink);text-wrap:balance}h1 span{color:var(--brand)}
+.sub{font-size:14px;color:var(--muted);margin:0}
+h2{font-size:17px;margin:0 0 14px;color:var(--ink)}
+.fld{padding:12px 0;border-top:1px solid var(--line)}.box h2+.fld{border-top:none;padding-top:0}
+.lab{display:flex;align-items:center;justify-content:space-between;gap:10px;font-size:13px;font-weight:700;color:var(--muted);margin-bottom:6px}
+.val{font-size:15px;color:var(--ink);white-space:pre-wrap}.val.big{background:var(--soft);border-radius:10px;padding:12px 14px;font-size:14.5px;line-height:1.75}
+button.cp{flex:0 0 auto;min-height:36px;padding:0 14px;border-radius:999px;border:none;background:var(--brand);color:var(--brand-ink);font:700 13.5px 'Noto Sans KR',sans-serif;cursor:pointer}
+.price{display:flex;align-items:center;gap:10px;padding:6px 0;font-size:14.5px}.price span{flex:1;min-width:0}.price b{font-variant-numeric:tabular-nums;white-space:nowrap}
+.imgs{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;margin:6px 0 4px}
+figure{margin:0}figure img{width:100%;max-width:100%;height:auto;display:block;border-radius:10px;border:1px solid var(--line)}
+figcaption{font-size:12px;color:var(--muted);margin-top:4px}
+figure.one{max-width:340px;margin-bottom:6px}
+.news{padding:14px 0;border-top:1px dashed var(--line)}
+.when{font-weight:900;font-size:15px;color:var(--brand);margin-bottom:8px}
+.note{font-size:13px;color:var(--muted);margin:6px 0 10px}.note b{color:var(--ink)}
+ol.how{margin:0;padding-left:20px;font-size:14.5px;color:var(--body)}ol.how li{margin-bottom:6px}ol.how b{color:var(--ink)}
+</style>
+<div class="wrap">
+<section class="box"><h1>박찬 통합과학 · <span>당근</span> 올리기 묶음</h1><p class="sub">비즈프로필 · 쿠폰 · 소식 6편(10/13~10/30) · 광고 그림 3종 — 칸마다 '복사'를 눌러 그대로 붙여 넣으면 됩니다</p></section>
+<section class="box"><h2>순서</h2>%ORDER%</section>
+%BODY%
+</div>
+<script>
+document.addEventListener('click', async e => { const b = e.target.closest('button.cp'); if (!b) return; const t = b.dataset.text, old = b.textContent;
+  try { await navigator.clipboard.writeText(t); b.textContent = '복사됨'; }
+  catch (_) { const v = b.closest('.fld,.price').querySelector('.val,span'); const r = document.createRange(); r.selectNodeContents(v); const s = getSelection(); s.removeAllRanges(); s.addRange(r); b.textContent = '선택됨 · 길게 눌러 복사'; }
+  setTimeout(() => b.textContent = old, 1600); });
+</script>
