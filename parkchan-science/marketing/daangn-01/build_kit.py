@@ -120,7 +120,6 @@ def cp(label, text, big=False):
 h = []
 h.append('<section class="box"><h2>① 비즈프로필 채우기</h2>' + ''.join(cp(k, v, k == "소개글") for k, v in PROFILE) +
          '<div class="fld"><div class="lab">가격(메뉴) — 네 줄 각각 등록</div>' + ''.join(f'<div class="price"><span>{html.escape(a)}</span><b>{b}</b><button class="cp" data-text="{html.escape(a)} {b}">복사</button></div>' for a, b in PRICES) + '</div>'
-         '<div class="fld"><div class="lab">교습비 안내 그림 — 매장 사진 마지막 장 또는 가격 사진으로</div><figure class="one"><img src="images/fee_info.png" alt="교습비 안내 — 남교입 제2019-115호, 과정별 월 총 교습시간과 교습비"></figure></div>'
          '<div class="fld"><div class="lab">프로필 사진 · 매장 사진</div><div class="imgs"><figure><img src="images/00_profile.png" alt="프로필 사진 — 박찬 통합과학 글자 로고"><figcaption>프로필 사진(네이버 블로그와 같음)</figcaption></figure><figure><img src="images/photo_sign_front.jpg" alt="학원 간판과 고1 예비생 모집 현수막"><figcaption>매장 사진 · 간판 정면(첫 장으로)</figcaption></figure><figure><img src="images/photo_sign.png" alt="학원 외벽 간판"><figcaption>매장 사진 · 간판</figcaption></figure><figure><img src="images/photo_banner.png" alt="학원 입구 배너"><figcaption>매장 사진 · 입구</figcaption></figure></div>'
          '<p class="note">매장 사진은 5장 이상이 좋습니다 — 간판 정면을 첫 장으로 두고, 원장님 폰으로 <b>강의실 · 수업 영상 시청 공간 · 교재 책상</b> 3장을 더 찍어 넣어 주십시오(학생 얼굴은 나오지 않게).</p></div></section>')
 h.append('<section class="box"><h2>② 쿠폰 만들기</h2>' + ''.join(cp(k, v) for k, v in COUPON) + '</section>')
