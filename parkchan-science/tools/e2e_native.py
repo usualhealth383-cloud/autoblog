@@ -19,7 +19,7 @@ document.addEventListener('DOMContentLoaded', () => new MutationObserver(ms => m
 const L = {};
 window.Capacitor = { isNativePlatform: () => true, getPlatform: () => 'android', Plugins: {
   NativePurchases: {
-    getProducts: async ({ productIdentifiers }) => ({ products: productIdentifiers.map(id => ({ identifier:id, title:id, priceString:{ pass_m1:'₩9,900', pass_m6:'₩49,000', pass_y1:'₩79,000' }[id] })) }),
+    getProducts: async ({ productIdentifiers }) => ({ products: productIdentifiers.map(id => ({ identifier:id, title:id, priceString:{ pass_m1:'₩9,900', pass_m6:'₩39,000', pass_y1:'₩59,000' }[id] })) }),
     purchaseProduct: async (o) => { window.__iap.calls.push(o); if (window.__iap.next === 'CANCEL') throw new Error('User cancelled');
       const t = window.__iap.next; const r = { productIdentifier:o.productIdentifier, purchaseToken:t, transactionId:'GPA.'+t }; window.__iap.purchases.push(r); return r; },
     getPurchases: async () => ({ purchases: window.__iap.purchases }),
@@ -64,7 +64,7 @@ async def main():
             uid = await s.evaluate('ACC.id')
             # ① 스토어 가격 표시 → 1년 이용권 결제
             await s.click('.tab[data-v="me"]'); await s.wait_for_timeout(300); await s.click('#goPlans'); await s.wait_for_timeout(900)
-            assert '₩79,000 · 구매' in await s.locator('#v-plans').inner_text(), '스토어 가격이 안 보임'
+            assert '₩59,000 · 구매' in await s.locator('#v-plans').inner_text(), '스토어 가격이 안 보임'
             await s.screenshot(path=f'{SC}/n01_plans_store_price.png', full_page=True)
             await s.evaluate("__iap.next = 'CANCEL'"); await s.click('[data-buy="y1"]'); await s.wait_for_timeout(500)
             assert await s.locator('#sheetBg').count() == 0 and await s.evaluate('hasPass()') is False, '사용자가 취소했는데 오류 창이 뜨거나 열림'
