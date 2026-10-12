@@ -117,10 +117,13 @@ sw = ROOT / 'sw.js'
 if sw.exists():
     s = re.sub(r"const CACHE = '[^']*'", f"const CACHE = 'yakjido-{stamp}-{abs(hash(j)) % 10000}'", sw.read_text(encoding='utf-8'))
     (pages / 'sw.js').write_text(s, encoding='utf-8')
-for name in ('manifest.webmanifest', 'privacy.html'):   # privacy.html = 스토어에 적는 개인정보처리방침 주소
+for name in ('manifest.webmanifest', 'privacy.html', 'delete-account.html', 'srv.js'):   # delete-account.html = 스토어 「계정 삭제 URL」(메디나눔 안내 2026-10-13)   # srv.js = 계정·기록 이어 두기(따로 받는 파일)   # privacy.html = 스토어에 적는 개인정보처리방침 주소
     src = ROOT / name
     if src.exists():
         (pages / name).write_text(src.read_text(encoding='utf-8'), encoding='utf-8')
+# 메디나눔 공통 이름(privacy-<앱>.html · delete-account-<앱>.html)으로도 같은 쪽을 둔다 — 옛 주소(privacy.html)는 스토어에 이미 적혀 있어 그대로 둔다
+for name, alias in (('privacy.html', 'privacy-yakjido.html'), ('delete-account.html', 'delete-account-yakjido.html')):
+    if (pages / name).exists(): (pages / alias).write_text((pages / name).read_text(encoding='utf-8'), encoding='utf-8')
 for ic in (ROOT / 'icons').glob('*'):
     (pages / ic.name).write_bytes(ic.read_bytes())
 

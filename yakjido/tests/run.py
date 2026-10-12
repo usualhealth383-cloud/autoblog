@@ -916,11 +916,36 @@ def main():
         if _e9: fails.append(f'화면이 터졌을 때 오류가 밖으로 샙니다: {_e9[:1]}')
         pg.evaluate("()=>{ vAbout = window.__vAboutKeep; }"); pg.goto(url + '#/home'); pg.wait_for_timeout(200); pg.goto(url + '#/about'); pg.wait_for_timeout(400)   # 같은 주소로는 다시 그리지 않으니 홈을 거쳐 온다
         if '문제가 생겼어요' in pg.inner_text('#view'): fails.append('화면 오류 카드가 복구 뒤에도 남습니다')
+        # 9e. 메디나눔 계정(2026-10-13) — 동의 전에는 서버·라이브러리에 한 번도 닿지 않고, 계정 칸은 동의 단추만 보인다.
+        #     동의하면 그때 처음 로그인 칸 + 만 14세 확인이 나오고, 체크 전엔 「계정 만들기」가 막혀 있다.
+        _ac = br.new_context(viewport={'width': 390, 'height': 844}); _ap = _ac.new_page(); _aerr = []; _hits = []
+        _ap.on('pageerror', lambda e: _aerr.append(str(e)))
+        _ap.route('**/*supabase.co/**', lambda rt: (_hits.append(rt.request.url), rt.abort()))
+        _ap.route('**/cdn.jsdelivr.net/npm/@supabase/**', lambda rt: (_hits.append(rt.request.url), rt.abort()))
+        _ap.goto(url + '#/home'); _ap.wait_for_function('window.__READY__===true && DETAIL===2', timeout=15000)
+        _ap.evaluate("localStorage.setItem('yakjido.hello.v1','1')")
+        _ap.goto(url + '#/me?t=set'); _ap.reload(); _ap.wait_for_function('window.__READY__===true', timeout=15000); _ap.wait_for_timeout(1500)
+        if _ap.query_selector('#acct'): fails.append('공용 서버가 열리기 전(meta.account=false)인데 계정 칸이 보입니다')
+        _ap.evaluate("()=>{ D.meta.account = true; route(); }"); _ap.wait_for_timeout(400)   # 서버가 열린 뒤의 모습
+        _box = _ap.inner_text('#acct') if _ap.query_selector('#acct') else ''
+        if '동의하고 계속' not in _box: fails.append(f'계정 칸이 동의 단추로 시작하지 않습니다: {_box[:80]!r}')
+        if _ap.query_selector('#srvEmail'): fails.append('동의 전인데 이메일 칸이 보입니다(되는 척 금지)')
+        if _hits: fails.append(f'동의 전인데 서버·라이브러리에 요청이 갑니다: {_hits[:2]}')
+        _ap.once('dialog', lambda d: d.accept())
+        _ap.click('#acct button:has-text("동의하고 계속")'); _ap.wait_for_timeout(1500)
+        if not _ap.query_selector('#srvEmail') or not _ap.query_selector('#srvAge'): fails.append('동의 뒤에 로그인 칸·만 14세 확인이 안 나옵니다')
+        elif not _ap.is_disabled('#srvSignup'): fails.append('만 14세 확인 전인데 「계정 만들기」가 눌립니다')
+        else:
+            _ap.check('#srvAge')
+            if _ap.is_disabled('#srvSignup'): fails.append('만 14세 확인 뒤에도 「계정 만들기」가 막혀 있습니다')
+        if '이 휴대폰에만 저장돼요' not in _ap.inner_text('#view'): fails.append('로그인 전인데 저장 위치 문구가 「이 휴대폰에만」이 아닙니다')
+        if _aerr: fails.append(f'계정 칸 JS 오류: {_aerr[:2]}')
+        _ac.close()
         br.close()
     print(f'화면 {len(routes)}개 검사 완료')
     if fails:
         print('실패', len(fails)); [print('  ✗', f) for f in fails]; sys.exit(1)
-    print('✓ 전부 통과 — JS 오류 0 · 넘침 0 · 잘림 0 · 명암비 AA · 조작 부품 3:1 · 44px · 단추 누르기 · 복용 간격 · 복약 달력 · 홈 오늘약 · 어르신 소염제 · 소아 한도 · 계열 경고 · 어근 오인 · 내 정보 칸 · 화면 밝기 · 아이콘 전수 · 약 알림 · 어르신 모드 · 320px · 병용 8건 · 겹침 규칙 53 · 입력칸 이름표 · 성분 해석 123 · 죽은 규칙 0 · 약통 판정 4건 · 자기중복 3건 · 바구니 겹침 · 이중계산 0 · 검색 8건 · 구어 30건 · 문장 16건 · 새 약 검색 12건 · 하루 최대 표기 · 먹는/바르는 구분 · 영양제 질문 순서 · 인터넷 없이 · 화면 오류 카드')
+    print('✓ 전부 통과 — JS 오류 0 · 넘침 0 · 잘림 0 · 명암비 AA · 조작 부품 3:1 · 44px · 단추 누르기 · 복용 간격 · 복약 달력 · 홈 오늘약 · 어르신 소염제 · 소아 한도 · 계열 경고 · 어근 오인 · 내 정보 칸 · 화면 밝기 · 아이콘 전수 · 약 알림 · 어르신 모드 · 320px · 병용 8건 · 겹침 규칙 53 · 입력칸 이름표 · 성분 해석 123 · 죽은 규칙 0 · 약통 판정 4건 · 자기중복 3건 · 바구니 겹침 · 이중계산 0 · 검색 8건 · 구어 30건 · 문장 16건 · 새 약 검색 12건 · 하루 최대 표기 · 먹는/바르는 구분 · 영양제 질문 순서 · 인터넷 없이 · 화면 오류 카드 · 계정 동의 먼저')
 
 if __name__ == '__main__':
     main()

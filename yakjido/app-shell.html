@@ -2616,7 +2616,7 @@ async function wxFetch(force){
   if (document.querySelector('.wx') && (WX.at !== before || (!!WX.fail) !== failBefore)) route();
 }
 /* 워커 주소가 있으면 그 옆 /wx — 사진 서버와 같은 워커 */
-function wxEndpoint(){ const p = (D.meta?.wxEndpoint || '') || (photoEndpoint() ? photoEndpoint().replace(/\/+$/, '') + '/wx' : ''); return p; }
+function wxEndpoint(){ return D.meta?.wxEndpoint || ''; }
 function wxSetCity(v){
   if (v === 'geo') {
     if (!navigator.geolocation) { toast('이 기기에서는 위치를 못 받아요 — 도시를 골라 주세요'); return; }
@@ -3545,7 +3545,7 @@ function vKids(){
     <div class="kid-form"><label>이름(선택)<input id="k-name" value="${esc(c.name || '')}" placeholder="서아"></label><label>생년월일<input id="k-birth" type="date" value="${esc(c.birth || '')}"></label><label class="full">몸무게 (kg) — 해열제는 나이가 아니라 몸무게로 정해요<input id="k-w" type="number" inputmode="decimal" step="0.1" min="2" max="120" value="${c.weight || ''}" placeholder="예: 12.4"></label></div>
     <div class="actions" style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn" style="flex:1 1 140px;min-width:0" onclick="saveKid()">${I.check} 계산하기</button><button class="btn line" style="flex:1 1 140px;min-width:0" onclick="kidImport()">${I.user} ${esc(K.import?.title || '우리집 소아과에서 가져오기')}</button></div>
     <p class="small muted" style="margin-top:10px">${esc(K.import?.text || '')}</p>
-    <p class="privacy">${I.lock}이 기기에만 저장돼요.</p>
+    <p class="privacy">${I.lock}${savedWhere()}</p>
   </section>
   ${sane ? `<div class="flag" style="margin-top:16px">${I.alert}<div><b>몸무게를 한 번만 확인해 주세요</b><p>${esc(sane)}</p></div></div>` : ''}
   ${m != null && m < 3 ? `<div class="flag" style="margin-top:16px">${I.alert}<div><b>생후 ${m}개월이에요</b><p>3개월 미만 아기가 열이 나면 해열제를 먹이지 말고 <b>바로 진료</b>를 받으세요. 열을 낮추면 원인을 찾기 어려워져요.</p><a class="call" href="tel:119">${I.alert} 119</a></div></div>` : ''}
@@ -4266,7 +4266,7 @@ function vVitals(){
     <div class="actions" style="margin-top:12px"><button class="btn" onclick="vitalSave()">${I.check} 적어 두기</button></div></section>
   ${k === 'bp' && av ? `<section class="sec card vt-sum"><div class="vt-big"><span>최근 7일 평균</span><b>${av.s}<small>/</small>${av.d}</b><em>mmHg · ${av.days}일 ${av.n}번</em></div>
     ${hiAvg ? `<div class="note" style="margin-top:10px">${I.info}<span><b>가정혈압 기준(135/85)보다 높은 편이에요.</b> ${takesBp ? '혈압약을 드시고 계시니, 이 기록을 <b>다음 진료 때 보여 주세요.</b>' : '며칠 더 재 보시고, 계속 높으면 <b>내과 진료</b>를 받아 보세요.'}</span></div>` : av.n < 3 ? `<p class="small muted" style="margin-top:8px">아침·저녁으로 며칠 더 적으시면 평균이 믿을 만해져요.</p>` : ''}
-    ${lastBp && hiAvg ? `<p class="small muted" style="margin-top:8px">코막힘약(슈도에페드린·페닐레프린·에페드린)은 혈압을 올릴 수 있어요 — 약국에서 «혈압이 높다»고 말씀하세요.</p>` : ''}
+    ${lastBp && hiAvg ? `<p class="small muted" style="margin-top:8px">코막힘약(슈도에페드린·페닐레프린·에페드린)은 혈압을 올릴 수 있어요 — 약국에서 「혈압이 높다」고 말씀하세요.</p>` : ''}
   </section>` : ''}
   <section class="sec card"><h2>2주 흐름</h2>${vitalChart(k)}</section>
   ${k === 'bp' && NATIVE ? `<section class="sec card"><div class="toggle"><div class="t"><b>혈압 재기 알림</b><span>${((ME.vitalRemind || {}).bp || []).length ? '아침 7:30 · 저녁 9:00 — 켜져 있어요' : '매일 아침·저녁 잴 시간을 알려 드려요'}</span></div><button class="btn ghost" style="width:auto;min-height:46px;padding:0 14px" onclick="vitalRemindToggle()">${((ME.vitalRemind || {}).bp || []).length ? '끄기' : '켜기'}</button></div></section>` : ''}
@@ -4360,7 +4360,7 @@ function vGuide(step, q){
     ${more.length ? `<details class="acc" style="margin-top:12px"><summary>다른 것도 확인하기<small>${more.length}가지</small>${I.chev}</summary><div class="bd"><div class="g-chips">${more.map(flagBtn).join('')}</div></div></details>` : ''}
     ${kid ? `<div class="card" style="margin-top:12px"><b class="small">아이 정보</b><div class="kid-form"><label>생년월일<input id="k-birth" type="date" value="${esc(ME.child?.birth || '')}"></label><label>몸무게 (kg)<input id="k-w" type="number" inputmode="decimal" step="0.1" value="${ME.child?.weight || ''}" placeholder="예: 12.4" onchange="ME.child={...(ME.child||{}),weight:parseFloat(this.value)||'',birth:document.getElementById('k-birth').value};saveMe()"></label></div><p class="small muted" style="margin-top:6px">아이 약은 몸무게로 정해요. 넣어 두면 답 화면에 시럽 몇 mL인지 같이 나와요.</p></div>` : ''}
     <div class="actions"><button class="btn" onclick="document.getElementById('k-w')&&(ME.child={...(ME.child||{}),weight:parseFloat(document.getElementById('k-w').value)||'',birth:document.getElementById('k-birth').value},saveMe());go('/guide/3/${s.id}')">${I.check} ${nextLabel}</button></div>
-    <p class="privacy">${I.lock}이 기기에만 저장되고 전송되지 않아요.</p>`;
+    <p class="privacy">${I.lock}${savedWhere()}</p>`;
   }
   const bk = basket(s); const clinic = (s.care?.clinic || []).slice(0, 2), er = (s.care?.er || []).slice(0, 1);
   return `${topBar({ back:'이전' })}${bar}<div class="eyebrow">${esc(s.name)}${activeFlags().length ? ' · ' + activeFlags().map(x => FLAG_LABEL[x]).join(', ') : ''}</div><div class="g-q">이렇게 사세요</div>
@@ -4620,7 +4620,7 @@ function vHello(step){
     <h1 class="hello-q">해당하는 것이 있으면 눌러 주세요</h1>
     <p class="hello-sub">이걸 알면 <b>위험한 조합을 미리 걸러</b> 드릴 수 있어요. 해당하는 것이 없으면 그냥 넘어가셔도 됩니다.</p>
     <div class="hello-chips">${KEYS.map(k => `<button class="hello-chk ${ME[k] ? 'on' : ''}" aria-pressed="${!!ME[k]}" onclick="ME['${k}']=!ME['${k}'];saveMe();route()"><span class="bx">${ME[k] ? I.check : ''}</span>${esc(FLAG_Q[k])}</button>`).join('')}</div>
-    <p class="privacy">${I.lock}이 기기에만 저장되고 어디로도 전송되지 않아요.</p>
+    <p class="privacy">${I.lock}${savedWhere()}</p>
     <div class="actions"><button class="btn" onclick="go('/hello/3')">${on ? `${on}가지 골랐어요 · 다음` : '해당 없어요 · 다음'}</button></div>`;
   }
   const f = activeFlags();
@@ -5006,7 +5006,7 @@ function prnDefault(id){
   return ingOf(it).ings.some(e => (e.cls || []).some(c => PRN_ING_CLS.has(c)));
 }
 function markPrnIfNew(id){ if (!prnDefault(id)) return false; ME.prn = ME.prn || {}; ME.prn[id] = true; return true; }
-function toggleTaking(id){ ME.taking = ME.taking || []; const adding = !ME.taking.includes(id); ME.taking = adding ? [...ME.taking, id] : ME.taking.filter(x => x !== id); const prn = adding && markPrnIfNew(id); saveMe(); route(); toast(prn ? '내 약통에 담았어요 — 아플 때만 드시는 약이라 «필요할 때만»으로 두었어요' : ME.taking.includes(id) ? '내 약통에 담았어요' : '내 약통에서 뺐어요'); }
+function toggleTaking(id){ ME.taking = ME.taking || []; const adding = !ME.taking.includes(id); ME.taking = adding ? [...ME.taking, id] : ME.taking.filter(x => x !== id); const prn = adding && markPrnIfNew(id); saveMe(); route(); toast(prn ? '내 약통에 담았어요 — 아플 때만 드시는 약이라 「필요할 때만」으로 두었어요' : ME.taking.includes(id) ? '내 약통에 담았어요' : '내 약통에서 뺐어요'); }
 function toast(t){ document.querySelector('.toast')?.remove(); const el = document.createElement('div'); el.className = 'toast'; el.textContent = t; document.body.appendChild(el); setTimeout(() => el.remove(), 1800); }
 function jumpTab(p){ const t = document.querySelector(`.tab[data-p="${p}"]`); if (!t) return; t.click(); const top = document.querySelector('.tabs'); if (top) window.scrollTo({ top: top.getBoundingClientRect().top + window.scrollY - 8, behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' }); }
 document.addEventListener('click', e => { const t = e.target.closest('.tab[data-p]'); if (!t) return; if (t.closest('.schtabs')) PANE.schedule = t.dataset.p; t.parentElement.querySelectorAll('.tab').forEach(x => x.classList.toggle('on', x === t)); document.querySelectorAll('.pane').forEach(p => p.classList.toggle('on', p.id === t.dataset.p)); });
@@ -5235,7 +5235,8 @@ document.addEventListener('input', e => { if (e.target.id === 'mq') { MQ = e.tar
 
 /* ───────── 사진으로 약 알아보기 ───────── */
 const PH = { ocr:null, step:'', q:'', busy:false, result:null, img:'', err:'' };
-function photoEndpoint(){ try { return localStorage.getItem('yakjido.photo') || D.meta?.photoEndpoint || ''; } catch (e) { return D.meta?.photoEndpoint || ''; } }
+/* 2026-10-13 메디나눔 공통 규칙 — Gemini·OpenAI 같은 바깥 인공지능 호출은 쓰지 않는다. 사진은 늘 이 폰 안에서만 읽는다(사진 서버 길은 닫음). */
+function photoEndpoint(){ return ''; }
 async function photoPick(file){
   if (!file) return; PH.err = ''; PH.result = null; PH.ocr = null; PH.step = ''; PH.busy = true; route();
   try {
@@ -5914,8 +5915,10 @@ async function exportMe(){
 /* 기록 모두 지우기 — 글자 크기·화면 밝기 같은 보기 설정은 개인 기록이 아니라 남긴다 */
 async function wipeMe(){
   const n = (ME.taking || []).length, d = Object.keys(ME.taken || {}).length;
-  if (!confirm(`이 휴대폰의 약지도 기록을 «모두» 지웁니다.\n\n약 ${n}가지 · 복용 기록 ${d}일치 · 불편했던 일 · 알림\n\n되돌릴 수 없어요. 지울까요?`)) return;
+  const srv = srvLoggedIn();
+  if (!confirm(`이 휴대폰의 약지도 기록을 「모두」 지웁니다.${srv ? ' 로그인해 두셔서 메디나눔 서버에 있는 약지도 기록도 함께 지웁니다(계정은 남아요).' : ''}\n\n약 ${n}가지 · 복용 기록 ${d}일치 · 불편했던 일 · 알림\n\n되돌릴 수 없어요. 지울까요?`)) return;
   try { localStorage.removeItem(ME_KEY); localStorage.removeItem(WX_KEY); } catch (e) {}
+  if (srv) { try { 서버.전부지움(); } catch (e) {} }
   ME = { ...ME_DEF }; WX = {};
   NOTI_TIMERS.forEach(clearTimeout); NOTI_TIMERS = [];
   const LN = plug('LocalNotifications');
@@ -5928,7 +5931,7 @@ async function importMe(file){
   const me = j && (j.me || (j.app === 'yakjido' ? null : j));
   if (!me || typeof me !== 'object' || Array.isArray(me)) { toast('약지도에서 받은 파일이 아니에요'); return; }
   const n = (me.taking || []).length, d = Object.keys(me.taken || {}).length, ae = (me.ae || []).length;
-  if (!confirm(`가져오면 지금 이 휴대폰의 기록을 «덮어씁니다».\n\n들어 있는 것 — 약 ${n}가지 · 복용 기록 ${d}일치 · 불편했던 일 ${ae}건\n\n계속할까요?`)) return;
+  if (!confirm(`가져오면 지금 이 휴대폰의 기록을 「덮어씁니다」.\n\n들어 있는 것 — 약 ${n}가지 · 복용 기록 ${d}일치 · 불편했던 일 ${ae}건\n\n계속할까요?`)) return;
   ME = { ...ME_DEF, ...me };   /* 옛 파일에 없는 칸은 기본값으로 채운다 */
   saveMe();
   try { rollDay(); } catch (e) {}
@@ -5979,7 +5982,7 @@ function vMe(_, q){
     ${condBox()}
     <details class="why-more" style="margin-top:12px"><summary>항목마다 왜 묻는지 보기</summary>
       <div class="cond-all">${CONDS.map(([, t, d]) => `<p><b>${esc(t)}</b> — ${esc(d)}</p>`).join('')}</div></details>
-    <p class="privacy">${I.lock}입력한 내용은 이 기기에만 저장되고 어디로도 전송되지 않아요.</p>
+    <p class="privacy">${I.lock}입력한 내용은 ${savedWhere()}</p>
   </section>`;
   else if (tab === 'meds') body = `
   <section class="sec card"><h2>지금 먹는 약 <small>중복 성분을 잡아드려요</small></h2>
@@ -6023,9 +6026,12 @@ function vMe(_, q){
       <div class="actions"><button class="btn ghost" onclick="wipeMe()">${I.x} 모두 지우기</button></div>
     </details>
   </section>
-  <section class="sec card"><h2>이 앱에 대해</h2><p class="small" style="margin-top:6px">${esc(D.meta?.about || '')}</p><p class="small muted" style="margin-top:10px">기록은 이 휴대폰에만 있어요 · <a class="link" href="${NATIVE ? esc((D.meta?.share?.app || 'https://usualhealth383-cloud.github.io/autoblog/yakjido/') + 'privacy.html') : 'privacy.html'}"${NATIVE ? ' target="_blank" rel="noopener"' : ''}>개인정보처리방침</a>${D.meta?.contact?.email ? `<br>문의 · <a class="link" href="mailto:${esc(D.meta.contact.email)}">${esc(D.meta.contact.email)}</a>${D.meta.contact.operator ? ` <span class="muted">(운영 ${esc(D.meta.contact.operator)})</span>` : ''}` : ''}</p></section>
-  ${(q?.admin || (() => { try { return !!localStorage.getItem('yakjido.photo'); } catch (e) { return false; } })()) ? `<details class="why-more" style="margin-top:16px"><summary>관리자용 — 사진 서버</summary>
-    <p class="small" style="margin-top:6px">사진 읽기(Gemini) 서버 주소예요. yakjido/server 를 배포한 뒤 붙여 넣으세요. 비워 두면 기본값(${esc(D.meta?.photoEndpoint || '없음')}).</p><div class="search" style="margin-top:10px">${I.link}<input id="ep" aria-label="사진 서버 주소" placeholder="https://<워커이름>.workers.dev" value="${esc((() => { try { return localStorage.getItem('yakjido.photo') || ''; } catch (e) { return ''; } })())}" onchange="try{localStorage.setItem('yakjido.photo',this.value.trim())}catch(e){};toast('저장했어요')"></div></details>` : ''}
+  ${D.meta?.account === true ? `<section class="sec card" id="acct"><h2>계정 <small>폰을 바꿔도 이어 보기 · 선택</small></h2>
+    <p class="small muted" style="margin:4px 0 12px">계정 없이도 약지도는 그대로 쓰실 수 있어요. 로그인하시면 기록을 메디나눔 서버(서울)에 복사해 두어 다른 폰에서 이어 받아요.</p>
+    ${window.계정화면HTML ? 계정화면HTML() : '<p class="loading">계정 칸을 불러오는 중…</p>'}
+    ${srvAgreed() ? `<button type="button" class="srvlink" onclick="서버동의끄기()">「서버에 저장하기」 동의 거두기</button>` : ''}
+  </section>` : ''}
+  <section class="sec card"><h2>이 앱에 대해</h2><p class="small" style="margin-top:6px">${esc(D.meta?.about || '')}</p><p class="small muted" style="margin-top:10px">${savedWhere()} · <a class="link" href="${esc(방침주소())}"${NATIVE ? ' target="_blank" rel="noopener"' : ''}>개인정보처리방침</a>${D.meta?.contact?.email ? `<br>문의 · <a class="link" href="mailto:${esc(D.meta.contact.email)}">${esc(D.meta.contact.email)}</a>${D.meta.contact.operator ? ` <span class="muted">(운영 ${esc(D.meta.contact.operator)})</span>` : ''}` : ''}</p></section>
   <p class="small muted" style="margin-top:16px;text-align:center">약지도 v${esc(D.meta?.version || '')} · 빌드 ${BUILD}<br>식약처 공공데이터 — e약은요 ${esc(String(D.public?.easy_source || '').match(/\d{8}/)?.[0] || '')} · 낱알식별 ${esc(String(D.public?.pills_source || '').match(/\d{8}/)?.[0] || '')} 기준</p>`;
   return `${topBar()}
   <h1>내 정보</h1>
@@ -6080,6 +6086,34 @@ try { const th = localStorage.getItem('yakjido.theme'); if (th === 'light' || th
 /* 2026-10-08 출시 점검: 3G 흉내(1.6 Mbps)에서 본문이 26초 걸렸다 — 사전 묶음이 3.5초 뒤 본문과 «같은 선을 나눠 쓰며» 내려와서다.
    본문·약 칸이 다 온 «뒤에» 받고, 2G급 신호면 아예 받지 않는다(검색을 처음 쓸 때 받는다). */
 setTimeout(() => { try { const c = navigator.connection; if (c && (c.saveData || /2g/.test(c.effectiveType || ''))) return; } catch (e) {} Promise.all([ensureCore(), ensureDetail()]).then(() => setTimeout(() => { lexLoad(true); pubIndexSoon(); }, 800)); }, 3500);
+
+/* ───────── 계정·기록 이어 두기 (메디나눔 공용 서버, 2026-10-13) ─────────
+   기록의 정본은 이 휴대폰(localStorage 'yakjido.me.v1')이다. 로그인하고 「서버에 저장하기」에 동의하면 그 한 덩이를
+   메디나눔 서버(서울)의 records 표(app='yakjido')에 복사해 두고, 다른 폰에서 같은 계정으로 들어오면 이어 받는다.
+   보기 설정(글자 크기·밝기)과 날씨는 올리지 않는다. 동의는 기기마다 따로 받는다(이 키는 올리지 않는다). */
+const AGREE_KEY = 'yakjido.agree.v1';
+function srvAgreed(){ try { return (JSON.parse(localStorage.getItem(AGREE_KEY) || '{}') || {}).server === true; } catch (e) { return false; } }
+window.계정항목 = { ko: '드시는 약·복용 시간과 기록·몸 상태(임신·지병 등)·불편했던 일·혈압 수첩·진료 예약', 뒤: ' 건강에 관한 민감정보라 따로 동의를 받습니다. 보기 설정과 날씨는 올라가지 않습니다.' };
+window.서버동의켜기 = function(){
+  if (!confirm('「서버에 저장하기」에 동의하시겠어요?\n\n올라가는 것: ' + 계정항목.ko + '\n어디에: 메디나눔 서버(Supabase, 서울)\n왜: 폰을 바꿔도 이어 보려고\n언제까지: 계정을 지우실 때까지\n\n건강에 관한 민감정보예요. 동의하지 않아도 약지도는 이 폰에서 그대로 쓰실 수 있어요.')) return;
+  try { localStorage.setItem(AGREE_KEY, JSON.stringify({ server:true, at:new Date().toISOString() })); } catch (e) {}
+  route();
+};
+window.서버동의끄기 = function(){
+  const off = (msg) => { try { localStorage.setItem(AGREE_KEY, JSON.stringify({ server:false, at:new Date().toISOString() })); } catch (e) {} toast(msg); route(); };
+  if (!srvLoggedIn()) return off('서버에 저장하기 동의를 거두었어요. 이 폰의 기록은 그대로 있어요.');
+  /* 동의를 거두면 서버에 둔 것도 지운다(처리방침 9항) — 이 폰의 기록은 남긴다 */
+  if (!confirm('동의를 거두면 메디나눔 서버에 있는 약지도 기록을 지우고 로그아웃해요. 이 폰의 기록은 그대로 있어요.\n(다른 메디나눔 앱 기록이 없으면 계정도 함께 지워져요.)')) return;
+  서버.서버만지움().then(() => off('동의를 거두고 서버의 약지도 기록을 지웠어요. 이 폰의 기록은 그대로 있어요.'))
+    .catch(() => toast('서버에 닿지 못해 아직 거두지 못했어요. 인터넷이 연결되면 다시 눌러 주세요.'));
+};
+function srvReload(){ try { ME = { ...ME_DEF, ...(JSON.parse(localStorage.getItem(ME_KEY) || '{}')) }; } catch (e) {} try { route(); } catch (e) {} }
+function srvLoggedIn(){ try { return !!(window.서버 && 서버.세션 && 서버.세션()); } catch (e) { return false; } }
+/* 서버 부품(약 30 KB)은 srv.js 로 따로 받는다 — index.html 첫 화면 예산(압축 220 KB) 때문. 받기 전엔 계정 칸이 「불러오는 중」이다. */
+/* 「어디에 저장되나요」 한 줄 — 로그인해 동의했으면 사실대로 서버도 말한다 */
+window.방침주소 = function(){ return NATIVE ? (D.meta?.share?.app || 'https://usualhealth383-cloud.github.io/autoblog/yakjido/') + 'privacy.html' : 'privacy.html'; };
+function savedWhere(){ return srvLoggedIn() && srvAgreed() ? '이 휴대폰과 내 메디나눔 계정(서울 서버)에 저장돼요.' : '이 휴대폰에만 저장돼요.'; }
+
 /* ───────── 시작 ───────── */
 try { if (!helloDone() && !location.hash) { location.hash = '#/hello/1'; } } catch (e) {}
 try { rollDay(); } catch (e) {}   /* 앱을 열 때 오늘 계획을 기록에 적고, 60일 지난 것을 치운다 */
@@ -6106,3 +6140,4 @@ if ('serviceWorker' in navigator && location.protocol.startsWith('http') && !NAT
   Promise.all([ensureCore(), ensureDetail()]).then(() => setTimeout(warmLater, 1500));
 }
 </script>
+<script src="srv.js" defer></script>   <!-- 계정·기록 이어 두기(메디나눔 공용 서버) — 첫 화면 예산 밖으로 -->

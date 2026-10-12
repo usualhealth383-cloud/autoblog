@@ -30,8 +30,17 @@ for f in sorted((ROOT/'art').glob('*.webp')):
     art[f.stem] = 'data:image/webp;base64,' + base64.b64encode(f.read_bytes()).decode()
 # 미리보기(아티팩트)에서는 파일 내려받기가 막혀 있어 달력 파일 버튼을 안내 문구로 바꾼다 — 설치한 앱에서는 그대로 동작
 s = s.replace("onclick=\"downloadIcs()\">${I.clock} 받기</button>", "onclick=\"toast('달력 파일은 설치한 약지도 앱에서 받을 수 있어요')\">${I.clock} 앱에서</button>")
+# 아티팩트는 파일 하나 — srv.js(계정·기록 이어 두기)를 안에 싣는다. 클로드 아티팩트 화면에서는 바깥 서버 연결이 막혀 있어 계정 칸은 「연결 안 됨」으로 끝난다.
+_srv = ROOT / 'srv.js'
+if _srv.exists():
+    s = s.replace('<script src="srv.js" defer></script>', '<script>' + _srv.read_text(encoding='utf-8').replace('</script', '<\\/script') + '</script>')
 # 아티팩트에는 privacy.html 파일이 없다 — 깃허브 페이지의 방침으로 연다
-s = s.replace('''<a class="link" href="${NATIVE ? esc((D.meta?.share?.app || 'https://usualhealth383-cloud.github.io/autoblog/yakjido/') + 'privacy.html') : 'privacy.html'}"${NATIVE ? ' target="_blank" rel="noopener"' : ''}>개인정보처리방침</a>''', '<a class="link" href="https://usualhealth383-cloud.github.io/autoblog/yakjido/privacy.html" target="_blank" rel="noopener">개인정보처리방침</a>')
+_a = "window.방침주소 = function(){ return NATIVE ? (D.meta?.share?.app || 'https://usualhealth383-cloud.github.io/autoblog/yakjido/') + 'privacy.html' : 'privacy.html'; };"
+assert _a in s, '방침주소 정의가 바뀌었습니다 — mkart.py 를 맞춰 주세요'
+s = s.replace(_a, "window.방침주소 = function(){ return 'https://usualhealth383-cloud.github.io/autoblog/yakjido/privacy.html'; };")
+s = s.replace('''${NATIVE ? ' target="_blank" rel="noopener"' : ''}>개인정보처리방침</a>''', ''' target="_blank" rel="noopener">개인정보처리방침</a>''')
+# 아티팩트 화면은 Supabase 연결이 막혀 있다 — 되는 척 로그인 칸을 보이지 않고 「준비 중」 한 줄로(메디나눔 규칙: 안 되는 단추는 숨긴다)
+s = s.replace("D.meta.account === true); },", "false); },")
 s = s.replace('<img src="art/${n}.webp"', '<img src="${ART_DATA[n] || ("art/" + n + ".webp")}"')
 # 아티팩트는 파일 하나라 서버가 없다 — 본문 자료(core.json)도 같이 심는다
 # 첫 화면 머리의 앱 표시(34px) — 아티팩트 호스트에는 icon-192.png 파일이 없어 깨진 그림이 나왔다(2026-09-23 현욱님 캡처)
