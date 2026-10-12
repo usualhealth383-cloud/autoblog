@@ -17,8 +17,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" media="print" crossorigin="anonymous" onload="this.media='all';this.onload=null"
-      href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700;800;900&family=Noto+Serif+KR:wght@400;700&display=swap">
-<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700;800;900&family=Noto+Serif+KR:wght@400;700&display=swap"></noscript>
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700;900&family=Noto+Serif+KR:wght@400;700&display=swap">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700;900&family=Noto+Serif+KR:wght@400;700&display=swap"></noscript>
 <style>
 :root{
   --paper:#FAF8F4; --ground:#EFECE6; --card:#FFFFFF;
@@ -177,6 +177,16 @@ button{font-family:inherit;color:inherit}
 .pnow.fin .linkbtn{padding:12px 2px 0;min-height:44px;font-weight:700;color:var(--brand-dark);text-decoration:none}
 /* 손님·무료 범위 — 경로 밑 한 줄 */
 .pfoot{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:-2px 0 14px 28px;font-size:var(--t-cap);color:var(--muted);line-height:1.6}
+.passnote{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:0 0 14px;padding:4px 6px 4px 14px;border:1px solid var(--hair);border-radius:var(--r-m);background:var(--card);font-size:var(--t-cap);color:var(--muted);line-height:1.6;word-break:keep-all}
+.eplan{list-style:none;margin:0 0 6px;padding:0;display:flex;flex-direction:column;gap:0;border-top:1px solid var(--hair)}
+.eplan li{display:flex;align-items:center;gap:12px;padding:10px 2px;border-bottom:1px solid var(--hair);font-size:var(--t-small);color:var(--body);line-height:1.5;word-break:keep-all}
+.eplan .dt{flex:0 0 44px;font-weight:700;color:var(--muted);font-variant-numeric:tabular-nums;display:flex;flex-direction:column;line-height:1.3}
+.eplan .dt small{font-weight:400;font-size:var(--t-cap)}
+.eplan .tx{flex:1;min-width:0}.eplan .tx small{display:block;color:var(--muted);font-size:var(--t-cap)}
+.eplan li.now{background:var(--u-soft);border-radius:var(--r-s);border-bottom-color:transparent;padding-inline:10px}.eplan li.now .dt{color:var(--u-dark)}
+.eplan li.ex .tx b{color:var(--ink)}
+.passnote b{color:var(--ink);font-weight:700}
+.passnote .linkbtn{flex:0 0 auto;min-height:44px;padding:0 8px;font-size:var(--t-cap);font-weight:700;color:var(--brand-dark);text-decoration:none}
 .pfoot .linkbtn{flex:0 0 auto;padding:0 2px;min-height:44px;font-size:var(--t-cap);font-weight:700;color:var(--brand-dark);text-decoration:none}
 /* 빈칸 채우기 시트 — 문장 하나에 칸 하나 */
 .sheet p.bklead{margin-bottom:12px}
@@ -222,11 +232,11 @@ button{font-family:inherit;color:inherit}
 .asgcard .tx b .k{font-size:var(--t-tab);font-weight:700;color:var(--u-dark);background:var(--u-soft);border-radius:var(--r-pill);padding:1px 8px;margin-left:4px;vertical-align:1px}
 .revcard.asgcard .tx span.t{font-size:var(--t-small);font-weight:700;color:var(--ink);line-height:1.45}
 .asgmore{text-align:left;padding:0 4px 12px;margin-top:-6px}
-.asgbar{display:flex;align-items:center;gap:8px;background:var(--u-soft);border:1px solid var(--u-line);border-radius:12px;padding:9px 12px;margin:0 0 12px}
-.asgbar .k{font-size:11.5px;font-weight:800;color:var(--u-dark);white-space:nowrap}
-.asgbar .t{flex:1;min-width:0;font-size:12.5px;color:var(--body);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.asgbar .n{font-weight:900;font-size:15px;color:var(--ink);font-variant-numeric:tabular-nums}
-.asgbar .n small{font-size:11.5px;color:var(--muted);font-weight:700}
+.asgbar{display:flex;align-items:center;gap:8px;background:var(--u-soft);border:1px solid var(--u-line);border-radius:var(--r-s);padding:9px 12px;margin:0 0 12px}
+.asgbar .k{font-size:var(--t-tab);font-weight:700;color:var(--u-dark);white-space:nowrap}
+.asgbar .t{flex:1;min-width:0;font-size:var(--t-cap);color:var(--body);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.asgbar .n{font-weight:900;font-size:var(--t-body);color:var(--ink);font-variant-numeric:tabular-nums}
+.asgbar .n small{font-size:var(--t-tab);color:var(--muted);font-weight:700}
 .asgsent{color:var(--brand-dark);font-weight:700}
 .qhead .rk{display:inline-block;font-size:var(--t-tab);font-weight:700;color:var(--u-dark);background:var(--u-soft);border-radius:var(--r-pill);padding:1px 8px;margin-right:6px}
 .revnext{justify-content:center;font-size:var(--t-small);margin:0 0 14px}
@@ -265,40 +275,40 @@ p.leech{font-size:var(--t-cap);color:var(--muted);line-height:1.6;margin:-4px 0 
   background:var(--card);border-radius:var(--r-s);padding:6px 11px;flex:0 0 auto;align-self:center;cursor:pointer}
 
 /* 개념 카드 */
-.card{background:var(--card);border:1px solid var(--u-line);border-radius:17px;
+.card{background:var(--card);border:1px solid var(--u-line);border-radius:var(--r-l);
   padding:18px;position:relative;overflow:hidden;margin-bottom:13px}
 .card::before{content:"";position:absolute;inset:0 0 auto 0;height:3px;background:var(--u)}
-.loc{font-size:11px;font-weight:800;letter-spacing:.1em;color:var(--u);margin-bottom:8px;display:flex;justify-content:space-between;align-items:center}
+.loc{font-size:var(--t-tab);font-weight:700;letter-spacing:0;color:var(--u);margin-bottom:8px;display:flex;justify-content:space-between;align-items:center}
 .loc .acts{display:flex;gap:4px}
-.loc .acts button{background:none;border:1px solid var(--hair);border-radius:10px;width:40px;height:40px;display:grid;place-items:center;cursor:pointer;color:var(--muted)}
+.loc .acts button{background:none;border:1px solid var(--hair);border-radius:var(--r-s);width:40px;height:40px;display:grid;place-items:center;cursor:pointer;color:var(--muted)}
 .loc .acts button svg{width:17px;height:17px;stroke:currentColor;stroke-width:2;fill:none;stroke-linecap:round;stroke-linejoin:round}
 .loc .acts button.on{color:var(--warn);border-color:var(--warn)}
 .loc .acts button.on svg{fill:var(--warn)}
 h1{font-size:var(--t-h1);font-weight:900;letter-spacing:-.025em;line-height:1.3;margin-bottom:3px}
-.sub{font-size:13px;color:var(--muted);margin-bottom:16px}
+.sub{font-size:var(--t-small);color:var(--muted);margin-bottom:16px}
 .steps{margin:2px 0 16px}
 .step{display:grid;grid-template-columns:26px 1fr;column-gap:9px;align-items:baseline;
   border-top:1px solid var(--hair);padding:11px 0 12px}
 .step:first-child{border-top:2.5px solid var(--u);padding-top:10px}
-.step .n{grid-column:1;font-size:14px;font-weight:900;color:var(--u);font-family:var(--serif)}
-.step .t{grid-column:2;font-size:14.5px;font-weight:800;margin:0;line-height:1.4;letter-spacing:-.01em}
-.step .d{grid-column:2;font-size:13.5px;color:var(--body);line-height:1.75;margin-top:4px}
-figure{background:var(--u-soft);border-radius:11px;padding:12px 8px 8px;text-align:center;margin-bottom:15px}
+.step .n{grid-column:1;font-size:var(--t-small);font-weight:900;color:var(--u);font-family:var(--serif)}
+.step .t{grid-column:2;font-size:var(--t-body);font-weight:700;margin:0;line-height:1.4;letter-spacing:-.01em}
+.step .d{grid-column:2;font-size:var(--t-small);color:var(--body);line-height:1.75;margin-top:4px}
+figure{background:var(--u-soft);border-radius:var(--r-s);padding:12px 8px 8px;text-align:center;margin-bottom:15px}
 figure svg{max-width:100%;height:auto;background:var(--figplate);border-radius:8px}
-figcaption{font-size:11.5px;color:var(--u-dark);font-weight:700;margin-top:7px;padding:0 6px;line-height:1.5}
-.howto{background:#FFFDF6;border:1px solid #EBDDB8;border-radius:11px;padding:11px 14px;margin-bottom:15px}
+figcaption{font-size:var(--t-tab);color:var(--u-dark);font-weight:700;margin-top:7px;padding:0 6px;line-height:1.5}
+.howto{background:#FFFDF6;border:1px solid #EBDDB8;border-radius:var(--r-s);padding:11px 14px;margin-bottom:15px}
 @media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) .howto{background:#221E12;border-color:#3B3320} } :root[data-theme="dark"] .howto{background:#221E12;border-color:#3B3320}   /* 어두운 화면에서만(밝은 화면에 새던 것 — 2026-10-01) */
-.howto .k{font-size:11px;font-weight:900;color:var(--hzk);letter-spacing:.1em;display:block;margin-bottom:7px}
+.howto .k{font-size:var(--t-tab);font-weight:900;color:var(--hzk);letter-spacing:0;display:block;margin-bottom:7px}
 @media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) .howto .k{color:#D9A73C} } :root[data-theme="dark"] .howto .k{color:#D9A73C}   /* 어두운 화면에서만(밝은 화면에 새던 것 — 2026-10-01) */
-.howto li{font-size:12.5px;line-height:1.7;color:var(--body);margin-bottom:5px;list-style:none;padding-left:15px;text-indent:-15px}
+.howto li{font-size:var(--t-cap);line-height:1.7;color:var(--body);margin-bottom:5px;list-style:none;padding-left:15px;text-indent:-15px}
 .howto li b.n{color:var(--hzk);font-weight:900;margin-right:6px}
 @media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) .howto li b.n{color:#D9A73C} } :root[data-theme="dark"] .howto li b.n{color:#D9A73C}   /* 어두운 화면에서만(밝은 화면에 새던 것 — 2026-10-01) */
-.prose p{font-family:var(--serif);font-size:15px;line-height:2;color:var(--body);margin-bottom:15px}
+.prose p{font-family:var(--serif);font-size:var(--t-body);line-height:2;color:var(--body);margin-bottom:15px}
 .prose p:last-child{margin-bottom:0}
 .prose b{color:var(--ink);font-weight:700}
 button.blank{display:inline-block;min-width:52px;text-align:center;border:none;
   border-bottom:2px solid var(--u);background:var(--u-soft);color:var(--u);
-  font-weight:800;font-family:var(--sans);font-size:13px;
+  font-weight:700;font-family:var(--sans);font-size:var(--t-small);
   padding:3px 8px;border-radius:5px 5px 0 0;cursor:pointer;font-feature-settings:normal}
 button.blank.open{background:transparent;color:var(--u-dark)}
 
@@ -306,18 +316,18 @@ button.blank.open{background:transparent;color:var(--u-dark)}
 .sec{background:var(--card);border:1px solid var(--hair);border-radius:var(--r-m);padding:15px 17px;margin-bottom:13px}
 .sec h2{font-size:var(--t-cap);font-weight:700;letter-spacing:0;color:var(--muted);margin-bottom:11px;display:flex;justify-content:space-between;align-items:center}
 .sec h2 .more{font-size:var(--t-tab);font-weight:700;color:var(--muted);background:none;border:none;cursor:pointer;letter-spacing:0;min-height:36px;min-width:36px;padding:0 8px}
-.terms dt{font-size:13px;font-weight:800;color:var(--u-dark);margin-bottom:3px}
-.terms dd{font-size:13px;color:var(--body);line-height:1.72;padding-bottom:11px;margin-bottom:11px;border-bottom:1px solid var(--hair)}
+.terms dt{font-size:var(--t-small);font-weight:700;color:var(--u-dark);margin-bottom:3px}
+.terms dd{font-size:var(--t-small);color:var(--body);line-height:1.72;padding-bottom:11px;margin-bottom:11px;border-bottom:1px solid var(--hair)}
 .terms dd:last-child{border:none;padding-bottom:0;margin-bottom:0}
-.myth{background:var(--u-soft);border-radius:11px;padding:11px 13px;margin-bottom:8px;font-size:12.5px;line-height:1.7}
+.myth{background:var(--u-soft);border-radius:var(--r-s);padding:11px 13px;margin-bottom:8px;font-size:var(--t-cap);line-height:1.7}
 .myth:last-child{margin-bottom:0}
 .myth .x{color:var(--no);font-weight:900}
 .myth .o{color:var(--u-dark);font-weight:900}
 .myth .w{color:var(--muted);font-weight:900}
 .myth .why{display:block;margin-top:3px;color:var(--body)}
-.point{background:var(--u-soft);border-left:4px solid var(--u);border-radius:0 13px 13px 0;padding:14px 17px;margin-bottom:13px}
-.point .k{font-size:11.5px;font-weight:900;color:var(--u-dark);letter-spacing:.13em;display:block;margin-bottom:6px}
-.point p{font-size:14.5px;font-weight:700;line-height:1.78}
+.point{background:var(--u-soft);border-left:4px solid var(--u);border-radius:0 var(--r-m) var(--r-m) 0;padding:14px 17px;margin-bottom:13px}
+.point .k{font-size:var(--t-tab);font-weight:900;color:var(--u-dark);letter-spacing:0;display:block;margin-bottom:6px}
+.point p{font-size:var(--t-body);font-weight:700;line-height:1.78}
 
 /* 버튼 */
 .btn{display:block;width:100%;text-align:center;font-size:var(--t-body);font-weight:700;padding:15px;border-radius:var(--r-m);border:none;
@@ -372,7 +382,7 @@ button,.tab,.btn,.chip,.chipbar button,.seg button{-webkit-user-select:none;user
 .opt.ok .m,.opt.ok .mk{color:var(--ok-dark)}   /* --u 는 연한 바탕 위에서 4.47:1 — AA 미달(2026-10 모의고사 해설 점검) */
 .opt.bad{border-color:var(--no);background:var(--no-soft);color:var(--ink)}
 .opt.bad .m,.opt.bad .mk{color:var(--no)}
-.verdict{background:var(--u-soft);border-left:4px solid var(--u);border-radius:0 var(--r-m) var(--r-m) 0;padding:13px 16px;margin-bottom:11px}
+.verdict{background:var(--u-soft);border-radius:var(--r-m);padding:13px 16px;margin-bottom:11px}
 .verdict .h{font-size:var(--t-small);font-weight:900;color:var(--u-dark);margin-bottom:5px}
 .verdict p{font-size:var(--t-body);line-height:1.75;color:var(--body)}
 .again{display:flex;align-items:center;gap:7px;font-size:var(--t-cap);color:var(--muted);margin-bottom:13px;line-height:1.5}
@@ -436,14 +446,13 @@ button,.tab,.btn,.chip,.chipbar button,.seg button{-webkit-user-select:none;user
 .bar-row .v{flex:0 0 46px;text-align:right;color:var(--muted);font-variant-numeric:tabular-nums}
 .cal{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px;margin-top:6px}
 .cal .h{font-size:var(--t-tab);color:var(--faint);text-align:center;font-weight:700;padding-bottom:2px}
-.cal .c{aspect-ratio:1;min-width:0;border-radius:var(--r-s);background:var(--hair);display:grid;place-items:center;font-size:var(--t-tab);color:var(--faint)}
-.cal .c.on{background:var(--u);color:var(--on-color);font-weight:700}
+.cal .c{position:relative;aspect-ratio:1;min-width:0;border-radius:var(--r-pill);display:grid;place-items:center;font-size:var(--t-cap);color:var(--muted);font-variant-numeric:tabular-nums}   /* 하루콩식(디자인 감사 #12): 칸을 칠하지 않고 공부한 날은 숫자 아래 점, 출석은 테두리 링 */
+.cal .c.on{color:var(--ink);font-weight:700}
+.cal .c.on::after{content:'';position:absolute;left:50%;bottom:9%;width:6px;height:6px;margin-left:-3px;border-radius:var(--r-pill);background:var(--u)}
 .cal .c.att{box-shadow:inset 0 0 0 2px var(--warn)}
-.cal .c.blank{background:transparent}
-.cal .c.today{box-shadow:inset 0 0 0 1.5px var(--brand)}
-.cal .c.on.today{box-shadow:inset 0 0 0 1.5px var(--paper)}
+.cal .c.today{color:var(--brand-dark);font-weight:900;background:var(--brand-soft)}
 .legend{display:flex;gap:12px;font-size:var(--t-tab);color:var(--muted);margin-top:8px}
-.legend i{display:inline-block;width:10px;height:10px;border-radius:var(--r-pill);vertical-align:-1px;margin-right:4px;background:var(--u)}
+.legend i{display:inline-block;width:6px;height:6px;vertical-align:1px!important;border-radius:var(--r-pill);vertical-align:-1px;margin-right:4px;background:var(--u)}
 .legend i.att{background:transparent;box-shadow:inset 0 0 0 2px var(--warn)}
 /* ═ 보호자 — 이번 주 한눈에 ═ */
 .pweek .week{margin-bottom:10px}
@@ -524,6 +533,15 @@ button,.tab,.btn,.chip,.chipbar button,.seg button{-webkit-user-select:none;user
 .stuedit summary .cst{margin-left:4px}
 /* 합답형 ㄱㄴㄷ 판정 한 줄(해설 문장에서 'ㄱ (옳음) …' · 'ㄴ (틀림 →) …'을 나눠 그린다) */
 .jdl{margin:6px 0 0}
+.jme{display:block;margin-top:2px;font-size:var(--t-cap);font-weight:700;color:var(--u-dark)}.jme.off{color:var(--no)}
+.sjtog{display:block;margin:0 0 8px auto;min-height:44px;padding:0 4px;font-size:var(--t-cap);font-weight:700;color:var(--brand-dark)}
+.sjbox{display:flex;flex-direction:column;gap:8px}
+.sjh{margin:0;font-size:var(--t-small);color:var(--muted);word-break:keep-all}
+.sjrow{display:flex;align-items:center;gap:8px}
+.sjrow .k{flex:0 0 28px;font-weight:700;font-size:var(--t-body);color:var(--ink);text-align:center}
+.sjrow button{flex:1;min-height:52px;border:1.5px solid var(--line);border-radius:var(--r-m);background:var(--card);color:var(--ink);font:inherit;font-size:var(--t-body);font-weight:400}
+.sjrow button.on{border-color:var(--brand);background:var(--brand-soft);color:var(--brand-dark);font-weight:700}
+.sjsum{margin:2px 0 0;font-size:var(--t-small);color:var(--body);word-break:keep-all}
 .jd{display:flex;gap:8px;align-items:flex-start;padding:7px 0;border-top:1px solid var(--u-line);font-size:var(--t-small);line-height:1.7;color:var(--body)}
 .jd:first-child{border-top:none;padding-top:2px}
 .jd .k{flex:0 0 auto;font-weight:900;color:var(--ink);min-width:15px}
@@ -792,7 +810,7 @@ select.sel{font-family:inherit;font-size:var(--t-small);font-weight:700;color:va
 .auth label.agree input{width:24px;height:24px;flex:0 0 auto;margin:0;accent-color:var(--brand);cursor:pointer}
 .auth label.agree u{cursor:pointer;color:var(--brand)}
 .auth .fine{padding-top:10px}
-.auth .facts{font-size:14px;color:var(--muted);margin:0 0 22px;font-variant-numeric:tabular-nums;word-break:keep-all}
+.auth .facts{font-size:var(--t-small);color:var(--muted);margin:0 0 22px;font-variant-numeric:tabular-nums;word-break:keep-all}
 .auth.start .art{height:clamp(170px,28vh,250px);display:flex;align-items:center;justify-content:center;background:var(--brand-soft);border-radius:var(--r-l);overflow:hidden;margin:2px 0 22px}
 .auth.start .art svg{height:100%;width:auto;display:block}
 .auth.start .lead{margin-bottom:6px}
@@ -910,7 +928,7 @@ select.sel{font-family:inherit;font-size:var(--t-small);font-weight:700;color:va
 .todo-row .nm small{font-weight:700;font-size:var(--t-cap);color:var(--faint);margin-left:4px}
 .todo-row .why{display:block;font-size:var(--t-cap);line-height:1.65;color:var(--body);margin-top:2px;word-break:keep-all}
 .todo-act{flex:0 0 auto;min-height:44px;padding:0 14px;border-radius:var(--r-m);border:1px solid var(--brand-line);background:var(--card);color:var(--brand-dark);font-family:inherit;font-size:var(--t-small);font-weight:700;display:inline-flex;align-items:center;text-decoration:none;cursor:pointer;white-space:nowrap}
-.wrongbox{background:var(--no-soft);border-left:4px solid var(--no);border-radius:0 var(--r-m) var(--r-m) 0;padding:11px 14px;margin-bottom:11px;font-size:var(--t-small);line-height:1.7;color:var(--body)}
+.wrongbox{background:var(--no-soft);border-radius:var(--r-m);padding:11px 14px;margin-bottom:11px;font-size:var(--t-small);line-height:1.7;color:var(--body)}
 .wrongbox .h{font-size:var(--t-cap);font-weight:900;color:var(--no);margin-bottom:3px}
 .result{background:var(--card);border:1.5px solid var(--u);border-radius:var(--r-l);padding:18px;text-align:center;margin-bottom:13px}
 .result .big{font-size:var(--t-num);font-weight:900;letter-spacing:-.03em;color:var(--u);line-height:1.1}
@@ -919,7 +937,7 @@ select.sel{font-family:inherit;font-size:var(--t-small);font-weight:700;color:va
 /* 대단원 마무리 · 실전 모의고사 · 시험처럼(2026-10) — 손가락 목표 44px 이상, 조용한 색 */
 .tgl{display:flex;align-items:center;gap:10px;min-height:44px;width:100%;margin-top:10px;padding:0 12px;border:1px solid var(--line);border-radius:var(--r-m);background:var(--card);color:var(--body);font-family:inherit;font-size:var(--t-small);font-weight:700;cursor:pointer;text-align:left}
 .tnote{margin:12px 0 4px;padding:12px 14px;border-radius:var(--r-m);background:var(--u-soft);border:1px solid var(--u-line)}.tnote{display:block}.tnote .tk{display:block;font-size:var(--t-cap);font-weight:700;color:var(--u-dark);margin-bottom:4px}.tnote p{margin:0;font-size:var(--t-body);line-height:1.7;color:var(--ink);word-break:keep-all}
-.tnoteed h2 small{font-size:var(--t-cap);font-weight:600;color:var(--muted);margin-left:6px}
+.tnoteed h2 small{font-size:var(--t-cap);font-weight:700;color:var(--muted);margin-left:6px}
 .gsee h2{margin-top:6px}.gsee .gl{margin:4px 0 12px;padding-left:18px;font-size:var(--t-small);line-height:1.75;color:var(--body);word-break:keep-all}.gsee .gl.no{color:var(--muted)}
 .tgl .sw{position:relative;flex:0 0 36px;height:20px;border-radius:var(--r-pill);background:var(--line);transition:background-color .15s ease}
 .tgl .sw::after{content:'';position:absolute;left:3px;top:3px;width:14px;height:14px;border-radius:50%;background:var(--card);transition:transform .15s ease}
@@ -1017,7 +1035,7 @@ figure.zoomable{cursor:zoom-in}
 .dcard figure.zoomable .zbtn{right:12px;top:14px}
 /* 그림 읽는 법 — 번호를 누르면 크게 보기가 그 자리로 */
 .howto.hz li{display:grid;grid-template-columns:26px 1fr;column-gap:8px;align-items:start;padding-left:0;text-indent:0;margin-bottom:7px}
-.howto.hz li .n{display:grid;place-items:center;width:24px;height:24px;margin:1px 0 0;border-radius:var(--r-pill);font-size:12px;font-weight:900;color:var(--hzk)}
+.howto.hz li .n{display:grid;place-items:center;width:24px;height:24px;margin:1px 0 0;border-radius:var(--r-pill);font-size:var(--t-cap);font-weight:900;color:var(--hzk)}
 .howto.hz li button.n{border:1.5px solid var(--hzl);background:var(--hzs);cursor:pointer;font-family:inherit;padding:0}
 .howto.hz li button.n:focus-visible{outline:2px solid var(--hzk);outline-offset:2px}
 .phet{display:flex;align-items:center;gap:12px;margin:-4px 0 15px;padding:10px 12px;border:1px solid var(--line);border-radius:var(--r-m);background:var(--card);color:var(--ink);text-decoration:none;min-height:44px}
@@ -1026,7 +1044,7 @@ figure.zoomable{cursor:zoom-in}
 .phet svg.out{flex:0 0 auto;stroke:var(--muted)}
 .phet .tx{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px;word-break:keep-all}
 .phet .tx b{font-size:var(--t-small);font-weight:700}.phet .tx small{font-size:var(--t-cap);color:var(--muted)}
-.howto .k .hint{font-size:11.5px;font-weight:600;letter-spacing:0;color:var(--muted);margin-left:8px}
+.howto .k .hint{font-size:var(--t-tab);font-weight:700;letter-spacing:0;color:var(--muted);margin-left:8px}
 
 /* 탭바 */
 .tabs{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:440px;display:flex;border-top:1px solid var(--hair);background:var(--card);
@@ -1037,10 +1055,10 @@ figure.zoomable{cursor:zoom-in}
 .fine{font-size:var(--t-tab);color:var(--faint);text-align:center;line-height:1.7;padding:8px 10px 0}
 .nextup{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin:0 0 13px}
 .nextup.one{grid-template-columns:1fr}
-.nextup button{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px 13px;text-align:left;cursor:pointer;display:flex;flex-direction:column;gap:3px;min-height:72px;justify-content:center}
-.nextup .t{font-size:13.5px;font-weight:800;color:var(--ink);line-height:1.35}
-.nextup .d{font-size:11.5px;color:var(--muted);line-height:1.4}
-.donebar{background:var(--brand-soft);color:var(--brand-dark);border-radius:14px;padding:14px;text-align:center;font-size:14px;font-weight:800;margin-bottom:13px}
+.nextup button{background:var(--card);border:1px solid var(--line);border-radius:var(--r-m);padding:14px 13px;text-align:left;cursor:pointer;display:flex;flex-direction:column;gap:3px;min-height:72px;justify-content:center}
+.nextup .t{font-size:var(--t-small);font-weight:700;color:var(--ink);line-height:1.35}
+.nextup .d{font-size:var(--t-tab);color:var(--muted);line-height:1.4}
+.donebar{background:var(--brand-soft);color:var(--brand-dark);border-radius:var(--r-m);padding:14px;text-align:center;font-size:var(--t-small);font-weight:700;margin-bottom:13px}
 /* 오늘의 한 마디 */
 .qsay{background:var(--card);border:1px solid var(--hair);border-radius:var(--r-l);padding:18px 18px 12px;margin:0 0 12px;position:relative}
 .qsay .k{display:block;font-size:var(--t-cap);font-weight:700;letter-spacing:0;color:var(--muted);margin-bottom:13px}
@@ -1155,7 +1173,7 @@ figure svg,.qfig svg,.fv .stage svg{font-family:var(--sans,'Noto Sans KR',sans-s
 @media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) figure svg, :root:not([data-theme="light"]) .qfig svg, :root:not([data-theme="light"]) .fv .stage svg{filter:brightness(.92) saturate(.95);color:#1E2A2E;--ink:#1E2A2E;--body:#3A484D;--muted:#566268;--faint:#5E6B70;--line:#E2DED6} }
 :root[data-theme="dark"] figure svg,:root[data-theme="dark"] .qfig svg,:root[data-theme="dark"] .fv .stage svg{filter:brightness(.92) saturate(.95);color:#1E2A2E;--ink:#1E2A2E;--body:#3A484D;--muted:#566268;--faint:#5E6B70;--line:#E2DED6}
 figure.zoomable{position:relative}
-figure.zoomable .zbtn{position:absolute;right:8px;top:8px;display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:800;padding:7px 11px;min-height:34px;border-radius:999px;background:var(--card);color:var(--ink);border:1px solid var(--line);box-shadow:var(--shadow);pointer-events:none}
+figure.zoomable .zbtn{position:absolute;right:8px;top:8px;display:inline-flex;align-items:center;gap:5px;font-size:var(--t-cap);font-weight:700;padding:7px 11px;min-height:34px;border-radius:var(--r-pill);background:var(--card);color:var(--ink);border:1px solid var(--line);box-shadow:var(--shadow);pointer-events:none}
 /* 누르는 자리 넓히기 — 보이는 크기는 그대로, 손가락이 닿는 범위만 44px 가까이(2026-10-01 점검: 출석 체크 29px · 빈칸 27px 등) */
 button.pill,.notice button,.mini,.chipbar button,button.blank{position:relative}
 button.pill::before,.notice button::before,.mini::before,.chipbar button::before,button.blank::before{content:"";position:absolute;left:-4px;right:-4px;top:-8px;bottom:-8px}
@@ -1316,42 +1334,42 @@ button.pill::before,.notice button::before,.mini::before,.chipbar button::before
 /* ═══ 개념 상세 — 읽기 전에 O/X · ①②③→그림→포인트→[본문 펼치기] · 용어 말풍선 · 확인 문제(그 개념 OX) · 풀이 화면 그림 단서
    (2026-10-06 개념 학습 콘텐츠 감사 보완안 2·3·4·10·11). 이 블록의 이름은 개념 상세·풀이 단서에서만 쓴다 ═══ */
 .ox2{display:flex;gap:8px;align-items:stretch}
-.ox2 button{flex:1;min-height:46px;font-family:inherit;font-size:19px;font-weight:900;border-radius:12px;border:1.5px solid var(--line);background:var(--card);color:var(--body);cursor:pointer}
+.ox2 button{flex:1;min-height:46px;font-family:inherit;font-size:19px;font-weight:900;border-radius:var(--r-s);border:1.5px solid var(--line);background:var(--card);color:var(--body);cursor:pointer}
 .ox2 button.ok{border-color:var(--ok);background:var(--ok-soft);color:var(--ok-dark)}
 .ox2 button.bad{border-color:var(--no);background:var(--no-soft);color:var(--no)}
 .ox2 button:disabled{cursor:default}
 .ox2 button:focus-visible{outline:2px solid var(--u);outline-offset:2px}
-.pre{border:1.5px dashed var(--u-line);border-radius:13px;padding:12px 14px 13px;margin:0 0 14px;background:var(--card)}
-.pre .k{display:block;font-size:11.5px;font-weight:900;color:var(--u-dark);letter-spacing:.06em;margin-bottom:5px}
-.pre .q{font-size:14.5px;font-weight:700;line-height:1.62;color:var(--ink);margin-bottom:10px}
-.pre .ox2 .skip{flex:0 0 auto;font-size:12.5px;font-weight:800;color:var(--muted);border-color:transparent;background:none;padding:0 8px;min-width:64px}
+.pre{border:1.5px dashed var(--u-line);border-radius:var(--r-m);padding:12px 14px 13px;margin:0 0 14px;background:var(--card)}
+.pre .k{display:block;font-size:var(--t-tab);font-weight:900;color:var(--u-dark);letter-spacing:0;margin-bottom:5px}
+.pre .q{font-size:var(--t-body);font-weight:700;line-height:1.62;color:var(--ink);margin-bottom:10px}
+.pre .ox2 .skip{flex:0 0 auto;font-size:var(--t-cap);font-weight:700;color:var(--muted);border-color:transparent;background:none;padding:0 8px;min-width:64px}
 .pre.done{border-style:solid;border-color:var(--u-line);background:var(--u-soft);padding:10px 13px}
-.pre.done .r{font-size:13px;line-height:1.65;color:var(--body)}
+.pre.done .r{font-size:var(--t-small);line-height:1.65;color:var(--body)}
 .pre.done .r b{font-weight:900;color:var(--u-dark)}
 .pre.done .r b.no{color:var(--no)}
-.pre.done .q2{font-size:12.5px;line-height:1.6;color:var(--muted);margin-top:3px}
+.pre.done .q2{font-size:var(--t-cap);line-height:1.6;color:var(--muted);margin-top:3px}
 .dcard .point{margin:0}
-.dmore-t{display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%;min-height:54px;margin:14px 0 0;padding:10px 14px;border:1.5px solid var(--u-line);border-radius:12px;background:var(--card);color:var(--u-dark);font-family:inherit;text-align:left;cursor:pointer}
-.dmore-t b{display:block;font-size:14px;font-weight:800;line-height:1.4}
-.dmore-t small{display:block;font-size:12px;font-weight:600;color:var(--muted);line-height:1.45;margin-top:1px}
+.dmore-t{display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%;min-height:54px;margin:14px 0 0;padding:10px 14px;border:1.5px solid var(--u-line);border-radius:var(--r-s);background:var(--card);color:var(--u-dark);font-family:inherit;text-align:left;cursor:pointer}
+.dmore-t b{display:block;font-size:var(--t-small);font-weight:700;line-height:1.4}
+.dmore-t small{display:block;font-size:var(--t-cap);font-weight:700;color:var(--muted);line-height:1.45;margin-top:1px}
 .dmore-t svg{width:18px;height:18px;stroke:currentColor;stroke-width:2.4;fill:none;stroke-linecap:round;stroke-linejoin:round;flex:0 0 auto;transition:transform .2s ease}
 .dmore-t[aria-expanded="true"] svg{transform:rotate(180deg)}
 .dmore-t:focus-visible{outline:2px solid var(--u);outline-offset:2px}
-.dthink .q,.dex .q{font-size:15px;font-weight:700;line-height:1.65;color:var(--ink)}
+.dthink .q,.dex .q{font-size:var(--t-body);font-weight:700;line-height:1.65;color:var(--ink)}
 .reveal{margin-top:8px;border:1px solid var(--u-line);border-radius:var(--r-s,10px);background:var(--card)}
-.reveal summary{min-height:44px;display:flex;align-items:center;padding:0 14px;font-size:13.5px;font-weight:700;color:var(--u-dark);cursor:pointer;list-style:none}
+.reveal summary{min-height:44px;display:flex;align-items:center;padding:0 14px;font-size:var(--t-small);font-weight:700;color:var(--u-dark);cursor:pointer;list-style:none}
 .reveal summary::-webkit-details-marker{display:none}
 .reveal summary::after{content:'';margin-left:auto;width:8px;height:8px;border-right:2px solid currentColor;border-bottom:2px solid currentColor;transform:rotate(45deg);margin-top:-4px}
 .reveal[open] summary::after{transform:rotate(-135deg);margin-top:4px}
 .reveal summary:focus-visible{outline:2px solid var(--u);outline-offset:2px}
-.reveal p{padding:0 14px 12px;font-size:14px;line-height:1.7;color:var(--body)}
-.exsteps{margin:6px 0 0;padding-left:20px;font-size:14px;line-height:1.75;color:var(--body)}
+.reveal p{padding:0 14px 12px;font-size:var(--t-small);line-height:1.7;color:var(--body)}
+.exsteps{margin:6px 0 0;padding-left:20px;font-size:var(--t-small);line-height:1.75;color:var(--body)}
 .exsteps li{margin:2px 0}
-.exans{margin-top:8px;font-size:14px;color:var(--ink)}
-.dex .k{display:inline-block;font-size:12.5px;font-weight:700;color:var(--u-dark);margin-right:6px}
+.exans{margin-top:8px;font-size:var(--t-small);color:var(--ink)}
+.dex .k{display:inline-block;font-size:var(--t-cap);font-weight:700;color:var(--u-dark);margin-right:6px}
 .follow{margin-top:14px;padding-top:12px;border-top:1px dashed var(--u-line)}
-.follow .k{display:block;font-size:12.5px;font-weight:700;color:var(--u-dark);margin-bottom:2px}
-.dmyth .myth{font-size:13.5px;line-height:1.72;padding:12px 14px;border:1px solid var(--u-line);margin-bottom:9px}
+.follow .k{display:block;font-size:var(--t-cap);font-weight:700;color:var(--u-dark);margin-bottom:2px}
+.dmyth .myth{font-size:var(--t-small);line-height:1.72;padding:12px 14px;border:1px solid var(--u-line);margin-bottom:9px}
 .dmyth .myth p+p{margin-top:4px}
 .dmyth .myth .why{margin-top:8px;padding-top:8px;border-top:1px dashed var(--u-line)}
 .dmyth .myth .w{color:var(--u-dark)}
@@ -1359,33 +1377,33 @@ button.pill::before,.notice button::before,.mini::before,.chipbar button::before
 .tterm{cursor:pointer;color:inherit;text-decoration:underline dotted var(--u);text-decoration-thickness:1.5px;text-underline-offset:4px;border-radius:4px;padding:3px 0;-webkit-tap-highlight-color:transparent}
 .tterm[aria-expanded="true"]{background:var(--u-soft);color:var(--u-dark)}
 .tterm:focus-visible{outline:2px solid var(--u);outline-offset:1px}
-.ttip{position:absolute;z-index:35;width:max-content;max-width:min(300px,calc(100vw - 24px));background:var(--ink);color:var(--paper);border-radius:12px;padding:10px 13px 11px;font-size:13px;line-height:1.62;box-shadow:0 8px 28px rgba(0,0,0,.22)}
-.ttip b.h{display:block;font-size:12px;font-weight:900;margin-bottom:2px}
+.ttip{position:absolute;z-index:35;width:max-content;max-width:min(300px,calc(100vw - 24px));background:var(--ink);color:var(--paper);border-radius:var(--r-s);padding:10px 13px 11px;font-size:var(--t-small);line-height:1.62;box-shadow:0 8px 28px rgba(0,0,0,.22)}
+.ttip b.h{display:block;font-size:var(--t-cap);font-weight:900;margin-bottom:2px}
 .ttip b{color:inherit}
 .ttip .ar{position:absolute;top:-5px;width:10px;height:10px;background:var(--ink);transform:rotate(45deg)}
 .ttip.up .ar{top:auto;bottom:-5px}
-.dqc .lead{font-size:12.5px;color:var(--muted);line-height:1.6;margin:-4px 0 4px}
-.dqc h2 .n{font-size:11px;font-weight:800;letter-spacing:0;color:var(--u-dark);background:var(--u-soft);border-radius:999px;padding:2px 9px}
+.dqc .lead{font-size:var(--t-cap);color:var(--muted);line-height:1.6;margin:-4px 0 4px}
+.dqc h2 .n{font-size:var(--t-tab);font-weight:700;letter-spacing:0;color:var(--u-dark);background:var(--u-soft);border-radius:var(--r-pill);padding:2px 9px}
 .dqc .qi{padding:12px 0 2px;border-top:1px solid var(--hair);margin-top:10px}
 .dqc .lead+.qi{border-top:none;margin-top:0}
-.dqc .qs{display:flex;gap:8px;font-size:14px;line-height:1.65;color:var(--ink);margin-bottom:9px}
-.dqc .qs .no{flex:0 0 auto;font-size:12px;font-weight:900;color:var(--u-dark);background:var(--u-soft);border-radius:7px;min-width:22px;height:22px;display:grid;place-items:center;margin-top:1px}
-.dqc .fb{margin-top:9px;font-size:13px;line-height:1.7;color:var(--body);background:var(--u-soft);border-radius:10px;padding:9px 12px}
+.dqc .qs{display:flex;gap:8px;font-size:var(--t-small);line-height:1.65;color:var(--ink);margin-bottom:9px}
+.dqc .qs .no{flex:0 0 auto;font-size:var(--t-cap);font-weight:900;color:var(--u-dark);background:var(--u-soft);border-radius:7px;min-width:22px;height:22px;display:grid;place-items:center;margin-top:1px}
+.dqc .fb{margin-top:9px;font-size:var(--t-small);line-height:1.7;color:var(--body);background:var(--u-soft);border-radius:var(--r-s);padding:9px 12px}
 .dqc .fb:focus{outline:none}
 .dqc .fb b.r{font-weight:900;color:var(--ok-dark);margin-right:4px}
 .dqc .fb b.r.no{color:var(--no)}
-.dqc .fb .sl{display:block;font-size:12px;color:var(--muted);margin-top:4px}
+.dqc .fb .sl{display:block;font-size:var(--t-cap);color:var(--muted);margin-top:4px}
 .dqc .fb .sl b{color:var(--u-dark)}
-.dqc .wait{font-size:12.5px;color:var(--muted);margin-top:8px}
+.dqc .wait{font-size:var(--t-cap);color:var(--muted);margin-top:8px}
 .cuefig{margin:0 0 12px}
-.cuefig summary{display:inline-flex;align-items:center;gap:6px;min-height:44px;padding:5px 13px;border:1px solid var(--u-line);border-radius:999px;background:var(--u-soft);color:var(--u-dark);font-size:12.5px;font-weight:800;cursor:pointer;list-style:none}
+.cuefig summary{display:inline-flex;align-items:center;gap:6px;min-height:44px;padding:5px 13px;border:1px solid var(--u-line);border-radius:var(--r-pill);background:var(--u-soft);color:var(--u-dark);font-size:var(--t-cap);font-weight:700;cursor:pointer;list-style:none}
 .cuefig summary::-webkit-details-marker{display:none}
 .cuefig summary svg{width:15px;height:15px;stroke:currentColor;stroke-width:2.2;fill:none;stroke-linecap:round;stroke-linejoin:round;flex:0 0 auto}
-.cuefig summary span{font-weight:600;color:var(--muted)}
+.cuefig summary span{font-weight:700;color:var(--muted)}
 .cuefig[open] summary{margin-bottom:8px}
 .cuefig figure{margin:0;padding:8px 8px 6px}
 .cuefig figure svg{max-height:150px;width:auto}
-.cuefig figcaption{font-size:11.5px}
+.cuefig figcaption{font-size:var(--t-tab)}
 /* ═══ 2026-10-06 디자인 감사 #2·5·6·7·8·10·14 ═══ */
 /* 풀이 집중 모드 — 탭 바 숨김 · 위 막대(나가기 + 진행 8px, 붙어 있음) · 아래 채점 시트 */
 body.focus main{padding-bottom:calc(var(--fbh, var(--sab)) + 24px)}
@@ -2495,6 +2513,18 @@ const touchDay = () => { const t=todayISO(); if (!S.days.includes(t)){ S.days.pu
 const dayIndex = () => Math.max(0, daysBetween(S.start, todayISO())) % CONCEPTS.length;
 const todayConcept = () => CONCEPTS[dayIndex()];
 /* 이용 권한: 학원 수강생(코드) · 이용권 · 원장 → 전 범위. 그 외는 최근 7일치(무료 체험) */
+/* 이용권 끝나기 7일·1일 전, 끝난 뒤 7일 동안만 홈에 조용한 한 줄(벤치마크 #19) — 자동 결제가 없으니 예고가 곧 '해지 걱정 없음' 안내. 단계마다 한 번 닫으면 그 단계엔 다시 안 뜬다 */
+const passNote = () => {
+  if (!ACC || ACC.role === 'owner' || !ACC.passUntil || authLive()) return '';
+  const left = daysBetween(todayISO(), ACC.passUntil), stage = left < 0 ? 'end' : left <= 1 ? 'd1' : left <= 7 ? 'd7' : '';
+  if (!stage || left < -7) return '';
+  let seen = ''; try { seen = localStorage.getItem('pcs.passNote') || ''; } catch {}
+  if (seen === ACC.passUntil + ':' + stage) return '';
+  const msg = stage === 'end' ? `이용권이 <b>${kdate(ACC.passUntil)}</b>에 끝났어요. 기록은 그대로 있어요.`
+    : left === 0 ? `이용권이 <b>오늘</b>까지예요. 자동 결제는 없어요.`
+    : `이용권이 <b>${left}일</b> 남았어요(${kdate(ACC.passUntil)}까지). 자동 결제는 없어요.`;
+  return `<div class="passnote" role="note" data-k="${ACC.passUntil}:${stage}"><span>${msg}</span><span style="display:flex;flex:0 0 auto"><button class="linkbtn" id="passNoteGo">${stage==='end'?'이용권 보기':'이어 쓰기'}</button><button class="linkbtn" id="passNoteX" aria-label="이 안내 닫기">닫기</button></span></div>`;
+};
 const hasPass = () => !!(ACC && ACC.passUntil && ACC.passUntil >= todayISO());
 const authLive = () => !!(S.auth && (!S.auth.until || S.auth.until >= todayISO()));
 const fullAccess = () => !!(authLive() || hasPass() || (ACC && ACC.role==='owner'));
@@ -2954,8 +2984,8 @@ async function sendConsent(){
   let r; try { r = await DBX.consentRequest(pin ? pin.value : undefined); } catch (e){ toast(e.message); return; }
   if (pin && r.ok) ACC = await DBX.me();
   if (!r.ok){ toast(r.why); return; }
-  if (r.done){ ACC = await DBX.me(); show(view); toast('이미 동의가 확인되었습니다'); return; }
-  if (r.given){ ACC = await DBX.me(); show(view); toast('보호자가 이미 동의했습니다. 학원 확인 문자를 기다려 주세요'); return; }
+  if (r.done){ ACC = await DBX.me(); show(view); toast('이미 동의가 확인됐어요'); return; }
+  if (r.given){ ACC = await DBX.me(); show(view); toast('보호자가 이미 동의했어요. 학원 확인 문자를 기다려 주세요'); return; }
   const link = `${CONSENT_BASE()}consent.html?t=${r.token}`, ph = tel(String(r.guardian||'').replace(/^\S+\s*/, ''));
   const body = `[${CFG.academy}] ${ACC.name} 학생이 '하루 한 개념' 앱 가입에 보호자 동의를 요청했습니다. 아래 링크에서 내용을 보고 동의해 주세요(7일).\n${link}`;
   openSheet(`<h3>보호자에게 보내기</h3><p>가입할 때 적은 보호자 연락처${ph?` <b>${esc(ph)}</b>`:''}로 문자를 보내요. 보호자가 링크에서 동의하고 학원이 보호자께 확인 문자를 보내면 열려요.</p>
@@ -3063,12 +3093,12 @@ async function startAsg(id){
   if (q.sub && !q.ok){ await flushAsg(); toast(asgSentText(q)); renderToday(); return; }
   asgT[a.id] = Date.now();
   if (a.kind === 'read'){ const i0 = Math.min(q.i, a.n - 1), ci = CONCEPTS.findIndex(c => c.id === a.items[i0]);
-    if (ci < 0){ toast('이 개념을 찾지 못했습니다. 앱을 업데이트해 주세요'); return; }
+    if (ci < 0){ toast('이 개념을 찾지 못했어요. 앱을 업데이트해 주세요'); return; }
     asgRead = { id:a.id, i:i0 }; detailBack = 'today'; detailIdx = ci; show('detail'); return; }
   if (!MORE.ok){ toast('문제를 받는 중이에요…'); loadMore().then(() => startAsg(id)); return; }
   if (a.kind === 'mock'){ startMock(a.ref); if (mx) mx.asg = a.id; return; }
   const items = a.items.map(x => BANK.find(b => b.id === x)).filter(Boolean);
-  if (!items.length){ toast('이 과제의 문항을 찾지 못했습니다. 앱을 업데이트해 주세요'); return; }
+  if (!items.length){ toast('이 과제의 문항을 찾지 못했어요. 앱을 업데이트해 주세요'); return; }
   const at = Math.min(q.i, items.length);
   umPick = null; bs = { items, i:at, pick:null, right:q.r, wrong:(q.w||[]).map(x => BANK.find(b => b.id === x)).filter(Boolean), label:'학원 과제', ess:null, kind:'asg', asg:a.id };
   show('bank'); }
@@ -3173,6 +3203,7 @@ async function renderToday(){
     </div>
     ${consentCard('today')}
     ${unreadNotice ? `<div class="notice"><div class="ic">!</div><div class="b"><div class="t">${esc(unreadNotice.t)}</div><div class="d">${esc(unreadNotice.d)} · ${esc(unreadNotice.cls)}</div></div><button id="okNotice" data-id="${unreadNotice.id}">확인</button></div>` : ''}
+    ${passNote()}${examNote()}
     ${asgCard()}
     ${P.html}
     ${homeSum()}
@@ -3902,7 +3933,7 @@ async function sendFeedback(){
   try { await DBX.sendFeedback({ kind: fbState.kind, body, ref: fbState.ref, ver: `${CFG.version}${isNative ? '-app' : ''} · ${VIEW_KO[view] || view}` }); }
   catch (e){ btn.disabled = false; wbox.innerHTML = `<div class="piiwarn">${esc(e.message)}</div>`; return; }
   if (careCheck(body)){ openSheet(`<h3>보내 주셔서 고마워요</h3><p>원장님께 잘 전했어요. 그리고 혹시 마음이 많이 무겁다면, 지금 이야기를 들어 줄 사람이 있어요.</p>${helpCards()}<button class="btn ghost" id="sheetClose">닫기</button>`); return; }
-  closeSheet(); toast('원장님께 보냈습니다. 고맙습니다'); }
+  closeSheet(); toast('원장님께 보냈어요. 고마워요'); }
 
 async function renderPlan(){
   const v = document.getElementById('v-plan');
@@ -3972,7 +4003,7 @@ function sheetEvent(ev){
         ${LESSONS.map(l=>`<option value="l:${l.id}" ${e.scope&&e.scope.lesson===l.id?'selected':''}>${esc(l.bookName)} ${l.unit}-${l.id.slice(2)} ${esc(l.name)}</option>`).join('')}</select></div></div>
     <div class="fld"><label for="evM">메모 (선택)</label><textarea id="evM" placeholder="준비물, 유의사항">${esc(e.memo||'')}</textarea></div>
     ${e.scope ? `<div class="scopebox"><div class="h">범위가 걸린 일정</div><p>${esc(scopeName(e.scope))}</p>
-      <button class="btn soft" data-scopego="${e.id}" style="margin:0">이 범위 문제 풀기</button></div>` : ''}
+      ${examPlan(e) ? `<button class="btn" data-eplan="${e.id}" style="margin:0 0 8px">시험까지 계획 · D-${daysBetween(todayISO(), e.date)}</button>` : ''}<button class="btn soft" data-scopego="${e.id}" style="margin:0">이 범위 문제 풀기</button></div>` : ''}
     <button class="btn" id="evSave" data-id="${esc(e.id)}">저장</button>
     ${ev && ev.mine ? `<button class="btn ghost" id="evDel" data-id="${esc(e.id)}">이 일정 지우기</button>` : ''}
     <button class="btn ghost" id="sheetClose">닫기</button>`);
@@ -4006,10 +4037,62 @@ function scopeFrom(val){ if (!val) return null; if (val === 'b1') return { book:
 function drillScope(sc){ if (!sc) return;
   if (!MORE.ok){ toast('문제를 받는 중이에요…'); loadMore().then(() => drillScope(sc)); return; }
   bankSel = { book: sc.book || '전체', unit: sc.unit || '전체', lesson: sc.lesson || '전체', type:'전체', n:20, only:'전체' };
-  const pool = bankPool(); if (!pool.length){ toast('이 범위에 풀 문항이 없습니다'); return; }
+  const pool = bankPool(); if (!pool.length){ toast('이 범위에 풀 문항이 없어요'); return; }
   closeSheet(); show('bank'); startBank(pickBank(bankSel.n), '시험 범위 · ' + scopeName(sc));
 }
 
+/* ═══ 시험까지 계획(벤치마크 #12·#13) — 범위를 건 시험 일정에서, 남은 날 × 범위 소단원으로 하루 분량을 짜 준다.
+   앞쪽은 소단원을 하루 하나씩(남는 날은 약한 곳 다시), 마지막 3일(남은 날이 6일 아래면 1일)은 섞어 풀기 20문제 — 약한 소단원 3곳·꼭 볼 문항(must)을 먼저(약점 클리닉).
+   계획은 저장하지 않고 열 때마다 오늘부터 다시 짠다 — 하루 빠져도 밀린 날이 쌓이지 않는다(죄책감 문구 없음). 오늘 분량을 끝낸 날만 S.epd 에 남긴다 ═══ */
+const scopeLessons = sc => { if (!sc) return []; const open = new Set(openLessons().map(l => l.id));
+  return LESSONS.filter(l => open.has(l.id) && (sc.lesson ? l.id === sc.lesson : (!sc.book || l.book === sc.book) && (!sc.unit || l.unit === sc.unit))).map(l => l.id); };
+/* 약한 곳 = 3문제 넘게 풀어 정답률 80 % 아래인 소단원(낮은 순). 기록이 없으면 비워 두고 '범위 전체에서 고르게'라고 쓴다 — 근거 없이 '약한 곳'이라 부르지 않는다 */
+const weakOf = ls => { const st = lessonStats(), acc = l => st[l].o / st[l].n;
+  return ls.filter(l => st[l] && st[l].n >= 3 && acc(l) < .8).sort((a, b) => acc(a) - acc(b) || (a < b ? -1 : 1)); };
+function examPlan(e){
+  if (!e || !e.scope || e.kind !== 'exam') return null; const d = daysBetween(todayISO(), e.date); if (d < 1 || d > 60) return null;
+  const ls = scopeLessons(e.scope); if (!ls.length) return null;
+  const mix = d >= 6 ? 3 : d >= 3 ? 1 : 0, learn = d - mix, rows = [];
+  if (learn > 0){ const per = Math.ceil(ls.length / learn);
+    for (let i = 0; i < learn; i++){ const part = ls.slice(i * per, (i + 1) * per);
+      rows.push(part.length ? { kind:'learn', lessons:part } : { kind:'weak', lessons:weakOf(ls).slice(0, 2) }); } }
+  for (let i = 0; i < mix; i++) rows.push({ kind:'mix', lessons:weakOf(ls).slice(0, 3) });
+  return { d, ls, rows: rows.map((r, i) => ({ ...r, date:addDays(todayISO(), i), n: r.kind === 'mix' ? 20 : 10 })) };
+}
+function planItems(row, all){
+  const used = new Set(), bh = S.bh || {}, out = [], pool = l => BANK.filter(q => q.lessonId === l && q.type !== 'essay' && !isUM(q));
+  const grab = (l, k, mustFirst) => { const p = pool(l).filter(q => !used.has(q.id)), m = mustFirst ? shuffleArr(p.filter(q => q.must && bh[q.id] !== 'o')) : [];
+    for (const q of [...m, ...shuffleArr(p.filter(q => bh[q.id] === 'x')), ...shuffleArr(p.filter(q => !bh[q.id])), ...shuffleArr(p)]){ if (k <= 0) break; if (used.has(q.id)) continue; used.add(q.id); out.push({ lesson:l, q }); k--; } };
+  if (row.kind === 'mix'){ row.lessons.forEach(l => grab(l, 4, true)); const rest = shuffleArr(all.filter(l => !row.lessons.includes(l)));
+    for (let g = 0; out.length < row.n && g < Math.max(1, rest.length) * 6; g++) grab(rest.length ? rest[g % rest.length] : row.lessons[g % row.lessons.length], 1, true);
+    for (let g = 0; out.length < row.n && g < row.lessons.length * 6; g++) grab(row.lessons[g % row.lessons.length], 1, false); }
+  else if (row.lessons.length){ const k = Math.ceil(row.n / row.lessons.length); row.lessons.forEach(l => grab(l, k, row.kind === 'weak')); }
+  else { const sp = shuffleArr(all); for (let g = 0; out.length < row.n && g < sp.length * 6; g++) grab(sp[g % sp.length], 1, true); }   // 약한 곳 기록이 없으면 범위 전체에서 고르게
+  const ten = out.slice(0, row.n), mixed = interleave(ten); return [...mixed, ...ten.filter(x => !mixed.includes(x))].map(x => x.q);
+}
+const planRowText = r => r.kind === 'mix' ? `섞어 풀기 ${r.n}문제 <small>${r.lessons.length ? `약한 곳 ${r.lessons.map(l => lessonLabel(l).split(' ')[0]).join('·')} 먼저` : '범위 전체에서 고르게 · 꼭 볼 문제 먼저'}</small>`
+  : r.kind === 'weak' ? (r.lessons.length ? `약한 곳 다시 ${r.n}문제 <small>${r.lessons.map(l => esc(lessonLabel(l))).join(' · ')}</small>` : `범위 전체 다시 ${r.n}문제 <small>틀린 문제 먼저 · 고르게 섞어서</small>`)
+  : `${r.lessons.map(l => esc(lessonLabel(l))).join(' · ')} <small>${r.n}문제${r.lessons.length === 1 ? ' · 개념도 같이 보면 좋아요' : ''}</small>`;
+function openExamPlan(id){
+  const e = myEvents().find(x => x.id === id), P = examPlan(e); if (!P){ toast('범위를 건 시험 일정에서만 계획을 짤 수 있어요'); return; }
+  const done = ((S.epd || {})[e.id] || '') === todayISO();
+  openSheet(`<h3>시험까지 계획 <span style="font-size:var(--t-cap);color:var(--muted);font-weight:700">${esc(e.title)} · D-${P.d}</span></h3>
+    <p class="tip" style="margin:0 0 10px">${esc(scopeName(e.scope))} · 하루 10문제쯤, 마지막 ${P.rows.filter(r => r.kind === 'mix').length || 0}일은 섞어 풀기예요. 하루 빠져도 열 때마다 남은 날에 맞춰 다시 짜요.</p>
+    <ol class="eplan">${P.rows.map((r, i) => `<li class="${i === 0 ? 'now' : ''}"><span class="dt">${i === 0 ? '오늘' : `${+r.date.slice(5, 7)}/${+r.date.slice(8)}`}<small>${WD[wdOf(r.date)]}</small></span><span class="tx">${planRowText(r)}</span>${i === 0 ? (done ? '<span class="cst ok">끝</span>' : '') : ''}</li>`).join('')}
+      <li class="ex"><span class="dt">${+e.date.slice(5, 7)}/${+e.date.slice(8)}<small>${WD[wdOf(e.date)]}</small></span><span class="tx"><b>${esc(e.title)}</b></span></li></ol>
+    <p class="fine" style="text-align:left;padding:2px 2px 10px">오늘의 복습(다시 볼 문제)은 따로 나와요 — 시험이 가까우면 간격도 알아서 좁혀져요.</p>
+    <button class="btn" id="planGo" data-id="${esc(e.id)}">${done ? '오늘 분량 한 번 더' : '오늘 분량 풀기'}</button><button class="btn ghost" id="sheetClose">닫기</button>`);
+}
+function startPlanDay(id){
+  if (!MORE.ok){ toast('문제를 받는 중이에요…'); loadMore().then(() => startPlanDay(id)); return; }
+  const e = myEvents().find(x => x.id === id), P = examPlan(e); if (!P) return; const items = planItems(P.rows[0], P.ls);
+  if (!items.length){ toast('이 범위에 풀 문항이 없어요'); return; }
+  closeSheet(); startBank(items, `시험까지 계획 · ${e.title}`); bs.kind = 'plan'; bs.plan = e.id; renderBank();
+}
+/* 홈: 범위를 건 시험이 14일 안이면 조용한 한 줄(벤치마크 #13 '시험 2주 전부터 홈에 한 줄') */
+const examNote = () => { const e = myEvents().find(x => x.kind === 'exam' && x.scope && daysBetween(todayISO(), x.date) >= 1 && daysBetween(todayISO(), x.date) <= 14 && examPlan(x)); if (!e) return '';
+  const done = ((S.epd || {})[e.id] || '') === todayISO();
+  return `<div class="passnote" role="note"><span><b>${esc(e.title)} D-${daysBetween(todayISO(), e.date)}</b> · ${done ? '오늘 분량 끝났어요' : '시험까지 계획이 있어요'}</span><button class="linkbtn" data-eplan="${esc(e.id)}">${done ? '계획 보기' : '오늘 분량 보기'}</button></div>`; };
 /* ═══ 소단원 기록 · 숙련도(2026-10-06 디자인 감사 #8, Khan 식 4단계) ═══
    그 소단원 '문제 은행' 문항(대단원 마무리·모의고사 제외)의 기록 S.bh(문항마다 마지막 결과 o/x)와 간격 복습 상자(S.wrong)만 본다.
    0 시작 전 — 푼 문제가 5개보다 적다
@@ -4189,6 +4272,7 @@ function drawBankSession(){
   }
   const graded = bs.pick !== null && bs.pick !== 'show', L = LESSONS.find(x=>x.id===q.lessonId), jd = graded ? multiSplit(q) : null;   // show: 개념 카드 뒷면만 본 상태
   const rk = (bs.recs||[])[bs.i], rw = rk ? S.wrong.find(w => !w.cleared && wKey(w) === rk) : null;
+  if (bs.stepOn === undefined){ try { bs.stepOn = !!localStorage.getItem('pcs.sjOn'); } catch { bs.stepOn = false; } }   // 합답형 하나씩 판정 — 마지막에 고른 방식을 기억
   if (!bs.tl) bs.tl = Date.now();   // 걸린 시간: 문항 사이 10분까지만 센다(켜 두고 자리를 떠난 시간은 빼고)
   /* 시험처럼: 이 문제를 처음 그릴 때 시계를 건다(채점 전까지 96초) */
   if (bs.timed && !graded && bs.qi !== bs.i){ bs.qi = bs.i; bs.qt0 = Date.now(); }
@@ -4206,11 +4290,19 @@ function drawBankSession(){
         <button class="btn" data-leech="${esc(rk)}">개념 카드 읽기</button><button class="btn ghost" id="leechSkip">이 문제는 건너뛰기</button></div>`; return; }
   let body = '';
   const okMark = `<span class="okm" aria-hidden="true">${IC_OK}</span>`;   // 맞힌 선지 — 체크가 그려진다(240ms)
+  const sp = !graded && q.type === 'multi' && !bs.timed ? multiSplit(q) : null;   // 합답형 하나씩 판정(벤치마크 #10) — ㄱㄴㄷ를 O/X로 판정하면 조합이 정해진다
   if (q.type==='ox') body = `<div class="oxrow">${['O','X'].map(o=>`<button data-ox="${o}" ${graded?'disabled':''} class="${graded?(o===q.answer?'ok':(o===bs.pick?'bad':'')):''}">${o}</button>`).join('')}</div>`;
+  else if (sp && bs.stepOn){ const sj = (bs.sjNow ||= {}), keys = sp.rows.map(r => r.k), picked = keys.filter(k => sj[k] === true), all = keys.every(k => k in sj);
+    const ci = all ? q.choices.findIndex(t => { const ls = String(t).match(/[ㄱ-ㄹ]/g) || []; return ls.length === picked.length && picked.every(k => ls.includes(k)); }) : -1;
+    body = `<div class="sjbox" role="group" aria-label="보기 하나씩 판정"><p class="sjh">보기를 하나씩 판정해요. 고르면 조합이 정해져요.</p>
+      ${keys.map(k => `<div class="sjrow"><span class="k">${k}</span>${[[true,'옳아요'],[false,'틀려요']].map(([v, l]) => `<button data-sj="${k}|${v ? 1 : 0}" aria-pressed="${sj[k] === v}" class="${sj[k] === v ? 'on' : ''}">${l}</button>`).join('')}</div>`).join('')}
+      <p class="sjsum" aria-live="polite">${!all ? `${keys.length - Object.keys(sj).filter(k => keys.includes(k)).length}개 남았어요` : ci >= 0 ? `옳은 것 ${picked.join(', ') || '없음'} → <b>${MARKS[ci]}</b>` : `옳은 것 ${picked.join(', ') || '없음'} — 이 조합은 선지에 없어요. 다시 살펴봐요`}</p>
+      <button class="btn" id="sjGo" data-ci="${ci + 1}" ${ci >= 0 ? '' : 'disabled'}>${ci >= 0 ? `${MARKS[ci]}로 채점하기` : '채점하기'}</button></div>`; }
   else if (q.type==='mc' || q.type==='multi') body = `<div class="opts">${q.choices.map((t,i)=>{ const n=i+1; let cls='', mk=''; if (graded){ if (n===q.answer){cls='ok';mk='정답';} else if (n===+bs.pick){cls='bad';mk='내 답';} }
       return `<button class="opt ${cls}" data-bp="${n}" ${graded?'disabled':''}><span class="m">${MARKS[i]}</span><span class="tx">${rich(t)}</span>${mk?`<span class="mk">${cls === 'ok' && +bs.pick === n ? okMark : ''}${mk}</span>`:''}</button>`; }).join('')}</div>`;
   else if (q.type==='blank') body = graded ? `<div class="opts"><div class="opt ${bankCorrect(q,bs.pick)?'ok':'bad'}" style="cursor:default"><span class="tx">내 답: ${esc(bs.pick||'(빈칸)')} · 정답: <b>${esc(q.answer)}</b></span></div></div>` : `<div class="blankin"><input id="blankIn" aria-label="빈칸의 답" placeholder="${String(q.answer).includes(',') ? `빈칸 ${String(q.answer).split(',').length}개 — 순서대로 쉼표로 (예: 가, 나)` : '답을 쓰세요'}" autocomplete="off"><button id="blankGo">확인</button></div>`;
   else body = `<textarea class="essay" id="essayIn" placeholder="문장으로 답을 써 보세요" ${graded?'disabled':''}>${esc(bs.ess||'')}</textarea>${graded ? '' : `<button class="btn soft" id="essayShow">모범 답안 보기 · 스스로 채점</button>`}`;
+  if (sp) body = `<button class="linkbtn sjtog" id="sjTog" aria-pressed="${!!bs.stepOn}">${bs.stepOn ? '선지에서 한 번에 고르기' : 'ㄱ·ㄴ·ㄷ 하나씩 판정하기'}</button>` + body;
   const ok = graded && bankCorrect(q, bs.pick), essay = q.type === 'essay', selfGrade = essay && bs.pick === '?';
   /* 아직 안 풀었을 때 화면 아래가 비어 보이지 않도록, 유형에 맞는 한 줄 안내를 둔다 */
   const HINT = { ox:'맞으면 O, 틀리면 X를 골라요.', mc:'하나만 고르면 바로 채점해요.',
@@ -4219,7 +4311,7 @@ function drawBankSession(){
   const right = q.type==='mc'||q.type==='multi' ? ` · 정답 ${MARKS[q.answer-1]}` : q.type==='ox'||q.type==='blank' ? ` · 정답 ${esc(q.answer)}` : '';
   const head = essay ? (selfGrade ? '모범 답안과 견주어 스스로 채점해요' : bs.pick === '맞음' ? '맞게 썼어요' : '모범 답안을 한 번 더 봐요') : (ok ? '맞았어요' : '틀렸어요') + right;
   const line = srsLine((bs.res||[])[bs.i]), desc = `fbH${line ? ' fbL' : ''}`;
-  const btns = selfGrade ? `<div class="oxrow ess"><button data-ess="맞음" aria-describedby="fbH">맞게 썼다</button><button data-ess="틀림">부족했다</button></div>`
+  const btns = selfGrade ? `<div class="oxrow ess"><button data-ess="맞음" aria-describedby="fbH">맞게 썼어요</button><button data-ess="틀림">부족했어요</button></div>`
     : `<button class="btn" id="bankNext" aria-describedby="${desc}">${bs.i+1<bs.items.length?'다음 문제':'결과 보기'}</button>`;
   v.innerHTML = `${bar}
     <div class="qhead"><span class="l">${kindTag}${esc(L?L.unit+'-'+L.id.slice(2)+' '+L.name:'')}</span><span class="tag">${TYPE_NAME[q.type]}${q.difficulty ? ` · ${esc(q.difficulty)}` : ''}</span></div>
@@ -4228,7 +4320,7 @@ function drawBankSession(){
     ${graded || essay ? '' : confRow(bs.conf)}
     ${body}
     ${graded ? '' : `<p class="qhint">${HINT}<br>틀려도 괜찮아요. ${SRS_RULE}</p>`}
-    ${graded ? `${explBox(essay ? '모범 답안' : '해설', (jd ? jdHtml(jd) : q.explain ? `<p>${rich(q.explain)}</p>` : q.wrong ? '' : conceptGo(q))
+    ${graded ? `${explBox(essay ? '모범 답안' : '해설', (jd ? jdHtml(jd, (bs.sj || [])[bs.i]) : q.explain ? `<p>${rich(q.explain)}</p>` : q.wrong ? '' : conceptGo(q))
         + (q.wrong && !jd ? `<div class="wrongbox"><div class="h">${essay ? '채점 기준' : '오답 왜 틀렸나'}</div>${rich(q.wrong)}</div>` : ''))}
       <button class="flag" data-report="bank:${esc(q.id)}">문제·해설에 틀린 곳이 있나요?</button>
       ${fbSheet({ ok: essay ? (selfGrade ? null : bs.pick === '맞음') : ok, head, note: essay ? '' : confNote((bs.cf||[])[bs.i], ok), line, btns })}` : ''}`;
@@ -4254,7 +4346,7 @@ function multiSplit(q){
   return { lead: lead.filter(Boolean), rows: keys.map(k => ({ k, ...seg[k] })) };
 }
 /* 해설 칸 — 나뉘면 보기마다 한 줄, 아니면 지금처럼(해설 문단 + 바로알기 상자) */
-const jdHtml = sp => `${sp.lead.map(t => `<p>${rich(t)}</p>`).join('')}<div class="jdl" role="list">${sp.rows.map(r => `<div class="jd" role="listitem"><span class="k">${r.k}</span><span class="v ${r.ok ? 'o' : 'x'}">${r.ok ? '옳음' : '틀림'}</span><span class="t">${rich(r.why)}</span></div>`).join('')}</div>`;
+const jdHtml = (sp, mine) => `${sp.lead.map(t => `<p>${rich(t)}</p>`).join('')}<div class="jdl" role="list">${sp.rows.map(r => `<div class="jd" role="listitem"><span class="k">${r.k}</span><span class="v ${r.ok ? 'o' : 'x'}">${r.ok ? '옳음' : '틀림'}</span><span class="t">${rich(r.why)}${mine && r.k in mine ? `<span class="jme ${mine[r.k] === r.ok ? '' : 'off'}">내 판정 ${mine[r.k] ? '옳음' : '틀림'}${mine[r.k] === r.ok ? '' : ' — 여기서 갈렸어요'}</span>` : ''}</span></div>`).join('')}</div>`;
 function bankAnswer(pick){
   const q = bs.items[bs.i]; if (bs.pick !== null && bs.pick !== '?') return;
   bs.pick = pick; touchDay(); S.bh ||= {};
@@ -4264,7 +4356,8 @@ function bankAnswer(pick){
   if (bs.timed && bs.qt0) (bs.tm ||= [])[bs.i] = Math.round((Date.now() - bs.qt0) / 1000);   // 시험처럼: 문항별 걸린 초
   const conf = q.type === 'essay' ? '' : (bs.conf || ''); (bs.cf ||= [])[bs.i] = conf;
   if (ok) bs.right++; else bs.wrong.push(q);
-  if (bs.kind === 'asg') asgStep(bs.asg, bs.i + 1, bs.right, bs.wrong.map(x => x.id));   // 학원 과제: 한 문항마다 진행을 남기고, 끝이면 낸다
+  if (bs.kind === 'asg') asgStep(bs.asg, bs.i + 1, bs.right, bs.wrong.map(x => x.id));
+  if (bs.kind === 'plan' && bs.i === bs.items.length - 1) (S.epd ||= {})[bs.plan] = todayISO();   // 시험까지 계획: 오늘 분량 끝   // 학원 과제: 한 문항마다 진행을 남기고, 끝이면 낸다
   /* 간격 복습 — 문제 은행 오답도 같은 상자에(예전엔 담기만 하고 다시 나오지 않았다) */
   (bs.res ||= [])[bs.i] = q._qz ? srsMark({ l:q._qz.lessonId, n:q._qz.no }, ok, +pick, conf) : srsMark({ b:q.id }, ok, (q.type==='mc'||q.type==='multi')?MARKS[+pick-1]:String(pick), conf);
   save(S); renderBankSession(); document.querySelector('#v-bank .verdict.fb .btn, #v-bank .verdict.fb [data-ess]')?.focus({ preventScroll:true });   // 시트 머리·한 마디를 '다음' 버튼 설명으로 읽는다
@@ -4879,7 +4972,7 @@ async function renderStats(){
     <div class="tiles">
       <div class="tile rtile">${rhythm(S.days, 'tile')}</div>
       <div class="tile"><div class="v">${S.done.length}<small>/${CONCEPTS.length}</small></div><div class="l">공부한 개념</div></div>
-      <div class="tile"><div class="v">${S.stats.a?Math.round(S.stats.c/S.stats.a*100):0}<small>%</small></div><div class="l">정답률 · ${S.stats.a}문제</div></div>
+      ${S.stats.a ? `<div class="tile"><div class="v">${Math.round(S.stats.c/S.stats.a*100)}<small>%</small></div><div class="l">정답률 · ${S.stats.a}문제</div></div>` : `<div class="tile"><div class="v" aria-hidden="true">–</div><div class="l">아직 푼 문제가 없어요</div></div>`}
     </div>
     <div class="sec"><h2><span>학습 달력 · ${y}년 ${m}월</span><span><button class="more" data-mon="-1">‹</button> <button class="more" data-mon="1">›</button></span></h2>
       <div class="cal">${cal}</div>
@@ -4892,8 +4985,8 @@ async function renderStats(){
         ${mqLegend()}</div>`; })()}
     ${(() => { const bh=S.bh||{}; const ids=Object.keys(bh); if (!ids.length) return ''; const per = LESSONS.map(L => { const qs = BANK.filter(q=>q.lessonId===L.id && bh[q.id]); return { L, n:qs.length, r:qs.filter(q=>bh[q.id]==='o').length }; }).filter(x=>x.n>0).sort((a,b)=>b.n-a.n).slice(0,8);
       return `<div class="sec"><h2>문제 은행 · 소단원별 정답률</h2>${per.map(x=>`<div class="bar-row"><span class="k">${esc(x.L.unit)}-${x.L.id.slice(2)} ${esc(x.L.name)}<small>${esc(x.L.bookName)} · ${x.n}문제</small></span><span class="bar"><i style="width:${Math.round(x.r/x.n*100)}%"></i></span><span class="v">${Math.round(x.r/x.n*100)}%</span></div>`).join('')}</div>`; })()}
-    <div class="sec"><h2>오답</h2><div class="kv"><span class="k">담긴 문제</span><span class="v">${S.wrong.filter(w=>!w.cleared).length}</span></div><div class="kv"><span class="k">다시 풀어 정리</span><span class="v">${S.wrong.filter(w=>w.cleared).length}</span></div><div class="kv"><span class="k">북마크</span><span class="v">${S.bm.length}</span></div></div>
-    <button class="btn" id="goReview">복습 문제 풀기 · 배운 범위에서 무작위</button>`;
+    ${S.wrong.length || S.bm.length ? `<div class="sec"><h2>오답</h2><div class="kv"><span class="k">담긴 문제</span><span class="v">${S.wrong.filter(w=>!w.cleared).length}</span></div><div class="kv"><span class="k">다시 풀어 정리</span><span class="v">${S.wrong.filter(w=>w.cleared).length}</span></div><div class="kv"><span class="k">북마크</span><span class="v">${S.bm.length}</span></div></div>` : ''}
+    <button class="btn" id="goReview">${S.stats.a ? '복습 시작' : '10문제로 시작해 볼까요?'}</button><p class="fine" style="padding-top:2px">${S.stats.a ? '배운 범위에서 섞어 나와요' : '배운 범위에서 섞어 나와요 · 틀려도 괜찮아요'}</p>`;
 }
 
 /* ═══ 내 정보 · 설정 ═══ */
@@ -5163,13 +5256,13 @@ async function ownerTodo(st){
     ${rows.length ? `<p class="tip" style="margin:8px 0 0">출석했는데 7일 동안 앱 공부가 없는 학생 · 정답률이 지난주보다 ${TODO_DROP}%p 이상 떨어진 학생 · 최근 공지를 안 읽은 학생 · 다시 볼 문제가 ${TODO_BACKLOG}개 넘게 밀린 학생 · 과제 마감이 지났는데 아직 안 낸 학생을 모읍니다.</p>`
       : `<p class="tip" style="margin:0">출석·정답률·공지·밀린 복습·과제 마감을 날마다 살펴, 챙길 학생이 생기면 여기에 모읍니다.</p>`}</details>`; }   /* 할 일이 없는 날은 기준을 한 줄로(2026-10-07 7일 사용 점검: 빈 상자에 긴 설명만 펼쳐져 있었다) */
 /* ═══ 원장 › 과제(벤치마크 ★4) — 공지와 같은 문법: 무엇을(종류·범위) → 누구에게(반·학생) → 언제까지(마감) → 내기 ═══
-   소단원 문제는 낼 때 문항을 골라 모두 같은 문항을 푼다(많이 틀린 문항을 수업 시작 5분에 같이 보려고). 서술형은 스스로 채점이라 빼고 낸다 */
+   소단원 문제는 낼 때 문항을 골라 모두 같은 문항을 푼다(많이 틀린 문항을 수업 시작 5분에 같이 보려고). '유형 전체'에는 서술형을 넣지 않고, '서술형'을 고르면 서술형만 낸다 — 학생이 써 본 뒤 모범 답안·채점 기준과 견주어 스스로 채점한다(쓴 글은 서버로 보내지 않는다) */
 let asgF = { kind:'bank', lesson:'', type:'전체', diff:'전체', n:10, unit:'', mock:'1', cls:'', pick:[], due:'' };
 const ASG_DIFF = [['전체','난이도 전체'],['●○○','기본'],['●●○','실력'],['●●●','도전']];
 /* 과제에 담을 수 있는 문항 id — 서버 assign_create(와 로컬 흉내)가 이 꼴만 받아 '빈칸에 들어갈 말은?'(id 에 ㉠㉡㉢) 문항을 조용히 빼,
    제목은 '문제 5개'인데 학생에게 2문항만 가던 것(2026-10-07 7일 사용 점검). 서버 정규식을 넓히기 전까지는 고를 때부터 뺀다 */
 const ASG_ID = /^[A-Za-z0-9_:#.㉠-㉭-]{1,40}$/;   // 서버(assign_create)와 같은 규칙 — ㉠㉡㉢ 든 빈칸 선다형 id 도 받는다
-const asgPool = f => BANK.filter(q => ASG_ID.test(q.id) && q.lessonId === f.lesson && !isUM(q) && q.type !== 'essay' && (f.type === '전체' || q.type === f.type) && (f.diff === '전체' || String(q.difficulty||'').startsWith(f.diff)));
+const asgPool = f => BANK.filter(q => ASG_ID.test(q.id) && q.lessonId === f.lesson && !isUM(q) && (f.type === '전체' ? q.type !== 'essay' : q.type === f.type) && (f.diff === '전체' || String(q.difficulty||'').startsWith(f.diff)));
 const lessonName = id => { const L = LESSONS.find(l => l.id === id); return L ? `${L.unit}-${L.id.slice(2)} ${L.name}` : id; };
 function asgGrab(){ const g = id => document.getElementById(id); if (!g('asgForm')) return;
   if (g('afLesson')) asgF.lesson = g('afLesson').value; if (g('afUnit')) asgF.unit = g('afUnit').value; if (g('afMock')) asgF.mock = g('afMock').value;
@@ -5195,7 +5288,7 @@ function asgFormHtml(st, CL){ const f = asgF; if (!f.lesson) f.lesson = (LESSONS
   const d = asgDraft(), live = st.filter(x => x.until >= todayISO()), who = asgWho(st);
   return `<div class="form" id="asgForm"><h3>과제 내기</h3>
     <div class="afk"><span class="k">무엇을</span>${chips('kind', [['bank','소단원 문제'],['unit','대단원 마무리'],['mock','모의고사'],['read','개념 읽기']])}</div>
-    ${f.kind === 'bank' ? `<div class="afk">${lessonSel}</div><div class="afk">${chips('type', [['전체','유형 전체'],['ox','OX'],['blank','빈칸'],['mc','선다형'],['multi','자료·보기']])}${chips('diff', ASG_DIFF)}${chips('n', [[5,'5문제'],[10,'10문제'],[15,'15문제'],[20,'20문제']])}</div>`
+    ${f.kind === 'bank' ? `<div class="afk">${lessonSel}</div><div class="afk">${chips('type', [['전체','유형 전체'],['ox','OX'],['blank','빈칸'],['mc','선다형'],['multi','자료·보기'],['essay','서술형']])}${chips('diff', ASG_DIFF)}${chips('n', [[5,'5문제'],[10,'10문제'],[15,'15문제'],[20,'20문제']])}</div>`
       : f.kind === 'unit' ? `<div class="afk"><select id="afUnit" aria-label="대단원">${unitList().map(u => `<option value="${u.key}" ${f.unit === u.key ? 'selected' : ''}>통합과학 ${u.book} ${u.unit}. ${esc(u.name)}</option>`).join('')}</select></div>`
       : f.kind === 'mock' ? `<div class="afk"><select id="afMock" aria-label="모의고사 회차">${MOCKS.map(m => `<option value="${m.k}" ${f.mock === m.k ? 'selected' : ''}>${esc(m.t)} · ${esc(m.s)}</option>`).join('')}</select></div>`
       : `<div class="afk">${lessonSel}</div>`}
@@ -5204,7 +5297,7 @@ function asgFormHtml(st, CL){ const f = asgF; if (!f.lesson) f.lesson = (LESSONS
     <p class="afsum" id="afSum" aria-live="polite">${asgSum(d, who)}</p>
     <button class="btn" id="afSend" ${d.why ? 'disabled' : ''}>과제 내기</button></div>`; }
 const asgWho = st => { const f = asgF, live = st.filter(x => x.until >= todayISO()); return f.cls === '학생 고르기' ? `학생 ${f.pick.length}명` : f.cls === '전체' ? `전체 ${live.length}명` : `${f.cls} ${live.filter(x => x.cls === f.cls).length}명`; };
-const asgSum = (d, who) => d.why ? esc(d.why) : `${esc(d.title)} → <b>${esc(who)}</b> · ${esc(kdate(asgF.due))}(${WD[wdOf(asgF.due)]}) 23:59까지${d.pool ? ` · 고를 수 있는 문항 ${d.pool}개 중에서` : ''}`;
+const asgSum = (d, who) => d.why ? esc(d.why) : `${esc(d.title)} → <b>${esc(who)}</b> · ${esc(kdate(asgF.due))}(${WD[wdOf(asgF.due)]}) 23:59까지${d.pool ? ` · 고를 수 있는 문항 ${d.pool}개 중에서` : ''}${asgF.kind === 'bank' && asgF.type === 'essay' && !d.why ? ' · 학생이 써 본 뒤 모범 답안과 견주어 스스로 채점해요' : ''}`;
 let asgCtx = null;
 /* 고른 값이 바뀌면 양식만 다시 그린다(누른 자리에 포커스를 둔다) */
 function asgRedraw(focusId){ const el = document.getElementById('asgForm'); if (!el || !asgCtx) return; el.outerHTML = asgFormHtml(asgCtx.st, asgCtx.CL); a11yPass(document.getElementById('asgForm'));
@@ -5231,6 +5324,7 @@ async function openAsgReport(id){
   openSheet(`<h3>${esc(a.title)}</h3>
     <p>${esc(a.cls || `학생 ${a.target}명`)} · ${esc(ASG_KIND[a.kind] || '')} ${a.n}${a.kind === 'read' ? '개' : '문항'} · 마감 ${esc(asgWhen(a.due))}${dLeft(a.due) < 0 ? ' · 마감 지남' : ''}</p>
     <div class="tiles"><div class="tile"><div class="v">${a.submitted}<small>/${a.target}</small></div><div class="l">제출</div></div><div class="tile"><div class="v">${a.rate != null ? a.rate : '–'}<small>${a.rate != null ? '%' : ''}</small></div><div class="l">정답률</div></div><div class="tile"><div class="v">${a.late}<small>명</small></div><div class="l">늦은 제출</div></div></div>
+    ${r.items.some(id => (qOf(id) || {}).type === 'essay') ? `<p class="tip" style="margin:0 0 10px">서술형은 학생이 모범 답안과 견주어 스스로 채점한 결과예요. 쓴 글은 학생 기기에만 있어요.</p>` : ''}
     ${a.kind !== 'read' ? `<div class="sec asgtop"><h2>많이 틀린 문항</h2>${r.top.length ? r.top.map(t => { const q = qOf(t.id), no = r.items.indexOf(t.id) + 1;
         return `<div class="kv" style="align-items:flex-start;gap:10px"><span class="k" style="flex:1"><b>${no}번</b> ${q ? esc(String(q.stem || '').replace(/<[^>]+>/g, '').slice(0, 70)) : esc(t.id)}</span><span class="v">${t.n}명 틀림</span></div>`; }).join('')
         + '<p class="tip" style="margin:8px 0 0">수업 시작 5분에 같이 짚어 보기 좋은 문항입니다.</p>' : '<p class="tip" style="margin:0">아직 낸 학생이 없거나 틀린 문항이 없습니다.</p>'}</div>` : ''}
@@ -5482,6 +5576,37 @@ async function downloadAttendance(ym){
   const name = `${CFG.academy}_출석부_${y}-${pad(m)}.csv`;
   if (await saveFile(name, csv, 'text/csv') && !isNative) toast(`${name} 을(를) 내려받았습니다`);
 }
+/* 원장 → 보호자 '이번 주 요약 문자'(벤치마크 ★5 마지막) — 보호자 화면 '이번 주 요약'과 같은 숫자를 문자 한 통으로.
+   원장 폰의 문자 앱(sms:)으로 보내므로 유료 알림톡이 필요 없다. 보내기 전에 글을 그대로 보여 주고, 복사해 카카오톡으로 보내도 된다.
+   보호자 화면 원칙 그대로: 다른 학생과 견주지 않고, 연속 일수·노트·이야기 글은 넣지 않는다 */
+async function weekSmsText(st){
+  let prog = null, tn = null, ca = [];
+  try { prog = await DBX.loadProgress(st.code); } catch {}
+  try { const n = await DBX.noteGet(st.code); tn = n && n.ok && n.body ? n.body : null; } catch {}
+  try { const mon = weekDays()[0], list = (await DBX.assignList()).filter(a => a.due >= addDays(mon, -7) && a.due <= weekDays()[6]);
+    for (const a of list.slice(0, 8)){ const r = await DBX.assignReport(a.id); const x = r && r.ok && r.rows.find(y => y.code === st.code); if (x) ca.push({ title:a.title, due:a.due, submitted_at:x.submitted_at, late:x.late }); } } catch {}
+  const w = weekSummary(prog, ca), now = w.trend[w.trend.length - 1], sub = ca.filter(a => a.submitted_at).length;
+  const L = id => { const x = LESSONS.find(y => y.id === id); return x ? x.name : id; };
+  const lines = [`[${CFG.academy}] ${st.name} 학생 이번 주(${w.range.replace('–', '~')})`,
+    `공부한 날 ${weekCount(prog && prog.days)}/7일 · 개념 ${w.concepts}개 · 문제 ${w.solved}개${now.r == null ? '' : `(정답률 ${now.r}%)`}`];
+  if (w.asg.length) lines.push(`학원 과제 ${w.asg.length}개 중 ${sub}개 냄`);
+  if (w.again.length) lines.push(`다음 주 한 번 더 볼 곳: ${w.again.map(e => L(e.l)).join(', ')}`);
+  if (tn) lines.push(`선생님 한 마디: ${tn}`);
+  lines.push(`앱 '자녀' 화면에서 자세히 보실 수 있어요.`);
+  return lines.join('\n');
+}
+async function openWeekSms(code){
+  const st = (await DBX.students()).find(s => s.code === code); if (!st) return;
+  let lk = { guardians:[] }; try { lk = await DBX.linkedOf(code); } catch {}
+  const text = await weekSmsText(st), ios = /iphone|ipad/i.test(navigator.userAgent) ? '&' : '?';
+  const gph = (lk.guardians || []).filter(g => g.approved !== false).map(g => tel(g.phone)).filter(Boolean), ph = gph.length ? gph : (tel(st.phone) ? [tel(st.phone)] : []);
+  openSheet(`<h3>이번 주 요약 문자 <span style="font-size:var(--t-cap);color:var(--muted);font-weight:700">${esc(st.name)} · ${esc(st.cls)}</span></h3>
+    <p class="tip" style="margin:0 0 8px">보호자 화면 '이번 주 요약'과 같은 숫자예요. 보내기 전에 고쳐도 됩니다.</p>
+    <textarea id="wsmsText" rows="7" aria-label="보낼 문자" style="width:100%;border:1.5px solid var(--line);border-radius:var(--r-m);padding:10px 12px;font-family:inherit;font-size:var(--t-small);line-height:1.6;background:var(--card);color:var(--ink);word-break:keep-all">${esc(text)}</textarea>
+    <p class="fine" style="text-align:left;padding:4px 2px 10px">받는 사람: ${ph.length ? (gph.length ? `보호자 ${gph.length}명(${gph.map(esc).join(', ')})` : `학생 연락처 ${esc(ph[0])} — 앱에 연결된 보호자 번호가 없어요`) : '연락처가 없어요 · 복사해서 보내 주세요'}</p>
+    ${ph.length ? `<a class="btn" id="wsmsGo" data-ph="${esc(ph.join(','))}" data-ios="${ios}" href="sms:${ph.join(',')}${ios}body=${encodeURIComponent(text)}" style="text-decoration:none">문자 앱으로 보내기</a>` : ''}
+    <button class="btn soft" id="wsmsCopy">복사하기 · 카카오톡에 붙여 보내기</button><button class="btn ghost" id="sheetClose">닫기</button>`);
+}
 async function openStudent(code){
   const st = (await DBX.students()).find(s=>s.code===code); if (!st) return;
   const ym = todayISO().slice(0,7); let att=[], prog=null, lk={ student:0, guardians:[] };
@@ -5506,6 +5631,7 @@ async function openStudent(code){
       <button class="btn" id="seSave" data-code="${esc(st.code)}">저장</button>
       ${lk.student ? `<button class="linkbtn" id="seRelease" data-code="${esc(st.code)}">학생 계정 연결 풀기 <small>— 학생이 계정을 새로 만들어 코드가 막혔을 때</small></button>` : ''}
     </details>
+    <button class="btn soft" id="wsmsOpen" data-code="${esc(st.code)}">이번 주 요약 문자 <small style="font-weight:400">· 보호자에게</small></button>
     ${tel(st.phone) ? `<a class="btn soft" href="sms:${tel(st.phone)}" style="text-decoration:none">문자 보내기</a>` : ''}<button class="btn ghost" id="sheetClose">닫기</button>`);
 }
 
@@ -5728,6 +5854,7 @@ async function linkStudentCode(code){
 }
 
 /* ═══ 이벤트 ═══ */
+document.addEventListener('input', e => { if (e.target.id !== 'wsmsText') return; const a = document.getElementById('wsmsGo'); if (a) a.href = `sms:${a.dataset.ph}${a.dataset.ios}body=${encodeURIComponent(e.target.value)}`; });
 document.addEventListener('click', async e => {
   const T = sel => e.target.closest(sel);
   if (T('#sheetBg') && !T('.sheet')){ closeSheet(); return; }
@@ -5776,7 +5903,7 @@ document.addEventListener('click', async e => {
   const bsel = T('[data-bsel]'); if (bsel){ const k=bsel.dataset.bsel; bankSel[k] = k==='n' ? +bsel.dataset.val : bsel.dataset.val; if (k==='book'||k==='unit') bankSel.lesson='전체'; if (!redrawBankSheet(bsel)) renderBank(); return; }
   if (T('#bankStart')){ closeSheet(); startBank(pickBank(bankSel.n), '', !!S.bt); return; }
   if (T('#mxRetryWrong') && mx && mx.done){ const w = mx.items.filter((q, i) => !mx.res.ok[i]); mx = null; umPick = null; startBank(w, '모의고사 틀린 문항'); return; }
-  const drill = T('[data-drill]'); if (drill){ if (mx && mx.done) mx = null; bankSel = { ...bankSel, book:'전체', unit:'전체', lesson:drill.dataset.drill, type:'전체', only:'전체' }; const pool = bankPool(); if (!pool.length){ toast('이 소단원은 아직 잠겨 있습니다'); return; } startBank(pickBank(Math.min(10,pool.length)), ''); return; }
+  const drill = T('[data-drill]'); if (drill){ if (mx && mx.done) mx = null; bankSel = { ...bankSel, book:'전체', unit:'전체', lesson:drill.dataset.drill, type:'전체', only:'전체' }; const pool = bankPool(); if (!pool.length){ toast('이 소단원은 아직 잠겨 있어요'); return; } startBank(pickBank(Math.min(10,pool.length)), ''); return; }
   const lab = T('[data-lab]'); if (lab){ labId = lab.dataset.lab; show('lab'); return; }
   if (T('#labBack')){ show(bs?'bank':(view==='lab'&&detailIdx!==null?'bank':'bank')); return; }
   if (T('#bankQuit') || T('#bankQuit2')){ const rev = bs && (bs.kind === 'review' || bs.kind === 'asg'), unit = bs && (bs.kind === 'unit' || bs.kind === 'recap');
@@ -5803,6 +5930,9 @@ document.addEventListener('click', async e => {
   const oxb = T('[data-ox]'); if (oxb && bs){ bankAnswer(oxb.dataset.ox); return; }
   const bp = T('[data-bp]'); if (bp && bs && !bp.disabled){ bankAnswer(bp.dataset.bp); return; }
   if (T('#blankGo') && bs){ bankAnswer((document.getElementById('blankIn').value||'').trim()); return; }
+  if (T('#sjTog') && bs){ bs.stepOn = !bs.stepOn; bs.sjNow = {}; try { localStorage.setItem('pcs.sjOn', bs.stepOn ? '1' : ''); } catch {} renderBankSession(); document.getElementById('sjTog')?.focus({ preventScroll:true }); return; }
+  const sjb = T('[data-sj]'); if (sjb && bs){ const [k, v] = sjb.dataset.sj.split('|'); (bs.sjNow ||= {})[k] = v === '1'; renderBankSession(); document.querySelector(`[data-sj="${k}|${v}"]`)?.focus({ preventScroll:true }); return; }
+  if (T('#sjGo') && bs){ const ci = +T('#sjGo').dataset.ci; if (!ci) return; (bs.sj ||= [])[bs.i] = { ...bs.sjNow }; bs.sjNow = {}; bankAnswer(String(ci)); return; }
   if (T('#essayShow') && bs){ bs.ess = document.getElementById('essayIn').value; bankAnswer('?'); return; }
   const essb = T('[data-ess]'); if (essb && bs){ bs.pick = null; bankAnswer(essb.dataset.ess); return; }
   if (T('#csFlip') && bs){ bs.pick = 'show'; renderBankSession(); document.querySelector('#v-bank [data-csr]')?.focus({ preventScroll:true }); return; }
@@ -5849,7 +5979,7 @@ document.addEventListener('click', async e => {
   const cpk = T('[data-ncpick]'); if (cpk){ nedAddConcept(cpk.dataset.ncpick); closeSheet(); return; }
   const csg = T('[data-csug]'); if (csg){ nedAddConcept(csg.dataset.csug); return; }
   const ccx = T('[data-cx]'); if (ccx){ noteEd.cids = noteEd.cids.filter(id => id !== ccx.dataset.cx); document.getElementById('nedCs').innerHTML = nedChips(); nedCommit(); return; }
-  const cop = T('[data-copen]'); if (cop){ nedCommit(); const i = CONCEPTS.findIndex(c => c.id === cop.dataset.copen); if (i >= 0 && isOpen(i)){ noteEd = null; detailIdx = i; show('detail'); } else toast('이 개념은 아직 열리지 않았습니다'); return; }
+  const cop = T('[data-copen]'); if (cop){ nedCommit(); const i = CONCEPTS.findIndex(c => c.id === cop.dataset.copen); if (i >= 0 && isOpen(i)){ noteEd = null; detailIdx = i; show('detail'); } else toast('이 개념은 아직 열리지 않았어요'); return; }
   if (T('#nedDel')){ if (!await ask('이 노트를 지울까요? 되돌릴 수 없습니다.', '지우기', true)) return; clearTimeout(noteT); const d = noteEd.date; removeNote(noteEd.id); noteEd = null; noteDay = d; toast('노트를 지웠어요'); show('note'); return; }
   /* ── 이야기 ── */
   if (T('#talkLogin')){ authMode='start'; show('auth'); return; }
@@ -5869,7 +5999,7 @@ document.addEventListener('click', async e => {
     if (!isOwner() && abuseLevel(nk)){ w.innerHTML = `<div class="piiwarn">닉네임에 욕설이나 남을 낮추는 말은 쓸 수 없습니다.</div>`; return; }
     const nx = T('#nkSave').dataset.next;
     try { ACC = await DBX.setNick(nk); } catch (e){ w.innerHTML = `<div class="piiwarn">${esc(e.message)}</div>`; return; }
-    closeSheet(); toast('닉네임을 정했습니다');
+    closeSheet(); toast('닉네임을 정했어요');
     if (nx === 'new') sheetPost(null); else if (view === 'post') renderPost(); else if (view === 'me') renderMe(); else renderTalk(); return; }
   if (T('#poSave')){
     const g = id => (document.getElementById(id)||{}).value || '';
@@ -5991,6 +6121,8 @@ document.addEventListener('click', async e => {
   const fxOpen = T('[data-fix]'); if (fxOpen){ const f = (S.sched.fixed||[]).find(x => x.id === fxOpen.dataset.fix); if (f) sheetFixed(f); return; }
   const dp = T('[data-dp]'); if (dp){ dp.classList.toggle('on'); return; }
   const ddp = T('[data-ddp]'); if (ddp){ document.getElementById('ddT').value = ddp.dataset.ddp; return; }
+  const epl = T('[data-eplan]'); if (epl){ openExamPlan(epl.dataset.eplan); return; }
+  if (T('#planGo')){ startPlanDay(T('#planGo').dataset.id); return; }
   const scg = T('[data-scopego]'); if (scg){ const e = myEvents().find(x => x.id === scg.dataset.scopego); if (e) drillScope(e.scope); return; }
   if (T('#evSave')){
     const g = id => (document.getElementById(id)||{}).value || '';
@@ -6015,7 +6147,7 @@ document.addEventListener('click', async e => {
   if (T('#ddSave')){
     const t = (document.getElementById('ddT').value||'').trim(), dt = document.getElementById('ddD').value;
     if (!t || !dt){ toast('이름과 날짜를 넣어 주세요'); return; }
-    S.sched.ddays.push({ id: uid(), title: t, date: dt }); save(S); closeSheet(); renderPlan(); toast('D-day를 넣었습니다'); return; }
+    S.sched.ddays.push({ id: uid(), title: t, date: dt }); save(S); closeSheet(); renderPlan(); toast('D-day를 넣었어요'); return; }
   const ddd = T('[data-dddel]'); if (ddd){ S.sched.ddays = S.sched.ddays.filter(x => x.id !== ddd.dataset.dddel); save(S); sheetDday(); return; }
   if (T('#qNext')){ S.qskip = (S.qskip||0) + 1; save(S); renderToday(); return; }
   if (T('#qKeep')){ const q = quoteToday(); S.qkeep ||= [];
@@ -6037,7 +6169,7 @@ document.addEventListener('click', async e => {
   const fbg = T('[data-fbgo]'); if (fbg){ const [k, v = ''] = fbg.dataset.fbgo.split(':'); let cid = v;
     if (k === 'quiz') cid = (CONCEPTS.find(c => c.lessonId === v.split('#')[0]) || {}).id;
     if (k === 'bank'){ const q = BANK.find(x => x.id === v); cid = q && (+q.concept ? `${q.lessonId}-${String(q.concept).padStart(2, '0')}` : conceptIdOfQ(q)); }
-    const i = CONCEPTS.findIndex(c => c.id === cid); if (i >= 0){ detailIdx = i; show('detail'); } else toast('개념을 찾지 못했습니다'); return; }
+    const i = CONCEPTS.findIndex(c => c.id === cid); if (i >= 0){ detailIdx = i; show('detail'); } else toast('개념을 찾지 못했어요'); return; }
   if (T('#goLogin')){ authMode='login'; authErr=''; renderAuth(); window.scrollTo(0,0); return; }
   if (T('#goSignup')){ authMode='signup'; authErr=''; SU = SU0(); renderAuth(); window.scrollTo(0,0); return; }
   if (T('#introNext')){ if (introIdx < INTRO.length-1){ introIdx++; renderAuth(); return; } S.introSeen = true; save(S); authMode='start'; renderAuth(); window.scrollTo(0,0); return; }
@@ -6059,7 +6191,7 @@ document.addEventListener('click', async e => {
   if (T('#lgGo')){
     const em=(document.getElementById('lgEmail').value||'').trim(), pw=document.getElementById('lgPw').value||'';
     if (!validEmail(em) || !pw){ authErr='이메일과 비밀번호를 확인해 주세요.'; renderAuth(); return; }
-    try { authInfo=''; const acc = await DBX.signIn(em, pw); S.onboarded=true; toast(`${acc.name||'회원'}님, 반갑습니다`); await afterLogin(acc); } catch (err){ authErr = err.message; renderAuth(); }
+    try { authInfo=''; const acc = await DBX.signIn(em, pw); S.onboarded=true; toast(`${acc.name||'회원'}님, 반가워요`); await afterLogin(acc); } catch (err){ authErr = err.message; renderAuth(); }
     return;
   }
   if (T('#suGo') || T('#suSkipCode')){
@@ -6083,7 +6215,7 @@ document.addEventListener('click', async e => {
   if (T('#npGo')){ const a=(document.getElementById('npPw').value||''), b=(document.getElementById('npPw2').value||'');
     if (pwProblem(a)){ authErr=pwProblem(a); renderAuth(); return; }
     if (a!==b){ authErr='두 비밀번호가 다릅니다.'; renderAuth(); return; }
-    try { await DBX.setPassword(a); authErr=''; authInfo=''; toast('비밀번호를 바꿨습니다'); await afterLogin(await DBX.me()); } catch (err){ authErr=err.message; renderAuth(); } return; }
+    try { await DBX.setPassword(a); authErr=''; authInfo=''; toast('비밀번호를 바꿨어요'); await afterLogin(await DBX.me()); } catch (err){ authErr=err.message; renderAuth(); } return; }
 
   /* 빈칸 · 북마크 · 공유 */
   const blank = T('.blank'); if (blank){ const c = view==='detail' ? CONCEPTS[detailIdx] : todayConcept(); const key = blank.dataset.b;
@@ -6109,7 +6241,10 @@ document.addEventListener('click', async e => {
   if (T('#goStats') || T('#goStatsRing')){ show('stats'); return; }
   if (T('#backMe3')){ show('me'); return; }
   if (T('#goReview')){ startReview(); return; }
-  if (T('#goPlans') || T('#goPlansPill')){ if (!ACC){ authMode='start'; show('auth'); return; } show('plans'); return; }
+  if (T('#passNoteX')){ const n = e.target.closest('.passnote'); try { localStorage.setItem('pcs.passNote', n.dataset.k); } catch {} n.remove(); return; }
+  if (T('#wsmsOpen')){ openWeekSms(T('#wsmsOpen').dataset.code); return; }
+  if (T('#wsmsCopy')){ const t = document.getElementById('wsmsText').value; try { await navigator.clipboard.writeText(t); toast('복사했어요 · 카카오톡이나 문자에 붙여 보내 주세요'); } catch { const ta = document.getElementById('wsmsText'); ta.focus(); ta.select(); toast('글을 골라 두었어요 · 길게 눌러 복사해 주세요'); } return; }
+  if (T('#goPlans') || T('#goPlansPill') || T('#passNoteGo')){ if (!ACC){ authMode='start'; show('auth'); return; } show('plans'); return; }
   if (T('#backToday')){ const m = qState&&qState.mode; qState=null; show(m==='review'?'stats':home()); return; }
   if (T('#attOpen')){ openSheet(`<h3>출석 체크</h3><p>학원 입구 화면에 뜬 <b>4자리 숫자</b>를 치세요. 30초마다 바뀝니다.</p>
       <div class="f"><input id="attIn" class="big" inputmode="numeric" maxlength="4" placeholder="0000"></div><div class="err" id="attErr" style="font-size:var(--t-cap);color:var(--no);margin:-4px 0 10px;font-weight:700"></div><button class="btn" id="attGo">출석</button>`);
@@ -6144,8 +6279,8 @@ document.addEventListener('click', async e => {
   if (T('#markDone')){ const c = CONCEPTS[detailIdx]; markConceptDone(c.id); markRead(c.id); touchDay(); save(S); renderDetail(); toast('공부했음으로 표시했어요'); return; }
   if (T('#asgReadNext') && asgRead){ const a = ASG.find(x => x.id === asgRead.id), c = CONCEPTS[detailIdx]; if (!a) return;
     markConceptDone(c.id); markRead(c.id); touchDay(); save(S); asgStep(a.id, asgRead.i + 1, asgRead.i + 1, []);
-    if (asgRead.i + 1 >= a.n){ asgRead = null; toast('과제를 다 읽었습니다 · 학원에 냅니다'); show('today'); return; }
-    const ni = CONCEPTS.findIndex(x => x.id === a.items[asgRead.i + 1]); if (ni < 0){ toast('다음 개념을 찾지 못했습니다'); return; }
+    if (asgRead.i + 1 >= a.n){ asgRead = null; toast('과제를 다 읽었어요 · 학원에 낼게요'); show('today'); return; }
+    const ni = CONCEPTS.findIndex(x => x.id === a.items[asgRead.i + 1]); if (ni < 0){ toast('다음 개념을 찾지 못했어요'); return; }
     asgRead.i++; detailIdx = ni; renderDetail(); window.scrollTo(0,0); return; }
   if (T('#prevC')){ detailIdx=Math.max(0,detailIdx-1); renderDetail(); window.scrollTo(0,0); return; }
   if (T('#nextC')){ detailIdx=Math.min(CONCEPTS.length-1,detailIdx+1); renderDetail(); window.scrollTo(0,0); return; }
@@ -6153,14 +6288,14 @@ document.addEventListener('click', async e => {
 
   /* 내 정보 */
   if (T('#codeGo')){ const v=(document.getElementById('codeIn').value||'').trim().toUpperCase(); if (!v){ codeErr='코드를 입력해 주세요.'; renderMe(); return; }
-    try { const r = await linkStudentCode(v); if (r.ok){ codeErr=''; renderMe(); toast(`${r.student.name} 학생, 반갑습니다`); scheduleReminder(); initPush(); } else { codeErr=r.why; renderMe(); } } catch (err){ codeErr=err.message; renderMe(); } return; }
+    try { const r = await linkStudentCode(v); if (r.ok){ codeErr=''; renderMe(); toast(`${r.student.name} 학생, 반가워요`); scheduleReminder(); initPush(); } else { codeErr=r.why; renderMe(); } } catch (err){ codeErr=err.message; renderMe(); } return; }
   if (T('#childGo')){ /* 내 정보와 자녀 화면에 같은 입력이 동시에 있으므로, 지금 누른 쪽의 입력을 읽는다 */
     const box = T('#childGo').closest('.codebox') || document;
     const v=((box.querySelector('#childIn')||{}).value||'').trim().toUpperCase(); if (!v){ childErr='코드를 입력해 주세요.'; (view==='parent'?renderParent:renderMe)(); return; }
     const inSheet = !!T('#childGo').closest('.sheet');
     try { const r = await DBX.linkCode('child', v); if (!r.ok){ if (inSheet){ document.getElementById('childAddErr').textContent = r.why; return; } childErr = r.why; (view==='parent'?renderParent:renderMe)(); return; }
       ACC = await DBX.me(); childErr=''; closeSheet();
-      if (r.pending){ toast('연결을 요청했습니다. 원장님이 확인하면 열립니다'); show('parent'); return; }
+      if (r.pending){ toast('연결을 요청했어요. 원장님이 확인하면 열려요'); show('parent'); return; }
       parentSel = r.student.code; toast(`${r.student.name} 학생과 연결했습니다`); show('parent'); initPush(); } catch (err){ childErr=err.message; (view==='parent'?renderParent:renderMe)(); } return; }
   if (T('#unlinkChild')){ const c = T('#unlinkChild').dataset.code; if (!await ask('이 자녀와의 연결을 해제할까요? 출석·진도·공지를 더 볼 수 없습니다.', '연결 해제',true)) return;
     if (c) await DBX.unlinkChild(c); else await DBX.linkCode('child', ''); ACC = await DBX.me(); parentSel = ''; renderParent(); return; }
@@ -6171,7 +6306,7 @@ document.addEventListener('click', async e => {
   if (T('#unauth')){ if (!await ask('학원 코드 연결을 해제할까요? 공지·출석이 닫힙니다.', '연결 해제',true)) return; await flushProgress(); S.auth=null; if (ACC){ await DBX.linkCode('student', ''); ACC = await DBX.me(); } save(S); renderMe(); return; }
   if (T('#logout')){ if (!await ask(SRV ? '로그아웃할까요? 진도는 계정에 저장되어 있습니다.' : '로그아웃할까요? 진도는 이 기기에 남아 있어 같은 계정으로 다시 들어오면 이어집니다.', '로그아웃',false)) return; await flushProgress(); await dropPush(); try { await syncNotes(); } catch {} dropNotesCache(); await DBX.signOut(); ACC=null; S = freshS(); admTab='students'; parentSel=''; talkNew=0; talkBoard='전체'; talkQ=''; talkSt=null; admLim=null; save(S); authMode='start'; show('auth'); return; }
   if (T('#delAccount')){ if (!await ask('계정을 삭제하면 진도·오답 노트가 함께 지워지고 되돌릴 수 없습니다. 삭제할까요?', '계정 삭제',true)) return;
-    try { await DBX.deleteAccount(); dropNotesCache(true); ACC=null; clearTimeout(syncT); S = freshS(); try { localStorage.removeItem(KEY); } catch {} authMode='start'; toast('계정을 삭제했습니다'); show('auth'); } catch (err){ toast(err.message); } return; }
+    try { await DBX.deleteAccount(); dropNotesCache(true); ACC=null; clearTimeout(syncT); S = freshS(); try { localStorage.removeItem(KEY); } catch {} authMode='start'; toast('계정을 삭제했어요'); show('auth'); } catch (err){ toast(err.message); } return; }
   if (T('#editProfile')){ openSheet(`<h3>이름 · 연락처</h3><div class="f"><input id="epName" placeholder="이름" value="${esc(ACC.name)}" style="flex:1;border:1.5px solid var(--line);border-radius:var(--r-m);padding:12px 14px;font-size:var(--t-body);font-family:inherit;background:var(--paper);color:var(--ink)"></div>
       <div class="f"><input id="epPhone" placeholder="연락처" inputmode="tel" value="${esc(ACC.phone)}" style="flex:1;border:1.5px solid var(--line);border-radius:var(--r-m);padding:12px 14px;font-size:var(--t-body);font-family:inherit;background:var(--paper);color:var(--ink)"></div>
       <button class="btn" id="epSave">저장</button><button class="btn ghost" id="sheetClose">취소</button>`); return; }
@@ -6193,7 +6328,7 @@ document.addEventListener('click', async e => {
       <button class="btn" id="pwSave">바꾸기</button><button class="btn ghost" id="sheetClose">닫기</button>`); return; }
   if (T('#pwSave')){ const a = document.getElementById('pwNew').value||'', b = document.getElementById('pwNew2').value||'', e = document.getElementById('pwErr');
     if (pwProblem(a)){ e.textContent = pwProblem(a); return; } if (a !== b){ e.textContent = '두 비밀번호가 다릅니다.'; return; }
-    try { await DBX.setPassword(a); closeSheet(); toast('비밀번호를 바꿨습니다'); } catch (err){ e.textContent = AUTH_KO(err.message); } return; }
+    try { await DBX.setPassword(a); closeSheet(); toast('비밀번호를 바꿨어요'); } catch (err){ e.textContent = AUTH_KO(err.message); } return; }
   /* 학생: 보호자 화면에 무엇이 보이는지 미리(2026-10-07) — 보호자 화면(renderParent)과 같은 계산(weekSummary)으로, 내 기록 그대로 */
   if (T('#guardSee')){ const w = weekSummary(snapshot(), ASG); let tn = null; try { const n = await DBX.noteGet(S.auth.code); tn = n && n.ok && n.body ? n.body : null; } catch {}
     openSheet(`<h3>보호자에게 보이는 것</h3><p>학원 원장님이 확인한 보호자만 볼 수 있어요. 지금 내 기록이라면 이렇게 보여요.</p>
@@ -6215,7 +6350,7 @@ document.addEventListener('click', async e => {
   const buy = T('[data-buy]'); if (buy){ const p = CFG.plans.find(x=>x.id===buy.dataset.buy); if (!ACC){ authMode='start'; show('auth'); return; } await buyPlan(p); return; }
   if (T('#iapRestore')){ await restorePurchases(); return; }
   if (T('#consentSend')){ await sendConsent(); return; }
-  if (T('#consentCopy')){ const t = T('#consentCopy').dataset.t; try { if (navigator.share) await navigator.share({ text:t }); else { await navigator.clipboard.writeText(t); toast('복사했습니다 · 보호자에게 붙여 보내 주세요'); } } catch {} return; }
+  if (T('#consentCopy')){ const t = T('#consentCopy').dataset.t; try { if (navigator.share) await navigator.share({ text:t }); else { await navigator.clipboard.writeText(t); toast('복사했어요 · 보호자에게 붙여 보내 주세요'); } } catch {} return; }
   if (T('#consentPaper')){ openSheet(`<h3>학원에서 서면으로 동의</h3><p>보호자가 학원에 오시면 원장님께 <b>보호자 동의서</b>를 받아 서명해 주세요. 원장님이 앱에서 확인하면 바로 열립니다.</p><button class="btn ghost" id="sheetClose">닫기</button>`); return; }
   const cpap = T('[data-cpaper]'); if (cpap){ if (!await ask('보호자에게 서면 동의서를 받으셨나요? 받은 서면은 보관해 주세요.', '받았습니다',false)) return; await DBX.consentMark(cpap.dataset.cpaper, 'paper'); toast('서면 동의를 기록했습니다'); renderAdmin(); return; }
   const gok = T('[data-gok]'); if (gok){ await DBX.guardianDecide(gok.dataset.gok, gok.dataset.code, true); toast('보호자 연결을 확인했습니다'); renderAdmin(); return; }
@@ -6338,7 +6473,7 @@ async function checkAppMeta(){ if (!SRV) return;
     return; }
   if (m.notice){ const k = 'pcs.notice.' + String(m.notice).length + String(m.notice).slice(0, 12); let seen = false; try { seen = sessionStorage.getItem(k) === '1'; } catch {}
     if (!seen){ openSheet(`<h3>알려 드립니다</h3><p>${esc(m.notice)}</p><button class="btn" id="sheetClose">확인</button>`); try { sessionStorage.setItem(k, '1'); } catch {} } }
-  else if (isNative && m.latest_version && vcmp(CFG.version, m.latest_version) < 0) setTimeout(() => toast('새 버전이 있어요 · 스토어에서 업데이트할 수 있습니다'), 1500);
+  else if (isNative && m.latest_version && vcmp(CFG.version, m.latest_version) < 0) setTimeout(() => toast('새 버전이 있어요 · 스토어에서 업데이트할 수 있어요'), 1500);
 }
 /* ═══ 앱 안 브라우저 — 2026-10-08: 학원 링크는 단톡방으로 오는데, 카카오톡 안 브라우저에서는 홈 화면 추가가 안 되고
    (로그인 전) 기록도 그 앱 안에만 남는다. 막지 않고 위에 한 줄로 크롬·사파리로 여는 길을 준다 — 누를 때만 이동(사용자 동작 없이 넘기면 막힌다).
@@ -6388,7 +6523,7 @@ window.addEventListener('unhandledrejection', e => { const r = e.reason || {};
       if (!await ask(msg, '내 계정 맞아요', false)) throw new Error('링크의 계정으로 로그인하지 않았습니다.');
       ACC = await DBX.adoptSession(hp.get('access_token'), hp.get('refresh_token'), lu);
       if (hp.get('type')==='recovery'){ authMode='newpw'; show('auth'); nativeInit(); return; }
-      toast('메일 인증이 끝났습니다. 반갑습니다'); S.onboarded=true; await afterLogin(ACC); nativeInit(); return;
+      toast('메일 인증이 끝났어요. 반가워요'); S.onboarded=true; await afterLogin(ACC); nativeInit(); return;
     } catch (e){ linkErr = e.message; }
   }
   try { ACC = await DBX.me(); } catch { ACC = null; }
