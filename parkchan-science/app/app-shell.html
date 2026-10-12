@@ -178,6 +178,11 @@ button{font-family:inherit;color:inherit}
 /* 손님·무료 범위 — 경로 밑 한 줄 */
 .pfoot{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:-2px 0 14px 28px;font-size:var(--t-cap);color:var(--muted);line-height:1.6}
 .passnote{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:0 0 14px;padding:4px 6px 4px 14px;border:1px solid var(--hair);border-radius:var(--r-m);background:var(--card);font-size:var(--t-cap);color:var(--muted);line-height:1.6;word-break:keep-all}
+.qual .cnt{font-size:var(--t-cap);font-weight:400;color:var(--muted)}
+.qrow{display:flex;align-items:center;gap:12px;width:100%;min-height:56px;padding:10px 2px;border:0;border-bottom:1px solid var(--hair);background:none;text-align:left;font:inherit;color:var(--body);cursor:pointer}
+.qrow .qr{flex:0 0 52px;font-size:var(--t-h2);font-weight:900;color:var(--no);font-variant-numeric:tabular-nums}.qrow .qr small{font-size:var(--t-cap);font-weight:700}
+.qrow .qb{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}.qrow .qs{font-size:var(--t-small);color:var(--ink);line-height:1.5;word-break:keep-all}.qrow .qm{font-size:var(--t-cap);color:var(--muted)}.qrow .qm b{color:var(--warn)}
+.qpch{list-style:none;margin:0 0 10px;padding:0;display:flex;flex-direction:column;gap:6px}.qpch li{font-size:var(--t-small);line-height:1.6;padding:8px 10px;border:1px solid var(--hair);border-radius:var(--r-s)}.qpch li.ok{border-color:var(--u);background:var(--u-soft)}
 .eplan{list-style:none;margin:0 0 6px;padding:0;display:flex;flex-direction:column;gap:0;border-top:1px solid var(--hair)}
 .eplan li{display:flex;align-items:center;gap:12px;padding:10px 2px;border-bottom:1px solid var(--hair);font-size:var(--t-small);color:var(--body);line-height:1.5;word-break:keep-all}
 .eplan .dt{flex:0 0 44px;font-weight:700;color:var(--muted);font-variant-numeric:tabular-nums;display:flex;flex-direction:column;line-height:1.3}
@@ -5507,6 +5512,7 @@ async function renderAdmin(){
     try { att = await DBX.attendanceRange(`${admMonth}-01`, `${admMonth}-${pad(days)}`); } catch {}
     try { prog = await DBX.progressAll(); } catch {}
     try { ns = await DBX.allNotices(); } catch {}
+    let fbl = []; try { fbl = await DBX.feedbackList(); } catch {}
     const stats = await Promise.all(ns.slice(0,10).map(n=>DBX.noticeStats(n.id).catch(()=>null)));
     const readRate = stats.filter(Boolean).reduce((a,s)=>({r:a.r+s.read,t:a.t+s.sent}),{r:0,t:0});
     const active = prog.filter(p => p.state && p.state.at && daysBetween(p.state.at.slice(0,10), todayISO()) <= 7).length;
@@ -5519,7 +5525,8 @@ async function renderAdmin(){
         ${byCls.map(b=>`<div class="bar-row"><span class="k">${esc(b.c)}<small>${b.n}명</small></span><span class="bar"><i style="width:${b.n?Math.min(100,Math.round(b.att/(b.n*8)*100)):0}%"></i></span><span class="v">${b.att}회${b.late?` · 지각 ${b.late}`:''}</span></div>`).join('')}
         <p class="fine" style="text-align:left;padding:6px 0 0">막대는 한 달 8회 수업(주 2회)을 100 %로 봅니다. 학생 평균 학습 개념 ${avgDone}개.</p>
         <button class="btn soft" id="attCsv" style="margin-top:10px">${y}년 ${m}월 출석부 내려받기 (엑셀에서 열림)</button></div>
-      <div class="sec"><h2>학생별 · 이달</h2>${byStu.length ? byStu.map(({s,a,p})=>`<button class="stu" data-stu="${s.code}"><span class="nm">${esc(s.name)}</span><span class="cd t">${esc(s.cls)} · 출석 ${a.length}${a.filter(x=>x.late).length?` · 지각 ${a.filter(x=>x.late).length}`:''}</span><span class="un">개념 ${p&&p.state?((p.state.done||[]).length):0}</span></button>`).join('') : '<p class="fine" style="text-align:left;padding:0">등록된 학생이 없습니다.</p>'}</div>`;
+      <div class="sec"><h2>학생별 · 이달</h2>${byStu.length ? byStu.map(({s,a,p})=>`<button class="stu" data-stu="${s.code}"><span class="nm">${esc(s.name)}</span><span class="cd t">${esc(s.cls)} · 출석 ${a.length}${a.filter(x=>x.late).length?` · 지각 ${a.filter(x=>x.late).length}`:''}</span><span class="un">개념 ${p&&p.state?((p.state.done||[]).length):0}</span></button>`).join('') : '<p class="fine" style="text-align:left;padding:0">등록된 학생이 없습니다.</p>'}</div>
+      ${qualityHtml(prog, fbl)}`;
   }
   if (admTab==='settings'){
     const passes = await DBX.passes().catch(()=>[]);
@@ -5576,6 +5583,29 @@ async function downloadAttendance(ym){
   const name = `${CFG.academy}_출석부_${y}-${pad(m)}.csv`;
   if (await saveFile(name, csv, 'text/csv') && !isNative) toast(`${name} 을(를) 내려받았습니다`);
 }
+/* 원장 › 통계 '정답률이 낮은 문항'(벤치마크 #18 문항 품질 루프) — 학생 진도의 문항별 마지막 결과(bh)를 모아, 3명 이상 푼 문항 중 정답률 60 % 아래를 낮은 순으로 10개.
+   '틀린 곳 알림'(feedback ref bank:id) 수를 함께 보여, 문항이 어려운 것인지 문제·해설이 틀린 것인지 한 화면에서 가른다. 서버 함수 없이 원장이 이미 읽는 진도로 계산 */
+function qualityRows(prog, fbl){ const agg = new Map();
+  (prog || []).forEach(p => Object.entries((p.state && p.state.bh) || {}).forEach(([id, r]) => { const e = agg.get(id) || { id, n:0, o:0 }; e.n++; if (r === 'o') e.o++; agg.set(id, e); }));
+  const fb = new Map(); (fbl || []).forEach(f => { const m = /^bank:(.+)$/.exec(f.ref || ''); if (m) fb.set(m[1], (fb.get(m[1]) || 0) + 1); });
+  return [...agg.values()].filter(e => e.n >= 3 && e.o / e.n < .6).map(e => ({ ...e, r:Math.round(e.o / e.n * 100), fb:fb.get(e.id) || 0 }))
+    .sort((a, b) => a.r - b.r || b.n - a.n || (a.id < b.id ? -1 : 1)).slice(0, 10); }
+function qualityHtml(prog, fbl){
+  if (!MORE.ok){ loadMore().then(() => { if (view === 'admin' && admTab === 'stats') renderAdmin(); }).catch(() => {}); return `<div class="sec"><h2>정답률이 낮은 문항</h2><p class="tip" style="margin:0">문제를 받는 중이에요…</p></div>`; }
+  const rows = qualityRows(prog, fbl).map(e => ({ ...e, q:BANK.find(q => q.id === e.id) })).filter(e => e.q);
+  return `<div class="sec qual"><h2><span>정답률이 낮은 문항</span><span class="cnt">3명 이상 푼 문항 · 60 % 아래</span></h2>
+    ${rows.length ? rows.map(e => `<button class="qrow" data-qprev="${esc(e.id)}"><span class="qr">${e.r}<small>%</small></span><span class="qb"><span class="qs">${esc(String(e.q.stem || '').replace(/<[^>]+>/g, '').slice(0, 64))}${String(e.q.stem || '').length > 64 ? '…' : ''}</span><span class="qm">${esc(lessonLabel(e.q.lessonId).split(' ')[0])} · ${e.n}명 중 ${e.o}명 맞힘${e.fb ? ` · <b>틀린 곳 알림 ${e.fb}건</b>` : ''}</span></span></button>`).join('')
+      + `<p class="tip" style="margin:8px 0 0">알림이 붙은 문항은 문제·해설부터, 알림 없이 낮은 문항은 수업에서 같이 짚거나 교재 설명을 보강해 보세요.</p>`
+      : `<p class="tip" style="margin:0">아직 모아 볼 만큼 푼 문항이 없어요. 학생 3명 이상 푼 문항부터 여기에 모여요.</p>`}</div>`; }
+function openQPreview(id){ const q = BANK.find(x => x.id === id); if (!q) return;
+  const ans = q.type === 'mc' || q.type === 'multi' ? `${MARKS[q.answer - 1]} ${rich(String(q.choices[q.answer - 1] || ''))}` : esc(String(q.answer ?? ''));
+  openSheet(`<h3>${esc(lessonLabel(q.lessonId))} <span style="font-size:var(--t-cap);color:var(--muted);font-weight:700">${esc(q.id)} · ${esc(TYPE_NAME[q.type] || q.type)}</span></h3>
+    <p style="font-size:var(--t-stem);color:var(--ink);line-height:1.7">${rich(q.stem || '')}</p>
+    ${q.source ? `<div class="legal" style="max-height:none;white-space:pre-line;margin-bottom:10px">${rich(q.source)}</div>` : ''}
+    ${Array.isArray(q.choices) && q.choices.length ? `<ol class="qpch">${q.choices.map((c, i) => `<li class="${i + 1 === q.answer ? 'ok' : ''}"><span class="m">${MARKS[i]}</span> ${rich(String(c))}</li>`).join('')}</ol>` : ''}
+    <p class="tip" style="margin:0 0 6px"><b>정답</b> ${ans}</p>
+    ${q.explain ? `<div class="legal" style="max-height:none;margin-bottom:8px">${rich(q.explain)}</div>` : ''}${q.wrong ? `<div class="wrongbox">${rich(q.wrong)}</div>` : ''}
+    <button class="btn ghost" id="sheetClose">닫기</button>`); }
 /* 원장 → 보호자 '이번 주 요약 문자'(벤치마크 ★5 마지막) — 보호자 화면 '이번 주 요약'과 같은 숫자를 문자 한 통으로.
    원장 폰의 문자 앱(sms:)으로 보내므로 유료 알림톡이 필요 없다. 보내기 전에 글을 그대로 보여 주고, 복사해 카카오톡으로 보내도 된다.
    보호자 화면 원칙 그대로: 다른 학생과 견주지 않고, 연속 일수·노트·이야기 글은 넣지 않는다 */
@@ -6242,6 +6272,7 @@ document.addEventListener('click', async e => {
   if (T('#backMe3')){ show('me'); return; }
   if (T('#goReview')){ startReview(); return; }
   if (T('#passNoteX')){ const n = e.target.closest('.passnote'); try { localStorage.setItem('pcs.passNote', n.dataset.k); } catch {} n.remove(); return; }
+  const qpv = T('[data-qprev]'); if (qpv){ openQPreview(qpv.dataset.qprev); return; }
   if (T('#wsmsOpen')){ openWeekSms(T('#wsmsOpen').dataset.code); return; }
   if (T('#wsmsCopy')){ const t = document.getElementById('wsmsText').value; try { await navigator.clipboard.writeText(t); toast('복사했어요 · 카카오톡이나 문자에 붙여 보내 주세요'); } catch { const ta = document.getElementById('wsmsText'); ta.focus(); ta.select(); toast('글을 골라 두었어요 · 길게 눌러 복사해 주세요'); } return; }
   if (T('#goPlans') || T('#goPlansPill') || T('#passNoteGo')){ if (!ACC){ authMode='start'; show('auth'); return; } show('plans'); return; }
