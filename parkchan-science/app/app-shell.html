@@ -245,7 +245,7 @@ button{font-family:inherit;color:inherit}
 .asgbar .n{font-weight:900;font-size:var(--t-body);color:var(--ink);font-variant-numeric:tabular-nums}
 .asgbar .n small{font-size:var(--t-tab);color:var(--muted);font-weight:700}
 .asgsent{color:var(--brand-dark);font-weight:700}
-.qhead .rk{display:inline-block;font-size:var(--t-tab);font-weight:700;color:var(--u-dark);background:var(--u-soft);border-radius:var(--r-pill);padding:1px 8px;margin-right:6px}
+.qhead .qsrc{display:inline-block;font-size:var(--t-tab);font-weight:700;color:var(--muted);border:1px solid var(--line);border-radius:var(--r-pill);padding:0 8px;margin-right:6px}.qhead .rk{display:inline-block;font-size:var(--t-tab);font-weight:700;color:var(--u-dark);background:var(--u-soft);border-radius:var(--r-pill);padding:1px 8px;margin-right:6px}
 .revnext{justify-content:center;font-size:var(--t-small);margin:0 0 14px}
 /* 여러 번 갈린 문제 — 다시 묻지 않고 개념 카드로 */
 .leechcard{background:var(--card);border:1px solid var(--hair);border-radius:var(--r-l);padding:16px;margin:4px 0 13px}
@@ -4385,7 +4385,7 @@ function drawBankSession(){
   const bar = qtop('bankQuit', '그만 풀기', bs, done, n, `${qclock}<span class="pcnt"><b>${bs.i + 1}</b> / ${n}</span>`);
   const asgA = bs.kind === 'asg' ? (ASG || []).find(x => x.id === bs.asg) : null;   // 학원 과제를 푸는 중임을 머리에(2026-10-13 검수)
   const kindTag = asgA ? `<span class="rk">학원 과제 · ${asgDueText(asgA.due)}</span>` : bs.kind === 'review' || (bs.kind === 'rec' && rk) ? `<span class="rk">${rk ? '다시 볼 문제' : '지난 소단원'}</span>`
-    : q.step === 'unit' ? `<span class="rk">${umNo(q) > 12 ? '고난도' : '마무리'} ${umNo(q)}</span>` : q.step === 'recap' ? `<span class="rk">핵심 정리 ${umNo(q)}</span>` : q.step === 'mock' ? `<span class="rk">모의고사 ${umNo(q)}</span>` : q.up ? '<span class="rk">실력 다지기</span>' : q.plus ? '<span class="rk">시험에 나오는 보강</span>' : '';
+    : q.step === 'unit' ? `<span class="rk">${umNo(q) > 12 ? '고난도' : '마무리'} ${umNo(q)}</span>` : q.step === 'recap' ? `<span class="rk">핵심 정리 ${umNo(q)}</span>` : q.step === 'mock' ? `<span class="rk">모의고사 ${umNo(q)}</span>` : q.up ? '<span class="qsrc">실력 다지기</span>' : q.plus ? '<span class="qsrc">시험에 나오는 보강</span>' : '';
   if (q.type === 'card'){ v.innerHTML = `${bar}<div class="qhead"><span class="l"><span class="rk">개념 카드</span>${esc(L?L.unit+'-'+L.id.slice(2)+' '+L.name:'')}</span></div>${csHtml(q)}`; return; }   // 개념 카드 간격 복습(보완안 7)
   if (rw && isLeech(rw) && !graded){   // 여러 번 갈린 문제 — 다시 묻지 않고 개념 카드로
     const ci = conceptIdxOfW(rw), c = CONCEPTS[ci];
