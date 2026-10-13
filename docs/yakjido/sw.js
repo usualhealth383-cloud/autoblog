@@ -9,7 +9,7 @@
                        판이 같으면 캐시 그대로, 판이 바뀌면 새로 받아 넣고 옛 판은 지운다(prune).
    판 없는 옛 주소는 «캐시 먼저» — 한 번 받은 것은 즉시 열리고, 뒤에서 조용히 새로 받아 둔다.
    인터넷이 안 되면 어느 캐시에든 있는 사본을 준다(5-01 — 첫 방문 뒤 비행기 모드에서 본문이 안 뜨던 것). */
-const CACHE = 'yakjido-2026-10-13-8ba5d575';
+const CACHE = 'yakjido-2026-10-13-2602104b';
 const DATA = 'yakjido-data-v1';
 /* 본문(core·detail)은 여기서 받지 않는다 — 첫 방문에 페이지가 이미 받은 것을 한 번 더 받던 것(5-03). 페이지가 워커에 연결되면 같은 주소로 다시 불러 캐시에 넣는다. */
 const ASSETS = ['./', './index.html', './manifest.webmanifest', './srv.js', './find.js', './icon-192.png', './icon-512.png', './icon-180.png', './icon-maskable-512.png'];
