@@ -6475,10 +6475,12 @@ function vDrug(id, q = {}){
   const pub = (PUB.index || []).filter(p => (p.map || []).includes(d.id));
   const pubHtml = pub.length ? `<h3 style="margin-top:20px">식약처 등록 제품 <small class="muted" style="font-weight:500">${pub.length}개 · e약은요 공공데이터${pub.length > 30 ? ' · 30개만 표시' : ''}</small></h3>${(() => { const rowP = p => `<button class="row" onclick="go('/pub/${p.id}')">${pubThumb(p)}<div class="body"><b>${esc(p.n)}</b><span>${esc(p.m)}${p.map.length > 1 ? ' · 복합제(' + p.map.length + '성분)' : ''}</span></div>${p.cvs ? '<span class="badge cvs">편의점</span>' : ''}${I.chev}</button>`;
     const L = pub.slice(0, 30); return `<div class="rows">${L.slice(0, 5).map(rowP).join('')}</div>${L.length > 5 ? `<details class="more-rows"><summary>제품 더 보기 <span class="muted">${L.length - 5}개</span>${I.chev}</summary><div class="rows">${L.slice(5).map(rowP).join('')}</div></details>` : ''}`; })()}` : (PUB.index ? '' : '<p class="loading">식약처 제품 목록을 불러오는 중…</p>');
-  return `${topBar({ back:'약 사전', unreviewed:d.reviewed === false })}${prodTop(d, q.p)}
-  <div class="drug-hero">${c ? `<a class="cls link" href="#/class/${c.id}">${esc(c.name)} ›</a>` : ''}<h1>${esc(d.name)}</h1>
+  /* 제품 머리가 이 약 이름과 같으면(게보린정 → 게보린정) 아래 제목·대표 제품 줄은 겹친다 — 갈래 링크만 남긴다(10-14) */
+  const top = prodTop(d, q.p), dupTop = !!top && (d.contains || []).length > 0;   /* 복합제 항목은 이름이 곧 제품 이름 */
+  return `${topBar({ back:'약 사전', unreviewed:d.reviewed === false })}${top}
+  <div class="drug-hero">${c ? `<a class="cls link" href="#/class/${c.id}">${esc(c.name)} ›</a>` : ''}${dupTop ? '' : `<h1>${esc(d.name)}</h1>`}
     ${(() => { /* 3-3 ① — 대표 제품을 제목 바로 아래(NHS 「Other common brands」). 영어 이름은 근거 탭으로 내렸다 */
-      const P = (d.products || []).slice(0, 3); if (!P.length) return '';
+      const P = (d.products || []).slice(0, 3); if (!P.length || dupTop) return '';
       return `<button class="rep-line" onclick="jumpTab('p3')"><span>대표 제품 <b>${esc(P[0].name)}</b>${P.length > 1 ? ` · 그 밖에 ${esc(P.slice(1).map(x => x.name).join(', '))}` : ''}</span>${I.chev}</button>`; })()}
     <div class="en">${badge(d.rx)}${d.ach ? `<span class="badge ${d.ach >= 3 ? 'stop' : d.ach === 2 ? 'warn' : ''}" style="margin-left:4px">항콜린 ${esc(ACH_WORD[d.ach])}</span>` : ''}</div>
     <div class="hero-speak">${speakBtn(`drugSpeech(drug('${d.id}'))`, d.name + ' 읽어 주기')}</div></div>
