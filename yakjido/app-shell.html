@@ -4018,7 +4018,7 @@ async function showNote(title, body, key, day, plain){   /* plain — 약이 아
     const reg = navigator.serviceWorker && await navigator.serviceWorker.getRegistration();
     if (reg && reg.showNotification) {
       await reg.showNotification(title, { body, tag: key, renotify: true, requireInteraction: true, icon: 'icon-192.png', badge: 'icon-192.png',
-        data: { key: plain ? '' : key, day: day || todayKey() }, actions: plain ? [] : [{ action: 'took', title: '먹었어요' }, { action: 'open', title: '열기' }] });
+        data: { key: plain ? '' : key, day: day || todayKey(), go: plain ? '#/visits' : '' }, actions: plain ? [] : [{ action: 'took', title: '먹었어요' }, { action: 'open', title: '열기' }] });
       return;
     }
   } catch (e) {}
@@ -4217,7 +4217,7 @@ function tickFromNote(key, day){
   ME.taken = ME.taken || {}; const arr = ME.taken[k] = ME.taken[k] || [];
   if (!arr.includes(key)) { arr.push(key); rollDay(); saveMe(); toast(k === todayKey() ? '먹었다고 적어 두었어요' : '어제 기록으로 적어 두었어요'); if (NATIVE) nativeArm(); }
 }
-try { navigator.serviceWorker && navigator.serviceWorker.addEventListener('message', ev => { if (ev.data && ev.data.type === 'yakjido-tick') { tickFromNote(ev.data.key, ev.data.day); go('/schedule'); route(); } }); } catch (e) {}
+try { navigator.serviceWorker && navigator.serviceWorker.addEventListener('message', ev => { if (ev.data && ev.data.type === 'yakjido-tick') { if (ev.data.go === '/visits') { go('/visits'); route(); return; } tickFromNote(ev.data.key, ev.data.day); go('/schedule'); route(); } }); } catch (e) {}
 async function askNoti(){ if (!('Notification' in window)) { toast('이 브라우저는 알림을 지원하지 않아요'); return; } const r = await Notification.requestPermission(); if (r === 'granted') { toast('알림을 켰어요 — 앱이 열려 있을 때 울려요'); armNotifications(); } else toast('알림이 꺼져 있어요'); route(); }
 function icsText(){
   const pad = n => String(n).padStart(2, '0'); const d0 = new Date(); const ds = `${d0.getFullYear()}${pad(d0.getMonth() + 1)}${pad(d0.getDate())}`;
@@ -5943,7 +5943,7 @@ function photoResult(R){
 const SHARE = () => D.meta?.share || {};
 /* 2026-10-13 상용화 점검 3-06 — 약은 «받는 분» 몸 상태로 고른다(보내는 사람 ME 가 아니라). 받는 분 칩 네 가지 */
 const SEND_FQ = [['senior', '65세 이상이세요'], ['heart', '혈압·심장약 드세요'], ['anticoag', '피를 묽게 하는 약 드세요'], ['ulcer', '위가 약하세요']];
-let SEND_F = [], SEND_LBL = '', SEND_NOTE = '';
+let SEND_F = ['senior'], SEND_LBL = '', SEND_NOTE = '';   /* 「부모님께」라 받는 분은 대개 어르신 — 65세 이상을 기본으로 켠다(더 조심하는 쪽, 의사-질문-1013-2 6번) */
 function sendBasket(q){ const sy = q?.s ? byId(D.symptoms, q.s) : null; if (!sy) return null; return basket(sy, { flags: SEND_F.slice() }); }
 function sendItems(q){
   if (q?.s) { const bk = sendBasket(q); if (!bk) return [];
@@ -5963,7 +5963,7 @@ function sendText(items, label, note, link, dropped){
 function sendFlag(k){ SEND_F = SEND_F.includes(k) ? SEND_F.filter(x => x !== k) : [...SEND_F, k]; route(); }
 let SEND_Q = null;
 function vSend(_, q){
-  if (JSON.stringify(q || {}) !== JSON.stringify(SEND_Q || {})) { SEND_F = []; SEND_LBL = ''; SEND_NOTE = ''; }   /* 다른 증상으로 오면 처음부터 */
+  if (JSON.stringify(q || {}) !== JSON.stringify(SEND_Q || {})) { SEND_F = ['senior']; SEND_LBL = ''; SEND_NOTE = ''; }   /* 다른 증상으로 오면 처음부터(65세 이상 기본) */
   SEND_Q = q; const items = sendItems(q); const srv = !!SHARE().fn; const dropped = sendDropped(q);
   const sy = q?.s ? byId(D.symptoms, q.s) : null;
   return `${topBar({ back:'이전' })}<div class="eyebrow">${sy ? esc(sy.name) : '약 보내기'}</div><h1>부모님께 보내기</h1>

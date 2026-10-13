@@ -78,11 +78,11 @@ self.addEventListener('notificationclick', (e) => {
   e.notification.close();
   const d = e.notification.data || {};
   const took = e.action === 'took' && d.key;
-  const hash = took ? '#/schedule?tick=' + encodeURIComponent(d.key) + (d.day ? '&day=' + encodeURIComponent(d.day) : '') : '#/schedule';
+  const hash = took ? '#/schedule?tick=' + encodeURIComponent(d.key) + (d.day ? '&day=' + encodeURIComponent(d.day) : '') : (d.go === '#/visits' ? '#/visits' : '#/schedule');   // 진료 예약 알림은 예약 화면으로(2026-10-13)
   e.waitUntil((async () => {
     const all = await self.clients.matchAll({ type: 'window', includeUncontrolled: true });
     for (const c of all) {
-      if ('focus' in c) { try { c.postMessage({ type: 'yakjido-tick', key: took ? d.key : '', day: d.day || '' }); } catch (x) {} return c.focus(); }
+      if ('focus' in c) { try { c.postMessage({ type: 'yakjido-tick', key: took ? d.key : '', day: d.day || '', go: d.go === '#/visits' ? '/visits' : '' }); } catch (x) {} return c.focus(); }
     }
     return self.clients.openWindow('./' + hash);
   })());
