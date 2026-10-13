@@ -685,6 +685,8 @@ def parse_plus(path):
         t = sec.select_one('.psec'); title = txt(t, False) if t else ''
         body = __import__('copy').copy(sec)
         for x in body.select('.psec'): x.extract()
+        for x in body.find_all(style=True):   # 본책 쪽 배치(그림 오른쪽 격자·mm 여백)는 폰에서 글을 좁은 세로 줄로 만든다 — 그림 밖 style 은 걷는다
+            if not x.find_parent('svg') and x.name != 'svg': del x['style']
         for i, f in enumerate(body.select('svg')):
             f.replace_with(BeautifulSoup(selfcontain(str(f), markers, f'{code}px{k}{i}'), 'html.parser'))
         html = re.sub(r'\s+', ' ', ''.join(str(c) for c in body.contents)).strip()
