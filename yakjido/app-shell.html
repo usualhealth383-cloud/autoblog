@@ -2447,6 +2447,7 @@ function dupCheck(optionIds){
    식약처 성분명은 염 표기가 앞뒤로 붙어(염산노르트립틸린 / 아미트리프틸린염산염) 그대로는
    맞지 않으므로, 껍질을 벗긴 뒤 어근으로 맞춘다. */
 let ING_IX = null;
+const ACID_ONLY = new Set(['시트르산', '구연산', '아세트산', '초산', '글루콘산', '인산수소', '수산화', '황산', '염산', '타르타르산', '말레산', '푸마르산']);
 function ingIndex(){
   if (ING_IX) return ING_IX;
   const salt = (D.ingredients?.salt || []), list = (D.ingredients?.ing || []);
@@ -2474,7 +2475,9 @@ function ingIndex(){
          «통째로 같을 때만» 잡는다. 안 그러면 종합비타민 489개가 금연 보조제가 된다. */
       if ((e.exact || []).includes(a)) { if (base) exact.push([base, e]); continue; }
       if (base) roots.push([base, e]);
-      const r = norm(a); if (r && r !== base && r.length >= 3) roots.push([r, e]);
+      /* 염을 떼고 남은 것이 «짝 이온 산» 하나뿐이면 넣지 않는다 — 「시트르산칼슘」에서 남은 「시트르산」이
+         펜톡시베린시트르산염(감기약)을 제산제·칼슘으로 읽게 했다(Z4 #1 재현 중 발견) */
+      const r = norm(a); if (r && r !== base && r.length >= 3 && !ACID_ONLY.has(r)) roots.push([r, e]);
     }
   }
   roots.sort((a, b) => b[0].length - a[0].length);   /* 긴 어근부터 — 겹칠 때 더 구체적인 쪽 */
@@ -3044,6 +3047,13 @@ const isList = n => /·| 등$|제제$/.test(String(n || ''));
 function formOf(name){ const n = String(name || '').replace(/\(.*?\)/g, ''); for (const [re, ic, lb] of FORMPAT) if (re.test(n)) return [ic, lb]; return ['pill', '먹는 약']; }
 const formTag = name => { if (isList(name)) return `<span class="ftag">${I.pill}이 성분이 든 제품들</span>`; const [ic, lb] = formOf(name); return `<span class="ftag" title="${lb}" aria-label="${lb}">${I[ic] || I.pill}${lb}</span>`; };
 
+/* Z4 #1 — 이 이름이 «여러 성분이 든 제품»인가. 약지도 복합제 항목(contains)의 이름·제품, 또는 식약처 e약은요에서 그 이름으로 시작하는 제품이 모두 복합제일 때 */
+function comboName(name){
+  const k = pubNorm(prodName(name)); if (k.length < 2) return false;
+  if ((D.drugs || []).some(d => (d.contains || []).length > 1 && [d.name, ...(d.products || []).map(p => p.name)].some(n => pubNorm(n).startsWith(k)))) return true;
+  const c = (PUB.index || []).filter(p => pubNorm(p.n).startsWith(k));
+  return c.length > 0 && c.every(p => (p.i || []).length > 1);
+}
 function search(q, noFix){
   q = (q || '').toLowerCase().trim();
   /* 띄어쓰기를 틀려도 찾아진다 — 「타이 레놀」·「이부 프로펜」 */
@@ -3127,7 +3137,9 @@ function search(q, noFix){
     const hitFor = (d.for || []).find(m);
     if (m(d.name) || m(d.en) || mAll(d.name, d.en, d.tagline)) out.push({ k:'성분', c:'', t:d.name, d:(cls(d.class)?.name || '') + ' · ' + d.rx, h:'/drug/' + d.id, w:2 });
     else if (hitFor || mAll(d.name, d.en, d.tagline, (d.for || []).join(' '))) out.push({ k:'성분', c:'', t:d.name, d:(hitFor ? `‘${hitFor}’에 쓰는 · ` : '') + (cls(d.class)?.name || '') + ' · ' + d.rx, h:'/drug/' + d.id, w:1 });
-    (d.products || []).forEach(p => { if (!p.name.includes('·') && !p.name.includes(' 등') && m(p.name)) out.push({ k:'제품', c:'p', t:p.name, d:`${d.name} · ${p.amount || ''}`, h:'/drug/' + d.id, w:2 }); });
+    /* Z4 #1 — 단일 성분 항목의 제품 칸에 복합제 이름(구아이페네신 → 「판콜에이」)이 적혀 있다. 그 이름으로 찾으면 단일 성분 화면으로 가서
+       내 약통에 구아이페네신 하나로 담기고, 속의 아세트아미노펜 겹침을 놓쳤다. 복합제 이름이면 단일 성분 쪽은 내지 않는다(복합제 항목·식약처 제품이 잡는다) */
+    (d.products || []).forEach(p => { if (!p.name.includes('·') && !p.name.includes(' 등') && m(p.name) && !(!(d.contains || []).length && comboName(p.name))) out.push({ k:'제품', c:'p', t:p.name, d:`${d.name} · ${p.amount || ''}`, h:'/drug/' + d.id, w:2 }); });
   });
   (D.supplements || []).forEach(s => { const hitTag = (s.tags || []).find(m); if (m(s.name) || hitTag || mAll(s.name, (s.tags || []).join(' '), s.for)) out.push({ k:'영양제', c:'', t:s.name, d:(hitTag && !m(s.name) ? `‘${hitTag}’ → 이 성분 · ` : '') + (s.for || ''), h:'/supp/' + s.id, w:1 }); });
   /* 종류로 담는 «빠른 묶음» — 「와파린」·「혈압약」처럼 처방약 이름을 치신 경우.
@@ -3248,9 +3260,15 @@ function basket(s, ov){
   const f = ov ? ov.flags : activeFlags(); const senior = ov ? f.includes('senior') : ME.age === 'senior';
   /* 막힌 까닭 — 켜 둔 조건 전부가 아니라 이 약을 막은 조건만(3-14) */
   const whyOf = x => [...new Set((drug(x)?.avoid || []).flatMap(a => (a.flags || []).filter(fl => f.includes(fl))))];
-  return (s.plan || []).map((p, i) => Object.assign({}, p, { _i:i })).filter(p => p.otc !== false && p.options?.length).map(p => {
+  /* Z4 #13 — 약 알레르기·부작용이 있었던 성분(받는 분 조건으로 계산할 때는 보내는 사람 알레르기를 쓰지 않는다) */
+  const alg = ov ? [] : allergyKeys();
+  const allergic = x => alg.length && drugKeys(drug(x)).some(k => alg.includes(k));
+  const dropped = [];
+  const rows = (s.plan || []).map((p, i) => Object.assign({}, p, { _i:i }))
+    /* Z4 #3 — 자료가 「이 조건이면 이 칸을 보이지 말 것」(hideFlags)을 적어 둔 칸은 통째로 뺀다(소염진통제를 더하거나 번갈아 먹는 칸 — 임신·위·콩팥·항응고제) */
+    .filter(p => p.otc !== false && p.options?.length && !slotHidden(p, f)).map(p => {
     let pick = p.pick || p.options[0]; let d = drug(pick);
-    const bad = x => drug(x)?.avoid?.some(a => a.flags?.some(fl => f.includes(fl)));
+    const bad = x => drug(x)?.avoid?.some(a => a.flags?.some(fl => f.includes(fl))) || allergic(x);
     let swapped = false;
     if (d && bad(pick)) { const alt = p.options.find(o => !bad(o) && !['전문', '제품별'].includes(drug(o)?.rx)); if (alt) { pick = alt; d = drug(alt); swapped = true; } }
     /* 65세 이상이면 같은 자리에서 항콜린 부담이 낮은 쪽을 먼저 권한다 */
@@ -3265,9 +3283,40 @@ function basket(s, ov){
     const nsaidWarn = senior && d && d.class === 'nsaid';
     const senWarn = senior && d ? seniorWord(d) : '';
     const blocked = d ? !!bad(pick) : false;
-    return { slot: p.slot, i: p._i, d, optional: !!p.optional, either: p.either || '', swapped, achWarn, nsaidWarn, senWarn, blocked, why: blocked ? whyOf(pick) : [], again: !!p.again,
-             product: (p.prod && (d?.products || []).some(pr => pr.name === p.prod) ? p.prod : d?.products?.[0]?.name) };
-  }).filter(x => x.d);
+    /* Z4 #13 — 알레르기 성분이 든 약은 권하지 않는다(같은 칸에 대신할 것이 없으면 뺀다). 같은 계열은 「약사와 상의」 */
+    if (d && allergic(pick)) { dropped.push({ name: ingrName(d), why: 'allergy' }); return null; }
+    const algCls = !blocked && d && !ov && allergyClassHit(d);
+    /* Z4 #3 보강 — 임신이면 소염진통제를 «약사와 상의» 배지로 남기지 않고 뺀다(부루펜 허가: 임신 말기 금기 · 20주 이후 태아 콩팥·양수 위험, 주수를 묻지 않으므로 모두 뺀다) */
+    if (d && blocked && f.includes('pregnant') && isNsaid(d) && whyOf(pick).includes('pregnant')) { dropped.push({ name: ingrName(d), why: 'pregnant' }); return null; }
+    return { slot: p.slot, i: p._i, d, optional: !!p.optional, either: p.either || '', swapped, achWarn, nsaidWarn, senWarn, blocked: blocked || !!algCls, why: blocked ? whyOf(pick).concat(allergic(pick) ? ['allergy'] : []) : algCls ? ['allergycls'] : [], again: !!p.again,
+             options: p.options, product: (p.prod && (d?.products || []).some(pr => pr.name === p.prod) ? p.prod : d?.products?.[0]?.name) };
+  }).filter(x => x && x.d);
+  /* Z4 #5 — 같은 제품·같은 성분이 두 칸에 나오던 것(두통: 진통제 칸과 「더하기」 칸 모두 타이레놀). 뒤 칸에서 겹치지 않는 다른 약으로 바꾸고, 없으면 뒤 칸을 뺀다.
+     「이 중 하나만」 묶음끼리와 「7일 뒤 한 번 더」(again) 칸은 겹침이 아니다 */
+  const out = [], seen = [];
+  for (const x of rows) {
+    const clash = d => { const ks = drugKeys(d); return seen.some(o => !(x.either && o.either === x.either) && !x.again && !o.again && o.ks.some(k => ks.includes(k))); };
+    if (clash(x.d)) {
+      const bad = o => drug(o)?.avoid?.some(a => a.flags?.some(fl => f.includes(fl))) || allergic(o);
+      const alt = (x.options || []).map(drug).find(d2 => d2 && !bad(d2.id) && !['전문', '제품별'].includes(d2.rx) && !clash(d2) && !(f.includes('pregnant') && isNsaid(d2)));
+      if (!alt) continue;
+      Object.assign(x, { d: alt, swapped: x.swapped || 'dup', blocked: false, why: [], product: alt.products?.[0]?.name, nsaidWarn: senior && alt.class === 'nsaid', senWarn: senior ? seniorWord(alt) : '', achWarn: senior && achOfDrug(alt) >= 3 });
+    }
+    seen.push({ either: x.either, again: x.again, ks: drugKeys(x.d) }); out.push(x);
+  }
+  out.dropped = dropped;
+  return out;
+}
+/* 약 하나의 성분 열쇠들(복합제는 속 성분) — 겹침·알레르기 판정에 */
+function drugKeys(d){ if (!d) return []; const es = drugIngs(d); return es.length ? es.map(e => e.k) : [d.id]; }
+const isNsaid = d => !!d && (d.class === 'nsaid' || drugIngs(d).some(e => (e.cls || []).includes('nsaid')));
+/* Z4 #3 — 칸의 hideFlags 중 하나라도 켜져 있으면 숨긴다(증상 화면·약국 카드·부모님께 보내기가 모두 basket/이 함수를 쓴다) */
+const slotHidden = (p, f) => (p.hideFlags || []).some(k => (f || activeFlags()).includes(k));
+/* 빠진 약 한 줄 — 말없이 빼지 않는다 */
+function droppedNote(bk){
+  const dr = bk?.dropped || []; if (!dr.length) return '';
+  const al = dr.filter(x => x.why === 'allergy').map(x => x.name), pg = dr.filter(x => x.why === 'pregnant').map(x => x.name);
+  return [al.length ? `빠진 약: ${[...new Set(al)].join(', ')}(알레르기)` : '', pg.length ? `빠진 약: ${[...new Set(pg)].join(', ')} — 임신 중 소염진통제는 의사와 상의하세요. 주수에 따라 먹으면 안 되는 때가 있어요` : ''].filter(Boolean).join(' · ');
 }
 /* 65세가 넘으면 소염제 말고도 따로 일러 드릴 계열 — 현욱님 답(2026-09-23):
    1세대 항히스타민·코막힘 성분 → 전립선·소변 막힘 / 카페인 복합 → 불면 / 마그네슘(마그밀) 과용 → 콩팥 부담 */
@@ -3284,7 +3333,7 @@ function seniorWord(d){
    내 약통에 이미 있는 성분(복합제 속 성분 포함)은 have, 내 조건에 막힌 약(blocked)은 「약사와 상의」로 뒤에. */
 function takingDrugIds(){ const out = new Set(); for (const t of takingItems()) { if (t.pub?.ingr) ingFind(t.pub.ingr).forEach(e => { if (e.drug) out.add(e.drug); }); const d = t.d; if (!d) continue; out.add(d.id); (d.contains || []).forEach(c => out.add(c)); } return out; }
 function showable(bk){ const have = takingDrugIds(); const rank = x => x.have ? 2 : x.blocked ? 1 : 0;
-  return bk.map(x => Object.assign({}, x, { have: have.has(x.d.id) })).sort((a, b) => rank(a) - rank(b)); }
+  const r = bk.map(x => Object.assign({}, x, { have: have.has(x.d.id) })).sort((a, b) => rank(a) - rank(b)); r.dropped = bk.dropped; return r; }
 const flagWords = (ks, sep = '·') => (ks || []).map(k => FLAG_LABEL[k]).filter(Boolean).join(sep);
 function memoText(s){
   const bk = showable(basket(s)), f = activeFlags(), mine = takingItems().map(t => t.name);
@@ -4903,7 +4952,7 @@ function ixItems(extra){
   for (const x of takingItems()) {
     const r = ingOf(x);
     out.push({ name: x.name, ings: r.ings, known: r.known, approx: !!r.approx, from: '내 약통',
-               link: x.d ? '#/drug/' + x.d.id : (x.pub ? '#/pillinfo/' + x.pub.seq : '') });
+               link: x.d ? '#/drug/' + x.d.id : (x.pub ? (x.pub.seq ? '#/pillinfo/' + x.pub.seq : ((PUB.index || []).find(p => p.n === x.pub.full) ? '#/pub/' + (PUB.index || []).find(p => p.n === x.pub.full).id : '')) : '') });
   }
   for (const d of (extra || [])) {
     const ings = drugIngs(d).slice();
@@ -4967,7 +5016,13 @@ function ixRun(extra){
     if (!byIng.get(e.k).includes(it)) byIng.get(e.k).push(it);
   }
   for (const [k, list] of byIng) if (list.length > 1) dupe.push({ e: ingIndex().byKey[k], items: list });
-  return { items, hits: keep, dupe, unknown: items.filter(x => !x.known) };
+  /* Z4 #1 — 겹침을 «약 짝»으로 묶는다(약학정보원 방식): 성분이 모두 같은 짝(같은 약을 두 번)과 일부만 같은 짝(복합 감기약 + 진통제).
+     아세트아미노펜처럼 하루 총량이 정해진 성분을 맨 앞에 */
+  const pairs = new Map();
+  for (const d of dupe) { const key = d.items.map(i => items.indexOf(i)).sort((a, b) => a - b).join(','); if (!pairs.has(key)) pairs.set(key, { items: d.items, es: [] }); pairs.get(key).es.push(d.e); }
+  const sig = it => it.ings.map(e => e.k).sort().join('|');
+  const dupeGroups = [...pairs.values()].map(g => ({ items: g.items, es: g.es.filter(Boolean).sort((a, b) => (b.k === 'acetaminophen') - (a.k === 'acetaminophen')), all: g.items.every(it => sig(it) === sig(g.items[0])) }));
+  return { items, hits: keep, dupe, dupeGroups, unknown: items.filter(x => !x.known) };
 }
 const IX_LV = { stop: ['같이 드시면 안 돼요', I.alert], warn: ['조심해서 드세요', I.alert], info: ['시간만 띄우면 돼요', I.clock] };
 function ixCard(h){
@@ -5044,8 +5099,9 @@ function vTogether(){
       ${res.items.some(i => i.approx) ? `<p class="ix-unk">${I.info}<span><b>‘대략’</b>으로 담으신 약이 있어요. 종류만으로도 큰 위험은 걸러지지만, <b>항콜린 점수처럼 성분마다 다른 것</b>은 이름을 담아야 정확합니다. <a class="link" href="#/pill">이름으로 찾아 담기</a></span></p>` : ''}
       ${res.unknown.length ? `<p class="ix-unk">${I.info}<span><b>${res.unknown.length}가지</b>는 성분을 확인하지 못해 판정에서 빠졌어요. 약봉투에 적힌 <b>성분 이름</b>으로 다시 담으시면 함께 봐 드려요.</span></p>` : ''}
       ${res.dupe.length ? `<div class="ix stop"><div class="ix-h">${I.alert}<b>같은 성분이 두 군데에 들어 있어요</b><span class="ix-lv">겹침</span></div>
-        ${res.dupe.map(d => `<p class="ix-why"><b>${esc(d.e?.n || '')}</b> — ${d.items.map(i => esc(i.name)).join(' · ')}</p>`).join('')}
-        <p class="ix-do">${I.check}<span>모르고 두 배로 드시게 되는 자리예요. 하나만 남기세요.</span></p></div>` : ''}
+        ${res.dupeGroups.map(g => `<div class="ix-dg"><p class="ix-why"><span class="badge ${g.all ? 'stop' : 'warn'}">${g.all ? '성분이 모두 같아요' : '일부 성분이 같아요'}</span> <b>${g.items.map(i => esc(i.name)).join(' + ')}</b></p>
+          <p class="ix-why">같은 성분: <b>${g.es.map(e => esc(e.n)).join(' · ')}</b>${g.all ? ' — 같은 약을 두 번 드시는 셈이에요' : ''}</p></div>`).join('')}
+        <p class="ix-do">${I.check}<span>${res.dupeGroups.some(g => g.es.some(e => e.k === 'acetaminophen')) ? '아세트아미노펜은 <b>모든 약을 합쳐 하루 4 g까지</b>예요 — 넘기면 간이 상할 수 있어요. ' : ''}모르고 두 배로 드시게 되는 자리예요. 하나만 남기거나 약사에게 보여 주세요.</span></p></div>` : ''}
       ${res.hits.map(ixCard).join('')}
       ${ach}
       <button class="tog-cta" onclick="go('/bag')">${I.eye}<div><b>약사님께 보여드리기</b><span>내 약 목록과 이 판정을 큰 글씨 한 장으로</span></div>${I.chev}</button>
@@ -5674,7 +5730,9 @@ function vPub(id){
   ${oursSupp.length ? `<section class="sec"><h2>영양 성분 해설 <small>얼마나 듣는지·상한·겹침</small></h2><div class="card rows">${oursSupp.map(sp => `<button class="row" onclick="go('/supp/${sp.id}')"><div class="ic">${I.leaf}</div><div class="body"><b>${esc(sp.name)}</b><span>${esc(sp.for || '')}</span></div>${I.chev}</button>`).join('')}</div>
     <p class="small muted" style="margin-top:8px">비타민·미네랄은 <b>약으로도, 건강기능식품으로도</b> 팔려요. 다른 영양제와 겹쳐 상한을 넘기기 쉬우니 한 번 확인해 보세요.</p></section>` : ''}
 </div>` : ''}`; })()}
-  <div class="actions">${ours.length === 1 ? `<button class="btn ghost" onclick="toggleTaking('${ours[0].id}')">${I.pill} 내 약통에 담기</button>` : ''}</div>
+  <div class="actions">${(() => { /* Z4 #1 — 복합제도 제품 그대로(모든 성분) 담는다. 전에는 성분이 하나일 때만 단추가 있었다 */
+    const pid = 'pub:' + pubKeyOf(ix), on = (ME.taking || []).includes(pid);
+    return on ? `<button class="btn line" onclick="togglePub('${esc(pubKeyOf(ix))}')">${I.check} 내 약통에 있어요 (빼기)</button>` : `<button class="btn ghost" onclick="addPubIx(${id});route()">${I.pill} 내 약통에 담기</button>`; })()}</div>
   ${disclaimer('식약처 허가사항의 공공데이터 요약이에요. 원문은 공백이 제거된 형태라 읽기 어려운 부분이 있을 수 있어요. 최종 확인은 약 상자의 설명서와 약사에게.')}`;
 }
 
@@ -5813,6 +5871,30 @@ function pubIngrGuess(seq, name){
 /* 성분이 둘 이상인 복합제는 약지도 약 하나로 잇지 않는다 — 감기 복합제가 「아세트아미노펜」 복용법으로 읽히면 안 된다. 성분은 ingOf 가 전부 푼다 */
 const pubMulti = ingr => String(ingr || '').split('|').filter(Boolean).length > 1 && ingFind(ingr).length > 1;
 const pubDrug = (ingr, p) => ingr && !pubMulti(ingr) ? drugByIngr(ingr, p) : null;
+/* Z4 #1 — 「내 약통」 이름 검색이 제품을 약지도 성분 하나로 바꿔 담던 것(판콜에이 → 구아이페네신).
+   식약처 e약은요 제품(액상 감기약까지)을 먼저 보여 주고, 고르면 제품 이름·품목코드·«모든» 성분을 그대로 담는다(ME.pub).
+   단일 성분 항목은 그 뒤에 — 복합제 이름이 단일 성분의 제품 칸에 적혀 있어도 그쪽으로 담기지 않게(search 의 comboName) */
+const pubShort = n => String(n || '').replace(/\(.*?\)/g, '').replace(/[()]/g, '').trim();
+/* 품목코드가 없는 e약은요 제품(액상 감기약 일부)은 이름으로 열쇠를 만든다 — 판이 바뀌어도 같은 열쇠 */
+const pubKeyOf = p => p.seq ? String(p.seq) : 'n' + [...pubNorm(p.n)].reduce((h, c) => (h * 31 + c.charCodeAt(0)) >>> 0, 7).toString(36);
+function mqHits(q){
+  if (!PUB.index) pubIndexSoon();
+  const qn = pubNorm(q);
+  const pubs = qn.length < 2 ? [] : (PUB.index || []).filter(p => pubNorm(p.n).includes(qn))
+    .sort((a, b) => (pubNorm(b.n).startsWith(qn) - pubNorm(a.n).startsWith(qn)) || ((b.i || []).length > 1) - ((a.i || []).length > 1)).slice(0, 5);
+  const pn = pubs.map(p => pubNorm(p.n));
+  const combo = h => ((drug(h.h.slice(6)) || {}).contains || []).length > 0;
+  /* 같은 제품이 식약처 쪽에 있으면 약지도 «제품·복합제» 줄은 뺀다 — 식약처 쪽이 성분을 빠짐없이 갖고 있다. 성분(단일) 줄은 남긴다 */
+  const drugs = search(q).filter(h => h.h.startsWith('/drug/')).filter(h => !((h.k === '제품' || combo(h)) && pn.some(n => n.startsWith(pubNorm(prodName(h.t))))));
+  const all = [...pubs.map(p => ({ pub: p, t: p.n })), ...drugs];
+  const rank = h => (pubNorm(h.t).startsWith(qn) ? 4 : 0) + (h.pub ? 2 : combo(h) ? 1 : 0);
+  return all.map((h, i) => [h, i]).sort((a, b) => rank(b[0]) - rank(a[0]) || a[1] - b[1]).map(x => x[0]).slice(0, 8);
+}
+function addPubIx(i){ const p = (PUB.index || [])[+i]; if (!p) return; const id = 'pub:' + pubKeyOf(p); ME.taking = ME.taking || []; ME.pub = ME.pub || {};
+  if (ME.taking.includes(id)) { toast('이미 내 약통에 있어요'); return; }
+  const ingr = (p.i || []).join('|'); const d = pubDrug(ingr, p);
+  ME.taking.push(id); ME.pub[id] = { name: pubShort(p.n), full: p.n, ingr, rx: '', seq: p.seq || '', drugId: d?.id || '' }; markPrnIfNew(id);
+  saveMe(); toast('내 약통에 담았어요'); }
 /* 성분이 빈 채로 담긴 약을 채운다 — 자료가 아직 없으면 받아 온 뒤 한 번 더. 채운 것이 있으면 true */
 function pubIngrFill(){
   const P = ME.pub || {}; const empty = Object.keys(P).filter(k => !P[k].ingr && !P[k].manual && (ME.taking || []).includes(k));
@@ -6633,7 +6715,8 @@ function vMe(_, q){
     <div class="actions two"><button class="btn ghost" onclick="go('/photo')">${I.eye} 사진으로 등록</button><button class="btn ghost" onclick="go('/pill')">${I.search} 이름·알약으로</button></div>
     <div class="util" style="margin-top:8px">${urow(I.pill, '이름을 몰라도 종류만 골라 담기', '', "go('/kinds')", '고르기')}</div>
     <div class="search" style="margin-top:12px">${I.search}<input id="mq" aria-label="약 이름으로 찾아 내 약통에 담기" placeholder="약 이름으로 찾아 담기 (예: 타이레놀)" value="${esc(MQ)}" autocomplete="off"></div>
-    ${MQ.trim() ? `<div class="card rows" style="margin-top:8px">${(search(MQ.trim()).filter(h => h.h.startsWith('/drug/')).slice(0, 6).map(h => { const id = h.h.slice(6); const on = (ME.taking || []).includes(id); return `<button class="row" onclick="${on ? '' : `toggleTaking('${id}');`}MQ='';route()"><div class="ic">${I.pill}</div><div class="body"><b>${esc(h.t)}</b><span>${on ? '이미 등록돼 있어요' : '눌러서 내 약통에 담기'}</span></div>${I.chev}</button>`; }).join('')) || '<div class="empty">찾는 약이 없어요</div>'}</div>` : ''}
+    ${MQ.trim() ? `<div class="card rows" style="margin-top:8px">${mqHits(MQ.trim()).map(h => { if (h.pub) { const p = h.pub, id = 'pub:' + pubKeyOf(p), on = (ME.taking || []).includes(id); return `<button class="row" onclick="${on ? '' : `addPubIx(${p.id});`}MQ='';route()"><div class="ic">${I.pill}</div><div class="body"><b>${esc(pubShort(p.n))}</b><span>${on ? '이미 등록돼 있어요' : `식약처 제품 · 성분 ${(p.i || []).length}가지(${esc((p.i || []).slice(0, 4).map(t => t.replace(INGR_STRIP, '')).join('·'))}${(p.i || []).length > 4 ? ' 등' : ''}) — 눌러서 담기`}</span></div>${I.chev}</button>`; }
+      const id = h.h.slice(6); const on = (ME.taking || []).includes(id); return `<button class="row" onclick="${on ? '' : `toggleTaking('${id}');`}MQ='';route()"><div class="ic">${I.pill}</div><div class="body"><b>${esc(h.t)}</b><span>${on ? '이미 등록돼 있어요' : '눌러서 내 약통에 담기'}</span></div>${I.chev}</button>`; }).join('') || (PUB.index ? '<div class="empty">찾는 약이 없어요</div>' : '<p class="loading">식약처 제품 목록을 불러오는 중…</p>')}</div>` : ''}
     ${items.length ? `<p class="small muted" style="margin-top:8px">항생제·감기약처럼 <b>며칠만</b> 드시는 약은 ‘며칠만’을 눌러 두세요. 매일 드시는 약과 구분해서 부담을 셉니다.</p>` : ''}
   </section>
   ${items.length ? `<div class="sech"><h2 class="sec-h">담아 두신 약으로</h2></div><div class="rows-l">

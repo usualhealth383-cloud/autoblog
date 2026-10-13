@@ -1516,7 +1516,7 @@ main>*:nth-child(2){animation-delay:.04s} main>*:nth-child(3){animation-delay:.0
 window.__YAKJIDO_OK__ = true;   /* 여기까지 읽혔다 = 이 브라우저가 아래 문법(?. ?? 등)을 안다. 못 읽으면 머리의 안내문이 뜬다 */
 const D = JSON.parse(document.getElementById('data').textContent || '{}');
 const BUILD = '2026-10-13';
-const DATAV = '35e916be9e'.indexOf('__') === 0 ? BUILD : '35e916be9e';
+const DATAV = 'eb956e70f3'.indexOf('__') === 0 ? BUILD : 'eb956e70f3';
 const BRANDMARK = (typeof window !== 'undefined' && window.__BRANDMARK__) || 'icon-192.png';
 let CORE = 0, CORE_P = null;          /* 0 아직 · 1 받는 중 · 2 준비됨 · 3 실패 */
 function mergeCore(c){
@@ -2689,6 +2689,12 @@ const isList = n => /·| 등$|제제$/.test(String(n || ''));
 function formOf(name){ const n = String(name || '').replace(/\(.*?\)/g, ''); for (const [re, ic, lb] of FORMPAT) if (re.test(n)) return [ic, lb]; return ['pill', '먹는 약']; }
 const formTag = name => { if (isList(name)) return `<span class="ftag">${I.pill}이 성분이 든 제품들</span>`; const [ic, lb] = formOf(name); return `<span class="ftag" title="${lb}" aria-label="${lb}">${I[ic] || I.pill}${lb}</span>`; };
 
+function comboName(name){
+  const k = pubNorm(prodName(name)); if (k.length < 2) return false;
+  if ((D.drugs || []).some(d => (d.contains || []).length > 1 && [d.name, ...(d.products || []).map(p => p.name)].some(n => pubNorm(n).startsWith(k)))) return true;
+  const c = (PUB.index || []).filter(p => pubNorm(p.n).startsWith(k));
+  return c.length > 0 && c.every(p => (p.i || []).length > 1);
+}
 function search(q, noFix){
   q = (q || '').toLowerCase().trim();
   const qs = q.replace(/\s+/g, '');
@@ -2741,7 +2747,7 @@ function search(q, noFix){
     const hitFor = (d.for || []).find(m);
     if (m(d.name) || m(d.en) || mAll(d.name, d.en, d.tagline)) out.push({ k:'성분', c:'', t:d.name, d:(cls(d.class)?.name || '') + ' · ' + d.rx, h:'/drug/' + d.id, w:2 });
     else if (hitFor || mAll(d.name, d.en, d.tagline, (d.for || []).join(' '))) out.push({ k:'성분', c:'', t:d.name, d:(hitFor ? `‘${hitFor}’에 쓰는 · ` : '') + (cls(d.class)?.name || '') + ' · ' + d.rx, h:'/drug/' + d.id, w:1 });
-    (d.products || []).forEach(p => { if (!p.name.includes('·') && !p.name.includes(' 등') && m(p.name)) out.push({ k:'제품', c:'p', t:p.name, d:`${d.name} · ${p.amount || ''}`, h:'/drug/' + d.id, w:2 }); });
+    (d.products || []).forEach(p => { if (!p.name.includes('·') && !p.name.includes(' 등') && m(p.name) && !(!(d.contains || []).length && comboName(p.name))) out.push({ k:'제품', c:'p', t:p.name, d:`${d.name} · ${p.amount || ''}`, h:'/drug/' + d.id, w:2 }); });
   });
   (D.supplements || []).forEach(s => { const hitTag = (s.tags || []).find(m); if (m(s.name) || hitTag || mAll(s.name, (s.tags || []).join(' '), s.for)) out.push({ k:'영양제', c:'', t:s.name, d:(hitTag && !m(s.name) ? `‘${hitTag}’ → 이 성분 · ` : '') + (s.for || ''), h:'/supp/' + s.id, w:1 }); });
   (D.ingredients?.quick || []).forEach(g => {
@@ -4264,7 +4270,7 @@ function ixItems(extra){
   for (const x of takingItems()) {
     const r = ingOf(x);
     out.push({ name: x.name, ings: r.ings, known: r.known, approx: !!r.approx, from: '내 약통',
-               link: x.d ? '#/drug/' + x.d.id : (x.pub ? '#/pillinfo/' + x.pub.seq : '') });
+               link: x.d ? '#/drug/' + x.d.id : (x.pub ? (x.pub.seq ? '#/pillinfo/' + x.pub.seq : ((PUB.index || []).find(p => p.n === x.pub.full) ? '#/pub/' + (PUB.index || []).find(p => p.n === x.pub.full).id : '')) : '') });
   }
   for (const d of (extra || [])) {
     const ings = drugIngs(d).slice();
@@ -4319,7 +4325,11 @@ function ixRun(extra){
     if (!byIng.get(e.k).includes(it)) byIng.get(e.k).push(it);
   }
   for (const [k, list] of byIng) if (list.length > 1) dupe.push({ e: ingIndex().byKey[k], items: list });
-  return { items, hits: keep, dupe, unknown: items.filter(x => !x.known) };
+  const pairs = new Map();
+  for (const d of dupe) { const key = d.items.map(i => items.indexOf(i)).sort((a, b) => a - b).join(','); if (!pairs.has(key)) pairs.set(key, { items: d.items, es: [] }); pairs.get(key).es.push(d.e); }
+  const sig = it => it.ings.map(e => e.k).sort().join('|');
+  const dupeGroups = [...pairs.values()].map(g => ({ items: g.items, es: g.es.filter(Boolean).sort((a, b) => (b.k === 'acetaminophen') - (a.k === 'acetaminophen')), all: g.items.every(it => sig(it) === sig(g.items[0])) }));
+  return { items, hits: keep, dupe, dupeGroups, unknown: items.filter(x => !x.known) };
 }
 const IX_LV = { stop: ['같이 드시면 안 돼요', I.alert], warn: ['조심해서 드세요', I.alert], info: ['시간만 띄우면 돼요', I.clock] };
 function ixCard(h){
@@ -4389,8 +4399,9 @@ function vTogether(){
       ${res.items.some(i => i.approx) ? `<p class="ix-unk">${I.info}<span><b>‘대략’</b>으로 담으신 약이 있어요. 종류만으로도 큰 위험은 걸러지지만, <b>항콜린 점수처럼 성분마다 다른 것</b>은 이름을 담아야 정확합니다. <a class="link" href="#/pill">이름으로 찾아 담기</a></span></p>` : ''}
       ${res.unknown.length ? `<p class="ix-unk">${I.info}<span><b>${res.unknown.length}가지</b>는 성분을 확인하지 못해 판정에서 빠졌어요. 약봉투에 적힌 <b>성분 이름</b>으로 다시 담으시면 함께 봐 드려요.</span></p>` : ''}
       ${res.dupe.length ? `<div class="ix stop"><div class="ix-h">${I.alert}<b>같은 성분이 두 군데에 들어 있어요</b><span class="ix-lv">겹침</span></div>
-        ${res.dupe.map(d => `<p class="ix-why"><b>${esc(d.e?.n || '')}</b> — ${d.items.map(i => esc(i.name)).join(' · ')}</p>`).join('')}
-        <p class="ix-do">${I.check}<span>모르고 두 배로 드시게 되는 자리예요. 하나만 남기세요.</span></p></div>` : ''}
+        ${res.dupeGroups.map(g => `<div class="ix-dg"><p class="ix-why"><span class="badge ${g.all ? 'stop' : 'warn'}">${g.all ? '성분이 모두 같아요' : '일부 성분이 같아요'}</span> <b>${g.items.map(i => esc(i.name)).join(' + ')}</b></p>
+          <p class="ix-why">같은 성분: <b>${g.es.map(e => esc(e.n)).join(' · ')}</b>${g.all ? ' — 같은 약을 두 번 드시는 셈이에요' : ''}</p></div>`).join('')}
+        <p class="ix-do">${I.check}<span>${res.dupeGroups.some(g => g.es.some(e => e.k === 'acetaminophen')) ? '아세트아미노펜은 <b>모든 약을 합쳐 하루 4 g까지</b>예요 — 넘기면 간이 상할 수 있어요. ' : ''}모르고 두 배로 드시게 되는 자리예요. 하나만 남기거나 약사에게 보여 주세요.</span></p></div>` : ''}
       ${res.hits.map(ixCard).join('')}
       ${ach}
       <button class="tog-cta" onclick="go('/bag')">${I.eye}<div><b>약사님께 보여드리기</b><span>내 약 목록과 이 판정을 큰 글씨 한 장으로</span></div>${I.chev}</button>
@@ -4969,7 +4980,9 @@ function vPub(id){
   ${oursSupp.length ? `<section class="sec"><h2>영양 성분 해설 <small>얼마나 듣는지·상한·겹침</small></h2><div class="card rows">${oursSupp.map(sp => `<button class="row" onclick="go('/supp/${sp.id}')"><div class="ic">${I.leaf}</div><div class="body"><b>${esc(sp.name)}</b><span>${esc(sp.for || '')}</span></div>${I.chev}</button>`).join('')}</div>
     <p class="small muted" style="margin-top:8px">비타민·미네랄은 <b>약으로도, 건강기능식품으로도</b> 팔려요. 다른 영양제와 겹쳐 상한을 넘기기 쉬우니 한 번 확인해 보세요.</p></section>` : ''}
 </div>` : ''}`; })()}
-  <div class="actions">${ours.length === 1 ? `<button class="btn ghost" onclick="toggleTaking('${ours[0].id}')">${I.pill} 내 약통에 담기</button>` : ''}</div>
+  <div class="actions">${(() => { /* Z4 #1 — 복합제도 제품 그대로(모든 성분) 담는다. 전에는 성분이 하나일 때만 단추가 있었다 */
+    const pid = 'pub:' + pubKeyOf(ix), on = (ME.taking || []).includes(pid);
+    return on ? `<button class="btn line" onclick="togglePub('${esc(pubKeyOf(ix))}')">${I.check} 내 약통에 있어요 (빼기)</button>` : `<button class="btn ghost" onclick="addPubIx(${id});route()">${I.pill} 내 약통에 담기</button>`; })()}</div>
   ${disclaimer('식약처 허가사항의 공공데이터 요약이에요. 원문은 공백이 제거된 형태라 읽기 어려운 부분이 있을 수 있어요. 최종 확인은 약 상자의 설명서와 약사에게.')}`;
 }
 
@@ -5092,6 +5105,25 @@ function pubIngrGuess(seq, name){
 }
 const pubMulti = ingr => String(ingr || '').split('|').filter(Boolean).length > 1 && ingFind(ingr).length > 1;
 const pubDrug = (ingr, p) => ingr && !pubMulti(ingr) ? drugByIngr(ingr, p) : null;
+const pubShort = n => String(n || '').replace(/\(.*?\)/g, '').replace(/[()]/g, '').trim();
+const pubKeyOf = p => p.seq ? String(p.seq) : 'n' + [...pubNorm(p.n)].reduce((h, c) => (h * 31 + c.charCodeAt(0)) >>> 0, 7).toString(36);
+function mqHits(q){
+  if (!PUB.index) pubIndexSoon();
+  const qn = pubNorm(q);
+  const pubs = qn.length < 2 ? [] : (PUB.index || []).filter(p => pubNorm(p.n).includes(qn))
+    .sort((a, b) => (pubNorm(b.n).startsWith(qn) - pubNorm(a.n).startsWith(qn)) || ((b.i || []).length > 1) - ((a.i || []).length > 1)).slice(0, 5);
+  const pn = pubs.map(p => pubNorm(p.n));
+  const combo = h => ((drug(h.h.slice(6)) || {}).contains || []).length > 0;
+  const drugs = search(q).filter(h => h.h.startsWith('/drug/')).filter(h => !((h.k === '제품' || combo(h)) && pn.some(n => n.startsWith(pubNorm(prodName(h.t))))));
+  const all = [...pubs.map(p => ({ pub: p, t: p.n })), ...drugs];
+  const rank = h => (pubNorm(h.t).startsWith(qn) ? 4 : 0) + (h.pub ? 2 : combo(h) ? 1 : 0);
+  return all.map((h, i) => [h, i]).sort((a, b) => rank(b[0]) - rank(a[0]) || a[1] - b[1]).map(x => x[0]).slice(0, 8);
+}
+function addPubIx(i){ const p = (PUB.index || [])[+i]; if (!p) return; const id = 'pub:' + pubKeyOf(p); ME.taking = ME.taking || []; ME.pub = ME.pub || {};
+  if (ME.taking.includes(id)) { toast('이미 내 약통에 있어요'); return; }
+  const ingr = (p.i || []).join('|'); const d = pubDrug(ingr, p);
+  ME.taking.push(id); ME.pub[id] = { name: pubShort(p.n), full: p.n, ingr, rx: '', seq: p.seq || '', drugId: d?.id || '' }; markPrnIfNew(id);
+  saveMe(); toast('내 약통에 담았어요'); }
 function pubIngrFill(){
   const P = ME.pub || {}; const empty = Object.keys(P).filter(k => !P[k].ingr && !P[k].manual && (ME.taking || []).includes(k));
   if (!empty.length) return false;
@@ -5850,7 +5882,8 @@ function vMe(_, q){
     <div class="actions two"><button class="btn ghost" onclick="go('/photo')">${I.eye} 사진으로 등록</button><button class="btn ghost" onclick="go('/pill')">${I.search} 이름·알약으로</button></div>
     <div class="util" style="margin-top:8px">${urow(I.pill, '이름을 몰라도 종류만 골라 담기', '', "go('/kinds')", '고르기')}</div>
     <div class="search" style="margin-top:12px">${I.search}<input id="mq" aria-label="약 이름으로 찾아 내 약통에 담기" placeholder="약 이름으로 찾아 담기 (예: 타이레놀)" value="${esc(MQ)}" autocomplete="off"></div>
-    ${MQ.trim() ? `<div class="card rows" style="margin-top:8px">${(search(MQ.trim()).filter(h => h.h.startsWith('/drug/')).slice(0, 6).map(h => { const id = h.h.slice(6); const on = (ME.taking || []).includes(id); return `<button class="row" onclick="${on ? '' : `toggleTaking('${id}');`}MQ='';route()"><div class="ic">${I.pill}</div><div class="body"><b>${esc(h.t)}</b><span>${on ? '이미 등록돼 있어요' : '눌러서 내 약통에 담기'}</span></div>${I.chev}</button>`; }).join('')) || '<div class="empty">찾는 약이 없어요</div>'}</div>` : ''}
+    ${MQ.trim() ? `<div class="card rows" style="margin-top:8px">${mqHits(MQ.trim()).map(h => { if (h.pub) { const p = h.pub, id = 'pub:' + pubKeyOf(p), on = (ME.taking || []).includes(id); return `<button class="row" onclick="${on ? '' : `addPubIx(${p.id});`}MQ='';route()"><div class="ic">${I.pill}</div><div class="body"><b>${esc(pubShort(p.n))}</b><span>${on ? '이미 등록돼 있어요' : `식약처 제품 · 성분 ${(p.i || []).length}가지(${esc((p.i || []).slice(0, 4).map(t => t.replace(INGR_STRIP, '')).join('·'))}${(p.i || []).length > 4 ? ' 등' : ''}) — 눌러서 담기`}</span></div>${I.chev}</button>`; }
+      const id = h.h.slice(6); const on = (ME.taking || []).includes(id); return `<button class="row" onclick="${on ? '' : `toggleTaking('${id}');`}MQ='';route()"><div class="ic">${I.pill}</div><div class="body"><b>${esc(h.t)}</b><span>${on ? '이미 등록돼 있어요' : '눌러서 내 약통에 담기'}</span></div>${I.chev}</button>`; }).join('') || (PUB.index ? '<div class="empty">찾는 약이 없어요</div>' : '<p class="loading">식약처 제품 목록을 불러오는 중…</p>')}</div>` : ''}
     ${items.length ? `<p class="small muted" style="margin-top:8px">항생제·감기약처럼 <b>며칠만</b> 드시는 약은 ‘며칠만’을 눌러 두세요. 매일 드시는 약과 구분해서 부담을 셉니다.</p>` : ''}
   </section>
   ${items.length ? `<div class="sech"><h2 class="sec-h">담아 두신 약으로</h2></div><div class="rows-l">
