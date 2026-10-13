@@ -41,6 +41,20 @@ def serve():
     threading.Thread(target=srv.serve_forever, daemon=True).start()
     return f'http://127.0.0.1:{srv.server_address[1]}/index.html'
 
+# 오프라인 검사용 — 브라우저 캐시를 못 쓰게(no-store) 하고, 검사 중에 «진짜로 꺼 버릴» 수 있는 서버.
+# context.set_offline 은 서비스워커의 fetch 를 막지 못하고, 기본 서버는 브라우저가 휴리스틱 캐시로 메워 거짓 통과했다(2026-10-13 상용화 점검 5-01).
+class _NoStore(_Quiet):
+    def end_headers(self):
+        self.send_header('Cache-Control', 'no-store'); super().end_headers()
+
+def serve_nostore():
+    srv = socketserver.ThreadingTCPServer(('127.0.0.1', 0), functools.partial(_NoStore, directory=str(DOCS)))
+    srv.daemon_threads = True
+    threading.Thread(target=srv.serve_forever, daemon=True).start()
+    return srv, f'http://127.0.0.1:{srv.server_address[1]}/index.html'
+
+CACHED_CORE_JS = "async()=>{ for (const k of await caches.keys()) { const ks = (await (await caches.open(k)).keys()).map(r=>r.url); if (ks.some(u=>/data\\/core\\.json/.test(u)) && ks.some(u=>/data\\/detail\\.json/.test(u))) return true; } return false; }"
+
 OVERFLOW_JS = """()=>{const sw=document.documentElement.clientWidth;const ov=[],clip=[];
  for(const e of document.querySelectorAll('#view *')){
    if(e.closest('details:not([open]) .bd')||e.closest('.scroll-x,.tabs,.quick,.today-row,.pill-grid,.gjump'))continue;
@@ -626,13 +640,13 @@ def main():
         pp.click('.prn-row button:has-text("지금 먹었어요")'); pp.wait_for_timeout(300)
         row = pp.inner_text('.prn-row')
         if '오늘 1번' not in row or '14:00부터' not in row: fails.append(f'필요할 때만: 1번째 뒤 표시가 틀립니다 — {row[:120]}')
-        pp.once('dialog', lambda d: (dlg.append(d.message), d.dismiss()))
-        pp.click('.prn-row button:has-text("지금 먹었어요")'); pp.wait_for_timeout(300)
+        pp.click('.prn-row button:has-text("지금 먹었어요")'); pp.wait_for_timeout(300)   # 앱 안 확인 창(5-11) — 휴대폰 영어 OK/Cancel 창 대신
+        if pp.query_selector('.dlg'): dlg.append(pp.inner_text('.dlg p')); pp.click('.dlg [data-a=no]'); pp.wait_for_timeout(200)
         if not dlg or '4시간' not in dlg[0]: fails.append(f'필요할 때만: 간격 안에 또 누르면 물어봐야 합니다 — {dlg}')
         if '오늘 1번' not in pp.inner_text('.prn-row'): fails.append('필요할 때만: 취소했는데 적혔습니다')
         if pp.evaluate("()=>prnLeft('acetaminophen')") != 9: fails.append('필요할 때만: 남은 알 수가 1 줄지 않았습니다')
         pp.click('.prn-qty button:has-text("2알")'); pp.wait_for_timeout(200)
-        pp.once('dialog', lambda d: d.accept()); pp.click('.prn-row button:has-text("지금 먹었어요")'); pp.wait_for_timeout(300)
+        pp.click('.prn-row button:has-text("지금 먹었어요")'); pp.wait_for_selector('.dlg [data-a=ok]', timeout=3000); pp.click('.dlg [data-a=ok]'); pp.wait_for_timeout(300)
         _pl = pp.evaluate("()=>prnLeft('acetaminophen')")
         if _pl != 7: fails.append(f'필요할 때만: 2알을 골랐는데 남은 알 수가 맞지 않습니다 — {_pl}')
         pp.click('.prn-undo'); pp.wait_for_timeout(200)
@@ -657,11 +671,17 @@ def main():
         pn.add_init_script("localStorage.setItem('yakjido.hello.v1','1');localStorage.setItem('yakjido.me.v1',JSON.stringify({taking:['ibuprofen'],sched:{ibuprofen:['08:00','20:00']},pub:{}}))")
         pn.goto(url + '#/schedule?t=sc4'); pn.wait_for_selector('.app', timeout=15000); pn.wait_for_timeout(1500)   # 알림 방법은 탭 안(2026-09-30)
         L = pn.evaluate("()=>__LN.pending")
-        daily = [x for x in L if x.get('schedule', {}).get('on')]
-        again = [x for x in L if x.get('schedule', {}).get('at')]
-        if sorted((x['schedule']['on']['hour'], x['schedule']['on']['minute']) for x in daily) != [(8, 0), (20, 0)]:
-            fails.append(f'앱 알람: 매일 반복 알림이 08:00·20:00 둘이어야 합니다 — {[x.get("schedule") for x in daily]}')
-        if any(x.get('channelId') != 'dose' or x.get('actionTypeId') != 'dose' for x in L): fails.append('앱 알람: 복용 알림 채널·「먹었어요」 단추가 빠졌습니다')
+        # 2026-10-13 상용화 점검 1-03 — 매일 반복(on)은 둘째 날부터 도즈에서 늦게 울려, 앞으로 7일치를 한 번짜리(at)·allowWhileIdle 로 건다
+        daily = [x for x in L if x.get('title') == '약지도 · 약 드실 시간']
+        again = [x for x in L if x.get('title') == '아직 안 드셨어요']
+        if any(x.get('schedule', {}).get('on') for x in daily + again): fails.append('앱 알람: 복용 알림이 아직 매일 반복(on)입니다 — 둘째 날부터 도즈에서 늦게 울립니다')
+        if not all(x.get('schedule', {}).get('allowWhileIdle') for x in daily + again): fails.append('앱 알람: 복용 알림에 allowWhileIdle 이 없습니다')
+        if len(daily) != 13: fails.append(f'앱 알람: 제시간 알림이 7일치 13개(오늘 08:00 은 지남)여야 합니다 — {len(daily)}')
+        _hm = pn.evaluate("()=>[...new Set(__LN.pending.filter(x=>x.title==='약지도 · 약 드실 시간').map(x=>{const d=new Date(x.schedule.at);return d.getHours()+':'+d.getMinutes()}))].sort()")
+        if _hm != ['20:0', '8:0']: fails.append(f'앱 알람: 제시간 알림 시각이 08:00·20:00 이 아닙니다 — {_hm}')
+        if any(x.get('channelId') != 'dose2' or x.get('actionTypeId') != 'dose' for x in daily + again): fails.append('앱 알람: 복용 알림 채널(잠금 화면 비공개 dose2)·「먹었어요」 단추가 빠졌습니다')
+        if any('이부프로펜' in (x.get('body') or '') for x in daily + again): fails.append('앱 알람: 잠금 화면에 약 이름이 보입니다(기본은 숨김)')
+        if not any(x.get('title') == '약지도를 한 번 열어 주세요' for x in L): fails.append('앱 알람: 마지막 날 「약지도를 한 번 열어 주세요」 알림이 없습니다')
         if any(x.get('isExactNotification') for x in L): fails.append('앱 알람: 정확한 시각 권한이 없는데 정확 알람으로 걸어 설정 화면이 매번 뜹니다')
         if len(again) != 13: fails.append(f'앱 알람: 「아직 안 드셨어요」가 7일치 13개(오늘 08:30 은 지남)여야 합니다 — {len(again)}')
         if not (pn.evaluate("()=>__LN.types && __LN.types.types[0].actions.map(a=>a.id).join()") == 'took,later'): fails.append('앱 알람: 「먹었어요」·「10분 뒤 다시」 단추가 없습니다')
@@ -674,8 +694,12 @@ def main():
         pn.evaluate("()=>__LN.listeners.localNotificationActionPerformed({actionId:'took',notification:{extra:{key:'ibuprofen@20:00'}}})"); pn.wait_for_timeout(600)
         if 'ibuprofen@20:00' not in pn.evaluate("()=>takenSet()"): fails.append('앱 알람: 「먹었어요」가 체크로 이어지지 않습니다')
         if pn.evaluate("()=>__LN.pending.some(x=>x.schedule.at && new Date(x.schedule.at).getDate()===28 && new Date(x.schedule.at).getHours()===20)"):
-            fails.append('앱 알람: 먹었다고 누른 뒤에도 오늘 「아직 안 드셨어요」가 남아 있습니다')
-        if len([x for x in pn.evaluate("()=>__LN.pending") if x['schedule'].get('at')]) != 12: fails.append('앱 알람: 먹었어요 뒤 「아직 안 드셨어요」가 12개여야 합니다')
+            fails.append('앱 알람: 미리 먹었다고 누른 뒤에도 오늘 20시 알림(제시간·30분 뒤)이 남아 있습니다')
+        _ag = pn.evaluate("()=>__LN.pending.filter(x=>x.title==='아직 안 드셨어요').length")
+        if _ag != 12: fails.append(f'앱 알람: 먹었어요 뒤 「아직 안 드셨어요」가 12개여야 합니다 — {_ag}')
+        # 알림의 날짜로 적는다 — 어제 알림의 「먹었어요」는 어제 칸에(5-16)
+        pn.evaluate("()=>__LN.listeners.localNotificationActionPerformed({actionId:'took',notification:{extra:{key:'ibuprofen@08:00',day:dayBefore(1)}}})"); pn.wait_for_timeout(400)
+        if pn.evaluate("()=>((ME.taken||{})[dayBefore(1)]||[]).includes('ibuprofen@08:00') && !takenSet().includes('ibuprofen@08:00')") is not True: fails.append('앱 알람: 어제 알림의 「먹었어요」가 어제 기록으로 가지 않습니다')
         pn.evaluate("()=>__LN.listeners.localNotificationActionPerformed({actionId:'later',notification:{title:'약지도 · 약 드실 시간',body:'x',extra:{key:'ibuprofen@08:00'}}})"); pn.wait_for_timeout(400)
         if not [x for x in pn.evaluate("()=>__LN.pending") if x['id'] >= 900000]: fails.append('앱 알람: 「10분 뒤 다시」가 걸리지 않습니다')
         if pn.evaluate("async()=>!!(navigator.serviceWorker && await navigator.serviceWorker.getRegistration())"): fails.append('앱 알람: 설치 앱에서 서비스워커가 등록됩니다')
@@ -684,9 +708,8 @@ def main():
         rf = pn.evaluate("()=>__LN.pending.filter(x=>x.extra&&x.extra.stock).map(x=>{const d=new Date(x.schedule.at);return (d.getMonth()+1)+'/'+d.getDate()+' '+d.getHours()+'시 '+x.title})")
         if sorted(rf) != ['10/2 9시 약이 오늘 치만 남았어요', '9/30 9시 약이 3일치 남았어요']: fails.append(f'앱 알람: 약 떨어지기 전 알림이 틀립니다 — {rf}')
         # 기록 모두 지우기 — 기록·알람이 다 사라지고, 글자 크기 같은 보기 설정은 남는다
-        pn.once('dialog', lambda dg: dg.accept())
         pn.evaluate("()=>localStorage.setItem('yakjido.fs','20px')")
-        pn.evaluate("()=>wipeMe()"); pn.wait_for_timeout(600)
+        pn.evaluate("()=>{ wipeMe(); }"); pn.wait_for_selector('.dlg [data-a=ok]', timeout=3000); pn.click('.dlg [data-a=ok]'); pn.wait_for_timeout(600)   # 앱 안 확인 창(5-11)
         w = pn.evaluate("()=>({t:(ME.taking||[]).length, p:__LN.pending.length, ls:localStorage.getItem('yakjido.me.v1'), fs:localStorage.getItem('yakjido.fs')})")
         if w['t'] or w['p'] or w['ls'] or w['fs'] != '20px': fails.append(f'기록 모두 지우기가 제대로 안 됩니다 — {w}')
         # 진료 예약 — 전날 19시·2시간 전
@@ -891,14 +914,23 @@ def main():
             _o = pg.evaluate(OVERFLOW_JS)
             if _o['clip'] or _o['ov'] or _o['len'] < 40: fails.append(f'영양제 화면 {_r}: 넘침·잘림·빈 화면 {_o["clip"][:1]}{_o["ov"][:1]}')
         # 9c. 인터넷 없이 — 서비스워커가 껍데기·core·detail 을 받아 둔 뒤 비행기 모드에서도 증상·약·영양제가 열려야 한다(2026-10-08 출시 점검)
+        #     첫 방문 한 번 뒤 다시 열지 않고 곧장 비행기 모드 — 서버를 실제로 끄고(브라우저 캐시 없음) 본다.
+        _osrv, _ourl = serve_nostore()
         _oc = br.new_context(viewport={'width': 390, 'height': 844}); _op = _oc.new_page(); _oerr = []; _op.on('pageerror', lambda e: _oerr.append(str(e)))
-        _op.goto(url + '#/home'); _op.wait_for_function('window.__READY__===true && DETAIL===2', timeout=15000)
+        _op.goto(_ourl + '#/home'); _op.wait_for_function('window.__READY__===true && DETAIL===2', timeout=15000)
         _op.evaluate("localStorage.setItem('yakjido.hello.v1','1')")
-        try: _op.wait_for_function("navigator.serviceWorker.controller || (navigator.serviceWorker.getRegistration().then(r=>r&&r.active))", timeout=15000); _op.wait_for_timeout(2500)   # 설치·precache 끝날 때까지
-        except Exception: fails.append('서비스워커가 설치되지 않습니다')
+        try:
+            _op.wait_for_function("navigator.serviceWorker.controller", timeout=15000)
+            for _i in range(40):                       # 본문(core·detail)이 워커 캐시에 들어갈 때까지 — 안 들어가면 그 자체가 실패(wait_for_function 은 async 결과를 기다리지 않아 직접 묻는다)
+                if _op.evaluate(CACHED_CORE_JS): break
+                _op.wait_for_timeout(500)
+            else: raise RuntimeError('core·detail 이 워커 캐시에 없음')
+        except Exception: fails.append('서비스워커가 설치되지 않았거나 본문(core·detail)을 캐시에 넣지 않습니다 — 첫 방문 뒤 비행기 모드에서 본문이 안 뜹니다')
+        _osrv.shutdown(); _osrv.server_close()      # 진짜로 끈다
         _oc.set_offline(True)
+        _oc.route('**/*', lambda rt: rt.abort())    # 워커 밖으로 나가는 요청도 모두 막는다(워커 안의 fetch 는 서버가 꺼져 실패한다)
         for _r in ['/symptom/cold', '/drug/acetaminophen', '/supp/iron', '/schedule']:
-            _op.goto(url + '#' + _r); _op.reload()
+            _op.goto(_ourl + '#' + _r); _op.reload()
             try: _op.wait_for_function('window.__READY__===true && DETAIL===2', timeout=10000)
             except Exception: fails.append(f'인터넷 없이 {_r}: 본문 자료가 안 뜹니다(서비스워커 캐시)'); continue
             _op.wait_for_timeout(600)
@@ -932,8 +964,7 @@ def main():
         if '동의하고 계속' not in _box: fails.append(f'계정 칸이 동의 단추로 시작하지 않습니다: {_box[:80]!r}')
         if _ap.query_selector('#srvEmail'): fails.append('동의 전인데 이메일 칸이 보입니다(되는 척 금지)')
         if _hits: fails.append(f'동의 전인데 서버·라이브러리에 요청이 갑니다: {_hits[:2]}')
-        _ap.once('dialog', lambda d: d.accept())
-        _ap.click('#acct button:has-text("동의하고 계속")'); _ap.wait_for_timeout(1500)
+        _ap.click('#acct button:has-text("동의하고 계속")'); _ap.wait_for_selector('.dlg [data-a=ok]', timeout=3000); _ap.click('.dlg [data-a=ok]'); _ap.wait_for_timeout(1500)
         if not _ap.query_selector('#srvEmail') or not _ap.query_selector('#srvAge'): fails.append('동의 뒤에 로그인 칸·만 14세 확인이 안 나옵니다')
         elif not _ap.is_disabled('#srvSignup'): fails.append('만 14세 확인 전인데 「계정 만들기」가 눌립니다')
         else:

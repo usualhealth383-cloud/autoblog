@@ -1605,6 +1605,9 @@ window.__YAKJIDO_OK__ = true;   /* 여기까지 읽혔다 = 이 브라우저가 
 /* ───────── 데이터·유틸 ───────── */
 const D = JSON.parse(document.getElementById('data').textContent || '{}');
 const BUILD = '__BUILD__';
+/* 본문(core·detail) 판 — 빌드가 '__DATAV__' 를 본문 해시로 바꾸면 그것을, 아니면 빌드 날짜를 쓴다.
+   「?v=판」 주소로 받아 새 화면이 옛 본문(의사 검수 전 용량 글)과 섞이지 않게 한다(5-02). */
+const DATAV = '__DATAV__'.indexOf('__') === 0 ? BUILD : '__DATAV__';
 /* 상단 마크는 현욱님 아이콘 파일 그대로 쓴다 — 옮겨 그리면 또 틀어진다(2026-09-21 사고) */
 const BRANDMARK = (typeof window !== 'undefined' && window.__BRANDMARK__) || 'icon-192.png';
 /* ── 본문 자료는 첫 화면이 뜬 뒤에 받는다 ──────────────────────────────
@@ -1616,7 +1619,7 @@ let CORE = 0, CORE_P = null;          /* 0 아직 · 1 받는 중 · 2 준비됨
 function mergeCore(c){
   for (const k of ['symptoms', 'drugs', 'supplements', 'classes', 'tips', 'askdoc']) {
     const by = new Map((D[k] || []).map(x => [x.id, x]));
-    (c[k] || []).forEach(o => { const t = by.get(o.id); if (t) Object.assign(t, o); else (D[k] = D[k] || []).push(o); });
+    (c[k] || []).forEach(o => { const t = by.get(o.id); if (t) Object.assign(t, o); else if (o.name || o.title || o.q) (D[k] = D[k] || []).push(o); });   /* 이름 없는 반쪽(판이 어긋난 옛 본문의 지워진 약)은 목록에 넣지 않는다(5-02) */
   }
   /* 나머지 칸은 통째로 받는다 — 새 자료를 core 로 빼도 여기를 또 고칠 필요가 없게 */
   for (const k of Object.keys(c)) if (!['symptoms', 'drugs', 'supplements', 'classes', 'tips', 'askdoc'].includes(k)) D[k] = c[k];
@@ -1628,7 +1631,7 @@ function ensureCore(){
   if (CORE_P) return CORE_P;
   CORE = 1;
   if (window.__CORE__) { mergeCore(window.__CORE__); return (CORE_P = Promise.resolve()); }
-  CORE_P = fetch('data/core.json').then(r => { if (!r.ok) throw 0; return r.json(); })
+  CORE_P = fetch('data/core.json?v=' + DATAV).then(r => { if (!r.ok) throw 0; return r.json(); })
     .then(mergeCore).catch(() => { CORE = 3; });
   return CORE_P;
 }
@@ -1647,7 +1650,7 @@ function ensureDetail(){
   DETAIL = 1;
   if (window.__DETAIL__) { mergeDetail(window.__DETAIL__); return (DETAIL_P = Promise.resolve()); }
   /* 본문이 먼저 덧씌워져야 같은 약 객체에 붙는다 — 받기는 동시에, 합치기는 본문 다음에 */
-  const got = fetch('data/detail.json').then(r => { if (!r.ok) throw 0; return r.json(); });
+  const got = fetch('data/detail.json?v=' + DATAV).then(r => { if (!r.ok) throw 0; return r.json(); });
   DETAIL_P = Promise.all([got, ensureCore()]).then(([c]) => mergeDetail(c)).catch(() => { DETAIL = 3; DETAIL_P = null; });
   return DETAIL_P;
 }
@@ -3943,8 +3946,8 @@ async function showNote(title, body, key, day){
   try { new Notification(title, { body, tag: key }); } catch (e) { console.warn('알림을 띄우지 못했습니다', e); }
 }
 /* ── 설치한 안드로이드 앱(Capacitor) — 휴대폰 자체 알람으로 건다. 앱을 닫아도, 휴대폰을 껐다 켜도 울린다 ──
-   · 제시간 알림: 매일 같은 시각 반복(앱을 다시 안 열어도 계속 울림)
-   · 30분 뒤 「아직 안 드셨어요」: 앞으로 7일치만 한 번씩 건다. 먹었어요를 누르면 그날 것은 지운다.
+   · 제시간 알림·30분 뒤 「아직 안 드셨어요」: 앞으로 최대 7일치를 한 번짜리로 건다(2026-10-13 1-03 — 매일 반복은 둘째 날부터 도즈에서 늦었다). 앱을 열 때마다 이어서 다시 건다.
+   · 먹었어요를 누르면(미리 눌러도) 그 회차의 남은 알림은 지운다.
    · 정확한 시각 권한이 없으면 휴대폰이 몇 분 늦게 울릴 수 있다 — 설정 화면을 억지로 띄우지 않고 알림 방법 카드에 단추로만 둔다. */
 const CAPX = window.Capacitor, NATIVE = !!(CAPX && CAPX.isNativePlatform && CAPX.isNativePlatform());
 const plug = n => (NATIVE && CAPX.Plugins && CAPX.Plugins[n]) || null;
@@ -4008,7 +4011,7 @@ async function nativeArmOnce(){
     const exact = NATIVE_EXACT === 'granted', list = [], now = Date.now(); let id = 1;
     const doses = []; for (const d of takingItems()) for (const t of schedOf(d.id, d)) doses.push([d, t]);
     const other = visits().length * 2 + ((ME.vitalRemind || {}).bp || []).length + takingItems().length * 2 + 2;
-    const DAYS = doses.length ? Math.max(1, Math.min(7, Math.floor((480 - other) / (doses.length * 2)))) : 0;
+    const DAYS = doses.length ? Math.max(1, Math.min(7, Math.floor((460 - other) / (doses.length * 2)))) : 0;
     const taken = takenSet(); let lastAt = 0;
     doses.slice(0, 2000).forEach(([d, t], i) => {
       const [h, m] = t.split(':').map(Number); const key = d.id + '@' + t;
@@ -5316,7 +5319,7 @@ const appCopy = (msg, text) => appDialog(msg, { text, ok:'닫기', cancel:false 
 /* 다른 화면으로 가면(뒤로 가기 포함) 열린 창은 「아니요」로 닫는다 */
 window.addEventListener('hashchange', () => { if (DLG_DONE) DLG_DONE(null); });
 function jumpTab(p){ const t = document.querySelector(`.tab[data-p="${p}"]`); if (!t) return; t.click(); const top = document.querySelector('.tabs'); if (top) window.scrollTo({ top: top.getBoundingClientRect().top + window.scrollY - 8, behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' }); }
-document.addEventListener('click', e => { const t = e.target.closest('.tab[data-p]'); if (!t) return; if (t.closest('.schtabs')) PANE.schedule = t.dataset.p; t.parentElement.querySelectorAll('.tab').forEach(x => x.classList.toggle('on', x === t)); document.querySelectorAll('.pane').forEach(p => p.classList.toggle('on', p.id === t.dataset.p)); });
+document.addEventListener('click', e => { const t = e.target.closest('.tab[data-p]'); if (!t) return; if (t.closest('.schtabs')) PANE.schedule = t.dataset.p; t.parentElement.querySelectorAll('.tab').forEach(x => { x.classList.toggle('on', x === t); x.setAttribute('aria-selected', x === t ? 'true' : 'false'); }); document.querySelectorAll('.pane').forEach(p => p.classList.toggle('on', p.id === t.dataset.p)); });
 
 /* ───────── 식약처 제품 상세(e약은요) ───────── */
 /* 약학정보원 복약정보(2026-09-30 현욱님 「약 사전 내용도 약학정보원 참고해서 잘 보완해」) — tools/kpic_detail.py 가 식약처 코드로 짝지어 모은 것.
@@ -6445,6 +6448,11 @@ window.addEventListener('beforeprint', () => {
 route();
 if ('serviceWorker' in navigator && location.protocol.startsWith('http') && !NATIVE) {   /* 설치한 안드로이드 앱은 자료를 통째로 품고 있어 워커가 필요 없다 */
   navigator.serviceWorker.register('sw.js').catch(() => {});
+  /* 첫 방문에는 본문을 워커가 붙기 전에 받아 어느 캐시에도 없었다 — 그래서 첫 방문 뒤 비행기 모드로 열면 「자료를 불러오지 못했어요」(5-01).
+     워커가 이 화면을 맡으면 같은 주소로 한 번 더 불러(대개 브라우저 캐시에서 바로 온다) 워커 캐시에 넣는다. */
+  const warmCore = () => { if (warmCore.done) return; warmCore.done = true; for (const f of ['core', 'detail']) fetch(`data/${f}.json?v=${DATAV}`).catch(() => { warmCore.done = false; }); };
+  if (navigator.serviceWorker.controller) Promise.all([ensureCore(), ensureDetail()]).then(() => setTimeout(warmCore, 800));
+  else navigator.serviceWorker.addEventListener('controllerchange', () => setTimeout(warmCore, 300));
   /* 설치된 앱이 비행기 모드에서도 쓸 수 있게, 한가할 때 핵심 자료를 미리 받아 캐시에 넣는다.
      서비스워커의 fetch 처리가 응답을 캐시하므로 여기서는 「부르기만」 하면 된다. */
   const warm = () => { ['lexicon.json', 'brands.json', 'qa.json', 'mixes.json', 'nutrients.json', 'easy-index.json', 'pills.json']
