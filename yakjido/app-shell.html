@@ -2381,9 +2381,9 @@ function gqPanel(){
   const goHref = a?.go ? (a.go[0] === 'ing' ? (lexOf(a.go[1])?.drug && drug(lexOf(a.go[1]).drug) ? '/drug/' + lexOf(a.go[1]).drug : '/ingr/' + a.go[1]) : '') : '';
   return `<section class="sec findpanel">
     ${a ? `<div class="qa-card"><div class="qa-h">${I.info}<b>이 질문에 대한 답</b></div><p>${lexMark(a.a)}</p>${goHref ? `<button class="btn line" style="margin-top:10px" onclick="go('${goHref}')">${I.pill} 자세히 보기</button>` : ''}</div>` : ''}
-    <h2>‘${esc(q)}’ 검색 <small>${hits.length ? hits.length + '건' : (LEX.loading ? '찾는 중…' : '')}</small></h2>
+    <h2>‘${esc(q)}’ 검색 <small>${gn ? gn + '건' : (LEX.loading ? '찾는 중…' : '')}</small></h2>
     ${hits.length && hitsAll.fix ? `<p class="small" style="margin:4px 0 8px">혹시 <b>‘${esc(hitsAll.fix)}’</b>${josa(hitsAll.fix, '을', '를')} 찾으세요? 그 말로 찾은 결과예요.</p>` : ''}
-    ${hits.length ? `<div class="card rows">${hitsHtml(hits)}</div>`
+    ${hits.length ? gh
       : LEX.loading ? '<p class="loading">성분·제품 사전을 불러오는 중…</p>'
       : `<div class="empty card"><b>찾는 것이 없어요</b>다른 말로 해 보세요. 예: 허리, 목감기, 타이레놀, 유산균</div>
         <div class="util" style="margin-top:10px">${urow(I.eye, '약 사진 찍기', '상자·약봉투로 찾기', "go('/photo')", '찍기')}${urow(I.pill, '이름을 몰라도 종류로 담기', '“혈압약 먹어요”까지만 아셔도 돼요', "go('/kinds')", '고르기')}${urow(I.check, '여기 없어요', '질문 두 번으로 찾기', "go('/guide/1')", '시작')}</div>`}
