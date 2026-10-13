@@ -853,7 +853,7 @@ def main():
         _sp = _iu.spec_from_file_location('ing_audit', str(ROOT / 'yakjido' / 'tools' / 'ing_audit.py')); _ia = _iu.module_from_spec(_sp); _sp.loader.exec_module(_ia)
         pg.goto(url + '#/home'); ready(); pg.wait_for_timeout(600)
         _cov = pg.evaluate(_ia.JS, ['pills.json', 'pills-rx.json', 'easy-index.json'])
-        for _f, _lim in (('pills.json', 30), ('pills-rx.json', 157), ('easy-index.json', 85)):   # pills 25→30(2026-10-13): 빈 성분 1,491건을 품목기준코드로 채우자 새로 드러난 5개(메클리진·판테틴 복합 등) — 해석 퇴보 아님, 화면엔 「성분 모름」
+        for _f, _lim in (('pills.json', 37), ('pills-rx.json', 157), ('easy-index.json', 85)):   # pills 25→30→37(2026-10-13): 빈 성분을 품목기준코드(1,491건)·식약처 상세(749건)로 채우자 새로 드러난 12개(메클리진·판테틴 복합·생약 감기약 오제나·씨누스트·아이비엽 등) — 해석 퇴보 아님, 화면엔 「성분 모름」
             if _cov[_f]['none'] > _lim: fails.append(f'성분을 못 읽는 제품이 늘었습니다 {_f}: {_cov[_f]["none"]} (기준 {_lim}) — {_cov[_f]["bad"][:5]}')
         # 혈압·혈당 수첩 — 적기·7일 평균·기준(135/85) 안내·지우기(2026-09-29)
         pv = br.new_page(viewport={'width': 390, 'height': 844}); verr = []
