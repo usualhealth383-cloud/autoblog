@@ -461,6 +461,25 @@ def z7_checks(br, url, fails):
     # B10 — 고르지 않은 보조 칸(파모티딘)은 기침 약국 카드·보내기에 가지 않는다
     pz.evaluate(RESET); go('#/show/cough'); t = txt('.show-list')
     if '파모티딘' in t: fails.append('Z7 B10: 기침 약국 카드에 고르지 않은 파모티딘이 들어감(자료 cough.plan 「신물」 칸 optional — 내용 조 몫)')
+    # 내용 조 X4 뒤 부모 요청 — ageAskMonths 한 줄(막지 않음) · 아이 모드 성인 칸 숨김 · 제품 용법(아스피린프로텍트) · 자료 확인 중 도장 · 검색 · 코 스프레이는 코막힘 겹침으로 세지 않음
+    pz.evaluate(RESET)
+    z = pz.evaluate("""async()=>{ const bad=[]; const bd=m=>{ const d=new Date(); d.setMonth(d.getMonth()-m); d.setDate(d.getDate()-1); return d.toISOString().slice(0,10); };
+      ME.age='child'; ME.child={name:'',birth:bd(10),weight:9}; saveMe();
+      const bk=basket(byId(D.symptoms,'fever')); const ap=bk.find(x=>x.d.id==='acetaminophen');
+      if (bk.some(x=>/성인/.test(x.slot))) bad.push('아이 모드 열에 성인 칸');
+      if (Number.isFinite(drug('acetaminophen').ageAskMonths) && !(ap && /의사·약사와 상의/.test(ap.cau||'') && !ap.blocked)) bad.push('10개월 아세트아미노펜: ageAskMonths 「상의」 한 줄 없음(또는 막음) '+JSON.stringify(ap&&{c:ap.cau,b:ap.blocked}));
+      ME.age='adult'; ME.child=null; ME.taking=[]; ME.pub={}; const i=(PUB.index||[]).findIndex(p=>pubNorm(p.n).startsWith('아스피린프로텍트')); if (i>=0) { addPubIx(i); const it=takingItems()[0]; if (!/하루 1번/.test(it.simple||'') || /500 ?mg/.test(it.simple||'')) bad.push('아스피린프로텍트 용법이 제품 용법이 아님: '+it.simple); } else bad.push('아스피린프로텍트를 e약은요에서 못 찾음');
+      await lexLoad(true); const u=(LEX.ing||[]).find(x=>x.unv && !(x.drug && drug(x.drug))); if (u) { location.hash='#/ingr/'+u.id; route(); if (!/자료 확인 중/.test((document.querySelector('.review-stamp')||{}).innerText||'')) bad.push('unv 성분 화면에 「자료 확인 중」 없음 '+u.id); }
+      const s1=search('아이 기침')[0]||{}; if (!/기침/.test(s1.t||'')) bad.push('「아이 기침」 1번: '+s1.t);
+      const ab=search('알레르기 비염')[0]||{}; if (ab.k!=='증상') bad.push('「알레르기 비염」 1번: '+ab.k+':'+ab.t);
+      const rn=search('콧물약').map(h=>h.t), ci=rn.findIndex(t=>/코푸시럽\)/.test(t)), oi=rn.findIndex(t=>/클로르페니라민|세티리진|로라타딘/.test(t)); if (ci>=0 && (oi<0 || oi>ci)) bad.push('「콧물약」 처방 코푸시럽이 약국 항히스타민보다 앞: '+rn.slice(0,6));
+      const mq=mqHits('콧물약').map(h=>h.t), mc=mq.findIndex(t=>/코푸시럽\)/.test(t)); if (mc===0) bad.push('내 약통 「콧물약」 1번이 처방 코푸시럽');
+      if ((search('기침약').slice(0,4)).some(h=>/요실금/.test(h.t))) bad.push('「기침약」 상위에 요실금');
+      for (const q of ['해열제','진통제']) if (!search(q).slice(0,5).some(h=>/아세트아미노펜/.test(h.t))) bad.push('「'+q+'」 상위 5개에 아세트아미노펜 없음');
+      if (!/치통/.test((search('이 아파')[0]||{}).t||'')) bad.push('「이 아파」 1번이 치통 아님');
+      if (planDup([{d:drug('xylometazoline'),slot:'코'},{d:drug('coldaewon'),slot:'종합'}]).some(t=>/코막힘/.test(t))) bad.push('코 스프레이 + 콜대원을 코막힘 겹침으로 셈(규칙 decongest-dup 과 다름)');
+      ME.taking=[]; ME.pub={}; saveMe(); return bad; }""")
+    if z: fails.append(f'Z7 부모 요청(ageAsk·성인 칸·제품 용법·자료 확인 중·검색·코 스프레이): {z[:4]}')
     pz.evaluate(RESET)
     if zerr: fails.append(f'Z7: JS 오류 {zerr[:2]}')
     pz.close()

@@ -117,9 +117,15 @@ if (_pd / 'pills.json').exists() and (_pd / 'easy-index.json').exists():
     _pl = json.loads((_pd / 'pills.json').read_text(encoding='utf-8')); _n = 0
     for _x in _pl:
         if not _x.get('ingr') and _x.get('seq') in _seq: _x['ingr'] = '|'.join(_seq[_x['seq']]); _n += 1
+    # 그래도 빈 것은 식약처 의약품 상세 «원료약품 및 분량»을 품목기준코드별로 받아 둔 tools/pill-ingr.json 으로(2026-10-13 실사용 검수 2차 A3 —
+    # 판콜에이캡슐·펜잘나이트·게보린쿨다운이 성분 없이 담겨 타이레놀과의 겹침을 놓치던 것). 받는 도구: tools/pill_ingr_scrape.py
+    _pi = ROOT / 'tools' / 'pill-ingr.json'
+    _pi = json.loads(_pi.read_text(encoding='utf-8')) if _pi.exists() else {}
+    for _x in _pl:
+        if not _x.get('ingr') and _pi.get(_x.get('seq')): _x['ingr'] = '|'.join(_pi[_x['seq']]); _n += 1
     if _n:
         (_pd / 'pills.json').write_text(json.dumps(_pl, ensure_ascii=False, separators=(',', ':')), encoding='utf-8')
-        print(f'낱알 성분 채움 {_n}건(같은 품목기준코드)')
+        print(f'낱알 성분 채움 {_n}건(같은 품목기준코드 · 식약처 상세)')
 jd = json.dumps(detail, ensure_ascii=False, separators=(',', ':'))
 # 본문 판(DATAV)은 core·detail·지연 로드 자료 내용의 해시 — 같은 날 두 번 빌드해도 내용이 바뀌면 휴대폰이 새 본문을 받는다(2026-10-13 자체 검수 5-02)
 _lazy = b''.join(f.read_bytes() for f in sorted((ROOT.parent / 'docs' / 'yakjido' / 'data').rglob('*.json')) if f.name not in ('core.json', 'detail.json') or f.parent.name != 'data')   # 지연 로드 자료도 바뀌면 판이 바뀐다(5-02)
