@@ -41,6 +41,20 @@ def serve():
     threading.Thread(target=srv.serve_forever, daemon=True).start()
     return f'http://127.0.0.1:{srv.server_address[1]}/index.html'
 
+# 오프라인 검사용 — 브라우저 캐시를 못 쓰게(no-store) 하고, 검사 중에 «진짜로 꺼 버릴» 수 있는 서버.
+# context.set_offline 은 서비스워커의 fetch 를 막지 못하고, 기본 서버는 브라우저가 휴리스틱 캐시로 메워 거짓 통과했다(2026-10-13 상용화 점검 5-01).
+class _NoStore(_Quiet):
+    def end_headers(self):
+        self.send_header('Cache-Control', 'no-store'); super().end_headers()
+
+def serve_nostore():
+    srv = socketserver.ThreadingTCPServer(('127.0.0.1', 0), functools.partial(_NoStore, directory=str(DOCS)))
+    srv.daemon_threads = True
+    threading.Thread(target=srv.serve_forever, daemon=True).start()
+    return srv, f'http://127.0.0.1:{srv.server_address[1]}/index.html'
+
+CACHED_CORE_JS = "async()=>{ for (const k of await caches.keys()) { const ks = (await (await caches.open(k)).keys()).map(r=>r.url); if (ks.some(u=>/data\\/core\\.json/.test(u)) && ks.some(u=>/data\\/detail\\.json/.test(u))) return true; } return false; }"
+
 OVERFLOW_JS = """()=>{const sw=document.documentElement.clientWidth;const ov=[],clip=[];
  for(const e of document.querySelectorAll('#view *')){
    if(e.closest('details:not([open]) .bd')||e.closest('.scroll-x,.tabs,.quick,.today-row,.pill-grid,.gjump'))continue;
@@ -377,12 +391,12 @@ def main():
           [...document.querySelectorAll('.chip-m')].find(b=>b.innerText.includes('전립선비대')).click();
           const off=ME.bph===false && !document.querySelector('.cond-on');
           return {tabs, on, desc, stay, off, chips:document.querySelectorAll('.chip-m').length};}""")
-        if _mt['tabs'] != ['내 몸', '먹는 약', '설정']: fails.append(f'내 정보 탭이 셋이 아닙니다: {_mt["tabs"]}')
+        if _mt['tabs'] != ['내 몸', '내 약통', '설정']: fails.append(f'내 정보 탭이 셋이 아닙니다: {_mt["tabs"]}')   # 3-20 이름 하나로 — 「먹는 약」 → 「내 약통」
         if _mt['chips'] != 12 or not _mt['on'] or not _mt['off']: fails.append(f'건강 상태 단추가 켜지고 꺼지지 않습니다: {_mt}')
         if '소변이 막힐 수' not in _mt['desc']: fails.append('건강 상태를 눌러도 「켜 둔 것」 설명이 안 붙습니다')
         if not _mt['stay']: fails.append('건강 상태를 누르면 화면이 맨 위로 튑니다')
         pg.goto(url + '#/me?t=meds'); ready(); pg.wait_for_timeout(300)
-        if not pg.query_selector('#mq') or '복용 시간 알림' not in pg.inner_text('#view'): fails.append('내 정보 「먹는 약」 탭에 약 담기·알림이 없습니다')
+        if not pg.query_selector('#mq') or '복용 시간 알림' not in pg.inner_text('#view'): fails.append('내 정보 「내 약통」 탭에 약 담기·알림이 없습니다')
         pg.goto(url + '#/me?t=set'); ready(); pg.wait_for_timeout(300)
         _st = pg.inner_text('#view')
         for kw in ('글자 크기', '화면 밝기', '휴대폰을 바꾸실 때', '개인정보처리방침'):
@@ -505,6 +519,28 @@ def main():
           return {senior, adult};}""")
         if not _s['senior']: fails.append('65세 이상인데 소염제에 「어르신 주의」가 안 붙습니다')
         if _s['adult']: fails.append('성인인데도 소염제에 「어르신 주의」가 붙습니다')
+        # 5a-6b. 현욱님 10-13(Z2-1 → A) — 65세+심장+항응고제: 막힌 소염제 칸은 맨 뒤 「이 조건에선 약사와 먼저 상의」 묶음,
+        #        같은 증상에 아세트아미노펜 칸이 있으면 그 칸이 1번. 증상 화면과 약국 카드(#/show)가 같은 순서.
+        _q5 = pg.evaluate("""()=>{
+          const keep = JSON.stringify(ME), bad = [], NS = /이부프로펜|나프록센|덱시부프로펜/;
+          ['diabetes','ulcer','kidney','liver','glaucoma','bph','asthma','alcohol','gout','pregnant'].forEach(f=>{ME[f]=false;});
+          ME.age='senior'; ME.heart=true; ME.anticoag=true; ME.taking=[]; ME.pub={}; ME.allergy=[]; ME.allergyUnknown=false;
+          for (const sid of ['headache','msk','cold']) {
+            location.hash = '#/symptom/' + sid; route();
+            const all = [...document.querySelectorAll('.answer .buy .buy-item')];
+            const main = all.filter(e => !e.closest('.opt-fold,.consult-grp')).map(e => (e.querySelector('b')||{}).innerText||'');
+            const grp = all.filter(e => e.closest('.consult-grp')).map(e => (e.querySelector('b')||{}).innerText||'');
+            const head = (document.querySelector('.consult-grp .consult-h')||{}).innerText||'';
+            if (!/아세트아미노펜/.test(main[0]||'')) bad.push(sid+': 첫 칸이 아세트아미노펜이 아님 — '+(main[0]||'없음'));
+            if (main.some(t => NS.test(t))) bad.push(sid+': 막힌 소염제가 앞쪽 목록에 남음 — '+main.join(','));
+            if (sid !== 'headache' && !(grp.some(t => NS.test(t)) && /이 조건에선 약사와 먼저 상의/.test(head))) bad.push(sid+': 소염제가 「이 조건에선 약사와 먼저 상의」 묶음에 없음 — '+grp.join(','));
+            location.hash = '#/show/' + sid; route();
+            const sh = [...document.querySelectorAll('.show-list li:not(.show-have) b')].map(b => b.innerText);
+            if (!/아세트아미노펜/.test(sh[0]||'')) bad.push(sid+': 약국 카드 1번이 아세트아미노펜이 아님 — '+(sh[0]||'없음'));
+          }
+          ME = sanitizeMe(JSON.parse(keep)); saveMe(); location.hash = '#/home'; route();
+          return bad;}""")
+        if _q5: fails.append(f'막힌 약 순서(65세+심장+항응고제): {_q5[:3]}')
         # 5a-4. 홈 「오늘 약」 한 장 — 약이 없으면 안 뜨고, 있으면 지금 드실 것을 보여 줘야 한다
         pg.goto(url + '#/home'); ready(); pg.wait_for_timeout(250)
         _h = pg.evaluate("""()=>{
@@ -574,7 +610,7 @@ def main():
         _sp = _iu.spec_from_file_location('ing_audit', str(ROOT / 'yakjido' / 'tools' / 'ing_audit.py')); _ia = _iu.module_from_spec(_sp); _sp.loader.exec_module(_ia)
         pg.goto(url + '#/home'); ready(); pg.wait_for_timeout(600)
         _cov = pg.evaluate(_ia.JS, ['pills.json', 'pills-rx.json', 'easy-index.json'])
-        for _f, _lim in (('pills.json', 25), ('pills-rx.json', 157), ('easy-index.json', 85)):
+        for _f, _lim in (('pills.json', 30), ('pills-rx.json', 157), ('easy-index.json', 85)):   # pills 25→30(2026-10-13): 빈 성분 1,491건을 품목기준코드로 채우자 새로 드러난 5개(메클리진·판테틴 복합 등) — 해석 퇴보 아님, 화면엔 「성분 모름」
             if _cov[_f]['none'] > _lim: fails.append(f'성분을 못 읽는 제품이 늘었습니다 {_f}: {_cov[_f]["none"]} (기준 {_lim}) — {_cov[_f]["bad"][:5]}')
         # 혈압·혈당 수첩 — 적기·7일 평균·기준(135/85) 안내·지우기(2026-09-29)
         pv = br.new_page(viewport={'width': 390, 'height': 844}); verr = []
@@ -582,6 +618,13 @@ def main():
         pv.clock.install(time='2026-09-29T08:00:00')
         pv.add_init_script("localStorage.setItem('yakjido.hello.v1','1');localStorage.setItem('yakjido.me.v1',JSON.stringify({taking:['cls:bp.arb'],pub:{}}))")
         pv.goto(url + '#/vitals'); pv.wait_for_selector('.app', timeout=15000); pv.wait_for_timeout(600)
+        # 적던 숫자가 뒤에서 온 자료(낱알 목록·사전) 때문에 지워지면 안 된다 — 화면을 연 지 4초쯤 뒤 easy-index 가 오며
+        # 화면을 새로 그려 「184 / 100」이 사라졌고, 그래서 아래 재측정 검사가 전체 실행에서만 가끔 실패했다(2026-10-13)
+        pv.fill('#vs', '128'); pv.fill('#vd', '82')
+        try: pv.wait_for_function("()=>!!PUB.index && !!LEX.ing && !LEX.loading", timeout=20000); pv.wait_for_timeout(400)
+        except Exception: fails.append('혈압 수첩: 뒤에서 받는 낱알 목록이 20초 안에 오지 않았습니다')
+        if pv.evaluate("()=>[document.getElementById('vs').value, document.getElementById('vd').value].join('/')") != '128/82': fails.append('혈압 수첩: 적던 숫자가 뒤에서 온 자료 때문에 지워졌습니다')
+        pv.fill('#vs', ''); pv.fill('#vd', '')
         for sv, dv in ((142, 88), (138, 86), (140, 90)):
             pv.fill('#vs', str(sv)); pv.fill('#vd', str(dv)); pv.click('button:has-text("적어 두기")'); pv.wait_for_timeout(250)
         vt = pv.inner_text('.app')
@@ -599,8 +642,13 @@ def main():
         pv.fill('#vs', '186'); pv.fill('#vd', '104'); pv.click('button:has-text("적어 두기")'); pv.wait_for_timeout(250)
         if '먼저 바르게 쟀는지' not in pv.inner_text('.app'): fails.append('혈압 수첩: 180 이상 첫 값에 «바르게 재기» 안내가 없습니다')
         if '119' in pv.inner_text('.note.alert') if pv.query_selector('.note.alert') else False: fails.append('혈압 수첩: 첫 값부터 119 안내가 뜹니다')
-        pv.fill('#vs', '184'); pv.fill('#vd', '100'); pv.click('button:has-text("적어 두기")'); pv.wait_for_timeout(250)
-        if not pv.query_selector('.note.alert') or '오늘 안에 진료' not in pv.inner_text('.note.alert'): fails.append('혈압 수첩: 쉬고 다시 재도 높은데 안내가 없습니다')
+        _n0 = pv.evaluate("()=>ME.vitals.length")
+        pv.fill('#vs', '184'); pv.fill('#vd', '100'); pv.click('button:has-text("적어 두기")')
+        try: pv.wait_for_function(f"()=>ME.vitals.length>{_n0}", timeout=3000)   # 적힌 뒤에 본다(무거울 때 250 ms 로는 모자랄 수 있음) — 안 적혔으면 아래에서 실패
+        except Exception: pass
+        pv.wait_for_timeout(250)
+        if not pv.query_selector('.note.alert') or '오늘 안에 진료' not in pv.inner_text('.note.alert'):
+            fails.append('혈압 수첩: 쉬고 다시 재도 높은데 안내가 없습니다 — ' + str(pv.evaluate("()=>[VT.alert, JSON.stringify(ME.vitals.slice(-3)), document.querySelector('.toast')?.textContent||'', document.getElementById('vs')?.value, new Date().toISOString()]")) + str(verr[:2]))
         pv.click('.seg button:has-text("혈당")'); pv.wait_for_timeout(200); pv.fill('#vg', '62'); pv.click('button:has-text("적어 두기")'); pv.wait_for_timeout(250)
         if not pv.query_selector('.note.alert') or '저혈당' not in pv.inner_text('.note.alert'): fails.append('혈압 수첩: 70 미만인데 저혈당 안내가 없습니다')
         if '저혈당' not in pv.inner_text('.vt-list'): fails.append('혈압 수첩: 혈당 목록에 저혈당 표시가 없습니다')
@@ -626,13 +674,13 @@ def main():
         pp.click('.prn-row button:has-text("지금 먹었어요")'); pp.wait_for_timeout(300)
         row = pp.inner_text('.prn-row')
         if '오늘 1번' not in row or '14:00부터' not in row: fails.append(f'필요할 때만: 1번째 뒤 표시가 틀립니다 — {row[:120]}')
-        pp.once('dialog', lambda d: (dlg.append(d.message), d.dismiss()))
-        pp.click('.prn-row button:has-text("지금 먹었어요")'); pp.wait_for_timeout(300)
+        pp.click('.prn-row button:has-text("지금 먹었어요")'); pp.wait_for_timeout(300)   # 앱 안 확인 창(5-11) — 휴대폰 영어 OK/Cancel 창 대신
+        if pp.query_selector('.dlg'): dlg.append(pp.inner_text('.dlg p')); pp.click('.dlg [data-a=no]'); pp.wait_for_timeout(200)
         if not dlg or '4시간' not in dlg[0]: fails.append(f'필요할 때만: 간격 안에 또 누르면 물어봐야 합니다 — {dlg}')
         if '오늘 1번' not in pp.inner_text('.prn-row'): fails.append('필요할 때만: 취소했는데 적혔습니다')
         if pp.evaluate("()=>prnLeft('acetaminophen')") != 9: fails.append('필요할 때만: 남은 알 수가 1 줄지 않았습니다')
         pp.click('.prn-qty button:has-text("2알")'); pp.wait_for_timeout(200)
-        pp.once('dialog', lambda d: d.accept()); pp.click('.prn-row button:has-text("지금 먹었어요")'); pp.wait_for_timeout(300)
+        pp.click('.prn-row button:has-text("지금 먹었어요")'); pp.wait_for_selector('.dlg [data-a=ok]', timeout=3000); pp.click('.dlg [data-a=ok]'); pp.wait_for_timeout(300)
         _pl = pp.evaluate("()=>prnLeft('acetaminophen')")
         if _pl != 7: fails.append(f'필요할 때만: 2알을 골랐는데 남은 알 수가 맞지 않습니다 — {_pl}')
         pp.click('.prn-undo'); pp.wait_for_timeout(200)
@@ -649,6 +697,36 @@ def main():
         if not _gl.get('busco'): fails.append('부틸스코폴라민에 녹내장 금지 경고가 사라졌습니다')
         if perr: fails.append(f'필요할 때만: JS 오류 {perr[:2]}')
         pp.close()
+        # Z4 #1(외부 검수 P0) — 「내 정보 → 내 약통 → 이름으로 담기 → 같이 먹어도 되나요」. 판콜에이가 단일 성분(구아이페네신)으로 담겨
+        #   콜대원 콜드에스·타이레놀과의 아세트아미노펜 겹침을 놓치던 길을 그대로 밟는다. 제품은 모든 성분 그대로(ME.pub) 담겨야 한다
+        pz = br.new_page(viewport={'width': 390, 'height': 844}); zerr = []
+        pz.on('pageerror', lambda e: zerr.append(str(e)))
+        pz.add_init_script("localStorage.setItem('yakjido.hello.v1','1')")
+        def _z_add(names):
+            pz.goto(url + '#/me'); pz.wait_for_selector('.metabs', timeout=15000)
+            pz.evaluate("()=>{ME.taking=[];ME.pub={};ME.prn={};saveMe();route();}")
+            pz.click('.metabs .tab[data-k=meds]'); pz.wait_for_selector('#mq', timeout=5000)
+            for nm, want in names:
+                pz.fill('#mq', nm)
+                pz.wait_for_function("()=>typeof PUB!=='undefined' && PUB.index && PUB.index.length>0", timeout=20000)
+                pz.wait_for_function("w=>[...document.querySelectorAll('.card.rows .row b')].some(b=>b.innerText.replace(/\\s/g,'').startsWith(w))", arg=want, timeout=8000)
+                pz.evaluate("w=>[...document.querySelectorAll('.card.rows .row')].find(r=>r.querySelector('b').innerText.replace(/\\s/g,'').startsWith(w)).click()", want)
+                pz.wait_for_timeout(400)
+            pz.click('button.srow:has-text("같이 먹어도 되나요")'); pz.wait_for_selector('.ix-list', timeout=5000); pz.wait_for_timeout(300)
+            return pz.evaluate("()=>({dupe:[...document.querySelectorAll('.ix.stop .ix-dg')].map(e=>e.innerText), taking:ME.taking.slice(), ingr:Object.values(ME.pub).map(x=>x.ingr)})")
+        _z = _z_add([('콜대원 콜드에스', '콜대원콜드에스'), ('판콜에이', '판콜에이')])
+        if any(not t.startswith('pub:') for t in _z['taking']): fails.append(f'Z4 #1: 제품 이름으로 담았는데 단일 성분으로 담겼습니다 — {_z["taking"]}')
+        if not all('아세트아미노펜' in i for i in _z['ingr']): fails.append(f'Z4 #1: 복합제의 성분이 빠졌습니다 — {_z["ingr"]}')
+        if not any('아세트아미노펜' in d for d in _z['dupe']): fails.append(f'Z4 #1: 콜대원 콜드에스 + 판콜에이인데 아세트아미노펜 겹침이 안 뜹니다 — {_z["dupe"]}')
+        if not any('일부 성분이 같아요' in d for d in _z['dupe']): fails.append(f'Z4 #1: 「일부 성분이 같아요」 표시가 없습니다 — {_z["dupe"]}')
+        _z = _z_add([('판콜에이', '판콜에이'), ('타이레놀정 500', '타이레놀정500')])
+        if not any('아세트아미노펜' in d for d in _z['dupe']): fails.append(f'Z4 #1: 판콜에이 + 타이레놀정 500인데 아세트아미노펜 겹침이 안 뜹니다 — {_z["dupe"]}')
+        _z = _z_add([('타이레놀정 500', '타이레놀정500'), ('타이레놀 8시간', '타이레놀8시간')])
+        if not any('성분이 모두 같아요' in d and '아세트아미노펜' in d for d in _z['dupe']): fails.append(f'Z4 #1: 타이레놀정 500 + 타이레놀 8시간 이알서방정인데 「성분이 모두 같아요」가 없습니다 — {_z["dupe"]}')
+        # 단일 성분 항목의 제품 칸에 적힌 복합제 이름(구아이페네신 → 「판콜에이」)으로 찾아도 단일 성분 화면으로 보내지 않는다
+        if pz.evaluate("()=>search('판콜에이').some(h=>h.h==='/drug/guaifenesin')"): fails.append('Z4 #1: 「판콜에이」 검색이 구아이페네신으로 갑니다')
+        if zerr: fails.append(f'Z4 #1: JS 오류 {zerr[:2]}')
+        pz.close()
         # 설치한 안드로이드 앱 — 앱을 닫아도 울리도록 휴대폰 알람으로 거는지(2026-09-28)
         pn = br.new_page(viewport={'width': 390, 'height': 844}); nerr = []
         pn.on('pageerror', lambda e: nerr.append(str(e)))
@@ -657,11 +735,17 @@ def main():
         pn.add_init_script("localStorage.setItem('yakjido.hello.v1','1');localStorage.setItem('yakjido.me.v1',JSON.stringify({taking:['ibuprofen'],sched:{ibuprofen:['08:00','20:00']},pub:{}}))")
         pn.goto(url + '#/schedule?t=sc4'); pn.wait_for_selector('.app', timeout=15000); pn.wait_for_timeout(1500)   # 알림 방법은 탭 안(2026-09-30)
         L = pn.evaluate("()=>__LN.pending")
-        daily = [x for x in L if x.get('schedule', {}).get('on')]
-        again = [x for x in L if x.get('schedule', {}).get('at')]
-        if sorted((x['schedule']['on']['hour'], x['schedule']['on']['minute']) for x in daily) != [(8, 0), (20, 0)]:
-            fails.append(f'앱 알람: 매일 반복 알림이 08:00·20:00 둘이어야 합니다 — {[x.get("schedule") for x in daily]}')
-        if any(x.get('channelId') != 'dose' or x.get('actionTypeId') != 'dose' for x in L): fails.append('앱 알람: 복용 알림 채널·「먹었어요」 단추가 빠졌습니다')
+        # 2026-10-13 상용화 점검 1-03 — 매일 반복(on)은 둘째 날부터 도즈에서 늦게 울려, 앞으로 7일치를 한 번짜리(at)·allowWhileIdle 로 건다
+        daily = [x for x in L if x.get('title') == '약지도 · 약 드실 시간']
+        again = [x for x in L if x.get('title') == '아직 안 드셨어요']
+        if any(x.get('schedule', {}).get('on') for x in daily + again): fails.append('앱 알람: 복용 알림이 아직 매일 반복(on)입니다 — 둘째 날부터 도즈에서 늦게 울립니다')
+        if not all(x.get('schedule', {}).get('allowWhileIdle') for x in daily + again): fails.append('앱 알람: 복용 알림에 allowWhileIdle 이 없습니다')
+        if len(daily) != 13: fails.append(f'앱 알람: 제시간 알림이 7일치 13개(오늘 08:00 은 지남)여야 합니다 — {len(daily)}')
+        _hm = pn.evaluate("()=>[...new Set(__LN.pending.filter(x=>x.title==='약지도 · 약 드실 시간').map(x=>{const d=new Date(x.schedule.at);return d.getHours()+':'+d.getMinutes()}))].sort()")
+        if _hm != ['20:0', '8:0']: fails.append(f'앱 알람: 제시간 알림 시각이 08:00·20:00 이 아닙니다 — {_hm}')
+        if any(x.get('channelId') != 'dose2' or x.get('actionTypeId') != 'dose' for x in daily + again): fails.append('앱 알람: 복용 알림 채널(잠금 화면 비공개 dose2)·「먹었어요」 단추가 빠졌습니다')
+        if any('이부프로펜' in (x.get('body') or '') for x in daily + again): fails.append('앱 알람: 잠금 화면에 약 이름이 보입니다(기본은 숨김)')
+        if not any(x.get('title') == '약지도를 한 번 열어 주세요' for x in L): fails.append('앱 알람: 마지막 날 「약지도를 한 번 열어 주세요」 알림이 없습니다')
         if any(x.get('isExactNotification') for x in L): fails.append('앱 알람: 정확한 시각 권한이 없는데 정확 알람으로 걸어 설정 화면이 매번 뜹니다')
         if len(again) != 13: fails.append(f'앱 알람: 「아직 안 드셨어요」가 7일치 13개(오늘 08:30 은 지남)여야 합니다 — {len(again)}')
         if not (pn.evaluate("()=>__LN.types && __LN.types.types[0].actions.map(a=>a.id).join()") == 'took,later'): fails.append('앱 알람: 「먹었어요」·「10분 뒤 다시」 단추가 없습니다')
@@ -674,8 +758,12 @@ def main():
         pn.evaluate("()=>__LN.listeners.localNotificationActionPerformed({actionId:'took',notification:{extra:{key:'ibuprofen@20:00'}}})"); pn.wait_for_timeout(600)
         if 'ibuprofen@20:00' not in pn.evaluate("()=>takenSet()"): fails.append('앱 알람: 「먹었어요」가 체크로 이어지지 않습니다')
         if pn.evaluate("()=>__LN.pending.some(x=>x.schedule.at && new Date(x.schedule.at).getDate()===28 && new Date(x.schedule.at).getHours()===20)"):
-            fails.append('앱 알람: 먹었다고 누른 뒤에도 오늘 「아직 안 드셨어요」가 남아 있습니다')
-        if len([x for x in pn.evaluate("()=>__LN.pending") if x['schedule'].get('at')]) != 12: fails.append('앱 알람: 먹었어요 뒤 「아직 안 드셨어요」가 12개여야 합니다')
+            fails.append('앱 알람: 미리 먹었다고 누른 뒤에도 오늘 20시 알림(제시간·30분 뒤)이 남아 있습니다')
+        _ag = pn.evaluate("()=>__LN.pending.filter(x=>x.title==='아직 안 드셨어요').length")
+        if _ag != 12: fails.append(f'앱 알람: 먹었어요 뒤 「아직 안 드셨어요」가 12개여야 합니다 — {_ag}')
+        # 알림의 날짜로 적는다 — 어제 알림의 「먹었어요」는 어제 칸에(5-16)
+        pn.evaluate("()=>__LN.listeners.localNotificationActionPerformed({actionId:'took',notification:{extra:{key:'ibuprofen@08:00',day:dayBefore(1)}}})"); pn.wait_for_timeout(400)
+        if pn.evaluate("()=>((ME.taken||{})[dayBefore(1)]||[]).includes('ibuprofen@08:00') && !takenSet().includes('ibuprofen@08:00')") is not True: fails.append('앱 알람: 어제 알림의 「먹었어요」가 어제 기록으로 가지 않습니다')
         pn.evaluate("()=>__LN.listeners.localNotificationActionPerformed({actionId:'later',notification:{title:'약지도 · 약 드실 시간',body:'x',extra:{key:'ibuprofen@08:00'}}})"); pn.wait_for_timeout(400)
         if not [x for x in pn.evaluate("()=>__LN.pending") if x['id'] >= 900000]: fails.append('앱 알람: 「10분 뒤 다시」가 걸리지 않습니다')
         if pn.evaluate("async()=>!!(navigator.serviceWorker && await navigator.serviceWorker.getRegistration())"): fails.append('앱 알람: 설치 앱에서 서비스워커가 등록됩니다')
@@ -684,9 +772,8 @@ def main():
         rf = pn.evaluate("()=>__LN.pending.filter(x=>x.extra&&x.extra.stock).map(x=>{const d=new Date(x.schedule.at);return (d.getMonth()+1)+'/'+d.getDate()+' '+d.getHours()+'시 '+x.title})")
         if sorted(rf) != ['10/2 9시 약이 오늘 치만 남았어요', '9/30 9시 약이 3일치 남았어요']: fails.append(f'앱 알람: 약 떨어지기 전 알림이 틀립니다 — {rf}')
         # 기록 모두 지우기 — 기록·알람이 다 사라지고, 글자 크기 같은 보기 설정은 남는다
-        pn.once('dialog', lambda dg: dg.accept())
         pn.evaluate("()=>localStorage.setItem('yakjido.fs','20px')")
-        pn.evaluate("()=>wipeMe()"); pn.wait_for_timeout(600)
+        pn.evaluate("()=>{ wipeMe(); }"); pn.wait_for_selector('.dlg [data-a=ok]', timeout=3000); pn.click('.dlg [data-a=ok]'); pn.wait_for_timeout(600)   # 앱 안 확인 창(5-11)
         w = pn.evaluate("()=>({t:(ME.taking||[]).length, p:__LN.pending.length, ls:localStorage.getItem('yakjido.me.v1'), fs:localStorage.getItem('yakjido.fs')})")
         if w['t'] or w['p'] or w['ls'] or w['fs'] != '20px': fails.append(f'기록 모두 지우기가 제대로 안 됩니다 — {w}')
         # 진료 예약 — 전날 19시·2시간 전
@@ -755,6 +842,13 @@ def main():
         # 에텐자미드(근이완 복합제)는 소염 효과가 거의 없어 겹침으로 세지 않는다(현욱님 답, 2026-09-23) — 이제 겹치는 바구니는 0이어야 한다
         for sid, msgs in pdup.items():
             fails.append(f'추천 바구니가 스스로 겹침 {sid}: {msgs[0][:70]}')
+        # 6c-2. 조건을 켠 바구니도(한 가지·두 가지 조합 전부) 스스로 겹치지 않는지 — 위 조건에서 감기 거담제가 구아이페네신으로 바뀌어
+        #       「이 중 하나만」 묶음의 콜대원과 겹치던 것을 잡는다(2026-10-13)
+        pdup2 = pg.evaluate("""()=>{ const FL=['senior','ulcer','kidney','heart','anticoag','pregnant','liver','asthma','alcohol','glaucoma','bph','gout'];
+          const cs=FL.map(a=>[a]); for(let i=0;i<FL.length;i++) for(let j=i+1;j<FL.length;j++) cs.push([FL[i],FL[j]]); const out=[];
+          for(const fl of cs) for(const s of (D.symptoms||[])){ const m=planDup(basket(s,{flags:fl})); if(m.length) out.push(s.id+' ['+fl.join('+')+'] '+String(m[0]).slice(0,60)); }
+          return out; }""")
+        if pdup2: fails.append(f'조건을 켠 추천 바구니가 스스로 겹침 {len(pdup2)}건: {pdup2[:2]}')
         # 규칙이 죽지 않았는지 — 진짜 소염제 두 가지(이부프로펜+나프록센)는 여전히 잡혀야 하고, 이부프로펜+신신플렉스는 잡히면 안 된다
         _pd = pg.evaluate("""()=>[planDup([{d:drug('ibuprofen'),slot:'가'},{d:drug('naproxen'),slot:'나'}]).length, planDup([{d:drug('ibuprofen'),slot:'가'},{d:drug('relax-combo'),slot:'나'}]).length]""")
         if _pd[0] == 0: fails.append('소염제 두 가지(이부프로펜+나프록센) 겹침 경고가 사라짐 — 규칙이 죽었는지 확인')
@@ -803,9 +897,20 @@ def main():
           if(!txt.includes('맥시부펜은 덱시부프로펜')) bad.push('맥시부펜 안내 없음');
           return bad;}""")
         if kc: fails.append(f'소아 계산이 우리집 소아과와 다릅니다: {kc[:3]}')
+        # 10c. 현욱님 10-13(Z2-2 → B) — 생년월일 없이 6 kg 미만이면 mL 결과 위에 접지 않은 경고 한 줄, 결과는 그대로. 10 kg 이면 없음
+        _ky = pg.evaluate("""()=>{ const r = w => { ME.age='child'; ME.child={name:'',birth:'',weight:w}; route();
+            const e = document.querySelector('.kid-young'), c = document.querySelector('.dose-card');
+            return {on: !!e && e.getClientRects().length > 0 && !e.closest('details'), txt: e ? e.innerText : '', cards: document.querySelectorAll('.dose-card').length,
+                    above: !!(e && c && (e.compareDocumentPosition(c) & Node.DOCUMENT_POSITION_FOLLOWING))}; };
+          const a = r(5), b = r(10); ME.age='adult'; ME.child={}; saveMe(); return {a, b}; }""")
+        if not (_ky['a']['on'] and '생후 3개월 안팎일 수 있어요' in _ky['a']['txt'] and _ky['a']['above'] and _ky['a']['cards'] == 2):
+            fails.append(f'아이 5 kg·생년월일 없음: 「생후 3개월 안팎」 경고가 결과 위에 보이지 않습니다(또는 결과가 사라짐) {_ky["a"]}')
+        if _ky['b']['on']: fails.append('아이 10 kg·생년월일 없음인데 「생후 3개월 안팎」 경고가 뜹니다')
         # 7. 항콜린 이중 계산 · 8. 이름 검색
         r7 = pg.evaluate("""async()=>{ await pubPills(); await pubPillsRx(); let n=0;
-          for(const p of (PUB.rx||[]).concat(PUB.pills||[])){ if(ingFind((p.ingr||'')+' '+(p.n||'')).filter(e=>e.ach).length>1) n++; } return n; }""")
+          for(const p of (PUB.rx||[]).concat(PUB.pills||[])){ const ks=ingFind((p.ingr||'')+' '+(p.n||'')).filter(e=>e.ach).map(e=>e.k); if(ks.length!==new Set(ks).size) n++; } return n; }""")
+        # ↑ «같은 성분»이 두 번 잡히는 것만 이중 계산이다 — 클로르페니라민+벨라돈나처럼 항콜린 성분이 실제로 둘인 복합제는 둘로 세는 게 맞다
+        #   (2026-10-13 낱알 1,491건의 빈 성분을 품목기준코드로 채운 뒤 그런 제품 10개가 처음 드러남)
         if r7: fails.append(f'항콜린 이중 계산 제품 {r7}건')
         Q = {'베시케어': '베시케어', '하루날디': '하루날디', '타이레놀': '타이레놀', 'TY 500': '타이레놀', '크레스토': '크레스토', '플라빅스': '플라빅스', '베시케어 5mg': '베시케어', '트윈스타': '트윈스타'}
         r8 = pg.evaluate("(Q)=>Object.fromEntries(Object.keys(Q).map(q=>[q,(pillSearch({txt:q,sh:'',c:'',ln:''},true)[0]||[0,{n:''}])[1].n]))", Q)
@@ -891,14 +996,23 @@ def main():
             _o = pg.evaluate(OVERFLOW_JS)
             if _o['clip'] or _o['ov'] or _o['len'] < 40: fails.append(f'영양제 화면 {_r}: 넘침·잘림·빈 화면 {_o["clip"][:1]}{_o["ov"][:1]}')
         # 9c. 인터넷 없이 — 서비스워커가 껍데기·core·detail 을 받아 둔 뒤 비행기 모드에서도 증상·약·영양제가 열려야 한다(2026-10-08 출시 점검)
+        #     첫 방문 한 번 뒤 다시 열지 않고 곧장 비행기 모드 — 서버를 실제로 끄고(브라우저 캐시 없음) 본다.
+        _osrv, _ourl = serve_nostore()
         _oc = br.new_context(viewport={'width': 390, 'height': 844}); _op = _oc.new_page(); _oerr = []; _op.on('pageerror', lambda e: _oerr.append(str(e)))
-        _op.goto(url + '#/home'); _op.wait_for_function('window.__READY__===true && DETAIL===2', timeout=15000)
+        _op.goto(_ourl + '#/home'); _op.wait_for_function('window.__READY__===true && DETAIL===2', timeout=15000)
         _op.evaluate("localStorage.setItem('yakjido.hello.v1','1')")
-        try: _op.wait_for_function("navigator.serviceWorker.controller || (navigator.serviceWorker.getRegistration().then(r=>r&&r.active))", timeout=15000); _op.wait_for_timeout(2500)   # 설치·precache 끝날 때까지
-        except Exception: fails.append('서비스워커가 설치되지 않습니다')
+        try:
+            _op.wait_for_function("navigator.serviceWorker.controller", timeout=15000)
+            for _i in range(40):                       # 본문(core·detail)이 워커 캐시에 들어갈 때까지 — 안 들어가면 그 자체가 실패(wait_for_function 은 async 결과를 기다리지 않아 직접 묻는다)
+                if _op.evaluate(CACHED_CORE_JS): break
+                _op.wait_for_timeout(500)
+            else: raise RuntimeError('core·detail 이 워커 캐시에 없음')
+        except Exception: fails.append('서비스워커가 설치되지 않았거나 본문(core·detail)을 캐시에 넣지 않습니다 — 첫 방문 뒤 비행기 모드에서 본문이 안 뜹니다')
+        _osrv.shutdown(); _osrv.server_close()      # 진짜로 끈다
         _oc.set_offline(True)
+        _oc.route('**/*', lambda rt: rt.abort())    # 워커 밖으로 나가는 요청도 모두 막는다(워커 안의 fetch 는 서버가 꺼져 실패한다)
         for _r in ['/symptom/cold', '/drug/acetaminophen', '/supp/iron', '/schedule']:
-            _op.goto(url + '#' + _r); _op.reload()
+            _op.goto(_ourl + '#' + _r); _op.reload()
             try: _op.wait_for_function('window.__READY__===true && DETAIL===2', timeout=10000)
             except Exception: fails.append(f'인터넷 없이 {_r}: 본문 자료가 안 뜹니다(서비스워커 캐시)'); continue
             _op.wait_for_timeout(600)
@@ -932,8 +1046,7 @@ def main():
         if '동의하고 계속' not in _box: fails.append(f'계정 칸이 동의 단추로 시작하지 않습니다: {_box[:80]!r}')
         if _ap.query_selector('#srvEmail'): fails.append('동의 전인데 이메일 칸이 보입니다(되는 척 금지)')
         if _hits: fails.append(f'동의 전인데 서버·라이브러리에 요청이 갑니다: {_hits[:2]}')
-        _ap.once('dialog', lambda d: d.accept())
-        _ap.click('#acct button:has-text("동의하고 계속")'); _ap.wait_for_timeout(1500)
+        _ap.click('#acct button:has-text("동의하고 계속")'); _ap.wait_for_selector('.dlg [data-a=ok]', timeout=3000); _ap.click('.dlg [data-a=ok]'); _ap.wait_for_timeout(1500)
         if not _ap.query_selector('#srvEmail') or not _ap.query_selector('#srvAge'): fails.append('동의 뒤에 로그인 칸·만 14세 확인이 안 나옵니다')
         elif not _ap.is_disabled('#srvSignup'): fails.append('만 14세 확인 전인데 「계정 만들기」가 눌립니다')
         else:

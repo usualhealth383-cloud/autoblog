@@ -12,6 +12,7 @@
 - 작업 가지 `claude/medicine-recommendation-app-na6x0m`. main 병합은 현욱님 승인이 있을 때만.
 - **약 설명은 식약처 허가 문구가 기본.** 해외 지침·진료실 관행이 다르면 둘 다 보여 주고 「의사·약사와 상의」. 근거 없이 허가와 반대로 쓰지 않는다. 임상 판단은 `yakjido/의사-질문-*.md` 에 묶어서 짧게 묻는다.
 - 모든 임상 숫자에 출처(`sources*.json`), PubMed 는 DOI 링크. 모르면 고치지 않는다.
+- **화면 원칙(2026-10-13 현욱님):** 내용은 많이 담되 한눈에 명료하게 — 결론·할 일·숫자만 펼치고 이유·근거·예외·연구 수치는 화살표(«자세히 ›») 접이 안으로. 지우지 말고 접는다.
 - 글 규칙: 해요체 · 영어 약자 금지 · 숫자와 단위 띄어 쓰기 · 빈도는 「100명 중 N명」 · 「전문의」 대신 「의사」 · « » 『 』 금지 · 「무료」 금지(7일 체험만 예외).
 - 검사: `python3 yakjido/tools/build.py` 뒤 `git checkout -- docs/yakjido/icon-maskable-512.png`, `python3 yakjido/tests/data.py`(자료·글 규칙·키 검사·용량 예산), `python3 yakjido/tests/run.py`(화면 315개, 25분 — 도는 동안 빌드 금지). 「완료」는 검사를 통과했을 때만.
 - ⛔ 비밀 키(service_role·sb_secret·DB 비밀번호)는 어디에도 쓰지 않는다. publishable 키는 메디나눔 공용 키 하나만(data.py 가 막음).

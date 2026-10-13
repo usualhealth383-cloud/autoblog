@@ -113,19 +113,27 @@ for x in SUP: jargon(x, '', '영양제 ' + x['id'])
 for t in T: jargon(t, '', '팁 ' + t['id'])
 
 # ── 영어 약어를 본문에 쓰지 않는다(현욱님 규칙) — MAO·SSRI·PPI·DUR 가 약 화면·병용 규칙에 남아 있었다(자체 비판 3차) ──
-ABBR = re.compile(r'\b(SSRI|SNRI|MAO|MAOI|PPI|DUR|NSAIDs?|ACE|ARB|INR|VTE|DVT|OTC)\b')
+# 2026-10-13 상용화 점검: \b 는 한글도 글자로 봐서 「ACE억제제」「MAO억제제」「H2차단제」처럼 한글이 바로 붙으면 못 잡았다 → 영문자만 경계로 본다.
+#   경로에 'note' 가 들어가면 통째로 넘기던 것도 없앴다(약 「같이 먹으면」 note·제품 note 는 화면에 나온다). 넘기는 칸은 키 이름이 정확히 아래일 때만.
+ABBR = re.compile(r'(?<![A-Za-z])(SSRI|SNRI|MAOI?|PPI|DUR|NSAIDs?|ACE|ARB|INR|VTE|DVT|OTC|QT|COPD|H2|FDA|DOAC|NOAC|APAP)(?![A-Za-z])')
+ABBR_SKIP = {'id', 'en', 'class', 'flags', 'sources', 'srcText', 'src', 'chartSources', '_memo', 'achSrc', 'k', 'kw', 'go'}
 def abbr(o, path, owner):
     if isinstance(o, str):
-        if ABBR.search(o) and not any(k in path for k in ('src', 'source', '.en', 'note')): fails.append(f'영어 약어 {owner}{path}: {o[:60]!r}')
+        if ABBR.search(o): fails.append(f'영어 약어 {owner}{path}: {o[:60]!r}')
     elif isinstance(o, dict):
         for k, v in o.items():
-            if k not in ('id', 'en', 'class', 'flags', 'sources', 'srcText'): abbr(v, path + '.' + k, owner)
+            if k not in ABBR_SKIP: abbr(v, path + '.' + k, owner)
     elif isinstance(o, list):
         for i, v in enumerate(o): abbr(v, path + f'[{i}]', owner)
 for s in S: abbr(s, '', '증상 ' + s['id'])
 for d in D: abbr(d, '', '약 ' + d['id'])
 for k in K: abbr(k, '', '계열 ' + k['id'])
 for x in SUP: abbr(x, '', '영양제 ' + x['id'])
+for t in T: abbr(t, '', '팁 ' + t['id'])
+for r in IX['rules']: abbr(r, '', '규칙 ' + r['id'])
+for e in ING.get('ing', []): abbr(e.get('n', ''), '.n', '성분 ' + str(e.get('k')))
+for f_ in ('myths.json', 'kids.json', 'askdoc.json'):
+    if (C / f_).exists(): abbr(json.load(open(C / f_, encoding='utf-8')), '', f_ + ' ')
 
 # ── 계열 설명이 «모두 처방약·약국에서 살 수 없다»고 하는데 약국 약이 끼어 있으면 안 된다 ──
 # 여성 호르몬약(피임약 추가)·방광·전립선약(리도카인 크림 추가) 설명이 새 약과 어긋나 있었다(자체 비판 3차)
@@ -330,7 +338,7 @@ for _k, _v in SRC.items():
 # ── 숫자와 영어 단위는 한 칸 띄운다 ────────────────────────────────────
 # 「3,000mg」처럼 붙여 쓴 곳이 섞여 있었다. 한글 단위(알·정·캡슐)는 붙여 쓰는 것이 맞아
 # 영어 단위만 본다. 허가사항 제품명(타이레놀정 500mg)은 원문 그대로라 출처에서는 넘어간다.
-_unit = re.compile(r'(?<![A-Za-z0-9.])(\d[\d,.]*)(mg|g|mL|ml|µg|mcg|IU|kg)\b')
+_unit = re.compile(r'(?<![A-Za-z0-9.])(\d[\d,.]*)(mg|g|mL|ml|µg|mcg|IU|kg)(?![A-Za-z])')   # \b 는 「4,000mg을」처럼 한글이 붙으면 못 잡는다(10-13)
 for _p in sorted(ROOT.glob('content/*.json')):
     if _p.name.startswith('sources') or _p.name in ('productImages.json', 'drugRep.json', 'recalls.json'): continue   # 제품 이름 짝(원문 그대로)
     for _m in _unit.finditer(_p.read_text(encoding='utf-8')):
@@ -409,6 +417,88 @@ for _base in (ROOT, ROOT.parent / 'docs' / 'yakjido'):
 for _d in D:
     for _x in _d.get('interactions') or []:
         if not (_x.get('note') or _x.get('what')): fails.append(f'약 {_d["id"]} 의 같이 먹으면 「{_x.get("with")}」 에 설명(note)이 없습니다')
+# ── 2026-10-13 상용화 점검(반영 X조) ─────────────────────────────────────
+# ① 출처 note·label 은 「참고 문헌」 화면에 그대로 나온다 — 내부 작업 메모(검수 조 이름·「의사 검수 전」·현욱님·질문 번호·파일 이름·「확인 필요」)는
+#    화면에 안 나오는 `_memo` 칸으로. 「의사 검수 · 2026-09」 도장과 「의사 검수 전」이 같은 화면에 나와 검수가 거짓처럼 보였다.
+_WORK = re.compile(r'검수 [A-Z]조|의사 검수 전|임상 검수 전|현욱|doctor-[A-Z]|의사 질문|\.json\b|확인 필요|TODO')
+for _k, _v in SRC.items():
+    for _f in ('label', 'note', 'type'):
+        if _WORK.search(_v.get(_f) or ''): fails.append(f'출처 {_k} 의 {_f} 에 내부 작업 메모가 있습니다(화면에 나옴 → _memo 칸으로): {(_v.get(_f) or "")[:50]!r}')
+#    보이는 글(근거 칩 srcText·계획 설명 등)에 「현욱님」 같은 내부 호칭이 나오면 안 된다(공개 이름은 meta.reviewer 하나)
+def _honor(o, path, owner):
+    if isinstance(o, str):
+        if '현욱님' in o: fails.append(f'내부 호칭 «현욱님» {owner}{path}: {o[:50]!r}')
+    elif isinstance(o, dict):
+        for k, v in o.items():
+            if k != '_memo': _honor(v, path + '.' + k, owner)
+    elif isinstance(o, list):
+        for i, v in enumerate(o): _honor(v, path + f'[{i}]', owner)
+for s in S: _honor(s, '', '증상 ' + s['id'])
+for d in D: _honor(d, '', '약 ' + d['id'])
+for k in K: _honor(k, '', '계열 ' + k['id'])
+for x in SUP: _honor(x, '', '영양제 ' + x['id'])
+for t in T: _honor(t, '', '팁 ' + t['id'])
+for _m in _MY: _honor(_m, '', '그런줄 ' + _m['id'])
+
+# ② 출처 중복 — 같은 키를 두 sources 파일이 정의하면 빌드 순서로 뒤 파일이 조용히 덮는다(efsa_b6). 같은 DOI 를 두 키가 가리키면 참고 문헌에 두 줄로 나온다.
+_seen_src = {}
+for _f in sorted(C.glob('sources*.json')):
+    for _k in json.load(open(_f, encoding='utf-8')):
+        if _k in _seen_src: fails.append(f'출처 키 {_k} 가 {_seen_src[_k]} 와 {_f.name} 두 곳에 있습니다 — 하나로 합치세요')
+        else: _seen_src[_k] = _f.name
+_doi = {}
+for _k, _v in SRC.items():
+    _m = re.search(r'doi\.org/(.+)$', _v.get('url') or '')
+    if not _m: continue
+    _d = _m.group(1).lower().rstrip('/')
+    if _d in _doi: fails.append(f'같은 논문(DOI {_d})이 출처 키 {_doi[_d]} 와 {_k} 두 개로 있습니다 — 한 키로 합치고 인용처를 옮기세요')
+    else: _doi[_d] = _k
+
+# ③ 약의 class 가 가리키는 계열의 members 에 그 약이 있어야 한다 — 36개가 빠져 있었다(검색 부제·계열 화면이 어긋남).
+#    아래 셋은 맞는 계열이 아직 없다(은행잎·베타히스틴 → 「항히스타민제」, 알벤다졸 → 「항생제」로 잘못 들어가 있음). 새 계열을 만들면 지운다.
+_CLASS_PENDING = set()
+_KM = {k['id']: set(k.get('members') or []) for k in K}
+for d in D:
+    if d['id'] in _CLASS_PENDING: continue
+    if d.get('class') in _KM and d['id'] not in _KM[d['class']]:
+        fails.append(f'약 {d["id"]} 가 자기 계열 {d["class"]} 의 members 에 없습니다')
+
+# ④ 제품 rx 는 정해진 값만 — 「처방」이라고 적은 5개는 badge() 가 몰라서 「처방 필요」 딱지가 빠졌다
+_RXOK = {'안전상비', '일반', '전문', '제품별', '건기식'}
+for d in D:
+    for _p in d.get('products') or []:
+        if _p.get('rx') not in _RXOK: fails.append(f'약 {d["id"]} 제품 「{_p.get("name")}」 rx 가 {_p.get("rx")!r} — {sorted(_RXOK)} 중 하나')
+
+# ⑤ 지연 로드 자료(검색·성분 사전·같이 먹어도 되나요·영양제 사전·제품 사전)도 글 규칙을 지킨다 — content/ 만 보다가 « » 수천 개·영어 약어·붙은 단위가 샜다.
+#    넘기는 칸: 검색어(k·kw)·영어 이름(en)·연결 키. 출처 이름(src)과 제품 이름(brands.n·lexicon.ex — 허가 원문)은 « »만 본다.
+#    kpic-guide·kpic-extra 는 식약처·약학정보원 원문이라 제외.
+_PUBD = ROOT.parent / 'docs' / 'yakjido' / 'data'
+_LZ_SKIP = {'en', 'k', 'kw', 'id', 'go', 'drug', 'supp', 'herb', 'ing'}
+for _name in ('lexicon', 'qa', 'nutrients', 'brands', 'mixes'):
+    _p = _PUBD / f'{_name}.json'
+    if not _p.exists(): fails.append(f'docs/yakjido/data/{_name}.json 이 없습니다'); continue
+    _raw = _p.read_text(encoding='utf-8')
+    for _ch in '«»『』':
+        if _ch in _raw: fails.append(f'data/{_name}.json 에 {_ch} 가 있습니다 — 메디나눔 글 규칙은 「 」'); break
+    _bad = []
+    def _lz(o, key, path):
+        if isinstance(o, str):
+            if key in _LZ_SKIP or key == 'src' or (_name, key) in (('brands', 'n'), ('lexicon', 'ex')): return
+            if ABBR.search(o): _bad.append(f'영어 약어 {path}: {o[:50]!r}')
+            _mu = _unit.search(o)
+            if _mu: _bad.append(f'숫자와 단위를 붙여 씀 {path}: «{_mu.group(0)}»')
+        elif isinstance(o, dict):
+            for k, v in o.items(): _lz(v, k, path + '.' + k)
+        elif isinstance(o, list):
+            for i, v in enumerate(o): _lz(v, key, path + f'[{i}]')
+    _lz(json.loads(_raw), '', '')
+    fails += [f'data/{_name}.json {b}' for b in _bad]
+
+# ⑥ 같은 것을 화면마다 다르게 부르지 않는다(2026-10-13 자체 검수 3-20) — 담는 곳은 「내 약통」, 술은 「술을 자주 마셔요」.
+_SHELL = (ROOT / 'app-shell.html').read_text(encoding='utf-8')
+for _old, _new in (('지금 먹는 약으로 등록', '내 약통에 담기'), ('먹는 약에 담기', '내 약통에 담기'), ('내 약에 담기', '내 약통에 담기'), ('약통에 넣기', '내 약통에 담기'), ('술을 자주 드세요', '술을 자주 마셔요')):
+    if _old in _SHELL: fails.append(f'app-shell.html 에 옛 이름 「{_old}」 — 「{_new}」로 통일')
+
 print(f'증상 {len(S)} · 약 {len(D)} · 계열 {len(K)} · 영양제 {len(SUP)} · 팁 {len(T)} · 그런줄 {len(_MY)} · 규칙 {len(IX["rules"])} · 출처 {len(SRC)}')
 if fails:
     print('실패', len(fails)); [print('  ✗', f) for f in fails]; sys.exit(1)

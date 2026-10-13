@@ -30,6 +30,7 @@ priv = f'''<!doctype html>
 <title>약지도 개인정보 처리방침</title>
 <link rel="stylesheet" href="공통.css">
 <style>body{{word-break:keep-all;overflow-wrap:break-word}}</style>
+<script src="문서.js" defer></script>
 </head>
 <body>
 <div class="wrap">
