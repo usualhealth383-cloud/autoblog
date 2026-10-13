@@ -925,7 +925,8 @@ def main():
         _ap.goto(url + '#/home'); _ap.wait_for_function('window.__READY__===true && DETAIL===2', timeout=15000)
         _ap.evaluate("localStorage.setItem('yakjido.hello.v1','1')")
         _ap.goto(url + '#/me?t=set'); _ap.reload(); _ap.wait_for_function('window.__READY__===true', timeout=15000); _ap.wait_for_timeout(1500)
-        if _ap.query_selector('#acct'): fails.append('공용 서버가 열리기 전(meta.account=false)인데 계정 칸이 보입니다')
+        if _ap.query_selector('#acct') and not _ap.evaluate('D.meta.account === true'): fails.append('공용 서버가 열리기 전(meta.account=false)인데 계정 칸이 보입니다')
+        if not _ap.query_selector('#acct') and _ap.evaluate('D.meta.account === true'): fails.append('계정이 켜졌는데(meta.account=true) 계정 칸이 안 보입니다')
         _ap.evaluate("()=>{ D.meta.account = true; route(); }"); _ap.wait_for_timeout(400)   # 서버가 열린 뒤의 모습
         _box = _ap.inner_text('#acct') if _ap.query_selector('#acct') else ''
         if '동의하고 계속' not in _box: fails.append(f'계정 칸이 동의 단추로 시작하지 않습니다: {_box[:80]!r}')
