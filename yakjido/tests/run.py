@@ -613,8 +613,13 @@ def main():
         pv.fill('#vs', '186'); pv.fill('#vd', '104'); pv.click('button:has-text("적어 두기")'); pv.wait_for_timeout(250)
         if '먼저 바르게 쟀는지' not in pv.inner_text('.app'): fails.append('혈압 수첩: 180 이상 첫 값에 «바르게 재기» 안내가 없습니다')
         if '119' in pv.inner_text('.note.alert') if pv.query_selector('.note.alert') else False: fails.append('혈압 수첩: 첫 값부터 119 안내가 뜹니다')
-        pv.fill('#vs', '184'); pv.fill('#vd', '100'); pv.click('button:has-text("적어 두기")'); pv.wait_for_timeout(250)
-        if not pv.query_selector('.note.alert') or '오늘 안에 진료' not in pv.inner_text('.note.alert'): fails.append('혈압 수첩: 쉬고 다시 재도 높은데 안내가 없습니다')
+        _n0 = pv.evaluate("()=>ME.vitals.length")
+        pv.fill('#vs', '184'); pv.fill('#vd', '100'); pv.click('button:has-text("적어 두기")')
+        try: pv.wait_for_function(f"()=>ME.vitals.length>{_n0}", timeout=3000)   # 적힌 뒤에 본다(무거울 때 250 ms 로는 모자랄 수 있음) — 안 적혔으면 아래에서 실패
+        except Exception: pass
+        pv.wait_for_timeout(250)
+        if not pv.query_selector('.note.alert') or '오늘 안에 진료' not in pv.inner_text('.note.alert'):
+            fails.append('혈압 수첩: 쉬고 다시 재도 높은데 안내가 없습니다 — ' + str(pv.evaluate("()=>[VT.alert, JSON.stringify(ME.vitals.slice(-3)), document.querySelector('.toast')?.textContent||'', document.getElementById('vs')?.value, new Date().toISOString()]")) + str(verr[:2]))
         pv.click('.seg button:has-text("혈당")'); pv.wait_for_timeout(200); pv.fill('#vg', '62'); pv.click('button:has-text("적어 두기")'); pv.wait_for_timeout(250)
         if not pv.query_selector('.note.alert') or '저혈당' not in pv.inner_text('.note.alert'): fails.append('혈압 수첩: 70 미만인데 저혈당 안내가 없습니다')
         if '저혈당' not in pv.inner_text('.vt-list'): fails.append('혈압 수첩: 혈당 목록에 저혈당 표시가 없습니다')

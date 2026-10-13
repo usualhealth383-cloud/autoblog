@@ -1798,7 +1798,7 @@ function sanitizeMe(m){
   r.worked = {}; for (const [k, v] of Object.entries(obj(o.worked))) if (SAFE_ID.test(k)) { const a = ids(v); if (a.length) r.worked[k] = a; }
   r.pub = {}; for (const [k, v] of Object.entries(obj(o.pub))) if (/^pub:[A-Za-z0-9_-]{1,40}$/.test(k) && v && typeof v === 'object') r.pub[k] = { name: str(v.name, 80), full: str(v.full, 120), ingr: str(v.ingr, 200), rx: str(v.rx, 20), seq: str(String(v.seq ?? ''), 40), drugId: (typeof v.drugId === 'string' && SAFE_ID.test(v.drugId)) ? v.drugId : '', ...(v.manual ? { manual: true } : {}) };
   const c = obj(o.child); r.child = o.child && typeof o.child === 'object' ? { name: str(c.name, 20), birth: SAFE_DAY.test(c.birth) ? c.birth : '', weight: num(c.weight, 1, 150) ?? '' } : null;
-  const sw = obj(o.sw); if (Object.keys(sw).length) r.sw = { a: str(sw.a, 10), s: str(sw.s, 2) };
+  const sw = obj(o.sw); if (Object.keys(sw).length) { r.sw = { s: str(sw.s, 2) }; if (Number.isInteger(sw.a) && sw.a >= 0 && sw.a <= 9) r.sw.a = sw.a; }   /* a 는 나이 칸 번호(정수) — 글자로 바꾸면 영양제 하루 필요량이 기본 나이로 돌아간다(2026-10-13 e2e) */
   r._mt = {}; for (const [k, v] of Object.entries(obj(o._mt))) if (num(v, 0, 9e15) != null) r._mt[k] = Number(v);
   r.taking = r.taking.filter(id => !id.startsWith('pub:') || r.pub[id]);
   return r;
