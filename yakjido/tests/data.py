@@ -456,7 +456,7 @@ for _k, _v in SRC.items():
 
 # ③ 약의 class 가 가리키는 계열의 members 에 그 약이 있어야 한다 — 36개가 빠져 있었다(검색 부제·계열 화면이 어긋남).
 #    아래 셋은 맞는 계열이 아직 없다(은행잎·베타히스틴 → 「항히스타민제」, 알벤다졸 → 「항생제」로 잘못 들어가 있음). 새 계열을 만들면 지운다.
-_CLASS_PENDING = {'ginkgo', 'betahistine', 'albendazole'}
+_CLASS_PENDING = set()
 _KM = {k['id']: set(k.get('members') or []) for k in K}
 for d in D:
     if d['id'] in _CLASS_PENDING: continue
