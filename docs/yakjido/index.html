@@ -1180,7 +1180,7 @@ background:var(--tint2);border:1px solid var(--hairline);text-align:left;cursor:
 .rb .fill,.rk .fill{display:block;height:100%;border-radius:999px;background:var(--primary)}
 .rb .fill.l3,.rk .fill.l3{background:var(--caution)} .rb .fill.l4,.rb .fill.l5,.rk .fill.l4,.rk .fill.l5{background:var(--alert)}
 .rk-list{display:flex;flex-direction:column;gap:4px;margin-top:6px}
-.rk{display:grid;grid-template-columns:minmax(0,1fr) 30% 3.4em;align-items:center;gap:10px;min-height:52px;padding:4px 0;color:inherit;text-decoration:none;border-bottom:1px solid var(--hairline)}
+.rk{display:grid;grid-template-columns:minmax(0,1fr) 30% 3.4em;align-items:center;gap:10px;min-height:48px;padding:3px 0;color:inherit;text-decoration:none;border-bottom:1px solid var(--hairline)}
 .rk:last-child{border-bottom:0}
 .rk b{display:block;font-size:1.0625rem;line-height:1.3;word-break:keep-all}
 .rk small{display:block;font-size:.875rem;line-height:1.35;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -1189,7 +1189,7 @@ background:var(--tint2);border:1px solid var(--hairline);text-align:left;cursor:
 .rk .v.na{grid-column:2/4;text-align:left;font-weight:500;color:var(--muted)}
 .cmpr-list{padding:0 var(--s4);margin-top:var(--s3)}
 details.cmpr{border-bottom:1px solid var(--hairline)} details.cmpr:last-child{border-bottom:0}
-details.cmpr>summary{display:flex;align-items:center;gap:10px;min-height:56px;padding:8px 0;list-style:none;cursor:pointer}
+details.cmpr>summary{display:flex;align-items:center;gap:10px;min-height:52px;padding:6px 0;list-style:none;cursor:pointer}
 details.cmpr>summary::-webkit-details-marker{display:none}
 details.cmpr>summary .t{flex:1;min-width:0}
 details.cmpr>summary b{display:block;font-size:1.0625rem;line-height:1.35;word-break:keep-all}
@@ -1705,7 +1705,7 @@ background-repeat:no-repeat;background-position:right 9px center;background-size
 window.__YAKJIDO_OK__ = true;
 const D = JSON.parse(document.getElementById('data').textContent || '{}');
 const BUILD = '2026-10-13';
-const DATAV = 'e74605d104'.indexOf('__') === 0 ? BUILD : 'e74605d104';
+const DATAV = '088a70777e'.indexOf('__') === 0 ? BUILD : '088a70777e';
 const BRANDMARK = (typeof window !== 'undefined' && window.__BRANDMARK__) || 'icon-192.png';
 let CORE = 0, CORE_P = null;
 function mergeCore(c){
@@ -2115,14 +2115,14 @@ let GQ = '', MQ = '', LASTPATH = '', HINT = 0;
 function gqPanel(){
 const q = GQ.trim(); if (q.length < 1) return '';
 lexLoad(); pubIndexSoon(); findLoad();
-const hitsAll = search(q), hits = hitsAll.slice(0, 12);
+const hitsAll = search(q), [gh, gn] = hitsAll.length ? hitsGroups(hitsAll, q, 3) : ['', 0], hits = hitsAll;
 const a = qaFind(q);
 const goHref = a?.go ? (a.go[0] === 'ing' ? (lexOf(a.go[1])?.drug && drug(lexOf(a.go[1]).drug) ? '/drug/' + lexOf(a.go[1]).drug : '/ingr/' + a.go[1]) : '') : '';
 return `<section class="sec findpanel">
 ${a ? `<div class="qa-card"><div class="qa-h">${I.info}<b>이 질문에 대한 답</b></div><p>${lexMark(a.a)}</p>${goHref ? `<button class="btn line" style="margin-top:10px" onclick="go('${goHref}')">${I.pill} 자세히 보기</button>` : ''}</div>` : ''}
-<h2>‘${esc(q)}’ 검색 <small>${hits.length ? hits.length + '건' : (LEX.loading ? '찾는 중…' : '')}</small></h2>
+<h2>‘${esc(q)}’ 검색 <small>${gn ? gn + '건' : (LEX.loading ? '찾는 중…' : '')}</small></h2>
 ${hits.length && hitsAll.fix ? `<p class="small" style="margin:4px 0 8px">혹시 <b>‘${esc(hitsAll.fix)}’</b>${josa(hitsAll.fix, '을', '를')} 찾으세요? 그 말로 찾은 결과예요.</p>` : ''}
-${hits.length ? `<div class="card rows">${hitsHtml(hits)}</div>`
+${hits.length ? gh
 : LEX.loading ? '<p class="loading">성분·제품 사전을 불러오는 중…</p>'
 : `<div class="empty card"><b>찾는 것이 없어요</b>다른 말로 해 보세요. 예: 허리, 목감기, 타이레놀, 유산균</div>
 <div class="util" style="margin-top:10px">${urow(I.eye, '약 사진 찍기', '상자·약봉투로 찾기', "go('/photo')", '찍기')}${urow(I.pill, '이름을 몰라도 종류로 담기', '“혈압약 먹어요”까지만 아셔도 돼요', "go('/kinds')", '고르기')}${urow(I.check, '여기 없어요', '질문 두 번으로 찾기', "go('/guide/1')", '시작')}</div>`}
@@ -3100,11 +3100,41 @@ if (PUB.index || PUB_SOON) return; PUB_SOON = 1;
 pubIndex().then(() => { PUB.ezSeq = null; if (typeof route === 'function') redraw(); });
 }
 async function rxNames(){ if (!PUB.rxn) { if (window.__RXN__) PUB.rxn = window.__RXN__; else { try { PUB.rxn = await loadJSON('names-rx.json'); } catch (e) { PUB.rxn = []; } } } return PUB.rxn; }
-const hitsHtml = hits => hits.map(h => `<button class="hit" onclick="go('${h.h}')"><span class="k ${h.c}">${h.k}</span><div><b>${esc(h.t)}</b><span>${esc(h.d)}</span></div>${I.chev}</button>`).join('');
+const hitsHtml = (hits, noK) => hits.map(h => `<button class="hit" onclick="go('${h.h}')">${noK ? '' : `<span class="k ${h.c}">${h.k}</span>`}<div><b>${esc(h.t)}</b><span>${esc(h.d)}${h.alt ? ' · 식약처 이름 ' + esc(h.alt) : ''}</span></div>${I.chev}</button>`).join('');
+const HG = { 식약처:'식약처 제품 목록', 생약:'성분', 같이:'같이 먹을 때', 종류:'종류로 담기', '의사 답':'의사에게 물었어요' };
+const hitRank = h => /^\/(drug|brand)\//.test(h.h) ? 3 : h.h.startsWith('/pub/') ? 2 : 1;
+function hitsGroups(all, q, per){
+const keep = [], byS = new Map(), byQ = new Map(), num = t => (pubNorm(t).match(/\d+/g) || []).join(',');
+for (const h of all) {
+if (!['제품', '식약처', '처방약'].includes(h.k)) { keep.push(h); continue; }
+const s = famStem(h.t), n = num(h.t), seq = h.seq || (h.h.startsWith('/pillinfo/') ? h.h.slice(10) : '');
+const o = (seq && byQ.get(seq)) || (s.length > 1 && (byS.get(s) || []).find(x => !n || !x.ns.size || x.ns.has(n)));
+if (!o) { const x = { ...h, P:1, s, ns:new Set(n ? [n] : []) }; keep.push(x); if (s.length > 1) byS.set(s, [...(byS.get(s) || []), x]); if (seq) byQ.set(seq, x); continue; }
+if (n) o.ns.add(n); if (seq) byQ.set(seq, o);
+if (hitRank(h) > hitRank(o)) { const a = o.k === '제품' ? o.alt : o.t; Object.assign(o, h, { alt:a }); }
+else if (h.k !== '제품' && !o.alt && h.t !== o.t) o.alt = h.t;
+}
+const qq = String(all.fix ? all.fix.split('·')[0] : q).trim(), qs = famStem(qq), qn = qq.replace(/\s/g, '').toLowerCase();
+let card = '', cut = null;
+if (qs.length > 1 && !KID_Q.test(qq)) {
+const pr = keep.filter(h => h.P && /^\/(drug|brand)\//.test(h.h)), dr = keep.filter(h => h.k === '성분' && h.h.startsWith('/drug/')), top = keep.find(h => h.k !== '기능');
+const dn = (h, f) => [h.t, drug(h.h.slice(6))?.en].some(t => f(String(t || '').replace(/\s/g, '').toLowerCase()));
+cut = pr.find(h => h.s === qs) || dr.find(h => dn(h, t => t === qn))
+|| (top?.P && pr.includes(top) && top.s.startsWith(qs) ? pr.filter(h => h.s.startsWith(qs)).sort((a, b) => a.s.length - b.s.length)[0] : null)
+|| (qn.length > 2 && dr.includes(top) && dn(top, t => t.startsWith(qn)) ? top : null);
+if (cut) card = cut.k === '성분' ? drugHead(drug(cut.h.slice(6))) : prodHead(cut.h.startsWith('/brand/') ? decodeURIComponent(cut.h.slice(7)) : cut.t, { go:1 });
+}
+const feat = keep.filter(h => h.k === '기능'), G = new Map();
+keep.forEach(h => { if (h.k === '기능' || h === cut) return; const g = HG[h.k] || h.k; G.has(g) || G.set(g, []); G.get(g).push(h); });
+return [(feat.length ? `<div class="card results">${hitsHtml(feat)}</div>` : '') + (card ? `<div class="sech"><h3 class="sec-h">찾으신 약</h3></div>${card}` : '')
++ [...G].map(([g, L]) => `<div class="sech"><h3 class="sec-h">${esc(g)}</h3><span class="secn">${L.length}</span></div><div class="card results" style="margin-top:0">${hitsHtml(L.slice(0, per), 1)}</div>${L.length > per ? fold(`더 보기 <span class="muted">${L.length - per}개</span>`, `<div class="card results">${hitsHtml(L.slice(per, per + 50), 1)}</div>`, { cls:'more-rows' }) : ''}`).join(''),
+[...G.values()].reduce((a, L) => a + L.length, feat.length + !!cut)];
+}
 function vSearch(_, q){
 lexLoad(); pubIndexSoon(); findLoad();
-const hits = search(q.q || '');
-return `${topBar({ back:'뒤로' })}<h1>‘${esc(q.q || '')}’ 검색</h1><div class="card results" style="margin-top:16px">${hitsHtml(hits) || `<div class="empty"><b>검색 결과가 없어요</b>증상 이름(허리·두통·생리통)이나 성분 이름으로 찾아보세요.</div>`}</div>`;
+const s = (q.q || '').trim(), hits = s ? search(s) : [], [html, n] = s ? hitsGroups(hits, s, 5) : ['', 0];
+if (!s) return `${topBar({ back:'뒤로' })}<h1>약 찾기</h1><p style="margin:6px 0 14px">위 칸에 증상이나 약 이름을 쳐 주세요.</p>${gqPop()}`;
+return `${topBar({ back:'뒤로' })}<h1>‘${esc(s)}’ 검색 <small class="muted" style="font-size:.875rem">${n ? n + '건' : ''}</small></h1>${hits.fix ? `<p class="small" style="margin-top:6px">혹시 <b>‘${esc(hits.fix)}’</b>${josa(hits.fix, '을', '를')} 찾으세요? 그 말로 찾은 결과예요.</p>` : ''}${html || `<div class="card results" style="margin-top:16px"><div class="empty"><b>검색 결과가 없어요</b>증상 이름(허리·두통·생리통)이나 성분 이름으로 찾아보세요.</div></div>`}`;
 }
 
 const FLAG_Q = {
