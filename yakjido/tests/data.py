@@ -275,6 +275,13 @@ if _ix.exists():
     if re.search(r'=>|`|\?\.|\?\?|\blet\b|\bconst\b', _guard):
         fails.append('오래된 웹뷰 안내 조각에 새 문법(화살표·백틱·?.·let·const)이 섞였습니다 — 옛 브라우저에서 이 조각마저 못 읽습니다')
 
+# ── 메디나눔 공통 글 규칙(2026-10-13) — « » 『 』 를 쓰지 않고(「 」로), 「무료」라는 말을 쓰지 않는다 ─────────
+for _f in sorted(C.glob('*.json')):
+    _t = _f.read_text(encoding='utf-8')
+    for _ch in '«»『』':
+        if _ch in _t: fails.append(f'{_f.name} 에 {_ch} 가 있습니다 — 메디나눔 글 규칙은 「 」'); break
+    if '무료' in _t: fails.append(f'{_f.name} 에 「무료」가 있습니다 — 「비용 없이」 등으로(메디나눔 규칙)')
+
 # ── 첫 화면이 가벼운지 — 어르신은 데이터가 느린 곳에서 여신다 ──────────────
 # 본문을 data/core.json 으로 뺀 뒤 첫 내려받기가 1.47 MB → 0.5 MB 가 됐다(v84).
 # 다시 통째로 심는 실수를 하면 여기서 걸린다.
@@ -283,8 +290,10 @@ _idx = ROOT.parent / 'docs' / 'yakjido' / 'index.html'
 _core = ROOT.parent / 'docs' / 'yakjido' / 'data' / 'core.json'
 if _idx.exists():
     _b = _idx.read_bytes(); _gzkb = len(_gz.compress(_b, 6)) / 1024
-    if _gzkb > 220:
-        fails.append(f'첫 화면이 무겁습니다 — index.html 압축 {_gzkb:.0f} KB (한계 220 KB). 본문은 data/core.json 으로 빼야 합니다')
+    # 2026-10-13 220 → 224 KB: 복용 진행 고리·알약 그림·약국 쪽지 머리(디자인 리서치) +2 KB. 3G(초당 약 50 KB)에서 0.1초 미만.
+    #   본문은 이미 data/core.json 으로 뺐고(askdoc 대답·약 tips 도 이날 뺌), 남은 것은 화면 코드다.
+    if _gzkb > 224:
+        fails.append(f'첫 화면이 무겁습니다 — index.html 압축 {_gzkb:.0f} KB (한계 224 KB). 본문은 data/core.json 으로 빼야 합니다')
     if not _core.exists():
         fails.append('docs/yakjido/data/core.json 이 없습니다 — 빌드를 다시 돌리세요')
     else:
@@ -381,6 +390,25 @@ for _name, _rows in (('계열', K), ('그런줄', _MY), ('담기 계열', _quick
         elif _ic and _ic in _u: fails.append(f'{_name} «{_u[_ic]}» 와 «{_r.get("id")}» 가 같은 아이콘 «{_ic}» 을 씁니다')
         elif _ic: _u[_ic] = _r.get('id')
 
+# ── 열쇠 검사 — 메디나눔 공용 publishable 키 하나만 앱에 들어갈 수 있다 ─────────
+# 「service_role·sb_secret·DB 비밀번호는 앱·저장소 어디에도 넣지 않는다」(메디나눔 안내 2026-10-13).
+# publishable 키는 앱에 넣으라고 만든 키지만, 공용 프로젝트 것 하나만 허용한다(옛 프로젝트 키가 섞이면 안 됨).
+_SHARED_PUB = 'sb_publishable_YQSz-D-RCXzHGUhso06rMg_GOIIRDuV'
+for _base in (ROOT, ROOT.parent / 'docs' / 'yakjido'):
+    for _p in _base.rglob('*'):
+        if not _p.is_file() or _p.suffix not in ('.js', '.html', '.json', '.ts', '.sql', '.md', '.py', '.xml', '.gradle'): continue
+        if 'node_modules' in _p.parts or '.axe' in _p.parts or _p.stat().st_size > 3_000_000: continue
+        _t = _p.read_text(encoding='utf-8', errors='ignore')
+        if re.search(r'sb_secret_[A-Za-z0-9_-]{8,}', _t): fails.append(f'{_p.name} — sb_secret 키가 들어 있습니다')
+        if re.search(r'eyJhbGciOi[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{20,}\.[A-Za-z0-9_-]{20,}', _t) and 'service_role' in _t:
+            fails.append(f'{_p.name} — service_role 토큰처럼 보이는 값이 있습니다')
+        for _k in set(re.findall(r'sb_publishable_[A-Za-z0-9_-]{10,}', _t)):
+            if _k != _SHARED_PUB: fails.append(f'{_p.name} — 공용 키가 아닌 publishable 키가 들어 있습니다')
+
+# 약 화면 「같이 먹으면」 줄은 설명이 있어야 한다 — 10-13 검수: {with, what} 꼴 35줄이 화면에 빈 설명으로 나왔다(그리는 쪽은 note || what)
+for _d in D:
+    for _x in _d.get('interactions') or []:
+        if not (_x.get('note') or _x.get('what')): fails.append(f'약 {_d["id"]} 의 같이 먹으면 「{_x.get("with")}」 에 설명(note)이 없습니다')
 print(f'증상 {len(S)} · 약 {len(D)} · 계열 {len(K)} · 영양제 {len(SUP)} · 팁 {len(T)} · 그런줄 {len(_MY)} · 규칙 {len(IX["rules"])} · 출처 {len(SRC)}')
 if fails:
     print('실패', len(fails)); [print('  ✗', f) for f in fails]; sys.exit(1)
