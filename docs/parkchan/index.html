@@ -169,6 +169,8 @@ button{font-family:inherit;color:inherit}
 .pnow.fin .linkbtn{padding:12px 2px 0;min-height:44px;font-weight:700;color:var(--brand-dark);text-decoration:none}
 
 .pfoot{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:-2px 0 14px 28px;font-size:var(--t-cap);color:var(--muted);line-height:1.6}
+.legalrow{display:flex;justify-content:center;align-items:center;gap:4px;padding-top:0}.legalrow .linkbtn{min-height:44px;padding:0 6px;font-size:var(--t-cap);color:var(--muted)}
+.whytodo{margin:8px 0 0}.whytodo>summary{min-height:44px;display:flex;align-items:center;font-size:var(--t-cap);font-weight:700;color:var(--brand-dark);cursor:pointer}
 .passnote{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:0 0 14px;padding:4px 6px 4px 14px;border:1px solid var(--hair);border-radius:var(--r-m);background:var(--card);font-size:var(--t-cap);color:var(--muted);line-height:1.6;word-break:keep-all}
 .qual .cnt{font-size:var(--t-cap);font-weight:400;color:var(--muted)}
 .qrow{display:flex;align-items:center;gap:12px;width:100%;min-height:56px;padding:10px 2px;border:0;border-bottom:1px solid var(--hair);background:none;text-align:left;font:inherit;color:var(--body);cursor:pointer}
@@ -2711,6 +2713,7 @@ function renderAuth(){
       <div class="or">또는</div>
       <button class="btn ghost" id="goGuest">가입 없이 둘러보기 · 최근 ${FREE_DAYS}일치 무료</button>
       <p class="fine">학원 코드를 넣으면 전 범위와 출석·공지가 열려요.</p>
+      <p class="fine legalrow"><button class="linkbtn" data-legal="terms">이용약관</button> · <button class="linkbtn" data-legal="privacy">개인정보처리방침</button></p>
     </div>`;
   if (authMode==='login') v.innerHTML = `
     <div class="auth">
@@ -3121,11 +3124,11 @@ const lOpenOf = () => dLoad('pcs.lopen') || {};
 function renderList(){
   const idx = dayIndex(), q = listQ.trim().toLowerCase(), fa = fullAccess(), st = lessonStats(), lo = lOpenOf(), todayU = CONCEPTS[idx].book + '-' + CONCEPTS[idx].unit;
   const hit = c => !q || [c.title, c.subtitle, c.lessonName, c.unitName, ...c.terms.map(t=>t.k)].some(t => (t||'').toLowerCase().includes(q));
-  const pass = (c,i) => listF==='전체' ? true : listF==='공부함' ? S.done.includes(c.id) : listF==='북마크' ? S.bm.includes(c.id) : listF==='안 함' ? !S.done.includes(c.id) && isOpen(i) : true;
+  const pass = (c,i) => listF==='전체' ? true : listF==='공부함' ? S.done.includes(c.id) : listF==='북마크' ? S.bm.includes(c.id) : listF==='아직' ? !S.done.includes(c.id) && isOpen(i) : true;
   const forced = !!q || listF !== '전체';
   let html = `<h1 class="h-page">교재</h1>
     <div class="search"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg><input id="listQ" aria-label="개념·용어 검색" placeholder="개념·용어 검색 (예: 효소, 운동량)" value="${esc(listQ)}"></div>
-    <div class="chipbar">${['전체','안 함','공부함','북마크'].map(f=>`<button data-lf="${f}" class="${listF===f?'on':''}">${f}</button>`).join('')}</div>
+    <div class="chipbar">${['전체','아직','공부함','북마크'].map(f=>`<button data-lf="${f}" class="${listF===f?'on':''}">${f}</button>`).join('')}</div>
     ${fa ? '' : `<div class="lockcard"><span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 018 0v3"/></svg></span><div class="tx"><b>지금은 최근 ${FREE_DAYS}일치가 열려 있어요</b><span>학원 코드나 이용권을 등록하면 ${CONCEPTS.length}개념이 모두 열려요. 잠긴 개념은 자물쇠로 표시했어요.</span></div><button class="linkbtn" id="goMe">등록하기</button></div>`}`;
   const groups = []; CONCEPTS.forEach((c, i) => { const k = c.book + '-' + c.unit; let g = groups[groups.length - 1];
     if (!g || g.k !== k){ g = { k, c, ls:[], all:0, done:0, hits:[] }; groups.push(g); }
@@ -3926,7 +3929,7 @@ function drawBank(){
       <button class="btn" id="bankRec">바로 시작</button>
       <button class="rcus" id="bankCustom"><span><b>직접 고르기</b><small>범위 · 유형 · 개수 · 시험처럼</small></span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg></button>
     </section>
-    <p class="bstat">전체 ${BANK_N.toLocaleString('ko-KR')}문항 · ${done ? `푼 문항 ${done.toLocaleString('ko-KR')} · 정답률 ${Math.round(right/done*100)}%` : '아직 푼 문제가 없어요'}${fa ? '' : ` · 무료 범위(최근 ${FREE_DAYS}일치)에서 골라요`}</p>
+    <p class="bstat">전체 ${BANK_N.toLocaleString('ko-KR')}문항 · ${done ? `푼 문항 ${done.toLocaleString('ko-KR')}개 · 문항마다 마지막 답으로 ${Math.round(right/done*100)}% 맞힘` : '아직 푼 문제가 없어요'}${fa ? '' : ` · 무료 범위(최근 ${FREE_DAYS}일치)에서 골라요`}</p>
     <div class="umsec"><h2 class="lbl">실전처럼 풀기</h2>
       <div class="umtiles">
         <button class="umtile" data-um="unit" ${fa ? '' : 'aria-describedby="umLockNote"'}><span class="k">대단원 마무리${lock}</span><span class="t">단원마다 16문항</span><span class="s">${fa && ux ? `지난번 ${ux[0]}/${ux[1]}` : '마무리 12 + 고난도 4'}</span></button>
@@ -4031,7 +4034,8 @@ function drawBankSession(){
   const qclock = bs.timed && !graded ? `<span class="qclock"><span class="sr">이 문제 남은 시간 </span><span id="qClock">${clockText(QSEC * 1000 - (Date.now() - bs.qt0))}</span></span>` : '';
   const n = bs.items.length, done = bs.i + (graded ? 1 : 0);
   const bar = qtop('bankQuit', '그만 풀기', bs, done, n, `${qclock}<span class="pcnt"><b>${bs.i + 1}</b> / ${n}</span>`);
-  const kindTag = bs.kind === 'review' || (bs.kind === 'rec' && rk) ? `<span class="rk">${rk ? '다시 볼 문제' : '지난 소단원'}</span>`
+  const asgA = bs.kind === 'asg' ? (ASG || []).find(x => x.id === bs.asg) : null;   // 학원 과제를 푸는 중임을 머리에(2026-10-13 검수)
+  const kindTag = asgA ? `<span class="rk">학원 과제 · ${asgDueText(asgA.due)}</span>` : bs.kind === 'review' || (bs.kind === 'rec' && rk) ? `<span class="rk">${rk ? '다시 볼 문제' : '지난 소단원'}</span>`
     : q.step === 'unit' ? `<span class="rk">${umNo(q) > 12 ? '고난도' : '마무리'} ${umNo(q)}</span>` : q.step === 'recap' ? `<span class="rk">핵심 정리 ${umNo(q)}</span>` : q.step === 'mock' ? `<span class="rk">모의고사 ${umNo(q)}</span>` : '';
   if (q.type === 'card'){ v.innerHTML = `${bar}<div class="qhead"><span class="l"><span class="rk">개념 카드</span>${esc(L?L.unit+'-'+L.id.slice(2)+' '+L.name:'')}</span></div>${csHtml(q)}`; return; }   // 개념 카드 간격 복습(보완안 7)
   if (rw && isLeech(rw) && !graded){   // 여러 번 갈린 문제 — 다시 묻지 않고 개념 카드로
@@ -4929,7 +4933,7 @@ async function ownerTodo(st){
     : `<button class="todo-act" data-stu="${esc(r.s.code)}">학생 보기</button>`;
   return `<details class="stuedit todo" id="todoBox" ${todoOpen ? 'open' : ''}><summary>처리할 것 ${rows.length ? `<span class="cst wait">${rows.length}명</span>` : `<span class="none">· 오늘 챙길 학생이 없습니다</span>`}</summary>
     ${rows.map(r => `<div class="todo-row"><span class="b"><span class="nm">${esc(r.s.name)}<small>${esc(r.s.cls)}</small></span><span class="why">${r.why.map(esc).join('<br>')}</span></span>${act(r)}</div>`).join('')}
-    ${rows.length ? `<p class="tip" style="margin:8px 0 0">출석했는데 7일 동안 앱 공부가 없는 학생 · 정답률이 지난주보다 ${TODO_DROP}%p 이상 떨어진 학생 · 최근 공지를 안 읽은 학생 · 다시 볼 문제가 ${TODO_BACKLOG}개 넘게 밀린 학생 · 과제 마감이 지났는데 아직 안 낸 학생을 모읍니다.</p>`
+    ${rows.length ? `<details class="whytodo"><summary>어떤 학생이 여기 뜨나요?</summary><p class="tip" style="margin:4px 0 0">출석했는데 7일 동안 앱 공부가 없는 학생 · 정답률이 지난주보다 ${TODO_DROP}점(100점 기준) 넘게 떨어진 학생 · 최근 공지를 안 읽은 학생 · 다시 볼 문제가 ${TODO_BACKLOG}개 넘게 밀린 학생 · 과제 마감이 지났는데 아직 안 낸 학생을 모읍니다.</p></details>`
       : `<p class="tip" style="margin:0">출석·정답률·공지·밀린 복습·과제 마감을 날마다 살펴, 챙길 학생이 생기면 여기에 모읍니다.</p>`}</details>`; }   /* 할 일이 없는 날은 기준을 한 줄로(2026-10-07 7일 사용 점검: 빈 상자에 긴 설명만 펼쳐져 있었다) */
 let asgF = { kind:'bank', lesson:'', type:'전체', diff:'전체', n:10, unit:'', mock:'1', cls:'', pick:[], due:'' };
 const ASG_DIFF = [['전체','난이도 전체'],['●○○','기본'],['●●○','실력'],['●●●','도전']];
@@ -4988,7 +4992,7 @@ async function openAsgReport(id){
   const reHtml = asgRe ? `<div class="sec asgre"><h2>틀린 학생에게만 다시 내기</h2><p class="tip" style="margin:0 0 10px">틀린 문항이 있는 <b>${wr.length}명</b>에게, 누군가 틀린 문항 <b>${reIt.length}개</b>만 새 과제로 냅니다. 다 맞힌 학생은 받지 않아요.</p>
       <div class="g" style="display:flex;gap:8px;align-items:center"><label for="asgReDue" style="font-size:var(--t-small);color:var(--muted)">마감</label><input id="asgReDue" type="date" value="${addDays(todayISO(), 2)}" min="${todayISO()}" max="${addDays(todayISO(), 60)}"></div>
       <button class="btn soft" id="asgReGo" style="margin-top:10px">${wr.length}명에게 ${reIt.length}문항 다시 내기</button></div>` : '';
-  const st = x => x.submitted_at ? `<span class="cst ${x.late ? 'wait' : 'ok'}">${x.late ? '늦게 냄' : '냄'}</span>` : `<span class="cst none">아직${x.done ? ` ${x.done}/${a.n}` : ''}</span>`;
+  const st = x => x.submitted_at ? `<span class="cst ${x.late ? 'wait' : 'ok'}">${x.late ? '늦게 냄' : '냄'}</span>` : `<span class="cst none">${x.done ? `푸는 중 ${x.done}/${a.n}` : '미제출'}</span>`;
   openSheet(`<h3>${esc(a.title)}</h3>
     <p>${esc(a.cls || `학생 ${a.target}명`)} · ${esc(ASG_KIND[a.kind] || '')} ${a.n}${a.kind === 'read' ? '개' : '문항'} · 마감 ${esc(asgWhen(a.due))}${dLeft(a.due) < 0 ? ' · 마감 지남' : ''}</p>
     <div class="tiles"><div class="tile"><div class="v">${a.submitted}<small>/${a.target}</small></div><div class="l">제출</div></div><div class="tile"><div class="v">${a.rate != null ? a.rate : '–'}<small>${a.rate != null ? '%' : ''}</small></div><div class="l">정답률</div></div><div class="tile"><div class="v">${a.late}<small>명</small></div><div class="l">늦은 제출</div></div></div>

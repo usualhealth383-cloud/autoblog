@@ -196,7 +196,7 @@ async def main():
         assert '제출 1 / 2명 · 정답률 60%' in lst and '제출 1 / 2명 · 정답률 100% · 늦은 제출 1 · 아직 1명' in lst and '제출 1 / 2명 · 정답률 80%' in lst, lst
         await pg.locator('.asgsentrow', has_text=L1 + ' · 문제').locator('[data-asgrep]').click(); await pg.wait_for_timeout(800)
         sh = await pg.inner_text('.sheet')
-        assert '많이 틀린 문항' in sh and '1명 틀림' in sh and '3/5' in sh and '아직' in sh and '냄' in sh, sh
+        assert '많이 틀린 문항' in sh and '1명 틀림' in sh and '3/5' in sh and ('미제출' in sh or '푸는 중' in sh) and '냄' in sh, sh
         assert await pg.locator('.sheet .asgtop .kv').count() == 2, '틀린 문항 2개(학생 1명이 2문항 틀림)'
         nophone = await pg.locator('.sheet a[href^="sms:"]').count(); assert nophone == (1 if SRV else 0), '아직 안 낸 학생에게 문자(연락처 있을 때만)'
         await pg.screenshot(path=f'{SC}/a06_report_light.png', full_page=True)
