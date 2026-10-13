@@ -115,7 +115,7 @@ for t in T: jargon(t, '', '팁 ' + t['id'])
 # ── 영어 약어를 본문에 쓰지 않는다(현욱님 규칙) — MAO·SSRI·PPI·DUR 가 약 화면·병용 규칙에 남아 있었다(자체 비판 3차) ──
 # 2026-10-13 상용화 점검: \b 는 한글도 글자로 봐서 「ACE억제제」「MAO억제제」「H2차단제」처럼 한글이 바로 붙으면 못 잡았다 → 영문자만 경계로 본다.
 #   경로에 'note' 가 들어가면 통째로 넘기던 것도 없앴다(약 「같이 먹으면」 note·제품 note 는 화면에 나온다). 넘기는 칸은 키 이름이 정확히 아래일 때만.
-ABBR = re.compile(r'(?<![A-Za-z])(SSRI|SNRI|MAOI?|PPI|DUR|NSAIDs?|ACE|ARB|INR|VTE|DVT|OTC|QT|COPD|H2|FDA|DOAC|NOAC|APAP)(?![A-Za-z])')
+ABBR = re.compile(r'(?<![A-Za-z])(SSRI|SNRI|MAOI?|PPI|DUR|NSAIDs?|ACE|ARB|INR|VTE|DVT|OTC|QT|COPD|H2|FDA|DOAC|NOAC|APAP|COX)(?![A-Za-z])')   # COX: 성분 사전 「COX-2 선택」(검수 2차 C9, 10-13)
 ABBR_SKIP = {'id', 'en', 'class', 'flags', 'sources', 'srcText', 'src', 'chartSources', '_memo', 'achSrc', 'k', 'kw', 'go'}
 def abbr(o, path, owner):
     if isinstance(o, str):
@@ -470,10 +470,13 @@ for d in D:
         if _p.get('rx') not in _RXOK: fails.append(f'약 {d["id"]} 제품 「{_p.get("name")}」 rx 가 {_p.get("rx")!r} — {sorted(_RXOK)} 중 하나')
 
 # ⑤ 지연 로드 자료(검색·성분 사전·같이 먹어도 되나요·영양제 사전·제품 사전)도 글 규칙을 지킨다 — content/ 만 보다가 « » 수천 개·영어 약어·붙은 단위가 샜다.
-#    넘기는 칸: 검색어(k·kw)·영어 이름(en)·연결 키. 출처 이름(src)과 제품 이름(brands.n·lexicon.ex — 허가 원문)은 « »만 본다.
+#    넘기는 칸: 검색어(k·kw)·연결 키. 영어 이름(en)은 약자는 넘기고 붙은 단위만 본다.
 #    kpic-guide·kpic-extra 는 식약처·약학정보원 원문이라 제외.
+#    2026-10-13 검수 2차 C8·C9 — 「출처(src)·제품 이름(brands.n·lexicon.ex)은 허가 원문」이라며 통째로 넘겼더니 성분 사전 65쪽에
+#    「아론정 25mg」·「levonorgestrel 1.5mg」·「식약처 DUR」가 그대로 나왔다(허가 원문 제품명은 「…밀리그램」으로 적혀 있어 우리가 줄여 쓴 글이었다).
+#    그래서 src·brands.n·lexicon.ex 도 약자·단위를 본다. 원문 그대로인 낱알·e약은요 자료(pills·easy-*)는 여기서 보지 않는다.
 _PUBD = ROOT.parent / 'docs' / 'yakjido' / 'data'
-_LZ_SKIP = {'en', 'k', 'kw', 'id', 'go', 'drug', 'supp', 'herb', 'ing'}
+_LZ_SKIP = {'k', 'kw', 'id', 'go', 'drug', 'supp', 'herb', 'ing'}
 for _name in ('lexicon', 'qa', 'nutrients', 'brands', 'mixes'):
     _p = _PUBD / f'{_name}.json'
     if not _p.exists(): fails.append(f'docs/yakjido/data/{_name}.json 이 없습니다'); continue
@@ -483,8 +486,8 @@ for _name in ('lexicon', 'qa', 'nutrients', 'brands', 'mixes'):
     _bad = []
     def _lz(o, key, path):
         if isinstance(o, str):
-            if key in _LZ_SKIP or key == 'src' or (_name, key) in (('brands', 'n'), ('lexicon', 'ex')): return
-            if ABBR.search(o): _bad.append(f'영어 약어 {path}: {o[:50]!r}')
+            if key in _LZ_SKIP: return
+            if key != 'en' and ABBR.search(o): _bad.append(f'영어 약어 {path}: {o[:50]!r}')
             _mu = _unit.search(o)
             if _mu: _bad.append(f'숫자와 단위를 붙여 씀 {path}: «{_mu.group(0)}»')
         elif isinstance(o, dict):
@@ -498,6 +501,61 @@ for _name in ('lexicon', 'qa', 'nutrients', 'brands', 'mixes'):
 _SHELL = (ROOT / 'app-shell.html').read_text(encoding='utf-8')
 for _old, _new in (('지금 먹는 약으로 등록', '내 약통에 담기'), ('먹는 약에 담기', '내 약통에 담기'), ('내 약에 담기', '내 약통에 담기'), ('약통에 넣기', '내 약통에 담기'), ('술을 자주 드세요', '술을 자주 마셔요')):
     if _old in _SHELL: fails.append(f'app-shell.html 에 옛 이름 「{_old}」 — 「{_new}」로 통일')
+
+# ⑦ 아이 나이(2026-10-13 X4 — 검수 2차 A4·A6). 아이 조건이 «나이와 상관없는 스위치 하나»라 생후 2개월에게 이부프로펜·콜대원을,
+#    4세에게 알레그라정 120 mg·엘도스캡슐을 권하고 있었다. 증상 계획에 나오는 약은 「설명서상 몇 개월부터」를 숫자로 가진다.
+#    minAgeMonths : 이 나이(개월) 미만이면 설명서 금기이거나, 목록 제품 어디에도 그 나이 용법이 없다 → 아이 모드에서 권하지 않는다
+#    ageAskMonths : 이 나이 미만은 설명서가 「의사·약사와 상의」 → 막지 않고 아래 한 줄(결정 101 원칙)
+#    kidForm      : products 가운데 그 나이에 닿는 아이용 제품(첫 제품이 어른용일 때). 근거 출처는 약의 sources 에 있다.
+#    처방약(rx 전문)은 의사가 나이·체중으로 정하므로 넘긴다. 아래는 원문으로 확인하지 못해 일부러 비워 둔 것 — 확인하면 지운다.
+_AGE_UNVERIFIED = {
+    'allergy-eyedrop',       # 케토티펜 점안액 1세 미만 금기·「유소아는 의사 처방」, 크로몰린 점안액은 나이 문구 없음 — 제품마다 다름
+    'antihistamine-topical', # 대표 제품이 없다(「약국 벌레 물린 데 바르는 약」)
+    'hemorrhoid-topical',    # 대표 제품이 없다(「약국 치질 연고·좌약」)
+    'oxytetracycline-eye',   # 대표 제품이 없다(「약국 안연고」)
+    'ors',                   # 경구수액 설명서 원문이 자료에 없다
+    'chlorhexidine',         # 가글 — 「소아 상의」·「18세 미만 상의」만 있고 나이 하한이 원문에 없다
+    'chx-gel',               # 위와 같음
+    'xylitol-gum',           # 의약품이 아니다
+    'vitamin-d-rx',          # 건강기능식품·처방약이 섞인 칸
+    'loxoprofen',            # 먹는 약은 처방약, 파스는 「영아·유아·소아 상의」만 — 제품별
+    'antibiotic-eyedrop',    # 대부분 처방약 — 제품별
+    'artificial-tears',      # 설명서에 나이 문구가 없음(리프레쉬플러스점안액) — 하한을 확인하지 못함
+    'mupirocin',             # 설명서에 나이 문구가 없음(무피신연고)
+    'policresulen',          # 설명서에 나이 문구가 없음(알보칠) — 약 화면은 「소아는 오라메디가 순해요」
+    'urea-cream',            # 설명서에 나이 문구가 없음(요소 크림)
+    'saliva-sub',            # 설명서에 나이 문구가 없음(드라이문트겔)
+    'scar-gel',              # 벤트락스겔은 나이 문구 없음 · 노스카나겔은 6개월 미만 금기 — 제품마다 다름
+}
+_DID = {d['id']: d for d in D}
+_planned = sorted({o for s in S for p in s.get('plan', []) for o in (p.get('options') or []) if not o.startswith('lex:')})
+for _i in _planned:
+    _d = _DID.get(_i)
+    if not _d: continue
+    _m = _d.get('minAgeMonths')
+    if _i in _AGE_UNVERIFIED:
+        if _m is not None: fails.append(f'약 {_i} 에 minAgeMonths 가 생겼습니다 — data.py 의 _AGE_UNVERIFIED 에서 지우세요')
+        continue
+    if _d.get('rx') == '전문': continue
+    if not isinstance(_m, int) or not 0 <= _m <= 240:
+        fails.append(f'약 {_i} 에 아이 나이(minAgeMonths, 개월 정수)가 없습니다 — 증상 계획에 나오는 약이에요(설명서 용법·금기 나이로)'); continue
+    _a = _d.get('ageAskMonths')
+    if _a is not None and (not isinstance(_a, int) or _a <= _m): fails.append(f'약 {_i} ageAskMonths({_a})는 minAgeMonths({_m})보다 커야 합니다')
+    _k = _d.get('kidForm')
+    if _k and _k not in [p.get('name') for p in _d.get('products') or []]: fails.append(f'약 {_i} kidForm 「{_k}」 이 products 에 없습니다')
+    if not any(x in SRC and re.search(r'허가|설명서|e약은요', SRC[x].get('label', '')) for x in _d.get('sources') or []):
+        fails.append(f'약 {_i} 의 아이 나이 근거(식약처 허가사항 출처)가 sources 에 없습니다')
+# 「소아」 칸(kid)은 어른 알약을 보여 주면 안 된다 — 열 화면 「소아」에 타이레놀정 500 mg 이 나오던 것(A6)
+for s in S:
+    for p in s.get('plan', []):
+        if p.get('prod'):
+            _pk = _DID.get(p.get('pick'))
+            if _pk and p['prod'] not in [x.get('name') for x in _pk.get('products') or []]: fails.append(f'증상 {s["id"]} 「{p.get("slot")}」 prod 「{p["prod"]}」 가 {p.get("pick")} 제품에 없습니다')
+        if p.get('kid'):
+            for o in p.get('options') or []:
+                _o = _DID.get(o)
+                if _o and not _o.get('kidForm') and (_o.get('minAgeMonths') is None or _o['minAgeMonths'] >= 144):
+                    fails.append(f'증상 {s["id"]} 아이 칸 「{p.get("slot")}」의 {o} 에 아이용 제품(kidForm)이 없습니다')
 
 print(f'증상 {len(S)} · 약 {len(D)} · 계열 {len(K)} · 영양제 {len(SUP)} · 팁 {len(T)} · 그런줄 {len(_MY)} · 규칙 {len(IX["rules"])} · 출처 {len(SRC)}')
 if fails:
