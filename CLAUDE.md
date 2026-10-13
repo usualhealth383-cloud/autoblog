@@ -4,7 +4,8 @@
 - **시작할 때** yozm-health 저장소 `docs/memory/` 의 세 파일을 차례로 읽는다(붙어 있지 않으면 add_repo 로 붙이기 — 쓰기는 push):
   `medinanum-shared-hub.md`(메디나눔 지금 사실) → `medinanum-session-log.md`(최근 소식) → `shared-lessons.md`(모든 세션의 교훈·현욱님 공통 원칙).
   커밋은 `git pull --no-rebase` 뒤 push. yozm-health 는 커밋 전 현욱님 승인 규칙이 있다.
-- **끝날 때**(또는 큰 실수·현욱님 지적 직후) `shared-lessons.md` 에 교훈 한 줄, 다른 앱에 영향이 가는 변경은 `medinanum-session-log.md` 에 한 줄. yozm-health 에 쓸 수 없으면 이 저장소 `yakjido/교훈-대기.md` 에 적고, 다음 세션이 옮긴다.
+- **끝날 때마다**(또는 큰 실수·현욱님 지적 직후): 다른 세션에 영향이 가는 것을 바꿨거나 새로 배운 것이 있으면 ① 허브(`medinanum-shared-hub.md`)의 맞는 절을 고치고 ② 세션 소식(`medinanum-session-log.md`) **맨 위**에 `- MM-DD · 약지도 · 무엇 → 다른 세션이 할 일` 한 줄 ③ 교훈은 `shared-lessons.md` 에 한 줄.
+  커밋은 `git pull --no-rebase` 뒤 push(⛔ `rebase --autostash` 금지). 비밀 값은 적지 않는다. (2026-10-13 현욱님 공용 지식 지시) yozm-health 에 쓸 수 없으면 이 저장소 `yakjido/교훈-대기.md` 에 적고, 다음 세션이 옮긴다.
 - **현욱님께 묻기 전에** 같은 결정이 이미 있었는지 찾는다 — `yakjido/의사-피드백.md`, 형제 앱(우리 집 소아과 등 yozm-health `med/`), 공통 교훈. 있으면 묻지 않고 따른다.
 
 ## 약지도 (`yakjido/` → 빌드 `docs/yakjido/`)
