@@ -84,6 +84,11 @@ async def main():
                 h = (await home())['rev']; m = re.search(r'오늘의 복습 (\d+)', h); assert m, h
                 parts = [int(x) for x in re.findall(r'(?:다시 볼 문제|개념 카드|지난 소단원) (\d+)', h)]
                 assert sum(parts) == int(m.group(1)), ('홈 복습 수와 줄 글 합이 다름', h)
+                # 결과 줄의 '다음 묶음'과 홈 수가 같고, 하루 몫이 한 묶음보다 많으면 처음부터 모두 몇 개인지 말한다(GPT 검수 #7·#26)
+                if sets: assert nx_prev == int(m.group(1)), ('결과 줄의 다음 묶음 수와 홈 복습 수가 다름', nx_prev, h)
+                tot = await pg.evaluate('revTotal(reviewPlan(MORE.ok))')
+                if tot > int(m.group(1)): assert f'모두 {tot}개' in h, ('하루 몫(모두 n개)을 말하지 않음', tot, h)
+                else: assert '모두' not in h, h
                 await pg.click('#revStart'); await pg.wait_for_timeout(300)
                 items = await pg.evaluate('bs.items.map(q => q.type)'); assert len(items) == int(m.group(1)), ('홈 복습 수와 실제 문항 수가 다름', h, items)
                 if 'card' not in items: assert not await pg.evaluate("bs.items.length && csToday().length"), '오늘 카드가 있는데 세트에 없음'
@@ -92,6 +97,8 @@ async def main():
                     await answer(rev_ok(i)); await pg.click('#bankNext'); await pg.wait_for_timeout(150); i += 1
                 res = await pg.inner_text('#v-bank'); more = await pg.evaluate('reviewPlan(false).items.length')
                 if more: assert '한 묶음을 마쳤어요' in res and await pg.locator('#revMore').count() == 1 and await pg.locator('#bankQuit2').count() == 1, res
+                nx_prev = await pg.evaluate('reviewPlan(MORE.ok).items.length'); rn = await pg.inner_text('#v-bank .revnext')
+                if nx_prev: assert f'{nx_prev}개' in rn and '오늘 남은 복습' in rn, ('결과 줄이 다음 묶음 수를 말하지 않음', nx_prev, rn)
                 else: assert '오늘의 복습을 마쳤어요' in res and await pg.locator('#revMore').count() == 0, res
                 await pg.click('#bankQuit2'); await pg.wait_for_timeout(300); sets += 1; assert sets <= 4, '복습 세트가 끝나지 않음'
             assert (await home())['now'] == 'ps-fin'

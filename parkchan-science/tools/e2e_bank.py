@@ -83,5 +83,19 @@ async def main():
         await pg.click('#v-detail [data-drill="1304"]'); await pg.wait_for_timeout(300); assert await pg.evaluate('bs && bs.items.every(q=>q.lessonId==="1304")')
         await pg.click('#bankQuit'); await pg.wait_for_timeout(200)   # 풀이 중엔 탭 바가 없다(집중 모드) — 나가기로
         await pg.click('.tab[data-v="me"]'); await pg.wait_for_timeout(300); await pg.click('#goStats'); await pg.wait_for_timeout(800); assert '문제 은행 · 소단원별 정답률' in await pg.locator('#v-stats').inner_text()
+        st_txt = await pg.locator('#v-stats').inner_text(); assert '마지막 답 기준' in st_txt and '모든 답' in st_txt, ('통계 정답률 기준이 없음(GPT 검수 #23)', st_txt[:400])
+        # 심화(adv) 문항 — 앱이 고르는 곳·숙련도에서 빠지고, 직접 고르기·원장 '(심화)'에서만(2026-10-13 내용 검수)
+        adv = await pg.evaluate("""(() => { const A = BANK.filter(isAdv), L = '2104', ids = new Set(A.map(q => q.id)), hit = a => a.some(q => ids.has(q.id || (q.q && q.q.id)));
+            const bh0 = S.bh, one = BANK.find(q => q.lessonId === L && !isAdv(q) && !isUM(q)); S.bh = { [one.id]:'o' };   // 배운 소단원 = 2104 하나
+            const recs = [...Array(30)].map(() => recPlan(true).items.map(e => e.q)).flat(), revs = [...Array(30)].map(() => reviewPlan0(true).items.filter(e => e.q).map(e => e.q)).flat(); S.bh = bh0;
+            const near = recs.filter(q => q && q.lessonId === L).length;
+            const ex = examPlan({ id:'a', kind:'exam', title:'t', date:addDays(todayISO(), 5), scope:{ lesson:L } }), plan = ex ? ex.rows.flatMap(r => planItems(r, ex.ls)) : [];
+            const save = S.bh; S.bh = Object.fromEntries(A.map(q => [q.id, 'x'])); const ls = lessonStats()[L]; S.bh = save;
+            const tq = CONCEPTS.filter(c => c.lessonId === L).map(c => todayQ(c)).filter(Boolean);
+            bankSel = { book:'전체', unit:'전체', lesson:L, type:'전체', n:200, only:'전체' };
+            return { n:A.length, near, rec:hit(recs), rev:hit(revs), plan:hit(plan), tq:hit(tq), ls:ls ? ls.n : 0, pick:hit(pickBank(200, true)), direct:hit(bankPool()),
+              asgAll:hit(asgPool({ lesson:L, type:'전체', diff:'전체' })), asgAdv:asgPool({ lesson:L, type:'전체', diff:'심화' }).every(isAdv) && asgPool({ lesson:L, type:'전체', diff:'심화' }).length > 0,
+              dqc:hit(CONCEPTS.filter(c => c.lessonId === L).flatMap(dqcItems)) }; })()""")
+        assert adv['n'] >= 2 and adv['near'] >= 30 and not any(adv[k] for k in ('rec', 'rev', 'plan', 'tq', 'pick', 'asgAll', 'dqc')) and adv['ls'] == 0 and adv['direct'] and adv['asgAdv'], adv
         await b.close(); print('BANK OK', errs); assert not errs
 asyncio.run(main())
