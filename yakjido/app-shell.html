@@ -4199,7 +4199,7 @@ function vSymptom(id){
     const hasHow = ['how', 'pharmacy', 'selfcare', 'avoid', 'faq'].some(k => (s[k] || []).length) || s.notWorking;
     const hasRx = (s.plan || []).length || s.rxCombo || s.lead;
     const nsrc = (s.sources || []).length + (s.srcText || []).length;
-    const T = [['sp1', noBuy ? '먼저 할 일' : '약국에서 사기'], ['sp2', '병원 갈 때', cn], ...(hasHow ? [['sp3', '드시는 법·팁']] : []), ...(hasRx ? [['sp4', '진료실 처방']] : []), ...(nsrc ? [['sp5', '근거', nsrc]] : [])];
+    const T = [['sp1', noBuy ? '먼저 할 일' : '약국에서 사기'], ...(hasHow ? [['sp3', '드시는 법·팁']] : []), ...(hasRx ? [['sp4', '진료실 처방']] : []), ['sp2', '병원 갈 때', cn], ...(nsrc ? [['sp5', '근거', nsrc]] : [])];   /* 탭 순서: 약국에서 사기 → 드시는 법·팁 → 진료실 처방 → 병원 갈 때(현욱님 10-14) */
     return `<nav class="tabs stabs" role="tablist" aria-label="이 증상">${T.map(([k, n, c], i) => `<button class="tab ${i ? '' : 'on'}" role="tab" data-p="${k}">${n}${c ? `<span class="n">${c}</span>` : ''}</button>`).join('')}</nav>`; })()}
   <div class="pane on" id="sp1">
   <section class="sec answer" aria-label="바로 답" style="margin-top:8px">
