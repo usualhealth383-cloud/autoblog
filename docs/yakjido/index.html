@@ -1643,7 +1643,7 @@ background-repeat:no-repeat;background-position:right 9px center;background-size
 window.__YAKJIDO_OK__ = true;
 const D = JSON.parse(document.getElementById('data').textContent || '{}');
 const BUILD = '2026-10-13';
-const DATAV = 'a0e854fbfd'.indexOf('__') === 0 ? BUILD : 'a0e854fbfd';
+const DATAV = 'a863a5d26a'.indexOf('__') === 0 ? BUILD : 'a863a5d26a';
 const BRANDMARK = (typeof window !== 'undefined' && window.__BRANDMARK__) || 'icon-192.png';
 let CORE = 0, CORE_P = null;
 function mergeCore(c){
@@ -3003,7 +3003,7 @@ out.push({ k:'영양제', c:'', t:x.n, d:esc0(x.what), h:'/nut/' + x.id, w:1 });
 (PUB.index || []).forEach(p => { if (m(p.n) || p.i.some(m)) out.push({ k:'식약처', c:'p', t:p.n, d:p.m + ' · ' + p.i.slice(0, 3).join(', '), h:'/pub/' + p.id, w:0 }); });
 if (PUB.pills) { if (!PUB.ezSeq) PUB.ezSeq = new Set((PUB.index || []).map(p => p.seq).filter(Boolean));
 PUB.pills.forEach(p => { if (!PUB.ezSeq.has(p.seq) && m(p.n)) out.push({ k:'식약처', c:'p', t:p.n, d:p.m + (p.ingr ? ' · ' + p.ingr.split('|').slice(0, 3).join(', ') : ''), h:'/pillinfo/' + p.seq, w:-.2 }); }); }
-(PUB.rxn || []).forEach(([n, seq, mk]) => { if (m(n)) out.push({ k:'처방약', c:'', t:n, d:(mk ? mk + ' · ' : '') + '병원 처방이 필요한 약', h:'/pillinfo/' + seq, w:-1 }); });
+(PUB.rxn || []).forEach(([n, seq, mk, rx]) => { if (m(n)) out.push(rx === 0 ? { k:'식약처', c:'p', t:n, d:mk, h:'/pillinfo/' + seq, w:-.3 } : { k:'처방약', c:'', t:n, d:(mk ? mk + ' · ' : '') + '병원 처방이 필요한 약', h:'/pillinfo/' + seq, w:-1 }); });
 const inName = h => { const t = norm(h.t); return many && words.length && words.every(w => t.includes(w)) ? 2 : 0; };
 const sc = h => h.w + (h.k !== '같이' && (h.t || '').toLowerCase().startsWith(q) ? 2 : 0) + ((h.t || '').toLowerCase() === q ? 1 : 0) + inName(h) + (many && h.k === '증상' ? 1 : 0) + (q.length > 1 && norm(h.t).includes(norm(q)) ? .5 : 0) - (h.h?.startsWith('/drug/') && drug(h.h.slice(6))?.rx === '전문' ? 2 : 0);
 const kidBad = h => ADULT_ONLY.test(h.t) || (h.h.startsWith('/drug/') && (drug(h.h.slice(6))?.avoid || []).some(a => (a.flags || []).includes('child')));
@@ -5586,7 +5586,7 @@ kpicLoad();
 const p = findPill(seq);
 if (!p) { if (!PUB.pills) { pubPills().then(route); return `${topBar({ back:'뒤로' })}<p class="loading">불러오는 중…</p>`; } if (!PUB.rx) { Promise.all([pubPillsRx(), rxNames()]).then(route); return `${topBar({ back:'뒤로' })}<p class="loading">처방약 자료를 불러오는 중…</p>`; }
 const rn = (PUB.rxn || []).find(x => x[1] === String(seq)); if (!rn) return vPill();
-return `${topBar({ back:'뒤로' })}<div class="eyebrow">처방약</div><h1 style="font-size:1.25rem">${esc(rn[0].replace(/\(.*?\)/g, ''))}</h1><p class="small muted">${esc(rn[2])}${/\((.+)\)/.test(rn[0]) ? ' · ' + esc(rn[0].match(/\((.+)\)/)[1]) : ''}</p><p style="margin-top:12px">처방약이에요. 용법·용량은 약봉투와 처방한 의사·약사 지시가 우선이에요.</p><div class="links" style="margin-top:12px"><a class="plink" href="https://nedrug.mfds.go.kr/pbp/CCBBB01/getItemDetail?itemSeq=${esc(rn[1])}" target="_blank" rel="noopener">${I.link}식약처 허가정보</a></div>`; }
+return `${topBar({ back:'뒤로' })}<div class="eyebrow">${rn[3] === 0 ? '약국 · 일반의약품' : '처방약'}</div><h1 style="font-size:1.25rem">${esc(rn[0].replace(/\(.*?\)/g, ''))}</h1><p class="small muted">${esc(rn[2])}${/\((.+)\)/.test(rn[0]) ? ' · ' + esc(rn[0].match(/\((.+)\)/)[1]) : ''}</p><p style="margin-top:12px">${rn[3] === 0 ? '사용법은 제품 설명서를 따르고, 궁금하면 약사에게 여쭤 보세요.' : '처방약이에요. 용법·용량은 약봉투와 처방한 의사·약사 지시가 우선이에요.'}</p><div class="links" style="margin-top:12px"><a class="plink" href="https://nedrug.mfds.go.kr/pbp/CCBBB01/getItemDetail?itemSeq=${esc(rn[1])}" target="_blank" rel="noopener">${I.link}식약처 허가정보</a></div>`; }
 const img = pillImg(p); const d = drugByIngr(p.ingr, p);
 const pubHit = (PUB.index || []).find(x => x.seq === p.seq);
 const id = 'pub:' + p.seq; const taking = (ME.taking || []).includes(id) || (d && (ME.taking || []).includes(d.id));
@@ -5790,7 +5790,7 @@ cand.push({ name: n.replace(/\(.*?\)/g, '').trim() || n, kind, href, extra, scor
 const ez = new Set();
 (PUB.index || []).forEach(p => { if (p.seq) ez.add(p.seq); pubHit(p.n, '약국 약', '/pub/' + p.id, p.m, .5); });
 (PUB.pills || []).forEach(p => { if (!ez.has(p.seq)) pubHit(p.n, '약국 약', '/pillinfo/' + p.seq, p.m, .5); });
-(PUB.rxn || []).forEach(([n, seq, mk]) => pubHit(n, '처방약', '/pillinfo/' + seq, mk, 1.5));
+(PUB.rxn || []).forEach(([n, seq, mk, rx]) => pubHit(n, rx === 0 ? '약국 약' : '처방약', '/pillinfo/' + seq, mk, rx === 0 ? .7 : 1.5));
 const seen = new Set();
 return cand.sort((a, b) => b.score - a.score).filter(c => { const k = c.kind + c.name; if (seen.has(k)) return false; seen.add(k); return true; }).slice(0, 8);
 }

@@ -147,6 +147,7 @@ RULES_JS = """()=>{
   const cands=[];
   for(const d of (D.drugs||[])) cands.push(d.id);
   for(const g of (D.ingredients.quick||[])) for(const x of (g.subs||[])) cands.push('cls:'+x.id);
+  for(const x of (D.supplements||[])) cands.push('supp:'+x.id);   /* 영양제도 내 약통에 담긴다 — 철분+제산제·와파린+코엔자임 Q10 규칙(10-13) */
   const info={};
   for(const id of cands){ ME.taking=[id]; ME.pub={};
     const c=new Set(), k=new Set();

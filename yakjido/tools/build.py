@@ -31,11 +31,18 @@ if (pub / 'pills-rx.json').exists() and (pub / 'pills.json').exists() and (pub /
     _seen, _rxl = set(), []
     for _x in _rx:
         if _x.get('seq') and _x['seq'] not in _seen: _seen.add(_x['seq']); _rxl.append([_x['n'], _x['seq'], _x.get('m', '')])
-    (pub / 'names-rx.json').write_text(json.dumps(_rxl, ensure_ascii=False, separators=(',', ':')), encoding='utf-8')
     _oseq = {x['seq'] for x in _ot if x.get('seq')} | {x['seq'] for x in _ez if x.get('seq')}
     _onm = {_nm(x['n']) for x in _ot} | {_nm(x['n']) for x in _ez if x.get('seq')}
     _otc = len(_oseq) + len({_nm(x['n']) for x in _ez if not x.get('seq') and _nm(x['n']) not in _onm})
-    data['public'].update({'prod_otc': _otc, 'prod_rx': len(_rxl)})
+    # 식약처 허가 목록(tools/fetch_mfds.py → tools/permits.json, 시럽·연고·주사까지 모든 허가 제품)이 있으면 그 이름도 — 처방약은 [이름, 코드, 회사], 낱알·e약은요에 없는 약국 약은 끝에 0
+    _pm = ROOT / 'tools' / 'permits.json'
+    if _pm.exists():
+        for _s, _n, _m, _r, _i in json.loads(_pm.read_text(encoding='utf-8')):
+            if not _s or _s in _seen or _s in _oseq: continue
+            if _r: _seen.add(_s); _rxl.append([_n, _s, _m])
+            elif _nm(_n) not in _onm: _oseq.add(_s); _onm.add(_nm(_n)); _otc += 1; _rxl.append([_n, _s, _m, 0])
+    (pub / 'names-rx.json').write_text(json.dumps(_rxl, ensure_ascii=False, separators=(',', ':')), encoding='utf-8')
+    data['public'].update({'prod_otc': _otc, 'prod_rx': sum(1 for x in _rxl if len(x) == 3)})
 # 낱알 사진은 식약처 서버 주소를 그대로 쓴다(저장 안 함). docs/yakjido/img/ 에 파일이 있을 때만 그것을 우선.
 imgdir = ROOT.parent / 'docs' / 'yakjido' / 'img'
 for v in (data.get('productImages') or {}).values():
@@ -139,6 +146,11 @@ if (_pd / 'pills.json').exists() and (_pd / 'easy-index.json').exists():
     _pi = json.loads(_pi.read_text(encoding='utf-8')) if _pi.exists() else {}
     for _x in _pl:
         if not _x.get('ingr') and _pi.get(_x.get('seq')): _x['ingr'] = '|'.join(_pi[_x['seq']]); _n += 1
+    _pm = ROOT / 'tools' / 'permits.json'   # 식약처 허가 목록의 주성분(품목기준코드가 같을 때만)
+    if _pm.exists():
+        _pmi = {x[0]: x[4] for x in json.loads(_pm.read_text(encoding='utf-8')) if x[4]}
+        for _x in _pl:
+            if not _x.get('ingr') and _pmi.get(_x.get('seq')): _x['ingr'] = _pmi[_x['seq']]; _n += 1
     if _n:
         (_pd / 'pills.json').write_text(json.dumps(_pl, ensure_ascii=False, separators=(',', ':')), encoding='utf-8')
         print(f'낱알 성분 채움 {_n}건(같은 품목기준코드 · 식약처 상세)')
