@@ -290,10 +290,21 @@ AUTO_CHOICES = {
 # 한 쪽에 담아, 초전도체 문항의 '개념 그림 보기'가 탄소 신소재 그림으로 갔다. 문항 id 는 그대로, 이어지는 개념 카드만 바로잡는다.
 # 강의용 빈칸 정답을 바꾼 자리 — 오답 보기 후보(pool)에는 옛 정답을 그 자리에 그대로 둔다. 후보 목록이 바뀌면 다른 문항들의 오답 보기가
 # 줄줄이 바뀌기 때문이다(2026-10-13: 1203-05 ㉢ '않는다' → '고체'로 옮기자 다른 문항 13개의 보기가 흔들렸다). 그 문항 자신의 보기는 AUTO_CHOICES 가 정한다.
+# 손으로 고른 자동 빈칸 보기·해설은 소단원마다 data/auto_choices/{소단원}.json 에도 둔다(여러 작성자가 나눠 쓰게 — 2026-10-13 문항 품질 검수).
+# 꼴: {"1203-b1-㉢": {"choices": [오답 셋], "wrong": {"오답": "바로알기", ...}, "explain": "(선택) 정답 해설을 이 글로", "adv": true(선택, 심화)}}
+# 자동 오해 OX(-m…) 처럼 보기가 없는 문항은 "explain"·"adv" 만 쓴다
+AUTO_EXPLAIN = {}
+for _f in sorted((ROOT / 'data' / 'auto_choices').glob('*.json')) if (ROOT / 'data' / 'auto_choices').is_dir() else []:
+    for _id, _v in json.loads(_f.read_text(encoding='utf-8')).items():
+        assert _id not in AUTO_CHOICES, f'{_f.name}: {_id} 가 AUTO_CHOICES 와 겹침'
+        if _v.get('choices'): assert len(_v['choices']) == 3 and set(_v.get('wrong', {})) <= set(_v['choices']), f'{_f.name}: {_id} 보기 셋·바로알기 키'; AUTO_CHOICES[_id] = (_v['choices'], _v.get('wrong', {}))
+        if _v.get('explain'): AUTO_EXPLAIN[_id] = _v['explain']
+        if _v.get('adv'): _ADV_EXTRA = globals().setdefault('_ADV_EXTRA', set()); _ADV_EXTRA.add(_id)
 POOL_AS_BEFORE = {('1203-05', '㉢'): '않는다'}
 
 # '(심화)' 표시 — 본책 문항은 .q/.pq 의 data-adv="1"(docs/24 X5), 강의용 자동 문항은 여기 id 로. 앱이 추천·과제·숙련도에서 뺀다(2026-10-13 GPT 검수 ③ 2104 이온 수 역산)
 ADV_IDS = {'2104-m4-2x', '2104-b4-㉢'}
+ADV_IDS |= globals().get('_ADV_EXTRA', set())   # data/auto_choices/*.json 의 "adv": true
 
 ITEM_CONCEPT = {'1205-c3-2': 5, '1205-c3-3': 5, '1205-q3': 5, '1205-q20': 5, '1205-q22': 5, '1205-u4': 5}
 
@@ -323,8 +334,9 @@ def auto_from_lecture(concepts):
         return ''
 
     def term_def(word, c):
-        """용어표에서 그 말의 뜻 — 같은 개념 → 같은 소단원 → 전체. '라이다(LiDAR)'처럼 괄호가 붙은 용어도 찾는다"""
-        same = [c] + [x for x in concepts if x['lessonId'] == c['lessonId'] and x is not c] + [x for x in concepts if x['lessonId'] != c['lessonId']]
+        """용어표에서 그 말의 뜻 — 같은 개념 → 같은 소단원까지만. '라이다(LiDAR)'처럼 괄호가 붙은 용어도 찾는다.
+        2026-10-13 문항 품질 검수 G3: 다른 소단원까지 찾다가 DNA '염기' 빈칸에 산·염기의 '염기'(OH⁻ 를 내놓는 물질) 뜻이 붙었다 — 같은 낱말 다른 뜻"""
+        same = [c] + [x for x in concepts if x['lessonId'] == c['lessonId'] and x is not c]
         for x in same:
             for t in x.get('terms', []):
                 k = bare_of(t['k'])
@@ -371,6 +383,7 @@ def auto_from_lecture(concepts):
                 # 해설: 답을 채운 원문 + 용어표 정의(없으면 개념 포인트) · 오답 보기: 그 말의 뜻이나 그 말이 원래 채우는 문장
                 d = term_def(bare, c)
                 explain = filled(c, k) + (f' — <b>{bare}</b>: {d}' if d else (' ' + c['point'] if c['point'] else ''))
+                explain = AUTO_EXPLAIN.get(f'{code}-b{no}-{k}', explain)
                 wl = []
                 for j, b in enumerate(ch):
                     if b == v: continue
@@ -830,6 +843,7 @@ def main():
         if it['concept'] and it['lessonId'] in nmax: it['concept'] = min(int(it['concept']), nmax[it['lessonId']])
         if it['id'] in ITEM_CONCEPT: it['concept'] = ITEM_CONCEPT[it['id']]
         if it['id'] in ADV_IDS: it['adv'] = True
+        if it['id'] in AUTO_EXPLAIN: it['explain'] = AUTO_EXPLAIN[it['id']]   # 자동 오해 OX 등 해설을 손으로
     # 같은 OX 문장이 바로바로 체크와 자동(오해/진실)에 두 번 — 본책 것을 남긴다
     key = lambda t: re.sub(r'[\W_]+', '', re.sub(r'<[^>]+>', '', t))
     seen, keep = set(), []
