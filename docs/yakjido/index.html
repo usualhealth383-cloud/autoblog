@@ -1541,7 +1541,7 @@ main>*:nth-child(2){animation-delay:.04s} main>*:nth-child(3){animation-delay:.0
 window.__YAKJIDO_OK__ = true;   /* 여기까지 읽혔다 = 이 브라우저가 아래 문법(?. ?? 등)을 안다. 못 읽으면 머리의 안내문이 뜬다 */
 const D = JSON.parse(document.getElementById('data').textContent || '{}');
 const BUILD = '2026-10-13';
-const DATAV = 'ef4d5b87d3'.indexOf('__') === 0 ? BUILD : 'ef4d5b87d3';
+const DATAV = '7b86e2a331'.indexOf('__') === 0 ? BUILD : '7b86e2a331';
 const BRANDMARK = (typeof window !== 'undefined' && window.__BRANDMARK__) || 'icon-192.png';
 let CORE = 0, CORE_P = null;          /* 0 아직 · 1 받는 중 · 2 준비됨 · 3 실패 */
 function mergeCore(c){
@@ -2944,7 +2944,7 @@ function basket(s, ov){
   }).filter(x => x && x.d);
   const out = [], seen = [];
   for (const x of rows) {
-    const clash = d => { const ks = drugKeys(d); return seen.some(o => !o.either && !x.again && !o.again && o.ks.some(k => ks.includes(k))); };
+    const clash = d => { const ks = drugKeys(d); return seen.some(o => !(o.either && o.either === x.either) && !x.again && !o.again && o.ks.some(k => ks.includes(k))); };   /* 같은 「이 중 하나만」 묶음끼리만 견주지 않는다 — 묶음 밖 칸이 묶음 속 종합약과 겹치면(감기: 위 조건에서 거담제가 구아이페네신으로 바뀌어 콜대원과 겹침) 바꾸거나 뺀다(10-13) */
     if (clash(x.d)) {
       const bad = o => drug(o)?.avoid?.some(a => a.flags?.some(fl => f.includes(fl))) || allergic(o);
       const alt = (x.options || []).map(drug).find(d2 => d2 && !bad(d2.id) && !['전문', '제품별'].includes(d2.rx) && !clash(d2) && !(f.includes('pregnant') && isNsaid(d2)));

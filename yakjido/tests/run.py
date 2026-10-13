@@ -842,6 +842,13 @@ def main():
         # 에텐자미드(근이완 복합제)는 소염 효과가 거의 없어 겹침으로 세지 않는다(현욱님 답, 2026-09-23) — 이제 겹치는 바구니는 0이어야 한다
         for sid, msgs in pdup.items():
             fails.append(f'추천 바구니가 스스로 겹침 {sid}: {msgs[0][:70]}')
+        # 6c-2. 조건을 켠 바구니도(한 가지·두 가지 조합 전부) 스스로 겹치지 않는지 — 위 조건에서 감기 거담제가 구아이페네신으로 바뀌어
+        #       「이 중 하나만」 묶음의 콜대원과 겹치던 것을 잡는다(2026-10-13)
+        pdup2 = pg.evaluate("""()=>{ const FL=['senior','ulcer','kidney','heart','anticoag','pregnant','liver','asthma','alcohol','glaucoma','bph','gout'];
+          const cs=FL.map(a=>[a]); for(let i=0;i<FL.length;i++) for(let j=i+1;j<FL.length;j++) cs.push([FL[i],FL[j]]); const out=[];
+          for(const fl of cs) for(const s of (D.symptoms||[])){ const m=planDup(basket(s,{flags:fl})); if(m.length) out.push(s.id+' ['+fl.join('+')+'] '+String(m[0]).slice(0,60)); }
+          return out; }""")
+        if pdup2: fails.append(f'조건을 켠 추천 바구니가 스스로 겹침 {len(pdup2)}건: {pdup2[:2]}')
         # 규칙이 죽지 않았는지 — 진짜 소염제 두 가지(이부프로펜+나프록센)는 여전히 잡혀야 하고, 이부프로펜+신신플렉스는 잡히면 안 된다
         _pd = pg.evaluate("""()=>[planDup([{d:drug('ibuprofen'),slot:'가'},{d:drug('naproxen'),slot:'나'}]).length, planDup([{d:drug('ibuprofen'),slot:'가'},{d:drug('relax-combo'),slot:'나'}]).length]""")
         if _pd[0] == 0: fails.append('소염제 두 가지(이부프로펜+나프록센) 겹침 경고가 사라짐 — 규칙이 죽었는지 확인')

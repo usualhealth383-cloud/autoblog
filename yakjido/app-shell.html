@@ -3388,7 +3388,7 @@ function basket(s, ov){
   const out = [], seen = [];
   for (const x of rows) {
     /* 「이 중 하나만」 묶음 안의 약과는 견주지 않는다 — 묶음의 다른 쪽을 고르면 겹치지 않으니(그 겹침은 planDup 이 말한다) */
-    const clash = d => { const ks = drugKeys(d); return seen.some(o => !o.either && !x.again && !o.again && o.ks.some(k => ks.includes(k))); };
+    const clash = d => { const ks = drugKeys(d); return seen.some(o => !(o.either && o.either === x.either) && !x.again && !o.again && o.ks.some(k => ks.includes(k))); };   /* 같은 「이 중 하나만」 묶음끼리만 견주지 않는다 — 묶음 밖 칸이 묶음 속 종합약과 겹치면(감기: 위 조건에서 거담제가 구아이페네신으로 바뀌어 콜대원과 겹침) 바꾸거나 뺀다(10-13) */
     if (clash(x.d)) {
       const bad = o => drug(o)?.avoid?.some(a => a.flags?.some(fl => f.includes(fl))) || allergic(o);
       const alt = (x.options || []).map(drug).find(d2 => d2 && !bad(d2.id) && !['전문', '제품별'].includes(d2.rx) && !clash(d2) && !(f.includes('pregnant') && isNsaid(d2)));
