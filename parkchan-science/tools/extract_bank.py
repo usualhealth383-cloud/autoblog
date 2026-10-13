@@ -124,7 +124,7 @@ def parse_chapter(path):
         if n is None: continue
         ps = [p for p in sol.find_all('p', recursive=False)]
         wb = sol.select_one('.wrongbox')
-        sols[n] = {'explain': txt(ps[0]) if ps else '', 'wrong': txt(wb.select_one('p')) if wb and wb.select_one('p') else '',
+        sols[n] = {'explain': ' '.join(txt(p) for p in ps), 'wrong': txt(wb.select_one('p')) if wb and wb.select_one('p') else '',
                    'concept': txt(sol.select_one('.slink'), False)}
         sa = sol.select_one('.sans')                  # 해설 머리의 정답 — 정답표가 비었을 때의 보조
         if sa and txt(sa, False) and not ans.get(n): ans[n] = txt(sa, False)
@@ -147,13 +147,13 @@ def parse_chapter(path):
         for s in stem_el.select('.blankline'): s.replace_with('＿＿＿')
         # 그림 밖 자료(2026-10): 탐구 과정·조건 줄(.exp)과 표(.qtab·.exptab)를 대단원·모의고사와 같은 data(줄)·table(표)로.
         # 예전엔 .exp 가 발문 글자에 이어 붙고(표는 칸이 뭉개져 '원소산소탄소…'), 발문 밖 .exp 는 통째로 빠졌다(2103-q21 반응식)
-        fig = el.select_one('figure svg')
+        fig = el.select_one('figure svg') or el.select_one('.exp svg')   # 1305-q13: [결과] 표를 그림(svg)으로 .exp 안에 그렸다 — 글자로 뭉개지 않게 그림으로
         exps = el.select('.exp')
         tabs = [tb for tb in el.select('table.qtab, table.exptab') if not tb.find_parent('figure')]
         data = []
         for x in exps:
             xc = __import__('copy').copy(x)
-            for f in xc.select('figure, table'): f.extract()      # 그림은 figure 로, 표는 table 로 따로
+            for f in xc.select('figure, table, svg'): f.extract()      # 그림은 figure 로, 표는 table 로 따로
             data += block_lines(xc)
         table = [table_rows(tb) for tb in tabs]
         order = el.find_all(True)
@@ -162,7 +162,15 @@ def parse_chapter(path):
         for x in exps + tabs: x.extract()
         for f in stem_el.select('figure'): f.extract()         # 발문 안에 든 그림의 글자(svg text)가 발문에 섞이지 않게
         stem = txt(stem_el)
-        bogi = el.select_one('.bogi-box')
+        # 자료 상자(머리 '보기' 없는 .bogi-box)가 <보기> 앞에 따로 있으면 그것은 data 로 — 2026-10-13: 첫 상자만 읽어
+        # 2204-q21·2301-q23·2303-q17·22, 1310-q21 의 ㄱㄴㄷ 이 빠져 풀 수 없었다
+        boxes = el.select('.bogi-box')
+        bogi = next((b for b in boxes if b.select_one('.bt')), boxes[-1] if boxes else None)
+        for b in boxes:
+            if b is bogi: continue
+            bc = __import__('copy').copy(b)
+            for br in bc.find_all('br'): br.replace_with('\n')
+            data = [l for l in (re.sub(r'[ \t]+', ' ', x).strip() for x in plain_text(bc, '').split('\n')) if l] + data
         if bogi:
             bt = bogi.select_one('.bt');
             if bt: bt.extract()
@@ -424,18 +432,39 @@ def solutions(soup):
     return sols
 
 
+def stack_svgs(svgs, gap=8):
+    """한 문항의 svg 여러 장을 위아래로 쌓아 한 장으로(앱의 figure 칸은 하나)"""
+    parts, y, w = [], 0.0, 0.0
+    for x in svgs:
+        vb = [float(v) for v in re.split(r'[\s,]+', (x.get('viewBox') or x.get('viewbox') or '').strip()) if v] or [0, 0, float(x.get('width', 300)), float(x.get('height', 100))]
+        vw, vh = vb[2], vb[3]
+        c = __import__('copy').copy(x)
+        for k in ('style', 'width', 'height'): c.attrs.pop(k, None)
+        c['x'], c['y'], c['width'], c['height'] = '0', f'{y:g}', f'{vw:g}', f'{vh:g}'
+        parts.append(str(c)); y += vh + gap; w = max(w, vw)
+    h = y - gap
+    font = svgs[0].get('font-family', 'PC Sans')
+    return BeautifulSoup(f'<svg width="{w:g}" height="{h:g}" viewBox="0 0 {w:g} {h:g}" font-family="{font}">' + ''.join(parts) + '</svg>', 'html.parser').find('svg')
+
+
 def item_common(el, stem_sel):
     """문항 상자에서 그림·자료·표·보기·선지를 읽는다"""
     fig = el.find('svg')                                # 그림은 figure 안에, 모의고사 몇 문항은 자료 상자(.dta) 안에 있다
+    tops = [x for x in el.find_all('svg') if not x.find_parent('svg')]
+    fig0 = fig
+    if len(tops) > 1: fig = stack_svgs(tops)            # M1-q25: 그림 + 코돈표(svg 두 장) — 둘째 장이 빠져 풀 수 없었다(2026-10-13)
     data, table = [], []
     for x in el.select('.exp, .dta'): data += block_lines(x, ('bt',))
     for tb in el.select('table.qtab, table.xt'): table += [table_rows(tb)]
-    bogi = el.select_one('.bogi-box, .bogi')
+    boxes = el.select('.bogi-box, .bogi')               # 머리 '보기' 없는 상자는 자료(위 parse_chapter 와 같음)
+    bogi = next((b for b in boxes if b.select_one('.bt')), boxes[-1] if boxes else None)
+    for b in boxes:
+        if b is not bogi: data = block_lines(b) + data
     source = '\n'.join(block_lines(bogi)) if bogi else ''
     choices = [re.sub(r'^[①②③④⑤]\s*', '', txt(li)) for li in el.select('ul.choices li, ul.ch li')]
     after = False
     if fig is not None:                                # 자료·표가 그림보다 앞에 있으면 앱도 그 차례로(figAfter)
-        order = el.find_all(True); fi = order.index(fig)
+        order = el.find_all(True); fi = order.index(fig0)
         first = min((order.index(x) for x in el.select('.exp, .dta, table.qtab, table.xt')), default=None)
         after = first is not None and first < fi
     return fig, data, table, source, choices, after

@@ -39,6 +39,10 @@ for k in ('bank', 'labs'):
 # '<보기>' 같은 글자가 태그로 오인돼 지워진 흔적
 for it in data['bank']:
     if it['type'] == 'multi' and re.search(r'옳은 것만을\s+에서', it['stem']): bad.append(f'bank {it["id"]}: "<보기>" 가 지워진 듯함')
+    # 2026-10-13 정답 검수: 자료 상자를 <보기>로 읽어 ㄱㄴㄷ 이 빠진 문항 5 · 그림 두 장 중 코돈표 빠짐 · svg 표가 글자로 뭉개짐
+    if it['type'] == 'multi' and re.search(r'ㄱ\s*,|ㄱ\b|^ㄱ$', ' '.join(map(str, it.get('choices', [])))) and 'ㄱ' not in it.get('source', ''): bad.append(f'bank {it["id"]}: 합답형인데 <보기> ㄱ 문장이 없음')
+    if re.search(r'(?<!화살)(?<!대)(?<!목)(?<!지)표는|표와 같이', it['stem']) and not (it.get('table') or it.get('figure') or it.get('data')): bad.append(f'bank {it["id"]}: 발문에 표가 있는데 table·그림이 없음')
+    if re.search(r'(?:[가-힣)])(?:\d+\.\d){3,}', it.get('data', '')): bad.append(f'bank {it["id"]}: 자료의 숫자가 붙어 뭉개진 듯함(표가 글자로)')
 # 개념 덧붙임(data/concept_extras.json — 손으로 만든 원본, 추출기가 덮어쓰지 않음): '왜?' 정교화 질문 + 계산형 예제 → 따라 풀기
 # · 키 = 실제 개념 id · why 는 개념마다 1개(q·a·src) · a 는 그 개념의 src 문단/용어 글과 겹쳐야 한다(새 사실 금지)
 # · example 과 follow 는 짝으로 · 첨자는 <sup>·<sub> 태그로(유니코드 첨자·'H2O'·'10−6' 흔적 금지)
