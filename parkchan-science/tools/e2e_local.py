@@ -30,7 +30,7 @@ async def main():
         ctx, s = await page()
         assert await s.evaluate('view') == 'auth'; await shot(s, 'l01_start')
         await s.click('#goGuest'); await s.wait_for_timeout(300); assert await s.evaluate('view') == 'today'
-        assert '체험' in await txt(s, '.pill'); await shot(s, 'l02_guest_today')
+        assert '최근 7일치' in await txt(s, '.pill'); await shot(s, 'l02_guest_today')   # 무료 범위 = 최근 7일치(2026-10-13: 기간제처럼 보이던 '체험 n일 남음'을 바꿈)
         await s.click('.tab[data-v="list"]'); await s.wait_for_timeout(300)
         assert await s.locator('.row.locked').count() > 100, '게스트에게 잠긴 개념이 없음'
         await s.click('.row.locked'); await s.wait_for_timeout(200); assert await s.locator('#sheetBg').count() == 1; await s.click('#sheetClose')

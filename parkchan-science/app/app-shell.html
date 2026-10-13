@@ -941,7 +941,8 @@ select.sel{font-family:inherit;font-size:var(--t-small);font-weight:700;color:va
 .lab-list .row .n{background:var(--warn-soft);color:var(--warn)}
 /* 대단원 마무리 · 실전 모의고사 · 시험처럼(2026-10) — 손가락 목표 44px 이상, 조용한 색 */
 .tgl{display:flex;align-items:center;gap:10px;min-height:44px;width:100%;margin-top:10px;padding:0 12px;border:1px solid var(--line);border-radius:var(--r-m);background:var(--card);color:var(--body);font-family:inherit;font-size:var(--t-small);font-weight:700;cursor:pointer;text-align:left}
-.tnote{margin:12px 0 4px;padding:12px 14px;border-radius:var(--r-m);background:var(--u-soft);border:1px solid var(--u-line)}.tnote{display:block}.tnote .tk{display:block;font-size:var(--t-cap);font-weight:700;color:var(--u-dark);margin-bottom:4px}.tnote p{margin:0;font-size:var(--t-body);line-height:1.7;color:var(--ink);word-break:keep-all}
+/* 선생님 한 마디 상자 — 2026-10-13 홈 노트 줄(.tnote)과 이름이 같아 홈 노트 줄이 세로로 깨지던 것 → .tchnote */
+.tchnote{display:block;margin:12px 0 4px;padding:12px 14px;border-radius:var(--r-m);background:var(--u-soft);border:1px solid var(--u-line)}.tchnote .tk{display:block;font-size:var(--t-cap);font-weight:700;color:var(--u-dark);margin-bottom:4px}.tchnote p{margin:0;font-size:var(--t-body);line-height:1.7;color:var(--ink);word-break:keep-all}
 .tnoteed h2 small{font-size:var(--t-cap);font-weight:700;color:var(--muted);margin-left:6px}
 .gsee h2{margin-top:6px}.gsee .gl{margin:4px 0 12px;padding-left:18px;font-size:var(--t-small);line-height:1.75;color:var(--body);word-break:keep-all}.gsee .gl.no{color:var(--muted)}
 .tgl .sw{position:relative;flex:0 0 36px;height:20px;border-radius:var(--r-pill);background:var(--line);transition:background-color .15s ease}
@@ -1334,6 +1335,7 @@ button.pill::before,.notice button::before,.mini::before,.chipbar button::before
 .kv:last-child{border:none}
 .kv .k{color:var(--muted)}
 .kv .v{font-weight:700;font-variant-numeric:tabular-nums}
+.toast.top{bottom:auto;top:calc(14px + var(--sat))}
 .toast{pointer-events:none;position:fixed;left:50%;bottom:calc(92px + var(--sab));transform:translateX(-50%);background:var(--ink);color:var(--paper);font-size:var(--t-small);font-weight:700;padding:10px 16px;border-radius:var(--r-pill);z-index:40;box-shadow:var(--shadow);animation:tst 2.4s forwards;max-width:86%;text-align:center}
 @keyframes tst{0%{opacity:0;transform:translate(-50%,8px)}12%{opacity:1;transform:translate(-50%,0)}80%{opacity:1}100%{opacity:0}}
 /* ═══ 개념 상세 — 읽기 전에 O/X · ①②③→그림→포인트→[본문 펼치기] · 용어 말풍선 · 확인 문제(그 개념 OX) · 풀이 화면 그림 단서
@@ -1684,7 +1686,7 @@ const CFG = {
   classes: [{cls:'월목반',start:'18:00'},{cls:'화금반',start:'17:30'},{cls:'수토반',start:'17:30'}],   // 화금·수토 = 고1 예비반 오후 5시 30분(2026-10-12 원장님) · 월목반 [확인 필요]
   phone: '053-213-3577', kakao: '', email: 'stepfirst@naver.com',   // 학원 연락처(2026-10-12 원장님) — 비어 있으면 그 줄이 숨는다
   /* 스토어 상품은 모두 '일회성 이용권'(자동 결제 없음 — 미성년 이용자가 모르게 결제가 이어지지 않게). sku 는 Play Console 상품 ID 와 같아야 한다 */
-  plans: [ { id:'m1', sku:'pass_m1', name:'월 이용권', days:30, months:1, price:9900, sub:'한 달 · 자동 결제 없음' }, { id:'m6', sku:'pass_m6', name:'6개월 이용권', days:180, months:6, price:39000, sub:'34 % 할인 · 자동 결제 없음' }, { id:'y1', sku:'pass_y1', name:'12개월 이용권', days:365, months:12, price:59000, sub:'51 % 할인 · 월 4,900원꼴 · 자동 결제 없음', best:true } ],
+  plans: [ { id:'m1', sku:'pass_m1', name:'월 이용권', days:30, months:1, price:9900, sub:'한 달 · 자동 결제 없음' }, { id:'m6', sku:'pass_m6', name:'6개월 이용권', days:180, months:6, price:39000, sub:'자동 결제 없음' }, { id:'y1', sku:'pass_y1', name:'12개월 이용권', days:365, months:12, price:59000, sub:'자동 결제 없음', best:true } ],
   push: '__PUSH__' === 'on',          // build.py 가 server/config.json 의 "push": true 를 보고 켠다(google-services.json 이 있어야 함)   // 2026-09-08 결정: 월 9,900 · 수강생 무료
 };
 
@@ -1707,7 +1709,7 @@ const daysBetween = (a,b) => Math.round((Date.parse(b)-Date.parse(a))/86400000);
 const addDays = (iso, n) => { const d=new Date(iso+'T00:00:00'); d.setDate(d.getDate()+n); return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`; };
 const tel = t => String(t??'').replace(/[^0-9+\-]/g,'');
 const esc = t => String(t??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-const rich = t => esc(t).replace(/&lt;(\/?)(b|sup|sub)&gt;/g,'<$1$2>')
+const rich = t => esc(t).replace(/&lt;(\/?)(b|sup|sub)&gt;/g,'<$1$2>').replace(/(\d) (?=(?:[nμµmckMGT]?(?:m|g|s|L|J|W|N|V|A|Hz|Pa|K|mol|cd|B)|kg|°C|℃|%)(?![A-Za-z]))/g, '$1\u00A0')   // 숫자와 단위가 줄에서 갈리지 않게(2026-10-13 검수 '1 / mm')
   .replace(/\{\{(.+?)\}\}/g, (_,m) => `<button class="blank" data-b="${m}">${m}</button>`);
 /* 태그를 걷되 위·아래 첨자는 유니코드로 살린다(10<sup>−10</sup> → 10⁻¹⁰, H<sub>2</sub>O → H₂O) — 검색·공유·원장 목록에서도 뜻이 남게 */
 const SUP = { '0':'⁰','1':'¹','2':'²','3':'³','4':'⁴','5':'⁵','6':'⁶','7':'⁷','8':'⁸','9':'⁹','-':'⁻','−':'⁻','+':'⁺','n':'ⁿ' }, SUB = { '0':'₀','1':'₁','2':'₂','3':'₃','4':'₄','5':'₅','6':'₆','7':'₇','8':'₈','9':'₉','+':'₊','-':'₋' };
@@ -1769,7 +1771,8 @@ function drawNet(){
 }
 window.addEventListener('online',  () => { setNet(false); drawNet(); });
 window.addEventListener('offline', drawNet);
-const toast = msg => { const t=document.createElement('div'); t.className='toast'; t.setAttribute('aria-hidden','true'); t.textContent=msg; document.body.appendChild(t); setTimeout(()=>t.remove(),2500);
+/* 아래에서 올라온 시트·채점 시트가 있으면 위쪽에 띄운다 — 2026-10-13 검수: 시트의 주 버튼을 토스트가 덮었다 */
+const toast = msg => { const t=document.createElement('div'); t.className='toast' + (document.querySelector('#sheet .sheet, .verdict.fb') ? ' top' : ''); t.setAttribute('aria-hidden','true'); t.textContent=msg; document.body.appendChild(t); setTimeout(()=>t.remove(),2500);
   const lv = document.getElementById('live'); if (lv){ lv.textContent = ''; setTimeout(() => { lv.textContent = msg; }, 30); } };   // 화면낭독기는 늘 있는 알림 칸(role=status)으로 읽는다
 const Cap = window.Capacitor, isNative = !!(Cap && Cap.isNativePlatform && Cap.isNativePlatform());
 const plug = n => (Cap && Cap.Plugins && Cap.Plugins[n]) || null;
@@ -2666,7 +2669,7 @@ function csAnswer(v){
   save(S); renderBankSession(); document.querySelector('#v-bank .verdict.fb .btn')?.focus({ preventScroll:true }); }
 if (csEnsure()) saveLocal();   // 이 기능 전에 공부한 개념도 카드로(첫 복습은 내일)
 /* 확신도 한 탭 — 답을 고르기 전에 '확신 / 헷갈림'(선택, 다시 누르면 풀림). 채점에는 쓰지 않고 상자 규칙에만 쓴다 */
-const confRow = cur => `<div class="conf" role="group" aria-label="답을 고르기 전에 얼마나 확신하는지 고를 수 있어요(선택)"><span class="k">고르기 전에 · 선택</span>${[['s','확신'],['u','헷갈림']].map(([k, l]) => `<button type="button" data-conf="${k}" aria-pressed="${cur === k}">${l}</button>`).join('')}</div>`;
+const confRow = cur => `<div class="conf" role="group" aria-label="답을 고르기 전에 얼마나 확신하는지 고를 수 있어요(선택)"><span class="k">얼마나 자신 있어요? · 선택</span>${[['s','확신'],['u','헷갈림']].map(([k, l]) => `<button type="button" data-conf="${k}" aria-pressed="${cur === k}">${l}</button>`).join('')}</div>`;
 const confNote = (conf, ok) => conf === 's' && !ok ? `<p class="confnote">확신했는데 틀렸어요 — 이런 문제가 가장 잘 고쳐져요</p>` : '';
 /* 날짜별 푼 수·맞힌 수(최근 28일만, 진도 JSON 을 작게) — 원장 '처리할 것'의 정답률 급락 판정용. dq: { 'YYYY-MM-DD': [푼 수, 맞힌 수] } */
 const statDay = ok => { const t = todayISO(); if (!S.dq || typeof S.dq !== 'object' || Array.isArray(S.dq)) S.dq = {}; const r = S.dq[t] ||= [0, 0]; r[0]++; if (ok) r[1]++;
@@ -2686,7 +2689,9 @@ let detailBack = null;   // 문제 화면에서 '이 개념 다시 보기'로 �
 const dueWord = d => { const n = daysBetween(todayISO(), d); return n <= 0 ? '오늘' : n === 1 ? '내일' : `${kdate(d)}(${n}일 뒤)`; };
 const srsLine = r => !r ? '' : r.st === 'new' ? `↻ 오답 노트에 담았어요 · <b>${dueWord(r.d)}</b> 한 번 더 물어볼게요`
   : r.st === 'reset' ? `↻ 한 번 더 담아 둘게요 · <b>${dueWord(r.d)}</b> 다시 물어볼게요`
-  : r.st === 'up' ? `✓ 간격을 넓혀요 · 다음 복습은 <b>${dueWord(r.d)}</b>이에요`
+  : r.st === 'up' ? (r.w && examLeft(lessonOfW(r.w)) !== null && srsGap(r.w.x, lessonOfW(r.w)) < SRS[Math.min(5, Math.max(1, r.w.x)) - 1]
+      ? `✓ 맞았어요 · 시험이 가까워 간격을 좁혀 <b>${dueWord(r.d)}</b> 한 번 더 볼게요`   // 2026-10-13 검수: 시험 압축으로 '내일'인데 '간격을 넓혀요'라 앞뒤가 안 맞았다
+      : `✓ 간격을 넓혀요 · 다음 복습은 <b>${dueWord(r.d)}</b>이에요`)
   : r.st === 'clear' ? '✓ 이제 됐어요 — 오답 노트에서 정리돼요'
   : r.st === 'hold' ? `헷갈렸다면 아직 익는 중이에요 · <b>${dueWord(r.d)}</b> 한 번 더 물어볼게요`
   : r.st === 'early' ? `맞았어요 · 복습 날짜는 그대로 <b>${dueWord(r.d)}</b>이에요` : '';
@@ -3206,7 +3211,7 @@ async function renderToday(){
       ${S.auth && authLive()   // 출석은 수강생에게만(2026-10-07 원장님) — 수강 기간이 끝난 코드에도 뜨지 않게
         ? (myAtt ? `<span class="pill"><svg viewBox="0 0 24 24"><path d="M4 12.5l5.5 5.5L20 7"/></svg> ${myAtt.time} 출석${myAtt.late?' · 지각':''}</span>`
                  : `<button class="pill att-pill todo" id="attOpen"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="3"/><path d="M8 12h8M12 8v8"/></svg> 출석 체크</button>`)
-        : (hasPass() ? `<span class="pill">이용권 ~${kdate(ACC.passUntil)}</span>` : trialLeft === null ? '' : `<button class="pill warn" id="goPlansPill">체험 ${trialLeft}일 남음</button>`)}
+        : (hasPass() ? `<span class="pill">이용권 ~${kdate(ACC.passUntil)}</span>` : trialLeft === null ? '' : `<button class="pill warn" id="goPlansPill">무료 · 최근 ${FREE_DAYS}일치</button>`)}
     </div>
     ${consentCard('today')}
     ${unreadNotice ? `<div class="notice"><div class="ic">!</div><div class="b"><div class="t">${esc(unreadNotice.t)}</div><div class="d">${esc(unreadNotice.d)} · ${esc(unreadNotice.cls)}</div></div><button id="okNotice" data-id="${unreadNotice.id}">확인</button></div>` : ''}
@@ -3250,7 +3255,7 @@ function renderQuiz(){
     ${qtop('backToday', '그만 풀기')}
     <h1 class="sr">${mode==='review'?'복습 문제':'오늘의 문제'}</h1>
     <div class="qhead"><span class="l">${label}${mode==='review'?` · ${esc(qState.lessonName||'')}`:''}</span>
-      <span class="tag">${retry ? `${kdate(retry.iso)}에 틀림` : (graded && pick!==q.answer ? '다시 볼 문제' : (q.type||'확인'))}</span></div>
+      <span class="tag">${retry ? `${kdate(retry.iso)}에 틀림` : (graded && pick!==q.answer ? '다시 볼 문제' : (TYPE_NAME[q.type]||'확인'))}</span></div>
     ${retry ? `<p class="again">↻ 전에 갈렸던 문제예요. 이번엔 어디서 갈리는지 봐요.</p>` : ''}
     ${q.id ? qBody(q, '') : `<p class="stem">${rich(q.stem)}</p>
     ${q.source ? `<div class="bogi">${rich(q.source)}</div>`:''}
@@ -3951,6 +3956,7 @@ async function renderPlan(){
   const upcoming = dds.filter(d => dLeft(d.date) >= 0);
   const cur = dds.find(d => d.id === planDday) || upcoming[0] || dds[dds.length-1] || null;
   const evAll = myEvents(), soon = evAll.filter(e => dLeft(e.date) >= 0).slice(0, 8);
+  const exNext = cur ? null : soon.find(e => e.kind === 'exam');   // D-day 를 따로 안 넣었어도 다가오는 시험 일정이 있으면 그것을 맨 위에(2026-10-13 검수: 'D-day 없음' 아래에 D-9 시험이 있었다)
   const onDay = [...fixedOn(day).map(f => ({ fixed:true, ...f })), ...evAll.filter(e => e.date === day)];
   const week = [...Array(7)].map((_,i) => { const iso = addDays(todayISO(), i); return { iso,
     has: fixedOn(iso).length > 0 || evAll.some(e => e.date === iso) }; });
@@ -3962,8 +3968,11 @@ async function renderPlan(){
         <div class="d">${kdate(cur.date)} ${WD[wdOf(cur.date)]}요일</div>
         ${dds.length > 1 ? `<div class="others">${dds.map(d=>`<button data-dd="${d.id}" class="${d.id===cur.id?'on':''}">${esc(d.title)} ${ddayText(dLeft(d.date))}</button>`).join('')}</div>` : ''}
       </div>`
-      : `<div class="dday"><div class="k">D-day가 없습니다</div><div class="v" style="font-size:var(--t-h1);color:var(--muted);letter-spacing:-.01em">시험일을 넣어 두세요</div>
-        <div class="d">수능·중간고사·기말고사·모의고사까지 남은 날을 매일 보여 드립니다.</div>
+      : exNext ? `<div class="dday"><div class="k">${esc(exNext.title)}까지</div><div class="v">${ddayText(dLeft(exNext.date))}</div>
+        <div class="d">${kdate(exNext.date)} ${WD[wdOf(exNext.date)]}요일${exNext.acad ? ' · 학원 일정' : ''}</div>
+        ${examPlan(exNext) ? `<button class="btn soft" data-eplan="${esc(exNext.id)}" style="margin:12px 0 0">시험까지 계획 보기</button>` : ''}</div>`
+      : `<div class="dday"><div class="k">D-day가 없어요</div><div class="v" style="font-size:var(--t-h1);color:var(--muted);letter-spacing:-.01em">시험일을 넣어 두세요</div>
+        <div class="d">수능·중간고사·기말고사·모의고사까지 남은 날을 매일 보여 드려요.</div>
         <button class="btn soft" data-ddnew style="margin:12px 0 0">시험일 넣기</button></div>`}
 
     <div class="sec"><h2><span>${kdate(day)} ${WD[wdOf(day)]}요일</span>${day!==todayISO()?`<button class="more" id="planToday">오늘로</button>`:''}</h2>
@@ -4077,14 +4086,14 @@ function planItems(row, all){
   else { const sp = shuffleArr(all); for (let g = 0; out.length < row.n && g < sp.length * 6; g++) grab(sp[g % sp.length], 1, true); }   // 약한 곳 기록이 없으면 범위 전체에서 고르게
   const ten = out.slice(0, row.n), mixed = interleave(ten); return [...mixed, ...ten.filter(x => !mixed.includes(x))].map(x => x.q);
 }
-const planRowText = r => r.kind === 'mix' ? `섞어 풀기 ${r.n}문제 <small>${r.lessons.length ? `약한 곳 ${r.lessons.map(l => lessonLabel(l).split(' ')[0]).join('·')} 먼저` : '범위 전체에서 고르게 · 꼭 볼 문제 먼저'}</small>`
+const planRowText = r => r.kind === 'mix' ? `섞어 풀기 ${r.n}문제 <small>${r.lessons.length ? `약한 곳 ${r.lessons.map(l => lessonLabel(l).split(/[\s\u00A0]/)[0]).join('·')} 먼저` : '범위 전체에서 고르게 · 꼭 볼 문제 먼저'}</small>`
   : r.kind === 'weak' ? (r.lessons.length ? `약한 곳 다시 ${r.n}문제 <small>${r.lessons.map(l => esc(lessonLabel(l))).join(' · ')}</small>` : `범위 전체 다시 ${r.n}문제 <small>틀린 문제 먼저 · 고르게 섞어서</small>`)
   : `${r.lessons.map(l => esc(lessonLabel(l))).join(' · ')} <small>${r.n}문제${r.lessons.length === 1 ? ' · 개념도 같이 보면 좋아요' : ''}</small>`;
 function openExamPlan(id){
   const e = myEvents().find(x => x.id === id), P = examPlan(e); if (!P){ toast('범위를 건 시험 일정에서만 계획을 짤 수 있어요'); return; }
   const done = ((S.epd || {})[e.id] || '') === todayISO();
   openSheet(`<h3>시험까지 계획 <span style="font-size:var(--t-cap);color:var(--muted);font-weight:700">${esc(e.title)} · D-${P.d}</span></h3>
-    <p class="tip" style="margin:0 0 10px">${esc(scopeName(e.scope))} · 하루 10문제쯤, 마지막 ${P.rows.filter(r => r.kind === 'mix').length || 0}일은 섞어 풀기예요. 하루 빠져도 열 때마다 남은 날에 맞춰 다시 짜요.</p>
+    <p class="tip" style="margin:0 0 10px">${esc(scopeName(e.scope))} · 평소엔 하루 10문제, 마지막 ${P.rows.filter(r => r.kind === 'mix').length || 0}일은 섞어서 20문제예요. 하루 빠져도 열 때마다 남은 날에 맞춰 다시 짜요.</p>
     <ol class="eplan">${P.rows.map((r, i) => `<li class="${i === 0 ? 'now' : ''}"><span class="dt">${i === 0 ? '오늘' : `${+r.date.slice(5, 7)}/${+r.date.slice(8)}`}<small>${WD[wdOf(r.date)]}</small></span><span class="tx">${planRowText(r)}</span>${i === 0 ? (done ? '<span class="cst ok">끝</span>' : '') : ''}</li>`).join('')}
       <li class="ex"><span class="dt">${+e.date.slice(5, 7)}/${+e.date.slice(8)}<small>${WD[wdOf(e.date)]}</small></span><span class="tx"><b>${esc(e.title)}</b></span></li></ol>
     <p class="fine" style="text-align:left;padding:2px 2px 10px">오늘의 복습(다시 볼 문제)은 따로 나와요 — 시험이 가까우면 간격도 알아서 좁혀져요.</p>
@@ -4312,7 +4321,7 @@ function drawBankSession(){
   if (sp) body = `<button class="linkbtn sjtog" id="sjTog" aria-pressed="${!!bs.stepOn}">${bs.stepOn ? '선지에서 한 번에 고르기' : 'ㄱ·ㄴ·ㄷ 하나씩 판정하기'}</button>` + body;
   const ok = graded && bankCorrect(q, bs.pick), essay = q.type === 'essay', selfGrade = essay && bs.pick === '?';
   /* 아직 안 풀었을 때 화면 아래가 비어 보이지 않도록, 유형에 맞는 한 줄 안내를 둔다 */
-  const HINT = { ox:'맞으면 O, 틀리면 X를 골라요.', mc:'하나만 고르면 바로 채점해요.',
+  const HINT = { ...(sp && bs.stepOn ? { multi:'보기를 하나씩 판정하면 답이 정해져요.' } : {}), ox:'옳으면 O, 틀리면 X를 골라요.', mc:'하나만 고르면 바로 채점해요.',
     multi:'자료와 보기를 함께 보고 하나를 골라요.', blank:'정답만 짧게 적으면 돼요 — 띄어쓰기·가운뎃점은 보지 않아요.',
     essay:'문장으로 써 본 뒤 모범 답안과 견주어 스스로 채점해요.' }[q.type] || '';
   const right = q.type==='mc'||q.type==='multi' ? ` · 정답 ${MARKS[q.answer-1]}` : q.type==='ox'||q.type==='blank' ? ` · 정답 ${esc(q.answer)}` : '';
@@ -4381,7 +4390,7 @@ function qBody(q, zoom){
   const ask = q.ask ? `<p class="ask">${rich(q.ask)}</p>` : '', src = q.source ? `<div class="bogi">${rich(q.source).replace(/\n/g,'<br>')}</div>` : '';
   return `<p class="stem">${rich(q.stem)}</p>${q.figAfter ? dat + fig : fig + dat}${isUM(q) ? ask + src : src + ask}`;
 }
-const lessonLabel = id => { const L = LESSONS.find(x => x.id === id); return L ? `${L.unit}-${L.id.slice(2)} ${L.name}` : id; };
+const lessonLabel = id => { const L = LESSONS.find(x => x.id === id); return L ? `${L.unit}-${L.id.slice(2)}\u00A0${L.name}` : id; };   // 번호와 이름 사이는 줄바꿈 없는 띄어쓰기(2026-10-13 검수: 'I-02 / 기본량과 단위'로 갈림)
 const fmtPt = n => String(+(+n || 0).toFixed(1));
 const clockText = ms => { const t = Math.max(0, Math.ceil(ms / 1000)); return `${Math.floor(t / 60)}:${pad(t % 60)}`; };
 
@@ -5013,22 +5022,22 @@ function renderMe(){
         <div class="who">${esc(ACC.name)}${roleName?` <span style="font-size:var(--t-small);color:var(--muted);font-weight:700">${roleName}</span>`:''}</div>
         <div class="where">${esc(ACC.email)}</div>
         <dl>
-          ${a ? `<div class="row"><dt>학원</dt><dd><b>${esc(CFG.academy)} ${esc(a.cls)}</b> · ${kdate(a.until)}까지</dd></div><div class="row"><dt>공지</dt><dd><b>${esc(a.cls)}</b> 공지를 받고, 홈에서 출석을 칩니다</dd></div>` : ''}
-          ${ACC.role==='parent' ? `<div class="row"><dt>자녀</dt><dd>${ACC.childCodes.length?`<b>${ACC.childCodes.length}명</b> 연결됨 · ${ACC.childCodes.map(esc).join(', ')}`:'아직 연결하지 않았습니다'}</dd></div>` : ''}
+          ${a ? `<div class="row"><dt>학원</dt><dd><b>${esc(CFG.academy)} ${esc(a.cls)}</b> · ${kdate(a.until)}까지</dd></div><div class="row"><dt>공지</dt><dd><b>${esc(a.cls)}</b> 공지를 받고, 홈에서 출석을 체크해요</dd></div>` : ''}
+          ${ACC.role==='parent' ? `<div class="row"><dt>자녀</dt><dd>${ACC.childCodes.length?`<b>${ACC.childCodes.length}명</b> 연결됨 · ${ACC.childCodes.map(esc).join(', ')}`:'아직 연결하지 않았어요'}</dd></div>` : ''}
           <div class="row"><dt>진도</dt><dd>${SRV ? '서버에 저장 — 기기를 바꿔도 이어집니다' : '이 기기에 저장 (서버 연동 전)'}</dd></div>
         </dl></div>`
-      : `<div class="codebox"><h3>가입 없이 둘러보는 중</h3><p>로그인하면 진도가 계정에 저장되고, 학원 코드·이용권을 등록할 수 있습니다.</p><button class="btn sm" id="goAuth" style="width:100%">로그인 · 회원가입</button></div>`}
+      : `<div class="codebox"><h3>가입 없이 둘러보는 중</h3><p>로그인하면 진도가 계정에 저장되고, 학원 코드·이용권을 등록할 수 있어요.</p><button class="btn sm" id="goAuth" style="width:100%">로그인 · 회원가입</button></div>`}
     ${consentCard('me')}
-    ${ACC && ACC.role==='student' && !a ? `<div class="codebox"><h3>학원 코드 등록</h3><p>원장님께 받은 6자리 코드를 넣으면 전 범위가 열리고 <b>내 반 공지</b>와 출석이 연결됩니다.</p>
+    ${ACC && ACC.role==='student' && !a ? `<div class="codebox"><h3>학원 코드 등록</h3><p>원장님께 받은 6자리 코드를 넣으면 전 범위가 열리고 <b>내 반 공지</b>와 출석이 연결돼요.</p>
         <div class="f"><input id="codeIn" class="code" placeholder="코드 6자리" maxlength="6" autocomplete="off" autocapitalize="characters"><button id="codeGo">등록</button></div>${codeErr?`<div class="err">${esc(codeErr)}</div>`:''}
         ${DBX.mode==='local' ? `<div class="demo">시연용 코드 — <code>MON123</code> 월목반 · <code>TUE456</code> 화금반 · <code>WED789</code> 수토반</div>` : ''}</div>` : ''}
-    ${ACC && ACC.role==='parent' && !ACC.childCodes.length ? `<div class="codebox"><h3>자녀 연결</h3><p>자녀가 받은 학원 코드 6자리를 넣으면 출석·진도·공지를 볼 수 있습니다.</p>
+    ${ACC && ACC.role==='parent' && !ACC.childCodes.length ? `<div class="codebox"><h3>자녀 연결</h3><p>자녀가 받은 학원 코드 6자리를 넣으면 출석·진도·공지를 볼 수 있어요.</p>
         <div class="f"><input id="childIn" class="code" placeholder="자녀 코드 6자리" maxlength="6" autocomplete="off" autocapitalize="characters"><button id="childGo">연결</button></div>${childErr?`<div class="err">${esc(childErr)}</div>`:''}</div>` : ''}
     ${ACC && ACC.role!=='owner' && !a ? `<button class="setrow go" id="goPlans"><span class="l">이용권<small>${hasPass()?`${kdate(ACC.passUntil)}까지 · 연장하기`:'전 범위 열기 · 이용권 코드 등록'}</small></span><span class="v">보기</span></button>` : ''}
-    ${ACC ? `<button class="setrow go" id="nickOpen"><span class="l">이야기 닉네임<small>${ACC.nick ? esc(ACC.nick) : '아직 정하지 않았습니다 · 글을 쓰려면 필요합니다'}</small></span><span class="v">${ACC.nick?'바꾸기':'정하기'}</span></button>` : ''}
-    ${ACC && !isOwner() ? `<button class="setrow go" id="blockOpen"><span class="l">차단한 사용자<small>${(S.blocked||[]).length}명 · 이야기에서 보이지 않습니다</small></span><span class="v">관리</span></button>` : ''}
+    ${ACC ? `<button class="setrow go" id="nickOpen"><span class="l">이야기 닉네임<small>${ACC.nick ? esc(ACC.nick) : '아직 정하지 않았어요 · 글을 쓰려면 필요해요'}</small></span><span class="v">${ACC.nick?'바꾸기':'정하기'}</span></button>` : ''}
+    ${ACC && !isOwner() ? `<button class="setrow go" id="blockOpen"><span class="l">차단한 사용자<small>${(S.blocked||[]).length}명 · 이야기에서 보이지 않아요</small></span><span class="v">관리</span></button>` : ''}
     <button class="setrow go" id="goHelp"><span class="l">마음이 힘들 때<small>24시간 상담 109 · 청소년 상담 1388</small></span><span class="v">보기</span></button>
-    <button class="setrow go" id="goNoteMe"><span class="l">공부 노트 · 달력<small>${liveNotes().length ? `노트 ${liveNotes().length}개 · 나만 봅니다` : '오늘 공부한 내용을 정리하는 나만의 메모장'}</small></span><span class="v">열기</span></button>
+    <button class="setrow go" id="goNoteMe"><span class="l">공부 노트 · 달력<small>${liveNotes().length ? `노트 ${liveNotes().length}개 · 나만 봐요` : '오늘 공부한 내용을 정리하는 나만의 메모장'}</small></span><span class="v">열기</span></button>
     <button class="setrow go" id="goStats"><span class="l">학습 통계<small>이번 주 ${weekCount(S.days)}일 · 공부한 개념 ${S.done.length}/${CONCEPTS.length} · 정답률 ${S.stats.a?Math.round(S.stats.c/S.stats.a*100):0}%</small></span><span class="v">보기</span></button>
     ${a && ACC && ACC.role === 'student' ? `<button class="setrow go" id="guardSee"><span class="l">보호자에게 보이는 것<small>학원이 확인한 보호자 화면 · 미리 보기</small></span><span class="v">보기</span></button>` : ''}
     <button class="setrow go" id="qKeepOpen"><span class="l">보관한 한 마디<small>${(S.qkeep||[]).length}개 · 오늘의 한 마디에서 담은 글</small></span><span class="v">보기</span></button>
@@ -5054,26 +5063,28 @@ function renderMe(){
       <button class="setrow go" data-legal="delete"><span class="l">계정·데이터 삭제 안내</span><span class="v"></span></button>
       <button class="setrow go" data-legal="about" style="border:none"><span class="l">앱 정보</span><span class="v">v${CFG.version}</span></button></div>
     ${ACC ? `<button class="linkbtn danger" id="delAccount">계정 삭제</button>` : ''}`;
-  if (document.getElementById('myGuard')) DBX.myGuardians().then(g => { const el = document.getElementById('myGuard'); if (el) el.textContent = g.length ? `${g.map(x => x.name || '이름 없음').join(', ')} · 학원이 확인한 보호자만 봅니다` : '아직 없습니다 · 모르는 사람이 보이면 원장님께 알려 주세요'; })
-    .catch(() => { const el = document.getElementById('myGuard'); if (el) el.textContent = '지금은 확인하지 못했습니다'; });
+  if (document.getElementById('myGuard')) DBX.myGuardians().then(g => { const el = document.getElementById('myGuard'); if (el) el.textContent = g.length ? `${g.map(x => x.name || '이름 없음').join(', ')} · 학원이 확인한 보호자만 봐요` : '아직 없어요 · 모르는 사람이 보이면 원장님께 알려 주세요'; })
+    .catch(() => { const el = document.getElementById('myGuard'); if (el) el.textContent = '지금은 확인하지 못했어요'; });
 }
 
 /* ═══ 이용권 ═══ */
+/* 할인율은 월 이용권 값 × 달 수와 견줘 계산하고 내림한다 — 2026-10-13 검수: 손으로 적은 '51 %'가 실제(50.3 %)보다 컸다(표시·광고 부풀림 금지) */
+const planOff = p => { const m = CFG.plans.find(x => x.months === 1); return m && p.months > 1 ? Math.floor((1 - p.price / (m.price * p.months)) * 100) : 0; };
 function renderPlans(){
   document.getElementById('v-plans').innerHTML = `
     <button class="back" id="backMe"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg>내 정보</button>
     <h1 class="h-page">이용권</h1>
-    <p class="fine" style="text-align:left;padding:0 0 14px">${hasPass() ? `지금 이용권은 <b>${kdate(ACC.passUntil)}</b>까지입니다. 이용권을 더 사거나 코드를 등록하면 그 뒤로 이어집니다.` : `가입 없이도 최근 ${FREE_DAYS}일치는 무료입니다. 전 범위(개념 ${CONCEPTS.length}개 · 문제 은행 ${BANK_N.toLocaleString()}문항 · 자료 탐구 ${LABS_N}편)를 열려면 아래 중 하나를 고르세요.`}</p>
+    <p class="fine" style="text-align:left;padding:0 0 14px">${hasPass() ? `지금 이용권은 <b>${kdate(ACC.passUntil)}</b>까지예요. 이용권을 더 사거나 코드를 등록하면 그 뒤로 이어져요.` : `최근 ${FREE_DAYS}일치 개념은 가입 없이도 늘 열려 있어요. 전 범위(개념 ${CONCEPTS.length}개 · 문제 은행 ${BANK_N.toLocaleString()}문항 · 자료 탐구 ${LABS_N}편)를 열려면 아래 중 하나를 골라요.`}</p>
     <div class="plan best"><span class="tag">학원 수강생</span><h3>학원 코드 등록</h3><div class="price">무료<small> · 수강 기간 동안</small></div>
       <ul><li>전 범위 개념 ${CONCEPTS.length}개 · 문제 은행 ${BANK_N.toLocaleString()}문항</li><li>내 반 공지 · 출석 체크</li><li>기기를 바꿔도 진도 이어짐</li></ul>
       <button class="btn soft" id="backMe2">내 정보에서 코드 등록</button></div>
-    ${CFG.plans.map(p=>`<div class="plan ${p.best?'best':''}">${p.best?'<span class="tag">인기</span>':''}<h3>${esc(p.name)}</h3><div class="price">${p.price.toLocaleString()}원<small> · ${p.days>=365?'1년':p.days>=180?'6개월':'1개월'}${p.months>1?` · 월 ${Math.round(p.price/p.months).toLocaleString()}원꼴`:''}</small></div>
-      <ul><li>전 범위 개념 ${CONCEPTS.length}개 · 그림 ${FIGS_N}장</li><li>문제 은행 ${BANK_N.toLocaleString()}문항 · 자료 탐구 ${LABS_N}편</li><li>오답 노트 · 복습 문제 · 학습 통계</li><li>${esc(p.sub||'')}</li></ul>
+    ${CFG.plans.map(p=>`<div class="plan ${p.best?'best':''}">${p.best?'<span class="tag">인기</span>':''}<h3>${esc(p.name)}</h3><div class="price">${p.price.toLocaleString()}원<small> · ${p.days>=365?'1년':p.days>=180?'6개월':'1개월'}${p.months>1?` · 월 약 ${Math.round(p.price/p.months).toLocaleString()}원`:''}</small></div>
+      <ul><li>전 범위 개념 ${CONCEPTS.length}개 · 그림 ${FIGS_N}장</li><li>문제 은행 ${BANK_N.toLocaleString()}문항 · 자료 탐구 ${LABS_N}편</li><li>오답 노트 · 복습 문제 · 학습 통계</li><li>${planOff(p) ? `월 이용권보다 ${planOff(p)}% 싸요 · ` : ''}${esc(p.sub||'')}</li></ul>
       <button class="btn ${p.best?'':'ghost'}" data-buy="${p.id}">${STORE_PRICE[p.sku] ? `${esc(STORE_PRICE[p.sku])} · 구매` : '스토어에서 구매'}</button></div>`).join('')}
     ${IAP() ? `<button class="linkbtn" id="iapRestore">구매 복원 · 결제했는데 열리지 않았어요</button>` : ''}
-    <div class="codebox"><h3>이용권 코드</h3><p>학원이나 이벤트로 받은 코드를 넣으면 바로 열립니다.</p>
+    <div class="codebox"><h3>이용권 코드</h3><p>학원이나 이벤트로 받은 코드를 넣으면 바로 열려요.</p>
       <div class="f"><input id="passIn" class="code" placeholder="이용권 코드" maxlength="6" autocapitalize="characters" autocomplete="off"><button id="passGo">등록</button></div>${passErr?`<div class="err">${esc(passErr)}</div>`:''}</div>
-    <p class="fine">가격은 부가세 포함. 결제는 Google Play를 통해 이루어지며 자동으로 다시 결제되지 않습니다. 구매 후 7일 이내 이용 전이면 전액 환불됩니다(이용약관 제7조). 학원 수강생은 결제 없이 코드로 열립니다.</p>
+    <p class="fine">가격은 부가세 포함이에요. 결제는 Google Play로 하고, 자동으로 다시 결제되지 않아요. 구매 후 7일 안에 쓰기 전이면 전액 환불돼요(이용약관 제7조). 학원 수강생은 결제 없이 코드로 열려요.</p>
     <p class="fine" id="minorNote">미성년자가 법정대리인(보호자)의 동의 없이 결제한 경우, 미성년자 본인 또는 법정대리인이 그 계약을 취소할 수 있습니다(이용약관 제7조 ⑤).</p>`;
   loadStorePrices();
 }
@@ -5179,7 +5190,7 @@ async function renderParent(){
       <div class="pstat"><div><b>${weekCount(days)}<small>/7일</small></b><span>공부한 날</span></div><div><b>${wsum.concepts}<small>개</small></b><span>공부한 개념</span></div><div><b>${wsum.solved}<small>문제</small></b><span>푼 문제</span></div></div>
       <p class="fine" style="text-align:left;padding:8px 2px 2px">칸이 채워진 날은 앱으로 공부한 날, 아래 점은 학원에 출석한 날이에요.</p>
       ${weekSumRows(wsum)}
-      ${tn ? `<div class="tnote"><span class="tk">선생님 한 마디</span><p>${esc(tn)}</p></div>` : ''}
+      ${tn ? `<div class="tchnote"><span class="tk">선생님 한 마디</span><p>${esc(tn)}</p></div>` : ''}
       <button class="tgl" id="wkPush" aria-pressed="${!(ACC && ACC.weeklyOff)}"><span class="sw" aria-hidden="true"></span><span>일요일 저녁 7시 이번 주 요약 알림 ${ACC && ACC.weeklyOff ? '끔' : '켬'}</span></button>
       <p class="fine" style="text-align:left;padding:6px 2px 0">앱에서 알림을 허용했을 때만 와요. 꺼도 이 화면의 요약은 그대로 볼 수 있어요.</p>
       ${acad.length ? `<div class="pnext">${acad.map(e => `<div class="kv"><span class="k">${kdate(e.date)} ${WD[wdOf(e.date)]}</span><span class="v">${esc(e.title)} <b style="color:${dLeft(e.date)<=3?'var(--no)':'var(--brand-dark)'}">${ddayText(dLeft(e.date))}</b></span></div>`).join('')}</div>` : ''}</div>
@@ -5596,7 +5607,7 @@ function qualityHtml(prog, fbl){
   if (!MORE.ok){ loadMore().then(() => { if (view === 'admin' && admTab === 'stats') renderAdmin(); }).catch(() => {}); return `<div class="sec"><h2>정답률이 낮은 문항</h2><p class="tip" style="margin:0">문제를 받는 중이에요…</p></div>`; }
   const rows = qualityRows(prog, fbl).map(e => ({ ...e, q:BANK.find(q => q.id === e.id) })).filter(e => e.q);
   return `<div class="sec qual"><h2><span>정답률이 낮은 문항</span><span class="cnt">3명 이상 푼 문항 · 60 % 아래</span></h2>
-    ${rows.length ? rows.map(e => `<button class="qrow" data-qprev="${esc(e.id)}"><span class="qr">${e.r}<small>%</small></span><span class="qb"><span class="qs">${esc(String(e.q.stem || '').replace(/<[^>]+>/g, '').slice(0, 64))}${String(e.q.stem || '').length > 64 ? '…' : ''}</span><span class="qm">${esc(lessonLabel(e.q.lessonId).split(' ')[0])} · ${e.n}명 중 ${e.o}명 맞힘${e.fb ? ` · <b>틀린 곳 알림 ${e.fb}건</b>` : ''}</span></span></button>`).join('')
+    ${rows.length ? rows.map(e => `<button class="qrow" data-qprev="${esc(e.id)}"><span class="qr">${e.r}<small>%</small></span><span class="qb"><span class="qs">${esc(String(e.q.stem || '').replace(/<[^>]+>/g, '').slice(0, 64))}${String(e.q.stem || '').length > 64 ? '…' : ''}</span><span class="qm">${esc(lessonLabel(e.q.lessonId).split(/[\s\u00A0]/)[0])} · ${e.n}명 중 ${e.o}명 맞힘${e.fb ? ` · <b>틀린 곳 알림 ${e.fb}건</b>` : ''}</span></span></button>`).join('')
       + `<p class="tip" style="margin:8px 0 0">알림이 붙은 문항은 문제·해설부터, 알림 없이 낮은 문항은 수업에서 같이 짚거나 교재 설명을 보강해 보세요.</p>`
       : `<p class="tip" style="margin:0">아직 모아 볼 만큼 푼 문항이 없어요. 학생 3명 이상 푼 문항부터 여기에 모여요.</p>`}</div>`; }
 function openQPreview(id){ const q = BANK.find(x => x.id === id); if (!q) return;
@@ -6368,7 +6379,7 @@ document.addEventListener('click', async e => {
     openSheet(`<h3>보호자에게 보이는 것</h3><p>학원 원장님이 확인한 보호자만 볼 수 있어요. 지금 내 기록이라면 이렇게 보여요.</p>
       <div class="sec pweek"><h2><span>이번 주 요약</span><span class="wsd">${esc(w.range)}</span></h2>
         <div class="pstat"><div><b>${weekCount(S.days)}<small>/7일</small></b><span>공부한 날</span></div><div><b>${w.concepts}<small>개</small></b><span>공부한 개념</span></div><div><b>${w.solved}<small>문제</small></b><span>푼 문제</span></div></div>
-        ${weekSumRows(w)}${tn ? `<div class="tnote"><span class="tk">선생님 한 마디</span><p>${esc(tn)}</p></div>` : ''}</div>
+        ${weekSumRows(w)}${tn ? `<div class="tchnote"><span class="tk">선생님 한 마디</span><p>${esc(tn)}</p></div>` : ''}</div>
       <div class="sec gsee"><h2>보이는 것</h2><ul class="gl"><li>학원 출석(오늘 · 이달 · 지각)</li><li>공부한 날 · 공부한 개념 수 · 푼 문제 수 · 정답률(이번 주와 지난 3주)</li><li>다시 볼 문제가 많은 소단원 이름과 개수</li><li>학원 과제를 냈는지</li><li>선생님이 남긴 이번 주 한 마디</li><li>학원 공지 · 일정 · 이야기를 켜고 끄는 설정</li></ul>
         <h2>보이지 않는 것</h2><ul class="gl no"><li>공부 노트와 오늘 기분</li><li>어떤 문제를 틀렸는지(문제 내용)</li><li>이야기에 쓴 글 · 댓글(보호자 화면에 따로 모아 보여 주지 않아요)</li><li>친구와 견준 순위 · 평균</li></ul></div>
       <button class="btn ghost" id="sheetClose">닫기</button>`); return; }

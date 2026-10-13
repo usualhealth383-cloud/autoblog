@@ -111,7 +111,7 @@ async def main():
         for k, (why, r) in rows.items():
             assert await r.locator('.todo-act').count() == 1, k
         a = get('공지학생')[1].locator('.todo-act')
-        assert (await a.inner_text()).strip() == '공지 보내기' and (await a.get_attribute('href')).startswith('sms:01033334444'), await a.get_attribute('href')
+        assert (await a.inner_text()).strip() == '문자로 다시 알리기' and (await a.get_attribute('href')).startswith('sms:01033334444'), await a.get_attribute('href')
         assert '%EB%AA%A9%EC%9A%94%EC%9D%BC' in await a.get_attribute('href'), '문자 본문에 공지 제목이 없음'
         nophone = get('공지만연락처없음')[1].locator('.todo-act'); assert (await nophone.inner_text()).strip() == '공지 보내기'
         assert (await get('출석만학생')[1].locator('.todo-act').inner_text()).strip() == '학생 보기'
