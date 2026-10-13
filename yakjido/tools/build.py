@@ -157,10 +157,16 @@ if (_pd / 'pills.json').exists() and (_pd / 'easy-index.json').exists():
     if _pm.exists():
         _pmi = {x[0]: x[4] for x in json.loads(_pm.read_text(encoding='utf-8')) if x[4] and _r0b.search(x[4])}   # 한글 성분만 — 허가 목록 칸은 영어라 성분 사전과 안 맞는다(10-14)
         for _x in _pl:
-            if not _x.get('ingr') and _pmi.get(_x.get('seq')): _x['ingr'] = _pmi[_x['seq']]; _n += 1
+            # 허가 목록의 한글 주성분이 있으면 그것이 원본이다 — 이름 끝 괄호는 맛 이름일 때가 있다(「트로앤텍트로키(페퍼민트)」가 페퍼민트 캡슐로 읽히던 것, 10-14)
+            if _pmi.get(_x.get('seq')) and _x.get('ingr') != _pmi[_x['seq']]: _x['ingr'] = _pmi[_x['seq']]; _n += 1
     if _n:
         (_pd / 'pills.json').write_text(json.dumps(_pl, ensure_ascii=False, separators=(',', ':')), encoding='utf-8')
         print(f'낱알 성분 채움 {_n}건(같은 품목기준코드 · 식약처 상세)')
+    if _pm.exists() and (_pd / 'pills-rx.json').exists():   # 처방약 낱알도 허가 목록의 한글 주성분으로(이름 괄호에 없는 복합 성분까지)
+        _pr = json.loads((_pd / 'pills-rx.json').read_text(encoding='utf-8')); _m = 0
+        for _x in _pr:
+            if _pmi.get(_x.get('seq')) and _x.get('ingr') != _pmi[_x['seq']]: _x['ingr'] = _pmi[_x['seq']]; _m += 1
+        if _m: (_pd / 'pills-rx.json').write_text(json.dumps(_pr, ensure_ascii=False, separators=(',', ':')), encoding='utf-8'); print(f'처방약 낱알 성분 {_m}건 허가 목록대로')
 jd = json.dumps(detail, ensure_ascii=False, separators=(',', ':'))
 # 본문 판(DATAV)은 core·detail·지연 로드 자료 내용의 해시 — 같은 날 두 번 빌드해도 내용이 바뀌면 휴대폰이 새 본문을 받는다(2026-10-13 자체 검수 5-02)
 _lazy = b''.join(f.read_bytes() for f in sorted((ROOT.parent / 'docs' / 'yakjido' / 'data').rglob('*.json')) if f.name not in ('core.json', 'detail.json') or f.parent.name != 'data')   # 지연 로드 자료도 바뀌면 판이 바뀐다(5-02)

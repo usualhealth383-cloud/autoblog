@@ -1027,7 +1027,10 @@ def main():
         _sp = _iu.spec_from_file_location('ing_audit', str(ROOT / 'yakjido' / 'tools' / 'ing_audit.py')); _ia = _iu.module_from_spec(_sp); _sp.loader.exec_module(_ia)
         pg.goto(url + '#/home'); ready(); pg.wait_for_timeout(600)
         _cov = pg.evaluate(_ia.JS, ['pills.json', 'pills-rx.json', 'easy-index.json'])
-        for _f, _lim in (('pills.json', 37), ('pills-rx.json', 157), ('easy-index.json', 85)):   # pills 25→30→37(2026-10-13): 빈 성분을 품목기준코드(1,491건)·식약처 상세(749건)로 채우자 새로 드러난 12개(메클리진·판테틴 복합·생약 감기약 오제나·씨누스트·아이비엽 등) — 해석 퇴보 아님, 화면엔 「성분 모름」
+        # 2026-10-14 기준선 37→80 · 157→335: 낱알 자료를 2022 → 2026-10 식약처 OpenAPI 로 바꾸고 성분을 허가 목록 한글 주성분(원본)으로 맞추자,
+        #   이름 괄호 한 성분만 보던 제품이 생약 복합(길경·작약·연교·육계)·산화아연 종합비타민·새 처방약(브리바라세탐·설박탐피복실·닌테다닙)으로 드러났다.
+        #   잘못 읽기(엉뚱한 약으로 잇기)는 위 5a-9 전수 검사가 0건으로 지킨다 — 이 수는 「성분 모름」으로 남는 제품 수다
+        for _f, _lim in (('pills.json', 80), ('pills-rx.json', 335), ('easy-index.json', 85)):   # pills 25→30→37(2026-10-13): 빈 성분을 품목기준코드(1,491건)·식약처 상세(749건)로 채우자 새로 드러난 12개(메클리진·판테틴 복합·생약 감기약 오제나·씨누스트·아이비엽 등) — 해석 퇴보 아님, 화면엔 「성분 모름」
             if _cov[_f]['none'] > _lim: fails.append(f'성분을 못 읽는 제품이 늘었습니다 {_f}: {_cov[_f]["none"]} (기준 {_lim}) — {_cov[_f]["bad"][:5]}')
         # 혈압·혈당 수첩 — 적기·7일 평균·기준(135/85) 안내·지우기(2026-09-29)
         pv = br.new_page(viewport={'width': 390, 'height': 844}); verr = []
