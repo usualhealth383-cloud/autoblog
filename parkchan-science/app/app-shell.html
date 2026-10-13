@@ -1068,6 +1068,7 @@ figure.zoomable{cursor:zoom-in}
 /* 오늘의 한 마디 */
 .qsay{background:var(--card);border:1px solid var(--hair);border-radius:var(--r-l);padding:18px 18px 12px;margin:0 0 12px;position:relative}
 .qsay .k{display:block;font-size:var(--t-cap);font-weight:700;letter-spacing:0;color:var(--muted);margin-bottom:13px}
+.qmore{margin:6px 0 0}.qmore>summary{display:inline-flex;align-items:center;min-height:44px;font-size:var(--t-cap);font-weight:700;color:var(--brand-dark);cursor:pointer;list-style:none}.qmore>summary::-webkit-details-marker{display:none}.qmore>summary::after{content:'▾';margin-left:6px;font-size:var(--t-tab)}.qmore[open]>summary::after{content:'▴'}
 .qsay blockquote{font-family:var(--serif);font-size:var(--t-stem);line-height:1.9;color:var(--ink);letter-spacing:-.01em;font-weight:400;margin:0 0 13px}
 .qsay .orig{font-size:var(--t-tab);color:var(--faint);line-height:1.65;margin:-7px 0 12px}
 .qsay .by{display:flex;flex-direction:column;gap:1px;margin-bottom:2px}
@@ -1919,7 +1920,7 @@ const DB = (() => {
   const w = () => { try { localStorage.setItem(DBKEY, JSON.stringify(d)); } catch {} };
   const fixNotes = () => { if (Array.isArray(d.notes)){ d.tnotes = (d.tnotes || []).concat(d.notes.filter(n => n && n.wk)); d.notes = {}; } if (!d.notes || typeof d.notes !== 'object') d.notes = {}; if (!Array.isArray(d.tnotes)) d.tnotes = []; };
   let sid = null; try { sid = localStorage.getItem('pcs.local.sid'); } catch {}
-  const pub = a => a ? { weeklyOff:!!a.weeklyOff, id:a.id, email:a.email, role:a.role, name:a.name, phone:a.phone||'', studentCode:a.studentCode||'', childCodes:(a.childCodes||[]).slice(), childPending:(a.childPending||[]).slice(), childCode:(a.childCodes||[])[0]||'', passUntil:a.passUntil||'', nick:a.nick||'', under14:!!a.under14, guardian:a.guardian||'', guardianOk:!!a.guardianOk, guardianHow:a.guardianHow||'', guardianAt:a.guardianAt||'', talkUntil:a.talkUntil||'', created:a.created } : null;
+  const pub = a => a ? { weeklyOff:!!a.weeklyOff, attendOff:!!a.attendOff, id:a.id, email:a.email, role:a.role, name:a.name, phone:a.phone||'', studentCode:a.studentCode||'', childCodes:(a.childCodes||[]).slice(), childPending:(a.childPending||[]).slice(), childCode:(a.childCodes||[])[0]||'', passUntil:a.passUntil||'', nick:a.nick||'', under14:!!a.under14, guardian:a.guardian||'', guardianOk:!!a.guardianOk, guardianHow:a.guardianHow||'', guardianAt:a.guardianAt||'', talkUntil:a.talkUntil||'', created:a.created } : null;
   const me = () => d.accounts.find(a => a.id === sid) || null;
   const nameOf = id => (d.accounts.find(z => z.id === id) || {}).name || '';
   const stateOf = code => d.progress[code] || null;
@@ -1945,7 +1946,7 @@ const DB = (() => {
     },
     signOut: async () => { sid = null; try { localStorage.removeItem('pcs.local.sid'); } catch {} },
     resetPassword: async email => { const a = d.accounts.find(x => x.email === email.trim().toLowerCase()); if (!a) throw new Error('가입되지 않은 이메일입니다.'); return { ok:true, note:'로컬 모드에서는 메일이 가지 않습니다. 서버 모드에서는 재설정 메일이 발송됩니다.' }; },
-    updateMe: async patch => { const a = me(); if (!a) throw new Error('로그인이 필요합니다.'); ['name','phone','nick','weeklyOff'].forEach(k => { if (k in patch) a[k] = patch[k]; }); w(); return pub(a); },
+    updateMe: async patch => { const a = me(); if (!a) throw new Error('로그인이 필요합니다.'); ['name','phone','nick','weeklyOff','attendOff'].forEach(k => { if (k in patch) a[k] = patch[k]; }); w(); return pub(a); },
     setPassword: async pw => { const a = me(); if (!a) throw new Error('로그인이 필요합니다.'); a.pw = h32(pw); w(); return { ok:true }; },
     /* 서버의 link_code 와 같은 규칙: 틀린 코드 1시간 10번 · 한 코드 한 학생 계정 · 만료 코드 거절 */
     linkCode: async (kind, code) => { const a = me(); if (!a) return { ok:false, why:'로그인이 필요합니다.' };
@@ -2240,7 +2241,7 @@ const DB = (() => {
 const serverDB = () => {
   const notice = (n, reads=[]) => ({ id:n.id, cls:n.cls, t:n.title, d:n.body||'', at:n.at, read: reads.filter(r=>r.notice_id===n.id).map(r=>r.code) });
   const att = a => ({ code:a.code, date:a.date, time:hhmm(a.time), late:!!a.late, manual:!!a.manual });
-  const prof = p => p ? { weeklyOff:!!p.weekly_off, id:p.id, email:p.email||'', role:p.role, name:p.name, phone:p.phone||'', studentCode:p.student_code||'', childCodes:(p._children||[]).slice(), childPending:(p._pending||[]).slice(), childCode:(p._children||[])[0]||'', passUntil:p.pass_until||'', nick:p.nick||'', under14:!!p.under14, guardian:p.guardian||'', guardianOk:!!p.guardian_ok, guardianHow:p.guardian_how||'', guardianAt:p.guardian_at||'', created:p.created_at } : null;
+  const prof = p => p ? { weeklyOff:!!p.weekly_off, attendOff:!!p.attend_off, id:p.id, email:p.email||'', role:p.role, name:p.name, phone:p.phone||'', studentCode:p.student_code||'', childCodes:(p._children||[]).slice(), childPending:(p._pending||[]).slice(), childCode:(p._children||[])[0]||'', passUntil:p.pass_until||'', nick:p.nick||'', under14:!!p.under14, guardian:p.guardian||'', guardianOk:!!p.guardian_ok, guardianHow:p.guardian_how||'', guardianAt:p.guardian_at||'', created:p.created_at } : null;
   let attCache = null, meCache = null;
   const myProfile = async () => { if (!SESSION) return null; const r = await api(`/rest/v1/profiles?id=eq.${SESSION.user.id}&select=*`);
     if (!r.length){ meCache = null; return null; }
@@ -2276,7 +2277,7 @@ const serverDB = () => {
     /* 메일 링크로 돌아왔을 때(#access_token=…) 세션을 받는다 */
     linkUser: async at => { const r = await fetchT(SRV.url + '/auth/v1/user', { headers:{ apikey:SRV.key, Authorization:'Bearer '+at } }); if (!r.ok) throw new Error('링크가 만료되었습니다. 다시 요청해 주세요.'); return r.json(); },
     adoptSession: async (at, rt, u) => { u = u || await DBX.linkUser(at); SESSION = { access_token:at, refresh_token:rt, user:{ id:u.id, email:u.email } }; saveSession(); meCache = null; return myProfile(); },
-    updateMe: async patch => { const b = {}; if ('name' in patch) b.name = patch.name; if ('phone' in patch) b.phone = patch.phone; if ('nick' in patch) b.nick = patch.nick; if ('weeklyOff' in patch) b.weekly_off = !!patch.weeklyOff;
+    updateMe: async patch => { const b = {}; if ('name' in patch) b.name = patch.name; if ('phone' in patch) b.phone = patch.phone; if ('nick' in patch) b.nick = patch.nick; if ('weeklyOff' in patch) b.weekly_off = !!patch.weeklyOff; if ('attendOff' in patch) b.attend_off = !!patch.attendOff;
       await api(`/rest/v1/profiles?id=eq.${SESSION.user.id}`, { method:'PATCH', prefer:'return=minimal', body:b }); return myProfile(); },
     /* 학원 코드·자녀 연결은 서버 함수 한 곳에서만(틀린 코드 제한 · 한 코드 한 학생 계정) */
     unlinkChild: async code => { await api('/rest/v1/rpc/unlink_child', { method:'POST', body:{ p_code: code } }); meCache = null; },
@@ -2583,7 +2584,7 @@ const migrateWrong = arr => { let n = 0; (arr||[]).forEach(w => { if (!w || type
 if (migrateWrong(S.wrong)) saveLocal();
 /* 범위에 든 시험(D-day · 범위를 건 시험 일정)까지 남은 날 — 범위가 없는 D-day 는 모든 소단원에 든다 */
 const examLeft = lessonId => { const L = LESSONS.find(x => x.id === lessonId); let best = null;
-  const cov = sc => !sc || !!(L && (sc.lesson ? sc.lesson === L.id : sc.unit ? (String(sc.book) === String(L.book) && sc.unit === L.unit) : sc.book ? String(sc.book) === String(L.book) : true));
+  const cov = sc => !sc || !!(L && (sc.lessons ? sc.lessons.includes(L.id) : sc.lesson ? sc.lesson === L.id : sc.unit ? (String(sc.book) === String(L.book) && sc.unit === L.unit) : sc.book ? String(sc.book) === String(L.book) : true));
   const see = (date, sc) => { const n = dLeft(date); if (n >= 1 && cov(sc) && (best === null || n < best)) best = n; };
   (S.sched.ddays||[]).forEach(d => see(d.date, d.scope));
   myEvents().forEach(e => { if (e.kind === 'exam' && e.scope) see(e.date, e.scope); });
@@ -3033,11 +3034,12 @@ function quoteCard(q, c){
   return `<div class="qsay">
       <span class="k">오늘의 한 마디${q.kindName ? ` · ${esc(q.kindName)}` : ''}</span>
       <blockquote>“${esc(q.ko)}”</blockquote>
-      ${q.orig ? `<p class="orig">${/^[a-z]/.test(q.orig) ? '…' : ''}${esc(q.orig)}</p>` : ''}
       <div class="by"><span class="who">${esc(q.who||'')}</span>${q.role?`<span class="role">${esc(q.role)}</span>`:''}</div>
-      ${q.src ? `<div class="src">출처 · ${esc(q.src)}</div>` : ''}
-      ${q.note ? `<div class="note">${esc(q.note)}</div>` : ''}
-      ${br ? `<div class="qbridge"><b>과학으로 잇기</b>${esc(br)}</div>` : ''}
+      ${q.orig || q.src || q.note || br ? `<details class="qmore"><summary>원문 · 출처 · 과학으로 잇기</summary>   <!-- 2026-10-13 원장님: 홈이 길다 → 글귀와 사람만 보이고 나머지는 접기 -->
+        ${q.orig ? `<p class="orig">${/^[a-z]/.test(q.orig) ? '…' : ''}${esc(q.orig)}</p>` : ''}
+        ${q.src ? `<div class="src">출처 · ${esc(q.src)}</div>` : ''}
+        ${q.note ? `<div class="note">${esc(q.note)}</div>` : ''}
+        ${br ? `<div class="qbridge"><b>과학으로 잇기</b>${esc(br)}</div>` : ''}</details>` : ''}
       <div class="acts">
         <button id="qNext"><svg viewBox="0 0 24 24"><path d="M21 12a9 9 0 1 1-2.6-6.4"/><path d="M21 4v5h-5"/></svg>다른 한 마디</button>
         <button id="qKeep" class="${kept?'on':''}"><svg viewBox="0 0 24 24"><path d="M12 20.5 4.5 13a4.6 4.6 0 0 1 6.5-6.5l1 1 1-1A4.6 4.6 0 0 1 19.5 13z"/></svg>${kept?'보관함에 있음':'보관하기'}</button>
@@ -4003,7 +4005,7 @@ async function renderPlan(){
         <span class="b"><b>${esc(f.title)}</b><small><span class="tagdot" style="background:${TAGCOLOR[f.tag]||'var(--brand)'}"></span>${esc(TAGS[f.tag]||'')}${f.place?` · ${esc(f.place)}`:''} · ${(f.days||[]).map(d=>WD[d]).join('·')}요일</small></span></button>`).join('')}</div>` : ''}
     <p class="fine">학원·학교·과외를 한 곳에서 봅니다. 학원이 보낸 일정에는 <b>학원</b> 표시가 붙고 지울 수 없습니다.</p>`;
 }
-const scopeName = sc => { if (!sc) return ''; if (sc.lesson){ const L = LESSONS.find(l=>l.id===sc.lesson); return L ? `${L.bookName} ${L.unit}-${L.id.slice(2)} ${L.name}` : ''; }
+const scopeName = sc => { if (!sc) return ''; if (sc.lessons) return sc.name || `소단원 ${sc.lessons.length}개`; if (sc.lesson){ const L = LESSONS.find(l=>l.id===sc.lesson); return L ? `${L.bookName} ${L.unit}-${L.id.slice(2)} ${L.name}` : ''; }
   if (sc.unit) return `통합과학 ${sc.book} · ${sc.unit}단원`; if (sc.book) return `통합과학 ${sc.book} 전체`; return ''; };
 
 /* ── 일정 넣기·고치기 ── */
@@ -4017,7 +4019,9 @@ function sheetEvent(ev){
       <div class="fld"><label for="evS">시험 범위 (선택)</label><select id="evS"><option value="">범위 없음</option>
         <option value="b1" ${e.scope&&e.scope.book==='1'&&!e.scope.unit?'selected':''}>통합과학 1 전체</option>
         <option value="b2" ${e.scope&&e.scope.book==='2'&&!e.scope.unit?'selected':''}>통합과학 2 전체</option>
-        ${LESSONS.map(l=>`<option value="l:${l.id}" ${e.scope&&e.scope.lesson===l.id?'selected':''}>${esc(l.bookName)} ${l.unit}-${l.id.slice(2)} ${esc(l.name)}</option>`).join('')}</select></div></div>
+        <optgroup label="학력평가 범위">${HAKP.map(h => `<option value="p:${h.k}" ${e.scope && e.scope.preset === h.k ? 'selected' : ''}>${esc(h.t)} — ${esc(h.s)}</option>`).join('')}</optgroup>
+        <optgroup label="소단원 하나">${LESSONS.map(l=>`<option value="l:${l.id}" ${e.scope&&e.scope.lesson===l.id?'selected':''}>${esc(l.bookName)} ${l.unit}-${l.id.slice(2)} ${esc(l.name)}</option>`).join('')}</optgroup></select></div></div>
+    ${ev ? '' : `<div class="chips hpre" role="group" aria-label="학력평가로 채우기">${HAKP.map(h => `<button class="chip" data-hp="${h.k}">${esc(h.t.replace(' 학력평가', ' 학평'))}</button>`).join('')}</div><p class="fine" style="text-align:left;padding:0 2px 8px">학평을 고르면 이름·범위가 채워져요. 날짜는 학교 안내를 보고 넣어 주세요.</p>`}
     <div class="fld"><label for="evM">메모 (선택)</label><textarea id="evM" placeholder="준비물, 유의사항">${esc(e.memo||'')}</textarea></div>
     ${e.scope ? `<div class="scopebox"><div class="h">범위가 걸린 일정</div><p>${esc(scopeName(e.scope))}</p>
       ${examPlan(e) ? `<button class="btn" data-eplan="${e.id}" style="margin:0 0 8px">시험까지 계획 · D-${daysBetween(todayISO(), e.date)}</button>` : ''}<button class="btn soft" data-scopego="${e.id}" style="margin:0">이 범위 문제 풀기</button></div>` : ''}
@@ -4049,10 +4053,20 @@ function sheetDday(){
     ${(S.sched.ddays||[]).length ? `<div class="sec"><h2>등록한 D-day</h2>${(S.sched.ddays||[]).map(d=>`<div class="setrow"><span class="l">${esc(d.title)}<small>${kdate(d.date)} · ${ddayText(dLeft(d.date))}</small></span><button class="more" data-dddel="${d.id}">지우기</button></div>`).join('')}</div>` : ''}
     <button class="btn ghost" id="sheetClose">닫기</button>`);
 }
+/* 학력평가 범위(2026 학년도 교육청 학평 — docs/19 5절, 메가스터디·종로 정리). 날짜는 해마다 달라 학생이 넣는다 */
+const HAKP = [
+  { k:'h6', t:'고1 6월 학력평가', s:'통합과학1 Ⅰ~Ⅲ-1(지구시스템)까지', ls: () => LESSONS.filter(l => l.book === '1' && l.id <= '1301').map(l => l.id) },
+  { k:'h9', t:'고1 9월 학력평가', s:'통합과학1 전체 + 통합과학2 Ⅰ-1', ls: () => LESSONS.filter(l => l.book === '1' || l.id === '2101').map(l => l.id) },
+  { k:'h10', t:'고1 10월 학력평가', s:'통합과학1 전체 + 통합과학2 Ⅱ-1까지', ls: () => LESSONS.filter(l => l.book === '1' || (l.id >= '2101' && l.id <= '2201')).map(l => l.id) },
+  { k:'h2', t:'고2 학력평가', s:'통합과학1·2 전체', ls: () => LESSONS.map(l => l.id) } ];
 function scopeFrom(val){ if (!val) return null; if (val === 'b1') return { book:'1' }; if (val === 'b2') return { book:'2' };
+  if (val.startsWith('p:')){ const h = HAKP.find(x => x.k === val.slice(2)); return h ? { preset:h.k, name:h.s, lessons:h.ls() } : null; }
   if (val.startsWith('l:')){ const id = val.slice(2), L = LESSONS.find(l=>l.id===id); return L ? { book:L.book, unit:L.unit, lesson:id } : null; } return null; }
 function drillScope(sc){ if (!sc) return;
   if (!MORE.ok){ toast('문제를 받는 중이에요…'); loadMore().then(() => drillScope(sc)); return; }
+  if (sc.lessons){ const ls = scopeLessons(sc), pool = shuffleArr(BANK.filter(q => !isUM(q) && q.type !== 'essay' && ls.includes(q.lessonId))); if (!pool.length){ toast('이 범위에 풀 문항이 없어요'); return; }
+    closeSheet(); show('bank'); const ten = pool.slice(0, 20).map(q => ({ lesson:q.lessonId, q })), mixed = interleave(ten);
+    startBank([...mixed, ...ten.filter(x => !mixed.includes(x))].map(x => x.q), '시험 범위 · ' + scopeName(sc)); return; }
   bankSel = { book: sc.book || '전체', unit: sc.unit || '전체', lesson: sc.lesson || '전체', type:'전체', n:20, only:'전체' };
   const pool = bankPool(); if (!pool.length){ toast('이 범위에 풀 문항이 없어요'); return; }
   closeSheet(); show('bank'); startBank(pickBank(bankSel.n), '시험 범위 · ' + scopeName(sc));
@@ -4062,6 +4076,7 @@ function drillScope(sc){ if (!sc) return;
    앞쪽은 소단원을 하루 하나씩(남는 날은 약한 곳 다시), 마지막 3일(남은 날이 6일 아래면 1일)은 섞어 풀기 20문제 — 약한 소단원 3곳·꼭 볼 문항(must)을 먼저(약점 클리닉).
    계획은 저장하지 않고 열 때마다 오늘부터 다시 짠다 — 하루 빠져도 밀린 날이 쌓이지 않는다(죄책감 문구 없음). 오늘 분량을 끝낸 날만 S.epd 에 남긴다 ═══ */
 const scopeLessons = sc => { if (!sc) return []; const open = new Set(openLessons().map(l => l.id));
+  if (sc.lessons) return LESSONS.filter(l => open.has(l.id) && sc.lessons.includes(l.id)).map(l => l.id);
   return LESSONS.filter(l => open.has(l.id) && (sc.lesson ? l.id === sc.lesson : (!sc.book || l.book === sc.book) && (!sc.unit || l.unit === sc.unit))).map(l => l.id); };
 /* 약한 곳 = 3문제 넘게 풀어 정답률 80 % 아래인 소단원(낮은 순). 기록이 없으면 비워 두고 '범위 전체에서 고르게'라고 쓴다 — 근거 없이 '약한 곳'이라 부르지 않는다 */
 const weakOf = ls => { const st = lessonStats(), acc = l => st[l].o / st[l].n;
@@ -5193,6 +5208,7 @@ async function renderParent(){
       ${weekSumRows(wsum)}
       ${tn ? `<div class="tchnote"><span class="tk">선생님 한 마디</span><p>${esc(tn)}</p></div>` : ''}
       <button class="tgl" id="wkPush" aria-pressed="${!(ACC && ACC.weeklyOff)}"><span class="sw" aria-hidden="true"></span><span>일요일 저녁 7시 이번 주 요약 알림 ${ACC && ACC.weeklyOff ? '끔' : '켬'}</span></button>
+      <button class="tgl" id="atPush" aria-pressed="${!(ACC && ACC.attendOff)}"><span class="sw" aria-hidden="true"></span><span>학원 출석하면 바로 알림 ${ACC && ACC.attendOff ? '끔' : '켬'}</span></button>
       <p class="fine" style="text-align:left;padding:6px 2px 0">앱에서 알림을 허용했을 때만 와요. 꺼도 이 화면의 요약은 그대로 볼 수 있어요.</p>
       ${acad.length ? `<div class="pnext">${acad.map(e => `<div class="kv"><span class="k">${kdate(e.date)} ${WD[wdOf(e.date)]}</span><span class="v">${esc(e.title)} <b style="color:${dLeft(e.date)<=3?'var(--no)':'var(--brand-dark)'}">${ddayText(dLeft(e.date))}</b></span></div>`).join('')}</div>` : ''}</div>
     <div class="sec"><h2>이달 출석</h2>${month.length ? month.map(a=>`<div class="kv"><span class="k">${kdate(a.date)}</span><span class="v" style="color:${a.late?'var(--warn)':'var(--u)'}">${a.time} ${a.late?'지각':'출석'}${a.manual?' (수동)':''}</span></div>`).join('') : `<p class="fine" style="text-align:left;padding:0">이달 출석 기록이 아직 없어요.</p>`}</div>
@@ -5762,7 +5778,8 @@ function paintWM(){ const el = document.getElementById('wm'); if (!el) return; c
   const key = t + dark; if (key === wmPainted) return; wmPainted = key;
   if (!t){ el.style.backgroundImage = ''; return; }
   const x = t.replace(/[<>&"']/g, c => ({ '<':'&lt;', '>':'&gt;', '&':'&amp;', '"':'&quot;', "'":'&#39;' })[c]);
-  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="250" height="160"><text x="125" y="88" text-anchor="middle" transform="rotate(-22 125 80)" font-family="Noto Sans KR, sans-serif" font-size="13" font-weight="700" fill="${dark ? 'rgba(237,234,228,0.085)' : 'rgba(30,42,46,0.075)'}">${x}</text></svg>`;
+  /* 2026-10-13 원장님 '덜 보이게'(디자인 감사 #11): 간격 250×160 → 360×280, 13px 굵게 → 12px 보통, 진하기 약 0.08 → 0.045. 화면 위 층은 그대로(캡처 억제 유지) */
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="360" height="280"><text x="180" y="148" text-anchor="middle" transform="rotate(-22 180 140)" font-family="Noto Sans KR, sans-serif" font-size="12" font-weight="400" fill="${dark ? 'rgba(237,234,228,0.05)' : 'rgba(30,42,46,0.045)'}">${x}</text></svg>`;
   el.style.backgroundImage = `url("data:image/svg+xml,${encodeURIComponent(svg)}")`; }
 function guardScreen(v){ const on = SECURE_VIEWS.includes(v);
   if (isNative && secureOn !== on){ secureOn = on;
@@ -6169,6 +6186,7 @@ document.addEventListener('click', async e => {
   const epl = T('[data-eplan]'); if (epl){ openExamPlan(epl.dataset.eplan); return; }
   if (T('#planGo')){ startPlanDay(T('#planGo').dataset.id); return; }
   const scg = T('[data-scopego]'); if (scg){ const e = myEvents().find(x => x.id === scg.dataset.scopego); if (e) drillScope(e.scope); return; }
+  const hpb = T('[data-hp]'); if (hpb){ const h = HAKP.find(x => x.k === hpb.dataset.hp); if (h){ const t = document.getElementById('evT'); if (t && !t.value.trim()) t.value = h.t + ' · 통합과학'; const sel = document.getElementById('evS'); if (sel) sel.value = 'p:' + h.k; const k = document.getElementById('evK'); if (k) k.value = 'exam'; toast(`${h.t} 범위를 채웠어요 · 날짜를 넣어 주세요`); } return; }
   if (T('#evSave')){
     const g = id => (document.getElementById(id)||{}).value || '';
     const title = g('evT').trim(), date = g('evD');
@@ -6386,6 +6404,7 @@ document.addEventListener('click', async e => {
       <button class="btn ghost" id="sheetClose">닫기</button>`); return; }
   if (T('#noteSave')){ const r = await DBX.noteSet(T('#noteSave').dataset.code, (document.getElementById('noteIn') || {}).value || '').catch(e => ({ ok:false, why:e.message }));
     if (!r || !r.ok){ toast((r && r.why) || '남기지 못했습니다'); return; } toast(r.cleared ? '한 마디를 지웠어요' : '한 마디를 남겼어요'); openStudent(T('#noteSave').dataset.code); return; }
+  if (T('#atPush')){ const off = !(ACC && ACC.attendOff); try { ACC = await DBX.updateMe({ attendOff:off }); } catch (e){ toast(e.message || '바꾸지 못했어요'); return; } toast(off ? '출석 알림을 껐어요' : '출석 알림을 켰어요'); renderParent(); return; }
   if (T('#wkPush')){ const off = !(ACC && ACC.weeklyOff); try { ACC = await DBX.updateMe({ weeklyOff:off }); } catch (e){ toast(e.message || '바꾸지 못했습니다'); return; } toast(off ? '주간 요약 알림을 껐어요' : '주간 요약 알림을 켰어요'); renderParent(); return; }
   if (T('#epSave')){ const name=(document.getElementById('epName').value||'').trim(), phone=(document.getElementById('epPhone').value||'').trim(); if (!name){ toast('이름을 넣어 주세요'); return; }
     ACC = await DBX.updateMe({ name, phone }); closeSheet(); renderMe(); toast('저장했습니다'); return; }

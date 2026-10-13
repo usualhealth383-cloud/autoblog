@@ -166,6 +166,12 @@ def main():
       SENT.clear(); call('POST', '/functions/v1/push', {'type': 'INSERT', 'table': 'attendance', 'record': {'code': 'PUSH01', 'time': '18:02:11', 'late': True, 'manual': False}}, headers=PH)
       check('출석 → 보호자에게만 "푸시학생 학생 지각 · 18:02"', [m['token'] for m in SENT] == ['tok-par1'] and '푸시학생 학생 지각' in SENT[0]['notification']['title'] and '18:02' in SENT[0]['notification']['body'], SENT)
       check('  └ Firebase 범위로 따로 인증', any('firebase.messaging' in x for x in SCOPES))
+      s, _ = call('PATCH', f'/rest/v1/profiles?id=eq.{P1_ID}', {'attend_off': True}, P1, headers={'Prefer': 'return=minimal'}); check('보호자가 출석 알림을 직접 끔(2026-10-13)', s in (200, 204), s)
+      SENT.clear(); call('POST', '/functions/v1/push', {'type': 'INSERT', 'table': 'attendance', 'record': {'code': 'PUSH01', 'time': '18:05:00', 'late': False, 'manual': False}}, headers=PH)
+      check('  └ 끈 보호자에게는 출석 알림이 가지 않음', not [m for m in SENT if m['token'] == 'tok-par1'], SENT)
+      SENT.clear(); call('POST', '/functions/v1/push', {'type': 'INSERT', 'table': 'notices', 'record': {'cls': '전체', 'title': '전체 공지', 'body': ''}}, headers=PH)
+      check('  └ 출석 알림만 꺼지고 공지는 그대로 감', 'tok-par1' in [m['token'] for m in SENT], [m['token'] for m in SENT])
+      call('PATCH', f'/rest/v1/profiles?id=eq.{P1_ID}', {'attend_off': False}, P1, headers={'Prefer': 'return=minimal'})
       # 이야기 댓글 → 글쓴이에게만(자기 댓글은 알리지 않음)
       import psycopg2 as _pg; _c = _pg.connect('host=127.0.0.1 port=54329 user=postgres dbname=pcs'); _c.autocommit = True
       _c.cursor().execute("update profiles set first_ok_at = now() where role = 'student'"); _c.close()   # 첫 글 검토를 지난 학생으로(검토는 testbed_security 에서)

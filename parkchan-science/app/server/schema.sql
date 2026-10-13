@@ -286,7 +286,8 @@ alter table profiles add column if not exists first_ok_at timestamptz;          
 alter table profiles add column if not exists guard_talk text check (guard_talk in ('write','all'));
 alter table profiles add column if not exists guard_by   uuid references auth.users(id) on delete set null;
 alter table profiles add column if not exists guard_at   timestamptz;
-alter table profiles add column if not exists weekly_off boolean not null default false;   -- 보호자가 '일요일 주간 요약 알림'을 끔(2026-10-07)
+alter table profiles add column if not exists weekly_off boolean not null default false;
+alter table profiles add column if not exists attend_off boolean not null default false;   -- 보호자가 '학원 출석 알림'을 끔(2026-10-13, 기본은 켬)   -- 보호자가 '일요일 주간 요약 알림'을 끔(2026-10-07)
 
 -- 밤(22~07시) 동안 미룬 댓글 알림 — 아침 7시에 '밤사이 새 댓글이 있어요'로 한 번 보내고 지운다(push 함수 · 서비스 키 전용)
 create table if not exists push_later (
@@ -980,7 +981,8 @@ language sql stable security definer set search_path = public as $$
     from push_tokens t join profiles pr on pr.id = t.uid
    where (p_kind = 'care' and pr.role = 'owner')
       or (p_kind not in ('attend', 'care') and pr.student_code in (select code from codes))
-      or exists (select 1 from guardian_links g where g.uid = t.uid and g.approved and g.code in (select code from codes))
+      or (exists (select 1 from guardian_links g where g.uid = t.uid and g.approved and g.code in (select code from codes))
+          and not (p_kind = 'attend' and pr.attend_off))   -- 출석 알림을 끈 보호자는 빼고(공지·일정은 그대로)
 $$;
 
 -- ═══ 만 14세 미만 — 법정대리인 동의 확인(개인정보 보호법 제22조의2) ═══
@@ -1266,7 +1268,7 @@ grant execute on function grant_purchase(uuid, text, text, text, int, jsonb), re
 
 revoke insert, update on profiles from anon, authenticated;
 grant insert (id, role, name, phone, under14, guardian, terms_ver) on profiles to authenticated;   -- 트리거가 못 만든 옛 계정 대비
-grant update (name, phone, nick, weekly_off) on profiles to authenticated;   -- weekly_off: 보호자 주간 요약 알림 끄기(본인 줄만 — 아래 profiles 고치기 정책)
+grant update (name, phone, nick, weekly_off, attend_off) on profiles to authenticated;   -- weekly_off: 보호자 주간 요약 알림 끄기(본인 줄만 — 아래 profiles 고치기 정책)
 
 revoke select, insert, update on posts, comments from anon, authenticated;
 grant select (id, author, nick, board, title, body, attach, likes, report_n, comment_n, staff, solved, deleted, at, edited, care, review, review_why) on posts to authenticated;
