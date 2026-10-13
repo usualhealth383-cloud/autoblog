@@ -72,7 +72,8 @@ JS = r"""
     const xs = pts.map(p => p.x), ys = pts.map(p => p.y); return { x:Math.min(...xs), y:Math.min(...ys), w:Math.max(...xs)-Math.min(...xs), h:Math.max(...ys)-Math.min(...ys) }; };
   const T = texts.map(t => ({ t:t.textContent.trim().slice(0, 24), b:box(t), el:t })).filter(i => i.b.w > 0.5);
   const core = b => ({ x:b.x, w:b.w, y:b.y + b.h * 0.24, h:b.h * 0.56 });   // 글자 상자는 글꼴 위아래 여백까지라 두 줄 이름표가 늘 겹쳐 보인다 — 글자 몸통만
-  T.forEach(i => { const b = { x:i.b.x, w:i.b.w, y:i.b.y + i.b.h * 0.18, h:i.b.h * 0.7 }; if (b.x < vb.x - 1 || b.y < vb.y - 1 || b.x + b.w > vb.x + vb.width + 1 || b.y + b.h > vb.y + vb.height + 1) out.push({ k:'밖', a:i.t }); });
+  const vis = svg.getAttribute('overflow') === 'visible';   // 넘쳐도 보이게 둔 그림(쪽 배치 때문에 viewBox 를 못 넓힌 것)은 '밖' 검사 안 함
+  if (!vis) T.forEach(i => { const b = { x:i.b.x, w:i.b.w, y:i.b.y + i.b.h * 0.18, h:i.b.h * 0.7 }; if (b.x < vb.x - 1 || b.y < vb.y - 1 || b.x + b.w > vb.x + vb.width + 1 || b.y + b.h > vb.y + vb.height + 1) out.push({ k:'밖', a:i.t }); });
   for (let i = 0; i < T.length; i++) for (let j = i + 1; j < T.length; j++){ const a = core(T[i].b), b = core(T[j].b);
     const ox = Math.min(a.x+a.w, b.x+b.w) - Math.max(a.x, b.x), oy = Math.min(a.y+a.h, b.y+b.h) - Math.max(a.y, b.y);
     if (ox > 1.5 && oy > 1 && ox * oy > 0.08 * Math.min(a.w*a.h, b.w*b.h)) out.push({ k:'글자겹침', a:T[i].t, b:T[j].t }); }

@@ -10,7 +10,7 @@ from playwright.sync_api import sync_playwright
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 DRY = '--dry' in sys.argv
-files = [a for a in sys.argv[1:] if not a.startswith('--')] or sorted(
+files = [str(pathlib.Path(a).resolve()) for a in sys.argv[1:] if not a.startswith('--')] or sorted(
     glob.glob(str(ROOT / 'book*/lecture-edition/L-*.html')) + glob.glob(str(ROOT / 'book*/chapter-*/chapter.html')) +
     glob.glob(str(ROOT / 'book*/summary-*/summary.html')) + glob.glob(str(ROOT / 'book*/mock-exam*/exam.html')))
 
