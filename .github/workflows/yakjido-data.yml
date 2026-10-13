@@ -46,6 +46,7 @@ jobs:
         if: steps.k.outputs.ok == '1'
         run: |
           pip install pillow >/dev/null
+          python3 yakjido/tools/remap_easy.py   # 새 e약은요 성분 → 약지도 약 연결
           python3 yakjido/tools/build.py
           git checkout -- docs/yakjido/icon-maskable-512.png || true
           python3 yakjido/tests/data.py
@@ -60,6 +61,7 @@ jobs:
             docs/yakjido/data/meta.json
             yakjido/tools/permits.json
             yakjido/tools/quasi.json
+            docs/yakjido/data/easy-*.json
           if-no-files-found: ignore
       - name: 작업 가지에 올리기
         if: steps.k.outputs.ok == '1'

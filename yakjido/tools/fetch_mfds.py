@@ -5,10 +5,11 @@
     공공데이터포털 OpenAPI 두 개가 매달 갱신된다(둘 다 자동 승인·무료·개발 계정 하루 1만 번).
   · 15057639 식품의약품안전처_의약품 낱알식별 정보   — MdcinGrnIdntfcInfoService03/getMdcinGrnIdntfcInfoList03 (약 2만 5천 건)
   · 15095677 식품의약품안전처_의약품 제품 허가정보   — DrugPrdtPrmsnInfoService08/getDrugPrdtPrmsnInq08 (허가된 모든 제품 — 시럽·연고·주사 포함)
+  · 15075057 식품의약품안전처_의약품개요정보(e약은요) — DrbEasyDrugInfoService/getDrbEasyDrugList (easy-index·easy-N, 성분은 허가 목록에서)
   · 15095679 식품의약품안전처_의약외품 제품 허가 정보 — QdrgPrdtPrmsnInfoService03/getQdrgPrdtPrmsnInfoInq03 (tools/quasi.json 에만, 앱 반영은 갈래를 본 뒤)
 
 인증키: 공공데이터포털 «일반 인증키(Decoding)». ⛔ 파일·대화에 적지 않는다 — 환경변수 DATA_GO_KR_KEY 로만(깃허브 Secrets).
-사용:   DATA_GO_KR_KEY=… python3 yakjido/tools/fetch_mfds.py [--only pills|permits|quasi]
+사용:   DATA_GO_KR_KEY=… python3 yakjido/tools/fetch_mfds.py [--only pills|permits|easy|quasi]
 결과:   docs/yakjido/data/pills.json · pills-rx.json (지금 앱과 같은 꼴) · yakjido/tools/permits.json([품목코드, 이름, 회사, 전문 1/일반 0, 주성분]) · meta.json 출처·날짜
         그다음 python3 yakjido/tools/build.py 가 성분 채우기·이름 목록·건수를 다시 만든다.
 """
@@ -19,6 +20,7 @@ OUT = ROOT.parent / 'docs' / 'yakjido' / 'data'
 BASE = 'https://apis.data.go.kr/1471000/'
 PILL_OP = 'MdcinGrnIdntfcInfoService03/getMdcinGrnIdntfcInfoList03'
 PERMIT_OP = 'DrugPrdtPrmsnInfoService08/getDrugPrdtPrmsnInq08'
+EASY_OP = 'DrbEasyDrugInfoService/getDrbEasyDrugList'   # 15075057 의약품개요정보(e약은요) — 성분 칸이 없어 허가 목록 주성분을 품목코드로 붙인다
 QUASI_OP = 'QdrgPrdtPrmsnInfoService03/getQdrgPrdtPrmsnInfoInq03'   # 15095679 의약외품 제품 허가 정보(가그린·파스류 일부·소독제 등, 10-14 현욱님 신청)
 ROWS = 100
 
@@ -99,6 +101,28 @@ def permits(k):
     return out
 
 
+def easy(k, permits_rows):
+    rows = fetch_all(EASY_OP, k, 'e약은요')
+    ing = {x[0]: [i for i in x[4].split('|') if i] for x in permits_rows if x[4]}
+    pl = {}
+    for f in ('pills.json', 'pills-rx.json'):
+        if (OUT / f).exists():
+            for x in json.loads((OUT / f).read_text(encoding='utf-8')): pl[x['seq']] = x
+    def clean(t):
+        t = re.sub(r'<[^>]+>', '', s(t)).replace('|', ', ')
+        return re.sub(r'\.(?=[가-힣A-Za-z(])', '.\n', t)   # import_public_data.py 와 같은 줄바꿈
+    out = []
+    for r in rows:
+        seq = s(r.get('itemSeq')); p = pl.get(seq)
+        warn, atpn = clean(r.get('atpnWarnQesitm')), clean(r.get('atpnQesitm'))
+        out.append({'n': s(r.get('itemName')), 'm': s(r.get('entpName')), 'i': ing.get(seq, []), 'map': [],
+                    'e': clean(r.get('efcyQesitm')), 'u': clean(r.get('useMethodQesitm')), 'c': (warn + '\n' + atpn).strip() if warn else atpn,
+                    'x': clean(r.get('intrcQesitm')), 's': clean(r.get('seQesitm')), 'k': clean(r.get('depositMethodQesitm')),
+                    'img': s(r.get('itemImage')) or (('https://nedrug.mfds.go.kr/pbp/cmn/itemImageDownload/' + p['img']) if p and p.get('img') else ''),
+                    'cvs': p['cvs'] if p else 0, 'seq': seq})
+    return out
+
+
 def quasi(k):
     rows = fetch_all(QUASI_OP, k, '의약외품 허가 목록')
     out = []
@@ -126,6 +150,21 @@ def main():
         (ROOT / 'tools' / 'permits.json').write_text(dump(R), encoding='utf-8')   # 앱에 싣지 않음 — build.py 가 이름 목록·성분 채우기에만 씀
         meta.update({'permits_count': len(R), 'permits_source': f'식약처 의약품 제품 허가정보 OpenAPI {today}'})
         print(f'허가 제품(정상) {len(R):,}건')
+    if only in ('', 'easy'):
+        try:   # e약은요가 실패해도 위 자료는 그대로 쓴다(옛 e약은요 파일은 다 받은 뒤에만 바꾼다)
+            pm = ROOT / 'tools' / 'permits.json'
+            PR = R if only == '' else (json.loads(pm.read_text(encoding='utf-8')) if pm.exists() else [])
+            E = easy(k, PR)
+            if len(E) < 4000: sys.exit(f'e약은요 {len(E)}건 — 너무 적어 기존 자료를 그대로 둡니다')
+            CH = 200
+            for old in OUT.glob('easy-*.json'): old.unlink()
+            (OUT / 'easy-index.json').write_text(dump([{'n': e['n'], 'm': e['m'], 'i': e['i'], 'map': e['map'], 'img': e['img'], 'cvs': e['cvs'], 'seq': e['seq'], 'id': i} for i, e in enumerate(E)]), encoding='utf-8')
+            for c in range(0, len(E), CH):
+                (OUT / f'easy-{c // CH}.json').write_text(dump([{kk: v for kk, v in e.items() if kk in ('e', 'u', 'c', 'x', 's', 'k')} for e in E[c:c + CH]]), encoding='utf-8')
+            meta.update({'easy_count': len(E), 'with_image': sum(1 for e in E if e['img']), 'easy_source': f'식약처 의약품개요정보(e약은요) OpenAPI {today}', 'chunk': CH})
+            print(f'e약은요 {len(E):,}건(성분 붙음 {sum(1 for e in E if e["i"]):,}) — 성분→약 연결은 remap_easy.py 가 다시 맞춤')
+        except (Exception, SystemExit) as e:
+            print('e약은요 받기 실패 — 옛 자료 그대로:', e)
     if only in ('', 'quasi'):
         try:   # 의약외품은 있으면 좋은 것 — 실패해도 위 두 자료는 그대로 쓴다
             Q = quasi(k)
