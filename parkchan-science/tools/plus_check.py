@@ -58,6 +58,8 @@ types = Counter()
 for el, it in zip(soup.select('.pq'), items):
     n = el.get('data-n'); typ = it['type']; types[typ] += 1; tag = f'{code}-p{n}({typ})'
     if typ not in ('mc', 'multi', 'ox', 'blank', 'essay'): bad.append(f'{tag}: 모르는 data-type'); continue
+    pn = el.select_one('.pqno')
+    if not pn or pn.get_text(strip=True) != n: bad.append(f'{tag}: 보이는 번호(.pqno) {pn.get_text(strip=True) if pn else "없음"} ≠ data-n {n}')
     if n not in sol_ns: bad.append(f'{tag}: 해설(.psol data-n="{n}") 없음')
     if not it['explain'].strip(): bad.append(f'{tag}: 해설 글이 비었음')
     cn = int(el.get('data-concept') or 0)
