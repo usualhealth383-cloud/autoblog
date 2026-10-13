@@ -86,10 +86,14 @@ self.addEventListener('notificationclick', (e) => {
   e.notification.close();
   const d = e.notification.data || {};
   const took = e.action === 'took' && d.key;
-  const hash = took ? '#/schedule?tick=' + encodeURIComponent(d.key) + (d.day ? '&day=' + encodeURIComponent(d.day) : '') : (d.go === '#/visits' ? '#/visits' : '#/schedule');   // 진료 예약 알림은 예약 화면으로(2026-10-13)
+  // Z6 — 「10분 뒤 다시」: 서비스워커는 10분을 기다려 주지 않아(브라우저가 몇 분 안에 멈춤) 열린 창에 타이머를 맡긴다. 창이 없으면 그 창을 열어 맡긴다
+  const later = e.action === 'later' && d.key;
+  const q = () => encodeURIComponent(d.key) + (d.day ? '&day=' + encodeURIComponent(d.day) : '');
+  const hash = took ? '#/schedule?tick=' + q() : later ? '#/schedule?later=' + q() : (d.go === '#/visits' ? '#/visits' : '#/schedule');   // 진료 예약 알림은 예약 화면으로(2026-10-13)
   e.waitUntil((async () => {
     const all = await self.clients.matchAll({ type: 'window', includeUncontrolled: true });
     for (const c of all) {
+      if (later) { try { c.postMessage({ type: 'yakjido-later', key: d.key, day: d.day || '', title: e.notification.title || '', body: e.notification.body || '' }); } catch (x) {} return; }
       if ('focus' in c) { try { c.postMessage({ type: 'yakjido-tick', key: took ? d.key : '', day: d.day || '', go: d.go === '#/visits' ? '/visits' : '' }); } catch (x) {} return c.focus(); }
     }
     return self.clients.openWindow('./' + hash);

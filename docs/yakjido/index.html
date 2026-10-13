@@ -532,6 +532,11 @@ nav.gjump{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;margin-left:calc
 .dose-tick.done{background:var(--normal-tint);border-color:transparent}
 .dose-tick.done .bx{background:var(--normal);border-color:var(--normal)}
 .dose-tick.late{border-color:rgba(182,54,41,.35)}
+.dose-tick.skip{background:var(--tint2)}.dose-tick.skip .bx{color:var(--muted);font-weight:800;font-size:1.125rem}   /* Z6 건너뜀 — 먹음(초록)·늦음(빨강)과 다르게 회색 「–」 */
+.skip-l{display:flex;flex-direction:column;gap:8px;margin-top:8px}.skip-l .btn{min-height:46px;height:auto;padding:8px 14px;text-align:left;justify-content:flex-start;white-space:normal}
+.dh-fam{padding:12px 16px;border-top:1px solid var(--hairline);background:var(--caution-tint)}.dh-fam b{display:block;color:var(--text);font-size:1rem;overflow-wrap:anywhere}.dh-fam small{display:block;color:var(--body);font-size:.8125rem;margin-top:2px}
+.dh-fam .row{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}.dh-fam .row .btn{flex:1 1 9em;width:auto;min-height:46px;height:auto;padding:8px 12px;white-space:normal}
+.dh-fam .x{min-height:44px;margin-top:4px;padding:0 4px;background:transparent;border:0;color:var(--body);font:inherit;font-size:.8125rem;text-decoration:underline;cursor:pointer}
 .wait-fold>summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:8px;min-height:52px;font-size:1.0625rem}
 .wait-fold>summary::-webkit-details-marker{display:none}
 .wait-fold>summary small{flex:1;font-size:.8125rem;font-weight:500;color:var(--muted)}
@@ -559,6 +564,7 @@ nav.gjump{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;margin-left:calc
 .cal-d.full{background:var(--normal);color:var(--on-primary);border-color:var(--normal)}
 .cal-d.part{background:var(--caution-tint);color:var(--caution);border-color:var(--caution)}
 .cal-d.miss{background:transparent;color:var(--alert);border:1px dashed var(--alert)}
+.cal-d.skip{background:var(--tint2);color:var(--body);border:1px solid var(--ui-line)}
 .cal-d.soon{background:var(--tint);color:var(--primary-deep);border-color:var(--primary)}
 .cal-d.fut{background:transparent;color:var(--muted);border-color:transparent;opacity:.85}   /* 다가올 날 — 칸 없이 글자만, 그래도 읽히게(1.3:1 → AA, 2026-10-07) */
 .cal-key{display:flex;flex-wrap:wrap;align-items:center;gap:5px 10px;margin-top:10px;font-size:.75rem;color:var(--muted)}
@@ -567,6 +573,7 @@ nav.gjump{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;margin-left:calc
 .cal-key .k.full{background:var(--normal);border-color:var(--normal)}
 .cal-key .k.part{background:var(--caution-tint);border-color:var(--caution)}
 .cal-key .k.miss{border:1px dashed var(--alert)}
+.cal-key .k.skip{background:var(--tint2);border-color:var(--ui-line);color:var(--body)}
 .cal-key .k.none{background:var(--tint2);border-color:var(--hairline)}
 .cal-key .k.cal-now{background:transparent;box-shadow:0 0 0 2px var(--primary);border-color:transparent}
 .ae-list{list-style:none;margin-top:12px;display:flex;flex-direction:column;gap:8px}
@@ -596,7 +603,7 @@ button.cal-d[aria-expanded="true"]{outline:3px solid var(--primary-deep);outline
 .cal-day-list{list-style:none;margin-top:4px;padding-right:8px;display:flex;flex-direction:column;gap:6px}
 .cal-day-list li{display:flex;align-items:flex-start;gap:8px;font-size:.875rem;line-height:1.5;color:var(--body);word-break:keep-all;overflow-wrap:anywhere}
 .cal-day-list .cm{flex:none;width:20px;text-align:center;font-weight:800}
-.cal-day-list .cm.ok{color:var(--normal)}.cal-day-list .cm.no{color:var(--alert)}.cal-day-list .cm.wait{color:var(--muted)}
+.cal-day-list .cm.ok{color:var(--normal)}.cal-day-list .cm.no{color:var(--alert)}.cal-day-list .cm.wait,.cal-day-list .cm.skip{color:var(--muted)}
 .cal-d .cm{position:absolute;right:3px;top:1px;font-size:.625rem;line-height:1;font-weight:800}
 .cal-key .k{display:inline-grid;place-items:center;font-size:.5625rem;line-height:1;font-weight:800;width:14px;height:14px}
 .cal-key .k.full{color:var(--on-primary)}.cal-key .k.part{color:var(--caution)}.cal-key .k.miss{color:var(--alert)}
@@ -1541,7 +1548,7 @@ main>*:nth-child(2){animation-delay:.04s} main>*:nth-child(3){animation-delay:.0
 window.__YAKJIDO_OK__ = true;   /* 여기까지 읽혔다 = 이 브라우저가 아래 문법(?. ?? 등)을 안다. 못 읽으면 머리의 안내문이 뜬다 */
 const D = JSON.parse(document.getElementById('data').textContent || '{}');
 const BUILD = '2026-10-13';
-const DATAV = '7b86e2a331'.indexOf('__') === 0 ? BUILD : '7b86e2a331';
+const DATAV = '2932e38dd0'.indexOf('__') === 0 ? BUILD : '2932e38dd0';
 const BRANDMARK = (typeof window !== 'undefined' && window.__BRANDMARK__) || 'icon-192.png';
 let CORE = 0, CORE_P = null;          /* 0 아직 · 1 받는 중 · 2 준비됨 · 3 실패 */
 function mergeCore(c){
@@ -1671,6 +1678,7 @@ function sanitizeMe(m){
   r.sched = {}; for (const [k, v] of Object.entries(obj(o.sched))) if (SAFE_ID.test(k) && Array.isArray(v)) r.sched[k] = v.filter(t => typeof t === 'string' && SAFE_HM.test(t));
   for (const f of ['prn', 'short']) { r[f] = {}; for (const [k, v] of Object.entries(obj(o[f]))) if (SAFE_ID.test(k) && v) r[f][k] = typeof v === 'number' ? v : true; }
   r.taken = {}; for (const [d, v] of Object.entries(obj(o.taken))) if (SAFE_DAY.test(d) && Array.isArray(v)) r.taken[d] = v.filter(x => typeof x === 'string' && /^[A-Za-z0-9가-힣_.:\-]{1,80}@([01]\d|2[0-3]):[0-5]\d$/.test(x));
+  r.skipped = {}; for (const [d, v] of Object.entries(obj(o.skipped))) if (SAFE_DAY.test(d) && Array.isArray(v)) r.skipped[d] = [...new Set(v.filter(x => typeof x === 'string' && /^[A-Za-z0-9가-힣_.:\-]{1,80}@([01]\d|2[0-3]):[0-5]\d$/.test(x)))];
   r.days = {}; for (const [d, v] of Object.entries(obj(o.days))) if (SAFE_DAY.test(d) && v && typeof v === 'object') { const n = num(v.n, 0, 200); const sl = {}; for (const [t, c] of Object.entries(obj(v.s))) if (SAFE_HM.test(t) && num(c, 0, 50) != null) sl[t] = Number(c); if (n != null) r.days[d] = { n, s: sl }; }
   r.prnLog = {}; for (const [d, v] of Object.entries(obj(o.prnLog))) if (SAFE_DAY.test(d) && Array.isArray(v)) r.prnLog[d] = v.filter(x => x && SAFE_ID.test(x.id) && SAFE_HM.test(x.t)).map(x => ({ id: x.id, t: x.t, n: num(x.n, 0, 20) ?? 1 }));
   r.prnQty = {}; for (const [k, v] of Object.entries(obj(o.prnQty))) if (SAFE_ID.test(k) && num(v, 0, 20) != null) r.prnQty[k] = Number(v);
@@ -1745,19 +1753,37 @@ function workedHome(){
       <span><b>${esc(r.s.name.split(' (')[0])}</b><small>${esc(r.ds.map(d => prodName((d.products || [])[0]?.name) || ingrName(d)).join(' · '))}</small></span>${I.chev}</button>`).join('')}
   </section>`;
 }
+const FAM_K = 'yakjido.famask';
+function famAsk(left, nowMin){
+  if (!noteSenior()) return '';
+  const late = left.filter(r => r.min <= nowMin - 120); if (!late.length) return '';
+  const t = late[0].t, tag = todayKey() + '@' + t; let off = ''; try { off = localStorage.getItem(FAM_K) || ''; } catch (e) {}
+  if (off === tag) return '';
+  const L = late.filter(r => r.t === t);
+  return `<div class="dh-fam" role="group" aria-label="가족에게 알릴까요"><b>${esc(hourWord(t))} 약을 아직 체크하지 않으셨어요</b><small>드셨으면 눌러 두세요. 도움이 필요하면 가족에게 알려 보세요 — 보내는 곳은 직접 고르세요.</small>
+    <div class="row"><button class="btn" onclick="tickFromNote('${L.map(r => r.d.id + '@' + t).join(',')}');route()">${I.check} 먹었어요</button><button class="btn line" onclick="famSend('${t}')">${I.user} 가족에게 알리기</button></div>
+    <button type="button" class="x" onclick="famOff('${tag}')">괜찮아요 — 오늘은 묻지 않기</button></div>`;
+}
+function famOff(tag){ try { localStorage.setItem(FAM_K, tag); } catch (e) {} route(); }
+async function famSend(t){
+  const names = takingItems().filter(d => schedOf(d.id, d).includes(t) && !takenSet().includes(d.id + '@' + t)).map(d => d.name);
+  const text = `오늘 ${hourWord(t)} 약을 아직 못 챙겼어요${names.length ? ` (${names.slice(0, 4).join(', ')})` : ''}. 시간 되실 때 전화 한 번 주세요.\n\n— 약지도에서 보냄`;
+  try { if (await shareOut({ title: '약을 아직 못 챙겼어요', text })) return; } catch (e) { if (e && e.name === 'AbortError') return; }
+  try { await navigator.clipboard.writeText(text); toast('복사했어요 — 카카오톡이나 문자에 붙여 넣으세요'); } catch (e) { appCopy('아래 글을 길게 눌러 복사해서 보내세요', text); }
+}
 function doseHome(){
   const taking = takingItems(); if (!taking.length) return '';
   try { rollDay(); } catch (e) {}
   const taken = takenSet(); const now = new Date(); const nowMin = now.getHours() * 60 + now.getMinutes();
   const rows = [];
-  for (const d of taking) for (const t of schedOf(d.id, d)) { const [h, m] = t.split(':').map(Number); rows.push({ d, t, min: h * 60 + m, done: taken.includes(d.id + '@' + t) }); }
+  for (const d of taking) for (const t of schedOf(d.id, d)) { const [h, m] = t.split(':').map(Number); rows.push({ d, t, min: h * 60 + m, done: taken.includes(d.id + '@' + t), skip: isSkipped(d.id + '@' + t) }); }
   if (!rows.length) return '';
   rows.sort((a, b) => a.min - b.min);
-  const left = rows.filter(r => !r.done), done = rows.length - left.length;
+  const left = rows.filter(r => !r.done && !r.skip), done = rows.filter(r => r.done).length;
   const due = left.find(r => r.min <= nowMin + 30);     /* 시간이 됐거나 30분 안에 오는 것 */
   const next = left.find(r => r.min > nowMin + 30);
   const low = lowStock();
-  const say = !done ? `오늘 ${rows.length}번 드실 차례예요` : !left.length ? `오늘 ${rows.length}번, 모두 드셨어요` : `${rows.length}번 중 ${done}번 드셨어요`;
+  const say = !left.length && done < rows.length ? `오늘 ${rows.length}번 중 ${done}번 드시고 ${rows.length - done}번 건너뛰셨어요` : !done ? `오늘 ${rows.length}번 드실 차례예요` : !left.length ? `오늘 ${rows.length}번, 모두 드셨어요` : `${rows.length}번 중 ${done}번 드셨어요`;
   const head = `<div class="dh-h"><span class="eb">오늘 약</span> <b>${say}</b></div>`;   /* 사이 띄어쓰기: 읽어 주는 이름(aria-label)과 보이는 글자를 맞추려고 — 둘 다 블록이라 화면엔 영향 없음 */
   let body;
   if (!left.length) body = `<div class="dh-b ok">${I.check}<span><b>잘 챙기셨어요</b><small>내일 ${rows[0].t}에 다시 알려드릴게요</small></span></div>`;
@@ -1768,7 +1794,8 @@ function doseHome(){
     <div class="dh" role="group">
       <button class="dh-go" onclick="go('/schedule')" aria-label="오늘 약 ${esc(String(say).replace(/<[^>]+>/g, ''))} — 복용 시간 알림 열기">${doseRing(done, rows.length, 46)}${head}</button>
       ${body}
-      ${low.length ? `<div class="dh-low">${I.alert}<span><b>곧 떨어져요</b> — ${low.map(x => esc(x.n) + ' ' + x.days + '일치').join(' · ')}</span></div>` : ''}
+      ${famAsk(left, nowMin)}
+      ${low.length ? `<div class="dh-low">${I.alert}<span><b>곧 떨어져요</b> — ${low.map(x => esc(x.n) + ' ' + x.days + '일치').join(' · ')}. 미리 처방·구입해 두세요</span></div>` : ''}
     </div></section>`;
 }
 const WHY_LABEL = { allergy:'약 알레르기', allergycls:'알레르기가 있었던 성분과 같은 계열' };
@@ -3641,6 +3668,7 @@ function rollDay(){
   for (const d in ME.taken) if (d < cut) { delete ME.taken[d]; dirty = true; }
   for (const d in ME.days) if (d < cut) { delete ME.days[d]; dirty = true; }
   for (const d in (ME.prnLog || {})) if (d < cut) { delete ME.prnLog[d]; dirty = true; }
+  for (const d in (ME.skipped || {})) if (d < cut || !ME.skipped[d].length) { delete ME.skipped[d]; dirty = true; }
   const slots = {}; let plan = 0;
   for (const d of takingItems()) for (const t of schedOf(d.id, d)) { slots[t] = (slots[t] || 0) + 1; plan++; }
   if (plan) { const cur = ME.days[k];
@@ -3651,11 +3679,12 @@ function rollDay(){
 function dayPlan(k){ const v = (ME.days || {})[k]; if (!v) return { n: 0, s: {} };
   return typeof v === 'number' ? { n: v, s: {} } : { n: v.n || 0, s: v.s || {} }; }
 function dayStat(k){
-  const plan = dayPlan(k).n;
-  const done = ((ME.taken || {})[k] || []).length;
-  if (!plan) return { s: 'none', plan: 0, done };
-  if (done >= plan) return { s: 'full', plan, done };
-  return { s: done ? 'part' : 'miss', plan, done };
+  const plan = dayPlan(k).n, took = (ME.taken || {})[k] || [];
+  const done = took.length, skip = ((ME.skipped || {})[k] || []).filter(x => !took.includes(x)).length;
+  if (!plan) return { s: 'none', plan: 0, done, skip };
+  if (done >= plan) return { s: 'full', plan, done, skip: 0 };
+  if (skip && done + skip >= plan) return { s: 'skip', plan, done, skip };
+  return { s: done || skip ? 'part' : 'miss', plan, done, skip };
 }
 function slotMiss(n = 30){
   const tally = {};
@@ -3679,18 +3708,28 @@ function slotLine(){
   return `<div class="note" style="margin-top:12px">${I.clock}<span><b>${esc(g)} 약은 잘 챙기시는데 ${esc(w)} 약을 자주 놓치세요</b> — 어제까지 30일 동안 ${esc(w)}은 ${worst.want}번 중 ${worst.miss}번을 못 드셨어요. 진료 때 <b>이 말씀을 그대로 전해 주세요.</b> 하루 한 번 먹는 약으로 바꿀 수 있는 경우가 많습니다.</span></div>`;
 }
 function adherence(n = 30){
-  let days = 0, full = 0, doses = 0, took = 0;
-  for (let i = 1; i <= n; i++) { const st = dayStat(dayBefore(i)); if (!st.plan) continue; days++; if (st.s === 'full') full++; doses += st.plan; took += Math.min(st.done, st.plan); }
-  return { days, full, doses, took };
+  let days = 0, full = 0, doses = 0, took = 0, skip = 0;
+  for (let i = 1; i <= n; i++) { const st = dayStat(dayBefore(i)); if (!st.plan) continue; days++; if (st.s === 'full') full++; doses += st.plan; took += Math.min(st.done, st.plan); skip += Math.min(st.skip, st.plan - Math.min(st.done, st.plan)); }
+  return { days, full, doses, took, skip };
 }
-function tick(id, t){ const arr = takenSet(); const key = id + '@' + t; const i = arr.indexOf(key); i >= 0 ? arr.splice(i, 1) : arr.push(key); rollDay(); saveMe(); if (NATIVE) nativeArm(); route(); }
+function tick(id, t){ const arr = takenSet(); const key = id + '@' + t; const i = arr.indexOf(key); i >= 0 ? arr.splice(i, 1) : arr.push(key); unskip(todayKey(), [key]); rollDay(); saveMe(); if (NATIVE) nativeArm(); route(); }
+function skippedSet(k){ ME.skipped = ME.skipped || {}; k = k || todayKey(); return (ME.skipped[k] = ME.skipped[k] || []); }
+function unskip(k, keys){ const L = (ME.skipped || {})[k]; if (!L) return; for (const x of keys) { const i = L.indexOf(x); if (i >= 0) L.splice(i, 1); } }
+function skipKeys(keys, day){ const k = day || todayKey(); const T = (ME.taken || {})[k] || [], L = skippedSet(k); let n = 0;
+  for (const x of keys) if (!T.includes(x) && !L.includes(x)) { L.push(x); n++; } return n; }
+function skipDose(id, t){ if (skipKeys([id + '@' + t])) { rollDay(); saveMe(); if (NATIVE) nativeArm(); toast('이번 회는 건너뛴 것으로 적었어요 — 다음 시간부터 원래대로 드세요'); } route(); }
+function skipFromNote(key, day){ const keys = noteKeys(key); if (!keys.length) return; const k = day || todayKey();
+  if (k !== todayKey() && k !== dayBefore(1)) { toast('지난 알림이라 기록하지 않았어요 — 복용 시간 화면에서 눌러 주세요'); return; }
+  if (skipKeys(keys, k)) { saveMe(); toast('이번 회는 건너뛴 것으로 적었어요'); if (NATIVE) nativeArm(); } }
+const isSkipped = (key, k) => ((ME.skipped || {})[k || todayKey()] || []).includes(key);
+const noteKeys = key => (Array.isArray(key) ? key : String(key || '').split(',')).filter(x => /^[A-Za-z0-9가-힣_.:\-]{1,80}@([01]\d|2[0-3]):[0-5]\d$/.test(x));
 let NOTI_TIMERS = [];
 async function showNote(title, body, key, day, plain){   /* plain — 약이 아닌 알림(진료 예약): 「먹었어요」 단추를 달지 않는다 */
   try {
     const reg = navigator.serviceWorker && await navigator.serviceWorker.getRegistration();
     if (reg && reg.showNotification) {
       await reg.showNotification(title, { body, tag: key, renotify: true, requireInteraction: true, icon: 'icon-192.png', badge: 'icon-192.png',
-        data: { key: plain ? '' : key, day: day || todayKey(), go: plain ? (typeof plain === 'string' ? plain : '#/visits') : '' }, actions: plain ? [] : [{ action: 'took', title: '먹었어요' }, { action: 'open', title: '열기' }] });
+        data: { key: plain ? '' : key, day: day || todayKey(), go: plain ? (typeof plain === 'string' ? plain : '#/visits') : '' }, actions: plain ? [] : [{ action: 'took', title: '먹었어요' }, { action: 'later', title: '10분 뒤 다시' }] });
       return;
     }
   } catch (e) {}
@@ -3702,23 +3741,44 @@ async function shareOut(o){ const SH = plug('Share'); if (SH) { await SH.share({
 let NATIVE_PERM = 'prompt', NATIVE_EXACT = 'granted', NATIVE_READY = null;
 const noteName = () => typeof ME.notename === 'boolean' ? ME.notename : !!ME.easy;
 const noteNameEasy = () => typeof ME.notename !== 'boolean' && !!ME.easy;
-function noteBody(d, t, again){
-  const w = SLOT_WORD[t] ? `${SLOT_WORD[t]} ${t}` : t;
-  if (!noteName()) return again ? `${w}에 드실 약이 아직이에요. 드셨으면 「먹었어요」를 눌러 주세요.` : `${w} — 약 드실 시간이에요. 눌러서 확인해 주세요.`;
-  return (again ? `${d.name} — ${t}에 드실 약이에요. 드셨으면 「먹었어요」를 눌러 주세요.` : `${d.name} — ${d.simple || ''}`).slice(0, 120);
+const hourWord = t => { const [h, m] = t.split(':').map(Number); return `${h < 5 ? '새벽' : h < 11 ? '아침' : h < 15 ? '점심' : h < 18 ? '오후' : h < 21 ? '저녁' : '밤'} ${h % 12 || 12}시${m ? ' ' + m + '분' : ''}`; };
+const qtyWord = d => { const f = pillForm(d); return (f === 'tab' || f === 'cap') && (!d.approx || (ME.qty || {})[d.id]) ? ` ${doseQty(d.id)}알` : ''; };
+function slotBody(t, items, again){
+  const w = hourWord(t), water = items.some(d => ((d.d && d.d.pict) || []).includes('물많이')) ? ' 물 한 컵과 함께 드세요.' : '';
+  if (!noteName()) return (again ? `${w} 약을 아직 체크하지 않으셨어요. 드셨으면 「먹었어요」를 눌러 주세요.` : `${w} — 약 드실 시간이에요.${water || ' 눌러서 확인해 주세요.'}`);
+  const L = items.slice(0, 4).map(d => d.name + qtyWord(d)).join(', ') + (items.length > 4 ? ` 외 ${items.length - 4}가지` : '');
+  return `${w} 약${again ? '이 아직이에요' : ''} — ${L}.${again ? ' 드셨으면 「먹었어요」를 눌러 주세요.' : water}`.slice(0, 240);
 }
+function slotGroups(){ const g = {}; for (const d of takingItems()) for (const t of schedOf(d.id, d)) (g[t] = g[t] || []).push(d); return Object.keys(g).sort().map(t => ({ t, items: g[t] })); }
+const noteSenior = () => !!ME.easy || (ME.age === 'senior' && ME.easy !== false);
+const NOTE_CH_SR = 'dose_senior';
+const noteCh = () => noteSenior() ? NOTE_CH_SR : NOTE_CH;
+const againMin = () => noteSenior() ? [15, 45] : [30];
+const eveningOn = () => typeof ME.evening === 'boolean' ? ME.evening : noteSenior();
+function setEvening(on){ ME.evening = !!on; saveMe(); armNotifications(); route(); }
+function eveningLeft(k, dayIsToday){ const T = (ME.taken || {})[k] || [], S = (ME.skipped || {})[k] || [], out = [];
+  for (const g of slotGroups()) if (g.t < '21:00') for (const d of g.items) { const key = d.id + '@' + g.t; if (!dayIsToday || (!T.includes(key) && !S.includes(key))) out.push(d); }
+  return out; }
+function eveningBody(L){ const names = [...new Set(L.map(d => d.name))]; return `오늘 아직 체크하지 않은 약이 ${L.length}번 있어요.${noteName() ? ' ' + names.slice(0, 3).join(', ') + (names.length > 3 ? ` 외 ${names.length - 3}가지` : '') + '.' : ''} 눌러서 확인해 주세요.`.slice(0, 200); }
 const noteNameRow = () => `<div class="toggle"><div class="t"><b>알림에 약 이름 보이기</b><span>${noteNameEasy() ? '잠금 화면에도 약 이름이 보여요 — 끄려면 여기서' : noteName() ? '켜져 있어요 — 잠금 화면에도 약 이름이 보일 수 있어요' : '꺼 두면 잠금 화면·옆 사람에게 약 이름 없이 「약 드실 시간이에요」만 보여요'}</span></div><button class="sw ${noteName() ? 'on' : ''}" role="switch" aria-checked="${noteName()}" aria-label="알림에 약 이름 보이기" onclick="setNoteName(!noteName())"></button></div>`;
+const noteMore = () => `<div class="toggle"><div class="t"><b>저녁 9시 하루 정리</b><span>${eveningOn() ? '켜져 있어요 — ' : ''}그때까지 체크하지 않은 약이 있으면 한 번 알려 드려요</span></div><button class="sw ${eveningOn() ? 'on' : ''}" role="switch" aria-checked="${eveningOn()}" aria-label="저녁 9시 하루 정리" onclick="setEvening(!eveningOn())"></button></div>
+  <details class="why-more" style="margin-top:10px"><summary>소리·진동 바꾸기${I.chev}</summary><div class="why" style="margin-top:6px">
+    ${NATIVE ? `<p>${noteSenior() ? '어르신 모드라 <b>「복용 알림(어르신)」</b> 갈래로 소리·진동과 함께 와요.' : '<b>「복용 알림」</b> 갈래로 와요. 어르신 모드를 켜면 소리·진동이 나는 <b>「복용 알림(어르신)」</b> 갈래로 바뀌어요.'}</p>
+    <p style="margin-top:6px">소리를 바꾸려면 <b>휴대폰 설정 → 앱 → 약지도 → 알림 → ${noteSenior() ? '복용 알림(어르신)' : '복용 알림'}</b>에서 「소리」·「진동」을 고르세요.</p>` : '<p>알림 소리는 휴대폰·브라우저 설정을 따라요.</p>'}
+    <p style="margin-top:6px"><b>무음·방해 금지 모드</b>에서는 소리 없이 와요. 방해 금지 중에도 울리게 하려면 설정 → 알림 → 방해 금지 → 「예외 앱」에 약지도를 넣어 주세요.</p></div></details>`;
 function setNoteName(on){ ME.notename = !!on; saveMe(); armNotifications(); route(); }
 async function nativeSetup(){
   const LN = plug('LocalNotifications'); if (!LN) return;
   try {
     await LN.createChannel({ id: NOTE_CH, name: '복용 알림', description: '약 드실 시간을 알려 드려요', importance: 5, visibility: 0, vibration: true, lights: true, lightColor: '#0B6E8F' });
     try { if (LN.deleteChannel) await LN.deleteChannel({ id: 'dose' }); } catch (e) {}
-    await LN.registerActionTypes({ types: [{ id: 'dose', actions: [{ id: 'took', title: '먹었어요' }, { id: 'later', title: '10분 뒤 다시' }] }] });
+    await LN.createChannel({ id: NOTE_CH_SR, name: '복용 알림(어르신)', description: '약 드실 시간을 소리와 진동으로 알려 드려요', importance: 5, visibility: 1, vibration: true, lights: true, lightColor: '#0B6E8F' });
+    await LN.registerActionTypes({ types: [{ id: 'dose', actions: [{ id: 'took', title: '먹었어요' }, { id: 'later', title: '10분 뒤 다시' }, { id: 'skip', title: '건너뛰기' }] }] });
     LN.addListener('localNotificationActionPerformed', ev => {
-      const n = ev && ev.notification || {}; const key = n.extra && n.extra.key;
+      const n = ev && ev.notification || {}; const key = n.extra && (n.extra.keys || n.extra.key);
       if (ev.actionId === 'later') { nativeSnooze(n); return; }
       if (ev.actionId === 'took') tickFromNote(key, n.extra && n.extra.day);
+      if (ev.actionId === 'skip') skipFromNote(key, n.extra && n.extra.day);
       go(n.extra && n.extra.vitals ? '/vitals' : n.extra && n.extra.visit ? '/visits' : '/schedule'); route();
     });
     NATIVE_PERM = (await LN.checkPermissions()).display;
@@ -3727,7 +3787,7 @@ async function nativeSetup(){
 }
 async function nativeSnooze(n){
   const LN = plug('LocalNotifications'); if (!LN) return;
-  try { await LN.schedule({ notifications: [{ id: 900000 + Math.floor(Math.random() * 90000), title: n.title || '약지도 · 약 드실 시간', body: n.body || '', channelId: NOTE_CH, actionTypeId: 'dose', extra: n.extra || {},
+  try { await LN.schedule({ notifications: [{ id: 900000 + Math.floor(Math.random() * 90000), title: n.title || '약지도 · 약 드실 시간', body: n.body || '', channelId: noteCh(), actionTypeId: 'dose', extra: n.extra || {},
     isExactNotification: NATIVE_EXACT === 'granted', schedule: { at: new Date(Date.now() + 10 * 60000), allowWhileIdle: true } }] });
     toast('10분 뒤에 다시 알려 드릴게요'); } catch (e) {}
 }
@@ -3740,7 +3800,7 @@ async function testNote(){
     try { await (NATIVE_READY = NATIVE_READY || nativeSetup()); } catch (e) {}
     if (NATIVE_PERM !== 'granted') { try { NATIVE_PERM = (await LN.requestPermissions()).display; } catch (e) {} }
     if (NATIVE_PERM !== 'granted') { NOTE_HELP = true; route(); toast('알림이 꺼져 있어요 — 아래 방법으로 켜 주세요'); return; }
-    try { await LN.schedule({ notifications: [{ id: 999990, title, body, channelId: NOTE_CH, extra: { test: 1 }, isExactNotification: NATIVE_EXACT === 'granted', schedule: { at: new Date(Date.now() + 5000), allowWhileIdle: true } }] });
+    try { await LN.schedule({ notifications: [{ id: 999990, title, body, channelId: noteCh(), extra: { test: 1 }, isExactNotification: NATIVE_EXACT === 'granted', schedule: { at: new Date(Date.now() + 5000), allowWhileIdle: true } }] });
       toast('5초 뒤에 시험 알림이 와요 — 화면을 꺼 두고 기다려 보셔도 돼요'); } catch (e) { toast('시험 알림을 걸지 못했어요 — 아래 방법을 확인해 주세요'); }
     return;
   }
@@ -3764,47 +3824,56 @@ async function nativeArmOnce(){
     const pend = (await LN.getPending()).notifications || [];
     const ours = pend.filter(p => p.id < 900000);                  /* 「10분 뒤 다시」는 그대로 둔다 */
     if (NATIVE_PERM !== 'granted') { if (ours.length) await LN.cancel({ notifications: ours.map(p => ({ id: p.id })) }); return; }
-    const exact = NATIVE_EXACT === 'granted', list = [], now = Date.now(); let id = 1;
-    const doses = []; for (const d of takingItems()) for (const t of schedOf(d.id, d)) doses.push([d, t]);
-    const other = visits().length * 2 + ((ME.vitalRemind || {}).bp || []).length + takingItems().length * 2 + 2;
-    const DAYS = doses.length ? Math.max(1, Math.min(7, Math.floor((460 - other) / (doses.length * 2)))) : 0;
-    const taken = takenSet(); let lastAt = 0;
-    doses.slice(0, 2000).forEach(([d, t], i) => {
-      const [h, m] = t.split(':').map(Number); const key = d.id + '@' + t;
+    const exact = NATIVE_EXACT === 'granted', list = [], now = Date.now(), ch = noteCh(); let id = 1;
+    const groups = slotGroups().slice(0, 1440), ev = eveningOn() && groups.some(g => g.t < '21:00');
+    const other = visits().length * 2 + ((ME.vitalRemind || {}).bp || []).length + takingItems().length * 2 + 2 + (ev ? 7 : 0);
+    let ag = againMin(), DAYS = 0;
+    if (groups.length) { for (;;) { DAYS = Math.min(7, Math.floor((460 - other) / (groups.length * (1 + ag.length)))); if (DAYS >= 1 || !ag.length) break; ag = ag.slice(0, -1); } DAYS = Math.max(1, DAYS); }
+    const taken = takenSet(), skipped = skippedSet(); let lastAt = 0;
+    groups.forEach(({ t, items }, i) => {
+      const [h, m] = t.split(':').map(Number);
       for (let k = 0; k < DAYS; k++) {
-        const at = new Date(); at.setDate(at.getDate() + k); at.setHours(h, m, 0, 0);
-        const again = new Date(at.getTime() + 30 * 60000), day = dayKey(at);
-        if (k === 0 && taken.includes(key)) continue;                    /* 오늘 이미 드셨으면 제시간·30분 뒤 둘 다 걸지 않는다 */
-        if (at.getTime() > now) { list.push({ id: 1 + i * 20 + k, title: '약지도 · 약 드실 시간', body: noteBody(d, t), channelId: NOTE_CH, actionTypeId: 'dose',
-          extra: { key, day }, isExactNotification: exact, schedule: { at, allowWhileIdle: true } }); lastAt = Math.max(lastAt, at.getTime()); }
-        if (again.getTime() > now) list.push({ id: 11 + i * 20 + k, title: '아직 안 드셨어요', body: noteBody(d, t, true), channelId: NOTE_CH, actionTypeId: 'dose',
-          extra: { key, day, again: day }, isExactNotification: exact, schedule: { at: again, allowWhileIdle: true } });
+        const at = new Date(); at.setDate(at.getDate() + k); at.setHours(h, m, 0, 0); const day = dayKey(at);
+        const its = k === 0 ? items.filter(d => !taken.includes(d.id + '@' + t) && !skipped.includes(d.id + '@' + t)) : items;
+        if (!its.length) continue;
+        const keys = its.map(d => d.id + '@' + t), extra = { key: keys[0], keys, day };
+        if (at.getTime() > now) { list.push({ id: 1 + i * 40 + k, title: '약지도 · 약 드실 시간', body: slotBody(t, its), channelId: ch, actionTypeId: 'dose',
+          extra, isExactNotification: exact, schedule: { at, allowWhileIdle: true } }); lastAt = Math.max(lastAt, at.getTime()); }
+        ag.forEach((mins, j) => { const again = new Date(at.getTime() + mins * 60000);
+          if (again.getTime() > now) list.push({ id: 1 + i * 40 + (j + 1) * 10 + k, title: '아직 안 드셨어요', body: slotBody(t, its, true), channelId: ch, actionTypeId: 'dose',
+            extra: { ...extra, again: day }, isExactNotification: exact, schedule: { at: again, allowWhileIdle: true } }); });
       }
     });
-    id = 1 + Math.min(doses.length, 2000) * 20;
+    if (ev) for (let k = 0; k < DAYS; k++) { const at = new Date(); at.setDate(at.getDate() + k); at.setHours(21, 0, 0, 0); if (at.getTime() <= now) continue;
+      const L = eveningLeft(dayKey(at), k === 0); if (!L.length) continue;
+      list.push({ id: 590000 + k, title: '오늘 약 체크', body: eveningBody(L), channelId: ch, extra: { evening: dayKey(at) }, isExactNotification: exact, schedule: { at, allowWhileIdle: true } }); }
+    id = 1 + groups.length * 40;
     if (lastAt) { const at = new Date(lastAt + 60 * 60000);
-      list.push({ id: 599999, title: '약지도를 한 번 열어 주세요', body: '며칠 동안 앱을 안 여셔서, 이다음 복용 알림은 아직 걸려 있지 않아요. 열기만 하시면 다시 이어서 울려요.', channelId: NOTE_CH,
+      list.push({ id: 599999, title: '약지도를 한 번 열어 주세요', body: '며칠 동안 앱을 안 여셔서, 이다음 복용 알림은 아직 걸려 있지 않아요. 열기만 하시면 다시 이어서 울려요.', channelId: ch,
         extra: { open: 1 }, isExactNotification: exact, schedule: { at, allowWhileIdle: true } }); }
     for (const v of visits()) {
       const at = new Date(v.at); const eve = new Date(at); eve.setDate(eve.getDate() - 1); eve.setHours(19, 0, 0, 0);
       const pre = new Date(at.getTime() - 2 * 3600000);
       for (const [when, title, body] of [[eve, '내일 진료가 있어요', `${visitWord(v)} — 내 약 한 장·혈압 수첩을 챙기세요.`], [pre, '2시간 뒤 진료예요', `${visitWord(v)} — 드시는 약 목록을 챙기세요.`]]) {
         if (when.getTime() <= now) continue;
-        list.push({ id: 600000 + id++, title, body: body.slice(0, 120), channelId: NOTE_CH, extra: { visit: v.id }, isExactNotification: exact, schedule: { at: when, allowWhileIdle: true } });
+        list.push({ id: 600000 + id++, title, body: body.slice(0, 120), channelId: ch, extra: { visit: v.id }, isExactNotification: exact, schedule: { at: when, allowWhileIdle: true } });
       }
     }
     for (const t of ((ME.vitalRemind || {}).bp || [])) { const [h, m] = t.split(':').map(Number);
       list.push({ id: 700000 + id++, title: '약지도 · 혈압 잴 시간', body: t < '12:00' ? '일어나 1시간 안, 소변 본 뒤, 혈압약 먹기 전에 재 주세요.' : '잠자기 전에 재 주세요. 앉아서 몇 분 쉰 뒤에요.',
-        channelId: NOTE_CH, extra: { vitals: 'bp' }, isExactNotification: exact, schedule: { on: { hour: h, minute: m }, allowWhileIdle: true } }); }
+        channelId: ch, extra: { vitals: 'bp' }, isExactNotification: exact, schedule: { on: { hour: h, minute: m }, allowWhileIdle: true } }); }
     for (const d of takingItems()) {
       const dl = daysLeft(d.id); if (dl == null) continue;
-      for (const left of [3, 1]) {
+      for (const left of [5, 1]) {
         const at = new Date(); at.setDate(at.getDate() + (dl - left)); at.setHours(9, 0, 0, 0);
         if (dl < left || at.getTime() <= now) continue;
-        list.push({ id: 800000 + id++, title: left === 1 ? '약이 오늘 치만 남았어요' : '약이 3일치 남았어요', body: `${noteName() ? d.name : '드시는 약 하나가 곧 떨어져요'} — 주말·연휴 전에 미리 받아 두세요.${(d.quick || (d.pub && d.pub.rx)) ? ' 처방약이면 진료를 미리 잡아 두세요.' : ''}`.slice(0, 120),
-          channelId: NOTE_CH, extra: { stock: d.id }, isExactNotification: false, schedule: { at, allowWhileIdle: true } });
+        list.push({ id: 800000 + id++, title: left === 1 ? '약이 오늘 치만 남았어요' : '약이 5일분쯤 남았어요', body: `${noteName() ? d.name + ' 약이' : '드시는 약 하나가'} ${left === 1 ? '오늘 치만 남았어요' : '5일분쯤 남았어요'} — 미리 처방·구입해 두세요.${(d.quick || (d.pub && d.pub.rx)) ? ' 처방약이면 진료를 미리 잡아 두세요.' : ''}`.slice(0, 120),
+          channelId: ch, extra: { stock: d.id }, isExactNotification: false, schedule: { at, allowWhileIdle: true } });
       }
     }
+    const CAP = 480 - pend.filter(p => p.id >= 900000).length;
+    if (list.length > CAP) { const open = list.find(x => x.id === 599999); const tm = x => x.schedule.at ? new Date(x.schedule.at).getTime() : 0;
+      list.splice(0, list.length, ...list.filter(x => x !== open).sort((a, b) => tm(a) - tm(b)).slice(0, CAP - (open ? 1 : 0)), ...(open ? [open] : [])); }
     const keep = new Set(list.map(x => x.id)), stale = ours.filter(p => !keep.has(p.id));
     if (stale.length) await LN.cancel({ notifications: stale.map(p => ({ id: p.id })) });
     if (list.length) await LN.schedule({ notifications: list });
@@ -3859,24 +3928,30 @@ function armNotifications(){
   if (NATIVE) { nativeArm(); return; }
   if (!('Notification' in window) || Notification.permission !== 'granted') return;
   const now = new Date();
-  for (const d of takingItems()) for (const t of schedOf(d.id, d)) {
-    const [h, m] = t.split(':').map(Number); const at = new Date(); at.setHours(h, m, 0, 0);
-    const key = d.id + '@' + t, day = dayKey(at);
-    if (at > now) NOTI_TIMERS.push(setTimeout(() => { if (!takenSet().includes(key)) showNote('약지도 · 약 드실 시간', noteBody(d, t), key, day); }, at - now));
-    const again = new Date(at.getTime() + 30 * 60000);
-    if (again > now) NOTI_TIMERS.push(setTimeout(() => { if (!takenSet().includes(key)) showNote('아직 안 드셨어요', noteBody(d, t, true), key, day); }, again - now));
+  const left = (t, items) => items.filter(d => !takenSet().includes(d.id + '@' + t) && !isSkipped(d.id + '@' + t));
+  for (const { t, items } of slotGroups()) {
+    const [h, m] = t.split(':').map(Number); const at = new Date(); at.setHours(h, m, 0, 0); const day = dayKey(at);
+    const fire = again => { const L = left(t, items); if (L.length) showNote(again ? '아직 안 드셨어요' : '약지도 · 약 드실 시간', slotBody(t, L, again), L.map(d => d.id + '@' + t).join(','), day); };
+    if (at > now) NOTI_TIMERS.push(setTimeout(() => fire(false), at - now));
+    for (const mins of againMin()) { const again = new Date(at.getTime() + mins * 60000); if (again > now) NOTI_TIMERS.push(setTimeout(() => fire(true), again - now)); }
   }
+  const ev = new Date(now); ev.setHours(21, 0, 0, 0);
+  if (eveningOn() && ev > now) NOTI_TIMERS.push(setTimeout(() => { const L = eveningLeft(todayKey(), true); if (L.length) showNote('오늘 약 체크', eveningBody(L), 'yakjido-evening', '', '#/schedule'); }, ev - now));
   for (const v of visits()) for (const [when, title] of visitTimes(v)) { const ms = when - now; if (ms > 0 && ms < 2147000000) NOTI_TIMERS.push(setTimeout(() => showNote(title, visitWord(v), 'visit-' + v.id, '', true), ms)); }
   const mid = new Date(now); mid.setHours(24, 0, 1, 0);
   NOTI_TIMERS.push(setTimeout(() => dayCheck(), mid - now));
 }
 function tickFromNote(key, day){
-  if (!key) return; const k = day || todayKey();
+  const keys = noteKeys(key); if (!keys.length) return; const k = day || todayKey();
   if (k !== todayKey() && k !== dayBefore(1)) { toast('지난 알림이라 기록하지 않았어요 — 복용 시간 화면에서 눌러 주세요'); return; }
   ME.taken = ME.taken || {}; const arr = ME.taken[k] = ME.taken[k] || [];
-  if (!arr.includes(key)) { arr.push(key); rollDay(); saveMe(); toast(k === todayKey() ? '먹었다고 적어 두었어요' : '어제 기록으로 적어 두었어요'); if (NATIVE) nativeArm(); }
+  const add = keys.filter(x => !arr.includes(x));
+  if (add.length) { arr.push(...add); unskip(k, add); rollDay(); saveMe(); toast(k === todayKey() ? '먹었다고 적어 두었어요' : '어제 기록으로 적어 두었어요'); if (NATIVE) nativeArm(); }
 }
-try { navigator.serviceWorker && navigator.serviceWorker.addEventListener('message', ev => { if (ev.data && ev.data.type === 'yakjido-tick') { if (ev.data.go === '/visits') { go('/visits'); route(); return; } tickFromNote(ev.data.key, ev.data.day); go('/schedule'); route(); } }); } catch (e) {}
+function webSnooze(key, day, title, body){ const keys = noteKeys(key); if (!keys.length) return;
+  setTimeout(() => { const k = day || todayKey(), L = keys.filter(x => !((ME.taken || {})[k] || []).includes(x) && !isSkipped(x, k)); if (L.length) showNote(title || '약지도 · 약 드실 시간', body || '약 드실 시간이에요', L.join(','), k); }, 10 * 60000);
+  toast('10분 뒤에 다시 알려 드릴게요'); }
+try { navigator.serviceWorker && navigator.serviceWorker.addEventListener('message', ev => { if (ev.data && ev.data.type === 'yakjido-later') { webSnooze(ev.data.key, ev.data.day, ev.data.title, ev.data.body); return; } if (ev.data && ev.data.type === 'yakjido-tick') { if (ev.data.go === '/visits') { go('/visits'); route(); return; } tickFromNote(ev.data.key, ev.data.day); go('/schedule'); route(); } }); } catch (e) {}
 async function askNoti(){ if (!('Notification' in window)) { toast('이 브라우저는 알림을 지원하지 않아요'); return; } const r = await Notification.requestPermission(); if (r === 'granted') { toast('알림을 켰어요 — 앱이 열려 있을 때 울려요'); armNotifications(); } else toast('알림이 꺼져 있어요'); route(); }
 function icsText(){
   const pad = n => String(n).padStart(2, '0'); const d0 = new Date(); const ds = `${d0.getFullYear()}${pad(d0.getMonth() + 1)}${pad(d0.getDate())}`;
@@ -3915,14 +3990,14 @@ async function downloadIcs(){ if (await saveFile('약지도-복용알림.ics', i
 function careReport(){
   const taking = takingItems(); const taken = takenSet();
   const now = new Date(); const rows = [];
-  for (const d of taking) for (const t of schedOf(d.id, d)) rows.push({ n: d.name, t, done: taken.includes(d.id + '@' + t) });
+  for (const d of taking) for (const t of schedOf(d.id, d)) rows.push({ n: d.name, t, done: taken.includes(d.id + '@' + t), skip: isSkipped(d.id + '@' + t) });
   rows.sort((a, b) => a.t.localeCompare(b.t));
   const head = `${now.getMonth() + 1}월 ${now.getDate()}일 오늘 약`;
   const prnTxt = taking.filter(d => isPrn(d.id)).map(d => { const L = prnLog().filter(x => x.id === d.id).map(x => x.t); return L.length ? `${d.name} ${L.length}번 (${L.join(', ')})` : ''; }).filter(Boolean);
   const prnLine = prnTxt.length ? `\n\n필요할 때 드신 약: ${prnTxt.join(' · ')}` : '';
   if (!rows.length) return head + (prnLine || '\n아직 시간을 정해 둔 약이 없어요.');
   const done = rows.filter(r => r.done).length;
-  const body = rows.map(r => `${r.done ? '✓' : '□'} ${r.t}  ${r.n}`).join('\n');
+  const body = rows.map(r => `${r.done ? '✓' : r.skip ? '–' : '□'} ${r.t}  ${r.n}${r.skip && !r.done ? ' (건너뜀)' : ''}`).join('\n');
   const low = lowStock();
   const a = adherence(30);
   return `${head} (${done}/${rows.length} 드셨어요)\n\n${body}` +
@@ -3942,7 +4017,8 @@ function stockOf(id){ return (ME.stock || {})[id]; }
 function setStock(id, n){ ME.stock = ME.stock || {}; const raw = String(n ?? '').trim();
   if (raw === '') { delete ME.stock[id]; saveMe(); route(); return; }
   const v = Number(raw); if (!Number.isInteger(v) || v < 0 || v > 10000) { toast('남은 알 수를 0 이상 정수로 넣어 주세요'); route(); return; }
-  ME.stock[id] = { left: v, at: todayKey() }; saveMe(); armNotifications(); route(); }
+  ME.stock[id] = { left: v, at: todayKey() }; saveMe(); armNotifications(); route();
+  const dl = daysLeft(id); if (dl != null && dl <= 5) toast(dl === 0 ? '오늘 치도 모자라요 — 미리 처방·구입해 두세요' : `${dl}일분쯤 남았어요 — 미리 처방·구입해 두세요`); }
 const doseQty = id => ((ME.qty || {})[id] || 1);
 function setDoseQty(id, n){ ME.qty = ME.qty || {}; if (n === 1) delete ME.qty[id]; else ME.qty[id] = n; saveMe(); armNotifications(); route(); }
 function daysLeft(id){
@@ -3989,7 +4065,7 @@ function schedWarn(item){
   return many + `<div class="note" style="margin-top:8px">${I.alert}<span><b>시간이 너무 촘촘해요</b> — 이 약은 <b>${need}시간</b>은 띄우는 것이 허가 용법인데, 지금은 가장 가까운 두 번이 <b>${h}시간${mm ? ' ' + mm + '분' : ''}</b> 차이예요. 한 번을 빼시거나 시간을 옮겨 주세요.</span></div>`;
 }
 const DOW = ['일', '월', '화', '수', '목', '금', '토'];
-const CAL_MARK = { full: '✓', part: '◐', miss: '✕' };
+const CAL_MARK = { full: '✓', part: '◐', miss: '✕', skip: '–' };
 let CAL_PICK = '';
 function calPick(k){ CAL_PICK = CAL_PICK === k ? '' : k; route();
   if (CAL_PICK) requestAnimationFrame(() => { const el = document.getElementById('cal-day'); if (el && el.getBoundingClientRect().bottom > innerHeight) try { el.scrollIntoView({ block: 'nearest' }); } catch (e) {} }); }
@@ -3999,17 +4075,20 @@ function calDay(k){
   const items = takingItems(), nameOf = id => (items.find(x => x.id === id) || {}).name || drug(id)?.name || '지금은 내 약통에 없는 약';
   const curSlots = {}; for (const it of items) for (const t of schedOf(it.id, it)) (curSlots[t] = curSlots[t] || []).push(it.id);
   const sameSched = JSON.stringify(Object.keys(p.s).sort().map(t => [t, p.s[t]])) === JSON.stringify(Object.keys(curSlots).sort().map(t => [t, curSlots[t].length]));
-  const times = [...new Set([...Object.keys(p.s), ...took.map(x => x.split('@')[1])])].filter(Boolean).sort();
+  const times = [...new Set([...Object.keys(p.s), ...took.map(x => x.split('@')[1]), ...((ME.skipped || {})[k] || []).map(x => x.split('@')[1])])].filter(Boolean).sort();
+  const skd = ((ME.skipped || {})[k] || []).filter(x => !took.includes(x));
   const rows = times.map(t => {
     const got = took.filter(x => x.endsWith('@' + t)).map(x => x.slice(0, -(t.length + 1)));
-    const miss = Math.max(0, (p.s[t] || 0) - got.length), later = isToday && t > now;
-    const missNames = sameSched || isToday ? (curSlots[t] || []).filter(id => !got.includes(id)).map(nameOf) : [];
+    const sk = skd.filter(x => x.endsWith('@' + t)).map(x => x.slice(0, -(t.length + 1)));
+    const miss = Math.max(0, (p.s[t] || 0) - got.length - sk.length), later = isToday && t > now;
+    const missNames = sameSched || isToday ? (curSlots[t] || []).filter(id => !got.includes(id) && !sk.includes(id)).map(nameOf) : [];
     const word = `${esc(SLOT_WORD[t] || '')} ${t}`.trim();
     return [...got.map(id => `<li><span class="cm ok" aria-hidden="true">✓</span><span><b>${word}</b> ${esc(nameOf(id))} — 드셨어요</span></li>`),
+      ...sk.map(id => `<li><span class="cm skip" aria-hidden="true">–</span><span><b>${word}</b> ${esc(nameOf(id))} — 건너뜀</span></li>`),
       ...(miss ? [`<li><span class="cm ${later ? 'wait' : 'no'}" aria-hidden="true">${later ? '○' : '✕'}</span><span><b>${word}</b> ${missNames.length === miss ? missNames.map(esc).join(', ') + ' — ' + (later ? '아직 드실 시간이 안 됐어요' : '못 드셨어요') : later ? `${miss}번 남았어요 — 아직 드실 시간이 안 됐어요` : `${miss}번 못 드셨어요`}</span></li>`] : [])].join('');
   }).join('');
   const prn = ((ME.prnLog || {})[k] || []).map(x => `<li><span class="cm ok" aria-hidden="true">✓</span><span><b>${esc(x.t)}</b> ${esc(nameOf(x.id))} — 필요할 때 ${x.n || 1}번 드셨어요</span></li>`).join('');
-  const st = dayStat(k), head = p.n ? `${p.n}번 중 ${Math.min(st.done, p.n)}번` : '정해 둔 복용 없음';
+  const st = dayStat(k), head = p.n ? `${p.n}번 중 ${Math.min(st.done, p.n)}번${st.skip ? ` · 건너뜀 ${st.skip}번` : ''}` : '정해 둔 복용 없음';
   return `<div id="cal-day" class="cal-day" role="region" aria-label="${d.getMonth() + 1}월 ${d.getDate()}일 복용 기록">
     <div class="cal-day-h"><b>${d.getMonth() + 1}월 ${d.getDate()}일(${DOW[d.getDay()]})</b><span>${head}</span><button type="button" class="cal-day-x" onclick="calPick('${k}')" aria-label="이 날 기록 닫기">${I.x}</button></div>
     ${rows || prn ? `<ul class="cal-day-list">${rows}${prn}</ul>` : `<p class="small muted" style="margin-top:6px">이날은 적어 둔 복용이 없어요.</p>`}
@@ -4022,7 +4101,7 @@ function calCard(){
   const cells = [];
   for (let i = 34; i >= 0; i--) { const d = new Date(end); d.setDate(d.getDate() - i); cells.push(d); }
   const a = adherence(30);
-  const LBL = { full: '다 드셨어요', part: '일부만', miss: '빠짐', none: '정해 둔 것 없음', soon: '아직 남은 시간이 있어요' };
+  const LBL = { full: '다 드셨어요', part: '일부만', miss: '빠짐', skip: '건너뛴 것 있음', none: '정해 둔 것 없음', soon: '아직 남은 시간이 있어요' };
   const grid = cells.map(d => {
     const k = dayKey(d);
     const future = k > todayKey();
@@ -4037,7 +4116,7 @@ function calCard(){
   const first = cells[0], last = new Date(today);
   const span = `${first.getMonth() + 1}월 ${first.getDate()}일 — ${last.getMonth() + 1}월 ${last.getDate()}일`;
   return `<section class="sec card"><h2>지난 기록 <small>${DAYS_KEEP}일까지 이 휴대폰에만</small></h2>
-  ${a.days ? `<p style="margin-top:6px"><b>어제까지 30일 가운데 약을 드시기로 한 날이 ${a.days}일</b>이었고, 그중 <b>${a.full}일</b>은 빠짐없이 드셨어요.${a.doses ? ` 전체로는 ${a.doses}번 중 ${a.took}번이에요.` : ''}</p>`
+  ${a.days ? `<p style="margin-top:6px"><b>어제까지 30일 가운데 약을 드시기로 한 날이 ${a.days}일</b>이었고, 그중 <b>${a.full}일</b>은 빠짐없이 드셨어요.${a.doses ? ` 전체로는 ${a.doses}번 중 ${a.took}번이에요.` : ''}${a.skip ? ` 일부러 건너뛴 것은 ${a.skip}번이에요.` : ''}</p>`
     : `<p style="margin-top:6px">아직 기록이 없어요. 위에서 시간을 고르고 드실 때마다 눌러 두시면 여기에 쌓입니다.</p>`}
   <div class="cal-span">${span}</div>
   <div class="cal-dow">${DOW.map(x => `<span>${x}</span>`).join('')}</div>
@@ -4045,7 +4124,7 @@ function calCard(){
   <p class="small muted cal-tip">날짜를 누르면 그날 드신 약을 아래에 보여 드려요.</p>
   ${calDay(CAL_PICK)}
   ${slotLine()}
-  <div class="cal-key">${[['full', '다 드심'], ['part', '일부'], ['miss', '빠짐'], ['none', '정해 둔 것 없음'], ['cal-now', '오늘']].map(([c, n]) => `<span class="ki"><span class="k ${c}" aria-hidden="true">${CAL_MARK[c] || ''}</span>${n}</span>`).join('')}</div>
+  <div class="cal-key">${[['full', '다 드심'], ['part', '일부'], ['skip', '건너뜀'], ['miss', '빠짐'], ['none', '정해 둔 것 없음'], ['cal-now', '오늘']].map(([c, n]) => `<span class="ki"><span class="k ${c}" aria-hidden="true">${CAL_MARK[c] || ''}</span>${n}</span>`).join('')}</div>
   <p class="small muted" style="margin-top:10px">진료 때 이 화면을 그대로 보여 주시면 됩니다. <b>못 드신 날을 탓하려고 만든 것이 아니에요</b> — 언제 왜 놓치시는지 의사·약사가 보면 약을 더 쉬운 쪽으로 바꿔 드릴 수 있어요.</p>
   </section>`
 }
@@ -4078,7 +4157,7 @@ function doseRing(done, total, size = 64){ const r = 26, C = 2 * Math.PI * r, f 
   return `<svg class="ring" viewBox="0 0 64 64" width="${size}" height="${size}" aria-hidden="true"><circle cx="32" cy="32" r="${r}" fill="none" stroke="var(--hairline)" stroke-width="7"/><circle cx="32" cy="32" r="${r}" fill="none" stroke="${f >= 1 ? 'var(--normal)' : 'var(--primary)'}" stroke-width="7" stroke-linecap="round" stroke-dasharray="${(C * f).toFixed(1)} ${C.toFixed(1)}" transform="rotate(-90 32 32)"/></svg>`; }
 const DAYPART = [['아침', 0, 660], ['점심', 660, 900], ['저녁', 900, 1200], ['자기 전', 1200, 1440]];
 function daypartGroups(todays){ return DAYPART.map(([n, a, b]) => [n, todays.filter(x => x.min >= a && x.min < b)]).filter(([, l]) => l.length); }
-function todayHero(todays, nowMin, link){ const done = todays.filter(x => x.done).length, all = todays.length, nx = todays.find(x => !x.done && x.min >= nowMin - 60) || todays.find(x => !x.done);
+function todayHero(todays, nowMin, link){ const done = todays.filter(x => x.done).length, all = todays.length, nx = todays.find(x => !x.done && !x.skip && x.min >= nowMin - 60) || todays.find(x => !x.done && !x.skip);
   const head = done >= all ? '오늘 약 다 드셨어요' : `오늘 <b>${done}</b><span>/${all}</span>`;
   const sub = done >= all ? '내일도 같은 시간에 알려 드릴게요' : (nx ? `다음 ${nx.t} · ${esc(nx.d.name)}` : '');
   return `<div class="today-hero${done >= all ? ' all' : ''}"${link ? ` role="link" tabindex="0" onclick="go('/schedule')" onkeydown="if(event.key==='Enter')go('/schedule')"` : ''}>${doseRing(done, all)}<div class="th-t"><div class="th-h">${head}</div>${sub ? `<div class="th-s">${sub}</div>` : ''}</div>${link ? `<span class="th-go" aria-hidden="true">${I.chev || ''}</span>` : ''}</div>`; }
@@ -4110,17 +4189,19 @@ function vDemo(_, q){
   ${disclaimer()}`;
 }
 function vSchedule(_, q){
-  if (q && q.tick) { tickFromNote(q.tick, q.day); setTimeout(() => { try { history.replaceState(null, '', '#/schedule'); } catch (e) {} }, 0); }
+  if (q && (q.tick || q.later)) { q.tick ? tickFromNote(q.tick, q.day) : webSnooze(q.later, q.day); setTimeout(() => { try { history.replaceState(null, '', '#/schedule'); } catch (e) {} }, 0); }
   const taking = takingItems(); rollDay();
   const perm = ('Notification' in window) ? Notification.permission : 'unsupported';
   const now = new Date(); const nowMin = now.getHours() * 60 + now.getMinutes(); const taken = takenSet();
-  const todays = []; for (const d of taking) for (const t of schedOf(d.id, d)) { const [h, m] = t.split(':').map(Number); todays.push({ d, t, min: h * 60 + m, done: taken.includes(d.id + '@' + t) }); }
+  const todays = []; for (const d of taking) for (const t of schedOf(d.id, d)) { const [h, m] = t.split(':').map(Number); todays.push({ d, t, min: h * 60 + m, done: taken.includes(d.id + '@' + t), skip: isSkipped(d.id + '@' + t) }); }
   todays.sort((a, b) => a.min - b.min);
+  const lateL = todays.filter(x => !x.done && !x.skip && x.min < nowMin - 60);
   return `${topBar({ back:'내 정보' })}<div class="eyebrow">복용 시간 알림</div><h1>오늘 약, 잊지 않게</h1>${todays.length ? todayHero(todays, nowMin) : art('schedule', 'banner')}
   ${leadHtml('먹는 약마다 시간을 고르면 오늘 할 일이 체크 목록으로 나오고, 시간이 되면 알려드려요. **시간을 정한 약만** 알려 드려요 — 허가 용법대로 시간을 제안해 드리니 맞으면 「이 시간으로 정하기」를 누르세요.', 'margin-top:6px', todays.length ? 'small muted' : '')}
   ${taking.filter(schedUnset).length ? `<div class="note" style="margin-top:10px">${I.clock}<span><b>시간을 아직 정하지 않은 약이 ${taking.filter(schedUnset).length}가지 있어요</b> — 아래 「약마다 시간 고르기」에서 매일 드시는지, 필요할 때만 드시는지 골라 주세요.</span></div>` : ''}
   ${!taking.length ? `<section class="sec card"><div class="empty"><b>아직 담아 둔 약이 없어요</b>약 사전에서 약을 찾아 ‘내 약통에 담기’를 누르면 여기 나와요.</div><div class="actions"><button class="btn ghost" onclick="go('/drugs')">${I.search} 약 찾기</button></div></section>` : ''}
-  ${todays.length ? `<section class="sec"><h2>오늘 <small>${now.getMonth() + 1}월 ${now.getDate()}일 · ${todays.filter(x => x.done).length}/${todays.length} 완료</small></h2>${daypartGroups(todays).map(([part, list]) => `<div class="dp"><div class="dp-h">${part}</div><div class="dose-list">${list.map(x => `<button class="dose-tick ${x.done ? 'done' : (x.min < nowMin - 60 ? 'late' : '')}" onclick="tick('${x.d.id}','${x.t}')" aria-pressed="${x.done}"><span class="bx">${x.done ? I.check : ''}</span>${pillGlyph(x.d)}<span class="n"><b>${esc(x.d.name)}</b><small><span class="t">${x.t}</span> · ${fmt((x.d.simple || '').split('.')[0])}</small></span></button>`).join('')}</div></div>`).join('')}${todays.some(x => !x.done && x.min < nowMin - 60) ? `<details class="why-more" style="margin-top:10px"><summary>드셨는지 기억이 안 나요${I.chev}</summary><div class="why" style="margin-top:6px"><p>확실하지 않으면 <b>이번 회는 건너뛰고</b> 다음 시간부터 원래대로 드세요. 대부분의 약은 <b>두 번 드시는 쪽이 더 위험</b>해요. 피임약·항생제처럼 놓치면 곤란한 약은 약사에게 물어보세요. 앞으로는 드시자마자 위 칸을 눌러 두시면 헷갈리지 않아요.</p></div></details>` : ''}</section>` : ''}
+  ${todays.length ? `<section class="sec"><h2>오늘 <small>${now.getMonth() + 1}월 ${now.getDate()}일 · ${todays.filter(x => x.done).length}/${todays.length} 완료</small></h2>${daypartGroups(todays).map(([part, list]) => `<div class="dp"><div class="dp-h">${part}</div><div class="dose-list">${list.map(x => `<button class="dose-tick ${x.done ? 'done' : x.skip ? 'skip' : (x.min < nowMin - 60 ? 'late' : '')}" onclick="tick('${x.d.id}','${x.t}')" aria-pressed="${x.done}"><span class="bx">${x.done ? I.check : x.skip ? '–' : ''}</span>${pillGlyph(x.d)}<span class="n"><b>${esc(x.d.name)}</b><small><span class="t">${x.t}</span> · ${x.skip ? '건너뛰었어요 — 드셨으면 눌러 주세요' : fmt((x.d.simple || '').split('.')[0])}</small></span></button>`).join('')}</div></div>`).join('')}${lateL.length ? `<details class="why-more" style="margin-top:10px"><summary>드셨는지 기억이 안 나요${I.chev}</summary><div class="why" style="margin-top:6px"><p>확실하지 않으면 <b>이번 회는 건너뛰고</b> 다음 시간부터 원래대로 드세요. 대부분의 약은 <b>두 번 드시는 쪽이 더 위험</b>해요. 피임약·항생제처럼 놓치면 곤란한 약은 약사에게 물어보세요. 앞으로는 드시자마자 위 칸을 눌러 두시면 헷갈리지 않아요.</p>
+    <p style="margin-top:8px">건너뛰기로 하셨으면 눌러 두세요 — <b>못 드신 것과 따로</b> 적어서 진료 때 구분돼요.</p><div class="skip-l">${lateL.map(x => `<button type="button" class="btn line" onclick="skipDose('${x.d.id}','${x.t}')">${esc(hourWord(x.t))} ${esc(x.d.name)} — 건너뛰기</button>`).join('')}</div></div></details>` : ''}</section>` : ''}
   ${taking.filter(d => isPrn(d.id)).length ? `<section class="sec card"><h2>필요할 때 드신 약</h2>
     <p class="small muted" style="margin-top:4px">아플 때만 드시는 약은 드실 때마다 눌러 적어 두세요. <b>다음은 몇 시부터</b>인지, 오늘 몇 번째인지 알려 드려요.</p>
     ${taking.filter(d => isPrn(d.id)).map(d => { const st = prnState(d); return `<div class="sched-row prn-row"><div class="nm"><span>${esc(d.name)}</span>${st.count ? `<b class="${st.full ? 'stockwarn' : 'stockok'}">오늘 ${st.count}번${st.max ? ` / ${st.max}번` : ''}</b>` : ''}</div>${painBadge(d) ? `<div class="pain-row">${painBadge(d)}</div>` : ''}
@@ -4149,8 +4230,8 @@ function vSchedule(_, q){
   ${taking.length ? `<div class="pane${schOn('sc4')}" id="sc4">` : ''}${NATIVE ? `<section class="sec card"><h2>알림 방법</h2>
     <div class="toggle"><div class="t"><b>휴대폰 알림</b><span>${NATIVE_PERM === 'granted' ? '켜져 있어요 — 앱을 닫아도, 휴대폰을 껐다 켜도 울려요' : NATIVE_PERM === 'denied' ? '꺼져 있어요 — 휴대폰 설정 → 앱 → 약지도 → 알림' : '허용하면 시간에 맞춰 알려드려요'}</span></div><button class="btn ghost" style="width:auto;min-height:46px;padding:0 14px" onclick="askNativeNoti()">${NATIVE_PERM === 'granted' ? '켜짐' : '켜기'}</button></div>
     ${NATIVE_PERM === 'granted' && NATIVE_EXACT !== 'granted' ? `<div class="toggle"><div class="t"><b>정확한 시각에 울리기</b><span>지금은 휴대폰이 몇 분 늦게 울릴 수 있어요. 「알람 및 리마인더」를 허용해 주세요</span></div><button class="btn ghost" style="width:auto;min-height:46px;padding:0 14px" onclick="askExact()">허용</button></div>` : ''}
-    ${noteNameRow()}
-    <p class="small muted" style="margin-top:10px">알림의 <b>「먹었어요」</b>를 누르면 약지도가 열리며 바로 체크돼요. <b>「10분 뒤 다시」</b>도 있어요. 30분이 지나도 체크가 없으면 <b>한 번 더</b> 알려 드려요. 알림은 앞으로 며칠치를 미리 걸어 두고, 앱을 여실 때마다 이어서 다시 걸어요.</p>
+    ${noteNameRow()}${noteMore()}
+    <p class="small muted" style="margin-top:10px">알림의 <b>「먹었어요」</b>를 누르면 약지도가 열리며 바로 체크돼요. <b>「10분 뒤 다시」</b>·<b>「건너뛰기」</b>도 있어요. ${noteSenior() ? '체크가 없으면 <b>15분·45분 뒤 두 번 더</b>' : '30분이 지나도 체크가 없으면 <b>한 번 더</b>'} 알려 드려요. 알림은 앞으로 며칠치를 미리 걸어 두고, 앱을 여실 때마다 이어서 다시 걸어요.</p>
     <details class="why-more" style="margin-top:10px" ${NOTE_HELP ? 'open' : ''}><summary>알림이 늦거나 안 와요${I.chev}</summary><div class="why" style="margin-top:6px">
       <button type="button" class="btn line" style="margin:4px 0 10px" onclick="testNote()">${I.clock} 시험 알림 보내기</button>
       ${NOTE_HELP && NATIVE_PERM !== 'granted' ? `<p class="note soft" style="margin-bottom:8px">${I.info}<span>알림이 꺼져 있어요. <b>휴대폰 설정 → 앱 → 약지도 → 알림</b>에서 「알림 허용」을 켜 주세요. 그다음 다시 눌러 보세요.</span></p>` : ''}
@@ -4163,8 +4244,8 @@ function vSchedule(_, q){
   </section>` : `<section class="sec card"><h2>알림 방법</h2>
     <div class="toggle"><div class="t"><b>앱이 열려 있을 때 알림</b><span>${perm === 'granted' ? '켜져 있어요' : perm === 'denied' ? '브라우저 설정에서 차단됨' : perm === 'unsupported' ? '이 브라우저는 지원하지 않아요' : '허용하면 시간에 맞춰 알려드려요'}</span></div><button class="btn ghost" style="width:auto;min-height:46px;padding:0 14px" onclick="askNoti()">${perm === 'granted' ? '켜짐' : '켜기'}</button></div>
     <div class="toggle"><div class="t"><b>휴대폰 달력에 매일 알림 넣기</b><span>앱을 닫아도 울려요. 파일을 열면 달력이 등록해요</span></div><button class="btn ghost" style="width:auto;min-height:46px;padding:0 14px" onclick="downloadIcs()">${I.clock} 받기</button></div>
-    ${noteNameRow()}
-    <p class="small muted" style="margin-top:10px">알림의 <b>「먹었어요」</b>를 누르면 바로 체크돼요. 30분이 지나도 체크가 없으면 <b>한 번 더</b> 알려 드려요. 앱을 완전히 닫아 두시면 울리지 않으니, 그럴 땐 <b>달력 알림</b>을 함께 켜 두세요.</p>
+    ${noteNameRow()}${noteMore()}
+    <p class="small muted" style="margin-top:10px">알림의 <b>「먹었어요」</b>를 누르면 바로 체크돼요. <b>「10분 뒤 다시」</b>도 있어요. ${noteSenior() ? '체크가 없으면 <b>15분·45분 뒤 두 번 더</b>' : '30분이 지나도 체크가 없으면 <b>한 번 더</b>'} 알려 드려요. 앱을 완전히 닫아 두시면 울리지 않으니, 그럴 땐 <b>달력 알림</b>을 함께 켜 두세요.</p>
     <details class="why-more" style="margin-top:10px" ${NOTE_HELP ? 'open' : ''}><summary>알림이 늦거나 안 와요${I.chev}</summary><div class="why" style="margin-top:6px">
       <button type="button" class="btn line" style="margin:4px 0 10px" onclick="testNote()">${I.clock} 시험 알림 보내기</button>
       ${NOTE_HELP && perm !== 'granted' ? `<p class="note soft" style="margin-bottom:8px">${I.info}<span>${perm === 'unsupported' ? '이 브라우저는 알림을 지원하지 않아요. 위의 <b>「휴대폰 달력에 매일 알림 넣기」</b>를 써 주세요.' : '알림이 막혀 있어요. 주소창 왼쪽의 <b>자물쇠(또는 설정) 표시 → 사이트 설정 → 알림 → 허용</b>으로 바꾼 뒤 다시 눌러 주세요.'}</span></p>` : ''}
