@@ -17,7 +17,7 @@
 |---|---|
 | 앱 ID | 스토어판 `app.yakjido` (2026-10-13 메디나눔 공통 꼴로 바꿈 — 그 전 시험판 `kr.yakjido.app` 은 다른 앱으로 남으니 지우고 새로 설치) · **시험판(디버그) `app.yakjido.test`, 이름 「약지도 시험판」**(10-13 — 공개 시험 키로 서명한 앱이 스토어판을 덮어쓸 수 없게 따로 깔림) |
 | 버전 | 사용자에게 보이는 `1.0.0`(package.json 과 같게) · 번호는 빌드 번호×10+다시 돌린 횟수(같은 실행을 다시 돌려도 겹치지 않게) |
-| 알림 부품 고침 | `npm install`·`npm ci` 뒤 `tools/patch-local-notifications.js` 가 매일 반복 알림의 다음 날 예약을 폰을 깨우는 꼴로 바꾼다(원래는 도즈에서 늦게 울림). 플러그인 판이 바뀌어 고칠 줄을 못 찾으면 설치를 멈춘다 |
+| 알림 부품 고침 | (앱은 2026-10-13부터 7일치 한 번짜리 알림을 쓰지만, 남은 반복 알림도 깨우게) `npm install`·`npm ci` 뒤 `tools/patch-local-notifications.js` 가 매일 반복 알림의 다음 날 예약을 폰을 깨우는 꼴로 바꾼다(원래는 도즈에서 늦게 울림). 플러그인 판이 바뀌어 고칠 줄을 못 찾으면 설치를 멈춘다 |
 | 위치 | 대략 위치만 — `MainActivity` 가 웹 위치 요청에 ACCESS_COARSE_LOCATION 만 묻는다(Capacitor 기본은 정밀 위치도 같이 물어 안드로이드 11 이하에서 늘 거절됐음) |
 | 웹 소스 | `www/` ← `docs/yakjido/` 복사본 (`npm run web`, 서비스워커·매니페스트와, 앱이 읽지 않는 중간 자료 `kpic-guide.json`·`kpic-extra.json` 20 MB 는 뺌 — 제품 화면은 `data/kg/` 조각만 읽는다) |
 | 아이콘·스플래시·상태바 아이콘 | `python3 yakjido/tools/make_native_icons.py` 가 **정본 `art/icon-1024.png`** 에서 만든다 |

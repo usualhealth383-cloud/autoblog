@@ -6,7 +6,7 @@
 - public/ 에 공공데이터(e약은요·낱알식별) 추출본이 있으면 함께 심는다.
 - 배포본은 GitHub Pages(docs/yakjido/) 로 나간다. manifest·sw 는 같은 폴더에 둔다.
 """
-import json, pathlib, re, datetime
+import json, pathlib, re, datetime, hashlib
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 shell = (ROOT / 'app-shell.html').read_text(encoding='utf-8')
 data = {}
@@ -109,7 +109,10 @@ for k, v in data.items():
 jc = json.dumps(core, ensure_ascii=False, separators=(',', ':'))
 j = json.dumps(inline, ensure_ascii=False, separators=(',', ':')).replace('</', '<\\/')
 stamp = datetime.date.today().isoformat()
-out = shell.replace('<!--DATA-->', j).replace('__BUILD__', stamp)
+jd = json.dumps(detail, ensure_ascii=False, separators=(',', ':'))
+# 본문 판(DATAV)은 core·detail 내용의 해시 — 같은 날 두 번 빌드해도 내용이 바뀌면 휴대폰이 새 본문을 받는다(2026-10-13 자체 검수 5-02)
+datav = hashlib.sha1((jc + jd).encode('utf-8')).hexdigest()[:10]
+out = shell.replace('<!--DATA-->', j).replace('__BUILD__', stamp).replace('__DATAV__', datav)
 # 2026-10-13 상용화 점검 — 배포본에서는 «줄 전체가 주석»인 /* … */ 덩어리를 뺀다(원본은 그대로). 휴대폰마다 개발 메모 수백 개를 내려받던 것 —
 # 첫 화면 압축 225 → 192 KB. 줄 중간·코드 뒤의 주석은 건드리지 않는다(문자열 안일 수 있어서).
 import re as _re
@@ -119,12 +122,14 @@ pages.mkdir(parents=True, exist_ok=True)
 (pages / 'index.html').write_text(out, encoding='utf-8')
 (pages / 'data').mkdir(parents=True, exist_ok=True)
 (pages / 'data' / 'core.json').write_text(jc, encoding='utf-8')
-(pages / 'data' / 'detail.json').write_text(json.dumps(detail, ensure_ascii=False, separators=(',', ':')), encoding='utf-8')
+(pages / 'data' / 'detail.json').write_text(jd, encoding='utf-8')
 print(f'첫 화면 {len(out)/1024:.0f} KB · 본문 data/core.json {len(jc)/1024:.0f} KB')
-# 서비스워커 캐시 이름을 빌드마다 갱신
+# 서비스워커 캐시 이름 = 배포 파일 내용의 해시 — 내용이 같으면 같은 이름(파이썬 hash() 는 실행마다 달라 매번 바뀌던 것, 2026-10-13)
+_srvjs = (ROOT / 'srv.js').read_text(encoding='utf-8') if (ROOT / 'srv.js').exists() else ''
+cache_id = hashlib.sha1((out + jc + jd + _srvjs).encode('utf-8')).hexdigest()[:8]
 sw = ROOT / 'sw.js'
 if sw.exists():
-    s = re.sub(r"const CACHE = '[^']*'", f"const CACHE = 'yakjido-{stamp}-{abs(hash(j)) % 10000}'", sw.read_text(encoding='utf-8'))
+    s = re.sub(r"const CACHE = '[^']*'", f"const CACHE = 'yakjido-{stamp}-{cache_id}'", sw.read_text(encoding='utf-8'))
     (pages / 'sw.js').write_text(s, encoding='utf-8')
 for name in ('manifest.webmanifest', 'privacy.html', 'delete-account.html', 'srv.js'):   # delete-account.html = 스토어 「계정 삭제 URL」(메디나눔 안내 2026-10-13)   # srv.js = 계정·기록 이어 두기(따로 받는 파일)   # privacy.html = 스토어에 적는 개인정보처리방침 주소
     src = ROOT / name
