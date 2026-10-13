@@ -107,7 +107,7 @@ CAP_MOCK = """
 window.__LN = {pending:[], listeners:{}, perm:'granted', exact:'denied', types:null};
 window.Capacitor = { isNativePlatform: () => true, Plugins: {
   LocalNotifications: {
-    createChannel: async () => {}, registerActionTypes: async o => { __LN.types = o; },
+    createChannel: async o => { (__LN.ch = __LN.ch || []).push(o); }, registerActionTypes: async o => { __LN.types = o; },
     addListener: (n, f) => { __LN.listeners[n] = f; return { remove(){} }; },
     checkPermissions: async () => ({ display: __LN.perm }), requestPermissions: async () => ({ display: __LN.perm }),
     checkExactNotificationSetting: async () => ({ exact_alarm: __LN.exact }),
@@ -227,7 +227,7 @@ CLASSFLAG_JS = """pairs=>{
   for (const d of (D.drugs||[])) {
     ME.taking=[d.id]; ME.pub={};
     const cls=new Set(); ixItems([]).forEach(it=>it.ings.forEach(e=>(e.cls||[]).forEach(c=>cls.add(c))));
-    const fl=new Set((d.avoid||[]).flatMap(a=>a.flags||[]));
+    const fl=new Set([...(d.avoid||[]), ...(d.caution||[])].flatMap(a=>a.flags||[]));   /* 금기(avoid)든 주의(caution)든 «경고가 달려 있으면» 됨 — 소염제+항응고제는 주의(현욱님 10-13 「금기까지는 아니지, 의사 먼저 상의」) */
     for (const [c,f] of pairs)
       if (cls.has(c) && !fl.has(f) && !(KEEP[d.id]||[]).includes(f)) out.push(d.id+' 에 '+f+' 가 없습니다('+c+' 계열)');
   }
@@ -240,6 +240,249 @@ CLASSFLAG_PAIRS = [['nsaid', 'anticoag'], ['nsaid', 'asthma'], ['nsaid', 'ulcer'
                    ['macrolide', 'heart'], ['quinolone', 'child']]
 
 TAP_JS = """()=>[...document.querySelectorAll('#view button,#view a')].filter(e=>!((e.matches('a.link')||e.matches('a.call-in'))&&e.closest('p,span,li,div'))).map(e=>{const b=e.getBoundingClientRect();return b.height>0&&b.height<44?((e.innerText||e.className)+'').slice(0,20)+':'+Math.round(b.height):null}).filter(Boolean)"""
+
+# Z6(2026-10-13 의사-피드백 §101) — 메디세이프처럼 알림을 잘, 어르신 약도. 단 「너무 자주 하면 안 된다 · 광고 알림 금지」(현욱님).
+#   같은 시각 약은 한 장으로 묶기 · 30분 뒤 한 번만 · 하루 «시각 수 + 1»장 · 건너뛰기(놓침과 따로) · 10분 뒤 다시(앱·웹) ·
+#   어르신 갈래(dose_senior) · 약 이름·알 수 글 · 저녁 정리(기본 꺼짐, 켠 분만) · 약 떨어짐 한 번 · 가족에게 알릴까요(앱 안에서만) · 알람 500개 한도
+def alarm_z6(br, url, fails):
+    zerr = []
+    def page(me, t='2026-09-28T07:00:00', native=True):
+        pz = br.new_page(viewport={'width': 390, 'height': 844}); pz.on('pageerror', lambda e: zerr.append(str(e)))
+        pz.clock.install(time=t)
+        if native: pz.add_init_script(CAP_MOCK)
+        pz.add_init_script("localStorage.setItem('yakjido.hello.v1','1');localStorage.setItem('yakjido.me.v1',%s)" % json.dumps(json.dumps(me)))
+        pz.goto(url + '#/schedule?t=sc4'); pz.wait_for_selector('.app', timeout=15000); pz.wait_for_timeout(1500)
+        return pz
+    SR = {'age': 'senior', 'easy': True, 'taking': ['ibuprofen', 'acetaminophen'], 'sched': {'ibuprofen': ['08:00', '20:00'], 'acetaminophen': ['08:00']}, 'qty': {'acetaminophen': 2}, 'pub': {}}
+    pz = page(SR)
+    P = lambda: pz.evaluate("()=>__LN.pending")
+    L = P(); dose = [x for x in L if x.get('actionTypeId') == 'dose']
+    on = [x for x in L if x.get('title') == '약지도 · 약 드실 시간']; ag = [x for x in L if x.get('title') == '아직 안 드셨어요']
+    if any(x.get('channelId') != 'dose_senior' for x in dose): fails.append('Z6 알림: 어르신 모드 복용 알림이 어르신 갈래(dose_senior)로 가지 않습니다')
+    chs = pz.evaluate("()=>(__LN.ch||[]).map(c=>c.id+':'+c.visibility+':'+c.importance)")
+    if 'dose_senior:1:5' not in chs or 'dose2:0:5' not in chs: fails.append(f'Z6 알림: 알림 갈래가 틀립니다 — {chs}')
+    # 같은 시각 약은 한 장 — 08:00 은 두 약이 한 장, 7일 × 시각 2개 = 14
+    if len(on) != 14: fails.append(f'Z6 알림: 같은 시각 약을 한 장으로 묶지 않았습니다 — 제시간 알림 {len(on)}개(14개여야)')
+    m8 = [x for x in on if x['body'].startswith('아침 8시 약')]
+    if not m8 or sorted(m8[0]['extra'].get('keys') or []) != ['acetaminophen@08:00', 'ibuprofen@08:00']: fails.append(f'Z6 알림: 08:00 알림이 두 약을 함께 담지 않습니다 — {m8[:1]}')
+    if m8 and ('2알' not in m8[0]['body'] or '이부프로펜' not in m8[0]['body'] or '물 한 컵과 함께' not in m8[0]['body']): fails.append(f'Z6 알림: 어르신 알림 글이 「아침 8시 약 — 이름 알 수」·물 한 컵 꼴이 아닙니다 — {m8[0]["body"]}')
+    e8 = [x for x in on if x['body'].startswith('저녁 8시 약')]
+    if not e8 or '물 한 컵' in e8[0]['body']: fails.append(f'Z6 알림: 물 그림이 없는 약(이부프로펜만)에 「물 한 컵」이 붙었습니다 — {e8[:1]}')
+    # 어르신도 더 자주가 아니다 — 다시 알림은 30분 뒤 한 번뿐
+    mins = sorted({pz.evaluate("(a)=>new Date(a).getMinutes()", x['schedule']['at']) for x in ag})
+    if mins != [30]: fails.append(f'Z6 알림: 다시 알림이 30분 뒤 한 번이 아닙니다 — 분 {mins}')
+    perday = pz.evaluate("()=>{const c={};for(const x of __LN.pending){if(x.id>=900000||!x.schedule.at)continue;const d=new Date(x.schedule.at);const k=d.getMonth()+'-'+d.getDate();c[k]=(c[k]||0)+1;}return c;}")
+    if max(perday.values()) > 3: fails.append(f'Z6 알림: 하루 알림이 «시각 수 + 1»(3장)을 넘습니다 — {perday}')
+    if any(x.get('title') == '오늘 약 체크' for x in L): fails.append('Z6 알림: 저녁 하루 정리가 어르신에게도 기본으로 켜져 있습니다(기본 꺼짐)')
+    # 광고·홍보성 알림 0 — 제목은 정해진 것만
+    OK_T = {'약지도 · 약 드실 시간', '아직 안 드셨어요', '알림을 이어 가려면 약지도를 한 번 열어 주세요', '약이 5일분쯤 남았어요', '오늘 약 체크', '내일 진료가 있어요', '2시간 뒤 진료예요', '약지도 · 혈압 잴 시간'}
+    bad = sorted({x.get('title') for x in L if x.get('title') not in OK_T})
+    if bad: fails.append(f'Z6 알림: 정해지지 않은 알림 제목(광고·홍보 금지) — {bad}')
+    # 저녁 정리 켜기 → 오늘 21:00 「체크하지 않은 약이 3번」, 08:00 「먹었어요」 → 1번, 20:00 건너뛰기 → 오늘 정리 사라짐
+    pz.evaluate("()=>setEvening(true)"); pz.wait_for_timeout(500)
+    ev = lambda: [x for x in P() if x.get('title') == '오늘 약 체크']
+    e0 = [x for x in ev() if x['id'] == 590000]
+    if not e0 or '3번' not in e0[0]['body'] or pz.evaluate("(a)=>new Date(a).getHours()", e0[0]['schedule']['at']) != 21: fails.append(f'Z6 알림: 저녁 9시 하루 정리가 틀립니다 — {e0}')
+    pz.evaluate("()=>__LN.listeners.localNotificationActionPerformed({actionId:'took',notification:{extra:{key:'ibuprofen@08:00',keys:['ibuprofen@08:00','acetaminophen@08:00']}}})"); pz.wait_for_timeout(600)
+    if sorted(pz.evaluate("()=>takenSet()")) != ['acetaminophen@08:00', 'ibuprofen@08:00']: fails.append('Z6 알림: 묶은 알림의 「먹었어요」가 두 약을 함께 체크하지 않습니다')
+    e0 = [x for x in ev() if x['id'] == 590000]
+    if not e0 or '1번' not in e0[0]['body']: fails.append(f'Z6 알림: 체크 뒤 저녁 정리 개수가 맞지 않습니다 — {e0}')
+    pz.evaluate("()=>__LN.listeners.localNotificationActionPerformed({actionId:'skip',notification:{extra:{key:'ibuprofen@20:00',keys:['ibuprofen@20:00'],day:todayKey()}}})"); pz.wait_for_timeout(600)
+    sk = pz.evaluate("()=>({s:(ME.skipped||{})[todayKey()]||[], t:takenSet(), st:dayStat(todayKey()).s, left:__LN.pending.filter(x=>x.schedule.at&&new Date(x.schedule.at).getDate()===28&&x.id<900000).map(x=>x.title)})")
+    if sk['s'] != ['ibuprofen@20:00'] or 'ibuprofen@20:00' in sk['t']: fails.append(f'Z6 건너뛰기: 건너뛴 회차가 따로 적히지 않습니다 — {sk}')
+    if sk['st'] != 'skip': fails.append(f'Z6 건너뛰기: 남은 회차를 다 건너뛴 날이 skip 이 아닙니다 — {sk["st"]}')
+    if sk['left']: fails.append(f'Z6 건너뛰기: 건너뛴 뒤에도 오늘 알림이 남아 있습니다 — {sk["left"]}')
+    # 「10분 뒤 다시」 — 어르신 갈래로 다시
+    pz.evaluate("()=>__LN.listeners.localNotificationActionPerformed({actionId:'later',notification:{title:'약지도 · 약 드실 시간',body:'x',extra:{key:'ibuprofen@20:00',keys:['ibuprofen@20:00']}}})"); pz.wait_for_timeout(400)
+    sn = [x for x in P() if x['id'] >= 900000 and x['id'] < 999990]
+    if not sn or sn[0].get('channelId') != 'dose_senior' or (sn[0].get('extra') or {}).get('keys') != ['ibuprofen@20:00']: fails.append(f'Z6 알림: 「10분 뒤 다시」가 틀립니다 — {sn[:1]}')
+    # 복용률 — 건너뛴 것은 먹은 것으로 세지 않고 따로
+    a = pz.evaluate("()=>{const y=dayBefore(1);ME.days[y]={n:2,s:{'08:00':1,'20:00':1}};ME.taken[y]=['ibuprofen@08:00'];ME.skipped[y]=['ibuprofen@20:00'];return adherence(30);}")
+    if a.get('took') != 1 or a.get('skip') != 1 or a.get('full') != 0: fails.append(f'Z6 건너뛰기: 복용률이 건너뛴 것을 먹은 것으로 셉니다 — {a}')
+    pz.goto(url + '#/schedule?t=sc3'); pz.wait_for_timeout(500)
+    pz.evaluate("()=>calPick(dayBefore(1))"); pz.wait_for_timeout(300)
+    cd = pz.inner_text('#cal-day') if pz.query_selector('#cal-day') else ''
+    if '건너뜀' not in cd: fails.append(f'Z6 건너뛰기: 달력에서 건너뛴 회차가 「건너뜀」으로 보이지 않습니다 — {cd[:120]}')
+    if '건너뜀' not in pz.inner_text('.cal-key'): fails.append('Z6 건너뛰기: 달력 표에 「건너뜀」이 없습니다')
+    # 저장 꼴 — skipped 는 「id@HH:MM」 배열만, evening 은 참/거짓
+    sm = pz.evaluate("()=>sanitizeMe({skipped:{'2026-09-27':['ibuprofen@20:00','x<y@08:00',3,'ibuprofen@20:00'],'bad':['a@08:00']},evening:true,qty:{a:'2'}})")
+    if sm.get('skipped') != {'2026-09-27': ['ibuprofen@20:00']} or sm.get('evening') is not True: fails.append(f'Z6 저장 꼴: skipped·evening 이 바로잡히지 않습니다 — {sm.get("skipped")} {sm.get("evening")}')
+    # 약 떨어짐 — 하루 1번 약 6알 → 남을 날 6일 → 5일분 되는 내일 9시 한 번. 이미 5일분 안쪽(4알)이면 알림 없이 넣을 때 바로 말씀
+    pz.evaluate("()=>{ME.stock={acetaminophen:{left:12,at:todayKey()}};saveMe();nativeArm();}"); pz.wait_for_timeout(500)
+    rf = pz.evaluate("()=>__LN.pending.filter(x=>x.extra&&x.extra.stock).map(x=>x.title+'|'+x.body)")
+    if len(rf) != 1 or '5일분쯤 남았어요 — 미리 처방·구입해 두세요' not in rf[0]: fails.append(f'Z6 약 떨어짐: 알림이 한 번이 아니거나 글이 틀립니다 — {rf}')
+    pz.close()
+    # 알람 한도 — 어르신 · 약 60개 × 하루 4번(같은 시각) / 약 60개 × 서로 다른 240개 시각 둘 다 500개 아래
+    for nm, mk in [('60개 × 4번', "(ids)=>{const s={};ids.forEach(id=>s[id]=['08:00','13:00','19:00','22:00']);return s;}"),
+                   ('60개 × 다른 시각 240개', "(ids)=>{const s={};ids.forEach((id,i)=>s[id]=[0,1,2,3].map(j=>{const m=(i*4+j)*5+300;return String(Math.floor(m/60)%24).padStart(2,'0')+':'+String(m%60).padStart(2,'0')}));return s;}")]:
+        pz = page({'age': 'senior', 'easy': True, 'evening': True, 'pub': {}})
+        n = pz.evaluate("async(mk)=>{const ids=D.drugs.slice(0,60).map(d=>d.id);ME.taking=ids;ME.sched=(eval(mk))(ids);ME.stock={};ids.forEach(id=>ME.stock[id]={left:40,at:todayKey()});ME.visits=[{id:'v1',at:'2026-10-01T10:30',where:'x'}];ME.vitalRemind={bp:['07:30','21:00']};saveMe();await nativeArm();"
+                        "const c={};for(const x of __LN.pending){if(!x.schedule.at||x.id>=900000)continue;if(x.extra&&(x.extra.visit||x.extra.vitals))continue;const d=new Date(x.schedule.at);const k=d.getMonth()+'-'+d.getDate();c[k]=(c[k]||0)+1;}"
+                        "return {n:__LN.pending.length, slots:new Set(Object.values(ME.sched).flat()).size, max:Math.max(...Object.values(c)), on:__LN.pending.filter(x=>x.title==='약지도 · 약 드실 시간').length};}", mk)
+        if n['n'] > 500: fails.append(f'Z6 알람 한도({nm}): 휴대폰 알람 {n["n"]}개 — 500개를 넘습니다')
+        if n['max'] > n['slots'] + 1: fails.append(f'Z6 알람 한도({nm}): 하루 {n["max"]}장 — 시각 수 + 1({n["slots"] + 1})을 넘습니다')
+        if n['on'] < 1: fails.append(f'Z6 알람 한도({nm}): 제시간 알림이 없습니다')
+        pz.close()
+    # 일반 모드 — 비공개 갈래 dose2 그대로, 약 이름 없이 「아침 8시」
+    pz = page({'taking': ['ibuprofen', 'acetaminophen'], 'sched': {'ibuprofen': ['08:00'], 'acetaminophen': ['08:00']}, 'pub': {}})
+    L = P()
+    if any(x.get('channelId') != 'dose2' for x in L if x.get('actionTypeId') == 'dose'): fails.append('Z6 알림: 일반 모드가 비공개 갈래(dose2)가 아닙니다')
+    if any('이부프로펜' in x.get('body', '') or '타이레놀' in x.get('body', '') for x in L): fails.append('Z6 알림: 일반 모드 알림에 약 이름이 보입니다')
+    if '광고 알림은 보내지 않아요' not in pz.evaluate("()=>document.querySelector('#sc4').textContent"): fails.append('Z6 알림: 알림 칸에 「광고 알림은 보내지 않아요」가 없습니다')
+    pz.close()
+    # 웹 — 묶은 알림 · 30분 뒤 한 번 · 10분 뒤 다시(창이 타이머) · 하루 상한
+    pw = page(SR, '2026-09-28T07:58:00', native=False)
+    pw.evaluate("()=>{window.__F=[];window.showNote=(t,b,k,d,p)=>__F.push(t+'|'+k);Object.defineProperty(Notification,'permission',{get:()=>'granted'});armNotifications();}")
+    pw.clock.run_for(40 * 60000); pw.wait_for_timeout(200)
+    F = pw.evaluate("()=>__F")
+    if F != ['약지도 · 약 드실 시간|ibuprofen@08:00,acetaminophen@08:00', '아직 안 드셨어요|ibuprofen@08:00,acetaminophen@08:00']: fails.append(f'Z6 웹 알림: 08:00 묶은 알림·08:30 다시 알림이 틀립니다 — {F}')
+    pw.evaluate("()=>{__F.length=0;webSnooze('ibuprofen@20:00',todayKey(),'약지도 · 약 드실 시간','x');}")
+    pw.clock.run_for(11 * 60000); pw.wait_for_timeout(200)
+    if pw.evaluate("()=>__F") != ['약지도 · 약 드실 시간|ibuprofen@20:00']: fails.append(f'Z6 웹 알림: 「10분 뒤 다시」가 10분 뒤 울리지 않습니다 — {pw.evaluate("()=>__F")}')
+    sws = (DOCS / 'sw.js').read_text(encoding='utf-8')
+    if "yakjido-later" not in sws or "action === 'later'" not in sws: fails.append('Z6 웹 알림: 서비스워커가 「10분 뒤 다시」를 처리하지 않습니다')
+    pw.close()
+    # 홈 — 어르신이 2시간 넘게 체크하지 않은 회차 → 「가족에게 알릴까요」(앱 안에서만) · 괜찮아요 · 먹었어요
+    ph = page(SR, '2026-09-28T10:30:00')
+    ph.goto(url + '#/home'); ph.wait_for_timeout(600)
+    if not ph.query_selector('.dh-fam'): fails.append('Z6 가족: 2시간 넘게 체크 안 한 회차에 「가족에게 알리기」가 없습니다')
+    else:
+        ph.click('.dh-fam .x'); ph.wait_for_timeout(300)
+        if ph.query_selector('.dh-fam'): fails.append('Z6 가족: 「괜찮아요」를 눌러도 다시 묻습니다')
+    if any('가족' in (x.get('title', '') + x.get('body', '')) for x in ph.evaluate("()=>__LN.pending")): fails.append('Z6 가족: 가족 알림이 휴대폰 알림으로 걸렸습니다(앱 안에서만)')
+    # 복용 시간 화면 — 지난 회차 건너뛰기 단추(접이 안)
+    ph.goto(url + '#/schedule'); ph.wait_for_timeout(500)
+    ph.evaluate("()=>document.querySelectorAll('details.why-more').forEach(d=>d.open=true)")
+    b = ph.query_selector('.skip-l button')
+    if not b: fails.append('Z6 건너뛰기: 복용 시간 화면에 지난 회차 「건너뛰기」 단추가 없습니다')
+    else:
+        b.click(); ph.wait_for_timeout(400)
+        if not ph.evaluate("()=>((ME.skipped||{})[todayKey()]||[]).length") or not ph.query_selector('.dose-tick.skip'): fails.append('Z6 건너뛰기: 단추를 눌러도 건너뜀으로 적히지 않습니다')
+    ph.close()
+    if zerr: fails.append(f'Z6 알림: JS 오류 {zerr[:2]}')
+
+# Z7(실사용 검수 2차 audit2 — 2026-10-13) — 약국 카드·내 약통·아이 나이·내 몸 조건이 실제 제품으로 다시 깨지지 않게.
+#   A1 「이 중 하나만」 묶음은 카드·보내기·메모에 하나만 · A2 내 약통은 «성분»으로 견줌(타이레놀 → 콜대원 겹침) ·
+#   A3 낱알 검색으로 담은 판콜에이캡슐·펜잘의 성분 · 성분 모름이면 안심 문장 없음 · A4 아이 2개월·5개월·4세·14세 ·
+#   A5 「아이 ○ kg 기준」 한 줄의 나이 규칙 · A6 열 「소아」 칸은 어린이 제품 · B5·B6 신장 + 마그밀, 항응고제 + 부루펜(§101 한 줄) ·
+#   B8 응급 신호 체크 시 「두 가지」 칸·용량 숨김 · B10 기침 카드에 고르지 않은 파모티딘 없음
+def z7_checks(br, url, fails):
+    zerr = []
+    pz = br.new_page(viewport={'width': 390, 'height': 844}); pz.on('pageerror', lambda e: zerr.append(str(e)))
+    pz.add_init_script("localStorage.setItem('yakjido.hello.v1','1')")
+    pz.goto(url + '#/home'); pz.wait_for_function("()=>typeof CORE!=='undefined' && CORE===2", timeout=20000)
+    pz.evaluate("async()=>{ await pubIndex(); await pubPills(); await lexLoad(true); }")
+    RESET = """()=>{ for (const k of Object.keys(FLAG_LABEL)) if (k!=='senior'&&k!=='child') ME[k]=false; ME.age='adult'; ME.child=null; ME.taking=[]; ME.pub={}; ME.prn={}; ME.allergy=[]; ME.allergyUnknown=false; for (const k in EITHER_PICK) delete EITHER_PICK[k]; for (const k in OPT_PICK) delete OPT_PICK[k]; saveMe(); }"""
+    ADD = "n=>{ const i=(PUB.index||[]).findIndex(p=>pubNorm(p.n).startsWith(pubNorm(n))); if (i<0) return ''; addPubIx(i); return PUB.index[i].n; }"
+    def go(h):
+        pz.evaluate("h=>{ location.hash=h; route(); }", h); pz.wait_for_timeout(60)
+    def txt(sel='#view'):
+        return pz.evaluate("s=>[...document.querySelectorAll(s)].filter(e=>e.getClientRects().length).map(e=>e.innerText).join(' | ')", sel)
+    # A1 — 감기·열 약국 카드: 묶음은 하나만, 카드 안 성분 겹침 0, 「또는」 바꾸기, 보내기·메모도 하나만
+    pz.evaluate(RESET)
+    a1 = pz.evaluate("""()=>{ const bad=[]; const keys=sid=>{ const s=byId(D.symptoms,sid); return showable(basketPicked(s,basket(s))).filter(x=>!x.have&&!x.again).map(x=>drugKeys(x.d)); };
+      for (const sid of ['cold','fever','headache','msk','deworm']) { const ks=keys(sid).flat(); const dup=ks.filter((k,i)=>ks.indexOf(k)!==i); if (dup.length) bad.push(sid+' 카드 안 같은 성분: '+dup.join(',')); }
+      const s=byId(D.symptoms,'cold'); const ids=showable(basketPicked(s,basket(s))).map(x=>x.d.id); if (ids.includes('acetaminophen') && ids.includes('coldaewon')) bad.push('감기 카드에 아세트아미노펜과 콜대원이 함께');
+      const m=memoText(s); if (/아세트아미노펜 —/.test(m) && /\\n· 콜대원/.test(m)) bad.push('메모에 묶음 둘 다');
+      const sd=sendItems({s:'cold'}).map(x=>x.id); if (sd.includes('acetaminophen') && sd.includes('coldaewon')) bad.push('보내기에 묶음 둘 다');
+      location.hash='#/show/fever'; route(); const n1=document.querySelectorAll('.show-list li:not(.show-have) .n').length; if (n1!==1) bad.push('열 카드 번호 줄이 '+n1+'개');
+      const sw=document.querySelector('.show-sw'); if (!sw) bad.push('열 카드에 「또는 … 바꾸기」 단추 없음'); else { sw.click(); const t=document.querySelector('.show-list').innerText; if (!/소아/.test(t)) bad.push('바꾸기를 눌러도 소아 칸으로 안 바뀜'); }
+      location.hash='#/show/deworm'; route(); if (document.querySelectorAll('.show-list li .n:not([aria-hidden])').length!==1) bad.push('구충제 카드에 알벤다졸이 두 번 번호로');
+      return bad; }""")
+    if a1: fails.append(f'Z7 A1 묶음 하나만: {a1[:4]}')
+    # A2 — 내 약통 타이레놀정500 → 감기 카드에 아세트아미노펜이 든 약을 표시 없이 1번으로 권하지 않는다
+    pz.evaluate(RESET); tn = pz.evaluate(ADD, '타이레놀정500')
+    a2 = pz.evaluate("""()=>{ const bad=[]; for (const sid of ['cold','fever','headache']) { const s=byId(D.symptoms,sid); for (const x of showable(basketPicked(s,basket(s)))) if (!x.have && !x.cab && drugKeys(x.d).includes('acetaminophen')) bad.push(sid+': '+x.d.id+' (아세트아미노펜) 표시 없이 권함'); }
+      eitherSet('cold', 1); location.hash='#/show/cold'; route(); const t=document.querySelector('.show-list').innerText; if (/콜대원/.test(t) && !/같은 성분\\(아세트아미노펜\\)/.test(t)) bad.push('콜대원을 골랐는데 「드시는 타이레놀과 같은 성분」 표시 없음');
+      location.hash='#/symptom/cold'; route(); if (!/아세트아미노펜/.test((document.querySelector('.dupbox')||{}).innerText||'')) bad.push('감기 화면 확인 상자에 아세트아미노펜 겹침 없음');
+      return bad; }""")
+    if not tn: fails.append('Z7 A2: 타이레놀정500을 e약은요에서 못 찾음')
+    if a2: fails.append(f'Z7 A2 성분으로 견주기: {a2[:3]}')
+    # A3 — 낱알 검색(#/pill) → 「내 약통에 담기」 → 같이 먹어도 되나요
+    pz.evaluate(RESET)
+    for nm in ['판콜에이캡슐', '펜잘']:
+        go('#/pill'); pz.fill('#pq', nm); pz.wait_for_timeout(700)
+        pz.evaluate("n=>{ const c=[...document.querySelectorAll('.pill-cw')].find(e=>e.querySelector('.pill-card b').innerText.replace(/\\s/g,'').startsWith(n)); c && c.querySelector('.pc-take').click(); }", nm)
+        pz.wait_for_timeout(500)
+    pz.evaluate(ADD, '타이레놀정500'); pz.evaluate("()=>pubIngrFill()")
+    a3 = pz.evaluate("()=>Object.values(ME.pub).map(x=>({n:x.name, i:x.ingr}))")
+    pc = [x for x in a3 if x['n'].startswith('판콜에이캡슐')]
+    if not pc: fails.append(f'Z7 A3: 낱알 검색에서 판콜에이캡슐을 담지 못함 {a3}')
+    elif '아세트아미노펜' not in pc[0]['i']: fails.append(f'Z7 A3: 판콜에이캡슐 성분이 비어 있음 — {pc[0]}')
+    if not any(x['n'].startswith('펜잘') for x in a3): fails.append(f'Z7 A3: 낱알 검색에서 펜잘을 담지 못함 {a3}')
+    go('#/together'); t = txt()
+    if pc and '아세트아미노펜' in pc[0]['i'] and '아세트아미노펜' not in t: fails.append('Z7 A3: 판콜에이캡슐 + 타이레놀정500인데 아세트아미노펜 겹침이 안 뜸')
+    pz.evaluate(RESET); pz.evaluate(ADD, '타이레놀정500')
+    pz.evaluate("()=>{ ME.taking.push('pub:z7x'); ME.pub['pub:z7x']={name:'모르는감기캡슐',full:'모르는감기캡슐',ingr:'',rx:0,seq:'',drugId:''}; saveMe(); }")
+    go('#/together'); t = txt('.ix-sum')
+    if '걸리는 조합' in t or '성분을 몰라 겹침을 확인하지 못했어요' not in t: fails.append(f'Z7 A3: 성분 모름 약이 있는데 머리말이 분명하지 않음 — {t[:80]}')
+    # A4·A5·A6 — 아이 나이(2개월·5개월·4세·14세·생년월일 없음)
+    a4 = pz.evaluate("""()=>{ const bad=[]; const bd=m=>{ const d=new Date(); d.setMonth(d.getMonth()-m); d.setDate(d.getDate()-1); return d.toISOString().slice(0,10); };
+      const kid=(m,w)=>{ ME.age='child'; ME.child={name:'',birth:m==null?'':bd(m),weight:w}; saveMe(); };
+      const ids=sid=>{ const s=byId(D.symptoms,sid); return basket(s).map(x=>x.d); };
+      kid(2,5); location.hash='#/symptom/fever'; route();
+      if (!document.querySelector('.inf-stop') || document.querySelector('.answer .buy-item')) bad.push('2개월 열: 「진료가 먼저」 대신 약 목록');
+      location.hash='#/show/fever'; route(); if (document.querySelector('.show-list li')) bad.push('2개월 열: 약국 카드에 약');
+      location.hash='#/symptom/headache'; route(); if (!/3개월 미만/.test((document.querySelector('.answer .kid-line')||{}).innerText||'')) bad.push('2개월: 「아이 kg 기준」 줄에 3개월 미만 안내 없음');
+      for (const sid of ['cold','fever','headache','allergy']) if (ids(sid).some(isNsaid)) bad.push('2개월 '+sid+': 소염진통제를 권함');
+      kid(5,7); for (const sid of ['cold','fever','headache','msk']) if (ids(sid).some(isNsaid)) bad.push('5개월 '+sid+': 소염진통제(이부프로펜 등)를 권함');
+      location.hash='#/symptom/fever'; route(); const k5=(document.querySelector('.answer .kid-line')||{}).innerText||''; if (!/이부프로펜 시럽은 생후 6개월부터/.test(k5)) bad.push('5개월: kg 줄에 이부프로펜 6개월 안내 없음 — '+k5.slice(0,60));
+      kid(48,16); location.hash='#/symptom/fever'; route(); if (!/설명서 표/.test([...document.querySelectorAll('.answer .kid-over')].map(e=>e.innerText).join(''))) bad.push('4세 16 kg: 이부프로펜 설명서 표 넘음 경고 없음');
+      for (const sid of ['cold','allergy','cough','constipation','diarrhea']) for (const x of basket(byId(D.symptoms,sid))) { if (/500 ?mg|정$|캡슐/.test(x.product||'') && !kidAdultOk(x.d)) bad.push('4세 '+sid+': 어른 제품 '+x.product); if (minAgeOf(x.d)!=null && minAgeOf(x.d)>48) bad.push('4세 '+sid+': '+x.d.id+'('+minAgeOf(x.d)+'개월부터)'); }
+      kid(168,50); for (const sid of ['allergy','diarrhea','cold']) for (const x of basket(byId(D.symptoms,sid))) if ((x.why||[]).includes('child') && minAgeOf(x.d)!=null) bad.push('14세 '+sid+': 나이 기준이 있는데 「소아」로 막음 '+x.d.id);
+      kid(null,5); location.hash='#/symptom/fever'; route(); if (!/생후 3개월 안팎/.test([...document.querySelectorAll('.answer .kid-over')].map(e=>e.innerText).join(''))) bad.push('생년월일 없음 5 kg: 「생후 3개월 안팎」 경고 없음');
+      ME.age='adult'; ME.child=null; saveMe(); location.hash='#/symptom/fever'; route();
+      const kidRow=[...document.querySelectorAll('.answer .buy-item')].find(b=>/소아/.test((b.querySelector('.role')||{}).innerText||''));
+      if (!kidRow || /500 ?mg|세토펜정/.test(kidRow.innerText) || !/어린이/.test(kidRow.innerText)) bad.push('어른 모드 열 「소아」 칸: '+(kidRow?kidRow.innerText.replace(/\\n/g,' / '):'없음'));
+      return bad; }""")
+    if a4: fails.append(f'Z7 A4·A5·A6 아이 나이: {a4[:5]}')
+    # B5·B6 — 내 몸 조건: 신장 + 마그밀(빨강), 항응고제 + 부루펜(§101 주의 한 줄 — 증상 화면·약국 카드·같이 먹어도 되나요)
+    AC = '금기는 아니지만 위장관 출혈 가능성이 있어 주의해요. 처방한 의사와 먼저 상의하세요'
+    pz.evaluate(RESET); pz.evaluate("()=>{ ME.kidney=true; saveMe(); }"); pz.evaluate(ADD, '마그밀정')
+    go('#/together'); t = txt('.ix.stop')   # 병용 규칙(kidney-mg)이 말하든, 내 몸 조건 칸이 말하든 빨강이면 된다
+    if '마그밀' not in t or '걸리는 조합은 나오지 않았어요' in txt(): fails.append('Z7 B5: 신장 질환 + 마그밀정인데 빨강(먹지 말 것) 판정이 없음')
+    pz.evaluate(RESET); pz.evaluate("()=>{ ME.anticoag=true; saveMe(); }"); pz.evaluate(ADD, '부루펜정')
+    go('#/together'); t = txt()
+    if AC not in t: fails.append('Z7 B6: 항응고제 + 부루펜정인데 §101 주의 한 줄이 같이 먹어도 되나요에 없음')
+    if '같이 드시면 안 돼' in t or '내 몸 조건과 맞지 않는' in t: fails.append('Z7 B6: 항응고제 + 부루펜이 «금기»처럼 나옴(§101 은 주의)')
+    pz.evaluate("()=>{ ME.taking=[]; ME.pub={}; saveMe(); }")
+    go('#/symptom/msk'); t = txt('.answer .buy')
+    if AC not in t: fails.append('Z7 B6: 항응고제 조건에서 근육통 화면 소염제 칸에 주의 한 줄 없음')
+    go('#/show/msk'); t = txt('.show-list')
+    if AC not in t: fails.append('Z7 B6: 항응고제 조건에서 약국 카드 소염제 줄에 주의 한 줄 없음')
+    # B8 — 응급 신호 체크 → 「두 가지(함께·번갈아)」 칸·아이 용량 줄도 숨김
+    pz.evaluate(RESET); pz.evaluate("()=>{ ME.age='child'; ME.child={name:'',birth:'',weight:12}; saveMe(); }")
+    go('#/symptom/fever')
+    b8 = pz.evaluate("""()=>{ const v=s=>[...document.querySelectorAll(s)].some(e=>e.getClientRects().length>0); const before=v('.answer .med-tip');
+      document.querySelector('.rf input[type=checkbox]').click();
+      return {before, tip:v('.med-tip'), kid:v('.answer .kid-line')||v('.answer .kid-over'), doTwo:[...document.querySelectorAll('.care-do')].some(e=>/번갈아/.test(e.innerText))}; }""")
+    if not b8['before']: fails.append('Z7 B8: 열 화면에 「두 가지 — 함께·번갈아」 접이가 없음(체크 전)')
+    if b8['tip'] or b8['kid'] or b8['doTwo']: fails.append(f'Z7 B8: 응급 신호 체크 뒤에도 약 쓰는 법·용량이 보임 {b8}')
+    # B10 — 고르지 않은 보조 칸(파모티딘)은 기침 약국 카드·보내기에 가지 않는다
+    pz.evaluate(RESET); go('#/show/cough'); t = txt('.show-list')
+    if '파모티딘' in t: fails.append('Z7 B10: 기침 약국 카드에 고르지 않은 파모티딘이 들어감(자료 cough.plan 「신물」 칸 optional — 내용 조 몫)')
+    # 내용 조 X4 뒤 부모 요청 — ageAskMonths 한 줄(막지 않음) · 아이 모드 성인 칸 숨김 · 제품 용법(아스피린프로텍트) · 자료 확인 중 도장 · 검색 · 코 스프레이는 코막힘 겹침으로 세지 않음
+    pz.evaluate(RESET)
+    z = pz.evaluate("""async()=>{ const bad=[]; const bd=m=>{ const d=new Date(); d.setMonth(d.getMonth()-m); d.setDate(d.getDate()-1); return d.toISOString().slice(0,10); };
+      ME.age='child'; ME.child={name:'',birth:bd(10),weight:9}; saveMe();
+      const bk=basket(byId(D.symptoms,'fever')); const ap=bk.find(x=>x.d.id==='acetaminophen');
+      if (bk.some(x=>/성인/.test(x.slot))) bad.push('아이 모드 열에 성인 칸');
+      if (Number.isFinite(drug('acetaminophen').ageAskMonths) && !(ap && /의사·약사와 상의/.test(ap.cau||'') && !ap.blocked)) bad.push('10개월 아세트아미노펜: ageAskMonths 「상의」 한 줄 없음(또는 막음) '+JSON.stringify(ap&&{c:ap.cau,b:ap.blocked}));
+      ME.age='adult'; ME.child=null; ME.taking=[]; ME.pub={}; const i=(PUB.index||[]).findIndex(p=>pubNorm(p.n).startsWith('아스피린프로텍트')); if (i>=0) { addPubIx(i); const it=takingItems()[0]; if (!/하루 1번/.test(it.simple||'') || /500 ?mg/.test(it.simple||'')) bad.push('아스피린프로텍트 용법이 제품 용법이 아님: '+it.simple); } else bad.push('아스피린프로텍트를 e약은요에서 못 찾음');
+      await lexLoad(true); const u=(LEX.ing||[]).find(x=>x.unv && !(x.drug && drug(x.drug))); if (u) { location.hash='#/ingr/'+u.id; route(); if (!/자료 확인 중/.test((document.querySelector('.review-stamp')||{}).innerText||'')) bad.push('unv 성분 화면에 「자료 확인 중」 없음 '+u.id); }
+      const s1=search('아이 기침')[0]||{}; if (!/기침/.test(s1.t||'')) bad.push('「아이 기침」 1번: '+s1.t);
+      const ab=search('알레르기 비염')[0]||{}; if (ab.k!=='증상') bad.push('「알레르기 비염」 1번: '+ab.k+':'+ab.t);
+      const rn=search('콧물약').map(h=>h.t), ci=rn.findIndex(t=>/코푸시럽\)/.test(t)), oi=rn.findIndex(t=>/클로르페니라민|세티리진|로라타딘/.test(t)); if (ci>=0 && (oi<0 || oi>ci)) bad.push('「콧물약」 처방 코푸시럽이 약국 항히스타민보다 앞: '+rn.slice(0,6));
+      const mq=mqHits('콧물약').map(h=>h.t), mc=mq.findIndex(t=>/코푸시럽\)/.test(t)); if (mc===0) bad.push('내 약통 「콧물약」 1번이 처방 코푸시럽');
+      if ((search('기침약').slice(0,4)).some(h=>/요실금/.test(h.t))) bad.push('「기침약」 상위에 요실금');
+      for (const q of ['해열제','진통제']) if (!search(q).slice(0,5).some(h=>/아세트아미노펜/.test(h.t))) bad.push('「'+q+'」 상위 5개에 아세트아미노펜 없음');
+      if (!/치통/.test((search('이 아파')[0]||{}).t||'')) bad.push('「이 아파」 1번이 치통 아님');
+      if (planDup([{d:drug('xylometazoline'),slot:'코'},{d:drug('coldaewon'),slot:'종합'}]).some(t=>/코막힘/.test(t))) bad.push('코 스프레이 + 콜대원을 코막힘 겹침으로 셈(규칙 decongest-dup 과 다름)');
+      ME.taking=[]; ME.pub={}; saveMe(); return bad; }""")
+    if z: fails.append(f'Z7 부모 요청(ageAsk·성인 칸·제품 용법·자료 확인 중·검색·코 스프레이): {z[:4]}')
+    pz.evaluate(RESET)
+    if zerr: fails.append(f'Z7: JS 오류 {zerr[:2]}')
+    pz.close()
 
 def main():
     ap = argparse.ArgumentParser(); ap.add_argument('--url'); a = ap.parse_args()
@@ -610,7 +853,7 @@ def main():
         _sp = _iu.spec_from_file_location('ing_audit', str(ROOT / 'yakjido' / 'tools' / 'ing_audit.py')); _ia = _iu.module_from_spec(_sp); _sp.loader.exec_module(_ia)
         pg.goto(url + '#/home'); ready(); pg.wait_for_timeout(600)
         _cov = pg.evaluate(_ia.JS, ['pills.json', 'pills-rx.json', 'easy-index.json'])
-        for _f, _lim in (('pills.json', 30), ('pills-rx.json', 157), ('easy-index.json', 85)):   # pills 25→30(2026-10-13): 빈 성분 1,491건을 품목기준코드로 채우자 새로 드러난 5개(메클리진·판테틴 복합 등) — 해석 퇴보 아님, 화면엔 「성분 모름」
+        for _f, _lim in (('pills.json', 37), ('pills-rx.json', 157), ('easy-index.json', 85)):   # pills 25→30→37(2026-10-13): 빈 성분을 품목기준코드(1,491건)·식약처 상세(749건)로 채우자 새로 드러난 12개(메클리진·판테틴 복합·생약 감기약 오제나·씨누스트·아이비엽 등) — 해석 퇴보 아님, 화면엔 「성분 모름」
             if _cov[_f]['none'] > _lim: fails.append(f'성분을 못 읽는 제품이 늘었습니다 {_f}: {_cov[_f]["none"]} (기준 {_lim}) — {_cov[_f]["bad"][:5]}')
         # 혈압·혈당 수첩 — 적기·7일 평균·기준(135/85) 안내·지우기(2026-09-29)
         pv = br.new_page(viewport={'width': 390, 'height': 844}); verr = []
@@ -745,10 +988,15 @@ def main():
         if _hm != ['20:0', '8:0']: fails.append(f'앱 알람: 제시간 알림 시각이 08:00·20:00 이 아닙니다 — {_hm}')
         if any(x.get('channelId') != 'dose2' or x.get('actionTypeId') != 'dose' for x in daily + again): fails.append('앱 알람: 복용 알림 채널(잠금 화면 비공개 dose2)·「먹었어요」 단추가 빠졌습니다')
         if any('이부프로펜' in (x.get('body') or '') for x in daily + again): fails.append('앱 알람: 잠금 화면에 약 이름이 보입니다(기본은 숨김)')
-        if not any(x.get('title') == '약지도를 한 번 열어 주세요' for x in L): fails.append('앱 알람: 마지막 날 「약지도를 한 번 열어 주세요」 알림이 없습니다')
+        if not any(x.get('title') == '알림을 이어 가려면 약지도를 한 번 열어 주세요' for x in L): fails.append('앱 알람: 마지막 날 「알림을 이어 가려면 약지도를 한 번 열어 주세요」 알림이 없습니다')
         if any(x.get('isExactNotification') for x in L): fails.append('앱 알람: 정확한 시각 권한이 없는데 정확 알람으로 걸어 설정 화면이 매번 뜹니다')
-        if len(again) != 13: fails.append(f'앱 알람: 「아직 안 드셨어요」가 7일치 13개(오늘 08:30 은 지남)여야 합니다 — {len(again)}')
-        if not (pn.evaluate("()=>__LN.types && __LN.types.types[0].actions.map(a=>a.id).join()") == 'took,later'): fails.append('앱 알람: 「먹었어요」·「10분 뒤 다시」 단추가 없습니다')
+        # 현욱님 10-13 「너무 자주 하면 안 된다」 — 하루 «시각 수 + 1»장. 시각 2개(08·20)면 하루 3장: 제시간 2 + 다시 알림 1(이른 08:30).
+        #   오늘은 08:00·08:30 이 이미 울려 20:00 한 장만, 내일부터 08:30 다시 알림만 — 마지막 날은 「약지도를 한 번 열어 주세요」가 그 자리를 쓴다 → 5개
+        if len(again) != 5: fails.append(f'앱 알람: 「아직 안 드셨어요」가 하루 상한 안에서 5개(내일부터 08:30, 마지막 날 빼고)여야 합니다 — {len(again)}')
+        _pd = pn.evaluate("()=>{const c={};for(const x of __LN.pending){if(!x.schedule||!x.schedule.at||x.id>=900000)continue;const d=new Date(x.schedule.at);const k=d.getMonth()+'-'+d.getDate();c[k]=(c[k]||0)+1;}return Math.max(0,...Object.values(c));}")
+        if _pd > 3: fails.append(f'앱 알람: 하루 알림이 «시각 수 + 1»(3장)을 넘습니다 — {_pd}')
+        if any(x.get('id') == 590000 or str(x.get('title')) == '오늘 약 체크' for x in L): fails.append('앱 알람: 저녁 하루 정리가 기본으로 켜져 있습니다(기본 꺼짐)')
+        if not (pn.evaluate("()=>__LN.types && __LN.types.types[0].actions.map(a=>a.id).join()") == 'took,later,skip'): fails.append('앱 알람: 「먹었어요」·「10분 뒤 다시」·「건너뛰기」 단추가 없습니다')
         t = pn.inner_text('.app')
         if '휴대폰 알림' not in t or '앱이 열려 있을 때' in t: fails.append('앱 알람: 알림 방법 카드가 설치 앱용으로 바뀌지 않았습니다')
         if '정확한 시각에 울리기' not in t: fails.append('앱 알람: 정확한 시각 허용 단추가 없습니다')
@@ -760,17 +1008,17 @@ def main():
         if pn.evaluate("()=>__LN.pending.some(x=>x.schedule.at && new Date(x.schedule.at).getDate()===28 && new Date(x.schedule.at).getHours()===20)"):
             fails.append('앱 알람: 미리 먹었다고 누른 뒤에도 오늘 20시 알림(제시간·30분 뒤)이 남아 있습니다')
         _ag = pn.evaluate("()=>__LN.pending.filter(x=>x.title==='아직 안 드셨어요').length")
-        if _ag != 12: fails.append(f'앱 알람: 먹었어요 뒤 「아직 안 드셨어요」가 12개여야 합니다 — {_ag}')
+        if _ag != 5: fails.append(f'앱 알람: 먹었어요 뒤 「아직 안 드셨어요」가 5개여야 합니다 — {_ag}')
         # 알림의 날짜로 적는다 — 어제 알림의 「먹었어요」는 어제 칸에(5-16)
         pn.evaluate("()=>__LN.listeners.localNotificationActionPerformed({actionId:'took',notification:{extra:{key:'ibuprofen@08:00',day:dayBefore(1)}}})"); pn.wait_for_timeout(400)
         if pn.evaluate("()=>((ME.taken||{})[dayBefore(1)]||[]).includes('ibuprofen@08:00') && !takenSet().includes('ibuprofen@08:00')") is not True: fails.append('앱 알람: 어제 알림의 「먹었어요」가 어제 기록으로 가지 않습니다')
         pn.evaluate("()=>__LN.listeners.localNotificationActionPerformed({actionId:'later',notification:{title:'약지도 · 약 드실 시간',body:'x',extra:{key:'ibuprofen@08:00'}}})"); pn.wait_for_timeout(400)
         if not [x for x in pn.evaluate("()=>__LN.pending") if x['id'] >= 900000]: fails.append('앱 알람: 「10분 뒤 다시」가 걸리지 않습니다')
         if pn.evaluate("async()=>!!(navigator.serviceWorker && await navigator.serviceWorker.getRegistration())"): fails.append('앱 알람: 설치 앱에서 서비스워커가 등록됩니다')
-        # 남은 알 수 10알·하루 2번 → 5일치 → 3일치 되는 날(9/30)·오늘 치만 남는 날(10/2) 아침 9시
-        pn.evaluate("()=>{ME.stock={ibuprofen:{left:10,at:todayKey()}};saveMe();nativeArm();}"); pn.wait_for_timeout(600)
+        # 남은 알 수 14알·하루 2번 → 7일치 → 5일분 남는 날(9/30) 아침 9시 한 번만(한 번 받아 올 때마다 한 번 — Z6)
+        pn.evaluate("()=>{ME.stock={ibuprofen:{left:14,at:todayKey()}};saveMe();nativeArm();}"); pn.wait_for_timeout(600)
         rf = pn.evaluate("()=>__LN.pending.filter(x=>x.extra&&x.extra.stock).map(x=>{const d=new Date(x.schedule.at);return (d.getMonth()+1)+'/'+d.getDate()+' '+d.getHours()+'시 '+x.title})")
-        if sorted(rf) != ['10/2 9시 약이 오늘 치만 남았어요', '9/30 9시 약이 3일치 남았어요']: fails.append(f'앱 알람: 약 떨어지기 전 알림이 틀립니다 — {rf}')
+        if sorted(rf) != ['9/30 9시 약이 5일분쯤 남았어요']: fails.append(f'앱 알람: 약 떨어지기 전 알림이 틀립니다 — {rf}')
         # 기록 모두 지우기 — 기록·알람이 다 사라지고, 글자 크기 같은 보기 설정은 남는다
         pn.evaluate("()=>localStorage.setItem('yakjido.fs','20px')")
         pn.evaluate("()=>{ wipeMe(); }"); pn.wait_for_selector('.dlg [data-a=ok]', timeout=3000); pn.click('.dlg [data-a=ok]'); pn.wait_for_timeout(600)   # 앱 안 확인 창(5-11)
@@ -786,6 +1034,8 @@ def main():
         if vr != ['21:0', '7:30']: fails.append(f'앱 알람: 혈압 재기 알림이 틀립니다 — {vr}')
         if nerr: fails.append(f'앱 알람: JS 오류 {nerr[:2]}')
         pn.close()
+        alarm_z6(br, url, fails)
+        z7_checks(br, url, fails)
         # 6b-2. 성분표에 없던 공공 제품 — 클로닉신(먹는 소염제 26개 제품)·돔페리돈이 약통에서 실제로 걸려야 한다(2026-09-23)
         _pb = {'노리스정 + 와파린': ({'taking':['pub:1','cls:blood.warf'],'pub':{'pub:1':{'name':'노리스정','full':'노리스정(클로닉신리시네이트)','ingr':'클로닉신리시네이트','rx':0,'seq':'1','drugId':''}}}, 'warfarin-nsaid'),
                '노리스정 + 이부프로펜': ({'taking':['pub:1','ibuprofen'],'pub':{'pub:1':{'name':'노리스정','full':'노리스정','ingr':'클로닉신리시네이트','rx':0,'seq':'1','drugId':''}}}, 'nsaid-dup'),
