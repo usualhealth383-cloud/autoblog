@@ -361,6 +361,110 @@ def alarm_z6(br, url, fails):
     ph.close()
     if zerr: fails.append(f'Z6 알림: JS 오류 {zerr[:2]}')
 
+# Z7(실사용 검수 2차 audit2 — 2026-10-13) — 약국 카드·내 약통·아이 나이·내 몸 조건이 실제 제품으로 다시 깨지지 않게.
+#   A1 「이 중 하나만」 묶음은 카드·보내기·메모에 하나만 · A2 내 약통은 «성분»으로 견줌(타이레놀 → 콜대원 겹침) ·
+#   A3 낱알 검색으로 담은 판콜에이캡슐·펜잘의 성분 · 성분 모름이면 안심 문장 없음 · A4 아이 2개월·5개월·4세·14세 ·
+#   A5 「아이 ○ kg 기준」 한 줄의 나이 규칙 · A6 열 「소아」 칸은 어린이 제품 · B5·B6 신장 + 마그밀, 항응고제 + 부루펜(§101 한 줄) ·
+#   B8 응급 신호 체크 시 「두 가지」 칸·용량 숨김 · B10 기침 카드에 고르지 않은 파모티딘 없음
+def z7_checks(br, url, fails):
+    zerr = []
+    pz = br.new_page(viewport={'width': 390, 'height': 844}); pz.on('pageerror', lambda e: zerr.append(str(e)))
+    pz.add_init_script("localStorage.setItem('yakjido.hello.v1','1')")
+    pz.goto(url + '#/home'); pz.wait_for_function("()=>typeof CORE!=='undefined' && CORE===2", timeout=20000)
+    pz.evaluate("async()=>{ await pubIndex(); await pubPills(); await lexLoad(true); }")
+    RESET = """()=>{ for (const k of Object.keys(FLAG_LABEL)) if (k!=='senior'&&k!=='child') ME[k]=false; ME.age='adult'; ME.child=null; ME.taking=[]; ME.pub={}; ME.prn={}; ME.allergy=[]; ME.allergyUnknown=false; for (const k in EITHER_PICK) delete EITHER_PICK[k]; for (const k in OPT_PICK) delete OPT_PICK[k]; saveMe(); }"""
+    ADD = "n=>{ const i=(PUB.index||[]).findIndex(p=>pubNorm(p.n).startsWith(pubNorm(n))); if (i<0) return ''; addPubIx(i); return PUB.index[i].n; }"
+    def go(h):
+        pz.evaluate("h=>{ location.hash=h; route(); }", h); pz.wait_for_timeout(60)
+    def txt(sel='#view'):
+        return pz.evaluate("s=>[...document.querySelectorAll(s)].filter(e=>e.getClientRects().length).map(e=>e.innerText).join(' | ')", sel)
+    # A1 — 감기·열 약국 카드: 묶음은 하나만, 카드 안 성분 겹침 0, 「또는」 바꾸기, 보내기·메모도 하나만
+    pz.evaluate(RESET)
+    a1 = pz.evaluate("""()=>{ const bad=[]; const keys=sid=>{ const s=byId(D.symptoms,sid); return showable(basketPicked(s,basket(s))).filter(x=>!x.have&&!x.again).map(x=>drugKeys(x.d)); };
+      for (const sid of ['cold','fever','headache','msk','deworm']) { const ks=keys(sid).flat(); const dup=ks.filter((k,i)=>ks.indexOf(k)!==i); if (dup.length) bad.push(sid+' 카드 안 같은 성분: '+dup.join(',')); }
+      const s=byId(D.symptoms,'cold'); const ids=showable(basketPicked(s,basket(s))).map(x=>x.d.id); if (ids.includes('acetaminophen') && ids.includes('coldaewon')) bad.push('감기 카드에 아세트아미노펜과 콜대원이 함께');
+      const m=memoText(s); if (/아세트아미노펜 —/.test(m) && /\\n· 콜대원/.test(m)) bad.push('메모에 묶음 둘 다');
+      const sd=sendItems({s:'cold'}).map(x=>x.id); if (sd.includes('acetaminophen') && sd.includes('coldaewon')) bad.push('보내기에 묶음 둘 다');
+      location.hash='#/show/fever'; route(); const n1=document.querySelectorAll('.show-list li:not(.show-have) .n').length; if (n1!==1) bad.push('열 카드 번호 줄이 '+n1+'개');
+      const sw=document.querySelector('.show-sw'); if (!sw) bad.push('열 카드에 「또는 … 바꾸기」 단추 없음'); else { sw.click(); const t=document.querySelector('.show-list').innerText; if (!/소아/.test(t)) bad.push('바꾸기를 눌러도 소아 칸으로 안 바뀜'); }
+      location.hash='#/show/deworm'; route(); if (document.querySelectorAll('.show-list li .n:not([aria-hidden])').length!==1) bad.push('구충제 카드에 알벤다졸이 두 번 번호로');
+      return bad; }""")
+    if a1: fails.append(f'Z7 A1 묶음 하나만: {a1[:4]}')
+    # A2 — 내 약통 타이레놀정500 → 감기 카드에 아세트아미노펜이 든 약을 표시 없이 1번으로 권하지 않는다
+    pz.evaluate(RESET); tn = pz.evaluate(ADD, '타이레놀정500')
+    a2 = pz.evaluate("""()=>{ const bad=[]; for (const sid of ['cold','fever','headache']) { const s=byId(D.symptoms,sid); for (const x of showable(basketPicked(s,basket(s)))) if (!x.have && !x.cab && drugKeys(x.d).includes('acetaminophen')) bad.push(sid+': '+x.d.id+' (아세트아미노펜) 표시 없이 권함'); }
+      eitherSet('cold', 1); location.hash='#/show/cold'; route(); const t=document.querySelector('.show-list').innerText; if (/콜대원/.test(t) && !/같은 성분\\(아세트아미노펜\\)/.test(t)) bad.push('콜대원을 골랐는데 「드시는 타이레놀과 같은 성분」 표시 없음');
+      location.hash='#/symptom/cold'; route(); if (!/아세트아미노펜/.test((document.querySelector('.dupbox')||{}).innerText||'')) bad.push('감기 화면 확인 상자에 아세트아미노펜 겹침 없음');
+      return bad; }""")
+    if not tn: fails.append('Z7 A2: 타이레놀정500을 e약은요에서 못 찾음')
+    if a2: fails.append(f'Z7 A2 성분으로 견주기: {a2[:3]}')
+    # A3 — 낱알 검색(#/pill) → 「내 약통에 담기」 → 같이 먹어도 되나요
+    pz.evaluate(RESET)
+    for nm in ['판콜에이캡슐', '펜잘']:
+        go('#/pill'); pz.fill('#pq', nm); pz.wait_for_timeout(700)
+        pz.evaluate("n=>{ const c=[...document.querySelectorAll('.pill-cw')].find(e=>e.querySelector('.pill-card b').innerText.replace(/\\s/g,'').startsWith(n)); c && c.querySelector('.pc-take').click(); }", nm)
+        pz.wait_for_timeout(500)
+    pz.evaluate(ADD, '타이레놀정500'); pz.evaluate("()=>pubIngrFill()")
+    a3 = pz.evaluate("()=>Object.values(ME.pub).map(x=>({n:x.name, i:x.ingr}))")
+    pc = [x for x in a3 if x['n'].startswith('판콜에이캡슐')]
+    if not pc: fails.append(f'Z7 A3: 낱알 검색에서 판콜에이캡슐을 담지 못함 {a3}')
+    elif '아세트아미노펜' not in pc[0]['i']: fails.append(f'Z7 A3: 판콜에이캡슐 성분이 비어 있음 — {pc[0]}')
+    if not any(x['n'].startswith('펜잘') for x in a3): fails.append(f'Z7 A3: 낱알 검색에서 펜잘을 담지 못함 {a3}')
+    go('#/together'); t = txt()
+    if pc and '아세트아미노펜' in pc[0]['i'] and '아세트아미노펜' not in t: fails.append('Z7 A3: 판콜에이캡슐 + 타이레놀정500인데 아세트아미노펜 겹침이 안 뜸')
+    pz.evaluate(RESET); pz.evaluate(ADD, '타이레놀정500')
+    pz.evaluate("()=>{ ME.taking.push('pub:z7x'); ME.pub['pub:z7x']={name:'모르는감기캡슐',full:'모르는감기캡슐',ingr:'',rx:0,seq:'',drugId:''}; saveMe(); }")
+    go('#/together'); t = txt('.ix-sum')
+    if '걸리는 조합' in t or '성분을 몰라 겹침을 확인하지 못했어요' not in t: fails.append(f'Z7 A3: 성분 모름 약이 있는데 머리말이 분명하지 않음 — {t[:80]}')
+    # A4·A5·A6 — 아이 나이(2개월·5개월·4세·14세·생년월일 없음)
+    a4 = pz.evaluate("""()=>{ const bad=[]; const bd=m=>{ const d=new Date(); d.setMonth(d.getMonth()-m); d.setDate(d.getDate()-1); return d.toISOString().slice(0,10); };
+      const kid=(m,w)=>{ ME.age='child'; ME.child={name:'',birth:m==null?'':bd(m),weight:w}; saveMe(); };
+      const ids=sid=>{ const s=byId(D.symptoms,sid); return basket(s).map(x=>x.d); };
+      kid(2,5); location.hash='#/symptom/fever'; route();
+      if (!document.querySelector('.inf-stop') || document.querySelector('.answer .buy-item')) bad.push('2개월 열: 「진료가 먼저」 대신 약 목록');
+      location.hash='#/show/fever'; route(); if (document.querySelector('.show-list li')) bad.push('2개월 열: 약국 카드에 약');
+      location.hash='#/symptom/headache'; route(); if (!/3개월 미만/.test((document.querySelector('.answer .kid-line')||{}).innerText||'')) bad.push('2개월: 「아이 kg 기준」 줄에 3개월 미만 안내 없음');
+      for (const sid of ['cold','fever','headache','allergy']) if (ids(sid).some(isNsaid)) bad.push('2개월 '+sid+': 소염진통제를 권함');
+      kid(5,7); for (const sid of ['cold','fever','headache','msk']) if (ids(sid).some(isNsaid)) bad.push('5개월 '+sid+': 소염진통제(이부프로펜 등)를 권함');
+      location.hash='#/symptom/fever'; route(); const k5=(document.querySelector('.answer .kid-line')||{}).innerText||''; if (!/이부프로펜 시럽은 생후 6개월부터/.test(k5)) bad.push('5개월: kg 줄에 이부프로펜 6개월 안내 없음 — '+k5.slice(0,60));
+      kid(48,16); location.hash='#/symptom/fever'; route(); if (!/설명서 표/.test([...document.querySelectorAll('.answer .kid-over')].map(e=>e.innerText).join(''))) bad.push('4세 16 kg: 이부프로펜 설명서 표 넘음 경고 없음');
+      for (const sid of ['cold','allergy','cough','constipation','diarrhea']) for (const x of basket(byId(D.symptoms,sid))) { if (/500 ?mg|정$|캡슐/.test(x.product||'') && !kidAdultOk(x.d)) bad.push('4세 '+sid+': 어른 제품 '+x.product); if (minAgeOf(x.d)!=null && minAgeOf(x.d)>48) bad.push('4세 '+sid+': '+x.d.id+'('+minAgeOf(x.d)+'개월부터)'); }
+      kid(168,50); for (const sid of ['allergy','diarrhea','cold']) for (const x of basket(byId(D.symptoms,sid))) if ((x.why||[]).includes('child') && minAgeOf(x.d)!=null) bad.push('14세 '+sid+': 나이 기준이 있는데 「소아」로 막음 '+x.d.id);
+      kid(null,5); location.hash='#/symptom/fever'; route(); if (!/생후 3개월 안팎/.test([...document.querySelectorAll('.answer .kid-over')].map(e=>e.innerText).join(''))) bad.push('생년월일 없음 5 kg: 「생후 3개월 안팎」 경고 없음');
+      ME.age='adult'; ME.child=null; saveMe(); location.hash='#/symptom/fever'; route();
+      const kidRow=[...document.querySelectorAll('.answer .buy-item')].find(b=>/소아/.test((b.querySelector('.role')||{}).innerText||''));
+      if (!kidRow || /500 ?mg|세토펜정/.test(kidRow.innerText) || !/어린이/.test(kidRow.innerText)) bad.push('어른 모드 열 「소아」 칸: '+(kidRow?kidRow.innerText.replace(/\\n/g,' / '):'없음'));
+      return bad; }""")
+    if a4: fails.append(f'Z7 A4·A5·A6 아이 나이: {a4[:5]}')
+    # B5·B6 — 내 몸 조건: 신장 + 마그밀(빨강), 항응고제 + 부루펜(§101 주의 한 줄 — 증상 화면·약국 카드·같이 먹어도 되나요)
+    AC = '금기는 아니지만 위장관 출혈 가능성이 있어 주의해요. 처방한 의사와 먼저 상의하세요'
+    pz.evaluate(RESET); pz.evaluate("()=>{ ME.kidney=true; saveMe(); }"); pz.evaluate(ADD, '마그밀정')
+    go('#/together'); t = txt('.ix.stop')   # 병용 규칙(kidney-mg)이 말하든, 내 몸 조건 칸이 말하든 빨강이면 된다
+    if '마그밀' not in t or '걸리는 조합은 나오지 않았어요' in txt(): fails.append('Z7 B5: 신장 질환 + 마그밀정인데 빨강(먹지 말 것) 판정이 없음')
+    pz.evaluate(RESET); pz.evaluate("()=>{ ME.anticoag=true; saveMe(); }"); pz.evaluate(ADD, '부루펜정')
+    go('#/together'); t = txt()
+    if AC not in t: fails.append('Z7 B6: 항응고제 + 부루펜정인데 §101 주의 한 줄이 같이 먹어도 되나요에 없음')
+    if '같이 드시면 안 돼' in t or '내 몸 조건과 맞지 않는' in t: fails.append('Z7 B6: 항응고제 + 부루펜이 «금기»처럼 나옴(§101 은 주의)')
+    pz.evaluate("()=>{ ME.taking=[]; ME.pub={}; saveMe(); }")
+    go('#/symptom/msk'); t = txt('.answer .buy')
+    if AC not in t: fails.append('Z7 B6: 항응고제 조건에서 근육통 화면 소염제 칸에 주의 한 줄 없음')
+    go('#/show/msk'); t = txt('.show-list')
+    if AC not in t: fails.append('Z7 B6: 항응고제 조건에서 약국 카드 소염제 줄에 주의 한 줄 없음')
+    # B8 — 응급 신호 체크 → 「두 가지(함께·번갈아)」 칸·아이 용량 줄도 숨김
+    pz.evaluate(RESET); pz.evaluate("()=>{ ME.age='child'; ME.child={name:'',birth:'',weight:12}; saveMe(); }")
+    go('#/symptom/fever')
+    b8 = pz.evaluate("""()=>{ const v=s=>[...document.querySelectorAll(s)].some(e=>e.getClientRects().length>0); const before=v('.answer .med-tip');
+      document.querySelector('.rf input[type=checkbox]').click();
+      return {before, tip:v('.med-tip'), kid:v('.answer .kid-line')||v('.answer .kid-over'), doTwo:[...document.querySelectorAll('.care-do')].some(e=>/번갈아/.test(e.innerText))}; }""")
+    if not b8['before']: fails.append('Z7 B8: 열 화면에 「두 가지 — 함께·번갈아」 접이가 없음(체크 전)')
+    if b8['tip'] or b8['kid'] or b8['doTwo']: fails.append(f'Z7 B8: 응급 신호 체크 뒤에도 약 쓰는 법·용량이 보임 {b8}')
+    # B10 — 고르지 않은 보조 칸(파모티딘)은 기침 약국 카드·보내기에 가지 않는다
+    pz.evaluate(RESET); go('#/show/cough'); t = txt('.show-list')
+    if '파모티딘' in t: fails.append('Z7 B10: 기침 약국 카드에 고르지 않은 파모티딘이 들어감(자료 cough.plan 「신물」 칸 optional — 내용 조 몫)')
+    pz.evaluate(RESET)
+    if zerr: fails.append(f'Z7: JS 오류 {zerr[:2]}')
+    pz.close()
+
 def main():
     ap = argparse.ArgumentParser(); ap.add_argument('--url'); a = ap.parse_args()
     # 0. 자료 고리(브라우저 없이 1초) — 끊긴 출처·약 id·팁 링크가 있으면 여기서 멈춘다
@@ -912,6 +1016,7 @@ def main():
         if nerr: fails.append(f'앱 알람: JS 오류 {nerr[:2]}')
         pn.close()
         alarm_z6(br, url, fails)
+        z7_checks(br, url, fails)
         # 6b-2. 성분표에 없던 공공 제품 — 클로닉신(먹는 소염제 26개 제품)·돔페리돈이 약통에서 실제로 걸려야 한다(2026-09-23)
         _pb = {'노리스정 + 와파린': ({'taking':['pub:1','cls:blood.warf'],'pub':{'pub:1':{'name':'노리스정','full':'노리스정(클로닉신리시네이트)','ingr':'클로닉신리시네이트','rx':0,'seq':'1','drugId':''}}}, 'warfarin-nsaid'),
                '노리스정 + 이부프로펜': ({'taking':['pub:1','ibuprofen'],'pub':{'pub:1':{'name':'노리스정','full':'노리스정','ingr':'클로닉신리시네이트','rx':0,'seq':'1','drugId':''}}}, 'nsaid-dup'),
