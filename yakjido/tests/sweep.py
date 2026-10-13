@@ -21,9 +21,9 @@ with sync_playwright() as p:
     b=p.chromium.launch(**({'executable_path':_c} if os.path.exists(_c) else {}))
     pg=b.new_page(viewport={'width':A.w,'height':844})
     pg.goto('http://localhost:8765/index.html#/home'); pg.wait_for_timeout(2500)
-    pg.evaluate("localStorage.setItem('yakjido.hello.v1','1');localStorage.setItem('yakjido.me.v1',JSON.stringify({age:'senior',pregnant:true,taking:['acetaminophen','cls:bp.arb'],pub:{}}))" + (f";localStorage.setItem('yakjido.fs','{A.fs}')" if A.fs else ''))
+    pg.evaluate("localStorage.setItem('yakjido.hello.v1','1');localStorage.setItem('yakjido.me.v1',JSON.stringify({age:'senior',pregnant:true,taking:['acetaminophen','cls:bp.arb','cls:blood.warf','supp:calcium'],pub:{}}))" + (f";localStorage.setItem('yakjido.fs','{A.fs}')" if A.fs else ''))
     pg.reload(); pg.wait_for_timeout(2500)
-    routes=pg.evaluate(ROUTE_JS)
+    routes=pg.evaluate(ROUTE_JS)+['/supp/omega3','/supp/iron']   # Z9 — 와파린·칼슘 영양제를 담아 영양제 화면의 「내 약통 기준 확인」도 훑는다
     for theme in A.themes.split(','):
         pg.emulate_media(color_scheme=theme)
         try: pg.evaluate("t=>{ try { setTheme(t); } catch (e) {} }", theme)   # 앱 기본이 밝게라 설정으로도 바꾼다(10-14)

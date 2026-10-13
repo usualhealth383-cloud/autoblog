@@ -484,6 +484,107 @@ def z7_checks(br, url, fails):
     if zerr: fails.append(f'Z7: JS 오류 {zerr[:2]}')
     pz.close()
 
+# Z9(실사용 검수 3차 — 2026-10-14) — B6 아주 높은 혈당(현욱님: 식사·증상으로 나눠, 증상이면 119) · B7 영양제 ↔ 내 약통 ·
+#   B8 늦게 온 제품 목록이 계산기 칸을 지우지 않게 · C2 계산기 ** · C3 하루 최대 겹말 · C12 아이 처음 안내 · C13 당뇨 목표 · C14 탭 화살표
+def z9_checks(br, url, fails):
+    zerr = []
+    pz = br.new_page(viewport={'width': 390, 'height': 844}); pz.on('pageerror', lambda e: zerr.append(str(e)))
+    pz.add_init_script("localStorage.setItem('yakjido.hello.v1','1')")
+    pz.goto(url + '#/home'); pz.wait_for_function("()=>typeof CORE!=='undefined' && CORE===2", timeout=20000)
+    def go(h):
+        pz.evaluate("h=>{ location.hash=h; route(); }", h); pz.wait_for_timeout(80)
+    def txt():
+        return pz.inner_text('#view')
+    pz.evaluate("()=>{ ME.taking=[]; ME.vitals=[]; ME.diabetes=false; ME.kidney=false; saveMe(); }")
+    # B6 — 300 이상: 식사·증상 칩 → 결과 한 줄
+    def bg(v, w):
+        go('/vitals'); pz.evaluate("w=>{ VT.k='bg'; VT.gw=w; route(); }", w); pz.fill('#vg', str(v)); pz.click('button:has-text("적어 두기")'); pz.wait_for_timeout(120)
+    bg(320, '식후 2시간')
+    t = txt()
+    if '많이 높아요' not in t or '지금 이런 증상이 있나요?' not in t: fails.append('혈당 320(식후) 뒤에 「많이 높아요」·증상 묻기가 없습니다')
+    if pz.query_selector('.bg-hi .bg-out'): fails.append('혈당 320 — 증상을 고르기 전에 119 결과가 먼저 뜹니다')
+    pz.click('.bg-hi button:has-text("없음")'); pz.wait_for_timeout(100)
+    if '다음 공복에 다시 재세요' not in pz.inner_text('.bg-hi'): fails.append('혈당 320 식후 + 증상 없음 → 「다시 재세요」가 아닙니다')
+    pz.click('.bg-hi button:has-text("구토·복통")'); pz.wait_for_timeout(100)
+    if '바로 진료' not in pz.inner_text('.bg-hi') or not pz.query_selector('.bg-hi a.call[href="tel:119"]'): fails.append('혈당 320 + 구토·복통 → 「바로 진료·119」 단추가 없습니다')
+    if pz.evaluate("()=>(VT.bgs||[]).includes(4)"): fails.append('혈당 증상 칩 — 증상을 고르면 「없음」이 풀려야 합니다')
+    bg(350, '공복'); pz.click('.bg-hi button:has-text("없음")'); pz.wait_for_timeout(100)
+    if '오늘 안에 진료' not in pz.inner_text('.bg-hi'): fails.append('혈당 350 공복 + 증상 없음 → 「오늘 안에 진료」가 아닙니다')
+    bg(400, '그 밖')
+    if '언제 재셨어요?' not in pz.inner_text('.bg-hi'): fails.append('혈당 400 「그 밖」 — 식사를 묻지 않습니다')
+    pz.click('.bg-hi button:has-text("없음")'); pz.wait_for_timeout(80)
+    if pz.query_selector('.bg-hi .bg-out'): fails.append('혈당 400 「그 밖」 — 식사를 고르기 전에 결과가 나옵니다')
+    pz.click('.bg-hi button:has-text("식사하고 몇 시간 안")'); pz.wait_for_timeout(80)
+    if '다음 공복에 다시 재세요' not in pz.inner_text('.bg-hi'): fails.append('혈당 400 「그 밖」 → 식후 + 없음 → 「다시 재세요」가 아닙니다')
+    if pz.evaluate("()=>JSON.stringify(ME).includes('bgs')"): fails.append('혈당 증상 칩이 내 기록(ME)에 저장됩니다 — 화면 기억만이어야 합니다')
+    # C13 — 「목표 안」은 당뇨일 때만
+    bg(110, '공복')
+    if '목표' in pz.inner_text('.vt-list'): fails.append('당뇨가 아닌데 혈당 기록에 「목표」 표가 붙습니다')
+    pz.evaluate("()=>{ ME.diabetes=true; saveMe(); route(); }"); pz.wait_for_timeout(80)
+    if '목표 안' not in pz.inner_text('.vt-list'): fails.append('당뇨인데 공복 110 에 「목표 안」이 없습니다')
+    pz.evaluate("()=>{ ME.diabetes=false; ME.vitals=[]; VT.alert=null; saveMe(); }")
+    # B7 — 와파린 담고 오메가3 화면 → 배너, 영양제 담기 → 같이 먹어도 되나요
+    pz.evaluate("()=>{ ME.taking=['cls:blood.warf']; saveMe(); }"); go('/supp/omega3')
+    b = pz.inner_text('.supp-box') if pz.query_selector('.supp-box') else ''
+    if '오메가3' not in b or '항응고' not in b: fails.append(f'와파린을 담았는데 오메가3 화면에 내 약통 경고가 없습니다: {b[:80]}')
+    go('/supp/vitc')
+    if pz.query_selector('.supp-box'): fails.append('와파린 + 비타민 C — 걸릴 것이 없는데 내 약통 경고가 뜹니다')
+    go('/supp/omega3'); pz.click('button:has-text("내 약통에 담기")'); pz.wait_for_timeout(120)
+    if 'supp:omega3' not in pz.evaluate("()=>ME.taking"): fails.append('영양제 화면 「내 약통에 담기」가 담지 못했습니다')
+    if pz.evaluate("()=>!!(ME.prn||{})['supp:omega3']"): fails.append('영양제를 「필요할 때만」으로 담았습니다 — 매일 드시는 것이 기본')
+    if 'sx-omega3' not in pz.evaluate("()=>ixRun().hits.map(h=>h.r.id)"): fails.append('같이 먹어도 되나요가 와파린 + 오메가3 를 판정하지 않습니다')
+    go('/together')
+    if '오메가' not in txt(): fails.append('같이 먹어도 되나요 화면에 담은 영양제가 없습니다')
+    pz.evaluate("()=>{ ME.taking=['cls:thy.levo','supp:calcium']; saveMe(); }")
+    if 'levo-mineral' not in pz.evaluate("()=>ixRun().hits.map(h=>h.r.id)"): fails.append('갑상선약 + 칼슘 영양제가 「시간을 띄우세요」로 걸리지 않습니다')
+    go('/supp/iron')
+    if '갑상선' not in (pz.inner_text('.supp-box') if pz.query_selector('.supp-box') else ''): fails.append('갑상선약을 담았는데 철분 화면에 시간 띄우기 안내가 없습니다')
+    if pz.evaluate("()=>sanitizeMe(JSON.parse(JSON.stringify(ME))).taking.join(',')") != 'cls:thy.levo,supp:calcium': fails.append('영양제 id 가 기록 바로잡기(sanitizeMe)에서 빠집니다')
+    for r in ['/schedule', '/bag', '/me?t=meds', '/home', '/show']:
+        go(r)
+        if '문제가 생겼어요' in txt(): fails.append(f'영양제를 담은 뒤 {r} 화면이 터집니다')
+    pz.evaluate("()=>{ ME.taking=[]; saveMe(); }")
+    # C2·C3 — 계산기 ** · 「하루 최대 약국…」 겹말 · 「—」
+    go('/supp/zinc'); pz.evaluate("()=>document.querySelectorAll('details').forEach(d=>d.open=true)")
+    if '**' in txt(): fails.append('아연 계산기에 ** 가 그대로 보입니다')
+    go('/drug/ibuprofen')
+    if '하루 최대 약국' in pz.inner_text('.dose-hero'): fails.append('이부프로펜 용량 칸 「하루 최대 약국…」 겹말')
+    go('/drug/ciclopirox-shampoo')
+    if pz.query_selector('.dose-hero') and pz.inner_text('.dose-hero').split('\n')[-1].strip().startswith('—'): fails.append('시클로피록스 용량 칸에 「—」 한 글자가 값처럼 보입니다')
+    # C12 — 아이 처음 안내: 어른 조건 칩 없음 · 생년월일·몸무게 칸
+    go('/hello/1'); pz.click('button.hello-big:has-text("아이가 먹을 약이에요")'); pz.wait_for_timeout(120)
+    t = txt()
+    if '임신' in t or '전립선' in t or '술을' in t: fails.append('아이 처음 안내 2단계에 임신·전립선·술 칩이 나옵니다')
+    if not pz.query_selector('#k-birth') or not pz.query_selector('#k-w'): fails.append('아이 처음 안내에 생년월일·몸무게 칸이 없습니다')
+    else:
+        pz.fill('#k-w', '11.5'); pz.fill('#k-birth', '2024-03-01'); pz.click('.actions .btn'); pz.wait_for_timeout(100)
+        c = pz.evaluate("()=>ME.child")
+        if not c or c.get('weight') != 11.5 or c.get('birth') != '2024-03-01': fails.append(f'아이 처음 안내의 몸무게·생년월일이 저장되지 않습니다: {c}')
+    pz.evaluate("()=>{ ME.age='adult'; ME.child=null; saveMe(); }")
+    # C14 — 약 탭 ←/→
+    go('/drug/acetaminophen'); pz.focus('.dtabs [role=tab]'); pz.keyboard.press('ArrowRight')
+    if pz.evaluate("()=>[...document.querySelectorAll('.dtabs [role=tab]')].indexOf(document.activeElement)") != 1: fails.append('약 탭에서 → 키로 다음 탭에 가지 않습니다')
+    pz.keyboard.press('Home')
+    if pz.evaluate("()=>[...document.querySelectorAll('.dtabs [role=tab]')].indexOf(document.activeElement)") != 0: fails.append('약 탭에서 Home 키로 첫 탭에 가지 않습니다')
+    if zerr: fails.append(f'Z9 검사 JS 오류: {zerr[:2]}')
+    pz.close()
+    # B8 — 제품 목록(easy-index)이 늦게 와도 계산기에 적은 값·펼친 칸이 남는다
+    ctx = br.new_context(viewport={'width': 390, 'height': 844}, service_workers='block'); p2 = ctx.new_page(); e2 = []; p2.on('pageerror', lambda e: e2.append(str(e)))
+    held = []
+    p2.route('**/easy-index.json*', lambda rt: held.append(rt))   # 붙잡아 두었다가 다 적은 뒤에 보낸다(느린 휴대폰 흉내)
+    p2.add_init_script("localStorage.setItem('yakjido.hello.v1','1')")
+    p2.goto(url + '#/supp/iron'); p2.wait_for_function("()=>typeof CORE!=='undefined' && CORE===2 && !!document.querySelector('.pick-more')", timeout=20000)
+    p2.evaluate("()=>{ document.querySelector('.pick-more').open = true; }")
+    if p2.evaluate("()=>!!PUB.index"): fails.append('B8 검사 — 제품 목록이 이미 와 있어 늦게 오는 경우를 재현하지 못했습니다')
+    p2.fill('#c-amt', '50'); p2.fill('#c-price', '9000'); p2.fill('#c-n', '60')
+    before = p2.inner_text('#c-pct')
+    for rt in held: rt.continue_()
+    p2.wait_for_function("()=>!!PUB.index", timeout=20000); p2.wait_for_timeout(300)
+    after = p2.evaluate("()=>[document.getElementById('c-amt').value, document.getElementById('c-n').value, document.getElementById('c-pct').innerText, document.querySelector('.pick-more').open]")
+    if after[:2] != ['50', '60'] or after[2] != before or not after[3]: fails.append(f'제품 목록이 늦게 오면 계산기 칸이 지워집니다: 전 {before} → 뒤 {after}')
+    if e2: fails.append(f'B8 검사 JS 오류: {e2[:2]}')
+    ctx.close()
+
 def main():
     ap = argparse.ArgumentParser(); ap.add_argument('--url'); a = ap.parse_args()
     # 0. 자료 고리(브라우저 없이 1초) — 끊긴 출처·약 id·팁 링크가 있으면 여기서 멈춘다
@@ -1052,6 +1153,7 @@ def main():
         pn.close()
         alarm_z6(br, url, fails)
         z7_checks(br, url, fails)
+        z9_checks(br, url, fails)
         # 6b-2. 성분표에 없던 공공 제품 — 클로닉신(먹는 소염제 26개 제품)·돔페리돈이 약통에서 실제로 걸려야 한다(2026-09-23)
         _pb = {'노리스정 + 와파린': ({'taking':['pub:1','cls:blood.warf'],'pub':{'pub:1':{'name':'노리스정','full':'노리스정(클로닉신리시네이트)','ingr':'클로닉신리시네이트','rx':0,'seq':'1','drugId':''}}}, 'warfarin-nsaid'),
                '노리스정 + 이부프로펜': ({'taking':['pub:1','ibuprofen'],'pub':{'pub:1':{'name':'노리스정','full':'노리스정','ingr':'클로닉신리시네이트','rx':0,'seq':'1','drugId':''}}}, 'nsaid-dup'),
@@ -1337,7 +1439,7 @@ def main():
     print(f'화면 {len(routes)}개 검사 완료')
     if fails:
         print('실패', len(fails)); [print('  ✗', f) for f in fails]; sys.exit(1)
-    print('✓ 전부 통과 — JS 오류 0 · 넘침 0 · 잘림 0 · 명암비 AA · 조작 부품 3:1 · 44px · 단추 누르기 · 복용 간격 · 복약 달력 · 홈 오늘약 · 어르신 소염제 · 소아 한도 · 계열 경고 · 어근 오인 · 내 정보 칸 · 화면 밝기(처음 밝게·세 가지·인쇄 밝게) · 아이콘 전수 · 약 알림 · 어르신 모드 · 320px · 병용 8건 · 겹침 규칙 53 · 입력칸 이름표 · 성분 해석 123 · 죽은 규칙 0 · 약통 판정 4건 · 자기중복 3건 · 바구니 겹침 · 이중계산 0 · 검색 8건 · 구어 30건 · 문장 16건 · 새 약 검색 12건 · 하루 최대 표기 · 먹는/바르는 구분 · 영양제 질문 순서 · 인터넷 없이 · 화면 오류 카드 · 계정 동의 먼저 · 둘러보기')
+    print('✓ 전부 통과 — JS 오류 0 · 넘침 0 · 잘림 0 · 명암비 AA · 조작 부품 3:1 · 44px · 단추 누르기 · 복용 간격 · 복약 달력 · 홈 오늘약 · 어르신 소염제 · 소아 한도 · 계열 경고 · 어근 오인 · 내 정보 칸 · 화면 밝기(처음 밝게·세 가지·인쇄 밝게) · 아이콘 전수 · 약 알림 · 어르신 모드 · 320px · 병용 8건 · 겹침 규칙 53 · 입력칸 이름표 · 성분 해석 123 · 죽은 규칙 0 · 약통 판정 4건 · 자기중복 3건 · 바구니 겹침 · 이중계산 0 · 검색 8건 · 구어 30건 · 문장 16건 · 새 약 검색 12건 · 하루 최대 표기 · 먹는/바르는 구분 · 영양제 질문 순서 · 인터넷 없이 · 화면 오류 카드 · 계정 동의 먼저 · 둘러보기 · 아주 높은 혈당(식사·증상) · 영양제 ↔ 내 약통 · 늦은 목록에도 입력 유지 · 아이 처음 안내')
 
 if __name__ == '__main__':
     main()

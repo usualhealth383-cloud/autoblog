@@ -1083,7 +1083,7 @@ main > .answer + *, main > .sec + .care, main > .card + .care, main > .rx-card +
 .calc-out{margin-top:var(--s3);display:grid;grid-template-columns:1fr 1fr;gap:var(--s2)}
 .calc-out div{background:var(--tint);border-radius:12px;padding:12px 14px}
 .calc-out small{display:block;font-size:.6875rem;font-weight:700;color:var(--muted);letter-spacing:.05em}
-.calc-out b{display:block;font-size:1.375rem;font-weight:800;letter-spacing:-.02em;color:var(--primary-deep)}
+.calc-out>div>b{display:block;font-size:1.375rem;font-weight:800;letter-spacing:-.02em;color:var(--primary-deep)}
 .dup{padding:12px 14px;border-radius:12px;background:var(--caution-tint);color:var(--caution);margin-top:var(--s3)}
 .dup-h{display:flex;align-items:center;gap:8px;font-size:.9375rem;font-weight:800}
 .dup ul.plain{margin-top:6px}
@@ -5628,7 +5628,7 @@ function ixItems(extra){
                link: x.supp ? '#/supp/' + x.supp.id : x.d ? '#/drug/' + x.d.id : (x.pub ? (x.pub.seq ? '#/pillinfo/' + x.pub.seq : ((PUB.index || []).find(p => p.n === x.pub.full) ? '#/pub/' + (PUB.index || []).find(p => p.n === x.pub.full).id : '')) : '') });
   }
   for (const d of (extra || [])) {
-    if (d.supp) { out.push({ name: d.name, ings: ingOf(d).ings, known: true, from: '지금 보는 영양제', link: '#/supp/' + d.supp.id }); continue; }
+    if (d.supp) { out.unshift({ name: d.name, ings: ingOf(d).ings, known: true, from: '지금 보는 영양제', link: '#/supp/' + d.supp.id }); continue; }
     const ings = drugIngs(d).slice();
     if (!ings.length) ingFind(d.name).forEach(e => { if (!ings.includes(e)) ings.push(e); });
     out.push({ name: ingrName(d), ings, known: ings.length > 0, from: '지금 보는 약', link: '#/drug/' + d.id });
@@ -6090,7 +6090,7 @@ function maxLine(mx, rule){
   /* 「3일 넘게…」·「1~2주」는 기간이지 하루 양이 아니다 */
   if (/^[\d.,~\s]+(일|주|개월|달|시간|년)/.test(mx)) return fmt(mx);
   /* 「하루 최대 240 mg/일」의 겹말 */
-  if (/^\d/.test(mx) && !/이상|넘으면|진료/.test(mx)) return '하루 최대 ' + fmt(mx.replace(/\s*\/일/, ''));
+  if (/^\d/.test(mx) && !/이상|넘으면/.test(mx.split(/ · | — /)[0].replace(/\(.*?\)/g, ''))) return '하루 최대 ' + fmt(mx.replace(/\s*\/일/, ''));
   return fmt(mx);
 }
 /* 먹는 약인가 — 안약·크림·파스·샴푸에 「먹는 약으로 등록」·「먹고 불편했어요」라고 쓰지 않으려고 */
@@ -7333,8 +7333,10 @@ function suppNeed(s, nd, w){
 }
 /* Z9 B7 — 영양제 화면에도 약 화면의 「내 정보 기준 확인」처럼: 내 약통(와파린·갑상선약·항생제·제산제…)과 이 영양제를 병용 판정에 돌려 걸린 것만 */
 function suppBox(s){ if (!(ME.taking || []).length && !activeFlags().length) return '';
-  const inBox = (ME.taking || []).includes('supp:' + s.id), me = it => it.ings.some(e => (e.cls || []).includes('supp-' + s.id));
-  const hs = ixRun(inBox ? [] : [{ supp: s, name: s.name }]).hits.filter(h => h.items.some(me)); if (!hs.length) return '';
+  const me = it => it.ings.some(e => (e.cls || []).includes('supp-' + s.id));
+  /* 이 영양제를 맨 앞 «지금 보는 영양제»로 — 규칙은 묶음마다 처음 맞는 약을 고르므로, 담아 둔 다른 칼슘이 철분 자리를 가로채지 않게 */
+  const T = ME.taking; let hs; ME.taking = (T || []).filter(x => x !== 'supp:' + s.id);
+  try { hs = ixRun([{ supp: s, name: s.name }]).hits.filter(h => h.items.some(me)); } finally { ME.taking = T; } if (!hs.length) return '';
   return `<div class="card sec supp-box" style="border-color:rgba(182,54,41,.25)"><div class="eyebrow" style="color:var(--alert)">내 약통 기준 확인</div>${hs.map(h => { const o = h.items.filter(it => !me(it)).map(it => it.name);
     return `<div class="note${h.r.lv === 'stop' ? ' alert' : h.r.lv === 'info' ? ' soft' : ''}" style="margin-bottom:8px">${h.r.lv === 'info' ? I.clock : I.alert}<span><b>${esc(h.r.t)}</b><br>${fmt(h.r.do)}${o.length ? `<br><small>내 약통: ${esc(o.join(' · '))}</small>` : ''}</span></div>`; }).join('')}
     <p class="small"><a class="link" href="#/together">같이 먹어도 되나요에서 모두 보기 ›</a></p></div>`; }
@@ -7601,6 +7603,10 @@ function vAbout(){
   ${disclaimer()}`;
 }
 
+/* Z9 C14 — 탭 줄에서 ←/→·Home·End 로 옆 탭에 초점(누르면 엶 — 지금처럼 Enter·Space) */
+document.addEventListener('keydown', e => { const t = e.target.closest?.('[role=tab]'), k = e.key; if (!t || !/^(ArrowLeft|ArrowRight|Home|End)$/.test(k)) return;
+  const L = [...t.parentNode.querySelectorAll('[role=tab]')], n = L.length, j = k === 'Home' ? 0 : k === 'End' ? n - 1 : (L.indexOf(t) + (k === 'ArrowRight' ? 1 : -1) + n) % n;
+  e.preventDefault(); L[j].focus(); L[j].scrollIntoView({ block: 'nearest', inline: 'nearest' }); });
 document.addEventListener('input', e => { if (!e.target.closest('.calc')) return; const id = location.hash.split('/')[2]?.split('?')[0]; const s = supp(id); if (!s?.calc) return; const amt = +document.getElementById('c-amt').value, per = +document.getElementById('c-per').value || 1, price = +document.getElementById('c-price').value, n = +document.getElementById('c-n').value; const pct = document.getElementById('c-pct'), won = document.getElementById('c-won'); if (amt > 0) { const perServing = amt * per; const r = perServing / s.calc.typical; pct.textContent = Math.round(r * 100) + '%'; pct.style.color = r > (s.calc.ulRatio || 99) ? 'var(--alert)' : r < 0.5 ? 'var(--caution)' : 'var(--primary-deep)'; if (price > 0 && n > 0) { const unitPrice = price / n; const effDoses = perServing / s.calc.typical; won.textContent = Math.round(unitPrice * per / effDoses).toLocaleString('ko-KR') + '원'; } else won.textContent = '—'; } else { pct.textContent = '—'; won.textContent = '—'; } });
 function setFs(v){ try { localStorage.setItem('yakjido.fs', v); } catch (e) {} document.documentElement.style.setProperty('--fs', v); route(); }
 /* 3-07 — 어르신 모드는 글자를 「줄이지」 않는다: 켤 때 20px 보다 작으면 20px 로(전 값을 기억), 끌 때는 그 전 값으로. 이미 크게 고르신 분은 그대로 */

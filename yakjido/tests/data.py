@@ -497,6 +497,26 @@ for _name in ('lexicon', 'qa', 'nutrients', 'brands', 'mixes'):
     _lz(json.loads(_raw), '', '')
     fails += [f'data/{_name}.json {b}' for b in _bad]
 
+# ⑤-2 영양제 쪽 영어 약자(실사용 검수 3차 C9, 10-14) — 위 ABBR 목록에 없어 「상한(UL)」·「50억 CFU」·「rTG vs EE」·「HACCP」·「1,000 IU」가 화면에 그대로 나왔다.
+#    → 상한 섭취량 · 균 수(집락 형성 단위)·「억 마리」 · 재에스테르화 중성지방형(알티지)·에틸에스테르형 · 식품안전관리인증 · 국제단위.
+#    상자 표기를 알려 주는 「IU」처럼 낫표 안에 넣은 것만 허용. 제품 이름(n·ex·name)·검색어(tags·k·kw)·출처(src·sources)는 원문 그대로라 넘긴다.
+SUPP_ABBR = re.compile(r'(?<![A-Za-z「])(UL|CFU|TG|rTG|EE|HACCP|IU|NHS)(?![A-Za-z」])')
+_SA_SKIP = {'tags', 'brands', 'n', 'ex', 'name', 'src', 'sources', 'srcText', 'k', 'kw', 'id', 'en', '_memo', 'go', 'drug', 'supp', 'herb', 'ing', 'class', 'flags'}
+def _sabbr(o, key, path, owner):
+    if isinstance(o, str):
+        if key not in _SA_SKIP and SUPP_ABBR.search(o): fails.append(f'영어 약자 {owner}{path}: {o[:60]!r}')
+    elif isinstance(o, dict):
+        for k, v in o.items(): _sabbr(v, k, path + '.' + k, owner)
+    elif isinstance(o, list):
+        for i, v in enumerate(o): _sabbr(v, key, path + f'[{i}]', owner)
+for x in SUP: _sabbr(x, '', '', '영양제 ' + x['id'])
+for d in D: _sabbr(d, '', '', '약 ' + d['id'])
+for s in S: _sabbr(s, '', '', '증상 ' + s['id'])
+if (C / 'suppRules.json').exists(): _sabbr(json.load(open(C / 'suppRules.json', encoding='utf-8')), '', '', 'suppRules ')
+for _name in ('lexicon', 'qa', 'nutrients', 'brands', 'mixes'):
+    _p = _PUBD / f'{_name}.json'
+    if _p.exists(): _sabbr(json.loads(_p.read_text(encoding='utf-8')), '', '', f'data/{_name}.json ')
+
 # ⑥ 같은 것을 화면마다 다르게 부르지 않는다(2026-10-13 자체 검수 3-20) — 담는 곳은 「내 약통」, 술은 「술을 자주 마셔요」.
 _SHELL = (ROOT / 'app-shell.html').read_text(encoding='utf-8')
 for _old, _new in (('지금 먹는 약으로 등록', '내 약통에 담기'), ('먹는 약에 담기', '내 약통에 담기'), ('내 약에 담기', '내 약통에 담기'), ('약통에 넣기', '내 약통에 담기'), ('술을 자주 드세요', '술을 자주 마셔요')):
