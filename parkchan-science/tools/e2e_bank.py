@@ -97,5 +97,27 @@ async def main():
               asgAll:hit(asgPool({ lesson:L, type:'전체', diff:'전체' })), asgAdv:asgPool({ lesson:L, type:'전체', diff:'심화' }).every(isAdv) && asgPool({ lesson:L, type:'전체', diff:'심화' }).length > 0,
               dqc:hit(CONCEPTS.filter(c => c.lessonId === L).flatMap(dqcItems)) }; })()""")
         assert adv['n'] >= 2 and adv['near'] >= 30 and not any(adv[k] for k in ('rec', 'rev', 'plan', 'tq', 'pick', 'asgAll', 'dqc')) and adv['ls'] == 0 and adv['direct'] and adv['asgAdv'], adv
+        # 오해 OX 의 진실 짝(…-{i}o, 정답 O, pair → …-{i}x) — 있어야 하고, 어느 세트·묶음에도 짝 둘이 함께 들지 않는다(2026-10-14 문항 품질 G3)
+        pr = await pg.evaluate("""(() => { const O = BANK.filter(q => /-m\\d+-\\d+o$/.test(q.id)), byId = new Map(BANK.map(q => [q.id, q]));
+            const okO = O.every(q => q.type === 'ox' && q.answer === 'O' && byId.get(q.pair) && byId.get(q.pair).answer === 'X' && q.pair === q.id.slice(0, -1) + 'x');
+            const both = a => { const ids = new Set(a.filter(Boolean).map(q => q.id || (q.q && q.q.id) || '')); return a.filter(Boolean).some(q => { const id = q.id || (q.q && q.q.id) || ''; return /-m\\d+-\\d+[ox]$/.test(id) && ids.has(id.slice(0, -1) + (id.endsWith('x') ? 'o' : 'x')); }); };
+            const L = (O.find(q => openLessons().some(l => l.id === q.lessonId)) || {}).lessonId, P = O.find(q => q.lessonId === L), X = byId.get(P.pair);
+            const bh0 = S.bh, w0 = S.wrong, sel0 = bankSel, asg0 = asgF; let hit = [], seenO = 0;
+            S.bh = { [X.id]:'o' };   // 배운 소단원 = L
+            for (let r = 0; r < 40; r++){
+              bankSel = { book:'전체', unit:'전체', lesson:L, type:'ox', n:200, only:'전체' }; const pk = pickBank(200, true); seenO += pk.filter(q => q.answer === 'O' && q.pair).length;
+              if (both(pk)) hit.push('pick'); if (both(recPlan(true).items.map(e => e.q))) hit.push('rec'); if (both(reviewPlan0(true).items.map(e => e.q || (e.w && reviewItem(e.w))))) hit.push('rev');
+              asgF = { ...asg0, kind:'bank', lesson:L, type:'ox', diff:'전체', n:40 }; const dr = asgDraft(); if (dr.items && both(dr.items.map(id => byId.get(id)))) hit.push('asg');
+              const ex = examPlan({ id:'p', kind:'exam', title:'t', date:addDays(todayISO(), 5), scope:{ lesson:L } }); if (ex && ex.rows.some(rw => both(planItems(rw, ex.ls)))) hit.push('plan'); }
+            if (CONCEPTS.some(c => both(dqcItems(c)))) hit.push('dqc');
+            // 짝 둘이 모두 오늘 복습 기한이어도 한 묶음에는 하나만(남은 하나는 다음 묶음)
+            const t = todayISO(), mk = id => ({ b:id, iso:addDays(t, -3), a:addDays(t, -3), x:1, k:1, d:t }); S.wrong = [mk(X.id), mk(P.id)];
+            const rv = reviewPlan0(true).items.filter(e => e.w).map(e => e.w.b);
+            const sb = (startBank([X, P], ''), bs.items.map(q => q.id)); bs = null;
+            S.bh = bh0; S.wrong = w0; bankSel = sel0; asgF = asg0;
+            return { n:O.length, okO, hit:[...new Set(hit)], seenO, rv, sb, dp:[dropPairs([X, P]).length, dropPairs([P, X]).length, dropPairs([{ id:'a1', pair:'b1' }, { id:'b1' }]).length, dropPairs([{ id:'b1' }, { id:'a1', pair:'b1' }]).length] }; })()""")
+        assert pr['n'] >= 100 and pr['okO'] and not pr['hit'] and pr['seenO'] > 0, pr
+        assert len(pr['rv']) == 1 and pr['sb'] == [pr['sb'][0]] and pr['dp'] == [1, 1, 1, 1], pr
+        print(f"  진실 짝 O {pr['n']}문항 · 세트마다 짝 하나만 · 복습 기한 둘 → {pr['rv']}")
         await b.close(); print('BANK OK', errs); assert not errs
 asyncio.run(main())

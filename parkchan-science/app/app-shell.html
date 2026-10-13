@@ -2899,14 +2899,14 @@ function reviewPlan0(real){
   const cards = csToday().map(w => ({ cs:w, lesson:lessonOfW(w) }));   // 개념 카드(하루 CS_DAY 장) — 문제와 섞는다
   /* 섞다가 어쩔 수 없이 붙는 것은 뒤에 붙여 다 낸다(2026-10-07 7일 사용 점검: 첫 주 학생은 배운 소단원이 하나뿐이라
      세트가 1문제씩 쪼개져 '마쳤어요' 뒤에 또 복습이 나오고, 맨 뒤로 밀린 개념 카드는 한 번도 나오지 않았다) */
-  const all = [...due, ...extra, ...cards]; let mixed = interleave(all), left = all.filter(e => !mixed.includes(e));
+  const all = dropPairs([...due, ...extra, ...cards], e => e.q || (e.w && reviewItem(e.w))); let mixed = interleave(all), left = all.filter(e => !mixed.includes(e));
   /* 같은 소단원은 잇달아 내지 않는다 — 엄격히(2026-10-07 원장님). 섞고 남은 것이 있으면 다른 소단원(배운 소단원·오늘 소단원) 문제를
      사이에 끼워 떼어 놓는다(세트는 SRS_CAP 안). 배운 소단원이 하나뿐인 첫날처럼 끼울 것이 없을 때만 뒤에 붙인다 */
   if (real && left.length){ const used = new Set([...all.map(e => e.q && e.q.id), S.tp && S.tp.qid].filter(Boolean)), live = new Set(S.wrong.filter(w => !w.cleared).map(wKey));
     const others = [...new Set([...studiedLessons(), todayL])].filter(l => open.has(l));
     while (left.length && all.length < SRS_CAP){
       const ls = others.filter(l => !left.some(e => e.lesson === l)).sort(() => Math.random() - .5); let add = null;
-      for (const l of ls){ const pool = BANK.filter(q => q.lessonId === l && q.type !== 'essay' && !isUM(q) && !isAdv(q) && !used.has(q.id) && !live.has('b:'+q.id)), fresh = pool.filter(q => !(S.bh||{})[q.id]);
+      for (const l of ls){ const pool = BANK.filter(q => q.lessonId === l && q.type !== 'essay' && !isUM(q) && !isAdv(q) && !used.has(q.id) && !live.has('b:'+q.id) && !pairIds(q).some(p => used.has(p) || live.has('b:'+p))), fresh = pool.filter(q => !(S.bh||{})[q.id]);
         const from = fresh.length ? fresh : pool; if (from.length){ add = { lesson:l, q: from[Math.floor(Math.random() * from.length)] }; break; } }
       if (!add) break;
       used.add(add.q.id); all.push(add); mixed = interleave(all); left = all.filter(e => !mixed.includes(e)); } }
@@ -3666,7 +3666,7 @@ function ttPlace(){
    맞힘·틀림은 문제 은행과 같은 복습 상자(srsMark). 문제 은행은 첫 화면 뒤에 받으므로 그 전엔 자리 표시 → 받으면 이 칸만 채운다 */
 let dqc = null;   // { id: 개념 id, pk: { 문항 id: 'O'|'X' }, rs: { 문항 id: srsMark 결과 } }
 const dqcItems = c => { const same = q => q.lessonId === c.lessonId && +q.concept === +c.no && q.type === 'ox' && (q.answer === 'O' || q.answer === 'X') && !isAdv(q);
-  return [...BANK.filter(q => same(q) && q.step === 'qc'), ...BANK.filter(q => same(q) && q.step === 'auto')].slice(0, 3); };
+  return dropPairs([...BANK.filter(q => same(q) && q.step === 'qc'), ...BANK.filter(q => same(q) && q.step === 'auto')]).slice(0, 3); };
 function dqcHtml(c){
   const h2 = n => `<h2><span>확인 문제</span>${n ? `<span class="n">OX ${n}</span>` : ''}</h2>`;
   if (!MORE.ok) return `<div class="sec dqc" id="dqcBox" aria-busy="${!MORE.err}">${h2(0)}${MORE.err
@@ -3754,6 +3754,13 @@ function renderWrong(){
 let bankSel = { book:'전체', unit:'전체', lesson:'전체', type:'전체', n:10, only:'전체' }, bs = null;   // bs = 진행 중 세션
 const TYPE_NAME = { ox:'OX', blank:'빈칸', mc:'선다형', multi:'자료·보기', essay:'서술형' };
 const openLessons = () => LESSONS.filter(l => CONCEPTS.some((c,i) => c.lessonId===l.id && isOpen(i)));
+/* 짝 문항 — 자동 오해 OX(…-m{개념}-{i}x)와 그 진실 짝(…-{i}o, 필드 pair)은 한 세트·한 묶음에 하나만 낸다.
+   둘이 함께 나오면 하나가 다른 하나의 답을 알려 준다(2026-10-14 문항 품질 G3 — 오해 OX 가 모두 정답 X 라 진실 짝 O 를 더했다) */
+function pairIds(q){ const id = (q && q.id) || '', m = /^(.*-m\d+-\d+)([ox])$/.exec(id); return [q && q.pair, m && m[1] + (m[2] === 'x' ? 'o' : 'x')].filter(Boolean); }
+function dropPairs(list, qOf){ const kept = new Set(), block = new Set();   // 앞의 것을 남긴다 — 기한 된 복습을 앞에 두면 그쪽이 남는다
+  return (list || []).filter(e => { const q = qOf ? qOf(e) : e; if (!q || !q.id) return true;
+    const ps = pairIds(q); if (block.has(q.id) || ps.some(p => kept.has(p))) return false;
+    kept.add(q.id); ps.forEach(p => block.add(p)); return true; }); }
 function bankPool(){
   const ls = openLessons().filter(l => (bankSel.book==='전체' || l.book===bankSel.book) && (bankSel.unit==='전체' || l.unit===bankSel.unit) && (bankSel.lesson==='전체' || l.id===bankSel.lesson)).map(l=>l.id);
   return BANK.filter(q => !isUM(q) && ls.includes(q.lessonId) && (bankSel.type==='전체' ? q.type!=='essay' : q.type===bankSel.type)
@@ -4238,7 +4245,7 @@ function scopeFrom(val){ if (!val) return null; if (val === 'b1') return { book:
 function drillScope(sc){ if (!sc) return;
   if (!MORE.ok){ toast('문제를 받는 중이에요…'); loadMore().then(() => drillScope(sc)); return; }
   if (sc.lessons){ const ls = scopeLessons(sc), pool = shuffleArr(BANK.filter(q => !isUM(q) && !isAdv(q) && q.type !== 'essay' && ls.includes(q.lessonId))); if (!pool.length){ toast('이 범위에 풀 문항이 없어요'); return; }
-    closeSheet(); show('bank'); const ten = pool.slice(0, 20).map(q => ({ lesson:q.lessonId, q })), mixed = interleave(ten);
+    closeSheet(); show('bank'); const ten = dropPairs(pool).slice(0, 20).map(q => ({ lesson:q.lessonId, q })), mixed = interleave(ten);
     startBank([...mixed, ...ten.filter(x => !mixed.includes(x))].map(x => x.q), '시험 범위 · ' + scopeName(sc)); return; }
   bankSel = { book: sc.book || '전체', unit: sc.unit || '전체', lesson: sc.lesson || '전체', type:'전체', n:20, only:'전체' };
   const pool = bankPool(); if (!pool.length){ toast('이 범위에 풀 문항이 없어요'); return; }
@@ -4270,7 +4277,7 @@ const splitN = (n, k) => [...Array(k)].map((_, i) => Math.floor(n / k) + (i < n 
 function planItems(row, all){
   const used = new Set(), bh = S.bh || {}, out = [], pool = l => BANK.filter(q => q.lessonId === l && q.type !== 'essay' && !isUM(q) && !isAdv(q));
   const grab = (l, k, mustFirst) => { const p = pool(l).filter(q => !used.has(q.id)), m = mustFirst ? shuffleArr(p.filter(q => q.must && bh[q.id] !== 'o')) : [];
-    for (const q of [...m, ...shuffleArr(p.filter(q => bh[q.id] === 'x')), ...shuffleArr(p.filter(q => !bh[q.id])), ...shuffleArr(p)]){ if (k <= 0) break; if (used.has(q.id)) continue; used.add(q.id); out.push({ lesson:l, q }); k--; } };
+    for (const q of [...m, ...shuffleArr(p.filter(q => bh[q.id] === 'x')), ...shuffleArr(p.filter(q => !bh[q.id])), ...shuffleArr(p)]){ if (k <= 0) break; if (used.has(q.id) || pairIds(q).some(p => used.has(p))) continue; used.add(q.id); out.push({ lesson:l, q }); k--; } };
   if (row.kind === 'mix'){ row.lessons.forEach(l => grab(l, 4, true)); const rest = shuffleArr(all.filter(l => !row.lessons.includes(l)));
     for (let g = 0; out.length < row.n && g < Math.max(1, rest.length) * 6; g++) grab(rest.length ? rest[g % rest.length] : row.lessons[g % row.lessons.length], 1, true);
     for (let g = 0; out.length < row.n && g < row.lessons.length * 6; g++) grab(row.lessons[g % row.lessons.length], 1, false); }
@@ -4334,12 +4341,12 @@ function recPlan(real){
   const used = new Set(), out = due.map(w => { const q = reviewItem(w); used.add(q.id); return { lesson:lessonOfW(w), q, w }; });
   const grab = (l, k) => { const pool = BANK.filter(q => q.lessonId === l && q.type !== 'essay' && !isUM(q) && !isAdv(q) && !used.has(q.id) && !live.has('b:' + q.id));
     const fresh = pool.filter(q => !(S.bh || {})[q.id]), missed = pool.filter(q => (S.bh || {})[q.id] === 'x'), from = [...shuffleArr(fresh), ...shuffleArr(missed), ...shuffleArr(pool)];
-    for (const q of from){ if (k <= 0) break; if (used.has(q.id)) continue; used.add(q.id); out.push({ lesson:l, q }); k--; } };
+    for (const q of from){ if (k <= 0) break; if (used.has(q.id) || pairIds(q).some(p => used.has(p))) continue; used.add(q.id); out.push({ lesson:l, q }); k--; } };
   weak.forEach(l => grab(l, 3));
   /* 나머지 — 배운 소단원을 돌아가며 하나씩. 한 소단원은 4문제까지(그래야 섞인다), 더 채울 곳이 없으면 그 한도를 푼다 */
   const per = l => out.filter(e => e.lesson === l).length;
   for (const cap of [4, REC_N]) for (let guard = 0; out.length < REC_N && guard < base.length * 12; guard++){ const l = base[guard % base.length]; if (per(l) < cap) grab(l, 1); }
-  const ten = out.slice(0, REC_N), mixed = interleave(ten);   // 섞다가 어쩔 수 없이 붙는 것은 뒤에 붙여 10문제를 채운다
+  const ten = dropPairs(out, e => e.q).slice(0, REC_N), mixed = interleave(ten);   // 섞다가 어쩔 수 없이 붙는 것은 뒤에 붙여 10문제를 채운다
   return { items: [...mixed, ...ten.filter(e => !mixed.includes(e))], due:due.length, weak, base };
 }
 const shuffleArr = a => { a = a.slice(); for (let i = a.length - 1; i > 0; i--){ const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
@@ -4407,7 +4414,7 @@ function redrawBankSheet(focusEl){ const box = document.getElementById('bsBox');
   const key = focusEl && (focusEl.id ? '#' + focusEl.id : focusEl.dataset.bsel ? `[data-bsel="${focusEl.dataset.bsel}"][data-val="${focusEl.dataset.val}"]` : '');
   box.innerHTML = bankSheetBody(); if (key) box.querySelector(key)?.focus({ preventScroll:true }); return true; }
 function startBank(items, label, timed){
-  umPick = null; bs = { items, i:0, pick:null, right:0, wrong:[], label:label||'', ess:null, timed:!!timed }; show('bank');
+  umPick = null; bs = { items: dropPairs(items), i:0, pick:null, right:0, wrong:[], label:label||'', ess:null, timed:!!timed }; show('bank');
 }
 /* 빈칸 채점 — 칸마다 정확히 맞아야 한다(예전엔 '16'이 정답 '6'을 품어 맞다고 했다). 괄호는 있어도 없어도: '(태양계) 성운'·'s(초)'.
    한 글자 답은 온전한 말도 인정(고 → 고생대). 빈칸이 여럿이면 쉼표로 순서대로(순서가 뜻을 가르는 문제가 있다: 이온, 공유) */
@@ -4577,7 +4584,7 @@ function bankAnswer(pick){
   save(S); renderBankSession(); document.querySelector('#v-bank .verdict.fb .btn, #v-bank .verdict.fb [data-ess]')?.focus({ preventScroll:true });   // 시트 머리·한 마디를 '다음' 버튼 설명으로 읽는다
 }
 /* noAdv: 앱이 고르는 묶음(시험 범위·소단원 바로 풀기)은 심화를 뺀다 — 직접 고르기는 심화도 나온다 */
-function pickBank(n, noAdv){ const pool = bankPool(); const arr = noAdv ? pool.filter(q => !isAdv(q)) : pool.slice(); for (let i=arr.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [arr[i],arr[j]]=[arr[j],arr[i]]; } return arr.slice(0, n); }
+function pickBank(n, noAdv){ const pool = bankPool(); const arr = noAdv ? pool.filter(q => !isAdv(q)) : pool.slice(); for (let i=arr.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [arr[i],arr[j]]=[arr[j],arr[i]]; } return dropPairs(arr).slice(0, n); }
 
 /* ═══ 문항 그리기(공통) — 발문 · 그림 · 자료 줄 · 표 · 발문 뒷부분 · <보기>
    대단원 마무리·모의고사 문항은 그림 밖 자료(data: 탐구 과정 줄, table: 표)와 그림 뒤 발문(ask)이 있다.
@@ -5517,8 +5524,8 @@ function asgGrab(){ const g = id => document.getElementById(id); if (!g('asgForm
 function asgDraft(){ const f = asgF;
   if (f.kind === 'bank'){ if (!MORE.ok) return { why:'문제를 받는 중입니다…' }; const pool = asgPool(f); if (!pool.length) return { why:'이 조건에 맞는 문항이 없습니다' };
     const a = pool.slice(); for (let i = a.length - 1; i > 0; i--){ const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; }
-    const n = Math.min(f.n, a.length), tag = [f.type !== '전체' ? TYPE_NAME[f.type] : '', f.diff !== '전체' ? String((ASG_DIFF.find(x => x[0] === f.diff) || [])[1] || '').replace(/[()]/g, '') : ''].filter(Boolean).join('·');
-    return { kind:'bank', ref:f.lesson, items:a.slice(0, n).map(q => q.id), title:`${lessonName(f.lesson)} · 문제 ${n}개${tag ? ` (${tag})` : ''}`, pool:pool.length }; }
+    const b = dropPairs(a), n = Math.min(f.n, b.length), tag = [f.type !== '전체' ? TYPE_NAME[f.type] : '', f.diff !== '전체' ? String((ASG_DIFF.find(x => x[0] === f.diff) || [])[1] || '').replace(/[()]/g, '') : ''].filter(Boolean).join('·');
+    return { kind:'bank', ref:f.lesson, items:b.slice(0, n).map(q => q.id), title:`${lessonName(f.lesson)} · 문제 ${n}개${tag ? ` (${tag})` : ''}`, pool:pool.length }; }
   if (f.kind === 'unit'){ const u = unitList().find(x => x.key === f.unit); if (!u) return { why:'대단원을 골라 주세요' }; if (!MORE.ok) return { why:'문제를 받는 중입니다…' };
     const it = umItems('unit', u.book, u.unit); if (!it.length) return { why:'이 단원 문항이 아직 없습니다' };
     return { kind:'unit', ref:u.key, items:it.map(q => q.id), title:`통합과학 ${u.book} ${u.unit}. ${u.name} · 대단원 마무리` }; }

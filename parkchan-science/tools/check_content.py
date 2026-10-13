@@ -69,6 +69,27 @@ for it in data['bank']:
         _wrong_bad.append(f'{it["id"]} {m[1]} {_pl(m[2])} — {_pl(why)[:40]}')
 for w in _wrong_bad[:20]: bad.append(f'bank 자동 문항 오답 해설이 그 개념 카드 밖의 글: {w}')
 if len(_wrong_bad) > 20: bad.append(f'… 그런 줄 모두 {len(_wrong_bad)}개')
+# 자동 오해 OX 의 '진실' 짝(-m…-{i}o, data/auto_choices 에 손으로 씀) — 2026-10-14 문항 품질 G3: 오해 OX 가 모두 정답 X 라 읽지 않고 X 만 눌러도 맞았다.
+# 정답 O · pair 가 있는 X 문항 · '.'으로 끝나는 홀로 서는 문장 · 짝 X 문장을 거의 그대로 뒤집은 것이 아님 · 손 해설 · 조건 없는 단정어 없음
+import difflib
+from extract_bank import AUTO_O, standalone
+_ABS = re.compile(r'(^|[^가-힣])늘 |항상|언제나|반드시|무조건|(^|[^가-힣])모든 |전부(?!터)|오직|오로지|결코|예외 ?없이|[가-힣]{1,8}(?:에|에게|에서|으로|로)만 ')
+_byid = {it['id']: it for it in data['bank']}
+_n_o = 0
+for it in data['bank']:
+    if not re.search(r'-m\d+-\d+o$', it['id']): continue
+    _n_o += 1; k = it['id']; x = _byid.get(it.get('pair', ''))
+    if it['type'] != 'ox' or it['answer'] != 'O': bad.append(f'bank {k}: 진실 짝은 정답 O 인 OX')
+    if not x or x['answer'] != 'X' or it.get('pair') != k[:-1] + 'x': bad.append(f'bank {k}: pair 가 짝 X 문항({k[:-1]}x)을 가리키지 않음'); continue
+    s, xs = _pl(it['stem']), _pl(x['stem'])
+    if not s.endswith('.') or not standalone(it['stem']): bad.append(f'bank {k}: 진실 짝 문장이 "."으로 끝나는 홀로 서는 문장이 아님 · {s[:40]}')
+    r = difflib.SequenceMatcher(None, s, xs).ratio()
+    if r >= 0.75: bad.append(f'bank {k}: 진실 짝이 오해 문장과 거의 같음({r:.2f}) — 낱말만 뒤집지 말고 제 말로 · {s[:40]}')
+    if not (AUTO_O.get(k, {}).get('explain') or '').strip() or len(_pl(it['explain'])) < 15: bad.append(f'bank {k}: 진실 짝에 손 해설(explain)이 없음')
+    if _ABS.search(s): bad.append(f'bank {k}: 진실 짝 문장에 조건 없는 단정어 · {s[:40]}')
+_missing_o = [k for k in AUTO_O if k not in _byid]
+if _missing_o: bad.append(f'auto_choices 의 진실 짝이 은행에 없음(짝 X 가 없거나 바로바로 체크와 겹쳐 빠짐): {_missing_o[:6]}')
+print(f'자동 오해 OX 진실 짝 {_n_o}개')
 # 개념 덧붙임(data/concept_extras.json — 손으로 만든 원본, 추출기가 덮어쓰지 않음): '왜?' 정교화 질문 + 계산형 예제 → 따라 풀기
 # · 키 = 실제 개념 id · why 는 개념마다 1개(q·a·src) · a 는 그 개념의 src 문단/용어 글과 겹쳐야 한다(새 사실 금지)
 # · example 과 follow 는 짝으로 · 첨자는 <sup>·<sub> 태그로(유니코드 첨자·'H2O'·'10−6' 흔적 금지)

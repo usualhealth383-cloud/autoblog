@@ -63,9 +63,9 @@ async def run(b, theme, errs):
     assert len(qi) == 3 and all(x['ok'] for x in qi) and all(x['step'] == 'qc' for x in qi), qi
     assert any('소모되어 없어진다' in x['stem'] for x in qi), qi
     allc = await s.evaluate("""CONCEPTS.map(c => { const it = dqcItems(c), qc = BANK.filter(q => q.lessonId === c.lessonId && +q.concept === +c.no && q.type === 'ox' && q.step === 'qc').length,
-        au = BANK.filter(q => q.lessonId === c.lessonId && +q.concept === +c.no && q.type === 'ox' && q.step === 'auto').length;
+        au = dropPairs(BANK.filter(q => q.lessonId === c.lessonId && +q.concept === +c.no && q.type === 'ox' && q.step === 'auto')).length;   // 오해 X·진실 O 짝은 하나만(2026-10-14)
         return { id: c.id, n: it.length, want: Math.min(3, qc + au), match: it.every(q => q.lessonId === c.lessonId && +q.concept === +c.no && q.type === 'ox'),
-          order: it.every((q, i) => i < Math.min(3, qc) ? q.step === 'qc' : q.step === 'auto') }; })""")
+          order: it.every((q, i) => i < Math.min(3, qc) ? q.step === 'qc' : q.step === 'auto') && dropPairs(it).length === it.length }; })""")
     bad = [x for x in allc if not (x['match'] and x['order'] and x['n'] == x['want'])]
     assert not bad, bad[:5]
     short = [x['id'] for x in allc if x['n'] < 3]
