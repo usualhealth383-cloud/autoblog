@@ -51,7 +51,6 @@
 - 개인정보처리방침: https://medinanum.com/privacy-yakjido.html
 - 계정 삭제 안내: https://medinanum.com/delete-account-yakjido.html
 - (2026-10-14 Cloudflare 이메일 숨김을 끔 — 메일 주소가 글자로 보이는 것 확인. 제출 전에 제작 PC 에서 medinanum.com 을 다시 올려 처리방침이 최신(약 알레르기 칸 등)인지 확인)
-- ⚠️ medinanum.com 쪽 주소(`yakjido.medinanum.com/privacy-yakjido` 등)는 10-13 현재 Cloudflare 「이메일 주소 난독화」 때문에 자바스크립트 없이 읽으면 문의 메일이 `[email protected]` 로 보입니다(curl 확인). 계정 삭제 쪽의 핵심이 「이 메일로 요청」이라, Cloudflare 에서 이 기능을 끈 뒤에만 medinanum.com 주소로 바꿉니다(출시-체크리스트 E3).
 
 ## 그림
 - 아이콘 512×512: `icon-512.png`
@@ -99,7 +98,7 @@
 | 수집 항목 — 건강 정보 · 건강 정보 | 수집 · **선택**(로그인 + 「서버에 저장하기」 따로 동의할 때만) · 앱 기능(기기 간 이어 보기) · 공유 안 함 — 드시는 약·복용 기록·불편했던 약·임신·지병 여부·혈압·맥박·혈당·진료 예약·아이 몸무게 |
 | 수집 항목 — 메시지 · 기타 사용자 생성 콘텐츠 | 문의 글(로그인 후 보낼 때만) · 고객 지원 |
 | 사용자가 삭제 요청 가능 | 예 — 앱 안 「계정 지우기」(그 앱 기록, 다른 메디나눔 앱 기록이 없으면 계정까지) · 「서버에 저장하기」 동의 거두기(서버 기록 지움) + 웹 주소 아래 |
-| 계정 삭제 URL(콘솔 「데이터 삭제」 칸) | https://medinanum.com/delete-account-yakjido.html — 앱을 지운 분도 읽을 수 있는 웹 쪽이어야 함. medinanum.com 쪽(`yakjido.medinanum.com/delete-account-yakjido`)은 이메일 난독화를 끈 뒤에 바꿈(위 ⚠️) |
+| 계정 삭제 URL(콘솔 「데이터 삭제」 칸) | https://medinanum.com/delete-account-yakjido.html — 앱을 지운 분도 읽을 수 있는 웹 쪽이어야 함(10-14 이메일 숨김 끔 확인) |
 | 앱 액세스 | 위 「앱 액세스」 — 모든 기능이 로그인 없이 열림, 테스트 계정 넣지 않음 |
 
 ## 콘텐츠 등급 (IARC 설문)
