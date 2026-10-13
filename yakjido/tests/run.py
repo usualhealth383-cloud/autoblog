@@ -890,6 +890,15 @@ def main():
           if(!txt.includes('맥시부펜은 덱시부프로펜')) bad.push('맥시부펜 안내 없음');
           return bad;}""")
         if kc: fails.append(f'소아 계산이 우리집 소아과와 다릅니다: {kc[:3]}')
+        # 10c. 현욱님 10-13(Z2-2 → B) — 생년월일 없이 6 kg 미만이면 mL 결과 위에 접지 않은 경고 한 줄, 결과는 그대로. 10 kg 이면 없음
+        _ky = pg.evaluate("""()=>{ const r = w => { ME.age='child'; ME.child={name:'',birth:'',weight:w}; route();
+            const e = document.querySelector('.kid-young'), c = document.querySelector('.dose-card');
+            return {on: !!e && e.getClientRects().length > 0 && !e.closest('details'), txt: e ? e.innerText : '', cards: document.querySelectorAll('.dose-card').length,
+                    above: !!(e && c && (e.compareDocumentPosition(c) & Node.DOCUMENT_POSITION_FOLLOWING))}; };
+          const a = r(5), b = r(10); ME.age='adult'; ME.child={}; saveMe(); return {a, b}; }""")
+        if not (_ky['a']['on'] and '생후 3개월 안팎일 수 있어요' in _ky['a']['txt'] and _ky['a']['above'] and _ky['a']['cards'] == 2):
+            fails.append(f'아이 5 kg·생년월일 없음: 「생후 3개월 안팎」 경고가 결과 위에 보이지 않습니다(또는 결과가 사라짐) {_ky["a"]}')
+        if _ky['b']['on']: fails.append('아이 10 kg·생년월일 없음인데 「생후 3개월 안팎」 경고가 뜹니다')
         # 7. 항콜린 이중 계산 · 8. 이름 검색
         r7 = pg.evaluate("""async()=>{ await pubPills(); await pubPillsRx(); let n=0;
           for(const p of (PUB.rx||[]).concat(PUB.pills||[])){ const ks=ingFind((p.ingr||'')+' '+(p.n||'')).filter(e=>e.ach).map(e=>e.k); if(ks.length!==new Set(ks).size) n++; } return n; }""")
