@@ -519,6 +519,28 @@ def main():
           return {senior, adult};}""")
         if not _s['senior']: fails.append('65세 이상인데 소염제에 「어르신 주의」가 안 붙습니다')
         if _s['adult']: fails.append('성인인데도 소염제에 「어르신 주의」가 붙습니다')
+        # 5a-6b. 현욱님 10-13(Z2-1 → A) — 65세+심장+항응고제: 막힌 소염제 칸은 맨 뒤 「이 조건에선 약사와 먼저 상의」 묶음,
+        #        같은 증상에 아세트아미노펜 칸이 있으면 그 칸이 1번. 증상 화면과 약국 카드(#/show)가 같은 순서.
+        _q5 = pg.evaluate("""()=>{
+          const keep = JSON.stringify(ME), bad = [], NS = /이부프로펜|나프록센|덱시부프로펜/;
+          ['diabetes','ulcer','kidney','liver','glaucoma','bph','asthma','alcohol','gout','pregnant'].forEach(f=>{ME[f]=false;});
+          ME.age='senior'; ME.heart=true; ME.anticoag=true; ME.taking=[]; ME.pub={}; ME.allergy=[]; ME.allergyUnknown=false;
+          for (const sid of ['headache','msk','cold']) {
+            location.hash = '#/symptom/' + sid; route();
+            const all = [...document.querySelectorAll('.answer .buy .buy-item')];
+            const main = all.filter(e => !e.closest('.opt-fold,.consult-grp')).map(e => (e.querySelector('b')||{}).innerText||'');
+            const grp = all.filter(e => e.closest('.consult-grp')).map(e => (e.querySelector('b')||{}).innerText||'');
+            const head = (document.querySelector('.consult-grp .consult-h')||{}).innerText||'';
+            if (!/아세트아미노펜/.test(main[0]||'')) bad.push(sid+': 첫 칸이 아세트아미노펜이 아님 — '+(main[0]||'없음'));
+            if (main.some(t => NS.test(t))) bad.push(sid+': 막힌 소염제가 앞쪽 목록에 남음 — '+main.join(','));
+            if (sid !== 'headache' && !(grp.some(t => NS.test(t)) && /이 조건에선 약사와 먼저 상의/.test(head))) bad.push(sid+': 소염제가 「이 조건에선 약사와 먼저 상의」 묶음에 없음 — '+grp.join(','));
+            location.hash = '#/show/' + sid; route();
+            const sh = [...document.querySelectorAll('.show-list li:not(.show-have) b')].map(b => b.innerText);
+            if (!/아세트아미노펜/.test(sh[0]||'')) bad.push(sid+': 약국 카드 1번이 아세트아미노펜이 아님 — '+(sh[0]||'없음'));
+          }
+          ME = sanitizeMe(JSON.parse(keep)); saveMe(); location.hash = '#/home'; route();
+          return bad;}""")
+        if _q5: fails.append(f'막힌 약 순서(65세+심장+항응고제): {_q5[:3]}')
         # 5a-4. 홈 「오늘 약」 한 장 — 약이 없으면 안 뜨고, 있으면 지금 드실 것을 보여 줘야 한다
         pg.goto(url + '#/home'); ready(); pg.wait_for_timeout(250)
         _h = pg.evaluate("""()=>{
