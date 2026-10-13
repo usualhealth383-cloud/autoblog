@@ -68,7 +68,10 @@ jobs:
         run: |
           git config user.name "yakjido-data-bot"
           git config user.email "yakjido-data-bot@users.noreply.github.com"
-          git add -A docs/yakjido yakjido/tools/permits.json yakjido/tools/quasi.json 2>/dev/null || git add -A docs/yakjido yakjido/tools/permits.json
+          # 받은 자료 파일만 올린다 — 화면 파일(index.html·core.json·sw.js)은 작업 세션이 당겨 와서 다시 빌드한다(겹쳐 올리다 부딪히지 않게)
+          git add docs/yakjido/data/pills.json docs/yakjido/data/pills-rx.json docs/yakjido/data/meta.json docs/yakjido/data/names-rx.json
+          git add -A docs/yakjido/data/easy-*.json docs/yakjido/data/easy-index.json
+          for f in yakjido/tools/permits.json yakjido/tools/quasi.json; do [ -f "$f" ] && git add "$f"; done
           if git diff --cached --quiet; then echo "바뀐 것 없음"; exit 0; fi
           git commit -m "약지도 — 식약처 낱알식별·허가 목록 최신으로(OpenAPI 자동 받기)"
           # 받는 동안(10~20분) 가지에 다른 커밋이 올라올 수 있다 — 받은 자료 커밋을 그 위로 옮겨 올린다
