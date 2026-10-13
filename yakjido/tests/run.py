@@ -596,6 +596,13 @@ def main():
         pv.clock.install(time='2026-09-29T08:00:00')
         pv.add_init_script("localStorage.setItem('yakjido.hello.v1','1');localStorage.setItem('yakjido.me.v1',JSON.stringify({taking:['cls:bp.arb'],pub:{}}))")
         pv.goto(url + '#/vitals'); pv.wait_for_selector('.app', timeout=15000); pv.wait_for_timeout(600)
+        # 적던 숫자가 뒤에서 온 자료(낱알 목록·사전) 때문에 지워지면 안 된다 — 화면을 연 지 4초쯤 뒤 easy-index 가 오며
+        # 화면을 새로 그려 「184 / 100」이 사라졌고, 그래서 아래 재측정 검사가 전체 실행에서만 가끔 실패했다(2026-10-13)
+        pv.fill('#vs', '128'); pv.fill('#vd', '82')
+        try: pv.wait_for_function("()=>!!PUB.index && !!LEX.ing && !LEX.loading", timeout=20000); pv.wait_for_timeout(400)
+        except Exception: fails.append('혈압 수첩: 뒤에서 받는 낱알 목록이 20초 안에 오지 않았습니다')
+        if pv.evaluate("()=>[document.getElementById('vs').value, document.getElementById('vd').value].join('/')") != '128/82': fails.append('혈압 수첩: 적던 숫자가 뒤에서 온 자료 때문에 지워졌습니다')
+        pv.fill('#vs', ''); pv.fill('#vd', '')
         for sv, dv in ((142, 88), (138, 86), (140, 90)):
             pv.fill('#vs', str(sv)); pv.fill('#vd', str(dv)); pv.click('button:has-text("적어 두기")'); pv.wait_for_timeout(250)
         vt = pv.inner_text('.app')

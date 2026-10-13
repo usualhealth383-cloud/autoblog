@@ -5,10 +5,11 @@
                        본문은 앱이 「?v=판」 주소로 받으므로 같은 판끼리만 맞물린다 — 새 화면 + 옛 본문이 섞이지 않게(5-02).
    · 자료(DATA)      — 나머지 data/*.json (낱알 5,660개·성분 4,766개 등 17 MB).
                        내용이 거의 안 바뀌는데 빌드마다 버리면 어르신 폰이 매번 다시 받는다.
-                       그래서 이름을 고정하고, 빌드가 바뀌어도 그대로 둔다.
-   자료는 «캐시 먼저» — 한 번 받은 것은 즉시 열리고, 뒤에서 조용히 새로 받아 둔다.
+                       그래서 이름을 고정하고, 빌드가 바뀌어도 그대로 둔다. 앱은 이것도 「?v=판」으로 받아(5-02)
+                       판이 같으면 캐시 그대로, 판이 바뀌면 새로 받아 넣고 옛 판은 지운다(prune).
+   판 없는 옛 주소는 «캐시 먼저» — 한 번 받은 것은 즉시 열리고, 뒤에서 조용히 새로 받아 둔다.
    인터넷이 안 되면 어느 캐시에든 있는 사본을 준다(5-01 — 첫 방문 뒤 비행기 모드에서 본문이 안 뜨던 것). */
-const CACHE = 'yakjido-2026-10-13-05e5ef9d';
+const CACHE = 'yakjido-2026-10-13-70ff5dcc';
 const DATA = 'yakjido-data-v1';
 /* 본문(core·detail)은 여기서 받지 않는다 — 첫 방문에 페이지가 이미 받은 것을 한 번 더 받던 것(5-03). 페이지가 워커에 연결되면 같은 주소로 다시 불러 캐시에 넣는다. */
 const ASSETS = ['./', './index.html', './manifest.webmanifest', './srv.js', './icon-192.png', './icon-512.png', './icon-180.png', './icon-maskable-512.png'];
@@ -24,6 +25,9 @@ self.addEventListener('activate', (e) => {
     .then(() => self.clients.claim()));
 });
 
+/* 자료 캐시는 이름이 고정이라, 새 판을 넣으면 같은 파일의 다른 판(옛 ?v=·꼬리 없는 옛 주소)을 지운다 — 17 MB 가 판마다 쌓이지 않게.
+   인터넷이 없을 때 쓸 사본은 방금 넣은 새 판이 맡는다 */
+const prune = (c, url) => c.keys().then((ks) => Promise.all(ks.filter((r) => { const u = new URL(r.url); return u.pathname === url.pathname && u.search !== url.search; }).map((r) => c.delete(r)))).catch(() => {});
 /* 어느 캐시에든 있으면 — 주소 꼬리(?v=)가 달라도 같은 파일이면 준다(인터넷이 없을 때만) */
 const anyCache = (req) => caches.match(req, { ignoreSearch: true });
 /* 네트워크를 기다리되, 8초 안에 응답이 시작되지 않으면 캐시에 있는 사본을 먼저 준다(신호는 잡히는데 데이터가 안 흐르는 곳). 캐시에도 없으면 계속 기다린다. */
@@ -42,11 +46,15 @@ self.addEventListener('fetch', (e) => {
 
   if (url.pathname.includes('/data/')) {
     const core = /\/data\/(core|detail)\.json$/.test(url.pathname);
+    /* 앱은 모든 자료를 「?v=판」 주소로 받는다(5-02). 판이 박힌 주소는 내용이 바뀌지 않으니 캐시에 있으면 그것이 곧 정답 */
+    const ver = url.searchParams.has('v');
     e.respondWith(caches.open(core ? CACHE : DATA).then((c) => c.match(e.request).then((hit) => {
-      /* 본문 — 판이 박힌 주소라 캐시에 있으면 그것이 곧 정답 */
-      if (hit && core) return hit;
-      const net = fetch(e.request).then((res) => { if (res && res.ok) c.put(e.request, res.clone()); return res; });
-      /* 나머지 자료 — 캐시 먼저, 뒤에서 갱신 */
+      if (hit && (core || ver)) return hit;
+      const net = fetch(e.request).then((res) => {
+        if (res && res.ok) { c.put(e.request, res.clone()).then(() => { if (!core) prune(c, url); }).catch(() => {}); }
+        return res;
+      });
+      /* 판 없는 옛 주소 — 캐시 먼저, 뒤에서 갱신 */
       if (hit) { net.catch(() => {}); return hit; }
       return netOrCache(e.request, net);
     })));

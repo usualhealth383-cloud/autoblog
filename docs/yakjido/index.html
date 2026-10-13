@@ -584,6 +584,19 @@ nav.gjump{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;margin-left:calc
 .cal-span{margin-top:12px;font-size:.75rem;font-weight:700;color:var(--muted);text-align:center;font-variant-numeric:tabular-nums}
 .cal-d.cal-now{box-shadow:0 0 0 2px var(--primary)}
 .cal-d{position:relative}
+.cal-li{min-width:0;display:grid}
+.cal-d{min-height:44px;width:100%}   /* 눌러서 그날 기록을 여는 칸 — 좁은 화면에서도 높이 44px(다가올 날도 같은 높이로 줄을 맞춘다) */
+button.cal-d{width:100%;padding:0;font-family:inherit;cursor:pointer;-webkit-tap-highlight-color:transparent}
+button.cal-d[aria-expanded="true"]{outline:3px solid var(--primary-deep);outline-offset:1px;z-index:1}
+.cal-tip{margin-top:8px;text-align:center}
+.cal-day{margin-top:10px;background:var(--tint2);border-radius:12px;padding:10px 6px 12px 14px}
+.cal-day-h{display:flex;align-items:center;gap:8px;min-width:0}
+.cal-day-h>b{font-size:.9375rem}.cal-day-h>span{flex:1;min-width:0;font-size:.8125rem;font-weight:700;color:var(--muted);font-variant-numeric:tabular-nums}
+.cal-day-x{flex:none;width:44px;height:44px;display:grid;place-items:center;border:0;border-radius:10px;background:transparent;color:var(--muted);cursor:pointer}
+.cal-day-list{list-style:none;margin-top:4px;padding-right:8px;display:flex;flex-direction:column;gap:6px}
+.cal-day-list li{display:flex;align-items:flex-start;gap:8px;font-size:.875rem;line-height:1.5;color:var(--body);word-break:keep-all;overflow-wrap:anywhere}
+.cal-day-list .cm{flex:none;width:20px;text-align:center;font-weight:800}
+.cal-day-list .cm.ok{color:var(--normal)}.cal-day-list .cm.no{color:var(--alert)}.cal-day-list .cm.wait{color:var(--muted)}
 .cal-d .cm{position:absolute;right:3px;top:1px;font-size:.625rem;line-height:1;font-weight:800}
 .cal-key .k{display:inline-grid;place-items:center;font-size:.5625rem;line-height:1;font-weight:800;width:14px;height:14px}
 .cal-key .k.full{color:var(--on-primary)}.cal-key .k.part{color:var(--caution)}.cal-key .k.miss{color:var(--alert)}
@@ -889,6 +902,8 @@ main > .answer + *, main > .sec + .care, main > .card + .care, main > .rx-card +
 .flag ul.plain li::before{background:var(--alert)}
 .note{display:flex;gap:var(--s2);padding:var(--s3) var(--s4);border-radius:var(--r-input);background:var(--caution-tint);color:var(--caution);font-size:.875rem;font-weight:600;line-height:1.5}
 .note svg.i{margin-top:2px;width:18px;height:18px}
+.store-bar{margin-top:var(--s3);align-items:flex-start}.store-bar span{flex:1;min-width:0}
+.store-x{flex:none;width:44px;height:44px;margin:-10px -12px -10px 0;display:grid;place-items:center;border:0;border-radius:10px;background:transparent;color:inherit;cursor:pointer}.store-x svg.i{margin:0}
 .me-flags{display:flex;flex-wrap:wrap;gap:6px;margin-top:var(--s2)}
 .ach{border-radius:var(--r-card);border:1px solid var(--hairline);background:var(--card);padding:var(--s4);margin-top:var(--s3)}
 .ach.ok{border-color:rgba(26,121,70,.35)}
@@ -1511,7 +1526,7 @@ function mergeCore(c){
   }
   for (const k of Object.keys(c)) if (!['symptoms', 'drugs', 'supplements', 'classes', 'tips', 'askdoc'].includes(k)) D[k] = c[k];
   CORE = 2; window.__READY__ = true;
-  try { if (typeof route === 'function' && document.getElementById('view')?.innerHTML) route(); } catch (e) {}
+  try { if (typeof route === 'function' && document.getElementById('view')?.innerHTML) redraw(); } catch (e) {}
 }
 function ensureCore(){
   if (CORE_P) return CORE_P;
@@ -1653,6 +1668,8 @@ function sanitizeMe(m){
 }
 function loadMe(raw){ let j = {}; try { j = JSON.parse(raw || '{}'); } catch (e) { j = {}; } return sanitizeMe(j); }
 ME = loadMe((() => { try { return localStorage.getItem(ME_KEY); } catch (e) { return null; } })());
+const STORE_OK = (() => { try { const k = 'yakjido.__t'; localStorage.setItem(k, '1'); localStorage.removeItem(k); return true; } catch (e) { return false; } })();
+let STORE_HIDE = (() => { try { return sessionStorage.getItem('yakjido.storehide') === '1'; } catch (e) { return false; } })();
 let ME_SNAP = {};
 const saveMe = () => { try {
   const now = Date.now(); ME._mt = ME._mt || {};
@@ -1660,7 +1677,7 @@ const saveMe = () => { try {
   for (const k of Object.keys(ME_SNAP)) if (!(k in ME)) { ME._mt[k] = now; delete ME_SNAP[k]; }
   try { localStorage.setItem(ME_KEY, JSON.stringify(ME)); } catch (e1) { localStorage.removeItem('yakjido.wx.v1'); localStorage.setItem(ME_KEY, JSON.stringify(ME)); }
   if (!saveMe.persist && (ME.taking || []).length) { saveMe.persist = true; try { if (!NATIVE && navigator.storage && navigator.storage.persist) navigator.storage.persist().catch(() => {}); } catch (e2) {} }
-} catch (e) { if (!saveMe.warned) { saveMe.warned = true; try { toast('저장하지 못했어요 — 휴대폰 저장 공간을 확인해 주세요'); } catch (e2) {} } } };
+} catch (e) { if (!saveMe.warned && STORE_OK) { saveMe.warned = true; try { toast('저장하지 못했어요 — 휴대폰 저장 공간을 확인해 주세요'); } catch (e2) {} } } };   /* 저장이 아예 막힌 브라우저는 홈의 띠가 알린다(공간 탓이 아니라서) */
 function snapMe(){ ME_SNAP = {}; for (const k of Object.keys(ME)) if (k !== '_mt') ME_SNAP[k] = JSON.stringify(ME[k]); }
 snapMe();
 const FLAG_LABEL = { pregnant:'임신·수유 중', ulcer:'위궤양·위장출혈 병력', kidney:'신장 질환', liver:'간 질환·음주', heart:'고혈압·심장병', asthma:'천식', anticoag:'항응고제·항혈소판제 복용', alcohol:'술을 자주 마심', gout:'통풍', glaucoma:'녹내장', bph:'전립선비대', diabetes:'당뇨', senior:'65세 이상', child:'소아' };
@@ -1759,20 +1776,21 @@ const PUB = { index:null, pills:null, chunks:{}, err:false };
 const LEX = { ing:null, brand:null, qa:null, nut:null, mix:null, loading:false, err:false };
 const pubFailed = () => PUB.err && !(PUB.pills || []).length;
 function pubRetry(){ PUB.err = false; PUB.pills = null; PUB.rx = null; PUB.index = null; PUB.chunks = {}; route(); }
-async function loadJSON(name){ const r = await fetch('data/' + name, { cache:'force-cache' }); if (!r.ok) throw new Error(name); return r.json(); }
+const dataPath = name => 'data/' + name + (window.__CORE__ ? '' : '?v=' + DATAV);
+async function loadJSON(name){ const r = await fetch(dataPath(name), { cache:'force-cache' }); if (!r.ok) throw new Error(name); return r.json(); }
 async function pubIndex(){ if (!PUB.index && window.__EASY__) PUB.index = window.__EASY__;   /* 미리보기용 내장 자료 */
   if (!PUB.index) { try { PUB.index = await loadJSON('easy-index.json'); } catch (e) { PUB.index = []; PUB.err = true; } } return PUB.index; }
 const IMG_PREFIX = 'https://nedrug.mfds.go.kr/pbp/cmn/itemImageDownload/';
 let KPIC = null;
 const KPIC_PIC = 'https://common.health.kr/shared/images/sb_photo/big3/';
-function kpicLoad(){ if (KPIC) return; KPIC = {}; fetch('data/kpic.json').then(r => r.ok ? r.json() : {}).then(j => { if (j && Object.keys(j).length) { KPIC = j; route(); } }).catch(() => {}); }
+function kpicLoad(){ if (KPIC) return; KPIC = {}; fetch(dataPath('kpic.json')).then(r => r.ok ? r.json() : {}).then(j => { if (j && Object.keys(j).length) { KPIC = j; redraw(); } }).catch(() => {}); }
 const kpicOf = seq => (KPIC && seq && KPIC[String(seq)]) || null;
 const kpicLink = seq => { const g = kgGet(seq); const k = kpicOf(seq) || (g && g.c ? [g.c] : null); return k && k[0] ? `https://www.health.kr/searchDrug/result_drug.asp?drug_cd=${encodeURIComponent(k[0])}` : ''; };
 const pillImg = p => { const k = p && kpicOf(p.seq); if (k && k[1]) return k[1].startsWith('http') ? k[1] : KPIC_PIC + k[1];
   return p?.img ? (p.img.startsWith('http') ? p.img : IMG_PREFIX + p.img) : ''; };
 async function pubPills(){ if (!PUB.pills && window.__PILLS__) PUB.pills = window.__PILLS__;   /* 미리보기용 내장 자료 */
   if (!PUB.pills) { try { PUB.pills = await loadJSON('pills.json'); } catch (e) { PUB.pills = []; PUB.err = true; } } return PUB.pills; }
-const lexRedraw = quiet => { if (!quiet) { route(); return; } if ((GQ || MQ) && document.activeElement?.tagName !== 'INPUT') route(); };
+const lexRedraw = quiet => { if (!quiet) { redraw(); return; } if ((GQ || MQ) && document.activeElement?.tagName !== 'INPUT') redraw(); };
 async function lexLoad(quiet){
   if (LEX.ing || LEX.loading) return LEX;
   if (window.__LEX__) { LEX.ing = __LEX__.ing; LEX.brand = __LEX__.brand; LEX.qa = __LEX__.qa; LEX.nut = __LEX__.nut || []; LEX.mix = __LEX__.mix || []; LEX.ingI = {}; LEX.ing.forEach(x => { LEX.ingI[x.id] = x; }); setTimeout(() => lexRedraw(quiet), 0); return LEX; }  /* 미리보기용 내장 자료 */
@@ -1955,6 +1973,23 @@ function focusSig(){
   return null;
 }
 function focusBack(sig){ try { const el = view.querySelectorAll(sig.q)[Math.max(0, sig.i)]; if (el) el.focus({ preventScroll: true }); } catch (e) {} }
+function redraw(){
+  const v = document.getElementById('view');
+  if (!v || !v.innerHTML) { route(); return; }
+  const h0 = location.hash, a = document.activeElement;
+  const dirty = e => e.tagName === 'SELECT' ? [...e.options].some(o => o.selected !== o.defaultSelected)
+    : (e.type === 'checkbox' || e.type === 'radio') ? e.checked !== e.defaultChecked : e.type !== 'file' && e.value !== e.defaultValue;
+  const keep = [...v.querySelectorAll('input[id], textarea[id], select[id]')].filter(dirty).map(e => ({ id: e.id, type: e.type, value: e.value, checked: e.checked }));
+  const opens = [...v.querySelectorAll('details')].map(d => d.open);
+  let sel = null; if (a && a.id && v.contains(a)) { try { sel = [a.id, a.selectionStart, a.selectionEnd]; } catch (e) { sel = [a.id]; } }
+  route();
+  if (location.hash !== h0) return;
+  for (const k of keep) { const e = document.getElementById(k.id); if (!e || !v.contains(e) || e.type !== k.type || dirty(e)) continue;
+    if (k.type === 'checkbox' || k.type === 'radio') e.checked = k.checked; else e.value = k.value; }
+  const ds = [...v.querySelectorAll('details')]; if (ds.length === opens.length) ds.forEach((d, i) => { if (d.open !== opens[i]) d.open = opens[i]; });
+  if (sel) { const e = document.getElementById(sel[0]); if (e && v.contains(e)) { if (document.activeElement !== e) try { e.focus({ preventScroll: true }); } catch (x) {}
+    if (sel[1] != null) try { e.setSelectionRange(sel[1], sel[2]); } catch (x) {} } }
+}
 const CORE_SAFE = new Set(['home', 'hello', '']);
 const HIST = [], SCROLL = {};
 window.addEventListener('scroll', () => { SCROLL[LASTPATH] = window.scrollY; }, { passive:true });
@@ -2558,6 +2593,8 @@ function homeTab(k){
   el.outerHTML = homeList();
   document.querySelectorAll('.htabs .tab').forEach(b => { const on = b.dataset.k === k; b.classList.toggle('on', on); b.setAttribute('aria-selected', on); });
 }
+const storeBar = () => STORE_OK || STORE_HIDE ? '' : `<div class="note soft store-bar">${I.info}<span>이 브라우저에서는 기록이 저장되지 않아요 — 일반 창이나 설치한 앱에서 써 주세요</span><button type="button" class="store-x" onclick="storeHide()" aria-label="이 안내 닫기">${I.x}</button></div>`;
+function storeHide(){ STORE_HIDE = true; try { sessionStorage.setItem('yakjido.storehide', '1'); } catch (e) {} route(); const h = view.querySelector('h1'); if (h) { h.setAttribute('tabindex', '-1'); try { h.focus({ preventScroll: true }); } catch (e) {} } }
 function vHome(){
   const hour = new Date().getHours();
   const hello = hour < 5 ? '늦은 밤이네요' : hour < 11 ? '좋은 아침이에요' : hour < 18 ? '안녕하세요' : '편안한 저녁이에요';
@@ -2571,6 +2608,7 @@ function vHome(){
     <h1 class="greet">어디가 불편하세요?</h1>
     <p>증상을 고르시면 약국에서 무엇을 찾으면 되는지, 병원에 가야 할 신호는 무엇인지 알려 드려요.</p>
   </section>
+  ${storeBar()}
   ${doseHome()}
   <div class="util" aria-label="다른 방법으로 찾기">
     ${v && vd <= 3 ? urow(I.cal, `${vd <= 0 ? '오늘' : vd === 1 ? '내일' : vd + '일 뒤'} 진료`, `${esc(visitWord(v, false))} · 내 약 한 장 챙기기`, "go('/visits')", '보기', 'visit-soon') : ''}
@@ -2742,7 +2780,7 @@ function search(q, noFix){
 let PUB_SOON = 0;
 function pubIndexSoon(){
   if (PUB.index || PUB_SOON) return; PUB_SOON = 1;
-  pubIndex().then(() => { if (typeof route === 'function') route(); });
+  pubIndex().then(() => { if (typeof route === 'function') redraw(); });
 }
 const hitsHtml = hits => hits.map(h => `<button class="hit" onclick="go('${h.h}')"><span class="k ${h.c}">${h.k}</span><div><b>${esc(h.t)}</b><span>${esc(h.d)}</span></div>${I.chev}</button>`).join('');
 function vSearch(_, q){
@@ -3490,7 +3528,7 @@ async function showNote(title, body, key, day, plain){   /* plain — 약이 아
     const reg = navigator.serviceWorker && await navigator.serviceWorker.getRegistration();
     if (reg && reg.showNotification) {
       await reg.showNotification(title, { body, tag: key, renotify: true, requireInteraction: true, icon: 'icon-192.png', badge: 'icon-192.png',
-        data: { key: plain ? '' : key, day: day || todayKey(), go: plain ? '#/visits' : '' }, actions: plain ? [] : [{ action: 'took', title: '먹었어요' }, { action: 'open', title: '열기' }] });
+        data: { key: plain ? '' : key, day: day || todayKey(), go: plain ? (typeof plain === 'string' ? plain : '#/visits') : '' }, actions: plain ? [] : [{ action: 'took', title: '먹었어요' }, { action: 'open', title: '열기' }] });
       return;
     }
   } catch (e) {}
@@ -3531,6 +3569,25 @@ async function nativeSnooze(n){
     toast('10분 뒤에 다시 알려 드릴게요'); } catch (e) {}
 }
 const NOTE_CH = 'dose2';
+let NOTE_HELP = false;
+async function testNote(){
+  const title = '약지도 · 시험 알림', body = '알림이 잘 와요. 약 드실 시간에도 이렇게 알려 드려요.';
+  if (NATIVE) {
+    const LN = plug('LocalNotifications'); if (!LN) { toast('이 휴대폰에서는 알림을 걸 수 없어요'); return; }
+    try { await (NATIVE_READY = NATIVE_READY || nativeSetup()); } catch (e) {}
+    if (NATIVE_PERM !== 'granted') { try { NATIVE_PERM = (await LN.requestPermissions()).display; } catch (e) {} }
+    if (NATIVE_PERM !== 'granted') { NOTE_HELP = true; route(); toast('알림이 꺼져 있어요 — 아래 방법으로 켜 주세요'); return; }
+    try { await LN.schedule({ notifications: [{ id: 999990, title, body, channelId: NOTE_CH, extra: { test: 1 }, isExactNotification: NATIVE_EXACT === 'granted', schedule: { at: new Date(Date.now() + 5000), allowWhileIdle: true } }] });
+      toast('5초 뒤에 시험 알림이 와요 — 화면을 꺼 두고 기다려 보셔도 돼요'); } catch (e) { toast('시험 알림을 걸지 못했어요 — 아래 방법을 확인해 주세요'); }
+    return;
+  }
+  if (!('Notification' in window)) { NOTE_HELP = true; route(); toast('이 브라우저는 알림을 지원하지 않아요'); return; }
+  let p = Notification.permission;
+  if (p === 'default') { try { p = await Notification.requestPermission(); } catch (e) {} if (p === 'granted') armNotifications(); }
+  if (p !== 'granted') { NOTE_HELP = true; route(); toast('알림이 막혀 있어요 — 아래 방법으로 허용해 주세요'); return; }
+  setTimeout(() => showNote(title, body, 'yakjido-test', '', '#/schedule'), 5000);
+  toast('5초 뒤에 시험 알림이 와요 — 이 화면을 열어 둔 채 기다려 주세요');
+}
 let NATIVE_ARMING = null, NATIVE_ARM_AGAIN = false;
 async function nativeArm(){
   if (NATIVE_ARMING) { NATIVE_ARM_AGAIN = true; return NATIVE_ARMING; }
@@ -3624,7 +3681,7 @@ function nativeInit(){
   } catch (e) {} });
   nativeBars();
   const Splash = plug('SplashScreen'); Splash && setTimeout(() => Splash.hide(), 150);
-  (NATIVE_READY = nativeSetup()).then(route);
+  (NATIVE_READY = nativeSetup()).then(redraw);
 }
 let DAY_NOW = todayKey();
 function dayCheck(force){
@@ -3770,6 +3827,32 @@ function schedWarn(item){
 }
 const DOW = ['일', '월', '화', '수', '목', '금', '토'];
 const CAL_MARK = { full: '✓', part: '◐', miss: '✕' };
+let CAL_PICK = '';
+function calPick(k){ CAL_PICK = CAL_PICK === k ? '' : k; route();
+  if (CAL_PICK) requestAnimationFrame(() => { const el = document.getElementById('cal-day'); if (el && el.getBoundingClientRect().bottom > innerHeight) try { el.scrollIntoView({ block: 'nearest' }); } catch (e) {} }); }
+function calDay(k){
+  if (!k || k > todayKey() || k < dayBefore(40)) return '<div id="cal-day" class="cal-day" hidden></div>';
+  const d = new Date(k + 'T00:00:00'), p = dayPlan(k), took = (ME.taken || {})[k] || [], isToday = k === todayKey(), now = hhmm(new Date());
+  const items = takingItems(), nameOf = id => (items.find(x => x.id === id) || {}).name || drug(id)?.name || '지금은 내 약통에 없는 약';
+  const curSlots = {}; for (const it of items) for (const t of schedOf(it.id, it)) (curSlots[t] = curSlots[t] || []).push(it.id);
+  const sameSched = JSON.stringify(Object.keys(p.s).sort().map(t => [t, p.s[t]])) === JSON.stringify(Object.keys(curSlots).sort().map(t => [t, curSlots[t].length]));
+  const times = [...new Set([...Object.keys(p.s), ...took.map(x => x.split('@')[1])])].filter(Boolean).sort();
+  const rows = times.map(t => {
+    const got = took.filter(x => x.endsWith('@' + t)).map(x => x.slice(0, -(t.length + 1)));
+    const miss = Math.max(0, (p.s[t] || 0) - got.length), later = isToday && t > now;
+    const missNames = sameSched || isToday ? (curSlots[t] || []).filter(id => !got.includes(id)).map(nameOf) : [];
+    const word = `${esc(SLOT_WORD[t] || '')} ${t}`.trim();
+    return [...got.map(id => `<li><span class="cm ok" aria-hidden="true">✓</span><span><b>${word}</b> ${esc(nameOf(id))} — 드셨어요</span></li>`),
+      ...(miss ? [`<li><span class="cm ${later ? 'wait' : 'no'}" aria-hidden="true">${later ? '○' : '✕'}</span><span><b>${word}</b> ${missNames.length === miss ? missNames.map(esc).join(', ') + ' — ' + (later ? '아직 드실 시간이 안 됐어요' : '못 드셨어요') : later ? `${miss}번 남았어요 — 아직 드실 시간이 안 됐어요` : `${miss}번 못 드셨어요`}</span></li>`] : [])].join('');
+  }).join('');
+  const prn = ((ME.prnLog || {})[k] || []).map(x => `<li><span class="cm ok" aria-hidden="true">✓</span><span><b>${esc(x.t)}</b> ${esc(nameOf(x.id))} — 필요할 때 ${x.n || 1}번 드셨어요</span></li>`).join('');
+  const st = dayStat(k), head = p.n ? `${p.n}번 중 ${Math.min(st.done, p.n)}번` : '정해 둔 복용 없음';
+  return `<div id="cal-day" class="cal-day" role="region" aria-label="${d.getMonth() + 1}월 ${d.getDate()}일 복용 기록">
+    <div class="cal-day-h"><b>${d.getMonth() + 1}월 ${d.getDate()}일(${DOW[d.getDay()]})</b><span>${head}</span><button type="button" class="cal-day-x" onclick="calPick('${k}')" aria-label="이 날 기록 닫기">${I.x}</button></div>
+    ${rows || prn ? `<ul class="cal-day-list">${rows}${prn}</ul>` : `<p class="small muted" style="margin-top:6px">이날은 적어 둔 복용이 없어요.</p>`}
+    ${!sameSched && !isToday && p.n && rows.includes('못 드셨어요') ? '<p class="small muted" style="margin-top:6px">그 뒤로 복용 시간을 바꾸셔서, 못 드신 것은 횟수로만 보여 드려요.</p>' : ''}
+  </div>`;
+}
 function calCard(){
   const today = new Date(todayKey() + 'T00:00:00');
   const end = new Date(today); end.setDate(end.getDate() + (6 - today.getDay()));
@@ -3784,8 +3867,9 @@ function calCard(){
     if (k === todayKey() && st !== 'full') st = 'soon';
     const stat = dayStat(k);
     const say = future ? '' : `${d.getMonth() + 1}월 ${d.getDate()}일 — ${stat.plan ? `${LBL[st]}, ${stat.plan}번 중 ${Math.min(stat.done, stat.plan)}번` : LBL.none}`;
-    return `<div class="cal-d ${future ? 'fut' : st}${k === todayKey() ? ' cal-now' : ''}" role="listitem" ${future ? 'aria-hidden="true"' : `title="${say}" aria-label="${say}"`}>
-      <span class="n">${d.getDate()}</span>${!future && CAL_MARK[st] ? `<span class="cm" aria-hidden="true">${CAL_MARK[st]}</span>` : ''}</div>`;
+    if (future) return `<div class="cal-d fut" role="listitem" aria-hidden="true"><span class="n">${d.getDate()}</span></div>`;
+    return `<div class="cal-li" role="listitem"><button type="button" class="cal-d ${st}${k === todayKey() ? ' cal-now' : ''}" onclick="calPick('${k}')" aria-expanded="${CAL_PICK === k}" aria-controls="cal-day" title="${say}" aria-label="${say}">
+      <span class="n">${d.getDate()}</span>${CAL_MARK[st] ? `<span class="cm" aria-hidden="true">${CAL_MARK[st]}</span>` : ''}</button></div>`;
   }).join('');
   const first = cells[0], last = new Date(today);
   const span = `${first.getMonth() + 1}월 ${first.getDate()}일 — ${last.getMonth() + 1}월 ${last.getDate()}일`;
@@ -3795,6 +3879,8 @@ function calCard(){
   <div class="cal-span">${span}</div>
   <div class="cal-dow">${DOW.map(x => `<span>${x}</span>`).join('')}</div>
   <div class="cal" role="list" aria-label="${a.days ? `지난 30일 중 ${a.days}일이 복용일이었고 ${a.full}일은 모두 드셨습니다` : '아직 복용 기록이 없습니다'}">${grid}</div>
+  <p class="small muted cal-tip">날짜를 누르면 그날 드신 약을 아래에 보여 드려요.</p>
+  ${calDay(CAL_PICK)}
   ${slotLine()}
   <div class="cal-key">${[['full', '다 드심'], ['part', '일부'], ['miss', '빠짐'], ['none', '정해 둔 것 없음'], ['cal-now', '오늘']].map(([c, n]) => `<span class="ki"><span class="k ${c}" aria-hidden="true">${CAL_MARK[c] || ''}</span>${n}</span>`).join('')}</div>
   <p class="small muted" style="margin-top:10px">진료 때 이 화면을 그대로 보여 주시면 됩니다. <b>못 드신 날을 탓하려고 만든 것이 아니에요</b> — 언제 왜 놓치시는지 의사·약사가 보면 약을 더 쉬운 쪽으로 바꿔 드릴 수 있어요.</p>
@@ -3901,7 +3987,9 @@ function vSchedule(_, q){
     ${NATIVE_PERM === 'granted' && NATIVE_EXACT !== 'granted' ? `<div class="toggle"><div class="t"><b>정확한 시각에 울리기</b><span>지금은 휴대폰이 몇 분 늦게 울릴 수 있어요. 「알람 및 리마인더」를 허용해 주세요</span></div><button class="btn ghost" style="width:auto;min-height:46px;padding:0 14px" onclick="askExact()">허용</button></div>` : ''}
     ${noteNameRow()}
     <p class="small muted" style="margin-top:10px">알림의 <b>「먹었어요」</b>를 누르면 약지도가 열리며 바로 체크돼요. <b>「10분 뒤 다시」</b>도 있어요. 30분이 지나도 체크가 없으면 <b>한 번 더</b> 알려 드려요. 알림은 앞으로 며칠치를 미리 걸어 두고, 앱을 여실 때마다 이어서 다시 걸어요.</p>
-    <details class="why-more" style="margin-top:10px"><summary>알림이 늦거나 안 와요</summary><div class="why" style="margin-top:6px">
+    <details class="why-more" style="margin-top:10px" ${NOTE_HELP ? 'open' : ''}><summary>알림이 늦거나 안 와요</summary><div class="why" style="margin-top:6px">
+      <button type="button" class="btn line" style="margin:4px 0 10px" onclick="testNote()">${I.clock} 시험 알림 보내기</button>
+      ${NOTE_HELP && NATIVE_PERM !== 'granted' ? `<p class="note soft" style="margin-bottom:8px">${I.info}<span>알림이 꺼져 있어요. <b>휴대폰 설정 → 앱 → 약지도 → 알림</b>에서 「알림 허용」을 켜 주세요. 그다음 다시 눌러 보세요.</span></p>` : ''}
       <p>휴대폰이 전기를 아끼려고 오래 안 연 앱의 알림을 늦추거나 막을 수 있어요. 한 번만 바꿔 두시면 돼요.</p>
       <p style="margin-top:6px"><b>삼성 갤럭시</b> — 설정 → 배터리 → 백그라운드 사용 제한 → 「절전 안 함 앱」에 약지도를 넣어 주세요. 「절전 앱」·「깊은 절전 앱」 목록에 있으면 빼 주세요.</p>
       <p style="margin-top:6px"><b>그 밖의 휴대폰</b> — 설정 → 앱 → 약지도 → 배터리 → 「제한 없음」(또는 「최적화하지 않음」)으로 바꿔 주세요.</p>
@@ -3913,6 +4001,12 @@ function vSchedule(_, q){
     <div class="toggle"><div class="t"><b>휴대폰 달력에 매일 알림 넣기</b><span>앱을 닫아도 울려요. 파일을 열면 달력이 등록해요</span></div><button class="btn ghost" style="width:auto;min-height:46px;padding:0 14px" onclick="downloadIcs()">${I.clock} 받기</button></div>
     ${noteNameRow()}
     <p class="small muted" style="margin-top:10px">알림의 <b>「먹었어요」</b>를 누르면 바로 체크돼요. 30분이 지나도 체크가 없으면 <b>한 번 더</b> 알려 드려요. 앱을 완전히 닫아 두시면 울리지 않으니, 그럴 땐 <b>달력 알림</b>을 함께 켜 두세요.</p>
+    <details class="why-more" style="margin-top:10px" ${NOTE_HELP ? 'open' : ''}><summary>알림이 늦거나 안 와요</summary><div class="why" style="margin-top:6px">
+      <button type="button" class="btn line" style="margin:4px 0 10px" onclick="testNote()">${I.clock} 시험 알림 보내기</button>
+      ${NOTE_HELP && perm !== 'granted' ? `<p class="note soft" style="margin-bottom:8px">${I.info}<span>${perm === 'unsupported' ? '이 브라우저는 알림을 지원하지 않아요. 위의 <b>「휴대폰 달력에 매일 알림 넣기」</b>를 써 주세요.' : '알림이 막혀 있어요. 주소창 왼쪽의 <b>자물쇠(또는 설정) 표시 → 사이트 설정 → 알림 → 허용</b>으로 바꾼 뒤 다시 눌러 주세요.'}</span></p>` : ''}
+      <p>웹에서는 <b>약지도 창이 열려 있을 때만</b> 알림이 울려요. 창을 닫거나 오래 다른 앱을 쓰면 늦거나 안 올 수 있어요.</p>
+      <p style="margin-top:6px">휴대폰이 <b>무음·방해 금지 모드</b>면 소리 없이 와요. 확실하게 받으시려면 <b>휴대폰 달력에 매일 알림 넣기</b>나 설치한 약지도 앱을 써 주세요.</p>
+    </div></details>
   </section>`}${taking.length ? '</div>' : ''}` : ''}
   ${disclaimer('알림은 잊지 않도록 돕는 도구예요. 용량·간격은 약 상자와 약사·의사 지시가 우선이에요.')}`;
 }
@@ -4788,7 +4882,7 @@ const KG_N = 128;   /* tools/build.py 와 같은 수 — 처방약까지 늘자 
 const kgShard = seq => (/^\d+$/.test(String(seq)) ? Number(String(seq)) : 0) % KG_N;
 function kgGet(seq){
   if (!seq) return null; const k = kgShard(seq);
-  if (!(k in KG)) { KG[k] = null; fetch(`data/kg/${k}.json`).then(r => r.ok ? r.json() : {}).then(j => { KG[k] = j || {}; if (j && j[String(seq)]) route(); }).catch(() => { KG[k] = {}; }); return null; }
+  if (!(k in KG)) { KG[k] = null; fetch(dataPath(`kg/${k}.json`)).then(r => r.ok ? r.json() : {}).then(j => { KG[k] = j || {}; if (j && j[String(seq)]) redraw(); }).catch(() => { KG[k] = {}; }); return null; }
   return KG[k] ? (KG[k][String(seq)] || null) : null;
 }
 const pictoSrc = c => (window.__PICTO_LOCAL ? `pg/${c}.jpg` : `https://common.health.kr/shared/images/pictogram/black/kor/${c}.jpg`);
@@ -4821,7 +4915,7 @@ function enKo(t){
 let KG_LEX_ASKED = false;
 function kgCard(seq){
   const g = kgGet(seq); if (!g || !(g.t || (g.g || []).length)) return '';
-  if (g.dur?.contra && !LEX.ing && !KG_LEX_ASKED) { KG_LEX_ASKED = true; lexLoad(true).then(() => { EN_KO = null; route(); }).catch(() => {}); }
+  if (g.dur?.contra && !LEX.ing && !KG_LEX_ASKED) { KG_LEX_ASKED = true; lexLoad(true).then(() => { EN_KO = null; redraw(); }).catch(() => {}); }
   const dur = Object.entries(g.dur || {}).map(([k, v]) => [KG_DUR[k] || k, (k === 'contra' ? String(v).replace(/【\s*([^】]+?)\s*】/g, (m, n) => enKo(n)).replace(/\s*,\s*/g, ' · ') : String(v)).replace(/^[A-Za-z0-9 ,.()\-]+ : /, '').replace(/\s*\|\s*/g, ' · ').replace(/^1일 최대 투여량\s*-\s*/, '').replace(/(\d등급)\s*,\s*/, '$1 — ')]);
   const facts = [['생김새', g.ch], ['보관', g.st], ['포장', g.bx]].filter(x => x[1]);
   return `<section class="sec card kg"><h2>약사가 알려 드리는 것 <small>약학정보원 복약정보</small></h2>
@@ -5003,7 +5097,7 @@ function pubIngrFill(){
   if (!empty.length) return false;
   let n = 0; for (const k of empty) { const g = pubIngrGuess(P[k].seq, P[k].full || P[k].name); if (g) { P[k].ingr = g; const d = pubDrug(g, P[k]); if (d) P[k].drugId = d.id; n++; } }
   if (n) saveMe();
-  if (n < empty.length && !pubIngrFill.tried) { pubIngrFill.tried = true; Promise.all([pubIndex(), lexLoad(true)]).then(() => { if (pubIngrFill()) route(); }).catch(() => {}); }
+  if (n < empty.length && !pubIngrFill.tried) { pubIngrFill.tried = true; Promise.all([pubIndex(), lexLoad(true)]).then(() => { if (pubIngrFill()) redraw(); }).catch(() => {}); }
   return n > 0;
 }
 async function togglePub(seq){ const p = findPill(seq) || (ME.pub || {})['pub:' + seq]; if (!p) return; ME.pub = ME.pub || {}; const id = 'pub:' + seq; ME.taking = ME.taking || [];
@@ -5892,7 +5986,7 @@ if ('serviceWorker' in navigator && location.protocol.startsWith('http') && !NAT
   if (navigator.serviceWorker.controller) Promise.all([ensureCore(), ensureDetail()]).then(() => setTimeout(warmCore, 800));
   else navigator.serviceWorker.addEventListener('controllerchange', () => setTimeout(warmCore, 300));
   const warm = () => { ['lexicon.json', 'brands.json', 'qa.json', 'mixes.json', 'nutrients.json', 'easy-index.json', 'pills.json']
-    .forEach((f, i) => setTimeout(() => fetch('data/' + f, { cache:'force-cache' }).catch(() => {}), i * 1200)); };
+    .forEach((f, i) => setTimeout(() => fetch(dataPath(f), { cache:'force-cache' }).catch(() => {}), i * 1200)); };   /* 앱이 받을 때와 같은 판 주소로 — 워커 캐시에 그대로 맞물린다 */
   const warmLater = () => { try { const c = navigator.connection; if (c && (c.saveData || /2g/.test(c.effectiveType || ''))) return; } catch (e) {} if ('requestIdleCallback' in window) requestIdleCallback(warm, { timeout:8000 }); else setTimeout(warm, 4000); };
   Promise.all([ensureCore(), ensureDetail()]).then(() => setTimeout(warmLater, 1500));
 }
