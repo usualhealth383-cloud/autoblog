@@ -122,7 +122,7 @@ if (_pd / 'pills.json').exists() and (_pd / 'easy-index.json').exists():
         print(f'낱알 성분 채움 {_n}건(같은 품목기준코드)')
 jd = json.dumps(detail, ensure_ascii=False, separators=(',', ':'))
 # 본문 판(DATAV)은 core·detail·지연 로드 자료 내용의 해시 — 같은 날 두 번 빌드해도 내용이 바뀌면 휴대폰이 새 본문을 받는다(2026-10-13 자체 검수 5-02)
-_lazy = b''.join(f.read_bytes() for f in sorted((ROOT.parent / 'docs' / 'yakjido' / 'data').glob('*.json')) if f.name not in ('core.json', 'detail.json'))   # 지연 로드 자료도 바뀌면 판이 바뀐다(5-02)
+_lazy = b''.join(f.read_bytes() for f in sorted((ROOT.parent / 'docs' / 'yakjido' / 'data').rglob('*.json')) if f.name not in ('core.json', 'detail.json') or f.parent.name != 'data')   # 지연 로드 자료도 바뀌면 판이 바뀐다(5-02)
 datav = hashlib.sha1((jc + jd).encode('utf-8') + _lazy).hexdigest()[:10]
 out = shell.replace('<!--DATA-->', j).replace('__BUILD__', stamp).replace('__DATAV__', datav)
 # 2026-10-13 상용화 점검 — 배포본에서는 «줄 전체가 주석»인 /* … */ 덩어리를 뺀다(원본은 그대로). 휴대폰마다 개발 메모 수백 개를 내려받던 것 —
