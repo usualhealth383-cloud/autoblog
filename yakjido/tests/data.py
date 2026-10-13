@@ -113,19 +113,27 @@ for x in SUP: jargon(x, '', '영양제 ' + x['id'])
 for t in T: jargon(t, '', '팁 ' + t['id'])
 
 # ── 영어 약어를 본문에 쓰지 않는다(현욱님 규칙) — MAO·SSRI·PPI·DUR 가 약 화면·병용 규칙에 남아 있었다(자체 비판 3차) ──
-ABBR = re.compile(r'\b(SSRI|SNRI|MAO|MAOI|PPI|DUR|NSAIDs?|ACE|ARB|INR|VTE|DVT|OTC)\b')
+# 2026-10-13 상용화 점검: \b 는 한글도 글자로 봐서 「ACE억제제」「MAO억제제」「H2차단제」처럼 한글이 바로 붙으면 못 잡았다 → 영문자만 경계로 본다.
+#   경로에 'note' 가 들어가면 통째로 넘기던 것도 없앴다(약 「같이 먹으면」 note·제품 note 는 화면에 나온다). 넘기는 칸은 키 이름이 정확히 아래일 때만.
+ABBR = re.compile(r'(?<![A-Za-z])(SSRI|SNRI|MAOI?|PPI|DUR|NSAIDs?|ACE|ARB|INR|VTE|DVT|OTC|QT|COPD|H2|FDA|DOAC|NOAC|APAP)(?![A-Za-z])')
+ABBR_SKIP = {'id', 'en', 'class', 'flags', 'sources', 'srcText', 'src', 'chartSources', '_memo', 'achSrc', 'k', 'kw', 'go'}
 def abbr(o, path, owner):
     if isinstance(o, str):
-        if ABBR.search(o) and not any(k in path for k in ('src', 'source', '.en', 'note')): fails.append(f'영어 약어 {owner}{path}: {o[:60]!r}')
+        if ABBR.search(o): fails.append(f'영어 약어 {owner}{path}: {o[:60]!r}')
     elif isinstance(o, dict):
         for k, v in o.items():
-            if k not in ('id', 'en', 'class', 'flags', 'sources', 'srcText'): abbr(v, path + '.' + k, owner)
+            if k not in ABBR_SKIP: abbr(v, path + '.' + k, owner)
     elif isinstance(o, list):
         for i, v in enumerate(o): abbr(v, path + f'[{i}]', owner)
 for s in S: abbr(s, '', '증상 ' + s['id'])
 for d in D: abbr(d, '', '약 ' + d['id'])
 for k in K: abbr(k, '', '계열 ' + k['id'])
 for x in SUP: abbr(x, '', '영양제 ' + x['id'])
+for t in T: abbr(t, '', '팁 ' + t['id'])
+for r in IX['rules']: abbr(r, '', '규칙 ' + r['id'])
+for e in ING.get('ing', []): abbr(e.get('n', ''), '.n', '성분 ' + str(e.get('k')))
+for f_ in ('myths.json', 'kids.json', 'askdoc.json'):
+    if (C / f_).exists(): abbr(json.load(open(C / f_, encoding='utf-8')), '', f_ + ' ')
 
 # ── 계열 설명이 «모두 처방약·약국에서 살 수 없다»고 하는데 약국 약이 끼어 있으면 안 된다 ──
 # 여성 호르몬약(피임약 추가)·방광·전립선약(리도카인 크림 추가) 설명이 새 약과 어긋나 있었다(자체 비판 3차)
@@ -330,7 +338,7 @@ for _k, _v in SRC.items():
 # ── 숫자와 영어 단위는 한 칸 띄운다 ────────────────────────────────────
 # 「3,000mg」처럼 붙여 쓴 곳이 섞여 있었다. 한글 단위(알·정·캡슐)는 붙여 쓰는 것이 맞아
 # 영어 단위만 본다. 허가사항 제품명(타이레놀정 500mg)은 원문 그대로라 출처에서는 넘어간다.
-_unit = re.compile(r'(?<![A-Za-z0-9.])(\d[\d,.]*)(mg|g|mL|ml|µg|mcg|IU|kg)\b')
+_unit = re.compile(r'(?<![A-Za-z0-9.])(\d[\d,.]*)(mg|g|mL|ml|µg|mcg|IU|kg)(?![A-Za-z])')   # \b 는 「4,000mg을」처럼 한글이 붙으면 못 잡는다(10-13)
 for _p in sorted(ROOT.glob('content/*.json')):
     if _p.name.startswith('sources') or _p.name in ('productImages.json', 'drugRep.json', 'recalls.json'): continue   # 제품 이름 짝(원문 그대로)
     for _m in _unit.finditer(_p.read_text(encoding='utf-8')):
