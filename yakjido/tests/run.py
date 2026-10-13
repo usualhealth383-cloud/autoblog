@@ -1491,6 +1491,14 @@ def main():
         for _r in ['/home', '/schedule', '/together', '/vitals', '/visits', '/me?t=meds']:
             _dp.goto(url + '#' + _r); _dp.wait_for_timeout(500)
             if '문제가 생겼어요' in _dp.inner_text('#view'): fails.append(f'둘러보기 예시로 {_r} 화면이 터집니다')
+        # 10-14 디자인 리서치 3-10 — 표·비교 화면이 휴대폰 폭에서 옆으로 넘치지 않는지(영양제 비교가 카드로 쪼개지거나 옆으로 밀던 것). 예시 약을 담은 채로
+        for _w in (390, 360, 320):
+            _dp.set_viewport_size({'width': _w, 'height': 800})
+            for _r in ['/compare?ids=vitd,calcium,mg', '/class/nsaid', '/class/topical', '/together', '/drug/ibuprofen']:
+                _dp.goto(url + '#' + _r); _dp.wait_for_timeout(500)
+                _o = _dp.evaluate(OVERFLOW_JS)
+                if _o['ov']: fails.append(f'3-10 가로 넘침 {_w}px {_r}: {_o["ov"][:2]}')
+        _dp.set_viewport_size({'width': 390, 'height': 844})
         _dp.goto(url + '#/demo'); _dp.wait_for_timeout(400); _dp.click('button:has-text("예시 지우기")'); _dp.wait_for_timeout(400)
         if _dp.evaluate('(ME.taking || []).length'): fails.append('「예시 지우기」 뒤에도 예시 약이 남습니다')
         if _derr: fails.append(f'둘러보기 JS 오류: {_derr[:2]}')
