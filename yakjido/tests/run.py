@@ -942,11 +942,23 @@ def main():
         if '이 휴대폰에만 저장돼요' not in _ap.inner_text('#view'): fails.append('로그인 전인데 저장 위치 문구가 「이 휴대폰에만」이 아닙니다')
         if _aerr: fails.append(f'계정 칸 JS 오류: {_aerr[:2]}')
         _ac.close()
+        # 9f. 둘러보기(#/demo) — 외부 검수자가 링크 하나로 채워진 화면을 만지게(2026-10-13). 예시를 담고, 화면이 터지지 않고, 「예시 지우기」로 비워져야 한다.
+        _dc = br.new_context(viewport={'width': 390, 'height': 844}); _dp = _dc.new_page(); _derr = []
+        _dp.on('pageerror', lambda e: _derr.append(str(e)))
+        _dp.goto(url + '#/demo'); _dp.wait_for_function('window.__READY__===true', timeout=15000); _dp.wait_for_timeout(1200)
+        if '예시 기록을 담았어요' not in _dp.inner_text('#view'): fails.append('둘러보기(#/demo)가 예시를 담지 못했습니다')
+        for _r in ['/home', '/schedule', '/together', '/vitals', '/visits', '/me?t=meds']:
+            _dp.goto(url + '#' + _r); _dp.wait_for_timeout(500)
+            if '문제가 생겼어요' in _dp.inner_text('#view'): fails.append(f'둘러보기 예시로 {_r} 화면이 터집니다')
+        _dp.goto(url + '#/demo'); _dp.wait_for_timeout(400); _dp.click('button:has-text("예시 지우기")'); _dp.wait_for_timeout(400)
+        if _dp.evaluate('(ME.taking || []).length'): fails.append('「예시 지우기」 뒤에도 예시 약이 남습니다')
+        if _derr: fails.append(f'둘러보기 JS 오류: {_derr[:2]}')
+        _dc.close()
         br.close()
     print(f'화면 {len(routes)}개 검사 완료')
     if fails:
         print('실패', len(fails)); [print('  ✗', f) for f in fails]; sys.exit(1)
-    print('✓ 전부 통과 — JS 오류 0 · 넘침 0 · 잘림 0 · 명암비 AA · 조작 부품 3:1 · 44px · 단추 누르기 · 복용 간격 · 복약 달력 · 홈 오늘약 · 어르신 소염제 · 소아 한도 · 계열 경고 · 어근 오인 · 내 정보 칸 · 화면 밝기 · 아이콘 전수 · 약 알림 · 어르신 모드 · 320px · 병용 8건 · 겹침 규칙 53 · 입력칸 이름표 · 성분 해석 123 · 죽은 규칙 0 · 약통 판정 4건 · 자기중복 3건 · 바구니 겹침 · 이중계산 0 · 검색 8건 · 구어 30건 · 문장 16건 · 새 약 검색 12건 · 하루 최대 표기 · 먹는/바르는 구분 · 영양제 질문 순서 · 인터넷 없이 · 화면 오류 카드 · 계정 동의 먼저')
+    print('✓ 전부 통과 — JS 오류 0 · 넘침 0 · 잘림 0 · 명암비 AA · 조작 부품 3:1 · 44px · 단추 누르기 · 복용 간격 · 복약 달력 · 홈 오늘약 · 어르신 소염제 · 소아 한도 · 계열 경고 · 어근 오인 · 내 정보 칸 · 화면 밝기 · 아이콘 전수 · 약 알림 · 어르신 모드 · 320px · 병용 8건 · 겹침 규칙 53 · 입력칸 이름표 · 성분 해석 123 · 죽은 규칙 0 · 약통 판정 4건 · 자기중복 3건 · 바구니 겹침 · 이중계산 0 · 검색 8건 · 구어 30건 · 문장 16건 · 새 약 검색 12건 · 하루 최대 표기 · 먹는/바르는 구분 · 영양제 질문 순서 · 인터넷 없이 · 화면 오류 카드 · 계정 동의 먼저 · 둘러보기')
 
 if __name__ == '__main__':
     main()

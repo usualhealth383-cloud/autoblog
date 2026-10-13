@@ -1738,7 +1738,7 @@ function workedCard(s){
     <div class="wk-list">${ids.map(d => `<button class="wk" onclick="go('/drug/${d.id}')">
       ${imgTag(pimg((d.products || [])[0]?.name), 'wk-img', '')}
       <span><b>${esc(prodName((d.products || [])[0]?.name) || ingrName(d))}</b><small>${fmt(d.simple || '')}</small></span>${I.chev}</button>`).join('')}</div>
-    <p class="small muted" style="margin-top:8px">이 기록은 이 기기에만 저장돼요. 같은 증상이라도 몸 상태가 달라졌으면 약사·의사와 다시 상의하세요.</p>
+    <p class="small muted" style="margin-top:8px">${savedWhere()} 같은 증상이라도 몸 상태가 달라졌으면 약사·의사와 다시 상의하세요.</p>
   </section>`;
 }
 /* 첫 화면 — 적어 두신 「효과 본 약」이 있으면 제일 먼저 꺼내 드린다.
@@ -2009,7 +2009,7 @@ function route(){
     if (DETAIL === 3) { window.__DETAIL_SKIP__ = true; ensureDetail(); }   /* 실패했으면 두 칸 없이 그리고, 다음에 다시 받아 본다 */
     else { view.innerHTML = topBar({ back:'뒤로', nosearch:true }) + `<section class="sec"><p class="loading">자료를 불러오는 중이에요…</p></section>`; ensureDetail().then(route); return; }
   }
-  const R = { send:vSend, p:vParentShare, show:vShow, check:vCheck, home:vHome, symptom:vSymptom, drugs:vDrugs, drug:vDrug, class:vClass, search:vSearch, pub:vPub, pill:vPill, guide:vGuide, kids:vKids, tips:vTips, myths:vMyths, schedule:vSchedule, photo:vPhoto, pillinfo:vPillInfo, supp:vSupp, compare:vCompare, me:vMe, about:vAbout, ingr:vIngr, brand:vBrand, nut:vNut, hello:vHello, mix:vMix, together:vTogether, kinds:vKinds, bag:vBag, rxout:vRxOut, senior:vSenior, askdoc:vAskDoc, vitals:vVitals, visits:vVisits };
+  const R = { send:vSend, p:vParentShare, show:vShow, check:vCheck, home:vHome, symptom:vSymptom, drugs:vDrugs, drug:vDrug, class:vClass, search:vSearch, pub:vPub, pill:vPill, guide:vGuide, kids:vKids, tips:vTips, myths:vMyths, schedule:vSchedule, photo:vPhoto, pillinfo:vPillInfo, supp:vSupp, compare:vCompare, me:vMe, about:vAbout, ingr:vIngr, brand:vBrand, nut:vNut, hello:vHello, mix:vMix, together:vTogether, kinds:vKinds, bag:vBag, rxout:vRxOut, senior:vSenior, askdoc:vAskDoc, vitals:vVitals, visits:vVisits, demo:vDemo };
   /* 한 화면이 그리다 터져도 앱 전체가 멈춘 것처럼 보이지 않게 — 자료 한 줄의 흠이 흰 화면이 되지 않도록(2026-10-08 출시 점검) */
   let html;
   try { html = (R[seg[0]] || vHome)(seg[1], q); }
@@ -4159,6 +4159,33 @@ function todayHero(todays, nowMin, link){ const done = todays.filter(x => x.done
 /* 사진을 못 받으면 64px 빈칸 대신 알약 모양 그림(2026-10-13 디자인 리서치 — Drugs.com·Medisafe) */
 function pubThumb(p){ const g = pillGlyph({ id: p.n, name: p.n }, 34);
   return `<span class="pillwrap">${g}${p.img ? `<img class="pillimg" src="${esc(p.img)}" alt="" loading="lazy" onerror="this.remove()">` : ''}</span>`; }
+/* ── 둘러보기(#/demo) — 외부 검수·처음 보는 분이 「채워진 화면」을 바로 만져 보게(2026-10-13 현욱님 「앱 링크를 열어 이것저것 눌러 보게」).
+   예시 기록을 담는다. 이미 기록이 있으면 덮기 전에 묻고, 언제든 「예시 지우기」 한 번으로 비운다. 서버로는 아무것도 가지 않는다. */
+function demoFill(){
+  const k = todayKey(), dd = n => { const d = new Date(); d.setDate(d.getDate() + n); return dayKey(d); };
+  ME = { ...ME_DEF, age:'senior', demo:true,
+    taking:['acetaminophen', 'famotidine', 'ibuprofen', 'cls:bp.arb'],
+    sched:{ acetaminophen:['08:00','13:00','19:00'], famotidine:['08:00','19:00'], ibuprofen:['13:00'], 'cls:bp.arb':['08:00'] },
+    prn:{ acetaminophen:true }, taken:{ [k]:['famotidine@08:00', 'cls:bp.arb@08:00'] },
+    stock:{ famotidine:{ left:3, at:k } }, pub:{},
+    vitals:[{ t:dd(-1) + 'T07:40', k:'bp', s:138, d:86, p:72, w:'아침' }, { t:k + 'T07:35', k:'bp', s:142, d:88, p:75, w:'아침' }],   /* t 는 앱이 쓰는 꼴 그대로(YYYY-MM-DDTHH:MM) */
+    visits:[{ id:'demo1', at:dd(2) + 'T10:30', where:'동네 내과' }] };
+  try { localStorage.setItem('yakjido.hello.v1', '1'); } catch (e) {}
+  saveMe(); try { armNotifications(); } catch (e) {}
+}
+function demoClear(){ ME = { ...ME_DEF }; saveMe(); try { armNotifications(); } catch (e) {} toast('예시를 지웠어요'); go('/home'); }
+function vDemo(_, q){
+  const has = (ME.taking || []).length && !ME.demo;
+  if (q && q.go === '1' || !has) { if (!ME.demo) demoFill(); }
+  else return `${topBar({ back:'홈' })}<h1>둘러보기</h1><section class="sec card"><p>지금 이 휴대폰에 드시는 약 기록이 있어요. 예시로 바꾸면 <b>지금 기록을 덮어써요.</b></p>
+    <div class="actions" style="margin-top:12px"><button class="btn" onclick="if(confirm('지금 기록을 예시로 덮어쓸까요? 되돌릴 수 없어요.')){demoFill();route()}">예시로 바꾸기</button><button class="btn ghost" onclick="go('/home')">그대로 두기</button></div></section>`;
+  const T = [['/home', '홈 — 오늘 약 진행 고리'], ['/schedule', '복용 시간 — 아침·점심·저녁 묶음, 눌러서 체크'], ['/together', '드시는 약 겹침 확인 — 이부프로펜 + 혈압약'], ['/symptom/cold', '증상 → 약국 쪽지(감기)'], ['/symptom/msk', '허리·근육 통증'], ['/drug/ibuprofen', '약 사전 — 이부프로펜'], ['/vitals', '혈압 수첩'], ['/supp/iron', '영양제 — 철분'], ['/kids', '아이 해열제 용량'], ['/pill', '낱알로 찾기'], ['/me?t=set', '설정 · 글자 크기 · 계정']];
+  return `${topBar({ back:'홈' })}<div class="eyebrow">둘러보기</div><h1>예시 기록을 담았어요</h1>
+  <p style="margin-top:6px">65세 어르신이 <b>타이레놀·파모티딘·이부프로펜·혈압약</b>을 드시는 상황이에요. 오늘 아침 약 두 가지는 드신 것으로, 혈압 두 번과 모레 진료 예약도 넣어 두었어요. 마음껏 눌러 보세요 — 서버로는 아무것도 가지 않아요.</p>
+  <section class="sec"><div class="rows-l">${T.map(([r, t]) => lrow(I.eye, esc(t), esc(r), `go('${r}')`)).join('')}</div></section>
+  <div class="actions"><button class="btn ghost" onclick="demoClear()">${I.x} 예시 지우기</button></div>
+  ${disclaimer()}`;
+}
 function vSchedule(_, q){
   if (q && q.tick) { tickFromNote(q.tick); setTimeout(() => { try { history.replaceState(null, '', '#/schedule'); } catch (e) {} }, 0); }
   const taking = takingItems(); rollDay();
@@ -4181,7 +4208,7 @@ function vSchedule(_, q){
   ${taking.length ? schTabs(q) : ''}
   ${taking.length ? `<div class="pane${schOn('sc1')}" id="sc1"><section class="sec card" style="margin-top:8px"><h2>약마다 시간 고르기</h2>${taking.map(d => `<div class="sched-row"><div class="nm"><span>${esc(d.name)}</span>${d.d ? `<a class="link small" href="#/drug/${d.d.id}">복용법 ›</a>` : ''}</div><div class="small muted">${fmt((d.simple || '').split('.')[0])}</div><div class="times">${isPrn(d.id) ? '' : SLOTS.map(([n, t]) => `<button class="chip ${schedOf(d.id, d).includes(t) ? 'on' : ''}" onclick="toggleSlot('${d.id}','${t}')">${schedOf(d.id, d).includes(t) ? I.check : ''}${n} ${t}</button>`).join('')}<button class="chip ${isPrn(d.id) ? 'on' : ''}" onclick="togglePrn('${d.id}')" aria-pressed="${isPrn(d.id)}">${isPrn(d.id) ? I.check : ''}필요할 때만</button></div>${isPrn(d.id) ? `<p class="small muted" style="margin-top:6px">시간 알림 없이, 드실 때마다 위의 <b>「필요할 때 드신 약」</b>에 적어요.</p>` : schedWarn(d)}</div>`).join('')}</section></div>
   ${taking.length ? `<div class="pane${schOn('sc5')}" id="sc5"><section class="sec card" style="margin-top:8px"><h2>보호자에게 오늘 상황 보내기</h2>
-    <p class="small" style="margin-top:6px">오늘 무엇을 드셨고 무엇이 남았는지 <b>한 장으로 만들어</b> 드려요. 카카오톡·문자로 보내시면 됩니다. <b>이 앱이 대신 보내지 않습니다</b> — 기록은 이 휴대폰에만 있어요.</p>
+    <p class="small" style="margin-top:6px">오늘 무엇을 드셨고 무엇이 남았는지 <b>한 장으로 만들어</b> 드려요. 카카오톡·문자로 보내시면 됩니다. <b>이 앱이 대신 보내지 않습니다</b> — ${savedWhere()}</p>
     <div class="actions"><button class="btn" onclick="sendCare()">${I.user} 보호자에게 보내기</button></div>
     <details class="why-more" style="margin-top:10px"><summary>무엇이 보내지나요</summary><p class="why" style="margin-top:6px">${esc(careReport())}</p></details>
   </section></div>
@@ -4213,7 +4240,7 @@ function vSchedule(_, q){
    팔을 심장보다 낮게 두고 재서 높게 나오는 분이 많다(현욱님). */
 const VREF = { bp: { s: 135, d: 85, hs: 180, hd: 120, src: ['ksh2018hbpm', 'ksh2022'] }, bg: { fLo: 80, fHi: 130, pHi: 180, hypo: 70, src: ['ada2025glyc'] } };
 let VT = { k: 'bp' };
-function vitals(){ ME.vitals = ME.vitals || []; return ME.vitals; }
+function vitals(){ ME.vitals = (ME.vitals || []).map(x => typeof x.t === 'string' ? x : { ...x, t: dayKey(new Date(x.t)) + 'T' + hhmm(new Date(x.t)) }); return ME.vitals; }   /* t 는 늘 「YYYY-MM-DDTHH:MM」 — 숫자로 들어온 옛·가져온 기록도 고쳐 읽는다(2026-10-13) */
 function vitalSave(){
   const num = id => { const v = parseFloat((document.getElementById(id) || {}).value); return isFinite(v) ? v : null; };
   const now = new Date(), t = dayKey(now) + 'T' + hhmm(now);
@@ -4315,7 +4342,7 @@ function vVitals(){
   : `<div class="vt-row"><label class="vt-f"><span>혈당 (mg/dL)</span><input id="vg" type="number" inputmode="numeric" min="20" max="600" placeholder="110" aria-label="혈당"></label></div>
     <div class="times" style="margin-top:10px">${['공복', '식후 2시간', '그 밖'].map(w => `<button class="chip ${(VT.gw || '공복') === w ? 'on' : ''}" onclick="VT.gw='${w}';route()">${w}</button>`).join('')}</div>`;
   return `${topBar({ back:'내 정보' })}<div class="eyebrow">혈압·혈당 수첩</div><h1>재 두신 숫자, 진료 때 한눈에</h1>
-  <p style="margin-top:6px">집에서 잰 혈압·혈당을 적어 두면 <b>2주 흐름</b>과 <b>7일 평균</b>을 보여 드려요. 기록은 <b>이 휴대폰에만</b> 있어요.</p>
+  <p style="margin-top:6px">집에서 잰 혈압·혈당을 적어 두면 <b>2주 흐름</b>과 <b>7일 평균</b>을 보여 드려요. ${savedWhere()}</p>
   <div class="seg" style="margin-top:14px" role="group" aria-label="무엇을 적을까요">${[['bp', '혈압'], ['bg', '혈당']].map(([v, n]) => `<button class="${k === v ? 'on' : ''}" onclick="VT.k='${v}';VT.alert=null;route()" aria-pressed="${k === v}">${n}</button>`).join('')}</div>
   ${vitalAlert()}
   <section class="sec card"><h2>지금 잰 값 적기</h2>${form}
