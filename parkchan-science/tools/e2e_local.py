@@ -106,6 +106,9 @@ async def main():
         await o.fill('#clsName', '일요반'); await o.fill('#clsStart', '10:00'); await o.click('#clsAdd'); await o.wait_for_timeout(400); assert '일요반' in await txt(o, '#v-admin')
         await o.select_option('#passDays', '90'); await o.click('#passIssue'); await o.wait_for_timeout(400); pcode = await o.evaluate('issuedPass.code'); assert len(pcode) == 6; await shot(o, 'l14_admin_settings')
         await o.click('[data-adm="notice"]'); await o.click('[data-chip="시험 안내"]'); await o.select_option('#ntCls', '전체'); await o.click('#ntSend'); await o.wait_for_timeout(300); assert '읽음 0' in await txt(o, '.sent .r')
+        # 읽음 분모는 앱을 쓰는 학생만, 앱 없는 학생은 따로(GPT 검수 #31)
+        nr = await txt(o, '.sent .r'); ex = await o.evaluate("DBX.rosterLinks().then(l => [l.filter(x => x.app || x.last).length, l.filter(x => !x.app && !x.last).length])")
+        assert f'/ {ex[0]}명' in nr and ex[1] > 0 and f'앱 없음 {ex[1]}명' in nr and f'앱 없는 {ex[1]}명' in nr, (nr, ex)
         await ctx.close()
 
         # ── 학원 밖 학생: 가입(코드 없음) → 잠김 → 이용권 코드 등록 → 전 범위 ──

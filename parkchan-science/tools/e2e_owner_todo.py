@@ -26,7 +26,8 @@ AGO = lambda h: (NOW - dt.timedelta(hours=h)).isoformat().replace('+00:00', 'Z')
 
 # 학생: 코드 → (이름, 반, 연락처)
 STU = {'TODO01': ('출석만학생', '월목반', '01011112222'), 'TODO02': ('급락학생', '화금반', ''), 'TODO03': ('공지학생', '월목반', '01033334444'),
-       'TODO04': ('밀린학생', '수토반', ''), 'TODO05': ('괜찮은학생', '월목반', ''), 'TODO06': ('공지만연락처없음', '월목반', '')}
+       'TODO04': ('밀린학생', '수토반', ''), 'TODO05': ('괜찮은학생', '월목반', ''), 'TODO06': ('공지만연락처없음', '월목반', ''),
+       'TODO07': ('앱없는학생', '월목반', '01077778888')}   # 앱 계정도 진도 기록도 없음 — 출석은 했지만 처리할 것에서 뺀다(GPT 검수 #31)
 PROG = {
     'TODO01': {'days': [D(10)], 'wrong': [], 'dq': {}},                                                    # 출석 O · 7일 공부 X
     'TODO02': {'days': [D(0), D(8)], 'wrong': [], 'dq': {D(1): [10, 4], D(9): [10, 9]}},                     # 90% → 40%
@@ -35,7 +36,7 @@ PROG = {
     'TODO05': {'days': [D(0)], 'wrong': [{'b': f'1101-q{i}', 'iso': D(9), 'a': D(9), 'd': D(1), 'x': 1, 'k': 1} for i in range(30)], 'dq': {D(1): [6, 5], D(9): [6, 6]}},   # 30개는 '넘게'가 아님 · 6%p
     'TODO06': {'days': [D(2)], 'wrong': [], 'dq': {}},
 }
-ATT = [('TODO01', D(2)), ('TODO05', D(1))]
+ATT = [('TODO01', D(2)), ('TODO05', D(1)), ('TODO07', D(1))]
 READ_OK = ['TODO05']                 # 월목반 공지를 읽은 학생(01·03·06 은 안 읽음)
 
 
@@ -104,6 +105,8 @@ async def main():
         assert '35개' in get('밀린학생')[0], get('밀린학생')[0]
         assert get('공지학생')[0].strip() == '공지 ‘목요일 보강 안내’ 아직 안 읽음', get('공지학생')[0]
         assert not any(k.startswith('괜찮은학생') for k in rows), '읽음·공부·출석 다 한 학생(밀린 30개·6%p)이 목록에 있음'
+        assert not any(k.startswith('앱없는학생') for k in rows), '앱 없는 학생(출석만·공지 안 읽음)이 처리할 것에 뜸'
+        assert '앱 없음' in await box.locator('.todo-noapp').inner_text(), '앱 없는 학생을 뺐다는 줄이 없음'
         assert '방금 보낸 공지' not in txt and '오래된 공지' not in txt, '3시간 안 · 14일 넘은 공지는 묻지 않아야 함'
         assert all(len(v[0].split('\n')) >= 1 for v in rows.values())
         # 반 표시(이름·반) · 할 일 하나

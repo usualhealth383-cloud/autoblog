@@ -172,6 +172,7 @@ async def run(b, theme, errs):
     for i in range(3):
         await answer(s, True); await s.click('#bankNext'); await s.wait_for_timeout(80)
     assert '전부 맞았어요' in await s.inner_text('#v-bank .rline') and await s.locator('#v-bank #bankRetryWrong').count() == 0
+    rl = await s.inner_text('#v-bank .rline'); assert '잡혔어요' not in rl and '며칠 뒤' in rl, ('한 번 다 맞힌 것으로 숙달을 단정하지 않는다(GPT 검수 #24)', rl)
     assert await s.locator('#v-bank .btn#bankAgain').count() == 1, '전부 맞으면 새 세트가 주 버튼'
     await s.click('#bankQuit2'); await s.wait_for_timeout(200)
 

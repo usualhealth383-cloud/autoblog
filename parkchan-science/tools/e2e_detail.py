@@ -212,10 +212,18 @@ async def run(b, theme, errs):
     assert np >= 20, f'보강 칸이 있는 개념이 너무 적음 {np}'
     await s.evaluate("(() => { const i = CONCEPTS.findIndex(c => c.id === '1303-02'); dOpenSet(CONCEPTS[i].id, true); detailIdx = i; show('detail'); })()"); await s.wait_for_timeout(400)
     assert await s.locator('#v-detail .dplus details').count() >= 1, '1303-02 에 보강 칸이 없음'
+    # 누르는 자리 44 px — 북마크·공유(40 px 였음) · '틀린 곳이 있나요?'(36 px 였음)
+    tg = await s.evaluate("[...document.querySelectorAll('#v-detail .loc .acts button, #v-detail .flag')].map(e => { const r = e.getBoundingClientRect(); return [e.className || e.getAttribute('aria-label'), Math.round(r.width), Math.round(r.height)]; })")
+    assert len(tg) >= 3 and all(h >= 44 for _, w, h in tg) and all(w >= 44 for _, w, h in tg[:2]), ('누르는 자리 44 px 아래', tg)
     await s.locator('#v-detail .dplus summary').first.click(); await s.wait_for_timeout(200)
     narrow = await s.evaluate("[...document.querySelectorAll('#v-detail .dplus .pbody p')].filter(p => p.getBoundingClientRect().width < 260).length")
     assert narrow == 0, f'보강 칸 문단이 좁게 갈림 {narrow}'
     assert await s.evaluate("[...document.querySelectorAll('#v-detail .dplus .pbody [style]')].filter(e => !e.closest('svg')).length") == 0, '본책 style 이 남음'
+    # svg 그림·표는 그림 이름표를 이름으로 한 덩어리(GPT 검수 #14) — 모든 보강 칸에서
+    fa = await s.evaluate("""(() => { const d = document.createElement('div'); d.innerHTML = CONCEPTS.flatMap(c => (c.x && c.x.plus) || []).map(p => figA11y(p.h)).join('');
+        const sv = [...d.querySelectorAll('figure svg')]; return { n:sv.length, bad:sv.filter(v => v.getAttribute('role') !== 'img' || !(v.getAttribute('aria-label') || '').trim()).length,
+          cap:sv.filter(v => { const c = v.closest('figure').querySelector('figcaption'); return c && v.getAttribute('aria-label') !== c.textContent.replace(/\\s+/g, ' ').trim(); }).length }; })()""")
+    assert fa['n'] >= 30 and fa['bad'] == 0 and fa['cap'] == 0, ('보강 svg 에 role=img·이름 없음', fa)
     await shot('d09_plus')
     # 문제 은행: 보강·실력 다지기 문항 머리
     pu = await s.evaluate("[BANK.find(q => q.plus), BANK.find(q => q.up)].filter(Boolean).map(q => q.id)")
