@@ -633,6 +633,10 @@ nav.gjump{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;margin-left:calc
 .ae-form .btn{margin-top:10px}
 .cal-span{margin-top:12px;font-size:.75rem;font-weight:700;color:var(--muted);text-align:center;font-variant-numeric:tabular-nums}
 .cal-d.cal-now{box-shadow:0 0 0 2px var(--primary)}
+.cal-d{position:relative}
+.cal-d .cm{position:absolute;right:3px;top:1px;font-size:.625rem;line-height:1;font-weight:800}
+.cal-key .k{display:inline-grid;place-items:center;font-size:.5625rem;line-height:1;font-weight:800;width:14px;height:14px}
+.cal-key .k.full{color:var(--on-primary)}.cal-key .k.part{color:var(--caution)}.cal-key .k.miss{color:var(--alert)}
 /* 나에게 맞추기 칩 */
 .fitme{margin-top:var(--s3)}
 .fitme .chips .chip{min-height:46px}   /* 2026-10-13 44px 미만이던 것(새 조건 칩 「간이 안 좋아요」) */
@@ -2734,7 +2738,7 @@ function wxSetCity(v){
   if (v === 'geo') {
     if (!navigator.geolocation) { toast('이 기기에서는 위치를 못 받아요 — 도시를 골라 주세요'); return; }
     navigator.geolocation.getCurrentPosition(p => { WX.city = '내 위치'; WX.lat = +p.coords.latitude.toFixed(1); WX.lon = +p.coords.longitude.toFixed(1); wxSave(); route(); wxFetch(true); },
-      () => { toast('위치를 못 받았어요 — 도시를 골라 주세요'); route(); }, { timeout: 8000, maximumAge: 600000 });
+      () => { toast('위치를 못 받았어요 — 도시를 골라 주세요'); route(); }, { enableHighAccuracy: false, timeout: 8000, maximumAge: 600000 });   /* 날씨에는 대략 위치면 된다 — 정밀 위치는 묻지 않는다 */
     return;
   }
   WX.city = v; WX.failAt = 0; wxSave(); route(); wxFetch(true);
@@ -3927,12 +3931,12 @@ function tick(id, t){ const arr = takenSet(); const key = id + '@' + t; const i 
 let NOTI_TIMERS = [];
 /* 알림 띄우기 — 서비스워커가 있으면 그쪽으로(안드로이드는 이것만 된다), 없으면 예전 방식.
    「먹었어요」 단추를 달아 알림에서 바로 체크할 수 있게 한다(메디세이프와 같은 자리). */
-async function showNote(title, body, key){
+async function showNote(title, body, key, day){
   try {
     const reg = navigator.serviceWorker && await navigator.serviceWorker.getRegistration();
     if (reg && reg.showNotification) {
       await reg.showNotification(title, { body, tag: key, renotify: true, requireInteraction: true, icon: 'icon-192.png', badge: 'icon-192.png',
-        data: { key }, actions: [{ action: 'took', title: '먹었어요' }, { action: 'open', title: '열기' }] });
+        data: { key, day: day || todayKey() }, actions: [{ action: 'took', title: '먹었어요' }, { action: 'open', title: '열기' }] });
       return;
     }
   } catch (e) {}
@@ -3947,15 +3951,27 @@ const plug = n => (NATIVE && CAPX.Plugins && CAPX.Plugins[n]) || null;
 /* 2026-10-13 상용화 점검 — 설치 앱(웹뷰)에는 navigator.share 가 없어 「보내기」가 늘 복사로만 빠졌다. 앱에서는 Share 플러그인으로 공유 창을 연다. 취소하면 throw(부르는 쪽 try 가 받음). */
 async function shareOut(o){ const SH = plug('Share'); if (SH) { await SH.share({ title:o.title, text:o.text, dialogTitle:'어디로 보낼까요' }); return true; } if (navigator.share) { await navigator.share(o); return true; } return false; }
 let NATIVE_PERM = 'prompt', NATIVE_EXACT = 'granted', NATIVE_READY = null;
+/* 알림 글(5-14) — 잠금 화면·옆 사람에게 약 이름이 보이지 않게, 기본은 「언제 드실 약」만 쓴다(형제 앱 「곁에」도 잠금 화면에 병명 금지).
+   알림 방법 칸에서 「알림에 약 이름 보이기」를 켜신 분만 약 이름까지 적는다. */
+const noteName = () => !!ME.notename;
+function noteBody(d, t, again){
+  const w = SLOT_WORD[t] ? `${SLOT_WORD[t]} ${t}` : t;
+  if (!noteName()) return again ? `${w}에 드실 약이 아직이에요. 드셨으면 「먹었어요」를 눌러 주세요.` : `${w} — 약 드실 시간이에요. 눌러서 확인해 주세요.`;
+  return (again ? `${d.name} — ${t}에 드실 약이에요. 드셨으면 「먹었어요」를 눌러 주세요.` : `${d.name} — ${d.simple || ''}`).slice(0, 120);
+}
+const noteNameRow = () => `<div class="toggle"><div class="t"><b>알림에 약 이름 보이기</b><span>${noteName() ? '켜져 있어요 — 잠금 화면에도 약 이름이 보일 수 있어요' : '꺼 두면 잠금 화면·옆 사람에게 약 이름 없이 「약 드실 시간이에요」만 보여요'}</span></div><button class="sw ${noteName() ? 'on' : ''}" role="switch" aria-checked="${noteName()}" aria-label="알림에 약 이름 보이기" onclick="setNoteName(!noteName())"></button></div>`;
+function setNoteName(on){ ME.notename = !!on; saveMe(); armNotifications(); route(); }
 async function nativeSetup(){
   const LN = plug('LocalNotifications'); if (!LN) return;
   try {
-    await LN.createChannel({ id: 'dose', name: '복용 알림', description: '약 드실 시간을 알려 드려요', importance: 5, visibility: 1, vibration: true, lights: true, lightColor: '#0B6E8F' });
+    /* 잠금 화면에서는 내용을 숨기는 갈래(visibility 0 = 비공개)로 — 안드로이드 갈래 설정은 만든 뒤 못 바꾸니 새 이름(dose2)으로 만들고 옛 갈래는 지운다(5-14) */
+    await LN.createChannel({ id: NOTE_CH, name: '복용 알림', description: '약 드실 시간을 알려 드려요', importance: 5, visibility: 0, vibration: true, lights: true, lightColor: '#0B6E8F' });
+    try { if (LN.deleteChannel) await LN.deleteChannel({ id: 'dose' }); } catch (e) {}
     await LN.registerActionTypes({ types: [{ id: 'dose', actions: [{ id: 'took', title: '먹었어요' }, { id: 'later', title: '10분 뒤 다시' }] }] });
     LN.addListener('localNotificationActionPerformed', ev => {
       const n = ev && ev.notification || {}; const key = n.extra && n.extra.key;
       if (ev.actionId === 'later') { nativeSnooze(n); return; }
-      if (ev.actionId === 'took') tickFromNote(key);
+      if (ev.actionId === 'took') tickFromNote(key, n.extra && n.extra.day);
       go(n.extra && n.extra.vitals ? '/vitals' : n.extra && n.extra.visit ? '/visits' : '/schedule'); route();
     });
     NATIVE_PERM = (await LN.checkPermissions()).display;
@@ -3964,54 +3980,79 @@ async function nativeSetup(){
 }
 async function nativeSnooze(n){
   const LN = plug('LocalNotifications'); if (!LN) return;
-  try { await LN.schedule({ notifications: [{ id: 900000 + Math.floor(Math.random() * 90000), title: n.title || '약지도 · 약 드실 시간', body: n.body || '', channelId: 'dose', actionTypeId: 'dose', extra: n.extra || {},
+  try { await LN.schedule({ notifications: [{ id: 900000 + Math.floor(Math.random() * 90000), title: n.title || '약지도 · 약 드실 시간', body: n.body || '', channelId: NOTE_CH, actionTypeId: 'dose', extra: n.extra || {},
     isExactNotification: NATIVE_EXACT === 'granted', schedule: { at: new Date(Date.now() + 10 * 60000), allowWhileIdle: true } }] });
     toast('10분 뒤에 다시 알려 드릴게요'); } catch (e) {}
 }
+const NOTE_CH = 'dose2';
+let NATIVE_ARMING = null, NATIVE_ARM_AGAIN = false;
+/* 여러 곳(체크·시간 바꾸기·복귀)에서 동시에 불려도 한 번에 하나만 — 겹치면 지우고 거는 순서가 꼬인다 */
 async function nativeArm(){
+  if (NATIVE_ARMING) { NATIVE_ARM_AGAIN = true; return NATIVE_ARMING; }
+  NATIVE_ARMING = (async () => { do { NATIVE_ARM_AGAIN = false; await nativeArmOnce(); } while (NATIVE_ARM_AGAIN); })();
+  try { await NATIVE_ARMING; } finally { NATIVE_ARMING = null; }
+}
+/* 2026-10-13 상용화 점검 1-03 — 매일 반복(on) 알림은 둘째 날부터 플러그인이 «깨우지 않는» 알람으로 다시 걸어,
+   밤새 둔 폰(도즈)에서는 아침 약 알림이 폰을 집어 들 때까지 늦어졌다. 그래서 앞으로 며칠치를 «한 번짜리(at)·allowWhileIdle»로 미리 건다.
+   · 휴대폰 알람 한도(앱당 500개)를 넘지 않게 날 수를 정한다(최대 7일). 앱을 열 때·돌아올 때·체크할 때마다 다시 건다.
+   · 번호는 「몇 번째 복용 × 며칠째」로 정해 다시 걸어도 같은 알림은 같은 번호. 이번에 안 거는 옛 번호는 지운다.
+   · 미리 「먹었어요」를 누른 회차는 그날 제시간 알림도 걸지 않는다(1-17 — 한 번 더 드시는 일 막기).
+   · 마지막 날 저녁에 「약지도를 한 번 열어 주세요」 — 그 뒤로는 알림이 걸려 있지 않으니까. */
+async function nativeArmOnce(){
   const LN = plug('LocalNotifications'); if (!LN) return;
   await (NATIVE_READY = NATIVE_READY || nativeSetup());
   try {
     const pend = (await LN.getPending()).notifications || [];
     const ours = pend.filter(p => p.id < 900000);                  /* 「10분 뒤 다시」는 그대로 둔다 */
-    if (ours.length) await LN.cancel({ notifications: ours.map(p => ({ id: p.id })) });
-    if (NATIVE_PERM !== 'granted') return;
+    if (NATIVE_PERM !== 'granted') { if (ours.length) await LN.cancel({ notifications: ours.map(p => ({ id: p.id })) }); return; }
     const exact = NATIVE_EXACT === 'granted', list = [], now = Date.now(); let id = 1;
-    for (const d of takingItems()) for (const t of schedOf(d.id, d)) {
+    const doses = []; for (const d of takingItems()) for (const t of schedOf(d.id, d)) doses.push([d, t]);
+    const other = visits().length * 2 + ((ME.vitalRemind || {}).bp || []).length + takingItems().length * 2 + 2;
+    const DAYS = doses.length ? Math.max(1, Math.min(7, Math.floor((480 - other) / (doses.length * 2)))) : 0;
+    const taken = takenSet(); let lastAt = 0;
+    doses.slice(0, 2000).forEach(([d, t], i) => {
       const [h, m] = t.split(':').map(Number); const key = d.id + '@' + t;
-      list.push({ id: id++, title: '약지도 · 약 드실 시간', body: `${d.name} — ${d.simple || ''}`.slice(0, 120), channelId: 'dose', actionTypeId: 'dose',
-        extra: { key }, isExactNotification: exact, schedule: { on: { hour: h, minute: m }, allowWhileIdle: true } });
-      for (let k = 0; k < 7; k++) {
-        const at = new Date(); at.setDate(at.getDate() + k); at.setHours(h, m + 30, 0, 0);
-        if (at.getTime() <= now) continue;
-        if (k === 0 && takenSet().includes(key)) continue;             /* 오늘 이미 드셨으면 다시 묻지 않는다 */
-        list.push({ id: id++, title: '아직 안 드셨어요', body: `${d.name} — ${t}에 드실 약이에요. 드셨으면 「먹었어요」를 눌러 주세요.`.slice(0, 120), channelId: 'dose', actionTypeId: 'dose',
-          extra: { key, again: dayKey(at) }, isExactNotification: exact, schedule: { at, allowWhileIdle: true } });
+      for (let k = 0; k < DAYS; k++) {
+        const at = new Date(); at.setDate(at.getDate() + k); at.setHours(h, m, 0, 0);
+        const again = new Date(at.getTime() + 30 * 60000), day = dayKey(at);
+        if (k === 0 && taken.includes(key)) continue;                    /* 오늘 이미 드셨으면 제시간·30분 뒤 둘 다 걸지 않는다 */
+        if (at.getTime() > now) { list.push({ id: 1 + i * 20 + k, title: '약지도 · 약 드실 시간', body: noteBody(d, t), channelId: NOTE_CH, actionTypeId: 'dose',
+          extra: { key, day }, isExactNotification: exact, schedule: { at, allowWhileIdle: true } }); lastAt = Math.max(lastAt, at.getTime()); }
+        /* 30분이 지나도 체크가 없으면 한 번만 더 — 놓친 복용을 줄이는 가장 흔한 방법 */
+        if (again.getTime() > now) list.push({ id: 11 + i * 20 + k, title: '아직 안 드셨어요', body: noteBody(d, t, true), channelId: NOTE_CH, actionTypeId: 'dose',
+          extra: { key, day, again: day }, isExactNotification: exact, schedule: { at: again, allowWhileIdle: true } });
       }
-    }
+    });
+    id = 1 + Math.min(doses.length, 2000) * 20;
+    if (lastAt) { const at = new Date(lastAt + 60 * 60000);
+      list.push({ id: 599999, title: '약지도를 한 번 열어 주세요', body: '며칠 동안 앱을 안 여셔서, 이다음 복용 알림은 아직 걸려 있지 않아요. 열기만 하시면 다시 이어서 울려요.', channelId: NOTE_CH,
+        extra: { open: 1 }, isExactNotification: exact, schedule: { at, allowWhileIdle: true } }); }
     /* 진료 예약 — 전날 저녁 7시, 2시간 전 */
     for (const v of visits()) {
       const at = new Date(v.at); const eve = new Date(at); eve.setDate(eve.getDate() - 1); eve.setHours(19, 0, 0, 0);
       const pre = new Date(at.getTime() - 2 * 3600000);
       for (const [when, title, body] of [[eve, '내일 진료가 있어요', `${visitWord(v)} — 내 약 한 장·혈압 수첩을 챙기세요.`], [pre, '2시간 뒤 진료예요', `${visitWord(v)} — 드시는 약 목록을 챙기세요.`]]) {
         if (when.getTime() <= now) continue;
-        list.push({ id: 600000 + id++, title, body: body.slice(0, 120), channelId: 'dose', extra: { visit: v.id }, isExactNotification: exact, schedule: { at: when, allowWhileIdle: true } });
+        list.push({ id: 600000 + id++, title, body: body.slice(0, 120), channelId: NOTE_CH, extra: { visit: v.id }, isExactNotification: exact, schedule: { at: when, allowWhileIdle: true } });
       }
     }
     /* 혈압 재기 알림 — 수첩에서 켜 두신 분만. 지침의 «아침·저녁» 측정에 맞춘다 */
     for (const t of ((ME.vitalRemind || {}).bp || [])) { const [h, m] = t.split(':').map(Number);
       list.push({ id: 700000 + id++, title: '약지도 · 혈압 잴 시간', body: t < '12:00' ? '일어나 1시간 안, 소변 본 뒤, 혈압약 먹기 전에 재 주세요.' : '잠자기 전에 재 주세요. 앉아서 몇 분 쉰 뒤에요.',
-        channelId: 'dose', extra: { vitals: 'bp' }, isExactNotification: exact, schedule: { on: { hour: h, minute: m }, allowWhileIdle: true } }); }
+        channelId: NOTE_CH, extra: { vitals: 'bp' }, isExactNotification: exact, schedule: { on: { hour: h, minute: m }, allowWhileIdle: true } }); }
     /* 약이 떨어지기 전에 — 남은 알 수를 넣어 두신 약만. 3일치·1일치 남는 날 아침 9시에 한 번씩(메디세이프의 「리필 알림」 자리) */
     for (const d of takingItems()) {
       const dl = daysLeft(d.id); if (dl == null) continue;
       for (const left of [3, 1]) {
         const at = new Date(); at.setDate(at.getDate() + (dl - left)); at.setHours(9, 0, 0, 0);
         if (dl < left || at.getTime() <= now) continue;
-        list.push({ id: 800000 + id++, title: left === 1 ? '약이 오늘 치만 남았어요' : '약이 3일치 남았어요', body: `${d.name} — 주말·연휴 전에 미리 받아 두세요.${(d.quick || (d.pub && d.pub.rx)) ? ' 처방약이면 진료를 미리 잡아 두세요.' : ''}`.slice(0, 120),
-          channelId: 'dose', extra: { stock: d.id }, isExactNotification: false, schedule: { at, allowWhileIdle: true } });
+        list.push({ id: 800000 + id++, title: left === 1 ? '약이 오늘 치만 남았어요' : '약이 3일치 남았어요', body: `${noteName() ? d.name : '드시는 약 하나가 곧 떨어져요'} — 주말·연휴 전에 미리 받아 두세요.${(d.quick || (d.pub && d.pub.rx)) ? ' 처방약이면 진료를 미리 잡아 두세요.' : ''}`.slice(0, 120),
+          channelId: NOTE_CH, extra: { stock: d.id }, isExactNotification: false, schedule: { at, allowWhileIdle: true } });
       }
     }
+    /* 이번에 다시 걸지 않는 옛 알림만 지운다 — 같은 번호는 schedule 이 덮어쓴다 */
+    const keep = new Set(list.map(x => x.id)), stale = ours.filter(p => !keep.has(p.id));
+    if (stale.length) await LN.cancel({ notifications: stale.map(p => ({ id: p.id })) });
     if (list.length) await LN.schedule({ notifications: list });
   } catch (e) { console.warn('알림을 걸지 못했습니다', e); }
 }
@@ -4029,13 +4070,36 @@ async function askExact(){
 function nativeInit(){
   if (!NATIVE) return;
   const App = plug('App');
-  App && App.addListener('backButton', () => { if ((location.hash || '#/') === '#/' || location.hash === '#/home') App.exitApp(); else history.back(); });
-  App && App.addListener('resume', () => { rollDay(); nativeArm(); route(); });
+  App && App.addListener('backButton', () => { if (DLG_DONE) { DLG_DONE(null); return; }   /* 확인 창이 열려 있으면 닫기만 */
+    if ((location.hash || '#/') === '#/' || location.hash === '#/home') App.exitApp(); else history.back(); });
+  App && App.addListener('resume', () => dayCheck(true));   /* 돌아올 때마다 오늘 계획·알림(앞으로 며칠치)·화면을 다시 */
+  /* 메일 링크·소셜 로그인에서 앱으로 돌아올 때(app.yakjido://login, https://yakjido.medinanum.com/…) — 주소 꼬리(#access_token…·type=recovery)를
+     이 앱의 주소 꼬리로 넘겨 계정 부품(srv.js)이 웹에서와 똑같이 처리하게 한다(1-15). 소셜 전용 처리가 있으면 그쪽에 먼저 맡긴다. */
+  App && App.addListener('appUrlOpen', ev => { try {
+    const url = String((ev && ev.url) || ''); if (!/^app\.yakjido:\/\/login|^https:\/\/yakjido\.medinanum\.com\//.test(url)) return;
+    const frag = url.includes('#') ? url.slice(url.indexOf('#') + 1) : (url.split('?')[1] || '');
+    const S = window.서버 || {}, rec = /(^|&)(type=recovery|error_code=|error=)/.test(frag);
+    /* 비밀번호 다시 정하기 링크 — srv.js 가 웹에서 쓰는 자리(sessionStorage yj_recovery)에 넣고 계정 칸을 열면 거기서 이어 간다 */
+    if (rec) { try { sessionStorage.setItem('yj_recovery', frag); } catch (e) {} if (typeof S.복구처리 === 'function') S.복구처리(); go('/me?t=set'); return; }
+    if (typeof S.소셜돌아옴 === 'function') { S.소셜돌아옴(url); return; }
+    if (/(^|&)(access_token|code|type)=/.test(frag)) { toast('메일 확인이 끝났어요 — 이메일과 비밀번호로 로그인해 주세요'); go('/me?t=set'); return; }
+    if (frag.startsWith('/')) go(frag);   /* 앱 화면 주소(#/drug/…)면 그 화면으로 */
+  } catch (e) {} });
   const Bar = plug('StatusBar');
   if (Bar) { const dark = matchMedia('(prefers-color-scheme: dark)').matches; try { Bar.setStyle({ style: dark ? 'DARK' : 'LIGHT' }); Bar.setBackgroundColor({ color: dark ? '#161A1C' : '#FAF8F3' }); } catch (e) {} }
   const Splash = plug('SplashScreen'); Splash && setTimeout(() => Splash.hide(), 150);
   (NATIVE_READY = nativeSetup()).then(route);
 }
+/* ── 자정·복귀(5-04) — 켜 둔 채 밤을 넘기면 다음 날 아침 홈이 어제 「모두 드셨어요」 그대로였고, 웹 알림도 다시 걸리지 않았다.
+   날이 바뀌었으면 오늘 계획을 적고(rollDay) 알림을 다시 걸고 화면을 새로 그린다. 화면으로 돌아올 때·1분마다 본다. */
+let DAY_NOW = todayKey();
+function dayCheck(force){
+  const k = todayKey(); if (!force && k === DAY_NOW) return;
+  DAY_NOW = k; try { rollDay(); } catch (e) {} try { armNotifications(); } catch (e) {} try { route(); } catch (e) {}
+}
+document.addEventListener('visibilitychange', () => { if (document.hidden) return; if (todayKey() !== DAY_NOW) dayCheck(); else if (!NATIVE) armNotifications(); });
+window.addEventListener('focus', () => dayCheck());
+setInterval(() => dayCheck(), 60000);
 function armNotifications(){
   NOTI_TIMERS.forEach(clearTimeout); NOTI_TIMERS = [];
   if (NATIVE) { nativeArm(); return; }
@@ -4044,18 +4108,25 @@ function armNotifications(){
   /* 화면에 「켜져 있는」 것과 실제 알림이 달라지지 않도록, 미리 골라 둔 시간도 함께 건다 */
   for (const d of takingItems()) for (const t of schedOf(d.id, d)) {
     const [h, m] = t.split(':').map(Number); const at = new Date(); at.setHours(h, m, 0, 0);
-    const key = d.id + '@' + t;
-    if (at > now) NOTI_TIMERS.push(setTimeout(() => { if (!takenSet().includes(key)) showNote('약지도 · 약 드실 시간', `${d.name} — ${d.simple || ''}`.slice(0, 120), key); }, at - now));
+    const key = d.id + '@' + t, day = dayKey(at);
+    if (at > now) NOTI_TIMERS.push(setTimeout(() => { if (!takenSet().includes(key)) showNote('약지도 · 약 드실 시간', noteBody(d, t), key, day); }, at - now));
     /* 30분이 지나도 체크가 없으면 한 번만 더 — 놓친 복용을 줄이는 가장 흔한 방법 */
     const again = new Date(at.getTime() + 30 * 60000);
-    if (again > now) NOTI_TIMERS.push(setTimeout(() => { if (!takenSet().includes(key)) showNote('아직 안 드셨어요', `${d.name} — ${t}에 드실 약이에요. 드셨으면 「먹었어요」를 눌러 주세요.`.slice(0, 120), key); }, again - now));
+    if (again > now) NOTI_TIMERS.push(setTimeout(() => { if (!takenSet().includes(key)) showNote('아직 안 드셨어요', noteBody(d, t, true), key, day); }, again - now));
   }
+  /* 자정을 넘기면 내일 알림을 다시 건다(켜 둔 채 밤을 넘겨도 다음 날 08:00 이 울리게) */
+  const mid = new Date(now); mid.setHours(24, 0, 1, 0);
+  NOTI_TIMERS.push(setTimeout(() => dayCheck(), mid - now));
 }
-/* 알림의 「먹었어요」 — 앱이 열려 있으면 메시지로, 닫혀 있었으면 #/schedule?tick= 으로 들어온다 */
-function tickFromNote(key){
-  if (!key) return; const arr = takenSet(); if (!arr.includes(key)) { arr.push(key); rollDay(); saveMe(); toast('먹었다고 적어 두었어요'); if (NATIVE) nativeArm(); }
+/* 알림의 「먹었어요」 — 앱이 열려 있으면 메시지로, 닫혀 있었으면 #/schedule?tick= 으로 들어온다.
+   그 알림의 «날짜»에 적는다(5-16) — 밤 10시 알림을 다음 날 아침에 누르면 오늘 저녁 약이 먹은 것으로 적히던 것. 오늘·어제가 아니면 적지 않는다. */
+function tickFromNote(key, day){
+  if (!key) return; const k = day || todayKey();
+  if (k !== todayKey() && k !== dayBefore(1)) { toast('지난 알림이라 기록하지 않았어요 — 복용 시간 화면에서 눌러 주세요'); return; }
+  ME.taken = ME.taken || {}; const arr = ME.taken[k] = ME.taken[k] || [];
+  if (!arr.includes(key)) { arr.push(key); rollDay(); saveMe(); toast(k === todayKey() ? '먹었다고 적어 두었어요' : '어제 기록으로 적어 두었어요'); if (NATIVE) nativeArm(); }
 }
-try { navigator.serviceWorker && navigator.serviceWorker.addEventListener('message', ev => { if (ev.data && ev.data.type === 'yakjido-tick') { tickFromNote(ev.data.key); go('/schedule'); route(); } }); } catch (e) {}
+try { navigator.serviceWorker && navigator.serviceWorker.addEventListener('message', ev => { if (ev.data && ev.data.type === 'yakjido-tick') { tickFromNote(ev.data.key, ev.data.day); go('/schedule'); route(); } }); } catch (e) {}
 async function askNoti(){ if (!('Notification' in window)) { toast('이 브라우저는 알림을 지원하지 않아요'); return; } const r = await Notification.requestPermission(); if (r === 'granted') { toast('알림을 켰어요 — 앱이 열려 있을 때 울려요'); armNotifications(); } else toast('알림이 꺼져 있어요'); route(); }
 function icsText(){
   const pad = n => String(n).padStart(2, '0'); const d0 = new Date(); const ds = `${d0.getFullYear()}${pad(d0.getMonth() + 1)}${pad(d0.getDate())}`;
@@ -4189,6 +4260,7 @@ function schedWarn(item){
    국내 「오늘의약」의 달력 기록, 해외 메디세이프의 복약 리포트가 이 자리를 메운다.
    비율(%) 대신 「30일 중 27일」로 적는다 — 자연빈도가 어르신께 훨씬 잘 읽힌다. */
 const DOW = ['일', '월', '화', '수', '목', '금', '토'];
+const CAL_MARK = { full: '✓', part: '◐', miss: '✕' };
 function calCard(){
   const today = new Date(todayKey() + 'T00:00:00');
   /* 오늘이 들어간 주의 토요일까지 채워 5주를 그린다 */
@@ -4204,8 +4276,10 @@ function calCard(){
     /* 오늘은 아직 끝나지 않았다 — 덜 드셨다고 «빠짐»으로 칠하면 억울하시다 */
     if (k === todayKey() && st !== 'full') st = 'soon';
     const stat = dayStat(k);
-    return `<div class="cal-d ${future ? 'fut' : st}${k === todayKey() ? ' cal-now' : ''}" ${future ? '' : `title="${d.getMonth() + 1}월 ${d.getDate()}일 — ${stat.plan ? `${stat.plan}번 중 ${Math.min(stat.done, stat.plan)}번` : LBL.none}"`}>
-      <span class="n">${d.getDate()}</span></div>`;
+    /* 색만으로 가르지 않게 — 칸 안에 모양(✓ 다 드심 · ◐ 일부 · ✕ 빠짐)을 함께, 화면낭독기에는 날짜별 글로(5-19) */
+    const say = future ? '' : `${d.getMonth() + 1}월 ${d.getDate()}일 — ${stat.plan ? `${LBL[st]}, ${stat.plan}번 중 ${Math.min(stat.done, stat.plan)}번` : LBL.none}`;
+    return `<div class="cal-d ${future ? 'fut' : st}${k === todayKey() ? ' cal-now' : ''}" role="listitem" ${future ? 'aria-hidden="true"' : `title="${say}" aria-label="${say}"`}>
+      <span class="n">${d.getDate()}</span>${!future && CAL_MARK[st] ? `<span class="cm" aria-hidden="true">${CAL_MARK[st]}</span>` : ''}</div>`;
   }).join('');
   const first = cells[0], last = new Date(today);
   const span = `${first.getMonth() + 1}월 ${first.getDate()}일 — ${last.getMonth() + 1}월 ${last.getDate()}일`;
@@ -4214,9 +4288,9 @@ function calCard(){
     : `<p style="margin-top:6px">아직 기록이 없어요. 위에서 시간을 고르고 드실 때마다 눌러 두시면 여기에 쌓입니다.</p>`}
   <div class="cal-span">${span}</div>
   <div class="cal-dow">${DOW.map(x => `<span>${x}</span>`).join('')}</div>
-  <div class="cal" role="img" aria-label="${a.days ? `지난 30일 중 ${a.days}일이 복용일이었고 ${a.full}일은 모두 드셨습니다` : '아직 복용 기록이 없습니다'}">${grid}</div>
+  <div class="cal" role="list" aria-label="${a.days ? `지난 30일 중 ${a.days}일이 복용일이었고 ${a.full}일은 모두 드셨습니다` : '아직 복용 기록이 없습니다'}">${grid}</div>
   ${slotLine()}
-  <div class="cal-key">${[['full', '다 드심'], ['part', '일부'], ['miss', '빠짐'], ['none', '정해 둔 것 없음'], ['cal-now', '오늘']].map(([c, n]) => `<span class="ki"><span class="k ${c}"></span>${n}</span>`).join('')}</div>
+  <div class="cal-key">${[['full', '다 드심'], ['part', '일부'], ['miss', '빠짐'], ['none', '정해 둔 것 없음'], ['cal-now', '오늘']].map(([c, n]) => `<span class="ki"><span class="k ${c}" aria-hidden="true">${CAL_MARK[c] || ''}</span>${n}</span>`).join('')}</div>
   <p class="small muted" style="margin-top:10px">진료 때 이 화면을 그대로 보여 주시면 됩니다. <b>못 드신 날을 탓하려고 만든 것이 아니에요</b> — 언제 왜 놓치시는지 의사·약사가 보면 약을 더 쉬운 쪽으로 바꿔 드릴 수 있어요.</p>
   </section>`
 }
@@ -4287,7 +4361,7 @@ function vDemo(_, q){
   ${disclaimer()}`;
 }
 function vSchedule(_, q){
-  if (q && q.tick) { tickFromNote(q.tick); setTimeout(() => { try { history.replaceState(null, '', '#/schedule'); } catch (e) {} }, 0); }
+  if (q && q.tick) { tickFromNote(q.tick, q.day); setTimeout(() => { try { history.replaceState(null, '', '#/schedule'); } catch (e) {} }, 0); }
   const taking = takingItems(); rollDay();
   const perm = ('Notification' in window) ? Notification.permission : 'unsupported';
   const now = new Date(); const nowMin = now.getHours() * 60 + now.getMinutes(); const taken = takenSet();
@@ -4322,10 +4396,19 @@ function vSchedule(_, q){
   ${taking.length ? `<div class="pane${schOn('sc4')}" id="sc4">` : ''}${NATIVE ? `<section class="sec card"><h2>알림 방법</h2>
     <div class="toggle"><div class="t"><b>휴대폰 알림</b><span>${NATIVE_PERM === 'granted' ? '켜져 있어요 — 앱을 닫아도, 휴대폰을 껐다 켜도 울려요' : NATIVE_PERM === 'denied' ? '꺼져 있어요 — 휴대폰 설정 → 앱 → 약지도 → 알림' : '허용하면 시간에 맞춰 알려드려요'}</span></div><button class="btn ghost" style="width:auto;min-height:46px;padding:0 14px" onclick="askNativeNoti()">${NATIVE_PERM === 'granted' ? '켜짐' : '켜기'}</button></div>
     ${NATIVE_PERM === 'granted' && NATIVE_EXACT !== 'granted' ? `<div class="toggle"><div class="t"><b>정확한 시각에 울리기</b><span>지금은 휴대폰이 몇 분 늦게 울릴 수 있어요. 「알람 및 리마인더」를 허용해 주세요</span></div><button class="btn ghost" style="width:auto;min-height:46px;padding:0 14px" onclick="askExact()">허용</button></div>` : ''}
-    <p class="small muted" style="margin-top:10px">알림의 <b>「먹었어요」</b>를 누르면 바로 체크돼요. <b>「10분 뒤 다시」</b>도 있어요. 30분이 지나도 체크가 없으면 <b>한 번 더</b> 알려 드려요.</p>
+    ${noteNameRow()}
+    <p class="small muted" style="margin-top:10px">알림의 <b>「먹었어요」</b>를 누르면 약지도가 열리며 바로 체크돼요. <b>「10분 뒤 다시」</b>도 있어요. 30분이 지나도 체크가 없으면 <b>한 번 더</b> 알려 드려요. 알림은 앞으로 며칠치를 미리 걸어 두고, 앱을 여실 때마다 이어서 다시 걸어요.</p>
+    <details class="why-more" style="margin-top:10px"><summary>알림이 늦거나 안 와요</summary><div class="why" style="margin-top:6px">
+      <p>휴대폰이 전기를 아끼려고 오래 안 연 앱의 알림을 늦추거나 막을 수 있어요. 한 번만 바꿔 두시면 돼요.</p>
+      <p style="margin-top:6px"><b>삼성 갤럭시</b> — 설정 → 배터리 → 백그라운드 사용 제한 → 「절전 안 함 앱」에 약지도를 넣어 주세요. 「절전 앱」·「깊은 절전 앱」 목록에 있으면 빼 주세요.</p>
+      <p style="margin-top:6px"><b>그 밖의 휴대폰</b> — 설정 → 앱 → 약지도 → 배터리 → 「제한 없음」(또는 「최적화하지 않음」)으로 바꿔 주세요.</p>
+      <p style="margin-top:6px"><b>정확한 시각</b> — 설정 → 앱 → 약지도 → 「알람 및 리마인더」를 허용해 두시면 몇 분씩 늦지 않아요.</p>
+      <p style="margin-top:6px">앱 정보에서 <b>「강제 중지」</b>를 누르시면 걸어 둔 알림이 모두 지워져요. 그랬다면 약지도를 한 번 열어 주세요 — 다시 걸려요.</p>
+    </div></details>
   </section>` : `<section class="sec card"><h2>알림 방법</h2>
     <div class="toggle"><div class="t"><b>앱이 열려 있을 때 알림</b><span>${perm === 'granted' ? '켜져 있어요' : perm === 'denied' ? '브라우저 설정에서 차단됨' : perm === 'unsupported' ? '이 브라우저는 지원하지 않아요' : '허용하면 시간에 맞춰 알려드려요'}</span></div><button class="btn ghost" style="width:auto;min-height:46px;padding:0 14px" onclick="askNoti()">${perm === 'granted' ? '켜짐' : '켜기'}</button></div>
     <div class="toggle"><div class="t"><b>휴대폰 달력에 매일 알림 넣기</b><span>앱을 닫아도 울려요. 파일을 열면 달력이 등록해요</span></div><button class="btn ghost" style="width:auto;min-height:46px;padding:0 14px" onclick="downloadIcs()">${I.clock} 받기</button></div>
+    ${noteNameRow()}
     <p class="small muted" style="margin-top:10px">알림의 <b>「먹었어요」</b>를 누르면 바로 체크돼요. 30분이 지나도 체크가 없으면 <b>한 번 더</b> 알려 드려요. 앱을 완전히 닫아 두시면 울리지 않으니, 그럴 땐 <b>달력 알림</b>을 함께 켜 두세요.</p>
   </section>`}${taking.length ? '</div>' : ''}` : ''}
   ${disclaimer('알림은 잊지 않도록 돕는 도구예요. 용량·간격은 약 상자와 약사·의사 지시가 우선이에요.')}`;

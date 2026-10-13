@@ -91,6 +91,9 @@ DETAIL = {'drugs': ['faq', 'sideFreq', 'lact', 'tips', 'interactions'],   # tips
 detail = {k: [{'id': o['id'], **{f: o[f] for f in fs if f in o}} for o in data[k] if any(f in o for f in fs)] for k, fs in DETAIL.items()}
 for k, fs in DETAIL.items():
     data[k] = [{f: v for f, v in o.items() if f not in fs} for o in data[k]]
+# 출처의 _memo(내부 검수 메모)는 앱에 싣지 않는다 — 원본에만 남김(2026-10-13 자체 검수 4-01)
+if isinstance(data.get('sources'), dict):
+    data['sources'] = {k: ({f: x for f, x in v.items() if not f.startswith('_')} if isinstance(v, dict) else v) for k, v in data['sources'].items()}
 inline, core = {}, {}
 for k, v in data.items():
     if k in SLIM:
