@@ -699,7 +699,14 @@ def parse_plus(path):
         if not n: continue
         if any('up' in (pg.get('class') or []) for pg in sol.find_parents('div')): n = 'u' + n   # 실력 다지기 해설은 따로
         ps = sol.find_all('p', recursive=False); wb = sol.select_one('.wrongbox')
-        sols[n] = {'explain': ' '.join(txt(x) for x in ps), 'wrong': ' '.join(txt(x) for x in wb.select('p')) if wb else ''}
+        wrong = ' '.join(txt(x) for x in wb.select('p')) if wb else ''
+        rub = sol.select_one('table.rubric')
+        if rub:   # 서술형 채점 기준 — 본책 해설(solutions)과 같은 꼴로 앱에(2026-10-13: 보강·실력 다지기 서술형에서 빠지던 것)
+            rows = [[txt(td) for td in tr.find_all('td')] for tr in rub.select('tr')]
+            crit = ' '.join(f'{r[0]} ({r[1]})' for r in rows if len(r) >= 2)
+            wt = txt(wb.select_one('.wt'), False) if wb and wb.select_one('.wt') else ''
+            wrong = crit + (f' — {wt}: {wrong}' if wrong else '')
+        sols[n] = {'explain': ' '.join(txt(x) for x in ps), 'wrong': wrong}
     for el in soup.select('.pq'):
         n = el.get('data-n'); typ = el.get('data-type', 'mc'); a = (el.get('data-answer') or '').strip()
         stem_el = el.select_one('.stem')
