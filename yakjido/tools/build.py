@@ -39,8 +39,13 @@ if (pub / 'pills-rx.json').exists() and (pub / 'pills.json').exists() and (pub /
     if _pm.exists():
         for _s, _n, _m, _r, _i in json.loads(_pm.read_text(encoding='utf-8')):
             if not _s or _s in _seen or _s in _oseq: continue
-            if _r: _seen.add(_s); _rxl.append([_n, _s, _m])
+            if _r == 1: _seen.add(_s); _rxl.append([_n, _s, _m])
             elif _nm(_n) not in _onm: _oseq.add(_s); _onm.add(_nm(_n)); _otc += 1; _rxl.append([_n, _s, _m, 0])
+    # 검색 때 받는 파일이라 가볍게(압축 576 → 약 400 KB, 10-14): 병원에서만 쓰는 주사·수액·검사 키트는 빼고(집에서 쓰는 펜형 주사는 남김),
+    _hosp = _r0.compile(r'주사(?!기)|주[0-9][0-9.]*\s*(?:밀리|그램|마이크로|단위|mg|g|mL|IU)|주\(|수액|키트|조영|투석액|관류액|흡입마취')
+    _keep = _r0.compile(r'펜|프리필드')
+    _rxl = [x for x in _rxl if not (_hosp.search(x[0]) and not _keep.search(x[0]))]
+    _rxl = [[x[0], x[1], ''] + x[3:] for x in _rxl]   # 회사 이름은 뺀다(같은 이름은 함량이 이름에 있어 구별된다) — 약 화면에서 낱알 자료로 보인다
     (pub / 'names-rx.json').write_text(json.dumps(_rxl, ensure_ascii=False, separators=(',', ':')), encoding='utf-8')
     data['public'].update({'prod_otc': _otc, 'prod_rx': sum(1 for x in _rxl if len(x) == 3)})
 # 낱알 사진은 식약처 서버 주소를 그대로 쓴다(저장 안 함). docs/yakjido/img/ 에 파일이 있을 때만 그것을 우선.
@@ -100,7 +105,7 @@ data['art'] = found
 # 화면 함수는 하나도 바꾸지 않아도 된다.
 SLIM = {
     'symptoms':    ['id', 'group', 'icon', 'name', 'short', 'tags', 'reviewed'],
-    'drugs':       ['id', 'name', 'en', 'class', 'rx', 'tagline', 'simple', 'for'],
+    'drugs':       ['id', 'name', 'class', 'rx', 'simple'],   # for(쓰임)도 본문으로 — 약 사전·검색은 본문이 오면 다시 그린다(10-14 화면 개편으로 첫 화면 226 KB)   # tagline 도 본문으로(증상·약 화면은 본문을 받은 뒤 그려진다, 10-14 첫 화면 예산)   # en(영어 이름)은 본문으로 — 첫 화면 목록엔 안 보인다(10-14 많이 찾는 약 타일로 224 KB 넘침)
     'supplements': ['id', 'name', 'en', 'tags', 'brands', 'evidence'],
     'classes':     ['id', 'name', 'short', 'icon'],
     'tips':        ['id', 'group', 'icon', 'title'],
@@ -110,7 +115,8 @@ CORE_KEYS = ['sources', 'ingredients', 'interactions', 'kids', 'productImages', 
 # 약 화면에서만 쓰는 칸(자주 묻는 질문·부작용 빈도)은 data/detail.json 으로 한 번 더 뺀다.
 # 본문과 «동시에» 받기 시작하고, 약 화면만 이것까지 기다린다 — core.json 400 KB 예산(2026-10-04)
 DETAIL = {'drugs': ['faq', 'sideFreq', 'lact', 'tips', 'interactions', 'riskNote', 'sideEffects', 'stop'],   # sideEffects·stop: 약 화면(읽어 주기 포함)에서만 — 10-14 투석·출처 보강으로 core 401 KB   # tips·interactions: 약 화면에서만(2026-10-13 검수 반영으로 core 400 KB) · riskNote: 약 화면 「부담 정도」 막대 아래 설명만(10-13 아이 나이 칸·병용 규칙 추가로 core 400 KB)
-          'supplements': ['foods', 'need', 'faq', 'evidenceNote', 'priceTip']}
+          'supplements': ['foods', 'need', 'faq', 'evidenceNote', 'priceTip'],
+          'classes': ['table', 'notes', 'verdict']}   # 계열 비교 화면에서만 — 10-14 쉬운 말·알아두면 좋은 것 보강으로 core 402 KB
 detail = {k: [{'id': o['id'], **{f: o[f] for f in fs if f in o}} for o in data[k] if any(f in o for f in fs)] for k, fs in DETAIL.items()}
 for k, fs in DETAIL.items():
     data[k] = [{f: v for f, v in o.items() if f not in fs} for o in data[k]]
@@ -146,14 +152,21 @@ if (_pd / 'pills.json').exists() and (_pd / 'easy-index.json').exists():
     _pi = json.loads(_pi.read_text(encoding='utf-8')) if _pi.exists() else {}
     for _x in _pl:
         if not _x.get('ingr') and _pi.get(_x.get('seq')): _x['ingr'] = '|'.join(_pi[_x['seq']]); _n += 1
+    import re as _rb; _r0b = _rb.compile('[가-힣]')
     _pm = ROOT / 'tools' / 'permits.json'   # 식약처 허가 목록의 주성분(품목기준코드가 같을 때만)
     if _pm.exists():
-        _pmi = {x[0]: x[4] for x in json.loads(_pm.read_text(encoding='utf-8')) if x[4]}
+        _pmi = {x[0]: x[4] for x in json.loads(_pm.read_text(encoding='utf-8')) if x[4] and _r0b.search(x[4])}   # 한글 성분만 — 허가 목록 칸은 영어라 성분 사전과 안 맞는다(10-14)
         for _x in _pl:
-            if not _x.get('ingr') and _pmi.get(_x.get('seq')): _x['ingr'] = _pmi[_x['seq']]; _n += 1
+            # 허가 목록의 한글 주성분이 있으면 그것이 원본이다 — 이름 끝 괄호는 맛 이름일 때가 있다(「트로앤텍트로키(페퍼민트)」가 페퍼민트 캡슐로 읽히던 것, 10-14)
+            if _pmi.get(_x.get('seq')) and _x.get('ingr') != _pmi[_x['seq']]: _x['ingr'] = _pmi[_x['seq']]; _n += 1
     if _n:
         (_pd / 'pills.json').write_text(json.dumps(_pl, ensure_ascii=False, separators=(',', ':')), encoding='utf-8')
         print(f'낱알 성분 채움 {_n}건(같은 품목기준코드 · 식약처 상세)')
+    if _pm.exists() and (_pd / 'pills-rx.json').exists():   # 처방약 낱알도 허가 목록의 한글 주성분으로(이름 괄호에 없는 복합 성분까지)
+        _pr = json.loads((_pd / 'pills-rx.json').read_text(encoding='utf-8')); _m = 0
+        for _x in _pr:
+            if _pmi.get(_x.get('seq')) and _x.get('ingr') != _pmi[_x['seq']]: _x['ingr'] = _pmi[_x['seq']]; _m += 1
+        if _m: (_pd / 'pills-rx.json').write_text(json.dumps(_pr, ensure_ascii=False, separators=(',', ':')), encoding='utf-8'); print(f'처방약 낱알 성분 {_m}건 허가 목록대로')
 jd = json.dumps(detail, ensure_ascii=False, separators=(',', ':'))
 # 본문 판(DATAV)은 core·detail·지연 로드 자료 내용의 해시 — 같은 날 두 번 빌드해도 내용이 바뀌면 휴대폰이 새 본문을 받는다(2026-10-13 자체 검수 5-02)
 _lazy = b''.join(f.read_bytes() for f in sorted((ROOT.parent / 'docs' / 'yakjido' / 'data').rglob('*.json')) if f.name not in ('core.json', 'detail.json') or f.parent.name != 'data')   # 지연 로드 자료도 바뀌면 판이 바뀐다(5-02)

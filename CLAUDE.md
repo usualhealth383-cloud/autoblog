@@ -16,6 +16,7 @@
 - **화면 원칙(2026-10-13 현욱님):** 내용은 많이 담되 한눈에 명료하게 — 결론·할 일·숫자만 펼치고 이유·근거·예외·연구 수치는 화살표(«자세히 ›») 접이 안으로. 지우지 말고 접는다.
 - 글 규칙: 해요체 · 영어 약자 금지 · 숫자와 단위 띄어 쓰기 · 빈도는 「100명 중 N명」 · 「전문의」 대신 「의사」 · « » 『 』 금지 · 「무료」 금지(7일 체험만 예외).
 - 검사: `python3 yakjido/tools/build.py` 뒤 `git checkout -- docs/yakjido/icon-maskable-512.png`, `python3 yakjido/tests/data.py`(자료·글 규칙·키 검사·용량 예산), `python3 yakjido/tests/run.py`(화면 315개, 25분 — 도는 동안 빌드 금지). 「완료」는 검사를 통과했을 때만.
+- **공공데이터(data.go.kr):** 현욱님 계정 키 하나를 저장소 Secrets `DATA_GO_KR_KEY` 로만 쓴다(캡처에 보여도 옮겨 적지 않음). 받기는 `yakjido/tools/fetch_mfds.py` · 작업 yakjido-data(`tools/data-refresh.txt` 를 바꿔 올리면 돈다). 승인된 것: 낱알식별·의약품 허가·의약외품 허가·e약은요·응급의료기관·병원정보(심평원)·식품영양성분·국가표준식품성분·기상청 단기예보·에어코리아 등. **필요한 자료가 있으면 언제든 현욱님께 말한다 — 신청해 주신다**(2026-10-14 현욱님).
 - ⛔ 비밀 키(service_role·sb_secret·DB 비밀번호)는 어디에도 쓰지 않는다. publishable 키는 메디나눔 공용 키 하나만(data.py 가 막음).
 - 메디나눔 공용 서버(gildongmu)는 네 앱과 같이 쓴다 — SQL 은 `yakjido/server/supabase/medinanum/`, 앱 목록 다섯 개 유지. 준비 안 된 서버 기능은 `meta` 스위치를 끈 채 넣는다.
 - 기존 완성 아티팩트(https://claude.ai/artifact/9hsGKmBcZHpL16LtNoxCnn)는 `yakjido/tools/mkart.py` 로 다시 짓고 같은 주소에 올린다.
