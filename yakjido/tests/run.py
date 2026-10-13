@@ -1357,8 +1357,10 @@ def main():
         if not _sm['dn'].startswith('8'): fails.append(f'남자를 고르면 철분 필요량이 8 mg이어야 합니다: {_sm}')
         if abs(_sm['y'] - _y0) > 40: fails.append(f'누구 기준을 고르면 화면이 튑니다: {_y0}→{_sm["y"]}')
         pg.evaluate("()=>{document.querySelector('details.pick-more').open=true}")
-        pg.fill('#c-amt', '60'); pg.wait_for_timeout(200)
-        if pg.inner_text('#c-pct').strip() != '100%': fails.append(f'접힌 칸 안 함량 계산기가 듣지 않습니다: {pg.inner_text("#c-pct")}')
+        _base = pg.evaluate("()=>{const s=(D.supplements||[]).find(x=>x.id==='iron');return s&&s.calc&&(s.calc.typical||s.calc.base)||0}")   # 계산 기준은 자료에서(10-14 예방 15 mg 으로 바뀜 — 숫자를 박아 두지 않음)
+        _base = _base if isinstance(_base, (int, float)) and _base > 0 else 15
+        pg.fill('#c-amt', str(_base)); pg.wait_for_timeout(200)
+        if pg.inner_text('#c-pct').strip() != '100%': fails.append(f'접힌 칸 안 함량 계산기가 듣지 않습니다(기준 {_base} mg): {pg.inner_text("#c-pct")}')
         for _r in ['/supp/coq10', '/supp/lutein', '/supp/multi']:
             pg.goto(url + '#' + _r); pg.reload(); ready(); pg.wait_for_timeout(600)
             _o = pg.evaluate(OVERFLOW_JS)
