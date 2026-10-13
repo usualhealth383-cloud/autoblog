@@ -750,6 +750,9 @@ button,.tab,.btn,.chip,.chipbar button,.seg button{-webkit-user-select:none;user
 .pass .row dt{color:var(--muted);flex:0 0 44px}
 .pass .row dd{color:var(--body);flex:1}
 .pass .row dd b{color:var(--ink);font-weight:700}
+.dplus details.plusd{border:1px solid var(--line);border-radius:var(--r-m);background:var(--card);margin:0 0 8px}.dplus summary{padding:12px 14px;font-weight:700;font-size:var(--t-small);color:var(--ink);cursor:pointer;min-height:44px}
+.dplus .pbody{padding:0 14px 12px;font-size:var(--t-small);line-height:1.8;color:var(--body);word-break:keep-all}.dplus .pbody p{margin:0 0 8px}.dplus .pbody figure{margin:8px 0}.dplus .pbody figure svg{width:100%;height:auto}
+.dplus .pkey{background:var(--brand-soft);color:var(--brand-dark);border-radius:var(--r-s);padding:8px 10px;font-weight:700;margin-top:6px}
 .joinqr{width:210px;max-width:70%;margin:8px auto 0;background:#fff;padding:8px;border-radius:var(--r-m);border:1px solid var(--line)}.joinqr svg{display:block;width:100%;height:auto}
 .enform{display:flex;flex-direction:column;gap:8px}.fullin{display:block;width:100%;margin:8px 0;border:1.5px solid var(--line);border-radius:var(--r-s);padding:12px 14px;font-size:var(--t-body);font-family:inherit;background:var(--paper);color:var(--ink)}
 .enform input:not([type=checkbox]),.enform select{width:100%;border:1.5px solid var(--line);border-radius:var(--r-s);padding:12px 14px;font-size:var(--t-body);font-family:inherit;background:var(--paper);color:var(--ink)}
@@ -3294,6 +3297,7 @@ function dThinkHtml(c){
       <p class="exans"><span class="k">답</span> ${rich(x.example.answer)}</p>
       ${x.follow ? `<div class="follow"><span class="k">따라 풀기</span><p class="q">${rich(x.follow.q)}</p>
         <details class="reveal"><summary>답 보기</summary><p><b>${rich(x.follow.answer)}</b>${x.follow.explain ? ` — ${rich(x.follow.explain)}` : ''}</p></details></div>` : ''}</div>`;
+  if (x.plus && x.plus.length) h += `<div class="sec dplus"><h2>시험에 나오는 보강</h2>${x.plus.map(p => `<details class="plusd"><summary>${esc(p.t)}</summary><div class="pbody">${p.h}</div></details>`).join('')}</div>`;
   return h;
 }
 function dThinkFill(){ const c = CONCEPTS[detailIdx], el = document.getElementById('dThink'), b = document.getElementById('dMoreBtn'); if (!c || !el) return;

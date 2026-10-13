@@ -13,6 +13,12 @@ concepts = json.loads((ROOT / 'data/concepts.json').read_text(encoding='utf-8'))
 # 2026-10-07: 앱 파일 한도(1,700 KB) 때문에 나중에 받는 more-*.json 으로 옮겼다 — 본문을 펼친 안쪽에만 보이므로 첫 화면에 필요 없다(앱이 받으면 CONCEPTS[i].x 로 붙인다)
 _ex = json.loads((ROOT / 'data/concept_extras.json').read_text(encoding='utf-8'))
 extras = {c['id']: {k: ({kk: vv for kk, vv in v.items() if kk != 'src'} if isinstance(v, dict) else v) for k, v in _ex[c['id']].items()} for c in concepts if _ex.get(c['id'])}
+# 본책 '시험에 나오는 보강' 쪽(2026-10-13 완자 대조) — 개념 상세 안 '시험에 나오는 보강' 칸으로(data/plus.json, extract_bank.py 가 만든다)
+_pf = ROOT / 'data/plus.json'
+for _p in (json.loads(_pf.read_text(encoding='utf-8')) if _pf.exists() else []):
+    _cs = [c for c in concepts if c['lessonId'] == _p['lessonId']]
+    _c = next((c for c in _cs if int(c['no']) == int(_p['concept'] or 1)), _cs[0] if _cs else None)
+    if _c: extras.setdefault(_c['id'], {}).setdefault('plus', []).append({'t': _p['title'], 'h': _p['html']})
 quizzes = json.loads((ROOT / 'data/quizzes.json').read_text(encoding='utf-8'))
 bank = json.loads((ROOT / 'data/bank.json').read_text(encoding='utf-8'))
 labs = json.loads((ROOT / 'data/labs.json').read_text(encoding='utf-8'))
