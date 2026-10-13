@@ -82,9 +82,11 @@ async def main():
         assert await g.locator('#v-detail .dact .btn#markDone').count() == 1, "안 읽은 개념의 주 버튼이 '공부했음'이 아님"
         await g.click('#markDone'); await g.wait_for_timeout(300)
         assert await g.evaluate('S.read.includes(todayConcept().id)'), '공부했음을 눌렀는데 읽기 끝이 아님'
+        # 펼침 표시는 0.24초 움직임 뒤 지워진다 — 기계가 바쁘면 확인이 늦어 놓치므로, 붙는 순간을 기록해 둔다(시간 경합 없이)
+        await g.evaluate("window.__unf = false; new MutationObserver(() => { const e = document.getElementById('ps-blank'); if (e && e.classList.contains('unfold')) window.__unf = true; }).observe(document.body, { subtree:true, childList:true, attributes:true, attributeFilter:['class'] })")
         await g.click('#backList'); await g.wait_for_timeout(120)
         st = await state(g); assert st['now'] == 'ps-blank' and st['cls']['ps-read'] == 'done' and st['head'] == '1 / 3', st
-        assert await g.locator('#ps-blank.unfold').count() == 1, '다음 단계가 펼쳐지지 않음'
+        assert await g.evaluate('window.__unf'), '다음 단계가 펼쳐지지 않음'
         await g.wait_for_timeout(500); assert await g.locator('.ps.unfold').count() == 0, '움직임이 끝나도 클래스가 남음'
         assert '다 읽었어요' in await g.inner_text('#ps-read')
         await g.screenshot(path=f'{SC}/h02_after_read_light.png')
