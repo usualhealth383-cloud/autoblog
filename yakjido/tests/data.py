@@ -290,8 +290,10 @@ _idx = ROOT.parent / 'docs' / 'yakjido' / 'index.html'
 _core = ROOT.parent / 'docs' / 'yakjido' / 'data' / 'core.json'
 if _idx.exists():
     _b = _idx.read_bytes(); _gzkb = len(_gz.compress(_b, 6)) / 1024
-    if _gzkb > 220:
-        fails.append(f'첫 화면이 무겁습니다 — index.html 압축 {_gzkb:.0f} KB (한계 220 KB). 본문은 data/core.json 으로 빼야 합니다')
+    # 2026-10-13 220 → 224 KB: 복용 진행 고리·알약 그림·약국 쪽지 머리(디자인 리서치) +2 KB. 3G(초당 약 50 KB)에서 0.1초 미만.
+    #   본문은 이미 data/core.json 으로 뺐고(askdoc 대답·약 tips 도 이날 뺌), 남은 것은 화면 코드다.
+    if _gzkb > 224:
+        fails.append(f'첫 화면이 무겁습니다 — index.html 압축 {_gzkb:.0f} KB (한계 224 KB). 본문은 data/core.json 으로 빼야 합니다')
     if not _core.exists():
         fails.append('docs/yakjido/data/core.json 이 없습니다 — 빌드를 다시 돌리세요')
     else:
