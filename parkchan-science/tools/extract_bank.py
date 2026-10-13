@@ -706,6 +706,7 @@ def parse_plus(path):
             for x in stem_el.select('.blankline'): x.replace_with('＿＿＿')
         fig, data, table, source, choices, after = item_common(el, '.stem')
         stem = txt(stem_el) if stem_el else ''
+        if typ == 'ox': stem = re.sub(r'\(\s*O\s*,\s*X\s*\)\s*$', '', stem).strip()   # 바로바로 체크(101줄)와 같이 — 앱은 O/X 단추를 따로 그린다
         sol = sols.get(n, {}); cn = int(el.get('data-concept') or 0)
         answer = mark_no(a) if typ in ('mc', 'multi') else ('' if typ == 'essay' else a)
         items.append({'id': f'{code}-p{n}', 'lessonId': code, 'concept': lec_no(code, cn) if cn else 0, 'step': 2, 'type': typ,

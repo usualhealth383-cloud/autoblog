@@ -97,7 +97,7 @@ for ch in '«»『』':
     if ch in text: bad.append(f'금지 괄호 {ch}')
 
 print(f'{code} {path.parent.name}: 보강 쪽 {len(plus)} · 개념 {len(secs)} · 문항 {len(items)} {dict(types)}')
-for it in items: print(f'  {it["id"]} {it["type"]:5} 정답 {it["answer"]!s:6} 그림 {"○" if it["figure"] else "·"}  {re.sub(r"<[^>]+>", "", it["stem"])[:60]}')
+for it in items: print(f'  {it["id"]} {it["type"]:5} 정답 {it["answer"]!s:6} 그림 {"○" if it["figure"] else "·"}  {re.sub(r"</?[a-zA-Z][^>]*>", "", it["stem"])[:60]}')
 for w in warn: print('  ! ' + w)
 for b in bad: print('  ✗ ' + b)
 print('PLUS OK' if not bad else f'PLUS FAIL {len(bad)}')
