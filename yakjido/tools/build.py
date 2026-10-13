@@ -20,6 +20,22 @@ for p in sorted((ROOT / 'content').glob('*.json')):
 pub = ROOT.parent / 'docs' / 'yakjido' / 'data'   # 공공데이터는 import_public_data.py 가 여기에 직접 쓴다
 if (pub / 'meta.json').exists():
     data['public'] = json.loads((pub / 'meta.json').read_text(encoding='utf-8'))  # 건수·출처만 인라인, 본문은 data/ 로 지연 로드
+# 「제품 이름으로 찾기」가 제품 사전 357개만 세던 것 — 실제로는 e약은요·낱알식별의 약국 약과 처방약까지 이름으로 찾는다(2026-10-13 현욱님 「엄청 많을건데」).
+# 처방약 낱알 자료(5 MB)는 무거워 이름·품목코드·회사만 뽑은 names-rx.json 을 검색 때 받는다. 건수는 같은 품목기준코드를 한 번만 센다.
+if (pub / 'pills-rx.json').exists() and (pub / 'pills.json').exists() and (pub / 'easy-index.json').exists():
+    import re as _r0
+    _nm = lambda t: _r0.sub(r'\(.*?\)|[\s\-·.]', '', str(t or '')).lower()
+    _rx = json.loads((pub / 'pills-rx.json').read_text(encoding='utf-8'))
+    _ot = json.loads((pub / 'pills.json').read_text(encoding='utf-8'))
+    _ez = json.loads((pub / 'easy-index.json').read_text(encoding='utf-8'))
+    _seen, _rxl = set(), []
+    for _x in _rx:
+        if _x.get('seq') and _x['seq'] not in _seen: _seen.add(_x['seq']); _rxl.append([_x['n'], _x['seq'], _x.get('m', '')])
+    (pub / 'names-rx.json').write_text(json.dumps(_rxl, ensure_ascii=False, separators=(',', ':')), encoding='utf-8')
+    _oseq = {x['seq'] for x in _ot if x.get('seq')} | {x['seq'] for x in _ez if x.get('seq')}
+    _onm = {_nm(x['n']) for x in _ot} | {_nm(x['n']) for x in _ez if x.get('seq')}
+    _otc = len(_oseq) + len({_nm(x['n']) for x in _ez if not x.get('seq') and _nm(x['n']) not in _onm})
+    data['public'].update({'prod_otc': _otc, 'prod_rx': len(_rxl)})
 # 낱알 사진은 식약처 서버 주소를 그대로 쓴다(저장 안 함). docs/yakjido/img/ 에 파일이 있을 때만 그것을 우선.
 imgdir = ROOT.parent / 'docs' / 'yakjido' / 'img'
 for v in (data.get('productImages') or {}).values():
@@ -135,6 +151,9 @@ out = shell.replace('<!--DATA-->', j).replace('__BUILD__', stamp).replace('__DAT
 # 첫 화면 압축 225 → 192 KB. 줄 중간·코드 뒤의 주석은 건드리지 않는다(문자열 안일 수 있어서).
 import re as _re
 out = _re.sub(r'(?m)^[ \t]*/\*(?:(?!\*/).)*?\*/[ \t]*\n', '', out, flags=_re.S)
+# 줄 앞 들여쓰기도 뺀다(압축 약 2 KB) — 화면 글은 HTML 이 빈칸을 접고, 줄바꿈을 살리는 칸(pre-line)도 줄 앞 빈칸은 버린다.
+# 들여쓰기가 뜻을 갖는 글(pre·pre-wrap)은 셸에 없다(2026-10-13, 제품 이름 검색 확대로 첫 화면 225 KB → 예산 224 KB)
+out = _re.sub(r'(?m)^[ \t]+', '', out)
 pages = ROOT.parent / 'docs' / 'yakjido'
 pages.mkdir(parents=True, exist_ok=True)
 (pages / 'index.html').write_text(out, encoding='utf-8')

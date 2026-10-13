@@ -484,6 +484,50 @@ def z7_checks(br, url, fails):
     if zerr: fails.append(f'Z7: JS 오류 {zerr[:2]}')
     pz.close()
 
+# Z10(현욱님 10-14 답 넷 + R1 앱 연결) — 아이 화상 응급 선 · 자일리톨 껌·경구수액 수유 · 철분 + 제산제(다른 항목만) · 코엔자임 Q10 + 와파린 ·
+#   집 혈압 낮은 기준(90/60) · 설사 약국 카드에 스멕타이트 + 트리메부틴 함께(현욱님 10-14) · 테트라사이클린 카드 한 장
+def z10_checks(br, url, fails):
+    zerr = []
+    pz = br.new_page(viewport={'width': 390, 'height': 844}); pz.on('pageerror', lambda e: zerr.append(str(e)))
+    pz.add_init_script("localStorage.setItem('yakjido.hello.v1','1')")
+    pz.goto(url + '#/home'); pz.wait_for_function("()=>typeof CORE!=='undefined' && CORE===2", timeout=20000)
+    def go(h):
+        pz.evaluate("h=>{ location.hash=h; route(); }", h); pz.wait_for_timeout(100)
+    pz.evaluate("()=>{ ME.taking=[]; ME.vitals=[]; saveMe(); }")
+    go('/symptom/burn')
+    if '어른 손바닥 3개·아이 2개 넓이를 넘는 화상' not in pz.evaluate("()=>document.querySelector('#sp2')?.textContent||''"): fails.append('화상 병원 갈 때 — 응급 칸에 「어른 손바닥 3개·아이 2개」가 없습니다')
+    for did, want in [('xylitol-gum', '보통 양은 괜찮은 편'), ('ors', '몸에 원래 있는 소금·포도당')]:
+        go('/drug/' + did)
+        try: pz.wait_for_selector('.lact', state='attached', timeout=8000)
+        except Exception: pass
+        t = pz.evaluate("()=>document.querySelector('.lact')?.textContent||''")
+        if '수유 중 괜찮은 편' not in t or want not in t: fails.append(f'{did} 수유 칸이 「괜찮은 편」이 아닙니다: {t[:60]}')
+    ix = lambda tk: pz.evaluate("t=>{ ME.taking=t; saveMe(); return ixRun().hits.map(h=>h.r.id); }", tk)
+    if 'iron-antacid' in ix(['supp:iron']): fails.append('철분 영양제 하나만으로 「철분 + 제산제」 카드가 뜹니다')
+    if 'iron-antacid' in ix(['supp:iron', 'supp:calcium']): fails.append('철분 + 칼슘 영양제에 「철분 + 제산제」 카드가 뜹니다(칼슘 카드가 따로 있음)')
+    if 'iron-antacid' not in ix(['supp:iron', 'almagate']): fails.append('철분 영양제 + 알마게이트에 「철분 + 제산제」 카드가 없습니다')
+    h = ix(['cls:blood.warf', 'supp:coq10'])
+    if 'warfarin-coq10' not in h: fails.append('와파린 + 코엔자임 Q10 카드가 없습니다')
+    elif pz.evaluate("()=>{ const r=ixRun().hits.find(h=>h.r.id==='warfarin-coq10').r; return r.lv==='info' && r.badge==='알아 두기' && /수치를 확인/.test(r.do); }") is not True: fails.append('와파린 + 코엔자임 Q10 카드가 「알아 두기」 info 가 아니거나 문장이 다릅니다')
+    if 'warfarin-coq10' in ix(['supp:coq10']) or 'warfarin-coq10' in ix(['cls:blood.warf']): fails.append('와파린 + 코엔자임 Q10 카드가 한쪽만으로 뜹니다')
+    h = ix(['cls:derm.tetra', 'almagate'])
+    if 'tetra-mineral' not in h or 'sx-tetra' in h: fails.append(f'테트라사이클린 + 제산제 — 정식 규칙 한 장이어야 합니다: {h}')
+    pz.evaluate("()=>{ ME.taking=[]; saveMe(); }")
+    def bp(s_, d_):
+        go('/vitals'); pz.evaluate("()=>{ VT.k='bp'; route(); }"); pz.fill('#vs', str(s_)); pz.fill('#vd', str(d_)); pz.click('button:has-text("적어 두기")'); pz.wait_for_timeout(150)
+        return pz.evaluate("()=>{ const n=document.querySelector('.bp-lo'); return n ? n.textContent + (n.querySelector('.src-chip') ? '#src' : '') : ''; }")
+    t = bp(85, 55)
+    if '90/60보다 낮아요' not in t or '#src' not in t: fails.append(f'혈압 85/55 — 낮은 혈압 안내·출처가 없습니다: {t[:60]}')
+    if pz.query_selector('.bp-lo a.call') or '119' in t: fails.append('낮은 혈압 안내에 119 가 붙습니다(조용한 안내여야)')
+    if bp(110, 70): fails.append('혈압 110/70 에 낮은 혈압 안내가 뜹니다')
+    ids = pz.evaluate("()=>{ const s=byId(D.symptoms,'diarrhea'); return showable(basketPicked(s,basket(s))).map(x=>x.d.id); }")
+    if 'smectite' not in ids or 'trimebutine' not in ids: fails.append(f'설사 약국 카드에 스멕타이트·트리메부틴이 함께 있지 않습니다: {ids}')
+    go('/show/diarrhea'); t = pz.evaluate("()=>document.querySelector('.show-list')?.innerText||''")
+    if '트리메부틴' not in t and '포리부틴' not in t: fails.append('설사 「약국에서 보여드리기」에 트리메부틴이 없습니다')
+    pz.evaluate("()=>{ ME.vitals=[]; VT.alert=null; saveMe(); }")
+    if zerr: fails.append(f'Z10 검사 JS 오류: {zerr[:2]}')
+    pz.close()
+
 # Z9(실사용 검수 3차 — 2026-10-14) — B6 아주 높은 혈당(현욱님: 식사·증상으로 나눠, 증상이면 119) · B7 영양제 ↔ 내 약통 ·
 #   B8 늦게 온 제품 목록이 계산기 칸을 지우지 않게 · C2 계산기 ** · C3 하루 최대 겹말 · C12 아이 처음 안내 · C13 당뇨 목표 · C14 탭 화살표
 def z9_checks(br, url, fails):
@@ -1154,6 +1198,7 @@ def main():
         alarm_z6(br, url, fails)
         z7_checks(br, url, fails)
         z9_checks(br, url, fails)
+        z10_checks(br, url, fails)
         # 6b-2. 성분표에 없던 공공 제품 — 클로닉신(먹는 소염제 26개 제품)·돔페리돈이 약통에서 실제로 걸려야 한다(2026-09-23)
         _pb = {'노리스정 + 와파린': ({'taking':['pub:1','cls:blood.warf'],'pub':{'pub:1':{'name':'노리스정','full':'노리스정(클로닉신리시네이트)','ingr':'클로닉신리시네이트','rx':0,'seq':'1','drugId':''}}}, 'warfarin-nsaid'),
                '노리스정 + 이부프로펜': ({'taking':['pub:1','ibuprofen'],'pub':{'pub:1':{'name':'노리스정','full':'노리스정','ingr':'클로닉신리시네이트','rx':0,'seq':'1','drugId':''}}}, 'nsaid-dup'),

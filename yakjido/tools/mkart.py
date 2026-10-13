@@ -41,6 +41,11 @@ s = s.replace(_a, "window.방침주소 = function(){ return 'https://usualhealth
 s = s.replace('''${NATIVE ? ' target="_blank" rel="noopener"' : ''}>개인정보처리방침</a>''', ''' target="_blank" rel="noopener">개인정보처리방침</a>''')
 # 아티팩트 화면은 Supabase 연결이 막혀 있다 — 되는 척 로그인 칸을 보이지 않고 「준비 중」 한 줄로(메디나눔 규칙: 안 되는 단추는 숨긴다)
 s = s.replace("D.meta.account === true); },", "false); },")
+# 아티팩트 화면은 바깥 그림(식약처 제품 사진)을 막는다 — 막힌 그림이 원래 크기의 빈 상자로 남아 약 사전 줄이 깨졌다(2026-10-13 현욱님 캡처, 진경제·소염진통제).
+# 아티팩트에서는 함께 실은 사진 판(ps)에 없는 바깥 주소 제품 사진은 쓰지 않고 갈래 그림·제형 그림으로 대신한다. 설치 앱·웹은 그대로 사진.
+_p = "const pimg = name => D.productImages?.[name]?.img || '';"
+assert _p in s, 'pimg 정의가 바뀌었습니다 — mkart.py 를 맞춰 주세요'
+s = s.replace(_p, "const pimg = name => { const u = D.productImages?.[name]?.img || ''; return /^https?:/i.test(u) && !(window.__PS && window.__PS[u] != null) ? '' : u; };")   # 사진 판(ps)에 있는 것만
 s = s.replace('<img src="art/${n}.webp"', '<img src="${ART_DATA[n] || ("art/" + n + ".webp")}"')
 # 아티팩트는 파일 하나라 서버가 없다 — 본문 자료(core.json)도 같이 심는다
 # 첫 화면 머리의 앱 표시(34px) — 아티팩트 호스트에는 icon-192.png 파일이 없어 깨진 그림이 나왔다(2026-09-23 현욱님 캡처)
@@ -56,7 +61,8 @@ inject = ('<script>const ART_DATA = ' + json.dumps(art) + ';\n'
           "window.__DETAIL__ = " + (ROOT/'data/detail.json').read_text(encoding='utf-8') + ';\n'
           "window.__PILLS__ = " + (ROOT/'data/pills.json').read_text(encoding='utf-8') + ';\n'
           "window.__EASY__ = "  + (ROOT/'data/easy-index.json').read_text(encoding='utf-8') + ';\n'
-          "window.__LEX__ = {ing:" + (ROOT/'data/lexicon.json').read_text(encoding='utf-8')
+          + ("window.__RXN__ = " + (ROOT/'data/names-rx.json').read_text(encoding='utf-8') + ';\n' if (ROOT/'data/names-rx.json').exists() else '')
+          + "window.__LEX__ = {ing:" + (ROOT/'data/lexicon.json').read_text(encoding='utf-8')
           + ",brand:" + (ROOT/'data/brands.json').read_text(encoding='utf-8')
           + ",qa:" + (ROOT/'data/qa.json').read_text(encoding='utf-8')
           + ",nut:" + (ROOT/'data/nutrients.json').read_text(encoding='utf-8')
@@ -64,7 +70,8 @@ inject = ('<script>const ART_DATA = ' + json.dumps(art) + ';\n'
 # 낱알·제품 사진 판(tools/pill_sprites.py)과 약학정보원 그림 표시·복약정보 조각을 함께 싣는다 — 아티팩트는 바깥 사진을 막아서(2026-09-30)
 SP = OUT.parent.parent / 'sprites'
 files = {}
-if (SP / 'ps.json').exists():
+# 사진 판 파일(ps/*.jpg)이 없는데 번호표(ps.json)만 실으면 사진 자리가 흰 빈칸으로 남는다(v167, 2026-10-13) — 둘 다 있을 때만
+if (SP / 'ps.json').exists() and any((SP / 'ps').glob('*.jpg')):
     inject += '<script>window.__PS = ' + (SP / 'ps.json').read_text(encoding='utf-8') + ';window.__PICTO_LOCAL = true;</script>\n'
     for f in sorted((SP / 'ps').glob('*.jpg')): files['ps/' + f.name] = str(f)
     # 그림 표시(픽토그램) — 복약정보에 나오는 것만 받아 둔다

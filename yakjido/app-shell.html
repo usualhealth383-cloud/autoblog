@@ -1772,7 +1772,16 @@ main>*:nth-child(2){animation-delay:.04s} main>*:nth-child(3){animation-delay:.0
 .kg-dur small{flex:none;min-width:5.5em;font-weight:800;color:var(--caution);font-size:.8125rem}.kg-dur span{font-size:.875rem;line-height:1.5;color:var(--text);min-width:0;overflow-wrap:anywhere}
 .psp{display:block;width:100%;aspect-ratio:140/76;background-size:800% 800%;background-repeat:no-repeat;background-color:#fff;border-radius:inherit}
 .pill-card .ph .psp,.pill-hero .ph .psp{width:100%;height:auto;aspect-ratio:140/76}
+.camv{position:fixed;inset:0;z-index:99;background:#000;display:flex;flex-direction:column;justify-content:center;gap:12px;padding:16px;color:#fff;text-align:center}
+.camv video{width:100%;max-height:72vh;object-fit:contain;border-radius:12px;background:#111}
+.camv .actions{justify-content:center}
 .psp.pillimg{flex:none;height:auto;aspect-ratio:140/76;align-self:center;border-radius:10px}
+/* 사진 판으로 바꿔 낀 제품 사진은 원래 자리 크기 그대로 — .psp 의 width:100% 가 .pimg(44px)를 이겨 약 사전 줄이 통째로 깨졌다(2026-10-13 현욱님 캡처).
+   사진 판 칸은 140×76 이라 정사각형에 넣으면 찌그러진다 — 폭만 정하고 높이는 비율대로 */
+.psp.pimg{flex:none;width:56px;height:auto;aspect-ratio:140/76;align-self:center;border:1px solid var(--hairline);border-radius:8px}
+.buy .buy-item .psp.pimg{width:52px;height:auto}
+.psp.wk-img{flex:none;width:40px;height:auto;aspect-ratio:140/76;border-radius:6px}
+.drug-photo .psp{flex:none;width:72px;height:auto;aspect-ratio:140/76;border-radius:10px;border:1px solid var(--hairline)}
 </style>
 
 <div class="app">
@@ -2826,8 +2835,7 @@ const SUPP_IX = [['sx-omega3', 'warn', [['anticoag', 'antiplt'], ['supp-omega3']
   ['sx-ginseng', 'warn', [['k:warfarin'], ['supp-ginseng']], '와파린에 홍삼이 더해졌어요', /홍삼.*와파린/],
   ['sx-vitk', 'warn', [['k:warfarin'], ['supp-multi']], '와파린에 종합비타민 — 비타민 K가 들었는지 라벨 확인', /비타민 K.*와파린/],
   ['sx-gluco', 'warn', [['k:warfarin'], ['joint-supp']], '와파린에 글루코사민이 더해졌어요', /와파린을 드시는 분/, 'glucosamine'],
-  ['sx-mela', 'warn', [['k:warfarin'], ['supp-melatonin']], '와파린에 멜라토닌이 더해졌어요', /와파린/, 'melatonin'],
-  ['sx-tetra', 'info', [['k:tetracycline'], ['antacid']], '이 항생제(테트라사이클린 계열)는 제산제·칼슘·철분과 시간을 띄우세요', /테트라사이클린/],
+  ['sx-mela', 'warn', [['k:warfarin'], ['supp-melatonin']], '와파린에 멜라토닌이 더해졌어요', /와파린·뇌/, 'melatonin'],
   ['sx-feca', 'info', [['supp-iron'], ['supp-calcium']], '철분과 칼슘은 시간을 띄우세요', /철 \+ 칼슘/],
   ['sx-mgkid', 'stop', [['supp-mg']], '콩팥이 안 좋으신데 마그네슘 영양제가 있어요', /신장 질환/, 'mg', ['kidney']]];
 function suppIxRules(){ const R = D.suppRules || {};
@@ -3037,7 +3045,9 @@ function achLine(extra){
   return `<p class="show-ach">${I.alert}<span>${items.length === 1 ? '항콜린 작용이 있는 성분이 있어요' : '항콜린 성분이 겹칩니다'} — <b>${big.slice(0, 4).map(x => esc(x.e.n)).join(', ')}</b>${big.length > 4 ? ` 외 ${big.length - 4}가지` : ''}. 부담이 덜한 것으로 바꿀 수 있을지 봐 주세요.</span></p>`;
 }
 const pimg = name => D.productImages?.[name]?.img || '';
-const imgTag = (src, cls, alt) => src ? `<img class="${cls}" src="${esc(src)}" alt="${esc(alt || '')}" loading="lazy" onerror="this.closest('.has-img')?.classList.remove('has-img');this.closest('.drug-photo')?.remove();this.remove()">` : '';
+/* 크기도 태그에 적어 둔다 — 겉 글꼴 규칙이 닿지 않는 화면에서도 사진이 원래 크기(수백 px)로 커져 줄을 깨지 않게(2026-10-13) */
+const IMG_WH = { pimg: [44, 44], 'wk-img': [40, 32], '': [72, 72] };
+const imgTag = (src, cls, alt) => src ? `<img class="${cls}" src="${esc(src)}" alt="${esc(alt || '')}" width="${(IMG_WH[cls] || IMG_WH.pimg)[0]}" height="${(IMG_WH[cls] || IMG_WH.pimg)[1]}" loading="lazy" onerror="this.closest('.has-img')?.classList.remove('has-img');this.closest('.drug-photo')?.remove();this.remove()">` : '';
 /* ── 사진이 없는 제품은 「생김새」를 그린다 ──
    식약처 제품 이미지 접속이 막혀 있어 96개 제품에 사진이 없다.
    빈칸을 두는 대신, 이름에서 읽은 제형으로 「약국에서 집어 들 물건」을 그려 준다. */
@@ -3496,6 +3506,10 @@ function search(q, noFix){
   (LEX.nut || []).forEach(x => { if (!m(x.n)) return; if (x.supp && haveS.has(x.supp)) return;
     out.push({ k:'영양제', c:'', t:x.n, d:esc0(x.what), h:'/nut/' + x.id, w:1 }); });
   (PUB.index || []).forEach(p => { if (m(p.n) || p.i.some(m)) out.push({ k:'식약처', c:'p', t:p.n, d:p.m + ' · ' + p.i.slice(0, 3).join(', '), h:'/pub/' + p.id, w:0 }); });
+  /* 제품 이름은 e약은요 4천여 개뿐 아니라 낱알식별 약국 약·처방약까지 — 「제품 357개」만 찾는 줄 아시던 것(2026-10-13 현욱님). 처방약은 약국 약 뒤에 */
+  if (PUB.pills) { if (!PUB.ezSeq) PUB.ezSeq = new Set((PUB.index || []).map(p => p.seq).filter(Boolean));
+    PUB.pills.forEach(p => { if (!PUB.ezSeq.has(p.seq) && m(p.n)) out.push({ k:'식약처', c:'p', t:p.n, d:p.m + (p.ingr ? ' · ' + p.ingr.split('|').slice(0, 3).join(', ') : ''), h:'/pillinfo/' + p.seq, w:-.2 }); }); }
+  (PUB.rxn || []).forEach(([n, seq, mk]) => { if (m(n)) out.push({ k:'처방약', c:'', t:n, d:(mk ? mk + ' · ' : '') + '병원 처방이 필요한 약', h:'/pillinfo/' + seq, w:-1 }); });
   /* 이름이 그 글자로 시작하면 위로 — "인사돌" 은 잇몸 증상(태그)보다 인사돌정(제품)이 먼저다 */
   /* 이름 안에 찾으신 말이 「들어 있으면」 태그로만 걸린 것보다 위로 —
      「목이 아파요」에 「근육·관절·허리 통증」(태그에 ‘목’)이 「인후통」보다 먼저 나오던 문제 */
@@ -3508,7 +3522,7 @@ function search(q, noFix){
      「열이 날 때」로 가야 한다(‘아이’가 구아이페네신 안에 우연히 들어 있어서 생긴 일). */
   const seen = new Set();
   /* 같은 제품이 제품 사전·식약처 목록·약 화면에서 「타이레놀콜드-에스정」「타이레놀 콜드-에스정」으로 겹쳐 나오던 것 — 띄어쓰기·붙임표·괄호를 떼고 한 줄로(3-12) */
-  const dkey = h => (['제품', '식약처'].includes(h.k) ? 'P' : h.k) + norm(String(h.t).replace(/\(.*?\)/g, '')).replace(/[-‐–]/g, '');
+  const dkey = h => (['제품', '식약처', '처방약'].includes(h.k) ? 'P' : h.k) + norm(String(h.t).replace(/\(.*?\)/g, '')).replace(/[-‐–]/g, '');
   const res = out.sort((a, b) => sc(b) - sc(a)).filter(h => { const k = dkey(h); if (seen.has(k) || (kidQ && kidBad(h))) return false; seen.add(k); return true; });
   /* 낱말을 「전부」 맞추라고 하면 한 낱말만 어긋나도 0건이 된다.
      그럴 땐 가장 긴 낱말 하나로 한 번 더 — 빈손으로 돌려보내지 않는다. */
@@ -3540,10 +3554,15 @@ function findFix(q, res){
    내려받느라, 신호가 약한 곳에서는 첫 화면이 20초 넘게 걸렸다. 이제는
    ① 3.5초 뒤 조용히 받거나 ② 검색을 시작하시면 그때 받는다. 다 받으면 화면을 다시 그린다. */
 let PUB_SOON = 0;
+let RXN_SOON = 0;
 function pubIndexSoon(){
+  /* 낱알 약국 약·처방약 이름(names-rx, 압축 약 300 KB)도 검색 때 함께 — 다 오면 결과를 다시 그린다 */
+  if (!PUB.rxn && !RXN_SOON) { RXN_SOON = 1;
+    Promise.all([pubPills(), rxNames()]).then(() => { PUB.ezSeq = null; if (typeof route === 'function' && /^#\/(search|photo)/.test(location.hash)) redraw(); else if (typeof lexRedraw === 'function') lexRedraw(true); }); }
   if (PUB.index || PUB_SOON) return; PUB_SOON = 1;
-  pubIndex().then(() => { if (typeof route === 'function') redraw(); });
+  pubIndex().then(() => { PUB.ezSeq = null; if (typeof route === 'function') redraw(); });
 }
+async function rxNames(){ if (!PUB.rxn) { if (window.__RXN__) PUB.rxn = window.__RXN__; else { try { PUB.rxn = await loadJSON('names-rx.json'); } catch (e) { PUB.rxn = []; } } } return PUB.rxn; }
 const hitsHtml = hits => hits.map(h => `<button class="hit" onclick="go('${h.h}')"><span class="k ${h.c}">${h.k}</span><div><b>${esc(h.t)}</b><span>${esc(h.d)}</span></div>${I.chev}</button>`).join('');
 function vSearch(_, q){
   lexLoad(); pubIndexSoon(); findLoad();
@@ -5331,7 +5350,7 @@ function vSchedule(_, q){
    혈당 기준(공복 80~130 · 식후 2시간 180 미만 · 70 미만 저혈당)은 현욱님 승인(2026-09-29), 근거 ADA 2025.
    아주 높은 혈압(180/120)은 «바르게 재고, 5분 쉬고 다시 잰 값»으로만 판단한다 — 커프를 세게 감거나
    팔을 심장보다 낮게 두고 재서 높게 나오는 분이 많다(현욱님). */
-const VREF = { bp: { s: 135, d: 85, hs: 180, hd: 120, src: ['ksh2018hbpm', 'ksh2022'] }, bg: { fLo: 80, fHi: 130, pHi: 180, hypo: 70, hi: 300, src: ['ada2025glyc'], hiSrc: ['umpierrez2024hhs'] } };
+const VREF = { bp: { s: 135, d: 85, hs: 180, hd: 120, lo: 90, ld: 60, src: ['ksh2018hbpm', 'ksh2022'] }, bg: { fLo: 80, fHi: 130, pHi: 180, hypo: 70, hi: 300, src: ['ada2025glyc'], hiSrc: ['umpierrez2024hhs'] } };
 /* Z9 B6 — 아주 높은 혈당(300 이상, 현욱님 10-14 「증상에 따라 다르지, 케톤산증·고삼투압 감별, 식사에 따라 다르고」): 숫자만으로 겁주지 않고
    식사(공복/식후)와 증상 칩으로 나눈다. 증상 있으면 바로 진료·119, 없고 식후면 다시 재기, 없고 공복이면 오늘 진료. 고른 칩은 화면 기억만(저장 안 함) */
 const BG_SYM = ['구토·복통', '숨이 가쁘거나 숨에서 과일 냄새', '심한 갈증·소변이 많음', '기운이 없고 처짐·의식이 흐림', '없음'];
@@ -5360,7 +5379,7 @@ function vitalSave(){
     const prevHi = prev && (prev.s >= VREF.bp.hs || prev.d >= VREF.bp.hd) && Math.abs(now - new Date(prev.t)) < 40 * 60000;
     /* 칩을 따로 누르지 않았으면 «잰 시각»으로 아침·낮·저녁 */
     vitals().push({ t, k: 'bp', s, d, p: pl, w: VT.w || slotWord(now) });
-    VT.alert = hi ? (prevHi ? 'bp-again' : 'bp-first') : null;
+    VT.alert = hi ? (prevHi ? 'bp-again' : 'bp-first') : s < VREF.bp.lo || d < VREF.bp.ld ? 'bp-low' : null;
   } else {
     const v = num('vg');
     if (!(v >= 20 && v <= 600)) { toast('혈당 숫자를 확인해 주세요 (예: 110)'); return; }
@@ -5400,6 +5419,7 @@ function vitalAlert(){
   const a = VT.alert; if (!a) return '';
   if (a === 'bp-first') return `<div class="note" style="margin-top:14px">${I.alert}<span><b>높게 나왔어요 — 먼저 바르게 쟀는지 확인해 주세요.</b> 커프를 세게 감지 않았는지, 팔이 심장 높이였는지 보시고 <b>등을 기대고 5분 쉰 뒤 다시 재서</b> 적어 주세요.</span></div>`;
   if (a === 'bp-again') return `<div class="note alert" style="margin-top:14px">${I.alert}<span><b>쉬고 다시 재도 ${VREF.bp.hs}/${VREF.bp.hd} 이상이에요.</b> 심한 두통·가슴 통증·숨참·한쪽 팔다리 마비·말 어눌함이 있으면 <b>바로 119</b>에 연락하세요. 증상이 없어도 <b>오늘 안에 진료</b>를 받으세요.</span></div>`;
+  if (a === 'bp-low') return `<div class="note bp-lo" style="margin-top:14px">${I.info}<div><b>90/60보다 낮아요</b> — 어지럽지 않으면 대개 괜찮아요. 어지럽거나 쓰러질 것 같으면 앉거나 누우시고, 되풀이되면 진료를 받으세요.${srcChips(['nhs_hypotension'], true)}</div></div>`;
   if (a === 'bg-high') { const S = VT.bgs || [], m = VT.bgm, sym = S.some(i => i < 4), chip = (k, v, t, on) => `<button class="chip ${on ? 'on' : ''}" aria-pressed="${on}" onclick="bgPick('${k}',${typeof v === 'string' ? `'${v}'` : v})">${t}</button>`;
     const out = sym ? `<p class="bg-out"><b>바로 진료를 받으세요.</b> 숨이 가쁘거나 의식이 흐리면 <b>119</b>에 연락하세요.</p><a class="call" href="tel:119">${I.alert} 119 전화</a>`
       : !S.length || !m ? '' : m === '식후' ? `<p class="bg-out"><b>물을 드시고 몇 시간 뒤나 다음 공복에 다시 재세요.</b> 계속 ${VREF.bg.hi} 이상이면 진료를 받으세요.</p>` : `<p class="bg-out"><b>오늘 안에 진료를 받으세요</b> — 약 조절이 필요할 수 있어요.</p>`;
@@ -5967,6 +5987,8 @@ function vNut(id){
   ${disclaimer(D.meta?.suppDisclaimer)}`;
 }
 
+/* 이름으로 찾을 수 있는 제품 수 — 식약처 e약은요·낱알식별의 약국 약과 처방약(같은 품목기준코드는 한 번). build.py 가 센다 */
+const prodCountLine = () => { const P = D.public || {}; return P.prod_otc ? `약국 약 ${P.prod_otc.toLocaleString()}개 · 처방약 ${(P.prod_rx || 0).toLocaleString()}개` : `제품 ${(P.brands_count || 0).toLocaleString()}개 · 성분 ${(P.lexicon_count || 0).toLocaleString()}가지`; };
 /* ───────── 약 사전 ───────── */
 function vDrugs(_, q){
   /* 2026-09-29 — ClinicScore 문법. 전에는 「전체」가 갈래 25개를 3개씩 모두 펼쳐 폰 14장 길이였다.
@@ -5987,7 +6009,7 @@ function vDrugs(_, q){
     ${lrow(I.scale, '같이 먹어도 되나요', `혈압약과 진통제, 항생제와 유산균, 한방약 겹침 — ${(D.public?.mixes_count || 0)}가지`, "go('/mix')")}
     ${lrow(I.user, '나이가 들면 달라지는 약', `65세 이상이 한 번 더 살펴볼 약국 약 ${seniorItems().filter(i => i.d.rx !== '전문').length}가지 — 왜 그런지와 대신 쓸 것`, "go('/senior')")}
     ${lrow(I.cross, '처방받은 약이 떨어졌어요', `약국에서 이어 갈 수 있는 것과 없는 것 — 처방약 ${(D.drugs || []).filter(d => d.otcAlt).length}가지`, "go('/rxout')")}
-    ${lrow(I.book || I.search, '제품 이름으로 찾기', `게보린·판피린·훼스탈처럼 아시는 이름으로 — 제품 ${(D.public?.brands_count || 0).toLocaleString()}개 · 성분 ${(D.public?.lexicon_count || 0).toLocaleString()}가지`, "lexLoad();document.getElementById('gq')?.focus()")}
+    ${lrow(I.book || I.search, '제품 이름으로 찾기', `게보린·판피린·훼스탈처럼 아시는 이름으로 — ${prodCountLine()}`, "lexLoad();pubIndexSoon();document.getElementById('gq')?.focus()")}
   </div>
   <nav class="tabs" role="tablist" aria-label="약 묶음" style="margin-top:20px">${tabs.map(([k, n, ic, c]) => `<button class="tab ${cat === k ? 'on' : ''}" role="tab" aria-selected="${cat === k}" onclick="go('/drugs?cat=${k}')">${ic}${esc(n)}<span class="n">${c}</span></button>`).join('')}</nav>
   ${cat === 'grid' ? `<div class="sech"><h2 class="sec-h">갈래별로 보기</h2><span class="secn">${CL.length}갈래</span></div><p class="viewnote">갈래를 누르면 그 약만 모아 보여 드려요</p>
@@ -6558,7 +6580,10 @@ function drugByIngr(name, prod){ if (!name) return null; const n = name.replace(
 function vPillInfo(seq){
   kpicLoad();
   const p = findPill(seq);
-  if (!p) { if (!PUB.pills) { pubPills().then(route); return `${topBar({ back:'뒤로' })}<p class="loading">불러오는 중…</p>`; } if (!PUB.rx) { pubPillsRx().then(route); return `${topBar({ back:'뒤로' })}<p class="loading">처방약 자료를 불러오는 중…</p>`; } return vPill(); }
+  if (!p) { if (!PUB.pills) { pubPills().then(route); return `${topBar({ back:'뒤로' })}<p class="loading">불러오는 중…</p>`; } if (!PUB.rx) { Promise.all([pubPillsRx(), rxNames()]).then(route); return `${topBar({ back:'뒤로' })}<p class="loading">처방약 자료를 불러오는 중…</p>`; }
+    /* 낱알 자료를 못 받았어도(미리보기·끊긴 인터넷) 이름 목록에 있는 처방약이면 이름·회사·성분과 식약처 허가정보로 */
+    const rn = (PUB.rxn || []).find(x => x[1] === String(seq)); if (!rn) return vPill();
+    return `${topBar({ back:'뒤로' })}<div class="eyebrow">처방약</div><h1 style="font-size:1.25rem">${esc(rn[0].replace(/\(.*?\)/g, ''))}</h1><p class="small muted">${esc(rn[2])}${/\((.+)\)/.test(rn[0]) ? ' · ' + esc(rn[0].match(/\((.+)\)/)[1]) : ''}</p><p style="margin-top:12px">처방약이에요. 용법·용량은 약봉투와 처방한 의사·약사 지시가 우선이에요.</p><div class="links" style="margin-top:12px"><a class="plink" href="https://nedrug.mfds.go.kr/pbp/CCBBB01/getItemDetail?itemSeq=${esc(rn[1])}" target="_blank" rel="noopener">${I.link}식약처 허가정보</a></div>`; }
   const img = pillImg(p); const d = drugByIngr(p.ingr, p);
   const pubHit = (PUB.index || []).find(x => x.seq === p.seq);
   const id = 'pub:' + p.seq; const taking = (ME.taking || []).includes(id) || (d && (ME.taking || []).includes(d.id));
@@ -6673,7 +6698,7 @@ document.addEventListener('input', e => { if (e.target.id === 'mq') { MQ = e.tar
 const PH = { ocr:null, step:'', q:'', busy:false, result:null, img:'', err:'' };
 /* 2026-10-13 메디나눔 공통 규칙 — Gemini·OpenAI 같은 바깥 인공지능 호출은 쓰지 않는다. 사진은 늘 이 폰 안에서만 읽는다(사진 서버 길은 닫음). */
 function photoEndpoint(){ return ''; }
-async function photoPick(file){
+async function photoPick(file){ PH.none = 0;
   if (!file) return; PH.err = ''; PH.result = null; PH.ocr = null; PH.step = ''; PH.busy = true; route();
   try {
     const bmp = await createImageBitmap(file); const max = 1024; const r = Math.min(1, max / Math.max(bmp.width, bmp.height));
@@ -6698,11 +6723,27 @@ async function photoPick(file){
   PH.busy = false; route();
 }
 /* 이름으로 찾아 담기 — 인터넷 없이도 되는 주 경로.
-   봉투·상자에 「보이는 글자」를 그대로 치면 제품 357·성분 336 에서 골라 준다. */
-function photoManual(){ PH.manual = true; PH.err = ''; PH.ocr = null; lexLoad(); route(); setTimeout(() => document.getElementById('phq')?.focus(), 60); }
+   봉투·상자에 「보이는 글자」를 그대로 치면 제품 사전·식약처 약국 약·처방약·성분에서 골라 준다. */
+/* 카메라로 찍기 — 폰은 카메라 앱(capture), 마우스로 쓰는 컴퓨터는 capture 가 무시되어 파일 창만 떴다 → 화면 안에서 웹캠으로 찍는다(2026-10-13 현욱님).
+   웹캠을 못 열면(권한 거절·카메라 없음) 파일 고르기로 */
+function photoCam(){
+  const fine = matchMedia('(pointer:fine)').matches && !matchMedia('(pointer:coarse)').matches;
+  if (!fine || NATIVE || !navigator.mediaDevices?.getUserMedia) { document.getElementById('ph-cam').click(); return; }
+  navigator.mediaDevices.getUserMedia({ video:{ facingMode:'environment', width:{ ideal:1920 } } }).then(st => {
+    const v = document.createElement('div'); v.className = 'camv'; v.setAttribute('role', 'dialog'); v.setAttribute('aria-label', '카메라');
+    v.innerHTML = `<video autoplay playsinline muted></video><p>약 이름이 화면 가운데 크게 오게 맞춰 주세요</p><div class="actions"><button class="btn" id="camgo">${I.eye} 찍기</button><button class="btn ghost" id="camx">닫기</button></div>`;
+    document.body.appendChild(v); const vd = v.querySelector('video'); vd.srcObject = st;
+    const end = () => { st.getTracks().forEach(t => t.stop()); v.remove(); };
+    v.querySelector('#camx').onclick = end;
+    v.querySelector('#camgo').onclick = () => { const c = document.createElement('canvas'); c.width = vd.videoWidth; c.height = vd.videoHeight; c.getContext('2d').drawImage(vd, 0, 0); end(); c.toBlob(b => b && photoPick(b), 'image/jpeg', .9); };
+  }).catch(() => document.getElementById('ph-cam').click());
+}
+/* 고르기 창을 그냥 닫으셨을 때 — 권한 창에서 「허용 안 함」을 고르셨을 수도 있다. 다시 하는 법을 조용히 한 줄로 */
+function photoNone(){ PH.none = 1; route(); }
+function photoManual(){ PH.manual = true; PH.err = ''; PH.ocr = null; lexLoad(); pubIndexSoon(); route(); setTimeout(() => document.getElementById('phq')?.focus(), 60); }
 function manualPanel(){
   const q = (PH.q || '').trim();
-  const hits = q.length >= 1 ? ocrMatch(q).slice(0, 8) : [];
+  const hits = q.length >= 1 ? ocrMatch(q, true).slice(0, 10) : [];
   return `<section class="sec"><h2>이름으로 찾기 <small>봉투·상자에 보이는 글자를 그대로</small></h2>
     <div class="search">${I.search}<input id="phq" placeholder="예: 타이레놀, 부루펜, 아세트아미노펜" value="${esc(q)}" autocomplete="off" enterkeyhint="search"></div>
     ${q.length >= 1 ? (hits.length
@@ -6757,7 +6798,7 @@ function ocrLoad(){
   return window.__ocrP;
 }
 /* 읽어 낸 글자를 우리가 아는 이름에 맞춰 본다 — 두 글자 이상 이어서 겹치면 후보 */
-function ocrMatch(text){
+function ocrMatch(text, typed){
   const t = String(text || '').replace(/[^0-9A-Za-z가-힣]/g, '');
   if (t.length < 2) return [];
   const cand = [];
@@ -6776,6 +6817,16 @@ function ocrMatch(text){
   (D.drugs || []).forEach(d => { push(ingrName(d), '성분', '/drug/' + d.id, d.tagline);
     (d.products || []).forEach(pr => String(pr.name).split('·').forEach(one => push(prodName(one), '제품', '/drug/' + d.id, ingrName(d)))); });
   (LEX.ing || []).forEach(x => { if (!x.drug) push(ingrName(x), '성분', '/ingr/' + x.id, x.cls); });
+  /* 식약처 제품 이름(e약은요·낱알 약국 약, 처방약)도 — 357개 제품 사전에 없는 이름이 대부분이다(2026-10-13 현욱님).
+     2만 개가 넘어 위처럼 조각마다 비교하지 않고, 괄호·함량을 뗀 이름이 통째로 맞을 때만(친 말이면 그 말이 이름 안에, 사진 글이면 이름이 글 안에) */
+  const base = n => String(n).replace(/\(.*?\)/g, '').replace(/[^0-9A-Za-z가-힣]/g, '');
+  const pubHit = (n, kind, href, extra, minus) => { const b = base(n); if (b.length < 2) return;
+    const ok = typed ? b.includes(t) : (b.length >= 3 && t.includes(b)); if (!ok) return;
+    cand.push({ name: n.replace(/\(.*?\)/g, '').trim() || n, kind, href, extra, score: (typed ? t.length + (b.startsWith(t) ? 3 : 0) + (b === t ? 2 : 0) : b.length + 2) - minus }); };
+  const ez = new Set();
+  (PUB.index || []).forEach(p => { if (p.seq) ez.add(p.seq); pubHit(p.n, '약국 약', '/pub/' + p.id, p.m, .5); });
+  (PUB.pills || []).forEach(p => { if (!ez.has(p.seq)) pubHit(p.n, '약국 약', '/pillinfo/' + p.seq, p.m, .5); });
+  (PUB.rxn || []).forEach(([n, seq, mk]) => pubHit(n, '처방약', '/pillinfo/' + seq, mk, 1.5));
   const seen = new Set();
   return cand.sort((a, b) => b.score - a.score).filter(c => { const k = c.kind + c.name; if (seen.has(k)) return false; seen.add(k); return true; }).slice(0, 8);
 }
@@ -6818,16 +6869,17 @@ function vPhoto(_, q){
   else if (PH.err) body = `<div class="photo-box"><p><b>읽지 못했어요</b></p><p class="small muted" style="margin-top:6px">${esc(PH.err)}. 밝은 곳에서 글자가 보이게 다시 찍어 주세요.</p><div class="actions"><button class="btn ghost" onclick="photoManual()">약 이름 직접 적기</button></div></div>`;
   else if (R) body = photoResult(R);
   else body = `${art('photo-guide', 'banner')}<div class="photo-box"><p style="font-size:1.0625rem;font-weight:700">약봉투·약 상자·알약·영양제 라벨</p><p class="small muted" style="margin-top:6px">글자가 보이게 밝은 곳에서 찍어 주세요. <b>사진은 이 폰 안에서 읽고 바로 버립니다</b> — 어디로도 보내지 않고 저장하지도 않아요.</p></div>
-    <div class="sec rows-l">${lrow(I.search, '이름이 보이면 — 적어서 찾기', `제품 ${(D.public?.brands_count || 0)}개 · 성분 ${(D.public?.lexicon_count || 0)}가지에서 바로`, 'photoManual()')}
+    ${PH.none ? `<p class="small muted" style="margin-top:10px">${I.info} 사진을 고르지 않으셨어요. 사진·카메라 권한 창에서 「허용 안 함」을 누르셨다면 휴대폰 설정 → 애플리케이션 → 쓰시는 앱 → 권한에서 바꿀 수 있어요. 「선택한 사진만(제한된 액세스)」도 괜찮아요 — 고른 사진만 보여요.</p>` : ''}
+    <div class="sec rows-l">${lrow(I.search, '이름이 보이면 — 적어서 찾기', `${prodCountLine()}에서 바로`, 'photoManual()')}
     ${lrow(I.eye, '알약만 있으면 — 모양·색으로 찾기', `식약처 낱알 ${(D.public?.pills_count || 0).toLocaleString()}건`, "go('/pill')")}</div>`;
   /* 1-11 — capture 가 있으면 안드로이드 10 이하는 카메라만 뜨고 앨범을 못 골랐다. 「카메라로 찍기」·「앨범에서 고르기」 둘로 나눈다 */
   return `${topBar({ back:'약 알아보기' })}
   <div class="eyebrow">사진으로 약 알아보기</div><h1>찍으면 알려드려요</h1>
   <p style="margin-top:6px">무슨 약인지, 어떻게 드시는지, 겹치는 약은 없는지 — 사진 한 장으로.</p>
   <div class="sec">
-    <button type="button" class="big-btn" onclick="document.getElementById('ph-cam').click()"><div class="ic">${I.eye}</div><div><b>${R ? '다시 카메라로 찍기' : '카메라로 찍기'}</b><span>${ep ? '약봉투·약 상자·알약을 지금 찍어요' : '지금 찍어요 — 폰 안에서 읽어 드려요'}</span></div></button>
+    <button type="button" class="big-btn" onclick="photoCam()"><div class="ic">${I.eye}</div><div><b>${R ? '다시 카메라로 찍기' : '카메라로 찍기'}</b><span>${ep ? '약봉투·약 상자·알약을 지금 찍어요' : '지금 찍어요 — 폰 안에서 읽어 드려요'}</span></div></button>
     <button type="button" class="big-btn soft" onclick="document.getElementById('ph-alb').click()"><div class="ic">${I.book}</div><div><b>앨범에서 고르기</b><span>이미 찍어 둔 사진에서 골라요</span></div></button>
-    <input id="ph-cam" type="file" accept="image/*" capture="environment" hidden onchange="photoPick(this.files[0]);this.value=''"><input id="ph-alb" type="file" accept="image/*" hidden onchange="photoPick(this.files[0]);this.value=''">
+    <input id="ph-cam" type="file" accept="image/*" capture="environment" hidden onchange="photoPick(this.files[0]);this.value=''" oncancel="photoNone()"><input id="ph-alb" type="file" accept="image/*" hidden onchange="photoPick(this.files[0]);this.value=''" oncancel="photoNone()">
   </div>
   <div class="sec">${body}</div>
   ${disclaimer(D.meta?.photoNote ? D.meta.photoNote + ' 읽은 결과는 참고용이며, 처방약은 봉투의 용법과 약사 지시가 우선이에요.' : '')}`;
