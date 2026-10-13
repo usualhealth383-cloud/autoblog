@@ -413,6 +413,15 @@ def z7_checks(br, url, fails):
     if not any(x['n'].startswith('펜잘') for x in a3): fails.append(f'Z7 A3: 낱알 검색에서 펜잘을 담지 못함 {a3}')
     go('#/together'); t = txt()
     if pc and '아세트아미노펜' in pc[0]['i'] and '아세트아미노펜' not in t: fails.append('Z7 A3: 판콜에이캡슐 + 타이레놀정500인데 아세트아미노펜 겹침이 안 뜸')
+    # 10-14 디자인 리서치 3-7 — 요약 띠 숫자 = 판정 행 수 = 머리 문장 숫자, 같은 원인(아세트아미노펜 겹침)은 빨강 한 행에만
+    _b = pz.evaluate("""()=>{ const n=k=>document.querySelectorAll('#view details.ix.'+k).length; const head=(document.querySelector('.ix-sum b')||{}).textContent||'';
+      return {band:[...document.querySelectorAll('.ix-band button b')].map(b=>+b.textContent), rows:[n('stop'),n('warn'),n('info')], nums:(head.match(/\\d+/g)||[]).map(Number),
+        apap:[...document.querySelectorAll('.ix-h b')].filter(b=>/아세트아미노펜이 두 군데/.test(b.textContent)).length,
+        tick:document.querySelectorAll('.ix-do svg').length}; }""")
+    if pc and '아세트아미노펜' in pc[0]['i']:
+        if _b['band'] != _b['rows'] or _b['nums'] != [x for x in _b['rows'][:2] if x]: fails.append(f'3-7: 요약 띠·머리 숫자와 판정 행 수가 다름 — {_b}')
+        if _b['apap']: fails.append('3-7: 아세트아미노펜 겹침이 「같은 성분」 행과 따로 한 번 더 나옴')
+        if _b['tick']: fails.append('3-7: 경고 행의 할 일 앞에 ✓ 표시')
     pz.evaluate(RESET); pz.evaluate(ADD, '타이레놀정500')
     pz.evaluate("()=>{ ME.taking.push('pub:z7x'); ME.pub['pub:z7x']={name:'모르는감기캡슐',full:'모르는감기캡슐',ingr:'',rx:0,seq:'',drugId:''}; saveMe(); }")
     go('#/together'); t = txt('.ix-sum')
@@ -443,7 +452,10 @@ def z7_checks(br, url, fails):
     go('#/together'); t = txt('.ix.stop')   # 병용 규칙(kidney-mg)이 말하든, 내 몸 조건 칸이 말하든 빨강이면 된다
     if '마그밀' not in t or '걸리는 조합은 나오지 않았어요' in txt(): fails.append('Z7 B5: 신장 질환 + 마그밀정인데 빨강(먹지 말 것) 판정이 없음')
     pz.evaluate(RESET); pz.evaluate("()=>{ ME.anticoag=true; saveMe(); }"); pz.evaluate(ADD, '부루펜정')
-    go('#/together'); t = txt()
+    go('#/together')
+    # 10-14 디자인 리서치 3-7 — 판정은 한 줄 행(누르면 「이렇게 하세요」)이라, 행을 펼친 뒤 읽는다. 「조심」 묶음에 있어야 하는 것은 그대로 본다
+    if not pz.query_selector('details.ix.warn'): fails.append('Z7 B6: 항응고제 + 부루펜정이 「조심」 묶음 행으로 나오지 않음')
+    pz.evaluate("()=>document.querySelectorAll('#view details.ix').forEach(d=>d.open=true)"); t = txt()
     if AC not in t: fails.append('Z7 B6: 항응고제 + 부루펜정인데 §101 주의 한 줄이 같이 먹어도 되나요에 없음')
     if '같이 드시면 안 돼' in t or '내 몸 조건과 맞지 않는' in t: fails.append('Z7 B6: 항응고제 + 부루펜이 «금기»처럼 나옴(§101 은 주의)')
     pz.evaluate("()=>{ ME.taking=[]; ME.pub={}; saveMe(); }")
@@ -1015,7 +1027,10 @@ def main():
         _sp = _iu.spec_from_file_location('ing_audit', str(ROOT / 'yakjido' / 'tools' / 'ing_audit.py')); _ia = _iu.module_from_spec(_sp); _sp.loader.exec_module(_ia)
         pg.goto(url + '#/home'); ready(); pg.wait_for_timeout(600)
         _cov = pg.evaluate(_ia.JS, ['pills.json', 'pills-rx.json', 'easy-index.json'])
-        for _f, _lim in (('pills.json', 37), ('pills-rx.json', 157), ('easy-index.json', 85)):   # pills 25→30→37(2026-10-13): 빈 성분을 품목기준코드(1,491건)·식약처 상세(749건)로 채우자 새로 드러난 12개(메클리진·판테틴 복합·생약 감기약 오제나·씨누스트·아이비엽 등) — 해석 퇴보 아님, 화면엔 「성분 모름」
+        # 2026-10-14 기준선 37→80 · 157→335: 낱알 자료를 2022 → 2026-10 식약처 OpenAPI 로 바꾸고 성분을 허가 목록 한글 주성분(원본)으로 맞추자,
+        #   이름 괄호 한 성분만 보던 제품이 생약 복합(길경·작약·연교·육계)·산화아연 종합비타민·새 처방약(브리바라세탐·설박탐피복실·닌테다닙)으로 드러났다.
+        #   잘못 읽기(엉뚱한 약으로 잇기)는 위 5a-9 전수 검사가 0건으로 지킨다 — 이 수는 「성분 모름」으로 남는 제품 수다
+        for _f, _lim in (('pills.json', 80), ('pills-rx.json', 335), ('easy-index.json', 85)):   # pills 25→30→37(2026-10-13): 빈 성분을 품목기준코드(1,491건)·식약처 상세(749건)로 채우자 새로 드러난 12개(메클리진·판테틴 복합·생약 감기약 오제나·씨누스트·아이비엽 등) — 해석 퇴보 아님, 화면엔 「성분 모름」
             if _cov[_f]['none'] > _lim: fails.append(f'성분을 못 읽는 제품이 늘었습니다 {_f}: {_cov[_f]["none"]} (기준 {_lim}) — {_cov[_f]["bad"][:5]}')
         # 혈압·혈당 수첩 — 적기·7일 평균·기준(135/85) 안내·지우기(2026-09-29)
         pv = br.new_page(viewport={'width': 390, 'height': 844}); verr = []
@@ -1479,6 +1494,14 @@ def main():
         for _r in ['/home', '/schedule', '/together', '/vitals', '/visits', '/me?t=meds']:
             _dp.goto(url + '#' + _r); _dp.wait_for_timeout(500)
             if '문제가 생겼어요' in _dp.inner_text('#view'): fails.append(f'둘러보기 예시로 {_r} 화면이 터집니다')
+        # 10-14 디자인 리서치 3-10 — 표·비교 화면이 휴대폰 폭에서 옆으로 넘치지 않는지(영양제 비교가 카드로 쪼개지거나 옆으로 밀던 것). 예시 약을 담은 채로
+        for _w in (390, 360, 320):
+            _dp.set_viewport_size({'width': _w, 'height': 800})
+            for _r in ['/compare?ids=vitd,calcium,mg', '/class/nsaid', '/class/topical', '/together', '/drug/ibuprofen']:
+                _dp.goto(url + '#' + _r); _dp.wait_for_timeout(500)
+                _o = _dp.evaluate(OVERFLOW_JS)
+                if _o['ov']: fails.append(f'3-10 가로 넘침 {_w}px {_r}: {_o["ov"][:2]}')
+        _dp.set_viewport_size({'width': 390, 'height': 844})
         _dp.goto(url + '#/demo'); _dp.wait_for_timeout(400); _dp.click('button:has-text("예시 지우기")'); _dp.wait_for_timeout(400)
         if _dp.evaluate('(ME.taking || []).length'): fails.append('「예시 지우기」 뒤에도 예시 약이 남습니다')
         if _derr: fails.append(f'둘러보기 JS 오류: {_derr[:2]}')

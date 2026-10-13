@@ -290,6 +290,20 @@ for _f in sorted(C.glob('*.json')):
         if _ch in _t: fails.append(f'{_f.name} 에 {_ch} 가 있습니다 — 메디나눔 글 규칙은 「 」'); break
     if '무료' in _t: fails.append(f'{_f.name} 에 「무료」가 있습니다 — 「비용 없이」 등으로(메디나눔 규칙)')
 
+# ── 식약처 자료의 성분은 한글이어야 한다 — 성분 사전·겹침 판정이 한글 이름으로 맞춘다 ──
+# 2026-10-14 허가 목록 OpenAPI 의 성분 칸(영어)으로 e약은요 4,746건 성분이 모두 영어가 되어 연결이 끊길 뻔했다.
+_pdir = ROOT.parent / 'docs' / 'yakjido' / 'data'
+_ko = re.compile('[가-힣]')
+if (_pdir / 'easy-index.json').exists():
+    _ez = json.loads((_pdir / 'easy-index.json').read_text(encoding='utf-8'))
+    _kon = sum(1 for x in _ez if x.get('i') and _ko.search(''.join(x['i'])))
+    if _kon < len([x for x in _ez if x.get('i')]) * .95: fails.append(f'e약은요 성분이 한글이 아닌 것이 많습니다 — {_kon}/{len(_ez)}건만 한글')
+    if sum(1 for x in _ez if x.get('map')) < len(_ez) * .4: fails.append('e약은요 → 약지도 약 연결(map)이 너무 적습니다 — remap_easy.py 를 돌리세요')
+for _pf in ('pills.json', 'pills-rx.json'):
+    if (_pdir / _pf).exists():
+        _en = sum(1 for x in json.loads((_pdir / _pf).read_text(encoding='utf-8')) if x.get('ingr') and not _ko.search(x['ingr']))
+        if _en > 50: fails.append(f'{_pf} 성분 칸에 한글 없는 것이 {_en}건 — 성분 사전과 맞지 않습니다')
+
 # ── 첫 화면이 가벼운지 — 어르신은 데이터가 느린 곳에서 여신다 ──────────────
 # 본문을 data/core.json 으로 뺀 뒤 첫 내려받기가 1.47 MB → 0.5 MB 가 됐다(v84).
 # 다시 통째로 심는 실수를 하면 여기서 걸린다.
