@@ -697,6 +697,7 @@ def parse_plus(path):
     for sol in soup.select('.psol'):
         n = sol.get('data-n');
         if not n: continue
+        if any('up' in (pg.get('class') or []) for pg in sol.find_parents('div')): n = 'u' + n   # 실력 다지기 해설은 따로
         ps = sol.find_all('p', recursive=False); wb = sol.select_one('.wrongbox')
         sols[n] = {'explain': ' '.join(txt(x) for x in ps), 'wrong': ' '.join(txt(x) for x in wb.select('p')) if wb else ''}
     for el in soup.select('.pq'):
@@ -709,11 +710,12 @@ def parse_plus(path):
         fig, data, table, source, choices, after = item_common(el, '.stem')
         stem = txt(stem_el) if stem_el else ''
         if typ == 'ox': stem = re.sub(r'\(\s*O\s*,\s*X\s*\)\s*$', '', stem).strip()   # 바로바로 체크(101줄)와 같이 — 앱은 O/X 단추를 따로 그린다
-        sol = sols.get(n, {}); cn = int(el.get('data-concept') or 0)
+        sol = sols.get(('u' if any('up' in (pg.get('class') or []) for pg in el.find_parents('div')) else '') + n, {}); cn = int(el.get('data-concept') or 0)
         answer = mark_no(a) if typ in ('mc', 'multi') else ('' if typ == 'essay' else a)
-        items.append({'id': f'{code}-p{n}', 'lessonId': code, 'concept': lec_no(code, cn) if cn else 0, 'step': 2, 'type': typ,
+        up = any('up' in (pg.get('class') or []) for pg in el.find_parents('div'))   # '실력 다지기' 쪽(본책 STEP 3 뒤) — 따로 번호 {코드}-u{n}
+        items.append({'id': f'{code}-{"u" if up else "p"}{n}', 'lessonId': code, 'concept': lec_no(code, cn) if cn else 0, 'step': 3 if up else 2, 'type': typ,
                       'stem': stem, 'source': source, 'choices': choices, 'answer': answer, 'explain': sol.get('explain', ''), 'wrong': sol.get('wrong', ''),
-                      'figure': selfcontain(str(fig), markers, f'{code}p{n}') if fig else '', 'difficulty': difficulty, 'plus': True,
+                      'figure': selfcontain(str(fig), markers, f'{code}p{n}') if fig else '', 'difficulty': difficulty, **({'up': True} if up else {'plus': True}),
                       **({'data': '\n'.join(data)} if data else {}), **({'table': table} if table else {}), **({'figAfter': True} if after else {})})
     return items, secs
 
