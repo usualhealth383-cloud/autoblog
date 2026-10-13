@@ -433,15 +433,16 @@ def solutions(soup):
 
 
 def stack_svgs(svgs, gap=8):
-    """한 문항의 svg 여러 장을 위아래로 쌓아 한 장으로(앱의 figure 칸은 하나)"""
+    """한 문항의 svg 여러 장을 위아래로 쌓아 한 장으로(앱의 figure 칸은 하나).
+    안쪽을 <svg> 로 겹쳐 넣으면 앱 CSS(figure svg{height:auto; 배경})가 안쪽 장에도 걸려 크기가 틀어진다 → <g transform> 으로."""
     parts, y, w = [], 0.0, 0.0
     for x in svgs:
         vb = [float(v) for v in re.split(r'[\s,]+', (x.get('viewBox') or x.get('viewbox') or '').strip()) if v] or [0, 0, float(x.get('width', 300)), float(x.get('height', 100))]
-        vw, vh = vb[2], vb[3]
-        c = __import__('copy').copy(x)
-        for k in ('style', 'width', 'height'): c.attrs.pop(k, None)
-        c['x'], c['y'], c['width'], c['height'] = '0', f'{y:g}', f'{vw:g}', f'{vh:g}'
-        parts.append(str(c)); y += vh + gap; w = max(w, vw)
+        vx, vy, vw, vh = vb
+        font = x.get('font-family')
+        inner = ''.join(str(c) for c in x.contents)
+        parts.append(f'<g transform="translate({-vx:g},{y - vy:g})"' + (f' font-family="{font}"' if font else '') + f'>{inner}</g>')
+        y += vh + gap; w = max(w, vw)
     h = y - gap
     font = svgs[0].get('font-family', 'PC Sans')
     return BeautifulSoup(f'<svg width="{w:g}" height="{h:g}" viewBox="0 0 {w:g} {h:g}" font-family="{font}">' + ''.join(parts) + '</svg>', 'html.parser').find('svg')
