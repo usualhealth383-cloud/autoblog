@@ -1319,6 +1319,25 @@ details.ix-how .bd p:last-child{margin-bottom:0}
 .chart svg{width:100%;height:auto;display:block;font-family:var(--font)}
 .legend{display:flex;flex-wrap:wrap;gap:var(--s3);margin-top:var(--s2);font-size:.75rem;color:var(--muted)}
 .legend i{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:5px;vertical-align:-1px}
+.pop-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:var(--s3)}
+.pop{display:flex;align-items:center;gap:10px;min-height:64px;padding:10px 12px;background:var(--card);border:1px solid var(--hairline);border-radius:14px;text-align:left;box-shadow:var(--shadow-card)}
+.pop-pic{position:relative;width:44px;height:44px;flex:none}
+.pop-pic .pimg{width:44px;height:44px}
+.pop-pic img{position:absolute;inset:0;width:44px;height:44px;border-radius:10px;object-fit:cover;background:#fff;border:1px solid var(--hairline)}
+.pop span{min-width:0}
+.pop b{display:block;font-size:.9375rem;line-height:1.35;word-break:keep-all;overflow-wrap:anywhere}
+.pop small{display:block;font-size:.8125rem;color:var(--muted);line-height:1.35;margin-top:2px;word-break:keep-all}
+.cmpc-list{display:flex;flex-direction:column;gap:10px;margin-top:var(--s3)}
+.cmpc{background:var(--card);border:1px solid var(--hairline);border-radius:14px;padding:14px 16px}
+.cmpc-h{display:flex;align-items:center;justify-content:space-between;gap:8px;min-height:44px;color:var(--primary-deep, var(--primary));text-decoration:none}
+.cmpc-h b{font-size:1.0625rem;line-height:1.4;word-break:keep-all}
+.cmpc dl{display:grid;gap:6px;margin-top:4px}
+.cmpc dl>div{display:grid;grid-template-columns:5.5em 1fr;gap:10px;align-items:baseline}
+.cmpc dt{color:var(--muted);font-size:.875rem;word-break:keep-all}
+.cmpc dd{font-size:1rem;line-height:1.55;word-break:keep-all;overflow-wrap:anywhere}
+.cmpc details.cmpc-why{margin-top:8px;border:0;border-top:1px dashed var(--hairline);border-radius:0;background:none;box-shadow:none}
+.cmpc details.cmpc-why summary{min-height:44px;padding:8px 0 0;font-size:.875rem;font-weight:600;color:var(--muted)}
+.cmpc details.cmpc-why .bd{padding:4px 0 2px}
 table.cmp{width:100%;border-collapse:collapse;font-size:.8125rem;margin-top:var(--s3)}
 /* 3-17 — 좁은 화면에서 셋째 칸이 반쯤 잘린 채 밀 수 있다는 표시도 없었다 → 520px 미만은 성분마다 카드 */
 .cmp-cards{display:none}
@@ -1329,7 +1348,7 @@ table.cmp{width:100%;border-collapse:collapse;font-size:.8125rem;margin-top:var(
 @media (max-width:519px){.cmp-tbl{display:none}.cmp-cards{display:block}}
 table.cmp th{text-align:left;font-weight:700;color:var(--muted);font-size:.6875rem;letter-spacing:.05em;text-transform:uppercase;padding:8px 6px;border-bottom:1px solid var(--hairline)}
 table.cmp td{padding:10px 6px;border-bottom:1px solid var(--hairline);vertical-align:top;line-height:1.45}
-table.cmp td:first-child{font-weight:700;white-space:nowrap}
+table.cmp td:first-child{font-weight:700;word-break:keep-all;min-width:6em}
 .scroll-x{overflow-x:auto;margin:0 calc(-1 * var(--s4));padding:0 var(--s4)}
 
 /* 영양제 비교 */
@@ -5987,6 +6006,23 @@ function vNut(id){
   ${disclaimer(D.meta?.suppDisclaimer)}`;
 }
 
+/* 많이 찾는 약 — 약 사전 맨 위에 사진 타일로(10-14 현욱님 「게보린·베나치오·판피린을 찾고 찾아서 들어가야 볼 수 있다」).
+   순서: 데일리팜 월간 일반약 판매 순위(유비케어 약국 판매 횟수 — 타이레놀정500·판콜에스·까스활명수큐·판피린큐가 늘 위)와 현욱님이 꼽은 약.
+   [제품 사전 이름, 사진 이름(없으면 e약은요 사진·제형 그림), 한 줄] */
+const POP = [['타이레놀', '타이레놀정 500 mg', '열·통증'], ['판콜에스', '판콜에스 내복액(약국용)', '종합 감기'], ['까스활명수큐', '', '체함·소화불량'], ['판피린큐', '', '종합 감기'],
+  ['게보린', '게보린정', '두통·치통·생리통'], ['베나치오에프', '', '체함·소화불량'], ['탁센', '탁센 연질캡슐', '통증·열'], ['베아제', '베아제정·닥터베아제정', '소화불량'],
+  ['겔포스엠', '겔포스엠 현탁액', '속쓰림'], ['개비스콘더블액션', '개비스콘 더블액션 현탁액', '속쓰림·역류'], ['이지엔6애니', '', '통증·열'], ['훼스탈플러스', '', '소화불량'],
+  ['부루펜', '부루펜정 400 mg', '통증·열'], ['둘코락스에스', '둘코락스에스 장용정', '변비'], ['마데카솔케어', '마데카솔 케어 연고', '상처'], ['후시딘', '후시딘 연고', '상처가 덧날 때'],
+  ['케토톱', '케토톱 플라스타', '근육·관절 통증'], ['지르텍', '지르텍정', '콧물·두드러기']];
+function popTiles(){
+  const img = ([n, k]) => pimg(k) || (window.__CORE__ ? '' : ((PUB.index || []).find(x => pubNorm(x.n).startsWith(pubNorm(n)))?.img || ''));
+  /* 사진이 안 오면(막힘·없음) 그 자리에 제형 그림이 남게 — 타일마다 그림 칸이 늘 같은 자리에 */
+  const pic = p => { const u = img(p); return `<span class="pop-pic"><span class="pimg drawn" aria-hidden="true">${formArt(p[1] || p[0])}</span>${u ? `<img src="${esc(u)}" alt="" loading="lazy" width="44" height="44" onerror="this.remove()">` : ''}</span>`; };
+  const tile = p => `<button class="pop" onclick="go('/brand/${encodeURIComponent(p[0])}')">${pic(p)}<span><b>${esc(p[0])}</b><small>${esc(p[2])}</small></span></button>`;
+  return `<section class="sec"><div class="sech"><h2 class="sec-h">많이 찾는 약</h2><span class="secn">누르면 성분·먹는 법</span></div>
+    <div class="pop-grid">${POP.slice(0, 8).map(tile).join('')}</div>
+    <details class="more-rows"><summary>더 보기 <span class="muted">${POP.length - 8}가지</span>${I.chev}</summary><div class="pop-grid" style="margin-top:8px">${POP.slice(8).map(tile).join('')}</div></details></section>`;
+}
 /* 이름으로 찾을 수 있는 제품 수 — 식약처 e약은요·낱알식별의 약국 약과 처방약(같은 품목기준코드는 한 번). build.py 가 센다 */
 const prodCountLine = () => { const P = D.public || {}; return P.prod_otc ? `약국 약 ${P.prod_otc.toLocaleString()}개 · 처방약 ${(P.prod_rx || 0).toLocaleString()}개` : `제품 ${(P.brands_count || 0).toLocaleString()}개 · 성분 ${(P.lexicon_count || 0).toLocaleString()}가지`; };
 /* ───────── 약 사전 ───────── */
@@ -6001,9 +6037,10 @@ function vDrugs(_, q){
   const c0 = cat !== 'all' && cat !== 'cvs' && cat !== 'grid' ? cls(cat) : null;
   const cvsN = (D.drugs || []).filter(d => d.rx === '안전상비' || d.products?.some(p => p.rx === '안전상비')).length;
   const tabs = [['grid', '갈래별', I.book, CL.length], ['cvs', '편의점', I.cart, cvsN], ['all', '전체', I.pill, (D.drugs || []).length], ...(c0 ? [[cat, c0.short || c0.name, '', items.length]] : [])];
-  const rowOf = d => `<button class="row" onclick="go('/drug/${d.id}')">${(() => { const pr = (d.products || []).find(x => pimg(x.name)); return pr ? imgTag(pimg(pr.name), 'pimg', pr.name) : `<div class="ic">${icon(cls(d.class)?.icon || 'pill')}</div>`; })()}<div class="body"><b>${esc(d.name)} <span style="display:inline;color:var(--faint);font-weight:500">${esc(d.en || '')}</span></b><span>${esc((d.for || []).join(' · '))}</span>${useTag(d)}</div>${badge(d.rx)}</button>`;
+  const rowOf = d => `<button class="row" onclick="go('/drug/${d.id}')">${(() => { const pr = (d.products || []).find(x => pimg(x.name)); return pr ? imgTag(pimg(pr.name), 'pimg', pr.name) : `<div class="ic">${icon(cls(d.class)?.icon || 'pill')}</div>`; })()}<div class="body"><b>${esc(d.name)}</b><span>${esc((d.for || []).join(' · '))}</span>${useTag(d)}</div>${badge(d.rx)}</button>`;
   return `${topBar()}
   <h1>약 사전</h1><p style="margin-top:6px">성분 기준으로 정리했어요. 성분·함량·제형이 같으면 같은 약이에요 — 확실하지 않으면 약사에게 확인하세요.</p>
+  ${popTiles()}
   <div class="rows-l" style="margin-top:14px">
     ${lrow(I.eye, '이 알약이 무슨 약인지 찾기', `모양·색·각인으로 식약처 낱알 ${(D.public?.pills_count || 0).toLocaleString()}건 검색`, "go('/pill')")}
     ${lrow(I.scale, '같이 먹어도 되나요', `혈압약과 진통제, 항생제와 유산균, 한방약 겹침 — ${(D.public?.mixes_count || 0)}가지`, "go('/mix')")}
@@ -6014,7 +6051,7 @@ function vDrugs(_, q){
   <nav class="tabs" role="tablist" aria-label="약 묶음" style="margin-top:20px">${tabs.map(([k, n, ic, c]) => `<button class="tab ${cat === k ? 'on' : ''}" role="tab" aria-selected="${cat === k}" onclick="go('/drugs?cat=${k}')">${ic}${esc(n)}<span class="n">${c}</span></button>`).join('')}</nav>
   ${cat === 'grid' ? `<div class="sech"><h2 class="sec-h">갈래별로 보기</h2><span class="secn">${CL.length}갈래</span></div><p class="viewnote">갈래를 누르면 그 약만 모아 보여 드려요</p>
     <div class="cgrid">${CL.map(c => { const L = (D.drugs || []).filter(d => d.class === c.id); return `<button class="cg" onclick="go('/drugs?cat=${c.id}')"><span class="ab">${icon(c.icon || 'pill')}</span><b>${esc(c.short || c.name)}</b><small>${L.length}가지</small></button>`; }).join('')}</div>`
-  : `${c0 ? `<div class="sech"><h2 class="sec-h">${esc(c0.name)}</h2><span class="secn">${items.length}가지</span></div><div class="rows-l" style="margin-bottom:12px">${lrow(I.scale, `${esc(c0.name)} 한눈에 비교`, esc(c0.short2 || '위장·심혈관 부담, 지속시간, 구입 방법'), `go('/class/${cat}')`)}</div>`
+  : `${c0 ? `<div class="sech"><h2 class="sec-h">${esc(c0.name)}</h2><span class="secn">${items.length}가지</span></div><div class="rows-l" style="margin-bottom:12px">${lrow(I.scale, `${esc(c0.name)} 한눈에 비교`, esc(c0.short2 || (cat === 'nsaid' ? '위장·심혈관 부담, 지속시간, 구입 방법' : '상황별로 고르는 법, 구입 방법')), `go('/class/${cat}')`)}</div>`
       : `<div class="sech"><h2 class="sec-h">${cat === 'cvs' ? '편의점에서 살 수 있는 약' : '전체'}</h2><span class="secn">${items.length}가지</span></div>`}
     <div class="card rows">${items.map(rowOf).join('') || '<div class="empty">아직 등록된 약이 없어요.</div>'}</div>`}
   ${disclaimer()}`;
@@ -7252,6 +7289,9 @@ function vCheck(sid){
 
 /* ───────── 계열 비교(차트는 코드로) ───────── */
 function scatter(c){
+  /* 위장 × 심혈관 두 축으로 고르는 것이 맞는 계열만 — 소염진통제(연구로 두 부담이 갈림). 통풍약(발작 끄는 약 · 요산 낮추는 약)·항생제·
+     비뇨기 약은 이 두 축으로 고르지 않아 점 두세 개만 덩그러니 찍혔다(10-14 현욱님 「너무 별로」). 다른 계열은 자료에 chart:true 일 때만 */
+  if (c.id !== 'nsaid' && c.chart !== true) return '';
   const pts = (c.members || []).map(id => drug(id)).filter(d => d?.risk?.gi && d?.risk?.cv);
   /* 점이 둘뿐이거나 전부 같은 자리면 그림이 아무것도 말해 주지 않는다 — 그런 그림은 그리지 않는다 */
   if (pts.length < 3) return '';
@@ -7311,7 +7351,8 @@ function vClass(id){
   <div class="eyebrow">계열 비교</div><h1>${esc(c.name)}</h1>${leadHtml(c.lead, 'margin-top:8px')}
   ${(() => { const sc = scatter(c);
     if (sc) return `<section class="sec card"><h2>${esc(c.chartTitle || '위장 부담 × 심혈관 부담')}</h2>${sc}</section>`;
-    /* 그림이 안 나오는 계열은 「왜 안 나오는지」를 한 줄로 — 빈 칸을 남기지 않는다 */
+    /* 그림이 안 나오는 계열은 «위·심장 부담» 이야기 자체를 꺼내지 않는다(두 축으로 고르는 계열이 아니다, 10-14) */
+    if (c.id !== 'nsaid' && c.chart !== true) return '';
     const pts = (c.members || []).map(id => drug(id)).filter(d => d?.risk?.gi && d?.risk?.cv);
     if (pts.length >= 3 && pts.every(d => d.risk.gi <= 2 && d.risk.cv <= 2) && new Set(pts.map(d => d.risk.gi + ',' + d.risk.cv)).size >= 2)
       return `<section class="sec card"><h2>위·심장 부담은 어떤가요</h2><p>이 계열 ${pts.length}가지는 <b>모두 위·심장 부담이 낮은 편</b>이에요(바르거나 넣는 약이 많아요). 그래서 그림 대신 <b>아래 「한눈에 비교」 표</b>로 고르시면 됩니다.</p></section>`;
@@ -7319,7 +7360,13 @@ function vClass(id){
       return `<section class="sec card"><h2>위·심장 부담은 어떤가요</h2><p>이 계열은 <b>${pts.length}가지가 모두 비슷합니다</b> — 위나 심장 부담으로는 갈리지 않아요. 그래서 그림 대신 <b>아래 「한눈에 비교」 표</b>를 보시면 됩니다. 고르는 기준이 거기 적혀 있어요.</p>${srcChips(c.chartSources)}</section>`;
     return ''; })()}
   ${c.verdict?.length ? `<section class="sec card"><h2>상황별로 고르면</h2>${list(c.verdict)}</section>` : ''}
-  ${c.table?.length ? `<section class="sec card"><h2>한눈에 비교</h2><div class="scroll-x"><table class="cmp"><thead><tr><th>성분</th>${cols.map(k => `<th>${esc(k.label)}</th>`).join('')}</tr></thead><tbody>${c.table.map(r => `<tr><td><a class="link" href="#/drug/${r.drug}">${esc(drug(r.drug)?.name || r.drug)}</a></td>${cols.map(k => `<td>${fmt(r[k.key] || '—')}</td>`).join('')}</tr>`).join('')}</tbody></table></div></section>` : ''}
+  ${c.table?.length ? (() => {
+    /* 폰에서 칸 네 개짜리 표는 글자가 세로로 쪼개졌다(10-14 현욱님 캡처) — 약마다 한 장, 「무엇·어디서·이럴 때」만 펼치고
+       근거·작용 같은 이유 칸은 「자세히 ›」 안으로(화면 원칙: 결론은 펼치고 이유는 접는다) */
+    const why = k => /근거|작용|위장|심혈관/.test(k.label), F = cols.filter(k => !why(k)), W = cols.filter(why);
+    return `<section class="sec"><h2 class="sec-h">한눈에 비교 <small>${c.table.length}가지</small></h2><div class="cmpc-list">${c.table.map(r => `<div class="cmpc"><a class="cmpc-h" href="#/drug/${r.drug}"><b>${esc(drug(r.drug)?.name || r.drug)}</b>${I.chev}</a>
+      <dl>${F.filter(k => r[k.key]).map(k => `<div><dt>${esc(k.label)}</dt><dd>${fmt(r[k.key])}</dd></div>`).join('')}</dl>
+      ${W.some(k => r[k.key]) ? `<details class="acc cmpc-why"><summary>${esc(W.map(k => k.label).join('·'))} 자세히${I.chev}</summary><div class="bd"><dl>${W.filter(k => r[k.key]).map(k => `<div><dt>${esc(k.label)}</dt><dd>${fmt(r[k.key])}</dd></div>`).join('')}</dl></div></details>` : ''}</div>`).join('')}</div></section>`; })() : ''}
   ${c.notes?.length ? `<section class="sec card"><h2>알아두면 좋은 것</h2>${list(c.notes)}</section>` : ''}
   ${srcChips(c.sources)}
   ${disclaimer()}`;

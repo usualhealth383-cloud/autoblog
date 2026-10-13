@@ -100,7 +100,7 @@ data['art'] = found
 # 화면 함수는 하나도 바꾸지 않아도 된다.
 SLIM = {
     'symptoms':    ['id', 'group', 'icon', 'name', 'short', 'tags', 'reviewed'],
-    'drugs':       ['id', 'name', 'en', 'class', 'rx', 'tagline', 'simple', 'for'],
+    'drugs':       ['id', 'name', 'class', 'rx', 'tagline', 'simple', 'for'],   # en(영어 이름)은 본문으로 — 첫 화면 목록엔 안 보인다(10-14 많이 찾는 약 타일로 224 KB 넘침)
     'supplements': ['id', 'name', 'en', 'tags', 'brands', 'evidence'],
     'classes':     ['id', 'name', 'short', 'icon'],
     'tips':        ['id', 'group', 'icon', 'title'],
