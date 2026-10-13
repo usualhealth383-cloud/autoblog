@@ -588,7 +588,7 @@ def main():
         _sp = _iu.spec_from_file_location('ing_audit', str(ROOT / 'yakjido' / 'tools' / 'ing_audit.py')); _ia = _iu.module_from_spec(_sp); _sp.loader.exec_module(_ia)
         pg.goto(url + '#/home'); ready(); pg.wait_for_timeout(600)
         _cov = pg.evaluate(_ia.JS, ['pills.json', 'pills-rx.json', 'easy-index.json'])
-        for _f, _lim in (('pills.json', 25), ('pills-rx.json', 157), ('easy-index.json', 85)):
+        for _f, _lim in (('pills.json', 30), ('pills-rx.json', 157), ('easy-index.json', 85)):   # pills 25→30(2026-10-13): 빈 성분 1,491건을 품목기준코드로 채우자 새로 드러난 5개(메클리진·판테틴 복합 등) — 해석 퇴보 아님, 화면엔 「성분 모름」
             if _cov[_f]['none'] > _lim: fails.append(f'성분을 못 읽는 제품이 늘었습니다 {_f}: {_cov[_f]["none"]} (기준 {_lim}) — {_cov[_f]["bad"][:5]}')
         # 혈압·혈당 수첩 — 적기·7일 평균·기준(135/85) 안내·지우기(2026-09-29)
         pv = br.new_page(viewport={'width': 390, 'height': 844}); verr = []
@@ -870,7 +870,9 @@ def main():
         if kc: fails.append(f'소아 계산이 우리집 소아과와 다릅니다: {kc[:3]}')
         # 7. 항콜린 이중 계산 · 8. 이름 검색
         r7 = pg.evaluate("""async()=>{ await pubPills(); await pubPillsRx(); let n=0;
-          for(const p of (PUB.rx||[]).concat(PUB.pills||[])){ if(ingFind((p.ingr||'')+' '+(p.n||'')).filter(e=>e.ach).length>1) n++; } return n; }""")
+          for(const p of (PUB.rx||[]).concat(PUB.pills||[])){ const ks=ingFind((p.ingr||'')+' '+(p.n||'')).filter(e=>e.ach).map(e=>e.k); if(ks.length!==new Set(ks).size) n++; } return n; }""")
+        # ↑ «같은 성분»이 두 번 잡히는 것만 이중 계산이다 — 클로르페니라민+벨라돈나처럼 항콜린 성분이 실제로 둘인 복합제는 둘로 세는 게 맞다
+        #   (2026-10-13 낱알 1,491건의 빈 성분을 품목기준코드로 채운 뒤 그런 제품 10개가 처음 드러남)
         if r7: fails.append(f'항콜린 이중 계산 제품 {r7}건')
         Q = {'베시케어': '베시케어', '하루날디': '하루날디', '타이레놀': '타이레놀', 'TY 500': '타이레놀', '크레스토': '크레스토', '플라빅스': '플라빅스', '베시케어 5mg': '베시케어', '트윈스타': '트윈스타'}
         r8 = pg.evaluate("(Q)=>Object.fromEntries(Object.keys(Q).map(q=>[q,(pillSearch({txt:q,sh:'',c:'',ln:''},true)[0]||[0,{n:''}])[1].n]))", Q)
