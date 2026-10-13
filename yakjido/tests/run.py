@@ -413,6 +413,15 @@ def z7_checks(br, url, fails):
     if not any(x['n'].startswith('펜잘') for x in a3): fails.append(f'Z7 A3: 낱알 검색에서 펜잘을 담지 못함 {a3}')
     go('#/together'); t = txt()
     if pc and '아세트아미노펜' in pc[0]['i'] and '아세트아미노펜' not in t: fails.append('Z7 A3: 판콜에이캡슐 + 타이레놀정500인데 아세트아미노펜 겹침이 안 뜸')
+    # 10-14 디자인 리서치 3-7 — 요약 띠 숫자 = 판정 행 수 = 머리 문장 숫자, 같은 원인(아세트아미노펜 겹침)은 빨강 한 행에만
+    _b = pz.evaluate("""()=>{ const n=k=>document.querySelectorAll('#view details.ix.'+k).length; const head=(document.querySelector('.ix-sum b')||{}).textContent||'';
+      return {band:[...document.querySelectorAll('.ix-band button b')].map(b=>+b.textContent), rows:[n('stop'),n('warn'),n('info')], nums:(head.match(/\\d+/g)||[]).map(Number),
+        apap:[...document.querySelectorAll('.ix-h b')].filter(b=>/아세트아미노펜이 두 군데/.test(b.textContent)).length,
+        tick:document.querySelectorAll('.ix-do svg').length}; }""")
+    if pc and '아세트아미노펜' in pc[0]['i']:
+        if _b['band'] != _b['rows'] or _b['nums'] != [x for x in _b['rows'][:2] if x]: fails.append(f'3-7: 요약 띠·머리 숫자와 판정 행 수가 다름 — {_b}')
+        if _b['apap']: fails.append('3-7: 아세트아미노펜 겹침이 「같은 성분」 행과 따로 한 번 더 나옴')
+        if _b['tick']: fails.append('3-7: 경고 행의 할 일 앞에 ✓ 표시')
     pz.evaluate(RESET); pz.evaluate(ADD, '타이레놀정500')
     pz.evaluate("()=>{ ME.taking.push('pub:z7x'); ME.pub['pub:z7x']={name:'모르는감기캡슐',full:'모르는감기캡슐',ingr:'',rx:0,seq:'',drugId:''}; saveMe(); }")
     go('#/together'); t = txt('.ix-sum')
@@ -443,7 +452,10 @@ def z7_checks(br, url, fails):
     go('#/together'); t = txt('.ix.stop')   # 병용 규칙(kidney-mg)이 말하든, 내 몸 조건 칸이 말하든 빨강이면 된다
     if '마그밀' not in t or '걸리는 조합은 나오지 않았어요' in txt(): fails.append('Z7 B5: 신장 질환 + 마그밀정인데 빨강(먹지 말 것) 판정이 없음')
     pz.evaluate(RESET); pz.evaluate("()=>{ ME.anticoag=true; saveMe(); }"); pz.evaluate(ADD, '부루펜정')
-    go('#/together'); t = txt()
+    go('#/together')
+    # 10-14 디자인 리서치 3-7 — 판정은 한 줄 행(누르면 「이렇게 하세요」)이라, 행을 펼친 뒤 읽는다. 「조심」 묶음에 있어야 하는 것은 그대로 본다
+    if not pz.query_selector('details.ix.warn'): fails.append('Z7 B6: 항응고제 + 부루펜정이 「조심」 묶음 행으로 나오지 않음')
+    pz.evaluate("()=>document.querySelectorAll('#view details.ix').forEach(d=>d.open=true)"); t = txt()
     if AC not in t: fails.append('Z7 B6: 항응고제 + 부루펜정인데 §101 주의 한 줄이 같이 먹어도 되나요에 없음')
     if '같이 드시면 안 돼' in t or '내 몸 조건과 맞지 않는' in t: fails.append('Z7 B6: 항응고제 + 부루펜이 «금기»처럼 나옴(§101 은 주의)')
     pz.evaluate("()=>{ ME.taking=[]; ME.pub={}; saveMe(); }")
