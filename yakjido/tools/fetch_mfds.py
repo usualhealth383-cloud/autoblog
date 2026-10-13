@@ -5,9 +5,10 @@
     공공데이터포털 OpenAPI 두 개가 매달 갱신된다(둘 다 자동 승인·무료·개발 계정 하루 1만 번).
   · 15057639 식품의약품안전처_의약품 낱알식별 정보   — MdcinGrnIdntfcInfoService03/getMdcinGrnIdntfcInfoList03 (약 2만 5천 건)
   · 15095677 식품의약품안전처_의약품 제품 허가정보   — DrugPrdtPrmsnInfoService08/getDrugPrdtPrmsnInq08 (허가된 모든 제품 — 시럽·연고·주사 포함)
+  · 15095679 식품의약품안전처_의약외품 제품 허가 정보 — QdrgPrdtPrmsnInfoService03/getQdrgPrdtPrmsnInfoInq03 (tools/quasi.json 에만, 앱 반영은 갈래를 본 뒤)
 
 인증키: 공공데이터포털 «일반 인증키(Decoding)». ⛔ 파일·대화에 적지 않는다 — 환경변수 DATA_GO_KR_KEY 로만(깃허브 Secrets).
-사용:   DATA_GO_KR_KEY=… python3 yakjido/tools/fetch_mfds.py [--only pills|permits]
+사용:   DATA_GO_KR_KEY=… python3 yakjido/tools/fetch_mfds.py [--only pills|permits|quasi]
 결과:   docs/yakjido/data/pills.json · pills-rx.json (지금 앱과 같은 꼴) · yakjido/tools/permits.json([품목코드, 이름, 회사, 전문 1/일반 0, 주성분]) · meta.json 출처·날짜
         그다음 python3 yakjido/tools/build.py 가 성분 채우기·이름 목록·건수를 다시 만든다.
 """
@@ -18,6 +19,7 @@ OUT = ROOT.parent / 'docs' / 'yakjido' / 'data'
 BASE = 'https://apis.data.go.kr/1471000/'
 PILL_OP = 'MdcinGrnIdntfcInfoService03/getMdcinGrnIdntfcInfoList03'
 PERMIT_OP = 'DrugPrdtPrmsnInfoService08/getDrugPrdtPrmsnInq08'
+QUASI_OP = 'QdrgPrdtPrmsnInfoService03/getQdrgPrdtPrmsnInfoInq03'   # 15095679 의약외품 제품 허가 정보(가그린·파스류 일부·소독제 등, 10-14 현욱님 신청)
 ROWS = 100
 
 
@@ -97,6 +99,15 @@ def permits(k):
     return out
 
 
+def quasi(k):
+    rows = fetch_all(QUASI_OP, k, '의약외품 허가 목록')
+    out = []
+    for r in rows:
+        if s(r.get('CANCEL_CODE_NAME')) not in ('', '정상'): continue
+        out.append([s(r.get('ITEM_SEQ')), s(r.get('ITEM_NAME')), s(r.get('ENTP_NAME')), s(r.get('CLASS_NO_NAME')), s(r.get('MAIN_INGR'))[:200]])
+    return out
+
+
 def main():
     only = sys.argv[sys.argv.index('--only') + 1] if '--only' in sys.argv else ''
     k = key(); today = datetime.date.today().isoformat()
@@ -115,6 +126,14 @@ def main():
         (ROOT / 'tools' / 'permits.json').write_text(dump(R), encoding='utf-8')   # 앱에 싣지 않음 — build.py 가 이름 목록·성분 채우기에만 씀
         meta.update({'permits_count': len(R), 'permits_source': f'식약처 의약품 제품 허가정보 OpenAPI {today}'})
         print(f'허가 제품(정상) {len(R):,}건')
+    if only in ('', 'quasi'):
+        try:   # 의약외품은 있으면 좋은 것 — 실패해도 위 두 자료는 그대로 쓴다
+            Q = quasi(k)
+            (ROOT / 'tools' / 'quasi.json').write_text(dump(Q), encoding='utf-8')   # 앱에 아직 싣지 않음 — 갈래(CLASS_NO_NAME)를 보고 넣을 것을 고른다
+            meta.update({'quasi_count': len(Q), 'quasi_source': f'식약처 의약외품 제품 허가 정보 OpenAPI {today}'})
+            print(f'의약외품(정상) {len(Q):,}건')
+        except (Exception, SystemExit) as e:
+            print('의약외품 받기 실패 — 건너뜀:', e)
     meta_p.write_text(json.dumps(meta, ensure_ascii=False, indent=1), encoding='utf-8')
 
 

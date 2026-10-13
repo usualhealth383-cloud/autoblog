@@ -39,7 +39,7 @@ if (pub / 'pills-rx.json').exists() and (pub / 'pills.json').exists() and (pub /
     if _pm.exists():
         for _s, _n, _m, _r, _i in json.loads(_pm.read_text(encoding='utf-8')):
             if not _s or _s in _seen or _s in _oseq: continue
-            if _r: _seen.add(_s); _rxl.append([_n, _s, _m])
+            if _r == 1: _seen.add(_s); _rxl.append([_n, _s, _m])
             elif _nm(_n) not in _onm: _oseq.add(_s); _onm.add(_nm(_n)); _otc += 1; _rxl.append([_n, _s, _m, 0])
     (pub / 'names-rx.json').write_text(json.dumps(_rxl, ensure_ascii=False, separators=(',', ':')), encoding='utf-8')
     data['public'].update({'prod_otc': _otc, 'prod_rx': sum(1 for x in _rxl if len(x) == 3)})

@@ -54,7 +54,7 @@ jobs:
         run: |
           git config user.name "yakjido-data-bot"
           git config user.email "yakjido-data-bot@users.noreply.github.com"
-          git add -A docs/yakjido yakjido/tools/permits.json
+          git add -A docs/yakjido yakjido/tools/permits.json yakjido/tools/quasi.json 2>/dev/null || git add -A docs/yakjido yakjido/tools/permits.json
           if git diff --cached --quiet; then echo "바뀐 것 없음"; exit 0; fi
           git commit -m "약지도 — 식약처 낱알식별·허가 목록 최신으로(OpenAPI 자동 받기)"
           git push origin HEAD:claude/medicine-recommendation-app-na6x0m
