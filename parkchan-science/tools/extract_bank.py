@@ -189,7 +189,7 @@ def parse_chapter(path):
         items.append({'id': f'{code}-q{n}', 'lessonId': code, 'concept': lec_no(code, int(m.group(1))) if m else 0, 'step': step, 'type': typ,
                       'stem': stem, 'source': source, 'choices': choices, 'answer': answer,
                       'explain': sol.get('explain', ''), 'wrong': sol.get('wrong', ''), 'figure': figure,
-                      'difficulty': difficulty or {1: '●○○', 2: '●●○', 3: '●●●'}[step], **({'must': True} if must else {}),
+                      'difficulty': difficulty or {1: '●○○', 2: '●●○', 3: '●●●'}[step], **({'must': True} if must else {}), **({'adv': True} if el.get('data-adv') == '1' else {}),
                       **({'data': '\n'.join(data)} if data else {}), **({'table': table} if table else {}), **({'figAfter': True} if fig_after else {})})
         qi += 1
 
@@ -253,7 +253,49 @@ AUTO_CHOICES = {
         '50': '1 mg = 1000 μg이라 0.5 mg = 0.5 × 1000 = 500 μg이다. 100을 곱하면 안 된다.',
         '5000': '0.5 × 1000 = 500이다. 1 mg = 10000 μg으로 잘못 잡은 값이다.',
         '0.0005': '1000으로 나눈 값이다. 큰 단위(mg)를 작은 단위(μg)로 바꾸면 수는 커진다.'}),
+    # 2026-10-13 외부 검수 ③: '알칼리 금속이 ___' 에 않는다·흐른다·같은 이 나와 문법만으로 풀렸다 — 분류를 헷갈린 말로
+    '1203-b1-㉢': (['맞다', '된다', '아니라 할로젠이다'], {
+        '맞다': '수소는 1족에 놓이지만 금속이 아닌 비금속이다. 알칼리 금속은 수소를 뺀 1족 금속 원소(Li·Na·K …)다.',
+        '된다': '수소는 반응해도 알칼리 금속으로 바뀌지 않는다. 원소의 종류는 화학 반응으로 바뀌지 않는다.',
+        '아니라 할로젠이다': '할로젠은 17족(F·Cl·Br·I)이다. 수소는 원자가 전자가 1개인 1족 원소다.'}),
+    # 같은 날(통합과학2 검수): 보기 많아서·줄어·적은 이 문법만으로 풀렸다 — 평형 온도를 헷갈린 말로
+    '2203-b2-㉡': (['더 낮은', '산업화 이전과 같은', '해마다 낮아지는'], {
+        '더 낮은': '재복사가 늘어 지표가 더 데워지므로 평형 온도는 낮아지지 않는다.',
+        '산업화 이전과 같은': '에너지가 쌓이는 동안 기온이 올라 예전 온도로 돌아가지 않는다.',
+        '해마다 낮아지는': '지금은 들어오는 에너지가 더 많아 기온이 오르는 중이다.'}),
+    # 같은 날: '물을 끓여 ___로 터빈을 돌린다' 에 생산자·온실 기체·분해자 — 터빈을 돌리는 것을 헷갈린 말로('로' 조사가 맞는 말만)
+    '2205-b2-㉡': (['끓는 물', '연소 가스', '공기'], {
+        '끓는 물': '터빈을 돌리는 것은 물을 끓여 생긴 증기다. 떨어지는 물로 돌리는 것은 수력이다.',
+        '연소 가스': '가스 터빈은 태운 가스로 돌지만, 이 문장은 물을 끓여 얻은 것을 묻는다.',
+        '공기': '공기의 흐름(바람)으로 터빈을 돌리는 것은 풍력 발전이다. 화력은 물을 끓여 생긴 증기로 돌린다.'}),
+    # 같은 날: '＿＿＿에 바닥에 닿는다' 에 굴지성·재활·자신이 나와 뜻만으로 풀렸다 — 수평 투사에서 실제로 하는 착각으로
+    '1303-b3-㉠': (['다른 시각', '같은 위치', '던진 공이 나중'], {
+        '다른 시각': '연직 방향으로는 두 공 모두 같은 자유 낙하라, 같은 높이에서 출발하면 같은 시각에 닿는다.',
+        '같은 위치': '던진 공은 수평 방향으로 등속 운동을 해서 놓은 공보다 멀리 떨어진다. 같은 것은 닿는 시각이다.',
+        '던진 공이 나중': '수평 속력은 얼마나 멀리 가는지만 정하고, 낙하 시간은 높이만 정한다. 세게 던져도 늦게 닿지 않는다.'}),
+    # 같은 날: '전기가 통하지 ___' 빈칸(정답 않는다)이 부정 어미 하나라 문법만으로 풀렸다 — 강의용 문장의 빈칸을 상태(고체)로 옮기고(정답 번호 그대로),
+    # 오답은 염화 나트륨이 전기가 '통하는' 상태로
+    '1203-b5-㉢': (['수용액', '액체', '물에 녹은 상태'], {
+        '수용액': '물에 녹으면 Na<sup>+</sup>·Cl<sup>−</sup> 이 자유롭게 움직이며 전하를 나르므로 전기가 통한다.',
+        '액체': '녹여 액체가 되면 이온이 제자리를 벗어나 움직일 수 있어 전기가 통한다.',
+        '물에 녹은 상태': '수용액과 같다 — 움직일 수 있는 이온이 생겨 전기가 통한다. 통하지 않는 것은 이온이 붙들린 고체일 때다.'}),
+    # 같은 날 조사: '주위의 온도가 ___간다'(정답 올라)에 '바다'·'열분해' 같은 명사가 섞여 뜻으로 거저 풀렸다 — 발열·흡열을 헷갈린 말로
+    '2105-b1-㉠': (['내려', '식어', '낮아져'], {
+        '내려': '열을 내놓는 반응(발열 반응)은 주위에 열을 주므로 주위 온도가 올라간다. 내려가는 것은 열을 흡수하는 반응(흡열 반응)이다.',
+        '식어': '열을 받은 주위는 식지 않고 데워진다. 주위가 식는 것은 반응이 주위의 열을 흡수할 때다.',
+        '낮아져': '발열 반응에서 주위는 열을 얻어 온도가 높아진다. 온도가 낮아지는 쪽은 흡열 반응이다.'}),
 }
+
+# 본책 개념 번호 → 강의용 개념 번호가 문항마다 갈리는 곳 — 2026-10-13 외부 검수 ③: 1205 본책 개념 4(신소재)는 강의용 04 탄소 신소재 + 05 초전도체·액정을
+# 한 쪽에 담아, 초전도체 문항의 '개념 그림 보기'가 탄소 신소재 그림으로 갔다. 문항 id 는 그대로, 이어지는 개념 카드만 바로잡는다.
+# 강의용 빈칸 정답을 바꾼 자리 — 오답 보기 후보(pool)에는 옛 정답을 그 자리에 그대로 둔다. 후보 목록이 바뀌면 다른 문항들의 오답 보기가
+# 줄줄이 바뀌기 때문이다(2026-10-13: 1203-05 ㉢ '않는다' → '고체'로 옮기자 다른 문항 13개의 보기가 흔들렸다). 그 문항 자신의 보기는 AUTO_CHOICES 가 정한다.
+POOL_AS_BEFORE = {('1203-05', '㉢'): '않는다'}
+
+# '(심화)' 표시 — 본책 문항은 .q/.pq 의 data-adv="1"(docs/24 X5), 강의용 자동 문항은 여기 id 로. 앱이 추천·과제·숙련도에서 뺀다(2026-10-13 GPT 검수 ③ 2104 이온 수 역산)
+ADV_IDS = {'2104-m4-2x', '2104-b4-㉢'}
+
+ITEM_CONCEPT = {'1205-c3-2': 5, '1205-c3-3': 5, '1205-q3': 5, '1205-q20': 5, '1205-q22': 5, '1205-u4': 5}
 
 
 def auto_from_lecture(concepts):
@@ -263,6 +305,7 @@ def auto_from_lecture(concepts):
     origin = {}                                 # 값 → (개념, 빈칸) — 오답 보기 해설: 그 말이 원래 채우는 문장
     for c in concepts:
         for k, v in c['blanks'].items():
+            v = POOL_AS_BEFORE.get((c['id'], k), v)
             if 1 <= len(re.sub(r'<[^>]+>', '', v)) <= 12 and v not in [p[0] for p in pool]: pool.append((v, c['lessonId'], c['lessonId'][:2])); origin[v] = (c, k)
     bare_of = lambda t: re.sub(r'<[^>]+>', '', t).strip()
 
@@ -286,6 +329,12 @@ def auto_from_lecture(concepts):
             for t in x.get('terms', []):
                 k = bare_of(t['k'])
                 if word and (k == word or re.sub(r'\s*\(.*?\)\s*', '', k) == word): return t['v']
+        return ''
+    def own_term(word, c):
+        """그 개념 카드 용어표에서만 찾은 뜻(다른 개념으로 넘어가지 않는다)"""
+        for t in c.get('terms', []):
+            k = bare_of(t['k'])
+            if word and (k == word or re.sub(r'\s*\(.*?\)\s*', '', k) == word): return t['v']
         return ''
     rnd = random.Random(7)
     for c in concepts:
@@ -325,8 +374,14 @@ def auto_from_lecture(concepts):
                 wl = []
                 for j, b in enumerate(ch):
                     if b == v: continue
-                    oc = origin.get(b); bb = bare_of(b)
-                    why = (hand[1].get(b) if hand else '') or term_def(bb, oc[0] if oc else c) or (filled(*oc) if oc else '')
+                    bb = bare_of(b)
+                    # 오답 보기 해설은 손 해설 → 이 문항 개념 카드 안의 용어 뜻 → 이 개념 카드에서 그 말이 채우는 빈칸 문장 순서로만.
+                    # 2026-10-13 GPT 검수 ③: 다른 개념·단원의 문장(그 말이 다른 데서 쓰인 곳)이 '오답 왜 틀렸나'로 붙어 91 %가 문제와 무관했다
+                    # (기온 문제 아래 부도체 함정 문장 등). 시험 요령 문장·15글자 미만 토막도 뺀다. 남는 것이 없으면 그 보기는 비운다(정답 해설은 남음).
+                    hw = hand[1].get(b) if hand else ''
+                    own_k = next((kk for kk, vv in c['blanks'].items() if vv == b and kk != k), None)
+                    why = hw or own_term(bb, c) or (filled(c, own_k) if own_k else '')
+                    if why and not hw and (TIPS.search(strip_tags(why)) or len(bare_of(strip_tags(why))) < 15): why = ''
                     if why: wl.append(f'<b>{MARKS[j]}</b> {bb} — {why}')
                 items.append({'id': f'{code}-b{no}-{k}', 'lessonId': code, 'concept': no, 'step': 'auto', 'type': 'mc', 'stem': '빈칸에 들어갈 말은? ' + stem,
                               'source': '', 'choices': ch, 'answer': ch.index(v) + 1, 'explain': explain.strip(), 'wrong': ' '.join(wl), 'figure': '', 'difficulty': '●○○'})
@@ -750,7 +805,8 @@ def parse_plus(path):
         items.append({'id': f'{code}-{"u" if up else "p"}{n}', 'lessonId': code, 'concept': lec_no(code, cn) if cn else 0, 'step': 3 if up else 2, 'type': typ,
                       'stem': stem, 'source': source, 'choices': choices, 'answer': answer, 'explain': sol.get('explain', ''), 'wrong': sol.get('wrong', ''),
                       'figure': selfcontain(str(fig), markers, f'{code}p{n}') if fig else '', 'difficulty': difficulty, **({'up': True} if up else {'plus': True}),
-                      **({'data': '\n'.join(data)} if data else {}), **({'table': table} if table else {}), **({'figAfter': True} if after else {})})
+                      **({'data': '\n'.join(data)} if data else {}), **({'table': table} if table else {}), **({'figAfter': True} if after else {}),
+                      **({'adv': True} if el.get('data-adv') == '1' else {})})
     return items, secs
 
 
@@ -772,6 +828,8 @@ def main():
     for c in concepts: nmax[c['lessonId']] = max(nmax.get(c['lessonId'], 0), int(c['no']))
     for it in items:
         if it['concept'] and it['lessonId'] in nmax: it['concept'] = min(int(it['concept']), nmax[it['lessonId']])
+        if it['id'] in ITEM_CONCEPT: it['concept'] = ITEM_CONCEPT[it['id']]
+        if it['id'] in ADV_IDS: it['adv'] = True
     # 같은 OX 문장이 바로바로 체크와 자동(오해/진실)에 두 번 — 본책 것을 남긴다
     key = lambda t: re.sub(r'[\W_]+', '', re.sub(r'<[^>]+>', '', t))
     seen, keep = set(), []
