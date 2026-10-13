@@ -261,6 +261,12 @@ table.sorttab th:nth-child(3){ background:#2E6B3A; }
 table.sorttab td{ border:0.3mm solid var(--line); padding:1.2mm 1.8mm; vertical-align:top; }
 table.sorttab tr:nth-child(2) td{ color:var(--sub); }
 p.sortnote{ font-size:8pt; color:var(--sub); text-align:center; margin-bottom:1mm; }
+  /* 2026-10-13 '시험에 나오는 보강' 쪽(docs/22) */
+  .plus-h{ display:flex; align-items:center; gap:3mm; margin:0 0 4mm; } .plus-h .tag{ background:var(--point); color:#fff; font-weight:900; font-size:9pt; padding:1.2mm 3mm; border-radius:1.5mm; } .plus-h .tt{ font-size:12.5pt; font-weight:900; }
+  h3.psec{ font-size:11.5pt; font-weight:800; margin:5mm 0 2.4mm; } .pkey{ font-size:8.8pt; font-weight:700; color:var(--unit); border-left:0.8mm solid var(--unit); padding:0.6mm 0 0.6mm 2.6mm; margin:1.5mm 0 3mm; }
+  .pq-h{ font-size:10.5pt; font-weight:900; margin:5mm 0 3mm; color:var(--unit); } .pq{ margin-bottom:5.5mm; break-inside:avoid; } .pq .stem{ font-family:'PC Serif','PC Sans',serif; font-size:9.4pt; line-height:1.72; } .pq .pqno{ font-weight:900; color:var(--unit); margin-right:1.6mm; } .pq .stem .difficulty{ color:#C9A227; font-size:8pt; margin-left:1.5mm; }
+  .psols{ margin-top:4mm; border-top:0.3mm solid var(--line); padding-top:2mm; } .psol{ font-size:8.6pt; line-height:1.7; margin-bottom:2.6mm; break-inside:avoid; } .psol p{ margin:0; }
+  .psol::before{ content:attr(data-n); float:left; font-weight:900; color:var(--unit); margin-right:1.6mm; } .psol > p{ font-family:'PC Serif','PC Sans',serif; }   /* 해설 번호(쪽에서 문항을 찾게) · 본문 해설과 같은 글꼴 */
 </style>
 </head>
 <body>
@@ -801,6 +807,240 @@ p.sortnote{ font-size:8pt; color:var(--sub); text-align:center; margin-bottom:1m
     </div>
   </div>
   <div class="folio"><span>III. 시스템과 상호작용</span><span class="num">236</span></div>
+</div>
+
+<!-- ═════════════ 보강 · 시험에 나오는 보강 (2026-10-13 완자 대조 보강, 우리 글·그림·문제) ═════════════ -->
+<!-- 계산 확인: 그림 보강 2 — 0.2 kg, +10 m/s → −8 m/s: p₁ = +2, p₂ = −1.6, Δp = −3.6 kg·m/s · 0.01 s 동안이면 평균 힘 360 N
+     그림 보강 3 — 0.5 kg 수레 2 m/s → 정지: 넓이 ½ × 0.01 s × 200 N = 1 N·s = 0.5 × 2
+     문항 4 — 0.5 kg, +6 → −4 m/s: Δp = −2 − 3 = −5 kg·m/s, 평균 힘 5 ÷ 0.02 = 250 N
+     문항 6 — 1 kg, +4 m/s, 넓이 ½ × 0.02 × 600 = 6 N·s(− 방향): v₂ = 4 − 6 = −2 m/s, 평균 힘 6 ÷ 0.02 = 300 N
+     관성 법칙(뉴턴 운동 제1법칙)·갈릴레이 빗면 사고 실험은 교과서 공통 내용 -->
+<div class="page plus">
+  <div class="runhead"><span class="unit-tag">III. 시스템과 상호작용</span><span class="lesson-tag">04. 운동량과 충격량</span></div>
+  <div class="plus-h"><span class="tag">시험에 나오는 보강</span><span class="tt">알짜힘과 관성 법칙 · 되튀는 충돌의 부호 · 힘 센서·달걀 낙하 실험</span></div>
+
+  <section class="plus-sec" data-concept="1">
+    <h3 class="psec">알짜힘과 관성 법칙 · 갈릴레이의 빗면 사고 실험</h3>
+    <p class="body">물체에 여러 힘이 함께 작용할 때, 그 힘들을 모두 합한 하나의 힘을 <span class="kw">알짜힘</span>이라 한다. 한 직선 위에서는 같은 방향의 힘은 더하고 반대 방향의 힘은 뺀다. 오른쪽으로 10&nbsp;N, 왼쪽으로 4&nbsp;N을 받으면 알짜힘은 오른쪽으로 6&nbsp;N이고, 양쪽에서 같은 크기로 당기면 0이다. <span class="u-amber">알짜힘이 0이면 정지한 물체는 계속 정지해 있고, 운동하던 물체는 등속 직선 운동을 계속한다</span> — 이것이 <span class="kw">관성 법칙</span>(뉴턴 운동 제1법칙)이다.</p>
+    <p class="body">'움직이게 하려면 계속 밀어야 한다'는 옛 생각을 갈릴레이는 마찰이 없는 빗면으로 뒤집었다. 한쪽 빗면에서 놓은 공은 맞은편 빗면을 따라 <b>처음 높이까지</b> 올라간다. 맞은편 빗면을 완만하게 할수록 같은 높이에 이르려고 <b>더 멀리</b> 굴러간다. 맞은편을 아예 수평으로 하면 오를 높이에 끝내 닿지 못하니 공은 <span class="u-amber">끝없이 굴러간다</span>. 현실의 공이 멈추는 것은 마찰 때문이다.</p>
+    <figure>
+      <svg width="640" height="158" viewBox="0 30 760 188" font-family="PC Sans">
+        <defs>
+          <marker id="p9ArrK" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="#5B6B77"/></marker>
+          <marker id="p9ArrR" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="#D6455D"/></marker>
+          <marker id="p9ArrP" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="#6B46C8"/></marker>
+        </defs>
+        <g stroke="#9AA7B1" stroke-width="1" stroke-dasharray="4 3"><line x1="14" y1="54" x2="244" y2="54"/><line x1="264" y1="54" x2="494" y2="54"/><line x1="514" y1="54" x2="748" y2="54"/></g>
+        <!-- (가) 맞은편이 가파름 -->
+        <path d="M20,60 L80,150 L110,150 L160,60" fill="none" stroke="#22303A" stroke-width="2.2"/>
+        <circle cx="24" cy="54" r="7" fill="#E8940A"/><circle cx="156" cy="54" r="7" fill="none" stroke="#E8940A" stroke-width="2" stroke-dasharray="3 2"/>
+        <!-- (나) 맞은편이 완만함 -->
+        <path d="M270,60 L330,150 L360,150 L484,60" fill="none" stroke="#22303A" stroke-width="2.2"/>
+        <circle cx="274" cy="54" r="7" fill="#E8940A"/><circle cx="480" cy="54" r="7" fill="none" stroke="#E8940A" stroke-width="2" stroke-dasharray="3 2"/>
+        <!-- (다) 맞은편이 수평 -->
+        <path d="M520,60 L580,150 L748,150" fill="none" stroke="#22303A" stroke-width="2.2"/>
+        <circle cx="524" cy="54" r="7" fill="#E8940A"/><circle cx="640" cy="143" r="7" fill="#E8940A" opacity="0.5"/>
+        <line x1="654" y1="130" x2="740" y2="130" stroke="#D6455D" stroke-width="2.2" marker-end="url(#p9ArrR)"/>
+        <text x="697" y="120" text-anchor="middle" font-size="13" font-weight="800" fill="#D6455D">끝없이</text>
+        <text x="130" y="44" text-anchor="middle" font-size="13" fill="#5B6B77">처음 높이</text>
+        <line x1="120" y1="172" x2="160" y2="172" stroke="#6B46C8" stroke-width="1.6" marker-end="url(#p9ArrP)"/>
+        <line x1="370" y1="172" x2="484" y2="172" stroke="#6B46C8" stroke-width="1.6" marker-end="url(#p9ArrP)"/>
+        <text x="427" y="190" text-anchor="middle" font-size="13" font-weight="700" fill="#6B46C8">더 멀리 간다</text>
+        <text x="140" y="190" text-anchor="middle" font-size="13" fill="#6B46C8">짧다</text>
+        <g font-size="14" font-weight="800" text-anchor="middle"><text x="125" y="212">(가) 가파른 맞은편</text><text x="380" y="212">(나) 완만한 맞은편</text><text x="634" y="212">(다) 수평인 맞은편</text></g>
+      </svg>
+      <figcaption>그림 보강 1 | 마찰이 없으면 공은 처음 높이까지 오른다 — 맞은편이 수평이면 멈출 까닭이 없다</figcaption>
+    </figure>
+    <p class="body">생활 속 관성은 둘이다. <b>정지해 있으려는 관성</b> — 컵 위의 카드를 빠르게 튕기면 카드만 날아가고 동전은 컵 속으로 떨어진다. <b>운동하던 대로 가려는 관성</b> — 달리다 돌부리에 걸리면 발은 멈춰도 몸은 나아가 넘어진다.</p>
+    <div class="pkey">한 줄 정리: 알짜힘 = 힘의 합(같은 방향은 더하고 반대 방향은 뺀다) · 알짜힘 0 → 정지는 정지, 운동은 등속 직선 운동(관성 법칙)</div>
+  </section>
+
+  <section class="plus-sec" data-concept="3">
+    <h3 class="psec">힘 센서로 충격량 재기</h3>
+    <div style="display:grid; grid-template-columns:1fr auto; gap:5mm; align-items:start;">
+      <p class="body" style="margin-bottom:0;">수레를 벽에 단 <b>힘 센서</b>에 부딪치게 하면 충돌하는 동안의 힘을 재어 <b>힘–시간 그래프</b>를 그려 준다. 그래프 아래 넓이가 충격량이고, 봉우리가 최대 힘이다. 질량 0.5&nbsp;kg인 수레가 2&nbsp;m/s로 부딪쳐 멈췄다면 운동량 변화량의 크기는 0.5 × 2 = 1&nbsp;kg·m/s이고, 그래프 넓이도 <span style="white-space:nowrap;">½ × 0.01&nbsp;s × 200&nbsp;N</span> = <span class="u-amber">1&nbsp;N·s로 같다</span>. 충격량 = 운동량 변화량의 실험 확인이다. <b>평균 힘</b>은 넓이를 충돌 시간으로 나눈 값(1 ÷ 0.01 = 100&nbsp;N)으로, 최대 힘(200&nbsp;N)과 다르다.</p>
+      <figure style="margin:0;">
+        <svg width="276" height="150" viewBox="0 0 316 172" font-family="PC Sans">
+          <!-- 원점 (60,150): 0.01 s = 200 px, 200 N = 110 px -->
+          <path d="M60,150 L160,40 L260,150 Z" fill="#F8E9C6"/>
+          <line x1="60" y1="150" x2="290" y2="150" stroke="#5B6B77" stroke-width="1.2" marker-end="url(#p9ArrK)"/>
+          <line x1="60" y1="150" x2="60" y2="14" stroke="#5B6B77" stroke-width="1.2" marker-end="url(#p9ArrK)"/>
+          <polyline points="60,150 160,40 260,150" fill="none" stroke="#6B46C8" stroke-width="2.4"/>
+          <line x1="60" y1="40" x2="160" y2="40" stroke="#9AA7B1" stroke-width="1" stroke-dasharray="3 2"/>
+          <g font-size="14" fill="#5B6B77" text-anchor="end"><text x="54" y="45">200</text><text x="54" y="100">100</text></g>
+          <g font-size="14" fill="#5B6B77" text-anchor="middle"><text x="60" y="168">0</text><text x="260" y="168">0.01</text></g>
+          <text x="66" y="16" font-size="14" font-weight="800">힘(N)</text>
+          <text x="314" y="140" text-anchor="end" font-size="14" fill="#5B6B77">시간(s)</text>
+          <text x="160" y="112" text-anchor="middle" font-size="14" font-weight="800" fill="#9C6503">넓이 = 1 N·s</text>
+          <text x="160" y="132" text-anchor="middle" font-size="14" fill="#9C6503">= 충격량</text>
+        </svg>
+        <figcaption>그림 보강 3 | 힘 센서로 잰 힘–시간 그래프</figcaption>
+      </figure>
+    </div>
+    <div class="pkey">한 줄 정리: 힘–시간 그래프 넓이 = 충격량 = 운동량 변화량 · 평균 힘 = 넓이 ÷ 충돌 시간(최대 힘과 다르다)</div>
+  </section>
+  <div class="folio"><span>III. 시스템과 상호작용</span><span class="num">?</span></div>
+</div>
+
+<div class="page plus">
+  <div class="runhead"><span class="unit-tag">III. 시스템과 상호작용</span><span class="lesson-tag">04. 운동량과 충격량</span></div>
+
+  <section class="plus-sec" data-concept="3">
+    <h3 class="psec" style="margin-top:0;">되튀는 충돌의 충격량 — 부호를 먼저 정한다</h3>
+    <p class="body">운동량과 충격량은 방향이 있는 양이므로, 계산 전에 <span class="u-amber">한 방향을 (+)로 정하고 반대 방향은 (−)로 쓴다</span>. 보통 처음 운동 방향을 (+)로 잡는다. 그다음 <b>운동량 변화량 = 나중 운동량 − 처음 운동량</b>을 부호째로 계산하고, 이것이 물체가 받은 충격량이다. 질량 0.2&nbsp;kg인 공이 +10&nbsp;m/s로 벽에 부딪쳐 −8&nbsp;m/s로 되튀어 나오면, 처음 운동량은 0.2 × (+10) = +2&nbsp;kg·m/s, 나중 운동량은 0.2 × (−8) = −1.6&nbsp;kg·m/s이다. 변화량은 (−1.6) − (+2) = <b>−3.6&nbsp;kg·m/s</b>, 곧 공은 크기 3.6&nbsp;N·s의 충격량을 <b>처음 운동과 반대 방향(벽에서 나오는 쪽)</b>으로 받았다. 충돌 시간이 0.01&nbsp;s였다면 평균 힘의 크기는 3.6&nbsp;÷&nbsp;0.01&nbsp;=&nbsp;360&nbsp;N이다.</p>
+    <p class="body">크기만 보고 2 − 1.6 = 0.4라고 빼면 틀린다. 되튀면 방향이 바뀌므로 크기가 <b>더해진다</b>(2 + 1.6). 그래서 같은 공이 같은 속력으로 부딪쳐도 붙어서 멈출 때(변화량 크기 2&nbsp;kg·m/s)보다 되튈 때 더 큰 충격량을 받는다.</p>
+    <figure>
+      <svg width="640" height="168" viewBox="0 0 760 200" font-family="PC Sans">
+        <!-- 왼쪽: 충돌 전후 / 오른쪽: 운동량 수직선(1 kg·m/s = 60 px, 0 = x 580) -->
+        <line x1="30" y1="22" x2="110" y2="22" stroke="#22303A" stroke-width="2" marker-end="url(#p9ArrK)"/>
+        <text x="118" y="27" font-size="13" font-weight="800">(+) 방향</text>
+        <rect x="320" y="34" width="16" height="132" fill="#C9D2D8"/><g stroke="#9AA7B1" stroke-width="1"><line x1="336" y1="44" x2="346" y2="34"/><line x1="336" y1="74" x2="346" y2="64"/><line x1="336" y1="104" x2="346" y2="94"/><line x1="336" y1="134" x2="346" y2="124"/><line x1="336" y1="164" x2="346" y2="154"/></g>
+        <text x="328" y="186" text-anchor="middle" font-size="13" fill="#5B6B77">벽</text>
+        <circle cx="120" cy="72" r="12" fill="#E8940A"/>
+        <line x1="138" y1="72" x2="238" y2="72" stroke="#D6455D" stroke-width="2.4" marker-end="url(#p9ArrR)"/>
+        <text x="40" y="77" font-size="13" font-weight="700">충돌 전</text>
+        <text x="190" y="62" text-anchor="middle" font-size="13" font-weight="800" fill="#D6455D">+10 m/s</text>
+        <circle cx="296" cy="132" r="12" fill="#E8940A"/>
+        <line x1="278" y1="132" x2="198" y2="132" stroke="#1F6FA8" stroke-width="2.4" marker-end="url(#p9ArrB2)"/>
+        <defs><marker id="p9ArrB2" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="#1F6FA8"/></marker></defs>
+        <text x="40" y="137" font-size="13" font-weight="700">충돌 후</text>
+        <text x="238" y="122" text-anchor="middle" font-size="13" font-weight="800" fill="#1F6FA8">−8 m/s</text>
+        <text x="190" y="166" text-anchor="middle" font-size="13" fill="#5B6B77">공 0.2 kg</text>
+        <!-- 수직선 -->
+        <line x1="410" y1="100" x2="746" y2="100" stroke="#5B6B77" stroke-width="1.2" marker-end="url(#p9ArrK)"/>
+        <g stroke="#5B6B77" stroke-width="1.2"><line x1="460" y1="95" x2="460" y2="105"/><line x1="520" y1="95" x2="520" y2="105"/><line x1="580" y1="93" x2="580" y2="107"/><line x1="640" y1="95" x2="640" y2="105"/><line x1="700" y1="95" x2="700" y2="105"/></g>
+        <g font-size="13" fill="#5B6B77" text-anchor="middle"><text x="460" y="122">−2</text><text x="520" y="122">−1</text><text x="580" y="122">0</text><text x="640" y="122">+1</text><text x="700" y="122">+2</text></g>
+        <circle cx="700" cy="100" r="5" fill="#D6455D"/><circle cx="484" cy="100" r="5" fill="#1F6FA8"/>
+        <text x="700" y="80" text-anchor="middle" font-size="13" font-weight="800" fill="#D6455D">처음 +2</text>
+        <text x="484" y="80" text-anchor="middle" font-size="13" font-weight="800" fill="#1F6FA8">나중 −1.6</text>
+        <path d="M700,60 C660,36 540,36 492,58" fill="none" stroke="#6B46C8" stroke-width="2" marker-end="url(#p9ArrP)"/>
+        <text x="592" y="30" text-anchor="middle" font-size="13" font-weight="800" fill="#6B46C8">변화량 −3.6</text>
+        <text x="578" y="150" text-anchor="middle" font-size="13" fill="#22303A">운동량(kg·m/s)</text>
+        <text x="578" y="176" text-anchor="middle" font-size="14" font-weight="800" fill="#6B46C8">(−1.6) − (+2) = −3.6 kg·m/s</text>
+      </svg>
+      <figcaption>그림 보강 2 | 되튀는 충돌 — 처음 방향을 (+)로 정하고 나중 − 처음을 부호째로 뺀다</figcaption>
+    </figure>
+    <div class="pkey">한 줄 정리: 충격량 = 운동량 변화량 = 나중 − 처음(부호째) · 되튀면 크기가 더해지고, 충격량의 방향은 처음 운동과 반대</div>
+  </section>
+
+  <section class="plus-sec" data-concept="4">
+    <h3 class="psec">달걀 낙하 실험 · 안전장치의 두 갈래</h3>
+    <p class="body">같은 달걀을 같은 높이에서 딱딱한 바닥과 방석 위에 떨어뜨린다. <b>같게 할 것</b>(통제 변인)은 높이와 달걀, <b>바꿀 것</b>(조작 변인)은 바닥의 종류, <b>잴 것</b>(종속 변인)은 깨짐 여부다. 높이가 같으면 닿는 순간의 속력이 같으므로 두 경우의 <b>운동량 변화량과 충격량은 같다</b>. 방석은 달걀이 멈추는 시간을 늘려 <b>평균 힘을 줄이므로</b> 달걀이 깨지지 않는다. 높이를 높이면 닿는 속력이 커져 충격량 자체가 커진다.</p>
+    <p class="body">안전장치는 크게 두 갈래다. <span class="u-amber">관성에 대비하는 장치</span>는 하던 운동을 계속하려는 몸을 붙잡는다(안전띠, 머리 받침). <span class="u-amber">충격을 줄이는 장치</span>는 멈추는 시간을 늘려 힘을 줄인다(에어백, 범퍼, 헬멧 완충재, 놀이터 바닥). 충돌 순간 안전띠가 몸을 잡고 에어백이 멈추는 시간을 늘리듯, 두 갈래는 함께 일한다.</p>
+    <div class="pkey">한 줄 정리: 높이가 같으면 충격량이 같다 → 차이는 시간과 힘 · 안전장치는 관성 대비(안전띠) / 충격 줄이기(에어백)</div>
+  </section>
+  <div class="folio"><span>III. 시스템과 상호작용</span><span class="num">?</span></div>
+</div>
+
+<div class="page plus">
+  <div class="runhead"><span class="unit-tag">III. 시스템과 상호작용</span><span class="lesson-tag">04. 운동량과 충격량</span></div>
+  <div class="pq-h" style="margin-top:0;">보강 문제</div>
+  <div class="qgrid">
+    <div>
+      <div class="pq" data-n="1" data-concept="1" data-type="ox" data-answer="O">
+        <div class="stem"><span class="pqno">1</span>운동하던 물체에 작용하는 알짜힘이 0이 되면, 물체는 등속 직선 운동을 한다. ( O , X ) <span class="difficulty">●○○</span></div>
+      </div>
+      <div class="pq" data-n="2" data-concept="3" data-type="ox" data-answer="X">
+        <div class="stem"><span class="pqno">2</span>공이 벽에 부딪쳐 같은 속력으로 되튀어 나오면, 속력이 변하지 않았으므로 공의 운동량 변화량은 0이다. ( O , X ) <span class="difficulty">●○○</span></div>
+      </div>
+      <div class="pq" data-n="3" data-concept="1" data-type="blank" data-answer="알짜힘">
+        <div class="stem"><span class="pqno">3</span>물체에 작용하는 여러 힘을 모두 합한 힘을 <span class="blankline"></span>(이)라고 한다. <span class="difficulty">●○○</span></div>
+      </div>
+      <div class="pq" data-n="4" data-concept="3" data-type="mc" data-answer="②">
+        <div class="stem"><span class="pqno">4</span>질량 0.5 kg인 공이 6 m/s로 날아와 벽에 수직으로 부딪친 뒤, 4 m/s의 속력으로 반대 방향으로 되튀어 나왔다. 공이 벽과 닿아 있던 시간은 0.02 s이다. 공이 받은 충격량의 크기와 평균 힘의 크기를 옳게 짝 지은 것은? <span class="difficulty">●●○</span></div>
+        <ul class="choices">
+          <li>① 1 N·s, 50 N</li>
+          <li>② 5 N·s, 250 N</li>
+          <li>③ 5 N·s, 100 N</li>
+          <li>④ 3 N·s, 150 N</li>
+          <li>⑤ 1 N·s, 250 N</li>
+        </ul>
+      </div>
+      <div class="pq" data-n="5" data-concept="1" data-type="mc" data-answer="⑤">
+        <div class="stem"><span class="pqno">5</span>갈릴레이의 빗면 사고 실험에 대한 설명으로 옳은 것은? (단, 빗면의 마찰과 공기 저항은 없다.) <span class="difficulty">●●○</span></div>
+        <ul class="choices">
+          <li>① 맞은편 빗면이 완만할수록 공은 더 낮은 높이까지 올라간다.</li>
+          <li>② 맞은편 빗면이 가파를수록 공은 더 멀리 굴러간다.</li>
+          <li>③ 맞은편을 수평으로 하면 공은 곧 멈춘다.</li>
+          <li>④ 이 실험은 운동을 계속하려면 힘이 계속 필요함을 보여 준다.</li>
+          <li>⑤ 맞은편 빗면의 기울기와 관계없이 공은 처음 높이까지 올라간다.</li>
+        </ul>
+      </div>
+    </div>
+    <div>
+      <div class="pq" data-n="6" data-concept="3" data-type="multi" data-answer="③">
+        <div class="stem"><span class="pqno">6</span><span class="badge-data">자료</span>질량 1 kg인 수레가 오른쪽으로 4 m/s로 움직여 벽의 힘 센서에 부딪친 뒤 왼쪽으로 되튀어 나왔다. 그림은 이때 힘 센서로 잰 힘을 시간에 따라 나타낸 것이다. 옳은 것만을 &lt;보기&gt;에서 있는 대로 고른 것은? (단, 마찰은 무시한다.) <span class="difficulty">●●●</span></div>
+        <figure style="margin:2mm 0 1mm 4mm;">
+          <svg width="276" height="150" viewBox="0 0 316 172" font-family="PC Sans">
+            <!-- 원점 (60,136): 0.02 s = 200 px, 600 N = 108 px -->
+            <path d="M60,136 L160,28 L260,136 Z" fill="#F8E9C6"/>
+            <line x1="60" y1="136" x2="290" y2="136" stroke="#5B6B77" stroke-width="1.2" marker-end="url(#p9ArrK)"/>
+            <line x1="60" y1="136" x2="60" y2="10" stroke="#5B6B77" stroke-width="1.2" marker-end="url(#p9ArrK)"/>
+            <polyline points="60,136 160,28 260,136" fill="none" stroke="#6B46C8" stroke-width="2.4"/>
+            <line x1="60" y1="28" x2="160" y2="28" stroke="#9AA7B1" stroke-width="1" stroke-dasharray="3 2"/>
+            <g font-size="14" fill="#5B6B77" text-anchor="end"><text x="54" y="33">600</text><text x="54" y="141">0</text></g>
+            <g font-size="14" fill="#5B6B77" text-anchor="middle"><text x="160" y="154">0.01</text><text x="260" y="154">0.02</text></g>
+            <text x="66" y="12" font-size="14" font-weight="800">힘의 크기(N)</text>
+            <text x="300" y="170" text-anchor="end" font-size="14" fill="#5B6B77">시간(s)</text>
+          </svg>
+        </figure>
+        <div class="bogi-box">
+          <div class="bt">보기</div>
+          ㄱ. 수레가 받은 충격량의 크기는 6&nbsp;N·s이다.<br>
+          ㄴ. 충돌 후 수레는 2&nbsp;m/s의 속력으로 되튀어 나온다.<br>
+          ㄷ. 충돌하는 동안 수레가 받은 평균 힘의 크기는 600&nbsp;N이다.
+        </div>
+        <ul class="choices inline">
+          <li>① ㄱ</li><li>② ㄷ</li><li>③ ㄱ, ㄴ</li><li>④ ㄱ, ㄷ</li><li>⑤ ㄱ, ㄴ, ㄷ</li>
+        </ul>
+      </div>
+      <div class="pq" data-n="7" data-concept="1" data-type="multi" data-answer="④">
+        <div class="stem"><span class="pqno">7</span>관성과 알짜힘에 대한 설명으로 옳은 것만을 &lt;보기&gt;에서 있는 대로 고른 것은? <span class="difficulty">●●○</span></div>
+        <div class="bogi-box">
+          <div class="bt">보기</div>
+          ㄱ. 컵 위의 카드를 빠르게 튕기면 동전이 컵 속으로 떨어지는 것은 동전이 정지해 있으려 하기 때문이다.<br>
+          ㄴ. 버스가 급출발하면 승객의 몸은 앞으로 쏠린다.<br>
+          ㄷ. 한 직선 위에서 오른쪽으로 7&nbsp;N, 왼쪽으로 3&nbsp;N의 힘을 받는 물체에 작용하는 알짜힘은 오른쪽으로 4&nbsp;N이다.
+        </div>
+        <ul class="choices inline">
+          <li>① ㄱ</li><li>② ㄷ</li><li>③ ㄱ, ㄴ</li><li>④ ㄱ, ㄷ</li><li>⑤ ㄱ, ㄴ, ㄷ</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div class="folio"><span>III. 시스템과 상호작용</span><span class="num">?</span></div>
+</div>
+
+<div class="page plus">
+  <div class="runhead"><span class="unit-tag">III. 시스템과 상호작용</span><span class="lesson-tag">04. 운동량과 충격량</span></div>
+  <div class="pq" data-n="8" data-concept="4" data-type="mc" data-answer="①">
+    <div class="stem"><span class="pqno">8</span>같은 달걀을 같은 높이에서 (가) 딱딱한 바닥과 (나) 두꺼운 방석 위에 떨어뜨렸더니 (가)에서만 깨졌다. 이 실험에 대한 설명으로 옳은 것은? <span class="difficulty">●●○</span></div>
+    <ul class="choices">
+      <li>① (나)에서는 달걀이 멈추는 시간이 길어 달걀이 받는 평균 힘이 작다.</li>
+      <li>② (나)에서 달걀의 운동량 변화량이 (가)보다 작다.</li>
+      <li>③ (나)에서 달걀이 받는 충격량이 (가)보다 작다.</li>
+      <li>④ 떨어뜨리는 높이는 이 실험의 조작 변인이다.</li>
+      <li>⑤ 떨어뜨리는 높이를 높여도 달걀이 받는 충격량은 변하지 않는다.</li>
+    </ul>
+  </div>
+
+  <div class="psols"><div class="pq-h">보강 문제 해설</div>
+    <div class="solcols">
+      <div>
+        <div class="psol" data-n="1"><p><b>O</b> 관성 법칙이다. 알짜힘이 0이면 속도가 변하지 않으므로, 운동하던 물체는 그 속도로 곧게 계속 나아간다.</p></div>
+        <div class="psol" data-n="2"><p><b>X</b> 처음 방향을 (+)로 하면 처음 +mv, 나중 −mv이므로 변화량은 −mv − (+mv) = −2mv다. 속력은 같아도 방향이 바뀌어 운동량이 변했다.</p></div>
+        <div class="psol" data-n="3"><p><b>알짜힘</b> 같은 방향의 힘은 더하고 반대 방향의 힘은 빼서 구한다. 알짜힘이 0이면 운동 상태가 변하지 않는다.</p></div>
+        <div class="psol" data-n="4"><p><b>②</b> 처음 운동 방향(벽 쪽)을 (+)로 정하면 처음 속도 +6&nbsp;m/s, 나중 속도 −4&nbsp;m/s다. 처음 운동량 = 0.5 × (+6) = +3&nbsp;kg·m/s, 나중 운동량 = 0.5 × (−4) = −2&nbsp;kg·m/s. 충격량 = 나중 − 처음 = (−2) − (+3) = −5&nbsp;N·s, 곧 크기 5&nbsp;N·s(벽에서 나오는 쪽)다. 평균 힘의 크기 = 5&nbsp;N·s ÷ 0.02&nbsp;s = 250&nbsp;N.</p><div class="wrongbox"><div class="wt">바로알기</div><p><b>①</b> 크기만 빼서 0.5 × (6 − 4) = 1로 계산한 오류다.</p><p><b>③</b> 충격량은 맞지만 평균 힘 = 5 ÷ 0.02 = 250&nbsp;N이다(100&nbsp;N은 0.05&nbsp;s일 때).</p><p><b>④</b> 3&nbsp;N·s는 공이 붙어서 멈출 때의 크기다.</p><p><b>⑤</b> 평균 힘은 맞지만 충격량은 5&nbsp;N·s다(1&nbsp;N·s는 크기만 뺀 값).</p></div></div>
+        <div class="psol" data-n="5"><p><b>⑤</b> 마찰이 없으면 공은 맞은편 빗면의 기울기와 관계없이 처음 높이까지 올라간다.</p><div class="wrongbox"><div class="wt">바로알기</div><p><b>①</b> 완만해도 같은 높이까지 올라가며, 그 대신 더 멀리 간다.</p><p><b>②</b> 가파를수록 짧은 거리에서 처음 높이에 닿는다.</p><p><b>③</b> 오를 높이에 닿지 못하므로 끝없이 굴러간다.</p><p><b>④</b> 운동을 계속하는 데 힘이 필요 없음을 보여 준다.</p></div></div>
+      </div>
+      <div>
+        <div class="psol" data-n="6"><p><b>③</b> 오른쪽을 (+)로 정한다. ㄱ: 넓이 = ½ × 0.02&nbsp;s × 600&nbsp;N = 6&nbsp;N·s이고, 벽이 미는 힘은 왼쪽이므로 충격량은 −6&nbsp;N·s다. ㄴ: 나중 운동량 = 처음 + 충격량 = 1 × (+4) + (−6) = −2&nbsp;kg·m/s → 나중 속도 −2&nbsp;m/s, 왼쪽으로 2&nbsp;m/s다.</p><div class="wrongbox"><div class="wt">바로알기</div><p><b>ㄷ</b> 600&nbsp;N은 최대 힘이다. 평균 힘 = 6&nbsp;N·s ÷ 0.02&nbsp;s = 300&nbsp;N이다.</p></div></div>
+        <div class="psol" data-n="7"><p><b>④</b> ㄱ: 카드만 힘을 받아 날아가고 동전은 정지 상태를 유지하려 해 아래로 떨어진다. ㄷ: 반대 방향 힘은 빼므로 7 − 3 = 4&nbsp;N, 큰 힘 쪽인 오른쪽이다.</p><div class="wrongbox"><div class="wt">바로알기</div><p><b>ㄴ</b> 몸은 정지해 있으려 하므로 버스가 앞으로 나갈 때 뒤로 쏠린다.</p></div></div>
+        <div class="psol" data-n="8"><p><b>①</b> 높이가 같아 충격량은 같고, 방석이 멈추는 시간을 늘려 평균 힘이 작아졌다.</p><div class="wrongbox"><div class="wt">바로알기</div><p><b>②</b> 닿는 속력이 같고 둘 다 멈추므로 변화량이 같다.</p><p><b>③</b> 충격량 = 운동량 변화량이므로 같다.</p><p><b>④</b> 높이는 같게 한 통제 변인이고, 바닥의 종류가 조작 변인이다.</p><p><b>⑤</b> 높을수록 닿는 속력이 커져 충격량도 커진다.</p></div></div>
+      </div>
+    </div>
+  </div>
+  <div class="folio"><span>III. 시스템과 상호작용</span><span class="num">?</span></div>
 </div>
 
 <!-- ═════════════ p.123 STEP 1 + STEP 2 시작 ═════════════ -->
