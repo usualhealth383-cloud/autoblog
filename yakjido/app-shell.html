@@ -516,7 +516,7 @@ ul.steps li::before{content:counter(s);position:absolute;left:0;top:2px;width:24
 .answer .line{display:grid;grid-template-columns:56px 1fr;gap:10px;margin-top:12px;font-size:.9375rem;line-height:1.5}
 .answer .line span:first-child{font-weight:800;color:var(--muted);font-size:.8125rem;padding-top:2px}
 .answer .line.stop span:first-child{color:var(--alert)}
-.memo-actions{display:flex;gap:8px;margin-top:14px}
+.memo-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
 .memo-actions .btn{min-height:48px;font-size:.875rem;padding:0 14px}
 /* 바로 답 항목 펼침 */
 .buy-item{cursor:pointer;text-align:left;width:100%;border:0;font:inherit;color:inherit}
@@ -1900,7 +1900,7 @@ function mergeCore(c){
   }
   /* 나머지 칸은 통째로 받는다 — 새 자료를 core 로 빼도 여기를 또 고칠 필요가 없게 */
   for (const k of Object.keys(c)) if (!['symptoms', 'drugs', 'supplements', 'classes', 'tips', 'askdoc'].includes(k)) D[k] = c[k];
-  CORE = 2; window.__READY__ = true;
+  CORE = 2; window.__READY__ = true; SEARCH_CORPUS = '';   /* 본문이 오면 검색 말뭉치를 새로(영어 이름·쓰임 칸은 본문에 있다, 10-14) */
   /* Z6 — 알림 글(약 이름·「물 한 컵과 함께」)은 본문 자료가 있어야 맞다. 본문이 늦게 왔으면 알림을 한 번 다시 건다 */
   setTimeout(() => { try { if ((ME.taking || []).length) armNotifications(); } catch (e) {} }, 0);
   /* 첫 화면을 이미 그린 뒤에 자료가 왔다면 — 약통 개수처럼 본문이 있어야 맞는 것들을 다시 그린다 */
@@ -7551,7 +7551,7 @@ function vClass(id){
   ${c.table?.length ? (() => {
     /* 3-5 ③ — 약마다 한 장이던 카드(같은 「…자세히」 단추가 10번)를 한 줄 행으로: 성분 · 대표 제품 · 약국/처방 · ›.
        나머지 칸(이런 분께·지속·위장·심혈관…)은 행을 눌러 펼친 안에. 지우지 않고 접기만 */
-    const buyK = cols.find(k => k.key === 'otc'), rest = cols.filter(k => k !== buyK);
+    const buyK = cols.find(k => k.key === 'otc'), rest = cols.filter(k => k !== buyK).sort((a, b) => (b.key === 'pick') - (a.key === 'pick'));   /* 「이런 분께·고를 때」가 먼저 */
     const chip = t => { const w = String(t || '').split('(')[0].trim(); return w ? `<span class="badge ${/^처방/.test(w) ? 'rx' : /^편의점/.test(w) ? 'cvs' : /^(약국|마트)/.test(w) ? 'otc' : 'soft'}">${esc(w)}</span>` : ''; };
     return `<section class="sec"><h2 class="sec-h">한눈에 비교 <small>${c.table.length}가지 · 누르면 펼쳐져요</small></h2><div class="card cmpr-list">${c.table.map(r => { const d = drug(r.drug), w = String(r.otc || '').split('(')[0].trim();
       return `<details class="cmpr"><summary><span class="t"><b>${esc(d?.name || r.drug)}</b>${repProd(d) ? `<small>${esc(repProd(d))}</small>` : ''}</span>${buyK ? chip(r.otc) : badge(d?.rx)}${I.chev}</summary><div class="bd">
