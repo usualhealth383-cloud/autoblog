@@ -6,7 +6,7 @@ cfg as (select k from private.config),
 -- pg_cron 을 아직 안 켰으면 cron.job 이 없다 — 그때도 오류 없이 ✗ 로 보이게 돌려 읽는다
 jobs as (select x::text as jobname from unnest(case when to_regclass('cron.job') is null then '{}'::xml[]
           else xpath('//jobname/text()', query_to_xml('select jobname from cron.job', false, true, '')) end) x),
-owners as (select p.id, u.email_confirmed_at from profiles p join auth.users u on u.id = p.id where p.role = 'owner'),
+owners as (select p.id, u.email_confirmed_at from profiles p join auth.users u on u.id = p.id where p.role = 'owner' and not exists (select 1 from private.admins a where a.uid = p.id)),   -- 관리자(원장님이 지정)는 빼고 센다
 checks(n, name, ok, todo) as (
   select 1, 'pg_cron 켜짐', exists (select 1 from pg_extension where extname = 'pg_cron'), 'Database → Extensions → pg_cron 켜고 schema.sql 다시 Run'
   union all select 2, '새벽 정리 예약(pcs-purge-old)', exists (select 1 from jobs where jobname = 'pcs-purge-old'), 'pg_cron 켠 뒤 schema.sql 다시 Run(개인정보 보관 기간 약속)'
@@ -22,5 +22,6 @@ checks(n, name, ok, todo) as (
   union all select 12, '(푸시) pg_net 켜짐', exists (select 1 from pg_extension where extname = 'pg_net'), '앱 스토어 출시 때 — README 「결제 · 푸시 알림」 B'
   union all select 13, '(푸시) 예약 3개(morning·weekly·asgdue)', (select count(*) = 3 from jobs where jobname in ('pcs-push-morning', 'pcs-push-weekly', 'pcs-push-asgdue')), '앱 스토어 출시 때 — functions.sql ① 부분'
   union all select 14, '(결제) 환불 정리 예약', exists (select 1 from jobs where jobname = 'pcs-voided-purchases'), '스토어 결제를 켤 때 — functions.sql ② 부분'
+  union all select 15, '관리자 3명 이하 · 모두 메일 인증 · 역할 owner', (select count(*) <= 3 and coalesce(bool_and(u.email_confirmed_at is not null and p.role = 'owner'), true) from private.admins a join auth.users u on u.id = a.uid join profiles p on p.id = a.uid), '원장 화면 › 관리자에서 해제했다가 다시 지정'
 )
 select n, case when ok then '✓' else '✗' end as ok, name, case when ok then '' else todo end as "할 일" from checks order by n;

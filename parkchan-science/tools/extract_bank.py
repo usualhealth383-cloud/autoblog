@@ -674,6 +674,47 @@ def unit_mock():
     return items, warns
 
 
+def parse_plus(path):
+    """본책 '시험에 나오는 보강' 쪽(2026-10-13 완자 대조 보강) → (보강 문항, 보강 개념 칸).
+    · <section class="plus-sec" data-concept="N"> 제목(.psec)·본문·그림·한 줄 정리(.pkey) → data/plus.json (앱 개념 상세의 '시험에 나오는 보강')
+    · <div class="pq" data-n data-concept data-type data-answer> + .psol[data-n] → 문제 은행 {코드}-p{n} (기존 문항 id 를 건드리지 않게 따로 번호)
+    · 정답은 data-answer: 선지형은 ①~⑤, OX 는 O/X, 빈칸은 낱말, 서술형은 비움"""
+    src = path.read_text(encoding='utf-8'); code = lesson_code(path); markers = defs_map(src)
+    soup = BeautifulSoup(src, 'html.parser'); items, secs = [], []
+    for k, sec in enumerate(soup.select('.plus-sec'), 1):
+        t = sec.select_one('.psec'); title = txt(t, False) if t else ''
+        body = __import__('copy').copy(sec)
+        for x in body.select('.psec'): x.extract()
+        for i, f in enumerate(body.select('svg')):
+            f.replace_with(BeautifulSoup(selfcontain(str(f), markers, f'{code}px{k}{i}'), 'html.parser'))
+        html = re.sub(r'\s+', ' ', ''.join(str(c) for c in body.contents)).strip()
+        html = re.sub(r'\sclass="body"', '', html)
+        cn = int(sec.get('data-concept') or 0)
+        secs.append({'lessonId': code, 'concept': lec_no(code, cn) if cn else 0, 'id': f'{code}-x{k}', 'title': title, 'html': html})
+    sols = {}
+    for sol in soup.select('.psol'):
+        n = sol.get('data-n');
+        if not n: continue
+        ps = sol.find_all('p', recursive=False); wb = sol.select_one('.wrongbox')
+        sols[n] = {'explain': ' '.join(txt(x) for x in ps), 'wrong': ' '.join(txt(x) for x in wb.select('p')) if wb else ''}
+    for el in soup.select('.pq'):
+        n = el.get('data-n'); typ = el.get('data-type', 'mc'); a = (el.get('data-answer') or '').strip()
+        stem_el = el.select_one('.stem')
+        diff = stem_el.select_one('.difficulty') if stem_el else None; difficulty = txt(diff, False) if diff else '●●○'
+        if stem_el:
+            for x in stem_el.select('.difficulty, .tags, .badge-data, .badge-essay'): x.extract()
+            for x in stem_el.select('.blankline'): x.replace_with('＿＿＿')
+        fig, data, table, source, choices, after = item_common(el, '.stem')
+        stem = txt(stem_el) if stem_el else ''
+        sol = sols.get(n, {}); cn = int(el.get('data-concept') or 0)
+        answer = mark_no(a) if typ in ('mc', 'multi') else ('' if typ == 'essay' else a)
+        items.append({'id': f'{code}-p{n}', 'lessonId': code, 'concept': lec_no(code, cn) if cn else 0, 'step': 2, 'type': typ,
+                      'stem': stem, 'source': source, 'choices': choices, 'answer': answer, 'explain': sol.get('explain', ''), 'wrong': sol.get('wrong', ''),
+                      'figure': selfcontain(str(fig), markers, f'{code}p{n}') if fig else '', 'difficulty': difficulty, 'plus': True,
+                      **({'data': '\n'.join(data)} if data else {}), **({'table': table} if table else {}), **({'figAfter': True} if after else {})})
+    return items, secs
+
+
 def main():
     global LESSON_SET
     out = OUT
@@ -681,10 +722,11 @@ def main():
         out = pathlib.Path(_sys.argv[_sys.argv.index('--out') + 1]).resolve(); out.mkdir(parents=True, exist_ok=True)
     concepts = json.loads((OUT / 'concepts.json').read_text(encoding='utf-8'))
     LESSON_SET = {c['lessonId'] for c in concepts}
-    items, labs = [], []
+    items, labs, plus = [], [], []
     for path in sorted(list((ROOT / 'book').glob('chapter-*/chapter.html')) + [ROOT / 'book' / 'sample-chapter' / 'chapter.html'] + list((ROOT / 'book2').glob('chapter-*/chapter.html'))):
         its, lbs = parse_chapter(path); items += its; labs += lbs
-        print(f'{path.parent.name} → {lesson_code(path)}: 문항 {len(its)} · 탐구 {len(lbs)}')
+        pit, psc = parse_plus(path); items += pit; plus += psc
+        print(f'{path.parent.name} → {lesson_code(path)}: 문항 {len(its)} · 탐구 {len(lbs)}' + (f' · 보강 개념 {len(psc)} · 보강 문항 {len(pit)}' if pit or psc else ''))
     auto = auto_from_lecture(concepts); items += auto
     # 개념 번호는 그 소단원의 개념 수를 넘지 않게(바로바로 체크가 개념보다 많은 장이 있다 — 없는 개념 카드로 가던 것)
     nmax = {}
@@ -709,6 +751,7 @@ def main():
         items = [i for i in items if i not in dropped]
     (out / 'bank.json').write_text(json.dumps(items, ensure_ascii=False, indent=0), encoding='utf-8')
     (out / 'labs.json').write_text(json.dumps(labs, ensure_ascii=False, indent=0), encoding='utf-8')
+    (out / 'plus.json').write_text(json.dumps(plus, ensure_ascii=False, indent=0), encoding='utf-8')   # 보강 개념 칸(본책 보강 쪽) — build.py 가 개념 덧붙임(extras.plus)으로 싣는다
     if out != OUT: print(f'  → {out} 에 썼습니다(data/ 는 그대로)')
     from collections import Counter
     na = sum(1 for i in items if i['step'] == 'auto')

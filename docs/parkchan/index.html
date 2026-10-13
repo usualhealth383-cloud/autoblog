@@ -750,6 +750,12 @@ button,.tab,.btn,.chip,.chipbar button,.seg button{-webkit-user-select:none;user
 .pass .row dt{color:var(--muted);flex:0 0 44px}
 .pass .row dd{color:var(--body);flex:1}
 .pass .row dd b{color:var(--ink);font-weight:700}
+.joinqr{width:210px;max-width:70%;margin:8px auto 0;background:#fff;padding:8px;border-radius:var(--r-m);border:1px solid var(--line)}.joinqr svg{display:block;width:100%;height:auto}
+.enform{display:flex;flex-direction:column;gap:8px}.fullin{display:block;width:100%;margin:8px 0;border:1.5px solid var(--line);border-radius:var(--r-s);padding:12px 14px;font-size:var(--t-body);font-family:inherit;background:var(--paper);color:var(--ink)}
+.enform input:not([type=checkbox]),.enform select{width:100%;border:1.5px solid var(--line);border-radius:var(--r-s);padding:12px 14px;font-size:var(--t-body);font-family:inherit;background:var(--paper);color:var(--ink)}
+.enform .agree{display:flex;gap:10px;align-items:center;font-size:var(--t-small);color:var(--ink);line-height:1.5;padding:6px 0;min-height:44px;cursor:pointer}.enform .agree input{width:22px;height:22px;flex:0 0 22px;margin:0;accent-color:var(--brand)}
+.enform .agreemore summary{font-size:var(--t-cap);color:var(--muted);cursor:pointer}
+.enst{font-size:var(--t-small);color:var(--brand-dark);background:var(--brand-soft);border-radius:var(--r-s);padding:10px 12px;margin:0 0 10px}.enst.no{color:var(--warn);background:var(--warn-soft,rgba(138,100,8,.1))}.enst small{display:block;color:var(--muted)}
 .codebox{background:var(--card);border:1px solid var(--line);border-radius:var(--r-m);padding:16px;margin-bottom:14px}
 .codebox h3{font-size:var(--t-body);font-weight:900;margin-bottom:6px}
 .codebox p{font-size:var(--t-cap);color:var(--muted);line-height:1.7;margin-bottom:13px}
@@ -1946,6 +1952,50 @@ const DB = (() => {
     linkedOf: async code => ({ student: d.accounts.filter(a => a.role==='student' && a.studentCode===code).length,
       guardians: d.accounts.filter(a => a.role==='parent' && ((a.childCodes||[]).includes(code) || (a.childPending||[]).includes(code))).map(a => ({ uid:a.id, name:a.name, phone:a.phone||'', approved:(a.childCodes||[]).includes(code) })) }),
     releaseCode: async code => { const rows = d.accounts.filter(a => a.studentCode===code); rows.forEach(a => a.studentCode=''); w(); return rows.length; },
+    myStaff: async () => { const a = me(); return a && a.role === 'owner' ? (a.admin ? 'admin' : 'head') : null; },
+    staffList: async () => { const a = me(); if (!a || a.role !== 'owner') return []; return d.accounts.filter(x => x.admin).map(x => ({ uid:x.id, email:x.email, name:x.name, at:x.adminAt })); },
+    staffAdd: async email => { const a = me(); if (!a || a.role !== 'owner' || a.admin) return { ok:false, why:'관리자는 원장님만 지정할 수 있습니다.' };
+      const t = d.accounts.find(x => x.email === String(email||'').trim().toLowerCase());
+      if (!t) return { ok:false, why:'이 이메일로 가입하고 메일 인증까지 마친 계정이 없습니다. 먼저 앱에서 가입해 주세요.' };
+      if (t.id === a.id) return { ok:false, why:'원장님 본인 계정입니다.' };
+      if (t.admin) return { ok:true, already:true, uid:t.id };
+      if (d.accounts.filter(x => x.admin).length >= 3) return { ok:false, why:'관리자는 3명까지 지정할 수 있습니다. 한 명을 해제한 뒤 다시 지정해 주세요.' };
+      t.prevRole = t.role; t.role = 'owner'; t.admin = true; t.adminAt = new Date().toISOString(); t.studentCode = ''; t.childCodes = []; t.childPending = []; w(); return { ok:true, uid:t.id }; },
+    staffRemove: async uid => { const a = me(); if (!a || a.role !== 'owner' || a.admin) return { ok:false, why:'관리자 해제는 원장님만 할 수 있습니다.' };
+      const t = d.accounts.find(x => x.id === uid && x.admin); if (!t) return { ok:false, why:'관리자가 아닙니다.' };
+      t.role = t.prevRole || 'student'; delete t.admin; delete t.adminAt; delete t.prevRole; w(); return { ok:true }; },
+    joinToken: async fresh => { const a = me(); if (!a || a.role !== 'owner') throw new Error('원장님만 볼 수 있습니다.');
+      if (fresh || !d.joinToken){ d.joinToken = Array.from({ length:10 }, () => '0123456789ABCDEF'[Math.floor(Math.random() * 16)]).join(''); w(); } return d.joinToken; },
+    joinCheck: async tok => d.joinToken && String(tok||'').trim().toUpperCase() === d.joinToken ? { ok:true, classes:d.classes.map(c => c.cls), academy:CFG.academy }
+      : { ok:false, why:'학원 QR이 바뀌었습니다. 학원에 붙은 새 QR을 찍어 주세요.' },
+    enrollRequest: async ({ token, name, cls, phone, gphone, agree }) => { const a = me(); if (!a) return { ok:false, why:'로그인이 필요합니다.' };
+      if (a.role !== 'student') return { ok:false, why:'학생 계정에서만 수강 등록을 신청할 수 있어요.' };
+      if (a.under14 && !a.guardianOk) return { ok:false, consent:true, why:'만 14세 미만은 보호자 동의를 마친 뒤 신청할 수 있어요.' };
+      if (!agree) return { ok:false, why:'개인정보 수집·이용에 동의해야 신청할 수 있어요.' };
+      if (!d.joinToken || String(token||'').trim().toUpperCase() !== d.joinToken) return { ok:false, why:'학원 QR이 바뀌었습니다. 학원에 붙은 새 QR을 찍어 주세요.' };
+      const cur = a.studentCode && d.students.find(x => x.code === a.studentCode); if (cur && cur.until >= todayISO()) return { ok:false, why:'이미 학원 코드가 연결되어 있어요.' };
+      name = String(name||'').trim(); if (!name || name.length > 40) return { ok:false, why:'이름을 적어 주세요.' };
+      if (!d.classes.some(c => c.cls === cls)) return { ok:false, why:'반을 골라 주세요.' };
+      if (![phone, gphone].every(x => /^[0-9+ ()-]{0,20}$/.test(x||''))) return { ok:false, why:'연락처는 숫자와 - 만 적어 주세요.' };
+      d.enrolls ||= []; let r = d.enrolls.find(x => x.uid === a.id && x.state === 'wait');
+      if (!r){ r = { id:uid(), uid:a.id, state:'wait' }; d.enrolls.push(r); }
+      Object.assign(r, { name, cls, phone:phone||'', gphone:gphone||'', agreedAt:new Date().toISOString(), at:new Date().toISOString() }); w(); return { ok:true, id:r.id, state:'wait' }; },
+    myEnroll: async () => { const a = me(); if (!a) return null; const r = (d.enrolls||[]).filter(x => x.uid === a.id).sort((x, y) => String(y.at).localeCompare(String(x.at)))[0];
+      return r ? { id:r.id, state:r.state, cls:r.cls, at:r.at, decided_at:r.decidedAt||null, code:r.code||null } : null; },
+    enrollList: async () => { const a = me(); if (!a || a.role !== 'owner') return [];
+      return (d.enrolls||[]).filter(x => x.state === 'wait').map(x => { const u = d.accounts.find(k => k.id === x.uid) || {};
+        return { id:x.id, uid:x.uid, email:u.email||'', name:x.name, cls:x.cls, phone:x.phone, gphone:x.gphone, under14:!!u.under14, at:x.at }; }); },
+    enrollDecide: async (id, ok, until, cls) => { const a = me(); if (!a || a.role !== 'owner') throw new Error('원장님만 할 수 있습니다.');
+      const r = (d.enrolls||[]).find(x => x.id === id && x.state === 'wait'); if (!r) return { ok:false, why:'이미 처리된 신청입니다.' };
+      r.decidedAt = new Date().toISOString();
+      if (!ok){ r.state = 'no'; w(); return { ok:true, state:'no' }; }
+      if (!until || until < todayISO()) return { ok:false, why:'수강 만료일을 오늘이나 그 뒤로 정해 주세요.' };
+      const s = { code:genCode(r.name, c => d.students.some(x => x.code === c)), name:r.name, cls:cls||r.cls, until, phone:r.phone||r.gphone||'', joined:todayISO() }; d.students.push(s);
+      const u = d.accounts.find(k => k.id === r.uid); let linked = false;
+      if (u && !(u.studentCode && d.students.some(x => x.code === u.studentCode && x.until >= todayISO()))){ u.studentCode = s.code; if (!u.phone && r.phone) u.phone = r.phone; linked = true; }
+      r.state = 'ok'; r.code = s.code; w(); return { ok:true, code:s.code, linked }; },
+    rosterLinks: async () => d.students.map(s => ({ code:s.code, app:d.accounts.some(a => a.role === 'student' && a.studentCode === s.code),
+      guardians:d.accounts.filter(a => a.role === 'parent' && (a.childCodes||[]).includes(s.code)).length, last:(d.progress[s.code] && d.progress[s.code].at) || null })),
     attendanceOn: async date => d.attendance.filter(a=>a.date===date),
     attendanceRange: async (from, to, code) => d.attendance.filter(a => a.date>=from && a.date<=to && (!code || a.code===code)).sort((a,b)=>b.date.localeCompare(a.date)),
     myAttendance: async (code, date) => d.attendance.find(a=>a.code===code && a.date===date) || null,
@@ -2221,6 +2271,17 @@ const serverDB = () => {
     extendClass: async (cls, until) => (await api(`/rest/v1/students?${cls==='전체'?'':`cls=eq.${encodeURIComponent(cls)}&`}until=lt.${until}`, { method:'PATCH', prefer:'return=representation', body:{ until } })).length,
     guardiansOf: async code => { const r = await api('/rest/v1/rpc/linked_of', { method:'POST', body:{ p_code: code } }); return (r && r.guardians) || []; },
     linkedOf: async code => (await api('/rest/v1/rpc/linked_of', { method:'POST', body:{ p_code: code } })) || { student:0, guardians:[] },
+    myStaff: async () => { try { return await api('/rest/v1/rpc/my_staff', { method:'POST', body:{} }); } catch { return null; } },
+    staffList: async () => (await api('/rest/v1/rpc/staff_list', { method:'POST', body:{} })) || [],
+    staffAdd: async email => (await api('/rest/v1/rpc/staff_add', { method:'POST', body:{ p_email:email } })) || { ok:false, why:'지정하지 못했습니다.' },
+    staffRemove: async uid => (await api('/rest/v1/rpc/staff_remove', { method:'POST', body:{ p_uid:uid } })) || { ok:false, why:'해제하지 못했습니다.' },
+    joinToken: async fresh => api('/rest/v1/rpc/join_token', { method:'POST', body:{ p_new:!!fresh } }),
+    joinCheck: async tok => (await api('/rest/v1/rpc/join_check', { method:'POST', body:{ p_token:tok } })) || { ok:false, why:'확인하지 못했습니다.' },
+    enrollRequest: async ({ token, name, cls, phone, gphone, agree }) => (await api('/rest/v1/rpc/enroll_request', { method:'POST', body:{ p_token:token, p_name:name, p_cls:cls, p_phone:phone||'', p_gphone:gphone||'', p_agree:!!agree } })) || { ok:false, why:'신청하지 못했습니다.' },
+    myEnroll: async () => api('/rest/v1/rpc/my_enroll', { method:'POST', body:{} }),
+    enrollList: async () => (await api('/rest/v1/rpc/enroll_list', { method:'POST', body:{} })) || [],
+    enrollDecide: async (id, ok, until, cls) => { const r = await api('/rest/v1/rpc/enroll_decide', { method:'POST', body:{ p_id:id, p_ok:!!ok, p_until:until||null, p_cls:cls||null } }); return r || { ok:false, why:'처리하지 못했습니다.' }; },
+    rosterLinks: async () => (await api('/rest/v1/rpc/roster_links', { method:'POST', body:{} })) || [],
     guardianRequests: async () => (await api('/rest/v1/rpc/guardian_requests', { method:'POST', body:{} })) || [],
     clearReports: async (kind, id) => { await api('/rest/v1/rpc/clear_reports', { method:'POST', body:{ p_kind:kind, p_id:id } }); },
     deleteUser: async email => (await api('/rest/v1/rpc/delete_user', { method:'POST', body:{ p_email:email } })) || { ok:false, why:'지우지 못했습니다.' },
@@ -4710,7 +4771,7 @@ function renderMe(){
         </dl></div>`
       : `<div class="codebox"><h3>가입 없이 둘러보는 중</h3><p>로그인하면 진도가 계정에 저장되고, 학원 코드·이용권을 등록할 수 있어요.</p><button class="btn sm" id="goAuth" style="width:100%">로그인 · 회원가입</button></div>`}
     ${consentCard('me')}
-    ${ACC && ACC.role==='student' && !a ? `<div class="codebox"><h3>학원 코드 등록</h3><p>원장님께 받은 6자리 코드를 넣으면 전 범위가 열리고 <b>내 반 공지</b>와 출석이 연결돼요.</p>
+    ${ACC && ACC.role==='student' && !a ? `<div class="codebox"><h3>학원 코드 등록</h3><p>원장님께 받은 6자리 코드를 넣으면 전 범위가 열리고 <b>내 반 공지</b>와 출석이 연결돼요. 코드가 없으면 학원에 붙은 <b>QR</b>을 폰 카메라로 찍어 신청해도 돼요.</p>${enrollMeHtml()}
         <div class="f"><input id="codeIn" class="code" placeholder="코드 6자리" maxlength="6" autocomplete="off" autocapitalize="characters"><button id="codeGo">등록</button></div>${codeErr?`<div class="err">${esc(codeErr)}</div>`:''}
         ${DBX.mode==='local' ? `<div class="demo">시연용 코드 — <code>MON123</code> 월목반 · <code>TUE456</code> 화금반 · <code>WED789</code> 수토반</div>` : ''}</div>` : ''}
     ${ACC && ACC.role==='parent' && !ACC.childCodes.length ? `<div class="codebox"><h3>자녀 연결</h3><p>자녀가 받은 학원 코드 6자리를 넣으면 출석·진도·공지를 볼 수 있어요.</p>
@@ -5004,17 +5065,97 @@ async function openAsgReport(id){
     ${miss.length && ph.length ? `<a class="btn soft" href="sms:${ph.join(',')}${ios}body=${encodeURIComponent(`[${CFG.academy}] 학원 과제 ‘${a.title}’ — ${asgWhen(a.due)}까지 앱 오늘 화면에서 낼 수 있습니다.`)}" style="text-decoration:none">아직 안 낸 ${miss.length}명에게 문자</a>` : ''}
     ${reHtml}
     <button class="linkbtn" data-asgdel="${esc(a.id)}">이 과제 지우기</button><button class="btn ghost" id="sheetClose">닫기</button>`); }
+let ENR = [], JOIN_TOK = '', STAFF_ME;
+const joinUrl = t => `${WEB_URL}?join=${encodeURIComponent(t)}`;
+let QRP = null;
+const loadQR = () => QRP || (QRP = new Promise((ok, no) => { if (window.qrcode) return ok(); const sc = document.createElement('script'); sc.src = 'qr.js?v=1.4.4';
+  sc.onload = () => ok(); sc.onerror = () => { QRP = null; no(new Error('QR 그림을 불러오지 못했어요. 인터넷 연결을 확인해 주세요.')); }; document.head.appendChild(sc); }));
+const qrSvg = (text, cell) => { if (!window.qrcode) return '<p class="tip">QR 그림을 불러오지 못했어요 — 인터넷 연결 뒤 다시 열어 주세요.</p>'; try { const q = qrcode(0, 'M'); q.addData(text); q.make(); return q.createSvgTag({ cellSize:cell || 4, margin:2, scalable:true }); } catch { return ''; } };
+async function enrollBox(){
+  try { ENR = await DBX.enrollList(); } catch { ENR = []; }
+  if (!ENR.length) return '';
+  return `<details class="stuedit" id="enrBox" open><summary>수강 등록 신청 <span class="cst wait">${ENR.length}건 할 일</span></summary>
+    <p class="tip" style="margin:0 0 8px">학원 QR을 찍고 개인정보 수집·이용에 동의한 학생이에요. 우리 학원 학생이 맞는지 보고 <b>승인</b>하면 학생 코드가 만들어져 그 계정에 바로 연결돼요. 모르는 사람이면 거절하세요.</p>
+    ${ENR.map(x => `<div class="kv" style="align-items:flex-start;gap:8px"><span class="k" style="flex:1">${esc(x.name)} <small style="color:var(--faint)">${esc(x.cls)}${x.under14 ? ' · 만 14세 미만(보호자 동의 끝)' : ''}</small><br><small>${[x.phone && `학생 ${esc(x.phone)}`, x.gphone && `보호자 ${esc(x.gphone)}`, x.email && esc(x.email)].filter(Boolean).join(' · ')} · ${ago(x.at)}</small></span>
+      <span class="v" style="display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end"><button class="mini pri" data-enok="${esc(x.id)}">승인</button><button class="mini" data-enno="${esc(x.id)}">거절</button></span></div>`).join('')}</details>`;
+}
+async function joinQrBox(){
+  try { JOIN_TOK = await DBX.joinToken(false); } catch { return ''; }
+  const u = joinUrl(JOIN_TOK); await loadQR().catch(() => {});
+  return `<details class="stuedit" id="qrBox"><summary>학원 QR · 학생이 찍어서 수강 등록 신청</summary>
+    <div class="joinqr" aria-label="수강 등록 QR">${qrSvg(u)}</div>
+    <p class="tip" style="margin:8px 0">학원 입구에 붙여 두세요. 학생이 폰 카메라로 찍으면 앱이 열리고, 로그인한 뒤 이름·반·연락처를 적고 개인정보 수집·이용에 동의하면 위 <b>수강 등록 신청</b>으로 와요. 원장님이 승인해야 열리니, 사진이 퍼져도 모르는 사람은 들어오지 못해요.</p>
+    <div class="g"><button class="btn" id="qrPoster" style="margin:0">포스터 저장</button><button class="btn ghost" id="qrNew" style="margin:0">새 QR로 바꾸기</button></div>
+    <p class="tip" style="margin:8px 0 0;word-break:break-all">포스터는 A4 한 장(인쇄용)이에요. 주소 ${esc(u)}</p></details>`;
+}
+function posterHtml(u){
+  return `<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${esc(CFG.academy)} 수강 등록 QR</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700;900&display=swap">
+<style>@page{size:A4;margin:16mm}body{font-family:'Noto Sans KR',system-ui,sans-serif;color:#1E2A2E;text-align:center;margin:0;word-break:keep-all}h1{font-size:30pt;margin:8mm 0 3mm;color:#147D6F;font-weight:900}p{font-size:15pt;line-height:1.7;margin:0}.q{width:105mm;margin:9mm auto 7mm}.q svg{width:100%;height:auto;display:block}ol{display:inline-block;text-align:left;font-size:14pt;line-height:2;margin:0;padding-left:1.4em}.s{font-size:12pt;color:#566268;margin-top:7mm}</style></head><body>
+<h1>${esc(CFG.academy)} 앱 수강 등록</h1><p>폰 카메라로 아래 QR을 찍어 주세요</p><div class="q">${qrSvg(u, 8)}</div>
+<ol><li>앱이 열리면 가입하거나 로그인해요</li><li>이름 · 반 · 연락처를 적고 개인정보 수집·이용에 동의해요</li><li>원장님이 확인하면 전 범위가 열려요</li></ol>
+<p class="s">폰이 없어도 괜찮아요 — 출석과 수업은 원장님 명단으로 그대로 관리돼요${CFG.phone ? ` · 문의 ${esc(CFG.phone)}` : ''}</p></body></html>`;
+}
+function openEnrollDecide(x, CL){
+  openSheet(`<h3>수강 등록 승인</h3><p class="tip">${esc(x.name)} · ${esc(x.cls)} — 승인하면 학생 코드가 만들어져 이 계정에 바로 연결되고 전 범위가 열려요. 연락처는 명단에 함께 들어가요.</p>
+    <div class="form" style="margin:0"><div class="g"><select id="enCls" aria-label="반">${CL.map(c => `<option ${c === x.cls ? 'selected' : ''}>${esc(c)}</option>`).join('')}</select><input id="enUntil" type="date" aria-label="수강 만료일" value="${new Date().getFullYear() + 1}-02-28"></div>
+    <button class="btn" id="enGo" data-id="${esc(x.id)}" data-nm="${esc(x.name)}">승인하고 코드 연결</button></div><button class="btn ghost" id="sheetClose">닫기</button>`);
+}
+async function staffBox(){
+  const me = STAFF_ME; let list = []; try { list = await DBX.staffList(); } catch {}
+  const head = me === 'head';
+  return `<div class="form" id="staffBox"><h3>관리자 · 원장님과 같은 권한</h3>
+    <p class="tip" style="margin:0 0 8px">${me === 'admin' ? '지금 <b>관리자</b> 계정으로 쓰고 있어요. 학생·출석·공지·과제·이야기·통계는 원장님과 똑같이 다루고, 관리자 지정·해제만 원장님이 해요.' : '앱 운영을 함께 맡는 분의 계정을 관리자로 정하면 원장님과 같은 화면·권한을 가져요(학생 연락처·출석·이야기 관리 포함). 그분이 먼저 앱에서 가입하고 메일 인증까지 마쳐야 해요. 3명까지.'}</p>
+    ${list.length ? list.map(x => `<div class="kv"><span class="k">${esc(x.name || '이름 없음')} <small style="color:var(--faint)">${esc(x.email || '')}</small></span><span class="v">${head ? `<button class="mini" data-stfdel="${esc(x.uid)}" data-nm="${esc(x.name || x.email || '')}">해제</button>` : '관리자'}</span></div>`).join('') : '<p class="tip" style="margin:0 0 8px">아직 관리자가 없어요.</p>'}
+    ${head ? `<input id="stfEmail" class="fullin" type="email" inputmode="email" autocomplete="off" placeholder="관리자 계정 이메일" aria-label="관리자로 정할 계정의 이메일"><button class="btn soft" id="stfAdd">관리자로 지정</button>` : ''}</div>`;
+}
+let ENR_ME;
+function enrollMeHtml(){
+  let sent = false; try { sent = !!localStorage.getItem('pcs.enrSent'); } catch {}   // 신청을 보낸 계정만 상태를 묻는다(내 정보를 열 때마다 서버에 묻지 않게)
+  if (ENR_ME === undefined && ACC && ACC.role === 'student' && sent && !S.auth){ ENR_ME = null;
+    DBX.myEnroll().then(async r => { ENR_ME = r || null; if (r && r.state !== 'wait') try { localStorage.removeItem('pcs.enrSent'); } catch {}
+      if (r && r.state === 'ok' && r.code && !S.auth){ try { const v = await DBX.verifyCode(r.code); if (v.ok){ S.auth = { code:r.code, name:v.student.name, cls:v.student.cls, until:v.student.until }; ACC = await DBX.me(); save(S); toast('원장님이 수강 등록을 확인했어요. 전 범위가 열렸어요'); } } catch {} }
+      if (view === 'me') renderMe(); }).catch(() => {}); }
+  if (joinTok()) return `<button class="btn soft" id="enResume" style="margin:0 0 10px">학원 QR 수강 등록 신청 이어서 하기</button>`;
+  if (ENR_ME && ENR_ME.state === 'wait') return `<p class="enst">수강 등록 신청을 보냈어요 · 원장님 확인 중 <small>${esc(ENR_ME.cls || '')} · ${kdate(String(ENR_ME.at || '').slice(0, 10))}</small></p>`;
+  if (ENR_ME && ENR_ME.state === 'no') return `<p class="enst no">수강 등록 신청이 받아지지 않았어요. 학원에 문의해 주세요.</p>`;
+  return '';
+}
+const joinTok = () => { try { return localStorage.getItem('pcs.join') || ''; } catch { return ''; } };
+const dropJoin = () => { try { localStorage.removeItem('pcs.join'); } catch {} };
+async function maybeEnroll(){
+  const tok = joinTok(); if (!tok || !ACC) return;
+  if (ACC.role !== 'student'){ dropJoin(); if (ACC.role !== 'owner') toast('수강 등록 신청은 학생 계정에서 할 수 있어요'); return; }
+  if (S.auth){ dropJoin(); toast('이미 학원 코드가 연결되어 있어요'); return; }
+  let ck; try { ck = await DBX.joinCheck(tok); } catch (e){ toast(e.message); return; }
+  if (!ck.ok){ dropJoin(); toast(ck.why || '학원 QR을 확인하지 못했어요'); return; }
+  openSheet(`<h3>${esc(ck.academy || CFG.academy)} 수강 등록 신청</h3>
+    <p class="tip">원장님이 확인하면 학원 코드가 연결돼 전 범위가 열리고, 내 반 공지·출석이 이어져요.</p>
+    <div class="form enform" style="margin:0">
+      <input id="enName" value="${esc(ACC.name || '')}" maxlength="40" autocomplete="name" placeholder="이름" aria-label="이름">
+      <select id="enCls2" aria-label="반"><option value="">반 고르기</option>${(ck.classes || []).map(c => `<option>${esc(c)}</option>`).join('')}</select>
+      <input id="enPhone" inputmode="tel" value="${esc(ACC.phone || '')}" placeholder="학생 연락처 (선택)" aria-label="학생 연락처(선택)">
+      <input id="enG" inputmode="tel" placeholder="보호자 연락처 (선택 · 학원 문자 안내용)" aria-label="보호자 연락처(선택)">
+      <label class="agree"><input type="checkbox" id="enAgree"> <span>개인정보 수집·이용에 동의해요 <b>(필수)</b></span></label>
+      <details class="agreemore"><summary>무엇을 모으고 언제 지우나요</summary><p class="tip" style="margin:6px 0 0">· 모으는 것: 이름, 반, 학생·보호자 연락처<br>· 쓰는 곳: ${esc(CFG.academy)}의 수강 관리·출석·공지·학원 문자 안내<br>· 보관: 수강이 끝나 명단에서 지우면 바로 삭제 · 거절된 신청은 30일, 처리되지 않은 신청은 90일 뒤 삭제<br>· 동의하지 않아도 돼요 — 그러면 앱 수강 등록은 안 되지만, 학원에 말하면 원장님이 명단에 넣어 줄 수 있어요. <a href="privacy.html" target="_blank" rel="noopener">개인정보처리방침</a></p></details>
+      <button class="btn" id="enSend">신청 보내기</button></div>
+    <button class="btn ghost" id="enLater">나중에 할게요</button>`);
+}
 async function renderAdmin(){
   const v = document.getElementById('v-admin');
   const seg = `<div class="seg adm">${[['students','학생'],['attend','출석'],['notice','공지'],['asg','과제'],['sched','일정'],['talk','이야기'],['stats','통계'],['settings','설정']].map(([k,l])=>`<button data-adm="${k}" class="${admTab===k?'on':''}">${l}</button>`).join('')}</div>`;
-  const head = `<div class="adm-h"><h1 class="h-page">원장</h1><span class="who">${esc(CFG.academy)} · ${esc(DBX.ownerEmail()||'이 기기')}</span></div>${seg}`;
+  if (STAFF_ME === undefined) STAFF_ME = await DBX.myStaff().catch(() => null);
+  const head = `<div class="adm-h"><h1 class="h-page">${STAFF_ME === 'admin' ? '관리자' : '원장'}</h1><span class="who">${esc(CFG.academy)} · ${esc(DBX.ownerEmail()||'이 기기')}</span></div>${seg}`;
   clearInterval(attTimer); attTimer=null;
   let classes = CLASSES_CACHE; try { classes = await DBX.classes(); } catch {}
   const CL = classes.map(c=>c.cls); if (!admCls) admCls = CL[0]||'전체';
 
   if (admTab==='students'){
     const st = await DBX.students(); const todo = await ownerTodo(st).catch(() => '');
-    v.innerHTML = head + todo + `
+    const LK = new Map(((await DBX.rosterLinks().catch(() => [])) || []).map(x => [x.code, x]));
+    const appChip = c => { const l = LK.get(c); return !l ? '' : l.app ? `<span class="cst ok" title="학생 계정이 이 코드로 앱을 쓰고 있어요">앱</span>` : `<span class="cst none" title="아직 앱 계정이 연결되지 않았어요(폰이 없거나 등록 전)">앱 없음</span>`; };
+    const nApp = [...LK.values()].filter(x => x.app).length;
+    v.innerHTML = head + todo + await enrollBox(CL) + `
       <div class="form"><h3>수강생 등록 → 코드 발급</h3>
         <div class="g"><input id="stName" placeholder="이름" aria-label="이름"><select id="stCls" aria-label="반">${CL.map(c=>`<option>${esc(c)}</option>`).join('')}</select></div>
         <div class="g"><input id="stPhone" placeholder="연락처(문자 발송용)" aria-label="연락처(문자 발송용)" inputmode="tel"><input id="stUntil" type="date" aria-label="수강 만료일" value="${new Date().getFullYear()+1}-02-28"></div>
@@ -5034,7 +5175,8 @@ async function renderAdmin(){
           <div class="g"><label for="bulkUntil" style="flex:0 0 auto;align-self:center;font-size:var(--t-small);font-weight:700;color:var(--muted);border:0;padding:0;background:none">수강 만료일</label><input id="bulkUntil" type="date" value="${new Date().getFullYear()+1}-02-28"></div>
           <button class="btn" id="bulkCheck">미리 보기</button>`}
       </details>
-      <p class="tip">1인 1코드. 학생은 '학원 코드 등록', 보호자는 '자녀 연결'에 같은 코드를 씁니다. 만료일이 지나면 저절로 닫힙니다. 이름을 누르면 출석·진도·정보 고치기가 보입니다.</p>
+      ${await joinQrBox()}
+      <p class="tip">1인 1코드. 학생은 '학원 코드 등록', 보호자는 '자녀 연결'에 같은 코드를 씁니다. 만료일이 지나면 저절로 닫힙니다. 이름을 누르면 출석·진도·정보 고치기가 보입니다.${LK.size ? ` 지금 <b>${nApp}명</b>이 앱을 쓰고 있어요(명단 ${st.length}명 · ‘앱 없음’은 폰이 없거나 아직 등록하지 않은 학생 — 명단·출석은 그대로 관리돼요).` : ''}</p>
       ${await (async () => { let gr = []; try { gr = await DBX.guardianRequests(); } catch {} if (!gr.length) return '';
         return `<details class="stuedit" id="grBox" open><summary>보호자 연결 요청 <span class="cst wait">${gr.length}건 할 일</span></summary>
           <p class="tip" style="margin:0 0 8px">학생 코드만 알면 누구나 ‘보호자’로 연결을 요청할 수 있어, 원장님이 확인해야 열립니다. 수강 신청서의 보호자 이름·연락처와 같은지 보고 확인해 주세요. 모르는 사람이면 거절하세요.</p>
@@ -5065,8 +5207,8 @@ async function renderAdmin(){
       </details>
       ${CL.map(c => { const rows = st.filter(s=>s.cls===c); if(!rows.length) return '';
         return `<div class="unit-h"><span class="nm">${esc(c)}</span><span class="ln"></span><span class="s" style="font-size:var(--t-cap);color:var(--faint)">${rows.length}명</span></div>` +
-          rows.map(s=>`<button class="stu" data-stu="${s.code}"><span class="nm">${esc(s.name)}</span><span class="cd">${s.code}</span><span class="un">~${kdate(s.until)}</span></button>`).join(''); }).join('')}
-      ${st.some(s=>!CL.includes(s.cls)) ? `<div class="unit-h"><span class="nm">반 미지정</span><span class="ln"></span></div>` + st.filter(s=>!CL.includes(s.cls)).map(s=>`<button class="stu" data-stu="${s.code}"><span class="nm">${esc(s.name)}</span><span class="cd">${s.code} · ${esc(s.cls)}</span><span class="mini" data-del="${s.code}">해제</span></button>`).join('') : ''}`;
+          rows.map(s=>`<button class="stu" data-stu="${s.code}"><span class="nm">${esc(s.name)}</span><span class="cd">${s.code}</span>${appChip(s.code)}<span class="un">~${kdate(s.until)}</span></button>`).join(''); }).join('')}
+      ${st.some(s=>!CL.includes(s.cls)) ? `<div class="unit-h"><span class="nm">반 미지정</span><span class="ln"></span></div>` + st.filter(s=>!CL.includes(s.cls)).map(s=>`<button class="stu" data-stu="${s.code}"><span class="nm">${esc(s.name)}</span><span class="cd">${s.code} · ${esc(s.cls)}</span>${appChip(s.code)}<span class="mini" data-del="${s.code}">수강 끝</span></button>`).join('') : ''}`;
   }
   if (admTab==='attend'){
     const st = await DBX.students(), att = await DBX.attendanceOn(todayISO()); let cur = null;
@@ -5213,6 +5355,7 @@ async function renderAdmin(){
           ${er.slice(0,10).map(e=>`<div class="kv" style="flex-direction:column;align-items:flex-start;gap:2px"><span class="v" style="font-size:var(--t-cap);word-break:break-all">${esc(String(e.msg||'').slice(0,120))}</span><span class="k">${esc(String(e.at||'').slice(0,16).replace('T',' '))} · v${esc(e.ver||'')}</span></div>`).join('')}</div>`; })()}
       <div class="form"><h3>학원 정보</h3><div class="kv"><span class="k">학원명</span><span class="v">${esc(CFG.academy)}</span></div><div class="kv"><span class="k">연락처</span><span class="v">${CFG.phone ? esc(CFG.phone) : '아직 없음 — 앱 설정에 넣어야 계정 삭제 안내에 보입니다'}</span></div><div class="kv"><span class="k">모드</span><span class="v">${SRV?'서버(Supabase)':'로컬 · 이 기기 안에서만'}</span></div>
         <p class="tip" style="margin:8px 0 0">학원명·연락처를 바꾸려면 앱 제작자에게 알려 주세요.</p></div>
+      ${await staffBox()}
       <details class="stuedit"><summary>계정 삭제 요청 처리 · 앱을 지운 사람</summary>
         <p class="tip" style="margin:0 0 8px">앱을 지운 사람이 전화·메일로 계정 삭제를 요청하면 여기서 지웁니다(요청 뒤 10일 안 — 개인정보처리방침). 가입한 이메일로 온 요청이거나 전화로 본인을 확인한 뒤에 하세요.</p>
         <div class="g"><input id="delUserEmail" type="email" inputmode="email" aria-label="지울 계정의 이메일" placeholder="지울 계정의 이메일"></div>
@@ -5316,7 +5459,7 @@ async function openStudent(code){
       <div class="g"><input id="sePhone" value="${esc(st.phone||'')}" inputmode="tel" aria-label="연락처" placeholder="연락처"><input id="seUntil" type="date" value="${st.until}" aria-label="수강 만료일"></div>
       <div class="chips">${[['+1개월',1],['+3개월',3],['+6개월',6]].map(([l,m])=>`<button class="chip" data-seplus="${m}">${l}</button>`).join('')}</div>
       <button class="btn" id="seSave" data-code="${esc(st.code)}">저장</button>
-      <button class="linkbtn" data-del="${esc(st.code)}" style="color:var(--no)">코드 해제(수강 끝) <small>— 이 학생의 앱 접근이 바로 닫힙니다</small></button>
+      <button class="linkbtn" data-del="${esc(st.code)}" data-nm="${esc(st.name)}" style="color:var(--no)">수강 끝 · 명단에서 삭제 <small>— 앱 접근이 바로 닫히고 출석·진도·과제 기록도 지워집니다</small></button>
       ${lk.student ? `<button class="linkbtn" id="seRelease" data-code="${esc(st.code)}">학생 계정 연결 풀기 <small>— 학생이 계정을 새로 만들어 코드가 막혔을 때</small></button>` : ''}
     </details>
     <button class="btn soft" id="wsmsOpen" data-code="${esc(st.code)}">이번 주 요약 문자 <small style="font-weight:400">· 보호자에게</small></button>
@@ -5369,14 +5512,14 @@ const LEGAL = {
 <h4>부칙</h4>
 <p>이 약관은 2026년 11월 1일부터 시행합니다.</p>
 ` },
-  privacy: { t:'개인정보처리방침', h:`<p class="meta">시행일 2026년 11월 1일 · 판 2026-10-07</p>
+  privacy: { t:'개인정보처리방침', h:`<p class="meta">시행일 2026년 11월 1일 · 판 2026-10-13</p>
 <p>박찬 과학(이하 "회사")은 「개인정보 보호법」 제30조에 따라 이용자의 개인정보를 보호하고 관련 고충을 신속하게 처리하기 위하여 다음과 같이 개인정보처리방침을 수립·공개합니다.</p>
 <h4>1. 개인정보의 처리 목적</h4>
-<p>① 회원 가입·관리: 본인 확인, 계정 유지, 만 14세 미만 아동의 법정대리인 동의 확인, 부정 이용 방지<br>② 학습 서비스 제공: 개념·문제 제공, 진도·오답·북마크·통계와 공부 노트의 저장 및 기기 간 동기화, 알림 발송<br>③ 학원 운영: 수강생 인증(학원 코드), 출석 기록, 반별 공지와 확인 여부 관리, 학원 과제 배정과 제출 확인, 보호자에게 자녀의 출석·진도·과제 제출과 주간 요약 제공<br>④ 유료 서비스: 이용권 개통·기간 관리(결제 자체는 앱 마켓이 처리하며 회사는 결제 정보를 저장하지 않습니다)<br>⑤ 고충 처리: 문의 응대, 분쟁 조정, 공지 전달</p>
+<p>① 회원 가입·관리: 본인 확인, 계정 유지, 만 14세 미만 아동의 법정대리인 동의 확인, 부정 이용 방지<br>② 학습 서비스 제공: 개념·문제 제공, 진도·오답·북마크·통계와 공부 노트의 저장 및 기기 간 동기화, 알림 발송<br>③ 학원 운영: 수강생 인증(학원 코드), 학원 QR을 통한 수강 등록 신청의 접수·확인, 출석 기록, 반별 공지와 확인 여부 관리, 학원 과제 배정과 제출 확인, 보호자에게 자녀의 출석·진도·과제 제출과 주간 요약 제공<br>④ 유료 서비스: 이용권 개통·기간 관리(결제 자체는 앱 마켓이 처리하며 회사는 결제 정보를 저장하지 않습니다)<br>⑤ 고충 처리: 문의 응대, 분쟁 조정, 공지 전달</p>
 <h4>2. 처리하는 개인정보의 항목</h4>
-<p>① 회원가입 시(필수): 이메일, 비밀번호(암호화 저장), 이름, 역할(학생/보호자/교사) / (선택): 연락처<br>② 만 14세 미만 아동: 법정대리인의 성명·연락처(동의 확인용)<br>③ 학원 수강생: 학원 코드, 반, 수강 기간, 출석 일시, 공지 확인 여부, 학원 과제 제출 기록(푼 문항 수·맞힌 수·걸린 시간·틀린 문항 번호·제출 시각·마감 뒤 제출 여부 — 학원과 원장이 확인한 보호자만 봄. 보호자에게는 낸 것과 낸 때만 보여 줍니다), 원장이 남긴 이번 주 한 마디(120자 이내 — 학생 본인과 원장이 확인한 보호자만 봄)<br>④ 보호자: 연결한 자녀의 학원 코드<br>⑤ 커뮤니티('이야기') 이용 시: 닉네임, 작성한 글·댓글의 내용과 작성 일시, 도움됨·채택 기록, 신고한 내역(고른 신고 사유·처리 결과 포함)과 신고받은 내역, 차단한 이용자 목록, 학원이 건 이야기 이용 제한(기간·학생에게 보이는 사유·학원 메모·보호자 요청 여부). 학생 계정의 첫 글 검토 결과(검토 중·공개 여부·공개하지 않은 짧은 사유·첫 글을 공개한 시각), 학원이 학생 댓글에 단 ‘선생님 확인’ 표시, 보호자가 자녀의 이야기 쓰기·읽기를 끈 설정(끈 보호자·시각), 학원 처리 기록(글·댓글 지우기, 신고 되돌리기, 이용 제한, 첫 글 공개 여부, 선생님 확인, 보호자의 이야기 설정을 누가 언제 했는지와 대상 글). 신고가 학원 확인으로 자주 되돌려졌는지(최근 30일의 처리 결과로 그때그때 계산하며 따로 저장하지 않음). 밤(22시~아침 7시)에 미뤄 둔 댓글 알림(아침에 한 번 보내고 바로 지움). 글·댓글의 휴대전화 번호는 가운데를 가려(010-****-5678) 저장합니다. 글·댓글에 자해·자살 신호로 보이는 말이 있는지 자동으로 확인한 결과(학원이 먼저 살펴보고 필요하면 연락하기 위한 목적)<br>⑥ 일정 기능 이용 시: 이용자가 직접 넣은 시간표(수업 이름·장소·요일·시각), 일정, D-day. 학원이 반에 보낸 일정<br>⑦ 공부 노트 기능 이용 시: 이용자가 직접 쓴 노트(날짜, 제목, 내용, 노트에 붙인 개념, 고른 노트 틀과 칸별 내용) · (선택) 노트에 고른 그날의 마음(다섯 단어 가운데 하나)과 이해한 정도(3단계). 노트는 작성자 본인만 볼 수 있으며 학원(원장)과 보호자에게도 제공하지 않고, 통계·분석에 쓰지 않습니다<br>⑧ 서비스 이용 중 자동 생성: 학습 기록(공부한 개념과 최근 28일의 날짜별 공부한 개념 수, 문제 풀이 결과와 최근 28일의 날짜별 푼 수·맞힌 수, 답하기 전에 고른 확신 정도(선택), 오답, 북마크, 학습 일자), 이용권 만료일, 알림 설정<br>⑨ 이용권을 앱 마켓에서 구매한 경우: 상품, 주문번호, 결제 확인 토큰, 결제·반영 일시(카드번호 등 결제 수단 정보는 마켓이 처리하며 회사는 받지 않습니다)<br>⑩ 푸시 알림을 켠 경우: 알림을 받을 기기의 알림 토큰<br>⑪ 앱 오류가 났을 때 자동으로: 오류 내용, 앱 버전, 화면 이름, 기기·브라우저 종류(오류 진단용)<br>⑪의2 학원 코드·출석 코드·이용권 코드를 틀리게 입력한 경우 자동으로: 입력 시각과 접속 IP 주소(남의 코드를 추측해 넣는 부정 이용을 막기 위한 목적 · 위치 파악에는 쓰지 않음)<br>⑪의3 ‘의견 보내기·오류 신고’를 이용한 경우: 보낸 내용과 종류, 관련 개념·문제, 앱 버전과 보낸 화면, 보낸 시각(학원만 읽으며, 교재·앱을 고치고 답하는 데만 씀)<br>⑫ 회사는 주민등록번호, 위치 정보, 사진, 연락처 목록을 수집하지 않습니다.</p>
+<p>① 회원가입 시(필수): 이메일, 비밀번호(암호화 저장), 이름, 역할(학생/보호자/교사) / (선택): 연락처<br>② 만 14세 미만 아동: 법정대리인의 성명·연락처(동의 확인용)<br>③ 학원 수강생: 학원 코드, 반, 수강 기간, 출석 일시, 공지 확인 여부, 학원 과제 제출 기록(푼 문항 수·맞힌 수·걸린 시간·틀린 문항 번호·제출 시각·마감 뒤 제출 여부 — 학원과 원장이 확인한 보호자만 봄. 보호자에게는 낸 것과 낸 때만 보여 줍니다), 원장이 남긴 이번 주 한 마디(120자 이내 — 학생 본인과 원장이 확인한 보호자만 봄)<br>④ 보호자: 연결한 자녀의 학원 코드<br>⑤ 커뮤니티('이야기') 이용 시: 닉네임, 작성한 글·댓글의 내용과 작성 일시, 도움됨·채택 기록, 신고한 내역(고른 신고 사유·처리 결과 포함)과 신고받은 내역, 차단한 이용자 목록, 학원이 건 이야기 이용 제한(기간·학생에게 보이는 사유·학원 메모·보호자 요청 여부). 학생 계정의 첫 글 검토 결과(검토 중·공개 여부·공개하지 않은 짧은 사유·첫 글을 공개한 시각), 학원이 학생 댓글에 단 ‘선생님 확인’ 표시, 보호자가 자녀의 이야기 쓰기·읽기를 끈 설정(끈 보호자·시각), 학원 처리 기록(글·댓글 지우기, 신고 되돌리기, 이용 제한, 첫 글 공개 여부, 선생님 확인, 보호자의 이야기 설정을 누가 언제 했는지와 대상 글). 신고가 학원 확인으로 자주 되돌려졌는지(최근 30일의 처리 결과로 그때그때 계산하며 따로 저장하지 않음). 밤(22시~아침 7시)에 미뤄 둔 댓글 알림(아침에 한 번 보내고 바로 지움). 글·댓글의 휴대전화 번호는 가운데를 가려(010-****-5678) 저장합니다. 글·댓글에 자해·자살 신호로 보이는 말이 있는지 자동으로 확인한 결과(학원이 먼저 살펴보고 필요하면 연락하기 위한 목적)<br>⑥ 일정 기능 이용 시: 이용자가 직접 넣은 시간표(수업 이름·장소·요일·시각), 일정, D-day. 학원이 반에 보낸 일정<br>⑦ 공부 노트 기능 이용 시: 이용자가 직접 쓴 노트(날짜, 제목, 내용, 노트에 붙인 개념, 고른 노트 틀과 칸별 내용) · (선택) 노트에 고른 그날의 마음(다섯 단어 가운데 하나)과 이해한 정도(3단계). 노트는 작성자 본인만 볼 수 있으며 학원(원장)과 보호자에게도 제공하지 않고, 통계·분석에 쓰지 않습니다<br>⑧ 서비스 이용 중 자동 생성: 학습 기록(공부한 개념과 최근 28일의 날짜별 공부한 개념 수, 문제 풀이 결과와 최근 28일의 날짜별 푼 수·맞힌 수, 답하기 전에 고른 확신 정도(선택), 오답, 북마크, 학습 일자), 이용권 만료일, 알림 설정<br>⑨ 이용권을 앱 마켓에서 구매한 경우: 상품, 주문번호, 결제 확인 토큰, 결제·반영 일시(카드번호 등 결제 수단 정보는 마켓이 처리하며 회사는 받지 않습니다)<br>⑩ 푸시 알림을 켠 경우: 알림을 받을 기기의 알림 토큰<br>⑪ 앱 오류가 났을 때 자동으로: 오류 내용, 앱 버전, 화면 이름, 기기·브라우저 종류(오류 진단용)<br>⑪의1 학원 QR로 수강 등록을 신청할 때(필수): 이름, 반, 개인정보 수집·이용 동의 시각 / (선택): 학생 연락처, 보호자 연락처 — 원장(관리자 포함)만 보고, 승인되면 수강생 정보(③)로 옮겨집니다<br>⑪의2 학원 코드·출석 코드·이용권 코드를 틀리게 입력한 경우 자동으로: 입력 시각과 접속 IP 주소(남의 코드를 추측해 넣는 부정 이용을 막기 위한 목적 · 위치 파악에는 쓰지 않음)<br>⑪의3 ‘의견 보내기·오류 신고’를 이용한 경우: 보낸 내용과 종류, 관련 개념·문제, 앱 버전과 보낸 화면, 보낸 시각(학원만 읽으며, 교재·앱을 고치고 답하는 데만 씀)<br>⑫ 회사는 주민등록번호, 위치 정보, 사진, 연락처 목록을 수집하지 않습니다.</p>
 <h4>3. 개인정보의 처리 및 보유 기간</h4>
-<p>① 회원 정보와 학습 기록(진도·오답·보관한 글귀·일정·시간표·공부 노트 포함): 회원 탈퇴 시 즉시 파기. 공부 노트는 이용자가 지우면 그때 바로 파기<br>② 커뮤니티 게시물·댓글: 회원 탈퇴 시 삭제하거나 작성자를 알 수 없도록 처리. 다만 다른 이용자의 답변이 달린 질문은 학습 자료로서의 맥락을 위해 작성자 정보를 지운 뒤 남길 수 있습니다<br>③ 신고 접수·처리 기록과 원장이 지운 글·댓글: 반복 위반 확인과 분쟁 대응을 위해 지운 뒤 <b>6개월</b>간 보관 후 파기(신고된 글이 지워지지 않으면 그 글이 남아 있는 동안 신고 수만 보관)<br>④ 출석 기록·수강생 정보: 학원 운영과 수강료 정산의 근거로 수강 종료 후 1년까지 보관 후 파기(학원의 설립·운영 및 과외교습에 관한 법률에 따른 장부 관리)<br>⑤ 이용권 구매·개통 기록(마켓 결제 기록 포함): 「전자상거래 등에서의 소비자보호에 관한 법률」에 따라 5년<br>⑥ 소비자 불만·분쟁 처리 기록: 같은 법에 따라 3년<br>⑦ 서비스 접속 기록(서버 로그): 「통신비밀보호법」에 따라 3개월<br>⑧ 앱 오류 기록: 수집 후 90일이 지나면 파기<br>⑨ 푸시 알림 토큰: 로그아웃·회원 탈퇴 시 즉시 삭제, 앱을 지운 기기의 토큰은 알림 전송이 실패하는 즉시 삭제<br>⑩ 코드 입력 기록(입력 시각·접속 IP 주소): 수집 후 하루가 지나면 매일 새벽 자동 파기<br>⑪ 의견·오류 신고: 보낸 날부터 1년이 지나면 자동 파기(회원 탈퇴 시 즉시 파기)<br>⑫ 이야기 처리 기록(이용 제한·지우기·신고 되돌리기·첫 글 공개 여부·선생님 확인·보호자의 이야기 설정): 남긴 날부터 <b>6개월</b> 뒤 파기, 끝난 제한의 사유는 끝나면 지움(회원 탈퇴 시 즉시 파기). 학원이 공개하지 않은 첫 글은 그때부터 6개월 뒤 파기(작성자가 먼저 지우면 지운 글과 같이). 보호자의 이야기 끄기 설정은 보호자가 다시 켜거나, 자녀 연결을 끊거나, 탈퇴하면 바로 지움<br>⑬ 미뤄 둔 밤 알림: 아침에 보내면 바로 지우고, 보내지 못한 것도 2일 뒤 파기<br>⑭ 학원 과제와 제출 기록: 마감일부터 <b>1년</b> 뒤 매일 새벽 자동 파기. 학원이 과제를 지우거나 학생 코드를 지우면, 학생이 탈퇴하면 그때 바로 파기. 보호자 주간 요약은 따로 저장하지 않고 볼 때·알림을 보낼 때 학습 기록에서 계산합니다<br>⑮ 선생님 한 마디: 남긴 주부터 <b>1년</b> 뒤 매일 새벽 자동 파기. 원장이 비워 남기거나 학생 코드를 지우면 그때 바로 파기</p>
+<p>① 회원 정보와 학습 기록(진도·오답·보관한 글귀·일정·시간표·공부 노트 포함): 회원 탈퇴 시 즉시 파기. 공부 노트는 이용자가 지우면 그때 바로 파기<br>② 커뮤니티 게시물·댓글: 회원 탈퇴 시 삭제하거나 작성자를 알 수 없도록 처리. 다만 다른 이용자의 답변이 달린 질문은 학습 자료로서의 맥락을 위해 작성자 정보를 지운 뒤 남길 수 있습니다<br>③ 신고 접수·처리 기록과 원장이 지운 글·댓글: 반복 위반 확인과 분쟁 대응을 위해 지운 뒤 <b>6개월</b>간 보관 후 파기(신고된 글이 지워지지 않으면 그 글이 남아 있는 동안 신고 수만 보관)<br>④ 출석 기록·수강생 정보: 학원 운영과 수강료 정산의 근거로 수강 종료 후 1년까지 보관 후 파기(학원의 설립·운영 및 과외교습에 관한 법률에 따른 장부 관리)<br>⑤ 이용권 구매·개통 기록(마켓 결제 기록 포함): 「전자상거래 등에서의 소비자보호에 관한 법률」에 따라 5년<br>⑥ 소비자 불만·분쟁 처리 기록: 같은 법에 따라 3년<br>⑦ 서비스 접속 기록(서버 로그): 「통신비밀보호법」에 따라 3개월<br>⑧ 앱 오류 기록: 수집 후 90일이 지나면 파기<br>⑨ 푸시 알림 토큰: 로그아웃·회원 탈퇴 시 즉시 삭제, 앱을 지운 기기의 토큰은 알림 전송이 실패하는 즉시 삭제<br>⑩ 코드 입력 기록(입력 시각·접속 IP 주소): 수집 후 하루가 지나면 매일 새벽 자동 파기<br>⑪ 의견·오류 신고: 보낸 날부터 1년이 지나면 자동 파기(회원 탈퇴 시 즉시 파기)<br>⑫ 이야기 처리 기록(이용 제한·지우기·신고 되돌리기·첫 글 공개 여부·선생님 확인·보호자의 이야기 설정): 남긴 날부터 <b>6개월</b> 뒤 파기, 끝난 제한의 사유는 끝나면 지움(회원 탈퇴 시 즉시 파기). 학원이 공개하지 않은 첫 글은 그때부터 6개월 뒤 파기(작성자가 먼저 지우면 지운 글과 같이). 보호자의 이야기 끄기 설정은 보호자가 다시 켜거나, 자녀 연결을 끊거나, 탈퇴하면 바로 지움<br>⑬ 미뤄 둔 밤 알림: 아침에 보내면 바로 지우고, 보내지 못한 것도 2일 뒤 파기<br>⑭ 학원 과제와 제출 기록: 마감일부터 <b>1년</b> 뒤 매일 새벽 자동 파기. 학원이 과제를 지우거나 학생 코드를 지우면, 학생이 탈퇴하면 그때 바로 파기. 보호자 주간 요약은 따로 저장하지 않고 볼 때·알림을 보낼 때 학습 기록에서 계산합니다<br>⑮ 선생님 한 마디: 남긴 주부터 <br>⑯ 수강 등록 신청(학원 QR): 승인·거절한 신청은 처리한 날부터 30일, 처리하지 않은 신청은 신청한 날부터 90일이 지나면 파기. 승인된 신청의 이름·반·연락처는 수강생 정보로 옮겨져 ④에 따라 보관하며, 원장이 명단에서 지우면(수강 끝) 출석·진도·과제 기록과 함께 바로 파기<b>1년</b> 뒤 매일 새벽 자동 파기. 원장이 비워 남기거나 학생 코드를 지우면 그때 바로 파기</p>
 <h4>3의2. 커뮤니티에서 다른 이용자에게 보이는 정보</h4>
 <p>커뮤니티에 글이나 댓글을 올리면 <b>닉네임과 작성한 내용, 작성 시각</b>이 서비스에 가입한 다른 이용자에게 보입니다. 이메일·이름·연락처·학원 코드·출석·진도·성적은 <b>보이지 않습니다</b>. 글에 개인정보를 직접 적지 않도록 앱이 자동으로 확인하여 알려 드리며, 주민등록번호로 보이는 내용은 올릴 수 없습니다. 학생 계정이 처음 쓴 글은 학원이 확인한 뒤 다른 이용자에게 보이며, 그 전에는 작성자와 학원만 봅니다. 신고한 사람이 누구인지는 신고받은 사람에게 알리지 않으며, 차단 사실도 상대에게 알리지 않습니다.</p>
 
@@ -5396,7 +5539,7 @@ const LEGAL = {
 <h4>7. 개인정보의 파기</h4>
 <p>보유 기간이 지나거나 처리 목적이 달성되면 지체 없이 파기합니다. 전자 파일은 복구할 수 없는 방법으로 삭제하고, 종이 문서는 분쇄 또는 소각합니다. 법령에 따라 보존해야 하는 정보는 별도 저장소로 옮겨 그 기간 동안만 보관합니다.</p>
 <h4>8. 개인정보의 안전성 확보 조치</h4>
-<p>① 비밀번호는 단방향 암호화하여 저장하고, 통신 구간은 TLS로 암호화합니다.<br>② 데이터베이스는 행 단위 접근 제어(RLS)를 적용하여 학생은 자기 정보만, 보호자는 연결한 자녀 정보만, 원장은 학원 운영 정보만 접근할 수 있습니다.<br>③ 출석 코드는 30초마다 바뀌는 일회성 코드이며, 서버에서만 검증합니다.<br>④ 개인정보 접근 권한은 원장 1인으로 최소화하고 접근 기록을 보관합니다.</p>
+<p>① 비밀번호는 단방향 암호화하여 저장하고, 통신 구간은 TLS로 암호화합니다.<br>② 데이터베이스는 행 단위 접근 제어(RLS)를 적용하여 학생은 자기 정보만, 보호자는 연결한 자녀 정보만, 원장은 학원 운영 정보만 접근할 수 있습니다.<br>③ 출석 코드는 30초마다 바뀌는 일회성 코드이며, 서버에서만 검증합니다.<br>④ 개인정보 접근 권한은 원장과 원장이 지정한 관리자(3명 이내 · 학원 운영 담당자)로 최소화하고, 관리자 지정·해제는 원장만 할 수 있으며 접근 기록을 보관합니다.</p>
 <h4>9. 개인정보 자동 수집 장치</h4>
 <p>앱은 광고·추적용 쿠키나 광고 식별자를 사용하지 않습니다. 기기 안의 저장소(localStorage)에는 로그인 상태와 학습 진도가 저장되며, 앱을 삭제하면 함께 삭제됩니다.</p>
 <h4>10. 개인정보 보호책임자</h4>
@@ -5589,7 +5732,8 @@ async function afterLogin(acc){
   try { mergeProgress(await DBX.loadProgress(progressKey())); } catch {}
   adoptGuestNotes(); syncNotes().then(refreshNoteCard).catch(()=>{});
   if (isNative) setTimeout(() => restorePurchases(true).catch(()=>{}), 1500);
-  save(S); scheduleReminder(); show(home()); initPush(); checkTalkNew();
+  save(S); scheduleReminder(); show(home()); initPush(); checkTalkNew(); ENR_ME = undefined; STAFF_ME = undefined;
+  if (joinTok()) setTimeout(maybeEnroll, 600);
 }
 async function linkStudentCode(code){
   const r = await DBX.linkCode('student', code); if (!r.ok) return r;
@@ -5605,6 +5749,14 @@ document.addEventListener('click', async e => {
   if (T('#sheetBg') && !T('.sheet')){ closeSheet(); return; }
   if (T('#sheetClose')){ closeSheet(); return; }
   if (T('#openHelp') || T('#goHelp')){ openHelp(); return; }
+  if (T('#enResume')){ maybeEnroll(); return; }
+  if (T('#enLater')){ closeSheet(); toast('내 정보에서 이어서 신청할 수 있어요'); if (view === 'me') renderMe(); return; }
+  if (T('#enSend')){ const g = id => ((document.getElementById(id) || {}).value || '').trim();
+    if (!g('enName')){ toast('이름을 적어 주세요'); return; } if (!g('enCls2')){ toast('반을 골라 주세요'); return; }
+    if (!(document.getElementById('enAgree') || {}).checked){ toast('개인정보 수집·이용에 동의해야 신청할 수 있어요'); return; }
+    try { const r = await DBX.enrollRequest({ token:joinTok(), name:g('enName'), cls:g('enCls2'), phone:g('enPhone'), gphone:g('enG'), agree:true });
+      if (!r.ok){ toast(r.why || '신청하지 못했어요'); return; }
+      dropJoin(); ENR_ME = undefined; try { localStorage.setItem('pcs.enrSent', '1'); } catch {} closeSheet(); toast('신청했어요. 원장님이 확인하면 전 범위가 열려요'); if (view === 'me') renderMe(); } catch (err){ toast(err.message); } return; }
   const tab = T('.tab'); if (tab){ qState=null; if (tab.dataset.v==='bank' && bs && bs.kind==='review'){ revHold = bs; bs = null; } if (tab.dataset.v==='bank' && bs && bs.kind==='asg') bs = null; if (tab.dataset.v==='bank' && mx && mx.asg && mx.done) mx = null; if (tab.dataset.v==='bank' && !bs) umPick = null; show(tab.dataset.v); return; }   // 문제 탭은 늘 문제 은행 — 하다 만 오늘의 복습은 오늘 화면에서 이어 푼다
   const lg = T('[data-legal]'); if (lg){ openLegal(lg.dataset.legal); return; }
   if (T('#moreRetry')){ MORE.err = false; moreArrived(); loadMore(); return; }
@@ -6082,6 +6234,17 @@ document.addEventListener('click', async e => {
   if (T('#consentCopy')){ const t = T('#consentCopy').dataset.t; try { if (navigator.share) await navigator.share({ text:t }); else { await navigator.clipboard.writeText(t); toast('복사했어요 · 보호자에게 붙여 보내 주세요'); } } catch {} return; }
   if (T('#consentPaper')){ openSheet(`<h3>학원에서 서면으로 동의</h3><p>보호자가 학원에 오시면 원장님께 <b>보호자 동의서</b>를 받아 서명해 주세요. 원장님이 앱에서 확인하면 바로 열립니다.</p><button class="btn ghost" id="sheetClose">닫기</button>`); return; }
   const cpap = T('[data-cpaper]'); if (cpap){ if (!await ask('보호자에게 서면 동의서를 받으셨나요? 받은 서면은 보관해 주세요.', '받았습니다',false)) return; await DBX.consentMark(cpap.dataset.cpaper, 'paper'); toast('서면 동의를 기록했습니다'); renderAdmin(); return; }
+  const enok = T('[data-enok]'); if (enok){ const x = ENR.find(y => y.id === enok.dataset.enok); if (x){ let CL = []; try { CL = (await DBX.classes()).map(c => c.cls); } catch {} openEnrollDecide(x, CL.length ? CL : [x.cls]); } return; }
+  const engo = T('#enGo'); if (engo){ const until = (document.getElementById('enUntil') || {}).value, cls = (document.getElementById('enCls') || {}).value;
+    try { const r = await DBX.enrollDecide(engo.dataset.id, true, until, cls); if (!r.ok){ toast(r.why || '승인하지 못했어요'); return; }
+      closeSheet(); toast(`${engo.dataset.nm} 학생 등록 · 코드 ${r.code}${r.linked ? ' · 앱 연결됨' : ''}`); renderAdmin(); } catch (err){ toast(err.message); } return; }
+  const enno = T('[data-enno]'); if (enno){ if (await ask('이 신청을 거절할까요? 신청 내용은 30일 뒤 지워져요.', '거절', true)){ try { await DBX.enrollDecide(enno.dataset.enno, false); toast('거절했어요'); renderAdmin(); } catch (err){ toast(err.message); } } return; }
+  if (T('#qrPoster')){ await saveFile(`${CFG.academy} 수강 등록 QR.html`, posterHtml(joinUrl(JOIN_TOK)), 'text/html'); return; }
+  if (T('#qrNew')){ if (await ask('새 QR로 바꾸면 지금 붙어 있는 QR은 바로 안 통해요. 새 포스터를 다시 붙여야 해요. 바꿀까요?', '새 QR로 바꾸기', true)){ try { JOIN_TOK = await DBX.joinToken(true); toast('새 QR을 만들었어요 — 포스터를 다시 저장해 붙여 주세요'); renderAdmin(); } catch (err){ toast(err.message); } } return; }
+  if (T('#stfAdd')){ const em = ((document.getElementById('stfEmail') || {}).value || '').trim(); if (!em){ toast('이메일을 적어 주세요'); return; }
+    if (!await ask(`${em} 계정을 관리자로 정할까요? 원장님과 같은 권한(학생 연락처·출석·이야기 관리 포함)을 가져요.`, '관리자로 지정', false)) return;
+    try { const r = await DBX.staffAdd(em); toast(r.ok ? (r.already ? '이미 관리자예요' : '관리자로 정했어요 — 그 계정이 다시 열면 원장 화면이 보여요') : (r.why || '지정하지 못했어요')); if (r.ok) renderAdmin(); } catch (err){ toast(err.message); } return; }
+  const sdel = T('[data-stfdel]'); if (sdel){ if (await ask(`${sdel.dataset.nm} 관리자를 해제할까요? 원래 계정(학생·보호자)으로 돌아가요.`, '해제', true)){ try { const r = await DBX.staffRemove(sdel.dataset.stfdel); toast(r.ok ? '해제했어요' : (r.why || '해제하지 못했어요')); renderAdmin(); } catch (err){ toast(err.message); } } return; }
   const gok = T('[data-gok]'); if (gok){ await DBX.guardianDecide(gok.dataset.gok, gok.dataset.code, true); toast('보호자 연결을 확인했습니다'); renderAdmin(); return; }
   const gno = T('[data-gno]'); if (gno){ if (!await ask('이 보호자 연결을 지울까요? 그 계정은 이 학생의 출석·진도·공지를 더 볼 수 없습니다.', '연결 지우기', true)) return;
     await DBX.guardianDecide(gno.dataset.gno, gno.dataset.code, false); toast('보호자 연결을 지웠습니다'); closeSheet(); renderAdmin(); return; }
@@ -6131,7 +6294,8 @@ document.addEventListener('click', async e => {
   const adl = T('[data-asgdel]'); if (adl){ if (!await ask('이 과제를 지울까요? 학생 화면에서도 사라지고 제출 기록도 함께 지워집니다.', '지우기', true)) return;
     await DBX.assignDelete(adl.dataset.asgdel).catch(e => toast(e.message)); closeSheet(); toast('과제를 지웠습니다'); if (view === 'admin') renderAdmin(); return; }
   const adm = T('[data-adm]'); if (adm){ admTab=adm.dataset.adm; issued=null; issuedPass=null; renderAdmin(); return; }
-  const del = T('[data-del]'); if (del){ e.stopPropagation(); if (await ask('이 학생의 코드를 해제할까요? 앱 접근이 바로 닫힙니다.', '코드 해제',true)){ await DBX.removeStudent(del.dataset.del); closeSheet(); renderAdmin(); } return; }
+  const del = T('[data-del]'); if (del){ e.stopPropagation(); const nm = del.dataset.nm || (del.closest('.stu') && del.closest('.stu').querySelector('.nm') || {}).textContent || '이';
+    if (await ask(`${nm} 학생을 명단에서 지울까요? 앱 접근이 바로 닫히고, 이 학생의 출석·진도·과제 기록과 연락처도 함께 지워집니다. 되돌릴 수 없어요(다시 다니면 새로 등록).`, '명단에서 삭제', true)){ await DBX.removeStudent(del.dataset.del); closeSheet(); toast('명단에서 지웠어요'); renderAdmin(); } return; }
   const stu = T('[data-stu]'); if (stu){ openStudent(stu.dataset.stu); return; }
   if (T('#stAdd')){ const name=(document.getElementById('stName').value||'').trim(), cls=document.getElementById('stCls').value, until=document.getElementById('stUntil').value, phone=(document.getElementById('stPhone').value||'').trim();
     if (!name || !until){ toast('이름과 만료일을 채워 주세요'); return; } issued = await DBX.addStudent({name, cls, until, phone}); renderAdmin(); return; }
@@ -6225,6 +6389,9 @@ window.addEventListener('unhandledrejection', e => { const r = e.reason || {};
   iabHint();
   setTimeout(() => { const Sp = plug('SplashScreen'); Sp && Sp.hide(); }, 1500);   // 망이 느려도 첫 화면을 21초씩 가리지 않게
   if (storeWarn) setTimeout(() => toast(storeWarn), 900);
+  { const jq = new URLSearchParams(location.search); const jt = jq.get('join');
+    if (jt !== null){ if (/^[0-9A-Fa-f]{6,16}$/.test(jt)){ try { localStorage.setItem('pcs.join', jt.toUpperCase()); } catch {} }
+      jq.delete('join'); history.replaceState(null, '', location.pathname + (jq.toString() ? '?' + jq : '') + location.hash); } }
   const hp = new URLSearchParams(location.hash.slice(1)); let linkErr = '';
   if (SRV && (hp.get('access_token') || hp.get('error_description'))){
     history.replaceState(null, '', location.pathname + location.search);
@@ -6247,12 +6414,13 @@ window.addEventListener('unhandledrejection', e => { const r = e.reason || {};
         else { if (S.auth) toast(r.why || '학원 코드가 닫혔습니다'); S.auth = null; } } catch {} }
     else if (S.auth && ACC.role==='student') S.auth = null;
     if (S.auth && ACC.role!=='student') S.auth = null;
-    show(home());
+    show(home()); if (joinTok()) setTimeout(maybeEnroll, 700);
     DBX.loadProgress(progressKey()).then(p => { if (p){ mergeProgress(p); save(S); if (view==='today') renderToday(); } else if (progressKey() && ((S.days || []).length || S.done.length)) save(S); }).catch(()=>{});
   } else {
     if (S.auth) S.auth = null;      // 로그아웃 상태에서는 학원 연결도 닫는다
     if (!S.onboarded && !S.introSeen) authMode = 'intro';
-    show(S.onboarded ? 'today' : 'auth');
+    if (joinTok()){ S.onboarded = true; authMode = 'login'; show('auth'); setTimeout(() => toast('학원 QR로 들어왔어요 — 가입하거나 로그인하면 수강 등록 신청으로 이어져요'), 500); }
+    else show(S.onboarded ? 'today' : 'auth');
   }
   nativeInit(); initPush(); setTimeout(checkTalkNew, 1200); checkAppMeta();
 })();
