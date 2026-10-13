@@ -252,6 +252,14 @@
   .qg2 .q figure{ margin:1.6mm 0 0.6mm 8.4mm !important; }
   .exp{ border:0.35mm solid #B8C2CA; border-radius:1.6mm; background:#FAFBFC; padding:1.6mm 2.6mm; margin:1.4mm 0 1.6mm; font-size:8.9pt; line-height:1.7; }
   .exp b{ font-family:'PC Sans'; font-size:7.8pt; font-weight:900; color:var(--brand); }
+
+/* ── 2026-10-13 시험에 나오는 보강 쪽(docs/22) ── */
+  .plus-h{ display:flex; align-items:center; gap:3mm; margin:0 0 4mm; } .plus-h .tag{ background:var(--point); color:#fff; font-weight:900; font-size:9pt; padding:1.2mm 3mm; border-radius:1.5mm; } .plus-h .tt{ font-size:12.5pt; font-weight:900; }
+  h3.psec{ font-size:11.5pt; font-weight:800; margin:5mm 0 2.4mm; } .pkey{ font-size:8.8pt; font-weight:700; color:var(--unit); border-left:0.8mm solid var(--unit); padding:0.6mm 0 0.6mm 2.6mm; margin:1.5mm 0 3mm; }
+  .pq-h{ font-size:10.5pt; font-weight:900; margin:5mm 0 3mm; color:var(--unit); } .pq{ margin-bottom:5.5mm; break-inside:avoid; } .pq .stem{ font-family:'PC Serif','PC Sans',serif; font-size:9.4pt; line-height:1.72; } .pq .pqno{ font-weight:900; color:var(--unit); margin-right:1.6mm; } .pq .stem .difficulty{ color:#C9A227; font-size:8pt; margin-left:1.5mm; }
+  .psols{ margin-top:4mm; border-top:0.3mm solid var(--line); padding-top:2mm; } .psol{ font-size:8.6pt; line-height:1.7; margin-bottom:2.6mm; break-inside:avoid; } .psol p{ margin:0; }
+  .psol::before{ content:attr(data-n); float:left; font-weight:900; color:var(--unit); margin-right:1.6mm; } .psol > p{ font-family:'PC Serif','PC Sans',serif; }   /* 해설 번호 · 본문 해설과 같은 글꼴 */
+  table.qtab{ border-collapse:collapse; margin:1.6mm 0 0.6mm 8.4mm; width:calc(100% - 8.4mm); font-family:'PC Sans'; font-size:8pt; line-height:1.45; } table.qtab th, table.qtab td{ border:0.25mm solid #B8C2CA; padding:0.5mm 1.2mm; text-align:center; vertical-align:middle; } table.qtab th{ background:#F2F5F7; font-weight:800; color:var(--ink); }
 </style>
 </head>
 <body>
@@ -1023,6 +1031,146 @@
     </div>
   </div>
   <div class="folio"><span>III. 과학과 미래 사회</span><span class="num">227</span></div>
+</div>
+
+<!-- ═════════════ 보강 · 시험에 나오는 보강 (2026-10-13 완자 대조 보강, 우리 글·그림·문제) ═════════════ -->
+<!-- 근거: 공공 데이터 — 공공데이터포털(data.go.kr, 행정안전부)·기상자료개방포털(기상청) · 기계 학습의 갈래(지도·비지도·강화 학습)와 학습용·평가용 데이터 나누기(교과서 공통)
+     라이다: 거리 = 빛의 속력 × 왕복 시간 ÷ 2, 빛의 속력 약 3 × 10⁸ m/s — 본문 예 2 × 10⁻⁷ s → 30 m, 문항 4 예 4 × 10⁻⁷ s → 60 m -->
+<div class="page plus">
+  <div class="runhead"><span class="unit-tag">III. 과학과 미래 사회</span><span class="lesson-tag">02. 빅데이터와 인공지능·로봇</span></div>
+  <div class="plus-h"><span class="tag">시험에 나오는 보강</span><span class="tt">데이터셋과 공공 데이터 · 기계 학습 · 라이다와 스마트 홈</span></div>
+
+  <section class="plus-sec" data-concept="1">
+    <h3 class="psec" style="margin-top:0;">데이터셋과 공공 데이터</h3>
+    <p class="body">분석이나 학습에 쓰려고 같은 형식으로 모아 정리한 데이터 묶음이 <span class="kw">데이터셋</span>이다. 표로 보면 한 줄이 한 사례, 한 칸이 한 항목(날짜·기온 등)이다. 공공 기관이 만들거나 모은 데이터를 누구나 쓰게 공개한 것이 <span class="kw">공공 데이터</span>로, 공공데이터포털·기상자료개방포털에서 내려받는다. 쓰기 전에는 <b>출처·단위·빠진 값</b>을 확인한다.</p>
+    <div class="pkey">한 줄 정리: 데이터셋 = 같은 형식으로 정리한 데이터 묶음 · 공공 데이터 = 공공 기관이 공개한 데이터 — 출처·단위·빠진 값부터 확인한다.</div>
+  </section>
+
+  <section class="plus-sec" data-concept="4">
+    <h3 class="psec">기계 학습 — 지도 학습·비지도 학습·강화 학습</h3>
+    <p class="body">컴퓨터가 데이터에서 규칙을 스스로 찾아 성능을 높이는 방법이 <span class="kw">기계 학습</span>이다. 정답이 붙은 데이터로 배우는 <b>지도 학습</b>(예: '스팸'·'정상' 표시가 붙은 메일로 스팸 거르기), 정답 없이 비슷한 것끼리 묶는 <b>비지도 학습</b>(예: 비슷한 고객 무리 찾기), 잘한 행동에 보상을 주며 시행착오로 배우는 <b>강화 학습</b>(예: 게임·로봇 걷기)이 있다. 데이터는 <span class="u-amber">학습용과 평가용으로 나누고</span> 배울 때 보지 않은 평가용 데이터로 실력을 잰다.</p>
+    <figure style="margin:1mm 0 0.5mm;">
+      <svg width="640" height="142" viewBox="0 0 640 142" font-family="PC Sans">
+        <!-- (가) 지도 학습 -->
+        <rect x="10" y="6" width="300" height="114" rx="6" fill="#FAFBFC" stroke="#D8E0E5"/>
+        <g fill="#2E6690"><circle cx="50" cy="40" r="6"/><circle cx="74" cy="58" r="6"/><circle cx="44" cy="80" r="6"/><circle cx="92" cy="34" r="6"/><circle cx="70" cy="96" r="6"/></g>
+        <g fill="#D6455D"><rect x="196" y="44" width="11" height="11"/><rect x="226" y="66" width="11" height="11"/><rect x="250" y="38" width="11" height="11"/><rect x="206" y="90" width="11" height="11"/><rect x="262" y="88" width="11" height="11"/></g>
+        <line x1="150" y1="14" x2="134" y2="114" stroke="#22303A" stroke-width="1.8" stroke-dasharray="5 3"/>
+        <text x="100" y="114" text-anchor="middle" font-size="13" font-weight="800" fill="#2E6690">정상</text>
+        <text x="238" y="30" text-anchor="middle" font-size="13" font-weight="800" fill="#D6455D">스팸</text>
+        <text x="160" y="64" font-size="13" font-weight="700" fill="#22303A">배운 경계</text>
+        <text x="160" y="138" text-anchor="middle" font-size="13" font-weight="900" fill="#22303A">(가) 지도 학습 — 정답이 붙은 데이터</text>
+        <!-- (나) 비지도 학습 -->
+        <rect x="330" y="6" width="300" height="114" rx="6" fill="#FAFBFC" stroke="#D8E0E5"/>
+        <g fill="#8A949E"><circle cx="372" cy="42" r="6"/><circle cx="394" cy="58" r="6"/><circle cx="368" cy="70" r="6"/><circle cx="398" cy="34" r="6"/><circle cx="520" cy="44" r="6"/><circle cx="546" cy="36" r="6"/><circle cx="538" cy="62" r="6"/><circle cx="460" cy="96" r="6"/><circle cx="484" cy="88" r="6"/><circle cx="470" cy="108" r="6"/></g>
+        <g fill="none" stroke="#147D6F" stroke-width="1.6" stroke-dasharray="4 3"><ellipse cx="384" cy="52" rx="32" ry="30"/><ellipse cx="534" cy="48" rx="30" ry="26"/><ellipse cx="472" cy="98" rx="28" ry="20"/></g>
+        <text x="600" y="100" text-anchor="end" font-size="13" font-weight="700" fill="#147D6F">비슷한 것끼리</text>
+        <text x="600" y="116" text-anchor="end" font-size="13" font-weight="700" fill="#147D6F">스스로 묶음</text>
+        <text x="480" y="138" text-anchor="middle" font-size="13" font-weight="900" fill="#22303A">(나) 비지도 학습 — 정답 없는 데이터</text>
+      </svg>
+      <figcaption>그림 보강 1 | 기계 학습 — (가) 정답을 보고 나누는 기준을 배운다 (나) 정답 없이 비슷한 데이터끼리 묶는다</figcaption>
+    </figure>
+    <div class="pkey">한 줄 정리: 지도 학습 = 정답 있음 · 비지도 학습 = 정답 없이 묶기 · 강화 학습 = 보상으로 배우기 — 성능은 평가용 데이터로 확인한다.</div>
+  </section>
+
+  <section class="plus-sec" data-concept="5">
+    <h3 class="psec">라이다와 스마트 홈 — 사물이 주변을 재고 스스로 움직인다</h3>
+    <p class="body"><span class="kw">라이다</span>는 레이저 빛을 쏘아 물체에 맞고 되돌아오기까지의 시간을 재어 거리를 구하는 센서다. 빛은 갔다가 돌아오므로 <span class="u-amber">거리 = 빛의 속력 × 왕복 시간 ÷ 2</span>다. 왕복 2 × 10<sup>−7</sup>&nbsp;s이면 3 × 10<sup>8</sup>&nbsp;m/s × 2 × 10<sup>−7</sup>&nbsp;s ÷ 2 = 30&nbsp;m다. 주변을 점으로 된 3차원 지도로 그려 자율주행차·청소 로봇·드론 측량에 쓰인다. <span class="kw">스마트 홈</span>은 가전·조명·보일러를 인터넷으로 연결해 멀리서 조절하고, 센서가 빈집을 알아채면 조명과 난방을 꺼 에너지를 아낀다. 해킹과 개인 정보 유출에는 대비해야 한다.</p>
+    <figure style="margin:1mm 0 0.5mm;">
+      <svg width="640" height="92" viewBox="0 0 640 92" font-family="PC Sans">
+        <defs>
+          <marker id="pb2302R" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="#D6455D"/></marker>
+          <marker id="pb2302B" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="#2E6690"/></marker>
+          <marker id="pb2302K" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto-start-reverse"><path d="M0,0 L7,3 L0,6 Z" fill="#5B6B77"/></marker>
+        </defs>
+        <!-- 자동차와 라이다 -->
+        <rect x="20" y="40" width="84" height="26" rx="8" fill="#B8C2CA"/><rect x="40" y="26" width="44" height="18" rx="5" fill="#B8C2CA"/>
+        <circle cx="40" cy="68" r="8" fill="#22303A"/><circle cx="86" cy="68" r="8" fill="#22303A"/>
+        <rect x="56" y="18" width="12" height="9" rx="2" fill="#D6455D"/>
+        <text x="62" y="12" text-anchor="middle" font-size="13" font-weight="800" fill="#D6455D">라이다</text>
+        <!-- 장애물 -->
+        <rect x="548" y="18" width="26" height="52" rx="3" fill="#E8940A"/>
+        <text x="561" y="86" text-anchor="middle" font-size="13" font-weight="700" fill="#9C6503">물체</text>
+        <line x1="112" y1="30" x2="540" y2="30" stroke="#D6455D" stroke-width="2.2" marker-end="url(#pb2302R)"/>
+        <line x1="540" y1="52" x2="112" y2="52" stroke="#2E6690" stroke-width="2.2" stroke-dasharray="6 3" marker-end="url(#pb2302B)"/>
+        <text x="326" y="22" text-anchor="middle" font-size="13" font-weight="800" fill="#D6455D">쏜 레이저 빛</text>
+        <text x="326" y="70" text-anchor="middle" font-size="13" font-weight="800" fill="#2E6690">되돌아온 빛 — 왕복 2 × 10⁻⁷ s</text>
+        <line x1="112" y1="84" x2="540" y2="84" stroke="#5B6B77" stroke-width="1" marker-start="url(#pb2302K)" marker-end="url(#pb2302K)"/>
+        <rect x="290" y="76" width="72" height="16" fill="#fff"/><text x="326" y="89" text-anchor="middle" font-size="13" font-weight="800" fill="#22303A">거리 30 m</text>
+      </svg>
+      <figcaption>그림 보강 2 | 라이다의 거리 재기 — 빛은 왕복하므로 빛의 속력 × 왕복 시간을 2로 나눈다</figcaption>
+    </figure>
+    <div class="pkey" style="margin-bottom:0;">한 줄 정리: 라이다의 거리 = 빛의 속력 × 왕복 시간 ÷ 2 · 스마트 홈 = 연결된 집(절약, 해킹·개인 정보 대비)</div>
+  </section>
+  <div class="folio"><span>III. 과학과 미래 사회</span><span class="num">?</span></div>
+</div>
+
+<div class="page plus">
+  <div class="runhead"><span class="unit-tag">III. 과학과 미래 사회</span><span class="lesson-tag">02. 빅데이터와 인공지능·로봇</span></div>
+  <div class="pq-h" style="margin-top:0;">보강 문제</div>
+  <div class="qgrid">
+    <div>
+      <div class="pq" data-n="1" data-concept="4" data-type="ox" data-answer="X">
+        <div class="stem"><span class="pqno">1</span>지도 학습은 정답 없는 데이터를 묶는 방법이다. ( O , X ) <span class="difficulty">●○○</span></div>
+      </div>
+      <div class="pq" data-n="2" data-concept="5" data-type="blank" data-answer="라이다">
+        <div class="stem"><span class="pqno">2</span>빛의 왕복 시간으로 거리를 재는 센서는 <span class="blankline"></span>이다. <span class="difficulty">●○○</span></div>
+      </div>
+      <div class="pq" data-n="3" data-concept="5" data-type="mc" data-answer="②">
+        <div class="stem"><span class="pqno">3</span><span class="badge-data">자료</span>다음은 라이다로 앞 물체를 잰 결과이다. 물체까지의 거리는? <span class="difficulty">●●○</span></div>
+        <div class="exp">• 빛이 되돌아오기까지 걸린 시간: 4 × 10<sup>−7</sup>&nbsp;s<br>• 빛의 속력: 3 × 10<sup>8</sup>&nbsp;m/s</div>
+        <ul class="choices inline"><li>① 30&nbsp;m</li><li>② 60&nbsp;m</li><li>③ 120&nbsp;m</li><li>④ 600&nbsp;m</li><li>⑤ 1200&nbsp;m</li></ul>
+      </div>
+      <div class="pq" style="margin-bottom:0;" data-n="4" data-concept="4" data-type="mc" data-answer="③">
+        <div class="stem"><span class="pqno">4</span>지도 학습의 예로 가장 알맞은 것은? <span class="difficulty">●●○</span></div>
+        <ul class="choices">
+          <li>① 정답 없이 비슷한 고객끼리 묶기</li>
+          <li>② 이기면 점수를 주며 게임 익히기</li>
+          <li>③ 스팸·정상 표시가 붙은 메일로 스팸 거르기</li>
+          <li>④ 사람이 모든 규칙을 적어 넣은 계산기</li>
+          <li>⑤ 학습에 쓴 데이터로만 성능 평가하기</li>
+        </ul>
+      </div>
+    </div>
+    <div>
+      <div class="pq" data-n="5" data-concept="5" data-type="multi" data-answer="④">
+        <div class="stem"><span class="pqno">5</span>옳은 것만을 &lt;보기&gt;에서 있는 대로 고른 것은? <span class="difficulty">●●○</span></div>
+        <div class="bogi-box">
+          <div class="bt">보기</div>
+          ㄱ. 라이다는 전파를 쏘아 거리를 잰다.<br>
+          ㄴ. 스마트 홈은 빈집에서 전기를 아낀다.<br>
+          ㄷ. 기계 학습의 성능은 평가용 데이터로 잰다.
+        </div>
+        <ul class="choices inline"><li>① ㄱ</li><li>② ㄷ</li><li>③ ㄱ, ㄴ</li><li>④ ㄴ, ㄷ</li><li>⑤ ㄱ, ㄴ, ㄷ</li></ul>
+      </div>
+      <div class="pq" style="margin-bottom:0;" data-n="6" data-concept="1" data-type="multi" data-answer="③">
+        <div class="stem"><span class="pqno">6</span>데이터셋을 다룰 때 옳은 것만을 &lt;보기&gt;에서 있는 대로 고른 것은? <span class="difficulty">●●○</span></div>
+        <div class="bogi-box">
+          <div class="bt">보기</div>
+          ㄱ. 빠진 값과 단위는 분석 전에 확인한다.<br>
+          ㄴ. 치우친 데이터는 치우친 결과를 낳는다.<br>
+          ㄷ. 데이터가 많기만 하면 결과는 늘 옳다.
+        </div>
+        <ul class="choices inline"><li>① ㄱ</li><li>② ㄷ</li><li>③ ㄱ, ㄴ</li><li>④ ㄴ, ㄷ</li><li>⑤ ㄱ, ㄴ, ㄷ</li></ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="psols" style="margin-top:2mm;"><div class="pq-h" style="margin-top:1mm;">보강 문제 해설</div>
+    <div class="solcols">
+      <div>
+        <div class="psol" data-n="1"><p><b>X</b> 정답 없이 묶는 것은 비지도 학습이다.</p></div>
+        <div class="psol" data-n="2"><p><b>라이다</b> 전파를 쓰는 것은 레이더다.</p></div>
+        <div class="psol" data-n="3"><p><b>②</b> 거리 = 3 × 10<sup>8</sup>&nbsp;m/s × 4 × 10<sup>−7</sup>&nbsp;s ÷ 2 = 120&nbsp;m ÷ 2 = 60&nbsp;m이다.</p><div class="wrongbox"><div class="wt">바로알기</div><p><b>①</b> 2로 두 번 나눈 값이다.</p><p><b>③</b> 왕복 거리다(÷ 2를 빠뜨림).</p><p><b>④</b> 편도 거리를 10배로 잘못 셈했다.</p><p><b>⑤</b> 왕복 거리를 10배로 잘못 셈했다.</p></div></div>
+      </div>
+      <div>
+        <div class="psol" data-n="4"><p><b>③</b> 정답(스팸·정상)이 붙은 데이터로 배운다.</p><div class="wrongbox"><div class="wt">바로알기</div><p><b>①</b> 비지도 학습이다.</p><p><b>②</b> 강화 학습이다.</p><p><b>④</b> 데이터에서 배우지 않는다.</p><p><b>⑤</b> 성능은 평가용 데이터로 확인해야 한다.</p></div></div>
+        <div class="psol" data-n="5"><p><b>④</b> ㄴ: 빈집의 불·난방을 끈다. ㄷ: 평가용 데이터로 잰다.</p><div class="wrongbox"><div class="wt">바로알기</div><p><b>ㄱ</b> 라이다는 레이저 빛을 쓴다(전파는 레이더).</p></div></div>
+        <div class="psol" data-n="6"><p><b>③</b> ㄱ: 출처·단위부터 본다. ㄴ: 치우치면 불공정하다.</p><div class="wrongbox"><div class="wt">바로알기</div><p><b>ㄷ</b> 많아도 틀리거나 치우치면 결과도 틀린다.</p></div></div>
+      </div>
+    </div>
+  </div>
+  <div class="folio"><span>III. 과학과 미래 사회</span><span class="num">?</span></div>
 </div>
 
 <!-- ═════════════ p.169 STEP 1 + STEP 2 시작 (7~10) ═════════════ -->
