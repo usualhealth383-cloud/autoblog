@@ -264,6 +264,9 @@ table.rubric th{ background:#F4F1EA; font-weight:800; white-space:nowrap; }
   .psols{ margin-top:4mm; border-top:0.3mm solid var(--line); padding-top:2mm; } .psol{ font-size:8.6pt; line-height:1.7; margin-bottom:2.6mm; break-inside:avoid; } .psol p{ margin:0; }
   .psol::before{ content:attr(data-n); float:left; font-weight:900; color:var(--unit); margin-right:1.6mm; } .psol > p{ font-family:'PC Serif','PC Sans',serif; }   /* 해설 번호(쪽에서 문항을 찾게) · 본문 해설과 같은 글꼴 */
   .up .qgrid > div > .pq:last-child{ margin-bottom:0; }   /* 실력 다지기: 단 끝 문항 아래 여백이 하한선을 넘지 않게 */
+  /* 2026-10-13 개념 쪽 비교표(그림과 글의 배합) */
+  table.ctab{ width:100%; border-collapse:collapse; font-size:8.8pt; line-height:1.55; margin:2.5mm 0 3mm; break-inside:avoid; } table.ctab th{ background:var(--unit); color:#fff; font-weight:800; padding:1.2mm 2mm; text-align:center; } table.ctab td{ border-bottom:0.25mm solid var(--line); padding:1.2mm 2mm; vertical-align:top; word-break:keep-all; } table.ctab td:first-child{ font-weight:800; color:var(--unit); white-space:nowrap; } table.ctab .cap{ caption-side:bottom; font-size:7.8pt; color:#6B7780; text-align:left; padding-top:1mm; }
+  table.ctab td.c{ text-align:center; } table.ctab .an{ color:var(--sub); font-size:8pt; }   /* 가운데 칸(○·× 등) · 덧말(비유) */
   .pq table.qtab{ border-collapse:collapse; margin:1.6mm 0 0.6mm 4mm; width:calc(100% - 4mm); font-family:'PC Sans'; font-size:8.2pt; line-height:1.45; } .pq table.qtab th, .pq table.qtab td{ border:0.25mm solid #B8C2CA; padding:0.6mm 1mm; text-align:center; vertical-align:middle; } .pq table.qtab th{ background:#F2F5F7; font-weight:800; white-space:nowrap; }
 </style>
 </head>
@@ -361,8 +364,17 @@ table.rubric th{ background:#F4F1EA; font-weight:800; white-space:nowrap; }
   <div class="cols">
     <div class="main">
       <h3 class="sec"><span class="n">1</span>세포 — 생명 시스템의 기본 단위</h3>
-      <p class="body">지구시스템이 다섯 권역의 상호작용으로 굴러가듯, 생명체도 하나의 <span class="kw">시스템</span>이다. 그 기본 단위가 <span class="kw">세포</span>다. 비슷한 세포가 모여 <b>조직</b>을, 여러 조직이 모여 <b>기관</b>을 이룬다. 동물은 함께 일하는 기관들이 모여 <b>기관계</b>(소화계·순환계 등)를 이루고, 기관계가 모여 <b>개체</b>가 된다 — <span class="u-amber">세포 → 조직 → 기관 → 기관계 → 개체</span>. 식물에는 기관계가 없는 대신 조직들이 모여 <b>조직계</b>를 이루고, 조직계가 모여 뿌리·줄기·잎 같은 기관을 만든다 — <span class="u-amber">세포 → 조직 → 조직계 → 기관 → 개체</span>.</p>
-      <p class="body">세포 속을 들여다보면 분업이 정교하다. <span class="kw">핵</span>은 유전 정보(설계도)를 보관하고, <span class="kw">마이토콘드리아</span>는 양분을 분해해 세포가 쓸 에너지를 만들며, <span class="kw">라이보솜</span>은 단백질을 조립한다. 그리고 이 모든 것을 감싸는 <span class="kw">세포막</span>이 물질의 출입을 관리한다. 공장에 비유하면 설계실·발전소·조립 라인·정문 경비실이 한 건물 안에 다 있는 셈이다. 식물 세포에는 둘이 더 있다. 광합성으로 양분을 만드는 <span class="kw">엽록체</span>, 그리고 세포막 바깥에서 세포를 보호하고 모양을 유지하는 <span class="kw">세포벽</span>이다. 다 자란 식물 세포에는 큰 <b>액포</b>도 있다.</p>
+      <p class="body">지구시스템이 다섯 권역의 상호작용으로 굴러가듯, 생명체도 하나의 <span class="kw">시스템</span>이다. 그 기본 단위가 <span class="kw">세포</span>다. 비슷한 세포가 모여 <b>조직</b>을, 여러 조직이 모여 <b>기관</b>을 이룬다. 동물은 기관이 모여 <b>기관계</b>(소화계·순환계 등)를, 기관계가 모여 <b>개체</b>를 이룬다. 식물은 기관계 대신 조직이 모여 <b>조직계</b>를, 조직계가 모여 뿌리·줄기·잎 같은 기관을 이룬다.</p>
+      <table class="ctab">
+        <caption class="cap">표 1 | 세포 속의 분업 (○ 있다, × 없다) — 다 자란 식물 세포에는 큰 액포도 있다</caption>
+        <tr><th>구조</th><th>하는 일 <span style="font-weight:600;">(공장에 비유하면)</span></th><th>동물 세포</th><th>식물 세포</th></tr>
+        <tr><td>핵</td><td>유전 정보(설계도)를 보관한다 <span class="an">설계실</span></td><td class="c">○</td><td class="c">○</td></tr>
+        <tr><td>마이토콘드리아</td><td>양분을 분해해 세포가 쓸 에너지를 만든다 <span class="an">발전소</span></td><td class="c">○</td><td class="c">○</td></tr>
+        <tr><td>라이보솜</td><td>단백질을 조립한다 <span class="an">조립 라인</span></td><td class="c">○</td><td class="c">○</td></tr>
+        <tr><td>세포막</td><td>세포를 감싸고 물질의 출입을 관리한다 <span class="an">정문 경비실</span></td><td class="c">○</td><td class="c">○</td></tr>
+        <tr><td>엽록체</td><td>광합성으로 양분을 만든다</td><td class="c">×</td><td class="c">○</td></tr>
+        <tr><td>세포벽</td><td>세포막 바깥에서 세포를 보호하고 모양을 유지한다</td><td class="c">×</td><td class="c">○</td></tr>
+      </table>
 
       <figure>
         <svg width="494" height="248" viewBox="0 0 470 236" font-family="PC Sans">
@@ -485,7 +497,6 @@ table.rubric th{ background:#F4F1EA; font-weight:800; white-space:nowrap; }
     <div class="main">
       <h3 class="sec"><span class="n">2</span>물질대사 — 세포 안의 화학 반응</h3>
       <p class="body">생명체 안에서 일어나는 모든 화학 반응을 <span class="kw">물질대사</span>라고 한다. 방향은 두 가지뿐이다. 작고 간단한 물질로 크고 복잡한 물질을 <b>합성</b>하면 <span class="kw">동화 작용</span>(에너지 흡수), 크고 복잡한 물질을 작고 간단한 물질로 <b>분해</b>하면 <span class="kw">이화 작용</span>(에너지 방출)이다. 식물이 이산화 탄소와 물로 포도당을 만드는 <b>광합성</b>이 동화의 대표라면, 세포가 포도당을 분해해 에너지를 꺼내 쓰는 <b>세포 호흡</b>은 이화의 대표다.</p>
-      <p class="body">세포 호흡은 연소와 닮았다 — 포도당과 산소가 반응해 이산화 탄소와 물이 되니까. 그러나 결정적 차이가 있다. 연소는 한꺼번에 높은 온도로 타오르지만, 물질대사는 <span class="u-amber">체온 정도의 낮은 온도에서, 여러 단계로 나뉘어 조금씩</span> 진행된다. 그래서 세포는 타 버리지 않고 에너지를 차곡차곡 꺼내 쓴다. 이 '저온의 마법'을 가능하게 하는 주인공이 다음 개념, 효소다.</p>
 
       <figure>
         <svg width="494" height="157.7" viewBox="0 0 470 150" font-family="PC Sans">
@@ -516,6 +527,16 @@ table.rubric th{ background:#F4F1EA; font-weight:800; white-space:nowrap; }
         </svg>
         <figcaption>그림 2 | 동화 작용과 이화 작용 — 만들 때는 에너지를 넣고, 부술 때는 에너지가 나온다</figcaption>
       </figure>
+
+      <p class="body">세포 호흡은 연소와 닮았다 — 포도당과 산소가 반응해 이산화 탄소와 물이 되니까. 그러나 진행 방식이 결정적으로 달라서, 세포는 타 버리지 않고 에너지를 차곡차곡 꺼내 쓴다. 이 '저온의 마법'을 가능하게 하는 주인공이 다음 개념, 효소다.</p>
+      <table class="ctab">
+        <caption class="cap">표 2 | 연소와 세포 호흡 — 둘 다 포도당 + 산소 → 이산화 탄소 + 물 + 에너지, 진행 방식만 다르다</caption>
+        <tr><th></th><th>연소</th><th>세포 호흡(물질대사)</th></tr>
+        <tr><td>온도</td><td>높은 온도</td><td>체온 정도의 낮은 온도</td></tr>
+        <tr><td>진행</td><td>한꺼번에 타오른다</td><td>여러 단계로 나뉘어 조금씩 진행된다</td></tr>
+        <tr><td>에너지</td><td>빛과 열로 한꺼번에 나온다</td><td>조금씩 나와 세포가 차곡차곡 꺼내 쓴다</td></tr>
+        <tr><td>효소</td><td>필요 없다</td><td>효소가 반응을 돕는다</td></tr>
+      </table>
 
       <div class="expoint">
         <div class="boxtitle"><span class="ico">!</span>시험엔 이렇게</div>
@@ -551,7 +572,7 @@ table.rubric th{ background:#F4F1EA; font-weight:800; white-space:nowrap; }
     <div class="main">
       <h3 class="sec"><span class="n">3</span>효소 — 37&nbsp;℃의 마법사</h3>
       <p class="body">화학 반응이 일어나려면 반응물이 넘어야 할 에너지 언덕이 있다 — 이 언덕의 높이가 <span class="kw">활성화 에너지</span>다. 언덕이 높으면 반응은 느리거나 거의 일어나지 않는다. <span class="kw">효소</span>는 반응물과 결합해 <span class="u-amber">활성화 에너지를 낮추어 반응이 빠르게 일어나게 하는 생체 촉매</span>다. 언덕을 깎아 지름길을 내는 것이다. 덕분에 실험실에서라면 고온·고압이 필요할 반응이 몸속에서는 37&nbsp;℃에서 순식간에 끝난다.</p>
-      <p class="body">효소에게는 두 가지 성격이 더 있다. 첫째, <b>가리는 것이 확실하다</b> — 효소는 입체 구조가 맞는 특정 반응물(기질)하고만 결합한다. 열쇠 하나가 자물쇠 하나만 여는 것과 같다(<span class="kw">기질 특이성</span>). 둘째, <b>반응 후에도 소모되지 않는다</b> — 반응을 도운 효소는 그대로 빠져나와 다음 반응물을 붙잡는다. 소량으로도 계속 일할 수 있는 이유다.</p>
+      <p class="body">효소에게는 두 가지 성격이 더 있다. ① <b>가리는 것이 확실하다</b> — 효소는 입체 구조가 맞는 특정 반응물(기질)하고만 결합한다. 열쇠 하나가 자물쇠 하나만 여는 것과 같다(<span class="kw">기질 특이성</span>). ② <b>반응 후에도 소모되지 않는다</b> — 반응을 도운 효소는 그대로 빠져나와 다음 반응물을 붙잡는다. 소량으로도 계속 일할 수 있는 이유다.</p>
 
       <figure>
         <svg width="494" height="161.9" viewBox="0 0 470 154" font-family="PC Sans">
@@ -630,10 +651,15 @@ table.rubric th{ background:#F4F1EA; font-weight:800; white-space:nowrap; }
     <div class="main">
       <h3 class="sec"><span class="n">4</span>세포막 — 드나듦을 관리하는 똑똑한 경계</h3>
       <p class="body">물질대사가 돌아가려면 재료(산소·양분)는 들어오고 폐기물(이산화 탄소 등)은 나가야 한다. 이 출입을 관리하는 것이 <span class="kw">세포막</span>이다. 세포막은 <span class="u-amber">인지질 2중층에 단백질이 곳곳에 박힌 구조</span>다. 인지질 분자는 물과 친한 머리를 바깥쪽으로, 물을 피하는 꼬리를 안쪽으로 향한 채 두 겹으로 늘어서 있고, 그 사이사이에 <b>막단백질</b>이 통로와 검문소 역할을 한다.</p>
-      <p class="body">출입 방식은 물질마다 다르다. 산소나 이산화 탄소처럼 <b>작은 분자</b>는 인지질 2중층 사이를 직접 빠져나가며, 농도가 높은 쪽에서 낮은 쪽으로 저절로 퍼진다(<span class="kw">확산</span>). 반면 포도당이나 이온처럼 <b>크거나 전하를 띤 물질</b>은 막단백질이 만든 통로를 통해서만 드나든다. 아무나 통과시키지 않고 물질을 가려 받는 이 성질을 <span class="kw">선택적 투과성</span>이라 한다 — 세포가 안정된 화학 공장으로 유지되는 비결이다.</p>
-      <p class="body">물도 세포막을 지난다. 세포 안팎의 용질 농도가 다르면 물은 세포막을 지나 <span class="u-amber">용질 농도가 낮은 쪽에서 높은 쪽으로</span> 이동한다 — 이것이 <span class="kw">삼투</span>다. 확산이 물질 분자가 퍼져 나가는 것이라면, 삼투는 물이 옮겨 가는 것이다. 적혈구를 증류수에 넣으면 물이 들어와 부풀어 터지고, 진한 소금물에 넣으면 물이 빠져나가 쭈그러든다. 뒤의 '교과서 탐구'에서 직접 확인한다.</p>
-
-      <figure>
+      <p class="body">출입 방식은 물질마다 다르다. 산소처럼 <b>작은 분자</b>는 인지질 2중층을 직접 통과해 확산하고, <b>크거나 전하를 띤 물질</b>은 막단백질 통로로만 드나든다. 이렇게 물질을 가려 받는 성질이 <span class="kw">선택적 투과성</span>이다 — 세포가 안정된 화학 공장으로 유지되는 비결이다. 물이 옮겨 가는 <span class="kw">삼투</span> 때문에 증류수 속 적혈구는 물이 들어와 부풀어 터지고, 진한 소금물 속 적혈구는 물이 빠져나가 쭈그러든다(뒤의 '교과서 탐구').</p>
+      <table class="ctab">
+        <caption class="cap">표 3 | 세포막을 지나는 방식 — 확산은 물질 분자가 퍼져 나가는 것, 삼투는 물이 옮겨 가는 것</caption>
+        <colgroup><col style="width:15mm"><col style="width:33mm"><col style="width:33mm"><col></colgroup>
+        <tr><th rowspan="2"></th><th colspan="2">확산</th><th rowspan="2">삼투</th></tr>
+        <tr><th style="padding-top:0;">인지질 2중층 사이로</th><th style="padding-top:0;">막단백질 통로로</th></tr>
+        <tr><td>무엇이</td><td>산소·이산화 탄소</td><td>포도당·이온</td><td>물</td></tr>
+        <tr><td>방향</td><td class="c" colspan="2">농도가 높은 쪽 → 낮은 쪽</td><td>용질 농도가 낮은 쪽 → 높은 쪽</td></tr>
+      </table>      <figure>
         <svg width="494" height="159.8" viewBox="0 0 470 152" font-family="PC Sans">
           <g transform="translate(235,10)" font-size="10.5">
             <text x="-200" y="8" text-anchor="middle" font-size="10.6" fill="#5B6B77">세포 밖</text>
@@ -720,9 +746,16 @@ table.rubric th{ background:#F4F1EA; font-weight:800; white-space:nowrap; }
   <div class="cols">
     <div class="main">
       <h3 class="sec"><span class="n">5</span>식탁 위의 화학 — 생활 속 효소와 발효</h3>
-      <p class="body">효소의 무대는 몸속만이 아니다. 김치가 익는 것은 젖산균이라는 미생물이 자신의 물질대사(<span class="kw">발효</span>)로 배추 속 양분을 분해해 신맛 물질을 만들기 때문이고, 빵 반죽이 부푸는 것은 효모가 당을 분해하며 내놓는 이산화 탄소 기체 때문이다. 요구르트·된장·식초 — 인류는 효소의 정체를 알기 수천 년 전부터 <span class="u-amber">미생물의 물질대사를 빌려 음식을 만들어</span> 왔다.</p>
-      <p class="body">효소를 직접 꺼내 쓰기도 한다. <b>소화제</b>에는 녹말·단백질·지방을 분해하는 효소가 들어 있어 소화를 돕고, 질긴 고기를 <b>파인애플이나 키위즙</b>에 재우면 과일 속 단백질 분해 효소가 고기의 단백질을 끊어 연하게 만든다. 때가 잘 빠지는 <b>효소 세제</b>, 혈당을 재는 <b>혈당 측정기</b>의 감지 원리에도 효소가 들어 있다. 생명의 화학은 이렇게 식탁과 약국, 세탁실까지 이어진다.</p>
-
+      <p class="body">효소의 무대는 몸속만이 아니다. 김치가 익는 것은 젖산균이라는 미생물의 물질대사(<span class="kw">발효</span>) 때문이다. 요구르트·된장·식초 — 인류는 효소의 정체를 알기 수천 년 전부터 <span class="u-amber">미생물의 물질대사를 빌려 음식을 만들어</span> 왔다. 지금은 효소를 직접 꺼내 쓰기도 한다 — 소화제에는 녹말·단백질·지방을 분해하는 효소가 들어 있어 소화를 돕는다.</p>
+      <table class="ctab">
+        <caption class="cap">표 4 | 생활 속 효소와 발효 — 생명의 화학은 식탁과 약국, 세탁실까지 이어진다</caption>
+        <tr><th>쓰임</th><th>누가</th><th>무슨 일을 하나</th></tr>
+        <tr><td>김치</td><td>젖산균(발효)</td><td>배추 속 양분을 분해해 신맛 물질을 만든다</td></tr>
+        <tr><td>빵</td><td>효모(발효)</td><td>당을 분해하며 이산화 탄소 기체를 내놓아 반죽이 부푼다</td></tr>
+        <tr><td>소화제</td><td>소화 효소</td><td>녹말·단백질·지방을 분해해 소화를 돕는다</td></tr>
+        <tr><td>연육</td><td>단백질 분해 효소</td><td>파인애플·키위즙 속 효소가 질긴 고기의 단백질을 끊어 연하게 한다</td></tr>
+        <tr><td colspan="2">효소 세제 · 혈당 측정기</td><td>효소가 때를 잘 빠지게 하고, 혈당을 감지하는 원리에 쓰인다</td></tr>
+      </table>
       <figure>
         <svg width="494" height="138.7" viewBox="0 0 470 132" font-family="PC Sans">
           <g font-size="10.3">
