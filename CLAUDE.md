@@ -1,9 +1,10 @@
 # CLAUDE.md — autoblog 저장소 (약지도 앱 · 자동 블로그)
 
 ## 🧠 세션끼리 배우기 — 모든 세션 공통 (2026-10-13 현욱님 「각 세션이 서로 배우고 완전히 공유」)
-- **시작할 때** 공통 교훈을 읽는다: https://github.com/usualhealth383-cloud/yozm-health/blob/master/docs/memory/shared-lessons.md
-  (yozm-health 가 이 세션에 붙어 있으면 `docs/memory/shared-lessons.md` 와 `docs/memory/MEMORY.md`.)
-- **끝날 때**(또는 큰 실수·현욱님 지적 직후) 그 파일 맨 아래에 교훈 한 줄을 보탠다. yozm-health 에 쓸 수 없으면 이 저장소 `yakjido/교훈-대기.md` 에 적고, 다음 세션이 옮긴다.
+- **시작할 때** yozm-health 저장소 `docs/memory/` 의 세 파일을 차례로 읽는다(붙어 있지 않으면 add_repo 로 붙이기 — 쓰기는 push):
+  `medinanum-shared-hub.md`(메디나눔 지금 사실) → `medinanum-session-log.md`(최근 소식) → `shared-lessons.md`(모든 세션의 교훈·현욱님 공통 원칙).
+  커밋은 `git pull --no-rebase` 뒤 push. yozm-health 는 커밋 전 현욱님 승인 규칙이 있다.
+- **끝날 때**(또는 큰 실수·현욱님 지적 직후) `shared-lessons.md` 에 교훈 한 줄, 다른 앱에 영향이 가는 변경은 `medinanum-session-log.md` 에 한 줄. yozm-health 에 쓸 수 없으면 이 저장소 `yakjido/교훈-대기.md` 에 적고, 다음 세션이 옮긴다.
 - **현욱님께 묻기 전에** 같은 결정이 이미 있었는지 찾는다 — `yakjido/의사-피드백.md`, 형제 앱(우리 집 소아과 등 yozm-health `med/`), 공통 교훈. 있으면 묻지 않고 따른다.
 
 ## 약지도 (`yakjido/` → 빌드 `docs/yakjido/`)
