@@ -268,6 +268,9 @@ p.sortnote{ font-size:8pt; color:var(--sub); text-align:center; margin-bottom:1m
   .psols{ margin-top:4mm; border-top:0.3mm solid var(--line); padding-top:2mm; } .psol{ font-size:8.6pt; line-height:1.7; margin-bottom:2.6mm; break-inside:avoid; } .psol p{ margin:0; }
   .psol::before{ content:attr(data-n); float:left; font-weight:900; color:var(--unit); margin-right:1.6mm; } .psol > p{ font-family:'PC Serif','PC Sans',serif; }   /* 해설 번호(쪽에서 문항을 찾게) · 본문 해설과 같은 글꼴 */
   .up .qgrid > div > .pq:last-child{ margin-bottom:0; }   /* 실력 다지기: 단 끝 문항 아래 여백이 하한선을 넘지 않게 */
+  /* 2026-10-13 개념 쪽 비교표(그림과 글의 배합) */
+  table.ctab{ width:100%; border-collapse:collapse; font-size:8.8pt; line-height:1.55; margin:2.5mm 0 3mm; break-inside:avoid; } table.ctab th{ background:var(--unit); color:#fff; font-weight:800; padding:1.2mm 2mm; text-align:center; } table.ctab td{ border-bottom:0.25mm solid var(--line); padding:1.2mm 2mm; vertical-align:top; word-break:keep-all; } table.ctab td:first-child{ font-weight:800; color:var(--unit); white-space:nowrap; } table.ctab .cap{ caption-side:bottom; font-size:7.8pt; color:#6B7780; text-align:left; padding-top:1mm; }
+  table.ctab td.c{ text-align:center; } table.ctab .an{ color:var(--sub); font-size:8pt; }   /* 가운데 칸(○·× 등) · 덧말(비유) */
   .pq table.qtab{ border-collapse:collapse; margin:1.6mm 0 0.6mm 4mm; width:calc(100% - 4mm); font-family:'PC Sans'; font-size:8.2pt; line-height:1.45; } .pq table.qtab th, .pq table.qtab td{ border:0.25mm solid #B8C2CA; padding:0.6mm 1mm; text-align:center; vertical-align:middle; } .pq table.qtab th{ background:#F2F5F7; font-weight:800; white-space:nowrap; }
 </style>
 </head>
@@ -366,7 +369,15 @@ p.sortnote{ font-size:8pt; color:var(--sub); text-align:center; margin-bottom:1m
     <div class="main">
       <h3 class="sec"><span class="n">1</span>관성 — 힘이 없으면 하던 대로</h3>
       <p class="body">앞 소단원에서 힘(중력)이 운동을 어떻게 '바꾸는지' 보았다. 이번엔 거꾸로 묻자 — <b>힘이 없으면?</b> 답: <span class="u-amber">아무것도 바뀌지 않는다.</span> 상호작용이 없으면 정지한 물체는 계속 정지해 있고, 움직이던 물체는 <b>같은 속도로 계속 움직인다</b>(가속되지 않는다). 물체가 이렇게 운동 상태를 유지하려는 성질이 <span class="kw">관성</span>이며, <b>질량이 클수록 관성도 크다</b>.</p>
-      <p class="body">일상은 관성 사례로 가득하다. 버스가 <b>급정거</b>하면 몸은 <b>앞으로</b> 쏠린다 — 몸이 힘을 받아서가 아니라, 버스는 멈췄는데 몸은 <b>하던 운동을 계속하려 하기 때문</b>이다. <b>급출발</b>하면 반대로 뒤로 쏠린다(몸은 '하던 대로' 정지해 있으려 하니까). 이불을 두드려 먼지를 터는 것도, 망치 자루를 내리쳐 머리를 박는 것도 모두 관성의 작품이다.</p>
+      <p class="body">일상은 관성 사례로 가득하다. 버스가 <b>급정거</b>하면 몸은 <b>앞으로</b> 쏠린다 — 몸이 힘을 받아서가 아니라, 버스는 멈췄는데 몸은 <b>하던 운동을 계속하려 하기 때문</b>이다.</p>
+      <table class="ctab">
+        <caption class="cap">표 1 | 생활 속 관성 — 이불 먼지 털기도, 망치 머리 박기도 모두 관성의 작품이다</caption>
+        <tr><th>상황</th><th>하던 운동</th><th>그래서 일어나는 일</th></tr>
+        <tr><td>버스 급정거</td><td>움직이던 몸</td><td>버스는 멈췄는데 몸은 계속 나아가 <b>앞으로</b> 쏠린다</td></tr>
+        <tr><td>버스 급출발</td><td>정지해 있던 몸</td><td>몸은 '하던 대로' 정지해 있으려 해 <b>뒤로</b> 쏠린다</td></tr>
+        <tr><td>이불 두드리기</td><td>정지해 있던 먼지</td><td>이불만 움직이고 먼지는 그대로 있어 떨어져 나간다</td></tr>
+        <tr><td>망치 자루 내리치기</td><td>내려가던 망치 머리</td><td>자루가 멈춰도 머리는 계속 내려가 자루에 박힌다</td></tr>
+      </table>
 
       <figure>
         <svg width="490" height="150" viewBox="0 0 490 150" font-family="PC Sans">
@@ -438,8 +449,16 @@ p.sortnote{ font-size:8pt; color:var(--sub); text-align:center; margin-bottom:1m
   <div class="cols">
     <div class="main">
       <h3 class="sec"><span class="n">2</span>운동량 — 운동의 양을 재는 법</h3>
-      <p class="body">천천히 구르는 트럭과 쌩쌩 달리는 자전거 — 어느 쪽을 멈추기가 더 어려울까? 빠르기만으로도, 무게만으로도 답할 수 없다. 그래서 물리학은 '운동의 양'을 재는 자를 만들었다. <span class="kw">운동량</span> = <span class="u-amber">질량 × 속도</span>. 단위는 kg·m/s이고, 속도처럼 <b>방향을 가진다</b>.</p>
+      <p class="body">천천히 구르는 트럭과 쌩쌩 달리는 자전거 — 어느 쪽을 멈추기가 더 어려울까? 빠르기만으로도, 무게만으로도 답할 수 없다. 그래서 물리학은 '운동의 양'을 재는 자를 만들었다. <span class="kw">운동량</span> = <span class="u-amber">질량 × 속도</span>. 속도처럼 <b>방향을 가진다</b>.</p>
       <p class="body">같은 속도라면 <b>질량이 큰</b> 트럭의 운동량이 크고, 같은 질량이라면 <b>빠른</b> 쪽이 크다. 질량 2 kg인 공이 3 m/s로 구르면 운동량은 2 × 3 = <b>6 kg·m/s</b> — 계산은 곱셈 한 번이면 끝이다. 운동량이 큰 물체일수록 <b>멈추거나 방향을 바꾸기 위해 더 큰 '노력'</b>이 필요하다. 그 노력의 정체가 다음 개념, 충격량이다.</p>
+      <table class="ctab">
+        <caption class="cap">표 2 | 질량 · 속도 · 운동량 — 운동량은 두 양의 곱이고, 방향은 속도에게서 물려받는다</caption>
+        <tr><th></th><th>질량</th><th>속도</th><th>운동량</th></tr>
+        <tr><td>식</td><td class="c">m</td><td class="c">v</td><td class="c">m × v</td></tr>
+        <tr><td>단위</td><td class="c">kg</td><td class="c">m/s</td><td class="c">kg·m/s</td></tr>
+        <tr><td>방향</td><td class="c">없다</td><td class="c">있다</td><td class="c">있다(속도의 방향)</td></tr>
+        <tr><td>클수록</td><td class="c">관성이 크다</td><td class="c">빠르다</td><td class="c">멈추거나 방향을 바꾸기 어렵다</td></tr>
+      </table>
 
       <figure>
         <svg width="490" height="140" viewBox="0 0 490 140" font-family="PC Sans">
@@ -513,7 +532,7 @@ p.sortnote{ font-size:8pt; color:var(--sub); text-align:center; margin-bottom:1m
     <div class="main">
       <h3 class="sec"><span class="n">3</span>충격량 — 힘 × 시간 = 운동량의 변화</h3>
       <p class="body">운동량을 바꾸려면 힘이 필요하다. 그런데 얼마나 바뀌는지는 힘의 크기만으로 정해지지 않는다 — <b>얼마나 오래 작용했는가</b>도 똑같이 중요하다. 그래서 <span class="kw">충격량</span> = <span class="u-amber">힘 × 시간</span>으로 정의한다. 그리고 이 소단원의 심장인 등식이 나온다. <span class="u-amber">충격량 = 운동량의 변화량.</span></p>
-      <p class="body">이 등식을 그림으로 보는 방법이 <b>힘-시간 그래프</b>다. 그래프 아래의 <span class="kw">넓이가 곧 충격량</span>이다. 같은 공이 같은 속도에서 멈춘다면 운동량 변화량 — 즉 넓이 — 는 정해져 있다. 그렇다면 남는 선택지는 하나뿐이다. <b>그 넓이를 '높고 좁게' 받을 것인가, '낮고 넓게' 받을 것인가.</b> 짧은 시간에 받으면 힘이 크고(아프다), 긴 시간에 나눠 받으면 힘이 작다(덜 아프다). 이 선택이 다음 두 개념 — 안전장치와 스포츠 — 의 갈림길이다.</p>
+      <p class="body">이 등식을 그림으로 보는 방법이 <b>힘-시간 그래프</b>다. 그래프 아래의 <span class="kw">넓이가 곧 충격량</span>이다. 같은 공이 같은 속도에서 멈춘다면 운동량 변화량 — 즉 넓이 — 는 정해져 있다. 그렇다면 남는 선택지는 하나뿐이다. <b>그 넓이를 ① '높고 좁게' 받을 것인가, ② '낮고 넓게' 받을 것인가.</b> ① 짧은 시간에 받으면 힘이 크고(아프다), ② 긴 시간에 나눠 받으면 힘이 작다(덜 아프다). 이 선택이 다음 두 개념 — 안전장치와 스포츠 — 의 갈림길이다.</p>
 
       <figure style="margin:4mm 0 0;">
         <svg width="470" height="166" viewBox="0 0 470 166" font-family="PC Sans">
@@ -700,8 +719,15 @@ p.sortnote{ font-size:8pt; color:var(--sub); text-align:center; margin-bottom:1m
     <div class="main">
       <h3 class="sec"><span class="n">5</span>힘과 시간을 키워 멀리 — 스포츠</h3>
       <p class="body">같은 공식을 반대로 쓰면 공격의 기술이 된다. 공을 <b>더 빠르게</b> 날리고 싶다면 공의 <b>운동량 변화량 — 곧 충격량 — 을 키워야</b> 한다. 충격량 = 힘 × 시간이니 방법은 둘이다. <b>더 큰 힘으로 치거나, 더 오래 밀어 주거나.</b></p>
-      <p class="body">골프와 야구의 <span class="kw">팔로스루</span>(공을 친 뒤에도 끝까지 휘두르기)는 채와 공의 <span class="u-amber">접촉 시간을 늘려 충격량을 키우는</span> 기술이다. 힘을 빼려는 동작이 아니라 <b>더 멀리 보내려는</b> 동작인 것이다. 반대로 태권도 격파는 <b>아주 짧은 시간에 힘을 집중</b>시켜 순간의 힘을 키운다 — 같은 등식의 양 끝을 오가며, 스포츠는 물리학을 몸으로 쓴다.</p>
-      <p class="body">정리하면 이 소단원의 등식 하나가 <b>두 방향</b>으로 일한다. <b>지킬 때는 시간을 늘려 힘을 줄이고(안전), 보낼 때는 힘·시간을 키워 충격량을 늘린다(스포츠).</b> 문제를 만나면 먼저 물어라 — "지금 목적이 보호인가, 발사인가?"</p>
+      <p class="body">골프와 야구의 <span class="kw">팔로스루</span>(공을 친 뒤에도 끝까지 휘두르기)는 채와 공의 <span class="u-amber">접촉 시간을 늘려 충격량을 키우는</span> 기술이다. 힘을 빼려는 동작이 아니라 <b>더 멀리 보내려는</b> 동작인 것이다. 이 소단원의 등식 하나가 <b>두 방향</b>으로 일하니, 문제를 만나면 먼저 물어라 — "지금 목적이 보호인가, 발사인가?"</p>
+      <table class="ctab">
+        <caption class="cap">표 3 | 등식 하나, 두 방향 — 같은 등식의 양 끝을 오가며, 스포츠는 물리학을 몸으로 쓴다</caption>
+        <colgroup><col style="width:12mm"><col style="width:44mm"><col></colgroup>
+        <tr><th></th><th>지킬 때(안전)</th><th>보낼 때(스포츠)</th></tr>
+        <tr><td>목적</td><td>몸이 받는 힘을 줄인다</td><td>공을 더 빠르게, 더 멀리 보낸다</td></tr>
+        <tr><td>방법</td><td>시간을 늘려 힘을 줄인다</td><td>힘·시간을 키워 충격량을 늘린다</td></tr>
+        <tr><td>예</td><td>에어백, 무릎 굽히기</td><td>팔로스루 — 접촉 시간을 늘린다<br>태권도 격파 — 아주 짧은 시간에 힘 집중, 순간의 힘 ↑</td></tr>
+      </table>
 
       <figure>
         <svg width="460" height="134" viewBox="0 0 460 134" font-family="PC Sans">

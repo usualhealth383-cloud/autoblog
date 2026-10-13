@@ -259,6 +259,9 @@ table.rubric th{ background:#F4F1EA; font-weight:800; white-space:nowrap; }
   .psols{ margin-top:4mm; border-top:0.3mm solid var(--line); padding-top:2mm; } .psol{ font-size:8.6pt; line-height:1.7; margin-bottom:2.6mm; break-inside:avoid; } .psol p{ margin:0; }
   .psol::before{ content:attr(data-n); float:left; font-weight:900; color:var(--unit); margin-right:1.6mm; } .psol > p{ font-family:'PC Serif','PC Sans',serif; }   /* 해설 번호(쪽에서 문항을 찾게) · 본문 해설과 같은 글꼴 */
   .up .qgrid > div > .pq:last-child{ margin-bottom:0; }   /* 실력 다지기: 단 끝 문항 아래 여백이 하한선을 넘지 않게 */
+  /* 2026-10-13 개념 쪽 비교표(그림과 글의 배합) */
+  table.ctab{ width:100%; border-collapse:collapse; font-size:8.8pt; line-height:1.55; margin:2.5mm 0 3mm; break-inside:avoid; } table.ctab th{ background:var(--unit); color:#fff; font-weight:800; padding:1.2mm 2mm; text-align:center; } table.ctab td{ border-bottom:0.25mm solid var(--line); padding:1.2mm 2mm; vertical-align:top; word-break:keep-all; } table.ctab td:first-child{ font-weight:800; color:var(--unit); white-space:nowrap; } table.ctab .cap{ caption-side:bottom; font-size:7.8pt; color:#6B7780; text-align:left; padding-top:1mm; }
+  table.ctab td.c{ text-align:center; } table.ctab .an{ color:var(--sub); font-size:8pt; }   /* 가운데 칸(○·× 등) · 덧말(비유) */
   .pq table.qtab{ border-collapse:collapse; margin:1.6mm 0 0.6mm 4mm; width:calc(100% - 4mm); font-family:'PC Sans'; font-size:8.2pt; line-height:1.45; } .pq table.qtab th, .pq table.qtab td{ border:0.25mm solid #B8C2CA; padding:0.6mm 1mm; text-align:center; vertical-align:middle; } .pq table.qtab th{ background:#F2F5F7; font-weight:800; white-space:nowrap; }
 </style>
 </head>
@@ -357,7 +360,14 @@ table.rubric th{ background:#F4F1EA; font-weight:800; white-space:nowrap; }
     <div class="main">
       <h3 class="sec"><span class="n">1</span>설계도의 주소 — 염색체, DNA, 유전자</h3>
       <p class="body">눈동자 색, 혈액형, 귓불 모양처럼 생물이 가진 고유한 특징을 <span class="kw">형질</span>이라 한다. 형질의 정보는 세포핵 속 <span class="kw">DNA</span>에 담겨 있다. DNA는 두 가닥이 꼬인 <b>이중 나선</b> 구조이고, 그 안쪽에 <span class="u-amber">아데닌(A)·구아닌(G)·사이토신(C)·타이민(T) 네 종류의 염기</span>가 줄지어 있다 — 이 <b>염기의 순서(서열)</b>가 곧 유전 정보다. 네 글자로 쓰인 생명의 문장인 셈이다.</p>
-      <p class="body">이때 주소를 정확히 잡자. DNA 전체가 하나의 설계도 책이라면, <span class="kw">유전자</span>는 그중 <b>특정 단백질 하나에 대한 정보가 담긴 부분</b> — 책 속의 한 단원이다. 하나의 DNA에는 수많은 유전자가 들어 있다. 그리고 <span class="kw">염색체</span>는 긴 DNA가 단백질과 함께 촘촘히 감겨 뭉쳐진 덩어리다. 크기로 줄 세우면 <b>염색체 ⊃ DNA ⊃ 유전자</b>가 된다.</p>
+      <p class="body">이때 주소를 정확히 잡자. 하나의 DNA에는 수많은 <span class="kw">유전자</span>가 들어 있고, 긴 DNA는 단백질과 함께 감겨 <span class="kw">염색체</span>를 이룬다. 크기로 줄 세우면 <b>염색체 ⊃ DNA ⊃ 유전자</b>가 된다.</p>
+      <table class="ctab">
+        <caption class="cap">표 1 | 설계도의 주소 — DNA 전체가 하나의 설계도 책이라면, 유전자는 책 속의 한 단원이다</caption>
+        <tr><th>이름</th><th>무엇인가</th><th>설계도에 비유하면</th></tr>
+        <tr><td>염색체</td><td>긴 DNA가 단백질과 함께 촘촘히 감겨 뭉쳐진 덩어리</td><td>단백질로 싸 둔 책 한 권</td></tr>
+        <tr><td>DNA</td><td>염기의 순서로 유전 정보를 담은 이중 나선</td><td>설계도 책</td></tr>
+        <tr><td>유전자</td><td><b>특정 단백질 하나에 대한 정보가 담긴 부분</b></td><td>책 속의 한 단원</td></tr>
+      </table>
 
       <figure>
         <svg width="494" height="164" viewBox="0 0 470 156" font-family="PC Sans">
@@ -435,7 +445,14 @@ table.rubric th{ background:#F4F1EA; font-weight:800; white-space:nowrap; }
     <div class="main">
       <h3 class="sec"><span class="n">2</span>정보의 흐름 — DNA에서 단백질까지</h3>
       <p class="body">형질을 실제로 만들어 내는 일꾼은 <span class="kw">단백질</span>이다. 앞 소단원의 효소도, 머리카락의 케라틴도, 산소를 나르는 헤모글로빈도 전부 단백질이다. 그런데 문제가 하나 있다 — 단백질 조립 공장인 <b>라이보솜은 핵 밖(세포질)에 있고, 설계도 원본인 DNA는 핵 밖으로 나가지 않는다.</b> 귀중한 원본을 공장에 들고 다닐 수는 없는 노릇이다.</p>
-      <p class="body">세포의 해법은 <b>복사본</b>이다. 핵 안에서 DNA의 유전 정보를 <span class="kw">RNA</span>라는 물질에 옮겨 적고(<span class="kw">전사</span>), 이 복사본이 핵 밖 라이보솜으로 나가면 라이보솜이 그 정보대로 아미노산을 연결해 단백질을 만든다(<span class="kw">번역</span>). 즉 세포 내 정보는 <span class="u-amber">DNA → (전사) → RNA → (번역) → 단백질</span> 한 방향으로 흐른다 — 이것이 생명의 중심 원리다. 그리고 만들어진 단백질이 형질을 나타낸다.</p>
+      <p class="body">세포의 해법은 <b>복사본</b>이다. 핵 안에서 DNA의 유전 정보를 <span class="kw">RNA</span>라는 물질에 옮겨 적고(<span class="kw">전사</span>), 이 복사본을 라이보솜이 읽어 단백질을 만든다(<span class="kw">번역</span>). 즉 세포 내 정보는 <span class="u-amber">DNA → (전사) → RNA → (번역) → 단백질</span> 한 방향으로 흐른다 — 이것이 생명의 중심 원리다. 그리고 만들어진 단백질이 형질을 나타낸다.</p>
+      <table class="ctab">
+        <caption class="cap">표 2 | 전사와 번역 — 원본(DNA)은 핵 밖으로 나가지 않고, 복사본(RNA)이 라이보솜으로 간다</caption>
+        <tr><th></th><th>전사</th><th>번역</th></tr>
+        <tr><td>장소</td><td>핵 안</td><td>핵 밖(세포질)의 라이보솜</td></tr>
+        <tr><td>정보</td><td>DNA → RNA</td><td>RNA → 단백질</td></tr>
+        <tr><td>하는 일</td><td>DNA의 유전 정보를 RNA에 옮겨 적는다</td><td>정보대로 아미노산을 연결해 단백질을 만든다</td></tr>
+      </table>
 
       <figure>
         <svg width="494" height="159.8" viewBox="0 0 470 152" font-family="PC Sans">
@@ -515,7 +532,13 @@ table.rubric th{ background:#F4F1EA; font-weight:800; white-space:nowrap; }
     <div class="main">
       <h3 class="sec"><span class="n">3</span>전사 — 원본을 옮겨 적다</h3>
       <p class="body">DNA 이중 나선의 두 가닥은 염기끼리 정해진 짝으로만 마주 본다 — <span class="u-amber">A는 T와, G는 C와</span> 결합한다(상보결합). 덕분에 한 가닥의 서열만 알면 반대 가닥은 자동으로 정해진다. <span class="kw">전사</span>는 이 성질을 이용한다. 유전자 부분의 이중 나선이 살짝 풀리면, 두 가닥 중 <b>한 가닥을 틀(거푸집)로 삼아</b> 짝이 맞는 염기를 하나씩 붙여 RNA 가닥을 만들어 간다. 이때 틀이 되는 가닥을 <span class="kw">주형 가닥(틀 가닥)</span>이라 한다.</p>
-      <p class="body">단, RNA의 세계에는 타이민(T)이 없다. T가 설 자리에는 <span class="kw">유라실(U)</span>이 대신 들어간다 — DNA의 A를 만나면 RNA에는 U가 붙는 것이다. 예컨대 DNA 주형 가닥이 <b>T A C</b>라면 RNA에는 <b>A U G</b>가 새겨진다. 완성된 RNA는 <b>한 가닥짜리 짧은 복사본</b>이 되어 핵막의 작은 구멍을 통해 세포질로 빠져나간다 — 다음 무대는 라이보솜이다.</p>
+      <p class="body">단, RNA의 세계에는 타이민(T)이 없다. T가 설 자리에는 <span class="kw">유라실(U)</span>이 대신 들어간다 — DNA의 A를 만나면 RNA에는 U가 붙는 것이다. 완성된 RNA는 <b>한 가닥짜리 짧은 복사본</b>이 되어 핵막의 작은 구멍을 통해 세포질로 빠져나간다 — 다음 무대는 라이보솜이다.</p>
+      <table class="ctab">
+        <caption class="cap">표 3 | 전사의 짝 — 예컨대 DNA 주형 가닥이 T A C라면 RNA에는 A U G가 새겨진다</caption>
+        <colgroup><col style="width:31mm"><col style="width:24mm"><col style="width:24mm"><col style="width:24mm"><col style="width:24mm"></colgroup>
+        <tr><th>DNA 주형 가닥</th><th>A</th><th>T</th><th>G</th><th>C</th></tr>
+        <tr><td>전사된 RNA</td><td class="c"><b>U</b>(T가 아니다)</td><td class="c">A</td><td class="c">C</td><td class="c">G</td></tr>
+      </table>
 
       <figure>
         <svg width="494" height="170.3" viewBox="0 0 470 162" font-family="PC Sans">
@@ -586,7 +609,13 @@ table.rubric th{ background:#F4F1EA; font-weight:800; white-space:nowrap; }
   <div class="cols">
     <div class="main">
       <h3 class="sec"><span class="n">4</span>번역 — 세 글자가 아미노산 하나</h3>
-      <p class="body">라이보솜에 도착한 RNA의 정보는 염기 네 종류(A·G·C·U)뿐인데, 단백질의 재료인 아미노산은 <b>스무 가지</b>다. 글자 하나로 하나씩 지정하면 4가지, 두 글자씩 묶어도 4 × 4 = 16가지 — 모자란다. 그래서 생명은 <span class="u-amber">세 글자를 한 묶음</span>으로 읽는다. 4 × 4 × 4 = <b>64가지</b> 조합이면 스무 가지 아미노산을 지정하고도 남는다. 이 세 염기 묶음이 유전 암호의 단위, <span class="kw">코돈</span>이다.</p>
+      <p class="body">라이보솜에 도착한 RNA의 정보는 염기 네 종류(A·G·C·U)뿐인데, 단백질의 재료인 아미노산은 <b>스무 가지</b>다. 그래서 생명은 <span class="u-amber">세 글자를 한 묶음</span>으로 읽는다. 이 세 염기 묶음이 유전 암호의 단위, <span class="kw">코돈</span>이다.</p>
+      <table class="ctab">
+        <caption class="cap">표 4 | 왜 세 글자인가 — 염기는 네 종류, 아미노산은 스무 가지</caption>
+        <tr><th>한 묶음의 염기</th><th>1개</th><th>2개</th><th>3개(코돈)</th></tr>
+        <tr><td>조합의 수</td><td class="c">4가지</td><td class="c">4 × 4 = 16가지</td><td class="c">4 × 4 × 4 = <b>64가지</b></td></tr>
+        <tr><td>아미노산 20가지를</td><td class="c">모자란다</td><td class="c">모자란다</td><td class="c">지정하고도 남는다</td></tr>
+      </table>
       <p class="body"><span class="kw">번역</span>은 라이보솜이 RNA를 붙잡고 코돈을 <b>한 칸씩 읽으며 대응하는 아미노산을 차례로 연결</b>하는 과정이다. 예를 들어 RNA 서열 AUG-GUG-CAU는 '메싸이오닌-발린-히스티딘' 세 아미노산이 된다. 이렇게 이어진 아미노산 사슬이 II단원에서 본 것처럼 <b>고유한 입체 구조로 접히면</b> 비로소 일하는 단백질이 완성된다. 염기 서열이 아미노산 서열을, 아미노산 서열이 단백질의 모양과 기능을 결정하는 것이다.</p>
 
       <figure>
@@ -661,8 +690,8 @@ table.rubric th{ background:#F4F1EA; font-weight:800; white-space:nowrap; }
   <div class="cols">
     <div class="main">
       <h3 class="sec"><span class="n">5</span>한 글자의 무게 — 유전자 이상과 형질</h3>
-      <p class="body">'DNA → RNA → 단백질 → 형질'의 사슬이 정말 이어져 있다면, <b>첫 고리(염기 서열)가 바뀌면 마지막 고리(형질)도 바뀌어야</b> 한다. 실제 사례가 <span class="kw">낫 모양 적혈구 빈혈증</span>이다. 헤모글로빈 유전자의 염기 <b>단 하나</b>가 바뀌면, 그 코돈이 지정하는 아미노산이 글루탐산에서 발린으로 <b>하나</b> 바뀌고, 아미노산 서열이 달라진 헤모글로빈은 <b>다른 모양으로 접힌다</b>.</p>
-      <p class="body">변형된 헤모글로빈은 서로 엉겨 붙어 긴 막대처럼 굳고, 둥글넓적하던 적혈구를 <b>낫 모양</b>으로 찌그러뜨린다. 낫 모양 적혈구는 산소를 잘 나르지 못하고 좁은 모세혈관을 막아 빈혈과 통증을 일으킨다. 염기 한 글자의 변화가 단백질을 거쳐 몸 전체의 형질로 증폭된 것이다 — <span class="u-amber">유전자가 단백질을 통해 형질을 결정한다</span>는 사실을 이보다 선명하게 보여 주는 증거는 없다.</p>
+      <p class="body">'DNA → RNA → 단백질 → 형질'의 사슬이 정말 이어져 있다면, <b>첫 고리(염기 서열)가 바뀌면 마지막 고리(형질)도 바뀌어야</b> 한다. 실제 사례가 <span class="kw">낫 모양 적혈구 빈혈증</span>이다. 헤모글로빈 유전자의 ① 염기 <b>단 하나</b>가 바뀌면, ② 그 코돈이 지정하는 아미노산이 글루탐산에서 발린으로 <b>하나</b> 바뀌고, ③ 아미노산 서열이 달라진 헤모글로빈은 <b>다른 모양으로 접힌다</b>.</p>
+      <p class="body">④ 변형된 헤모글로빈은 서로 엉겨 붙어 긴 막대처럼 굳고, 둥글넓적하던 적혈구를 <b>낫 모양</b>으로 찌그러뜨린다. ⑤ 낫 모양 적혈구는 산소를 잘 나르지 못하고 좁은 모세혈관을 막아 빈혈과 통증을 일으킨다. 염기 한 글자의 변화가 단백질을 거쳐 몸 전체의 형질로 증폭된 것이다 — <span class="u-amber">유전자가 단백질을 통해 형질을 결정한다</span>는 사실을 이보다 선명하게 보여 주는 증거는 없다.</p>
 
       <figure>
         <svg width="494" height="168.2" viewBox="0 0 470 160" font-family="PC Sans">
