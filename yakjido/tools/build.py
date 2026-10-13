@@ -20,6 +20,29 @@ for p in sorted((ROOT / 'content').glob('*.json')):
 pub = ROOT.parent / 'docs' / 'yakjido' / 'data'   # 공공데이터는 import_public_data.py 가 여기에 직접 쓴다
 if (pub / 'meta.json').exists():
     data['public'] = json.loads((pub / 'meta.json').read_text(encoding='utf-8'))  # 건수·출처만 인라인, 본문은 data/ 로 지연 로드
+# 「제품 이름으로 찾기」가 제품 사전 357개만 세던 것 — 실제로는 e약은요·낱알식별의 약국 약과 처방약까지 이름으로 찾는다(2026-10-13 현욱님 「엄청 많을건데」).
+# 처방약 낱알 자료(5 MB)는 무거워 이름·품목코드·회사만 뽑은 names-rx.json 을 검색 때 받는다. 건수는 같은 품목기준코드를 한 번만 센다.
+if (pub / 'pills-rx.json').exists() and (pub / 'pills.json').exists() and (pub / 'easy-index.json').exists():
+    import re as _r0
+    _nm = lambda t: _r0.sub(r'\(.*?\)|[\s\-·.]', '', str(t or '')).lower()
+    _rx = json.loads((pub / 'pills-rx.json').read_text(encoding='utf-8'))
+    _ot = json.loads((pub / 'pills.json').read_text(encoding='utf-8'))
+    _ez = json.loads((pub / 'easy-index.json').read_text(encoding='utf-8'))
+    _seen, _rxl = set(), []
+    for _x in _rx:
+        if _x.get('seq') and _x['seq'] not in _seen: _seen.add(_x['seq']); _rxl.append([_x['n'], _x['seq'], _x.get('m', '')])
+    _oseq = {x['seq'] for x in _ot if x.get('seq')} | {x['seq'] for x in _ez if x.get('seq')}
+    _onm = {_nm(x['n']) for x in _ot} | {_nm(x['n']) for x in _ez if x.get('seq')}
+    _otc = len(_oseq) + len({_nm(x['n']) for x in _ez if not x.get('seq') and _nm(x['n']) not in _onm})
+    # 식약처 허가 목록(tools/fetch_mfds.py → tools/permits.json, 시럽·연고·주사까지 모든 허가 제품)이 있으면 그 이름도 — 처방약은 [이름, 코드, 회사], 낱알·e약은요에 없는 약국 약은 끝에 0
+    _pm = ROOT / 'tools' / 'permits.json'
+    if _pm.exists():
+        for _s, _n, _m, _r, _i in json.loads(_pm.read_text(encoding='utf-8')):
+            if not _s or _s in _seen or _s in _oseq: continue
+            if _r: _seen.add(_s); _rxl.append([_n, _s, _m])
+            elif _nm(_n) not in _onm: _oseq.add(_s); _onm.add(_nm(_n)); _otc += 1; _rxl.append([_n, _s, _m, 0])
+    (pub / 'names-rx.json').write_text(json.dumps(_rxl, ensure_ascii=False, separators=(',', ':')), encoding='utf-8')
+    data['public'].update({'prod_otc': _otc, 'prod_rx': sum(1 for x in _rxl if len(x) == 3)})
 # 낱알 사진은 식약처 서버 주소를 그대로 쓴다(저장 안 함). docs/yakjido/img/ 에 파일이 있을 때만 그것을 우선.
 imgdir = ROOT.parent / 'docs' / 'yakjido' / 'img'
 for v in (data.get('productImages') or {}).values():
@@ -86,7 +109,7 @@ SLIM = {
 CORE_KEYS = ['sources', 'ingredients', 'interactions', 'kids', 'productImages', 'suppRules', 'myths', 'recalls', 'drugRep']   # drugRep: 약 화면(본문 받은 뒤)에서만 씀 — 첫 화면 220 KB 예산
 # 약 화면에서만 쓰는 칸(자주 묻는 질문·부작용 빈도)은 data/detail.json 으로 한 번 더 뺀다.
 # 본문과 «동시에» 받기 시작하고, 약 화면만 이것까지 기다린다 — core.json 400 KB 예산(2026-10-04)
-DETAIL = {'drugs': ['faq', 'sideFreq', 'lact', 'tips', 'interactions', 'riskNote'],   # tips·interactions: 약 화면에서만(2026-10-13 검수 반영으로 core 400 KB) · riskNote: 약 화면 「부담 정도」 막대 아래 설명만(10-13 아이 나이 칸·병용 규칙 추가로 core 400 KB)
+DETAIL = {'drugs': ['faq', 'sideFreq', 'lact', 'tips', 'interactions', 'riskNote', 'sideEffects', 'stop'],   # sideEffects·stop: 약 화면(읽어 주기 포함)에서만 — 10-14 투석·출처 보강으로 core 401 KB   # tips·interactions: 약 화면에서만(2026-10-13 검수 반영으로 core 400 KB) · riskNote: 약 화면 「부담 정도」 막대 아래 설명만(10-13 아이 나이 칸·병용 규칙 추가로 core 400 KB)
           'supplements': ['foods', 'need', 'faq', 'evidenceNote', 'priceTip']}
 detail = {k: [{'id': o['id'], **{f: o[f] for f in fs if f in o}} for o in data[k] if any(f in o for f in fs)] for k, fs in DETAIL.items()}
 for k, fs in DETAIL.items():
@@ -123,6 +146,11 @@ if (_pd / 'pills.json').exists() and (_pd / 'easy-index.json').exists():
     _pi = json.loads(_pi.read_text(encoding='utf-8')) if _pi.exists() else {}
     for _x in _pl:
         if not _x.get('ingr') and _pi.get(_x.get('seq')): _x['ingr'] = '|'.join(_pi[_x['seq']]); _n += 1
+    _pm = ROOT / 'tools' / 'permits.json'   # 식약처 허가 목록의 주성분(품목기준코드가 같을 때만)
+    if _pm.exists():
+        _pmi = {x[0]: x[4] for x in json.loads(_pm.read_text(encoding='utf-8')) if x[4]}
+        for _x in _pl:
+            if not _x.get('ingr') and _pmi.get(_x.get('seq')): _x['ingr'] = _pmi[_x['seq']]; _n += 1
     if _n:
         (_pd / 'pills.json').write_text(json.dumps(_pl, ensure_ascii=False, separators=(',', ':')), encoding='utf-8')
         print(f'낱알 성분 채움 {_n}건(같은 품목기준코드 · 식약처 상세)')
@@ -135,6 +163,9 @@ out = shell.replace('<!--DATA-->', j).replace('__BUILD__', stamp).replace('__DAT
 # 첫 화면 압축 225 → 192 KB. 줄 중간·코드 뒤의 주석은 건드리지 않는다(문자열 안일 수 있어서).
 import re as _re
 out = _re.sub(r'(?m)^[ \t]*/\*(?:(?!\*/).)*?\*/[ \t]*\n', '', out, flags=_re.S)
+# 줄 앞 들여쓰기도 뺀다(압축 약 2 KB) — 화면 글은 HTML 이 빈칸을 접고, 줄바꿈을 살리는 칸(pre-line)도 줄 앞 빈칸은 버린다.
+# 들여쓰기가 뜻을 갖는 글(pre·pre-wrap)은 셸에 없다(2026-10-13, 제품 이름 검색 확대로 첫 화면 225 KB → 예산 224 KB)
+out = _re.sub(r'(?m)^[ \t]+', '', out)
 pages = ROOT.parent / 'docs' / 'yakjido'
 pages.mkdir(parents=True, exist_ok=True)
 (pages / 'index.html').write_text(out, encoding='utf-8')
@@ -144,12 +175,14 @@ pages.mkdir(parents=True, exist_ok=True)
 print(f'첫 화면 {len(out)/1024:.0f} KB · 본문 data/core.json {len(jc)/1024:.0f} KB')
 # 서비스워커 캐시 이름 = 배포 파일 내용의 해시 — 내용이 같으면 같은 이름(파이썬 hash() 는 실행마다 달라 매번 바뀌던 것, 2026-10-13)
 _srvjs = (ROOT / 'srv.js').read_text(encoding='utf-8') if (ROOT / 'srv.js').exists() else ''
+_srvjs += (ROOT / 'find.js').read_text(encoding='utf-8') if (ROOT / 'find.js').exists() else ''   # 찾기 부품도 바뀌면 캐시 이름이 바뀌게(10-14)
 cache_id = hashlib.sha1((out + jc + jd + _srvjs).encode('utf-8')).hexdigest()[:8]
 sw = ROOT / 'sw.js'
 if sw.exists():
     s = re.sub(r"const CACHE = '[^']*'", f"const CACHE = 'yakjido-{stamp}-{cache_id}'", sw.read_text(encoding='utf-8'))
     (pages / 'sw.js').write_text(s, encoding='utf-8')
-for name in ('manifest.webmanifest', 'privacy.html', 'delete-account.html', 'srv.js'):   # delete-account.html = 스토어 「계정 삭제 URL」(메디나눔 안내 2026-10-13)   # srv.js = 계정·기록 이어 두기(따로 받는 파일)   # privacy.html = 스토어에 적는 개인정보처리방침 주소
+for name in ('manifest.webmanifest', 'privacy.html', 'delete-account.html', 'srv.js', 'find.js'):   # find.js = 공용 찾기 부품 + 약지도 쪽(검색을 처음 쓸 때 받음, Z8)
+    # delete-account.html = 스토어 「계정 삭제 URL」(메디나눔 안내 2026-10-13)   # srv.js = 계정·기록 이어 두기(따로 받는 파일)   # privacy.html = 스토어에 적는 개인정보처리방침 주소
     src = ROOT / name
     if src.exists():
         (pages / name).write_text(src.read_text(encoding='utf-8'), encoding='utf-8')

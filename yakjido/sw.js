@@ -12,7 +12,7 @@
 const CACHE = 'yakjido-2026-09-21-8896';
 const DATA = 'yakjido-data-v1';
 /* 본문(core·detail)은 여기서 받지 않는다 — 첫 방문에 페이지가 이미 받은 것을 한 번 더 받던 것(5-03). 페이지가 워커에 연결되면 같은 주소로 다시 불러 캐시에 넣는다. */
-const ASSETS = ['./', './index.html', './manifest.webmanifest', './srv.js', './icon-192.png', './icon-512.png', './icon-180.png', './icon-maskable-512.png'];
+const ASSETS = ['./', './index.html', './manifest.webmanifest', './srv.js', './find.js', './icon-192.png', './icon-512.png', './icon-180.png', './icon-maskable-512.png'];
 
 self.addEventListener('install', (e) => {
   /* HTTP 캐시를 건너뛰고 서버에서 새로 — 몇 시간 묵은 srv.js 가 새 캐시 이름에 갇히지 않게(5-03) */

@@ -1,0 +1,60 @@
+name: yakjido-data
+
+# 약지도 — 식약처 낱알식별·의약품 허가 목록을 공공데이터 OpenAPI 로 «최신»으로 받아 작업 가지에 올린다(2026-10-13).
+# 필요한 것: 저장소 Secrets 의 DATA_GO_KR_KEY(공공데이터포털 일반 인증키) — 키 값은 로그·파일 어디에도 남지 않는다.
+# 돌리는 법: yakjido/tools/data-refresh.txt 를 바꿔 이 가지에 올리면 돈다(main 에 병합된 뒤에는 Actions 탭 「Run workflow」와 매달 1일 자동도).
+# 받는 데 실패하거나 건수가 너무 적으면 기존 자료를 그대로 두고 멈춘다(fetch_mfds.py).
+on:
+  workflow_dispatch: {}
+  schedule:
+    - cron: '17 18 1 * *'   # 매달 2일 03:17(한국 시각) — 기본 가지(main)에서만 돈다
+  push:
+    branches: [claude/medicine-recommendation-app-na6x0m]
+    paths:
+      - 'yakjido/tools/data-refresh.txt'
+
+concurrency:
+  group: yakjido-data
+  cancel-in-progress: false
+
+permissions:
+  contents: write   # 받은 자료를 작업 가지에 커밋
+
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: claude/medicine-recommendation-app-na6x0m
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: 키 확인
+        id: k
+        env:
+          DATA_GO_KR_KEY: ${{ secrets.DATA_GO_KR_KEY }}
+        run: |
+          if [ -z "$DATA_GO_KR_KEY" ]; then echo "::notice::Secrets 에 DATA_GO_KR_KEY 가 아직 없어 건너뜁니다 — yakjido/현욱님-할일-1013.md ⑥"; echo "ok=0" >> $GITHUB_OUTPUT; else echo "ok=1" >> $GITHUB_OUTPUT; fi
+      - name: 식약처 OpenAPI 받기
+        if: steps.k.outputs.ok == '1'
+        env:
+          DATA_GO_KR_KEY: ${{ secrets.DATA_GO_KR_KEY }}
+        run: python3 yakjido/tools/fetch_mfds.py
+      - name: 빌드·자료 검사
+        if: steps.k.outputs.ok == '1'
+        run: |
+          pip install pillow >/dev/null
+          python3 yakjido/tools/build.py
+          git checkout -- docs/yakjido/icon-maskable-512.png || true
+          python3 yakjido/tests/data.py
+      - name: 작업 가지에 올리기
+        if: steps.k.outputs.ok == '1'
+        run: |
+          git config user.name "yakjido-data-bot"
+          git config user.email "yakjido-data-bot@users.noreply.github.com"
+          git add -A docs/yakjido yakjido/tools/permits.json
+          if git diff --cached --quiet; then echo "바뀐 것 없음"; exit 0; fi
+          git commit -m "약지도 — 식약처 낱알식별·허가 목록 최신으로(OpenAPI 자동 받기)"
+          git push origin HEAD:claude/medicine-recommendation-app-na6x0m
