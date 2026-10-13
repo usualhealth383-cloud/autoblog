@@ -642,6 +642,97 @@ def z9_checks(br, url, fails):
     if e2: fails.append(f'B8 검사 JS 오류: {e2[:2]}')
     ctx.close()
 
+# 간단히 보기(2026-10-14 현욱님 「어르신은 클로르족사존을 모른다 — 소염제·근이완제·타이레놀·위보호제, 약 사진이랑」).
+#   계산(바구니·거르개·위험 신호)은 자세히 화면과 같아야 한다 — 보여 주는 것만 줄인다.
+#   (a) 두통·근육·감기 화면에 살 약 줄·약국 카드 단추 (b) 응급 신호를 체크하면 살 약 줄이 숨는다 (c) 임신이면 소염제가 빠진다(자세히와 같은 약)
+#   (d) 설정·증상 화면의 「간단히 | 자세히」가 ME.view 를 바꾼다 (e) 390·360·320 px × 큰 글씨에서 넘침 0 · 명암비·44px
+def simple_checks(br, url, fails):
+    zerr = []
+    pz = br.new_page(viewport={'width': 390, 'height': 844}); pz.on('pageerror', lambda e: zerr.append(str(e)))
+    pz.add_init_script("localStorage.setItem('yakjido.hello.v1','1')")
+    pz.goto(url + '#/home'); pz.wait_for_function("()=>typeof CORE!=='undefined' && CORE===2", timeout=20000)
+    def go(h):
+        pz.evaluate("h=>{ location.hash=h; route(); }", h); pz.wait_for_timeout(80)
+    pz.evaluate("()=>{ for (const k of Object.keys(FLAG_LABEL)) if (k!=='senior'&&k!=='child') ME[k]=false; ME.age='adult'; ME.easy=false; ME.taking=[]; ME.pub={}; ME.allergy=[]; ME.allergyUnknown=false; delete ME.view; saveMe(); }")
+    # 기본값 — 일반은 자세히, 65세 이상·어르신 모드는 간단히
+    d0 = pz.evaluate("()=>{ const a=viewMode(); ME.age='senior'; const b=viewMode(); ME.age='adult'; ME.easy=true; const c=viewMode(); ME.easy=false; return [a,b,c]; }")
+    if d0 != ['detail', 'simple', 'simple']: fails.append(f'간단히 보기 기본값이 틀립니다(일반·65세·어르신 모드): {d0}')
+    if pz.evaluate("()=>[sanitizeMe({view:'simple'}).view, sanitizeMe({view:'x'}).view===undefined]") != ['simple', True]: fails.append('sanitizeMe 가 화면 보기(view)를 두 값으로만 지키지 않습니다')
+    pz.evaluate("()=>{ ME.view='simple'; saveMe(); }")
+    # (a) + 바구니가 자세히와 같은 약인지
+    SAME = """(sid)=>{ const b = basketPicked(byId(D.symptoms,sid), basket(byId(D.symptoms,sid))).filter(x=>!(x.optional&&!x.either)).map(x=>x.d.id);
+      const rows = [...document.querySelectorAll('.answer .buy > .buy-item.sv, .answer .buy .consult-grp .buy-item.sv')].map(a=>a.getAttribute('href').split('/').pop());
+      return {b, rows, cart: !!document.querySelector('.answer .go-cart'), simple: !!document.querySelector('.sv-ans')}; }"""
+    for sid in ['headache', 'msk', 'cold']:
+        go('/symptom/' + sid); r = pz.evaluate(SAME, sid)
+        if not r['simple'] or not r['rows']: fails.append(f'간단히 {sid}: 살 약 줄이 없습니다')
+        elif r['rows'] != r['b']: fails.append(f'간단히 {sid}: 살 약이 자세히 화면 바구니와 다릅니다 {r["rows"]} ≠ {r["b"]}')
+        if not r['cart']: fails.append(f'간단히 {sid}: 「약국에서 이 화면 보여 주기」 단추가 없습니다')
+        if '클로르족사존' in ' '.join(pz.eval_on_selector_all('.answer .buy-item.sv b', 'e=>e.map(x=>x.innerText)')): fails.append(f'간단히 {sid}: 큰 글씨에 성분 이름(클로르족사존)이 나옵니다')
+    # (b) 응급 신호 → 살 약 줄·약국 단추가 숨는다(자세히와 같은 규칙) · 진료 신호 → 「진료가 먼저예요」
+    go('/symptom/msk'); pz.click('.rf-list .rf-i input'); pz.wait_for_timeout(120)
+    vis = pz.evaluate("()=>[...document.querySelectorAll('.answer .buy-item.sv, .answer .go-cart')].some(e=>e.offsetParent!==null)")
+    if vis or not pz.is_visible('.rf-er-h') or not pz.is_visible('.rf-hit.er'): fails.append('간단히: 응급 신호를 체크해도 살 약이 보이거나 119 안내가 없습니다')
+    pz.evaluate("()=>{ RF.sid=''; }"); go('/home'); go('/symptom/msk')   # 체크는 같은 증상 안에서만 남는다 — 비우고 본다
+    pz.evaluate("()=>{ document.querySelector('.rf-cl').open=true; }"); pz.click('.rf-cl .rf-i input'); pz.wait_for_timeout(120)
+    if not pz.is_visible('.answer .rf-dim-h') or pz.evaluate("()=>document.querySelector('.answer .buy').offsetParent!==null"): fails.append('간단히: 진료 신호를 체크해도 「지금은 약보다 진료가 먼저예요」로 접히지 않습니다')
+    pz.evaluate("()=>{ RF.sid=''; }"); go('/home')
+    # (c) 임신 — 소염제가 빠지고 자세히와 같은 약
+    pz.evaluate("()=>{ ME.pregnant=true; saveMe(); }")
+    for sid in ['headache', 'msk', 'cold']:
+        go('/symptom/' + sid); r = pz.evaluate(SAME, sid)
+        ns = pz.evaluate("(ids)=>ids.filter(i=>isNsaid(drug(i)))", r['rows'])
+        if ns: fails.append(f'간단히 + 임신 {sid}: 소염제가 남아 있습니다 {ns}')
+        if r['rows'] != r['b']: fails.append(f'간단히 + 임신 {sid}: 자세히 바구니와 다릅니다 {r["rows"]} ≠ {r["b"]}')
+    pz.evaluate("()=>{ ME.pregnant=false; saveMe(); }")
+    # 내 약통과 부딪히는 줄(와파린 + 소염제)은 간단히에서도
+    pz.evaluate("()=>{ ME.taking=['cls:blood.warf']; saveMe(); }"); go('/symptom/msk')
+    if '와파린' not in pz.evaluate("()=>[...document.querySelectorAll('.ixline,.ix-h b')].map(x=>x.innerText).join(' ')"): fails.append('간단히: 와파린을 담았는데 근육통 화면에 같이 먹기 경고가 없습니다')
+    pz.evaluate("()=>{ ME.taking=[]; saveMe(); }")
+    # 약 화면 — 먹지 말 때(내 조건은 빠짐없이)·자세히 보기
+    pz.evaluate("()=>{ ME.ulcer=true; saveMe(); }"); go('/drug/ibuprofen')
+    t = pz.inner_text('#view')
+    me_li = pz.inner_text('.sv-no li.me') if pz.query_selector('.sv-no li.me') else ''
+    if '한 번에' not in t or '위궤양' not in me_li: fails.append('간단히 약 화면: 용량 칸이나 내 조건(위궤양) 금기 줄이 없습니다')
+    if pz.query_selector('.dtabs'): fails.append('간단히 약 화면에 자세한 탭이 그대로 나옵니다')
+    go('/drug/ibuprofen?full=1')
+    if not pz.query_selector('.dtabs'): fails.append('간단히 약 화면 「자세히 보기」(?full=1)가 자세한 화면을 열지 않습니다')
+    pz.evaluate("()=>{ ME.ulcer=false; saveMe(); }")
+    # (d) 증상 화면 단추와 설정 단추가 ME.view 를 바꾼다
+    go('/symptom/headache'); pz.click('.view-seg button:has-text("자세히")'); pz.wait_for_timeout(120)
+    if pz.evaluate("()=>ME.view") != 'detail' or not pz.query_selector('.stabs'): fails.append('증상 화면 「자세히」 단추가 화면 보기를 바꾸지 않습니다')
+    pz.click('.view-seg button:has-text("간단히")'); pz.wait_for_timeout(120)
+    if pz.evaluate("()=>JSON.parse(localStorage.getItem('yakjido.me.v1')).view") != 'simple' or not pz.query_selector('.sv-ans'): fails.append('증상 화면 「간단히」 단추가 화면 보기를 바꾸지 않습니다(저장 포함)')
+    go('/me?t=set'); pz.click('.view-row .view-seg button:has-text("자세히")'); pz.wait_for_timeout(120)
+    if pz.evaluate("()=>ME.view") != 'detail': fails.append('설정 「화면 보기 — 자세히」가 ME.view 를 바꾸지 않습니다')
+    pz.click('.view-row .view-seg button:has-text("간단히")'); pz.wait_for_timeout(120)
+    if pz.evaluate("()=>ME.view") != 'simple': fails.append('설정 「화면 보기 — 간단히」가 ME.view 를 바꾸지 않습니다')
+    go('/hello/3')
+    if len(pz.query_selector_all('.hello-big')) != 2 or not pz.query_selector('.hello-big.on:has-text("간단히")'): fails.append('처음 안내에 간단히·자세히 고르기가 없거나 지금 값이 표시되지 않습니다')
+    go('/home')
+    if len(pz.query_selector_all('.sv-tile')) < 8: fails.append('간단히 홈에 큰 증상 칸 8개가 없습니다')
+    # (e) 넘침·잘림 — 390·360·320 × 16·22 px, 그리고 명암비·44px(두 테마)
+    R = ['/home', '/symptom/msk', '/symptom/headache', '/symptom/cold', '/symptom/heartburn', '/symptom/insomnia', '/symptom/diarrhea', '/symptom/fever', '/drug/ibuprofen', '/drug/relax-combo', '/hello/3', '/me?t=set']
+    for fs in ('16px', '22px'):
+        pz.evaluate("v=>{ localStorage.setItem('yakjido.fs',v); document.documentElement.style.setProperty('--fs',v); }", fs)
+        for w in (390, 360, 320):
+            pz.set_viewport_size({'width': w, 'height': 800})
+            for r in R:
+                go(r); pz.wait_for_timeout(60); o = pz.evaluate(OVERFLOW_JS)
+                if o['ov'] or o['clip']: fails.append(f'간단히 넘침 {w}px·{fs} {r}: {o["ov"][:2]} {o["clip"][:2]}')
+    pz.evaluate("()=>{ localStorage.setItem('yakjido.fs','16px'); document.documentElement.style.setProperty('--fs','16px'); }"); pz.set_viewport_size({'width': 390, 'height': 844})
+    for theme in ('light', 'dark'):
+        pz.emulate_media(color_scheme=theme); pz.evaluate("t=>setTheme(t)", theme); bad = []; tap = []
+        for r in ['/home', '/symptom/msk', '/symptom/cold', '/drug/ibuprofen', '/hello/3']:
+            go(r); pz.evaluate("()=>document.querySelectorAll('#view details').forEach(d=>d.open=true)")
+            bad += [dict(x, at=r) for x in pz.evaluate(CONTRAST_JS)]; tap += pz.evaluate(TAP_JS)
+            for u in pz.evaluate(UICON_JS): fails.append(f'간단히 조작 부품 대비({theme}) {r}: {u}')
+        if bad: fails.append(f'간단히 명암비({theme}) {len(bad)}: {bad[:3]}')
+        if tap: fails.append(f'간단히 44px 미만({theme}) {len(tap)}: {sorted(set(tap))[:5]}')
+    pz.emulate_media(color_scheme='light'); pz.evaluate("()=>{ ME.view='detail'; saveMe(); }")
+    if zerr: fails.append(f'간단히 보기 JS 오류: {zerr[:2]}')
+    pz.close()
+
 def main():
     ap = argparse.ArgumentParser(); ap.add_argument('--url'); a = ap.parse_args()
     # 0. 자료 고리(브라우저 없이 1초) — 끊긴 출처·약 id·팁 링크가 있으면 여기서 멈춘다
@@ -668,7 +759,7 @@ def main():
             try: pg.wait_for_function('window.__READY__===true && (typeof DETAIL==="undefined" || DETAIL===2)', timeout=ms)   # 약 화면 칸(detail.json)까지
             except Exception: fails.append('본문 자료(core.json)를 못 받았습니다 — ' + pg.url)
         pg.goto(url); ready(); pg.wait_for_timeout(1200)
-        pg.evaluate("localStorage.setItem('yakjido.hello.v1','1');localStorage.setItem('yakjido.me.v1',JSON.stringify({age:'senior',taking:['cls:bp.arb'],pub:{}}))")
+        pg.evaluate("localStorage.setItem('yakjido.hello.v1','1');localStorage.setItem('yakjido.me.v1',JSON.stringify({age:'senior',view:'detail',taking:['cls:bp.arb'],pub:{}}))")
         routes = pg.evaluate("()=>['/home','/drugs','/tips','/me','/together','/kinds','/kinds/bp','/pill','/supp','/kids','/mix','/hello/1','/hello/3','/photo','/schedule','/about','/bag','/rxout','/senior','/myths','/askdoc','/askdoc?open=gout','/vitals','/visits','/me?t=meds','/me?t=set','/drugs?cat=all','/drugs?cat=nsaid','/senior?w=rx','/supp?t=label','/supp?t=stack','/tips?g=5','/myths?g=3','/schedule?t=sc2','/schedule?t=sc4','/pub/0','/pub/5']" +
                              ".concat(D.symptoms.map(s=>'/symptom/'+s.id)).concat(D.drugs.map(d=>'/drug/'+d.id)).concat(D.classes.map(c=>'/class/'+c.id)).concat(D.classes.map(c=>'/drugs?cat='+c.id)).concat((D.myths||[]).map(m=>'/myths?open='+m.id))")
         # 1~3. 모든 화면
@@ -718,6 +809,8 @@ def main():
                 if pg.evaluate("()=>location.hash") != '#' + r:
                     pg.goto(url + '#' + r); ready(); pg.wait_for_timeout(120)
         errs.clear()
+        # 증상 화면의 「간단히」 단추를 누르면 화면 보기가 바뀐다 — 뒤 검사는 자세히 화면을 본다(10-14)
+        pg.evaluate("()=>{ ME.view='detail'; saveMe(); }")
 
         # 5a-2. 고른 시간이 약의 최소 간격보다 촘촘하면 알려 줘야 한다
         pg.goto(url + '#/schedule'); ready(); pg.wait_for_timeout(250)
@@ -986,7 +1079,7 @@ def main():
         if _n['errs']: fails.append(f'약 알림이 터집니다: {_n["errs"][:2]}')
         if not _n['fired']: fails.append('약 알림이 하나도 만들어지지 않습니다 — 시간이 돼도 안 옵니다')
         # 5b. 어르신 모드(글자 20px·큰 단추) — 넘침·잘림은 큰 글씨에서 먼저 터진다
-        pg.evaluate("localStorage.setItem('yakjido.fs','22px');localStorage.setItem('yakjido.me.v1',JSON.stringify({age:'senior',easy:true,taking:['cls:bp.arb','ibuprofen'],pub:{}}))")
+        pg.evaluate("localStorage.setItem('yakjido.fs','22px');localStorage.setItem('yakjido.me.v1',JSON.stringify({age:'senior',easy:true,view:'detail',taking:['cls:bp.arb','ibuprofen'],pub:{}}))")
         for r in SC + ['/bag', '/schedule', '/symptom/cramp', '/symptom/sprain', '/drug/acetaminophen', '/kinds/bp', '/vitals', '/visits', '/me?t=meds', '/me?t=set']:
             pg.goto(url + '#' + r); pg.reload(); ready(); pg.wait_for_timeout(500)
             o = pg.evaluate(OVERFLOW_JS)
@@ -1008,7 +1101,7 @@ def main():
         CASES += [(['eye.glau'], '/symptom/cold', '안압'), (['resp.luka'], '/symptom/msk', '천식'),
                   (['ster.pred'], '/symptom/msk', '스테로이드')]
         for picks, r, kw in CASES:
-            pg.evaluate("(p)=>localStorage.setItem('yakjido.me.v1',JSON.stringify({age:'senior',taking:p.map(x=>'cls:'+x),pub:{}}))", picks)
+            pg.evaluate("(p)=>localStorage.setItem('yakjido.me.v1',JSON.stringify({age:'senior',view:'detail',taking:p.map(x=>'cls:'+x),pub:{}}))", picks)
             pg.goto(url + '#' + r); pg.reload(); ready(); pg.wait_for_timeout(700)
             txt = pg.evaluate("()=>[...document.querySelectorAll('.ixline,.ix-h b')].map(x=>x.innerText).join(' | ')")
             if kw not in txt: fails.append(f'병용 시나리오 {picks} → "{kw}" 없음: {txt[:80]}')
@@ -1215,6 +1308,7 @@ def main():
         z7_checks(br, url, fails)
         z9_checks(br, url, fails)
         z10_checks(br, url, fails)
+        simple_checks(br, url, fails)
         # 6b-2. 성분표에 없던 공공 제품 — 클로닉신(먹는 소염제 26개 제품)·돔페리돈이 약통에서 실제로 걸려야 한다(2026-09-23)
         _pb = {'노리스정 + 와파린': ({'taking':['pub:1','cls:blood.warf'],'pub':{'pub:1':{'name':'노리스정','full':'노리스정(클로닉신리시네이트)','ingr':'클로닉신리시네이트','rx':0,'seq':'1','drugId':''}}}, 'warfarin-nsaid'),
                '노리스정 + 이부프로펜': ({'taking':['pub:1','ibuprofen'],'pub':{'pub:1':{'name':'노리스정','full':'노리스정','ingr':'클로닉신리시네이트','rx':0,'seq':'1','drugId':''}}}, 'nsaid-dup'),
@@ -1510,7 +1604,7 @@ def main():
     print(f'화면 {len(routes)}개 검사 완료')
     if fails:
         print('실패', len(fails)); [print('  ✗', f) for f in fails]; sys.exit(1)
-    print('✓ 전부 통과 — JS 오류 0 · 넘침 0 · 잘림 0 · 명암비 AA · 조작 부품 3:1 · 44px · 단추 누르기 · 복용 간격 · 복약 달력 · 홈 오늘약 · 어르신 소염제 · 소아 한도 · 계열 경고 · 어근 오인 · 내 정보 칸 · 화면 밝기(처음 밝게·세 가지·인쇄 밝게) · 아이콘 전수 · 약 알림 · 어르신 모드 · 320px · 병용 8건 · 겹침 규칙 53 · 입력칸 이름표 · 성분 해석 123 · 죽은 규칙 0 · 약통 판정 4건 · 자기중복 3건 · 바구니 겹침 · 이중계산 0 · 검색 8건 · 구어 30건 · 문장 16건 · 새 약 검색 12건 · 하루 최대 표기 · 먹는/바르는 구분 · 영양제 질문 순서 · 인터넷 없이 · 화면 오류 카드 · 계정 동의 먼저 · 둘러보기 · 아주 높은 혈당(식사·증상) · 영양제 ↔ 내 약통 · 늦은 목록에도 입력 유지 · 아이 처음 안내')
+    print('✓ 전부 통과 — JS 오류 0 · 넘침 0 · 잘림 0 · 명암비 AA · 조작 부품 3:1 · 44px · 단추 누르기 · 복용 간격 · 복약 달력 · 홈 오늘약 · 어르신 소염제 · 소아 한도 · 계열 경고 · 어근 오인 · 내 정보 칸 · 화면 밝기(처음 밝게·세 가지·인쇄 밝게) · 아이콘 전수 · 약 알림 · 어르신 모드 · 320px · 병용 8건 · 겹침 규칙 53 · 입력칸 이름표 · 성분 해석 123 · 죽은 규칙 0 · 약통 판정 4건 · 자기중복 3건 · 바구니 겹침 · 이중계산 0 · 검색 8건 · 구어 30건 · 문장 16건 · 새 약 검색 12건 · 하루 최대 표기 · 먹는/바르는 구분 · 영양제 질문 순서 · 인터넷 없이 · 화면 오류 카드 · 계정 동의 먼저 · 둘러보기 · 아주 높은 혈당(식사·증상) · 영양제 ↔ 내 약통 · 늦은 목록에도 입력 유지 · 아이 처음 안내 · 간단히 보기(같은 바구니·응급 숨김·임신·전환·넘침)')
 
 if __name__ == '__main__':
     main()
