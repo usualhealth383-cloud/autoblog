@@ -17,7 +17,7 @@
 
 전제: docs/parkchan 이 :8765 에 떠 있다.   사용: python3 tools/e2e_focus.py [--shots 폴더]
 """
-import asyncio, sys, os
+import asyncio, sys, os, re
 from playwright.async_api import async_playwright
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from _ui import NO_INTRO, auto_yes
@@ -130,10 +130,10 @@ async def run(b, theme, errs):
     await answer(s, False); await s.wait_for_timeout(400)
     assert await s.get_attribute('.qtop .pbar', 'aria-valuenow') == '1', '틀렸는데 막대가 그대로'
     w = await s.evaluate("document.querySelector('.qtop .pbar i').style.width"); assert w == '10%', w
-    # 채점 시트 — 아래에 붙음 · 틀렸어요 · 다음에 포커스 · 해설은 시트 위 본문
+    # 채점 시트 — 아래에 붙음 · 틀리면 '정답은 O예요'(docs/23 S3 머리 꼴 하나로) · 다음에 포커스 · 해설은 시트 위 본문
     fb = s.locator('#v-bank .verdict.fb'); bb = await fb.bounding_box()
     assert abs(bb['y'] + bb['height'] - 844) <= 1 and bb['height'] < 844 * .45, ('시트가 아래에 붙지 않음/너무 큼', bb)
-    assert '틀렸어요' in await fb.inner_text() and await fb.locator('#bankNext').count() == 1
+    assert re.search(r'정답은 \S+(이에요|예요)', await fb.inner_text()) and await fb.locator('#bankNext').count() == 1
     assert await s.evaluate("document.activeElement.id") == 'bankNext' and 'fbH' in await s.get_attribute('#bankNext', 'aria-describedby')
     pad = await s.evaluate("parseFloat(getComputedStyle(document.querySelector('main')).paddingBottom)"); assert pad >= bb['height'], (pad, bb)
     assert '내일' in await s.inner_text('#v-bank .verdict.fb .again')

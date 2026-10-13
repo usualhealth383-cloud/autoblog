@@ -26,13 +26,16 @@ quotes = json.loads((ROOT / 'data/quotes.json').read_text(encoding='utf-8'))
 # 그림은 문서에 미리 그려 두지 않는다 — 필요할 때 만들도록 문자열로만 싣는다
 figs = {c['id']: (ROOT / 'data' / c['figure']['file']).read_text(encoding='utf-8')
         for c in concepts if c.get('figure')}
-j = lambda o: json.dumps(o, ensure_ascii=False).replace('</', '<\\/')
+# 앱 파일 한도(1,700 KB) — 끼워 넣는 JSON 은 빈칸 없이(2026-10-13, 내용은 같고 약 22 KB 줄어듦)
+j = lambda o: json.dumps(o, ensure_ascii=False, separators=(',', ':')).replace('</', '<\\/')
 # 서버 연결값: app/server/config.json {"url": "...", "anonKey": "..."} 이 있으면 심고, 없으면 로컬 모드
 cfg_p = ROOT / 'app' / 'server' / 'config.json'
 cfg = json.loads(cfg_p.read_text(encoding='utf-8')) if cfg_p.exists() else {}
 shell = shell.replace('__SB_URL__', cfg.get('url', '')).replace('__SB_KEY__', cfg.get('anonKey', ''))
 shell = shell.replace('__PUSH__', 'on' if cfg.get('push') else 'off')   # 푸시: google-services.json 과 함께 켠다
 print('서버 모드:', cfg.get('url') or '(없음 → 로컬 모드)')
+# 법 문서 번호·잘림·【확인 필요】 검사 — 깨진 판이 공개 웹 문서로 나가지 않게(2026-10-13 ⑮ 문장 잘림 사고)
+if _sp.run([_sys.executable, str(ROOT / 'tools' / 'legal_check.py')]).returncode: _sys.exit('법 문서 검사 실패 — tools/legal_check.py')
 legal = {k: (ROOT / 'app' / 'legal' / f'{k}.html').read_text(encoding='utf-8') for k in ('terms', 'privacy', 'delete')}
 # 학원 연락처(app-shell 의 CFG.phone·email)를 약관·처리방침·삭제 안내에 그대로 넣는다 — 앱이 없는 사람도 볼 수 있게(Play 계정 삭제 요건)
 _cfg = {k: (re.search(k + r": *'([^']*)'", shell) or [None, ''])[1] for k in ('phone', 'email', 'academy')}

@@ -82,7 +82,7 @@ async def main():
         await s.click('[data-ntpl="line3"]'); await s.wait_for_timeout(300)
         assert await s.input_value('#nedF0') == '같은 질량이면 부피가 클수록 밀도가 작다.', '자유 → 세 줄로 바꿀 때 글이 첫 칸으로 안 옮겨짐'
         await s.click('#nedDone'); await s.wait_for_timeout(300)
-        assert await s.locator('.ncard.t-line3').count() == 1 and await s.locator(f'.ncal .c[data-nday="{today}"] .dots i').count() >= 1, '달력에 노트 점이 없음'
+        assert await s.locator('.ncard.t-line3').count() == 1 and await s.locator(f'.ncal .c[data-nday="{today}"] .dmk i.nt').count() >= 1, '달력에 노트 점이 없음'
         assert '남겨 뒀어요' in await s.inner_text('.ndone'), '저장한 뒤 차분한 완료 한 줄이 없음'
 
         # ② 끼워 넣기 칩 · 틀 바꾸기 · 마음/이해 · 쓰는 대로 저장(다시 열어도 남음)

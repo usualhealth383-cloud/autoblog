@@ -3,7 +3,7 @@
 
 · 최근 7일 출석했는데 7일 동안 앱 공부 기록 없음 · 정답률이 지난주보다 20%p 이상 떨어짐 · 최근 공지 안 읽음 · 기한 지난 다시 볼 문제 30개 넘게
 · 한 학생은 한 줄(이유를 모음) · 할 일 하나: 공지만 안 읽었으면 '공지 보내기'(문자), 아니면 '학생 보기'(학생 상세)
-· 방금(3시간 안) 보낸 공지는 아직 묻지 않는다 · 아무도 없으면 '오늘 챙길 학생이 없습니다' · 접어 두면 다음에도 접힌 채
+· 방금(3시간 안) 보낸 공지는 아직 묻지 않는다 · 아무도 없으면 '오늘 챙길 학생이 없어요' · 접어 두면 다음에도 접힌 채
 · 로컬: 기기 저장소에 바로 심는다 · --server: 시험대(:8767)에 서비스 키로 심고 원장 계정으로 읽는다(원장 읽기 정책 그대로)
 
 전제: docs/parkchan 이 :8765 에 떠 있다. --server 면 tools/testbed_up.sh.   사용: python3 tools/e2e_owner_todo.py [--server] [--shots 폴더]
@@ -145,7 +145,7 @@ async def main():
             if await o.evaluate('view') != 'admin': await o.evaluate("show('admin')")
         await o.click('[data-adm="stats"]'); await o.wait_for_timeout(400); await o.click('[data-adm="students"]'); await o.wait_for_selector('#todoBox')
         t2 = await o.locator('#todoBox summary').inner_text()
-        assert '오늘 챙길 학생이 없습니다' in t2 and await o.locator('#todoBox .todo-row').count() == 0, t2
+        assert '오늘 챙길 학생이 없어요' in t2 and await o.locator('#todoBox .todo-row').count() == 0, t2
         await o.locator('#todoBox').screenshot(path=f'{SC}/t03_todo_empty.png')
         assert not errs, errs
         print(('SERVER ' if SRV else 'LOCAL ') + 'OWNER TODO E2E OK · 콘솔 오류', errs); await b.close()

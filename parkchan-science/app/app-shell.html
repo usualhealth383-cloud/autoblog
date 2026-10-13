@@ -33,7 +33,7 @@
   /* 정답 색 — 단원 색(--u)과 따로. I단원 테라코타가 오답 빨강과 닮아 정답이 오답처럼 보였다(2026-10-06 디자인 감사) */
   --ok:#147D6F; --ok-soft:#E7F5F1; --ok-dark:#0F6357;
   /* 그림 받침 — 그림 SVG 는 진한 글자를 투명 바탕에 얹는다. 어두운 화면에서는 밝은 종이를 깔아 글자가 보이게 */
-  --figplate:transparent;
+  --figplate:transparent; --figpad:0;
   /* 그림 읽는 법 번호(금빛) — 글자 · 바탕 · 테두리 */
   --hzk:#8A6200; --hzs:#FFF6DC; --hzl:#E2C77E;
   --shadow:0 4px 20px rgba(30,42,46,.07);
@@ -65,7 +65,8 @@
     --brand:#4FBFAC; --brand-soft:#122724; --brand-line:#1D3D38; --brand-dark:#7FD6C6;
     --on-color:#0B1614; color-scheme:dark;
     --no:#E4776A; --no-soft:#2C1A18; --warn:#D9A73C; --warn-soft:#2A2314;
-    --ok:#4FBFAC; --ok-soft:#122724; --ok-dark:#7FD6C6; --figplate:#E4E0D8; --hzk:#E2B85A; --hzs:#2C2614; --hzl:#5A4A22;
+    --ok:#4FBFAC; --ok-soft:#122724; --ok-dark:#7FD6C6; --figplate:#D9D5CC; --figpad:8px; --hzk:#E2B85A; --hzs:#2C2614; --hzl:#5A4A22;
+    --brand-fill:#3FAE9B; --hero-bg:#122724; --hero-line:#2A5049; --hero-sh:none; --soft-bg:#17332E; --soft-ring:inset 0 0 0 1px var(--brand-line);
     --shadow:0 4px 20px rgba(0,0,0,.45);
   }
   :root:not([data-theme="light"])[data-unit="I"]{ --u:#E4885A; --u-soft:#2A1D16; --u-line:#412A1E; --u-dark:#F0A275; }
@@ -80,7 +81,8 @@
   --brand:#4FBFAC; --brand-soft:#122724; --brand-line:#1D3D38; --brand-dark:#7FD6C6;
   --on-color:#0B1614; color-scheme:dark;
   --no:#E4776A; --no-soft:#2C1A18; --warn:#D9A73C; --warn-soft:#2A2314;
-  --ok:#4FBFAC; --ok-soft:#122724; --ok-dark:#7FD6C6; --figplate:#E4E0D8; --hzk:#E2B85A; --hzs:#2C2614; --hzl:#5A4A22;
+  --ok:#4FBFAC; --ok-soft:#122724; --ok-dark:#7FD6C6; --figplate:#D9D5CC; --figpad:8px; --hzk:#E2B85A; --hzs:#2C2614; --hzl:#5A4A22;
+    --brand-fill:#3FAE9B; --hero-bg:#122724; --hero-line:#2A5049; --hero-sh:none; --soft-bg:#17332E; --soft-ring:inset 0 0 0 1px var(--brand-line);
   --shadow:0 4px 20px rgba(0,0,0,.45);
 }
 :root[data-theme="dark"][data-unit="I"]{ --u:#E4885A; --u-soft:#2A1D16; --u-line:#412A1E; --u-dark:#F0A275; }
@@ -93,7 +95,7 @@ body{background:var(--ground);color:var(--ink);
   min-height:100vh;font-size:var(--fs,15px)}
 .app{width:100%;max-width:440px;background:var(--paper);min-height:100vh;
   display:flex;flex-direction:column;box-shadow:var(--shadow);position:relative;padding:var(--sat) var(--sar) 0 var(--sal)}
-.stripe{height:4px;background:var(--brand);flex:0 0 auto}
+.stripe{height:4px;background:var(--brand-fill);flex:0 0 auto}
 main{flex:1;padding:16px 18px calc(96px + var(--sab));overflow-x:hidden;overflow-x:clip}   /* clip: 가로 넘침만 자르고, 가입 화면 아래 고정 버튼(sticky)은 살린다 */
 .hide{display:none!important}
 button{font-family:inherit;color:inherit}
@@ -105,9 +107,9 @@ button{font-family:inherit;color:inherit}
 .rhythm .dots{flex:1;display:flex;justify-content:space-between;gap:4px;max-width:236px;margin-left:auto}
 .rhythm .dt{display:flex;flex-direction:column;align-items:center;gap:3px;font-size:var(--t-tab);font-weight:700;color:var(--faint);min-width:18px}
 .rhythm .dt i{display:block;width:10px;height:10px;border-radius:50%;background:var(--hair);border:1.5px solid var(--line)}
-.rhythm .dt.on i{background:var(--u);border-color:var(--u)}
-.rhythm .dt.today{color:var(--u)}
-.rhythm .dt.today i{box-shadow:0 0 0 2px var(--paper),0 0 0 3.5px var(--u)}
+.rhythm .dt.on i{background:var(--mk-study);border-color:var(--mk-study)}
+.rhythm .dt.today{color:var(--brand-dark)}
+.rhythm .dt.today i{box-shadow:0 0 0 2px var(--paper),0 0 0 3.5px var(--brand)}
 .rhythm .dt.later i{background:transparent;border-style:dashed}
 .rhythm .n{flex:0 0 auto;font-size:var(--t-body);font-weight:900;color:var(--ink);font-variant-numeric:tabular-nums}
 .rhythm .n small{font-size:var(--t-tab);color:var(--muted);font-weight:700}
@@ -120,7 +122,16 @@ button{font-family:inherit;color:inherit}
 .rhythm.tile .n small{font-size:var(--t-cap);font-weight:700}
 .rhythm.tile .dots{order:2}
 .tile.rtile{padding:12px 8px}
-.week .d.later i{background:transparent;border:1.5px dashed var(--line)}
+/* 통계 히어로(docs/23 S12) — '이번 주에 3일 공부했어요' 한 문장 + 요일 점 7개, 나머지 둘은 아래 2열 */
+.tiles.st2{grid-template-columns:1fr 1fr}
+.tile.rhero{grid-column:1/-1;text-align:left;padding:16px 18px;background:var(--hero-bg);border-color:var(--hero-line);box-shadow:var(--hero-sh);border-radius:var(--r-l)}
+.rhythm.hero{flex-direction:column;align-items:stretch;gap:10px;background:none;border:none;padding:0;margin:0}
+.rhythm.hero .hl{font-size:var(--t-h1);font-weight:900;color:var(--ink);line-height:1.3;letter-spacing:-.02em}
+.rhythm.hero .dots{max-width:none;margin:0;width:100%}
+.rhythm.hero .n{display:none}
+.calnav{width:44px;height:44px;margin:-8px 0;border-radius:var(--r-m);border:none;background:none;color:var(--muted);cursor:pointer;display:inline-grid;place-items:center}
+.calnav svg{width:18px;height:18px;stroke:currentColor;stroke-width:2.2;fill:none;stroke-linecap:round;stroke-linejoin:round}
+.week .d.later>i{border:1.5px dashed var(--line)}
 /* 오늘의 복습 카드 — 차분하게, 숫자 하나 */
 .revcard{display:flex;align-items:center;gap:12px;width:100%;min-height:64px;text-align:left;background:var(--card);border:1px solid var(--u-line);border-radius:var(--r-l);padding:12px 14px;margin:-2px 0 13px;cursor:pointer;font-family:inherit;color:var(--ink)}
 .revcard .ic{flex:0 0 38px;height:38px;border-radius:var(--r-m);background:var(--u-soft);display:grid;place-items:center}
@@ -136,7 +147,9 @@ button{font-family:inherit;color:inherit}
    끝낸 단계 = 단원 색 점(접힘·흐리게) · 지금 단계 = 브랜드 색 고리 + 큰 카드(화면의 히어로는 이것 하나) · 아직 = 빈 점, 작은 카드.
    움직임은 단계를 끝내고 돌아왔을 때 다음 단계 카드가 펼쳐지는 것 하나(240ms, 줄임 설정이면 없음). 별·불꽃·캐릭터 없음
    카드 형태는 세 가지만(감사 #9): ① 히어로(흰 바탕 + 옅은 그림자, 화면당 1개) ② 카드(흰 바탕 + 가는 테두리) ③ 줄(카드 없이) */
-.phead{display:flex;align-items:baseline;justify-content:space-between;gap:8px;margin:6px 2px 10px}
+.phead{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:6px 2px 10px}
+.exchip{flex:0 1 auto;display:inline-flex;align-items:center;gap:2px;min-height:32px;margin:-6px 0 -6px auto;padding:4px 6px 4px 11px;border:none;border-radius:var(--r-pill);background:var(--brand-soft);color:var(--brand-dark);font-family:inherit;font-size:var(--t-cap);font-weight:700;line-height:1.35;text-align:left;cursor:pointer}
+.exchip svg{flex:0 0 14px;width:14px;height:14px;stroke:currentColor;stroke-width:2.4;fill:none;stroke-linecap:round;stroke-linejoin:round}
 .phead h2{font-size:var(--t-cap);font-weight:700;color:var(--muted);margin:0}
 .phead .n{font-size:var(--t-cap);font-weight:700;color:var(--muted);font-variant-numeric:tabular-nums}
 .path{list-style:none;position:relative;margin:0 0 14px;padding:0 0 0 28px}
@@ -144,7 +157,7 @@ button{font-family:inherit;color:inherit}
 .ps{position:relative;margin:0 0 8px}
 .ps:last-child{margin-bottom:0}
 .ps::before{content:"";position:absolute;left:-23.5px;top:23px;width:10px;height:10px;border-radius:50%;background:var(--paper);border:1.5px solid var(--line);box-sizing:border-box}
-.ps.done::before{background:var(--u);border-color:var(--u)}
+.ps.done::before{background:var(--brand-fill);border-color:var(--brand-fill)}   /* 앱 껍데기 = 브랜드 색(docs/07 §9 · docs/23 S9). 단원 색은 단원 화면 안에서만 */
 .ps.none::before{border-style:dashed}
 .ps.now::before{left:-25.5px;top:24px;width:14px;height:14px;border:2.5px solid var(--brand);background:var(--paper);box-shadow:0 0 0 4px var(--brand-soft)}
 /* 작은 단계 카드(아직 · 끝냄) — 줄 하나에 이름과 상태 */
@@ -162,6 +175,11 @@ button{font-family:inherit;color:inherit}
 .pnow{background:var(--card);border:1px solid var(--brand-line);border-radius:var(--r-l);padding:16px 18px 18px;box-shadow:var(--shadow)}
 .pnow .k{display:block;font-size:var(--t-cap);font-weight:700;color:var(--brand-dark);margin:0 0 6px}
 .pnow h3{font-size:var(--t-h1);font-weight:900;letter-spacing:-.02em;line-height:1.3;margin:0 0 4px;color:var(--ink)}
+/* 히어로 오른쪽 오늘 개념 그림 96×96(원장님 T1-B) — 잘라 내지 않고 그림 전체를 칸에 맞춰 줄인다(글자가 잘리지 않게, meet). 제목은 왼쪽 2/3 */
+.pntop{display:flex;align-items:flex-start;gap:12px}
+.pntx{flex:1;min-width:0}
+.pthumb{flex:0 0 96px;width:96px;height:96px;margin-top:2px;padding:5px;border-radius:var(--r-m);background:var(--figplate);box-shadow:inset 0 0 0 1px var(--hair);display:grid;place-items:center;overflow:hidden}
+.pthumb svg{display:block;width:100%;height:100%}
 .pnow .hb{display:grid;grid-template-rows:1fr}
 .pnow .hb>div{min-height:0}
 .pnow p{font-size:var(--t-body);color:var(--body);line-height:1.65;margin:0}
@@ -236,8 +254,7 @@ button{font-family:inherit;color:inherit}
 .hsum .tnote .tx span{font-size:var(--t-cap);color:var(--muted);line-height:1.55;display:block;overflow:visible;-webkit-line-clamp:unset}
 .hsum .tnote>svg{flex-basis:16px;width:16px;height:16px}
 /* 학원 과제 카드(★4) — 복습 카드와 같은 모양, 이름 한 줄 더. 마감이 지나도 색으로 다그치지 않는다(글로만 '마감 지남 · 늦게 내도 받아요') */
-.asgcard .tx b .k{font-size:var(--t-tab);font-weight:700;color:var(--u-dark);background:var(--u-soft);border-radius:var(--r-pill);padding:1px 8px;margin-left:4px;vertical-align:1px}
-.revcard.asgcard .tx span.t{font-size:var(--t-small);font-weight:700;color:var(--ink);line-height:1.45}
+.revcard.asgcard .tx b{font-size:var(--t-body);line-height:1.45}   /* 두 줄: 과제 이름(15/700) + '학원 과제 · 내일 마감 · 3/5 했어요'(13 흐림) — docs/23 S2 이중 제목 정리 */
 .asgmore{text-align:left;padding:0 4px 12px;margin-top:-6px}
 .asgbar{display:flex;align-items:center;gap:8px;background:var(--u-soft);border:1px solid var(--u-line);border-radius:var(--r-s);padding:9px 12px;margin:0 0 12px}
 .asgbar .k{font-size:var(--t-tab);font-weight:700;color:var(--u-dark);white-space:nowrap}
@@ -264,22 +281,18 @@ p.leech{font-size:var(--t-cap);color:var(--muted);line-height:1.6;margin:-4px 0 
   color:var(--u-dark);background:var(--u-soft);padding:5px 11px;border-radius:var(--r-pill)}
 .pill svg{width:13px;height:13px;stroke:currentColor;stroke-width:2.4;fill:none;
   stroke-linecap:round;stroke-linejoin:round}
-.pill.grey{background:var(--hair);color:var(--muted)}
+.pill.grey{background:var(--hair);color:var(--muted);border:none}
 .pill.warn{background:var(--warn-soft);color:var(--warn)}
 
 /* 공지 */
-.notice{display:flex;gap:10px;background:#FBEFE7;border:1px solid #F0D9C7;
-  border-radius:var(--r-m);padding:11px 13px;margin-bottom:13px;align-items:flex-start}
-@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) .notice{background:#2A1D16;border-color:#412A1E} } :root[data-theme="dark"] .notice{background:#2A1D16;border-color:#412A1E}   /* 어두운 화면에서만(밝은 화면에 새던 것 — 2026-10-01) */
-.notice .ic{width:21px;height:21px;border-radius:50%;background:#A64516;flex:0 0 auto;
-  display:grid;place-items:center;margin-top:1px;color:var(--on-color);font-size:var(--t-cap);font-weight:900}
+/* 학원 공지 = '소식' 꼴(docs/23 S2) — 경고(빨강 원 '!')가 아니라 확성기 선 아이콘 + 브랜드 연한 바탕. 하드코딩 색 6개를 --info 토큰으로 */
+.notice{display:flex;gap:10px;background:var(--info-soft);border:1px solid var(--brand-line);border-radius:var(--r-m);padding:11px 13px;margin-bottom:13px;align-items:flex-start}
+.notice .ic{flex:0 0 18px;height:18px;margin-top:2px;color:var(--info)}
+.notice .ic svg{display:block;width:18px;height:18px;stroke:currentColor;stroke-width:1.9;fill:none;stroke-linecap:round;stroke-linejoin:round}
 .notice .b{flex:1;min-width:0}
-.notice .t{font-size:var(--t-cap);font-weight:700;color:#A64516;line-height:1.45}   /* 대비 AA(2026-10-06 — #C1521E 는 4.1)*/
-@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) .notice .t{color:#E4885A} } :root[data-theme="dark"] .notice .t{color:#E4885A}   /* 어두운 화면에서만(밝은 화면에 새던 것 — 2026-10-01) */
-.notice .d{font-size:var(--t-tab);color:var(--body);line-height:1.5;margin-top:2px}
-@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) .notice .ic{background:#E4885A} :root:not([data-theme="light"]) .notice button{color:#E4885A;border-color:#412A1E} } :root[data-theme="dark"] .notice .ic{background:#E4885A} :root[data-theme="dark"] .notice button{color:#E4885A;border-color:#412A1E}
-.notice button{font-size:var(--t-tab);font-weight:700;color:#A64516;border:1px solid #F0D9C7;
-  background:var(--card);border-radius:var(--r-s);padding:6px 11px;flex:0 0 auto;align-self:center;cursor:pointer}
+.notice .t{font-size:var(--t-small);font-weight:700;color:var(--ink);line-height:1.45}
+.notice .d{font-size:var(--t-cap);color:var(--body);line-height:1.55;margin-top:2px}
+.notice button{min-height:44px;min-width:52px;font-size:var(--t-cap);font-weight:700;color:var(--info);border:1px solid var(--brand-line);background:var(--card);border-radius:var(--r-s);padding:6px 12px;flex:0 0 auto;align-self:center;cursor:pointer}
 
 /* 개념 카드 */
 .card{background:var(--card);border:1px solid var(--u-line);border-radius:var(--r-l);
@@ -297,11 +310,11 @@ h1{font-size:var(--t-h1);font-weight:900;letter-spacing:-.025em;line-height:1.3;
 .step{display:grid;grid-template-columns:26px 1fr;column-gap:9px;align-items:baseline;
   border-top:1px solid var(--hair);padding:11px 0 12px}
 .step:first-child{border-top:2.5px solid var(--u);padding-top:10px}
-.step .n{grid-column:1;font-size:var(--t-small);font-weight:900;color:var(--u);font-family:var(--serif)}
+.step .n{grid-column:1;font-size:var(--t-small);font-weight:700;color:var(--u);font-family:var(--sans)}   /* 명조는 본문 .prose p + 인용 두 곳만(docs/23 S17) */
 .step .t{grid-column:2;font-size:var(--t-body);font-weight:700;margin:0;line-height:1.4;letter-spacing:-.01em}
 .step .d{grid-column:2;font-size:var(--t-small);color:var(--body);line-height:1.75;margin-top:4px}
 figure{background:var(--u-soft);border-radius:var(--r-s);padding:12px 8px 8px;text-align:center;margin-bottom:15px}
-figure svg{max-width:100%;height:auto;background:var(--figplate);border-radius:8px}
+figure svg{max-width:100%;height:auto;background:var(--figplate);border-radius:8px;padding:var(--figpad)}   /* 어두운 화면: 판을 한 단계 낮추고 둘레 8px — '종이 한 장'(docs/23 S11) */
 figcaption{font-size:var(--t-tab);color:var(--u-dark);font-weight:700;margin-top:7px;padding:0 6px;line-height:1.5}
 .howto{background:#FFFDF6;border:1px solid #EBDDB8;border-radius:var(--r-s);padding:11px 14px;margin-bottom:15px}
 @media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) .howto{background:#221E12;border-color:#3B3320} } :root[data-theme="dark"] .howto{background:#221E12;border-color:#3B3320}   /* 어두운 화면에서만(밝은 화면에 새던 것 — 2026-10-01) */
@@ -310,7 +323,7 @@ figcaption{font-size:var(--t-tab);color:var(--u-dark);font-weight:700;margin-top
 .howto li{font-size:var(--t-cap);line-height:1.7;color:var(--body);margin-bottom:5px;list-style:none;padding-left:15px;text-indent:-15px}
 .howto li b.n{color:var(--hzk);font-weight:900;margin-right:6px}
 @media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) .howto li b.n{color:#D9A73C} } :root[data-theme="dark"] .howto li b.n{color:#D9A73C}   /* 어두운 화면에서만(밝은 화면에 새던 것 — 2026-10-01) */
-.prose p{font-family:var(--serif);font-size:var(--t-body);line-height:2;color:var(--body);margin-bottom:15px}
+.prose p{font-family:var(--serif);font-size:var(--t-stem);line-height:1.85;color:var(--body);margin-bottom:15px}   /* 읽는 화면만 16px · 줄 간격 1.85(원장님 T3-C). 목록·버튼은 15 그대로 */
 .prose p:last-child{margin-bottom:0}
 .prose b{color:var(--ink);font-weight:700}
 button.blank{display:inline-block;min-width:52px;text-align:center;border:none;
@@ -338,7 +351,7 @@ button.blank.open{background:transparent;color:var(--u-dark)}
 
 /* 버튼 */
 .btn{display:block;width:100%;text-align:center;font-size:var(--t-body);font-weight:700;padding:15px;border-radius:var(--r-m);border:none;
-  background:var(--brand);color:var(--on-color);cursor:pointer;letter-spacing:-.01em;margin-bottom:13px}
+  background:var(--brand-fill);color:var(--on-color);cursor:pointer;letter-spacing:-.01em;margin-bottom:13px}
 .btn:disabled{background:var(--line);color:var(--faint);cursor:default}
 /* 앱처럼: 누르면 살짝 눌리고, 파란 반짝임·300ms 터치 지연은 없다. 단추 글자는 길게 눌러도 선택되지 않는다 */
 button,a,label,.tab,.pcard,.stu,.setrow{-webkit-tap-highlight-color:transparent;touch-action:manipulation}
@@ -358,7 +371,7 @@ button,.tab,.btn,.chip,.chipbar button,.seg button{-webkit-user-select:none;user
 @keyframes spin{to{transform:rotate(360deg)}}
 @media (prefers-reduced-motion: reduce){.vin,.skel i,.figslot,#ptr.spin svg{animation:none}.btn,.pcard,.setrow.go,.stu{transition:none}}
 .btn.ghost{background:transparent;color:var(--muted);border:1px solid var(--line)}
-.btn.soft{background:var(--brand-soft);color:var(--brand-dark)}
+.btn.soft{background:var(--soft-bg);color:var(--brand-dark);box-shadow:var(--soft-ring)}   /* 어두운 화면: 카드와 1.1:1 이던 연한 버튼에 바탕 한 단계 + 1px 고리(docs/23 S11) */
 .btn.danger{background:var(--no);color:var(--on-color)}
 /* 확인 묻기 — 기기 기본 대화상자(주소가 찍히는 회색 창) 대신 앱 안의 작은 시트. 열린 시트 위에도 뜬다 */
 .sheet-bg.yn-bg{z-index:45}
@@ -407,7 +420,7 @@ button,.tab,.btn,.chip,.chipbar button,.seg button{-webkit-user-select:none;user
 .chipbar{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:6px;padding-bottom:2px}
 .chipbar button{flex:0 0 auto;font-size:var(--t-cap);font-weight:700;padding:6px 12px;border-radius:var(--r-pill);border:1px solid var(--line);background:var(--card);color:var(--muted);cursor:pointer}
 .chipbar button.on{background:var(--u);border-color:var(--u);color:var(--on-color)}
-.book-h{font-family:var(--serif);font-size:var(--t-h2);font-weight:700;letter-spacing:-.01em;margin:26px 0 2px;padding-bottom:6px;border-bottom:2px solid var(--line)}
+.book-h{font-family:var(--sans);font-size:var(--t-h2);font-weight:700;letter-spacing:-.01em;margin:24px 0 2px;padding-bottom:6px}   /* 앱 껍데기 제목은 고딕 · 밑줄 대신 위 여백으로 가른다(docs/23 S17) */
 .book-h:first-of-type{margin-top:4px}
 .unit-h{display:flex;align-items:center;gap:9px;margin:20px 0 10px}
 .unit-h:first-of-type{margin-top:4px}
@@ -427,19 +440,24 @@ button,.tab,.btn,.chip,.chipbar button,.seg button{-webkit-user-select:none;user
 .row.locked .st svg{stroke:var(--faint);stroke-width:1.8}
 
 /* 빈 상태 */
-.empty{text-align:center;padding:56px 24px;color:var(--faint)}
-.empty svg{width:44px;height:44px;stroke:var(--line);stroke-width:1.5;fill:none;margin-bottom:14px;stroke-linecap:round;stroke-linejoin:round}
-.empty p{font-size:var(--t-small);line-height:1.8}
+.empty{text-align:center;padding:56px 24px;color:var(--muted)}
+/* 빈 상태 하나의 꼴(docs/23 S19 · 이야기 빈 그림과 같은 언어) — 64px 두 색 그림 + 굵은 한 줄 + 설명 + 버튼 하나 */
+.empty svg,.eart{display:block;width:64px;height:64px;margin:0 auto 12px;fill:var(--brand-soft);stroke:var(--brand-dark);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+.eart,.empty .eart{stroke-width:2.2}.eart .a{fill:none}   /* 빈 상태 그림 4곳(원장님 T4-B) — 64px 두 색 선 그림, 사람·캐릭터 없음. 선은 --brand-dark(--brand-line 은 너무 흐렸다) */
+.nempty .eart{margin-bottom:10px}.nempty b,.todo .eb{display:block;font-size:var(--t-body);font-weight:700;color:var(--ink);margin-bottom:2px}.nempty p,.todo .ep{font-size:var(--t-cap);color:var(--muted);line-height:1.6}
+.todo .eempty{text-align:center;padding:6px 4px 8px}
+.empty b{display:block;font-size:var(--t-body);font-weight:700;color:var(--ink);margin-bottom:4px}
+.empty p{font-size:var(--t-cap);line-height:1.7}
+.empty .btn{margin-top:16px}
 
 /* 진도 · 통계 */
 .week{display:flex;gap:6px;justify-content:space-between;margin:2px 0 13px}
 .week .d{flex:1;text-align:center;font-size:var(--t-tab);color:var(--faint);font-weight:700}
-.week .d i{display:grid;place-items:center;width:100%;aspect-ratio:1;border-radius:var(--r-s);background:var(--hair);
-  margin-bottom:4px;border:1.5px solid transparent;font-style:normal;font-size:var(--t-cap);font-weight:700;color:var(--faint);font-variant-numeric:tabular-nums}
-.week .d.on i{background:var(--u);border-color:var(--u);color:var(--on-color)}
-.week .d.today i{border-color:var(--u);color:var(--u)}
-.week .d.today{color:var(--u)}
-.week .d.on.today i{color:var(--on-color);box-shadow:0 0 0 2px var(--paper),0 0 0 3.5px var(--u)}   /* 오늘 공부했으면: 채운 칸 + 바깥 고리(숫자가 배경색에 묻히지 않게) */
+.week .d>i{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;width:100%;aspect-ratio:1;border-radius:var(--r-pill);
+  margin-bottom:4px;border:1.5px solid transparent;font-style:normal;font-size:var(--t-cap);font-weight:700;color:var(--muted);font-variant-numeric:tabular-nums}
+.week .d.on>i{color:var(--ink)}
+.week .d.today>i{box-shadow:var(--ring-sel);color:var(--brand-dark);font-weight:900}
+.week .d.today{color:var(--brand-dark)}
 .tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:13px}
 .tile{background:var(--card);border:1px solid var(--hair);border-radius:var(--r-m);padding:12px 10px;text-align:center}
 .tile .v{font-size:var(--t-h1);font-weight:900;letter-spacing:-.02em;font-variant-numeric:tabular-nums;line-height:1.2;color:var(--ink)}
@@ -453,18 +471,28 @@ button,.tab,.btn,.chip,.chipbar button,.seg button{-webkit-user-select:none;user
 .bar-row .v{flex:0 0 46px;text-align:right;color:var(--muted);font-variant-numeric:tabular-nums}
 .cal{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px;margin-top:6px}
 .cal .h{font-size:var(--t-tab);color:var(--faint);text-align:center;font-weight:700;padding-bottom:2px}
-.cal .c{position:relative;aspect-ratio:1;min-width:0;border-radius:var(--r-pill);display:grid;place-items:center;font-size:var(--t-cap);color:var(--muted);font-variant-numeric:tabular-nums}   /* 하루콩식(디자인 감사 #12): 칸을 칠하지 않고 공부한 날은 숫자 아래 점, 출석은 테두리 링 */
+.cal .c{position:relative;aspect-ratio:1;min-width:0;border-radius:var(--r-pill);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-size:var(--t-cap);color:var(--muted);font-variant-numeric:tabular-nums}   /* 하루콩식(디자인 감사 #12): 칸을 칠하지 않고 공부한 날은 숫자 아래 점, 출석은 테두리 링 */
 .cal .c.on{color:var(--ink);font-weight:700}
-.cal .c.on::after{content:'';position:absolute;left:50%;bottom:9%;width:6px;height:6px;margin-left:-3px;border-radius:var(--r-pill);background:var(--u)}
-.cal .c.att{box-shadow:inset 0 0 0 2px var(--warn)}
-.cal .c.today{color:var(--brand-dark);font-weight:900;background:var(--brand-soft)}
-.legend{display:flex;gap:12px;font-size:var(--t-tab);color:var(--muted);margin-top:8px}
-.legend i{display:inline-block;width:6px;height:6px;vertical-align:1px!important;border-radius:var(--r-pill);vertical-align:-1px;margin-right:4px;background:var(--u)}
-.legend i.att{background:transparent;box-shadow:inset 0 0 0 2px var(--warn)}
+.cal .c.today{color:var(--brand-dark);font-weight:900;box-shadow:var(--ring-sel)}
+/* 달력 표시 하나로(docs/23 S1, 하루콩식) — 통계 달력·노트 달력·보호자 주간 띠가 같은 뜻을 같은 꼴로:
+   공부한 날 = 브랜드 점 · 노트 = 금빛 점 · 일정 = 회색 점 · 학원 출석 = 고리 · 오늘 = 테두리 고리 · 고른 날 = 채움. 칸은 칠하지 않는다(어두운 화면 1.03:1 이던 칠한 칸 없앰) */
+/* 브랜드 '채운 면'(주 버튼·고른 칸·배지) — 어두운 화면에서만 한 단계 낮춘다(원장님 T2-B: 밤에 큰 버튼이 화면에서 가장 밝은 면이 되지 않게). 글자·아이콘 브랜드는 그대로 */
+:root{--brand-fill:var(--brand);--hero-bg:var(--card);--hero-line:var(--brand-line);--hero-sh:var(--shadow);--soft-bg:var(--brand-soft);--soft-ring:none;--info:var(--brand-dark);--info-soft:var(--brand-soft);--mk-study:var(--brand);--mk-note:var(--hzk);--mk-event:var(--muted);--mk-att:var(--brand-dark);--ring-sel:inset 0 0 0 1.5px var(--brand)}
+.dmk{display:flex;justify-content:center;gap:3px;height:6px}
+.dmk i,.legend i{display:inline-block;flex:0 0 6px;width:6px;height:6px;border-radius:50%;background:var(--mk-study)}
+.dmk i.nt,.legend i.nt{background:var(--mk-note)}
+.dmk i.ev,.legend i.ev{background:var(--mk-event)}
+.dmk i.at,.legend i.at{background:none;box-shadow:inset 0 0 0 1.5px var(--mk-att)}
+.legend{display:flex;flex-wrap:wrap;gap:4px 14px;font-size:var(--t-tab);color:var(--muted);margin-top:8px}
+.legend i{margin-right:5px;vertical-align:1px}
 /* ═ 보호자 — 이번 주 한눈에 ═ */
 .pweek .week{margin-bottom:10px}
-.pweek .week .d{position:relative}
-.pweek .week .d b.att{display:block;width:5px;height:5px;border-radius:50%;background:var(--warn);margin:3px auto 0}
+/* 보호자 첫 화면 히어로 = 이번 주 요약(원장님 T6-B) — 이름·수강·오늘은 위 머리 두 줄(13 흐림)로 줄였다 */
+.phd{font-size:var(--t-cap);color:var(--muted);line-height:1.65;margin:-6px 2px 12px}
+.phd .qmore{margin:0}.phd .qmore>summary{min-height:36px}
+.phd b{color:var(--ink);font-weight:700}
+.pweek.phero{background:var(--hero-bg);border-color:var(--hero-line);box-shadow:var(--hero-sh);border-radius:var(--r-l)}
+.pweek .whl{display:block;font-size:var(--t-h1);font-weight:900;letter-spacing:-.02em;line-height:1.3;color:var(--ink);margin:-2px 2px 2px}
 .pstat{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
 .pstat>div{background:var(--paper);border:1px solid var(--hair);border-radius:var(--r-m);padding:10px 8px;text-align:center}
 .pstat b{display:block;font-size:var(--t-h1);font-weight:900;color:var(--ink);font-variant-numeric:tabular-nums;line-height:1.2}
@@ -482,8 +510,8 @@ button,.tab,.btn,.chip,.chipbar button,.seg button{-webkit-user-select:none;user
 .tb .bt{display:flex;align-items:flex-end;justify-content:center;width:100%;height:46px;border-bottom:1px solid var(--hair)}
 .tb i{display:block;width:100%;max-width:38px;background:var(--brand-line);border-radius:var(--r-s) var(--r-s) 0 0}
 .tb b{font-size:var(--t-cap);font-weight:700;color:var(--ink);font-variant-numeric:tabular-nums;line-height:1}
-.tb small{font-size:var(--t-tab);color:var(--muted);font-weight:700}
-.tb.now i{background:var(--brand)}
+.tb small{font-size:var(--t-cap);color:var(--muted);font-weight:700}
+.tb.now i{background:var(--brand-fill)}
 .tb.now small{color:var(--brand-dark)}
 .wasg{display:flex;flex-direction:column;gap:6px;margin-top:8px}
 .wa{display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:var(--t-cap);color:var(--body)}
@@ -501,7 +529,7 @@ button,.tab,.btn,.chip,.chipbar button,.seg button{-webkit-user-select:none;user
 .help .hc span{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
 .help .hc i{font-style:normal;font-size:var(--t-small);font-weight:700}
 .help .hc small{font-size:var(--t-cap);color:var(--body);word-break:keep-all}
-.help .hc em{font-style:normal;font-size:var(--t-cap);font-weight:700;color:var(--on-color);background:var(--brand);border-radius:var(--r-pill);padding:6px 12px}
+.help .hc em{font-style:normal;font-size:var(--t-cap);font-weight:700;color:var(--on-color);background:var(--brand-fill);border-radius:var(--r-pill);padding:6px 12px}
 .help .now{font-size:var(--t-cap);color:var(--muted);margin:2px 2px 0;line-height:1.6}
 .sheet.care h3{font-size:var(--t-h2)}
 .sheet.care p{color:var(--body)}
@@ -532,7 +560,7 @@ button,.tab,.btn,.chip,.chipbar button,.seg button{-webkit-user-select:none;user
 .rvw.no{color:var(--muted);background:var(--ground)}
 .rvnote{font-size:var(--t-cap);color:var(--body);background:var(--warn-soft);border-radius:var(--r-m);padding:10px 13px;margin:10px 0 0;line-height:1.7;word-break:keep-all}
 .rvnote.no{background:var(--ground)}
-.chk{display:inline-flex;align-items:center;gap:3px;font-size:var(--t-tab);font-weight:900;color:var(--on-color);background:var(--brand);border-radius:var(--r-s);padding:2px 7px 2px 5px}
+.chk{display:inline-flex;align-items:center;gap:3px;font-size:var(--t-tab);font-weight:900;color:var(--on-color);background:var(--brand-fill);border-radius:var(--r-s);padding:2px 7px 2px 5px}
 .chk svg{width:12px;height:12px;fill:none;stroke:currentColor;stroke-width:3;stroke-linecap:round;stroke-linejoin:round}
 .cm.chkc{background:var(--brand-soft);border-radius:var(--r-m);border-top-color:transparent;padding:12px 12px;margin:4px 0}
 .cm.chkc + .cm{border-top:none}
@@ -563,9 +591,10 @@ button,.tab,.btn,.chip,.chipbar button,.seg button{-webkit-user-select:none;user
 .setrow>button.more{flex:0 0 auto;font-size:var(--t-cap);font-weight:700;color:var(--brand-dark);background:var(--brand-soft);border:none;border-radius:var(--r-pill);padding:0 13px;min-height:34px;cursor:pointer;font-family:inherit;white-space:nowrap}
 .setrow>button[data-admpdel],.setrow>button[data-admcdel]{color:var(--no);background:var(--no-soft)}
 /* ═ 공부 노트 · 달력 ═ */
-.hrow{display:flex;align-items:center;justify-content:space-between;gap:8px}
-.hrow .h-page{flex:1;min-width:0}
-.hrow .more{flex:0 0 auto;font-size:var(--t-cap);font-weight:700;color:var(--brand-dark);background:var(--brand-soft);border:none;border-radius:var(--r-pill);padding:0 14px;min-height:36px;cursor:pointer;font-family:inherit;margin-bottom:14px}
+/* 화면 머리 줄(제목 + 오른쪽 작은 버튼) — 2026-10-13 홈 목록 줄 .hrow 와 이름이 겹쳐 홈 줄 간격이 8px 로 그려지던 것을 가름 */
+.pghead{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.pghead .h-page{flex:1;min-width:0}
+.pghead .more{flex:0 0 auto;font-size:var(--t-cap);font-weight:700;color:var(--brand-dark);background:var(--brand-soft);border:none;border-radius:var(--r-pill);padding:0 14px;min-height:36px;cursor:pointer;font-family:inherit;margin-bottom:14px}
 .ncal{background:var(--card);border:1px solid var(--hair);border-radius:var(--r-l);padding:12px 12px 12px;margin-bottom:14px}
 .ncal .mh{display:flex;align-items:center;justify-content:space-between;margin:0 0 4px}
 .ncal .mh b{font-size:var(--t-stem);font-weight:900;letter-spacing:-.01em;font-variant-numeric:tabular-nums}
@@ -576,17 +605,10 @@ button,.tab,.btn,.chip,.chipbar button,.seg button{-webkit-user-select:none;user
 .ncal .h.sun{color:var(--no)}
 .ncal .c{position:relative;aspect-ratio:1;min-width:0;border:none;background:none;border-radius:var(--r-m);font-size:var(--t-small);font-weight:700;color:var(--ink);cursor:pointer;font-family:inherit;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;font-variant-numeric:tabular-nums;padding:0}
 .ncal .c.out{visibility:hidden}
-.ncal .c.study{background:var(--brand-soft)}
-.ncal .c.today{box-shadow:inset 0 0 0 1.5px var(--brand);color:var(--brand-dark);font-weight:900}
-.ncal .c.sel{background:var(--brand);color:var(--on-color);box-shadow:none}
-.ncal .c .dots{display:flex;gap:3px;height:5px}
-.ncal .c .dots i{width:5px;height:5px;border-radius:50%;background:var(--brand)}
-.ncal .c .dots i.ev{background:var(--warn)}
-.ncal .c.sel .dots i{background:var(--on-color)}
-.ncal .lg{display:flex;flex-wrap:wrap;gap:4px 14px;font-size:var(--t-tab);color:var(--muted);margin-top:8px;padding:0 4px}
-.ncal .lg i{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--brand);margin-right:5px;vertical-align:0}
-.ncal .lg i.st{width:10px;height:10px;border-radius:var(--r-pill);background:var(--brand-soft);box-shadow:inset 0 0 0 1px var(--brand-line);vertical-align:-1px}
-.ncal .lg i.ev{background:var(--warn)}
+.ncal .c.today{box-shadow:var(--ring-sel);color:var(--brand-dark);font-weight:900}
+.ncal .c.sel{background:var(--brand-fill);color:var(--on-color);box-shadow:none}
+.ncal .c.sel .dmk i{background:var(--on-color)}
+.ncal .legend{padding:0 4px}
 .nday{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:2px 2px 10px}
 .nday b{font-size:var(--t-h2);font-weight:900;letter-spacing:-.01em}
 .nday small{display:block;font-size:var(--t-cap);color:var(--muted);font-weight:700;margin-top:2px;word-break:keep-all}
@@ -629,7 +651,7 @@ button,.tab,.btn,.chip,.chipbar button,.seg button{-webkit-user-select:none;user
 .ncard .m .more{font-size:var(--t-cap);font-weight:700;color:var(--brand-dark);background:none;border:none;cursor:pointer;min-height:36px;padding:0 4px;font-family:inherit}
 .ngr{display:inline-flex;align-items:center;gap:3px;font-size:var(--t-cap);color:var(--muted);font-weight:700}
 .ngr i{display:block;width:5px;height:12px;border-radius:2px;background:var(--line)}
-.ngr i.on{background:var(--brand)}
+.ngr i.on{background:var(--brand-fill)}
 .ngr span{margin-left:4px}
 .ndone{display:flex;align-items:center;gap:8px;font-size:var(--t-small);font-weight:700;color:var(--brand-dark);background:var(--brand-soft);border-radius:var(--r-m);padding:10px 14px;margin:0 0 10px;animation:ndIn .3s ease-out}
 .ndone svg{width:18px;height:18px;flex:0 0 18px;stroke:currentColor;stroke-width:2.4;fill:none;stroke-linecap:round;stroke-linejoin:round}
@@ -737,7 +759,7 @@ button,.tab,.btn,.chip,.chipbar button,.seg button{-webkit-user-select:none;user
 /* 오늘 화면 — 일력(한 장씩 넘기는 달력) + 공부 노트 */
 .tnote{display:flex;align-items:stretch;gap:14px;width:100%;text-align:left;background:var(--card);border:1px solid var(--hair);border-radius:var(--r-l);padding:12px;margin-bottom:13px;cursor:pointer;font-family:inherit;color:var(--ink)}
 .tnote .pg{flex:0 0 64px;border-radius:var(--r-m);background:var(--paper);border:1px solid var(--line);display:flex;flex-direction:column;align-items:center;justify-content:center;overflow:hidden;padding-bottom:6px}
-.tnote .pg small{display:block;width:100%;text-align:center;background:var(--brand);color:var(--on-color);font-size:var(--t-tab);font-weight:700;padding:3px 0;margin-bottom:2px}
+.tnote .pg small{display:block;width:100%;text-align:center;background:var(--brand-fill);color:var(--on-color);font-size:var(--t-tab);font-weight:700;padding:3px 0;margin-bottom:2px}
 .tnote .pg b{font-size:var(--t-hero);font-weight:900;line-height:1.15;font-variant-numeric:tabular-nums}
 .tnote .pg i{font-style:normal;font-size:var(--t-tab);color:var(--muted);font-weight:700}
 .tnote .tx{flex:1;min-width:0;display:flex;flex-direction:column;justify-content:center;gap:3px}
@@ -788,13 +810,13 @@ button,.tab,.btn,.chip,.chipbar button,.seg button{-webkit-user-select:none;user
 .setrow .ctl button{font-size:var(--t-cap);font-weight:700;padding:6px 10px;border-radius:var(--r-s);border:1px solid var(--line);background:var(--card);color:var(--muted);cursor:pointer}
 .setrow .ctl button.on{background:var(--u);border-color:var(--u);color:var(--on-color)}
 .setrow.go{cursor:pointer}
-.setrow.go .v::after{content:" ›";font-weight:900}
+.setrow.go .v::after{content:" ›";font-weight:900}   /* 오른쪽 끝은 '›'만 — 값이 있는 줄(앱 정보·학원 전화)만 값을 쓴다(docs/23 S20) */
 select.sel{font-family:inherit;font-size:var(--t-small);font-weight:700;color:var(--u);background:var(--u-soft);border:none;border-radius:var(--r-s);padding:8px 10px;cursor:pointer}
 
 /* 시작 · 로그인 */
 .auth{min-height:calc(100vh - 4px);display:flex;flex-direction:column;padding:clamp(16px,4vh,34px) 6px 30px}
 .auth.start{padding-top:clamp(10px,2.5vh,22px)}
-.auth .mark{width:52px;height:52px;border-radius:var(--r-l);background:var(--brand);display:grid;place-items:center;margin-bottom:14px;box-shadow:0 6px 18px rgba(20,125,111,.22)}
+.auth .mark{width:52px;height:52px;border-radius:var(--r-l);background:var(--brand-fill);display:grid;place-items:center;margin-bottom:14px;box-shadow:0 6px 18px rgba(20,125,111,.22)}
 .auth .mark svg{width:32px;height:32px}
 .auth h1{font-size:var(--t-hero);line-height:1.3;margin-bottom:8px}
 .auth .lead{font-size:var(--t-body);color:var(--body);line-height:1.8;margin-bottom:22px}
@@ -804,9 +826,13 @@ select.sel{font-family:inherit;font-size:var(--t-small);font-weight:700;color:va
 .auth input:focus,.auth select:focus{outline:2px solid var(--brand);outline-offset:-2px}
 .auth .err{font-size:var(--t-cap);color:var(--no);font-weight:700;margin:-4px 0 10px}
 .stuedit{margin:12px 0 4px;border:1px solid var(--line);border-radius:var(--r-m);padding:10px 12px;background:var(--paper)}
-.stuedit summary{cursor:pointer;font-weight:700;font-size:var(--t-small);color:var(--brand-dark);list-style:none;padding:2px 0}
+.stuedit summary{cursor:pointer;font-weight:700;font-size:var(--t-small);color:var(--brand-dark);list-style:none;padding:2px 0;min-height:44px;display:flex;align-items:center;flex-wrap:wrap;gap:4px 6px}
 .stuedit summary::-webkit-details-marker{display:none}
-.stuedit summary::after{content:' ▾';color:var(--faint)}
+/* 펼치기 표시는 글자 '▾' 대신 학생 화면과 같은 꺾쇠, 오른쪽 끝(docs/23 S20) */
+.stuedit summary::after{content:'';flex:0 0 8px;width:8px;height:8px;margin:-4px 4px 0 auto;border-right:2px solid var(--muted);border-bottom:2px solid var(--muted);transform:rotate(45deg)}
+.stuedit details[open]>summary::after,.stuedit[open]>summary::after{transform:rotate(-135deg);margin-top:4px}
+/* 원장 화면 글자 한 단계 크게(docs/04 원장님 60대 · docs/23 S20) */
+#v-admin{--t-small:15px;--t-cap:14px}
 .stuedit[open] summary{margin-bottom:10px}
 .stuedit .g{display:flex;gap:8px;margin-bottom:8px}
 .stuedit .g>*{flex:1;min-width:0;border:1.5px solid var(--line);border-radius:var(--r-m);padding:11px 12px;font-size:var(--t-body);font-family:inherit;background:var(--card);color:var(--ink)}
@@ -821,7 +847,7 @@ select.sel{font-family:inherit;font-size:var(--t-small);font-weight:700;color:va
 .auth .roles button .rt{flex:1;min-width:0}
 .auth .roles button small{display:block;font-size:var(--t-cap);font-weight:400;color:var(--muted);margin-top:1px}
 .auth .roles button.on{border-color:var(--brand);background:var(--brand-soft)}
-.auth .roles button.on .ri{background:var(--brand);color:var(--on-color)}
+.auth .roles button.on .ri{background:var(--brand-fill);color:var(--on-color)}
 .auth .roles button.on small{color:var(--brand-dark)}
 .auth label.agree{display:flex;gap:10px;align-items:center;font-size:var(--t-cap);color:var(--body);line-height:1.6;margin-bottom:14px;min-height:44px;cursor:pointer}
 .auth label.agree input{width:24px;height:24px;flex:0 0 auto;margin:0;accent-color:var(--brand);cursor:pointer}
@@ -839,7 +865,7 @@ select.sel{font-family:inherit;font-size:var(--t-small);font-weight:700;color:va
 .stepbar{display:flex;align-items:center;gap:10px;margin:0 0 18px;min-height:44px}
 .stepbar .back{margin:0;padding:0 6px 0 0}
 .stepbar .track{flex:1;height:5px;border-radius:var(--r-pill);background:var(--hair);overflow:hidden}
-.stepbar .track i{display:block;height:100%;background:var(--brand);border-radius:var(--r-pill);transition:width .3s ease}
+.stepbar .track i{display:block;height:100%;background:var(--brand-fill);border-radius:var(--r-pill);transition:width .3s ease}
 .stepbar .n{font-size:var(--t-cap);font-weight:700;color:var(--faint);font-variant-numeric:tabular-nums;min-width:34px;text-align:right}
 .auth .grow{flex:1}
 .auth .cta{position:sticky;bottom:0;padding:12px 0 calc(8px + var(--sab));background:linear-gradient(to top,var(--paper) 80%,transparent);margin-top:10px}
@@ -881,13 +907,13 @@ select.sel{font-family:inherit;font-size:var(--t-small);font-weight:700;color:va
 .intro .sp{flex:1;min-height:20px}
 .intro .dots{display:flex;gap:7px;justify-content:center;margin:0 0 16px}
 .intro .dots i{width:7px;height:7px;border-radius:var(--r-pill);background:var(--line);transition:all .25s}
-.intro .dots i.on{width:22px;background:var(--brand)}
+.intro .dots i.on{width:22px;background:var(--brand-fill)}
 .welcome .big{width:72px;height:72px;border-radius:var(--r-l);background:var(--brand-soft);display:grid;place-items:center;margin:26px 0 16px}
 .welcome.solo .grow{display:flex;flex-direction:column;justify-content:center;padding-bottom:12vh}   /* 학생은 한 문장 — 화면 가운데에 */
 .welcome.solo .big{margin-top:0}
 .welcome .next{display:flex;flex-direction:column;gap:9px;margin:4px 0 16px}
 .welcome .next div{display:flex;gap:11px;align-items:flex-start;background:var(--card);border:1px solid var(--hair);border-radius:var(--r-m);padding:12px 14px;font-size:var(--t-small);color:var(--body);line-height:1.6;word-break:keep-all}
-.welcome .next .no{font-style:normal;flex:0 0 24px;height:24px;border-radius:var(--r-s);background:var(--brand);color:var(--on-color);display:grid;place-items:center;font-size:var(--t-cap);font-weight:900}
+.welcome .next .no{font-style:normal;flex:0 0 24px;height:24px;border-radius:var(--r-s);background:var(--brand-fill);color:var(--on-color);display:grid;place-items:center;font-size:var(--t-cap);font-weight:900}
 .permcard{border:1.5px solid var(--brand-line);background:var(--brand-soft);border-radius:var(--r-l);padding:14px 15px;margin:0 0 6px}
 .permcard .t{font-size:var(--t-body);font-weight:900;color:var(--brand-dark)}
 .permcard .d{font-size:var(--t-cap);color:var(--body);line-height:1.6;margin:3px 0 10px}
@@ -904,7 +930,7 @@ select.sel{font-family:inherit;font-size:var(--t-small);font-weight:700;color:va
 /* 이용권 */
 .plan{background:var(--card);border:1.5px solid var(--line);border-radius:var(--r-l);padding:16px;margin-bottom:10px;position:relative}
 .plan.best{border-color:var(--brand)}
-.plan .tag{position:absolute;top:-10px;right:14px;background:var(--brand);color:var(--on-color)}
+.plan .tag{position:absolute;top:-10px;right:14px;background:var(--brand-fill);color:var(--on-color)}
 .plan h3{font-size:var(--t-stem);font-weight:900;margin-bottom:2px}
 .plan .price{font-size:var(--t-h1);font-weight:900;letter-spacing:-.02em;margin:6px 0 4px;font-variant-numeric:tabular-nums}
 .plan .price small{font-size:var(--t-cap);color:var(--muted);font-weight:700}
@@ -931,9 +957,10 @@ select.sel{font-family:inherit;font-size:var(--t-small);font-weight:700;color:va
 .blankin button{background:var(--u);color:var(--on-color);border:none;border-radius:var(--r-m);padding:12px 18px;font-size:var(--t-small);font-weight:700;cursor:pointer}
 /* 확신도 한 탭 · 해설 없는 문항의 개념 카드 링크 */
 .conf{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:2px 0 12px}
-.conf .k{font-size:var(--t-cap);font-weight:700;color:var(--faint);margin-right:2px}
-.conf button{min-height:44px;min-width:84px;padding:0 16px;border-radius:var(--r-pill);border:1.5px solid var(--line);background:var(--card);color:var(--muted);font-family:inherit;font-size:var(--t-small);font-weight:700;cursor:pointer}
-.conf button[aria-pressed="true"]{border-color:var(--brand);background:var(--brand-soft);color:var(--brand-dark)}
+.conf .k{font-size:var(--t-cap);font-weight:400;color:var(--faint);margin-right:2px}
+/* 확신도 칩은 선지보다 가볍게(docs/23 S5) — 테두리 없음 · 흐린 바탕 · 13/700. 누르는 자리는 44px 그대로(e2e_review) */
+.conf button{min-height:44px;min-width:64px;padding:0 14px;border-radius:var(--r-pill);border:none;background:var(--hair);color:var(--muted);font-family:inherit;font-size:var(--t-cap);font-weight:700;cursor:pointer}
+.conf button[aria-pressed="true"]{background:var(--brand-soft);color:var(--brand-dark);box-shadow:var(--ring-sel)}
 .confnote{font-size:var(--t-small);font-weight:700;color:var(--u-dark);margin:0 0 6px;line-height:1.6;word-break:keep-all}
 .verdict .cgo{background:var(--card);border:1px solid var(--u-line);color:var(--u-dark);margin-top:6px;padding:12px;font-size:var(--t-small)}
 /* 원장 '처리할 것' — 학생 탭 맨 위 */
@@ -960,7 +987,7 @@ select.sel{font-family:inherit;font-size:var(--t-small);font-weight:700;color:va
 .tgl .sw{position:relative;flex:0 0 36px;height:20px;border-radius:var(--r-pill);background:var(--line);transition:background-color .15s ease}
 .tgl .sw::after{content:'';position:absolute;left:3px;top:3px;width:14px;height:14px;border-radius:50%;background:var(--card);transition:transform .15s ease}
 .tgl[aria-pressed="true"]{border-color:var(--brand-line);color:var(--brand-dark)}
-.tgl[aria-pressed="true"] .sw{background:var(--brand)}
+.tgl[aria-pressed="true"] .sw{background:var(--brand-fill)}
 .tgl[aria-pressed="true"] .sw::after{transform:translateX(16px)}
 .umrow{display:flex;align-items:center;gap:12px;width:100%;min-height:62px;padding:11px 2px;border:none;border-bottom:1px solid var(--hair);background:none;text-align:left;font-family:inherit;color:var(--ink);cursor:pointer}
 .umrow:last-of-type{border-bottom:none}
@@ -1027,7 +1054,7 @@ select.sel{font-family:inherit;font-size:var(--t-small);font-weight:700;color:va
 .labcard ol{padding-left:18px}
 .labcard figure{margin:10px 0}
 .qfig{background:var(--u-soft);border-radius:var(--r-s);padding:10px 6px;margin-bottom:12px;text-align:center;cursor:zoom-in}
-.qfig svg{max-width:100%;height:auto;background:var(--figplate);border-radius:var(--r-s)}
+.qfig svg{max-width:100%;height:auto;background:var(--figplate);border-radius:var(--r-s);padding:var(--figpad)}
 .fv .stage svg{background:var(--figplate);border-radius:var(--r-s)}
 figure.zoomable{cursor:zoom-in}
 /* 그림 확대 보기 */
@@ -1095,7 +1122,7 @@ figure.zoomable{cursor:zoom-in}
 .qsay .acts button.on{color:var(--brand);border-color:var(--brand-line);background:var(--brand-soft)}
 .qsay .acts svg{width:15px;height:15px;stroke:currentColor;stroke-width:2;fill:none;stroke-linecap:round;stroke-linejoin:round}
 .qsay .acts button.on svg{fill:currentColor;stroke:none}
-.staff{display:inline-block;margin-left:5px;font-size:var(--t-tab);font-weight:900;color:var(--on-color);background:var(--brand);border-radius:var(--r-s);padding:1px 6px;vertical-align:1px}
+.staff{display:inline-block;margin-left:5px;font-size:var(--t-tab);font-weight:900;color:var(--on-color);background:var(--brand-fill);border-radius:var(--r-s);padding:1px 6px;vertical-align:1px}
 .cm.staffc{border-left:3px solid var(--brand);padding-left:10px}
 .newc{display:inline-block;font-size:var(--t-tab);font-weight:900;color:var(--brand-dark);background:var(--brand-soft);border-radius:var(--r-pill);padding:2px 9px;margin:6px 0 2px}
 .tab{position:relative}
@@ -1129,6 +1156,7 @@ figure.zoomable{cursor:zoom-in}
 .tempty svg{width:150px;height:auto;display:block;margin:0 auto 12px}
 .tempty p{font-size:var(--t-small);line-height:1.7;color:var(--muted);word-break:keep-all}
 .tempty p b{display:block;font-size:var(--t-body);font-weight:700;color:var(--ink);margin-bottom:2px}
+.tempty .btn{margin-top:14px}
 .trule{margin:4px 0 12px;border-radius:var(--r-m);background:var(--brand-soft)}
 .trule summary{display:flex;align-items:center;gap:6px;min-height:44px;padding:0 14px;font-size:var(--t-small);font-weight:700;color:var(--brand-dark);cursor:pointer;list-style:none}
 .trule summary::-webkit-details-marker{display:none}
@@ -1141,7 +1169,7 @@ figure.zoomable{cursor:zoom-in}
 .pcard{display:block;width:100%;text-align:left;background:var(--card);border:1px solid var(--hair);border-radius:var(--r-l);padding:14px 15px;margin-bottom:9px;cursor:pointer}
 .pcard .h{display:flex;align-items:center;gap:6px;margin-bottom:6px;flex-wrap:wrap}
 .pcard .bd{font-size:var(--t-tab);font-weight:700;letter-spacing:0;color:var(--on-color);background:var(--u);border-radius:var(--r-s);padding:2px 7px}
-.pcard .bd.qna{background:#4053B8}.pcard .bd.share{background:#C1521E}.pcard .bd.talk{background:var(--brand)}
+.pcard .bd.qna{background:#4053B8}.pcard .bd.share{background:#C1521E}.pcard .bd.talk{background:var(--brand-fill)}
 .pcard .ok{font-size:var(--t-tab);font-weight:900;color:var(--brand-dark);background:var(--brand-soft);border-radius:var(--r-s);padding:2px 7px}
 .pcard .t{font-size:var(--t-body);font-weight:700;color:var(--ink);line-height:1.45;letter-spacing:-.01em;margin-bottom:4px}
 .pcard .x{font-size:var(--t-cap);color:var(--muted);line-height:1.6;overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
@@ -1167,14 +1195,14 @@ figure.zoomable{cursor:zoom-in}
 .cm:first-child{border-top:none}
 .cm .h{display:flex;align-items:center;gap:7px;font-size:var(--t-cap);color:var(--muted);margin-bottom:5px;flex-wrap:wrap}
 .cm .h b{font-size:var(--t-cap);font-weight:700;color:var(--body)}
-.cm .picked{font-size:var(--t-tab);font-weight:900;color:var(--on-color);background:var(--brand);border-radius:var(--r-s);padding:2px 7px}
+.cm .picked{font-size:var(--t-tab);font-weight:900;color:var(--on-color);background:var(--brand-fill);border-radius:var(--r-s);padding:2px 7px}
 .cm .body{font-size:var(--t-small);line-height:1.8;color:var(--body);white-space:pre-wrap;word-break:keep-all;overflow-wrap:anywhere}
 .cm .a{display:flex;gap:12px;margin-top:7px;font-size:var(--t-tab)}
 .cm .a button{background:none;border:none;color:var(--faint);font-size:var(--t-tab);cursor:pointer;padding:5px 0;min-height:32px}
 .cm .a button.on{color:var(--brand);font-weight:700}
 .cwrite{display:flex;gap:8px;align-items:flex-end;margin-top:6px}
 .cwrite textarea{flex:1;min-height:46px;max-height:140px;border:1.5px solid var(--line);border-radius:var(--r-m);padding:12px 13px;font-family:inherit;font-size:var(--t-small);line-height:1.7;background:var(--card);color:var(--ink);resize:vertical}
-.cwrite button{flex:0 0 auto;min-height:46px;padding:0 16px;font-size:var(--t-small);font-weight:700;background:var(--brand);color:var(--on-color);border:none;border-radius:var(--r-m);cursor:pointer}
+.cwrite button{flex:0 0 auto;min-height:46px;padding:0 16px;font-size:var(--t-small);font-weight:700;background:var(--brand-fill);color:var(--on-color);border:none;border-radius:var(--r-m);cursor:pointer}
 .fbref{font-size:var(--t-cap);line-height:1.6;background:var(--paper,var(--bg));border:1px solid var(--line);border-radius:var(--r-s);padding:9px 12px;margin-bottom:10px;color:var(--ink);word-break:keep-all}
 .fbref span{display:block;font-size:var(--t-tab);font-weight:700;color:var(--faint)}
 .fbcount{text-align:right;font-size:var(--t-tab);color:var(--faint);margin:-4px 2px 10px;font-variant-numeric:tabular-nums}
@@ -1189,8 +1217,8 @@ figure.zoomable{cursor:zoom-in}
 sup,sub{font-size:.72em;line-height:0;position:relative;vertical-align:baseline}sup{top:-.5em}sub{bottom:-.2em}
 figure svg,.qfig svg,.fv .stage svg{font-family:var(--sans,'Noto Sans KR',sans-serif)}   /* 그림 속 글자 — 정의 안 된 'PC Sans' 대신 앱 글꼴(바탕체로 떨어지던 것) */
 /* 어두운 화면: 그림 밑에 밝은 종이(--figplate)를 깔았으니, 앱 글자색을 따라가는 그림 글자(currentColor·var(--ink))도 종이 위 진한 색으로 */
-@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) figure svg, :root:not([data-theme="light"]) .qfig svg, :root:not([data-theme="light"]) .fv .stage svg{filter:brightness(.92) saturate(.95);color:#1E2A2E;--ink:#1E2A2E;--body:#3A484D;--muted:#566268;--faint:#5E6B70;--line:#E2DED6} }
-:root[data-theme="dark"] figure svg,:root[data-theme="dark"] .qfig svg,:root[data-theme="dark"] .fv .stage svg{filter:brightness(.92) saturate(.95);color:#1E2A2E;--ink:#1E2A2E;--body:#3A484D;--muted:#566268;--faint:#5E6B70;--line:#E2DED6}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) figure svg, :root:not([data-theme="light"]) .qfig svg, :root:not([data-theme="light"]) .fv .stage svg, :root:not([data-theme="light"]) .pthumb svg{filter:brightness(.92) saturate(.95);color:#1E2A2E;--ink:#1E2A2E;--body:#3A484D;--muted:#566268;--faint:#5E6B70;--line:#E2DED6} }
+:root[data-theme="dark"] figure svg,:root[data-theme="dark"] .qfig svg,:root[data-theme="dark"] .fv .stage svg,:root[data-theme="dark"] .pthumb svg{filter:brightness(.92) saturate(.95);color:#1E2A2E;--ink:#1E2A2E;--body:#3A484D;--muted:#566268;--faint:#5E6B70;--line:#E2DED6}
 figure.zoomable{position:relative}
 figure.zoomable .zbtn{position:absolute;right:8px;top:8px;display:inline-flex;align-items:center;gap:5px;font-size:var(--t-cap);font-weight:700;padding:7px 11px;min-height:34px;border-radius:var(--r-pill);background:var(--card);color:var(--ink);border:1px solid var(--line);box-shadow:var(--shadow);pointer-events:none}
 /* 누르는 자리 넓히기 — 보이는 크기는 그대로, 손가락이 닿는 범위만 44px 가까이(2026-10-01 점검: 출석 체크 29px · 빈칸 27px 등) */
@@ -1209,19 +1237,19 @@ button.pill::before,.notice button::before,.mini::before,.chipbar button::before
 .dday .d{font-size:var(--t-cap);color:var(--muted)}
 .dday .others{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin-top:14px;border-top:1px solid var(--hair);padding-top:12px}
 .dday .others button{font-size:var(--t-tab);font-weight:700;color:var(--body);background:var(--ground);border:none;border-radius:var(--r-pill);padding:7px 12px;cursor:pointer;min-height:34px}
-.dday .others button.on{background:var(--brand);color:var(--on-color)}
+.dday .others button.on{background:var(--brand-fill);color:var(--on-color)}
 .wdbar{display:flex;gap:5px;margin-bottom:11px}
 .wdbar button{flex:1;min-height:52px;border:1px solid var(--line);background:var(--card);border-radius:var(--r-m);cursor:pointer;
   display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-size:var(--t-cap);font-weight:700;color:var(--muted);padding:6px 0}
 .wdbar button i{font-style:normal;font-size:var(--t-tab);color:var(--faint);font-variant-numeric:tabular-nums}
-.wdbar button.on{background:var(--brand);border-color:var(--brand);color:var(--on-color)}
+.wdbar button.on{background:var(--brand-fill);border-color:var(--brand-fill);color:var(--on-color)}
 .wdbar button.on i{color:var(--on-color);opacity:.8}
-.wdbar button.has::after{content:"";width:4px;height:4px;border-radius:50%;background:var(--brand);display:block}
+.wdbar button.has::after{content:"";width:4px;height:4px;border-radius:50%;background:var(--brand-fill);display:block}
 .wdbar button.on.has::after{background:var(--on-color)}
 .slot{display:flex;gap:11px;align-items:flex-start;padding:12px 0;border-bottom:1px solid var(--hair);width:100%;background:none;border-left:none;border-right:none;border-top:none;text-align:left;cursor:pointer}
 .slot:last-child{border-bottom:none}
 .slot .t{flex:0 0 62px;font-size:var(--t-tab);font-weight:700;color:var(--muted);font-variant-numeric:tabular-nums;line-height:1.5;padding-top:1px}
-.slot .bar{flex:0 0 3px;align-self:stretch;border-radius:var(--r-pill);background:var(--brand);min-height:34px}
+.slot .bar{flex:0 0 3px;align-self:stretch;border-radius:var(--r-pill);background:var(--brand-fill);min-height:34px}
 .slot .b{flex:1;min-width:0}
 .slot .b b{display:block;font-size:var(--t-body);font-weight:700;color:var(--ink);line-height:1.4}
 .slot .b small{display:block;font-size:var(--t-cap);color:var(--muted);margin-top:2px;line-height:1.5}
@@ -1236,13 +1264,18 @@ button.pill::before,.notice button::before,.mini::before,.chipbar button::before
 .sheet textarea{min-height:70px;resize:vertical;font-size:var(--t-small);line-height:1.7}
 .daypick{display:flex;gap:5px;margin-bottom:10px}
 .daypick button{flex:1;min-height:42px;border:1.5px solid var(--line);background:var(--card);border-radius:var(--r-s);font-size:var(--t-small);font-weight:700;color:var(--muted);cursor:pointer}
-.daypick button.on{background:var(--brand);border-color:var(--brand);color:var(--on-color)}
+.daypick button.on{background:var(--brand-fill);border-color:var(--brand-fill);color:var(--on-color)}
 .scopebox{background:var(--brand-soft);border-radius:var(--r-m);padding:12px 13px;margin-bottom:10px}
 .scopebox .h{font-size:var(--t-cap);font-weight:700;letter-spacing:0;color:var(--brand-dark);margin-bottom:7px}
 .scopebox p{font-size:var(--t-cap);color:var(--brand-dark);line-height:1.6;margin-bottom:8px}
 .fromacademy{display:inline-block;font-size:var(--t-tab);font-weight:700;color:var(--brand-dark);background:var(--brand-soft);border-radius:var(--r-s);padding:2px 6px;margin-left:6px;vertical-align:1px}
 .qhint{font-size:var(--t-cap);color:var(--faint);text-align:center;line-height:1.85;margin-top:18px;padding:14px 12px;border-top:1px solid var(--hair)}
 .qhint b{color:var(--muted)}
+/* 규칙 문장 접기(docs/23 S4 · 토스 '필요할 때만') — 풀이 안내는 처음 3문제만 펼치고, 그 뒤엔 문제 머리 ⓘ · 복습 히어로·오답 노트는 '언제 다시 나오나요?' 한 줄 → 시트 */
+.srsq{flex:0 0 auto;display:inline-flex;align-items:center;justify-content:center;gap:5px;min-width:44px;min-height:44px;margin:-10px -10px -10px 0;padding:0;border:none;background:none;font-family:inherit;font-size:var(--t-cap);font-weight:700;color:var(--muted);cursor:pointer}
+.srsq svg{width:18px;height:18px;stroke:currentColor;stroke-width:2;fill:none;stroke-linecap:round}
+.srsq.w{min-width:0;margin:-6px 0 4px;justify-content:flex-start}
+.srsq.w svg{width:16px;height:16px}
 /* 개념 카드 간격 복습 — 앞면(제목·실마리·질문) → 떠올린 뒤 포인트 → 기억났어요 / 흐려요(보완안 7) */
 .cscard{background:var(--card);border:1px solid var(--u-line);border-radius:var(--r-l);padding:18px 18px 16px;position:relative;overflow:hidden}
 .cscard::before{content:"";position:absolute;inset:0 0 auto 0;height:3px;background:var(--u)}
@@ -1260,10 +1293,10 @@ button.pill::before,.notice button::before,.mini::before,.chipbar button::before
 #csFlip{margin-top:12px}
 .seg{display:flex;gap:6px;margin-bottom:14px}
 .seg button{flex:1;font-size:var(--t-cap);font-weight:700;padding:12px 4px;border-radius:var(--r-s);border:1px solid var(--line);background:var(--card);color:var(--muted);cursor:pointer;min-height:44px}
-.seg button.on{background:var(--brand);border-color:var(--brand);color:var(--on-color)}
+.seg button.on{background:var(--brand-fill);border-color:var(--brand-fill);color:var(--on-color)}
 /* 원장 탭 8개 — 한 줄에 다 넣으면 글자가 넘쳐 두 줄(4칸)로 */
 .seg.adm{display:grid;grid-template-columns:repeat(4,minmax(0,1fr))}
-.seg.adm button{padding:10px 2px}
+.seg.adm button{padding:8px 2px;min-height:40px}   /* 원장 위 8칸: 높이 44 → 40 · 간격 6(원장님 T5-A). 칸이 넓어 누르는 면적은 충분 */
 /* 원장 › 과제 내기 */
 .afk{margin-bottom:10px}
 .afk>.k{display:block;font-size:var(--t-tab);font-weight:700;color:var(--muted);margin-bottom:6px}
@@ -1285,7 +1318,7 @@ button.pill::before,.notice button::before,.mini::before,.chipbar button::before
 
 /* 시트 */
 .sheet-bg{position:fixed;inset:0;background:rgba(20,30,34,.42);display:flex;align-items:flex-end;justify-content:center;z-index:30}
-.sheet{width:100%;max-width:440px;background:var(--card);border-radius:var(--r-l) var(--r-l) 0 0;padding:18px 20px max(22px,var(--sab));max-height:88vh;overflow-y:auto}
+.sheet{width:100%;max-width:440px;background:var(--card);border:1px solid var(--line);border-bottom:none;border-radius:var(--r-l) var(--r-l) 0 0;padding:18px 20px max(22px,var(--sab));max-height:88vh;overflow-y:auto}
 .sheet .grab{width:38px;height:4px;border-radius:var(--r-pill);background:var(--line);margin:0 auto 16px}
 .sheet h3{font-size:var(--t-h2);font-weight:900;margin-bottom:6px}
 .sheet p{font-size:var(--t-small);color:var(--body);line-height:1.7;margin-bottom:14px}
@@ -1300,7 +1333,8 @@ button.pill::before,.notice button::before,.mini::before,.chipbar button::before
 .sheet .legal table{width:100%;border-collapse:collapse;font-size:var(--t-tab);margin:6px 0}
 .sheet .legal th,.sheet .legal td{border:1px solid var(--hair);padding:5px 6px;text-align:left;vertical-align:top}
 .att-pill{cursor:pointer;border:none}
-.att-pill.todo{background:var(--card);border:1.5px dashed var(--u)}
+/* 점선은 '비어 있음·앞으로'만(docs/23 S10) — 할 일 버튼은 실선 + 채움 */
+.att-pill.todo{background:var(--brand-soft);color:var(--brand-dark);border:1px solid var(--brand-line)}
 
 /* 원장 · 보호자 */
 .adm-h{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:12px}
@@ -1324,7 +1358,7 @@ button.pill::before,.notice button::before,.mini::before,.chipbar button::before
 .stu .st.no{color:var(--faint)}
 .mini{font-size:var(--t-tab);font-weight:700;padding:5px 9px;border-radius:var(--r-s);border:1px solid var(--line);background:var(--card);color:var(--muted);cursor:pointer;flex:0 0 auto}
 .mini{font-family:inherit;text-decoration:none;display:inline-flex;align-items:center;min-height:30px;line-height:1.2}
-.mini.pri{background:var(--brand);border-color:var(--brand);color:var(--on-color)}
+.mini.pri{background:var(--brand-fill);border-color:var(--brand-fill);color:var(--on-color)}
 .form{background:var(--card);border:1px solid var(--line);border-radius:var(--r-m);padding:15px;margin-bottom:13px}
 .form h3{font-size:var(--t-small);font-weight:900;margin-bottom:10px}
 .form .g{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px}
@@ -1359,7 +1393,7 @@ button.pill::before,.notice button::before,.mini::before,.chipbar button::before
 .ox2 button.bad{border-color:var(--no);background:var(--no-soft);color:var(--no)}
 .ox2 button:disabled{cursor:default}
 .ox2 button:focus-visible{outline:2px solid var(--u);outline-offset:2px}
-.pre{border:1.5px dashed var(--u-line);border-radius:var(--r-m);padding:12px 14px 13px;margin:0 0 14px;background:var(--card)}
+.pre{border:1.5px solid transparent;border-radius:var(--r-m);padding:12px 14px 13px;margin:0 0 14px;background:var(--u-soft)}   /* 할 일 상자 = 채움(점선은 '비어 있음'만 · docs/23 S10) */
 .pre .k{display:block;font-size:var(--t-tab);font-weight:900;color:var(--u-dark);letter-spacing:0;margin-bottom:5px}
 .pre .q{font-size:var(--t-body);font-weight:700;line-height:1.62;color:var(--ink);margin-bottom:10px}
 .pre .ox2 .skip{flex:0 0 auto;font-size:var(--t-cap);font-weight:700;color:var(--muted);border-color:transparent;background:none;padding:0 8px;min-width:64px}
@@ -1432,14 +1466,14 @@ body.focus main{padding-bottom:calc(var(--fbh, var(--sab)) + 24px)}
 .qx svg{width:20px;height:20px;stroke:currentColor;stroke-width:2.2;fill:none;stroke-linecap:round}
 .qx:active{background:var(--hair)}
 .pbar{flex:1;min-width:48px;height:8px;background:var(--hair);border-radius:var(--r-pill);overflow:hidden}
-.pbar i{display:block;height:100%;background:var(--brand);border-radius:var(--r-pill);transition:width .3s ease-out}
+.pbar i{display:block;height:100%;background:var(--brand-fill);border-radius:var(--r-pill);transition:width .3s ease-out}
 .pn{flex:0 0 auto;display:flex;align-items:center;gap:10px;font-size:var(--t-cap);color:var(--muted);font-variant-numeric:tabular-nums}
 .pn b{color:var(--ink);font-weight:700}
 .pn .qclock{font-size:var(--t-small);font-weight:700;color:var(--ink)}
 .qhead .l .of{font-size:var(--t-cap);font-weight:400;color:var(--muted)}
 .verdict.fb{position:fixed;left:0;right:0;bottom:0;margin:0 auto;max-width:440px;z-index:20;border:none;border-top:1px solid var(--line);border-radius:var(--r-l) var(--r-l) 0 0;
   padding:14px 18px max(14px,var(--sab));background:var(--card);box-shadow:0 -8px 28px rgba(30,42,46,.12);animation:fbup .2s ease-out}
-.verdict.fb.ok{background:var(--ok-soft);border-top-color:var(--brand-line)}
+.verdict.fb.ok{background:var(--ok-soft);border-top-color:var(--line)}   /* 맞음·틀림 시트 위 테두리 같게(docs/23 S3) */
 .verdict.fb.no{background:var(--no-soft);border-top-color:var(--line)}
 @keyframes fbup{from{transform:translateY(16px);opacity:0}to{transform:none;opacity:1}}
 .fbh{display:flex;align-items:center;gap:10px;margin:0 0 6px}
@@ -1466,6 +1500,7 @@ body.focus main{padding-bottom:calc(var(--fbh, var(--sab)) + 24px)}
 .fbb .oxrow button{font-size:var(--t-body);padding:14px}
 /* 맞힌 선지 · 시트의 체크 — 240ms 동안 그려진다 */
 .okm{display:inline-block;width:16px;height:16px;vertical-align:-3px;margin-right:5px}
+.okm.nom svg circle{fill:var(--no)}
 .ck{stroke-dasharray:16;stroke-dashoffset:0;animation:ckdraw .24s ease-out .1s backwards}
 @keyframes ckdraw{from{stroke-dashoffset:16}to{stroke-dashoffset:0}}
 /* 해설 칸(시트 위 본문) */
@@ -1516,6 +1551,12 @@ body.focus main{padding-bottom:calc(var(--fbh, var(--sab)) + 24px)}
 .rxmore summary{display:flex;align-items:center;min-height:44px;font-size:var(--t-small);font-weight:700;color:var(--brand-dark);cursor:pointer;border-top:1px solid var(--hair);margin-top:4px}
 /* 문제 탭 — 히어로 '오늘 추천 10문제' + 직접 고르기 시트 */
 .rec{background:var(--card);border:1px solid var(--brand-line);border-radius:var(--r-l);padding:18px 18px 4px;box-shadow:var(--shadow);margin:0 0 10px}
+/* 히어로 공통 꼴 하나(docs/23 S8) — 홈 지금 단계 · 문제 추천 · 일정 D-day · 결과 · 출석 코드. 밝은 화면: 흰 바탕 + 브랜드 선 + 그림자 /
+   어두운 화면: 그림자가 안 보이니 '채운 바탕'(--hero-*). 신분·이용권 .pass(1.5px + 띠)와 개념 카드 .card 위 띠는 전용으로 남긴다. 안쪽 여백은 S7(여백 토큰)에서 맞춘다 */
+.pnow,.rec,.dday,.result,.code-big{background:var(--hero-bg);border:1px solid var(--hero-line);box-shadow:var(--hero-sh);border-radius:var(--r-l)}
+.code-big::before{content:none}
+.code-big .k{color:var(--brand-dark)}
+.code-big .bar i{background:var(--brand-fill)}
 .rec .k{display:block;font-size:var(--t-cap);font-weight:700;color:var(--brand-dark);margin:0 0 4px}
 .rec h2{font-size:var(--t-h1);font-weight:900;letter-spacing:-.02em;line-height:1.3;margin:0 0 6px;color:var(--ink)}
 .rec .rd{font-size:var(--t-small);color:var(--body);line-height:1.65;margin:0}
@@ -1606,7 +1647,7 @@ body.focus main{padding-bottom:calc(var(--fbh, var(--sab)) + 24px)}
 .mqsec .mqleg{border-top:1px solid var(--hair);padding-top:12px;margin-top:8px}
 /* 개념 상세 아래 — 주 버튼 하나 + 보조 한 줄 + 이전/다음 글 버튼 */
 .nextup.dact{display:block;margin:4px 0 4px}
-.nextup.dact .dgo{display:flex;flex-direction:row;align-items:center;justify-content:center;gap:8px;min-height:54px;margin:0 0 9px;padding:14px;background:var(--brand);border:none;border-radius:var(--r-m);color:var(--on-color);text-align:center}
+.nextup.dact .dgo{display:flex;flex-direction:row;align-items:center;justify-content:center;gap:8px;min-height:54px;margin:0 0 9px;padding:14px;background:var(--brand-fill);border:none;border-radius:var(--r-m);color:var(--on-color);text-align:center}
 .nextup.dact .dgo .t{font-size:var(--t-body);font-weight:700;color:var(--on-color);line-height:1.4}
 .nextup.dact .dgo .d{font-size:var(--t-small);font-weight:400;color:var(--on-color);line-height:1.4}
 .dact .dgo .d::before{content:"·";margin-right:8px}
@@ -1625,7 +1666,7 @@ body.focus main{padding-bottom:calc(var(--fbh, var(--sab)) + 24px)}
 #iab .t{flex:1;min-width:0}#iab .t b{display:block;font-size:var(--t-body);margin-bottom:2px}
 #iab .a{display:flex;flex-wrap:wrap;gap:8px;margin-top:9px}
 #iab .a a,#iab .a button{display:inline-flex;align-items:center;min-height:40px;padding:0 14px;border-radius:var(--r-pill);font-family:inherit;font-size:var(--t-small);font-weight:700;text-decoration:none;cursor:pointer}
-#iab .a .go{background:var(--brand);color:var(--on-color);border:none}#iab .a .cp{background:none;color:var(--brand-dark);border:1.5px solid var(--brand-line)}
+#iab .a .go{background:var(--brand-fill);color:var(--on-color);border:none}#iab .a .cp{background:none;color:var(--brand-dark);border:1.5px solid var(--brand-line)}
 #iab .x{flex:0 0 40px;height:40px;margin:-6px -4px 0 0;border:none;background:none;color:var(--brand-dark);font-size:20px;line-height:1;cursor:pointer;border-radius:var(--r-pill)}
 /* 폰에서 입력 칸 글자는 16px 이상 — 2026-10-08: 아이폰 사파리는 16px 보다 작은 칸을 누르면 화면을 저절로 확대하고 되돌리지 않는다(15·13.5px 칸이 많았다).
    손가락 기기에만 · 더 큰 칸(.big·제목 .ti)은 그대로 · 확대 막기(maximum-scale)는 쓰지 않는다(손가락 확대는 접근성) */
@@ -1732,6 +1773,7 @@ const plain = t => plainText(t).replace(/\{\{(.+?)\}\}/g,'$1');
    문자열로만 싣고, 처음 필요해질 때 한 번 해석한다. */
 let FIGMAP = {};
 const figOf = id => FIGMAP[id] || '';
+const thumbFig = id => figOf(id).replace(/(\sid="|url\(#|href="#)/g, '$1t-');   // 홈 히어로 작은 그림 — 개념 상세 그림과 id 가 겹치지 않게(화살촉·그러데이션이 숨은 쪽을 가리키면 안 그려진다)
 /* 그림 자리: 받기 전엔 같은 비율의 빈 자리(화면이 밀리지 않게), 받으면 그 자리에 채운다 */
 const figSlot = id => { if (FIGMAP[id]) return FIGMAP[id]; const [w, h] = (MORE_META.fv[id] || '600 300').split(' ');
   return `<span class="figslot" data-fig="${id}" style="width:min(100%,${w}px);aspect-ratio:${w}/${h}" aria-hidden="true"></span>`; };
@@ -1758,6 +1800,7 @@ function loadMore(){
 const MORE_VIEWS = ['bank','lab','wrong','stats','note','noted'];
 function moreArrived(){
   document.querySelectorAll('.figslot[data-fig]').forEach(el => { const f = figOf(el.dataset.fig); if (f) el.outerHTML = f; });
+  document.querySelectorAll('.pthumb[data-tfig]:empty').forEach(el => { el.innerHTML = thumbFig(el.dataset.tfig); });
   dqcFill();   // 개념 상세의 확인 문제 칸(그 개념 OX)
   if (view === 'detail') dThinkFill();   // 본문 펼친 안쪽의 생각해 보기·예제
   if (!MORE_VIEWS.includes(view) || document.getElementById('sheetBg')) return;
@@ -1784,8 +1827,11 @@ function drawNet(){
 }
 window.addEventListener('online',  () => { setNet(false); drawNet(); });
 window.addEventListener('offline', drawNet);
-/* 아래에서 올라온 시트·채점 시트가 있으면 위쪽에 띄운다 — 2026-10-13 검수: 시트의 주 버튼을 토스트가 덮었다 */
-const toast = msg => { const t=document.createElement('div'); t.className='toast' + (document.querySelector('#sheet .sheet, .verdict.fb') ? ' top' : ''); t.setAttribute('aria-hidden','true'); t.textContent=msg; document.body.appendChild(t); setTimeout(()=>t.remove(),2500);
+/* 아래에서 올라온 시트·채점 시트가 있으면 위쪽에 띄운다 — 2026-10-13 검수: 시트의 주 버튼을 토스트가 덮었다.
+   토스트가 먼저 뜨고 시트가 뒤에 열려도(공부했음 표시 → 빈칸 시트) 열릴 때 위로 올린다(openSheet·afterDraw 가 부름) */
+const sheetUp = () => !!document.querySelector('#sheet .sheet, .verdict.fb');
+const toastUp = () => { if (sheetUp()) document.querySelectorAll('.toast:not(.top)').forEach(t => t.classList.add('top')); };
+const toast = msg => { const t=document.createElement('div'); t.className='toast' + (sheetUp() ? ' top' : ''); t.setAttribute('aria-hidden','true'); t.textContent=msg; document.body.appendChild(t); setTimeout(()=>t.remove(),2500);
   const lv = document.getElementById('live'); if (lv){ lv.textContent = ''; setTimeout(() => { lv.textContent = msg; }, 30); } };   // 화면낭독기는 늘 있는 알림 칸(role=status)으로 읽는다
 const Cap = window.Capacitor, isNative = !!(Cap && Cap.isNativePlatform && Cap.isNativePlatform());
 const plug = n => (Cap && Cap.Plugins && Cap.Plugins[n]) || null;
@@ -2638,6 +2684,18 @@ const quizFor = c => { const all = QUIZZES.filter(q=>q.lessonId===c.lessonId), p
 const SRS = [1, 3, 7, 14, 30], SRS_CAP = 10, LEECH = 6;
 /* 복습 규칙 한 문장 — 소개·환영·문제 풀기·오답 노트·오늘 경로가 모두 이 문장을 쓴다(2026-10-06 감사 #13: 화면마다 4가지로 달랐다) */
 const SRS_RULE = '틀린 문제는 내일 다시 나오고, 맞힐 때마다 3·7·14·30일 뒤로 간격이 넓어져요.';
+/* 빈 상태 그림(64 × 64, 두 색) — 노트 · 오답 노트 · 통계 처음 · 원장 처리할 것 0 */
+const EART = { note:'<rect x="15" y="9" width="34" height="46" rx="6"/><path class="a" d="M23 23h18M23 31h18M23 39h10"/>',
+  wrong:'<path d="M20 9h24v46l-12-9-12 9z"/><path class="a" d="M26 25.5l4 4 8-8.5"/>',
+  stats:'<rect x="9" y="13" width="46" height="42" rx="7"/><path class="a" d="M9 25h46M21 8v9M43 8v9"/><circle cx="22" cy="37" r="2.6" fill="var(--brand-dark)" stroke="none"/><circle cx="32" cy="37" r="2.6" fill="var(--brand-dark)" stroke="none"/><circle cx="42" cy="46" r="2.6" class="a"/>',
+  todo:'<rect x="13" y="9" width="38" height="46" rx="6"/><path class="a" d="M21 24l3.5 3.5 7-7.5M36 24h7M21 40l3.5 3.5 7-7.5M36 40h7"/>' };
+const eart = k => `<svg class="eart" viewBox="0 0 64 64" aria-hidden="true">${EART[k]}</svg>`;
+const QZ_HINT = '고르면 바로 채점하고, 왜 갈렸는지 알려 줘요.';
+const hintOn = () => !(S.stats && S.stats.a >= 3);   // 풀이 안내 줄은 처음 3문제까지만
+const IC_INFO = '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 7.7v.3"/></svg>';
+const srsBtn = (hint, wide) => `<button type="button" class="srsq${wide ? ' w' : ''}" data-srsq="${esc(hint || '')}"${wide ? '' : ' aria-label="풀이 안내 · 언제 다시 나오나요?"'}>${IC_INFO}${wide ? '언제 다시 나오나요?' : ''}</button>`;
+const srsSheet = hint => openSheet(`<h3>${hint ? '풀이 안내' : '언제 다시 나오나요?'}</h3>${hint ? `<p>${esc(hint)}</p>` : ''}<p>틀려도 괜찮아요. ${SRS_RULE}</p>
+  <p class="fine" style="text-align:left">7일 넘게 띄워 두 번 잇달아 맞히면 오답 노트에서 정리되고, 복습은 하루에 10문제까지만 나와요.</p><button class="btn ghost" id="sheetClose">닫기</button>`);
 const wKey = w => w.ci ? 'c:'+w.ci : w.b ? 'b:'+w.b : w.l+':'+w.n;
 const lessonOfW = w => w.l || (w.ci ? String(w.ci).split('-')[0] : bankLesson(w.b));
 /* 문제 은행 id → 소단원. 대단원 마무리(U1-1-q5)·모의고사(M1-q12)는 id 에 소단원이 없어 문항의 lessonId 를 쓴다(받기 전엔 그 단원 첫 소단원) */
@@ -2710,7 +2768,7 @@ function csMark(ci, ok){
   if (w.g >= 2){ w.cleared = true; delete w.g; return { st:'clear', w }; }
   if (!w.g) delete w.g;
   w.d = addDays(t, srsGap(w.x, L)); return { st:'up', d:w.d, w }; }
-const csLine = r => !r ? '' : r.st === 'reset' ? `<b>${dueWord(r.d)}</b> 다시 떠올려 볼게요` : r.st === 'up' ? `✓ 간격을 넓혀요 · 다음은 <b>${dueWord(r.d)}</b>이에요`
+const csLine = r => !r ? '' : r.st === 'reset' ? `<b>${dueWord(r.d)}</b> 다시 떠올려 볼게요` : r.st === 'up' ? (squeezed(r.w) ? `시험이 가까워 <b>${dueWord(r.d)}</b> 한 번 더 떠올려 볼게요` : `✓ 간격을 넓혀요 · 다음은 <b>${dueWord(r.d)}</b>이에요`)
   : r.st === 'clear' ? '✓ 이제 오래 기억할 거예요 — 이 카드는 쉬어요' : r.st === 'early' ? `다음은 그대로 <b>${dueWord(r.d)}</b>이에요` : '';
 /* 앞면 질문 — 그 개념의 '생각해 보기'(나중에 받는 데이터), 없으면 포인트를 가린 질문. 단계 제목은 실마리로(빈칸은 ㉠ 그대로) */
 const csFront = c => { const w = c.x && c.x.why;
@@ -2738,7 +2796,7 @@ function csAnswer(v){
   save(S); renderBankSession(); document.querySelector('#v-bank .verdict.fb .btn')?.focus({ preventScroll:true }); }
 if (csEnsure()) saveLocal();   // 이 기능 전에 공부한 개념도 카드로(첫 복습은 내일)
 /* 확신도 한 탭 — 답을 고르기 전에 '확신 / 헷갈림'(선택, 다시 누르면 풀림). 채점에는 쓰지 않고 상자 규칙에만 쓴다 */
-const confRow = cur => `<div class="conf" role="group" aria-label="답을 고르기 전에 얼마나 확신하는지 고를 수 있어요(선택)"><span class="k">얼마나 자신 있어요? · 선택</span>${[['s','확신'],['u','헷갈림']].map(([k, l]) => `<button type="button" data-conf="${k}" aria-pressed="${cur === k}">${l}</button>`).join('')}</div>`;
+const confRow = cur => `<div class="conf" role="group" aria-label="답을 고르기 전에 얼마나 확신하는지 고를 수 있어요(선택)"><span class="k">확신이 있으면 골라 두세요</span>${[['s','확신'],['u','헷갈림']].map(([k, l]) => `<button type="button" data-conf="${k}" aria-pressed="${cur === k}">${l}</button>`).join('')}</div>`;
 const confNote = (conf, ok) => conf === 's' && !ok ? `<p class="confnote">확신했는데 틀렸어요 — 이런 문제가 가장 잘 고쳐져요</p>` : '';
 /* 날짜별 푼 수·맞힌 수(최근 28일만, 진도 JSON 을 작게) — 원장 '처리할 것'의 정답률 급락 판정용. dq: { 'YYYY-MM-DD': [푼 수, 맞힌 수] } */
 const statDay = ok => { const t = todayISO(); if (!S.dq || typeof S.dq !== 'object' || Array.isArray(S.dq)) S.dq = {}; const r = S.dq[t] ||= [0, 0]; r[0]++; if (ok) r[1]++;
@@ -2755,15 +2813,20 @@ const conceptIdOfQ = q => { let c = null;
   return (c || CONCEPTS.find(x => x.lessonId === q.lessonId) || {}).id || ''; };
 const conceptGo = q => { const id = conceptIdOfQ(q); return id ? `<button class="btn soft cgo" data-cgo="${esc(id)}">이 개념 다시 보기</button>` : ''; };
 let detailBack = null;   // 문제 화면에서 '이 개념 다시 보기'로 왔으면 그 화면으로 돌아간다
+/* 채점 시트 머리 하나의 꼴(docs/23 S3) — 맞으면 '맞았어요', 틀리면 '정답은 ②예요' · '정답은 산소예요'(끝 글자 받침이면 '이에요') */
+const ansHead = a => { const w = String(a).trim(), ch = w.slice(-1), c = ch.charCodeAt(0) - 0xAC00;
+  return `정답은 ${w}${(c >= 0 && c <= 11171 ? c % 28 > 0 : /[013678lmnrLMNR①③]/.test(ch) || !/[\w②④⑤]/.test(ch)) ? '이에요' : '예요'}`; };
 const dueWord = d => { const n = daysBetween(todayISO(), d); return n <= 0 ? '오늘' : n === 1 ? '내일' : `${kdate(d)}(${n}일 뒤)`; };
+/* 시험이 가까워 간격이 좁혀졌는가 — 그러면 '간격을 넓혀요'라고 말하지 않는다(2026-10-13 검수: D-9 에 다음이 내일인데 '넓혀요') */
+const squeezed = w => !!w && examLeft(lessonOfW(w)) !== null && srsGap(w.x, lessonOfW(w)) < SRS[Math.min(5, Math.max(1, w.x)) - 1];
 const srsLine = r => !r ? '' : r.st === 'new' ? `↻ 오답 노트에 담았어요 · <b>${dueWord(r.d)}</b> 한 번 더 물어볼게요`
   : r.st === 'reset' ? `↻ 한 번 더 담아 둘게요 · <b>${dueWord(r.d)}</b> 다시 물어볼게요`
-  : r.st === 'up' ? (r.w && examLeft(lessonOfW(r.w)) !== null && srsGap(r.w.x, lessonOfW(r.w)) < SRS[Math.min(5, Math.max(1, r.w.x)) - 1]
-      ? `✓ 맞았어요 · 시험이 가까워 간격을 좁혀 <b>${dueWord(r.d)}</b> 한 번 더 볼게요`   // 2026-10-13 검수: 시험 압축으로 '내일'인데 '간격을 넓혀요'라 앞뒤가 안 맞았다
+  : r.st === 'up' ? (squeezed(r.w)
+      ? `시험이 가까워 <b>${dueWord(r.d)}</b> 한 번 더 볼게요`   // 2026-10-13 검수: 시험 압축으로 '내일'인데 '간격을 넓혀요'라 앞뒤가 안 맞았다
       : `✓ 간격을 넓혀요 · 다음 복습은 <b>${dueWord(r.d)}</b>이에요`)
   : r.st === 'clear' ? '✓ 이제 됐어요 — 오답 노트에서 정리돼요'
   : r.st === 'hold' ? `헷갈렸다면 아직 익는 중이에요 · <b>${dueWord(r.d)}</b> 한 번 더 물어볼게요`
-  : r.st === 'early' ? `맞았어요 · 복습 날짜는 그대로 <b>${dueWord(r.d)}</b>이에요` : '';
+  : r.st === 'early' ? `복습 날짜는 그대로 <b>${dueWord(r.d)}</b>이에요` : '';
 /* 개념 카드 자리 — 오답 문제가 나온 개념(문제 은행은 concept 번호, 오늘의 문제는 그 문제를 내는 개념) */
 const conceptIdxOfW = w => { const l = lessonOfW(w); let i = -1;
   if (w.b){ const q = BANK.find(x => x.id === w.b); if (q && +q.concept) i = CONCEPTS.findIndex(c => c.lessonId === l && +c.no === +q.concept); }
@@ -2835,7 +2898,7 @@ const weekDays = () => { const t = todayISO(), mon = addDays(t, -((wdOf(t) + 6) 
 function rhythm(days, cls){ const set = new Set(days||[]), t = todayISO(), wk = weekDays(), n = wk.filter(d => set.has(d)).length;
   const on = wk.filter(d => set.has(d)).map(d => WD[wdOf(d)]);
   return `<div class="rhythm ${cls||''}" role="img" aria-label="이번 주 리듬: 7일 가운데 ${n}일 공부했습니다${on.length ? ` (${on.join('·')})` : ''}">
-    <span class="k">이번 주 리듬</span><span class="dots" aria-hidden="true">${wk.map(d => `<span class="dt ${set.has(d)?'on':''} ${d===t?'today':''} ${d>t?'later':''}"><i></i>${WD[wdOf(d)]}</span>`).join('')}</span>
+    <span class="k">이번 주 리듬</span>${cls === 'hero' ? `<b class="hl" aria-hidden="true">${n ? `이번 주에 ${n}일 공부했어요` : '이번 주는 아직 시작 전이에요'}</b>` : ''}<span class="dots" aria-hidden="true">${wk.map(d => `<span class="dt ${set.has(d)?'on':''} ${d===t?'today':''} ${d>t?'later':''}"><i></i>${WD[wdOf(d)]}</span>`).join('')}</span>
     <span class="n" aria-hidden="true">${n}<small>/7</small></span></div>`; }
 const weekCount = days => { const set = new Set(days||[]); return weekDays().filter(d => set.has(d)).length; };
 
@@ -2881,7 +2944,7 @@ const INTRO = [
       <path d="M84 138a66 19 0 0 0 132 0" fill="none" stroke="var(--brand)" stroke-width="4.5" opacity=".85" transform="rotate(-14 150 138)"/>
       <circle cx="254" cy="89" r="7.5" fill="var(--brand-dark)"/>
       <g stroke="var(--brand)" opacity=".4" stroke-linecap="round"><path d="M50 250h200" stroke-width="2"/><g stroke-width="2.2">${[0,1,2,3,4,5,6,7,8].map(i => `<path d="M${50 + i * 25} 250v-${i % 2 ? 6 : 11}"/>`).join('')}</g></g></svg>` },
-  { t:'시험 날까지<br>이어지는 연습', d:SRS_RULE,
+  { t:'시험 날까지<br>이어지는 연습', d:'틀린 문제는 잊을 때쯤 다시 나와요.',   // 숫자(1·3·7·14·30일)는 그림이 말한다(docs/23 S16)
     art:() => `<svg viewBox="0 0 300 300" role="img" aria-label="문제 카드와 넓어지는 복습 간격 — 내일, 3일, 7일, 14일, 30일">
       <g transform="rotate(-7 132 118)"><rect x="54" y="52" width="160" height="130" rx="16" fill="var(--card)" stroke="var(--brand-line)"/></g>
       <rect x="68" y="44" width="164" height="140" rx="16" fill="var(--card)" stroke="var(--brand-line)" stroke-width="1.5"/>
@@ -3166,9 +3229,9 @@ function asgCard(){
   if (!open.length) return '';
   const ic = '<span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="5" y="4" width="14" height="17" rx="2.5"/><path d="M9 4.5h6v3H9z"/><path d="M8.5 12.5l2.2 2.2 4.8-4.8"/></svg></span>';
   return open.slice(0, 2).map(a => { const q = aqOf(a.id), late = dLeft(a.due) < 0, pend = q.sub && !q.ok;
-    const line = pend ? asgSentText(q) : `${asgDueText(a.due)} · ${asgWhen(a.due)} · ${Math.min(q.i, a.n)}/${a.n}${late ? ' · 늦게 내도 받아요' : ''}`;
+    const line = pend ? asgSentText(q) : `학원 과제 · ${dLeft(a.due) === 1 ? '내일 마감' : asgDueText(a.due)} · ${Math.min(q.i, a.n)}/${a.n} 했어요${late ? ' · 늦게 내도 받아요' : ''}`;
     return `<button class="revcard asgcard ${late ? 'late' : ''}" data-asg="${esc(a.id)}" aria-label="학원 과제 ${esc(a.title)}, ${esc(line)}">${ic}
-      <span class="tx"><b>학원 과제 <span class="k">${ASG_KIND[a.kind] || ''}</span></b><span class="t">${esc(a.title)}</span><span>${esc(line)}</span></span>
+      <span class="tx"><b>${esc(a.title)}</b><span>${esc(line)}</span></span>
       <svg class="chev" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg></button>`; }).join('')
     + (open.length > 2 ? `<p class="fine asgmore">학원 과제가 ${open.length - 2}개 더 있어요 · 앞의 것을 내면 이어서 보여요</p>` : ''); }
 async function startAsg(id){
@@ -3229,13 +3292,13 @@ function pathHtml(){
       h:'오늘의 문제 1개', p: q.essay ? '문장으로 써 보고 모범 답안과 견줘 봐요.' : '고르면 바로 채점하고, 왜 갈렸는지 알려 줘요.', m:`${tag} ${c.lessonName}`, btn:'풀기' },
     review: { btnId:'revStart', name: st.review === 'done' ? '오늘의 복습을 마쳤어요' : st.review === 'none' ? '오늘 다시 볼 것 없음' : `오늘의 복습 ${n}`,
       todo: revSub, done: nextDueText(), none: S.wrong.some(w => !w.cleared) || (S.cs || []).some(w => !w.cleared) ? nextDueText() : '틀린 문제는 다음 날 여기에 다시 나와요',
-      h:`오늘의 복습 ${n}`, p:revSub, m:SRS_RULE, btn: cur ? '이어서 풀기' : '복습 시작' } };
+      h:`오늘의 복습 ${n}`, p:revSub, m:'', srs:1, btn: cur ? '이어서 풀기' : '복습 시작' } };
   const step = (k, i) => { const d = D[k], isNow = st.now === k;
     const state = k === 'review' && st.review === 'none' ? 'none' : isNow ? 'now' : (k === 'review' ? st.review === 'done' : st[k]) ? 'done' : 'todo';
     const lab = { now:'지금', done:'끝냄', todo:'남음', none:'없음' }[state];
     if (state === 'now') return `<li class="ps now" id="ps-${k}" aria-current="step"><div class="pnow">
-        <span class="k">지금 할 일</span><h3>${esc(d.h)}</h3>
-        <div class="hb"><div><p>${esc(d.p)}</p>${d.m ? `<p class="m">${esc(d.m)}</p>` : ''}<button class="btn" id="${d.btnId}">${d.btn}</button></div></div></div></li>`;
+        <div class="pntop"><div class="pntx"><span class="k">지금 할 일</span><h3>${esc(d.h)}</h3><p>${esc(d.p)}</p>${d.m ? `<p class="m">${esc(d.m)}</p>` : ''}</div>${k !== 'review' && c.figure ? `<span class="pthumb" data-tfig="${c.id}" aria-hidden="true">${thumbFig(c.id)}</span>` : ''}</div>
+        <div class="hb"><div>${d.srs ? srsBtn('', 1) : ''}<button class="btn" id="${d.btnId}">${d.btn}</button></div></div></div></li>`;
     const sub = state === 'done' ? d.done : state === 'none' ? d.none : d.todo;
     const inner = `<span class="tx"><span class="t">${esc(d.name)}</span><span class="d">${esc(sub)}</span></span>`;
     if (k === 'review' && state !== 'todo') return `<li class="ps ${state}" id="ps-${k}"><div class="pc"><span class="sr">${lab} · </span>${inner}${state === 'done' ? IC_CHK : ''}</div></li>`;
@@ -3249,10 +3312,10 @@ function pathHtml(){
   const yi = daysBetween(S.start, todayISO()) >= 1 ? (dayIndex() + CONCEPTS.length - 1) % CONCEPTS.length : -1, yc = yi >= 0 ? CONCEPTS[yi] : null;
   const miss = yc && isOpen(yi) && !S.done.includes(yc.id) && !S.read.includes(yc.id)
     ? `<div class="pfoot pmiss"><span>어제 개념도 볼까요? · ${esc(yc.title)}</span><button class="linkbtn" id="pMiss" data-i="${yi}" aria-label="어제 개념 ${esc(yc.title)} 보기">볼래요</button></div>` : '';
-  const foot = !ACC ? `<div class="pfoot"><span>둘러보는 중이에요 · 기록은 이 기기에만 남아요</span><button class="linkbtn" id="pfootGo">로그인</button></div>`
+  const foot = !ACC ? `<div class="pfoot"><span>둘러보는 중이에요 · 기록은 이 기기에만 남아요</span><button class="linkbtn" id="pfootGo">이용권 보기</button></div>`
     : !fullAccess() && ACC.role === 'student' ? `<div class="pfoot"><span>최근 ${FREE_DAYS}일치 개념이 열려 있어요</span><button class="linkbtn" id="pfootGo">전 범위 열기</button></div>` : '';
-  return { st, html: `<div class="phead"><h2 id="pathH">오늘 할 일</h2><span class="n" aria-label="${st.total}개 가운데 ${st.doneN}개 끝냄">${st.doneN} / ${st.total}</span></div>
-    <ol class="path" aria-labelledby="pathH">${PATH_KEYS.map(step).join('')}${fin}</ol>${miss}${foot}` }; }
+  return { st, html: `<div class="phead"><h2 id="pathH">오늘 할 일</h2><span class="n" aria-label="${st.total}개 가운데 ${st.doneN}개 끝냄">${st.doneN} / ${st.total}</span>${examNote()}</div>
+    <ol class="path" aria-labelledby="pathH">${PATH_KEYS.filter(k => !(k === 'review' && st.review === 'none' && !S.wrong.length && !(S.cs || []).length)).map(step).join('')}${fin}</ol>${miss}${foot}` }; }
 /* 경로 아래 작은 카드 한 장 — 이번 주 리듬 · 오늘 일정 · 공부 노트 · 내 공부 기록을 줄로 */
 function homeSum(){
   const iso = todayISO(), todayList = [...fixedOn(iso), ...myEvents().filter(e => e.date === iso)];
@@ -3282,11 +3345,11 @@ async function renderToday(){
       ${S.auth && authLive()   // 출석은 수강생에게만(2026-10-07 원장님) — 수강 기간이 끝난 코드에도 뜨지 않게
         ? (myAtt ? `<span class="pill"><svg viewBox="0 0 24 24"><path d="M4 12.5l5.5 5.5L20 7"/></svg> ${myAtt.time} 출석${myAtt.late?' · 지각':''}</span>`
                  : `<button class="pill att-pill todo" id="attOpen"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="3"/><path d="M8 12h8M12 8v8"/></svg> 출석 체크</button>`)
-        : (hasPass() ? `<span class="pill">이용권 ~${kdate(ACC.passUntil)}</span>` : trialLeft === null ? '' : `<button class="pill warn" id="goPlansPill">무료 · 최근 ${FREE_DAYS}일치</button>`)}
+        : (hasPass() ? `<span class="pill">이용권 ~${kdate(ACC.passUntil)}</span>` : trialLeft === null ? '' : `<button class="pill grey" id="goPlansPill">최근 ${FREE_DAYS}일치 열람 중</button>`)}
     </div>
     ${consentCard('today')}
-    ${unreadNotice ? `<div class="notice"><div class="ic">!</div><div class="b"><div class="t">${esc(unreadNotice.t)}</div><div class="d">${esc(unreadNotice.d)} · ${esc(unreadNotice.cls)}</div></div><button id="okNotice" data-id="${unreadNotice.id}">확인</button></div>` : ''}
-    ${passNote()}${examNote()}
+    ${unreadNotice ? `<div class="notice"><div class="ic" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 10v4h3l6 4V6l-6 4z"/><path d="M16.5 9.5a3.5 3.5 0 0 1 0 5M19 7a7 7 0 0 1 0 10"/></svg></div><div class="b"><div class="t">${esc(unreadNotice.t)}</div><div class="d">${esc(unreadNotice.d)} · ${esc(unreadNotice.cls)}</div></div><button id="okNotice" data-id="${unreadNotice.id}">확인</button></div>` : ''}
+    ${passNote()}
     ${asgCard()}
     ${P.html}
     ${homeSum()}
@@ -3326,7 +3389,7 @@ function renderQuiz(){
     ${qtop('backToday', '그만 풀기')}
     <h1 class="sr">${mode==='review'?'복습 문제':'오늘의 문제'}</h1>
     <div class="qhead"><span class="l">${label}${mode==='review'?` · ${esc(qState.lessonName||'')}`:''}</span>
-      <span class="tag">${retry ? `${kdate(retry.iso)}에 틀림` : (graded && pick!==q.answer ? '다시 볼 문제' : (TYPE_NAME[q.type]||'확인'))}</span></div>
+      <span class="tag">${retry ? `${kdate(retry.iso)}에 틀림` : (graded && pick!==q.answer ? '다시 볼 문제' : (TYPE_NAME[q.type]||'확인'))}</span>${graded || q.essay || hintOn() ? '' : srsBtn(QZ_HINT)}</div>
     ${retry ? `<p class="again">↻ 전에 갈렸던 문제예요. 이번엔 어디서 갈리는지 봐요.</p>` : ''}
     ${q.id ? qBody(q, '') : `<p class="stem">${rich(q.stem)}</p>
     ${q.source ? `<div class="bogi">${rich(q.source)}</div>`:''}
@@ -3338,15 +3401,15 @@ function renderQuiz(){
     ` : `
       ${graded ? '' : confRow(qState.conf)}
       <div class="opts">${q.choices.map((t,i)=>{ const n=i+1; let cls='', mk=''; if (graded){ if (n===q.answer){cls='ok';mk='정답';} else if (n===pick){cls='bad';mk='내 답';} }
-        return `<button class="opt ${cls}" data-p="${n}" ${graded?'disabled':''}><span class="m">${MARKS[i]}</span><span class="tx">${rich(t)}</span>${mk?`<span class="mk">${mk}</span>`:''}</button>`; }).join('')}</div>
+        return `<button class="opt ${cls}" data-p="${n}" ${graded?'disabled':''}><span class="m">${MARKS[i]}</span><span class="tx">${rich(t)}</span>${optMk(cls, mk)}</button>`; }).join('')}</div>
       ${graded ? `
         ${q.id ? cueFig(q) : ''}
         ${q.id ? (() => { const jd = multiSplit(q); return explBox('해설', (jd ? jdHtml(jd) : q.explain ? `<p>${rich(q.explain)}</p>` : q.wrong ? '' : conceptGo(q)) + (q.wrong && !jd ? `<div class="wrongbox"><div class="h">오답 왜 틀렸나</div>${rich(q.wrong)}</div>` : '')); })()
           : explBox('해설', q.explain ? `<p>${rich(q.explain)}</p>` : conceptGo(q))}
         <button class="flag" data-report="${q.id ? `bank:${esc(q.id)}` : `quiz:${esc(q.lessonId)}#${q.no}`}">문제·해설에 틀린 곳이 있나요?</button>
-        ${fbSheet({ ok: pick===q.answer, head: pick===q.answer ? '맞았어요' : `정답은 ${MARKS[q.answer-1]}${[2, 4, 5].includes(+q.answer) ? '예요' : '이에요'}`, note: confNote(qState.conf, pick===q.answer), line: srsLine(qState.srs),
+        ${fbSheet({ ok: pick===q.answer, head: pick===q.answer ? '맞았어요' : ansHead(MARKS[q.answer-1]), note: confNote(qState.conf, pick===q.answer), line: srsLine(qState.srs),
           btns: `<button class="btn" id="grade" aria-describedby="fbH${srsLine(qState.srs) ? ' fbL' : ''}">${mode==='review' ? '다음 복습 문제' : (retry ? '오늘의 문제로' : '오늘로 돌아가기')}</button>` })}
-      ` : `<p class="qhint">고르면 바로 채점하고, 왜 갈렸는지 알려 줘요.<br>틀려도 괜찮아요. ${SRS_RULE}</p>`}
+      ` : hintOn() ? `<p class="qhint">${QZ_HINT}<br>틀려도 괜찮아요. ${SRS_RULE}</p>` : ''}
     `}`;
   afterDraw();
 }
@@ -3441,7 +3504,7 @@ function renderDetail(){
           <button id="noteThis">${ic('note')}<span>노트에 적기</span></button></div></div>`;
       return `<div class="nextup dact">
         ${rOn ? '' : done ? `<button class="btn dgo" data-drill="${c.lessonId}"><span class="t">이 소단원 문제 풀기</span><span class="d">${nq}문항</span></button>`
-          : `<button class="btn dgo" id="markDone"><span class="t">다 읽었어요 · 공부했음</span></button>`}
+          : `<button class="btn dgo" id="markDone"><span class="t">공부했어요</span></button>`}
         <div class="dsub">
           ${rOn ? `<button data-drill="${c.lessonId}">${ic('drill')}<span>문제 풀기<small>${nq}문항</small></span></button>`
             : done ? `<span class="dchip">${ic('ok')}<span>공부한 개념</span></span>` : `<button data-drill="${c.lessonId}">${ic('drill')}<span>문제 풀기<small>${nq}문항</small></span></button>`}
@@ -3624,7 +3687,7 @@ const LEECH_NOTE = '여러 번 갈린 문제예요. 문제를 또 풀기보다 �
 function renderWrong(){
   const v = document.getElementById('v-wrong');
   const live = S.wrong.filter(w=>!w.cleared).sort((a,b) => (a.d||'') < (b.d||'') ? -1 : (a.d||'') > (b.d||'') ? 1 : 0), cleared = S.wrong.filter(w=>w.cleared);
-  if (!S.wrong.length){ v.innerHTML = `<h1 class="h-page">오답 노트</h1><div class="empty"><svg viewBox="0 0 24 24"><path d="M6 4h12v16l-6-4-6 4z"/></svg><p>아직 담긴 문제가 없어요.<br>${SRS_RULE}</p></div>
+  if (!S.wrong.length){ v.innerHTML = `<h1 class="h-page">오답 노트</h1><div class="empty">${eart('wrong')}<b>아직 담긴 문제가 없어요</b><p>${SRS_RULE}</p></div>
     <button class="btn soft" id="goReview">복습 문제 풀기</button>`; return; }
   const when = w => { if (w.cleared) return ' · 정리됨'; if (isLeech(w)) return ' · 개념부터 다시'; const n = daysBetween(todayISO(), w.d || todayISO()); return n > 0 ? ` · ${n}일 뒤 다시` : ' · 오늘 다시'; };
   const act = (w, retry) => w.cleared ? '' : isLeech(w) ? `<button class="more" data-leech="${esc(wKey(w))}">개념 카드부터 다시</button>` : retry;
@@ -3644,7 +3707,7 @@ function renderWrong(){
       ${c ? foot(w, c.lessonName) : ''}</div>`; };
   v.innerHTML = `<h1 class="h-page">오답 노트</h1>
     <p class="fine" style="text-align:left;padding:0 0 6px">${live.length}문제가 담겨 있어요${cleared.length?` · ${cleared.length}문제는 다시 풀어 정리했어요`:''}.</p>
-    <p class="fine" style="text-align:left;padding:0 0 14px">${SRS_RULE} 7일 넘게 띄워 두 번 잇달아 맞히면 정리되고, 하루에 10문제까지만 나와요.</p>
+    ${srsBtn('', 1)}
     ${live.map(item).join('')}${cleared.map(item).join('')}<button class="btn soft" id="goReview">복습 문제 풀기</button>`;
 }
 
@@ -3885,7 +3948,7 @@ async function renderTalk(){
       <input id="talkSearch" aria-label="이야기 글 검색" placeholder="글 검색 (예: 충격량, 오답)" value="${esc(talkQ)}"></div>
     <div class="chipbar">${['전체', ...Object.keys(BOARDS)].map(b=>`<button data-tb="${b}" class="${talkBoard===b?'on':''}">${b==='전체'?'전체':BOARDS[b]}</button>`).join('')}</div>
     ${repHtml}
-    ${gate ? talkGate(gate) : `<button class="btn" id="postNew">글쓰기</button>`}
+    ${gate ? talkGate(gate) : list.length || failed || talkQ ? `<button class="btn" id="postNew">글쓰기</button>` : ''}
     ${failed ? `<div class="loadfail"><p>글을 불러오지 못했습니다.<br>연결을 확인한 뒤 다시 시도해 주세요.</p><button class="btn soft" id="talkRetry" style="margin:0">다시 불러오기</button></div>` : ''}
     ${list.length ? list.map(x => {
       const hid = !shown(x), at = attachName(x.attach);
@@ -3898,7 +3961,7 @@ async function renderTalk(){
           <span><svg viewBox="0 0 24 24"><path d="M20.5 12c0 4-3.8 7.2-8.5 7.2-1 0-2-.15-2.9-.42L4 20.5l1.5-3.6C4.2 15.6 3.5 13.9 3.5 12c0-4 3.8-7.2 8.5-7.2s8.5 3.2 8.5 7.2z"/></svg>${x.comments||0}</span>
           <span><svg viewBox="0 0 24 24"><path d="M12 20.5 4.5 13a4.6 4.6 0 0 1 6.5-6.5l1 1 1-1A4.6 4.6 0 0 1 19.5 13z"/></svg>${(x.likes||[]).length}</span>
           ${at?`<span>· ${esc(at.k)} 첨부</span>`:''}</div></button>`; }).join('')
-      : (failed ? '' : talkQ ? `<p class="planempty">찾는 글이 없어요.</p>` : `<div class="tempty">${TALK_EMPTY_ART}<p><b>첫 질문을 올려 보세요</b>막힌 곳을 자기 말로 적으면 함께 풀어 봐요.</p></div>`)}
+      : (failed ? '' : talkQ ? `<p class="planempty">찾는 글이 없어요.</p>` : `<div class="tempty">${TALK_EMPTY_ART}<p><b>첫 질문을 올려 보세요</b>막힌 곳을 자기 말로 적으면 함께 풀어 봐요.</p>${gate ? '' : `<button class="btn" id="postNew">질문 올리기</button>`}</div>`)}
     <details class="trule"><summary>함께 쓰는 규칙 3가지</summary><ul>
       <li>닉네임으로 활동해요. 실명·전화번호·주소·SNS 아이디는 적지 않아요.</li>
       <li>시중 문제집이나 기출 문제의 <b>원문은 그대로 올리지 않아요</b>(저작권). 어디가 막히는지 자기 말로 적어 주세요.</li>
@@ -4003,7 +4066,7 @@ function sheetFeedback(ref, kind){
   if (consentPending()){ openSheet(`<h3>의견 보내기</h3><p>보호자 동의가 끝나면 앱에서 보낼 수 있어요. 급한 일은 학원에 직접 말해 주세요.${CFG.phone ? ` (${esc(CFG.phone)})` : ''}</p><button class="btn ghost" id="sheetClose">닫기</button>`); return; }
   fbState = { kind: kind || (ref ? 'content' : 'bug'), ref: ref || null }; const appeal = ref === 'talk:appeal';
   openSheet(`<h3>${appeal ? '다시 살펴봐 주세요' : ref ? '틀린 곳 알려 주기' : '의견 보내기 · 오류 신고'}</h3>
-    <p class="fine" style="text-align:left;padding:0 0 10px">원장님만 읽습니다. 고치면 교재와 앱이 같이 바뀝니다. 이름·전화번호 같은 개인정보는 적지 마세요.</p>
+    <p class="fine" style="text-align:left;padding:0 0 10px">원장님만 읽어요. 고치면 교재와 앱이 같이 바뀌어요. 이름·전화번호 같은 개인정보는 적지 말아 주세요.</p>
     ${ref ? `<div class="fbref"><span>보내는 곳</span>${esc(refLabel(ref))}</div>` : ''}
     <div class="chipbar" role="radiogroup" aria-label="종류" id="fbKinds">${FB_KIND.map(([k, l]) => `<button role="radio" aria-checked="${fbState.kind===k}" data-fbk="${k}" class="${fbState.kind===k?'on':''}">${l}</button>`).join('')}</div>
     <textarea id="fbBody" maxlength="1000" aria-label="내용" placeholder="${esc(appeal ? '어떤 글 때문인지, 왜 다시 봐 주면 좋겠는지 적어 주세요. 원장님이 읽고 답해 드려요.' : FB_HINT[fbState.kind])}"></textarea>
@@ -4035,7 +4098,7 @@ async function renderPlan(){
   const week = [...Array(7)].map((_,i) => { const iso = addDays(todayISO(), i); return { iso,
     has: fixedOn(iso).length > 0 || evAll.some(e => e.date === iso) }; });
 
-  v.innerHTML = `<div class="hrow"><h1 class="h-page">일정</h1><button class="more" id="planNote">달력 · 노트</button></div>
+  v.innerHTML = `<div class="pghead"><h1 class="h-page">일정</h1><button class="more" id="planNote">달력 · 노트</button></div>
     ${cur ? `<div class="dday">
         <div class="k">${esc(cur.title)}${dLeft(cur.date) < 0 ? ' (지난 일정)' : '까지'}</div>
         <div class="v ${dLeft(cur.date) < 0 ? 'past' : ''}">${ddayText(dLeft(cur.date))}</div>
@@ -4056,7 +4119,7 @@ async function renderPlan(){
              <span class="b"><b>${esc(x.title)}</b><small>${esc(TAGS[x.tag]||'')}${x.place?` · ${esc(x.place)}`:''} · 매주 ${(x.days||[]).map(d=>WD[d]).join('·')}</small></span></button>`
         : `<button class="slot" data-ev="${x.id}"><span class="t">${esc(x.from||KINDS[x.kind]||'')}</span><span class="bar" style="background:${x.kind==='exam'?'var(--no)':'var(--u)'}"></span>
              <span class="b"><b>${esc(x.title)}${x.acad?'<span class="fromacademy">학원</span>':''}</b><small>${esc(KINDS[x.kind]||'')}${x.memo?` · ${esc(x.memo)}`:''}</small></span></button>`).join('')
-        : `<p class="planempty">이 날은 등록된 일정이 없습니다.</p>`}
+        : `<p class="planempty">이날은 일정이 없어요.</p>`}
     </div>
 
     <div class="sec"><h2>다가오는 일정</h2>
@@ -4192,10 +4255,10 @@ function startPlanDay(id){
   if (!items.length){ toast('이 범위에 풀 문항이 없어요'); return; }
   closeSheet(); startBank(items, `시험까지 계획 · ${e.title}`); bs.kind = 'plan'; bs.plan = e.id; renderBank();
 }
-/* 홈: 범위를 건 시험이 14일 안이면 조용한 한 줄(벤치마크 #13 '시험 2주 전부터 홈에 한 줄') */
+/* 홈: 범위를 건 시험이 14일 안이면 '오늘 할 일' 줄 오른쪽에 조용한 칩 하나(벤치마크 #13 · docs/23 S2 — 카드 한 장이던 것을 줄였다) */
 const examNote = () => { const e = myEvents().find(x => x.kind === 'exam' && x.scope && daysBetween(todayISO(), x.date) >= 1 && daysBetween(todayISO(), x.date) <= 14 && examPlan(x)); if (!e) return '';
   const done = ((S.epd || {})[e.id] || '') === todayISO();
-  return `<div class="passnote" role="note"><span><b>${esc(e.title)} D-${daysBetween(todayISO(), e.date)}</b> · ${done ? '오늘 분량 끝났어요' : '시험까지 계획이 있어요'}</span><button class="linkbtn" data-eplan="${esc(e.id)}">${done ? '계획 보기' : '오늘 분량 보기'}</button></div>`; };
+  return `<button class="exchip" data-eplan="${esc(e.id)}">${esc(e.title)} D-${daysBetween(todayISO(), e.date)}${done ? ' · 오늘 분량 끝났어요' : '<span class="sr"> · 시험까지 계획이 있어요 · 오늘 분량 보기</span>'}<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></button>`; };
 /* ═══ 소단원 기록 · 숙련도(2026-10-06 디자인 감사 #8, Khan 식 4단계) ═══
    그 소단원 '문제 은행' 문항(대단원 마무리·모의고사 제외)의 기록 S.bh(문항마다 마지막 결과 o/x)와 간격 복습 상자(S.wrong)만 본다.
    0 시작 전 — 푼 문제가 5개보다 적다
@@ -4270,7 +4333,7 @@ function drawBank(){
       <button class="btn" id="bankRec">바로 시작</button>
       <button class="rcus" id="bankCustom"><span><b>직접 고르기</b><small>범위 · 유형 · 개수 · 시험처럼</small></span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg></button>
     </section>
-    <p class="bstat">전체 ${BANK_N.toLocaleString('ko-KR')}문항 · ${done ? `푼 문항 ${done.toLocaleString('ko-KR')}개 · 문항마다 마지막 답으로 ${Math.round(right/done*100)}% 맞힘` : '아직 푼 문제가 없어요'}${fa ? '' : ` · 무료 범위(최근 ${FREE_DAYS}일치)에서 골라요`}</p>
+    <p class="bstat">${done ? `지금까지 ${done.toLocaleString('ko-KR')}문항 · 마지막 답으로 ${Math.round(right/done*100)}% 맞힘` : '아직 푼 문제가 없어요'}${fa ? '' : ` · 무료 범위(최근 ${FREE_DAYS}일치)에서 골라요`}</p>
     <div class="umsec"><h2 class="lbl">실전처럼 풀기</h2>
       <div class="umtiles">
         <button class="umtile" data-um="unit" ${fa ? '' : 'aria-describedby="umLockNote"'}><span class="k">대단원 마무리${lock}</span><span class="t">단원마다 16문항</span><span class="s">${fa && ux ? `지난번 ${ux[0]}/${ux[1]}` : '마무리 12 + 고난도 4'}</span></button>
@@ -4295,7 +4358,7 @@ function bankSheetBody(){
     <button class="btn" id="bankStart" ${pool.length?'':'disabled'}>${pool.length ? `${Math.min(bankSel.n,pool.length)}문제 시작` : '이 조건에 맞는 문항이 없어요'}</button>
     ${pool.length ? `<p class="fine bsn">고를 수 있는 문항 ${pool.length.toLocaleString('ko-KR')}개${fullAccess() ? '' : ` · 무료 범위(최근 ${FREE_DAYS}일치)`}</p>` : ''}`;
 }
-function openBankSheet(){ openSheet(`<div class="bsheet"><h3>직접 고르기</h3><div id="bsBox">${bankSheetBody()}</div><button class="btn ghost" id="sheetClose">닫기</button></div>`); }
+function openBankSheet(){ openSheet(`<div class="bsheet"><h3>직접 고르기</h3><p class="fine" style="text-align:left;padding:0 0 8px">전체 ${BANK_N.toLocaleString('ko-KR')}문항에서 골라요</p><div id="bsBox">${bankSheetBody()}</div><button class="btn ghost" id="sheetClose">닫기</button></div>`); }
 function redrawBankSheet(focusEl){ const box = document.getElementById('bsBox'); if (!box) return false;
   const key = focusEl && (focusEl.id ? '#' + focusEl.id : focusEl.dataset.bsel ? `[data-bsel="${focusEl.dataset.bsel}"][data-val="${focusEl.dataset.val}"]` : '');
   box.innerHTML = bankSheetBody(); if (key) box.querySelector(key)?.focus({ preventScroll:true }); return true; }
@@ -4393,7 +4456,6 @@ function drawBankSession(){
       <div class="leechcard"><div class="h">개념 카드부터 다시</div><p>${LEECH_NOTE}</p>${c ? `<p class="c">${esc(c.title)} · ${esc(c.lessonName)}</p>` : ''}
         <button class="btn" data-leech="${esc(rk)}">개념 카드 읽기</button><button class="btn ghost" id="leechSkip">이 문제는 건너뛰기</button></div>`; return; }
   let body = '';
-  const okMark = `<span class="okm" aria-hidden="true">${IC_OK}</span>`;   // 맞힌 선지 — 체크가 그려진다(240ms)
   const sp = !graded && q.type === 'multi' && !bs.timed ? multiSplit(q) : null;   // 합답형 하나씩 판정(벤치마크 #10) — ㄱㄴㄷ를 O/X로 판정하면 조합이 정해진다
   if (q.type==='ox') body = `<div class="oxrow">${['O','X'].map(o=>`<button data-ox="${o}" ${graded?'disabled':''} class="${graded?(o===q.answer?'ok':(o===bs.pick?'bad':'')):''}">${o}</button>`).join('')}</div>`;
   else if (sp && bs.stepOn){ const sj = (bs.sjNow ||= {}), keys = sp.rows.map(r => r.k), picked = keys.filter(k => sj[k] === true), all = keys.every(k => k in sj);
@@ -4403,7 +4465,7 @@ function drawBankSession(){
       <p class="sjsum" aria-live="polite">${!all ? `${keys.length - Object.keys(sj).filter(k => keys.includes(k)).length}개 남았어요` : ci >= 0 ? `옳은 것 ${picked.join(', ') || '없음'} → <b>${MARKS[ci]}</b>` : `옳은 것 ${picked.join(', ') || '없음'} — 이 조합은 선지에 없어요. 다시 살펴봐요`}</p>
       <button class="btn" id="sjGo" data-ci="${ci + 1}" ${ci >= 0 ? '' : 'disabled'}>${ci >= 0 ? `${MARKS[ci]}로 채점하기` : '채점하기'}</button></div>`; }
   else if (q.type==='mc' || q.type==='multi') body = `<div class="opts">${q.choices.map((t,i)=>{ const n=i+1; let cls='', mk=''; if (graded){ if (n===q.answer){cls='ok';mk='정답';} else if (n===+bs.pick){cls='bad';mk='내 답';} }
-      return `<button class="opt ${cls}" data-bp="${n}" ${graded?'disabled':''}><span class="m">${MARKS[i]}</span><span class="tx">${rich(t)}</span>${mk?`<span class="mk">${cls === 'ok' && +bs.pick === n ? okMark : ''}${mk}</span>`:''}</button>`; }).join('')}</div>`;
+      return `<button class="opt ${cls}" data-bp="${n}" ${graded?'disabled':''}><span class="m">${MARKS[i]}</span><span class="tx">${rich(t)}</span>${optMk(cls, mk)}</button>`; }).join('')}</div>`;
   else if (q.type==='blank') body = graded ? `<div class="opts"><div class="opt ${bankCorrect(q,bs.pick)?'ok':'bad'}" style="cursor:default"><span class="tx">내 답: ${esc(bs.pick||'(빈칸)')} · 정답: <b>${esc(q.answer)}</b></span></div></div>` : `<div class="blankin"><input id="blankIn" aria-label="빈칸의 답" placeholder="${String(q.answer).includes(',') ? `빈칸 ${String(q.answer).split(',').length}개 — 순서대로 쉼표로 (예: 가, 나)` : '답을 쓰세요'}" autocomplete="off"><button id="blankGo">확인</button></div>`;
   else body = `<textarea class="essay" id="essayIn" placeholder="문장으로 답을 써 보세요" ${graded?'disabled':''}>${esc(bs.ess||'')}</textarea>${graded ? '' : `<button class="btn soft" id="essayShow">모범 답안 보기 · 스스로 채점</button>`}`;
   if (sp) body = `<button class="linkbtn sjtog" id="sjTog" aria-pressed="${!!bs.stepOn}">${bs.stepOn ? '선지에서 한 번에 고르기' : 'ㄱ·ㄴ·ㄷ 하나씩 판정하기'}</button>` + body;
@@ -4412,18 +4474,18 @@ function drawBankSession(){
   const HINT = { ...(sp && bs.stepOn ? { multi:'보기를 하나씩 판정하면 답이 정해져요.' } : {}), ox:'옳으면 O, 틀리면 X를 골라요.', mc:'하나만 고르면 바로 채점해요.',
     multi:'자료와 보기를 함께 보고 하나를 골라요.', blank:'정답만 짧게 적으면 돼요 — 띄어쓰기·가운뎃점은 보지 않아요.',
     essay:'문장으로 써 본 뒤 모범 답안과 견주어 스스로 채점해요.' }[q.type] || '';
-  const right = q.type==='mc'||q.type==='multi' ? ` · 정답 ${MARKS[q.answer-1]}` : q.type==='ox'||q.type==='blank' ? ` · 정답 ${esc(q.answer)}` : '';
-  const head = essay ? (selfGrade ? '모범 답안과 견주어 스스로 채점해요' : bs.pick === '맞음' ? '맞게 썼어요' : '모범 답안을 한 번 더 봐요') : (ok ? '맞았어요' : '틀렸어요') + right;
+  const right = q.type==='mc'||q.type==='multi' ? MARKS[q.answer-1] : q.type==='ox'||q.type==='blank' ? esc(q.answer) : '';
+  const head = essay ? (selfGrade ? '모범 답안과 견주어 스스로 채점해요' : bs.pick === '맞음' ? '맞게 썼어요' : '모범 답안을 한 번 더 봐요') : ok ? '맞았어요' : right ? ansHead(right) : '틀렸어요';
   const line = srsLine((bs.res||[])[bs.i]), desc = `fbH${line ? ' fbL' : ''}`;
   const btns = selfGrade ? `<div class="oxrow ess"><button data-ess="맞음" aria-describedby="fbH">맞게 썼어요</button><button data-ess="틀림">부족했어요</button></div>`
     : `<button class="btn" id="bankNext" aria-describedby="${desc}">${bs.i+1<bs.items.length?'다음 문제':'결과 보기'}</button>`;
   v.innerHTML = `${bar}
-    <div class="qhead"><span class="l">${kindTag}${esc(L?L.unit+'-'+L.id.slice(2)+' '+L.name:'')}</span><span class="tag">${TYPE_NAME[q.type]}${q.difficulty ? ` · ${esc(q.difficulty)}` : ''}</span></div>
+    <div class="qhead"><span class="l">${kindTag}${esc(L?L.unit+'-'+L.id.slice(2)+' '+L.name:'')}</span><span class="tag">${TYPE_NAME[q.type]}${q.difficulty ? ` · ${esc(q.difficulty)}` : ''}</span>${graded || hintOn() ? '' : srsBtn(HINT)}</div>
     ${qBody(q, `data-zoomsvg="${bs.i}"`)}
     ${graded ? cueFig(q) : ''}
     ${graded || essay ? '' : confRow(bs.conf)}
     ${body}
-    ${graded ? '' : `<p class="qhint">${HINT}<br>틀려도 괜찮아요. ${SRS_RULE}</p>`}
+    ${graded || !hintOn() ? '' : `<p class="qhint">${HINT}<br>틀려도 괜찮아요. ${SRS_RULE}</p>`}
     ${graded ? `${explBox(essay ? '모범 답안' : '해설', (jd ? jdHtml(jd, (bs.sj || [])[bs.i]) : q.explain ? `<p>${rich(q.explain)}</p>` : q.wrong ? '' : conceptGo(q))
         + (q.wrong && !jd ? `<div class="wrongbox"><div class="h">${essay ? '채점 기준' : '오답 왜 틀렸나'}</div>${rich(q.wrong)}</div>` : ''))}
       <button class="flag" data-report="bank:${esc(q.id)}">문제·해설에 틀린 곳이 있나요?</button>
@@ -4609,8 +4671,8 @@ function renderMockReview(v){
     <div class="qhead"><span class="l">${i + 1}번 · ${esc(lessonLabel(q.lessonId))}</span><span class="tag">${TYPE_NAME[q.type]}</span></div>
     ${qBody(q, `data-mxzoom="${i}"`)}
     <div class="opts">${q.choices.map((t, j) => { const n = j + 1; const cls = n === q.answer ? 'ok' : n === pk ? 'bad' : ''; const mk = n === q.answer ? '정답' : n === pk ? '내 답' : '';
-      return `<div class="opt ${cls}"><span class="m">${MARKS[j]}</span><span class="tx">${rich(t)}</span>${mk ? `<span class="mk">${mk}</span>` : ''}</div>`; }).join('')}</div>
-    <div class="verdict" tabindex="-1" role="status"><div class="h">${ok ? '맞았어요' : pk ? '틀렸어요' : '답하지 않았어요'} · 정답 ${MARKS[q.answer - 1]}</div>${jd ? jdHtml(jd) : q.explain ? `<p>${rich(q.explain)}</p>` : conceptGo(q)}</div>
+      return `<div class="opt ${cls}"><span class="m">${MARKS[j]}</span><span class="tx">${rich(t)}</span>${optMk(cls, mk)}</div>`; }).join('')}</div>
+    <div class="verdict" tabindex="-1" role="status"><div class="h">${ok ? '맞았어요' : (pk ? '' : '답하지 않았어요 · ') + ansHead(MARKS[q.answer - 1])}</div>${jd ? jdHtml(jd) : q.explain ? `<p>${rich(q.explain)}</p>` : conceptGo(q)}</div>
     ${q.wrong && !jd ? `<div class="wrongbox"><div class="h">바로알기</div>${rich(q.wrong)}</div>` : ''}
     ${(q.lessons||[]).length ? `<p class="fine" style="text-align:left;padding:0 0 12px">이어지는 소단원 · ${q.lessons.map(l => esc(lessonLabel(l))).join(' · ')}</p>` : ''}
     <div class="mxnav"><button class="btn ghost" id="mxRvPrev" ${i ? '' : 'disabled'}>이전 문항</button><button class="btn soft" id="mxRvNext" ${i + 1 < mx.items.length ? '' : 'disabled'}>다음 문항</button></div>
@@ -4869,7 +4931,7 @@ function renderNote(){
   const cells = [...Array(first)].map(() => '<span class="c out" aria-hidden="true"></span>').join('') + [...Array(days)].map((_, i) => {
     const iso = `${noteMonth}-${pad(i+1)}`, k = cnt.get(iso) || 0, st = S.days.includes(iso), ev = evDay.has(iso);
     const lab = `${m}월 ${i+1}일${iso===today?' 오늘':''}${k?` · 노트 ${k}개`:''}${st?' · 공부한 날':''}${ev?' · 일정':''}`;
-    return `<button class="c ${st?'study':''} ${iso===today?'today':''} ${iso===noteDay?'sel':''}" data-nday="${iso}" aria-label="${lab}" ${iso===noteDay?'aria-current="date"':''}>${i+1}<span class="dots">${k?'<i></i>':''}${ev?'<i class="ev"></i>':''}</span></button>`; }).join('');
+    return `<button class="c ${st?'study':''} ${iso===today?'today':''} ${iso===noteDay?'sel':''}" data-nday="${iso}" aria-label="${lab}" ${iso===noteDay?'aria-current="date"':''}>${i+1}<span class="dmk">${st?'<i></i>':''}${k?'<i class="nt"></i>':''}${ev?'<i class="ev"></i>':''}</span></button>`; }).join('');
   const dayNotes = live.filter(n => n.date === noteDay).sort((a,b) => a.at < b.at ? 1 : -1);
   const onDay = [...fixedOn(noteDay), ...evs.filter(e => e.date === noteDay), ...(S.sched.ddays||[]).filter(d => d.date === noteDay)];
   const q = noteQ.trim().toLowerCase();
@@ -4883,14 +4945,14 @@ function renderNote(){
         <b>${y}년 ${m}월</b>
         <button data-nmon="1" aria-label="다음 달"><svg viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg></button></div>
       <div class="g">${WD.map((w,i) => `<span class="h ${i===0?'sun':''}">${w}</span>`).join('')}${cells}</div>
-      <div class="lg"><span><i></i>노트</span><span><i class="st"></i>공부한 날</span><span><i class="ev"></i>일정</span>${monthN?`<span style="margin-left:auto">이달 노트 ${monthN}개</span>`:''}</div>
+      <div class="legend"><span><i></i>공부한 날</span><span><i class="nt"></i>노트</span><span><i class="ev"></i>일정</span>${monthN?`<span style="margin-left:auto">이달 노트 ${monthN}개</span>`:''}</div>
     </div>
     <div class="nday"><span><b>${kdate(noteDay)} ${WD[wdOf(noteDay)]}요일${noteDay===today?' · 오늘':''}</b>
       <small>${S.days.includes(noteDay) ? '이 날 공부했어요' : (noteDay > today ? '앞으로의 날' : '공부 기록이 없는 날')}${dayNotes.length ? ` · 노트 ${dayNotes.length}개` : ''}</small></span>
       ${noteDay!==today ? `<button class="more" id="noteToday">오늘로</button>` : ''}</div>
     ${doneLine}
     ${onDay.length ? `<div class="nsched"><b>일정</b>${onDay.map(x => esc(x.title) + (x.from ? ` ${esc(x.from)}` : '')).join(' · ')}</div>` : ''}
-    ${dayNotes.length ? dayNotes.map(n => noteItem(n)).join('') : `<div class="nempty">${noteDay===today ? '오늘 기억에 남은 것 하나만 적어 두면<br>시험 전날 다시 읽을 나만의 요약이 돼요.' : '이 날의 노트가 없어요.'}</div>`}
+    ${dayNotes.length ? dayNotes.map(n => noteItem(n)).join('') : `<div class="nempty">${noteDay===today ? `${eart('note')}<b>오늘 기억에 남은 것 하나만 적어 봐요</b><p>시험 전날 다시 읽을 나만의 요약이 돼요.</p>` : '이 날의 노트가 없어요.'}</div>`}
     <button class="btn" id="noteNew">${noteDay===today ? '오늘 노트 쓰기' : `${kdate(noteDay)} 노트 쓰기`}</button>
     ${noteDay === today ? pastHtml(pastNote()) : ''}`;
   v.innerHTML = `<button class="back" id="noteBack"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg>${({plan:'일정',me:'내 정보',detail:'개념'})[noteFrom]||'오늘'}</button>
@@ -5068,28 +5130,32 @@ async function renderStats(){
   if (S.auth){ try { att = await DBX.attendanceRange(`${statMonth}-01`, `${statMonth}-${pad(days)}`, S.auth.code); } catch {} }
   const attSet = new Set(att.map(a=>a.date));
   const cal = ['일','월','화','수','목','금','토'].map(h=>`<div class="h">${h}</div>`).join('') + '<div class="c blank"></div>'.repeat(first.getDay()) +
-    [...Array(days)].map((_,i)=>{ const iso=`${statMonth}-${pad(i+1)}`; return `<div class="c ${S.days.includes(iso)?'on':''} ${attSet.has(iso)?'att':''} ${iso===todayISO()?'today':''}">${i+1}</div>`; }).join('');
+    [...Array(days)].map((_,i)=>{ const iso=`${statMonth}-${pad(i+1)}`, on=S.days.includes(iso), at=attSet.has(iso);
+      return `<div class="c ${on?'on':''} ${at?'att':''} ${iso===todayISO()?'today':''}" role="img" aria-label="${m}월 ${i+1}일${on?' · 공부함':''}${at?' · 학원 출석':''}">${i+1}<span class="dmk" aria-hidden="true">${on?'<i></i>':''}${at?'<i class="at"></i>':''}</span></div>`; }).join('');
   const units = []; CONCEPTS.forEach(c => { const k = c.book+c.unit; let u = units.find(x=>x.k===k); if (!u){ u={k, book:c.bookName, unit:c.unit, name:c.unitName, total:0, done:0}; units.push(u); } u.total++; if (S.done.includes(c.id)) u.done++; });
   const monthDays = S.days.filter(d=>d.startsWith(statMonth)).length;
   v.innerHTML = `<button class="back" id="backMe3"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg>내 정보</button>
     <h1 class="h-page">학습 통계</h1>
-    <div class="tiles">
-      <div class="tile rtile">${rhythm(S.days, 'tile')}</div>
+    ${!S.days.length && !S.stats.a ? `<div class="empty" style="padding:28px 16px 32px">${eart('stats')}<b>아직 쌓인 기록이 없어요</b><p>개념 하나를 읽거나 문제를 풀면 날마다 여기에 쌓여요.</p></div>` : `<div class="tiles st2">
+      <div class="tile rhero">${rhythm(S.days, 'hero')}</div>
       <div class="tile"><div class="v">${S.done.length}<small>/${CONCEPTS.length}</small></div><div class="l">공부한 개념</div></div>
       ${S.stats.a ? `<div class="tile"><div class="v">${Math.round(S.stats.c/S.stats.a*100)}<small>%</small></div><div class="l">정답률 · ${S.stats.a}문제</div></div>` : `<div class="tile"><div class="v" aria-hidden="true">–</div><div class="l">아직 푼 문제가 없어요</div></div>`}
-    </div>
-    <div class="sec"><h2><span>학습 달력 · ${y}년 ${m}월</span><span><button class="more" data-mon="-1">‹</button> <button class="more" data-mon="1">›</button></span></h2>
+    </div>`}
+    <div class="sec"><h2><span>학습 달력 · ${y}년 ${m}월</span><span><button class="calnav" data-mon="-1" aria-label="지난달"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg></button><button class="calnav" data-mon="1" aria-label="다음 달"><svg viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg></button></span></h2>
       <div class="cal">${cal}</div>
-      <div class="legend"><span><i></i>공부한 날 ${monthDays}일</span>${S.auth?`<span><i class="att"></i>학원 출석 ${att.length}일${att.filter(a=>a.late).length?` · 지각 ${att.filter(a=>a.late).length}`:''}</span>`:''}</div></div>
-    <div class="sec"><h2>단원별 진도</h2>${units.map(u=>`<div class="bar-row"><span class="k">${esc(u.unit)}. ${esc(u.name)}<small>${esc(u.book)}</small></span><span class="bar"><i style="width:${Math.round(u.done/u.total*100)}%"></i></span><span class="v">${u.done}/${u.total}</span></div>`).join('')}</div>
+      <div class="legend"><span><i></i>공부한 날 ${monthDays}일</span>${S.auth && att.length?`<span><i class="at"></i>학원 출석 ${att.length}일${att.filter(a=>a.late).length?` · 지각 ${att.filter(a=>a.late).length}`:''}</span>`:''}</div></div>
+    ${(() => { const row = u => `<div class="bar-row"><span class="k">${esc(u.unit)}. ${esc(u.name)}<small>${esc(u.book)}</small></span><span class="bar"><i style="width:${Math.round(u.done/u.total*100)}%"></i></span><span class="v">${u.done}/${u.total}</span></div>`;
+      const go = units.filter(u => u.done), yet = units.filter(u => !u.done);   // 시작 전 단원은 한 줄로 접는다(docs/23 S12 — 빈 막대 여럿 대신)
+      return `<div class="sec"><h2>단원별 진도</h2>${go.map(row).join('')}${yet.length ? `<details class="qmore"><summary>아직 시작 전 · ${esc(yet[0].unit)}. ${esc(yet[0].name)}${yet.length > 1 ? ` 외 ${yet.length - 1}단원` : ''}</summary>${yet.map(row).join('')}</details>` : ''}</div>`; })()}
     ${(() => { const st = lessonStats(), lv = LESSONS.map(L => ({ L, v: masteryOf(L.id, st) })), cnt = MQ.map((_, i) => lv.filter(x => x.v === i).length);
       const ug = []; lv.forEach(x => { const k = x.L.book + x.L.unit; let g = ug.find(y => y.k === k); if (!g){ g = { k, L:x.L, xs:[] }; ug.push(g); } g.xs.push(x); });
       return `<div class="sec mqsec" id="mqSec"><h2><span>소단원 숙련도</span><span class="cnt">숙달 ${cnt[3]} · 능숙 ${cnt[2]} · 익숙 ${cnt[1]}</span></h2>
         ${ug.map(g => `<div class="mqrow"><span class="k">${esc(g.L.unit)}. ${esc(g.L.unitName)}<small>${esc(g.L.bookName)}</small></span><span class="mqs">${g.xs.map(x => mqBox(x.v, `${x.L.unit}-${x.L.id.slice(2)} ${x.L.name} · ${MQ[x.v]}`)).join('')}</span></div>`).join('')}
         ${mqLegend()}</div>`; })()}
-    ${(() => { const bh=S.bh||{}; const ids=Object.keys(bh); if (!ids.length) return ''; const per = LESSONS.map(L => { const qs = BANK.filter(q=>q.lessonId===L.id && bh[q.id]); return { L, n:qs.length, r:qs.filter(q=>bh[q.id]==='o').length }; }).filter(x=>x.n>0).sort((a,b)=>b.n-a.n).slice(0,8);
-      return `<div class="sec"><h2>문제 은행 · 소단원별 정답률</h2>${per.map(x=>`<div class="bar-row"><span class="k">${esc(x.L.unit)}-${x.L.id.slice(2)} ${esc(x.L.name)}<small>${esc(x.L.bookName)} · ${x.n}문제</small></span><span class="bar"><i style="width:${Math.round(x.r/x.n*100)}%"></i></span><span class="v">${Math.round(x.r/x.n*100)}%</span></div>`).join('')}</div>`; })()}
-    ${S.wrong.length || S.bm.length ? `<div class="sec"><h2>오답</h2><div class="kv"><span class="k">담긴 문제</span><span class="v">${S.wrong.filter(w=>!w.cleared).length}</span></div><div class="kv"><span class="k">다시 풀어 정리</span><span class="v">${S.wrong.filter(w=>w.cleared).length}</span></div><div class="kv"><span class="k">북마크</span><span class="v">${S.bm.length}</span></div></div>` : ''}
+    ${(() => { const bh=S.bh||{}; const ids=Object.keys(bh); if (!ids.length) return ''; const per = LESSONS.map(L => { const qs = BANK.filter(q=>q.lessonId===L.id && bh[q.id]); return { L, n:qs.length, r:qs.filter(q=>bh[q.id]==='o').length }; }).filter(x=>x.n>0).sort((a,b)=>a.r/a.n-b.r/b.n || b.n-a.n);   // 낮은 순 3줄 + 나머지는 '모두 보기'(docs/23 S12)
+      const row = x => `<div class="bar-row"><span class="k">${esc(x.L.unit)}-${x.L.id.slice(2)} ${esc(x.L.name)}<small>${esc(x.L.bookName)} · ${x.n}문제</small></span><span class="bar"><i style="width:${Math.round(x.r/x.n*100)}%"></i></span><span class="v">${Math.round(x.r/x.n*100)}%</span></div>`;
+      return `<div class="sec"><h2>문제 은행 · 소단원별 정답률</h2>${per.slice(0,3).map(row).join('')}${per.length > 3 ? `<details class="qmore"><summary>모두 보기 · ${per.length}개 소단원</summary>${per.slice(3).map(row).join('')}</details>` : ''}</div>`; })()}
+    ${S.wrong.length || S.bm.length ? `<div class="sec"><h2>오답</h2>${[['담긴 문제', S.wrong.filter(w=>!w.cleared).length], ['다시 풀어 정리', S.wrong.filter(w=>w.cleared).length], ['북마크', S.bm.length]].filter(r => r[1]).map(r => `<div class="kv"><span class="k">${r[0]}</span><span class="v">${r[1]}</span></div>`).join('')}</div>` : ''}
     <button class="btn" id="goReview">${S.stats.a ? '복습 시작' : '10문제로 시작해 볼까요?'}</button><p class="fine" style="padding-top:2px">${S.stats.a ? '배운 범위에서 섞어 나와요' : '배운 범위에서 섞어 나와요 · 틀려도 괜찮아요'}</p>`;
 }
 
@@ -5121,14 +5187,14 @@ function renderMe(){
         ${DBX.mode==='local' ? `<div class="demo">시연용 코드 — <code>MON123</code> 월목반 · <code>TUE456</code> 화금반 · <code>WED789</code> 수토반</div>` : ''}</div>` : ''}
     ${ACC && ACC.role==='parent' && !ACC.childCodes.length ? `<div class="codebox"><h3>자녀 연결</h3><p>자녀가 받은 학원 코드 6자리를 넣으면 출석·진도·공지를 볼 수 있어요.</p>
         <div class="f"><input id="childIn" class="code" placeholder="자녀 코드 6자리" maxlength="6" autocomplete="off" autocapitalize="characters"><button id="childGo">연결</button></div>${childErr?`<div class="err">${esc(childErr)}</div>`:''}</div>` : ''}
-    ${ACC && ACC.role!=='owner' && !a ? `<button class="setrow go" id="goPlans"><span class="l">이용권<small>${hasPass()?`${kdate(ACC.passUntil)}까지 · 연장하기`:'전 범위 열기 · 이용권 코드 등록'}</small></span><span class="v">보기</span></button>` : ''}
-    ${ACC ? `<button class="setrow go" id="nickOpen"><span class="l">이야기 닉네임<small>${ACC.nick ? esc(ACC.nick) : '아직 정하지 않았어요 · 글을 쓰려면 필요해요'}</small></span><span class="v">${ACC.nick?'바꾸기':'정하기'}</span></button>` : ''}
-    ${ACC && !isOwner() ? `<button class="setrow go" id="blockOpen"><span class="l">차단한 사용자<small>${(S.blocked||[]).length}명 · 이야기에서 보이지 않아요</small></span><span class="v">관리</span></button>` : ''}
-    <button class="setrow go" id="goHelp"><span class="l">마음이 힘들 때<small>24시간 상담 109 · 청소년 상담 1388</small></span><span class="v">보기</span></button>
-    <button class="setrow go" id="goNoteMe"><span class="l">공부 노트 · 달력<small>${liveNotes().length ? `노트 ${liveNotes().length}개 · 나만 봐요` : '오늘 공부한 내용을 정리하는 나만의 메모장'}</small></span><span class="v">열기</span></button>
-    <button class="setrow go" id="goStats"><span class="l">학습 통계<small>이번 주 ${weekCount(S.days)}일 · 공부한 개념 ${S.done.length}/${CONCEPTS.length} · 정답률 ${S.stats.a?Math.round(S.stats.c/S.stats.a*100):0}%</small></span><span class="v">보기</span></button>
-    ${a && ACC && ACC.role === 'student' ? `<button class="setrow go" id="guardSee"><span class="l">보호자에게 보이는 것<small>학원이 확인한 보호자 화면 · 미리 보기</small></span><span class="v">보기</span></button>` : ''}
-    <button class="setrow go" id="qKeepOpen"><span class="l">보관한 한 마디<small>${(S.qkeep||[]).length}개 · 오늘의 한 마디에서 담은 글</small></span><span class="v">보기</span></button>
+    ${ACC && ACC.role!=='owner' && !a ? `<button class="setrow go" id="goPlans"><span class="l">이용권<small>${hasPass()?`${kdate(ACC.passUntil)}까지 · 연장하기`:'전 범위 열기 · 이용권 코드 등록'}</small></span><span class="v"></span></button>` : ''}
+    ${ACC ? `<button class="setrow go" id="nickOpen"><span class="l">이야기 닉네임<small>${ACC.nick ? esc(ACC.nick) : '아직 정하지 않았어요 · 글을 쓰려면 필요해요'}</small></span><span class="v"></span></button>` : ''}
+    ${ACC && !isOwner() ? `<button class="setrow go" id="blockOpen"><span class="l">차단한 사용자<small>${(S.blocked||[]).length}명 · 이야기에서 보이지 않아요</small></span><span class="v"></span></button>` : ''}
+    <button class="setrow go" id="goHelp"><span class="l">마음이 힘들 때<small>24시간 상담 109 · 청소년 상담 1388</small></span><span class="v"></span></button>
+    <button class="setrow go" id="goNoteMe"><span class="l">공부 노트 · 달력<small>${liveNotes().length ? `노트 ${liveNotes().length}개 · 나만 봐요` : '오늘 공부한 내용을 정리하는 나만의 메모장'}</small></span><span class="v"></span></button>
+    <button class="setrow go" id="goStats"><span class="l">학습 통계<small>이번 주 ${weekCount(S.days)}일 · 공부한 개념 ${S.done.length}/${CONCEPTS.length} · 정답률 ${S.stats.a?Math.round(S.stats.c/S.stats.a*100):0}%</small></span><span class="v"></span></button>
+    ${a && ACC && ACC.role === 'student' ? `<button class="setrow go" id="guardSee"><span class="l">보호자에게 보이는 것<small>학원이 확인한 보호자 화면 · 미리 보기</small></span><span class="v"></span></button>` : ''}
+    <button class="setrow go" id="qKeepOpen"><span class="l">보관한 한 마디<small>${(S.qkeep||[]).length}개 · 오늘의 한 마디에서 담은 글</small></span><span class="v"></span></button>
     ${pauseNote()}
     <div class="sec"><h2>설정</h2>
       <div class="setrow"><span class="l">알림 받을 시각${S.nPause && S.notifyAt && S.notifyAt!=='안 받음' ? '<small>잠시 멈춤 · 시각을 다시 고르면 켜집니다</small>' : ''}</span><select class="sel" id="notifyAt" aria-label="알림 받을 시각">${['07:00','12:00','18:00','21:00','안 받음'].map(v=>`<option ${v===S.notifyAt?'selected':''}>${v}</option>`).join('')}</select></div>
@@ -5234,14 +5300,14 @@ function weekSummary(prog, ca){ const wk = weekDays(), mon = wk[0], p = prog || 
   const asg = (ca || []).filter(a => a.due >= mon && a.due <= wk[6] || (!a.submitted_at && a.due < mon && a.due >= addDays(mon, -7)));
   return { range:`${+mon.slice(5, 7)}/${+mon.slice(8)}–${+wk[6].slice(5, 7)}/${+wk[6].slice(8)}`, solved:cur.n, concepts, trend, again, asg }; }
 function weekSumRows(w){
-  const bars = w.trend.map(t => `<span class="tb ${t.now ? 'now' : ''}" aria-hidden="true"><span class="bt"><i style="height:${t.r == null ? 0 : Math.max(6, t.r)}%"></i></span><b>${t.r == null ? '–' : t.r}</b><small>${t.now ? '이번 주' : `${+t.a.slice(5, 7)}/${+t.a.slice(8)}`}</small></span>`).join('');
+  const bars = w.trend.map(t => `<span class="tb ${t.now ? 'now' : ''}" aria-hidden="true">${t.r == null ? '' : `<span class="bt"><i style="height:${Math.max(6, t.r)}%"></i></span><b>${t.r}</b>`}<small>${t.now ? '이번 주' : `${+t.a.slice(5, 7)}/${+t.a.slice(8)}`}</small></span>`).join('');
   const said = w.trend.map(t => `${t.now ? '이번 주' : `${+t.a.slice(5, 7)}월 ${+t.a.slice(8)}일 주`} ${t.r == null ? '푼 문제 없음' : t.r + '%'}`).join(', ');
   const done = w.asg.filter(a => a.submitted_at).length;
   return `<div class="wrow"><span class="wk">정답률 · 최근 4주</span><div class="tbars" role="img" aria-label="정답률 최근 4주: ${esc(said)}">${bars}</div></div>
-    <div class="wrow"><span class="wk">학원 과제</span>${w.asg.length ? `<span class="wv">${w.asg.length}개 중 <b>${done}개</b> 냈어요</span>
+    <div class="wrow"><span class="wk">학원 과제</span>${w.asg.length ? `<span class="wv">${done ? `${w.asg.length}개 중 ${done}개 냈어요` : `이번 주 과제 ${w.asg.length}개 · 아직 내기 전이에요`}</span>
       <div class="wasg">${w.asg.map(a => `<span class="wa"><span class="t">${esc(a.title)}</span><span class="cst ${a.submitted_at ? (a.late ? 'wait' : 'ok') : 'none'}">${a.submitted_at ? (a.late ? '늦게 냄' : '냄') : dLeft(a.due) < 0 ? '아직' : `${asgDueText(a.due)}`}</span></span>`).join('')}</div>` : `<span class="wv">이번 주에는 학원 과제가 없었어요</span>`}</div>
     <div class="wrow"><span class="wk">다음 주에 한 번 더 보면 좋은 곳</span>${w.again.length ? `<div class="wagain">${w.again.map(e => `<span class="wl">${esc(lessonLabel(e.l))}<small>다시 볼 문제 ${e.n}</small></span>`).join('')}</div>` : `<span class="wv">지금은 밀린 복습이 없어요</span>`}</div>
-    <p class="fine" style="text-align:left;padding:8px 2px 0">다른 학생과 견주지 않고, 이 학생의 한 주만 보여 드려요.${SRV && CFG.push ? ' 일요일 저녁에 알림으로도 보내 드려요.' : ''}</p>`; }
+    ${SRV && CFG.push ? `<p class="fine" style="text-align:left;padding:8px 2px 0">일요일 저녁에 알림으로도 보내 드려요.</p>` : ''}`; }
 async function renderParent(){
   const v = document.getElementById('v-parent');
   const pendHtml = ACC && (ACC.childPending||[]).length ? `<div class="consent" role="note"><div class="t">원장님 확인을 기다리고 있어요</div>
@@ -5269,14 +5335,15 @@ async function renderParent(){
   const lateN = month.filter(a=>a.late).length;
   v.innerHTML = `<h1 class="h-page">자녀</h1>${pendHtml}
     ${kids.length ? `<div class="chipbar" role="tablist" aria-label="자녀 고르기">${kids.map(k => `<button role="tab" aria-selected="${k.c===code}" data-kid="${esc(k.c)}" class="${k.c===code?'on':''}">${esc(k.s ? k.s.name : k.c)}</button>`).join('')}</div>` : ''}
-    <div class="pass"><span class="badge">${esc(CFG.academy)} · ${esc(st.cls)}</span><div class="who">${esc(st.name)} 학생</div><div class="where">수강 ${kdate(st.until)}까지 · 수업 시작 ${classStart(st.cls)}</div>
-      <dl><div class="row"><dt>오늘</dt><dd>${todayA ? `<b>${todayA.time} 출석</b>${todayA.late?' · 지각':''}` : offDay(st.cls) ? '수업 없는 날' : '아직 출석 전'}</dd></div>
-      <div class="row"><dt>이달</dt><dd>출석 <b>${month.length}일</b>${lateN?` · 지각 ${lateN}일`:''}</dd></div>
-      <div class="row"><dt>학습</dt><dd>개념 <b>${done}개</b> 공부${last?` · 마지막 ${kdate(last)}`:''}${prog&&prog.stats&&prog.stats.a?` · 지금까지 정답률 ${Math.round(prog.stats.c/prog.stats.a*100)}%`:''}</dd></div></dl></div>
-    <div class="sec pweek" id="weekSum"><h2><span>이번 주 요약</span><span class="wsd">${esc(wsum.range)}</span></h2>
-      <div class="week">${wk.map(x => `<div class="d ${x.st?'on':''} ${x.today?'today':''} ${x.later?'later':''}" aria-label="${kdate(x.iso)}${x.st?' 공부함':''}${x.at?' · 학원 출석':''}"><i>${+x.iso.slice(-2)}</i>${WD[wdOf(x.iso)]}${x.at?'<b class="att" aria-hidden="true"></b>':''}</div>`).join('')}</div>
+    <div class="phd"><b>${esc(st.name)} 학생</b> · ${esc(CFG.academy)} ${esc(st.cls)}<br>수강 ${kdate(st.until)}까지 · 수업 시작 ${classStart(st.cls)}<br>
+      오늘 ${todayA ? `${todayA.time} 출석${todayA.late?' · 지각':''}` : offDay(st.cls) ? '수업 없는 날' : '아직 출석 전'}${month.length ? ` · 이달 출석 ${month.length}일${lateN?` · 지각 ${lateN}일`:''}` : ''} · 개념 ${done}개 공부${last?` · 마지막 ${kdate(last)}`:''}
+      ${prog&&prog.stats&&prog.stats.a?`<details class="qmore"><summary>자세히</summary>지금까지 푼 ${prog.stats.a}문제 · 모든 답 기준 정답률 ${Math.round(prog.stats.c/prog.stats.a*100)}%(이번 주 정답률은 아래 요약에)</details>`:''}</div>
+    <div class="sec pweek phero" id="weekSum"><h2><span>이번 주 요약</span><span class="wsd">${esc(wsum.range)}</span></h2>
+      <b class="whl">${weekCount(days) ? `이번 주 ${weekCount(days)}일 공부했어요` : '이번 주는 아직 공부 기록이 없어요'}</b>
+      <p class="fine" style="text-align:left;padding:0 2px 12px">다른 학생과 견주지 않고, 이 학생의 한 주만 보여 드려요.</p>
+      <div class="week">${wk.map(x => `<div class="d ${x.st?'on':''} ${x.today?'today':''} ${x.later?'later':''}" role="img" aria-label="${kdate(x.iso)}${x.st?' · 공부함':''}${x.at?' · 학원 출석':''}"><i>${+x.iso.slice(-2)}<span class="dmk" aria-hidden="true">${x.st?'<i></i>':''}${x.at?'<i class="at"></i>':''}</span></i>${WD[wdOf(x.iso)]}</div>`).join('')}</div>
+      <div class="legend" style="margin:-4px 2px 12px"><span><i></i>앱으로 공부한 날</span><span><i class="at"></i>학원 출석</span></div>
       <div class="pstat"><div><b>${weekCount(days)}<small>/7일</small></b><span>공부한 날</span></div><div><b>${wsum.concepts}<small>개</small></b><span>공부한 개념</span></div><div><b>${wsum.solved}<small>문제</small></b><span>푼 문제</span></div></div>
-      <p class="fine" style="text-align:left;padding:8px 2px 2px">칸이 채워진 날은 앱으로 공부한 날, 아래 점은 학원에 출석한 날이에요.</p>
       ${weekSumRows(wsum)}
       ${tn ? `<div class="tchnote"><span class="tk">선생님 한 마디</span><p>${esc(tn)}</p></div>` : ''}
       <button class="tgl" id="wkPush" aria-pressed="${!(ACC && ACC.weeklyOff)}"><span class="sw" aria-hidden="true"></span><span>일요일 저녁 7시 이번 주 요약 알림 ${ACC && ACC.weeklyOff ? '끔' : '켬'}</span></button>
@@ -5358,10 +5425,10 @@ async function ownerTodo(st){
   const ios = /iphone|ipad/i.test(navigator.userAgent) ? '&' : '?';
   const act = r => r.ak ? `<button class="todo-act" data-asgrep="${esc(r.ak.id)}">과제 보기</button>` : r.nt ? (tel(r.s.phone) ? `<a class="todo-act" href="sms:${tel(r.s.phone)}${ios}body=${encodeURIComponent(`[${CFG.academy}] ${r.nt.t}${r.nt.d ? ' — ' + r.nt.d : ''}`)}">문자로 다시 알리기</a>` : `<button class="todo-act" data-adm="notice">공지 보내기</button>`)
     : `<button class="todo-act" data-stu="${esc(r.s.code)}">학생 보기</button>`;
-  return `<details class="stuedit todo" id="todoBox" ${todoOpen ? 'open' : ''}><summary>처리할 것 ${rows.length ? `<span class="cst wait">${rows.length}명</span>` : `<span class="none">· 오늘 챙길 학생이 없습니다</span>`}</summary>
+  return `<details class="stuedit todo" id="todoBox" ${todoOpen ? 'open' : ''}><summary>처리할 것 ${rows.length ? `<span class="cst wait">${rows.length}명</span>` : `<span class="none">· 오늘 챙길 학생이 없어요</span>`}</summary>
     ${rows.map(r => `<div class="todo-row"><span class="b"><span class="nm">${esc(r.s.name)}<small>${esc(r.s.cls)}</small></span><span class="why">${r.why.map(esc).join('<br>')}</span></span>${act(r)}</div>`).join('')}
     ${rows.length ? `<details class="whytodo"><summary>어떤 학생이 여기 뜨나요?</summary><p class="tip" style="margin:4px 0 0">출석했는데 7일 동안 앱 공부가 없는 학생 · 정답률이 지난주보다 ${TODO_DROP}점(100점 기준) 넘게 떨어진 학생 · 최근 공지를 안 읽은 학생 · 다시 볼 문제가 ${TODO_BACKLOG}개 넘게 밀린 학생 · 과제 마감이 지났는데 아직 안 낸 학생을 모읍니다.</p></details>`
-      : `<p class="tip" style="margin:0">출석·정답률·공지·밀린 복습·과제 마감을 날마다 살펴, 챙길 학생이 생기면 여기에 모읍니다.</p>`}</details>`; }   /* 할 일이 없는 날은 기준을 한 줄로(2026-10-07 7일 사용 점검: 빈 상자에 긴 설명만 펼쳐져 있었다) */
+      : `<div class="eempty">${eart('todo')}<span class="eb">날마다 살펴서 모아 드려요</span><p class="ep">출석·정답률·공지·밀린 복습·과제 마감을 보고, 챙길 학생이 생기면 여기에 모여요.</p></div>`}</details>`; }   /* 할 일이 없는 날은 기준을 한 줄로(2026-10-07 7일 사용 점검: 빈 상자에 긴 설명만 펼쳐져 있었다) */
 /* ═══ 원장 › 과제(벤치마크 ★4) — 공지와 같은 문법: 무엇을(종류·범위) → 누구에게(반·학생) → 언제까지(마감) → 내기 ═══
    소단원 문제는 낼 때 문항을 골라 모두 같은 문항을 푼다(많이 틀린 문항을 수업 시작 5분에 같이 보려고). '유형 전체'에는 서술형을 넣지 않고, '서술형'을 고르면 서술형만 낸다 — 학생이 써 본 뒤 모범 답안·채점 기준과 견주어 스스로 채점한다(쓴 글은 서버로 보내지 않는다) */
 let asgF = { kind:'bank', lesson:'', type:'전체', diff:'전체', n:10, unit:'', mock:'1', cls:'', pick:[], due:'' };
@@ -5950,7 +6017,7 @@ let sheetFrom = null;
 function openSheet(html){ const box = document.getElementById('sheet'); if (!box.innerHTML) sheetFrom = document.activeElement;
   box.innerHTML = `<div class="sheet-bg" id="sheetBg"><div class="sheet" role="dialog" aria-modal="true" tabindex="-1">` + `<div class="grab" aria-hidden="true"></div>${html}</div></div>`;
   const sh = box.querySelector('.sheet'), h = sh.querySelector('h3'); if (h){ h.id = 'sheetH'; sh.setAttribute('aria-labelledby', 'sheetH'); }
-  document.querySelector('.app')?.setAttribute('inert', '');
+  document.querySelector('.app')?.setAttribute('inert', ''); toastUp();
   setTimeout(() => { if (!sh.contains(document.activeElement)) (sh.querySelector('input,textarea,select') || sh).focus({ preventScroll:true }); }, 30); }
 function closeSheet(){ const box = document.getElementById('sheet'); if (!box.innerHTML) return; box.innerHTML=''; document.querySelector('.app')?.removeAttribute('inert');
   const f = sheetFrom; sheetFrom = null; if (f && document.contains(f)) f.focus({ preventScroll:true }); }
@@ -6008,12 +6075,12 @@ function fbFit(){ const fb = document.querySelector(`#v-${view} .verdict.fb`); i
 window.addEventListener('resize', () => fbFit());
 const reduceMotion = () => { try { return matchMedia('(prefers-reduced-motion: reduce)').matches; } catch { return false; } };
 /* 그린 뒤 한 번: 집중 모드 · 시트 높이 · 진행 막대(전 너비 → 새 너비, 300ms) · 점수 세기(600ms). 줄임 동작 설정이면 움직이지 않는다 */
-function afterDraw(){ syncFocus(); const v = document.getElementById('v-' + view); if (!v) return;
+function afterDraw(){ syncFocus(); toastUp(); const v = document.getElementById('v-' + view); if (!v) return;
   v.querySelectorAll('.pbar i[data-w]').forEach(i => { const w = i.dataset.w; i.removeAttribute('data-w'); requestAnimationFrame(() => requestAnimationFrame(() => { i.style.width = w + '%'; })); });
   v.querySelectorAll('.cu[data-to]:not([data-on])').forEach(countUp);
-  /* 해설이 시트 아래로 가려져 있으면 시트에 '해설 보기'를 띄운다 */
+  /* 해설이 있으면 시트에 '해설 보기'를 늘 띄운다(누르면 해설로 내려간다) */
   const ex = v.querySelector('.expl'), fx = v.querySelector('#fbExpl'), fb = v.querySelector('.verdict.fb');
-  if (ex && fx && fb) fx.hidden = ex.getBoundingClientRect().top < innerHeight - fb.offsetHeight - 24; }
+  if (ex && fx && fb) fx.hidden = false; }   // 해설은 늘 같은 자리 '해설 보기'로(docs/23 S3 · Duolingo 'Explain My Answer')
 function countUp(el){ el.dataset.on = '1'; const fin = el.dataset.to, to = parseFloat(fin), dec = fin.includes('.');
   if (reduceMotion() || !(to > 0)) return;
   const t0 = performance.now(), D = 600; el.textContent = '0';
@@ -6029,6 +6096,8 @@ function qtop(id, label, st, done, n, right){ let prog = '';
 /* 채점 시트 — 맞음/틀림 한 줄 + 한 마디 + 다음 버튼. 해설은 시트 위 본문에(길어도 '다음'이 화면 밖으로 밀리지 않게) */
 const IC_OK = '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path class="ck" d="M7.2 12.4l3.2 3.2 6.4-6.8"/></svg>';
 const IC_NO = '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M8.6 8.6l6.8 6.8M15.4 8.6l-6.8 6.8"/></svg>';
+/* 선지 표시 — 색에만 기대지 않게 정답은 체크, 내 답은 ✕ 아이콘을 글자 옆에(WCAG 1.4.1 · docs/23 S21) */
+const optMk = (cls, mk) => mk ? `<span class="mk">${cls === 'ok' ? `<span class="okm" aria-hidden="true">${IC_OK}</span>` : cls === 'bad' ? `<span class="okm nom" aria-hidden="true">${IC_NO}</span>` : ''}${mk}</span>` : '';
 function fbSheet(o){   // { ok:true|false|null, head, note(HTML), line(HTML), btns(HTML) }
   const cls = o.ok === true ? 'ok' : o.ok === false ? 'no' : 'mid';
   return `<div class="verdict fb ${cls}" role="status"><div class="fbh"><span class="fbi">${o.ok === false ? IC_NO : IC_OK}</span><div class="h" id="fbH">${o.head}</div><button class="fbx" id="fbExpl" hidden>해설 보기<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></button></div>
@@ -6128,6 +6197,7 @@ document.addEventListener('click', async e => {
   if (T('#bankTimed')){ S.bt = !S.bt; saveLocal(); if (!redrawBankSheet(T('#bankTimed'))){ renderBank(); document.getElementById('bankTimed')?.focus({ preventScroll:true }); } return; }
   /* 문제 은행 — 오늘 추천(히어로) · 직접 고르기(시트) */
   if (T('#bankRec')){ startRec(); return; }
+  const sq = T('[data-srsq]'); if (sq){ srsSheet(sq.dataset.srsq); return; }
   if (T('#fbExpl')){ const ex = document.querySelector(`#v-${view} .expl`); if (ex){ ex.scrollIntoView({ block:'start', behavior: reduceMotion() ? 'auto' : 'smooth' }); ex.setAttribute('tabindex', '-1'); ex.focus({ preventScroll:true }); T('#fbExpl').hidden = true; } return; }
   if (T('#bankCustom')){ openBankSheet(); return; }
   if (T('#labMore')){ labAll = !labAll; renderBank(); document.getElementById('labMore')?.focus({ preventScroll:true }); return; }
@@ -6469,7 +6539,7 @@ document.addEventListener('click', async e => {
   const bkt = T('[data-bkt]'); if (bkt){ const tp = tpToday(), i = +bkt.dataset.bkt; if (Array.isArray(tp.b)){ tp.b[i] = tp.b[i] ? 0 : 1; save(S); sheetBlank(); document.querySelector(`[data-bkt="${i}"]`)?.focus({ preventScroll:true }); } return; }
   if (T('#bkDone')){ closeSheet(); if (view === 'today'){ await renderToday(); document.querySelector('#v-today .ps.now button')?.focus({ preventScroll:true }); } return; }
   if (T('#pMiss')){ detailBack = 'today'; detailIdx = +T('#pMiss').dataset.i; show('detail'); return; }
-  if (T('#pfootGo')){ if (!ACC){ authMode = 'start'; show('auth'); return; } show('plans'); return; }
+  if (T('#pfootGo')){ show('plans'); return; }   // 손님도 이용권 화면으로(가입은 거기서) — 2026-10-13 검수 #34
   if (T('#goStats') || T('#goStatsRing')){ show('stats'); return; }
   if (T('#backMe3')){ show('me'); return; }
   if (T('#goReview')){ startReview(); return; }
@@ -6477,9 +6547,9 @@ document.addEventListener('click', async e => {
   const qpv = T('[data-qprev]'); if (qpv){ openQPreview(qpv.dataset.qprev); return; }
   if (T('#wsmsOpen')){ openWeekSms(T('#wsmsOpen').dataset.code); return; }
   if (T('#wsmsCopy')){ const t = document.getElementById('wsmsText').value; try { await navigator.clipboard.writeText(t); toast('복사했어요 · 카카오톡이나 문자에 붙여 보내 주세요'); } catch { const ta = document.getElementById('wsmsText'); ta.focus(); ta.select(); toast('글을 골라 두었어요 · 길게 눌러 복사해 주세요'); } return; }
-  if (T('#goPlans') || T('#goPlansPill') || T('#passNoteGo')){ if (!ACC){ authMode='start'; show('auth'); return; } show('plans'); return; }
+  if (T('#goPlans') || T('#goPlansPill') || T('#passNoteGo')){ show('plans'); return; }   // 손님이 알약을 눌러도 이용권 화면으로(검수 #34)
   if (T('#backToday')){ const m = qState&&qState.mode; qState=null; show(m==='review'?'stats':home()); return; }
-  if (T('#attOpen')){ openSheet(`<h3>출석 체크</h3><p>학원 입구 화면에 뜬 <b>4자리 숫자</b>를 치세요. 30초마다 바뀝니다.</p>
+  if (T('#attOpen')){ openSheet(`<h3>출석 체크</h3><p>학원 입구 화면에 뜬 <b>4자리 숫자</b>를 넣어 주세요. 30초마다 바뀌어요.</p>
       <div class="f"><input id="attIn" class="big" inputmode="numeric" maxlength="4" placeholder="0000"></div><div class="err" id="attErr" style="font-size:var(--t-cap);color:var(--no);margin:-4px 0 10px;font-weight:700"></div><button class="btn" id="attGo">출석</button>`);
     setTimeout(()=>document.getElementById('attIn')?.focus(), 50); return; }
   if (T('#attGo')){ const r = await DBX.markAttend(S.auth.code, (document.getElementById('attIn').value||'').trim());

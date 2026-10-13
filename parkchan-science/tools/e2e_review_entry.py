@@ -29,7 +29,7 @@ async def main():
         assert await pg.evaluate("todayISO()") == TODAY.isoformat()
         assert await pg.evaluate("(document.querySelector('#v-today .ps.now')||{}).id") == 'ps-read', '오늘은 아직 공부 전'
         assert await pg.locator('.asgcard').count() == 1 and '3/5' in await pg.locator('.asgcard').inner_text()
-        assert 'D-9' in await pg.locator('.passnote', has_text='중간고사').inner_text()
+        assert 'D-9' in await pg.locator('.exchip', has_text='중간고사').inner_text()
         assert await pg.evaluate("S.wrong.filter(w => !w.cleared).length") >= 5
         await pg.screenshot(path=f'{SC}/r1_student.png'); assert not errs, errs; await ctx.close()
         # 보호자

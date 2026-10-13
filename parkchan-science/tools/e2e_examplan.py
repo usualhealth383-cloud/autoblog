@@ -36,7 +36,7 @@ async def main():
         # 일정에 시험 넣기(UI) → 시트에 '시험까지 계획'
         await pg.evaluate("S.sched.events.push({ id:'ex1', date:addDays(todayISO(), 9), title:'2학기 중간고사', kind:'exam', from:'', memo:'', scope:{ book:'1' } }); save(S)")
         await pg.click('.tab[data-v="today"]'); await pg.wait_for_timeout(700)
-        note = await pg.locator('.passnote', has_text='중간고사').inner_text(); assert 'D-9' in note and '시험까지 계획' in note, note
+        note = await pg.locator('.exchip', has_text='중간고사').inner_text(); assert 'D-9' in note and '시험까지 계획' in note, note
         await pg.click('[data-eplan="ex1"]'); await pg.wait_for_timeout(500)
         sh = await pg.inner_text('.sheet'); assert '시험까지 계획' in sh and '오늘' in sh and '섞어 풀기 20문제' in sh and '약한 곳 I-02' in sh and '2학기 중간고사' in sh, sh
         rows = await pg.locator('.eplan li').count(); assert rows == 10, rows   # 9일 + 시험날
@@ -52,10 +52,10 @@ async def main():
             await pg.wait_for_timeout(200); await pg.click('#bankNext'); await pg.wait_for_timeout(200)
         assert await pg.evaluate("S.epd && S.epd.ex1") == await pg.evaluate("todayISO()"), '오늘 분량 끝이 남지 않음'
         await pg.click('#bankQuit2'); await pg.click('.tab[data-v="today"]'); await pg.wait_for_timeout(600)
-        assert '오늘 분량 끝났어요' in await pg.locator('.passnote', has_text='중간고사').inner_text()
+        assert '오늘 분량 끝났어요' in await pg.locator('.exchip', has_text='중간고사').inner_text()
         # 시험 15일 전이면 홈에 안 뜸
         await pg.evaluate("S.sched.events[S.sched.events.length-1].date = addDays(todayISO(), 15); save(S); renderToday()"); await pg.wait_for_timeout(400)
-        assert await pg.locator('.passnote', has_text='중간고사').count() == 0
+        assert await pg.locator('.exchip', has_text='중간고사').count() == 0
         assert not errs, errs
         print('EXAMPLAN OK'); await b.close()
 asyncio.run(main())
