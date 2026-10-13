@@ -2043,6 +2043,8 @@ function sanitizeMe(m){
   /* 조건 칩(diabetes 등)·easy·demo — 참/거짓 칸은 이름 꼴만 맞으면 둔다 */
   for (const [k, v] of Object.entries(o)) if (typeof v === 'boolean' && /^[a-z]{2,20}$/.test(k)) r[k] = v;
   r.age = ['adult', 'senior', 'child', 'teen'].includes(o.age) ? o.age : ME_DEF.age;
+  /* 10-14 현욱님 — 화면 보기(간단히·자세히). 고른 적이 없으면 비워 두고 viewMode() 가 나이·어르신 모드로 정한다 */
+  if (['simple', 'detail'].includes(o.view)) r.view = o.view;
   r.taking = ids(o.taking);
   r.sched = {}; for (const [k, v] of Object.entries(obj(o.sched))) if (SAFE_ID.test(k) && Array.isArray(v)) r.sched[k] = v.filter(t => typeof t === 'string' && SAFE_HM.test(t));
   for (const f of ['prn', 'short']) { r[f] = {}; for (const [k, v] of Object.entries(obj(o[f]))) if (SAFE_ID.test(k) && v) r[f][k] = typeof v === 'number' ? v : true; }
