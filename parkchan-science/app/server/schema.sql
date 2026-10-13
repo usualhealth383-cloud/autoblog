@@ -501,6 +501,8 @@ create or replace function redeem_pass(p_code text, p_child text default null) r
 declare p passes; base date; c text := upper(trim(coalesce(p_code, ''))); k text := upper(trim(coalesce(p_child, ''))); who uuid := auth.uid(); n int; kname text;
 begin
   if who is null then return json_build_object('ok', false, 'why', '로그인이 필요합니다.'); end if;
+  -- 만 14세 미만은 보호자 동의가 확인된 뒤에(법 22조의2 ②: 동의 전에는 법정대리인 성명·연락처만) — 2026-10-13 GPT 검수 #8
+  if not consent_ok() then return json_build_object('ok', false, 'consent', true, 'why', '보호자 동의가 확인된 뒤에 이용권을 등록할 수 있습니다.'); end if;
   if (select role from profiles where id = who) = 'parent' then
     if k = '' then
       select count(*), min(code) into n, k from guardian_links where uid = who and approved;
@@ -982,6 +984,7 @@ end $$;
 create or replace function register_push(p_token text, p_platform text) returns void language plpgsql security definer set search_path = public as $$
 begin
   if auth.uid() is null or coalesce(p_token, '') = '' then return; end if;
+  if not consent_ok() then return; end if;   -- 만 14세 미만은 보호자 동의가 확인된 뒤에 알림 기기를 등록(동의 전 수집 최소화)
   delete from push_tokens where token = p_token;
   insert into push_tokens(token, uid, platform) values (left(p_token, 400), auth.uid(), left(coalesce(p_platform, 'android'), 20));
   delete from push_tokens where uid = auth.uid() and token not in (select token from push_tokens where uid = auth.uid() order by at desc limit 5);   -- 한 사람 기기 5대까지
@@ -1649,6 +1652,7 @@ end $$;
 -- ═══ 크기·개수 한도(2026-10-01 점검: 로그인 없이 오류 기록을 무한히 넣어 DB 를 채우거나, 3MB 첨부·200,000자 닉네임이 들어갔다) ═══
 create or replace function private.errors_cap() returns trigger language plpgsql security definer set search_path = public as $$
 begin
+  if new.uid is not null and exists (select 1 from profiles where id = new.uid and under14 and not guardian_ok) then new.uid := null; end if;   -- 동의 전 아동의 오류 기록은 계정과 잇지 않는다
   if new.uid is not null and (select count(*) from client_errors where uid = new.uid and at > now() - interval '1 hour') >= 30 then return null; end if;
   if new.uid is null and (select count(*) from client_errors where uid is null and at > now() - interval '1 hour') >= 300 then return null; end if;
   if (select count(*) from client_errors where at > now() - interval '1 hour') >= 3000 then return null; end if;
