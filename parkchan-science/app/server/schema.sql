@@ -494,19 +494,35 @@ begin
 end $$;
 
 -- ═══ 이용권 ═══
-create or replace function redeem_pass(p_code text) returns json language plpgsql security definer set search_path = public, private as $$
-declare p passes; base date; c text := upper(trim(coalesce(p_code, '')));
+-- 보호자가 넣으면 자녀 계정에 붙는다(2026-10-13 GPT 검수 #36: 전에는 보호자 본인 계정에 붙어 자녀는 잠긴 채였음).
+-- p_child = 자녀 학원 코드(원장이 확인한 연결만). 확인된 자녀가 하나면 비워도 그 자녀, 둘 이상이면 골라야 한다.
+drop function if exists redeem_pass(text);
+create or replace function redeem_pass(p_code text, p_child text default null) returns json language plpgsql security definer set search_path = public, private as $$
+declare p passes; base date; c text := upper(trim(coalesce(p_code, ''))); k text := upper(trim(coalesce(p_child, ''))); who uuid := auth.uid(); n int; kname text;
 begin
-  if auth.uid() is null then return json_build_object('ok', false, 'why', '로그인이 필요합니다.'); end if;
+  if who is null then return json_build_object('ok', false, 'why', '로그인이 필요합니다.'); end if;
+  if (select role from profiles where id = who) = 'parent' then
+    if k = '' then
+      select count(*), min(code) into n, k from guardian_links where uid = who and approved;
+      if n = 0 then return json_build_object('ok', false, 'why', '원장님이 자녀 연결을 확인한 뒤에 등록할 수 있습니다.'); end if;
+      if n > 1 then return json_build_object('ok', false, 'pick', true, 'why', '어느 자녀에게 등록할지 골라 주세요.'); end if;
+    elsif not exists (select 1 from guardian_links where uid = who and code = k and approved) then
+      return json_build_object('ok', false, 'why', '원장님이 확인한 자녀 연결이 아닙니다.');
+    end if;
+    select id, name into who, kname from profiles where role = 'student' and student_code = k order by agreed_at desc nulls last limit 1;
+    if who is null then return json_build_object('ok', false, 'why', '자녀가 앱에 가입해 학원 코드를 연결한 뒤에 등록할 수 있습니다.'); end if;
+  elsif k <> '' then
+    return json_build_object('ok', false, 'why', '자녀에게 등록하는 것은 보호자 계정만 할 수 있습니다.');
+  end if;
   if private.too_many('pass', 10) then return json_build_object('ok', false, 'why', '코드를 여러 번 틀렸습니다. 1시간 뒤에 다시 시도해 주세요.'); end if;
   select * into p from passes where code = c for update;
   if not found then perform private.note('pass', false); return json_build_object('ok', false, 'why', '없는 이용권 코드입니다.'); end if;
   if p.used_by is not null then perform private.note('pass', false); return json_build_object('ok', false, 'why', '이미 사용된 코드입니다.'); end if;
-  select greatest(coalesce(pass_until, kst_today()), kst_today()) into base from profiles where id = auth.uid() for update;   -- 결제 반영과 동시에 와도 기간이 덮이지 않게
-  update profiles set pass_until = base + p.days where id = auth.uid();
-  update passes set used_by = auth.uid(), used_at = kst_today() where code = c;
+  select greatest(coalesce(pass_until, kst_today()), kst_today()) into base from profiles where id = who for update;   -- 결제 반영과 동시에 와도 기간이 덮이지 않게
+  update profiles set pass_until = base + p.days where id = who;
+  update passes set used_by = who, used_at = kst_today() where code = c;
   perform private.note('pass', true);
-  return json_build_object('ok', true, 'until', (base + p.days)::text);
+  return json_build_object('ok', true, 'until', (base + p.days)::text, 'for', kname);
 end $$;
 -- 스토어 결제 반영 — verify-purchase 함수(서비스 키)만 부른다. 같은 영수증은 두 번 반영하지 않는다
 create or replace function grant_purchase(p_uid uuid, p_token text, p_product text, p_order text, p_days int, p_raw jsonb) returns json
