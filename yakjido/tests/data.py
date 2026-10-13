@@ -405,6 +405,10 @@ for _base in (ROOT, ROOT.parent / 'docs' / 'yakjido'):
         for _k in set(re.findall(r'sb_publishable_[A-Za-z0-9_-]{10,}', _t)):
             if _k != _SHARED_PUB: fails.append(f'{_p.name} — 공용 키가 아닌 publishable 키가 들어 있습니다')
 
+# 약 화면 「같이 먹으면」 줄은 설명이 있어야 한다 — 10-13 검수: {with, what} 꼴 35줄이 화면에 빈 설명으로 나왔다(그리는 쪽은 note || what)
+for _d in D:
+    for _x in _d.get('interactions') or []:
+        if not (_x.get('note') or _x.get('what')): fails.append(f'약 {_d["id"]} 의 같이 먹으면 「{_x.get("with")}」 에 설명(note)이 없습니다')
 print(f'증상 {len(S)} · 약 {len(D)} · 계열 {len(K)} · 영양제 {len(SUP)} · 팁 {len(T)} · 그런줄 {len(_MY)} · 규칙 {len(IX["rules"])} · 출처 {len(SRC)}')
 if fails:
     print('실패', len(fails)); [print('  ✗', f) for f in fails]; sys.exit(1)
