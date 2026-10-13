@@ -7,7 +7,8 @@
 · 대상: 본책 book*/chapter-*/chapter.html 의 개념 본문·날개·보강·해설 문장 + data/concept_extras.json
 · 이미 조건이 붙은 문장(…에서는·…때·…경우·…무시하면·대략·보통·대부분)은 따로 표시해 뒤로 보낸다
 출력: review/단정-표현-점검.md (소단원별) · 마지막 줄 ABSOLUTE n
-사용: python3 tools/absolute_audit.py [소단원 코드 ...]
+사용: python3 tools/absolute_audit.py            (전체 → review/단정-표현-점검.md)
+      python3 tools/absolute_audit.py 1305 2104  (그 소단원만 화면에 — 보고서는 그대로)
 """
 import re, sys, glob, json, pathlib
 from bs4 import BeautifulSoup
@@ -61,6 +62,8 @@ for code in sorted(rows):
         t2 = ABS.sub(lambda m: f'〔{m.group(0)}〕', t)
         out.append(f'- {"**" if hard else ""}{t2}{"**" if hard else ""} · {src}')
     out.append('')
+if codes or '-h' in sys.argv or '--help' in sys.argv:   # 소단원만 볼 때는 화면에만 — 공용 보고서를 일부 목록으로 덮어쓰지 않게(2026-10-14 에이전트 4명이 덮어씀)
+    print('\n'.join(out)); sys.exit(0)
 OUT.write_text('\n'.join(out) + '\n', encoding='utf-8')
 print(f'{OUT.relative_to(ROOT)} — 소단원 {len(rows)} · 조건 없는 단정 {n} · 전체 {sum(len(set(v)) for v in rows.values())}')
 print(f'ABSOLUTE {n}')
