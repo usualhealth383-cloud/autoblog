@@ -96,6 +96,7 @@ if pages.exists():
         (pages / fn).write_text(PAGE.format(t=t, b=legal[k]), encoding='utf-8')
     # 보호자 동의 페이지(자녀가 보낸 링크로 열림) — 서버 연결값만 심는다
     (pages / 'guide.html').write_text((ROOT / 'app' / 'guide.html').read_text(encoding='utf-8').replace('<!--CONTACT-->', CONTACT), encoding='utf-8')   # 수강생·보호자 시작 안내(2026-10-08) — 문자로 링크만 보내면 된다
+    (pages / 'review.html').write_text((ROOT / 'app' / 'review.html').read_text(encoding='utf-8'), encoding='utf-8')   # 외부 검수 입구(2026-10-13) — 예시 기록은 tools/make_review_fixtures.py 가 review-fixtures.json 으로
     consent = (ROOT / 'app' / 'consent.html').read_text(encoding='utf-8').replace('__SB_URL__', cfg.get('url', '')).replace('__SB_KEY__', cfg.get('anonKey', ''))
     (pages / 'consent.html').write_text(consent, encoding='utf-8')
     print(f'배포본 → {pages}/index.html')

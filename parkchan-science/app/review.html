@@ -1,0 +1,112 @@
+<!DOCTYPE html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex"><title>검수 입구 · 박찬 과학</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700;900&display=swap">
+<style>
+:root{--brand:#147D6F;--brand-dark:#0F6357;--soft:#E7F5F1;--line:#D9E6E2;--paper:#FAF8F4;--ink:#1E2A2E;--body:#3A484D;--muted:#566268;--warn:#8A6408;--warn-soft:#FFF7E0}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:'Noto Sans KR',system-ui,-apple-system,'Apple SD Gothic Neo','Malgun Gothic',sans-serif;line-height:1.75;word-break:keep-all}
+main{max-width:720px;margin:0 auto;padding:28px 18px 60px}
+.hero{background:var(--brand);color:#fff;border-radius:18px;padding:24px 22px 20px;margin-bottom:20px}
+.hero h1{font-size:24px;margin:0 0 6px;line-height:1.35}.hero p{margin:0;font-size:15px;color:#fff;opacity:.94}
+h2{font-size:17px;margin:26px 0 10px}
+p,li{font-size:15px;color:var(--body);margin:0 0 8px}
+ul{padding-left:20px;margin:0 0 6px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}@media(max-width:560px){.grid{grid-template-columns:1fr}}
+.card{background:#fff;border:1px solid var(--line);border-radius:14px;padding:16px 18px;display:flex;flex-direction:column;gap:6px;min-width:0}
+.card h3{margin:0;font-size:16px}.card .who{font-size:13px;color:var(--muted)}
+.card ul{flex:1}.card li{font-size:14px;margin-bottom:4px}
+button{font:inherit}
+.go{min-height:48px;border:0;border-radius:12px;background:var(--brand);color:#fff;font-size:15px;font-weight:700;cursor:pointer;padding:0 14px}
+.go:focus-visible,.ghost:focus-visible{outline:3px solid var(--ink);outline-offset:2px}
+.ghost{min-height:44px;border:1.5px solid var(--line);border-radius:12px;background:#fff;color:var(--brand-dark);font-size:14px;font-weight:700;cursor:pointer;padding:0 14px}
+.note{background:var(--soft);border-radius:12px;padding:12px 14px;font-size:14px;color:var(--brand-dark)}
+.warn{background:var(--warn-soft);border-radius:12px;padding:12px 14px;font-size:14px;color:var(--warn)}
+table{width:100%;border-collapse:collapse;font-size:14px;background:#fff;border-radius:12px;overflow:hidden}
+th,td{border-bottom:1px solid var(--line);padding:9px 10px;text-align:left;vertical-align:top}th{color:var(--muted);font-weight:700;font-size:13px}
+code{font-family:ui-monospace,Menlo,monospace;font-size:13px;background:var(--soft);border-radius:6px;padding:1px 6px}
+.status{font-size:14px;color:var(--muted);min-height:1.6em}
+.tw{overflow-x:auto}
+footer{margin-top:34px;font-size:13px;color:var(--muted);border-top:1px solid var(--line);padding-top:14px}
+footer a{color:var(--brand-dark);margin-right:12px}
+</style></head>
+<body><main>
+<div class="hero"><h1>박찬 과학 · 하루 한 개념<br>검수 입구</h1>
+<p>9일 동안 써 본 예시 기록으로 앱을 엽니다. 기록 날짜는 오늘에 맞춰 옮겨지고, '오늘'은 아직 그날 공부를 하기 전 상태예요.</p></div>
+
+<p class="warn" id="realWarn" hidden>이 기기에 다른 기록이 있어요. 열기 전에 따로 보관해 두었다가, 아래 <b>원래 기록으로 되돌리기</b>로 돌아갈 수 있어요.</p>
+
+<h2>어떤 사람으로 볼까요?</h2>
+<div class="grid">
+  <div class="card"><h3>학생 · 학원 수강생</h3><span class="who">박○○ · 월목반 · 9일째</span>
+    <ul><li>오늘(홈) 하루 경로: 개념 읽기 → 빈칸 → 오늘의 문제 → 복습</li><li>문제 탭 추천 10문제 · 오답 · 교재 · 공부 노트 3개</li><li>학원 과제 3/5 · 중간고사 D-9 '시험까지 계획'</li></ul>
+    <button class="go" data-sc="student">학생으로 열기</button></div>
+  <div class="card"><h3>보호자</h3><span class="who">박○○ 학생의 보호자</span>
+    <ul><li>자녀 화면: 출석 · 이번 주 요약 · 선생님 한 마디</li><li>공지 · 학원 일정</li><li>노트·이야기 글은 보이지 않는 것이 맞아요</li></ul>
+    <button class="go" data-sc="parent">보호자로 열기</button></div>
+  <div class="card"><h3>원장</h3><span class="who">학원 운영 화면</span>
+    <ul><li>학생 · 출석(4자리 숫자) · 공지 · 과제 · 일정 · 이야기 · 통계 · 설정</li><li>처리할 것 · 과제 제출 현황 · 이번 주 요약 문자</li><li>통계 › 정답률이 낮은 문항</li></ul>
+    <button class="go" data-sc="owner">원장으로 열기</button></div>
+  <div class="card"><h3>처음 온 사람</h3><span class="who">로그인 전 · 기록 없음</span>
+    <ul><li>소개 3장 → 시작 화면</li><li>둘러보기(무료 범위) · 회원가입 화면</li><li>체험 기간 · 이용권 안내</li></ul>
+    <button class="go" data-sc="guest">처음 상태로 열기</button></div>
+</div>
+<p class="status" id="st" role="status" aria-live="polite"></p>
+<p><button class="ghost" id="restore" hidden>원래 기록으로 되돌리기</button></p>
+
+<h2>시연 계정(앱 안에서 바꿔 가며 볼 때)</h2>
+<div class="tw"><table><tr><th>역할</th><th>이메일</th><th>비밀번호</th></tr>
+<tr><td>학생</td><td><code>student@demo.kr</code></td><td><code>1234</code></td></tr>
+<tr><td>보호자</td><td><code>parent@demo.kr</code></td><td><code>1234</code></td></tr>
+<tr><td>원장</td><td><code>owner@parkchan.kr</code></td><td><code>2580</code></td></tr></table></div>
+<p class="note" style="margin-top:10px">로그인 화면 아래 <b>학생 · 보호자 · 원장</b> 단추를 누르면 위 계정이 채워져요. 이 시연판은 서버 없이 이 기기 안에서만 돌아가요(로컬 모드). 무엇을 해도 다른 사람에게 가지 않아요.</p>
+
+<h2>알아 두면 좋은 것</h2>
+<ul>
+<li>폰 크기(가로 390px 안팎)로 보는 것이 실제와 가까워요. 앱 안 <b>내 정보 › 글자 크기·화면 밝기</b>로 '크게'·'어두운 화면'도 볼 수 있어요.</li>
+<li>결제 화면은 웹판에선 안내만 나오고, 실제 결제는 안드로이드 앱(구글 플레이)에서만 돼요.</li>
+<li>푸시 알림·카메라 QR 출석·문자 보내기는 브라우저에서 동작이 제한돼요. 화면과 문구만 봐 주세요.</li>
+</ul>
+
+<footer><a href="./">앱 바로 열기</a><a href="guide.html">수강생 시작 안내</a><a href="privacy.html">개인정보처리방침</a><a href="https://github.com/usualhealth383-cloud/autoblog/blob/main/parkchan-science/docs/17-%EC%99%B8%EB%B6%80-%EA%B2%80%EC%88%98-%EC%95%88%EB%82%B4.md">검수 의뢰서</a></footer>
+</main>
+<script>
+(() => {
+  const BK = 'review.backup', st = document.getElementById('st');
+  const pcsKeys = () => { const k = []; for (let i = 0; i < localStorage.length; i++){ const x = localStorage.key(i); if (x && x.startsWith('pcs.')) k.push(x); } return k; };
+  const kst = () => new Date().toLocaleDateString('sv-SE', { timeZone:'Asia/Seoul' });
+  const dayDiff = (a, b) => Math.round((Date.parse(b + 'T00:00:00Z') - Date.parse(a + 'T00:00:00Z')) / 864e5);
+  const sh = (iso, n) => { const d = new Date(iso + 'T00:00:00Z'); if (isNaN(d)) return iso; d.setUTCDate(d.getUTCDate() + n); return d.toISOString().slice(0, 10); };
+  /* 기록 속 날짜를 모두 n일 옮긴다 — 'YYYY-MM-DD'(시각이 붙어도) · 날짜를 키로 쓰는 칸(날짜별 푼 수 등) · 밀리초 시각 숫자 */
+  const mon = iso => { const d = new Date(iso + 'T00:00:00Z'), w = (d.getUTCDay() + 6) % 7; return sh(iso, -w); };
+  let WK = null;   // 주 단위 칸(wk = 그 주 월요일, 선생님 한 마디): 기준일 주 → 오늘 주, k주 전 → 오늘 주의 k주 전
+  const shiftAll = (v, n) => {
+    if (typeof v === 'string') return v.replace(/\b(20\d\d)-(\d\d)-(\d\d)\b/g, m => sh(m, n));
+    if (typeof v === 'number') return v > 1.6e12 && v < 2.2e12 ? v + n * 864e5 : v;
+    if (Array.isArray(v)) return v.map(x => shiftAll(x, n));
+    if (v && typeof v === 'object'){ const o = {}; for (const [k, x] of Object.entries(v)) o[shiftAll(k, n)] = k === 'wk' && WK && typeof x === 'string' && /^\d{4}-\d\d-\d\d$/.test(x) ? sh(WK.now, -7 * Math.round(dayDiff(x, WK.base) / 7)) : shiftAll(x, n); return o; }
+    return v; };
+  const realData = () => pcsKeys().length && !localStorage.getItem('pcs.review');
+  const refresh = () => { document.getElementById('realWarn').hidden = !realData(); document.getElementById('restore').hidden = !localStorage.getItem(BK); };
+  refresh();
+  let FX = null;
+  const fx = async () => FX || (FX = await (await fetch('review-fixtures.json', { cache:'no-store' })).json());
+  document.addEventListener('click', async e => {
+    const b = e.target.closest('[data-sc]');
+    if (b){ const sc = b.dataset.sc; st.textContent = '예시 기록을 넣는 중이에요…';
+      try {
+        const f = await fx(), n = dayDiff(f.t0, kst()), role = f.roles[sc]; WK = { base:mon(f.t0), now:mon(kst()) };
+        if (!role) throw new Error('예시 기록이 없어요');
+        if (realData() && !localStorage.getItem(BK)){ const keep = {}; pcsKeys().forEach(k => keep[k] = localStorage.getItem(k)); localStorage.setItem(BK, JSON.stringify({ at:new Date().toISOString(), keep })); }
+        pcsKeys().forEach(k => localStorage.removeItem(k));
+        for (const [k, raw] of Object.entries(role)){ let val; try { val = JSON.stringify(shiftAll(JSON.parse(raw), n)); } catch { val = shiftAll(raw, n); } localStorage.setItem(k, val); }
+        localStorage.setItem('pcs.review', JSON.stringify({ sc, t0:f.t0, shift:n, at:new Date().toISOString() }));
+        if (sc === 'guest') localStorage.removeItem('pcs.v2');   // 처음 온 사람: 소개부터
+        st.textContent = '열고 있어요…'; location.href = './index.html';
+      } catch (err){ st.textContent = '열지 못했어요: ' + (err.message || err) + ' · 새로고침한 뒤 다시 눌러 주세요.'; }
+      return; }
+    if (e.target.closest('#restore')){
+      try { const bk = JSON.parse(localStorage.getItem(BK) || 'null'); pcsKeys().forEach(k => localStorage.removeItem(k));
+        if (bk && bk.keep) Object.entries(bk.keep).forEach(([k, v]) => localStorage.setItem(k, v));
+        localStorage.removeItem(BK); st.textContent = '원래 기록으로 되돌렸어요.'; refresh(); } catch (err){ st.textContent = '되돌리지 못했어요: ' + (err.message || err); } }
+  });
+})();
+</script>
+</body></html>

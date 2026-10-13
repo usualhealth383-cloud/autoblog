@@ -1914,6 +1914,7 @@ const DB = (() => {
     return a && a.role === 'owner' ? (v => v) : piiMask; };
   CLASSES_CACHE = d.classes.slice();
   const w = () => { try { localStorage.setItem(DBKEY, JSON.stringify(d)); } catch {} };
+  const fixNotes = () => { if (Array.isArray(d.notes)){ d.tnotes = (d.tnotes || []).concat(d.notes.filter(n => n && n.wk)); d.notes = {}; } if (!d.notes || typeof d.notes !== 'object') d.notes = {}; if (!Array.isArray(d.tnotes)) d.tnotes = []; };
   let sid = null; try { sid = localStorage.getItem('pcs.local.sid'); } catch {}
   const pub = a => a ? { weeklyOff:!!a.weeklyOff, id:a.id, email:a.email, role:a.role, name:a.name, phone:a.phone||'', studentCode:a.studentCode||'', childCodes:(a.childCodes||[]).slice(), childPending:(a.childPending||[]).slice(), childCode:(a.childCodes||[])[0]||'', passUntil:a.passUntil||'', nick:a.nick||'', under14:!!a.under14, guardian:a.guardian||'', guardianOk:!!a.guardianOk, guardianHow:a.guardianHow||'', guardianAt:a.guardianAt||'', talkUntil:a.talkUntil||'', created:a.created } : null;
   const me = () => d.accounts.find(a => a.id === sid) || null;
@@ -2138,8 +2139,9 @@ const DB = (() => {
     loadProgress: async key => stateOf(key),
     saveProgress: async (key, state) => { d.progress[key] = state; w(); },
     /* 공부 노트 — 계정별, 본인만 */
-    notesAll: async () => { const a = me(); return a ? ((d.notes||{})[a.id]||[]).map(n => ({ ...n, cids:(n.cids||[]).slice(), parts:(n.parts||[]).slice() })) : []; },
-    noteSave: async n => { const a = me(); if (!a) throw new Error('로그인이 필요합니다.'); d.notes ||= {}; const L = d.notes[a.id] ||= [];
+    /* 로컬 DB: 공부 노트 d.notes = { 계정id: [...] } · 선생님 한 마디 d.tnotes = [...] — 2026-10-13 둘이 같은 d.notes 를 써서(배열 ↔ 객체) 학생이 노트를 쓴 기기에선 한 마디가 안 남고, 한 마디가 먼저면 노트가 JSON 에서 사라지던 것 */
+    notesAll: async () => { const a = me(); fixNotes(); return a ? ((d.notes||{})[a.id]||[]).map(n => ({ ...n, cids:(n.cids||[]).slice(), parts:(n.parts||[]).slice() })) : []; },
+    noteSave: async n => { const a = me(); if (!a) throw new Error('로그인이 필요합니다.'); fixNotes(); const L = d.notes[a.id] ||= [];
       const r = { id:n.id, date:n.date, title:(n.title||'').slice(0,80), body:(n.body||'').slice(0,NOTE_MAX), cids:(n.cids||[]).slice(0,12),
         tpl:n.tpl||'', parts:(n.parts||[]).slice(0,4), mood:n.mood||'', grasp:n.grasp||0, at:n.at };
       const i = L.findIndex(x => x.id === n.id); if (i < 0) L.push(r); else L[i] = r; w(); },
@@ -2186,9 +2188,9 @@ const DB = (() => {
     /* 선생님 한 마디(2026-10-07) — 서버 note_set·note_get 과 같은 답. 그 주 월요일 기준 학생마다 한 줄(120자) */
     noteSet: async (code, body) => { if (!seeAll()) throw new Error('owner only'); const c = String(code||'').trim().toUpperCase(), b = String(body||'').trim(), wk = weekDays()[0];
       if (!d.students.some(x => x.code === c)) return { ok:false, why:'학생을 찾을 수 없습니다.' }; if (b.length > 120) return { ok:false, why:'한 마디는 120자까지예요.' };
-      d.notes = (d.notes||[]).filter(n => !(n.code === c && n.wk === wk)); if (b) d.notes.push({ code:c, wk, body:b, at:new Date().toISOString() }); w(); return b ? { ok:true } : { ok:true, cleared:true }; },
+      fixNotes(); d.tnotes = d.tnotes.filter(n => !(n.code === c && n.wk === wk)); if (b) d.tnotes.push({ code:c, wk, body:b, at:new Date().toISOString() }); w(); return b ? { ok:true } : { ok:true, cleared:true }; },
     noteGet: async code => { const a = me(), c = String(code||'').trim().toUpperCase(); if (!a || !(seeAll() || (a.role === 'student' && a.studentCode === c) || (a.role === 'parent' && (a.childCodes||[]).includes(c)))) return { ok:false };
-      const n = (d.notes||[]).find(x => x.code === c && x.wk === weekDays()[0]); return { ok:true, body: n ? n.body : null, at: n ? n.at : null }; },
+      fixNotes(); const n = d.tnotes.find(x => x.code === c && x.wk === weekDays()[0]); return { ok:true, body: n ? n.body : null, at: n ? n.at : null }; },
     childAssignments: async code => { const g = me(), c = String(code||'').trim().toUpperCase(); if (!g || g.role !== 'parent' || !(g.childCodes||[]).includes(c)) return { ok:false, why:'연결된 자녀가 아닙니다.' };
       const cut = addDays(todayISO(), -14);
       return { ok:true, list:(d.asg||[]).filter(a => a.codes.includes(c) && a.due >= cut).sort((p, q) => p.due < q.due ? -1 : 1).map(a => { const x = (d.subs||[]).find(y => y.aid === a.id && y.code === c) || {};
