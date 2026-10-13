@@ -74,5 +74,8 @@ jobs:
           for f in yakjido/tools/permits.json yakjido/tools/quasi.json; do [ -f "$f" ] && git add "$f"; done
           if git diff --cached --quiet; then echo "바뀐 것 없음"; exit 0; fi
           git commit -m "약지도 — 식약처 낱알식별·허가 목록 최신으로(OpenAPI 자동 받기)"
-          # 받는 동안(10~20분) 가지에 다른 커밋이 올라올 수 있다 — 받은 자료 커밋을 그 위로 옮겨 올린다
-          for i in 1 2 3; do git pull --rebase origin claude/medicine-recommendation-app-na6x0m && git push origin HEAD:claude/medicine-recommendation-app-na6x0m && break; sleep 5; done
+          # 받는 동안(10~20분) 가지에 다른 커밋이 올라올 수 있다 — 받은 자료 커밋을 그 위로 옮겨 올린다.
+          # 빌드가 바꾼 화면 파일(올리지 않는 것)은 버린 뒤에 당긴다 — 남아 있으면 rebase 가 거절하고 조용히 끝났다(10-14)
+          git reset -q --hard HEAD
+          ok=0; for i in 1 2 3; do if git pull --rebase origin claude/medicine-recommendation-app-na6x0m && git push origin HEAD:claude/medicine-recommendation-app-na6x0m; then ok=1; break; fi; sleep 5; done
+          [ "$ok" = 1 ] || { echo "::error::작업 가지에 올리지 못했습니다 — 실행 결과물 mfds-data 에 받은 자료가 있습니다"; exit 1; }

@@ -101,6 +101,7 @@ def pills(k):
             'cls': s(r.get('CLASS_NAME')), 'cvs': 1 if '안전상비' in kind else 0, 'sz': s(r.get('LENG_LONG')), 'seq': s(r.get('ITEM_SEQ')),
             'rx': 1 if kind.startswith('전문') else 0, 'ln': s(r.get('LINE_FRONT')).replace('-', ''),
             'ingr': mm.group(1) if mm and not mm.group(1).startswith('수출') else '',
+            'fm': s(r.get('FORM_CODE_NAME')),   # 제형(필름코팅정·경질캡슐제·연질캡슐제 …) — 낱알 검색 「겉모습」 거르기
         })
     seen, uniq = set(), []
     for x in out:   # 같은 품목이 두 번 오는 일이 있다
