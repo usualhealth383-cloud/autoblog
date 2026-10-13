@@ -109,9 +109,21 @@ for k, v in data.items():
 jc = json.dumps(core, ensure_ascii=False, separators=(',', ':'))
 j = json.dumps(inline, ensure_ascii=False, separators=(',', ':')).replace('</', '<\\/')
 stamp = datetime.date.today().isoformat()
+# 낱알식별(pills.json) 중 성분 칸이 빈 일반약을 «같은 품목기준코드(seq)»의 e약은요 성분으로 채운다 — 이름 짐작 없이 코드가 같을 때만.
+# 사진으로 담은 약의 겹침 판정(같은 성분 두 번)이 성분을 몰라 초록으로 나오던 것(2026-10-13 자체 검수 3-03). 다시 돌려도 같은 결과.
+_pd = ROOT.parent / 'docs' / 'yakjido' / 'data'
+if (_pd / 'pills.json').exists() and (_pd / 'easy-index.json').exists():
+    _seq = {x['seq']: x['i'] for x in json.loads((_pd / 'easy-index.json').read_text(encoding='utf-8')) if x.get('seq') and x.get('i')}
+    _pl = json.loads((_pd / 'pills.json').read_text(encoding='utf-8')); _n = 0
+    for _x in _pl:
+        if not _x.get('ingr') and _x.get('seq') in _seq: _x['ingr'] = '|'.join(_seq[_x['seq']]); _n += 1
+    if _n:
+        (_pd / 'pills.json').write_text(json.dumps(_pl, ensure_ascii=False, separators=(',', ':')), encoding='utf-8')
+        print(f'낱알 성분 채움 {_n}건(같은 품목기준코드)')
 jd = json.dumps(detail, ensure_ascii=False, separators=(',', ':'))
-# 본문 판(DATAV)은 core·detail 내용의 해시 — 같은 날 두 번 빌드해도 내용이 바뀌면 휴대폰이 새 본문을 받는다(2026-10-13 자체 검수 5-02)
-datav = hashlib.sha1((jc + jd).encode('utf-8')).hexdigest()[:10]
+# 본문 판(DATAV)은 core·detail·지연 로드 자료 내용의 해시 — 같은 날 두 번 빌드해도 내용이 바뀌면 휴대폰이 새 본문을 받는다(2026-10-13 자체 검수 5-02)
+_lazy = b''.join(f.read_bytes() for f in sorted((ROOT.parent / 'docs' / 'yakjido' / 'data').glob('*.json')) if f.name not in ('core.json', 'detail.json'))   # 지연 로드 자료도 바뀌면 판이 바뀐다(5-02)
+datav = hashlib.sha1((jc + jd).encode('utf-8') + _lazy).hexdigest()[:10]
 out = shell.replace('<!--DATA-->', j).replace('__BUILD__', stamp).replace('__DATAV__', datav)
 # 2026-10-13 상용화 점검 — 배포본에서는 «줄 전체가 주석»인 /* … */ 덩어리를 뺀다(원본은 그대로). 휴대폰마다 개발 메모 수백 개를 내려받던 것 —
 # 첫 화면 압축 225 → 192 KB. 줄 중간·코드 뒤의 주석은 건드리지 않는다(문자열 안일 수 있어서).

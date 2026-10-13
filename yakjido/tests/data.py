@@ -494,6 +494,11 @@ for _name in ('lexicon', 'qa', 'nutrients', 'brands', 'mixes'):
     _lz(json.loads(_raw), '', '')
     fails += [f'data/{_name}.json {b}' for b in _bad]
 
+# ⑥ 같은 것을 화면마다 다르게 부르지 않는다(2026-10-13 자체 검수 3-20) — 담는 곳은 「내 약통」, 술은 「술을 자주 마셔요」.
+_SHELL = (ROOT / 'app-shell.html').read_text(encoding='utf-8')
+for _old, _new in (('지금 먹는 약으로 등록', '내 약통에 담기'), ('먹는 약에 담기', '내 약통에 담기'), ('내 약에 담기', '내 약통에 담기'), ('약통에 넣기', '내 약통에 담기'), ('술을 자주 드세요', '술을 자주 마셔요')):
+    if _old in _SHELL: fails.append(f'app-shell.html 에 옛 이름 「{_old}」 — 「{_new}」로 통일')
+
 print(f'증상 {len(S)} · 약 {len(D)} · 계열 {len(K)} · 영양제 {len(SUP)} · 팁 {len(T)} · 그런줄 {len(_MY)} · 규칙 {len(IX["rules"])} · 출처 {len(SRC)}')
 if fails:
     print('실패', len(fails)); [print('  ✗', f) for f in fails]; sys.exit(1)
