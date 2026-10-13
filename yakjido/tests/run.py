@@ -227,7 +227,7 @@ CLASSFLAG_JS = """pairs=>{
   for (const d of (D.drugs||[])) {
     ME.taking=[d.id]; ME.pub={};
     const cls=new Set(); ixItems([]).forEach(it=>it.ings.forEach(e=>(e.cls||[]).forEach(c=>cls.add(c))));
-    const fl=new Set((d.avoid||[]).flatMap(a=>a.flags||[]));
+    const fl=new Set([...(d.avoid||[]), ...(d.caution||[])].flatMap(a=>a.flags||[]));   /* 금기(avoid)든 주의(caution)든 «경고가 달려 있으면» 됨 — 소염제+항응고제는 주의(현욱님 10-13 「금기까지는 아니지, 의사 먼저 상의」) */
     for (const [c,f] of pairs)
       if (cls.has(c) && !fl.has(f) && !(KEEP[d.id]||[]).includes(f)) out.push(d.id+' 에 '+f+' 가 없습니다('+c+' 계열)');
   }
