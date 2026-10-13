@@ -237,6 +237,25 @@ def kind(v):
     return 'noun'
 
 
+# 자동 빈칸 문항 가운데 무작위 오답 보기가 너무 엉뚱해 거저 풀리던 것 — 같은 갈래의 헷갈리는 말로 손수 바꾼다(문항 id·정답 자리는 그대로).
+# 2026-10-13 외부 검수 22번: '참값과 측정값의 차이' 빈칸에 거래·페르미·KRISS 가 나와 생각 없이 풀렸다.
+AUTO_CHOICES = {
+    '1103-b1-㉠': (['정밀도', '평균값', '어림'], {
+        '정밀도': '같은 양을 여러 번 쟀을 때 측정값들이 서로 가까운 정도다. 참값과의 차이가 아니다.',
+        '평균값': '여러 번 잰 값을 더해 횟수로 나눈 값이다. 오차를 줄이는 방법이지, 참값과 측정값의 차이가 아니다.',
+        '어림': '도구 없이, 또는 정확히 잴 수 없을 때 경험과 지식으로 양을 대략 헤아리는 것이다.'}),
+    # 같은 날 20번: 접두어 ㉢ 을 '한 칸 = 1000배'(㉠ 과 같은 답)에서 '0.5 mg = 500 μg' 환산으로 바꾸며, 오답도 환산 실수로
+    '1102-b4-㉡': (['10⁹', '10⁻⁶', '10⁻³'], {
+        '10⁹': '지수의 부호를 뒤집은 값이다. 나노는 작아지는 쪽이라 10<sup>−9</sup>이다.',
+        '10⁻⁶': '마이크로(μ)의 크기다. 나노는 그보다 한 칸(1000배) 더 작다.',
+        '10⁻³': '밀리(m)의 크기다. 나노는 그보다 두 칸(10<sup>6</sup>배) 더 작다.'}),
+    '1102-b4-㉢': (['50', '5000', '0.0005'], {
+        '50': '1 mg = 1000 μg이라 0.5 mg = 0.5 × 1000 = 500 μg이다. 100을 곱하면 안 된다.',
+        '5000': '0.5 × 1000 = 500이다. 1 mg = 10000 μg으로 잘못 잡은 값이다.',
+        '0.0005': '1000으로 나눈 값이다. 큰 단위(mg)를 작은 단위(μg)로 바꾸면 수는 커진다.'}),
+}
+
+
 def auto_from_lecture(concepts):
     """강의용 교재에서 자동 생성: 오해✗ 문장 → X, 진실✓ 문장 → O · 빈칸 ㉠㉡㉢ → 4지선다(같은 종류의 다른 빈칸 정답이 오답 보기)"""
     items = []
@@ -297,7 +316,9 @@ def auto_from_lecture(concepts):
                 near = [p[0] for p in pool if ok(p[0]) and p[1] == code] + [p[0] for p in pool if ok(p[0]) and p[2] == code[:2] and p[1] != code] + [p[0] for p in pool if ok(p[0]) and p[2] != code[:2]]
                 near = list(dict.fromkeys(near))
                 if len(near) < 3: break
-                ch = rnd.sample(near[:12], 3) + [v]; rnd.shuffle(ch)
+                ch = rnd.sample(near[:12], 3) + [v]; rnd.shuffle(ch)   # 손으로 고른 보기가 있어도 rnd 는 똑같이 돌린다(뒤 문항들의 보기가 바뀌지 않게)
+                hand = AUTO_CHOICES.get(f'{code}-b{no}-{k}')
+                if hand: ch = [x if x == v else hand[0][[y for y in ch if y != v].index(x)] for x in ch]   # 정답 자리는 그대로, 오답 셋만 바꾼다
                 # 해설: 답을 채운 원문 + 용어표 정의(없으면 개념 포인트) · 오답 보기: 그 말의 뜻이나 그 말이 원래 채우는 문장
                 d = term_def(bare, c)
                 explain = filled(c, k) + (f' — <b>{bare}</b>: {d}' if d else (' ' + c['point'] if c['point'] else ''))
@@ -305,7 +326,7 @@ def auto_from_lecture(concepts):
                 for j, b in enumerate(ch):
                     if b == v: continue
                     oc = origin.get(b); bb = bare_of(b)
-                    why = term_def(bb, oc[0] if oc else c) or (filled(*oc) if oc else '')
+                    why = (hand[1].get(b) if hand else '') or term_def(bb, oc[0] if oc else c) or (filled(*oc) if oc else '')
                     if why: wl.append(f'<b>{MARKS[j]}</b> {bb} — {why}')
                 items.append({'id': f'{code}-b{no}-{k}', 'lessonId': code, 'concept': no, 'step': 'auto', 'type': 'mc', 'stem': '빈칸에 들어갈 말은? ' + stem,
                               'source': '', 'choices': ch, 'answer': ch.index(v) + 1, 'explain': explain.strip(), 'wrong': ' '.join(wl), 'figure': '', 'difficulty': '●○○'})
