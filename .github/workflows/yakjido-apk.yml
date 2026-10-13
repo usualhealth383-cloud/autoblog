@@ -4,17 +4,26 @@ name: yakjido-apk
 # 약지도 앱 코드가 바뀌어 이 브랜치에 올라가면 돌고, Actions 탭에서 손으로도 돌릴 수 있다.
 # 결과물: 폰에서 바로 받는 고정 링크 — https://github.com/usualhealth383-cloud/autoblog/releases/download/yakjido-latest/yakjido.apk
 #         (실행 화면 아래 Artifacts → yakjido-apk 에도 같은 파일)
+#         이 시험판은 패키지 app.yakjido.test · 이름 「약지도 시험판」 — 스토어판(app.yakjido)과 따로 깔리는 별도 앱이다(10-13 점검 1-05).
 # 스토어 제출용 서명본은 Secrets 4개(YAKJIDO_KEYSTORE_B64 · _PASSWORD · _ALIAS · _KEY_PASSWORD)가 있을 때만 함께 만든다.
 on:
   workflow_dispatch: {}
   push:
     branches: [main, claude/medicine-recommendation-app-na6x0m]
+    # 앱 묶음(www)에 들어가는 것이 바뀌면 다시 만든다 — 계정 부품(srv.js)·처리방침·계정 지우기 쪽·그림 포함(2026-10-13 점검 1-21)
     paths:
       - 'yakjido/app-shell.html'
+      - 'yakjido/srv.js'
+      - 'yakjido/privacy.html'
+      - 'yakjido/delete-account.html'
+      - 'yakjido/manifest.webmanifest'
       - 'yakjido/content/**'
+      - 'yakjido/art/**'
+      - 'yakjido/icons/**'
       - 'yakjido/app-native/**'
       - 'yakjido/tools/build.py'
       - '.github/workflows/yakjido-apk.yml'
+      - '!yakjido/app-native/**/*.md'
 
 concurrency:
   group: yakjido-apk-${{ github.ref }}
@@ -99,7 +108,9 @@ jobs:
           NOTES="약지도 안드로이드 시험판 · 빌드 ${GITHUB_RUN_NUMBER} · $(date -u +%F) · ${GITHUB_SHA::7}
 
           설치: 이 페이지 아래 yakjido.apk 를 눌러 받고 → 열기 → (처음 한 번) 출처를 알 수 없는 앱 허용.
-          새 빌드는 옛 앱 위에 그대로 덮어 설치됩니다(기록 유지).
+          홈 화면 이름은 「약지도 시험판」입니다. 스토어판 약지도와는 따로 깔리는 별도 앱이라 서로 덮어쓰지 않습니다.
+          새 시험판은 옛 시험판 위에 그대로 덮어 설치됩니다(기록 유지).
+          2026-10-13 이전에 받은 시험판(이름 「약지도」)은 이 시험판과 다른 앱입니다 — 옛 앱의 내 정보 → 설정에 계정 칸이 있으면 거기서 메디나눔 계정에 이어 둔 뒤, 새 시험판에서 같은 계정으로 로그인하면 기록이 옮겨집니다.
           시험판입니다 — 스토어 배포본이 아닙니다."
           if gh release view yakjido-latest >/dev/null 2>&1; then
             gh release upload yakjido-latest yakjido.apk --clobber

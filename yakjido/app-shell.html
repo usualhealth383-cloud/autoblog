@@ -1710,8 +1710,58 @@ const icon = n => I[n] || I.pill;
 const ME_KEY = 'yakjido.me.v1';
 const ME_DEF = { child:null, age:'adult', pregnant:false, ulcer:false, kidney:false, liver:false, heart:false, asthma:false, anticoag:false, alcohol:false, gout:false, glaucoma:false, bph:false };
 let ME = { ...ME_DEF };
-try { ME = { ...ME_DEF, ...(JSON.parse(localStorage.getItem(ME_KEY) || '{}')) }; } catch (e) {}
-const saveMe = () => { try { localStorage.setItem(ME_KEY, JSON.stringify(ME)); } catch (e) {} };
+/* 2026-10-13 상용화 점검 — 기록의 «모양»을 들어올 때마다 바로잡는다(가져온 파일·서버에서 받은 것·옛 판 기록).
+   ① 모양이 틀린 파일 하나로 모든 화면이 오류가 되던 것(예: taking 이 글자) ② 일부러 만든 파일로 화면에 코드가 끼어들던 것
+   (약 id·시각·혈압 숫자가 onclick·화면에 그대로 들어간다) — id·시각·숫자는 정해진 꼴만 남기고 나머지는 버린다.
+   이 함수는 앱 맨 처음(날짜 도우미가 만들어지기 전)에도 불리므로 날짜 도우미를 안에 따로 둔다. */
+const SAFE_ID = /^[A-Za-z0-9가-힣_.:\-]{1,80}$/, SAFE_HM = /^([01]\d|2[0-3]):[0-5]\d$/, SAFE_DAY = /^\d{4}-\d{2}-\d{2}$/;
+function sanitizeMe(m){
+  const p2 = n => String(n).padStart(2, '0'), dk = d => `${d.getFullYear()}-${p2(d.getMonth() + 1)}-${p2(d.getDate())}`, hm = d => `${p2(d.getHours())}:${p2(d.getMinutes())}`;
+  const o = (m && typeof m === 'object' && !Array.isArray(m)) ? m : {};
+  const obj = x => (x && typeof x === 'object' && !Array.isArray(x)) ? x : {};
+  const num = (x, lo, hi) => { if (x === null || x === '' || typeof x === 'boolean') return null; const v = Number(x); return Number.isFinite(v) && v >= lo && v <= hi ? v : null; };
+  const str = (x, n) => typeof x === 'string' ? x.slice(0, n) : '';
+  const ids = a => Array.isArray(a) ? [...new Set(a.filter(x => typeof x === 'string' && SAFE_ID.test(x)))] : [];
+  const r = { ...ME_DEF };
+  for (const [k, v] of Object.entries(o)) if (typeof v === 'boolean' && /^[a-z]{2,20}$/.test(k)) r[k] = v;   /* 조건 칩(diabetes 등)·easy·demo — 참/거짓 칸은 이름 꼴만 맞으면 둔다 */
+  r.age = ['adult', 'senior', 'child', 'teen'].includes(o.age) ? o.age : ME_DEF.age;
+  r.taking = ids(o.taking);
+  r.sched = {}; for (const [k, v] of Object.entries(obj(o.sched))) if (SAFE_ID.test(k) && Array.isArray(v)) r.sched[k] = v.filter(t => typeof t === 'string' && SAFE_HM.test(t));
+  for (const f of ['prn', 'short']) { r[f] = {}; for (const [k, v] of Object.entries(obj(o[f]))) if (SAFE_ID.test(k) && v) r[f][k] = typeof v === 'number' ? v : true; }
+  r.taken = {}; for (const [d, v] of Object.entries(obj(o.taken))) if (SAFE_DAY.test(d) && Array.isArray(v)) r.taken[d] = v.filter(x => typeof x === 'string' && /^[A-Za-z0-9가-힣_.:\-]{1,80}@([01]\d|2[0-3]):[0-5]\d$/.test(x));
+  r.days = {}; for (const [d, v] of Object.entries(obj(o.days))) if (SAFE_DAY.test(d) && v && typeof v === 'object') { const n = num(v.n, 0, 200); const sl = {}; for (const [t, c] of Object.entries(obj(v.s))) if (SAFE_HM.test(t) && num(c, 0, 50) != null) sl[t] = Number(c); if (n != null) r.days[d] = { n, s: sl }; }
+  r.prnLog = {}; for (const [d, v] of Object.entries(obj(o.prnLog))) if (SAFE_DAY.test(d) && Array.isArray(v)) r.prnLog[d] = v.filter(x => x && SAFE_ID.test(x.id) && SAFE_HM.test(x.t)).map(x => ({ id: x.id, t: x.t, n: num(x.n, 0, 20) ?? 1 }));
+  r.prnQty = {}; for (const [k, v] of Object.entries(obj(o.prnQty))) if (SAFE_ID.test(k) && num(v, 0, 20) != null) r.prnQty[k] = Number(v);
+  r.stock = {}; for (const [k, v] of Object.entries(obj(o.stock))) if (SAFE_ID.test(k) && v && num(v.left, 0, 10000) != null) r.stock[k] = { left: Number(v.left), at: SAFE_DAY.test(v.at) ? v.at : dk(new Date()) };
+  r.vitals = (Array.isArray(o.vitals) ? o.vitals : []).map(x => { if (!x || !['bp', 'bg'].includes(x.k)) return null;
+    const t = typeof x.t === 'number' ? dk(new Date(x.t)) + 'T' + hm(new Date(x.t)) : (typeof x.t === 'string' && /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/.test(x.t) ? x.t : null); if (!t) return null;
+    const w = str(x.w, 10);
+    if (x.k === 'bp') { const s2 = num(x.s, 40, 300), d2 = num(x.d, 20, 200); if (s2 == null || d2 == null) return null; const pl = num(x.p, 20, 250); return { t, k:'bp', s: s2, d: d2, ...(pl != null ? { p: pl } : {}), w }; }
+    const v2 = num(x.v, 10, 1000); return v2 == null ? null : { t, k:'bg', v: v2, w }; }).filter(Boolean).slice(-400);
+  r.vitalRemind = {}; for (const [k, v] of Object.entries(obj(o.vitalRemind))) if (['bp', 'bg'].includes(k) && Array.isArray(v)) r.vitalRemind[k] = v.filter(t => typeof t === 'string' && SAFE_HM.test(t));
+  r.visits = (Array.isArray(o.visits) ? o.visits : []).filter(v => v && /^[A-Za-z0-9_-]{1,40}$/.test(v.id) && /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/.test(v.at)).map(v => ({ id: v.id, at: v.at, where: str(v.where, 30) })).slice(-50);
+  r.ae = (Array.isArray(o.ae) ? o.ae : []).filter(x => x && typeof x.id === 'string' && SAFE_ID.test(x.id)).map(x => ({ id: x.id, n: str(x.n, 80), at: str(x.at, 30), t: str(x.t, 200) })).slice(0, 50);
+  r.worked = {}; for (const [k, v] of Object.entries(obj(o.worked))) if (SAFE_ID.test(k)) { const a = ids(v); if (a.length) r.worked[k] = a; }
+  r.pub = {}; for (const [k, v] of Object.entries(obj(o.pub))) if (/^pub:[A-Za-z0-9_-]{1,40}$/.test(k) && v && typeof v === 'object') r.pub[k] = { name: str(v.name, 80), full: str(v.full, 120), ingr: str(v.ingr, 200), rx: str(v.rx, 20), seq: str(String(v.seq ?? ''), 40), drugId: (typeof v.drugId === 'string' && SAFE_ID.test(v.drugId)) ? v.drugId : '', ...(v.manual ? { manual: true } : {}) };
+  const c = obj(o.child); r.child = o.child && typeof o.child === 'object' ? { name: str(c.name, 20), birth: SAFE_DAY.test(c.birth) ? c.birth : '', weight: num(c.weight, 1, 150) ?? '' } : null;
+  const sw = obj(o.sw); if (Object.keys(sw).length) r.sw = { a: str(sw.a, 10), s: str(sw.s, 2) };
+  r._mt = {}; for (const [k, v] of Object.entries(obj(o._mt))) if (num(v, 0, 9e15) != null) r._mt[k] = Number(v);
+  r.taking = r.taking.filter(id => !id.startsWith('pub:') || r.pub[id]);
+  return r;
+}
+function loadMe(raw){ let j = {}; try { j = JSON.parse(raw || '{}'); } catch (e) { j = {}; } return sanitizeMe(j); }
+ME = loadMe((() => { try { return localStorage.getItem(ME_KEY); } catch (e) { return null; } })());
+/* 2026-10-13 상용화 점검 — 두 폰 동기화: 기록 전체가 한 덩어리라 서로 덮었다. 칸마다 «마지막으로 바뀐 때»(_mt)를 적어 두고 합칠 때 쓴다. */
+let ME_SNAP = {};
+const saveMe = () => { try {
+  const now = Date.now(); ME._mt = ME._mt || {};
+  for (const k of Object.keys(ME)) { if (k === '_mt') continue; const j = JSON.stringify(ME[k]); if (ME_SNAP[k] !== undefined && ME_SNAP[k] !== j) ME._mt[k] = now; ME_SNAP[k] = j; }
+  for (const k of Object.keys(ME_SNAP)) if (!(k in ME)) { ME._mt[k] = now; delete ME_SNAP[k]; }
+  localStorage.setItem(ME_KEY, JSON.stringify(ME));
+} catch (e) { if (!saveMe.warned) { saveMe.warned = true; try { toast('저장하지 못했어요 — 휴대폰 저장 공간을 확인해 주세요'); } catch (e2) {} } } };
+function snapMe(){ ME_SNAP = {}; for (const k of Object.keys(ME)) if (k !== '_mt') ME_SNAP[k] = JSON.stringify(ME[k]); }
+snapMe();
+/* 두 폰 합치기(mergeMe)는 동기화 때만 쓰여 srv.js 에 있다(첫 화면 예산) */
 const FLAG_LABEL = { pregnant:'임신·수유 중', ulcer:'위궤양·위장출혈 병력', kidney:'신장 질환', liver:'간 질환·음주', heart:'심장·혈관 질환', asthma:'천식', anticoag:'항응고제·항혈소판제 복용', alcohol:'술을 자주 마심', gout:'통풍', glaucoma:'녹내장', bph:'전립선비대', diabetes:'당뇨', senior:'65세 이상', child:'소아' };
 /* 「이 약, 효과 봤어요」 — 증상마다 내가 효과 본 약을 기억해 둔다.
    현욱님 지시(2026-09-17): 다음에 같은 증상이 오면 지난번에 들었던 약부터 보여 준다.
@@ -1786,7 +1836,7 @@ function doseHome(){
       ${low.length ? `<div class="dh-low">${I.alert}<span><b>곧 떨어져요</b> — ${low.map(x => esc(x.n) + ' ' + x.days + '일치').join(' · ')}</span></div>` : ''}
     </div></section>`;
 }
-function activeFlags(){ const f = Object.keys(ME).filter(k => k !== 'age' && k !== 'taking' && k !== 'child' && ME[k] === true); if (ME.age === 'senior') f.push('senior'); if (ME.age === 'child') f.push('child'); return f; }
+function activeFlags(){ const f = Object.keys(FLAG_LABEL).filter(k => k !== 'senior' && k !== 'child' && ME[k] === true);   /* 2026-10-13 — 어르신 모드(easy)·둘러보기(demo) 같은 참/거짓 칸이 「조건」으로 세져 약사 카드에 빈칸·「easy」가 찍히던 것 */ if (ME.age === 'senior') f.push('senior'); if (ME.age === 'child') f.push('child'); return f; }
 
 /* 비교 바구니 */
 let CMP = [];
@@ -3085,7 +3135,7 @@ function memoText(s){
   const items = basket(s).map(x => x.blocked ? `${x.slot}: ${x.d.name}은(는) 내 상태(${activeFlags().map(k => FLAG_LABEL[k] || k).join('·')})에 주의 — 약사와 상의` : `${x.optional ? '(필요 시) ' : ''}${x.d.name}${x.product ? ' — 예: ' + x.product : ''}`);
   return `[약지도] ${s.name}\n${items.map(t => '· ' + t).join('\n')}\n${s.pharmacy?.[0] ? '\n' + s.pharmacy[0].replace(/\*\*/g, '') : ''}\n\n소염제는 한 가지만 · 아세트아미노펜 하루 4 g 이내`;
 }
-async function shareMemo(id){ const s = byId(D.symptoms, id); const t = memoText(s); try { if (navigator.share) { await navigator.share({ title: '약국 메모 · ' + s.name, text: t }); return; } } catch (e) { return; } try { await navigator.clipboard.writeText(t); toast('약국 메모를 복사했어요'); } catch (e) { prompt('복사해서 쓰세요', t); } }
+async function shareMemo(id){ const s = byId(D.symptoms, id); const t = memoText(s); try { if (await shareOut({ title: '약국 메모 · ' + s.name, text: t })) return; } catch (e) { return; } try { await navigator.clipboard.writeText(t); toast('약국 메모를 복사했어요'); } catch (e) { prompt('복사해서 쓰세요', t); } }
 function prodSeq(name){ return D.productImages?.[name]?.seq || ''; }
 /* 회수 공지 — tools/mfds_recalls.py 가 식약처 «회수·폐기» 목록을 품목코드로 받아 둔 것(content/recalls.json).
    회수는 «특정 제조번호»만이라 제품에 빨간 딱지를 붙이지 않는다. 제조번호를 적어 «집에 있는 약을 확인»하게 한다. */
@@ -3855,6 +3905,8 @@ async function showNote(title, body, key){
    · 정확한 시각 권한이 없으면 휴대폰이 몇 분 늦게 울릴 수 있다 — 설정 화면을 억지로 띄우지 않고 알림 방법 카드에 단추로만 둔다. */
 const CAPX = window.Capacitor, NATIVE = !!(CAPX && CAPX.isNativePlatform && CAPX.isNativePlatform());
 const plug = n => (NATIVE && CAPX.Plugins && CAPX.Plugins[n]) || null;
+/* 2026-10-13 상용화 점검 — 설치 앱(웹뷰)에는 navigator.share 가 없어 「보내기」가 늘 복사로만 빠졌다. 앱에서는 Share 플러그인으로 공유 창을 연다. 취소하면 throw(부르는 쪽 try 가 받음). */
+async function shareOut(o){ const SH = plug('Share'); if (SH) { await SH.share({ title:o.title, text:o.text, dialogTitle:'어디로 보낼까요' }); return true; } if (navigator.share) { await navigator.share(o); return true; } return false; }
 let NATIVE_PERM = 'prompt', NATIVE_EXACT = 'granted', NATIVE_READY = null;
 async function nativeSetup(){
   const LN = plug('LocalNotifications'); if (!LN) return;
@@ -3981,6 +4033,15 @@ function icsText(){
    설치형·웹에서는 예전 방식이 맞다. 그래서 두 길을 다 두고 되는 쪽으로 보낸다.
    (2026-09-22 — 아티팩트에서 「파일로 받기」가 죽어 있는 것을 발행 경고로 알았다) */
 async function saveFile(name, data, mime){
+  /* 2026-10-13 상용화 점검 — 설치 앱 웹뷰에는 내려받기 처리기가 없어 「파일로 받기」가 아무 일도 안 하면서 「받았어요」를 띄웠다(폰 바꿀 때 기록을 잃는 길).
+     앱에서는 파일을 만들어 공유 창으로 넘긴다 — 드라이브·카카오톡·내 파일에 저장 */
+  const FS = plug('Filesystem'), SH = plug('Share');
+  if (NATIVE) {
+    if (!FS || !SH) { toast('이 판에서는 파일로 받을 수 없어요 — 앱을 최신판으로 바꿔 주세요'); return false; }
+    try { const r = await FS.writeFile({ path:name, data, directory:'CACHE', encoding:'utf8' });
+      await SH.share({ title:name, files:[r.uri], dialogTitle:'어디에 저장할까요' }); return true; }
+    catch (e) { if (!/cancel/i.test(String(e && (e.message || e)))) toast('파일을 만들지 못했어요 — 잠시 뒤 다시 해 주세요'); return false; }
+  }
   try {
     const dl = await window.claude?.use?.('downloads');
     if (dl) { await dl.save({ filename: name, data }); return true; }
@@ -4024,7 +4085,7 @@ function careReport(){
 async function sendCare(){
   const text = careReport();
   try {
-    if (navigator.share) { await navigator.share({ title: '오늘 약', text }); return; }
+    if (await shareOut({ title: '오늘 약', text })) return;
   } catch (e) { if (e && e.name === 'AbortError') return; }
   try { await navigator.clipboard.writeText(text); toast('복사했어요 — 카카오톡이나 문자에 붙여 넣으세요'); }
   catch (e) { prompt('아래 내용을 복사해서 보내세요', text); }
@@ -4175,7 +4236,7 @@ function demoFill(){
 }
 function demoClear(){ ME = { ...ME_DEF }; saveMe(); try { armNotifications(); } catch (e) {} toast('예시를 지웠어요'); go('/home'); }
 function vDemo(_, q){
-  const has = (ME.taking || []).length && !ME.demo;
+  const has = !ME.demo && ((ME.taking || []).length || (ME.vitals || []).length || (ME.visits || []).length || (ME.ae || []).length || activeFlags().length);   /* 약이 없어도 혈압·예약·조건이 있으면 덮기 전에 묻는다 */
   if (q && q.go === '1' || !has) { if (!ME.demo) demoFill(); }
   else return `${topBar({ back:'홈' })}<h1>둘러보기</h1><section class="sec card"><p>지금 이 휴대폰에 드시는 약 기록이 있어요. 예시로 바꾸면 <b>지금 기록을 덮어써요.</b></p>
     <div class="actions" style="margin-top:12px"><button class="btn" onclick="if(confirm('지금 기록을 예시로 덮어쓸까요? 되돌릴 수 없어요.')){demoFill();route()}">예시로 바꾸기</button><button class="btn ghost" onclick="go('/home')">그대로 두기</button></div></section>`;
@@ -4355,7 +4416,7 @@ function vVitals(){
   ${k === 'bp' && NATIVE ? `<section class="sec card"><div class="toggle"><div class="t"><b>혈압 재기 알림</b><span>${((ME.vitalRemind || {}).bp || []).length ? '아침 7:30 · 저녁 9:00 — 켜져 있어요' : '매일 아침·저녁 잴 시간을 알려 드려요'}</span></div><button class="btn ghost" style="width:auto;min-height:46px;padding:0 14px" onclick="vitalRemindToggle()">${((ME.vitalRemind || {}).bp || []).length ? '끄기' : '켜기'}</button></div></section>` : ''}
   <section class="sec card"><h2>적은 기록 <small>${mine.length}번</small></h2>
     ${mine.length ? `<div class="vt-list">${mine.slice(0, 30).map(x => `<div class="vt-li"><span class="vt-t">${x.t.slice(5, 10).replace('-', '/')} <small>${x.t.slice(11)} · ${esc(x.w || '')}</small></span><b>${k === 'bp' ? `${x.s}/${x.d}<small> mmHg${x.p ? ` · 맥박 ${x.p}` : ''}</small>` : `${x.v}<small> mg/dL${bgTag(x)}</small>`}</b><button class="vt-x" onclick="vitalDel(${x.i})" aria-label="이 기록 지우기">${I.x}</button></div>`).join('')}</div>` : `<div class="empty"><b>아직 적은 기록이 없어요</b>위에서 한 번 적어 보세요.</div>`}
-    ${mine.length ? `<div class="actions" style="margin-top:12px"><button class="btn line" onclick="window.print()">${I.book} 진료 때 보여 드리기(인쇄·PDF)</button></div>` : ''}
+    ${mine.length && !NATIVE ? `<div class="actions" style="margin-top:12px"><button class="btn line" onclick="window.print()">${I.book} 진료 때 보여 드리기(인쇄·PDF)</button></div>` : ''}
   </section>
   <details class="why-more sec" ${vitals().filter(x => x.k === k).length < 3 || VT.alert === 'bp-first' ? 'open' : ''}><summary>${k === 'bp' ? '혈압, 바르게 재는 법' : '혈당, 언제 재고 어떻게 볼까요'}</summary>
     ${k === 'bp' ? `<ul class="how-list">
@@ -5562,7 +5623,7 @@ async function doSend(){
     } catch (e) { toast('링크를 만들지 못해 글로 보내요'); }
   }
   const t = sendText(items, label, note, link);
-  try { if (navigator.share) { await navigator.share({ title: '약지도 · 약 좀 사 주세요', text: t }); return; } } catch (e) { return; }
+  try { if (await shareOut({ title: '약지도 · 약 좀 사 주세요', text: t })) return; } catch (e) { return; }
   try { await navigator.clipboard.writeText(t); toast('복사했어요 — 카카오톡이나 문자에 붙여 넣으세요'); } catch (e) { prompt('아래 내용을 복사해 보내세요', t); }
 }
 /* 부모님 화면 — 큰 글씨, 약 사진, «약사님께 보여 주세요», 근처 약국 */
@@ -5641,7 +5702,7 @@ function vBag(){
   ${adhCard()}
   ${vitalsCard()}
   ${nextVisit() ? `<p class="small muted" style="margin-top:10px">다음 진료 — ${esc(visitWord(nextVisit()))}</p>` : ''}
-  <div class="actions"><button class="btn ghost" onclick="shareBag()">${I.cart} 메모로 복사·전송</button><button class="btn ghost" onclick="window.print()">${I.book} 종이로 뽑기</button><button class="btn ghost" onclick="go('/together')">${I.shield} 자세한 판정 보기</button></div>
+  <div class="actions"><button class="btn ghost" onclick="shareBag()">${I.cart} 메모로 복사·전송</button>${NATIVE ? '' : `<button class="btn ghost" onclick="window.print()">${I.book} 종이로 뽑기</button>`}<button class="btn ghost" onclick="go('/together')">${I.shield} 자세한 판정 보기</button></div>
   <details class="why-more" style="margin-top:12px"><summary>병원·약국에서 받은 약까지 한 번에 보려면 — 나라 서비스</summary><div class="why" style="margin-top:8px">
     <p>이 약통은 <b>직접 담으신 약</b>만 봐요. <b>건강보험심사평가원 「내가 먹는 약! 한눈에」</b>에서는 지난 1년 동안 병원·약국에서 받은 약을 볼 수 있고(간편인증 로그인), <b>「의약품 안전사용 서비스(DUR) 국민 체험관」</b>에서는 약 이름을 넣어 함께 먹으면 안 되는 조합을 직접 확인해 볼 수 있어요.</p>
     <div class="gl" style="display:flex;flex-wrap:wrap;gap:8px;margin-top:8px"><a class="btn line" href="https://www.hira.or.kr/rb/dur/form.do?pgmid=HIRAA050300000100" target="_blank" rel="noopener">내가 먹는 약! 한눈에</a><a class="btn line" href="https://www.hira.or.kr/ra/medi/form.do?pgmid=HIRAA030029000000" target="_blank" rel="noopener">DUR 국민 체험관</a></div>
@@ -5739,7 +5800,7 @@ function bagText(){
   L.push('앱이 미리 본 것이라 참고용이에요. 약사·의사 판단이 우선입니다.');
   return L.join('\n');
 }
-async function shareBag(){ const t = bagText(); try { if (navigator.share) { await navigator.share({ title: '약지도 · 제가 먹는 약', text: t }); return; } } catch (e) { return; } try { await navigator.clipboard.writeText(t); toast('약 목록을 복사했어요'); } catch (e) { prompt('복사해서 쓰세요', t); } }
+async function shareBag(){ const t = bagText(); try { if (await shareOut({ title: '약지도 · 제가 먹는 약', text: t })) return; } catch (e) { return; } try { await navigator.clipboard.writeText(t); toast('약 목록을 복사했어요'); } catch (e) { prompt('복사해서 쓰세요', t); } }
 
 /* ───────── 약사님이 권한 약 확인 ───────── */
 /* 성분명을 모르는 어르신이 카운터에서 바로 확인할 수 있게 — 이름만 넣으면 같은 약인지 판정한다. */
@@ -6003,7 +6064,7 @@ async function wipeMe(){
   const srv = srvLoggedIn();
   if (!confirm(`이 휴대폰의 약지도 기록을 「모두」 지웁니다.${srv ? ' 로그인해 두셔서 메디나눔 서버에 있는 약지도 기록도 함께 지웁니다(계정은 남아요).' : ''}\n\n약 ${n}가지 · 복용 기록 ${d}일치 · 불편했던 일 · 알림\n\n되돌릴 수 없어요. 지울까요?`)) return;
   try { localStorage.removeItem(ME_KEY); localStorage.removeItem(WX_KEY); } catch (e) {}
-  if (srv) { try { 서버.전부지움(); } catch (e) {} }
+  if (srv || srvHasAccount()) { try { 서버.전부지움(); } catch (e) {} }   /* 로그인 전이면 「지움」 표시를 남겨 다음 로그인 때 서버에서도 지운다 */
   ME = { ...ME_DEF }; WX = {};
   NOTI_TIMERS.forEach(clearTimeout); NOTI_TIMERS = [];
   const LN = plug('LocalNotifications');
@@ -6012,12 +6073,14 @@ async function wipeMe(){
 }
 async function importMe(file){
   if (!file) return;
+  if (file.size > 3e6) { toast('파일이 너무 커요 — 약지도에서 받은 파일인지 확인해 주세요'); return; }
   let j; try { j = JSON.parse(await file.text()); } catch (e) { toast('읽을 수 없는 파일이에요'); return; }
-  const me = j && (j.me || (j.app === 'yakjido' ? null : j));
+  if (j && j.app && j.app !== 'yakjido') { toast('다른 앱에서 받은 파일이에요 — 약지도에서 「파일로 받기」 한 파일을 골라 주세요'); return; }   /* 우리 집 소아과 등 형제 앱 파일이 들어와 기록을 지우던 것(2026-10-13) */
+  const me = j && (j.me || (j.app === 'yakjido' ? null : ((Array.isArray(j.taking) || (j.sched && typeof j.sched === 'object')) ? j : null)));
   if (!me || typeof me !== 'object' || Array.isArray(me)) { toast('약지도에서 받은 파일이 아니에요'); return; }
   const n = (me.taking || []).length, d = Object.keys(me.taken || {}).length, ae = (me.ae || []).length;
   if (!confirm(`가져오면 지금 이 휴대폰의 기록을 「덮어씁니다」.\n\n들어 있는 것 — 약 ${n}가지 · 복용 기록 ${d}일치 · 불편했던 일 ${ae}건\n\n계속할까요?`)) return;
-  ME = { ...ME_DEF, ...me };   /* 옛 파일에 없는 칸은 기본값으로 채운다 */
+  ME = sanitizeMe(me); snapMe(); ME._mt = {}; for (const k of Object.keys(ME)) if (k !== '_mt') ME._mt[k] = Date.now();   /* 가져온 것이 가장 새것 — 옛 파일에 없는 칸은 기본값, 틀린 꼴은 버린다(2026-10-13 — 틀린 파일 하나로 앱 전체가 멈추거나 코드가 끼어들던 것) */
   saveMe();
   try { rollDay(); } catch (e) {}
   armNotifications(); go('/me?t=meds'); route();
@@ -6101,13 +6164,13 @@ function vMe(_, q){
     ${lrow(I.book, '근거·검수 기준', `참고 문헌 ${Object.keys(D.sources || {}).length}건`, "go('/about')")}
   </div>
   <section class="sec card"><h2>휴대폰을 바꾸실 때</h2>
-    <p class="small" style="margin-top:6px">이 앱은 기록을 <b>서버에 두지 않아요.</b> 그래서 휴대폰을 바꾸시면 담아 둔 약·복용 기록·불편했던 일이 함께 사라집니다. <b>파일 하나로 받아 두셨다가</b> 새 휴대폰에서 넣으시면 그대로 이어져요. 그 파일은 온전히 본인 것이고, 어디로도 올라가지 않아요.</p>
+    <p class="small" style="margin-top:6px">${srvLoggedIn() && srvAgreed() ? '메디나눔 계정으로 이어 보기를 켜 두셨어요 — 새 휴대폰에서 <b>같은 이메일로 로그인</b>하시면 그대로 이어져요. 따로 보관하고 싶으시면 파일로도 받아 두실 수 있어요.' : '지금은 기록이 <b>이 휴대폰에만</b> 있어요. 휴대폰을 바꾸시면 담아 둔 약·복용 기록·불편했던 일이 함께 사라지니, 위 「계정」으로 이어 보기를 켜시거나 <b>파일 하나로 받아 두셨다가</b> 새 휴대폰에서 넣으세요. 그 파일은 온전히 본인 것이에요.'}</p>
     <div class="actions two"><button class="btn ghost" onclick="exportMe()">${I.book} 파일로 받기</button>
       <button class="btn ghost" onclick="document.getElementById('mefile').click()">${I.user} 파일에서 가져오기</button></div>
     <input id="mefile" type="file" accept="application/json,.json" style="position:absolute;width:1px;height:1px;opacity:0;pointer-events:none" aria-label="약지도 기록 파일 고르기" onchange="importMe(this.files[0]);this.value=''">
     <p class="small muted" style="margin-top:8px">가져오면 <b>지금 기록을 덮어씁니다.</b> 넣기 전에 한 번 더 여쭤볼게요.</p>
     <details class="why-more" style="margin-top:10px"><summary>이 휴대폰의 기록 모두 지우기</summary>
-      <p class="small" style="margin-top:6px">담아 둔 약·복용 기록·불편했던 일·알림·날씨 위치를 <b>이 휴대폰에서 모두 지웁니다.</b> 저희 서버에는 처음부터 없으니, 지우시면 어디에도 남지 않아요. 되돌릴 수 없으니 필요하면 먼저 <b>파일로 받아</b> 두세요.</p>
+      <p class="small" style="margin-top:6px">담아 둔 약·복용 기록·불편했던 일·알림·날씨 위치를 <b>이 휴대폰에서 모두 지웁니다.</b> ${srvLoggedIn() && srvAgreed() ? '로그인해 두셔서 메디나눔 서버의 약지도 기록도 함께 지워요(계정은 남아요).' : '서버에 올린 기록이 없으면 지우신 뒤 어디에도 남지 않아요.'} 되돌릴 수 없으니 필요하면 먼저 <b>파일로 받아</b> 두세요.</p>
       <div class="actions"><button class="btn ghost" onclick="wipeMe()">${I.x} 모두 지우기</button></div>
     </details>
   </section>
@@ -6143,7 +6206,7 @@ function vAbout(){
       const ia = ORDER.indexOf(a), ib = ORDER.indexOf(b);
       return (ia < 0 ? 99 : ia) - (ib < 0 ? 99 : ib);
     });
-    const row = ([k, v]) => `<a class="row" href="${esc(v.url)}" target="_blank" rel="noopener" style="text-decoration:none"><div class="body"><b>${fmt(v.label)}</b><span>${esc(v.type || '')}${v.note ? ' · ' + esc(v.note) : ''}</span></div>${I.link}</a>`;
+    const row = ([k, v]) => `<a class="row" href="${esc(v.url)}" target="_blank" rel="noopener" style="text-decoration:none"><div class="body"><b>${fmt(v.label)}</b><span>${esc(v.type || '')}${(m => m ? ' · ' + esc(m[0]) : '')(String(v.note || '').match(/PMID\s*\d+/))}</span></div>${I.link}</a>`;
     return `<section class="sec"><h2>참고 문헌·지침 <small>${Object.keys(S).length}건</small></h2>
       <p class="small muted" style="margin-bottom:8px">근거가 센 것부터 묶어 두었어요. 갈래를 누르면 펼쳐집니다.</p>
       ${keys.map(t => `<details class="acc"><summary>${esc(t)}<small>${g.get(t).length}건</small>${I.chev}</summary><div class="bd"><div class="rows">${g.get(t).map(row).join('')}</div></div></details>`).join('')}
@@ -6186,13 +6249,15 @@ window.서버동의켜기 = function(){
 };
 window.서버동의끄기 = function(){
   const off = (msg) => { try { localStorage.setItem(AGREE_KEY, JSON.stringify({ server:false, at:new Date().toISOString() })); } catch (e) {} toast(msg); route(); };
-  if (!srvLoggedIn()) return off('서버에 저장하기 동의를 거두었어요. 이 폰의 기록은 그대로 있어요.');
+  if (!srvHasAccount()) return off('서버에 저장하기 동의를 거두었어요. 이 폰의 기록은 그대로 있어요.');
   /* 동의를 거두면 서버에 둔 것도 지운다(처리방침 9항) — 이 폰의 기록은 남긴다 */
   if (!confirm('동의를 거두면 메디나눔 서버에 있는 약지도 기록을 지우고 로그아웃해요. 이 폰의 기록은 그대로 있어요.\n(다른 메디나눔 앱 기록이 없으면 계정도 함께 지워져요.)')) return;
-  서버.서버만지움().then(() => off('동의를 거두고 서버의 약지도 기록을 지웠어요. 이 폰의 기록은 그대로 있어요.'))
+  서버.서버만지움().then(r => { if (r && r.skipped) { toast('로그인이 풀려 있어 서버 기록을 지우지 못했어요 — 다시 로그인한 뒤 거두어 주세요'); return; } off('동의를 거두고 서버의 약지도 기록을 지웠어요. 이 폰의 기록은 그대로 있어요.'); })
     .catch(() => toast('서버에 닿지 못해 아직 거두지 못했어요. 인터넷이 연결되면 다시 눌러 주세요.'));
 };
-function srvReload(){ try { ME = { ...ME_DEF, ...(JSON.parse(localStorage.getItem(ME_KEY) || '{}')) }; } catch (e) {} try { route(); } catch (e) {} }
+function srvReload(){ try { ME = loadMe(localStorage.getItem(ME_KEY)); snapMe(); } catch (e) {} try { armNotifications(); } catch (e) {} try { route(); } catch (e) {} }
+/* 계정이 이 폰에 «기억돼» 있는가 — 세션을 되살리기 전(앱을 연 직후·인터넷 없음)에도 참. 동의 거두기·모두 지우기가 서버 기록을 놓치지 않게(2026-10-13) */
+function srvHasAccount(){ try { return srvLoggedIn() || !!(window.서버 && 서버.상태 && (서버.상태() || {}).email); } catch (e) { return false; } }
 function srvLoggedIn(){ try { return !!(window.서버 && 서버.세션 && 서버.세션()); } catch (e) { return false; } }
 /* 서버 부품(약 30 KB)은 srv.js 로 따로 받는다 — index.html 첫 화면 예산(압축 220 KB) 때문. 받기 전엔 계정 칸이 「불러오는 중」이다. */
 /* 「어디에 저장되나요」 한 줄 — 로그인해 동의했으면 사실대로 서버도 말한다 */

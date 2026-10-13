@@ -23,7 +23,13 @@
   var 준비중말 = '계정·동기화는 준비 중입니다. 지금은 이 기기에서 그대로 쓰실 수 있습니다.';
   var 복구모드 = false, 복구중 = false;   /* 2026-09-23 큰문제 #10 — 메일의 복구 링크로 들어와 새 비밀번호를 정하는 중 */
   /* 메일 링크가 돌아올 주소 — 지금 앱 주소. file:// 등 웹 주소가 아니면 넘기지 않는다(Supabase Site URL 로 간다). */
-  function 앱주소() { try { return /^https?:$/.test(location.protocol) ? location.origin + location.pathname : null; } catch (e) { return null; } }
+  /* 2026-10-13 상용화 점검 — 설치 앱(https://localhost)·옛 주소(github.io)는 Supabase 돌아올 주소 허용 목록에 없어 메일 링크가 다른 앱 첫 화면으로 갔다.
+     허용 목록에 있는 약지도 웹 주소(meta.webUrl = yakjido.medinanum.com)로 돌려보낸다 — 거기서 비밀번호 다시 정하기까지 끝난다. */
+  function 앱주소() { try {
+    var 웹 = (typeof D !== 'undefined' && D.meta && D.meta.webUrl) || '';
+    var 지금 = /^https?:$/.test(location.protocol) ? location.origin + location.pathname : null;
+    if (웹 && (!지금 || /localhost|github\.io/.test(location.hostname))) return 웹;
+    return 지금; } catch (e) { return null; } }
   function 복구대기() { try { return sessionStorage.getItem('yj_recovery'); } catch (e) { return null; } }
   function 복구처리() {
     if (!준비됨()) return;
@@ -129,9 +135,11 @@
         /* 2026-09-22 — 누가 바뀌었는지는 「마지막으로 맞춘 값의 해시」로 본다.
            서버만 바뀜 → 서버 것. 나만 바뀜 → 내 것(곧 올린다). 둘 다 바뀜 → 합친다(못 합치면 서버 것). */
         var 맞춘 = 해시들[row.key], 내바뀜 = (지금 !== null && 맞춘 != null && 해시(지금) !== 맞춘), 서버바뀜 = (맞춘 == null || 해시(v) !== 맞춘);
+        /* 2026-10-13 상용화 점검 — 이 기기에 기록이 있는데 한 번도 맞춘 적이 없으면(처음 로그인) 덮지 않고 합친다. 예전엔 서버 것으로 말없이 덮었다. */
+        if (지금 !== null && 맞춘 == null && 지금 !== v) { var 첫합 = (typeof 설정.병합 === 'function' ? 설정.병합(row.key, 지금, v) : 병합(지금, v)); if (첫합 !== null) { try { localStorage.setItem(row.key, 첫합); 해시들[row.key] = 해시(v); 바뀜++; } catch (e) {} return; } }
         if (지금 === null || !내바뀜) { try { localStorage.setItem(row.key, v); 해시들[row.key] = 해시(v); 바뀜++; } catch (e) {} return; }
         if (!서버바뀜) return;   /* 내 것만 바뀜 — 밀어올리기가 올린다 */
-        var 합친 = 병합(지금, v);
+        var 합친 = (typeof 설정.병합 === 'function' ? 설정.병합(row.key, 지금, v) : 병합(지금, v));   /* 앱이 자기 기록 모양을 알면 앱이 합친다(약지도 2026-10-13) */
         if (합친 === null) { if (서버시각 > 내시각) { try { localStorage.setItem(row.key, v); 해시들[row.key] = 해시(v); 바뀜++; } catch (e) {} } return; }
         try { localStorage.setItem(row.key, 합친); 해시들[row.key] = 해시(v); 바뀜++; } catch (e) {}   /* 해시는 서버 것 — 합친 값은 곧 올라간다 */
       });
@@ -347,7 +355,7 @@
         알림(r && r.data && r.data.account_deleted === false ? '약지도의 서버 기록과 이 기기의 기록을 지웠습니다. 다른 메디나눔 앱 기록이 남아 있어 계정은 그대로예요.' : '계정과 약지도 서버 기록을 지웠습니다. 이 기기에 있던 약지도 기록도 비웠습니다.');
         화면갱신();
         if (typeof 설정.다시그리기 === 'function') { try { 설정.다시그리기(); } catch (e) {} }
-      }).catch(function (e) { 알림(말(e)); });
+      }).catch(function (e) { var m = 말(e); 알림(/인터넷/.test(m) ? '인터넷이 닿지 않아 지우지 못했어요. 연결되면 「계정 지우기」를 다시 눌러 주세요.' : m); });   /* 2026-10-13 — 「자동으로 이어집니다」는 지우기에는 거짓이었다 */
     }
     if (what === 'newpw') {   /* 2026-09-23 큰문제 #10 — 복구 링크로 들어온 세션에서 새 비밀번호를 저장한다 */
       var n1 = (document.getElementById('srvNewPw') || {}).value || '', n2 = (document.getElementById('srvNewPw2') || {}).value || '';
@@ -385,7 +393,8 @@
       설정.동기화허용 = typeof o.동기화허용 === 'function' ? o.동기화허용 : null;   /* 2026-09-23 구독 틀 */
       설정.가입확인 = (o.가입확인 && o.가입확인.글) ? o.가입확인 : null;
       설정.지우기전 = typeof o.지우기전 === 'function' ? o.지우기전 : null; 설정.로그인됨 = typeof o.로그인됨 === 'function' ? o.로그인됨 : null;   /* 길동무 서버 준비 1008 */
-      설정.준비됨 = o.준비됨 !== false;   /* 검수 #8 — 서버 표가 올라가면 앱의 설치 줄에서 true 로(또는 줄을 지운다) */   /* 2026-09-23 나 — { 글, 설명, 기록 } : 계정 만들기 앞 필수 체크 */
+      설정.준비됨 = typeof o.준비됨 === 'function' ? o.준비됨 : o.준비됨 !== false;   /* 2026-10-13 — 함수로 넘기면 함수 그대로(약지도 meta.account 스위치) */
+      설정.병합 = typeof o.병합 === 'function' ? o.병합 : null;   /* 2026-10-13 — 앱이 자기 기록 모양대로 합치는 갈고리(두 폰 동기화) */   /* 검수 #8 — 서버 표가 올라가면 앱의 설치 줄에서 true 로(또는 줄을 지운다) */   /* 2026-09-23 나 — { 글, 설명, 기록 } : 계정 만들기 앞 필수 체크 */
       if (준비됨()) { try { if (/(^#|&)(type=recovery|error_code=)/.test(location.hash)) { sessionStorage.setItem('yj_recovery', location.hash.slice(1)); history.replaceState(history.state, '', location.pathname + location.search); } } catch (e) {} }   /* 길동무 서버 준비 1008 */
       var st = 상태읽기();
       /* 전에 로그인한 적이 있을 때만 라이브러리를 받아 세션을 되살린다 — 처음 온 분의 첫 화면은 건드리지 않는다 */
@@ -426,9 +435,26 @@
   };
 })();
 /* ▲▲ 서버 부품 끝 ▲▲ */
+
+/* 약지도 — 두 폰 합치기(app-shell 의 sanitizeMe 를 씀). 2026-10-13 상용화 점검 */
+window.mergeMe = function (localRaw, serverRaw) {
+  let a, b; try { a = sanitizeMe(JSON.parse(localRaw)); b = sanitizeMe(JSON.parse(serverRaw)); } catch (e) { return null; }
+  const ma = a._mt || {}, mb = b._mt || {}, out = {}, mt = {};
+  const keys = new Set([...Object.keys(a), ...Object.keys(b)]); keys.delete('_mt');
+  const dayUnion = (x, y, f) => { const r = { ...(y || {}) }; for (const [d, v] of Object.entries(x || {})) r[d] = r[d] ? f(v, r[d]) : v; return r; };
+  for (const k of keys) {
+    if (k === 'taken') out.taken = dayUnion(a.taken, b.taken, (x, y) => [...new Set([...y, ...x])]);
+    else if (k === 'prnLog') out.prnLog = dayUnion(a.prnLog, b.prnLog, (x, y) => { const s = new Set(y.map(e => e.id + '@' + e.t)); return [...y, ...x.filter(e => !s.has(e.id + '@' + e.t))]; });
+    else if (k === 'days') out.days = dayUnion(a.days, b.days, (x, y) => (x.n >= y.n ? x : y));
+    else out[k] = (ma[k] || 0) >= (mb[k] || 0) ? (k in a ? a[k] : b[k]) : (k in b ? b[k] : a[k]);
+    mt[k] = Math.max(ma[k] || 0, mb[k] || 0);
+  }
+  out._mt = mt;
+  return JSON.stringify(sanitizeMe(out));
+};
 try {
   /* 준비됨 = meta.json 의 account 스위치 — 공용 서버에 약지도 칸(메디나눔_약지도_추가_1013.sql)이 열린 뒤에 true 로 켠다. 그 전엔 「준비 중」 한 줄(되는 척 금지). */
-  서버.설치({ app: 'yakjido', 열쇠: /^yakjido\.me\.v1$/, 준비됨: function () { return !!(typeof D !== 'undefined' && D.meta && D.meta.account === true); }, 허용: srvAgreed, 다시그리기: srvReload,
+  서버.설치({ app: 'yakjido', 열쇠: /^yakjido\.me\.v1$/, 병합: function (k, mine, theirs) { return typeof mergeMe === 'function' ? mergeMe(mine, theirs) : null; }, 준비됨: function () { return !!(typeof D !== 'undefined' && D.meta && D.meta.account === true); }, 허용: srvAgreed, 다시그리기: srvReload,
     가입확인: { 글: '만 14세 이상이에요', 설명: '메디나눔 계정은 만 14세 이상만 만들 수 있어요. 아이 약은 보호자 계정에 담아 주세요.' } });
 } catch (e) {}
 /* 내 정보 화면을 보고 있었으면 계정 칸을 다시 그린다 */

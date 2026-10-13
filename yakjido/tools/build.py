@@ -107,6 +107,10 @@ jc = json.dumps(core, ensure_ascii=False, separators=(',', ':'))
 j = json.dumps(inline, ensure_ascii=False, separators=(',', ':')).replace('</', '<\\/')
 stamp = datetime.date.today().isoformat()
 out = shell.replace('<!--DATA-->', j).replace('__BUILD__', stamp)
+# 2026-10-13 상용화 점검 — 배포본에서는 «줄 전체가 주석»인 /* … */ 덩어리를 뺀다(원본은 그대로). 휴대폰마다 개발 메모 수백 개를 내려받던 것 —
+# 첫 화면 압축 225 → 192 KB. 줄 중간·코드 뒤의 주석은 건드리지 않는다(문자열 안일 수 있어서).
+import re as _re
+out = _re.sub(r'(?m)^[ \t]*/\*(?:(?!\*/).)*?\*/[ \t]*\n', '', out, flags=_re.S)
 pages = ROOT.parent / 'docs' / 'yakjido'
 pages.mkdir(parents=True, exist_ok=True)
 (pages / 'index.html').write_text(out, encoding='utf-8')
