@@ -453,11 +453,14 @@ window.mergeMe = function (localRaw, serverRaw) {
   const dayUnion = (x, y, f) => { const r = { ...(y || {}) }; for (const [d, v] of Object.entries(x || {})) r[d] = r[d] ? f(v, r[d]) : v; return r; };
   for (const k of keys) {
     if (k === 'taken') out.taken = dayUnion(a.taken, b.taken, (x, y) => [...new Set([...y, ...x])]);
+    else if (k === 'skipped') out.skipped = dayUnion(a.skipped, b.skipped, (x, y) => [...new Set([...y, ...x])]);   /* 건너뜀도 날마다 합침 — 다른 폰에서 먹었어요면 아래에서 뺀다 */
     else if (k === 'prnLog') out.prnLog = dayUnion(a.prnLog, b.prnLog, (x, y) => { const s = new Set(y.map(e => e.id + '@' + e.t)); return [...y, ...x.filter(e => !s.has(e.id + '@' + e.t))]; });
     else if (k === 'days') out.days = dayUnion(a.days, b.days, (x, y) => (x.n >= y.n ? x : y));
     else out[k] = (ma[k] || 0) >= (mb[k] || 0) ? (k in a ? a[k] : b[k]) : (k in b ? b[k] : a[k]);
     mt[k] = Math.max(ma[k] || 0, mb[k] || 0);
   }
+  /* 한 폰은 「먹었어요」, 다른 폰은 「건너뜀」이면 먹었어요가 이긴다 */
+  if (out.skipped && out.taken) for (const d of Object.keys(out.skipped)) { const t = new Set(out.taken[d] || []); out.skipped[d] = out.skipped[d].filter(x => !t.has(x)); if (!out.skipped[d].length) delete out.skipped[d]; }
   out._mt = mt;
   return JSON.stringify(sanitizeMe(out));
 };
