@@ -86,7 +86,7 @@ SLIM = {
 CORE_KEYS = ['sources', 'ingredients', 'interactions', 'kids', 'productImages', 'suppRules', 'myths', 'recalls', 'drugRep']   # drugRep: 약 화면(본문 받은 뒤)에서만 씀 — 첫 화면 220 KB 예산
 # 약 화면에서만 쓰는 칸(자주 묻는 질문·부작용 빈도)은 data/detail.json 으로 한 번 더 뺀다.
 # 본문과 «동시에» 받기 시작하고, 약 화면만 이것까지 기다린다 — core.json 400 KB 예산(2026-10-04)
-DETAIL = {'drugs': ['faq', 'sideFreq', 'lact', 'tips', 'interactions', 'riskNote'],   # tips·interactions: 약 화면에서만(2026-10-13 검수 반영으로 core 400 KB) · riskNote: 약 화면 「부담 정도」 막대 아래 설명만(10-13 아이 나이 칸·병용 규칙 추가로 core 400 KB)
+DETAIL = {'drugs': ['faq', 'sideFreq', 'lact', 'tips', 'interactions', 'riskNote', 'sideEffects', 'stop'],   # sideEffects·stop: 약 화면(읽어 주기 포함)에서만 — 10-14 투석·출처 보강으로 core 401 KB   # tips·interactions: 약 화면에서만(2026-10-13 검수 반영으로 core 400 KB) · riskNote: 약 화면 「부담 정도」 막대 아래 설명만(10-13 아이 나이 칸·병용 규칙 추가로 core 400 KB)
           'supplements': ['foods', 'need', 'faq', 'evidenceNote', 'priceTip']}
 detail = {k: [{'id': o['id'], **{f: o[f] for f in fs if f in o}} for o in data[k] if any(f in o for f in fs)] for k, fs in DETAIL.items()}
 for k, fs in DETAIL.items():
@@ -144,12 +144,14 @@ pages.mkdir(parents=True, exist_ok=True)
 print(f'첫 화면 {len(out)/1024:.0f} KB · 본문 data/core.json {len(jc)/1024:.0f} KB')
 # 서비스워커 캐시 이름 = 배포 파일 내용의 해시 — 내용이 같으면 같은 이름(파이썬 hash() 는 실행마다 달라 매번 바뀌던 것, 2026-10-13)
 _srvjs = (ROOT / 'srv.js').read_text(encoding='utf-8') if (ROOT / 'srv.js').exists() else ''
+_srvjs += (ROOT / 'find.js').read_text(encoding='utf-8') if (ROOT / 'find.js').exists() else ''   # 찾기 부품도 바뀌면 캐시 이름이 바뀌게(10-14)
 cache_id = hashlib.sha1((out + jc + jd + _srvjs).encode('utf-8')).hexdigest()[:8]
 sw = ROOT / 'sw.js'
 if sw.exists():
     s = re.sub(r"const CACHE = '[^']*'", f"const CACHE = 'yakjido-{stamp}-{cache_id}'", sw.read_text(encoding='utf-8'))
     (pages / 'sw.js').write_text(s, encoding='utf-8')
-for name in ('manifest.webmanifest', 'privacy.html', 'delete-account.html', 'srv.js'):   # delete-account.html = 스토어 「계정 삭제 URL」(메디나눔 안내 2026-10-13)   # srv.js = 계정·기록 이어 두기(따로 받는 파일)   # privacy.html = 스토어에 적는 개인정보처리방침 주소
+for name in ('manifest.webmanifest', 'privacy.html', 'delete-account.html', 'srv.js', 'find.js'):   # find.js = 공용 찾기 부품 + 약지도 쪽(검색을 처음 쓸 때 받음, Z8)
+    # delete-account.html = 스토어 「계정 삭제 URL」(메디나눔 안내 2026-10-13)   # srv.js = 계정·기록 이어 두기(따로 받는 파일)   # privacy.html = 스토어에 적는 개인정보처리방침 주소
     src = ROOT / name
     if src.exists():
         (pages / name).write_text(src.read_text(encoding='utf-8'), encoding='utf-8')

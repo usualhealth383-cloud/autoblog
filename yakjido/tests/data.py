@@ -557,6 +557,56 @@ for s in S:
                 if _o and not _o.get('kidForm') and (_o.get('minAgeMonths') is None or _o['minAgeMonths'] >= 144):
                     fails.append(f'증상 {s["id"]} 아이 칸 「{p.get("slot")}」의 {o} 에 아이용 제품(kidForm)이 없습니다')
 
+# ⑧ 출처는 「어느 문서의 어디」까지(2026-10-13 X5). 의약품안전나라 첫 화면·검색 화면 주소로는 어느 품목의 어느 문구인지 알 수 없어
+#    품목 상세(getItemDetail?itemSeq=…)로 바꿨다. 아래 둘만 일부러 검색 화면을 가리킨다 — 바꾸면 지운다.
+_NEDRUG_SEARCH_OK = {
+    'nedrug_search',     # 「제품별 허가사항 검색」 도구 자체. 약·계열·증상 20여 곳이 근거로 달고 있어 품목별 출처로 나눠야 한다(그 파일들 담당과 함께)
+    'nedrug_melatonin',  # 「멜라토닌 품목은 모두 전문의약품」 — 성분 전체를 말하므로 성분 검색 결과 자체가 근거
+}
+_NEDRUG_BARE = re.compile(r'^https?://nedrug\.mfds\.go\.kr/?(searchDrug\b.*)?$')
+for _k, _v in SRC.items():
+    if _NEDRUG_BARE.match(_v.get('url') or '') and _k not in _NEDRUG_SEARCH_OK:
+        fails.append(f'출처 {_k} 주소가 의약품안전나라 첫 화면·검색 화면입니다 — 품목 상세(getItemDetail?itemSeq=…) 주소로')
+for _k in sorted(_NEDRUG_SEARCH_OK):
+    if _k in SRC and not _NEDRUG_BARE.match(SRC[_k].get('url') or ''): fails.append(f'출처 {_k} 는 이제 구체적인 주소예요 — data.py _NEDRUG_SEARCH_OK 에서 지우세요')
+# 「같이 먹어도 되나요」(mixes.json) 출처는 글로만 보여서 「기관·문서 제목(연도) 주소」를 한 줄에 적는다.
+# 문서를 아직 못 찾은 것은 「(원문 확인 중)」을 붙이고 여기 적는다 — 찾으면 지운다(학회 이름만으로는 근거가 아니다).
+_MIX_SRC_PENDING = {
+    '대한약사회 복약지도 자료(원문 확인 중)',                       # 감기약 두 가지 — 약사회 문서를 특정하지 못함
+    '대한류마티스학회 소염진통제 자료(원문 확인 중)',               # 소염진통제 두 가지·스테로이드+소염진통제
+    '대한소화기학회 항생제 연관 설사·유산균 자료(원문 확인 중)',    # 항생제+유산균
+    '대한소화기학회 제산제 복용 간격 자료(원문 확인 중)',           # 제산제+다른 약
+    '대한이비인후과학회 비염 자료(원문 확인 중)',                   # 코 스프레이 3일 — 학회 문서를 특정하지 못함
+    '대한뇌졸중학회·대한심장학회 항혈전제 자료(원문 확인 중)',      # 항혈전제+진통제
+    '대한천식알레르기학회 아스피린·소염진통제 과민 천식 자료(원문 확인 중)',
+    '대한신경정신의학회 자료(원문 확인 중)',                        # 세로토닌 재흡수 억제제+소염진통제
+    '대한비뇨의학회 전립선비대증 자료(원문 확인 중)',               # 2016 한국 진료지침(doi 10.4111/icu.2016.57.1.30)에는 감기약 이야기가 없어 쓰지 않음
+    '대한골대사학회 「골다공증 진료지침 2022」(원문 확인 중)',      # 문서는 있으나 공개 주소를 찾지 못함
+    '대한마취통증의학회 수술 전 영양제 중단 자료(원문 확인 중)',
+    '대한한방내과학회 자료(원문 확인 중)',                          # 감초·마황 겹침
+    '대한수면학회 불면증 자료(원문 확인 중)',                       # 2020 한국 불면증 진료지침(doi 10.30773/pi.2020.0146)에 술+수면약 내용이 없어 쓰지 않음
+    '대한감염학회 항생제 사용 자료(원문 확인 중)',                  # 우유·제산제+항생제
+    '대한혈액학회 철결핍빈혈 자료(원문 확인 중)',
+    '대한심장학회 항응고 치료 자료(원문 확인 중)',                  # 와파린+비타민 K
+    '대한산부인과학회 자료(원문 확인 중)',
+    '대한모유수유의사회 자료(원문 확인 중)',
+    '대한신장학회 자료(원문 확인 중)',
+    '대한간학회 자료(원문 확인 중)',
+    '미국 간학회 아세트아미노펜 자료(원문 확인 중)',               # 어느 학회(미국간학회·미국간재단)인지부터 확인 필요
+}
+_YEAR, _URL = re.compile(r'(?<!\d)(19|20)\d{2}(?!\d)'), re.compile(r'https?://\S+')
+_MIX = json.loads((ROOT.parent / 'docs' / 'yakjido' / 'data' / 'mixes.json').read_text(encoding='utf-8'))
+_mix_seen = set()
+for _m in _MIX:
+    for _s in _m.get('src') or []:
+        if _s in _MIX_SRC_PENDING: _mix_seen.add(_s); continue
+        if '(원문 확인 중)' in _s: fails.append(f'같이 먹기 {_m["id"]} 출처 「{_s[:40]}」 가 (원문 확인 중)인데 data.py _MIX_SRC_PENDING 에 없습니다'); continue
+        if not (_YEAR.search(_s) and _URL.search(_s)):
+            fails.append(f'같이 먹기 {_m["id"]} 출처 「{_s[:50]}」 에 연도와 주소가 함께 없습니다 — 「기관·문서 제목(연도) 주소」로')
+        elif _NEDRUG_BARE.match(_URL.search(_s).group(0)):
+            fails.append(f'같이 먹기 {_m["id"]} 출처 주소가 의약품안전나라 첫 화면·검색 화면입니다 — 품목 상세로')
+for _s in sorted(_MIX_SRC_PENDING - _mix_seen): fails.append(f'data.py _MIX_SRC_PENDING 의 「{_s[:40]}」 는 이제 mixes.json 에 없어요 — 지우세요')
+
 print(f'증상 {len(S)} · 약 {len(D)} · 계열 {len(K)} · 영양제 {len(SUP)} · 팁 {len(T)} · 그런줄 {len(_MY)} · 규칙 {len(IX["rules"])} · 출처 {len(SRC)}')
 if fails:
     print('실패', len(fails)); [print('  ✗', f) for f in fails]; sys.exit(1)

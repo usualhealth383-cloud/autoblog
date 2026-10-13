@@ -528,7 +528,8 @@ def main():
         # 4~5. 명암비·탭 타깃 (대표 화면, 두 테마)
         SC = ['/home', '/symptom/cold', '/symptom/drymouth', '/drug/ibuprofen', '/me', '/together', '/kinds', '/tips', '/drugs', '/hello/3']
         for theme in ['light', 'dark']:
-            pg.emulate_media(color_scheme=theme); bad = []; tap = []
+            # Z8 — 처음은 밝게(메디나눔 10-14): 휴대폰을 어둡게 해도 앱은 밝게 뜬다. 어두운 화면 검사는 앱 설정 「어둡게」를 켜고 본다(휴대폰도 어둡게)
+            pg.emulate_media(color_scheme=theme); pg.evaluate("t=>setTheme(t)", theme); bad = []; tap = []
             for r in SC:
                 pg.goto(url + '#' + r); pg.wait_for_timeout(500)
                 bad += pg.evaluate(CONTRAST_JS); tap += pg.evaluate(TAP_JS)
@@ -541,7 +542,7 @@ def main():
                     bad += [dict(x, at=r + ':' + tb) for x in pg.evaluate(CONTRAST_JS)]; tap += pg.evaluate(TAP_JS)
             if bad: fails.append(f'명암비({theme}) {len(bad)}: {bad[:3]}')
             if tap: fails.append(f'44px 미만({theme}) {len(tap)}: {sorted(set(tap))[:5]}')
-        pg.emulate_media(color_scheme='light')
+        pg.emulate_media(color_scheme='light'); pg.evaluate("()=>{ try { localStorage.removeItem('yakjido.theme'); } catch (e) {} document.documentElement.dataset.theme = 'light'; }")
         # 5a-1. 단추를 전부 눌러 본다 — 화면만 그려 보는 검사로는 «눌렀을 때 터지는 것»을 못 잡는다.
         #        되돌리기 어려운 단추(삭제·내보내기·인쇄·공유)는 건드리지 않는다.
         _CLICK = ['/home', '/kinds', '/supp', '/tips', '/myths', '/askdoc', '/me', '/schedule',
@@ -706,6 +707,21 @@ def main():
           return {a, b, c};}""")
         if _th['a'] != 'light' or _th['b'] != 'dark' or _th['c'] != '(없음)':
             fails.append(f'화면 밝기 고르기가 듣지 않습니다: {_th}')
+        # 5a-11b. Z8 — 처음은 밝게(휴대폰이 어둡게여도) · 세 가지(밝게·어둡게·기기 따라)를 이 기기에 기억 · 다시 열어도 그대로 · 어둡게여도 종이에는 밝게
+        _pt = br.new_page(viewport={'width': 390, 'height': 844}, color_scheme='dark')
+        _pt.add_init_script("localStorage.setItem('yakjido.hello.v1','1')"); _pt.goto(url + '#/me?t=set'); _pt.wait_for_timeout(1500)
+        _bg = "()=>({th:document.documentElement.dataset.theme||'(없음)', bg:getComputedStyle(document.body).backgroundColor, seg:[...document.querySelectorAll('[aria-label=\"화면 밝기\"] button')].map(b=>b.textContent+(b.getAttribute('aria-pressed')==='true'?'*':''))})"
+        _d0 = _pt.evaluate(_bg)
+        if _d0['th'] != 'light' or _d0['bg'] != 'rgb(239, 235, 227)': fails.append(f'처음 화면이 밝게가 아닙니다(휴대폰 어둡게): {_d0}')
+        if _d0['seg'] != ['밝게*', '어둡게', '기기 따라']: fails.append(f'화면 밝기 칸이 「밝게·어둡게·기기 따라」(밝게 골라짐)가 아닙니다: {_d0["seg"]}')
+        for _k, _want in (('dark', ('dark', 'rgb(14, 18, 20)')), ('auto', ('(없음)', 'rgb(14, 18, 20)')), ('light', ('light', 'rgb(239, 235, 227)'))):
+            _pt.click(f'[aria-label="화면 밝기"] button:nth-child({["light", "dark", "auto"].index(_k) + 1})'); _pt.reload(); _pt.wait_for_timeout(1200)
+            _d = _pt.evaluate(_bg)
+            if (_d['th'], _d['bg']) != _want: fails.append(f'화면 밝기 {_k} 를 고르고 다시 열면 {_d} (기대 {_want})')
+        _pt.click('[aria-label="화면 밝기"] button:nth-child(2)'); _pt.emulate_media(media='print')
+        _pr = _pt.evaluate("()=>[getComputedStyle(document.documentElement).getPropertyValue('--muted').trim(), getComputedStyle(document.documentElement).getPropertyValue('--card').trim()]")
+        if _pr != ['#5B6770', '#FFFFFF']: fails.append(f'어둡게에서 종이로 뽑으면 밝은 색이 아닙니다: {_pr}')
+        _pt.close()
         # 5a-9. 성분 이름 읽기 — «두 글자 어근»이 엉뚱한 약을 물면 안 된다.
         #       「산화마그네슘」에서 염을 떼다 남은 「산화」가 여드름 겔(과산화벤조일)을
         #       제산제로 만들고 있었다. 겹침 경고가 통째로 틀어지는 자리다(2026-09-22).
@@ -1321,7 +1337,7 @@ def main():
     print(f'화면 {len(routes)}개 검사 완료')
     if fails:
         print('실패', len(fails)); [print('  ✗', f) for f in fails]; sys.exit(1)
-    print('✓ 전부 통과 — JS 오류 0 · 넘침 0 · 잘림 0 · 명암비 AA · 조작 부품 3:1 · 44px · 단추 누르기 · 복용 간격 · 복약 달력 · 홈 오늘약 · 어르신 소염제 · 소아 한도 · 계열 경고 · 어근 오인 · 내 정보 칸 · 화면 밝기 · 아이콘 전수 · 약 알림 · 어르신 모드 · 320px · 병용 8건 · 겹침 규칙 53 · 입력칸 이름표 · 성분 해석 123 · 죽은 규칙 0 · 약통 판정 4건 · 자기중복 3건 · 바구니 겹침 · 이중계산 0 · 검색 8건 · 구어 30건 · 문장 16건 · 새 약 검색 12건 · 하루 최대 표기 · 먹는/바르는 구분 · 영양제 질문 순서 · 인터넷 없이 · 화면 오류 카드 · 계정 동의 먼저 · 둘러보기')
+    print('✓ 전부 통과 — JS 오류 0 · 넘침 0 · 잘림 0 · 명암비 AA · 조작 부품 3:1 · 44px · 단추 누르기 · 복용 간격 · 복약 달력 · 홈 오늘약 · 어르신 소염제 · 소아 한도 · 계열 경고 · 어근 오인 · 내 정보 칸 · 화면 밝기(처음 밝게·세 가지·인쇄 밝게) · 아이콘 전수 · 약 알림 · 어르신 모드 · 320px · 병용 8건 · 겹침 규칙 53 · 입력칸 이름표 · 성분 해석 123 · 죽은 규칙 0 · 약통 판정 4건 · 자기중복 3건 · 바구니 겹침 · 이중계산 0 · 검색 8건 · 구어 30건 · 문장 16건 · 새 약 검색 12건 · 하루 최대 표기 · 먹는/바르는 구분 · 영양제 질문 순서 · 인터넷 없이 · 화면 오류 카드 · 계정 동의 먼저 · 둘러보기')
 
 if __name__ == '__main__':
     main()

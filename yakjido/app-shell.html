@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="ko">
+<html lang="ko" data-theme="light">
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>약지도 · 증상에 맞는 약 성분, 의사가 정리했어요</title>
@@ -12,6 +12,10 @@
 <link rel="apple-touch-icon" href="icon-180.png">
 <link rel="icon" href="icon-192.png">
 <script>
+/* Z8 — 메디나눔 공통(10-14 현욱님): 처음은 밝게. 「어둡게」·「기기 따라」는 내 정보 → 설정에서 고르고 이 기기에 기억한다 */
+try { var th0 = localStorage.getItem('yakjido.theme'), de0 = document.documentElement;
+  if (th0 === 'dark' || th0 === 'auto') { if (th0 === 'dark') de0.dataset.theme = 'dark'; else de0.removeAttribute('data-theme');
+    if (th0 === 'dark' || matchMedia('(prefers-color-scheme: dark)').matches) document.querySelector('meta[name="theme-color"]').content = '#161A1C'; } } catch (e) {}
 /* 오래된 안드로이드 웹뷰·브라우저(크롬 80 미만)는 아래 큰 묶음을 읽다 멈춰 흰 화면만 남긴다(2026-10-08 출시 점검).
    이 조각은 옛 문법만 써서 어디서나 돌고, 4초 안에 본 묶음이 읽히지 않으면 안내문을 띄운다. */
 (function(){
@@ -102,6 +106,15 @@
 :root[data-theme="dark"] .g-etc{--gbg:#242A3E;--gfg:#AEB9F0} :root[data-theme="dark"] .g-uro{--gbg:#1C3330;--gfg:#8CD8CC}
 :root[data-theme="dark"] .g-women{--gbg:#3A2430;--gfg:#F0A8C4} :root[data-theme="dark"] .g-oral{--gbg:#1E3328;--gfg:#9ED9B4}
 :root[data-theme="dark"] .g-eye{--gbg:#1F2740;--gfg:#A8BCEA}
+/* Z8 — 종이로 뽑을 때는 어둡게를 골랐어도 밝은 색으로(어두운 색 그대로 뽑으면 연회색 글씨가 흐리게 찍힌다 — 길동무 10-14) */
+@media print{:root:not([data-theme="light"]),:root[data-theme="dark"]{
+  --primary:#0B6E8F; --primary-deep:#08526B; --primary-rgb:11,110,143; --accent:#B5711C; --accent-text:#8A5512; --accent-tint:#FBF0DC;
+  --surface:#FFFFFF; --card:#FFFFFF; --ground:#EFEBE3; --text:#1E2A30; --body:#3B474E; --muted:#5B6770; --faint:#6E787E;
+  --hairline:#E6E2DA; --tint:#DCEFF5; --tint2:#F3F1EB; --ui-line:#848C92; --normal:#1A7946; --caution:#8A6313; --alert:#B63629;
+  --normal-tint:#E4F1E9; --caution-tint:#F6EEDD; --alert-tint:#F6E4E1; --rx:#4C5FB5; --rx-tint:#E9ECF8; --viz-1:#0075A8; --viz-2:#B96A12;
+  --on-primary:#FFFFFF; --on-alert:#FFFFFF; --shadow-card:none; --shadow-raised:none}
+ :root:not([data-theme="light"]) .g-pain,:root[data-theme="dark"] .g-pain,:root:not([data-theme="light"]) .g-resp,:root[data-theme="dark"] .g-resp,:root:not([data-theme="light"]) .g-gi,:root[data-theme="dark"] .g-gi,:root:not([data-theme="light"]) .g-skin,:root[data-theme="dark"] .g-skin,:root:not([data-theme="light"]) .g-etc,:root[data-theme="dark"] .g-etc,:root:not([data-theme="light"]) .g-uro,:root[data-theme="dark"] .g-uro,:root:not([data-theme="light"]) .g-women,:root[data-theme="dark"] .g-women,:root:not([data-theme="light"]) .g-oral,:root[data-theme="dark"] .g-oral,:root:not([data-theme="light"]) .g-eye,:root[data-theme="dark"] .g-eye{--gbg:#F3F1EB;--gfg:#3B474E}
+ :root:not([data-theme="light"]) .art img,:root[data-theme="dark"] .art img{filter:none}}
 .tile .ic{background:var(--gbg,var(--tint));color:var(--gfg,var(--primary))}
 .gdot{display:inline-block;width:10px;height:10px;border-radius:50%;background:var(--gfg,var(--primary));margin-right:8px;vertical-align:1px}
 .tile.wait .wait-t{background:var(--tint2);color:var(--muted)}
@@ -1322,7 +1335,7 @@ nav.tabbar button.on svg.i{stroke-width:2.2}
 .hit{display:flex;align-items:center;gap:var(--s3);padding:12px 0;border-bottom:1px solid var(--hairline);text-align:left;width:100%;min-height:56px}
 .hit:last-child{border-bottom:0}
 .hit .k{font-size:.6875rem;font-weight:700;padding:3px 7px;border-radius:6px;background:var(--tint);color:var(--primary-deep);flex:none;min-width:44px;text-align:center}
-.hit .k.s{background:var(--accent-tint);color:var(--accent)} .hit .k.p{background:var(--tint2);color:var(--muted)}
+.hit .k.s{background:var(--accent-tint);color:var(--accent-text)} .hit .k.p{background:var(--tint2);color:var(--muted)}
 .hit b{display:block;font-size:.9375rem;overflow-wrap:anywhere}
 .hit span{display:block;font-size:.8125rem;color:var(--muted)}
 .hit mark{background:none;color:var(--primary);font-weight:800}
@@ -2210,7 +2223,7 @@ let GQ = '', MQ = '', LASTPATH = '', HINT = 0;
 function gqPanel(){
   const q = GQ.trim(); if (q.length < 1) return '';
   /* 사전과 식약처 목록은 검색을 처음 쓸 때 받는다 */
-  lexLoad(); pubIndexSoon();
+  lexLoad(); pubIndexSoon(); findLoad();
   const hitsAll = search(q), hits = hitsAll.slice(0, 12);
   const a = qaFind(q);
   const goHref = a?.go ? (a.go[0] === 'ing' ? (lexOf(a.go[1])?.drug && drug(lexOf(a.go[1]).drug) ? '/drug/' + lexOf(a.go[1]).drug : '/ingr/' + a.go[1]) : '') : '';
@@ -3253,7 +3266,7 @@ function comboName(name){
   return c.length > 0 && c.every(p => (p.i || []).length > 1);
 }
 function search(q, noFix){
-  q = (q || '').toLowerCase().trim();
+  q = (q || '').toLowerCase().trim(); const qIn = q;
   /* Z7 — 「아이 기침」의 「아이」가 「아이봉·아이드롭」 제품에 걸리던 것: 아이를 뜻하는 말은 떼고 찾되(아이 쪽 거르개는 아래), 떼고 남는 말이 있을 때만 */
   const kidQ = KID_Q.test(q), kq = q.replace(/아기|애기|아가|어린이|소아|우리애|아이(?!페|오|소)/g, ' ').trim(); if (kidQ && kq) q = kq;
   /* 띄어쓰기를 틀려도 찾아진다 — 「타이 레놀」·「이부 프로펜」 */
@@ -3398,9 +3411,26 @@ function search(q, noFix){
   if (!res.length && words.length > 1) return search([...words].sort((a, b) => b.length - a.length)[0], noFix);
   /* 한 마디로 치셔도 말끝을 떼 본다 — 「어지러워요」는 구어 사전의 「어지러워」에 닿지 못하고 있었다 */
   if (!res.length) { const st = SEARCH_SYN[stem(q)] || stem(q); if (st && st !== q) return search(st, noFix); }
+  /* Z8 — 초성·오타 고치기(공용 찾기 부품)를 모음 바꾸기보다 먼저: 「베아재」가 모음만 바꾼 「배아재」로 엉뚱한 배 증상에 가던 것 */
+  const fx = !noFix && findFix(qIn, res); if (fx) return fx;
   /* 그래도 0건이면 모음 하나를 바꿔 본다(ㅐ↔ㅔ 등) — 찾으면 「혹시 ○○?」로 알린다 */
   if (!res.length && !noFix && /[가-힣]/.test(qs)) for (const v of vowelVariants(qs)) { const r2 = search(v, true); if (r2.length) { r2.fix = v; return r2; } }
   return res;
+}
+/* Z8 — 메디나눔 공용 찾기 부품(find.js, 검색을 처음 쓸 때 따로 받음)은 «못 알아들은 말을 고치는 데만» 쓴다: 초성(ㅌㅇㄹㄴ)·오타(타이레롤·두퉁).
+   고친 말로 이 검색을 다시 돌리므로 순위·아이 거르기·기능 바로가기는 그대로다. 위 검색이 친 말 그대로 찾은 것이 있으면 손대지 않는다 */
+let FIND = null;
+function findLoad(){ if (FIND) return findIx(); FIND = {}; if (window.약지도찾기) return findIx();
+  const s = document.createElement('script'); s.src = 'find.js'; s.onload = findIx; s.onerror = () => { FIND.err = 1; }; document.head.appendChild(s); }
+function findIx(){ if (FIND.ix || !window.약지도찾기 || !LEX.brand || CORE !== 2) return;
+  try { FIND.ix = 약지도찾기.만들기(D, LEX, [...Object.keys(SEARCH_SYN), ...Object.keys(SEARCH_DRUG), ...FEATURE_GO.flatMap(f => f.kw)]); } catch (e) { FIND.err = 1; return; }
+  /^#\/search/.test(location.hash) ? redraw() : lexRedraw(true); }
+function findFix(q, res){
+  if (!FIND?.ix) return null; let f = null; try { f = 약지도찾기.고치기(FIND.ix, q, res.map(h => h.t)); } catch (e) {} if (!f) return null;
+  /* 초성 하나만 쳤으면 다음 후보 둘도 몇 줄씩 — 새 결과를 더한 말만 「혹시 ○○·○○?」에 적는다 */
+  const seen = new Set(), used = [], r2 = [];
+  [f.질의, ...f.다른].forEach((w, i) => { const add = search(w, true).slice(0, i ? 3 : 99).filter(h => !seen.has(h.h + h.t) && seen.add(h.h + h.t)); if (add.length) { used.push(w); r2.push(...add); } });
+  if (!r2.length) return null; r2.fix = used.join('·'); return r2;
 }
 /* 식약처 낱알 목록(약 1.2 MB)은 예전에 앱이 뜨자마자 받았다. 본문(core.json)과 같이
    내려받느라, 신호가 약한 곳에서는 첫 화면이 20초 넘게 걸렸다. 이제는
@@ -3412,7 +3442,7 @@ function pubIndexSoon(){
 }
 const hitsHtml = hits => hits.map(h => `<button class="hit" onclick="go('${h.h}')"><span class="k ${h.c}">${h.k}</span><div><b>${esc(h.t)}</b><span>${esc(h.d)}</span></div>${I.chev}</button>`).join('');
 function vSearch(_, q){
-  lexLoad(); pubIndexSoon();
+  lexLoad(); pubIndexSoon(); findLoad();
   const hits = search(q.q || '');
   return `${topBar({ back:'뒤로' })}<h1>‘${esc(q.q || '')}’ 검색</h1><div class="card results" style="margin-top:16px">${hitsHtml(hits) || `<div class="empty"><b>검색 결과가 없어요</b>증상 이름(허리·두통·생리통)이나 성분 이름으로 찾아보세요.</div>`}</div>`;
 }
@@ -7355,8 +7385,8 @@ function vMe(_, q){
   </div>`;
   else body = `
   <section class="sec card" style="padding-top:10px;padding-bottom:10px"><div class="view-row col"><div class="t"><b>글자 크기</b><span>지금 이 글씨가 작으면 키우세요</span></div>${fsSeg()}</div>
-    <div class="view-row col" style="border-top:1px solid var(--hairline)"><div class="t"><b>화면 밝기</b><span>눈이 부시거나 어두운 화면이 안 보이면 바꾸세요</span></div>
-      <div class="fs-seg" role="group" aria-label="화면 밝기">${[['auto','자동'],['light','밝게'],['dark','어둡게']].map(([k, n]) => `<button class="${themeNow() === k ? 'on' : ''}" style="min-width:auto;min-height:46px;padding:0 10px;font-size:.8125rem" aria-pressed="${themeNow() === k}" onclick="setTheme('${k}')">${n}</button>`).join('')}</div></div>
+    <div class="view-row col" style="border-top:1px solid var(--hairline)"><div class="t"><b>화면 밝기</b><span>눈이 부시면 어둡게, 휴대폰 설정을 따르려면 기기 따라를 고르세요</span></div>
+      <div class="fs-seg" role="group" aria-label="화면 밝기">${[['light','밝게'],['dark','어둡게'],['auto','기기 따라']].map(([k, n]) => `<button class="${themeNow() === k ? 'on' : ''}" style="min-width:auto;min-height:46px;padding:0 10px;font-size:.8125rem" aria-pressed="${themeNow() === k}" onclick="setTheme('${k}')">${n}</button>`).join('')}</div></div>
     <div class="view-row" style="border-top:1px solid var(--hairline)"><div class="t"><b>어르신 모드</b><span>큰 글씨 · 홈 맨 위에 「오늘 약 체크」</span></div><button class="sw ${ME.easy ? 'on' : ''}" role="switch" aria-checked="${!!ME.easy}" aria-label="어르신 모드" onclick="setEasy(!ME.easy)"></button></div></section>
   <div class="rows-l" style="margin-top:16px">
     ${lrow(I.info, '알아두면 좋은 것', `짧은 건강정보 ${(D.tips || []).length}가지`, "go('/tips')")}
@@ -7427,9 +7457,9 @@ function setEasy(on){ ME.easy = !!on; saveMe(); try { armNotifications(); } catc
   if (on) { if (parseFloat(cur) < parseFloat(EASY_FS)) { try { localStorage.setItem('yakjido.fs.before', cur); } catch (e) {} setFs(EASY_FS); return; } }
   else { const b = lsGet('yakjido.fs.before'); try { localStorage.removeItem('yakjido.fs.before'); } catch (e) {} if (b && cur === EASY_FS) { setFs(b); return; } }
   route(); }
-/* 자동 = 휴대폰 설정을 따름 */
+/* 기기 따라(auto) = 휴대폰 설정을 따름 · 고른 것이 없으면 밝게(Z8 — 메디나눔 공통 10-14) */
 function setTheme(v){
-  try { if (v === 'auto') localStorage.removeItem('yakjido.theme'); else localStorage.setItem('yakjido.theme', v); } catch (e) {}
+  try { localStorage.setItem('yakjido.theme', v); } catch (e) {}
   if (v === 'auto') delete document.documentElement.dataset.theme; else document.documentElement.dataset.theme = v;
   const m = document.querySelector('meta[name="theme-color"]');
   if (m) m.content = (v === 'dark' || (v === 'auto' && matchMedia('(prefers-color-scheme:dark)').matches)) ? '#161A1C' : '#0B6E8F';
@@ -7439,11 +7469,10 @@ function setTheme(v){
 /* 휴대폰 밝기 설정이 바뀌면(「자동」일 때) 머리 색·상태 표시줄도 따라간다 */
 try { const mq = matchMedia('(prefers-color-scheme: dark)'), onTheme = () => { if (themeNow() !== 'auto') return; const m = document.querySelector('meta[name="theme-color"]'); if (m) m.content = mq.matches ? '#161A1C' : '#0B6E8F'; try { nativeBars(); } catch (e) {} };
   mq.addEventListener ? mq.addEventListener('change', onTheme) : mq.addListener && mq.addListener(onTheme); } catch (e) {}
-const themeNow = () => { try { return localStorage.getItem('yakjido.theme') || 'auto'; } catch (e) { return 'auto'; } };
+const themeNow = () => { try { const t = localStorage.getItem('yakjido.theme'); return t === 'dark' || t === 'auto' ? t : 'light'; } catch (e) { return 'light'; } };
 try { const fs = localStorage.getItem('yakjido.fs'); if (fs) document.documentElement.style.setProperty('--fs', fs); } catch (e) {}
 /* 화면 밝기는 휴대폰 설정만 따라가고 있었다. 눈이 부시거나(백내장) 어두운 화면이
-   안 보이는 분이 스스로 고를 칸이 없었다 — 앱 안에서 고르게 한다(2026-09-22). */
-try { const th = localStorage.getItem('yakjido.theme'); if (th === 'light' || th === 'dark') document.documentElement.dataset.theme = th; } catch (e) {}
+   안 보이는 분이 스스로 고를 칸이 없었다 — 앱 안에서 고르게 한다(2026-09-22). 고른 밝기는 <head> 첫 조각이 그리기 전에 붙인다(Z8) */
 /* 제품·성분 사전(약 700 KB)은 첫 화면이 자리 잡은 뒤 조용히 미리 받는다 — "인사돌" 을 쳤을 때 제품이 증상보다 위에 오게(감사 #38). 데이터 절약 모드면 안 받는다 */
 /* 2026-10-08 출시 점검: 3G 흉내(1.6 Mbps)에서 본문이 26초 걸렸다 — 사전 묶음이 3.5초 뒤 본문과 «같은 선을 나눠 쓰며» 내려와서다.
    본문·약 칸이 다 온 «뒤에» 받고, 2G급 신호면 아예 받지 않는다(검색을 처음 쓸 때 받는다). */

@@ -26,6 +26,8 @@ with sync_playwright() as p:
     routes=pg.evaluate(ROUTE_JS)
     for theme in A.themes.split(','):
         pg.emulate_media(color_scheme=theme)
+        try: pg.evaluate("t=>{ try { setTheme(t); } catch (e) {} }", theme)   # 앱 기본이 밝게라 설정으로도 바꾼다(10-14)
+        except Exception: pass
         for r in routes:
             pg.goto('http://localhost:8765/index.html#'+r); pg.wait_for_timeout(300)
             tabs=pg.evaluate("()=>[...document.querySelectorAll('#view .tab[data-p]')].map(b=>b.dataset.p)") or [None]
