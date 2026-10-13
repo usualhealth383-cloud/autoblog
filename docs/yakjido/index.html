@@ -933,9 +933,15 @@ main > .answer + *, main > .sec + .care, main > .card + .care, main > .rx-card +
 .opt-fold>summary svg.i{flex:none;width:18px;height:18px;color:var(--muted);transition:transform .2s}.opt-fold[open]>summary svg.i{transform:rotate(90deg)}
 .consult-grp{margin-top:var(--s4);padding-top:var(--s3);border-top:1px dashed var(--ui-line)}
 .consult-h{display:flex;align-items:center;gap:8px;margin:0 0 8px;font-size:.9375rem;font-weight:800;color:var(--alert)}.consult-h svg.i{flex:none;width:18px;height:18px}
-.opt-lead{margin:0 0 10px}.opt-one{margin-bottom:12px}.opt-one .buy-item{margin-bottom:4px!important}
-.opt-add{display:inline-flex;align-items:center;gap:6px;min-height:48px;padding:0 14px;border-radius:999px;border:1.5px solid var(--primary);background:var(--card);color:var(--primary);font:inherit;font-size:.875rem;font-weight:700;cursor:pointer}
-.opt-add.on{background:var(--primary);color:var(--on-primary)}.opt-add svg.i{width:16px;height:16px}
+.opt-lead{margin:0 0 10px}
+.opt-one{margin-bottom:10px;border:1px solid var(--hairline);border-radius:16px;background:var(--card);overflow:hidden}
+.opt-one.on{border-color:var(--primary)}
+.opt-one .buy-item{margin:0!important;border:0!important;border-radius:0!important;box-shadow:none!important;background:transparent!important}
+.opt-add{display:flex;align-items:center;gap:10px;width:100%;min-height:48px;padding:0 16px;border:0;border-top:1px dashed var(--hairline);background:transparent;color:var(--primary);font:inherit;font-size:.9375rem;font-weight:700;text-align:left;cursor:pointer}
+.opt-add.on{background:var(--tint);color:var(--primary-deep, var(--primary))}
+.opt-box{display:inline-grid;place-items:center;flex:none;width:22px;height:22px;border:2px solid var(--primary);border-radius:6px;font-style:normal}
+.opt-box.round{border-radius:50%}
+.opt-add.on .opt-box{background:var(--primary);color:var(--on-primary)}.opt-box svg.i{width:14px;height:14px}
 .pshare h1{word-break:keep-all}
 .ps-note{margin-top:10px;font-size:1.125rem;line-height:1.6;color:var(--body)}
 .ps-list{display:flex;flex-direction:column;gap:10px}
@@ -3450,6 +3456,7 @@ const title = x.d.combo ? ing : (ing || prod || x.d.name);
 const ex = prodNames(x.d, 3, x.kid).filter(n => n !== title);
 const sub = x.d.combo ? (prodNames(x.d, 2, x.kid).length ? '이 성분이 든 제품: ' + prodNames(x.d, 2, x.kid).join(' · ') : '')
 : (ex.length ? '같은 성분 제품 예: ' + ex.join(' · ') : '');
+const nbu = t => String(t || '').replace(/(\d) (mg|mL|g|정|캡슐|포|병|알|매)/g, '$1\u00a0$2');
 const badge = x.have ? '<span class="badge soft">이미 드시는 성분 — 사지 않아요</span>'
 : x.cab ? `<span class="badge warn">${esc(cabWord(x))}</span>`
 : aeFor(x.d.id).length ? '<span class="badge stop">전에 불편했던 약</span>'
@@ -3463,7 +3470,7 @@ const badge = x.have ? '<span class="badge soft">이미 드시는 성분 — 사
 return `<button class="buy-item ${x.optional ? 'opt' : ''} ${pimg(x.product) ? 'has-img' : ''} ${open ? 'open' : ''}" onclick="OPEN_BUY=OPEN_BUY==='${x.d.id}'?'':'${x.d.id}';route()" aria-expanded="${open}">
 <span class="bi-t">
 <small class="role">${esc(x.slot)}${x.optional ? ' · 도움될 수 있어요' : ''}${SYM_NOW && isWorked(SYM_NOW, x.d.id) ? ' · 효과 봤던 약' : ''}</small>
-<b>${esc(title)}</b>${sub ? `<small class="sub">${esc(sub)}</small>` : ''}${badge}${x.cau ? `<small class="cau">${I.alert}${esc(x.cau)}</small>` : ''}
+<b>${esc(nbu(title))}</b>${sub ? `<small class="sub">${esc(nbu(sub))}</small>` : ''}${badge}${x.cau ? `<small class="cau">${I.alert}${esc(x.cau)}</small>` : ''}
 </span>
 ${imgTag(pimg(x.product), 'pimg', x.product)}
 <span class="bi-r">${I.chev}</span></button>
@@ -3571,7 +3578,7 @@ close();
 if (e) { grp = e; out.push(`<div class="either"><div class="either-h">${esc(e)} — <b>이 중 하나만</b> 고르세요</div>`); }
 } else if (e) out.push('<div class="either-or"><span>또는</span></div>');
 const g = e ? bk.filter(y => y.either === e && !y.consult) : [];
-if (g.length > 1) { const on = eitherChoice(s.id, g) === x; out.push(`<div class="opt-one">${buyItem(x)}<button type="button" class="opt-add ${on ? 'on' : ''}" aria-pressed="${on}" onclick="eitherSet('${s.id}',${x.i})">${on ? I.check + ' 약국 카드에 들어가요' : '이걸로 약국 카드에'}</button></div>`); }
+if (g.length > 1) { const on = eitherChoice(s.id, g) === x; out.push(`<div class="opt-one ${on ? 'on' : ''}">${buyItem(x)}<button type="button" class="opt-add ${on ? 'on' : ''}" role="radio" aria-checked="${on}" onclick="eitherSet('${s.id}',${x.i})"><i class="opt-box round">${on ? I.check : ''}</i>${on ? '약국 카드에 들어가요' : '이걸로 약국 카드에'}</button></div>`); }
 else out.push(buyItem(x));
 }
 close();
@@ -3579,7 +3586,7 @@ if (opt.length) {
 const n = opt.filter(x => optPicked(s.id, x.i)).length;
 out.push(`<details class="opt-fold" ${OPT_FOLD === s.id || n ? 'open' : ''} ontoggle="OPT_FOLD=this.open?'${s.id}':(OPT_FOLD==='${s.id}'?'':OPT_FOLD)"><summary><span><b>이런 증상도 있으면</b><small>${opt.map(x => esc(x.slot)).join(' · ')}${n ? ` — ${n}가지 넣었어요` : ''}</small></span>${I.chev}</summary>
 <p class="small muted opt-lead">해당할 때만 더하세요. <b>「약국 카드에 넣기」</b>를 누른 것만 약국에서 보여드리기·가족에게 보내기에 들어가요.</p>
-${opt.map(x => { const on = optPicked(s.id, x.i); return `<div class="opt-one">${buyItem(x)}<button type="button" class="opt-add ${on ? 'on' : ''}" aria-pressed="${on}" onclick="optToggle('${s.id}',${x.i})">${on ? I.check + ' 약국 카드에 넣었어요' : '+ 약국 카드에 넣기'}</button></div>`; }).join('')}
+${opt.map(x => { const on = optPicked(s.id, x.i); return `<div class="opt-one ${on ? 'on' : ''}">${buyItem(x)}<button type="button" class="opt-add ${on ? 'on' : ''}" role="checkbox" aria-checked="${on}" onclick="optToggle('${s.id}',${x.i})"><i class="opt-box">${on ? I.check : ''}</i>${on ? '약국 카드에 넣었어요' : '약국 카드에 넣기'}</button></div>`; }).join('')}
 </details>`);
 }
 if (late.length) out.push(`<div class="consult-grp"><div class="consult-h">${I.alert}<span>이 조건에선 약사와 먼저 상의</span></div>${late.map(buyItem).join('')}</div>`);
