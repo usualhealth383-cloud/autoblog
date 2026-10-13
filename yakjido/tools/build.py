@@ -100,7 +100,7 @@ data['art'] = found
 # 화면 함수는 하나도 바꾸지 않아도 된다.
 SLIM = {
     'symptoms':    ['id', 'group', 'icon', 'name', 'short', 'tags', 'reviewed'],
-    'drugs':       ['id', 'name', 'class', 'rx', 'tagline', 'simple', 'for'],   # en(영어 이름)은 본문으로 — 첫 화면 목록엔 안 보인다(10-14 많이 찾는 약 타일로 224 KB 넘침)
+    'drugs':       ['id', 'name', 'class', 'rx', 'simple', 'for'],   # tagline 도 본문으로(증상·약 화면은 본문을 받은 뒤 그려진다, 10-14 첫 화면 예산)   # en(영어 이름)은 본문으로 — 첫 화면 목록엔 안 보인다(10-14 많이 찾는 약 타일로 224 KB 넘침)
     'supplements': ['id', 'name', 'en', 'tags', 'brands', 'evidence'],
     'classes':     ['id', 'name', 'short', 'icon'],
     'tips':        ['id', 'group', 'icon', 'title'],
@@ -110,7 +110,8 @@ CORE_KEYS = ['sources', 'ingredients', 'interactions', 'kids', 'productImages', 
 # 약 화면에서만 쓰는 칸(자주 묻는 질문·부작용 빈도)은 data/detail.json 으로 한 번 더 뺀다.
 # 본문과 «동시에» 받기 시작하고, 약 화면만 이것까지 기다린다 — core.json 400 KB 예산(2026-10-04)
 DETAIL = {'drugs': ['faq', 'sideFreq', 'lact', 'tips', 'interactions', 'riskNote', 'sideEffects', 'stop'],   # sideEffects·stop: 약 화면(읽어 주기 포함)에서만 — 10-14 투석·출처 보강으로 core 401 KB   # tips·interactions: 약 화면에서만(2026-10-13 검수 반영으로 core 400 KB) · riskNote: 약 화면 「부담 정도」 막대 아래 설명만(10-13 아이 나이 칸·병용 규칙 추가로 core 400 KB)
-          'supplements': ['foods', 'need', 'faq', 'evidenceNote', 'priceTip']}
+          'supplements': ['foods', 'need', 'faq', 'evidenceNote', 'priceTip'],
+          'classes': ['table', 'notes', 'verdict']}   # 계열 비교 화면에서만 — 10-14 쉬운 말·알아두면 좋은 것 보강으로 core 402 KB
 detail = {k: [{'id': o['id'], **{f: o[f] for f in fs if f in o}} for o in data[k] if any(f in o for f in fs)] for k, fs in DETAIL.items()}
 for k, fs in DETAIL.items():
     data[k] = [{f: v for f, v in o.items() if f not in fs} for o in data[k]]

@@ -2393,7 +2393,7 @@ function route(){
     return;
   }
   /* 영양제 상세도 음식·필요량 칸이 detail.json 에 있다 */
-  if ((seg[0] === 'drug' || (seg[0] === 'supp' && seg[1])) && DETAIL < 2 && !window.__DETAIL_SKIP__) {
+  if ((seg[0] === 'drug' || seg[0] === 'class' || (seg[0] === 'supp' && seg[1])) && DETAIL < 2 && !window.__DETAIL_SKIP__) {   /* 계열 비교의 표·알아두면 좋은 것도 detail(10-14) */
     /* 실패했으면 두 칸 없이 그리고, 다음에 다시 받아 본다 */
     if (DETAIL === 3) { window.__DETAIL_SKIP__ = true; ensureDetail(); }
     else { view.innerHTML = topBar({ back:'뒤로', nosearch:true }) + `<section class="sec"><p class="loading">자료를 불러오는 중이에요…</p></section>`; ensureDetail().then(route); return; }
@@ -6519,7 +6519,7 @@ function vPub(id){
 }
 
 /* ───────── 약 알아보기(낱알 식별) — 약학정보원 식별기보다 앞서기 위한 설계 ───────── */
-const PILLQ = { sh:'', c:'', txt:'', ln:'', rx:false };
+const PILLQ = { sh:'', c:'', txt:'', ln:'', fm:'', rx:false };
 function vPill(){
   kpicLoad();
   if (!PUB.pills) { pubPills().then(route); return `${topBar({ back:'약 사전' })}<h1>이 약이 무슨 약일까</h1><p class="loading">식약처 낱알식별 자료를 불러오는 중… (한 번만 받아요)</p>`; }
@@ -6530,8 +6530,9 @@ function vPill(){
   ${disclaimer('미리보기 화면에서는 식약처 자료가 연결되지 않아요. 실제 앱에서는 정상으로 동작해요.')}`;
   if (PILLQ.rx && !PUB.rx) { pubPillsRx().then(redraw); }
   const colors = Object.keys(COLORS).filter(c => PUB.pills.some(p => p.c === c));
-  const res = pillSearch(PILLQ, PILLQ.rx);
-  const active = PILLQ.txt.trim() || PILLQ.sh || PILLQ.c || PILLQ.ln;
+  /* 제형(알약·캡슐·말랑한 캡슐)으로도 거른다 — 약학정보원 낱알 검색과 같은 칸(10-13 외부 검수 비교 4). 자료에 제형(fm)이 있으면 그것, 없으면 이름으로 */
+  const res = pillSearch(PILLQ, PILLQ.rx).filter(([, p]) => !PILLQ.fm || pillFm(p) === PILLQ.fm);
+  const active = PILLQ.txt.trim() || PILLQ.sh || PILLQ.c || PILLQ.ln || PILLQ.fm;
   const shown = active ? res.slice(0, 30) : [];
   /* 이 화면은 아래 「이름 또는 새겨진 글자」 칸이 검색칸이다 — 위의 공용 검색칸까지 있으면 어르신은 첫 칸에 치신다(3-18) */
   return `${topBar({ back:'약 사전', nosearch:true })}
@@ -6546,12 +6547,14 @@ function vPill(){
     <p class="small muted" style="margin-top:7px">약봉투·약 상자에 적힌 이름 그대로 치셔도 되고, 용량까지 적으셔도 돼요(베시케어 5mg). <b>한글 이름을 치시면 처방약도 함께 찾습니다.</b></p>
     <h2 style="margin-top:16px">모양</h2>
     <div class="shape-grid">${Object.keys(SHAPES_SVG).map(x => `<button class="shape-btn ${PILLQ.sh === x ? 'on' : ''}" onclick="PILLQ.sh=PILLQ.sh==='${x}'?'':'${x}';route()"><svg viewBox="0 0 28 28">${SHAPES_SVG[x]}</svg>${x.replace('형', '')}</button>`).join('')}</div>
+    <h2 style="margin-top:16px">겉모습</h2>
+    <div class="chips" style="margin-top:8px">${[['tab', '알약(정제)'], ['cap', '딱딱한 캡슐'], ['soft', '말랑한 캡슐']].map(([k, n]) => `<button class="chip ${PILLQ.fm === k ? 'on' : ''}" onclick="PILLQ.fm=PILLQ.fm==='${k}'?'':'${k}';route()">${n}</button>`).join('')}</div>
     <h2 style="margin-top:16px">색</h2>
     <div class="color-grid">${colors.map(x => `<button class="color-btn ${PILLQ.c === x ? 'on' : ''}" onclick="PILLQ.c=PILLQ.c==='${x}'?'':'${x}';route()"><i style="background:${COLORS[x]}"></i>${x}</button>`).join('')}</div>
     <div class="chips" style="margin-top:16px">
       <button class="chip ${PILLQ.ln === 'y' ? 'on' : ''}" onclick="PILLQ.ln=PILLQ.ln==='y'?'':'y';route()">가운데 줄(분할선) 있음</button>
       <button class="chip ${PILLQ.rx ? 'on' : ''}" onclick="PILLQ.rx=!PILLQ.rx;route()">${PILLQ.rx ? I.check : ''}처방약까지 찾기${PILLQ.rx && !PUB.rx ? ' (받는 중…)' : ''}</button>
-      ${active ? `<button class="chip" onclick="Object.assign(PILLQ,{sh:'',c:'',txt:'',ln:''});route()">${I.x}지우기</button>` : ''}
+      ${active ? `<button class="chip" onclick="Object.assign(PILLQ,{sh:'',c:'',txt:'',ln:'',fm:''});route()">${I.x}지우기</button>` : ''}
     </div>
   </section>
   <section class="sec"><h2>${active ? `후보 ${res.length.toLocaleString()}개` : '고르면 여기에 사진이 나와요'} <small>${res.length > 30 ? '30개만 표시 — 글자나 색을 더 고르면 줄어요' : PILLQ.rx ? `약국약 ${(PUB.pills || []).length.toLocaleString()} + 처방약 ${(PUB.rx || []).length.toLocaleString()}건에서` : `약국약 ${(PUB.pills || []).length.toLocaleString()}건에서`}</small></h2>
@@ -6559,6 +6562,7 @@ function vPill(){
     <div class="srcs"><span class="src-chip">${I.link}출처: 식약처 의약품 낱알식별 정보 · 사진 약학정보원</span></div></section>
   ${disclaimer('낱알 사진과 각인은 참고용이에요. 같은 모양의 다른 약도 있으니, 확실하지 않으면 약사에게 실물을 보여 주세요.')}`;
 }
+function pillFm(p){ const t = (p.fm || '') + ' ' + (p.n || ''); return /연질/.test(t) ? 'soft' : /캡슐|캅셀/.test(t) ? 'cap' : 'tab'; }
 function pillCard(p, sc){
   const img = pillImg(p);
 /* 사진이 없거나 안 뜰 때 — 자료에 있는 모양·색·각인으로 알약을 직접 그린다.
