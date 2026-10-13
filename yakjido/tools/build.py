@@ -41,6 +41,11 @@ if (pub / 'pills-rx.json').exists() and (pub / 'pills.json').exists() and (pub /
             if not _s or _s in _seen or _s in _oseq: continue
             if _r == 1: _seen.add(_s); _rxl.append([_n, _s, _m])
             elif _nm(_n) not in _onm: _oseq.add(_s); _onm.add(_nm(_n)); _otc += 1; _rxl.append([_n, _s, _m, 0])
+    # 검색 때 받는 파일이라 가볍게(압축 576 → 약 400 KB, 10-14): 병원에서만 쓰는 주사·수액·검사 키트는 빼고(집에서 쓰는 펜형 주사는 남김),
+    _hosp = _r0.compile(r'주사(?!기)|주[0-9][0-9.]*\s*(?:밀리|그램|마이크로|단위|mg|g|mL|IU)|주\(|수액|키트|조영|투석액|관류액|흡입마취')
+    _keep = _r0.compile(r'펜|프리필드')
+    _rxl = [x for x in _rxl if not (_hosp.search(x[0]) and not _keep.search(x[0]))]
+    _rxl = [[x[0], x[1], ''] + x[3:] for x in _rxl]   # 회사 이름은 뺀다(같은 이름은 함량이 이름에 있어 구별된다) — 약 화면에서 낱알 자료로 보인다
     (pub / 'names-rx.json').write_text(json.dumps(_rxl, ensure_ascii=False, separators=(',', ':')), encoding='utf-8')
     data['public'].update({'prod_otc': _otc, 'prod_rx': sum(1 for x in _rxl if len(x) == 3)})
 # 낱알 사진은 식약처 서버 주소를 그대로 쓴다(저장 안 함). docs/yakjido/img/ 에 파일이 있을 때만 그것을 우선.
@@ -147,9 +152,10 @@ if (_pd / 'pills.json').exists() and (_pd / 'easy-index.json').exists():
     _pi = json.loads(_pi.read_text(encoding='utf-8')) if _pi.exists() else {}
     for _x in _pl:
         if not _x.get('ingr') and _pi.get(_x.get('seq')): _x['ingr'] = '|'.join(_pi[_x['seq']]); _n += 1
+    import re as _rb; _r0b = _rb.compile('[가-힣]')
     _pm = ROOT / 'tools' / 'permits.json'   # 식약처 허가 목록의 주성분(품목기준코드가 같을 때만)
     if _pm.exists():
-        _pmi = {x[0]: x[4] for x in json.loads(_pm.read_text(encoding='utf-8')) if x[4]}
+        _pmi = {x[0]: x[4] for x in json.loads(_pm.read_text(encoding='utf-8')) if x[4] and _r0b.search(x[4])}   # 한글 성분만 — 허가 목록 칸은 영어라 성분 사전과 안 맞는다(10-14)
         for _x in _pl:
             if not _x.get('ingr') and _pmi.get(_x.get('seq')): _x['ingr'] = _pmi[_x['seq']]; _n += 1
     if _n:

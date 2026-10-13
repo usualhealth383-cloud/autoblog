@@ -20,6 +20,7 @@ OUT = ROOT.parent / 'docs' / 'yakjido' / 'data'
 BASE = 'https://apis.data.go.kr/1471000/'
 PILL_OP = 'MdcinGrnIdntfcInfoService03/getMdcinGrnIdntfcInfoList03'
 PERMIT_OP = 'DrugPrdtPrmsnInfoService08/getDrugPrdtPrmsnInq08'
+MCPN_OP = 'DrugPrdtPrmsnInfoService08/getDrugPrdtMcpnDtlInq08'   # 주성분 상세 — 원료명(MTRAL_NM)이 한글. 목록의 ITEM_INGR_NAME 은 영어라 성분 사전과 안 맞았다(10-14)
 EASY_OP = 'DrbEasyDrugInfoService/getDrbEasyDrugList'   # 15075057 의약품개요정보(e약은요) — 성분 칸이 없어 허가 목록 주성분을 품목코드로 붙인다
 QUASI_OP = 'QdrgPrdtPrmsnInfoService03/getQdrgPrdtPrmsnInfoInq03'   # 15095679 의약외품 제품 허가 정보(가그린·파스류 일부·소독제 등, 10-14 현욱님 신청)
 ROWS = 100
@@ -112,17 +113,28 @@ def pills(k):
 
 def permits(k):
     rows = fetch_all(PERMIT_OP, k, '의약품 허가 목록')
+    ko = {}
+    try:
+        for r in fetch_all(MCPN_OP, k, '주성분 상세(한글 원료명)'):
+            sq, nm = s(r.get('ITEM_SEQ')), s(r.get('MTRAL_NM'))
+            if sq and nm and nm not in ko.setdefault(sq, []): ko[sq].append(nm)
+    except (Exception, SystemExit) as e:
+        print('주성분 상세 받기 실패 — 성분 칸은 비워 둠:', e)
     out = []
     for r in rows:
         if s(r.get('CANCEL_NAME')) not in ('', '정상'): continue          # 취소·취하는 뺀다
-        ing = '|'.join(x.strip() for x in re.split(r'[|]', re.sub(r'\[[^\]]*\]', '', s(r.get('ITEM_INGR_NAME')))) if x.strip())
+        ing = '|'.join(ko.get(s(r.get('ITEM_SEQ')), []))   # 한글 원료명만(없으면 빈 칸)
         out.append([s(r.get('ITEM_SEQ')), s(r.get('ITEM_NAME')), s(r.get('ENTP_NAME')), 1 if s(r.get('SPCLTY_PBLC')).startswith('전문') else 0, ing])
     return out
 
 
 def easy(k, permits_rows):
     rows = fetch_all(EASY_OP, k, 'e약은요')
-    ing = {x[0]: [i for i in x[4].split('|') if i] for x in permits_rows if x[4]}
+    ing = {x[0]: [i for i in x[4].split('|') if i] for x in permits_rows if x[4] and re.search('[가-힣]', x[4])}
+    old = {}
+    if (OUT / 'easy-index.json').exists():   # 허가 목록에 한글 성분이 없으면 지금 쓰는 e약은요 성분을 그대로
+        for x in json.loads((OUT / 'easy-index.json').read_text(encoding='utf-8')):
+            if x.get('seq') and x.get('i'): old[x['seq']] = x['i']
     pl = {}
     for f in ('pills.json', 'pills-rx.json'):
         if (OUT / f).exists():
@@ -134,7 +146,7 @@ def easy(k, permits_rows):
     for r in rows:
         seq = s(r.get('itemSeq')); p = pl.get(seq)
         warn, atpn = clean(r.get('atpnWarnQesitm')), clean(r.get('atpnQesitm'))
-        out.append({'n': s(r.get('itemName')), 'm': s(r.get('entpName')), 'i': ing.get(seq, []), 'map': [],
+        out.append({'n': s(r.get('itemName')), 'm': s(r.get('entpName')), 'i': ing.get(seq) or old.get(seq, []), 'map': [],
                     'e': clean(r.get('efcyQesitm')), 'u': clean(r.get('useMethodQesitm')), 'c': (warn + '\n' + atpn).strip() if warn else atpn,
                     'x': clean(r.get('intrcQesitm')), 's': clean(r.get('seQesitm')), 'k': clean(r.get('depositMethodQesitm')),
                     'img': s(r.get('itemImage')) or (('https://nedrug.mfds.go.kr/pbp/cmn/itemImageDownload/' + p['img']) if p and p.get('img') else ''),
@@ -175,6 +187,8 @@ def main():
             PR = R if only == '' else (json.loads(pm.read_text(encoding='utf-8')) if pm.exists() else [])
             E = easy(k, PR)
             if len(E) < 4000: sys.exit(f'e약은요 {len(E)}건 — 너무 적어 기존 자료를 그대로 둡니다')
+            ko_n = sum(1 for e in E if e['i'] and re.search('[가-힣]', ''.join(e['i'])))
+            if ko_n < len(E) * .9: sys.exit(f'e약은요 한글 성분 {ko_n}/{len(E)} — 성분 연결이 깨질 수 있어 기존 자료를 그대로 둡니다')
             CH = 200
             for old in OUT.glob('easy-*.json'): old.unlink()
             (OUT / 'easy-index.json').write_text(dump([{'n': e['n'], 'm': e['m'], 'i': e['i'], 'map': e['map'], 'img': e['img'], 'cvs': e['cvs'], 'seq': e['seq'], 'id': i} for i, e in enumerate(E)]), encoding='utf-8')
