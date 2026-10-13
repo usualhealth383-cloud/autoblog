@@ -1,4 +1,4 @@
-package kr.yakjido.app;
+package app.yakjido;
 
 import com.getcapacitor.BridgeActivity;
 

@@ -80,12 +80,14 @@ SLIM = {
     'drugs':       ['id', 'name', 'en', 'class', 'rx', 'tagline', 'simple', 'for'],
     'supplements': ['id', 'name', 'en', 'tags', 'brands', 'evidence'],
     'classes':     ['id', 'name', 'short', 'icon'],
-    'tips':        ['id', 'group', 'icon', 'title'],   # 홈은 제목만 쓴다 — 본문은 팁 화면(본문 받은 뒤)에서(2026-10-06 첫 화면 220 KB)
+    'tips':        ['id', 'group', 'icon', 'title'],
+    'askdoc':      ['id', 'icon', 'q'],               # 홈은 개수·검색은 질문만 — 대답은 본문과 함께(2026-10-13 검수 반영으로 첫 화면 220 KB)   # 홈은 제목만 쓴다 — 본문은 팁 화면(본문 받은 뒤)에서(2026-10-06 첫 화면 220 KB)
 }
 CORE_KEYS = ['sources', 'ingredients', 'interactions', 'kids', 'productImages', 'suppRules', 'myths', 'recalls', 'drugRep']   # drugRep: 약 화면(본문 받은 뒤)에서만 씀 — 첫 화면 220 KB 예산
 # 약 화면에서만 쓰는 칸(자주 묻는 질문·부작용 빈도)은 data/detail.json 으로 한 번 더 뺀다.
 # 본문과 «동시에» 받기 시작하고, 약 화면만 이것까지 기다린다 — core.json 400 KB 예산(2026-10-04)
-DETAIL = {'drugs': ['faq', 'sideFreq', 'lact'], 'supplements': ['foods', 'need', 'faq', 'evidenceNote', 'priceTip']}
+DETAIL = {'drugs': ['faq', 'sideFreq', 'lact', 'tips', 'interactions'],   # tips·interactions: 약 화면에서만(2026-10-13 검수 반영으로 core 400 KB)
+          'supplements': ['foods', 'need', 'faq', 'evidenceNote', 'priceTip']}
 detail = {k: [{'id': o['id'], **{f: o[f] for f in fs if f in o}} for o in data[k] if any(f in o for f in fs)] for k, fs in DETAIL.items()}
 for k, fs in DETAIL.items():
     data[k] = [{f: v for f, v in o.items() if f not in fs} for o in data[k]]
@@ -117,10 +119,13 @@ sw = ROOT / 'sw.js'
 if sw.exists():
     s = re.sub(r"const CACHE = '[^']*'", f"const CACHE = 'yakjido-{stamp}-{abs(hash(j)) % 10000}'", sw.read_text(encoding='utf-8'))
     (pages / 'sw.js').write_text(s, encoding='utf-8')
-for name in ('manifest.webmanifest', 'privacy.html'):   # privacy.html = 스토어에 적는 개인정보처리방침 주소
+for name in ('manifest.webmanifest', 'privacy.html', 'delete-account.html', 'srv.js'):   # delete-account.html = 스토어 「계정 삭제 URL」(메디나눔 안내 2026-10-13)   # srv.js = 계정·기록 이어 두기(따로 받는 파일)   # privacy.html = 스토어에 적는 개인정보처리방침 주소
     src = ROOT / name
     if src.exists():
         (pages / name).write_text(src.read_text(encoding='utf-8'), encoding='utf-8')
+# 메디나눔 공통 이름(privacy-<앱>.html · delete-account-<앱>.html)으로도 같은 쪽을 둔다 — 옛 주소(privacy.html)는 스토어에 이미 적혀 있어 그대로 둔다
+for name, alias in (('privacy.html', 'privacy-yakjido.html'), ('delete-account.html', 'delete-account-yakjido.html')):
+    if (pages / name).exists(): (pages / alias).write_text((pages / name).read_text(encoding='utf-8'), encoding='utf-8')
 for ic in (ROOT / 'icons').glob('*'):
     (pages / ic.name).write_bytes(ic.read_bytes())
 
