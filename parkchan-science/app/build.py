@@ -54,6 +54,13 @@ out = (shell.replace('<!--CONCEPTS-->', j([{k: v for k, v in c.items() if k not 
             .replace('<!--MORE_META-->', j(meta))
             .replace('<!--QUOTES-->', j(quotes)))
 for _k in ('<!--BANK-->', '<!--LABS-->', '<!--FIGS-->'): assert _k not in out
+# 배포본에서 주석을 덜어 낸다(2026-10-12, 앱 파일 한도 1,700 KB) — 원본(app-shell.html)의 설명 주석은 그대로 둔다.
+# ① 첫 <style> 안의 CSS 주석 ② 한 줄을 통째로 차지하는 /* … */ 블록(안에 */ 가 없고 */ 뒤가 곧 줄 끝일 때만 — 코드가 붙은 줄은 건드리지 않음).
+# 줄 끝 // 주석은 템플릿 글자 속일 수 있어 두고, 결과는 아래 node --check 관문을 그대로 지난다
+import re as _re
+_a, _b = out.index('<style>'), out.index('</style>')
+out = out[:_a] + _re.sub(r'/\*[\s\S]*?\*/', '', out[_a:_b]) + out[_b:]
+out = _re.sub(r'^[ \t]*/\*(?:(?!\*/)[\s\S])*?\*/[ \t]*\n', '', out, flags=_re.M)
 
 # GitHub Pages 로 나가는 PWA 배포본 — manifest·service worker 가 함께 있어야 앱처럼 동작한다
 pages = ROOT.parent / 'docs' / 'parkchan'

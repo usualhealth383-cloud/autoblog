@@ -1,0 +1,212 @@
+<!doctype html><html lang="ko"><head><meta charset="utf-8"><style>
+@font-face{font-family:S;font-weight:400;src:url(file:///root/.fonts/static/NotoSansKR-400.ttf)}
+@font-face{font-family:S;font-weight:500;src:url(file:///root/.fonts/static/NotoSansKR-500.ttf)}
+@font-face{font-family:S;font-weight:700;src:url(file:///root/.fonts/static/NotoSansKR-700.ttf)}
+@font-face{font-family:S;font-weight:900;src:url(file:///root/.fonts/static/NotoSansKR-900.ttf)}
+@font-face{font-family:P;src:url(file:///root/.fonts/NanumPenScript.ttf)}
+:root{--cream:#FBF5EA;--paper:#FFFDF7;--kraft:#F1E5CF;--line:#E9DCC4;--ink:#2B3245;--navy:#24406F;--blue:#3B6AD0;--butter:#FFE287;--butter2:#FFF2C2;--peach:#F7CDB0;--leaf:#9CC4A6;--sky:#CFE0F7;--body:#4A4F5C;--muted:#8A7F6E}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#bbb;font-family:S,sans-serif;color:var(--ink);word-break:keep-all;-webkit-font-smoothing:antialiased}
+.card{width:1080px;position:relative;overflow:hidden;margin-bottom:40px;
+  background-color:var(--cream);background-image:radial-gradient(rgba(150,120,80,.10) 1.6px,transparent 1.7px);background-size:28px 28px}
+.pad{padding:84px 84px 88px;position:relative;z-index:2}
+.pen{font-family:P,cursive;font-weight:400;color:var(--blue)}
+.hi{background:linear-gradient(transparent 58%,var(--butter) 58%,var(--butter) 92%,transparent 92%);padding:0 4px}
+.note{position:relative;background:var(--paper);border-radius:18px;box-shadow:0 2px 0 rgba(120,90,50,.08),0 18px 36px rgba(120,90,50,.12)}
+.tape{position:absolute;width:150px;height:44px;background:rgba(255,226,135,.85);top:-20px;left:50%;transform:translateX(-50%) rotate(-3deg);border-radius:3px}
+.tape.b{background:rgba(207,224,247,.9)}.tape.p{background:rgba(247,205,176,.9)}
+.foot{position:absolute;left:0;right:0;bottom:46px;text-align:center;font-size:25px;color:var(--muted);font-weight:500;z-index:2}
+.foot b{color:var(--navy);font-weight:900}
+.doodle{position:absolute;z-index:1;fill:none;stroke-linecap:round;stroke-linejoin:round}
+h2{font-size:58px;font-weight:900;line-height:1.3;letter-spacing:-.02em;color:var(--navy)}
+.src{font-size:19px;color:var(--muted);line-height:1.55;text-align:center;margin-top:30px}
+
+/* 1 대표 */
+#c1{height:1080px}
+#c1 .note{margin:70px 40px 0;padding:92px 70px 76px;transform:rotate(-1.2deg)}
+#c1 .pen.top{font-size:56px;margin-bottom:10px;display:block}
+#c1 h1{font-size:88px;font-weight:900;line-height:1.24;letter-spacing:-.035em;color:var(--navy)}
+#c1 p{font-size:31px;line-height:1.65;color:var(--body);margin-top:34px}
+#c1 p b{color:var(--ink)}
+
+/* 2 수능 */
+.idx{display:grid;grid-template-columns:repeat(3,1fr);gap:22px;margin-top:56px}
+.idx .note{padding:58px 28px 34px;text-align:center}
+.idx .note:nth-child(1){transform:rotate(-1.5deg)}.idx .note:nth-child(3){transform:rotate(1.4deg)}
+.idx .ic{width:96px;height:96px;margin:0 auto 18px;border-radius:50%;display:grid;place-items:center}
+.idx b{display:block;font-size:31px;font-weight:900;line-height:1.35;color:var(--navy);margin-bottom:12px}
+.idx span{font-size:23px;line-height:1.55;color:var(--body);display:block}
+.saying{margin-top:46px;text-align:center;font-size:52px}
+
+/* 3 원장 */
+#c3 .note{margin-top:46px;padding:60px 56px 50px}
+.row{display:flex;gap:26px;align-items:flex-start;padding:20px 0;border-bottom:2px dashed var(--line)}
+.row:last-child{border-bottom:none}
+.row .ic{flex:0 0 74px;height:74px;border-radius:50%;display:grid;place-items:center}
+.row b{display:block;font-size:32px;font-weight:900;color:var(--navy);margin:4px 0 6px}
+.row span{font-size:25px;line-height:1.6;color:var(--body)}
+.chain{display:flex;align-items:center;justify-content:center;gap:14px;margin-top:40px}
+.chain span{font-size:29px;font-weight:900;color:var(--navy);background:var(--paper);border:2.5px solid var(--navy);border-radius:999px;padding:12px 26px}
+.chain span.now{background:var(--butter);border-color:var(--butter)}
+.chain i{font-family:P;font-style:normal;font-size:48px;color:var(--blue)}
+
+/* 4 수업 */
+.lined{margin-top:44px;padding:52px 60px 40px;background-color:var(--paper)}
+.lined li{list-style:none;display:flex;gap:22px;align-items:center;min-height:92px;font-size:33px;font-weight:700;color:var(--ink);border-bottom:2px dashed var(--line)}
+.lined li:last-child{border-bottom:none}
+.lined li svg{flex:0 0 46px}
+.lined li small{font-size:23px;font-weight:400;color:var(--muted);margin-left:8px}
+.bookpic{position:absolute;right:70px;top:120px;width:250px;transform:rotate(5deg);border-radius:6px;box-shadow:0 14px 30px rgba(120,90,50,.22);z-index:3;background:#fff;border:8px solid #fff}
+
+
+
+.pubs{display:flex;flex-wrap:wrap;justify-content:flex-start;gap:12px;margin-top:40px}
+.pubs span{font-size:27px;font-weight:700;color:var(--navy);background:var(--paper);border:2px solid var(--line);border-radius:12px;padding:10px 20px;box-shadow:0 4px 10px rgba(120,90,50,.08)}
+.pubs span:nth-child(odd){transform:rotate(-2deg)}.pubs span:nth-child(even){transform:rotate(1.5deg)}
+.pubn{font-size:23px;color:var(--muted);margin-top:16px}
+#c3 .note{margin-top:40px;padding:50px 52px 36px}
+.stairs{display:flex;align-items:flex-end;gap:20px;margin-top:50px;height:430px}
+.stairs .note{flex:1;padding:50px 24px 30px;text-align:center}
+.stairs .st1{height:300px}.stairs .st2{height:360px}.stairs .st3{height:420px;background:#FFF6D6}
+.stairs small{display:inline-block;font-size:24px;font-weight:900;color:#fff;background:var(--blue);border-radius:999px;padding:4px 18px;line-height:1.4}
+.stairs b{display:block;font-size:34px;font-weight:900;color:var(--navy);margin:14px 0 12px;letter-spacing:-.02em}
+.stairs span{font-size:23px;line-height:1.55;color:var(--body)}
+/* 6 영상 */
+.vid{display:grid;grid-template-columns:1fr 1fr;gap:26px;margin-top:50px}
+.vid .note{padding:58px 34px 40px}
+.vid .note:nth-child(1){transform:rotate(-1.2deg)}.vid .note:nth-child(2){transform:rotate(1.1deg)}
+.vid .ic{width:96px;height:96px;border-radius:50%;display:grid;place-items:center;margin-bottom:22px}
+.vid b{display:block;font-size:34px;font-weight:900;color:var(--navy);margin-bottom:10px}
+.vid span{font-size:25px;line-height:1.6;color:var(--body)}
+/* 7 무료 수강 */
+.stp{display:flex;align-items:center;justify-content:center;gap:14px;margin-top:40px}
+.stp span{font-size:29px;font-weight:900;color:var(--navy);background:var(--paper);border:2.5px solid var(--navy);border-radius:999px;padding:14px 28px}
+.stp span.now{background:var(--butter);border-color:var(--butter)}
+.stp i{font-family:P;font-style:normal;font-size:48px;color:var(--blue)}
+/* 5 오시는 길 */
+#c5 .note{margin-top:44px;padding:66px 60px 54px;text-align:center}
+#c5 .name{font-size:58px;font-weight:900;color:var(--navy);letter-spacing:-.02em}
+#c5 .name .p{color:#1F86D6}
+#c5 .addr{font-size:32px;line-height:1.6;color:var(--body);margin-top:18px}
+#c5 .tel{display:inline-flex;align-items:center;gap:18px;margin-top:34px;background:var(--butter);border-radius:999px;padding:18px 40px;font-size:30px;font-weight:700;color:var(--ink)}
+#c5 .tel b{font-size:54px;font-weight:900;letter-spacing:-.01em}
+#c5 .reg{font-size:21px;color:var(--muted);margin-top:28px}
+.q4{display:grid;grid-template-columns:1fr 1fr;gap:26px;margin-top:56px}
+.q4 .note{padding:50px 34px 36px;display:flex;gap:22px;align-items:flex-start}
+.q4 .note:nth-child(1){transform:rotate(-1.2deg)}.q4 .note:nth-child(5){transform:rotate(1.1deg)}
+.q4 .note.wide{grid-column:1/-1;background:var(--butter);align-items:center;padding:42px 44px 38px}.q4 .note.wide span{font-size:25px}
+.q4 .ic{flex:0 0 84px;height:84px;border-radius:50%;display:grid;place-items:center}
+.q4 b{display:block;font-size:33px;font-weight:900;color:var(--navy);margin:6px 0 10px;letter-spacing:-.02em}
+.q4 span{font-size:23px;line-height:1.55;color:var(--body);display:block}
+
+@font-face{font-family:S;font-weight:800;src:url(file:///root/.fonts/static/NotoSansKR-800.ttf)}
+.sq{width:1080px;height:1080px;position:relative;overflow:hidden;margin-bottom:40px}
+/* 프로필 */
+#prof{width:640px;height:640px;background:#002C59;display:grid;place-items:center;margin-bottom:40px;font-family:S}
+#prof .in{text-align:center;line-height:1.02;font-weight:900;letter-spacing:-.04em}
+#prof .a{font-size:150px;color:#00B4FF}#prof .b{font-size:104px;color:#FDF9F1}#prof .c{font-size:44px;color:#FFE600;letter-spacing:.3em;margin-top:18px;font-weight:800}
+/* 광고 A 검정 노랑 */
+#adA{background:#000;font-family:S;padding:70px 64px 60px;display:flex;flex-direction:column}
+#adA .nm{font-weight:900;font-size:128px;line-height:1;letter-spacing:-.045em;color:#FFE600;white-space:nowrap}#adA .nm b{color:#fff}#adA .nm i{font-style:normal;font-size:.72em}
+#adA .big{margin-top:70px;font-weight:900;font-size:210px;line-height:1;color:#FFE600;letter-spacing:-.04em}
+#adA .rec{margin-top:26px;font-weight:900;font-size:92px;line-height:1.1;color:#fff;letter-spacing:-.035em}#adA .rec em{font-style:normal;color:#FFE600}
+#adA .info{margin-top:52px;display:flex;gap:16px}
+#adA .info span{border:6px solid #FFE600;color:#FFE600;border-radius:14px;padding:12px 24px;font-weight:900;font-size:44px;white-space:nowrap}
+#adA .info span.f{background:#FFE600;color:#000}
+#adA .tel{margin-top:auto;font-weight:900;font-size:104px;color:#FFE600;letter-spacing:-.02em;line-height:1}#adA .tel small{color:#fff;font-size:.62em;margin-right:14px}
+/* 소식·광고 B C D 편안한 판 */
+.sq.cream{background:var(--cream)}
+#adB .note{position:absolute;left:84px;right:84px;top:118px;padding:84px 70px 70px;transform:rotate(-1.2deg)}
+#adB h1{font-size:96px;font-weight:900;line-height:1.22;letter-spacing:-.035em;color:var(--navy)}
+#adB p{font-size:36px;line-height:1.6;color:var(--body);margin-top:34px}#adB p b{color:var(--ink)}
+#adC .pad,#news .pad{padding:96px 84px}
+#adC .stp4{margin-top:54px}
+#adC .tel2{margin:64px auto 0;display:flex;justify-content:center}
+#adC .tel2 span{background:var(--butter);border-radius:999px;padding:22px 52px;font-size:34px;font-weight:700;color:var(--ink)}#adC .tel2 b{font-size:62px;font-weight:900;margin-left:14px}
+#news h2{text-align:center;font-size:72px}
+#news .note{margin-top:56px;padding:48px 56px 30px}
+#news .row b{font-size:38px}#news .row span{font-size:28px}
+
+.period{display:flex;align-items:center;justify-content:center;gap:28px;margin-top:46px}
+.period .d{text-align:center}
+.period .d small{display:block;font-size:24px;font-weight:700;color:var(--muted);margin-bottom:6px}
+.period .d b{font-size:58px;font-weight:900;color:var(--navy);letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+.period i{font-family:P;font-style:normal;font-size:70px;color:var(--blue)}
+.months{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-top:64px}
+.months .note{padding:46px 10px 26px;text-align:center}
+.months .note:nth-child(odd){transform:rotate(-1.4deg)}.months .note:nth-child(even){transform:rotate(1.2deg)}
+.months b{display:block;font-size:44px;font-weight:900;color:var(--navy)}
+.months span{font-size:21px;color:var(--muted)}
+.who{margin-top:40px;text-align:center;font-size:30px;color:var(--body);line-height:1.7}
+.who b{color:var(--navy);background:linear-gradient(transparent 58%,var(--butter) 58%,var(--butter) 92%,transparent 92%);padding:0 4px}
+.badge{display:inline-block;font-size:26px;font-weight:900;color:#fff;background:var(--blue);border-radius:999px;padding:8px 24px;margin-bottom:18px}
+
+.road{position:relative;margin-top:44px;display:grid;gap:18px}
+.road::before{content:"";position:absolute;left:47px;top:40px;bottom:40px;width:4px;background:repeating-linear-gradient(var(--line) 0 12px,transparent 12px 22px)}
+.rs{display:grid;grid-template-columns:98px 1fr;gap:22px;align-items:center;position:relative}
+.rs .dot{width:98px;height:98px;border-radius:50%;background:var(--paper);border:3px solid var(--navy);display:grid;place-items:center;font-size:34px;font-weight:900;color:var(--navy);z-index:1}
+.rs .note{padding:26px 30px 24px;display:flex;justify-content:space-between;gap:20px;align-items:center}
+.rs .note b{display:block;font-size:34px;font-weight:900;color:var(--navy);letter-spacing:-.02em}
+.rs .note span{display:block;font-size:22px;color:var(--body);margin-top:4px;line-height:1.5}
+.rs .note em{flex:0 0 auto;font-style:normal;text-align:right;font-size:22px;font-weight:700;color:var(--muted);line-height:1.45}
+.rs.now .dot{background:var(--butter);border-color:var(--butter)}
+.rs.now .note{background:#FFF6D6;outline:3px solid var(--butter)}
+.rs.now .note em b{font-size:22px;color:#fff;background:var(--blue);border-radius:999px;padding:4px 14px;display:inline-block;margin-bottom:6px}
+
+.halves{display:grid;grid-template-columns:1fr 1fr;gap:26px;margin-top:60px}
+.halves .note{padding:56px 40px 36px}
+.halves .note:nth-child(1){transform:rotate(-1.2deg)}.halves .note:nth-child(2){transform:rotate(1.1deg)}
+.halves small{display:inline-block;font-size:23px;font-weight:900;color:#fff;background:var(--blue);border-radius:999px;padding:6px 18px}
+.halves b{display:block;font-size:50px;font-weight:900;color:var(--navy);margin:18px 0 14px;letter-spacing:-.02em}
+.halves ul{list-style:none;border-top:2px dashed var(--line)}
+.halves li{font-size:27px;color:var(--body);padding:12px 0 12px 34px;position:relative;border-bottom:2px dashed var(--line)}
+.halves li::before{content:"";position:absolute;left:4px;top:24px;width:14px;height:14px;border-radius:50%;background:var(--butter);border:2.5px solid var(--navy)}
+
+.stp4{display:flex;align-items:stretch;gap:8px;margin-top:64px}
+.stp4 div{flex:1;background:var(--paper);border:2.5px solid var(--navy);border-radius:22px;padding:18px 10px 20px;text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px}
+.stp4 div.now{background:var(--butter);border-color:var(--butter)}
+.stp4 em{font-style:normal;width:40px;height:40px;border-radius:50%;background:var(--navy);color:#fff;font-size:22px;font-weight:900;display:grid;place-items:center}
+.stp4 b{font-size:27px;font-weight:900;color:var(--navy);line-height:1.3;letter-spacing:-.02em}
+.stp4 i{align-self:center;font-style:normal;font-size:40px;font-weight:900;color:var(--blue)}
+
+#adA{padding:64px 56px 56px}
+#adA .nm,#adA .big,#adA .rec,#adA .tel{align-self:flex-start}
+#adA .info{width:100%}#adA .info span{flex:1;text-align:center}#adA .info span.f{flex:1.5}
+#adB .note{top:104px;padding:76px 64px 60px}#adB h1{font-size:90px}#adB p{font-size:34px;margin-top:28px}
+#adB .badge{font-size:32px;padding:10px 28px}
+#adC .stp4 b{font-size:31px}#adC .stp4 em{width:48px;height:48px;font-size:26px}#adC .stp4 div{padding:26px 10px 28px}
+#adC .pad{padding-top:118px}#adC .dates{margin-top:56px;text-align:center;font-size:38px;line-height:1.6;color:var(--body)}#adC .dates b{color:var(--navy)}#adC .tel2{margin-top:44px}
+#adA{align-items:center;text-align:center;padding:58px 56px 58px;justify-content:space-between}
+#adA .nm1,#adA .nm2,#adA .rec,#adA .tel{align-self:center;margin:0;line-height:1;font-weight:900}
+#adA .nm1{color:#fff;letter-spacing:-.04em}
+#adA .nm2{color:#FFE600;letter-spacing:-.045em;margin-top:-10px}#adA .nm2 i{font-style:normal;font-size:.8em;margin-left:.03em}
+#adA .rec{color:#fff;letter-spacing:-.035em}#adA .rec em{font-style:normal;color:#FFE600}
+#adA .info{margin:0;width:100%;gap:14px}#adA .info span{min-width:0;padding:12px 6px;font-size:38px;display:grid;place-items:center}#adA .info span:nth-child(1){flex:1.5}#adA .info span:nth-child(2){flex:.75}#adA .info span.f{flex:1.45}
+#adA{position:relative}
+.fineA{position:absolute;left:0;right:0;bottom:14px;text-align:center;font-size:19px;font-weight:500;color:#7A7A7A;letter-spacing:0}
+.fineC{position:absolute;left:0;right:0;bottom:16px;text-align:center;font-size:19px;font-weight:500;color:#A39A8C;z-index:2}
+.sq.cream .foot{bottom:52px}
+</style></head><body>
+<section id="prof"><div class="in"><div class="a">박찬</div><div class="b">통합과학</div><div class="c">학원</div></div></section>
+<section class="sq" id="adA">
+ <div class="nm1 fit" data-w="968" data-h="300">박찬</div>
+ <div class="nm2 fit" data-w="968" data-h="200">통합과학<i>학원</i></div>
+ <div class="rec fit" data-w="968" data-h="90">고1 예비 (현 중3) 수강생 <em>모집!</em></div>
+ <div class="info"><span>11월 3일 · 4일 개강</span><span>주 2회</span><span class="f">일주일 무료 수강</span></div>
+ <div class="tel fit" data-w="968" data-h="120"><small>T.</small>053-213-3577</div><div class="fineA">남교입 제2019-115호 · 교습비(월) 중등부 210,000 / 267,000원 · 고등부 220,000 / 317,000원</div></section>
+<section class="sq cream" id="adB">
+ <svg class="doodle" style="right:70px;top:46px" width="170" height="170" viewBox="0 0 190 190" stroke="#3B6AD0" stroke-width="5"><ellipse cx="95" cy="95" rx="80" ry="30" transform="rotate(-25 95 95)"/><ellipse cx="95" cy="95" rx="80" ry="30" transform="rotate(35 95 95)"/><circle cx="95" cy="95" r="13" fill="#FFE287"/></svg>
+ <div class="note"><span class="tape"></span>
+  <span class="pen" style="font-size:58px;display:block;margin-bottom:14px">현 중3 학부모님께</span>
+  <span class="badge">고1 예비반 모집</span>
+  <h1>처음 만나는<br><span class="hi">통합과학</span>,<br>차근차근 준비합니다</h1>
+  <p><b>3월 입학 전, 통합과학 1·2를 확실히</b><br>화금반 11월 3일(화) · 수토반 11월 4일(수) 개강<br>주 2회 수업</p></div><div class="foot"><b>박찬 통합과학 학원</b> · 대구 달서구 조암로 25 그루빌딩 501호 (월성 CGV 옆)</div><div class="fineC">남교입 제2019-115호 · 교습비(월) 중등부 210,000 / 267,000원 · 고등부 220,000 / 317,000원</div></section>
+<section class="sq cream" id="adC"><div class="pad">
+ <p class="pen" style="font-size:84px;text-align:center">먼저 일주일 들어 보십시오</p>
+ <h2 style="text-align:center;margin-top:18px">고1 예비반 · 일주일 무료 수강</h2>
+ <div class="stp4"><div><em>1</em><b>상담 전화<br>또는 내원</b></div><i>›</i><div><em>2</em><b>수강 예약</b></div><i>›</i><div class="now"><em>3</em><b>일주일<br>무료 수강</b></div><i>›</i><div><em>4</em><b>등록 결정</b></div></div>
+ <p class="dates">화금반 <b>11월 3일(화)</b> · 수토반 <b>11월 4일(수)</b> 개강<br>주 2회 수업</p><div class="tel2"><span>상담<b>053-213-3577</b></span></div></div><div class="foot"><b>박찬 통합과학 학원</b> · 대구 달서구 조암로 25 그루빌딩 501호 (월성 CGV 옆)</div><div class="fineC">남교입 제2019-115호 · 교습비(월) 중등부 210,000 / 267,000원 · 고등부 220,000 / 317,000원</div></section>
+<section class="sq cream" id="news"><div class="pad"><h2>이렇게 강의합니다</h2><div class="note"><span class="tape b"></span><div class="row"><div class="ic" style="background:var(--butter2)"><svg width="44" height="44" viewBox="0 0 58 58" fill="none" stroke="#24406F" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"><path d="M29 8 a14 14 0 0 1 9 25 L38 40 L20 40 L20 33 A14 14 0 0 1 29 8 Z"/><path d="M22 47 L36 47 M25 53 L33 53"/></svg></div><div><b>개념과 원리 위주의 이해 중심 강의</b><span>기초가 부족했던 학생을 위한 특별 보충 수업까지</span></div></div><div class="row"><div class="ic" style="background:var(--sky)"><svg width="44" height="44" viewBox="0 0 58 58" fill="none" stroke="#24406F" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"><path d="M8 46 L20 30 L30 38 L48 14"/><path d="M38 14 L48 14 L48 24"/></svg></div><div><b>사고력 · 응용력 향상을 돕는 문제 풀이</b><span>자료를 해석하고, 처음 보는 상황에 적용하기</span></div></div><div class="row"><div class="ic" style="background:#F9E1D0"><svg width="44" height="44" viewBox="0 0 58 58" fill="none" stroke="#24406F" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="12" width="46" height="34" rx="7"/><path d="M24 21 L36 29 L24 37 Z" fill="#24406F"/></svg></div><div><b>동영상으로 보강하는 수업</b><span>결석한 날도 학원에서 동영상으로 보강</span></div></div><div class="row"><div class="ic" style="background:var(--butter2)"><svg width="44" height="44" viewBox="0 0 58 58" fill="none" stroke="#24406F" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="29" cy="19" r="10"/><path d="M11 50 Q13 33 29 33 Q45 33 47 50"/></svg></div><div><b>원장 직강</b><span>공통과학을 가르쳤던 경험으로 처음부터 끝까지</span></div></div></div></div><div class="foot"><b>박찬 통합과학 학원</b> · 대구 달서구 조암로 25 그루빌딩 501호 (월성 CGV 옆)</div><div class="fineC">남교입 제2019-115호 · 교습비(월) 중등부 210,000 / 267,000원 · 고등부 220,000 / 317,000원</div></section>
+<script>
+Promise.all([document.fonts.load('900 100px S'),document.fonts.load('800 100px S')]).then(()=>{document.querySelectorAll('.fit').forEach(el=>{el.style.whiteSpace='nowrap';el.style.display='inline-block';const W=+el.dataset.w,H=+el.dataset.h;let lo=10,hi=500;for(let k=0;k<28;k++){const m=(lo+hi)/2;el.style.fontSize=m+'px';const r=el.getBoundingClientRect();(r.width<=W&&r.height<=H)?lo=m:hi=m}el.style.fontSize=lo+'px'});document.body.dataset.ok=1});
+</script></body></html>

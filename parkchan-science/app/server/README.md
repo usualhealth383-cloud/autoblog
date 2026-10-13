@@ -36,7 +36,7 @@
 앱 쪽 코드와 서버 함수(`functions/verify-purchase`, `functions/push`)는 다 되어 있습니다. 원장님 계정으로 켜는 일만 남았습니다.
 
 **A. 스토어 결제(Google Play · 일회성 이용권, 자동 결제 없음)**
-1. Play Console → 앱 → **수익 창출 → 인앱 상품**: `pass_m1`(9,900원) · `pass_m6`(49,000원) · `pass_y1`(79,000원) 세 개를 만들고 활성화.
+1. Play Console → 앱 → **수익 창출 → 인앱 상품**: `pass_m1`(9,900원) · `pass_m6`(39,000원) · `pass_y1`(59,000원) 세 개를 만들고 활성화.
 2. Google Cloud 에서 **서비스 계정** 하나 만들고 JSON 키 받기 → Play Console **사용자 및 권한**에서 그 이메일을 초대(권한: 재무 데이터 보기 · 주문 관리).
 3. Supabase → **Edge Functions → Secrets**: `GOOGLE_SA_JSON`(키 JSON 전체) · `ANDROID_PACKAGE`=`kr.parkchan.science` · `CRON_SECRET`(아무 긴 문자열).
 4. 배포: `npx supabase functions deploy verify-purchase --project-ref <REF>` (함수 폴더는 이 `functions/`).
