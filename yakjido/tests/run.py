@@ -391,12 +391,12 @@ def main():
           [...document.querySelectorAll('.chip-m')].find(b=>b.innerText.includes('전립선비대')).click();
           const off=ME.bph===false && !document.querySelector('.cond-on');
           return {tabs, on, desc, stay, off, chips:document.querySelectorAll('.chip-m').length};}""")
-        if _mt['tabs'] != ['내 몸', '먹는 약', '설정']: fails.append(f'내 정보 탭이 셋이 아닙니다: {_mt["tabs"]}')
+        if _mt['tabs'] != ['내 몸', '내 약통', '설정']: fails.append(f'내 정보 탭이 셋이 아닙니다: {_mt["tabs"]}')   # 3-20 이름 하나로 — 「먹는 약」 → 「내 약통」
         if _mt['chips'] != 12 or not _mt['on'] or not _mt['off']: fails.append(f'건강 상태 단추가 켜지고 꺼지지 않습니다: {_mt}')
         if '소변이 막힐 수' not in _mt['desc']: fails.append('건강 상태를 눌러도 「켜 둔 것」 설명이 안 붙습니다')
         if not _mt['stay']: fails.append('건강 상태를 누르면 화면이 맨 위로 튑니다')
         pg.goto(url + '#/me?t=meds'); ready(); pg.wait_for_timeout(300)
-        if not pg.query_selector('#mq') or '복용 시간 알림' not in pg.inner_text('#view'): fails.append('내 정보 「먹는 약」 탭에 약 담기·알림이 없습니다')
+        if not pg.query_selector('#mq') or '복용 시간 알림' not in pg.inner_text('#view'): fails.append('내 정보 「내 약통」 탭에 약 담기·알림이 없습니다')
         pg.goto(url + '#/me?t=set'); ready(); pg.wait_for_timeout(300)
         _st = pg.inner_text('#view')
         for kw in ('글자 크기', '화면 밝기', '휴대폰을 바꾸실 때', '개인정보처리방침'):

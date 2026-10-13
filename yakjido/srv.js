@@ -1,6 +1,6 @@
 /* 약지도 — 계정·기록 이어 두기(메디나눔 공용 서버). app-shell.html 뒤에 따로 받는 파일(2026-10-13). */
 /* ▼▼ 서버 부품 시작 ▼▼ */
-/* 약지도 메디나눔 합류 1013 — 길동무.html(yozm-health, 10-13 정본)의 서버 부품 사본. 바꾼 것: 계정 지우기에 p_app · 결과 문구 · 동의 안내 글 · 버튼 색(약지도 색) · 복구 표시 이름 */
+/* 약지도 메디나눔 합류 1013 — 길동무.html(yozm-health, 10-13 정본)의 서버 부품 사본. 바꾼 것: 계정 지우기에 p_app · 결과 문구 · 동의 안내 글 · 버튼 색(약지도 색) · 복구 표시 이름 · 라이브러리 SRI(supabase.js) · 가입 때 user_metadata {app, age14_at} · 서버.복구처리 내보내기 */
 /* ═══ 계정·기록 동기화·문의 — 네 앱 공용 부품 (Supabase, 2026-09-15) ═══════════════
    원칙: ‘없어도 앱은 그대로’. 인터넷이 없거나 스크립트를 못 받으면 조용히 꺼진다.
    기록은 localStorage 가 정본이고, 서버는 ‘복사본’이다. 열쇠(앱마다 접두사)로 골라 올린다.
@@ -14,7 +14,11 @@
      publishable 키는 앱에 실어도 되는 키다(행 단위 보안이 지킨다). ⛔ service_role 키 · secret 키는 넣지 않는다. 비우면 준비()가 라이브러리를 받지 않는다. */
   var URL = 'https://uszalzczpmyifzbamjno.supabase.co';
   var KEY = 'sb_publishable_YQSz-D-RCXzHGUhso06rMg_GOIIRDuV';
-  var LIB = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js';
+  /* 2026-10-13 상용화 점검 1-23 — 판을 못 박고 무결성(SRI) 값을 단다. CDN 이 바뀐 파일을 주면 브라우저가 실행하지 않는다(로그인 칸만 「잠시 문제」).
+     .min.js 는 jsDelivr 가 그때그때 만드는 파일이라 SRI 를 쓰면 안 된다 — npm 묶음에 든 그대로의 supabase.js(110 KB)를 쓴다.
+     판을 올릴 때: curl 로 받아 `openssl dgst -sha384 -binary | openssl base64 -A` 값으로 LIB_SRI 를 함께 바꾼다. */
+  var LIB = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js';
+  var LIB_SRI = 'sha384-0w2KAL2YHP6wKOkUDzkCDGgVvfmHnj02DHeQ6XcHOgTfFsGyonKOpShMH1x6nk9o';
   var 설정 = { app: 'app', 열쇠: /^$/, 다시그리기: null, 준비됨: true };
   var sb = null, 준비중 = null, 세션 = null, 동기화중 = false;
   /* 2026-09-23 검수 #8 — 서버에 표(스키마)가 아직 없으면 앱이 서버.설치({ 준비됨:false }) 로 알린다.
@@ -74,7 +78,7 @@
     준비중 = new Promise(function (res, rej) {
       if (window.supabase && window.supabase.createClient) return res();
       if (!온라인()) return rej(new Error('offline'));
-      var s = document.createElement('script'); s.src = LIB; s.async = true;
+      var s = document.createElement('script'); s.src = LIB; s.async = true; s.integrity = LIB_SRI; s.crossOrigin = 'anonymous'; s.referrerPolicy = 'no-referrer';
       s.onload = function () { res(); }; s.onerror = function () { rej(new Error('lib')); };
       document.head.appendChild(s);
     }).then(function () {
@@ -295,7 +299,7 @@
       h += '<input id="srvEmail" type="email" inputmode="email" autocomplete="email" enterkeyhint="next" aria-label="이메일" placeholder="이메일" value="' + (st.email || '') + '">'
         + '<input id="srvPw" type="password" autocomplete="current-password" enterkeyhint="go" aria-label="비밀번호 (6자 이상)" placeholder="비밀번호 (6자 이상)">'
         /* 2026-09-23 결정 0923 나 — 가입확인 갈고리: 앱이 넘기면 계정 만들기 앞에 필수 체크를 둔다(체크 전에는 계정 만들기 단추가 막힘). 로그인은 그대로. */
-        + (설정.가입확인 ? '<label class="srvage"><input id="srvAge" type="checkbox" onchange="var b=document.getElementById(\'srvSignup\');if(b)b.disabled=!this.checked"><span>' + 글자안전(설정.가입확인.글) + '</span></label>'
+        + (설정.가입확인 ? '<label class="srvage"><input id="srvAge" type="checkbox" onchange="this.dataset.at=this.checked?new Date().toISOString():\'\';var b=document.getElementById(\'srvSignup\');if(b)b.disabled=!this.checked"><span>' + 글자안전(설정.가입확인.글) + '</span></label>'
             + (설정.가입확인.설명 ? '<p class="srvtiny">' + 글자안전(설정.가입확인.설명) + '</p>' : '') : '')
         + (window.구독 ? 구독.가입동의HTML() : '')   /* 2026-09-23 구독 틀 — 유료화 켜짐일 때만: 체험 뒤 결제 안내 필수 체크 */
         + '<div class="srvbtns"><button type="button" onclick="계정동작(\'login\')">로그인</button><button type="button" id="srvSignup" onclick="계정동작(\'signup\')"' + (설정.가입확인 ? ' disabled' : '') + '>계정 만들기</button></div>'
@@ -375,7 +379,10 @@
     if (pw.length < 6) { 알림('비밀번호는 6자 이상이어야 합니다.'); return; }
     return 준비().then(function () {
       if (what === 'signup' && 설정.가입확인 && typeof 설정.가입확인.기록 === 'function') { try { 설정.가입확인.기록(); } catch (e) {} }   /* 2026-09-23 나 — 확인한 때를 앱이 적는다 */
-      if (what === 'signup') return sb.auth.signUp(앱주소() ? { email: email, password: pw, options: { emailRedirectTo: 앱주소() } } : { email: email, password: pw }).then(function (r) {
+      /* 2026-10-13 상용화 점검 2-08/2-19 — 만 14세 확인을 «언제» 했는지 계정 기록(user_metadata)에 남긴다(처리방침 1항: 가입 앱·만 14세 확인 시각).
+         가입확인을 쓰지 않는 앱이면 app 만 넣는다. 비밀 값은 없다. */
+      var 가입표 = { app: 설정.app }; if (설정.가입확인) { var ag = document.getElementById('srvAge'); 가입표.age14_at = (ag && ag.dataset && ag.dataset.at) || new Date().toISOString(); }
+      if (what === 'signup') return sb.auth.signUp(앱주소() ? { email: email, password: pw, options: { emailRedirectTo: 앱주소(), data: 가입표 } } : { email: email, password: pw, options: { data: 가입표 } }).then(function (r) {
         if (r.error) throw r.error;
         if (r.data && r.data.session) { 세션 = r.data.session; 알림('계정을 만들었습니다. 기록을 올리는 중…'); 화면갱신(); }
         else 알림('메일함에 확인 링크를 보냈습니다. 누른 뒤 로그인해 주세요.');
@@ -431,6 +438,8 @@
     },
     문의: function (kind, text, screen) { return 준비().then(function () { if (!세션) throw new Error('login'); return sb.from('inquiries').insert({ user_id: 세션.user.id, app: 설정.app, kind: kind || 'ask', text: text, screen: screen || '' }); }); },
     준비: 준비, 상태: 상태읽기, 구독: function () { return 준비().then(구독조회); },
+    /* 2026-10-13 상용화 점검 1-15 — 설치 앱이 메일 복구 링크(appUrlOpen)로 돌아오면 app-shell 이 sessionStorage 에 넣고 바로 부른다 */
+    복구처리: 복구처리,
     준비됨: 준비됨   /* 검수 #8 — false 면 계정·동기화 준비 중 */
   };
 })();
