@@ -6,6 +6,7 @@
 · 각 장 안에서 줄 첫머리 ①②③… 가 ①부터 하나씩 늘어나는가('⑪의1 ⑪의2'처럼 '의 N' 붙은 하위 항목은 허용)
 · 한 줄 가운데에 다른 항목 번호가 끼어 있지 않은가(줄 첫머리가 아닌 ①~⑳ 뒤에 ':' 가 오면 잘린 항목으로 본다)
 · 줄이 조사(부터·에서·까지…)로 끝나거나 '파기1년'처럼 끝말 뒤에 숫자가 바로 붙은 곳(잘라 붙인 흔적)
+· 【확인 필요】·TODO 같은 채우지 않은 자리(공개 웹 문서로 나감)
 · 빈 줄(<br><br>), 끝나지 않은 괄호
 마지막 줄: LEGAL OK / LEGAL FAIL
 사용: python3 tools/legal_check.py [파일 ...]
@@ -15,7 +16,7 @@ from bs4 import BeautifulSoup
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 CIRC = '①②③④⑤⑥⑦⑧⑨⑩⑪⑫⑬⑭⑮⑯⑰⑱⑲⑳'
-files = sys.argv[1:] or sorted(glob.glob(str(ROOT / 'app/legal/*.html')))
+files = sys.argv[1:] or sorted(glob.glob(str(ROOT / 'app/legal/*.html'))) + [str(ROOT / 'app/consent.html')]
 bad = []
 
 def head_key(t):
@@ -25,6 +26,7 @@ def head_key(t):
 for f in files:
     name = pathlib.Path(f).name
     raw = pathlib.Path(f).read_text(encoding='utf-8')
+    for m in re.finditer(r'[【\[]\s*확인 필요\s*[】\]]|TODO|XXX', raw): bad.append(f'{name}: 채우지 않은 자리 {m.group(0)} — 공개 문서에 나가면 안 됨(초안은 review/gpt/법문서-초안/)')
     if re.search(r'<br>\s*<br>', raw): bad.append(f'{name}: 빈 줄(<br><br>)')
     s = BeautifulSoup(raw, 'html.parser')
     prev = None
