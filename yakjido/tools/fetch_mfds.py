@@ -31,15 +31,25 @@ def key():
     return urllib.parse.unquote(k) if '%' in k else k   # Encoding 키를 넣어도 되게
 
 
-def page(op, n, k):
-    q = urllib.parse.urlencode({'serviceKey': k, 'pageNo': n, 'numOfRows': ROWS, 'type': 'json'})
-    for i in range(5):
+def _xml_items(raw):
+    import xml.etree.ElementTree as ET
+    root = ET.fromstring(raw)
+    code = root.findtext('.//resultCode') or root.findtext('.//returnReasonCode') or ''
+    if code not in ('00', '0', ''):
+        raise RuntimeError('API 오류: ' + (root.findtext('.//resultMsg') or root.findtext('.//returnAuthMsg') or code))
+    items = [{c.tag: (c.text or '') for c in it} for it in root.iter('item')]
+    return int(root.findtext('.//totalCount') or 0), items
+
+
+def page(op, n, k, rows=ROWS, extra=None):
+    base = op if op.startswith('http') else BASE + op
+    q = urllib.parse.urlencode({'serviceKey': k, 'pageNo': n, 'numOfRows': rows, 'type': 'json', '_type': 'json', **(extra or {})})
+    for i in range(6):
         try:
-            with urllib.request.urlopen(urllib.request.Request(BASE + op + '?' + q, headers={'Accept': 'application/json'}), timeout=60) as r:
+            with urllib.request.urlopen(urllib.request.Request(base + '?' + q, headers={'Accept': 'application/json'}), timeout=90) as r:
                 raw = r.read().decode('utf-8')
-            if raw.lstrip().startswith('<'):   # 키 오류는 XML 로 온다
-                msg = re.search(r'<returnAuthMsg>(.*?)</|<resultMsg>(.*?)</', raw)
-                raise RuntimeError('API 오류: ' + (next(g for g in msg.groups() if g) if msg else raw[:200]))
+            if raw.lstrip().startswith('<'):   # 키 오류·XML 만 주는 서비스(국립중앙의료원)
+                return _xml_items(raw)
             j = json.loads(raw)
             body = j.get('body') or j.get('response', {}).get('body') or {}
             items = body.get('items') or []
@@ -48,18 +58,26 @@ def page(op, n, k):
             return int(body.get('totalCount') or 0), items
         except RuntimeError: raise
         except Exception as e:
-            if i == 4: raise
+            if i == 5: raise
             time.sleep(2 ** i)
 
 
-def fetch_all(op, k, label):
-    total, first = page(op, 1, k)
-    out = list(first); pages = (total + ROWS - 1) // ROWS
-    print(f'{label}: {total:,}건 · {pages}쪽', flush=True)
-    for n in range(2, pages + 1):
-        out += page(op, n, k)[1]
-        if n % 50 == 0: print(f'  {n}/{pages}쪽', flush=True)
-        time.sleep(.05)
+def fetch_all(op, k, label, extra=None, want=500, workers=6):
+    """한 쪽에 몇 건까지 주는지는 서비스마다 다르다 — 500 을 청해 보고 덜 주면 그 수로 다시 센다. 여러 쪽을 동시에(하루 한도 안)."""
+    import concurrent.futures as cf
+    total, first = page(op, 1, k, want, extra)
+    rows = want if (len(first) >= want or len(first) >= total) else len(first)
+    if rows != want and rows: total, first = page(op, 1, k, rows, extra)
+    rows = rows or want
+    pages = (total + rows - 1) // rows
+    print(f'{label}: {total:,}건 · 한 쪽 {rows}건 · {pages}쪽', flush=True)
+    got = {1: first}
+    with cf.ThreadPoolExecutor(workers) as ex:
+        futs = {ex.submit(page, op, n, k, rows, extra): n for n in range(2, pages + 1)}
+        for i, f in enumerate(cf.as_completed(futs), 1):
+            got[futs[f]] = f.result()[1]
+            if i % 100 == 0: print(f'  {i}/{pages}쪽', flush=True)
+    out = [x for n in sorted(got) for x in got[n]]
     if len(out) < total * .98: sys.exit(f'{label}: {len(out)}/{total} 만 받음 — 중간에 끊겼습니다. 기존 자료는 그대로 둡니다')
     return out
 
