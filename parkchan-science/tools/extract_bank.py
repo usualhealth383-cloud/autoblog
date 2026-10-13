@@ -702,7 +702,7 @@ def parse_plus(path):
         stem_el = el.select_one('.stem')
         diff = stem_el.select_one('.difficulty') if stem_el else None; difficulty = txt(diff, False) if diff else '●●○'
         if stem_el:
-            for x in stem_el.select('.difficulty, .tags, .badge-data, .badge-essay'): x.extract()
+            for x in stem_el.select('.difficulty, .pqno, .tags, .badge-data, .badge-essay'): x.extract()
             for x in stem_el.select('.blankline'): x.replace_with('＿＿＿')
         fig, data, table, source, choices, after = item_common(el, '.stem')
         stem = txt(stem_el) if stem_el else ''
