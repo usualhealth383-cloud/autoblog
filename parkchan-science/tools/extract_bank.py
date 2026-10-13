@@ -719,6 +719,12 @@ def parse_plus(path):
         if typ == 'ox': stem = re.sub(r'\(\s*O\s*,\s*X\s*\)\s*$', '', stem).strip()   # 바로바로 체크(101줄)와 같이 — 앱은 O/X 단추를 따로 그린다
         sol = sols.get(('u' if any('up' in (pg.get('class') or []) for pg in el.find_parents('div')) else '') + n, {}); cn = int(el.get('data-concept') or 0)
         answer = mark_no(a) if typ in ('mc', 'multi') else ('' if typ == 'essay' else a)
+        if typ == 'multi' and answer and choices:   # 합답형 '하나씩 판정'(앱 multiSplit) 꼴로 — 보강 해설 'ㄱ: …'(옳음)·바로알기 '<b>ㄷ</b> …'(틀림) → '<b>ㄱ (옳음)</b> …'
+            right = set(re.findall('[ㄱ-ㄹ]', str(choices[answer - 1])))
+            ex = sol.get('explain', ''); wr = sol.get('wrong', '')
+            ex2 = re.sub(r'(^|\s|</b>\s*)([ㄱ-ㄹ])\s*:\s*', lambda m: f"{m.group(1)}<b>{m.group(2)} (옳음)</b> " if m.group(2) in right else m.group(0), ex)
+            wr2 = re.sub(r'<b>\s*([ㄱ-ㄹ])\s*</b>\s*', lambda m: f"<b>{m.group(1)} (틀림)</b> " if m.group(1) not in right else m.group(0), wr)
+            sol = {**sol, 'explain': ex2, 'wrong': wr2}
         up = any('up' in (pg.get('class') or []) for pg in el.find_parents('div'))   # '실력 다지기' 쪽(본책 STEP 3 뒤) — 따로 번호 {코드}-u{n}
         items.append({'id': f'{code}-{"u" if up else "p"}{n}', 'lessonId': code, 'concept': lec_no(code, cn) if cn else 0, 'step': 3 if up else 2, 'type': typ,
                       'stem': stem, 'source': source, 'choices': choices, 'answer': answer, 'explain': sol.get('explain', ''), 'wrong': sol.get('wrong', ''),
