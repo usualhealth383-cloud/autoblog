@@ -294,11 +294,13 @@ AUTO_CHOICES = {
 # 꼴: {"1203-b1-㉢": {"choices": [오답 셋], "wrong": {"오답": "바로알기", ...}, "explain": "(선택) 정답 해설을 이 글로", "adv": true(선택, 심화)}}
 # 자동 오해 OX(-m…) 처럼 보기가 없는 문항은 "explain"·"adv" 만 쓴다
 AUTO_EXPLAIN = {}
+AUTO_O = {}   # {code}-m{no}-{i}o : {'stem': 홀로 서는 참 문장, 'explain': 왜 옳은지} — 2026-10-14 문항 품질 G3: 오해 OX 정답이 모두 X 라 읽지 않고 X 만 눌러도 맞았다
 for _f in sorted((ROOT / 'data' / 'auto_choices').glob('*.json')) if (ROOT / 'data' / 'auto_choices').is_dir() else []:
     for _id, _v in json.loads(_f.read_text(encoding='utf-8')).items():
         assert _id not in AUTO_CHOICES, f'{_f.name}: {_id} 가 AUTO_CHOICES 와 겹침'
         if _v.get('choices'): assert len(_v['choices']) == 3 and set(_v.get('wrong', {})) <= set(_v['choices']), f'{_f.name}: {_id} 보기 셋·바로알기 키'; AUTO_CHOICES[_id] = (_v['choices'], _v.get('wrong', {}))
         if _v.get('explain'): AUTO_EXPLAIN[_id] = _v['explain']
+        if _v.get('stem') and re.search(r'-m\d+-\d+o$', _id): AUTO_O[_id] = _v   # 손으로 쓴 '진실' 문장 → 정답 O 짝 문항
         if _v.get('adv'): _ADV_EXTRA = globals().setdefault('_ADV_EXTRA', set()); _ADV_EXTRA.add(_id)
 POOL_AS_BEFORE = {('1203-05', '㉢'): '않는다'}
 
@@ -356,6 +358,10 @@ def auto_from_lecture(concepts):
             if x.endswith('.') and standalone(x):
                 items.append({'id': f'{code}-m{no}-{i}x', 'lessonId': code, 'concept': no, 'step': 'auto', 'type': 'ox', 'stem': x,
                               'source': '', 'choices': [], 'answer': 'X', 'explain': f'오해: {x} → 진실: {o}' + (f' (왜? {strip_tags(m["why"]).strip()})' if m.get('why') else ''), 'wrong': '', 'figure': '', 'difficulty': '●○○'})
+            oid = f'{code}-m{no}-{i}o'
+            if oid in AUTO_O:   # 진실 문장을 손으로 다듬어 둔 것만(그대로 내면 토막이 많다) — X 문항·난수 흐름은 그대로
+                items.append({'id': oid, 'lessonId': code, 'concept': no, 'step': 'auto', 'type': 'ox', 'stem': AUTO_O[oid]['stem'],
+                              'source': '', 'choices': [], 'answer': 'O', 'explain': AUTO_O[oid].get('explain') or f'진실: {o}', 'wrong': '', 'figure': '', 'difficulty': '●○○', 'pair': f'{code}-m{no}-{i}x'})
             if False and o.endswith('.') and standalone(o):   # 진실(✓) 문장은 오해 없이 홀로 읽으면 뜻이 비는 것이 많아(2026-10-01 점검 77건+) 문제로 내지 않고 X 문항의 해설로만 쓴다
                 items.append({'id': f'{code}-m{no}-{i}o', 'lessonId': code, 'concept': no, 'step': 'auto', 'type': 'ox', 'stem': o,
                               'source': '', 'choices': [], 'answer': 'O', 'explain': '교재 개념 카드의 설명 그대로입니다.', 'wrong': '', 'figure': '', 'difficulty': '●○○'})
