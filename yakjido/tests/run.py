@@ -675,6 +675,36 @@ def main():
         if not _gl.get('busco'): fails.append('부틸스코폴라민에 녹내장 금지 경고가 사라졌습니다')
         if perr: fails.append(f'필요할 때만: JS 오류 {perr[:2]}')
         pp.close()
+        # Z4 #1(외부 검수 P0) — 「내 정보 → 내 약통 → 이름으로 담기 → 같이 먹어도 되나요」. 판콜에이가 단일 성분(구아이페네신)으로 담겨
+        #   콜대원 콜드에스·타이레놀과의 아세트아미노펜 겹침을 놓치던 길을 그대로 밟는다. 제품은 모든 성분 그대로(ME.pub) 담겨야 한다
+        pz = br.new_page(viewport={'width': 390, 'height': 844}); zerr = []
+        pz.on('pageerror', lambda e: zerr.append(str(e)))
+        pz.add_init_script("localStorage.setItem('yakjido.hello.v1','1')")
+        def _z_add(names):
+            pz.goto(url + '#/me'); pz.wait_for_selector('.metabs', timeout=15000)
+            pz.evaluate("()=>{ME.taking=[];ME.pub={};ME.prn={};saveMe();route();}")
+            pz.click('.metabs .tab[data-k=meds]'); pz.wait_for_selector('#mq', timeout=5000)
+            for nm, want in names:
+                pz.fill('#mq', nm)
+                pz.wait_for_function("()=>typeof PUB!=='undefined' && PUB.index && PUB.index.length>0", timeout=20000)
+                pz.wait_for_function("w=>[...document.querySelectorAll('.card.rows .row b')].some(b=>b.innerText.replace(/\\s/g,'').startsWith(w))", arg=want, timeout=8000)
+                pz.evaluate("w=>[...document.querySelectorAll('.card.rows .row')].find(r=>r.querySelector('b').innerText.replace(/\\s/g,'').startsWith(w)).click()", want)
+                pz.wait_for_timeout(400)
+            pz.click('button.srow:has-text("같이 먹어도 되나요")'); pz.wait_for_selector('.ix-list', timeout=5000); pz.wait_for_timeout(300)
+            return pz.evaluate("()=>({dupe:[...document.querySelectorAll('.ix.stop .ix-dg')].map(e=>e.innerText), taking:ME.taking.slice(), ingr:Object.values(ME.pub).map(x=>x.ingr)})")
+        _z = _z_add([('콜대원 콜드에스', '콜대원콜드에스'), ('판콜에이', '판콜에이')])
+        if any(not t.startswith('pub:') for t in _z['taking']): fails.append(f'Z4 #1: 제품 이름으로 담았는데 단일 성분으로 담겼습니다 — {_z["taking"]}')
+        if not all('아세트아미노펜' in i for i in _z['ingr']): fails.append(f'Z4 #1: 복합제의 성분이 빠졌습니다 — {_z["ingr"]}')
+        if not any('아세트아미노펜' in d for d in _z['dupe']): fails.append(f'Z4 #1: 콜대원 콜드에스 + 판콜에이인데 아세트아미노펜 겹침이 안 뜹니다 — {_z["dupe"]}')
+        if not any('일부 성분이 같아요' in d for d in _z['dupe']): fails.append(f'Z4 #1: 「일부 성분이 같아요」 표시가 없습니다 — {_z["dupe"]}')
+        _z = _z_add([('판콜에이', '판콜에이'), ('타이레놀정 500', '타이레놀정500')])
+        if not any('아세트아미노펜' in d for d in _z['dupe']): fails.append(f'Z4 #1: 판콜에이 + 타이레놀정 500인데 아세트아미노펜 겹침이 안 뜹니다 — {_z["dupe"]}')
+        _z = _z_add([('타이레놀정 500', '타이레놀정500'), ('타이레놀 8시간', '타이레놀8시간')])
+        if not any('성분이 모두 같아요' in d and '아세트아미노펜' in d for d in _z['dupe']): fails.append(f'Z4 #1: 타이레놀정 500 + 타이레놀 8시간 이알서방정인데 「성분이 모두 같아요」가 없습니다 — {_z["dupe"]}')
+        # 단일 성분 항목의 제품 칸에 적힌 복합제 이름(구아이페네신 → 「판콜에이」)으로 찾아도 단일 성분 화면으로 보내지 않는다
+        if pz.evaluate("()=>search('판콜에이').some(h=>h.h==='/drug/guaifenesin')"): fails.append('Z4 #1: 「판콜에이」 검색이 구아이페네신으로 갑니다')
+        if zerr: fails.append(f'Z4 #1: JS 오류 {zerr[:2]}')
+        pz.close()
         # 설치한 안드로이드 앱 — 앱을 닫아도 울리도록 휴대폰 알람으로 거는지(2026-09-28)
         pn = br.new_page(viewport={'width': 390, 'height': 844}); nerr = []
         pn.on('pageerror', lambda e: nerr.append(str(e)))
