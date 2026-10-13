@@ -102,6 +102,16 @@ async def main():
         await step(R, '공부 노트', lambda: pg.evaluate("show('note')")); await shot(pg, R, '공부 노트', '노트 3개 · 달력 · 지난 기록 한 장')
         await step(R, '내 정보', lambda: pg.evaluate("show('me')")); await shot(pg, R, '내 정보', '설정 · 보호자에게 보이는 것 · 이용권 · 약관/처리방침')
         await step(R, '통계', lambda: pg.evaluate("show('stats')")); await shot(pg, R, '학습 통계', '이번 주 리듬 · 달력 점 · 숙련도 · 소단원별 정답률')
+        async def plusd():   # 2026-10-13 본책 '시험에 나오는 보강' 칸(개념 상세) · 실력 다지기 문항
+            await pg.evaluate("bs = null; (() => { const i = CONCEPTS.findIndex(c => c.id === '1303-02'); dOpenSet(CONCEPTS[i].id, true); detailIdx = i; show('detail'); })()"); await pg.wait_for_timeout(700)
+            if await pg.locator('#dMoreBtn').count() and await pg.get_attribute('#dMoreBtn', 'aria-expanded') != 'true': await pg.click('#dMoreBtn'); await pg.wait_for_timeout(300)
+            await pg.locator('#v-detail .dplus summary').first.click(); await pg.wait_for_timeout(300)
+            await pg.locator('#v-detail .dplus').scroll_into_view_if_needed(); await pg.wait_for_timeout(200)
+        await step(R, '시험에 나오는 보강', plusd); await shot(pg, R, '개념 상세 · 시험에 나오는 보강', '본책 보강 쪽(완자 대조로 채운 주제)이 폰에서 읽기 좋은가 · 그림·표·한 줄 정리', full=False)
+        async def upq():
+            await pg.evaluate("startBank(BANK.filter(q => q.up && q.figure).slice(0, 2), '실력 다지기')"); await pg.wait_for_timeout(600)
+        await step(R, '실력 다지기 문항', upq); await shot(pg, R, '문제 · 실력 다지기(자료·추론)', '머리 표시 · 그림·표 자료 · 난도가 STEP 3 다음 한 걸음인가')
+        await pg.evaluate("bs = null")
         async def asg():
             await pg.evaluate("show('today')"); await pg.wait_for_timeout(500); await pg.locator('.asgcard').first.click(); await pg.wait_for_timeout(600)
         await step(R, '학원 과제', asg); await shot(pg, R, '학원 과제 풀기(이어서 4/5)', '이어 풀기 · 마감 표시', full=False)
@@ -134,6 +144,10 @@ async def main():
                     await pg.click('#wsmsOpen'); await pg.wait_for_timeout(900)
                 await step(R, '이번 주 요약 문자', wsms); await shot(pg, R, '이번 주 요약 문자', '보호자에게 보낼 글 미리 보기 · 문자/복사', full=False)
                 await close_sheet(pg)
+            if tab == 'students':
+                async def qr():
+                    await pg.click('#qrBox summary'); await pg.wait_for_timeout(500); await pg.locator('#qrBox').scroll_into_view_if_needed()
+                await step(R, '학원 QR', qr); await shot(pg, R, '학원 QR(수강 등록)', 'QR·주소 · A4 포스터 · 새 QR로 바꾸기 · 명단의 앱/앱 없음 표시', full=False)
             if tab == 'asg':
                 async def rep():
                     await pg.locator('[data-asgrep]').first.click(); await pg.wait_for_timeout(800)
