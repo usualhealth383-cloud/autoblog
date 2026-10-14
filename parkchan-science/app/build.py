@@ -48,7 +48,21 @@ for k, v in legal.items():
 # 문제 은행·자료 탐구·그림(약 1.5MB)은 앱 파일과 따로 — 첫 화면을 그린 뒤 받는다(느린 4G 에서 첫 화면 10초+ → 2026-10-02).
 # 파일 이름에 내용 지문을 붙여, 앱과 데이터의 판이 어긋나지 않게 한다(옛 앱은 옛 파일, 새 앱은 새 파일).
 import hashlib
-more = json.dumps({'bank': bank, 'labs': labs, 'figs': figs, 'extras': extras}, ensure_ascii=False, separators=(',', ':'))
+# 앱이 쓰지 않는 칸(answers — blanks 와 같은 내용, warning — 화면에 안 쓰임)은 앱 파일에서 뺀다(2026-10-07, 앱 파일 한도 1,700 KB). data/ 는 그대로
+APP_DROP = ('answers', 'warning')
+# 2026-10-14 앱 파일 덜기(첫 화면에 안 쓰는 글 약 200 KB → more) — 펼치거나 눌러야 보이는 글만 옮긴다. 앱이 받으면 제자리에 붙인다(loadMore)
+# ① 오늘의 한 마디: 원문·출처·근거 주소는 '원문 · 출처' 접기 안(과 보관함)에만 → more 'qx'. 분야 이름(kindName)은 kind 로 앱이 붙인다('kn')
+QLAZY = ('orig', 'src', 'url')
+_kn = {q['kind']: q['kindName'] for q in quotes['quotes']}
+assert all(_kn[q['kind']] == q['kindName'] for q in quotes['quotes']), '같은 분야(kind)에 이름(kindName)이 둘'
+quotes_app = {**{k: v for k, v in quotes.items() if k != 'quotes'}, 'kn': _kn,
+              'quotes': [{k: v for k, v in q.items() if k not in QLAZY + ('kindName',)} for q in quotes['quotes']]}
+qx = {q['id']: {k: q[k] for k in QLAZY if q.get(k)} for q in quotes['quotes']}
+# ② 개념: 용어 뜻풀이(terms[].v)·오해의 진실과 까닭(myths[].o·why)은 '본문 자세히 읽기' 안과 용어 말풍선에만 → more 'cl'.
+#    용어 이름(k — 찾기·본문 용어 단추)과 오해 문장(x — '읽기 전에' O/X)·개수는 앱 파일에 남긴다
+cl = {c['id']: {'t': [t['v'] for t in c['terms']], 'm': [{k: v for k, v in m.items() if k != 'x'} for m in c['myths']]} for c in concepts if c['terms'] or c['myths']}
+_slim = lambda c: {**{k: v for k, v in c.items() if k not in APP_DROP}, 'terms': [{'k': t['k']} for t in c['terms']], 'myths': [{'x': m['x']} for m in c['myths']]}
+more = json.dumps({'bank': bank, 'labs': labs, 'figs': figs, 'extras': extras, 'qx': qx, 'cl': cl}, ensure_ascii=False, separators=(',', ':'))
 MORE_NAME = 'more-' + hashlib.sha1(more.encode('utf-8')).hexdigest()[:10] + '.json'
 _vb = lambda svg: (re.search(r'viewBox="0 0 ([\d.]+) ([\d.]+)"', svg) or [None, '600', '300'])
 meta = {'url': MORE_NAME, 'bank': len(bank), 'labs': len(labs),
@@ -56,12 +70,10 @@ meta = {'url': MORE_NAME, 'bank': len(bank), 'labs': len(labs),
         'bl': {L: sum(1 for q in bank if q['lessonId'] == L and str(q.get('step')) not in ('unit', 'mock', 'recap')) for L in sorted({q['lessonId'] for q in bank})},
         'll': sorted({l['lessonId'] for l in labs}),
         'fv': {k: f"{_vb(v)[1]} {_vb(v)[2]}" for k, v in figs.items()}}
-# 앱이 쓰지 않는 칸(answers — blanks 와 같은 내용, warning — 화면에 안 쓰임)은 앱 파일에서 뺀다(2026-10-07, 앱 파일 한도 1,700 KB). data/ 는 그대로
-APP_DROP = ('answers', 'warning')
-out = (shell.replace('<!--CONCEPTS-->', j([{k: v for k, v in c.items() if k not in APP_DROP} for c in concepts]))
+out = (shell.replace('<!--CONCEPTS-->', j([_slim(c) for c in concepts]))
             .replace('<!--QUIZZES-->', j(quizzes))
             .replace('<!--MORE_META-->', j(meta))
-            .replace('<!--QUOTES-->', j(quotes)))
+            .replace('<!--QUOTES-->', j(quotes_app)))
 for _k in ('<!--BANK-->', '<!--LABS-->', '<!--FIGS-->'): assert _k not in out
 # 배포본에서 주석을 덜어 낸다(2026-10-12, 앱 파일 한도 1,700 KB) — 원본(app-shell.html)의 설명 주석은 그대로 둔다.
 # ① 첫 <style> 안의 CSS 주석 ② 한 줄을 통째로 차지하는 /* … */ 블록(안에 */ 가 없고 */ 뒤가 곧 줄 끝일 때만 — 코드가 붙은 줄은 건드리지 않음).

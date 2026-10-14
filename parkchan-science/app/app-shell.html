@@ -367,11 +367,16 @@ button,.tab,.btn,.chip,.chipbar button,.seg button{-webkit-user-select:none;user
 .skel{display:flex;flex-direction:column;gap:12px;padding-top:6px}
 .skel i{display:block;border-radius:var(--r-m);background:linear-gradient(90deg,var(--hair) 0%,var(--ground) 45%,var(--hair) 90%);background-size:220% 100%;animation:shim 1.2s linear infinite}
 @keyframes shim{from{background-position:100% 0}to{background-position:-120% 0}}
+/* 나중에 받는 글(한 마디 원문·출처, 오해 풀이, 용어 뜻)의 자리 — 받기 전엔 옅은 줄 하나와 한 줄 안내, 받으면 그 자리에 채운다(2026-10-14) */
+.lzi{display:inline-block;vertical-align:middle;width:9em;max-width:100%;height:.8em;border-radius:var(--r-m);background:linear-gradient(90deg,var(--hair) 0%,var(--ground) 45%,var(--hair) 90%);background-size:220% 100%;animation:shim 1.2s linear infinite}
+.lzq{margin:2px 0 4px}.lzq .lzi{display:block;width:84%;height:12px;margin:8px 0}.lzq .lzi+.lzi{width:52%}
+.lzs{white-space:nowrap}.lzs .lzi{width:4.5em}
+.lzm{font-size:var(--t-cap);color:var(--muted);line-height:1.6;margin:8px 0 2px}
 #ptr{position:fixed;left:50%;top:calc(6px + var(--sat));z-index:60;width:38px;height:38px;margin-left:-19px;border-radius:50%;background:var(--card);box-shadow:0 4px 14px rgba(0,0,0,.14);display:grid;place-items:center;opacity:0;transform:translateY(-50px);pointer-events:none}
 #ptr svg{width:20px;height:20px;stroke:var(--brand);stroke-width:2.4;fill:none;stroke-linecap:round}
 #ptr.spin svg{animation:spin .8s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
-@media (prefers-reduced-motion: reduce){.vin,.skel i,.figslot,#ptr.spin svg{animation:none}.btn,.pcard,.setrow.go,.stu{transition:none}}
+@media (prefers-reduced-motion: reduce){.vin,.skel i,.lzi,.figslot,#ptr.spin svg{animation:none}.btn,.pcard,.setrow.go,.stu{transition:none}}
 .btn.ghost{background:transparent;color:var(--muted);border:1px solid var(--line)}
 .btn.soft{background:var(--soft-bg);color:var(--brand-dark);box-shadow:var(--soft-ring)}   /* 어두운 화면: 카드와 1.1:1 이던 연한 버튼에 바탕 한 단계 + 1px 고리(docs/23 S11) */
 .btn.danger{background:var(--no);color:var(--on-color)}
@@ -1733,6 +1738,7 @@ const BANK_N = MORE_META.bank, LABS_N = MORE_META.labs;
 const MORE = { ok:false, err:false, p:null, kick:null };
 const QDATA    = JSON.parse(document.getElementById('d-quotes').textContent);    // 오늘의 한 마디
 const QUOTES   = QDATA.quotes, BRIDGE = QDATA.bridge;
+QUOTES.forEach(q => { q.kindName = (QDATA.kn || {})[q.kind] || ''; });   // 분야 이름은 kind 로(2026-10-14 앱 파일 덜기) — 원문·출처(orig·src·url)는 나중에 받는 데이터(qx)에
 const FIGS_N = CONCEPTS.filter(c=>c.figure).length;
 const LESSONS  = (() => { const m = new Map(); CONCEPTS.forEach(c => { if (!m.has(c.lessonId)) m.set(c.lessonId, { id:c.lessonId, name:c.lessonName, book:c.book, bookName:c.bookName, unit:c.unit, unitName:c.unitName, idx:CONCEPTS.findIndex(x=>x.lessonId===c.lessonId) }); }); return [...m.values()]; })();
 const MARKS = '①②③④⑤';
@@ -1804,6 +1810,9 @@ function loadMore(){
         const d = await r.json();
         BANK.push(...d.bank); LABS.push(...d.labs); FIGMAP = d.figs || {};
         if (d.extras) CONCEPTS.forEach(c => { if (d.extras[c.id]) c.x = d.extras[c.id]; });   // 생각해 보기·예제(2026-10-07 앱 파일 한도로 옮김)
+        /* 2026-10-14 앱 파일 덜기 — 한 마디 원문·출처(qx), 용어 뜻(cl.t)·오해의 진실과 까닭(cl.m)을 제자리에 붙인다 */
+        if (d.qx) QUOTES.forEach(q => { if (d.qx[q.id]) Object.assign(q, d.qx[q.id]); });
+        if (d.cl) CONCEPTS.forEach(c => { const l = d.cl[c.id]; if (!l) return; c.terms.forEach((t, i) => { if (l.t[i] != null) t.v = l.t[i]; }); c.myths.forEach((m, i) => Object.assign(m, l.m[i] || {})); });
         MORE.ok = true; moreArrived(); return true;
       } catch (e) {
         if (i >= 1){ MORE.err = true; moreArrived(); }
@@ -1820,6 +1829,7 @@ function moreArrived(){
   document.querySelectorAll('.pthumb[data-tfig]:empty').forEach(el => { el.innerHTML = thumbFig(el.dataset.tfig); });
   dqcFill();   // 개념 상세의 확인 문제 칸(그 개념 OX)
   if (view === 'detail') dThinkFill();   // 본문 펼친 안쪽의 생각해 보기·예제
+  lzFill();   // 한 마디 원문·출처 · 오해 풀이 · 용어 뜻(받기 실패면 안내만 바뀐다)
   if (!MORE_VIEWS.includes(view) || document.getElementById('sheetBg')) return;
   const a = document.activeElement; if (a && a.matches && a.matches('input,textarea,select')) return;
   const y = window.scrollY;
@@ -1829,6 +1839,17 @@ function moreArrived(){
 const moreWait = () => MORE.err
   ? `<div class="empty" role="status"><svg viewBox="0 0 24 24"><path d="M7 18h10a4 4 0 0 0 .9-7.9A6 6 0 0 0 6.3 9.2 4.4 4.4 0 0 0 7 18z"/><path d="M12 11v4M10 13.5l2 2 2-2"/></svg><b>문제를 아직 받지 못했습니다</b><p>인터넷에 연결되면 자동으로 받습니다.</p><button class="btn soft" id="moreRetry">지금 다시 받기</button></div>`
   : SKEL;
+/* 나중에 받는 글의 자리(data-lz="종류:id") — 받기 전엔 옅은 줄 + 한 줄 안내, 받으면(또는 받기 실패면) 그 자리만 다시 그린다 */
+const LZI = '<span class="lzi" aria-hidden="true"></span>';
+const lzMsg = t => `<p class="lzm" role="status">${MORE.err ? '아직 받지 못했어요 · 인터넷에 연결되면 자동으로 받아요.' : `${t} 받는 중이에요…`}</p>`;
+const LZ = { q: id => { const q = QUOTES.find(x => x.id === id); return q ? quoteSrc(q) : ''; },
+  qs: id => { const q = QUOTES.find(x => x.id === id); return q ? quoteSrcInline(q) : ''; },
+  my: id => { const c = CONCEPTS.find(x => x.id === id); return c ? dMythHtml(c) : ''; },
+  tm: id => { const c = CONCEPTS.find(x => x.id === id); return c ? dTermHtml(c) : ''; } };
+function lzFill(){
+  document.querySelectorAll('[data-lz]').forEach(el => { const [k, id] = el.dataset.lz.split(':'); if (LZ[k]) el.outerHTML = LZ[k](id); });
+  if (ttBtn && ttBtn.isConnected && document.getElementById('ttip')) ttOpen(ttBtn);   // 열려 있던 용어 말풍선에 뜻을 채운다
+}
 /* 버튼이 데이터를 써야 하는데 아직이면: 받은 다음 그 버튼을 다시 누른다 */
 function afterMore(el){ toast('자료를 받는 중입니다…'); loadMore().then(() => { if (el && el.isConnected) el.click(); }); }
 const setUnit = u => document.documentElement.dataset.unit = u;
@@ -3205,9 +3226,8 @@ function quoteCard(q, c){
       <span class="k">오늘의 한 마디${q.kindName ? ` · ${esc(q.kindName)}` : ''}</span>
       <blockquote>“${esc(q.ko)}”</blockquote>
       <div class="by"><span class="who">${esc(q.who||'')}</span>${q.role?`<span class="role">${esc(q.role)}</span>`:''}</div>
-      ${q.orig || q.src || q.note || br ? `<details class="qmore"><summary>원문 · 출처 · 과학으로 잇기</summary>   <!-- 2026-10-13 원장님: 홈이 길다 → 글귀와 사람만 보이고 나머지는 접기 -->
-        ${q.orig ? `<p class="orig">${/^[a-z]/.test(q.orig) ? '…' : ''}${esc(q.orig)}</p>` : ''}
-        ${q.src ? `<div class="src">출처 · ${esc(q.src)}</div>` : ''}
+      ${!MORE.ok || q.orig || q.src || q.note || br ? `<details class="qmore"><summary>원문 · 출처 · 과학으로 잇기</summary>   <!-- 2026-10-13 원장님: 홈이 길다 → 글귀와 사람만 보이고 나머지는 접기 -->
+        ${quoteSrc(q)}
         ${q.note ? `<div class="note">${esc(q.note)}</div>` : ''}
         ${br ? `<div class="qbridge"><b>과학으로 잇기</b>${esc(br)}</div>` : ''}</details>` : ''}
       <div class="acts">
@@ -3216,11 +3236,15 @@ function quoteCard(q, c){
       </div>
     </div>`;
 }
+/* 원문·출처는 나중에 받는 데이터(qx) — 받기 전엔 접기 안에 자리 표시, 받으면 lzFill 이 채운다 */
+const quoteSrc = q => !MORE.ok ? `<div class="lzq" data-lz="q:${esc(q.id)}">${LZI}${LZI}${lzMsg('원문과 출처를')}</div>`
+  : `${q.orig ? `<p class="orig">${/^[a-z]/.test(q.orig) ? '…' : ''}${esc(q.orig)}</p>` : ''}${q.src ? `<div class="src">출처 · ${esc(q.src)}</div>` : ''}`;
+const quoteSrcInline = q => !MORE.ok ? `<span class="lzs" data-lz="qs:${esc(q.id)}"> · ${LZI}</span>` : q.src ? ` · ${esc(q.src)}` : '';
 function openQuoteKeep(){
   const keep = QUOTES.filter(q => (S.qkeep||[]).includes(q.id));
   openSheet(`<h3>보관한 한 마디 <span style="font-size:var(--t-cap);color:var(--muted);font-weight:700">${keep.length}개</span></h3>
     ${keep.length ? `<div class="qlist">${keep.map(q=>`<div class="row"><blockquote>“${esc(q.ko)}”</blockquote>
-        <div class="m"><span>${esc(q.who||'')}${q.src?` · ${esc(q.src)}`:''}</span><button data-qdel="${q.id}">빼기</button></div></div>`).join('')}</div>`
+        <div class="m"><span>${esc(q.who||'')}${quoteSrcInline(q)}</span><button data-qdel="${q.id}">빼기</button></div></div>`).join('')}</div>`
       : `<p class="fine" style="text-align:left;padding:6px 0 14px">아직 보관한 글귀가 없습니다. 오늘 화면 아래 <b>오늘의 한 마디</b>에서 마음에 드는 글을 보관해 두세요.</p>`}
     <button class="btn ghost" id="sheetClose">닫기</button>`);
 }
@@ -3576,10 +3600,14 @@ function detailCard(c){
     <div class="dmore" id="dMore" ${open ? '' : 'hidden'}>
       <div class="sec dbody"><h2>본문</h2><div class="prose">${c.body.map(p=>`<p>${termify(rich(p), keys, u2)}</p>`).join('')}</div></div>
       <div id="dThink">${dThinkHtml(c)}</div>
-      ${c.myths.length ? `<div class="sec dmyth"><h2>자주 하는 오해</h2>${c.myths.map(m=>`<div class="myth"><p><span class="x">✗ 오해</span> ${rich(m.x)}</p><p><span class="o">✓ 진실</span> ${rich(m.o)}</p>${m.why ? `<p class="why"><span class="w">왜?</span> ${rich(m.why)}</p>` : ''}</div>`).join('')}</div>`:''}
-      ${c.terms.length ? `<div class="sec"><h2>용어</h2><dl class="terms">${c.terms.map(t=>`<dt>${esc(t.k)}</dt><dd>${esc(t.v)}</dd>`).join('')}</dl></div>`:''}
+      ${dMythHtml(c)}
+      ${dTermHtml(c)}
     </div>`;
 }
+/* 자주 하는 오해·용어 — 오해 문장(x)·용어 이름(k)은 앱 파일에, 진실·까닭(o·why)·뜻(v)은 나중에 받는 데이터(cl)에(2026-10-14).
+   받기 전엔 문장·이름은 그대로 보이고 그 옆만 옅은 줄 → 받으면 lzFill 이 그 칸만 다시 그린다 */
+const dMythHtml = c => !c.myths.length ? '' : `<div class="sec dmyth"${MORE.ok ? '' : ` data-lz="my:${c.id}"`}><h2>자주 하는 오해</h2>${c.myths.map(m=>`<div class="myth"><p><span class="x">✗ 오해</span> ${rich(m.x)}</p><p><span class="o">✓ 진실</span> ${MORE.ok ? rich(m.o) : LZI}</p>${m.why ? `<p class="why"><span class="w">왜?</span> ${rich(m.why)}</p>` : ''}</div>`).join('')}${MORE.ok ? '' : lzMsg('오해 풀이를')}</div>`;
+const dTermHtml = c => !c.terms.length ? '' : `<div class="sec"${MORE.ok ? '' : ` data-lz="tm:${c.id}"`}><h2>용어</h2><dl class="terms">${c.terms.map(t=>`<dt>${esc(t.k)}</dt><dd>${MORE.ok ? esc(t.v) : LZI}</dd>`).join('')}</dl>${MORE.ok ? '' : lzMsg('용어 뜻을')}</div>`;
 /* 그림 읽는 법 — 강의용 교재의 것이 먼저, 없으면 앱용 덧붙임(data/concept_extras.json howto, 2026-10-07 콘텐츠 감사 보완안 12).
    PhET 시뮬레이션(콜로라도 대학교, 무료)이 그 개념에 꼭 맞으면 한 줄 링크 — 바깥 사이트로 나간다는 표시를 붙인다 */
 const howtoOf = c => (c.howto && c.howto.length) ? c.howto : ((c.x && c.x.howto) || []);
@@ -3649,7 +3677,7 @@ function ttClose(back){ document.getElementById('ttip')?.remove(); if (ttBtn){ t
 function ttOpen(btn){
   const c = CONCEPTS[detailIdx], t = c && c.terms[+btn.dataset.tt]; ttClose(); if (!t) return;
   const el = document.createElement('div'); el.id = 'ttip'; el.className = 'ttip'; el.setAttribute('role', 'status');
-  el.innerHTML = `<b class="h">${esc(t.k)}</b>${rich(t.v)}<i class="ar" aria-hidden="true"></i>`;
+  el.innerHTML = `<b class="h">${esc(t.k)}</b>${t.v != null ? rich(t.v) : MORE.err ? '뜻을 아직 받지 못했어요 · 인터넷에 연결되면 자동으로 받아요.' : '뜻을 받는 중이에요…'}<i class="ar" aria-hidden="true"></i>`;   // 뜻은 나중에 받는 데이터(2026-10-14)
   document.body.appendChild(el); ttBtn = btn; btn.setAttribute('aria-expanded', 'true'); ttPlace();
 }
 /* 말풍선 자리 — 화면 양옆 12px 안, 아래 자리가 모자라면(탭 막대까지) 위로 */

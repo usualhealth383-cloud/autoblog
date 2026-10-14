@@ -5,6 +5,9 @@
 · 데이터가 늦게 와도: 첫 화면이 바로 그려지고, 문항 수는 맞게 보이고, 그림 자리는 같은 비율로 비어 있다가 채워진다
 · 문제 은행 탭은 자리 표시 → 받으면 그려짐 · 개념 상세의 확인 문제(그 개념 OX)도 자리 표시 → 받으면 채워짐 · '이 소단원 문제 풀기'를 먼저 누르면 받은 뒤 바로 문제로
 · 받기가 실패하면 '다시 받기' 안내 → 누르면 받아진다
+· (2026-10-14 앱 파일 덜기) 오늘의 한 마디는 받기 전에 그려지고(글귀·사람·분야), 원문·출처는 접기 안 자리 표시 → 받으면 그 자리에 채워진다.
+  개념 상세의 오해 풀이(진실·까닭)·용어 뜻·용어 말풍선도 같다 — 받기 전엔 문장·이름만, 받으면 제자리에.
+  앱 파일 한도 1,600,000 B(덜어 낸 뒤 1,476,992 B + 여유 약 120 KB — 여유가 진짜로 남게 지킨다)
 전제: docs/parkchan 이 :8765.   사용: python3 tools/e2e_lazy.py [--shots 폴더]
 """
 import asyncio, sys, os, re, pathlib
@@ -20,7 +23,7 @@ async def main():
     idx = (PAGES / 'index.html').stat().st_size
     more = [p for p in PAGES.glob('more-*.json')]
     assert len(more) == 1, more
-    assert idx < 1_700_000, f'앱 파일이 다시 무거워졌다: {idx:,} B'
+    assert idx < 1_600_000, f'앱 파일이 다시 무거워졌다: {idx:,} B(한도 1,600,000 B — 첫 화면에 안 쓰는 데이터는 more-*.json 으로)'
     sw = (PAGES / 'sw.js').read_text(encoding='utf-8')
     assert f"const DATA = './{more[0].name}';" in sw, '서비스 워커가 미리 받는 데이터 파일 이름이 다르다'
     print(f'앱 {idx/1e6:.2f}MB + 나중에 받는 {more[0].name} {more[0].stat().st_size/1e6:.2f}MB')
@@ -83,6 +86,53 @@ async def main():
         await s2.wait_for_function('MORE.ok', timeout=5000); await s2.wait_for_timeout(300)
         assert await s2.locator('#bankRec').count() == 1, '다시 받은 뒤 문제 은행이 안 그려짐'
         await s2.screenshot(path=f'{SC}/l04_bank_loaded.png')
+        # ③ 한 마디 원문·출처 · 오해 풀이 · 용어 뜻 — 받기 전에 첫 화면(한 마디 포함)이 그려지고, 받으면 그 자리에 채워진다
+        ctx3 = await b.new_context(viewport={'width': 390, 'height': 844}, service_workers='block'); await ctx3.add_init_script(NO_INTRO)
+        s3 = await ctx3.new_page(); await auto_yes(s3)
+        s3.on('pageerror', lambda e: errs.append(str(e)))
+        gate3 = asyncio.Event()
+        async def hold3(route):
+            await gate3.wait(); await route.continue_()
+        await s3.route('**/more-*.json', hold3)
+        await s3.goto(APP); await s3.wait_for_timeout(700)
+        await s3.click('#goGuest'); await s3.wait_for_timeout(500)
+        assert await s3.evaluate('MORE.ok') is False
+        q = await s3.evaluate('(() => { const q = quoteToday(); return { id:q.id, ko:q.ko, who:q.who, kn:q.kindName, src:q.src || null, orig:q.orig || null }; })()')
+        assert q['src'] is None and q['orig'] is None, '원문·출처가 앱 파일에 남아 있음(나중에 받는 데이터로 옮겼다)'
+        assert await s3.inner_text('#v-today .qsay blockquote') == f"“{q['ko']}”" and q['who'] in await s3.inner_text('#v-today .qsay .by'), '받기 전에 한 마디가 안 그려짐'
+        assert q['kn'] and q['kn'] in await s3.inner_text('#v-today .qsay .k'), '받기 전에 한 마디 분야가 안 보임'
+        await s3.click('#v-today .qsay .qmore summary'); await s3.wait_for_timeout(200)
+        assert await s3.locator(f'#v-today .qsay [data-lz="q:{q["id"]}"] .lzi').count() == 2 and '받는 중' in await s3.inner_text('#v-today .qsay .qmore'), '원문·출처 자리 표시가 없음'
+        assert await s3.locator('#v-today .qsay .qmore .note').count() == 1, '한 줄 풀이(note)는 받기 전에도 보여야 함'
+        await s3.locator('#v-today .qsay').scroll_into_view_if_needed(); await s3.screenshot(path=f'{SC}/l05_quote_waiting.png')
+        # 개념 상세 — 본문을 펼쳐 둔 개념(용어·오해 있음): 오해 문장·용어 이름은 보이고 진실·뜻은 자리 표시, 용어 말풍선은 '받는 중'
+        ci = await s3.evaluate("CONCEPTS.findIndex((c, i) => isOpen(i) && c.myths.length && c.terms.length)")
+        await s3.evaluate(f"dOpenSet(CONCEPTS[{ci}].id, true); detailIdx = {ci}; show('detail')"); await s3.wait_for_timeout(300)
+        cid = await s3.evaluate(f'CONCEPTS[{ci}].id')
+        assert await s3.locator(f'#v-detail [data-lz="my:{cid}"] .myth').count() == await s3.evaluate(f'CONCEPTS[{ci}].myths.length'), '오해 자리 표시가 없음'
+        assert await s3.locator(f'#v-detail [data-lz="tm:{cid}"] dd .lzi').count() == await s3.evaluate(f'CONCEPTS[{ci}].terms.length'), '용어 뜻 자리 표시가 없음'
+        assert await s3.evaluate(f"plain(CONCEPTS[{ci}].myths[0].x)") in await s3.inner_text('#v-detail .dmyth'), '받기 전에 오해 문장이 안 보임'
+        tt = s3.locator('#v-detail .tterm').first; has_tt = await tt.count() == 1
+        if has_tt:
+            await tt.click(); await s3.wait_for_timeout(150); assert '받는 중' in await s3.inner_text('#ttip'), '용어 말풍선 자리 표시가 없음'
+        await s3.screenshot(path=f'{SC}/l06_detail_terms_waiting.png', full_page=True)
+        gate3.set(); await s3.wait_for_function('MORE.ok', timeout=8000); await s3.wait_for_timeout(400)
+        assert await s3.locator('[data-lz]').count() == 0, '받은 뒤에도 자리 표시가 남음'
+        my = await s3.evaluate(f"CONCEPTS[{ci}].myths.map(m => [plain(m.o), plain(m.why || '')])")
+        mt = await s3.inner_text('#v-detail .dmyth')
+        assert all(o and o in mt and w in mt for o, w in my), '받은 뒤 오해 풀이(진실·까닭)가 제자리에 안 채워짐'
+        tv = await s3.evaluate(f"CONCEPTS[{ci}].terms.map(t => t.v)")
+        assert all(tv) and [x.strip() for x in await s3.locator('#v-detail dl.terms dd').all_inner_texts()] == [v.strip() for v in tv], '받은 뒤 용어 뜻이 제자리에 안 채워짐'
+        if has_tt:
+            tip = await s3.inner_text('#ttip'); assert '받는 중' not in tip and len(tip) > 8, f'받은 뒤 말풍선에 뜻이 안 채워짐: {tip}'
+        # 한 마디: 다시 그리지 않아도(오늘 화면은 숨은 채) 접기 안에 원문·출처가 채워져 있다
+        q2 = await s3.evaluate(f"(() => {{ const q = QUOTES.find(x => x.id === '{q['id']}'); return {{ src:q.src, orig:q.orig || '' }}; }})()")
+        assert q2['src'] and await s3.inner_text('#v-today .qsay .qmore .src') == f"출처 · {q2['src']}", '받은 뒤 한 마디 출처가 안 채워짐'
+        assert not q2['orig'] or q2['orig'] in await s3.inner_text('#v-today .qsay .qmore .orig'), '받은 뒤 한 마디 원문이 안 채워짐'
+        assert await s3.evaluate("QUOTES.every(q => q.src && q.url && q.kindName)"), '받은 뒤 출처·주소·분야가 빈 글귀'
+        await s3.evaluate("show('today')"); await s3.wait_for_timeout(300)
+        await s3.click('#v-today .qsay .qmore summary'); await s3.wait_for_timeout(200)
+        await s3.locator('#v-today .qsay').scroll_into_view_if_needed(); await s3.screenshot(path=f'{SC}/l07_quote_loaded.png')
         assert not errs, errs
         print('LAZY E2E OK · 콘솔 오류', errs); await b.close()
 
