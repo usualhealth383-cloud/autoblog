@@ -106,7 +106,7 @@ data['art'] = found
 SLIM = {
     'symptoms':    ['id', 'group', 'icon', 'name', 'short', 'tags', 'reviewed'],
     'drugs':       ['id', 'name', 'class', 'rx'],   # simple(한 줄 먹는 법)도 본문으로 — 첫 화면(홈·처음 안내)은 본문이 오면 다시 그리고(mergeCore → redraw) 알림도 다시 건다(2026-10-14 외부 검수 2차 반영으로 첫 화면 232 KB, 압축 약 3 KB 줄임)   # for(쓰임)도 본문으로 — 약 사전·검색은 본문이 오면 다시 그린다(10-14 화면 개편으로 첫 화면 226 KB)   # tagline 도 본문으로(증상·약 화면은 본문을 받은 뒤 그려진다, 10-14 첫 화면 예산)   # en(영어 이름)은 본문으로 — 첫 화면 목록엔 안 보인다(10-14 많이 찾는 약 타일로 224 KB 넘침)
-    'supplements': ['id', 'name', 'en', 'tags', 'brands', 'evidence'],
+    'supplements': ['id', 'name', 'tags', 'brands', 'evidence'],   # en(영어 이름)은 본문으로 — 화면에 안 보이고(외부 검수 2차 #59) 검색만 씀(10-14 첫 화면 228 KB)
     'classes':     ['id', 'name', 'short', 'icon'],
     'tips':        ['id', 'group', 'icon', 'title'],
     'askdoc':      ['id', 'icon', 'q'],               # 홈은 개수·검색은 질문만 — 대답은 본문과 함께(2026-10-13 검수 반영으로 첫 화면 220 KB)   # 홈은 제목만 쓴다 — 본문은 팁 화면(본문 받은 뒤)에서(2026-10-06 첫 화면 220 KB)

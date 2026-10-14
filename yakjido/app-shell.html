@@ -1695,7 +1695,7 @@ nav.tabbar,.top,.topfind,.actions,.disclaimer,.netbar,#cmpbar,.eyebrow,.back,.sp
 .topfind svg.i{color:var(--muted);flex:none}
 /* 그림은 32px, 누르는 칸은 44px(3-22) */
 .topfind .gq-x{display:grid;place-items:center;width:32px;height:32px;border-radius:50%;background:var(--tint2);color:var(--muted);flex:none;box-sizing:content-box;border:6px solid transparent;background-clip:padding-box;margin:-6px}
-.findpanel{margin-top:0}.lk48{display:flex;flex-direction:column;gap:8px;margin-top:8px}.lk48 a{display:flex;align-items:center;min-height:48px;font-size:.9375rem}.gq-close{margin:8px 0 4px}
+.findpanel{margin-top:0}.lk48{display:flex;flex-direction:column;gap:8px;margin-top:8px}.lk48 a{display:flex;align-items:center;min-height:48px;font-size:.9375rem;overflow-wrap:anywhere}.gq-close{margin:8px 0 4px}
 .qa-card{background:var(--card);border:1.5px solid var(--primary);border-radius:var(--r-card);padding:var(--s4);margin-bottom:var(--s3);box-shadow:0 6px 20px rgba(var(--primary-rgb),.10)}
 .qa-h{display:flex;align-items:center;gap:8px;color:var(--primary-deep);font-size:.9375rem;font-weight:800;margin-bottom:8px}
 .qa-card p{font-size:.9375rem;line-height:1.7;white-space:pre-line}
@@ -4328,9 +4328,11 @@ function planRows(s){ SYM_NOW = s.id;
   close();
   if (opt.length) {
     const n = opt.filter(x => optPicked(s.id, x.i)).length;
-    out.push(`<details class="opt-fold" ${OPT_FOLD === s.id || n ? 'open' : ''} ontoggle="OPT_FOLD=this.open?'${s.id}':(OPT_FOLD==='${s.id}'?'':OPT_FOLD)"><summary><span><b>이런 증상도 있으면</b><small>${opt.map(x => esc(x.slot)).join(' · ')}${n ? ` — ${n}가지 넣었어요` : ''}</small></span>${I.chev}</summary>
+    /* 넣기 전 보조 칸도 내 약통과 부딪히면 카드 안에 보이고 펼침 */
+    const oix = x => optPicked(s.id, x.i) ? '' : ixLine([x.d]), hasIx = opt.some(x => oix(x));
+    out.push(`<details class="opt-fold" ${OPT_FOLD === s.id || n || hasIx ? 'open' : ''} ontoggle="OPT_FOLD=this.open?'${s.id}':(OPT_FOLD==='${s.id}'?'':OPT_FOLD)"><summary><span><b>이런 증상도 있으면</b><small>${opt.map(x => esc(x.slot)).join(' · ')}${n ? ` — ${n}가지 넣었어요` : ''}</small></span>${I.chev}</summary>
       <p class="small muted opt-lead">해당할 때만 더하세요. <b>「약국 카드에 넣기」</b>를 누른 것만 약국에서 보여드리기·가족에게 보내기에 들어가요.</p>
-      ${opt.map(x => { const on = optPicked(s.id, x.i); return `<div class="opt-one ${on ? 'on' : ''}">${buyItem(x)}<button type="button" class="opt-add ${on ? 'on' : ''}" role="checkbox" aria-checked="${on}" onclick="optToggle('${s.id}',${x.i})"><i class="opt-box">${on ? I.check : ''}</i>${on ? '약국 카드에 넣었어요' : '약국 카드에 넣기'}</button></div>`; }).join('')}
+      ${opt.map(x => { const on = optPicked(s.id, x.i); return `<div class="opt-one ${on ? 'on' : ''}">${buyItem(x)}${oix(x)}<button type="button" class="opt-add ${on ? 'on' : ''}" role="checkbox" aria-checked="${on}" onclick="optToggle('${s.id}',${x.i})"><i class="opt-box">${on ? I.check : ''}</i>${on ? '약국 카드에 넣었어요' : '약국 카드에 넣기'}</button></div>`; }).join('')}
     </details>`);
   }
   if (late.length) out.push(`<div class="consult-grp"><div class="consult-h">${I.alert}<span>이 조건에선 약사와 먼저 상의</span></div>${late.map(buyItem).join('')}</div>`);
@@ -4440,8 +4442,9 @@ function vSymptomS(s){
   const dos = inf ? [] : (s.plan || []).filter(p => p.otc !== false && !(p.options || []).length && !slotHidden(p) && !isMedTip(p));
   const noBuy = !main.length && !late.length && !opt.length, nb = main.filter(x => !x.have).length, hv = main.filter(x => x.have), unrev = s.reviewed === false;
   const row = x => svRow(x) + ((x.alts || []).length ? `<div class="sv-or"><small>${esc(x.either)} — 이 중 하나만</small>${x.alts.map(a => `<button type="button" onclick="eitherSet('${s.id}',${a.i})">또는 ${esc(nbu((catName(a) !== catName(x) ? catName(a) + ' — ' : '') + (prodName(a.product) || ingrName(a.d))))}${I.chev}</button>`).join('')}</div>` : '');
-  const optFold = !opt.length ? '' : `<details class="opt-fold" ${OPT_FOLD === s.id || nOpt ? 'open' : ''} ontoggle="OPT_FOLD=this.open?'${s.id}':(OPT_FOLD==='${s.id}'?'':OPT_FOLD)"><summary><span><b>이런 증상도 있으면 더하기</b><small>${nOpt ? nOpt + '가지 넣었어요' : opt.length + '가지'}</small></span>${I.chev}</summary>
-    ${opt.map(x => { const on = optPicked(s.id, x.i); return `<div class="opt-one ${on ? 'on' : ''}"><button type="button" class="opt-add sv-opt ${on ? 'on' : ''}" role="checkbox" aria-checked="${on}" onclick="optToggle('${s.id}',${x.i})"><i class="opt-box">${on ? I.check : ''}</i><span><b>${esc(nbu(catName(x) + ' — ' + (prodName(x.product) || ingrName(x.d))))}</b><small>${esc(x.title || x.slot)}</small></span></button>${on ? svRow(x) : ''}</div>`; }).join('')}</details>`;
+  const oix = x => optPicked(s.id, x.i) ? '' : ixLine([x.d]);
+  const optFold = !opt.length ? '' : `<details class="opt-fold" ${OPT_FOLD === s.id || nOpt || opt.some(oix) ? 'open' : ''} ontoggle="OPT_FOLD=this.open?'${s.id}':(OPT_FOLD==='${s.id}'?'':OPT_FOLD)"><summary><span><b>이런 증상도 있으면 더하기</b><small>${nOpt ? nOpt + '가지 넣었어요' : opt.length + '가지'}</small></span>${I.chev}</summary>
+    ${opt.map(x => { const on = optPicked(s.id, x.i); return `<div class="opt-one ${on ? 'on' : ''}"><button type="button" class="opt-add sv-opt ${on ? 'on' : ''}" role="checkbox" aria-checked="${on}" onclick="optToggle('${s.id}',${x.i})"><i class="opt-box">${on ? I.check : ''}</i><span><b>${esc(nbu(catName(x) + ' — ' + (prodName(x.product) || ingrName(x.d))))}</b><small>${esc(x.title || x.slot)}</small></span></button>${on ? svRow(x) : ''}${oix(x)}</div>`; }).join('')}</details>`;
   return `${topBar({ back:'증상', unreviewed:s.reviewed === false })}
   <div class="${gcls(s.group)}"><div class="eyebrow" style="color:var(--gfg,var(--primary))"><span class="gdot"></span>${esc(s.group)}</div><h1>${esc(s.name)}</h1></div>
   <div class="sv-top"><p class="sv-lead">${inf ? '약보다 진료가 먼저예요' : noBuy ? '약국에서 살 약은 없어요' : unrev ? '약국에서 이렇게 상의하세요' : '약국에서 이렇게 사세요'}</p>${viewSeg('simple')}</div>
