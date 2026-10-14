@@ -49,7 +49,7 @@ course (통합과학1 / 통합과학2)
 
 - **교재**: unit→lesson 순서대로 조판. concept.body+figures = 개념부, problem step1~3 = 문제부, explanation+wrong_notes = 해설편.
 - **앱 1일 1문제**: problem에서 난이도·성취기준 균형 추출, concept_ids로 복습 연결.
-- **모의고사**: 25문항/40분/배점 1.5·2·2.5 (2028 수능 규격)로 problem 조합.
+- **모의고사**: 25문항/40분/배점 1.5·2·2.5 (2028 수능 체제)로 problem 조합.
 - **앱 개념 열람**: concept.gist(알짜) 우선 노출 → 펼치면 body.
 
 v0.1 비고: 샘플 챕터는 이 스키마로 데이터를 만들되 조판은 수동 HTML. 조판 자동화(데이터→HTML 렌더러)는 MVP 단계에서 구현.
