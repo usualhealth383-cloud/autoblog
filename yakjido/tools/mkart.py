@@ -87,6 +87,9 @@ if (SP / 'ps.json').exists() and any((SP / 'ps').glob('*.jpg')):
                 except Exception as e: print('그림 표시 못 받음', c, e); continue
             files['pg/' + f.name] = str(f)
 for f in sorted((ROOT / 'data' / 'kg').glob('*.json')): files['data/kg/' + f.name] = str(f)
+# 첫 동의 화면의 「전문 보기」(#/doc/terms·#/doc/privacy)는 같은 주소의 html 을 받아 읽는다 — 아티팩트에도 싣는다(2026-10-14)
+for n in ('terms.html', 'privacy.html'):
+    if (ROOT / n).exists(): files[n] = str(ROOT / n)
 OUT.parent.mkdir(parents=True, exist_ok=True)   # 새 컨테이너에는 작업 폴더가 비어 있다(2026-10-04)
 (OUT.parent / 'files.json').write_text(json.dumps(files, ensure_ascii=False, indent=0))
 print('함께 싣는 파일', len(files), '개 ·', round(sum(pathlib.Path(v).stat().st_size for v in files.values()) / 1e6, 1), 'MB → files.json')
