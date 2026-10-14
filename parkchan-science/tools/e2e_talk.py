@@ -220,10 +220,15 @@ async def server_safety():
         await a.fill('#nkIn', '물리하는가'); await a.click('#nkSave'); await a.wait_for_timeout(600)
         await a.fill('#poT', '운동량 질문 있어요'); await a.fill('#poX', '충격량 단원 질문입니다. 답 주실 분은 010-1234-5678 로 문자 주세요')
         await a.click('#poSave'); await a.wait_for_timeout(300)
-        w = await a.inner_text('#poWarn'); assert '전화번호로' in w and '010-****-5678' in w, w
+        w = await a.inner_text('#poWarn'); assert '전화번호로' in w and '연락처는 이야기에 올릴 수 없어요' in w, w
         await a.screenshot(path=f'{SC}/s1_phone_warn.png')
+        await a.click('#poSave'); await a.wait_for_timeout(600)   # 한 번 더 눌러도 연락처는 막힌다(GPT ⑤ #18 — 가려 저장하던 것)
+        assert '연락처는 이야기에 올릴 수 없어요' in await a.inner_text('#poWarn') and await a.locator('#poSave').count() == 1, '연락처가 두 번째 누름에 올라감'
+        s_, j = await a.evaluate("DBX.addPost({ board:'qna', title:'연락', body:'문자 주세요 010-1234-5678' }).then(() => [0, ''], e => [1, e.message])")
+        assert s_ == 1 and '연락처' in j, ('앱을 거치지 않아도 서버가 연락처를 거절', j)
+        await a.fill('#poX', '충격량 단원 질문입니다. 그래프 넓이가 왜 충격량인지 알려 주세요')
         await a.click('#poSave'); await a.wait_for_timeout(900); await a.click('.pcard'); await a.wait_for_timeout(700)
-        body = await a.inner_text('.pfull .body'); assert '010-****-5678' in body and '1234' not in body, ('서버가 가운데를 가려 저장', body)
+        body = await a.inner_text('.pfull .body'); assert '그래프 넓이' in body and '010' not in body, body
         await a.fill('#cIn', '저는 한빛중 3학년 김민수예요 같이 공부해요'); await a.click('#cGo'); await a.wait_for_timeout(500)
         assert '학교·학년과 이름으로' in await a.inner_text('.piiwarn'), '학교+학년+이름 경고가 없음'
         await a.fill('#cIn', '(댓글 고침) 같이 공부해요'); await a.click('#cGo'); await a.wait_for_timeout(700)
@@ -231,7 +236,8 @@ async def server_safety():
         # 학생 B — 사유를 골라 신고
         cb, bb = await page(); await signup(bb, '나학생', 'rb@demo.kr'); await member(bb, aged=True); await nick(bb, '신고하는나')
         await talk(bb); await bb.click('.pcard'); await bb.wait_for_timeout(700); await bb.click('#pReport'); await bb.wait_for_timeout(300)
-        assert await bb.locator('.rsn [data-rsn]').count() == 7 and await bb.locator('[data-rsn="worry"]').count() == 1, '신고 사유가 7개(걱정돼요 포함)가 아님'
+        assert await bb.locator('.rsn [data-rsn]').count() == 8 and await bb.locator('[data-rsn="worry"]').count() == 1 and await bb.locator('[data-rsn="threat"]').count() == 1, '신고 사유가 8개(위협·걱정돼요 포함)가 아님'
+        assert '1건이어도 바로 가려' in await bb.inner_text('#sheetBg .sheet'), '긴급 사유는 바로 가린다는 안내가 없음'
         assert await bb.is_disabled('#rpGo'), '사유를 고르기 전에 신고 단추가 눌림'
         await bb.click('[data-rsn="bully"]'); await bb.screenshot(path=f'{SC}/s2_report_reasons.png')
         await bb.click('#rpGo'); await bb.wait_for_timeout(700)

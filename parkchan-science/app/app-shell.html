@@ -1750,12 +1750,14 @@ const CFG = {
   attendSecret: 'parkchan-2026',     // 로컬 출석 코드 씨앗 — 서버 모드에서는 서버만 안다
   classes: [{cls:'월목반',start:'18:00'},{cls:'화금반',start:'17:30'},{cls:'수토반',start:'17:30'}],   // 화금·수토 = 고1 예비반 오후 5시 30분(2026-10-12 원장님) · 월목반 [확인 필요]
   phone: '053-213-3577', kakao: '', email: 'stepfirst@naver.com',   // 학원 연락처(2026-10-12 원장님) — 비어 있으면 그 줄이 숨는다
+  /* 판매자 정보(전자상거래법 제10조 ①·제13조 ①②) — 이용약관 제14조와 같은 값. 빈 칸(대표자·사업자등록번호·통신판매업 신고번호)은 원장님 확인 뒤 채운다(그 전엔 줄이 숨음) */
+  seller: { name:'박찬 통합과학 학원', rep:'', addr:'대구광역시 달서구 조암로 25, 그루빌딩 501호', bizNo:'', mailOrder:'', academyNo:'제2019-115호' },
   /* 스토어 상품은 모두 '일회성 이용권'(자동 결제 없음 — 미성년 이용자가 모르게 결제가 이어지지 않게). sku 는 Play Console 상품 ID 와 같아야 한다 */
   plans: [ { id:'m1', sku:'pass_m1', name:'월 이용권', days:30, months:1, price:9900, sub:'한 달 · 자동 결제 없음' }, { id:'m6', sku:'pass_m6', name:'6개월 이용권', days:180, months:6, price:39000, sub:'자동 결제 없음' }, { id:'y1', sku:'pass_y1', name:'12개월 이용권', days:365, months:12, price:59000, sub:'자동 결제 없음', best:true } ],
   push: '__PUSH__' === 'on',          // build.py 가 server/config.json 의 "push": true 를 보고 켠다(google-services.json 이 있어야 함)   // 2026-09-08 결정: 월 9,900 · 수강생 무료
 };
 
-const TERMS_VER = '2026-10-02';        // 약관·개인정보처리방침 판 — 문서 머리의 '판'과 같게 적는다(가입 때 동의한 판이 계정에 남는다)
+const TERMS_VER = '2026-10-14';        // 약관·개인정보처리방침 판 — 문서 머리의 '판'과 같게 적는다(가입 때 동의한 판이 계정에 남는다)
 /* 메일 링크(가입 확인·비밀번호 재설정)가 돌아올 주소. 앱(네이티브)은 웹 주소로 돌아오게 한다 */
 const WEB_URL = 'https://usualhealth383-cloud.github.io/autoblog/parkchan/';
 const authRedirect = () => (window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform()) || !/^https?:/.test(location.href) ? WEB_URL : location.origin + location.pathname;
@@ -1960,6 +1962,9 @@ const hhmm = t => (t || '').slice(0, 5);
 
 /* ═══ 데이터 계층 — 로컬 어댑터 (계정·학생·출석·공지·이용권이 이 기기 안에 산다) ═══ */
 const DBKEY = 'pcs.db.v2';
+const REPORT_HIDE = 3;                       // 신고가 이만큼 쌓이면 자동으로 가린다(로컬 DB 가 처음 열 때도 쓰므로 DB 보다 위에)
+/* 긴급 사유 — 1건이면 '확인 중'으로 바로 가리고 원장님 폰에 바로 알린다(GPT 검수 ⑤ #19, 서버 private.recount · push 함수) */
+const URGENT_R = ['privacy', 'harm', 'threat'];
 const DB = (() => {
   const seed = () => ({
     students: [
@@ -1986,7 +1991,9 @@ const DB = (() => {
   /* 신고가 자주 되돌려진 계정(30일에 '그대로 둠' 3번 이상) — 서버 private.rep_muted 와 같다. 그 사람의 열린 신고는 가림 수에 넣지 않는다 */
   const keptN = u => { const since = new Date(Date.now() - 30*864e5).toISOString(); return [...(d.posts||[]), ...(d.comments||[])].reduce((n, x) => n + repOf(x).filter(r => r.uid === u && r.state === 'kept' && r.reason !== 'worry' && (r.resolved_at||'') > since).length, 0); };
   const muted = u => keptN(u) >= 3;
-  const recount = x => (x.report_n = repOf(x).filter(r => r.state === 'open' && r.reason !== 'worry' && !muted(r.uid)).length);
+  /* 긴급 신고(개인정보·성적/유해·위협)는 1건이면 바로 가림 — 서버 private.recount 와 같다 */
+  const recount = x => { const o = repOf(x).filter(r => r.state === 'open' && r.reason !== 'worry' && !muted(r.uid));
+    return (x.report_n = o.some(r => URGENT_R.includes(r.reason)) ? Math.max(o.length, REPORT_HIDE) : o.length); };
   [...(d.posts||[]), ...(d.comments||[])].forEach(recount);
   /* 처리 기록(운영 일지) — 서버 talk_log 와 같은 모양: 누구에게(uid) · 무엇을(action) · 누가(actor) · 어디(target) */
   const logAct = (uid, action, extra = {}) => { d.talkLog ||= []; d.talkLog.push({ uid, action, reason:'', memo:'', guardian:false, until:null, actor:(me()||{}).id || null, target:null, at:new Date().toISOString(), ...extra }); };
@@ -2008,10 +2015,12 @@ const DB = (() => {
     if (a.role !== 'student') return 'parent';
     if ((a.passUntil && a.passUntil >= todayISO()) || d.students.some(x => x.code === a.studentCode && x.until >= todayISO())) return null; return 'member'; };
   const talkGuard = () => { const a = me(), b = talkBlock(a); if (b) throw new Error(talkMsg(b, a && a.talkUntil, a && a.guardTalk)); return a; };
-  /* 개인정보 — 서버 pii_guard 와 같다: 주민등록번호는 거절, 휴대전화는 가운데를 가려 저장(원장 글은 그대로) */
+  /* 개인정보 — 서버 pii_guard 와 같다: 주민등록번호는 거절, 연락처(휴대전화·이메일·메신저 아이디)도 거절(원장 글은 그대로) */
   const piiGuard = (a, t) => { if (PII[0][0].test(t)) throw new Error('주민등록번호로 보이는 내용은 올릴 수 없습니다. 지우고 다시 올려 주세요.');
-    if (!(a && a.role === 'owner') && abuseLevel(t) >= 2) throw new Error('아주 심한 욕설이 들어 있어 올릴 수 없습니다. 고쳐서 다시 올려 주세요.');   // 서버 pii_guard 와 같다
-    return a && a.role === 'owner' ? (v => v) : piiMask; };
+    const own = a && a.role === 'owner';
+    if (!own && PII.some(([re, , , k]) => CONTACT_K.includes(k) && re.test(t))) throw new Error('전화번호·이메일·메신저 아이디 같은 연락처는 이야기에 올릴 수 없습니다. 지우고 다시 올려 주세요.');
+    if (!own && abuseLevel(t) >= 2) throw new Error('아주 심한 욕설이 들어 있어 올릴 수 없습니다. 고쳐서 다시 올려 주세요.');   // 서버 pii_guard 와 같다
+    return v => v; };
   CLASSES_CACHE = d.classes.slice();
   const w = () => { try { localStorage.setItem(DBKEY, JSON.stringify(d)); } catch {} };
   const fixNotes = () => { if (Array.isArray(d.notes)){ d.tnotes = (d.tnotes || []).concat(d.notes.filter(n => n && n.wk)); d.notes = {}; } if (!d.notes || typeof d.notes !== 'object') d.notes = {}; if (!Array.isArray(d.tnotes)) d.tnotes = []; };
@@ -2194,7 +2203,7 @@ const DB = (() => {
       const wo = reason === 'worry', pv = repOf(x).find(r => r.uid === a.id && (r.reason === 'worry') === wo);
       if (pv) return { ok:true, again:true, checked: pv.state !== 'open', n: recount(x), worry: wo };
       x.reports.push({ uid:a.id, reason, state:'open', at:new Date().toISOString() }); const n = recount(x); w();
-      return { ok:true, n, hidden: n >= REPORT_HIDE, worry: wo }; },
+      return { ok:true, n, hidden: n >= REPORT_HIDE, worry: wo, urgent: URGENT_R.includes(reason) }; },
     myReports: async () => { const a = me(); if (!a) return []; const since = Date.now() - 30*864e5;
       return [...(d.posts||[]).map(x => ['post', x]), ...(d.comments||[]).map(c => ['comment', c])].flatMap(([k, x]) => repOf(x).filter(r => r.uid === a.id && r.state !== 'open' && !r.seen_at && new Date(r.resolved_at) > since)
         .map(r => ({ kind:k, reason:r.reason, state:r.state, at:r.at, resolved_at:r.resolved_at }))); },
@@ -2478,14 +2487,14 @@ const serverDB = () => {
     posts: async (board, q) => { const bq = board === '전체' ? '' : `&board=eq.${encodeURIComponent(board)}`;
       const kw = (q||'').trim().replace(/[(),*]/g, ' '), kq = kw ? `&or=(title.ilike.*${encodeURIComponent(kw)}*,body.ilike.*${encodeURIComponent(kw)}*)` : '';
       const rows = await api(`/rest/v1/posts?deleted=is.false${bq}${kq}&select=${POST_COLS}&order=at.desc&limit=60`);
-      return rows.map(r => ({ ...r, uid: r.author, likes: r.likes||[], comments: r.comment_n || 0 })); },
+      return rows.map(r => ({ ...withCare(r), uid: r.author, likes: r.likes||[], comments: r.comment_n || 0 })); },
     post: async id => { const [rs, cs] = await Promise.all([api(`/rest/v1/posts?id=eq.${id}&select=${POST_COLS}`), api(`/rest/v1/comments?post_id=eq.${id}&deleted=is.false&select=${CM_COLS}&order=at.asc`)]);
-      if (!rs.length) return null; return { ...rs[0], uid: rs[0].author, likes: rs[0].likes||[],
-        comments: cs.map(c => ({ ...c, uid: c.author, postId: c.post_id, likes: c.likes||[] })) }; },
-    addPost: async body => (await api(`/rest/v1/posts?select=${POST_COLS}`, { method:'POST', prefer:'return=representation', body }))[0],
-    editPost: async (id, body) => (await api(`/rest/v1/posts?id=eq.${id}&select=${POST_COLS}`, { method:'PATCH', prefer:'return=representation', body:{ ...body, edited:new Date().toISOString() } }))[0],
+      if (!rs.length) return null; return { ...withCare(rs[0]), uid: rs[0].author, likes: rs[0].likes||[],
+        comments: cs.map(c => ({ ...withCare(c), uid: c.author, postId: c.post_id, likes: c.likes||[] })) }; },
+    addPost: async body => withCare((await api(`/rest/v1/posts?select=${POST_COLS}`, { method:'POST', prefer:'return=representation', body }))[0]),
+    editPost: async (id, body) => withCare((await api(`/rest/v1/posts?id=eq.${id}&select=${POST_COLS}`, { method:'PATCH', prefer:'return=representation', body:{ ...body, edited:new Date().toISOString() } }))[0]),
     delPost: async id => { await api('/rest/v1/rpc/delete_item', { method:'POST', body:{ p_kind:'post', p_id:id } }); },   // 함수로(지운 줄이 읽기 정책에 걸리지 않게 — schema.sql delete_item)
-    addComment: async (postId, text) => (await api(`/rest/v1/comments?select=${CM_COLS}`, { method:'POST', prefer:'return=representation', body:{ post_id:postId, body:text } }))[0],
+    addComment: async (postId, text) => withCare((await api(`/rest/v1/comments?select=${CM_COLS}`, { method:'POST', prefer:'return=representation', body:{ post_id:postId, body:text } }))[0]),
     delComment: async id => { await api('/rest/v1/rpc/delete_item', { method:'POST', body:{ p_kind:'comment', p_id:id } }); },   // 함수로(지운 줄이 읽기 정책에 걸리지 않게 — schema.sql delete_item)
     pickComment: async (postId, cid) => { await api(`/rest/v1/rpc/pick_comment`, { method:'POST', body:{ p_post: postId, p_comment: cid } }); },
     likeToggle: async (kind, id) => { await api('/rest/v1/rpc/like_toggle', { method:'POST', body:{ p_kind: kind, p_id: id } }); },
@@ -2564,15 +2573,17 @@ const serverDB = () => {
     registerPush: async (token, platform) => { await api('/rest/v1/rpc/register_push', { method:'POST', body:{ p_token:token, p_platform:platform } }); },
     logError: async e => { await api('/rest/v1/client_errors', { method:'POST', prefer:'return=minimal', body:e }); },
     errors: async () => api('/rest/v1/client_errors?select=*&order=at.desc&limit=30'),
-    verifyPurchase: async p => { const call = () => fetchT(SRV.url + '/functions/v1/verify-purchase', { method:'POST', headers:{ apikey:SRV.key, 'Content-Type':'application/json', Authorization:'Bearer '+((SESSION&&SESSION.access_token)||SRV.key) }, body: JSON.stringify(p) });
+    verifyPurchase: async p => { const call = () => fetchT(SRV.url + '/functions/v1/verify-purchase?forceFunctionRegion=ap-northeast-2', { method:'POST', headers:{ apikey:SRV.key, 'Content-Type':'application/json', Authorization:'Bearer '+((SESSION&&SESSION.access_token)||SRV.key) }, body: JSON.stringify(p) });
       let r = await call(); if (r.status === 401 && await refreshSession()) r = await call();   // 앱을 오래 켜 둬 토큰이 만료됐어도 결제 확인이 실패하지 않게
       const j = await r.json().catch(()=>({})); if (!r.ok || !j.ok) throw new Error(j.why || j.message || '결제를 확인하지 못했습니다. 잠시 뒤 [구매 복원]을 눌러 주세요.'); meCache = null; return j; },
     ownerEmail: () => (SESSION && SESSION.user.email) || '',
     reset: () => {},
   };
 };
-const POST_COLS = 'id,author,nick,board,title,body,attach,likes,report_n,comment_n,staff,solved,deleted,at,edited,care,review,review_why';
-const CM_COLS = 'id,post_id,author,nick,body,likes,report_n,staff,picked,deleted,at,care,checked';
+const POST_COLS = 'id,author,nick,board,title,body,attach,likes,report_n,comment_n,staff,solved,deleted,at,edited,review,review_why';
+const CM_COLS = 'id,post_id,author,nick,body,likes,report_n,staff,picked,deleted,at,checked';
+/* 글 아래 '힘든 마음' 안내는 보이는 글에서 바로 계산한다 — 서버의 자동 판정(care)은 원장만 본다(GPT 검수 ⑤ #17, schema.sql 권한) */
+const withCare = r => r && ({ ...r, care: careCheck(`${r.title||''} ${r.body||''}`) });
 const DBX = SRV ? serverDB() : DB;
 
 /* ═══ 계정 · 내 진도 ═══ */
@@ -3101,9 +3112,11 @@ function renderAuth(){
           <label class="one"><input type="checkbox" id="agTerms" ${SU.terms?'checked':''}><span class="t"><span class="req">[필수]</span> 이용약관</span><button class="see" data-legal="terms" type="button">보기</button></label>
           <label class="one"><input type="checkbox" id="agPrivacy" ${SU.privacy?'checked':''}><span class="t"><span class="req">[필수]</span> 개인정보 수집·이용</span><button class="see" id="pvToggle" type="button" aria-expanded="${SU.pvOpen}">${SU.pvOpen?'접기':'보기'}</button></label>
           ${SU.pvOpen ? `<div class="pv"><table>
-            <tr><th>목적</th><td>회원 식별과 로그인, 학습 기록 저장, 학원 출석·공지 연결, 문의 응대</td></tr>
-            <tr><th>항목</th><td>이메일, 비밀번호(암호화), 이름, 역할 · 선택: 연락처${kid?' · 보호자 성함·연락처(동의 확인용)':''}</td></tr>
-            <tr><th>보유 기간</th><td>회원 탈퇴 시 바로 파기. 법으로 정한 기록(결제 5년 등)은 그 기간만</td></tr></table>
+            <tr><th>목적</th><td><b>항목</b> · 보유 기간</td></tr>
+            <tr><th>[필수] 회원 관리·학습 기록 저장</th><td><b>이메일, 비밀번호(암호화), 이름, 역할${kid?', 보호자 성함·연락처(동의 확인용)':''}</b> · 선택: 연락처 · 쓰면서 생기는 공부한 개념·문제 풀이·오답·일정·공부 노트(노트는 본인만 봄) — 탈퇴하면 바로 파기</td></tr>
+            <tr><th>쓰는 기능만</th><td><b>학원 수강</b>(코드를 넣으면): 반·출석·공지 확인·과제 제출, 원장과 원장이 확인한 보호자가 봄 — 수강 끝나고 1년 · <b>이야기</b>: 닉네임·글·댓글·신고 — 탈퇴하면 삭제(신고·지운 글은 6개월) · <b>알림</b>을 켜면 알림 토큰 — 로그아웃하면 삭제</td></tr>
+            <tr><th>자동으로</th><td>앱 오류 기록 90일 · 코드를 틀리게 넣은 시각·IP 1일 · 로그인 기록(시각·IP) 3개월 · 이야기 글의 힘든 마음 신호(원장만 봄) 30일</td></tr>
+            <tr><th>법으로 보관</th><td>결제 기록 5년 · 분쟁 처리 기록 3년 — 전체 표는 개인정보처리방침 3항</td></tr></table>
             <p>동의하지 않을 권리가 있습니다. 다만 위 필수 항목에 동의하지 않으면 가입할 수 없고, <b>가입 없이 둘러보기</b>(최근 7일치)는 그대로 쓸 수 있습니다.</p></div>` : ''}
         </div>
         <p class="fine" style="text-align:left;padding:0"><button class="see" data-legal="privacy" type="button" style="padding:0">개인정보처리방침 전문</button></p>`;
@@ -3830,7 +3843,6 @@ function fixedOn(iso){ const w = wdOf(iso);
    미성년자가 쓰는 공간이라 안전장치를 함께 넣었다.
    닉네임 활동 · 개인정보 자동 감지 · 신고 · 원장(운영자) 삭제 · 기출 원문 전재 금지 안내 */
 const BOARDS = { qna:'질문', share:'자료·문제 공유', talk:'응원·잡담' };
-const REPORT_HIDE = 3;                       // 신고가 이만큼 쌓이면 자동으로 가린다
 let talkBoard = '전체', talkQ = '', postId = null, talkErr = '', poiOk = false;
 
 /* @rules — 서버(schema.sql 의 private.pii_* · care_hit · check_nick)와 같은 글자다. 한쪽만 고치지 않는다
@@ -3849,9 +3861,10 @@ const PII_SRC = [
   ['school', '[가-힣]{1,10}(초등학교|중학교|고등학교|초|중|고)\\s*[1-6]\\s*학년(\\s*[0-9]{1,2}\\s*반)?\\s*[%SUR%][가-힣]{1,2}'.replace('%SUR%', SURNAMES), '학교·학년과 이름', false],
 ];
 const PII = PII_SRC.map(([k, src, label, hard]) => [new RegExp(src), label, hard, k]);
-const PHONE_G = new RegExp(PII_SRC[1][1], 'g');
-/* 휴대전화 가운데 가리기 — 서버 private.pii_mask 와 같다(로컬 모드에서도 같은 모양으로 저장) */
-const piiMask = t => String(t ?? '').replace(PHONE_G, (m, p, a, b, c) => `${p}${a}-****-${c}`);
+/* 연락처(휴대전화·이메일·메신저 아이디)는 이야기에 올릴 수 없다(원장 글 제외) — 서버 pii_guard 와 같다.
+   2026-10-14 GPT 검수 ⑤ #18: 전에는 휴대전화를 가운데만 가려(010-****-5678) 올렸다 → 약관 제8조의2 ②1 대로 막는다 */
+const CONTACT_K = ['phone', 'email', 'sns'];
+const piiBlock = hits => hits.find(h => h.hard || (!isOwner() && CONTACT_K.includes(h.k)));
 /* 도움이 필요해 보이는 글(자해·자살 신호) — 서버의 private.care_hit() 와 같은 목록.
    막지 않는다. 쓰는 사람에게는 올리기 전에 상담 창구를 조용히 보여 주고, 원장님은 '먼저 살펴볼 글'로 본다.
    2026-10 보강: 청소년 은어 '뒤지고 싶'·'죽어야겠'·'태어나지 말았'·'살 의미가 없'(docs/11 §12-4 · 오탐 시험 함께)
@@ -3871,9 +3884,9 @@ const ABUSE_SOFT = new RegExp('((?:^|[^가-힣])시발(?!점|역|택시|차)|씨
 const abuseLevel = t => { const s = String(t||'').toLowerCase(); return ABUSE_HARD.test(s.replace(/[\s._\-·*]/g, '')) ? 2 : ABUSE_SOFT.test(s) ? 1 : 0; };
 /* @rules-end */
 /* 신고 사유 — 서버 reports.reason 과 같은 값(docs/11 §12-2). '친구가 걱정돼요'는 가리지 않고 원장님께 먼저 알린다 */
-const REASONS = [['privacy','개인정보가 있어요','실명·전화번호·주소·학교·SNS 아이디'],['bully','놀리거나 괴롭혀요','욕설·비방·따돌림·협박'],['harm','부적절한 내용이에요','성적인 내용·술·담배·도박'],
+const REASONS = [['privacy','개인정보가 있어요','실명·전화번호·주소·학교·SNS 아이디'],['threat','위협하거나 협박해요','해치겠다는 말·협박·사진이나 신상 퍼뜨리기'],['bully','놀리거나 괴롭혀요','욕설·비방·따돌림'],['harm','부적절한 내용이에요','성적인 내용·술·담배·도박'],
   ['ad','광고·도배예요','판매·과외 제안·같은 글 되풀이'],['copy','문제집·기출 원문이에요','저작권'],['other','기타','']];
-const REASON_KO = { privacy:'개인정보', bully:'괴롭힘', harm:'부적절', ad:'광고·도배', copy:'원문', other:'기타', worry:'걱정돼요' };
+const REASON_KO = { privacy:'개인정보', threat:'위협', bully:'괴롭힘', harm:'부적절', ad:'광고·도배', copy:'원문', other:'기타', worry:'걱정돼요' };
 /* 이야기 이용 제한(약관 제8조의3 ①②④) — 학생에게 보이는 짧은 사유. 원장 메모는 따로(학생에게 안 보임) */
 const LIMIT_WHY = ['이야기 규칙을 여러 번 어겼어요','개인정보를 올렸어요','친구를 놀리거나 괴롭혔어요','부적절한 내용을 올렸어요','광고·도배를 했어요','문제집·기출 원문을 올렸어요','보호자가 요청했어요'];
 const mdKo = iso => { const [, m, dd] = String(iso||'').split('-'); return `${+m}월 ${+dd}일`; };
@@ -3910,9 +3923,7 @@ function piiCheck(text){
   for (const [re, label, hard, k] of PII) if (re.test(text)) hits.push({ label, hard, k });
   return hits;
 }
-/* 경고 문구 — 휴대전화는 서버가 가운데를 가려(010-****-5678) 올린다(원장 글은 그대로) */
 const piiWarnText = hits => `${ro(hits.map(h => h.label).join(' · '))} 보이는 내용이 있습니다.`;
-const piiMaskNote = hits => hits.some(h => h.k === 'phone') && !isOwner() ? ' 전화번호는 가운데를 가려(010-****-5678) 올립니다.' : '';
 /* 내 이야기 상태(서버 my_talk) — 이용 제한 · 보호자 · 학원 코드나 이용권 없음이면 쓰기 대신 차분한 안내 */
 let talkSt = null;
 const loadTalkSt = async () => { if (!ACC){ talkSt = null; return null; } try { talkSt = await DBX.talkStatus(); } catch {} return talkSt; };
@@ -3932,7 +3943,7 @@ function talkGate(t){
 let rpState = null;
 function sheetReport(kind, id){ rpState = { kind, id, reason:'' };
   openSheet(`<h3>${kind === 'post' ? '이 글' : '이 댓글'} 신고하기</h3>
-    <p class="fine" style="text-align:left;padding:0 0 10px">무엇이 문제인지 골라 주세요. 누가 신고했는지는 글쓴이에게 알리지 않습니다.</p>
+    <p class="fine" style="text-align:left;padding:0 0 10px">무엇이 문제인지 골라 주세요. 누가 신고했는지는 글쓴이에게 알리지 않습니다. 개인정보·위협·부적절한 내용은 1건이어도 바로 가려 두고 원장님께 알려요.</p>
     <div class="rsn" role="radiogroup" aria-label="신고 사유">${REASONS.map(([k, l, dd]) => `<button role="radio" aria-checked="false" data-rsn="${k}">${l}${dd ? `<small>${dd}</small>` : ''}</button>`).join('')}
       <button role="radio" aria-checked="false" data-rsn="worry" class="worry">친구가 걱정돼요<small>힘들어 보이거나 위험해 보여요 · 글은 가리지 않고 원장님께 먼저 알려요</small></button></div>
     <button class="btn" id="rpGo" disabled>신고하기</button><button class="btn ghost" id="sheetClose">닫기</button>`); }
@@ -4037,9 +4048,9 @@ async function renderTalk(){
           ${at?`<span>· ${esc(at.k)} 첨부</span>`:''}</div></button>`; }).join('')
       : (failed ? '' : talkQ ? `<p class="planempty">찾는 글이 없어요.</p>` : `<div class="tempty">${TALK_EMPTY_ART}<p><b>첫 질문을 올려 보세요</b>막힌 곳을 자기 말로 적으면 함께 풀어 봐요.</p>${gate ? '' : `<button class="btn" id="postNew">질문 올리기</button>`}</div>`)}
     <details class="trule"><summary>함께 쓰는 규칙 3가지</summary><ul>
-      <li>닉네임으로 활동해요. 실명·전화번호·주소·SNS 아이디는 적지 않아요.</li>
+      <li>닉네임으로 활동해요. 실명·주소는 적지 않아요. 전화번호·이메일·SNS 아이디 같은 연락처는 올릴 수 없어요.</li>
       <li>시중 문제집이나 기출 문제의 <b>원문은 그대로 올리지 않아요</b>(저작권). 어디가 막히는지 자기 말로 적어 주세요.</li>
-      <li>비방·욕설은 신고해 주세요. 신고가 ${REPORT_HIDE}건 쌓이면 자동으로 가려지고 원장님이 확인해요.</li></ul></details>
+      <li>비방·욕설은 신고해 주세요. 신고가 ${REPORT_HIDE}건 쌓이면 자동으로 가려지고 원장님이 확인해요. 개인정보·위협·부적절한 내용은 1건이어도 바로 가려져요.</li></ul></details>
     <p class="fine" style="text-align:left;padding:6px 2px 0">학원 수강생과 이용권 학생이 글을 쓰고, 원장님이 하루 한 번 살펴봐요.</p>`;   // 누가 보는 곳인지 한 줄(2026-10-13 검수)
 }
 
@@ -5343,8 +5354,10 @@ function renderPlans(){
       <button class="btn ${p.best?'':'ghost'}" data-buy="${p.id}">${STORE_PRICE[p.sku] ? `${esc(STORE_PRICE[p.sku])} · 구매` : '스토어에서 구매'}</button></div>`).join('')}
     ${IAP() ? `<button class="linkbtn" id="iapRestore">구매 복원 · 결제했는데 열리지 않았어요</button>` : ''}
     ${ACC && ACC.role === 'parent' ? '' : passBoxHtml('')}
-    <p class="fine">가격은 부가세 포함이에요. 결제는 Google Play로 하고, 자동으로 다시 결제되지 않아요. 구매 후 7일 안에 쓰기 전이면 전액 환불돼요(이용약관 제7조). 학원 수강생은 결제 없이 코드로 열려요.</p>
-    <p class="fine" id="minorNote">미성년자가 법정대리인(보호자)의 동의 없이 결제한 경우, 미성년자 본인 또는 법정대리인이 그 계약을 취소할 수 있습니다(이용약관 제7조 ⑤).</p>`;
+    <p class="fine">가격은 부가세 포함이에요. 결제는 Google Play로 하고, 자동으로 다시 결제되지 않아요. 학원 수강생은 결제 없이 코드로 열려요.</p>
+    <p class="fine" id="refundNote">${REFUND_NOTE}</p>
+    <p class="fine" id="minorNote">${MINOR_NOTE}</p>
+    <p class="fine" id="sellerNote">${sellerLine()}</p>`;
   loadStorePrices(); passKidNames();
 }
 /* ── 스토어 결제(Google Play · 일회성 이용권) — 결제 → 서버가 Google 에 영수증 확인 → 이용권 연장 ── */
@@ -5354,20 +5367,44 @@ async function loadStorePrices(){ const NP = IAP(); if (!NP || pricesAsked) retu
   try { const { products } = await NP.getProducts({ productIdentifiers: CFG.plans.map(p=>p.sku), productType:'inapp' });
     (products||[]).forEach(x => { if (x.identifier && x.priceString) STORE_PRICE[x.identifier] = x.priceString; });
     if (Object.keys(STORE_PRICE).length && view==='plans') renderPlans(); } catch {} }
+/* 결제 직전 안내(전자상거래법 제13조 ②③ — 거래 조건·청약철회·미성년자 취소권·판매자 정보를 계약 전에) · 이용약관 제7조와 같은 말 */
+const REFUND_NOTE = '결제한 날(이용권이 그보다 늦게 열리면 열린 날)부터 7일 안에는 청약을 철회할 수 있어요. 전 범위를 아직 열지 않았으면 전액, 열었으면 쓴 날수만 빼고 돌려 드려요. 7일이 지나도 남은 날수만큼 해지할 수 있어요. 요청은 학원(내 정보 › 지원)으로 하면 학원이 접수·검토하고, 결제 취소는 Google Play 절차로 처리돼요(이용약관 제7조).';
+const MINOR_NOTE = '미성년자가 법정대리인(보호자)의 동의 없이 결제한 경우, 미성년자 본인 또는 법정대리인이 그 계약을 취소할 수 있고 낸 돈은 모두 돌려 드려요(이용약관 제7조 ⑦).';
+function sellerLine(){ const S = CFG.seller || {};
+  return '판매자 ' + [S.name, S.rep && `대표 ${S.rep}`, S.addr, CFG.phone && `전화 ${CFG.phone}`, CFG.email && `이메일 ${CFG.email}`, S.bizNo && `사업자등록번호 ${S.bizNo}`, S.mailOrder && `통신판매업 신고 ${S.mailOrder}`, S.academyNo && `학원 등록번호 ${S.academyNo}`]
+    .filter(Boolean).map(esc).join(' · ') + ' (이용약관 제14조)'; }
+function buyAsk(p){ return new Promise(res => { askDone && askDone(false);
+  const el = document.getElementById('ask'), back = document.activeElement, days = p.days >= 365 ? '1년' : p.days >= 180 ? '6개월' : `${p.days}일`;
+  el.innerHTML = `<div class="sheet-bg yn-bg" id="askBg"><div class="sheet yn" role="alertdialog" aria-modal="true" aria-labelledby="buyH"><div class="grab"></div>
+    <h3 id="buyH">${esc(p.name)} 결제 전에 확인해 주세요</h3>
+    <p><b>${STORE_PRICE[p.sku] ? esc(STORE_PRICE[p.sku]) : p.price.toLocaleString() + '원'}</b> · ${days} 동안 전 범위 · 한 번만 결제(자동으로 다시 결제되지 않아요)</p>
+    <p class="fine" style="text-align:left;padding:4px 0 0" id="buyRefund">${REFUND_NOTE}</p>
+    <p class="fine" style="text-align:left;padding:4px 0 0" id="buyMinor"><b>${MINOR_NOTE}</b></p>
+    <p class="fine" style="text-align:left;padding:4px 0 10px" id="buySeller">${sellerLine()}</p>
+    <div class="ynb"><button class="btn ghost" id="askNo">취소</button><button class="btn" id="askYes">결제하기</button></div></div></div>`;
+  askDone = v => { askDone = null; el.innerHTML = ''; el.onclick = null; try { back && back.focus && back.focus({ preventScroll:true }); } catch {} res(v); };
+  el.onclick = e => { e.stopPropagation(); const id = e.target.closest('button')?.id || e.target.id; if (id === 'askYes') askDone(true); else if (id === 'askNo' || id === 'askBg') askDone(false); };
+  setTimeout(() => document.getElementById('askNo')?.focus(), 30); }); }
 async function buyPlan(p){
   const NP = IAP();
   if (!NP){   // 웹·아이폰: 스토어 결제가 없다 — 학원 상담으로 이용권 코드를 받는 길을 먼저(2026-10-08 웹 먼저 출시), 안드로이드 앱은 출시 뒤 안내
     const ask = [CFG.phone ? `전화 <b>${esc(CFG.phone)}</b>` : '', CFG.kakao ? `<a href="${esc(CFG.kakao)}" target="_blank" rel="noopener">카카오톡 채널</a>` : '', CFG.email ? `이메일 <b>${esc(CFG.email)}</b>` : ''].filter(Boolean).join(' · ');
     openSheet(`<h3>${esc(p.name)} · ${p.price.toLocaleString()}원</h3><p>학원에 문의하시면 <b>이용권 코드</b>를 드립니다. 코드를 이용권 화면 아래 칸에 넣으면 바로 열려요.</p>${ask ? `<p class="tip">${ask}</p>` : ''}<p class="fine" style="text-align:left;padding:4px 0 0">안드로이드 앱(Google Play)이 나오면 앱 안에서 바로 결제할 수 있습니다.</p><button class="btn ghost" id="sheetClose">닫기</button>`); return; }
   if (consentPending()){ openSheet(`<h3>보호자 동의가 먼저 필요합니다</h3><p>만 14세 미만은 보호자 동의가 끝난 뒤에 이용권을 살 수 있습니다. 동의 안내는 오늘 화면 위에 있습니다.</p><button class="btn ghost" id="sheetClose">닫기</button>`); return; }
-  if (buying) return; buying = true;
+  if (buying) return;
+  if (!await buyAsk(p)) return;   // 결제 직전: 거래 조건 · 청약철회 · 미성년자 취소권 · 판매자 정보
+  buying = true;
   try {
     // 확인(소비)은 서버만 한다 — 서버가 반영하지 못한 결제(동의 전·검증 실패)는 확인되지 않은 채 남아 Google Play 가 3일 뒤 자동 환불
     const r = await NP.purchaseProduct({ productIdentifier: p.sku, productType:'inapp', quantity:1, appAccountToken: ACC.id, autoAcknowledgePurchases:false });
     if (!r || !r.purchaseToken) throw new Error('결제 정보를 받지 못했습니다. [구매 복원]을 눌러 주세요.');
     toast('결제를 확인하는 중입니다…');
     const v = await DBX.verifyPurchase({ productId:p.sku, purchaseToken:r.purchaseToken, orderId:r.transactionId||'' });
-    ACC = await DBX.me(); passErr=''; toast(`${kdate(v.until)}까지 전 범위가 열렸습니다`); renderPlans();
+    ACC = await DBX.me(); passErr=''; renderPlans();
+    // 계약 내용 화면(전자상거래법 제13조 ② 뒷부분 — 계약이 체결되면 거래 조건을 적은 서면을 준다 · 이용약관 제7조 ①의 '결제가 끝난 뒤 화면')
+    openSheet(`<h3>결제가 끝났어요</h3><p><b>${esc(p.name)}</b> · ${STORE_PRICE[p.sku] ? esc(STORE_PRICE[p.sku]) : p.price.toLocaleString() + '원'} · <b>${kdate(v.until)}</b>까지 전 범위가 열렸습니다.${r.transactionId ? ` 주문번호 ${esc(r.transactionId)}` : ''}</p>
+      <p class="fine" style="text-align:left;padding:4px 0 0">${REFUND_NOTE}</p><p class="fine" style="text-align:left;padding:4px 0 0">${MINOR_NOTE}</p>
+      <p class="fine" style="text-align:left;padding:4px 0 10px">${sellerLine()} · 결제 내역은 Google Play 영수증 메일에도 있어요.</p><button class="btn" id="sheetClose">확인</button>`);
   } catch (err){ let m = String((err && err.message) || err || '');
     if (/pending/i.test(m)) m = '결제가 아직 처리 중입니다(보류 중인 결제). 결제가 끝나면 앱을 열 때 자동으로 이용권이 열립니다.';
     if (!/cancel|취소/i.test(m)) openSheet(`<h3>결제를 마치지 못했습니다</h3><p>${esc(m)}</p><p class="fine" style="text-align:left;padding:0">돈이 빠져나갔는데 열리지 않았다면 [구매 복원]을 누르세요. 같은 결제가 두 번 반영되지는 않습니다.</p><button class="btn" id="iapRestore">구매 복원</button><button class="btn ghost" id="sheetClose">닫기</button>`);
@@ -5840,7 +5877,7 @@ async function renderAdmin(){
           <span style="display:flex;flex-direction:column;gap:6px"><button class="more" data-admcare="${esc(c.post_id)}">글 보기</button>${c.worry ? `<button class="more" data-admcdone="${esc(c.kind)}:${esc(c.id)}">살펴봤어요</button>` : ''}</span></div>`).join('')}</div>` : '';
     const until = a => talkStop(a.until) ? '중지' : `${mdKo(a.until)}까지`;
     const ACT = { d7:'7일 제한', d30:'30일 제한', stop:'중지', lift:'풀기' };
-    v.innerHTML = head + `<div class="tsafe"><b>이야기 운영</b><br>학생이 신고한 글·댓글이 여기 모입니다. 신고가 ${REPORT_HIDE}건 쌓이면 학생 화면에서는 이미 가려져 있고, 원장님만 원문을 봅니다. 처리하면 신고한 학생에게 결과(지움·그대로 둠)가 짧게 전해집니다.<br>
+    v.innerHTML = head + `<div class="tsafe"><b>이야기 운영</b><br>학생이 신고한 글·댓글이 여기 모입니다. 신고가 ${REPORT_HIDE}건 쌓이면(개인정보·위협·부적절 신고는 1건이면) 학생 화면에서는 이미 가려져 있고, 원장님만 원문을 봅니다. 처리하면 신고한 학생에게 결과(지움·그대로 둠)가 짧게 전해집니다.<br>
         개인정보·비방·기출 원문이 올라온 글은 지워 주세요. 지운 글은 되돌릴 수 없습니다. 되풀이하는 학생은 <b>이용 제한</b>(7일 → 30일 → 중지).</div>
       ${careHtml}
       ${rvHtml}
@@ -6414,12 +6451,12 @@ document.addEventListener('click', async e => {
     const title = g('poT').trim(), body = g('poX').trim(), w = document.getElementById('poWarn');
     if (title.length < 2 || body.length < 5){ w.innerHTML = `<div class="piiwarn">제목과 내용을 조금 더 적어 주세요.</div>`; return; }
     const hits = piiCheck(title + '\n' + body);
-    const hard = hits.find(h => h.hard);
-    if (hard){ w.innerHTML = `<div class="piiwarn"><b>${esc(ro(hard.label))} 보이는 내용이 있습니다.</b><br>이런 정보는 올릴 수 없습니다. 지우고 다시 올려 주세요.</div>`; return; }
+    const hard = piiBlock(hits);
+    if (hard){ w.innerHTML = `<div class="piiwarn"><b>${esc(ro(hard.label))} 보이는 내용이 있습니다.</b><br>${CONTACT_K.includes(hard.k) ? '연락처는 이야기에 올릴 수 없어요. 연락이 필요하면 원장님께 말해 주세요.' : '이런 정보는 올릴 수 없습니다.'} 지우고 다시 올려 주세요.</div>`; return; }
     const ab = isOwner() ? 0 : abuseLevel(title + ' ' + body);
     if (ab === 2){ w.innerHTML = `<div class="piiwarn"><b>아주 심한 욕설이 들어 있어요.</b><br>이런 말은 올릴 수 없어요. 고쳐서 다시 올려 주세요.</div>`; return; }
     if (hits.length && !poiOk){ poiOk = true;
-      w.innerHTML = `<div class="piiwarn"><b>${esc(piiWarnText(hits))}</b><br>모르는 사람도 볼 수 있는 글입니다.${piiMaskNote(hits)} 그래도 올리려면 <b>올리기</b>를 한 번 더 누르세요.</div>`; return; }
+      w.innerHTML = `<div class="piiwarn"><b>${esc(piiWarnText(hits))}</b><br>모르는 사람도 볼 수 있는 글입니다. 그래도 올리려면 <b>올리기</b>를 한 번 더 누르세요.</div>`; return; }
     poiOk = false;
     if (ab === 1 && !await ask(ABUSE_ASK, '그래도 올리기', false, '고쳐 쓸게요')) return;   // 막지 않고 한 번 더 묻기(docs/11 §12-14)
     if (careCheck(title + ' ' + body) && !isOwner() && await careAsk() !== 'post') return;
@@ -6450,6 +6487,7 @@ document.addEventListener('click', async e => {
     if (!r.ok){ closeSheet(); toast(r.why || '신고하지 못했습니다'); return; }
     if (reason === 'worry') worrySheet();
     else { closeSheet(); toast(r.again ? (r.checked ? '원장님이 이미 살펴본 글입니다. 더 알릴 것이 있으면 의견 보내기로 알려 주세요' : '이미 신고한 글입니다. 원장님이 확인할게요')
+      : r.urgent && r.hidden ? '신고했습니다. 바로 가려 두고 원장님께 알렸어요 · 지금 위험한 일이면 112'
       : r.hidden ? '신고했습니다. 원장님이 확인할 때까지 가려 둡니다' : '신고했습니다. 원장님이 확인합니다'); }
     if (view === 'post') renderPost(); return; }
   if (T('#repSeen')){ try { await DBX.myReportsSeen(); } catch {} renderTalk(); return; }
@@ -6480,11 +6518,11 @@ document.addEventListener('click', async e => {
     if (!ACC){ authMode='start'; show('auth'); return; }
     if (!ACC.nick && ACC.role!=='owner'){ sheetNick(''); return; }
     if (body.length < 2){ talkErr = '댓글을 조금 더 적어 주세요.'; renderPost(); return; }
-    const hits = piiCheck(body), hard = hits.find(h => h.hard);
-    if (hard){ talkErr = `${ro(hard.label)} 보이는 내용이 있어 올릴 수 없습니다.`; renderPost(); return; }
+    const hits = piiCheck(body), hard = piiBlock(hits);
+    if (hard){ talkErr = `${ro(hard.label)} 보이는 내용이 있어 올릴 수 없습니다.${CONTACT_K.includes(hard.k) ? ' 연락처는 이야기에 올리지 않아요.' : ''}`; renderPost(); return; }
     const ab = isOwner() ? 0 : abuseLevel(body);
     if (ab === 2){ talkErr = '아주 심한 욕설이 들어 있어 올릴 수 없어요. 고쳐서 다시 올려 주세요.'; renderPost(); return; }
-    if (hits.length && !poiOk){ poiOk = true; talkErr = `${piiWarnText(hits)}${piiMaskNote(hits)} 그래도 올리려면 등록을 한 번 더 누르세요.`; renderPost(); return; }
+    if (hits.length && !poiOk){ poiOk = true; talkErr = `${piiWarnText(hits)} 그래도 올리려면 등록을 한 번 더 누르세요.`; renderPost(); return; }
     if (ab === 1 && !await ask(ABUSE_ASK, '그래도 올리기', false, '고쳐 쓸게요')) return;
     if (careCheck(body) && !isOwner() && await careAsk() !== 'post') return;
     poiOk = false; talkErr = ''; try { await DBX.addComment(postId, body); } catch (e){ talkErr = e.message; } renderPost(); return; }

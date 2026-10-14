@@ -244,6 +244,9 @@ create table if not exists reports (
   seen_at     timestamptz,                             -- 신고한 사람이 결과 안내를 본 때
   check ((post_id is null) <> (comment_id is null))
 );
+-- 2026-10-14 GPT 검수 ⑤ #19: '위협·협박'(threat)을 괴롭힘(bully)에서 떼어 냈다 — 개인정보(privacy)·성적/유해(harm)·위협(threat)은 1건이면 '확인 중'으로 바로 가리고 원장 폰에 바로 알린다(private.recount · push 함수)
+alter table reports drop constraint if exists reports_reason_check;
+alter table reports add constraint reports_reason_check check (reason in ('privacy','bully','threat','harm','ad','copy','other','worry'));
 create unique index if not exists reports_post_uq    on reports (post_id, uid, (reason = 'worry')) where post_id is not null;
 create unique index if not exists reports_comment_uq on reports (comment_id, uid, (reason = 'worry')) where comment_id is not null;
 create index if not exists reports_uid_idx on reports (uid, at desc);
@@ -332,6 +335,15 @@ create table if not exists private.admins (
   uid       uuid primary key references auth.users(id) on delete cascade,
   prev_role text not null default 'student',        -- 해제하면 돌려놓을 역할(student · parent)
   at        timestamptz not null default now()
+);
+-- 관리자 지정·해제 기록(「개인정보의 안전성 확보조치 기준」 제5조 ③ — 권한 부여·변경·말소 내역 3년 보관) · API 로는 보이지 않는다 · 3년 뒤 파기(purge_old)
+create table if not exists private.admin_log (
+  id     bigint generated always as identity primary key,
+  at     timestamptz not null default now(),
+  actor  uuid,                                          -- 지정·해제한 사람(원장님)
+  action text not null check (action in ('add','remove')),
+  target uuid not null,                                 -- 관리자로 지정·해제된 계정(탈퇴해도 기록은 3년)
+  email  text not null default ''
 );
 create or replace function is_owner() returns boolean language sql stable security definer set search_path = public, private as $$
   select private.is_head()
@@ -581,11 +593,11 @@ create or replace function private.abuse_level(t text) returns int language sql 
     when lower(coalesce(t, '')) ~ '((?<![가-힣])시발(?!점|역|택시|차)|씨발|씨빨|씨팔|시팔|ㅅㅂ|ㅆㅂ|ㅂㅅ|ㅄ|병신|븅신|빙신|병싄|(?<![가-힣])존나|개새(끼|기|키)|개색(기|히|끼)|개세(끼|기)|개쉐(이|키)|지랄|미친\s*(놈|년|새끼|새기|새키|것|넘)|닥쳐(?!오|올|온|와|옴)|닥치라|또라이|돌아이|등신(?!대)|찐따|썅|틀딱|급식충|한남충|맘충|김치녀|짱깨|쪽바리|(?<![a-z])(fuck|shit|bitch|asshole|wtf))' then 1
     else 0 end $$;
 -- 개인정보 — 앱(PII_SRC)과 같은 규칙(같은 글자). 앱을 거치지 않고 들어온 글도 서버가 본다(docs/11 §12-3).
---  주민등록번호 → 거절 · 휴대전화 → 가운데를 가려(010-****-5678) 저장 · 이메일·SNS 아이디·○동 ○호·'○○중 2학년 김○○' → 앱이 올리기 전에 한 번 더 묻는다(닉네임은 모두 거절)
+--  주민등록번호 → 거절 · 휴대전화·이메일·SNS 메신저 아이디(연락처) → 거절(원장 글은 그대로) · ○동 ○호·'○○중 2학년 김○○' → 앱이 올리기 전에 한 번 더 묻는다(닉네임은 모두 거절)
+--  2026-10-14 GPT 검수 ⑤ #18: 전에는 휴대전화를 가운데만 가려(010-****-5678) 저장했다 — 약관 제8조의2 ②1('전화번호·이메일·SNS 아이디는 올릴 수 없다')과 맞게, 가린 번호도 남기지 않고 막는다
 create or replace function private.pii_hard(t text) returns boolean language sql immutable as $$
   select coalesce(t ~ '(?<![0-9])[0-9]{6}\s*[-–]\s*[1-4][0-9]{6}(?![0-9])', false) $$;
-create or replace function private.pii_mask(t text) returns text language sql immutable as $$
-  select regexp_replace(t, '(?<![0-9])(01[016-9])[-. ]?([0-9]{3,4})[-. ]?([0-9]{4})(?![0-9])', '\1-****-\3', 'g') $$;
+drop function if exists private.pii_mask(text);   -- 휴대전화를 가려 저장하던 것(2026-10-14 부터 연락처는 거절)
 create or replace function private.pii_kinds(t text) returns text[] language sql immutable as $$
   select array_remove(array[
     case when t ~ '(?<![0-9])[0-9]{6}\s*[-–]\s*[1-4][0-9]{6}(?![0-9])' then 'rrn' end,
@@ -600,12 +612,11 @@ begin
   if tg_table_name = 'posts' then t := coalesce(new.title, '') || ' ' || coalesce(new.body, ''); else t := coalesce(new.body, ''); end if;   -- 댓글에는 제목 칸이 없다
   if private.pii_hard(t) then
     raise exception '주민등록번호로 보이는 내용은 올릴 수 없습니다. 지우고 다시 올려 주세요.' using errcode = '22023'; end if;
+  if not is_owner() and private.pii_kinds(t) && array['phone','email','sns'] then
+    raise exception '전화번호·이메일·메신저 아이디 같은 연락처는 이야기에 올릴 수 없습니다. 지우고 다시 올려 주세요.' using errcode = '22023'; end if;
   if not is_owner() and private.abuse_level(t) >= 2 then   -- 아주 심한 욕은 서버도 거절(보통 거친 말은 앱이 한 번 더 묻기만) · 원장 안내 글은 예외
     raise exception '아주 심한 욕설이 들어 있어 올릴 수 없습니다. 고쳐서 다시 올려 주세요.' using errcode = '22023'; end if;
-  if not is_owner() then   -- 학원 연락처를 적는 원장 글은 그대로
-    if tg_table_name = 'posts' then new.title := private.pii_mask(new.title); end if;
-    new.body := private.pii_mask(new.body); end if;
-  return new;
+  return new;   -- 학원 연락처를 적는 원장 글은 그대로(가려 저장하던 pii_mask 는 쓰지 않는다)
 end $$;
 
 -- ═══ 이야기에 쓸 수 있는가 — 원장 · 또는 (보호자 동의 끝 · 이용 제한 중 아님 · 학생 계정 · 학원 코드(수강 중)나 이용권 기간 안) ═══
@@ -747,7 +758,7 @@ create or replace function report_item(p_kind text, p_id uuid, p_reason text def
 declare u uuid := auth.uid(); r text := coalesce(nullif(trim(p_reason), ''), 'other'); w boolean; au uuid; stf boolean; pv reports; n int; pid uuid; cid uuid;
 begin
   if u is null then raise exception '로그인이 필요합니다' using errcode = '42501'; end if;
-  if r not in ('privacy','bully','harm','ad','copy','other','worry') then raise exception '신고 사유를 골라 주세요.' using errcode = '22023'; end if;
+  if r not in ('privacy','bully','threat','harm','ad','copy','other','worry') then raise exception '신고 사유를 골라 주세요.' using errcode = '22023'; end if;
   w := r = 'worry';
   -- 신고 3건이면 글이 가려지므로, 계정을 여러 개 만들어 남의 글을 지우는 일을 막는다: 보호자 동의 · 가입 하루 뒤 · 하루 20건 · 선생님 글 제외
   --  '친구가 걱정돼요'는 글을 가리지 않으므로 가입 첫날에도 된다(원장에게 알리는 길을 막지 않는다)
@@ -768,20 +779,23 @@ begin
   insert into private.attempts(uid, kind, ok) values (u, 'report', true);
   insert into reports(post_id, comment_id, uid, reason) values (pid, cid, u, r);
   n := private.recount(pid, cid);
-  return json_build_object('ok', true, 'n', n, 'hidden', n >= 3, 'worry', w);
+  return json_build_object('ok', true, 'n', n, 'hidden', n >= 3, 'worry', w, 'urgent', r in ('privacy','harm','threat'));
 end $$;
 -- 신고가 자주 되돌려진 계정(30일에 '그대로 둠' 3번 이상, docs/11 §12-8) — 그 사람의 열린 신고는 가림 수에 넣지 않고 원장 목록에만 보인다
 create or replace function private.rep_muted(u uuid) returns boolean language sql stable security definer set search_path = public as $$
   select (select count(*) from reports where uid = u and state = 'kept' and reason <> 'worry' and resolved_at > now() - interval '30 days') >= 3 $$;
--- 신고 수(가림 기준) = 열린 신고 중 걱정돼요와 '신고가 자주 되돌려진 계정'의 것을 뺀 수
+-- 신고 수(가림 기준) = 열린 신고 중 걱정돼요와 '신고가 자주 되돌려진 계정'의 것을 뺀 수.
+--  긴급 신고(개인정보·성적/유해·위협 — GPT 검수 ⑤ #19, 정보통신망법 제44조의2 ②④ 임시조치)는 1건이어도 가림 기준(3)까지 올려 바로 가린다 — 원장이 되돌리면(kept) 다시 보인다
 create or replace function private.recount(p_post uuid, p_comment uuid) returns int language plpgsql security definer set search_path = public as $$
-declare n int;
+declare n int; u boolean;
 begin
   if p_post is not null then
-    select count(*) into n from reports r where r.post_id = p_post and r.state = 'open' and r.reason <> 'worry' and not private.rep_muted(r.uid);
+    select count(*), coalesce(bool_or(r.reason in ('privacy','harm','threat')), false) into n, u from reports r where r.post_id = p_post and r.state = 'open' and r.reason <> 'worry' and not private.rep_muted(r.uid);
+    if u then n := greatest(n, 3); end if;
     update posts set report_n = n where id = p_post and report_n is distinct from n;
   else
-    select count(*) into n from reports r where r.comment_id = p_comment and r.state = 'open' and r.reason <> 'worry' and not private.rep_muted(r.uid);
+    select count(*), coalesce(bool_or(r.reason in ('privacy','harm','threat')), false) into n, u from reports r where r.comment_id = p_comment and r.state = 'open' and r.reason <> 'worry' and not private.rep_muted(r.uid);
+    if u then n := greatest(n, 3); end if;
     update comments set report_n = n where id = p_comment and report_n is distinct from n;
   end if;
   return coalesce(n, 0);
@@ -1304,8 +1318,9 @@ grant insert (id, role, name, phone, under14, guardian, terms_ver) on profiles t
 grant update (name, phone, nick, weekly_off, attend_off) on profiles to authenticated;   -- weekly_off: 보호자 주간 요약 알림 끄기(본인 줄만 — 아래 profiles 고치기 정책)
 
 revoke select, insert, update on posts, comments from anon, authenticated;
-grant select (id, author, nick, board, title, body, attach, likes, report_n, comment_n, staff, solved, deleted, at, edited, care, review, review_why) on posts to authenticated;
-grant select (id, post_id, author, nick, body, likes, report_n, staff, picked, deleted, at, care, checked) on comments to authenticated;
+-- care(자해·자살 신호 자동 판정)는 API 로 읽지 못한다 — 원장은 care_list()·review_list() 로만 본다. 글 아래 안내는 앱이 보이는 글에서 바로 계산한다(GPT 검수 ⑤ #17)
+grant select (id, author, nick, board, title, body, attach, likes, report_n, comment_n, staff, solved, deleted, at, edited, review, review_why) on posts to authenticated;
+grant select (id, post_id, author, nick, body, likes, report_n, staff, picked, deleted, at, checked) on comments to authenticated;
 grant insert (board, title, body, attach) on posts to authenticated;
 grant insert (post_id, body) on comments to authenticated;
 grant update (board, title, body, attach, edited, deleted) on posts to authenticated;
@@ -1320,7 +1335,7 @@ grant execute on function report_item(text, uuid, text), clear_reports(text, uui
   talk_limit(uuid, int, text, text, boolean, text), talk_limits(), talk_ok(), my_talk(),
   review_list(), review_post(uuid, boolean, text), check_comment(uuid, boolean), unanswered_list(), muted_reporters(), child_talk(text), guardian_talk(text, text) to authenticated;   -- 원장 함수는 안에서 원장만 결과를 받는다 · 보호자 함수는 안에서 확인된 자녀만
 revoke all on push_tokens from anon, authenticated; grant select, delete on push_tokens to authenticated;
-revoke all on feedback from anon, authenticated; grant select, insert (kind, body, ref, ver) on feedback to authenticated;
+revoke all on feedback from anon, authenticated; grant select (id, uid, kind, body, ref, ver, at, done_at), insert (kind, body, ref, ver) on feedback to authenticated;   -- care(자동 판정)는 보낸 사람에게도 열지 않는다 — 원장은 feedback_list() 로
 grant usage on sequence feedback_id_seq to authenticated;
 revoke execute on function feedback_list(), feedback_done(bigint, boolean) from public, anon; grant execute on function feedback_list(), feedback_done(bigint, boolean) to authenticated;
 revoke all on notes from anon, authenticated; grant select, delete on notes to authenticated;
@@ -1460,6 +1475,7 @@ begin
   select * into pr from profiles where id = v for update;
   if not found then return json_build_object('ok', false, 'why', '계정 정보를 찾을 수 없습니다. 그 계정으로 앱에 한 번 로그인한 뒤 다시 해 주세요.'); end if;
   insert into private.admins(uid, prev_role) values (v, case when pr.role in ('student','parent') then pr.role else 'student' end);
+  insert into private.admin_log(actor, action, target, email) values (auth.uid(), 'add', v, e);
   update profiles set role = 'owner', student_code = null where id = v;
   update profiles set guard_talk = null, guard_by = null, guard_at = null where guard_by = v;   -- 보호자로 꺼 둔 자녀 이야기 설정도 푼다(unlink_child 와 같게)
   delete from guardian_links where uid = v;
@@ -1471,6 +1487,7 @@ begin
   if not private.is_head() then return json_build_object('ok', false, 'why', '관리자는 원장님만 해제할 수 있습니다.'); end if;
   delete from private.admins where uid = p_uid returning prev_role into r;
   if r is null then return json_build_object('ok', false, 'why', '관리자로 지정된 계정이 아닙니다.'); end if;
+  insert into private.admin_log(actor, action, target, email) values (auth.uid(), 'remove', p_uid, coalesce((select email from auth.users where id = p_uid), ''));
   update profiles set role = case when r in ('student','parent') then r else 'student' end where id = p_uid and role = 'owner';
   return json_build_object('ok', true);
 end $$;
@@ -1619,7 +1636,9 @@ revoke execute on function my_staff(), staff_list(), staff_add(text), staff_remo
 grant execute on function my_staff(), staff_list(), staff_add(text), staff_remove(uuid), join_token(boolean), join_check(text),
   enroll_request(text, text, text, text, text, boolean), my_enroll(), enroll_list(), enroll_decide(uuid, boolean, date, text), roster_links() to authenticated;   -- 원장 함수는 안에서 원장·관리자만 · 지정·해제는 원장님 본인만
 
--- ═══ 보관 기간이 지난 기록 지우기(개인정보처리방침 3항) — 오류 기록 90일 · 틀린 입력 기록 1일 · 처리 끝난 신고·이용 제한 기록 6개월 · 과제 제출 1년 · 수강 신청(QR) 처리 뒤 30일·처리 전 90일 · 보호자 동의가 7일 안에 없는 만 14세 미만 계정 ═══
+-- ═══ 보관 기간이 지난 기록 지우기(개인정보처리방침 3항 표 — 한 줄마다 여기 한 줄) — 오류 기록 90일 · 틀린 입력 기록 1일 · 처리 끝난 신고·이용 제한 기록 6개월 · 과제 제출 1년 ·
+--  수강 신청(QR) 처리 뒤 30일·처리 전 90일 · 보호자 동의가 7일 안에 없는 만 14세 미만 계정 · 수강 끝난 지 1년 지난 수강생(출석·공지 확인·한 마디·보호자 연결과 함께) ·
+--  자해·자살 신호 표시 30일 · 로그인 기록(Supabase Auth 감사 기록) 3개월 · 관리자 지정·해제 기록 3년 ═══
 create or replace function private.purge_old() returns void language sql security definer set search_path = public, private as $$
   delete from client_errors where at < now() - interval '90 days';
   delete from private.attempts where at < now() - interval '1 day';
@@ -1637,6 +1656,14 @@ create or replace function private.purge_old() returns void language sql securit
   delete from assignments where due < kst_today() - 365;                                     -- 학원 과제·제출 기록은 마감일부터 1년(처리방침 3⑭)
   delete from enroll_requests where state <> 'wait' and decided_at < now() - interval '30 days';   -- 수강 신청(QR): 처리 끝난 것 30일
   delete from enroll_requests where state = 'wait' and at < now() - interval '90 days';            --  └ 처리 안 된 신청 90일
+  delete from students where until < kst_today() - 365;   -- 수강생 정보·출석·공지 확인·선생님 한 마디·보호자 연결: 수강 끝난 날(until)부터 1년(처리방침 3항 표) — 연쇄 삭제 · 학습 기록은 학생 계정 쪽으로 다시 올라간다
+  update posts    set care = false where care and at < now() - interval '30 days';   -- 자해·자살 신호 표시는 원장이 먼저 살펴보는 30일만(GPT 검수 ⑤ #17 — 글은 그대로)
+  update comments set care = false where care and at < now() - interval '30 days';
+  update feedback set care = false where care and at < now() - interval '30 days';
+  delete from auth.audit_log_entries where created_at < now() - interval '3 months';   -- 로그인·가입·로그아웃 기록(IP 포함, Supabase Auth 가 DB 에 남김) 3개월
+  delete from private.admin_log where at < now() - interval '3 years';                -- 관리자 지정·해제 기록 3년(안전성 확보조치 기준 제5조 ③)
+  delete from purchases where at < now() - interval '5 years';                         -- 이용권 구매 기록 5년(전자상거래법 제6조 · 시행령 제6조 ① 2호)
+  delete from passes where used_at < kst_today() - 1827;                                -- 쓴 이용권 코드(개통 기록) 5년 · 아직 안 쓴 코드는 그대로
   delete from auth.users where id in (select id from profiles where under14 and not guardian_ok
     and ((guardian_at is null and created_at < now() - interval '7 days') or (guardian_how = 'reset' and guardian_at < now() - interval '7 days')));   -- 보호자가 동의를 표시했고 학원 확인만 남은 계정은 두고 원장 목록에 남긴다 · '번호 다름'으로 되돌린 계정은 그때부터 7일
 $$;

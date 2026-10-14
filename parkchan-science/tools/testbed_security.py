@@ -294,18 +294,24 @@ rpc('delete_my_account', {}, N1); cur.connection.commit()
 cur.execute('select count(*) from notes where title = %s', ('비밀 메모',)); check('계정 삭제하면 노트도 지워짐', before == 1 and cur.fetchone()[0] == 0)
 
 print('▸ 이야기 안전장치(도움이 필요해 보이는 글)')
-s, j = call('POST', '/rest/v1/posts?select=id,care', {'board': 'talk', 'title': '힘들어요', 'body': '요즘 죽고 싶다는 생각이 들어요'}, N2, 'return=representation'); cid = j[0]['id'] if s == 201 else None
-check('힘든 마음의 글은 서버가 care 표시', s == 201 and j[0].get('care') is True, (s, j))
+def care_of(pid):
+    cur.execute('select care from posts where id = %s', (pid,)); r = cur.fetchone(); return r and r[0]
+s, j = call('POST', '/rest/v1/posts?select=id', {'board': 'talk', 'title': '힘들어요', 'body': '요즘 죽고 싶다는 생각이 들어요'}, N2, 'return=representation'); cid = j[0]['id'] if s == 201 else None
+check('힘든 마음의 글은 서버가 care 표시', s == 201 and care_of(cid) is True, (s, j))
+s, j = call('GET', f'/rest/v1/posts?id=eq.{cid}&select=id,care', tok=N2); check('  └ care(자해·자살 신호 판정)는 API 로 못 읽음 — 쓴 사람도(GPT ⑤ #17)', s >= 400, (s, j))
+s, j = call('GET', f'/rest/v1/comments?select=id,care&limit=1', tok=N2); check('  └ 댓글 care 도 못 읽음', s >= 400, (s, j))
 s, j = call('PATCH', f'/rest/v1/posts?id=eq.{cid}', {'care': False}, N2, 'return=representation'); check('care 표시를 스스로 못 끔', s >= 400, (s, j))
-s, j = call('POST', '/rest/v1/posts?select=id,care', {'board': 'qna', 'title': '세포 자살', 'body': '아폽토시스를 세포 자살이라 하나요? 유서 깊은 실험'}, N2, 'return=representation'); check('과학 용어는 care 아님', s == 201 and j[0].get('care') is False, (s, j))
+s, j = call('POST', '/rest/v1/posts?select=id', {'board': 'qna', 'title': '세포 자살', 'body': '아폽토시스를 세포 자살이라 하나요? 유서 깊은 실험'}, N2, 'return=representation'); check('과학 용어는 care 아님', s == 201 and care_of(j[0]['id']) is False, (s, j))
 s, j = call('POST', '/rest/v1/posts', {'board': 'talk', 'title': '괜찮아', 'body': '그냥 궁금해서', 'care': False}, N2); check('글쓸 때 care 칸을 직접 못 넣음', s >= 400, (s, j))
-s, j = call('POST', '/rest/v1/posts?select=id,care', {'board': 'talk', 'title': '109 안내', 'body': '친구가 죽고 싶다고 하면 109로 연락하세요'}, OWN, 'return=representation'); oid = j[0]['id'] if s == 201 else None
-check('원장이 쓴 안내 글도 care 판정은 됨', s == 201 and j[0].get('care') is True, (s, j))
-s, j = call('POST', '/rest/v1/posts?select=id,care', {'board': 'qna', 'title': '세포의 자살', 'body': '세포가 자살한다는 게 무슨 뜻? 자살예방 캠페인 과제도 있어요'}, N2, 'return=representation'); check('세포의 자살·자살예방 과제는 care 아님', s == 201 and j[0].get('care') is False, (s, j))
+s, j = call('POST', '/rest/v1/posts?select=id', {'board': 'talk', 'title': '109 안내', 'body': '친구가 죽고 싶다고 하면 109로 연락하세요'}, OWN, 'return=representation'); oid = j[0]['id'] if s == 201 else None
+check('원장이 쓴 안내 글도 care 판정은 됨', s == 201 and care_of(oid) is True, (s, j))
+s, j = call('POST', '/rest/v1/posts?select=id', {'board': 'qna', 'title': '세포의 자살', 'body': '세포가 자살한다는 게 무슨 뜻? 자살예방 캠페인 과제도 있어요'}, N2, 'return=representation'); check('세포의 자살·자살예방 과제는 care 아님', s == 201 and care_of(j[0]['id']) is False, (s, j))
 s, j = rpc('care_list', {}, N2); check('학생은 먼저 살펴볼 목록을 못 받음', s == 200 and j == [], j)
 s, j = rpc('care_list', {}, OWN); check('원장은 이름과 함께 받음', s == 200 and any(x['post_id'] == cid and x['name'] == '노트둘' for x in j), j)
 check('  └ 원장이 쓴 글은 먼저 살펴볼 목록에 안 뜸', not any(x['post_id'] == oid for x in j), j)
-s, j = call('PATCH', f'/rest/v1/posts?id=eq.{cid}&select=id,care', {'body': '이제 괜찮아요. 고마워요'}, N2, 'return=representation'); check('  └ 고쳐 쓰면 다시 판정', s == 200 and j and j[0].get('care') is False, (s, j))
+cur.execute("update posts set at = now() - interval '31 days' where id = %s", (oid,)); cur.execute('select private.purge_old()'); cur.connection.commit()
+check('  └ 30일 지난 글의 care 표시는 새벽 정리가 지움(글은 그대로 · 최근 글은 남김)', care_of(oid) is False and care_of(cid) is True)
+s, j = call('PATCH', f'/rest/v1/posts?id=eq.{cid}&select=id', {'body': '이제 괜찮아요. 고마워요'}, N2, 'return=representation'); check('  └ 고쳐 쓰면 다시 판정', s == 200 and j and care_of(cid) is False, (s, j))
 
 print('▸ 의견 보내기 · 교재 오류 신고')
 FBP = 'return=minimal'
@@ -314,7 +320,7 @@ s, _ = call('POST', '/rest/v1/feedback', {'kind': 'content', 'body': '해설 단
 F3, F3_ID = signup('fb3@test.kr', '의견셋')   # 아래 목록·도배 제한 시험을 흔들지 않도록 다른 계정으로
 s, _ = call('POST', '/rest/v1/feedback', {'kind': 'content', 'body': '빈칸 선다형 해설 확인', 'ref': 'bank:1101-b1-㉠', 'ver': '1.0'}, F3, FBP); check('  └ ㉠ 든 문항 id 로도 틀린 곳 알리기(B2)', s == 201, s)
 rpc('delete_my_account', {}, F3)
-s, j = call('GET', '/rest/v1/feedback?select=uid,kind,body,care,done_at', tok=F1); check('  └ 보낸 사람은 자기 의견을 봄 · 주인은 서버가 채움', len(j) == 1 and j[0]['uid'] == F1_ID and j[0]['done_at'] is None, j)
+s, j = call('GET', '/rest/v1/feedback?select=uid,kind,body,done_at', tok=F1); check('  └ 보낸 사람은 자기 의견을 봄 · 주인은 서버가 채움', len(j) == 1 and j[0]['uid'] == F1_ID and j[0]['done_at'] is None, j)
 s, j = call('GET', '/rest/v1/feedback?select=id', tok=F2); check('다른 학생은 남의 의견을 못 봄', j == [], j)
 s, _ = call('POST', '/rest/v1/feedback', {'kind': 'bug', 'body': '비로그인 도배'}, None, FBP); check('로그인 안 하면 못 보냄', s in (401, 403), s)
 s, _ = call('POST', '/rest/v1/feedback', {'kind': 'bug', 'body': '남인 척', 'uid': F2_ID}, F1, FBP); check('남의 이름으로 못 보냄(uid 칸 못 씀)', s >= 400, s)
@@ -409,13 +415,13 @@ ABUSE = {'아 씨발 망했다': 1, 'ㅅㅂ 진짜': 1, '병신같이': 1, '존�
          '개의 새끼는 강아지': 0, '살이 찐다': 0, '호모 사피엔스': 0, '자위권': 0, '시발점탐험': 0, 'shift 키': 0, '니 엄마가 부르셔': 0,
          '시발 진짜': 1, '존나': 1, 'fuck': 1, '아이시발': 0, '예존나무': 0, 'sniffuck': 0}
 SENT += list(ABUSE)
-_js = _blk + "\nconst out = " + json.dumps(SENT, ensure_ascii=False) + ".map(t => ({ k: PII.filter(([re]) => re.test(t)).map(x => x[3]), c: careCheck(t), n: nickBad(t), m: piiMask(t), a: abuseLevel(t) }));\nprocess.stdout.write(JSON.stringify(out));"
+_js = _blk + "\nconst out = " + json.dumps(SENT, ensure_ascii=False) + ".map(t => ({ k: PII.filter(([re]) => re.test(t)).map(x => x[3]), c: careCheck(t), n: nickBad(t), a: abuseLevel(t) }));\nprocess.stdout.write(JSON.stringify(out));"
 _app = json.loads(_sp.run(['node', '-e', _js], capture_output=True, text=True, check=True).stdout)
 _bad = []
 for t, a in zip(SENT, _app):
-    cur.execute('select private.pii_kinds(%s), private.care_hit(%s), private.nick_bad(%s), private.pii_mask(%s), private.abuse_level(%s)', (t, t, t, t, t)); k, c, n, m, ab = cur.fetchone()
-    if (list(k), c, n, m, ab) != (a['k'], a['c'], a['n'], a['m'], a['a']): _bad.append((t, a, (k, c, n, m, ab)))
-check(f'같은 {len(SENT)}문장에서 앱(PII·CARE_RE·NICK_BAN·가림·욕설)과 서버 판정이 같음', not _bad, _bad[:3])
+    cur.execute('select private.pii_kinds(%s), private.care_hit(%s), private.nick_bad(%s), private.abuse_level(%s)', (t, t, t, t)); k, c, n, ab = cur.fetchone()
+    if (list(k), c, n, ab) != (a['k'], a['c'], a['n'], a['a']): _bad.append((t, a, (k, c, n, ab)))
+check(f'같은 {len(SENT)}문장에서 앱(PII·CARE_RE·NICK_BAN·욕설)과 서버 판정이 같음', not _bad, _bad[:3])
 _ab = {t: x['a'] for t, x in zip(SENT, _app)}; _miss = [(t, _ab[t], v) for t, v in ABUSE.items() if _ab[t] != v]
 check(f'  └ 욕설 {sum(1 for v in ABUSE.values() if v)}문장은 걸리고(아주 심한 욕은 띄어 써도 2), 과학 용어·일상어 {sum(1 for v in ABUSE.values() if not v)}문장은 안 걸림', not _miss, _miss)
 _by = dict(zip(SENT, _app))
@@ -423,18 +429,21 @@ check('  └ 은어(뒤지고 싶·죽어야겠·태어나지 말았·살 의미
       all(_by[t]['c'] for t in ('시험 망해서 뒤지고 싶다', '이번엔 진짜 죽어야겠다', '태어나지 말았어야 했어', '살 의미가 없어'))
       and not any(_by[t]['c'] for t in ('서랍을 뒤져 보니', '배고파 죽겠다', '세포 자살(아폽토시스)', '자살 예방 포스터', '유서 깊은 실험')))
 check("  └ '○○중 2학년 김○○'은 걸리고 '중학교 2학년 때'는 안 걸림", 'school' in _by['한빛중 2학년 김민수예요']['k'] and 'school' not in _by['중학교 2학년 때 배운 것']['k'])
-check('  └ 휴대전화는 010-****-5678 모양으로', _by['제 번호 010-1234-5678 로 연락']['m'] == '제 번호 010-****-5678 로 연락' and _by['01012345678로 문자']['m'] == '010-****-5678로 문자')
 
 print('▸ 개인정보 — 서버가 직접 검사(앱을 거치지 않은 글도)')
 T1, T1_ID = signup('t1@test.kr', '이야기1'); T2, T2_ID = signup('t2@test.kr', '이야기2'); T3, T3_ID = signup('t3@test.kr', '손님')
 cur.execute("update profiles set created_at = now() - interval '2 days' where id in (%s, %s, %s)", (T1_ID, T2_ID, T3_ID)); cur.connection.commit(); member(T1_ID, T2_ID)
 s, j = call('POST', '/rest/v1/posts?select=id,body', {'board': 'talk', 'title': '안녕', 'body': '주민번호 990101-1234567'}, T1, 'return=representation')
 check('주민등록번호가 든 글은 서버가 거절', s >= 400 and '주민등록번호' in str(j), (s, j))
-s, j = call('POST', '/rest/v1/posts?select=id,title,body', {'board': 'talk', 'title': '연락 01099998888', 'body': '문자 010-1234-5678 주세요'}, T1, 'return=representation')
-check('휴대전화는 가운데를 가려 저장(제목·본문)', s == 201 and j[0]['body'] == '문자 010-****-5678 주세요' and j[0]['title'] == '연락 010-****-8888', j)
-tpid = j[0]['id']
-s, j = call('PATCH', f'/rest/v1/posts?id=eq.{tpid}&select=body', {'body': '고침 010 5555 6666'}, T1, 'return=representation'); check('  └ 고쳐 쓸 때도 가림', s == 200 and j[0]['body'] == '고침 010-****-6666', j)
-s, j = call('POST', '/rest/v1/comments?select=body', {'post_id': tpid, 'body': '제 번호는 01011112222 예요'}, T2, 'return=representation'); check('  └ 댓글도 가림', s == 201 and j[0]['body'] == '제 번호는 010-****-2222 예요', j)
+s, j = call('POST', '/rest/v1/posts?select=id,title,body', {'board': 'talk', 'title': '연락 01099998888', 'body': '문자 주세요'}, T1, 'return=representation')
+check('휴대전화 번호가 든 글은 서버가 거절(가려 저장하지 않음 · GPT ⑤ #18)', s >= 400 and '연락처' in str(j), (s, j))
+for _t in ('메일 a.b+c@test.co.kr 로', '카톡 아이디: abc_123 추가해', '인스타 @hello.world'):
+    s, j = call('POST', '/rest/v1/posts', {'board': 'talk', 'title': '연락', 'body': _t}, T1); check(f'  └ 이메일·메신저 아이디도 거절: {_t}', s >= 400, (s, j))
+cur.execute("select count(*) from posts where body ~ '010|@|abc_123'"); check('  └ 거절한 연락처는 가린 꼴로도 남지 않음', cur.fetchone()[0] == 0)
+s, j = call('POST', '/rest/v1/posts?select=id,body', {'board': 'talk', 'title': '안녕', 'body': '전화 02-123-4567 은 학원 대표번호 아님'}, T1, 'return=representation'); tpid = j[0]['id']
+s, j = call('PATCH', f'/rest/v1/posts?id=eq.{tpid}&select=body', {'body': '고침 010 5555 6666'}, T1, 'return=representation'); check('  └ 고쳐 쓸 때도 거절', s >= 400, (s, j))
+s, j = call('POST', '/rest/v1/comments?select=body', {'post_id': tpid, 'body': '제 번호는 01011112222 예요'}, T2, 'return=representation'); check('  └ 댓글도 거절', s >= 400, (s, j))
+s, j = call('POST', '/rest/v1/comments?select=id', {'post_id': tpid, 'body': '좋은 질문이에요'}, T2, 'return=representation'); check('  └ 연락처 없는 댓글은 그대로 올라감', s == 201, (s, j))
 s, j = call('POST', '/rest/v1/comments', {'post_id': tpid, 'body': '990101-2234567'}, T2); check('  └ 댓글의 주민등록번호도 거절', s >= 400, s)
 s, j = call('POST', '/rest/v1/posts?select=body', {'board': 'talk', 'title': '학원 안내', 'body': '학원 전화 010-2222-3333'}, OWN, 'return=representation'); check('  └ 원장 글(학원 연락처)은 그대로', j[0]['body'] == '학원 전화 010-2222-3333', j)
 s, _ = call('PATCH', f'/rest/v1/profiles?id=eq.{T1_ID}', {'nick': '한빛중2학년김민수'}, T1); check('닉네임에 학교·학년·이름은 서버가 거절', s >= 400, s)
@@ -619,15 +628,31 @@ check('  (되돌림 2번까지는 그대로 셈 — 3건이면 가림)', get_pos
 rpc('report_item', {'p_kind': 'post', 'p_id': tgt[2], 'p_reason': 'bully'}, M); rpc('clear_reports', {'p_kind': 'post', 'p_id': tgt[2]}, OWN)
 cur.execute('select report_n from posts where id = %s', (py,)); check('세 번째 되돌림 뒤 그 계정의 다른 열린 신고도 가림 수에서 빠짐(3 → 2, 다시 보임)', cur.fetchone()[0] == 2 and len(get_post(py, R2)) == 1)
 px = mkpost(R3, R3_ID, '새 글', '새로 신고될 글', 'talk')
-for tk in (M, V1, V2): rpc('report_item', {'p_kind': 'post', 'p_id': px, 'p_reason': 'privacy'}, tk)
+for tk in (M, V1, V2): rpc('report_item', {'p_kind': 'post', 'p_id': px, 'p_reason': 'ad'}, tk)   # 긴급 사유(개인정보·유해·위협)는 1건이면 가리므로 여기서는 보통 사유로
 cur.execute('select report_n from posts where id = %s', (px,)); check('  └ 새 신고도 가림 수에 안 들어감(3명 신고 → 2, 가려지지 않음)', cur.fetchone()[0] == 2 and len(get_post(px, R2)) == 1)
-s, j = rpc('reported_list', {}, OWN); r = [x for x in j if x['id'] == px]; check('  └ 원장 목록에는 남음(신고 3 · 그중 되돌림 많은 계정 1)', r and r[0]['muted'] == 1 and r[0]['reasons'] == {'privacy': 3}, r)
+s, j = rpc('reported_list', {}, OWN); r = [x for x in j if x['id'] == px]; check('  └ 원장 목록에는 남음(신고 3 · 그중 되돌림 많은 계정 1)', r and r[0]['muted'] == 1 and r[0]['reasons'] == {'ad': 3}, r)
 s, j = rpc('muted_reporters', {}, OWN); mm = [x for x in j if x['uid'] == M_ID]; check('원장에게 "신고가 자주 되돌려진 계정" 표시(이름·되돌림 3)', mm and mm[0]['kept'] == 3 and mm[0]['name'] == '자주신고', j)
 for nm, t in (('학생', V1), ('보호자', RP), ('신고한 본인', M)):
     s, j = rpc('muted_reporters', {}, t); check(f'  └ {nm}은 못 받음', s == 200 and j == [], j)
 cur.execute("select count(*) from talk_log where action = 'keep' and actor = %s and target = any(%s)", (OWN_ID, [f'post:{t}' for t in tgt])); check('처리 기록: 신고 되돌리기 3건', cur.fetchone()[0] == 3)
 cur.execute("update reports set resolved_at = now() - interval '31 days' where uid = %s and state = 'kept'", (M_ID,)); cur.execute('select private.purge_old()'); cur.connection.commit()
 cur.execute('select report_n from posts where id = %s', (px,)); check('  └ 30일이 지나면 다시 셈(새벽 정리 때 맞춤 → 3, 가림)', cur.fetchone()[0] == 3 and get_post(px, R2) == [])
+
+print('▸ 긴급 신고(개인정보·성적/유해·위협) — 1건이면 바로 가림, 원장이 되돌리면 다시 보임(GPT ⑤ #19 · 정보통신망법 제44조의2)')
+for rs, rp_ in (('privacy', V1), ('harm', V2), ('threat', V1)):   # 되돌림 3번이면 '자주 되돌려진 계정'이 되므로 신고자를 나눈다
+    pz = mkpost(R3, R3_ID, f'긴급 {rs}', '신고될 글', 'talk')
+    s, j = rpc('report_item', {'p_kind': 'post', 'p_id': pz, 'p_reason': rs}, rp_)
+    check(f'  {rs} 1건 → 바로 가림(urgent)', j.get('ok') and j.get('hidden') and j.get('urgent') and get_post(pz, R2) == [], j)
+    s, j = rpc('reported_list', {}, OWN); r = [x for x in j if x['id'] == pz]; check(f'  └ 원장 목록에 사유 그대로({rs} 1)', r and r[0]['reasons'] == {rs: 1}, r)
+    rpc('clear_reports', {'p_kind': 'post', 'p_id': pz}, OWN); check('  └ 원장이 되돌리면 다시 보임', len(get_post(pz, R2)) == 1)
+pz = mkpost(R3, R3_ID, '보통 신고', '괴롭힘 1건', 'talk'); s, j = rpc('report_item', {'p_kind': 'post', 'p_id': pz, 'p_reason': 'bully'}, V2)
+check('  괴롭힘·광고 같은 보통 사유 1건은 가리지 않음', j.get('ok') and not j.get('hidden') and not j.get('urgent') and len(get_post(pz, R2)) == 1, j)
+cz = call('POST', '/rest/v1/comments?select=id', {'post_id': pz, 'body': '위협 댓글'}, R2, 'return=representation')[1][0]['id']
+s, j = rpc('report_item', {'p_kind': 'comment', 'p_id': cz, 'p_reason': 'threat'}, M); cur.execute('select report_n from comments where id = %s', (cz,))
+check('  댓글도 위협 1건 → 가림', j.get('hidden') and cur.fetchone()[0] == 3, j)
+pk = mkpost(R3, R3_ID, '되돌릴 글', '멀쩡한 글', 'talk'); rpc('report_item', {'p_kind': 'post', 'p_id': pk, 'p_reason': 'ad'}, V1); rpc('clear_reports', {'p_kind': 'post', 'p_id': pk}, OWN)   # V1 되돌림 3번
+pq = mkpost(R3, R3_ID, '긴급 남용', '멀쩡한 글', 'talk'); s, j = rpc('report_item', {'p_kind': 'post', 'p_id': pq, 'p_reason': 'privacy'}, V1); cur.execute('select report_n from posts where id = %s', (pq,))
+check('  신고가 자주 되돌려진 계정의 긴급 신고는 바로 가리지 않음(남용 막기)', cur.fetchone()[0] == 0 and len(get_post(pq, R2)) == 1, j)
 
 print('▸ 처리 기록(운영 일지, docs/11 §12-11) — 원장이 지운 것 · 30일치 · 6개월 뒤 파기')
 dp = mkpost(R3, R3_ID, '지울 글', '원장이 지움', 'talk')
@@ -940,5 +965,27 @@ check('새벽 정리: 처리 끝난 신청 30일 · 처리 안 된 신청 90일 
 rpc('delete_my_account', {}, E2); cur.execute('select count(*) from enroll_requests where uid = %s', (E2_ID,)); check('학생이 탈퇴하면 그 신청 기록도 지움', cur.fetchone()[0] == 0)
 s, j = rpc('staff_remove', {'p_uid': AD_ID}, OWN); check('관리자 해제 → 예전 역할(학생)로 · 권한 없음', j.get('ok') and me(AD, AD_ID)['role'] == 'student' and rpc('enroll_list', {}, AD)[1] == [] and rpc('join_token', {}, AD)[0] >= 400, j)
 s, j = rpc('staff_list', {}, OWN); check('  └ 관리자 목록 비움', j == [], j)
+cur.execute("select count(*) from private.admin_log where action = 'remove' and target = %s", (AD_ID,)); check('관리자 지정·해제 기록이 남음(안전성 확보조치 기준 제5조 ③ · 3년)', cur.fetchone()[0] == 1)
+cur.execute("select count(*) from private.admin_log where action = 'add' and target = %s and actor = %s", (AD_ID, OWN_ID)); check('  └ 지정 기록(누가 · 누구를)', cur.fetchone()[0] >= 1)
+cur.execute("insert into private.admin_log(actor, action, target, at) values (null, 'add', gen_random_uuid(), now() - interval '37 months')"); cur.connection.commit()
+
+print('▸ 보관 기간 표(처리방침 3항) — 수강 끝 1년 · 로그인 기록 3개월 · 관리자 기록 3년')
+cur.execute("insert into students(code, name, cls, until) values ('OLD001', '옛학생', '월목반', current_date - 366), ('OLD002', '작년학생', '월목반', current_date - 300) on conflict do nothing")
+cur.execute("insert into attendance(code, date) values ('OLD001', current_date - 400), ('OLD002', current_date - 310) on conflict do nothing")
+cur.execute("insert into weekly_notes(code, wk, body) values ('OLD002', current_date - 310, '작년 한 마디') on conflict do nothing")
+cur.execute("insert into purchases(purchase_token, product, days, until, at) values ('tok-old-5y', 'pass_m1', 30, current_date - 1800, now() - interval '61 months'), ('tok-new-4y', 'pass_m1', 30, current_date - 1400, now() - interval '47 months') on conflict do nothing")
+cur.execute("insert into passes(code, days, issued, used_at) values ('OLDPS1', 30, current_date - 1900, current_date - 1830), ('NEWPS1', 30, current_date - 1900, null) on conflict do nothing")
+cur.execute("insert into auth.audit_log_entries(created_at, ip_address, payload) values (now() - interval '4 months', '198.51.100.1', '{}'), (now() - interval '20 days', '198.51.100.2', '{}')")
+cur.execute('select private.purge_old()'); cur.connection.commit()
+cur.execute("select code from students where code like 'OLD00%%' order by code"); left_ = [r[0] for r in cur.fetchall()]
+cur.execute("select count(*) from attendance where code = 'OLD001'"); a1 = cur.fetchone()[0]; cur.execute("select count(*) from attendance where code = 'OLD002'"); a2 = cur.fetchone()[0]
+check('수강 끝난 지 1년 지난 수강생 정보·출석은 새벽 정리가 지움(1년 안은 남김)', left_ == ['OLD002'] and a1 == 0 and a2 == 1, (left_, a1, a2))
+cur.execute("select ip_address from auth.audit_log_entries where ip_address like '198.51.100.%%'"); ips = [r[0] for r in cur.fetchall()]
+check('로그인 기록(Supabase Auth 감사 기록 · IP)은 3개월 뒤 지움', ips == ['198.51.100.2'], ips)
+cur.execute("select purchase_token from purchases where purchase_token like 'tok-%%-%%y' order by 1"); pt = [r[0] for r in cur.fetchall()]
+cur.execute("select code from passes where code in ('OLDPS1', 'NEWPS1')"); pc = [r[0] for r in cur.fetchall()]
+check('이용권 구매 기록·쓴 이용권 코드는 5년 뒤 지움(안 쓴 코드·5년 안 기록은 남김)', pt == ['tok-new-4y'] and pc == ['NEWPS1'], (pt, pc))
+cur.execute("select count(*) from private.admin_log where at < now() - interval '3 years'"); check('관리자 지정·해제 기록은 3년 뒤 지움', cur.fetchone()[0] == 0)
+s, j = call('GET', '/rest/v1/admin_log?select=*', tok=OWN); check('  └ 관리자 기록은 API 로 안 보임', s >= 400, s)
 print(f'\n보안 시험 {len(OK)}/{len(OK) + len(BAD)} 통과')
 sys.exit(1 if BAD else 0)

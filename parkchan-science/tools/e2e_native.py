@@ -66,6 +66,17 @@ async def main():
             await s.click('.tab[data-v="me"]'); await s.wait_for_timeout(300); await s.click('#goPlans'); await s.wait_for_timeout(900)
             assert '₩59,000 · 구매' in await s.locator('#v-plans').inner_text(), '스토어 가격이 안 보임'
             await s.screenshot(path=f'{SC}/n01_plans_store_price.png', full_page=True)
+            # 결제 직전 안내(전자상거래법 제13조 ②③, GPT ⑤ #24·#25) — 사람처럼 눌러 보고, 취소하면 결제 창을 열지 않음
+            await s.evaluate('window.__askManual = true'); n0 = len(await s.evaluate('__iap.calls'))
+            await s.click('[data-buy="y1"]'); await s.wait_for_timeout(300)
+            sh = await s.locator('#ask .sheet').inner_text()
+            assert all(k in sh for k in ('7일 안에는 청약을 철회', '미성년자', '취소할 수 있고', '판매자 박찬 통합과학 학원', '조암로 25', '제2019-115호', '자동으로 다시 결제되지 않아요', 'Google Play 절차')), sh
+            await s.screenshot(path=f'{SC}/n01b_buy_confirm.png', full_page=True)
+            await s.click('#askNo'); await s.wait_for_timeout(200)
+            assert len(await s.evaluate('__iap.calls')) == n0, '결제 직전 안내에서 취소했는데 결제 창이 열림'
+            await s.evaluate('window.__askManual = false')
+            plans = await s.locator('#v-plans').inner_text()
+            assert '판매자 박찬 통합과학 학원' in plans and '제7조 ⑦' in plans and '구매 후 7일 안에 쓰기 전이면' not in plans, plans[-400:]
             await s.evaluate("__iap.next = 'CANCEL'"); await s.click('[data-buy="y1"]'); await s.wait_for_timeout(500)
             assert await s.locator('#sheetBg').count() == 0 and await s.evaluate('hasPass()') is False, '사용자가 취소했는데 오류 창이 뜨거나 열림'
             tf.buy('pass_y1', 'tok-native-000001', uid); await s.evaluate("__iap.next = 'tok-native-000001'")
@@ -76,6 +87,9 @@ async def main():
             assert await s.evaluate('hasPass()') is True and await s.evaluate('ACC.passUntil') == exp, await s.evaluate('ACC.passUntil')
             assert await s.evaluate('fullAccess()') is True
             await s.screenshot(path=f'{SC}/n02_after_purchase.png', full_page=True)
+            sh = await s.locator('#sheetBg .sheet').inner_text()   # 계약 내용 화면(전자상거래법 제13조 ②) — 상품·기간·철회 방법·판매자
+            assert '결제가 끝났어요' in sh and '12개월 이용권' in sh and '7일 안에는 청약을 철회' in sh and '판매자 박찬 통합과학 학원' in sh, sh
+            await s.click('#sheetClose'); await s.wait_for_timeout(250)
             # ② 구매 복원: 앱이 꺼져 확인 못 한 1개월 결제 → 복원하면 30일 더, 다시 복원해도 두 번 안 늘어남
             tf.buy('pass_m1', 'tok-native-000002', uid)
             await s.evaluate("__iap.purchases.push({ productIdentifier:'pass_m1', purchaseToken:'tok-native-000002', transactionId:'GPA.2' })")
