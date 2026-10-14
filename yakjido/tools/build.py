@@ -105,8 +105,8 @@ data['art'] = found
 # 화면 함수는 하나도 바꾸지 않아도 된다.
 SLIM = {
     'symptoms':    ['id', 'group', 'icon', 'name', 'short', 'tags', 'reviewed'],
-    'drugs':       ['id', 'name', 'class', 'rx', 'simple'],   # for(쓰임)도 본문으로 — 약 사전·검색은 본문이 오면 다시 그린다(10-14 화면 개편으로 첫 화면 226 KB)   # tagline 도 본문으로(증상·약 화면은 본문을 받은 뒤 그려진다, 10-14 첫 화면 예산)   # en(영어 이름)은 본문으로 — 첫 화면 목록엔 안 보인다(10-14 많이 찾는 약 타일로 224 KB 넘침)
-    'supplements': ['id', 'name', 'en', 'tags', 'brands', 'evidence'],
+    'drugs':       ['id', 'name', 'class', 'rx'],   # simple(한 줄 먹는 법)도 본문으로 — 첫 화면(홈·처음 안내)은 본문이 오면 다시 그리고(mergeCore → redraw) 알림도 다시 건다(2026-10-14 외부 검수 2차 반영으로 첫 화면 232 KB, 압축 약 3 KB 줄임)   # for(쓰임)도 본문으로 — 약 사전·검색은 본문이 오면 다시 그린다(10-14 화면 개편으로 첫 화면 226 KB)   # tagline 도 본문으로(증상·약 화면은 본문을 받은 뒤 그려진다, 10-14 첫 화면 예산)   # en(영어 이름)은 본문으로 — 첫 화면 목록엔 안 보인다(10-14 많이 찾는 약 타일로 224 KB 넘침)
+    'supplements': ['id', 'name', 'tags', 'brands', 'evidence'],   # en(영어 이름)은 본문으로 — 화면에 안 보이고(외부 검수 2차 #59) 검색만 씀(10-14 첫 화면 228 KB)
     'classes':     ['id', 'name', 'short', 'icon'],
     'tips':        ['id', 'group', 'icon', 'title'],
     'askdoc':      ['id', 'icon', 'q'],               # 홈은 개수·검색은 질문만 — 대답은 본문과 함께(2026-10-13 검수 반영으로 첫 화면 220 KB)   # 홈은 제목만 쓴다 — 본문은 팁 화면(본문 받은 뒤)에서(2026-10-06 첫 화면 220 KB)
@@ -114,7 +114,7 @@ SLIM = {
 CORE_KEYS = ['sources', 'ingredients', 'interactions', 'kids', 'productImages', 'suppRules', 'myths', 'recalls', 'drugRep']   # drugRep: 약 화면(본문 받은 뒤)에서만 씀 — 첫 화면 220 KB 예산
 # 약 화면에서만 쓰는 칸(자주 묻는 질문·부작용 빈도)은 data/detail.json 으로 한 번 더 뺀다.
 # 본문과 «동시에» 받기 시작하고, 약 화면만 이것까지 기다린다 — core.json 400 KB 예산(2026-10-04)
-DETAIL = {'drugs': ['faq', 'sideFreq', 'lact', 'tips', 'interactions', 'riskNote', 'sideEffects', 'stop'],   # sideEffects·stop: 약 화면(읽어 주기 포함)에서만 — 10-14 투석·출처 보강으로 core 401 KB   # tips·interactions: 약 화면에서만(2026-10-13 검수 반영으로 core 400 KB) · riskNote: 약 화면 「부담 정도」 막대 아래 설명만(10-13 아이 나이 칸·병용 규칙 추가로 core 400 KB)
+DETAIL = {'drugs': ['faq', 'sideFreq', 'lact', 'tips', 'interactions', 'riskNote', 'sideEffects', 'stop', 'lead', 'onset', 'duration'],   # lead·onset·duration: 자세한 약 화면(vDrug)에서만 — 10-14 외부 검수 2차 반영(제품 용법·메타 본문 이동)으로 core 401 KB   # sideEffects·stop: 약 화면(읽어 주기 포함)에서만 — 10-14 투석·출처 보강으로 core 401 KB   # tips·interactions: 약 화면에서만(2026-10-13 검수 반영으로 core 400 KB) · riskNote: 약 화면 「부담 정도」 막대 아래 설명만(10-13 아이 나이 칸·병용 규칙 추가로 core 400 KB)
           'supplements': ['foods', 'need', 'faq', 'evidenceNote', 'priceTip'],
           'classes': ['table', 'notes', 'verdict']}   # 계열 비교 화면에서만 — 10-14 쉬운 말·알아두면 좋은 것 보강으로 core 402 KB
 detail = {k: [{'id': o['id'], **{f: o[f] for f in fs if f in o}} for o in data[k] if any(f in o for f in fs)] for k, fs in DETAIL.items()}
@@ -134,6 +134,10 @@ for k, v in data.items():
         core[k] = v
     else:
         inline[k] = v                       # meta · art · public · tips 는 작아서 그대로 둔다
+# meta 의 「이 앱에 대해(about)·이렇게 만들었어요(method)」는 설정 화면(본문을 받은 뒤에만 그려짐)에서만 쓴다 — 본문에는 meta 전체를 싣고
+# (mergeCore 가 D.meta 를 본문 것으로 바꾼다) 첫 화면에서는 뺀다(2026-10-14 외부 검수 2차 반영으로 첫 화면 예산, 압축 약 0.9 KB)
+if isinstance(inline.get('meta'), dict):
+    core['meta'] = inline['meta']; inline['meta'] = {k: v for k, v in inline['meta'].items() if k not in ('about', 'method')}
 
 jc = json.dumps(core, ensure_ascii=False, separators=(',', ':'))
 j = json.dumps(inline, ensure_ascii=False, separators=(',', ':')).replace('</', '<\\/')
@@ -189,18 +193,19 @@ print(f'첫 화면 {len(out)/1024:.0f} KB · 본문 data/core.json {len(jc)/1024
 # 서비스워커 캐시 이름 = 배포 파일 내용의 해시 — 내용이 같으면 같은 이름(파이썬 hash() 는 실행마다 달라 매번 바뀌던 것, 2026-10-13)
 _srvjs = (ROOT / 'srv.js').read_text(encoding='utf-8') if (ROOT / 'srv.js').exists() else ''
 _srvjs += (ROOT / 'find.js').read_text(encoding='utf-8') if (ROOT / 'find.js').exists() else ''   # 찾기 부품도 바뀌면 캐시 이름이 바뀌게(10-14)
+_srvjs += ''.join((ROOT / f).read_text(encoding='utf-8') for f in ('terms.html', 'privacy.html') if (ROOT / f).exists())   # 앱 안에서 읽는 약관·방침도(오프라인 캐시, 10-14)
 cache_id = hashlib.sha1((out + jc + jd + _srvjs).encode('utf-8')).hexdigest()[:8]
 sw = ROOT / 'sw.js'
 if sw.exists():
     s = re.sub(r"const CACHE = '[^']*'", f"const CACHE = 'yakjido-{stamp}-{cache_id}'", sw.read_text(encoding='utf-8'))
     (pages / 'sw.js').write_text(s, encoding='utf-8')
-for name in ('manifest.webmanifest', 'privacy.html', 'delete-account.html', 'srv.js', 'find.js'):   # find.js = 공용 찾기 부품 + 약지도 쪽(검색을 처음 쓸 때 받음, Z8)
+for name in ('manifest.webmanifest', 'privacy.html', 'terms.html', 'delete-account.html', 'srv.js', 'find.js'):   # terms.html = 약지도 이용약관(첫 동의 화면·설정에서 앱 안으로 읽음, 10-14)   # find.js = 공용 찾기 부품 + 약지도 쪽(검색을 처음 쓸 때 받음, Z8)
     # delete-account.html = 스토어 「계정 삭제 URL」(메디나눔 안내 2026-10-13)   # srv.js = 계정·기록 이어 두기(따로 받는 파일)   # privacy.html = 스토어에 적는 개인정보처리방침 주소
     src = ROOT / name
     if src.exists():
         (pages / name).write_text(src.read_text(encoding='utf-8'), encoding='utf-8')
 # 메디나눔 공통 이름(privacy-<앱>.html · delete-account-<앱>.html)으로도 같은 쪽을 둔다 — 옛 주소(privacy.html)는 스토어에 이미 적혀 있어 그대로 둔다
-for name, alias in (('privacy.html', 'privacy-yakjido.html'), ('delete-account.html', 'delete-account-yakjido.html')):
+for name, alias in (('privacy.html', 'privacy-yakjido.html'), ('terms.html', 'terms-yakjido.html'), ('delete-account.html', 'delete-account-yakjido.html')):
     if (pages / name).exists(): (pages / alias).write_text((pages / name).read_text(encoding='utf-8'), encoding='utf-8')
 for ic in (ROOT / 'icons').glob('*'):
     (pages / ic.name).write_bytes(ic.read_bytes())

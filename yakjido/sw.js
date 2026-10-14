@@ -12,7 +12,8 @@
 const CACHE = 'yakjido-2026-09-21-8896';
 const DATA = 'yakjido-data-v1';
 /* 본문(core·detail)은 여기서 받지 않는다 — 첫 방문에 페이지가 이미 받은 것을 한 번 더 받던 것(5-03). 페이지가 워커에 연결되면 같은 주소로 다시 불러 캐시에 넣는다. */
-const ASSETS = ['./', './index.html', './manifest.webmanifest', './srv.js', './find.js', './icon-192.png', './icon-512.png', './icon-180.png', './icon-maskable-512.png'];
+/* terms.html·privacy.html — 첫 동의 화면과 설정의 「약관·개인정보」가 앱 안에서 읽는다(비행기 모드에서도 열리게, 10-14) */
+const ASSETS = ['./', './index.html', './manifest.webmanifest', './srv.js', './find.js', './terms.html', './privacy.html', './icon-192.png', './icon-512.png', './icon-180.png', './icon-maskable-512.png'];
 
 self.addEventListener('install', (e) => {
   /* HTTP 캐시를 건너뛰고 서버에서 새로 — 몇 시간 묵은 srv.js 가 새 캐시 이름에 갇히지 않게(5-03) */
@@ -20,8 +21,9 @@ self.addEventListener('install', (e) => {
 });
 self.addEventListener('activate', (e) => {
   e.waitUntil(caches.keys()
-    /* 자료 캐시는 남긴다 — 이것까지 지우면 17 MB 를 다시 받게 된다 */
-    .then((keys) => Promise.all(keys.filter((k) => k !== CACHE && k !== DATA).map((k) => caches.delete(k))))
+    /* 자료 캐시는 남긴다 — 이것까지 지우면 17 MB 를 다시 받게 된다.
+       같은 주소(github.io)를 쓰는 다른 앱의 캐시는 건드리지 않는다 — 「yakjido-」로 시작하는 약지도 것만 지운다(2026-10-14 외부 검수 2차 #23) */
+    .then((keys) => Promise.all(keys.filter((k) => k.startsWith('yakjido-') && k !== CACHE && k !== DATA).map((k) => caches.delete(k))))
     .then(() => self.clients.claim()));
 });
 
@@ -91,7 +93,8 @@ self.addEventListener('notificationclick', (e) => {
   const q = () => encodeURIComponent(d.key) + (d.day ? '&day=' + encodeURIComponent(d.day) : '');
   const hash = took ? '#/schedule?tick=' + q() : later ? '#/schedule?later=' + q() : (d.go === '#/visits' ? '#/visits' : '#/schedule');   // 진료 예약 알림은 예약 화면으로(2026-10-13)
   e.waitUntil((async () => {
-    const all = await self.clients.matchAll({ type: 'window', includeUncontrolled: true });
+    /* 같은 주소의 다른 앱 창이 먼저 잡히던 것 — 이 워커가 맡은 범위(약지도 주소) 안의 창만 고른다. 없으면 약지도를 새로 연다(2026-10-14 외부 검수 2차 #24) */
+    const all = (await self.clients.matchAll({ type: 'window', includeUncontrolled: true })).filter((c) => String(c.url || '').startsWith(self.registration.scope));
     for (const c of all) {
       if (later) { try { c.postMessage({ type: 'yakjido-later', key: d.key, day: d.day || '', title: e.notification.title || '', body: e.notification.body || '' }); } catch (x) {} return; }
       if ('focus' in c) { try { c.postMessage({ type: 'yakjido-tick', key: took ? d.key : '', day: d.day || '', go: d.go === '#/visits' ? '/visits' : '' }); } catch (x) {} return c.focus(); }
