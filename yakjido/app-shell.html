@@ -3428,7 +3428,7 @@ function vHome(){
   <div class="sech"><h2 class="sec-h">바로 가기</h2></div>
   <div class="rows-l">
     ${tip ? lrow(icon(tip.icon), '알아두면 좋은 것', esc(tip.title), `go('/tips?open=${tip.id}')`) : ''}
-    ${lrow(I.pill, '약 이름을 몰라도 담기', '“혈압약 먹어요”까지만 아셔도 위험한 조합을 걸러요', "go('/kinds')")}
+    ${lrow(I.pill, '약 이름을 몰라도 담기', '“혈압약 먹어요”까지만 아셔도 위험한 조합 일부를 먼저 살펴봐요', "go('/kinds')")}
     ${lrow(I.scale, '그런 줄 알았는데', `흔히 듣는 말 ${(D.myths || []).length || 18}가지를 근거로 다시 봤어요`, "go('/myths')")}
     ${(D.askdoc || []).length ? lrow(I.user, '의사에게 물었어요', `자주 묻는 ${D.askdoc.length}가지 — 진료실에서 하는 대답 그대로`, "go('/askdoc')") : ''}
   </div>
@@ -3516,7 +3516,7 @@ const FEATURE_GO = [
   { kw:['부모님', '가족', '보내기', '보내', '엄마', '아빠', '카톡', '카카오톡', '문자'], t:'부모님께 보내기', d:'고른 약 목록을 카카오톡·문자로 — 받는 분 몸 상태에 맞춰', h:'/send' },
   { kw:['알림', '알람', '복용시간', '약시간'], t:'복용 시간 알림', d:'먹었어요 체크·약 떨어지기 전 알림', h:'/schedule' },
   { kw:['같이먹어도', '같이먹', '함께먹', '병용'], t:'같이 먹어도 되나요', d:'내 약통의 약을 성분으로 풀어 부딪히는 자리를 봐요', h:'/together' },
-  { kw:['약통', '내약', '먹는약'], t:'내 약통', d:'드시는 약을 담아 겹치는 성분을 걸러요', h:'/me?t=meds' },
+  { kw:['약통', '내약', '먹는약'], t:'내 약통', d:'드시는 약을 담으면 겹치는 성분을 먼저 살펴봐요', h:'/me?t=meds' },
   { kw:['약알레르기', '약물알레르기', '알레르기기록', '알레르기적어', '부작용있었'], t:'약 알레르기 적어 두기', d:'있었던 성분은 추천에서 빼요', h:'/me?t=body' },
 ];
 function comboName(name){
@@ -4421,7 +4421,7 @@ const CATN = { nsaid:'소염제', acetaminophen:'진통제', geworin:'진통제'
   spasm:'배 아픈 데 푸는 약', combo:'종합감기약', 'coughs-combo':'기침약', cold:'가래약', dextromethorphan:'기침약', yonggaksan:'기침약', pseudoephedrine:'코막힘 약', antihistamine:'콧물·알레르기 약', xylometazoline:'코에 뿌리는 약',
   sleep:'잠 오는 약', dimenhydrinate:'멀미약', scopolamine:'멀미약', topical:'파스·바르는 약', flurbiprofen:'목 아픈 데 녹여 먹는 약' };
 const catName = x => { const d = x.d, c = CATN[d.id] || CATN[d.class];
-  if (c === '위산 줄이는 약' && /위보호|위 지키/.test(x.slot + (x.title || ''))) return '위 보호하는 약(위장약)';
+  if (c === '위산 줄이는 약' && /위보호|위 지키/.test(x.slot + (x.title || ''))) return '위장약(속쓰림 덜기)';
   return c || (/^(skin|oral)$/.test(d.class) ? d.name.split(' (')[0] : String(cls(d.class)?.name || ingrName(d)).replace(/\s*\(.*$/, '')); };
 /* 한 줄 = 사진 · 「종류 — 제품」 · 성분(작게) · 먹는 법 한 줄(약 자료의 simple) · 조건 배지(자세히와 같은 buyBadge). 복합제 속 성분은 제품을 앞세우지 않는다(자세히와 같은 까닭 — 종합감기약을 두 번 사게 된다) */
 function svRow(x){
@@ -4544,7 +4544,7 @@ function vSymptom(id, q){
       /* 모양과 색이 제각각인 띠 다섯 개를 한 상자 안의 같은 줄로 묶는다.
          강조는 아래 큰 단추 하나에만 준다(현욱님 지적 2026-09-21). */
       const rows = [];
-      if (!takingItems().length) rows.push({ ic: I.pill, t: '내 약통에 약 담기', s: '드시는 약과 겹치는 성분을 걸러 드려요', go: `go('/me?t=meds')` });
+      if (!takingItems().length) rows.push({ ic: I.pill, t: '내 약통에 약 담기', s: '드시는 약과 겹치는 성분을 먼저 살펴봐요', go: `go('/me?t=meds')` });
       const rel = mixFor(bk.map(x => x.d));
       if (rel.length) rows.push({ ic: I.scale, t: '같이 드시는 약이 있다면', s: rel[0].t, go: `go('/mix/${rel[0].id}')` });
       const cn = (s.care?.clinic?.length || 0) + (s.care?.er?.length || 0);
@@ -6143,7 +6143,7 @@ function vTogether(){
       : `${head}${band}
       <div class="ix-list">${res.items.map(it => `<span class="ix-chip ${it.approx || it.est ? 'approx' : it.known ? '' : 'unk'}">${it.link ? `<a href="${it.link}">${esc(it.name)}</a>` : esc(it.name)}${it.approx ? '<em>대략</em>' : !it.known ? '<em>성분 모름</em>' : it.est ? '<em>성분 추정</em>' : ''}</span>`).join('')}</div>
       ${res.items.some(i => i.est && i.known) ? `<p class="ix-unk">${I.info}<span><b>‘성분 추정’</b>은 이름이 같은 다른 제형의 성분으로 본 것이에요. 상자 뒷면 성분과 같은지 확인해 주세요.</span></p>` : ''}
-      ${res.items.some(i => i.approx) ? `<p class="ix-unk">${I.info}<span><b>‘대략’</b>으로 담으신 약이 있어요. 종류만으로도 큰 위험은 걸러지지만, <b>항콜린 점수처럼 성분마다 다른 것</b>은 이름을 담아야 정확합니다. <a class="link" href="#/pill">이름으로 찾아 담기</a></span></p>` : ''}
+      ${res.items.some(i => i.approx) ? `<p class="ix-unk">${I.info}<span><b>‘대략’</b>으로 담으신 약이 있어요. 종류만 담으면 일부 위험만 먼저 살펴봐요. <b>항콜린 점수처럼 성분마다 다른 것</b>은 이름을 담아야 정확합니다. <a class="link" href="#/pill">이름으로 찾아 담기</a></span></p>` : ''}
       ${unk.length && (S || W || N || aLv !== 'ok') ? `<p class="ix-unk">${I.info}<span><b>${esc(unk.join(', '))}</b>${josa(unk[unk.length - 1], '은', '는')} 성분을 몰라 판정에서 빠졌어요 — 이 약의 겹침은 확인하지 못했어요.</span></p>` : ''}
       ${S ? `<h2 class="ix-gh stop" id="ixg-stop">${I.alert}안 돼요<small>${S}가지</small></h2>${grp('stop')}` : ''}
       ${W ? `<h2 class="ix-gh warn" id="ixg-warn">${I.alert}조심<small>${W}가지</small></h2>${grp('warn')}` : ''}
@@ -6229,7 +6229,7 @@ function vHello(step){
     const on = KEYS.filter(k => ME[k]).length;
     return `${topBar({ back:'이전', nosearch:true })}${dots}
     <h1 class="hello-q">해당하는 것이 있으면 눌러 주세요</h1>
-    <p class="hello-sub">이걸 알면 <b>위험한 조합을 미리 걸러</b> 드릴 수 있어요. 해당하는 것이 없으면 그냥 넘어가셔도 됩니다.</p>
+    <p class="hello-sub">이걸 알면 <b>피해야 할 조합을 먼저 살펴봐</b> 드릴 수 있어요. 해당하는 것이 없으면 그냥 넘어가셔도 됩니다.</p>
     <div class="hello-chips">${KEYS.map(k => `<button class="hello-chk ${ME[k] ? 'on' : ''}" aria-pressed="${!!ME[k]}" onclick="ME['${k}']=!ME['${k}'];saveMe();redraw()"><span class="bx">${ME[k] ? I.check : ''}</span>${esc(FLAG_Q[k])}</button>`).join('')}</div>
     ${kid ? kidMini() : ''}
     <p class="privacy">${I.lock}${savedWhere()}</p>
@@ -7875,7 +7875,7 @@ function vSuppDetail(id){
   const s = supp(id); if (!s) return vSupp();
   const w = suppWho(), nd = s.need ? needOf(s.need, w) : null;
   return `${topBar({ back:'영양제' })}
-  <div class="drug-hero"><span class="cls">영양제 성분</span><h1>${esc(s.name)}</h1><div class="en">${esc(s.en || '')} ${evTag(s.evidence)}</div>${s.role ? `<p class="supp-role">${fmt(s.role)}</p>` : ''}</div>
+  <div class="drug-hero"><span class="cls">영양제 성분</span><h1>${esc(s.name)}</h1><div class="en">${evTag(s.evidence)}</div>${s.role ? `<p class="supp-role">${fmt(s.role)}</p>` : ''}</div>
   ${suppBox(s)}
   ${nd ? whoPick(w) : ''}
   ${suppFoods(s, nd)}
