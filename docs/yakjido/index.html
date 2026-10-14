@@ -1339,6 +1339,18 @@ nav.tabbar button{flex:1;min-width:0;display:flex;flex-direction:column;align-it
 nav.tabbar button.on{color:var(--primary)}
 nav.tabbar button svg.i{width:22px;height:22px}
 nav.tabbar button.on svg.i{stroke-width:2.2}
+nav.tabbar .pc{display:none}
+@media (min-width:600px){.app{max-width:720px}nav.tabbar,.cmp-bar{width:min(720px,100%)}main{padding-inline:var(--s5)}}
+@media (min-width:1024px){body{padding-left:248px}body.no-nav{padding-left:0}.app{max-width:none;box-shadow:none}
+main{width:100%;max-width:1008px;margin:0 auto;padding:var(--s6) var(--s7) var(--s7)}
+nav.tabbar{top:0;left:0;transform:none;width:248px;flex-direction:column;gap:4px;padding:20px 14px;border:0;border-right:1px solid var(--hairline);background:var(--card);backdrop-filter:none;-webkit-backdrop-filter:none}
+nav.tabbar button{flex:none;flex-direction:row;justify-content:flex-start;gap:12px;min-height:48px;padding:0 14px;font-size:1rem}
+nav.tabbar button.on{background:var(--tint);color:var(--primary-deep)}nav.tabbar .pc{display:flex}
+nav.tabbar .nav-acct{margin-top:auto;border:1px solid var(--hairline)}
+.top .brand{display:none}.top{justify-content:flex-end}.top:has(.back){justify-content:space-between}
+body .cmp-bar,body .toast{left:calc(50% + 124px)}body .toast{bottom:40px}.cmp-bar{bottom:24px}body.no-nav .toast{left:50%}
+#view p,#view li{max-width:46em}#view p[style*="text-align:center"]{margin-left:auto;margin-right:auto}
+.rows-l{display:grid;grid-template-columns:1fr 1fr;column-gap:12px}}
 
 .results{margin-top:var(--s3)}
 .hit{display:flex;align-items:center;gap:var(--s3);padding:12px 0;border-bottom:1px solid var(--hairline);text-align:left;width:100%;min-height:56px}
@@ -1724,6 +1736,8 @@ background-repeat:no-repeat;background-position:right 9px center;background-size
 <svg class="i" viewBox="0 0 24 24"><path d="M12 3c-3 4-7 6-7 11a7 7 0 0 0 14 0c0-5-4-7-7-11z"/><path d="M12 21v-6"/></svg>영양제</button>
 <button data-tab="me" aria-label="내 정보">
 <svg class="i" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>내 정보</button>
+<button data-tab="login" class="pc nav-acct" aria-label="계정 · 로그인">
+<svg class="i" viewBox="0 0 24 24"><path d="M14 4h4a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-4M10 16l4-4-4-4M14 12H4"/></svg>계정 · 로그인</button>
 </nav>
 </div>
 <!-- 알림 글(toast)을 화면낭독기가 읽는 자리 — 본문 전체를 aria-live 로 두면 체크 한 번에 화면 전체를 다시 읽었다(5-07) -->
@@ -1734,7 +1748,7 @@ background-repeat:no-repeat;background-position:right 9px center;background-size
 window.__YAKJIDO_OK__ = true;
 const D = JSON.parse(document.getElementById('data').textContent || '{}');
 const BUILD = '2026-10-14';
-const DATAV = '644f11fb80'.indexOf('__') === 0 ? BUILD : '644f11fb80';
+const DATAV = 'f97adc1aee'.indexOf('__') === 0 ? BUILD : 'f97adc1aee';
 const BRANDMARK = (typeof window !== 'undefined' && window.__BRANDMARK__) || 'icon-192.png';
 let CORE = 0, CORE_P = null;
 function mergeCore(c){
@@ -2186,10 +2200,11 @@ const h = location.hash.replace(/^#\/?/, '') || 'home';
 const [path, qs] = h.split('?');
 if (path !== LASTPATH) { SCROLL[LASTPATH] = window.scrollY; GQ = ''; GQ_Y = null; LASTPATH = path; try { if (!path.startsWith('photo')) PH.img = ''; } catch (e) {} }
 const seg = path.split('/');
+if (consentGate(seg[0], h)) return;
 if (seg[0] === 'hello' && helloDone() && (() => { try { return sessionStorage.getItem(HELLO_FIN); } catch (e) { return null; } })()) { try { location.replace(location.href.split('#')[0] + '#/home'); return; } catch (e) {} }
-document.body.classList.toggle('no-nav', seg[0] === 'hello');
+document.body.classList.toggle('no-nav', /^(hello|consent|login|doc)$/.test(seg[0])); document.body.classList.toggle('door', /^(consent|login)$/.test(seg[0]));
 const q = Object.fromEntries(new URLSearchParams(qs || ''));
-const tab = { send:'home', p:'home', show:'home', check:'home', home:'home', symptom:'home', drugs:'drugs', drug:'drugs', class:'drugs', search:'drugs', pub:'drugs', pill:'drugs', guide:'home', kids:'home', tips:'home', myths:'home', schedule:'me', photo:'drugs', pillinfo:'drugs', supp:'supp', compare:'supp', me:'me', about:'me', ingr:'drugs', brand:'drugs', nut:'supp', hello:'home', mix:'drugs', together:'me', kinds:'me', rxout:'drugs', senior:'drugs', askdoc:'home' }[seg[0]] || 'home';
+const tab = { send:'home', p:'home', show:'home', check:'home', home:'home', symptom:'home', drugs:'drugs', drug:'drugs', class:'drugs', search:'drugs', pub:'drugs', pill:'drugs', guide:'home', kids:'home', tips:'home', myths:'home', schedule:'me', photo:'drugs', pillinfo:'drugs', supp:'supp', compare:'supp', me:'me', about:'me', ingr:'drugs', brand:'drugs', nut:'supp', hello:'home', mix:'drugs', together:'me', kinds:'me', rxout:'drugs', senior:'drugs', askdoc:'home', login:'login' }[seg[0]] || 'home';
 document.querySelectorAll('nav.tabbar button').forEach(b => { const on = b.dataset.tab === tab; b.classList.toggle('on', on); on ? b.setAttribute('aria-current', 'page') : b.removeAttribute('aria-current'); });
 if (CORE !== 2 && !CORE_SAFE.has(seg[0])) {
 if (CORE === 3) {
@@ -2205,7 +2220,7 @@ if ((seg[0] === 'drug' || seg[0] === 'class' || (seg[0] === 'supp' && seg[1])) &
 if (DETAIL === 3) { window.__DETAIL_SKIP__ = true; ensureDetail(); }
 else { view.innerHTML = topBar({ back:'뒤로', nosearch:true }) + `<section class="sec"><p class="loading">자료를 불러오는 중이에요…</p></section>`; ensureDetail().then(route); return; }
 }
-const R = { send:vSend, p:vParentShare, show:vShow, check:vCheck, home:vHome, symptom:vSymptom, drugs:vDrugs, drug:vDrug, class:vClass, search:vSearch, pub:vPub, pill:vPill, guide:vGuide, kids:vKids, tips:vTips, myths:vMyths, schedule:vSchedule, photo:vPhoto, pillinfo:vPillInfo, supp:vSupp, compare:vCompare, me:vMe, about:vAbout, ingr:vIngr, brand:vBrand, nut:vNut, hello:vHello, mix:vMix, together:vTogether, kinds:vKinds, bag:vBag, rxout:vRxOut, senior:vSenior, askdoc:vAskDoc, vitals:vVitals, visits:vVisits, demo:vDemo };
+const R = { send:vSend, p:vParentShare, show:vShow, check:vCheck, home:vHome, symptom:vSymptom, drugs:vDrugs, drug:vDrug, class:vClass, search:vSearch, pub:vPub, pill:vPill, guide:vGuide, kids:vKids, tips:vTips, myths:vMyths, schedule:vSchedule, photo:vPhoto, pillinfo:vPillInfo, supp:vSupp, compare:vCompare, me:vMe, about:vAbout, ingr:vIngr, brand:vBrand, nut:vNut, hello:vHello, mix:vMix, together:vTogether, kinds:vKinds, bag:vBag, rxout:vRxOut, senior:vSenior, askdoc:vAskDoc, vitals:vVitals, visits:vVisits, demo:vDemo, consent:vDoor, login:vDoor, doc:vDoor };
 let html;
 try { html = (R[seg[0]] || vHome)(seg[1], q); }
 catch (err) {
@@ -2258,7 +2273,7 @@ const ds = [...v.querySelectorAll('details')]; dKeys(ds).forEach((k, i) => { con
 if (sel) { const e = document.getElementById(sel[0]); if (e && v.contains(e)) { if (document.activeElement !== e) try { e.focus({ preventScroll: true }); } catch (x) {}
 if (sel[1] != null) try { e.setSelectionRange(sel[1], sel[2]); } catch (x) {} } }
 }
-const CORE_SAFE = new Set(['home', 'hello', '']);
+const CORE_SAFE = new Set(['home', 'hello', '', 'consent', 'login', 'doc']);
 const HIST = [], SCROLL = {};
 window.addEventListener('scroll', () => { SCROLL[LASTPATH] = window.scrollY; }, { passive:true });
 window.addEventListener('hashchange', route);
@@ -5257,7 +5272,8 @@ if (ME.age === 'senior' && ME.easy === undefined) { ME.easy = true; saveMe(); tr
 <div class="hello-fs"><b>큰 글씨·오늘 약 먼저<span class="small muted" style="display:block;font-weight:500">어르신 모드</span></b><button class="sw ${ME.easy ? 'on' : ''}" role="switch" aria-checked="${!!ME.easy}" aria-label="어르신 모드" onclick="setEasy(!ME.easy)"></button></div>
 <p class="hello-close">오늘 어디가 불편하신지부터 함께 볼게요.</p>
 <div class="actions"><button class="btn" onclick="helloFinish()">${I.check} 시작하기</button></div>
-<p class="small muted" style="text-align:center;margin-top:10px">지금 고른 것은 언제든 <b>내 정보</b>에서 바꿀 수 있어요.</p>`;
+<p class="small muted" style="text-align:center;margin-top:10px">지금 고른 것은 언제든 <b>내 정보</b>에서 바꿀 수 있어요.</p>
+${ext('처음계정')}`;
 }
 
 const RISK_LBL = { gi:'위장', kd:'신장', lv:'간', sd:'졸음' };
@@ -6887,16 +6903,13 @@ ${lrow(I.book, '근거·검수 기준', `참고 문헌 ${Object.keys(D.sources |
 <div class="actions"><button class="btn ghost" onclick="wipeMe()">${I.x} 모두 지우기</button></div>
 </details>
 </section>
-${D.meta?.account === true ? `<section class="sec card" id="acct"><h2>계정 <small>폰을 바꿔도 이어 보기 · 선택</small></h2>
-<p class="small muted" style="margin:4px 0 12px">계정 없이도 약지도는 그대로 쓰실 수 있어요. 로그인하시면 기록을 메디나눔 서버(서울)에 복사해 두어 다른 폰에서 이어 받아요.</p>
-${window.계정화면HTML ? 계정화면HTML() : '<p class="loading">계정 칸을 불러오는 중…</p>'}
-${srvAgreed() ? `<button type="button" class="srvlink" onclick="서버동의끄기()">「서버에 저장하기」 동의 거두기</button>` : ''}
-</section>` : ''}
+${ext('계정칸')}
+${ext('약관칸')}
 <section class="sec card"><h2>이 앱에 대해</h2><p class="small" style="margin-top:6px">${esc(D.meta?.about || '')}</p><p class="small muted" style="margin-top:10px">${savedWhere()}</p><div class="lk48"><a class="link" href="${esc(방침주소())}"${NATIVE ? ' target="_blank" rel="noopener"' : ''}>개인정보처리방침</a>${D.meta?.contact?.email ? `<a class="link" href="mailto:${esc(D.meta.contact.email)}">문의 · ${esc(D.meta.contact.email)}</a>${D.meta.contact.operator ? `<span class="small muted">운영 ${esc(D.meta.contact.operator)}</span>` : ''}` : ''}</div></section>
 <p class="small muted" style="margin-top:16px;text-align:center">약지도 v${esc(D.meta?.version || '')} · 빌드 ${BUILD}<br>${(() => { const P = D.public || {}, ds = ['easy_source', 'pills_source', 'permits_source'].map(k => `<span style="white-space:nowrap">${esc(String(P[k] || '').match(/\d{4}-\d\d-\d\d|\d{8}/)?.[0] || '확인일 기록 필요')}</span>`);
 return `식약처 제품 이름 자료 받은 날 — ${new Set(ds).size === 1 ? ds[0] + '(e약은요·낱알식별·허가 정보)' : `e약은요 ${ds[0]} · 낱알식별 ${ds[1]} · 허가 정보 ${ds[2]}`}<br>약 설명 ${esc(D.meta?.reviewLabel || '의료진 검수')} ${esc(D.meta?.reviewed || '확인일 기록 필요')}`; })()}</p>`;
 return `${topBar()}
-<h1>내 정보</h1>
+<h1>내 정보</h1>${ext('계정줄')}
 <nav class="tabs metabs" role="tablist" aria-label="내 정보 칸">${TABS.map(([k, n, ic, c]) => `<button class="tab ${tab === k ? 'on' : ''}" role="tab" aria-selected="${tab === k}" data-k="${k}" onclick="go('/me?t=${k}')">${ic}${n}<span class="n">${c}</span></button>`).join('')}</nav>
 ${body}`;
 }
@@ -6955,24 +6968,22 @@ setTimeout(() => { try { const c = navigator.connection; if (c && (c.saveData ||
 
 const AGREE_KEY = 'yakjido.agree.v1';
 function srvAgreed(){ try { return (JSON.parse(localStorage.getItem(AGREE_KEY) || '{}') || {}).server === true; } catch (e) { return false; } }
-window.계정항목 = { ko: '드시는 약·복용 시간과 기록·몸 상태(임신·지병 등)·약 알레르기·불편했던 일·혈압 수첩·진료 예약·아이 정보(부르는 말·생년월일·몸무게)', 뒤: ' 목적은 폰을 바꿔도 이어 보기, 보관은 계정을 지우시거나 동의를 거두실 때까지(거두시면 바로 지워요). 건강에 관한 민감정보라 따로 동의를 받고, 동의하지 않으셔도 약지도는 이 폰에서 그대로 쓰실 수 있어요. 보기 설정과 날씨는 올라가지 않아요.' };
-window.서버동의켜기 = async function(){
-if (!(await appConfirm('「서버에 저장하기」에 동의하시겠어요?\n\n올라가는 것: ' + 계정항목.ko + '\n어디에: 메디나눔 서버(Supabase, 서울)\n왜: 폰을 바꿔도 이어 보려고\n언제까지: 계정을 지우실 때까지 — 동의를 거두시면 서버 기록을 바로 지워요\n\n건강에 관한 민감정보예요. 동의하지 않으셔도 되고, 동의하지 않아도 약지도는 이 폰에서 그대로 쓰실 수 있어요.', { ok:'동의해요', cancel:'동의하지 않아요' }))) return;
-try { localStorage.setItem(AGREE_KEY, JSON.stringify({ server:true, at:new Date().toISOString() })); } catch (e) {}
-route();
-};
-window.서버동의끄기 = async function(){
-const off = (msg) => { try { localStorage.setItem(AGREE_KEY, JSON.stringify({ server:false, at:new Date().toISOString() })); } catch (e) {} toast(msg); route(); };
-if (!srvHasAccount()) return off('서버에 저장하기 동의를 거두었어요. 이 폰의 기록은 그대로 있어요.');
-if (!(await appConfirm('동의를 거두면 메디나눔 서버에 있는 약지도 기록을 지우고 로그아웃해요. 이 폰의 기록은 그대로 있어요.\n(다른 메디나눔 앱 기록이 없으면 계정도 함께 지워져요.)', { ok:'동의 거두기', cancel:'그만둘게요', danger:true }))) return;
-서버.서버만지움().then(r => { if (r && r.skipped) { toast('로그인이 풀려 있어 서버 기록을 지우지 못했어요 — 다시 로그인한 뒤 거두어 주세요'); return; } off('동의를 거두고 서버의 약지도 기록을 지웠어요. 이 폰의 기록은 그대로 있어요.'); })
-.catch(() => toast('서버에 닿지 못해 아직 거두지 못했어요. 인터넷이 연결되면 다시 눌러 주세요.'));
-};
 function srvReload(){ try { ME = loadMe(localStorage.getItem(ME_KEY)); snapMe(); } catch (e) {} try { armNotifications(); } catch (e) {} try { route(); } catch (e) {} }
 function srvHasAccount(){ try { return srvLoggedIn() || !!(window.서버 && 서버.상태 && (서버.상태() || {}).email); } catch (e) { return false; } }
 function srvLoggedIn(){ try { return !!(window.서버 && 서버.세션 && 서버.세션()); } catch (e) { return false; } }
 window.방침주소 = function(){ return NATIVE ? (D.meta?.share?.app || 'https://usualhealth383-cloud.github.io/autoblog/yakjido/') + 'privacy.html' : 'privacy.html'; };
 function savedWhere(){ return srvLoggedIn() && srvAgreed() ? '이 휴대폰과 내 메디나눔 계정(서울 서버)에 저장돼요.' : '이 휴대폰에만 저장돼요.'; }
+
+const CONSENT_VER = '2026-10-20', CONSENT_KEY = 'yakjido.consent.v1', CONSENT_NEXT = 'yakjido.consent.next';
+function consentRec(){ try { return JSON.parse(localStorage.getItem(CONSENT_KEY) || 'null'); } catch (e) { return null; } }
+function consentOk(){ if (window.__동의됨 === CONSENT_VER) return true; try { localStorage.length; } catch (e) { return true; }
+const c = consentRec(); return !!(c && c.terms && c.privacy && String(c.v || '') >= CONSENT_VER); }
+function consentGate(s, h){ const ok = consentOk();
+if (ok ? s !== 'consent' : s === 'consent' || s === 'doc') return false;
+if (!ok) try { sessionStorage.setItem(CONSENT_NEXT, h); } catch (e) {}
+try { location.replace(location.href.split('#')[0] + (ok ? '#/home' : '#/consent')); } catch (e) {} return true; }
+const vDoor = (a, q) => { const f = window['문_' + (location.hash.match(/^#\/?([a-z]+)/) || [])[1]]; return f ? f(a, q) : '<p class="loading">잠시만요…</p>'; };
+const ext = n => window[n] ? window[n]() : '';
 
 try { if (!helloDone() && !location.hash) { location.hash = '#/hello/1'; } } catch (e) {}
 try { rollDay(); } catch (e) {}

@@ -818,7 +818,7 @@ def r2_checks(br, url, fails):
 def r2a2_checks(br, url, fails):
     err = []
     pg = br.new_page(viewport={'width': 390, 'height': 844}); pg.on('pageerror', lambda e: err.append(str(e)))
-    pg.add_init_script("localStorage.setItem('yakjido.hello.v1','1')")
+    pg.add_init_script("localStorage.setItem('yakjido.hello.v1','1'); localStorage.setItem('yakjido.consent.v1', JSON.stringify({terms:true, privacy:true, v:'9999'}))")
     pg.goto(url + '#/home'); pg.wait_for_function("()=>typeof CORE!=='undefined' && CORE===2", timeout=20000)
     pg.evaluate("async()=>{ await pubIndex(); await pubPills(); await rxNames(); await lexLoad(true); }")
     r = pg.evaluate("()=>mqHits('와파린').map(h=>h.qk ? 'qk:'+h.qk.x.id : h.rxn ? 'rx:'+h.rxn[0] : h.t)")
