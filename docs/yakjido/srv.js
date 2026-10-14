@@ -559,6 +559,8 @@ try {
    본보기: ClinicScore renderConsent(로고·이름·한 줄 → 세 줄 카드 → 모두 동의 → 필수 줄 → 큰 단추 → 발문).
    ⚖️ 들어올 때 받는 동의는 필수 둘(이용약관·개인정보 처리방침)뿐 — 계약 이행에 필요한 처리는 동의가 필요 없고(개인정보 보호법 15조 1항 4호, 2023 개정),
       건강 민감정보는 «모으는 그 순간» 따로 받는다(23조) → 「서버에 저장하기」·만 14세 확인은 계정을 만들 때(로그인 문). 선택 항목·광고 동의는 없다. */
+/* 다른 폰의 기록을 받아 오면 다시 그린다(서버.설치의 다시그리기) — 10-14 app-shell 에서 옮김(첫 화면 예산). 함수 선언이라 위 설치 줄보다 먼저 있다 */
+function srvReload(){ try { ME = loadMe(localStorage.getItem(ME_KEY)); snapMe(); } catch (e) {} try { armNotifications(); } catch (e) {} try { route(); } catch (e) {} }
 /* ── 「서버에 저장하기」 동의 켜기·거두기(설정의 계정 칸) — 10-14 app-shell 에서 옮김(첫 화면 예산). 내용은 그대로 ── */
 /* Z4 #22 — 올라가는 것에 아이 정보(부르는 말·생년월일·몸무게)·약 알레르기가 빠져 있었다. 처리방침 1절 표와 같게 */
 window.계정항목 = { ko: '드시는 약·복용 시간과 기록·몸 상태(임신·지병 등)·약 알레르기·불편했던 일·혈압 수첩·진료 예약·아이 정보(부르는 말·생년월일·몸무게)', 뒤: ' 목적은 폰을 바꿔도 이어 보기, 보관은 계정을 지우시거나 동의를 거두실 때까지(거두시면 바로 지워요). 건강에 관한 민감정보라 따로 동의를 받고, 동의하지 않으셔도 약지도는 이 폰에서 그대로 쓰실 수 있어요. 보기 설정과 날씨는 올라가지 않아요.' };
@@ -603,7 +605,7 @@ window.문_consent = () => {
   return `<div class="door cs">
   <img class="door-mark" src="${esc(BRANDMARK)}" alt="" width="64" height="64">
   <h1>약지도</h1>
-  <p class="door-s">증상에 맞는 약 성분, 의사가 정리했어요</p>
+  <p class="door-s">어디가 불편한지 고르면, 집에서 할 일 · 약국에서 찾을 약 · 진료가 필요한 신호를 차례로 알려 드려요</p>
   ${다시 ? `<p class="cs-new">${I.info}<span>약지도에 이용약관과 개인정보 처리방침이 새로 생겼어요. 한 번만 확인해 주세요.</span></p>` : ''}
   <ul class="cs-list">
     <li>${I.pill}<span>증상에 맞는 약국 약과 먹는 법을 <b>식약처 허가 설명서</b> 기준으로 알려 드려요.</span></li>
@@ -640,13 +642,14 @@ window.계정칸 = () => D.meta?.account !== true ? '' : `<section class="sec ca
     ${계정화면HTML()}
     ${srvAgreed() ? `<button type="button" class="srvlink" onclick="서버동의끄기()">「서버에 저장하기」 동의 거두기</button>` : ''}
   </section>`;
-window.계정줄 = () => D.meta?.account !== true ? '' : `<div class="rows-l acct-row">${srvLoggedIn() ? lrow(I.user, '메디나눔 계정', esc((서버.세션()?.user?.email || '') + ' · 이어 보기 켜짐'), "go('/login')") : lrow(I.user, '계정 만들기 · 로그인 <small class="muted">선택</small>', '폰을 바꿔도 이어 봐요', "go('/login')")}</div>`;
-window.처음계정 = () => D.meta?.account !== true || srvLoggedIn() ? '' : `<div class="hello-acct"><b>계정 만들기 · 로그인 <span class="muted">선택</span></b><span>폰을 바꿔도 이어 봐요</span>
+window.계정줄 = () => D.meta?.account !== true ? '' : `<div class="rows-l acct-row">${srvLoggedIn() ? lrow(I.user, '메디나눔 계정', esc((서버.세션()?.user?.email || '') + ' · 이어 보기 켜짐'), "go('/login')") : lrow(I.user, '계정 만들기 · 로그인 <em class="door-tag">선택</em>', '폰을 바꿔도 이어 봐요', "go('/login')")}</div>`;
+window.처음계정 = () => D.meta?.account !== true || srvLoggedIn() ? '' : `<div class="hello-acct"><b>계정 만들기 · 로그인 <em class="door-tag">선택</em></b><span>폰을 바꿔도 이어 봐요</span>
   <div class="actions two"><button class="btn line" onclick="helloFinish();go('/login')">${I.user} 로그인</button><button class="btn ghost" onclick="helloFinish()">나중에</button></div></div>`;
 /* 넓은 화면 왼쪽 메뉴의 앱 표시(아티팩트는 BRANDMARK 가 다르다) · 계정이 꺼져 있으면 메뉴의 계정 칸을 뺀다 */
 try { const nv = document.querySelector('nav.tabbar');
-  if (nv && !nv.querySelector('.nav-mark')) nv.insertAdjacentHTML('afterbegin', `<a class="nav-mark pc" href="#/home"><img src="${esc(BRANDMARK)}" alt="" width="36" height="36"><span><b>약지도</b><small>증상에 맞는 약 성분, 의사가 정리했어요</small></span></a>`);
-  if (D.meta?.account !== true) nv.querySelector('.nav-acct')?.remove(); } catch (e) {}
+  if (nv && !nv.querySelector('.nav-mark')) nv.insertAdjacentHTML('afterbegin', `<a class="nav-mark pc" href="#/home"><img src="${esc(BRANDMARK)}" alt="" width="36" height="36"><span><b>약지도</b><small>집에서 할 일 · 약국 약 · 진료 신호를 차례로</small></span></a>`);
+  if (nv && D.meta?.account === true && !nv.querySelector('.nav-acct')) nv.insertAdjacentHTML('beforeend', `<button data-tab="login" class="pc nav-acct" aria-label="계정 · 로그인" onclick="go('/login')"><svg class="i" viewBox="0 0 24 24"><path d="M14 4h4a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-4M10 16l4-4-4-4M14 12H4"/></svg>계정 · 로그인</button>`);
+  if (/^#\/login/.test(location.hash)) nv.querySelector('.nav-acct')?.classList.add('on'); } catch (e) {}
 
 /* 로그인 문 — 따로 한 장(현욱님 「회원가입/로그인 화면」). 로그인은 언제나 고르는 것(애플 심사 5.1.1(v) · 메디나눔 약관 7조): 「로그인 없이 계속 쓰기」가 늘 있다 */
 window.문나가기 = () => { const p = HIST.length >= 2 ? HIST[HIST.length - 2] : ''; if (p && !/^(login|consent|hello|doc)/.test(p)) goBack(); else go('/home'); };
@@ -673,7 +676,7 @@ function 문서풀기(t){
   const d = new DOMParser().parseFromString(t, 'text/html'), m = d.querySelector('main') || d.body;
   m.querySelectorAll('script,style,link,.mark').forEach(e => e.remove());
   m.querySelectorAll('*').forEach(e => { for (const a of [...e.attributes]) if (/^on/i.test(a.name)) e.removeAttribute(a.name); if (e.id) e.id = 'doc-' + e.id; });
-  m.querySelectorAll('a[href]').forEach(a => { const h = a.getAttribute('href') || '';
+  m.querySelectorAll('a[href]').forEach(a => { const h = a.getAttribute('href') || ''; a.classList.add('link');   /* 문장 속 링크(누름 크기 예외 — WCAG 2.5.8) */
     if (h.startsWith('#')) { a.setAttribute('href', '#'); a.setAttribute('onclick', `document.getElementById(${JSON.stringify('doc-' + h.slice(1))})?.scrollIntoView();return false`); }
     else if (/^privacy(-yakjido)?\.html/.test(h)) a.setAttribute('href', '#/doc/privacy');
     else if (/^terms(-yakjido)?\.html/.test(h)) a.setAttribute('href', '#/doc/terms');
@@ -744,7 +747,8 @@ try { const css = document.createElement('style'); css.textContent = `
 .srvbox .door-pw input{padding-right:84px}
 .door-eye{position:absolute;right:3px;top:50%;transform:translateY(-50%);min-height:44px;min-width:64px;padding:0 10px;border-radius:9px;font-size:.875rem;font-weight:700;color:var(--primary-deep)}
 .door-ck{display:flex;gap:12px;align-items:flex-start;padding:12px 2px 2px;cursor:pointer}
-.srvbox .door-ck input{flex:none;width:22px;height:22px;min-height:0;margin:2px 0 0;padding:0;accent-color:var(--primary)}
+.srvbox .door-ck input{-webkit-appearance:none;appearance:none;flex:none;width:24px;height:24px;min-height:0;margin:1px 0 0;padding:0;border:2px solid var(--ui-line);border-radius:7px;background:var(--card);cursor:pointer}
+.srvbox .door-ck input:checked{border-color:var(--primary);background:var(--primary) url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='3.2' stroke-linecap='round' stroke-linejoin='round'><path d='M5 12.5l4.5 4.5L19 7.5'/></svg>") center/16px no-repeat}
 .door-ck b{display:block;font-size:.9375rem;line-height:1.45}
 .door-ck small{display:block;margin-top:3px;font-size:.8125rem;line-height:1.55;color:var(--muted)}
 .door-more{padding-left:36px}
@@ -784,15 +788,15 @@ try { const css = document.createElement('style'); css.textContent = `
 .docv table{width:100%;border-collapse:collapse;font-size:.8125rem;margin-top:6px}
 .docv th,.docv td{text-align:left;vertical-align:top;padding:8px 6px;border-bottom:1px solid var(--hairline);overflow-wrap:anywhere;color:var(--body)}
 .docv th{color:var(--muted);font-weight:700}
-.docv a{color:var(--primary-deep);font-weight:600}
+.docv a{color:var(--primary-deep);font-weight:600;display:inline;padding:0;text-decoration:underline;text-underline-offset:3px;overflow-wrap:anywhere}
 .docv b{color:var(--text)}
 .docv footer{border-top:1px solid var(--hairline);padding-top:14px}
 .docv footer p{font-size:.8125rem;margin:0 0 4px;color:var(--muted)}
-.docv-web{margin-top:16px}
+.docv-web{margin-top:16px}.docv-web a{display:inline;overflow-wrap:anywhere}
 @media (hover:hover){.cs-row:hover{background:var(--tint2)}.cs-all:hover{background:var(--tint)}.door-skip:hover,.door-seg button:not(.on):hover{color:var(--text)}.door-go:not(:disabled):hover{filter:brightness(1.06)}}
 @media (min-width:600px){
-  body.door .app{max-width:none;background:var(--ground)}
-  body.door main{padding-top:40px}
+  body.is-door .app{max-width:none;background:var(--ground)}
+  body.is-door main{padding-top:40px}
   .door{padding:28px 40px 32px;border-radius:24px;background:var(--surface);border:1px solid var(--hairline);box-shadow:0 12px 40px rgba(0,0,0,.08)}
 }`; document.head.appendChild(css); } catch (e) {}
 
