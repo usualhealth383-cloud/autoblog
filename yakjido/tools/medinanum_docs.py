@@ -4,7 +4,7 @@
   정본은 yakjido/privacy.html · yakjido/delete-account.html (앱·깃허브 페이지가 쓰는 쪽).
   메디나눔 공용 문서 폴더(yozm-health 저장소 med/_공개/)는 다섯 앱이 같은 모양(공통.css)이라, 내용은 그대로 두고 껍데기만 바꾼다.
     python3 yakjido/tools/medinanum_docs.py <med/_공개 폴더>
-  → privacy-yakjido.html · delete-account-yakjido.html · img/yakjido.png
+  → privacy-yakjido.html · terms-yakjido.html · delete-account-yakjido.html · img/yakjido.png
 """
 import re, sys, pathlib, io
 from PIL import Image
@@ -89,8 +89,20 @@ dele = f'''<!doctype html>
 </body>
 </html>
 '''
+# ── 이용약관(2026-10-14) → 같은 공통.css 틀. 메디나눔 공통 약관(terms.html)은 네 앱만 다루어 약지도 것은 terms-yakjido.html 로 따로 ──
+t = main_of('terms.html')
+t = re.sub(r'\s*<div class="mark">.*?</div>\s*<h1>.*?</h1>\s*<p class="meta">.*?</p>', '', t, flags=re.S)
+t_eff = re.search(r'시행일 (\d{4}년 \d+월 \d+일)', (ROOT / 'terms.html').read_text(encoding='utf-8')).group(1)
+t = t.replace('<div class="lead" id="top">', '<div class="요약">')
+t = re.sub(r'<section( id="history")?>', lambda x: '<div id="history"></div>' if x.group(1) else '', t).replace('</section>', '')
+t = t.replace('<div class="wrap"><table>', '<div class="표감"><table>')
+t = re.sub(r'<footer>.*?</footer>', '', t, flags=re.S)
+t = t.replace('href="delete-account.html"', 'href="delete-account-yakjido.html"').replace('href="privacy.html"', 'href="privacy-yakjido.html"')
+terms = priv.replace('<title>약지도 개인정보 처리방침</title>', '<title>약지도 이용약관</title>').replace('<h1>약지도 개인정보 처리방침</h1>', '<h1>약지도 이용약관</h1>')
+terms = terms.replace(m.strip(), t.strip()).replace(f'시행일 {eff}', f'시행일 {t_eff}')
+(OUT / 'terms-yakjido.html').write_text(terms, encoding='utf-8')
 (OUT / 'privacy-yakjido.html').write_text(priv, encoding='utf-8')
 (OUT / 'delete-account-yakjido.html').write_text(dele, encoding='utf-8')
 im = Image.open(ROOT / 'icons' / 'icon-512.png' if (ROOT / 'icons' / 'icon-512.png').exists() else ROOT.parent / 'docs' / 'yakjido' / 'icon-512.png').convert('RGBA').resize((128, 128), Image.LANCZOS)
 (OUT / 'img').mkdir(exist_ok=True); im.save(OUT / 'img' / 'yakjido.png', optimize=True)
-print('지음', OUT / 'privacy-yakjido.html', OUT / 'delete-account-yakjido.html', OUT / 'img' / 'yakjido.png')
+print('지음', OUT / 'privacy-yakjido.html', OUT / 'terms-yakjido.html', OUT / 'delete-account-yakjido.html', OUT / 'img' / 'yakjido.png')
