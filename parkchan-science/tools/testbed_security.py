@@ -975,6 +975,7 @@ cur.execute("insert into attendance(code, date) values ('OLD001', current_date -
 cur.execute("insert into weekly_notes(code, wk, body) values ('OLD002', current_date - 310, '작년 한 마디') on conflict do nothing")
 cur.execute("insert into purchases(purchase_token, product, days, until, at) values ('tok-old-5y', 'pass_m1', 30, current_date - 1800, now() - interval '61 months'), ('tok-new-4y', 'pass_m1', 30, current_date - 1400, now() - interval '47 months') on conflict do nothing")
 cur.execute("insert into passes(code, days, issued, used_at) values ('OLDPS1', 30, current_date - 1900, current_date - 1830), ('NEWPS1', 30, current_date - 1900, null) on conflict do nothing")
+cur.execute("delete from auth.audit_log_entries where ip_address like '198.51.100.%%'")   # 시험대 /__reset 이 이 표를 비우지 않아, 두 번째 실행에서 지난번 줄이 남던 것(2026-10-14)
 cur.execute("insert into auth.audit_log_entries(created_at, ip_address, payload) values (now() - interval '4 months', '198.51.100.1', '{}'), (now() - interval '20 days', '198.51.100.2', '{}')")
 cur.execute('select private.purge_old()'); cur.connection.commit()
 cur.execute("select code from students where code like 'OLD00%%' order by code"); left_ = [r[0] for r in cur.fetchall()]
