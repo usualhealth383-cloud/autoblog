@@ -733,6 +733,114 @@ def simple_checks(br, url, fails):
     if zerr: fails.append(f'간단히 보기 JS 오류: {zerr[:2]}')
     pz.close()
 
+# 외부 검수 2차(2026-10-14, ChatGPT) P0 세 가지가 다시 생기지 않게 — 그리고 같이 고친 P1 몇 가지.
+#   #1 고른 제품(?p=)의 용법: 타이레놀 8시간 이알서방정은 간단히·자세히 모두 2정·8시간·하루 6정(500 mg 「하루 8정」이 아니라), 자세히로 가도 p 유지
+#   #2 근이완 복합제(신신플렉스) 설명서 「다른 해열진통제와 동시에 먹지 말 것」: 내 약통에 소염진통제가 있으면 「약사와 먼저 상의」로, 함께 권할 땐 카드 바로 아래 설명서 문장
+#   #3 응급 신호를 체크한 증상의 약국 카드(#/show)·보내기(#/send)는 약 목록 없이 119 — 새로 고침·뒤로 가기에도
+def r2_checks(br, url, fails):
+    import re
+    zerr = []
+    pz = br.new_page(viewport={'width': 390, 'height': 844}); pz.on('pageerror', lambda e: zerr.append(str(e)))
+    pz.add_init_script("localStorage.setItem('yakjido.hello.v1','1')")
+    pz.goto(url + '#/home'); pz.wait_for_function("()=>typeof CORE!=='undefined' && CORE===2 && DETAIL===2", timeout=20000)
+    def go(h):
+        pz.evaluate("h=>{ location.hash=h; route(); }", h); pz.wait_for_timeout(120)
+    def me(js):
+        pz.evaluate("()=>{ for (const k of Object.keys(FLAG_LABEL)) if (k!=='senior'&&k!=='child') ME[k]=false; ME.age='senior'; ME.easy=false; ME.taking=[]; ME.pub={}; ME.allergy=[]; ME.allergyUnknown=false; RF.sid=''; " + js + "; saveMe(); }")
+    txt = lambda sel='#view': pz.inner_text(sel) if pz.query_selector(sel) else ''
+    ER = '타이레놀 8시간 이알서방정'
+    # #1 — 간단히·자세히 모두 서방정 용법
+    me("ME.view='simple'"); go('/drug/acetaminophen?p=' + ER)
+    t = txt('.dose-hero')
+    if not ('2정' in t and '8시간' in t and '6정' in t) or '8정' in t: fails.append(f'#1 간단히 서방정 화면이 서방정 용법(2정·8시간·하루 6정)이 아닙니다: {t[:80]!r}')
+    if ER not in txt('.phead'): fails.append('#1 간단히 서방정 화면 머리에 고른 제품 이름이 없습니다')
+    pz.click('.sv-more'); pz.wait_for_timeout(300)
+    if 'p=' not in pz.evaluate('location.hash'): fails.append('#1 「자세히 보기」로 가면 고른 제품(p)이 빠집니다')
+    t = txt('.dose-hero')
+    if '3,900 mg' not in t or '8시간' not in t or '4,000 mg' in t: fails.append(f'#1 자세히 서방정 화면의 하루 최대·간격이 서방정 것이 아닙니다: {t[:100]!r}')
+    me("ME.view='simple'"); go('/drug/acetaminophen')
+    if '8정' not in txt('.dose-hero'): fails.append('#1 제품을 고르지 않은 아세트아미노펜 화면의 일반정 용법이 사라졌습니다')
+    # #2 — 내 약통에 타이레놀·이부프로펜 → 신신플렉스는 「약사와 먼저 상의」(간단히·자세히·약국 카드), 설명서 문장
+    LBL = '다른 해열진통제·감기약과 동시에 먹지 말라고'
+    for v in ('simple', 'detail'):
+        me(f"ME.view='{v}'; ME.taking=['acetaminophen','ibuprofen']"); go('/symptom/msk')
+        main = pz.evaluate("()=>[...document.querySelectorAll('.answer .buy > .buy-item, .answer .buy > .either .buy-item')].map(e=>e.innerText).join(' | ')")
+        cons = txt('.answer .consult-grp')
+        if '신신플렉스' in main or '클로르족사존' in main: fails.append(f'#2 {v}: 소염진통제를 드시는데 근이완 복합제가 「사세요」 줄에 있습니다')
+        if not ('신신플렉스' in cons or '클로르족사존' in cons) or LBL not in cons: fails.append(f'#2 {v}: 근이완 복합제가 「약사와 먼저 상의」 묶음에 설명서 문장과 함께 있지 않습니다: {cons[:80]!r}')
+    go('/show/msk')
+    if LBL not in txt('.show-list'): fails.append('#2 약국 카드에 근이완 복합제 설명서 문장이 없습니다')
+    for v in ('simple', 'detail'):
+        me(f"ME.view='{v}'"); go('/symptom/msk')
+        if LBL not in txt('.answer .buy'): fails.append(f'#2 {v}: 타이레놀·소염제와 함께 권하는 근이완 복합제 카드 아래 설명서 문장이 없습니다')
+    go('/send?s=msk')
+    if LBL not in txt(): fails.append('#2 부모님께 보내기 목록에 근이완 복합제 설명서 문장이 없습니다')
+    if LBL not in pz.evaluate("()=>sendText(sendItems(SEND_Q),'','',null,sendDropped(SEND_Q))"): fails.append('#2 보내는 글에 근이완 복합제 설명서 문장이 없습니다')
+    # #3 — 벼락 두통 체크 → 약국 카드·보내기는 119만(주소 바로 열기·새로 고침·뒤로 가기)
+    me("ME.view='detail'"); go('/symptom/headache'); pz.click('.rf-list .rf-i input'); pz.wait_for_timeout(150)
+    for h in ('/show/headache', '/send?s=headache'):
+        go(h); t = txt()
+        if '지금은 약국에 갈 때가 아니에요' not in t or pz.query_selector('.show-list') or pz.query_selector('button:has-text("보내기")'): fails.append(f'#3 응급 신호 체크 뒤 {h} 에 약 목록이나 보내기가 나옵니다')
+    pz.evaluate("()=>{ location.hash='#/show/headache'; }"); pz.reload(); pz.wait_for_function("()=>CORE===2", timeout=15000); pz.wait_for_timeout(300)
+    if '지금은 약국에 갈 때가 아니에요' not in txt(): fails.append('#3 새로 고침하면 응급 신호 체크가 사라져 약 목록이 나옵니다')
+    go('/home'); pz.go_back(); pz.wait_for_timeout(300)
+    if '지금은 약국에 갈 때가 아니에요' not in txt(): fails.append('#3 뒤로 가기로 돌아오면 약 목록이 나옵니다')
+    me("ME.view='detail'"); go('/symptom/headache'); pz.evaluate("()=>{ document.querySelector('.rf-cl').open=true; }"); pz.click('.rf-cl .rf-i input'); pz.wait_for_timeout(150)
+    go('/show/headache')
+    if '약보다 진료가 먼저예요' not in txt() or pz.evaluate("()=>!document.querySelector('details .show-card')"): fails.append('#3 진료 신호 체크 뒤 약국 카드가 «진료 먼저» 없이 바로 나옵니다')
+    me(""); go('/show/headache')
+    if not pz.query_selector('.show-list'): fails.append('#3 체크를 지운 뒤에도 약국 카드가 나오지 않습니다')
+    # #4·#5·#6 아이 계산 — 보호자 나이 그대로, 미래 생일·120 kg 넘으면 결과 없음, 약병 표와 계산이 다르면 «다르다»
+    me("ME.age='adult'; ME.child=null"); go('/kids')
+    by = pz.evaluate("()=>new Date().getFullYear()-13")
+    pz.fill('#k-birth', f'{by}-01-01'); pz.fill('#k-w', '72'); pz.click('button:has-text("계산하기")'); pz.wait_for_timeout(200)
+    if pz.evaluate('ME.age') != 'adult': fails.append('#4 아이 계산이 보호자 나이를 바꿉니다')
+    t = txt()
+    if '위 범위 안이라' in t or '약병 표시와 몸무게 계산값이 달라요' not in t: fails.append('#6 13세 72 kg: 약병 20 mL 가 계산 범위 밖인데 «범위 안»이라고 합니다')
+    if '성인 상한을 적용해' not in t: fails.append('#32 성인 상한에 걸린 하루 최대를 몸무게 × mg/kg 등식처럼 씁니다')
+    pz.fill('#k-birth', f'{by + 20}-01-01'); pz.fill('#k-w', '160'); pz.click('button:has-text("계산하기")'); pz.wait_for_timeout(200)
+    if not pz.query_selector('#k-err') or pz.query_selector('.dose-card'): fails.append('#5 미래 생년월일·160 kg 인데 결과가 나오거나 다시 확인 안내가 없습니다')
+    # #17 약국 카드에 드시는 약 전부 · #53 미리보기 완료형 금지 · #9 간단히 약 화면의 누구에게나 주의 · #13 한 번 몇 캡슐
+    me("ME.taking=['acetaminophen','ibuprofen','famotidine','loratadine','naproxen','simethicone','almagate','bisacodyl']"); go('/show/cold')
+    if not pz.evaluate("()=>{ const L = takingItems().map(t=>t.name), h = document.querySelector('.show-head').innerText; return L.length > 6 && L.every(n => h.includes(n)); }"): fails.append(f'#17 약국 카드가 드시는 약을 전부 적지 않습니다: {txt(".show-head")[:120]!r}')
+    me("ME.view='detail'"); go('/send?s=msk'); pz.click('button.chip:has-text("위가 약하거나")'); pz.wait_for_timeout(150)
+    if '보냈어요' in txt(): fails.append('#53 보내기 전 미리보기에 «보냈어요»(완료형)가 나옵니다')
+    me("ME.view='simple'"); go('/drug/ibuprofen')
+    if '에스시탈로프람' not in txt('.sv-no'): fails.append('#9 간단히 약 화면이 조건 없는 주의(우울증약·스테로이드)를 버립니다')
+    go('/symptom/cold')
+    if not re.search(r'한 번[^·]*1캡슐', txt('.answer')): fails.append('#13 간단히 감기 화면 가래약 먹는 법에 한 번 몇 캡슐인지가 없습니다')
+    pz.evaluate("()=>{ ME.view='detail'; RF.sid=''; saveMe(); }")
+    if zerr: fails.append(f'외부 검수 2차 검사 JS 오류: {zerr[:2]}')
+    pz.close()
+
+# 외부 검수 2차(10-14) 앱 화면 몫 — #16 내 약통 검색이 처방약(와파린)을 종류·제품으로 찾고 제품 그대로(성분까지) 담는지,
+#   #26 「(수출용)」이 사는 약 후보에 없는지, #50·#51 글자 크기·나이 고르기의 선택 상태와 설정 링크 높이, #23·#24 서비스워커(정적)
+def r2a2_checks(br, url, fails):
+    err = []
+    pg = br.new_page(viewport={'width': 390, 'height': 844}); pg.on('pageerror', lambda e: err.append(str(e)))
+    pg.add_init_script("localStorage.setItem('yakjido.hello.v1','1')")
+    pg.goto(url + '#/home'); pg.wait_for_function("()=>typeof CORE!=='undefined' && CORE===2", timeout=20000)
+    pg.evaluate("async()=>{ await pubIndex(); await pubPills(); await rxNames(); await lexLoad(true); }")
+    r = pg.evaluate("()=>mqHits('와파린').map(h=>h.qk ? 'qk:'+h.qk.x.id : h.rxn ? 'rx:'+h.rxn[0] : h.t)")
+    if 'qk:blood.warf' not in r or not any(x.startswith('rx:') and '와파린' in x for x in r): fails.append(f'2차 #16: 내 약통 검색에서 와파린(종류·처방약)이 안 나옵니다 — {r[:5]}')
+    a = pg.evaluate("async()=>{ ME.taking=[]; ME.pub={}; const h=mqHits('와파린').find(h=>h.rxn); if (!h) return ''; await mqRx(h.rxn[1]); const x=ME.pub['pub:'+h.rxn[1]]; return x ? x.ingr : ''; }")
+    if '와파린' not in a: fails.append(f'2차 #16: 내 약통에서 고른 와파린 제품이 성분과 함께 담기지 않습니다 — {a!r}')
+    ex = pg.evaluate("()=>[...search('게보린'), ...search('뉴파린'), ...search('헵세스')].map(h=>h.t).concat(mqHits('게보린').map(h=>h.t||h.rxn?.[0]||''), mqHits('뉴파린').map(h=>h.t||h.rxn?.[0]||'')).filter(t=>/수출\\s*용/.test(t))")
+    if ex: fails.append(f'2차 #26: 수출용 품목이 사는 약 후보에 나옵니다 — {ex[:3]}')
+    pg.evaluate("()=>{ location.hash='#/me?t=set'; route(); }"); pg.wait_for_timeout(150)
+    fs = pg.evaluate("()=>[...document.querySelectorAll('.fs-seg[aria-label=\"글자 크기\"] button')].map(b=>b.getAttribute('aria-pressed'))")
+    if len(fs) < 3 or fs.count('true') != 1: fails.append(f'2차 #50: 글자 크기 단추에 선택 상태(aria-pressed)가 없습니다 — {fs}')
+    lk = pg.evaluate("()=>[...document.querySelectorAll('.lk48 a')].map(a=>a.getBoundingClientRect().height)")
+    if not lk or min(lk) < 44: fails.append(f'2차 #51: 개인정보처리방침·문의 누름 높이가 44 px 미만입니다 — {lk}')
+    pg.evaluate("()=>{ ME.age='senior'; location.hash='#/me?t=body'; route(); }"); pg.wait_for_timeout(150)
+    ag = pg.evaluate("()=>[...document.querySelectorAll('[aria-label=\"약을 드실 분의 나이\"] button')].map(b=>b.getAttribute('aria-pressed'))")
+    if ag != ['false', 'true', 'false']: fails.append(f'2차 #50: 나이 고르기의 선택 상태가 틀립니다 — {ag}')
+    if err: fails.append(f'2차 앱 화면 검사: JS 오류 {err[:2]}')
+    pg.close()
+    sw = (DOCS / 'sw.js').read_text(encoding='utf-8')
+    if "k.startsWith('yakjido-')" not in sw: fails.append('2차 #23: 서비스워커가 약지도 것이 아닌 캐시까지 지울 수 있습니다(yakjido- 접두사 조건 없음)')
+    if 'self.registration.scope' not in sw: fails.append('2차 #24: 알림을 누르면 약지도 창인지 보지 않고 첫 창을 씁니다')
+
 def main():
     ap = argparse.ArgumentParser(); ap.add_argument('--url'); a = ap.parse_args()
     # 0. 자료 고리(브라우저 없이 1초) — 끊긴 출처·약 id·팁 링크가 있으면 여기서 멈춘다
@@ -1309,6 +1417,8 @@ def main():
         z9_checks(br, url, fails)
         z10_checks(br, url, fails)
         simple_checks(br, url, fails)
+        r2_checks(br, url, fails)
+        r2a2_checks(br, url, fails)
         # 6b-2. 성분표에 없던 공공 제품 — 클로닉신(먹는 소염제 26개 제품)·돔페리돈이 약통에서 실제로 걸려야 한다(2026-09-23)
         _pb = {'노리스정 + 와파린': ({'taking':['pub:1','cls:blood.warf'],'pub':{'pub:1':{'name':'노리스정','full':'노리스정(클로닉신리시네이트)','ingr':'클로닉신리시네이트','rx':0,'seq':'1','drugId':''}}}, 'warfarin-nsaid'),
                '노리스정 + 이부프로펜': ({'taking':['pub:1','ibuprofen'],'pub':{'pub:1':{'name':'노리스정','full':'노리스정','ingr':'클로닉신리시네이트','rx':0,'seq':'1','drugId':''}}}, 'nsaid-dup'),

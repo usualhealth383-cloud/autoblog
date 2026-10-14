@@ -24,7 +24,7 @@
   /* 2026-09-23 검수 #8 — 서버에 표(스키마)가 아직 없으면 앱이 서버.설치({ 준비됨:false }) 로 알린다.
      그동안 계정 칸은 「준비 중」 한 줄뿐 — 가입·로그인·문의 칸과 단추를 보이지 않고, 라이브러리도 받지 않는다(되는 척 금지). */
   function 준비됨() { var r = 설정.준비됨; try { if (typeof r === 'function') r = r(); } catch (e) { r = false; } return r !== false; }
-  var 준비중말 = '계정·동기화는 준비 중입니다. 지금은 이 기기에서 그대로 쓰실 수 있습니다.';
+  var 준비중말 = '계정·이어 보기는 준비 중이에요. 지금은 이 휴대폰에서 그대로 쓰실 수 있어요.';
   var 복구모드 = false, 복구중 = false;   /* 2026-09-23 큰문제 #10 — 메일의 복구 링크로 들어와 새 비밀번호를 정하는 중 */
   /* 메일 링크가 돌아올 주소 — 지금 앱 주소. file:// 등 웹 주소가 아니면 넘기지 않는다(Supabase Site URL 로 간다). */
   /* 2026-10-13 상용화 점검 — 설치 앱(https://localhost)·옛 주소(github.io)는 Supabase 돌아올 주소 허용 목록에 없어 메일 링크가 다른 앱 첫 화면으로 갔다.
@@ -41,11 +41,11 @@
     var p = {}; h.split('&').forEach(function (kv) { var i = kv.indexOf('='); if (i > 0) { try { p[kv.slice(0, i)] = decodeURIComponent(kv.slice(i + 1).replace(/\+/g, ' ')); } catch (e) {} } });
     if (p.error || p.error_code) {
       try { sessionStorage.removeItem('yj_recovery'); } catch (e) {}
-      알림('메일의 링크가 만료되었거나 이미 쓰였습니다. 비밀번호를 바꾸려면 「비밀번호 다시 정하기」로 새 링크를 받아 주세요.');
+      알림('메일의 링크가 만료됐거나 이미 쓰였어요. 비밀번호를 바꾸시려면 「비밀번호를 잊으셨나요?」로 새 링크를 받아 주세요.');
       return;
     }
     if (!p.access_token || !p.refresh_token) { try { sessionStorage.removeItem('yj_recovery'); } catch (e) {} return; }
-    if (!서버허용()) { 알림('서버 저장 동의 후 새 비밀번호를 정할 수 있습니다. 내 정보 → 설정 → 계정에서 동의해 주세요.'); return; }
+    if (!서버허용()) { 알림('「서버에 저장하기」에 동의하신 뒤 새 비밀번호를 정할 수 있어요. 로그인 화면이나 내 정보 → 설정 → 계정에서 동의해 주세요.'); return; }
     복구중 = true;
     준비().then(function () { return sb.auth.setSession({ access_token: p.access_token, refresh_token: p.refresh_token }); }).then(function (r) {
       복구중 = false;
@@ -60,7 +60,7 @@
       var m = (e && e.message) || '';
       if (/offline|lib|Failed to fetch|NetworkError/i.test(m)) { 알림(말(e)); return; }   /* 연결되면 다시 — 링크는 들고 있는다 */
       try { sessionStorage.removeItem('yj_recovery'); } catch (e2) {}
-      알림('메일의 링크가 만료되었거나 이미 쓰였습니다. 비밀번호를 바꾸려면 「비밀번호 다시 정하기」로 새 링크를 받아 주세요.');
+      알림('메일의 링크가 만료됐거나 이미 쓰였어요. 비밀번호를 바꾸시려면 「비밀번호를 잊으셨나요?」로 새 링크를 받아 주세요.');
     });
   }
 
@@ -116,7 +116,7 @@
     if (st.user && st.user !== 새) {
       try { 내열쇠().forEach(function (k) { localStorage.removeItem(k); }); } catch (e) {}
       상태쓰기({ user: 새 });
-      try { 알림('다른 계정으로 들어와서, 이 기기에 있던 이전 계정의 기록은 비웠습니다.'); } catch (e) {}
+      try { 알림('다른 계정으로 들어오셔서, 이 휴대폰에 있던 이전 계정의 기록은 비웠어요.'); } catch (e) {}
       if (typeof 설정.다시그리기 === 'function') { try { 설정.다시그리기(); } catch (e) {} }
       return;
     }
@@ -248,17 +248,21 @@
     var 열림 = (o.status === 'trial' || o.status === 'active') && (!o.until || o.until > Date.now());
     return { status: o.status, plan: o.plan, source: o.source, until: o.until, days: 남, 열림: 열림, at: o.at, user: o.user };
   };
-  var 알림 = function (t) { try { if (typeof 잠깐말 === 'function') 잠깐말(t); else if (typeof tell === 'function') tell(t, ''); else if (typeof toast === 'function') toast(t); else console.log(t); } catch (e) { console.log(t); } };
+  /* 2026-10-14 — 로그인 문(#/login)을 보고 있으면 알림을 단추 바로 위 글 칸에(사라지는 토스트 대신) */
+  var 알림 = function (t) { try { if (document.getElementById('doorMsg')) { 문말(t); return; } if (typeof 잠깐말 === 'function') 잠깐말(t); else if (typeof tell === 'function') tell(t, ''); else if (typeof toast === 'function') toast(t); else console.log(t); } catch (e) { console.log(t); } };
   function 말(e) { var m = (e && e.message) || String(e || '');
     if (m === 'off') return 준비중말;
-    if (/offline|lib|Failed to fetch|NetworkError/i.test(m)) return '인터넷이 닿지 않습니다. 연결되면 자동으로 이어집니다.';
-    if (/Invalid login/i.test(m)) return '이메일이나 비밀번호가 맞지 않습니다.';
-    if (/already registered|already exists/i.test(m)) return '이미 가입된 이메일입니다. 로그인해 주세요.';
-    if (/Password should be/i.test(m)) return '비밀번호는 6자 이상이어야 합니다.';
+    if (/offline|lib|Failed to fetch|NetworkError/i.test(m)) return '인터넷이 닿지 않아요. 연결된 뒤 다시 해 주세요.';
+    if (/Invalid login/i.test(m)) return '이메일이나 비밀번호가 맞지 않아요.';
+    if (/already registered|already exists/i.test(m)) return '이미 가입된 이메일이에요. 로그인해 주세요.';
+    if (/Password should be|weak/i.test(m)) return '비밀번호는 6자 이상, 남이 짐작하기 어렵게 정해 주세요.';
     if (/Email not confirmed/i.test(m)) return '메일함의 확인 링크를 먼저 눌러 주세요.';
-    if (/rate limit/i.test(m)) return '잠시 뒤에 다시 해 주세요.';
+    if (/rate limit|too many|security purposes/i.test(m)) return '잠깐 사이에 여러 번 하셔서 잠시 막혔어요. 조금 뒤에 다시 해 주세요.';
     if (/different from the old/i.test(m)) return '이전과 다른 비밀번호를 써 주세요.';
-    return '잠시 문제가 있었습니다. ' + m.slice(0, 60); }
+    if (/invalid.*email|validate email|email.*invalid/i.test(m)) return '이메일 주소를 다시 확인해 주세요.';
+    if (/signups? not allowed|disabled/i.test(m)) return '지금은 새 계정을 만들 수 없어요. 잠시 뒤에 다시 해 주세요.';
+    try { console.warn('계정', m); } catch (e2) {}
+    return '잠시 문제가 생겼어요. 조금 뒤에 다시 해 주세요.'; }
 
   function 이용권줄() {
     if (!window.구독 || !구독.켜짐()) return '';   /* 2026-09-23 구독 틀 — 유료화 스위치가 꺼져 있으면 체험·요금 글을 보이지 않는다(되는 척 금지) */
@@ -266,16 +270,16 @@
     var 날 = sv.until ? new Date(sv.until).toLocaleDateString('ko-KR', { month: 'long', day: 'numeric' }) : '';
     var t = sv.status === 'active' ? '구독 중' + (sv.plan === 'year' ? ' · 연 결제' : sv.plan === 'month' ? ' · 월 결제' : '') + (날 ? ' · ' + 날 + '까지' : '')
       : (sv.status === 'trial' && sv.열림) ? '체험 중 · ' + sv.days + '일 남음' + (날 ? ' (' + 날 + '까지)' : '')
-      : '체험이 끝났습니다 · 결제는 아직 붙기 전이라 요금이 나가지 않습니다';
+      : '체험이 끝났어요 · 결제는 아직 붙기 전이라 요금이 나가지 않아요';
     return '<div class="srvrow"><b>이용권</b><span>' + t + '</span></div>';
   }
-  function 화면갱신() { var el = document.getElementById('srvbox'); if (el) el.outerHTML = window.계정화면HTML(); }
+  function 화면갱신() { var el = document.getElementById('srvbox'); if (el) el.outerHTML = (el.getAttribute('data-door') && window.계정문HTML) ? window.계정문HTML() : window.계정화면HTML(); }   /* 10-14 로그인 문은 그 모양 그대로 */
 
   window.계정화면HTML = function () {
     var st = 상태읽기(), 이메일 = 세션 && 세션.user ? 세션.user.email : '';
     var 시각 = st.last_push || st.last_pull; var 언제 = 시각 ? new Date(시각).toLocaleString('ko-KR', { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : '아직';
     var h = '<div id="srvbox" class="srvbox">';
-    if (!준비됨()) return h + '<div class="srvrow"><b>계정·동기화는 준비 중입니다</b><span>지금은 이 기기에서 그대로 쓰실 수 있습니다.</span></div></div>';   /* 검수 #8 */
+    if (!준비됨()) return h + '<div class="srvrow"><b>계정·이어 보기는 준비 중이에요</b><span>지금은 이 휴대폰에서 그대로 쓰실 수 있어요.</span></div></div>';   /* 검수 #8 */
     if (!서버허용()) {   /* 2026-09-22 — 동의 전·철회 상태: 되는 척 로그인 칸을 보이지 않고, 계정을 만드는 그 자리에서 동의를 받는다 */
       return h + '<p class="srvtiny">계정을 만들거나 로그인하려면 「서버에 저장하기」 동의가 필요해요 — ' + (window.계정항목 ? 계정항목.ko : '') + ' — 이 기록이 계정에 묶여 메디나눔 서버(서울)에 저장돼요.' + (window.계정항목 && 계정항목.뒤 != null ? 계정항목.뒤 : '') + '</p>'
         + '<div class="srvbtns"><button type="button" onclick="if(window.서버동의켜기)서버동의켜기()">동의하고 계속</button></div>'
@@ -283,16 +287,16 @@
     }
     if (!이메일 && 복구대기() && !복구중) setTimeout(복구처리, 0);   /* 동의를 막 켠 뒤라면 여기서 이어 간다 */
     if (이메일 && 복구모드) {   /* 2026-09-23 큰문제 #10 — 메일의 복구 링크로 들어왔다 */
-      h += '<div class="srvrow"><b>새 비밀번호 정하기</b><span>' + 글자안전(이메일) + ' · 메일의 링크로 들어왔습니다</span></div>'
+      h += '<div class="srvrow"><b>새 비밀번호 정하기</b><span>' + 글자안전(이메일) + ' · 메일의 링크로 들어오셨어요</span></div>'
         + '<input id="srvNewPw" type="password" autocomplete="new-password" enterkeyhint="next" aria-label="새 비밀번호 (6자 이상)" placeholder="새 비밀번호 (6자 이상)">'
         + '<input id="srvNewPw2" type="password" autocomplete="new-password" enterkeyhint="done" aria-label="새 비밀번호 한 번 더" placeholder="새 비밀번호 한 번 더">'
         + '<div class="srvbtns"><button type="button" onclick="계정동작(\'newpw\')">새 비밀번호 저장</button></div>'
-        + '<p class="srvtiny">저장하면 이 기기에서 로그인된 채로 이어집니다.</p>';
+        + '<p class="srvtiny">저장하면 이 휴대폰에서 로그인된 채로 이어져요.</p>';
     }
     if (이메일) {
       h += '<div class="srvrow"><b>' + 이메일 + '</b><span>로그인됨 · 마지막 동기화 ' + 언제 + '</span></div>' + 이용권줄()
         + '<div class="srvbtns"><button type="button" onclick="계정동작(\'sync\')">지금 동기화</button><button type="button" onclick="계정동작(\'logout\')">로그아웃</button></div>'
-        + '<p class="srvtiny">기록은 이 기기와 메디나눔 서버(서울)에 함께 있습니다. 폰을 바꿔도 같은 이메일로 로그인하면 이어집니다. 메디나눔의 다른 앱과 계정은 하나지만 기록은 앱마다 따로입니다.</p>'
+        + '<p class="srvtiny">기록은 이 휴대폰과 메디나눔 서버(서울)에 함께 있어요. 폰을 바꿔도 같은 이메일로 로그인하시면 이어져요. 메디나눔의 다른 앱과 계정은 하나지만 기록은 앱마다 따로예요.</p>'
         + '<button type="button" class="srvlink" onclick="계정동작(\'delete\')">계정 지우기 — 약지도의 서버 기록을 지웁니다</button>';
     } else {
       /* 2026-09-21 — 바로 위 화면 설명이 같은 말을 이미 하고 있었다(한 화면에 두 번). */
@@ -303,8 +307,8 @@
             + (설정.가입확인.설명 ? '<p class="srvtiny">' + 글자안전(설정.가입확인.설명) + '</p>' : '') : '')
         + (window.구독 ? 구독.가입동의HTML() : '')   /* 2026-09-23 구독 틀 — 유료화 켜짐일 때만: 체험 뒤 결제 안내 필수 체크 */
         + '<div class="srvbtns"><button type="button" onclick="계정동작(\'login\')">로그인</button><button type="button" id="srvSignup" onclick="계정동작(\'signup\')"' + (설정.가입확인 ? ' disabled' : '') + '>계정 만들기</button></div>'
-        + '<p class="srvtiny">계정을 만들면 메일함에 확인 링크가 옵니다. 한 번 누르면 끝입니다. 비밀번호를 잊으면 아래 「비밀번호 다시 정하기」.</p>'
-        + '<button type="button" class="srvlink" onclick="계정동작(\'reset\')">비밀번호 다시 정하기</button>';
+        + '<p class="srvtiny">계정을 만들면 메일함에 확인 링크가 가요. 한 번 누르면 끝이에요. 비밀번호를 잊으시면 아래 「비밀번호를 잊으셨나요?」를 눌러 주세요.</p>'
+        + '<button type="button" class="srvlink" onclick="계정동작(\'reset\')">비밀번호를 잊으셨나요?</button>';
     }
     /* 2026-10-13 — 문의는 로그인해야 보내진다(답할 곳). 로그인 전엔 칸을 숨긴다 — 바로 아래 「이 앱에 대해」의 메일 주소가 그 자리. */
     if (이메일) h += '<div class="srvask"><b>문의 · 잘못된 내용 알리기</b><textarea id="srvAsk" rows="3" aria-label="문의 · 잘못된 내용 알리기" placeholder="어느 화면의 무엇이 이상한지 적어 주세요. 답은 이메일로 드립니다."></textarea>'
@@ -313,13 +317,89 @@
     return h;
   };
 
+  /* ── 2026-10-14 약지도 — 로그인 문(#/login · 현욱님 「회원가입/로그인 화면」) ────────────────────
+     같은 칸 id(srvEmail·srvPw·srvAge)와 같은 계정동작을 쓰고 모양만 다르다 — 서버 쪽 동작은 그대로.
+     화면갱신은 #srvbox 의 data-door 를 보고 이 모양으로 다시 그린다.
+     「서버에 저장하기」(건강 민감정보 · 개인정보 보호법 23조)는 계정을 쓰는 «그 자리»에서 따로 체크로 받는다 — 기본은 꺼짐.
+     소셜 단추는 앱이 켠 것(window.소셜켜짐() → [{ n:'카카오', 열기:function }])만 그린다 — 지금 약지도에는 없다(눌러도 안 되는 단추 금지). */
+  var 문탭 = 'login', 문말글 = '';
+  function 문말(t) { 문말글 = t || ''; var el = document.getElementById('doorMsg'); if (el) { el.textContent = 문말글; el.hidden = !문말글; } }
+  window.계정문말 = 문말;
+  function 비번칸(id, 이름, ac, 다음) {
+    return '<label class="door-f" for="' + id + '">' + 이름 + '</label><div class="door-pw"><input id="' + id + '" type="password" autocomplete="' + ac + '" enterkeyhint="' + 다음 + '" minlength="6" autocapitalize="off" spellcheck="false">'
+      + '<button type="button" class="door-eye" aria-pressed="false" aria-controls="' + id + '" aria-label="비밀번호 보이기" onclick="계정문눈(this,\'' + id + '\')">보이기</button></div>';
+  }
+  window.계정문눈 = function (b, id) { var p = document.getElementById(id); if (!p) return; var 보임 = p.type === 'password'; p.type = 보임 ? 'text' : 'password'; b.setAttribute('aria-pressed', 보임 ? 'true' : 'false'); b.setAttribute('aria-label', 보임 ? '비밀번호 숨기기' : '비밀번호 보이기'); b.textContent = 보임 ? '숨기기' : '보이기'; };
+  window.계정문탭 = function (t) {
+    var e = document.getElementById('srvEmail'), v = e ? e.value : null;
+    문탭 = t === 'signup' ? 'signup' : 'login'; 문말글 = ''; 화면갱신();
+    var e2 = document.getElementById('srvEmail'); if (e2 && v != null) e2.value = v;
+    var b = document.querySelector('.door-seg [aria-selected="true"]'); if (b) b.focus();
+  };
+  window.계정문확인 = function () {
+    var b = document.getElementById('srvDoorGo'), w = document.getElementById('doorWhy'); if (!b) return;
+    var a = document.getElementById('srvAge'), g = document.getElementById('srvAgree'), 막 = !!((a && !a.checked) || (g && !g.checked));
+    b.disabled = 막; if (w) w.hidden = !막;
+  };
+  window.계정문동작 = function (what) {
+    what = what || (문탭 === 'signup' ? 'signup' : 'login');
+    var g = document.getElementById('srvAgree'), a = document.getElementById('srvAge'), em = document.getElementById('srvEmail'), pw = document.getElementById('srvPw');
+    if (!서버허용()) {
+      if (!g || !g.checked) { 문말('「서버에 저장하기」에 동의하셔야 계정을 쓸 수 있어요. 동의하지 않으셔도 약지도는 그대로 쓰실 수 있어요.'); if (g) g.focus(); return; }
+      if (typeof 설정.동의기록 === 'function') { try { 설정.동의기록(); } catch (e) {} }
+    }
+    if (what === 'signup' && 설정.가입확인 && (!a || !a.checked)) { 문말('계정을 만들려면 「' + 설정.가입확인.글 + '」에 체크해 주세요.'); if (a) a.focus(); return; }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(((em || {}).value || '').trim())) { 문말('이메일 주소를 다시 확인해 주세요.'); if (em) em.focus(); return; }
+    if (what !== 'reset' && ((pw || {}).value || '').length < 6) { 문말('비밀번호는 6자 이상이에요.'); if (pw) pw.focus(); return; }
+    문말(what === 'reset' ? '메일을 보내는 중이에요…' : '잠시만요…');
+    return window.계정동작(what);
+  };
+  window.계정문HTML = function () {
+    var st = 상태읽기(), 이메일 = 세션 && 세션.user ? 세션.user.email : '', h = '<div id="srvbox" class="srvbox door-box" data-door="1">';
+    var 말칸 = '<p id="doorMsg" class="door-msg" role="status" aria-live="polite"' + (문말글 ? '' : ' hidden') + '>' + 글자안전(문말글) + '</p>';
+    if (!준비됨()) return h + '<p class="door-note">' + 준비중말 + '</p></div>';
+    if (!이메일 && 복구대기() && !복구중 && 서버허용()) setTimeout(복구처리, 0);
+    /* 전에 로그인한 폰 — 세션을 되살리는 동안 로그인 칸이 잠깐 보이고, 되살아나면 계정 모양으로 바꾼다 */
+    if (!이메일 && st.email && !sb && 서버허용() && 온라인()) 준비().then(function () { if (세션) 화면갱신(); }).catch(function () {});
+    if (이메일 && 복구모드) return h + '<h2 class="door-h2">새 비밀번호 정하기</h2><p class="door-note">' + 글자안전(이메일) + ' · 메일의 링크로 들어오셨어요.</p>'
+      + 비번칸('srvNewPw', '새 비밀번호 <small>6자 이상</small>', 'new-password', 'next') + 비번칸('srvNewPw2', '새 비밀번호 한 번 더', 'new-password', 'done')
+      + 말칸 + '<button type="button" class="door-go" onclick="계정동작(\'newpw\')">새 비밀번호 저장</button></div>';
+    if (이메일) {
+      var 시각 = st.last_push || st.last_pull, 언제 = 시각 ? new Date(시각).toLocaleString('ko-KR', { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : '아직 없어요';
+      return h + '<div class="door-me"><span class="door-av" aria-hidden="true">' + 글자안전(이메일.charAt(0).toUpperCase()) + '</span><span><b>' + 글자안전(이메일) + '</b><small>로그인돼 있어요 · 마지막으로 맞춘 때 ' + 글자안전(언제) + '</small></span></div>'
+        + '<p class="door-note">기록은 이 휴대폰과 메디나눔 서버(서울)에 함께 있어요. 새 휴대폰에서 같은 이메일로 로그인하시면 그대로 이어져요.</p>' + 말칸
+        + '<div class="srvbtns"><button type="button" onclick="계정동작(\'sync\')">지금 맞추기</button><button type="button" onclick="계정동작(\'logout\')">로그아웃</button></div>'
+        + '<button type="button" class="srvlink" onclick="go(\'/me?t=set\')">계정 지우기·동의 거두기는 내 정보 → 설정에서</button></div>';
+    }
+    var 가입 = 문탭 === 'signup', 동의됨 = 서버허용(), 소셜 = [], 항목 = window.계정항목 || {};
+    try { 소셜 = (typeof window.소셜켜짐 === 'function' && window.소셜켜짐()) || []; } catch (e) { 소셜 = []; }
+    h += '<div class="door-seg" role="tablist" aria-label="로그인 또는 회원가입">' + ['login', 'signup'].map(function (k) { var on = (k === 'signup') === 가입;
+      return '<button type="button" role="tab" aria-selected="' + on + '"' + (on ? ' class="on"' : '') + ' onclick="계정문탭(\'' + k + '\')">' + (k === 'login' ? '로그인' : '회원가입') + '</button>'; }).join('') + '</div>';
+    if (소셜.length) h += '<div class="door-social">' + 소셜.map(function (x, i) { return '<button type="button" onclick="소셜켜짐()[' + i + '].열기()">' + 글자안전(x.n) + '로 계속하기</button>'; }).join('') + '</div><p class="door-or"><span>또는 이메일로</span></p>';
+    h += '<label class="door-f" for="srvEmail">이메일</label><input id="srvEmail" type="email" inputmode="email" autocomplete="email" autocapitalize="off" spellcheck="false" enterkeyhint="next" value="' + 글자안전(st.email || '') + '">'
+      + 비번칸('srvPw', '비밀번호' + (가입 ? ' <small>6자 이상</small>' : ''), 가입 ? 'new-password' : 'current-password', 'go');
+    if (가입 && 설정.가입확인) h += '<label class="door-ck"><input id="srvAge" type="checkbox" onchange="this.dataset.at=this.checked?new Date().toISOString():\'\';계정문확인()"><span><b>' + 글자안전(설정.가입확인.글) + ' <em class="door-tag">필수</em></b>' + (설정.가입확인.설명 ? '<small>' + 글자안전(설정.가입확인.설명) + '</small>' : '') + '</span></label>';
+    if (!동의됨) h += '<label class="door-ck"><input id="srvAgree" type="checkbox" onchange="계정문확인()"><span><b>「서버에 저장하기」에 동의해요 <em class="door-tag">필수</em></b><small>건강에 관한 민감정보라 따로 여쭤요. 로그인하시면 이 휴대폰의 기록이 계정으로 이어져요.</small></span></label>'
+      + '<details class="door-more"><summary>무엇이 올라가나요<svg class="i chev" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></summary><dl>'
+      + '<dt>올라가는 것</dt><dd>' + 글자안전(항목.ko || '약지도 기록') + '</dd><dt>어디에</dt><dd>메디나눔 서버(Supabase, 서울)</dd><dt>왜</dt><dd>폰을 바꿔도 이어 보려고</dd>'
+      + '<dt>언제까지</dt><dd>계정을 지우실 때까지 — 동의를 거두시면 서버 기록을 바로 지워요</dd></dl><p>동의하지 않으셔도 되고, 동의하지 않아도 약지도는 이 휴대폰에서 그대로 쓰실 수 있어요. 보기 설정과 날씨는 올라가지 않아요.</p></details>';
+    var 막힘 = (가입 && !!설정.가입확인) || !동의됨;
+    h += 말칸 + '<button type="button" id="srvDoorGo" class="door-go" onclick="계정문동작()"' + (막힘 ? ' disabled aria-describedby="doorWhy"' : '') + '>' + (가입 ? '계정 만들기' : '로그인') + '</button>'
+      + (막힘 ? '<p id="doorWhy" class="door-why">필수에 체크하시면 눌려요</p>' : '')
+      + (가입 ? '<p class="door-note">계정을 만들면 메일함에 확인 링크가 가요. 한 번 누르면 끝이에요.</p>'
+              : '<button type="button" class="srvlink door-forgot" onclick="계정문동작(\'reset\')">비밀번호를 잊으셨나요?</button>');
+    return h + '</div>';
+  };
+  /* 다른 화면에서 왔으면 지난 글 칸을 비운다 */
+  window.계정문처음 = function (탭) { 문말글 = ''; if (탭) 문탭 = 탭 === 'signup' ? 'signup' : 'login'; };
+
   var 지우기예약 = 0;   /* 2026-09-22 — 계정 지우기 두 번 누르기 */
   /* 2026-09-22 — 엔터로 로그인. 칸이 <form> 안에 있지 않아 엔터가 아무 데도 닿지 않았다. */
   document.addEventListener('keydown', function (e) {
     if (e.key !== 'Enter' || e.isComposing) return;
     var id = e.target && e.target.id;
     if (id === 'srvEmail') { e.preventDefault(); var pw = document.getElementById('srvPw'); if (pw) pw.focus(); }
-    else if (id === 'srvPw') { e.preventDefault(); window.계정동작('login'); }
+    else if (id === 'srvPw') { e.preventDefault(); if (document.querySelector('#srvbox[data-door]')) window.계정문동작(); else window.계정동작('login'); }
     else if (id === 'srvNewPw') { e.preventDefault(); var p2 = document.getElementById('srvNewPw2'); if (p2) p2.focus(); }
     else if (id === 'srvNewPw2') { e.preventDefault(); window.계정동작('newpw'); }
   });
@@ -330,15 +410,15 @@
   window.계정동작 = function (what) {
     if (!준비됨()) { 알림(준비중말); return; }   /* 검수 #8 — 서버 표가 올라가기 전 */
     /* 2026-09-22 — 「서버에 저장하기」 동의를 철회한 동안은 로그아웃만 된다 */
-    if (!서버허용() && what !== 'logout') { 알림('서버 저장 동의를 철회한 상태입니다. 내 정보 → 설정 → 계정에서 다시 동의하면 계정을 쓸 수 있습니다.'); return; }
+    if (!서버허용() && what !== 'logout') { 알림('「서버에 저장하기」에 동의하셔야 계정을 쓸 수 있어요. 로그인 화면이나 내 정보 → 설정 → 계정에서 동의해 주세요.'); return; }
     var email = (document.getElementById('srvEmail') || {}).value || '', pw = (document.getElementById('srvPw') || {}).value || '';
     email = email.trim();
     if (what === 'ask') {
       var t = ((document.getElementById('srvAsk') || {}).value || '').trim(); if (!t) { 알림('내용을 적어 주세요.'); return; }
       return 준비().then(function () {
-        if (!세션) { 알림('문의는 로그인한 뒤에 보낼 수 있습니다(답을 드릴 곳이 필요합니다).'); return; }
+        if (!세션) { 알림('문의는 로그인한 뒤에 보내실 수 있어요(답을 드릴 곳이 필요해요).'); return; }
         return sb.from('inquiries').insert({ user_id: 세션.user.id, app: 설정.app, kind: 'ask', text: t, screen: location.hash || '' }).then(function (r) {
-          if (r.error) throw r.error; 알림('보냈습니다. 이메일로 답해 드리겠습니다.'); var ta = document.getElementById('srvAsk'); if (ta) ta.value = '';
+          if (r.error) throw r.error; 알림('보냈어요. 이메일로 답해 드릴게요.'); var ta = document.getElementById('srvAsk'); if (ta) ta.value = '';
         });
       }).catch(function (e) { 알림(말(e)); });
     }
@@ -347,7 +427,7 @@
       if (!세션) { 알림('먼저 로그인해 주세요.'); return; }
       if (Date.now() - 지우기예약 > 10000) {
         지우기예약 = Date.now();
-        알림('약지도의 서버 기록을 지우고, 다른 메디나눔 앱 기록이 없으면 계정까지 지웁니다. 되돌릴 수 없습니다. 10초 안에 「계정 지우기」를 한 번 더 누르면 지웁니다.');
+        알림('약지도의 서버 기록을 지우고, 다른 메디나눔 앱 기록이 없으면 계정까지 지워요. 되돌릴 수 없어요. 10초 안에 「계정 지우기」를 한 번 더 누르시면 지워요.');
         return;
       }
       지우기예약 = 0;
@@ -356,27 +436,27 @@
         try { 내열쇠().forEach(function (k) { localStorage.removeItem(k); }); } catch (e) {}
         try { localStorage.removeItem('_srv_' + 설정.app); localStorage.removeItem(구독키()); } catch (e) {}
         세션 = null; try { sb.auth.signOut(); } catch (e) {}
-        알림(r && r.data && r.data.account_deleted === false ? '약지도의 서버 기록과 이 기기의 기록을 지웠습니다. 다른 메디나눔 앱 기록이 남아 있어 계정은 그대로예요.' : '계정과 약지도 서버 기록을 지웠습니다. 이 기기에 있던 약지도 기록도 비웠습니다.');
+        알림(r && r.data && r.data.account_deleted === false ? '약지도의 서버 기록과 이 휴대폰의 기록을 지웠어요. 다른 메디나눔 앱 기록이 남아 있어 계정은 그대로예요.' : '계정과 약지도 서버 기록을 지웠어요. 이 휴대폰에 있던 약지도 기록도 비웠어요.');
         화면갱신();
         if (typeof 설정.다시그리기 === 'function') { try { 설정.다시그리기(); } catch (e) {} }
       }).catch(function (e) { var m = 말(e); 알림(/인터넷/.test(m) ? '인터넷이 닿지 않아 지우지 못했어요. 연결되면 「계정 지우기」를 다시 눌러 주세요.' : m); });   /* 2026-10-13 — 「자동으로 이어집니다」는 지우기에는 거짓이었다 */
     }
     if (what === 'newpw') {   /* 2026-09-23 큰문제 #10 — 복구 링크로 들어온 세션에서 새 비밀번호를 저장한다 */
       var n1 = (document.getElementById('srvNewPw') || {}).value || '', n2 = (document.getElementById('srvNewPw2') || {}).value || '';
-      if (n1.length < 6) { 알림('비밀번호는 6자 이상이어야 합니다.'); return; }
-      if (n1 !== n2) { 알림('두 칸의 비밀번호가 다릅니다.'); return; }
+      if (n1.length < 6) { 알림('비밀번호는 6자 이상이어야 해요.'); return; }
+      if (n1 !== n2) { 알림('두 칸의 비밀번호가 달라요.'); return; }
       return 준비().then(function () { if (!세션) throw new Error('login'); return sb.auth.updateUser({ password: n1 }); }).then(function (r) {
         if (r && r.error) throw r.error;
-        복구모드 = false; 알림('새 비밀번호를 저장했습니다.'); 화면갱신();
-      }).catch(function (e) { 알림(/^login$/.test((e && e.message) || '') ? '복구 링크가 만료되었습니다. 「비밀번호 다시 정하기」로 새 링크를 받아 주세요.' : 말(e)); });
+        복구모드 = false; 알림('새 비밀번호를 저장했어요.'); 화면갱신();
+      }).catch(function (e) { 알림(/^login$/.test((e && e.message) || '') ? '복구 링크가 만료됐어요. 「비밀번호를 잊으셨나요?」로 새 링크를 받아 주세요.' : 말(e)); });
     }
-    if (what === 'logout') { return 준비().then(function () { return sb.auth.signOut(); }).then(function () { 세션 = null; try { localStorage.removeItem(구독키()); } catch (e) {} 알림('로그아웃했습니다. 이 기기의 기록은 그대로 있습니다.'); 화면갱신(); }).catch(function (e) { 알림(말(e)); }); }
-    if (what === 'sync') { return 준비().then(function () { if (!세션) { 알림('먼저 로그인해 주세요.'); return; } return 끌어오기().then(function () { return 밀어올리기(); }).then(function (n) { 알림('동기화했습니다' + (n ? ' (' + n + '건 올림)' : '') + '.'); 화면갱신(); }); }).catch(function (e) { 알림(말(e)); }); }
+    if (what === 'logout') { return 준비().then(function () { return sb.auth.signOut(); }).then(function () { 세션 = null; try { localStorage.removeItem(구독키()); } catch (e) {} 알림('로그아웃했어요. 이 휴대폰의 기록은 그대로 있어요.'); 화면갱신(); }).catch(function (e) { 알림(말(e)); }); }
+    if (what === 'sync') { return 준비().then(function () { if (!세션) { 알림('먼저 로그인해 주세요.'); return; } return 끌어오기().then(function () { return 밀어올리기(); }).then(function (n) { 알림('맞췄어요' + (n ? ' (' + n + '건 올림)' : '') + '.'); 화면갱신(); }); }).catch(function (e) { 알림(말(e)); }); }
     if (what === 'signup' && 설정.가입확인 && !(document.getElementById('srvAge') || {}).checked) { 알림('계정을 만들려면 「' + 설정.가입확인.글 + '」에 체크해 주세요.'); return; }   /* 2026-09-23 나 */
     if (!email || email.indexOf('@') < 0) { 알림('이메일을 적어 주세요.'); return; }
     var st = 상태읽기(); st.email = email; 상태쓰기(st);
-    if (what === 'reset') { return 준비().then(function () { var u = 앱주소(); return u ? sb.auth.resetPasswordForEmail(email, { redirectTo: u }) : sb.auth.resetPasswordForEmail(email); }).then(function (r) { if (r && r.error) throw r.error; }).then(function () { 알림('메일함을 확인해 주세요. 링크를 누르면 새 비밀번호를 정할 수 있습니다.'); }).catch(function (e) { 알림(말(e)); }); }
-    if (pw.length < 6) { 알림('비밀번호는 6자 이상이어야 합니다.'); return; }
+    if (what === 'reset') { return 준비().then(function () { var u = 앱주소(); return u ? sb.auth.resetPasswordForEmail(email, { redirectTo: u }) : sb.auth.resetPasswordForEmail(email); }).then(function (r) { if (r && r.error) throw r.error; }).then(function () { 알림('메일함을 확인해 주세요. 링크를 누르면 새 비밀번호를 정하실 수 있어요.'); }).catch(function (e) { 알림(말(e)); }); }
+    if (pw.length < 6) { 알림('비밀번호는 6자 이상이어야 해요.'); return; }
     return 준비().then(function () {
       if (what === 'signup' && 설정.가입확인 && typeof 설정.가입확인.기록 === 'function') { try { 설정.가입확인.기록(); } catch (e) {} }   /* 2026-09-23 나 — 확인한 때를 앱이 적는다 */
       /* 2026-10-13 상용화 점검 2-08/2-19 — 만 14세 확인을 «언제» 했는지 계정 기록(user_metadata)에 남긴다(처리방침 1항: 가입 앱·만 14세 확인 시각).
@@ -384,11 +464,11 @@
       var 가입표 = { app: 설정.app }; if (설정.가입확인) { var ag = document.getElementById('srvAge'); 가입표.age14_at = (ag && ag.dataset && ag.dataset.at) || new Date().toISOString(); }
       if (what === 'signup') return sb.auth.signUp(앱주소() ? { email: email, password: pw, options: { emailRedirectTo: 앱주소(), data: 가입표 } } : { email: email, password: pw, options: { data: 가입표 } }).then(function (r) {
         if (r.error) throw r.error;
-        if (r.data && r.data.session) { 세션 = r.data.session; 알림('계정을 만들었습니다. 기록을 올리는 중…'); 화면갱신(); }
-        else 알림('메일함에 확인 링크를 보냈습니다. 누른 뒤 로그인해 주세요.');
+        if (r.data && r.data.session) { 세션 = r.data.session; 알림('계정을 만들었어요. 기록을 올리는 중이에요…'); 화면갱신(); }
+        else 알림('메일함에 확인 링크를 보냈어요. 누르신 뒤 로그인해 주세요.');
       });
       return sb.auth.signInWithPassword({ email: email, password: pw }).then(function (r) {
-        if (r.error) throw r.error; 세션 = r.data.session; 알림('로그인했습니다. 기록을 맞추는 중…'); 화면갱신();
+        if (r.error) throw r.error; 세션 = r.data.session; 알림('로그인했어요. 기록을 맞추는 중이에요…'); 화면갱신();
       });
     }).catch(function (e) { 알림(말(e)); });
   };
@@ -400,6 +480,7 @@
       설정.동기화허용 = typeof o.동기화허용 === 'function' ? o.동기화허용 : null;   /* 2026-09-23 구독 틀 */
       설정.가입확인 = (o.가입확인 && o.가입확인.글) ? o.가입확인 : null;
       설정.지우기전 = typeof o.지우기전 === 'function' ? o.지우기전 : null; 설정.로그인됨 = typeof o.로그인됨 === 'function' ? o.로그인됨 : null;   /* 길동무 서버 준비 1008 */
+      설정.동의기록 = typeof o.동의기록 === 'function' ? o.동의기록 : null;   /* 2026-10-14 로그인 문 — 「서버에 저장하기」 체크를 앱의 동의 기록에 적는 갈고리 */
       설정.준비됨 = typeof o.준비됨 === 'function' ? o.준비됨 : o.준비됨 !== false;   /* 2026-10-13 — 함수로 넘기면 함수 그대로(약지도 meta.account 스위치) */
       설정.병합 = typeof o.병합 === 'function' ? o.병합 : null;   /* 2026-10-13 — 앱이 자기 기록 모양대로 합치는 갈고리(두 폰 동기화) */   /* 검수 #8 — 서버 표가 올라가면 앱의 설치 줄에서 true 로(또는 줄을 지운다) */   /* 2026-09-23 나 — { 글, 설명, 기록 } : 계정 만들기 앞 필수 체크 */
       if (준비됨()) { try { if (/(^#|&)(type=recovery|error_code=)/.test(location.hash)) { sessionStorage.setItem('yj_recovery', location.hash.slice(1)); history.replaceState(history.state, '', location.pathname + location.search); } } catch (e) {} }   /* 길동무 서버 준비 1008 */
@@ -467,7 +548,212 @@ window.mergeMe = function (localRaw, serverRaw) {
 try {
   /* 준비됨 = meta.json 의 account 스위치 — 공용 서버에 약지도 칸(메디나눔_약지도_추가_1013.sql)이 열린 뒤에 true 로 켠다. 그 전엔 「준비 중」 한 줄(되는 척 금지). */
   서버.설치({ app: 'yakjido', 열쇠: /^yakjido\.me\.v1$/, 병합: function (k, mine, theirs) { return typeof mergeMe === 'function' ? mergeMe(mine, theirs) : null; }, 준비됨: function () { return !!(typeof D !== 'undefined' && D.meta && D.meta.account === true); }, 허용: srvAgreed, 다시그리기: srvReload,
-    가입확인: { 글: '만 14세 이상이에요', 설명: '메디나눔 계정은 만 14세 이상만 만들 수 있어요. 아이 약은 보호자 계정에 담아 주세요.' } });
+    가입확인: { 글: '만 14세 이상이에요', 설명: '메디나눔 계정은 만 14세 이상만 만들 수 있어요. 아이 약은 보호자 계정에 담아 주세요.' },
+    /* 2026-10-14 로그인 문의 「서버에 저장하기」 체크 — 설정의 서버동의켜기와 같은 꼴로 적는다 */
+    동의기록: function () { try { localStorage.setItem(AGREE_KEY, JSON.stringify({ server: true, at: new Date().toISOString() })); } catch (e) {} } });
 } catch (e) {}
-/* 내 정보 화면을 보고 있었으면 계정 칸을 다시 그린다 */
-try { if (/^#\/me/.test(location.hash)) route(); } catch (e) {}
+
+/* ═══ 2026-10-14 약지도 — 첫 동의 · 로그인 문 · 약관 읽기 (현욱님 「이용약관을 체크하지 못하게 돼있잖아」 「회원가입/로그인 화면」) ═══
+   첫 화면 예산(index.html 압축 228 KB) 때문에 화면 코드는 여기(따로 받는 파일)에 둔다. index 에는 문지기(consentGate)와 길(#/consent·#/login·#/doc)만.
+   본보기: ClinicScore renderConsent(로고·이름·한 줄 → 세 줄 카드 → 모두 동의 → 필수 줄 → 큰 단추 → 발문).
+   ⚖️ 들어올 때 받는 동의는 필수 둘(이용약관·개인정보 처리방침)뿐 — 계약 이행에 필요한 처리는 동의가 필요 없고(개인정보 보호법 15조 1항 4호, 2023 개정),
+      건강 민감정보는 «모으는 그 순간» 따로 받는다(23조) → 「서버에 저장하기」·만 14세 확인은 계정을 만들 때(로그인 문). 선택 항목·광고 동의는 없다. */
+const 동의칸 = { terms: 0, privacy: 0 };
+function 동의그리기(){
+  const C = 동의칸, both = !!(C.terms && C.privacy);
+  document.querySelectorAll('.cs-row[data-k]').forEach(b => b.setAttribute('aria-checked', String(!!C[b.dataset.k])));
+  const all = document.querySelector('.cs-all'); if (all) all.setAttribute('aria-checked', both ? 'true' : (C.terms || C.privacy) ? 'mixed' : 'false');
+  const g = document.getElementById('csGo'); if (g) g.disabled = !both;
+  const w = document.getElementById('csWhy'); if (w) w.hidden = both;
+}
+window.동의누름 = k => { const C = 동의칸; if (k === 'all') { const v = C.terms && C.privacy ? 0 : 1; C.terms = C.privacy = v; } else C[k] = C[k] ? 0 : 1; 동의그리기(); };
+window.동의하기 = () => {
+  if (!(동의칸.terms && 동의칸.privacy)) return;
+  try { localStorage.setItem(CONSENT_KEY, JSON.stringify({ v: CONSENT_VER, at: dayKey(new Date()), terms: 1, privacy: 1 })); } catch (e) {}
+  window.__동의됨 = CONSENT_VER;   /* 저장이 막힌 브라우저에서도 이번에는 들어가게 */
+  let n = ''; try { n = sessionStorage.getItem(CONSENT_NEXT) || ''; sessionStorage.removeItem(CONSENT_NEXT); } catch (e) {}
+  if (/^(consent|doc|login)(\/|\?|$)/.test(n)) n = '';
+  HIST.length = 0;   /* 뒤로 가기가 동의 화면으로 돌아가지 않게 */
+  const to = n || (helloDone() ? 'home' : 'hello/1');
+  try { location.replace(location.href.split('#')[0] + '#/' + to); } catch (e) { go('/' + to); }
+};
+const 동의줄 = (k, t, s, L, 링크) => `<div class="cs-item"><button type="button" class="cs-row" role="checkbox" aria-checked="${!!동의칸[k]}" data-k="${k}" onclick="동의누름('${k}')"><span class="cs-bx">${I.check}</span><span class="cs-tx"><b><span class="cs-tag">필수</span>${t}</b><span>${s}</span></span></button>
+  <details class="cs-more"><summary>자세히${I.chev}</summary><ul>${L.map(x => `<li>${x}</li>`).join('')}</ul><button type="button" class="cs-doc" onclick="go('/doc/${k}')">${링크}${I.chev}</button></details></div>`;
+window.문_consent = () => {
+  let 전 = null; try { 전 = JSON.parse(localStorage.getItem(CONSENT_KEY) || 'null'); } catch (e) {}
+  const 다시 = helloDone() || !!전, both = !!(동의칸.terms && 동의칸.privacy);
+  return `<div class="door cs">
+  <img class="door-mark" src="${esc(BRANDMARK)}" alt="" width="64" height="64">
+  <h1>약지도</h1>
+  <p class="door-s">증상에 맞는 약 성분, 의사가 정리했어요</p>
+  ${다시 ? `<p class="cs-new">${I.info}<span>약지도에 이용약관과 개인정보 처리방침이 새로 생겼어요. 한 번만 확인해 주세요.</span></p>` : ''}
+  <ul class="cs-list">
+    <li>${I.pill}<span>증상에 맞는 약국 약과 먹는 법을 <b>식약처 허가 설명서</b> 기준으로 알려 드려요.</span></li>
+    <li>${I.shield}<span>드시는 약끼리 성분이 겹치거나 함께 드시면 안 되는 조합을 살펴 드려요.</span></li>
+    <li>${I.heart}<span>진단·처방을 대신하지 않아요. 급하면 119, 그리고 의사·약사와 상의하세요.</span></li>
+  </ul>
+  <h2 class="cs-h">시작하기 전에 동의를 받아요</h2>
+  <button type="button" class="cs-row cs-all" role="checkbox" aria-checked="${both ? 'true' : (동의칸.terms || 동의칸.privacy) ? 'mixed' : 'false'}" onclick="동의누름('all')"><span class="cs-bx">${I.check}</span><span class="cs-tx"><b>모두 동의해요</b><span>아래 필수 두 가지를 한 번에 체크해요</span></span></button>
+  ${동의줄('terms', '이용약관', '의료기기가 아니에요. 약 정보를 드리고 기록을 도와요. 약을 고르고 드시는 결정은 의사·약사와 함께 하세요.', [
+    '약 설명은 <b>식약처 허가 설명서</b>가 기본이에요. 해외 지침이나 진료실 관행이 다르면 둘 다 보여 드려요.',
+    '위험 신호가 있으면 약보다 진료가 먼저예요. 급하면 119예요.',
+    '약을 팔거나 건네지 않아요. 약은 약국에서 약사와 상의해 사세요.',
+    '계정은 고르실 수 있고, 만 14세 이상만 만들 수 있어요.',
+    '지금은 돈을 내는 기능이 없어요. 생기면 요금과 해지·환불 조건을 미리 알리고 따로 동의를 받아요.'], '약관 전문 보기')}
+  ${동의줄('privacy', '개인정보 처리방침', '드시는 약·기록·몸 상태는 기본으로 이 휴대폰에만 저장되고, 광고·분석에 쓰지 않아요. 계정을 만들고 따로 동의하실 때만 메디나눔 서버(서울)에 복사돼요.', [
+    '계정 없이 모든 기능을 쓰실 수 있어요.',
+    '광고나 이용자 분석 도구를 넣지 않았어요.',
+    '서버 저장은 계정을 만들 때 「서버에 저장하기」에 따로 동의하셔야 해요. 거두시면 서버 기록을 바로 지워요.',
+    '「부모님께 보내기」를 링크로 보내실 때만 고른 약 목록·호칭·메모가 7일 동안 서버에 머문 뒤 지워져요.',
+    '약 사진은 휴대폰 안에서 글자를 읽는 데만 쓰고 보내지 않아요.',
+    '기록은 내 정보 → 설정에서 언제든 지우실 수 있어요.'], '전문 보기')}
+  <button type="button" class="door-go" id="csGo" onclick="동의하기()"${both ? '' : ' disabled'} aria-describedby="csWhy">${다시 ? '동의하고 계속하기' : '동의하고 시작하기'}</button>
+  <p class="door-why" id="csWhy"${both ? ' hidden' : ''}>필수 두 가지에 체크하시면 눌려요</p>
+  <p class="cs-foot">동의 내용은 설정 → 약관·개인정보에서 언제든 다시 보실 수 있어요 · 약지도 v${esc(D.meta?.version || '')}</p>
+</div>`;
+};
+
+/* 로그인 문 — 따로 한 장(현욱님 「회원가입/로그인 화면」). 로그인은 언제나 고르는 것(애플 심사 5.1.1(v) · 메디나눔 약관 7조): 「로그인 없이 계속 쓰기」가 늘 있다 */
+window.문나가기 = () => { const p = HIST.length >= 2 ? HIST[HIST.length - 2] : ''; if (p && !/^(login|consent|hello|doc)/.test(p)) goBack(); else go('/home'); };
+window.문_login = (_, q) => {
+  if (ROUTE_PREV !== 'login' && window.계정문처음) 계정문처음(q && q.t);
+  const 켜짐 = D.meta?.account === true, 나 = srvLoggedIn();
+  return `<div class="door lg">
+  <button type="button" class="back door-back" onclick="문나가기()">${I.prev}뒤로</button>
+  <img class="door-mark" src="${esc(BRANDMARK)}" alt="" width="64" height="64">
+  <h1>${나 ? '메디나눔 계정' : '로그인하면 폰을 바꿔도<br>그대로 이어 봐요'}</h1>
+  ${나 ? '' : `<ul class="lg-list">
+    <li>${I.check}<span>새 휴대폰에서 같은 이메일로 로그인하면 약통·복용 기록이 그대로 와요</span></li>
+    <li>${I.check}<span>메디나눔 앱들과 계정 하나 — 기록은 앱마다 따로예요</span></li>
+    <li>${I.check}<span>로그인하지 않아도 약지도는 모두 쓰실 수 있어요</span></li></ul>`}
+  ${켜짐 && window.계정문HTML ? 계정문HTML() : '<p class="door-note" style="margin-top:20px">계정은 준비 중이에요. 지금은 이 휴대폰에서 그대로 쓰실 수 있어요.</p>'}
+  <button type="button" class="door-skip" onclick="문나가기()">${나 ? '돌아가기' : '로그인 없이 계속 쓰기'}</button>
+  <p class="cs-foot"><button type="button" class="cs-doc" onclick="go('/doc/terms')">이용약관</button> · <button type="button" class="cs-doc" onclick="go('/doc/privacy')">개인정보 처리방침</button></p>
+</div>`;
+};
+
+/* 약관·방침 전문 — 앱 안에서 읽는다(설치 앱에서 바깥 주소로 나가면 앱 화면이 끊긴다). 같은 주소의 html 을 받아 본문(main)만 보여 준다 */
+const 문서 = {};
+function 문서풀기(t){
+  const d = new DOMParser().parseFromString(t, 'text/html'), m = d.querySelector('main') || d.body;
+  m.querySelectorAll('script,style,link,.mark').forEach(e => e.remove());
+  m.querySelectorAll('*').forEach(e => { for (const a of [...e.attributes]) if (/^on/i.test(a.name)) e.removeAttribute(a.name); if (e.id) e.id = 'doc-' + e.id; });
+  m.querySelectorAll('a[href]').forEach(a => { const h = a.getAttribute('href') || '';
+    if (h.startsWith('#')) { a.setAttribute('href', '#'); a.setAttribute('onclick', `document.getElementById(${JSON.stringify('doc-' + h.slice(1))})?.scrollIntoView();return false`); }
+    else if (/^privacy(-yakjido)?\.html/.test(h)) a.setAttribute('href', '#/doc/privacy');
+    else if (/^terms(-yakjido)?\.html/.test(h)) a.setAttribute('href', '#/doc/terms');
+    else if (!h.startsWith('mailto:')) { if (NATIVE && !/^https?:/.test(h)) a.setAttribute('href', (D.meta?.webUrl || '') + h); a.setAttribute('target', '_blank'); a.setAttribute('rel', 'noopener'); } });
+  return m.innerHTML;
+}
+window.문_doc = k => {
+  k = k === 'privacy' ? 'privacy' : 'terms';
+  const 이름 = k === 'terms' ? '이용약관' : '개인정보 처리방침', 웹 = (D.meta?.webUrl || 'https://yakjido.medinanum.com/') + k + '.html', v = 문서[k];
+  if (v === undefined) { 문서[k] = null; fetch(k + '.html', { cache: 'no-cache' }).then(r => r.ok ? r.text() : Promise.reject(r.status)).then(t => { 문서[k] = 문서풀기(t); }).catch(() => { 문서[k] = false; }).then(() => { if (location.hash.startsWith('#/doc/' + k)) route(); }); }
+  const 몸 = v ? v : v === false ? `<h1>${이름}</h1><div class="empty card" style="margin-top:16px"><b>전문을 불러오지 못했어요</b>인터넷 연결을 확인하고 다시 열어 주세요.</div>` : `<h1>${이름}</h1><p class="loading">불러오는 중이에요…</p>`;
+  if (v === false) 문서[k] = undefined;   /* 다음에 열 때 다시 받아 본다 */
+  return `<div class="top"><button class="back" onclick="goBack()">${I.prev}뒤로</button></div><article class="docv">${몸}</article>
+  <p class="small muted docv-web">웹에서도 보실 수 있어요 — <a class="link" href="${esc(웹)}" target="_blank" rel="noopener">${esc(웹.replace(/^https:\/\//, ''))}</a></p>`;
+};
+
+try { const css = document.createElement('style'); css.textContent = `
+.door{max-width:560px;margin:0 auto;padding:4px 0 32px}
+.door-mark{display:block;width:64px;height:64px;border-radius:18px;margin:12px auto 14px;box-shadow:0 6px 18px rgba(var(--primary-rgb),.18)}
+.door h1{text-align:center;font-size:1.625rem;line-height:1.35}
+.door-s{text-align:center;color:var(--muted);margin-top:6px;font-size:.9375rem}
+.cs-new{display:flex;gap:10px;align-items:flex-start;margin-top:18px;padding:12px 14px;border-radius:12px;background:var(--accent-tint);color:var(--accent-text);font-size:.9375rem;font-weight:600;line-height:1.55}
+.cs-new svg.i{margin-top:2px}
+.cs-list{list-style:none;margin:20px 0 0;padding:2px 16px;background:var(--card);border:1px solid var(--hairline);border-radius:var(--r-card);box-shadow:var(--shadow-card)}
+.cs-list li{display:flex;gap:12px;align-items:flex-start;padding:13px 0;line-height:1.6;color:var(--body);font-size:.9375rem}
+.cs-list li+li{border-top:1px solid var(--hairline)}
+.cs-list svg.i{margin-top:2px;color:var(--primary)}
+.cs-h{font-size:1.0625rem;font-weight:800;margin:28px 2px 10px}
+.cs-row{display:flex;gap:12px;align-items:flex-start;width:100%;text-align:left;padding:14px 16px;min-height:56px;border-radius:14px;color:var(--text)}
+.cs-all{background:var(--tint)}
+.cs-all .cs-tx b{font-size:1.0625rem}
+.cs-item{margin-top:10px;border:1.5px solid var(--hairline);border-radius:14px;background:var(--card)}
+.cs-bx{flex:none;width:24px;height:24px;margin-top:1px;border-radius:7px;border:2px solid var(--ui-line);background:var(--card);display:grid;place-items:center;color:transparent}
+.cs-bx svg.i{width:16px;height:16px;stroke-width:3}
+[aria-checked=true]>.cs-bx{background:var(--primary);border-color:var(--primary);color:var(--on-primary)}
+[aria-checked=mixed]>.cs-bx{border-color:var(--primary);background:linear-gradient(var(--primary),var(--primary)) center/10px 2.5px no-repeat var(--card)}
+.cs-tx{flex:1;min-width:0}.cs-tx b{display:block;font-size:1rem;line-height:1.45}
+.cs-tx>span{display:block;margin-top:4px;font-size:.875rem;line-height:1.6;color:var(--body)}
+.cs-tag,.door-tag{display:inline-block;margin-right:6px;padding:1px 7px;border-radius:6px;background:var(--tint);color:var(--primary-deep);font-size:.75rem;font-weight:800;font-style:normal;vertical-align:2px}
+.door-tag{margin:0 0 0 4px}
+.cs-more{padding:0 16px 6px 52px}
+.cs-more>summary,.door-more>summary{display:inline-flex;align-items:center;gap:4px;min-height:48px;font-size:.875rem;font-weight:700;color:var(--primary-deep);cursor:pointer;list-style:none}
+.cs-more>summary::-webkit-details-marker,.door-more>summary::-webkit-details-marker{display:none}
+.cs-more>summary svg.chev,.door-more>summary svg.chev{width:16px;height:16px;transition:transform .2s}
+.cs-more[open]>summary svg.chev,.door-more[open]>summary svg.chev{transform:rotate(90deg)}
+.cs-more ul{margin:0 0 4px;padding-left:1.1em;font-size:.875rem;line-height:1.65;color:var(--body)}
+.cs-more li{margin:5px 0;color:var(--body)}
+.cs-doc{display:inline-flex;align-items:center;gap:2px;min-height:48px;font-size:.875rem;font-weight:700;color:var(--primary-deep)}
+.cs-doc svg.i{width:16px;height:16px}
+.door-go{display:flex;align-items:center;justify-content:center;width:100%;min-height:56px;margin-top:22px;border-radius:14px;background:var(--primary);color:var(--on-primary);font-size:1.0625rem;font-weight:800;box-shadow:var(--shadow-raised)}
+.door-go:disabled{background:var(--tint2);color:var(--muted);box-shadow:none;border:1.5px dashed var(--ui-line);cursor:not-allowed}
+.door-why{margin-top:8px;text-align:center;font-size:.8125rem;color:var(--muted)}
+.door-why[hidden],.door-msg[hidden]{display:none}
+.cs-foot{margin-top:18px;text-align:center;font-size:.8125rem;color:var(--muted);line-height:1.6}
+.cs-foot .cs-doc{font-size:.8125rem}
+.lg h1{font-size:1.5rem}
+.door-back{display:flex}
+.lg-list{list-style:none;margin:16px auto 0;padding:0;max-width:420px}
+.lg-list li{display:flex;gap:10px;align-items:flex-start;padding:5px 0;font-size:.9375rem;line-height:1.55;color:var(--body)}
+.lg-list svg.i{width:18px;height:18px;margin-top:3px;color:var(--normal);stroke-width:2.4}
+.srvbox.door-box{margin-top:20px;padding:18px 16px 14px;background:var(--card);border:1px solid var(--hairline);border-radius:var(--r-card);box-shadow:var(--shadow-card);gap:8px}
+.door-seg{display:grid;grid-template-columns:1fr 1fr;gap:4px;padding:4px;border-radius:12px;background:var(--tint2);margin-bottom:6px}
+.door-seg button{min-height:46px;border-radius:9px;font-weight:700;color:var(--muted)}
+.door-seg button.on{background:var(--card);color:var(--text);box-shadow:0 1px 4px rgba(0,0,0,.14)}
+.door-f{display:block;margin-top:6px;font-size:.875rem;font-weight:700;color:var(--text)}
+.door-f small{font-weight:500;color:var(--muted);margin-left:4px}
+.door-pw{position:relative}
+.srvbox .door-pw input{padding-right:84px}
+.door-eye{position:absolute;right:3px;top:50%;transform:translateY(-50%);min-height:44px;min-width:64px;padding:0 10px;border-radius:9px;font-size:.875rem;font-weight:700;color:var(--primary-deep)}
+.door-ck{display:flex;gap:12px;align-items:flex-start;padding:12px 2px 2px;cursor:pointer}
+.srvbox .door-ck input{flex:none;width:22px;height:22px;min-height:0;margin:2px 0 0;padding:0;accent-color:var(--primary)}
+.door-ck b{display:block;font-size:.9375rem;line-height:1.45}
+.door-ck small{display:block;margin-top:3px;font-size:.8125rem;line-height:1.55;color:var(--muted)}
+.door-more{padding-left:36px}
+.door-more dl{display:grid;grid-template-columns:auto 1fr;gap:4px 10px;margin:0 0 8px;font-size:.8125rem;line-height:1.55}
+.door-more dt{color:var(--muted);font-weight:700}.door-more dd{margin:0;color:var(--body)}
+.door-more p{font-size:.8125rem;line-height:1.55;color:var(--muted)}
+.door-msg{margin-top:4px;padding:10px 12px;border-radius:10px;background:var(--tint2);color:var(--text);font-size:.875rem;line-height:1.55}
+.srvbox .door-go{margin-top:6px}
+.door-forgot{align-self:center;text-align:center}
+.door-note{font-size:.8125rem;color:var(--muted);line-height:1.6;text-align:center}
+.door-h2{font-size:1.0625rem}
+.door-me{display:flex;gap:12px;align-items:center}
+.door-av{flex:none;width:44px;height:44px;border-radius:50%;background:var(--tint);color:var(--primary-deep);display:grid;place-items:center;font-weight:800;font-size:1.125rem}
+.door-me b{display:block;overflow-wrap:anywhere}.door-me small{display:block;color:var(--muted);font-size:.8125rem}
+.door-social{display:flex;flex-direction:column;gap:8px}.door-social button{min-height:50px;border-radius:12px;border:1.5px solid var(--ui-line);font-weight:700}
+.door-or{display:flex;align-items:center;gap:10px;color:var(--muted);font-size:.8125rem}.door-or::before,.door-or::after{content:"";flex:1;border-top:1px solid var(--hairline)}
+.door-skip{display:block;width:100%;min-height:52px;margin-top:14px;border-radius:12px;border:1.5px solid var(--hairline);background:var(--card);color:var(--body);font-weight:700}
+.docv{max-width:42em}
+.docv h1{font-size:1.5rem;margin:4px 0 6px}
+.docv .meta{font-size:.8125rem;color:var(--muted);margin-bottom:16px;line-height:1.6}
+.docv .lead{background:var(--tint);border-radius:14px;padding:14px 16px;margin:0 0 12px}
+.docv .lead p{margin:0 0 6px;color:var(--text)}
+.docv section{border-top:1px solid var(--hairline);padding:14px 0}
+.docv>p{margin-bottom:12px}
+.docv h2{font-size:1.125rem;margin:0 0 6px}
+.docv h3{font-size:1rem;margin:14px 0 4px}
+.docv p,.docv li{font-size:.9375rem;line-height:1.75;color:var(--body)}
+.docv li{margin:0 0 6px}
+.docv ul,.docv ol{padding-left:1.25em;margin:0 0 8px}
+.docv .wrap{overflow-x:auto}
+.docv table{width:100%;border-collapse:collapse;font-size:.8125rem;margin-top:6px}
+.docv th,.docv td{text-align:left;vertical-align:top;padding:8px 6px;border-bottom:1px solid var(--hairline);overflow-wrap:anywhere;color:var(--body)}
+.docv th{color:var(--muted);font-weight:700}
+.docv a{color:var(--primary-deep);font-weight:600}
+.docv b{color:var(--text)}
+.docv footer{border-top:1px solid var(--hairline);padding-top:14px}
+.docv footer p{font-size:.8125rem;margin:0 0 4px;color:var(--muted)}
+.docv-web{margin-top:16px}
+@media (hover:hover){.cs-row:hover{background:var(--tint2)}.cs-all:hover{background:var(--tint)}.door-skip:hover,.door-seg button:not(.on):hover{color:var(--text)}.door-go:not(:disabled):hover{filter:brightness(1.06)}}
+@media (min-width:600px){
+  body.door .app{max-width:none;background:var(--ground)}
+  body.door main{padding-top:40px}
+  .door{padding:28px 40px 32px;border-radius:24px;background:var(--surface);border:1px solid var(--hairline);box-shadow:0 12px 40px rgba(0,0,0,.08)}
+}`; document.head.appendChild(css); } catch (e) {}
+
+/* 내 정보·동의·로그인·약관 화면을 보고 있었으면 다시 그린다(이 파일이 늦게 오므로) */
+try { if (/^#\/(me|consent|login|doc)/.test(location.hash)) route(); } catch (e) {}
