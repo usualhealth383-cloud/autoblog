@@ -975,7 +975,7 @@ details.fold>.bd.bd{margin-top:2px;padding:0;animation:none}.fold>.bd>p:first-ch
 .tg-row{padding:var(--s3) 0 var(--s4) var(--s4);border-left:3px solid var(--hairline);margin-bottom:2px}
 .tg-row:last-child{margin-bottom:0}
 .tg-row.clinic{border-left-color:var(--primary)}
-.tg-row.pharm{border-left-color:var(--primary);opacity:1}
+.tg-row.pharm{border-left-color:var(--primary);opacity:1}.triage.tg-er .tg-row.pharm{display:none}
 .tg-row.esc{border-left-color:var(--alert)}
 .tg-row>b{display:block;font-size:.8125rem;font-weight:800;letter-spacing:.02em;margin-bottom:5px;color:var(--muted)}
 .tg-row.esc>b{color:var(--alert)}
@@ -2517,6 +2517,7 @@ function route(){
   const same = path === ROUTE_PREV && !!ROUTE_PREV, keepY = window.scrollY, fsig = same ? focusSig() : null;
   view.classList.toggle('same', same);
   view.innerHTML = panel ? insertPanel(html, panel) : html;
+  view.querySelectorAll('.tab[role=tab]').forEach(t => t.setAttribute('aria-selected', t.classList.contains('on')));
   psSwap(view);
   /* 고른 탭은 aria-selected 로도 — 색(on)만으로는 화면낭독기가 모른다(5-18) */
   view.querySelectorAll('[role="tab"]').forEach(t => t.setAttribute('aria-selected', t.classList.contains('on') ? 'true' : 'false'));
@@ -4244,6 +4245,7 @@ function rfApply(){
   /* 「hit」은 검색 결과 줄(.hit{display:flex})과 이름이 겹쳐 체크하면 칸이 옆으로 밀렸다 */
   const r = document.querySelector('#view .rf'); if (r) { r.classList.toggle('hit-er', er); r.classList.toggle('hit-cl', !er && cl); r.classList.toggle('rf-any', er || cl); }
   const a = document.querySelector('#view .answer'); if (a) { a.classList.toggle('rf-on', er || cl); a.classList.toggle('rf-er', er); if (!(er || cl) || er) a.classList.remove('rf-peek'); }
+  document.querySelector('#view .triage')?.classList.toggle('tg-er', er); const t1 = document.querySelector('#view .stabs .tab[data-p=sp1]'); if (t1) t1.textContent = er ? '먼저 할 일' : (t1.dataset.n0 ||= t1.textContent);
 }
 function rfToggle(sid, k, i, on){ if (RF.sid !== sid) { RF.sid = sid; RF.er = new Set(); RF.cl = new Set(); } RF[k][on ? 'add' : 'delete'](i); rfSave(); rfApply(); }
 function redflagCheck(s){
