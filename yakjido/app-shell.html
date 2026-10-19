@@ -621,7 +621,7 @@ ul.steps li::before{content:counter(s);position:absolute;left:0;top:2px;width:24
 .today-hero .th-t{flex:1;min-width:0}.today-hero .th-h{font-size:1.375rem;font-weight:800;line-height:1.3;font-variant-numeric:tabular-nums}.today-hero .th-h span{color:var(--muted);font-weight:700}
 .today-hero .th-s{margin-top:4px;color:var(--body);font-size:.9375rem;line-height:1.45}
 /* 예전 이름 .today 가 홈 카드와 충돌했다 */
-.today-hero.all{background:var(--normal-tint)}.today-hero .th-go{color:var(--muted);flex:none}
+.today-hero.all{background:var(--normal-tint)}@keyframes rfill{from{stroke-dasharray:0 200}}.today-hero.all .ring circle+circle{animation:rfill .3s ease-out}.today-hero .th-go{color:var(--muted);flex:none}
 .dose-tick{display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:14px;background:var(--card);border:1px solid var(--hairline);width:100%;text-align:left;min-height:60px}
 .dose-tick .t{font-weight:800;font-size:1.0625rem;min-width:52px;font-variant-numeric:tabular-nums}
 .dose-tick .n{flex:1;min-width:0;overflow-wrap:anywhere}
@@ -5012,7 +5012,7 @@ const hourWord = t => { const [h, m] = t.split(':').map(Number); return `${h < 5
 const qtyWord = d => { const f = pillForm(d); return (f === 'tab' || f === 'cap') && (!d.approx || (ME.qty || {})[d.id]) ? ` ${doseQty(d.id)}알` : ''; };
 function slotBody(t, items, again){
   const w = hourWord(t), water = items.some(d => ((d.d && d.d.pict) || []).includes('물많이')) ? ' 물 한 컵과 함께 드세요.' : '';
-  if (!noteName()) return (again ? `${w} 약을 아직 체크하지 않으셨어요. 드셨으면 「먹었어요」를 눌러 주세요.` : `${w} — 약 드실 시간이에요.${water || ' 눌러서 확인해 주세요.'}`);
+  if (!noteName()) return (again ? `${w} 약을 아직 체크하지 않으셨어요. 드셨으면 「먹었어요」를 눌러 주세요.` : `${w} — 약 드실 시간이에요.${water || [' 눌러서 확인해 주세요.', ' 드시고 「먹었어요」를 눌러 주세요.', ' 천천히 챙겨 드세요.'][new Date().getDate() % 3]}`);
   const L = items.slice(0, 4).map(d => d.name + qtyWord(d)).join(', ') + (items.length > 4 ? ` 외 ${items.length - 4}가지` : '');
   return `${w} 약${again ? '이 아직이에요' : ''} — ${L}.${again ? ' 드셨으면 「먹었어요」를 눌러 주세요.' : water}`.slice(0, 240);
 }
