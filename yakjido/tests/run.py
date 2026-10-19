@@ -609,7 +609,7 @@ def z9_checks(br, url, fails):
     go('/drug/ciclopirox-shampoo')
     if pz.query_selector('.dose-hero') and pz.inner_text('.dose-hero').split('\n')[-1].strip().startswith('—'): fails.append('시클로피록스 용량 칸에 「—」 한 글자가 값처럼 보입니다')
     # C12 — 아이 처음 안내: 어른 조건 칩 없음 · 생년월일·몸무게 칸
-    go('/hello/1'); pz.click('button.hello-big:has-text("아이가 먹을 약이에요")'); pz.wait_for_timeout(120)
+    go('/hello/1'); pz.click('button.hello-big:has-text("아이가 아파요")'); pz.wait_for_timeout(120)
     t = txt()
     if '임신' in t or '전립선' in t or '술을' in t: fails.append('아이 처음 안내 2단계에 임신·전립선·술 칩이 나옵니다')
     if not pz.query_selector('#k-birth') or not pz.query_selector('#k-w'): fails.append('아이 처음 안내에 생년월일·몸무게 칸이 없습니다')

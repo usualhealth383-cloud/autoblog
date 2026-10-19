@@ -1745,7 +1745,7 @@ background-repeat:no-repeat;background-position:right 9px center;background-size
 <script>
 window.__YAKJIDO_OK__ = true;
 const D = JSON.parse(document.getElementById('data').textContent || '{}');
-const BUILD = '2026-10-14';
+const BUILD = '2026-10-19';
 const DATAV = 'c585ddbe41'.indexOf('__') === 0 ? BUILD : 'c585ddbe41';
 const BRANDMARK = (typeof window !== 'undefined' && window.__BRANDMARK__) || 'icon-192.png';
 let CORE = 0, CORE_P = null;
@@ -2290,7 +2290,7 @@ const topBar = (opts = {}) => `
 <div class="top">
 ${opts.back ? `<button class="back" onclick="goBack()">${I.prev}${esc(opts.back)}</button>` : `
 <div class="brand"><div class="mark"><img src="${BRANDMARK}" alt="" width="34" height="34"></div><div><b>약지도</b><span>집에서 할 일 · 약국 약 · 진료 신호를 차례로</span></div></div>`}
-${opts.unreviewed ? `<span class="review-stamp wait">${I.alert}검수 대기</span>` : opts.unv ? `<span class="review-stamp wait">${I.info}자료 확인 중</span>` : `<span class="review-stamp">${I.shield}${esc(D.meta?.reviewLabel || '의료진 검수')}${bigFs() ? '' : ` · ${esc(D.meta?.reviewed || '')}`}</span>`}
+${opts.unreviewed ? `<span class="review-stamp wait">${I.alert}의사 확인 중</span>` : opts.unv ? `<span class="review-stamp wait">${I.info}자료 확인 중</span>` : `<span class="review-stamp">${I.shield}${esc(D.meta?.reviewLabel || '의료진 검수')}${bigFs() ? '' : ` · ${esc(D.meta?.reviewed || '')}`}</span>`}
 </div>
 ${opts.nosearch ? '' : `<div class="topfind">${I.search}<input id="gq" aria-label="증상이나 약 이름으로 찾기" placeholder="${bigFs() ? '증상이나 약 이름' : '증상·약 이름으로 찾기 (예: 허리, 타이레놀)'}" autocomplete="off" enterkeyhint="search" value="${esc(GQ)}"><button class="gq-x ${GQ ? '' : 'hide'}" onclick="GQ='';route()" aria-label="지우기">${I.x}</button></div>`}<!--TOPEND-->`;
 const srcShort = t => {
@@ -2896,7 +2896,7 @@ const HOME_TOP = ['cold', 'fever', 'headache', 'msk', 'heartburn', 'dyspepsia', 
 let HTAB = (() => { try { return sessionStorage.getItem('yakjido.htab') || 'top'; } catch (e) { return 'top'; } })();
 const urow = (ic, t, s, on, gw = '열기', cls = '') => `<button class="util-row ${cls}" onclick="${on}"><span class="ic">${ic}</span><span class="t"><b>${t}</b>${s ? `<small>${s}</small>` : ''}</span><span class="go">${esc(gw)}${I.chev}</span></button>`;
 const lrow = (ic, t, sub, on) => `<button class="srow" onclick="${on}"><span class="ab">${ic}</span><span class="rtx"><b>${t}</b>${sub ? `<span>${sub}</span>` : ''}</span>${I.chev}</button>`;
-const srow = (s, wait) => `<button class="srow" onclick="go('/symptom/${s.id}')"><span class="ab">${sicon(s)}</span><span class="rtx"><b>${esc(s.name)}</b>${s.short ? `<span>${esc(s.short)}</span>` : ''}${wait ? '<span class="wait-t">검수 대기</span>' : ''}</span>${I.chev}</button>`;
+const srow = (s, wait) => `<button class="srow" onclick="go('/symptom/${s.id}')"><span class="ab">${sicon(s)}</span><span class="rtx"><b>${esc(s.name)}</b>${s.short ? `<span>${esc(s.short)}</span>` : ''}${wait ? '<span class="wait-t">의사 확인 중</span>' : ''}</span>${I.chev}</button>`;
 const homeTop = () => HOME_TOP.filter(id => !(svOn() && SV_HOME.includes(id)));
 function homeTabs(){
 const sp = seasonPick(), S = D.symptoms || [], ok = S.filter(s => s.reviewed !== false), wait = S.filter(s => s.reviewed === false);
@@ -2907,7 +2907,7 @@ return [
 { k:'season', n:sp.eb, c:sp.ids.filter(id => byId(S, id)).length, ic:icon(sp.ico) },
 ...groups.map(g => ({ k:'g:' + g, n:g, c:ok.filter(s => s.group === g).length })),
 { k:'all', n:'전체', c:ok.length, ic:I.book },
-...(wait.length ? [{ k:'wait', n:'검수 대기', c:wait.length }] : []),
+...(wait.length ? [{ k:'wait', n:'의사 확인 중', c:wait.length }] : []),
 ];
 }
 function homeList(){
@@ -2920,7 +2920,7 @@ else if (HTAB === 'season') { const L = sp.ids.map(id => byId(S, id)).filter(Boo
 else if (HTAB === 'all') { const gs = [...new Set(ok.map(s => s.group))];
 body = head('전체 증상', ok.length, '갈래별로 모았어요') + gs.map(g => `<h3 class="sub-h">${esc(g)}</h3>${ok.filter(s => s.group === g).map(s => srow(s)).join('')}`).join(''); }
 else if (HTAB === 'wait') { const L = S.filter(s => s.reviewed === false);
-body = head('검수 대기', L.length, '자료를 바탕으로 정리했지만 아직 의사 확인을 거치지 않았어요. 참고만 하시고 약사·의사와 상의하세요.') + L.map(s => srow(s, true)).join(''); }
+body = head('의사 확인 중', L.length, '자료를 바탕으로 정리했지만 아직 의사 확인을 거치지 않았어요. 참고만 하시고 약사·의사와 상의하세요.') + L.map(s => srow(s, true)).join(''); }
 else { const g = HTAB.slice(2), L = ok.filter(s => s.group === g); body = head(g, L.length) + L.map(s => srow(s)).join(''); }
 return `<div id="hlist" role="tabpanel" aria-label="증상 목록">${body}</div>`;
 }
@@ -2954,7 +2954,7 @@ ${v && vd <= 3 ? urow(I.cal, `${vd <= 0 ? '오늘' : vd === 1 ? '내일' : vd + 
 ${ME.easy ? urow(I.clock, '오늘 약 체크', '드셨는지 표시하고 알림 받기', "go('/schedule')", '열기') : ''}
 ${urow(I.check, '여기 없어요', '질문 두 번으로 찾기', "go('/guide/1')", '시작')}
 ${urow(I.eye, '약 사진 찍기', '상자·약봉투로 확인', "go('/photo')", '찍기')}
-${urow(I.pill, n ? `내 약통 ${n}가지` : '내 약통에 약 담기', n ? '겹치는지 확인' : '겹치는 약 거르기', `go('${n ? '/together' : '/kinds'}')`, n ? '확인' : '담기')}
+${urow(I.pill, n ? `내 약통 ${n}가지` : '내 약통에 약 담기', n ? '겹치는지 확인' : '겹치는 약 살펴보기', `go('${n ? '/together' : '/kinds'}')`, n ? '확인' : '담기')}
 ${wxCard()}
 </div>
 ${workedHome()}
@@ -3815,7 +3815,7 @@ const T = [['sp1', noBuy ? '먼저 할 일' : '약국에서 사기'], ...(hasHow
 return `<nav class="tabs stabs" role="tablist" aria-label="이 증상">${T.map(([k, n, c], i) => `<button class="tab ${i ? '' : 'on'}" role="tab" data-p="${k}">${n}${c ? `<span class="n">${c}</span>` : ''}</button>`).join('')}</nav>`; })()}
 <div class="pane on" id="sp1">
 <section class="sec answer" aria-label="바로 답" style="margin-top:8px">
-<div class="ans-note" aria-hidden="true"><span>${(d => `${d.getFullYear()}.${d.getMonth() + 1}.${d.getDate()}`)(new Date())} · ${esc(s.name.split(' (')[0])}</span><span class="rx-stamp${s.reviewed === false ? ' wait' : ''}">${s.reviewed === false ? '검수 대기' : esc(D.meta?.stamp || '의사 검수')}</span></div>
+<div class="ans-note" aria-hidden="true"><span>${(d => `${d.getFullYear()}.${d.getMonth() + 1}.${d.getDate()}`)(new Date())} · ${esc(s.name.split(' (')[0])}</span><span class="rx-stamp${s.reviewed === false ? ' wait' : ''}">${s.reviewed === false ? '의사 확인 중' : esc(D.meta?.stamp || '의사 검수')}</span></div>
 <div class="ans-head"><div class="eyebrow">${inf ? '약보다 진료가 먼저예요' : noBuy ? '약국에서 살 약은 없어요' : s.reviewed === false ? '약국에서 상의할 것' : '약국에서 이 성분을 찾으세요'}</div><button class="speak" onclick="speakAnswer('${s.id}', this)" aria-label="핵심 읽어 주기">${I.info}읽어 주기</button></div>
 ${s.reviewed === false && !noBuy ? `<p class="note" style="margin-bottom:10px">${I.alert}<span>아직 의사 검수가 끝나지 않은 안내예요.</span></p>` : ''}
 ${noBuy ? '' : `<button type="button" class="rf-dim-h" onclick="this.closest('.answer').classList.add('rf-peek')">${I.alert}<span><b>지금은 약보다 진료가 먼저예요</b><small>진료를 받으셔야 하는 신호에 체크하셨어요. 그래도 약을 보시려면 누르세요</small></span></button>
@@ -3856,7 +3856,7 @@ ${s.faq?.length ? xcard('faq', 'info', '자주 묻는 질문', s.faq, faqList(s.
 <p class="lead-p">${fmt(s.lead)}</p>
 <section class="sec">
 <div class="rx-card">
-<div class="rx-head"><div><h2>${esc(s.planTitle || '진료실에서 처방하는 방식')}</h2><div class="lbl">${esc(s.planLabel || '같은 원리로 약국에서 고르면 돼요')}</div></div><span class="rx-stamp${s.reviewed === false ? ' wait' : ''}">${s.reviewed === false ? '검수 대기' : esc(D.meta?.stamp || '의사 검수')}</span></div>
+<div class="rx-head"><div><h2>${esc(s.planTitle || '진료실에서 처방하는 방식')}</h2><div class="lbl">${esc(s.planLabel || '같은 원리로 약국에서 고르면 돼요')}</div></div><span class="rx-stamp${s.reviewed === false ? ' wait' : ''}">${s.reviewed === false ? '의사 확인 중' : esc(D.meta?.stamp || '의사 검수')}</span></div>
 ${(s.plan || []).filter(p => !slotHidden(p)).map(slotHtml).join('')}
 </div>
 </section>
@@ -5243,10 +5243,10 @@ return `${topBar({ nosearch:true })}${dots}
 <div class="hello-hi">
 <div class="hello-mark"><svg viewBox="0 0 24 24"><rect x="3" y="8" width="18" height="8" rx="4" transform="rotate(-45 12 12)"/><path d="M9 9l6 6"/></svg></div>
 <h1>약지도에 오셨어요</h1>
-<p>증상에 맞는 약국 약 <b>성분</b>을 의사가 정리한 기준으로 알려 드려요.<br>먼저 한 가지만 여쭐게요.</p>
+<p>어디가 불편한지 고르면 <b>집에서 할 일 · 약국에서 찾을 약 · 진료가 필요한 신호</b>를 차례로 알려 드려요.<br>먼저 한 가지만 여쭐게요.</p>
 </div>
-<h2 class="hello-q">누가 드실 약인가요?</h2>
-<div class="hello-list">${pick('adult', '제가 먹을 약이에요', '성인 기준으로 골라 드려요')}${pick('senior', '어르신이 드실 약이에요', '65세 이상 — 부담이 적은 쪽을 먼저 권해요')}${pick('child', '아이가 먹을 약이에요', '소아·청소년 — 몸무게로 용량을 계산해요')}</div>
+<h2 class="hello-q">누가 불편하세요?</h2>
+<div class="hello-list">${pick('adult', '제가 불편해요', '성인 기준으로 알려 드려요')}${pick('senior', '어르신이 불편하세요', '65세 이상 — 부담이 적은 쪽을 먼저 권해요')}${pick('child', '아이가 아파요', '소아·청소년 — 몸무게로 용량을 계산해요')}</div>
 ${skip}`;
 }
 if (n === 2) {
