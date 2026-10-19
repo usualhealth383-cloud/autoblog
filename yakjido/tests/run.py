@@ -357,7 +357,7 @@ def alarm_z6(br, url, fails):
     b = ph.query_selector('.skip-l button')
     if not b: fails.append('Z6 건너뛰기: 복용 시간 화면에 지난 회차 「건너뛰기」 단추가 없습니다')
     else:
-        b.click(); ph.wait_for_timeout(400)
+        ph.locator('.skip-l button').first.click(); ph.wait_for_timeout(400)  # 화면이 다시 그려지면 쥔 단추가 떨어진다 — 찾아서 누르기
         if not ph.evaluate("()=>((ME.skipped||{})[todayKey()]||[]).length") or not ph.query_selector('.dose-tick.skip'): fails.append('Z6 건너뛰기: 단추를 눌러도 건너뜀으로 적히지 않습니다')
     ph.close()
     if zerr: fails.append(f'Z6 알림: JS 오류 {zerr[:2]}')
