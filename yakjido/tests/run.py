@@ -72,7 +72,9 @@ CONTRAST_JS = """()=>{
    const st=getComputedStyle(e);if(st.visibility==='hidden'||st.display==='none'||+st.opacity===0)continue;
    const L1=lum(st.color),L2=lum(bg(e));const r=(Math.max(L1,L2)+.05)/(Math.min(L1,L2)+.05);
    const size=parseFloat(st.fontSize),bold=parseInt(st.fontWeight)>=700;const need=(size>=24||(size>=18.66&&bold))?3:4.5;
-   if(r<need)out.push({t:t.slice(0,24),r:+r.toFixed(2),need,cls:(''+e.className).slice(0,18)});}
+   if(r<need)out.push({t:t.slice(0,24),r:+r.toFixed(2),need,cls:(''+e.className).slice(0,18)});
+   /* 10-19 — 글자 최소 14 px(디자인 리서치 1019 #1 · NHS 휴대폰 작은 글씨 14 px). 그림 속 글자는 뺀다 */
+   if(size<13.9&&e.getClientRects().length&&!e.closest('svg'))out.push({t:t.slice(0,24),r:'글자 '+size+'px',need:'14px',cls:(''+e.className).slice(0,18)});}
  return out;}"""
 
 # 글자 말고 «조작 부품»의 대비 — WCAG 1.4.11(3:1).
