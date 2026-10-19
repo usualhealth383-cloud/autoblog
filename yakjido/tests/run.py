@@ -154,7 +154,7 @@ RULES_JS = """()=>{
     ixItems([]).forEach(it=>it.ings.forEach(e=>{(e.cls||[]).forEach(x=>c.add(x)); if(e.k)k.add(e.k);}));
     info[id]={c,k}; }
   const hit=(id,g)=>g.some(t=>t.startsWith('k:')?info[id].k.has(t.slice(2)):info[id].c.has(t));
-  const F=['heart','diabetes','ulcer','kidney','liver','anticoag','glaucoma','bph','asthma','alcohol','gout','pregnant','senior'];
+  const F=['heart','diabetes','ulcer','kidney','liver','anticoag','glaucoma','bph','asthma','alcohol','gout','pregnant','nursing','senior'];
   const bad=[];
   for(const r of rules){
     let pick=[],ok=true;
@@ -1083,14 +1083,14 @@ def main():
         _fl = pg.evaluate("""()=>{
           const txt = document.getElementById('view').innerText;
           /* 칸의 문구는 조금씩 다르다 — 핵심 낱말로 본다 */
-          const need = {pregnant:'임신', ulcer:'위궤양', kidney:'신장', liver:'간 질환', heart:'심장',
+          const need = {pregnant:'임신', nursing:'수유', ulcer:'위궤양', kidney:'신장', liver:'간 질환', heart:'심장',
                         asthma:'천식', anticoag:'항응고', glaucoma:'녹내장', bph:'전립선', gout:'통풍', diabetes:'당뇨'};
           return Object.keys(need).filter(k => !txt.includes(need[k]));}""")
         if _fl: fails.append(f'내 정보에서 켤 수 없는 몸 상태가 있습니다: {_fl}')
         # 5a-10b. ClinicScore 문법(2026-09-29 현욱님) — 내 정보는 탭 셋, 건강 상태는 누르는 단추.
         #         누르면 그 자리에서 켜지고(맨 위로 튀지 않고) 「켜 둔 것」에 설명이 붙어야 한다.
         _mt = pg.evaluate("""()=>{
-          ['heart','diabetes','ulcer','kidney','liver','anticoag','glaucoma','bph','asthma','alcohol','gout','pregnant'].forEach(f=>{ME[f]=false;}); saveMe(); route();
+          ['heart','diabetes','ulcer','kidney','liver','anticoag','glaucoma','bph','asthma','alcohol','gout','pregnant','nursing'].forEach(f=>{ME[f]=false;}); saveMe(); route();
           const tabs=[...document.querySelectorAll('.metabs .tab')].map(b=>b.innerText.trim().replace(/\\s*\\d+$/,''));
           window.scrollTo(0,400); const y=window.scrollY;
           const chip=[...document.querySelectorAll('.chip-m')].find(b=>b.innerText.includes('전립선비대')); chip.click();
@@ -1099,7 +1099,7 @@ def main():
           const off=ME.bph===false && !document.querySelector('.cond-on');
           return {tabs, on, desc, stay, off, chips:document.querySelectorAll('.chip-m').length};}""")
         if _mt['tabs'] != ['내 몸', '내 약통', '설정']: fails.append(f'내 정보 탭이 셋이 아닙니다: {_mt["tabs"]}')   # 3-20 이름 하나로 — 「먹는 약」 → 「내 약통」
-        if _mt['chips'] != 12 or not _mt['on'] or not _mt['off']: fails.append(f'건강 상태 단추가 켜지고 꺼지지 않습니다: {_mt}')
+        if _mt['chips'] != 13 or not _mt['on'] or not _mt['off']: fails.append(f'건강 상태 단추가 켜지고 꺼지지 않습니다: {_mt}')
         if '소변이 막힐 수' not in _mt['desc']: fails.append('건강 상태를 눌러도 「켜 둔 것」 설명이 안 붙습니다')
         if not _mt['stay']: fails.append('건강 상태를 누르면 화면이 맨 위로 튑니다')
         pg.goto(url + '#/me?t=meds'); ready(); pg.wait_for_timeout(300)
@@ -1232,7 +1232,7 @@ def main():
         pg.goto(url + '#/symptom/cold'); ready(); pg.wait_for_timeout(400)
         _s = pg.evaluate("""()=>{
           /* 앞 검사가 켜 둔 몸 상태가 남아 있으면 「약사와 상의」 배지가 먼저 붙는다 — 비우고 본다 */
-          ['heart','diabetes','ulcer','kidney','liver','anticoag','glaucoma','bph','asthma','alcohol','gout','pregnant'].forEach(f=>{ME[f]=false;});
+          ['heart','diabetes','ulcer','kidney','liver','anticoag','glaucoma','bph','asthma','alcohol','gout','pregnant','nursing'].forEach(f=>{ME[f]=false;});
           const has = a => { ME.age=a; ME.taking=[]; ME.pub={}; route();
             return [...document.querySelectorAll('.buy-item')]
               .some(e=>/이부프로펜|나프록센|덱시부프로펜/.test(e.innerText) && /어르신 주의/.test(e.innerText)); };
@@ -1245,7 +1245,7 @@ def main():
         #        같은 증상에 아세트아미노펜 칸이 있으면 그 칸이 1번. 증상 화면과 약국 카드(#/show)가 같은 순서.
         _q5 = pg.evaluate("""()=>{
           const keep = JSON.stringify(ME), bad = [], NS = /이부프로펜|나프록센|덱시부프로펜/;
-          ['diabetes','ulcer','kidney','liver','glaucoma','bph','asthma','alcohol','gout','pregnant'].forEach(f=>{ME[f]=false;});
+          ['diabetes','ulcer','kidney','liver','glaucoma','bph','asthma','alcohol','gout','pregnant','nursing'].forEach(f=>{ME[f]=false;});
           ME.age='senior'; ME.heart=true; ME.anticoag=true; ME.taking=[]; ME.pub={}; ME.allergy=[]; ME.allergyUnknown=false;
           for (const sid of ['headache','msk','cold']) {
             location.hash = '#/symptom/' + sid; route();
@@ -1584,7 +1584,7 @@ def main():
             fails.append(f'추천 바구니가 스스로 겹침 {sid}: {msgs[0][:70]}')
         # 6c-2. 조건을 켠 바구니도(한 가지·두 가지 조합 전부) 스스로 겹치지 않는지 — 위 조건에서 감기 거담제가 구아이페네신으로 바뀌어
         #       「이 중 하나만」 묶음의 콜대원과 겹치던 것을 잡는다(2026-10-13)
-        pdup2 = pg.evaluate("""()=>{ const FL=['senior','ulcer','kidney','heart','anticoag','pregnant','liver','asthma','alcohol','glaucoma','bph','gout'];
+        pdup2 = pg.evaluate("""()=>{ const FL=['senior','ulcer','kidney','heart','anticoag','pregnant','nursing','liver','asthma','alcohol','glaucoma','bph','gout'];
           const cs=FL.map(a=>[a]); for(let i=0;i<FL.length;i++) for(let j=i+1;j<FL.length;j++) cs.push([FL[i],FL[j]]); const out=[];
           for(const fl of cs) for(const s of (D.symptoms||[])){ const m=planDup(basket(s,{flags:fl})); if(m.length) out.push(s.id+' ['+fl.join('+')+'] '+String(m[0]).slice(0,60)); }
           return out; }""")

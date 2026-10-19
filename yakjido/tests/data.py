@@ -187,7 +187,7 @@ for d in D:
 
 # 「내 정보」 조건 이름은 정해진 13가지뿐이다. 없는 이름을 쓰면 그 주의는 «영원히 안 뜬다».
 # 실제로 달걀 알레르기에 없는 이름(allergy)을 쓴 곳이 있었다.
-VALID_FLAG = {'pregnant', 'ulcer', 'heart', 'anticoag', 'kidney', 'liver', 'alcohol',
+VALID_FLAG = {'pregnant', 'nursing', 'ulcer', 'heart', 'anticoag', 'kidney', 'liver', 'alcohol',
               'asthma', 'glaucoma', 'bph', 'gout', 'diabetes', 'senior', 'child'}
 for d in D:
     for a in (d.get('avoid') or []) + (d.get('caution') or []):
@@ -310,6 +310,16 @@ for _pf in ('pills.json', 'pills-rx.json'):
 import gzip as _gz
 _idx = ROOT.parent / 'docs' / 'yakjido' / 'index.html'
 _core = ROOT.parent / 'docs' / 'yakjido' / 'data' / 'core.json'
+# 임신·수유 나눔(2026-10-19 3차 검수 #16) — 수유 줄이 빌드에서 생기고, 임신에만 해당하는 문장이 수유에 걸리지 않아야 한다
+if _core.exists():
+    _cd = {d['id']: d for d in json.loads(_core.read_text(encoding='utf-8')).get('drugs', [])}
+    _ib = _cd.get('ibuprofen', {})
+    if not any('nursing' in (e.get('flags') or []) for e in _ib.get('caution') or []): fails.append('이부프로펜에 수유 중 주의(설명서·LactMed)가 없습니다 — build.py 임신·수유 나눔')
+    for _d in _cd.values():
+        for _k in ('avoid', 'caution'):
+            for _e in _d.get(_k) or []:
+                if isinstance(_e, dict) and {'pregnant', 'nursing'} <= set(_e.get('flags') or []) and not re.search(r'수유|젖', _e.get('text', '')):
+                    fails.append(f'{_d["id"]}: 임신 문장이 수유에도 걸려 있습니다 — {_e.get("text", "")[:30]}')
 if _idx.exists():
     _b = _idx.read_bytes(); _gzkb = len(_gz.compress(_b, 6)) / 1024
     # 2026-10-13 220 → 224 KB: 복용 진행 고리·알약 그림·약국 쪽지 머리(디자인 리서치) +2 KB. 3G(초당 약 50 KB)에서 0.1초 미만.

@@ -1746,7 +1746,7 @@ background-repeat:no-repeat;background-position:right 9px center;background-size
 window.__YAKJIDO_OK__ = true;
 const D = JSON.parse(document.getElementById('data').textContent || '{}');
 const BUILD = '2026-10-19';
-const DATAV = 'bedc5f541b'.indexOf('__') === 0 ? BUILD : 'bedc5f541b';
+const DATAV = 'd51fb4ff5a'.indexOf('__') === 0 ? BUILD : 'd51fb4ff5a';
 const BRANDMARK = (typeof window !== 'undefined' && window.__BRANDMARK__) || 'icon-192.png';
 let CORE = 0, CORE_P = null;
 function mergeCore(c){
@@ -1859,7 +1859,7 @@ f_sup:'<svg class="i" viewBox="0 0 24 24"><path d="M12 3c2.6 2.4 4 4.6 4 7.4v6.2
 const icon = n => I[n] || I.pill;
 
 const ME_KEY = 'yakjido.me.v1';
-const ME_DEF = { child:null, age:'adult', pregnant:false, ulcer:false, kidney:false, liver:false, heart:false, asthma:false, anticoag:false, alcohol:false, gout:false, glaucoma:false, bph:false };
+const ME_DEF = { child:null, age:'adult', pregnant:false, nursing:false, ulcer:false, kidney:false, liver:false, heart:false, asthma:false, anticoag:false, alcohol:false, gout:false, glaucoma:false, bph:false };
 let ME = { ...ME_DEF };
 const SAFE_ID = /^[A-Za-z0-9가-힣_.:\-]{1,80}$/, SAFE_HM = /^([01]\d|2[0-3]):[0-5]\d$/, SAFE_DAY = /^\d{4}-\d{2}-\d{2}$/;
 const ALG_R = { hives:'두드러기', breath:'숨이 참', swell:'붓기', unk:'모름' };
@@ -1916,7 +1916,7 @@ if (!saveMe.persist && (ME.taking || []).length) { saveMe.persist = true; try { 
 } catch (e) { if (!saveMe.warned && STORE_OK) { saveMe.warned = true; try { toast('저장하지 못했어요 — 휴대폰 저장 공간을 확인해 주세요'); } catch (e2) {} } } };
 function snapMe(){ ME_SNAP = {}; for (const k of Object.keys(ME)) if (k !== '_mt') ME_SNAP[k] = JSON.stringify(ME[k]); }
 snapMe();
-const FLAG_LABEL = { pregnant:'임신·수유 중', ulcer:'위가 약함·위궤양·위장출혈 병력', kidney:'신장 질환', liver:'간 질환·음주', heart:'고혈압·심장병', asthma:'천식', anticoag:'항응고제·항혈소판제 복용', alcohol:'술을 자주 마심', gout:'통풍', glaucoma:'녹내장', bph:'전립선비대', diabetes:'당뇨', senior:'65세 이상', child:'소아' };
+const FLAG_LABEL = { pregnant:'임신 중', nursing:'수유 중', ulcer:'위가 약함·위궤양·위장출혈 병력', kidney:'신장 질환', liver:'간 질환·음주', heart:'고혈압·심장병', asthma:'천식', anticoag:'항응고제·항혈소판제 복용', alcohol:'술을 자주 마심', gout:'통풍', glaucoma:'녹내장', bph:'전립선비대', diabetes:'당뇨', senior:'65세 이상', child:'소아' };
 function workedList(sid){ return (ME.worked && ME.worked[sid]) || []; }
 function isWorked(sid, did){ return workedList(sid).includes(did); }
 function toggleWorked(sid, did){
@@ -2336,7 +2336,6 @@ const rows = [];
 for (const dr of list) {
 (dr.avoid || []).forEach(a => { if (a.flags?.some(x => f.includes(x))) rows.push(['stop', dr, a.text || a]); });
 (dr.caution || []).forEach(a => { if (a.flags?.some(x => f.includes(x))) rows.push(['warn', dr, a.text || a]); });
-if (f.includes('pregnant') && dr.lact?.lv === 'avoid') rows.push(['warn', dr, '수유 중이시면 — ' + dr.lact.t]);
 }
 if (!rows.length) return '';
 return `<ul class="plain mew">${rows.map(([lv, dr, t]) => `<li class="${lv}"><b>${esc(ingrName(dr))}</b> — ${fmt(t)}</li>`).join('')}</ul><p class="small muted" style="margin-top:6px">내 정보 탭에서 표시한 상태를 기준으로 골라낸 항목이에요. 최종 판단은 약사·의사와 함께 하세요.</p>`;
@@ -2346,7 +2345,6 @@ const f = activeFlags(); if (!f.length) return '';
 const hits = [];
 const add = (lv, a) => { const m = (a.flags || []).filter(x => f.includes(x)); if (m.length) hits.push({ lv, t: a.text || a, m }); };
 (dr.avoid || []).forEach(a => add('stop', a)); (dr.caution || []).forEach(a => add('warn', a));
-if (f.includes('pregnant') && dr.lact?.lv === 'avoid') hits.push({ lv:'warn', t:'수유 중이시면 — ' + dr.lact.t, m:['pregnant'] });
 if (!hits.length) return '';
 const st = hits.filter(h => h.lv === 'stop'), wa = hits.filter(h => h.lv === 'warn'), who = L => flagWords([...new Set(L.flatMap(h => h.m))]);
 const row = h => `<div class="note${h.lv === 'stop' ? ' me-stop' : ''}">${I.alert}<span>${fmt(h.t)}</span></div>`;
@@ -2359,7 +2357,6 @@ const f = activeFlags(); if (!f.length) return '';
 const hits = [];
 (dr.avoid || []).forEach(a => { if (a.flags?.some(x => f.includes(x))) hits.push({ lv:'stop', t:a.text || a }); });
 (dr.caution || []).forEach(a => { if (a.flags?.some(x => f.includes(x))) hits.push({ lv:'warn', t:a.text || a }); });
-if (f.includes('pregnant') && dr.lact?.lv === 'avoid') hits.push({ lv:'warn', t:'수유 중이시면 — ' + dr.lact.t });
 if (!hits.length) return '';
 return `<div class="card" style="border-color:rgba(182,54,41,.25)"><div class="eyebrow" style="color:var(--alert)">내 정보 기준 확인</div>${hits.map(h => `<div class="note" style="${h.lv === 'stop' ? 'background:var(--alert-tint);color:var(--alert)' : ''};margin-bottom:8px">${I.alert}<span>${fmt(h.t)}</span></div>`).join('')}<p class="small muted">내 정보 탭에서 표시한 상태를 기준으로 골라낸 항목이에요. 최종 판단은 약사·의사와 함께 하세요.</p></div>`;
 }
@@ -3208,7 +3205,7 @@ return `${topBar({ back:'뒤로' })}<h1>‘${esc(s)}’ 검색 <small class="mut
 }
 
 const FLAG_Q = {
-pregnant:'임신 중이거나 수유 중이에요', ulcer:'위가 약함·위궤양·위장출혈 병력이 있어요',
+pregnant:'임신 중이에요', nursing:'모유 수유 중이에요', ulcer:'위가 약함·위궤양·위장출혈 병력이 있어요',
 heart:'고혈압·심장병이 있어요', anticoag:'피를 묽게 하는 약(항응고제·아스피린)을 먹어요',
 kidney:'신장이 안 좋아요', liver:'간이 안 좋아요', alcohol:'술을 자주 마셔요',
 asthma:'천식이 있어요', glaucoma:'녹내장이 있어요', bph:'전립선이 커요(소변 줄기가 약해요)',
@@ -5252,7 +5249,7 @@ return `${topBar({ nosearch:true })}${dots}
 ${skip}`;
 }
 if (n === 2) {
-const kid = ME.age === 'child', KEYS = kid ? ['asthma', 'heart', 'kidney', 'liver', 'diabetes'] : ['heart', 'diabetes', 'ulcer', 'kidney', 'liver', 'anticoag', 'glaucoma', 'bph', 'asthma', 'alcohol', 'gout', 'pregnant'];
+const kid = ME.age === 'child', KEYS = kid ? ['asthma', 'heart', 'kidney', 'liver', 'diabetes'] : ['heart', 'diabetes', 'ulcer', 'kidney', 'liver', 'anticoag', 'glaucoma', 'bph', 'asthma', 'alcohol', 'gout', 'pregnant', 'nursing'];
 const on = KEYS.filter(k => ME[k]).length;
 return `${topBar({ back:'이전', nosearch:true })}${dots}
 <h1 class="hello-q">해당하는 것이 있으면 눌러 주세요</h1>
@@ -5558,7 +5555,7 @@ const LACT_LV = { ok: ['수유 중 괜찮은 편', 'otc'], caution: ['수유 중
 function lactCell(d){
 const l = d.lact;
 if (!l || !LACT_LV[l.lv]) return d.pregnancy && !/수유|젖/.test(d.pregnancy) ? `<div class="lact"><small>수유</small><span class="badge soft" style="margin:2px 0 4px">수유 자료 없음</span><b>약사·의사와 상의하세요</b></div>` : '';
-const [w, c] = LACT_LV[l.lv]; const me = activeFlags().includes('pregnant');
+const [w, c] = LACT_LV[l.lv]; const me = activeFlags().includes('nursing');
 return `<div class="lact${me ? ' me' : ''}"><small>수유</small><span class="badge ${c}" style="margin:2px 0 4px">${w}</span><b>${fmt(l.t)}</b></div>`;
 }
 const KID_DRUG = new Set(['acetaminophen', 'ibuprofen', 'dexibuprofen']);
@@ -6794,7 +6791,8 @@ armNotifications(); go('/me?t=meds'); route();
 toast('가져왔어요');
 }
 const CONDS = [
-['pregnant', '임신·수유 중', '소염진통제는 임신 20주 이후 피해요'],
+['pregnant', '임신 중', '소염진통제는 임신 20주 이후 피해요'],
+['nursing', '수유 중', '약마다 수유 근거(설명서·해외 자료)로 살펴봐요'],
 ['ulcer', '위가 약함·위궤양·위장출혈 병력', '소염진통제를 고를 때 가장 중요해요'],
 ['kidney', '신장 질환', '소염진통제·마그네슘 등에 주의'],
 ['liver', '간 질환', '아세트아미노펜 용량에 주의'],
