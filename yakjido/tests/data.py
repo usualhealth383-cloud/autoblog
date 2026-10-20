@@ -653,6 +653,16 @@ for _m in _MIX:
             fails.append(f'같이 먹기 {_m["id"]} 출처 주소가 의약품안전나라 첫 화면·검색 화면입니다 — 품목 상세로')
 for _s in sorted(_MIX_SRC_PENDING - _mix_seen): fails.append(f'data.py _MIX_SRC_PENDING 의 「{_s[:40]}」 는 이제 mixes.json 에 없어요 — 지우세요')
 
+# 영양제 두 입구(10-20) — 성분·출처·증상 고리, 아이콘, 자리표시 남음 없음
+for _fn in ('suppGoals.json', 'suppStages.json'):
+    for _g in json.load(open(C / _fn, encoding='utf-8')):
+        _t = json.dumps(_g, ensure_ascii=False)
+        if re.search(r'MFDS:|_LINE|FOLATE_', _t): fails.append(f'{_fn} {_g["id"]}: 확인 전 자리표시가 남아 있습니다')
+        if _g.get('icon') and _g['icon'] not in icons: fails.append(f'{_fn} {_g["id"]}: 없는 아이콘 {_g["icon"]}')
+        if _g.get('symptom') and _g['symptom'] not in sid: fails.append(f'{_fn} {_g["id"]}: 없는 증상 {_g["symptom"]}')
+        for _x in (_g.get('picks') or []) + (_g.get('skip') or []):
+            if not str(_x['supp']).startswith('nut:') and _x['supp'] not in supid: fails.append(f'{_fn} {_g["id"]}: 없는 영양제 {_x["supp"]}')
+            src_ok(f'{_fn} {_g["id"]}', _x.get('src'))
 print(f'증상 {len(S)} · 약 {len(D)} · 계열 {len(K)} · 영양제 {len(SUP)} · 팁 {len(T)} · 그런줄 {len(_MY)} · 규칙 {len(IX["rules"])} · 출처 {len(SRC)}')
 if fails:
     print('실패', len(fails)); [print('  ✗', f) for f in fails]; sys.exit(1)
