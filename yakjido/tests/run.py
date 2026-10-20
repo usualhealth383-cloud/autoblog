@@ -1092,7 +1092,7 @@ def main():
         # 5a-10b. ClinicScore 문법(2026-09-29 현욱님) — 내 정보는 탭 셋, 건강 상태는 누르는 단추.
         #         누르면 그 자리에서 켜지고(맨 위로 튀지 않고) 「켜 둔 것」에 설명이 붙어야 한다.
         _mt = pg.evaluate("""()=>{
-          ['heart','diabetes','ulcer','kidney','liver','anticoag','glaucoma','bph','asthma','alcohol','gout','pregnant','nursing'].forEach(f=>{ME[f]=false;}); saveMe(); route();
+          ['heart','hf','diabetes','ulcer','kidney','liver','anticoag','glaucoma','bph','asthma','alcohol','gout','pregnant','nursing'].forEach(f=>{ME[f]=false;}); saveMe(); route();
           const tabs=[...document.querySelectorAll('.metabs .tab')].map(b=>b.innerText.trim().replace(/\\s*\\d+$/,''));
           window.scrollTo(0,400); const y=window.scrollY;
           const chip=[...document.querySelectorAll('.chip-m')].find(b=>b.innerText.includes('전립선비대')); chip.click();
@@ -1101,7 +1101,7 @@ def main():
           const off=ME.bph===false && !document.querySelector('.cond-on');
           return {tabs, on, desc, stay, off, chips:document.querySelectorAll('.chip-m').length};}""")
         if _mt['tabs'] != ['내 몸', '내 약통', '설정']: fails.append(f'내 정보 탭이 셋이 아닙니다: {_mt["tabs"]}')   # 3-20 이름 하나로 — 「먹는 약」 → 「내 약통」
-        if _mt['chips'] != 13 or not _mt['on'] or not _mt['off']: fails.append(f'건강 상태 단추가 켜지고 꺼지지 않습니다: {_mt}')
+        if _mt['chips'] != 14 or not _mt['on'] or not _mt['off']: fails.append(f'건강 상태 단추가 켜지고 꺼지지 않습니다: {_mt}')
         if '소변이 막힐 수' not in _mt['desc']: fails.append('건강 상태를 눌러도 「켜 둔 것」 설명이 안 붙습니다')
         if not _mt['stay']: fails.append('건강 상태를 누르면 화면이 맨 위로 튑니다')
         pg.goto(url + '#/me?t=meds'); ready(); pg.wait_for_timeout(300)
@@ -1235,7 +1235,7 @@ def main():
         pg.goto(url + '#/symptom/cold'); ready(); pg.wait_for_timeout(400)
         _s = pg.evaluate("""()=>{
           /* 앞 검사가 켜 둔 몸 상태가 남아 있으면 「약사와 상의」 배지가 먼저 붙는다 — 비우고 본다 */
-          ['heart','diabetes','ulcer','kidney','liver','anticoag','glaucoma','bph','asthma','alcohol','gout','pregnant','nursing'].forEach(f=>{ME[f]=false;});
+          ['heart','hf','diabetes','ulcer','kidney','liver','anticoag','glaucoma','bph','asthma','alcohol','gout','pregnant','nursing'].forEach(f=>{ME[f]=false;});
           const has = a => { ME.age=a; ME.taking=[]; ME.pub={}; route();
             return [...document.querySelectorAll('.buy-item')]
               .some(e=>/이부프로펜|나프록센|덱시부프로펜/.test(e.innerText) && /어르신 주의/.test(e.innerText)); };
