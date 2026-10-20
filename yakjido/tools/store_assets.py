@@ -19,13 +19,13 @@ SENIOR = {'age': 'senior', 'easy': False, 'taking': ['cls:bp.ccb', 'acetaminophe
           'sched': {'cls:bp.ccb': ['08:00'], 'magnesium-oxide': ['08:00', '19:00']},
           'prnLog': {'2026-10-08': [{'id': 'acetaminophen', 't': '08:10'}]}, 'taken': {'2026-10-08': ['cls:bp.ccb@08:00']}, 'pub': {}}
 SHOTS = [
-    ('01-home', '/home', SENIOR, '어디가 불편하세요?', '증상을 고르면 약국에서 무엇을 찾을지 알려 드려요'),
-    ('02-symptom', '/symptom/cold', SENIOR, '증상에 맞는 약, 의사가 고르듯', '성분·용량·주의할 점을 쉬운 말로'),
+    ('01-home', '/home', {**SENIOR, 'view': 'detail'}, '어디가 불편하세요?', '몸 위치 8칸에서 고르면 할 일부터 차례로 알려 드려요', '.rg', 120),
+    ('02-symptom', '/symptom/cold', SENIOR, '약국 갈까, 병원 갈까', '응급 신호를 먼저 확인하고, 약국에서 찾을 성분을 쉬운 말로'),
     ('03-together', '/symptom/arthritis', {**SENIOR, 'taking': ['cls:blood.warf', 'cls:bp.ccb']}, '드시는 약과 겹치면 먼저 알려요', '와파린·혈압약과 진통제처럼 조심할 조합', '.ixline, .ix-h', 70),
     ('04-schedule', '/schedule', SENIOR, '앱을 닫아도 약 시간에 울려요', '먹었어요 · 10분 뒤 다시 · 약 떨어지기 전 알림', 'h2:has-text("오늘")', 20),
     ('05-kids', '/kids', {'age': 'child', 'child': {'weight': '14', 'birth': '2023-03-01', 'name': '아이'}, 'taking': [], 'pub': {}}, '아이 해열제, 몸무게로 mL까지', '아세트아미노펜·이부프로펜 시럽 용량 계산', 'text=/mL · 한 번에/', 150),
     ('06-pill', '/pill', SENIOR, '모르는 알약, 모양으로 찾아요', '식약처 낱알식별 자료로 색·모양·글자 검색'),
-    ('07-supp', '/supp/iron', {**SENIOR, 'sw': {'s': 'f', 'a': 3}}, '영양제, 어떤 음식에 얼마나', '한 접시에 든 양과 나이·성별에 맞는 하루 필요량', '.sq', 225),
+    ('07-supp', '/supp', SENIOR, '영양제, 무엇이 불편해서요?', '피곤함·뼈·눈 — 영양제보다 진료가 먼저인 신호부터 알려 드려요', '.rg', 90),
     ('08-bag', '/bag', {**SENIOR, 'taking': ['cls:bp.ccb', 'acetaminophen', 'coldaewon']}, '내 약통 한 장, 겹치면 바로 알려요', '종합감기약 속 성분과 타이레놀이 겹치는 것까지', '.show-big.warn', 150),
 ]
 
@@ -56,7 +56,7 @@ def main():
         for name, route, me, h, p, *focus in SHOTS:
             pg = br.new_page(viewport={'width': 360, 'height': 700}, device_scale_factor=3)
             pg.clock.install(time='2026-10-08T09:30:00')
-            pg.add_init_script("localStorage.setItem('yakjido.hello.v1','1');localStorage.setItem('yakjido.me.v1'," + json.dumps(json.dumps(me)) + ")")
+            pg.add_init_script("localStorage.setItem('yakjido.hello.v1','1');localStorage.setItem('yakjido.consent.v1',JSON.stringify({v:'2026-10-20',at:'2026-10-20',terms:1,privacy:1}));localStorage.setItem('yakjido.me.v1'," + json.dumps(json.dumps(me)) + ")")
             pg.goto(url + '#' + route); pg.wait_for_selector('.app', timeout=15000); pg.wait_for_timeout(1800)
             if focus:                                        # 그 화면의 핵심(경고·오늘 목록·mL)이 첫 화면에 오게
                 el = pg.locator(focus[0]).first
@@ -77,7 +77,7 @@ def main():
 display:flex;align-items:center;gap:44px;padding:0 80px;box-sizing:border-box;word-break:keep-all}}
 img{{width:210px;height:210px;border-radius:48px;box-shadow:0 16px 40px rgba(6,40,56,.35)}}
 h1{{font-size:72px;margin:0;font-weight:800;letter-spacing:-1px}} p{{font-size:30px;margin:10px 0 0;color:#DDF1F7;font-weight:500;line-height:1.4}}</style></head>
-<body><img src="data:image/png;base64,{icon}"><div><h1>약지도</h1><p>증상에 맞는 약, 의사가 고르듯<br>복용 알림까지 한 앱에서</p></div></body></html>""")
+<body><img src="data:image/png;base64,{icon}"><div><h1>약지도</h1><p>약국 갈까, 병원 갈까<br>집에서 할 일부터 차례로</p></div></body></html>""")
         fg.wait_for_timeout(900); fg.screenshot(path=str(OUT / 'feature-1024x500.png')); fg.close()
         br.close()
     Image.open(DOCS / 'icon-512.png').convert('RGBA').save(OUT / 'icon-512.png')
