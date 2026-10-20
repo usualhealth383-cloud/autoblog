@@ -1110,17 +1110,18 @@ def main():
         _st = pg.inner_text('#view')
         for kw in ('글자 크기', '화면 밝기', '휴대폰을 바꾸실 때', '개인정보처리방침'):
             if kw not in _st: fails.append(f'내 정보 「설정」 탭에 {kw} 없음')
-        # 홈 — 탭을 누르면 그 묶음만. 전체 = 검수 끝난 증상 전부, 검수 대기는 따로
+        # 홈 — 탭을 누르면 그 묶음만. 전체 = 증상 전부(의사 확인 중은 이름표로 섞임)
         pg.goto(url + '#/home'); ready(); pg.wait_for_timeout(300)
         _hm = pg.evaluate("""()=>{
           const n=()=>document.querySelectorAll('#hlist .srow').length, S=D.symptoms||[];
           const tab=k=>{ const b=[...document.querySelectorAll('.htabs .tab')].find(x=>x.dataset.k===k); b.click(); return n(); };
-          const r={top:tab('top'), pain:tab('g:통증'), all:tab('all'), wait:tab('wait'),
-            wantPain:S.filter(s=>s.group==='통증'&&s.reviewed!==false).length, wantAll:S.filter(s=>s.reviewed!==false).length, wantWait:S.filter(s=>s.reviewed===false).length,
+          const r={top:tab('top'), pain:tab('g:허리·관절·근육'), all:tab('all'), wait:0, groups:[...document.querySelectorAll('.htabs .tab')].filter(x=>x.dataset.k.startsWith('g:')).length,
+            wantPain:S.filter(s=>s.group==='허리·관절·근육').length, wantAll:S.length, wantWait:0,
             oneOn:document.querySelectorAll('.htabs .tab.on').length};
           tab('top'); return r;}""")
         if _hm['top'] != 12: fails.append(f'홈 「자주 찾는」이 12가지가 아닙니다: {_hm["top"]}')
         if _hm['pain'] != _hm['wantPain'] or _hm['all'] != _hm['wantAll'] or _hm['wait'] != _hm['wantWait']: fails.append(f'홈 탭 목록 수가 어긋납니다: {_hm}')
+        if _hm['groups'] != 8: fails.append(f'홈 갈래가 몸 위치 8칸이 아닙니다: {_hm}')   # 10-19 몸 위치 8칸 · 「의사 확인 중」은 칸 안에 이름표로
         if _hm['oneOn'] != 1: fails.append('홈 탭에서 고른 것이 하나가 아닙니다')
         # 5a-10c. 증상·약 상세도 탭(2026-09-30 현욱님 「증상상세 약 상세도 잘 정리하자」) — 탭마다 내용이 있고 넘침·잘림이 없어야 한다
         for _r in ['/symptom/cold', '/symptom/bph', '/symptom/fever', '/drug/ibuprofen', '/drug/acetaminophen']:

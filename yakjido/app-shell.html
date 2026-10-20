@@ -621,7 +621,7 @@ ul.steps li::before{content:counter(s);position:absolute;left:0;top:2px;width:24
 .today-hero .th-t{flex:1;min-width:0}.today-hero .th-h{font-size:1.375rem;font-weight:800;line-height:1.3;font-variant-numeric:tabular-nums}.today-hero .th-h span{color:var(--muted);font-weight:700}
 .today-hero .th-s{margin-top:4px;color:var(--body);font-size:.9375rem;line-height:1.45}
 /* 예전 이름 .today 가 홈 카드와 충돌했다 */
-.today-hero.all{background:var(--normal-tint)}@keyframes rfill{from{stroke-dasharray:0 200}}.today-hero.all .ring circle+circle{animation:rfill .3s ease-out}.today-hero .th-go{color:var(--muted);flex:none}
+.today-hero.all{background:var(--normal-tint)}.er-line{display:flex;gap:8px;align-items:flex-start;margin-top:12px;padding:10px 14px;min-height:48px;border-radius:14px;background:var(--alert-tint);color:var(--alert);text-decoration:none;font-size:.875rem;font-weight:600;line-height:1.5}.er-line svg.i{flex:none;margin-top:2px}.rg{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:14px}.rg-t{display:flex;flex-direction:column;align-items:flex-start;gap:4px;padding:12px 14px;min-height:96px;border-radius:16px;background:var(--gbg);color:var(--text);text-align:left;min-width:0}.rg-t .ic{color:var(--gfg)}.rg-t b{font-size:1rem;font-weight:800;line-height:1.3}.rg-t small{color:var(--body);font-size:.875rem;line-height:1.4}@keyframes rfill{from{stroke-dasharray:0 200}}.today-hero.all .ring circle+circle{animation:rfill .3s ease-out}.today-hero .th-go{color:var(--muted);flex:none}
 .dose-tick{display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:14px;background:var(--card);border:1px solid var(--hairline);width:100%;text-align:left;min-height:60px}
 .dose-tick .t{font-weight:800;font-size:1.0625rem;min-width:52px;font-variant-numeric:tabular-nums}
 .dose-tick .n{flex:1;min-width:0;overflow-wrap:anywhere}
@@ -3210,7 +3210,7 @@ const flagBox = (title, items, sub) => items?.length ? `<div class="flag">${I.al
 
 
 /* 그룹마다 방 색을 정한다. 증상마다 고유 아이콘을 준다 — 통증 6개가 전부 뼈 아이콘이면 어르신은 못 고른다 */
-const GROUP_CLS = { '통증':'g-pain', '감기·호흡기':'g-resp', '소화기':'g-gi', '알레르기·피부':'g-skin', '수면·기타':'g-etc', '비뇨기':'g-uro', '여성 건강':'g-women', '입·치아':'g-oral', '눈·귀':'g-eye',
+const GROUP_CLS = { '감기·열·목':'g-resp', '머리·눈·귀·코':'g-eye', '입·이':'g-oral', '배·소화':'g-gi', '허리·관절·근육':'g-pain', '피부·머리카락':'g-skin', '소변·생리·갱년기':'g-women', '잠·마음·생활':'g-etc',
   /* 약 상식 갈래 — 같은 팔레트를 다시 쓴다(새 색을 늘리지 않는다) */
   '약 이름과 고르기':'g-etc', '제대로 드시는 법':'g-resp', '조심할 것':'g-pain', '열·감기·배탈일 때':'g-gi', '보관하고 버리기':'g-oral', '병원·헌혈 가실 때':'g-uro' };
 const gcls = g => GROUP_CLS[g] || '';
@@ -3362,29 +3362,25 @@ const srow = (s, wait) => `<button class="srow" onclick="go('/symptom/${s.id}')"
 /* 외부 검수 2차 #48 — 간단히 홈은 큰 증상 칸 8개가 위에 있다 — 「자주 찾는」 목록에서 같은 8개를 되풀이하지 않는다 */
 const homeTop = () => HOME_TOP.filter(id => !(svOn() && SV_HOME.includes(id)));
 function homeTabs(){
-  const sp = seasonPick(), S = D.symptoms || [], ok = S.filter(s => s.reviewed !== false), wait = S.filter(s => s.reviewed === false);
-  const groups0 = [...new Set(ok.map(s => s.group))];
-  const groups = [sp.g, ...groups0.filter(g => g !== sp.g)].filter(g => groups0.includes(g));
+  const sp = seasonPick(), S = D.symptoms || [], ok = S, GK = Object.keys(GROUP_CLS);
+  const groups = [...new Set(ok.map(s => s.group))].sort((a, b) => GK.indexOf(a) - GK.indexOf(b));
   return [
     { k:'top', n:'자주 찾는', c:homeTop().filter(id => byId(S, id)).length, ic:I.check },
     { k:'season', n:sp.eb, c:sp.ids.filter(id => byId(S, id)).length, ic:icon(sp.ico) },
     ...groups.map(g => ({ k:'g:' + g, n:g, c:ok.filter(s => s.group === g).length })),
     { k:'all', n:'전체', c:ok.length, ic:I.book },
-    ...(wait.length ? [{ k:'wait', n:'의사 확인 중', c:wait.length }] : []),
   ];
 }
 function homeList(){
-  const sp = seasonPick(), S = D.symptoms || [], ok = S.filter(s => s.reviewed !== false);
+  const sp = seasonPick(), S = D.symptoms || [], ok = S, GK = Object.keys(GROUP_CLS), w = s => srow(s, s.reviewed === false);
   const tabs = homeTabs(); if (!tabs.some(t => t.k === HTAB)) HTAB = 'top';
   const head = (t, n, note) => `<div class="sech"><h2 class="sec-h">${esc(t)}</h2>${n != null ? `<span class="secn">${n}가지</span>` : ''}</div>${note ? `<p class="viewnote">${note}</p>` : ''}`;
   let body;
   if (HTAB === 'top') { const L = homeTop().map(id => byId(S, id)).filter(Boolean); body = head(svOn() ? '그 밖에 자주 찾는 증상' : '자주 찾는 증상', L.length, svOn() ? '' : '처음 오셨다면 여기서 시작해 보세요') + L.map(s => srow(s)).join(''); }
   else if (HTAB === 'season') { const L = sp.ids.map(id => byId(S, id)).filter(Boolean); body = head(`${sp.eb} · ${sp.t}`, L.length, esc(sp.d)) + L.map(s => srow(s, s.reviewed === false)).join(''); }
-  else if (HTAB === 'all') { const gs = [...new Set(ok.map(s => s.group))];
-    body = head('전체 증상', ok.length, '갈래별로 모았어요') + gs.map(g => `<h3 class="sub-h">${esc(g)}</h3>${ok.filter(s => s.group === g).map(s => srow(s)).join('')}`).join(''); }
-  else if (HTAB === 'wait') { const L = S.filter(s => s.reviewed === false);
-    body = head('의사 확인 중', L.length, '자료를 바탕으로 정리했지만 아직 의사 확인을 거치지 않았어요. 참고만 하시고 약사·의사와 상의하세요.') + L.map(s => srow(s, true)).join(''); }
-  else { const g = HTAB.slice(2), L = ok.filter(s => s.group === g); body = head(g, L.length) + L.map(s => srow(s)).join(''); }
+  else if (HTAB === 'all') { const gs = [...new Set(ok.map(s => s.group))].sort((a, b) => GK.indexOf(a) - GK.indexOf(b));
+    body = head('전체 증상', ok.length, '갈래별로 모았어요') + gs.map(g => `<h3 class="sub-h">${esc(g)}</h3>${ok.filter(s => s.group === g).map(w).join('')}`).join(''); }
+  else { const g = HTAB.slice(2), L = ok.filter(s => s.group === g); body = head(g, L.length) + L.map(w).join(''); }
   return `<div id="hlist" role="tabpanel" aria-label="증상 목록">${body}</div>`;
 }
 function homeTab(k){
@@ -3395,6 +3391,9 @@ function homeTab(k){
 }
 const storeBar = () => STORE_OK || STORE_HIDE ? '' : `<div class="note soft store-bar">${I.info}<span>이 브라우저에서는 기록이 저장되지 않아요 — 일반 창이나 설치한 앱에서 써 주세요</span><button type="button" class="store-x" onclick="storeHide()" aria-label="이 안내 닫기">${I.x}</button></div>`;
 function storeHide(){ STORE_HIDE = true; try { sessionStorage.setItem('yakjido.storehide', '1'); } catch (e) {} route(); const h = view.querySelector('h1'); if (h) { h.setAttribute('tabindex', '-1'); try { h.focus({ preventScroll: true }); } catch (e) {} } }
+/* 10-19 몸 위치 8칸 격자(다음방향 리서치 5-3·5-4) — 고르면 그 칸 목록으로. 대표 증상 둘을 함께 보여 무엇이 드는지 안다 */
+const regionGrid = () => { const S = D.symptoms || [];
+  return `<div class="rg" role="group" aria-label="어디가 불편하세요">${Object.keys(GROUP_CLS).slice(0, 8).map(g => { const L = S.filter(s => s.group === g); return L.length ? `<button class="rg-t ${GROUP_CLS[g]}" onclick="homeTab('g:${g}');jumpTo('hlist')"><span class="ic">${sicon(L[0])}</span><b>${esc(g)}</b><small>${L.slice(0, 2).map(s => esc(s.name.split(/ \(|·/)[0])).join(' · ')}</small></button>` : ''; }).join('')}</div>`; };
 function vHome(){
   const hour = new Date().getHours();
   const hello = hour < 5 ? '늦은 밤이네요' : hour < 11 ? '좋은 아침이에요' : hour < 18 ? '안녕하세요' : '편안한 저녁이에요';
@@ -3410,8 +3409,10 @@ function vHome(){
     <h1 class="greet">어디가 불편하세요?</h1>
     <p>증상을 고르시면 약국에서 무엇을 찾으면 되는지, 병원에 가야 할 신호는 무엇인지 알려 드려요.</p>
   </section>`}
+  <a class="er-line" href="tel:119">${I.alert}<span>가슴이 조이듯 아프거나, 숨이 많이 차거나, 말이 어눌하고 한쪽에 힘이 빠지면 <b>바로 119</b></span></a>
   ${storeBar()}
   ${doseHome()}
+  ${svOn() ? '' : regionGrid()}
   <div class="util" aria-label="다른 방법으로 찾기">
     ${v && vd <= 3 ? urow(I.cal, `${vd <= 0 ? '오늘' : vd === 1 ? '내일' : vd + '일 뒤'} 진료`, `${esc(visitWord(v, false))} · 내 약 한 장 챙기기`, "go('/visits')", '보기', 'visit-soon') : ''}
     ${ME.easy ? urow(I.clock, '오늘 약 체크', '드셨는지 표시하고 알림 받기', "go('/schedule')", '열기') : ''}
