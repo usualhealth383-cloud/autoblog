@@ -1124,7 +1124,7 @@ main > .answer + *, main > .sec + .care, main > .card + .care, main > .rx-card +
 /* 경고·레드플래그 */
 .flag{display:flex;gap:var(--s3);padding:var(--s4);border-radius:var(--r-card);background:var(--alert-tint);border:1px solid rgba(182,54,41,.25)}
 .flag svg.i{color:var(--alert);margin-top:2px}
-.flag b{color:var(--alert);display:block;font-size:.9375rem}
+.flag b{color:var(--alert);display:block;font-size:.9375rem}.flag li b{display:inline;font-size:inherit}
 .flag p{font-size:.875rem;margin-top:2px}
 .flag ul.plain li::before{background:var(--alert)}
 .note{display:flex;gap:var(--s2);padding:var(--s3) var(--s4);border-radius:var(--r-input);background:var(--caution-tint);color:var(--caution);font-size:.875rem;font-weight:600;line-height:1.5}
@@ -7435,6 +7435,9 @@ function sendText(items, label, note, link, dropped){
   const who = label ? label + ', ' : '';
   const dl = sendDropLine(dropped || [], 1);
   const cl = [...sendCau(SEND_Q), ...sendXL()];
+  /* 외부 검수 2차 #3 — 링크를 못 열고 글만 받아도 가장 급한 신호 하나는 보이게 */
+  const er1 = (SEND_Q?.s ? byId(D.symptoms, SEND_Q.s)?.care?.er?.[0] : '') || '';
+  if (er1) cl.push(`이럴 땐 약 대신 바로 119 — ${er1.replace(/\*\*/g, '')}`);
   return `[약지도] ${who}약국에서 이 약 좀 사 주세요\n${items.map(x => '· ' + (x.product ? x.product + ' (' + x.name + ')' : x.name)).join('\n')}${cl.length ? '\n' + cl.map(t => '※ ' + t).join('\n') : ''}${dl ? '\n' + dl : ''}${note ? '\n\n' + note : ''}\n\n약사님께 이 목록을 보여 주시고, 앓고 계신 병과 드시는 약을 꼭 말씀하세요.${link ? '\n' + link : '\n가까운 문 연 약국: ' + GO_LINK.open[0]}`;
 }
 function sendFlag(k){ SEND_F = SEND_F.includes(k) ? SEND_F.filter(x => x !== k) : [...SEND_F, k]; route(); }
@@ -7459,7 +7462,7 @@ function vSend(_, q){
     <input id="send-label" class="ae-inp" type="text" maxlength="20" placeholder="예: 엄마" autocomplete="off" value="${esc(SEND_LBL)}" oninput="SEND_LBL=this.value">
     <label class="ae-lbl" for="send-note">한 줄 메모 <small>(선택)</small></label>
     <input id="send-note" class="ae-inp" type="text" maxlength="100" placeholder="예: 기침이 심하시면 이걸로요" autocomplete="off" value="${esc(SEND_NOTE)}" oninput="SEND_NOTE=this.value"></div>
-    ${srv ? `<label class="rf-i" for="send-ok" style="margin-top:12px"><input type="checkbox" id="send-ok"><span><b>링크로 보내려면 민감정보 처리 동의가 필요해요</b> — 보낸 약 목록·호칭·메모를 링크로 열 수 있게 서버에 <b>7일 동안</b> 보관한 뒤 지워요. 실명·전화번호·위치를 묻는 칸은 없어요. 호칭과 메모도 링크에 보이니 실명·전화번호·주소는 적지 마세요. 동의하지 않으면 서버에 저장하지 않고 <b>글로만</b> 보내요. 만 14세 미만은 보호자와 함께 써 주세요. <a class="link" href="#/about">자세히</a></span></label>` : `<p class="small muted" style="margin-top:10px">지금은 <b>글로 보내요</b>(서버에 저장하지 않음). 사진이 담긴 링크 보내기는 준비 중이에요.</p>`}
+    ${srv ? `<label class="rf-i" for="send-ok" style="margin-top:12px"><input type="checkbox" id="send-ok"><span><b>링크로 보내려면 민감정보 처리 동의가 필요해요</b> — 보낸 약 목록·증상 이름·호칭·메모를 링크로 열 수 있게 서버에 <b>7일 동안</b> 보관한 뒤 지워요. 실명·전화번호·위치를 묻는 칸은 없어요. 호칭과 메모도 링크에 보이니 실명·전화번호·주소는 적지 마세요. 동의하지 않으면 서버에 저장하지 않고 <b>글로만</b> 보내요. 만 14세 미만은 보호자와 함께 써 주세요. <a class="link" href="#/about">자세히</a></span></label>` : `<p class="small muted" style="margin-top:10px">지금은 <b>글로 보내요</b>(서버에 저장하지 않음). 사진이 담긴 링크 보내기는 준비 중이에요.</p>`}
   </section>
   ${items.length ? `<div class="actions"><button class="btn" onclick="doSend()">${I.family} 보내기</button></div>` : ''}
   ${disclaimer()}`;
@@ -7477,7 +7480,10 @@ async function doSend(){
   }
   if (viaLink) {
     try {
-      const r = await fetch(S.fn, { method:'POST', headers:{ 'Content-Type':'application/json' }, body: JSON.stringify({ action:'create', items, label, note, consent:true }) });
+      /* 외부 검수 2차 #3 — 받는 화면도 응급 신호를 보이게 증상을 한 줄(sym:)로 함께 담는다(서버 함수·표는 그대로, 약 9개 + 증상 1개) */
+      const sy = SEND_Q?.s ? byId(D.symptoms, SEND_Q.s) : null;
+      const its = sy ? [...items.slice(0, 9), { id: 'sym:' + sy.id, name: sy.name }] : items;
+      const r = await fetch(S.fn, { method:'POST', headers:{ 'Content-Type':'application/json' }, body: JSON.stringify({ action:'create', items: its, label, note, consent:true }) });
       const j = await r.json(); if (!r.ok || !j.code) throw new Error(j.error || r.status);
       link = (S.app || location.href.split('#')[0]) + '#/p/' + j.code;
     } catch (e) { toast('링크를 만들지 못해 글로 보내요'); }
@@ -7499,13 +7505,17 @@ function vParentShare(code){
   if (st.loading) return `${topBar({ back:'처음으로', nosearch:true })}<section class="sec"><p class="loading">받은 약을 불러오는 중이에요…</p></section>`;
   if (st.err) return `${topBar({ back:'처음으로', nosearch:true })}<section class="sec"><div class="empty card"><b>${st.err === 410 ? '기간이 지난 링크예요' : '받은 약을 불러오지 못했어요'}</b>${st.err === 410 ? '보낸 지 7일이 지나 지워졌어요. 다시 보내 달라고 해 주세요.' : '인터넷 연결을 확인하고 다시 열어 주세요.'}</div></section>`;
   const x = st.data;
+  /* 외부 검수 2차 #3 — 보낸 증상(sym:)이 있으면 그 증상의 «바로 119» 신호를 약 목록 아래에. 증상 줄은 약 목록에서 뺀다 */
+  const sy = (() => { const t = (x.items || []).find(it => /^sym:/.test(it.id || '')); return t ? byId(D.symptoms, t.id.slice(4)) : null; })();
+  const meds = (x.items || []).filter(it => !/^sym:/.test(it.id || ''));
   return `<div class="pshare">${topBar({ back:'처음으로', nosearch:true })}
   <div class="eyebrow">${x.label ? esc(x.label) + '께 온 부탁' : '받은 약'}</div>
   <h1 style="font-size:1.625rem">이 화면을 약사님께 보여 주세요</h1>
   ${x.note ? `<p class="ps-note">“${esc(x.note)}”</p>` : ''}
-  <section class="sec"><div class="ps-list">${(x.items || []).map(it => { const d = drug(it.id); const nm = it.product || (d ? d.name : it.name);
+  <section class="sec"><div class="ps-list">${meds.map(it => { const d = drug(it.id); const nm = it.product || (d ? d.name : it.name);
     return `<div class="ps-item">${prodArt(pimg(it.product || ''), nm)}<div><b>${esc(nm)}</b><span>${esc(it.product ? (d ? ingrName(d) : it.name) : '')}</span></div></div>`; }).join('')}</div>
     <p class="ps-ask">성분·함량·제형이 같으면 다른 제품도 괜찮습니다.</p></section>
+  ${sy && sy.care?.er?.length ? `<div class="flag" role="note" style="margin-top:12px">${I.alert}<div><b>이럴 땐 약 대신 바로 119</b><p>${esc(sy.name)} 때문에 보내 드린 약이에요. 아래 가운데 하나라도 있으면 약국에 가지 마시고 119에 전화하거나 응급실로 가세요.</p>${list(sy.care.er)}<a class="call" href="tel:119">${I.alert} 119 전화</a></div></div>${sy.care.clinic?.length ? fold('이럴 땐 오늘 병원으로', list(sy.care.clinic)) : ''}` : ''}
   <div class="note" style="margin-top:12px">${I.alert}<span><b>약사님께 앓고 계신 병과 드시는 약을 꼭 말씀하세요.</b> 혈압약·당뇨약·피 묽게 하는 약을 드시면 특히요.</span></div>
   <div class="actions"><a class="btn" href="${GO_LINK.open[0]}" target="_blank" rel="noopener">${I.pin || I.search} 가까운 문 연 약국 찾기</a>${x.bought_at ? `<span class="badge otc">샀어요 표시함</span>` : `<button class="btn line" onclick="psBought('${esc(code)}')">${I.check} 샀어요</button>`}</div>
   ${disclaimer()}</div>`;
