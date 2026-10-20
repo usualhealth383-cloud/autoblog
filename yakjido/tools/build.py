@@ -158,7 +158,9 @@ if isinstance(inline.get('meta'), dict):
 
 jc = json.dumps(core, ensure_ascii=False, separators=(',', ':'))
 j = json.dumps(inline, ensure_ascii=False, separators=(',', ':')).replace('</', '<\\/')
-stamp = datetime.date.today().isoformat()
+# 10-21 검수자가 판을 구분하도록 한국 시각 날짜·시:분(컨테이너는 UTC 라 하루 늦게 찍혔다)
+_kst = datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=9)))
+stamp = _kst.strftime('%Y-%m-%d %H:%M')
 # 낱알식별(pills.json) 중 성분 칸이 빈 일반약을 «같은 품목기준코드(seq)»의 e약은요 성분으로 채운다 — 이름 짐작 없이 코드가 같을 때만.
 # 사진으로 담은 약의 겹침 판정(같은 성분 두 번)이 성분을 몰라 초록으로 나오던 것(2026-10-13 자체 검수 3-03). 다시 돌려도 같은 결과.
 _pd = ROOT.parent / 'docs' / 'yakjido' / 'data'
@@ -214,7 +216,7 @@ _srvjs += ''.join((ROOT / f).read_text(encoding='utf-8') for f in ('terms.html',
 cache_id = hashlib.sha1((out + jc + jd + _srvjs).encode('utf-8')).hexdigest()[:8]
 sw = ROOT / 'sw.js'
 if sw.exists():
-    s = re.sub(r"const CACHE = '[^']*'", f"const CACHE = 'yakjido-{stamp}-{cache_id}'", sw.read_text(encoding='utf-8'))
+    s = re.sub(r"const CACHE = '[^']*'", f"const CACHE = 'yakjido-{stamp.replace(' ', 'T')}-{cache_id}'", sw.read_text(encoding='utf-8'))
     (pages / 'sw.js').write_text(s, encoding='utf-8')
 for name in ('manifest.webmanifest', 'privacy.html', 'terms.html', 'delete-account.html', 'srv.js', 'find.js'):   # terms.html = 약지도 이용약관(첫 동의 화면·설정에서 앱 안으로 읽음, 10-14)   # find.js = 공용 찾기 부품 + 약지도 쪽(검색을 처음 쓸 때 받음, Z8)
     # delete-account.html = 스토어 「계정 삭제 URL」(메디나눔 안내 2026-10-13)   # srv.js = 계정·기록 이어 두기(따로 받는 파일)   # privacy.html = 스토어에 적는 개인정보처리방침 주소
