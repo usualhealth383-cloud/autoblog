@@ -45,7 +45,7 @@ async def main():
                 assert r['ah'] >= r['vh'] * 0.4, (i, '그림 판이 작음', r)
                 assert 0 <= r['gap'] <= 30, (i, '그림과 제목 사이가 비어 있음', r)
                 assert r['n'] == 1 and len(SENT.findall(r['p'])) == 1 and r['p'].rstrip().endswith('요.'), (i, '한 장에 한 문장(해요체)이 아님', r['p'])
-                if i == 1: assert r['p'] == await pg.evaluate('SRS_RULE'), '2장이 복습 규칙 문장과 다름'
+                if i == 1: assert r['p'] == '틀린 문제는 잊을 때쯤 다시 나와요.', '2장이 복습 한 줄과 다름(docs/23 S16 — 숫자는 그림이 말한다)'
                 await tidy(f'소개 {i+1}'); await pg.screenshot(path=f'{SC}/i0{i+1}_intro_{theme}.png')
                 await pg.click('#introNext'); await pg.wait_for_timeout(250)
             assert len(set(hs)) == 1, ('세 장 그림 높이가 다름', hs)

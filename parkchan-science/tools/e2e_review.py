@@ -73,7 +73,7 @@ async def main():
         await s.click('#goLogin'); await s.fill('#lgEmail', 'student@demo.kr'); await s.fill('#lgPw', '1234'); await s.click('#lgGo'); await s.wait_for_timeout(900)
         assert await s.evaluate('view') == 'today'
         await s.evaluate('loadMore()'); await s.wait_for_function('MORE.ok', timeout=15000)
-        assert await s.locator('#revStart').count() == 0 and await s.locator('#ps-review.none').count() == 1, '아무것도 안 배웠는데 오늘의 복습이 보임'
+        assert await s.locator('#revStart').count() == 0 and await s.locator('#ps-review:not(.none)').count() == 0, '아무것도 안 배웠는데 오늘의 복습이 보임'   # 빈 단계는 '없음' 줄 또는 생략(docs/23 S18)
         L1 = await s.evaluate('todayConcept().lessonId')
         qid = await s.evaluate(f"BANK.find(q => q.lessonId === '{L1}' && q.type === 'ox').id")
         await s.evaluate(f"startBank([BANK.find(q => q.id === '{qid}')], '')"); await s.wait_for_timeout(200)
@@ -215,7 +215,7 @@ async def main():
         seq2 = [x['l'] for x in pl]; assert all(seq2[i] != seq2[i+1] for i in range(len(seq2) - 1)), ('같은 소단원이 잇달아 나옴', pl)
         # 기한 문제도, 배운 다른 소단원도 없으면 카드를 숨긴다(기한 문제만 있으면 그것만)
         await s.evaluate("S.wrong = []; S.bh = {}; S.rv = null; save(S); show('today')"); await s.wait_for_timeout(200)
-        assert await s.locator('#revStart').count() == 0 and await s.locator('#ps-review.none').count() == 1, '복습할 것이 없는데 카드가 보임'
+        assert await s.locator('#revStart').count() == 0 and await s.locator('#ps-review:not(.none)').count() == 0, '복습할 것이 없는데 카드가 보임'
 
         # ───────── 7) 이번 주 리듬 — 점 7개, 연속 일수는 어디에도 없음 ─────────
         D = dt.date(2026, 12, 3)      # 목요일

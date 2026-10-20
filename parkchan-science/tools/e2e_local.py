@@ -30,7 +30,7 @@ async def main():
         ctx, s = await page()
         assert await s.evaluate('view') == 'auth'; await shot(s, 'l01_start')
         await s.click('#goGuest'); await s.wait_for_timeout(300); assert await s.evaluate('view') == 'today'
-        assert '체험' in await txt(s, '.pill'); await shot(s, 'l02_guest_today')
+        assert '최근 7일치' in await txt(s, '.pill'); await shot(s, 'l02_guest_today')   # 무료 범위 = 최근 7일치(2026-10-13: 기간제처럼 보이던 '체험 n일 남음'을 바꿈)
         await s.click('.tab[data-v="list"]'); await s.wait_for_timeout(300)
         assert await s.locator('.row.locked').count() > 100, '게스트에게 잠긴 개념이 없음'
         await s.click('.row.locked'); await s.wait_for_timeout(200); assert await s.locator('#sheetBg').count() == 1; await s.click('#sheetClose')
@@ -106,6 +106,9 @@ async def main():
         await o.fill('#clsName', '일요반'); await o.fill('#clsStart', '10:00'); await o.click('#clsAdd'); await o.wait_for_timeout(400); assert '일요반' in await txt(o, '#v-admin')
         await o.select_option('#passDays', '90'); await o.click('#passIssue'); await o.wait_for_timeout(400); pcode = await o.evaluate('issuedPass.code'); assert len(pcode) == 6; await shot(o, 'l14_admin_settings')
         await o.click('[data-adm="notice"]'); await o.click('[data-chip="시험 안내"]'); await o.select_option('#ntCls', '전체'); await o.click('#ntSend'); await o.wait_for_timeout(300); assert '읽음 0' in await txt(o, '.sent .r')
+        # 읽음 분모는 앱을 쓰는 학생만, 앱 없는 학생은 따로(GPT 검수 #31)
+        nr = await txt(o, '.sent .r'); ex = await o.evaluate("DBX.rosterLinks().then(l => [l.filter(x => x.app || x.last).length, l.filter(x => !x.app && !x.last).length])")
+        assert f'/ {ex[0]}명' in nr and ex[1] > 0 and f'앱 없음 {ex[1]}명' in nr and f'앱 없는 {ex[1]}명' in nr, (nr, ex)
         await ctx.close()
 
         # ── 학원 밖 학생: 가입(코드 없음) → 잠김 → 이용권 코드 등록 → 전 범위 ──

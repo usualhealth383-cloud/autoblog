@@ -23,6 +23,9 @@ async def main():
         await pg.click('#sjTog'); await pg.wait_for_timeout(200)
         assert await pg.locator('.sjrow').count() == 3 and await pg.is_disabled('#sjGo')
         R = await pg.evaluate("multiSplit(bs.items[0]).rows.map(r => [r.k, r.ok])")
+        # 버튼 이름에 보기 글자와 문장 첫머리(GPT 검수 #15 — '옳아요'만 여섯 번 들리던 것)
+        nm = await pg.evaluate("[...document.querySelectorAll('.sjrow button')].map(b => b.getAttribute('aria-label') || '')")
+        assert len(set(nm)) == 6 and all(x[0] in 'ㄱㄴㄷㄹ' and (x.endswith('옳아요') or x.endswith('틀려요')) and len(x) > 8 for x in nm), nm
         # 1) 일부러 첫 보기를 반대로 판정 → 선지에 있으면 채점, 없으면 막힘
         wrong = {k: (not ok if i == 0 else ok) for i, (k, ok) in enumerate(R)}
         for k, v in wrong.items(): await pg.click(f'[data-sj="{k}|{1 if v else 0}"]'); await pg.wait_for_timeout(80)

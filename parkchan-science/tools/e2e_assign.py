@@ -193,12 +193,13 @@ async def main():
         # ── 7. 원장: 제출 현황 · 처리할 것 ──
         await logout(); await login(*OWNER); await asg_tab()
         lst = await pg.inner_text('#v-admin')
-        assert '제출 1 / 2명 · 정답률 60%' in lst and '제출 1 / 2명 · 정답률 100% · 늦은 제출 1 · 아직 1명' in lst and '제출 1 / 2명 · 정답률 80%' in lst, lst
+        assert '제출 1 / 2명 · 정답률 60%' in lst and '제출 1 / 2명 · 정답률 100% · 늦은 제출 1 · 앱 없음 1명' in lst and '제출 1 / 2명 · 정답률 80%' in lst, lst
+        assert '아직 1명' not in lst, ('앱 없는 학생을 아직 안 낸 학생으로 셈(GPT 검수 #31)', lst)
         await pg.locator('.asgsentrow', has_text=L1 + ' · 문제').locator('[data-asgrep]').click(); await pg.wait_for_timeout(800)
         sh = await pg.inner_text('.sheet')
-        assert '많이 틀린 문항' in sh and '1명 틀림' in sh and '3/5' in sh and '아직' in sh and '냄' in sh, sh
+        assert '많이 틀린 문항' in sh and '1명 틀림' in sh and '3/5' in sh and '앱 없음' in sh and '미제출' not in sh and '냄' in sh, sh
         assert await pg.locator('.sheet .asgtop .kv').count() == 2, '틀린 문항 2개(학생 1명이 2문항 틀림)'
-        nophone = await pg.locator('.sheet a[href^="sms:"]').count(); assert nophone == (1 if SRV else 0), '아직 안 낸 학생에게 문자(연락처 있을 때만)'
+        nophone = await pg.locator('.sheet a[href^="sms:"]').count(); assert nophone == 0, "앱 없는 학생에게는 '앱에서 내세요' 문자를 띄우지 않음"
         await pg.screenshot(path=f'{SC}/a06_report_light.png', full_page=True)
         # 틀린 학생에게만 다시 내기(2026-10-07) — 틀린 1명에게, 틀린 2문항만
         re_ = await pg.inner_text('.sheet .asgre'); assert '1명' in re_ and '2개' in re_, re_
@@ -217,6 +218,11 @@ async def main():
         await pg.locator('.asgsentrow', has_text=L2).locator('[data-asgrep]').click(); await pg.wait_for_timeout(700)
         assert '늦게 냄' in await pg.inner_text('.sheet'); await pg.click('#sheetClose')
         await pg.click('[data-adm="students"]'); await pg.wait_for_selector('#todoBox')
+        assert await pg.locator('#todoBox .todo-row', has_text='마감 지남').count() == 0, '앱 없는 학생이 처리할 것에 뜸(GPT 검수 #31)'
+        assert '앱 없음' in await pg.inner_text('#todoBox .todo-noapp'), await pg.inner_text('#todoBox')
+        # 안 낸 학생이 앱에 가입하면 그때부터 처리할 것에 뜬다
+        await logout(); await signup(pg, '안낸학생', 'asg-late@t.kr', code='E2EA02' if SRV else 'MON123'); await logout(); await login(*OWNER)
+        await pg.click('[data-adm="students"]'); await pg.wait_for_selector('#todoBox'); await pg.wait_for_timeout(500)
         rows = await pg.locator('#todoBox .todo-row', has_text='마감 지남').all()
         assert len(rows) >= 1, await pg.inner_text('#todoBox')
         tr = rows[0]; assert '아직 안 냄' in await tr.inner_text() and (await tr.locator('.todo-act').inner_text()).strip() == '과제 보기', await tr.inner_text()

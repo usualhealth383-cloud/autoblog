@@ -124,7 +124,7 @@ def parse_chapter(path):
         if n is None: continue
         ps = [p for p in sol.find_all('p', recursive=False)]
         wb = sol.select_one('.wrongbox')
-        sols[n] = {'explain': txt(ps[0]) if ps else '', 'wrong': txt(wb.select_one('p')) if wb and wb.select_one('p') else '',
+        sols[n] = {'explain': ' '.join(txt(p) for p in ps), 'wrong': txt(wb.select_one('p')) if wb and wb.select_one('p') else '',
                    'concept': txt(sol.select_one('.slink'), False)}
         sa = sol.select_one('.sans')                  # 해설 머리의 정답 — 정답표가 비었을 때의 보조
         if sa and txt(sa, False) and not ans.get(n): ans[n] = txt(sa, False)
@@ -147,13 +147,13 @@ def parse_chapter(path):
         for s in stem_el.select('.blankline'): s.replace_with('＿＿＿')
         # 그림 밖 자료(2026-10): 탐구 과정·조건 줄(.exp)과 표(.qtab·.exptab)를 대단원·모의고사와 같은 data(줄)·table(표)로.
         # 예전엔 .exp 가 발문 글자에 이어 붙고(표는 칸이 뭉개져 '원소산소탄소…'), 발문 밖 .exp 는 통째로 빠졌다(2103-q21 반응식)
-        fig = el.select_one('figure svg')
+        fig = el.select_one('figure svg') or el.select_one('.exp svg')   # 1305-q13: [결과] 표를 그림(svg)으로 .exp 안에 그렸다 — 글자로 뭉개지 않게 그림으로
         exps = el.select('.exp')
         tabs = [tb for tb in el.select('table.qtab, table.exptab') if not tb.find_parent('figure')]
         data = []
         for x in exps:
             xc = __import__('copy').copy(x)
-            for f in xc.select('figure, table'): f.extract()      # 그림은 figure 로, 표는 table 로 따로
+            for f in xc.select('figure, table, svg'): f.extract()      # 그림은 figure 로, 표는 table 로 따로
             data += block_lines(xc)
         table = [table_rows(tb) for tb in tabs]
         order = el.find_all(True)
@@ -162,7 +162,15 @@ def parse_chapter(path):
         for x in exps + tabs: x.extract()
         for f in stem_el.select('figure'): f.extract()         # 발문 안에 든 그림의 글자(svg text)가 발문에 섞이지 않게
         stem = txt(stem_el)
-        bogi = el.select_one('.bogi-box')
+        # 자료 상자(머리 '보기' 없는 .bogi-box)가 <보기> 앞에 따로 있으면 그것은 data 로 — 2026-10-13: 첫 상자만 읽어
+        # 2204-q21·2301-q23·2303-q17·22, 1310-q21 의 ㄱㄴㄷ 이 빠져 풀 수 없었다
+        boxes = el.select('.bogi-box')
+        bogi = next((b for b in boxes if b.select_one('.bt')), boxes[-1] if boxes else None)
+        for b in boxes:
+            if b is bogi: continue
+            bc = __import__('copy').copy(b)
+            for br in bc.find_all('br'): br.replace_with('\n')
+            data = [l for l in (re.sub(r'[ \t]+', ' ', x).strip() for x in plain_text(bc, '').split('\n')) if l] + data
         if bogi:
             bt = bogi.select_one('.bt');
             if bt: bt.extract()
@@ -181,7 +189,7 @@ def parse_chapter(path):
         items.append({'id': f'{code}-q{n}', 'lessonId': code, 'concept': lec_no(code, int(m.group(1))) if m else 0, 'step': step, 'type': typ,
                       'stem': stem, 'source': source, 'choices': choices, 'answer': answer,
                       'explain': sol.get('explain', ''), 'wrong': sol.get('wrong', ''), 'figure': figure,
-                      'difficulty': difficulty or {1: '●○○', 2: '●●○', 3: '●●●'}[step], **({'must': True} if must else {}),
+                      'difficulty': difficulty or {1: '●○○', 2: '●●○', 3: '●●●'}[step], **({'must': True} if must else {}), **({'adv': True} if el.get('data-adv') == '1' else {}),
                       **({'data': '\n'.join(data)} if data else {}), **({'table': table} if table else {}), **({'figAfter': True} if fig_after else {})})
         qi += 1
 
@@ -229,6 +237,80 @@ def kind(v):
     return 'noun'
 
 
+# 자동 빈칸 문항 가운데 무작위 오답 보기가 너무 엉뚱해 거저 풀리던 것 — 같은 갈래의 헷갈리는 말로 손수 바꾼다(문항 id·정답 자리는 그대로).
+# 2026-10-13 외부 검수 22번: '참값과 측정값의 차이' 빈칸에 거래·페르미·KRISS 가 나와 생각 없이 풀렸다.
+AUTO_CHOICES = {
+    '1103-b1-㉠': (['정밀도', '평균값', '어림'], {
+        '정밀도': '같은 양을 여러 번 쟀을 때 측정값들이 서로 가까운 정도다. 참값과의 차이가 아니다.',
+        '평균값': '여러 번 잰 값을 더해 횟수로 나눈 값이다. 오차를 줄이는 방법이지, 참값과 측정값의 차이가 아니다.',
+        '어림': '도구 없이, 또는 정확히 잴 수 없을 때 경험과 지식으로 양을 대략 헤아리는 것이다.'}),
+    # 같은 날 20번: 접두어 ㉢ 을 '한 칸 = 1000배'(㉠ 과 같은 답)에서 '0.5 mg = 500 μg' 환산으로 바꾸며, 오답도 환산 실수로
+    '1102-b4-㉡': (['10⁹', '10⁻⁶', '10⁻³'], {
+        '10⁹': '지수의 부호를 뒤집은 값이다. 나노는 작아지는 쪽이라 10<sup>−9</sup>이다.',
+        '10⁻⁶': '마이크로(μ)의 크기다. 나노는 그보다 한 칸(1000배) 더 작다.',
+        '10⁻³': '밀리(m)의 크기다. 나노는 그보다 두 칸(10<sup>6</sup>배) 더 작다.'}),
+    '1102-b4-㉢': (['50', '5000', '0.0005'], {
+        '50': '1 mg = 1000 μg이라 0.5 mg = 0.5 × 1000 = 500 μg이다. 100을 곱하면 안 된다.',
+        '5000': '0.5 × 1000 = 500이다. 1 mg = 10000 μg으로 잘못 잡은 값이다.',
+        '0.0005': '1000으로 나눈 값이다. 큰 단위(mg)를 작은 단위(μg)로 바꾸면 수는 커진다.'}),
+    # 2026-10-13 외부 검수 ③: '알칼리 금속이 ___' 에 않는다·흐른다·같은 이 나와 문법만으로 풀렸다 — 분류를 헷갈린 말로
+    '1203-b1-㉢': (['맞다', '된다', '아니라 할로젠이다'], {
+        '맞다': '수소는 1족에 놓이지만 금속이 아닌 비금속이다. 알칼리 금속은 수소를 뺀 1족 금속 원소(Li·Na·K …)다.',
+        '된다': '수소는 반응해도 알칼리 금속으로 바뀌지 않는다. 원소의 종류는 화학 반응으로 바뀌지 않는다.',
+        '아니라 할로젠이다': '할로젠은 17족(F·Cl·Br·I)이다. 수소는 원자가 전자가 1개인 1족 원소다.'}),
+    # 같은 날(통합과학2 검수): 보기 많아서·줄어·적은 이 문법만으로 풀렸다 — 평형 온도를 헷갈린 말로
+    '2203-b2-㉡': (['더 낮은', '산업화 이전과 같은', '해마다 낮아지는'], {
+        '더 낮은': '재복사가 늘어 지표가 더 데워지므로 평형 온도는 낮아지지 않는다.',
+        '산업화 이전과 같은': '에너지가 쌓이는 동안 기온이 올라 예전 온도로 돌아가지 않는다.',
+        '해마다 낮아지는': '지금은 들어오는 에너지가 더 많아 기온이 오르는 중이다.'}),
+    # 같은 날: '물을 끓여 ___로 터빈을 돌린다' 에 생산자·온실 기체·분해자 — 터빈을 돌리는 것을 헷갈린 말로('로' 조사가 맞는 말만)
+    '2205-b2-㉡': (['끓는 물', '연소 가스', '공기'], {
+        '끓는 물': '터빈을 돌리는 것은 물을 끓여 생긴 증기다. 떨어지는 물로 돌리는 것은 수력이다.',
+        '연소 가스': '가스 터빈은 태운 가스로 돌지만, 이 문장은 물을 끓여 얻은 것을 묻는다.',
+        '공기': '공기의 흐름(바람)으로 터빈을 돌리는 것은 풍력 발전이다. 화력은 물을 끓여 생긴 증기로 돌린다.'}),
+    # 같은 날: '＿＿＿에 바닥에 닿는다' 에 굴지성·재활·자신이 나와 뜻만으로 풀렸다 — 수평 투사에서 실제로 하는 착각으로
+    '1303-b3-㉠': (['다른 시각', '같은 위치', '던진 공이 나중'], {
+        '다른 시각': '연직 방향으로는 두 공 모두 같은 자유 낙하라, 같은 높이에서 출발하면 같은 시각에 닿는다.',
+        '같은 위치': '던진 공은 수평 방향으로 등속 운동을 해서 놓은 공보다 멀리 떨어진다. 같은 것은 닿는 시각이다.',
+        '던진 공이 나중': '수평 속력은 얼마나 멀리 가는지만 정하고, 낙하 시간은 높이만 정한다. 세게 던져도 늦게 닿지 않는다.'}),
+    # 같은 날: '전기가 통하지 ___' 빈칸(정답 않는다)이 부정 어미 하나라 문법만으로 풀렸다 — 강의용 문장의 빈칸을 상태(고체)로 옮기고(정답 번호 그대로),
+    # 오답은 염화 나트륨이 전기가 '통하는' 상태로
+    '1203-b5-㉢': (['수용액', '액체', '젖은 상태'], {
+        '수용액': '물에 녹으면 Na<sup>+</sup>·Cl<sup>−</sup> 이 자유롭게 움직이며 전하를 나르므로 전기가 통한다.',
+        '액체': '녹여 액체가 되면 이온이 제자리를 벗어나 움직일 수 있어 전기가 통한다.',
+        '젖은 상태': '물이 묻으면 겉면이 녹아 이온이 움직일 수 있어 전기가 통한다. 통하지 않는 것은 이온이 붙들린 마른 고체일 때다.'}),   # 2026-10-14 G2: '물에 녹은 상태'가 '수용액'과 같은 뜻이라 사실상 3지선다였다
+    # 같은 날 조사: '주위의 온도가 ___간다'(정답 올라)에 '바다'·'열분해' 같은 명사가 섞여 뜻으로 거저 풀렸다 — 발열·흡열을 헷갈린 말로
+    '2105-b1-㉠': (['내려', '식어', '낮아져'], {
+        '내려': '열을 내놓는 반응(발열 반응)은 주위에 열을 주므로 주위 온도가 올라간다. 내려가는 것은 열을 흡수하는 반응(흡열 반응)이다.',
+        '식어': '열을 받은 주위는 식지 않고 데워진다. 주위가 식는 것은 반응이 주위의 열을 흡수할 때다.',
+        '낮아져': '발열 반응에서 주위는 열을 얻어 온도가 높아진다. 온도가 낮아지는 쪽은 흡열 반응이다.'}),
+}
+
+# 본책 개념 번호 → 강의용 개념 번호가 문항마다 갈리는 곳 — 2026-10-13 외부 검수 ③: 1205 본책 개념 4(신소재)는 강의용 04 탄소 신소재 + 05 초전도체·액정을
+# 한 쪽에 담아, 초전도체 문항의 '개념 그림 보기'가 탄소 신소재 그림으로 갔다. 문항 id 는 그대로, 이어지는 개념 카드만 바로잡는다.
+# 강의용 빈칸 정답을 바꾼 자리 — 오답 보기 후보(pool)에는 옛 정답을 그 자리에 그대로 둔다. 후보 목록이 바뀌면 다른 문항들의 오답 보기가
+# 줄줄이 바뀌기 때문이다(2026-10-13: 1203-05 ㉢ '않는다' → '고체'로 옮기자 다른 문항 13개의 보기가 흔들렸다). 그 문항 자신의 보기는 AUTO_CHOICES 가 정한다.
+# 손으로 고른 자동 빈칸 보기·해설은 소단원마다 data/auto_choices/{소단원}.json 에도 둔다(여러 작성자가 나눠 쓰게 — 2026-10-13 문항 품질 검수).
+# 꼴: {"1203-b1-㉢": {"choices": [오답 셋], "wrong": {"오답": "바로알기", ...}, "explain": "(선택) 정답 해설을 이 글로", "adv": true(선택, 심화)}}
+# 자동 오해 OX(-m…) 처럼 보기가 없는 문항은 "explain"·"adv" 만 쓴다
+AUTO_EXPLAIN = {}
+AUTO_O = {}   # {code}-m{no}-{i}o : {'stem': 홀로 서는 참 문장, 'explain': 왜 옳은지} — 2026-10-14 문항 품질 G3: 오해 OX 정답이 모두 X 라 읽지 않고 X 만 눌러도 맞았다
+for _f in sorted((ROOT / 'data' / 'auto_choices').glob('*.json')) if (ROOT / 'data' / 'auto_choices').is_dir() else []:
+    for _id, _v in json.loads(_f.read_text(encoding='utf-8')).items():
+        assert _id not in AUTO_CHOICES, f'{_f.name}: {_id} 가 AUTO_CHOICES 와 겹침'
+        if _v.get('choices'): assert len(_v['choices']) == 3 and set(_v.get('wrong', {})) <= set(_v['choices']), f'{_f.name}: {_id} 보기 셋·바로알기 키'; AUTO_CHOICES[_id] = (_v['choices'], _v.get('wrong', {}))
+        if _v.get('explain'): AUTO_EXPLAIN[_id] = _v['explain']
+        if _v.get('stem') and re.search(r'-m\d+-\d+o$', _id): AUTO_O[_id] = _v   # 손으로 쓴 '진실' 문장 → 정답 O 짝 문항
+        if _v.get('adv'): _ADV_EXTRA = globals().setdefault('_ADV_EXTRA', set()); _ADV_EXTRA.add(_id)
+POOL_AS_BEFORE = {('1203-05', '㉢'): '않는다'}
+
+# '(심화)' 표시 — 본책 문항은 .q/.pq 의 data-adv="1"(docs/24 X5), 강의용 자동 문항은 여기 id 로. 앱이 추천·과제·숙련도에서 뺀다(2026-10-13 GPT 검수 ③ 2104 이온 수 역산)
+ADV_IDS = {'2104-m4-2x', '2104-b4-㉢'}
+ADV_IDS |= globals().get('_ADV_EXTRA', set())   # data/auto_choices/*.json 의 "adv": true
+
+ITEM_CONCEPT = {'1205-c3-2': 5, '1205-c3-3': 5, '1205-q3': 5, '1205-q20': 5, '1205-q22': 5, '1205-u4': 5}
+
+
 def auto_from_lecture(concepts):
     """강의용 교재에서 자동 생성: 오해✗ 문장 → X, 진실✓ 문장 → O · 빈칸 ㉠㉡㉢ → 4지선다(같은 종류의 다른 빈칸 정답이 오답 보기)"""
     items = []
@@ -236,6 +318,7 @@ def auto_from_lecture(concepts):
     origin = {}                                 # 값 → (개념, 빈칸) — 오답 보기 해설: 그 말이 원래 채우는 문장
     for c in concepts:
         for k, v in c['blanks'].items():
+            v = POOL_AS_BEFORE.get((c['id'], k), v)
             if 1 <= len(re.sub(r'<[^>]+>', '', v)) <= 12 and v not in [p[0] for p in pool]: pool.append((v, c['lessonId'], c['lessonId'][:2])); origin[v] = (c, k)
     bare_of = lambda t: re.sub(r'<[^>]+>', '', t).strip()
 
@@ -253,12 +336,19 @@ def auto_from_lecture(concepts):
         return ''
 
     def term_def(word, c):
-        """용어표에서 그 말의 뜻 — 같은 개념 → 같은 소단원 → 전체. '라이다(LiDAR)'처럼 괄호가 붙은 용어도 찾는다"""
-        same = [c] + [x for x in concepts if x['lessonId'] == c['lessonId'] and x is not c] + [x for x in concepts if x['lessonId'] != c['lessonId']]
+        """용어표에서 그 말의 뜻 — 같은 개념 → 같은 소단원까지만. '라이다(LiDAR)'처럼 괄호가 붙은 용어도 찾는다.
+        2026-10-13 문항 품질 검수 G3: 다른 소단원까지 찾다가 DNA '염기' 빈칸에 산·염기의 '염기'(OH⁻ 를 내놓는 물질) 뜻이 붙었다 — 같은 낱말 다른 뜻"""
+        same = [c] + [x for x in concepts if x['lessonId'] == c['lessonId'] and x is not c]
         for x in same:
             for t in x.get('terms', []):
                 k = bare_of(t['k'])
                 if word and (k == word or re.sub(r'\s*\(.*?\)\s*', '', k) == word): return t['v']
+        return ''
+    def own_term(word, c):
+        """그 개념 카드 용어표에서만 찾은 뜻(다른 개념으로 넘어가지 않는다)"""
+        for t in c.get('terms', []):
+            k = bare_of(t['k'])
+            if word and (k == word or re.sub(r'\s*\(.*?\)\s*', '', k) == word): return t['v']
         return ''
     rnd = random.Random(7)
     for c in concepts:
@@ -268,6 +358,10 @@ def auto_from_lecture(concepts):
             if x.endswith('.') and standalone(x):
                 items.append({'id': f'{code}-m{no}-{i}x', 'lessonId': code, 'concept': no, 'step': 'auto', 'type': 'ox', 'stem': x,
                               'source': '', 'choices': [], 'answer': 'X', 'explain': f'오해: {x} → 진실: {o}' + (f' (왜? {strip_tags(m["why"]).strip()})' if m.get('why') else ''), 'wrong': '', 'figure': '', 'difficulty': '●○○'})
+            oid = f'{code}-m{no}-{i}o'
+            if oid in AUTO_O:   # 진실 문장을 손으로 다듬어 둔 것만(그대로 내면 토막이 많다) — X 문항·난수 흐름은 그대로
+                items.append({'id': oid, 'lessonId': code, 'concept': no, 'step': 'auto', 'type': 'ox', 'stem': AUTO_O[oid]['stem'],
+                              'source': '', 'choices': [], 'answer': 'O', 'explain': AUTO_O[oid].get('explain') or f'진실: {o}', 'wrong': '', 'figure': '', 'difficulty': '●○○', 'pair': f'{code}-m{no}-{i}x'})
             if False and o.endswith('.') and standalone(o):   # 진실(✓) 문장은 오해 없이 홀로 읽으면 뜻이 비는 것이 많아(2026-10-01 점검 77건+) 문제로 내지 않고 X 문항의 해설로만 쓴다
                 items.append({'id': f'{code}-m{no}-{i}o', 'lessonId': code, 'concept': no, 'step': 'auto', 'type': 'ox', 'stem': o,
                               'source': '', 'choices': [], 'answer': 'O', 'explain': '교재 개념 카드의 설명 그대로입니다.', 'wrong': '', 'figure': '', 'difficulty': '●○○'})
@@ -289,15 +383,24 @@ def auto_from_lecture(concepts):
                 near = [p[0] for p in pool if ok(p[0]) and p[1] == code] + [p[0] for p in pool if ok(p[0]) and p[2] == code[:2] and p[1] != code] + [p[0] for p in pool if ok(p[0]) and p[2] != code[:2]]
                 near = list(dict.fromkeys(near))
                 if len(near) < 3: break
-                ch = rnd.sample(near[:12], 3) + [v]; rnd.shuffle(ch)
+                ch = rnd.sample(near[:12], 3) + [v]; rnd.shuffle(ch)   # 손으로 고른 보기가 있어도 rnd 는 똑같이 돌린다(뒤 문항들의 보기가 바뀌지 않게)
+                hand = AUTO_CHOICES.get(f'{code}-b{no}-{k}')
+                if hand: ch = [x if x == v else hand[0][[y for y in ch if y != v].index(x)] for x in ch]   # 정답 자리는 그대로, 오답 셋만 바꾼다
                 # 해설: 답을 채운 원문 + 용어표 정의(없으면 개념 포인트) · 오답 보기: 그 말의 뜻이나 그 말이 원래 채우는 문장
                 d = term_def(bare, c)
                 explain = filled(c, k) + (f' — <b>{bare}</b>: {d}' if d else (' ' + c['point'] if c['point'] else ''))
+                explain = AUTO_EXPLAIN.get(f'{code}-b{no}-{k}', explain)
                 wl = []
                 for j, b in enumerate(ch):
                     if b == v: continue
-                    oc = origin.get(b); bb = bare_of(b)
-                    why = term_def(bb, oc[0] if oc else c) or (filled(*oc) if oc else '')
+                    bb = bare_of(b)
+                    # 오답 보기 해설은 손 해설 → 이 문항 개념 카드 안의 용어 뜻 → 이 개념 카드에서 그 말이 채우는 빈칸 문장 순서로만.
+                    # 2026-10-13 GPT 검수 ③: 다른 개념·단원의 문장(그 말이 다른 데서 쓰인 곳)이 '오답 왜 틀렸나'로 붙어 91 %가 문제와 무관했다
+                    # (기온 문제 아래 부도체 함정 문장 등). 시험 요령 문장·15글자 미만 토막도 뺀다. 남는 것이 없으면 그 보기는 비운다(정답 해설은 남음).
+                    hw = hand[1].get(b) if hand else ''
+                    own_k = next((kk for kk, vv in c['blanks'].items() if vv == b and kk != k), None)
+                    why = hw or own_term(bb, c) or (filled(c, own_k) if own_k else '')
+                    if why and not hw and (TIPS.search(strip_tags(why)) or len(bare_of(strip_tags(why))) < 15): why = ''
                     if why: wl.append(f'<b>{MARKS[j]}</b> {bb} — {why}')
                 items.append({'id': f'{code}-b{no}-{k}', 'lessonId': code, 'concept': no, 'step': 'auto', 'type': 'mc', 'stem': '빈칸에 들어갈 말은? ' + stem,
                               'source': '', 'choices': ch, 'answer': ch.index(v) + 1, 'explain': explain.strip(), 'wrong': ' '.join(wl), 'figure': '', 'difficulty': '●○○'})
@@ -424,18 +527,40 @@ def solutions(soup):
     return sols
 
 
+def stack_svgs(svgs, gap=8):
+    """한 문항의 svg 여러 장을 위아래로 쌓아 한 장으로(앱의 figure 칸은 하나).
+    안쪽을 <svg> 로 겹쳐 넣으면 앱 CSS(figure svg{height:auto; 배경})가 안쪽 장에도 걸려 크기가 틀어진다 → <g transform> 으로."""
+    parts, y, w = [], 0.0, 0.0
+    for x in svgs:
+        vb = [float(v) for v in re.split(r'[\s,]+', (x.get('viewBox') or x.get('viewbox') or '').strip()) if v] or [0, 0, float(x.get('width', 300)), float(x.get('height', 100))]
+        vx, vy, vw, vh = vb
+        font = x.get('font-family')
+        inner = ''.join(str(c) for c in x.contents)
+        parts.append(f'<g transform="translate({-vx:g},{y - vy:g})"' + (f' font-family="{font}"' if font else '') + f'>{inner}</g>')
+        y += vh + gap; w = max(w, vw)
+    h = y - gap
+    font = svgs[0].get('font-family', 'PC Sans')
+    return BeautifulSoup(f'<svg width="{w:g}" height="{h:g}" viewBox="0 0 {w:g} {h:g}" font-family="{font}">' + ''.join(parts) + '</svg>', 'html.parser').find('svg')
+
+
 def item_common(el, stem_sel):
     """문항 상자에서 그림·자료·표·보기·선지를 읽는다"""
     fig = el.find('svg')                                # 그림은 figure 안에, 모의고사 몇 문항은 자료 상자(.dta) 안에 있다
+    tops = [x for x in el.find_all('svg') if not x.find_parent('svg')]
+    fig0 = fig
+    if len(tops) > 1: fig = stack_svgs(tops)            # M1-q25: 그림 + 코돈표(svg 두 장) — 둘째 장이 빠져 풀 수 없었다(2026-10-13)
     data, table = [], []
     for x in el.select('.exp, .dta'): data += block_lines(x, ('bt',))
     for tb in el.select('table.qtab, table.xt'): table += [table_rows(tb)]
-    bogi = el.select_one('.bogi-box, .bogi')
+    boxes = el.select('.bogi-box, .bogi')               # 머리 '보기' 없는 상자는 자료(위 parse_chapter 와 같음)
+    bogi = next((b for b in boxes if b.select_one('.bt')), boxes[-1] if boxes else None)
+    for b in boxes:
+        if b is not bogi: data = block_lines(b) + data
     source = '\n'.join(block_lines(bogi)) if bogi else ''
     choices = [re.sub(r'^[①②③④⑤]\s*', '', txt(li)) for li in el.select('ul.choices li, ul.ch li')]
     after = False
     if fig is not None:                                # 자료·표가 그림보다 앞에 있으면 앱도 그 차례로(figAfter)
-        order = el.find_all(True); fi = order.index(fig)
+        order = el.find_all(True); fi = order.index(fig0)
         first = min((order.index(x) for x in el.select('.exp, .dta, table.qtab, table.xt')), default=None)
         after = first is not None and first < fi
     return fig, data, table, source, choices, after
@@ -644,6 +769,66 @@ def unit_mock():
     return items, warns
 
 
+def parse_plus(path):
+    """본책 '시험에 나오는 보강' 쪽(2026-10-13 완자 대조 보강) → (보강 문항, 보강 개념 칸).
+    · <section class="plus-sec" data-concept="N"> 제목(.psec)·본문·그림·한 줄 정리(.pkey) → data/plus.json (앱 개념 상세의 '시험에 나오는 보강')
+    · <div class="pq" data-n data-concept data-type data-answer> + .psol[data-n] → 문제 은행 {코드}-p{n} (기존 문항 id 를 건드리지 않게 따로 번호)
+    · 정답은 data-answer: 선지형은 ①~⑤, OX 는 O/X, 빈칸은 낱말, 서술형은 비움"""
+    src = path.read_text(encoding='utf-8'); code = lesson_code(path); markers = defs_map(src)
+    soup = BeautifulSoup(src, 'html.parser'); items, secs = [], []
+    for k, sec in enumerate(soup.select('.plus-sec'), 1):
+        t = sec.select_one('.psec'); title = txt(t, False) if t else ''
+        body = __import__('copy').copy(sec)
+        for x in body.select('.psec'): x.extract()
+        for x in body.find_all(style=True):   # 본책 쪽 배치(그림 오른쪽 격자·mm 여백)는 폰에서 글을 좁은 세로 줄로 만든다 — 그림 밖 style 은 걷는다
+            if not x.find_parent('svg') and x.name != 'svg': del x['style']
+        for i, f in enumerate(body.select('svg')):
+            f.replace_with(BeautifulSoup(selfcontain(str(f), markers, f'{code}px{k}{i}'), 'html.parser'))
+        html = re.sub(r'\s+', ' ', ''.join(str(c) for c in body.contents)).strip()
+        html = re.sub(r'\sclass="body"', '', html)
+        cn = int(sec.get('data-concept') or 0)
+        secs.append({'lessonId': code, 'concept': lec_no(code, cn) if cn else 0, 'id': f'{code}-x{k}', 'title': title, 'html': html})
+    sols = {}
+    for sol in soup.select('.psol'):
+        n = sol.get('data-n');
+        if not n: continue
+        if any('up' in (pg.get('class') or []) for pg in sol.find_parents('div')): n = 'u' + n   # 실력 다지기 해설은 따로
+        ps = sol.find_all('p', recursive=False); wb = sol.select_one('.wrongbox')
+        wrong = ' '.join(txt(x) for x in wb.select('p')) if wb else ''
+        rub = sol.select_one('table.rubric')
+        if rub:   # 서술형 채점 기준 — 본책 해설(solutions)과 같은 꼴로 앱에(2026-10-13: 보강·실력 다지기 서술형에서 빠지던 것)
+            rows = [[txt(td) for td in tr.find_all('td')] for tr in rub.select('tr')]
+            crit = ' '.join(f'{r[0]} ({r[1]})' for r in rows if len(r) >= 2)
+            wt = txt(wb.select_one('.wt'), False) if wb and wb.select_one('.wt') else ''
+            wrong = crit + (f' — {wt}: {wrong}' if wrong else '')
+        sols[n] = {'explain': ' '.join(txt(x) for x in ps), 'wrong': wrong}
+    for el in soup.select('.pq'):
+        n = el.get('data-n'); typ = el.get('data-type', 'mc'); a = (el.get('data-answer') or '').strip()
+        stem_el = el.select_one('.stem')
+        diff = stem_el.select_one('.difficulty') if stem_el else None; difficulty = txt(diff, False) if diff else '●●○'
+        if stem_el:
+            for x in stem_el.select('.difficulty, .pqno, .tags, .badge-data, .badge-essay'): x.extract()
+            for x in stem_el.select('.blankline'): x.replace_with('＿＿＿')
+        fig, data, table, source, choices, after = item_common(el, '.stem')
+        stem = txt(stem_el) if stem_el else ''
+        if typ == 'ox': stem = re.sub(r'\(\s*O\s*,\s*X\s*\)\s*$', '', stem).strip()   # 바로바로 체크(101줄)와 같이 — 앱은 O/X 단추를 따로 그린다
+        sol = sols.get(('u' if any('up' in (pg.get('class') or []) for pg in el.find_parents('div')) else '') + n, {}); cn = int(el.get('data-concept') or 0)
+        answer = mark_no(a) if typ in ('mc', 'multi') else ('' if typ == 'essay' else a)
+        if typ == 'multi' and answer and choices:   # 합답형 '하나씩 판정'(앱 multiSplit) 꼴로 — 보강 해설 'ㄱ: …'(옳음)·바로알기 '<b>ㄷ</b> …'(틀림) → '<b>ㄱ (옳음)</b> …'
+            right = set(re.findall('[ㄱ-ㄹ]', str(choices[answer - 1])))
+            ex = sol.get('explain', ''); wr = sol.get('wrong', '')
+            ex2 = re.sub(r'(^|\s|</b>\s*)([ㄱ-ㄹ])\s*:\s*', lambda m: f"{m.group(1)}<b>{m.group(2)} (옳음)</b> " if m.group(2) in right else m.group(0), ex)
+            wr2 = re.sub(r'<b>\s*([ㄱ-ㄹ])\s*</b>\s*', lambda m: f"<b>{m.group(1)} (틀림)</b> " if m.group(1) not in right else m.group(0), wr)
+            sol = {**sol, 'explain': ex2, 'wrong': wr2}
+        up = any('up' in (pg.get('class') or []) for pg in el.find_parents('div'))   # '실력 다지기' 쪽(본책 STEP 3 뒤) — 따로 번호 {코드}-u{n}
+        items.append({'id': f'{code}-{"u" if up else "p"}{n}', 'lessonId': code, 'concept': lec_no(code, cn) if cn else 0, 'step': 3 if up else 2, 'type': typ,
+                      'stem': stem, 'source': source, 'choices': choices, 'answer': answer, 'explain': sol.get('explain', ''), 'wrong': sol.get('wrong', ''),
+                      'figure': selfcontain(str(fig), markers, f'{code}p{n}') if fig else '', 'difficulty': difficulty, **({'up': True} if up else {'plus': True}),
+                      **({'data': '\n'.join(data)} if data else {}), **({'table': table} if table else {}), **({'figAfter': True} if after else {}),
+                      **({'adv': True} if el.get('data-adv') == '1' else {})})
+    return items, secs
+
+
 def main():
     global LESSON_SET
     out = OUT
@@ -651,16 +836,20 @@ def main():
         out = pathlib.Path(_sys.argv[_sys.argv.index('--out') + 1]).resolve(); out.mkdir(parents=True, exist_ok=True)
     concepts = json.loads((OUT / 'concepts.json').read_text(encoding='utf-8'))
     LESSON_SET = {c['lessonId'] for c in concepts}
-    items, labs = [], []
+    items, labs, plus = [], [], []
     for path in sorted(list((ROOT / 'book').glob('chapter-*/chapter.html')) + [ROOT / 'book' / 'sample-chapter' / 'chapter.html'] + list((ROOT / 'book2').glob('chapter-*/chapter.html'))):
         its, lbs = parse_chapter(path); items += its; labs += lbs
-        print(f'{path.parent.name} → {lesson_code(path)}: 문항 {len(its)} · 탐구 {len(lbs)}')
+        pit, psc = parse_plus(path); items += pit; plus += psc
+        print(f'{path.parent.name} → {lesson_code(path)}: 문항 {len(its)} · 탐구 {len(lbs)}' + (f' · 보강 개념 {len(psc)} · 보강 문항 {len(pit)}' if pit or psc else ''))
     auto = auto_from_lecture(concepts); items += auto
     # 개념 번호는 그 소단원의 개념 수를 넘지 않게(바로바로 체크가 개념보다 많은 장이 있다 — 없는 개념 카드로 가던 것)
     nmax = {}
     for c in concepts: nmax[c['lessonId']] = max(nmax.get(c['lessonId'], 0), int(c['no']))
     for it in items:
         if it['concept'] and it['lessonId'] in nmax: it['concept'] = min(int(it['concept']), nmax[it['lessonId']])
+        if it['id'] in ITEM_CONCEPT: it['concept'] = ITEM_CONCEPT[it['id']]
+        if it['id'] in ADV_IDS: it['adv'] = True
+        if it['id'] in AUTO_EXPLAIN: it['explain'] = AUTO_EXPLAIN[it['id']]   # 자동 오해 OX 등 해설을 손으로
     # 같은 OX 문장이 바로바로 체크와 자동(오해/진실)에 두 번 — 본책 것을 남긴다
     key = lambda t: re.sub(r'[\W_]+', '', re.sub(r'<[^>]+>', '', t))
     seen, keep = set(), []
@@ -679,6 +868,7 @@ def main():
         items = [i for i in items if i not in dropped]
     (out / 'bank.json').write_text(json.dumps(items, ensure_ascii=False, indent=0), encoding='utf-8')
     (out / 'labs.json').write_text(json.dumps(labs, ensure_ascii=False, indent=0), encoding='utf-8')
+    (out / 'plus.json').write_text(json.dumps(plus, ensure_ascii=False, indent=0), encoding='utf-8')   # 보강 개념 칸(본책 보강 쪽) — build.py 가 개념 덧붙임(extras.plus)으로 싣는다
     if out != OUT: print(f'  → {out} 에 썼습니다(data/ 는 그대로)')
     from collections import Counter
     na = sum(1 for i in items if i['step'] == 'auto')

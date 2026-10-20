@@ -20,6 +20,14 @@ async def main():
         P = await pg.evaluate("(() => { const P = examPlan({ id:'x', kind:'exam', title:'중간', date:addDays(todayISO(), 10), scope:{ book:'1' } }); return { d:P.d, n:P.ls.length, k:P.rows.map(r => r.kind), first:P.rows[0].date === todayISO(), cover:[...new Set(P.rows.filter(r => r.kind === 'learn').flatMap(r => r.lessons))].length }; })()")
         assert P['d'] == 10 and len(P['k']) == 10 and P['k'][-3:] == ['mix'] * 3 and P['first'], P
         assert P['cover'] == P['n'], ('범위 소단원이 모두 계획에 들어가야 한다', P)
+        # 하루 분량을 소단원에 고르게 나누고, 계획 줄에 나눈 수를 쓴다(GPT 검수 #25 — '10문제'라 쓰고 4·4·2로 담던 것)
+        sp = await pg.evaluate("""(() => { const P = examPlan({ id:'x', kind:'exam', title:'중간', date:addDays(todayISO(), 9), scope:{ book:'1' } });
+            return P.rows.filter(r => r.kind === 'learn' && r.lessons.length > 1).map(r => { const it = planItems(r, P.ls);
+              return { split:r.split, n:r.n, got:r.lessons.map(l => it.filter(q => q.lessonId === l).length), txt:planRowText(r).replace(/<[^>]+>/g, '') }; }); })()""")
+        assert sp, '여러 소단원을 하루에 묶는 날이 없음(시험 범위가 너무 작음)'
+        for r in sp:
+            assert sum(r['split']) == r['n'] and max(r['split']) - min(r['split']) <= 1 and r['got'] == r['split'], ('나눈 수와 실제 배정이 다름', r)
+            assert all(f'{k}문제' in r['txt'] for k in set(r['split'])) and f"모두 {r['n']}문제" in r['txt'], ('계획 줄에 소단원별 수가 없음', r)
         P2 = await pg.evaluate("examPlan({ id:'y', kind:'exam', title:'쪽지', date:addDays(todayISO(), 2), scope:{ lesson:'1101' } }).rows.map(r => r.kind)")
         assert P2 == ['learn', 'weak'], P2
         P3 = await pg.evaluate("examPlan({ id:'z', kind:'exam', title:'지난 시험', date:todayISO(), scope:{ book:'1' } })"); assert P3 is None, '시험 당일·지난 시험은 계획 없음'
@@ -36,7 +44,11 @@ async def main():
         # 일정에 시험 넣기(UI) → 시트에 '시험까지 계획'
         await pg.evaluate("S.sched.events.push({ id:'ex1', date:addDays(todayISO(), 9), title:'2학기 중간고사', kind:'exam', from:'', memo:'', scope:{ book:'1' } }); save(S)")
         await pg.click('.tab[data-v="today"]'); await pg.wait_for_timeout(700)
-        note = await pg.locator('.passnote', has_text='중간고사').inner_text(); assert 'D-9' in note and '시험까지 계획' in note, note
+        note = await pg.locator('.exchip', has_text='중간고사').inner_text(); assert 'D-9' in note and '시험까지 계획' in note, note
+        # 알약은 32 px 그대로, 누르는 자리는 위아래 44 px(가장자리 2 px 안쪽을 눌러도 칩)
+        hit = await pg.evaluate("""(() => { const c = document.querySelector('.exchip'), r = c.getBoundingClientRect(), x = r.left + r.width / 2, y = r.top + r.height / 2;
+            return [Math.round(r.height), [y - 20, y + 20].every(v => { const e = document.elementFromPoint(x, v); return !!(e && e.closest('.exchip') === c); })]; })()""")
+        assert hit[1], ('시험 칩 누르는 자리가 44 px 아래', hit)
         await pg.click('[data-eplan="ex1"]'); await pg.wait_for_timeout(500)
         sh = await pg.inner_text('.sheet'); assert '시험까지 계획' in sh and '오늘' in sh and '섞어 풀기 20문제' in sh and '약한 곳 I-02' in sh and '2학기 중간고사' in sh, sh
         rows = await pg.locator('.eplan li').count(); assert rows == 10, rows   # 9일 + 시험날
@@ -52,10 +64,10 @@ async def main():
             await pg.wait_for_timeout(200); await pg.click('#bankNext'); await pg.wait_for_timeout(200)
         assert await pg.evaluate("S.epd && S.epd.ex1") == await pg.evaluate("todayISO()"), '오늘 분량 끝이 남지 않음'
         await pg.click('#bankQuit2'); await pg.click('.tab[data-v="today"]'); await pg.wait_for_timeout(600)
-        assert '오늘 분량 끝났어요' in await pg.locator('.passnote', has_text='중간고사').inner_text()
+        assert '오늘 분량 끝났어요' in await pg.locator('.exchip', has_text='중간고사').inner_text()
         # 시험 15일 전이면 홈에 안 뜸
         await pg.evaluate("S.sched.events[S.sched.events.length-1].date = addDays(todayISO(), 15); save(S); renderToday()"); await pg.wait_for_timeout(400)
-        assert await pg.locator('.passnote', has_text='중간고사').count() == 0
+        assert await pg.locator('.exchip', has_text='중간고사').count() == 0
         assert not errs, errs
         print('EXAMPLAN OK'); await b.close()
 asyncio.run(main())

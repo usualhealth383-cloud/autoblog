@@ -63,9 +63,9 @@ async def run(b, theme, errs):
     assert len(qi) == 3 and all(x['ok'] for x in qi) and all(x['step'] == 'qc' for x in qi), qi
     assert any('소모되어 없어진다' in x['stem'] for x in qi), qi
     allc = await s.evaluate("""CONCEPTS.map(c => { const it = dqcItems(c), qc = BANK.filter(q => q.lessonId === c.lessonId && +q.concept === +c.no && q.type === 'ox' && q.step === 'qc').length,
-        au = BANK.filter(q => q.lessonId === c.lessonId && +q.concept === +c.no && q.type === 'ox' && q.step === 'auto').length;
+        au = dropPairs(BANK.filter(q => q.lessonId === c.lessonId && +q.concept === +c.no && q.type === 'ox' && q.step === 'auto')).length;   // 오해 X·진실 O 짝은 하나만(2026-10-14)
         return { id: c.id, n: it.length, want: Math.min(3, qc + au), match: it.every(q => q.lessonId === c.lessonId && +q.concept === +c.no && q.type === 'ox'),
-          order: it.every((q, i) => i < Math.min(3, qc) ? q.step === 'qc' : q.step === 'auto') }; })""")
+          order: it.every((q, i) => i < Math.min(3, qc) ? q.step === 'qc' : q.step === 'auto') && dropPairs(it).length === it.length }; })""")
     bad = [x for x in allc if not (x['match'] and x['order'] and x['n'] == x['want'])]
     assert not bad, bad[:5]
     short = [x['id'] for x in allc if x['n'] < 3]
@@ -127,6 +127,7 @@ async def run(b, theme, errs):
     assert '본문 접기' in await s.inner_text('#dMoreBtn')
     assert await s.locator('#v-detail .dmyth .myth .why').first.is_visible(), "펼친 뒤 오해 카드의 '왜?'가 안 보임"
     sec = await s.evaluate("[...document.querySelectorAll('#dMore > .sec h2, #dThink > .sec h2')].map(h => h.textContent)")   # 생각해 보기·예제는 #dThink 안(나중에 받는 데이터)
+    sec = [x for x in sec if x != '시험에 나오는 보강']   # 2026-10-13 본책 보강 쪽 칸(있는 개념만) — 아래 ⑦에서 따로 본다
     assert sec == ['본문', '생각해 보기', '자주 하는 오해', '용어'] or sec == ['본문', '생각해 보기', '예제', '자주 하는 오해', '용어'], sec   # 2026-10-06 생각해 보기·예제(보완안 8·9)
     assert await s.evaluate(f"JSON.parse(localStorage.getItem('pcs.dopen'))['{CID}']") == 1
     await a11y(s, '본문 펼침')
@@ -206,6 +207,30 @@ async def run(b, theme, errs):
     assert await s.locator('#v-bank .cuefig').count() == 1, '오늘의 복습(답한 뒤)에 그림 단서가 없음'
     await s.click('#v-bank .cuefig summary'); await s.wait_for_timeout(150)
     await shot('d08_review_cue')
+    # ── ⑦ 시험에 나오는 보강(본책 보강 쪽) — 폰에서 글이 좁은 세로 줄이 되지 않는다(본책 쪽 배치 style 걷기, 2026-10-13)
+    np = await s.evaluate("CONCEPTS.filter(c => c.x && c.x.plus && c.x.plus.length).length")
+    assert np >= 20, f'보강 칸이 있는 개념이 너무 적음 {np}'
+    await s.evaluate("(() => { const i = CONCEPTS.findIndex(c => c.id === '1303-02'); dOpenSet(CONCEPTS[i].id, true); detailIdx = i; show('detail'); })()"); await s.wait_for_timeout(400)
+    assert await s.locator('#v-detail .dplus details').count() >= 1, '1303-02 에 보강 칸이 없음'
+    # 누르는 자리 44 px — 북마크·공유(40 px 였음) · '틀린 곳이 있나요?'(36 px 였음)
+    tg = await s.evaluate("[...document.querySelectorAll('#v-detail .loc .acts button, #v-detail .flag')].map(e => { const r = e.getBoundingClientRect(); return [e.className || e.getAttribute('aria-label'), Math.round(r.width), Math.round(r.height)]; })")
+    assert len(tg) >= 3 and all(h >= 44 for _, w, h in tg) and all(w >= 44 for _, w, h in tg[:2]), ('누르는 자리 44 px 아래', tg)
+    await s.locator('#v-detail .dplus summary').first.click(); await s.wait_for_timeout(200)
+    narrow = await s.evaluate("[...document.querySelectorAll('#v-detail .dplus .pbody p')].filter(p => p.getBoundingClientRect().width < 260).length")
+    assert narrow == 0, f'보강 칸 문단이 좁게 갈림 {narrow}'
+    assert await s.evaluate("[...document.querySelectorAll('#v-detail .dplus .pbody [style]')].filter(e => !e.closest('svg')).length") == 0, '본책 style 이 남음'
+    # svg 그림·표는 그림 이름표를 이름으로 한 덩어리(GPT 검수 #14) — 모든 보강 칸에서
+    fa = await s.evaluate("""(() => { const d = document.createElement('div'); d.innerHTML = CONCEPTS.flatMap(c => (c.x && c.x.plus) || []).map(p => figA11y(p.h)).join('');
+        const sv = [...d.querySelectorAll('figure svg')]; return { n:sv.length, bad:sv.filter(v => v.getAttribute('role') !== 'img' || !(v.getAttribute('aria-label') || '').trim()).length,
+          cap:sv.filter(v => { const c = v.closest('figure').querySelector('figcaption'); return c && v.getAttribute('aria-label') !== c.textContent.replace(/\\s+/g, ' ').trim(); }).length }; })()""")
+    assert fa['n'] >= 30 and fa['bad'] == 0 and fa['cap'] == 0, ('보강 svg 에 role=img·이름 없음', fa)
+    await shot('d09_plus')
+    # 문제 은행: 보강·실력 다지기 문항 머리
+    pu = await s.evaluate("[BANK.find(q => q.plus), BANK.find(q => q.up)].filter(Boolean).map(q => q.id)")
+    if pu:
+        await s.evaluate(f"startBank({pu!r}.map(id => BANK.find(q => q.id === id)), '')"); await s.wait_for_timeout(250)
+        assert '시험에 나오는 보강' in await s.inner_text('#v-bank .qhead'), '보강 문항 머리 표시 없음'
+        await s.evaluate("bs = null")
     await ctx.close()
     return short, tf
 

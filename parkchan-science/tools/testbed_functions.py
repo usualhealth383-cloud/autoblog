@@ -157,15 +157,22 @@ def main():
       SENT.clear(); s, j = call('POST', '/functions/v1/push', {'type': 'INSERT', 'table': 'notices', 'record': {'cls': '월목반', 'title': '휴강 안내', 'body': '태풍으로 휴강'}}, headers=PH)
       to = sorted(m['token'] for m in SENT)
       check('월목반 공지 → 그 반 학생·보호자에게만', s == 200 and to == ['tok-par1', 'tok-stu1'], (s, j, to))
-      check('  └ 제목·채널·우선순위', SENT and SENT[0]['notification']['title'] == '[박찬 과학] 휴강 안내' and SENT[0]['android']['notification']['channel_id'] == 'academy' and SENT[0]['android']['priority'] == 'HIGH', SENT[:1])
+      check('  └ 제목·채널·우선순위 · 공지 보관 3일(ttl)', SENT and SENT[0]['notification']['title'] == '[박찬 과학] 휴강 안내' and SENT[0]['android']['notification']['channel_id'] == 'academy' and SENT[0]['android']['priority'] == 'HIGH' and SENT[0]['android'].get('ttl') == '259200s', SENT[:1])
       check('  └ 없어진 기기 토큰은 지움', j.get('dropped') == 1 and call('GET', '/rest/v1/push_tokens?token=eq.dead-old-phone&select=token', tok=P1)[1] == [], j)
       SENT.clear(); call('POST', '/functions/v1/push', {'type': 'INSERT', 'table': 'notices', 'record': {'cls': '전체', 'title': '전체 공지', 'body': ''}}, headers=PH)
       check('전체 공지 → 모든 반', sorted(m['token'] for m in SENT) == ['tok-par1', 'tok-stu1', 'tok-stu2'], [m['token'] for m in SENT])
       SENT.clear(); call('POST', '/functions/v1/push', {'type': 'INSERT', 'table': 'sched', 'record': {'cls': '화금반', 'date': '2026-10-15', 'title': '단원 평가', 'memo': '3단원'}}, headers=PH)
       check('반 일정 → 그 반만 · "10/15 단원 평가"', [m['token'] for m in SENT] == ['tok-stu2'] and '10/15 단원 평가' in SENT[0]['notification']['title'], SENT)
       SENT.clear(); call('POST', '/functions/v1/push', {'type': 'INSERT', 'table': 'attendance', 'record': {'code': 'PUSH01', 'time': '18:02:11', 'late': True, 'manual': False}}, headers=PH)
-      check('출석 → 보호자에게만 "푸시학생 학생 지각 · 18:02"', [m['token'] for m in SENT] == ['tok-par1'] and '푸시학생 학생 지각' in SENT[0]['notification']['title'] and '18:02' in SENT[0]['notification']['body'], SENT)
+      check('출석 → 보호자에게만 "시학생 학생 지각 · 18:02"(성은 빼고 · 잠금화면 PRIVATE · 보관 1일)', [m['token'] for m in SENT] == ['tok-par1'] and '] 시학생 학생 지각' in SENT[0]['notification']['title'] and '푸시학생' not in SENT[0]['notification']['title']
+            and '18:02' in SENT[0]['notification']['body'] and SENT[0]['android']['notification'].get('visibility') == 'PRIVATE' and SENT[0]['android'].get('ttl') == '86400s', SENT)
       check('  └ Firebase 범위로 따로 인증', any('firebase.messaging' in x for x in SCOPES))
+      s, _ = call('PATCH', f'/rest/v1/profiles?id=eq.{P1_ID}', {'attend_off': True}, P1, headers={'Prefer': 'return=minimal'}); check('보호자가 출석 알림을 직접 끔(2026-10-13)', s in (200, 204), s)
+      SENT.clear(); call('POST', '/functions/v1/push', {'type': 'INSERT', 'table': 'attendance', 'record': {'code': 'PUSH01', 'time': '18:05:00', 'late': False, 'manual': False}}, headers=PH)
+      check('  └ 끈 보호자에게는 출석 알림이 가지 않음', not [m for m in SENT if m['token'] == 'tok-par1'], SENT)
+      SENT.clear(); call('POST', '/functions/v1/push', {'type': 'INSERT', 'table': 'notices', 'record': {'cls': '전체', 'title': '전체 공지', 'body': ''}}, headers=PH)
+      check('  └ 출석 알림만 꺼지고 공지는 그대로 감', 'tok-par1' in [m['token'] for m in SENT], [m['token'] for m in SENT])
+      call('PATCH', f'/rest/v1/profiles?id=eq.{P1_ID}', {'attend_off': False}, P1, headers={'Prefer': 'return=minimal'})
       # 이야기 댓글 → 글쓴이에게만(자기 댓글은 알리지 않음)
       import psycopg2 as _pg; _c = _pg.connect('host=127.0.0.1 port=54329 user=postgres dbname=pcs'); _c.autocommit = True
       _c.cursor().execute("update profiles set first_ok_at = now() where role = 'student'"); _c.close()   # 첫 글 검토를 지난 학생으로(검토는 testbed_security 에서)
@@ -214,7 +221,12 @@ def main():
       SENT.clear(); call('POST', '/functions/v1/push', {'type': 'INSERT', 'table': 'reports', 'record': {'id': 2, 'post_id': None, 'comment_id': cid, 'uid': 'x', 'reason': 'worry'}}, headers=PH)
       check('  └ 댓글에 대한 걱정돼요도 그 글로 이어짐', [m['data'].get('post') for m in SENT] == [pid], SENT)
       SENT.clear(); call('POST', '/functions/v1/push', {'type': 'INSERT', 'table': 'reports', 'record': {'id': 3, 'post_id': pid, 'comment_id': None, 'uid': 'x', 'reason': 'bully'}}, headers=PH)
-      check('  └ 다른 사유의 신고는 원장 폰에 알리지 않음(매일 목록으로)', SENT == [], SENT)
+      check('  └ 괴롭힘 같은 보통 사유의 신고는 원장 폰에 알리지 않음(매일 목록으로)', SENT == [], SENT)
+      for i, rs in enumerate(('privacy', 'harm', 'threat')):
+          SENT.clear(); call('POST', '/functions/v1/push', {'type': 'INSERT', 'table': 'reports', 'record': {'id': 10 + i, 'post_id': None, 'comment_id': cid, 'uid': 'x', 'reason': rs}}, headers=PH)
+          check(f'  긴급 신고({rs}) 1건 → 원장 폰에만 "바로 살펴볼 신고"(내용 없이 · PRIVATE)', [m['token'] for m in SENT] == ['tok-own'] and '바로 살펴볼 신고' in SENT[0]['notification']['title']
+                and SENT[0]['data'].get('post') == pid and SENT[0]['data'].get('kind') == 'report' and '댓글 하나' not in json.dumps(SENT, ensure_ascii=False)
+                and SENT[0]['android']['notification'].get('visibility') == 'PRIVATE', SENT)
       print('▸ 보호자 주간 요약(★5) — 일요일 저녁 · 확인된 보호자에게 자녀마다 한 줄 · 밤에는 보내지 않음')
       mon = today - dt.timedelta(days=today.isoweekday() - 1); D = lambda n: (mon + dt.timedelta(days=n)).isoformat()
       cur.execute("insert into progress(code, state) values ('PUSH01', %s) on conflict (code) do update set state = excluded.state",
@@ -230,9 +242,10 @@ def main():
       to = sorted((m['token'], m['data'].get('code')) for m in SENT)
       check('일요일 19시 → 확인된 보호자에게만, 자녀마다 한 번(학생·확인 전 보호자는 안 받음)', s == 200 and to == [('tok-par1', 'PUSH01'), ('tok-par1', 'PUSH02')], (s, j, to))
       m1 = next((m for m in SENT if m['data'].get('code') == 'PUSH01'), {}); m2 = next((m for m in SENT if m['data'].get('code') == 'PUSH02'), {})
-      check('  └ "푸시학생 학생의 이번 주" · 공부한 날 2일 · 푼 문제 10개 · 과제 1/1 제출(지난주 것은 세지 않음)', m1 and '푸시학생 학생의 이번 주' in m1['notification']['title']
-            and '공부한 날 2일' in m1['notification']['body'] and '푼 문제 10개' in m1['notification']['body'] and '과제 1/1 제출' in m1['notification']['body'], m1)
-      check('  └ 공부 기록이 없는 주는 탓하지 않는 말("쉬어 갔어요")', m2 and '쉬어 갔어요' in m2['notification']['body'] and all(w not in json.dumps(SENT, ensure_ascii=False) for w in ('안 했', '못 했', '순위', '평균', '친구')), m2)
+      blob = json.dumps(SENT, ensure_ascii=False)
+      check('  └ "이번 주 요약이 도착했어요"만 — 자녀 이름·공부한 날·푼 문제 수는 알림에 싣지 않음(GPT ⑤ #16)', m1 and m1['notification']['title'] == '[박찬 과학] 이번 주 요약이 도착했어요'
+            and all(w not in blob for w in ('푸시학생', '공부한 날', '푼 문제', '과제 1/1', '2일', '10개')), m1)
+      check('  └ 탓하거나 견주는 말 없음 · 보관 1일(ttl)', all(w not in blob for w in ('안 했', '못 했', '순위', '평균', '친구')) and m1['android'].get('ttl') == '86400s', m2)
       check('  └ 자녀별로 따로 남음(tag) · 잠금화면 공개 범위 PRIVATE · kind weekly', m1 and m2 and m1['android']['notification']['tag'] != m2['android']['notification']['tag']
             and m1['android']['notification'].get('visibility') == 'PRIVATE' and m1['data']['kind'] == 'weekly', SENT)
       for at in (SUN + 'T22:00:00+09:00', SUN + 'T23:30:00+09:00', SUN + 'T06:59:00+09:00'):

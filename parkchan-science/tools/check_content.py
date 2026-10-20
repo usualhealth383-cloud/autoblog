@@ -3,13 +3,15 @@
 
 · 원본(book*/)의 <sup>·<sub> 수와 앱 데이터(data/)에 남은 첨자 수(태그 + 유니코드 첨자)가 크게 다르면 실패
 · '10−10 m'·'10-15'처럼 첨자가 사라진 흔적(10 뒤에 바로 음수·지수 숫자)이 데이터 글자에 있으면 실패
-사용: python3 tools/check_content.py        (추출 뒤, 빌드 전에)
+· 자동 빈칸 4지선다의 오답 보기 해설(wrong)은 손 해설(AUTO_CHOICES)이거나 그 문항 개념 카드 안의 글이어야 한다(다른 개념 문장이면 실패)
+사용: python3 tools/check_content.py [--data 폴더]       (추출 뒤, 빌드 전에 · --data: data/ 대신 그 폴더의 json 을 본다 — 시험용)
 """
 import json, re, glob, pathlib, sys
 ROOT = pathlib.Path(__file__).resolve().parent.parent
+DATA = pathlib.Path(sys.argv[sys.argv.index('--data') + 1]).resolve() if '--data' in sys.argv[1:-1] else ROOT / 'data'
 UNI = '⁰¹²³⁴⁵⁶⁷⁸⁹⁺⁻ⁿ₀₁₂₃₄₅₆₇₈₉₊₋'
 bad = []
-data = {f: json.loads((ROOT / 'data' / f'{f}.json').read_text(encoding='utf-8')) for f in ('concepts', 'quizzes', 'bank', 'labs')}
+data = {f: json.loads((DATA / f'{f}.json').read_text(encoding='utf-8')) for f in ('concepts', 'quizzes', 'bank', 'labs')}
 def strings(x):
     if isinstance(x, str): yield x
     elif isinstance(x, list):
@@ -30,7 +32,7 @@ print(f'강의용 교재 원본 첨자 {src}개 · 개념·확인 문제 데이�
 if src and got < src * 0.8: bad.append(f'개념·확인 문제의 첨자가 원본보다 너무 적음({got} < {src}×0.8) — 추출기가 <sup>·<sub> 를 걷고 있지 않은지')
 # 그림: 정의 없이 참조만 하는 기호·그라데이션(그리면 빈칸) — 0 이어야 한다
 sys.path.insert(0, str(ROOT / 'tools')); from _extract_common import dangling
-for f in sorted((ROOT / 'data' / 'figures').glob('*.svg')):
+for f in sorted((DATA / 'figures' if (DATA / 'figures').is_dir() else ROOT / 'data' / 'figures').glob('*.svg')):
     d = dangling(f.read_text(encoding='utf-8'))
     if d: bad.append(f'그림 {f.name}: 정의 없는 참조 {d[:4]}')
 for k in ('bank', 'labs'):
@@ -39,10 +41,59 @@ for k in ('bank', 'labs'):
 # '<보기>' 같은 글자가 태그로 오인돼 지워진 흔적
 for it in data['bank']:
     if it['type'] == 'multi' and re.search(r'옳은 것만을\s+에서', it['stem']): bad.append(f'bank {it["id"]}: "<보기>" 가 지워진 듯함')
+    # 2026-10-13 정답 검수: 자료 상자를 <보기>로 읽어 ㄱㄴㄷ 이 빠진 문항 5 · 그림 두 장 중 코돈표 빠짐 · svg 표가 글자로 뭉개짐
+    if it['type'] == 'multi' and re.search(r'ㄱ\s*,|ㄱ\b|^ㄱ$', ' '.join(map(str, it.get('choices', [])))) and 'ㄱ' not in it.get('source', ''): bad.append(f'bank {it["id"]}: 합답형인데 <보기> ㄱ 문장이 없음')
+    if re.search(r'(?<!화살)(?<!대)(?<!목)(?<!지)표는|표와 같이', it['stem']) and not (it.get('table') or it.get('figure') or it.get('data')): bad.append(f'bank {it["id"]}: 발문에 표가 있는데 table·그림이 없음')
+    if re.search(r'(?:[가-힣)])(?:\d+\.\d){3,}', it.get('data', '')): bad.append(f'bank {it["id"]}: 자료의 숫자가 붙어 뭉개진 듯함(표가 글자로)')
+# 자동 빈칸 4지선다의 '오답 왜 틀렸나' — 2026-10-13 GPT 검수 ③: 다른 개념·단원 문장이 붙어 91 %가 문제와 무관했다.
+# 줄마다 손 해설(AUTO_CHOICES)이거나, 그 문항 개념 카드(뼈대·본문·용어·포인트, 빈칸은 답으로 채움) 글 안에 있어야 한다.
+from extract_bank import AUTO_CHOICES
+_pl = lambda s: re.sub(r'\s+', ' ', re.sub(r'<[^>]+>', '', s)).strip()
+_cards = {(c['lessonId'], int(c['no'])): c for c in data['concepts']}
+def _card_text(c):
+    ts = [s['d'] for s in c['steps']] + c['body'] + [t['v'] for t in c.get('terms', [])] + [c.get('point', '')]
+    out = []
+    for t in ts:
+        for k, v in c['blanks'].items(): t = t.replace('{{%s}}' % k, v)
+        out.append(_pl(t))
+    return ' '.join(out)
+_wrong_bad = []
+for it in data['bank']:
+    if it.get('step') != 'auto' or it['type'] != 'mc' or not it.get('wrong'): continue
+    c = _cards.get((it['lessonId'], int(it['concept'])))
+    hand = AUTO_CHOICES.get(it['id'], ([], {}))[1]
+    card = _card_text(c) if c else ''
+    for m in re.finditer(r'<b>([①②③④⑤])</b>\s*(.*?)\s—\s(.*?)(?=\s*<b>[①②③④⑤]</b>|$)', it['wrong'], re.S):
+        why = m[3].strip()
+        if why in hand.values() or _pl(why) in card: continue
+        _wrong_bad.append(f'{it["id"]} {m[1]} {_pl(m[2])} — {_pl(why)[:40]}')
+for w in _wrong_bad[:20]: bad.append(f'bank 자동 문항 오답 해설이 그 개념 카드 밖의 글: {w}')
+if len(_wrong_bad) > 20: bad.append(f'… 그런 줄 모두 {len(_wrong_bad)}개')
+# 자동 오해 OX 의 '진실' 짝(-m…-{i}o, data/auto_choices 에 손으로 씀) — 2026-10-14 문항 품질 G3: 오해 OX 가 모두 정답 X 라 읽지 않고 X 만 눌러도 맞았다.
+# 정답 O · pair 가 있는 X 문항 · '.'으로 끝나는 홀로 서는 문장 · 짝 X 문장을 거의 그대로 뒤집은 것이 아님 · 손 해설 · 조건 없는 단정어 없음
+import difflib
+from extract_bank import AUTO_O, standalone
+_ABS = re.compile(r'(^|[^가-힣])늘 |항상|언제나|반드시|무조건|(^|[^가-힣])모든 |전부(?!터)|오직|오로지|결코|예외 ?없이|[가-힣]{1,8}(?:에|에게|에서|으로|로)만 ')
+_byid = {it['id']: it for it in data['bank']}
+_n_o = 0
+for it in data['bank']:
+    if not re.search(r'-m\d+-\d+o$', it['id']): continue
+    _n_o += 1; k = it['id']; x = _byid.get(it.get('pair', ''))
+    if it['type'] != 'ox' or it['answer'] != 'O': bad.append(f'bank {k}: 진실 짝은 정답 O 인 OX')
+    if not x or x['answer'] != 'X' or it.get('pair') != k[:-1] + 'x': bad.append(f'bank {k}: pair 가 짝 X 문항({k[:-1]}x)을 가리키지 않음'); continue
+    s, xs = _pl(it['stem']), _pl(x['stem'])
+    if not s.endswith('.') or not standalone(it['stem']): bad.append(f'bank {k}: 진실 짝 문장이 "."으로 끝나는 홀로 서는 문장이 아님 · {s[:40]}')
+    r = difflib.SequenceMatcher(None, s, xs).ratio()
+    if r >= 0.75: bad.append(f'bank {k}: 진실 짝이 오해 문장과 거의 같음({r:.2f}) — 낱말만 뒤집지 말고 제 말로 · {s[:40]}')
+    if not (AUTO_O.get(k, {}).get('explain') or '').strip() or len(_pl(it['explain'])) < 15: bad.append(f'bank {k}: 진실 짝에 손 해설(explain)이 없음')
+    if _ABS.search(s): bad.append(f'bank {k}: 진실 짝 문장에 조건 없는 단정어 · {s[:40]}')
+_missing_o = [k for k in AUTO_O if k not in _byid]
+if _missing_o: bad.append(f'auto_choices 의 진실 짝이 은행에 없음(짝 X 가 없거나 바로바로 체크와 겹쳐 빠짐): {_missing_o[:6]}')
+print(f'자동 오해 OX 진실 짝 {_n_o}개')
 # 개념 덧붙임(data/concept_extras.json — 손으로 만든 원본, 추출기가 덮어쓰지 않음): '왜?' 정교화 질문 + 계산형 예제 → 따라 풀기
 # · 키 = 실제 개념 id · why 는 개념마다 1개(q·a·src) · a 는 그 개념의 src 문단/용어 글과 겹쳐야 한다(새 사실 금지)
 # · example 과 follow 는 짝으로 · 첨자는 <sup>·<sub> 태그로(유니코드 첨자·'H2O'·'10−6' 흔적 금지)
-_ex_p = ROOT / 'data' / 'concept_extras.json'
+_ex_p = ROOT / 'data' / 'concept_extras.json'   # 손으로 만든 원본 — --data 와 관계없이 늘 data/ 의 것
 if not _ex_p.exists(): bad.append('data/concept_extras.json 이 없음')
 else:
     extras = json.loads(_ex_p.read_text(encoding='utf-8')); cmap = {c['id']: c for c in data['concepts']}

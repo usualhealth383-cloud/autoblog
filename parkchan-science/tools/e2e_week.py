@@ -84,6 +84,11 @@ async def main():
                 h = (await home())['rev']; m = re.search(r'오늘의 복습 (\d+)', h); assert m, h
                 parts = [int(x) for x in re.findall(r'(?:다시 볼 문제|개념 카드|지난 소단원) (\d+)', h)]
                 assert sum(parts) == int(m.group(1)), ('홈 복습 수와 줄 글 합이 다름', h)
+                # 결과 줄의 '다음 묶음'과 홈 수가 같고, 하루 몫이 한 묶음보다 많으면 처음부터 모두 몇 개인지 말한다(GPT 검수 #7·#26)
+                if sets: assert nx_prev == int(m.group(1)), ('결과 줄의 다음 묶음 수와 홈 복습 수가 다름', nx_prev, h)
+                tot = await pg.evaluate('revTotal(reviewPlan(MORE.ok))')
+                if tot > int(m.group(1)): assert f'모두 {tot}개' in h, ('하루 몫(모두 n개)을 말하지 않음', tot, h)
+                else: assert '모두' not in h, h
                 await pg.click('#revStart'); await pg.wait_for_timeout(300)
                 items = await pg.evaluate('bs.items.map(q => q.type)'); assert len(items) == int(m.group(1)), ('홈 복습 수와 실제 문항 수가 다름', h, items)
                 if 'card' not in items: assert not await pg.evaluate("bs.items.length && csToday().length"), '오늘 카드가 있는데 세트에 없음'
@@ -92,6 +97,8 @@ async def main():
                     await answer(rev_ok(i)); await pg.click('#bankNext'); await pg.wait_for_timeout(150); i += 1
                 res = await pg.inner_text('#v-bank'); more = await pg.evaluate('reviewPlan(false).items.length')
                 if more: assert '한 묶음을 마쳤어요' in res and await pg.locator('#revMore').count() == 1 and await pg.locator('#bankQuit2').count() == 1, res
+                nx_prev = await pg.evaluate('reviewPlan(MORE.ok).items.length'); rn = await pg.inner_text('#v-bank .revnext')
+                if nx_prev: assert f'{nx_prev}개' in rn and '오늘 남은 복습' in rn, ('결과 줄이 다음 묶음 수를 말하지 않음', nx_prev, rn)
                 else: assert '오늘의 복습을 마쳤어요' in res and await pg.locator('#revMore').count() == 0, res
                 await pg.click('#bankQuit2'); await pg.wait_for_timeout(300); sets += 1; assert sets <= 4, '복습 세트가 끝나지 않음'
             assert (await home())['now'] == 'ps-fin'
@@ -104,7 +111,7 @@ async def main():
         await signup(pg, '하늘', 'sky@week.kr', code='MON123')
         assert await pg.evaluate('view') == 'today'
         await pg.evaluate('loadMore()'); await pg.wait_for_function('MORE.ok', timeout=15000)
-        r = await pg.inner_text('#ps-review'); assert '오늘 다시 볼 것 없음' in r, r
+        assert await pg.locator('#ps-review').count() == 0, '처음 쓰는 학생에게 할 수 없는 빈 복습 단계가 보임(docs/23 S18)'
         assert '하나만' in await pg.inner_text('#goNote'), '노트 카드 안내가 쓰기 화면(한 칸)과 다름'
         await pg.screenshot(path=f'{SC}/w01_day1_home.png')
         await path(1)
@@ -144,17 +151,17 @@ async def main():
         t = await pg.inner_text('#v-parent'); assert '원장님 확인을 기다리고' in t and '다른 자녀도 연결하기' in t, t[:300]
         await approve_child(pg, 'MON123')
         ws = await pg.inner_text('#weekSum'); assert re.search(r'6\s*/7일', ws) and re.search(r'6\s*개\s*공부한 개념', ws), ws[:300]
-        assert '수업 없는 날' in await pg.inner_text('#v-parent .pass'), '월목반인데 일요일에 아직 출석 전'
+        assert '수업 없는 날' in await pg.inner_text('#v-parent .phd'), '월목반인데 일요일에 아직 출석 전'
         await pg.screenshot(path=f'{SC}/w05_parent_week.png', full_page=True)
         await pg.clock.set_fixed_time(at(8, 19)); await pg.reload(); await pg.wait_for_timeout(900)
-        assert '아직 출석 전' in await pg.inner_text('#v-parent .pass'), '월요일(수업 날)인데 수업 없는 날'
+        assert '아직 출석 전' in await pg.inner_text('#v-parent .phd'), '월요일(수업 날)인데 수업 없는 날'
 
         # ───── 원장: 처리할 것 · 과제 → 학생 → 제출 현황 ─────
         await pg.click('.tab[data-v="me"]'); await pg.wait_for_timeout(300); await pg.click('#logout'); await pg.wait_for_timeout(600)
         await pg.evaluate("authMode = 'login'; authErr = ''; show('auth')"); await pg.wait_for_timeout(200)
         await pg.fill('#lgEmail', 'owner@parkchan.kr'); await pg.fill('#lgPw', '2580'); await pg.click('#lgGo'); await pg.wait_for_timeout(1200)
         await pg.wait_for_selector('#todoBox')
-        if await pg.locator('#todoBox .todo-row').count() == 0: assert '모읍니다' in await pg.inner_text('#todoBox') and len(await pg.inner_text('#todoBox .tip')) < 60
+        if await pg.locator('#todoBox .todo-row').count() == 0: assert '모여요' in await pg.inner_text('#todoBox') and len(await pg.inner_text('#todoBox .ep')) < 60   # 빈 상태 그림 + 한 줄(T4-B)
         await pg.click('[data-adm="asg"]'); await pg.wait_for_selector('#asgForm'); await pg.wait_for_function('MORE.ok', timeout=20000); await pg.wait_for_timeout(300)
         await pg.click('#asgForm [data-af="kind"][data-val="bank"]'); await pg.select_option('#afLesson', '1101'); await pg.click('#asgForm [data-af="n"][data-val="5"]')
         await pg.select_option('#afCls', '월목반'); await pg.wait_for_timeout(150)

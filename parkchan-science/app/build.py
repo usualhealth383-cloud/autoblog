@@ -13,6 +13,12 @@ concepts = json.loads((ROOT / 'data/concepts.json').read_text(encoding='utf-8'))
 # 2026-10-07: 앱 파일 한도(1,700 KB) 때문에 나중에 받는 more-*.json 으로 옮겼다 — 본문을 펼친 안쪽에만 보이므로 첫 화면에 필요 없다(앱이 받으면 CONCEPTS[i].x 로 붙인다)
 _ex = json.loads((ROOT / 'data/concept_extras.json').read_text(encoding='utf-8'))
 extras = {c['id']: {k: ({kk: vv for kk, vv in v.items() if kk != 'src'} if isinstance(v, dict) else v) for k, v in _ex[c['id']].items()} for c in concepts if _ex.get(c['id'])}
+# 본책 '시험에 나오는 보강' 쪽(2026-10-13 완자 대조) — 개념 상세 안 '시험에 나오는 보강' 칸으로(data/plus.json, extract_bank.py 가 만든다)
+_pf = ROOT / 'data/plus.json'
+for _p in (json.loads(_pf.read_text(encoding='utf-8')) if _pf.exists() else []):
+    _cs = [c for c in concepts if c['lessonId'] == _p['lessonId']]
+    _c = next((c for c in _cs if int(c['no']) == int(_p['concept'] or 1)), _cs[0] if _cs else None)
+    if _c: extras.setdefault(_c['id'], {}).setdefault('plus', []).append({'t': _p['title'], 'h': _p['html']})
 quizzes = json.loads((ROOT / 'data/quizzes.json').read_text(encoding='utf-8'))
 bank = json.loads((ROOT / 'data/bank.json').read_text(encoding='utf-8'))
 labs = json.loads((ROOT / 'data/labs.json').read_text(encoding='utf-8'))
@@ -20,13 +26,16 @@ quotes = json.loads((ROOT / 'data/quotes.json').read_text(encoding='utf-8'))
 # 그림은 문서에 미리 그려 두지 않는다 — 필요할 때 만들도록 문자열로만 싣는다
 figs = {c['id']: (ROOT / 'data' / c['figure']['file']).read_text(encoding='utf-8')
         for c in concepts if c.get('figure')}
-j = lambda o: json.dumps(o, ensure_ascii=False).replace('</', '<\\/')
+# 앱 파일 한도(1,700 KB) — 끼워 넣는 JSON 은 빈칸 없이(2026-10-13, 내용은 같고 약 22 KB 줄어듦)
+j = lambda o: json.dumps(o, ensure_ascii=False, separators=(',', ':')).replace('</', '<\\/')
 # 서버 연결값: app/server/config.json {"url": "...", "anonKey": "..."} 이 있으면 심고, 없으면 로컬 모드
 cfg_p = ROOT / 'app' / 'server' / 'config.json'
 cfg = json.loads(cfg_p.read_text(encoding='utf-8')) if cfg_p.exists() else {}
 shell = shell.replace('__SB_URL__', cfg.get('url', '')).replace('__SB_KEY__', cfg.get('anonKey', ''))
 shell = shell.replace('__PUSH__', 'on' if cfg.get('push') else 'off')   # 푸시: google-services.json 과 함께 켠다
 print('서버 모드:', cfg.get('url') or '(없음 → 로컬 모드)')
+# 법 문서 번호·잘림·【확인 필요】 검사 — 깨진 판이 공개 웹 문서로 나가지 않게(2026-10-13 ⑮ 문장 잘림 사고)
+if _sp.run([_sys.executable, str(ROOT / 'tools' / 'legal_check.py')]).returncode: _sys.exit('법 문서 검사 실패 — tools/legal_check.py')
 legal = {k: (ROOT / 'app' / 'legal' / f'{k}.html').read_text(encoding='utf-8') for k in ('terms', 'privacy', 'delete')}
 # 학원 연락처(app-shell 의 CFG.phone·email)를 약관·처리방침·삭제 안내에 그대로 넣는다 — 앱이 없는 사람도 볼 수 있게(Play 계정 삭제 요건)
 _cfg = {k: (re.search(k + r": *'([^']*)'", shell) or [None, ''])[1] for k in ('phone', 'email', 'academy')}
@@ -39,7 +48,21 @@ for k, v in legal.items():
 # 문제 은행·자료 탐구·그림(약 1.5MB)은 앱 파일과 따로 — 첫 화면을 그린 뒤 받는다(느린 4G 에서 첫 화면 10초+ → 2026-10-02).
 # 파일 이름에 내용 지문을 붙여, 앱과 데이터의 판이 어긋나지 않게 한다(옛 앱은 옛 파일, 새 앱은 새 파일).
 import hashlib
-more = json.dumps({'bank': bank, 'labs': labs, 'figs': figs, 'extras': extras}, ensure_ascii=False, separators=(',', ':'))
+# 앱이 쓰지 않는 칸(answers — blanks 와 같은 내용, warning — 화면에 안 쓰임)은 앱 파일에서 뺀다(2026-10-07, 앱 파일 한도 1,700 KB). data/ 는 그대로
+APP_DROP = ('answers', 'warning')
+# 2026-10-14 앱 파일 덜기(첫 화면에 안 쓰는 글 약 200 KB → more) — 펼치거나 눌러야 보이는 글만 옮긴다. 앱이 받으면 제자리에 붙인다(loadMore)
+# ① 오늘의 한 마디: 원문·출처·근거 주소는 '원문 · 출처' 접기 안(과 보관함)에만 → more 'qx'. 분야 이름(kindName)은 kind 로 앱이 붙인다('kn')
+QLAZY = ('orig', 'src', 'url')
+_kn = {q['kind']: q['kindName'] for q in quotes['quotes']}
+assert all(_kn[q['kind']] == q['kindName'] for q in quotes['quotes']), '같은 분야(kind)에 이름(kindName)이 둘'
+quotes_app = {**{k: v for k, v in quotes.items() if k != 'quotes'}, 'kn': _kn,
+              'quotes': [{k: v for k, v in q.items() if k not in QLAZY + ('kindName',)} for q in quotes['quotes']]}
+qx = {q['id']: {k: q[k] for k in QLAZY if q.get(k)} for q in quotes['quotes']}
+# ② 개념: 용어 뜻풀이(terms[].v)·오해의 진실과 까닭(myths[].o·why)은 '본문 자세히 읽기' 안과 용어 말풍선에만 → more 'cl'.
+#    용어 이름(k — 찾기·본문 용어 단추)과 오해 문장(x — '읽기 전에' O/X)·개수는 앱 파일에 남긴다
+cl = {c['id']: {'t': [t['v'] for t in c['terms']], 'm': [{k: v for k, v in m.items() if k != 'x'} for m in c['myths']]} for c in concepts if c['terms'] or c['myths']}
+_slim = lambda c: {**{k: v for k, v in c.items() if k not in APP_DROP}, 'terms': [{'k': t['k']} for t in c['terms']], 'myths': [{'x': m['x']} for m in c['myths']]}
+more = json.dumps({'bank': bank, 'labs': labs, 'figs': figs, 'extras': extras, 'qx': qx, 'cl': cl}, ensure_ascii=False, separators=(',', ':'))
 MORE_NAME = 'more-' + hashlib.sha1(more.encode('utf-8')).hexdigest()[:10] + '.json'
 _vb = lambda svg: (re.search(r'viewBox="0 0 ([\d.]+) ([\d.]+)"', svg) or [None, '600', '300'])
 meta = {'url': MORE_NAME, 'bank': len(bank), 'labs': len(labs),
@@ -47,12 +70,10 @@ meta = {'url': MORE_NAME, 'bank': len(bank), 'labs': len(labs),
         'bl': {L: sum(1 for q in bank if q['lessonId'] == L and str(q.get('step')) not in ('unit', 'mock', 'recap')) for L in sorted({q['lessonId'] for q in bank})},
         'll': sorted({l['lessonId'] for l in labs}),
         'fv': {k: f"{_vb(v)[1]} {_vb(v)[2]}" for k, v in figs.items()}}
-# 앱이 쓰지 않는 칸(answers — blanks 와 같은 내용, warning — 화면에 안 쓰임)은 앱 파일에서 뺀다(2026-10-07, 앱 파일 한도 1,700 KB). data/ 는 그대로
-APP_DROP = ('answers', 'warning')
-out = (shell.replace('<!--CONCEPTS-->', j([{k: v for k, v in c.items() if k not in APP_DROP} for c in concepts]))
+out = (shell.replace('<!--CONCEPTS-->', j([_slim(c) for c in concepts]))
             .replace('<!--QUIZZES-->', j(quizzes))
             .replace('<!--MORE_META-->', j(meta))
-            .replace('<!--QUOTES-->', j(quotes)))
+            .replace('<!--QUOTES-->', j(quotes_app)))
 for _k in ('<!--BANK-->', '<!--LABS-->', '<!--FIGS-->'): assert _k not in out
 # 배포본에서 주석을 덜어 낸다(2026-10-12, 앱 파일 한도 1,700 KB) — 원본(app-shell.html)의 설명 주석은 그대로 둔다.
 # ① 첫 <style> 안의 CSS 주석 ② 한 줄을 통째로 차지하는 /* … */ 블록(안에 */ 가 없고 */ 뒤가 곧 줄 끝일 때만 — 코드가 붙은 줄은 건드리지 않음).
@@ -96,6 +117,8 @@ if pages.exists():
         (pages / fn).write_text(PAGE.format(t=t, b=legal[k]), encoding='utf-8')
     # 보호자 동의 페이지(자녀가 보낸 링크로 열림) — 서버 연결값만 심는다
     (pages / 'guide.html').write_text((ROOT / 'app' / 'guide.html').read_text(encoding='utf-8').replace('<!--CONTACT-->', CONTACT), encoding='utf-8')   # 수강생·보호자 시작 안내(2026-10-08) — 문자로 링크만 보내면 된다
+    (pages / 'qr.js').write_text((ROOT / 'app' / 'qr.js').read_text(encoding='utf-8'), encoding='utf-8')   # 학원 QR 라이브러리 — 원장 화면에서만 불러온다(2026-10-13)
+    (pages / 'review.html').write_text((ROOT / 'app' / 'review.html').read_text(encoding='utf-8'), encoding='utf-8')   # 외부 검수 입구(2026-10-13) — 예시 기록은 tools/make_review_fixtures.py 가 review-fixtures.json 으로
     consent = (ROOT / 'app' / 'consent.html').read_text(encoding='utf-8').replace('__SB_URL__', cfg.get('url', '')).replace('__SB_KEY__', cfg.get('anonKey', ''))
     (pages / 'consent.html').write_text(consent, encoding='utf-8')
     print(f'배포본 → {pages}/index.html')

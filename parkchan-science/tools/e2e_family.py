@@ -58,6 +58,24 @@ async def main():
         assert await pg.locator('.pweek .week .d').count() == 7 and await pg.locator('.pweek .pstat > div').count() == 3, '이번 주 요약이 없음'
         assert '공부한 날' in await pg.locator('.pweek').inner_text() and '연속' not in await pg.locator('.pweek').inner_text() and '공부 노트' not in (t := await pg.locator('.pweek').inner_text()) and '메모' not in t
         await pg.click('.tab[data-v="me"]'); await pg.wait_for_timeout(300); assert '2명' in await pg.locator('#v-me').inner_text()
+        # 보호자 내 정보(GPT 검수 #28·#55·#57·#59): 학생용 줄(학습 통계·닉네임·공부 노트) 없음 · 이름 뒤 '보호자' 겹치지 않음 · 자녀 화면 줄
+        me = await pg.locator('#v-me').inner_text()
+        for sel in ('#goStats', '#nickOpen', '#goNoteMe'): assert await pg.locator(f'#v-me {sel}').count() == 0, ('보호자 내 정보에 학생용 줄', sel)
+        assert await pg.locator('#v-me [data-go="parent"]').count() == 1 and '보호자 보호자' not in me and '형제보호자' in me, me[:300]
+        # 이용권 코드 칸(#16·#36): 내 정보와 이용권 화면 둘 다, 자녀 둘이면 고르기 · 자녀가 앱에 가입 전이면 서버와 같은 까닭으로 막음
+        assert await pg.locator('#v-me #passKidMe option').count() == 2, '내 정보 이용권 칸에 자녀 고르기가 없음'
+        await pg.select_option('#passKidMe', codes[0]); await pg.fill('#passInMe', 'ZZZ999'); await pg.click('#passGoMe'); await pg.wait_for_timeout(700)
+        assert '자녀가 앱에 가입' in await pg.locator('#v-me .passbox .err').inner_text(), await pg.locator('#v-me .passbox').inner_text()
+        await pg.click('#goPlans'); await pg.wait_for_timeout(500)
+        assert await pg.locator('#v-plans #backMe2').count() == 0 and await pg.locator('#v-plans #passKid option').count() == 2, '보호자 이용권 화면에 코드 칸·자녀 고르기가 없음'
+        await pg.screenshot(path=f'{SC}/f01b_parent_plans.png', full_page=True)
+        if not SRV:   # 자녀가 가입하면 그 자녀 계정에 붙는다(보호자 계정에는 안 붙음)
+            pin = await pg.evaluate("DB.issuePass(30).then(p => p.code)")
+            await logout(); await signup(pg, '형학생', 'fam-kid@t.kr', code=codes[0]); await logout(); await login('fam@t.kr', 'pass1234')
+            await pg.click('.tab[data-v="me"]'); await pg.wait_for_timeout(400)
+            await pg.select_option('#passKidMe', codes[0]); await pg.fill('#passInMe', pin); await pg.click('#passGoMe'); await pg.wait_for_timeout(700)
+            got = await pg.evaluate("(() => { const d = JSON.parse(localStorage.getItem('pcs.db.v2')); return [d.accounts.find(a => a.email === 'fam-kid@t.kr').passUntil || '', d.accounts.find(a => a.email === 'fam@t.kr').passUntil || '']; })()")
+            assert got[0] and not got[1], ('이용권이 자녀가 아니라 보호자 계정에 붙음', got)
         # 보호자 일정 화면에 동생 반 일정이 이름과 함께
         await pg.evaluate("planDay = '2099-10-15'"); await pg.click('.tab[data-v="plan"]'); await pg.wait_for_timeout(900)
         assert await pg.evaluate("acadEvents.some(e => e.title === '동생학생 · 3단원 평가')"), await pg.evaluate('acadEvents')

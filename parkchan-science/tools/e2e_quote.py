@@ -24,7 +24,10 @@ async def main():
         await s.goto(APP); await s.wait_for_timeout(500); await s.click('#goGuest'); await s.wait_for_timeout(500)
         n = await s.evaluate('QUOTES.length'); assert n >= 366, f'글귀가 {n}개 — 1년을 채우지 못함'
         assert await s.evaluate("QUOTES.filter(q => q.who === '박찬 과학' || q.kind === 'teacher').length") == 0, '선생님 글이 남아 있음'
-        assert await s.evaluate("QUOTES.every(q => q.ko && q.who && q.src && q.note && q.kindName)"), '빈 칸이 있는 글귀'
+        assert await s.evaluate("QUOTES.every(q => q.ko && q.who && q.note && q.kindName)"), '빈 칸이 있는 글귀'
+        # 원문·출처·주소는 나중에 받는 데이터(more-*.json · 2026-10-14 앱 파일 덜기) — 받은 뒤 모든 글귀에 출처가 있다(받기 전 자리 표시는 e2e_lazy ③)
+        await s.wait_for_function('MORE.ok', timeout=20000)
+        assert await s.evaluate("QUOTES.every(q => q.src && q.url)"), '출처가 빈 글귀'
         assert await s.evaluate("new Set(QUOTES.map(q => q.id)).size") == n, 'id 중복'
         # 여러 시작일에서 366일씩 — 겹침 없음
         rep = await s.evaluate("""() => { const bad = []; for (const start of ['2026-01-01','2026-11-01','2027-02-28','2028-02-29','2031-07-15']) {

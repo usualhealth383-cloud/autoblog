@@ -22,6 +22,7 @@ async def main():
             const st = await DBX.loadProgress('DEMO01') || {}; const L = LESSONS[0].id, q = (BANK||[]).find(x => x.lessonId === L) || {};
             await DBX.saveProgress('DEMO01', { ...st, days:[wk[0], wk[1]], dq, dc, wrong:[{ id:q.id || (L+'-q1'), l:L, d:wk[1] }] });
             await DBX.updateStudent('DEMO01', { phone:'010-1234-5678' });
+            await DBX.noteSave({ date:todayISO(), body:'공부 노트', parts:['공부 노트'], tpl:'line3' });   // 2026-10-13: 로컬 DB 에 공부 노트가 있으면 한 마디가 안 남던 것(d.notes 겸용)
             await DBX.noteSet('DEMO01', '이번 주 원자 구조를 끝까지 붙잡았어요.'); }""")
         await o.click('[data-stu="DEMO01"]'); await o.wait_for_timeout(600)
         await o.click('#wsmsOpen'); await o.wait_for_timeout(900)

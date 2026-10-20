@@ -61,7 +61,7 @@ async def main():
         await g.click('#goGuest'); await g.wait_for_timeout(400)
         st = await state(g)
         assert st['now'] == 'ps-read' and st['heroes'] == 1, st
-        assert st['cls'] == {'ps-read': 'now', 'ps-blank': 'todo', 'ps-quiz': 'todo', 'ps-review': 'none'}, st
+        assert st['cls'] == {'ps-read': 'now', 'ps-blank': 'todo', 'ps-quiz': 'todo'}, st   # 손님에게 할 수 없는 빈 복습 단계는 그리지 않는다(docs/23 S18)
         assert st['head'] == '0 / 3', '다시 볼 문제가 없으면 할 일은 3개'
         assert await g.locator('#ps-read #pRead').count() == 1 and await g.locator('#goQuiz').count() == 1 and await g.locator('#revStart').count() == 0
         t = await g.inner_text('#v-today')
@@ -82,9 +82,11 @@ async def main():
         assert await g.locator('#v-detail .dact .btn#markDone').count() == 1, "안 읽은 개념의 주 버튼이 '공부했음'이 아님"
         await g.click('#markDone'); await g.wait_for_timeout(300)
         assert await g.evaluate('S.read.includes(todayConcept().id)'), '공부했음을 눌렀는데 읽기 끝이 아님'
+        # 펼침 표시는 0.24초 움직임 뒤 지워진다 — 기계가 바쁘면 확인이 늦어 놓치므로, 붙는 순간을 기록해 둔다(시간 경합 없이)
+        await g.evaluate("window.__unf = false; new MutationObserver(() => { const e = document.getElementById('ps-blank'); if (e && e.classList.contains('unfold')) window.__unf = true; }).observe(document.body, { subtree:true, childList:true, attributes:true, attributeFilter:['class'] })")
         await g.click('#backList'); await g.wait_for_timeout(120)
         st = await state(g); assert st['now'] == 'ps-blank' and st['cls']['ps-read'] == 'done' and st['head'] == '1 / 3', st
-        assert await g.locator('#ps-blank.unfold').count() == 1, '다음 단계가 펼쳐지지 않음'
+        assert await g.evaluate('window.__unf'), '다음 단계가 펼쳐지지 않음'
         await g.wait_for_timeout(500); assert await g.locator('.ps.unfold').count() == 0, '움직임이 끝나도 클래스가 남음'
         assert '다 읽었어요' in await g.inner_text('#ps-read')
         await g.screenshot(path=f'{SC}/h02_after_read_light.png')
@@ -135,7 +137,11 @@ async def main():
           S.wrong = [{ b:q.id, p:'O', iso:addDays(todayISO(), -1), a:addDays(todayISO(), -1), d:todayISO(), x:1, k:1 }]; S.rv = null; save(S); show('today'); })()""")
         await g.wait_for_timeout(250)
         st = await state(g); assert st['now'] == 'ps-review' and st['head'] == '3 / 4', st
-        rv = await g.inner_text('#ps-review'); assert '오늘의 복습 1' in rv and '다시 볼 문제 1' in rv and await g.evaluate('SRS_RULE') in rv, rv
+        rv = await g.inner_text('#ps-review'); assert '오늘의 복습 1' in rv and '다시 볼 문제 1' in rv and await g.evaluate('SRS_RULE') not in rv, rv
+        # 규칙 문장은 히어로에 펼치지 않고 '언제 다시 나오나요?' → 시트(docs/23 S4) — 누르면 같은 문장이 나와야 한다
+        await g.click('#ps-review [data-srsq]'); await g.wait_for_timeout(200)
+        assert await g.evaluate('SRS_RULE') in await g.inner_text('#sheet .sheet'), '복습 규칙 시트가 없음'
+        await g.click('#sheetClose'); await g.wait_for_timeout(150)
         assert await g.locator('#ps-review #revStart').count() == 1
         await g.screenshot(path=f'{SC}/h07_review_now_light.png')
         await g.click('#revStart'); await g.wait_for_timeout(300); assert await g.evaluate("bs.kind") == 'review'

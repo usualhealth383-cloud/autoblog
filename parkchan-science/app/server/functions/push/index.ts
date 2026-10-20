@@ -7,6 +7,9 @@
 //   · 원장 폰의 '먼저 살펴볼 글'(힘든 마음의 글·'친구가 걱정돼요' 신고)은 밤에도 바로 간다 — 원장님이 폰 설정으로 직접 정한다
 //  보호자 주간 요약(벤치마크 ★5) — 일요일 저녁 cron({action:'weekly'})이 부른다. 받을 사람·숫자는 DB 함수 weekly_digest()(서비스 키 전용)
 //   · 원장이 확인한 보호자 · 수강 중인 자녀마다 한 번(자녀 둘이면 알림 둘 — 서로 덮지 않게 자녀별 tag)
+//   · 2026-10-14 GPT 검수 ⑤ #16: 알림(= Google 로 넘어가는 글)에는 자녀 이름·공부한 날·푼 문제 수를 싣지 않는다 — "이번 주 요약이 도착했어요"만, 숫자는 앱 자녀 화면에서
+//  알림 보관 기간(android.ttl) — 기기가 꺼져 있을 때 Google 이 들고 있는 기간을 정해 둔다(정하지 않으면 4주): 공지·일정 3일, 나머지 1일(처리방침 5항)
+//  긴급 신고(개인정보·성적/유해·위협, 2026-10-14) — 1건이면 글이 바로 가려지고(private.recount) 원장 폰에 "바로 살펴볼 신고"(내용 없이)
 //   · 밤 22시~아침 7시에 불리면 보내지 않는다(다음 주에 다시) · 비교·순위 없이 그 주 숫자만, 잠금화면 공개 범위 PRIVATE
 //  과제 알림(2026-10-07) — 새 과제(assignments INSERT) → 대상 학생 본인 폰 · 매일 19시 cron({action:'asgdue'}) → 내일 마감인데 아직 안 낸 학생에게 한 번
 //   · 밤 22시~아침 7시에는 보내지 않는다(학생은 오늘 화면 맨 위 과제 카드로 본다) · 보호자에게는 보내지 않는다(주간 요약에 과제 제출이 있다)
@@ -20,7 +23,9 @@ const md = (d: string) => { const [, m, dd] = d.split('-'); return `${+m}/${+dd}
 const kstHour = (iso?: string) => { let t = iso ? new Date(iso) : new Date(); if (Number.isNaN(t.getTime())) t = new Date(); return (t.getUTCHours() + 9) % 24; };
 const isNight = (iso?: string) => { const h = kstHour(iso); return h >= 22 || h < 7; };
 
-type Msg = { title: string; body: string; kind: string; post?: string; quiet?: boolean; tag?: string; code?: string };
+type Msg = { title: string; body: string; kind: string; post?: string; quiet?: boolean; tag?: string; code?: string; ttl?: string };
+const TTL_DAY = '86400s', TTL_3DAYS = '259200s';
+const URGENT = ['privacy', 'harm', 'threat'];
 type Job = { args: any; uid?: string; tokens?: { token: string; uid: string }[]; msg: Msg };
 // 도움이 필요해 보이는 글·댓글(서버가 care 로 표시) · '친구가 걱정돼요' 신고 → 원장 폰. 잠금화면에 보일 수 있으니 내용은 싣지 않는다
 const careJob = (A: string, post: string, worry = false): Job => ({ args: { p_kind: 'care', p_cls: null, p_code: null },
@@ -31,10 +36,13 @@ async function composeAll(table: string, r: Record<string, any>): Promise<Job[]>
   const jobs: Job[] = [];
   if (r.care && !r.staff && (table === 'posts' || table === 'comments')) jobs.push(careJob(A, table === 'posts' ? r.id : r.post_id));
   if (table === 'reports') {
-    if (r.reason !== 'worry') return jobs;
+    if (r.reason !== 'worry' && !URGENT.includes(r.reason)) return jobs;   // 괴롭힘·광고·원문·기타는 원장이 매일 목록으로 본다
     let post = r.post_id;
     if (!post && r.comment_id) post = ((await rest(`comments?id=eq.${encodeURIComponent(r.comment_id)}&select=post_id`))[0] || {}).post_id;
-    jobs.push(careJob(A, post || '', true)); return jobs;
+    if (r.reason === 'worry') jobs.push(careJob(A, post || '', true));
+    else jobs.push({ args: { p_kind: 'care', p_cls: null, p_code: null }, msg: { kind: 'report', post: post || '', quiet: true, title: `[${A}] 바로 살펴볼 신고가 있어요`,
+      body: '개인정보·유해·위협 신고가 들어와 글을 잠시 가려 두었습니다. 원장 화면 → 이야기에서 확인해 주세요.' } });
+    return jobs;
   }
   const c = table === 'posts' ? null : await compose(table, r);
   if (c) jobs.push(c);
@@ -42,8 +50,8 @@ async function composeAll(table: string, r: Record<string, any>): Promise<Job[]>
 }
 async function compose(table: string, r: Record<string, any>): Promise<Job | null> {
   const A = Deno.env.get('ACADEMY') || '박찬 과학';
-  if (table === 'notices') return { args: { p_kind: 'notice', p_cls: r.cls, p_code: null }, msg: { kind: 'notice', title: `[${A}] ${r.title}`, body: r.body || '공지를 확인해 주세요' } };
-  if (table === 'sched') return { args: { p_kind: 'sched', p_cls: r.cls, p_code: null }, msg: { kind: 'sched', title: `[${A}] 일정 · ${md(r.date)} ${r.title}`, body: r.memo || '일정 화면에 들어갔습니다' } };
+  if (table === 'notices') return { args: { p_kind: 'notice', p_cls: r.cls, p_code: null }, msg: { kind: 'notice', ttl: TTL_3DAYS, title: `[${A}] ${r.title}`, body: r.body || '공지를 확인해 주세요' } };
+  if (table === 'sched') return { args: { p_kind: 'sched', p_cls: r.cls, p_code: null }, msg: { kind: 'sched', ttl: TTL_3DAYS, title: `[${A}] 일정 · ${md(r.date)} ${r.title}`, body: r.memo || '일정 화면에 들어갔습니다' } };
   if (table === 'assignments') {   // 새 과제 → 대상 학생 본인 폰(밤에 낸 과제는 알리지 않는다 — 다음 날 오늘 화면 맨 위 카드로 본다)
     if (isNight(r.at)) return null;
     const tokens = await rpc('asg_push_targets', { p_aid: r.id });
@@ -53,7 +61,9 @@ async function compose(table: string, r: Record<string, any>): Promise<Job | nul
     const s = (await rest(`students?code=eq.${encodeURIComponent(r.code)}&select=name`))[0];
     if (!s) return null;
     const t = String(r.time || '').slice(0, 5);
-    return { args: { p_kind: 'attend', p_cls: null, p_code: r.code }, msg: { kind: 'attend', title: `[${A}] ${s.name} 학생 ${r.late ? '지각' : '출석'}`, body: `${t}에 ${r.manual ? '선생님이 출석 체크했습니다' : '출석했습니다'}${r.late ? ' (수업 시작 뒤)' : ''}` } };
+    // 형제가 같이 다니면 누구인지 알아야 하므로 이름은 싣되 성은 빼고(민수 학생) · 잠금화면에는 내용을 숨김(PRIVATE)
+    const nm = String(s.name || '').length >= 3 ? String(s.name).slice(1) : String(s.name || '');
+    return { args: { p_kind: 'attend', p_cls: null, p_code: r.code }, msg: { kind: 'attend', quiet: true, title: `[${A}] ${nm} 학생 ${r.late ? '지각' : '출석'}`, body: `${t}에 ${r.manual ? '선생님이 출석 체크했습니다' : '출석했습니다'}${r.late ? ' (수업 시작 뒤)' : ''}` } };
   }
   if (table === 'comments') {   // 내 글에 댓글 → 글쓴이 폰으로(자기 댓글·지운 글은 빼고)
     const post = (await rest(`posts?id=eq.${encodeURIComponent(r.post_id)}&select=author,deleted`))[0];
@@ -93,13 +103,9 @@ async function weeklyJobs(): Promise<Job[]> {
   const rows: Dig[] = await rpc('weekly_digest', {});
   const by = new Map<string, { d: Dig; tokens: { token: string; uid: string }[] }>();
   for (const r of rows || []) { const k = r.uid + '|' + r.code; const o = by.get(k) || { d: r, tokens: [] }; o.tokens.push({ token: r.token, uid: r.uid }); by.set(k, o); }
-  return [...by.values()].map(({ d, tokens }) => {
-    const parts = d.days ? [`공부한 날 ${d.days}일`] : ['이번 주는 쉬어 갔어요'];
-    if (d.solved) parts.push(`푼 문제 ${d.solved}개`);
-    if (d.asg_due) parts.push(`과제 ${d.asg_done}/${d.asg_due} 제출`);
-    return { args: null, tokens, msg: { kind: 'weekly', tag: 'weekly-' + d.code, code: d.code, quiet: true,
-      title: `[${A}] ${d.name} 학생의 이번 주`, body: `${parts.join(' · ')} — 앱에서 이번 주 요약을 볼 수 있어요` } };
-  });
+  // 이름·숫자는 싣지 않는다 — 누르면 앱이 data.code 로 그 자녀의 '이번 주 요약' 카드를 연다(자녀가 둘이면 알림도 둘, tag 로 따로)
+  return [...by.values()].map(({ d, tokens }) => ({ args: null, tokens, msg: { kind: 'weekly', tag: 'weekly-' + d.code, code: d.code, quiet: true,
+      title: `[${A}] 이번 주 요약이 도착했어요`, body: '앱의 자녀 화면에서 이번 주 공부를 볼 수 있어요' } }));
 }
 
 Deno.serve(async (req) => {
@@ -136,7 +142,7 @@ Deno.serve(async (req) => {
         method: 'POST', headers: { Authorization: `Bearer ${at}`, 'Content-Type': 'application/json' },
         body: JSON.stringify({ message: { token: t.token, notification: { title: c.msg.title, body: c.msg.body },
           data: { kind: c.msg.kind, ...(c.msg.post ? { post: c.msg.post } : {}), ...(c.msg.code ? { code: c.msg.code } : {}) },
-          android: { priority: 'HIGH', notification: { channel_id: 'academy', tag: c.msg.tag || c.msg.kind, ...(c.msg.quiet ? { visibility: 'PRIVATE' } : {}) } } } }),
+          android: { priority: 'HIGH', ttl: c.msg.ttl || TTL_DAY, notification: { channel_id: 'academy', tag: c.msg.tag || c.msg.kind, ...(c.msg.quiet ? { visibility: 'PRIVATE' } : {}) } } } }),
       });
       if (r.ok) { sent++; return; }
       const j = await r.json().catch(() => ({}));

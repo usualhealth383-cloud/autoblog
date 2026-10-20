@@ -17,6 +17,11 @@ create table if not exists auth.users (
   raw_user_meta_data jsonb not null default '{}'::jsonb,
   created_at timestamptz not null default now()
 );
+-- Supabase Auth 감사 기록(로그인·가입·로그아웃 — IP 포함). 실제 Supabase 와 같은 칸 · purge_old 가 3개월 뒤 지운다
+create table if not exists auth.audit_log_entries (
+  instance_id uuid, id uuid primary key default gen_random_uuid(), payload json,
+  created_at timestamptz default now(), ip_address varchar(64) not null default ''
+);
 create or replace function auth.jwt() returns jsonb language sql stable as $$
   select coalesce(nullif(current_setting('request.jwt.claims', true), '')::jsonb, '{}'::jsonb) $$;
 create or replace function auth.uid() returns uuid language sql stable as $$
