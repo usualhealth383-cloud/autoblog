@@ -187,7 +187,7 @@ for d in D:
 
 # 「내 정보」 조건 이름은 정해진 13가지뿐이다. 없는 이름을 쓰면 그 주의는 «영원히 안 뜬다».
 # 실제로 달걀 알레르기에 없는 이름(allergy)을 쓴 곳이 있었다.
-VALID_FLAG = {'pregnant', 'ulcer', 'heart', 'anticoag', 'kidney', 'liver', 'alcohol',
+VALID_FLAG = {'pregnant', 'nursing', 'ulcer', 'heart', 'anticoag', 'kidney', 'liver', 'alcohol',
               'asthma', 'glaucoma', 'bph', 'gout', 'diabetes', 'senior', 'child'}
 for d in D:
     for a in (d.get('avoid') or []) + (d.get('caution') or []):
@@ -310,13 +310,24 @@ for _pf in ('pills.json', 'pills-rx.json'):
 import gzip as _gz
 _idx = ROOT.parent / 'docs' / 'yakjido' / 'index.html'
 _core = ROOT.parent / 'docs' / 'yakjido' / 'data' / 'core.json'
+# 임신·수유 나눔(2026-10-19 3차 검수 #16) — 수유 줄이 빌드에서 생기고, 임신에만 해당하는 문장이 수유에 걸리지 않아야 한다
+if _core.exists():
+    _cd = {d['id']: d for d in json.loads(_core.read_text(encoding='utf-8')).get('drugs', [])}
+    _ib = _cd.get('ibuprofen', {})
+    if not any('nursing' in (e.get('flags') or []) for e in _ib.get('caution') or []): fails.append('이부프로펜에 수유 중 주의(설명서·LactMed)가 없습니다 — build.py 임신·수유 나눔')
+    for _d in _cd.values():
+        for _k in ('avoid', 'caution'):
+            for _e in _d.get(_k) or []:
+                if isinstance(_e, dict) and {'pregnant', 'nursing'} <= set(_e.get('flags') or []) and not re.search(r'수유|젖', _e.get('text', '')):
+                    fails.append(f'{_d["id"]}: 임신 문장이 수유에도 걸려 있습니다 — {_e.get("text", "")[:30]}')
 if _idx.exists():
     _b = _idx.read_bytes(); _gzkb = len(_gz.compress(_b, 6)) / 1024
     # 2026-10-13 220 → 224 KB: 복용 진행 고리·알약 그림·약국 쪽지 머리(디자인 리서치) +2 KB. 3G(초당 약 50 KB)에서 0.1초 미만.
     #   본문은 이미 data/core.json 으로 뺐고(askdoc 대답·약 tips 도 이날 뺌), 남은 것은 화면 코드다.
     # 2026-10-14 224 → 228 KB: 어르신 «간단히 보기»(현욱님 최우선 — 홈 큰 칸·증상 한 장·약 한 장·처음 안내 고르기) +3 KB. 화면 코드라 본문으로 뺄 수 없다.
-    if _gzkb > 228:
-        fails.append(f'첫 화면이 무겁습니다 — index.html 압축 {_gzkb:.0f} KB (한계 228 KB). 본문은 data/core.json 으로 빼야 합니다')
+    # 2026-10-19 228 → 229 KB: 3차 외부 검수 P0 #1(응급 체크 뒤 한눈 보기 「약국」 줄·탭 이름 숨김) + 탭 aria-selected. 안전 고침이라 화면 코드에 둔다(+0.2 KB).
+    if _gzkb > 229:
+        fails.append(f'첫 화면이 무겁습니다 — index.html 압축 {_gzkb:.0f} KB (한계 229 KB). 본문은 data/core.json 으로 빼야 합니다')
     if not _core.exists():
         fails.append('docs/yakjido/data/core.json 이 없습니다 — 빌드를 다시 돌리세요')
     else:
@@ -642,6 +653,16 @@ for _m in _MIX:
             fails.append(f'같이 먹기 {_m["id"]} 출처 주소가 의약품안전나라 첫 화면·검색 화면입니다 — 품목 상세로')
 for _s in sorted(_MIX_SRC_PENDING - _mix_seen): fails.append(f'data.py _MIX_SRC_PENDING 의 「{_s[:40]}」 는 이제 mixes.json 에 없어요 — 지우세요')
 
+# 영양제 두 입구(10-20) — 성분·출처·증상 고리, 아이콘, 자리표시 남음 없음
+for _fn in ('suppGoals.json', 'suppStages.json'):
+    for _g in json.load(open(C / _fn, encoding='utf-8')):
+        _t = json.dumps(_g, ensure_ascii=False)
+        if re.search(r'MFDS:|_LINE|FOLATE_', _t): fails.append(f'{_fn} {_g["id"]}: 확인 전 자리표시가 남아 있습니다')
+        if _g.get('icon') and _g['icon'] not in icons: fails.append(f'{_fn} {_g["id"]}: 없는 아이콘 {_g["icon"]}')
+        if _g.get('symptom') and _g['symptom'] not in sid: fails.append(f'{_fn} {_g["id"]}: 없는 증상 {_g["symptom"]}')
+        for _x in (_g.get('picks') or []) + (_g.get('skip') or []):
+            if not str(_x['supp']).startswith('nut:') and _x['supp'] not in supid: fails.append(f'{_fn} {_g["id"]}: 없는 영양제 {_x["supp"]}')
+            src_ok(f'{_fn} {_g["id"]}', _x.get('src'))
 print(f'증상 {len(S)} · 약 {len(D)} · 계열 {len(K)} · 영양제 {len(SUP)} · 팁 {len(T)} · 그런줄 {len(_MY)} · 규칙 {len(IX["rules"])} · 출처 {len(SRC)}')
 if fails:
     print('실패', len(fails)); [print('  ✗', f) for f in fails]; sys.exit(1)

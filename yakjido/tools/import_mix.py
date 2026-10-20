@@ -5,6 +5,9 @@
 37건을 따로 뽑는다. 약끼리·지병 약·영양제·음식술·사람에 따라 다섯 갈래다.
 
 출력: docs/yakjido/data/mixes.json  (검색을 처음 쓸 때 지연 로드)
+⚠️ (10-20) 배포본 mixes.json 은 import 뒤 손으로 다듬은 글(숫자·단위 띄어 쓰기, 영어 약자 풀기 등)이 있어,
+   지금 다시 돌리면 그 다듬음이 사라지고 data.py 가 실패한다. 문구를 고칠 땐 mixes.json 과 COMBO.json 을 함께 고치고,
+   다시 돌려야 하면 COMBO.json 원문부터 같은 글 규칙으로 맞출 것.
 성분 id 는 약지도 해설이 있으면 그 id, 없으면 'lex:<약손 id>' 로 둔다.
 """
 import json, glob, pathlib, re

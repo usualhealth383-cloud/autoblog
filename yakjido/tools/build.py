@@ -17,6 +17,23 @@ for p in sorted((ROOT / 'content').glob('*.json')):
     if key in data and isinstance(v, list): data[key].extend(v)
     elif key in data and isinstance(v, dict): data[key].update(v)
     else: data[key] = v
+# 임신과 수유를 나눈다(2026-10-19, 3차 외부 검수 #16) — 예전엔 「임신·수유 중」 한 칸이라 수유 중인 분께도 「임신 20주 이후」 금기가 걸려 이부프로펜이 빠졌다.
+#  ① 「임신」 표시 문장 중 수유·젖을 말하는 것만 수유(nursing)에도 건다  ② 약마다 정리된 수유 근거(lact — 설명서·LactMed)로 수유 주의 한 줄
+#  ③ 수유 근거가 없는데 임신 경고가 있는 약은 「자료가 부족해요 — 상의」. 수유 줄은 모두 «주의»(전처럼) — 금기 단정은 설명서 문장에만.
+for _d in data.get('drugs', []):
+    _has = False
+    for _k in ('avoid', 'caution'):
+        for _e in _d.get(_k) or []:
+            if isinstance(_e, dict) and 'pregnant' in (_e.get('flags') or []) and re.search(r'수유|젖', _e.get('text', '')):
+                if 'nursing' not in _e['flags']: _e['flags'] = _e['flags'] + ['nursing']
+                _has = True
+    if _has: continue
+    _l = _d.get('lact') or {}
+    if _l.get('lv') in ('avoid', 'caution') and _l.get('t'): _t = '수유 중이시면 — ' + _l['t']
+    elif _l.get('lv') == 'none' or (not _l and any('pregnant' in (e.get('flags') or []) for k in ('avoid', 'caution') for e in (_d.get(k) or []) if isinstance(e, dict))):
+        _t = '수유 중 자료가 부족해요 — 드시기 전에 약사·의사와 상의하세요'
+    else: continue
+    _d.setdefault('caution', []).append({'flags': ['nursing'], 'text': _t})
 pub = ROOT.parent / 'docs' / 'yakjido' / 'data'   # 공공데이터는 import_public_data.py 가 여기에 직접 쓴다
 if (pub / 'meta.json').exists():
     data['public'] = json.loads((pub / 'meta.json').read_text(encoding='utf-8'))  # 건수·출처만 인라인, 본문은 data/ 로 지연 로드
@@ -111,7 +128,7 @@ SLIM = {
     'tips':        ['id', 'group', 'icon', 'title'],
     'askdoc':      ['id', 'icon', 'q'],               # 홈은 개수·검색은 질문만 — 대답은 본문과 함께(2026-10-13 검수 반영으로 첫 화면 220 KB)   # 홈은 제목만 쓴다 — 본문은 팁 화면(본문 받은 뒤)에서(2026-10-06 첫 화면 220 KB)
 }
-CORE_KEYS = ['sources', 'ingredients', 'interactions', 'kids', 'productImages', 'suppRules', 'myths', 'recalls', 'drugRep']   # drugRep: 약 화면(본문 받은 뒤)에서만 씀 — 첫 화면 220 KB 예산
+CORE_KEYS = ['sources', 'ingredients', 'interactions', 'kids', 'productImages', 'suppRules', 'suppGoals', 'suppStages', 'myths', 'recalls', 'drugRep']   # drugRep: 약 화면(본문 받은 뒤)에서만 씀 — 첫 화면 220 KB 예산
 # 약 화면에서만 쓰는 칸(자주 묻는 질문·부작용 빈도)은 data/detail.json 으로 한 번 더 뺀다.
 # 본문과 «동시에» 받기 시작하고, 약 화면만 이것까지 기다린다 — core.json 400 KB 예산(2026-10-04)
 DETAIL = {'drugs': ['faq', 'sideFreq', 'lact', 'tips', 'interactions', 'riskNote', 'sideEffects', 'stop', 'lead', 'onset', 'duration'],   # lead·onset·duration: 자세한 약 화면(vDrug)에서만 — 10-14 외부 검수 2차 반영(제품 용법·메타 본문 이동)으로 core 401 KB   # sideEffects·stop: 약 화면(읽어 주기 포함)에서만 — 10-14 투석·출처 보강으로 core 401 KB   # tips·interactions: 약 화면에서만(2026-10-13 검수 반영으로 core 400 KB) · riskNote: 약 화면 「부담 정도」 막대 아래 설명만(10-13 아이 나이 칸·병용 규칙 추가로 core 400 KB)

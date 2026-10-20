@@ -715,7 +715,7 @@ try { const css = document.createElement('style'); css.textContent = `
 [aria-checked=mixed]>.cs-bx{border-color:var(--primary);background:linear-gradient(var(--primary),var(--primary)) center/10px 2.5px no-repeat var(--card)}
 .cs-tx{flex:1;min-width:0}.cs-tx b{display:block;font-size:1rem;line-height:1.45}
 .cs-tx>span{display:block;margin-top:4px;font-size:.875rem;line-height:1.6;color:var(--body)}
-.cs-tag,.door-tag{display:inline-block;margin-right:6px;padding:1px 7px;border-radius:6px;background:var(--tint);color:var(--primary-deep);font-size:.75rem;font-weight:800;font-style:normal;vertical-align:2px}
+.cs-tag,.door-tag{display:inline-block;margin-right:6px;padding:1px 7px;border-radius:6px;background:var(--tint);color:var(--primary-deep);font-size:.875rem;font-weight:800;font-style:normal;vertical-align:2px}
 .door-tag{margin:0 0 0 4px}
 .cs-more{padding:0 16px 6px 52px}
 .cs-more>summary,.door-more>summary{display:inline-flex;align-items:center;gap:4px;min-height:48px;font-size:.875rem;font-weight:700;color:var(--primary-deep);cursor:pointer;list-style:none}
@@ -728,10 +728,10 @@ try { const css = document.createElement('style'); css.textContent = `
 .cs-doc svg.i{width:16px;height:16px}
 .door-go{display:flex;align-items:center;justify-content:center;width:100%;min-height:56px;margin-top:22px;border-radius:14px;background:var(--primary);color:var(--on-primary);font-size:1.0625rem;font-weight:800;box-shadow:var(--shadow-raised)}
 .door-go:disabled{background:var(--tint2);color:var(--muted);box-shadow:none;border:1.5px dashed var(--ui-line);cursor:not-allowed}
-.door-why{margin-top:8px;text-align:center;font-size:.8125rem;color:var(--muted)}
+.door-why{margin-top:8px;text-align:center;font-size:.875rem;color:var(--muted)}
 .door-why[hidden],.door-msg[hidden]{display:none}
-.cs-foot{margin-top:18px;text-align:center;font-size:.8125rem;color:var(--muted);line-height:1.6}
-.cs-foot .cs-doc{font-size:.8125rem}
+.cs-foot{margin-top:18px;text-align:center;font-size:.875rem;color:var(--muted);line-height:1.6}
+.cs-foot .cs-doc{font-size:.875rem}
 .lg h1{font-size:1.5rem}
 .door-back{display:flex}
 .lg-list{list-style:none;margin:16px auto 0;padding:0;max-width:420px}
@@ -750,23 +750,23 @@ try { const css = document.createElement('style'); css.textContent = `
 .srvbox .door-ck input{-webkit-appearance:none;appearance:none;flex:none;width:24px;height:24px;min-height:0;margin:1px 0 0;padding:0;border:2px solid var(--ui-line);border-radius:7px;background:var(--card);cursor:pointer}
 .srvbox .door-ck input:checked{border-color:var(--primary);background:var(--primary) url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='3.2' stroke-linecap='round' stroke-linejoin='round'><path d='M5 12.5l4.5 4.5L19 7.5'/></svg>") center/16px no-repeat}
 .door-ck b{display:block;font-size:.9375rem;line-height:1.45}
-.door-ck small{display:block;margin-top:3px;font-size:.8125rem;line-height:1.55;color:var(--muted)}
+.door-ck small{display:block;margin-top:3px;font-size:.875rem;line-height:1.55;color:var(--muted)}
 .door-more{padding-left:36px}
-.door-more dl{display:grid;grid-template-columns:auto 1fr;gap:4px 10px;margin:0 0 8px;font-size:.8125rem;line-height:1.55}
+.door-more dl{display:grid;grid-template-columns:auto 1fr;gap:4px 10px;margin:0 0 8px;font-size:.875rem;line-height:1.55}
 .door-more dt{color:var(--muted);font-weight:700}.door-more dd{margin:0;color:var(--body)}
-.door-more p{font-size:.8125rem;line-height:1.55;color:var(--muted)}
+.door-more p{font-size:.875rem;line-height:1.55;color:var(--muted)}
 .door-msg{margin-top:4px;padding:10px 12px;border-radius:10px;background:var(--tint2);color:var(--text);font-size:.875rem;line-height:1.55}
 .srvbox .door-go{margin-top:6px}
 .door-forgot{align-self:center;text-align:center}
-.door-note{font-size:.8125rem;color:var(--muted);line-height:1.6;text-align:center}
+.door-note{font-size:.875rem;color:var(--muted);line-height:1.6;text-align:center}
 .door-h2{font-size:1.0625rem}
 .door-me{display:flex;gap:12px;align-items:center}
 .door-av{flex:none;width:44px;height:44px;border-radius:50%;background:var(--tint);color:var(--primary-deep);display:grid;place-items:center;font-weight:800;font-size:1.125rem}
-.door-me b{display:block;overflow-wrap:anywhere}.door-me small{display:block;color:var(--muted);font-size:.8125rem}
+.door-me b{display:block;overflow-wrap:anywhere}.door-me small{display:block;color:var(--muted);font-size:.875rem}
 .door-social{display:flex;flex-direction:column;gap:8px}.door-social button{min-height:50px;border-radius:12px;border:1.5px solid var(--ui-line);font-weight:700}
-.door-or{display:flex;align-items:center;gap:10px;color:var(--muted);font-size:.8125rem}.door-or::before,.door-or::after{content:"";flex:1;border-top:1px solid var(--hairline)}
+.door-or{display:flex;align-items:center;gap:10px;color:var(--muted);font-size:.875rem}.door-or::before,.door-or::after{content:"";flex:1;border-top:1px solid var(--hairline)}
 @media (min-width:1024px){.nav-mark{align-items:center;gap:10px;padding:4px 8px 20px;text-decoration:none;color:var(--text)}.nav-mark img{border-radius:10px;flex:none}
-.nav-mark b{display:block;font-size:1.125rem;font-weight:800}.nav-mark small{display:block;font-size:.75rem;line-height:1.35;color:var(--muted)}
+.nav-mark b{display:block;font-size:1.125rem;font-weight:800}.nav-mark small{display:block;font-size:.875rem;line-height:1.35;color:var(--muted)}
 .hello-hi p,.hello-close{margin-left:auto;margin-right:auto}}
 @media (hover:hover){nav.tabbar button:hover{background:var(--tint2);color:var(--text)}nav.tabbar button.on:hover{background:var(--tint)}.srow:hover,.util-row:hover,.hello-big:hover,.card .row:hover{background:var(--tint2)}}
 .srvdoor{min-height:48px;margin-bottom:6px;border-radius:12px;border:1.5px solid var(--ui-line);background:var(--card);color:var(--text);font-weight:700}
@@ -774,7 +774,7 @@ try { const css = document.createElement('style'); css.textContent = `
 .door-skip{display:block;width:100%;min-height:52px;margin-top:14px;border-radius:12px;border:1.5px solid var(--hairline);background:var(--card);color:var(--body);font-weight:700}
 .docv{max-width:42em}
 .docv h1{font-size:1.5rem;margin:4px 0 6px}
-.docv .meta{font-size:.8125rem;color:var(--muted);margin-bottom:16px;line-height:1.6}
+.docv .meta{font-size:.875rem;color:var(--muted);margin-bottom:16px;line-height:1.6}
 .docv .lead{background:var(--tint);border-radius:14px;padding:14px 16px;margin:0 0 12px}
 .docv .lead p{margin:0 0 6px;color:var(--text)}
 .docv section{border-top:1px solid var(--hairline);padding:14px 0}
@@ -785,13 +785,13 @@ try { const css = document.createElement('style'); css.textContent = `
 .docv li{margin:0 0 6px}
 .docv ul,.docv ol{padding-left:1.25em;margin:0 0 8px}
 .docv .wrap{overflow-x:auto}
-.docv table{width:100%;border-collapse:collapse;font-size:.8125rem;margin-top:6px}
+.docv table{width:100%;border-collapse:collapse;font-size:.875rem;margin-top:6px}
 .docv th,.docv td{text-align:left;vertical-align:top;padding:8px 6px;border-bottom:1px solid var(--hairline);overflow-wrap:anywhere;color:var(--body)}
 .docv th{color:var(--muted);font-weight:700}
 .docv a{color:var(--primary-deep);font-weight:600;display:inline;padding:0;text-decoration:underline;text-underline-offset:3px;overflow-wrap:anywhere}
 .docv b{color:var(--text)}
 .docv footer{border-top:1px solid var(--hairline);padding-top:14px}
-.docv footer p{font-size:.8125rem;margin:0 0 4px;color:var(--muted)}
+.docv footer p{font-size:.875rem;margin:0 0 4px;color:var(--muted)}
 .docv-web{margin-top:16px}.docv-web a{display:inline;overflow-wrap:anywhere}
 @media (hover:hover){.cs-row:hover{background:var(--tint2)}.cs-all:hover{background:var(--tint)}.door-skip:hover,.door-seg button:not(.on):hover{color:var(--text)}.door-go:not(:disabled):hover{filter:brightness(1.06)}}
 @media (min-width:600px){
@@ -800,5 +800,36 @@ try { const css = document.createElement('style'); css.textContent = `
   .door{padding:28px 40px 32px;border-radius:24px;background:var(--surface);border:1px solid var(--hairline);box-shadow:0 12px 40px rgba(0,0,0,.08)}
 }`; document.head.appendChild(css); } catch (e) {}
 
+/* ───────── 영양제 두 입구(10-20, 다음방향 리서치 4장) ─────────
+   「무엇이 불편해서요?」(목적별 suppGoals) · 「누구세요?」(시기별 suppStages). 둘 다 성분 단위이고 성분 설명은 supplements·성분 사전을 가리키기만 한다.
+   결론 한 줄 → 먼저 진료 신호(두 보기 모두 펼침) → 챙겨 볼 것(언제만 · 근거 세기) → 값을 못 해요. 식약처 문구·연구 한 줄·출처는 「왜 그런가요 ›」 안. */
+const 영양이름 = x => String(x.supp).startsWith('nut:') ? (x.label || x.supp.slice(4)) : (supp(x.supp)?.name || x.supp);
+const 영양길 = x => String(x.supp).startsWith('nut:') ? `go('/nut/${x.supp.slice(4)}')` : `go('/supp/${x.supp}')`;
+const 근거세기 = { '강함':'otc', '중간':'cvs', '약함':'warn', '차이없음':'warn' };
+const 근거말 = g => g === '차이없음' ? '사람 연구에서 차이 없음' : '근거 ' + g;
+const 영양칸 = (x, sub) => `<div class="sg-pick"><button type="button" class="sg-h" onclick="${영양길(x)}"><b>${esc(영양이름(x))}</b>${x.grade ? `<span class="badge ${근거세기[x.grade] || 'warn'}">${esc(근거말(x.grade))}</span>` : ''}${I.chev}</button>
+  ${sub ? `<p class="sg-when">${fmt(sub)}</p>` : ''}${x.mfds || x.human || x.why || (x.src || []).length ? fold('왜 그런가요', `${x.why ? `<p>${fmt(x.why)}</p>` : ''}${x.mfds ? `<p><b>식약처 기능성</b> — ${fmt(x.mfds)}</p>` : ''}${x.human ? `<p style="margin-top:6px"><b>사람 연구</b> — ${fmt(x.human)}</p>` : ''}${srcChips(x.src, true)}`) : ''}</div>`;
+const 값못함 = L => (L || []).length ? `<section class="sec"><div class="sech"><h2 class="sec-h">따로 드실 이유가 적은 것</h2></div><div class="card rows">${L.map(x => `<div class="sg-skip"><button type="button" class="sg-h" onclick="${영양길(x)}"><b>${esc(영양이름(x))}</b>${I.chev}</button><p>${fmt(x.why)}</p>${(x.src || []).length ? srcChips(x.src) : ''}</div>`).join('')}</div></section>` : '';
+window.영양입구 = () => { const G = D.suppGoals || [], S = D.suppStages || []; if (!G.length) return '';
+  return `<section class="sec"><div class="sech"><h2 class="sec-h">무엇이 불편해서요?</h2></div><div class="rg">${G.map(g => `<button class="rg-t ${g.tone || ''}" onclick="go('/sgoal/${g.id}')"><span class="ic">${icon(g.icon)}</span><b>${esc(g.name)}</b></button>`).join('')}</div></section>
+  <section class="sec"><div class="sech"><h2 class="sec-h">누구세요?</h2><span class="secn">나이·시기별로 챙길 것</span></div><div class="rows-l">${S.map(x => lrow(icon(x.icon), esc(x.name), esc(x.line), `go('/sstage/${x.id}')`)).join('')}${lrow(I.family, '아이·10대예요', '아이 영양은 우리 집 소아과와 같은 기준으로 봐요', "go('/kids')")}</div></section>`; };
+window.문_sgoal = id => { const g = byId(D.suppGoals, id); if (!g) return `${topBar({ back:'영양제' })}<p class="loading">찾는 항목이 없어요.</p>`;
+  return `${topBar({ back:'영양제' })}<div class="${g.tone || ''}"><div class="eyebrow" style="color:var(--gfg,var(--primary))">무엇이 불편해서요?</div><h1>${esc(g.name)}</h1></div>
+  <div class="note" role="note" style="margin-top:12px">${I.info}<span><b>${fmt(g.first.line)}</b></span></div>
+  <section class="sec card"><h2>이럴 땐 영양제보다 진료가 먼저예요</h2>${list(g.first.flags, 'plain x')}${g.first.test ? `<p class="small" style="margin-top:8px"><b>먼저 할 검사</b> — ${esc(g.first.test)}</p>` : ''}${g.symptom ? `<div class="rows-l" style="margin-top:8px">${lrow(I.alert, '증상 화면에서 진료 신호 모두 보기', '', `go('/symptom/${g.symptom}')`)}</div>` : ''}</section>
+  ${(g.picks || []).length ? `<section class="sec"><div class="sech"><h2 class="sec-h">챙겨 볼 만한 것</h2></div><div class="card rows">${g.picks.map(x => 영양칸(x, x.when)).join('')}</div></section>` : ''}
+  ${값못함(g.skip)}
+  ${disclaimer(D.meta?.suppDisclaimer)}`; };
+window.문_sstage = id => { const g = byId(D.suppStages, id); if (!g) return `${topBar({ back:'영양제' })}<p class="loading">찾는 항목이 없어요.</p>`;
+  return `${topBar({ back:'영양제' })}<div class="eyebrow">누구세요?</div><h1>${esc(g.name)}</h1>
+  <div class="note" role="note" style="margin-top:12px">${I.info}<span><b>${fmt(g.line)}</b></span></div>
+  ${(g.picks || []).length ? `<section class="sec"><div class="sech"><h2 class="sec-h">챙길 것</h2></div><div class="card rows">${g.picks.map(x => 영양칸(x, x.dose)).join('')}</div></section>` : ''}
+  ${값못함(g.skip)}
+  ${(g.check || []).length ? `<section class="sec card"><h2>먼저 확인할 것</h2>${list(g.check)}</section>` : ''}
+  ${disclaimer(D.meta?.suppDisclaimer)}`; };
+try { const css = document.createElement('style'); css.textContent = `.sg-pick,.sg-skip{padding:12px 0;border-bottom:1px solid var(--hairline)}.sg-pick:last-child,.sg-skip:last-child{border-bottom:0}
+.sg-h{display:flex;align-items:center;gap:8px;width:100%;min-height:48px;text-align:left}.sg-h b{flex:1;min-width:0;font-size:1.0625rem;font-weight:800}.sg-h .badge{flex:none}
+.sg-when{font-size:.9375rem;color:var(--body);line-height:1.6}.sg-skip p{font-size:.9375rem;color:var(--body);line-height:1.6}`; document.head.appendChild(css); } catch (e) {}
+
 /* 내 정보·동의·로그인·약관 화면을 보고 있었으면 다시 그린다(이 파일이 늦게 오므로) */
-try { if (/^#\/(me|consent|login|doc|hello\/3)/.test(location.hash)) route(); } catch (e) {}
+try { if (/^#\/(me|consent|login|doc|hello\/3|supp$|supp\?|sgoal|sstage)/.test(location.hash)) route(); } catch (e) {}
