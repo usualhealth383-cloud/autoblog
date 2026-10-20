@@ -559,8 +559,8 @@ ul.steps li::before{content:counter(s);position:absolute;left:0;top:2px;width:24
 .vt-li b{font-variant-numeric:tabular-nums;color:var(--text)}.vt-li b small{font-weight:500;color:var(--muted);font-size:.875rem}
 .vt-x{width:44px;height:44px;display:grid;place-items:center;border-radius:12px;color:var(--faint);background:none;border:0}
 .vz{width:100%;height:auto;display:block;margin-top:8px}
-.vz-grid{stroke:var(--hairline);stroke-width:1}.vz-ax{fill:var(--muted);font-size:11px;font-variant-numeric:tabular-nums}
-.vz-ref{stroke:var(--faint);stroke-width:1.5;stroke-dasharray:4 4}.vz-reft{fill:var(--muted);font-size:10.5px;font-weight:600}
+.vz-grid{stroke:var(--hairline);stroke-width:1}.vz-ax{fill:var(--muted);font-size:var(--vz,14px);font-variant-numeric:tabular-nums}
+.vz-ref{stroke:var(--faint);stroke-width:1.5;stroke-dasharray:4 4}.vz-reft{fill:var(--muted);font-size:var(--vz,14px);font-weight:600}
 .vz-line{fill:none;stroke-width:2;stroke-linejoin:round;stroke-linecap:round}.vz-dot{stroke:var(--card);stroke-width:2}
 .vz-line.v1{stroke:var(--viz-1)}.vz-line.v2{stroke:var(--viz-2)}.vz-dot.v1{fill:var(--viz-1)}.vz-dot.v2{fill:var(--viz-2)}
 .vz-legend{display:flex;flex-wrap:wrap;gap:6px 14px;margin-top:6px;font-size:.875rem;color:var(--muted)}
@@ -2057,7 +2057,7 @@ const icon = n => I[n] || I.pill;
 
 /* 내 정보(기기 내 저장) */
 const ME_KEY = 'yakjido.me.v1';
-const ME_DEF = { child:null, age:'adult', pregnant:false, nursing:false, ulcer:false, kidney:false, liver:false, heart:false, asthma:false, anticoag:false, alcohol:false, gout:false, glaucoma:false, bph:false };
+const ME_DEF = { child:null, age:'adult', pregnant:false, nursing:false, ulcer:false, kidney:false, liver:false, heart:false, hf:false, asthma:false, anticoag:false, alcohol:false, gout:false, glaucoma:false, bph:false };
 let ME = { ...ME_DEF };
 /* 2026-10-13 상용화 점검 — 기록의 «모양»을 들어올 때마다 바로잡는다(가져온 파일·서버에서 받은 것·옛 판 기록).
    ① 모양이 틀린 파일 하나로 모든 화면이 오류가 되던 것(예: taking 이 글자) ② 일부러 만든 파일로 화면에 코드가 끼어들던 것
@@ -2132,7 +2132,7 @@ const saveMe = () => { try {
 function snapMe(){ ME_SNAP = {}; for (const k of Object.keys(ME)) if (k !== '_mt') ME_SNAP[k] = JSON.stringify(ME[k]); }
 snapMe();
 /* 두 폰 합치기(mergeMe)는 동기화 때만 쓰여 srv.js 에 있다(첫 화면 예산) */
-const FLAG_LABEL = { pregnant:'임신 중', nursing:'수유 중', ulcer:'위가 약함·위궤양·위장출혈 병력', kidney:'신장 질환', liver:'간 질환·음주', heart:'고혈압·심장병', asthma:'천식', anticoag:'항응고제·항혈소판제 복용', alcohol:'술을 자주 마심', gout:'통풍', glaucoma:'녹내장', bph:'전립선비대', diabetes:'당뇨', senior:'65세 이상', child:'소아' };
+const FLAG_LABEL = { pregnant:'임신 중', nursing:'수유 중', ulcer:'위가 약함·위궤양·위장출혈 병력', kidney:'신장 질환', liver:'간 질환·음주', heart:'고혈압·심장병', hf:'심한 심장병·조절 안 되는 고혈압', asthma:'천식', anticoag:'항응고제·항혈소판제 복용', alcohol:'술을 자주 마심', gout:'통풍', glaucoma:'녹내장', bph:'전립선비대', diabetes:'당뇨', senior:'65세 이상', child:'소아' };
 /* 「이 약, 효과 봤어요」 — 증상마다 내가 효과 본 약을 기억해 둔다.
    현욱님 지시(2026-09-17): 다음에 같은 증상이 오면 지난번에 들었던 약부터 보여 준다.
    기기에만 저장되고 어디로도 보내지 않는다. */
@@ -2253,7 +2253,8 @@ function allergyWarn(d){
 const ingrNameK = n => String(n || '').replace(/\s*\(.*$/, '').trim();
 function activeFlags(){ const f = Object.keys(FLAG_LABEL).filter(k => k !== 'senior' && k !== 'child' && ME[k] === true);
   /* 2026-10-13 — 어르신 모드(easy)·둘러보기(demo) 같은 참/거짓 칸이 「조건」으로 세져 약사 카드에 빈칸·「easy」가 찍히던 것 */
-if (ME.age === 'senior') f.push('senior'); if (ME.age === 'child') f.push('child'); return f; }
+if (ME.age === 'senior') f.push('senior'); if (ME.age === 'child') f.push('child');
+  if (f.includes('hf') && !f.includes('heart')) f.push('heart'); return f; }
 
 /* 비교 바구니 */
 let CMP = [];
@@ -3760,7 +3761,7 @@ function vSearch(_, q){
 /* 후보 약들의 avoid(금기)·caution(주의)에 걸린 flag 를 점수로 세어, 관련 없는 질문은 아예 묻지 않는다. */
 const FLAG_Q = {
   pregnant:'임신 중이에요', nursing:'모유 수유 중이에요', ulcer:'위가 약함·위궤양·위장출혈 병력이 있어요',
-  heart:'고혈압·심장병이 있어요', anticoag:'피를 묽게 하는 약(항응고제·아스피린)을 먹어요',
+  heart:'고혈압·심장병이 있어요', hf:'심부전·협심증·부정맥이 있거나, 약을 먹어도 혈압이 잘 안 잡혀요', anticoag:'피를 묽게 하는 약(항응고제·아스피린)을 먹어요',
   kidney:'신장이 안 좋아요', liver:'간이 안 좋아요', alcohol:'술을 자주 마셔요',
   asthma:'천식이 있어요', glaucoma:'녹내장이 있어요', bph:'전립선이 커요(소변 줄기가 약해요)',
   gout:'통풍이 있어요', diabetes:'당뇨가 있어요', senior:'65세 이상이에요', child:'소아·청소년(15세 미만)이에요'
@@ -3832,7 +3833,7 @@ function basket(s, ov){
   const f = ov ? ov.flags : activeFlags(); const senior = ov ? f.includes('senior') : ME.age === 'senior';
   const kidMode = !ov && f.includes('child'), km = kidMode ? kidMon() : null;
   /* 막힌 까닭 — 켜 둔 조건 전부가 아니라 이 약을 막은 조건만(3-14). 아이 모드에서 나이(개월) 기준이 있는 약은 「소아」 표시 대신 나이로 본다(Z7 A4) */
-  const whyOf = x => { const d = drug(x); return [...new Set((d?.avoid || []).flatMap(a => (a.flags || []).filter(fl => f.includes(fl) && !(fl === 'child' && kidMode && minAgeOf(d) != null))))]; };
+  const whyOf = x => { const d = drug(x); return [...new Set([...(d?.avoid || []), ...(d?.caution || []).filter(c => c?.ask)].flatMap(a => (a.flags || []).filter(fl => f.includes(fl) && !(fl === 'child' && kidMode && minAgeOf(d) != null))))]; };
   /* Z4 #13 — 약 알레르기·부작용이 있었던 성분(받는 분 조건으로 계산할 때는 보내는 사람 알레르기를 쓰지 않는다) */
   const alg = ov ? [] : allergyKeys();
   const allergic = x => alg.length && drugKeys(drug(x)).some(k => alg.includes(k));
@@ -4244,6 +4245,9 @@ function rfApply(){
   const r = document.querySelector('#view .rf'); if (r) { r.classList.toggle('hit-er', er); r.classList.toggle('hit-cl', !er && cl); r.classList.toggle('rf-any', er || cl); }
   const a = document.querySelector('#view .answer'); if (a) { a.classList.toggle('rf-on', er || cl); a.classList.toggle('rf-er', er); if (!(er || cl) || er) a.classList.remove('rf-peek'); }
   document.querySelector('#view .triage')?.classList.toggle('tg-er', er); const t1 = document.querySelector('#view .stabs .tab[data-p=sp1]'); if (t1) t1.textContent = er ? '먼저 할 일' : (t1.dataset.n0 ||= t1.textContent);
+  /* 3차 #9 — 응급이면 「약국에서 사세요」류 제목도 바꾼다 */
+  const sw = (q, t) => document.querySelectorAll('#view ' + q).forEach(e => { e.dataset.n0 ??= e.textContent; e.textContent = er ? t : e.dataset.n0; });
+  sw('.sv-lead', '지금 해야 할 일'); sw('.ans-head .eyebrow', '지금 해야 할 일'); sw('.tg-fold>summary>b', '병원에서는'); sw('.tg-fold>summary>span', '의사가 처방하는 방식');
 }
 function rfToggle(sid, k, i, on){ if (RF.sid !== sid) { RF.sid = sid; RF.er = new Set(); RF.cl = new Set(); } RF[k][on ? 'add' : 'delete'](i); rfSave(); rfApply(); }
 function redflagCheck(s){
@@ -4875,7 +4879,7 @@ function prnState(item){
 async function prnTook(id){
   const item = takingItems().find(x => x.id === id); if (!item) return;
   const st = prnState(item);
-  if (st.early && !(await appConfirm(`마지막으로 드신 때가 ${hhmm(st.last)}이에요. 이 약은 ${st.gap}시간은 띄우는 것이 허가 용법이에요.\n\n그래도 지금 드신 것으로 적을까요?`, { ok:'그래도 적을게요', cancel:'그만둘게요' }))) return;
+  if (st.early && !(await appConfirm(`마지막으로 드신 때가 ${hhmm(st.last)}이에요. 이 약은 ${st.gap}시간쯤 띄우기를 권해요(설명서·약사 안내를 따르세요).\n\n그래도 지금 드신 것으로 적을까요?`, { ok:'그래도 적을게요', cancel:'그만둘게요' }))) return;
   if (st.full && !(await appConfirm(`오늘 벌써 ${st.count}번 드셨어요 — 이 약은 하루 ${st.max}번까지로 안내드려요.\n\n그래도 적을까요?`, { ok:'그래도 적을게요', cancel:'그만둘게요' }))) return;
   const n = prnQty(id); prnLog().push({ id, t: hhmm(new Date()), n }); saveMe(); toast(`드신 시각을 적어 두었어요 (${n}알)`); route();
 }
@@ -5433,7 +5437,7 @@ function schedWarn(item){
   worst = Math.min(worst, (ts[0] + 24 * 60) - ts[ts.length - 1]);
   if (worst >= need * 60) return many;
   const h = Math.floor(worst / 60), mm = worst % 60;
-  return many + `<div class="note" style="margin-top:8px">${I.alert}<span><b>시간이 너무 촘촘해요</b> — 이 약은 <b>${need}시간</b>은 띄우는 것이 허가 용법인데, 지금은 가장 가까운 두 번이 <b>${h}시간${mm ? ' ' + mm + '분' : ''}</b> 차이예요. 한 번을 빼시거나 시간을 옮겨 주세요.</span></div>`;
+  return many + `<div class="note" style="margin-top:8px">${I.alert}<span><b>시간이 너무 촘촘해요</b> — 이 약은 <b>${need}시간</b>쯤 띄우기를 권하는데(설명서·약사 안내를 따르세요), 지금은 가장 가까운 두 번이 <b>${h}시간${mm ? ' ' + mm + '분' : ''}</b> 차이예요. 한 번을 빼시거나 시간을 옮겨 주세요.</span></div>`;
 }
 /* ── 지난 30일 달력 ──
    「요즘 약 잘 드셨어요?」는 진료실에서 가장 많이 묻는 말인데, 대답할 근거가 없었다.
@@ -5586,7 +5590,7 @@ function vSchedule(_, q){
   todays.sort((a, b) => a.min - b.min);
   const lateL = todays.filter(x => !x.done && !x.skip && x.min < nowMin - 60);
   return `${topBar({ back:'내 정보' })}<div class="eyebrow">복용 시간 알림</div><h1>오늘 약, 잊지 않게</h1>${todays.length ? todayHero(todays, nowMin) : art('schedule', 'banner')}
-  ${leadHtml('먹는 약마다 시간을 고르면 오늘 할 일이 체크 목록으로 나오고, 시간이 되면 알려드려요. **시간을 정한 약만** 알려 드려요 — 허가 용법대로 시간을 제안해 드리니 맞으면 「이 시간으로 정하기」를 누르세요.', 'margin-top:6px', todays.length ? 'small muted' : '')}
+  ${leadHtml('먹는 약마다 시간을 고르면 오늘 할 일이 체크 목록으로 나오고, 시간이 되면 알려드려요. **시간을 정한 약만** 알려 드려요 — 설명서·안내 간격대로 시간을 제안해 드리니 맞으면 「이 시간으로 정하기」를 누르세요.', 'margin-top:6px', todays.length ? 'small muted' : '')}
   ${taking.filter(schedUnset).length ? `<div class="note" style="margin-top:10px">${I.clock}<span><b>시간을 아직 정하지 않은 약이 ${taking.filter(schedUnset).length}가지 있어요</b> — 아래 「약마다 시간 고르기」에서 매일 드시는지, 필요할 때만 드시는지 골라 주세요.</span></div>` : ''}
   ${!taking.length ? `<section class="sec card"><div class="empty"><b>아직 담아 둔 약이 없어요</b>약 사전에서 약을 찾아 ‘내 약통에 담기’를 누르면 여기 나와요.</div><div class="actions"><button class="btn ghost" onclick="go('/drugs')">${I.search} 약 찾기</button></div></section>` : ''}
   ${todays.length ? `<section class="sec"><h2>오늘 <small>${now.getMonth() + 1}월 ${now.getDate()}일 · ${todays.filter(x => x.done).length}/${todays.length} 완료</small></h2>${daypartGroups(todays).map(([part, list]) => `<div class="dp"><div class="dp-h">${part}</div><div class="dose-list">${list.map(x => `<button class="dose-tick ${x.done ? 'done' : x.skip ? 'skip' : (x.min < nowMin - 60 ? 'late' : '')}" onclick="tick('${x.d.id}','${x.t}')" aria-pressed="${x.done}"><span class="bx">${x.done ? I.check : x.skip ? '–' : ''}</span>${pillGlyph(x.d)}<span class="n"><b>${esc(x.d.name)}</b><small><span class="t">${x.t}</span> · ${x.skip ? '건너뛰었어요 — 드셨으면 눌러 주세요' : fmt((x.d.simple || '').split('.')[0])}</small></span></button>`).join('')}</div></div>`).join('')}${lateL.length ? `<details class="why-more" style="margin-top:10px"><summary>드셨는지 기억이 안 나요${I.chev}</summary><div class="why" style="margin-top:6px"><p>확실하지 않으면 <b>이번 회는 건너뛰고</b> 다음 시간부터 원래대로 드세요. 대부분의 약은 <b>두 번 드시는 쪽이 더 위험</b>해요. 피임약·항생제처럼 놓치면 곤란한 약은 약사에게 물어보세요. 앞으로는 드시자마자 위 칸을 눌러 두시면 헷갈리지 않아요.</p>
@@ -5594,7 +5598,7 @@ function vSchedule(_, q){
   ${taking.filter(d => isPrn(d.id)).length ? `<section class="sec card"><h2>필요할 때 드신 약</h2>
     <p class="small muted" style="margin-top:4px">아플 때만 드시는 약은 드실 때마다 눌러 적어 두세요. <b>다음은 몇 시부터</b>인지, 오늘 몇 번째인지 알려 드려요.</p>
     ${taking.filter(d => isPrn(d.id)).map(d => { const st = prnState(d); return `<div class="sched-row prn-row"><div class="nm"><span>${esc(d.name)}</span>${st.count ? `<b class="${st.full ? 'stockwarn' : 'stockok'}">오늘 ${st.count}번${st.max ? ` / ${st.max}번` : ''}</b>` : ''}</div>${painBadge(d) ? `<div class="pain-row">${painBadge(d)}</div>` : ''}
-      <div class="small" style="margin-top:4px">${st.last ? `마지막 <b>${hhmm(st.last)}</b>${st.last.getDate() !== new Date().getDate() ? '(어제)' : ''}` : '오늘은 아직 안 드셨어요'}${st.early ? ` · <b>${hhmm(st.next)}부터</b> 다시 드실 수 있어요` : ''}${st.gap ? `<span class="muted"> · ${st.gap}시간 간격${st.max ? `, 하루 ${st.max}번까지` : ''}(허가 용법)</span>` : ''}</div>
+      <div class="small" style="margin-top:4px">${st.last ? `마지막 <b>${hhmm(st.last)}</b>${st.last.getDate() !== new Date().getDate() ? '(어제)' : ''}` : '오늘은 아직 안 드셨어요'}${st.early ? ` · <b>${hhmm(st.next)}부터</b> 다시 드실 수 있어요` : ''}${st.gap ? `<span class="muted"> · ${st.gap}시간 간격${st.max ? `, 하루 ${st.max}번까지` : ''}</span>` : ''}</div>
       ${st.full ? `<div class="note" style="margin-top:8px">${I.alert}<span><b>오늘 드실 만큼 드셨어요.</b> 더 아프시면 더 드시기보다 약사·의사와 상의하세요.</span></div>` : ''}
       <div class="prn-qty" role="group" aria-label="한 번에 몇 알"><span>한 번에</span>${[1, 2].map(k => `<button class="${prnQty(d.id) === k ? 'on' : ''}" aria-pressed="${prnQty(d.id) === k}" onclick="setPrnQty('${d.id}',${k})">${k}알</button>`).join('')}</div>
       <div class="actions" style="margin-top:8px"><button class="btn ${st.early || st.full ? 'ghost' : ''}" onclick="prnTook('${d.id}')">${I.check} 지금 먹었어요 (${prnQty(d.id)}알)</button></div>${st.count ? `<button class="prn-undo" onclick="prnUndo('${d.id}')">잘못 눌렀어요 — 방금 적은 것 지우기</button>` : ''}</div>`; }).join('')}
@@ -5602,7 +5606,7 @@ function vSchedule(_, q){
   ${taking.length ? schTabs(q) : ''}
   ${taking.length ? `<div class="pane${schOn('sc1')}" id="sc1"><section class="sec card" style="margin-top:8px"><h2>약마다 시간 고르기</h2>${taking.map(d => `<div class="sched-row"><div class="nm"><span>${esc(d.name)}</span>${d.d ? `<a class="link small" href="#/drug/${d.d.id}">복용법 ›</a>` : ''}</div><div class="small muted">${fmt((d.simple || '').split('.')[0])}</div><div class="times">${isPrn(d.id) ? '' : SLOTS.map(([n, t]) => `<button class="chip ${schedOf(d.id, d).includes(t) ? 'on' : ''}" aria-pressed="${schedOf(d.id, d).includes(t)}" onclick="toggleSlot('${d.id}','${t}')">${schedOf(d.id, d).includes(t) ? I.check : ''}${n} ${t}</button>`).join('')
       + schedOf(d.id, d).filter(t => !SLOTS.some(x => x[1] === t)).map(t => `<button class="chip on" aria-pressed="true" aria-label="${t} 빼기" onclick="toggleSlot('${d.id}','${t}')">${I.check}${t}</button>`).join('')
-      + `<button type="button" class="chip" aria-expanded="false" onclick="const f=this.nextElementSibling;f.classList.toggle('hide');this.setAttribute('aria-expanded',!f.classList.contains('hide'))">${I.clock}직접 시각</button><span class="tadd-f hide"><input type="time" value="07:00" aria-label="${esc(d.name)} 알림 시각"><button type="button" class="chip" onclick="addSlot('${d.id}', this.previousElementSibling.value)">넣기</button></span>`}<button class="chip ${isPrn(d.id) ? 'on' : ''}" onclick="togglePrn('${d.id}')" aria-pressed="${isPrn(d.id)}">${isPrn(d.id) ? I.check : ''}필요할 때만</button></div>${isPrn(d.id) ? `<p class="small muted" style="margin-top:6px">시간 알림 없이, 드실 때마다 위의 <b>「필요할 때 드신 약」</b>에 적어요.</p>` : schedUnset(d) ? (() => { const sug = defaultSlots(d); return `<div class="sched-ask"><p class="small"><b>아직 시간을 정하지 않았어요.</b> 매일 정해진 시간에 드시면 위에서 시각을 누르시고, 아플 때만 드시면 「필요할 때만」을 누르세요.</p>${sug.length ? `<p class="small muted" style="margin-top:4px">제안(허가 용법): ${sug.map(t => esc((SLOT_WORD[t] ? SLOT_WORD[t] + ' ' : '') + t)).join(' · ')}</p><button type="button" class="btn line" style="margin-top:8px" onclick="schedConfirm('${d.id}')">${I.check} 매일 — 이 시간으로 정하기</button>` : ''}</div>`; })() : schedWarn(d)}</div>`).join('')}</section></div>
+      + `<button type="button" class="chip" aria-expanded="false" onclick="const f=this.nextElementSibling;f.classList.toggle('hide');this.setAttribute('aria-expanded',!f.classList.contains('hide'))">${I.clock}직접 시각</button><span class="tadd-f hide"><input type="time" value="07:00" aria-label="${esc(d.name)} 알림 시각"><button type="button" class="chip" onclick="addSlot('${d.id}', this.previousElementSibling.value)">넣기</button></span>`}<button class="chip ${isPrn(d.id) ? 'on' : ''}" onclick="togglePrn('${d.id}')" aria-pressed="${isPrn(d.id)}">${isPrn(d.id) ? I.check : ''}필요할 때만</button></div>${isPrn(d.id) ? `<p class="small muted" style="margin-top:6px">시간 알림 없이, 드실 때마다 위의 <b>「필요할 때 드신 약」</b>에 적어요.</p>` : schedUnset(d) ? (() => { const sug = defaultSlots(d); return `<div class="sched-ask"><p class="small"><b>아직 시간을 정하지 않았어요.</b> 매일 정해진 시간에 드시면 위에서 시각을 누르시고, 아플 때만 드시면 「필요할 때만」을 누르세요.</p>${sug.length ? `<p class="small muted" style="margin-top:4px">제안(설명서·안내 간격): ${sug.map(t => esc((SLOT_WORD[t] ? SLOT_WORD[t] + ' ' : '') + t)).join(' · ')}</p><button type="button" class="btn line" style="margin-top:8px" onclick="schedConfirm('${d.id}')">${I.check} 매일 — 이 시간으로 정하기</button>` : ''}</div>`; })() : schedWarn(d)}</div>`).join('')}</section></div>
   ${taking.length ? `<div class="pane${schOn('sc5')}" id="sc5"><section class="sec card" style="margin-top:8px"><h2>보호자에게 오늘 상황 보내기</h2>
     <p class="small" style="margin-top:6px">오늘 무엇을 드셨고 무엇이 남았는지 <b>한 장으로 만들어</b> 드려요. 카카오톡·문자로 보내시면 됩니다. <b>이 앱이 대신 보내지 않습니다</b> — ${savedWhere()}</p>
     <div class="actions"><button class="btn" onclick="sendCare()">${I.user} 보호자에게 보내기</button></div>
@@ -5750,7 +5754,9 @@ function bpAvg(days){
 function vitalChart(k){
   const L = vitals().filter(x => x.k === k && x.t.slice(0, 10) >= dayBefore(13)).sort((a, b) => a.t.localeCompare(b.t));
   if (L.length < 2) return `<p class="small muted" style="margin-top:8px">두 번 이상 적으시면 2주 흐름을 그림으로 보여 드려요.</p>`;
-  const W = 340, H = 190, pl = 34, pr = 12, pt = 12, pb = 26;
+  /* 3차 #7 — 축 글자도 최소 14 px, 글자 크기 설정을 따라 커지고 여백도 함께 */
+  const fz = Math.max(14, Math.round((parseFloat(getComputedStyle(document.documentElement).fontSize) || 16) * .875));
+  const W = Math.round(Math.min(560, Math.max(280, (innerWidth || 390) - 72))), H = 170 + fz * 2, pl = Math.ceil(fz * 1.9) + 8, pr = 12, pt = fz + 4, pb = fz + 14;
   const t0 = new Date(dayBefore(13) + 'T00:00').getTime(), t1 = new Date(dayKey(new Date()) + 'T23:59').getTime();
   const X = t => pl + (new Date(t).getTime() - t0) / (t1 - t0) * (W - pl - pr);
   const vals = k === 'bp' ? L.flatMap(x => [x.s, x.d]) : L.map(x => x.v);
@@ -5760,13 +5766,13 @@ function vitalChart(k){
   const Y = v => pt + (hi - v) / (hi - lo) * (H - pt - pb);
   const ticks = []; for (let v = lo; v <= hi; v += step) ticks.push(v);
   const grid = ticks.map(v => `<line x1="${pl}" x2="${W - pr}" y1="${Y(v)}" y2="${Y(v)}" class="vz-grid"/><text x="${pl - 6}" y="${Y(v) + 4}" text-anchor="end" class="vz-ax">${v}</text>`).join('');
-  const days = [13, 6, 0].map(n => { const d = new Date(); d.setDate(d.getDate() - n); return `<text x="${X(dayKey(d) + 'T12:00')}" y="${H - 6}" text-anchor="middle" class="vz-ax">${d.getMonth() + 1}/${d.getDate()}</text>`; }).join('');
+  const days = [13, 6, 0].map(n => { const d = new Date(); d.setDate(d.getDate() - n); return `<text x="${Math.max(pl + fz * 1.3, Math.min(W - pr - fz * 1.3, X(dayKey(d) + 'T12:00')))}" y="${H - 6}" text-anchor="middle" class="vz-ax">${d.getMonth() + 1}/${d.getDate()}</text>`; }).join('');
   const refs = ref.map((v, i) => `<line x1="${pl}" x2="${W - pr}" y1="${Y(v)}" y2="${Y(v)}" class="vz-ref"/><text x="${W - pr}" y="${Y(v) - 4}" text-anchor="end" class="vz-reft">${i ? '아래' : '위'} ${v}</text>`).join('');
   const line = (f, c) => `<polyline points="${L.map(x => `${X(x.t).toFixed(1)},${Y(x[f]).toFixed(1)}`).join(' ')}" class="vz-line ${c}"/>` +
     L.map(x => `<circle cx="${X(x.t).toFixed(1)}" cy="${Y(x[f]).toFixed(1)}" r="4.5" class="vz-dot ${c}"><title>${x.t.slice(5, 10).replace('-', '/')} ${x.t.slice(11)} · ${k === 'bp' ? x.s + '/' + x.d + ' mmHg' : x.v + ' mg/dL'}</title></circle>`).join('');
   const series = k === 'bp' ? line('s', 'v1') + line('d', 'v2') : line('v', 'v1');
   const legend = k === 'bp' ? `<div class="vz-legend"><span><i class="v1"></i>위 혈압(수축기)</span><span><i class="v2"></i>아래 혈압(이완기)</span><span><i class="ref"></i>가정혈압 기준</span></div>` : '';
-  return `<svg class="vz" viewBox="0 0 ${W} ${H}" role="img" aria-label="최근 2주 ${k === 'bp' ? '혈압' : '혈당'} 흐름 — 아래 목록에 같은 숫자가 있어요">${grid}${refs}${days}${series}</svg>${legend}`;
+  return `<svg class="vz" style="--vz:${fz}px" viewBox="0 0 ${W} ${H}" role="img" aria-label="최근 2주 ${k === 'bp' ? '혈압' : '혈당'} 흐름 — 아래 목록에 같은 숫자가 있어요">${grid}${refs}${days}${series}</svg>${legend}`;
 }
 function vVitals(){
   const k = VT.k, L = vitals(), mine = L.map((x, i) => ({ ...x, i })).filter(x => x.k === k).reverse();
@@ -6030,12 +6036,15 @@ const MILD_DUP = new Set(['gi-enzyme', 'gi-gas', 'udca', 'probiotic', 'supp', 'h
 function ixCond(items, f, hits){
   const out = [];
   for (const it of items) {
-    const ds = [...new Set([it.d, ...it.ings.map(e => e.drug && drug(e.drug))].filter(Boolean))];
+    /* 3차 #4 — 제품이면 그 설명서 금기만(단일 성분 처방약 금기를 물려받지 않게) */
+    const ds = it.d ? [it.d] : [...new Set(it.ings.map(e => e.drug && drug(e.drug)).filter(Boolean))];
     /* 피 묽게 하는 약 자체(아스피린프로텍트·와파린)는 「항응고제·항혈소판제 복용」 조건으로 걸지 않는다 — 그 조건이 바로 이 약이다 */
     const own = it.ings.some(e => (e.cls || []).some(c => c === 'antiplt' || c === 'anticoag'));
     const said = fl => (own && fl === 'anticoag') || hits.some(h => (h.r.flags || []).includes(fl) && h.items.includes(it));
     const av = []; for (const d of ds) for (const a of (d.avoid || [])) { const fl = (a.flags || []).filter(x => f.includes(x) && !said(x)); if (fl.length && !av.some(v => v.t === a.text)) av.push({ t: plainTxt(a.text), fl }); }
     if (av.length) { out.push({ lv: 'stop', it, fl: [...new Set(av.flatMap(v => v.fl))], t: av.slice(0, 2).map(v => v.t).join(' · ') }); continue; }
+    const ask = []; for (const d of ds) for (const c of (d.caution || [])) { if (!c?.ask) continue; const fl = (c.flags || []).filter(x => f.includes(x) && !said(x)); if (fl.length && !ask.some(v => v.t === c.text)) ask.push({ t: plainTxt(c.text), fl }); }
+    if (ask.length) { out.push({ lv: 'warn', it, fl: [...new Set(ask.flatMap(v => v.fl))], t: ask.slice(0, 2).map(v => v.t).join(' · ') }); continue; }
     const nsaid = it.ings.some(e => (e.cls || []).includes('nsaid'));
     if (f.includes('anticoag') && nsaid && !said('anticoag')) out.push({ lv: 'warn', it, fl: ['anticoag'], t: AC_NSAID });
   }
@@ -6228,7 +6237,7 @@ function vHello(step){
     ${skip}`;
   }
   if (n === 2) {
-    const kid = ME.age === 'child', KEYS = kid ? ['asthma', 'heart', 'kidney', 'liver', 'diabetes'] : ['heart', 'diabetes', 'ulcer', 'kidney', 'liver', 'anticoag', 'glaucoma', 'bph', 'asthma', 'alcohol', 'gout', 'pregnant', 'nursing'];
+    const kid = ME.age === 'child', KEYS = kid ? ['asthma', 'heart', 'kidney', 'liver', 'diabetes'] : ['heart', 'hf', 'diabetes', 'ulcer', 'kidney', 'liver', 'anticoag', 'glaucoma', 'bph', 'asthma', 'alcohol', 'gout', 'pregnant', 'nursing'];
     const on = KEYS.filter(k => ME[k]).length;
     return `${topBar({ back:'이전', nosearch:true })}${dots}
     <h1 class="hello-q">해당하는 것이 있으면 눌러 주세요</h1>
@@ -7411,12 +7420,12 @@ function photoResult(R){
 const SHARE = () => D.meta?.share || {};
 /* 2026-10-13 상용화 점검 3-06 — 약은 «받는 분» 몸 상태로 고른다(보내는 사람 ME 가 아니라). 받는 분 칩 네 가지 */
 /* 외부 검수 2차 #10 — 콩팥·간 질환(약 거르개에 들어감)과 알레르기·드시는 약·잘 모르겠어요(보낼 글에 한 줄로 — 약사에게 꼭 말하게) */
-const SEND_FQ = [['senior', '65세 이상이세요'], ['heart', '혈압·심장약 드세요'], ['anticoag', '피를 묽게 하는 약 드세요'], ['ulcer', '위가 약하거나 위궤양·위장출혈이 있으세요'], ['kidney', '콩팥병이 있으세요'], ['liver', '간질환이 있으세요'], ['alg', '약 알레르기가 있었어요'], ['meds', '드시는 약이 있으세요'], ['unk', '지병·드시는 약을 잘 모르겠어요']];
+const SEND_FQ = [['senior', '65세 이상이세요'], ['heart', '혈압·심장약 드세요'], ['hf', '심부전·협심증·부정맥이 있거나 혈압이 잘 안 잡히세요'], ['anticoag', '피를 묽게 하는 약 드세요'], ['ulcer', '위가 약하거나 위궤양·위장출혈이 있으세요'], ['kidney', '콩팥병이 있으세요'], ['liver', '간질환이 있으세요'], ['alg', '약 알레르기가 있었어요'], ['meds', '드시는 약이 있으세요'], ['unk', '지병·드시는 약을 잘 모르겠어요']];
 const SEND_XL = { alg: '받는 분은 약 알레르기가 있었어요 — 약사님께 꼭 말씀하세요.', meds: '받는 분이 드시는 약이 있어요 — 약봉투를 약사님께 같이 보여 주세요.', unk: '받는 분의 지병과 약은 아직 확인하지 않았어요. 약사에게 목록을 보여 주세요.' };
 const sendXL = () => SEND_F.map(k => SEND_XL[k]).filter(Boolean).concat(SEND_Q?.s && rfOf(SEND_Q.s) === 'cl' ? ['진료를 받으셔야 하는 신호가 있다고 표시했어요 — 약보다 진료가 먼저예요.'] : []);
 /* 「부모님께」라 받는 분은 대개 어르신 — 65세 이상을 기본으로 켠다(더 조심하는 쪽, 의사-질문-1013-2 6번) */
 let SEND_F = ['senior'], SEND_LBL = '', SEND_NOTE = '';
-function sendBasket(q){ const sy = q?.s ? byId(D.symptoms, q.s) : null; if (!sy) return null; return basketPicked(sy, basket(sy, { flags: SEND_F.slice() })); }
+function sendBasket(q){ const sy = q?.s ? byId(D.symptoms, q.s) : null; if (!sy) return null; const fl = SEND_F.slice(); if (fl.includes('hf') && !fl.includes('heart')) fl.push('heart'); return basketPicked(sy, basket(sy, { flags: fl })); }
 function sendItems(q){
   if (q?.s) { const bk = sendBasket(q); if (!bk) return [];
     /* 주된 칸 + 증상 화면에서 「약국 카드에 넣기」로 넣은 보조 칸(Z4 #12). 「이 중 하나만」 묶음은 하나만(Z7 A1) */
@@ -7435,7 +7444,6 @@ function sendText(items, label, note, link, dropped){
   const who = label ? label + ', ' : '';
   const dl = sendDropLine(dropped || [], 1);
   const cl = [...sendCau(SEND_Q), ...sendXL()];
-  /* 외부 검수 2차 #3 — 링크를 못 열고 글만 받아도 가장 급한 신호 하나는 보이게 */
   const er1 = (SEND_Q?.s ? byId(D.symptoms, SEND_Q.s)?.care?.er?.[0] : '') || '';
   if (er1) cl.push(`이럴 땐 약 대신 바로 119 — ${er1.replace(/\*\*/g, '')}`);
   return `[약지도] ${who}약국에서 이 약 좀 사 주세요\n${items.map(x => '· ' + (x.product ? x.product + ' (' + x.name + ')' : x.name)).join('\n')}${cl.length ? '\n' + cl.map(t => '※ ' + t).join('\n') : ''}${dl ? '\n' + dl : ''}${note ? '\n\n' + note : ''}\n\n약사님께 이 목록을 보여 주시고, 앓고 계신 병과 드시는 약을 꼭 말씀하세요.${link ? '\n' + link : '\n가까운 문 연 약국: ' + GO_LINK.open[0]}`;
@@ -7480,7 +7488,7 @@ async function doSend(){
   }
   if (viaLink) {
     try {
-      /* 외부 검수 2차 #3 — 받는 화면도 응급 신호를 보이게 증상을 한 줄(sym:)로 함께 담는다(서버 함수·표는 그대로, 약 9개 + 증상 1개) */
+      /* 2차 #3 — 증상을 sym: 한 줄로 함께(서버 그대로) */
       const sy = SEND_Q?.s ? byId(D.symptoms, SEND_Q.s) : null;
       const its = sy ? [...items.slice(0, 9), { id: 'sym:' + sy.id, name: sy.name }] : items;
       const r = await fetch(S.fn, { method:'POST', headers:{ 'Content-Type':'application/json' }, body: JSON.stringify({ action:'create', items: its, label, note, consent:true }) });
@@ -7505,7 +7513,6 @@ function vParentShare(code){
   if (st.loading) return `${topBar({ back:'처음으로', nosearch:true })}<section class="sec"><p class="loading">받은 약을 불러오는 중이에요…</p></section>`;
   if (st.err) return `${topBar({ back:'처음으로', nosearch:true })}<section class="sec"><div class="empty card"><b>${st.err === 410 ? '기간이 지난 링크예요' : '받은 약을 불러오지 못했어요'}</b>${st.err === 410 ? '보낸 지 7일이 지나 지워졌어요. 다시 보내 달라고 해 주세요.' : '인터넷 연결을 확인하고 다시 열어 주세요.'}</div></section>`;
   const x = st.data;
-  /* 외부 검수 2차 #3 — 보낸 증상(sym:)이 있으면 그 증상의 «바로 119» 신호를 약 목록 아래에. 증상 줄은 약 목록에서 뺀다 */
   const sy = (() => { const t = (x.items || []).find(it => /^sym:/.test(it.id || '')); return t ? byId(D.symptoms, t.id.slice(4)) : null; })();
   const meds = (x.items || []).filter(it => !/^sym:/.test(it.id || ''));
   return `<div class="pshare">${topBar({ back:'처음으로', nosearch:true })}
@@ -8011,6 +8018,7 @@ const CONDS = [
   ['alcohol', '술을 자주 마심', '주 3회 이상이면 켜 주세요'],
   /* 처음 안내·카드·내 몸이 같은 이름(3-20) */
   ['heart', '고혈압·심장병', '일부 소염진통제·코감기약에 주의'],
+  ['hf', '심한 심장병·조절 안 되는 고혈압', '심부전·협심증·부정맥, 약을 먹어도 혈압이 높을 때'],
   ['diabetes', '당뇨', '코감기약 성분이 혈당을 올릴 수 있어요'],
   ['asthma', '천식', '아스피린·소염진통제로 악화될 수 있어요'],
   ['anticoag', '항응고제·항혈소판제 복용', '와파린·아스피린·클로피도그렐 등'],
