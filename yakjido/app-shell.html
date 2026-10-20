@@ -4176,7 +4176,7 @@ function buyItem(x){
   const title = x.d.combo ? ing : (ing || prod || x.d.name);
   const ex = prodNames(x.d, 3, x.kid).filter(n => n !== title);
   const sub = x.d.combo ? (prodNames(x.d, 2, x.kid).length ? '이 성분이 든 제품: ' + prodNames(x.d, 2, x.kid).join(' · ') : '')
-    : (ex.length ? `같은 성분 제품 예${amtDiff(x.d, ex) ? '(한 알 양이 달라요)' : ''}: ` + ex.map(n => wAmt(x.d, n)).join(' · ') : '');
+    : (ex.length ? `${x.d.prodMix ? '이런 제품이 있어요(제품마다 성분이 조금씩 달라요)' : '같은 성분 제품 예' + (amtDiff(x.d, ex) ? '(한 알 양이 달라요)' : '')}: ` + ex.map(n => wAmt(x.d, n)).join(' · ') : '');
   const badge = buyBadge(x);
   return `<button class="buy-item ${x.optional ? 'opt' : ''} ${pimg(x.product) ? 'has-img' : ''} ${open ? 'open' : ''}" onclick="OPEN_BUY=OPEN_BUY==='${x.d.id}'?'':'${x.d.id}';route()" aria-expanded="${open}">
     <span class="bi-t">
@@ -4200,7 +4200,7 @@ function buyItem(x){
       return sec('어떻게 드세요', `<p class="bm-dose">${fmt(ds.head)}</p>${sub ? `<p class="bm-sub">${fmt(sub)}</p>` : ''}${senMaxH(d)}`); })()}
     ${rules ? sec('꼭 지킬 것', `<ul class="bm-rules">${rules}</ul>`) : ''}
     ${x.blocked && x.mix !== 2 ? `<div class="note" style="margin-top:12px">${I.alert}<span>내 조건(${esc(flagWords(x.why, ', ') || activeFlags().map(f => FLAG_LABEL[f]).join(', '))})에서는 주의가 필요해요. 약사에게 조건을 말하고 고르세요.</span></div>` : ''}
-    ${names.length ? sec('같은 성분 제품 예', shots + `<p class="bm-names">${names.map(esc).join(' · ')}</p>`) : ''}
+    ${names.length ? sec(d.prodMix ? '이런 제품이 있어요 — 제품마다 성분이 조금씩 달라요' : '같은 성분 제품 예', shots + `<p class="bm-names">${names.map(esc).join(' · ')}</p>`) : ''}
     ${erProds(d).length ? sec('서방정은 따로 — 먹는 간격이 달라요', erProds(d).map(p => `<p class="bm-names"><b>${esc(p.name)}</b>${p.amount ? ' — ' + esc(p.amount) : ''}</p>`).join('') + '<p class="bm-sub">위 「어떻게 드세요」와 다르게, 이 제품은 상자에 적힌 간격과 하루 양을 따르세요. 일반정과 섞어 드시지 마세요.</p>') : ''}
     ${(() => { const alts = altSame(d); return alts.length ? sec('같은 일을 하는 다른 약', `<div class="bm-alts">${alts.map(a => `<button class="bm-alt" onclick="event.stopPropagation();go('/drug/${a.id}')"><b>${esc(ingrName(a))}</b><small>${esc(a.tagline || (a.for || []).join(' · '))}</small></button>`).join('')}</div>`) : ''; })()}
     <div class="bm-links">${prodLinks(d, x.product)}</div>
