@@ -509,6 +509,9 @@ for _name in ('lexicon', 'qa', 'nutrients', 'brands', 'mixes'):
     _raw = _p.read_text(encoding='utf-8')
     for _ch in '«»『』':
         if _ch in _raw: fails.append(f'data/{_name}.json 에 {_ch} 가 있습니다 — 메디나눔 글 규칙은 「 」'); break
+    # 2026-10-21 「~합니다」체 약 1,600곳을 「~해요」체로 바꿨다 — 다시 섞이지 않게(글 규칙: 해요체)
+    _hm = re.search(r'.{0,12}[가-힣]*(습니다|십시오)', _raw) or next((m for m in re.finditer(r'.{0,12}([가-힣])니다', _raw) if (ord(m.group(1)) - 0xAC00) % 28 == 17 and '메트로니다졸' not in m.group(0)), None)
+    if _hm: fails.append(f'data/{_name}.json 에 「~합니다」체가 있습니다 — 글 규칙은 해요체: «{_hm.group(0)}»')
     _bad = []
     def _lz(o, key, path):
         if isinstance(o, str):
