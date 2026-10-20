@@ -6279,7 +6279,7 @@ function vIngr(id){
   ${(() => {
     const rxOnly = [x.dose, x.gap, x.max].every(v => !v || /^처방대로$/.test(String(v).trim()));
     if (rxOnly) return x.rx === '전문' ? `<div class="usebar" style="background:var(--rx-tint);color:var(--rx)">${I.info}<span>처방약이에요. 용법·용량은 <b>약봉투와 의사·약사 지시</b>가 우선입니다.</span></div>` : '';
-    const sub = [x.gap, x.max ? '하루 최대 ' + x.max : ''].filter(v => v && v !== '처방대로').join(' · ');
+    const sub = [x.gap, x.max ? (/^[\d.,~\s]+(mg|g|µg|mL|정|캡슐|포|병|개|매|회|번|알|방울)/.test(x.max) ? '하루 최대 ' : '한도 — ') + x.max : ''].filter(v => v && v !== '처방대로' && v !== '—').join(' · ');
     return `<div class="dose-hero"><small>이렇게 씁니다</small><div class="big">${esc(x.dose || '—')}</div>${sub ? `<small>${esc(sub)}</small>` : ''}</div>`;
   })()}
   ${x.care?.length ? `<section class="sec card"><h2>주의할 것</h2><ul class="plain x">${x.care.map(t => `<li>${lexMark(t)}</li>`).join('')}</ul></section>` : ''}
@@ -6289,7 +6289,7 @@ function vIngr(id){
   ${bs.length ? `<section class="sec"><h2>이 성분이 든 제품 <small>${bs.length}개</small></h2><div class="card rows">${bs.map(b => `<button class="row" onclick="go('/brand/${encodeURIComponent(b.n)}')"><div class="body"><b>${esc(b.n)}</b><span>${esc(short(b.comp || b.use, 46))}</span></div>${badge(b.rx === '둘 다' ? '' : b.rx)}${I.chev}</button>`).join('')}</div></section>`
     : (x.ex?.length ? `<section class="sec card"><h2>이런 제품에 들어 있어요</h2><ul class="plain">${x.ex.map(t => `<li>${esc(t)}</li>`).join('')}</ul></section>` : '')}
   <div class="actions">${takeBtn(x.drug && drug(x.drug) ? x.drug : 'lex:' + x.id)}</div>
-  ${x.src?.length ? `<div class="srcs">${x.src.map(t => `<span class="src-chip${/미확인/.test(t) ? ' unv' : ''}">${I.link}${esc(t)}</span>`).join('')}</div>${x.src.some(t => /미확인/.test(t)) ? '<p class="small muted" style="margin-top:8px">‘미확인’은 원문 허가사항을 아직 대조하지 못했다는 표시예요. 분류(일반·전문)는 식약처 공공데이터와 대조했습니다.</p>' : ''}` : ''}
+  ${x.src?.length ? `<div class="srcs">${x.src.map(t => { const u = (String(t).match(/https?:\/\/\S+/) || [])[0], z = u ? String(t).replace(u, '').trim() : t, c = `src-chip${/미확인/.test(t) ? ' unv' : ''}`; return u ? `<a class="${c}" href="${esc(u)}" target="_blank" rel="noopener">${I.link}${esc(z)}</a>` : `<span class="${c}">${I.link}${esc(z)}</span>`; }).join('')}</div>${x.src.some(t => /미확인/.test(t)) ? '<p class="small muted" style="margin-top:8px">‘미확인’은 원문 허가사항을 아직 대조하지 못했다는 표시예요. 분류(일반·전문)는 식약처 공공데이터와 대조했습니다.</p>' : ''}` : ''}
   ${disclaimer()}`;
 }
 function vBrand(name){
