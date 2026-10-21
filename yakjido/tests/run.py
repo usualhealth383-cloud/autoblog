@@ -1596,8 +1596,14 @@ def main():
         _pd = pg.evaluate("""()=>[planDup([{d:drug('ibuprofen'),slot:'가'},{d:drug('naproxen'),slot:'나'}]).length, planDup([{d:drug('ibuprofen'),slot:'가'},{d:drug('relax-combo'),slot:'나'}]).length]""")
         if _pd[0] == 0: fails.append('소염제 두 가지(이부프로펜+나프록센) 겹침 경고가 사라짐 — 규칙이 죽었는지 확인')
         if _pd[1] != 0: fails.append('이부프로펜+신신플렉스에 겹침 경고가 뜸 — 현욱님 답과 어긋남')
-        # 9. 날씨 카드
+        # 9-0. 기본은 Open-Meteo 끔(2026-10-21 약관: 무료는 비상업만) — 기상청 워커가 없으면 날씨 줄도, 바깥 요청도 없어야 한다
+        _om = [0]; pg.on('request', lambda r: 'open-meteo.com' in r.url and _om.__setitem__(0, _om[0] + 1))
+        pg.evaluate("localStorage.removeItem('yakjido.wx.v1')"); pg.goto(url + '#/home'); pg.reload(); ready(); pg.wait_for_timeout(1500)
+        if _om[0]: fails.append(f'Open-Meteo 를 껐는데 요청이 {_om[0]}번 나감')
+        if pg.evaluate("()=>!!document.querySelector('.wx')"): fails.append('날씨 받을 길이 없는데 날씨 줄이 보임')
+        # 9. 날씨 카드(스위치를 켠 상태에서 — 상업 요금제·기상청 워커가 생기면 같은 화면이 된다)
         pg.goto(url + '#/home'); pg.reload(); ready(); pg.wait_for_timeout(1000)
+        pg.evaluate("()=>{D.meta.openMeteo=true;WX_TRIED='';route()}"); pg.wait_for_timeout(1500)
         wx = pg.evaluate("()=>document.querySelector('.wx')?.innerText||''")
         for kw in ['일교차', '14℃', '미세먼지', '나쁨']:
             if kw not in wx: fails.append(f'날씨 카드에 "{kw}" 없음: {wx[:80]!r}')
@@ -1606,6 +1612,7 @@ def main():
         _NULL = json.dumps({'current': {'temperature_2m': None, 'apparent_temperature': None, 'relative_humidity_2m': None, 'weather_code': None}, 'daily': {'temperature_2m_max': [None], 'temperature_2m_min': [None]}})
         pg.route('**/api.open-meteo.com/**', lambda rt: rt.fulfill(status=200, content_type='application/json', body=_NULL if 'kma_seamless' in rt.request.url else FC))
         pg.evaluate("localStorage.removeItem('yakjido.wx.v1')"); pg.goto(url + '#/home'); pg.reload(); ready(); pg.wait_for_timeout(1500)
+        pg.evaluate("()=>{D.meta.openMeteo=true;WX_TRIED='';route()}"); pg.wait_for_timeout(1500)
         wx = pg.evaluate("()=>document.querySelector('.wx')?.innerText||''")
         if '0℃' in wx.split('\n')[0][:4] or '일교차 —' in wx or '14℃' not in wx: fails.append(f'기상청 모델이 빈 값을 보낼 때 날씨가 틀립니다: {wx[:80]!r}')
         pg.unroute('**/api.open-meteo.com/**')
@@ -1614,7 +1621,8 @@ def main():
         pg.unroute('**/api.open-meteo.com/**'); pg.unroute('**/air-quality-api.open-meteo.com/**')
         cnt = [0]
         pg.route('**/*open-meteo.com/**', lambda rt: (cnt.__setitem__(0, cnt[0] + 1), rt.abort()))
-        pg.evaluate("localStorage.removeItem('yakjido.wx.v1')"); pg.goto(url + '#/home'); pg.reload(); ready(); pg.wait_for_timeout(3000)
+        pg.evaluate("localStorage.removeItem('yakjido.wx.v1')"); pg.goto(url + '#/home'); pg.reload(); ready(); pg.wait_for_timeout(500)
+        pg.evaluate("()=>{D.meta.openMeteo=true;WX_TRIED='';route()}"); pg.wait_for_timeout(3000)
         if cnt[0] > 6: fails.append(f'날씨 실패 시 요청 반복 {cnt[0]}회/3초 (6회 이하여야)')
         wx = pg.evaluate("()=>document.querySelector('.wx')?.innerText||''")
         if '못 받았어요' not in wx: fails.append(f'날씨 실패 문구 없음: {wx[:60]!r}')

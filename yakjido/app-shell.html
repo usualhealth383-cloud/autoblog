@@ -1795,6 +1795,7 @@ main>*:nth-child(2){animation-delay:.04s} main>*:nth-child(3){animation-delay:.0
 .toast{position:fixed;left:50%;bottom:96px;transform:translateX(-50%);background:var(--text);color:var(--card);padding:10px 16px;border-radius:12px;font-size:.875rem;font-weight:600;z-index:20;box-shadow:0 8px 24px rgba(0,0,0,.25);animation:rise .25s ease}
 .toast.undo{display:flex;align-items:center;gap:12px;padding:6px 6px 6px 16px;max-width:calc(100vw - 32px)}
 .toast.undo button{flex:none;min-height:48px;padding:0 16px;border:0;border-radius:10px;background:var(--card);color:var(--primary-deep);font:inherit;font-weight:800;cursor:pointer}
+.toast.remind{flex-wrap:wrap;padding:12px 12px 8px 16px;gap:8px;width:min(420px,calc(100vw - 32px))}.toast.remind span{flex:1 1 100%;font-size:.9375rem;line-height:1.45}.toast.remind button.later{background:transparent;color:var(--card);border:1px solid color-mix(in srgb,var(--card) 50%,transparent)}
 
 /* ═══ ClinicScore 문법 (2026-09-29 현욱님 「clinicscore 앱 참조하라」) ═══
    한 줄 행: 아이콘(틴트 상자 없이) · 굵은 이름 — 설명 · 오른쪽 «열기 ›»
@@ -3234,6 +3235,7 @@ function wxLoc(){ if (WX.city === '내 위치' && WX.lat != null) return { name:
 /* 이 화면 세션에서 이미 시도한 지역 — 실패해도 홈을 그릴 때마다 다시 가지 않는다 */
 let WX_TRIED = '';
 async function wxFetch(force){
+  if (!wxSrcOn()) return;
   if (WX_BUSY || (typeof navigator !== 'undefined' && navigator.onLine === false)) return;
   const loc = wxLoc();
   if (!force && WX.data && WX.at && Date.now() - WX.at < 60 * 60 * 1000 && WX.data.name === loc.name) return;
@@ -3248,8 +3250,10 @@ async function wxFetch(force){
     /* 1) 우리 워커(기상청 실황·에어코리아 실측) — 키가 설정돼 있을 때만 응답한다 */
     const ep = wxEndpoint();
     if (ep) { try { const r = await fetch(`${ep}?lat=${loc.lat}&lon=${loc.lon}`); const j = r.ok ? await r.json() : null; if (j && (j.now != null || j.max != null)) got = { ...j, name: loc.name, src: 'kma' }; } catch (e) {} }
-    /* 2) Open-Meteo — 기상청 모델(kma_seamless)을 먼저, 모델 이름이 안 받아들여지면 기본 모델로 */
-    if (!got) {
+    /* 2) Open-Meteo — 기상청 모델(kma_seamless)을 먼저, 모델 이름이 안 받아들여지면 기본 모델로.
+       ⛔ 2026-10-21 저작권·약관 점검: Open-Meteo 무료 API 는 비상업 용도만(https://open-meteo.com/en/terms) — 유료 앱이라 기본은 끔.
+       기상청·에어코리아 워커(meta.wxEndpoint)를 쓰거나, 상업 요금제를 받으면 meta.openMeteo = true */
+    if (!got && D.meta?.openMeteo === true) {
       const q = `latitude=${loc.lat}&longitude=${loc.lon}&timezone=Asia%2FSeoul`;
       const fc = `https://api.open-meteo.com/v1/forecast?${q}&current=temperature_2m,apparent_temperature,relative_humidity_2m,weather_code&daily=temperature_2m_max,temperature_2m_min&forecast_days=1`;
       /* 한 요청이 멈춰 있으면(기상청 모델이 가끔 그렇다) 6초에서 끊고 다음으로 — 「보는 중」이 오래 남지 않게 */
@@ -3269,6 +3273,7 @@ async function wxFetch(force){
   /* 바뀐 것이 있을 때만 다시 그린다 — 새 자료가 왔거나, 처음 실패해서 문구가 바뀌어야 할 때 */
   if (document.querySelector('.wx') && (WX.at !== before || (!!WX.fail) !== failBefore)) route();
 }
+const wxSrcOn = () => !!wxEndpoint() || D.meta?.openMeteo === true;
 /* 워커 주소가 있으면 그 옆 /wx — 사진 서버와 같은 워커 */
 function wxEndpoint(){ return D.meta?.wxEndpoint || ''; }
 function wxSetCity(v){
@@ -3328,6 +3333,8 @@ function wxAdvice(d){
   return A.sort((a, b) => a.p - b.p).filter(a => !seen.has(a.th) && seen.add(a.th)).slice(0, 2);
 }
 function wxCard(){
+  /* 날씨를 받을 길이 없으면(기상청 워커 없음 · Open-Meteo 끔) 줄 자체를 두지 않는다 — 옛 캐시도 보이지 않게 */
+  if (!wxSrcOn()) return '';
   /* 오늘의 한 장 카드 안의 한 줄 — 예전엔 따로 큰 카드였고, 못 받으면 빈 카드가 한 칸을 통째로 차지했다(2026-09-29 현욱님 캡처).
      ClinicScore 처럼 조용하게: 받았으면 한 줄 + 내 약통 조언 하나, 못 받았으면 작은 글씨 한 줄 */
   const loc = wxLoc(); const d = WX.data && WX.data.name === loc.name ? WX.data : null;
@@ -6856,6 +6863,22 @@ async function confirmRemove(id){
   if (!(it.pub?.rx || it.quick || daily)) return true;
   return appConfirm(`${it.name}${josa(it.name, '을', '를')} 내 약통에서 뺄까요?${daily ? '\n복용 알림도 함께 꺼져요.' : ''}`, { ok:'뺄게요', cancel:'그만둘게요', danger:true });
 }
+/* 메디나눔 감사 ④-3(10-22) — 약을 담으면 그 자리에서 알림 시각을 묻는다(알림이 홈 아래에 묻혀 있었다).
+   화면을 막는 창이 아니라 아래 한 줄(10초) — 필요할 때만 드시는 약·이미 시각을 정한 약·둘러보기에서는 묻지 않는다 */
+function askRemind(id){
+  if (ME.demo) return; const item = takingItems().find(x => x.id === id); if (!item || isPrn(id) || !schedUnset(item)) return;
+  const L = defaultSlots(item); if (!L.length) return;
+  document.querySelector('.toast')?.remove();
+  const el = document.createElement('div'); el.className = 'toast undo remind';
+  el.innerHTML = '<span></span><button type="button">이 시간으로</button><button type="button" class="later">나중에</button>';
+  el.querySelector('span').textContent = `${String(item.name).split(' (')[0]} — ${L.join(' · ')}에 알려 드릴까요?`;
+  const [b1, b2] = el.querySelectorAll('button');
+  b1.onclick = e => { e.stopPropagation(); el.remove(); schedConfirm(id); };
+  b2.onclick = e => { e.stopPropagation(); el.remove(); };
+  document.body.appendChild(el);
+  const sr = document.getElementById('sr'); if (sr) { sr.textContent = ''; setTimeout(() => { sr.textContent = el.querySelector('span').textContent + ' — 화면 아래 「이 시간으로」'; }, 60); }
+  setTimeout(() => el.remove(), 10000);
+}
 function undoToast(msg, snap){
   document.querySelector('.toast')?.remove();
   const el = document.createElement('div'); el.className = 'toast undo';
@@ -6867,7 +6890,7 @@ function undoToast(msg, snap){
 }
 async function toggleTaking(id){ ME.taking = ME.taking || []; const adding = !ME.taking.includes(id);
   if (!adding) { if (!(await confirmRemove(id))) return; const snap = JSON.stringify(ME); ME.taking = ME.taking.filter(x => x !== id); saveMe(); armNotifications(); route(); undoToast('내 약통에서 뺐어요', snap); return; }
-  ME.taking = [...ME.taking, id]; const prn = markPrnIfNew(id); saveMe(); route(); toast(prn ? '내 약통에 담았어요 — 아플 때만 드시는 약이라 「필요할 때만」으로 두었어요' : '내 약통에 담았어요'); }
+  ME.taking = [...ME.taking, id]; const prn = markPrnIfNew(id); saveMe(); route(); toast(prn ? '내 약통에 담았어요 — 아플 때만 드시는 약이라 「필요할 때만」으로 두었어요' : '내 약통에 담았어요'); if (!prn) setTimeout(() => askRemind(id), 1800); }
 /* 알림 글 — 어르신이 읽을 시간이 있게 3.5초 이상(글이 길면 더), 누르면 닫힌다. 화면낭독기는 #sr 로 읽는다(5-07) */
 function toast(t){ document.querySelector('.toast')?.remove(); const el = document.createElement('div'); el.className = 'toast'; el.setAttribute('aria-hidden', 'true'); el.textContent = t; el.onclick = () => el.remove(); document.body.appendChild(el);
   const sr = document.getElementById('sr'); if (sr) { sr.textContent = ''; setTimeout(() => { sr.textContent = t; }, 60); }
@@ -6927,20 +6950,7 @@ function kgGet(seq){
 }
 const pictoSrc = c => (window.__PICTO_LOCAL ? `pg/${c}.jpg` : `https://common.health.kr/shared/images/pictogram/black/kor/${c}.jpg`);
 /* 약학정보원 그림 표시 뜻 — 그림 안 글씨를 옮겨 적은 것(2026-09-30). 화면 읽기(대체 글)에 쓴다 */
-const PICTO_LABEL = { C01:'충분한 물과 함께 드세요', C02:'대변 또는 소변색이 변해요', C05:'운전 또는 위험한 기계조작 시 주의해 주세요', C16:'임부·수유부는 전문가와 상의하세요',
-  C21:'생활요법을 같이 하세요', C25:'쪼개거나 씹지 마세요', C27:'어린이 주의', C28:'영·유아 주의', D04:'취침 전에 복용하세요', D11:'공복에 복용하세요',
-  E01:'입이 마를 수 있으니 물을 많이 드세요', E03:'위장장애가 나타날 수 있어요', E05:'이상 출혈 시 전문가에게 알려주세요', E06:'발진이 생기면 전문가에게 알려주세요',
-  F01:'먹는 약', F12:'질정', F16:'입 안에서 녹여 드세요', F17:'씹어서 복용하세요', I01:'유제품 X', I03:'알코올 X', I04:'카페인 X', I06:'흡연·알코올 X',
-  P01:'쪼개지 마세요', P02:'먹지 마세요', P06:'복용 후 눕지 마세요', P08:'금연하세요', P09:'수유부 X', P11:'임부·수유부 X', P12:'임신·임신 계획 시 먹지 마세요',
-  S03:'습기를 주의하세요', S05:'어린이 손에 닿지 않게 하세요',
-  C08:'흔들어서 사용하세요', C09:'바르기 전후 손을 씻으세요', D12:'식사와 함께 또는 식사 직후 복용', D13:'식전에 복용하세요', D17:'1일 1회', D19:'일주일에 1회',
-  E02:'천천히 일어나세요', E09:'두통이 생길 수 있어요', F05:'구강분무약', F06:'붙이는 약', F13:'바르는 약', F14:'물약', F15:'가글약', F18:'물에 녹여서 복용하세요',
-  I02:'자몽주스 X', P03:'자외선을 피하세요', P07:'다른 약과 먹지 마세요', S04:'직사광선 및 고온을 피해 서늘한 곳에 보관해 주세요',
-  C04:'졸릴 수 있어요', C19:'근육통이 생기면 알리세요', D16:'매일 같은 시간에 복용하세요', P10:'여성은 먹지 마세요', P17:'피임하세요', S06:'차광보관하세요',
-  C07:'사용법을 익히세요', C18:'정기적으로 혈액검사를 받으세요', D01:'일정한 시간마다 드세요', D02:'아침에 드세요', D03:'저녁에 드세요', D05:'하루 2번(아침·저녁) 드세요',
-  D07:'식사 후 바로 드세요', D08:'식사 30분 전에 드세요', D14:'식사 후에 드세요', D18:'한 달에 1번 드세요', F04:'입으로 들이마시는 약이에요', F10:'혀 밑에 녹여 먹는 약이에요',
-  I07:'칼륨이 많은 음식(바나나·감자·시금치 등)을 피하세요', P05:'임신부는 만지지 마세요', P16:'여성은 만지지 마세요', P18:'헌혈하지 마세요', S01:'냉장 보관하세요',
-  C11:'용기 입구가 눈에 닿지 않게 하세요', C20:'넣은 뒤 눈 안쪽 구석(코눈물관)을 누르세요', C22:'들이마신 뒤 입안을 헹구세요', F08:'눈에 넣는 약이에요', F19:'손발톱에 바르는 네일라카예요' };
+const PICTO_LABEL = {};   /* 약학정보원 그림 표시 뜻 표 — 2026-10-21 저작권 점검으로 그림 표시를 끄며 뺐다(git 기록 10-21 이전에 있음) */
 const KG_DUR = { dose: '하루 최대', preg: '임신 중', senior: '65세 이상', age: '나이', period: '쓰는 기간', contra: '같이 쓰면 안 되는 약' };
 /* 3-21 — 약학정보원 DUR 「같이 쓰면 안 되는 약」이 영어 성분명·【 】 그대로였다. 성분 사전(lexicon)·약지도 성분표에 있는 이름은 한글로 */
 let EN_KO = null, EN_KO_LEX = false;
@@ -7066,7 +7076,7 @@ function vPill(){
   ${nq ? `<section class="sec"><h2>제품 이름으로 찾은 것 <small>물약·가루약도 함께</small></h2>${nh.length ? `<div class="card results">${hitsHtml(nh)}</div>` : ''}<button class="btn line" style="margin-top:8px" onclick="go('/search?q='+encodeURIComponent(PILLQ.txt.trim()))">${I.search} 이름으로 모두 찾기</button></section>` : ''}
   <section class="sec"><h2>${active ? `${nq ? '알약 모양·글자로 찾은 ' : ''}후보 ${res.length.toLocaleString()}개` : '고르면 여기에 사진이 나와요'} <small>${res.length > 30 ? '30개만 표시 — 글자나 색을 더 고르면 줄어요' : PILLQ.rx ? `약국약 ${(PUB.pills || []).length.toLocaleString()} + 처방약 ${(PUB.rx || []).length.toLocaleString()}건에서` : `약국약 ${(PUB.pills || []).length.toLocaleString()}건에서`}</small></h2>
     ${shown.length ? `<div class="pill-grid">${shown.map(([sc, p]) => pillCard(p, sc)).join('')}</div>` : active ? '<div class="empty"><b>조건에 맞는 약이 없어요</b>이름이면 앞 두세 글자만 쳐 보세요(베시케어 → 베시). 각인이면 글자를 줄이거나 색을 바꿔 보세요.</div>' : ''}
-    <div class="srcs"><span class="src-chip">${I.link}출처: 식약처 의약품 낱알식별 정보</span></div></section>
+    <div class="srcs"><span class="src-chip">${I.link}출처: 식약처 의약품 낱알식별 정보 · 사진 약학정보원</span></div></section>
   ${disclaimer('낱알 사진과 각인은 참고용이에요. 같은 모양의 다른 약도 있으니, 확실하지 않으면 약사에게 실물을 보여 주세요.')}`;
 }
 function pillFm(p){ const t = (p.fm || '') + ' ' + (p.n || ''); return /연질/.test(t) ? 'soft' : /캡슐|캅셀/.test(t) ? 'cap' : 'tab'; }
@@ -7152,7 +7162,7 @@ function vPillInfo(seq){
   <div class="actions"><button class="btn ${taking ? 'line' : ''}" onclick="togglePub('${p.seq}')">${taking ? I.check + ' 내 약통에 있어요 (빼기)' : I.pill + ' 내 약통에 담기'}</button>${taking && takingItems().length >= 2 ? `<button class="btn ghost" onclick="go('/together')">${I.shield} 다른 약과 같이 먹어도 되는지 보기</button>` : ''}${taking ? `<button class="btn ghost" onclick="go('/schedule')">${I.clock} 복용 시간 알림 만들기</button>` : ''}</div>
   <div class="links" style="display:flex;gap:6px;flex-wrap:wrap;margin-top:12px"><a class="plink" href="https://nedrug.mfds.go.kr/pbp/CCBBB01/getItemDetail?itemSeq=${esc(p.seq)}" target="_blank" rel="noopener">${I.link}식약처 허가정보</a>${kpicLink(p.seq) ? `<a class="plink" href="${kpicLink(p.seq)}" target="_blank" rel="noopener">${I.search}약학정보원 — 사진·자세히</a>` : `<a class="plink" href="https://www.health.kr/searchDrug/search_detail.asp" target="_blank" rel="noopener" onclick="copyName('${esc(p.n.replace(/\(.*?\)/g, '')).replace(/'/g, "\\'")}')">${I.search}약학정보원에서 찾기</a>`}</div>
   ${kgCard(p.seq)}
-  <div class="srcs"><span class="src-chip">${I.link}출처: 식약처 의약품 낱알식별 정보</span></div>
+  <div class="srcs"><span class="src-chip">${I.link}출처: 식약처 의약품 낱알식별 정보 · 사진 약학정보원</span></div>
   ${disclaimer('낱알 정보는 참고용이에요. 같은 모양의 다른 약도 있으니 확실하지 않으면 약사에게 실물을 보여 주세요.')}`;
 }
 /* 2026-10-13 상용화 점검 3-03 — 낱알 자료 약국약의 3분의 2는 성분 칸이 비어 있다(복합 감기약·진통제가 대부분).
@@ -7211,7 +7221,7 @@ function addPubIx(i){ const p = (PUB.index || [])[+i]; if (!p) return; const id 
   if (ME.taking.includes(id)) { toast('이미 내 약통에 있어요'); return; }
   const ingr = (p.i || []).join('|'); const d = pubDrug(ingr, p);
   ME.taking.push(id); ME.pub[id] = { name: pubShort(p.n), full: p.n, ingr, rx: '', seq: p.seq || '', drugId: d?.id || '' }; markPrnIfNew(id);
-  saveMe(); toast('내 약통에 담았어요'); }
+  saveMe(); toast('내 약통에 담았어요'); setTimeout(() => askRemind(id), 1800); }
 /* 성분이 빈 채로 담긴 약을 채운다 — 자료가 아직 없으면 받아 온 뒤 한 번 더. 채운 것이 있으면 true */
 function pubIngrFill(){
   const P = ME.pub || {}; const empty = Object.keys(P).filter(k => !P[k].ingr && !P[k].manual && (ME.taking || []).includes(k));
@@ -7227,7 +7237,7 @@ async function togglePub(seq){ const p = findPill(seq) || (ME.pub || {})['pub:' 
   const [ingr, est] = p.ingr ? [p.ingr, 0] : pubIngrGuess(p.seq, p.n); const d = pubDrug(ingr, p);
   /* full: 괄호 속에 성분이 들어 있는 제품이 많다 — 버리지 않는다 */
   ME.taking.push(id); ME.pub[id] = { name: p.n.replace(/\(.*?\)/g, '').replace(/[()]/g, '').trim(), full: p.n, ingr, rx: p.rx, seq, drugId: d?.id || '', ...(est && ingr ? { est: true } : {}) }; markPrnIfNew(id);
-  saveMe(); route(); toast('내 약통에 담았어요');
+  saveMe(); route(); toast('내 약통에 담았어요'); setTimeout(() => askRemind(id), 1800);
   if (!ingr) { pubIngrFill.tried = false; pubIngrFill(); } }
 /* 내 약통 항목 통합 조회(약지도 성분 | 공공 제품) */
 /* 대략 담기: 'cls:bp.arb' 처럼 계열만 아는 항목 */

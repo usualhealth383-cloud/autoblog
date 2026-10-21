@@ -68,7 +68,8 @@ if (pub / 'pills-rx.json').exists() and (pub / 'pills.json').exists() and (pub /
 # ⛔ 약학정보원 자료 끔(2026-10-21, 현욱님 「저작권에 위배되는 사항이 없는지 잘 확인」) — 약학정보원 「법적 책임의 한계」(https://www.health.kr/notice/legal):
 #   「제공하는 모든 정보…의 저작권은 법인에 있습니다. 허락 없이 사용할 경우 법적 제재」, 이용약관(/notice/terms): 「얻은 정보를 가공, 판매하는 행위 등… 상업적으로 사용할 수 없습니다」.
 #   약지도는 유료 앱이라 복약정보(1만 9천 건)·상자 사진(common.health.kr)·그림 표시를 싣지 않는다. 「약학정보원에서 보기」 링크는 남긴다(링크는 복제가 아님).
-#   정식 이용 허락(약학정보원 광고/제휴 문의)을 받으면 True 로 바꾸고 tools/kpic_detail.py·kpic_products.py 로 다시 모은다.
+#   정식 이용 허락(약학정보원 광고/제휴 문의)을 받으면 True. 모으던 스크립트(kpic_*.py — 휴대폰 브라우저 위장·토큰 추출, 약관 32조②11·14호 위험)는 지웠다:
+#   허락을 받으면 약학정보원이 정한 방식(제공 파일·API)으로 받는다. 옛 스크립트는 git 기록(2026-10-21 이전)에만 있다.
 KPIC_USE = False
 if not KPIC_USE:
     data['productImages'] = {k: v for k, v in (data.get('productImages') or {}).items() if 'health.kr' not in str(v.get('img', ''))}

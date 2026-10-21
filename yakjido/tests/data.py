@@ -668,6 +668,20 @@ for _fn in ('suppGoals.json', 'suppStages.json'):
         for _x in (_g.get('picks') or []) + (_g.get('skip') or []):
             if not str(_x['supp']).startswith('nut:') and _x['supp'] not in supid: fails.append(f'{_fn} {_g["id"]}: 없는 영양제 {_x["supp"]}')
             src_ok(f'{_fn} {_g["id"]}', _x.get('src'))
+# 메디나눔 감사(10-22) — 본문 자료(content)에도 「~습니다·~십시오」가 1,456곳 남아 있었다 → 해요체로 바꿈. 「 」 안의 인용(허가 문구)과 출처는 빼고 본다
+_HM_SKIP = {'id', 'en', 'src', 'sources', 'url', 'label', 'k', 'kw', 'go', 'drug', 'supp', 'pick', 'options', 'icon', 'slot', 'flags'}
+def _hm_walk(o, f, key=''):
+    if isinstance(o, dict):
+        for k, v in o.items():
+            if k not in _HM_SKIP: _hm_walk(v, f, k)
+    elif isinstance(o, list):
+        for v in o: _hm_walk(v, f, key)
+    elif isinstance(o, str):
+        _m = re.search(r'[가-힣]{0,8}(습니다|십시오)', re.sub(r'「[^」]*」', '', o))
+        if _m: fails.append(f'{f} {key}: 「~합니다」체가 있습니다 — 해요체로: «{_m.group(0)}»')
+for _f in sorted(C.glob('*.json')):
+    if _f.name.startswith('sources'): continue
+    _hm_walk(json.loads(_f.read_text(encoding='utf-8')), _f.name)
 # 외부 검수 4차 #3(10-21) — 위보호 문구는 한 문장으로 맞췄다(현욱님 ⑪ 「위보호는 좁히기」). 옛 문턱(「소염제 3일 이상」·「속쓰림·위 부담을 덜려면」)이 다시 들어오지 않게
 for _f in sorted(C.glob('*.json')):
     _t = _f.read_text(encoding='utf-8')
