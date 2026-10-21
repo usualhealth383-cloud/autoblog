@@ -692,14 +692,14 @@ def simple_checks(br, url, fails):
     if '와파린' not in pz.evaluate("()=>[...document.querySelectorAll('.ixline,.ix-h b')].map(x=>x.innerText).join(' ')"): fails.append('간단히: 와파린을 담았는데 근육통 화면에 같이 먹기 경고가 없습니다')
     pz.evaluate("()=>{ ME.taking=[]; saveMe(); }")
     # 약 화면 — 먹지 말 때(내 조건은 빠짐없이)·자세히 보기
-    pz.evaluate("()=>{ ME.ulcer=true; saveMe(); }"); go('/drug/ibuprofen')
+    pz.evaluate("()=>{ ME.bleed=true; saveMe(); }"); go('/drug/ibuprofen')
     t = pz.inner_text('#view')
     me_li = pz.inner_text('.sv-no li.me') if pz.query_selector('.sv-no li.me') else ''
-    if '한 번에' not in t or '위궤양' not in me_li: fails.append('간단히 약 화면: 용량 칸이나 내 조건(위궤양) 금기 줄이 없습니다')
+    if '한 번에' not in t or '위궤양' not in me_li: fails.append('간단히 약 화면: 용량 칸이나 내 조건(위장출혈·위궤양) 금기 줄이 없습니다')
     if pz.query_selector('.dtabs'): fails.append('간단히 약 화면에 자세한 탭이 그대로 나옵니다')
     go('/drug/ibuprofen?full=1')
     if not pz.query_selector('.dtabs'): fails.append('간단히 약 화면 「자세히 보기」(?full=1)가 자세한 화면을 열지 않습니다')
-    pz.evaluate("()=>{ ME.ulcer=false; saveMe(); }")
+    pz.evaluate("()=>{ ME.bleed=false; saveMe(); }")
     # (d) 증상 화면 단추와 설정 단추가 ME.view 를 바꾼다
     go('/symptom/headache'); pz.click('.view-seg button:has-text("자세히")'); pz.wait_for_timeout(120)
     if pz.evaluate("()=>ME.view") != 'detail' or not pz.query_selector('.stabs'): fails.append('증상 화면 「자세히」 단추가 화면 보기를 바꾸지 않습니다')
@@ -847,6 +847,51 @@ def r2a2_checks(br, url, fails):
 #   처음 오면 동의 화면 · 필수 둘 전엔 단추가 막힘 · 모두 동의가 둘을 켜고 끔 · 링크로 온 주소는 동의 뒤에 이어짐 · 옛 판이면 다시 물음 ·
 #   설정의 약관·개인정보 칸 · 로그인 문(바깥 요청 0 — 누르기 전엔 서버에 안 닿음) · 1280 px 왼쪽 메뉴·아래 탭 없음·가로 넘침 0
 CONSENT_SEED = "localStorage.setItem('yakjido.hello.v1','1');localStorage.setItem('yakjido.consent.v1',JSON.stringify({v:'2026-10-20',at:'2026-10-14',terms:1,privacy:1}))"
+# 외부 검수 5차(2026-10-22) — 다시 들어오지 않게
+#   #1 위궤양 두 칸: 「앓은 적」은 사기 칸에 상의로 남고 팁의 먹는 법은 빠짐 / 「위장출혈·지금 위궤양」은 빠진 약
+#   #2 처방 조합 카드·처방 칸 설명도 같은 거르개 · #3 고른 어린이 제품은 어른 용량 대신 몸무게 계산
+#   #4 소화효소제 「같은 성분」 없음 · #5 칼슘 ↔ 레보티록신 최소 4시간 · #6 보내기 「자세히」 → 처리방침 보내기 항목
+def r5_checks(br, url, fails):
+    import re
+    zerr = []
+    pz = br.new_page(viewport={'width': 390, 'height': 844}); pz.on('pageerror', lambda e: zerr.append(str(e)))
+    pz.add_init_script("localStorage.setItem('yakjido.hello.v1','1');localStorage.setItem('yakjido.consent.v1',JSON.stringify({v:'2026-10-20',at:'2026-10-14',terms:1,privacy:1}))")
+    pz.goto(url + '#/home'); pz.wait_for_function("()=>typeof CORE!=='undefined' && CORE===2 && DETAIL===2", timeout=20000)
+    def go(h):
+        pz.evaluate("h=>{ location.hash=h; route(); }", h); pz.wait_for_timeout(150)
+    def me(js):
+        pz.evaluate("()=>{ for (const k of Object.keys(FLAG_LABEL)) if (k!=='senior'&&k!=='child') ME[k]=false; ME.age='adult'; ME.easy=false; ME.taking=[]; RF.sid=''; " + js + "; saveMe(); }")
+    def txt(sel='#view'):
+        return pz.evaluate("s=>{let t='';document.querySelectorAll(s).forEach(e=>t+=' '+e.textContent);return t.replace(/\\s+/g,' ')}", sel)
+    me("ME.ulcer=true; ME.view='detail'"); go('/symptom/msk')
+    if re.search(r'이부프로펜 400|400 mg 한 알|근이완제 복합제를 더하', txt('#sp3')): fails.append('5차 #1 위궤양 앓은 적: 팁 탭에 소염제 먹는 법이 남았습니다')
+    if not ('이부프로펜' in txt('#sp1') and '상의' in txt('#sp1')): fails.append('5차 #1 위궤양 앓은 적: 사기 칸에 소염제가 「상의」로 남지 않습니다')
+    me("ME.bleed=true; ME.view='detail'"); go('/symptom/msk')
+    if '빠진 약' not in txt('#sp1'): fails.append('5차 #1 위장출혈·지금 위궤양: 소염제가 「빠진 약」으로 가지 않습니다')
+    me("ME.hf=true; ME.view='detail'"); go('/symptom/msk')
+    if '염증을 꺼요' in txt('#sp4 .rxc') or '어느 것이든 한 가지만' in txt('#sp4 .rx-card'): fails.append('5차 #2 심한 심장병: 진료실 처방 탭이 소염제를 그대로 권합니다')
+    for v in ('simple', 'detail'):
+        me(f"ME.view='{v}'"); go('/drug/acetaminophen?p=' + '어린이 타이레놀 현탁액')
+        t = txt()
+        if '1~2정' in t or '몸무게' not in t: fails.append(f'5차 #3 어린이 현탁액({v})에 어른 정제 용량이 나옵니다')
+    go('/search?q=타이레놀')
+    h = pz.evaluate("()=>[...document.querySelectorAll('#view [onclick]')].map(a=>a.getAttribute('onclick')).filter(x=>/\\/drug\\/acetaminophen/.test(x))")
+    if not h or any('p=' not in x for x in h): fails.append(f'5차 #3 검색 제품 줄이 고른 제품을 약 화면에 넘기지 않습니다: {h[:2]}')
+    me("ME.view='simple'"); go('/symptom/dyspepsia')
+    if re.search('같은 성분[^.]{0,30}베아제', txt()): fails.append('5차 #4 소화불량 간단히 보기에 「같은 성분 베아제정」이 남았습니다')
+    go('/show/dyspepsia')
+    if re.search('같은 성분[^:]{0,30}:[^.]{0,30}베아제', txt()): fails.append('5차 #4 약국 카드에 「같은 성분 … 베아제정」이 남았습니다')
+    me("ME.view='detail'"); go('/supp/calcium'); pz.evaluate("()=>document.querySelectorAll('details').forEach(d=>d.open=true)")
+    t = txt()
+    if '최소 4시간' not in t or '2~4시간' in t: fails.append('5차 #5 칼슘 화면에 레보티록신 「최소 4시간」이 없거나 「2~4시간」이 남았습니다')
+    if 'privacy.html#share' not in pz.content() and "방침주소())}#share" not in open(__file__.replace('tests/run.py', 'app-shell.html'), encoding='utf-8').read():
+        fails.append('5차 #6 보내기 동의 「자세히」가 처리방침 보내기 항목으로 가지 않습니다')
+    if 'id="share"' not in open(__file__.replace('tests/run.py', 'privacy.html'), encoding='utf-8').read(): fails.append('5차 #6 처리방침에 보내기 항목(id=share)이 없습니다')
+    go('/show/msk')
+    if re.search('니다[.]', txt()): fails.append('5차 #7 약국 카드에 합니다체가 남았습니다')
+    if zerr: fails.append(f'5차 화면 JS 오류: {zerr[:2]}')
+    pz.close()
+
 def consent_checks(br, url, fails):
     def page(w=390, init=''):
         ctx = br.new_context(viewport={'width': w, 'height': 900}); pg = ctx.new_page(); errs = []; ext = []
@@ -1101,7 +1146,7 @@ def main():
           const off=ME.bph===false && !document.querySelector('.cond-on');
           return {tabs, on, desc, stay, off, chips:document.querySelectorAll('.chip-m').length};}""")
         if _mt['tabs'] != ['내 몸', '내 약통', '설정']: fails.append(f'내 정보 탭이 셋이 아닙니다: {_mt["tabs"]}')   # 3-20 이름 하나로 — 「먹는 약」 → 「내 약통」
-        if _mt['chips'] != 15 or not _mt['on'] or not _mt['off']: fails.append(f'건강 상태 단추가 켜지고 꺼지지 않습니다: {_mt}')
+        if _mt['chips'] != 16 or not _mt['on'] or not _mt['off']: fails.append(f'건강 상태 단추가 켜지고 꺼지지 않습니다: {_mt}')
         if '소변이 막힐 수' not in _mt['desc']: fails.append('건강 상태를 눌러도 「켜 둔 것」 설명이 안 붙습니다')
         if not _mt['stay']: fails.append('건강 상태를 누르면 화면이 맨 위로 튑니다')
         pg.goto(url + '#/me?t=meds'); ready(); pg.wait_for_timeout(300)
@@ -1529,6 +1574,7 @@ def main():
         r2_checks(br, url, fails)
         r2a2_checks(br, url, fails)
         consent_checks(br, url, fails)
+        r5_checks(br, url, fails)
         # 6b-2. 성분표에 없던 공공 제품 — 클로닉신(먹는 소염제 26개 제품)·돔페리돈이 약통에서 실제로 걸려야 한다(2026-09-23)
         _pb = {'노리스정 + 와파린': ({'taking':['pub:1','cls:blood.warf'],'pub':{'pub:1':{'name':'노리스정','full':'노리스정(클로닉신리시네이트)','ingr':'클로닉신리시네이트','rx':0,'seq':'1','drugId':''}}}, 'warfarin-nsaid'),
                '노리스정 + 이부프로펜': ({'taking':['pub:1','ibuprofen'],'pub':{'pub:1':{'name':'노리스정','full':'노리스정','ingr':'클로닉신리시네이트','rx':0,'seq':'1','drugId':''}}}, 'nsaid-dup'),
