@@ -1,0 +1,43 @@
+name: yakjido-labels
+
+# 약지도 처방약 길잡이 — 국내 대표 제품의 식약처 허가 상세(효능·용법·사용상의 주의사항)를 받아 yakjido/tools/rxlabels.json 으로 올린다(2026-10-22).
+# 길잡이 글을 식약처 원문과 대조하는 용도이고 앱에는 싣지 않는다. 키는 Secrets 의 DATA_GO_KR_KEY(로그·파일에 남지 않음).
+# 돌리는 법: yakjido/tools/labels-refresh.txt 를 바꿔 작업 가지에 올린다.
+on:
+  workflow_dispatch: {}
+  push:
+    branches: [claude/youthful-einstein-79py77]
+    paths:
+      - 'yakjido/tools/labels-refresh.txt'
+
+concurrency:
+  group: yakjido-labels
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: 처방약 허가 상세 받기
+        env:
+          DATA_GO_KR_KEY: ${{ secrets.DATA_GO_KR_KEY }}
+        run: |
+          if [ -z "$DATA_GO_KR_KEY" ]; then echo "::error::Secrets 에 DATA_GO_KR_KEY 가 없습니다"; exit 1; fi
+          python3 yakjido/tools/fetch_mfds.py --only labels
+      - name: 작업 가지에 올리기
+        run: |
+          git config user.name "yakjido-data-bot"
+          git config user.email "yakjido-data-bot@users.noreply.github.com"
+          git add yakjido/tools/rxlabels.json
+          if git diff --cached --quiet; then echo "바뀐 것 없음"; exit 0; fi
+          git commit -m "약지도 — 처방약 길잡이 대조용 식약처 허가 상세(OpenAPI)"
+          ok=0; for i in 1 2 3; do if git pull --rebase origin "${GITHUB_REF_NAME}" && git push origin "HEAD:${GITHUB_REF_NAME}"; then ok=1; break; fi; sleep 5; done
+          [ "$ok" = 1 ] || { echo "::error::작업 가지에 올리지 못했습니다"; exit 1; }
