@@ -4068,16 +4068,6 @@ function prodNames(d, max = 4, kidSlot){
 }
 /* 제형 그림 — 식약처는 알약 사진만 준다(낱알 5,660건 100%, 연고·파스류는 2%).
    사진이 없는 자리는 「어떻게 생긴 약인지」를 그림으로 알려 준다. */
-function formIcon(name){
-  const t = String(name || '');
-  if (/연고|크림|겔(?!포스)|로션/.test(t)) return ['f_tube', '바르는 약'];
-  if (/파스|플라스타|카타플라스마|첩부|패치|패취|플라스터/.test(t)) return ['f_patch', '붙이는 약'];
-  if (/스프레이|분무|나잘|비강/.test(t)) return ['f_spray', '뿌리는 약'];
-  if (/점안|안약|안연고/.test(t)) return ['f_drop', '눈에 넣는 약'];
-  if (/좌약|좌제|질정/.test(t)) return ['f_sup', '넣는 약'];
-  if (/시럽|현탁|내복액|액$|드링크|과립|산$/.test(t)) return ['f_bottle', '마시는 약'];
-  return ['pill', '먹는 약'];
-}
 /* 펼친 약의 대표 제품 사진들 — 이름만으로는 진열대에서 못 찾으신다 */
 function prodShots(d){
   const seen = new Set(), out = [];
@@ -4128,7 +4118,6 @@ function maxNote(d){
   });
   return keep.length ? '하루 최대 ' + keep.join(' · ') : '';
 }
-const prodChips = d => { const n = prodNames(d); return n.length > 1 ? `<div class="prodchips"><span class="pl">약국에서 찾으실 이름</span>${n.map(x => `<span class="pc">${esc(x)}</span>`).join('')}</div>` : ''; };
 const ingrName = d => String(d?.name || '').replace(/\s*\(.*$/, '').trim();
 const plainTxt = t => String(t || '').replace(/\*\*(.+?)\*\*/g, '$1').replace(/\[\[\w+:[\w-]+\|([^\]]+)\]\]/g, '$1');
 /* 말줄임은 단어 중간에서 자르지 않는다 — 어르신께는 잘린 글자가 읽기 어렵다 */
@@ -4412,7 +4401,7 @@ function kidLine(){
   const line = (r, nm, tail) => !r ? '' : ok(r) ? `${nm} 시럽 <b>${ml(r)}</b>(${tail})` : `${nm} 시럽은 <b>생후 ${r.D.minMonths}개월부터</b> — 그 전에는 진료에서 확인`;
   const over = ok(i) ? ibuOver(i, m) : null;
   const warn = [m == null && w < 6 ? '생후 3개월 안팎일 수 있어요 — 생년월일을 넣어 주세요. 생후 3개월 미만 아기의 열은 해열제보다 지금 응급실이 먼저예요.' : '',
-    over ? `이부프로펜 계산이 설명서 표(${over[2]} 1회 ${over[3]}~${over[4]} mL · 하루 ${over[5]} mL)보다 많아요 — 먹이기 전에 약사·의사와 확인하세요.` : ''].filter(Boolean);
+    over ? `이부프로펜 계산이 설명서 표(${over[2]} 1회 ${over[3]}~${over[4]} mL · 하루 ${over[5]} mL)보다 많아요 — 먹이기 전에 약사·의사와 확인하세요.` : i?.ageCap ? `이부프로펜은 몸무게 셈이 설명서 나이 표(${i.ageCap[2]})보다 많아 나이 표에 맞췄어요.` : ''].filter(Boolean);
   return `${warn.map(t => `<div class="kid-over kid-young" role="note">${I.alert}<span>${t}</span></div>`).join('')}<div class="kid-line">${I.user}<span><b>${esc(ME.child?.name || '아이')} ${w} kg</b> 기준 — ${[line(a, '아세트아미노펜', `${a.D.gapText} 간격, 하루 ${a.D.maxPerDay}회`), line(i, '이부프로펜', i?.D.gapText)].filter(Boolean).join(' · ')}. 어른 정제·복합감기약은 아이에게 쓰지 마세요.${noB} <a class="link" href="#/kids">자세히 ›</a></span></div>`;
 }
 
@@ -4435,14 +4424,6 @@ const faqList = items => (items || []).map(f => `<details class="fold qa"><summa
 /* 「신호 8가지」는 숫자만 크고 아무것도 알려 주지 않는다(현욱님 지적 2026-09-21).
    급이 다른 둘을 한 덩어리로 세지 말고, 「지금 119」와 「진료」를 갈라 세고
    가장 급한 신호 한 줄을 미리 보여 준다. */
-function trafficLight(c){
-  if (!c) return '';
-  const er = (c.er || []), cl = (c.clinic || []);
-  if (!er.length && !cl.length) return '';
-  const cnt = [er.length ? `지금 119·응급실 ${er.length}가지` : '', cl.length ? `진료 받으실 것 ${cl.length}가지` : ''].filter(Boolean).join(' · ');
-  const top = (er[0] || cl[0] || '').replace(/\*\*/g, '');
-  return `<button class="tl1" onclick="openCare()">${I.alert}<span><b>이럴 땐 병원으로</b><small>${esc(cnt)}</small>${top ? `<em>${esc(short(top, 40))}</em>` : ''}</span>${I.chev}</button>`;
-}
 const acc = (title, body, sub, open) => body ? `<details class="acc" ${open ? 'open' : ''}><summary>${esc(title)}${sub ? `<small>${esc(sub)}</small>` : ''}${I.chev}</summary><div class="bd">${body}</div></details>` : '';
 /* ───────── 간단히 보기(10-14 현욱님) ─────────
    「어르신들은 클로르족사존이 뭔지 모른다 — 소염제·근이완제·타이레놀·위보호제 사드세요, 약 사진이랑」.
@@ -4684,8 +4665,13 @@ function kidDose(k, w, m){
      1회 = 몸무게 × mg/kg 범위(어른 1회 상한까지), 하루 = 몸무게 × 하루 mg/kg(어른 하루 상한까지).
      「하루 몇 번」을 따로 셈하지 않는다 — 25~30 kg 아이에게 「하루 1번」이 나오던 자리다. */
   const capDay = D.capDay;
-  const rawDay = w * perKgDay; const day = Math.round(Math.min(rawDay, capDay));
-  return { D, lo, hi, day, perKgDay, capDay,
+  const rawDay = w * perKgDay; let day = Math.round(Math.min(rawDay, capDay));
+  /* 공통 숫자표(yozm-health docs/shared/공통숫자_해열수액.md · 현욱님 10-21 결정 1) — 이부프로펜은 몸무게 셈과 설명서 나이 표 가운데 «작은 쪽».
+     10-01 「계산은 그대로 + 표보다 많으면 경고」를 이것으로 바꿈(우리집 소아과와 같은 mL) */
+  let L = lo, H = hi, ageCap = null;
+  if (k === 'ibu' && m != null) { const row = ibuRow(m), c = D.conc[0].mgPerMl;
+    if (row && (hi > row[4] * c + .5 || day > row[5] * c + .5)) { ageCap = row; H = Math.min(hi, Math.round(row[4] * c)); L = Math.min(lo, H); day = Math.min(day, Math.round(row[5] * c)); } }
+  return { D, lo: L, hi: H, day, perKgDay, capDay, ageCap,
            capped: rawHi > D.capDose + .5 || rawDay > capDay + .5,
            rawHi: Math.round(rawHi), rawDay: Math.round(rawDay) };
 }
@@ -4729,7 +4715,8 @@ function vKids(){
         /* 현욱님 2026-10-01: 계산은 그대로, 카드 맨 아래에 「최근 개정: ~」으로 짧게 */
         rev = `<p class="kid-rev">최근 개정(2026년 3월 약병 설명서): ${row[2]} 1회 ${row[3]}~${row[4]} mL · 하루 ${row[5]} mL까지${over ? ' — 위 계산이 이보다 많으면 소아과·약국과 상의' : ''}</p>`;
         /* Z4 #2 — 계산(의사 결정: 몸무게 기준 그대로)이 그 나이 설명서 값보다 많으면 결과 바로 아래 눈에 띄게 한 줄 */
-        if (over) overLine = `<div class="kid-over">${I.alert}<span>설명서 표(${row[2]} 1회 ${row[3]}~${row[4]} mL · 하루 ${row[5]} mL)보다 많아요 — 먹이기 전에 약사·의사와 확인하세요.</span></div>`; }
+        if (over) overLine = `<div class="kid-over">${I.alert}<span>설명서 표(${row[2]} 1회 ${row[3]}~${row[4]} mL · 하루 ${row[5]} mL)보다 많아요 — 먹이기 전에 약사·의사와 확인하세요.</span></div>`;
+        else if (r.ageCap) overLine = `<div class="kid-line">${I.info}<span>몸무게로 셈한 양이 설명서 나이 표(${row[2]})보다 많아 <b>나이 표에 맞췄어요</b>.</span></div>`; }
       else if (m < 12) rev = `<p class="kid-rev">최근 개정(2026년 3월 약병 설명서): 용량표는 만 1세부터 — 그보다 어린 아기는 진료에서 확인</p>`; }
     /* Z4 #2 — 생년월일이 없으면 나이를 몰라 비교할 수 없다 — 설명서 표 전체를 펼쳐 둔다 */
     if (k === 'ibu' && m == null && (K.ibuLabelTable || []).length) rev = `<div class="kid-rev"><p><b>나이별 설명서 표</b>(2026년 3월 약병 설명서) — 아래 계산이 아이 나이 칸보다 많으면 먹이기 전에 약사·의사와 확인하세요.</p><ul class="kid-tbl">${K.ibuLabelTable.map(r => `<li><b>${esc(r[2])}</b> 1회 ${r[3]}~${r[4]} mL · 하루 ${r[5]} mL</li>`).join('')}</ul></div>`;
