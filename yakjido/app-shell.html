@@ -8209,7 +8209,8 @@ function vMe(_, q){
   ${ext('계정칸')}
   ${ext('약관칸')}
   <section class="sec card"><h2>이 앱에 대해</h2><p class="small" style="margin-top:6px">${esc(D.meta?.about || '')}</p><p class="small muted" style="margin-top:10px">${savedWhere()}</p><div class="lk48"><a class="link" href="${esc(방침주소())}"${NATIVE ? ' target="_blank" rel="noopener"' : ''}>개인정보처리방침</a>${D.meta?.contact?.email ? `<a class="link" href="mailto:${esc(D.meta.contact.email)}">문의 · ${esc(D.meta.contact.email)}</a>${D.meta.contact.operator ? `<span class="small muted">운영 ${esc(D.meta.contact.operator)}</span>` : ''}` : ''}</div></section>
-  <p class="small muted" style="margin-top:16px;text-align:center">약지도 v${esc(D.meta?.version || '')} · 빌드 ${BUILD}<br>${(() => { const P = D.public || {}, ds = ['easy_source', 'pills_source', 'permits_source'].map(k => `<span style="white-space:nowrap">${esc(String(P[k] || '').match(/\d{4}-\d\d-\d\d|\d{8}/)?.[0] || '확인일 기록 필요')}</span>`);
+  <p class="small" style="margin-top:20px;text-align:center"><b>메디나눔</b> · 응급 판단 기준을 응급실 의사가 함께 검토한, 우리 가족 건강 앱</p>
+  <p class="small muted" style="margin-top:6px;text-align:center">약지도 v${esc(D.meta?.version || '')} · 빌드 ${BUILD}<br>${(() => { const P = D.public || {}, ds = ['easy_source', 'pills_source', 'permits_source'].map(k => `<span style="white-space:nowrap">${esc(String(P[k] || '').match(/\d{4}-\d\d-\d\d|\d{8}/)?.[0] || '확인일 기록 필요')}</span>`);
     /* 외부 검수 2차 #56 — 날짜 꼴이 바뀌어(2026-10-13) 빈칸으로 나오던 것. 제품 이름 자료를 받은 날과 약 설명 검수 달을 따로(빌드 날짜로 대신하지 않음) */
     return `식약처 제품 이름 자료 받은 날 — ${new Set(ds).size === 1 ? ds[0] + '(e약은요·낱알식별·허가 정보)' : `e약은요 ${ds[0]} · 낱알식별 ${ds[1]} · 허가 정보 ${ds[2]}`}<br>약 설명 ${esc(D.meta?.reviewLabel || '의료진 검수')} ${esc(D.meta?.reviewed || '확인일 기록 필요')}`; })()}</p>`;
   return `${topBar()}
