@@ -165,7 +165,7 @@ for k, v in data.items():
 # meta 의 「이 앱에 대해(about)·이렇게 만들었어요(method)」는 설정 화면(본문을 받은 뒤에만 그려짐)에서만 쓴다 — 본문에는 meta 전체를 싣고
 # (mergeCore 가 D.meta 를 본문 것으로 바꾼다) 첫 화면에서는 뺀다(2026-10-14 외부 검수 2차 반영으로 첫 화면 예산, 압축 약 0.9 KB)
 if isinstance(inline.get('meta'), dict):
-    core['meta'] = inline['meta']; inline['meta'] = {k: v for k, v in inline['meta'].items() if k not in ('about', 'method')}
+    core['meta'] = inline['meta']; inline['meta'] = {k: v for k, v in inline['meta'].items() if k not in ('about', 'method', 'oss')}
 
 jc = json.dumps(core, ensure_ascii=False, separators=(',', ':'))
 j = json.dumps(inline, ensure_ascii=False, separators=(',', ':')).replace('</', '<\\/')

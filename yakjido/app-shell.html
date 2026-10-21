@@ -3408,11 +3408,11 @@ function storeHide(){ STORE_HIDE = true; try { sessionStorage.setItem('yakjido.s
 const regionGrid = () => { const S = D.symptoms || [];
   return `<div class="rg" role="group" aria-label="어디가 불편하세요">${Object.keys(GROUP_CLS).slice(0, 8).map(g => { const L = S.filter(s => s.group === g); return L.length ? `<button class="rg-t ${GROUP_CLS[g]}" onclick="homeTab('g:${g}');jumpTo('hlist')"><span class="ic">${sicon(L[0])}</span><b>${esc(g)}</b><small>${L.slice(0, 2).map(s => esc(s.name.split(/ \(|·/)[0])).join(' · ')}</small></button>` : ''; }).join('')}</div>`; };
 /* 현욱님 10-22(메디나눔 감사 ④-1) — 홈 맨 위에 지금 되는 두 가지를 크게: 약 찾기(이름·모양) · 오늘 약·알림.
-   사진으로 알아보기는 판독 서버가 꺼져 있어 앞세우지 않는다(되는 척 금지) */
+   사진은 휴대폰 안에서 글자를 읽는 방식(tesseract.js)으로 된다 — 사진 화면에서 이름·모양 찾기로도 이어진다(서버 판독은 꺼져 있음) */
 function homeQuick(n){
   const sched = n && takingItems().some(d => schedOf(d.id, d).length);
   const cell = (ic, t, sub, to) => `<button type="button" class="hq-c" onclick="go('${to}')"><span class="ic">${ic}</span><b>${t}</b><small>${sub}</small></button>`;
-  return `<div class="hq" aria-label="바로 쓰기">${cell(I.search, '약 찾기', '이름이나 알약 색·모양으로', '/pill')}${cell(I.clock, sched ? '오늘 약 · 알림' : '약 알림 받기', sched ? '드신 것 표시 · 시각 바꾸기' : n ? `내 약통 ${n}가지 — 드실 시각 정하기` : '약을 담으면 제때 알려 드려요', n ? '/schedule' : '/me?t=meds')}</div>`;
+  return `<div class="hq" aria-label="바로 쓰기">${cell(I.search, '약 찾기', '사진·이름·알약 모양으로', '/photo')}${cell(I.clock, sched ? '오늘 약 · 알림' : '약 알림 받기', sched ? '드신 것 표시 · 시각 바꾸기' : n ? `내 약통 ${n}가지 — 드실 시각 정하기` : '약을 담으면 제때 알려 드려요', n ? '/schedule' : '/me?t=meds')}</div>`;
 }
 function vHome(){
   const hour = new Date().getHours();
@@ -8229,6 +8229,9 @@ function vMe(_, q){
   <nav class="tabs metabs" role="tablist" aria-label="내 정보 칸">${TABS.map(([k, n, ic, c]) => `<button class="tab ${tab === k ? 'on' : ''}" role="tab" aria-selected="${tab === k}" data-k="${k}" onclick="go('/me?t=${k}')">${ic}${n}<span class="n">${c}</span></button>`).join('')}</nav>
   ${body}`;
 }
+/* 오픈소스 고지(2026-10-22, 메디나눔 감사 ② — ClinicScore docOss 본보기). 실제로 불러 쓰는 것만: 글꼴 둘 · 계정 동기화 · 휴대폰 안 글자 읽기 · Android 앱 껍데기.
+   전문은 원문 주소에 있다(사용 허가 이름과 주소를 밝힌다) */
+const ossList = () => `<p class="why">약지도는 아래 오픈소스 글꼴과 부품을 써요. 각 사용 허가의 전문은 원문 주소에 있어요.</p><ul class="plain">${(D.meta?.oss || []).map(x => `<li><b>${esc(x[0])}</b> — ${esc(x[4])} · © ${esc(x[1])} · <a class="link" href="${x[3]}" target="_blank" rel="noopener">${esc(x[2])}</a></li>`).join('')}</ul><p class="small muted" style="margin-top:6px">약 정보의 출처(식약처 공공데이터·허가사항·논문)는 화면마다 「근거」에 있어요.</p>`;
 function vAbout(){
   const S = D.sources || {};
   return `${topBar({ back:'내 정보' })}<h1>근거와 검수 기준</h1>
@@ -8257,6 +8260,7 @@ function vAbout(){
       ${keys.map(t => `<details class="acc"><summary>${esc(t)}<small>${g.get(t).length}건</small>${I.chev}</summary><div class="bd"><div class="rows">${g.get(t).map(row).join('')}</div></div></details>`).join('')}
     </section>`;
   })()}
+  ${fold(`${I.book}오픈소스 고지`, ossList(), { cls:'oss-fold' })}
   ${disclaimer()}`;
 }
 

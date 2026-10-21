@@ -1750,8 +1750,8 @@ background-repeat:no-repeat;background-position:right 9px center;background-size
 <script>
 window.__YAKJIDO_OK__ = true;
 const D = JSON.parse(document.getElementById('data').textContent || '{}');
-const BUILD = '2026-10-22 03:01';
-const DATAV = 'c7ea0829f3'.indexOf('__') === 0 ? BUILD : 'c7ea0829f3';
+const BUILD = '2026-10-22 03:03';
+const DATAV = '0fedaefe00'.indexOf('__') === 0 ? BUILD : '0fedaefe00';
 const BRANDMARK = (typeof window !== 'undefined' && window.__BRANDMARK__) || 'icon-192.png';
 let CORE = 0, CORE_P = null;
 function mergeCore(c){
@@ -2941,7 +2941,7 @@ return `<div class="rg" role="group" aria-label="어디가 불편하세요">${Ob
 function homeQuick(n){
 const sched = n && takingItems().some(d => schedOf(d.id, d).length);
 const cell = (ic, t, sub, to) => `<button type="button" class="hq-c" onclick="go('${to}')"><span class="ic">${ic}</span><b>${t}</b><small>${sub}</small></button>`;
-return `<div class="hq" aria-label="바로 쓰기">${cell(I.search, '약 찾기', '이름이나 알약 색·모양으로', '/pill')}${cell(I.clock, sched ? '오늘 약 · 알림' : '약 알림 받기', sched ? '드신 것 표시 · 시각 바꾸기' : n ? `내 약통 ${n}가지 — 드실 시각 정하기` : '약을 담으면 제때 알려 드려요', n ? '/schedule' : '/me?t=meds')}</div>`;
+return `<div class="hq" aria-label="바로 쓰기">${cell(I.search, '약 찾기', '사진·이름·알약 모양으로', '/photo')}${cell(I.clock, sched ? '오늘 약 · 알림' : '약 알림 받기', sched ? '드신 것 표시 · 시각 바꾸기' : n ? `내 약통 ${n}가지 — 드실 시각 정하기` : '약을 담으면 제때 알려 드려요', n ? '/schedule' : '/me?t=meds')}</div>`;
 }
 function vHome(){
 const hour = new Date().getHours();
@@ -6993,6 +6993,7 @@ return `${topBar()}
 <nav class="tabs metabs" role="tablist" aria-label="내 정보 칸">${TABS.map(([k, n, ic, c]) => `<button class="tab ${tab === k ? 'on' : ''}" role="tab" aria-selected="${tab === k}" data-k="${k}" onclick="go('/me?t=${k}')">${ic}${n}<span class="n">${c}</span></button>`).join('')}</nav>
 ${body}`;
 }
+const ossList = () => `<p class="why">약지도는 아래 오픈소스 글꼴과 부품을 써요. 각 사용 허가의 전문은 원문 주소에 있어요.</p><ul class="plain">${(D.meta?.oss || []).map(x => `<li><b>${esc(x[0])}</b> — ${esc(x[4])} · © ${esc(x[1])} · <a class="link" href="${x[3]}" target="_blank" rel="noopener">${esc(x[2])}</a></li>`).join('')}</ul><p class="small muted" style="margin-top:6px">약 정보의 출처(식약처 공공데이터·허가사항·논문)는 화면마다 「근거」에 있어요.</p>`;
 function vAbout(){
 const S = D.sources || {};
 return `${topBar({ back:'내 정보' })}<h1>근거와 검수 기준</h1>
@@ -7018,6 +7019,7 @@ return `<section class="sec"><h2>참고 문헌·지침 <small>${Object.keys(S).l
 ${keys.map(t => `<details class="acc"><summary>${esc(t)}<small>${g.get(t).length}건</small>${I.chev}</summary><div class="bd"><div class="rows">${g.get(t).map(row).join('')}</div></div></details>`).join('')}
 </section>`;
 })()}
+${fold(`${I.book}오픈소스 고지`, ossList(), { cls:'oss-fold' })}
 ${disclaimer()}`;
 }
 
