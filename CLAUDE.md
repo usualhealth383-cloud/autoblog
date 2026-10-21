@@ -20,6 +20,8 @@
 - **공공데이터(data.go.kr):** 현욱님 계정 키 하나를 저장소 Secrets `DATA_GO_KR_KEY` 로만 쓴다(캡처에 보여도 옮겨 적지 않음). 받기는 `yakjido/tools/fetch_mfds.py` · 작업 yakjido-data(`tools/data-refresh.txt` 를 바꿔 올리면 돈다). 승인된 것: 낱알식별·의약품 허가·의약외품 허가·e약은요·응급의료기관·병원정보(심평원)·식품영양성분·국가표준식품성분·기상청 단기예보·에어코리아 등. **필요한 자료가 있으면 언제든 현욱님께 말한다 — 신청해 주신다**(2026-10-14 현욱님).
 - ⛔ 비밀 키(service_role·sb_secret·DB 비밀번호)는 어디에도 쓰지 않는다. publishable 키는 메디나눔 공용 키 하나만(data.py 가 막음).
 - 메디나눔 공용 서버(gildongmu)는 네 앱과 같이 쓴다 — SQL 은 `yakjido/server/supabase/medinanum/`, 앱 목록 다섯 개 유지. 준비 안 된 서버 기능은 `meta` 스위치를 끈 채 넣는다.
+- **현욱님께 검수 요청·보고문은 md 파일로 보내지 않는다**(2026-10-21 「md 파일로 보내지마 안열리더라」) — GPT 검수 요청 등은 답장 안에 복사·붙여넣기 할 수 있는 글(코드 블록)로 바로 준다. 저장소 기록용 md 는 따로 남겨도 된다.
+- **저작권(2026-10-21):** 약학정보원(health.kr) 복약정보·상자 사진·그림 표시는 싣지 않는다(약학정보원 「모든 정보의 저작권은 법인」, 약관 「상업적 사용 금지」) — `tools/build.py` 의 `KPIC_USE = False`. 링크만 남긴다. 사진·허가 문구는 식약처 공공데이터(낱알식별·e약은요 — 공공데이터포털 「이용허락범위 제한 없음」)만.
 - 기존 완성 아티팩트(https://claude.ai/artifact/9hsGKmBcZHpL16LtNoxCnn)는 `yakjido/tools/mkart.py` 로 다시 짓고 같은 주소에 올린다.
 
 ## 자동 블로그
