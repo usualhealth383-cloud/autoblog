@@ -688,6 +688,34 @@ for _f in sorted(C.glob('*.json')):
     _t = _f.read_text(encoding='utf-8')
     for _w in ('3일 이상 쓰거나', '3일 이상 먹거나', '속쓰림·위 부담을 덜려면 약국 파모티딘'):
         if _w in _t: fails.append(f'{_f.name}: 옛 위보호 문구 「{_w}」 — 「65세 이상이시거나 피 묽게 하는 약·스테로이드를 함께 드시면 …」 한 문장으로')
+# 처방약 길잡이(10-22 현욱님 ③ 「출시 전에 혈압·당뇨·고지혈·수면·갑상선」) — 출처 고리·글 규칙·약 종류 고리
+_RX = json.load(open(C.parent / 'rxguide.json', encoding='utf-8'))
+_qsub = {x['id'] for g in json.load(open(C / 'ingredients.json', encoding='utf-8'))['quick'] for x in g['subs']}
+_qgrp = {g['id'] for g in json.load(open(C / 'ingredients.json', encoding='utf-8'))['quick']}
+for _id in _RX['order']:
+    _g = _RX['guides'].get(_id)
+    if not _g: fails.append(f'rxguide: order 의 {_id} 가 guides 에 없습니다'); continue
+    if _id not in _qgrp: fails.append(f'rxguide {_id}: 약 종류(ingredients.quick)에 없는 묶음')
+    for _f in ('title', 'lead', 'do', 'miss', 'er', 'src'):
+        if not _g.get(_f): fails.append(f'rxguide {_id}: {_f} 칸이 비었습니다')
+    for _k in _g.get('kinds') or []:
+        if _k['k'] not in _qsub: fails.append(f'rxguide {_id}: 없는 약 종류 {_k["k"]}')
+    def _rxw(o, path):
+        if isinstance(o, dict):
+            for k, v in o.items():
+                if k == 'src': src_ok(f'rxguide {path}', v)
+                elif k not in ('k', 'go'): _rxw(v, path + '.' + k)
+        elif isinstance(o, list):
+            for i, v in enumerate(o): _rxw(v, f'{path}[{i}]')
+        elif isinstance(o, str):
+            _t = re.sub(r'「[^」]*」', '', o)
+            if re.search('[«»『』]', o): fails.append(f'rxguide {path}: « » 『 』 금지')
+            if '무료' in o: fails.append(f'rxguide {path}: 「무료」 금지')
+            if re.search(r'(습니다|십시오|[가-힣]ㅂ니다)', _t) or next((m for m in re.finditer(r'([가-힣])니다', _t) if (ord(m.group(1)) - 0xAC00) % 28 == 17), None): fails.append(f'rxguide {path}: 「~합니다」체 — 해요체로')
+            _ab = re.search(r'(?<![A-Za-z])[A-Z]{2,}(?![A-Za-z])', _t)
+            if _ab: fails.append(f'rxguide {path}: 영어 약자 {_ab.group(0)}')
+            if re.search(r'\d(mg|g|mL|mmHg|kg)\b', o): fails.append(f'rxguide {path}: 숫자와 단위는 띄어 쓰기')
+    _rxw(_g, _id)
 print(f'증상 {len(S)} · 약 {len(D)} · 계열 {len(K)} · 영양제 {len(SUP)} · 팁 {len(T)} · 그런줄 {len(_MY)} · 규칙 {len(IX["rules"])} · 출처 {len(SRC)}')
 if fails:
     print('실패', len(fails)); [print('  ✗', f) for f in fails]; sys.exit(1)

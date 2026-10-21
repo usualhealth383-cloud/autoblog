@@ -167,6 +167,9 @@ for k, v in data.items():
 if isinstance(inline.get('meta'), dict):
     core['meta'] = inline['meta']; inline['meta'] = {k: v for k, v in inline['meta'].items() if k not in ('about', 'method', 'oss')}
 
+# 처방약 길잡이(혈압·당뇨·콜레스테롤·갑상선·잠과 마음, 10-22) — #/rx 를 열 때만 받는 따로 파일(첫 화면·본문 예산 밖)
+_rx = json.loads((ROOT / 'rxguide.json').read_text(encoding='utf-8')); _rx.pop('_about', None)
+(ROOT.parent / 'docs' / 'yakjido' / 'data' / 'rxguide.json').write_text(json.dumps(_rx, ensure_ascii=False, separators=(',', ':')), encoding='utf-8')
 jc = json.dumps(core, ensure_ascii=False, separators=(',', ':'))
 j = json.dumps(inline, ensure_ascii=False, separators=(',', ':')).replace('</', '<\\/')
 # 10-21 검수자가 판을 구분하도록 한국 시각 날짜·시:분(컨테이너는 UTC 라 하루 늦게 찍혔다)

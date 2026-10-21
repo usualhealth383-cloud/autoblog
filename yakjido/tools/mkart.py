@@ -61,6 +61,7 @@ inject = ('<script>const ART_DATA = ' + json.dumps(art) + ';\n'
           "window.__DETAIL__ = " + (ROOT/'data/detail.json').read_text(encoding='utf-8') + ';\n'
           "window.__PILLS__ = " + (ROOT/'data/pills.json').read_text(encoding='utf-8') + ';\n'
           "window.__EASY__ = "  + (ROOT/'data/easy-index.json').read_text(encoding='utf-8') + ';\n'
+          + ("window.__RXG__ = " + (ROOT/'data/rxguide.json').read_text(encoding='utf-8') + ';\n' if (ROOT/'data/rxguide.json').exists() else '')
           + ("window.__RXN__ = " + (ROOT/'data/names-rx.json').read_text(encoding='utf-8') + ';\n' if (ROOT/'data/names-rx.json').exists() else '')
           + "window.__LEX__ = {ing:" + (ROOT/'data/lexicon.json').read_text(encoding='utf-8')
           + ",brand:" + (ROOT/'data/brands.json').read_text(encoding='utf-8')

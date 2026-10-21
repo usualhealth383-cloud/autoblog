@@ -439,7 +439,7 @@ def z7_checks(br, url, fails):
       for (const sid of ['cold','fever','headache','allergy']) if (ids(sid).some(isNsaid)) bad.push('2개월 '+sid+': 소염진통제를 권함');
       kid(5,7); for (const sid of ['cold','fever','headache','msk']) if (ids(sid).some(isNsaid)) bad.push('5개월 '+sid+': 소염진통제(이부프로펜 등)를 권함');
       location.hash='#/symptom/fever'; route(); const k5=(document.querySelector('.answer .kid-line')||{}).innerText||''; if (!/이부프로펜 시럽은 생후 6개월부터/.test(k5)) bad.push('5개월: kg 줄에 이부프로펜 6개월 안내 없음 — '+k5.slice(0,60));
-      kid(48,16); location.hash='#/symptom/fever'; route(); if (!/설명서 표/.test([...document.querySelectorAll('.answer .kid-over')].map(e=>e.innerText).join(''))) bad.push('4세 16 kg: 이부프로펜 설명서 표 넘음 경고 없음');
+      kid(48,16); location.hash='#/symptom/fever'; route(); { const t=[...document.querySelectorAll('.answer .kid-over, .answer .kid-line')].map(e=>e.innerText).join(' '); if (!/나이 표에 맞췄어요/.test(t) || !/이부프로펜 시럽 4\.0~7\.5 mL/.test(t)) bad.push('4세 16 kg: 이부프로펜이 나이 표(5~7.5 mL)와 몸무게 셈 가운데 작은 쪽이 아님(공통 숫자표) — '+t.slice(0,160)); }
       for (const sid of ['cold','allergy','cough','constipation','diarrhea']) for (const x of basket(byId(D.symptoms,sid))) { if (/500 ?mg|정$|캡슐/.test(x.product||'') && !kidAdultOk(x.d)) bad.push('4세 '+sid+': 어른 제품 '+x.product); if (minAgeOf(x.d)!=null && minAgeOf(x.d)>48) bad.push('4세 '+sid+': '+x.d.id+'('+minAgeOf(x.d)+'개월부터)'); }
       kid(168,50); for (const sid of ['allergy','diarrhea','cold']) for (const x of basket(byId(D.symptoms,sid))) if ((x.why||[]).includes('child') && minAgeOf(x.d)!=null) bad.push('14세 '+sid+': 나이 기준이 있는데 「소아」로 막음 '+x.d.id);
       kid(null,5); location.hash='#/symptom/fever'; route(); if (!/생후 3개월 안팎/.test([...document.querySelectorAll('.answer .kid-over')].map(e=>e.innerText).join(''))) bad.push('생년월일 없음 5 kg: 「생후 3개월 안팎」 경고 없음');
@@ -889,6 +889,19 @@ def r5_checks(br, url, fails):
     if 'id="share"' not in open(__file__.replace('tests/run.py', 'privacy.html'), encoding='utf-8').read(): fails.append('5차 #6 처리방침에 보내기 항목(id=share)이 없습니다')
     go('/show/msk')
     if re.search('니다[.]', txt()): fails.append('5차 #7 약국 카드에 합니다체가 남았습니다')
+    # 처방약 길잡이(10-22 ③) — 다섯 화면이 열리고, 「이렇게 드세요」·「이럴 땐 바로」가 맨 위, 검수 전 표시, 입구 셋(약 종류·내 약통·검색)
+    me("ME.view='detail'; ME.taking=['cls:bp.acei']")
+    for g in ('bp', 'dm', 'chol', 'blood', 'thy', 'mind'):
+        go('/rx/' + g); pz.wait_for_function("()=>!document.querySelector('#view').innerText.includes('불러오는 중')", timeout=10000)
+        t = txt()
+        if '이렇게 드세요' not in t or '이럴 땐 바로' not in t or '깜빡했을 때' not in t: fails.append(f'처방약 길잡이 /rx/{g} 화면이 비었거나 칸이 빠졌습니다')
+        if '의사 확인 중' not in t: fails.append(f'처방약 길잡이 /rx/{g} 에 검수 전 표시가 없습니다')
+    go('/rx/bp')
+    if '내 약' not in txt(): fails.append('처방약 길잡이: 내 약통의 …프릴 약에 「내 약」 표시가 없습니다')
+    go('/kinds/bp')
+    if '혈압약 드시는 분께' not in txt(): fails.append('약 종류(혈압) 화면에 처방약 길잡이 입구가 없습니다')
+    go('/search?q=당뇨약')
+    if not pz.evaluate("()=>[...document.querySelectorAll('#view [onclick]')].some(a=>/\\/rx\\/dm/.test(a.getAttribute('onclick')))"): fails.append('「당뇨약」 검색에 처방약 길잡이가 없습니다')
     if zerr: fails.append(f'5차 화면 JS 오류: {zerr[:2]}')
     pz.close()
 
@@ -1190,17 +1203,16 @@ def main():
         pg.goto(url + '#/symptom/cold'); ready(); pg.wait_for_timeout(300)
         if pg.evaluate("()=>{openCare();return getComputedStyle(document.getElementById('sp2')).display!=='none'&&document.querySelector('.tab[data-p=sp2]').classList.contains('on')}") is not True:
             fails.append('증상 화면: 「이럴 땐 병원으로」를 눌러도 병원 탭이 열리지 않습니다')
-        # 약학정보원 사진(2026-09-30 현욱님 「그냥 쓰자」) — 짝 자료가 있으면 그 사진·그 제품 페이지로, 없으면 식약처 사진·검색 화면
+        # 약학정보원 사진·제품 링크는 2026-10-21 저작권 점검으로 뺐다 — 사진은 식약처 것만, 약학정보원은 «이름으로 찾기» 링크만 남는다
         pg.goto(url + '#/pill'); ready(); pg.wait_for_timeout(300)
         _kp = pg.evaluate("""async()=>{ await pubPills(); const p=(PUB.pills||[]).find(x=>x.img); if(!p) return {skip:true};
-          const before=pillImg(p); KPIC={[p.seq]:['2013062800004','201306280000401.jpg']};
-          const after=pillImg(p); location.hash='#/pillinfo/'+p.seq; route();
-          const a=[...document.querySelectorAll('a.plink')].find(x=>/health\.kr/.test(x.href));
-          const r={before, after, link:a&&a.href}; KPIC={}; return r; }""")
+          const img=pillImg(p); location.hash='#/pillinfo/'+p.seq; route();
+          const a=[...document.querySelectorAll('a.plink')].find(x=>/health\\.kr/.test(x.href));
+          return {img, link:a&&a.href, kp:[...document.querySelectorAll('#view img')].some(x=>/health\\.kr/.test(x.src))}; }""")
         if not _kp.get('skip'):
-            if 'nedrug' not in (_kp['before'] or ''): fails.append(f'약학정보원 짝이 없을 때 식약처 사진을 안 씁니다: {_kp["before"]}')
-            if _kp['after'] != 'https://common.health.kr/shared/images/sb_photo/big3/201306280000401.jpg': fails.append(f'약학정보원 사진 주소가 틀립니다: {_kp["after"]}')
-            if 'result_drug.asp?drug_cd=2013062800004' not in (_kp['link'] or ''): fails.append(f'약학정보원 제품 페이지 링크가 없습니다: {_kp["link"]}')
+            if 'nedrug' not in (_kp['img'] or ''): fails.append(f'낱알 사진이 식약처 사진이 아닙니다: {_kp["img"]}')
+            if _kp['kp']: fails.append('약학정보원 사진이 화면에 다시 나옵니다(저작권 — KPIC_USE)')
+            if 'result_drug.asp' in (_kp['link'] or ''): fails.append(f'약학정보원 제품 페이지로 바로 잇습니다(이름으로 찾기만): {_kp["link"]}')
         # 식약처 제품 화면(e약은요) — 탭(약사 안내·허가 내용·성분 해설) 칸마다 내용이 있고 날것 코드(${)가 보이면 안 된다(2026-09-30)
         pg.goto(url + '#/pub/0'); ready(); pg.wait_for_timeout(1500)
         _pb = pg.evaluate("""()=>['pb1','pb2','pb3'].filter(k=>document.getElementById(k)).map(k=>{const t=document.getElementById(k).textContent; return [k, t.trim().length, t.includes('${')];})""")
@@ -1678,14 +1690,17 @@ def main():
         # 10. 소아 용량 계산 — 아세트아미노펜 10~15 mg/kg(하루 75, 두 돌 전 60), 이부프로펜 5~10 mg/kg(하루 40), 상한
         #     우리집 소아과 계산기와 같은 식이다(현욱님 지시 2026-09-23) — 몸무게로 걸린 별도 한도는 두지 않는다.
         kd = pg.evaluate("()=>[[15,36],[8,5],[40,150],[10,20]].map(([w,m])=>['apap','ibu'].map(k=>{const r=kidDose(k,w,m);return [r.lo,r.hi,r.day]}))")
-        want = [[[150, 225, 1125], [75, 150, 600]], [[80, 120, 480], [40, 80, 320]], [[400, 600, 3000], [200, 400, 1600]], [[100, 150, 600], [50, 100, 400]]]
+        want = [[[150, 225, 1125], [75, 150, 600]], [[80, 120, 480], [40, 80, 320]], [[400, 600, 3000], [200, 250, 1000]], [[100, 150, 600], [50, 100, 400]]]   # 40 kg·150개월 이부프로펜 = 나이 표(만 11~14세 1회 250·하루 1,000 mg)로 «작은 쪽»(공통 숫자표, 10-22)
         if kd != want: fails.append(f'소아 용량 계산 불일치: {kd} ≠ {want}')
         # 10b. 우리집 소아과와 같은 답인지 — 그 앱의 doseRange 를 그대로 옮긴 식과 몸무게 4~70 kg 전부 비교.
         #      그리고 「하루 1번」 같은 횟수 문장·맥시부펜 계산 카드가 다시 생기면 안 된다.
         pg.goto(url + '#/kids'); ready(); pg.wait_for_timeout(400)
         kc = pg.evaluate("""()=>{const DR={apap:{pk:[10,15],day:75,capDose:1000,capDay:4000},ibu:{pk:[5,10],day:40,capDose:400,capDay:2400}};
           const bad=[]; for(let w=4;w<=70;w+=0.5) for(const m of [12,48]) for(const k of ['apap','ibu']){ const D=DR[k];
-            const perKg=(k==='apap'&&m<24)?60:D.day; const lo=Math.round(Math.min(w*D.pk[0],D.capDose)), hi=Math.round(Math.min(w*D.pk[1],D.capDose)), day=Math.round(Math.min(w*perKg,D.capDay));
+            /* 우리집 소아과 doseRange(10-21 이부허가표 — 몸무게 셈과 나이 표 가운데 작은 쪽) 그대로 */
+            const 표=[[12,36,50,100,400],[36,84,100,150,600],[84,132,150,200,800],[132,180,200,250,1000]], 칸=k==='ibu'?(표.find(x=>m>=x[0]&&m<x[1])||null):null;
+            const 위끝=칸?Math.min(D.capDose,칸[3]):D.capDose;
+            const perKg=(k==='apap'&&m<24)?60:D.day; const lo=Math.round(Math.min(w*D.pk[0],위끝)), hi=Math.round(Math.min(w*D.pk[1],위끝)), day=Math.round(Math.min(w*perKg,D.capDay,칸?칸[4]:Infinity));
             const r=kidDose(k,w,m); if(r.lo!==lo||r.hi!==hi||r.day!==day) bad.push(k+' '+w+'kg '+[r.lo,r.hi,r.day]+' ≠ '+[lo,hi,day]); }
           ME.age='child'; ME.child={name:'',birth:'2016-03-01',weight:28}; route();
           const txt=document.getElementById('view').innerText; ME.age='adult'; ME.child={}; saveMe();
