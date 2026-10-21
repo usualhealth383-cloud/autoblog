@@ -169,7 +169,8 @@ def quasi(k):
 RX_LABEL_SEQ = {'amlodipine': '200610660', 'losartan': '200811814', 'ramipril': '199200883', 'bisoprolol': '200008764',
                 'hctz': '196000008', 'metformin': '198500321', 'glimepiride': '199600863', 'sitagliptin': '200710758',
                 'empagliflozin': '201403744', 'simvastatin': '200807527', 'rosuvastatin': '200210097', 'levothyroxine': '197400278',
-                'zolpidem': '200700634', 'sertraline': '200511068', 'alprazolam': '200410869'}
+                'zolpidem': '200700634', 'sertraline': '200511068', 'alprazolam': '200410869',
+                'apixaban': '201305918', 'rivaroxaban': '201201271', 'dabigatran': '201100747', 'clopidogrel': '200700907', 'warfarin': '200502107'}
 DTL_OPS = ['DrugPrdtPrmsnInfoService08/getDrugPrdtPrmsnDtlInq07', 'DrugPrdtPrmsnInfoService08/getDrugPrdtPrmsnDtlInq08',
            'DrugPrdtPrmsnInfoService07/getDrugPrdtPrmsnDtlInq06', 'DrugPrdtPrmsnInfoService06/getDrugPrdtPrmsnDtlInq05',
            'DrugPrdtPrmsnInfoService05/getDrugPrdtPrmsnDtlInq04']
