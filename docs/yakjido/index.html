@@ -1748,8 +1748,8 @@ background-repeat:no-repeat;background-position:right 9px center;background-size
 <script>
 window.__YAKJIDO_OK__ = true;
 const D = JSON.parse(document.getElementById('data').textContent || '{}');
-const BUILD = '2026-10-21 19:37';
-const DATAV = 'd41702e97a'.indexOf('__') === 0 ? BUILD : 'd41702e97a';
+const BUILD = '2026-10-21 22:47';
+const DATAV = '3812f71f43'.indexOf('__') === 0 ? BUILD : '3812f71f43';
 const BRANDMARK = (typeof window !== 'undefined' && window.__BRANDMARK__) || 'icon-192.png';
 let CORE = 0, CORE_P = null;
 function mergeCore(c){
@@ -3373,14 +3373,15 @@ const cabWord = x => x.cab ? `드시는 ${x.cab.from.join(', ')}${josa(x.cab.fro
 const euro = w => { const c = String(w).trim().slice(-1).charCodeAt(0) - 0xAC00; return c >= 0 && c <= 11171 && c % 28 && c % 28 !== 8 ? '으로' : '로'; };
 const flagWords = (ks, sep = '·') => (ks || []).map(k => FLAG_LABEL[k] || WHY_LABEL[k]).filter(Boolean).join(sep);
 function memoText(s){
+if (RF.sid === s.id && RF.er.size) return `[약지도] ${s.name}\n응급 신호에 체크하셨어요 — 약을 사지 말고 119에 전화하거나 응급실로 가세요.`;
 if (infStop(s)) return `[약지도] ${s.name}\n생후 3개월 미만 아기는 약보다 진료가 먼저예요 — 해열제를 먹이지 말고 바로 소아과나 응급실로 가세요.`;
 const bk = showable(basketPicked(s, basket(s))), f = activeFlags(), mine = takingItems().map(t => t.name);
 const items = bk.map(x => x.have ? `${x.slot}: ${x.d.name} — 이미 먹고 있어요(더 사지 않아요)`
 : x.again ? `${x.title || '7일 뒤 한 번 더'}: 같은 약(${x.d.name})`
 : x.blocked ? `${x.slot}: ${x.d.name}${josa(x.d.name, '은', '는')} 내 상태(${flagWords(x.why)})에 주의 — 약사와 상의`
 : `${x.optional ? '(필요 시) ' : ''}${x.d.name}${x.product ? ' — 예: ' + x.product : ''}${x.alts?.length ? ` (또는 ${x.alts.map(a => a.d.name).join(', ')})` : ''}${x.cab ? ' — ' + cabWord(x) : ''}${x.cau ? ' — ' + x.cau : ''}`).map((t, i) => bk[i].mix ? t + ' — ' + mixTxt(bk[i]) : t);
-const say = bk.some(x => x.blocked || x.have || x.cab)
-? `「${f.length ? `제 상태를 먼저 말씀드릴게요 — ${flagWords(f, ', ')}. ` : ''}${mine.length ? `지금 먹는 약은 ${mine.join(', ')}${josa(mine[mine.length - 1], '이에요', '예요')}. ` : ''}${s.name.split(' (')[0]}에 맞는 약을 골라 주세요.」`
+const say = bk.some(x => x.blocked || x.have || x.cab) || (bk.dropped || []).some(x => x.why === 'avoid')
+? `「${f.length ? `제 상태를 먼저 말씀드릴게요 — ${flagWords(f.filter(x => !(x === 'heart' && f.includes('hf')) && !(x === 'liver' && f.includes('lvs'))), ', ')}. ` : ''}${mine.length ? `지금 먹는 약은 ${mine.join(', ')}${josa(mine[mine.length - 1], '이에요', '예요')}. ` : ''}${s.name.split(' (')[0]}에 맞는 약을 골라 주세요.」`
 : (s.pharmacy?.[0] || '').replace(/\*\*/g, '');
 const dn = droppedNote(bk), alg = (ME.allergy || []).map(x => ingrNameK(ingIndex().byKey[x.ing]?.n || x.ing));
 return `[약지도] ${s.name}\n${items.map(t => '· ' + t).join('\n')}${dn ? '\n' + dn : ''}${alg.length || ME.allergyUnknown ? '\n약 알레르기: ' + (alg.length ? alg.join(', ') : '있었어요(성분은 몰라요)') : ''}\n${say ? '\n' + say : ''}\n\n소염제는 한 가지만 · 아세트아미노펜 하루 4 g 이내`;
@@ -5458,7 +5459,7 @@ return `<button class="chip${on ? ' on' : ''}" aria-pressed="${on}" onclick="go(
 function prodHead(n, o = {}){
 const amb = famAmb(n), r = prodRec(n), segs = amb ? [] : prodSegs(r), d = r.d, T = o.h1 ? 'h1' : 'b';
 const age = (String(d?.dose?.child || '') + ' ' + (r.b?.who || '')).match(/(\d+)세 미만(?:은|는)?\s*(?:금지|드시지|먹지|복용하지|쓰지)/);
-const dose = o.go && !amb && (d?.dose?.adult ? `한 번 ${fmt(d.dose.adult)}${d.dose.interval ? ' · 간격 ' + fmt(d.dose.interval) : ''}` : r.b?.how ? esc(short(r.b.how, 60)) : '');
+const no = avoidHit(d), dose = o.go && !amb && (no.length ? `<span class="badge stop">내 몸 조건(${esc(flagWords(no, ", "))})엔 먹지 마세요</span>` : d?.dose?.adult ? `한 번 ${fmt(d.dose.adult)}${d.dose.interval ? ' · 간격 ' + fmt(d.dose.interval) : ''}` : r.b?.how ? esc(short(r.b.how, 60)) : '');
 return `<div class="phead">${popPic(r.img, r.n, 72)}<div class="ph-b"><${T} class="ph-n">${esc(r.n)}</${T}>
 ${segs.length ? `<p class="ph-i">성분${segs.length > 1 ? ` ${segs.length}가지` : ''} — ${segs.map(t => { const h = ingHref(t, d); return h ? `<a class="link" href="#${h}">${esc(t)}</a>` : esc(t); }).join(' · ')}</p>` : ''}
 ${amb ? `<p class="ph-i">${esc(amb.root)}${josa(amb.root, '은', '는')} 제품마다 성분과 먹는 법이 달라요. 갖고 계신 상자 이름을 골라 주세요.</p>` : `<div class="ph-t">${badge(r.rx)}${r.rx === '둘 다' ? '<span class="badge warn">제품에 따라 일반·전문</span>' : ''}${age ? `<span class="badge">${age[1]}세부터</span>` : ''}</div>`}${dose ? `<p class="ph-i">${dose}</p>` : ''}</div>
@@ -5466,8 +5467,10 @@ ${o.band && d && !(d.contains || []).length ? `<p class="ph-x small muted">${esc
 ${o.go ? `<a class="btn line ph-x" href="#${r.h}">자세히 ›</a>` : ''}</div>`;
 }
 function prodTop(d, n){ if (!n) return ''; if (!LEX.brand) lexLoad(); return prodDrug(n)?.d === d ? prodHead(n, { band:1 }) : ''; }
+const MIXBRAND = /판콜|판피린|콜대원|화이투벤|타이레놀 ?콜드|테라플루|씨콜드|베아제|훼스탈|겔포스|게보린|펜잘|그날엔/;
+const avoidHit = d => { if (!d) return []; const f = activeFlags(); return [...new Set((d.avoid || []).filter(a => !narrowAv(a)).flatMap(a => (a.flags || []).filter(x => f.includes(x))))]; };
 const drugHead = d => { const pr = (d.products || []).find(x => pimg(x.name));
-return `<div class="phead">${popPic(pr ? pimg(pr.name) : '', pr?.name || d.name, 72)}<div class="ph-b"><b class="ph-n">${esc(d.name)}</b><p class="ph-i">${esc(d.tagline || (d.for || []).join(' · '))}</p><div class="ph-t">${rxMix(d) ? `<span class="small">${esc(rxMix(d))}</span>` : badge(d.rx)}</div>${d.dose?.adult ? `<p class="ph-i">한 번 ${fmt(d.dose.adult)}</p>` : ''}</div><a class="btn line ph-x" href="#/drug/${d.id}">자세히 ›</a></div>`; };
+return `<div class="phead">${popPic(pr ? pimg(pr.name) : '', pr?.name || d.name, 72)}<div class="ph-b"><b class="ph-n">${esc(d.name)}</b><p class="ph-i">${esc(d.tagline || (d.for || []).join(' · '))}</p><div class="ph-t">${rxMix(d) ? `<span class="small">${esc(rxMix(d))}</span>` : badge(d.rx)}</div>${avoidHit(d).length ? `<p class="ph-i"><span class="badge stop">내 몸 조건(${esc(flagWords(avoidHit(d), ", "))})엔 먹지 마세요</span></p>` : d.dose?.adult ? `<p class="ph-i">한 번 ${fmt(d.dose.adult)}</p>` : ''}</div><a class="btn line ph-x" href="#/drug/${d.id}">자세히 ›</a></div>`; };
 const prodCountLine = () => { const P = D.public || {}; return P.prod_otc ? `약국 약 ${P.prod_otc.toLocaleString()}개 · 처방약 ${(P.prod_rx || 0).toLocaleString()}개` : `제품 ${(P.brands_count || 0).toLocaleString()}개 · 성분 ${(P.lexicon_count || 0).toLocaleString()}가지`; };
 function vDrugs(_, q){
 const CL = (D.classes || []).filter(c => (D.drugs || []).some(d => d.class === c.id));
@@ -5702,7 +5705,8 @@ return `${topBar({ back:'약 사전', unreviewed:d.reviewed === false })}${top}
 <div class="drug-hero">${c ? `<a class="cls link" href="#/class/${c.id}">${esc(c.name)} ›</a>` : ''}${dupTop ? '' : `<h1>${esc(d.name)}</h1>`}
 ${(() => { /* 3-3 ① — 대표 제품을 제목 바로 아래(NHS 「Other common brands」). 영어 이름은 근거 탭으로 내렸다 */
 const P = (d.products || []).slice(0, 3); if (!P.length || dupTop) return '';
-return `<button class="rep-line" onclick="jumpTab('p3')"><span>대표 제품 <b>${esc(P[0].name)}</b>${P.length > 1 ? ` · 그 밖에 ${esc(P.slice(1).map(x => x.name).join(', '))}` : ''}</span>${I.chev}</button>`; })()}
+const mix = x => !(d.contains || []).length && !d.prodMix && !/단일제/.test(x.name) && (/복합|소화제/.test(x.name + ' ' + (x.amount || '')) || MIXBRAND.test(x.name)), S = P.filter(x => !mix(x)), M = P.filter(mix);
+return `<button class="rep-line" onclick="jumpTab('p3')"><span>${S.length ? `대표 제품 <b>${esc(S[0].name)}</b>${S.length > 1 ? ` · 그 밖에 ${esc(S.slice(1).map(x => x.name).join(', '))}` : ''}` : ''}${M.length ? `${S.length ? ' · ' : ''}이 성분이 든 복합제 ${S.length ? esc(M.map(x => x.name).join(', ')) : `<b>${esc(M.map(x => x.name).join(', '))}</b>`}` : ''}</span>${I.chev}</button>`; })()}
 <div class="en">${rxMix(d) ? `<span class="small">${esc(rxMix(d))}</span>` : badge(d.rx)}${d.ach ? `<span class="badge ${d.ach >= 3 ? 'stop' : d.ach === 2 ? 'warn' : ''}" style="margin-left:4px">항콜린 ${esc(ACH_WORD[d.ach])}</span>` : ''}</div>
 <div class="hero-speak">${speakBtn(`drugSpeech(pView(drug('${d.id}'), ${d.pSel ? `'${esc(d.pSel.name).replace(/'/g, '')}'` : 'null'}))`, (d.pSel?.name || d.name) + ' 읽어 주기')}</div></div>
 ${allergyWarn(d)}
