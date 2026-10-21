@@ -1690,14 +1690,17 @@ def main():
         # 10. 소아 용량 계산 — 아세트아미노펜 10~15 mg/kg(하루 75, 두 돌 전 60), 이부프로펜 5~10 mg/kg(하루 40), 상한
         #     우리집 소아과 계산기와 같은 식이다(현욱님 지시 2026-09-23) — 몸무게로 걸린 별도 한도는 두지 않는다.
         kd = pg.evaluate("()=>[[15,36],[8,5],[40,150],[10,20]].map(([w,m])=>['apap','ibu'].map(k=>{const r=kidDose(k,w,m);return [r.lo,r.hi,r.day]}))")
-        want = [[[150, 225, 1125], [75, 150, 600]], [[80, 120, 480], [40, 80, 320]], [[400, 600, 3000], [200, 400, 1600]], [[100, 150, 600], [50, 100, 400]]]
+        want = [[[150, 225, 1125], [75, 150, 600]], [[80, 120, 480], [40, 80, 320]], [[400, 600, 3000], [200, 250, 1000]], [[100, 150, 600], [50, 100, 400]]]   # 40 kg·150개월 이부프로펜 = 나이 표(만 11~14세 1회 250·하루 1,000 mg)로 «작은 쪽»(공통 숫자표, 10-22)
         if kd != want: fails.append(f'소아 용량 계산 불일치: {kd} ≠ {want}')
         # 10b. 우리집 소아과와 같은 답인지 — 그 앱의 doseRange 를 그대로 옮긴 식과 몸무게 4~70 kg 전부 비교.
         #      그리고 「하루 1번」 같은 횟수 문장·맥시부펜 계산 카드가 다시 생기면 안 된다.
         pg.goto(url + '#/kids'); ready(); pg.wait_for_timeout(400)
         kc = pg.evaluate("""()=>{const DR={apap:{pk:[10,15],day:75,capDose:1000,capDay:4000},ibu:{pk:[5,10],day:40,capDose:400,capDay:2400}};
           const bad=[]; for(let w=4;w<=70;w+=0.5) for(const m of [12,48]) for(const k of ['apap','ibu']){ const D=DR[k];
-            const perKg=(k==='apap'&&m<24)?60:D.day; const lo=Math.round(Math.min(w*D.pk[0],D.capDose)), hi=Math.round(Math.min(w*D.pk[1],D.capDose)), day=Math.round(Math.min(w*perKg,D.capDay));
+            /* 우리집 소아과 doseRange(10-21 이부허가표 — 몸무게 셈과 나이 표 가운데 작은 쪽) 그대로 */
+            const 표=[[12,36,50,100,400],[36,84,100,150,600],[84,132,150,200,800],[132,180,200,250,1000]], 칸=k==='ibu'?(표.find(x=>m>=x[0]&&m<x[1])||null):null;
+            const 위끝=칸?Math.min(D.capDose,칸[3]):D.capDose;
+            const perKg=(k==='apap'&&m<24)?60:D.day; const lo=Math.round(Math.min(w*D.pk[0],위끝)), hi=Math.round(Math.min(w*D.pk[1],위끝)), day=Math.round(Math.min(w*perKg,D.capDay,칸?칸[4]:Infinity));
             const r=kidDose(k,w,m); if(r.lo!==lo||r.hi!==hi||r.day!==day) bad.push(k+' '+w+'kg '+[r.lo,r.hi,r.day]+' ≠ '+[lo,hi,day]); }
           ME.age='child'; ME.child={name:'',birth:'2016-03-01',weight:28}; route();
           const txt=document.getElementById('view').innerText; ME.age='adult'; ME.child={}; saveMe();
