@@ -327,8 +327,9 @@ if _idx.exists():
     # 2026-10-14 224 → 228 KB: 어르신 «간단히 보기»(현욱님 최우선 — 홈 큰 칸·증상 한 장·약 한 장·처음 안내 고르기) +3 KB. 화면 코드라 본문으로 뺄 수 없다.
     # 2026-10-21 229 → 230 KB: 외부 검수 3차 결과 P1 #4 판정(제품 설명서 금기만·「먼저 상의」 한 줄)·#7 그래프 글자·#9 응급 제목 — 안전 고침이라 화면 코드에 둔다.
     # 2026-10-19 228 → 229 KB: 3차 외부 검수 P0 #1(응급 체크 뒤 한눈 보기 「약국」 줄·탭 이름 숨김) + 탭 aria-selected. 안전 고침이라 화면 코드에 둔다(+0.2 KB).
-    if _gzkb > 230:
-        fails.append(f'첫 화면이 무겁습니다 — index.html 압축 {_gzkb:.0f} KB (한계 230 KB). 본문은 data/core.json 으로 빼야 합니다')
+    # 2026-10-21 230 → 232 KB: 외부 검수 4차 P0 #1(응급·금기 약을 팁·처방 탭·읽어 주기에서도 거르기)·#4 이름 줄기 고르기·#5 기준선 줄 — 안전 고침이라 화면 코드에 둔다.
+    if _gzkb > 232:
+        fails.append(f'첫 화면이 무겁습니다 — index.html 압축 {_gzkb:.0f} KB (한계 232 KB). 본문은 data/core.json 으로 빼야 합니다')
     if not _core.exists():
         fails.append('docs/yakjido/data/core.json 이 없습니다 — 빌드를 다시 돌리세요')
     else:
@@ -667,6 +668,11 @@ for _fn in ('suppGoals.json', 'suppStages.json'):
         for _x in (_g.get('picks') or []) + (_g.get('skip') or []):
             if not str(_x['supp']).startswith('nut:') and _x['supp'] not in supid: fails.append(f'{_fn} {_g["id"]}: 없는 영양제 {_x["supp"]}')
             src_ok(f'{_fn} {_g["id"]}', _x.get('src'))
+# 외부 검수 4차 #3(10-21) — 위보호 문구는 한 문장으로 맞췄다(현욱님 ⑪ 「위보호는 좁히기」). 옛 문턱(「소염제 3일 이상」·「속쓰림·위 부담을 덜려면」)이 다시 들어오지 않게
+for _f in sorted(C.glob('*.json')):
+    _t = _f.read_text(encoding='utf-8')
+    for _w in ('3일 이상 쓰거나', '3일 이상 먹거나', '속쓰림·위 부담을 덜려면 약국 파모티딘'):
+        if _w in _t: fails.append(f'{_f.name}: 옛 위보호 문구 「{_w}」 — 「65세 이상이시거나 피 묽게 하는 약·스테로이드를 함께 드시면 …」 한 문장으로')
 print(f'증상 {len(S)} · 약 {len(D)} · 계열 {len(K)} · 영양제 {len(SUP)} · 팁 {len(T)} · 그런줄 {len(_MY)} · 규칙 {len(IX["rules"])} · 출처 {len(SRC)}')
 if fails:
     print('실패', len(fails)); [print('  ✗', f) for f in fails]; sys.exit(1)
