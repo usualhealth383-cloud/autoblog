@@ -554,18 +554,18 @@ ul.steps li::before{content:counter(s);position:absolute;left:0;top:2px;width:24
 .vt-big b{font-size:2.25rem;line-height:1.1;color:var(--text);font-variant-numeric:tabular-nums;letter-spacing:-.5px}.vt-big b small{font-size:1.5rem;color:var(--faint);margin:0 2px}
 .vt-big em{font-style:normal;font-size:.875rem;color:var(--muted)}
 .vt-list{display:flex;flex-direction:column}
-.vt-li{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--hairline)}.vt-li:last-child{border-bottom:0}
-.vt-t{flex:1;min-width:0;font-weight:700;color:var(--text);font-variant-numeric:tabular-nums}.vt-t small{font-weight:500;color:var(--muted)}
+.vt-li{display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px;padding:10px 0;border-bottom:1px solid var(--hairline)}.vt-li:last-child{border-bottom:0}
+.vt-t{flex:1;min-width:min(9em,100%);font-weight:700;color:var(--text);font-variant-numeric:tabular-nums}.vt-t small{font-weight:500;color:var(--muted)}
 .vt-li b{font-variant-numeric:tabular-nums;color:var(--text)}.vt-li b small{font-weight:500;color:var(--muted);font-size:.875rem}
 .vt-x{width:44px;height:44px;display:grid;place-items:center;border-radius:12px;color:var(--faint);background:none;border:0}
 .vz{width:100%;height:auto;display:block;margin-top:8px}
 .vz-grid{stroke:var(--hairline);stroke-width:1}.vz-ax{fill:var(--muted);font-size:var(--vz,14px);font-variant-numeric:tabular-nums}
-.vz-ref{stroke:var(--faint);stroke-width:1.5;stroke-dasharray:4 4}.vz-reft{fill:var(--muted);font-size:var(--vz,14px);font-weight:600}
+.vz-ref{stroke:var(--faint);stroke-width:1.5;stroke-dasharray:4 4}
 .vz-line{fill:none;stroke-width:2;stroke-linejoin:round;stroke-linecap:round}.vz-dot{stroke:var(--card);stroke-width:2}
 .vz-line.v1{stroke:var(--viz-1)}.vz-line.v2{stroke:var(--viz-2)}.vz-dot.v1{fill:var(--viz-1)}.vz-dot.v2{fill:var(--viz-2)}
 .vz-legend{display:flex;flex-wrap:wrap;gap:6px 14px;margin-top:6px;font-size:.875rem;color:var(--muted)}
 .vz-legend span{display:inline-flex;align-items:center;gap:6px}.vz-legend i{width:14px;height:3px;border-radius:2px;display:inline-block}
-.vz-legend i.v1{background:var(--viz-1)}.vz-legend i.v2{background:var(--viz-2)}.vz-legend i.ref{background:none;border-top:2px dashed var(--faint);height:0}
+.vz-legend i.v1{background:var(--viz-1)}.vz-legend i.v2{background:var(--viz-2)}.vz-refl{display:flex;align-items:center;gap:8px;margin:2px 0 6px;font-size:.9375rem;font-weight:600;color:var(--body)}.vz-refl i{width:18px;border-top:2px dashed var(--faint)}
 /* 홈 가운데 — ClinicScore 처럼 같은 모양 한 줄 행, 한 장 카드, 한 줄 가로 탭 (2026-09-29) */
 .util{display:flex;flex-direction:column;gap:8px;margin-top:12px}
 .util-row{display:flex;align-items:center;gap:12px;width:100%;min-height:56px;padding:8px 14px;border-radius:14px;background:var(--card);border:1px solid var(--hairline);text-align:left;color:var(--text)}
@@ -1033,6 +1033,8 @@ main > .answer + *, main > .sec + .care, main > .card + .care, main > .rx-card +
 .rf.hit-er .rf-hit.er,.rf.hit-cl .rf-hit.cl{display:block} .rf.rf-any .rf-no{display:none}
 .rf-cl{margin-top:6px}.rf-cl>summary{display:flex;align-items:center;gap:6px;min-height:48px;font-size:.875rem;font-weight:700;color:var(--body);cursor:pointer}.rf-cl>summary small{color:var(--muted);font-weight:500}
 .answer.rf-er .buy,.answer.rf-er .kid-line,.answer.rf-er .med-tip,.answer.rf-er .kid-over,.answer.rf-er .inf-stop,.answer.rf-er .dupbox,.answer.rf-er .ach,.answer.rf-er .go-cart,.answer.rf-er .rf-dim-h,.answer.rf-er .acts,.answer.rf-er .opt-fold,.answer.rf-er .drop-note{display:none!important}
+.rf-er-only{display:none}.pane.rf-er-on>.how-body{display:none}.pane.rf-er-on>.rf-er-only{display:flex;align-items:center;gap:10px;margin-top:8px;padding:12px 14px;border:1.5px solid var(--alert);border-radius:14px;background:var(--alert-tint);color:var(--alert);font-weight:700;line-height:1.5}
+.ban-note{margin:8px 0 4px}.opt-pill.no{opacity:.8;text-decoration:none;cursor:default}
 .rf-er-h{display:none}.answer.rf-er .rf-er-h{display:flex;align-items:center;gap:10px;margin-top:10px;padding:12px 14px;border:1.5px solid var(--alert);border-radius:14px;background:var(--alert-tint);color:var(--alert);font-weight:700;line-height:1.5}
 .rf-no{margin-top:4px;font-size:.875rem;color:var(--muted)}
 .sched-ask{margin-top:8px;padding:10px 12px;border-radius:12px;background:var(--tint2)}
@@ -3147,9 +3149,11 @@ function speakNow(text, btn){
 function speakAnswer(sid, btn){
   const s = byId(D.symptoms, sid); if (!s || !('speechSynthesis' in window)) { toast('이 기기는 읽어 주기를 지원하지 않아요'); return; }
   if (SPEAKING) { speechSynthesis.cancel(); SPEAKING = null; document.querySelectorAll('.speak.on').forEach(b => b.classList.remove('on')); return; }
-  const bk = basket(s);
+  /* 4차 #1 — 응급 신호에 체크했으면 약 이름·먹는 법을 읽지 않는다. 아니어도 내 몸 조건에 걸린 약의 먹는 법은 뺀다 */
+  if (RF.sid === sid && RF.er.size) { speakNow(`${s.name}. 응급 신호에 체크하셨어요. 약을 먹고 기다리지 말고 119에 전화하거나 응급실로 가세요.`, btn); return; }
+  const bk = basket(s), ban = tipBan(s);
   const buy = bk.map(x => `${x.slot}, ${prodName(x.product) || ingrName(x.d)}${x.optional ? ', 도움이 될 수 있어요' : ''}`).join('. ');
-  const how = (s.how || []).slice(0, 2).map(t => String(t).replace(/\*\*/g, '')).join(' ');
+  const how = (banList(s.how, ban) || []).slice(0, 2).map(t => String(t).replace(/\*\*/g, '')).join(' ');
   const care = (s.care?.clinic || []).slice(0, 1).map(t => String(t).replace(/\*\*/g, '')).join('');
   const t3 = s.triage || {};
   const plain = t => String(t || '').replace(/\*\*/g, '');
@@ -3739,7 +3743,10 @@ function hitsGroups(all, q, per){
     cut = pr.find(h => h.s === qs) || dr.find(h => dn(h, t => t === qn))
       || (top?.P && pr.includes(top) && top.s.startsWith(qs) ? pr.filter(h => h.s.startsWith(qs)).sort((a, b) => a.s.length - b.s.length)[0] : null)
       || (qn.length > 2 && dr.includes(top) && dn(top, t => t.startsWith(qn)) ? top : null);
-    if (cut) card = cut.k === '성분' ? drugHead(drug(cut.h.slice(6))) : prodHead(cut.h.startsWith('/brand/') ? decodeURIComponent(cut.h.slice(7)) : cut.t, { go:1 });
+    /* 외부 검수 4차 #4 — 「콜대원」처럼 줄기만 치면 가장 짧은 이름(키즈펜시럽)이 「찾으신 약」으로 올라왔다. 딱 맞는 이름이 없고 여럿이 그 글자로 시작하면 고르게 한다 */
+    const fam = !pr.some(h => h.s === qs) && pr.filter(h => h.s.startsWith(qs));
+    if (cut && cut.k !== '성분' && fam.length > 1) { card = famPick(qq, fam); cut = null; }
+    else if (cut) card = cut.k === '성분' ? drugHead(drug(cut.h.slice(6))) : prodHead(cut.h.startsWith('/brand/') ? decodeURIComponent(cut.h.slice(7)) : cut.t, { go:1 });
   }
   const feat = keep.filter(h => h.k === '기능'), G = new Map();
   /* 카드가 복합제 약 화면이면 같은 화면으로 가는 성분 줄은 한 번만 */
@@ -3879,6 +3886,10 @@ function basket(s, ov){
     const algCls = d && algC(pick);
     /* Z4 #3 보강 — 임신이면 소염진통제를 «약사와 상의» 배지로 남기지 않고 뺀다(부루펜 허가: 임신 말기 금기 · 20주 이후 태아 콩팥·양수 위험, 주수를 묻지 않으므로 모두 뺀다) */
     if (d && blocked && f.includes('pregnant') && isNsaid(d) && whyOf(pick).includes('pregnant')) { dropped.push({ name: ingrName(d), why: 'pregnant' }); return null; }
+    /* 외부 검수 4차 #1 — 허가상 «피하라»(avoid)에 걸린 약은 「약사와 상의」 줄로도 남기지 않는다(이름·양·먹는 법이 보이면 그대로 따라 사신다).
+       같은 칸에 대신할 것이 없을 때만 여기까지 온다. 「상의」(caution ask)만 걸린 약은 지금처럼 상의 묶음으로 */
+    const hard = d ? [...new Set((d.avoid || []).filter(a => !narrowAv(a)).flatMap(a => (a.flags || []).filter(fl => f.includes(fl) && !(fl === 'child' && kidMode && minAgeOf(d) != null))))] : [];
+    if (hard.length) { if (!p.optional) dropped.push({ name: ingrName(d), why: 'avoid', fl: hard }); return null; }
     /* Z7 A6 — 「소아」 칸·아이 모드는 아이 제품(자료의 prod → kidForm → 이름에 어린이·시럽)을, 어른 알약을 보이지 않는다 */
     const kid = kidMode || kidSlot(p);
     const product = p.prod && !swapped ? p.prod : kid ? (kidProds(d)[0] || (kidMode && kidAdultOk(d) ? d?.products?.[0]?.name : '') || '') : (p.prod && (d?.products || []).some(pr => pr.name === p.prod) ? p.prod : d?.products?.[0]?.name);
@@ -3949,7 +3960,8 @@ function droppedNote(bk){
   const dr = bk?.dropped || []; if (!dr.length) return '';
   const al = dr.filter(x => x.why === 'allergy').map(x => x.name), pg = dr.filter(x => x.why === 'pregnant').map(x => x.name);
   const kd = [...new Set(dr.filter(x => x.why === 'kidage').map(x => `${x.name}(${ageWord(x.min)})`))];
-  return [al.length ? `빠진 약: ${[...new Set(al)].join(', ')}(알레르기)` : '', pg.length ? `빠진 약: ${[...new Set(pg)].join(', ')} — 임신 중 소염진통제는 의사와 상의하세요. 주수에 따라 먹으면 안 되는 때가 있어요` : '', kd.length ? `빠진 약: ${kd.join(', ')}${kidMon() == null ? ' — 생년월일을 넣으면 나이에 맞춰 골라 드려요' : ''}` : ''].filter(Boolean).join(' · ');
+  const av = dr.filter(x => x.why === 'avoid'), avN = [...new Set(av.map(x => x.name))], avF = [...new Set(av.flatMap(x => x.fl || []))].map(x => FLAG_LABEL[x] || x);
+  return [al.length ? `빠진 약: ${[...new Set(al)].join(', ')}(알레르기)` : '', avN.length ? `빠진 약: ${avN.join(', ')} — 내 몸 조건(${avF.join(', ')})에선 피해야 하는 약이에요. 대신할 약은 약사·의사와 상의하세요` : '', pg.length ? `빠진 약: ${[...new Set(pg)].join(', ')} — 임신 중 소염진통제는 의사와 상의하세요. 주수에 따라 먹으면 안 되는 때가 있어요` : '', kd.length ? `빠진 약: ${kd.join(', ')}${kidMon() == null ? ' — 생년월일을 넣으면 나이에 맞춰 골라 드려요' : ''}` : ''].filter(Boolean).join(' · ');
 }
 /* 65세가 넘으면 소염제 말고도 따로 일러 드릴 계열 — 현욱님 답(2026-09-23):
    1세대 항히스타민·코막힘 성분 → 전립선·소변 막힘 / 카페인 복합 → 불면 / 마그네슘(마그밀) 과용 → 콩팥 부담 */
@@ -4176,7 +4188,7 @@ function buyItem(x){
   const title = x.d.combo ? ing : (ing || prod || x.d.name);
   const ex = prodNames(x.d, 3, x.kid).filter(n => n !== title);
   const sub = x.d.combo ? (prodNames(x.d, 2, x.kid).length ? '이 성분이 든 제품: ' + prodNames(x.d, 2, x.kid).join(' · ') : '')
-    : (ex.length ? `${x.d.prodMix ? '이런 제품이 있어요(제품마다 성분이 조금씩 달라요)' : '같은 성분 제품 예' + (amtDiff(x.d, ex) ? '(한 알 양이 달라요)' : '')}: ` + ex.map(n => wAmt(x.d, n)).join(' · ') : '');
+    : (ex.length ? `${x.d.prodMix ? '이런 제품이 있어요(제품마다 성분·함량이 달라요)' : '같은 성분 제품 예' + (amtDiff(x.d, ex) ? '(한 알 양이 달라요)' : '')}: ` + ex.map(n => wAmt(x.d, n)).join(' · ') : '');
   const badge = buyBadge(x);
   return `<button class="buy-item ${x.optional ? 'opt' : ''} ${pimg(x.product) ? 'has-img' : ''} ${open ? 'open' : ''}" onclick="OPEN_BUY=OPEN_BUY==='${x.d.id}'?'':'${x.d.id}';route()" aria-expanded="${open}">
     <span class="bi-t">
@@ -4200,7 +4212,7 @@ function buyItem(x){
       return sec('어떻게 드세요', `<p class="bm-dose">${fmt(ds.head)}</p>${sub ? `<p class="bm-sub">${fmt(sub)}</p>` : ''}${senMaxH(d)}`); })()}
     ${rules ? sec('꼭 지킬 것', `<ul class="bm-rules">${rules}</ul>`) : ''}
     ${x.blocked && x.mix !== 2 ? `<div class="note" style="margin-top:12px">${I.alert}<span>내 조건(${esc(flagWords(x.why, ', ') || activeFlags().map(f => FLAG_LABEL[f]).join(', '))})에서는 주의가 필요해요. 약사에게 조건을 말하고 고르세요.</span></div>` : ''}
-    ${names.length ? sec(d.prodMix ? '이런 제품이 있어요 — 제품마다 성분이 조금씩 달라요' : '같은 성분 제품 예', shots + `<p class="bm-names">${names.map(esc).join(' · ')}</p>`) : ''}
+    ${names.length ? sec(d.prodMix ? '이런 제품이 있어요 — 제품마다 성분·함량이 달라요' : '같은 성분 제품 예', shots + `<p class="bm-names">${names.map(esc).join(' · ')}</p>`) : ''}
     ${erProds(d).length ? sec('서방정은 따로 — 먹는 간격이 달라요', erProds(d).map(p => `<p class="bm-names"><b>${esc(p.name)}</b>${p.amount ? ' — ' + esc(p.amount) : ''}</p>`).join('') + '<p class="bm-sub">위 「어떻게 드세요」와 다르게, 이 제품은 상자에 적힌 간격과 하루 양을 따르세요. 일반정과 섞어 드시지 마세요.</p>') : ''}
     ${(() => { const alts = altSame(d); return alts.length ? sec('같은 일을 하는 다른 약', `<div class="bm-alts">${alts.map(a => `<button class="bm-alt" onclick="event.stopPropagation();go('/drug/${a.id}')"><b>${esc(ingrName(a))}</b><small>${esc(a.tagline || (a.for || []).join(' · '))}</small></button>`).join('')}</div>`) : ''; })()}
     <div class="bm-links">${prodLinks(d, x.product)}</div>
@@ -4247,6 +4259,8 @@ function rfApply(){
   document.querySelector('#view .triage')?.classList.toggle('tg-er', er); const t1 = document.querySelector('#view .stabs .tab[data-p=sp1]'); if (t1) t1.textContent = er ? '먼저 할 일' : (t1.dataset.n0 ||= t1.textContent);
   /* 3차 #9 — 응급이면 「약국에서 사세요」류 제목도 바꾼다 */
   const sw = (q, t) => document.querySelectorAll('#view ' + q).forEach(e => { e.dataset.n0 ??= e.textContent; e.textContent = er ? t : e.dataset.n0; });
+  /* 4차 #1 — 응급이면 「드시는 법·팁」「진료실 처방」의 먹는 법·더 먹기·기다리기·사기 안내를 통째로 가린다 */
+  document.querySelectorAll('#view #sp3, #view #sp4').forEach(e => e.classList.toggle('rf-er-on', er));
   sw('.sv-lead', '지금 해야 할 일'); sw('.ans-head .eyebrow', '지금 해야 할 일'); sw('.tg-fold>summary>b', '병원에서는'); sw('.tg-fold>summary>span', '의사가 처방하는 방식');
 }
 function rfToggle(sid, k, i, on){ if (RF.sid !== sid) { RF.sid = sid; RF.er = new Set(); RF.cl = new Set(); } RF[k][on ? 'add' : 'delete'](i); rfSave(); rfApply(); }
@@ -4267,11 +4281,11 @@ function redflagCheck(s){
     <div class="rf-hit cl"><p><b>약보다 진료가 먼저예요.</b> 오늘이나 며칠 안에 병원에 가 보세요. 약은 진료 전까지 버티는 용도로만 쓰세요.</p></div>` : '<p class="rf-no">없으면 아래 안내대로 하시면 돼요.</p>'}
   </section>`;
 }
-function triageCard(s){
+function triageCard(s, ban){
   const t = s.triage; if (!t) return '';
   const rows = [
     ['clinic', I.cross, '병원에서는', t.clinic],
-    ['pharm', I.pill, '약국에서는', t.pharmacy],
+    ['pharm', I.pill, '약국에서는', banProse(t.pharmacy, ban)],
     ['esc', I.alert, '이럴 땐 병원으로', t.escalate],
   ].filter(r => r[3]);
   if (!rows.length) return '';
@@ -4346,7 +4360,7 @@ function planRows(s){ SYM_NOW = s.id;
 /* Z7 B8 — 약을 어떻게 쓰는지에 관한 칸(열 「두 가지 — 함께·번갈아」, hideFlags 가 붙은 약 없는 칸)은 「약 없이 할 일」이 아니라 약 칸 아래 접이로.
    응급 신호에 체크하면 약 목록과 함께 숨는다 */
 const isMedTip = p => p.otc !== false && !(p.options || []).length && (p.hideFlags || []).length > 0;
-function medTips(s){ return (s.plan || []).filter(p => isMedTip(p) && !slotHidden(p)).map(p => `<div class="med-tip">${fold(esc(p.title || p.slot), `<p class="why">${fmt(p.why)}</p>`)}</div>`).join(''); }
+function medTips(s){ const ban = tipBan(s); return (s.plan || []).filter(p => isMedTip(p) && !slotHidden(p) && !(ban && ban.hit(p.why))).map(p => `<div class="med-tip">${fold(esc(p.title || p.slot), `<p class="why">${fmt(p.why)}</p>`)}</div>`).join(''); }
 function doRows(s){
   /* Z4 #3 — hideFlags 칸은 여기서도 숨긴다 */
   const rows = (s.plan || []).filter(p => p.otc !== false && !(p.options || []).length && !slotHidden(p) && !isMedTip(p));
@@ -4500,17 +4514,44 @@ function buyChecks(s, bk, sv){
       return `<div class="dup dupbox ${lv}"><div class="dup-h">${I.alert}<b>사시기 전에 확인할 것 ${n}가지</b></div>
         ${ix}${w.length ? `<ul class="plain">${w.map(t => `<li>${fmt(t)}</li>`).join('')}</ul>` : ''}${achWarn ? achH : ''}</div>${achWarn || sv ? '' : ach}`;
 }
+/* 외부 검수 4차 #1 — 내 몸 조건에 «피하라»(avoid)로 걸린 약은 사기 칸만이 아니라 팁·처방 설명·읽어 주기에서도
+   이름·양·먹는 법을 뺀다(심한 심장병인데 「두통이 시작될 때 이부프로펜 400 mg」이 팁 탭에 남아 있었다).
+   걸러 내는 말 = 그 약의 성분 이름·제품 이름 + 그 갈래 약이 이 증상에서 «전부» 막혔을 때만 갈래 낱말(소염제·근이완제) */
+const erOnly = () => `<p class="rf-er-only">${I.alert}<span>응급 신호에 체크하셨어요. 약을 먹고 기다리지 말고 위의 119·응급실 안내를 따라 주세요.</span></p>`;
+const BAN_CAT = { '소염제': ['소염제', '소염진통제', '소염 진통제'], '근육 푸는 약(근이완제)': ['근이완제', '근이완 복합제'] };
+function tipBan(s){
+  const f = activeFlags(); if (!f.length) return null;
+  const ids = [...new Set((s.plan || []).flatMap(p => p.options || []))].filter(o => drug(o));
+  const bad = ids.filter(o => (drug(o).avoid || []).some(a => !narrowAv(a) && (a.flags || []).some(x => f.includes(x))));
+  if (!bad.length) return null;
+  const W = new Set(), trim = t => String(t).replace(/\s*\d.*$/, '').replace(/(연질캡슐|캡슐|시럽|정)$/, '').trim();
+  bad.forEach(o => { const d = drug(o);
+    String(d.name).split(/[()·,/]|\s복합제/).map(trim).forEach(t => t.length >= 2 && W.add(t));
+    (d.products || []).forEach(x => { const t = trim(String(x.name || '').split(' ')[0]); if (t.length >= 2) W.add(t); }); });
+  const cat = {}; ids.forEach(o => { const c = CATN[o] || CATN[drug(o).class]; if (BAN_CAT[c]) (cat[c] ||= []).push(o); });
+  Object.entries(cat).forEach(([c, L]) => L.every(o => bad.includes(o)) && BAN_CAT[c].forEach(w => W.add(w)));
+  const words = [...W], hit = t => { const x = String(t || '').replace(/\*\*/g, ''); return words.some(w => x.includes(w)); };
+  return { hit, names: [...new Set(bad.map(o => ingrName(drug(o))))], why: [...new Set(bad.flatMap(o => (drug(o).avoid || []).filter(a => !narrowAv(a)).flatMap(a => (a.flags || []).filter(x => f.includes(x)))))] };
+}
+/* 목록은 줄째로 뺀다(문장 반쪽만 남기면 뜻이 바뀐다), 이야기 글(약국에서는)은 문장째로 */
+/* 「천식」 칸은 넓다 — 설명서가 «소염진통제로 발작이 난 적 있는 천식(아스피린 천식)»만 막는 약(아세트아미노펜 등)은
+   일반 천식에서 통째로 빼지 않고 지금처럼 「약사와 먼저 상의」로 남긴다(4차 #1 뒤 자체 점검 — 천식이면 두통에 살 약이 하나도 없어졌다) */
+const narrowAv = a => String(a.flags) === 'asthma' && /(아스피린|소염진통제|감기약)[^.]*(적이 있|있었던|생긴 적|온 적)/.test(a.text || '') && !/그 밖의 천식도 설명서/.test(a.text || '');
+const banList = (L, b) => !b || !Array.isArray(L) ? L : L.filter(t => !b.hit(typeof t === 'object' ? (t.q || '') + ' ' + (t.a || '') + ' ' + (t.t || t.text || '') : t));
+const banProse = (t, b) => !b || !t ? t : String(t).split(/(?<=[.!?])\s+/).filter(x => !b.hit(x)).join(' ');
+const banNote = b => !b ? '' : `<p class="note ban-note">${I.alert}<span>내 몸 조건(${esc(b.why.map(x => FLAG_LABEL[x] || x).join(', '))}) 때문에 <b>${esc(b.names.join('·'))}</b> 안내는 뺐어요 — 다른 약도 먹기 전에 약사·의사와 먼저 상의하세요.</span></p>`;
 function vSymptom(id, q){
   const s = byId(D.symptoms, id); if (!s) return vHome();
   if (svOn(q)) return vSymptomS(s);
   const f = activeFlags();
-  const bk = basket(s);
+  const bk = basket(s), ban = tipBan(s), B = k => banList(s[k], ban), nw = s.notWorking && banList(s.notWorking.steps, ban);
   const slotHtml = (p, i) => {
     const kind = p.otc === false ? 'rx' : (p.optional ? 'opt' : '');
     return `<div class="slot"><div class="n ${kind}">${esc(p.slot)}</div><div>
       <h3>${esc(p.title || p.slot)} ${p.otc === false ? '<span class="badge rx">처방 필요</span>' : !(p.options || []).length ? '<span class="badge cvs">약 없이 할 일</span>' : p.optional ? '<span class="badge soft">도움될 수 있어요</span>' : '<span class="badge otc">약국 구입</span>'}</h3>
-      ${whyHtml(p.why)}
-      <div class="opts">${(p.options || []).map(oid => { const d = drug(oid); if (!d) return ''; const warn = d.avoid?.some(a => a.flags?.some(x => f.includes(x))); return `<a class="opt-pill ${p.pick === oid ? 'pick' : ''}" href="#${String(oid).startsWith('lex:') ? '/ingr/' + String(oid).slice(4) : '/drug/' + oid}">${p.pick === oid ? '<span class="dot"></span>' : ''}${esc(d.name)}${warn ? ' <span class="badge stop">내 정보 주의</span>' : ''}</a>`; }).join('')}</div>
+      ${whyHtml(banProse(p.why, ban))}
+      <div class="opts">${(p.options || []).map(oid => { const d = drug(oid); if (!d) return ''; const warn = d.avoid?.some(a => a.flags?.some(x => f.includes(x)));
+        if (warn) return `<span class="opt-pill no">${esc(ingrName(d))} <span class="badge stop">내 몸 조건엔 피하세요</span></span>`; return `<a class="opt-pill ${p.pick === oid ? 'pick' : ''}" href="#${String(oid).startsWith('lex:') ? '/ingr/' + String(oid).slice(4) : '/drug/' + oid}">${p.pick === oid ? '<span class="dot"></span>' : ''}${esc(d.name)}${warn ? ' <span class="badge stop">내 정보 주의</span>' : ''}</a>`; }).join('')}</div>
       ${p.alt ? `<p class="alt">${fmt(p.alt)}</p>` : ''}
     </div></div>`;
   };
@@ -4524,13 +4565,13 @@ function vSymptom(id, q){
   <h1>${esc(s.name)}</h1></div>
   ${viewSeg('detail')}
   ${redflagCheck(s)}
-  ${triageCard(s)}
+  ${triageCard(s, ban)}
   ${workedCard(s)}
   ${fitChips(s)}
   ${(() => {
     /* 2026-09-29 — ClinicScore 문법: 답·병원·먹는 법·처방·출처가 아래로 이어져 폰 6장이었다 → 탭, 한 번에 한 칸 */
     const cn = (s.care?.clinic?.length || 0) + (s.care?.er?.length || 0) + (s.care ? 0 : (s.redflags || []).length);
-    const hasHow = ['how', 'pharmacy', 'selfcare', 'avoid', 'faq'].some(k => (s[k] || []).length) || s.notWorking;
+    const hasHow = ['how', 'pharmacy', 'selfcare', 'avoid', 'faq'].some(k => (B(k) || []).length) || nw?.length || ban;
     const hasRx = (s.plan || []).length || s.rxCombo || s.lead;
     const nsrc = (s.sources || []).length + (s.srcText || []).length;
     const T = [['sp1', noBuy ? '먼저 할 일' : '약국에서 사기'], ...(hasHow ? [['sp3', '드시는 법·팁']] : []), ...(hasRx ? [['sp4', '진료실 처방']] : []), ['sp2', '병원 갈 때', cn], ...(nsrc ? [['sp5', '근거', nsrc]] : [])];   /* 탭 순서: 약국에서 사기 → 드시는 법·팁 → 진료실 처방 → 병원 갈 때(현욱님 10-14) */
@@ -4567,16 +4608,23 @@ function vSymptom(id, q){
   ${doRows(s)}
   </div>
   <div class="pane" id="sp3">
+  ${erOnly()}
+  <div class="how-body">
+  ${banNote(ban)}
   <div class="explore">
-    ${xcard('how', 'clock', '이렇게 드세요', s.how, list(s.how, 'steps'), true)}
-    ${xcard('talk', 'cart', '약국에서 이렇게 말씀하세요', s.pharmacy, chatList(s.pharmacy))}
-    ${xcard('self', 'leaf', '약 없이도 해 볼 것', s.selfcare, ckList(s.selfcare))}
-    ${xcard('nono', 'no', '이것만은 피해 주세요', s.avoid, nonoList(s.avoid))}
-    ${s.notWorking ? xcard('next', 'clock', s.notWorking.title || '잘 낫지 않으면', s.notWorking.steps, tlList(s.notWorking.steps)) : ''}
-    ${s.faq?.length ? xcard('faq', 'info', '자주 묻는 질문', s.faq, faqList(s.faq)) : ''}
+    ${xcard('how', 'clock', '이렇게 드세요', B('how'), list(B('how'), 'steps'), true)}
+    ${xcard('talk', 'cart', '약국에서 이렇게 말씀하세요', B('pharmacy'), chatList(B('pharmacy')))}
+    ${xcard('self', 'leaf', '약 없이도 해 볼 것', B('selfcare'), ckList(B('selfcare')))}
+    ${xcard('nono', 'no', '이것만은 피해 주세요', B('avoid'), nonoList(B('avoid')))}
+    ${nw?.length ? xcard('next', 'clock', s.notWorking.title || '잘 낫지 않으면', nw, tlList(nw)) : ''}
+    ${B('faq')?.length ? xcard('faq', 'info', '자주 묻는 질문', B('faq'), faqList(B('faq'))) : ''}
+  </div>
   </div>
   </div>
   <div class="pane" id="sp4">
+  ${erOnly()}
+  <div class="how-body">
+  ${ban ? `<p class="note ban-note">${I.alert}<span>아래는 진료실에서 처방하는 방식이에요. 내 몸 조건에 피해야 할 약(<b>${esc(ban.names.join('·'))}</b>)이 있어요 — 따라 사지 마시고 의사와 먼저 상의하세요.</span></p>` : ''}
   <p class="lead-p">${fmt(s.lead)}</p>
   <section class="sec">
     <div class="rx-card">
@@ -4585,6 +4633,7 @@ function vSymptom(id, q){
     </div>
   </section>
   ${rxComboCard(s.rxCombo)}
+  </div>
   </div>
   <div class="pane" id="sp2"><section class="sec" id="care" style="margin-top:8px"><h2><span>어디까지 약국, 어디부터 병원인가요</span></h2>${careCards(s.care)}${!s.care ? flagBox('이럴 땐 약을 사지 말고 진료를 받으세요', s.redflags, s.redflagLead) : ''}</section></div>
   <div class="pane" id="sp5"><section class="sec card" style="margin-top:8px"><h2>이 화면의 근거</h2>${srcChips(s.sources, true)}${s.srcText?.length ? `<div class="srcs">${s.srcText.map(t => `<span class="src-chip${/검수 전|검수 필요|미확인/.test(t) ? ' unv' : ''}">${I.link}${esc(t)}</span>`).join('')}</div>` : ''}</section></div>
@@ -5767,12 +5816,14 @@ function vitalChart(k){
   const ticks = []; for (let v = lo; v <= hi; v += step) ticks.push(v);
   const grid = ticks.map(v => `<line x1="${pl}" x2="${W - pr}" y1="${Y(v)}" y2="${Y(v)}" class="vz-grid"/><text x="${pl - 6}" y="${Y(v) + 4}" text-anchor="end" class="vz-ax">${v}</text>`).join('');
   const days = [13, 6, 0].map(n => { const d = new Date(); d.setDate(d.getDate() - n); return `<text x="${Math.max(pl + fz * 1.3, Math.min(W - pr - fz * 1.3, X(dayKey(d) + 'T12:00')))}" y="${H - 6}" text-anchor="middle" class="vz-ax">${d.getMonth() + 1}/${d.getDate()}</text>`; }).join('');
-  const refs = ref.map((v, i) => `<line x1="${pl}" x2="${W - pr}" y1="${Y(v)}" y2="${Y(v)}" class="vz-ref"/><text x="${W - pr}" y="${Y(v) - 4}" text-anchor="end" class="vz-reft">${i ? '아래' : '위'} ${v}</text>`).join('');
+  const refs = ref.map((v, i) => `<line x1="${pl}" x2="${W - pr}" y1="${Y(v)}" y2="${Y(v)}" class="vz-ref"/>`).join('');
   const line = (f, c) => `<polyline points="${L.map(x => `${X(x.t).toFixed(1)},${Y(x[f]).toFixed(1)}`).join(' ')}" class="vz-line ${c}"/>` +
     L.map(x => `<circle cx="${X(x.t).toFixed(1)}" cy="${Y(x[f]).toFixed(1)}" r="4.5" class="vz-dot ${c}"><title>${x.t.slice(5, 10).replace('-', '/')} ${x.t.slice(11)} · ${k === 'bp' ? x.s + '/' + x.d + ' mmHg' : x.v + ' mg/dL'}</title></circle>`).join('');
   const series = k === 'bp' ? line('s', 'v1') + line('d', 'v2') : line('v', 'v1');
-  const legend = k === 'bp' ? `<div class="vz-legend"><span><i class="v1"></i>위 혈압(수축기)</span><span><i class="v2"></i>아래 혈압(이완기)</span><span><i class="ref"></i>가정혈압 기준</span></div>` : '';
-  return `<svg class="vz" style="--vz:${fz}px" viewBox="0 0 ${W} ${H}" role="img" aria-label="최근 2주 ${k === 'bp' ? '혈압' : '혈당'} 흐름 — 아래 목록에 같은 숫자가 있어요">${grid}${refs}${days}${series}</svg>${legend}`;
+  const legend = k === 'bp' ? `<div class="vz-legend"><span><i class="v1"></i>위 혈압(수축기)</span><span><i class="v2"></i>아래 혈압(이완기)</span></div>` : '';
+  /* 외부 검수 4차 #5 — 가장 큰 글씨에서 기준선 글자(위 135·아래 85)가 마지막 점과 겹쳤다. 글자는 그래프 위 한 줄로, 그래프 안에는 점선만 */
+  const refLine = k === 'bp' ? `<p class="vz-refl"><i class="ref"></i>가정혈압 기준: 위 ${VREF.bp.s} / 아래 ${VREF.bp.d}</p>` : '';
+  return `${refLine}<svg class="vz" style="--vz:${fz}px" viewBox="0 0 ${W} ${H}" role="img" aria-label="최근 2주 ${k === 'bp' ? '혈압' : '혈당'} 흐름 — 아래 목록에 같은 숫자가 있어요">${grid}${refs}${days}${series}</svg>${legend}`;
 }
 function vVitals(){
   const k = VT.k, L = vitals(), mine = L.map((x, i) => ({ ...x, i })).filter(x => x.k === k).reverse();
@@ -6405,6 +6456,9 @@ function prodFam(n){
   if (L.length > 2) L = L.filter(x => x.k !== root || x.p);
   return L.length > 1 ? { root, L: L.slice(0, 6) } : null;
 }
+function famPick(root, L){ const kid = x => /키즈|어린이|소아|베이비/.test(x.t), A = L.filter(x => !kid(x)), K = L.filter(kid);
+  const row = (h, M) => M.length ? `<p class="ph-i" style="margin:10px 0 6px;font-weight:700">${h}</p><div class="chips">${M.map(x => `<button class="chip" onclick="go('${esc(x.h)}')">${esc(x.t)}<small>${esc(famSub(x.t))}</small></button>`).join('')}</div>` : '';
+  return `<div class="phead fam-pick"><div class="ph-b"><b class="ph-n">어떤 ${esc(root)}인가요?</b><p class="ph-i">정확한 제품 이름을 골라 주세요 — 제품마다 성분과 먹는 법이 달라요.</p>${row('어른용', A)}${row('어린이용', K)}</div></div>`; }
 /* 외부 검수 2차 #27 — 상품을 고르기 전(「판피린」)에는 가족을 합친 성분·용법을 보이지 않는다(큐액 6성분 · 티정 3성분). 가족 칩 가운데 고른 것이 없으면 아직 안 고른 것 */
 const famAmb = n => { const f = prodFam(n), cur = prodDrug(n)?.p, s = famStem(n); return f && !f.L.some(x => x.k === s || (!!cur && x.p === cur)) ? f : null; };
 function famChips(n){ const f = prodFam(n), cur = prodDrug(n)?.p, s = famStem(n); if (!f) return '';
