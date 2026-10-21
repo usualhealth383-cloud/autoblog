@@ -6920,7 +6920,8 @@ const KG = {};
 const KG_N = 128;
 const kgShard = seq => (/^\d+$/.test(String(seq)) ? Number(String(seq)) : 0) % KG_N;
 function kgGet(seq){
-  if (!seq) return null; const k = kgShard(seq);
+  /* 약학정보원 자료 끔(2026-10-21 저작권 — tools/build.py KPIC_USE) */
+  if (!seq || D.meta?.kpic === false) return null; const k = kgShard(seq);
   if (!(k in KG)) { KG[k] = null; fetch(dataPath(`kg/${k}.json`)).then(r => r.ok ? r.json() : {}).then(j => { KG[k] = j || {}; if (j && j[String(seq)]) redraw(); }).catch(() => { KG[k] = {}; }); return null; }
   return KG[k] ? (KG[k][String(seq)] || null) : null;
 }
@@ -7065,7 +7066,7 @@ function vPill(){
   ${nq ? `<section class="sec"><h2>제품 이름으로 찾은 것 <small>물약·가루약도 함께</small></h2>${nh.length ? `<div class="card results">${hitsHtml(nh)}</div>` : ''}<button class="btn line" style="margin-top:8px" onclick="go('/search?q='+encodeURIComponent(PILLQ.txt.trim()))">${I.search} 이름으로 모두 찾기</button></section>` : ''}
   <section class="sec"><h2>${active ? `${nq ? '알약 모양·글자로 찾은 ' : ''}후보 ${res.length.toLocaleString()}개` : '고르면 여기에 사진이 나와요'} <small>${res.length > 30 ? '30개만 표시 — 글자나 색을 더 고르면 줄어요' : PILLQ.rx ? `약국약 ${(PUB.pills || []).length.toLocaleString()} + 처방약 ${(PUB.rx || []).length.toLocaleString()}건에서` : `약국약 ${(PUB.pills || []).length.toLocaleString()}건에서`}</small></h2>
     ${shown.length ? `<div class="pill-grid">${shown.map(([sc, p]) => pillCard(p, sc)).join('')}</div>` : active ? '<div class="empty"><b>조건에 맞는 약이 없어요</b>이름이면 앞 두세 글자만 쳐 보세요(베시케어 → 베시). 각인이면 글자를 줄이거나 색을 바꿔 보세요.</div>' : ''}
-    <div class="srcs"><span class="src-chip">${I.link}출처: 식약처 의약품 낱알식별 정보 · 사진 약학정보원</span></div></section>
+    <div class="srcs"><span class="src-chip">${I.link}출처: 식약처 의약품 낱알식별 정보</span></div></section>
   ${disclaimer('낱알 사진과 각인은 참고용이에요. 같은 모양의 다른 약도 있으니, 확실하지 않으면 약사에게 실물을 보여 주세요.')}`;
 }
 function pillFm(p){ const t = (p.fm || '') + ' ' + (p.n || ''); return /연질/.test(t) ? 'soft' : /캡슐|캅셀/.test(t) ? 'cap' : 'tab'; }
@@ -7151,7 +7152,7 @@ function vPillInfo(seq){
   <div class="actions"><button class="btn ${taking ? 'line' : ''}" onclick="togglePub('${p.seq}')">${taking ? I.check + ' 내 약통에 있어요 (빼기)' : I.pill + ' 내 약통에 담기'}</button>${taking && takingItems().length >= 2 ? `<button class="btn ghost" onclick="go('/together')">${I.shield} 다른 약과 같이 먹어도 되는지 보기</button>` : ''}${taking ? `<button class="btn ghost" onclick="go('/schedule')">${I.clock} 복용 시간 알림 만들기</button>` : ''}</div>
   <div class="links" style="display:flex;gap:6px;flex-wrap:wrap;margin-top:12px"><a class="plink" href="https://nedrug.mfds.go.kr/pbp/CCBBB01/getItemDetail?itemSeq=${esc(p.seq)}" target="_blank" rel="noopener">${I.link}식약처 허가정보</a>${kpicLink(p.seq) ? `<a class="plink" href="${kpicLink(p.seq)}" target="_blank" rel="noopener">${I.search}약학정보원 — 사진·자세히</a>` : `<a class="plink" href="https://www.health.kr/searchDrug/search_detail.asp" target="_blank" rel="noopener" onclick="copyName('${esc(p.n.replace(/\(.*?\)/g, '')).replace(/'/g, "\\'")}')">${I.search}약학정보원에서 찾기</a>`}</div>
   ${kgCard(p.seq)}
-  <div class="srcs"><span class="src-chip">${I.link}출처: 식약처 의약품 낱알식별 정보 · 사진 약학정보원</span></div>
+  <div class="srcs"><span class="src-chip">${I.link}출처: 식약처 의약품 낱알식별 정보</span></div>
   ${disclaimer('낱알 정보는 참고용이에요. 같은 모양의 다른 약도 있으니 확실하지 않으면 약사에게 실물을 보여 주세요.')}`;
 }
 /* 2026-10-13 상용화 점검 3-03 — 낱알 자료 약국약의 3분의 2는 성분 칸이 비어 있다(복합 감기약·진통제가 대부분).

@@ -65,6 +65,14 @@ if (pub / 'pills-rx.json').exists() and (pub / 'pills.json').exists() and (pub /
     _rxl = [[x[0], x[1], ''] + x[3:] for x in _rxl]   # 회사 이름은 뺀다(같은 이름은 함량이 이름에 있어 구별된다) — 약 화면에서 낱알 자료로 보인다
     (pub / 'names-rx.json').write_text(json.dumps(_rxl, ensure_ascii=False, separators=(',', ':')), encoding='utf-8')
     data['public'].update({'prod_otc': _otc, 'prod_rx': sum(1 for x in _rxl if len(x) == 3)})
+# ⛔ 약학정보원 자료 끔(2026-10-21, 현욱님 「저작권에 위배되는 사항이 없는지 잘 확인」) — 약학정보원 「법적 책임의 한계」(https://www.health.kr/notice/legal):
+#   「제공하는 모든 정보…의 저작권은 법인에 있습니다. 허락 없이 사용할 경우 법적 제재」, 이용약관(/notice/terms): 「얻은 정보를 가공, 판매하는 행위 등… 상업적으로 사용할 수 없습니다」.
+#   약지도는 유료 앱이라 복약정보(1만 9천 건)·상자 사진(common.health.kr)·그림 표시를 싣지 않는다. 「약학정보원에서 보기」 링크는 남긴다(링크는 복제가 아님).
+#   정식 이용 허락(약학정보원 광고/제휴 문의)을 받으면 True 로 바꾸고 tools/kpic_detail.py·kpic_products.py 로 다시 모은다.
+KPIC_USE = False
+if not KPIC_USE:
+    data['productImages'] = {k: v for k, v in (data.get('productImages') or {}).items() if 'health.kr' not in str(v.get('img', ''))}
+    if isinstance(data.get('meta'), dict): data['meta']['kpic'] = False
 # 낱알 사진은 식약처 서버 주소를 그대로 쓴다(저장 안 함). docs/yakjido/img/ 에 파일이 있을 때만 그것을 우선.
 imgdir = ROOT.parent / 'docs' / 'yakjido' / 'img'
 for v in (data.get('productImages') or {}).values():
@@ -73,7 +81,9 @@ for v in (data.get('productImages') or {}).values():
         if (imgdir / (iid + ext)).exists(): v['img'] = 'img/' + iid + ext; break
 # 약학정보원 복약정보(tools/kpic_detail.py) — 제품 화면이 그 제품 조각만 받게 16개로 나눈다(2026-09-30)
 kg = pub / 'kpic-guide.json'
-if kg.exists():
+if not KPIC_USE:
+    import shutil; shutil.rmtree(pub / 'kg', ignore_errors=True); (pub / 'kpic.json').write_text('{}', encoding='utf-8')
+elif kg.exists():
     _g = json.loads(kg.read_text(encoding='utf-8')); _kd = pub / 'kg'; _kd.mkdir(exist_ok=True)
     if (pub / 'kpic-extra.json').exists():   # 약 사전 대표 제품(tools/kpic_rep.py) — 수집 파일과 따로 받은 것
         for _s, _v in json.loads((pub / 'kpic-extra.json').read_text(encoding='utf-8')).items():
