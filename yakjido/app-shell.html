@@ -6855,7 +6855,7 @@ function vDrug(id, q = {}){
     ${d.simple ? `<div class="dose-hero" style="margin-top:0;margin-bottom:16px"><small>간단히 — 약국 구입 기준</small><div style="font-size:1.0625rem;font-weight:700;line-height:1.5;margin-top:4px">${fmt(d.simple)}</div></div>` : ''}
     ${d.how?.length ? `<h2>알아 두실 것</h2>${list(d.how)}` : ''}
     ${d.tips?.length ? `<h2${d.how?.length ? ' style="margin-top:20px"' : ''}>${isOral(d) ? '어떻게 먹나요?' : '어떻게 쓰나요?'}</h2>${list(d.tips)}` : ''}
-    ${d.faq?.length ? `<h2 style="margin-top:20px">자주 묻는 질문</h2>${faqList(d.faq)}` : ''}
+    ${(() => { const F = (d.faq || []).filter(x => !d.kidSel || !/\d\s*(~\s*\d+\s*)?(정|알|캡슐)/.test((x.q || '') + ' ' + (x.a || ''))); return F.length ? `<h2 style="margin-top:20px">자주 묻는 질문</h2>${faqList(F)}` : ''; })()}
     ${keepToss(d)}
   </section></div>
   <div class="pane" id="p2"><section class="card">
