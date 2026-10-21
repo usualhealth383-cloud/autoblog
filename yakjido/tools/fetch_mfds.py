@@ -177,8 +177,9 @@ DTL_OPS = ['DrugPrdtPrmsnInfoService08/getDrugPrdtPrmsnDtlInq07', 'DrugPrdtPrmsn
 
 def _doc_text(x):
     """허가 문서 칸(EE_DOC_DATA·UD_DOC_DATA·NB_DOC_DATA)은 XML 글 — 태그를 걷고 문단만 남긴다"""
-    t = re.sub(r'<(PARAGRAPH|ARTICLE)[^>]*title="([^"]*)"[^>]*>', lambda m: '\n' + m.group(2) + '\n', s(x))
-    t = re.sub(r'<[^>]+>', '\n', t); t = re.sub(r'&lt;', '<', t); t = re.sub(r'&gt;', '>', t); t = re.sub(r'&amp;', '&', t)
+    t = s(x).replace('<![CDATA[', '').replace(']]>', '')   # 문단 글은 CDATA 안에 있다 — 먼저 벗겨야 태그 지우기에 글이 같이 지워지지 않는다(10-22)
+    t = re.sub(r'<(PARAGRAPH|ARTICLE)[^>]*title="([^"]*)"[^>]*>', lambda m: '\n' + m.group(2) + '\n', t)
+    t = re.sub(r'<[^>]+>', '\n', t); t = t.replace('&nbsp;', ' ').replace('&lt;', '<').replace('&gt;', '>').replace('&amp;', '&')
     return re.sub(r'\n\s*\n+', '\n', t).strip()
 
 
