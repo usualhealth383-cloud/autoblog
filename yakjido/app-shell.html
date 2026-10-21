@@ -2057,7 +2057,7 @@ const icon = n => I[n] || I.pill;
 
 /* 내 정보(기기 내 저장) */
 const ME_KEY = 'yakjido.me.v1';
-const ME_DEF = { child:null, age:'adult', pregnant:false, nursing:false, ulcer:false, kidney:false, liver:false, heart:false, hf:false, asthma:false, anticoag:false, alcohol:false, gout:false, glaucoma:false, bph:false };
+const ME_DEF = { child:null, age:'adult', pregnant:false, nursing:false, ulcer:false, kidney:false, liver:false, lvs:false, heart:false, hf:false, asthma:false, anticoag:false, alcohol:false, gout:false, glaucoma:false, bph:false };
 let ME = { ...ME_DEF };
 /* 2026-10-13 상용화 점검 — 기록의 «모양»을 들어올 때마다 바로잡는다(가져온 파일·서버에서 받은 것·옛 판 기록).
    ① 모양이 틀린 파일 하나로 모든 화면이 오류가 되던 것(예: taking 이 글자) ② 일부러 만든 파일로 화면에 코드가 끼어들던 것
@@ -2132,7 +2132,7 @@ const saveMe = () => { try {
 function snapMe(){ ME_SNAP = {}; for (const k of Object.keys(ME)) if (k !== '_mt') ME_SNAP[k] = JSON.stringify(ME[k]); }
 snapMe();
 /* 두 폰 합치기(mergeMe)는 동기화 때만 쓰여 srv.js 에 있다(첫 화면 예산) */
-const FLAG_LABEL = { pregnant:'임신 중', nursing:'수유 중', ulcer:'위가 약함·위궤양·위장출혈 병력', kidney:'신장 질환', liver:'간 질환·음주', heart:'고혈압·심장병', hf:'심한 심장병·조절 안 되는 고혈압', asthma:'천식', anticoag:'항응고제·항혈소판제 복용', alcohol:'술을 자주 마심', gout:'통풍', glaucoma:'녹내장', bph:'전립선비대', diabetes:'당뇨', senior:'65세 이상', child:'소아' };
+const FLAG_LABEL = { pregnant:'임신 중', nursing:'수유 중', ulcer:'위가 약함·위궤양·위장출혈 병력', kidney:'신장 질환', liver:'간 질환·음주', lvs:'심한 간질환(간경변 등)', heart:'고혈압·심장병', hf:'심한 심장병·조절 안 되는 고혈압', asthma:'천식', anticoag:'항응고제·항혈소판제 복용', alcohol:'술을 자주 마심', gout:'통풍', glaucoma:'녹내장', bph:'전립선비대', diabetes:'당뇨', senior:'65세 이상', child:'소아' };
 /* 「이 약, 효과 봤어요」 — 증상마다 내가 효과 본 약을 기억해 둔다.
    현욱님 지시(2026-09-17): 다음에 같은 증상이 오면 지난번에 들었던 약부터 보여 준다.
    기기에만 저장되고 어디로도 보내지 않는다. */
@@ -2254,7 +2254,7 @@ const ingrNameK = n => String(n || '').replace(/\s*\(.*$/, '').trim();
 function activeFlags(){ const f = Object.keys(FLAG_LABEL).filter(k => k !== 'senior' && k !== 'child' && ME[k] === true);
   /* 2026-10-13 — 어르신 모드(easy)·둘러보기(demo) 같은 참/거짓 칸이 「조건」으로 세져 약사 카드에 빈칸·「easy」가 찍히던 것 */
 if (ME.age === 'senior') f.push('senior'); if (ME.age === 'child') f.push('child');
-  if (f.includes('hf') && !f.includes('heart')) f.push('heart'); return f; }
+  if (f.includes('hf') && !f.includes('heart')) f.push('heart'); if (f.includes('lvs') && !f.includes('liver')) f.push('liver'); return f; }
 
 /* 비교 바구니 */
 let CMP = [];
@@ -3762,7 +3762,7 @@ function vSearch(_, q){
 const FLAG_Q = {
   pregnant:'임신 중이에요', nursing:'모유 수유 중이에요', ulcer:'위가 약함·위궤양·위장출혈 병력이 있어요',
   heart:'고혈압·심장병이 있어요', hf:'심부전·협심증·부정맥이 있거나, 약을 먹어도 혈압이 잘 안 잡혀요', anticoag:'피를 묽게 하는 약(항응고제·아스피린)을 먹어요',
-  kidney:'신장이 안 좋아요', liver:'간이 안 좋아요', alcohol:'술을 자주 마셔요',
+  kidney:'신장이 안 좋아요', liver:'간이 안 좋아요', lvs:'간경변이 있거나 간이 많이 나쁘다는 말을 들었어요', alcohol:'술을 자주 마셔요',
   asthma:'천식이 있어요', glaucoma:'녹내장이 있어요', bph:'전립선이 커요(소변 줄기가 약해요)',
   gout:'통풍이 있어요', diabetes:'당뇨가 있어요', senior:'65세 이상이에요', child:'소아·청소년(15세 미만)이에요'
 };
@@ -6237,7 +6237,7 @@ function vHello(step){
     ${skip}`;
   }
   if (n === 2) {
-    const kid = ME.age === 'child', KEYS = kid ? ['asthma', 'heart', 'kidney', 'liver', 'diabetes'] : ['heart', 'hf', 'diabetes', 'ulcer', 'kidney', 'liver', 'anticoag', 'glaucoma', 'bph', 'asthma', 'alcohol', 'gout', 'pregnant', 'nursing'];
+    const kid = ME.age === 'child', KEYS = kid ? ['asthma', 'heart', 'kidney', 'liver', 'diabetes'] : ['heart', 'hf', 'diabetes', 'ulcer', 'kidney', 'liver', 'lvs', 'anticoag', 'glaucoma', 'bph', 'asthma', 'alcohol', 'gout', 'pregnant', 'nursing'];
     const on = KEYS.filter(k => ME[k]).length;
     return `${topBar({ back:'이전', nosearch:true })}${dots}
     <h1 class="hello-q">해당하는 것이 있으면 눌러 주세요</h1>
@@ -7420,12 +7420,12 @@ function photoResult(R){
 const SHARE = () => D.meta?.share || {};
 /* 2026-10-13 상용화 점검 3-06 — 약은 «받는 분» 몸 상태로 고른다(보내는 사람 ME 가 아니라). 받는 분 칩 네 가지 */
 /* 외부 검수 2차 #10 — 콩팥·간 질환(약 거르개에 들어감)과 알레르기·드시는 약·잘 모르겠어요(보낼 글에 한 줄로 — 약사에게 꼭 말하게) */
-const SEND_FQ = [['senior', '65세 이상이세요'], ['heart', '혈압·심장약 드세요'], ['hf', '심부전·협심증·부정맥이 있거나 혈압이 잘 안 잡히세요'], ['anticoag', '피를 묽게 하는 약 드세요'], ['ulcer', '위가 약하거나 위궤양·위장출혈이 있으세요'], ['kidney', '콩팥병이 있으세요'], ['liver', '간질환이 있으세요'], ['alg', '약 알레르기가 있었어요'], ['meds', '드시는 약이 있으세요'], ['unk', '지병·드시는 약을 잘 모르겠어요']];
+const SEND_FQ = [['senior', '65세 이상이세요'], ['heart', '혈압·심장약 드세요'], ['hf', '심부전·협심증·부정맥이 있거나 혈압이 잘 안 잡히세요'], ['anticoag', '피를 묽게 하는 약 드세요'], ['ulcer', '위가 약하거나 위궤양·위장출혈이 있으세요'], ['kidney', '콩팥병이 있으세요'], ['liver', '간질환이 있으세요'], ['lvs', '간경변 등 간이 많이 나쁘세요'], ['alg', '약 알레르기가 있었어요'], ['meds', '드시는 약이 있으세요'], ['unk', '지병·드시는 약을 잘 모르겠어요']];
 const SEND_XL = { alg: '받는 분은 약 알레르기가 있었어요 — 약사님께 꼭 말씀하세요.', meds: '받는 분이 드시는 약이 있어요 — 약봉투를 약사님께 같이 보여 주세요.', unk: '받는 분의 지병과 약은 아직 확인하지 않았어요. 약사에게 목록을 보여 주세요.' };
 const sendXL = () => SEND_F.map(k => SEND_XL[k]).filter(Boolean).concat(SEND_Q?.s && rfOf(SEND_Q.s) === 'cl' ? ['진료를 받으셔야 하는 신호가 있다고 표시했어요 — 약보다 진료가 먼저예요.'] : []);
 /* 「부모님께」라 받는 분은 대개 어르신 — 65세 이상을 기본으로 켠다(더 조심하는 쪽, 의사-질문-1013-2 6번) */
 let SEND_F = ['senior'], SEND_LBL = '', SEND_NOTE = '';
-function sendBasket(q){ const sy = q?.s ? byId(D.symptoms, q.s) : null; if (!sy) return null; const fl = SEND_F.slice(); if (fl.includes('hf') && !fl.includes('heart')) fl.push('heart'); return basketPicked(sy, basket(sy, { flags: fl })); }
+function sendBasket(q){ const sy = q?.s ? byId(D.symptoms, q.s) : null; if (!sy) return null; const fl = SEND_F.slice(); if (fl.includes('hf') && !fl.includes('heart')) fl.push('heart'); if (fl.includes('lvs') && !fl.includes('liver')) fl.push('liver'); return basketPicked(sy, basket(sy, { flags: fl })); }
 function sendItems(q){
   if (q?.s) { const bk = sendBasket(q); if (!bk) return [];
     /* 주된 칸 + 증상 화면에서 「약국 카드에 넣기」로 넣은 보조 칸(Z4 #12). 「이 중 하나만」 묶음은 하나만(Z7 A1) */
@@ -8015,6 +8015,7 @@ const CONDS = [
   ['ulcer', '위가 약함·위궤양·위장출혈 병력', '소염진통제를 고를 때 가장 중요해요'],
   ['kidney', '신장 질환', '소염진통제·마그네슘 등에 주의'],
   ['liver', '간 질환', '아세트아미노펜 용량에 주의'],
+  ['lvs', '심한 간질환(간경변 등)', '일부 진통제·소화제는 먹지 않아요'],
   ['alcohol', '술을 자주 마심', '주 3회 이상이면 켜 주세요'],
   /* 처음 안내·카드·내 몸이 같은 이름(3-20) */
   ['heart', '고혈압·심장병', '일부 소염진통제·코감기약에 주의'],

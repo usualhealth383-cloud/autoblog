@@ -187,7 +187,7 @@ for d in D:
 
 # 「내 정보」 조건 이름은 정해진 13가지뿐이다. 없는 이름을 쓰면 그 주의는 «영원히 안 뜬다».
 # 실제로 달걀 알레르기에 없는 이름(allergy)을 쓴 곳이 있었다.
-VALID_FLAG = {'pregnant', 'nursing', 'ulcer', 'heart', 'hf', 'anticoag', 'kidney', 'liver', 'alcohol',
+VALID_FLAG = {'pregnant', 'nursing', 'ulcer', 'heart', 'hf', 'lvs', 'anticoag', 'kidney', 'liver', 'alcohol',
               'asthma', 'glaucoma', 'bph', 'gout', 'diabetes', 'senior', 'child'}
 for d in D:
     for a in (d.get('avoid') or []) + (d.get('caution') or []):

@@ -1746,8 +1746,8 @@ background-repeat:no-repeat;background-position:right 9px center;background-size
 <script>
 window.__YAKJIDO_OK__ = true;
 const D = JSON.parse(document.getElementById('data').textContent || '{}');
-const BUILD = '2026-10-21 09:51';
-const DATAV = '9558050229'.indexOf('__') === 0 ? BUILD : '9558050229';
+const BUILD = '2026-10-21 09:53';
+const DATAV = '84ba1193c7'.indexOf('__') === 0 ? BUILD : '84ba1193c7';
 const BRANDMARK = (typeof window !== 'undefined' && window.__BRANDMARK__) || 'icon-192.png';
 let CORE = 0, CORE_P = null;
 function mergeCore(c){
@@ -1860,7 +1860,7 @@ f_sup:'<svg class="i" viewBox="0 0 24 24"><path d="M12 3c2.6 2.4 4 4.6 4 7.4v6.2
 const icon = n => I[n] || I.pill;
 
 const ME_KEY = 'yakjido.me.v1';
-const ME_DEF = { child:null, age:'adult', pregnant:false, nursing:false, ulcer:false, kidney:false, liver:false, heart:false, hf:false, asthma:false, anticoag:false, alcohol:false, gout:false, glaucoma:false, bph:false };
+const ME_DEF = { child:null, age:'adult', pregnant:false, nursing:false, ulcer:false, kidney:false, liver:false, lvs:false, heart:false, hf:false, asthma:false, anticoag:false, alcohol:false, gout:false, glaucoma:false, bph:false };
 let ME = { ...ME_DEF };
 const SAFE_ID = /^[A-Za-z0-9가-힣_.:\-]{1,80}$/, SAFE_HM = /^([01]\d|2[0-3]):[0-5]\d$/, SAFE_DAY = /^\d{4}-\d{2}-\d{2}$/;
 const ALG_R = { hives:'두드러기', breath:'숨이 참', swell:'붓기', unk:'모름' };
@@ -1917,7 +1917,7 @@ if (!saveMe.persist && (ME.taking || []).length) { saveMe.persist = true; try { 
 } catch (e) { if (!saveMe.warned && STORE_OK) { saveMe.warned = true; try { toast('저장하지 못했어요 — 휴대폰 저장 공간을 확인해 주세요'); } catch (e2) {} } } };
 function snapMe(){ ME_SNAP = {}; for (const k of Object.keys(ME)) if (k !== '_mt') ME_SNAP[k] = JSON.stringify(ME[k]); }
 snapMe();
-const FLAG_LABEL = { pregnant:'임신 중', nursing:'수유 중', ulcer:'위가 약함·위궤양·위장출혈 병력', kidney:'신장 질환', liver:'간 질환·음주', heart:'고혈압·심장병', hf:'심한 심장병·조절 안 되는 고혈압', asthma:'천식', anticoag:'항응고제·항혈소판제 복용', alcohol:'술을 자주 마심', gout:'통풍', glaucoma:'녹내장', bph:'전립선비대', diabetes:'당뇨', senior:'65세 이상', child:'소아' };
+const FLAG_LABEL = { pregnant:'임신 중', nursing:'수유 중', ulcer:'위가 약함·위궤양·위장출혈 병력', kidney:'신장 질환', liver:'간 질환·음주', lvs:'심한 간질환(간경변 등)', heart:'고혈압·심장병', hf:'심한 심장병·조절 안 되는 고혈압', asthma:'천식', anticoag:'항응고제·항혈소판제 복용', alcohol:'술을 자주 마심', gout:'통풍', glaucoma:'녹내장', bph:'전립선비대', diabetes:'당뇨', senior:'65세 이상', child:'소아' };
 function workedList(sid){ return (ME.worked && ME.worked[sid]) || []; }
 function isWorked(sid, did){ return workedList(sid).includes(did); }
 function toggleWorked(sid, did){
@@ -2020,7 +2020,7 @@ return c ? `<div class="note" style="margin-top:12px">${I.alert}<span><b>알레�
 const ingrNameK = n => String(n || '').replace(/\s*\(.*$/, '').trim();
 function activeFlags(){ const f = Object.keys(FLAG_LABEL).filter(k => k !== 'senior' && k !== 'child' && ME[k] === true);
 if (ME.age === 'senior') f.push('senior'); if (ME.age === 'child') f.push('child');
-if (f.includes('hf') && !f.includes('heart')) f.push('heart'); return f; }
+if (f.includes('hf') && !f.includes('heart')) f.push('heart'); if (f.includes('lvs') && !f.includes('liver')) f.push('liver'); return f; }
 
 let CMP = [];
 
@@ -3209,7 +3209,7 @@ return `${topBar({ back:'뒤로' })}<h1>‘${esc(s)}’ 검색 <small class="mut
 const FLAG_Q = {
 pregnant:'임신 중이에요', nursing:'모유 수유 중이에요', ulcer:'위가 약함·위궤양·위장출혈 병력이 있어요',
 heart:'고혈압·심장병이 있어요', hf:'심부전·협심증·부정맥이 있거나, 약을 먹어도 혈압이 잘 안 잡혀요', anticoag:'피를 묽게 하는 약(항응고제·아스피린)을 먹어요',
-kidney:'신장이 안 좋아요', liver:'간이 안 좋아요', alcohol:'술을 자주 마셔요',
+kidney:'신장이 안 좋아요', liver:'간이 안 좋아요', lvs:'간경변이 있거나 간이 많이 나쁘다는 말을 들었어요', alcohol:'술을 자주 마셔요',
 asthma:'천식이 있어요', glaucoma:'녹내장이 있어요', bph:'전립선이 커요(소변 줄기가 약해요)',
 gout:'통풍이 있어요', diabetes:'당뇨가 있어요', senior:'65세 이상이에요', child:'소아·청소년(15세 미만)이에요'
 };
@@ -5256,7 +5256,7 @@ return `${topBar({ nosearch:true })}${dots}
 ${skip}`;
 }
 if (n === 2) {
-const kid = ME.age === 'child', KEYS = kid ? ['asthma', 'heart', 'kidney', 'liver', 'diabetes'] : ['heart', 'hf', 'diabetes', 'ulcer', 'kidney', 'liver', 'anticoag', 'glaucoma', 'bph', 'asthma', 'alcohol', 'gout', 'pregnant', 'nursing'];
+const kid = ME.age === 'child', KEYS = kid ? ['asthma', 'heart', 'kidney', 'liver', 'diabetes'] : ['heart', 'hf', 'diabetes', 'ulcer', 'kidney', 'liver', 'lvs', 'anticoag', 'glaucoma', 'bph', 'asthma', 'alcohol', 'gout', 'pregnant', 'nursing'];
 const on = KEYS.filter(k => ME[k]).length;
 return `${topBar({ back:'이전', nosearch:true })}${dots}
 <h1 class="hello-q">해당하는 것이 있으면 눌러 주세요</h1>
@@ -6284,11 +6284,11 @@ PH.img = ''; return parts.join('');
 }
 
 const SHARE = () => D.meta?.share || {};
-const SEND_FQ = [['senior', '65세 이상이세요'], ['heart', '혈압·심장약 드세요'], ['hf', '심부전·협심증·부정맥이 있거나 혈압이 잘 안 잡히세요'], ['anticoag', '피를 묽게 하는 약 드세요'], ['ulcer', '위가 약하거나 위궤양·위장출혈이 있으세요'], ['kidney', '콩팥병이 있으세요'], ['liver', '간질환이 있으세요'], ['alg', '약 알레르기가 있었어요'], ['meds', '드시는 약이 있으세요'], ['unk', '지병·드시는 약을 잘 모르겠어요']];
+const SEND_FQ = [['senior', '65세 이상이세요'], ['heart', '혈압·심장약 드세요'], ['hf', '심부전·협심증·부정맥이 있거나 혈압이 잘 안 잡히세요'], ['anticoag', '피를 묽게 하는 약 드세요'], ['ulcer', '위가 약하거나 위궤양·위장출혈이 있으세요'], ['kidney', '콩팥병이 있으세요'], ['liver', '간질환이 있으세요'], ['lvs', '간경변 등 간이 많이 나쁘세요'], ['alg', '약 알레르기가 있었어요'], ['meds', '드시는 약이 있으세요'], ['unk', '지병·드시는 약을 잘 모르겠어요']];
 const SEND_XL = { alg: '받는 분은 약 알레르기가 있었어요 — 약사님께 꼭 말씀하세요.', meds: '받는 분이 드시는 약이 있어요 — 약봉투를 약사님께 같이 보여 주세요.', unk: '받는 분의 지병과 약은 아직 확인하지 않았어요. 약사에게 목록을 보여 주세요.' };
 const sendXL = () => SEND_F.map(k => SEND_XL[k]).filter(Boolean).concat(SEND_Q?.s && rfOf(SEND_Q.s) === 'cl' ? ['진료를 받으셔야 하는 신호가 있다고 표시했어요 — 약보다 진료가 먼저예요.'] : []);
 let SEND_F = ['senior'], SEND_LBL = '', SEND_NOTE = '';
-function sendBasket(q){ const sy = q?.s ? byId(D.symptoms, q.s) : null; if (!sy) return null; const fl = SEND_F.slice(); if (fl.includes('hf') && !fl.includes('heart')) fl.push('heart'); return basketPicked(sy, basket(sy, { flags: fl })); }
+function sendBasket(q){ const sy = q?.s ? byId(D.symptoms, q.s) : null; if (!sy) return null; const fl = SEND_F.slice(); if (fl.includes('hf') && !fl.includes('heart')) fl.push('heart'); if (fl.includes('lvs') && !fl.includes('liver')) fl.push('liver'); return basketPicked(sy, basket(sy, { flags: fl })); }
 function sendItems(q){
 if (q?.s) { const bk = sendBasket(q); if (!bk) return [];
 const all = bk.filter(x => !x.blocked && x.d && !x.again);
@@ -6811,6 +6811,7 @@ const CONDS = [
 ['ulcer', '위가 약함·위궤양·위장출혈 병력', '소염진통제를 고를 때 가장 중요해요'],
 ['kidney', '신장 질환', '소염진통제·마그네슘 등에 주의'],
 ['liver', '간 질환', '아세트아미노펜 용량에 주의'],
+['lvs', '심한 간질환(간경변 등)', '일부 진통제·소화제는 먹지 않아요'],
 ['alcohol', '술을 자주 마심', '주 3회 이상이면 켜 주세요'],
 ['heart', '고혈압·심장병', '일부 소염진통제·코감기약에 주의'],
 ['hf', '심한 심장병·조절 안 되는 고혈압', '심부전·협심증·부정맥, 약을 먹어도 혈압이 높을 때'],
