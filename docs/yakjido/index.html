@@ -1753,8 +1753,8 @@ background-repeat:no-repeat;background-position:right 9px center;background-size
 <script>
 window.__YAKJIDO_OK__ = true;
 const D = JSON.parse(document.getElementById('data').textContent || '{}');
-const BUILD = '2026-10-22 07:48';
-const DATAV = 'dfd6fa18ec'.indexOf('__') === 0 ? BUILD : 'dfd6fa18ec';
+const BUILD = '2026-10-22 07:57';
+const DATAV = 'cab9314b8c'.indexOf('__') === 0 ? BUILD : 'cab9314b8c';
 const BRANDMARK = (typeof window !== 'undefined' && window.__BRANDMARK__) || 'icon-192.png';
 let CORE = 0, CORE_P = null;
 function mergeCore(c){
@@ -3383,7 +3383,7 @@ const euro = w => { const c = String(w).trim().slice(-1).charCodeAt(0) - 0xAC00;
 const flagWords = (ks, sep = '·') => (ks || []).map(k => FLAG_LABEL[k] || WHY_LABEL[k]).filter(Boolean).join(sep);
 function memoText(s){
 if (RF.sid === s.id && RF.er.size) return `[약지도] ${s.name}\n응급 신호에 체크하셨어요 — 약을 사지 말고 119에 전화하거나 응급실로 가세요.`;
-if (infStop(s)) return `[약지도] ${s.name}\n생후 3개월 미만 아기는 약보다 진료가 먼저예요 — 해열제를 먹이지 말고 바로 소아과나 응급실로 가세요.`;
+if (infStop(s)) return `[약지도] ${s.name}\n생후 3개월 미만 아기는 약보다 진료가 먼저예요 — 열이 나면 해열제를 먹이지 말고 지금 응급실로 가세요.`;
 const bk = showable(basketPicked(s, basket(s))), f = activeFlags(), mine = takingItems().map(t => t.name);
 const items = bk.map(x => x.have ? `${x.slot}: ${x.d.name} — 이미 먹고 있어요(더 사지 않아요)`
 : x.again ? `${x.title || '7일 뒤 한 번 더'}: 같은 약(${x.d.name})`
@@ -3697,11 +3697,11 @@ const ibuRow = m => m == null ? null : (D_KIDS().ibuLabelTable || []).find(([a, 
 const ibuOver = (r, m) => { const row = ibuRow(m), c = r.D.conc[0].mgPerMl; return row && (r.hi / c > row[4] + .05 || r.day / c > row[5] + .05) ? row : null; };
 const INF_SYM = new Set(['fever', 'cold', 'cough', 'sorethroat', 'diarrhea', 'gastroenteritis']);
 function infStop(s){ if (ME.age !== 'child' || !INF_SYM.has(s.id)) return ''; const m = kidMon(); if (m == null || m >= 3) return '';
-return `<div class="flag inf-stop" role="note">${I.alert}<div><b>${s.id === 'fever' ? '생후 3개월 미만의 열은 진료가 먼저예요' : '생후 3개월 미만 아기는 약보다 진료가 먼저예요'}</b><p>생후 ${m}개월이에요. 38도 이상 열이 나면 <b>해열제를 먹이지 말고</b> 바로 소아과나 응급실로 가세요. 약국 약은 보여 드리지 않아요.</p><a class="call" href="tel:119">${I.alert} 119</a></div></div>`; }
+return `<div class="flag inf-stop" role="note">${I.alert}<div><b>${s.id === 'fever' ? '생후 3개월 미만의 열은 지금 응급실이에요' : '생후 3개월 미만 아기는 약보다 진료가 먼저예요'}</b><p>생후 ${m}개월이에요. 38도 이상 열이 나면 <b>해열제를 먹이지 말고 지금 응급실로</b> 가세요. 약국 약은 보여 드리지 않아요.</p><a class="call" href="tel:119">${I.alert} 119</a></div></div>`; }
 function kidLine(){
 if (ME.age !== 'child') return '';
 const w = kidBad(ME.child) ? NaN : parseFloat(ME.child?.weight); const m = kidMon();
-if (m != null && m < 3) return `<div class="kid-line">${I.alert}<span><b>생후 ${m}개월</b> — 3개월 미만 아기가 열이 나면 해열제를 먹이지 말고 <b>바로 진료</b>를 받으세요. <a class="link" href="#/kids">아이 해열제 ›</a></span></div>`;
+if (m != null && m < 3) return `<div class="kid-line">${I.alert}<span><b>생후 ${m}개월</b> — 3개월 미만 아기가 열이 나면 해열제를 먹이지 말고 <b>지금 응급실</b>로 가세요. <a class="link" href="#/kids">아이 해열제 ›</a></span></div>`;
 const noB = m == null ? ' 생년월일을 넣으면 나이에 맞는 약만 골라 드려요.' : '';
 if (!(w > 0)) return `<div class="kid-line">${I.user}<span>소아·청소년이면 약은 몸무게로 정해요.${noB} <a class="link" href="#/kids">몸무게를 넣고 시럽 mL 계산 ›</a></span></div>`;
 const a = kidDose('apap', w, m), i = kidDose('ibu', w, m); if (!a) return '';
@@ -3709,7 +3709,7 @@ const ml = r => { const [a, b] = mlRange(r); return `${a === b ? a : a + '~' + b
 const ok = r => r && (m == null || m >= r.D.minMonths);
 const line = (r, nm, tail) => !r ? '' : ok(r) ? `${nm} 시럽 <b>${ml(r)}</b>(${tail})` : `${nm} 시럽은 <b>생후 ${r.D.minMonths}개월부터</b> — 그 전에는 진료에서 확인`;
 const over = ok(i) ? ibuOver(i, m) : null;
-const warn = [m == null && w < 6 ? '생후 3개월 안팎일 수 있어요 — 생년월일을 넣어 주세요. 생후 3개월 미만 아기의 열은 해열제보다 진료가 먼저예요.' : '',
+const warn = [m == null && w < 6 ? '생후 3개월 안팎일 수 있어요 — 생년월일을 넣어 주세요. 생후 3개월 미만 아기의 열은 해열제보다 지금 응급실이 먼저예요.' : '',
 over ? `이부프로펜 계산이 설명서 표(${over[2]} 1회 ${over[3]}~${over[4]} mL · 하루 ${over[5]} mL)보다 많아요 — 먹이기 전에 약사·의사와 확인하세요.` : ''].filter(Boolean);
 return `${warn.map(t => `<div class="kid-over kid-young" role="note">${I.alert}<span>${t}</span></div>`).join('')}<div class="kid-line">${I.user}<span><b>${esc(ME.child?.name || '아이')} ${w} kg</b> 기준 — ${[line(a, '아세트아미노펜', `${a.D.gapText} 간격, 하루 ${a.D.maxPerDay}회`), line(i, '이부프로펜', i?.D.gapText)].filter(Boolean).join(' · ')}. 어른 정제·복합감기약은 아이에게 쓰지 마세요.${noB} <a class="link" href="#/kids">자세히 ›</a></span></div>`;
 }
@@ -4008,8 +4008,8 @@ ${bad ? `<p id="k-err" class="kid-over" role="alert">${I.alert}<span>생년월�
 </section>
 ${sane ? `<div class="flag" style="margin-top:16px">${I.alert}<div><b>몸무게를 한 번만 확인해 주세요</b><p>${esc(sane)}</p></div></div>` : ''}
 ${m == null && w > 0 ? `<div class="note" style="margin-top:16px">${I.info}<span><b>아이 생년월일을 넣어 주세요.</b> 그래야 <b>3개월 미만 발열</b>(해열제보다 진료가 먼저)과 약마다 <b>쓸 수 있는 개월 수</b>까지 함께 봐 드려요.</span></div>` : ''}
-${m != null && m < 3 ? `<div class="flag" style="margin-top:16px">${I.alert}<div><b>생후 ${m}개월이에요</b><p>3개월 미만 아기가 열이 나면 해열제를 먹이지 말고 <b>바로 진료</b>를 받으세요. 열을 낮추면 원인을 찾기 어려워져요.</p><a class="call" href="tel:119">${I.alert} 119</a></div></div>` : ''}
-${w > 0 ? `<section class="sec"><h2>한 번에 이만큼 <small>몸무게 ${w} kg 기준</small></h2>${m == null && w < 6 ? `<div class="kid-over kid-young" role="note">${I.alert}<span>생후 3개월 안팎일 수 있어요 — 생년월일을 넣어 주세요. 생후 3개월 미만 아기의 열은 해열제보다 진료가 먼저예요.</span></div>` : ''}${doseCard('apap')}${doseCard('ibu')}<div class="note" style="margin-top:12px">${I.info}<span>${esc(K.dexibuNote || '')}</span></div></section>` : `<section class="sec"><div class="empty"><b>몸무게를 넣으면 바로 계산해 드려요</b>아세트아미노펜·이부프로펜 시럽 mL, 간격, 하루 한도까지.</div></section>`}
+${m != null && m < 3 ? `<div class="flag" style="margin-top:16px">${I.alert}<div><b>생후 ${m}개월이에요</b><p>3개월 미만 아기가 열이 나면 해열제를 먹이지 말고 <b>지금 응급실</b>로 가세요. 열을 낮추면 원인을 찾기 어려워져요.</p><a class="call" href="tel:119">${I.alert} 119</a></div></div>` : ''}
+${w > 0 ? `<section class="sec"><h2>한 번에 이만큼 <small>몸무게 ${w} kg 기준</small></h2>${m == null && w < 6 ? `<div class="kid-over kid-young" role="note">${I.alert}<span>생후 3개월 안팎일 수 있어요 — 생년월일을 넣어 주세요. 생후 3개월 미만 아기의 열은 해열제보다 지금 응급실이 먼저예요.</span></div>` : ''}${doseCard('apap')}${doseCard('ibu')}<div class="note" style="margin-top:12px">${I.info}<span>${esc(K.dexibuNote || '')}</span></div></section>` : `<section class="sec"><div class="empty"><b>몸무게를 넣으면 바로 계산해 드려요</b>아세트아미노펜·이부프로펜 시럽 mL, 간격, 하루 한도까지.</div></section>`}
 ${acc('이렇게 먹이세요', list(K.rules, 'steps'), '교차·중복·계량', true)}
 <section class="sec"><h2>병원에 가야 할 때</h2>${careCards({ clinic: K.care?.clinic, er: K.care?.er }, true)}</section>
 ${srcChips(K.sources)}
@@ -5216,7 +5216,7 @@ ${disclaimer('대략 담으신 약은 화면에 ‘대략’으로 표시됩니�
 const RX_IDS = ['bp', 'dm', 'chol', 'thy', 'mind'];
 const RX_NAME = { bp:'혈압약', dm:'당뇨약', chol:'콜레스테롤약', thy:'갑상선약', mind:'수면제·안정제·우울약' };
 let RXG = null;
-function rxLoad(){ if (!RXG) { RXG = { wait:true }; loadJSON('rxguide.json').then(j => { RXG = j; redraw(); }).catch(() => { RXG = { err:true }; redraw(); }); } return RXG; }
+function rxLoad(){ if (!RXG && window.__RXG__) RXG = window.__RXG__; if (!RXG) { RXG = { wait:true }; loadJSON('rxguide.json').then(j => { RXG = j; redraw(); }).catch(() => { RXG = { err:true }; redraw(); }); } return RXG; }
 const rxMine = () => RX_IDS.filter(g => (ME.taking || []).some(x => x.startsWith('cls:' + g + '.')));
 const rxRows = L => `<div class="rows-l">${L.map(g => lrow(I.pill, esc(RX_NAME[g]) + ' 드시는 분께', RXG?.guides?.[g]?.short ? esc(RXG.guides[g].short) : '먹는 법 · 깜빡했을 때 · 조심할 약', `go('/rx/${g}')`)).join('')}</div>`;
 function vRx(id){

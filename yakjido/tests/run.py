@@ -1203,17 +1203,16 @@ def main():
         pg.goto(url + '#/symptom/cold'); ready(); pg.wait_for_timeout(300)
         if pg.evaluate("()=>{openCare();return getComputedStyle(document.getElementById('sp2')).display!=='none'&&document.querySelector('.tab[data-p=sp2]').classList.contains('on')}") is not True:
             fails.append('증상 화면: 「이럴 땐 병원으로」를 눌러도 병원 탭이 열리지 않습니다')
-        # 약학정보원 사진(2026-09-30 현욱님 「그냥 쓰자」) — 짝 자료가 있으면 그 사진·그 제품 페이지로, 없으면 식약처 사진·검색 화면
+        # 약학정보원 사진·제품 링크는 2026-10-21 저작권 점검으로 뺐다 — 사진은 식약처 것만, 약학정보원은 «이름으로 찾기» 링크만 남는다
         pg.goto(url + '#/pill'); ready(); pg.wait_for_timeout(300)
         _kp = pg.evaluate("""async()=>{ await pubPills(); const p=(PUB.pills||[]).find(x=>x.img); if(!p) return {skip:true};
-          const before=pillImg(p); KPIC={[p.seq]:['2013062800004','201306280000401.jpg']};
-          const after=pillImg(p); location.hash='#/pillinfo/'+p.seq; route();
-          const a=[...document.querySelectorAll('a.plink')].find(x=>/health\.kr/.test(x.href));
-          const r={before, after, link:a&&a.href}; KPIC={}; return r; }""")
+          const img=pillImg(p); location.hash='#/pillinfo/'+p.seq; route();
+          const a=[...document.querySelectorAll('a.plink')].find(x=>/health\\.kr/.test(x.href));
+          return {img, link:a&&a.href, kp:[...document.querySelectorAll('#view img')].some(x=>/health\\.kr/.test(x.src))}; }""")
         if not _kp.get('skip'):
-            if 'nedrug' not in (_kp['before'] or ''): fails.append(f'약학정보원 짝이 없을 때 식약처 사진을 안 씁니다: {_kp["before"]}')
-            if _kp['after'] != 'https://common.health.kr/shared/images/sb_photo/big3/201306280000401.jpg': fails.append(f'약학정보원 사진 주소가 틀립니다: {_kp["after"]}')
-            if 'result_drug.asp?drug_cd=2013062800004' not in (_kp['link'] or ''): fails.append(f'약학정보원 제품 페이지 링크가 없습니다: {_kp["link"]}')
+            if 'nedrug' not in (_kp['img'] or ''): fails.append(f'낱알 사진이 식약처 사진이 아닙니다: {_kp["img"]}')
+            if _kp['kp']: fails.append('약학정보원 사진이 화면에 다시 나옵니다(저작권 — KPIC_USE)')
+            if 'result_drug.asp' in (_kp['link'] or ''): fails.append(f'약학정보원 제품 페이지로 바로 잇습니다(이름으로 찾기만): {_kp["link"]}')
         # 식약처 제품 화면(e약은요) — 탭(약사 안내·허가 내용·성분 해설) 칸마다 내용이 있고 날것 코드(${)가 보이면 안 된다(2026-09-30)
         pg.goto(url + '#/pub/0'); ready(); pg.wait_for_timeout(1500)
         _pb = pg.evaluate("""()=>['pb1','pb2','pb3'].filter(k=>document.getElementById(k)).map(k=>{const t=document.getElementById(k).textContent; return [k, t.trim().length, t.includes('${')];})""")
