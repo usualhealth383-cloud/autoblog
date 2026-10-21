@@ -2,7 +2,7 @@
 <html lang="ko" data-theme="light">
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>약지도 · 집에서 할 일 · 약국 약 · 진료 신호를 차례로</title>
+<title>약지도 · 증상에 맞는 약 찾기·복약 알림</title>
 <meta name="description" content="증상별 일반의약품 선택 가이드·성분 비교·영양제 비교. 임상에서 처방하는 조합을 약국 구입 기준으로 풀어드립니다.">
 <link rel="manifest" href="manifest.webmanifest">
 <meta name="theme-color" content="#0B6E8F">
@@ -294,7 +294,7 @@ p{color:var(--body)}
 .brand .mark img{width:34px;height:34px;display:block;border-radius:9px}
 .brand b{font-size:1.125rem;font-weight:800;letter-spacing:-.02em}
 .brand span{display:block;font-size:.875rem;color:var(--muted);line-height:1.2}
-.review-stamp{display:inline-flex;align-items:center;gap:6px;color:var(--primary);font-size:.875rem;font-weight:600}
+.review-stamp{display:inline-flex;align-items:center;gap:6px;white-space:nowrap;flex:none;color:var(--primary);font-size:.875rem;font-weight:600}
 .review-stamp svg.i{width:15px;height:15px}
 .review-stamp.wait{color:var(--caution)}
 .rx-stamp.wait{color:var(--caution);border-color:var(--caution)}
@@ -672,6 +672,7 @@ details.acc .bd{padding:0 var(--s4) var(--s4)}
 .quick button{flex:none;display:inline-flex;align-items:center;gap:8px;min-height:48px;padding:0 16px 0 12px;border-radius:14px;background:var(--card);border:1px solid var(--hairline);box-shadow:var(--shadow-card);font-weight:700;font-size:.9375rem}
 .quick button svg.i{color:var(--primary)}
 .pimg{width:44px;height:44px;border-radius:10px;object-fit:cover;background:#fff;border:1px solid var(--hairline);flex:none}
+img.pimg,img.pillimg,.drug-photo img{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2394A3AE' stroke-width='1.6' stroke-linecap='round'%3E%3Crect x='3' y='8' width='18' height='8' rx='4' transform='rotate(-45 12 12)'/%3E%3Cpath d='M9 9l6 6'/%3E%3C/svg%3E")!important;background-position:center!important;background-size:46%!important;background-repeat:no-repeat!important}
 .buy-item.has-img{grid-template-columns:52px 44px 1fr auto}
 .drug-photo{display:flex;gap:12px;align-items:center;margin-top:var(--s3);padding:12px;background:var(--card);border:1px solid var(--hairline);border-radius:14px}
 .drug-photo img{width:72px;height:72px;border-radius:12px;object-fit:cover;background:#fff;border:1px solid var(--hairline)}
@@ -1631,6 +1632,7 @@ background-repeat:no-repeat;background-position:right 9px center;background-size
 .toast{position:fixed;left:50%;bottom:96px;transform:translateX(-50%);background:var(--text);color:var(--card);padding:10px 16px;border-radius:12px;font-size:.875rem;font-weight:600;z-index:20;box-shadow:0 8px 24px rgba(0,0,0,.25);animation:rise .25s ease}
 .toast.undo{display:flex;align-items:center;gap:12px;padding:6px 6px 6px 16px;max-width:calc(100vw - 32px)}
 .toast.undo button{flex:none;min-height:48px;padding:0 16px;border:0;border-radius:10px;background:var(--card);color:var(--primary-deep);font:inherit;font-weight:800;cursor:pointer}
+.cond-line{display:flex;align-items:center;gap:4px;margin:4px 0 8px;border-radius:12px;background:var(--tint2)}.cond-line>button:first-child{flex:1;display:flex;align-items:center;gap:8px;min-height:44px;padding:8px 12px;text-align:left;font-size:.875rem;color:var(--body)}.cond-line>button:first-child svg{width:18px;height:18px;flex:none;color:var(--primary)}.cond-line .x{width:44px;height:44px;display:grid;place-items:center;color:var(--muted)}.cond-line .x svg{width:16px;height:16px}
 .hq{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:12px 0 4px}.hq-c{display:flex;flex-direction:column;align-items:flex-start;gap:4px;padding:14px;border-radius:16px;background:var(--card);border:1px solid var(--hairline);text-align:left;min-height:104px;color:var(--text)}.hq-c .ic svg{width:26px;height:26px;color:var(--primary)}.hq-c b{font-size:1.0625rem;line-height:1.3}.hq-c small{color:var(--muted);font-size:.875rem;line-height:1.4}
 .toast.remind{flex-wrap:wrap;padding:12px 12px 8px 16px;gap:8px;width:min(420px,calc(100vw - 32px))}.toast.remind span{flex:1 1 100%;font-size:.9375rem;line-height:1.45}.toast.remind button.later{background:transparent;color:var(--card);border:1px solid color-mix(in srgb,var(--card) 50%,transparent)}
 
@@ -1750,8 +1752,8 @@ background-repeat:no-repeat;background-position:right 9px center;background-size
 <script>
 window.__YAKJIDO_OK__ = true;
 const D = JSON.parse(document.getElementById('data').textContent || '{}');
-const BUILD = '2026-10-22 03:03';
-const DATAV = '0fedaefe00'.indexOf('__') === 0 ? BUILD : '0fedaefe00';
+const BUILD = '2026-10-22 04:55';
+const DATAV = '0970a4356f'.indexOf('__') === 0 ? BUILD : '0970a4356f';
 const BRANDMARK = (typeof window !== 'undefined' && window.__BRANDMARK__) || 'icon-192.png';
 let CORE = 0, CORE_P = null;
 function mergeCore(c){
@@ -2296,7 +2298,7 @@ const bigFs = () => { try { return parseFloat(localStorage.getItem('yakjido.fs')
 const topBar = (opts = {}) => `
 <div class="top">
 ${opts.back ? `<button class="back" onclick="goBack()">${I.prev}${esc(opts.back)}</button>` : `
-<div class="brand"><div class="mark"><img src="${BRANDMARK}" alt="" width="34" height="34"></div><div><b>약지도</b><span>집에서 할 일 · 약국 약 · 진료 신호를 차례로</span></div></div>`}
+<div class="brand"><div class="mark"><img src="${BRANDMARK}" alt="" width="34" height="34"></div><div><b>약지도</b><span>증상에 맞는 약 · 복약 알림</span></div></div>`}
 ${opts.unreviewed ? `<span class="review-stamp wait">${I.alert}의사 확인 중</span>` : opts.unv ? `<span class="review-stamp wait">${I.info}자료 확인 중</span>` : `<span class="review-stamp">${I.shield}${esc(D.meta?.reviewLabel || '의료진 검수')}${bigFs() ? '' : ` · ${esc(D.meta?.reviewed || '')}`}</span>`}
 </div>
 ${opts.nosearch ? '' : `<div class="topfind">${I.search}<input id="gq" aria-label="증상이나 약 이름으로 찾기" placeholder="${bigFs() ? '증상이나 약 이름' : '증상·약 이름으로 찾기 (예: 허리, 타이레놀)'}" autocomplete="off" enterkeyhint="search" value="${esc(GQ)}"><button class="gq-x ${GQ ? '' : 'hide'}" onclick="GQ='';route()" aria-label="지우기">${I.x}</button></div>`}<!--TOPEND-->`;
@@ -2952,6 +2954,7 @@ const v = nextVisit(), vd = v ? Math.round((new Date(dayKey(new Date(v.at))) - n
 const T = (D.tips || []), tip = T.length ? T[new Date().getDate() % T.length] : null;
 return `${topBar()}
 ${homeQuick(n)}
+${condOn().length || ME.condskip ? '' : `<div class="cond-line"><button type="button" onclick="go('/me?t=body')">${I.user}<span>앓는 병이 있으면 알려 주세요 — <b>피해야 할 약을 걸러 드려요</b></span>${I.chev}</button><button type="button" class="x" aria-label="이 안내 닫기" onclick="ME.condskip=true;saveMe();route()">${I.x}</button></div>`}
 ${svOn() ? `<section class="hero"><div class="eyebrow">${esc(hello)}</div><h1 class="greet">어디가 불편하세요?</h1><p class="sv-lead">누르면 사야 할 약을 바로 알려 드려요</p></section>
 <div class="sv-tiles">${SV_HOME.map(id => byId(D.symptoms, id)).filter(Boolean).map(s => `<button class="sv-tile ${gcls(s.group)}" onclick="go('/symptom/${s.id}')"><span class="ic">${sicon(s)}</span><b>${esc(s.name.split(' (')[0])}</b></button>`).join('')}</div>
 <button class="btn ghost sv-all" onclick="homeTab('all');jumpTo('hlist')">다른 증상 모두 보기${I.chev}</button>` : `<section class="hero">
@@ -2966,7 +2969,6 @@ ${svOn() ? '' : regionGrid()}
 <div class="util" aria-label="다른 방법으로 찾기">
 ${v && vd <= 3 ? urow(I.cal, `${vd <= 0 ? '오늘' : vd === 1 ? '내일' : vd + '일 뒤'} 진료`, `${esc(visitWord(v, false))} · 내 약 한 장 챙기기`, "go('/visits')", '보기', 'visit-soon') : ''}
 ${urow(I.check, '여기 없어요', '질문 두 번으로 찾기', "go('/guide/1')", '시작')}
-${urow(I.eye, '약 사진 찍기', '상자·약봉투로 확인', "go('/photo')", '찍기')}
 ${urow(I.pill, n ? `내 약통 ${n}가지` : '내 약통에 약 담기', n ? '겹치는지 확인' : '겹치는 약 살펴보기', `go('${n ? '/together' : '/kinds'}')`, n ? '확인' : '담기')}
 ${wxCard()}
 </div>
@@ -4648,7 +4650,7 @@ return `<div class="cal-li" role="listitem"><button type="button" class="cal-d $
 }).join('');
 const first = cells[0], last = new Date(today);
 const span = `${first.getMonth() + 1}월 ${first.getDate()}일 — ${last.getMonth() + 1}월 ${last.getDate()}일`;
-return `<section class="sec card"><h2>지난 기록 <small>${DAYS_KEEP}일까지 이 휴대폰에만</small></h2>
+return `<section class="sec card"><h2>지난 기록 <small>${DAYS_KEEP}일까지 보관</small></h2>
 ${a.days ? `<p style="margin-top:6px"><b>어제까지 30일 가운데 약을 드시기로 한 날이 ${a.days}일</b>이었고, 그중 <b>${a.full}일</b>은 빠짐없이 드셨어요.${a.doses ? ` 전체로는 ${a.doses}번 중 ${a.took}번이에요.` : ''}${a.skip ? ` 일부러 건너뛴 것은 ${a.skip}번이에요.` : ''}</p>`
 : `<p style="margin-top:6px">아직 기록이 없어요. 위에서 시간을 고르고 드실 때마다 눌러 두시면 여기에 쌓입니다.</p>`}
 <div class="cal-span">${span}</div>
@@ -5874,32 +5876,7 @@ return KG[k] ? (KG[k][String(seq)] || null) : null;
 }
 const pictoSrc = c => (window.__PICTO_LOCAL ? `pg/${c}.jpg` : `https://common.health.kr/shared/images/pictogram/black/kor/${c}.jpg`);
 const PICTO_LABEL = {};   /* 약학정보원 그림 표시 뜻 표 — 2026-10-21 저작권 점검으로 그림 표시를 끄며 뺐다(git 기록 10-21 이전에 있음) */
-const KG_DUR = { dose: '하루 최대', preg: '임신 중', senior: '65세 이상', age: '나이', period: '쓰는 기간', contra: '같이 쓰면 안 되는 약' };
-let EN_KO = null, EN_KO_LEX = false;
-function enKo(t){
-if (!EN_KO || (!EN_KO_LEX && LEX.ing)) { EN_KO = {}; EN_KO_LEX = !!LEX.ing;
-const put = (en, ko) => { const k = String(en || '').trim().toLowerCase(); if (k && ko && /^[a-z]/.test(k) && !/[()\s]/.test(ko) && !EN_KO[k]) EN_KO[k] = ko; };
-(LEX.ing || []).forEach(x => put(x.en, x.n));
-(D.drugs || []).forEach(d => put(d.en, ingrName(d)));
-(D.ingredients?.ing || []).forEach(e => { put(e.k, e.n); (e.aka || []).forEach(a => put(a, e.n)); }); }
-const one = w => { const raw = String(w).trim(); const base = raw.replace(/\(.*?\)/g, '').trim(); const tail = (raw.match(/\((.*?)\)/) || [])[0] || '';
-return (EN_KO[base.toLowerCase()] || base) + (tail && /[가-힣]/.test(tail) ? tail : ''); };
-return String(t).split(/\s*\+\s*/).map(one).join(' + ');
-}
-let KG_LEX_ASKED = false;
-function kgCard(seq){
-const g = kgGet(seq); if (!g || !(g.t || (g.g || []).length)) return '';
-if (g.dur?.contra && !LEX.ing && !KG_LEX_ASKED) { KG_LEX_ASKED = true; lexLoad(true).then(() => { EN_KO = null; redraw(); }).catch(() => {}); }
-const dur = Object.entries(g.dur || {}).map(([k, v]) => [KG_DUR[k] || k, (k === 'contra' ? String(v).replace(/【\s*([^】]+?)\s*】/g, (m, n) => enKo(n)).replace(/\s*,\s*/g, ' · ') : String(v)).replace(/^[A-Za-z0-9 ,.()\-]+ : /, '').replace(/\s*\|\s*/g, ' · ').replace(/^1일 최대 투여량\s*-\s*/, '').replace(/(\d등급)\s*,\s*/, '$1 — ')]);
-const facts = [['생김새', g.ch], ['보관', g.st], ['포장', g.bx]].filter(x => x[1]);
-return `<section class="sec card kg"><h2>약사가 알려 드리는 것 <small>약학정보원 복약정보</small></h2>
-${g.t ? `<p class="kg-t">${esc(g.t)}</p>` : ''}
-${(g.g || []).length ? `<ul class="plain kg-g">${g.g.map(x => `<li>${esc(x)}</li>`).join('')}</ul>` : ''}
-${(g.p || []).length ? `<div class="kg-p" role="group" aria-label="복약 그림 표시">${g.p.map(c => `<img src="${pictoSrc(c)}" alt="${esc(PICTO_LABEL[c] || '복약 그림 표시')}" loading="lazy" onerror="this.remove()">`).join('')}</div>` : ''}
-${dur.length ? `<div class="kg-dur">${dur.map(([k, v]) => `<div><small>${esc(k)}</small><span>${esc(v)}</span></div>`).join('')}</div>` : ''}
-${facts.length ? `<div class="kv" style="grid-template-columns:1fr;margin-top:12px">${facts.map(([k, v]) => `<div><small>${k}</small><b>${esc(v)}</b></div>`).join('')}</div>` : ''}
-<p class="small muted" style="margin-top:10px">출처: 약학정보원 복약정보${g.c ? ` · <a class="link" href="https://www.health.kr/searchDrug/result_drug.asp?drug_cd=${encodeURIComponent(g.c)}" target="_blank" rel="noopener">약학정보원에서 자세히</a>` : ''}</p></section>`;
-}
+function kgCard(){ return ''; }
 function vPub(id){
 id = +id; const ix = (PUB.index || [])[id];
 if (!PUB.index) { pubIndex().then(route); return `${topBar({ back:'뒤로' })}<p class="loading">식약처 제품 정보를 불러오는 중…</p>`; }
@@ -6557,7 +6534,7 @@ ME.ae = aeList().slice(0, 50); saveMe(); route(); toast('적어 두었어요 —
 function aeCard(){
 const items = takingItems(); const list = aeList();
 return `<section class="sec card"><h2>약 먹고 불편했던 일</h2>
-<p class="small" style="margin-top:6px">진료실에서 <b>「그 약 드시고 어떠셨어요?」</b>라고 여쭤보면 막상 떠오르지 않으시죠. 그때그때 한 줄로 적어 두시면 됩니다. <b>이 휴대폰에만 남아요.</b></p>
+<p class="small" style="margin-top:6px">진료실에서 <b>「그 약 드시고 어떠셨어요?」</b>라고 여쭤보면 막상 떠오르지 않으시죠. 그때그때 한 줄로 적어 두시면 돼요. <b>${savedWhere()}</b></p>
 ${list.length ? `<ul class="ae-list">${list.map((x, i) => `<li><div><b>${esc(x.n)}</b><span>${esc(dateWord(x.at))}</span><p>${esc(x.t)}</p></div><button class="ae-x" onclick="aeDel(${i})" aria-label="${esc(x.t.slice(0, 20))} 지우기">${I.x}</button></li>`).join('')}</ul>` : ''}
 <div class="ae-form">
 <label class="ae-lbl" for="ae-who">어느 약이었나요</label>
