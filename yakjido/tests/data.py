@@ -187,7 +187,7 @@ for d in D:
 
 # 「내 정보」 조건 이름은 정해진 13가지뿐이다. 없는 이름을 쓰면 그 주의는 «영원히 안 뜬다».
 # 실제로 달걀 알레르기에 없는 이름(allergy)을 쓴 곳이 있었다.
-VALID_FLAG = {'pregnant', 'nursing', 'ulcer', 'heart', 'hf', 'lvs', 'anticoag', 'kidney', 'liver', 'alcohol',
+VALID_FLAG = {'pregnant', 'nursing', 'ulcer', 'bleed', 'heart', 'hf', 'lvs', 'anticoag', 'kidney', 'liver', 'alcohol',
               'asthma', 'glaucoma', 'bph', 'gout', 'diabetes', 'senior', 'child'}
 for d in D:
     for a in (d.get('avoid') or []) + (d.get('caution') or []):
@@ -328,8 +328,9 @@ if _idx.exists():
     # 2026-10-21 229 → 230 KB: 외부 검수 3차 결과 P1 #4 판정(제품 설명서 금기만·「먼저 상의」 한 줄)·#7 그래프 글자·#9 응급 제목 — 안전 고침이라 화면 코드에 둔다.
     # 2026-10-19 228 → 229 KB: 3차 외부 검수 P0 #1(응급 체크 뒤 한눈 보기 「약국」 줄·탭 이름 숨김) + 탭 aria-selected. 안전 고침이라 화면 코드에 둔다(+0.2 KB).
     # 2026-10-21 230 → 232 KB: 외부 검수 4차 P0 #1(응급·금기 약을 팁·처방 탭·읽어 주기에서도 거르기)·#4 이름 줄기 고르기·#5 기준선 줄 — 안전 고침이라 화면 코드에 둔다.
-    if _gzkb > 232:
-        fails.append(f'첫 화면이 무겁습니다 — index.html 압축 {_gzkb:.0f} KB (한계 232 KB). 본문은 data/core.json 으로 빼야 합니다')
+    # 2026-10-22 232 → 233 KB: 외부 검수 5차 #1·#2(위궤양 두 칸·상의 약 먹는 법 빼기·처방 조합 카드)·#3(고른 어린이 제품은 몸무게 계산) — 안전 고침이라 화면 코드에 둔다.
+    if _gzkb > 233:
+        fails.append(f'첫 화면이 무겁습니다 — index.html 압축 {_gzkb:.0f} KB (한계 233 KB). 본문은 data/core.json 으로 빼야 합니다')
     if not _core.exists():
         fails.append('docs/yakjido/data/core.json 이 없습니다 — 빌드를 다시 돌리세요')
     else:
