@@ -1631,6 +1631,7 @@ background-repeat:no-repeat;background-position:right 9px center;background-size
 .toast{position:fixed;left:50%;bottom:96px;transform:translateX(-50%);background:var(--text);color:var(--card);padding:10px 16px;border-radius:12px;font-size:.875rem;font-weight:600;z-index:20;box-shadow:0 8px 24px rgba(0,0,0,.25);animation:rise .25s ease}
 .toast.undo{display:flex;align-items:center;gap:12px;padding:6px 6px 6px 16px;max-width:calc(100vw - 32px)}
 .toast.undo button{flex:none;min-height:48px;padding:0 16px;border:0;border-radius:10px;background:var(--card);color:var(--primary-deep);font:inherit;font-weight:800;cursor:pointer}
+.hq{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:12px 0 4px}.hq-c{display:flex;flex-direction:column;align-items:flex-start;gap:4px;padding:14px;border-radius:16px;background:var(--card);border:1px solid var(--hairline);text-align:left;min-height:104px;color:var(--text)}.hq-c .ic svg{width:26px;height:26px;color:var(--primary)}.hq-c b{font-size:1.0625rem;line-height:1.3}.hq-c small{color:var(--muted);font-size:.875rem;line-height:1.4}
 .toast.remind{flex-wrap:wrap;padding:12px 12px 8px 16px;gap:8px;width:min(420px,calc(100vw - 32px))}.toast.remind span{flex:1 1 100%;font-size:.9375rem;line-height:1.45}.toast.remind button.later{background:transparent;color:var(--card);border:1px solid color-mix(in srgb,var(--card) 50%,transparent)}
 
 .util{gap:8px}
@@ -1749,7 +1750,7 @@ background-repeat:no-repeat;background-position:right 9px center;background-size
 <script>
 window.__YAKJIDO_OK__ = true;
 const D = JSON.parse(document.getElementById('data').textContent || '{}');
-const BUILD = '2026-10-22 02:15';
+const BUILD = '2026-10-22 03:01';
 const DATAV = 'c7ea0829f3'.indexOf('__') === 0 ? BUILD : 'c7ea0829f3';
 const BRANDMARK = (typeof window !== 'undefined' && window.__BRANDMARK__) || 'icon-192.png';
 let CORE = 0, CORE_P = null;
@@ -2937,6 +2938,11 @@ const storeBar = () => STORE_OK || STORE_HIDE ? '' : `<div class="note soft stor
 function storeHide(){ STORE_HIDE = true; try { sessionStorage.setItem('yakjido.storehide', '1'); } catch (e) {} route(); const h = view.querySelector('h1'); if (h) { h.setAttribute('tabindex', '-1'); try { h.focus({ preventScroll: true }); } catch (e) {} } }
 const regionGrid = () => { const S = D.symptoms || [];
 return `<div class="rg" role="group" aria-label="어디가 불편하세요">${Object.keys(GROUP_CLS).slice(0, 8).map(g => { const L = S.filter(s => s.group === g); return L.length ? `<button class="rg-t ${GROUP_CLS[g]}" onclick="homeTab('g:${g}');jumpTo('hlist')"><span class="ic">${sicon(L[0])}</span><b>${esc(g)}</b><small>${L.slice(0, 2).map(s => esc(s.name.split(/ \(|·/)[0])).join(' · ')}</small></button>` : ''; }).join('')}</div>`; };
+function homeQuick(n){
+const sched = n && takingItems().some(d => schedOf(d.id, d).length);
+const cell = (ic, t, sub, to) => `<button type="button" class="hq-c" onclick="go('${to}')"><span class="ic">${ic}</span><b>${t}</b><small>${sub}</small></button>`;
+return `<div class="hq" aria-label="바로 쓰기">${cell(I.search, '약 찾기', '이름이나 알약 색·모양으로', '/pill')}${cell(I.clock, sched ? '오늘 약 · 알림' : '약 알림 받기', sched ? '드신 것 표시 · 시각 바꾸기' : n ? `내 약통 ${n}가지 — 드실 시각 정하기` : '약을 담으면 제때 알려 드려요', n ? '/schedule' : '/me?t=meds')}</div>`;
+}
 function vHome(){
 const hour = new Date().getHours();
 const hello = hour < 5 ? '늦은 밤이네요' : hour < 11 ? '좋은 아침이에요' : hour < 18 ? '안녕하세요' : '편안한 저녁이에요';
@@ -2945,6 +2951,7 @@ setTimeout(() => wxFetch(false), 0);
 const v = nextVisit(), vd = v ? Math.round((new Date(dayKey(new Date(v.at))) - new Date(todayKey())) / 86400000) : 99;
 const T = (D.tips || []), tip = T.length ? T[new Date().getDate() % T.length] : null;
 return `${topBar()}
+${homeQuick(n)}
 ${svOn() ? `<section class="hero"><div class="eyebrow">${esc(hello)}</div><h1 class="greet">어디가 불편하세요?</h1><p class="sv-lead">누르면 사야 할 약을 바로 알려 드려요</p></section>
 <div class="sv-tiles">${SV_HOME.map(id => byId(D.symptoms, id)).filter(Boolean).map(s => `<button class="sv-tile ${gcls(s.group)}" onclick="go('/symptom/${s.id}')"><span class="ic">${sicon(s)}</span><b>${esc(s.name.split(' (')[0])}</b></button>`).join('')}</div>
 <button class="btn ghost sv-all" onclick="homeTab('all');jumpTo('hlist')">다른 증상 모두 보기${I.chev}</button>` : `<section class="hero">
@@ -2958,7 +2965,6 @@ ${doseHome()}
 ${svOn() ? '' : regionGrid()}
 <div class="util" aria-label="다른 방법으로 찾기">
 ${v && vd <= 3 ? urow(I.cal, `${vd <= 0 ? '오늘' : vd === 1 ? '내일' : vd + '일 뒤'} 진료`, `${esc(visitWord(v, false))} · 내 약 한 장 챙기기`, "go('/visits')", '보기', 'visit-soon') : ''}
-${ME.easy ? urow(I.clock, '오늘 약 체크', '드셨는지 표시하고 알림 받기', "go('/schedule')", '열기') : ''}
 ${urow(I.check, '여기 없어요', '질문 두 번으로 찾기', "go('/guide/1')", '시작')}
 ${urow(I.eye, '약 사진 찍기', '상자·약봉투로 확인', "go('/photo')", '찍기')}
 ${urow(I.pill, n ? `내 약통 ${n}가지` : '내 약통에 약 담기', n ? '겹치는지 확인' : '겹치는 약 살펴보기', `go('${n ? '/together' : '/kinds'}')`, n ? '확인' : '담기')}
@@ -4780,6 +4786,7 @@ ${NOTE_HELP && perm !== 'granted' ? `<p class="note soft" style="margin-bottom:8
 <p style="margin-top:6px">휴대폰이 <b>무음·방해 금지 모드</b>면 소리 없이 와요. 확실하게 받으시려면 <b>휴대폰 달력에 매일 알림 넣기</b>나 설치한 약지도 앱을 써 주세요.</p>
 </div></details>
 </section>`}${taking.length ? '</div>' : ''}` : ''}
+${fold(`${I.info}약을 깜빡했을 때`, `<p class="why">많은 약의 설명서는 이렇게 적고 있어요 — <b>생각난 즉시 드시고, 다음 드실 때가 가까우면 잊은 것은 건너뛰고 다음 때 한 번 몫만</b> 드세요. <b>두 번 몫을 한꺼번에 드시지 마세요.</b></p><p class="why" style="margin-top:6px">피임약·피 묽게 하는 약(와파린 등)·골다공증 약·당뇨 주사처럼 약마다 따로 정해진 방법이 있는 약이 있어요. 그런 약은 약봉투 설명서와 약사·의사 안내를 따르세요. 자주 잊으시면 알림 시각을 식사·양치 같은 습관에 맞춰 보세요.</p>`, { cls:'miss-fold' })}
 ${disclaimer('알림은 잊지 않도록 돕는 도구예요. 용량·간격은 약 상자와 약사·의사 지시가 우선이에요.')}`;
 }
 
@@ -5281,19 +5288,22 @@ const HELLO_FIN = 'yakjido.hello.fin';
 function helloFinish(){ try { localStorage.setItem(HELLO_KEY, '1'); } catch (e) {} try { sessionStorage.setItem(HELLO_FIN, '1'); } catch (e) {} HINT = 1; GQ = '';
 try { location.replace(location.href.split('#')[0] + '#/home'); } catch (e) { go('/home'); } }
 function helloAgain(){ try { sessionStorage.removeItem(HELLO_FIN); } catch (e) {} go('/hello/1'); }
+function helloPick(k){ ME.age = k; saveMe();
+if (k === 'senior' && ME.easy === undefined) { ME.easy = true; saveMe(); try { if (!localStorage.getItem('yakjido.fs')) { localStorage.setItem('yakjido.fs.before', '16px'); localStorage.setItem('yakjido.fs', EASY_FS); document.documentElement.style.setProperty('--fs', EASY_FS); } } catch (e) {} }
+if (k === 'child') go('/hello/2'); else helloFinish(); }
 function vHello(step){
 const n = Math.min(3, Math.max(1, parseInt(step || '1', 10) || 1));
 const dots = `<div class="steps-bar">${[1, 2, 3].map(i => `<i class="${i <= n ? 'on' : ''}"></i>`).join('')}</div>`;
 const skip = `<button class="hello-skip" onclick="helloFinish()">나중에 할게요</button>`;
 if (n === 1) {
 const ICO3 = { adult:'user', senior:'shield', child:'family' };
-const pick = (k, t, sub) => `<button class="hello-big" onclick="ME.age='${k}';saveMe();go('/hello/2')">
+const pick = (k, t, sub) => `<button class="hello-big" onclick="helloPick('${k}')">
 <div class="ic">${icon(ICO3[k])}</div><div><b>${esc(t)}</b><span>${esc(sub)}</span></div>${I.chev}</button>`;
-return `${topBar({ nosearch:true })}${dots}
+return `${topBar({ nosearch:true })}
 <div class="hello-hi">
 <div class="hello-mark"><svg viewBox="0 0 24 24"><rect x="3" y="8" width="18" height="8" rx="4" transform="rotate(-45 12 12)"/><path d="M9 9l6 6"/></svg></div>
 <h1>약지도에 오셨어요</h1>
-<p>어디가 불편한지 고르면 <b>집에서 할 일 · 약국에서 찾을 약 · 진료가 필요한 신호</b>를 차례로 알려 드려요.<br>먼저 한 가지만 여쭐게요.</p>
+<p>어디가 불편한지 고르면 <b>집에서 할 일 · 약국에서 찾을 약 · 진료가 필요한 신호</b>를 차례로 알려 드려요.<br>한 가지만 여쭐게요.</p>
 </div>
 <h2 class="hello-q">누가 불편하세요?</h2>
 <div class="hello-list">${pick('adult', '제가 불편해요', '성인 기준으로 알려 드려요')}${pick('senior', '어르신이 불편하세요', '65세 이상 — 부담이 적은 쪽을 먼저 권해요')}${pick('child', '아이가 아파요', '소아·청소년 — 몸무게로 용량을 계산해요')}</div>
@@ -5308,7 +5318,7 @@ return `${topBar({ back:'이전', nosearch:true })}${dots}
 <div class="hello-chips">${KEYS.map(k => `<button class="hello-chk ${ME[k] ? 'on' : ''}" aria-pressed="${!!ME[k]}" onclick="ME['${k}']=!ME['${k}'];saveMe();redraw()"><span class="bx">${ME[k] ? I.check : ''}</span>${esc(FLAG_Q[k])}</button>`).join('')}</div>
 ${kid ? kidMini() : ''}
 <p class="privacy">${I.lock}${savedWhere()}</p>
-<div class="actions"><button class="btn" onclick="kidMiniSave();go('/hello/3')">${on ? `${on}가지 골랐어요 · 다음` : '해당 없어요 · 다음'}</button></div>`;
+<div class="actions"><button class="btn" onclick="kidMiniSave();${kid ? 'helloFinish()' : "go('/hello/3')"}">${on ? `${on}가지 골랐어요 · 다음` : '해당 없어요 · 다음'}</button></div>`;
 }
 const f = activeFlags();
 return `${topBar({ back:'이전', nosearch:true })}${dots}
@@ -6490,15 +6500,17 @@ ${res.hits.map(h => `<p class="show-big ${h.r.lv}">${h.r.organ ? icon(h.r.organ.
 ${sc ? `<p class="show-big ${lv}">${lv === 'ok' ? I.info : I.alert}<span>항콜린 부담 ${sc}점 · ${ACH_LV_WORD[lv]}<small>${al.filter(x => x.e.ach).map(x => esc(x.e.n)).slice(0, 6).join(' · ')}${lv === 'ok' ? '' : ' — 입마름·변비·어지럼·기억 흐림이 있으면 말씀하세요'}</small></span></p>` : ''}
 ${res.unknown.length ? `<p class="small muted" style="margin-top:8px">성분을 확인하지 못한 약 ${res.unknown.length}가지는 판정에서 빠져 있어요.</p>` : ''}
 </div>
+${(() => { /* 메디나눔 감사 ③-10(10-22) — 약이 다섯 가지를 넘으면 한 번에 점검을 권한다(여러 약 함께 드시는 분) */
+const m = items.filter(x => !String(x.id).startsWith('supp:')).length; return m >= 5 ? `<p class="note" style="margin-top:12px">${I.info}<span><b>드시는 약이 ${m}가지예요.</b> 다섯 가지가 넘으면 약사에게 한 번에 점검을 받아 보세요 — 단골 약국에 약봉투를 모두 가져가시거나, 아래 「내가 먹는 약! 한눈에」로 병원·약국에서 받은 약을 함께 보세요.</span></p>` : ''; })()}
 ${aeCard()}
 ${adhCard()}
 ${vitalsCard()}
 ${nextVisit() ? `<p class="small muted" style="margin-top:10px">다음 진료 — ${esc(visitWord(nextVisit()))}</p>` : ''}
 <div class="actions"><button class="btn ghost" onclick="shareBag()">${I.cart} 메모로 복사·전송</button>${NATIVE ? '' : `<button class="btn ghost" onclick="window.print()">${I.book} 종이로 뽑기</button>`}<button class="btn ghost" onclick="go('/together')">${I.shield} 자세한 판정 보기</button></div>
-<details class="why-more" style="margin-top:12px"><summary>병원·약국에서 받은 약까지 한 번에 보려면 — 나라 서비스${I.chev}</summary><div class="why" style="margin-top:8px">
+<details class="why-more" style="margin-top:12px" ${items.filter(x => !String(x.id).startsWith('supp:')).length >= 5 ? 'open' : ''}><summary>병원·약국에서 받은 약까지 한 번에 보려면 — 나라 서비스${I.chev}</summary><div class="why" style="margin-top:8px">
 <p>이 약통은 <b>직접 담으신 약</b>만 봐요. <b>건강보험심사평가원 「내가 먹는 약! 한눈에」</b>에서는 지난 1년 동안 병원·약국에서 받은 약을 볼 수 있고(간편인증 로그인), <b>「의약품 안전사용 서비스(DUR) 국민 체험관」</b>에서는 약 이름을 넣어 함께 먹으면 안 되는 조합을 직접 확인해 볼 수 있어요.</p>
 <div class="gl" style="display:flex;flex-wrap:wrap;gap:8px;margin-top:8px"><a class="btn line" href="https://www.hira.or.kr/rb/dur/form.do?pgmid=HIRAA050300000100" target="_blank" rel="noopener">내가 먹는 약! 한눈에</a><a class="btn line" href="https://www.hira.or.kr/ra/medi/form.do?pgmid=HIRAA030029000000" target="_blank" rel="noopener">DUR 국민 체험관</a></div>
-<p class="small muted" style="margin-top:6px">심평원 1644-2000 · 이 앱은 그 기록을 가져오지 않아요(내 정보는 휴대폰에만).</p></div></details>`}
+<p class="small muted" style="margin-top:6px">심평원 1644-2000 · 이 앱은 그 기록을 가져오지 않아요.</p></div></details>`}
 ${disclaimer('이 한 장은 참고용이에요. 약을 스스로 끊거나 바꾸지 마시고, 약사·의사의 판단을 따르세요.')}`;
 }
 function dateWord(k){ const m = String(k).match(/^(\d{4})-(\d{2})-(\d{2})$/); if (!m) return k;
