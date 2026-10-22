@@ -1518,6 +1518,10 @@ body .cmp-bar,body .toast{left:calc(50% + 124px)}body .toast{bottom:40px}.cmp-ba
 .hit mark{background:none;color:var(--primary);font-weight:800}
 .empty{padding:var(--s6) var(--s4);text-align:center;color:var(--muted);font-size:.9375rem}
 .empty b{display:block;color:var(--text);margin-bottom:6px}
+.em-ic{display:grid;place-items:center;width:56px;height:56px;margin:0 auto 12px;border-radius:50%;background:var(--tint2);color:var(--primary)}.em-ic svg.i{width:26px;height:26px}
+.art.mini{width:116px;height:116px;margin:4px auto 0;border:0;background:none;border-radius:50%}.art.mini img{height:100%;object-fit:cover}
+.today-hero.all .ring{animation:th-pop .5s cubic-bezier(.2,.9,.3,1.3)}@keyframes th-pop{0%{transform:scale(.85)}100%{transform:none}}
+@media (prefers-reduced-motion:reduce){.today-hero.all .ring{animation:none}}
 
 /* 낱알 찾기·식약처 제품 */
 .pillimg{width:64px;height:64px;border-radius:12px;object-fit:cover;background:var(--tint2);border:1px solid var(--hairline);flex:none}
@@ -5629,7 +5633,7 @@ const DAYPART = [['아침', 0, 660], ['점심', 660, 900], ['저녁', 900, 1200]
 function daypartGroups(todays){ return DAYPART.map(([n, a, b]) => [n, todays.filter(x => x.min >= a && x.min < b)]).filter(([, l]) => l.length); }
 function todayHero(todays, nowMin, link){ const done = todays.filter(x => x.done).length, all = todays.length, nx = todays.find(x => !x.done && !x.skip && x.min >= nowMin - 60) || todays.find(x => !x.done && !x.skip);
   const head = done >= all ? '오늘 약 다 드셨어요' : `오늘 <b>${done}</b><span>/${all}</span>`;
-  const sub = done >= all ? '내일도 같은 시간에 알려 드릴게요' : (nx ? `다음 ${nx.t} · ${esc(nx.d.name)}` : '');
+  const sub = done >= all ? '수고하셨어요 · 내일도 같은 시간에 알려 드릴게요' : (nx ? `다음 ${nx.t} · ${esc(nx.d.name)}` : '');
   return `<div class="today-hero${done >= all ? ' all' : ''}"${link ? ` role="link" tabindex="0" onclick="go('/schedule')" onkeydown="if(event.key==='Enter')go('/schedule')"` : ''}>${doseRing(done, all)}<div class="th-t"><div class="th-h">${head}</div>${sub ? `<div class="th-s">${sub}</div>` : ''}</div>${link ? `<span class="th-go" aria-hidden="true">${I.chev || ''}</span>` : ''}</div>`; }
 /* 사진을 못 받으면 64px 빈칸 대신 알약 모양 그림(2026-10-13 디자인 리서치 — Drugs.com·Medisafe) */
 function pubThumb(p){ const g = pillGlyph({ id: p.n, name: p.n }, 34);
@@ -5884,7 +5888,7 @@ function vVitals(){
   <section class="sec card"><h2>2주 흐름</h2>${vitalChart(k)}</section>
   ${k === 'bp' && NATIVE ? `<section class="sec card"><div class="toggle"><div class="t"><b>혈압 재기 알림</b><span>${((ME.vitalRemind || {}).bp || []).length ? '아침 7:30 · 저녁 9:00 — 켜져 있어요' : '매일 아침·저녁 잴 시간을 알려 드려요'}</span></div><button class="btn ghost" style="width:auto;min-height:46px;padding:0 14px" onclick="vitalRemindToggle()">${((ME.vitalRemind || {}).bp || []).length ? '끄기' : '켜기'}</button></div></section>` : ''}
   <section class="sec card"><h2>적은 기록 <small>${mine.length}번</small></h2>
-    ${mine.length ? `<div class="vt-list">${mine.slice(0, 30).map(x => `<div class="vt-li"><span class="vt-t">${x.t.slice(5, 10).replace('-', '/')} <small>${x.t.slice(11)} · ${esc(x.w || '')}</small></span><b>${k === 'bp' ? `${x.s}/${x.d}<small> mmHg${x.p ? ` · 맥박 ${x.p}` : ''}</small>` : `${x.v}<small> mg/dL${bgTag(x)}</small>`}</b><button class="vt-x" onclick="vitalDel(${x.i})" aria-label="이 기록 지우기">${I.x}</button></div>`).join('')}</div>` : `<div class="empty"><b>아직 적은 기록이 없어요</b>위에서 한 번 적어 보세요.</div>`}
+    ${mine.length ? `<div class="vt-list">${mine.slice(0, 30).map(x => `<div class="vt-li"><span class="vt-t">${x.t.slice(5, 10).replace('-', '/')} <small>${x.t.slice(11)} · ${esc(x.w || '')}</small></span><b>${k === 'bp' ? `${x.s}/${x.d}<small> mmHg${x.p ? ` · 맥박 ${x.p}` : ''}</small>` : `${x.v}<small> mg/dL${bgTag(x)}</small>`}</b><button class="vt-x" onclick="vitalDel(${x.i})" aria-label="이 기록 지우기">${I.x}</button></div>`).join('')}</div>` : `<div class="empty"><span class="em-ic">${I.heart}</span><b>아직 적은 기록이 없어요</b>오늘 한 번이 시작이에요. 위에서 적어 보세요.</div>`}
     ${mine.length && !NATIVE ? `<div class="actions" style="margin-top:12px"><button class="btn line" onclick="window.print()">${I.book} 진료 때 보여 드리기(인쇄·PDF)</button></div>` : ''}
   </section>
   <details class="why-more sec" ${vitals().filter(x => x.k === k).length < 3 || VT.alert === 'bp-first' ? 'open' : ''}><summary>${k === 'bp' ? '혈압, 바르게 재는 법' : '혈당, 언제 재고 어떻게 볼까요'}${I.chev}</summary>
@@ -5954,7 +5958,7 @@ function vVisits(){
     <div class="actions" style="margin-top:12px"><button class="btn" onclick="visitSave()">${I.check} 적어 두기</button></div>
   </section>
   <section class="sec card"><h2>다가오는 진료 <small>${list.length}건</small></h2>
-    ${list.length ? `<div class="vt-list">${list.map(v => `<div class="vt-li"><span class="vt-t">${esc(visitWord(v))}</span><button class="vt-x" onclick="visitDel('${v.id}')" aria-label="이 예약 지우기">${I.x}</button></div>`).join('')}</div>${NATIVE ? '' : `<div class="actions" style="margin-top:12px"><button class="btn line" onclick="downloadVisitIcs()">${I.cal} 휴대폰 달력에 넣기</button></div>`}` : `<div class="empty"><b>적어 둔 예약이 없어요</b>위에서 날짜를 골라 적어 보세요.</div>`}
+    ${list.length ? `<div class="vt-list">${list.map(v => `<div class="vt-li"><span class="vt-t">${esc(visitWord(v))}</span><button class="vt-x" onclick="visitDel('${v.id}')" aria-label="이 예약 지우기">${I.x}</button></div>`).join('')}</div>${NATIVE ? '' : `<div class="actions" style="margin-top:12px"><button class="btn line" onclick="downloadVisitIcs()">${I.cal} 휴대폰 달력에 넣기</button></div>`}` : `<div class="empty"><span class="em-ic">${I.cal}</span><b>적어 둔 예약이 없어요</b>위에서 날짜를 골라 적어 보세요.</div>`}
   </section>
   <section class="sec card"><h2>진료실에 가져가실 것</h2>
     <div class="util" style="margin-top:10px">
@@ -6245,7 +6249,7 @@ function vTogether(){
     <div class="eyebrow">병원에서 받아 온 약</div>
     <h1>같이 먹어도 되나요</h1>
     <p class="ix-lead">내 약통에 담아 두신 약들을 <b>성분</b>으로 풀어서, 서로 부딪히는 자리가 있는지 봐요. 처방약도 함께 봐요.</p>
-    ${!n ? `<div class="empty">${I.pill}<p><b>아직 담아 두신 약이 없어요.</b><br>약봉투에 적힌 이름이나 약 사진으로 담으시면 바로 봐 드려요.</p>
+    ${!n ? `<div class="empty">${art('guide-2-pharmacy', 'mini')}<p><b>아직 담아 두신 약이 없어요.</b><br>약봉투에 적힌 이름이나 약 사진으로 담으시면 바로 봐 드려요.</p>
         <div class="ix-cta"><a class="btn" href="#/photo">${I.eye}약봉투·약 사진으로 담기</a><a class="btn line" href="#/pill">${I.search}이름으로 찾아 담기</a><a class="btn line" href="#/kinds">${I.pill}이름을 모르면 — 종류만 고르기</a></div></div>`
       : `${head}${band}
       <div class="ix-list">${res.items.map(it => `<span class="ix-chip ${it.approx || it.est ? 'approx' : it.known ? '' : 'unk'}">${it.link ? `<a href="${it.link}">${esc(it.name)}</a>` : esc(it.name)}${it.approx ? '<em>대략</em>' : !it.known ? '<em>성분 모름</em>' : it.est ? '<em>성분 추정</em>' : ''}</span>`).join('')}</div>
@@ -7650,7 +7654,7 @@ function vBag(){
   return `${topBar({ back:'이전' })}
   <div class="eyebrow">진료실·약국에서</div>
   <h1 style="font-size:1.375rem">제가 먹는 약이에요</h1>
-  ${!items.length ? `<div class="empty">${I.pill}<p><b>아직 담아 두신 약이 없어요.</b><br>약봉투 이름이나 약 사진으로 담으시면 여기 한 장으로 정리돼요.</p><div class="ix-cta"><a class="btn" href="#/photo">${I.eye}약봉투·약 사진으로 담기</a><a class="btn line" href="#/pill">${I.search}이름으로 찾아 담기</a><a class="btn line" href="#/kinds">${I.pill}이름을 모르면 — 종류만 고르기</a></div></div>`
+  ${!items.length ? `<div class="empty">${art('guide-2-pharmacy', 'mini')}<p><b>아직 담아 두신 약이 없어요.</b><br>약봉투 이름이나 약 사진으로 담으시면 여기 한 장으로 정리돼요.</p><div class="ix-cta"><a class="btn" href="#/photo">${I.eye}약봉투·약 사진으로 담기</a><a class="btn line" href="#/pill">${I.search}이름으로 찾아 담기</a><a class="btn line" href="#/kinds">${I.pill}이름을 모르면 — 종류만 고르기</a></div></div>`
   : `<div class="show-card">
     <div class="show-head">지금 먹는 약 ${items.length}가지${f.length ? ' · ' + f.map(k => esc(FLAG_LABEL[k])).join(' · ') : ''}</div>
     <ol class="show-list">${items.map((x, i) => `<li><span class="n">${i + 1}</span><div><b>${esc(x.name)}</b><small>${esc(x.approx ? '종류만 알아요 — 이름은 약봉투에' : x.pub?.ingr ? '성분: ' + x.pub.ingr : x.simple || '')}</small>${x.short ? '<span class="badge warn" style="margin-top:4px">며칠만</span>' : ''}${painBadge(x)}</div></li>`).join('')}</ol>
@@ -8162,7 +8166,7 @@ function vMe(_, q){
   else if (tab === 'meds') body = `
   <section class="sec card"><h2>내 약통 <small>중복 성분을 잡아드려요</small></h2>
     <p class="small" style="margin-top:6px">감기약·진통제·처방약을 등록해 두면, 증상별 추천에서 <b>같은 성분이 겹치는지</b> 알려드려요.</p>
-    <div class="bag-rows">${items.map(x => `<div class="bag-row"><div class="t"><b>${esc(x.name)}</b><span>${esc(x.short ? '며칠만 — 항콜린 부담은 절반으로 셌어요' : x.approx ? '종류만 담았어요 (대략)' : x.simple || '')}</span></div><button class="dur ${x.short ? 'on' : ''}" aria-pressed="${!!x.short}" onclick="toggleShort('${x.id}')">${x.short ? I.check + ' ' : ''}며칠만</button><button class="rm" aria-label="${esc(x.name)} 빼기" onclick="${x.id.startsWith('pub:') ? `togglePub('${x.id.slice(4)}')` : x.id.startsWith('cls:') ? `toggleQuick('${x.id.slice(4)}')` : `toggleTaking('${x.id}')`}">${I.x}</button></div>`).join('') || `<div class="empty-bag">${I.pill}<span><b>아직 담아 둔 약이 없어요.</b> 드시는 약을 등록하면 겹치는 성분을 살펴볼 수 있어요.</span></div>`}</div>
+    <div class="bag-rows">${items.map(x => `<div class="bag-row"><div class="t"><b>${esc(x.name)}</b><span>${esc(x.short ? '며칠만 — 항콜린 부담은 절반으로 셌어요' : x.approx ? '종류만 담았어요 (대략)' : x.simple || '')}</span></div><button class="dur ${x.short ? 'on' : ''}" aria-pressed="${!!x.short}" onclick="toggleShort('${x.id}')">${x.short ? I.check + ' ' : ''}며칠만</button><button class="rm" aria-label="${esc(x.name)} 빼기" onclick="${x.id.startsWith('pub:') ? `togglePub('${x.id.slice(4)}')` : x.id.startsWith('cls:') ? `toggleQuick('${x.id.slice(4)}')` : `toggleTaking('${x.id}')`}">${I.x}</button></div>`).join('') || `${art('guide-2-pharmacy', 'mini')}<div class="empty-bag">${I.pill}<span><b>아직 담아 둔 약이 없어요.</b> 드시는 약을 등록하면 겹치는 성분을 살펴볼 수 있어요.</span></div>`}</div>
     <div class="actions two"><button class="btn ghost" onclick="go('/photo')">${I.eye} 사진으로 등록</button><button class="btn ghost" onclick="go('/pill')">${I.search} 이름·알약으로</button></div>
     <div class="util" style="margin-top:8px">${urow(I.pill, '이름을 몰라도 종류만 골라 담기', '', "go('/kinds')", '고르기')}${rxMine().map(g => urow(I.book, RX_NAME[g] + ' 드시는 분께', '먹는 법 · 깜빡했을 때 · 조심할 약', `go('/rx/${g}')`, '보기')).join('')}${urow(I.pill, '영양제도 담기', '같이 먹어도 되나요에서 약과 함께 봐요', "go('/supp')", '고르기')}</div>
     <div class="search" style="margin-top:12px">${I.search}<input id="mq" aria-label="약 이름으로 찾아 내 약통에 담기" placeholder="약 이름으로 찾아 담기 (예: 타이레놀)" value="${esc(MQ)}" autocomplete="off"></div>
