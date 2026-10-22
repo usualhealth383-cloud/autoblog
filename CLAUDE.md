@@ -10,7 +10,7 @@
 - **현욱님께 묻기 전에** 같은 결정이 이미 있었는지 찾는다 — `yakjido/의사-피드백.md`, 형제 앱(우리 집 소아과 등 yozm-health `med/`), 공통 교훈. 있으면 묻지 않고 따른다.
 
 ## 약지도 (`yakjido/` → 빌드 `docs/yakjido/`)
-- 작업 가지 `claude/medicine-recommendation-app-na6x0m`. main 병합은 현욱님 승인이 있을 때만.
+- 작업 가지 `claude/youthful-einstein-79py77`(10-20부터 · 옛 가지 `claude/medicine-recommendation-app-na6x0m`). **main 병합은 현욱님 직접 지시 또는 Main 세션의 아침 묶음 승인 뒤에만**(10-22) — autoblog 는 공개 저장소라 main = 공개(github.io 사본·yakjido.medinanum.com 배포 원본). 평소에는 작업 가지에 올리고 미리보기 아티팩트만 갱신한다.
 - **약 설명은 식약처 허가 문구가 기본.** 해외 지침·진료실 관행이 다르면 둘 다 보여 주고 「의사·약사와 상의」. 근거 없이 허가와 반대로 쓰지 않는다. 임상 판단은 `yakjido/의사-질문-*.md` 에 묶어서 짧게 묻는다.
 - 모든 임상 숫자에 출처(`sources*.json`), PubMed 는 DOI 링크. 모르면 고치지 않는다.
 - **화면 원칙(2026-10-13 현욱님):** 내용은 많이 담되 한눈에 명료하게 — 결론·할 일·숫자만 펼치고 이유·근거·예외·연구 수치는 화살표(«자세히 ›») 접이 안으로. 지우지 말고 접는다.

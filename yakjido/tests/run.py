@@ -902,6 +902,24 @@ def r5_checks(br, url, fails):
     if '혈압약 드시는 분께' not in txt(): fails.append('약 종류(혈압) 화면에 처방약 길잡이 입구가 없습니다')
     go('/search?q=당뇨약')
     if not pz.evaluate("()=>[...document.querySelectorAll('#view [onclick]')].some(a=>/\\/rx\\/dm/.test(a.getAttribute('onclick')))"): fails.append('「당뇨약」 검색에 처방약 길잡이가 없습니다')
+    # 외부 검수 6차(10-22) — 처방 서두·칸 제목·간단히 보기 용량, 제품별 하루 한도 글, 제형 다른 검색 합치기, 골다공증약 간격, 받는 화면 설명서 단서, 하루 최대 설명, 합니다체, 꺼 둔 날씨 방침
+    for fl in ('bleed', 'ulcer', 'asthma'):
+        me(f"ME['{fl}']=true; ME.view='detail'"); go('/symptom/toothache')
+        if '이부프로펜 400 mg' in txt('#sp4'): fails.append(f'6차 #1 {fl}: 치통 진료실 처방 탭에 이부프로펜 400 mg 이 남았습니다')
+    me("ME.lvs=true; ME.view='simple'"); go('/symptom/msk')
+    if re.search(r'하루 8정|500 mg 1~2정', txt('.answer')): fails.append('6차 #1 심한 간질환: 간단히 보기에 아세트아미노펜 먹는 양이 남았습니다')
+    for nm in ('어린이 타이레놀 현탁액', '타이레놀 8시간 이알서방정'):
+        me("ME.view='detail'"); go('/drug/acetaminophen?p=' + nm)
+        pz.evaluate("()=>{document.querySelectorAll('details').forEach(d=>d.open=true);document.querySelectorAll('.dtabs .tab').forEach(t=>t.click())}")
+        if re.search(r'하루 4,000 mg 을 넘기지 말고, 4시간|하루 4 g을 넘기[면거]', txt()): fails.append(f'6차 #2 {nm}: 어른 일반정 하루 한도·간격 글이 남았습니다')
+    go('/search?q=타이레놀')
+    if '식약처 이름 어린이타이레놀산' in txt(): fails.append('6차 #3 현탁액에 산제 식약처 이름이 붙습니다')
+    me("ME.view='detail'"); go('/supp/calcium'); pz.evaluate("()=>document.querySelectorAll('details').forEach(d=>d.open=true)")
+    if '이반드론산은 최소 60분' not in txt(): fails.append('6차 #4 칼슘 화면에 이반드론산 60분이 없습니다')
+    pz.evaluate("()=>{const d=new Date();d.setMonth(d.getMonth()-48);ME.age='child';ME.child={name:'',birth:d.toISOString().slice(0,10),weight:16};saveMe()}"); go('/kids')
+    if '하루 640 mg이지만' not in txt(): fails.append('6차 #6 16 kg 이부프로펜 하루 최대 설명이 640 mg(몸무게)·600 mg(설명서)을 가르지 않습니다')
+    pz.evaluate("()=>{ME.age='adult';ME.child={};saveMe()}")
+    if 'Open-Meteo' in open(__file__.replace('tests/run.py', 'privacy.html'), encoding='utf-8').read(): fails.append('6차 #8 꺼 둔 날씨(Open-Meteo)가 처리방침에 남았습니다')
     if zerr: fails.append(f'5차 화면 JS 오류: {zerr[:2]}')
     pz.close()
 
