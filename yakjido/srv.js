@@ -862,5 +862,38 @@ window.vRxS = function(id){
   ${disclaimer('약을 줄이거나 바꾸는 것은 처방한 의사와 정하세요.')}`;
 }
 
+/* 근거와 검수 기준(app-shell 에서 옮김 — 첫 화면 예산) */
+window.vAboutS = function(){
+  const S = D.sources || {};
+  return `${topBar({ back:'내 정보' })}<h1>근거와 검수 기준</h1>
+  <section class="sec card"><h2>이렇게 만들었어요</h2>${list(D.meta?.method || [])}</section>
+  ${(() => {
+    /* 출처 242건을 한 줄로 늘어놓으면 화면이 25,000픽셀(폰 30장)이 된다 —
+       종류별로 묶고 접어 둔다. 코크란·메타분석처럼 「근거가 센 것」을 맨 위로. */
+    const ORDER = ['코크란 리뷰', '메타분석', '우산 리뷰', '체계적 고찰', '무작위 비교 시험', '진료 지침', '종설', '후향 연구', '관찰 연구', '허가사항', '기타'];
+    const g = new Map();
+    for (const [k, v] of Object.entries(S)) {
+      let t = String(v.type || '기타').trim();
+      if (/허가|식약처|e약은요/.test(t)) t = '허가사항';
+      if (!ORDER.includes(t)) t = ORDER.includes(t) ? t : (/지침|가이드/.test(t) ? '진료 지침' : /코크란/.test(t) ? '코크란 리뷰' : t);
+      if (!g.has(t)) g.set(t, []);
+      g.get(t).push([k, v]);
+    }
+    const keys = [...g.keys()].sort((a, b) => {
+      const ia = ORDER.indexOf(a), ib = ORDER.indexOf(b);
+      return (ia < 0 ? 99 : ia) - (ib < 0 ? 99 : ib);
+    });
+    /* 4-01 — 출처 메모(원문 인용·확인 날짜)는 줄 안에 늘어놓지 않고 작은 접이로. PMID 는 줄에 그대로 */
+    const row = ([k, v]) => { const note = String(v.note || '').trim(), extra = note.replace(/PMID\s*\d+/g, '').replace(/[\s·—\-.,]/g, '').length > 0;
+      return `<a class="row" href="${esc(v.url)}" target="_blank" rel="noopener" style="text-decoration:none"><div class="body"><b>${fmt(v.label)}</b><span>${esc(v.type || '')}${(m => m ? ' · ' + esc(m[0]) : '')(note.match(/PMID\s*\d+/))}</span></div>${I.link}</a>${extra ? `<details class="src-note"><summary>원문 메모 보기</summary><p>${esc(note)}</p></details>` : ''}`; };
+    return `<section class="sec"><h2>참고 문헌·지침 <small>${Object.keys(S).length}건</small></h2>
+      <p class="small muted" style="margin-bottom:8px">근거가 센 것부터 묶어 두었어요. 갈래를 누르면 펼쳐져요.</p>
+      ${keys.map(t => `<details class="acc"><summary>${esc(t)}<small>${g.get(t).length}건</small>${I.chev}</summary><div class="bd"><div class="rows">${g.get(t).map(row).join('')}</div></div></details>`).join('')}
+    </section>`;
+  })()}
+  ${fold(`${I.book}오픈소스 고지`, ossList(), { cls:'oss-fold' })}
+  ${disclaimer()}`;
+}
+
 /* 내 정보·동의·로그인·약관 화면을 보고 있었으면 다시 그린다(이 파일이 늦게 오므로) */
-try { if (/^#\/(me|consent|login|doc|hello\/3|supp$|supp\?|sgoal|sstage|rx)/.test(location.hash)) route(); } catch (e) {}
+try { if (/^#\/(me|consent|login|doc|hello\/3|supp$|supp\?|sgoal|sstage|rx|about)/.test(location.hash)) route(); } catch (e) {}
