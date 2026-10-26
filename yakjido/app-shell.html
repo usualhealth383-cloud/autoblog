@@ -4865,19 +4865,8 @@ function rxComboCard(rc, ban){
    「이 말은 어디까지 맞나」를 숫자로 보여 주는 화면이다. */
 /* 「의사에게 물었어요」 — 이 앱을 검수하는 응급실 의사가 실제로 한 대답만 옮긴다(의사-피드백.md 가 원문).
    새 임상 내용을 지어 넣는 자리가 아니다. 개별 상담 창구도 아니다(서버·의료법 — 현욱님 결정 전). */
-function vAskDoc(_, q){
-  const A = D.askdoc || []; if (!A.length) return vHome();
-  const item = x => `<details class="xc" id="ad-${x.id}" ${q.open === x.id ? 'open' : ''}><summary>
-    <div class="ic">${icon(x.icon)}</div><b>${esc(x.q)}</b><span class="cnt">답 보기${I.chev}</span></summary>
-    <div class="bd"><div class="chat"><div class="bubble me"><span class="who">물은 말</span>${esc(x.q)}</div>
-      <div class="bubble"><span class="who">응급실 의사</span>${fmt(x.a)}</div></div>
-      <div class="actions" style="margin-top:10px">${speakBtn(`(D.askdoc.find(y=>y.id==='${x.id}')||{}).a`, '답 읽어 주기')}${x.go ? `<a class="btn ghost" href="#${x.go}">${I.chev} ${esc(x.goText || '자세히')}</a>` : ''}</div>
-    </div></details>`;
-  return `${topBar({ back:'홈' })}<div class="eyebrow">진료실 답</div><h1>의사에게 물었어요</h1>
-  <p style="margin-top:6px">약국·진료실에서 자주 듣는 질문에, <b>이 앱을 검수하는 응급실 의사가 실제로 하는 대답</b>을 그대로 옮겼어요. 모두 ${A.length}가지.</p>
-  <section class="sec"><div class="explore">${A.map(item).join('')}</div></section>
-  <section class="sec"><div class="note">${I.info}<span>일반적인 설명이에요. <b>드시는 약이나 몸 상태에 따라 답이 달라질 수 있어</b> 약사·의사와 상의하세요.</span></div></section>`;
-}
+/* 의사에게 물어보기 화면은 srv.js 의 vAskDocS(첫 화면 예산 · 10-26) */
+function vAskDoc(_, q){ return window.vAskDocS ? vAskDocS(_, q) : `${topBar({ back:'뒤로' })}<p class="loading" style="margin-top:8px">불러오는 중이에요…</p>`; }
 /* 오해 풀이 화면은 srv.js 의 vMythsS(첫 화면 예산 · 10-26) */
 function vMyths(_, q){ return window.vMythsS ? vMythsS(_, q) : `${topBar({ back:'홈' })}<h1>그런 줄 알았는데</h1><p class="loading" style="margin-top:8px">불러오는 중이에요…</p>`; }
 
