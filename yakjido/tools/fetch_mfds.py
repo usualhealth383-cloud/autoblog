@@ -42,12 +42,12 @@ def _xml_items(raw):
     return int(root.findtext('.//totalCount') or 0), items
 
 
-def page(op, n, k, rows=ROWS, extra=None):
+def page(op, n, k, rows=ROWS, extra=None, tries=6, tmo=90):
     base = op if op.startswith('http') else BASE + op
     q = urllib.parse.urlencode({'serviceKey': k, 'pageNo': n, 'numOfRows': rows, 'type': 'json', '_type': 'json', **(extra or {})})
-    for i in range(6):
+    for i in range(tries):
         try:
-            with urllib.request.urlopen(urllib.request.Request(base + '?' + q, headers={'Accept': 'application/json'}), timeout=90) as r:
+            with urllib.request.urlopen(urllib.request.Request(base + '?' + q, headers={'Accept': 'application/json'}), timeout=tmo) as r:
                 raw = r.read().decode('utf-8')
             if raw.lstrip().startswith('<'):   # 키 오류·XML 만 주는 서비스(국립중앙의료원)
                 return _xml_items(raw)
@@ -59,7 +59,7 @@ def page(op, n, k, rows=ROWS, extra=None):
             return int(body.get('totalCount') or 0), items
         except RuntimeError: raise
         except Exception as e:
-            if i == 5: raise
+            if i == tries - 1: raise
             time.sleep(2 ** i)
 
 
@@ -193,7 +193,7 @@ def rx_labels(k, have=None):
         if key_ in out and out[key_].get('seq') == seq: continue
         for op in (([op_ok] + [o for o in DTL_OPS if o != op_ok]) if op_ok else DTL_OPS):
             try:
-                n, items = page(op, 1, k, rows=1, extra={'item_seq': seq})
+                n, items = page(op, 1, k, rows=1, extra={'item_seq': seq}, tries=2, tmo=25)
             except Exception as e:
                 print('  ', op, '실패:', str(e)[:80]); continue
             it = next((x for x in items if s(x.get('ITEM_SEQ')) == seq), items[0] if items else None)
