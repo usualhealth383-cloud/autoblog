@@ -37,7 +37,8 @@
     var p = d ? Promise.resolve(d) : fetch('data/i18n/' + L + '.json').then(function (r) { return r.ok ? r.json() : {}; }).catch(function () { return {}; });
     return p.then(function (j) {
       DICT = j || {}; ui = DICT.ui || {};
-      for (var k in ui) if (/\d/.test(k)) uiN[numKey(k)] = ui[k];
+      /* 숫자만 다른 글 — 번역의 숫자도 틀(#)로 바꿔 둔다. 숫자 개수가 원문과 다르면(°F 병기 등) 틀로 쓰지 않는다(같은 글일 때만 씀) */
+      for (var k in ui) if (/\d/.test(k)) { var a = k.match(/\d[\d,.]*/g) || [], b = String(ui[k]).match(/\d[\d,.]*/g) || []; if (a.length === b.length) uiN[numKey(k)] = numKey(String(ui[k])); }
     });
   }
   /* 본문 덮어쓰기 — 증상·처방약 길잡이의 안전 칸. 자료가 늦게 오므로 그릴 때마다 한 번씩 본다(이미 했으면 건너뜀) */
