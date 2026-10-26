@@ -4693,7 +4693,9 @@ function kidDose(k, w, m){
   let L = lo, H = hi, ageCap = null;
   if (k === 'ibu' && m != null) { const row = ibuRow(m), c = D.conc[0].mgPerMl;
     if (row && (hi > row[4] * c + .5 || day > row[5] * c + .5)) { ageCap = row; H = Math.min(hi, Math.round(row[4] * c)); L = Math.min(lo, H); day = Math.min(day, Math.round(row[5] * c)); } }
-  return { D, lo: L, hi: H, day, perKgDay, capDay, ageCap,
+  /* 공통 숫자표 10-26 — 30 kg 미만은 설명서(어린이부루펜시럽) 하루 500 mg(25 mL)까지 */
+  let cap30 = false; if (k === 'ibu' && w < 30 && D.under30Day && day > D.under30Day) { day = D.under30Day; cap30 = true; }
+  return { D, lo: L, hi: H, day, perKgDay, capDay, ageCap, cap30,
            capped: rawHi > D.capDose + .5 || rawDay > capDay + .5,
            rawHi: Math.round(rawHi), rawDay: Math.round(rawDay) };
 }
@@ -4744,6 +4746,8 @@ function vKids(){
     if (k === 'ibu' && m == null && (K.ibuLabelTable || []).length) rev = `<div class="kid-rev"><p><b>나이별 설명서 표</b>(2026년 3월 약병 설명서) — 아래 계산이 아이 나이 칸보다 많으면 먹이기 전에 약사·의사와 확인하세요.</p><ul class="kid-tbl">${K.ibuLabelTable.map(r => `<li><b>${esc(r[2])}</b> 1회 ${r[3]}~${r[4]} mL · 하루 ${r[5]} mL</li>`).join('')}</ul></div>`;
     /* 나이가 안 되는 약은 「숫자」를 먼저 보여 주면 안 된다.
        새벽에 당황한 부모는 큰 글씨부터 읽는다 — 경고를 그 자리에 놓고 숫자는 접어 둔다. */
+    /* 공통 숫자표 10-26 — 이부프로펜 생후 12개월 전은 설명서 나이 표 밖: 계산하지 않고 의사가 정한 양 */
+    if (k === 'ibu' && m != null && m < 12 && !tooYoung) return `<div class="dose-card young"><div class="eyebrow">${esc(D.name)} · ${esc(D.brand)}</div><div class="young-stop">${I.alert}<div><b>돌 전 아기는 의사가 정한 양으로</b><p>생후 6~11개월은 약병 설명서 나이 표에 없어 이 앱이 양을 계산하지 않아요. <b>진료에서 정해 준 양</b>을 따르시고, 열에는 아세트아미노펜이 먼저예요.</p></div></div></div>`;
     if (tooYoung) return `<div class="dose-card young"><div class="eyebrow">${esc(D.name)} · ${esc(D.brand)}</div>
       <div class="young-stop">${I.alert}<div><b>이 약은 아직 이릅니다</b>
         <p>${esc(D.name)}${josa(D.name, '은', '는')} 보통 <b>생후 ${D.minMonths}개월 이후</b>부터 씁니다. 그 전에는 <b>임의로 먹이지 마시고 진료를 받으세요.</b></p></div></div>
@@ -4758,7 +4762,7 @@ function vKids(){
       <div class="dose-meta"><div><small>성분량</small><b>${mlRange(r)[2]}~${mlRange(r)[3]} mg</b></div><div><small>간격</small><b>${esc(D.gapText)} 이상</b></div><div><small>하루 최대</small><b>${mlTxt(r.day / conc.mgPerMl)} mL</b></div></div>
       <p class="small muted" style="margin-top:6px">${(() => { const dm = mlTxt(r.day / conc.mgPerMl), mg = Math.round(dm * conc.mgPerMl).toLocaleString();
         /* #32 — 어른 하루 상한에 걸리면 «몸무게 × mg/kg» 등식처럼 쓰지 않고 실제로 적용한 상한을 말한다 */
-        return r.ageCap && r.day < Math.min(r.rawDay, r.capDay) - .5 ? `몸무게로 계산하면 하루 ${Math.min(r.rawDay, r.capDay).toLocaleString()} mg이지만, 이 제품 설명서의 하루 한도(${esc(r.ageCap[2])})에 맞춰 ${mg} mg(${dm} mL)까지로 표시했어요` : r.rawDay > r.capDay + .5 ? `몸무게 계산값은 하루 ${r.rawDay.toLocaleString()} mg이지만, 성인 상한을 적용해 하루 최대 ${mg} mg(${dm} mL)까지만 표시했어요` : `하루 최대 ${dm} mL(${mg} mg)는 <b>몸무게 ${w} kg × ${r.perKgDay} mg/kg</b> 기준이에요`; })()}${k === 'apap' ? ` · 하루 ${D.maxPerDay}번까지` : ''}.</p>
+        return r.cap30 ? `몸무게로 계산하면 하루 ${Math.min(r.rawDay, r.capDay).toLocaleString()} mg이지만, 30 kg 미만은 설명서 하루 한도에 맞춰 ${mg} mg(${dm} mL)까지로 표시했어요` : r.ageCap && r.day < Math.min(r.rawDay, r.capDay) - .5 ? `몸무게로 계산하면 하루 ${Math.min(r.rawDay, r.capDay).toLocaleString()} mg이지만, 이 제품 설명서의 하루 한도(${esc(r.ageCap[2])})에 맞춰 ${mg} mg(${dm} mL)까지로 표시했어요` : r.rawDay > r.capDay + .5 ? `몸무게 계산값은 하루 ${r.rawDay.toLocaleString()} mg이지만, 성인 상한을 적용해 하루 최대 ${mg} mg(${dm} mL)까지만 표시했어요` : `하루 최대 ${dm} mL(${mg} mg)는 <b>몸무게 ${w} kg × ${r.perKgDay} mg/kg</b> 기준이에요`; })()}${k === 'apap' ? ` · 하루 ${D.maxPerDay}번까지` : ''}.</p>
       ${label}
       <p class="small muted" style="margin-top:8px">${esc(D.note)}</p>
       ${fold('계산 근거', `${r.capped ? `<div class="note" style="margin-top:8px">${I.info}<span>몸무게로만 곱하면 1회 ${r.rawHi} mg·하루 ${r.rawDay} mg이지만, 어른 상한(1회 ${D.capDose}·하루 ${D.capDay} mg)에서 멈춰요.</span></div>` : ''}
