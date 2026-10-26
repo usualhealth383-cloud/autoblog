@@ -252,7 +252,8 @@ print(f'첫 화면 {len(out)/1024:.0f} KB · 본문 data/core.json {len(jc)/1024
 _dd = ROOT.parent / 'docs' / 'yakjido' / 'data'
 _off = [{'n': f.name, 'b': f.stat().st_size} for f in sorted(_dd.glob('*.json')) if f.name != 'offline.json']
 _off_i = [{'n': f.name, 'b': f.stat().st_size} for f in sorted((_dd / 'i18n').glob('*.json'))] if (_dd / 'i18n').exists() else []
-(_dd / 'offline.json').write_text(json.dumps({'data': _off, 'i18n': _off_i}, ensure_ascii=False, separators=(',', ':')), encoding='utf-8')
+_off_x = [{'n': str(f.relative_to(ROOT)), 'b': f.stat().st_size} for _d in ('fonts', 'vendor') if (ROOT / _d).exists() for f in sorted((ROOT / _d).rglob('*')) if f.is_file()]
+(_dd / 'offline.json').write_text(json.dumps({'data': _off, 'i18n': _off_i, 'ext': _off_x}, ensure_ascii=False, separators=(',', ':')), encoding='utf-8')
 # 서비스워커 캐시 이름 = 배포 파일 내용의 해시 — 내용이 같으면 같은 이름(파이썬 hash() 는 실행마다 달라 매번 바뀌던 것, 2026-10-13)
 _srvjs = (ROOT / 'srv.js').read_text(encoding='utf-8') if (ROOT / 'srv.js').exists() else ''
 _srvjs += (ROOT / 'find.js').read_text(encoding='utf-8') if (ROOT / 'find.js').exists() else ''   # 찾기 부품도 바뀌면 캐시 이름이 바뀌게(10-14)
@@ -262,6 +263,10 @@ sw = ROOT / 'sw.js'
 if sw.exists():
     s = re.sub(r"const CACHE = '[^']*'", f"const CACHE = 'yakjido-{stamp.replace(' ', 'T')}-{cache_id}'", sw.read_text(encoding='utf-8'))
     (pages / 'sw.js').write_text(s, encoding='utf-8')
+# 바깥 파일 0(10-27 · 중국·인터넷 막힌 곳) — 글꼴(Pretendard 부분 글꼴 92조각, SIL OFL)·로그인 프로그램(supabase-js)을 배포 묶음 안에
+import shutil as _sh
+for _d in ('fonts', 'vendor'):
+    if (ROOT / _d).exists(): _sh.copytree(ROOT / _d, pages / _d, dirs_exist_ok=True)
 for name in ('manifest.webmanifest', 'privacy.html', 'terms.html', 'delete-account.html', 'srv.js', 'find.js', 'i18n.js'):   # terms.html = 약지도 이용약관(첫 동의 화면·설정에서 앱 안으로 읽음, 10-14)   # find.js = 공용 찾기 부품 + 약지도 쪽(검색을 처음 쓸 때 받음, Z8)
     # delete-account.html = 스토어 「계정 삭제 URL」(메디나눔 안내 2026-10-13)   # srv.js = 계정·기록 이어 두기(따로 받는 파일)   # privacy.html = 스토어에 적는 개인정보처리방침 주소
     src = ROOT / name

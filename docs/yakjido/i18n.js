@@ -21,12 +21,9 @@
   /* 글꼴·줄바꿈 — ja·zh 는 낱말 단위가 아니라 글자 단위(keep-all 이면 한 줄이 통째로 넘침) */
   var root = document.documentElement;
   root.lang = L === 'zh' ? 'zh-Hans' : L; root.classList.add('lang-' + L);
-  if (L === 'ja' || L === 'zh') {
-    var fam = L === 'ja' ? 'Noto+Sans+JP' : 'Noto+Sans+SC';
-    var ln = document.createElement('link'); ln.rel = 'stylesheet'; ln.href = 'https://fonts.googleapis.com/css2?family=' + fam + ':wght@400;500;700;800&display=swap'; document.head.appendChild(ln);
-  }
+  /* ja·zh 는 기기 글꼴(10-27 바깥 파일 0 — 중국은 구글 글꼴이 막히고 Noto CJK 는 너무 커서 싣지 않는다) */
   var st = document.createElement('style');
-  st.textContent = '.lang-ja body,.lang-ja button,.lang-ja input{font-family:"Noto Sans JP",Pretendard,system-ui,sans-serif}.lang-zh body,.lang-zh button,.lang-zh input{font-family:"Noto Sans SC",Pretendard,system-ui,sans-serif}' +
+  st.textContent = '.lang-ja body,.lang-ja button,.lang-ja input,.lang-ja textarea{font-family:"Hiragino Sans","Hiragino Kaku Gothic ProN","Noto Sans CJK JP","Noto Sans JP","Yu Gothic UI","Meiryo","Pretendard Variable",system-ui,sans-serif}.lang-zh body,.lang-zh button,.lang-zh input,.lang-zh textarea{font-family:"PingFang SC","Hiragino Sans GB","Noto Sans CJK SC","Noto Sans SC","Microsoft YaHei","Pretendard Variable",system-ui,sans-serif}' +
     '.lang-ja *,.lang-zh *{word-break:normal!important;line-break:strict;overflow-wrap:anywhere}.lang-en *,.lang-es *{word-break:normal!important;overflow-wrap:break-word}' +
     'html:not(.lang-ko) .review-stamp{white-space:normal;flex:0 1 auto;min-width:0;text-align:right;line-height:1.25}html:not(.lang-ko) .chip,html:not(.lang-ko) .hq-c{white-space:normal;max-width:100%;min-width:0;overflow-wrap:anywhere}' +
     '.i18n-note{display:flex;flex-wrap:wrap;gap:4px 10px;align-items:center;margin:6px 0 12px;font-size:.8125rem;color:var(--muted)}.i18n-note button{color:var(--primary);font-weight:600;min-height:36px}';

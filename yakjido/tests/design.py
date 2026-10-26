@@ -13,11 +13,11 @@
 import http.server, socketserver, threading, functools, pathlib, sys
 from playwright.sync_api import sync_playwright
 
-# 시험 브라우저는 한국어·한국으로 연다(10-27 다섯 언어 — 언어를 안 정하면 navigator 가 en-US 라 영어 화면·911 이 된다)
+# 시험 브라우저는 한국어·서울 시간대로 연다(10-27 다섯 언어 — 안 정하면 en-US·UTC 라 영어 화면이 된다. 나라는 시간대가 먼저라 i18n.py 가 en-US+서울 → 119 를 따로 본다)
 from playwright.sync_api import Browser as _B
 _np, _nc = _B.new_page, _B.new_context
-_B.new_page = lambda self, **k: _np(self, **{'locale': 'ko-KR', **k})
-_B.new_context = lambda self, **k: _nc(self, **{'locale': 'ko-KR', **k})
+_B.new_page = lambda self, **k: _np(self, **{'locale': 'ko-KR', 'timezone_id': 'Asia/Seoul', **k})
+_B.new_context = lambda self, **k: _nc(self, **{'locale': 'ko-KR', 'timezone_id': 'Asia/Seoul', **k})
 
 D = pathlib.Path(__file__).resolve().parent.parent.parent / 'docs' / 'yakjido'
 class Q(http.server.SimpleHTTPRequestHandler):

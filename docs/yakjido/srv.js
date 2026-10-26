@@ -17,7 +17,7 @@
   /* 2026-10-13 상용화 점검 1-23 — 판을 못 박고 무결성(SRI) 값을 단다. CDN 이 바뀐 파일을 주면 브라우저가 실행하지 않는다(로그인 칸만 「잠시 문제」).
      .min.js 는 jsDelivr 가 그때그때 만드는 파일이라 SRI 를 쓰면 안 된다 — npm 묶음에 든 그대로의 supabase.js(110 KB)를 쓴다.
      판을 올릴 때: curl 로 받아 `openssl dgst -sha384 -binary | openssl base64 -A` 값으로 LIB_SRI 를 함께 바꾼다. */
-  var LIB = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js';
+  var LIB = 'vendor/supabase.js';   /* 바깥 파일 0(10-27) — 배포 묶음 안의 supabase-js 2.45.4 */
   var LIB_SRI = 'sha384-0w2KAL2YHP6wKOkUDzkCDGgVvfmHnj02DHeQ6XcHOgTfFsGyonKOpShMH1x6nk9o';
   var 설정 = { app: 'app', 열쇠: /^$/, 다시그리기: null, 준비됨: true };
   var sb = null, 준비중 = null, 세션 = null, 동기화중 = false;
@@ -1378,7 +1378,8 @@ window.언어칸 = function () {
     var 열쇠 = '_mnchat_' + (봇.설정.앱 || 'x');
     function 말(k) { var L = 기본말[봇.설정.언어] || 기본말.ko; return (봇.설정.말 && 봇.설정.말[k]) || L[k] || 기본말.ko[k]; }
     function 상태읽기() { try { return JSON.parse(localStorage.getItem(열쇠) || 'null'); } catch (e) { return null; } }
-    function 상태쓰기(s) { if (!봇.설정.기억) return; try { localStorage.setItem(열쇠, JSON.stringify(s)); } catch (e) {} }
+    function 사람말있나(s) { return !!(s && s.기록 && s.기록.some(function (r) { return r[0] === 'me'; })); }
+    function 상태쓰기(s) { if (!봇.설정.기억 || !사람말있나(s)) return; try { localStorage.setItem(열쇠, JSON.stringify(s)); } catch (e) {} }   /* 사람이 한 마디라도 한 뒤부터 기억(첫 인사만으론 저장 안 함 — 약지도 10-27) */
 
     봇.이해 = function (글) {
       var 값 = 값뽑기(글, 봇.설정.약), 위 = null;
@@ -1433,7 +1434,7 @@ window.언어칸 = function () {
       }
       폼.addEventListener('submit', function (ev) { ev.preventDefault(); var v = 칸.value; 칸.value = ''; 보냄(v); });
       var 지난 = 상태읽기();
-      if (지난 && 지난.기록 && 지난.기록.length) {
+      if (사람말있나(지난)) {
         봇말({ 말: [말('이어')], 칩: [말('예'), 말('새')] });
         var 원 = 보냄;
         보냄 = function (글) {
@@ -1474,14 +1475,28 @@ window.언어칸 = function () {
   /* 위험 — 앱이 이미 쓰는 판정을 글로 옮긴 것(홈 응급 줄 · 증상 응급 줄 · 아이 3개월 38℃ · 41℃ · 항암 38℃ · 과다복용). 새 기준을 짓지 않는다 */
   var 마음 = /죽고\s*싶|자살|자해|끝내고\s*싶|없어지고\s*싶|사라지고\s*싶|살\s*이유|손목.*그|그었|모아서.*먹|약.*모아/;
   var 응급 = [/가슴.*(쥐어|조이|짓누|아프|답답).*(땀|숨)|가슴.*(쥐어짜|조이듯|짓누르)/, /한쪽.*(힘|마비|저리|처)|말이\s*어눌|얼굴.*(처졌|비뚤)|발음이\s*이상/, /숨.*(차서|막|못\s*쉬|안\s*쉬|가빠|쌕쌕|힘들)/, /(입술|혀|목구멍|얼굴).*(부었|붓고|부어)/, /경련|발작|까무러/, /의식|깨워도|안\s*일어나|축\s*처지/, /피를\s*토|토혈|변이\s*(새)?까|짜장\s*같|짜장처럼/, /머리.*(부딪|다친).*(토|구토)/, /(제일|가장|살면서).*심한\s*두통|벼락\s*두통/, /배가\s*(딱딱|너무\s*아파서\s*못)/, /(한\s*통|통째|[0-9]{2,}\s*(알|정|개)|많이|잔뜩).*(먹었|삼켰)/];
+  /* 다섯 언어 위험 낱말(10-27 Main — 한국어만 알아듣던 곳이 있었다). 언어와 상관없이 다 본다(영어 폰을 쓰는 한국 사람도 있다) */
+  var 마음다국 = /suicid|kill(ing)? myself|want to die|end (my|it all)|self[- ]?harm|cut(ting)? myself|no reason to live|quiero morir|matarme|quitarme la vida|no quiero vivir|hacerme daño|autolesi|死にたい|自殺|消えたい|自傷|リストカット|想死|自杀|不想活|轻生|自残|割腕/i;
+  var 응급다국 = [/chest (pain|hurts|tight|pressure)|can'?t breathe|cannot breathe|short(ness)? of breath|trouble breathing|struggling to breathe|wheez|face (is )?droop|slurred|one side.*(weak|numb)|(lips?|tongue|throat).*(swell|swollen|clos)|(swell|swollen).*(lips?|tongue|throat)|seizure|convuls|fit(ting)?\b.*child|unconscious|passed out|won'?t wake|unresponsive|floppy|(vomit|throw)(ing|ed)? (up )?blood|black (stool|poop)|worst headache|took (a lot|too many|the whole|all)|overdos|not breathing/i,
+    /dolor (de|en el) pecho|no puedo respirar|me falta (mucho )?el aire|ahog|cara caída|habla arrastrada|un lado.*(débil|dormid)|(labios?|lengua|garganta).*(hinch|cierra)|hinch\w*.*(labios?|lengua|garganta)|convuls|inconsciente|no despierta|no responde|(vómito|vomit\w*) (con )?sangre|heces negras|peor dolor de cabeza|tom[ée] (muchas|demasiad)|sobredosis|no respira/i,
+    /胸が?(痛|苦し|締め付け|しめつけ)|息が(苦し|できな)|呼吸が(苦し|でき)|顔.*(ゆが|垂れ)|ろれつ|片側.*(力|しびれ)|(唇|舌|喉).*(腫れ|詰ま)|けいれん|痙攣|意識が(ない|な)|起きない|ぐったり|血を吐|吐血|黒い便|最悪の頭痛|(薬|錠).*(たくさん|大量|全部).*飲|過量|息をしていない/,
+    /胸(痛|口痛|闷|口闷|口发紧)|喘不过气|呼吸困难|不能呼吸|没法呼吸|脸.*(歪|下垂)|口齿不清|说话含糊|一侧.*(无力|麻)|(嘴唇|舌头|喉咙).*(肿|紧)|抽搐|惊厥|昏迷|失去意识|叫不醒|吐血|黑便|最严重的头痛|吃了(很多|一整瓶|大量|一整盒)|过量|没有呼吸/];
+  var 위험말 = {
+    ko: { m: function (p, e) { return '많이 힘드시군요. 혼자 견디지 마세요 — 지금 ' + p + '에 전화하면 바로 이야기를 들어 줘요(24시간). 위험이 급하면 ' + e + '.'; }, b: function (e) { return '3개월이 안 된 아기가 38℃ 이상이면 해열제보다 진료가 먼저예요. 지금 응급실로 가거나 ' + e + '에 전화하세요.'; }, h: function (e) { return '41℃ 이상이면 지금 응급실로 가거나 ' + e + '에 전화하세요.'; }, c: function (e) { return '항암 치료 중 38℃ 이상은 바로 병원에 알려야 하는 열이에요. 치료받는 병원 응급 연락처나 ' + e + '로.'; }, r: function (e) { return '약보다 진료가 먼저예요. 지금 ' + e + '에 전화하거나 응급실로 가세요. 직접 운전하지 마세요.'; } },
+    en: { m: function (p, e) { return "It sounds like things are really hard right now. You don't have to face this alone — call " + p + ' now to talk to someone (24 hours). If you are in immediate danger, call ' + e + '.'; }, b: function (e) { return 'A baby under 3 months with a temperature of 38°C or higher needs a doctor before any fever medicine. Go to the emergency room now or call ' + e + '.'; }, h: function (e) { return 'A temperature of 41°C or higher needs the emergency room now — or call ' + e + '.'; }, c: function (e) { return 'A temperature of 38°C or higher during cancer treatment must be reported right away. Call your treatment hospital’s emergency line or ' + e + '.'; }, r: function (e) { return 'See a doctor before taking any medicine. Call ' + e + ' or go to the emergency room now. Do not drive yourself.'; } },
+    es: { m: function (p, e) { return 'Parece que está pasando por un momento muy difícil. No tiene que afrontarlo solo: llame ahora al ' + p + ' para hablar con alguien (24 horas). Si corre peligro inmediato, llame al ' + e + '.'; }, b: function (e) { return 'Un bebé de menos de 3 meses con 38 °C o más necesita atención médica antes que cualquier antitérmico. Vaya a urgencias ahora o llame al ' + e + '.'; }, h: function (e) { return 'Con 41 °C o más, vaya a urgencias ahora o llame al ' + e + '.'; }, c: function (e) { return 'Durante un tratamiento contra el cáncer, 38 °C o más debe comunicarse enseguida. Llame al teléfono de urgencias de su hospital o al ' + e + '.'; }, r: function (e) { return 'Antes que cualquier medicamento, necesita atención médica. Llame ahora al ' + e + ' o vaya a urgencias. No conduzca usted mismo.'; } },
+    ja: { m: function (p, e) { return 'とてもつらい状態なのですね。ひとりで抱え込まないでください。今すぐ ' + p + ' に電話すれば話を聞いてもらえます（24時間）。命の危険が迫っているときは ' + e + ' へ。'; }, b: function (e) { return '生後3か月未満の赤ちゃんが38℃以上なら、解熱剤より先に受診が必要です。今すぐ救急外来へ行くか ' + e + ' に電話してください。'; }, h: function (e) { return '41℃以上なら今すぐ救急外来へ行くか ' + e + ' に電話してください。'; }, c: function (e) { return 'がん治療中の38℃以上の熱はすぐに病院へ連絡が必要です。治療中の病院の緊急連絡先か ' + e + ' へ。'; }, r: function (e) { return '薬より先に受診が必要です。今すぐ ' + e + ' に電話するか救急外来へ行ってください。ご自分で運転しないでください。'; } },
+    zh: { m: function (p, e) { return '听起来您现在非常难受。请不要一个人扛着——现在拨打 ' + p + '，会有人倾听您（24小时）。如果情况紧急，请拨打 ' + e + '。'; }, b: function (e) { return '不满3个月的婴儿体温达到38°C或以上，应先就医，而不是先用退烧药。请立即去急诊或拨打 ' + e + '。'; }, h: function (e) { return '体温达到41°C或以上，请立即去急诊或拨打 ' + e + '。'; }, c: function (e) { return '抗癌治疗期间体温达到38°C或以上，需要立即告知医院。请联系治疗医院的急诊电话或拨打 ' + e + '。'; }, r: function (e) { return '比起用药，您需要先就医。请立即拨打 ' + e + ' 或去急诊。请不要自己开车。'; } }
+  };
   function 위험(글, 값) {
-    var t = String(글 || ''), N = (window.I18N && window.I18N.emg) || { e: '119', m: ['109', '1577-0199'] };
-    if (마음.test(t)) return { 말: '많이 힘드시군요. 혼자 견디지 마세요 — 지금 ' + (N.m[0] || N.e) + '에 전화하면 바로 이야기를 들어 줘요(24시간). 위험이 급하면 ' + N.e + '.', 전화: N.m[0] || N.e };
+    var t = String(글 || ''), N = (window.I18N && window.I18N.emg) || { e: '119', m: ['109', '1577-0199'] }, M = 위험말[window.LANG] || 위험말.ko, p = N.m[0] || N.e;
+    if (마음.test(t) || 마음다국.test(t)) return { 말: M.m(p, N.e), 전화: p };
     var 열 = 값 && 값.체온, 달 = 값 && 값.나이개월;
-    if ((열 >= 38 && 달 != null && 달 < 3) || (열 >= 38 && /3\s*개월\s*(미만|안|전)|신생아|백일\s*전/.test(t))) return { 말: '3개월이 안 된 아기가 38℃ 이상이면 해열제보다 진료가 먼저예요. 지금 응급실로 가거나 ' + N.e + '에 전화하세요.', 전화: N.e };
-    if (열 >= 41) return { 말: '41℃ 이상이면 지금 응급실로 가거나 ' + N.e + '에 전화하세요.', 전화: N.e };
-    if (열 >= 38 && /항암|암\s*치료|항암제/.test(t)) return { 말: '항암 치료 중 38℃ 이상은 바로 병원에 알려야 하는 열이에요. 치료받는 병원 응급 연락처나 ' + N.e + '로.', 전화: N.e };
-    for (var i = 0; i < 응급.length; i++) if (응급[i].test(t)) return { 말: '약보다 진료가 먼저예요. 지금 ' + N.e + '에 전화하거나 응급실로 가세요. 직접 운전하지 마세요.', 전화: N.e };
+    if ((열 >= 38 && 달 != null && 달 < 3) || (열 >= 38 && /3\s*개월\s*(미만|안|전)|신생아|백일\s*전|newborn|recién nacido|新生児|新生儿/i.test(t))) return { 말: M.b(N.e), 전화: N.e };
+    if (열 >= 41) return { 말: M.h(N.e), 전화: N.e };
+    if (열 >= 38 && /항암|암\s*치료|항암제|chemo|cancer treatment|quimio|抗がん剤|がん治療|化疗|抗癌/i.test(t)) return { 말: M.c(N.e), 전화: N.e };
+    for (var i = 0; i < 응급.length; i++) if (응급[i].test(t)) return { 말: M.r(N.e), 전화: N.e };
+    for (var j = 0; j < 응급다국.length; j++) if (응급다국[j].test(t)) return { 말: M.r(N.e), 전화: N.e };
     return null;
   }
   function 뜻목록() {
@@ -1554,23 +1569,22 @@ window.언어칸 = function () {
       /* 화면을 다시 그려도(자료가 늦게 와 route() 가 다시 돌 때) 하던 대화를 그대로 — 같은 대화 칸을 다시 끼운다 */
       if (window._talkNode && window._talkNode !== 곳) { 곳.replaceWith(window._talkNode); return; }
       window._talkNode = 곳;
-      try { var 지 = JSON.parse(localStorage.getItem('_mnchat_yakjido') || 'null'); if (지 && !(지.기록 || []).some(function (r) { return r[0] === 'me'; })) localStorage.removeItem('_mnchat_yakjido'); } catch (e) {}
-      /* 기억은 사람이 한 마디라도 한 뒤부터 — 첫 인사만 저장되면 다시 열 때마다 「이어서 할까요?」가 떴다 */
-      var 봇 = 대화.만들기({ 앱: 'yakjido', 언어: window.LANG || 'ko', 뜻: 뜻목록(), 약: Object.keys(이름들()), 위험: function (t, v) { 봇.설정.기억 = true; return 위험(t, v); }, 처리: 처리, 기억: false });
+      var 봇 = 대화.만들기({ 앱: 'yakjido', 언어: window.LANG || 'ko', 뜻: 뜻목록(), 약: Object.keys(이름들()), 위험: 위험, 처리: 처리 });
       봇.붙이기(곳, { 말: ['어떤 약이 궁금하세요? 어디가 아프세요?', '편하게 적어 주세요. 예) 타이레놀이랑 감기약 같이 먹어도 돼?'], 칩: ['같이 먹어도 되나', '아이 해열제', '이 알약 뭐지'] });
       var q = (location.hash.match(/[?&]q=([^&]+)/) || [])[1]; if (q) setTimeout(function () { 봇.보냄(decodeURIComponent(q)); }, 900);
       window.약지도대화 = { 위험: 위험, 처리: 처리, 약찾기: 약찾기, 봇: 봇 };
     }, 0);
     return topBar({ back: '홈' }) + '<h1>물어보기</h1><p class="small muted" style="margin:4px 0 12px">사람 상담이 아니라 앱 안의 안내예요. 이 폰 안에서만 읽고 어디로도 보내지 않아요.</p><div id="talk" class="talk"></div>' + disclaimer();
   };
-  window.대화줄 = function () { return '<a class="talk-door" href="#/talk"><span class="b">어떤 약이 궁금하세요? 어디가 아프세요?</span><span class="small muted">「타이레놀이랑 감기약 같이 먹어도 돼?」처럼 편하게 물어보세요 ›</span></a>'; };
+  /* 대화의 뜻 고르기·답은 아직 한국어만(다섯 언어 말뭉치는 다음 회차) — 한국어가 아닌 화면에는 홈 입구를 내지 않는다. 위험 낱말은 다섯 언어 다 본다 */
+  window.대화줄 = function () { if (window.LANG && window.LANG !== 'ko') return ''; return '<a class="talk-door" href="#/talk"><span class="b">어떤 약이 궁금하세요? 어디가 아프세요?</span><span class="small muted">「타이레놀이랑 감기약 같이 먹어도 돼?」처럼 편하게 물어보세요 ›</span></a>'; };
   var cs = document.createElement('style');
   cs.textContent = '.talk-door{display:flex;flex-direction:column;gap:4px;margin:12px 0 4px;padding:14px 16px;border-radius:18px 18px 18px 6px;background:var(--tint);color:var(--ink);text-decoration:none;min-height:48px}.talk-door .b{font-weight:700}.talk{min-height:50vh}';
   document.head.appendChild(cs);
 })();
 
 /* 기내 모드(10-27 · 요청서 20261027_메디나눔_전앱_기내모드) — 인터넷 없이 쓰도록 자료·고른 언어·글꼴을 미리 받아 둔다.
-   받는 것은 서비스 워커 캐시에 들어간다(같은 주소라 앱이 그대로 꺼내 씀). 서버 응답(로그인·동기화)은 담지 않는다. */
+   받는 것은 서비스 워커 캐시에 들어간다(같은 주소라 앱이 그대로 꺼내 씀). 서버 응답(로그인·동기화)은 담지 않는다. 글꼴·supabase-js 도 묶음 안(바깥 파일 0). */
 (function () {
   var K = 'yakjido.offline', MB = function (b) { return (b / 1048576).toFixed(b < 10485760 ? 1 : 0) + ' MB'; };
   var 갈래 = [['core', '약 자료', '약 찾기·겹침·증상·처방약 길잡이', /^(core|detail|brands|lexicon|meta|mixes|nutrients|names-rx|kpic)\.json$/],
@@ -1580,18 +1594,15 @@ window.언어칸 = function () {
   var 판 = function () { try { return DATAV; } catch (e) { return ''; } };
   var 목록 = null, 고름 = { core: 1, easy: 1, pill: 1, lang: 1, font: 1 }, 받는중 = false;
   function 읽기() { return 목록 ? Promise.resolve(목록) : fetch('data/offline.json?v=' + 판(), { cache: 'no-store' }).then(function (r) { return r.json(); }).then(function (j) { 목록 = j; return j; }); }
-  function 글꼴주소() {
-    var u = []; document.querySelectorAll('link[rel=stylesheet][href^="https://"]').forEach(function (l) { if (/pretendard|fonts\.googleapis/.test(l.href)) u.push(l.href); });
-    u.push('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js');
-    return u;
-  }
   function 할일(j) {
     var out = [];
     갈래.forEach(function (g) { if (고름[g[0]]) j.data.forEach(function (f) { if (g[3].test(f.n)) out.push({ u: 'data/' + f.n + '?v=' + 판(), b: f.b }); }); });
     if (고름.lang && window.LANG && window.LANG !== 'ko') (j.i18n || []).forEach(function (f) { if (f.n === window.LANG + '.json') out.push({ u: 'data/i18n/' + f.n, b: f.b }); });
+    if (고름.font) (j.ext || []).forEach(function (f) { out.push({ u: f.n, b: f.b }); });
     return out;
   }
   function 크기(j, k) {
+    if (k === 'font') return (j.ext || []).reduce(function (s, f) { return s + f.b; }, 0);
     if (k === 'lang') return (j.i18n || []).filter(function (f) { return f.n === window.LANG + '.json'; }).reduce(function (s, f) { return s + f.b; }, 0);
     var g = 갈래.filter(function (x) { return x[0] === k; })[0]; return g ? j.data.filter(function (f) { return g[3].test(f.n); }).reduce(function (s, f) { return s + f.b; }, 0) : 0;
   }
@@ -1603,7 +1614,7 @@ window.언어칸 = function () {
       var h = st ? '<p class="gn-st ' + (새판 ? 'old' : 'ok') + '">' + (새판 ? '받아 둔 뒤에 약 자료가 새로 나왔어요 — 다시 받으면 새것으로 바뀌어요.' : '인터넷 없이 쓸 준비가 됐어요 · ' + esc(st.at) + ' 받음 · ' + MB(st.b)) + '</p>' : '';
       h += 갈래.map(function (g) { return 줄(g[0], g[1], g[2], MB(크기(j, g[0]))); }).join('');
       if (window.LANG && window.LANG !== 'ko') h += 줄('lang', '고른 언어', '번역 사전', MB(크기(j, 'lang')));
-      h += 줄('font', '글꼴', '글씨 모양 — 받으면서 크기를 세요', '—');
+      h += 줄('font', '글꼴·로그인 프로그램', '글씨 모양과 연결되면 쓰는 로그인', MB(크기(j, 'font')));
       h += '<p class="small muted gn-tot">받을 크기 약 <b>' + MB(tot) + '</b>' + (tot > 31457280 ? ' — 30 MB 가 넘어요. 필요한 갈래만 고르셔도 돼요.' : '') + ' 와이파이에서 받기를 권해요.</p>';
       h += '<div class="gn-bar" hidden><progress max="100" value="0"></progress><span class="small muted"></span></div>';
       h += '<button type="button" class="btn" onclick="기내받기()">' + (st ? '다시 받기' : '받아 두기') + '</button>';
@@ -1616,23 +1627,17 @@ window.언어칸 = function () {
     if (받는중) return; if (navigator.onLine === false) { try { toast('인터넷이 될 때 받을 수 있어요'); } catch (e) {} return; }
     받는중 = true;
     읽기().then(function (j) {
-      var q = 할일(j), all = q.reduce(function (s, x) { return s + x.b; }, 0) || 1, got = 0, n = 0, bad = 0, fb = 0;
+      var q = 할일(j), all = q.reduce(function (s, x) { return s + x.b; }, 0) || 1, got = 0, n = 0, bad = 0;
       var bar = document.querySelector('#gn-box .gn-bar'), pg = bar && bar.querySelector('progress'), tx = bar && bar.querySelector('span');
       if (bar) bar.hidden = false;
       var 표시 = function () { if (pg) pg.value = Math.min(100, Math.round(got / all * 100)); if (tx) tx.textContent = MB(got) + ' / ' + MB(all) + (bad ? ' · 못 받은 것 ' + bad : ''); };
-      var 하나 = function (x) { return fetch(x.u).then(function (r) { if (!r.ok) throw 0; return r.blob(); }).then(function (b) { got += x.b; fb += x.font ? b.size : 0; }).catch(function () { bad++; }).then(표시); };
+      var 하나 = function (x) { return fetch(x.u).then(function (r) { if (!r.ok) throw 0; return r.blob(); }).then(function () { got += x.b; }).catch(function () { bad++; }).then(표시); };
       var 일꾼 = function () { var x = q[n++]; return x ? 하나(x).then(일꾼) : Promise.resolve(); };
-      var 글꼴 = !고름.font ? Promise.resolve() : Promise.all(글꼴주소().map(function (u) {
-        return fetch(u).then(function (r) { return r.ok ? (/\.css|googleapis/.test(u) ? r.text() : r.blob().then(function (b) { fb += b.size; return ''; })) : ''; }).then(function (css) {
-          var us = (String(css).match(/url\(([^)]+)\)/g) || []).map(function (m) { return new URL(m.slice(4, -1).replace(/["']/g, ''), u).href; });
-          return Promise.all(us.map(function (f) { return fetch(f).then(function (r) { return r.blob(); }).then(function (b) { fb += b.size; }).catch(function () {}); }));
-        }).catch(function () {});
-      }));
-      return Promise.all([일꾼(), 일꾼(), 일꾼(), 글꼴]).then(function () {
+      return Promise.all([일꾼(), 일꾼(), 일꾼(), 일꾼()]).then(function () {
         받는중 = false;
         if (bad) { try { toast('못 받은 파일이 ' + bad + '개 있어요 — 다시 받기를 눌러 주세요'); } catch (e) {} 표시(); return; }
         var d = new Date(), at = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
-        try { localStorage.setItem(K, JSON.stringify({ v: 판(), at: at, b: got + fb, lang: window.LANG || 'ko' })); } catch (e) {}
+        try { localStorage.setItem(K, JSON.stringify({ v: 판(), at: at, b: got, lang: window.LANG || 'ko' })); } catch (e) {}
         try { if (navigator.storage && navigator.storage.persist) navigator.storage.persist(); } catch (e) {}
         try { toast('다 받았어요 — 인터넷 없이도 열려요'); } catch (e) {}
         그리기();
@@ -1644,7 +1649,7 @@ window.언어칸 = function () {
     if (!window.caches) return 끝();
     caches.keys().then(function (ks) { return Promise.all(ks.filter(function (k) { return k === 'yakjido-data-v1' || k === 'yakjido-ext-v1'; }).map(function (k) { return caches.delete(k); })); }).then(끝, 끝);
   };
-  window.기내칸 = function () { setTimeout(그리기, 0); return '<section class="sec card" id="offline" style="margin-top:16px"><h2>기내에서 쓰기</h2><p class="small muted">비행기·지하·해외처럼 인터넷이 없는 곳에서도 열리게 미리 받아 둬요. 로그인·동기화·바깥 링크는 연결되면 돼요.</p><div id="gn-box"><p class="small muted">목록을 읽는 중…</p></div></section>'; };
+  window.기내칸 = function () { setTimeout(그리기, 0); return '<section class="sec card" id="offline" style="margin-top:16px"><h2>기내에서 쓰기</h2><p class="small muted">비행기·지하·해외처럼 인터넷이 없거나 막힌 곳에 가시기 전에 미리 받아 두세요. 로그인·동기화·바깥 링크는 연결되면 돼요.</p><div id="gn-box"><p class="small muted">목록을 읽는 중…</p></div></section>'; };
   window.기내줄 = function () { var st = 상태(); if (st && st.v === 판()) return ''; return '<p class="gn-home"><a href="#/me?t=set&to=offline" onclick="setTimeout(function(){var e=document.getElementById(\'offline\');e&&e.scrollIntoView({block:\'start\'})},300)">' + (st ? '받아 둔 약 자료가 새로 나왔어요 — 기내용 다시 받기 ›' : '인터넷 없는 곳에 가세요? 기내에서 쓰게 받아 두기 ›') + '</a></p>'; };
   var cs = document.createElement('style');
   cs.textContent = '.gn-row{display:flex;gap:12px;align-items:center;padding:12px 0;border-top:1px solid var(--line);min-height:48px}.gn-row input{width:22px;height:22px;flex:none}.gn-row>span{flex:1;display:flex;flex-direction:column;gap:2px}.gn-row em{font-style:normal;color:var(--muted);font-size:.875rem;white-space:nowrap}' +

@@ -11,9 +11,9 @@
    인터넷이 안 되면 어느 캐시에든 있는 사본을 준다(5-01 — 첫 방문 뒤 비행기 모드에서 본문이 안 뜨던 것). */
 const CACHE = 'yakjido-2026-09-21-8896';
 const DATA = 'yakjido-data-v1';
-/* 기내 모드(10-27) — 바깥 주소는 이 허용 목록만 담는다: 글꼴(jsdelivr Pretendard·구글 Noto)·로그인 프로그램(supabase-js). 서버 응답(supabase REST)은 담지 않는다(09-22 원칙) */
+/* 기내 모드·바깥 파일 0(10-27) — 글꼴(fonts/)·로그인 프로그램(vendor/)은 배포 묶음 안. 판이 박힌 꾸러미라 내용이 안 바뀌니 «캐시 먼저», 앱 판이 바뀌어도 지우지 않는다(EXT).
+   바깥 주소는 하나도 담지 않는다 — 서버 응답(supabase REST)·날씨는 그대로 지나간다(09-22 원칙) */
 const EXT = 'yakjido-ext-v1';
-const EXT_OK = (u) => (u.hostname === 'cdn.jsdelivr.net' && /pretendard|supabase-js/.test(u.pathname)) || u.hostname === 'fonts.googleapis.com' || u.hostname === 'fonts.gstatic.com';
 /* 본문(core·detail)은 여기서 받지 않는다 — 첫 방문에 페이지가 이미 받은 것을 한 번 더 받던 것(5-03). 페이지가 워커에 연결되면 같은 주소로 다시 불러 캐시에 넣는다. */
 /* terms.html·privacy.html — 첫 동의 화면과 설정의 「약관·개인정보」가 앱 안에서 읽는다(비행기 모드에서도 열리게, 10-14) */
 const ASSETS = ['./', './index.html', './manifest.webmanifest', './srv.js', './find.js', './i18n.js', './terms.html', './privacy.html', './icon-192.png', './icon-512.png', './icon-180.png', './icon-maskable-512.png'];
@@ -47,10 +47,9 @@ function netOrCache(req, net) {
 self.addEventListener('fetch', (e) => {
   if (e.request.method !== 'GET') return;
   const url = new URL(e.request.url);
-  if (url.origin !== location.origin) {
-    if (!EXT_OK(url)) return;     // 날씨·서버·지도 같은 바깥 것은 건드리지 않는다
-    /* 허용 목록(글꼴·supabase-js) — 캐시 먼저, 없으면 받아 담기(판이 박힌 주소라 내용이 안 바뀐다) */
-    e.respondWith(caches.open(EXT).then((c) => c.match(e.request, { ignoreVary: true }).then((hit) => hit || fetch(e.request).then((res) => { if (res && (res.ok || res.type === 'opaque')) c.put(e.request, res.clone()).catch(() => {}); return res; }))));
+  if (url.origin !== location.origin) return;     // 날씨·서버·지도 같은 바깥 것은 건드리지 않는다
+  if (/\/(fonts|vendor)\//.test(url.pathname)) {
+    e.respondWith(caches.open(EXT).then((c) => c.match(e.request, { ignoreVary: true }).then((hit) => hit || fetch(e.request).then((res) => { if (res && res.ok) c.put(e.request, res.clone()).catch(() => {}); return res; }))));
     return;
   }
 

@@ -31,14 +31,9 @@ if (document.readyState === 'complete') setTimeout(show, 4000);
 else window.addEventListener('load', function(){ setTimeout(show, 4000); });
 })();
 </script>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<!-- 2026-10-13 상용화 점검 5-12 — 바깥 글꼴 CSS 가 첫 그림을 막지 않게(media=print 로 받고 다 받으면 all). 못 받으면 시스템 글꼴로 그대로 보인다 -->
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700;800&display=swap" media="print" onload="this.media='all'">
-<!-- 본문 글꼴: Pretendard Variable(토스·당근이 쓰는 한글 UI 서체). 필요한 글자 묶음만 받는 dynamic subset. 못 받으면 Noto Sans KR 로 자연히 떨어진다 -->
-<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css" media="print" onload="this.media='all'">
-<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700;800&display=swap"><link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css"></noscript>
+<!-- 본문 글꼴: Pretendard Variable 부분 글꼴(필요한 글자 묶음만 받음). 10-27 바깥 파일 0 — 배포 묶음 안(fonts/)에서 받는다(중국·인터넷 막힌 곳·기내). 첫 그림을 막지 않게 media=print 로 받고 다 받으면 all, 못 받으면 시스템 글꼴 -->
+<link rel="stylesheet" href="fonts/pretendard.css" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="fonts/pretendard.css"></noscript>
 <style>
 :root{
 --primary:#0B6E8F; --primary-deep:#08526B; --primary-rgb:11,110,143;
@@ -1768,8 +1763,8 @@ background-repeat:no-repeat;background-position:right 9px center;background-size
 <script>
 window.__YAKJIDO_OK__ = true;
 const D = JSON.parse(document.getElementById('data').textContent || '{}');
-const BUILD = '2026-10-27 07:00';
-const DATAV = 'bc944dfca6'.indexOf('__') === 0 ? BUILD : 'bc944dfca6';
+const BUILD = '2026-10-27 07:18';
+const DATAV = '6c666ea541'.indexOf('__') === 0 ? BUILD : '6c666ea541';
 const BRANDMARK = (typeof window !== 'undefined' && window.__BRANDMARK__) || 'icon-192.png';
 let CORE = 0, CORE_P = null;
 function mergeCore(c){
@@ -2212,7 +2207,13 @@ im.replaceWith(sp);
 });
 }
 const LANG = (() => { try { const v = localStorage.getItem('yakjido.lang'); if (/^(ko|en|es|ja|zh)$/.test(v)) return v; } catch (e) {} const n = (navigator.language || 'ko').slice(0, 2).toLowerCase(); return /^(ko|en|es|ja|zh)$/.test(n) ? n : 'en'; })();
-const CC = (() => { try { const v = localStorage.getItem('yakjido.cc'); if (v) return v; } catch (e) {} const m = (navigator.language || '').match(/-([A-Za-z]{2})\b/); return m ? m[1].toUpperCase() : ({ ko:'KR', en:'US', es:'ES', ja:'JP', zh:'CN' })[LANG]; })();
+const CC = (() => { try { const v = localStorage.getItem('yakjido.cc'); if (v) return v; } catch (e) {}
+let tz = ''; try { tz = Intl.DateTimeFormat().resolvedOptions().timeZone || ''; } catch (e) {}
+if (tz) { if (tz === 'Asia/Seoul') return 'KR'; if (tz === 'Asia/Tokyo') return 'JP'; if (/^Asia\/(Shanghai|Chongqing|Chungking|Harbin|Urumqi|Kashgar)$|^PRC$/.test(tz)) return 'CN';
+if (/^(Europe\/Madrid|Atlantic\/Canary|Africa\/Ceuta)$/.test(tz)) return 'ES';
+if (/^America\/(New_York|Chicago|Denver|Los_Angeles|Phoenix|Anchorage|Juneau|Sitka|Metlakatla|Yakutat|Nome|Adak|Boise|Detroit|Menominee|Indiana\/.+|Kentucky\/.+|North_Dakota\/.+)$|^Pacific\/Honolulu$|^US\//.test(tz)) return 'US';
+if (tz !== 'UTC' && tz !== 'Etc/UTC') return 'XX'; }
+const m = (navigator.language || '').match(/-([A-Za-z]{2})\b/); return m ? m[1].toUpperCase() : ({ ko:'KR', en:'US', es:'ES', ja:'JP', zh:'CN' })[LANG]; })();
 window.LANG = LANG; window.CC = CC;
 function setLang(l, cc){ try { localStorage.setItem('yakjido.lang', l); if (cc) localStorage.setItem('yakjido.cc', cc); } catch (e) {} location.reload(); }
 if (LANG !== 'ko' || CC !== 'KR') { const s = document.createElement('script'); s.src = 'i18n.js'; document.head.appendChild(s); }

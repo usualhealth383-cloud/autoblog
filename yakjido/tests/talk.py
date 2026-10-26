@@ -37,7 +37,19 @@ with sync_playwright() as p:
         r = pg.evaluate(JUDGE, [e['t'], e['뜻'], {}])
         if r == 'ok': dok += 1
         else: dmiss.append(f"{e['t']} → {e['뜻']} : {r}")
-    print(f'보통 뜻 맞힘 {good}/{len(C["보통"])} ({rate:.0%}) · 위험 {dok}/{len(C["위험"])}')
+    # 다섯 언어 위험(10-27) — 나라 번호까지: 그 언어·나라로 연 페이지에서
+    for L, CC, e119, mind in [('en', 'US', '911', '988'), ('es', 'ES', '112', '024'), ('ja', 'JP', '119', '0570-064-556'), ('zh', 'CN', '120', '12356')]:
+        q = b.new_page(); q.add_init_script(SEED + f";localStorage.setItem('yakjido.lang','{L}');localStorage.setItem('yakjido.cc','{CC}')")
+        q.goto(URL + '#/talk'); q.wait_for_function("()=>window.약지도대화&&window.I18N", timeout=20000); q.evaluate("()=>I18N.ready")
+        for l2, t, want in C['위험_다국']:
+            if l2 != L: continue
+            r = q.evaluate("t=>{const a=약지도대화.위험(t,대화.값뽑기(t,[]));return a&&[a.전화,a.말]}", t)
+            exp = mind if want == 'mind' else e119
+            if not r or r[0] != exp: dmiss.append(f'{L} {t} → {want} : {r}')
+            elif '119' in r[1] and e119 != '119': dmiss.append(f'{L} 안내 글에 119: {r[1][:40]}')
+            else: dok += 1
+        q.close()
+    print(f'보통 뜻 맞힘 {good}/{len(C["보통"])} ({rate:.0%}) · 위험 {dok}/{len(C["위험"]) + len(C["위험_다국"])}')
     for m in miss: print('  · 놓침', m)
     if rate < .9: fails.append(f'뜻 맞힘 {rate:.0%} < 90%')
     if dmiss: fails.append(f'위험 놓침 {dmiss}')

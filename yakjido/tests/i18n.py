@@ -31,6 +31,15 @@ with sync_playwright() as p:
             if errs: fails.append(f'{L} {W} JS 오류 {errs[:2]}')
             pg.close()
         if L != 'ko': rep.append(f'{L}: 한국어가 남은 글 덩어리 {ko_left[0]}/{ko_left[1]} ({ko_left[0]/max(1,ko_left[1]):.0%}) — 본문 번역 전 몫')
+    # 영어 폰을 쓰는 한국 거주자(10-27 Main) — 나라를 고르지 않았으면 기기 시간대로: en-US + Asia/Seoul → 119
+    for tz, want in (('Asia/Seoul', '119'), ('America/New_York', '911'), ('Europe/Paris', '112')):
+        pg = b.new_page(locale='en-US', timezone_id=tz); pg.add_init_script(SEED)
+        pg.goto(URL + '#/home'); pg.wait_for_function("()=>typeof CORE!=='undefined'&&CORE===2", timeout=20000)
+        if pg.evaluate("()=>!!window.I18N"): pg.evaluate("()=>I18N.ready"); pg.wait_for_timeout(400)
+        got = pg.evaluate("()=>{route();return [window.LANG, window.CC, (document.querySelector('#view a.er-line')||{}).getAttribute?.('href')]}")
+        if got[2] != 'tel:' + want: fails.append(f'en-US + {tz}: 응급 번호 {got} (기대 {want})')
+        else: rep.append(f'en-US + {tz} → {got[1]} · {got[2]}')
+        pg.close()
     b.close()
 for r in rep: print(' ', r)
 if fails: print('결함', len(fails)); [print('  ✗', f) for f in fails[:40]]; sys.exit(1)
