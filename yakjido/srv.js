@@ -1577,7 +1577,7 @@ window.vRxS = function(id){
   const all = [...new Set([...(g.src || []), ...[g.do, g.otc, g.kinds, g.er, g.myths].flat().filter(Boolean).flatMap(x => x.src || []), ...(g.miss?.src || []), ...(g.clinic?.src || [])])];
   const kind = k => `<li${mine.has(k.k) ? ' class="me"' : ''}><b>${esc(k.n)}</b>${mine.has(k.k) ? ' <span class="badge soft">내 약</span>' : ''}<br>${fmt(k.t)}</li>`;
   const clin = [g.clinic?.t, ...(g.kinds || []).filter(k => k.clinic).map(k => `**${k.n}** — ${k.clinic}`)].filter(Boolean);
-  return `${topBar({ back:'이전', unreviewed:!RXG?.reviewed })}
+  return `${topBar({ back:'이전', unreviewed:!(g.reviewed ?? RXG?.reviewed) })}
   <div class="eyebrow">처방약 길잡이</div><h1>${esc(g.title)}</h1>
   <p class="lead-p" style="margin-top:6px">${fmt(g.lead)}</p>
   <section class="sec card"><h2>이렇게 드세요</h2><ol class="steps">${g.do.map(x => `<li>${fmt(x.t)}${x.go ? ` <a class="link" href="#${esc(x.go[0])}">${esc(x.go[1])}</a>` : ''}</li>`).join('')}</ol></section>
