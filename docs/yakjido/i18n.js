@@ -28,6 +28,7 @@
   var st = document.createElement('style');
   st.textContent = '.lang-ja body,.lang-ja button,.lang-ja input{font-family:"Noto Sans JP",Pretendard,system-ui,sans-serif}.lang-zh body,.lang-zh button,.lang-zh input{font-family:"Noto Sans SC",Pretendard,system-ui,sans-serif}' +
     '.lang-ja *,.lang-zh *{word-break:normal!important;line-break:strict;overflow-wrap:anywhere}.lang-en *,.lang-es *{word-break:normal!important;overflow-wrap:break-word}' +
+    'html:not(.lang-ko) .review-stamp{white-space:normal;flex:0 1 auto;min-width:0;text-align:right;line-height:1.25}html:not(.lang-ko) .chip,html:not(.lang-ko) .hq-c{white-space:normal;max-width:100%;min-width:0;overflow-wrap:anywhere}' +
     '.i18n-note{display:flex;flex-wrap:wrap;gap:4px 10px;align-items:center;margin:6px 0 12px;font-size:.8125rem;color:var(--muted)}.i18n-note button{color:var(--primary);font-weight:600;min-height:36px}';
   document.head.appendChild(st);
 
@@ -37,7 +38,8 @@
     var p = d ? Promise.resolve(d) : fetch('data/i18n/' + L + '.json').then(function (r) { return r.ok ? r.json() : {}; }).catch(function () { return {}; });
     return p.then(function (j) {
       DICT = j || {}; ui = DICT.ui || {};
-      for (var k in ui) if (/\d/.test(k)) uiN[numKey(k)] = ui[k];
+      /* 숫자만 다른 글 — 번역의 숫자도 틀(#)로 바꿔 둔다. 숫자 개수가 원문과 다르면(°F 병기 등) 틀로 쓰지 않는다(같은 글일 때만 씀) */
+      for (var k in ui) if (/\d/.test(k)) { var a = k.match(/\d[\d,.]*/g) || [], b = String(ui[k]).match(/\d[\d,.]*/g) || []; if (a.length === b.length) uiN[numKey(k)] = numKey(String(ui[k])); }
     });
   }
   /* 본문 덮어쓰기 — 증상·처방약 길잡이의 안전 칸. 자료가 늦게 오므로 그릴 때마다 한 번씩 본다(이미 했으면 건너뜀) */
