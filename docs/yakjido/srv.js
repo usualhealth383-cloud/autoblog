@@ -1832,6 +1832,63 @@ window.vAboutS = function(){
 })();
 /* ▲▲ 통합찾기 부품 끝 ▲▲ */
 try { 통합찾기.설치({ 앱: 'yakjido', 열기: function (url) { location.href = url; } }); } catch (e) {}
+;/* ▼▼ 이용량 부품 시작 ▼▼ */
+/* ═══ 메디나눔 익명 이용 통계 — 다섯 앱 공용 (2026-10-26 Main · 현욱님 「월 정액 시범 → 이용량 보고 결정」) ═══
+   하는 일: 「검사 시작·끝냄·다시 하기·결과 칸 열기」 같은 기능 이름의 «횟수»만 기기에 모았다가 하루 한 번 서버 합계에 더한다.
+   보내는 것: 앱 이름 + {기능이름: 횟수}. 계정·기기 식별값·답·결과·검색어는 보내지 않는다. 서버는 날짜별 합계만 둔다(RPC bump_usage).
+   스위치: 켜짐 — 기본 false. 처리방침에 「익명 이용 통계」 줄이 시행된 뒤(출시 판)에만 켠다. 이용자가 설정에서 끄면 즉시 멈추고 모은 것도 버린다.
+   쓰는 법:
+     이용량.설치({ 앱:'gyeote', 켜짐:false, 주소:'https://<프로젝트>.supabase.co', 공개키:'<publishable 키>' });
+     이용량.센다('test_start_hsp');      // 이름은 영문 소문자·숫자·밑줄 40자 안. 검사 키는 이름 끝에 붙여도 된다(답·결과는 안 됨)
+     이용량.끄기(true|false) · 이용량.꺼짐()  // 설정 칸 「앱 개선을 위한 익명 이용 통계」
+*/
+(function () {
+  if (window.이용량) return;
+  var 설정 = { 앱: '', 켜짐: false, 주소: '', 공개키: '' };
+  var 열쇠 = '_mn_usage', 끔열쇠 = '_mn_usage_off';
+  function 읽기() { try { return JSON.parse(localStorage.getItem(열쇠) || 'null') || { d: '', e: {} }; } catch (e) { return { d: '', e: {} }; } }
+  function 쓰기(o) { try { localStorage.setItem(열쇠, JSON.stringify(o)); } catch (e) {} }
+  function 오늘() { var t = new Date(); return t.getFullYear() + '-' + (t.getMonth() + 1) + '-' + t.getDate(); }
+  function 꺼짐() { try { return localStorage.getItem(끔열쇠) === '1'; } catch (e) { return false; } }
+  function 돌아감() { return !!설정.켜짐 && !꺼짐() && !!설정.앱; }
+
+  function 보내기(o) {
+    if (!설정.주소 || !설정.공개키 || !window.fetch) return;
+    var 묶음 = o.e, 있음 = false; for (var k in 묶음) { 있음 = true; break; }
+    if (!있음) return;
+    try {
+      fetch(설정.주소.replace(/\/$/, '') + '/rest/v1/rpc/bump_usage', {
+        method: 'POST', credentials: 'omit', keepalive: true,
+        headers: { 'Content-Type': 'application/json', apikey: 설정.공개키, Authorization: 'Bearer ' + 설정.공개키 },
+        body: JSON.stringify({ p_app: 설정.앱, p_events: 묶음 })
+      }).catch(function () {});
+    } catch (e) {}
+  }
+  function 넘기기() {   /* 날이 바뀌었으면 어제 모은 것을 보내고 비운다 */
+    var o = 읽기(), d = 오늘();
+    if (o.d && o.d !== d) { 보내기(o); o = { d: d, e: {} }; 쓰기(o); }
+    if (!o.d) { o.d = d; 쓰기(o); }
+    return o;
+  }
+  function 센다(이름) {
+    if (!돌아감()) return;
+    이름 = String(이름 || '').toLowerCase();
+    if (!/^[a-z0-9_]{1,40}$/.test(이름)) return;
+    var o = 넘기기(), 개수 = 0; for (var k in o.e) 개수++;
+    if (!o.e[이름] && 개수 >= 30) return;
+    o.e[이름] = Math.min(200, (o.e[이름] || 0) + 1); 쓰기(o);
+  }
+  window.이용량 = {
+    판: '2026-10-26-1',
+    설치: function (o) { o = o || {}; for (var k in o) if (Object.prototype.hasOwnProperty.call(o, k)) 설정[k] = o[k]; if (돌아감()) 넘기기(); },
+    센다: 센다, 꺼짐: 꺼짐, 돌아감: 돌아감,
+    끄기: function (끔) { try { if (끔) { localStorage.setItem(끔열쇠, '1'); localStorage.removeItem(열쇠); } else localStorage.removeItem(끔열쇠); } catch (e) {} },
+    지금보내기: function () { if (!돌아감()) return; var o = 읽기(); 보내기(o); 쓰기({ d: 오늘(), e: {} }); }   /* 시험용 */
+  };
+})();
+/* ▲▲ 이용량 부품 끝 ▲▲ */
+/* 10-26 현욱님 「월 정액 시범 → 이용량 보고 결정」 — 꺼진 채(처리방침 「익명 이용 통계」 줄 시행 뒤에 켬) */
+try { 이용량.설치({ 앱: 'yakjido', 켜짐: false, 주소: 'https://uszalzczpmyifzbamjno.supabase.co', 공개키: 'sb_publishable_YQSz-D-RCXzHGUhso06rMg_GOIIRDuV' }); 이용량.센다('open'); } catch (e) {}
 
 /* 내 정보·동의·로그인·약관 화면을 보고 있었으면 다시 그린다(이 파일이 늦게 오므로) */
 try { if (/^#\/(me|consent|login|doc|hello\/3|supp$|supp\?|sgoal|sstage|rx|about|search|myths|askdoc)/.test(location.hash)) route(); } catch (e) {}
