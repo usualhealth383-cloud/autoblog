@@ -170,6 +170,27 @@ if isinstance(inline.get('meta'), dict):
 # 처방약 길잡이(혈압·당뇨·콜레스테롤·갑상선·잠과 마음, 10-22) — #/rx 를 열 때만 받는 따로 파일(첫 화면·본문 예산 밖)
 _rx = json.loads((ROOT / 'rxguide.json').read_text(encoding='utf-8')); _rx.pop('_about', None)
 (ROOT.parent / 'docs' / 'yakjido' / 'data' / 'rxguide.json').write_text(json.dumps(_rx, ensure_ascii=False, separators=(',', ':')), encoding='utf-8')
+# 메디나눔 통합 찾기 목록(10-26 Main) — 다른 네 앱이 약지도 글을 찾을 때 받는 작은 목록. 본문은 빼고 제목·한 줄·찾는 말·길만(100 KB 안쪽)
+def _mnx():
+    import glob as _g
+    S, Dg = [], []
+    for f in sorted(_g.glob(str(ROOT / 'content' / 'symptoms*.json'))):
+        d = json.loads(open(f, encoding='utf-8').read()); S += d if isinstance(d, list) else d.get('symptoms', [])
+    for f in sorted(_g.glob(str(ROOT / 'content' / 'drugs*.json'))):
+        d = json.loads(open(f, encoding='utf-8').read()); Dg += d if isinstance(d, list) else d.get('drugs', [])
+    def one(t): return re.sub(r'\*\*', '', str(t or '')).split('\n')[0][:70]
+    H = []
+    for s_ in S:
+        H.append({'id': 's:' + s_['id'], 't': s_['name'], 's': one(s_.get('short') or s_.get('lead')), 'k': (s_.get('tags') or [])[:8], 'u': '#/symptom/' + s_['id']})
+    for d_ in Dg:
+        k_ = list(d_.get('for') or [])[:6] + [p_.get('name', '').split(' ')[0] for p_ in (d_.get('products') or [])[:4] if isinstance(p_, dict)]
+        H.append({'id': 'd:' + d_['id'], 't': d_.get('name') or d_['id'], 's': one(d_.get('tagline')), 'k': [x for x in k_ if x][:10], 'u': '#/drug/' + d_['id']})
+    for gid, g_ in _rx.get('guides', {}).items():
+        H.append({'id': 'rx:' + gid, 't': g_.get('title', ''), 's': one(g_.get('short')), 'k': ['처방약', '복용법'], 'u': '#/rx/' + gid})
+    o = json.dumps({'앱': 'yakjido', '판': datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=9))).strftime('%Y-%m-%d'), '항목': H}, ensure_ascii=False, separators=(',', ':'))
+    (ROOT.parent / 'docs' / 'yakjido' / 'medinanum-search.json').write_text(o, encoding='utf-8')
+    print(f'통합 찾기 목록 {len(H)}개 · {len(o.encode()) // 1024} KB')
+_mnx()
 jc = json.dumps(core, ensure_ascii=False, separators=(',', ':'))
 j = json.dumps(inline, ensure_ascii=False, separators=(',', ':')).replace('</', '<\\/')
 # 10-21 검수자가 판을 구분하도록 한국 시각 날짜·시:분(컨테이너는 UTC 라 하루 늦게 찍혔다)

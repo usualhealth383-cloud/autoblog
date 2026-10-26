@@ -1625,5 +1625,165 @@ window.vAboutS = function(){
   ${disclaimer()}`;
 }
 
+/* ▼▼ 통합찾기 부품 시작 ▼▼ */
+/* ═══ 메디나눔 통합 찾기 — 다섯 앱 공용 (2026-10-26 Main · 요청서 docs/requests/20261023_메디나눔_전앱_통합찾기.md) ═══
+   하는 일: 이 앱에서 친 말로 «다른 네 앱»의 글·계산기를 찾아, 앱별로 묶어 보여 준다. 누르면 그 앱의 그 화면이 열린다.
+   목록: 앱마다 자기 웹 주소에 `medinanum-search.json` 을 둔다(그 앱 세션이 만든다 — 아래 «목록 꼴»).
+         https://kids.medinanum.com/ · gildongmu · cs · gyeote · yakjido  →  /medinanum-search.json
+         (배포 머리말 `_headers` 가 이 파일에 Access-Control-Allow-Origin: * 를 붙인다 — deploy_web.py)
+   목록 꼴: { "앱":"kids", "판":"2026-10-26", "항목":[ { "id":"fever", "t":"아이 열 판단", "s":"한 줄 요약",
+             "k":["열","해열제","발열"], "u":"#doc/fever", "e":1 (응급·위험 신호 — 누구에게나), "c":1 (의료인 전용) }, … ] }
+             — 본문은 넣지 않는다(작게: 앱 하나 100 KB 안쪽). u 는 그 앱 주소 뒤에 붙는 길(# 로 시작).
+   혜택(10-22·10-23 원칙): 회원권은 결제 권한, 자격은 따로.
+     · 회원(또는 유료화 스위치가 꺼져 있을 때): 다른 앱 결과 전부 보기·열기.
+     · 회원 아님: 다른 앱은 「N개 있어요」 개수만 + 응급(e) 항목은 늘 보이고 열린다.
+     · 의료인 전용(c) 항목은 의료인확인() 이 참일 때만 센다·보인다(회원권과 무관).
+   지키는 것: 검색어를 어디에도 보내지 않는다(목록만 받아 기기에서 찾는다) · 목록은 메모리 + localStorage(하루) ·
+              실패하면 조용히 빈 칸(이 앱 검색은 그대로) · ES5 · 화면 글은 해요체.
+   쓰는 법:
+     통합찾기.설치({ 앱:'kids', 의료인확인: function(){ return false; }, 열기: function(url){ location.href = url; } });
+     통합찾기.붙이기(document.getElementById('xsearch'), '열');   // 앱 찾기 결과 아래 빈 칸에 그린다
+     통합찾기.찾기('열').then(function(묶음){ … })                 // [{앱, 이름, 주소, 보임:[항목], 숨김수, 응급:[항목]}]
+*/
+(function () {
+  if (window.통합찾기) return;
+  var 앱들 = [
+    { 키: 'kids', 이름: '우리 집 소아과', 주소: 'https://kids.medinanum.com/' },
+    { 키: 'gildongmu', 이름: '길동무', 주소: 'https://gildongmu.medinanum.com/' },
+    { 키: 'yakjido', 이름: '약지도', 주소: 'https://yakjido.medinanum.com/' },
+    { 키: 'gyeote', 이름: '곁에', 주소: 'https://gyeote.medinanum.com/' },
+    { 키: 'cs', 이름: 'ClinicScore', 주소: 'https://cs.medinanum.com/' }
+  ];
+  var 설정 = { 앱: '', 의료인확인: null, 열기: null, 하루: 864e5 };
+  var 목록들 = {};   /* 키 → {항목, 색인} */
+  var 받는중 = null;
+
+  function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
+  function 고름(s) { return String(s || '').toLowerCase().replace(/[\s ·.,!?()\[\]{}'"~\-_/]/g, ''); }
+
+  function 회원() {
+    try {
+      var 구 = window.구독;
+      if (!구 || typeof 구.켜짐 !== 'function' || !구.켜짐()) return true;   /* 유료화 꺼짐 = 모두 열림 */
+      var st = 구.상태(); return !!(st && st.열림 && st.회원권);
+    } catch (e) { return false; }
+  }
+  function 의료인() { try { return typeof 설정.의료인확인 === 'function' && !!설정.의료인확인(); } catch (e) { return false; } }
+
+  function 저장읽기(키) {
+    try { var o = JSON.parse(localStorage.getItem('_mnx_' + 키) || 'null'); if (o && o.at && Date.now() - o.at < 설정.하루 && o.항목) return o.항목; } catch (e) {}
+    return null;
+  }
+  function 저장쓰기(키, 항목) { try { localStorage.setItem('_mnx_' + 키, JSON.stringify({ at: Date.now(), 항목: 항목 })); } catch (e) {} }
+
+  function 하나받기(a) {
+    var 남은 = 저장읽기(a.키);
+    if (남은) return Promise.resolve(남은);
+    if (!window.fetch) return Promise.resolve([]);
+    return fetch(a.주소 + 'medinanum-search.json', { credentials: 'omit', cache: 'no-cache' }).then(function (r) {
+      if (!r.ok) return [];
+      return r.json().then(function (j) { var 항 = (j && j.항목 && j.항목.length) ? j.항목 : []; 저장쓰기(a.키, 항); return 항; });
+    }).catch(function () { return []; });
+  }
+
+  function 색인만들기(항목) {
+    if (window.찾기 && typeof window.찾기.만들기 === 'function') {
+      try {
+        return window.찾기.만들기({ 항목: 항목.map(function (h) { return { id: h.id, 제목: h.t, 태그: h.k || [], 요약: h.s || '' }; }) });
+      } catch (e) {}
+    }
+    return null;
+  }
+
+  function 모두받기() {
+    if (받는중) return 받는중;
+    var 남 = 앱들.filter(function (a) { return a.키 !== 설정.앱; });
+    받는중 = Promise.all(남.map(function (a) {
+      return 하나받기(a).then(function (항) { 목록들[a.키] = { 항목: 항, 색인: 색인만들기(항) }; });
+    })).then(function () { 받는중 = null; return 목록들; }, function () { 받는중 = null; return 목록들; });
+    return 받는중;
+  }
+
+  function 맞추기(목, 말) {
+    if (!목 || !목.항목.length) return [];
+    if (목.색인) {
+      try {
+        var r = 목.색인.찾기(말, { 최대: 40 }); var 표 = {};
+        목.항목.forEach(function (h) { 표[h.id] = h; });
+        return r.map(function (x) { return 표[x.id]; }).filter(Boolean);
+      } catch (e) {}
+    }
+    var q = 고름(말); if (!q) return [];
+    return 목.항목.filter(function (h) {
+      return 고름(h.t).indexOf(q) >= 0 || (h.k || []).some(function (k) { return 고름(k).indexOf(q) >= 0; }) || 고름(h.s).indexOf(q) >= 0;
+    });
+  }
+
+  function 찾기(말) {
+    말 = String(말 || '').trim();
+    if (!말) return Promise.resolve([]);
+    return 모두받기().then(function () {
+      var 회 = 회원(), 의 = 의료인();
+      return 앱들.filter(function (a) { return a.키 !== 설정.앱; }).map(function (a) {
+        var 맞음 = 맞추기(목록들[a.키], 말).filter(function (h) { return !h.c || 의; });
+        var 응급 = 맞음.filter(function (h) { return h.e; });
+        var 보임 = 회 ? 맞음 : 응급;
+        return { 앱: a.키, 이름: a.이름, 주소: a.주소, 보임: 보임.slice(0, 6), 더: Math.max(0, 보임.length - 6), 숨김수: 회 ? 0 : 맞음.length - 응급.length, 전체: 맞음.length };
+      }).filter(function (g) { return g.전체 > 0; });
+    });
+  }
+
+  function HTML(묶음) {
+    if (!묶음 || !묶음.length) return '';
+    var 회 = 회원(), h = '<section class="mnx" aria-label="메디나눔 다른 앱에서"><h3 class="mnx-h">메디나눔 다른 앱에서</h3>';
+    묶음.forEach(function (g) {
+      h += '<div class="mnx-app"><div class="mnx-name">' + esc(g.이름) + ' <span>' + g.전체 + '개</span></div>';
+      g.보임.forEach(function (it) {
+        h += '<a class="mnx-row" href="' + esc(g.주소 + (it.u || '')) + '" data-mnx="1" rel="noopener">' +
+             (it.e ? '<i class="mnx-e">급할 때</i>' : '') + '<b>' + esc(it.t) + '</b>' + (it.s ? '<small>' + esc(it.s) + '</small>' : '') + '</a>';
+      });
+      if (g.더) h += '<a class="mnx-more" href="' + esc(g.주소) + '" data-mnx="1" rel="noopener">' + esc(g.이름) + '에서 ' + g.더 + '개 더 보기 ›</a>';
+      if (g.숨김수 > 0) h += '<div class="mnx-lock">' + g.숨김수 + '개가 더 있어요 · 메디나눔 회원권으로 다섯 앱을 한 번에 찾아요</div>';
+      h += '</div>';
+    });
+    if (!회) h += '<p class="mnx-note">급할 때 볼 안내는 회원권 없이도 늘 열려요.</p>';
+    return h + '</section>';
+  }
+
+  var CSS = '.mnx{margin:18px 0 8px}.mnx-h{font-size:calc(15px * var(--fs,1));margin:0 0 8px;font-weight:800}' +
+    '.mnx-app{border:1px solid var(--line,rgba(0,0,0,.12));border-radius:14px;padding:10px 12px;margin:0 0 10px;background:var(--card,transparent)}' +
+    '.mnx-name{font-weight:700;font-size:calc(14px * var(--fs,1));margin:0 0 6px}.mnx-name span{font-weight:500;opacity:.7}' +
+    '.mnx-row{display:block;padding:9px 0;min-height:44px;border-top:1px solid var(--line,rgba(0,0,0,.08));color:inherit;text-decoration:none;word-break:keep-all}' +
+    '.mnx-row b{display:block;font-size:calc(15px * var(--fs,1))}.mnx-row small{display:block;opacity:.75;font-size:calc(13px * var(--fs,1));margin-top:2px}' +
+    '.mnx-e{font-style:normal;font-size:calc(11px * var(--fs,1));font-weight:700;padding:2px 7px;border-radius:99px;background:#FDE7E4;color:#8A1F11;margin-right:6px}' +
+    '.mnx-more{display:block;padding:8px 0 2px;font-size:calc(13px * var(--fs,1));color:inherit;opacity:.85}' +
+    '.mnx-lock,.mnx-note{font-size:calc(13px * var(--fs,1));opacity:.8;padding-top:6px;word-break:keep-all}' +
+    'html[data-theme="dark"] .mnx-e{background:#4A1F1A;color:#FFD9D2}';
+
+  function 붙이기(곳, 말) {
+    if (!곳) return Promise.resolve();
+    if (!document.getElementById('mnx-css')) { var s = document.createElement('style'); s.id = 'mnx-css'; s.textContent = CSS; document.head.appendChild(s); }
+    var 이번 = (곳._mnx = (곳._mnx || 0) + 1);
+    return 찾기(말).then(function (묶음) {
+      if (곳._mnx !== 이번) return;   /* 그새 다른 말을 쳤으면 버린다 */
+      곳.innerHTML = HTML(묶음);
+      if (typeof 설정.열기 === 'function') {
+        Array.prototype.forEach.call(곳.querySelectorAll('a[data-mnx]'), function (a) {
+          a.addEventListener('click', function (ev) { ev.preventDefault(); try { 설정.열기(a.getAttribute('href')); } catch (e) { location.href = a.getAttribute('href'); } });
+        });
+      }
+    });
+  }
+
+  window.통합찾기 = {
+    판: '2026-10-26-1',
+    설치: function (o) { o = o || {}; for (var k in o) if (Object.prototype.hasOwnProperty.call(o, k)) 설정[k] = o[k]; },
+    찾기: 찾기, HTML: HTML, 붙이기: 붙이기, 앱들: 앱들,
+    비우기: function () { 목록들 = {}; 앱들.forEach(function (a) { try { localStorage.removeItem('_mnx_' + a.키); } catch (e) {} }); }
+  };
+})();
+/* ▲▲ 통합찾기 부품 끝 ▲▲ */
+try { 통합찾기.설치({ 앱: 'yakjido', 열기: function (url) { location.href = url; } }); } catch (e) {}
+
 /* 내 정보·동의·로그인·약관 화면을 보고 있었으면 다시 그린다(이 파일이 늦게 오므로) */
-try { if (/^#\/(me|consent|login|doc|hello\/3|supp$|supp\?|sgoal|sstage|rx|about)/.test(location.hash)) route(); } catch (e) {}
+try { if (/^#\/(me|consent|login|doc|hello\/3|supp$|supp\?|sgoal|sstage|rx|about|search)/.test(location.hash)) route(); } catch (e) {}

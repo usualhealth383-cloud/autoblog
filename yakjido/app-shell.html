@@ -3790,7 +3790,7 @@ function vSearch(_, q){
   lexLoad(); pubIndexSoon(); findLoad();
   const s = (q.q || '').trim(), hits = s ? search(s) : [], [html, n] = s ? hitsGroups(hits, s, 5) : ['', 0];
   if (!s) return `${topBar({ back:'뒤로' })}<h1>약 찾기</h1><p style="margin:6px 0 14px">위 칸에 증상이나 약 이름을 쳐 주세요.</p>${gqPop()}`;
-  return `${topBar({ back:'뒤로' })}<h1>‘${esc(s)}’ 검색 <small class="muted" style="font-size:.875rem">${n ? n + '건' : ''}</small></h1>${hits.fix ? `<p class="small" style="margin-top:6px">혹시 <b>‘${esc(hits.fix)}’</b>${josa(hits.fix, '을', '를')} 찾으세요? 그 말로 찾은 결과예요.</p>` : ''}${html || `<div class="card results" style="margin-top:16px"><div class="empty"><b>검색 결과가 없어요</b>증상 이름(허리·두통·생리통)이나 성분 이름으로 찾아보세요.</div></div>`}`;
+  return `${topBar({ back:'뒤로' })}<h1>‘${esc(s)}’ 검색 <small class="muted" style="font-size:.875rem">${n ? n + '건' : ''}</small></h1>${hits.fix ? `<p class="small" style="margin-top:6px">혹시 <b>‘${esc(hits.fix)}’</b>${josa(hits.fix, '을', '를')} 찾으세요? 그 말로 찾은 결과예요.</p>` : ''}${html || `<div class="card results" style="margin-top:16px"><div class="empty"><b>검색 결과가 없어요</b>증상 이름(허리·두통·생리통)이나 성분 이름으로 찾아보세요.</div></div>`}<div id="xsearch"></div>${(setTimeout(() => { if (window.통합찾기) 통합찾기.붙이기(document.getElementById('xsearch'), s); }, 0), '')}`;
 }
 
 /* ───────── 증상 상세: 처방 스타일 조합 ───────── */
