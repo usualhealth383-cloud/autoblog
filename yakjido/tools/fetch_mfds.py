@@ -191,12 +191,13 @@ def rx_labels(k, have=None):
     out, op_ok = dict(have or {}), next((v.get('op') for v in (have or {}).values() if v.get('op')), None)   # 10-26 이미 받은 것은 건너뛰고(20분 제한), 지난번에 된 오퍼레이션부터
     for key_, seq in RX_LABEL_SEQ.items():
         if key_ in out and out[key_].get('seq') == seq: continue
-        for op in ([op_ok] if op_ok else DTL_OPS):
+        for op in (([op_ok] + [o for o in DTL_OPS if o != op_ok]) if op_ok else DTL_OPS):
             try:
                 n, items = page(op, 1, k, rows=1, extra={'item_seq': seq})
             except Exception as e:
                 print('  ', op, '실패:', str(e)[:80]); continue
             it = next((x for x in items if s(x.get('ITEM_SEQ')) == seq), items[0] if items else None)
+            if not it or not (it.get('NB_DOC_DATA') or it.get('UD_DOC_DATA')): print(f'   {key_} {op.split("/")[-1]}: {n}건 · 문서 칸 {sorted(k_ for k_ in (it or {}) if "DOC" in k_)} · {[(k_, len(str(v_))) for k_, v_ in (it or {}).items() if "DOC" in k_]}')
             if not it or not (it.get('NB_DOC_DATA') or it.get('UD_DOC_DATA')): continue
             op_ok = op
             out[key_] = {'seq': seq, 'name': s(it.get('ITEM_NAME')), 'entp': s(it.get('ENTP_NAME')), 'op': op,
