@@ -292,7 +292,8 @@ def _seo():
                 s0 = syms[gid]; t = T.get('sym', {}).get(gid, {})
                 e['첫단락'] = cut(s0.get('lead'), 200) if L == 'ko' else cut(t.get('short', ''), 200)
                 # 증상의 먹는 법 줄은 뒤 문장이 조건·예외(「설명서는 함께 먹지 말라고 해요」)라 첫 문장만 떼면 위험 — 한 줄 전체가 40자 안인 것만
-                e['할일'] = [plain(h) for h in (s0.get('how') or []) if 0 < len(plain(h)) <= 40 and act(plain(h))][:3] if L == 'ko' else []
+                # 먹는 법(how) 다음 스스로 돌보기(selfcare) — 한 줄 전체가 행동 문장인 것만(조건 문장이 잘리지 않게)
+                e['할일'] = list(dict.fromkeys(plain(h) for h in (s0.get('how') or []) + (s0.get('selfcare') or []) if 0 < len(plain(h)) <= 40 and act(plain(h))))[:3] if L == 'ko' else []
                 er = (s0.get('care') or {}).get('er') or []
                 e['바로'] = plain(er[0]) if L == 'ko' and er else plain((t.get('er') or [''])[0])
                 if L == 'ko' and e['바로'] and '119' not in e['바로']: e['바로'] += ' → 바로 119'
@@ -303,6 +304,11 @@ def _seo():
                 ko_do = [first(o.get('t')) for o in g.get('do', [])]; ok_i = [i for i, h in enumerate(ko_do) if 0 < len(h) <= 40 and act(h)][:3]   # 다른 언어는 한국어에서 고른 같은 줄만
                 tr_do = t.get('do') or []
                 e['할일'] = [ko_do[i] for i in ok_i] if L == 'ko' else [first(tr_do[i]) for i in ok_i if i < len(tr_do) and first(tr_do[i])]
+                if L == 'ko' and len(e['할일']) < 2:   # 하나뿐이면 같은 줄들의 뒷문장에서 스스로 선 행동 문장을 더 찾는다(10-27 Main) — 없으면 그대로
+                    for o in g.get('do', []):
+                        for m in list(_re.finditer(r'[^.!?。？！]+(?:[.!?。？！]["”’」)]*)?', plain(o.get('t'))))[1:]:
+                            h = m.group(0).strip()
+                            if 0 < len(h) <= 40 and act(h) and h not in e['할일'] and len(e['할일']) < 3: e['할일'].append(h)
                 ers = [o.get('t') for o in g.get('er', [])] if L == 'ko' else (t.get('er') or [])
                 e['바로'] = plain(ers[0]) if ers else ''
                 e['주소'] = '#/rx/' + gid; e['출처'] = src1(g.get('src'))
