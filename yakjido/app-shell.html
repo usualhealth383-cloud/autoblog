@@ -5885,11 +5885,11 @@ function vVitals(){
     ${hiAvg ? `<div class="note" style="margin-top:10px">${I.info}<span><b>가정혈압 기준(135/85)보다 높은 편이에요.</b> ${takesBp ? '혈압약을 드시고 계시니, 이 기록을 <b>다음 진료 때 보여 주세요.</b>' : '며칠 더 재 보시고, 계속 높으면 <b>내과 진료</b>를 받아 보세요.'}</span></div>` : av.n < 3 ? `<p class="small muted" style="margin-top:8px">아침·저녁으로 며칠 더 적으시면 평균이 믿을 만해져요.</p>` : ''}
     ${lastBp && hiAvg ? `<p class="small muted" style="margin-top:8px">코막힘약(슈도에페드린·페닐레프린·에페드린)은 혈압을 올릴 수 있어요 — 약국에서 「혈압이 높다」고 말씀하세요.</p>` : ''}
   </section>` : ''}
-  <section class="sec card"><h2>2주 흐름</h2>${vitalChart(k)}</section>
+  <section class="sec card"><h2>2주 흐름</h2>${잠김('trend') ? `<button class="btn line" style="margin-top:8px" onclick="구독.막힘('trend')">2주 흐름 그림은 구독하면 보여요${I.chev}</button>` : vitalChart(k)}</section>
   ${k === 'bp' && NATIVE ? `<section class="sec card"><div class="toggle"><div class="t"><b>혈압 재기 알림</b><span>${((ME.vitalRemind || {}).bp || []).length ? '아침 7:30 · 저녁 9:00 — 켜져 있어요' : '매일 아침·저녁 잴 시간을 알려 드려요'}</span></div><button class="btn ghost" style="width:auto;min-height:46px;padding:0 14px" onclick="vitalRemindToggle()">${((ME.vitalRemind || {}).bp || []).length ? '끄기' : '켜기'}</button></div></section>` : ''}
   <section class="sec card"><h2>적은 기록 <small>${mine.length}번</small></h2>
     ${mine.length ? `<div class="vt-list">${mine.slice(0, 30).map(x => `<div class="vt-li"><span class="vt-t">${x.t.slice(5, 10).replace('-', '/')} <small>${x.t.slice(11)} · ${esc(x.w || '')}</small></span><b>${k === 'bp' ? `${x.s}/${x.d}<small> mmHg${x.p ? ` · 맥박 ${x.p}` : ''}</small>` : `${x.v}<small> mg/dL${bgTag(x)}</small>`}</b><button class="vt-x" onclick="vitalDel(${x.i})" aria-label="이 기록 지우기">${I.x}</button></div>`).join('')}</div>` : `<div class="empty"><span class="em-ic">${I.heart}</span><b>아직 적은 기록이 없어요</b>오늘 한 번이 시작이에요. 위에서 적어 보세요.</div>`}
-    ${mine.length && !NATIVE ? `<div class="actions" style="margin-top:12px"><button class="btn line" onclick="window.print()">${I.book} 진료 때 보여 드리기(인쇄·PDF)</button></div>` : ''}
+    ${mine.length && !NATIVE ? `<div class="actions" style="margin-top:12px"><button class="btn line" onclick="잠김('visitdoc')?구독.막힘('visitdoc'):window.print()">${I.book} 진료 때 보여 드리기(인쇄·PDF)</button></div>` : ''}
   </section>
   <details class="why-more sec" ${vitals().filter(x => x.k === k).length < 3 || VT.alert === 'bp-first' ? 'open' : ''}><summary>${k === 'bp' ? '혈압, 바르게 재는 법' : '혈당, 언제 재고 어떻게 볼까요'}${I.chev}</summary>
     ${k === 'bp' ? `<ul class="how-list">
@@ -7675,7 +7675,7 @@ function vBag(){
   ${adhCard()}
   ${vitalsCard()}
   ${nextVisit() ? `<p class="small muted" style="margin-top:10px">다음 진료 — ${esc(visitWord(nextVisit()))}</p>` : ''}
-  <div class="actions"><button class="btn ghost" onclick="shareBag()">${I.cart} 메모로 복사·전송</button>${NATIVE ? '' : `<button class="btn ghost" onclick="window.print()">${I.book} 종이로 뽑기</button>`}<button class="btn ghost" onclick="go('/together')">${I.shield} 자세한 판정 보기</button></div>
+  <div class="actions"><button class="btn ghost" onclick="shareBag()">${I.cart} 메모로 복사·전송</button>${NATIVE ? '' : `<button class="btn ghost" onclick="잠김('visitdoc')?구독.막힘('visitdoc'):window.print()">${I.book} 종이로 뽑기</button>`}<button class="btn ghost" onclick="go('/together')">${I.shield} 자세한 판정 보기</button></div>
   <details class="why-more" style="margin-top:12px" ${items.filter(x => !String(x.id).startsWith('supp:')).length >= 5 ? 'open' : ''}><summary>병원·약국에서 받은 약까지 한 번에 보려면 — 나라 서비스${I.chev}</summary><div class="why" style="margin-top:8px">
     <p>이 약통은 <b>직접 담으신 약</b>만 봐요. <b>건강보험심사평가원 「내가 먹는 약! 한눈에」</b>에서는 지난 1년 동안 병원·약국에서 받은 약을 볼 수 있고(간편인증 로그인), <b>「의약품 안전사용 서비스(DUR) 국민 체험관」</b>에서는 약 이름을 넣어 함께 먹으면 안 되는 조합을 직접 확인해 볼 수 있어요.</p>
     <div class="gl" style="display:flex;flex-wrap:wrap;gap:8px;margin-top:8px"><a class="btn line" href="https://www.hira.or.kr/rb/dur/form.do?pgmid=HIRAA050300000100" target="_blank" rel="noopener">내가 먹는 약! 한눈에</a><a class="btn line" href="https://www.hira.or.kr/ra/medi/form.do?pgmid=HIRAA030029000000" target="_blank" rel="noopener">DUR 국민 체험관</a></div>
@@ -8293,6 +8293,8 @@ function consentGate(s, h){ const ok = consentOk();
 const vDoor = (a, q) => { const f = window['문_' + (location.hash.match(/^#\/?([a-z]+)/) || [])[1]]; return f ? f(a, q) : '<p class="loading">잠시만요…</p>'; };
 /* 약관 칸·계정 줄·처음 안내의 계정 칸은 srv.js 가 그린다(첫 화면 예산) — 오기 전엔 빈칸 */
 const ext = n => window[n] ? window[n]() : '';
+/* 구독 잠금(스위치가 꺼져 있으면 늘 false — 잠금 목록은 srv.js 구독.설치) */
+const 잠김 = k => !!(window.구독 && !구독.열림(k));
 
 /* ───────── 시작 ───────── */
 try { if (!helloDone() && !location.hash) { location.hash = '#/hello/1'; } } catch (e) {}

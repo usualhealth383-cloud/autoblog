@@ -1265,12 +1265,12 @@ try {
 
 /* 2026-10-22 공용 구독 부품(다섯 앱 같은 것) — 유료화 스위치는 끈 채로. 꺼져 있는 동안 요금·체험 글은 어디에도 나오지 않는다(되는 척 금지). 검토는 주소에 ?paywall=1.
    요금 = 10-21 결정(앱 하나 월 5,900 · 연 49,000 / 출시 기념가 4,900 · 39,900 / 회원권). 무료로 남는 것 = 10-22 현욱님 답 9번(약 찾기·약봉투 읽기·복약 알림·안전 신호·겹침 확인).
-   잠금 목록은 초안(여러 기기 이어 보기만) — 무엇을 유료로 할지는 현욱님 결정 뒤 이 줄에서 더한다. */
+   잠금 목록 = 현욱님 10-22 답 A(기록을 쌓아 보는 것만). */
 try {
   구독.설치({ app: 'yakjido', 유료화: false,
     가격: { 월: 5900, 연: 49000, 출시: { 월: 4900, 연: 39900 } },
     회원권: { 월: 12900, 연: 99000, 출시월: 9900, 출시연: 79000, 판매: false },
-    잠금: { sync: '여러 기기에서 이어 보기' },
+    잠금: { sync: '여러 기기에서 이어 보기', trend: '혈압·혈당 2주 흐름 그림', visitdoc: '진료실 한 장 종이로 뽑기', rx: '처방약 길잡이' },   /* 10-22 현욱님 잠금 A — 약 개수로는 막지 않는다 */
     응급: ['emergency', 'redflag', 'call119', 'find', 'bag', 'schedule', 'together'],
     문구: { 응급안내: '약 찾기·약봉투 읽기·복약 알림·응급 신호와 겹침 확인은 언제나 열려 있어요.' },
     결제사: null, 인증: { 휴대폰: false, 공동: false },
@@ -1566,6 +1566,7 @@ function rxLoad(){ if (!RXG && window.__RXG__) RXG = window.__RXG__; if (!RXG) {
 const rxRows = L => `<div class="rows-l">${L.map(g => lrow(I.pill, esc(RX_NAME[g]) + ' 드시는 분께', RXG?.guides?.[g]?.short ? esc(RXG.guides[g].short) : '먹는 법 · 깜빡했을 때 · 조심할 약', `go('/rx/${g}')`)).join('')}</div>`;
 window.vRxS = function(id){
   const R = rxLoad();
+  if (window.구독 && !구독.열림('rx')) { setTimeout(() => 구독.막힘('rx'), 0); return `${topBar({ back:'이전' })}<h1>처방약 길잡이</h1>`; }
   if (R.wait) return `${topBar({ back:'이전', unreviewed:!RXG?.reviewed })}<h1>처방약 길잡이</h1><p class="muted" style="margin-top:8px">불러오는 중이에요…</p>`;
   if (R.err) return `${topBar({ back:'이전', unreviewed:!RXG?.reviewed })}<h1>처방약 길잡이</h1><div class="note" style="margin-top:12px">${I.alert}<span>자료를 불러오지 못했어요. 인터넷에 연결된 뒤 다시 열어 주세요.</span></div>`;
   const g = R.guides?.[id];
