@@ -263,11 +263,12 @@ def _seo():
     plain = lambda t: _re.sub(r'\s+', ' ', _re.sub(r'\*\*|<[^>]+>', '', str(t or ''))).strip()
     def cut(t, n):   # 문장 끝에서 자른다(한 문장이 넘치면 비움 — 말을 중간에 끊지 않는다)
         t = plain(t); out = ''
-        for m in _re.finditer(r'[^.!?。？！]+[.!?。？！]?', t):
+        for m in _re.finditer(r'[^.!?。？！]+(?:[.!?。？！]["”’」)]*)?', t):
             if len(out + m.group(0)) > n: break
             out += m.group(0)
         return out.strip()
-    first = lambda t: (_re.match(r'[^.!?。？！]+[.!?。？！]?', plain(t)) or [''])[0].strip()
+    act = lambda t: bool(_re.search(r'(세요|마세요|두세요|하세요)[.!]?$', t))   # 할일 = 이용자가 지금 할 행동(동사로 끝남) — 설명 문장(「도움이 돼요」)은 넣지 않는다(10-27 Main)
+    first = lambda t: (_re.match(r'[^.!?。？！]+(?:[.!?。？！]["”’」)]*)?', plain(t)) or [''])[0].strip()
     srcs = {}
     for f in sorted((ROOT / 'content').glob('sources*.json')): srcs.update(json.loads(f.read_text(encoding='utf-8')))
     def src1(ids):
@@ -291,7 +292,7 @@ def _seo():
                 s0 = syms[gid]; t = T.get('sym', {}).get(gid, {})
                 e['첫단락'] = cut(s0.get('lead'), 200) if L == 'ko' else cut(t.get('short', ''), 200)
                 # 증상의 먹는 법 줄은 뒤 문장이 조건·예외(「설명서는 함께 먹지 말라고 해요」)라 첫 문장만 떼면 위험 — 한 줄 전체가 40자 안인 것만
-                e['할일'] = [plain(h) for h in (s0.get('how') or []) if 0 < len(plain(h)) <= 40][:3] if L == 'ko' else []
+                e['할일'] = [plain(h) for h in (s0.get('how') or []) if 0 < len(plain(h)) <= 40 and act(plain(h))][:3] if L == 'ko' else []
                 er = (s0.get('care') or {}).get('er') or []
                 e['바로'] = plain(er[0]) if L == 'ko' and er else plain((t.get('er') or [''])[0])
                 if L == 'ko' and e['바로'] and '119' not in e['바로']: e['바로'] += ' → 바로 119'
@@ -299,12 +300,14 @@ def _seo():
             elif kind == 'rx' and gid in rx:
                 g = rx[gid]; t = T.get('rx', {}).get(gid, {})
                 e['첫단락'] = cut(g.get('lead'), 200) if L == 'ko' else cut(t.get('lead', ''), 200)
-                dos = [o.get('t') for o in g.get('do', [])] if L == 'ko' else (t.get('do') or [])
-                e['할일'] = [first(h) for h in dos if 0 < len(first(h)) <= 40][:3]
+                ko_do = [first(o.get('t')) for o in g.get('do', [])]; ok_i = [i for i, h in enumerate(ko_do) if 0 < len(h) <= 40 and act(h)][:3]   # 다른 언어는 한국어에서 고른 같은 줄만
+                tr_do = t.get('do') or []
+                e['할일'] = [ko_do[i] for i in ok_i] if L == 'ko' else [first(tr_do[i]) for i in ok_i if i < len(tr_do) and first(tr_do[i])]
                 ers = [o.get('t') for o in g.get('er', [])] if L == 'ko' else (t.get('er') or [])
                 e['바로'] = plain(ers[0]) if ers else ''
                 e['주소'] = '#/rx/' + gid; e['출처'] = src1(g.get('src'))
             else: continue
+            e['할일'] = [h for h in e['할일'] if h not in e.get('첫단락', '') and h not in e.get('바로', '')]   # 첫단락·바로와 겹치지 않게
             out[key] = e
         if out: (pages / f'medinanum-seo.{L}.json').write_text(json.dumps(out, ensure_ascii=False, indent=1), encoding='utf-8')
     print('찾아오기 medinanum-seo:', len(seo), '편')
