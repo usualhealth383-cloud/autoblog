@@ -194,7 +194,14 @@ _mnx()
 # 다섯 언어 사전(10-27) — yakjido/i18n/<lang>.json → docs/yakjido/data/i18n/<lang>.json (한국어·한국이면 받지 않음)
 _i18 = ROOT.parent / 'docs' / 'yakjido' / 'data' / 'i18n'; _i18.mkdir(parents=True, exist_ok=True)
 for _f in sorted((ROOT / 'i18n').glob('[a-z][a-z].json')) if (ROOT / 'i18n').exists() else []:
-    (_i18 / _f.name).write_text(json.dumps(json.loads(_f.read_text(encoding='utf-8')), ensure_ascii=False, separators=(',', ':')), encoding='utf-8')
+    _d = json.loads(_f.read_text(encoding='utf-8'))
+    # 안 보이는 찾는 말(seo.json · 10-27 Main) — 그 언어로 검색할 때만 쓰는 숨은 태그(번역 이름이 「発熱」「发烧」 같은 말과 달라도 찾게)
+    _sp = ROOT / 'seo.json'
+    if _sp.exists():
+        for _k, _v in json.loads(_sp.read_text(encoding='utf-8')).items():
+            _kind, _id = _k.split(':', 1); _w = (_v.get('찾는말') or {}).get(_f.stem)
+            if _w and _kind == 'sym': _d.setdefault('sym', {}).setdefault(_id, {})['find'] = _w
+    (_i18 / _f.name).write_text(json.dumps(_d, ensure_ascii=False, separators=(',', ':')), encoding='utf-8')
 jc = json.dumps(core, ensure_ascii=False, separators=(',', ':'))
 j = json.dumps(inline, ensure_ascii=False, separators=(',', ':')).replace('</', '<\\/')
 # 10-21 검수자가 판을 구분하도록 한국 시각 날짜·시:분(컨테이너는 UTC 라 하루 늦게 찍혔다)

@@ -26,6 +26,10 @@ with sync_playwright() as p:
                 bad = [t for t in tels if t in ('119', '911', '112', '120') and t != emg]
                 if bad: fails.append(f'{L}/{CC} {W} {r} 응급 번호 {bad} (기대 {emg})')
                 if W == 390 and L != 'ko': k, a = pg.evaluate(HANGUL); ko_left[0] += k; ko_left[1] += a
+            if W == 390:   # 찾기 — 공용 찾기 부품 새 판(ja·zh) + 안 보이는 찾는 말
+                for q, want in {'ja': [('発熱', 'fever'), ('頭痛', 'headache')], 'zh': [('发烧', 'fever'), ('咳嗽', 'cough')], 'en': [('fever', 'fever')], 'es': [('fiebre', 'fever')]}.get(L, []):
+                    top = pg.evaluate("q=>{const r=search(q);return (Array.isArray(r)?r:[]).filter(h=>h.k==='증상').slice(0,2).map(h=>h.h)}", q)
+                    if '/symptom/' + want not in top: fails.append(f'{L} 찾기 「{q}」 → {top} ({want} 없음)')
             er = pg.evaluate("()=>{location.hash='#/home';route();return [...document.querySelectorAll('#view a.er-line')].map(a=>a.getAttribute('href')+' '+a.innerText.slice(0,60))}")
             if W == 390: rep.append(f'{L}/{CC}: 홈 응급 줄 {er[:1]}')
             if errs: fails.append(f'{L} {W} JS 오류 {errs[:2]}')

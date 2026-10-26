@@ -42,7 +42,7 @@
    ═══════════════════════════════════════════════════════════════════════════════════════════════ */
 (function (바탕) {
   'use strict';
-  var 판 = '2026-10-14';
+  var 판 = '2026-10-27';
 
   /* ── 1. 글자 다듬기 — 길이를 그대로 둔다(1:1). 그래서 다듬은 글의 자리가 곧 원래 글의 자리다. ── */
   var 위첨자 = { '¹': '1', '²': '2', '³': '3', '⁰': '0' };
@@ -58,7 +58,7 @@
     if (n >= 0xe0 && n <= 0xff) { var a = 악센트.charAt(n - 0xe0); return a === '/' ? ' ' : a; }
     return ' ';
   }
-  var 남길글자 = /[^ 0-9a-z가-힣ㄱ-ㆎα-ω]/g;
+  var 남길글자 = /[^ 0-9a-z가-힣ㄱ-ㆎα-ω\u3040-\u30ff\u4e00-\u9fff]/g;   /* 가나·한자는 남긴다(10-27 — 전에는 일본어·중국어가 통째로 지워져 0건) */
   function 다듬기(s) {
     s = String(s == null ? '' : s);
     var 작게 = s.replace(/İ/g, 'i').toLowerCase();
@@ -346,7 +346,7 @@
     function 본문맞춤(v, 앞만) {
       var 횟수 = {};
       if (앞만) { (첫글자[v] || []).forEach(function (wid) { 더하기(횟수, wid); }); return 횟수; }
-      var 부분 = v.match(/[가-힣ㄱ-ㆎ]+|[0-9a-zα-ω]+/g) || [];
+      var 부분 = v.match(/[가-힣ㄱ-ㆎ]+|[0-9a-zα-ω]+|[\u3040-\u30ff\u4e00-\u9fff]+/g) || [];
       if (!부분.length) return 횟수;
       if (부분.length > 1) {   /* 여러 낱말 말(fever reducer · 저Na) — 모두 든 항목만, 횟수는 가장 적은 것 */
         var 모음 = 부분.map(본문한낱말);
@@ -451,6 +451,18 @@
         }
         if (붙임) { 낱.push(붙임); 원조각.push(조각들.slice(a, a + 몇)); a += 몇 - 1; } else { 낱.push(조각들[a]); 원조각.push(null); }
       }
+      /* 일본어·중국어는 띄어 쓰지 않는다 — 사전에 통째로 없는 가나·한자 덩이는 두 글자씩 겹쳐 나누고 한자는 한 글자씩도 더한다(咳が止まらない → 咳が·が止·止ま… + 咳·止). 맞은 조각이 많은 글이 위로 */
+      var 겹낱 = [], 겹원 = [];
+      낱.forEach(function (w, 순) {
+        var b0 = 압축(w);
+        if (!/[\u3040-\u30ff\u4e00-\u9fff]/.test(b0) || 말묶음[b0] || 통째[b0]) { 겹낱.push(w); 겹원.push(원조각[순]); return; }
+        (b0.match(/[\u3040-\u30ff\u4e00-\u9fff]+|[^\u3040-\u30ff\u4e00-\u9fff]+/g) || []).forEach(function (r) {
+          if (!/[\u3040-\u30ff\u4e00-\u9fff]/.test(r) || r.length <= 2 || 말묶음[r] || 통째[r]) { 겹낱.push(r); 겹원.push(null); return; }
+          for (var t = 0; t + 1 < r.length; t++) { 겹낱.push(r.substr(t, 2)); 겹원.push(null); }
+          for (var u = 0; u < r.length; u++) if (/[\u4e00-\u9fff]/.test(r.charAt(u))) { 겹낱.push(r.charAt(u)); 겹원.push(null); }   /* 한자 한 글자도 뜻이 있다(咳·熱·吐) */
+        });
+      });
+      낱 = 겹낱; 원조각 = 겹원;
       var 낱말들 = [];
       낱.forEach(function (w, 순) {
         var b = 압축(w); if (!b) return;

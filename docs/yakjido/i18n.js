@@ -48,6 +48,7 @@
       if (t.name) s.name = t.name; if (t.short) s.short = t.short;
       if (s.care) ['er', 'clinic', 'pharmacy'].forEach(function (k) { if (t[k] && s.care[k]) s.care[k] = s.care[k].map(function (x, i) { return t[k][i] || x; }); });
       if (s.triage && t.escalate) s.triage.escalate = t.escalate;
+      if (t.find && !s._find) { s._find = 1; s.tags = (s.tags || []).concat(t.find); }   /* 안 보이는 찾는 말 — 검색에서만(화면엔 안 보임) */
     });
     var R = typeof RXG !== 'undefined' ? RXG : window.RXG, RX = DICT.rx || {};
     if (R && R.guides) {
