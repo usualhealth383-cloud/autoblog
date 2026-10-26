@@ -187,9 +187,10 @@ def _doc_text(x):
     return re.sub(r'\n\s*\n+', '\n', t).strip()
 
 
-def rx_labels(k):
-    out, op_ok = {}, None
+def rx_labels(k, have=None):
+    out, op_ok = dict(have or {}), next((v.get('op') for v in (have or {}).values() if v.get('op')), None)   # 10-26 이미 받은 것은 건너뛰고(20분 제한), 지난번에 된 오퍼레이션부터
     for key_, seq in RX_LABEL_SEQ.items():
+        if key_ in out and out[key_].get('seq') == seq: continue
         for op in ([op_ok] if op_ok else DTL_OPS):
             try:
                 n, items = page(op, 1, k, rows=1, extra={'item_seq': seq})
@@ -251,7 +252,8 @@ def main():
         except (Exception, SystemExit) as e:
             print('의약외품 받기 실패 — 건너뜀:', e)
     if only == 'labels':   # 전체 받기('')에는 넣지 않는다 — 따로 돌린다
-        L = rx_labels(k)
+        _old = ROOT / 'tools' / 'rxlabels.json'
+        L = rx_labels(k, json.loads(_old.read_text(encoding='utf-8')).get('labels', {}) if _old.exists() else {})
         if not L: sys.exit('처방약 허가 상세를 하나도 받지 못했습니다 — 오퍼레이션 이름 확인 필요')
         (ROOT / 'tools' / 'rxlabels.json').write_text(json.dumps({'fetched': today, 'labels': L}, ensure_ascii=False, indent=1), encoding='utf-8')
         print(f'처방약 허가 상세 {len(L)}/{len(RX_LABEL_SEQ)} → yakjido/tools/rxlabels.json'); return
