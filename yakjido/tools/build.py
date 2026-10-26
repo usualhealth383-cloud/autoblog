@@ -248,6 +248,11 @@ pages.mkdir(parents=True, exist_ok=True)
 (pages / 'data' / 'core.json').write_text(jc, encoding='utf-8')
 (pages / 'data' / 'detail.json').write_text(jd, encoding='utf-8')
 print(f'첫 화면 {len(out)/1024:.0f} KB · 본문 data/core.json {len(jc)/1024:.0f} KB')
+# 기내 모드(10-27) — 받아 둘 파일 목록·크기(설정 「기내에서 쓰기」가 읽는다)
+_dd = ROOT.parent / 'docs' / 'yakjido' / 'data'
+_off = [{'n': f.name, 'b': f.stat().st_size} for f in sorted(_dd.glob('*.json')) if f.name != 'offline.json']
+_off_i = [{'n': f.name, 'b': f.stat().st_size} for f in sorted((_dd / 'i18n').glob('*.json'))] if (_dd / 'i18n').exists() else []
+(_dd / 'offline.json').write_text(json.dumps({'data': _off, 'i18n': _off_i}, ensure_ascii=False, separators=(',', ':')), encoding='utf-8')
 # 서비스워커 캐시 이름 = 배포 파일 내용의 해시 — 내용이 같으면 같은 이름(파이썬 hash() 는 실행마다 달라 매번 바뀌던 것, 2026-10-13)
 _srvjs = (ROOT / 'srv.js').read_text(encoding='utf-8') if (ROOT / 'srv.js').exists() else ''
 _srvjs += (ROOT / 'find.js').read_text(encoding='utf-8') if (ROOT / 'find.js').exists() else ''   # 찾기 부품도 바뀌면 캐시 이름이 바뀌게(10-14)

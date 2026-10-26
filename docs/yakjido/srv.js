@@ -1288,6 +1288,89 @@ window.언어칸 = function () {
   return '<section class="sec card" style="margin-top:16px"><h2>언어 · Language</h2><div class="fs-seg lang-seg" role="group" aria-label="언어" style="flex-wrap:wrap">' + LN.map(function (x) { return b(window.LANG === x[0], "setLang('" + x[0] + "')", x[1]); }).join('') + '</div>' +
     '<p class="small muted" style="margin-top:10px">사는 나라 · Country — 응급 번호</p><div class="fs-seg lang-seg" role="group" aria-label="나라" style="flex-wrap:wrap">' + CN.map(function (x) { return b(window.CC === x[0], "setLang(window.LANG,'" + x[0] + "')", x[1]); }).join('') + '</div></section>';
 };
+/* 기내 모드(10-27 · 요청서 20261027_메디나눔_전앱_기내모드) — 인터넷 없이 쓰도록 자료·고른 언어·글꼴을 미리 받아 둔다.
+   받는 것은 서비스 워커 캐시에 들어간다(같은 주소라 앱이 그대로 꺼내 씀). 서버 응답(로그인·동기화)은 담지 않는다. */
+(function () {
+  var K = 'yakjido.offline', MB = function (b) { return (b / 1048576).toFixed(b < 10485760 ? 1 : 0) + ' MB'; };
+  var 갈래 = [['core', '약 자료', '약 찾기·겹침·증상·처방약 길잡이', /^(core|detail|brands|lexicon|meta|mixes|nutrients|names-rx|kpic)\.json$/],
+              ['easy', '쉬운 설명', '제품마다 쉬운 말 설명서', /^easy-/],
+              ['pill', '낱알 식별', '모양·색·글자로 알약 찾기', /^pills/]];
+  var 상태 = function () { try { return JSON.parse(localStorage.getItem(K) || 'null'); } catch (e) { return null; } };
+  var 판 = function () { try { return DATAV; } catch (e) { return ''; } };
+  var 목록 = null, 고름 = { core: 1, easy: 1, pill: 1, lang: 1, font: 1 }, 받는중 = false;
+  function 읽기() { return 목록 ? Promise.resolve(목록) : fetch('data/offline.json?v=' + 판(), { cache: 'no-store' }).then(function (r) { return r.json(); }).then(function (j) { 목록 = j; return j; }); }
+  function 글꼴주소() {
+    var u = []; document.querySelectorAll('link[rel=stylesheet][href^="https://"]').forEach(function (l) { if (/pretendard|fonts\.googleapis/.test(l.href)) u.push(l.href); });
+    u.push('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js');
+    return u;
+  }
+  function 할일(j) {
+    var out = [];
+    갈래.forEach(function (g) { if (고름[g[0]]) j.data.forEach(function (f) { if (g[3].test(f.n)) out.push({ u: 'data/' + f.n + '?v=' + 판(), b: f.b }); }); });
+    if (고름.lang && window.LANG && window.LANG !== 'ko') (j.i18n || []).forEach(function (f) { if (f.n === window.LANG + '.json') out.push({ u: 'data/i18n/' + f.n, b: f.b }); });
+    return out;
+  }
+  function 크기(j, k) {
+    if (k === 'lang') return (j.i18n || []).filter(function (f) { return f.n === window.LANG + '.json'; }).reduce(function (s, f) { return s + f.b; }, 0);
+    var g = 갈래.filter(function (x) { return x[0] === k; })[0]; return g ? j.data.filter(function (f) { return g[3].test(f.n); }).reduce(function (s, f) { return s + f.b; }, 0) : 0;
+  }
+  function 줄(id, t, s, b) { return '<label class="gn-row"><input type="checkbox" ' + (고름[id] ? 'checked' : '') + ' onchange="기내고름(\'' + id + '\',this.checked)"><span><b>' + t + '</b><span class="small muted">' + s + '</span></span><em>' + b + '</em></label>'; }
+  function 그리기() {
+    var box = document.getElementById('gn-box'); if (!box) return;
+    읽기().then(function (j) {
+      var st = 상태(), 새판 = st && st.v !== 판(), tot = 할일(j).reduce(function (s, x) { return s + x.b; }, 0);
+      var h = st ? '<p class="gn-st ' + (새판 ? 'old' : 'ok') + '">' + (새판 ? '받아 둔 뒤에 약 자료가 새로 나왔어요 — 다시 받으면 새것으로 바뀌어요.' : '인터넷 없이 쓸 준비가 됐어요 · ' + esc(st.at) + ' 받음 · ' + MB(st.b)) + '</p>' : '';
+      h += 갈래.map(function (g) { return 줄(g[0], g[1], g[2], MB(크기(j, g[0]))); }).join('');
+      if (window.LANG && window.LANG !== 'ko') h += 줄('lang', '고른 언어', '번역 사전', MB(크기(j, 'lang')));
+      h += 줄('font', '글꼴', '글씨 모양 — 받으면서 크기를 세요', '—');
+      h += '<p class="small muted gn-tot">받을 크기 약 <b>' + MB(tot) + '</b>' + (tot > 31457280 ? ' — 30 MB 가 넘어요. 필요한 갈래만 고르셔도 돼요.' : '') + ' 와이파이에서 받기를 권해요.</p>';
+      h += '<div class="gn-bar" hidden><progress max="100" value="0"></progress><span class="small muted"></span></div>';
+      h += '<button type="button" class="btn" onclick="기내받기()">' + (st ? '다시 받기' : '받아 두기') + '</button>';
+      if (st) h += '<button type="button" class="btn ghost" style="margin-top:8px" onclick="기내지우기()">받아 둔 것 지우기</button>';
+      box.innerHTML = h;
+    }).catch(function () { box.innerHTML = '<p class="small muted">목록을 못 읽었어요 — 인터넷이 될 때 다시 열어 주세요.</p>'; });
+  }
+  window.기내고름 = function (k, on) { 고름[k] = on ? 1 : 0; 그리기(); };
+  window.기내받기 = function () {
+    if (받는중) return; if (navigator.onLine === false) { try { toast('인터넷이 될 때 받을 수 있어요'); } catch (e) {} return; }
+    받는중 = true;
+    읽기().then(function (j) {
+      var q = 할일(j), all = q.reduce(function (s, x) { return s + x.b; }, 0) || 1, got = 0, n = 0, bad = 0, fb = 0;
+      var bar = document.querySelector('#gn-box .gn-bar'), pg = bar && bar.querySelector('progress'), tx = bar && bar.querySelector('span');
+      if (bar) bar.hidden = false;
+      var 표시 = function () { if (pg) pg.value = Math.min(100, Math.round(got / all * 100)); if (tx) tx.textContent = MB(got) + ' / ' + MB(all) + (bad ? ' · 못 받은 것 ' + bad : ''); };
+      var 하나 = function (x) { return fetch(x.u).then(function (r) { if (!r.ok) throw 0; return r.blob(); }).then(function (b) { got += x.b; fb += x.font ? b.size : 0; }).catch(function () { bad++; }).then(표시); };
+      var 일꾼 = function () { var x = q[n++]; return x ? 하나(x).then(일꾼) : Promise.resolve(); };
+      var 글꼴 = !고름.font ? Promise.resolve() : Promise.all(글꼴주소().map(function (u) {
+        return fetch(u).then(function (r) { return r.ok ? (/\.css|googleapis/.test(u) ? r.text() : r.blob().then(function (b) { fb += b.size; return ''; })) : ''; }).then(function (css) {
+          var us = (String(css).match(/url\(([^)]+)\)/g) || []).map(function (m) { return new URL(m.slice(4, -1).replace(/["']/g, ''), u).href; });
+          return Promise.all(us.map(function (f) { return fetch(f).then(function (r) { return r.blob(); }).then(function (b) { fb += b.size; }).catch(function () {}); }));
+        }).catch(function () {});
+      }));
+      return Promise.all([일꾼(), 일꾼(), 일꾼(), 글꼴]).then(function () {
+        받는중 = false;
+        if (bad) { try { toast('못 받은 파일이 ' + bad + '개 있어요 — 다시 받기를 눌러 주세요'); } catch (e) {} 표시(); return; }
+        var d = new Date(), at = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+        try { localStorage.setItem(K, JSON.stringify({ v: 판(), at: at, b: got + fb, lang: window.LANG || 'ko' })); } catch (e) {}
+        try { if (navigator.storage && navigator.storage.persist) navigator.storage.persist(); } catch (e) {}
+        try { toast('다 받았어요 — 인터넷 없이도 열려요'); } catch (e) {}
+        그리기();
+      });
+    }).catch(function () { 받는중 = false; try { toast('목록을 못 읽었어요'); } catch (e) {} });
+  };
+  window.기내지우기 = function () {
+    var 끝 = function () { try { localStorage.removeItem(K); } catch (e) {} 그리기(); try { toast('받아 둔 것을 지웠어요'); } catch (e) {} };
+    if (!window.caches) return 끝();
+    caches.keys().then(function (ks) { return Promise.all(ks.filter(function (k) { return k === 'yakjido-data-v1' || k === 'yakjido-ext-v1'; }).map(function (k) { return caches.delete(k); })); }).then(끝, 끝);
+  };
+  window.기내칸 = function () { setTimeout(그리기, 0); return '<section class="sec card" id="offline" style="margin-top:16px"><h2>기내에서 쓰기</h2><p class="small muted">비행기·지하·해외처럼 인터넷이 없는 곳에서도 열리게 미리 받아 둬요. 로그인·동기화·바깥 링크는 연결되면 돼요.</p><div id="gn-box"><p class="small muted">목록을 읽는 중…</p></div></section>'; };
+  window.기내줄 = function () { var st = 상태(); if (st && st.v === 판()) return ''; return '<p class="gn-home"><a href="#/me?t=set&to=offline" onclick="setTimeout(function(){var e=document.getElementById(\'offline\');e&&e.scrollIntoView({block:\'start\'})},300)">' + (st ? '받아 둔 약 자료가 새로 나왔어요 — 기내용 다시 받기 ›' : '인터넷 없는 곳에 가세요? 기내에서 쓰게 받아 두기 ›') + '</a></p>'; };
+  var cs = document.createElement('style');
+  cs.textContent = '.gn-row{display:flex;gap:12px;align-items:center;padding:12px 0;border-top:1px solid var(--line);min-height:48px}.gn-row input{width:22px;height:22px;flex:none}.gn-row>span{flex:1;display:flex;flex-direction:column;gap:2px}.gn-row em{font-style:normal;color:var(--muted);font-size:.875rem;white-space:nowrap}' +
+    '.gn-tot{margin:10px 0}.gn-bar{display:flex;flex-direction:column;gap:4px;margin:8px 0 12px}.gn-bar progress{width:100%;height:10px;accent-color:var(--primary)}.gn-st{padding:10px 12px;border-radius:12px;font-size:.875rem;font-weight:600;margin:8px 0}.gn-st.ok{background:var(--tint);color:var(--primary-deep)}.gn-st.old{background:var(--caution-tint);color:var(--caution)}' +
+    '.gn-home{text-align:center;margin:18px 0 4px;font-size:.875rem}.gn-home a{color:var(--muted);display:inline-flex;align-items:center;min-height:44px}';
+  document.head.appendChild(cs);
+})();
 /* 설정 화면의 구독 칸 — 스위치가 꺼져 있으면 빈 글(아무것도 안 보임) */
 window.구독관리 = function () { try { var h = 구독.관리HTML(); return h ? '<section class="sec card" style="margin-top:16px"><h2>구독</h2>' + h + '</section>' : ''; } catch (e) { return ''; } };
 

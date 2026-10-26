@@ -2601,7 +2601,7 @@ window.addEventListener('scroll', () => { SCROLL[LASTPATH] = window.scrollY; }, 
 window.addEventListener('hashchange', route);
 /* ── 39. 오프라인 — 조용한 띠 하나. 앱은 캐시로 열리지만 식약처 자료는 못 받을 수 있다 ── */
 function netBar(){ let b = document.querySelector('.netbar'); if (navigator.onLine) { b?.remove(); return; }
-  if (!b) { b = document.createElement('div'); b.className = 'netbar'; b.innerHTML = `${I.info}<span>지금은 인터넷이 안 돼요. 저장된 화면은 보이지만 <b>식약처 낱알·사진 읽기</b>는 연결 뒤에 돼요.</span>`; document.querySelector('.app')?.prepend(b); } }
+  if (!b) { b = document.createElement('div'); b.className = 'netbar'; b.innerHTML = `${I.info}<span>인터넷 없이 쓰는 중 — 로그인·동기화·바깥 링크·사진 읽기는 연결되면 돼요</span>`; document.querySelector('.app')?.prepend(b); } }
 window.addEventListener('online', netBar); window.addEventListener('offline', netBar); setTimeout(netBar, 0);
 /* 지금 탭을 한 번 더 누르면 맨 위로(같은 화면은 다시 그려도 자리를 지키므로) */
 document.querySelectorAll('nav.tabbar button').forEach(b => b.addEventListener('click', () => { if (location.hash === '#/' + b.dataset.tab) window.scrollTo({ top: 0 }); go('/' + b.dataset.tab); }));
@@ -3478,6 +3478,7 @@ function vHome(){
     ${lrow(I.leaf, '내 영양제 성분 겹치는지 보기', '제형·함량·상한 기준으로 비교', "go('/supp')")}
     ${lrow(I.cart, '편의점에서 살 수 있는 약', '안전상비의약품 13종', "go('/drugs?cat=cvs')")}
   </div></details>
+  ${ext('기내줄')}
   ${disclaimer()}`;
 }
 document.addEventListener('keydown', e => { if (e.target.id === 'q' && e.key === 'Enter') go('/search?q=' + encodeURIComponent(e.target.value.trim())); });
@@ -8143,6 +8144,7 @@ function vMe(_, q){
     <div class="view-row col" style="border-top:1px solid var(--hairline)"><div class="t"><b>화면 보기</b><span>간단히 — 사야 할 약만 사진과 함께 · 자세히 — 왜 그런지·근거까지</span></div>${viewSeg()}</div></section>
   ${ext('구독관리')}
   ${ext('언어칸')}
+  ${ext('기내칸')}
   <div class="rows-l" style="margin-top:16px">
     ${lrow(I.info, '알아두면 좋은 것', `짧은 건강정보 ${(D.tips || []).length}가지`, "go('/tips')")}
     ${lrow(I.info, '처음 안내 다시 보기', '앱 쓰는 법 세 장', "helloAgain()")}

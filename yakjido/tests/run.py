@@ -32,6 +32,12 @@ CHROME = os.environ.get('CHROME', '/opt/pw-browsers/chromium-1194/chrome-linux/c
 if not os.path.exists(CHROME): CHROME = None
 LAUNCH = {'executable_path': CHROME} if CHROME else {}
 
+# 시험 브라우저는 한국어·한국으로 연다(10-27 다섯 언어 — 언어를 안 정하면 navigator 가 en-US 라 영어 화면·911 이 된다)
+from playwright.sync_api import Browser as _B
+_np, _nc = _B.new_page, _B.new_context
+_B.new_page = lambda self, **k: _np(self, **{'locale': 'ko-KR', **k})
+_B.new_context = lambda self, **k: _nc(self, **{'locale': 'ko-KR', **k})
+
 class _Quiet(http.server.SimpleHTTPRequestHandler):
     def log_message(self, *a, **k): pass          # 접속 기록으로 결과를 가리지 않는다
 

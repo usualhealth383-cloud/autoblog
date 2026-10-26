@@ -28,7 +28,7 @@
   var st = document.createElement('style');
   st.textContent = '.lang-ja body,.lang-ja button,.lang-ja input{font-family:"Noto Sans JP",Pretendard,system-ui,sans-serif}.lang-zh body,.lang-zh button,.lang-zh input{font-family:"Noto Sans SC",Pretendard,system-ui,sans-serif}' +
     '.lang-ja *,.lang-zh *{word-break:normal!important;line-break:strict;overflow-wrap:anywhere}.lang-en *,.lang-es *{word-break:normal!important;overflow-wrap:break-word}' +
-    '.i18n-note{display:flex;flex-wrap:wrap;gap:4px 10px;align-items:center;margin:6px 0 2px;font-size:.8125rem;color:var(--muted)}.i18n-note button{color:var(--primary);font-weight:600;min-height:36px}';
+    '.i18n-note{display:flex;flex-wrap:wrap;gap:4px 10px;align-items:center;margin:6px 0 12px;font-size:.8125rem;color:var(--muted)}.i18n-note button{color:var(--primary);font-weight:600;min-height:36px}';
   document.head.appendChild(st);
 
   function 받기() {
