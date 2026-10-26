@@ -191,6 +191,10 @@ def _mnx():
     (ROOT.parent / 'docs' / 'yakjido' / 'medinanum-search.json').write_text(o, encoding='utf-8')
     print(f'통합 찾기 목록 {len(H)}개 · {len(o.encode()) // 1024} KB')
 _mnx()
+# 다섯 언어 사전(10-27) — yakjido/i18n/<lang>.json → docs/yakjido/data/i18n/<lang>.json (한국어·한국이면 받지 않음)
+_i18 = ROOT.parent / 'docs' / 'yakjido' / 'data' / 'i18n'; _i18.mkdir(parents=True, exist_ok=True)
+for _f in sorted((ROOT / 'i18n').glob('[a-z][a-z].json')) if (ROOT / 'i18n').exists() else []:
+    (_i18 / _f.name).write_text(json.dumps(json.loads(_f.read_text(encoding='utf-8')), ensure_ascii=False, separators=(',', ':')), encoding='utf-8')
 jc = json.dumps(core, ensure_ascii=False, separators=(',', ':'))
 j = json.dumps(inline, ensure_ascii=False, separators=(',', ':')).replace('</', '<\\/')
 # 10-21 검수자가 판을 구분하도록 한국 시각 날짜·시:분(컨테이너는 UTC 라 하루 늦게 찍혔다)
@@ -253,7 +257,7 @@ sw = ROOT / 'sw.js'
 if sw.exists():
     s = re.sub(r"const CACHE = '[^']*'", f"const CACHE = 'yakjido-{stamp.replace(' ', 'T')}-{cache_id}'", sw.read_text(encoding='utf-8'))
     (pages / 'sw.js').write_text(s, encoding='utf-8')
-for name in ('manifest.webmanifest', 'privacy.html', 'terms.html', 'delete-account.html', 'srv.js', 'find.js'):   # terms.html = 약지도 이용약관(첫 동의 화면·설정에서 앱 안으로 읽음, 10-14)   # find.js = 공용 찾기 부품 + 약지도 쪽(검색을 처음 쓸 때 받음, Z8)
+for name in ('manifest.webmanifest', 'privacy.html', 'terms.html', 'delete-account.html', 'srv.js', 'find.js', 'i18n.js'):   # terms.html = 약지도 이용약관(첫 동의 화면·설정에서 앱 안으로 읽음, 10-14)   # find.js = 공용 찾기 부품 + 약지도 쪽(검색을 처음 쓸 때 받음, Z8)
     # delete-account.html = 스토어 「계정 삭제 URL」(메디나눔 안내 2026-10-13)   # srv.js = 계정·기록 이어 두기(따로 받는 파일)   # privacy.html = 스토어에 적는 개인정보처리방침 주소
     src = ROOT / name
     if src.exists():

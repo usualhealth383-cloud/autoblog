@@ -1280,6 +1280,14 @@ try {
     로그인열기: function () { go('/login'); },
     바뀜: function () { try { if (/^#\/me/.test(location.hash)) route(); } catch (e) {} } });
 } catch (e) {}
+/* 다섯 언어(10-27) — 설정의 언어·나라 칸. 언어를 바꾸면 다시 연다. 나라는 응급·위기 번호를 고른다(요청서 표) */
+window.언어칸 = function () {
+  var LN = [['ko', '한국어'], ['en', 'English'], ['es', 'Español'], ['ja', '日本語'], ['zh', '简体中文']];
+  var CN = [['KR', '한국 · 119'], ['US', 'USA · 911'], ['ES', 'España · 112'], ['JP', '日本 · 119'], ['CN', '中国 · 120']];
+  var b = function (on, js, t) { return '<button type="button" class="' + (on ? 'on' : '') + '" aria-pressed="' + on + '" onclick="' + js + '">' + t + '</button>'; };
+  return '<section class="sec card" style="margin-top:16px"><h2>언어 · Language</h2><div class="fs-seg lang-seg" role="group" aria-label="언어" style="flex-wrap:wrap">' + LN.map(function (x) { return b(window.LANG === x[0], "setLang('" + x[0] + "')", x[1]); }).join('') + '</div>' +
+    '<p class="small muted" style="margin-top:10px">사는 나라 · Country — 응급 번호</p><div class="fs-seg lang-seg" role="group" aria-label="나라" style="flex-wrap:wrap">' + CN.map(function (x) { return b(window.CC === x[0], "setLang(window.LANG,'" + x[0] + "')", x[1]); }).join('') + '</div></section>';
+};
 /* 설정 화면의 구독 칸 — 스위치가 꺼져 있으면 빈 글(아무것도 안 보임) */
 window.구독관리 = function () { try { var h = 구독.관리HTML(); return h ? '<section class="sec card" style="margin-top:16px"><h2>구독</h2>' + h + '</section>' : ''; } catch (e) { return ''; } };
 
@@ -1592,6 +1600,35 @@ window.vRxS = function(id){
   ${disclaimer('약을 줄이거나 바꾸는 것은 처방한 의사와 정하세요.')}`;
 }
 
+/* 받는 화면(app-shell 에서 옮김 — 첫 화면 예산 10-27) */
+window.vParentShareS = function(code){
+  const S = SHARE(); const st = PSHARE[code];
+  if (!S.fn) return `${topBar({ back:'처음으로', nosearch:true })}<section class="sec"><div class="empty card"><b>이 링크를 열 수 없어요</b>앱의 보내기 서버가 아직 준비되지 않았어요.</div></section>`;
+  if (!st) { PSHARE[code] = { loading: true };
+    fetch(S.fn, { method:'POST', headers:{ 'Content-Type':'application/json' }, body: JSON.stringify({ action:'get', code }) })
+      .then(r => r.json().then(j => ({ ok: r.ok, status: r.status, j }))).then(({ ok, status, j }) => { PSHARE[code] = ok ? { data: j } : { err: status }; route(); })
+      .catch(() => { PSHARE[code] = { err: 0 }; route(); });
+    return `${topBar({ back:'처음으로', nosearch:true })}<section class="sec"><p class="loading">받은 약을 불러오는 중이에요…</p></section>`; }
+  if (st.loading) return `${topBar({ back:'처음으로', nosearch:true })}<section class="sec"><p class="loading">받은 약을 불러오는 중이에요…</p></section>`;
+  if (st.err) return `${topBar({ back:'처음으로', nosearch:true })}<section class="sec"><div class="empty card"><b>${st.err === 410 ? '기간이 지난 링크예요' : '받은 약을 불러오지 못했어요'}</b>${st.err === 410 ? '보낸 지 7일이 지나 지워졌어요. 다시 보내 달라고 해 주세요.' : '인터넷 연결을 확인하고 다시 열어 주세요.'}</div></section>`;
+  const x = st.data;
+  const sy = (() => { const t = (x.items || []).find(it => /^sym:/.test(it.id || '')); return t ? byId(D.symptoms, t.id.slice(4)) : null; })();
+  const meds = (x.items || []).filter(it => !/^sym:/.test(it.id || ''));
+  /* 외부 검수 6차 #5 — 보내는 화면·복사 글과 같은 설명서 단서(근이완 복합제 + 다른 해열진통제)를 받는 화면에도 — 같은 판정(basket 의 mix 1) */
+  const nsK = k => (ingIndex().byKey[k]?.cls || []).includes('nsaid'), dk = it => drug(it.id) ? drugKeys(drug(it.id)) : [];
+  const mixIt = it => dk(it).includes('ethenzamide') && meds.some(o => o !== it && dk(o).some(k => k === 'acetaminophen' || nsK(k)));
+  return `<div class="pshare">${topBar({ back:'처음으로', nosearch:true })}
+  <div class="eyebrow">${x.label ? esc(x.label) + '께 온 부탁' : '받은 약'}</div>
+  <h1 style="font-size:1.625rem">이 화면을 약사님께 보여 주세요</h1>
+  ${x.note ? `<p class="ps-note">“${esc(x.note)}”</p>` : ''}
+  <section class="sec"><div class="ps-list">${meds.map(it => { const d = drug(it.id); const nm = it.product || (d ? d.name : it.name);
+    return `<div class="ps-item">${prodArt(pimg(it.product || ''), nm)}<div><b>${esc(nm)}</b><span>${esc(it.product ? (d ? ingrName(d) : it.name) : '')}</span>${mixIt(it) ? `<small class="cau">${I.alert}${esc(mixTxt({ mix: 1 }))}</small>` : ''}</div></div>`; }).join('')}</div>
+    <p class="ps-ask">성분·함량·제형이 같으면 다른 제품도 괜찮아요.</p></section>
+  ${sy && sy.care?.er?.length ? `<div class="flag" role="note" style="margin-top:12px">${I.alert}<div><b>이럴 땐 약 대신 바로 119</b><p>${esc(sy.name)} 때문에 보내 드린 약이에요. 아래 가운데 하나라도 있으면 약국에 가지 마시고 119에 전화하거나 응급실로 가세요.</p>${list(sy.care.er)}<a class="call" href="tel:119">${I.alert} 119 전화</a></div></div>${sy.care.clinic?.length ? fold('이럴 땐 오늘 병원으로', list(sy.care.clinic)) : ''}` : ''}
+  <div class="note" style="margin-top:12px">${I.alert}<span><b>약사님께 앓고 계신 병과 드시는 약을 꼭 말씀하세요.</b> 혈압약·당뇨약·피 묽게 하는 약을 드시면 특히요.</span></div>
+  <div class="actions"><a class="btn" href="${GO_LINK.open[0]}" target="_blank" rel="noopener">${I.pin || I.search} 가까운 문 연 약국 찾기</a>${x.bought_at ? `<span class="badge otc">샀어요 표시함</span>` : `<button class="btn line" onclick="psBought('${esc(code)}')">${I.check} 샀어요</button>`}</div>
+  ${disclaimer()}</div>`;
+};
 /* 의사에게 물어보기(app-shell 에서 옮김 — 첫 화면 예산 10-26) */
 window.vAskDocS = function(_, q){
   const A = D.askdoc || []; if (!A.length) return vHome();
@@ -1891,4 +1928,4 @@ try { 통합찾기.설치({ 앱: 'yakjido', 열기: function (url) { location.hr
 try { 이용량.설치({ 앱: 'yakjido', 켜짐: false, 주소: 'https://uszalzczpmyifzbamjno.supabase.co', 공개키: 'sb_publishable_YQSz-D-RCXzHGUhso06rMg_GOIIRDuV' }); 이용량.센다('open'); } catch (e) {}
 
 /* 내 정보·동의·로그인·약관 화면을 보고 있었으면 다시 그린다(이 파일이 늦게 오므로) */
-try { if (/^#\/(me|consent|login|doc|hello\/3|supp$|supp\?|sgoal|sstage|rx|about|search|myths|askdoc)/.test(location.hash)) route(); } catch (e) {}
+try { if (/^#\/(me|consent|login|doc|hello\/3|supp$|supp\?|sgoal|sstage|rx|about|search|myths|askdoc|p\/|p$)/.test(location.hash)) route(); } catch (e) {}
