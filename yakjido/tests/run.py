@@ -891,7 +891,7 @@ def r5_checks(br, url, fails):
     if re.search('니다[.]', txt()): fails.append('5차 #7 약국 카드에 합니다체가 남았습니다')
     # 처방약 길잡이(10-22 ③) — 다섯 화면이 열리고, 「이렇게 드세요」·「이럴 땐 바로」가 맨 위, 검수 전 표시, 입구 셋(약 종류·내 약통·검색)
     me("ME.view='detail'; ME.taking=['cls:bp.acei']")
-    for g in ('bp', 'dm', 'chol', 'blood', 'thy', 'mind', 'gi', 'bone', 'resp'):
+    for g in ('bp', 'dm', 'chol', 'blood', 'thy', 'mind', 'gi', 'bone', 'resp', 'pros', 'gout'):
         go('/rx/' + g); pz.wait_for_function("()=>!document.querySelector('#view').innerText.includes('불러오는 중')", timeout=10000)
         t = txt()
         if '이렇게 드세요' not in t or '이럴 땐 바로' not in t or '깜빡했을 때' not in t: fails.append(f'처방약 길잡이 /rx/{g} 화면이 비었거나 칸이 빠졌습니다')

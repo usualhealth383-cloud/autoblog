@@ -1592,6 +1592,40 @@ window.vRxS = function(id){
   ${disclaimer('약을 줄이거나 바꾸는 것은 처방한 의사와 정하세요.')}`;
 }
 
+/* 오해 풀이(app-shell 에서 옮김 — 첫 화면 예산 10-26) */
+window.vMythsS = function(_, q){
+  const M = D.myths || [];
+  if (!M.length) return vHome();
+  const MG = ['약국에서 사는 것', '영양제', '약 고르기', '같이 먹어도 되나', '그 밖에'];
+  const card = m => `<details class="xc myth" id="my-${m.id}" ${q.open === m.id ? 'open' : ''}><summary>
+    <div class="ic">${icon(m.icon)}</div>
+    <b class="heard">“${esc(m.heard)}”</b>
+    <span class="verdict">${esc(m.verdict)}</span>
+    <span class="cnt">근거 보기${I.chev}</span></summary>
+    <div class="bd">
+      <div class="myth-n">${I.scale}${esc(m.n)}</div>
+      <p class="myth-lead">${fmt(m.body)}</p>
+      <div class="actions" style="margin-top:6px">${speakBtn(`(D.myths.find(x=>x.id==='${m.id}')||{}).body`, m.heard + ' 근거 읽어 주기')}</div>
+      ${srcChips(m.src, true)}
+      ${m.go ? `<div class="actions"><a class="btn ghost" href="#${m.go}">${I.chev} ${esc(m.goText || '자세히 보기')}</a></div>` : ''}
+    </div></details>`;
+  const groups = MG.map(g => [g, M.filter(m => m.group === g)]).filter(([, xs]) => xs.length);
+  const rest = M.filter(m => !MG.includes(m.group));
+  return `${topBar({ back:'홈' })}<div class="eyebrow">근거로 다시 보기</div><h1>그런 줄 알았는데</h1>
+  <p style="margin-top:6px">약에 대해 흔히 듣는 말 가운데, <b>자료를 찾아보면 달랐던 것</b>들이에요.
+  「하지 마세요」가 아니라 <b>숫자가 어디까지 말하는지</b>를 그대로 적었어요. 모두 ${M.length}가지.</p>
+  ${(() => { const today = M[new Date().getDate() % M.length]; return `<div class="rows-l" style="margin-top:14px">${lrow(icon(today.icon), `오늘의 한 가지 — “${esc(today.heard)}”`, esc(today.verdict), `go('/myths?open=${today.id}')`)}</div>`; })()}
+  ${(() => {
+    /* 2026-09-30 — 갈래를 모두 펼치면 폰 4장이었다(오늘의 한 가지 카드는 옛 모양이 깨져 있었다). ClinicScore 처럼 탭, 고른 갈래만 */
+    const G = [...groups, ...(rest.length ? [['그 밖에', rest]] : [])];
+    const oi = q.open ? G.findIndex(([, xs]) => xs.some(m => m.id === q.open)) : -1;
+    const k = oi >= 0 ? oi : Math.max(0, Math.min(G.length - 1, +(q.g || 0) || 0)), [g, xs] = G[k];
+    return `<nav class="tabs" role="tablist" aria-label="갈래" style="margin-top:20px">${G.map(([gn, L], i) => `<button class="tab ${i === k ? 'on' : ''}" role="tab" aria-selected="${i === k}" onclick="go('/myths?g=${i}')">${esc(gn)}<span class="n">${L.length}</span></button>`).join('')}</nav>
+    <div class="sech"><h2 class="sec-h">${esc(g)}</h2><span class="secn">${xs.length}가지</span></div>
+    <div class="explore">${xs.map(card).join('')}</div>`; })()}
+  <section class="sec"><div class="note">${I.info}<span><b>이 화면은 「약을 먹지 마세요」가 아니에요.</b> 근거가 없다고 밝힌 것은 「효과가 없다고 증명됐다」와 다르고, 근거가 약한 것도 의사가 이유가 있어 내실 수 있어요. <b>드시던 약을 이 화면을 보고 스스로 끊지 마세요.</b></span></div></section>
+  ${disclaimer()}`;
+};
 /* 근거와 검수 기준(app-shell 에서 옮김 — 첫 화면 예산) */
 window.vAboutS = function(){
   const S = D.sources || {};
@@ -1786,4 +1820,4 @@ window.vAboutS = function(){
 try { 통합찾기.설치({ 앱: 'yakjido', 열기: function (url) { location.href = url; } }); } catch (e) {}
 
 /* 내 정보·동의·로그인·약관 화면을 보고 있었으면 다시 그린다(이 파일이 늦게 오므로) */
-try { if (/^#\/(me|consent|login|doc|hello\/3|supp$|supp\?|sgoal|sstage|rx|about|search)/.test(location.hash)) route(); } catch (e) {}
+try { if (/^#\/(me|consent|login|doc|hello\/3|supp$|supp\?|sgoal|sstage|rx|about|search|myths)/.test(location.hash)) route(); } catch (e) {}
