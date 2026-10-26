@@ -197,12 +197,14 @@ def rx_labels(k, have=None):
             except Exception as e:
                 print('  ', op, '실패:', str(e)[:80]); continue
             it = next((x for x in items if s(x.get('ITEM_SEQ')) == seq), items[0] if items else None)
-            if it and not (it.get('NB_DOC_DATA') or it.get('UD_DOC_DATA')) and str(it.get('NB_DOC_ID') or '').startswith('http'):
+            if it and not (it.get('NB_DOC_DATA') or it.get('UD_DOC_DATA')) and it.get('NB_DOC_ID'):
+                print(f'   {key_} 문서 주소 모양: {str(it.get("NB_DOC_ID"))[:60]}')
                 # 10-26 새 허가 문서는 본문 칸이 비고 PDF 주소(…_DOC_ID)만 있다 — PDF 를 받아 글자를 뽑는다(pypdf)
                 for _c in ('EE', 'UD', 'NB'):
                     try:
                         import io as _io, pypdf as _pp
-                        with urllib.request.urlopen(it[_c + '_DOC_ID'], timeout=40) as _r: _b = _r.read()
+                        _u = str(it[_c + '_DOC_ID']); _u = _u if _u.startswith('http') else 'https://nedrug.mfds.go.kr' + ('' if _u.startswith('/') else '/') + _u
+                        with urllib.request.urlopen(urllib.request.Request(_u, headers={'User-Agent': 'Mozilla/5.0'}), timeout=40) as _r: _b = _r.read()
                         it[_c + '_DOC_DATA'] = '\n'.join((pg.extract_text() or '') for pg in _pp.PdfReader(_io.BytesIO(_b)).pages)
                     except Exception as _e: print(f'   {key_} {_c} PDF 실패: {str(_e)[:80]}')
             if not it or not (it.get('NB_DOC_DATA') or it.get('UD_DOC_DATA')): print(f'   {key_} {op.split("/")[-1]}: {n}건 · 문서 칸 {sorted(k_ for k_ in (it or {}) if "DOC" in k_)} · {[(k_, len(str(v_))) for k_, v_ in (it or {}).items() if "DOC" in k_]}')
