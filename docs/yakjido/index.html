@@ -1321,6 +1321,7 @@ table.cmp td:first-child{font-weight:700;word-break:keep-all;min-width:6em}
 .cmp-bar button{background:var(--card);color:var(--text);border-radius:9px;padding:8px 14px;font-weight:700;font-size:.875rem;min-height:36px}
 .checkrow{display:flex;align-items:center;gap:var(--s3);padding:12px 0;border-bottom:1px solid var(--hairline);min-height:52px}
 .checkrow:last-child{border-bottom:0}
+.lang-pill{float:right;min-height:40px;padding:0 10px;border:1px solid var(--hairline);border-radius:999px;background:var(--card);color:var(--text);font:inherit;font-size:.875rem}
 .checkrow{position:relative}.checkrow label::before{content:"";position:absolute;inset:0}
 .checkrow input{width:20px;height:20px;accent-color:var(--primary);flex:none}
 .checkrow label{flex:1;min-width:0;font-size:.9375rem;font-weight:600;overflow-wrap:anywhere}
@@ -1767,7 +1768,7 @@ background-repeat:no-repeat;background-position:right 9px center;background-size
 <script>
 window.__YAKJIDO_OK__ = true;
 const D = JSON.parse(document.getElementById('data').textContent || '{}');
-const BUILD = '2026-10-27 04:27';
+const BUILD = '2026-10-27 04:35';
 const DATAV = 'cd4eb3c0be'.indexOf('__') === 0 ? BUILD : 'cd4eb3c0be';
 const BRANDMARK = (typeof window !== 'undefined' && window.__BRANDMARK__) || 'icon-192.png';
 let CORE = 0, CORE_P = null;
@@ -5276,6 +5277,7 @@ if (k === 'child') go('/hello/2'); else helloFinish(); }
 function vHello(step){
 const n = Math.min(3, Math.max(1, parseInt(step || '1', 10) || 1));
 const dots = `<div class="steps-bar">${[1, 2, 3].map(i => `<i class="${i <= n ? 'on' : ''}"></i>`).join('')}</div>`;
+const langPick = n === 1 ? `<select class="lang-pill" aria-label="Language" onchange="setLang(this.value)">${[['ko','한국어'],['en','English'],['es','Español'],['ja','日本語'],['zh','简体中文']].map(([k, t]) => `<option value="${k}"${k === LANG ? ' selected' : ''}>${t}</option>`).join('')}</select>` : '';
 const skip = `<button class="hello-skip" onclick="helloFinish()">나중에 할게요</button>`;
 if (n === 1) {
 const ICO3 = { adult:'user', senior:'shield', child:'family' };
@@ -5294,7 +5296,7 @@ ${skip}`;
 if (n === 2) {
 const kid = ME.age === 'child', KEYS = kid ? ['asthma', 'heart', 'kidney', 'liver', 'diabetes'] : ['heart', 'hf', 'diabetes', 'ulcer', 'bleed', 'kidney', 'liver', 'lvs', 'anticoag', 'glaucoma', 'bph', 'asthma', 'alcohol', 'gout', 'pregnant', 'nursing'];
 const on = KEYS.filter(k => ME[k]).length;
-return `${topBar({ back:'이전', nosearch:true })}${dots}
+return `${topBar({ back:'이전', nosearch:true })}${langPick}${dots}
 <h1 class="hello-q">해당하는 것이 있으면 눌러 주세요</h1>
 <p class="hello-sub">이걸 알면 <b>피해야 할 조합을 먼저 살펴봐</b> 드릴 수 있어요. 해당하는 것이 없으면 그냥 넘어가셔도 돼요.</p>
 <div class="hello-chips">${KEYS.map(k => `<button class="hello-chk ${ME[k] ? 'on' : ''}" aria-pressed="${!!ME[k]}" onclick="ME['${k}']=!ME['${k}'];saveMe();redraw()"><span class="bx">${ME[k] ? I.check : ''}</span>${esc(FLAG_Q[k])}</button>`).join('')}</div>

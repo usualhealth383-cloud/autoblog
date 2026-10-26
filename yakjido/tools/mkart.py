@@ -34,6 +34,12 @@ s = s.replace("onclick=\"downloadIcs()\">${I.clock} 받기</button>", "onclick=\
 _srv = ROOT / 'srv.js'
 if _srv.exists():
     s = s.replace('<script src="srv.js" defer></script>', '<script>' + _srv.read_text(encoding='utf-8').replace('</script', '<\\/script') + '</script>')
+# 다섯 언어(10-27) — 아티팩트는 파일 하나라 사전과 i18n.js 를 안에 싣는다(한국어·한국이면 i18n.js 는 아무것도 안 하게 가드)
+_i18 = ROOT / 'i18n.js'
+if _i18.exists():
+    _dicts = {f.stem: json.loads(f.read_text(encoding='utf-8')) for f in sorted((ROOT / 'i18n').glob('[a-z][a-z].json'))}
+    _blob = '<script>window.__I18N__=' + json.dumps(_dicts, ensure_ascii=False, separators=(',', ':')).replace('</', '<\\/') + ';if(window.LANG!=="ko"||window.CC!=="KR"){' + _i18.read_text(encoding='utf-8').replace('</script', '<\\/script') + '}</script>'
+    s = s.replace('</body>', _blob + '</body>', 1) if '</body>' in s else s + _blob
 # 아티팩트에는 privacy.html 파일이 없다 — 깃허브 페이지의 방침으로 연다
 _a = "window.방침주소 = function(){ return NATIVE ? (D.meta?.share?.app || 'https://usualhealth383-cloud.github.io/autoblog/yakjido/') + 'privacy.html' : 'privacy.html'; };"
 assert _a in s, '방침주소 정의가 바뀌었습니다 — mkart.py 를 맞춰 주세요'

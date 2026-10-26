@@ -42,16 +42,16 @@
   }
   /* 본문 덮어쓰기 — 증상·처방약 길잡이의 안전 칸. 자료가 늦게 오므로 그릴 때마다 한 번씩 본다(이미 했으면 건너뜀) */
   function 본문() {
-    if (!DICT || !window.D) return;
+    if (!DICT || typeof D === 'undefined' || !D) return;   /* D·RXG 는 앱 스크립트의 전역 const — window 속성이 아니다 */
     var S = DICT.sym || {};
     (D.symptoms || []).forEach(function (s) {
-      var t = S[s.id]; if (!t || s.__i18n) return; s.__i18n = 1;
+      var t = S[s.id]; if (!t) return;   /* 본문(core.json)이 늦게 와 덮을 수 있어 그릴 때마다 다시 얹는다(값이 같으면 그대로) */
       if (t.name) s.name = t.name; if (t.short) s.short = t.short;
       if (s.care) ['er', 'clinic', 'pharmacy'].forEach(function (k) { if (t[k] && s.care[k]) s.care[k] = s.care[k].map(function (x, i) { return t[k][i] || x; }); });
       if (s.triage && t.escalate) s.triage.escalate = t.escalate;
     });
-    var R = window.RXG, RX = DICT.rx || {};
-    if (R && R.guides && !R.__i18n) { R.__i18n = 1;
+    var R = typeof RXG !== 'undefined' ? RXG : window.RXG, RX = DICT.rx || {};
+    if (R && R.guides) {
       for (var g in RX) { var G = R.guides[g]; if (!G) continue; var x = RX[g];
         if (x.title) G.title = x.title; if (x.short) G.short = x.short; if (x.lead) G.lead = x.lead;
         ['er', 'do'].forEach(function (f) { if (x[f] && G[f]) G[f].forEach(function (o, i) { if (x[f][i]) o.t = x[f][i]; }); });
