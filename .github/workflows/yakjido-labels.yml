@@ -31,6 +31,7 @@ jobs:
           DATA_GO_KR_KEY: ${{ secrets.DATA_GO_KR_KEY }}
         run: |
           if [ -z "$DATA_GO_KR_KEY" ]; then echo "::error::Secrets 에 DATA_GO_KR_KEY 가 없습니다"; exit 1; fi
+          pip install -q pypdf
           python3 -u yakjido/tools/fetch_mfds.py --only labels
       - name: 작업 가지에 올리기
         run: |
