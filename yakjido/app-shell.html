@@ -2520,6 +2520,8 @@ function route(){
   const R = { send:vSend, p:vParentShare, show:vShow, check:vCheck, home:vHome, symptom:vSymptom, drugs:vDrugs, drug:vDrug, class:vClass, search:vSearch, pub:vPub, pill:vPill, guide:vGuide, kids:vKids, tips:vTips, myths:vMyths, schedule:vSchedule, photo:vPhoto, pillinfo:vPillInfo, supp:vSupp, sgoal:vDoor, sstage:vDoor, compare:vCompare, me:vMe, about:vAbout, ingr:vIngr, brand:vBrand, nut:vNut, hello:vHello, mix:vMix, together:vTogether, kinds:vKinds, rx:vRx, bag:vBag, rxout:vRxOut, senior:vSenior, askdoc:vAskDoc, vitals:vVitals, visits:vVisits, demo:vDemo, consent:vDoor, login:vDoor, doc:vDoor };
   /* 한 화면이 그리다 터져도 앱 전체가 멈춘 것처럼 보이지 않게 — 자료 한 줄의 흠이 흰 화면이 되지 않도록(2026-10-08 출시 점검) */
   let html;
+  /* 익명 이용 통계(공용 이용량 부품 · 기본 꺼짐) — 화면 «종류» 이름만 센다. 약 이름·증상·검색어는 세지 않는다 */
+  if (R[seg[0]]) try { window.이용량?.센다('v_' + seg[0]); } catch (e) {}
   try { html = (R[seg[0]] || vHome)(seg[1], q); }
   catch (err) {
     try { console.error('화면 오류', path, err); } catch (e) {}
