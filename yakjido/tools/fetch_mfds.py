@@ -170,7 +170,10 @@ RX_LABEL_SEQ = {'amlodipine': '200610660', 'losartan': '200811814', 'ramipril': 
                 'hctz': '196000008', 'metformin': '198500321', 'glimepiride': '199600863', 'sitagliptin': '200710758',
                 'empagliflozin': '201403744', 'simvastatin': '200807527', 'rosuvastatin': '200210097', 'levothyroxine': '197400278',
                 'zolpidem': '200700634', 'sertraline': '200511068', 'alprazolam': '200410869',
-                'apixaban': '201305918', 'rivaroxaban': '201201271', 'dabigatran': '201100747', 'clopidogrel': '200700907', 'warfarin': '200502107'}
+                'apixaban': '201305918', 'rivaroxaban': '201201271', 'dabigatran': '201100747', 'clopidogrel': '200700907', 'warfarin': '200502107',
+                'alendronate': '200009061', 'ibandronate': '200607634', 'risedronate': '200200772', 'raloxifene': '200108676',
+                'esomeprazole': '200009026', 'lansoprazole': '199907311', 'tegoprazan': '201802815',
+                'budesonide_formoterol': '200109101', 'tiotropium': '200811444', 'salbutamol': '199906869'}
 DTL_OPS = ['DrugPrdtPrmsnInfoService08/getDrugPrdtPrmsnDtlInq07', 'DrugPrdtPrmsnInfoService08/getDrugPrdtPrmsnDtlInq08',
            'DrugPrdtPrmsnInfoService07/getDrugPrdtPrmsnDtlInq06', 'DrugPrdtPrmsnInfoService06/getDrugPrdtPrmsnDtlInq05',
            'DrugPrdtPrmsnInfoService05/getDrugPrdtPrmsnDtlInq04']

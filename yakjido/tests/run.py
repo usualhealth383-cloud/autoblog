@@ -895,7 +895,10 @@ def r5_checks(br, url, fails):
         go('/rx/' + g); pz.wait_for_function("()=>!document.querySelector('#view').innerText.includes('불러오는 중')", timeout=10000)
         t = txt()
         if '이렇게 드세요' not in t or '이럴 땐 바로' not in t or '깜빡했을 때' not in t: fails.append(f'처방약 길잡이 /rx/{g} 화면이 비었거나 칸이 빠졌습니다')
-        if '의사 확인 중' not in t: fails.append(f'처방약 길잡이 /rx/{g} 에 검수 전 표시가 없습니다')
+        _rv = json.load(open(pathlib.Path(__file__).resolve().parent.parent / 'rxguide.json', encoding='utf-8')).get('reviewed')
+        # 10-26 현욱님 답 9 — 검수가 끝나면(reviewed) 「의사 확인 중」이 없어야, 그 전엔 있어야 한다
+        if _rv and '의사 확인 중' in pz.evaluate("()=>document.querySelector('.top')?.innerText||''"): fails.append(f'처방약 길잡이 /rx/{g} 에 검수 끝났는데 「의사 확인 중」이 남았습니다')
+        if not _rv and '의사 확인 중' not in t: fails.append(f'처방약 길잡이 /rx/{g} 에 검수 전 표시가 없습니다')
     go('/rx/bp')
     if '내 약' not in txt(): fails.append('처방약 길잡이: 내 약통의 …프릴 약에 「내 약」 표시가 없습니다')
     go('/kinds/bp')
