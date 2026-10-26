@@ -254,6 +254,61 @@ _off = [{'n': f.name, 'b': f.stat().st_size} for f in sorted(_dd.glob('*.json'))
 _off_i = [{'n': f.name, 'b': f.stat().st_size} for f in sorted((_dd / 'i18n').glob('*.json'))] if (_dd / 'i18n').exists() else []
 _off_x = [{'n': str(f.relative_to(ROOT)), 'b': f.stat().st_size} for _d in ('fonts', 'vendor') if (ROOT / _d).exists() for f in sorted((ROOT / _d).rglob('*')) if f.is_file()]
 (_dd / 'offline.json').write_text(json.dumps({'data': _off, 'i18n': _off_i, 'ext': _off_x}, ensure_ascii=False, separators=(',', ':')), encoding='utf-8')
+# 찾아오기(10-27 Main · 요청서 20261027_찾아오기_중국) — medinanum.com 짧은 판 재료. 화면엔 안 보임. seo.json(검색제목·검색설명·찾는말 다섯 언어) + 글 첫 단락·할 일·이럴 땐 바로·주소·출처
+def _seo():
+    import re as _re
+    sp = ROOT / 'seo.json'   # content/ 밖 — content/*.json 은 첫 화면에 실린다
+    if not sp.exists(): return
+    seo = json.loads(sp.read_text(encoding='utf-8'))
+    plain = lambda t: _re.sub(r'\s+', ' ', _re.sub(r'\*\*|<[^>]+>', '', str(t or ''))).strip()
+    def cut(t, n):   # 문장 끝에서 자른다(한 문장이 넘치면 비움 — 말을 중간에 끊지 않는다)
+        t = plain(t); out = ''
+        for m in _re.finditer(r'[^.!?。？！]+[.!?。？！]?', t):
+            if len(out + m.group(0)) > n: break
+            out += m.group(0)
+        return out.strip()
+    first = lambda t: (_re.match(r'[^.!?。？！]+[.!?。？！]?', plain(t)) or [''])[0].strip()
+    srcs = {}
+    for f in sorted((ROOT / 'content').glob('sources*.json')): srcs.update(json.loads(f.read_text(encoding='utf-8')))
+    def src1(ids):
+        ids = [x for x in (ids or []) if x in srcs]
+        g = [x for x in ids if '지침' in srcs[x].get('type', '')] or ids
+        return _re.sub(r'\s*\(.*?\)\s*$', '', srcs[g[0]]['label']).strip() if g else ''
+    syms = {}
+    for f in sorted((ROOT / 'content').glob('symptoms*.json')):
+        v = json.loads(f.read_text(encoding='utf-8')); v = v if isinstance(v, list) else v.get('symptoms', [])
+        for x in v: syms.setdefault(x['id'], {}).update(x)
+    rx = json.loads((ROOT / 'rxguide.json').read_text(encoding='utf-8')).get('guides', {})
+    dicts = {L: json.loads((ROOT / 'i18n' / f'{L}.json').read_text(encoding='utf-8')) for L in ('en', 'es', 'ja', 'zh') if (ROOT / 'i18n' / f'{L}.json').exists()}
+    for L in ('ko', 'en', 'es', 'ja', 'zh'):
+        out = {}
+        for key, v in seo.items():
+            kind, gid = key.split(':', 1)
+            if L not in v.get('검색제목', {}): continue
+            e = {'검색제목': v['검색제목'][L], '검색설명': v['검색설명'][L], '찾는말': v.get('찾는말', {}).get(L, [])[:10]}
+            T = dicts.get(L, {})
+            if kind == 'sym' and gid in syms:
+                s0 = syms[gid]; t = T.get('sym', {}).get(gid, {})
+                e['첫단락'] = cut(s0.get('lead'), 200) if L == 'ko' else cut(t.get('short', ''), 200)
+                # 증상의 먹는 법 줄은 뒤 문장이 조건·예외(「설명서는 함께 먹지 말라고 해요」)라 첫 문장만 떼면 위험 — 한 줄 전체가 40자 안인 것만
+                e['할일'] = [plain(h) for h in (s0.get('how') or []) if 0 < len(plain(h)) <= 40][:3] if L == 'ko' else []
+                er = (s0.get('care') or {}).get('er') or []
+                e['바로'] = plain(er[0]) if L == 'ko' and er else plain((t.get('er') or [''])[0])
+                if L == 'ko' and e['바로'] and '119' not in e['바로']: e['바로'] += ' → 바로 119'
+                e['주소'] = '#/symptom/' + gid; e['출처'] = src1(s0.get('sources'))
+            elif kind == 'rx' and gid in rx:
+                g = rx[gid]; t = T.get('rx', {}).get(gid, {})
+                e['첫단락'] = cut(g.get('lead'), 200) if L == 'ko' else cut(t.get('lead', ''), 200)
+                dos = [o.get('t') for o in g.get('do', [])] if L == 'ko' else (t.get('do') or [])
+                e['할일'] = [first(h) for h in dos if 0 < len(first(h)) <= 40][:3]
+                ers = [o.get('t') for o in g.get('er', [])] if L == 'ko' else (t.get('er') or [])
+                e['바로'] = plain(ers[0]) if ers else ''
+                e['주소'] = '#/rx/' + gid; e['출처'] = src1(g.get('src'))
+            else: continue
+            out[key] = e
+        if out: (pages / f'medinanum-seo.{L}.json').write_text(json.dumps(out, ensure_ascii=False, indent=1), encoding='utf-8')
+    print('찾아오기 medinanum-seo:', len(seo), '편')
+_seo()
 # 서비스워커 캐시 이름 = 배포 파일 내용의 해시 — 내용이 같으면 같은 이름(파이썬 hash() 는 실행마다 달라 매번 바뀌던 것, 2026-10-13)
 _srvjs = (ROOT / 'srv.js').read_text(encoding='utf-8') if (ROOT / 'srv.js').exists() else ''
 _srvjs += (ROOT / 'find.js').read_text(encoding='utf-8') if (ROOT / 'find.js').exists() else ''   # 찾기 부품도 바뀌면 캐시 이름이 바뀌게(10-14)

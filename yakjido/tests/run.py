@@ -32,11 +32,11 @@ CHROME = os.environ.get('CHROME', '/opt/pw-browsers/chromium-1194/chrome-linux/c
 if not os.path.exists(CHROME): CHROME = None
 LAUNCH = {'executable_path': CHROME} if CHROME else {}
 
-# 시험 브라우저는 한국어·서울 시간대로 연다(10-27 다섯 언어 — 안 정하면 en-US·UTC 라 영어 화면이 된다. 나라는 시간대가 먼저라 i18n.py 가 en-US+서울 → 119 를 따로 본다)
+# 시험 브라우저는 한국어로 연다(10-27 — 안 정하면 en-US 라 영어 화면이 된다). 시간대는 그대로(UTC — 알림 시험이 이 시계에 맞춰져 있다, UTC 는 나라 판단에서 건너뛰어 ko-KR → KR). en-US+서울 → 119 는 i18n.py 가 따로 본다
 from playwright.sync_api import Browser as _B
 _np, _nc = _B.new_page, _B.new_context
-_B.new_page = lambda self, **k: _np(self, **{'locale': 'ko-KR', 'timezone_id': 'Asia/Seoul', **k})
-_B.new_context = lambda self, **k: _nc(self, **{'locale': 'ko-KR', 'timezone_id': 'Asia/Seoul', **k})
+_B.new_page = lambda self, **k: _np(self, **{'locale': 'ko-KR', **k})
+_B.new_context = lambda self, **k: _nc(self, **{'locale': 'ko-KR', **k})
 
 class _Quiet(http.server.SimpleHTTPRequestHandler):
     def log_message(self, *a, **k): pass          # 접속 기록으로 결과를 가리지 않는다
