@@ -45,6 +45,8 @@ with sync_playwright() as p:
             if l2 != L: continue
             r = q.evaluate("t=>{const a=약지도대화.위험(t,대화.값뽑기(t,[]));return a&&[a.전화,a.말]}", t)
             exp = mind if want == 'mind' else e119
+            # 실수 과다복용은 그 나라 중독 상담으로 가는 것이 맞다(바깥 검수 9차)
+            if r and want != 'mind' and r[0] == {'US': '1-800-222-1222', 'ES': '915620420', 'JP': '072-727-2499'}.get(CC): dok += 1; continue
             if not r or r[0] != exp: dmiss.append(f'{L} {t} → {want} : {r}')
             elif '119' in r[1] and e119 != '119': dmiss.append(f'{L} 안내 글에 119: {r[1][:40]}')
             else: dok += 1
@@ -56,12 +58,25 @@ with sync_playwright() as p:
         q.goto(URL + '#/talk'); q.wait_for_function("()=>window.약지도대화" + ("&&window.I18N" if L != 'ko' else ''), timeout=20000)
         if L != 'ko': q.evaluate("()=>I18N.ready")
         r = q.evaluate("t=>{const a=약지도대화.위험(t,대화.값뽑기(t,[]));return a&&[a.전화,a.말]}", t); q.close()
-        if not r or r[0] != e or not any(w in r[1] for w in ('토하게', 'vomit', 'vómito', '吐かせ', '催吐')): dmiss.append(f'과다 {L} {t} → {r}')
+        # 실수 복용은 그 나라 중독 상담(미국·스페인·일본), 스스로 해치려 먹은 말·한국·중국은 응급 번호(바깥 검수 9차)
+        POI = {'US': '1-800-222-1222', 'ES': '915620420', 'JP': '072-727-2499'}
+        self_harm = any(w in t for w in ('죽고', 'kill', 'morir', '死に', '想死', '숨쉬기가 힘들'))   # 스스로 해침·중증 증상 → 응급 번호
+        want = e if (self_harm or cc not in POI) else POI[cc]
+        if not r or r[0] != want or not (self_harm or any(w in r[1] for w in ('토하게', 'vomit', 'vómito', '吐かせ', '催吐'))): dmiss.append(f'과다 {L} {t} → {r} (기대 {want})')
+        else: dok += 1
+    # 마음 위기 「24시간」은 한국·미국·스페인만(일본·중국은 지역마다 다름)
+    for L, cc, has in (('ko', 'KR', True), ('en', 'US', True), ('es', 'ES', True), ('ja', 'JP', False), ('zh', 'CN', False)):
+        q = b.new_page(); q.add_init_script(SEED + (f";localStorage.setItem('yakjido.lang','{L}');localStorage.setItem('yakjido.cc','{cc}')" if L != 'ko' else ''))
+        q.goto(URL + '#/talk'); q.wait_for_function("()=>window.약지도대화" + ("&&window.I18N" if L != 'ko' else ''), timeout=20000)
+        if L != 'ko': q.evaluate("()=>I18N.ready")
+        m = q.evaluate("()=>약지도대화.위험('죽고 싶어요 I want to die quiero morir 死にたい 我想死',{}).말"); q.close()
+        h24 = any(w in m for w in ('24시간', '24 hours', '24 horas', '24時間', '24小时'))
+        if h24 != has: dmiss.append(f'위기 24시간 {L}/{cc}: {m[:60]}')
         else: dok += 1
     for t in C['과다아님']:
         r = pg.evaluate("t=>{const a=약지도대화.위험(t,대화.값뽑기(t,[]));return a&&a.말}", t)
         if r: dmiss.append(f'과다 아닌데 막음: {t} → {r[:30]}')
-    print(f'보통 뜻 맞힘 {good}/{len(C["보통"])} ({rate:.0%}) · 위험 {dok}/{len(C["위험"]) + len(C["위험_다국"]) + len(C["과다"])}')
+    print(f'보통 뜻 맞힘 {good}/{len(C["보통"])} ({rate:.0%}) · 위험 {dok}/{len(C["위험"]) + len(C["위험_다국"]) + len(C["과다"]) + 5}')
     for m in miss: print('  · 놓침', m)
     if rate < .9: fails.append(f'뜻 맞힘 {rate:.0%} < 90%')
     if dmiss: fails.append(f'위험 놓침 {dmiss}')
