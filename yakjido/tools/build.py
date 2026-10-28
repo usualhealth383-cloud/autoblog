@@ -103,7 +103,8 @@ if not (pub / 'kpic.json').exists(): (pub / 'kpic.json').write_text('{}', encodi
 # 파일이 없으면 D.art 목록에 안 들어가서 화면에 빈 자리도 안 생긴다.
 ART_NAMES = ['hero-home', 'guide-1-where', 'guide-2-pharmacy', 'guide-3-take', 'photo-guide',
              'pill-search', 'schedule', 'supp-label', 'kids-dose', 'easy-mode',
-             'me-safety', 'tips', 'empty-search']
+             'me-safety', 'tips', 'empty-search',
+             'empty-bag', 'done-today']   # 10-28 현욱님이 그려 주실 두 장(빈 화면 · 다 드신 순간) — 넣으면 바로 뜬다
 artsrc = ROOT / 'art'
 artdst = ROOT.parent / 'docs' / 'yakjido' / 'art'
 MAXW = {'easy-mode': 300}                  # 88px 원형이라 작게, 나머지는 900px 이면 2배 화면까지 충분
