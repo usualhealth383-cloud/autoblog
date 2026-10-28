@@ -49,7 +49,19 @@ with sync_playwright() as p:
             elif '119' in r[1] and e119 != '119': dmiss.append(f'{L} 안내 글에 119: {r[1][:40]}')
             else: dok += 1
         q.close()
-    print(f'보통 뜻 맞힘 {good}/{len(C["보통"])} ({rate:.0%}) · 위험 {dok}/{len(C["위험"]) + len(C["위험_다국"])}')
+    # 과다복용(10-28 곁에 교훈) — 이미 먹은 말은 증상 묻기 전에 119 + 「토하게 하지 마세요」, 아닌 말은 막지 않기
+    NUM = {'ko': ('KR', '119'), 'en': ('US', '911'), 'es': ('ES', '112'), 'ja': ('JP', '119'), 'zh': ('CN', '120')}
+    for L, t in C['과다']:
+        cc, e = NUM[L]; q = b.new_page(); q.add_init_script(SEED + (f";localStorage.setItem('yakjido.lang','{L}');localStorage.setItem('yakjido.cc','{cc}')" if L != 'ko' else ''))
+        q.goto(URL + '#/talk'); q.wait_for_function("()=>window.약지도대화" + ("&&window.I18N" if L != 'ko' else ''), timeout=20000)
+        if L != 'ko': q.evaluate("()=>I18N.ready")
+        r = q.evaluate("t=>{const a=약지도대화.위험(t,대화.값뽑기(t,[]));return a&&[a.전화,a.말]}", t); q.close()
+        if not r or r[0] != e or not any(w in r[1] for w in ('토하게', 'vomit', 'vómito', '吐かせ', '催吐')): dmiss.append(f'과다 {L} {t} → {r}')
+        else: dok += 1
+    for t in C['과다아님']:
+        r = pg.evaluate("t=>{const a=약지도대화.위험(t,대화.값뽑기(t,[]));return a&&a.말}", t)
+        if r: dmiss.append(f'과다 아닌데 막음: {t} → {r[:30]}')
+    print(f'보통 뜻 맞힘 {good}/{len(C["보통"])} ({rate:.0%}) · 위험 {dok}/{len(C["위험"]) + len(C["위험_다국"]) + len(C["과다"])}')
     for m in miss: print('  · 놓침', m)
     if rate < .9: fails.append(f'뜻 맞힘 {rate:.0%} < 90%')
     if dmiss: fails.append(f'위험 놓침 {dmiss}')
