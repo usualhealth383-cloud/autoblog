@@ -1749,6 +1749,7 @@ main>*:nth-child(2){animation-delay:.04s} main>*:nth-child(3){animation-delay:.0
 .hello-chk .bx svg.i{width:17px;height:17px;stroke-width:2.6}
 .hello-chk.on{border-color:var(--primary);background:var(--tint);color:var(--primary-deep)}
 .hello-chk.on .bx{background:var(--primary);border-color:var(--primary);color:var(--on-primary)}
+.hello-end{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:18px}.hello-end .btn{margin:0;min-height:52px}
 .hello-skip{display:block;width:100%;margin:var(--s5) 0 var(--s4);min-height:52px;border-radius:12px;color:var(--muted);font-size:.9375rem;font-weight:600}
 
 
@@ -6307,7 +6308,8 @@ function vHello(step){
   const dots = `<div class="steps-bar">${[1, 2, 3].map(i => `<i class="${i <= n ? 'on' : ''}"></i>`).join('')}</div>`;
   /* 다섯 언어(10-27) — 첫 화면 작은 알약 */
   const langPick = n === 1 ? `<select class="lang-pill" aria-label="Language" onchange="setLang(this.value)">${[['ko','한국어'],['en','English'],['es','Español'],['ja','日本語'],['zh','简体中文']].map(([k, t]) => `<option value="${k}"${k === LANG ? ' selected' : ''}>${t}</option>`).join('')}</select>` : '';
-  const skip = `<button class="hello-skip" onclick="helloFinish()">나중에 할게요</button>`;
+  /* 10-29 현욱님 — 온보딩 끝에 「로그인 · 계정 만들기」와 「둘러보기」를 같은 크기로(계정을 숨기지 않는다) */
+  const skip = D.meta?.account === true && !srvLoggedIn() ? `<div class="hello-end"><button class="btn line" onclick="helloFinish();go('/login')">${I.user}로그인 · 계정 만들기</button><button class="btn line" onclick="helloFinish()">둘러보기</button></div>` : `<button class="hello-skip" onclick="helloFinish()">나중에 할게요</button>`;
   if (n === 1) {
     /* 아이 칸이 꽃이었다 — 어른과 아이 둘로 */
     const ICO3 = { adult:'user', senior:'shield', child:'family' };
