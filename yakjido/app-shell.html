@@ -324,7 +324,7 @@ p{color:var(--body)}
 .brand b{font-size:1.125rem;font-weight:800;letter-spacing:-.02em}
 .brand span{display:block;font-size:.875rem;color:var(--muted);line-height:1.2}
 .acct-btn{flex:none;display:inline-flex;align-items:center;gap:6px;min-height:44px;padding:0 14px;margin-left:10px;border:1px solid var(--hairline);border-radius:99px;background:var(--card);color:var(--primary-deep);font:700 .9375rem inherit}
-@media (max-width:480px){.top .rs-d{display:none}}
+@media (max-width:480px){.top .rs-d{display:none}}@media (max-width:400px){.acct-btn .ab-t{display:none}.acct-btn{width:44px;padding:0;justify-content:center}}.top .brand{min-width:0}
 .acct-btn.on{width:44px;padding:0;justify-content:center;background:var(--primary);color:var(--on-primary)}
 .top .review-stamp{margin-left:auto}
 .review-stamp{display:inline-flex;align-items:center;gap:6px;white-space:nowrap;flex:none;color:var(--primary);font-size:.875rem;font-weight:600}
@@ -8234,7 +8234,7 @@ function srvAgreed(){ try { return (JSON.parse(localStorage.getItem(AGREE_KEY) |
 function srvHasAccount(){ try { return srvLoggedIn() || !!(window.서버 && 서버.상태 && (서버.상태() || {}).email); } catch (e) { return false; } }
 function acctMail(){ try { const s = window.서버?.세션?.(); if (s) return s.user?.email || ''; const k = Object.keys(localStorage).find(k => /^sb-.+-auth-token$/.test(k)); return k ? JSON.parse(localStorage[k])?.user?.email || '' : ''; } catch (e) { return ''; } }
 const acctBtn = () => { if (D.meta?.account !== true) return ''; const m = acctMail();
-  return `<button type="button" class="acct-btn${m ? ' on' : ''}" ${m ? `aria-label="계정 ${esc(m)}"` : ''} onclick="go('/login')">${m ? esc(m[0].toUpperCase()) : I.user + '로그인'}</button>`; };
+  return `<button type="button" class="acct-btn${m ? ' on' : ''}" aria-label="${m ? `계정 ${esc(m)}` : '로그인'}" onclick="go('/login')">${m ? esc(m[0].toUpperCase()) : I.user + '<span class="ab-t">로그인</span>'}</button>`; };
 function srvLoggedIn(){ try { return !!(window.서버 && 서버.세션 && 서버.세션()); } catch (e) { return false; } }
 /* 서버 부품(약 30 KB)은 srv.js 로 따로 받는다 — index.html 첫 화면 예산(압축 220 KB) 때문. 받기 전엔 계정 칸이 「불러오는 중」이다. */
 /* 「어디에 저장되나요」 한 줄 — 로그인해 동의했으면 사실대로 서버도 말한다 */
