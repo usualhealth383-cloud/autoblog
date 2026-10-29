@@ -1730,6 +1730,8 @@ function 동의그리기(){
   const w = document.getElementById('csWhy'); if (w) w.hidden = both;
 }
 window.동의누름 = k => { const C = 동의칸; if (k === 'all') { const v = C.terms && C.privacy ? 0 : 1; C.terms = C.privacy = v; } else C[k] = C[k] ? 0 : 1; 동의그리기(); };
+/* 10-29 「첫 진입 동의 벽 금지」 — 체크박스 대신 단추 한 번으로 두 필수 동의 */
+window.동의한번 = () => { 동의칸.terms = 동의칸.privacy = 1; window.동의하기(); };
 window.동의하기 = () => {
   if (!(동의칸.terms && 동의칸.privacy)) return;
   try { localStorage.setItem(CONSENT_KEY, JSON.stringify({ v: CONSENT_VER, at: dayKey(new Date()), terms: 1, privacy: 1 })); } catch (e) {}
@@ -1755,23 +1757,22 @@ window.문_consent = () => {
     <li>${I.shield}<span>드시는 약끼리 성분이 겹치거나 함께 드시면 안 되는 조합을 살펴 드려요.</span></li>
     <li>${I.heart}<span>진단·처방을 대신하지 않아요. 급하면 119, 그리고 의사·약사와 상의하세요.</span></li>
   </ul>
-  <h2 class="cs-h">시작하기 전에 동의를 받아요</h2>
-  <button type="button" class="cs-row cs-all" role="checkbox" aria-checked="${both ? 'true' : (동의칸.terms || 동의칸.privacy) ? 'mixed' : 'false'}" onclick="동의누름('all')"><span class="cs-bx">${I.check}</span><span class="cs-tx"><b>모두 동의해요</b><span>아래 필수 두 가지를 한 번에 체크해요</span></span></button>
-  ${동의줄('terms', '이용약관', '의료기기가 아니에요. 약 정보를 드리고 기록을 도와요. 약을 고르고 드시는 결정은 의사·약사와 함께 하세요.', [
-    '약 설명은 <b>식약처 허가 설명서</b>가 기본이에요. 해외 지침이나 진료실 관행이 다르면 둘 다 보여 드려요.',
+  <p class="cs-sum">의료기기가 아니에요 · 기록은 먼저 이 휴대폰에 저장돼요 · 광고·분석에 쓰지 않아요</p>
+  <button type="button" class="door-go" id="csGo" onclick="동의한번()">${다시 ? '약관·처리방침에 동의하고 계속' : '약관·처리방침에 동의하고 시작'}</button>
+  <details class="cs-more cs-detail"><summary>자세히 — 무엇에 동의하나요${I.chev}</summary>
+    <h3>이용약관</h3><p>의료기기가 아니에요. 약 정보를 드리고 기록을 도와요. 약을 고르고 드시는 결정은 의사·약사와 함께 하세요.</p><ul>${['약 설명은 <b>식약처 허가 설명서</b>가 기본이에요. 해외 지침이나 진료실 관행이 다르면 둘 다 보여 드려요.',
     '위험 신호가 있으면 약보다 진료가 먼저예요. 급하면 119예요.',
     '약을 팔거나 건네지 않아요. 약은 약국에서 약사와 상의해 사세요.',
     '계정은 고르실 수 있고, 만 14세 이상만 만들 수 있어요.',
-    '지금은 돈을 내는 기능이 없어요. 생기면 요금과 해지·환불 조건을 미리 알리고 따로 동의를 받아요.'], '약관 전문 보기')}
-  ${동의줄('privacy', '개인정보 처리방침', '드시는 약·기록·몸 상태는 먼저 쓰시는 휴대폰에 저장되고, 광고·분석에 쓰지 않아요. 계정을 만들고 따로 동의하실 때만 메디나눔 서버(서울)에 복사돼요.', [
-    '로그인하지 않고도 대부분의 기능을 쓰실 수 있어요.',
+    '지금은 돈을 내는 기능이 없어요. 생기면 요금과 해지·환불 조건을 미리 알리고 따로 동의를 받아요.'].map(x => `<li>${x}</li>`).join('')}</ul><button type="button" class="cs-doc" onclick="go('/doc/terms')">약관 전문 보기${I.chev}</button>
+    <h3>개인정보 처리방침</h3><p>드시는 약·기록·몸 상태는 먼저 쓰시는 휴대폰에 저장되고, 광고·분석에 쓰지 않아요. 계정을 만들고 따로 동의하실 때만 메디나눔 서버(서울)에 복사돼요.</p><ul>${['로그인하지 않고도 대부분의 기능을 쓰실 수 있어요.',
     '광고나 이용자 분석 도구를 넣게 되면 먼저 알려요.',
     '서버 저장은 계정을 만들 때 「서버에 저장하기」에 따로 동의하셔야 해요. 거두시면 서버 기록을 바로 지워요.',
     '「부모님께 보내기」를 링크로 보내실 때만 고른 약 목록·호칭·메모가 7일 동안 서버에 머문 뒤 지워져요.',
     '약 사진은 휴대폰 안에서 글자를 읽는 데만 쓰고 보내지 않아요.',
-    '기록은 내 정보 → 설정에서 언제든 지우실 수 있어요.'], '전문 보기')}
-  <button type="button" class="door-go" id="csGo" onclick="동의하기()"${both ? '' : ' disabled'} aria-describedby="csWhy">${다시 ? '동의하고 계속하기' : '동의하고 시작하기'}</button>
-  <p class="door-why" id="csWhy"${both ? ' hidden' : ''}>필수 두 가지에 체크하시면 눌려요</p>
+    '기록은 내 정보 → 설정에서 언제든 지우실 수 있어요.'].map(x => `<li>${x}</li>`).join('')}</ul><button type="button" class="cs-doc" onclick="go('/doc/privacy')">전문 보기${I.chev}</button>
+    <p class="cs-note">건강에 관한 기록을 서버에 저장하는 것은 계정을 만들 때 따로 여쭤요.</p>
+  </details>
   <p class="cs-foot">동의 내용은 설정 → 약관·개인정보에서 언제든 다시 보실 수 있어요 · 약지도 v${esc(D.meta?.version || '')}</p>
 </div>`;
 };
@@ -1850,11 +1851,11 @@ try { const css = document.createElement('style'); css.textContent = `
 .door{max-width:560px;margin:0 auto;padding:4px 0 32px}
 .door-mark{display:block;width:64px;height:64px;border-radius:18px;margin:12px auto 14px;box-shadow:0 6px 18px rgba(var(--primary-rgb),.18)}
 .door h1{text-align:center;font-size:1.625rem;line-height:1.35}
-.door-s{text-align:center;color:var(--muted);margin-top:6px;font-size:.9375rem}
+.door-s{text-align:center;color:var(--muted);margin-top:6px;font-size:1rem}
 .cs-new{display:flex;gap:10px;align-items:flex-start;margin-top:18px;padding:12px 14px;border-radius:12px;background:var(--accent-tint);color:var(--accent-text);font-size:.9375rem;font-weight:600;line-height:1.55}
 .cs-new svg.i{margin-top:2px}
 .cs-list{list-style:none;margin:20px 0 0;padding:2px 16px;background:var(--card);border:1px solid var(--hairline);border-radius:var(--r-card);box-shadow:var(--shadow-card)}
-.cs-list li{display:flex;gap:12px;align-items:flex-start;padding:13px 0;line-height:1.6;color:var(--body);font-size:.9375rem}
+.cs-list li{display:flex;gap:12px;align-items:flex-start;padding:13px 0;line-height:1.6;color:var(--body);font-size:1rem}
 .cs-list li+li{border-top:1px solid var(--hairline)}
 .cs-list svg.i{margin-top:2px;color:var(--primary)}
 .cs-h{font-size:1.0625rem;font-weight:800;margin:28px 2px 10px}
@@ -1883,6 +1884,7 @@ try { const css = document.createElement('style'); css.textContent = `
 .door-go:disabled{background:var(--tint2);color:var(--muted);box-shadow:none;border:1.5px dashed var(--ui-line);cursor:not-allowed}
 .door-why{margin-top:8px;text-align:center;font-size:.875rem;color:var(--muted)}
 .door-why[hidden],.door-msg[hidden]{display:none}
+.cs-sum{margin-top:18px;text-align:center;font-size:1rem;line-height:1.6;color:var(--body)}.cs-detail{margin-top:10px;padding:0}.cs-detail>summary{min-height:48px;justify-content:center;width:100%;font-size:1rem}.cs-detail h3{font-size:1.0625rem;margin:16px 0 4px}.cs-detail p,.cs-detail li{font-size:1rem;line-height:1.65}.cs-detail ul{padding-left:1.1em;margin:6px 0}.cs-note{margin-top:14px;color:var(--muted)}
 .cs-foot{margin-top:18px;text-align:center;font-size:.875rem;color:var(--muted);line-height:1.6}
 .cs-foot .cs-doc{font-size:.875rem}
 .lg h1{font-size:1.5rem}
