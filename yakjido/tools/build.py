@@ -103,7 +103,8 @@ if not (pub / 'kpic.json').exists(): (pub / 'kpic.json').write_text('{}', encodi
 # 파일이 없으면 D.art 목록에 안 들어가서 화면에 빈 자리도 안 생긴다.
 ART_NAMES = ['hero-home', 'guide-1-where', 'guide-2-pharmacy', 'guide-3-take', 'photo-guide',
              'pill-search', 'schedule', 'supp-label', 'kids-dose', 'easy-mode',
-             'me-safety', 'tips', 'empty-search']
+             'me-safety', 'tips', 'empty-search',
+             'empty-bag', 'done-today']   # 10-28 현욱님이 그려 주실 두 장(빈 화면 · 다 드신 순간) — 넣으면 바로 뜬다
 artsrc = ROOT / 'art'
 artdst = ROOT.parent / 'docs' / 'yakjido' / 'art'
 MAXW = {'easy-mode': 300}                  # 88px 원형이라 작게, 나머지는 900px 이면 2배 화면까지 충분
@@ -191,6 +192,17 @@ def _mnx():
     (ROOT.parent / 'docs' / 'yakjido' / 'medinanum-search.json').write_text(o, encoding='utf-8')
     print(f'통합 찾기 목록 {len(H)}개 · {len(o.encode()) // 1024} KB')
 _mnx()
+# 다섯 언어 사전(10-27) — yakjido/i18n/<lang>.json → docs/yakjido/data/i18n/<lang>.json (한국어·한국이면 받지 않음)
+_i18 = ROOT.parent / 'docs' / 'yakjido' / 'data' / 'i18n'; _i18.mkdir(parents=True, exist_ok=True)
+for _f in sorted((ROOT / 'i18n').glob('[a-z][a-z].json')) if (ROOT / 'i18n').exists() else []:
+    _d = json.loads(_f.read_text(encoding='utf-8'))
+    # 안 보이는 찾는 말(seo.json · 10-27 Main) — 그 언어로 검색할 때만 쓰는 숨은 태그(번역 이름이 「発熱」「发烧」 같은 말과 달라도 찾게)
+    _sp = ROOT / 'seo.json'
+    if _sp.exists():
+        for _k, _v in json.loads(_sp.read_text(encoding='utf-8')).items():
+            _kind, _id = _k.split(':', 1); _w = (_v.get('찾는말') or {}).get(_f.stem)
+            if _w and _kind == 'sym': _d.setdefault('sym', {}).setdefault(_id, {})['find'] = _w
+    (_i18 / _f.name).write_text(json.dumps(_d, ensure_ascii=False, separators=(',', ':')), encoding='utf-8')
 jc = json.dumps(core, ensure_ascii=False, separators=(',', ':'))
 j = json.dumps(inline, ensure_ascii=False, separators=(',', ':')).replace('</', '<\\/')
 # 10-21 검수자가 판을 구분하도록 한국 시각 날짜·시:분(컨테이너는 UTC 라 하루 늦게 찍혔다)
@@ -244,6 +256,76 @@ pages.mkdir(parents=True, exist_ok=True)
 (pages / 'data' / 'core.json').write_text(jc, encoding='utf-8')
 (pages / 'data' / 'detail.json').write_text(jd, encoding='utf-8')
 print(f'첫 화면 {len(out)/1024:.0f} KB · 본문 data/core.json {len(jc)/1024:.0f} KB')
+# 기내 모드(10-27) — 받아 둘 파일 목록·크기(설정 「기내에서 쓰기」가 읽는다)
+_dd = ROOT.parent / 'docs' / 'yakjido' / 'data'
+_off = [{'n': f.name, 'b': f.stat().st_size} for f in sorted(_dd.glob('*.json')) if f.name != 'offline.json']
+_off_i = [{'n': f.name, 'b': f.stat().st_size} for f in sorted((_dd / 'i18n').glob('*.json'))] if (_dd / 'i18n').exists() else []
+_off_x = [{'n': str(f.relative_to(ROOT)), 'b': f.stat().st_size} for _d in ('fonts', 'vendor') if (ROOT / _d).exists() for f in sorted((ROOT / _d).rglob('*')) if f.is_file()]
+(_dd / 'offline.json').write_text(json.dumps({'data': _off, 'i18n': _off_i, 'ext': _off_x}, ensure_ascii=False, separators=(',', ':')), encoding='utf-8')
+# 찾아오기(10-27 Main · 요청서 20261027_찾아오기_중국) — medinanum.com 짧은 판 재료. 화면엔 안 보임. seo.json(검색제목·검색설명·찾는말 다섯 언어) + 글 첫 단락·할 일·이럴 땐 바로·주소·출처
+def _seo():
+    import re as _re
+    sp = ROOT / 'seo.json'   # content/ 밖 — content/*.json 은 첫 화면에 실린다
+    if not sp.exists(): return
+    seo = json.loads(sp.read_text(encoding='utf-8'))
+    plain = lambda t: _re.sub(r'\s+', ' ', _re.sub(r'\*\*|<[^>]+>', '', str(t or ''))).strip()
+    def cut(t, n):   # 문장 끝에서 자른다(한 문장이 넘치면 비움 — 말을 중간에 끊지 않는다)
+        t = plain(t); out = ''
+        for m in _re.finditer(r'[^.!?。？！]+(?:[.!?。？！]["”’」)]*)?', t):
+            if len(out + m.group(0)) > n: break
+            out += m.group(0)
+        return out.strip()
+    act = lambda t: bool(_re.search(r'(세요|마세요|두세요|하세요)[.!]?$', t))   # 할일 = 이용자가 지금 할 행동(동사로 끝남) — 설명 문장(「도움이 돼요」)은 넣지 않는다(10-27 Main)
+    first = lambda t: (_re.match(r'[^.!?。？！]+(?:[.!?。？！]["”’」)]*)?', plain(t)) or [''])[0].strip()
+    srcs = {}
+    for f in sorted((ROOT / 'content').glob('sources*.json')): srcs.update(json.loads(f.read_text(encoding='utf-8')))
+    def src1(ids):
+        ids = [x for x in (ids or []) if x in srcs]
+        g = [x for x in ids if '지침' in srcs[x].get('type', '')] or ids
+        return _re.sub(r'\s*\(.*?\)\s*$', '', srcs[g[0]]['label']).strip() if g else ''
+    syms = {}
+    for f in sorted((ROOT / 'content').glob('symptoms*.json')):
+        v = json.loads(f.read_text(encoding='utf-8')); v = v if isinstance(v, list) else v.get('symptoms', [])
+        for x in v: syms.setdefault(x['id'], {}).update(x)
+    rx = json.loads((ROOT / 'rxguide.json').read_text(encoding='utf-8')).get('guides', {})
+    dicts = {L: json.loads((ROOT / 'i18n' / f'{L}.json').read_text(encoding='utf-8')) for L in ('en', 'es', 'ja', 'zh') if (ROOT / 'i18n' / f'{L}.json').exists()}
+    for L in ('ko', 'en', 'es', 'ja', 'zh'):
+        out = {}
+        for key, v in seo.items():
+            kind, gid = key.split(':', 1)
+            if L not in v.get('검색제목', {}): continue
+            e = {'검색제목': v['검색제목'][L], '검색설명': v['검색설명'][L], '찾는말': v.get('찾는말', {}).get(L, [])[:10]}
+            T = dicts.get(L, {})
+            if kind == 'sym' and gid in syms:
+                s0 = syms[gid]; t = T.get('sym', {}).get(gid, {})
+                e['첫단락'] = cut(s0.get('lead'), 200) if L == 'ko' else cut(t.get('short', ''), 200)
+                # 증상의 먹는 법 줄은 뒤 문장이 조건·예외(「설명서는 함께 먹지 말라고 해요」)라 첫 문장만 떼면 위험 — 한 줄 전체가 40자 안인 것만
+                # 먹는 법(how) 다음 스스로 돌보기(selfcare) — 한 줄 전체가 행동 문장인 것만(조건 문장이 잘리지 않게)
+                e['할일'] = list(dict.fromkeys(plain(h) for h in (s0.get('how') or []) + (s0.get('selfcare') or []) if 0 < len(plain(h)) <= 40 and act(plain(h))))[:3] if L == 'ko' else []
+                er = (s0.get('care') or {}).get('er') or []
+                e['바로'] = plain(er[0]) if L == 'ko' and er else plain((t.get('er') or [''])[0])
+                if L == 'ko' and e['바로'] and '119' not in e['바로']: e['바로'] += ' → 바로 119'
+                e['주소'] = '#/symptom/' + gid; e['출처'] = src1(s0.get('sources'))
+            elif kind == 'rx' and gid in rx:
+                g = rx[gid]; t = T.get('rx', {}).get(gid, {})
+                e['첫단락'] = cut(g.get('lead'), 200) if L == 'ko' else cut(t.get('lead', ''), 200)
+                ko_do = [first(o.get('t')) for o in g.get('do', [])]; ok_i = [i for i, h in enumerate(ko_do) if 0 < len(h) <= 40 and act(h)][:3]   # 다른 언어는 한국어에서 고른 같은 줄만
+                tr_do = t.get('do') or []
+                e['할일'] = [ko_do[i] for i in ok_i] if L == 'ko' else [first(tr_do[i]) for i in ok_i if i < len(tr_do) and first(tr_do[i])]
+                if L == 'ko' and len(e['할일']) < 2:   # 하나뿐이면 같은 줄들의 뒷문장에서 스스로 선 행동 문장을 더 찾는다(10-27 Main) — 없으면 그대로
+                    for o in g.get('do', []):
+                        for m in list(_re.finditer(r'[^.!?。？！]+(?:[.!?。？！]["”’」)]*)?', plain(o.get('t'))))[1:]:
+                            h = m.group(0).strip()
+                            if 0 < len(h) <= 40 and act(h) and h not in e['할일'] and len(e['할일']) < 3: e['할일'].append(h)
+                ers = [o.get('t') for o in g.get('er', [])] if L == 'ko' else (t.get('er') or [])
+                e['바로'] = plain(ers[0]) if ers else ''
+                e['주소'] = '#/rx/' + gid; e['출처'] = src1(g.get('src'))
+            else: continue
+            e['할일'] = [h for h in e['할일'] if h not in e.get('첫단락', '') and h not in e.get('바로', '')]   # 첫단락·바로와 겹치지 않게
+            out[key] = e
+        if out: (pages / f'medinanum-seo.{L}.json').write_text(json.dumps(out, ensure_ascii=False, indent=1), encoding='utf-8')
+    print('찾아오기 medinanum-seo:', len(seo), '편')
+_seo()
 # 서비스워커 캐시 이름 = 배포 파일 내용의 해시 — 내용이 같으면 같은 이름(파이썬 hash() 는 실행마다 달라 매번 바뀌던 것, 2026-10-13)
 _srvjs = (ROOT / 'srv.js').read_text(encoding='utf-8') if (ROOT / 'srv.js').exists() else ''
 _srvjs += (ROOT / 'find.js').read_text(encoding='utf-8') if (ROOT / 'find.js').exists() else ''   # 찾기 부품도 바뀌면 캐시 이름이 바뀌게(10-14)
@@ -253,7 +335,11 @@ sw = ROOT / 'sw.js'
 if sw.exists():
     s = re.sub(r"const CACHE = '[^']*'", f"const CACHE = 'yakjido-{stamp.replace(' ', 'T')}-{cache_id}'", sw.read_text(encoding='utf-8'))
     (pages / 'sw.js').write_text(s, encoding='utf-8')
-for name in ('manifest.webmanifest', 'privacy.html', 'terms.html', 'delete-account.html', 'srv.js', 'find.js'):   # terms.html = 약지도 이용약관(첫 동의 화면·설정에서 앱 안으로 읽음, 10-14)   # find.js = 공용 찾기 부품 + 약지도 쪽(검색을 처음 쓸 때 받음, Z8)
+# 바깥 파일 0(10-27 · 중국·인터넷 막힌 곳) — 글꼴(Pretendard 부분 글꼴 92조각, SIL OFL)·로그인 프로그램(supabase-js)을 배포 묶음 안에
+import shutil as _sh
+for _d in ('fonts', 'vendor'):
+    if (ROOT / _d).exists(): _sh.copytree(ROOT / _d, pages / _d, dirs_exist_ok=True)
+for name in ('manifest.webmanifest', 'privacy.html', 'terms.html', 'delete-account.html', 'srv.js', 'find.js', 'i18n.js'):   # terms.html = 약지도 이용약관(첫 동의 화면·설정에서 앱 안으로 읽음, 10-14)   # find.js = 공용 찾기 부품 + 약지도 쪽(검색을 처음 쓸 때 받음, Z8)
     # delete-account.html = 스토어 「계정 삭제 URL」(메디나눔 안내 2026-10-13)   # srv.js = 계정·기록 이어 두기(따로 받는 파일)   # privacy.html = 스토어에 적는 개인정보처리방침 주소
     src = ROOT / name
     if src.exists():

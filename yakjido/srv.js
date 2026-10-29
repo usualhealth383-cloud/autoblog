@@ -17,7 +17,7 @@
   /* 2026-10-13 상용화 점검 1-23 — 판을 못 박고 무결성(SRI) 값을 단다. CDN 이 바뀐 파일을 주면 브라우저가 실행하지 않는다(로그인 칸만 「잠시 문제」).
      .min.js 는 jsDelivr 가 그때그때 만드는 파일이라 SRI 를 쓰면 안 된다 — npm 묶음에 든 그대로의 supabase.js(110 KB)를 쓴다.
      판을 올릴 때: curl 로 받아 `openssl dgst -sha384 -binary | openssl base64 -A` 값으로 LIB_SRI 를 함께 바꾼다. */
-  var LIB = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js';
+  var LIB = 'vendor/supabase.js';   /* 바깥 파일 0(10-27) — 배포 묶음 안의 supabase-js 2.45.4 */
   var LIB_SRI = 'sha384-0w2KAL2YHP6wKOkUDzkCDGgVvfmHnj02DHeQ6XcHOgTfFsGyonKOpShMH1x6nk9o';
   var 설정 = { app: 'app', 열쇠: /^$/, 다시그리기: null, 준비됨: true };
   var sb = null, 준비중 = null, 세션 = null, 동기화중 = false;
@@ -273,6 +273,7 @@
       : '체험이 끝났어요 · 결제는 아직 붙기 전이라 요금이 나가지 않아요';
     return '<div class="srvrow"><b>이용권</b><span>' + t + '</span></div>';
   }
+  window.이용권줄HTML = function () { try { return 이용권줄(); } catch (e) { return ''; } };
   function 화면갱신() { var el = document.getElementById('srvbox'); if (el) el.outerHTML = (el.getAttribute('data-door') && window.계정문HTML) ? window.계정문HTML() : window.계정화면HTML(); }   /* 10-14 로그인 문은 그 모양 그대로 */
 
   window.계정화면HTML = function () {
@@ -339,7 +340,7 @@
   };
   window.계정문확인 = function () {
     var b = document.getElementById('srvDoorGo'), w = document.getElementById('doorWhy'); if (!b) return;
-    var a = document.getElementById('srvAge'), g = document.getElementById('srvAgree'), 막 = !!((a && !a.checked) || (g && !g.checked));
+    var g = document.getElementById('srvAgree'), 막 = !!(g && !g.checked);
     b.disabled = 막; if (w) w.hidden = !막;
   };
   window.계정문동작 = function (what) {
@@ -374,21 +375,22 @@
     }
     var 가입 = 문탭 === 'signup', 동의됨 = 서버허용(), 소셜 = [], 항목 = window.계정항목 || {};
     try { 소셜 = (typeof window.소셜켜짐 === 'function' && window.소셜켜짐()) || []; } catch (e) { 소셜 = []; }
-    h += '<div class="door-seg" role="tablist" aria-label="로그인 또는 회원가입">' + ['login', 'signup'].map(function (k) { var on = (k === 'signup') === 가입;
-      return '<button type="button" role="tab" aria-selected="' + on + '"' + (on ? ' class="on"' : '') + ' onclick="계정문탭(\'' + k + '\')">' + (k === 'login' ? '로그인' : '회원가입') + '</button>'; }).join('') + '</div>';
+    /* 2026-10-29 현욱님 — 로그인/회원가입 갈림 없이 「메일로 계속하기」 하나: 계정이 있으면 로그인, 처음이면 그 자리에서 만든다 */
+    가입 = false;
     if (소셜.length) h += '<div class="door-social">' + 소셜.map(function (x, i) { return '<button type="button" onclick="소셜켜짐()[' + i + '].열기()">' + 글자안전(x.n) + '로 계속하기</button>'; }).join('') + '</div><p class="door-or"><span>또는 이메일로</span></p>';
     h += '<label class="door-f" for="srvEmail">이메일</label><input id="srvEmail" type="email" inputmode="email" autocomplete="email" autocapitalize="off" spellcheck="false" enterkeyhint="next" value="' + 글자안전(st.email || '') + '">'
-      + 비번칸('srvPw', '비밀번호' + (가입 ? ' <small>6자 이상</small>' : ''), 가입 ? 'new-password' : 'current-password', 'go');
+      + 비번칸('srvPw', '비밀번호 <small>처음이면 새로 정할 비밀번호 · 6자 이상</small>', 'current-password', 'go');
+    if (설정.가입확인) h += '<label class="door-ck"><input id="srvAge" type="checkbox" onchange="this.dataset.at=this.checked?new Date().toISOString():\'\'"><span><b>' + 글자안전(설정.가입확인.글) + ' <em class="door-tag">처음 만들 때 필수</em></b>' + (설정.가입확인.설명 ? '<small>' + 글자안전(설정.가입확인.설명) + '</small>' : '') + '</span></label>';
     if (가입 && 설정.가입확인) h += '<label class="door-ck"><input id="srvAge" type="checkbox" onchange="this.dataset.at=this.checked?new Date().toISOString():\'\';계정문확인()"><span><b>' + 글자안전(설정.가입확인.글) + ' <em class="door-tag">필수</em></b>' + (설정.가입확인.설명 ? '<small>' + 글자안전(설정.가입확인.설명) + '</small>' : '') + '</span></label>';
     if (!동의됨) h += '<label class="door-ck"><input id="srvAgree" type="checkbox" onchange="계정문확인()"><span><b>「서버에 저장하기」에 동의해요 <em class="door-tag">필수</em></b><small>건강에 관한 민감정보라 따로 여쭤요. 로그인하시면 이 휴대폰의 기록이 계정으로 이어져요.</small></span></label>'
       + '<details class="door-more"><summary>무엇이 올라가나요<svg class="i chev" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></summary><dl>'
       + '<dt>올라가는 것</dt><dd>' + 글자안전(항목.ko || '약지도 기록') + '</dd><dt>어디에</dt><dd>메디나눔 서버(Supabase, 서울)</dd><dt>왜</dt><dd>폰을 바꿔도 이어 보려고</dd>'
       + '<dt>언제까지</dt><dd>계정을 지우실 때까지 — 동의를 거두시면 서버 기록을 바로 지워요</dd></dl><p>동의하지 않으셔도 되고, 동의하지 않아도 약지도는 이 휴대폰에서 그대로 쓰실 수 있어요. 보기 설정과 날씨는 올라가지 않아요.</p></details>';
-    var 막힘 = (가입 && !!설정.가입확인) || !동의됨;
-    h += 말칸 + '<button type="button" id="srvDoorGo" class="door-go" onclick="계정문동작()"' + (막힘 ? ' disabled aria-describedby="doorWhy"' : '') + '>' + (가입 ? '계정 만들기' : '로그인') + '</button>'
+    var 막힘 = !동의됨;
+    h += 말칸 + '<button type="button" id="srvDoorGo" class="door-go" onclick="계정문동작(\'continue\')"' + (막힘 ? ' disabled aria-describedby="doorWhy"' : '') + '>메일로 계속하기</button>'
       + (막힘 ? '<p id="doorWhy" class="door-why">필수에 체크하시면 눌려요</p>' : '')
-      + (가입 ? '<p class="door-note">계정을 만들면 메일함에 확인 링크가 가요. 한 번 누르면 끝이에요.</p>'
-              : '<button type="button" class="srvlink door-forgot" onclick="계정문동작(\'reset\')">비밀번호를 잊으셨나요?</button>');
+      + '<p class="door-note">계정이 있으면 로그인하고, 처음이면 계정을 만들어요. 새로 만들면 메일함에 확인 링크가 가요 — 한 번 누르면 끝이에요.</p>'
+      + '<button type="button" class="srvlink door-forgot" onclick="계정문동작(\'reset\')">비밀번호를 잊으셨나요?</button>';
     return h + '</div>';
   };
   /* 다른 화면에서 왔으면 지난 글 칸을 비운다 */
@@ -463,6 +465,22 @@
       /* 2026-10-13 상용화 점검 2-08/2-19 — 만 14세 확인을 «언제» 했는지 계정 기록(user_metadata)에 남긴다(처리방침 1항: 가입 앱·만 14세 확인 시각).
          가입확인을 쓰지 않는 앱이면 app 만 넣는다. 비밀 값은 없다. */
       var 가입표 = { app: 설정.app }; if (설정.가입확인) { var ag = document.getElementById('srvAge'); 가입표.age14_at = (ag && ag.dataset && ag.dataset.at) || new Date().toISOString(); }
+      /* 2026-10-29 「메일로 계속하기」 — 먼저 로그인해 보고, 맞는 계정이 없으면 그 자리에서 만든다.
+         Supabase 는 「없는 메일」과 「틀린 비밀번호」를 같은 말로 돌려주므로, 만들기를 시도해 이미 있는 메일이면(identities 가 빈 배열) 비밀번호 문제로 알린다. */
+      if (what === 'continue') return sb.auth.signInWithPassword({ email: email, password: pw }).then(function (r) {
+        if (!r.error) { 세션 = r.data.session; 알림('로그인했어요. 기록을 맞추는 중이에요…'); 화면갱신(); return; }
+        if (!/invalid login credentials/i.test(String(r.error.message || ''))) throw r.error;
+        var ag = document.getElementById('srvAge');
+        if (설정.가입확인 && !(ag && ag.checked)) { 알림('비밀번호가 맞지 않거나 처음 쓰시는 메일이에요. 처음이시면 「' + 설정.가입확인.글 + '」에 체크하고 다시 눌러 주세요. 계정이 있으시면 「비밀번호를 잊으셨나요?」를 눌러 주세요.'); return; }
+        if (설정.가입확인 && typeof 설정.가입확인.기록 === 'function') { try { 설정.가입확인.기록(); } catch (e) {} }
+        return sb.auth.signUp(앱주소() ? { email: email, password: pw, options: { emailRedirectTo: 앱주소(), data: 가입표 } } : { email: email, password: pw, options: { data: 가입표 } }).then(function (r2) {
+          if (r2.error) throw r2.error;
+          var u = r2.data && r2.data.user;
+          if (u && Array.isArray(u.identities) && u.identities.length === 0) { 알림('이미 있는 계정이에요. 비밀번호를 다시 확인하시거나 「비밀번호를 잊으셨나요?」를 눌러 주세요.'); return; }
+          if (r2.data && r2.data.session) { 세션 = r2.data.session; 알림('처음 쓰시는 메일이라 계정을 만들었어요. 기록을 올리는 중이에요…'); 화면갱신(); }
+          else 알림('처음 쓰시는 메일이라 계정을 만들었어요. 메일함의 확인 링크를 누르신 뒤 다시 「메일로 계속하기」를 눌러 주세요.');
+        });
+      });
       if (what === 'signup') return sb.auth.signUp(앱주소() ? { email: email, password: pw, options: { emailRedirectTo: 앱주소(), data: 가입표 } } : { email: email, password: pw, options: { data: 가입표 } }).then(function (r) {
         if (r.error) throw r.error;
         if (r.data && r.data.session) { 세션 = r.data.session; 알림('계정을 만들었어요. 기록을 올리는 중이에요…'); 화면갱신(); }
@@ -1280,6 +1298,402 @@ try {
     로그인열기: function () { go('/login'); },
     바뀜: function () { try { if (/^#\/me/.test(location.hash)) route(); } catch (e) {} } });
 } catch (e) {}
+/* 다섯 언어(10-27) — 설정의 언어·나라 칸. 언어를 바꾸면 다시 연다. 나라는 응급·위기 번호를 고른다(요청서 표) */
+window.언어칸 = function () {
+  var LN = [['ko', '한국어'], ['en', 'English'], ['es', 'Español'], ['ja', '日本語'], ['zh', '简体中文']];
+  var CN = [['KR', '한국 · 119'], ['US', 'USA · 911'], ['ES', 'España · 112'], ['JP', '日本 · 119'], ['CN', '中国 · 120']];
+  var b = function (on, js, t) { return '<button type="button" class="' + (on ? 'on' : '') + '" aria-pressed="' + on + '" onclick="' + js + '">' + t + '</button>'; };
+  return '<section class="sec card" style="margin-top:16px"><h2>언어 · Language</h2><div class="fs-seg lang-seg" role="group" aria-label="언어" style="flex-wrap:wrap">' + LN.map(function (x) { return b(window.LANG === x[0], "setLang('" + x[0] + "')", x[1]); }).join('') + '</div>' +
+    '<p class="small muted" style="margin-top:10px">사는 나라 · Country — 응급 번호</p><div class="fs-seg lang-seg" role="group" aria-label="나라" style="flex-wrap:wrap">' + CN.map(function (x) { return b(window.CC === x[0], "setLang(window.LANG,'" + x[0] + "')", x[1]); }).join('') + '</div></section>';
+};
+/* ▼▼ 대화 부품 시작 ▼▼ */
+/* ═══ 메디나눔 대화 부품 — AI 없이 «대화하는 느낌» (2026-10-27 Main · 요청서 docs/requests/20261027_메디나눔_전앱_대화형.md) ═══
+   하는 일 두 가지(모두 기기 안 — 서버·AI 없음, 기내에서도 됨):
+   ① 이해: 사람이 친 한 문장에서 «값»(체온·나이·몸무게·시간·횟수·약 이름)을 뽑고, 앱이 준 «뜻» 목록 가운데 가장 가까운 것을 고른다.
+      위험 판정은 앱의 기존 함수(설정.위험)를 «맨 먼저» 부른다 — 위험이면 뜻 고르기를 하지 않는다.
+   ② 화면: 말풍선 · 입력 중 점 셋 · 답 칩(2~4개) · 직접 쓰기 · 같은 대화 기억 · 다시 열면 「이어서 할까요?」.
+   쓰는 법:
+     var 봇 = 대화.만들기({
+       앱:'kids', 언어:'ko',
+       뜻:[{ id:'fever', 예문:['애가 열이 나요','열이 39도','몸이 뜨거워요'], 태그:['열','발열','고열'] }, …],
+       약:['타이레놀','아세트아미노펜','이부프로펜','부루펜'],              // 이름 뽑기용(앱이 준다)
+       위험: function(글, 값){ return null 또는 {말:'지금 119 …', 전화:'119'} },   // 앱의 기존 위험 판정
+       처리: function(입력, 상태){ return { 말:['…'], 칩:['예','아니요'], 끝:false } }   // 한 번에 한 질문
+     });
+     봇.붙이기(document.getElementById('chat'));   // 화면 그리기
+     봇.이해('애가 39.2도인데 해열제 먹였어')      // → {값:{체온:39.2, 약:[]}, 뜻:[{id,점수}], 위험:null}
+*/
+(function () {
+  if (window.대화) return;
+  function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
+  function 고름(s) { return String(s || '').toLowerCase().replace(/\s+/g, ''); }
+  var 한수 = { '한': 1, '하나': 1, '두': 2, '둘': 2, '세': 3, '셋': 3, '네': 4, '넷': 4, '다섯': 5, '여섯': 6, '일곱': 7, '여덟': 8, '아홉': 9, '열': 10 };
+  var 날수 = { '하루': 1, '이틀': 2, '사흘': 3, '나흘': 4, '닷새': 5, '엿새': 6, '이레': 7, '열흘': 10 };
+
+  /* ── 값 뽑기 ── 숫자 표기·단위·띄어쓰기 흔들림을 받아 준다. 못 뽑으면 넣지 않는다(짐작 금지). */
+  function 값뽑기(글, 약목록) {
+    var t = String(글 || '').replace(/[，]/g, ',').replace(/℃/g, '도').replace(/°\s*c/gi, '도');
+    var v = {}, m;
+    m = t.match(/(3[4-9]|4[0-3])(?:[.,]([0-9]))?\s*(?:도|度|grados?|degrees?)/i) || t.match(/(?:체온|열|temp|fiebre|熱|体温|发烧|發燒)\D{0,6}(3[4-9]|4[0-3])(?:[.,]([0-9]))?/i);
+    if (m) v.체온 = parseFloat(m[1] + (m[2] ? '.' + m[2] : ''));
+    if ((m = t.match(/(1?[0-9]{2}|[0-9])(?:[.,]([0-9]))?\s*(?:kg|킬로|키로|kilo)/i))) v.몸무게 = parseFloat(m[1] + (m[2] ? '.' + m[2] : ''));
+    if ((m = t.match(/(?:생후\s*)?([0-9]{1,2})\s*(?:개월|달|months?|meses|か月|ヶ月|个月|個月)/i))) v.나이개월 = +m[1];
+    else if ((m = t.match(/(?:만\s*)?([0-9]{1,3})\s*(?:살|세|years?\s*old|años|歳|岁|歲)/i))) v.나이개월 = +m[1] * 12;
+    else if ((m = t.match(/([1-9]0)\s*대/))) v.나이개월 = +m[1] * 12;
+    else if ((m = t.match(/(한|두|세|네|다섯|여섯|일곱|여덟|아홉|열)\s*살/))) v.나이개월 = 한수[m[1]] * 12;
+    if ((m = t.match(/([0-9]{1,2})\s*(?:시간|hours?|horas?|時間|小时|小時)/i))) v.시간 = +m[1];
+    else if ((m = t.match(/([0-9]{1,2})\s*(?:일|days?|días?|日|天)\s*(?:째|전|동안|정도|넘게)?/i)) && !/[0-9]\s*일\s*(?:에|날)/.test(t)) v.시간 = +m[1] * 24;
+    else if ((m = t.match(/(?:^|[\s,])(하루|이틀|사흘|나흘|닷새|엿새|이레|열흘)\s*(?=째|동안|전|넘게|정도|이상|가\s*지|됐|지났|간)/))) v.시간 = 날수[m[1]] * 24;   /* 「하루 세 번」·「타이레놀」 같은 것은 기간이 아니다 */
+    else if (/어제|yesterday|ayer|昨日|昨天/.test(t)) v.시간 = 24;
+    if ((m = t.match(/([0-9]{1,2}|한|두|세|네|다섯)\s*(?:번|회|times|veces|回|次)/i))) v.횟수 = 한수[m[1]] || +m[1];
+    if (약목록 && 약목록.length) {
+      var g = 고름(t), 찾음 = [];
+      약목록.forEach(function (n) { if (n && g.indexOf(고름(n)) >= 0 && 찾음.indexOf(n) < 0) 찾음.push(n); });
+      if (찾음.length) v.약 = 찾음;
+    }
+    return v;
+  }
+
+  /* ── 뜻 고르기 ── 찾기 부품이 있으면 그것으로(띄어쓰기·조사·초성), 없으면 낱말 겹침 */
+  function 뜻색인(뜻) {
+    if (window.찾기 && typeof window.찾기.만들기 === 'function') {
+      try { return window.찾기.만들기({ 항목: 뜻.map(function (d) { return { id: d.id, 제목: (d.예문 || [])[0] || d.id, 별칭: (d.예문 || []).slice(1), 태그: d.태그 || [] }; }) }); } catch (e) {}
+    }
+    return null;
+  }
+  function 뜻고르기(봇, 글) {
+    if (봇.색인) { try { return 봇.색인.찾기(글, { 최대: 3 }).map(function (r) { return { id: r.id, 점수: r.점수 }; }); } catch (e) {} }
+    var g = 고름(글), 결과 = [];
+    봇.설정.뜻.forEach(function (d) {
+      var s = 0; (d.태그 || []).concat(d.예문 || []).forEach(function (w) { if (w && g.indexOf(고름(w)) >= 0) s += 고름(w).length; });
+      if (s) 결과.push({ id: d.id, 점수: s });
+    });
+    return 결과.sort(function (a, b) { return b.점수 - a.점수; }).slice(0, 3);
+  }
+
+  var 기본말 = {
+    ko: { 입력: '편하게 적어 주세요', 보내기: '보내기', 직접: '직접 쓰기', 모름: '제가 아직 그 말을 잘 몰라요. 이렇게 물어보시겠어요?', 이어: '지난번 이야기를 이어서 할까요?', 예: '이어서 할게요', 새: '새로 시작', 생각: '생각하는 중' },
+    en: { 입력: 'Type in your own words', 보내기: 'Send', 직접: 'Type instead', 모름: "I don't know that phrase yet. Could you ask it like one of these?", 이어: 'Pick up where we left off?', 예: 'Continue', 새: 'Start over', 생각: 'Thinking' },
+    es: { 입력: 'Escríbalo con sus palabras', 보내기: 'Enviar', 직접: 'Escribir', 모름: 'Todavía no conozco esa expresión. ¿Puede preguntarlo de una de estas formas?', 이어: '¿Seguimos donde lo dejamos?', 예: 'Seguir', 새: 'Empezar de nuevo', 생각: 'Pensando' },
+    ja: { 입력: 'ご自由に入力してください', 보내기: '送信', 직접: '自分で入力', 모름: 'その言い方はまだよく分かりません。次のように聞いてみてください。', 이어: '前回の続きから話しますか？', 예: '続ける', 새: '最初から', 생각: '考えています' },
+    zh: { 입력: '请用自己的话写下来', 보내기: '发送', 직접: '自己输入', 모름: '我还不太懂这个说法。可以换成下面这样问吗？', 이어: '要接着上次的话题吗？', 예: '继续', 새: '重新开始', 생각: '正在思考' }
+  };
+  var CSS = '.mnc{display:flex;flex-direction:column;gap:8px}.mnc-log{display:flex;flex-direction:column;gap:8px}' +
+    '.mnc-b{max-width:86%;padding:11px 14px;border-radius:18px;line-height:1.55;font-size:calc(15px * var(--fs,1));word-break:keep-all;overflow-wrap:anywhere;white-space:pre-line}' +
+    '.mnc-b.bot{align-self:flex-start;background:var(--card,#F3F4F2);border:1px solid var(--line,rgba(0,0,0,.08));border-bottom-left-radius:6px}' +
+    '.mnc-b.me{align-self:flex-end;background:var(--teal,#1F6F6B);color:#fff;border-bottom-right-radius:6px}' +
+    '.mnc-b.sos{border:2px solid #C0392B;background:#FDECEA;color:#5A1209}.mnc-b.sos a{display:inline-flex;margin-top:8px;min-height:44px;align-items:center;padding:0 16px;border-radius:12px;background:#C0392B;color:#fff;font-weight:800;text-decoration:none}' +
+    '.mnc-dots{align-self:flex-start;display:flex;gap:4px;padding:12px 14px}.mnc-dots i{width:7px;height:7px;border-radius:50%;background:currentColor;opacity:.35;animation:mncd 1s infinite}.mnc-dots i:nth-child(2){animation-delay:.15s}.mnc-dots i:nth-child(3){animation-delay:.3s}' +
+    '@keyframes mncd{50%{opacity:.9;transform:translateY(-3px)}}@media (prefers-reduced-motion:reduce){.mnc-dots i{animation:none}}' +
+    '.mnc-chips{display:flex;flex-wrap:wrap;gap:8px;justify-content:flex-end}.mnc-chips button{min-height:44px;padding:0 16px;border-radius:22px;border:1px solid var(--teal,#1F6F6B);background:transparent;color:inherit;font:inherit;font-size:calc(15px * var(--fs,1))}' +
+    '.mnc-in{display:flex;gap:8px;position:sticky;bottom:0;padding:8px 0;background:var(--surface,#fff)}.mnc-in input{flex:1;min-width:0;font:inherit;font-size:16px;padding:12px 14px;border-radius:22px;border:1px solid var(--line,rgba(0,0,0,.18));background:transparent;color:inherit}' +
+    '.mnc-in button{min-width:48px;min-height:48px;border-radius:24px;border:0;background:var(--teal,#1F6F6B);color:#fff;font:inherit;font-weight:700;padding:0 14px}';
+
+  function 만들기(o) {
+    var 봇 = { 설정: { 앱: '', 언어: 'ko', 뜻: [], 약: [], 위험: null, 처리: null, 말: {}, 기억: true } };
+    for (var k in o) if (Object.prototype.hasOwnProperty.call(o, k)) 봇.설정[k] = o[k];
+    봇.색인 = 뜻색인(봇.설정.뜻 || []);
+    var 열쇠 = '_mnchat_' + (봇.설정.앱 || 'x');
+    function 말(k) { var L = 기본말[봇.설정.언어] || 기본말.ko; return (봇.설정.말 && 봇.설정.말[k]) || L[k] || 기본말.ko[k]; }
+    function 상태읽기() { try { return JSON.parse(localStorage.getItem(열쇠) || 'null'); } catch (e) { return null; } }
+    function 사람말있나(s) { return !!(s && s.기록 && s.기록.some(function (r) { return r[0] === 'me'; })); }
+    function 상태쓰기(s) { if (!봇.설정.기억 || !사람말있나(s)) return; try { localStorage.setItem(열쇠, JSON.stringify(s)); } catch (e) {} }   /* 사람이 한 마디라도 한 뒤부터 기억(첫 인사만으론 저장 안 함 — 약지도 10-27) */
+
+    봇.이해 = function (글) {
+      var 값 = 값뽑기(글, 봇.설정.약), 위 = null;
+      try { if (typeof 봇.설정.위험 === 'function') 위 = 봇.설정.위험(String(글 || ''), 값); } catch (e) { 위 = null; }
+      return { 글: 글, 값: 값, 위험: 위 || null, 뜻: 위 ? [] : 뜻고르기(봇, 글) };
+    };
+
+    봇.붙이기 = function (곳, 첫말) {
+      if (!곳) return;
+      if (!document.getElementById('mnc-css')) { var st = document.createElement('style'); st.id = 'mnc-css'; st.textContent = CSS; document.head.appendChild(st); }
+      곳.innerHTML = '<div class="mnc" role="log" aria-live="polite"><div class="mnc-log"></div><div class="mnc-chips"></div>' +
+        '<form class="mnc-in"><input type="text" enterkeyhint="send" aria-label="' + esc(말('입력')) + '" placeholder="' + esc(말('입력')) + '"><button type="submit" aria-label="' + esc(말('보내기')) + '">' + esc(말('보내기')) + '</button></form></div>';
+      var 로그 = 곳.querySelector('.mnc-log'), 칩칸 = 곳.querySelector('.mnc-chips'), 폼 = 곳.querySelector('form'), 칸 = 곳.querySelector('input');
+      var 상태 = { 값: {}, 단계: 0, 기록: [] };
+      function 풍선(글, 누구, 위험) {
+        var d = document.createElement('div'); d.className = 'mnc-b ' + (누구 === 'me' ? 'me' : 'bot') + (위험 ? ' sos' : '');
+        if (위험) d.innerHTML = esc(위험.말) + (위험.전화 ? '<br><a href="tel:' + esc(위험.전화) + '">' + esc(위험.전화) + '</a>' : '');
+        else d.textContent = 글;
+        로그.appendChild(d); 상태.기록.push([누구, 위험 ? 위험.말 : 글]); if (상태.기록.length > 60) 상태.기록.shift();
+        try { d.scrollIntoView({ block: 'end', behavior: 'smooth' }); } catch (e) {}
+      }
+      function 칩(목록) {
+        칩칸.innerHTML = '';
+        (목록 || []).slice(0, 4).forEach(function (c) {
+          var b = document.createElement('button'); b.type = 'button'; b.textContent = c;
+          b.addEventListener('click', function () { 보냄(c); }); 칩칸.appendChild(b);
+        });
+      }
+      function 봇말(답) {
+        var 줄 = [].concat(답 && 답.말 || []), i = 0;
+        var 점 = document.createElement('div'); 점.className = 'mnc-dots'; 점.setAttribute('aria-label', 말('생각')); 점.innerHTML = '<i></i><i></i><i></i>';
+        function 다음() {
+          if (i >= 줄.length) { 칩(답 && 답.칩); 상태쓰기(상태); return; }
+          로그.appendChild(점);
+          setTimeout(function () { try { 점.remove(); } catch (e) {} 풍선(줄[i++], 'bot'); 다음(); }, Math.min(900, 250 + String(줄[i]).length * 12));
+        }
+        다음();
+      }
+      function 보냄(글) {
+        글 = String(글 || '').trim(); if (!글) return;
+        칩칸.innerHTML = ''; 풍선(글, 'me');
+        var 앎 = 봇.이해(글);
+        for (var k in 앎.값) if (Object.prototype.hasOwnProperty.call(앎.값, k)) 상태.값[k] = 앎.값[k];
+        if (앎.위험) { 풍선('', 'bot', 앎.위험); 상태쓰기(상태); return; }   /* 위험이면 다른 말 없이 안전 안내 먼저 */
+        var 답 = null;
+        try { 답 = typeof 봇.설정.처리 === 'function' ? 봇.설정.처리(앎, 상태) : null; } catch (e) { 답 = null; }
+        if (!답 || !답.말 || !답.말.length) {
+          var 가까운 = (봇.설정.뜻 || []).slice(0, 3).map(function (d) { return (d.예문 || [])[0]; }).filter(Boolean);
+          답 = { 말: [말('모름')], 칩: 가까운 };
+        }
+        봇말(답);
+      }
+      폼.addEventListener('submit', function (ev) { ev.preventDefault(); var v = 칸.value; 칸.value = ''; 보냄(v); });
+      var 지난 = 상태읽기();
+      if (사람말있나(지난)) {
+        봇말({ 말: [말('이어')], 칩: [말('예'), 말('새')] });
+        var 원 = 보냄;
+        보냄 = function (글) {
+          보냄 = 원;
+          if (글 === 말('예')) { 상태 = 지난; 칩칸.innerHTML = ''; 지난.기록.slice(-6).forEach(function (r) { 풍선(r[1], r[0]); }); return; }
+          try { localStorage.removeItem(열쇠); } catch (e) {}
+          칩칸.innerHTML = ''; if (첫말) 봇말(첫말); else return;
+          if (글 !== 말('새')) 원(글);
+        };
+      } else if (첫말) 봇말(첫말);
+      봇.보냄 = function (글) { 보냄(글); };
+      봇.지우기 = function () { try { localStorage.removeItem(열쇠); } catch (e) {} };
+    };
+    return 봇;
+  }
+  window.대화 = { 판: '2026-10-27-1', 만들기: 만들기, 값뽑기: 값뽑기 };
+})();
+/* ▲▲ 대화 부품 끝 ▲▲ */
+
+/* ═══ 약지도 대화(10-27 · 요청서 20261027_메디나눔_전앱_대화형) — AI 없이 «대화하는 느낌». 모두 기기 안(기내에서도 됨).
+   이해·말풍선은 메디나눔 공용 «대화 부품»(위), 뜻·약 이름·위험 판정·답은 여기. 겹침은 «같이 먹어도 되나요» 엔진(ixRun) 그대로 ═══ */
+(function () {
+  var 짧은이름 = function (n) { return String(n || '').replace(/\(.*?\)/g, '').split(/\s|\d/)[0].replace(/(정|캡슐|연질캡슐|시럽|현탁액|액|산|과립|츄어블정|서방정|이알서방정|필름코팅정|겔|크림|연고|패취|패치)$/, ''); };
+  var 이름표 = null;
+  function 이름들() {
+    if (이름표) return 이름표; 이름표 = {};
+    var 넣기 = function (n, id) { n = String(n || '').trim(); if (n.length >= 2 && !이름표[n]) 이름표[n] = id; };
+    /* 손으로 단 이름이 먼저 — 「판콜에이」는 페닐레프린이 아니라 복합 감기약(아세트아미노펜이 든) 화면으로 가야 겹침이 보인다 */
+    [['타이레놀', 'acetaminophen'], ['부루펜', 'ibuprofen'], ['애드빌', 'ibuprofen'], ['이지엔', 'ibuprofen'], ['탁센', 'naproxen'], ['아스피린', 'aspirin'], ['맥시부펜', 'dexibuprofen'], ['챔프', 'acetaminophen'], ['판콜', 'pancol-a'], ['판피린', 'panpyrin-t'], ['테라플루', 'theraflu'], ['콜대원', 'coldaewon'], ['게보린', 'geworin'], ['펜잘', 'penzal'], ['그날엔', 'gnalen'], ['타이레놀콜드', 'tylenol-cold']].forEach(function (x) { 넣기(x[0], x[1]); });
+    /* 성분 화면 이름은 괄호를 뗀 통째로만(괄호 안은 「마른기침」「두드러기」 같은 쓰임새라 약 이름이 아니다). 제품 하나짜리 화면(「판콜에이 내복액」)은 앞 낱말도. 제품 이름은 그다음 — 복합제 화면 이름이 성분 화면의 제품 목록보다 먼저 */
+    (D.drugs || []).forEach(function (d) { 넣기(String(d.name).replace(/\s*\(.*?\)/g, ''), d.id); if ((d.products || []).some(function (p) { return p.name === d.name; })) 넣기(짧은이름(d.name), d.id); if (d.en) 넣기(String(d.en).toLowerCase(), d.id); });
+    (D.drugs || []).forEach(function (d) { (d.products || []).forEach(function (p) { 넣기(짧은이름(p.name), d.id); }); });
+    return 이름표;
+  }
+  /* 갈래 낱말 — 제품을 모를 때. 처방약 갈래는 처방약 길잡이로 */
+  var 갈래 = { 감기약: { 묻기: '어떤 감기약인지 아세요?', 칩: ['판콜에이', '테라플루', '콜대원'] }, 진통제: { 묻기: '어떤 진통제인지 아세요?', 칩: ['타이레놀', '이부프로펜', '게보린'] }, 해열제: { 묻기: '어떤 해열제인지 아세요?', 칩: ['타이레놀', '이부프로펜'] }, 소화제: { 묻기: '어떤 소화제인지 아세요?', 칩: ['베아제', '훼스탈'] } };
+  var 처방갈래 = [['bp', /혈압약|고혈압/], ['dm', /당뇨약|혈당약|메트포르민/], ['chol', /콜레스테롤약|고지혈|스타틴/], ['blood', /와파린|항응고|피\s*묽게|아스피린\s*프로텍트|엘리퀴스|자렐토|릭시아나/], ['thyroid', /갑상선/], ['sleep', /수면제|우울증약|항우울|안정제/]];
+  /* 위험 — 앱이 이미 쓰는 판정을 글로 옮긴 것(홈 응급 줄 · 증상 응급 줄 · 아이 3개월 38℃ · 41℃ · 항암 38℃ · 과다복용). 새 기준을 짓지 않는다 */
+  var 마음 = /죽고\s*싶|자살|자해|끝내고\s*싶|없어지고\s*싶|사라지고\s*싶|살\s*이유|손목.*그|그었|모아서.*먹|약.*모아/;
+  var 응급 = [/가슴.*(쥐어|조이|짓누|아프|답답).*(땀|숨)|가슴.*(쥐어짜|조이듯|짓누르)/, /한쪽.*(힘|마비|저리|처)|말이\s*어눌|얼굴.*(처졌|비뚤)|발음이\s*이상/, /숨.*(차서|막|못\s*쉬|안\s*쉬|가빠|쌕쌕|힘들)/, /(입술|혀|목구멍|얼굴).*(부었|붓고|부어)/, /경련|발작|까무러/, /의식|깨워도|안\s*일어나|축\s*처지/, /피를\s*토|토혈|변이\s*(새)?까|짜장\s*같|짜장처럼/, /머리.*(부딪|다친).*(토|구토)/, /(제일|가장|살면서).*심한\s*두통|벼락\s*두통/, /배가\s*(딱딱|너무\s*아파서\s*못)/];
+  /* 이미 많이 먹었다·삼켰다(10-28 곁에 교훈) — 증상을 묻기 전에 119 상담 먼저. 문구는 약 화면 「너무 많이 드셨을 때」(NHS)와 같게 */
+  var 과다 = /(한\s*통|통째|[0-9]{2,}\s*(알|정|개|봉)|많이|잔뜩|한꺼번에|두\s*배|두\s*번|실수로|모르고\s*또).*(먹었|먹였|삼켰|먹여|먹어\s*버렸)|(아이|애기|아기|애)가.*(약|알약|약통|시럽).*(삼켰|주워\s*먹|꺼내\s*먹|먹어\s*버렸|다\s*먹)|took (a lot|too many|the whole|all|double|twice)|swallowed|overdos|tom[ée] (muchas|demasiad|el doble|dos veces)|sobredosis|se (lo )?tragó|(薬|錠).*(たくさん|大量|全部|二回分|2回分).*飲|飲み込んだ|過量|吃了(很多|一整瓶|大量|一整盒|两次|双倍)|吞了|过量/i;
+  /* 다섯 언어 위험 낱말(10-27 Main — 한국어만 알아듣던 곳이 있었다). 언어와 상관없이 다 본다(영어 폰을 쓰는 한국 사람도 있다) */
+  var 마음다국 = /suicid|kill(ing)? myself|want to die|end (my|it all)|self[- ]?harm|cut(ting)? myself|no reason to live|quiero morir|matarme|quitarme la vida|no quiero vivir|hacerme daño|autolesi|死にたい|自殺|消えたい|自傷|リストカット|想死|自杀|不想活|轻生|自残|割腕/i;
+  var 응급다국 = [/chest (pain|hurts|tight|pressure)|can'?t breathe|cannot breathe|short(ness)? of breath|trouble breathing|struggling to breathe|wheez|face (is )?droop|slurred|one side.*(weak|numb)|(lips?|tongue|throat).*(swell|swollen|clos)|(swell|swollen).*(lips?|tongue|throat)|seizure|convuls|fit(ting)?\b.*child|unconscious|passed out|won'?t wake|unresponsive|floppy|(vomit|throw)(ing|ed)? (up )?blood|black (stool|poop)|worst headache|took (a lot|too many|the whole|all)|overdos|not breathing/i,
+    /dolor (de|en el) pecho|no puedo respirar|me falta (mucho )?el aire|ahog|cara caída|habla arrastrada|un lado.*(débil|dormid)|(labios?|lengua|garganta).*(hinch|cierra)|hinch\w*.*(labios?|lengua|garganta)|convuls|inconsciente|no despierta|no responde|(vómito|vomit\w*) (con )?sangre|heces negras|peor dolor de cabeza|tom[ée] (muchas|demasiad)|sobredosis|no respira/i,
+    /胸が?(痛|苦し|締め付け|しめつけ)|息が(苦し|できな)|呼吸が(苦し|でき)|顔.*(ゆが|垂れ)|ろれつ|片側.*(力|しびれ)|(唇|舌|喉).*(腫れ|詰ま)|けいれん|痙攣|意識が(ない|な)|起きない|ぐったり|血を吐|吐血|黒い便|最悪の頭痛|(薬|錠).*(たくさん|大量|全部).*飲|過量|息をしていない/,
+    /胸(痛|口痛|闷|口闷|口发紧)|喘不过气|呼吸困难|不能呼吸|没法呼吸|脸.*(歪|下垂)|口齿不清|说话含糊|一侧.*(无力|麻)|(嘴唇|舌头|喉咙).*(肿|紧)|抽搐|惊厥|昏迷|失去意识|叫不醒|吐血|黑便|最严重的头痛|吃了(很多|一整瓶|大量|一整盒)|过量|没有呼吸/];
+  var 중독상담 = {
+    US: { 번호: '1-800-222-1222', 이름: { ko: '미국 중독 상담(Poison Control, 1-800-222-1222)', en: 'Poison Control at 1-800-222-1222', es: 'a Poison Control (1-800-222-1222)', ja: '米国の中毒相談（Poison Control、1-800-222-1222）', zh: '美国中毒咨询热线（Poison Control，1-800-222-1222）' } },
+    ES: { 번호: '915620420', 이름: { ko: '스페인 독성정보서비스(91 562 04 20)', en: "Spain's Toxicology Information Service (91 562 04 20)", es: 'al Servicio de Información Toxicológica (91 562 04 20)', ja: 'スペインの中毒情報サービス（91 562 04 20）', zh: '西班牙毒物信息服务（91 562 04 20）' } },
+    JP: { 번호: '072-727-2499', 이름: { ko: '일본 중독110번(오사카 072-727-2499 / 쓰쿠바 029-852-9999, 두 곳 모두 365일 24시간)', en: 'the Japan Poison Information Center (Osaka 072-727-2499 / Tsukuba 029-852-9999, both open 24 hours, every day)', es: 'al Centro de Información Toxicológica de Japón (Osaka 072-727-2499 / Tsukuba 029-852-9999, ambos 24 horas, todos los días)', ja: '中毒110番（大阪 072-727-2499／つくば 029-852-9999、どちらも365日24時間対応）', zh: '日本中毒110（大阪 072-727-2499／筑波 029-852-9999，均为全年24小时）' } }
+  };
+  var 위험말 = {
+    ko: { hr: ['(24시간)', '(상담 시간은 지역마다 달라요)'], s: function (e) { return '스스로 해치려고 약을 먹었거나, 깨우기 어렵거나, 숨쉬기 어렵거나, 경련하면 지금 ' + e + '에 전화하세요. 혼자 있지 말고 직접 운전하지 마세요. 약 상자와 남은 약을 챙기세요.'; }, p: function (P, e) { return '실수로 많이 먹었고 깨어 있고 숨을 평소처럼 쉬면, 증상이 없어도 지금 ' + P + '에 연락하세요. 스스로 해치려고 먹었거나 숨쉬기 어렵거나 경련·쓰러짐·깨우기 어려움이 있으면 ' + e + '. 억지로 토하게 하지 마시고, 약 상자와 남은 약을 챙기세요. 아세트아미노펜은 처음엔 멀쩡해도 몇 시간~며칠 뒤 간이 상할 수 있어요.'; }, o: function (e) { return '약을 너무 많이 먹었거나 아이가 약을 주워 먹었다면 증상이 없어도 지금 ' + e + '에 연락하세요. 억지로 토하게 하지 마시고, 약 상자와 남은 약을 챙기세요. 직접 운전해서 가지 마세요. 아세트아미노펜은 처음엔 멀쩡해도 몇 시간~며칠 뒤 간이 상할 수 있어요.'; }, m: function (p, e) { return '많이 힘드시군요. 혼자 견디지 마세요 — 지금 ' + p + '에 전화하면 바로 이야기를 들어 줘요(24시간). 위험이 급하면 ' + e + '.'; }, b: function (e) { return '3개월이 안 된 아기가 38℃ 이상이면 해열제보다 진료가 먼저예요. 지금 응급실로 가거나 ' + e + '에 전화하세요.'; }, h: function (e) { return '41℃ 이상이면 지금 응급실로 가거나 ' + e + '에 전화하세요.'; }, c: function (e) { return '항암 치료 중 38℃ 이상은 바로 병원에 알려야 하는 열이에요. 치료받는 병원 응급 연락처나 ' + e + '로.'; }, r: function (e) { return '약보다 진료가 먼저예요. 지금 ' + e + '에 전화하거나 응급실로 가세요. 직접 운전하지 마세요.'; } },
+    en: { hr: [' (24 hours)', ' (hours vary by region)'], s: function (e) { return 'If the medicine was taken to self-harm, or the person is hard to wake, has trouble breathing or is having a seizure, call ' + e + ' now. Do not stay alone and do not drive yourself. Bring the medicine box and any pills left.'; }, p: function (P, e) { return 'If this was accidental and the person is awake and breathing normally, call ' + P + ' now, even if there are no symptoms. For intentional self-harm, trouble breathing, seizures, collapse or difficulty waking, call ' + e + '. Do not make yourself vomit. Bring the medicine box and any pills left. With acetaminophen you can feel fine at first, but liver damage can show up hours to days later.'; }, o: function (e) { return 'If you took too much, call ' + e + ' now for advice even if you feel fine. Do not make yourself vomit. Bring the medicine box and any pills left. Do not drive yourself. With acetaminophen you can feel fine at first, but liver damage can show up hours to days later.'; }, m: function (p, e) { return "It sounds like things are really hard right now. You don't have to face this alone — call " + p + ' now to talk to someone (24 hours). If you are in immediate danger, call ' + e + '.'; }, b: function (e) { return 'A baby under 3 months with a temperature of 38°C or higher needs a doctor before any fever medicine. Go to the emergency room now or call ' + e + '.'; }, h: function (e) { return 'A temperature of 41°C or higher needs the emergency room now — or call ' + e + '.'; }, c: function (e) { return 'A temperature of 38°C or higher during cancer treatment must be reported right away. Call your treatment hospital’s emergency line or ' + e + '.'; }, r: function (e) { return 'See a doctor before taking any medicine. Call ' + e + ' or go to the emergency room now. Do not drive yourself.'; } },
+    es: { hr: [' (24 horas)', ' (el horario varía según la región)'], s: function (e) { return 'Si tomó el medicamento para hacerse daño, o si cuesta despertarle, respira con dificultad o tiene convulsiones, llame ahora al ' + e + '. No se quede solo y no conduzca usted mismo. Lleve la caja del medicamento y las pastillas que queden.'; }, p: function (P, e) { return 'Si la ingestión fue accidental y la persona está consciente y respira con normalidad, llame ahora ' + P + ', aunque no tenga síntomas. Si fue para hacerse daño o hay dificultad para respirar, convulsiones, desmayo o cuesta despertarla, llame al ' + e + '. No se provoque el vómito. Lleve la caja del medicamento y las pastillas que queden. Con el paracetamol puede sentirse bien al principio, pero el daño en el hígado puede aparecer horas o días después.'; }, o: function (e) { return 'Si ha tomado demasiado, llame ahora al ' + e + ' para que le orienten, aunque se encuentre bien. No se provoque el vómito. Lleve la caja del medicamento y las pastillas que queden. No conduzca usted mismo. Con el paracetamol puede sentirse bien al principio, pero el daño en el hígado puede aparecer horas o días después.'; }, m: function (p, e) { return 'Parece que está pasando por un momento muy difícil. No tiene que afrontarlo solo: llame ahora al ' + p + ' para hablar con alguien (24 horas). Si corre peligro inmediato, llame al ' + e + '.'; }, b: function (e) { return 'Un bebé de menos de 3 meses con 38 °C o más necesita atención médica antes que cualquier antitérmico. Vaya a urgencias ahora o llame al ' + e + '.'; }, h: function (e) { return 'Con 41 °C o más, vaya a urgencias ahora o llame al ' + e + '.'; }, c: function (e) { return 'Durante un tratamiento contra el cáncer, 38 °C o más debe comunicarse enseguida. Llame al teléfono de urgencias de su hospital o al ' + e + '.'; }, r: function (e) { return 'Antes que cualquier medicamento, necesita atención médica. Llame ahora al ' + e + ' o vaya a urgencias. No conduzca usted mismo.'; } },
+    ja: { hr: ['（24時間）', '（受付時間は地域によって異なります）'], s: function (e) { return '自分を傷つける目的で薬を飲んだ場合や、起こしても起きにくい・呼吸が苦しい・けいれんしている場合は、今すぐ ' + e + ' に電話してください。ひとりにならず、ご自分で運転しないでください。薬の箱と残りの薬を手元に置いてください。'; }, p: function (P, e) { return '誤って飲みすぎ、意識がはっきりしていて呼吸も普段どおりなら、症状がなくても' + P + 'へすぐ相談してください。自分を傷つける目的で飲んだ場合や、意識・呼吸の異常、けいれんがある場合は ' + e + ' へ。無理に吐かせず、薬の箱と残りの薬を手元に置いてください。アセトアミノフェンは最初は何ともなくても、数時間〜数日後に肝臓が傷むことがあります。'; }, o: function (e) { return '飲みすぎた場合は、平気そうでも今すぐ ' + e + ' に電話して相談してください。無理に吐かせないでください。薬の箱と残りの薬を持って行き、ご自分で運転しないでください。アセトアミノフェンは最初は何ともなくても、数時間〜数日後に肝臓が傷むことがあります。'; }, m: function (p, e) { return 'とてもつらい状態なのですね。ひとりで抱え込まないでください。今すぐ ' + p + ' に電話すれば話を聞いてもらえます（24時間）。命の危険が迫っているときは ' + e + ' へ。'; }, b: function (e) { return '生後3か月未満の赤ちゃんが38℃以上なら、解熱剤より先に受診が必要です。今すぐ救急外来へ行くか ' + e + ' に電話してください。'; }, h: function (e) { return '41℃以上なら今すぐ救急外来へ行くか ' + e + ' に電話してください。'; }, c: function (e) { return 'がん治療中の38℃以上の熱はすぐに病院へ連絡が必要です。治療中の病院の緊急連絡先か ' + e + ' へ。'; }, r: function (e) { return '薬より先に受診が必要です。今すぐ ' + e + ' に電話するか救急外来へ行ってください。ご自分で運転しないでください。'; } },
+    zh: { hr: ['（24小时）', '（服务时间因地区而异）'], s: function (e) { return '如果是为了伤害自己而服药，或者叫不醒、呼吸困难、抽搐，请立即拨打 ' + e + '。不要独处，不要自己开车。请带上药盒和剩下的药。'; }, p: function (P, e) { return '如果是误服过量，且人清醒、呼吸正常，即使没有症状也请现在联系' + P + '。如果是为了伤害自己而服药，或出现呼吸困难、抽搐、昏倒、叫不醒，请拨打 ' + e + '。不要催吐，请带上药盒和剩下的药。对乙酰氨基酚刚开始可能没有不适，但数小时到数天后可能出现肝损伤。'; }, o: function (e) { return '如果服用过量，即使感觉没事，也请现在拨打 ' + e + ' 咨询。不要催吐。请带上药盒和剩下的药，不要自己开车。对乙酰氨基酚刚开始可能没有不适，但数小时到数天后可能出现肝损伤。'; }, m: function (p, e) { return '听起来您现在非常难受。请不要一个人扛着——现在拨打 ' + p + '，会有人倾听您（24小时）。如果情况紧急，请拨打 ' + e + '。'; }, b: function (e) { return '不满3个月的婴儿体温达到38°C或以上，应先就医，而不是先用退烧药。请立即去急诊或拨打 ' + e + '。'; }, h: function (e) { return '体温达到41°C或以上，请立即去急诊或拨打 ' + e + '。'; }, c: function (e) { return '抗癌治疗期间体温达到38°C或以上，需要立即告知医院。请联系治疗医院的急诊电话或拨打 ' + e + '。'; }, r: function (e) { return '比起用药，您需要先就医。请立即拨打 ' + e + ' 或去急诊。请不要自己开车。'; } }
+  };
+  function 위험(글, 값) {
+    var t = String(글 || ''), N = (window.I18N && window.I18N.emg) || { e: '119', m: ['109', '1577-0199'] }, M = 위험말[window.LANG] || 위험말.ko, p = N.m[0] || N.e;
+    var 의도 = 마음.test(t) || 마음다국.test(t), L = 위험말[window.LANG] ? window.LANG : 'ko';
+    /* 이미 삼킨 것이 먼저(10-28 곁에 교훈). 바깥 검수 9차(10-28): 스스로 해치려고 먹었거나 의식·숨·경련 이상이면 응급 번호,
+       증상 없는 실수 복용은 그 나라 중독 상담(있는 나라만 — 미국·스페인·일본). 한국·중국·모르는 나라는 응급 번호 */
+    if (과다.test(t)) {
+      var t2 = t.replace(new RegExp(과다.source, 'gi'), ' ');   /* 「많이 먹었다」 낱말 자체는 중증 신호로 세지 않는다 */
+      var 중증 = 의도 || 응급.concat(응급다국).some(function (r) { return r.test(t2); }) || /의식|깨워도|안\s*깨|숨.*(못|안|힘들|차)|경련|쓰러|unconscious|won'?t wake|not breathing|seizure|inconsciente|no despierta|convuls|意識|けいれん|息をしていない|昏迷|叫不醒|抽搐|没有呼吸/i.test(t2);
+      if (중증) return { 말: M.s(N.e), 전화: N.e };
+      var P = 중독상담[window.CC];
+      if (P) return { 말: M.p(P.이름[L] || P.이름.en, N.e), 전화: P.번호 };
+      return { 말: M.o(N.e), 전화: N.e };
+    }
+    /* 마음 위기 번호의 「24시간」은 확인된 나라(한국 109·미국 988·스페인 024)만 — 일본·중국은 지역마다 운영 시간이 다르다(바깥 검수 9차) */
+    if (의도) { var 말 = M.m(p, N.e); if (!/^(KR|US|ES)$/.test(window.CC || 'KR')) 말 = 말.replace(M.hr[0], M.hr[1]); return { 말: 말, 전화: p }; }
+    var 열 = 값 && 값.체온, 달 = 값 && 값.나이개월;
+    if ((열 >= 38 && 달 != null && 달 < 3) || (열 >= 38 && /3\s*개월\s*(미만|안|전)|신생아|백일\s*전|newborn|recién nacido|新生児|新生儿/i.test(t))) return { 말: M.b(N.e), 전화: N.e };
+    if (열 >= 41) return { 말: M.h(N.e), 전화: N.e };
+    if (열 >= 38 && /항암|암\s*치료|항암제|chemo|cancer treatment|quimio|抗がん剤|がん治療|化疗|抗癌/i.test(t)) return { 말: M.c(N.e), 전화: N.e };
+    for (var i = 0; i < 응급.length; i++) if (응급[i].test(t)) return { 말: M.r(N.e), 전화: N.e };
+    for (var j = 0; j < 응급다국.length; j++) if (응급다국[j].test(t)) return { 말: M.r(N.e), 전화: N.e };
+    return null;
+  }
+  function 뜻목록() {
+    var L = (D.symptoms || []).map(function (s) { return { id: 'sym:' + s.id, 예문: [s.name, s.short].filter(Boolean), 태그: (s.tags || []).concat(String(s.name || '').split(/[·,\s]/)).filter(function (w) { return w && w.length >= 2; }) }; });
+    L.push({ id: 'kids', 예문: ['아이 해열제 몇 mL', '아기 해열제 양'], 태그: ['아이', '아기', '애기', '우리애', '애가', '개월', '키로', '미리', 'mL'] });
+    L.push({ id: 'pill', 예문: ['이 알약 뭐예요', '알약 모양으로 찾기'], 태그: ['알약', '모양', '써있', '적혀', '각인', '동그란', '길쭉'] });
+    L.push({ id: 'bag', 예문: ['먹는 약 정리', '내 약통'], 태그: ['약통', '정리', '먹는약'] });
+    L.push({ id: 'together', 예문: ['같이 먹어도 되나요'], 태그: ['같이', '함께', '병용', '이랑', '하고'] });
+    return L;
+  }
+  function 약찾기(글) {
+    var g = String(글 || '').toLowerCase().replace(/\s+/g, ''), T = 이름들(), 찾음 = [], ids = [];
+    Object.keys(T).sort(function (a, b) { return b.length - a.length; }).forEach(function (n) {
+      var k = n.toLowerCase().replace(/\s+/g, ''); if (g.indexOf(k) < 0) return;
+      if (찾음.some(function (x) { return x.indexOf(k) >= 0; })) return;   /* 「타이레놀콜드」 안의 「타이레놀」은 따로 세지 않는다 */
+      찾음.push(k); if (ids.indexOf(T[n]) < 0) ids.push(T[n]);
+    });
+    return ids;
+  }
+  var 갈곳 = {};
+  function 칩길(이름, 길) { 갈곳[이름] = 길; return 이름; }
+    function 겹침(ids) {
+    var ds = ids.map(function (i) { return drug(i); }).filter(Boolean), T = ME.taking, 결;
+    ME.taking = []; try { 결 = ixCards(ixRun(ds)); } finally { ME.taking = T; }
+    var 센 = 결.filter(function (c) { return c.lv === 'stop' || c.lv === 'warn'; });
+    var 말 = [ds.map(function (d) { return d.name; }).join(' · ') + ' — 같이 드시는지 볼게요.'];
+    if (센.length) 말.push((센.some(function (c) { return c.lv === 'stop'; }) ? '같이 드시면 안 되는 것이 있어요: ' : '조심할 것이 있어요: ') + 센.slice(0, 2).map(function (c) { return c.t; }).join(' / ') + '. 자세한 이유와 대신할 방법은 「내 약통에 담고 자세히」에서 보세요.');
+    else 말.push('이 둘 사이에 겹치는 성분이나 조심할 조합은 안 보여요. 다른 약을 더 드시면 그 약까지 함께 봐야 해요.');
+    return { 말: 말, 칩: [칩길('내 약통에 담고 자세히', function () { ME.taking = ME.taking || []; ids.forEach(function (i) { if (ME.taking.indexOf(i) < 0) ME.taking.push(i); }); saveMe(); go('/together'); }), 칩길(짧은이름(ds[0].name) + ' 자세히', '/drug/' + ds[0].id), '다른 질문'] };
+  }
+  /* 증상은 앱의 찾기(search — 구어 사전·말끝 떼기)로 고른다. 그 앞에 대화에서 흔한 입말을 찾기 낱말로 고른다 */
+  var 입말 = [[/술\s*(먹|마시)|숙취|해장/, '숙취'], [/머리.*(깨질|터질|지끈|띵)/, '두통'], [/담\s*(이\s*)?걸|목이?\s*안\s*돌|뻐근/, '담 결림'], [/코\s*(가\s*)?막혀|코막힘/, '코막힘'],
+    [/체한|체했|얹힌|명치/, '체함'], [/배탈|토하고\s*설사|토하면서\s*설사|장염/, '장염'], [/베였|베인|긁혔|까졌|상처/, '상처'], [/데었|데인|화상/, '데었을 때'], [/눈곱|눈이\s*빨개|결막염/, '눈병'], [/목.*(아프|따끔|칼칼|부었)|침\s*삼킬/, '목 아픔'],
+    [/눈.*가렵|가려운\s*눈|꽃가루|두드러기/, '알레르기'], [/기침/, '기침'], [/쪼매|억수로|겁나게|엄청/g, ' '], [/(나는데예|하는데예|예$|요$)/, '']];
+  function 증상찾기(t) {
+    var q = t, 낱 = [];
+    입말.forEach(function (x) { if (x[1] === ' ' || x[1] === '') q = q.replace(x[0], x[1]); else if (x[0].test(t)) 낱.push(x[1]); });
+    var 해 = function (w) { try { var r = search(w); r = Array.isArray(r) ? r : []; for (var i = 0; i < Math.min(3, r.length); i++) if (r[i].k === '증상') return r[i].h.replace('/symptom/', ''); } catch (e) {} return null; };
+    return (낱.length ? 해(낱[0]) : null) || 해(q);
+  }
+  function 처리(앎, 상태) {
+    var t = String(앎.글 || '').trim();
+    if (갈곳[t]) { var 길 = 갈곳[t]; setTimeout(function () { typeof 길 === 'function' ? 길() : go(길); }, 350); return { 말: ['열어 드릴게요.'] }; }
+    if (t === '다른 질문' || t === '모르겠어요') { 상태.약 = []; return { 말: ['네, 무엇이든 편하게 적어 주세요.'], 칩: ['같이 먹어도 되나', '아이 해열제', '이 알약 뭐지'] }; }
+    var ids = 약찾기(t), 이전 = 상태.약 || [], 같이 = /같이|함께|이랑|랑\s|하고|병용|먹어도|먹은\s*뒤|먹었는데|또\s*먹/.test(t);
+    var 갈 = Object.keys(갈래).filter(function (k) { return t.indexOf(k) >= 0; })[0];
+    var rx = 처방갈래.filter(function (x) { return x[1].test(t); })[0];
+    if (rx && (ids.length || 같이 || 갈)) return { 말: [RX_NAME[rx[0]] + '을 드시는군요. 처방약과 약국 약을 함께 드실 때 조심할 것을 길잡이에 모아 두었어요.'], 칩: [칩길(RX_NAME[rx[0]] + ' 길잡이', '/rx/' + rx[0]), '다른 질문'] };
+    if (ids.length >= 2) { 상태.약 = ids; return 겹침(ids); }
+    if (ids.length === 1 && 이전.length && 이전.indexOf(ids[0]) < 0) { 상태.약 = 이전.concat(ids); return 겹침(상태.약); }
+    if (/아이|아기|애기|우리\s*애|애가|[0-9]+\s*개월/.test(t) && /얼마|몇|양|미리|mL|ml|먹여/i.test(t)) 앎.뜻 = [{ id: 'kids' }].concat(앎.뜻 || []);
+    else if (ids.length === 1 && 갈) { 상태.약 = ids; 상태.기다림 = 갈; return { 말: [짧은이름(drug(ids[0]).name) + '와 ' + 갈 + '을 같이 — 맞으세요?', 갈래[갈].묻기], 칩: 갈래[갈].칩.concat(['모르겠어요']) }; }
+    if (ids.length === 1 && !(앎.뜻[0] && 앎.뜻[0].id === 'kids')) { var d = drug(ids[0]); 상태.약 = ids;
+      return { 말: [d.name + (d.tagline ? ' — ' + String(d.tagline).replace(/\*\*/g, '') : '') + '.', (앎.값.시간 ? '' : '함께 드시는 다른 약이 있으면 이름을 적어 주세요. 겹치는지 바로 볼게요.')].filter(Boolean), 칩: [칩길('먹는 법 보기', '/drug/' + d.id), '다른 질문'] }; }
+    var 뜻 = (앎.뜻 || [])[0], v = 앎.값;
+    if (뜻 && 뜻.id === 'kids' || /아이|아기|애기|우리\s*애|애가/.test(t) && /(해열|열|감기|시럽|미리|mL|ml)/i.test(t)) {
+      var 되 = [v.체온 ? v.체온 + '℃' : '', v.몸무게 ? v.몸무게 + ' kg' : '', v.나이개월 != null ? (v.나이개월 < 24 ? v.나이개월 + '개월' : Math.floor(v.나이개월 / 12) + '살') : ''].filter(Boolean).join(', ');
+      return { 말: [(되 ? 되 + ' — 확인했어요. ' : '') + '아이 해열제는 몸무게로 양을 정해요.', v.몸무게 ? '계산 화면에서 시럽 mL·간격·하루 한도를 바로 볼 수 있어요.' : '몸무게를 아시면 더 정확해요 — 계산 화면에서 넣어 주세요.'], 칩: [칩길('해열제 양 계산', '/kids'), '다른 질문'] }; }
+    if (뜻 && 뜻.id === 'pill') return { 말: ['색·모양·앞뒤 글자로 찾을 수 있어요. 사진으로 약봉투를 읽을 수도 있어요.'], 칩: [칩길('알약 찾기', '/pill'), 칩길('사진으로 읽기', '/photo'), '다른 질문'] };
+    if (뜻 && 뜻.id === 'bag') return { 말: ['드시는 약을 내 약통에 담아 두면 겹침·먹는 시간을 함께 봐 드려요.'], 칩: [칩길('내 약통 열기', '/bag'), '다른 질문'] };
+    var sid = 증상찾기(t); if (sid) 뜻 = { id: 'sym:' + sid };
+    if (뜻 && 뜻.id.indexOf('sym:') === 0) { var s = (D.symptoms || []).filter(function (x) { return 'sym:' + x.id === 뜻.id; })[0];
+      if (s) return { 말: [s.name + ' — 이렇게 들렸어요.', '먼저 위험 신호가 없는지 함께 보고, 약국에서 살 약과 먹는 법을 알려 드릴게요.'], 칩: [칩길('이렇게 하세요', '/symptom/' + s.id), '다른 질문'] }; }
+    if (뜻 && 뜻.id === 'together') return { 말: ['드시는 약 이름을 둘 이상 적어 주세요. 예) 타이레놀이랑 판콜'] };
+    return null;
+  }
+  window.vTalkS = function () {
+    setTimeout(function () {
+      var 곳 = document.getElementById('talk'); if (!곳 || !window.대화) return;
+      /* 화면을 다시 그려도(자료가 늦게 와 route() 가 다시 돌 때) 하던 대화를 그대로 — 같은 대화 칸을 다시 끼운다 */
+      if (window._talkNode && window._talkNode !== 곳) { 곳.replaceWith(window._talkNode); return; }
+      window._talkNode = 곳;
+      var 봇 = 대화.만들기({ 앱: 'yakjido', 언어: window.LANG || 'ko', 뜻: 뜻목록(), 약: Object.keys(이름들()), 위험: 위험, 처리: 처리 });
+      봇.붙이기(곳, { 말: ['어떤 약이 궁금하세요? 어디가 아프세요?', '편하게 적어 주세요. 예) 타이레놀이랑 감기약 같이 먹어도 돼?'], 칩: ['같이 먹어도 되나', '아이 해열제', '이 알약 뭐지'] });
+      var q = (location.hash.match(/[?&]q=([^&]+)/) || [])[1]; if (q) setTimeout(function () { 봇.보냄(decodeURIComponent(q)); }, 900);
+      window.약지도대화 = { 위험: 위험, 처리: 처리, 약찾기: 약찾기, 봇: 봇 };
+    }, 0);
+    return topBar({ back: '홈' }) + '<h1>물어보기</h1><p class="small muted" style="margin:4px 0 12px">사람 상담이 아니라 앱 안의 안내예요. 이 폰 안에서만 읽고 어디로도 보내지 않아요.</p><div id="talk" class="talk"></div>' + disclaimer();
+  };
+  /* 대화의 뜻 고르기·답은 아직 한국어만(다섯 언어 말뭉치는 다음 회차) — 한국어가 아닌 화면에는 홈 입구를 내지 않는다. 위험 낱말은 다섯 언어 다 본다 */
+  window.대화줄 = function () { if (window.LANG && window.LANG !== 'ko') return ''; return '<a class="talk-door" href="#/talk"><span class="b">어떤 약이 궁금하세요? 어디가 아프세요?</span><span class="small muted">「타이레놀이랑 감기약 같이 먹어도 돼?」처럼 편하게 물어보세요 ›</span></a>'; };
+  var cs = document.createElement('style');
+  cs.textContent = '.talk-door{display:flex;flex-direction:column;gap:4px;margin:12px 0 4px;padding:14px 16px;border-radius:18px 18px 18px 6px;background:var(--tint);color:var(--ink);text-decoration:none;min-height:48px}.talk-door .b{font-weight:700}.talk{min-height:50vh}';
+  document.head.appendChild(cs);
+})();
+
+/* 기내 모드(10-27 · 요청서 20261027_메디나눔_전앱_기내모드) — 인터넷 없이 쓰도록 자료·고른 언어·글꼴을 미리 받아 둔다.
+   받는 것은 서비스 워커 캐시에 들어간다(같은 주소라 앱이 그대로 꺼내 씀). 서버 응답(로그인·동기화)은 담지 않는다. 글꼴·supabase-js 도 묶음 안(바깥 파일 0). */
+(function () {
+  var K = 'yakjido.offline', MB = function (b) { return (b / 1048576).toFixed(b < 10485760 ? 1 : 0) + ' MB'; };
+  var 갈래 = [['core', '약 자료', '약 찾기·겹침·증상·처방약 길잡이', /^(core|detail|brands|lexicon|meta|mixes|nutrients|names-rx|kpic)\.json$/],
+              ['easy', '쉬운 설명', '제품마다 쉬운 말 설명서', /^easy-/],
+              ['pill', '낱알 식별', '모양·색·글자로 알약 찾기', /^pills/]];
+  var 상태 = function () { try { return JSON.parse(localStorage.getItem(K) || 'null'); } catch (e) { return null; } };
+  var 판 = function () { try { return DATAV; } catch (e) { return ''; } };
+  var 목록 = null, 고름 = { core: 1, easy: 1, pill: 1, lang: 1, font: 1 }, 받는중 = false;
+  function 읽기() { return 목록 ? Promise.resolve(목록) : fetch('data/offline.json?v=' + 판(), { cache: 'no-store' }).then(function (r) { return r.json(); }).then(function (j) { 목록 = j; return j; }); }
+  function 할일(j) {
+    var out = [];
+    갈래.forEach(function (g) { if (고름[g[0]]) j.data.forEach(function (f) { if (g[3].test(f.n)) out.push({ u: 'data/' + f.n + '?v=' + 판(), b: f.b }); }); });
+    if (고름.lang && window.LANG && window.LANG !== 'ko') (j.i18n || []).forEach(function (f) { if (f.n === window.LANG + '.json') out.push({ u: 'data/i18n/' + f.n, b: f.b }); });
+    if (고름.font) (j.ext || []).forEach(function (f) { out.push({ u: f.n, b: f.b }); });
+    return out;
+  }
+  function 크기(j, k) {
+    if (k === 'font') return (j.ext || []).reduce(function (s, f) { return s + f.b; }, 0);
+    if (k === 'lang') return (j.i18n || []).filter(function (f) { return f.n === window.LANG + '.json'; }).reduce(function (s, f) { return s + f.b; }, 0);
+    var g = 갈래.filter(function (x) { return x[0] === k; })[0]; return g ? j.data.filter(function (f) { return g[3].test(f.n); }).reduce(function (s, f) { return s + f.b; }, 0) : 0;
+  }
+  function 줄(id, t, s, b) { return '<label class="gn-row"><input type="checkbox" ' + (고름[id] ? 'checked' : '') + ' onchange="기내고름(\'' + id + '\',this.checked)"><span><b>' + t + '</b><span class="small muted">' + s + '</span></span><em>' + b + '</em></label>'; }
+  function 그리기() {
+    var box = document.getElementById('gn-box'); if (!box) return;
+    읽기().then(function (j) {
+      var st = 상태(), 새판 = st && st.v !== 판(), tot = 할일(j).reduce(function (s, x) { return s + x.b; }, 0);
+      var h = st ? '<p class="gn-st ' + (새판 ? 'old' : 'ok') + '">' + (새판 ? '받아 둔 뒤에 약 자료가 새로 나왔어요 — 다시 받으면 새것으로 바뀌어요.' : '인터넷 없이 쓸 준비가 됐어요 · ' + esc(st.at) + ' 받음 · ' + MB(st.b)) + '</p>' : '';
+      h += 갈래.map(function (g) { return 줄(g[0], g[1], g[2], MB(크기(j, g[0]))); }).join('');
+      if (window.LANG && window.LANG !== 'ko') h += 줄('lang', '고른 언어', '번역 사전', MB(크기(j, 'lang')));
+      h += 줄('font', '글꼴·로그인 프로그램', '글씨 모양과 연결되면 쓰는 로그인', MB(크기(j, 'font')));
+      h += '<p class="small muted gn-tot">받을 크기 약 <b>' + MB(tot) + '</b>' + (tot > 31457280 ? ' — 30 MB 가 넘어요. 필요한 갈래만 고르셔도 돼요.' : '') + ' 와이파이에서 받기를 권해요.</p>';
+      h += '<div class="gn-bar" hidden><progress max="100" value="0"></progress><span class="small muted"></span></div>';
+      h += '<button type="button" class="btn" onclick="기내받기()">' + (st ? '다시 받기' : '받아 두기') + '</button>';
+      if (st) h += '<button type="button" class="btn ghost" style="margin-top:8px" onclick="기내지우기()">받아 둔 것 지우기</button>';
+      box.innerHTML = h;
+    }).catch(function () { box.innerHTML = '<p class="small muted">목록을 못 읽었어요 — 인터넷이 될 때 다시 열어 주세요.</p>'; });
+  }
+  window.기내고름 = function (k, on) { 고름[k] = on ? 1 : 0; 그리기(); };
+  window.기내받기 = function () {
+    if (받는중) return; if (navigator.onLine === false) { try { toast('인터넷이 될 때 받을 수 있어요'); } catch (e) {} return; }
+    받는중 = true;
+    읽기().then(function (j) {
+      var q = 할일(j), all = q.reduce(function (s, x) { return s + x.b; }, 0) || 1, got = 0, n = 0, bad = 0;
+      var bar = document.querySelector('#gn-box .gn-bar'), pg = bar && bar.querySelector('progress'), tx = bar && bar.querySelector('span');
+      if (bar) bar.hidden = false;
+      var 표시 = function () { if (pg) pg.value = Math.min(100, Math.round(got / all * 100)); if (tx) tx.textContent = MB(got) + ' / ' + MB(all) + (bad ? ' · 못 받은 것 ' + bad : ''); };
+      var 하나 = function (x) { return fetch(x.u).then(function (r) { if (!r.ok) throw 0; return r.blob(); }).then(function () { got += x.b; }).catch(function () { bad++; }).then(표시); };
+      var 일꾼 = function () { var x = q[n++]; return x ? 하나(x).then(일꾼) : Promise.resolve(); };
+      return Promise.all([일꾼(), 일꾼(), 일꾼(), 일꾼()]).then(function () {
+        받는중 = false;
+        if (bad) { try { toast('못 받은 파일이 ' + bad + '개 있어요 — 다시 받기를 눌러 주세요'); } catch (e) {} 표시(); return; }
+        var d = new Date(), at = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+        try { localStorage.setItem(K, JSON.stringify({ v: 판(), at: at, b: got, lang: window.LANG || 'ko' })); } catch (e) {}
+        try { if (navigator.storage && navigator.storage.persist) navigator.storage.persist(); } catch (e) {}
+        try { toast('다 받았어요 — 인터넷 없이도 열려요'); } catch (e) {}
+        그리기();
+      });
+    }).catch(function () { 받는중 = false; try { toast('목록을 못 읽었어요'); } catch (e) {} });
+  };
+  window.기내지우기 = function () {
+    var 끝 = function () { try { localStorage.removeItem(K); } catch (e) {} 그리기(); try { toast('받아 둔 것을 지웠어요'); } catch (e) {} };
+    if (!window.caches) return 끝();
+    caches.keys().then(function (ks) { return Promise.all(ks.filter(function (k) { return k === 'yakjido-data-v1' || k === 'yakjido-ext-v1'; }).map(function (k) { return caches.delete(k); })); }).then(끝, 끝);
+  };
+  window.기내칸 = function () { setTimeout(그리기, 0); return '<section class="sec card" id="offline" style="margin-top:16px"><h2>기내에서 쓰기</h2><p class="small muted">비행기·지하·해외처럼 인터넷이 없거나 막힌 곳에 가시기 전에 미리 받아 두세요. 로그인·동기화·바깥 링크는 연결되면 돼요.</p><div id="gn-box"><p class="small muted">목록을 읽는 중…</p></div></section>'; };
+  window.기내줄 = function () { var st = 상태(); if (st && st.v === 판()) return ''; return '<p class="gn-home"><a href="#/me?t=set&to=offline" onclick="setTimeout(function(){var e=document.getElementById(\'offline\');e&&e.scrollIntoView({block:\'start\'})},300)">' + (st ? '받아 둔 약 자료가 새로 나왔어요 — 기내용 다시 받기 ›' : '인터넷 없는 곳에 가세요? 기내에서 쓰게 받아 두기 ›') + '</a></p>'; };
+  var cs = document.createElement('style');
+  cs.textContent = '.gn-row{display:flex;gap:12px;align-items:center;padding:12px 0;border-top:1px solid var(--line);min-height:48px}.gn-row input{width:22px;height:22px;flex:none}.gn-row>span{flex:1;display:flex;flex-direction:column;gap:2px}.gn-row em{font-style:normal;color:var(--muted);font-size:.875rem;white-space:nowrap}' +
+    '.gn-tot{margin:10px 0}.gn-bar{display:flex;flex-direction:column;gap:4px;margin:8px 0 12px}.gn-bar progress{width:100%;height:10px;accent-color:var(--primary)}.gn-st{padding:10px 12px;border-radius:12px;font-size:.875rem;font-weight:600;margin:8px 0}.gn-st.ok{background:var(--tint);color:var(--primary-deep)}.gn-st.old{background:var(--caution-tint);color:var(--caution)}' +
+    '.gn-home{text-align:center;margin:18px 0 4px;font-size:.875rem}.gn-home a{color:var(--muted);display:inline-flex;align-items:center;min-height:44px}';
+  document.head.appendChild(cs);
+})();
 /* 설정 화면의 구독 칸 — 스위치가 꺼져 있으면 빈 글(아무것도 안 보임) */
 window.구독관리 = function () { try { var h = 구독.관리HTML(); return h ? '<section class="sec card" style="margin-top:16px"><h2>구독</h2>' + h + '</section>' : ''; } catch (e) { return ''; } };
 
@@ -1316,6 +1730,8 @@ function 동의그리기(){
   const w = document.getElementById('csWhy'); if (w) w.hidden = both;
 }
 window.동의누름 = k => { const C = 동의칸; if (k === 'all') { const v = C.terms && C.privacy ? 0 : 1; C.terms = C.privacy = v; } else C[k] = C[k] ? 0 : 1; 동의그리기(); };
+/* 10-29 「첫 진입 동의 벽 금지」 — 체크박스 대신 단추 한 번으로 두 필수 동의 */
+window.동의한번 = () => { 동의칸.terms = 동의칸.privacy = 1; window.동의하기(); };
 window.동의하기 = () => {
   if (!(동의칸.terms && 동의칸.privacy)) return;
   try { localStorage.setItem(CONSENT_KEY, JSON.stringify({ v: CONSENT_VER, at: dayKey(new Date()), terms: 1, privacy: 1 })); } catch (e) {}
@@ -1341,23 +1757,22 @@ window.문_consent = () => {
     <li>${I.shield}<span>드시는 약끼리 성분이 겹치거나 함께 드시면 안 되는 조합을 살펴 드려요.</span></li>
     <li>${I.heart}<span>진단·처방을 대신하지 않아요. 급하면 119, 그리고 의사·약사와 상의하세요.</span></li>
   </ul>
-  <h2 class="cs-h">시작하기 전에 동의를 받아요</h2>
-  <button type="button" class="cs-row cs-all" role="checkbox" aria-checked="${both ? 'true' : (동의칸.terms || 동의칸.privacy) ? 'mixed' : 'false'}" onclick="동의누름('all')"><span class="cs-bx">${I.check}</span><span class="cs-tx"><b>모두 동의해요</b><span>아래 필수 두 가지를 한 번에 체크해요</span></span></button>
-  ${동의줄('terms', '이용약관', '의료기기가 아니에요. 약 정보를 드리고 기록을 도와요. 약을 고르고 드시는 결정은 의사·약사와 함께 하세요.', [
-    '약 설명은 <b>식약처 허가 설명서</b>가 기본이에요. 해외 지침이나 진료실 관행이 다르면 둘 다 보여 드려요.',
+  <p class="cs-sum">의료기기가 아니에요 · 기록은 먼저 이 휴대폰에 저장돼요 · 광고·분석에 쓰지 않아요</p>
+  <button type="button" class="door-go" id="csGo" onclick="동의한번()">${다시 ? '약관·처리방침에 동의하고 계속' : '약관·처리방침에 동의하고 시작'}</button>
+  <details class="cs-more cs-detail"><summary>자세히 — 무엇에 동의하나요${I.chev}</summary>
+    <h3>이용약관</h3><p>의료기기가 아니에요. 약 정보를 드리고 기록을 도와요. 약을 고르고 드시는 결정은 의사·약사와 함께 하세요.</p><ul>${['약 설명은 <b>식약처 허가 설명서</b>가 기본이에요. 해외 지침이나 진료실 관행이 다르면 둘 다 보여 드려요.',
     '위험 신호가 있으면 약보다 진료가 먼저예요. 급하면 119예요.',
     '약을 팔거나 건네지 않아요. 약은 약국에서 약사와 상의해 사세요.',
     '계정은 고르실 수 있고, 만 14세 이상만 만들 수 있어요.',
-    '지금은 돈을 내는 기능이 없어요. 생기면 요금과 해지·환불 조건을 미리 알리고 따로 동의를 받아요.'], '약관 전문 보기')}
-  ${동의줄('privacy', '개인정보 처리방침', '드시는 약·기록·몸 상태는 기본으로 이 휴대폰에만 저장되고, 광고·분석에 쓰지 않아요. 계정을 만들고 따로 동의하실 때만 메디나눔 서버(서울)에 복사돼요.', [
-    '계정 없이 모든 기능을 쓰실 수 있어요.',
-    '광고나 이용자 분석 도구를 넣지 않았어요.',
+    '지금은 돈을 내는 기능이 없어요. 생기면 요금과 해지·환불 조건을 미리 알리고 따로 동의를 받아요.'].map(x => `<li>${x}</li>`).join('')}</ul><button type="button" class="cs-doc" onclick="go('/doc/terms')">약관 전문 보기${I.chev}</button>
+    <h3>개인정보 처리방침</h3><p>드시는 약·기록·몸 상태는 먼저 쓰시는 휴대폰에 저장되고, 광고·분석에 쓰지 않아요. 계정을 만들고 따로 동의하실 때만 메디나눔 서버(서울)에 복사돼요.</p><ul>${['로그인하지 않고도 대부분의 기능을 쓰실 수 있어요.',
+    '광고나 이용자 분석 도구를 넣게 되면 먼저 알려요.',
     '서버 저장은 계정을 만들 때 「서버에 저장하기」에 따로 동의하셔야 해요. 거두시면 서버 기록을 바로 지워요.',
     '「부모님께 보내기」를 링크로 보내실 때만 고른 약 목록·호칭·메모가 7일 동안 서버에 머문 뒤 지워져요.',
     '약 사진은 휴대폰 안에서 글자를 읽는 데만 쓰고 보내지 않아요.',
-    '기록은 내 정보 → 설정에서 언제든 지우실 수 있어요.'], '전문 보기')}
-  <button type="button" class="door-go" id="csGo" onclick="동의하기()"${both ? '' : ' disabled'} aria-describedby="csWhy">${다시 ? '동의하고 계속하기' : '동의하고 시작하기'}</button>
-  <p class="door-why" id="csWhy"${both ? ' hidden' : ''}>필수 두 가지에 체크하시면 눌려요</p>
+    '기록은 내 정보 → 설정에서 언제든 지우실 수 있어요.'].map(x => `<li>${x}</li>`).join('')}</ul><button type="button" class="cs-doc" onclick="go('/doc/privacy')">전문 보기${I.chev}</button>
+    <p class="cs-note">건강에 관한 기록을 서버에 저장하는 것은 계정을 만들 때 따로 여쭤요.</p>
+  </details>
   <p class="cs-foot">동의 내용은 설정 → 약관·개인정보에서 언제든 다시 보실 수 있어요 · 약지도 v${esc(D.meta?.version || '')}</p>
 </div>`;
 };
@@ -1367,13 +1782,23 @@ window.약관칸 = () => { const c = consentRec(); return `<section class="sec c
   <p class="small muted" style="margin-top:8px">${c && c.at ? `동의한 날 ${esc(c.at)} · 판 ${esc(c.v || '')}` : '동의 기록이 이 휴대폰에 없어요'}</p></section>`; };
 /* 설정의 계정 칸(meta.account 가 켜졌을 때만) — 10-14 app-shell 에서 옮김(첫 화면 예산). 내용은 그대로 */
 window.계정칸 = () => D.meta?.account !== true ? '' : `<section class="sec card" id="acct"><h2>계정 <small>폰을 바꿔도 이어 보기 · 선택</small></h2>
-    <p class="small muted" style="margin:4px 0 12px">계정 없이도 약지도는 그대로 쓰실 수 있어요. 로그인하시면 기록을 메디나눔 서버(서울)에 복사해 두어 다른 폰에서 이어 받아요.</p>
+    <p class="small muted" style="margin:4px 0 12px">로그인하지 않아도 약지도는 쓰실 수 있어요. 로그인하시면 기록을 메디나눔 서버(서울)에 복사해 두어 다른 폰에서 이어 받아요.</p>
     ${계정화면HTML()}
     ${srvAgreed() ? `<button type="button" class="srvlink" onclick="서버동의끄기()">「서버에 저장하기」 동의 거두기</button>` : ''}
   </section>`;
+/* 2026-10-29 현욱님 — 설정 맨 위 첫 칸 = 계정 카드. 로그인 전엔 큰 단추 하나, 뒤엔 메일 · 이용권 · 동기화 · 로그아웃 · 계정 지우기(작게). 상세 칸(#acct)은 아래 그대로 */
+/* 계정 카드·메디나눔 서명 모양 — 첫 화면 예산 때문에 여기서 붙인다 */
+try { const st = document.createElement('style'); st.textContent = ".acct-card .acct-hd{display:flex;align-items:center;gap:12px}.acct-card .acct-hd>span:last-child{display:flex;flex-direction:column;min-width:0}.acct-card .acct-hd b{font-size:1.0625rem;overflow-wrap:anywhere}.acct-card .acct-hd small{color:var(--muted);font-size:.875rem;margin-top:2px}.acct-ic,.acct-av{flex:none;width:44px;height:44px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;background:var(--tint);color:var(--primary-deep)}.acct-av{background:var(--primary);color:var(--on-primary,#fff);font-weight:700;font-size:1.125rem}.acct-card .acct-go{width:100%;margin-top:14px;min-height:52px;font-size:1.0625rem}.acct-card .acct-act{display:flex;gap:10px;margin-top:14px}.acct-card .acct-act .btn{flex:1;margin:0;min-height:48px}.acct-card .srvrow{margin-top:12px}.acct-card .acct-del{margin-top:6px;font-size:.8125rem}.mn-logo{width:1.35em;height:1.35em;vertical-align:-.3em;margin-right:5px;color:#1A2B4A}.mn-logo path{fill:none;stroke:currentColor;stroke-width:236;stroke-linecap:round;stroke-linejoin:round}.mn-logo .mn-tile{fill:#FFFFFF;stroke:#CBD2DC;stroke-width:24}:root[data-theme=\"dark\"] .mn-logo .mn-tile{display:none}:root[data-theme=\"dark\"] .mn-logo{color:#FFFFFF}@media (prefers-color-scheme:dark){ :root:not([data-theme=\"light\"]) .mn-logo{color:#FFFFFF} :root:not([data-theme=\"light\"]) .mn-logo .mn-tile{display:none} }"; document.head.appendChild(st); } catch (e) {}
+window.계정카드 = () => { if (D.meta?.account !== true) return ''; const 나 = srvLoggedIn(), m = 나 ? (서버.세션()?.user?.email || '') : '';
+  if (!나) return `<section class="sec card acct-card"><div class="acct-hd"><span class="acct-ic" aria-hidden="true">${I.user}</span><span><b>메디나눔 계정</b><small>폰을 바꿔도 약통·복용 기록을 이어 봐요 · 선택</small></span></div>
+    <button type="button" class="btn primary acct-go" onclick="go('/login')">로그인 · 계정 만들기</button></section>`;
+  return `<section class="sec card acct-card"><div class="acct-hd"><span class="acct-av" aria-hidden="true">${esc(m.charAt(0).toUpperCase())}</span><span><b>${esc(m)}</b><small>로그인돼 있어요 · 이어 보기 켜짐</small></span></div>
+    ${window.이용권줄HTML ? 이용권줄HTML() : ''}
+    <div class="acct-act"><button type="button" class="btn line" onclick="계정동작('sync')">지금 맞추기</button><button type="button" class="btn line" onclick="계정동작('logout');setTimeout(route,600)">로그아웃</button></div>
+    <button type="button" class="srvlink acct-del" onclick="go('/me?t=set');setTimeout(()=>document.getElementById('acct')?.scrollIntoView({block:'start'}),300)">계정 지우기·동의 거두기는 아래 「계정」 칸에서</button></section>`; };
 window.계정줄 = () => D.meta?.account !== true ? '' : `<div class="rows-l acct-row">${srvLoggedIn() ? lrow(I.user, '메디나눔 계정', esc((서버.세션()?.user?.email || '') + ' · 이어 보기 켜짐'), "go('/login')") : lrow(I.user, '계정 만들기 · 로그인 <em class="door-tag">선택</em>', '폰을 바꿔도 이어 봐요', "go('/login')")}</div>`;
 window.처음계정 = () => D.meta?.account !== true || srvLoggedIn() ? '' : `<div class="hello-acct"><b>계정 만들기 · 로그인 <em class="door-tag">선택</em></b><span>폰을 바꿔도 이어 봐요</span>
-  <div class="actions two"><button class="btn line" onclick="helloFinish();go('/login')">${I.user} 로그인</button><button class="btn ghost" onclick="helloFinish()">나중에</button></div></div>`;
+  <div class="actions two"><button class="btn line" onclick="helloFinish();go('/login')">${I.user} 로그인 · 계정 만들기</button><button class="btn line" onclick="helloFinish()">둘러보기</button></div></div>`;
 /* 넓은 화면 왼쪽 메뉴의 앱 표시(아티팩트는 BRANDMARK 가 다르다) · 계정이 꺼져 있으면 메뉴의 계정 칸을 뺀다 */
 try { const nv = document.querySelector('nav.tabbar');
   if (nv && !nv.querySelector('.nav-mark')) nv.insertAdjacentHTML('afterbegin', `<a class="nav-mark pc" href="#/home"><img src="${esc(BRANDMARK)}" alt="" width="36" height="36"><span><b>약지도</b><small>집에서 할 일 · 약국 약 · 진료 신호를 차례로</small></span></a>`);
@@ -1392,7 +1817,7 @@ window.문_login = (_, q) => {
   ${나 ? '' : `<ul class="lg-list">
     <li>${I.check}<span>새 휴대폰에서 같은 이메일로 로그인하면 약통·복용 기록이 그대로 와요</span></li>
     <li>${I.check}<span>메디나눔 앱들과 계정 하나 — 기록은 앱마다 따로예요</span></li>
-    <li>${I.check}<span>로그인하지 않아도 약지도는 모두 쓰실 수 있어요</span></li></ul>`}
+    <li>${I.check}<span>로그인하지 않아도 약지도의 대부분의 기능을 쓰실 수 있어요</span></li></ul>`}
   ${켜짐 && window.계정문HTML ? 계정문HTML() : '<p class="door-note" style="margin-top:20px">계정은 준비 중이에요. 지금은 이 휴대폰에서 그대로 쓰실 수 있어요.</p>'}
   <button type="button" class="door-skip" onclick="문나가기()">${나 ? '돌아가기' : '로그인 없이 계속 쓰기'}</button>
   <p class="cs-foot"><button type="button" class="cs-doc" onclick="go('/doc/terms')">이용약관</button> · <button type="button" class="cs-doc" onclick="go('/doc/privacy')">개인정보 처리방침</button></p>
@@ -1426,11 +1851,11 @@ try { const css = document.createElement('style'); css.textContent = `
 .door{max-width:560px;margin:0 auto;padding:4px 0 32px}
 .door-mark{display:block;width:64px;height:64px;border-radius:18px;margin:12px auto 14px;box-shadow:0 6px 18px rgba(var(--primary-rgb),.18)}
 .door h1{text-align:center;font-size:1.625rem;line-height:1.35}
-.door-s{text-align:center;color:var(--muted);margin-top:6px;font-size:.9375rem}
+.door-s{text-align:center;color:var(--muted);margin-top:6px;font-size:1rem}
 .cs-new{display:flex;gap:10px;align-items:flex-start;margin-top:18px;padding:12px 14px;border-radius:12px;background:var(--accent-tint);color:var(--accent-text);font-size:.9375rem;font-weight:600;line-height:1.55}
 .cs-new svg.i{margin-top:2px}
 .cs-list{list-style:none;margin:20px 0 0;padding:2px 16px;background:var(--card);border:1px solid var(--hairline);border-radius:var(--r-card);box-shadow:var(--shadow-card)}
-.cs-list li{display:flex;gap:12px;align-items:flex-start;padding:13px 0;line-height:1.6;color:var(--body);font-size:.9375rem}
+.cs-list li{display:flex;gap:12px;align-items:flex-start;padding:13px 0;line-height:1.6;color:var(--body);font-size:1rem}
 .cs-list li+li{border-top:1px solid var(--hairline)}
 .cs-list svg.i{margin-top:2px;color:var(--primary)}
 .cs-h{font-size:1.0625rem;font-weight:800;margin:28px 2px 10px}
@@ -1459,6 +1884,7 @@ try { const css = document.createElement('style'); css.textContent = `
 .door-go:disabled{background:var(--tint2);color:var(--muted);box-shadow:none;border:1.5px dashed var(--ui-line);cursor:not-allowed}
 .door-why{margin-top:8px;text-align:center;font-size:.875rem;color:var(--muted)}
 .door-why[hidden],.door-msg[hidden]{display:none}
+.cs-sum{margin-top:18px;text-align:center;font-size:1rem;line-height:1.6;color:var(--body)}.cs-detail{margin-top:10px;padding:0}.cs-detail>summary{min-height:48px;justify-content:center;width:100%;font-size:1rem}.cs-detail h3{font-size:1.0625rem;margin:16px 0 4px}.cs-detail p,.cs-detail li{font-size:1rem;line-height:1.65}.cs-detail ul{padding-left:1.1em;margin:6px 0}.cs-note{margin-top:14px;color:var(--muted)}
 .cs-foot{margin-top:18px;text-align:center;font-size:.875rem;color:var(--muted);line-height:1.6}
 .cs-foot .cs-doc{font-size:.875rem}
 .lg h1{font-size:1.5rem}
@@ -1592,6 +2018,35 @@ window.vRxS = function(id){
   ${disclaimer('약을 줄이거나 바꾸는 것은 처방한 의사와 정하세요.')}`;
 }
 
+/* 받는 화면(app-shell 에서 옮김 — 첫 화면 예산 10-27) */
+window.vParentShareS = function(code){
+  const S = SHARE(); const st = PSHARE[code];
+  if (!S.fn) return `${topBar({ back:'처음으로', nosearch:true })}<section class="sec"><div class="empty card"><b>이 링크를 열 수 없어요</b>앱의 보내기 서버가 아직 준비되지 않았어요.</div></section>`;
+  if (!st) { PSHARE[code] = { loading: true };
+    fetch(S.fn, { method:'POST', headers:{ 'Content-Type':'application/json' }, body: JSON.stringify({ action:'get', code }) })
+      .then(r => r.json().then(j => ({ ok: r.ok, status: r.status, j }))).then(({ ok, status, j }) => { PSHARE[code] = ok ? { data: j } : { err: status }; route(); })
+      .catch(() => { PSHARE[code] = { err: 0 }; route(); });
+    return `${topBar({ back:'처음으로', nosearch:true })}<section class="sec"><p class="loading">받은 약을 불러오는 중이에요…</p></section>`; }
+  if (st.loading) return `${topBar({ back:'처음으로', nosearch:true })}<section class="sec"><p class="loading">받은 약을 불러오는 중이에요…</p></section>`;
+  if (st.err) return `${topBar({ back:'처음으로', nosearch:true })}<section class="sec"><div class="empty card"><b>${st.err === 410 ? '기간이 지난 링크예요' : '받은 약을 불러오지 못했어요'}</b>${st.err === 410 ? '보낸 지 7일이 지나 지워졌어요. 다시 보내 달라고 해 주세요.' : '인터넷 연결을 확인하고 다시 열어 주세요.'}</div></section>`;
+  const x = st.data;
+  const sy = (() => { const t = (x.items || []).find(it => /^sym:/.test(it.id || '')); return t ? byId(D.symptoms, t.id.slice(4)) : null; })();
+  const meds = (x.items || []).filter(it => !/^sym:/.test(it.id || ''));
+  /* 외부 검수 6차 #5 — 보내는 화면·복사 글과 같은 설명서 단서(근이완 복합제 + 다른 해열진통제)를 받는 화면에도 — 같은 판정(basket 의 mix 1) */
+  const nsK = k => (ingIndex().byKey[k]?.cls || []).includes('nsaid'), dk = it => drug(it.id) ? drugKeys(drug(it.id)) : [];
+  const mixIt = it => dk(it).includes('ethenzamide') && meds.some(o => o !== it && dk(o).some(k => k === 'acetaminophen' || nsK(k)));
+  return `<div class="pshare">${topBar({ back:'처음으로', nosearch:true })}
+  <div class="eyebrow">${x.label ? esc(x.label) + '께 온 부탁' : '받은 약'}</div>
+  <h1 style="font-size:1.625rem">이 화면을 약사님께 보여 주세요</h1>
+  ${x.note ? `<p class="ps-note">“${esc(x.note)}”</p>` : ''}
+  <section class="sec"><div class="ps-list">${meds.map(it => { const d = drug(it.id); const nm = it.product || (d ? d.name : it.name);
+    return `<div class="ps-item">${prodArt(pimg(it.product || ''), nm)}<div><b>${esc(nm)}</b><span>${esc(it.product ? (d ? ingrName(d) : it.name) : '')}</span>${mixIt(it) ? `<small class="cau">${I.alert}${esc(mixTxt({ mix: 1 }))}</small>` : ''}</div></div>`; }).join('')}</div>
+    <p class="ps-ask">성분·함량·제형이 같으면 다른 제품도 괜찮아요.</p></section>
+  ${sy && sy.care?.er?.length ? `<div class="flag" role="note" style="margin-top:12px">${I.alert}<div><b>이럴 땐 약 대신 바로 119</b><p>${esc(sy.name)} 때문에 보내 드린 약이에요. 아래 가운데 하나라도 있으면 약국에 가지 마시고 119에 전화하거나 응급실로 가세요.</p>${list(sy.care.er)}<a class="call" href="tel:119">${I.alert} 119 전화</a></div></div>${sy.care.clinic?.length ? fold('이럴 땐 오늘 병원으로', list(sy.care.clinic)) : ''}` : ''}
+  <div class="note" style="margin-top:12px">${I.alert}<span><b>약사님께 앓고 계신 병과 드시는 약을 꼭 말씀하세요.</b> 혈압약·당뇨약·피 묽게 하는 약을 드시면 특히요.</span></div>
+  <div class="actions"><a class="btn" href="${GO_LINK.open[0]}" target="_blank" rel="noopener">${I.pin || I.search} 가까운 문 연 약국 찾기</a>${x.bought_at ? `<span class="badge otc">샀어요 표시함</span>` : `<button class="btn line" onclick="psBought('${esc(code)}')">${I.check} 샀어요</button>`}</div>
+  ${disclaimer()}</div>`;
+};
 /* 의사에게 물어보기(app-shell 에서 옮김 — 첫 화면 예산 10-26) */
 window.vAskDocS = function(_, q){
   const A = D.askdoc || []; if (!A.length) return vHome();
@@ -1891,4 +2346,4 @@ try { 통합찾기.설치({ 앱: 'yakjido', 열기: function (url) { location.hr
 try { 이용량.설치({ 앱: 'yakjido', 켜짐: false, 주소: 'https://uszalzczpmyifzbamjno.supabase.co', 공개키: 'sb_publishable_YQSz-D-RCXzHGUhso06rMg_GOIIRDuV' }); 이용량.센다('open'); } catch (e) {}
 
 /* 내 정보·동의·로그인·약관 화면을 보고 있었으면 다시 그린다(이 파일이 늦게 오므로) */
-try { if (/^#\/(me|consent|login|doc|hello\/3|supp$|supp\?|sgoal|sstage|rx|about|search|myths|askdoc)/.test(location.hash)) route(); } catch (e) {}
+try { if (/^#\/(me|consent|login|doc|hello\/3|supp$|supp\?|sgoal|sstage|rx|about|search|myths|askdoc|talk|p\/|p\?|p$)/.test(location.hash)) route(); } catch (e) {}

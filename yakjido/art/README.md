@@ -17,6 +17,8 @@
 | `supp-label.png` | 영양제 라벨 사진 찍기 | 1:1 |
 | `kids-dose.png` | 아이 해열제 용량 | 1:1 |
 | `easy-mode.png` | 내 정보 › 어르신 모드 (88px 원형) | 1:1 |
+| `empty-bag.png` | 빈 화면(내 약통·같이 먹기·내 정보 약) — 없으면 약국 삽화 (116px 원형) | 1:1 |
+| `done-today.png` | 오늘 약 다 드신 순간 — 고리 자리에 (64px 원형) | 1:1 |
 | `me-safety.png` · `tips.png` · `empty-search.png` | (자리만 예약, 지금은 안 씀) | 1:1 |
 
 `.webp` · `.jpg` 도 같은 이름이면 인식합니다.

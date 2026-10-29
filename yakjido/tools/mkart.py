@@ -13,6 +13,9 @@ s = re.sub(r'^\s*<link rel="(manifest|apple-touch-icon|icon)"[^>]*>\s*$\n?', '',
 # 아티팩트 CSP 는 Google Fonts 외 스타일시트를 막는다 — jsdelivr 의 Pretendard 링크는 빼고 Noto Sans KR 로 간다
 s = re.sub(r'^\s*<link rel="preconnect" href="https://cdn.jsdelivr.net"[^>]*>\s*$\n?', '', s, flags=re.M)
 s = re.sub(r'^\s*<link rel="stylesheet" href="https://cdn.jsdelivr.net[^"]*">\s*$\n?', '', s, flags=re.M)
+# 10-27 바깥 파일 0 — 배포본은 묶음 안 fonts/pretendard.css 를 쓴다. 아티팩트(파일 하나)에는 그 파일이 없으니 Google Noto Sans KR 로 바꿔 단다(CSP 허용)
+s = re.sub(r'<link rel="stylesheet" href="fonts/pretendard\.css"[^>]*>', '<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700;800&display=swap">', s, count=1)
+s = re.sub(r'<noscript><link rel="stylesheet" href="fonts/pretendard\.css"></noscript>\s*', '', s)
 # 서비스워커 등록 블록 전체를 뺀다(아티팩트에는 워커가 없다). 여러 줄이라 중괄호를 세어 자른다.
 i = s.find("if ('serviceWorker' in navigator")
 if i >= 0:
@@ -34,6 +37,12 @@ s = s.replace("onclick=\"downloadIcs()\">${I.clock} 받기</button>", "onclick=\
 _srv = ROOT / 'srv.js'
 if _srv.exists():
     s = s.replace('<script src="srv.js" defer></script>', '<script>' + _srv.read_text(encoding='utf-8').replace('</script', '<\\/script') + '</script>')
+# 다섯 언어(10-27) — 아티팩트는 파일 하나라 사전과 i18n.js 를 안에 싣는다(한국어·한국이면 i18n.js 는 아무것도 안 하게 가드)
+_i18 = ROOT / 'i18n.js'
+if _i18.exists():
+    _dicts = {f.stem: json.loads(f.read_text(encoding='utf-8')) for f in sorted((ROOT / 'i18n').glob('[a-z][a-z].json'))}
+    _blob = '<script>window.__I18N__=' + json.dumps(_dicts, ensure_ascii=False, separators=(',', ':')).replace('</', '<\\/') + ';if(window.LANG!=="ko"||window.CC!=="KR"){' + _i18.read_text(encoding='utf-8').replace('</script', '<\\/script') + '}</script>'
+    s = s.replace('</body>', _blob + '</body>', 1) if '</body>' in s else s + _blob
 # 아티팩트에는 privacy.html 파일이 없다 — 깃허브 페이지의 방침으로 연다
 _a = "window.방침주소 = function(){ return NATIVE ? (D.meta?.share?.app || 'https://usualhealth383-cloud.github.io/autoblog/yakjido/') + 'privacy.html' : 'privacy.html'; };"
 assert _a in s, '방침주소 정의가 바뀌었습니다 — mkart.py 를 맞춰 주세요'

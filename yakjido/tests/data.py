@@ -329,8 +329,12 @@ if _idx.exists():
     # 2026-10-19 228 → 229 KB: 3차 외부 검수 P0 #1(응급 체크 뒤 한눈 보기 「약국」 줄·탭 이름 숨김) + 탭 aria-selected. 안전 고침이라 화면 코드에 둔다(+0.2 KB).
     # 2026-10-21 230 → 232 KB: 외부 검수 4차 P0 #1(응급·금기 약을 팁·처방 탭·읽어 주기에서도 거르기)·#4 이름 줄기 고르기·#5 기준선 줄 — 안전 고침이라 화면 코드에 둔다.
     # 2026-10-22 232 → 233 KB: 외부 검수 5차 #1·#2(위궤양 두 칸·상의 약 먹는 법 빼기·처방 조합 카드)·#3(고른 어린이 제품은 몸무게 계산) — 안전 고침이라 화면 코드에 둔다.
-    if _gzkb > 233:
-        fails.append(f'첫 화면이 무겁습니다 — index.html 압축 {_gzkb:.0f} KB (한계 233 KB). 본문은 data/core.json 으로 빼야 합니다')
+    # 2026-10-29 233 → 234 KB: 현욱님 「로그인이 설정 안에 숨어 있으면 말이 되냐」 — 홈 머리 계정 단추(첫 그림에 있어야 해서 뺄 수 없다, +0.3 KB). 카드·서명 모양은 srv.js 로 옮김.
+    # 2026-10-29 정규식 뒤돌아보기((?<! (?<=)는 iOS 16.4 전 Safari 에서 스크립트 전체가 열리지 않는다(곁에 13곳 사고)
+    for _f in list(_idx.parent.glob('*.js')) + [_idx]:
+        if re.search(r'\(\?<[!=]', _f.read_text(encoding='utf-8', errors='ignore')): fails.append(f'옛 Safari 에서 멈추는 정규식 뒤돌아보기가 있습니다 — {_f.name}')
+    if _gzkb > 234:
+        fails.append(f'첫 화면이 무겁습니다 — index.html 압축 {_gzkb:.0f} KB (한계 234 KB). 본문은 data/core.json 으로 빼야 합니다')
     if not _core.exists():
         fails.append('docs/yakjido/data/core.json 이 없습니다 — 빌드를 다시 돌리세요')
     else:

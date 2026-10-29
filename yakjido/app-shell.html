@@ -34,14 +34,9 @@ try { var th0 = localStorage.getItem('yakjido.theme'), de0 = document.documentEl
   else window.addEventListener('load', function(){ setTimeout(show, 4000); });
 })();
 </script>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<!-- 2026-10-13 상용화 점검 5-12 — 바깥 글꼴 CSS 가 첫 그림을 막지 않게(media=print 로 받고 다 받으면 all). 못 받으면 시스템 글꼴로 그대로 보인다 -->
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700;800&display=swap" media="print" onload="this.media='all'">
-<!-- 본문 글꼴: Pretendard Variable(토스·당근이 쓰는 한글 UI 서체). 필요한 글자 묶음만 받는 dynamic subset. 못 받으면 Noto Sans KR 로 자연히 떨어진다 -->
-<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css" media="print" onload="this.media='all'">
-<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700;800&display=swap"><link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css"></noscript>
+<!-- 본문 글꼴: Pretendard Variable 부분 글꼴(필요한 글자 묶음만 받음). 10-27 바깥 파일 0 — 배포 묶음 안(fonts/)에서 받는다(중국·인터넷 막힌 곳·기내). 첫 그림을 막지 않게 media=print 로 받고 다 받으면 all, 못 받으면 시스템 글꼴 -->
+<link rel="stylesheet" href="fonts/pretendard.css" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="fonts/pretendard.css"></noscript>
 <style>
 :root{
   --primary:#0B6E8F; --primary-deep:#08526B; --primary-rgb:11,110,143;
@@ -78,9 +73,6 @@ try { var th0 = localStorage.getItem('yakjido.theme'), de0 = document.documentEl
     --shadow-card:0 4px 18px rgba(0,0,0,.35); --shadow-raised:0 6px 16px rgba(0,0,0,.45);
   }
 }
-.mn-logo{width:1.15em;height:1.15em;vertical-align:-.2em;margin-right:4px;color:#1A2B4A}.mn-logo path{fill:none;stroke:currentColor;stroke-width:236;stroke-linecap:round;stroke-linejoin:round}
-:root[data-theme="dark"] .mn-logo{color:#FFFFFF}
-@media (prefers-color-scheme:dark){ :root:not([data-theme="light"]) .mn-logo{color:#FFFFFF} }
 :root[data-theme="dark"]{
   --primary:#5DB3D2; --primary-deep:#8CCDE3; --primary-rgb:93,179,210;
   --accent:#D9A24E; --accent-text:#E9B86A; --accent-tint:#2E2619;
@@ -286,7 +278,7 @@ ol.tl li:last-child{padding-bottom:0}
 .bag-line.on .cnt{flex:none;display:inline-grid;place-items:center;min-width:26px;height:26px;padding:0 7px;border-radius:13px;background:var(--normal);color:#fff;font-weight:800;font-size:.875rem;margin-right:2px}
 *{box-sizing:border-box;margin:0;padding:0}
 html{-webkit-text-size-adjust:100%}
-html{font-size:var(--fs,16px)}
+html{font-size:var(--fs,17px)}
 body{background:var(--ground);color:var(--text);font-family:var(--font);word-break:keep-all;overflow-wrap:break-word;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;
   line-height:1.6;display:flex;justify-content:center;min-height:100vh;font-size:1rem;
   -webkit-font-smoothing:antialiased;text-wrap:pretty}
@@ -331,6 +323,10 @@ p{color:var(--body)}
 .brand .mark img{width:34px;height:34px;display:block;border-radius:9px}
 .brand b{font-size:1.125rem;font-weight:800;letter-spacing:-.02em}
 .brand span{display:block;font-size:.875rem;color:var(--muted);line-height:1.2}
+.acct-btn{flex:none;display:inline-flex;align-items:center;gap:6px;min-height:44px;padding:0 14px;margin-left:10px;border:1px solid var(--hairline);border-radius:99px;background:var(--card);color:var(--primary-deep);font:700 .9375rem inherit}
+@media (max-width:480px){.top .rs-d{display:none}}@media (max-width:400px){.acct-btn .ab-t{display:none}.acct-btn{width:44px;padding:0;justify-content:center}}.top .brand{min-width:0}
+.acct-btn.on{width:44px;padding:0;justify-content:center;background:var(--primary);color:var(--on-primary)}
+.top .review-stamp{margin-left:auto}
 .review-stamp{display:inline-flex;align-items:center;gap:6px;white-space:nowrap;flex:none;color:var(--primary);font-size:.875rem;font-weight:600}
 .review-stamp svg.i{width:15px;height:15px}
 .review-stamp.wait{color:var(--caution)}
@@ -1454,6 +1450,7 @@ table.cmp td:first-child{font-weight:700;word-break:keep-all;min-width:6em}
 .cmp-bar button{background:var(--card);color:var(--text);border-radius:9px;padding:8px 14px;font-weight:700;font-size:.875rem;min-height:36px}
 .checkrow{display:flex;align-items:center;gap:var(--s3);padding:12px 0;border-bottom:1px solid var(--hairline);min-height:52px}
 .checkrow:last-child{border-bottom:0}
+.lang-pill{float:right;min-height:40px;padding:0 10px;border:1px solid var(--hairline);border-radius:999px;background:var(--card);color:var(--text);font:inherit;font-size:.875rem}
 .checkrow{position:relative}.checkrow label::before{content:"";position:absolute;inset:0}
 .checkrow input{width:20px;height:20px;accent-color:var(--primary);flex:none}
 .checkrow label{flex:1;min-width:0;font-size:.9375rem;font-weight:600;overflow-wrap:anywhere}
@@ -1520,6 +1517,7 @@ body .cmp-bar,body .toast{left:calc(50% + 124px)}body .toast{bottom:40px}.cmp-ba
 .empty b{display:block;color:var(--text);margin-bottom:6px}
 .em-ic{display:grid;place-items:center;width:56px;height:56px;margin:0 auto 12px;border-radius:50%;background:var(--tint2);color:var(--primary)}.em-ic svg.i{width:26px;height:26px}
 .art.mini{width:116px;height:116px;margin:4px auto 0;border:0;background:none;border-radius:50%}.art.mini img{height:100%;object-fit:cover}
+.art.done-art{width:64px;height:64px;margin:0;border:0;background:none;border-radius:50%;flex:none}.art.done-art img{height:100%;object-fit:cover}
 .today-hero.all .ring{animation:th-pop .5s cubic-bezier(.2,.9,.3,1.3)}@keyframes th-pop{0%{transform:scale(.85)}100%{transform:none}}
 @media (prefers-reduced-motion:reduce){.today-hero.all .ring{animation:none}}
 
@@ -1751,6 +1749,7 @@ main>*:nth-child(2){animation-delay:.04s} main>*:nth-child(3){animation-delay:.0
 .hello-chk .bx svg.i{width:17px;height:17px;stroke-width:2.6}
 .hello-chk.on{border-color:var(--primary);background:var(--tint);color:var(--primary-deep)}
 .hello-chk.on .bx{background:var(--primary);border-color:var(--primary);color:var(--on-primary)}
+.hello-end{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:18px}.hello-end .btn{margin:0;min-height:52px}
 .hello-skip{display:block;width:100%;margin:var(--s5) 0 var(--s4);min-height:52px;border-radius:12px;color:var(--muted);font-size:.9375rem;font-weight:600}
 
 
@@ -2432,6 +2431,8 @@ const COLORS = { '하양':'#F4F4F2', '노랑':'#F2D24B', '분홍':'#F2A7B8', '�
 /* 삽화 헬퍼: 빌드가 넣어 준 목록에 있는 그림만 그린다. 파일이 없으면 빈 문자열이라 레이아웃 구멍이 안 생긴다. */
 const ART = new Set(D.art || []);
 const hasArt = n => ART.has(n);
+/* 빈 화면 그림 — 현욱님 그림(empty-bag)이 들어오면 그것, 없으면 약국 삽화 (10-28) */
+const emptyArt = () => art(hasArt('empty-bag') ? 'empty-bag' : 'guide-2-pharmacy', 'mini');
 const art = (n, cls = '') => hasArt(n) ? `<figure class="art ${cls}"><img src="art/${n}.webp" alt="" decoding="async" onerror="this.closest('.art')?.remove()"></figure>` : '';
 
 /* 상단 검색 — 어느 화면에서든 바로 찾을 수 있게. 입력하면 결과가 그 자리에 뜬다. */
@@ -2484,6 +2485,19 @@ function psSwap(root){
     im.replaceWith(sp);
   });
 }
+/* 다섯 언어(10-27) — 언어는 기기·설정, 번호는 «있는 나라». 한국어·한국이면 번역 장치를 받지 않는다(i18n.js) */
+const LANG = (() => { try { const v = localStorage.getItem('yakjido.lang'); if (/^(ko|en|es|ja|zh)$/.test(v)) return v; } catch (e) {} const n = (navigator.language || 'ko').slice(0, 2).toLowerCase(); return /^(ko|en|es|ja|zh)$/.test(n) ? n : 'en'; })();
+/* 나라 = 응급 번호. ① 고른 나라 ② 기기 시간대(영어 폰을 쓰는 한국 거주자도 119 — 10-27 곁에에서 발견) ③ 언어 지역 꼬리. 시간대가 표 밖 나라면 'XX'(모르는 나라 → 112) */
+const CC = (() => { try { const v = localStorage.getItem('yakjido.cc'); if (v) return v; } catch (e) {}
+  let tz = ''; try { tz = Intl.DateTimeFormat().resolvedOptions().timeZone || ''; } catch (e) {}
+  if (tz) { if (tz === 'Asia/Seoul') return 'KR'; if (tz === 'Asia/Tokyo') return 'JP'; if (/^Asia\/(Shanghai|Chongqing|Chungking|Harbin|Urumqi|Kashgar)$|^PRC$/.test(tz)) return 'CN';
+    if (/^(Europe\/Madrid|Atlantic\/Canary|Africa\/Ceuta)$/.test(tz)) return 'ES';
+    if (/^America\/(New_York|Chicago|Denver|Los_Angeles|Phoenix|Anchorage|Juneau|Sitka|Metlakatla|Yakutat|Nome|Adak|Boise|Detroit|Menominee|Indiana\/.+|Kentucky\/.+|North_Dakota\/.+)$|^Pacific\/Honolulu$|^US\//.test(tz)) return 'US';
+    if (tz !== 'UTC' && tz !== 'Etc/UTC') return 'XX'; }
+  const m = (navigator.language || '').match(/-([A-Za-z]{2})\b/); return m ? m[1].toUpperCase() : ({ ko:'KR', en:'US', es:'ES', ja:'JP', zh:'CN' })[LANG]; })();
+window.LANG = LANG; window.CC = CC;
+function setLang(l, cc){ try { localStorage.setItem('yakjido.lang', l); if (cc) localStorage.setItem('yakjido.cc', cc); } catch (e) {} location.reload(); }
+if (LANG !== 'ko' || CC !== 'KR') { const s = document.createElement('script'); s.src = 'i18n.js'; document.head.appendChild(s); }
 function route(){
   const h = location.hash.replace(/^#\/?/, '') || 'home';
   const [path, qs] = h.split('?');
@@ -2495,7 +2509,7 @@ function route(){
   /* 처음 안내 중에는 아래 탭을 감춘다 — 누르면 안내가 반쯤 끝났다(3-24) */
   document.body.classList.toggle('no-nav', /^(hello|consent|login|doc)$/.test(seg[0])); document.body.classList.toggle('is-door', /^(consent|login)$/.test(seg[0]));
   const q = Object.fromEntries(new URLSearchParams(qs || ''));
-  const tab = { send:'home', p:'home', show:'home', check:'home', home:'home', symptom:'home', drugs:'drugs', drug:'drugs', class:'drugs', search:'drugs', pub:'drugs', pill:'drugs', guide:'home', kids:'home', tips:'home', myths:'home', schedule:'me', photo:'drugs', pillinfo:'drugs', supp:'supp', sgoal:'supp', sstage:'supp', compare:'supp', me:'me', about:'me', ingr:'drugs', brand:'drugs', nut:'supp', hello:'home', mix:'drugs', together:'me', kinds:'me', rx:'me', rxout:'drugs', senior:'drugs', askdoc:'home', login:'login' }[seg[0]] || 'home';
+  const tab = { send:'home', p:'home', show:'home', check:'home', home:'home', symptom:'home', drugs:'drugs', drug:'drugs', class:'drugs', search:'drugs', pub:'drugs', pill:'drugs', guide:'home', kids:'home', tips:'home', myths:'home', schedule:'me', photo:'drugs', pillinfo:'drugs', supp:'supp', sgoal:'supp', sstage:'supp', compare:'supp', me:'me', about:'me', ingr:'drugs', brand:'drugs', nut:'supp', hello:'home', mix:'drugs', together:'me', kinds:'me', rx:'me', rxout:'drugs', senior:'drugs', askdoc:'home', talk:'home', login:'login' }[seg[0]] || 'home';
   /* 지금 탭을 색으로만 보이지 않게 — 화면낭독기가 「현재 페이지」라고 읽는다(5-18) */
   document.querySelectorAll('nav.tabbar button').forEach(b => { const on = b.dataset.tab === tab; b.classList.toggle('on', on); on ? b.setAttribute('aria-current', 'page') : b.removeAttribute('aria-current'); });
   /* 본문 자료가 아직이면 — 첫 화면과 인사만 먼저 그리고, 나머지는 받은 뒤에 다시 그린다.
@@ -2517,7 +2531,7 @@ function route(){
     if (DETAIL === 3) { window.__DETAIL_SKIP__ = true; ensureDetail(); }
     else { view.innerHTML = topBar({ back:'뒤로', nosearch:true }) + `<section class="sec"><p class="loading">자료를 불러오는 중이에요…</p></section>`; ensureDetail().then(route); return; }
   }
-  const R = { send:vSend, p:vParentShare, show:vShow, check:vCheck, home:vHome, symptom:vSymptom, drugs:vDrugs, drug:vDrug, class:vClass, search:vSearch, pub:vPub, pill:vPill, guide:vGuide, kids:vKids, tips:vTips, myths:vMyths, schedule:vSchedule, photo:vPhoto, pillinfo:vPillInfo, supp:vSupp, sgoal:vDoor, sstage:vDoor, compare:vCompare, me:vMe, about:vAbout, ingr:vIngr, brand:vBrand, nut:vNut, hello:vHello, mix:vMix, together:vTogether, kinds:vKinds, rx:vRx, bag:vBag, rxout:vRxOut, senior:vSenior, askdoc:vAskDoc, vitals:vVitals, visits:vVisits, demo:vDemo, consent:vDoor, login:vDoor, doc:vDoor };
+  const R = { send:vSend, p:vParentShare, show:vShow, check:vCheck, home:vHome, symptom:vSymptom, drugs:vDrugs, drug:vDrug, class:vClass, search:vSearch, pub:vPub, pill:vPill, guide:vGuide, kids:vKids, tips:vTips, myths:vMyths, schedule:vSchedule, photo:vPhoto, pillinfo:vPillInfo, supp:vSupp, sgoal:vDoor, sstage:vDoor, compare:vCompare, me:vMe, about:vAbout, ingr:vIngr, brand:vBrand, nut:vNut, hello:vHello, mix:vMix, together:vTogether, kinds:vKinds, rx:vRx, bag:vBag, rxout:vRxOut, senior:vSenior, askdoc:vAskDoc, talk:vTalk, vitals:vVitals, visits:vVisits, demo:vDemo, consent:vDoor, login:vDoor, doc:vDoor };
   /* 한 화면이 그리다 터져도 앱 전체가 멈춘 것처럼 보이지 않게 — 자료 한 줄의 흠이 흰 화면이 되지 않도록(2026-10-08 출시 점검) */
   let html;
   /* 익명 이용 통계(공용 이용량 부품 · 기본 꺼짐) — 화면 «종류» 이름만 센다. 약 이름·증상·검색어는 세지 않는다 */
@@ -2551,6 +2565,7 @@ function route(){
   /* 다른 화면으로 가면 펼친 것을 접는다 */
   if (path !== ROUTE_PREV) { MORE_OPEN = false; OPEN_BUY = ''; }
   ROUTE_PREV = path;
+  window.I18N?.apply(view);
 }
 let ROUTE_PREV = '';
 /* 다시 그리기 전에 누르던 단추를 알아 두었다가 새로 그린 같은 단추로 초점을 돌려준다 */
@@ -2593,7 +2608,7 @@ window.addEventListener('scroll', () => { SCROLL[LASTPATH] = window.scrollY; }, 
 window.addEventListener('hashchange', route);
 /* ── 39. 오프라인 — 조용한 띠 하나. 앱은 캐시로 열리지만 식약처 자료는 못 받을 수 있다 ── */
 function netBar(){ let b = document.querySelector('.netbar'); if (navigator.onLine) { b?.remove(); return; }
-  if (!b) { b = document.createElement('div'); b.className = 'netbar'; b.innerHTML = `${I.info}<span>지금은 인터넷이 안 돼요. 저장된 화면은 보이지만 <b>식약처 낱알·사진 읽기</b>는 연결 뒤에 돼요.</span>`; document.querySelector('.app')?.prepend(b); } }
+  if (!b) { b = document.createElement('div'); b.className = 'netbar'; b.innerHTML = `${I.info}<span>인터넷 없이 쓰는 중 — 로그인·동기화·바깥 링크·사진 읽기는 연결되면 돼요</span>`; document.querySelector('.app')?.prepend(b); } }
 window.addEventListener('online', netBar); window.addEventListener('offline', netBar); setTimeout(netBar, 0);
 /* 지금 탭을 한 번 더 누르면 맨 위로(같은 화면은 다시 그려도 자리를 지키므로) */
 document.querySelectorAll('nav.tabbar button').forEach(b => b.addEventListener('click', () => { if (location.hash === '#/' + b.dataset.tab) window.scrollTo({ top: 0 }); go('/' + b.dataset.tab); }));
@@ -2606,12 +2621,12 @@ function insertPanel(html, panel){
 
 /* ───────── 공통 조각 ───────── */
 /* 큰 글씨(18px 이상)에서는 머리 도장의 날짜·검색 안내 예시를 뺀다 — 두 줄로 꺾이고 잘렸다(3-24). 날짜는 근거 화면에 있다 */
-const bigFs = () => { try { return parseFloat(localStorage.getItem('yakjido.fs') || '16') >= 18; } catch (e) { return false; } };
+const bigFs = () => { try { return parseFloat(localStorage.getItem('yakjido.fs') || '17') >= 19; } catch (e) { return false; } };
 const topBar = (opts = {}) => `
   <div class="top">
     ${opts.back ? `<button class="back" onclick="goBack()">${I.prev}${esc(opts.back)}</button>` : `
     <div class="brand"><div class="mark"><img src="${BRANDMARK}" alt="" width="34" height="34"></div><div><b>약지도</b><span>증상에 맞는 약 · 복약 알림</span></div></div>`}
-    ${opts.unreviewed ? `<span class="review-stamp wait">${I.alert}의사 확인 중</span>` : opts.unv ? `<span class="review-stamp wait">${I.info}자료 확인 중</span>` : `<span class="review-stamp">${I.shield}${esc(D.meta?.reviewLabel || '의료진 검수')}${bigFs() ? '' : ` · ${esc(D.meta?.reviewed || '')}`}</span>`}
+    ${opts.unreviewed ? `<span class="review-stamp wait">${I.alert}의사 확인 중</span>` : opts.unv ? `<span class="review-stamp wait">${I.info}자료 확인 중</span>` : `<span class="review-stamp">${I.shield}${esc(D.meta?.reviewLabel || '의료진 검수')}${bigFs() ? '' : `<span class="rs-d"> · ${esc(D.meta?.reviewed || '')}</span>`}</span>`}${!opts.back ? acctBtn() : ''}
   </div>
   ${opts.nosearch ? '' : `<div class="topfind">${I.search}<input id="gq" aria-label="증상이나 약 이름으로 찾기" placeholder="${bigFs() ? '증상이나 약 이름' : '증상·약 이름으로 찾기 (예: 허리, 타이레놀)'}" autocomplete="off" enterkeyhint="search" value="${esc(GQ)}"><button class="gq-x ${GQ ? '' : 'hide'}" onclick="GQ='';route()" aria-label="지우기">${I.x}</button></div>`}<!--TOPEND-->`;
 /* 출처 칩은 「저자·연도」까지만. 예전 규칙은 괄호 「(」에서만 잘라서, 「—」로 쓴 출처 44개가
@@ -2665,7 +2680,7 @@ function fmt(t){ return esc(t).replace(/\*\*(.+?)\*\*/g, '<b>$1</b>').replace(/\
     (m, w, cb, sp, num) => `${w}${cb || ''}${sp}<a class="call-in" href="tel:${num}">${num}</a>`)
   /* 119 는 본문 어디에 나와도 누르면 걸리게. 이 앱의 모든 119 는 «지금 전화하세요»라는 뜻이고,
      용량·개수로 119 가 쓰인 곳은 없다(검사로 확인). 이미 링크가 된 것은 건드리지 않는다. */
-  .replace(/(?<!tel:)(?<![\d>-])119(?![\d-])/g, '<a class="call-in" href="tel:119">119</a>'); }
+  .replace(/119(?![\d-])/g, (m, i, all) => /(tel:|[\d>-])$/.test(all.slice(Math.max(0, i - 4), i)) ? m : '<a class="call-in" href="tel:119">119</a>'); }   /* 10-29 뒤돌아보기 정규식은 iOS 16.4 전 Safari 에서 스크립트 전체를 멈춘다 */
 /* 여러 성분의 「내 정보 기준」 경고를 한 목록으로 — 성분 이름을 앞에 붙인다 */
 function meWarningsMany(list){
   const f = activeFlags(); if (!f.length) return '';
@@ -3443,6 +3458,7 @@ function vHome(){
     <h1 class="greet">어디가 불편하세요?</h1>
     <p>증상을 고르시면 약국에서 무엇을 찾으면 되는지, 병원에 가야 할 신호는 무엇인지 알려 드려요.</p>
   </section>`}
+  ${ext('대화줄')}
   <a class="er-line" href="tel:119">${I.alert}<span>가슴이 조이듯 아프거나, 숨이 많이 차거나, 말이 어눌하고 한쪽에 힘이 빠지면 <b>바로 119</b></span></a>
   ${condOn().length || ME.condskip ? '' : `<div class="cond-line"><button type="button" onclick="go('/me?t=body')">${I.user}<span>앓는 병이 있으면 알려 주세요 — <b>피해야 할 약을 걸러 드려요</b></span>${I.chev}</button><button type="button" class="x" aria-label="이 안내 닫기" onclick="ME.condskip=true;saveMe();route()">${I.x}</button></div>`}
   ${storeBar()}
@@ -3470,6 +3486,7 @@ function vHome(){
     ${lrow(I.leaf, '내 영양제 성분 겹치는지 보기', '제형·함량·상한 기준으로 비교', "go('/supp')")}
     ${lrow(I.cart, '편의점에서 살 수 있는 약', '안전상비의약품 13종', "go('/drugs?cat=cvs')")}
   </div></details>
+  ${ext('기내줄')}
   ${disclaimer()}`;
 }
 document.addEventListener('keydown', e => { if (e.target.id === 'q' && e.key === 'Enter') go('/search?q=' + encodeURIComponent(e.target.value.trim())); });
@@ -4565,7 +4582,7 @@ function tipBan(s){
    일반 천식에서 통째로 빼지 않고 지금처럼 「약사와 먼저 상의」로 남긴다(4차 #1 뒤 자체 점검 — 천식이면 두통에 살 약이 하나도 없어졌다) */
 const narrowAv = a => String(a.flags) === 'asthma' && /(아스피린|소염진통제|감기약)[^.]*(적이 있|있었던|생긴 적|온 적)/.test(a.text || '') && !/그 밖의 천식도 설명서/.test(a.text || '');
 const banList = (L, b) => !b || !Array.isArray(L) ? L : L.filter(t => !b.hit(typeof t === 'object' ? (t.q || '') + ' ' + (t.a || '') + ' ' + (t.t || t.text || '') : t));
-const banProse = (t, b) => !b || !t ? t : String(t).split(/(?<=[.!?])\s+/).filter(x => !b.hit(x)).join(' ');
+const banProse = (t, b) => !b || !t ? t : String(t).replace(/([.!?])\s+/g, '$1\u0001').split('\u0001').filter(x => !b.hit(x)).join(' ');
 /* 「심한 ○○」을 켜면 «덜 심한» 칸도 함께 켜진다 — 안내에는 한 번만 */
 const flagTop = L => (L || []).filter(x => !(x === 'heart' && L.includes('hf')) && !(x === 'liver' && L.includes('lvs')) && !(x === 'ulcer' && L.includes('bleed')));
 const banNote = b => !b ? '' : (b.names.length ? `<p class="note ban-note">${I.alert}<span>내 몸 조건(${esc(flagTop(b.why).map(x => FLAG_LABEL[x] || x).join(', '))}) 때문에 <b>${esc(b.names.join('·'))}</b> 안내는 뺐어요 — 다른 약도 먹기 전에 약사·의사와 먼저 상의하세요.</span></p>` : '')
@@ -4874,6 +4891,7 @@ function rxComboCard(rc, ban){
 /* 의사에게 물어보기 화면은 srv.js 의 vAskDocS(첫 화면 예산 · 10-26) */
 function vAskDoc(_, q){ return window.vAskDocS ? vAskDocS(_, q) : `${topBar({ back:'뒤로' })}<p class="loading" style="margin-top:8px">불러오는 중이에요…</p>`; }
 /* 오해 풀이 화면은 srv.js 의 vMythsS(첫 화면 예산 · 10-26) */
+function vTalk(){ return window.vTalkS ? vTalkS() : `${topBar({ back:'홈' })}<p class="muted">불러오는 중…</p>`; }
 function vMyths(_, q){ return window.vMythsS ? vMythsS(_, q) : `${topBar({ back:'홈' })}<h1>그런 줄 알았는데</h1><p class="loading" style="margin-top:8px">불러오는 중이에요…</p>`; }
 
 /* ───────── 복용 시간 알림 ───────── */
@@ -5598,7 +5616,7 @@ function daypartGroups(todays){ return DAYPART.map(([n, a, b]) => [n, todays.fil
 function todayHero(todays, nowMin, link){ const done = todays.filter(x => x.done).length, all = todays.length, nx = todays.find(x => !x.done && !x.skip && x.min >= nowMin - 60) || todays.find(x => !x.done && !x.skip);
   const head = done >= all ? '오늘 약 다 드셨어요' : `오늘 <b>${done}</b><span>/${all}</span>`;
   const sub = done >= all ? '수고하셨어요 · 내일도 같은 시간에 알려 드릴게요' : (nx ? `다음 ${nx.t} · ${esc(nx.d.name)}` : '');
-  return `<div class="today-hero${done >= all ? ' all' : ''}"${link ? ` role="link" tabindex="0" onclick="go('/schedule')" onkeydown="if(event.key==='Enter')go('/schedule')"` : ''}>${doseRing(done, all)}<div class="th-t"><div class="th-h">${head}</div>${sub ? `<div class="th-s">${sub}</div>` : ''}</div>${link ? `<span class="th-go" aria-hidden="true">${I.chev || ''}</span>` : ''}</div>`; }
+  return `<div class="today-hero${done >= all ? ' all' : ''}"${link ? ` role="link" tabindex="0" onclick="go('/schedule')" onkeydown="if(event.key==='Enter')go('/schedule')"` : ''}>${done >= all && hasArt('done-today') ? art('done-today', 'done-art') : doseRing(done, all)}<div class="th-t"><div class="th-h">${head}</div>${sub ? `<div class="th-s">${sub}</div>` : ''}</div>${link ? `<span class="th-go" aria-hidden="true">${I.chev || ''}</span>` : ''}</div>`; }
 /* 사진을 못 받으면 64px 빈칸 대신 알약 모양 그림(2026-10-13 디자인 리서치 — Drugs.com·Medisafe) */
 function pubThumb(p){ const g = pillGlyph({ id: p.n, name: p.n }, 34);
   return `<span class="pillwrap">${g}${p.img ? `<img class="pillimg" src="${esc(p.img)}" alt="" loading="lazy" onerror="this.remove()">` : ''}</span>`; }
@@ -6213,7 +6231,7 @@ function vTogether(){
     <div class="eyebrow">병원에서 받아 온 약</div>
     <h1>같이 먹어도 되나요</h1>
     <p class="ix-lead">내 약통에 담아 두신 약들을 <b>성분</b>으로 풀어서, 서로 부딪히는 자리가 있는지 봐요. 처방약도 함께 봐요.</p>
-    ${!n ? `<div class="empty">${art('guide-2-pharmacy', 'mini')}<p><b>아직 담아 두신 약이 없어요.</b><br>약봉투에 적힌 이름이나 약 사진으로 담으시면 바로 봐 드려요.</p>
+    ${!n ? `<div class="empty">${emptyArt()}<p><b>아직 담아 두신 약이 없어요.</b><br>약봉투에 적힌 이름이나 약 사진으로 담으시면 바로 봐 드려요.</p>
         <div class="ix-cta"><a class="btn" href="#/photo">${I.eye}약봉투·약 사진으로 담기</a><a class="btn line" href="#/pill">${I.search}이름으로 찾아 담기</a><a class="btn line" href="#/kinds">${I.pill}이름을 모르면 — 종류만 고르기</a></div></div>`
       : `${head}${band}
       <div class="ix-list">${res.items.map(it => `<span class="ix-chip ${it.approx || it.est ? 'approx' : it.known ? '' : 'unk'}">${it.link ? `<a href="${it.link}">${esc(it.name)}</a>` : esc(it.name)}${it.approx ? '<em>대략</em>' : !it.known ? '<em>성분 모름</em>' : it.est ? '<em>성분 추정</em>' : ''}</span>`).join('')}</div>
@@ -6283,12 +6301,15 @@ function helloAgain(){ try { sessionStorage.removeItem(HELLO_FIN); } catch (e) {
 /* 현욱님 10-22(메디나눔 감사 ④-2) — 처음 질문은 「누가 불편하세요?」 하나만. 어른·어르신은 고르면 바로 홈(어르신은 큰 글씨·간단히 보기 자동),
    아이는 해열제 양을 셈하려면 생년월일·몸무게가 있어야 해서 한 화면 더. 앓는 병(지병)은 증상 화면·약을 담을 때 그 자리에서 묻는다(내 몸 조건 칩) */
 function helloPick(k){ ME.age = k; saveMe();
-  if (k === 'senior' && ME.easy === undefined) { ME.easy = true; saveMe(); try { if (!localStorage.getItem('yakjido.fs')) { localStorage.setItem('yakjido.fs.before', '16px'); localStorage.setItem('yakjido.fs', EASY_FS); document.documentElement.style.setProperty('--fs', EASY_FS); } } catch (e) {} }
+  if (k === 'senior' && ME.easy === undefined) { ME.easy = true; saveMe(); try { if (!localStorage.getItem('yakjido.fs')) { localStorage.setItem('yakjido.fs.before', '17px'); localStorage.setItem('yakjido.fs', EASY_FS); document.documentElement.style.setProperty('--fs', EASY_FS); } } catch (e) {} }
   if (k === 'child') go('/hello/2'); else helloFinish(); }
 function vHello(step){
   const n = Math.min(3, Math.max(1, parseInt(step || '1', 10) || 1));
   const dots = `<div class="steps-bar">${[1, 2, 3].map(i => `<i class="${i <= n ? 'on' : ''}"></i>`).join('')}</div>`;
-  const skip = `<button class="hello-skip" onclick="helloFinish()">나중에 할게요</button>`;
+  /* 다섯 언어(10-27) — 첫 화면 작은 알약 */
+  const langPick = n === 1 ? `<select class="lang-pill" aria-label="Language" onchange="setLang(this.value)">${[['ko','한국어'],['en','English'],['es','Español'],['ja','日本語'],['zh','简体中文']].map(([k, t]) => `<option value="${k}"${k === LANG ? ' selected' : ''}>${t}</option>`).join('')}</select>` : '';
+  /* 10-29 현욱님 — 온보딩 끝에 「로그인 · 계정 만들기」와 「둘러보기」를 같은 크기로(계정을 숨기지 않는다) */
+  const skip = D.meta?.account === true && !srvLoggedIn() ? `<div class="hello-end"><button class="btn line" onclick="helloFinish();go('/login')">${I.user}로그인 · 계정 만들기</button><button class="btn line" onclick="helloFinish()">둘러보기</button></div>` : `<button class="hello-skip" onclick="helloFinish()">나중에 할게요</button>`;
   if (n === 1) {
     /* 아이 칸이 꽃이었다 — 어른과 아이 둘로 */
     const ICO3 = { adult:'user', senior:'shield', child:'family' };
@@ -6307,7 +6328,7 @@ function vHello(step){
   if (n === 2) {
     const kid = ME.age === 'child', KEYS = kid ? ['asthma', 'heart', 'kidney', 'liver', 'diabetes'] : ['heart', 'hf', 'diabetes', 'ulcer', 'bleed', 'kidney', 'liver', 'lvs', 'anticoag', 'glaucoma', 'bph', 'asthma', 'alcohol', 'gout', 'pregnant', 'nursing'];
     const on = KEYS.filter(k => ME[k]).length;
-    return `${topBar({ back:'이전', nosearch:true })}${dots}
+    return `${topBar({ back:'이전', nosearch:true })}${langPick}${dots}
     <h1 class="hello-q">해당하는 것이 있으면 눌러 주세요</h1>
     <p class="hello-sub">이걸 알면 <b>피해야 할 조합을 먼저 살펴봐</b> 드릴 수 있어요. 해당하는 것이 없으면 그냥 넘어가셔도 돼요.</p>
     <div class="hello-chips">${KEYS.map(k => `<button class="hello-chk ${ME[k] ? 'on' : ''}" aria-pressed="${!!ME[k]}" onclick="ME['${k}']=!ME['${k}'];saveMe();redraw()"><span class="bx">${ME[k] ? I.check : ''}</span>${esc(FLAG_Q[k])}</button>`).join('')}</div>
@@ -6321,7 +6342,7 @@ function vHello(step){
   <p>${f.length ? `이렇게 기억해 둘게요 — <b>${f.map(k => esc(FLAG_LABEL[k])).join(' · ')}</b>.<br>약을 고를 때마다 알아서 살펴 드릴게요.` : '약을 고를 때마다 필요한 것만 여쭤볼게요.'}</p></div>
   ${(() => {
     /* 어르신이 드실 약이면 큰 글씨·큰 단추를 기본으로 켜 둔다 — 첫 화면부터 편해야 한다. 여기서 끄면 그대로 존중 */
-    if (ME.age === 'senior' && ME.easy === undefined) { ME.easy = true; saveMe(); try { if (!localStorage.getItem('yakjido.fs')) { localStorage.setItem('yakjido.fs.before', '16px'); localStorage.setItem('yakjido.fs', EASY_FS); document.documentElement.style.setProperty('--fs', EASY_FS); } } catch (e) {} } return ''; })()}
+    if (ME.age === 'senior' && ME.easy === undefined) { ME.easy = true; saveMe(); try { if (!localStorage.getItem('yakjido.fs')) { localStorage.setItem('yakjido.fs.before', '17px'); localStorage.setItem('yakjido.fs', EASY_FS); document.documentElement.style.setProperty('--fs', EASY_FS); } } catch (e) {} } return ''; })()}
   <h2 class="hello-q sv-q">화면을 어떻게 보여 드릴까요?</h2>
   <div class="hello-list">${[['simple', 'check', '간단히 — 사야 할 약만 사진과 함께', '예) 허리가 아프면: 진통제 · 소염제 · 근육 푸는 약'], ['detail', 'book', '자세히 — 왜 그런지·근거까지', '예) 성분이 겹치는지, 병원에서는 어떻게 하는지까지']].map(([k, ic, t, ex]) => `<button class="hello-big ${viewMode() === k ? 'on' : ''}" aria-pressed="${viewMode() === k}" onclick="setView('${k}')"><div class="ic">${icon(ic)}</div><div><b>${t}</b><span>${ex}</span></div></button>`).join('')}</div>
   <div class="hello-fs"><b>글씨가 작으면 키우세요</b>${fsSeg()}</div>
@@ -7540,34 +7561,8 @@ async function doSend(){
 }
 /* 부모님 화면 — 큰 글씨, 약 사진, «약사님께 보여 주세요», 근처 약국 */
 const PSHARE = {};
-function vParentShare(code){
-  const S = SHARE(); const st = PSHARE[code];
-  if (!S.fn) return `${topBar({ back:'처음으로', nosearch:true })}<section class="sec"><div class="empty card"><b>이 링크를 열 수 없어요</b>앱의 보내기 서버가 아직 준비되지 않았어요.</div></section>`;
-  if (!st) { PSHARE[code] = { loading: true };
-    fetch(S.fn, { method:'POST', headers:{ 'Content-Type':'application/json' }, body: JSON.stringify({ action:'get', code }) })
-      .then(r => r.json().then(j => ({ ok: r.ok, status: r.status, j }))).then(({ ok, status, j }) => { PSHARE[code] = ok ? { data: j } : { err: status }; route(); })
-      .catch(() => { PSHARE[code] = { err: 0 }; route(); });
-    return `${topBar({ back:'처음으로', nosearch:true })}<section class="sec"><p class="loading">받은 약을 불러오는 중이에요…</p></section>`; }
-  if (st.loading) return `${topBar({ back:'처음으로', nosearch:true })}<section class="sec"><p class="loading">받은 약을 불러오는 중이에요…</p></section>`;
-  if (st.err) return `${topBar({ back:'처음으로', nosearch:true })}<section class="sec"><div class="empty card"><b>${st.err === 410 ? '기간이 지난 링크예요' : '받은 약을 불러오지 못했어요'}</b>${st.err === 410 ? '보낸 지 7일이 지나 지워졌어요. 다시 보내 달라고 해 주세요.' : '인터넷 연결을 확인하고 다시 열어 주세요.'}</div></section>`;
-  const x = st.data;
-  const sy = (() => { const t = (x.items || []).find(it => /^sym:/.test(it.id || '')); return t ? byId(D.symptoms, t.id.slice(4)) : null; })();
-  const meds = (x.items || []).filter(it => !/^sym:/.test(it.id || ''));
-  /* 외부 검수 6차 #5 — 보내는 화면·복사 글과 같은 설명서 단서(근이완 복합제 + 다른 해열진통제)를 받는 화면에도 — 같은 판정(basket 의 mix 1) */
-  const nsK = k => (ingIndex().byKey[k]?.cls || []).includes('nsaid'), dk = it => drug(it.id) ? drugKeys(drug(it.id)) : [];
-  const mixIt = it => dk(it).includes('ethenzamide') && meds.some(o => o !== it && dk(o).some(k => k === 'acetaminophen' || nsK(k)));
-  return `<div class="pshare">${topBar({ back:'처음으로', nosearch:true })}
-  <div class="eyebrow">${x.label ? esc(x.label) + '께 온 부탁' : '받은 약'}</div>
-  <h1 style="font-size:1.625rem">이 화면을 약사님께 보여 주세요</h1>
-  ${x.note ? `<p class="ps-note">“${esc(x.note)}”</p>` : ''}
-  <section class="sec"><div class="ps-list">${meds.map(it => { const d = drug(it.id); const nm = it.product || (d ? d.name : it.name);
-    return `<div class="ps-item">${prodArt(pimg(it.product || ''), nm)}<div><b>${esc(nm)}</b><span>${esc(it.product ? (d ? ingrName(d) : it.name) : '')}</span>${mixIt(it) ? `<small class="cau">${I.alert}${esc(mixTxt({ mix: 1 }))}</small>` : ''}</div></div>`; }).join('')}</div>
-    <p class="ps-ask">성분·함량·제형이 같으면 다른 제품도 괜찮아요.</p></section>
-  ${sy && sy.care?.er?.length ? `<div class="flag" role="note" style="margin-top:12px">${I.alert}<div><b>이럴 땐 약 대신 바로 119</b><p>${esc(sy.name)} 때문에 보내 드린 약이에요. 아래 가운데 하나라도 있으면 약국에 가지 마시고 119에 전화하거나 응급실로 가세요.</p>${list(sy.care.er)}<a class="call" href="tel:119">${I.alert} 119 전화</a></div></div>${sy.care.clinic?.length ? fold('이럴 땐 오늘 병원으로', list(sy.care.clinic)) : ''}` : ''}
-  <div class="note" style="margin-top:12px">${I.alert}<span><b>약사님께 앓고 계신 병과 드시는 약을 꼭 말씀하세요.</b> 혈압약·당뇨약·피 묽게 하는 약을 드시면 특히요.</span></div>
-  <div class="actions"><a class="btn" href="${GO_LINK.open[0]}" target="_blank" rel="noopener">${I.pin || I.search} 가까운 문 연 약국 찾기</a>${x.bought_at ? `<span class="badge otc">샀어요 표시함</span>` : `<button class="btn line" onclick="psBought('${esc(code)}')">${I.check} 샀어요</button>`}</div>
-  ${disclaimer()}</div>`;
-}
+/* 받는 화면(부모님께 보내기)은 srv.js 의 vParentShareS(첫 화면 예산 · 10-27) */
+function vParentShare(code){ return window.vParentShareS ? vParentShareS(code) : `<p class="loading" style="margin-top:24px">불러오는 중이에요…</p>`; }
 async function psBought(code){ try { await fetch(SHARE().fn, { method:'POST', headers:{ 'Content-Type':'application/json' }, body: JSON.stringify({ action:'bought', code }) }); if (PSHARE[code]?.data) PSHARE[code].data.bought_at = new Date().toISOString(); toast('보낸 분께 「샀어요」가 표시돼요'); route(); } catch (e) { toast('표시하지 못했어요'); } }
 function vShow(sid){
   const s = byId(D.symptoms, sid); if (!s) return vHome();
@@ -7618,7 +7613,7 @@ function vBag(){
   return `${topBar({ back:'이전' })}
   <div class="eyebrow">진료실·약국에서</div>
   <h1 style="font-size:1.375rem">제가 먹는 약이에요</h1>
-  ${!items.length ? `<div class="empty">${art('guide-2-pharmacy', 'mini')}<p><b>아직 담아 두신 약이 없어요.</b><br>약봉투 이름이나 약 사진으로 담으시면 여기 한 장으로 정리돼요.</p><div class="ix-cta"><a class="btn" href="#/photo">${I.eye}약봉투·약 사진으로 담기</a><a class="btn line" href="#/pill">${I.search}이름으로 찾아 담기</a><a class="btn line" href="#/kinds">${I.pill}이름을 모르면 — 종류만 고르기</a></div></div>`
+  ${!items.length ? `<div class="empty">${emptyArt()}<p><b>아직 담아 두신 약이 없어요.</b><br>약봉투 이름이나 약 사진으로 담으시면 여기 한 장으로 정리돼요.</p><div class="ix-cta"><a class="btn" href="#/photo">${I.eye}약봉투·약 사진으로 담기</a><a class="btn line" href="#/pill">${I.search}이름으로 찾아 담기</a><a class="btn line" href="#/kinds">${I.pill}이름을 모르면 — 종류만 고르기</a></div></div>`
   : `<div class="show-card">
     <div class="show-head">지금 먹는 약 ${items.length}가지${f.length ? ' · ' + f.map(k => esc(FLAG_LABEL[k])).join(' · ') : ''}</div>
     <ol class="show-list">${items.map((x, i) => `<li><span class="n">${i + 1}</span><div><b>${esc(x.name)}</b><small>${esc(x.approx ? '종류만 알아요 — 이름은 약봉투에' : x.pub?.ingr ? '성분: ' + x.pub.ingr : x.simple || '')}</small>${x.short ? '<span class="badge warn" style="margin-top:4px">며칠만</span>' : ''}${painBadge(x)}</div></li>`).join('')}</ol>
@@ -8002,10 +7997,10 @@ function vCompare(_, q){
 }
 
 /* ───────── 내 정보 ───────── */
-const FS_STEPS = [['16px', '보통'], ['18px', '크게'], ['20px', '더 크게'], ['22px', '가장 크게']];
+const FS_STEPS = [['17px', '보통'], ['19px', '크게'], ['21px', '더 크게'], ['23px', '가장 크게']];
 /* 사이트 저장이 막힌 브라우저에서는 localStorage 를 읽기만 해도 오류라 설정 화면이 통째로 깨졌다(5-10) */
 const lsGet = k => { try { return localStorage.getItem(k); } catch (e) { return null; } };
-const fsSeg = () => `<div class="fs-seg" role="group" aria-label="글자 크기">${FS_STEPS.map(([k, n]) => `<button class="${(lsGet('yakjido.fs') || '16px') === k ? 'on' : ''}" aria-pressed="${(lsGet('yakjido.fs') || '16px') === k}" onclick="setFs('${k}');route()" aria-label="글자 ${esc(n)}">가</button>`).join('')}</div>`;
+const fsSeg = () => `<div class="fs-seg" role="group" aria-label="글자 크기">${FS_STEPS.map(([k, n]) => `<button class="${(lsGet('yakjido.fs') || '17px') === k ? 'on' : ''}" aria-pressed="${(lsGet('yakjido.fs') || '17px') === k}" onclick="setFs('${k}');route()" aria-label="글자 ${esc(n)}">가</button>`).join('')}</div>`;
 /* ── 내 기록을 파일 하나로 옮기기 ──
    기록을 서버에 두지 않기로 했으니, 휴대폰을 바꾸면 그대로 사라진다.
    복약 달력 60일치와 불편했던 일까지 쌓이기 시작하면 그 손실이 크다.
@@ -8130,7 +8125,7 @@ function vMe(_, q){
   else if (tab === 'meds') body = `
   <section class="sec card"><h2>내 약통 <small>중복 성분을 잡아드려요</small></h2>
     <p class="small" style="margin-top:6px">감기약·진통제·처방약을 등록해 두면, 증상별 추천에서 <b>같은 성분이 겹치는지</b> 알려드려요.</p>
-    <div class="bag-rows">${items.map(x => `<div class="bag-row"><div class="t"><b>${esc(x.name)}</b><span>${esc(x.short ? '며칠만 — 항콜린 부담은 절반으로 셌어요' : x.approx ? '종류만 담았어요 (대략)' : x.simple || '')}</span></div><button class="dur ${x.short ? 'on' : ''}" aria-pressed="${!!x.short}" onclick="toggleShort('${x.id}')">${x.short ? I.check + ' ' : ''}며칠만</button><button class="rm" aria-label="${esc(x.name)} 빼기" onclick="${x.id.startsWith('pub:') ? `togglePub('${x.id.slice(4)}')` : x.id.startsWith('cls:') ? `toggleQuick('${x.id.slice(4)}')` : `toggleTaking('${x.id}')`}">${I.x}</button></div>`).join('') || `${art('guide-2-pharmacy', 'mini')}<div class="empty-bag">${I.pill}<span><b>아직 담아 둔 약이 없어요.</b> 드시는 약을 등록하면 겹치는 성분을 살펴볼 수 있어요.</span></div>`}</div>
+    <div class="bag-rows">${items.map(x => `<div class="bag-row"><div class="t"><b>${esc(x.name)}</b><span>${esc(x.short ? '며칠만 — 항콜린 부담은 절반으로 셌어요' : x.approx ? '종류만 담았어요 (대략)' : x.simple || '')}</span></div><button class="dur ${x.short ? 'on' : ''}" aria-pressed="${!!x.short}" onclick="toggleShort('${x.id}')">${x.short ? I.check + ' ' : ''}며칠만</button><button class="rm" aria-label="${esc(x.name)} 빼기" onclick="${x.id.startsWith('pub:') ? `togglePub('${x.id.slice(4)}')` : x.id.startsWith('cls:') ? `toggleQuick('${x.id.slice(4)}')` : `toggleTaking('${x.id}')`}">${I.x}</button></div>`).join('') || `${emptyArt()}<div class="empty-bag">${I.pill}<span><b>아직 담아 둔 약이 없어요.</b> 드시는 약을 등록하면 겹치는 성분을 살펴볼 수 있어요.</span></div>`}</div>
     <div class="actions two"><button class="btn ghost" onclick="go('/photo')">${I.eye} 사진으로 등록</button><button class="btn ghost" onclick="go('/pill')">${I.search} 이름·알약으로</button></div>
     <div class="util" style="margin-top:8px">${urow(I.pill, '이름을 몰라도 종류만 골라 담기', '', "go('/kinds')", '고르기')}${rxMine().map(g => urow(I.book, RX_NAME[g] + ' 드시는 분께', '먹는 법 · 깜빡했을 때 · 조심할 약', `go('/rx/${g}')`, '보기')).join('')}${urow(I.pill, '영양제도 담기', '같이 먹어도 되나요에서 약과 함께 봐요', "go('/supp')", '고르기')}</div>
     <div class="search" style="margin-top:12px">${I.search}<input id="mq" aria-label="약 이름으로 찾아 내 약통에 담기" placeholder="약 이름으로 찾아 담기 (예: 타이레놀)" value="${esc(MQ)}" autocomplete="off"></div>
@@ -8152,12 +8147,15 @@ function vMe(_, q){
     ${lrow(I.cal, '진료 예약', nextVisit() ? esc(visitWord(nextVisit())) : '전날·2시간 전에 알려 드려요', "go('/visits')")}
   </div>`;
   else body = `
+  ${ext('계정카드')}
   <section class="sec card" style="padding-top:10px;padding-bottom:10px"><div class="view-row col"><div class="t"><b>글자 크기</b><span>지금 이 글씨가 작으면 키우세요</span></div>${fsSeg()}</div>
     <div class="view-row col" style="border-top:1px solid var(--hairline)"><div class="t"><b>화면 밝기</b><span>눈이 부시면 어둡게, 휴대폰 설정을 따르려면 기기 따라를 고르세요</span></div>
       <div class="fs-seg" role="group" aria-label="화면 밝기">${[['light','밝게'],['dark','어둡게'],['auto','기기 따라']].map(([k, n]) => `<button class="${themeNow() === k ? 'on' : ''}" style="min-width:auto;min-height:46px;padding:0 10px;font-size:.875rem" aria-pressed="${themeNow() === k}" onclick="setTheme('${k}')">${n}</button>`).join('')}</div></div>
     <div class="view-row" style="border-top:1px solid var(--hairline)"><div class="t"><b>어르신 모드</b><span>큰 글씨 · 홈 맨 위에 「오늘 약 체크」</span></div><button class="sw ${ME.easy ? 'on' : ''}" role="switch" aria-checked="${!!ME.easy}" aria-label="어르신 모드" onclick="setEasy(!ME.easy)"></button></div>
     <div class="view-row col" style="border-top:1px solid var(--hairline)"><div class="t"><b>화면 보기</b><span>간단히 — 사야 할 약만 사진과 함께 · 자세히 — 왜 그런지·근거까지</span></div>${viewSeg()}</div></section>
   ${ext('구독관리')}
+  ${ext('언어칸')}
+  ${ext('기내칸')}
   <div class="rows-l" style="margin-top:16px">
     ${lrow(I.info, '알아두면 좋은 것', `짧은 건강정보 ${(D.tips || []).length}가지`, "go('/tips')")}
     ${lrow(I.info, '처음 안내 다시 보기', '앱 쓰는 법 세 장', "helloAgain()")}
@@ -8177,12 +8175,12 @@ function vMe(_, q){
   ${ext('계정칸')}
   ${ext('약관칸')}
   <section class="sec card"><h2>이 앱에 대해</h2><p class="small" style="margin-top:6px">${esc(D.meta?.about || '')}</p><p class="small muted" style="margin-top:10px">${savedWhere()}</p><div class="lk48"><a class="link" href="${esc(방침주소())}"${NATIVE ? ' target="_blank" rel="noopener"' : ''}>개인정보처리방침</a>${D.meta?.contact?.email ? `<a class="link" href="mailto:${esc(D.meta.contact.email)}">문의 · ${esc(D.meta.contact.email)}</a>${D.meta.contact.operator ? `<span class="small muted">운영 ${esc(D.meta.contact.operator)}</span>` : ''}` : ''}</div></section>
-  <p class="small mn-sign" style="margin-top:20px;text-align:center"><b><svg class="mn-logo" viewBox="0 0 1024 1024" aria-hidden="true"><path d="M790 470 V760"/><path d="M256 760 V410 C256 296 350 258 424 312 C478 352 494 520 566 548 C648 580 790 250 790 460"/></svg>메디나눔</b> · 응급 판단 기준을 응급실 의사가 함께 검토한, 우리 가족 건강 앱</p>
+  <p class="small mn-sign" style="margin-top:20px;text-align:center"><b><svg class="mn-logo" viewBox="0 0 1024 1024" aria-hidden="true"><rect class="mn-tile" x="12" y="12" width="1000" height="1000" rx="226"/><path d="M790 470 V760"/><path d="M256 760 V410 C256 296 350 258 424 312 C478 352 494 520 566 548 C648 580 790 250 790 460"/></svg>메디나눔</b> · 응급 판단 기준을 응급실 의사가 함께 검토한, 우리 가족 건강 앱</p>
   <p class="small muted" style="margin-top:6px;text-align:center">약지도 v${esc(D.meta?.version || '')} · 빌드 ${BUILD}<br>${(() => { const P = D.public || {}, ds = ['easy_source', 'pills_source', 'permits_source'].map(k => `<span style="white-space:nowrap">${esc(String(P[k] || '').match(/\d{4}-\d\d-\d\d|\d{8}/)?.[0] || '확인일 기록 필요')}</span>`);
     /* 외부 검수 2차 #56 — 날짜 꼴이 바뀌어(2026-10-13) 빈칸으로 나오던 것. 제품 이름 자료를 받은 날과 약 설명 검수 달을 따로(빌드 날짜로 대신하지 않음) */
     return `식약처 제품 이름 자료 받은 날 — ${new Set(ds).size === 1 ? ds[0] + '(e약은요·낱알식별·허가 정보)' : `e약은요 ${ds[0]} · 낱알식별 ${ds[1]} · 허가 정보 ${ds[2]}`}<br>약 설명 ${esc(D.meta?.reviewLabel || '의료진 검수')} ${esc(D.meta?.reviewed || '확인일 기록 필요')}`; })()}</p>`;
   return `${topBar()}
-  <h1>내 정보</h1>${ext('계정줄')}
+  <h1>내 정보</h1>${tab === 'set' ? '' : ext('계정줄')}
   <nav class="tabs metabs" role="tablist" aria-label="내 정보 칸">${TABS.map(([k, n, ic, c]) => `<button class="tab ${tab === k ? 'on' : ''}" role="tab" aria-selected="${tab === k}" data-k="${k}" onclick="go('/me?t=${k}')">${ic}${n}<span class="n">${c}</span></button>`).join('')}</nav>
   ${body}`;
 }
@@ -8199,10 +8197,10 @@ document.addEventListener('keydown', e => { const t = e.target.closest?.('[role=
 document.addEventListener('input', e => { if (!e.target.closest('.calc')) return; const id = location.hash.split('/')[2]?.split('?')[0]; const s = supp(id); if (!s?.calc) return; const amt = +document.getElementById('c-amt').value, per = +document.getElementById('c-per').value, price = +document.getElementById('c-price').value, n = +document.getElementById('c-n').value; const pct = document.getElementById('c-pct'), won = document.getElementById('c-won'), nv = document.getElementById('c-n').value, bad = !(per > 0 && per % 1 === 0) || nv !== '' && !(n > 0 && n % 1 === 0), ce = document.getElementById('c-err'); if (ce) ce.textContent = bad ? '0보다 큰 알 수를 넣어 주세요.' : ''; if (amt > 0 && !bad) { const perServing = amt * per; const r = perServing / s.calc.typical; pct.textContent = Math.round(r * 100) + '%'; pct.style.color = r > (s.calc.ulRatio || 99) ? (/^공식 상한은/.test(s.dose?.ul || '') ? 'var(--caution)' : 'var(--alert)') : r < 0.5 ? 'var(--caution)' : 'var(--primary-deep)'; if (price > 0 && n > 0) { const unitPrice = price / n; const effDoses = perServing / s.calc.typical; won.textContent = Math.round(unitPrice * per / effDoses).toLocaleString('ko-KR') + '원'; } else won.textContent = '—'; } else { pct.textContent = '—'; won.textContent = '—'; } });
 function setFs(v){ try { localStorage.setItem('yakjido.fs', v); } catch (e) {} document.documentElement.style.setProperty('--fs', v); route(); }
 /* 3-07 — 어르신 모드는 글자를 「줄이지」 않는다: 켤 때 20px 보다 작으면 20px 로(전 값을 기억), 끌 때는 그 전 값으로. 이미 크게 고르신 분은 그대로 */
-const EASY_FS = '20px';
+const EASY_FS = '21px';
 /* 알림 글의 약 이름 기본값이 어르신 모드를 따른다(Q14) */
 function setEasy(on){ ME.easy = !!on; saveMe(); try { armNotifications(); } catch (e) {}
-  const cur = lsGet('yakjido.fs') || '16px';
+  const cur = lsGet('yakjido.fs') || '17px';
   if (on) { if (parseFloat(cur) < parseFloat(EASY_FS)) { try { localStorage.setItem('yakjido.fs.before', cur); } catch (e) {} setFs(EASY_FS); return; } }
   else { const b = lsGet('yakjido.fs.before'); try { localStorage.removeItem('yakjido.fs.before'); } catch (e) {} if (b && cur === EASY_FS) { setFs(b); return; } }
   route(); }
@@ -8219,7 +8217,8 @@ function setTheme(v){
 try { const mq = matchMedia('(prefers-color-scheme: dark)'), onTheme = () => { if (themeNow() !== 'auto') return; const m = document.querySelector('meta[name="theme-color"]'); if (m) m.content = mq.matches ? '#161A1C' : '#0B6E8F'; try { nativeBars(); } catch (e) {} };
   mq.addEventListener ? mq.addEventListener('change', onTheme) : mq.addListener && mq.addListener(onTheme); } catch (e) {}
 const themeNow = () => { try { const t = localStorage.getItem('yakjido.theme'); return t === 'dark' || t === 'auto' ? t : 'light'; } catch (e) { return 'light'; } };
-try { const fs = localStorage.getItem('yakjido.fs'); if (fs) document.documentElement.style.setProperty('--fs', fs); } catch (e) {}
+/* 10-29 화면 헌법 「본문 17px 이상」 — 글자 단계를 한 칸씩 올렸다(16·18·20·22 → 17·19·21·23). 예전에 고른 값도 한 번 옮긴다 */
+try { let fs = localStorage.getItem('yakjido.fs'); if (fs && !localStorage.getItem('yakjido.fs.v2')) { const m = { '16px': '17px', '18px': '19px', '20px': '21px', '22px': '23px' }; if (m[fs]) { fs = m[fs]; localStorage.setItem('yakjido.fs', fs); } } localStorage.setItem('yakjido.fs.v2', '1'); if (fs) document.documentElement.style.setProperty('--fs', fs); } catch (e) {}
 /* 화면 밝기는 휴대폰 설정만 따라가고 있었다. 눈이 부시거나(백내장) 어두운 화면이
    안 보이는 분이 스스로 고를 칸이 없었다 — 앱 안에서 고르게 한다(2026-09-22). 고른 밝기는 <head> 첫 조각이 그리기 전에 붙인다(Z8) */
 /* 제품·성분 사전(약 700 KB)은 첫 화면이 자리 잡은 뒤 조용히 미리 받는다 — "인사돌" 을 쳤을 때 제품이 증상보다 위에 오게(감사 #38). 데이터 절약 모드면 안 받는다 */
@@ -8236,6 +8235,9 @@ function srvAgreed(){ try { return (JSON.parse(localStorage.getItem(AGREE_KEY) |
 /* 계정항목·서버동의켜기·서버동의끄기(설정의 계정 칸에서만 씀)는 srv.js 로 옮겼다 — 첫 화면 예산(10-14) */
 /* 계정이 이 폰에 «기억돼» 있는가 — 세션을 되살리기 전(앱을 연 직후·인터넷 없음)에도 참. 동의 거두기·모두 지우기가 서버 기록을 놓치지 않게(2026-10-13) */
 function srvHasAccount(){ try { return srvLoggedIn() || !!(window.서버 && 서버.상태 && (서버.상태() || {}).email); } catch (e) { return false; } }
+function acctMail(){ try { const s = window.서버?.세션?.(); if (s) return s.user?.email || ''; const k = Object.keys(localStorage).find(k => /^sb-.+-auth-token$/.test(k)); return k ? JSON.parse(localStorage[k])?.user?.email || '' : ''; } catch (e) { return ''; } }
+const acctBtn = () => { if (D.meta?.account !== true) return ''; const m = acctMail();
+  return `<button type="button" class="acct-btn${m ? ' on' : ''}" aria-label="${m ? `계정 ${esc(m)}` : '로그인'}" onclick="go('/login')">${m ? esc(m[0].toUpperCase()) : I.user + '<span class="ab-t">로그인</span>'}</button>`; };
 function srvLoggedIn(){ try { return !!(window.서버 && 서버.세션 && 서버.세션()); } catch (e) { return false; } }
 /* 서버 부품(약 30 KB)은 srv.js 로 따로 받는다 — index.html 첫 화면 예산(압축 220 KB) 때문. 받기 전엔 계정 칸이 「불러오는 중」이다. */
 /* 「어디에 저장되나요」 한 줄 — 로그인해 동의했으면 사실대로 서버도 말한다 */

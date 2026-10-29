@@ -9,11 +9,14 @@
                        판이 같으면 캐시 그대로, 판이 바뀌면 새로 받아 넣고 옛 판은 지운다(prune).
    판 없는 옛 주소는 «캐시 먼저» — 한 번 받은 것은 즉시 열리고, 뒤에서 조용히 새로 받아 둔다.
    인터넷이 안 되면 어느 캐시에든 있는 사본을 준다(5-01 — 첫 방문 뒤 비행기 모드에서 본문이 안 뜨던 것). */
-const CACHE = 'yakjido-2026-10-27T02:47-e304976b';
+const CACHE = 'yakjido-2026-10-30T02:22-50f003ec';
 const DATA = 'yakjido-data-v1';
+/* 기내 모드·바깥 파일 0(10-27) — 글꼴(fonts/)·로그인 프로그램(vendor/)은 배포 묶음 안. 판이 박힌 꾸러미라 내용이 안 바뀌니 «캐시 먼저», 앱 판이 바뀌어도 지우지 않는다(EXT).
+   바깥 주소는 하나도 담지 않는다 — 서버 응답(supabase REST)·날씨는 그대로 지나간다(09-22 원칙) */
+const EXT = 'yakjido-ext-v1';
 /* 본문(core·detail)은 여기서 받지 않는다 — 첫 방문에 페이지가 이미 받은 것을 한 번 더 받던 것(5-03). 페이지가 워커에 연결되면 같은 주소로 다시 불러 캐시에 넣는다. */
 /* terms.html·privacy.html — 첫 동의 화면과 설정의 「약관·개인정보」가 앱 안에서 읽는다(비행기 모드에서도 열리게, 10-14) */
-const ASSETS = ['./', './index.html', './manifest.webmanifest', './srv.js', './find.js', './terms.html', './privacy.html', './icon-192.png', './icon-512.png', './icon-180.png', './icon-maskable-512.png'];
+const ASSETS = ['./', './index.html', './manifest.webmanifest', './srv.js', './find.js', './i18n.js', './terms.html', './privacy.html', './icon-192.png', './icon-512.png', './icon-180.png', './icon-maskable-512.png'];
 
 self.addEventListener('install', (e) => {
   /* HTTP 캐시를 건너뛰고 서버에서 새로 — 몇 시간 묵은 srv.js 가 새 캐시 이름에 갇히지 않게(5-03) */
@@ -23,7 +26,7 @@ self.addEventListener('activate', (e) => {
   e.waitUntil(caches.keys()
     /* 자료 캐시는 남긴다 — 이것까지 지우면 17 MB 를 다시 받게 된다.
        같은 주소(github.io)를 쓰는 다른 앱의 캐시는 건드리지 않는다 — 「yakjido-」로 시작하는 약지도 것만 지운다(2026-10-14 외부 검수 2차 #23) */
-    .then((keys) => Promise.all(keys.filter((k) => k.startsWith('yakjido-') && k !== CACHE && k !== DATA).map((k) => caches.delete(k))))
+    .then((keys) => Promise.all(keys.filter((k) => k.startsWith('yakjido-') && k !== CACHE && k !== DATA && k !== EXT).map((k) => caches.delete(k))))
     .then(() => self.clients.claim()));
 });
 
@@ -44,7 +47,11 @@ function netOrCache(req, net) {
 self.addEventListener('fetch', (e) => {
   if (e.request.method !== 'GET') return;
   const url = new URL(e.request.url);
-  if (url.origin !== location.origin) return;     // 폰트·날씨 같은 바깥 것은 건드리지 않는다
+  if (url.origin !== location.origin) return;     // 날씨·서버·지도 같은 바깥 것은 건드리지 않는다
+  if (/\/(fonts|vendor)\//.test(url.pathname)) {
+    e.respondWith(caches.open(EXT).then((c) => c.match(e.request, { ignoreVary: true }).then((hit) => hit || fetch(e.request).then((res) => { if (res && res.ok) c.put(e.request, res.clone()).catch(() => {}); return res; }))));
+    return;
+  }
 
   if (url.pathname.includes('/data/')) {
     const core = /\/data\/(core|detail)\.json$/.test(url.pathname);

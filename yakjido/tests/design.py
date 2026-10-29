@@ -13,6 +13,12 @@
 import http.server, socketserver, threading, functools, pathlib, sys
 from playwright.sync_api import sync_playwright
 
+# 시험 브라우저는 한국어로 연다(10-27 — 안 정하면 en-US 라 영어 화면이 된다). 시간대는 그대로(UTC — 알림 시험이 이 시계에 맞춰져 있다, UTC 는 나라 판단에서 건너뛰어 ko-KR → KR). en-US+서울 → 119 는 i18n.py 가 따로 본다
+from playwright.sync_api import Browser as _B
+_np, _nc = _B.new_page, _B.new_context
+_B.new_page = lambda self, **k: _np(self, **{'locale': 'ko-KR', **k})
+_B.new_context = lambda self, **k: _nc(self, **{'locale': 'ko-KR', **k})
+
 D = pathlib.Path(__file__).resolve().parent.parent.parent / 'docs' / 'yakjido'
 class Q(http.server.SimpleHTTPRequestHandler):
     def log_message(self, *a): pass
@@ -54,7 +60,7 @@ def main():
     fails = []
     with sync_playwright() as p:
         b = p.chromium.launch(executable_path='/opt/pw-browsers/chromium-1194/chrome-linux/chrome', args=['--no-sandbox'])
-        def page(w, fs='16px', theme='light'):
+        def page(w, fs='17px', theme='light'):
             pg = b.new_page(viewport={'width': w, 'height': 800})
             pg.add_init_script(SEED + f";localStorage.setItem('yakjido.fs','{fs}');localStorage.setItem('yakjido.theme','{theme}')")
             pg.goto(URL + '#/home'); pg.wait_for_function("()=>typeof CORE!=='undefined' && CORE===2", timeout=20000); pg.wait_for_timeout(400)
@@ -74,7 +80,7 @@ def main():
             elif d > 1.5 and r not in READ_ONLY: fails.append(f'⑥ 행동 깊이 {r}: 첫 누를 것이 {d}화면 아래')
         pg.close()
         # ③ 글자 크기 — 보통 vs 가장 크게(같은 화면 같은 글 덩어리)
-        a, z = page(390, '16px'), page(390, '22px')
+        a, z = page(390, '17px'), page(390, '23px')
         for r in ['/home', '/symptom/headache', '/drug/acetaminophen', '/me?t=set', '/rx/bp', '/kids']:
             go(a, r); go(z, r); A = a.evaluate(TEXTS); Z = z.evaluate(TEXTS)
             small = [k for k in A if k in Z and A[k] and Z[k] / A[k] < 1.2]
@@ -82,7 +88,7 @@ def main():
         a.close(); z.close()
         # ④ 넘침 — 320 · 가장 크게 · 밝게/어둡게
         for th in ('light', 'dark'):
-            pg = page(320, '22px', th)
+            pg = page(320, '23px', th)
             for r in ROUTES:
                 go(pg, r); o = pg.evaluate(OVER)
                 if o: fails.append(f'④ 넘침 320·가장 크게·{th} {r}: {o}')
