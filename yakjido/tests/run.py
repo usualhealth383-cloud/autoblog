@@ -973,7 +973,7 @@ def consent_checks(br, url, fails):
     pg.goto(url + '#/drug/ibuprofen'); pg.wait_for_selector('#csGo', timeout=15000); pg.click('#csGo'); pg.wait_for_timeout(1200)
     if pg.evaluate('location.hash') != '#/drug/ibuprofen': fails.append('동의: 링크로 온 약 화면이 동의 뒤에 이어지지 않습니다 — ' + pg.evaluate('location.hash'))
     pg.evaluate("localStorage.setItem('yakjido.consent.v1', JSON.stringify({v:'2026-10-01',at:'2026-10-01',terms:1,privacy:1}))"); pg.goto(url + '#/drugs'); pg.reload(); pg.wait_for_timeout(1500)
-    if not pg.query_selector('#csGo') or '동의하고 계속' not in pg.inner_text('#csGo') or not pg.query_selector('.cs-new'): fails.append('동의: 옛 판에 동의한 분(처음 안내를 마친 분)에게 「동의하고 계속하기」로 다시 묻지 않습니다')
+    if not pg.query_selector('#csGo') or '확인하고 계속' not in pg.inner_text('#csGo') or not pg.query_selector('.cs-again'): fails.append('동의: 옛 판에 동의한 분(처음 안내를 마친 분)에게 「동의하고 계속하기」로 다시 묻지 않습니다')
     pg.click('#csGo'); pg.wait_for_timeout(800)
     if pg.evaluate('location.hash') != '#/drugs': fails.append('동의: 다시 동의한 뒤 가려던 화면으로 가지 않습니다 — ' + pg.evaluate('location.hash'))
     if errs: fails.append(f'동의(링크): JS 오류 {errs[:2]}')

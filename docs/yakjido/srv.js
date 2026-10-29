@@ -1747,6 +1747,22 @@ const 동의줄 = (k, t, s, L, 링크) => `<div class="cs-item"><button type="bu
 window.문_consent = () => {
   let 전 = null; try { 전 = JSON.parse(localStorage.getItem(CONSENT_KEY) || 'null'); } catch (e) {}
   const 다시 = helloDone() || !!전, both = !!(동의칸.terms && 동의칸.privacy);
+  /* 10-30 현욱님 「글 배열·디자인 이상」 — 예전 동의자의 다시 동의: 머리 하나 + 바뀐 것 세 줄 + 「확인하고 계속」 + 작은 자세히(판 번호·전문은 그 안) */
+  if (다시) return `<div class="door cs cs-again">
+  <img class="door-mark" src="${esc(BRANDMARK)}" alt="" width="64" height="64">
+  <h1>약지도 약속이 조금 바뀌었어요</h1>
+  <ul class="cs-list">
+    <li>${I.book}<span><b>이용약관·개인정보 처리방침이 생겼어요</b><small>약 정보의 기준과 기록을 다루는 방법을 적어 두었어요</small></span></li>
+    <li>${I.user}<span><b>계정은 고르는 거예요</b><small>로그인하지 않아도 대부분의 기능을 쓰실 수 있어요</small></span></li>
+    <li>${I.lock}<span><b>기록은 먼저 이 휴대폰에</b><small>서버에 저장하는 것은 계정을 만들 때 따로 여쭤요</small></span></li>
+  </ul>
+  <button type="button" class="door-go" id="csGo" onclick="동의한번()">확인하고 계속</button>
+  <details class="cs-more cs-detail"><summary>자세히${I.chev}</summary>
+    <p>이용약관 판 ${esc(CONSENT_VER)} · 동의하시면 두 문서에 함께 동의한 것으로 적어 둬요. 예전에 동의하신 날 ${esc((전 && 전.at) || '없음')}.</p>
+    <button type="button" class="cs-doc" onclick="go('/doc/terms')">이용약관 전문${I.chev}</button> <button type="button" class="cs-doc" onclick="go('/doc/privacy')">개인정보 처리방침 전문${I.chev}</button>
+    <p class="cs-note">동의 내용은 설정 → 약관·개인정보에서 언제든 다시 보실 수 있어요.</p>
+  </details>
+</div>`;
   return `<div class="door cs">
   <img class="door-mark" src="${esc(BRANDMARK)}" alt="" width="64" height="64">
   <h1>약지도</h1>
@@ -1884,6 +1900,7 @@ try { const css = document.createElement('style'); css.textContent = `
 .door-go:disabled{background:var(--tint2);color:var(--muted);box-shadow:none;border:1.5px dashed var(--ui-line);cursor:not-allowed}
 .door-why{margin-top:8px;text-align:center;font-size:.875rem;color:var(--muted)}
 .door-why[hidden],.door-msg[hidden]{display:none}
+.cs-again .cs-list li>span{display:flex;flex-direction:column}.cs-again .cs-list b{font-size:1.0625rem}.cs-again .cs-list small{color:var(--muted);font-size:.9375rem;margin-top:2px}.cs-again h1{margin-top:6px}
 .cs-sum{margin-top:18px;text-align:center;font-size:1rem;line-height:1.6;color:var(--body)}.cs-detail{margin-top:10px;padding:0}.cs-detail>summary{min-height:48px;justify-content:center;width:100%;font-size:1rem}.cs-detail h3{font-size:1.0625rem;margin:16px 0 4px}.cs-detail p,.cs-detail li{font-size:1rem;line-height:1.65}.cs-detail ul{padding-left:1.1em;margin:6px 0}.cs-note{margin-top:14px;color:var(--muted)}
 .cs-foot{margin-top:18px;text-align:center;font-size:.875rem;color:var(--muted);line-height:1.6}
 .cs-foot .cs-doc{font-size:.875rem}
