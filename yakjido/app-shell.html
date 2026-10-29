@@ -73,9 +73,6 @@ try { var th0 = localStorage.getItem('yakjido.theme'), de0 = document.documentEl
     --shadow-card:0 4px 18px rgba(0,0,0,.35); --shadow-raised:0 6px 16px rgba(0,0,0,.45);
   }
 }
-.mn-logo{width:1.15em;height:1.15em;vertical-align:-.2em;margin-right:4px;color:#1A2B4A}.mn-logo path{fill:none;stroke:currentColor;stroke-width:236;stroke-linecap:round;stroke-linejoin:round}
-:root[data-theme="dark"] .mn-logo{color:#FFFFFF}
-@media (prefers-color-scheme:dark){ :root:not([data-theme="light"]) .mn-logo{color:#FFFFFF} }
 :root[data-theme="dark"]{
   --primary:#5DB3D2; --primary-deep:#8CCDE3; --primary-rgb:93,179,210;
   --accent:#D9A24E; --accent-text:#E9B86A; --accent-tint:#2E2619;
@@ -326,6 +323,10 @@ p{color:var(--body)}
 .brand .mark img{width:34px;height:34px;display:block;border-radius:9px}
 .brand b{font-size:1.125rem;font-weight:800;letter-spacing:-.02em}
 .brand span{display:block;font-size:.875rem;color:var(--muted);line-height:1.2}
+.acct-btn{flex:none;display:inline-flex;align-items:center;gap:6px;min-height:44px;padding:0 14px;margin-left:10px;border:1px solid var(--hairline);border-radius:99px;background:var(--card);color:var(--primary-deep);font:700 .9375rem inherit}
+@media (max-width:480px){.top .rs-d{display:none}}
+.acct-btn.on{width:44px;padding:0;justify-content:center;background:var(--primary);color:var(--on-primary)}
+.top .review-stamp{margin-left:auto}
 .review-stamp{display:inline-flex;align-items:center;gap:6px;white-space:nowrap;flex:none;color:var(--primary);font-size:.875rem;font-weight:600}
 .review-stamp svg.i{width:15px;height:15px}
 .review-stamp.wait{color:var(--caution)}
@@ -2624,7 +2625,7 @@ const topBar = (opts = {}) => `
   <div class="top">
     ${opts.back ? `<button class="back" onclick="goBack()">${I.prev}${esc(opts.back)}</button>` : `
     <div class="brand"><div class="mark"><img src="${BRANDMARK}" alt="" width="34" height="34"></div><div><b>약지도</b><span>증상에 맞는 약 · 복약 알림</span></div></div>`}
-    ${opts.unreviewed ? `<span class="review-stamp wait">${I.alert}의사 확인 중</span>` : opts.unv ? `<span class="review-stamp wait">${I.info}자료 확인 중</span>` : `<span class="review-stamp">${I.shield}${esc(D.meta?.reviewLabel || '의료진 검수')}${bigFs() ? '' : ` · ${esc(D.meta?.reviewed || '')}`}</span>`}
+    ${opts.unreviewed ? `<span class="review-stamp wait">${I.alert}의사 확인 중</span>` : opts.unv ? `<span class="review-stamp wait">${I.info}자료 확인 중</span>` : `<span class="review-stamp">${I.shield}${esc(D.meta?.reviewLabel || '의료진 검수')}${bigFs() ? '' : `<span class="rs-d"> · ${esc(D.meta?.reviewed || '')}</span>`}</span>`}${!opts.back ? acctBtn() : ''}
   </div>
   ${opts.nosearch ? '' : `<div class="topfind">${I.search}<input id="gq" aria-label="증상이나 약 이름으로 찾기" placeholder="${bigFs() ? '증상이나 약 이름' : '증상·약 이름으로 찾기 (예: 허리, 타이레놀)'}" autocomplete="off" enterkeyhint="search" value="${esc(GQ)}"><button class="gq-x ${GQ ? '' : 'hide'}" onclick="GQ='';route()" aria-label="지우기">${I.x}</button></div>`}<!--TOPEND-->`;
 /* 출처 칩은 「저자·연도」까지만. 예전 규칙은 괄호 「(」에서만 잘라서, 「—」로 쓴 출처 44개가
@@ -8144,6 +8145,7 @@ function vMe(_, q){
     ${lrow(I.cal, '진료 예약', nextVisit() ? esc(visitWord(nextVisit())) : '전날·2시간 전에 알려 드려요', "go('/visits')")}
   </div>`;
   else body = `
+  ${ext('계정카드')}
   <section class="sec card" style="padding-top:10px;padding-bottom:10px"><div class="view-row col"><div class="t"><b>글자 크기</b><span>지금 이 글씨가 작으면 키우세요</span></div>${fsSeg()}</div>
     <div class="view-row col" style="border-top:1px solid var(--hairline)"><div class="t"><b>화면 밝기</b><span>눈이 부시면 어둡게, 휴대폰 설정을 따르려면 기기 따라를 고르세요</span></div>
       <div class="fs-seg" role="group" aria-label="화면 밝기">${[['light','밝게'],['dark','어둡게'],['auto','기기 따라']].map(([k, n]) => `<button class="${themeNow() === k ? 'on' : ''}" style="min-width:auto;min-height:46px;padding:0 10px;font-size:.875rem" aria-pressed="${themeNow() === k}" onclick="setTheme('${k}')">${n}</button>`).join('')}</div></div>
@@ -8171,12 +8173,12 @@ function vMe(_, q){
   ${ext('계정칸')}
   ${ext('약관칸')}
   <section class="sec card"><h2>이 앱에 대해</h2><p class="small" style="margin-top:6px">${esc(D.meta?.about || '')}</p><p class="small muted" style="margin-top:10px">${savedWhere()}</p><div class="lk48"><a class="link" href="${esc(방침주소())}"${NATIVE ? ' target="_blank" rel="noopener"' : ''}>개인정보처리방침</a>${D.meta?.contact?.email ? `<a class="link" href="mailto:${esc(D.meta.contact.email)}">문의 · ${esc(D.meta.contact.email)}</a>${D.meta.contact.operator ? `<span class="small muted">운영 ${esc(D.meta.contact.operator)}</span>` : ''}` : ''}</div></section>
-  <p class="small mn-sign" style="margin-top:20px;text-align:center"><b><svg class="mn-logo" viewBox="0 0 1024 1024" aria-hidden="true"><path d="M790 470 V760"/><path d="M256 760 V410 C256 296 350 258 424 312 C478 352 494 520 566 548 C648 580 790 250 790 460"/></svg>메디나눔</b> · 응급 판단 기준을 응급실 의사가 함께 검토한, 우리 가족 건강 앱</p>
+  <p class="small mn-sign" style="margin-top:20px;text-align:center"><b><svg class="mn-logo" viewBox="0 0 1024 1024" aria-hidden="true"><rect class="mn-tile" x="12" y="12" width="1000" height="1000" rx="226"/><path d="M790 470 V760"/><path d="M256 760 V410 C256 296 350 258 424 312 C478 352 494 520 566 548 C648 580 790 250 790 460"/></svg>메디나눔</b> · 응급 판단 기준을 응급실 의사가 함께 검토한, 우리 가족 건강 앱</p>
   <p class="small muted" style="margin-top:6px;text-align:center">약지도 v${esc(D.meta?.version || '')} · 빌드 ${BUILD}<br>${(() => { const P = D.public || {}, ds = ['easy_source', 'pills_source', 'permits_source'].map(k => `<span style="white-space:nowrap">${esc(String(P[k] || '').match(/\d{4}-\d\d-\d\d|\d{8}/)?.[0] || '확인일 기록 필요')}</span>`);
     /* 외부 검수 2차 #56 — 날짜 꼴이 바뀌어(2026-10-13) 빈칸으로 나오던 것. 제품 이름 자료를 받은 날과 약 설명 검수 달을 따로(빌드 날짜로 대신하지 않음) */
     return `식약처 제품 이름 자료 받은 날 — ${new Set(ds).size === 1 ? ds[0] + '(e약은요·낱알식별·허가 정보)' : `e약은요 ${ds[0]} · 낱알식별 ${ds[1]} · 허가 정보 ${ds[2]}`}<br>약 설명 ${esc(D.meta?.reviewLabel || '의료진 검수')} ${esc(D.meta?.reviewed || '확인일 기록 필요')}`; })()}</p>`;
   return `${topBar()}
-  <h1>내 정보</h1>${ext('계정줄')}
+  <h1>내 정보</h1>${tab === 'set' ? '' : ext('계정줄')}
   <nav class="tabs metabs" role="tablist" aria-label="내 정보 칸">${TABS.map(([k, n, ic, c]) => `<button class="tab ${tab === k ? 'on' : ''}" role="tab" aria-selected="${tab === k}" data-k="${k}" onclick="go('/me?t=${k}')">${ic}${n}<span class="n">${c}</span></button>`).join('')}</nav>
   ${body}`;
 }
@@ -8230,6 +8232,9 @@ function srvAgreed(){ try { return (JSON.parse(localStorage.getItem(AGREE_KEY) |
 /* 계정항목·서버동의켜기·서버동의끄기(설정의 계정 칸에서만 씀)는 srv.js 로 옮겼다 — 첫 화면 예산(10-14) */
 /* 계정이 이 폰에 «기억돼» 있는가 — 세션을 되살리기 전(앱을 연 직후·인터넷 없음)에도 참. 동의 거두기·모두 지우기가 서버 기록을 놓치지 않게(2026-10-13) */
 function srvHasAccount(){ try { return srvLoggedIn() || !!(window.서버 && 서버.상태 && (서버.상태() || {}).email); } catch (e) { return false; } }
+function acctMail(){ try { const s = window.서버?.세션?.(); if (s) return s.user?.email || ''; const k = Object.keys(localStorage).find(k => /^sb-.+-auth-token$/.test(k)); return k ? JSON.parse(localStorage[k])?.user?.email || '' : ''; } catch (e) { return ''; } }
+const acctBtn = () => { if (D.meta?.account !== true) return ''; const m = acctMail();
+  return `<button type="button" class="acct-btn${m ? ' on' : ''}" ${m ? `aria-label="계정 ${esc(m)}"` : ''} onclick="go('/login')">${m ? esc(m[0].toUpperCase()) : I.user + '로그인'}</button>`; };
 function srvLoggedIn(){ try { return !!(window.서버 && 서버.세션 && 서버.세션()); } catch (e) { return false; } }
 /* 서버 부품(약 30 KB)은 srv.js 로 따로 받는다 — index.html 첫 화면 예산(압축 220 KB) 때문. 받기 전엔 계정 칸이 「불러오는 중」이다. */
 /* 「어디에 저장되나요」 한 줄 — 로그인해 동의했으면 사실대로 서버도 말한다 */

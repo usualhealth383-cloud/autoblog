@@ -273,6 +273,7 @@
       : '체험이 끝났어요 · 결제는 아직 붙기 전이라 요금이 나가지 않아요';
     return '<div class="srvrow"><b>이용권</b><span>' + t + '</span></div>';
   }
+  window.이용권줄HTML = function () { try { return 이용권줄(); } catch (e) { return ''; } };
   function 화면갱신() { var el = document.getElementById('srvbox'); if (el) el.outerHTML = (el.getAttribute('data-door') && window.계정문HTML) ? window.계정문HTML() : window.계정화면HTML(); }   /* 10-14 로그인 문은 그 모양 그대로 */
 
   window.계정화면HTML = function () {
@@ -339,7 +340,7 @@
   };
   window.계정문확인 = function () {
     var b = document.getElementById('srvDoorGo'), w = document.getElementById('doorWhy'); if (!b) return;
-    var a = document.getElementById('srvAge'), g = document.getElementById('srvAgree'), 막 = !!((a && !a.checked) || (g && !g.checked));
+    var g = document.getElementById('srvAgree'), 막 = !!(g && !g.checked);
     b.disabled = 막; if (w) w.hidden = !막;
   };
   window.계정문동작 = function (what) {
@@ -374,21 +375,22 @@
     }
     var 가입 = 문탭 === 'signup', 동의됨 = 서버허용(), 소셜 = [], 항목 = window.계정항목 || {};
     try { 소셜 = (typeof window.소셜켜짐 === 'function' && window.소셜켜짐()) || []; } catch (e) { 소셜 = []; }
-    h += '<div class="door-seg" role="tablist" aria-label="로그인 또는 회원가입">' + ['login', 'signup'].map(function (k) { var on = (k === 'signup') === 가입;
-      return '<button type="button" role="tab" aria-selected="' + on + '"' + (on ? ' class="on"' : '') + ' onclick="계정문탭(\'' + k + '\')">' + (k === 'login' ? '로그인' : '회원가입') + '</button>'; }).join('') + '</div>';
+    /* 2026-10-29 현욱님 — 로그인/회원가입 갈림 없이 「메일로 계속하기」 하나: 계정이 있으면 로그인, 처음이면 그 자리에서 만든다 */
+    가입 = false;
     if (소셜.length) h += '<div class="door-social">' + 소셜.map(function (x, i) { return '<button type="button" onclick="소셜켜짐()[' + i + '].열기()">' + 글자안전(x.n) + '로 계속하기</button>'; }).join('') + '</div><p class="door-or"><span>또는 이메일로</span></p>';
     h += '<label class="door-f" for="srvEmail">이메일</label><input id="srvEmail" type="email" inputmode="email" autocomplete="email" autocapitalize="off" spellcheck="false" enterkeyhint="next" value="' + 글자안전(st.email || '') + '">'
-      + 비번칸('srvPw', '비밀번호' + (가입 ? ' <small>6자 이상</small>' : ''), 가입 ? 'new-password' : 'current-password', 'go');
+      + 비번칸('srvPw', '비밀번호 <small>처음이면 새로 정할 비밀번호 · 6자 이상</small>', 'current-password', 'go');
+    if (설정.가입확인) h += '<label class="door-ck"><input id="srvAge" type="checkbox" onchange="this.dataset.at=this.checked?new Date().toISOString():\'\'"><span><b>' + 글자안전(설정.가입확인.글) + ' <em class="door-tag">처음 만들 때 필수</em></b>' + (설정.가입확인.설명 ? '<small>' + 글자안전(설정.가입확인.설명) + '</small>' : '') + '</span></label>';
     if (가입 && 설정.가입확인) h += '<label class="door-ck"><input id="srvAge" type="checkbox" onchange="this.dataset.at=this.checked?new Date().toISOString():\'\';계정문확인()"><span><b>' + 글자안전(설정.가입확인.글) + ' <em class="door-tag">필수</em></b>' + (설정.가입확인.설명 ? '<small>' + 글자안전(설정.가입확인.설명) + '</small>' : '') + '</span></label>';
     if (!동의됨) h += '<label class="door-ck"><input id="srvAgree" type="checkbox" onchange="계정문확인()"><span><b>「서버에 저장하기」에 동의해요 <em class="door-tag">필수</em></b><small>건강에 관한 민감정보라 따로 여쭤요. 로그인하시면 이 휴대폰의 기록이 계정으로 이어져요.</small></span></label>'
       + '<details class="door-more"><summary>무엇이 올라가나요<svg class="i chev" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></summary><dl>'
       + '<dt>올라가는 것</dt><dd>' + 글자안전(항목.ko || '약지도 기록') + '</dd><dt>어디에</dt><dd>메디나눔 서버(Supabase, 서울)</dd><dt>왜</dt><dd>폰을 바꿔도 이어 보려고</dd>'
       + '<dt>언제까지</dt><dd>계정을 지우실 때까지 — 동의를 거두시면 서버 기록을 바로 지워요</dd></dl><p>동의하지 않으셔도 되고, 동의하지 않아도 약지도는 이 휴대폰에서 그대로 쓰실 수 있어요. 보기 설정과 날씨는 올라가지 않아요.</p></details>';
-    var 막힘 = (가입 && !!설정.가입확인) || !동의됨;
-    h += 말칸 + '<button type="button" id="srvDoorGo" class="door-go" onclick="계정문동작()"' + (막힘 ? ' disabled aria-describedby="doorWhy"' : '') + '>' + (가입 ? '계정 만들기' : '로그인') + '</button>'
+    var 막힘 = !동의됨;
+    h += 말칸 + '<button type="button" id="srvDoorGo" class="door-go" onclick="계정문동작(\'continue\')"' + (막힘 ? ' disabled aria-describedby="doorWhy"' : '') + '>메일로 계속하기</button>'
       + (막힘 ? '<p id="doorWhy" class="door-why">필수에 체크하시면 눌려요</p>' : '')
-      + (가입 ? '<p class="door-note">계정을 만들면 메일함에 확인 링크가 가요. 한 번 누르면 끝이에요.</p>'
-              : '<button type="button" class="srvlink door-forgot" onclick="계정문동작(\'reset\')">비밀번호를 잊으셨나요?</button>');
+      + '<p class="door-note">계정이 있으면 로그인하고, 처음이면 계정을 만들어요. 새로 만들면 메일함에 확인 링크가 가요 — 한 번 누르면 끝이에요.</p>'
+      + '<button type="button" class="srvlink door-forgot" onclick="계정문동작(\'reset\')">비밀번호를 잊으셨나요?</button>';
     return h + '</div>';
   };
   /* 다른 화면에서 왔으면 지난 글 칸을 비운다 */
@@ -463,6 +465,22 @@
       /* 2026-10-13 상용화 점검 2-08/2-19 — 만 14세 확인을 «언제» 했는지 계정 기록(user_metadata)에 남긴다(처리방침 1항: 가입 앱·만 14세 확인 시각).
          가입확인을 쓰지 않는 앱이면 app 만 넣는다. 비밀 값은 없다. */
       var 가입표 = { app: 설정.app }; if (설정.가입확인) { var ag = document.getElementById('srvAge'); 가입표.age14_at = (ag && ag.dataset && ag.dataset.at) || new Date().toISOString(); }
+      /* 2026-10-29 「메일로 계속하기」 — 먼저 로그인해 보고, 맞는 계정이 없으면 그 자리에서 만든다.
+         Supabase 는 「없는 메일」과 「틀린 비밀번호」를 같은 말로 돌려주므로, 만들기를 시도해 이미 있는 메일이면(identities 가 빈 배열) 비밀번호 문제로 알린다. */
+      if (what === 'continue') return sb.auth.signInWithPassword({ email: email, password: pw }).then(function (r) {
+        if (!r.error) { 세션 = r.data.session; 알림('로그인했어요. 기록을 맞추는 중이에요…'); 화면갱신(); return; }
+        if (!/invalid login credentials/i.test(String(r.error.message || ''))) throw r.error;
+        var ag = document.getElementById('srvAge');
+        if (설정.가입확인 && !(ag && ag.checked)) { 알림('비밀번호가 맞지 않거나 처음 쓰시는 메일이에요. 처음이시면 「' + 설정.가입확인.글 + '」에 체크하고 다시 눌러 주세요. 계정이 있으시면 「비밀번호를 잊으셨나요?」를 눌러 주세요.'); return; }
+        if (설정.가입확인 && typeof 설정.가입확인.기록 === 'function') { try { 설정.가입확인.기록(); } catch (e) {} }
+        return sb.auth.signUp(앱주소() ? { email: email, password: pw, options: { emailRedirectTo: 앱주소(), data: 가입표 } } : { email: email, password: pw, options: { data: 가입표 } }).then(function (r2) {
+          if (r2.error) throw r2.error;
+          var u = r2.data && r2.data.user;
+          if (u && Array.isArray(u.identities) && u.identities.length === 0) { 알림('이미 있는 계정이에요. 비밀번호를 다시 확인하시거나 「비밀번호를 잊으셨나요?」를 눌러 주세요.'); return; }
+          if (r2.data && r2.data.session) { 세션 = r2.data.session; 알림('처음 쓰시는 메일이라 계정을 만들었어요. 기록을 올리는 중이에요…'); 화면갱신(); }
+          else 알림('처음 쓰시는 메일이라 계정을 만들었어요. 메일함의 확인 링크를 누르신 뒤 다시 「메일로 계속하기」를 눌러 주세요.');
+        });
+      });
       if (what === 'signup') return sb.auth.signUp(앱주소() ? { email: email, password: pw, options: { emailRedirectTo: 앱주소(), data: 가입표 } } : { email: email, password: pw, options: { data: 가입표 } }).then(function (r) {
         if (r.error) throw r.error;
         if (r.data && r.data.session) { 세션 = r.data.session; 알림('계정을 만들었어요. 기록을 올리는 중이에요…'); 화면갱신(); }
@@ -1767,6 +1785,16 @@ window.계정칸 = () => D.meta?.account !== true ? '' : `<section class="sec ca
     ${계정화면HTML()}
     ${srvAgreed() ? `<button type="button" class="srvlink" onclick="서버동의끄기()">「서버에 저장하기」 동의 거두기</button>` : ''}
   </section>`;
+/* 2026-10-29 현욱님 — 설정 맨 위 첫 칸 = 계정 카드. 로그인 전엔 큰 단추 하나, 뒤엔 메일 · 이용권 · 동기화 · 로그아웃 · 계정 지우기(작게). 상세 칸(#acct)은 아래 그대로 */
+/* 계정 카드·메디나눔 서명 모양 — 첫 화면 예산 때문에 여기서 붙인다 */
+try { const st = document.createElement('style'); st.textContent = ".acct-card .acct-hd{display:flex;align-items:center;gap:12px}.acct-card .acct-hd>span:last-child{display:flex;flex-direction:column;min-width:0}.acct-card .acct-hd b{font-size:1.0625rem;overflow-wrap:anywhere}.acct-card .acct-hd small{color:var(--muted);font-size:.875rem;margin-top:2px}.acct-ic,.acct-av{flex:none;width:44px;height:44px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;background:var(--tint);color:var(--primary-deep)}.acct-av{background:var(--primary);color:var(--on-primary,#fff);font-weight:700;font-size:1.125rem}.acct-card .acct-go{width:100%;margin-top:14px;min-height:52px;font-size:1.0625rem}.acct-card .acct-act{display:flex;gap:10px;margin-top:14px}.acct-card .acct-act .btn{flex:1;margin:0;min-height:48px}.acct-card .srvrow{margin-top:12px}.acct-card .acct-del{margin-top:6px;font-size:.8125rem}.mn-logo{width:1.35em;height:1.35em;vertical-align:-.3em;margin-right:5px;color:#1A2B4A}.mn-logo path{fill:none;stroke:currentColor;stroke-width:236;stroke-linecap:round;stroke-linejoin:round}.mn-logo .mn-tile{fill:#FFFFFF;stroke:#CBD2DC;stroke-width:24}:root[data-theme=\"dark\"] .mn-logo .mn-tile{display:none}:root[data-theme=\"dark\"] .mn-logo{color:#FFFFFF}@media (prefers-color-scheme:dark){ :root:not([data-theme=\"light\"]) .mn-logo{color:#FFFFFF} :root:not([data-theme=\"light\"]) .mn-logo .mn-tile{display:none} }"; document.head.appendChild(st); } catch (e) {}
+window.계정카드 = () => { if (D.meta?.account !== true) return ''; const 나 = srvLoggedIn(), m = 나 ? (서버.세션()?.user?.email || '') : '';
+  if (!나) return `<section class="sec card acct-card"><div class="acct-hd"><span class="acct-ic" aria-hidden="true">${I.user}</span><span><b>메디나눔 계정</b><small>폰을 바꿔도 약통·복용 기록을 이어 봐요 · 선택</small></span></div>
+    <button type="button" class="btn primary acct-go" onclick="go('/login')">로그인 · 계정 만들기</button></section>`;
+  return `<section class="sec card acct-card"><div class="acct-hd"><span class="acct-av" aria-hidden="true">${esc(m.charAt(0).toUpperCase())}</span><span><b>${esc(m)}</b><small>로그인돼 있어요 · 이어 보기 켜짐</small></span></div>
+    ${window.이용권줄HTML ? 이용권줄HTML() : ''}
+    <div class="acct-act"><button type="button" class="btn line" onclick="계정동작('sync')">지금 맞추기</button><button type="button" class="btn line" onclick="계정동작('logout');setTimeout(route,600)">로그아웃</button></div>
+    <button type="button" class="srvlink acct-del" onclick="go('/me?t=set');setTimeout(()=>document.getElementById('acct')?.scrollIntoView({block:'start'}),300)">계정 지우기·동의 거두기는 아래 「계정」 칸에서</button></section>`; };
 window.계정줄 = () => D.meta?.account !== true ? '' : `<div class="rows-l acct-row">${srvLoggedIn() ? lrow(I.user, '메디나눔 계정', esc((서버.세션()?.user?.email || '') + ' · 이어 보기 켜짐'), "go('/login')") : lrow(I.user, '계정 만들기 · 로그인 <em class="door-tag">선택</em>', '폰을 바꿔도 이어 봐요', "go('/login')")}</div>`;
 window.처음계정 = () => D.meta?.account !== true || srvLoggedIn() ? '' : `<div class="hello-acct"><b>계정 만들기 · 로그인 <em class="door-tag">선택</em></b><span>폰을 바꿔도 이어 봐요</span>
   <div class="actions two"><button class="btn line" onclick="helloFinish();go('/login')">${I.user} 로그인</button><button class="btn ghost" onclick="helloFinish()">나중에</button></div></div>`;
@@ -1788,7 +1816,7 @@ window.문_login = (_, q) => {
   ${나 ? '' : `<ul class="lg-list">
     <li>${I.check}<span>새 휴대폰에서 같은 이메일로 로그인하면 약통·복용 기록이 그대로 와요</span></li>
     <li>${I.check}<span>메디나눔 앱들과 계정 하나 — 기록은 앱마다 따로예요</span></li>
-    <li>${I.check}<span>로그인하지 않아도 약지도는 모두 쓰실 수 있어요</span></li></ul>`}
+    <li>${I.check}<span>로그인하지 않아도 약지도의 대부분의 기능을 쓰실 수 있어요</span></li></ul>`}
   ${켜짐 && window.계정문HTML ? 계정문HTML() : '<p class="door-note" style="margin-top:20px">계정은 준비 중이에요. 지금은 이 휴대폰에서 그대로 쓰실 수 있어요.</p>'}
   <button type="button" class="door-skip" onclick="문나가기()">${나 ? '돌아가기' : '로그인 없이 계속 쓰기'}</button>
   <p class="cs-foot"><button type="button" class="cs-doc" onclick="go('/doc/terms')">이용약관</button> · <button type="button" class="cs-doc" onclick="go('/doc/privacy')">개인정보 처리방침</button></p>
