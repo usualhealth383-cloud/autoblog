@@ -278,7 +278,7 @@ ol.tl li:last-child{padding-bottom:0}
 .bag-line.on .cnt{flex:none;display:inline-grid;place-items:center;min-width:26px;height:26px;padding:0 7px;border-radius:13px;background:var(--normal);color:#fff;font-weight:800;font-size:.875rem;margin-right:2px}
 *{box-sizing:border-box;margin:0;padding:0}
 html{-webkit-text-size-adjust:100%}
-html{font-size:var(--fs,16px)}
+html{font-size:var(--fs,17px)}
 body{background:var(--ground);color:var(--text);font-family:var(--font);word-break:keep-all;overflow-wrap:break-word;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;
   line-height:1.6;display:flex;justify-content:center;min-height:100vh;font-size:1rem;
   -webkit-font-smoothing:antialiased;text-wrap:pretty}
@@ -2620,7 +2620,7 @@ function insertPanel(html, panel){
 
 /* ───────── 공통 조각 ───────── */
 /* 큰 글씨(18px 이상)에서는 머리 도장의 날짜·검색 안내 예시를 뺀다 — 두 줄로 꺾이고 잘렸다(3-24). 날짜는 근거 화면에 있다 */
-const bigFs = () => { try { return parseFloat(localStorage.getItem('yakjido.fs') || '16') >= 18; } catch (e) { return false; } };
+const bigFs = () => { try { return parseFloat(localStorage.getItem('yakjido.fs') || '17') >= 19; } catch (e) { return false; } };
 const topBar = (opts = {}) => `
   <div class="top">
     ${opts.back ? `<button class="back" onclick="goBack()">${I.prev}${esc(opts.back)}</button>` : `
@@ -6300,7 +6300,7 @@ function helloAgain(){ try { sessionStorage.removeItem(HELLO_FIN); } catch (e) {
 /* 현욱님 10-22(메디나눔 감사 ④-2) — 처음 질문은 「누가 불편하세요?」 하나만. 어른·어르신은 고르면 바로 홈(어르신은 큰 글씨·간단히 보기 자동),
    아이는 해열제 양을 셈하려면 생년월일·몸무게가 있어야 해서 한 화면 더. 앓는 병(지병)은 증상 화면·약을 담을 때 그 자리에서 묻는다(내 몸 조건 칩) */
 function helloPick(k){ ME.age = k; saveMe();
-  if (k === 'senior' && ME.easy === undefined) { ME.easy = true; saveMe(); try { if (!localStorage.getItem('yakjido.fs')) { localStorage.setItem('yakjido.fs.before', '16px'); localStorage.setItem('yakjido.fs', EASY_FS); document.documentElement.style.setProperty('--fs', EASY_FS); } } catch (e) {} }
+  if (k === 'senior' && ME.easy === undefined) { ME.easy = true; saveMe(); try { if (!localStorage.getItem('yakjido.fs')) { localStorage.setItem('yakjido.fs.before', '17px'); localStorage.setItem('yakjido.fs', EASY_FS); document.documentElement.style.setProperty('--fs', EASY_FS); } } catch (e) {} }
   if (k === 'child') go('/hello/2'); else helloFinish(); }
 function vHello(step){
   const n = Math.min(3, Math.max(1, parseInt(step || '1', 10) || 1));
@@ -6340,7 +6340,7 @@ function vHello(step){
   <p>${f.length ? `이렇게 기억해 둘게요 — <b>${f.map(k => esc(FLAG_LABEL[k])).join(' · ')}</b>.<br>약을 고를 때마다 알아서 살펴 드릴게요.` : '약을 고를 때마다 필요한 것만 여쭤볼게요.'}</p></div>
   ${(() => {
     /* 어르신이 드실 약이면 큰 글씨·큰 단추를 기본으로 켜 둔다 — 첫 화면부터 편해야 한다. 여기서 끄면 그대로 존중 */
-    if (ME.age === 'senior' && ME.easy === undefined) { ME.easy = true; saveMe(); try { if (!localStorage.getItem('yakjido.fs')) { localStorage.setItem('yakjido.fs.before', '16px'); localStorage.setItem('yakjido.fs', EASY_FS); document.documentElement.style.setProperty('--fs', EASY_FS); } } catch (e) {} } return ''; })()}
+    if (ME.age === 'senior' && ME.easy === undefined) { ME.easy = true; saveMe(); try { if (!localStorage.getItem('yakjido.fs')) { localStorage.setItem('yakjido.fs.before', '17px'); localStorage.setItem('yakjido.fs', EASY_FS); document.documentElement.style.setProperty('--fs', EASY_FS); } } catch (e) {} } return ''; })()}
   <h2 class="hello-q sv-q">화면을 어떻게 보여 드릴까요?</h2>
   <div class="hello-list">${[['simple', 'check', '간단히 — 사야 할 약만 사진과 함께', '예) 허리가 아프면: 진통제 · 소염제 · 근육 푸는 약'], ['detail', 'book', '자세히 — 왜 그런지·근거까지', '예) 성분이 겹치는지, 병원에서는 어떻게 하는지까지']].map(([k, ic, t, ex]) => `<button class="hello-big ${viewMode() === k ? 'on' : ''}" aria-pressed="${viewMode() === k}" onclick="setView('${k}')"><div class="ic">${icon(ic)}</div><div><b>${t}</b><span>${ex}</span></div></button>`).join('')}</div>
   <div class="hello-fs"><b>글씨가 작으면 키우세요</b>${fsSeg()}</div>
@@ -7995,10 +7995,10 @@ function vCompare(_, q){
 }
 
 /* ───────── 내 정보 ───────── */
-const FS_STEPS = [['16px', '보통'], ['18px', '크게'], ['20px', '더 크게'], ['22px', '가장 크게']];
+const FS_STEPS = [['17px', '보통'], ['19px', '크게'], ['21px', '더 크게'], ['23px', '가장 크게']];
 /* 사이트 저장이 막힌 브라우저에서는 localStorage 를 읽기만 해도 오류라 설정 화면이 통째로 깨졌다(5-10) */
 const lsGet = k => { try { return localStorage.getItem(k); } catch (e) { return null; } };
-const fsSeg = () => `<div class="fs-seg" role="group" aria-label="글자 크기">${FS_STEPS.map(([k, n]) => `<button class="${(lsGet('yakjido.fs') || '16px') === k ? 'on' : ''}" aria-pressed="${(lsGet('yakjido.fs') || '16px') === k}" onclick="setFs('${k}');route()" aria-label="글자 ${esc(n)}">가</button>`).join('')}</div>`;
+const fsSeg = () => `<div class="fs-seg" role="group" aria-label="글자 크기">${FS_STEPS.map(([k, n]) => `<button class="${(lsGet('yakjido.fs') || '17px') === k ? 'on' : ''}" aria-pressed="${(lsGet('yakjido.fs') || '17px') === k}" onclick="setFs('${k}');route()" aria-label="글자 ${esc(n)}">가</button>`).join('')}</div>`;
 /* ── 내 기록을 파일 하나로 옮기기 ──
    기록을 서버에 두지 않기로 했으니, 휴대폰을 바꾸면 그대로 사라진다.
    복약 달력 60일치와 불편했던 일까지 쌓이기 시작하면 그 손실이 크다.
@@ -8195,10 +8195,10 @@ document.addEventListener('keydown', e => { const t = e.target.closest?.('[role=
 document.addEventListener('input', e => { if (!e.target.closest('.calc')) return; const id = location.hash.split('/')[2]?.split('?')[0]; const s = supp(id); if (!s?.calc) return; const amt = +document.getElementById('c-amt').value, per = +document.getElementById('c-per').value, price = +document.getElementById('c-price').value, n = +document.getElementById('c-n').value; const pct = document.getElementById('c-pct'), won = document.getElementById('c-won'), nv = document.getElementById('c-n').value, bad = !(per > 0 && per % 1 === 0) || nv !== '' && !(n > 0 && n % 1 === 0), ce = document.getElementById('c-err'); if (ce) ce.textContent = bad ? '0보다 큰 알 수를 넣어 주세요.' : ''; if (amt > 0 && !bad) { const perServing = amt * per; const r = perServing / s.calc.typical; pct.textContent = Math.round(r * 100) + '%'; pct.style.color = r > (s.calc.ulRatio || 99) ? (/^공식 상한은/.test(s.dose?.ul || '') ? 'var(--caution)' : 'var(--alert)') : r < 0.5 ? 'var(--caution)' : 'var(--primary-deep)'; if (price > 0 && n > 0) { const unitPrice = price / n; const effDoses = perServing / s.calc.typical; won.textContent = Math.round(unitPrice * per / effDoses).toLocaleString('ko-KR') + '원'; } else won.textContent = '—'; } else { pct.textContent = '—'; won.textContent = '—'; } });
 function setFs(v){ try { localStorage.setItem('yakjido.fs', v); } catch (e) {} document.documentElement.style.setProperty('--fs', v); route(); }
 /* 3-07 — 어르신 모드는 글자를 「줄이지」 않는다: 켤 때 20px 보다 작으면 20px 로(전 값을 기억), 끌 때는 그 전 값으로. 이미 크게 고르신 분은 그대로 */
-const EASY_FS = '20px';
+const EASY_FS = '21px';
 /* 알림 글의 약 이름 기본값이 어르신 모드를 따른다(Q14) */
 function setEasy(on){ ME.easy = !!on; saveMe(); try { armNotifications(); } catch (e) {}
-  const cur = lsGet('yakjido.fs') || '16px';
+  const cur = lsGet('yakjido.fs') || '17px';
   if (on) { if (parseFloat(cur) < parseFloat(EASY_FS)) { try { localStorage.setItem('yakjido.fs.before', cur); } catch (e) {} setFs(EASY_FS); return; } }
   else { const b = lsGet('yakjido.fs.before'); try { localStorage.removeItem('yakjido.fs.before'); } catch (e) {} if (b && cur === EASY_FS) { setFs(b); return; } }
   route(); }
@@ -8215,7 +8215,8 @@ function setTheme(v){
 try { const mq = matchMedia('(prefers-color-scheme: dark)'), onTheme = () => { if (themeNow() !== 'auto') return; const m = document.querySelector('meta[name="theme-color"]'); if (m) m.content = mq.matches ? '#161A1C' : '#0B6E8F'; try { nativeBars(); } catch (e) {} };
   mq.addEventListener ? mq.addEventListener('change', onTheme) : mq.addListener && mq.addListener(onTheme); } catch (e) {}
 const themeNow = () => { try { const t = localStorage.getItem('yakjido.theme'); return t === 'dark' || t === 'auto' ? t : 'light'; } catch (e) { return 'light'; } };
-try { const fs = localStorage.getItem('yakjido.fs'); if (fs) document.documentElement.style.setProperty('--fs', fs); } catch (e) {}
+/* 10-29 화면 헌법 「본문 17px 이상」 — 글자 단계를 한 칸씩 올렸다(16·18·20·22 → 17·19·21·23). 예전에 고른 값도 한 번 옮긴다 */
+try { let fs = localStorage.getItem('yakjido.fs'); if (fs && !localStorage.getItem('yakjido.fs.v2')) { const m = { '16px': '17px', '18px': '19px', '20px': '21px', '22px': '23px' }; if (m[fs]) { fs = m[fs]; localStorage.setItem('yakjido.fs', fs); } } localStorage.setItem('yakjido.fs.v2', '1'); if (fs) document.documentElement.style.setProperty('--fs', fs); } catch (e) {}
 /* 화면 밝기는 휴대폰 설정만 따라가고 있었다. 눈이 부시거나(백내장) 어두운 화면이
    안 보이는 분이 스스로 고를 칸이 없었다 — 앱 안에서 고르게 한다(2026-09-22). 고른 밝기는 <head> 첫 조각이 그리기 전에 붙인다(Z8) */
 /* 제품·성분 사전(약 700 KB)은 첫 화면이 자리 잡은 뒤 조용히 미리 받는다 — "인사돌" 을 쳤을 때 제품이 증상보다 위에 오게(감사 #38). 데이터 절약 모드면 안 받는다 */

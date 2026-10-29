@@ -721,14 +721,14 @@ def simple_checks(br, url, fails):
     if len(pz.query_selector_all('.sv-tile')) < 8: fails.append('간단히 홈에 큰 증상 칸 8개가 없습니다')
     # (e) 넘침·잘림 — 390·360·320 × 16·22 px, 그리고 명암비·44px(두 테마)
     R = ['/home', '/symptom/msk', '/symptom/headache', '/symptom/cold', '/symptom/heartburn', '/symptom/insomnia', '/symptom/diarrhea', '/symptom/fever', '/drug/ibuprofen', '/drug/relax-combo', '/hello/3', '/me?t=set']
-    for fs in ('16px', '22px'):
+    for fs in ('17px', '23px'):
         pz.evaluate("v=>{ localStorage.setItem('yakjido.fs',v); document.documentElement.style.setProperty('--fs',v); }", fs)
         for w in (390, 360, 320):
             pz.set_viewport_size({'width': w, 'height': 800})
             for r in R:
                 go(r); pz.wait_for_timeout(60); o = pz.evaluate(OVERFLOW_JS)
                 if o['ov'] or o['clip']: fails.append(f'간단히 넘침 {w}px·{fs} {r}: {o["ov"][:2]} {o["clip"][:2]}')
-    pz.evaluate("()=>{ localStorage.setItem('yakjido.fs','16px'); document.documentElement.style.setProperty('--fs','16px'); }"); pz.set_viewport_size({'width': 390, 'height': 844})
+    pz.evaluate("()=>{ localStorage.setItem('yakjido.fs','17px'); document.documentElement.style.setProperty('--fs','17px'); }"); pz.set_viewport_size({'width': 390, 'height': 844})
     for theme in ('light', 'dark'):
         pz.emulate_media(color_scheme=theme); pz.evaluate("t=>setTheme(t)", theme); bad = []; tap = []
         for r in ['/home', '/symptom/msk', '/symptom/cold', '/drug/ibuprofen', '/hello/3']:
@@ -1384,7 +1384,7 @@ def main():
         if _n['errs']: fails.append(f'약 알림이 터집니다: {_n["errs"][:2]}')
         if not _n['fired']: fails.append('약 알림이 하나도 만들어지지 않습니다 — 시간이 돼도 안 옵니다')
         # 5b. 어르신 모드(글자 20px·큰 단추) — 넘침·잘림은 큰 글씨에서 먼저 터진다
-        pg.evaluate("localStorage.setItem('yakjido.fs','22px');localStorage.setItem('yakjido.me.v1',JSON.stringify({age:'senior',easy:true,view:'detail',taking:['cls:bp.arb','ibuprofen'],pub:{}}))")
+        pg.evaluate("localStorage.setItem('yakjido.fs','23px');localStorage.setItem('yakjido.me.v1',JSON.stringify({age:'senior',easy:true,view:'detail',taking:['cls:bp.arb','ibuprofen'],pub:{}}))")
         for r in SC + ['/bag', '/schedule', '/symptom/cramp', '/symptom/sprain', '/drug/acetaminophen', '/kinds/bp', '/vitals', '/visits', '/me?t=meds', '/me?t=set']:
             pg.goto(url + '#' + r); pg.reload(); ready(); pg.wait_for_timeout(500)
             o = pg.evaluate(OVERFLOW_JS)
@@ -1399,7 +1399,7 @@ def main():
             if o['ov']: fails.append(f'좁은 화면 가로 넘침 {r}: {o["ov"][:2]}')
             if o['clip']: fails.append(f'좁은 화면 글자 잘림 {r}: {o["clip"][:2]}')
         pg.set_viewport_size({'width': 390, 'height': 844})
-        pg.evaluate("localStorage.setItem('yakjido.fs','16px')")
+        pg.evaluate("localStorage.setItem('yakjido.fs','17px')")
         # 6. 병용 판정 시나리오 (이름 없이 종류로)
         CASES = [(['bp.arb', 'bp.diur'], '/symptom/arthritis', '콩팥'), (['blood.warf'], '/symptom/msk', '와파린'),
                  (['pros.alpha'], '/symptom/cold', '전립선'), (['dem.ache', 'blad.oab'], '/together', '치매약'), (['bp.any'], '/symptom/arthritis', '혈압약')]

@@ -253,7 +253,7 @@ background:linear-gradient(135deg,var(--gbg,var(--tint)) 0%,var(--card) 100%);bo
 .bag-line.on .cnt{flex:none;display:inline-grid;place-items:center;min-width:26px;height:26px;padding:0 7px;border-radius:13px;background:var(--normal);color:#fff;font-weight:800;font-size:.875rem;margin-right:2px}
 *{box-sizing:border-box;margin:0;padding:0}
 html{-webkit-text-size-adjust:100%}
-html{font-size:var(--fs,16px)}
+html{font-size:var(--fs,17px)}
 body{background:var(--ground);color:var(--text);font-family:var(--font);word-break:keep-all;overflow-wrap:break-word;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;
 line-height:1.6;display:flex;justify-content:center;min-height:100vh;font-size:1rem;
 -webkit-font-smoothing:antialiased;text-wrap:pretty}
@@ -1765,7 +1765,7 @@ background-repeat:no-repeat;background-position:right 9px center;background-size
 <script>
 window.__YAKJIDO_OK__ = true;
 const D = JSON.parse(document.getElementById('data').textContent || '{}');
-const BUILD = '2026-10-29 11:06';
+const BUILD = '2026-10-29 11:28';
 const DATAV = '9bec5e7054'.indexOf('__') === 0 ? BUILD : '9bec5e7054';
 const BRANDMARK = (typeof window !== 'undefined' && window.__BRANDMARK__) || 'icon-192.png';
 let CORE = 0, CORE_P = null;
@@ -2315,7 +2315,7 @@ const M = '<!--TOPEND-->', i = html.indexOf(M);
 return i < 0 ? panel + html : html.slice(0, i + M.length) + panel;
 }
 
-const bigFs = () => { try { return parseFloat(localStorage.getItem('yakjido.fs') || '16') >= 18; } catch (e) { return false; } };
+const bigFs = () => { try { return parseFloat(localStorage.getItem('yakjido.fs') || '17') >= 19; } catch (e) { return false; } };
 const topBar = (opts = {}) => `
 <div class="top">
 ${opts.back ? `<button class="back" onclick="goBack()">${I.prev}${esc(opts.back)}</button>` : `
@@ -5279,7 +5279,7 @@ function helloFinish(){ try { localStorage.setItem(HELLO_KEY, '1'); } catch (e) 
 try { location.replace(location.href.split('#')[0] + '#/home'); } catch (e) { go('/home'); } }
 function helloAgain(){ try { sessionStorage.removeItem(HELLO_FIN); } catch (e) {} go('/hello/1'); }
 function helloPick(k){ ME.age = k; saveMe();
-if (k === 'senior' && ME.easy === undefined) { ME.easy = true; saveMe(); try { if (!localStorage.getItem('yakjido.fs')) { localStorage.setItem('yakjido.fs.before', '16px'); localStorage.setItem('yakjido.fs', EASY_FS); document.documentElement.style.setProperty('--fs', EASY_FS); } } catch (e) {} }
+if (k === 'senior' && ME.easy === undefined) { ME.easy = true; saveMe(); try { if (!localStorage.getItem('yakjido.fs')) { localStorage.setItem('yakjido.fs.before', '17px'); localStorage.setItem('yakjido.fs', EASY_FS); document.documentElement.style.setProperty('--fs', EASY_FS); } } catch (e) {} }
 if (k === 'child') go('/hello/2'); else helloFinish(); }
 function vHello(step){
 const n = Math.min(3, Math.max(1, parseInt(step || '1', 10) || 1));
@@ -5316,7 +5316,7 @@ return `${topBar({ back:'이전', nosearch:true })}${dots}
 <div class="hello-hi"><div class="hello-mark ok">${I.check}</div><h1>준비됐어요</h1>
 <p>${f.length ? `이렇게 기억해 둘게요 — <b>${f.map(k => esc(FLAG_LABEL[k])).join(' · ')}</b>.<br>약을 고를 때마다 알아서 살펴 드릴게요.` : '약을 고를 때마다 필요한 것만 여쭤볼게요.'}</p></div>
 ${(() => {
-if (ME.age === 'senior' && ME.easy === undefined) { ME.easy = true; saveMe(); try { if (!localStorage.getItem('yakjido.fs')) { localStorage.setItem('yakjido.fs.before', '16px'); localStorage.setItem('yakjido.fs', EASY_FS); document.documentElement.style.setProperty('--fs', EASY_FS); } } catch (e) {} } return ''; })()}
+if (ME.age === 'senior' && ME.easy === undefined) { ME.easy = true; saveMe(); try { if (!localStorage.getItem('yakjido.fs')) { localStorage.setItem('yakjido.fs.before', '17px'); localStorage.setItem('yakjido.fs', EASY_FS); document.documentElement.style.setProperty('--fs', EASY_FS); } } catch (e) {} } return ''; })()}
 <h2 class="hello-q sv-q">화면을 어떻게 보여 드릴까요?</h2>
 <div class="hello-list">${[['simple', 'check', '간단히 — 사야 할 약만 사진과 함께', '예) 허리가 아프면: 진통제 · 소염제 · 근육 푸는 약'], ['detail', 'book', '자세히 — 왜 그런지·근거까지', '예) 성분이 겹치는지, 병원에서는 어떻게 하는지까지']].map(([k, ic, t, ex]) => `<button class="hello-big ${viewMode() === k ? 'on' : ''}" aria-pressed="${viewMode() === k}" onclick="setView('${k}')"><div class="ic">${icon(ic)}</div><div><b>${t}</b><span>${ex}</span></div></button>`).join('')}</div>
 <div class="hello-fs"><b>글씨가 작으면 키우세요</b>${fsSeg()}</div>
@@ -6763,9 +6763,9 @@ ${overlap.length ? `<section class="sec">${overlap.map(o => `<div class="note">$
 ${disclaimer(D.meta?.suppDisclaimer)}`;
 }
 
-const FS_STEPS = [['16px', '보통'], ['18px', '크게'], ['20px', '더 크게'], ['22px', '가장 크게']];
+const FS_STEPS = [['17px', '보통'], ['19px', '크게'], ['21px', '더 크게'], ['23px', '가장 크게']];
 const lsGet = k => { try { return localStorage.getItem(k); } catch (e) { return null; } };
-const fsSeg = () => `<div class="fs-seg" role="group" aria-label="글자 크기">${FS_STEPS.map(([k, n]) => `<button class="${(lsGet('yakjido.fs') || '16px') === k ? 'on' : ''}" aria-pressed="${(lsGet('yakjido.fs') || '16px') === k}" onclick="setFs('${k}');route()" aria-label="글자 ${esc(n)}">가</button>`).join('')}</div>`;
+const fsSeg = () => `<div class="fs-seg" role="group" aria-label="글자 크기">${FS_STEPS.map(([k, n]) => `<button class="${(lsGet('yakjido.fs') || '17px') === k ? 'on' : ''}" aria-pressed="${(lsGet('yakjido.fs') || '17px') === k}" onclick="setFs('${k}');route()" aria-label="글자 ${esc(n)}">가</button>`).join('')}</div>`;
 async function exportMe(){
 const payload = { app:'yakjido', v:1, at:new Date().toISOString(), me:ME };
 if (await saveFile(`약지도-내기록-${todayKey()}.json`, JSON.stringify(payload, null, 1), 'application/json'))
@@ -6938,9 +6938,9 @@ const L = [...t.parentNode.querySelectorAll('[role=tab]')], n = L.length, j = k 
 e.preventDefault(); L[j].focus(); L[j].scrollIntoView({ block: 'nearest', inline: 'nearest' }); });
 document.addEventListener('input', e => { if (!e.target.closest('.calc')) return; const id = location.hash.split('/')[2]?.split('?')[0]; const s = supp(id); if (!s?.calc) return; const amt = +document.getElementById('c-amt').value, per = +document.getElementById('c-per').value, price = +document.getElementById('c-price').value, n = +document.getElementById('c-n').value; const pct = document.getElementById('c-pct'), won = document.getElementById('c-won'), nv = document.getElementById('c-n').value, bad = !(per > 0 && per % 1 === 0) || nv !== '' && !(n > 0 && n % 1 === 0), ce = document.getElementById('c-err'); if (ce) ce.textContent = bad ? '0보다 큰 알 수를 넣어 주세요.' : ''; if (amt > 0 && !bad) { const perServing = amt * per; const r = perServing / s.calc.typical; pct.textContent = Math.round(r * 100) + '%'; pct.style.color = r > (s.calc.ulRatio || 99) ? (/^공식 상한은/.test(s.dose?.ul || '') ? 'var(--caution)' : 'var(--alert)') : r < 0.5 ? 'var(--caution)' : 'var(--primary-deep)'; if (price > 0 && n > 0) { const unitPrice = price / n; const effDoses = perServing / s.calc.typical; won.textContent = Math.round(unitPrice * per / effDoses).toLocaleString('ko-KR') + '원'; } else won.textContent = '—'; } else { pct.textContent = '—'; won.textContent = '—'; } });
 function setFs(v){ try { localStorage.setItem('yakjido.fs', v); } catch (e) {} document.documentElement.style.setProperty('--fs', v); route(); }
-const EASY_FS = '20px';
+const EASY_FS = '21px';
 function setEasy(on){ ME.easy = !!on; saveMe(); try { armNotifications(); } catch (e) {}
-const cur = lsGet('yakjido.fs') || '16px';
+const cur = lsGet('yakjido.fs') || '17px';
 if (on) { if (parseFloat(cur) < parseFloat(EASY_FS)) { try { localStorage.setItem('yakjido.fs.before', cur); } catch (e) {} setFs(EASY_FS); return; } }
 else { const b = lsGet('yakjido.fs.before'); try { localStorage.removeItem('yakjido.fs.before'); } catch (e) {} if (b && cur === EASY_FS) { setFs(b); return; } }
 route(); }
@@ -6955,7 +6955,7 @@ route();
 try { const mq = matchMedia('(prefers-color-scheme: dark)'), onTheme = () => { if (themeNow() !== 'auto') return; const m = document.querySelector('meta[name="theme-color"]'); if (m) m.content = mq.matches ? '#161A1C' : '#0B6E8F'; try { nativeBars(); } catch (e) {} };
 mq.addEventListener ? mq.addEventListener('change', onTheme) : mq.addListener && mq.addListener(onTheme); } catch (e) {}
 const themeNow = () => { try { const t = localStorage.getItem('yakjido.theme'); return t === 'dark' || t === 'auto' ? t : 'light'; } catch (e) { return 'light'; } };
-try { const fs = localStorage.getItem('yakjido.fs'); if (fs) document.documentElement.style.setProperty('--fs', fs); } catch (e) {}
+try { let fs = localStorage.getItem('yakjido.fs'); if (fs && !localStorage.getItem('yakjido.fs.v2')) { const m = { '16px': '17px', '18px': '19px', '20px': '21px', '22px': '23px' }; if (m[fs]) { fs = m[fs]; localStorage.setItem('yakjido.fs', fs); } } localStorage.setItem('yakjido.fs.v2', '1'); if (fs) document.documentElement.style.setProperty('--fs', fs); } catch (e) {}
 setTimeout(() => { try { const c = navigator.connection; if (c && (c.saveData || /2g/.test(c.effectiveType || ''))) return; } catch (e) {} Promise.all([ensureCore(), ensureDetail()]).then(() => setTimeout(() => { lexLoad(true); pubIndexSoon(); }, 800)); }, 3500);
 
 const AGREE_KEY = 'yakjido.agree.v1';
