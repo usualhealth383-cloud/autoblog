@@ -2680,7 +2680,7 @@ function fmt(t){ return esc(t).replace(/\*\*(.+?)\*\*/g, '<b>$1</b>').replace(/\
     (m, w, cb, sp, num) => `${w}${cb || ''}${sp}<a class="call-in" href="tel:${num}">${num}</a>`)
   /* 119 는 본문 어디에 나와도 누르면 걸리게. 이 앱의 모든 119 는 «지금 전화하세요»라는 뜻이고,
      용량·개수로 119 가 쓰인 곳은 없다(검사로 확인). 이미 링크가 된 것은 건드리지 않는다. */
-  .replace(/(?<!tel:)(?<![\d>-])119(?![\d-])/g, '<a class="call-in" href="tel:119">119</a>'); }
+  .replace(/119(?![\d-])/g, (m, i, all) => /(tel:|[\d>-])$/.test(all.slice(Math.max(0, i - 4), i)) ? m : '<a class="call-in" href="tel:119">119</a>'); }   /* 10-29 뒤돌아보기 정규식은 iOS 16.4 전 Safari 에서 스크립트 전체를 멈춘다 */
 /* 여러 성분의 「내 정보 기준」 경고를 한 목록으로 — 성분 이름을 앞에 붙인다 */
 function meWarningsMany(list){
   const f = activeFlags(); if (!f.length) return '';
@@ -4582,7 +4582,7 @@ function tipBan(s){
    일반 천식에서 통째로 빼지 않고 지금처럼 「약사와 먼저 상의」로 남긴다(4차 #1 뒤 자체 점검 — 천식이면 두통에 살 약이 하나도 없어졌다) */
 const narrowAv = a => String(a.flags) === 'asthma' && /(아스피린|소염진통제|감기약)[^.]*(적이 있|있었던|생긴 적|온 적)/.test(a.text || '') && !/그 밖의 천식도 설명서/.test(a.text || '');
 const banList = (L, b) => !b || !Array.isArray(L) ? L : L.filter(t => !b.hit(typeof t === 'object' ? (t.q || '') + ' ' + (t.a || '') + ' ' + (t.t || t.text || '') : t));
-const banProse = (t, b) => !b || !t ? t : String(t).split(/(?<=[.!?])\s+/).filter(x => !b.hit(x)).join(' ');
+const banProse = (t, b) => !b || !t ? t : String(t).replace(/([.!?])\s+/g, '$1\u0001').split('\u0001').filter(x => !b.hit(x)).join(' ');
 /* 「심한 ○○」을 켜면 «덜 심한» 칸도 함께 켜진다 — 안내에는 한 번만 */
 const flagTop = L => (L || []).filter(x => !(x === 'heart' && L.includes('hf')) && !(x === 'liver' && L.includes('lvs')) && !(x === 'ulcer' && L.includes('bleed')));
 const banNote = b => !b ? '' : (b.names.length ? `<p class="note ban-note">${I.alert}<span>내 몸 조건(${esc(flagTop(b.why).map(x => FLAG_LABEL[x] || x).join(', '))}) 때문에 <b>${esc(b.names.join('·'))}</b> 안내는 뺐어요 — 다른 약도 먹기 전에 약사·의사와 먼저 상의하세요.</span></p>` : '')

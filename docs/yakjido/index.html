@@ -1766,8 +1766,8 @@ background-repeat:no-repeat;background-position:right 9px center;background-size
 <script>
 window.__YAKJIDO_OK__ = true;
 const D = JSON.parse(document.getElementById('data').textContent || '{}');
-const BUILD = '2026-10-30 00:03';
-const DATAV = '8383962025'.indexOf('__') === 0 ? BUILD : '8383962025';
+const BUILD = '2026-10-30 00:26';
+const DATAV = 'd316ada6a3'.indexOf('__') === 0 ? BUILD : 'd316ada6a3';
 const BRANDMARK = (typeof window !== 'undefined' && window.__BRANDMARK__) || 'icon-192.png';
 let CORE = 0, CORE_P = null;
 function mergeCore(c){
@@ -2359,7 +2359,7 @@ function fmt(t){ return esc(t).replace(/\*\*(.+?)\*\*/g, '<b>$1</b>').replace(/\
 .replace(/\[([^\[\]]*확인 필요[^\[\]]*)\]/g, '<span class="chk">$1</span>')
 .replace(/(자살예방상담|정신건강상담|생명의전화|응급의료정보센터|중독관리)(<\/b>)?(\s*)(109|119|1339|129|1588-9191)/g,
 (m, w, cb, sp, num) => `${w}${cb || ''}${sp}<a class="call-in" href="tel:${num}">${num}</a>`)
-.replace(/(?<!tel:)(?<![\d>-])119(?![\d-])/g, '<a class="call-in" href="tel:119">119</a>'); }
+.replace(/119(?![\d-])/g, (m, i, all) => /(tel:|[\d>-])$/.test(all.slice(Math.max(0, i - 4), i)) ? m : '<a class="call-in" href="tel:119">119</a>'); }   /* 10-29 뒤돌아보기 정규식은 iOS 16.4 전 Safari 에서 스크립트 전체를 멈춘다 */
 function meWarningsMany(list){
 const f = activeFlags(); if (!f.length) return '';
 const rows = [];
@@ -3839,7 +3839,7 @@ return { hit, ids: all, names: nm(bad), why: why(bad), askNames: nm(ask), askWhy
 }
 const narrowAv = a => String(a.flags) === 'asthma' && /(아스피린|소염진통제|감기약)[^.]*(적이 있|있었던|생긴 적|온 적)/.test(a.text || '') && !/그 밖의 천식도 설명서/.test(a.text || '');
 const banList = (L, b) => !b || !Array.isArray(L) ? L : L.filter(t => !b.hit(typeof t === 'object' ? (t.q || '') + ' ' + (t.a || '') + ' ' + (t.t || t.text || '') : t));
-const banProse = (t, b) => !b || !t ? t : String(t).split(/(?<=[.!?])\s+/).filter(x => !b.hit(x)).join(' ');
+const banProse = (t, b) => !b || !t ? t : String(t).replace(/([.!?])\s+/g, '$1\u0001').split('\u0001').filter(x => !b.hit(x)).join(' ');
 const flagTop = L => (L || []).filter(x => !(x === 'heart' && L.includes('hf')) && !(x === 'liver' && L.includes('lvs')) && !(x === 'ulcer' && L.includes('bleed')));
 const banNote = b => !b ? '' : (b.names.length ? `<p class="note ban-note">${I.alert}<span>내 몸 조건(${esc(flagTop(b.why).map(x => FLAG_LABEL[x] || x).join(', '))}) 때문에 <b>${esc(b.names.join('·'))}</b> 안내는 뺐어요 — 다른 약도 먹기 전에 약사·의사와 먼저 상의하세요.</span></p>` : '')
 + ((b.askNames || []).length ? `<p class="note ban-note">${I.alert}<span>내 몸 조건(${esc(flagTop(b.askWhy).map(x => FLAG_LABEL[x] || x).join(', '))})에서는 <b>${esc(b.askNames.join('·'))}</b>${josa(b.askNames[b.askNames.length - 1], '을', '를')} 먹기 전에 약사·의사와 먼저 확인하세요 — 그래서 먹는 법·양 안내는 뺐어요.</span></p>` : '');
