@@ -2628,7 +2628,7 @@ const topBar = (opts = {}) => `
     <div class="brand"><div class="mark"><img src="${BRANDMARK}" alt="" width="34" height="34"></div><div><b>약지도</b><span>증상에 맞는 약 · 복약 알림</span></div></div>`}
     ${opts.unreviewed ? `<span class="review-stamp wait">${I.alert}의사 확인 중</span>` : opts.unv ? `<span class="review-stamp wait">${I.info}자료 확인 중</span>` : `<span class="review-stamp">${I.shield}${esc(D.meta?.reviewLabel || '의료진 검수')}${bigFs() ? '' : `<span class="rs-d"> · ${esc(D.meta?.reviewed || '')}</span>`}</span>`}${!opts.back ? acctBtn() : ''}
   </div>
-  ${opts.nosearch ? '' : `<div class="topfind">${I.search}<input id="gq" aria-label="증상이나 약 이름으로 찾기" placeholder="${bigFs() ? '증상이나 약 이름' : '증상·약 이름으로 찾기 (예: 허리, 타이레놀)'}" autocomplete="off" enterkeyhint="search" value="${esc(GQ)}"><button class="gq-x ${GQ ? '' : 'hide'}" onclick="GQ='';route()" aria-label="지우기">${I.x}</button></div>`}<!--TOPEND-->`;
+  ${opts.nosearch ? '' : `<div class="topfind">${I.search}<input id="gq" aria-label="증상이나 약 이름으로 찾기" placeholder="${bigFs() || innerWidth < 380 ? '증상이나 약 이름' : '증상·약 이름으로 찾기 (예: 허리, 타이레놀)'}" autocomplete="off" enterkeyhint="search" value="${esc(GQ)}"><button class="gq-x ${GQ ? '' : 'hide'}" onclick="GQ='';route()" aria-label="지우기">${I.x}</button></div>`}<!--TOPEND-->`;
 /* 출처 칩은 「저자·연도」까지만. 예전 규칙은 괄호 「(」에서만 잘라서, 「—」로 쓴 출처 44개가
    문장째로 화면에 깔렸다(어지럼 화면이 출처 문단 여섯 개로 끝나고 있었다).
    연도(19xx·20xx)를 만나면 거기서 끊고, 연도가 없으면 「—」·「·」 앞에서 끊는다. */
@@ -5851,11 +5851,11 @@ function vVitals(){
   const takesBp = takingItems().some(d => ingOf(d).ings.some(e => (e.cls || []).some(c => ['arb', 'acei', 'ccb', 'beta', 'diuretic', 'bp-any'].includes(c))));
   const lastBp = L.filter(x => x.k === 'bp').slice(-1)[0];
   const form = k === 'bp' ? `
-    <div class="vt-row"><label class="vt-f"><span>위 혈압</span><input id="vs" type="number" inputmode="numeric" min="60" max="260" placeholder="예: 128" aria-label="위 혈압(수축기)"></label>
-      <b class="vt-sl">/</b><label class="vt-f"><span>아래 혈압</span><input id="vd" type="number" inputmode="numeric" min="30" max="160" placeholder="예: 82" aria-label="아래 혈압(이완기)"></label>
-      <label class="vt-f"><span>맥박 <small>(선택)</small></span><input id="vp" type="number" inputmode="numeric" min="30" max="220" placeholder="예: 72" aria-label="맥박(선택)"></label></div>
+    <div class="vt-row"><label class="vt-f"><span>위 혈압</span><input id="vs" type="number" inputmode="numeric" min="60" max="260" placeholder="128" aria-label="위 혈압(수축기)"></label>
+      <b class="vt-sl">/</b><label class="vt-f"><span>아래 혈압</span><input id="vd" type="number" inputmode="numeric" min="30" max="160" placeholder="82" aria-label="아래 혈압(이완기)"></label>
+      <label class="vt-f"><span>맥박 <small>(선택)</small></span><input id="vp" type="number" inputmode="numeric" min="30" max="220" placeholder="72" aria-label="맥박(선택)"></label></div>
     <div class="times vt-wchips" style="margin-top:10px">${['아침', '낮', '저녁'].map(w => `<button class="chip ${(VT.w || slotWord(new Date())) === w ? 'on' : ''}" data-w="${w}" aria-pressed="${(VT.w || slotWord(new Date())) === w}" onclick="VT.w='${w}';document.querySelectorAll('.vt-wchips .chip').forEach(b=>{const on=b===this;b.classList.toggle('on',on);b.setAttribute('aria-pressed',on)})">${w}</button>`).join('')}</div>${vtWhenBox()}`
-  : `<div class="vt-row"><label class="vt-f"><span>혈당 (mg/dL)</span><input id="vg" type="number" inputmode="numeric" min="20" max="600" placeholder="예: 110" aria-label="혈당"></label></div>
+  : `<div class="vt-row"><label class="vt-f"><span>혈당 (mg/dL)</span><input id="vg" type="number" inputmode="numeric" min="20" max="600" placeholder="110" aria-label="혈당"></label></div>
     <div class="times vt-gchips" style="margin-top:10px">${['공복', '식후 2시간', '그 밖'].map(w => `<button class="chip ${(VT.gw || '공복') === w ? 'on' : ''}" aria-pressed="${(VT.gw || '공복') === w}" onclick="VT.gw='${w}';document.querySelectorAll('.vt-gchips .chip').forEach(b=>{const on=b===this;b.classList.toggle('on',on);b.setAttribute('aria-pressed',on)})">${w}</button>`).join('')}</div>${vtWhenBox()}`;
   return `${topBar({ back:'내 정보' })}<div class="eyebrow">혈압·혈당 수첩</div><h1>재 두신 숫자, 진료 때 한눈에</h1>
   <p style="margin-top:6px">집에서 잰 혈압·혈당을 적어 두면 <b>2주 흐름</b>과 <b>7일 평균</b>을 보여 드려요. ${savedWhere()}</p>
@@ -7674,7 +7674,7 @@ function aeDrugCard(d){
   return `<details class="acc" id="ae-drug"><summary>${isOral(d) ? '이 약 먹고 불편했어요' : '이 약 쓰고 불편했어요'}${I.chev}</summary><div class="bd"><p class="small muted" style="margin:0 0 10px">적어 두시면 이 약 화면 위와 약통에 계속 보여 드려요.</p>
     <div class="ae-form" style="margin-top:0">
       <label class="ae-lbl" for="aed-what">어떤 일이 있었나요</label>
-      <input id="aed-what" class="ae-inp" placeholder="예) 속이 메스껍고 어지러웠어요" maxlength="200" autocomplete="off">
+      <input id="aed-what" class="ae-inp" placeholder="예) 속이 메스꺼웠어요" maxlength="200" autocomplete="off">
       <label class="ae-lbl" for="aed-when">언제였나요</label>
       <input id="aed-when" class="ae-inp" type="date" value="${todayKey()}" max="${todayKey()}">
       <button class="btn ghost" onclick="aeAddFor('${esc(d.id)}')">${I.check} 적어 두기</button>
@@ -7698,7 +7698,7 @@ function aeCard(){
     <label class="ae-lbl" for="ae-who">어느 약이었나요</label>
     <select id="ae-who" class="ae-inp">${items.map(x => `<option value="${esc(x.id)}">${esc(x.name)}</option>`).join('')}<option value="">어느 약인지 모르겠어요</option></select>
     <label class="ae-lbl" for="ae-what">어떤 일이 있었나요</label>
-    <input id="ae-what" class="ae-inp" placeholder="예) 속이 메스껍고 어지러웠어요" maxlength="200" autocomplete="off">
+    <input id="ae-what" class="ae-inp" placeholder="예) 속이 메스꺼웠어요" maxlength="200" autocomplete="off">
     <label class="ae-lbl" for="ae-when">언제였나요</label>
     <input id="ae-when" class="ae-inp" type="date" value="${todayKey()}" max="${todayKey()}">
     <button class="btn ghost" onclick="aeAdd()">${I.check} 적어 두기</button>
@@ -7954,7 +7954,7 @@ function vSuppDetail(id){
   ${s.forms?.length ? `<section class="sec card"><h2>제형별 차이 <small>흡수·부작용</small></h2>${cmpRows(['흡수', '특징'], s.forms.map(f => [esc(f.name), [esc(f.bio || '—'), fmt(f.note || '')]]), { first:'제형', more:'제형 더' })}</section>` : ''}
   ${s.label?.length ? `<section class="sec card"><h2>라벨에서 볼 것</h2>${list(s.label, 'steps')}</section>` : ''}
   ${s.calc ? `<section class="sec card"><h2>내 제품 계산해 보기 <small>참고량 대비 %</small></h2><p class="small muted" style="margin-top:4px">라벨의 1회 함량과 가격을 넣으면 참고량 대비 몇 %인지, 참고량 1회분 가격이 얼마인지 보여드려요.</p>
-    <div class="calc"><label>1알 또는 1포에 든 양 (${esc(s.calc.unit)})<input type="number" inputmode="decimal" id="c-amt" placeholder="예: ${esc(String(s.calc.typical))}"></label><label>1회 분량 (정·포)<input type="number" inputmode="numeric" id="c-per" value="1" min="1" step="1"></label><label>제품 가격 (원)<input type="number" inputmode="numeric" id="c-price" placeholder="예: 25000"></label><label>총 개수 (정·포)<input type="number" inputmode="numeric" id="c-n" placeholder="예: 90"></label></div>
+    <div class="calc"><label>1알 또는 1포에 든 양 (${esc(s.calc.unit)})<input type="number" inputmode="decimal" id="c-amt" placeholder="${esc(String(s.calc.typical))}"></label><label>1회 분량 (정·포)<input type="number" inputmode="numeric" id="c-per" value="1" min="1" step="1"></label><label>제품 가격 (원)<input type="number" inputmode="numeric" id="c-price" placeholder="25000"></label><label>총 개수 (정·포)<input type="number" inputmode="numeric" id="c-n" placeholder="90"></label></div>
     <p class="small muted">라벨이 2알 합계로 적혀 있으면 나눠 넣어요 — 2알에 100이면 첫 칸에는 50을 넣어요.</p><p id="c-err" class="small" role="alert" style="color:var(--alert)"></p>
     <div class="calc-out"><div><small>참고량 대비</small><b id="c-pct">—</b><span class="small muted">기준 ${esc(String(s.calc.typical))} ${esc(s.calc.unit)}${s.calc.note ? ' · ' + fmt(s.calc.note) : ''}</span></div><div><small>참고량 1회분 가격</small><b id="c-won">—</b><span class="small muted">낮을수록 경제적</span></div></div>
     <p class="small muted" style="margin-top:8px">${s.calc.caveat ? fmt(s.calc.caveat) : '기준량은 함량·가격 비교용이에요. 효과가 보장되는 양이나 하루 안전 상한을 뜻하지 않아요.'}</p></section>` : ''}
@@ -8096,7 +8096,7 @@ function allergyBox(){
     <p class="small" style="margin:6px 0 10px">먹고 두드러기·숨참·붓기가 났던 약의 <b>성분</b>을 적어 두시면, 그 성분이 든 약은 추천에서 빼고 약 화면 맨 위에 알려 드려요.</p>
     ${L.length ? `<div class="alg-list">${L.map(x => `<div class="alg-row"><span><b>${esc(nm(x.ing))}</b> · ${esc(ALG_R[x.r])}</span><button type="button" class="alg-x" aria-label="${esc(nm(x.ing))} 지우기" onclick="allergyDel('${x.ing}')">${I.x}</button></div>`).join('')}</div>` : ''}
     ${pick ? `<div class="alg-pick"><p><b>${esc(nm(pick.k))}</b> — 어떤 반응이었나요?</p><div class="chips" role="group" aria-label="반응">${Object.entries(ALG_R).map(([r, t]) => `<button class="chip" onclick="allergyAdd('${pick.k}','${r}')">${esc(t)}</button>`).join('')}<button class="chip" onclick="ALQ_PICK='';route()">${I.x}그만두기</button></div></div>`
-      : `<div class="search" style="margin-top:4px">${I.search}<input id="alq" aria-label="알레르기가 있었던 성분 찾기" placeholder="성분 이름 (예: 이부프로펜)" value="${esc(ALQ)}" autocomplete="off"></div>
+      : `<div class="search" style="margin-top:4px">${I.search}<input id="alq" aria-label="알레르기가 있었던 성분 찾기" placeholder="성분 이름" value="${esc(ALQ)}" autocomplete="off"></div>
     ${ALQ.trim() ? `<div class="card rows" style="margin-top:8px">${allergyHits(ALQ).map(e => `<button class="row" onclick="ALQ_PICK='${e.k}';route()"><div class="ic">${I.pill}</div><div class="body"><b>${esc(nm(e.k))}</b><span>눌러서 반응 고르기</span></div>${I.chev}</button>`).join('') || '<div class="empty">찾는 성분이 없어요 — 약 상자의 성분 이름으로 쳐 보세요</div>'}</div>` : ''}`}
     <button type="button" class="alg-unk ${ME.allergyUnknown ? 'on' : ''}" aria-pressed="${!!ME.allergyUnknown}" onclick="ME.allergyUnknown=!ME.allergyUnknown;saveMe();route()">${ME.allergyUnknown ? I.check : ''}성분은 모르지만 약 알레르기가 있었어요</button>
     ${ME.allergyUnknown ? `<p class="small muted" style="margin-top:8px">약국에서 약을 고를 때 <b>「약 알레르기가 있었어요」</b>라고 꼭 말씀하세요. 약국에서 보여드리는 화면에도 적어 둘게요.</p>` : ''}
@@ -8128,7 +8128,7 @@ function vMe(_, q){
     <div class="bag-rows">${items.map(x => `<div class="bag-row"><div class="t"><b>${esc(x.name)}</b><span>${esc(x.short ? '며칠만 — 항콜린 부담은 절반으로 셌어요' : x.approx ? '종류만 담았어요 (대략)' : x.simple || '')}</span></div><button class="dur ${x.short ? 'on' : ''}" aria-pressed="${!!x.short}" onclick="toggleShort('${x.id}')">${x.short ? I.check + ' ' : ''}며칠만</button><button class="rm" aria-label="${esc(x.name)} 빼기" onclick="${x.id.startsWith('pub:') ? `togglePub('${x.id.slice(4)}')` : x.id.startsWith('cls:') ? `toggleQuick('${x.id.slice(4)}')` : `toggleTaking('${x.id}')`}">${I.x}</button></div>`).join('') || `${emptyArt()}<div class="empty-bag">${I.pill}<span><b>아직 담아 둔 약이 없어요.</b> 드시는 약을 등록하면 겹치는 성분을 살펴볼 수 있어요.</span></div>`}</div>
     <div class="actions two"><button class="btn ghost" onclick="go('/photo')">${I.eye} 사진으로 등록</button><button class="btn ghost" onclick="go('/pill')">${I.search} 이름·알약으로</button></div>
     <div class="util" style="margin-top:8px">${urow(I.pill, '이름을 몰라도 종류만 골라 담기', '', "go('/kinds')", '고르기')}${rxMine().map(g => urow(I.book, RX_NAME[g] + ' 드시는 분께', '먹는 법 · 깜빡했을 때 · 조심할 약', `go('/rx/${g}')`, '보기')).join('')}${urow(I.pill, '영양제도 담기', '같이 먹어도 되나요에서 약과 함께 봐요', "go('/supp')", '고르기')}</div>
-    <div class="search" style="margin-top:12px">${I.search}<input id="mq" aria-label="약 이름으로 찾아 내 약통에 담기" placeholder="약 이름으로 찾아 담기 (예: 타이레놀)" value="${esc(MQ)}" autocomplete="off"></div>
+    <div class="search" style="margin-top:12px">${I.search}<input id="mq" aria-label="약 이름으로 찾아 내 약통에 담기" placeholder="약 이름" value="${esc(MQ)}" autocomplete="off"></div>
     ${MQ.trim() ? `<div class="card rows" style="margin-top:8px">${mqHits(MQ.trim()).map(h => { if (h.pub) { const p = h.pub; return mqRow((ME.taking || []).includes('pub:' + pubKeyOf(p)), `addPubIx(${p.id})`, pubShort(p.n), `식약처 제품 · 성분 ${(p.i || []).length}가지(${esc((p.i || []).slice(0, 4).map(t => t.replace(INGR_STRIP, '')).join('·'))}${(p.i || []).length > 4 ? ' 등' : ''}) — 눌러서 담기`); }
       if (h.qk) { const { g, x } = h.qk; return mqRow((ME.taking || []).includes('cls:' + x.id), `toggleQuick('${x.id}')`, g.n + ' — ' + x.n.replace(/으로 끝나요|이에요|예요|이 들어 있어요/g, '').trim(), '종류로 담기 — 이름을 몰라도 겹치는지 봐 드려요'); }
       if (h.rxn) { const [n, seq, , rx] = h.rxn, ig = (n.match(/\((.+?)\)/) || [])[1]; return mqRow((ME.taking || []).includes('pub:' + seq), `mqRx('${esc(seq)}')`, pubShort(n), `${rx === 0 ? '약국 약' : '처방약'}${ig ? ' · ' + esc(ig) : ''} — 눌러서 담기`); }
