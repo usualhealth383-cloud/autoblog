@@ -1767,7 +1767,7 @@ background-repeat:no-repeat;background-position:right 9px center;background-size
 <script>
 window.__YAKJIDO_OK__ = true;
 const D = JSON.parse(document.getElementById('data').textContent || '{}');
-const BUILD = '2026-10-30 08:59';
+const BUILD = '2026-10-30 09:01';
 const DATAV = 'b3df5293ae'.indexOf('__') === 0 ? BUILD : 'b3df5293ae';
 const BRANDMARK = (typeof window !== 'undefined' && window.__BRANDMARK__) || 'icon-192.png';
 let CORE = 0, CORE_P = null;
@@ -2232,7 +2232,7 @@ if (consentGate(seg[0], h)) return;
 if (seg[0] === 'hello' && helloDone() && (() => { try { return sessionStorage.getItem(HELLO_FIN); } catch (e) { return null; } })()) { try { location.replace(location.href.split('#')[0] + '#/home'); return; } catch (e) {} }
 document.body.classList.toggle('no-nav', /^(hello|consent|login|doc)$/.test(seg[0])); document.body.classList.toggle('is-door', /^(consent|login)$/.test(seg[0]));
 const q = Object.fromEntries(new URLSearchParams(qs || ''));
-const tab = { send:'home', p:'home', show:'home', check:'home', home:'home', symptom:'home', drugs:'drugs', drug:'drugs', class:'drugs', search:'drugs', pub:'drugs', pill:'drugs', guide:'home', kids:'home', tips:'home', myths:'home', schedule:'me', photo:'drugs', pillinfo:'drugs', supp:'supp', sgoal:'supp', sstage:'supp', compare:'supp', me:'me', about:'me', ingr:'drugs', brand:'drugs', nut:'supp', hello:'home', mix:'drugs', together:'me', kinds:'me', rx:'me', rxout:'drugs', senior:'drugs', askdoc:'home', talk:'home', login:'login' }[seg[0]] || 'home';
+const tab = { send:'home', p:'home', show:'home', check:'home', home:'home', symptom:'home', drugs:'drugs', drug:'drugs', class:'drugs', search:'drugs', pub:'drugs', pill:'drugs', guide:'home', kids:'home', tips:'home', myths:'home', schedule:'me', notify:'me', photo:'drugs', pillinfo:'drugs', supp:'supp', sgoal:'supp', sstage:'supp', compare:'supp', me:'me', about:'me', ingr:'drugs', brand:'drugs', nut:'supp', hello:'home', mix:'drugs', together:'me', kinds:'me', rx:'me', rxout:'drugs', senior:'drugs', askdoc:'home', talk:'home', login:'login' }[seg[0]] || 'home';
 document.querySelectorAll('nav.tabbar button').forEach(b => { const on = b.dataset.tab === tab; b.classList.toggle('on', on); on ? b.setAttribute('aria-current', 'page') : b.removeAttribute('aria-current'); });
 if (CORE !== 2 && !CORE_SAFE.has(seg[0])) {
 if (CORE === 3) {
@@ -2248,7 +2248,7 @@ if ((seg[0] === 'drug' || seg[0] === 'class' || (seg[0] === 'supp' && seg[1])) &
 if (DETAIL === 3) { window.__DETAIL_SKIP__ = true; ensureDetail(); }
 else { view.innerHTML = topBar({ back:'뒤로', nosearch:true }) + `<section class="sec"><p class="loading">자료를 불러오는 중이에요…</p></section>`; ensureDetail().then(route); return; }
 }
-const R = { send:vSend, p:vParentShare, show:vShow, check:vCheck, home:vHome, symptom:vSymptom, drugs:vDrugs, drug:vDrug, class:vClass, search:vSearch, pub:vPub, pill:vPill, guide:vGuide, kids:vKids, tips:vTips, myths:vMyths, schedule:vSchedule, photo:vPhoto, pillinfo:vPillInfo, supp:vSupp, sgoal:vDoor, sstage:vDoor, compare:vCompare, me:vMe, about:vAbout, ingr:vIngr, brand:vBrand, nut:vNut, hello:vHello, mix:vMix, together:vTogether, kinds:vKinds, rx:vRx, bag:vBag, rxout:vRxOut, senior:vSenior, askdoc:vAskDoc, talk:vTalk, vitals:vVitals, visits:vVisits, demo:vDemo, consent:vDoor, login:vDoor, doc:vDoor };
+const R = { send:vSend, p:vParentShare, show:vShow, check:vCheck, home:vHome, symptom:vSymptom, drugs:vDrugs, drug:vDrug, class:vClass, search:vSearch, pub:vPub, pill:vPill, guide:vGuide, kids:vKids, tips:vTips, myths:vMyths, schedule:vSchedule, notify:vDoor, photo:vPhoto, pillinfo:vPillInfo, supp:vSupp, sgoal:vDoor, sstage:vDoor, compare:vCompare, me:vMe, about:vAbout, ingr:vIngr, brand:vBrand, nut:vNut, hello:vHello, mix:vMix, together:vTogether, kinds:vKinds, rx:vRx, bag:vBag, rxout:vRxOut, senior:vSenior, askdoc:vAskDoc, talk:vTalk, vitals:vVitals, visits:vVisits, demo:vDemo, consent:vDoor, login:vDoor, doc:vDoor };
 let html;
 if (R[seg[0]]) try { window.이용량?.센다('v_' + seg[0]); } catch (e) {}
 try { html = (R[seg[0]] || vHome)(seg[1], q); }
@@ -4259,6 +4259,8 @@ const NOTE_CH_SR = 'dose_senior';
 const noteCh = () => noteSenior() ? NOTE_CH_SR : NOTE_CH;
 const AGAIN_MIN = 30;
 const eveningOn = () => ME.evening === true;
+const noteOn = k => !((ME.noteOff || {})[k]);
+function setNoteOn(k, on){ ME.noteOff = ME.noteOff || {}; if (on) delete ME.noteOff[k]; else ME.noteOff[k] = 1; saveMe(); armNotifications(); route(); }
 function setEvening(on){ ME.evening = !!on; saveMe(); armNotifications(); route(); }
 function capDay(list, slots, usedToday){
 const rank = x => x.r || 0, byDay = {}, today = todayKey();
@@ -4351,10 +4353,10 @@ const at = new Date(); at.setDate(at.getDate() + k); at.setHours(h, m, 0, 0); co
 const its = k === 0 ? items.filter(d => !taken.includes(d.id + '@' + t) && !skipped.includes(d.id + '@' + t)) : items;
 if (!its.length) continue;
 const keys = its.map(d => d.id + '@' + t), extra = { key: keys[0], keys, day };
-if (at.getTime() > now) { med.push({ id: 1 + i * 20 + k, title: '약지도 · 약 드실 시간', body: slotBody(t, its), channelId: ch, actionTypeId: 'dose',
+if (at.getTime() > now && noteOn('dose')) { med.push({ id: 1 + i * 20 + k, title: '약지도 · 약 드실 시간', body: slotBody(t, its), channelId: ch, actionTypeId: 'dose',
 extra, isExactNotification: exact, schedule: { at, allowWhileIdle: true }, day, r: 0 }); lastAt = Math.max(lastAt, at.getTime()); }
 const again = new Date(at.getTime() + AGAIN_MIN * 60000);
-if (again.getTime() > now) med.push({ id: 11 + i * 20 + k, title: '아직 안 드셨어요', body: slotBody(t, its, true), channelId: ch, actionTypeId: 'dose',
+if (again.getTime() > now && noteOn('dose') && noteOn('again')) med.push({ id: 11 + i * 20 + k, title: '아직 안 드셨어요', body: slotBody(t, its, true), channelId: ch, actionTypeId: 'dose',
 extra: { ...extra, again: day }, isExactNotification: exact, schedule: { at: again, allowWhileIdle: true }, day, r: 3 });
 }
 });
@@ -4365,7 +4367,7 @@ id = 1 + groups.length * 20;
 if (lastAt) { const at = new Date(lastAt + 60 * 60000);
 med.push({ id: 599999, title: '알림을 이어 가려면 약지도를 한 번 열어 주세요', body: '며칠 동안 앱을 열지 않으셔서 다음 복용 알림이 아직 걸려 있지 않아요.', channelId: ch,
 extra: { open: 1 }, isExactNotification: exact, schedule: { at, allowWhileIdle: true }, day: dayKey(at), r: 1 }); }
-for (const v of visits()) {
+for (const v of (noteOn('visit') ? visits() : [])) {
 const at = new Date(v.at); const eve = new Date(at); eve.setDate(eve.getDate() - 1); eve.setHours(19, 0, 0, 0);
 const pre = new Date(at.getTime() - 2 * 3600000);
 for (const [when, title, body] of [[eve, '내일 진료가 있어요', `${visitWord(v)} — 내 약 한 장·혈압 수첩을 챙기세요.`], [pre, '2시간 뒤 진료예요', `${visitWord(v)} — 드시는 약 목록을 챙기세요.`]]) {
@@ -4377,7 +4379,7 @@ for (const t of ((ME.vitalRemind || {}).bp || [])) { const [h, m] = t.split(':')
 list.push({ id: 700000 + id++, title: '약지도 · 혈압 잴 시간', body: t < '12:00' ? '일어나 1시간 안, 소변 본 뒤, 혈압약 먹기 전에 재 주세요.' : '잠자기 전에 재 주세요. 앉아서 몇 분 쉰 뒤에요.',
 channelId: ch, extra: { vitals: 'bp' }, isExactNotification: exact, schedule: { on: { hour: h, minute: m }, allowWhileIdle: true } }); }
 for (const d of takingItems()) {
-const dl = daysLeft(d.id); if (dl == null) continue;
+const dl = daysLeft(d.id); if (dl == null || !noteOn('stock')) continue;
 for (const left of [5]) {
 const at = new Date(); at.setDate(at.getDate() + (dl - left)); at.setHours(9, 0, 0, 0);
 if (dl < left || at.getTime() <= now) continue;
@@ -4454,12 +4456,12 @@ const left = (t, items) => items.filter(d => !takenSet().includes(d.id + '@' + t
 for (const { t, items } of slotGroups()) {
 const [h, m] = t.split(':').map(Number); const at = new Date(); at.setHours(h, m, 0, 0); const day = dayKey(at);
 const fire = again => { const L = left(t, items); if (L.length && webQuota(again)) showNote(again ? '아직 안 드셨어요' : '약지도 · 약 드실 시간', slotBody(t, L, again), L.map(d => d.id + '@' + t).join(','), day); };
-if (at > now) NOTI_TIMERS.push(setTimeout(() => fire(false), at - now));
-const again = new Date(at.getTime() + AGAIN_MIN * 60000); if (again > now) NOTI_TIMERS.push(setTimeout(() => fire(true), again - now));
+if (at > now && noteOn('dose')) NOTI_TIMERS.push(setTimeout(() => fire(false), at - now));
+const again = new Date(at.getTime() + AGAIN_MIN * 60000); if (again > now && noteOn('dose') && noteOn('again')) NOTI_TIMERS.push(setTimeout(() => fire(true), again - now));
 }
 const ev = new Date(now); ev.setHours(21, 0, 0, 0);
 if (eveningOn() && ev > now) NOTI_TIMERS.push(setTimeout(() => { const L = eveningLeft(todayKey(), true); if (L.length && webQuota(true)) showNote('오늘 약 체크', eveningBody(L), 'yakjido-evening', '', '#/schedule'); }, ev - now));
-for (const v of visits()) for (const [when, title] of visitTimes(v)) { const ms = when - now; if (ms > 0 && ms < 2147000000) NOTI_TIMERS.push(setTimeout(() => showNote(title, visitWord(v), 'visit-' + v.id, '', true), ms)); }
+for (const v of (noteOn('visit') ? visits() : [])) for (const [when, title] of visitTimes(v)) { const ms = when - now; if (ms > 0 && ms < 2147000000) NOTI_TIMERS.push(setTimeout(() => showNote(title, visitWord(v), 'visit-' + v.id, '', true), ms)); }
 const mid = new Date(now); mid.setHours(24, 0, 1, 0);
 NOTI_TIMERS.push(setTimeout(() => dayCheck(), mid - now));
 }
@@ -4718,7 +4720,7 @@ const now = new Date(); const nowMin = now.getHours() * 60 + now.getMinutes(); c
 const todays = []; for (const d of taking) for (const t of schedOf(d.id, d)) { const [h, m] = t.split(':').map(Number); todays.push({ d, t, min: h * 60 + m, done: taken.includes(d.id + '@' + t), skip: isSkipped(d.id + '@' + t) }); }
 todays.sort((a, b) => a.min - b.min);
 const lateL = todays.filter(x => !x.done && !x.skip && x.min < nowMin - 60);
-return `${topBar({ back:'내 정보' })}<div class="eyebrow">복용 시간 알림</div><h1>오늘 약, 잊지 않게</h1>${todays.length ? todayHero(todays, nowMin) : art('schedule', 'banner')}
+return `${topBar({ back:'내 정보' })}<div class="eyebrow">복용 시간 알림 · <button type="button" class="link" onclick="go('/notify')">알림 설정</button></div><h1>오늘 약, 잊지 않게</h1>${todays.length ? todayHero(todays, nowMin) : art('schedule', 'banner')}
 ${leadHtml('먹는 약마다 시간을 고르면 오늘 할 일이 체크 목록으로 나오고, 시간이 되면 알려드려요. **시간을 정한 약만** 알려 드려요 — 설명서·안내 간격대로 시간을 제안해 드리니 맞으면 「이 시간으로 정하기」를 누르세요.', 'margin-top:6px', todays.length ? 'small muted' : '')}
 ${taking.filter(schedUnset).length ? `<div class="note" style="margin-top:10px">${I.clock}<span><b>시간을 아직 정하지 않은 약이 ${taking.filter(schedUnset).length}가지 있어요</b> — 아래 「약마다 시간 고르기」에서 매일 드시는지, 필요할 때만 드시는지 골라 주세요.</span></div>` : ''}
 ${!taking.length ? `<section class="sec card"><div class="empty"><b>아직 담아 둔 약이 없어요</b>약 사전에서 약을 찾아 ‘내 약통에 담기’를 누르면 여기 나와요.</div><div class="actions"><button class="btn ghost" onclick="go('/drugs')">${I.search} 약 찾기</button></div></section>` : ''}
@@ -6900,6 +6902,7 @@ ${lrow(I.cal, '진료 예약', nextVisit() ? esc(visitWord(nextVisit())) : '전�
 </div>`;
 else body = `
 ${ext('계정카드')}
+<div class="rows-l" style="margin-top:12px">${lrow(I.clock, '알림 설정', '약 시간 · 다시 알림 · 약 떨어짐 · 진료 예약', "go('/notify')")}</div>
 <section class="sec card" style="padding-top:10px;padding-bottom:10px"><div class="view-row col"><div class="t"><b>글자 크기</b><span>지금 이 글씨가 작으면 키우세요</span></div>${fsSeg()}</div>
 <div class="view-row col" style="border-top:1px solid var(--hairline)"><div class="t"><b>화면 밝기</b><span>눈이 부시면 어둡게, 휴대폰 설정을 따르려면 기기 따라를 고르세요</span></div>
 <div class="fs-seg" role="group" aria-label="화면 밝기">${[['light','밝게'],['dark','어둡게'],['auto','기기 따라']].map(([k, n]) => `<button class="${themeNow() === k ? 'on' : ''}" style="min-width:auto;min-height:46px;padding:0 10px;font-size:.875rem" aria-pressed="${themeNow() === k}" onclick="setTheme('${k}')">${n}</button>`).join('')}</div></div>

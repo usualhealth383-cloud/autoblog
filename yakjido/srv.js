@@ -1805,6 +1805,26 @@ window.계정칸 = () => D.meta?.account !== true ? '' : `<section class="sec ca
 /* 2026-10-29 현욱님 — 설정 맨 위 첫 칸 = 계정 카드. 로그인 전엔 큰 단추 하나, 뒤엔 메일 · 이용권 · 동기화 · 로그아웃 · 계정 지우기(작게). 상세 칸(#acct)은 아래 그대로 */
 /* 계정 카드·메디나눔 서명 모양 — 첫 화면 예산 때문에 여기서 붙인다 */
 try { const st = document.createElement('style'); st.textContent = ".acct-card .acct-hd{display:flex;align-items:center;gap:12px}.acct-card .acct-hd>span:last-child{display:flex;flex-direction:column;min-width:0}.acct-card .acct-hd b{font-size:1.0625rem;overflow-wrap:anywhere}.acct-card .acct-hd small{color:var(--muted);font-size:.875rem;margin-top:2px}.acct-ic,.acct-av{flex:none;width:44px;height:44px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;background:var(--tint);color:var(--primary-deep)}.acct-av{background:var(--primary);color:var(--on-primary,#fff);font-weight:700;font-size:1.125rem}.acct-card .acct-go{width:100%;margin-top:14px;min-height:52px;font-size:1.0625rem}.acct-card .acct-act{display:flex;gap:10px;margin-top:14px}.acct-card .acct-act .btn{flex:1;margin:0;min-height:48px}.acct-card .srvrow{margin-top:12px}.acct-card .acct-del{margin-top:6px;font-size:.8125rem}.mn-logo{width:1.35em;height:1.35em;vertical-align:-.3em;margin-right:5px;color:#1A2B4A}.mn-logo path{fill:none;stroke:currentColor;stroke-width:236;stroke-linecap:round;stroke-linejoin:round}.mn-logo .mn-tile{fill:#FFFFFF;stroke:#CBD2DC;stroke-width:24}:root[data-theme=\"dark\"] .mn-logo .mn-tile{display:none}:root[data-theme=\"dark\"] .mn-logo{color:#FFFFFF}@media (prefers-color-scheme:dark){ :root:not([data-theme=\"light\"]) .mn-logo{color:#FFFFFF} :root:not([data-theme=\"light\"]) .mn-logo .mn-tile{display:none} }"; document.head.appendChild(st); } catch (e) {}
+/* 10-30 현욱님 「알림 설정은?」 — 알림 한 화면: 무엇을 · 언제 · 켜기/끄기(다섯 앱 같은 꼴: 머리 + 권한 줄 + 종류별 스위치 행) */
+window.문_notify = () => {
+  const n = takingItems().length, timed = takingItems().filter(d => !schedUnset(d)).length;
+  const perm = NATIVE ? NATIVE_PERM : ('Notification' in window ? Notification.permission : 'unsupported');
+  const sw = (k, on, fn) => `<button class="sw ${on ? 'on' : ''}" role="switch" aria-checked="${on}" aria-label="${k}" onclick="${fn}"></button>`;
+  const row = (ic, t, s2, on, fn) => `<div class="nt-row"><span class="nt-ic">${ic}</span><span class="nt-t"><b>${t}</b><small>${s2}</small></span>${sw(t, on, fn)}</div>`;
+  const vn = (typeof visits === 'function' ? visits() : []).length;
+  return `${topBar({ back:'내 정보' })}<h1>알림 설정</h1>
+  <p class="nt-perm ${perm === 'granted' ? 'ok' : ''}">${perm === 'granted' ? `${I.check}<span>휴대폰 알림이 켜져 있어요</span>` : perm === 'denied' ? `${I.alert}<span>휴대폰 설정에서 약지도 알림이 꺼져 있어요 — 설정 → 앱 → 약지도 → 알림을 켜 주세요</span>` : `${I.info}<span>알림을 받으려면 한 번 허락이 필요해요</span><button type="button" class="btn line" onclick="${NATIVE ? 'askNativeNoti()' : 'askNoti()'}">허락하기</button>`}</p>
+  <section class="sec card nt-list">
+    ${row(I.clock, '약 드실 시간', n ? `시간을 정한 약 ${timed}가지 · 정한 시각에` : '약통에 약을 담고 시간을 고르면 울려요', noteOn('dose'), `setNoteOn('dose',${!noteOn('dose')})`)}
+    ${row(I.alert, '아직 안 드셨을 때 한 번 더', '체크가 없으면 30분 뒤 한 번만', noteOn('dose') && noteOn('again'), `setNoteOn('again',${!noteOn('again')})`)}
+    ${row(I.pill, '약이 떨어지기 전에', '남은 알 수를 넣은 약 · 5일분 남는 날 아침 9시', noteOn('stock'), `setNoteOn('stock',${!noteOn('stock')})`)}
+    ${row(I.cal, '진료 예약', vn ? `예약 ${vn}건 · 전날 저녁 7시와 2시간 전` : '진료 예약을 적어 두면 전날과 2시간 전에', noteOn('visit'), `setNoteOn('visit',${!noteOn('visit')})`)}
+    ${row(I.check, '저녁 9시 하루 정리', '그날 체크 안 한 약이 있을 때만 · 기본 꺼짐', eveningOn(), `setEvening(${!eveningOn()})`)}
+  </section>
+  <div class="actions two"><button class="btn line" onclick="go('/schedule?t=sc1')">${I.clock} 약마다 시간 고르기</button><button class="btn line" onclick="go('/schedule?t=sc2')">${I.pill} 남은 알 수 넣기</button></div>
+  <p class="small muted" style="margin-top:12px">알림이 늦거나 안 오면 <button type="button" class="link" onclick="go('/schedule?t=sc4')">알림이 늦어요 도움말</button>을 봐 주세요.</p>`;
+};
+try { const st2 = document.createElement('style'); st2.textContent = '.nt-perm{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:10px 0 4px;padding:12px 14px;border-radius:14px;background:var(--accent-tint);color:var(--accent-text);font-size:1rem}.nt-perm.ok{background:var(--normal-tint);color:var(--normal)}.nt-perm .btn{width:auto;margin:0 0 0 auto;min-height:44px}.nt-list{padding:4px 16px}.nt-row{display:flex;align-items:center;gap:12px;padding:14px 0;border-top:1px solid var(--hairline)}.nt-row:first-child{border-top:0}.nt-ic{flex:none;width:40px;height:40px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;background:var(--tint);color:var(--primary-deep)}.nt-t{flex:1;min-width:0;display:flex;flex-direction:column}.nt-t b{font-size:1.0625rem}.nt-t small{color:var(--muted);font-size:.9375rem;margin-top:2px}.nt-row .sw{flex:none}'; document.head.appendChild(st2); } catch (e) {}
 window.계정카드 = () => { if (D.meta?.account !== true) return ''; const 나 = srvLoggedIn(), m = 나 ? (서버.세션()?.user?.email || '') : '';
   if (!나) return `<section class="sec card acct-card"><div class="acct-hd"><span class="acct-ic" aria-hidden="true">${I.user}</span><span><b>메디나눔 계정</b><small>폰을 바꿔도 약통·복용 기록을 이어 봐요 · 선택</small></span></div>
     <button type="button" class="btn primary acct-go" onclick="go('/login')">로그인 · 계정 만들기</button></section>`;

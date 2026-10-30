@@ -2511,7 +2511,7 @@ function route(){
   /* 처음 안내 중에는 아래 탭을 감춘다 — 누르면 안내가 반쯤 끝났다(3-24) */
   document.body.classList.toggle('no-nav', /^(hello|consent|login|doc)$/.test(seg[0])); document.body.classList.toggle('is-door', /^(consent|login)$/.test(seg[0]));
   const q = Object.fromEntries(new URLSearchParams(qs || ''));
-  const tab = { send:'home', p:'home', show:'home', check:'home', home:'home', symptom:'home', drugs:'drugs', drug:'drugs', class:'drugs', search:'drugs', pub:'drugs', pill:'drugs', guide:'home', kids:'home', tips:'home', myths:'home', schedule:'me', photo:'drugs', pillinfo:'drugs', supp:'supp', sgoal:'supp', sstage:'supp', compare:'supp', me:'me', about:'me', ingr:'drugs', brand:'drugs', nut:'supp', hello:'home', mix:'drugs', together:'me', kinds:'me', rx:'me', rxout:'drugs', senior:'drugs', askdoc:'home', talk:'home', login:'login' }[seg[0]] || 'home';
+  const tab = { send:'home', p:'home', show:'home', check:'home', home:'home', symptom:'home', drugs:'drugs', drug:'drugs', class:'drugs', search:'drugs', pub:'drugs', pill:'drugs', guide:'home', kids:'home', tips:'home', myths:'home', schedule:'me', notify:'me', photo:'drugs', pillinfo:'drugs', supp:'supp', sgoal:'supp', sstage:'supp', compare:'supp', me:'me', about:'me', ingr:'drugs', brand:'drugs', nut:'supp', hello:'home', mix:'drugs', together:'me', kinds:'me', rx:'me', rxout:'drugs', senior:'drugs', askdoc:'home', talk:'home', login:'login' }[seg[0]] || 'home';
   /* 지금 탭을 색으로만 보이지 않게 — 화면낭독기가 「현재 페이지」라고 읽는다(5-18) */
   document.querySelectorAll('nav.tabbar button').forEach(b => { const on = b.dataset.tab === tab; b.classList.toggle('on', on); on ? b.setAttribute('aria-current', 'page') : b.removeAttribute('aria-current'); });
   /* 본문 자료가 아직이면 — 첫 화면과 인사만 먼저 그리고, 나머지는 받은 뒤에 다시 그린다.
@@ -2533,7 +2533,7 @@ function route(){
     if (DETAIL === 3) { window.__DETAIL_SKIP__ = true; ensureDetail(); }
     else { view.innerHTML = topBar({ back:'뒤로', nosearch:true }) + `<section class="sec"><p class="loading">자료를 불러오는 중이에요…</p></section>`; ensureDetail().then(route); return; }
   }
-  const R = { send:vSend, p:vParentShare, show:vShow, check:vCheck, home:vHome, symptom:vSymptom, drugs:vDrugs, drug:vDrug, class:vClass, search:vSearch, pub:vPub, pill:vPill, guide:vGuide, kids:vKids, tips:vTips, myths:vMyths, schedule:vSchedule, photo:vPhoto, pillinfo:vPillInfo, supp:vSupp, sgoal:vDoor, sstage:vDoor, compare:vCompare, me:vMe, about:vAbout, ingr:vIngr, brand:vBrand, nut:vNut, hello:vHello, mix:vMix, together:vTogether, kinds:vKinds, rx:vRx, bag:vBag, rxout:vRxOut, senior:vSenior, askdoc:vAskDoc, talk:vTalk, vitals:vVitals, visits:vVisits, demo:vDemo, consent:vDoor, login:vDoor, doc:vDoor };
+  const R = { send:vSend, p:vParentShare, show:vShow, check:vCheck, home:vHome, symptom:vSymptom, drugs:vDrugs, drug:vDrug, class:vClass, search:vSearch, pub:vPub, pill:vPill, guide:vGuide, kids:vKids, tips:vTips, myths:vMyths, schedule:vSchedule, notify:vDoor, photo:vPhoto, pillinfo:vPillInfo, supp:vSupp, sgoal:vDoor, sstage:vDoor, compare:vCompare, me:vMe, about:vAbout, ingr:vIngr, brand:vBrand, nut:vNut, hello:vHello, mix:vMix, together:vTogether, kinds:vKinds, rx:vRx, bag:vBag, rxout:vRxOut, senior:vSenior, askdoc:vAskDoc, talk:vTalk, vitals:vVitals, visits:vVisits, demo:vDemo, consent:vDoor, login:vDoor, doc:vDoor };
   /* 한 화면이 그리다 터져도 앱 전체가 멈춘 것처럼 보이지 않게 — 자료 한 줄의 흠이 흰 화면이 되지 않도록(2026-10-08 출시 점검) */
   let html;
   /* 익명 이용 통계(공용 이용량 부품 · 기본 꺼짐) — 화면 «종류» 이름만 센다. 약 이름·증상·검색어는 세지 않는다 */
@@ -5108,6 +5108,9 @@ const noteCh = () => noteSenior() ? NOTE_CH_SR : NOTE_CH;
 const AGAIN_MIN = 30;
 /* 저녁 9시 하루 정리 — 누구에게나 기본 꺼짐, 직접 켠 분만 */
 const eveningOn = () => ME.evening === true;
+/* 10-30 현욱님 「알림 설정은?」 — 종류별 끄기(기본은 모두 켜짐, 저녁 정리만 기본 꺼짐) */
+const noteOn = k => !((ME.noteOff || {})[k]);
+function setNoteOn(k, on){ ME.noteOff = ME.noteOff || {}; if (on) delete ME.noteOff[k]; else ME.noteOff[k] = 1; saveMe(); armNotifications(); route(); }
 function setEvening(on){ ME.evening = !!on; saveMe(); armNotifications(); route(); }
 /* 하루 상한 — 같은 날 알림을 중요한 것부터 «시각 수 + 1»장까지만 남긴다.
    남기는 순서: 제시간 → 앱 열기 부탁 → 약 떨어짐 → 저녁 정리(직접 켠 분) → 다시 알림(이른 시각부터). 체크할 때마다 다시 걸어서, 아침을 체크하면 저녁 다시 알림 자리가 생긴다 */
@@ -5221,11 +5224,11 @@ async function nativeArmOnce(){
         const its = k === 0 ? items.filter(d => !taken.includes(d.id + '@' + t) && !skipped.includes(d.id + '@' + t)) : items;
         if (!its.length) continue;
         const keys = its.map(d => d.id + '@' + t), extra = { key: keys[0], keys, day };
-        if (at.getTime() > now) { med.push({ id: 1 + i * 20 + k, title: '약지도 · 약 드실 시간', body: slotBody(t, its), channelId: ch, actionTypeId: 'dose',
+        if (at.getTime() > now && noteOn('dose')) { med.push({ id: 1 + i * 20 + k, title: '약지도 · 약 드실 시간', body: slotBody(t, its), channelId: ch, actionTypeId: 'dose',
           extra, isExactNotification: exact, schedule: { at, allowWhileIdle: true }, day, r: 0 }); lastAt = Math.max(lastAt, at.getTime()); }
         /* 체크가 없을 때만 30분 뒤 한 번(애플 건강 「후속 알림」과 같은 자리). 어르신도 더 자주 하지 않는다 */
         const again = new Date(at.getTime() + AGAIN_MIN * 60000);
-        if (again.getTime() > now) med.push({ id: 11 + i * 20 + k, title: '아직 안 드셨어요', body: slotBody(t, its, true), channelId: ch, actionTypeId: 'dose',
+        if (again.getTime() > now && noteOn('dose') && noteOn('again')) med.push({ id: 11 + i * 20 + k, title: '아직 안 드셨어요', body: slotBody(t, its, true), channelId: ch, actionTypeId: 'dose',
           extra: { ...extra, again: day }, isExactNotification: exact, schedule: { at: again, allowWhileIdle: true }, day, r: 3 });
       }
     });
@@ -5240,7 +5243,7 @@ async function nativeArmOnce(){
       med.push({ id: 599999, title: '알림을 이어 가려면 약지도를 한 번 열어 주세요', body: '며칠 동안 앱을 열지 않으셔서 다음 복용 알림이 아직 걸려 있지 않아요.', channelId: ch,
         extra: { open: 1 }, isExactNotification: exact, schedule: { at, allowWhileIdle: true }, day: dayKey(at), r: 1 }); }
     /* 진료 예약 — 전날 저녁 7시, 2시간 전 */
-    for (const v of visits()) {
+    for (const v of (noteOn('visit') ? visits() : [])) {
       const at = new Date(v.at); const eve = new Date(at); eve.setDate(eve.getDate() - 1); eve.setHours(19, 0, 0, 0);
       const pre = new Date(at.getTime() - 2 * 3600000);
       for (const [when, title, body] of [[eve, '내일 진료가 있어요', `${visitWord(v)} — 내 약 한 장·혈압 수첩을 챙기세요.`], [pre, '2시간 뒤 진료예요', `${visitWord(v)} — 드시는 약 목록을 챙기세요.`]]) {
@@ -5255,7 +5258,7 @@ async function nativeArmOnce(){
     /* 약이 떨어지기 전에 — 남은 알 수를 넣어 두신 약만, 남은 알 수를 넣을 때마다(한 번 받아 올 때마다) 딱 한 번: 5일분 남는 날 아침 9시(메디세이프 「리필 알림」 자리).
        이미 5일분 안쪽이면 알림 대신 넣을 때 바로 말씀드리고 홈 카드에 둔다 */
     for (const d of takingItems()) {
-      const dl = daysLeft(d.id); if (dl == null) continue;
+      const dl = daysLeft(d.id); if (dl == null || !noteOn('stock')) continue;
       for (const left of [5]) {
         const at = new Date(); at.setDate(at.getDate() + (dl - left)); at.setHours(9, 0, 0, 0);
         if (dl < left || at.getTime() <= now) continue;
@@ -5348,15 +5351,15 @@ function armNotifications(){
   for (const { t, items } of slotGroups()) {
     const [h, m] = t.split(':').map(Number); const at = new Date(); at.setHours(h, m, 0, 0); const day = dayKey(at);
     const fire = again => { const L = left(t, items); if (L.length && webQuota(again)) showNote(again ? '아직 안 드셨어요' : '약지도 · 약 드실 시간', slotBody(t, L, again), L.map(d => d.id + '@' + t).join(','), day); };
-    if (at > now) NOTI_TIMERS.push(setTimeout(() => fire(false), at - now));
+    if (at > now && noteOn('dose')) NOTI_TIMERS.push(setTimeout(() => fire(false), at - now));
     /* 체크가 없을 때만 30분 뒤 한 번 */
-    const again = new Date(at.getTime() + AGAIN_MIN * 60000); if (again > now) NOTI_TIMERS.push(setTimeout(() => fire(true), again - now));
+    const again = new Date(at.getTime() + AGAIN_MIN * 60000); if (again > now && noteOn('dose') && noteOn('again')) NOTI_TIMERS.push(setTimeout(() => fire(true), again - now));
   }
   /* 저녁 9시 하루 정리(Z6) */
   const ev = new Date(now); ev.setHours(21, 0, 0, 0);
   if (eveningOn() && ev > now) NOTI_TIMERS.push(setTimeout(() => { const L = eveningLeft(todayKey(), true); if (L.length && webQuota(true)) showNote('오늘 약 체크', eveningBody(L), 'yakjido-evening', '', '#/schedule'); }, ev - now));
   /* 진료 예약 — 앱(탭)이 열려 있는 동안만 전날 저녁 7시·2시간 전(3-10). 닫아 두시면 「달력에 넣기」가 대신한다 */
-  for (const v of visits()) for (const [when, title] of visitTimes(v)) { const ms = when - now; if (ms > 0 && ms < 2147000000) NOTI_TIMERS.push(setTimeout(() => showNote(title, visitWord(v), 'visit-' + v.id, '', true), ms)); }
+  for (const v of (noteOn('visit') ? visits() : [])) for (const [when, title] of visitTimes(v)) { const ms = when - now; if (ms > 0 && ms < 2147000000) NOTI_TIMERS.push(setTimeout(() => showNote(title, visitWord(v), 'visit-' + v.id, '', true), ms)); }
   /* 자정을 넘기면 내일 알림을 다시 건다(켜 둔 채 밤을 넘겨도 다음 날 08:00 이 울리게) */
   const mid = new Date(now); mid.setHours(24, 0, 1, 0);
   NOTI_TIMERS.push(setTimeout(() => dayCheck(), mid - now));
@@ -5662,7 +5665,7 @@ function vSchedule(_, q){
   const todays = []; for (const d of taking) for (const t of schedOf(d.id, d)) { const [h, m] = t.split(':').map(Number); todays.push({ d, t, min: h * 60 + m, done: taken.includes(d.id + '@' + t), skip: isSkipped(d.id + '@' + t) }); }
   todays.sort((a, b) => a.min - b.min);
   const lateL = todays.filter(x => !x.done && !x.skip && x.min < nowMin - 60);
-  return `${topBar({ back:'내 정보' })}<div class="eyebrow">복용 시간 알림</div><h1>오늘 약, 잊지 않게</h1>${todays.length ? todayHero(todays, nowMin) : art('schedule', 'banner')}
+  return `${topBar({ back:'내 정보' })}<div class="eyebrow">복용 시간 알림 · <button type="button" class="link" onclick="go('/notify')">알림 설정</button></div><h1>오늘 약, 잊지 않게</h1>${todays.length ? todayHero(todays, nowMin) : art('schedule', 'banner')}
   ${leadHtml('먹는 약마다 시간을 고르면 오늘 할 일이 체크 목록으로 나오고, 시간이 되면 알려드려요. **시간을 정한 약만** 알려 드려요 — 설명서·안내 간격대로 시간을 제안해 드리니 맞으면 「이 시간으로 정하기」를 누르세요.', 'margin-top:6px', todays.length ? 'small muted' : '')}
   ${taking.filter(schedUnset).length ? `<div class="note" style="margin-top:10px">${I.clock}<span><b>시간을 아직 정하지 않은 약이 ${taking.filter(schedUnset).length}가지 있어요</b> — 아래 「약마다 시간 고르기」에서 매일 드시는지, 필요할 때만 드시는지 골라 주세요.</span></div>` : ''}
   ${!taking.length ? `<section class="sec card"><div class="empty"><b>아직 담아 둔 약이 없어요</b>약 사전에서 약을 찾아 ‘내 약통에 담기’를 누르면 여기 나와요.</div><div class="actions"><button class="btn ghost" onclick="go('/drugs')">${I.search} 약 찾기</button></div></section>` : ''}
@@ -8153,6 +8156,7 @@ function vMe(_, q){
   </div>`;
   else body = `
   ${ext('계정카드')}
+  <div class="rows-l" style="margin-top:12px">${lrow(I.clock, '알림 설정', '약 시간 · 다시 알림 · 약 떨어짐 · 진료 예약', "go('/notify')")}</div>
   <section class="sec card" style="padding-top:10px;padding-bottom:10px"><div class="view-row col"><div class="t"><b>글자 크기</b><span>지금 이 글씨가 작으면 키우세요</span></div>${fsSeg()}</div>
     <div class="view-row col" style="border-top:1px solid var(--hairline)"><div class="t"><b>화면 밝기</b><span>눈이 부시면 어둡게, 휴대폰 설정을 따르려면 기기 따라를 고르세요</span></div>
       <div class="fs-seg" role="group" aria-label="화면 밝기">${[['light','밝게'],['dark','어둡게'],['auto','기기 따라']].map(([k, n]) => `<button class="${themeNow() === k ? 'on' : ''}" style="min-width:auto;min-height:46px;padding:0 10px;font-size:.875rem" aria-pressed="${themeNow() === k}" onclick="setTheme('${k}')">${n}</button>`).join('')}</div></div>
