@@ -323,7 +323,53 @@
      같은 칸 id(srvEmail·srvPw·srvAge)와 같은 계정동작을 쓰고 모양만 다르다 — 서버 쪽 동작은 그대로.
      화면갱신은 #srvbox 의 data-door 를 보고 이 모양으로 다시 그린다.
      「서버에 저장하기」(건강 민감정보 · 개인정보 보호법 23조)는 계정을 쓰는 «그 자리»에서 따로 체크로 받는다 — 기본은 꺼짐.
-     소셜 단추는 앱이 켠 것(window.소셜켜짐() → [{ n:'카카오', 열기:function }])만 그린다 — 지금 약지도에는 없다(눌러도 안 되는 단추 금지). */
+     소셜 단추는 켠 것(window.소셜켜짐() → ['google'])만 그린다 — 눌러도 안 되는 단추 금지.
+     10-30 현욱님 「일단 켜놓자」 — 구글만 켠다(카카오는 Supabase 키 고친 뒤, 네이버는 검수 뒤). 네 앱 계정 부품과 같은 꼴:
+     「메일로 계속하기」 아래 「또는」 + 「Google로 계속하기」, 누르면 메일과 같은 체크(만 14세·서버 저장)를 먼저 본다.
+     설치 앱(웹뷰)에서는 구글이 웹뷰 로그인을 막으므로, 바깥 브라우저로 여는 껍데기.열기가 있을 때만 보인다. */
+  var 소셜글 = { google: 'Google로 계속하기' };
+  var 소셜그림 = { google: '<svg viewBox="0 0 48 48" width="20" height="20" aria-hidden="true"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>' };
+  function 네이티브() { try { return !!(window.Capacitor && Capacitor.isNativePlatform && Capacitor.isNativePlatform()); } catch (e) { return false; } }
+  window.소셜켜짐 = function () { if (!준비됨()) return []; if (네이티브() && !(window.껍데기 && typeof window.껍데기.열기 === 'function')) return []; return ['google']; };
+  window.계정문소셜 = function (p) {
+    if (window.소셜켜짐().indexOf(p) < 0) return;
+    var g = document.getElementById('srvAgree'), a = document.getElementById('srvAge');
+    if (!서버허용()) {
+      if (!g || !g.checked) { 문말('「서버에 저장하기」에 동의하셔야 계정을 쓸 수 있어요. 동의하지 않으셔도 약지도는 그대로 쓰실 수 있어요.'); if (g) g.focus(); return; }
+      if (typeof 설정.동의기록 === 'function') { try { 설정.동의기록(); } catch (e) {} }
+    }
+    /* 처음인지 미리 알 수 없어 늘 묻는다 — 메일의 「처음 만들 때 필수」와 같은 체크 */
+    if (설정.가입확인 && (!a || !a.checked)) { 문말('Google로 계속하려면 「' + 설정.가입확인.글 + '」에 체크해 주세요.'); if (a) a.focus(); return; }
+    var 앱id = 네이티브() && window.껍데기 && window.껍데기.appId ? window.껍데기.appId : '';
+    var 돌아올 = 앱id ? 앱id + '://login' : 앱주소();
+    문말('Google로 넘어가는 중이에요…');
+    return 준비().then(function () {
+      try { sessionStorage.setItem('yj_oauth', JSON.stringify({ p: p, age14_at: (a && a.dataset && a.dataset.at) || new Date().toISOString() })); } catch (e) {}
+      return sb.auth.signInWithOAuth({ provider: p, options: { redirectTo: 돌아올 || undefined, skipBrowserRedirect: true } });
+    }).then(function (r) {
+      if (r && r.error) throw r.error;
+      var u = r && r.data && r.data.url; if (!u) throw new Error('no url');
+      if (앱id) return window.껍데기.열기(u);
+      location.assign(u);
+    }).catch(function (e) { 문말(''); 알림(말(e)); });
+  };
+  /* 구글에서 돌아옴 — 웹은 주소 꼬리(#access_token…), 설치 앱은 appUrlOpen 이 넘겨준 주소 */
+  function 소셜돌아옴(url) {
+    var i = String(url || '').search(/[#?]/); if (i < 0) return Promise.resolve(false);
+    var q = {}; String(url).slice(i + 1).split('&').forEach(function (kv) { var j = kv.indexOf('='); if (j > 0) { try { q[decodeURIComponent(kv.slice(0, j))] = decodeURIComponent(kv.slice(j + 1).replace(/\+/g, ' ')); } catch (e) {} } });
+    if (!(q.access_token && q.refresh_token) && !q.error) return Promise.resolve(false);
+    var 표 = {}; try { 표 = JSON.parse(sessionStorage.getItem('yj_oauth') || '{}') || {}; sessionStorage.removeItem('yj_oauth'); } catch (e) {}
+    if (q.error) { 알림(q.error === 'access_denied' ? '로그인을 그만두셨어요. 바뀐 것은 없어요.' : '로그인이 되지 않았어요. 잠시 뒤 다시 해 주세요.'); return Promise.resolve(false); }
+    return 준비().then(function () { return sb.auth.setSession({ access_token: q.access_token, refresh_token: q.refresh_token }); }).then(function (r) {
+      if (r && r.error) throw r.error;
+      if (r && r.data && r.data.session) 세션 = r.data.session;
+      var u = 세션 && 세션.user, st = 상태읽기(); if (u && u.email) st.email = u.email; st.social = (u && u.app_metadata && u.app_metadata.provider) || 'social'; 상태쓰기(st);
+      /* 처리방침 1항 — 가입 앱·만 14세 확인 시각을 계정 기록에 남긴다(메일 가입과 같은 칸) */
+      var m = (u && u.user_metadata) || {};
+      if (u && !m.age14_at) sb.auth.updateUser({ data: { app: m.app || 설정.app, age14_at: 표.age14_at || new Date().toISOString() } }).catch(function () {});
+      알림('로그인했어요. 기록을 맞추는 중이에요…'); 화면갱신(); try { if (typeof go === 'function') go('/me?t=set'); } catch (e) {} return true;
+    }).catch(function (e) { 알림(말(e)); return false; });
+  }
   var 문탭 = 'login', 문말글 = '';
   function 문말(t) { 문말글 = t || ''; var el = document.getElementById('doorMsg'); if (el) { el.textContent = 문말글; el.hidden = !문말글; } }
   window.계정문말 = 문말;
@@ -341,7 +387,7 @@
   window.계정문확인 = function () {
     var b = document.getElementById('srvDoorGo'), w = document.getElementById('doorWhy'); if (!b) return;
     var g = document.getElementById('srvAgree'), 막 = !!(g && !g.checked);
-    b.disabled = 막; if (w) w.hidden = !막;
+    b.disabled = 막; if (w) w.hidden = !막; document.querySelectorAll('.door-soc').forEach(function (x) { x.disabled = 막; });
   };
   window.계정문동작 = function (what) {
     what = what || (문탭 === 'signup' ? 'signup' : 'login');
@@ -377,7 +423,6 @@
     try { 소셜 = (typeof window.소셜켜짐 === 'function' && window.소셜켜짐()) || []; } catch (e) { 소셜 = []; }
     /* 2026-10-29 현욱님 — 로그인/회원가입 갈림 없이 「메일로 계속하기」 하나: 계정이 있으면 로그인, 처음이면 그 자리에서 만든다 */
     가입 = false;
-    if (소셜.length) h += '<div class="door-social">' + 소셜.map(function (x, i) { return '<button type="button" onclick="소셜켜짐()[' + i + '].열기()">' + 글자안전(x.n) + '로 계속하기</button>'; }).join('') + '</div><p class="door-or"><span>또는 이메일로</span></p>';
     h += '<label class="door-f" for="srvEmail">이메일</label><input id="srvEmail" type="email" inputmode="email" autocomplete="email" autocapitalize="off" spellcheck="false" enterkeyhint="next" value="' + 글자안전(st.email || '') + '">'
       + 비번칸('srvPw', '비밀번호 <small>처음이면 새로 정할 비밀번호 · 6자 이상</small>', 'current-password', 'go');
     if (설정.가입확인) h += '<label class="door-ck"><input id="srvAge" type="checkbox" onchange="this.dataset.at=this.checked?new Date().toISOString():\'\'"><span><b>' + 글자안전(설정.가입확인.글) + ' <em class="door-tag">처음 만들 때 필수</em></b>' + (설정.가입확인.설명 ? '<small>' + 글자안전(설정.가입확인.설명) + '</small>' : '') + '</span></label>';
@@ -390,7 +435,8 @@
     h += 말칸 + '<button type="button" id="srvDoorGo" class="door-go" onclick="계정문동작(\'continue\')"' + (막힘 ? ' disabled aria-describedby="doorWhy"' : '') + '>메일로 계속하기</button>'
       + (막힘 ? '<p id="doorWhy" class="door-why">필수에 체크하시면 눌려요</p>' : '')
       + '<p class="door-note">계정이 있으면 로그인하고, 처음이면 계정을 만들어요. 새로 만들면 메일함에 확인 링크가 가요 — 한 번 누르면 끝이에요.</p>'
-      + '<button type="button" class="srvlink door-forgot" onclick="계정문동작(\'reset\')">비밀번호를 잊으셨나요?</button>';
+      + '<button type="button" class="srvlink door-forgot" onclick="계정문동작(\'reset\')">비밀번호를 잊으셨나요?</button>'
+      + (소셜.length ? '<p class="door-or"><span>또는</span></p><div class="door-social">' + 소셜.filter(function (p) { return 소셜글[p]; }).map(function (p) { return '<button type="button" class="door-soc door-' + p + '" onclick="계정문소셜(\'' + p + '\')"' + (막힘 ? ' disabled aria-describedby="doorWhy"' : '') + '>' + 소셜그림[p] + '<span>' + 소셜글[p] + '</span></button>'; }).join('') + '</div>' : '');
     return h + '</div>';
   };
   /* 다른 화면에서 왔으면 지난 글 칸을 비운다 */
@@ -502,6 +548,9 @@
       설정.동의기록 = typeof o.동의기록 === 'function' ? o.동의기록 : null;   /* 2026-10-14 로그인 문 — 「서버에 저장하기」 체크를 앱의 동의 기록에 적는 갈고리 */
       설정.준비됨 = typeof o.준비됨 === 'function' ? o.준비됨 : o.준비됨 !== false;   /* 2026-10-13 — 함수로 넘기면 함수 그대로(약지도 meta.account 스위치) */
       설정.병합 = typeof o.병합 === 'function' ? o.병합 : null;   /* 2026-10-13 — 앱이 자기 기록 모양대로 합치는 갈고리(두 폰 동기화) */   /* 검수 #8 — 서버 표가 올라가면 앱의 설치 줄에서 true 로(또는 줄을 지운다) */   /* 2026-09-23 나 — { 글, 설명, 기록 } : 계정 만들기 앞 필수 체크 */
+      /* 10-30 구글에서 돌아옴 — 복구 링크보다 먼저 본다(취소하면 error= 로 온다) */
+      /* 설치 때는 자료(D.meta)가 아직일 수 있어 준비됨을 묻지 않는다 — yj_oauth 표시가 있으면 우리가 보낸 길이다. 처리는 자료가 온 뒤(최대 15초) */
+      try { var 소 = location.hash; if (sessionStorage.getItem('yj_oauth') && /(^#|&)(access_token|error)=/.test(소) && !/type=recovery/.test(소)) { history.replaceState(history.state, '', location.pathname + location.search); var 소n = 0; (function 기다림() { if (준비됨()) 소셜돌아옴('#' + 소.replace(/^#/, '')); else if (++소n < 60) setTimeout(기다림, 250); })(); } } catch (e) {}
       if (준비됨()) { try { if (/(^#|&)(type=recovery|error_code=)/.test(location.hash)) { sessionStorage.setItem('yj_recovery', location.hash.slice(1)); history.replaceState(history.state, '', location.pathname + location.search); } } catch (e) {} }   /* 길동무 서버 준비 1008 */
       var st = 상태읽기();
       /* 전에 로그인한 적이 있을 때만 라이브러리를 받아 세션을 되살린다 — 처음 온 분의 첫 화면은 건드리지 않는다 */
@@ -519,6 +568,7 @@
         + '.srvage{display:flex;align-items:center;gap:10px;min-height:46px;cursor:pointer}.srvbox .srvage input{width:20px;height:20px;min-height:20px;margin:0;padding:0;flex:none;accent-color:var(--accent,currentColor)}.srvbtns button:disabled{opacity:.45;cursor:not-allowed}';
       document.head.appendChild(css);
     },
+    소셜돌아옴: 소셜돌아옴,
     세션: function () { return 세션; }, 동기화: function () { return 준비().then(지운것올리기).then(끌어오기).then(밀어올리기); },
     /* 2026-09-22 — 지운 것을 서버에도 지운다. 로그인 전이거나 오프라인이면 묘비만 남기고,
        연결되면 그때 지운다. 앱은 열쇠를 지울 때 이걸 부르면 된다. */
@@ -1955,7 +2005,8 @@ try { const css = document.createElement('style'); css.textContent = `
 .door-me{display:flex;gap:12px;align-items:center}
 .door-av{flex:none;width:44px;height:44px;border-radius:50%;background:var(--tint);color:var(--primary-deep);display:grid;place-items:center;font-weight:800;font-size:1.125rem}
 .door-me b{display:block;overflow-wrap:anywhere}.door-me small{display:block;color:var(--muted);font-size:.875rem}
-.door-social{display:flex;flex-direction:column;gap:8px}.door-social button{min-height:50px;border-radius:12px;border:1.5px solid var(--ui-line);font-weight:700}
+.door-social{display:flex;flex-direction:column;gap:8px}.door-soc{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;min-height:48px;border-radius:12px;font:600 1rem/1.2 inherit;font-family:inherit;cursor:pointer;touch-action:manipulation}
+.door-google{background:#fff;color:#1f1f1f;border:1px solid #747775}.door-soc:disabled{opacity:.45;cursor:not-allowed}.door-google svg{flex:none}
 .door-or{display:flex;align-items:center;gap:10px;color:var(--muted);font-size:.875rem}.door-or::before,.door-or::after{content:"";flex:1;border-top:1px solid var(--hairline)}
 @media (min-width:1024px){.nav-mark{align-items:center;gap:10px;padding:4px 8px 20px;text-decoration:none;color:var(--text)}.nav-mark img{border-radius:10px;flex:none}
 .nav-mark b{display:block;font-size:1.125rem;font-weight:800}.nav-mark small{display:block;font-size:.875rem;line-height:1.35;color:var(--muted)}
