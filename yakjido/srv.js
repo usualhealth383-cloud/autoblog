@@ -387,7 +387,7 @@
   window.계정문확인 = function () {
     var b = document.getElementById('srvDoorGo'), w = document.getElementById('doorWhy'); if (!b) return;
     var g = document.getElementById('srvAgree'), 막 = !!(g && !g.checked);
-    b.disabled = 막; if (w) w.hidden = !막; document.querySelectorAll('.door-soc').forEach(function (x) { x.disabled = 막; });
+    b.disabled = 막; if (w) w.hidden = !막; document.querySelectorAll('.door-soc').forEach(function (x) { x.disabled = 막; }); document.querySelectorAll('.door-why').forEach(function (x) { x.hidden = !막; });
   };
   window.계정문동작 = function (what) {
     what = what || (문탭 === 'signup' ? 'signup' : 'login');
@@ -423,8 +423,6 @@
     try { 소셜 = (typeof window.소셜켜짐 === 'function' && window.소셜켜짐()) || []; } catch (e) { 소셜 = []; }
     /* 2026-10-29 현욱님 — 로그인/회원가입 갈림 없이 「메일로 계속하기」 하나: 계정이 있으면 로그인, 처음이면 그 자리에서 만든다 */
     가입 = false;
-    h += '<label class="door-f" for="srvEmail">이메일</label><input id="srvEmail" type="email" inputmode="email" autocomplete="email" autocapitalize="off" spellcheck="false" enterkeyhint="next" value="' + 글자안전(st.email || '') + '">'
-      + 비번칸('srvPw', '비밀번호 <small>처음이면 새로 정할 비밀번호 · 6자 이상</small>', 'current-password', 'go');
     if (설정.가입확인) h += '<label class="door-ck"><input id="srvAge" type="checkbox" onchange="this.dataset.at=this.checked?new Date().toISOString():\'\'"><span><b>' + 글자안전(설정.가입확인.글) + ' <em class="door-tag">처음 만들 때 필수</em></b>' + (설정.가입확인.설명 ? '<small>' + 글자안전(설정.가입확인.설명) + '</small>' : '') + '</span></label>';
     if (가입 && 설정.가입확인) h += '<label class="door-ck"><input id="srvAge" type="checkbox" onchange="this.dataset.at=this.checked?new Date().toISOString():\'\';계정문확인()"><span><b>' + 글자안전(설정.가입확인.글) + ' <em class="door-tag">필수</em></b>' + (설정.가입확인.설명 ? '<small>' + 글자안전(설정.가입확인.설명) + '</small>' : '') + '</span></label>';
     if (!동의됨) h += '<label class="door-ck"><input id="srvAgree" type="checkbox" onchange="계정문확인()"><span><b>「서버에 저장하기」에 동의해요 <em class="door-tag">필수</em></b><small>건강에 관한 민감정보라 따로 여쭤요. 로그인하시면 이 휴대폰의 기록이 계정으로 이어져요.</small></span></label>'
@@ -432,11 +430,14 @@
       + '<dt>올라가는 것</dt><dd>' + 글자안전(항목.ko || '약지도 기록') + '</dd><dt>어디에</dt><dd>메디나눔 서버(Supabase, 서울)</dd><dt>왜</dt><dd>폰을 바꿔도 이어 보려고</dd>'
       + '<dt>언제까지</dt><dd>계정을 지우실 때까지 — 동의를 거두시면 서버 기록을 바로 지워요</dd></dl><p>동의하지 않으셔도 되고, 동의하지 않아도 약지도는 이 휴대폰에서 그대로 쓰실 수 있어요. 보기 설정과 날씨는 올라가지 않아요.</p></details>';
     var 막힘 = !동의됨;
+    /* 11-01 네 앱 계정 시트와 같은 순서(Main 606f55c8 · 「어르신은 Google 이 위가 쉽다」): 동의 체크 → Google → 「또는 메일로」 → 이메일·비밀번호 → 메일로 계속하기 */
+    h += (소셜.length ? '<div class="door-social">' + 소셜.filter(function (p) { return 소셜글[p]; }).map(function (p) { return '<button type="button" class="door-soc door-' + p + '" onclick="계정문소셜(\'' + p + '\')"' + (막힘 ? ' disabled aria-describedby="doorWhy"' : '') + '>' + 소셜그림[p] + '<span>' + 소셜글[p] + '</span></button>'; }).join('') + '</div>' + (막힘 ? '<p class="door-why">필수에 체크하시면 눌려요</p>' : '') + '<p class="door-or"><span>또는 메일로</span></p>' : '');
+    h += '<label class="door-f" for="srvEmail">이메일</label><input id="srvEmail" type="email" inputmode="email" autocomplete="email" autocapitalize="off" spellcheck="false" enterkeyhint="next" value="' + 글자안전(st.email || '') + '">'
+      + 비번칸('srvPw', '비밀번호 <small>처음이면 새로 정할 비밀번호 · 6자 이상</small>', 'current-password', 'go');
     h += 말칸 + '<button type="button" id="srvDoorGo" class="door-go" onclick="계정문동작(\'continue\')"' + (막힘 ? ' disabled aria-describedby="doorWhy"' : '') + '>메일로 계속하기</button>'
       + (막힘 ? '<p id="doorWhy" class="door-why">필수에 체크하시면 눌려요</p>' : '')
       + '<p class="door-note">계정이 있으면 로그인하고, 처음이면 계정을 만들어요. 새로 만들면 메일함에 확인 링크가 가요 — 한 번 누르면 끝이에요.</p>'
-      + '<button type="button" class="srvlink door-forgot" onclick="계정문동작(\'reset\')">비밀번호를 잊으셨나요?</button>'
-      + (소셜.length ? '<p class="door-or"><span>또는</span></p><div class="door-social">' + 소셜.filter(function (p) { return 소셜글[p]; }).map(function (p) { return '<button type="button" class="door-soc door-' + p + '" onclick="계정문소셜(\'' + p + '\')"' + (막힘 ? ' disabled aria-describedby="doorWhy"' : '') + '>' + 소셜그림[p] + '<span>' + 소셜글[p] + '</span></button>'; }).join('') + '</div>' : '');
+      + '<button type="button" class="srvlink door-forgot" onclick="계정문동작(\'reset\')">비밀번호를 잊으셨나요?</button>';
     return h + '</div>';
   };
   /* 다른 화면에서 왔으면 지난 글 칸을 비운다 */
