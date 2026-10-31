@@ -1537,7 +1537,7 @@ body .cmp-bar,body .toast{left:calc(50% + 124px)}body .toast{bottom:40px}.cmp-ba
 
 
 .swatch.on{border-color:var(--primary);background:var(--tint);color:var(--primary-deep)}
-.loading{padding:var(--s5);text-align:center;color:var(--muted);font-size:.875rem}
+.loading{padding:var(--s5);text-align:center;color:var(--muted);font-size:.875rem}.sk i{display:block;height:96px;margin:16px 0;border-radius:16px;background:var(--hairline)}.sk i:first-child{height:44px;width:60%}
 /* 약 알아보기(사진·식별) */
 .big-btn{display:flex;align-items:center;gap:14px;width:100%;text-align:left;padding:18px;border-radius:18px;background:var(--primary);color:var(--on-primary);box-shadow:var(--shadow-raised);min-height:76px}
 .big-btn .ic{width:48px;height:48px;border-radius:14px;background:rgba(255,255,255,.18);display:grid;place-items:center;flex:none}
@@ -8269,7 +8269,7 @@ function consentGate(s, h){ const ok = consentOk();
   if (ok ? s !== 'consent' : s === 'consent' || s === 'doc') return false;
   if (!ok) try { sessionStorage.setItem(CONSENT_NEXT, h); } catch (e) {}
   try { location.replace(location.href.split('#')[0] + (ok ? '#/home' : '#/consent')); } catch (e) {} return true; }
-const vDoor = (a, q) => { const f = window['문_' + (location.hash.match(/^#\/?([a-z]+)/) || [])[1]]; return f ? f(a, q) : '<p class="loading">잠시만요…</p>'; };
+const vDoor = (a, q) => { const f = window['문_' + (location.hash.match(/^#\/?([a-z]+)/) || [])[1]]; return f ? f(a, q) : '<div class="sk" aria-busy="true" aria-label="불러오는 중"><i></i><i></i><i></i></div>'; };
 /* 약관 칸·계정 줄·처음 안내의 계정 칸은 srv.js 가 그린다(첫 화면 예산) — 오기 전엔 빈칸 */
 const ext = n => window[n] ? window[n]() : '';
 /* 구독 잠금(스위치가 꺼져 있으면 늘 false — 잠금 목록은 srv.js 구독.설치) */
