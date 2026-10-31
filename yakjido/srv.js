@@ -1863,7 +1863,7 @@ window.문_notify = () => {
   const row = (ic, t, s2, on, fn) => `<div class="nt-row"><span class="nt-ic">${ic}</span><span class="nt-t"><b>${t}</b><small>${s2}</small></span>${sw(t, on, fn)}</div>`;
   const vn = (typeof visits === 'function' ? visits() : []).length;
   return `${topBar({ back:'내 정보' })}<h1>알림 설정</h1>
-  <p class="nt-perm ${perm === 'granted' ? 'ok' : ''}">${perm === 'granted' ? `${I.check}<span>휴대폰 알림이 켜져 있어요</span>` : perm === 'denied' ? `${I.alert}<span>휴대폰 설정에서 약지도 알림이 꺼져 있어요 — 설정 → 앱 → 약지도 → 알림을 켜 주세요</span>` : `${I.info}<span>알림을 받으려면 한 번 허락이 필요해요</span><button type="button" class="btn line" onclick="${NATIVE ? 'askNativeNoti()' : 'askNoti()'}">허락하기</button>`}</p>
+  <p class="nt-perm ${perm === 'granted' ? 'ok' : ''}">${perm === 'granted' ? `${I.check}<span>휴대폰 알림이 켜져 있어요</span>` : perm === 'denied' ? `${I.alert}<span>${typeof NATIVE !== 'undefined' && NATIVE ? '휴대폰 설정에서 약지도 알림이 꺼져 있어요 — 설정 → 앱 → 약지도 → 알림을 켜 주세요' : '이 브라우저에서 약지도 알림이 막혀 있어요 — 주소창 왼쪽 자물쇠 → 알림 → 허용으로 바꿔 주세요'}</span>` : `${I.info}<span>알림을 받으려면 한 번 허락이 필요해요</span><button type="button" class="btn line" onclick="${NATIVE ? 'askNativeNoti()' : 'askNoti()'}">허락하기</button>`}</p>
   <section class="sec card nt-list">
     ${row(I.clock, '약 드실 시간', n ? `시간을 정한 약 ${timed}가지 · 정한 시각에` : '약통에 약을 담고 시간을 고르면 울려요', noteOn('dose'), `setNoteOn('dose',${!noteOn('dose')})`)}
     ${row(I.alert, '아직 안 드셨을 때 한 번 더', '체크가 없으면 30분 뒤 한 번만', noteOn('dose') && noteOn('again'), `setNoteOn('again',${!noteOn('again')})`)}
@@ -2434,4 +2434,4 @@ try { 통합찾기.설치({ 앱: 'yakjido', 열기: function (url) { location.hr
 try { 이용량.설치({ 앱: 'yakjido', 켜짐: false, 주소: 'https://uszalzczpmyifzbamjno.supabase.co', 공개키: 'sb_publishable_YQSz-D-RCXzHGUhso06rMg_GOIIRDuV' }); 이용량.센다('open'); } catch (e) {}
 
 /* 내 정보·동의·로그인·약관 화면을 보고 있었으면 다시 그린다(이 파일이 늦게 오므로) */
-try { if (/^#\/(me|consent|login|doc|hello\/3|supp$|supp\?|sgoal|sstage|rx|about|search|myths|askdoc|talk|p\/|p\?|p$)/.test(location.hash)) route(); } catch (e) {}
+try { if (/^#\/(me|consent|login|notify|sgoal|sstage|doc|hello\/3|supp$|supp\?|sgoal|sstage|rx|about|search|myths|askdoc|talk|p\/|p\?|p$)/.test(location.hash)) route(); } catch (e) {}
