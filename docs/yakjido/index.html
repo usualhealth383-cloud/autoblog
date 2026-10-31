@@ -953,6 +953,7 @@ main > .answer + *, main > .sec + .care, main > .card + .care, main > .rx-card +
 .sv-tile{display:flex;align-items:center;gap:10px;min-width:0;min-height:76px;padding:12px;border-radius:16px;background:var(--card);border:1.5px solid var(--hairline);text-align:left;color:var(--text)}
 .sv-tile .ic{flex:none;width:44px;height:44px;border-radius:12px;display:grid;place-items:center;background:var(--gbg,var(--tint));color:var(--gfg,var(--primary))}
 .sv-tile b{min-width:0;font-size:1.0625rem;line-height:1.3;word-break:keep-all;overflow-wrap:anywhere}
+@media (max-width:440px){.sv-tile{flex-direction:column;align-items:flex-start;justify-content:flex-start;gap:8px}.sv-tile .ic{width:40px;height:40px}}
 .sv-all,.sv-more{width:100%;margin-top:var(--s3)}
 .buy .buy-item.sv{grid-template-columns:60px minmax(0,1fr);align-items:start;text-decoration:none}
 .buy-item.sv .pop-pic,.buy-item.sv .pop-pic .pimg,.buy-item.sv .pop-pic img{width:60px;height:60px;border-radius:12px}
@@ -1587,6 +1588,7 @@ main>*:nth-child(2){animation-delay:.04s} main>*:nth-child(3){animation-delay:.0
 .hello-chk.on{border-color:var(--primary);background:var(--tint);color:var(--primary-deep)}
 .hello-chk.on .bx{background:var(--primary);border-color:var(--primary);color:var(--on-primary)}
 .hello-end{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:18px}.hello-end .btn{margin:0;min-height:52px}
+@media (max-width:400px){.hello-end{grid-template-columns:1fr}}
 .hello-skip{display:block;width:100%;margin:var(--s5) 0 var(--s4);min-height:52px;border-radius:12px;color:var(--muted);font-size:.9375rem;font-weight:600}
 
 
@@ -1766,7 +1768,7 @@ background-repeat:no-repeat;background-position:right 9px center;background-size
 <script>
 window.__YAKJIDO_OK__ = true;
 const D = JSON.parse(document.getElementById('data').textContent || '{}');
-const BUILD = '2026-10-30 15:22';
+const BUILD = '2026-11-01 01:01';
 const DATAV = 'b3df5293ae'.indexOf('__') === 0 ? BUILD : 'b3df5293ae';
 const BRANDMARK = (typeof window !== 'undefined' && window.__BRANDMARK__) || 'icon-192.png';
 let CORE = 0, CORE_P = null;
@@ -2106,6 +2108,7 @@ if (!got.length) continue;
 const long = Math.max(...got.map(k => k.length));
 const ok = got.length >= 2 || long >= 2 || t.length <= 14;
 if (!ok) continue;
+if (got.length < 2 && x.k.length >= 2 && t.length <= long + 1) continue;
 if (got.length > bs[0] || (got.length === bs[0] && long > bs[1])) { best = x; bs = [got.length, long]; }
 }
 return best;
@@ -2975,8 +2978,9 @@ const n = takingItems().length;
 setTimeout(() => wxFetch(false), 0);
 const v = nextVisit(), vd = v ? Math.round((new Date(dayKey(new Date(v.at))) - new Date(todayKey())) / 86400000) : 99;
 const T = (D.tips || []), tip = T.length ? T[new Date().getDate() % T.length] : null;
+const dh = doseHome();
 return `${topBar()}
-${homeQuick(n)}
+${dh ? dh + homeQuick(n) : homeQuick(n)}
 ${svOn() ? `<section class="hero"><div class="eyebrow">${esc(hello)}</div><h1 class="greet">어디가 불편하세요?</h1><p class="sv-lead">누르면 사야 할 약을 바로 알려 드려요</p></section>
 <div class="sv-tiles">${SV_HOME.map(id => byId(D.symptoms, id)).filter(Boolean).map(s => `<button class="sv-tile ${gcls(s.group)}" onclick="go('/symptom/${s.id}')"><span class="ic">${sicon(s)}</span><b>${esc(s.name.split(' (')[0])}</b></button>`).join('')}</div>
 <button class="btn ghost sv-all" onclick="homeTab('all');jumpTo('hlist')">다른 증상 모두 보기${I.chev}</button>` : `<section class="hero">
@@ -2988,7 +2992,6 @@ ${ext('대화줄')}
 <a class="er-line" href="tel:119">${I.alert}<span>가슴이 조이듯 아프거나, 숨이 많이 차거나, 말이 어눌하고 한쪽에 힘이 빠지면 <b>바로 119</b></span></a>
 ${condOn().length || ME.condskip ? '' : `<div class="cond-line"><button type="button" onclick="go('/me?t=body')">${I.user}<span>앓는 병이 있으면 알려 주세요 — <b>피해야 할 약을 걸러 드려요</b></span>${I.chev}</button><button type="button" class="x" aria-label="이 안내 닫기" onclick="ME.condskip=true;saveMe();route()">${I.x}</button></div>`}
 ${storeBar()}
-${doseHome()}
 ${svOn() ? '' : regionGrid()}
 <div class="util" aria-label="다른 방법으로 찾기">
 ${v && vd <= 3 ? urow(I.cal, `${vd <= 0 ? '오늘' : vd === 1 ? '내일' : vd + '일 뒤'} 진료`, `${esc(visitWord(v, false))} · 내 약 한 장 챙기기`, "go('/visits')", '보기', 'visit-soon') : ''}
