@@ -105,6 +105,7 @@
   }
   window.I18N = {
     lang: L, cc: CC, emg: N,
+    tr: function (el) { if (DICT && el) 바꾸기(el); },   /* 11-03 늦게 채우는 칸(기내용 받아 두기 등) */
     t: function (s) { var r = L !== 'ko' ? 글(s) : null; return 번호(r != null ? r : s); },   /* 11-03 그린 뒤에 넣는 글(로그인 필수 안내 등) */
     apply: function (view) { if (!DICT) return; 본문(); 바꾸기(view); 바꾸기(document.querySelector('nav.tabbar')); 알림줄(view); },
     ready: 받기().then(function () { 본문(); if (typeof route === 'function') route(); })

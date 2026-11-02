@@ -1720,8 +1720,8 @@ window.언어칸 = function () {
       h += '<div class="gn-bar" hidden><progress max="100" value="0"></progress><span class="small muted"></span></div>';
       h += '<button type="button" class="btn" onclick="기내받기()">' + (st ? '다시 받기' : '받아 두기') + '</button>';
       if (st) h += '<button type="button" class="btn ghost" style="margin-top:8px" onclick="기내지우기()">받아 둔 것 지우기</button>';
-      box.innerHTML = h;
-    }).catch(function () { box.innerHTML = '<p class="small muted">목록을 못 읽었어요 — 인터넷이 될 때 다시 열어 주세요.</p>'; });
+      box.innerHTML = h; if (window.I18N && I18N.tr) I18N.tr(box);
+    }).catch(function () { box.innerHTML = '<p class="small muted">목록을 못 읽었어요 — 인터넷이 될 때 다시 열어 주세요.</p>'; if (window.I18N && I18N.tr) I18N.tr(box); });
   }
   window.기내고름 = function (k, on) { 고름[k] = on ? 1 : 0; 그리기(); };
   window.기내받기 = function () {
