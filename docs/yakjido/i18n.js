@@ -50,6 +50,16 @@
       if (s.triage && t.escalate) s.triage.escalate = t.escalate;
       if (t.find && !s._find) { s._find = 1; s.tags = (s.tags || []).concat(t.find); }   /* 안 보이는 찾는 말 — 검색에서만(화면엔 안 보임) */
     });
+    /* 11-02 본문 — 많이 보는 증상부터 주마다(장부). 안전 칸과 따로 body 에 두고 칸마다 번호로 맞춘다. 빈 칸·모자란 칸은 한국어 그대로 */
+    var B = DICT.body || {};
+    (D.symptoms || []).forEach(function (s) {
+      var b = B[s.id]; if (!b) return;
+      ['lead', 'planTitle', 'planLabel'].forEach(function (k) { if (b[k] && s[k]) s[k] = b[k]; });
+      ['how', 'pharmacy', 'selfcare', 'avoid'].forEach(function (k) { if (b[k] && Array.isArray(s[k])) s[k] = s[k].map(function (x, i) { return b[k][i] || x; }); });
+      if (b.plan && Array.isArray(s.plan)) s.plan.forEach(function (o, i) { var x = b.plan[i]; if (x) ['slot', 'title', 'why', 'either'].forEach(function (f) { if (x[f] && o[f]) o[f] = x[f]; }); });
+      if (b.notWorking && s.notWorking) { if (b.notWorking.title) s.notWorking.title = b.notWorking.title; if (b.notWorking.steps && s.notWorking.steps) s.notWorking.steps = s.notWorking.steps.map(function (x, i) { return b.notWorking.steps[i] || x; }); }
+      if (b.faq && Array.isArray(s.faq)) s.faq.forEach(function (o, i) { var x = b.faq[i]; if (x) { if (x.q) o.q = x.q; if (x.a) o.a = x.a; } });
+    });
     var R = typeof RXG !== 'undefined' ? RXG : window.RXG, RX = DICT.rx || {};
     if (R && R.guides) {
       for (var g in RX) { var G = R.guides[g]; if (!G) continue; var x = RX[g];
