@@ -1881,6 +1881,8 @@ window.문_notify = (_, q) => {
    서버: 함수 yak_family_* · yak_push_* (메디나눔_약지도_가족알림_1102.sql) + 예약 함수 yak-family-check. meta.family 가 true 일 때만 보인다(되는 척 금지). */
 const FAMQ = { list: null, busy: false, open: '', msg: '', code: null };
 const famOn = () => D.meta?.family === true && D.meta?.account === true;
+/* 웹 푸시 공개 열쇠(공개 값 · 개인 열쇠는 서버 Vault) — 첫 화면 예산 때문에 meta 가 아니라 여기 */
+const FAM_VAPID = 'BLPdgoz3Tcdtm5wQNBSpBKelzaoP_TJ-_iA98wIAlUFmxfL0kKO3MePDvALZMryA8pUMy4r7Mcp5D1JgZPfptSo';
 const famRpc = (fn, args) => 서버.준비().then(sb => sb.rpc(fn, args || {})).then(r => { if (r.error) throw r.error; return r.data; });
 function famLoad(){ if (FAMQ.busy) return; FAMQ.busy = true; famRpc('yak_family_list').then(d => { FAMQ.list = d || []; }).catch(() => { FAMQ.list = []; FAMQ.msg = '가족 연결을 불러오지 못했어요. 잠시 뒤 다시 열어 주세요.'; }).finally(() => { FAMQ.busy = false; if (/^#\/notify/.test(location.hash)) route(); }); }
 const famWhen = t => { try { return new Date(t).toLocaleString('ko-KR', { month: 'long', day: 'numeric', hour: 'numeric', minute: '2-digit' }); } catch (e) { return ''; } };
@@ -1921,10 +1923,10 @@ function famInvite(){ const ok = document.getElementById('famOk'); if (!ok || !o
     .catch(e => { FAMQ.msg = famErr(e); }).finally(() => route()); }
 const b64u = s => { const p = '='.repeat((4 - s.length % 4) % 4), b = atob((s + p).replace(/-/g, '+').replace(/_/g, '/')); return Uint8Array.from(b, c => c.charCodeAt(0)); };
 async function famPush(){
-  if (!('serviceWorker' in navigator) || !('PushManager' in window) || !D.meta?.familyVapid) throw new Error('nopush');
+  if (!('serviceWorker' in navigator) || !('PushManager' in window) || !FAM_VAPID) throw new Error('nopush');
   const p = await Notification.requestPermission(); if (p !== 'granted') throw new Error('denied');
   const reg = await navigator.serviceWorker.ready; let sub = await reg.pushManager.getSubscription();
-  if (!sub) sub = await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: b64u(D.meta.familyVapid) });
+  if (!sub) sub = await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: b64u(FAM_VAPID) });
   const j = sub.toJSON(); await famRpc('yak_push_save', { p_endpoint: j.endpoint, p_p256dh: j.keys.p256dh, p_auth: j.keys.auth });
 }
 function famJoin(){ const c = (document.getElementById('famCode')?.value || '').replace(/\D/g, ''); FAMQ.code = c;
