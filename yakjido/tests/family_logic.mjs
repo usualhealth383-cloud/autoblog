@@ -34,7 +34,7 @@ s = localNow(new Date('2026-10-25T01:30:00Z'), 'Europe/Madrid'); ok(s.min === 2 
 s = localNow(new Date('2026-11-02T12:00:00Z'), 'Europe/Madrid'); ok(s.min === 13 * 60, '마드리드 겨울 UTC+1 ' + J(s));
 ok(seoulNow(new Date('2026-11-02T00:00:00Z')).min === 9 * 60, '서울 UTC+9');
 // 설정
-ok(J(prefs({ tz: 'Mars/Base', wait: 7, qs: '25:00' })) === J({ tz: 'Asia/Seoul', wait: 2, qs: '22:00', qe: '07:00', dose: false, nm: null }), '틀린 설정은 기본값');
+ok(J(prefs({ tz: 'Mars/Base', wait: 7, qs: '25:00' })) === J({ tz: 'Asia/Seoul', lang: 'ko', wait: 2, qs: '22:00', qe: '07:00', dose: false, nm: null }), '틀린 설정은 기본값');
 ok(prefs({ tz: 'America/New_York', wait: 3, qs: '09:00', qe: '17:00', dose: true }).tz === 'America/New_York', '설정 읽기');
 // 쉬는 시간
 ok(quiet(22 * 60) && quiet(6 * 60 + 59) && !quiet(7 * 60) && !quiet(21 * 60 + 59), '기본 쉬는 시간 22~07');
@@ -46,5 +46,17 @@ const m = message('엄마', '20:00'); ok(!/이부|ibu/.test(m.body) && /체크 �
 ok(/\(엄마 시간\)/.test(message('엄마', '20:00', true).body), '가족 시간대 다르면 (엄마 시간)');
 ok(doseMessage('08:00', ['ibu'], null).body === '오전 8:00 · 약 드실 시간이에요', '본인 글 기본: 약 이름 없음');
 ok(doseMessage('08:00', ['ibu', 'met'], { ibu: '이부프로펜', met: '메트포르민' }).body === '오전 8:00 · 이부프로펜, 메트포르민 드실 시간이에요', '본인 글: 이름 켬');
-console.log(bad ? `✗ ${bad}개 실패` : `✓ 알림 판정 ${n}가지(서울·뉴욕·마드리드·서머타임 경계)`);
+// 다섯 말 × 가족/본인(11-03 — 알림 글은 받는 사람 말로)
+const SW = { ko: '오후 8:00', en: '8:00 PM', es: '20:00', ja: '午後8:00', zh: '下午8:00' };
+for (const L of ['ko', 'en', 'es', 'ja', 'zh']) {
+  ok(slotWord('20:00', L) === SW[L], `시각 꼴 ${L} ${slotWord('20:00', L)}`);
+  const f = message('엄마', '20:00', false, L), fo = message('엄마', '20:00', true, L);
+  ok(f.body.includes(SW[L]) && f.body.includes('엄마') && !/[가-힣]{3,}/.test(f.body.replace(/엄마/g, '')) === (L !== 'ko') || L === 'ko', `가족 글 ${L}: ${f.body}`);
+  ok(fo.body.length > f.body.length && fo.body.split('엄마').length === 3, `가족 글 다른 시간대 표시 ${L}: ${fo.body}`);
+  const d0 = doseMessage('08:00', ['ibu'], null, L), d1 = doseMessage('08:00', ['ibu'], { ibu: 'Ibuprofen' }, L);
+  ok(d0.body.includes(slotWord('08:00', L)) && !d0.body.includes('Ibuprofen') && d1.body.includes('Ibuprofen') && d0.acts.length === 2, `본인 글 ${L}: ${d0.body} / ${d1.body} / ${d0.acts}`);
+  ok(L === 'ko' || !/[가-힣]/.test(d0.title + d0.body + d0.acts.join('')), `본인 글에 한국어 없음 ${L}`);
+}
+ok(prefs({ lang: 'fr' }).lang === 'ko' && prefs({ lang: 'ja' }).lang === 'ja', '언어 설정 읽기');
+console.log(bad ? `✗ ${bad}개 실패` : `✓ 알림 판정 ${n}가지(서울·뉴욕·마드리드·서머타임 경계·다섯 말)`);
 process.exit(bad ? 1 : 0);

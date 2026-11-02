@@ -335,11 +335,11 @@
     if (window.소셜켜짐().indexOf(p) < 0) return;
     var g = document.getElementById('srvAgree'), a = document.getElementById('srvAge');
     if (!서버허용()) {
-      if (!g || !g.checked) { 문말('「서버에 저장하기」에 동의하셔야 계정을 쓸 수 있어요. 동의하지 않으셔도 약지도는 그대로 쓰실 수 있어요.'); if (g) g.focus(); return; }
+      if (!g || !g.checked) { 문필수('srvAgree', '「서버에 저장하기」에 체크해 주세요. 동의하지 않으셔도 약지도는 그대로 쓰실 수 있어요.'); return; }
       if (typeof 설정.동의기록 === 'function') { try { 설정.동의기록(); } catch (e) {} }
     }
     /* 처음인지 미리 알 수 없어 늘 묻는다 — 메일의 「처음 만들 때 필수」와 같은 체크 */
-    if (설정.가입확인 && (!a || !a.checked)) { 문말(소셜이름[p] + '로 계속하려면 「' + 설정.가입확인.글 + '」에 체크해 주세요.'); if (a) a.focus(); return; }
+    if (설정.가입확인 && (!a || !a.checked)) { 문필수('srvAge', 소셜이름[p] + '로 계속하려면 「' + 설정.가입확인.글 + '」에 체크해 주세요.'); return; }
     var 앱id = 네이티브() && window.껍데기 && window.껍데기.appId ? window.껍데기.appId : '';
     var 돌아올 = 앱id ? 앱id + '://login' : 앱주소();
     문말(소셜이름[p] + '로 넘어가는 중이에요…');
@@ -387,16 +387,27 @@
   window.계정문확인 = function () {
     var b = document.getElementById('srvDoorGo'), w = document.getElementById('doorWhy'); if (!b) return;
     var g = document.getElementById('srvAgree'), 막 = !!(g && !g.checked);
-    b.disabled = 막; if (w) w.hidden = !막; document.querySelectorAll('.door-soc').forEach(function (x) { x.disabled = 막; }); document.querySelectorAll('.door-why').forEach(function (x) { x.hidden = !막; });
+    if (w) w.hidden = !막; document.querySelectorAll('.door-why').forEach(function (x) { x.hidden = !막; });
   };
+  /* 11-03 현욱님 폰 — 필수 체크 없이 카카오·Google 을 누르면 잠긴 단추라 아무 일도 없었다(「눌러도 진행이 안 돼요」).
+     단추는 늘 눌리고, 빠진 체크 칸 바로 아래에 빨간 글 · 칸 테두리 · 그 칸으로 스크롤(시트 뒤 띠에 가리지 않게) */
+  function 문필수(id, 글) {
+    var c = document.getElementById(id), lb = c && c.closest('label'); if (!lb) { 문말(글); return; }
+    document.querySelectorAll('.door-need-msg').forEach(function (x) { x.remove(); });
+    lb.classList.add('door-need');
+    var m = document.createElement('p'); m.className = 'door-need-msg'; m.setAttribute('role', 'alert'); m.textContent = window.I18N && I18N.t ? I18N.t(글) : 글; lb.insertAdjacentElement('afterend', m);
+    try { lb.scrollIntoView({ block: 'center', behavior: 'smooth' }); } catch (e) { lb.scrollIntoView(); }
+    try { c.focus({ preventScroll: true }); } catch (e) {}
+  }
+  document.addEventListener('change', function (e) { var t = e.target; if (!t || !/^(srvAgree|srvAge)$/.test(t.id) || !t.checked) return; var lb = t.closest('label'); if (lb) { lb.classList.remove('door-need'); var n = lb.nextElementSibling; if (n && n.classList.contains('door-need-msg')) n.remove(); } });
   window.계정문동작 = function (what) {
     what = what || (문탭 === 'signup' ? 'signup' : 'login');
     var g = document.getElementById('srvAgree'), a = document.getElementById('srvAge'), em = document.getElementById('srvEmail'), pw = document.getElementById('srvPw');
     if (!서버허용()) {
-      if (!g || !g.checked) { 문말('「서버에 저장하기」에 동의하셔야 계정을 쓸 수 있어요. 동의하지 않으셔도 약지도는 그대로 쓰실 수 있어요.'); if (g) g.focus(); return; }
+      if (!g || !g.checked) { 문필수('srvAgree', '「서버에 저장하기」에 체크해 주세요. 동의하지 않으셔도 약지도는 그대로 쓰실 수 있어요.'); return; }
       if (typeof 설정.동의기록 === 'function') { try { 설정.동의기록(); } catch (e) {} }
     }
-    if (what === 'signup' && 설정.가입확인 && (!a || !a.checked)) { 문말('계정을 만들려면 「' + 설정.가입확인.글 + '」에 체크해 주세요.'); if (a) a.focus(); return; }
+    if (what === 'signup' && 설정.가입확인 && (!a || !a.checked)) { 문필수('srvAge', '계정을 만들려면 「' + 설정.가입확인.글 + '」에 체크해 주세요.'); return; }
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(((em || {}).value || '').trim())) { 문말('이메일 주소를 다시 확인해 주세요.'); if (em) em.focus(); return; }
     if (what !== 'reset' && ((pw || {}).value || '').length < 6) { 문말('비밀번호는 6자 이상이에요.'); if (pw) pw.focus(); return; }
     문말(what === 'reset' ? '메일을 보내는 중이에요…' : '잠시만요…');
@@ -431,11 +442,11 @@
       + '<dt>언제까지</dt><dd>계정을 지우실 때까지 — 동의를 거두시면 서버 기록을 바로 지워요</dd></dl><p>동의하지 않으셔도 되고, 동의하지 않아도 약지도는 이 휴대폰에서 그대로 쓰실 수 있어요. 보기 설정과 날씨는 올라가지 않아요.</p></details>';
     var 막힘 = !동의됨;
     /* 11-01 네 앱 계정 시트와 같은 순서(Main 606f55c8 · 「어르신은 Google 이 위가 쉽다」): 동의 체크 → Google → 「또는 메일로」 → 이메일·비밀번호 → 메일로 계속하기 */
-    h += (소셜.length ? '<div class="door-social">' + 소셜.filter(function (p) { return 소셜글[p]; }).map(function (p) { return '<button type="button" class="door-soc door-' + p + '" onclick="계정문소셜(\'' + p + '\')"' + (막힘 ? ' disabled aria-describedby="doorWhy"' : '') + '>' + 소셜그림[p] + '<span>' + 소셜글[p] + '</span></button>'; }).join('') + '</div>' + (막힘 ? '<p class="door-why">필수에 체크하시면 눌려요</p>' : '') + '<p class="door-or"><span>또는 메일로</span></p>' : '');
+    h += (소셜.length ? '<div class="door-social">' + 소셜.filter(function (p) { return 소셜글[p]; }).map(function (p) { return '<button type="button" class="door-soc door-' + p + '" onclick="계정문소셜(\'' + p + '\')">' + 소셜그림[p] + '<span>' + 소셜글[p] + '</span></button>'; }).join('') + '</div>' + (막힘 ? '<p class="door-why">먼저 위의 필수 칸에 체크해 주세요</p>' : '') + '<p class="door-or"><span>또는 메일로</span></p>' : '');
     h += '<label class="door-f" for="srvEmail">이메일</label><input id="srvEmail" type="email" inputmode="email" autocomplete="email" autocapitalize="off" spellcheck="false" enterkeyhint="next" value="' + 글자안전(st.email || '') + '">'
       + 비번칸('srvPw', '비밀번호 <small>처음이면 새로 정할 비밀번호 · 6자 이상</small>', 'current-password', 'go');
-    h += 말칸 + '<button type="button" id="srvDoorGo" class="door-go" onclick="계정문동작(\'continue\')"' + (막힘 ? ' disabled aria-describedby="doorWhy"' : '') + '>메일로 계속하기</button>'
-      + (막힘 ? '<p id="doorWhy" class="door-why">필수에 체크하시면 눌려요</p>' : '')
+    h += 말칸 + '<button type="button" id="srvDoorGo" class="door-go" onclick="계정문동작(\'continue\')"' + (막힘 ? ' aria-describedby="doorWhy"' : '') + '>메일로 계속하기</button>'
+      + (막힘 ? '<p id="doorWhy" class="door-why">먼저 위의 필수 칸에 체크해 주세요</p>' : '')
       + '<p class="door-note">계정이 있으면 로그인하고, 처음이면 계정을 만들어요. 새로 만들면 메일함에 확인 링크가 가요 — 한 번 누르면 끝이에요.</p>'
       + '<button type="button" class="srvlink door-forgot" onclick="계정문동작(\'reset\')">비밀번호를 잊으셨나요?</button>';
     return h + '</div>';
@@ -1886,7 +1897,7 @@ const famOn = () => D.meta?.family === true && D.meta?.account === true;
    tz = 기기 시간대(기기 설정 값) · wait = 가족에게 알리기까지 1·2·3시간 · qs/qe = 쉬는 시간 · dose = 앱을 닫아도 정시 알림 · nm = 알림에 약 이름(「알림에 약 이름 보이기」를 켰을 때만) */
 const FAM_KEY = 'yakjido.fam.v1', FAM_DEF = { wait: 2, qs: '22:00', qe: '07:00', dose: false };
 const famPrefs = () => { let o = {}; try { o = JSON.parse(localStorage.getItem(FAM_KEY) || '{}') || {}; } catch (e) {} return { ...FAM_DEF, ...o }; };
-function famSave(ch){ const p = { ...famPrefs(), ...(ch || {}) }; try { p.tz = Intl.DateTimeFormat().resolvedOptions().timeZone || 'Asia/Seoul'; } catch (e) { p.tz = 'Asia/Seoul'; }
+function famSave(ch){ const p = { ...famPrefs(), ...(ch || {}) }; try { p.tz = Intl.DateTimeFormat().resolvedOptions().timeZone || 'Asia/Seoul'; } catch (e) { p.tz = 'Asia/Seoul'; } p.lang = typeof LANG !== 'undefined' ? LANG : 'ko';   /* 11-03 알림 글은 받는 사람 말로 */
   if (p.dose && noteName()) { p.nm = {}; for (const d of takingItems()) p.nm[d.id] = String(d.simple && !d.name ? d.simple : d.name || '').slice(0, 30); } else delete p.nm;
   const v = JSON.stringify(p); try { if (localStorage.getItem(FAM_KEY) !== v) localStorage.setItem(FAM_KEY, v); } catch (e) {} }
 /* 체크하면 그 자리에서 서버로(오프라인이면 다음 기회에) — 가족 알림 오알림을 줄인다 */
@@ -2235,7 +2246,7 @@ try { const css = document.createElement('style'); css.textContent = `
 .door-av{flex:none;width:44px;height:44px;border-radius:50%;background:var(--tint);color:var(--primary-deep);display:grid;place-items:center;font-weight:800;font-size:1.125rem}
 .door-me b{display:block;overflow-wrap:anywhere}.door-me small{display:block;color:var(--muted);font-size:.875rem}
 .door-social{display:flex;flex-direction:column;gap:8px}.door-soc{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;min-height:48px;border-radius:12px;font:600 1rem/1.2 inherit;font-family:inherit;cursor:pointer;touch-action:manipulation}
-.door-google{background:#fff;color:#1f1f1f;border:1px solid #747775}.door-kakao{background:#FEE500;color:rgba(0,0,0,.85);border:0}.door-soc:disabled{opacity:.45;cursor:not-allowed}.door-google svg{flex:none}
+.door-need{outline:2px solid var(--danger,#c0392b);outline-offset:4px;border-radius:10px}.door-need-msg{margin:-2px 0 6px;color:var(--danger,#c0392b);font-weight:700;font-size:.9375rem}.door-google{background:#fff;color:#1f1f1f;border:1px solid #747775}.door-kakao{background:#FEE500;color:rgba(0,0,0,.85);border:0}.door-soc:disabled{opacity:.45;cursor:not-allowed}.door-google svg{flex:none}
 .door-or{display:flex;align-items:center;gap:10px;color:var(--muted);font-size:.875rem}.door-or::before,.door-or::after{content:"";flex:1;border-top:1px solid var(--hairline)}
 @media (min-width:1024px){.nav-mark{align-items:center;gap:10px;padding:4px 8px 20px;text-decoration:none;color:var(--text)}.nav-mark img{border-radius:10px;flex:none}
 .nav-mark b{display:block;font-size:1.125rem;font-weight:800}.nav-mark small{display:block;font-size:.875rem;line-height:1.35;color:var(--muted)}

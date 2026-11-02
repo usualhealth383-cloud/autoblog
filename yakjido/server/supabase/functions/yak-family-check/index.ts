@@ -64,7 +64,7 @@ Deno.serve(async (req) => {
       for (const d of dueNow(parse(x.me), now)) {
         const ins = await sql`insert into public.yak_dose_sent (user_id, day, slot) values (${x.user_id}, ${now.day}, ${d.t}) on conflict do nothing returning slot`;
         if (!ins.length) continue;
-        const msg = doseMessage(d.t, d.ids, pf.nm);
+        const msg = doseMessage(d.t, d.ids, pf.nm, pf.lang);   // 본인 말로
         await push(x.user_id, JSON.stringify({ ...msg, kind: 'dose', key: d.key, day: now.day, tag: d.key }));
       }
     }
@@ -92,8 +92,8 @@ Deno.serve(async (req) => {
         if (ins.length) { slot = s; break; }
       }
       if (!slot) continue;
-      const mtz = prefs(parse(x.mfam)).tz, other = !!x.mfam && mtz !== pf.tz;
-      const msg = message(String(x.owner_label), slot, other);
+      const mp = prefs(parse(x.mfam)), other = !!x.mfam && mp.tz !== pf.tz;
+      const msg = message(String(x.owner_label), slot, other, mp.lang);   // 가족(받는 사람) 말로
       await push(x.member_id, JSON.stringify({ ...msg, kind: 'family', go: '#/notify?fam=1', tag: 'yakjido-family-' + x.id }));
     }
   } catch (e) {
