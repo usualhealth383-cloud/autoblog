@@ -226,7 +226,7 @@
     }).catch(function () { 동기화중 = false; return 0; });
   }
 
-  /* ── 구독 상태 ── 서버 표 subscriptions 를 RPC 로 읽는다(처음이면 체험 7일이 생긴다). 표가 아직 없거나 오프라인이면 조용히 지난 값을 쓴다. */
+  /* ── 구독 상태 ── 서버 표 subscriptions 를 RPC 로 읽는다(처음이면 체험 14일이 생긴다). 표가 아직 없거나 오프라인이면 조용히 지난 값을 쓴다. */
   function 구독키() { return '_srv_sub_' + 설정.app; }
   function 구독조회() {
     if (!sb || !세션) return Promise.resolve(null);
@@ -652,8 +652,8 @@
      검증은 구독.판 으로 새 부품인지 본다(다시 심기 전 앱은 구독.판 이 없다).
    판 2026-10-08(결제 다리) — 스토어 껍데기(_껍데기/src/껍데기.js)가 window.껍데기.결제 를 내놓으면 결제 자리를 그것으로 쓴다(앱 설치 줄은 그대로 결제사:null).
      · 스위치(유료화)가 꺼져 있으면 껍데기가 있어도 아무것도 바뀌지 않는다(껍데기결제() 가 null).
-     · 「7일 체험 시작」·「다시 구독하기」 → 껍데기.결제.구매('<app>_month') → 웹훅이 서버 표를 고치면 subscription_status 를 다시 읽는다(몇 번 되읽음).
-       start_trial RPC 는 스토어 길에서는 부르지 않는다(체험은 스토어 상품의 7일 체험이다).
+     · 「14일 체험 시작」·「다시 구독하기」 → 껍데기.결제.구매('<app>_month') → 웹훅이 서버 표를 고치면 subscription_status 를 다시 읽는다(몇 번 되읽음).
+       start_trial RPC 는 스토어 길에서는 부르지 않는다(체험은 스토어 상품의 14일 체험이다).
      · 설정 → 구독에 「구매 복원」(껍데기.결제.복원 → 되읽음) · 해지는 스토어의 구독 관리 화면으로(「스토어에서 구독 관리」 — 앱이 해지한 척하지 않는다).
      · 사용자가 결제를 그만두면 「결제를 취소했어요」, 그 밖의 오류는 「결제가 되지 않았어요」 한 줄(차분하게 · 기술 글 없음).
    판 2026-10-13(로그인 없이 구매) — 스토어 길(껍데기.결제)에서는 계정이 없어도 체험 시작·구독·구매 복원이 된다.
@@ -687,17 +687,17 @@
       구독: '구독', 이기능: '이 기능',
       잠김: '<b>{이름}</b>{은는} 구독으로 열리는 기능이에요.',
       응급기본: '위급할 때 쓰는 연결은 언제나 열려 있어요.',
-      계정으로: '체험은 계정으로 시작해요. 로그인하고 메일 확인을 마치면 7일 동안 모두 쓸 수 있어요.',
+      계정으로: '체험은 계정으로 시작해요. 로그인하고 메일 확인을 마치면 14일 동안 모두 쓸 수 있어요.',
       계정없음: '체험과 구독은 준비 중이에요. 지금은 이 기능을 열 수 없어요.',
-      전환날: '7일 체험 뒤 {날}부터 {값}이 결제됩니다. 그 전에 언제든 해지할 수 있습니다.',
-      전환: '7일 체험이 끝나면 {값}이 결제됩니다. 그 전에 언제든 해지할 수 있습니다.',
-      동의: '(필수) 7일 체험이 끝나는 {날}에 {값}이 결제됩니다. 그 전에 언제든 해지할 수 있습니다.',
-      체험끝: '7일 체험이 끝났어요.', 기간끝: '구독 기간이 끝났어요.', 기록그대로: '그동안 남긴 기록은 그대로 있어요.', 기록그대로2: '남긴 기록은 그대로 있어요.',
-      로그인하러: '로그인하러 가기', 닫기: '닫기', 체험시작: '7일 체험 시작', 결제수단: '결제수단 등록',
+      전환날: '14일 체험 뒤 {날}부터 {값}이 결제됩니다. 그 전에 언제든 해지할 수 있습니다.',
+      전환: '14일 체험이 끝나면 {값}이 결제됩니다. 그 전에 언제든 해지할 수 있습니다.',
+      동의: '(필수) 14일 체험이 끝나는 {날}에 {값}이 결제됩니다. 그 전에 언제든 해지할 수 있습니다.',
+      체험끝: '14일 체험이 끝났어요.', 기간끝: '구독 기간이 끝났어요.', 기록그대로: '그동안 남긴 기록은 그대로 있어요.', 기록그대로2: '남긴 기록은 그대로 있어요.',
+      로그인하러: '로그인하러 가기', 닫기: '닫기', 체험시작: '14일 체험 시작', 결제수단: '결제수단 등록',
       결제준비: '결제 준비 중이에요. 지금은 결제되지 않아요.', 결제준비짧게: '결제 준비 중이에요.',
       /* 2026-10-20 — 결제 단추 바로 위 고지(전자상거래법 13조 · Play 구독 정책). 요청 20261020_ClinicScore_메디나눔_구독부품글표 */
-      고지첫결제: '첫 결제 — 7일 체험이 끝나는 {날}에 {값}이 결제됩니다.',
-      고지첫결제날없음: '첫 결제 — 7일 체험이 끝나는 날에 {값}이 결제됩니다.',
+      고지첫결제: '첫 결제 — 14일 체험이 끝나는 {날}에 {값}이 결제됩니다.',
+      고지첫결제날없음: '첫 결제 — 14일 체험이 끝나는 날에 {값}이 결제됩니다.',
       고지갱신: '갱신 — 이후 {주기}마다 자동으로 갱신됩니다. 해지하지 않으면 계속 결제됩니다.',
       고지주기월: '한 달', 고지주기연: '1년',
       고지해지스토어: '해지 — 구독을 산 스토어에서 언제든 해지할 수 있습니다. Google Play 는 「결제 및 정기 결제 → 정기 결제」, App Store 는 「계정 → 구독」. 앱을 지워도 해지되지 않습니다.',
@@ -706,23 +706,23 @@
       고지복원: '복원 — 폰을 바꾸거나 앱을 다시 설치하면 「구매 복원」으로 이용권을 되살릴 수 있습니다.',
       약관: '이용약관', 처리방침: '개인정보 처리방침', 환불안내: '환불·해지 안내',
       다시동의: '결제가 시작되기 전에 요금·결제일을 보여 드리고 다시 동의를 받아요.',
-      동의준비: '(필수) 7일 체험은 {날}에 끝나요. 결제가 시작되기 전에 요금·결제일을 보여 드리고 다시 동의를 받아요.',
+      동의준비: '(필수) 14일 체험은 {날}에 끝나요. 결제가 시작되기 전에 요금·결제일을 보여 드리고 다시 동의를 받아요.',
       요금: '요금', 학생기본: '학생', 학생인증준비: '인증은 준비 중이에요', 학생인증단추: '학생 인증하기',
       출시가: '출시 기념가', 출시조건: '출시 3개월 안에 가입하면 첫 1년', 회원권: '메디나눔 회원권', 회원권설명: '다섯 앱을 함께 쓰는 이용권', 회원권자격: 'ClinicScore 의료인 기능은 의료인 확인 뒤 열려요',
       곧: '곧 열려요', 출시값: '{값}(출시 기념가 · 첫 1년, 둘째 해부터 {정가})', 출시값둘: '출시 기념가 {값} — 첫 1년, 둘째 해부터 {정가}', 초대중: '<b>초대 코드로 체험 중</b> · {날}까지', 초대뒤: '이 기간에는 결제되지 않아요. 기간이 끝나면 일반 상태로 돌아가요.', 회원권시작: '회원권으로 시작', 회원권연시작: '회원권 1년으로 시작 · {값}', 회원권중: '메디나눔 회원권으로 열려 있어요.',
       이유: { login: '먼저 로그인해 주세요.', verify: '메일함의 확인 링크를 먼저 눌러 주세요. 확인한 계정에서 체험이 시작돼요.',
-              used_account: '이 계정은 7일 체험을 이미 쓰셨어요.', used_device: '이 기기에서는 7일 체험을 이미 쓰셨어요.',
+              used_account: '이 계정은 14일 체험을 이미 쓰셨어요.', used_device: '이 기기에서는 14일 체험을 이미 쓰셨어요.',
               device: '이 브라우저에서는 체험을 시작할 수 없어요. 다른 브라우저로 해 주세요.', app: '잠시 문제가 있었어요. 다시 해 주세요.',
               noacct: '계정이 열리면 체험을 시작할 수 있어요.' },
       체크: '결제 안내를 확인하고 체크해 주세요.', 인터넷: '인터넷이 닿지 않아요. 연결되면 다시 해 주세요.',
-      체험됨: '7일 체험을 시작했어요. {날}까지 모두 쓸 수 있어요.',
+      체험됨: '14일 체험을 시작했어요. {날}까지 모두 쓸 수 있어요.',
       해지취소됨: '해지를 취소했어요. 그대로 이어져요.', 해지됨: '해지했어요. ', 까지그대로: '{날}까지는 그대로 쓸 수 있어요.',
       카드결제: '{날}에 {값}이 결제됩니다. 원하지 않으시면 그 전에 해지할 수 있어요.',
-      카드준비: '{날}에 7일 체험이 끝나요. 결제가 시작되기 전에 요금·결제일을 보여 드리고 다시 동의를 받아요.',
+      카드준비: '{날}에 14일 체험이 끝나요. 결제가 시작되기 전에 요금·결제일을 보여 드리고 다시 동의를 받아요.',
       해지자세히: '해지·자세히', 카드닫기이름: '결제 안내 닫기',
       관리로그인: '로그인하면 구독 상태를 볼 수 있어요.',
       관리계정없음: '계정이 열리면 여기서 체험을 시작하고 구독 상태를 볼 수 있어요.',
-      아직: '아직 체험을 시작하지 않았어요.', 관리전환: '7일 체험 뒤 {값}이 결제됩니다. 그 전에 언제든 해지할 수 있습니다.',
+      아직: '아직 체험을 시작하지 않았어요.', 관리전환: '14일 체험 뒤 {값}이 결제됩니다. 그 전에 언제든 해지할 수 있습니다.',
       구독중: '구독 중이에요', 체험중: '체험 중이에요', 남음: ' · {n}일 남았어요', 까지괄호: ' ({날}까지)',
       해지예약: '해지를 예약했어요. ', 해지예약뒤: '{날}까지는 그대로 쓸 수 있고, 그 뒤로 결제되지 않아요.',
       해지취소: '해지 취소', 다음결제: '다음 결제일 {날} · {값}', 해지하기: '해지하기', 해지해도: '해지해도 {날}까지는 그대로 쓸 수 있어요.', 기간끝말: '기간 끝',
@@ -732,26 +732,26 @@
       스토어해지: '해지는 스토어의 구독 관리 화면에서 해요. 해지해도 {날}까지는 그대로 쓸 수 있어요.',
       결제취소: '결제를 취소했어요. 바뀐 것은 없어요.', 결제안됨: '결제가 되지 않았어요. 잠시 뒤 다시 해 주세요.',
       결제반영중: '결제는 끝났어요. 구독 상태가 곧 반영돼요. 잠시 뒤 다시 열어 주세요.', 구독됨: '구독을 시작했어요. 바로 모두 쓸 수 있어요.',
-      관리전환둘: '7일 체험 뒤 고르신 요금({값})이 결제됩니다. 그 전에 언제든 해지할 수 있습니다.',
+      관리전환둘: '14일 체험 뒤 고르신 요금({값})이 결제됩니다. 그 전에 언제든 해지할 수 있습니다.',
       연시작: '1년으로 시작 · {값}', 연구독: '1년으로 구독 · {값}',
-      동의둘: '(필수) 7일 체험이 끝나는 {날}에 고르신 요금({값})이 결제됩니다. 그 전에 언제든 해지할 수 있습니다.',
-      전환둘날: '7일 체험 뒤 {날}부터 고르신 요금({값})이 결제됩니다. 그 전에 언제든 해지할 수 있습니다.',
+      동의둘: '(필수) 14일 체험이 끝나는 {날}에 고르신 요금({값})이 결제됩니다. 그 전에 언제든 해지할 수 있습니다.',
+      전환둘날: '14일 체험 뒤 {날}부터 고르신 요금({값})이 결제됩니다. 그 전에 언제든 해지할 수 있습니다.',
       복원됨: '구매를 복원했어요.', 복원없음: '복원할 구매가 없어요. 구매한 Google 계정이 이 폰에 로그인되어 있는지 확인해 주세요.'
     },
     en: {
       구독: 'Subscription', 이기능: 'This feature',
       잠김: '<b>{이름}</b> is part of the subscription.',
       응급기본: 'Emergency help is always open.',
-      계정으로: 'The trial starts from an account. Sign in and confirm your email to use everything for 7 days.',
+      계정으로: 'The trial starts from an account. Sign in and confirm your email to use everything for 14 days.',
       계정없음: 'The trial and subscription are still being prepared. This feature cannot be opened yet.',
-      전환날: 'After the 7-day trial, {값} will be charged from {날}. You can cancel any time before then.',
-      전환: 'When the 7-day trial ends, {값} will be charged. You can cancel any time before then.',
-      동의: '(Required) When the 7-day trial ends on {날}, {값} will be charged. You can cancel any time before then.',
-      체험끝: 'Your 7-day trial has ended.', 기간끝: 'Your subscription period has ended.', 기록그대로: 'Everything you recorded is still here.', 기록그대로2: 'Everything you recorded is still here.',
-      로그인하러: 'Sign in', 닫기: 'Close', 체험시작: 'Start 7-day trial', 결제수단: 'Add payment method',
+      전환날: 'After the 14-day trial, {값} will be charged from {날}. You can cancel any time before then.',
+      전환: 'When the 14-day trial ends, {값} will be charged. You can cancel any time before then.',
+      동의: '(Required) When the 14-day trial ends on {날}, {값} will be charged. You can cancel any time before then.',
+      체험끝: 'Your 14-day trial has ended.', 기간끝: 'Your subscription period has ended.', 기록그대로: 'Everything you recorded is still here.', 기록그대로2: 'Everything you recorded is still here.',
+      로그인하러: 'Sign in', 닫기: 'Close', 체험시작: 'Start 14-day trial', 결제수단: 'Add payment method',
       결제준비: 'Payments are not set up yet. Nothing is charged now.', 결제준비짧게: 'Payments are not set up yet.',
-      고지첫결제: 'First charge — {값} on {날}, when the 7-day trial ends.',
-      고지첫결제날없음: 'First charge — {값} on the day the 7-day trial ends.',
+      고지첫결제: 'First charge — {값} on {날}, when the 14-day trial ends.',
+      고지첫결제날없음: 'First charge — {값} on the day the 14-day trial ends.',
       고지갱신: 'Renewal — renews automatically every {주기}. You are charged until you cancel.',
       고지주기월: 'month', 고지주기연: 'year',
       고지해지스토어: 'Cancel — any time in the store you bought it from: Google Play ‘Payments and subscriptions → Subscriptions’, App Store ‘Account → Subscriptions’. Deleting the app does not cancel it.',
@@ -760,23 +760,23 @@
       고지복원: 'Restore — if you change phones or reinstall, ‘Restore purchase’ brings your subscription back.',
       약관: 'Terms of Service', 처리방침: 'Privacy Policy', 환불안내: 'Refunds and cancellation',
       다시동의: 'Before any payment starts, we will show you the price and billing date and ask for your consent again.',
-      동의준비: '(Required) The 7-day trial ends on {날}. Before any payment starts, we will show you the price and billing date and ask for your consent again.',
+      동의준비: '(Required) The 14-day trial ends on {날}. Before any payment starts, we will show you the price and billing date and ask for your consent again.',
       요금: 'Price', 학생기본: 'students', 학생인증준비: 'verification is coming soon', 학생인증단추: 'Verify student status',
       출시가: 'Launch price', 출시조건: 'first year, if you join within 3 months of launch', 회원권: 'MediNanum pass', 회원권설명: 'one plan for all five apps', 회원권자격: 'ClinicScore professional tools open after the professional check',
       곧: 'coming soon', 출시값: '{값} (launch price for the first year; {정가} from the second year)', 출시값둘: 'launch price {값} for the first year; {정가} from the second year', 초대중: '<b>Invite access</b> · until {날}', 초대뒤: 'Nothing is charged during this period. Afterwards it returns to normal.', 회원권시작: 'Start with the pass', 회원권연시작: 'Start a 1-year pass · {값}', 회원권중: 'Open through your MediNanum pass.',
       이유: { login: 'Please sign in first.', verify: 'Please open the confirmation link in your email first. The trial starts on a confirmed account.',
-              used_account: 'This account has already used the 7-day trial.', used_device: 'This device has already used the 7-day trial.',
+              used_account: 'This account has already used the 14-day trial.', used_device: 'This device has already used the 14-day trial.',
               device: 'The trial cannot be started in this browser. Please try another browser.', app: 'Something went wrong. Please try again.',
               noacct: 'You can start the trial once accounts open.' },
       체크: 'Please read the billing notice and tick the box.', 인터넷: 'Cannot reach the internet. Please try again once you are connected.',
-      체험됨: 'Your 7-day trial has started. Everything is open until {날}.',
+      체험됨: 'Your 14-day trial has started. Everything is open until {날}.',
       해지취소됨: 'Cancellation withdrawn. Your plan continues.', 해지됨: 'Cancelled. ', 까지그대로: 'You can keep using it until {날}.',
       카드결제: '{값} will be charged on {날}. If you do not want this, you can cancel before then.',
-      카드준비: 'Your 7-day trial ends on {날}. Before any payment starts, we will show you the price and billing date and ask for your consent again.',
+      카드준비: 'Your 14-day trial ends on {날}. Before any payment starts, we will show you the price and billing date and ask for your consent again.',
       해지자세히: 'Cancel · details', 카드닫기이름: 'Close billing notice',
       관리로그인: 'Sign in to see your subscription.',
       관리계정없음: 'Once accounts open, you can start the trial and see your subscription here.',
-      아직: 'You have not started the trial yet.', 관리전환: 'After the 7-day trial, {값} will be charged. You can cancel any time before then.',
+      아직: 'You have not started the trial yet.', 관리전환: 'After the 14-day trial, {값} will be charged. You can cancel any time before then.',
       구독중: 'Subscribed', 체험중: 'On trial', 남음: ' · {n} days left', 까지괄호: ' (until {날})',
       해지예약: 'Cancellation scheduled. ', 해지예약뒤: 'You can keep using it until {날}, and nothing will be charged after that.',
       해지취소: 'Undo cancellation', 다음결제: 'Next payment {날} · {값}', 해지하기: 'Cancel', 해지해도: 'Even if you cancel, you can keep using it until {날}.', 기간끝말: 'the end of the period',
@@ -786,10 +786,10 @@
       스토어해지: 'Cancel from the store’s subscription settings. Even if you cancel, you can keep using it until {날}.',
       결제취소: 'Payment cancelled. Nothing has changed.', 결제안됨: 'The payment did not go through. Please try again in a moment.',
       결제반영중: 'Payment complete. Your subscription will show up shortly. Please reopen in a moment.', 구독됨: 'Your subscription has started. Everything is open now.',
-      관리전환둘: 'After the 7-day trial, the plan you choose ({값}) will be charged. You can cancel any time before then.',
+      관리전환둘: 'After the 14-day trial, the plan you choose ({값}) will be charged. You can cancel any time before then.',
       연시작: 'Start with 1 year · {값}', 연구독: 'Subscribe for 1 year · {값}',
-      동의둘: '(Required) When the 7-day trial ends on {날}, the plan you choose ({값}) will be charged. You can cancel any time before then.',
-      전환둘날: 'After the 7-day trial, the plan you choose ({값}) will be charged from {날}. You can cancel any time before then.',
+      동의둘: '(Required) When the 14-day trial ends on {날}, the plan you choose ({값}) will be charged. You can cancel any time before then.',
+      전환둘날: 'After the 14-day trial, the plan you choose ({값}) will be charged from {날}. You can cancel any time before then.',
       복원됨: 'Purchases restored.', 복원없음: 'No purchases to restore. Please check that the Google account you bought with is signed in on this phone.'
     }
   };
@@ -1055,7 +1055,7 @@
   }
   function 결제줄(s) {
     if (껍데기결제()) {
-      /* 2026-10-08 스토어 결제 — 체험 전에는 「7일 체험 시작」이 곧 스토어 구매라 단추를 겹치지 않는다. 끝난 뒤(체험 끝·기간 끝)에만 「다시 구독하기」 */
+      /* 2026-10-08 스토어 결제 — 체험 전에는 「14일 체험 시작」이 곧 스토어 구매라 단추를 겹치지 않는다. 끝난 뒤(체험 끝·기간 끝)에만 「다시 구독하기」 */
       return (s && s.status && !s.열림) ? 줄(단추(말글('다시구독'), '구독.결제등록()', true) + (연있나() ? 단추(말글('연구독', { 값: 첫연값() }), "구독.결제등록('year')", false) : '')) : '';
     }
     if (결제있나()) {
@@ -1099,7 +1099,7 @@
     if (!켜짐()) return Promise.resolve(false);
     var 칸 = document.getElementById('subAgreeT');
     if (칸 && !칸.checked) { 알림(말글('체크')); try { 칸.focus(); } catch (e) {} return Promise.resolve(false); }
-    if (껍데기결제()) return 구매흐름(plan);   /* 스토어 길: 체험은 스토어 상품의 7일 체험. start_trial 은 부르지 않는다 · 2026-10-13 로그인 없이도 */
+    if (껍데기결제()) return 구매흐름(plan);   /* 스토어 길: 체험은 스토어 상품의 14일 체험. start_trial 은 부르지 않는다 · 2026-10-13 로그인 없이도 */
     if (!계정있나()) { 알림(이유('noacct')); return Promise.resolve(false); }
     if (!서버있나() || !세션()) { 알림(이유('login')); return Promise.resolve(false); }
     if (체험중) return Promise.resolve(false);
