@@ -38,7 +38,7 @@ export const quiet = (min: number) => min >= QUIET[0] || min < QUIET[1];
 export const stale = (updatedAt: Date | string | null, now: Date) => !updatedAt || now.getTime() - new Date(updatedAt).getTime() > STALE_DAYS * 864e5;
 /** 「오후 8:00」 */
 export function slotWord(t: string) { const m = toMin(t); const h = Math.floor(m / 60), mm = String(m % 60).padStart(2, '0'); return `${h < 12 ? '오전' : '오후'} ${h % 12 || 12}:${mm}`; }
-/** 알림 글 — 약 이름 없이, 단정하지 않게(「아직 체크가 없어요」) */
+/** 알림 글 — 약 이름 없이, 단정하지 않게(「체크 기록이 아직 없어요 · 이미 드셨을 수도」) */
 export function message(label: string, slot: string) {
-  return { title: '약지도 가족 알림', body: `${label} · ${slotWord(slot)} 약 체크가 아직 없어요. 한 번 연락해 보세요.` };
+  return { title: '약지도 가족 알림', body: `${label} · ${slotWord(slot)} 약 체크 기록이 아직 없어요. 이미 드셨을 수도 있으니 한 번 연락해 보세요.` };   // 11-03 — 체크 없음 ≠ 안 드심
 }

@@ -1,5 +1,5 @@
 // 약지도 가족 알림 — 15분마다(pg_cron → 이 함수) 연결된 가족에게 «아직 체크가 없어요» 웹 푸시 · 2026-11-02
-// 설계: yakjido/가족알림_설계.md · 표: yakjido/server/supabase/medinanum/메디나눔_약지도_가족알림_1102.sql
+// 설계: yakjido/가족알림_설계.md · 표: yakjido/server/supabase/medinanum/메디나눔_약지도_가족알림_1102.sql + _보완_1103.sql(본인 허락·끊으면 지움)
 // 배포: supabase functions deploy yak-family-check --no-verify-jwt (예약 작업이 부르므로 로그인 토큰 대신 x-cron-secret 머리글로 막는다)
 // 비밀은 Supabase Vault 에서 읽는다(11-02 Main — 값이 채팅·대시보드 입력을 거치지 않게): yak_family_cron_secret(서버 안 gen_random_bytes) ·
 // yak_vapid_private · yak_vapid_public(처음 돌 때 web-push 로 만들어 Vault 에 넣음). 저장소엔 값이 없다.
@@ -39,7 +39,7 @@ Deno.serve(async (req) => {
       select l.id, l.member_id, l.owner_label, l.muted_day, r.value, r.updated_at
         from public.yak_family_links l
         join public.records r on r.user_id = l.owner_id and r.app = 'yakjido' and r.key = 'yakjido.me.v1'
-       where l.member_id is not null and l.ended_at is null`;
+       where l.member_id is not null and l.approved_at is not null and l.ended_at is null`;   -- 11-03 본인이 허락한 연결만
     for (const x of rows) {
       checked++;
       if (x.muted_day && String(x.muted_day).slice(0, 10) === now.day) continue;

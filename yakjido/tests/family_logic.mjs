@@ -16,6 +16,6 @@ const s = seoulNow(new Date('2026-11-02T15:30:00Z')); ok(s.day === '2026-11-03' 
 ok(quiet(22 * 60) && quiet(6 * 60 + 59) && !quiet(7 * 60) && !quiet(21 * 60 + 59), '조용한 시간');
 ok(stale('2026-10-28T00:00:00Z', new Date('2026-11-02T00:00:00Z')) && !stale('2026-11-01T00:00:00Z', new Date('2026-11-02T00:00:00Z')), '3일 기록 없음');
 ok(slotWord('20:00') === '오후 8:00' && slotWord('08:05') === '오전 8:05' && slotWord('00:00') === '오전 12:00' && slotWord('12:30') === '오후 12:30', '시각 글');
-const m = message('엄마', '20:00'); ok(!/이부|ibu/.test(m.body) && /체크가 아직 없어요/.test(m.body), '약 이름 없음·단정 않음 ' + m.body);
+const m = message('엄마', '20:00'); ok(!/이부|ibu/.test(m.body) && /체크 기록이 아직 없어요/.test(m.body) && /이미 드셨을 수도/.test(m.body), '약 이름 없음·단정 않음 ' + m.body);
 console.log(bad ? `✗ ${bad}개 실패` : '✓ 가족 알림 판정 13가지');
 process.exit(bad ? 1 : 0);
