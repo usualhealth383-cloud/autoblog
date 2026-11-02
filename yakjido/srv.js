@@ -327,10 +327,10 @@
      10-30 현욱님 「일단 켜놓자」 — 구글만 켠다(카카오는 Supabase 키 고친 뒤, 네이버는 검수 뒤). 네 앱 계정 부품과 같은 꼴:
      「메일로 계속하기」 아래 「또는」 + 「Google로 계속하기」, 누르면 메일과 같은 체크(만 14세·서버 저장)를 먼저 본다.
      설치 앱(웹뷰)에서는 구글이 웹뷰 로그인을 막으므로, 바깥 브라우저로 여는 껍데기.열기가 있을 때만 보인다. */
-  var 소셜글 = { google: 'Google로 계속하기' };
-  var 소셜그림 = { google: '<svg viewBox="0 0 48 48" width="20" height="20" aria-hidden="true"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>' };
+  var 소셜글 = { kakao: '카카오로 계속하기', google: 'Google로 계속하기' }, 소셜이름 = { kakao: '카카오', google: 'Google' };
+  var 소셜그림 = { kakao: '<svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path fill="#000" d="M12 3C6.48 3 2 6.58 2 11c0 2.85 1.86 5.35 4.66 6.77l-.95 3.5c-.08.3.26.54.52.37l4.14-2.75c.53.07 1.08.11 1.63.11 5.52 0 10-3.58 10-8S17.52 3 12 3z"/></svg>', google: '<svg viewBox="0 0 48 48" width="20" height="20" aria-hidden="true"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>' };
   function 네이티브() { try { return !!(window.Capacitor && Capacitor.isNativePlatform && Capacitor.isNativePlatform()); } catch (e) { return false; } }
-  window.소셜켜짐 = function () { if (!준비됨()) return []; if (네이티브() && !(window.껍데기 && typeof window.껍데기.열기 === 'function')) return []; return ['google']; };
+  window.소셜켜짐 = function () { if (!준비됨()) return []; if (네이티브() && !(window.껍데기 && typeof window.껍데기.열기 === 'function')) return []; return ['kakao', 'google']; };   /* 11-02 카카오 켬(Main · 네 앱과 같은 순서: 카카오 위, Google 아래) */
   window.계정문소셜 = function (p) {
     if (window.소셜켜짐().indexOf(p) < 0) return;
     var g = document.getElementById('srvAgree'), a = document.getElementById('srvAge');
@@ -339,10 +339,10 @@
       if (typeof 설정.동의기록 === 'function') { try { 설정.동의기록(); } catch (e) {} }
     }
     /* 처음인지 미리 알 수 없어 늘 묻는다 — 메일의 「처음 만들 때 필수」와 같은 체크 */
-    if (설정.가입확인 && (!a || !a.checked)) { 문말('Google로 계속하려면 「' + 설정.가입확인.글 + '」에 체크해 주세요.'); if (a) a.focus(); return; }
+    if (설정.가입확인 && (!a || !a.checked)) { 문말(소셜이름[p] + '로 계속하려면 「' + 설정.가입확인.글 + '」에 체크해 주세요.'); if (a) a.focus(); return; }
     var 앱id = 네이티브() && window.껍데기 && window.껍데기.appId ? window.껍데기.appId : '';
     var 돌아올 = 앱id ? 앱id + '://login' : 앱주소();
-    문말('Google로 넘어가는 중이에요…');
+    문말(소셜이름[p] + '로 넘어가는 중이에요…');
     return 준비().then(function () {
       try { sessionStorage.setItem('yj_oauth', JSON.stringify({ p: p, age14_at: (a && a.dataset && a.dataset.at) || new Date().toISOString() })); } catch (e) {}
       return sb.auth.signInWithOAuth({ provider: p, options: { redirectTo: 돌아올 || undefined, skipBrowserRedirect: true } });
@@ -2007,7 +2007,7 @@ try { const css = document.createElement('style'); css.textContent = `
 .door-av{flex:none;width:44px;height:44px;border-radius:50%;background:var(--tint);color:var(--primary-deep);display:grid;place-items:center;font-weight:800;font-size:1.125rem}
 .door-me b{display:block;overflow-wrap:anywhere}.door-me small{display:block;color:var(--muted);font-size:.875rem}
 .door-social{display:flex;flex-direction:column;gap:8px}.door-soc{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;min-height:48px;border-radius:12px;font:600 1rem/1.2 inherit;font-family:inherit;cursor:pointer;touch-action:manipulation}
-.door-google{background:#fff;color:#1f1f1f;border:1px solid #747775}.door-soc:disabled{opacity:.45;cursor:not-allowed}.door-google svg{flex:none}
+.door-google{background:#fff;color:#1f1f1f;border:1px solid #747775}.door-kakao{background:#FEE500;color:rgba(0,0,0,.85);border:0}.door-soc:disabled{opacity:.45;cursor:not-allowed}.door-google svg{flex:none}
 .door-or{display:flex;align-items:center;gap:10px;color:var(--muted);font-size:.875rem}.door-or::before,.door-or::after{content:"";flex:1;border-top:1px solid var(--hairline)}
 @media (min-width:1024px){.nav-mark{align-items:center;gap:10px;padding:4px 8px 20px;text-decoration:none;color:var(--text)}.nav-mark img{border-radius:10px;flex:none}
 .nav-mark b{display:block;font-size:1.125rem;font-weight:800}.nav-mark small{display:block;font-size:.875rem;line-height:1.35;color:var(--muted)}
