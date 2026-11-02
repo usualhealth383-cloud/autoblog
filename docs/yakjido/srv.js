@@ -2099,8 +2099,9 @@ function hxSave(){ const v = id => (document.getElementById(id)?.value || '').tr
   hxWrite(L); HXQ.open = ''; HXQ.edit = -1; toast('적어 두었어요'); route(); }
 /* 병원에서 보여 주기 — 화면 가득 큰 글씨 한 장(응급 정보라 늘 열림) */
 function hxShow(){
-  const L = hxRead(), meds = takingItems(), al = (ME.ae || []).map(x => x.n || x.id).filter(Boolean), cs = (typeof condOn === 'function' ? condOn() : []).map(k => (typeof FLAG_LABEL !== 'undefined' && FLAG_LABEL[k]) || k);
+  const L = hxRead(), meds = takingItems(), al = (ME.ae || []).map(x => x.n || x.id).filter(Boolean), cs = (typeof condOn === 'function' ? condOn() : []).map(c => Array.isArray(c) ? c[1] : ((typeof FLAG_LABEL !== 'undefined' && FLAG_LABEL[c]) || c));
   const why = n => L.filter(x => x.src === n).map(x => x.t);
+  document.querySelectorAll('.hx-show').forEach(x => x.remove());
   const el = document.createElement('div'); el.className = 'hx-show'; el.setAttribute('role', 'dialog'); el.setAttribute('aria-modal', 'true'); el.setAttribute('aria-label', '병원에서 보여 주기');
   el.innerHTML = `<div class="hx-in"><button type="button" class="btn line hx-x" onclick="this.closest('.hx-show').remove()">${I.x} 닫기</button>
     <h1>진료 보실 때 보여 주세요</h1><p class="small muted">${esc(new Date().toLocaleDateString('ko-KR'))} · 약지도에 본인·보호자가 적은 내용이에요</p>
@@ -2109,6 +2110,10 @@ function hxShow(){
     <h2>드시는 약</h2>${meds.length ? `<ul>${meds.map(d => `<li><b>${esc(d.name)}</b>${why(d.name).length ? ` — ${esc(why(d.name).join(', '))} 때문에` : ''}</li>`).join('')}</ul>` : '<p>담은 약이 없어요</p>'}
     <h2>약 알레르기 · 부작용</h2><p>${al.length ? al.map(esc).join(' · ') : '적은 것이 없어요'}</p></div>`;
   document.body.appendChild(el); el.querySelector('.hx-x').focus();
+  /* 화면이 바뀌거나(뒤로 가기 포함) Esc 면 닫는다 — 덮인 채 남지 않게 */
+  const close = () => { el.remove(); removeEventListener('hashchange', close); removeEventListener('keydown', onKey); };
+  const onKey = e => { if (e.key === 'Escape') close(); };
+  addEventListener('hashchange', close); addEventListener('keydown', onKey);
 }
 Object.assign(window, { HXQ, hxAdd, hxEdit, hxDel, hxSave, hxShow });
 try { const st3 = document.createElement('style'); st3.textContent = '.hx-sug{margin-top:12px;padding-top:10px;border-top:1px dashed var(--hairline)}.hx-s{margin:8px 0}.hx-s b{display:block;margin-bottom:4px}.hx-s .chips{display:flex;flex-wrap:wrap;gap:6px}.hx-s .chip{min-height:44px;white-space:normal;text-align:left;display:inline-flex;align-items:center;gap:4px}.hx-sel{min-height:44px;padding:6px 10px;border:1.5px solid var(--ui-line);border-radius:12px;font:inherit;background:var(--card);color:var(--text)}'
