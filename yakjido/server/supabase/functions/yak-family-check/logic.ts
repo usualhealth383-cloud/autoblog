@@ -1,3 +1,4 @@
+// 사본 — 정본은 mn-push-check/modules/yak_logic.ts (배포는 함수 폴더 안 파일만 실린다). 예약을 mn-push-check 로 바꾸면 이 함수는 은퇴. 고칠 땐 정본을 고치고 여기로 복사(tests/family_logic.mjs 가 둘이 같은지 본다).
 // 약지도 알림 판정(순수 함수 · 시험: yakjido/tests/family_logic.mjs) — 11-03 사람마다 «자기 시간대»로
 // 기록 꼴: yakjido.me.v1 = taking[] · sched{id:["HH:MM"]} · prn{id:true} · taken{"YYYY-MM-DD":["id@HH:MM"]} · skipped{…}
 //          yakjido.fam.v1 = { tz:"Asia/Seoul", lang:"ko"|"en"|"es"|"ja"|"zh"(앱 언어 — 알림 글은 «받는 사람» 말로), wait:1|2|3, qs:"22:00", qe:"07:00", dose:true(앱을 닫아도 정시 알림), nm:{id:"이름"}(약 이름 보이기를 켠 경우만) }

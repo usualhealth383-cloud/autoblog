@@ -1,5 +1,5 @@
 // 알림 판정 시험 — node --experimental-strip-types yakjido/tests/family_logic.mjs
-import { missedSlots, dueNow, localNow, seoulNow, quiet, stale, message, doseMessage, slotWord, prefs } from '../server/supabase/functions/yak-family-check/logic.ts';
+import { missedSlots, dueNow, localNow, seoulNow, quiet, stale, message, doseMessage, slotWord, prefs } from '../server/supabase/functions/mn-push-check/modules/yak_logic.ts';
 let bad = 0, n = 0; const ok = (c, m) => { n++; if (!c) { bad++; console.log('✗', m); } };
 const day = '2026-11-02';
 const me = { taking: ['ibu', 'met', 'prnx'], sched: { ibu: ['08:00', '20:00'], met: ['08:00'], prnx: ['09:00'] }, prn: { prnx: true },
@@ -59,4 +59,14 @@ for (const L of ['ko', 'en', 'es', 'ja', 'zh']) {
 }
 ok(prefs({ lang: 'fr' }).lang === 'ko' && prefs({ lang: 'ja' }).lang === 'ja', '언어 설정 읽기');
 console.log(bad ? `✗ ${bad}개 실패` : `✓ 알림 판정 ${n}가지(서울·뉴욕·마드리드·서머타임 경계·다섯 말)`);
+
+// 사본 맞춤: yak-family-check/logic.ts 는 첫 줄 주석만 다르고 정본과 같아야 한다
+{
+  const fs = await import('node:fs');
+  const d = new URL('../server/supabase/functions/', import.meta.url);
+  const a = fs.readFileSync(new URL('mn-push-check/modules/yak_logic.ts', d), 'utf8');
+  const b = fs.readFileSync(new URL('yak-family-check/logic.ts', d), 'utf8').split('\n').slice(1).join('\n');
+  if (a !== b) { console.error('✘ yak-family-check/logic.ts 가 정본(mn-push-check/modules/yak_logic.ts)과 다름'); process.exit(1); }
+  console.log('✓ 판정 사본 = 정본');
+}
 process.exit(bad ? 1 : 0);
