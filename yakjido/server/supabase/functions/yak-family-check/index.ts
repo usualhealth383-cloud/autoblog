@@ -28,9 +28,10 @@ async function vapid() {
 }
 
 Deno.serve(async (req) => {
-  const secret = await vault('yak_family_cron_secret');
+  let secret: string | null = null;
+  try { secret = await vault('yak_family_cron_secret'); } catch { secret = null; }
   if (!secret || req.headers.get('x-cron-secret') !== secret) return new Response('forbidden', { status: 403 });
-  await vapid();
+  try { await vapid(); } catch (e) { console.error('vapid', (e as Error)?.name); return Response.json({ ok: false, step: 'vapid' }, { status: 500 }); }
   const nowD = new Date(), now = seoulNow(nowD);
   if (quiet(now.min)) return Response.json({ ok: true, quiet: true });
   let checked = 0, sent = 0, dropped = 0;
@@ -39,7 +40,7 @@ Deno.serve(async (req) => {
       select l.id, l.member_id, l.owner_label, l.muted_day, r.value, r.updated_at
         from public.yak_family_links l
         join public.records r on r.user_id = l.owner_id and r.app = 'yakjido' and r.key = 'yakjido.me.v1'
-       where l.member_id is not null and l.approved_at is not null and l.ended_at is null`;   -- 11-03 본인이 허락한 연결만
+       where l.member_id is not null and l.approved_at is not null and l.ended_at is null`;   // 11-03 본인이 허락한 연결만
     for (const x of rows) {
       checked++;
       if (x.muted_day && String(x.muted_day).slice(0, 10) === now.day) continue;
