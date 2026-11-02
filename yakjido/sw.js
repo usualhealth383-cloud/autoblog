@@ -97,7 +97,7 @@ self.addEventListener('push', (e) => {
     const day = /^\d{4}-\d{2}-\d{2}$/.test(m.day || '') ? m.day : '';
     e.waitUntil(self.registration.showNotification(String(m.title || '약지도 · 약 드실 시간').slice(0, 60), {
       body: String(m.body || '').slice(0, 200), tag: m.key, renotify: false, requireInteraction: true, icon: 'icon-192.png', badge: 'icon-192.png',
-      data: { key: m.key, day, go: '' }, actions: [{ action: 'took', title: '먹었어요' }, { action: 'later', title: '10분 뒤 다시' }] }));
+      data: { key: m.key, day, go: '' }, actions: [{ action: 'took', title: String((m.acts || [])[0] || '먹었어요').slice(0, 20) }, { action: 'later', title: String((m.acts || [])[1] || '10분 뒤 다시').slice(0, 20) }] }));   // 단추 글도 본인 말로(11-03)
     return;
   }
   const go = /^#\/notify(\?[a-z0-9=&]*)?$/.test(m.go || '') ? m.go : '#/notify?fam=1';

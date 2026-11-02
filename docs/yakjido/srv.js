@@ -335,11 +335,12 @@
     if (window.소셜켜짐().indexOf(p) < 0) return;
     var g = document.getElementById('srvAgree'), a = document.getElementById('srvAge');
     if (!서버허용()) {
-      if (!g || !g.checked) { 문말('「서버에 저장하기」에 동의하셔야 계정을 쓸 수 있어요. 동의하지 않으셔도 약지도는 그대로 쓰실 수 있어요.'); if (g) g.focus(); return; }
-      if (typeof 설정.동의기록 === 'function') { try { 설정.동의기록(); } catch (e) {} }
+      if (!g || !g.checked) { 문필수('srvAgree', '「서버에 저장하기」에 체크해 주세요. 동의하지 않으셔도 약지도는 그대로 쓰실 수 있어요.'); return; }
     }
     /* 처음인지 미리 알 수 없어 늘 묻는다 — 메일의 「처음 만들 때 필수」와 같은 체크 */
-    if (설정.가입확인 && (!a || !a.checked)) { 문말(소셜이름[p] + '로 계속하려면 「' + 설정.가입확인.글 + '」에 체크해 주세요.'); if (a) a.focus(); return; }
+    if (설정.가입확인 && (!a || !a.checked)) { 문필수('srvAge', 소셜이름[p] + '로 계속하려면 「' + 설정.가입확인.글 + '」에 체크해 주세요.'); return; }
+    /* 동의 기록은 모든 확인이 끝난 뒤 — 먼저 적으면 화면이 다시 그려져 방금 띄운 안내가 사라졌다(11-03) */
+    if (!서버허용() && typeof 설정.동의기록 === 'function') { try { 설정.동의기록(); } catch (e) {} }
     var 앱id = 네이티브() && window.껍데기 && window.껍데기.appId ? window.껍데기.appId : '';
     var 돌아올 = 앱id ? 앱id + '://login' : 앱주소();
     문말(소셜이름[p] + '로 넘어가는 중이에요…');
@@ -387,18 +388,29 @@
   window.계정문확인 = function () {
     var b = document.getElementById('srvDoorGo'), w = document.getElementById('doorWhy'); if (!b) return;
     var g = document.getElementById('srvAgree'), 막 = !!(g && !g.checked);
-    b.disabled = 막; if (w) w.hidden = !막; document.querySelectorAll('.door-soc').forEach(function (x) { x.disabled = 막; }); document.querySelectorAll('.door-why').forEach(function (x) { x.hidden = !막; });
+    if (w) w.hidden = !막; document.querySelectorAll('.door-why').forEach(function (x) { x.hidden = !막; });
   };
+  /* 11-03 현욱님 폰 — 필수 체크 없이 카카오·Google 을 누르면 잠긴 단추라 아무 일도 없었다(「눌러도 진행이 안 돼요」).
+     단추는 늘 눌리고, 빠진 체크 칸 바로 아래에 빨간 글 · 칸 테두리 · 그 칸으로 스크롤(시트 뒤 띠에 가리지 않게) */
+  function 문필수(id, 글) {
+    var c = document.getElementById(id), lb = c && c.closest('label'); if (!lb) { 문말(글); return; }
+    document.querySelectorAll('.door-need-msg').forEach(function (x) { x.remove(); });
+    lb.classList.add('door-need');
+    var m = document.createElement('p'); m.className = 'door-need-msg'; m.setAttribute('role', 'alert'); m.textContent = window.I18N && I18N.t ? I18N.t(글) : 글; lb.insertAdjacentElement('afterend', m);
+    try { lb.scrollIntoView({ block: 'center', behavior: 'smooth' }); } catch (e) { lb.scrollIntoView(); }
+    try { c.focus({ preventScroll: true }); } catch (e) {}
+  }
+  document.addEventListener('change', function (e) { var t = e.target; if (!t || !/^(srvAgree|srvAge)$/.test(t.id) || !t.checked) return; var lb = t.closest('label'); if (lb) { lb.classList.remove('door-need'); var n = lb.nextElementSibling; if (n && n.classList.contains('door-need-msg')) n.remove(); } });
   window.계정문동작 = function (what) {
     what = what || (문탭 === 'signup' ? 'signup' : 'login');
     var g = document.getElementById('srvAgree'), a = document.getElementById('srvAge'), em = document.getElementById('srvEmail'), pw = document.getElementById('srvPw');
     if (!서버허용()) {
-      if (!g || !g.checked) { 문말('「서버에 저장하기」에 동의하셔야 계정을 쓸 수 있어요. 동의하지 않으셔도 약지도는 그대로 쓰실 수 있어요.'); if (g) g.focus(); return; }
-      if (typeof 설정.동의기록 === 'function') { try { 설정.동의기록(); } catch (e) {} }
+      if (!g || !g.checked) { 문필수('srvAgree', '「서버에 저장하기」에 체크해 주세요. 동의하지 않으셔도 약지도는 그대로 쓰실 수 있어요.'); return; }
     }
-    if (what === 'signup' && 설정.가입확인 && (!a || !a.checked)) { 문말('계정을 만들려면 「' + 설정.가입확인.글 + '」에 체크해 주세요.'); if (a) a.focus(); return; }
+    if (what === 'signup' && 설정.가입확인 && (!a || !a.checked)) { 문필수('srvAge', '계정을 만들려면 「' + 설정.가입확인.글 + '」에 체크해 주세요.'); return; }
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(((em || {}).value || '').trim())) { 문말('이메일 주소를 다시 확인해 주세요.'); if (em) em.focus(); return; }
     if (what !== 'reset' && ((pw || {}).value || '').length < 6) { 문말('비밀번호는 6자 이상이에요.'); if (pw) pw.focus(); return; }
+    if (!서버허용() && typeof 설정.동의기록 === 'function') { try { 설정.동의기록(); } catch (e) {} }   /* 확인이 다 끝난 뒤에 적는다 */
     문말(what === 'reset' ? '메일을 보내는 중이에요…' : '잠시만요…');
     return window.계정동작(what);
   };
@@ -431,11 +443,11 @@
       + '<dt>언제까지</dt><dd>계정을 지우실 때까지 — 동의를 거두시면 서버 기록을 바로 지워요</dd></dl><p>동의하지 않으셔도 되고, 동의하지 않아도 약지도는 이 휴대폰에서 그대로 쓰실 수 있어요. 보기 설정과 날씨는 올라가지 않아요.</p></details>';
     var 막힘 = !동의됨;
     /* 11-01 네 앱 계정 시트와 같은 순서(Main 606f55c8 · 「어르신은 Google 이 위가 쉽다」): 동의 체크 → Google → 「또는 메일로」 → 이메일·비밀번호 → 메일로 계속하기 */
-    h += (소셜.length ? '<div class="door-social">' + 소셜.filter(function (p) { return 소셜글[p]; }).map(function (p) { return '<button type="button" class="door-soc door-' + p + '" onclick="계정문소셜(\'' + p + '\')"' + (막힘 ? ' disabled aria-describedby="doorWhy"' : '') + '>' + 소셜그림[p] + '<span>' + 소셜글[p] + '</span></button>'; }).join('') + '</div>' + (막힘 ? '<p class="door-why">필수에 체크하시면 눌려요</p>' : '') + '<p class="door-or"><span>또는 메일로</span></p>' : '');
+    h += (소셜.length ? '<div class="door-social">' + 소셜.filter(function (p) { return 소셜글[p]; }).map(function (p) { return '<button type="button" class="door-soc door-' + p + '" onclick="계정문소셜(\'' + p + '\')">' + 소셜그림[p] + '<span>' + 소셜글[p] + '</span></button>'; }).join('') + '</div>' + (막힘 ? '<p class="door-why">먼저 위의 필수 칸에 체크해 주세요</p>' : '') + '<p class="door-or"><span>또는 메일로</span></p>' : '');
     h += '<label class="door-f" for="srvEmail">이메일</label><input id="srvEmail" type="email" inputmode="email" autocomplete="email" autocapitalize="off" spellcheck="false" enterkeyhint="next" value="' + 글자안전(st.email || '') + '">'
       + 비번칸('srvPw', '비밀번호 <small>처음이면 새로 정할 비밀번호 · 6자 이상</small>', 'current-password', 'go');
-    h += 말칸 + '<button type="button" id="srvDoorGo" class="door-go" onclick="계정문동작(\'continue\')"' + (막힘 ? ' disabled aria-describedby="doorWhy"' : '') + '>메일로 계속하기</button>'
-      + (막힘 ? '<p id="doorWhy" class="door-why">필수에 체크하시면 눌려요</p>' : '')
+    h += 말칸 + '<button type="button" id="srvDoorGo" class="door-go" onclick="계정문동작(\'continue\')"' + (막힘 ? ' aria-describedby="doorWhy"' : '') + '>메일로 계속하기</button>'
+      + (막힘 ? '<p id="doorWhy" class="door-why">먼저 위의 필수 칸에 체크해 주세요</p>' : '')
       + '<p class="door-note">계정이 있으면 로그인하고, 처음이면 계정을 만들어요. 새로 만들면 메일함에 확인 링크가 가요 — 한 번 누르면 끝이에요.</p>'
       + '<button type="button" class="srvlink door-forgot" onclick="계정문동작(\'reset\')">비밀번호를 잊으셨나요?</button>';
     return h + '</div>';
@@ -1327,7 +1339,7 @@ window.mergeMe = function (localRaw, serverRaw) {
 };
 try {
   /* 준비됨 = meta.json 의 account 스위치 — 공용 서버에 약지도 칸(메디나눔_약지도_추가_1013.sql)이 열린 뒤에 true 로 켠다. 그 전엔 「준비 중」 한 줄(되는 척 금지). */
-  서버.설치({ app: 'yakjido', 열쇠: /^yakjido\.(me|fam)\.v1$/, 병합: function (k, mine, theirs) { return k === 'yakjido.me.v1' && typeof mergeMe === 'function' ? mergeMe(mine, theirs) : null; },   /* 11-03 fam.v1 = 알림 설정(시간대·기다리는 시간·쉬는 시간·정시 알림) — 서버 알림 함수가 읽는다 */ 준비됨: function () { return !!(typeof D !== 'undefined' && D.meta && D.meta.account === true); }, 허용: srvAgreed, 다시그리기: srvReload,
+  서버.설치({ app: 'yakjido', 열쇠: /^yakjido\.(me|fam|hx)\.v1$/, 병합: function (k, mine, theirs) { return k === 'yakjido.me.v1' && typeof mergeMe === 'function' ? mergeMe(mine, theirs) : null; },   /* 11-03 fam.v1 = 알림 설정(시간대·기다리는 시간·쉬는 시간·정시 알림) — 서버 알림 함수가 읽는다 */ 준비됨: function () { return !!(typeof D !== 'undefined' && D.meta && D.meta.account === true); }, 허용: srvAgreed, 다시그리기: srvReload,
     가입확인: { 글: '만 14세 이상이에요', 설명: '메디나눔 계정은 만 14세 이상만 만들 수 있어요. 아이 약은 보호자 계정에 담아 주세요.' },
     /* 2026-10-14 로그인 문의 「서버에 저장하기」 체크 — 설정의 서버동의켜기와 같은 꼴로 적는다 */
     동의기록: function () { try { localStorage.setItem(AGREE_KEY, JSON.stringify({ server: true, at: new Date().toISOString() })); } catch (e) {} } });
@@ -1886,7 +1898,7 @@ const famOn = () => D.meta?.family === true && D.meta?.account === true;
    tz = 기기 시간대(기기 설정 값) · wait = 가족에게 알리기까지 1·2·3시간 · qs/qe = 쉬는 시간 · dose = 앱을 닫아도 정시 알림 · nm = 알림에 약 이름(「알림에 약 이름 보이기」를 켰을 때만) */
 const FAM_KEY = 'yakjido.fam.v1', FAM_DEF = { wait: 2, qs: '22:00', qe: '07:00', dose: false };
 const famPrefs = () => { let o = {}; try { o = JSON.parse(localStorage.getItem(FAM_KEY) || '{}') || {}; } catch (e) {} return { ...FAM_DEF, ...o }; };
-function famSave(ch){ const p = { ...famPrefs(), ...(ch || {}) }; try { p.tz = Intl.DateTimeFormat().resolvedOptions().timeZone || 'Asia/Seoul'; } catch (e) { p.tz = 'Asia/Seoul'; }
+function famSave(ch){ const p = { ...famPrefs(), ...(ch || {}) }; try { p.tz = Intl.DateTimeFormat().resolvedOptions().timeZone || 'Asia/Seoul'; } catch (e) { p.tz = 'Asia/Seoul'; } p.lang = typeof LANG !== 'undefined' ? LANG : 'ko';   /* 11-03 알림 글은 받는 사람 말로 */
   if (p.dose && noteName()) { p.nm = {}; for (const d of takingItems()) p.nm[d.id] = String(d.simple && !d.name ? d.simple : d.name || '').slice(0, 30); } else delete p.nm;
   const v = JSON.stringify(p); try { if (localStorage.getItem(FAM_KEY) !== v) localStorage.setItem(FAM_KEY, v); } catch (e) {} }
 /* 체크하면 그 자리에서 서버로(오프라인이면 다음 기회에) — 가족 알림 오알림을 줄인다 */
@@ -2004,6 +2016,110 @@ function famMute(id){ const u = new Date(); u.setHours(24, 0, 0, 0); famRpc('yak
 function famApprove(id, ok){ famRpc('yak_family_approve', { p_id: id, p_ok: !!ok }).then(() => { FAMQ.list = null; FAMQ.msg = ok ? '연결했어요. 이제 약 체크 기록이 없으면 이 분께 알려요.' : '거절했어요. 연결 요청을 지웠어요.'; }).catch(e => { FAMQ.msg = famErr(e); }).finally(() => route()); }
 async function famPushOff(){ try { const reg = await navigator.serviceWorker.ready, sub = await reg.pushManager.getSubscription(); if (sub) { await famRpc('yak_push_drop', { p_endpoint: sub.endpoint }).catch(() => {}); await sub.unsubscribe(); } FAMQ.msg = '이 휴대폰에서 가족 알림 받기를 껐어요. 등록된 알림 주소도 지웠어요.'; } catch (e) { FAMQ.msg = famErr(e); } route(); }
 Object.assign(window, { FAMQ, famShare, famInvite, famJoin, famEnd, famMute, famApprove, famPushOff, famSet, doseSrv });
+/* ── 11-03 현욱님 「내 병력」 — 약만 보고는 왜 드시는지 알 수 없다(클로피도그렐: 스텐트? 뇌경색?). 환자·보호자가 병력·시술·병원을 적어 두고,
+   처음 가는 병원·응급실에서 한 장으로 보여 준다. 약 → 「보통 이런 때 써요」는 식약처 허가 효능·효과를 줄인 «후보»일 뿐 — 앱이 정하지 않고 사람이 고른다(진단 아님).
+   저장: yakjido.hx.v1(계정과 함께 서버로 — 서버.설치 열쇠). 응급 정보라 보기는 늘 열림 */
+const HX_KEY = 'yakjido.hx.v1';
+/* 약 갈래 → 성분 낱말(약봉투로 담은 처방약 이름·성분에서 찾기) · 보통 쓰는 경우(식약처 허가 효능·효과 요약) */
+const HX_USE = {
+  'bp.arb': [['사르탄'], ['고혈압', '심부전(일부 성분)', '당뇨병으로 생긴 콩팥병(일부 성분)']],
+  'bp.acei': [['프릴'], ['고혈압', '심부전', '심근경색 뒤(일부 성분)']],
+  'bp.ccb': [['디핀'], ['고혈압', '협심증']],
+  'bp.beta': [['올롤', '딜롤'], ['고혈압', '협심증', '심부전(일부 성분)', '빠른 맥박·부정맥(일부 성분)']],
+  'bp.diur': [['티아지드', '푸로세미드', '스피로노락톤', '인다파미드', '토라세미드'], ['고혈압', '몸이 붓는 병(심부전·콩팥·간)']],
+  'bp.dig': [['디곡신'], ['심부전', '심방세동(맥박 조절)']],
+  'bp.nitrate': [['니트로글리세린', '이소소르비드', '니코란딜'], ['협심증']],
+  'dm.met': [['메트포르민'], ['제2형 당뇨병']], 'dm.glip': [['글립틴'], ['제2형 당뇨병']], 'dm.su': [['글리메피리드', '글리클라지드', '글리피지드'], ['제2형 당뇨병']],
+  'dm.sglt': [['글리플로진'], ['제2형 당뇨병', '심부전(일부 성분)', '만성 콩팥병(일부 성분)']],
+  'chol.statin': [['스타틴'], ['콜레스테롤이 높음(이상지질혈증)', '심근경색·뇌졸중 예방(위험이 높은 분)']],
+  'blood.aspirin': [[], ['심근경색·협심증 뒤 재발 예방', '관상동맥 스텐트(심장 혈관 시술) 뒤', '뇌경색 뒤 재발 예방']],
+  'blood.clopi': [['클로피도그렐'], ['관상동맥 스텐트(심장 혈관 시술)·급성 관상동맥증후군 뒤', '심근경색 뒤', '뇌경색 뒤', '말초동맥질환(다리 혈관이 좁아짐)']],
+  'blood.warf': [['와파린'], ['심방세동(뇌졸중 예방)', '다리 혈전·폐색전', '인공 심장판막']],
+  'blood.doac': [['리바록사반', '아픽사반', '에독사반', '다비가트란'], ['심방세동(뇌졸중 예방)', '다리 혈전·폐색전', '무릎·고관절 수술 뒤 혈전 예방(일부 성분)']],
+  'blood.other': [['실로스타졸', '사르포그렐레이트'], ['말초동맥질환(다리 혈관이 좁아짐)', '뇌경색 뒤 재발 예방(실로스타졸)']],
+  'gi.ppi': [['프라졸'], ['위식도 역류', '위·십이지장 궤양', '헬리코박터 제균', '소염진통제·아스피린 드시는 동안 궤양 예방(일부 성분)']],
+  'gi.h2': [['티딘'], ['위·십이지장 궤양', '위식도 역류', '위염']],
+  'mind.ssri': [['세르트랄린', '에스시탈로프람', '플루옥세틴', '파록세틴'], ['우울증', '불안장애·공황장애', '강박장애(일부 성분)']],
+  'mind.tca': [['트립틸린'], ['우울증', '야뇨증(일부 성분)']],
+  'mind.zdrug': [['졸피뎀'], ['불면증']], 'mind.bzd': [['제팜', '졸람'], ['불안', '불면(일부 성분)', '근육 긴장·경련(일부 성분)']],
+  'mind.li': [['리튬'], ['양극성 장애(조울병)']],
+  'mind.aed': [['카르바마제핀', '발프로', '레비티라세탐', '라모트리진', '토피라메이트'], ['뇌전증(경련)', '양극성 장애(일부 성분)', '삼차신경통(카르바마제핀)']],
+  'pros.alpha': [['로신', '조신'], ['전립선비대증(소변 보기 불편)']], 'pros.5ari': [['스테리드'], ['전립선비대증', '남성형 탈모(일부 성분)']],
+  'blad.oab': [['페나신', '테로딘', '부티닌'], ['과민성 방광(소변이 잦고 급함)']], 'blad.b3': [['미라베그론'], ['과민성 방광(소변이 잦고 급함)']],
+  'thy.levo': [['티록신'], ['갑상선 기능 저하증', '갑상선 수술 뒤(갑상선암 등)']],
+  'gout.allo': [['알로퓨리놀', '페북소스타트'], ['통풍(요산 낮추기)']], 'gout.colch': [['콜히친'], ['통풍 발작 치료·예방']],
+  'dem.ache': [['네페질', '리바스티그민', '갈란타민'], ['알츠하이머 치매', '파킨슨병 치매(리바스티그민)']], 'dem.mem': [['메만틴'], ['알츠하이머 치매']],
+  'park.maob': [['길린'], ['파킨슨병']], 'park.dopa': [['로피니롤', '프라미펙솔', '레보도파'], ['파킨슨병', '하지불안증후군(로피니롤·프라미펙솔)']],
+  'bone.bis': [['드론산'], ['골다공증']],
+  'resp.luka': [['루카스트'], ['천식', '알레르기 비염']], 'resp.theo': [['테오필린'], ['천식', '만성 폐쇄성 폐질환']],
+  'pain.gaba': [['가바펜틴', '프레가발린'], ['신경병증 통증(대상포진 뒤·당뇨병)', '뇌전증(가바펜틴)', '섬유근육통(프레가발린)']],
+  'eye.glau': [['라타노프로스트', '타플루프로스트', '도르졸라미드', '브리모니딘'], ['녹내장·높은 안압']], 'eye.beta': [['티몰롤'], ['녹내장·높은 안압']],
+  'ster.pred': [['프레드니솔론', '메틸프레드니솔론', '덱사메타손'], ['여러 염증·면역 질환(류마티스·천식 악화·피부병·콩팥병 등) — 왜 드시는지 꼭 적어 두세요']],
+};
+const HX_COMMON = ['관상동맥 스텐트(심장 혈관 시술)', '심근경색', '협심증', '심부전', '심방세동', '뇌경색', '뇌출혈', '고혈압', '당뇨병', '만성 콩팥병', '투석', '간경변', '천식', '만성 폐쇄성 폐질환', '갑상선 수술', '암', '장기 이식', '인공 관절 수술', '심장 판막 수술', '뇌전증'];
+const hxRead = () => { try { const o = JSON.parse(localStorage.getItem(HX_KEY) || '{}'); return Array.isArray(o.list) ? o.list : []; } catch (e) { return []; } };
+const hxWrite = L => { try { localStorage.setItem(HX_KEY, JSON.stringify({ list: L.slice(0, 40), t: Date.now() })); } catch (e) {} };
+/* 드시는 약 → 보통 쓰는 경우 후보 */
+function hxSuggest(){
+  const out = [];
+  for (const d of takingItems()) {
+    let k = d.id.startsWith('cls:') ? d.id.slice(4) : '';
+    if (!HX_USE[k]) { k = ''; const txt = ((d.pub && (d.pub.ingr || '')) + ' ' + d.name); if (d.pub && d.pub.rx) for (const [kk, [kw]] of Object.entries(HX_USE)) if (kw.some(w => txt.includes(w))) { k = kk; break; }
+      if (!k && /아스피린/.test(txt) && /(^|[^\d])100\s*(mg|밀리그램)/i.test(txt)) k = 'blood.aspirin'; }   /* 심장 때문에 드시는 저용량 아스피린(일반약) */
+    if (k && HX_USE[k]) out.push({ d, k, uses: HX_USE[k][1] });
+  }
+  return out;
+}
+const HXQ = { open: '', pre: '', src: '', edit: -1 };
+window.병력칸 = () => {
+  const L = hxRead(), S = hxSuggest(), now = new Date().getFullYear();
+  const row = (x, i) => `<li><span><b>${esc(x.t)}</b><small>${esc([x.y ? x.y + '년' + (x.m ? ' ' + x.m + '월' : '') : '', x.where, x.note].filter(Boolean).join(' · ') || '언제·어디서는 비워 두셨어요')}${x.src ? ' · ' + esc(x.src) + ' 때문에 적음' : ''}</small></span><span class="fam-b"><button type="button" class="link" onclick="hxEdit(${i})">고치기</button><button type="button" class="link" onclick="hxDel(${i})">지우기</button></span></li>`;
+  const sel = (id, n0, n1, v, unit) => `<select id="${id}" class="hx-sel"><option value="">${unit === '년' ? '연도' : '월'}</option>${Array.from({ length: n1 - n0 + 1 }, (_, i) => unit === '년' ? n1 - i : n0 + i).map(n => `<option value="${n}"${String(v) === String(n) ? ' selected' : ''}>${n}${unit}</option>`).join('')}</select>`;
+  const e = HXQ.edit >= 0 ? L[HXQ.edit] || {} : {};
+  const form = HXQ.open ? `<div class="fam-form">
+      <label class="fam-l" for="hxT">무엇을 — 병·시술·수술</label><input id="hxT" list="hxCommon" maxlength="60" value="${esc(e.t || HXQ.pre || '')}" placeholder="예) 관상동맥 스텐트"><datalist id="hxCommon">${HX_COMMON.map(t => `<option value="${esc(t)}">`).join('')}</datalist>
+      <span class="fam-l">언제 <small class="muted">대략이라도 괜찮아요</small></span><div class="fam-q">${sel('hxY', now - 80, now, e.y, '년')}${sel('hxM', 1, 12, e.m, '월')}</div>
+      <label class="fam-l" for="hxW">어느 병원</label><input id="hxW" maxlength="40" value="${esc(e.where || '')}" placeholder="예) 경북대병원 순환기내과">
+      <label class="fam-l" for="hxN">메모 <small class="muted">선택</small></label><input id="hxN" maxlength="80" value="${esc(e.note || '')}" placeholder="예) 스텐트 2개 · 1년간 두 가지 피 묽게 하는 약">
+      <div class="actions two"><button type="button" class="btn primary" onclick="hxSave()">저장</button><button type="button" class="btn line" onclick="HXQ.open='';HXQ.edit=-1;route()">닫기</button></div></div>` : '';
+  return `<section class="sec card hx" id="hx"><h2 class="fam-h">내 병력 · 시술</h2>
+    <p class="small">어디서 진료받든 설명하기 쉽게 적어 두세요. 처음 가는 병원·응급실에서 <b>한 장으로 보여 줄 수 있어요.</b></p>
+    ${L.length ? `<ul class="fam-ul">${L.map(row).join('')}</ul>` : '<p class="small muted">아직 적은 것이 없어요.</p>'}
+    ${S.length ? `<div class="hx-sug"><p class="fam-l">드시는 약은 보통 이런 때 써요 <small class="muted">약만으로는 이유를 알 수 없어요. 해당하는 것만 눌러 적어 두세요 — 진단이 아니에요</small></p>${S.map(s => `<div class="hx-s"><b>${esc(s.d.name)}</b><div class="chips">${s.uses.map(u => L.some(x => x.t === u) ? `<span class="chip on" aria-disabled="true">${I.check} ${esc(u)} · 적어 둠</span>` : `<button type="button" class="chip" onclick="hxAdd(${esc(JSON.stringify(u))},${esc(JSON.stringify(s.d.name))})">${I.plus || '+'} ${esc(u)}</button>`).join('')}</div></div>`).join('')}<p class="small muted">출처: 식약처 의약품 허가사항(효능·효과)을 줄인 것</p></div>` : ''}
+    <div class="actions two"><button type="button" class="btn line" onclick="hxAdd('','')">직접 적기</button><button type="button" class="btn${L.length ? ' primary' : ' line'}" onclick="hxShow()">병원에서 보여 주기</button></div>
+    ${form}</section>`;
+};
+function hxAdd(t, src){ HXQ.open = 'add'; HXQ.pre = t || ''; HXQ.src = src || ''; HXQ.edit = -1; route(); setTimeout(() => document.getElementById('hxY')?.focus(), 50); }
+function hxEdit(i){ HXQ.open = 'edit'; HXQ.edit = i; HXQ.pre = ''; HXQ.src = ''; route(); }
+function hxDel(i){ if (!confirm('이 줄을 지울까요?')) return; const L = hxRead(); L.splice(i, 1); hxWrite(L); toast('지웠어요'); route(); }
+function hxSave(){ const v = id => (document.getElementById(id)?.value || '').trim(); const t = v('hxT').replace(/[<>]/g, '');
+  if (!t) { toast('무엇인지 적어 주세요'); document.getElementById('hxT')?.focus(); return; }
+  const L = hxRead(), x = { t: t.slice(0, 60), y: v('hxY') || '', m: v('hxM') || '', where: v('hxW').replace(/[<>]/g, '').slice(0, 40), note: v('hxN').replace(/[<>]/g, '').slice(0, 80) };
+  if (HXQ.edit >= 0 && L[HXQ.edit]) { x.src = L[HXQ.edit].src || ''; L[HXQ.edit] = x; } else { x.src = HXQ.src || ''; L.push(x); }
+  hxWrite(L); HXQ.open = ''; HXQ.edit = -1; toast('적어 두었어요'); route(); }
+/* 병원에서 보여 주기 — 화면 가득 큰 글씨 한 장(응급 정보라 늘 열림) */
+function hxShow(){
+  const L = hxRead(), meds = takingItems(), al = (ME.ae || []).map(x => x.n || x.id).filter(Boolean), cs = (typeof condOn === 'function' ? condOn() : []).map(c => Array.isArray(c) ? c[1] : ((typeof FLAG_LABEL !== 'undefined' && FLAG_LABEL[c]) || c));
+  const why = n => L.filter(x => x.src === n).map(x => x.t);
+  document.querySelectorAll('.hx-show').forEach(x => x.remove());
+  const el = document.createElement('div'); el.className = 'hx-show'; el.setAttribute('role', 'dialog'); el.setAttribute('aria-modal', 'true'); el.setAttribute('aria-label', '병원에서 보여 주기');
+  el.innerHTML = `<div class="hx-in"><button type="button" class="btn line hx-x" onclick="this.closest('.hx-show').remove()">${I.x} 닫기</button>
+    <h1>진료 보실 때 보여 주세요</h1><p class="small muted">${esc(new Date().toLocaleDateString('ko-KR'))} · 약지도에 본인·보호자가 적은 내용이에요</p>
+    <h2>병력 · 시술</h2>${L.length ? `<ul>${L.map(x => `<li><b>${esc(x.t)}</b>${x.y ? ` — ${esc(x.y)}년${x.m ? ' ' + esc(x.m) + '월' : ''}` : ''}${x.where ? ` · ${esc(x.where)}` : ''}${x.note ? `<br><span>${esc(x.note)}</span>` : ''}</li>`).join('')}</ul>` : '<p>적은 것이 없어요</p>'}
+    ${cs.length ? `<h2>건강 상태</h2><p>${cs.map(esc).join(' · ')}</p>` : ''}
+    <h2>드시는 약</h2>${meds.length ? `<ul>${meds.map(d => `<li><b>${esc(d.name)}</b>${why(d.name).length ? ` — ${esc(why(d.name).join(', '))} 때문에` : ''}</li>`).join('')}</ul>` : '<p>담은 약이 없어요</p>'}
+    <h2>약 알레르기 · 부작용</h2><p>${al.length ? al.map(esc).join(' · ') : '적은 것이 없어요'}</p></div>`;
+  document.body.appendChild(el); el.querySelector('.hx-x').focus();
+  /* 화면이 바뀌거나(뒤로 가기 포함) Esc 면 닫는다 — 덮인 채 남지 않게 */
+  const close = () => { el.remove(); removeEventListener('hashchange', close); removeEventListener('keydown', onKey); };
+  const onKey = e => { if (e.key === 'Escape') close(); };
+  addEventListener('hashchange', close); addEventListener('keydown', onKey);
+}
+Object.assign(window, { HXQ, hxAdd, hxEdit, hxDel, hxSave, hxShow });
+try { const st3 = document.createElement('style'); st3.textContent = '.hx-sug{margin-top:12px;padding-top:10px;border-top:1px dashed var(--hairline)}.hx-s{margin:8px 0}.hx-s b{display:block;margin-bottom:4px}.hx-s .chips{display:flex;flex-wrap:wrap;gap:6px}.hx-s .chip{min-height:44px;white-space:normal;text-align:left;display:inline-flex;align-items:center;gap:4px}.hx-sel{min-height:44px;padding:6px 10px;border:1.5px solid var(--ui-line);border-radius:12px;font:inherit;background:var(--card);color:var(--text)}'
+  + '.hx-show{position:fixed;inset:0;z-index:9999;background:var(--bg,#fff);overflow:auto;-webkit-overflow-scrolling:touch}.hx-in{max-width:720px;margin:0 auto;padding:16px 16px 48px;font-size:1.1875rem;line-height:1.6}.hx-in h1{font-size:1.625rem;margin:12px 0 4px}.hx-in h2{font-size:1.25rem;margin:20px 0 6px;padding-top:12px;border-top:2px solid var(--hairline)}.hx-in ul{margin:0;padding-left:1.1em}.hx-in li{margin:6px 0}.hx-in li span{color:var(--body)}.hx-x{width:auto;margin:0;float:right}@media print{.hx-x{display:none}}';
+  document.head.appendChild(st3); } catch (e) {}
+
 try { const st2 = document.createElement('style'); st2.textContent = '.fam-h{display:flex;align-items:center;justify-content:flex-start;gap:8px;margin:0 0 6px;font-size:1.125rem}.fam-h .i{width:22px;height:22px}.fam-s{margin:14px 0 4px;font-size:1rem;color:var(--muted)}.fam-ul{list-style:none;margin:0;padding:0}.fam-ul li{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;padding:10px 0;border-top:1px solid var(--hairline)}.fam-ul li>span:first-child{min-width:0}.fam-ul b{display:block;overflow-wrap:anywhere}.fam-ul small{display:block;color:var(--muted);font-size:.875rem}.fam-b{display:flex;align-items:center;gap:6px}.fam-b .btn{width:auto;min-height:44px;padding:0 14px;margin:0}.fam-b .link{min-height:44px;padding:0 8px}.fam-hot{background:var(--caution-tint);border-radius:12px;padding:10px!important}.fam-form{display:flex;flex-direction:column;gap:8px;margin-top:12px;padding-top:12px;border-top:1px dashed var(--hairline)}.fam-l{font-weight:700}.fam-form input:not([type=checkbox]){min-height:48px;padding:10px 12px;border:1.5px solid var(--ui-line);border-radius:12px;font:inherit;background:var(--card);color:var(--text)}.fam-rule{margin:6px 0 4px;padding-left:1.1em;color:var(--body);font-size:.9375rem;line-height:1.6}.fam-det{margin:4px 0;border:1px solid var(--hairline);border-radius:12px;padding:8px 12px}.fam-det summary{font-weight:700;cursor:pointer;min-height:40px;display:flex;align-items:center}.fam-det dl{margin:6px 0 0}.fam-det dt{font-weight:700;margin-top:8px}.fam-det dd{margin:2px 0 0;color:var(--body);font-size:.9375rem;line-height:1.6}.fam-off{display:block;min-height:44px;margin-top:6px}.fam-seg{display:flex;gap:6px}.fam-seg button{flex:1;min-height:44px;border:1.5px solid var(--ui-line);border-radius:12px;background:var(--card);color:var(--text);font:inherit;font-weight:700}.fam-seg button.on{background:var(--primary);color:var(--on-primary);border-color:var(--primary)}.fam-q{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.fam-q input{min-height:44px;padding:6px 10px;border:1.5px solid var(--ui-line);border-radius:12px;font:inherit;background:var(--card);color:var(--text)}.fam-q .btn{width:auto;margin:0;min-height:44px}.fam-ios{margin-top:10px}.fam-msg{padding:10px 12px;border-radius:12px;background:var(--accent-tint);color:var(--accent-text)}.nt-perm{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:10px 0 4px;padding:12px 14px;border-radius:14px;background:var(--accent-tint);color:var(--accent-text);font-size:1rem}.nt-perm.ok{background:var(--normal-tint);color:var(--normal)}.nt-perm .btn{width:auto;margin:0 0 0 auto;min-height:44px}.nt-list{padding:4px 16px}.nt-row{display:flex;align-items:center;gap:12px;padding:14px 0;border-top:1px solid var(--hairline)}.nt-row:first-child{border-top:0}.nt-ic{flex:none;width:40px;height:40px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;background:var(--tint);color:var(--primary-deep)}.nt-t{flex:1;min-width:0;display:flex;flex-direction:column}.nt-t b{font-size:1.0625rem}.nt-t small{color:var(--muted);font-size:.9375rem;margin-top:2px}.nt-row .sw{flex:none}'; document.head.appendChild(st2); } catch (e) {}
 window.계정카드 = () => { if (D.meta?.account !== true) return ''; const 나 = srvLoggedIn(), m = 나 ? (서버.세션()?.user?.email || '') : '';
   if (!나) return `<section class="sec card acct-card"><div class="acct-hd"><span class="acct-ic" aria-hidden="true">${I.user}</span><span><b>메디나눔 계정</b><small>폰을 바꿔도 약통·복용 기록을 이어 봐요 · 선택</small></span></div>
@@ -2136,7 +2252,7 @@ try { const css = document.createElement('style'); css.textContent = `
 .door-av{flex:none;width:44px;height:44px;border-radius:50%;background:var(--tint);color:var(--primary-deep);display:grid;place-items:center;font-weight:800;font-size:1.125rem}
 .door-me b{display:block;overflow-wrap:anywhere}.door-me small{display:block;color:var(--muted);font-size:.875rem}
 .door-social{display:flex;flex-direction:column;gap:8px}.door-soc{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;min-height:48px;border-radius:12px;font:600 1rem/1.2 inherit;font-family:inherit;cursor:pointer;touch-action:manipulation}
-.door-google{background:#fff;color:#1f1f1f;border:1px solid #747775}.door-kakao{background:#FEE500;color:rgba(0,0,0,.85);border:0}.door-soc:disabled{opacity:.45;cursor:not-allowed}.door-google svg{flex:none}
+.door-need{outline:2px solid var(--danger,#c0392b);outline-offset:4px;border-radius:10px}.door-need-msg{margin:-2px 0 6px;color:var(--danger,#c0392b);font-weight:700;font-size:.9375rem}.door-google{background:#fff;color:#1f1f1f;border:1px solid #747775}.door-kakao{background:#FEE500;color:rgba(0,0,0,.85);border:0}.door-soc:disabled{opacity:.45;cursor:not-allowed}.door-google svg{flex:none}
 .door-or{display:flex;align-items:center;gap:10px;color:var(--muted);font-size:.875rem}.door-or::before,.door-or::after{content:"";flex:1;border-top:1px solid var(--hairline)}
 @media (min-width:1024px){.nav-mark{align-items:center;gap:10px;padding:4px 8px 20px;text-decoration:none;color:var(--text)}.nav-mark img{border-radius:10px;flex:none}
 .nav-mark b{display:block;font-size:1.125rem;font-weight:800}.nav-mark small{display:block;font-size:.875rem;line-height:1.35;color:var(--muted)}

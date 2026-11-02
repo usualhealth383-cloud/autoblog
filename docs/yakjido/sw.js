@@ -9,7 +9,7 @@
                        판이 같으면 캐시 그대로, 판이 바뀌면 새로 받아 넣고 옛 판은 지운다(prune).
    판 없는 옛 주소는 «캐시 먼저» — 한 번 받은 것은 즉시 열리고, 뒤에서 조용히 새로 받아 둔다.
    인터넷이 안 되면 어느 캐시에든 있는 사본을 준다(5-01 — 첫 방문 뒤 비행기 모드에서 본문이 안 뜨던 것). */
-const CACHE = 'yakjido-2026-11-03T02:14-1e885ee6';
+const CACHE = 'yakjido-2026-11-03T02:48-198a8c14';
 const DATA = 'yakjido-data-v1';
 /* 기내 모드·바깥 파일 0(10-27) — 글꼴(fonts/)·로그인 프로그램(vendor/)은 배포 묶음 안. 판이 박힌 꾸러미라 내용이 안 바뀌니 «캐시 먼저», 앱 판이 바뀌어도 지우지 않는다(EXT).
    바깥 주소는 하나도 담지 않는다 — 서버 응답(supabase REST)·날씨는 그대로 지나간다(09-22 원칙) */
@@ -97,7 +97,7 @@ self.addEventListener('push', (e) => {
     const day = /^\d{4}-\d{2}-\d{2}$/.test(m.day || '') ? m.day : '';
     e.waitUntil(self.registration.showNotification(String(m.title || '약지도 · 약 드실 시간').slice(0, 60), {
       body: String(m.body || '').slice(0, 200), tag: m.key, renotify: false, requireInteraction: true, icon: 'icon-192.png', badge: 'icon-192.png',
-      data: { key: m.key, day, go: '' }, actions: [{ action: 'took', title: '먹었어요' }, { action: 'later', title: '10분 뒤 다시' }] }));
+      data: { key: m.key, day, go: '' }, actions: [{ action: 'took', title: String((m.acts || [])[0] || '먹었어요').slice(0, 20) }, { action: 'later', title: String((m.acts || [])[1] || '10분 뒤 다시').slice(0, 20) }] }));   // 단추 글도 본인 말로(11-03)
     return;
   }
   const go = /^#\/notify(\?[a-z0-9=&]*)?$/.test(m.go || '') ? m.go : '#/notify?fam=1';
