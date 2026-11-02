@@ -91,6 +91,15 @@ self.addEventListener('fetch', (e) => {
 /* 11-02 가족 알림 — 서버(yak-family-check)가 보낸 웹 푸시. 글은 약 이름 없이 「○○ · 오후 8:00 약 체크가 아직 없어요」 */
 self.addEventListener('push', (e) => {
   let m = {}; try { m = e.data ? e.data.json() : {}; } catch (x) {}
+  /* 11-03 본인 정시 알림 — 앱 안 알림과 같은 tag(약id@HH:MM,…)라 앱이 열려 있어 둘 다 와도 한 장으로 합쳐진다. 「먹었어요」·「10분 뒤 다시」는 아래 notificationclick 이 그대로 처리 */
+  const KEY = /^[A-Za-z0-9가-힣_.:\-]{1,80}@([01]\d|2[0-3]):[0-5]\d(,[A-Za-z0-9가-힣_.:\-]{1,80}@([01]\d|2[0-3]):[0-5]\d){0,30}$/;
+  if (m.kind === 'dose' && KEY.test(m.key || '')) {
+    const day = /^\d{4}-\d{2}-\d{2}$/.test(m.day || '') ? m.day : '';
+    e.waitUntil(self.registration.showNotification(String(m.title || '약지도 · 약 드실 시간').slice(0, 60), {
+      body: String(m.body || '').slice(0, 200), tag: m.key, renotify: false, requireInteraction: true, icon: 'icon-192.png', badge: 'icon-192.png',
+      data: { key: m.key, day, go: '' }, actions: [{ action: 'took', title: '먹었어요' }, { action: 'later', title: '10분 뒤 다시' }] }));
+    return;
+  }
   const go = /^#\/notify(\?[a-z0-9=&]*)?$/.test(m.go || '') ? m.go : '#/notify?fam=1';
   e.waitUntil(self.registration.showNotification(String(m.title || '약지도 가족 알림').slice(0, 60), {
     body: String(m.body || '').slice(0, 200), tag: String(m.tag || 'yakjido-family').slice(0, 80), renotify: true,
