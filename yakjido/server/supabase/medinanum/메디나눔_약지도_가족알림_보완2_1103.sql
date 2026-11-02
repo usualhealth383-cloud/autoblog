@@ -1,13 +1,37 @@
 -- ════════════════════════════════════════════════════════════════════════════
--- 약지도 가족 알림 보완(11-03 · GPT 개인정보 검수 반영) — 메디나눔_약지도_가족알림_1102.sql «뒤에» 돌린다
+-- 약지도 알림 보완2(11-03 · GPT 개인정보 검수 + 「개인 맞춤」) — 메디나눔_약지도_가족알림_1102.sql «뒤에» 돌린다(보완_1103 을 합친 판)
 --   ① 본인 허락 단계: 가족이 코드를 넣으면 «요청»(approved_at 비어 있음) → 본인이 상대 메일을 보고 허락해야 알림 시작
 --   ② 연결을 끊거나 거절하면 연결 줄을 지운다(보낸 기록도 함께 — on delete cascade). 만료된 초대 코드도 지운다
 --   ③ 코드 넣은 기록은 하루 지나면 지운다(초대·넣기 때마다)
+--   ④ 「오늘만 끄기」를 가족 기기의 자정까지로(muted_until · 시간대 무관) — yak_family_mute(p_id, p_until)
+--   ⑤ 본인 정시 알림 보낸 기록 yak_dose_sent(같은 날·같은 시각 한 번 · 30일 뒤 정리)
 -- 추가형: 칸 하나 더하기 + 함수 바꾸기. 표를 없애는 문장은 없다(delete 는 함수 «본문» 안에만). 여러 번 돌려도 같다. ⛔ 비밀 키 없음.
--- ⚠️ Edge Function yak-family-check 도 같이 다시 배포(허락된 연결만 보냄 · 알림 글 바뀜).
+-- ⚠️ Edge Function yak-family-check 도 같이 다시 배포(허락된 연결만 · 사람마다 시간대 · 본인 정시 알림 · 알림 글 바뀜).
 -- ════════════════════════════════════════════════════════════════════════════
 
 alter table public.yak_family_links add column if not exists approved_at timestamptz;   -- 본인이 허락한 때(비어 있으면 알림 안 감)
+alter table public.yak_family_links add column if not exists muted_until timestamptz;   -- 가족이 「오늘만 끄기」— 가족 기기의 그날 자정까지
+
+create table if not exists public.yak_dose_sent (
+  user_id  uuid not null references auth.users(id) on delete cascade,
+  day      date not null,
+  slot     text not null check (slot ~ '^[0-2][0-9]:[0-5][0-9]$'),
+  sent_at  timestamptz not null default now(),
+  primary key (user_id, day, slot)
+);
+alter table public.yak_dose_sent enable row level security;
+revoke all on public.yak_dose_sent from anon, authenticated;
+
+-- 가족: 이 분 알림 오늘만 끄기(p_until = 가족 기기의 오늘 자정 · 2일 넘게는 못 정함)
+create or replace function public.yak_family_mute(p_id uuid, p_until timestamptz)
+returns boolean language plpgsql security definer set search_path = public as $$
+declare v_n int;
+begin
+  if p_until is null or p_until <= now() or p_until > now() + interval '2 days' then raise exception 'bad until' using errcode = '22023'; end if;
+  update public.yak_family_links l set muted_until = p_until
+   where l.id = p_id and l.member_id = auth.uid() and l.ended_at is null;
+  get diagnostics v_n = row_count; return v_n > 0;
+end $$;
 
 create or replace function public.yak_family_invite(p_label text, p_consent boolean)
 returns table (code text, expires_at timestamptz)
@@ -76,12 +100,12 @@ returns table (id uuid, role text, label text, other_email text, status text, co
 language sql security definer set search_path = public as $$
   select l.id, 'owner', l.owner_label, u.email::text,
          case when l.member_id is null then 'waiting' when l.approved_at is null then 'asking' else 'linked' end,
-         l.code, l.code_expires, l.accepted_at, l.muted_day = (now() at time zone 'Asia/Seoul')::date
+         l.code, l.code_expires, l.accepted_at, coalesce(l.muted_until > now(), false)
     from public.yak_family_links l left join auth.users u on u.id = l.member_id
    where l.owner_id = auth.uid() and l.ended_at is null and (l.member_id is not null or l.code_expires > now())
   union all
   select l.id, 'member', l.owner_label, u.email::text, case when l.approved_at is null then 'asking' else 'linked' end,
-         null, null, l.accepted_at, l.muted_day = (now() at time zone 'Asia/Seoul')::date
+         null, null, l.accepted_at, coalesce(l.muted_until > now(), false)
     from public.yak_family_links l join auth.users u on u.id = l.owner_id
    where l.member_id = auth.uid() and l.ended_at is null
 $$;
@@ -105,5 +129,5 @@ begin
   get diagnostics v_n = row_count; return v_n;
 end $$;
 
-revoke all on function public.yak_family_approve(uuid, boolean), public.yak_family_list() from public, anon;
-grant execute on function public.yak_family_approve(uuid, boolean), public.yak_family_list() to authenticated;
+revoke all on function public.yak_family_approve(uuid, boolean), public.yak_family_list(), public.yak_family_mute(uuid, timestamptz) from public, anon;
+grant execute on function public.yak_family_approve(uuid, boolean), public.yak_family_list(), public.yak_family_mute(uuid, timestamptz) to authenticated;

@@ -12,4 +12,4 @@ select cron.schedule(
        timeout_milliseconds := 20000) $$
 );
 -- 보낸 기록 30일 지난 것 정리(매일 04:10 서울 = 19:10 UTC)
-select cron.schedule('yak-family-sent-trim', '10 19 * * *', $$ delete from public.yak_family_sent where day < (now() at time zone 'Asia/Seoul')::date - 30 $$);
+select cron.schedule('yak-family-sent-trim', '10 19 * * *', $$ delete from public.yak_family_sent where day < (now() at time zone 'Asia/Seoul')::date - 30; delete from public.yak_dose_sent where day < (now() at time zone 'Asia/Seoul')::date - 30 $$);   -- 11-03 본인 정시 알림 기록도(보완2 뒤 다시 돌리면 바뀜)
