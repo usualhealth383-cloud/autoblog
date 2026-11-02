@@ -336,10 +336,11 @@
     var g = document.getElementById('srvAgree'), a = document.getElementById('srvAge');
     if (!서버허용()) {
       if (!g || !g.checked) { 문필수('srvAgree', '「서버에 저장하기」에 체크해 주세요. 동의하지 않으셔도 약지도는 그대로 쓰실 수 있어요.'); return; }
-      if (typeof 설정.동의기록 === 'function') { try { 설정.동의기록(); } catch (e) {} }
     }
     /* 처음인지 미리 알 수 없어 늘 묻는다 — 메일의 「처음 만들 때 필수」와 같은 체크 */
     if (설정.가입확인 && (!a || !a.checked)) { 문필수('srvAge', 소셜이름[p] + '로 계속하려면 「' + 설정.가입확인.글 + '」에 체크해 주세요.'); return; }
+    /* 동의 기록은 모든 확인이 끝난 뒤 — 먼저 적으면 화면이 다시 그려져 방금 띄운 안내가 사라졌다(11-03) */
+    if (!서버허용() && typeof 설정.동의기록 === 'function') { try { 설정.동의기록(); } catch (e) {} }
     var 앱id = 네이티브() && window.껍데기 && window.껍데기.appId ? window.껍데기.appId : '';
     var 돌아올 = 앱id ? 앱id + '://login' : 앱주소();
     문말(소셜이름[p] + '로 넘어가는 중이에요…');
@@ -405,11 +406,11 @@
     var g = document.getElementById('srvAgree'), a = document.getElementById('srvAge'), em = document.getElementById('srvEmail'), pw = document.getElementById('srvPw');
     if (!서버허용()) {
       if (!g || !g.checked) { 문필수('srvAgree', '「서버에 저장하기」에 체크해 주세요. 동의하지 않으셔도 약지도는 그대로 쓰실 수 있어요.'); return; }
-      if (typeof 설정.동의기록 === 'function') { try { 설정.동의기록(); } catch (e) {} }
     }
     if (what === 'signup' && 설정.가입확인 && (!a || !a.checked)) { 문필수('srvAge', '계정을 만들려면 「' + 설정.가입확인.글 + '」에 체크해 주세요.'); return; }
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(((em || {}).value || '').trim())) { 문말('이메일 주소를 다시 확인해 주세요.'); if (em) em.focus(); return; }
     if (what !== 'reset' && ((pw || {}).value || '').length < 6) { 문말('비밀번호는 6자 이상이에요.'); if (pw) pw.focus(); return; }
+    if (!서버허용() && typeof 설정.동의기록 === 'function') { try { 설정.동의기록(); } catch (e) {} }   /* 확인이 다 끝난 뒤에 적는다 */
     문말(what === 'reset' ? '메일을 보내는 중이에요…' : '잠시만요…');
     return window.계정동작(what);
   };
