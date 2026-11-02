@@ -2003,9 +2003,10 @@ async function famPush(){
   const p = await Notification.requestPermission(); if (p !== 'granted') throw new Error('denied');
   const reg = await navigator.serviceWorker.ready; let sub = await reg.pushManager.getSubscription();
   if (!sub) sub = await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: b64u(FAM_VAPID) });
-  const j = sub.toJSON(); await famRpc('yak_push_save', { p_endpoint: j.endpoint, p_p256dh: j.keys.p256dh, p_auth: j.keys.auth });
-  /* 11-03 공용 푸시(mn-push-check)로 바뀔 때를 위해 공용 표에도(서버에 아직 없으면 그냥 넘어감) */
-  try { await famRpc('mn_push_save', { p_app: 'yakjido', p_endpoint: j.endpoint, p_p256dh: j.keys.p256dh, p_auth: j.keys.auth, p_lang: typeof LANG !== 'undefined' ? LANG : 'ko', p_tz: Intl.DateTimeFormat().resolvedOptions().timeZone || 'Asia/Seoul' }); } catch (e) {}
+  const j = sub.toJSON();
+  /* 11-03 서버가 공용 푸시(mn-push-check)로 바뀜 — 공용 표가 정본. 옛 yak_push_subs 는 남겨 두되 실패해도 넘어감 */
+  await famRpc('mn_push_save', { p_app: 'yakjido', p_endpoint: j.endpoint, p_p256dh: j.keys.p256dh, p_auth: j.keys.auth, p_lang: typeof LANG !== 'undefined' ? LANG : 'ko', p_tz: Intl.DateTimeFormat().resolvedOptions().timeZone || 'Asia/Seoul' });
+  try { await famRpc('yak_push_save', { p_endpoint: j.endpoint, p_p256dh: j.keys.p256dh, p_auth: j.keys.auth }); } catch (e) {}
 }
 function famJoin(){ const c = (document.getElementById('famCode')?.value || '').replace(/\D/g, ''); FAMQ.code = c;
   if (c.length !== 6) { FAMQ.msg = '6자리 숫자를 넣어 주세요.'; route(); return; }
