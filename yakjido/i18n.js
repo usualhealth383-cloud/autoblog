@@ -26,7 +26,7 @@
   st.textContent = '.lang-ja body,.lang-ja button,.lang-ja input,.lang-ja textarea{font-family:"Hiragino Sans","Hiragino Kaku Gothic ProN","Noto Sans CJK JP","Noto Sans JP","Yu Gothic UI","Meiryo","Pretendard Variable",system-ui,sans-serif}.lang-zh body,.lang-zh button,.lang-zh input,.lang-zh textarea{font-family:"PingFang SC","Hiragino Sans GB","Noto Sans CJK SC","Noto Sans SC","Microsoft YaHei","Pretendard Variable",system-ui,sans-serif}' +
     '.lang-ja *,.lang-zh *{word-break:normal!important;line-break:strict;overflow-wrap:anywhere}.lang-en *,.lang-es *{word-break:normal!important;overflow-wrap:break-word}' +
     'html:not(.lang-ko) .review-stamp{white-space:normal;flex:0 1 auto;min-width:0;text-align:right;line-height:1.25}html:not(.lang-ko) .chip,html:not(.lang-ko) .hq-c{white-space:normal;max-width:100%;min-width:0;overflow-wrap:anywhere}' +
-    '.i18n-note{display:flex;flex-wrap:wrap;gap:4px 10px;align-items:center;margin:6px 0 12px;font-size:.8125rem;color:var(--muted)}.i18n-note button{color:var(--primary);font-weight:600;min-height:36px}';
+    '.i18n-note{display:flex;flex-wrap:wrap;gap:4px 10px;align-items:center;margin:24px 0 8px;padding-top:10px;border-top:1px solid var(--hairline);font-size:.8125rem;color:var(--muted)}.i18n-note button{color:var(--primary);font-weight:600;min-height:36px}';
   document.head.appendChild(st);
 
   function 받기() {
@@ -86,7 +86,7 @@
     todo.forEach(function (n) {
       if (n.parentNode && /^(SCRIPT|STYLE|TEXTAREA)$/.test(n.parentNode.nodeName)) return;
       var v = n.nodeValue, t = L !== 'ko' ? 글(v) : null;
-      if (t != null) { var lead = v.match(/^\s*/)[0], tail = v.match(/\s*$/)[0]; v = lead + t + tail; }
+      if (t != null) { var lead = v.match(/^\s*/)[0], tail = v.match(/\s*$/)[0]; if (/^[.,:;!?。，、．）)]/.test(t)) lead = ''; v = lead + t + tail; }   /* 굵은 글씨로 나뉜 문장 — 「labels .」 빈칸 없애기 */
       v = 번호(v); if (v !== n.nodeValue) n.nodeValue = v;
     });
     el.querySelectorAll('[placeholder],[aria-label],[title]').forEach(function (e) {
@@ -96,10 +96,9 @@
   }
   function 알림줄(view) {
     if (L === 'ko' || !view || view.querySelector('.i18n-note')) return;
-    var top = view.querySelector('.topfind') || view.querySelector('.top');
     var d = document.createElement('div'); d.className = 'i18n-note';
     d.innerHTML = '<span>' + NOTE[L] + '</span><button type="button" onclick="setLang(\'ko\')">' + ORIG[L] + '</button>';
-    if (top && top.parentNode) top.parentNode.insertBefore(d, top.nextSibling); else view.insertBefore(d, view.firstChild);
+    view.appendChild(d);   /* 11-03 Main — 첫 3초에 경고가 먼저 보이지 않게 화면 맨 아래 작은 한 줄로(첫 진입 경고 벽 금지) */
     /* 약 용량 칸 — 「한국 허가 기준 — 사는 나라 약사와 확인」 */
     view.querySelectorAll('.dose-card,.dose-hero,.sv-dose').forEach(function (c) { if (c.querySelector('.i18n-kr')) return; var p = document.createElement('p'); p.className = 'i18n-kr small muted'; p.textContent = KRNOTE[L]; c.appendChild(p); });
   }
