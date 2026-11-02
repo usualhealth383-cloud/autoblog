@@ -2491,7 +2491,7 @@ function psSwap(root){
   });
 }
 /* 다섯 언어(10-27) — 언어는 기기·설정, 번호는 «있는 나라». 한국어·한국이면 번역 장치를 받지 않는다(i18n.js) */
-const LANG = (() => { try { const v = localStorage.getItem('yakjido.lang'); if (/^(ko|en|es|ja|zh)$/.test(v)) return v; } catch (e) {} const n = (navigator.language || 'ko').slice(0, 2).toLowerCase(); return /^(ko|en|es|ja|zh)$/.test(n) ? n : 'en'; })();
+const LANG = (() => { try { const v = localStorage.getItem('yakjido.lang'); if (/^(ko|en|es|ja|zh)$/.test(v)) return v; } catch (e) {} const n = (navigator.language || 'ko').slice(0, 2).toLowerCase(); return /^(ko|en|es|ja|zh)$/.test(n) ? n : 'ko'; })();
 /* 나라 = 응급 번호. ① 고른 나라 ② 기기 시간대(영어 폰을 쓰는 한국 거주자도 119 — 10-27 곁에에서 발견) ③ 언어 지역 꼬리. 시간대가 표 밖 나라면 'XX'(모르는 나라 → 112) */
 const CC = (() => { try { const v = localStorage.getItem('yakjido.cc'); if (v) return v; } catch (e) {}
   let tz = ''; try { tz = Intl.DateTimeFormat().resolvedOptions().timeZone || ''; } catch (e) {}
