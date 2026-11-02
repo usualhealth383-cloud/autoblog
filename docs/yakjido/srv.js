@@ -1881,6 +1881,8 @@ window.문_notify = (_, q) => {
    서버: 함수 yak_family_* · yak_push_* (메디나눔_약지도_가족알림_1102.sql) + 예약 함수 yak-family-check. meta.family 가 true 일 때만 보인다(되는 척 금지). */
 const FAMQ = { list: null, busy: false, open: '', msg: '', code: null };
 const famOn = () => D.meta?.family === true && D.meta?.account === true;
+/* 웹 푸시 공개 열쇠(공개 값 · 개인 열쇠는 서버 Vault) — 첫 화면 예산 때문에 meta 가 아니라 여기 */
+const FAM_VAPID = 'BLPdgoz3Tcdtm5wQNBSpBKelzaoP_TJ-_iA98wIAlUFmxfL0kKO3MePDvALZMryA8pUMy4r7Mcp5D1JgZPfptSo';
 const famRpc = (fn, args) => 서버.준비().then(sb => sb.rpc(fn, args || {})).then(r => { if (r.error) throw r.error; return r.data; });
 function famLoad(){ if (FAMQ.busy) return; FAMQ.busy = true; famRpc('yak_family_list').then(d => { FAMQ.list = d || []; }).catch(() => { FAMQ.list = []; FAMQ.msg = '가족 연결을 불러오지 못했어요. 잠시 뒤 다시 열어 주세요.'; }).finally(() => { FAMQ.busy = false; if (/^#\/notify/.test(location.hash)) route(); }); }
 const famWhen = t => { try { return new Date(t).toLocaleString('ko-KR', { month: 'long', day: 'numeric', hour: 'numeric', minute: '2-digit' }); } catch (e) { return ''; } };
@@ -1888,54 +1890,82 @@ function famCard(q){
   if (!famOn()) return '';
   if (q.code && /^\d{6}$/.test(q.code) && !FAMQ.open) { FAMQ.open = 'join'; FAMQ.code = q.code; }
   const head = `<h2 class="fam-h" id="fam">가족에게 알리기</h2>`;
-  if (!srvLoggedIn()) return `<section class="sec card fam">${head}<p>약 체크를 놓치면 가족 휴대폰에 알림이 가요. 가족이 보낸 코드를 넣어 알림을 받을 수도 있어요. 두 분 모두 로그인이 필요해요.</p>
+  /* 11-03 GPT 개인정보 검수 — 「체크 기록 없음 ≠ 안 드심」, 언제·얼마나·멈추는 조건을 동의 전에 보이게 */
+  const lead = `<p>약을 드셨는지 체크한 기록이 없으면 연결한 가족에게 알려요. <b>약을 안 드셨다고 확인된 것은 아니에요.</b></p>
+    <ul class="fam-rule"><li>정한 복용 시각에서 2시간이 지난 뒤, 15분마다 하는 확인 때 보내요</li><li>가족 한 분당 하루 최대 2번 · 한국 시각 밤 10시부터 아침 7시까지는 새 알림을 보내지 않아요</li><li>약 이름은 보내지 않아요</li><li>내 기록이 서버에 3일 넘게 올라오지 않으면 알림도 멈춰요. 알림이 없다고 약 체크가 잘되고 있다는 뜻은 아니에요</li></ul>`;
+  if (!srvLoggedIn()) return `<section class="sec card fam">${head}${lead}<p>가족이 보낸 코드를 넣어 알림을 받을 수도 있어요. 두 분 모두 로그인이 필요해요.</p>
     <button type="button" class="btn line" onclick="go('/login')">${I.user} 로그인하고 켜기</button></section>`;
   if (FAMQ.list == null) { famLoad(); return `<section class="sec card fam">${head}<p class="small muted">불러오는 중이에요…</p></section>`; }
   const mine = FAMQ.list.filter(x => x.role === 'owner'), watch = FAMQ.list.filter(x => x.role === 'member');
   const ownRow = x => x.status === 'waiting'
-    ? `<li><span><b>코드 ${esc(x.code)}</b><small>${esc(famWhen(x.code_expires))}까지 · 가족이 넣으면 연결돼요</small></span><span class="fam-b"><button type="button" class="btn line" onclick="famShare('${esc(x.code)}')">보내기</button><button type="button" class="link" onclick="famEnd('${x.id}')">취소</button></span></li>`
-    : `<li><span><b>${esc(x.other_email || '가족')}</b><small>연결됨 · 체크가 없으면 이 분께 알려요</small></span><span class="fam-b"><button type="button" class="link" onclick="famEnd('${x.id}')">끊기</button></span></li>`;
-  const watchRow = x => `<li${q.fam ? ' class="fam-hot"' : ''}><span><b>${esc(x.label)}</b><small>${x.muted_today ? '오늘은 알림을 멈췄어요' : '약 체크가 없으면 이 휴대폰으로 알려 드려요'}</small></span><span class="fam-b">${x.muted_today ? '' : `<button type="button" class="btn line" onclick="famMute('${x.id}')">오늘은 그만</button>`}<button type="button" class="link" onclick="famEnd('${x.id}')">끊기</button></span></li>`;
+    ? `<li><span><b>코드 ${esc(x.code)}</b><small>${esc(famWhen(x.code_expires))}까지 · 받은 분이 넣으면 연결 요청이 와요</small></span><span class="fam-b"><button type="button" class="btn line" onclick="famShare('${esc(x.code)}')">보내기</button><button type="button" class="link" onclick="famEnd('${x.id}')">취소</button></span></li>`
+    : x.status === 'asking'
+    ? `<li class="fam-hot"><span><b>코드를 받은 분이 연결을 요청했어요</b><small>계정 이메일: <span>${esc(x.other_email || '')}</span><br>이 분께 내 약 체크 알림을 보내도 될까요?</small></span><span class="fam-b"><button type="button" class="btn primary" onclick="famApprove('${x.id}',true)">연결 허락</button><button type="button" class="link" onclick="famApprove('${x.id}',false)">거절</button></span></li>`
+    : `<li><span><b>${esc(x.other_email || '가족')}</b><small>연결됨 · 체크 기록이 없으면 이 분께 알려요</small></span><span class="fam-b"><button type="button" class="link" onclick="famEnd('${x.id}')">끊기</button></span></li>`;
+  const watchRow = x => x.status === 'asking'
+    ? `<li><span><b>${esc(x.label)}</b><small>상대가 허락하면 알림이 시작돼요</small></span><span class="fam-b"><button type="button" class="link" onclick="famEnd('${x.id}')">취소</button></span></li>`
+    : `<li${q.fam ? ' class="fam-hot"' : ''}><span><b>${esc(x.label)}</b><small>${x.muted_today ? '오늘은 이 분의 새 알림을 보내지 않아요. 연결은 유지돼요.' : '약 체크 기록이 없으면 이 휴대폰으로 알려 드려요'}</small></span><span class="fam-b">${x.muted_today ? '' : `<button type="button" class="btn line" onclick="famMute('${x.id}')">이 분 알림 오늘만 끄기</button>`}<button type="button" class="link" onclick="famEnd('${x.id}')">끊기</button></span></li>`;
+  const tag = '<em class="door-tag">선택</em>';
   const invite = FAMQ.open === 'invite' ? `<div class="fam-form">
       <label class="fam-l" for="famLabel">가족 화면에 보일 내 이름</label><input id="famLabel" maxlength="20" placeholder="예) 엄마" autocomplete="off">
-      <label class="door-ck"><input id="famOk" type="checkbox"><span><b>약 체크 여부를 연결한 가족에게 알리는 데 동의해요 <em class="door-tag">필수</em></b><small>정한 시각에서 2시간이 지나도 체크가 없으면 연결한 가족(최대 3명) 휴대폰에 「아직 체크가 없어요」 알림이 가요. <b>약 이름은 보내지 않아요.</b> 하루 2번까지, 밤 10시부터 아침 7시까지는 보내지 않아요. 언제든 여기서 끊을 수 있어요.</small></span></label>
+      <p class="small muted">연결한 가족과 아직 쓰지 않은 초대 코드를 합쳐 최대 3개까지 만들 수 있어요. 코드는 24시간 안에 한 번만 쓸 수 있고, 받은 분이 로그인해 연결을 요청하면 내가 허락해야 알림이 시작돼요.</p>
+      <details class="fam-det" open><summary>제공 내용 자세히</summary><dl>
+        <dt>받는 분</dt><dd>내가 허락해 연결한 가족(최대 3명)</dd>
+        <dt>보내는 정보</dt><dd>내가 정한 이름(호칭), 내 계정 이메일, 복용 예정 시각, 그 시각의 체크 기록이 없다는 것. 약 이름·병·복용 기록 전체는 보내지 않아요</dd>
+        <dt>사용 목적</dt><dd>약을 놓쳤을 수 있을 때 가족이 안부를 확인하려고</dd>
+        <dt>받는 분의 보유·이용</dt><dd>안부 확인에만 쓰고, 연결을 끊거나 필요 없어지면 지우도록 안내해요. 끊으면 새 알림은 바로 멈춰요. 이미 도착한 알림은 가족 휴대폰에서 직접 지워야 해요</dd>
+        <dt>해외 전달</dt><dd>알림은 가족이 쓰는 브라우저·기기 회사(구글·애플·모질라 — 미국 등)의 알림 서버를 거쳐 가요. 전달을 기다리는 동안 최대 1시간 머물 수 있어요</dd>
+        <dt>잠금화면</dt><dd>호칭과 복용 시각이 가족 휴대폰 잠금화면에 보일 수 있어요</dd>
+        <dt>동의하지 않으면</dt><dd>가족 알림만 쓸 수 없어요. 다른 기능은 그대로 쓸 수 있어요</dd></dl></details>
+      <label class="door-ck"><input id="famOk" type="checkbox"><span><b>복용 예정 시각과 약 체크 기록 같은 건강정보를 가족 알림에 쓰고, 연결한 가족에게 제공하는 데 동의해요 ${tag}</b></span></label>
+      <label class="door-ck"><input id="famOk2" type="checkbox"><span><b>가족 알림을 전달하려고 알림 내용이 해외 알림 서버를 거치는 데 동의해요 ${tag}</b></span></label>
       <button type="button" class="btn primary" onclick="famInvite()">동의하고 코드 만들기</button></div>` : '';
   const join = FAMQ.open === 'join' ? `<div class="fam-form">
       <label class="fam-l" for="famCode">가족에게 받은 6자리 코드</label><input id="famCode" inputmode="numeric" maxlength="6" autocomplete="one-time-code" value="${esc(FAMQ.code || '')}">
-      <p class="small muted">연결하면 상대에게 내 메일 주소가 보이고, 알림은 이 휴대폰으로 와요. 알림 허락을 한 번 여쭤요.</p>
-      <button type="button" class="btn primary" onclick="famJoin()">연결하고 알림 받기</button></div>` : '';
-  return `<section class="sec card fam">${head}
-    <p>약 체크를 놓치면 가족 휴대폰에 알림이 가요. 정한 시각 2시간 뒤 · 하루 2번까지 · 약 이름은 빼고요.</p>
+      <details class="fam-det" open><summary>연결하기 전에 확인해 주세요</summary><dl>
+        <dt>상대에게 보이는 것</dt><dd>내 계정 이메일 — 서로 연결한 사람이 맞는지 확인하려고요</dd>
+        <dt>받는 정보</dt><dd>상대가 정한 이름(호칭), 복용 예정 시각, 그 시각의 체크 기록이 없다는 것. 약을 안 드셨다는 뜻은 아니에요</dd>
+        <dt>받은 정보는</dt><dd>안부 확인에만 써 주세요. 연결을 끊거나 필요 없어지면 휴대폰에서 지워 주세요. 이미 도착한 알림은 자동으로 지워지지 않아요</dd>
+        <dt>잠금화면</dt><dd>호칭과 복용 시각이 이 휴대폰 잠금화면에 보일 수 있어요. 원하지 않으면 휴대폰 설정에서 알림 미리보기를 꺼 주세요</dd>
+        <dt>해외 전달</dt><dd>알림은 이 휴대폰의 브라우저·기기 회사 알림 서버(미국 등)를 거쳐 와요</dd>
+        <dt>동의하지 않으면</dt><dd>연결하지 않아도 돼요. 다른 기능은 그대로 쓸 수 있어요</dd></dl></details>
+      <label class="door-ck"><input id="famJoinOk" type="checkbox"><span><b>내 계정 이메일을 상대에게 보여 주고, 위 내용으로 알림을 받는 데 동의해요 ${tag}</b></span></label>
+      <p class="small muted">상대가 허락하면 알림이 시작돼요. 알림 허락을 한 번 여쭤요.</p>
+      <button type="button" class="btn primary" onclick="famJoin()">동의하고 연결 요청하기</button></div>` : '';
+  return `<section class="sec card fam">${head}${lead}
     ${FAMQ.msg ? `<p class="fam-msg" role="status">${esc(FAMQ.msg)}</p>` : ''}
     ${mine.length ? `<h3 class="fam-s">내 약 체크를 받는 가족</h3><ul class="fam-ul">${mine.map(ownRow).join('')}</ul>` : ''}
-    ${watch.length ? `<h3 class="fam-s">내가 챙기는 분</h3><ul class="fam-ul">${watch.map(watchRow).join('')}</ul>` : ''}
+    ${watch.length ? `<h3 class="fam-s">내가 챙기는 분</h3><ul class="fam-ul">${watch.map(watchRow).join('')}</ul><button type="button" class="link fam-off" onclick="famPushOff()">이 휴대폰에서 가족 알림 받기 끄기</button>` : ''}
     <div class="actions two">${mine.length < 3 ? `<button type="button" class="btn line" aria-expanded="${FAMQ.open === 'invite'}" onclick="FAMQ.open=FAMQ.open==='invite'?'':'invite';FAMQ.msg='';route()">가족 초대하기</button>` : ''}<button type="button" class="btn line" aria-expanded="${FAMQ.open === 'join'}" onclick="FAMQ.open=FAMQ.open==='join'?'':'join';FAMQ.msg='';route()">받은 코드 넣기</button></div>
     ${invite}${join}</section>`;
 }
 const famErr = e => { const m = String((e && (e.message || e.code)) || e); return /family limit/.test(m) ? '가족은 3명까지 연결할 수 있어요.' : /too many/.test(m) ? '코드를 너무 여러 번 넣었어요. 한 시간 뒤에 다시 해 주세요.' : /self/.test(m) ? '내가 만든 코드예요. 가족 휴대폰에서 넣어 주세요.' : /already/.test(m) ? '이미 연결된 분이에요.' : /nopush/.test(m) ? '이 브라우저는 알림을 받을 수 없어요. 아이폰은 사파리 공유 → 홈 화면에 추가한 뒤 그 아이콘으로 열어 주세요.' : /denied/.test(m) ? '알림이 막혀 있어요. 위의 안내대로 알림을 허용한 뒤 다시 눌러 주세요.' : '잠시 뒤 다시 해 주세요.'; };
 function famShare(code){ const url = (D.meta?.webUrl || 'https://yakjido.medinanum.com/') + '#/notify?code=' + code;
   shareOut({ title: '약지도 가족 알림', text: `[약지도] 제 약 체크를 놓치면 알려 주는 가족 알림 코드예요: ${code} (24시간)\n약지도 → 내 정보 → 알림 설정 → 받은 코드 넣기\n${url}` }).catch(() => {}); }
-function famInvite(){ const ok = document.getElementById('famOk'); if (!ok || !ok.checked) { FAMQ.msg = '동의에 체크해 주셔야 코드를 만들 수 있어요.'; route(); return; }
+function famInvite(){ const ok = document.getElementById('famOk'), ok2 = document.getElementById('famOk2'); if (!ok || !ok.checked || !ok2 || !ok2.checked) { FAMQ.msg = '가족 알림을 쓰려면 두 가지 동의에 모두 체크해 주세요. 동의하지 않아도 다른 기능은 그대로 쓸 수 있어요.'; route(); return; }
   const label = (document.getElementById('famLabel')?.value || '').trim() || '가족';
   famRpc('yak_family_invite', { p_label: label, p_consent: true }).then(d => { const c = d && d[0] && d[0].code; FAMQ.open = ''; FAMQ.msg = c ? `코드 ${c} 를 만들었어요. 가족에게 보내 주세요.` : ''; FAMQ.list = null; if (c) famShare(c); })
     .catch(e => { FAMQ.msg = famErr(e); }).finally(() => route()); }
 const b64u = s => { const p = '='.repeat((4 - s.length % 4) % 4), b = atob((s + p).replace(/-/g, '+').replace(/_/g, '/')); return Uint8Array.from(b, c => c.charCodeAt(0)); };
 async function famPush(){
-  if (!('serviceWorker' in navigator) || !('PushManager' in window) || !D.meta?.familyVapid) throw new Error('nopush');
+  if (!('serviceWorker' in navigator) || !('PushManager' in window) || !FAM_VAPID) throw new Error('nopush');
   const p = await Notification.requestPermission(); if (p !== 'granted') throw new Error('denied');
   const reg = await navigator.serviceWorker.ready; let sub = await reg.pushManager.getSubscription();
-  if (!sub) sub = await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: b64u(D.meta.familyVapid) });
+  if (!sub) sub = await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: b64u(FAM_VAPID) });
   const j = sub.toJSON(); await famRpc('yak_push_save', { p_endpoint: j.endpoint, p_p256dh: j.keys.p256dh, p_auth: j.keys.auth });
 }
 function famJoin(){ const c = (document.getElementById('famCode')?.value || '').replace(/\D/g, ''); FAMQ.code = c;
   if (c.length !== 6) { FAMQ.msg = '6자리 숫자를 넣어 주세요.'; route(); return; }
+  if (!document.getElementById('famJoinOk')?.checked) { FAMQ.msg = '연결하려면 동의에 체크해 주세요. 연결하지 않아도 다른 기능은 그대로 쓸 수 있어요.'; route(); return; }
   famPush().then(() => famRpc('yak_family_accept', { p_code: c })).then(d => { if (!d || !d.length) { FAMQ.msg = '코드가 맞지 않거나 24시간이 지났어요. 가족에게 새 코드를 받아 주세요.'; return; }
-      FAMQ.open = ''; FAMQ.code = null; FAMQ.list = null; FAMQ.msg = `${d[0].owner_label} 님과 연결됐어요. 약 체크가 없으면 이 휴대폰으로 알려 드려요.`; })
+      FAMQ.open = ''; FAMQ.code = null; FAMQ.list = null; FAMQ.msg = `${d[0].owner_label} 님께 연결을 요청했어요. 상대가 허락하면 알림이 시작돼요.`; })
     .catch(e => { FAMQ.msg = famErr(e); }).finally(() => route()); }
-function famEnd(id){ if (!confirm('연결을 끊을까요? 바로 알림이 멈춰요.')) return; famRpc('yak_family_end', { p_id: id }).then(() => { FAMQ.list = null; FAMQ.msg = '끊었어요.'; }).catch(e => { FAMQ.msg = famErr(e); }).finally(() => route()); }
+function famEnd(id){ if (!confirm('연결을 끊을까요? 새 알림은 바로 멈추고 연결 기록은 지워요.')) return; famRpc('yak_family_end', { p_id: id }).then(() => { FAMQ.list = null; FAMQ.msg = '끊었어요.'; }).catch(e => { FAMQ.msg = famErr(e); }).finally(() => route()); }
 function famMute(id){ famRpc('yak_family_mute', { p_id: id }).then(() => { FAMQ.list = null; FAMQ.msg = '오늘은 알림을 보내지 않을게요.'; }).catch(e => { FAMQ.msg = famErr(e); }).finally(() => route()); }
-Object.assign(window, { FAMQ, famShare, famInvite, famJoin, famEnd, famMute });
-try { const st2 = document.createElement('style'); st2.textContent = '.fam-h{display:flex;align-items:center;justify-content:flex-start;gap:8px;margin:0 0 6px;font-size:1.125rem}.fam-h .i{width:22px;height:22px}.fam-s{margin:14px 0 4px;font-size:1rem;color:var(--muted)}.fam-ul{list-style:none;margin:0;padding:0}.fam-ul li{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;padding:10px 0;border-top:1px solid var(--hairline)}.fam-ul li>span:first-child{min-width:0}.fam-ul b{display:block;overflow-wrap:anywhere}.fam-ul small{display:block;color:var(--muted);font-size:.875rem}.fam-b{display:flex;align-items:center;gap:6px}.fam-b .btn{width:auto;min-height:44px;padding:0 14px;margin:0}.fam-b .link{min-height:44px;padding:0 8px}.fam-hot{background:var(--caution-tint);border-radius:12px;padding:10px!important}.fam-form{display:flex;flex-direction:column;gap:8px;margin-top:12px;padding-top:12px;border-top:1px dashed var(--hairline)}.fam-l{font-weight:700}.fam-form input:not([type=checkbox]){min-height:48px;padding:10px 12px;border:1.5px solid var(--ui-line);border-radius:12px;font:inherit;background:var(--card);color:var(--text)}.fam-msg{padding:10px 12px;border-radius:12px;background:var(--accent-tint);color:var(--accent-text)}.nt-perm{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:10px 0 4px;padding:12px 14px;border-radius:14px;background:var(--accent-tint);color:var(--accent-text);font-size:1rem}.nt-perm.ok{background:var(--normal-tint);color:var(--normal)}.nt-perm .btn{width:auto;margin:0 0 0 auto;min-height:44px}.nt-list{padding:4px 16px}.nt-row{display:flex;align-items:center;gap:12px;padding:14px 0;border-top:1px solid var(--hairline)}.nt-row:first-child{border-top:0}.nt-ic{flex:none;width:40px;height:40px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;background:var(--tint);color:var(--primary-deep)}.nt-t{flex:1;min-width:0;display:flex;flex-direction:column}.nt-t b{font-size:1.0625rem}.nt-t small{color:var(--muted);font-size:.9375rem;margin-top:2px}.nt-row .sw{flex:none}'; document.head.appendChild(st2); } catch (e) {}
+function famApprove(id, ok){ famRpc('yak_family_approve', { p_id: id, p_ok: !!ok }).then(() => { FAMQ.list = null; FAMQ.msg = ok ? '연결했어요. 이제 약 체크 기록이 없으면 이 분께 알려요.' : '거절했어요. 연결 요청을 지웠어요.'; }).catch(e => { FAMQ.msg = famErr(e); }).finally(() => route()); }
+async function famPushOff(){ try { const reg = await navigator.serviceWorker.ready, sub = await reg.pushManager.getSubscription(); if (sub) { await famRpc('yak_push_drop', { p_endpoint: sub.endpoint }).catch(() => {}); await sub.unsubscribe(); } FAMQ.msg = '이 휴대폰에서 가족 알림 받기를 껐어요. 등록된 알림 주소도 지웠어요.'; } catch (e) { FAMQ.msg = famErr(e); } route(); }
+Object.assign(window, { FAMQ, famShare, famInvite, famJoin, famEnd, famMute, famApprove, famPushOff });
+try { const st2 = document.createElement('style'); st2.textContent = '.fam-h{display:flex;align-items:center;justify-content:flex-start;gap:8px;margin:0 0 6px;font-size:1.125rem}.fam-h .i{width:22px;height:22px}.fam-s{margin:14px 0 4px;font-size:1rem;color:var(--muted)}.fam-ul{list-style:none;margin:0;padding:0}.fam-ul li{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;padding:10px 0;border-top:1px solid var(--hairline)}.fam-ul li>span:first-child{min-width:0}.fam-ul b{display:block;overflow-wrap:anywhere}.fam-ul small{display:block;color:var(--muted);font-size:.875rem}.fam-b{display:flex;align-items:center;gap:6px}.fam-b .btn{width:auto;min-height:44px;padding:0 14px;margin:0}.fam-b .link{min-height:44px;padding:0 8px}.fam-hot{background:var(--caution-tint);border-radius:12px;padding:10px!important}.fam-form{display:flex;flex-direction:column;gap:8px;margin-top:12px;padding-top:12px;border-top:1px dashed var(--hairline)}.fam-l{font-weight:700}.fam-form input:not([type=checkbox]){min-height:48px;padding:10px 12px;border:1.5px solid var(--ui-line);border-radius:12px;font:inherit;background:var(--card);color:var(--text)}.fam-rule{margin:6px 0 4px;padding-left:1.1em;color:var(--body);font-size:.9375rem;line-height:1.6}.fam-det{margin:4px 0;border:1px solid var(--hairline);border-radius:12px;padding:8px 12px}.fam-det summary{font-weight:700;cursor:pointer;min-height:40px;display:flex;align-items:center}.fam-det dl{margin:6px 0 0}.fam-det dt{font-weight:700;margin-top:8px}.fam-det dd{margin:2px 0 0;color:var(--body);font-size:.9375rem;line-height:1.6}.fam-off{display:block;min-height:44px;margin-top:6px}.fam-msg{padding:10px 12px;border-radius:12px;background:var(--accent-tint);color:var(--accent-text)}.nt-perm{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:10px 0 4px;padding:12px 14px;border-radius:14px;background:var(--accent-tint);color:var(--accent-text);font-size:1rem}.nt-perm.ok{background:var(--normal-tint);color:var(--normal)}.nt-perm .btn{width:auto;margin:0 0 0 auto;min-height:44px}.nt-list{padding:4px 16px}.nt-row{display:flex;align-items:center;gap:12px;padding:14px 0;border-top:1px solid var(--hairline)}.nt-row:first-child{border-top:0}.nt-ic{flex:none;width:40px;height:40px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;background:var(--tint);color:var(--primary-deep)}.nt-t{flex:1;min-width:0;display:flex;flex-direction:column}.nt-t b{font-size:1.0625rem}.nt-t small{color:var(--muted);font-size:.9375rem;margin-top:2px}.nt-row .sw{flex:none}'; document.head.appendChild(st2); } catch (e) {}
 window.계정카드 = () => { if (D.meta?.account !== true) return ''; const 나 = srvLoggedIn(), m = 나 ? (서버.세션()?.user?.email || '') : '';
   if (!나) return `<section class="sec card acct-card"><div class="acct-hd"><span class="acct-ic" aria-hidden="true">${I.user}</span><span><b>메디나눔 계정</b><small>폰을 바꿔도 약통·복용 기록을 이어 봐요 · 선택</small></span></div>
     <button type="button" class="btn primary acct-go" onclick="go('/login')">로그인 · 계정 만들기</button></section>`;
