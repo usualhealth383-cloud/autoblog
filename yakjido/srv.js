@@ -2118,6 +2118,26 @@ function hxShow(){
   addEventListener('hashchange', close); addEventListener('keydown', onKey);
 }
 Object.assign(window, { HXQ, hxAdd, hxEdit, hxDel, hxSave, hxShow });
+/* 11-03 검수 D — 내보내기·가져오기·모두 지우기에 「내 병력」(hx)·알림 설정(fam)도 함께. 첫 화면 예산 때문에 app-shell 함수를 여기서 감싼다 */
+try {
+  const ex0 = exportMe, wipe0 = wipeMe, im0 = importMe;
+  const getJ = k => { try { return JSON.parse(localStorage.getItem(k) || 'null'); } catch (e) { return null; } };
+  exportMe = async function () {
+    const payload = { app: 'yakjido', v: 2, at: new Date().toISOString(), me: ME, hx: getJ(HX_KEY), fam: getJ(FAM_KEY) };
+    if (await saveFile(`약지도-내기록-${todayKey()}.json`, JSON.stringify(payload, null, 1), 'application/json'))
+      toast('파일로 받았어요 — 새 휴대폰에서 「가져오기」로 넣으시면 돼요');
+  };
+  wipeMe = async function () { await wipe0(); try { if (!localStorage.getItem(ME_KEY)) { localStorage.removeItem(HX_KEY); localStorage.removeItem(FAM_KEY); } } catch (e) {} };
+  importMe = async function (file) {
+    let j = null; try { j = file && file.size <= 3e6 ? JSON.parse(await file.text()) : null; } catch (e) {}
+    const before = JSON.stringify(ME); await im0(file);
+    if (JSON.stringify(ME) !== before && j && j.app === 'yakjido') {
+      if (j.hx && Array.isArray(j.hx.list)) hxWrite(j.hx.list.filter(x => x && typeof x.t === 'string').map(x => ({ t: String(x.t).slice(0, 60), y: String(x.y || '').slice(0, 4), m: String(x.m || '').slice(0, 2), where: String(x.where || '').slice(0, 40), note: String(x.note || '').slice(0, 80), src: String(x.src || '').slice(0, 80) })));
+      if (j.fam && typeof j.fam === 'object') famSave({ wait: [1, 2, 3].includes(j.fam.wait) ? j.fam.wait : 2, qs: /^\d\d:\d\d$/.test(j.fam.qs) ? j.fam.qs : '22:00', qe: /^\d\d:\d\d$/.test(j.fam.qe) ? j.fam.qe : '07:00', dose: false });   /* 정시 알림은 새 기기에서 다시 켜야(구독은 기기마다) */
+      route();
+    }
+  };
+} catch (e) {}
 try { const st3 = document.createElement('style'); st3.textContent = '.hx-sug{margin-top:12px;padding-top:10px;border-top:1px dashed var(--hairline)}.hx-s{margin:8px 0}.hx-s b{display:block;margin-bottom:4px}.hx-s .chips{display:flex;flex-wrap:wrap;gap:6px}.hx-s .chip{min-height:44px;white-space:normal;text-align:left;display:inline-flex;align-items:center;gap:4px}.hx-sel{min-height:44px;padding:6px 10px;border:1.5px solid var(--ui-line);border-radius:12px;font:inherit;background:var(--card);color:var(--text)}'
   + '.hx-show{position:fixed;inset:0;z-index:9999;background:var(--bg,#fff);overflow:auto;-webkit-overflow-scrolling:touch}.hx-in{max-width:720px;margin:0 auto;padding:16px 16px 48px;font-size:1.1875rem;line-height:1.6}.hx-in h1{font-size:1.625rem;margin:12px 0 4px}.hx-in h2{font-size:1.25rem;margin:20px 0 6px;padding-top:12px;border-top:2px solid var(--hairline)}.hx-in ul{margin:0;padding-left:1.1em}.hx-in li{margin:6px 0}.hx-in li span{color:var(--body)}.hx-x{width:auto;margin:0;float:right}@media print{.hx-x{display:none}}';
   document.head.appendChild(st3); } catch (e) {}

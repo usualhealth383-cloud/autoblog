@@ -2004,6 +2004,8 @@ async function famPush(){
   const reg = await navigator.serviceWorker.ready; let sub = await reg.pushManager.getSubscription();
   if (!sub) sub = await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: b64u(FAM_VAPID) });
   const j = sub.toJSON(); await famRpc('yak_push_save', { p_endpoint: j.endpoint, p_p256dh: j.keys.p256dh, p_auth: j.keys.auth });
+  /* 11-03 공용 푸시(mn-push-check)로 바뀔 때를 위해 공용 표에도(서버에 아직 없으면 그냥 넘어감) */
+  try { await famRpc('mn_push_save', { p_app: 'yakjido', p_endpoint: j.endpoint, p_p256dh: j.keys.p256dh, p_auth: j.keys.auth, p_lang: typeof LANG !== 'undefined' ? LANG : 'ko', p_tz: Intl.DateTimeFormat().resolvedOptions().timeZone || 'Asia/Seoul' }); } catch (e) {}
 }
 function famJoin(){ const c = (document.getElementById('famCode')?.value || '').replace(/\D/g, ''); FAMQ.code = c;
   if (c.length !== 6) { FAMQ.msg = '6자리 숫자를 넣어 주세요.'; route(); return; }
@@ -2014,7 +2016,7 @@ function famJoin(){ const c = (document.getElementById('famCode')?.value || '').
 function famEnd(id){ if (!confirm('연결을 끊을까요? 새 알림은 바로 멈추고 연결 기록은 지워요.')) return; famRpc('yak_family_end', { p_id: id }).then(() => { FAMQ.list = null; FAMQ.msg = '끊었어요.'; }).catch(e => { FAMQ.msg = famErr(e); }).finally(() => route()); }
 function famMute(id){ const u = new Date(); u.setHours(24, 0, 0, 0); famRpc('yak_family_mute', { p_id: id, p_until: u.toISOString() }).then(() => { FAMQ.list = null; FAMQ.msg = '오늘은 알림을 보내지 않을게요.'; }).catch(e => { FAMQ.msg = famErr(e); }).finally(() => route()); }
 function famApprove(id, ok){ famRpc('yak_family_approve', { p_id: id, p_ok: !!ok }).then(() => { FAMQ.list = null; FAMQ.msg = ok ? '연결했어요. 이제 약 체크 기록이 없으면 이 분께 알려요.' : '거절했어요. 연결 요청을 지웠어요.'; }).catch(e => { FAMQ.msg = famErr(e); }).finally(() => route()); }
-async function famPushOff(){ try { const reg = await navigator.serviceWorker.ready, sub = await reg.pushManager.getSubscription(); if (sub) { await famRpc('yak_push_drop', { p_endpoint: sub.endpoint }).catch(() => {}); await sub.unsubscribe(); } FAMQ.msg = '이 휴대폰에서 가족 알림 받기를 껐어요. 등록된 알림 주소도 지웠어요.'; } catch (e) { FAMQ.msg = famErr(e); } route(); }
+async function famPushOff(){ try { const reg = await navigator.serviceWorker.ready, sub = await reg.pushManager.getSubscription(); if (sub) { await famRpc('yak_push_drop', { p_endpoint: sub.endpoint }).catch(() => {}); await famRpc('mn_push_drop', { p_endpoint: sub.endpoint }).catch(() => {}); await sub.unsubscribe(); } FAMQ.msg = '이 휴대폰에서 가족 알림 받기를 껐어요. 등록된 알림 주소도 지웠어요.'; } catch (e) { FAMQ.msg = famErr(e); } route(); }
 Object.assign(window, { FAMQ, famShare, famInvite, famJoin, famEnd, famMute, famApprove, famPushOff, famSet, doseSrv });
 /* ── 11-03 현욱님 「내 병력」 — 약만 보고는 왜 드시는지 알 수 없다(클로피도그렐: 스텐트? 뇌경색?). 환자·보호자가 병력·시술·병원을 적어 두고,
    처음 가는 병원·응급실에서 한 장으로 보여 준다. 약 → 「보통 이런 때 써요」는 식약처 허가 효능·효과를 줄인 «후보»일 뿐 — 앱이 정하지 않고 사람이 고른다(진단 아님).
@@ -2116,6 +2118,26 @@ function hxShow(){
   addEventListener('hashchange', close); addEventListener('keydown', onKey);
 }
 Object.assign(window, { HXQ, hxAdd, hxEdit, hxDel, hxSave, hxShow });
+/* 11-03 검수 D — 내보내기·가져오기·모두 지우기에 「내 병력」(hx)·알림 설정(fam)도 함께. 첫 화면 예산 때문에 app-shell 함수를 여기서 감싼다 */
+try {
+  const ex0 = exportMe, wipe0 = wipeMe, im0 = importMe;
+  const getJ = k => { try { return JSON.parse(localStorage.getItem(k) || 'null'); } catch (e) { return null; } };
+  exportMe = async function () {
+    const payload = { app: 'yakjido', v: 2, at: new Date().toISOString(), me: ME, hx: getJ(HX_KEY), fam: getJ(FAM_KEY) };
+    if (await saveFile(`약지도-내기록-${todayKey()}.json`, JSON.stringify(payload, null, 1), 'application/json'))
+      toast('파일로 받았어요 — 새 휴대폰에서 「가져오기」로 넣으시면 돼요');
+  };
+  wipeMe = async function () { await wipe0(); try { if (!localStorage.getItem(ME_KEY)) { localStorage.removeItem(HX_KEY); localStorage.removeItem(FAM_KEY); } } catch (e) {} };
+  importMe = async function (file) {
+    let j = null; try { j = file && file.size <= 3e6 ? JSON.parse(await file.text()) : null; } catch (e) {}
+    const before = JSON.stringify(ME); await im0(file);
+    if (JSON.stringify(ME) !== before && j && j.app === 'yakjido') {
+      if (j.hx && Array.isArray(j.hx.list)) hxWrite(j.hx.list.filter(x => x && typeof x.t === 'string').map(x => ({ t: String(x.t).slice(0, 60), y: String(x.y || '').slice(0, 4), m: String(x.m || '').slice(0, 2), where: String(x.where || '').slice(0, 40), note: String(x.note || '').slice(0, 80), src: String(x.src || '').slice(0, 80) })));
+      if (j.fam && typeof j.fam === 'object') famSave({ wait: [1, 2, 3].includes(j.fam.wait) ? j.fam.wait : 2, qs: /^\d\d:\d\d$/.test(j.fam.qs) ? j.fam.qs : '22:00', qe: /^\d\d:\d\d$/.test(j.fam.qe) ? j.fam.qe : '07:00', dose: false });   /* 정시 알림은 새 기기에서 다시 켜야(구독은 기기마다) */
+      route();
+    }
+  };
+} catch (e) {}
 try { const st3 = document.createElement('style'); st3.textContent = '.hx-sug{margin-top:12px;padding-top:10px;border-top:1px dashed var(--hairline)}.hx-s{margin:8px 0}.hx-s b{display:block;margin-bottom:4px}.hx-s .chips{display:flex;flex-wrap:wrap;gap:6px}.hx-s .chip{min-height:44px;white-space:normal;text-align:left;display:inline-flex;align-items:center;gap:4px}.hx-sel{min-height:44px;padding:6px 10px;border:1.5px solid var(--ui-line);border-radius:12px;font:inherit;background:var(--card);color:var(--text)}'
   + '.hx-show{position:fixed;inset:0;z-index:9999;background:var(--bg,#fff);overflow:auto;-webkit-overflow-scrolling:touch}.hx-in{max-width:720px;margin:0 auto;padding:16px 16px 48px;font-size:1.1875rem;line-height:1.6}.hx-in h1{font-size:1.625rem;margin:12px 0 4px}.hx-in h2{font-size:1.25rem;margin:20px 0 6px;padding-top:12px;border-top:2px solid var(--hairline)}.hx-in ul{margin:0;padding-left:1.1em}.hx-in li{margin:6px 0}.hx-in li span{color:var(--body)}.hx-x{width:auto;margin:0;float:right}@media print{.hx-x{display:none}}';
   document.head.appendChild(st3); } catch (e) {}
