@@ -987,7 +987,13 @@ def consent_checks(br, url, fails):
     if pg.is_visible('nav.tabbar'): fails.append('로그인 문: 아래 탭이 보입니다')
     if '로그인 없이 계속 쓰기' not in pg.inner_text('#view'): fails.append('로그인 문: 「로그인 없이 계속 쓰기」가 없습니다(로그인은 고르는 것)')
     if pg.get_attribute('#srvEmail', 'autocomplete') != 'email' or pg.get_attribute('#srvEmail', 'inputmode') != 'email' or pg.get_attribute('#srvPw', 'autocomplete') != 'current-password': fails.append('로그인 문: 이메일·비밀번호 autocomplete/inputmode 가 다릅니다')
-    if not pg.is_disabled('#srvDoorGo'): fails.append('로그인 문: 「서버에 저장하기」 동의 전인데 로그인이 눌립니다')
+    # 11-03 현욱님 폰 — 잠긴 단추는 눌러도 반응이 없어 「진행이 안 돼요」였다. 단추는 늘 눌리고, 빠진 필수 칸 아래 빨간 안내 + 그 칸 테두리, 진행은 막힌다
+    pg.click('#srvDoorGo'); pg.wait_for_timeout(300)
+    _nd = pg.evaluate("()=>({msg:(document.querySelector('.door-need-msg')||{}).textContent||'', need:!!document.querySelector('#srvAgree').closest('label.door-need'), door:!!document.querySelector('#srvbox[data-door]')})")
+    if not ('서버에 저장하기' in _nd['msg'] and _nd['need'] and _nd['door']): fails.append(f'로그인 문: 동의 전 「메일로 계속하기」를 누르면 그 칸 아래 안내가 떠야 합니다 — {_nd}')
+    for _sb in pg.query_selector_all('.door-soc'):
+        _sb.click(); pg.wait_for_timeout(200)
+        if '서버에 저장하기' not in (pg.evaluate("()=>(document.querySelector('.door-need-msg')||{}).textContent||''")): fails.append('로그인 문: 동의 전 소셜 단추를 눌러도 안내가 없습니다')
     pg.click('.door-eye')
     if pg.get_attribute('#srvPw', 'type') != 'text': fails.append('로그인 문: 비밀번호 보이기가 안 됩니다')
     # 2026-10-29 현욱님 — 로그인/회원가입 갈림 없이 「메일로 계속하기」 하나. 만 14세는 «처음 만들 때 필수»라 단추를 막지 않고, 만들기 직전에 확인한다
