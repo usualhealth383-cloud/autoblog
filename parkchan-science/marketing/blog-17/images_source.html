@@ -1,0 +1,99 @@
+<!doctype html><html lang="ko"><head><meta charset="utf-8"><style>
+@font-face{font-family:S;font-weight:400;src:url(file:///root/.fonts/static/NotoSansKR-400.ttf)}
+@font-face{font-family:S;font-weight:500;src:url(file:///root/.fonts/static/NotoSansKR-500.ttf)}
+@font-face{font-family:S;font-weight:700;src:url(file:///root/.fonts/static/NotoSansKR-700.ttf)}
+@font-face{font-family:S;font-weight:900;src:url(file:///root/.fonts/static/NotoSansKR-900.ttf)}
+@font-face{font-family:P;src:url(file:///root/.fonts/NanumPenScript.ttf)}
+:root{--cream:#FBF5EA;--paper:#FFFDF7;--kraft:#F1E5CF;--line:#E9DCC4;--ink:#2B3245;--navy:#24406F;--blue:#3B6AD0;--butter:#FFE287;--butter2:#FFF2C2;--peach:#F7CDB0;--leaf:#9CC4A6;--sky:#CFE0F7;--body:#4A4F5C;--muted:#8A7F6E}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#bbb;font-family:S,sans-serif;color:var(--ink);word-break:keep-all;-webkit-font-smoothing:antialiased}
+.card{width:1080px;position:relative;overflow:hidden;margin-bottom:40px;
+  background-color:var(--cream);background-image:radial-gradient(rgba(150,120,80,.10) 1.6px,transparent 1.7px);background-size:28px 28px}
+.pad{padding:84px 84px 88px;position:relative;z-index:2}
+.pen{font-family:P,cursive;font-weight:400;color:var(--blue)}
+.hi{background:linear-gradient(transparent 58%,var(--butter) 58%,var(--butter) 92%,transparent 92%);padding:0 4px}
+.note{position:relative;background:var(--paper);border-radius:18px;box-shadow:0 2px 0 rgba(120,90,50,.08),0 18px 36px rgba(120,90,50,.12)}
+.tape{position:absolute;width:150px;height:44px;background:rgba(255,226,135,.85);top:-20px;left:50%;transform:translateX(-50%) rotate(-3deg);border-radius:3px}
+.tape.b{background:rgba(207,224,247,.9)}.tape.p{background:rgba(247,205,176,.9)}
+.foot{position:absolute;left:0;right:0;bottom:46px;text-align:center;font-size:25px;color:var(--muted);font-weight:500;z-index:2}
+.foot b{color:var(--navy);font-weight:900}
+.doodle{position:absolute;z-index:1;fill:none;stroke-linecap:round;stroke-linejoin:round}
+h2{font-size:58px;font-weight:900;line-height:1.3;letter-spacing:-.02em;color:var(--navy)}
+@font-face{font-family:S;font-weight:800;src:url(file:///root/.fonts/static/NotoSansKR-800.ttf)}
+.card{height:1080px}
+.c{text-align:center}
+.kick{font-size:30px;font-weight:700;color:var(--blue);letter-spacing:.02em}
+/* 1 대표 */
+#b1 .note{margin:96px 60px 0;padding:96px 64px 84px;transform:rotate(-1deg);text-align:center}
+#b1 h1{font-size:82px;font-weight:900;line-height:1.28;letter-spacing:-.035em;color:var(--navy);margin-top:26px}
+#b1 .pen{font-size:58px;margin-top:40px;display:block}
+#b1 .who{font-size:30px;color:var(--body);margin-top:30px;line-height:1.6}
+/* 2 비교 */
+#b2 h2{text-align:center}
+#b2 .rows{display:grid;gap:26px;margin-top:50px}
+#b2 .r{display:grid;grid-template-columns:1fr 70px 1.25fr;align-items:center}
+#b2 .r .note{padding:30px 30px 28px;min-height:200px;display:flex;flex-direction:column;justify-content:center}
+#b2 .lab{font-size:24px;font-weight:700;color:var(--muted);margin-bottom:10px}
+#b2 .q{font-size:32px;font-weight:700;line-height:1.42;color:var(--ink)}
+#b2 .hs{background:var(--butter2)}#b2 .hs .lab{color:var(--blue)}#b2 .hs .q{color:var(--navy);font-weight:900}
+#b2 .ar{font-size:54px;color:var(--blue);text-align:center;font-weight:900}
+#b2 .tp{font-size:25px;font-weight:900;color:var(--navy);background:var(--paper);border:3px solid var(--navy);border-radius:40px;padding:4px 20px;display:inline-block;margin-bottom:14px}
+/* 3 공부 방법 */
+#b3 h2{text-align:center}
+#b3 .steps{display:grid;grid-template-columns:1fr 1fr 1fr;gap:30px;margin-top:70px}
+#b3 .note{padding:70px 26px 40px;text-align:center;min-height:430px}
+#b3 .n{width:84px;height:84px;border-radius:50%;margin:0 auto 26px;display:grid;place-items:center;font-size:42px;font-weight:900;color:var(--navy)}
+#b3 h3{font-size:38px;font-weight:900;color:var(--navy);line-height:1.3}
+#b3 p{font-size:26px;line-height:1.6;color:var(--body);margin-top:18px}
+#b3 .pen.l{display:block;text-align:center;font-size:52px;margin-top:64px}
+/* 4 안내 */
+#b4 h2{text-align:center}
+#b4 .two{display:grid;grid-template-columns:1fr 1fr;gap:30px;margin-top:56px}
+#b4 .two .note{padding:60px 30px 44px;text-align:center}
+#b4 .d{font-size:30px;font-weight:700;color:var(--muted)}
+#b4 .day{font-size:64px;font-weight:900;color:var(--navy);line-height:1.2;margin-top:8px}
+#b4 .free{margin-top:44px;padding:44px 40px;text-align:center;background:var(--butter2)}
+#b4 .free b{display:block;font-size:46px;font-weight:900;color:var(--navy)}
+#b4 .free span{display:block;font-size:28px;color:var(--body);margin-top:12px;line-height:1.55}
+#b4 .tel{margin-top:40px;text-align:center;font-size:30px;color:var(--body)}#b4 .tel b{font-size:52px;color:var(--navy);font-weight:900;margin-left:10px}
+.fineC{position:absolute;left:0;right:0;bottom:22px;text-align:center;font-size:20px;font-weight:500;color:#A39A8C;z-index:2}
+#b2 .pad,#b3 .pad{height:1080px;display:flex;flex-direction:column;justify-content:center;padding-top:40px;padding-bottom:60px}
+#b2 .src{text-align:center;margin-top:40px;font-size:22px}
+#b2 .rows{gap:34px}
+</style>
+<section class="card" id="b1"><div class="pad"><div class="note"><span class="tape"></span>
+ <div class="kick">고1 예비반 (현 중3)</div>
+ <h1>중학교 과학과<br>고등학교 통합과학,<br>무엇이 달라질까요</h1>
+ <span class="pen">같은 주제, 한 걸음 더 깊은 질문</span>
+ <div class="who">대구 월성동 박찬 통합과학 학원</div></div></div></section>
+
+<section class="card" id="b2"><div class="pad">
+ <h2>같은 주제, 다른 질문</h2>
+ <div class="rows">
+  <div class="r"><div class="note"><div class="lab">중학교</div><div class="q">물질은 어떤 원소로<br>이루어져 있을까?</div></div><div class="ar">→</div><div class="note hs"><span class="tape"></span><div class="lab">고등학교 통합과학</div><div class="q">그 원소들은 우주에서<br>어떻게 만들어졌을까?</div></div></div>
+  <div class="r"><div class="note"><div class="lab">중학교</div><div class="q">힘을 받은 물체는<br>어떻게 움직일까?</div></div><div class="ar">→</div><div class="note hs"><span class="tape b"></span><div class="lab">고등학교 통합과학</div><div class="q">에어백은 왜 충격을<br>줄여 줄까?</div></div></div>
+  <div class="r"><div class="note"><div class="lab">중학교</div><div class="q">세포는 어떤 구조로<br>되어 있을까?</div></div><div class="ar">→</div><div class="note hs"><span class="tape p"></span><div class="lab">고등학교 통합과학</div><div class="q">유전자에서 단백질은<br>어떻게 만들어질까?</div></div></div>
+ </div>
+ <p class="src">2022 개정 교육과정 통합과학1 성취기준에서 고른 예</p>
+</div></section>
+
+<section class="card" id="b3"><div class="pad">
+ <h2>고등학교 과학은<br>이렇게 공부합니다</h2>
+ <div class="steps">
+  <div class="note"><span class="tape"></span><div class="n" style="background:var(--butter)">1</div><h3>원리 이해</h3><p>외우기 전에<br>왜 그런지부터</p></div>
+  <div class="note"><span class="tape b"></span><div class="n" style="background:var(--sky)">2</div><h3>자료 해석</h3><p>그래프와 표에서<br>근거를 찾는 연습</p></div>
+  <div class="note"><span class="tape p"></span><div class="n" style="background:var(--peach)">3</div><h3>처음 보는<br>문제에 적용</h3><p>배운 원리로<br>스스로 판단하기</p></div>
+ </div>
+ <span class="pen l">고1 첫 내신을 <span class="hi">차근차근 준비합니다</span></span>
+</div></section>
+
+<section class="card" id="b4"><div class="pad">
+ <h2>고1 예비반이 문을 엽니다</h2>
+ <div class="two">
+  <div class="note"><span class="tape"></span><div class="d">화금반</div><div class="day">11월 3일<br>(화)</div></div>
+  <div class="note"><span class="tape b"></span><div class="d">수토반</div><div class="day">11월 4일<br>(수)</div></div>
+ </div>
+ <div class="note free"><b>일주일 무료 수강</b><span>실제 반에서 일주일 먼저 들어 보시고<br>등록을 결정하셔도 됩니다</span></div>
+ <div class="tel">상담 <b>053-213-3577</b></div>
+</div>
+<div class="fineC">남교입 제2019-115호 · 교습비(월) 중등부 210,000 / 267,000원 · 고등부 220,000 / 317,000원</div></section>
