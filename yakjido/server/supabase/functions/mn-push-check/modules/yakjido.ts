@@ -1,6 +1,6 @@
 // 약지도 판정 — ① 본인 정시 알림(fam.v1 dose:true) ② 가족 놓침 알림(허락된 연결만). 판정은 yak-family-check/logic.ts 와 같은 것(시험 60가지)
 import type { Module } from './types.ts';
-import { missedSlots, dueNow, localNow, quiet, stale, message, doseMessage, prefs, PER_DAY } from '../../yak-family-check/logic.ts';
+import { missedSlots, dueNow, localNow, quiet, stale, message, doseMessage, prefs, PER_DAY } from './yak_logic.ts';
 
 const mod: Module = {
   app: 'yakjido',
