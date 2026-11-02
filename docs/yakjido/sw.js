@@ -9,7 +9,7 @@
                        판이 같으면 캐시 그대로, 판이 바뀌면 새로 받아 넣고 옛 판은 지운다(prune).
    판 없는 옛 주소는 «캐시 먼저» — 한 번 받은 것은 즉시 열리고, 뒤에서 조용히 새로 받아 둔다.
    인터넷이 안 되면 어느 캐시에든 있는 사본을 준다(5-01 — 첫 방문 뒤 비행기 모드에서 본문이 안 뜨던 것). */
-const CACHE = 'yakjido-2026-11-02T20:40-9d835214';
+const CACHE = 'yakjido-2026-11-02T20:54-1f02541b';
 const DATA = 'yakjido-data-v1';
 /* 기내 모드·바깥 파일 0(10-27) — 글꼴(fonts/)·로그인 프로그램(vendor/)은 배포 묶음 안. 판이 박힌 꾸러미라 내용이 안 바뀌니 «캐시 먼저», 앱 판이 바뀌어도 지우지 않는다(EXT).
    바깥 주소는 하나도 담지 않는다 — 서버 응답(supabase REST)·날씨는 그대로 지나간다(09-22 원칙) */
@@ -88,6 +88,15 @@ self.addEventListener('fetch', (e) => {
   })());
 });
 
+/* 11-02 가족 알림 — 서버(yak-family-check)가 보낸 웹 푸시. 글은 약 이름 없이 「○○ · 오후 8:00 약 체크가 아직 없어요」 */
+self.addEventListener('push', (e) => {
+  let m = {}; try { m = e.data ? e.data.json() : {}; } catch (x) {}
+  const go = /^#\/notify(\?[a-z0-9=&]*)?$/.test(m.go || '') ? m.go : '#/notify?fam=1';
+  e.waitUntil(self.registration.showNotification(String(m.title || '약지도 가족 알림').slice(0, 60), {
+    body: String(m.body || '').slice(0, 200), tag: String(m.tag || 'yakjido-family').slice(0, 80), renotify: true,
+    icon: 'icon-192.png', badge: 'icon-192.png', data: { go } }));
+});
+
 /* 약 알림 — 안드로이드 크롬은 페이지의 new Notification() 을 막는다(서비스워커로만 띄울 수 있다).
    그래서 알림은 여기서 띄우고, 「먹었어요」를 누르면 앱을 열어 그 복용을 체크한다(2026-09-23).
    체크는 그 알림의 날짜로 적는다(5-16 — 밤 알림을 다음 날 아침에 눌러도 어제 것으로). */
@@ -98,13 +107,14 @@ self.addEventListener('notificationclick', (e) => {
   // Z6 — 「10분 뒤 다시」: 서비스워커는 10분을 기다려 주지 않아(브라우저가 몇 분 안에 멈춤) 열린 창에 타이머를 맡긴다. 창이 없으면 그 창을 열어 맡긴다
   const later = e.action === 'later' && d.key;
   const q = () => encodeURIComponent(d.key) + (d.day ? '&day=' + encodeURIComponent(d.day) : '');
-  const hash = took ? '#/schedule?tick=' + q() : later ? '#/schedule?later=' + q() : (d.go === '#/visits' ? '#/visits' : '#/schedule');   // 진료 예약 알림은 예약 화면으로(2026-10-13)
+  const goOk = /^#\/(visits|notify)(\?[a-z0-9=&]*)?$/.test(d.go || '');   // 진료 예약 알림 · 가족 알림(11-02)
+  const hash = took ? '#/schedule?tick=' + q() : later ? '#/schedule?later=' + q() : (goOk ? d.go : '#/schedule');   // 진료 예약 알림은 예약 화면으로(2026-10-13)
   e.waitUntil((async () => {
     /* 같은 주소의 다른 앱 창이 먼저 잡히던 것 — 이 워커가 맡은 범위(약지도 주소) 안의 창만 고른다. 없으면 약지도를 새로 연다(2026-10-14 외부 검수 2차 #24) */
     const all = (await self.clients.matchAll({ type: 'window', includeUncontrolled: true })).filter((c) => String(c.url || '').startsWith(self.registration.scope));
     for (const c of all) {
       if (later) { try { c.postMessage({ type: 'yakjido-later', key: d.key, day: d.day || '', title: e.notification.title || '', body: e.notification.body || '' }); } catch (x) {} return; }
-      if ('focus' in c) { try { c.postMessage({ type: 'yakjido-tick', key: took ? d.key : '', day: d.day || '', go: d.go === '#/visits' ? '/visits' : '' }); } catch (x) {} return c.focus(); }
+      if ('focus' in c) { try { c.postMessage({ type: 'yakjido-tick', key: took ? d.key : '', day: d.day || '', go: goOk ? d.go.slice(1) : '' }); } catch (x) {} return c.focus(); }
     }
     return self.clients.openWindow('./' + hash);
   })());

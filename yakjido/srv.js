@@ -481,7 +481,7 @@
         return;
       }
       지우기예약 = 0;
-      return 준비().then(function () { return typeof 설정.지우기전 === 'function' ? Promise.resolve(설정.지우기전(sb, 세션)).catch(function () {}) : null; }).then(function () { return sb.rpc('delete_own_account', { p_app: 설정.app }); }).then(function (r) {
+      return 준비().then(function () { return typeof 설정.지우기전 === 'function' ? Promise.resolve(설정.지우기전(sb, 세션)).catch(function () {}) : null; }).then(function () { return sb.rpc('yak_family_end_all').then(function () {}, function () {}); }).then(function () { return sb.rpc('delete_own_account', { p_app: 설정.app }); }).then(function (r) {
         if (r && r.error) throw r.error;
         try { 내열쇠().forEach(function (k) { localStorage.removeItem(k); }); } catch (e) {}
         try { localStorage.removeItem('_srv_' + 설정.app); localStorage.removeItem(구독키()); } catch (e) {}
@@ -579,7 +579,7 @@
     서버만지움: function () {
       return 준비().then(function () {
         if (!세션) return { skipped: true };
-        return sb.rpc('delete_own_account', { p_app: 설정.app }).then(function (r) {
+        return sb.rpc('yak_family_end_all').then(function () {}, function () {}).then(function () { return sb.rpc('delete_own_account', { p_app: 설정.app }); }).then(function (r) {   /* 11-02 — 동의를 거두면 가족 알림 연결도 끊는다 */
           if (r && r.error) throw r.error;
           try { localStorage.removeItem('_srv_' + 설정.app); } catch (e) {}
           세션 = null; try { sb.auth.signOut(); } catch (e) {}
@@ -1857,7 +1857,7 @@ window.계정칸 = () => D.meta?.account !== true ? '' : `<section class="sec ca
 /* 계정 카드·메디나눔 서명 모양 — 첫 화면 예산 때문에 여기서 붙인다 */
 try { const st = document.createElement('style'); st.textContent = ".acct-card .acct-hd{display:flex;align-items:center;gap:12px}.acct-card .acct-hd>span:last-child{display:flex;flex-direction:column;min-width:0}.acct-card .acct-hd b{font-size:1.0625rem;overflow-wrap:anywhere}.acct-card .acct-hd small{color:var(--muted);font-size:.875rem;margin-top:2px}.acct-ic,.acct-av{flex:none;width:44px;height:44px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;background:var(--tint);color:var(--primary-deep)}.acct-av{background:var(--primary);color:var(--on-primary,#fff);font-weight:700;font-size:1.125rem}.acct-card .acct-go{width:100%;margin-top:14px;min-height:52px;font-size:1.0625rem}.acct-card .acct-act{display:flex;gap:10px;margin-top:14px}.acct-card .acct-act .btn{flex:1;margin:0;min-height:48px}.acct-card .srvrow{margin-top:12px}.acct-card .acct-del{margin-top:6px;font-size:.8125rem}.mn-logo{width:1.35em;height:1.35em;vertical-align:-.3em;margin-right:5px;color:#1A2B4A}.mn-logo path{fill:none;stroke:currentColor;stroke-width:236;stroke-linecap:round;stroke-linejoin:round}.mn-logo .mn-tile{fill:#FFFFFF;stroke:#CBD2DC;stroke-width:24}:root[data-theme=\"dark\"] .mn-logo .mn-tile{display:none}:root[data-theme=\"dark\"] .mn-logo{color:#FFFFFF}@media (prefers-color-scheme:dark){ :root:not([data-theme=\"light\"]) .mn-logo{color:#FFFFFF} :root:not([data-theme=\"light\"]) .mn-logo .mn-tile{display:none} }"; document.head.appendChild(st); } catch (e) {}
 /* 10-30 현욱님 「알림 설정은?」 — 알림 한 화면: 무엇을 · 언제 · 켜기/끄기(다섯 앱 같은 꼴: 머리 + 권한 줄 + 종류별 스위치 행) */
-window.문_notify = () => {
+window.문_notify = (_, q) => {
   const n = takingItems().length, timed = takingItems().filter(d => !schedUnset(d)).length;
   const perm = NATIVE ? NATIVE_PERM : ('Notification' in window ? Notification.permission : 'unsupported');
   const sw = (k, on, fn) => `<button class="sw ${on ? 'on' : ''}" role="switch" aria-checked="${on}" aria-label="${k}" onclick="${fn}"></button>`;
@@ -1873,9 +1873,69 @@ window.문_notify = () => {
     ${row(I.check, '저녁 9시 하루 정리', '그날 체크 안 한 약이 있을 때만 · 기본 꺼짐', eveningOn(), `setEvening(${!eveningOn()})`)}
   </section>
   <div class="actions two"><button class="btn line" onclick="go('/schedule?t=sc1')">${I.clock} 약마다 시간 고르기</button><button class="btn line" onclick="go('/schedule?t=sc2')">${I.pill} 남은 알 수 넣기</button></div>
-  <p class="small muted" style="margin-top:12px">알림이 늦거나 안 오면 <button type="button" class="link" onclick="go('/schedule?t=sc4')">알림이 늦어요 도움말</button>을 봐 주세요.</p>`;
+  <p class="small muted" style="margin-top:12px">알림이 늦거나 안 오면 <button type="button" class="link" onclick="go('/schedule?t=sc4')">알림이 늦어요 도움말</button>을 봐 주세요.</p>
+  ${famCard(q || {})}`;
 };
-try { const st2 = document.createElement('style'); st2.textContent = '.nt-perm{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:10px 0 4px;padding:12px 14px;border-radius:14px;background:var(--accent-tint);color:var(--accent-text);font-size:1rem}.nt-perm.ok{background:var(--normal-tint);color:var(--normal)}.nt-perm .btn{width:auto;margin:0 0 0 auto;min-height:44px}.nt-list{padding:4px 16px}.nt-row{display:flex;align-items:center;gap:12px;padding:14px 0;border-top:1px solid var(--hairline)}.nt-row:first-child{border-top:0}.nt-ic{flex:none;width:40px;height:40px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;background:var(--tint);color:var(--primary-deep)}.nt-t{flex:1;min-width:0;display:flex;flex-direction:column}.nt-t b{font-size:1.0625rem}.nt-t small{color:var(--muted);font-size:.9375rem;margin-top:2px}.nt-row .sw{flex:none}'; document.head.appendChild(st2); } catch (e) {}
+/* ── 11-02 가족 알림(현욱님 「지금 만든다 · 가족 최대 3명 · 약 이름 뺌」 · 설계 yakjido/가족알림_설계.md) ──
+   본인: 초대 코드 6자리(24시간) → 가족이 「받은 코드 넣기」 → 정한 시각 2시간 뒤에도 체크가 없으면 가족 휴대폰에 「아직 체크가 없어요」.
+   서버: 함수 yak_family_* · yak_push_* (메디나눔_약지도_가족알림_1102.sql) + 예약 함수 yak-family-check. meta.family 가 true 일 때만 보인다(되는 척 금지). */
+const FAMQ = { list: null, busy: false, open: '', msg: '', code: null };
+const famOn = () => D.meta?.family === true && D.meta?.account === true;
+const famRpc = (fn, args) => 서버.준비().then(sb => sb.rpc(fn, args || {})).then(r => { if (r.error) throw r.error; return r.data; });
+function famLoad(){ if (FAMQ.busy) return; FAMQ.busy = true; famRpc('yak_family_list').then(d => { FAMQ.list = d || []; }).catch(() => { FAMQ.list = []; FAMQ.msg = '가족 연결을 불러오지 못했어요. 잠시 뒤 다시 열어 주세요.'; }).finally(() => { FAMQ.busy = false; if (/^#\/notify/.test(location.hash)) route(); }); }
+const famWhen = t => { try { return new Date(t).toLocaleString('ko-KR', { month: 'long', day: 'numeric', hour: 'numeric', minute: '2-digit' }); } catch (e) { return ''; } };
+function famCard(q){
+  if (!famOn()) return '';
+  if (q.code && /^\d{6}$/.test(q.code) && !FAMQ.open) { FAMQ.open = 'join'; FAMQ.code = q.code; }
+  const head = `<h2 class="fam-h" id="fam">가족에게 알리기</h2>`;
+  if (!srvLoggedIn()) return `<section class="sec card fam">${head}<p>약 체크를 놓치면 가족 휴대폰에 알림이 가요. 가족이 보낸 코드를 넣어 알림을 받을 수도 있어요. 두 분 모두 로그인이 필요해요.</p>
+    <button type="button" class="btn line" onclick="go('/login')">${I.user} 로그인하고 켜기</button></section>`;
+  if (FAMQ.list == null) { famLoad(); return `<section class="sec card fam">${head}<p class="small muted">불러오는 중이에요…</p></section>`; }
+  const mine = FAMQ.list.filter(x => x.role === 'owner'), watch = FAMQ.list.filter(x => x.role === 'member');
+  const ownRow = x => x.status === 'waiting'
+    ? `<li><span><b>코드 ${esc(x.code)}</b><small>${esc(famWhen(x.code_expires))}까지 · 가족이 넣으면 연결돼요</small></span><span class="fam-b"><button type="button" class="btn line" onclick="famShare('${esc(x.code)}')">보내기</button><button type="button" class="link" onclick="famEnd('${x.id}')">취소</button></span></li>`
+    : `<li><span><b>${esc(x.other_email || '가족')}</b><small>연결됨 · 체크가 없으면 이 분께 알려요</small></span><span class="fam-b"><button type="button" class="link" onclick="famEnd('${x.id}')">끊기</button></span></li>`;
+  const watchRow = x => `<li${q.fam ? ' class="fam-hot"' : ''}><span><b>${esc(x.label)}</b><small>${x.muted_today ? '오늘은 알림을 멈췄어요' : '약 체크가 없으면 이 휴대폰으로 알려 드려요'}</small></span><span class="fam-b">${x.muted_today ? '' : `<button type="button" class="btn line" onclick="famMute('${x.id}')">오늘은 그만</button>`}<button type="button" class="link" onclick="famEnd('${x.id}')">끊기</button></span></li>`;
+  const invite = FAMQ.open === 'invite' ? `<div class="fam-form">
+      <label class="fam-l" for="famLabel">가족 화면에 보일 내 이름</label><input id="famLabel" maxlength="20" placeholder="예) 엄마" autocomplete="off">
+      <label class="door-ck"><input id="famOk" type="checkbox"><span><b>약 체크 여부를 연결한 가족에게 알리는 데 동의해요 <em class="door-tag">필수</em></b><small>정한 시각에서 2시간이 지나도 체크가 없으면 연결한 가족(최대 3명) 휴대폰에 「아직 체크가 없어요」 알림이 가요. <b>약 이름은 보내지 않아요.</b> 하루 2번까지, 밤 10시부터 아침 7시까지는 보내지 않아요. 언제든 여기서 끊을 수 있어요.</small></span></label>
+      <button type="button" class="btn primary" onclick="famInvite()">동의하고 코드 만들기</button></div>` : '';
+  const join = FAMQ.open === 'join' ? `<div class="fam-form">
+      <label class="fam-l" for="famCode">가족에게 받은 6자리 코드</label><input id="famCode" inputmode="numeric" maxlength="6" autocomplete="one-time-code" value="${esc(FAMQ.code || '')}">
+      <p class="small muted">연결하면 상대에게 내 메일 주소가 보이고, 알림은 이 휴대폰으로 와요. 알림 허락을 한 번 여쭤요.</p>
+      <button type="button" class="btn primary" onclick="famJoin()">연결하고 알림 받기</button></div>` : '';
+  return `<section class="sec card fam">${head}
+    <p>약 체크를 놓치면 가족 휴대폰에 알림이 가요. 정한 시각 2시간 뒤 · 하루 2번까지 · 약 이름은 빼고요.</p>
+    ${FAMQ.msg ? `<p class="fam-msg" role="status">${esc(FAMQ.msg)}</p>` : ''}
+    ${mine.length ? `<h3 class="fam-s">내 약 체크를 받는 가족</h3><ul class="fam-ul">${mine.map(ownRow).join('')}</ul>` : ''}
+    ${watch.length ? `<h3 class="fam-s">내가 챙기는 분</h3><ul class="fam-ul">${watch.map(watchRow).join('')}</ul>` : ''}
+    <div class="actions two">${mine.length < 3 ? `<button type="button" class="btn line" aria-expanded="${FAMQ.open === 'invite'}" onclick="FAMQ.open=FAMQ.open==='invite'?'':'invite';FAMQ.msg='';route()">가족 초대하기</button>` : ''}<button type="button" class="btn line" aria-expanded="${FAMQ.open === 'join'}" onclick="FAMQ.open=FAMQ.open==='join'?'':'join';FAMQ.msg='';route()">받은 코드 넣기</button></div>
+    ${invite}${join}</section>`;
+}
+const famErr = e => { const m = String((e && (e.message || e.code)) || e); return /family limit/.test(m) ? '가족은 3명까지 연결할 수 있어요.' : /too many/.test(m) ? '코드를 너무 여러 번 넣었어요. 한 시간 뒤에 다시 해 주세요.' : /self/.test(m) ? '내가 만든 코드예요. 가족 휴대폰에서 넣어 주세요.' : /already/.test(m) ? '이미 연결된 분이에요.' : /nopush/.test(m) ? '이 브라우저는 알림을 받을 수 없어요. 아이폰은 사파리 공유 → 홈 화면에 추가한 뒤 그 아이콘으로 열어 주세요.' : /denied/.test(m) ? '알림이 막혀 있어요. 위의 안내대로 알림을 허용한 뒤 다시 눌러 주세요.' : '잠시 뒤 다시 해 주세요.'; };
+function famShare(code){ const url = (D.meta?.webUrl || 'https://yakjido.medinanum.com/') + '#/notify?code=' + code;
+  shareOut({ title: '약지도 가족 알림', text: `[약지도] 제 약 체크를 놓치면 알려 주는 가족 알림 코드예요: ${code} (24시간)\n약지도 → 내 정보 → 알림 설정 → 받은 코드 넣기\n${url}` }).catch(() => {}); }
+function famInvite(){ const ok = document.getElementById('famOk'); if (!ok || !ok.checked) { FAMQ.msg = '동의에 체크해 주셔야 코드를 만들 수 있어요.'; route(); return; }
+  const label = (document.getElementById('famLabel')?.value || '').trim() || '가족';
+  famRpc('yak_family_invite', { p_label: label, p_consent: true }).then(d => { const c = d && d[0] && d[0].code; FAMQ.open = ''; FAMQ.msg = c ? `코드 ${c} 를 만들었어요. 가족에게 보내 주세요.` : ''; FAMQ.list = null; if (c) famShare(c); })
+    .catch(e => { FAMQ.msg = famErr(e); }).finally(() => route()); }
+const b64u = s => { const p = '='.repeat((4 - s.length % 4) % 4), b = atob((s + p).replace(/-/g, '+').replace(/_/g, '/')); return Uint8Array.from(b, c => c.charCodeAt(0)); };
+async function famPush(){
+  if (!('serviceWorker' in navigator) || !('PushManager' in window) || !D.meta?.familyVapid) throw new Error('nopush');
+  const p = await Notification.requestPermission(); if (p !== 'granted') throw new Error('denied');
+  const reg = await navigator.serviceWorker.ready; let sub = await reg.pushManager.getSubscription();
+  if (!sub) sub = await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: b64u(D.meta.familyVapid) });
+  const j = sub.toJSON(); await famRpc('yak_push_save', { p_endpoint: j.endpoint, p_p256dh: j.keys.p256dh, p_auth: j.keys.auth });
+}
+function famJoin(){ const c = (document.getElementById('famCode')?.value || '').replace(/\D/g, ''); FAMQ.code = c;
+  if (c.length !== 6) { FAMQ.msg = '6자리 숫자를 넣어 주세요.'; route(); return; }
+  famPush().then(() => famRpc('yak_family_accept', { p_code: c })).then(d => { if (!d || !d.length) { FAMQ.msg = '코드가 맞지 않거나 24시간이 지났어요. 가족에게 새 코드를 받아 주세요.'; return; }
+      FAMQ.open = ''; FAMQ.code = null; FAMQ.list = null; FAMQ.msg = `${d[0].owner_label} 님과 연결됐어요. 약 체크가 없으면 이 휴대폰으로 알려 드려요.`; })
+    .catch(e => { FAMQ.msg = famErr(e); }).finally(() => route()); }
+function famEnd(id){ if (!confirm('연결을 끊을까요? 바로 알림이 멈춰요.')) return; famRpc('yak_family_end', { p_id: id }).then(() => { FAMQ.list = null; FAMQ.msg = '끊었어요.'; }).catch(e => { FAMQ.msg = famErr(e); }).finally(() => route()); }
+function famMute(id){ famRpc('yak_family_mute', { p_id: id }).then(() => { FAMQ.list = null; FAMQ.msg = '오늘은 알림을 보내지 않을게요.'; }).catch(e => { FAMQ.msg = famErr(e); }).finally(() => route()); }
+Object.assign(window, { FAMQ, famShare, famInvite, famJoin, famEnd, famMute });
+try { const st2 = document.createElement('style'); st2.textContent = '.fam-h{display:flex;align-items:center;justify-content:flex-start;gap:8px;margin:0 0 6px;font-size:1.125rem}.fam-h .i{width:22px;height:22px}.fam-s{margin:14px 0 4px;font-size:1rem;color:var(--muted)}.fam-ul{list-style:none;margin:0;padding:0}.fam-ul li{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;padding:10px 0;border-top:1px solid var(--hairline)}.fam-ul li>span:first-child{min-width:0}.fam-ul b{display:block;overflow-wrap:anywhere}.fam-ul small{display:block;color:var(--muted);font-size:.875rem}.fam-b{display:flex;align-items:center;gap:6px}.fam-b .btn{width:auto;min-height:44px;padding:0 14px;margin:0}.fam-b .link{min-height:44px;padding:0 8px}.fam-hot{background:var(--caution-tint);border-radius:12px;padding:10px!important}.fam-form{display:flex;flex-direction:column;gap:8px;margin-top:12px;padding-top:12px;border-top:1px dashed var(--hairline)}.fam-l{font-weight:700}.fam-form input:not([type=checkbox]){min-height:48px;padding:10px 12px;border:1.5px solid var(--ui-line);border-radius:12px;font:inherit;background:var(--card);color:var(--text)}.fam-msg{padding:10px 12px;border-radius:12px;background:var(--accent-tint);color:var(--accent-text)}.nt-perm{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:10px 0 4px;padding:12px 14px;border-radius:14px;background:var(--accent-tint);color:var(--accent-text);font-size:1rem}.nt-perm.ok{background:var(--normal-tint);color:var(--normal)}.nt-perm .btn{width:auto;margin:0 0 0 auto;min-height:44px}.nt-list{padding:4px 16px}.nt-row{display:flex;align-items:center;gap:12px;padding:14px 0;border-top:1px solid var(--hairline)}.nt-row:first-child{border-top:0}.nt-ic{flex:none;width:40px;height:40px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;background:var(--tint);color:var(--primary-deep)}.nt-t{flex:1;min-width:0;display:flex;flex-direction:column}.nt-t b{font-size:1.0625rem}.nt-t small{color:var(--muted);font-size:.9375rem;margin-top:2px}.nt-row .sw{flex:none}'; document.head.appendChild(st2); } catch (e) {}
 window.계정카드 = () => { if (D.meta?.account !== true) return ''; const 나 = srvLoggedIn(), m = 나 ? (서버.세션()?.user?.email || '') : '';
   if (!나) return `<section class="sec card acct-card"><div class="acct-hd"><span class="acct-ic" aria-hidden="true">${I.user}</span><span><b>메디나눔 계정</b><small>폰을 바꿔도 약통·복용 기록을 이어 봐요 · 선택</small></span></div>
     <button type="button" class="btn primary acct-go" onclick="go('/login')">로그인 · 계정 만들기</button></section>`;
