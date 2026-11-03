@@ -2730,6 +2730,43 @@ try { 통합찾기.설치({ 앱: 'yakjido', 열기: function (url) { location.hr
 /* 10-26 현욱님 「월 정액 시범 → 이용량 보고 결정」 — 꺼진 채(처리방침 「익명 이용 통계」 줄 시행 뒤에 켬) */
 try { 이용량.설치({ 앱: 'yakjido', 켜짐: false, 주소: 'https://uszalzczpmyifzbamjno.supabase.co', 공개키: 'sb_publishable_YQSz-D-RCXzHGUhso06rMg_GOIIRDuV' }); 이용량.센다('open'); } catch (e) {}
 
+/* ▼▼ 위기번호 표 시작 ▼▼ */
+/* ═══ 메디나눔 위기·응급 번호 표 — 나라 기준(말 기준 아님) · 2026-11-04 곁에에서 꺼냄(다섯 앱 공용 · 길동무 「말과 나라」가 재사용)
+   나라: ISO 2자. 위기[0] = 한국 109(자살예방) 자리, 위기[1] = 한국 1577-0199(정신건강) 자리. 위기가 비면 응급 번호로.
+   확인된 번호만 넣는다(멕시코는 응급 911 만 · 위기 전용 번호 확인 전). 표에 없는 나라는 XX — 번호 null: 누르는 단추 없이 「그 나라 응급 번호로 전화하세요」 글만.
+   판 2026-11-04b: XX 112 기본값 없앰 · 응급 번호 12나라(VN TH PH ID NP UZ KH MN LK BD IN GB) — 출처는 줄 옆.
+   나라 고르는 순서: ① localStorage mn.place.country(사용자가 「말과 나라」에서 고른 값) ② 앱이 가진 값 ③ 시간대·기기 지역 짐작. */
+(function () {
+  if (window.메디나눔위기번호) return;
+  var 표 = {
+    KR: { 이름: { ko: '한국', en: 'Korea', es: 'Corea', ja: '韓国', zh: '韩国' }, 응급: '119', 경찰: '112', 위기: ['109', '1577-0199'] },
+    US: { 이름: { ko: '미국', en: 'United States', es: 'Estados Unidos', ja: 'アメリカ', zh: '美国' }, 응급: '911', 경찰: '911', 위기: ['988'] },
+    ES: { 이름: { ko: '스페인', en: 'Spain', es: 'España', ja: 'スペイン', zh: '西班牙' }, 응급: '112', 경찰: '112', 위기: ['024'] },
+    JP: { 이름: { ko: '일본', en: 'Japan', es: 'Japón', ja: '日本', zh: '日本' }, 응급: '119', 경찰: '110', 위기: ['0570-783-556', '0570-064-556'] }   /* 109(자살예방) 자리 → いのちの電話, 1577-0199(정신건강) 자리 → こころの健康相談統一ダイヤル */,
+    CN: { 이름: { ko: '중국', en: 'China', es: 'China', ja: '中国', zh: '中国' }, 응급: '120', 경찰: '110', 위기: ['12356'] },
+    MX: { 이름: { ko: '멕시코', en: 'Mexico', es: 'México', ja: 'メキシコ', zh: '墨西哥' }, 응급: '911', 경찰: '911', 위기: [] },   /* 11-03 Main — 확인된 응급 911 만(위기 전용 번호는 확인 전이라 넣지 않음 → 위기 자리도 911) */
+    HK: { 이름: { ko: '홍콩', en: 'Hong Kong', es: 'Hong Kong', ja: '香港', zh: '香港' }, 응급: '999', 경찰: '999', 위기: ['2896 0000'] },   /* 10-27 Main 표 — The Samaritans(英文) */
+    /* 11-04 Main — 한국에 많이 사는 나라부터 «응급(구급) 번호만». 공식 출처 두 곳이 맞는 것만. 위기 상담 번호는 아직 넣지 않음(위기 자리도 응급 번호).
+       경찰은 한 번호로 모두 받는 나라만 같은 번호, 나머지는 null(→ 글로 「그 나라 경찰 번호」, 누르는 단추 없음).
+       뺀 나라: 미얀마(영국 정부 192 · 미국 대사관은 192 를 고속도로 번호로·다른 번호와 엇갈림) → 그 밖. */
+    VN: { 이름: { ko: '베트남', en: 'Vietnam', es: 'Vietnam', ja: 'ベトナム', zh: '越南' }, 응급: '115', 경찰: null, 위기: [] },   /* gov.uk/foreign-travel-advice/vietnam/getting-help · vietnam.travel(베트남 관광청) — 115 구급, 112 아님 */
+    TH: { 이름: { ko: '태국', en: 'Thailand', es: 'Tailandia', ja: 'タイ', zh: '泰国' }, 응급: '1669', 경찰: null, 위기: [] },   /* gov.uk Thailand health(1669 보건부) · th.usembassy.gov */
+    PH: { 이름: { ko: '필리핀', en: 'Philippines', es: 'Filipinas', ja: 'フィリピン', zh: '菲律宾' }, 응급: '911', 경찰: '911', 위기: [] },   /* gov.uk Philippines getting-help(911 구급·소방·경찰) · ph.usembassy.gov */
+    ID: { 이름: { ko: '인도네시아', en: 'Indonesia', es: 'Indonesia', ja: 'インドネシア', zh: '印度尼西亚' }, 응급: '118', 경찰: null, 위기: [] },   /* gov.uk Indonesia getting-help(118) · indonesia.travel(118·119) */
+    NP: { 이름: { ko: '네팔', en: 'Nepal', es: 'Nepal', ja: 'ネパール', zh: '尼泊尔' }, 응급: '102', 경찰: null, 위기: [] },   /* gov.uk Nepal getting-help · np.usembassy.gov · heoc.mohp.gov.np */
+    UZ: { 이름: { ko: '우즈베키스탄', en: 'Uzbekistan', es: 'Uzbekistán', ja: 'ウズベキスタン', zh: '乌兹别克斯坦' }, 응급: '103', 경찰: null, 위기: [] },   /* gov.uk Uzbekistan getting-help · uzbekistan.travel */
+    KH: { 이름: { ko: '캄보디아', en: 'Cambodia', es: 'Camboya', ja: 'カンボジア', zh: '柬埔寨' }, 응급: '119', 경찰: null, 위기: [] },   /* gov.uk Cambodia getting-help · travel.state.gov Cambodia */
+    MN: { 이름: { ko: '몽골', en: 'Mongolia', es: 'Mongolia', ja: 'モンゴル', zh: '蒙古' }, 응급: '103', 경찰: null, 위기: [] },   /* gov.uk Mongolia getting-help · mn.usembassy.gov */
+    LK: { 이름: { ko: '스리랑카', en: 'Sri Lanka', es: 'Sri Lanka', ja: 'スリランカ', zh: '斯里兰卡' }, 응급: '1990', 경찰: null, 위기: [] },   /* gov.uk Sri Lanka health · lk.usembassy.gov(1990 Suwa Seriya) */
+    BD: { 이름: { ko: '방글라데시', en: 'Bangladesh', es: 'Bangladés', ja: 'バングラデシュ', zh: '孟加拉国' }, 응급: '999', 경찰: '999', 위기: [] },   /* gov.uk Bangladesh getting-help · 999.gov.bd */
+    IN: { 이름: { ko: '인도', en: 'India', es: 'India', ja: 'インド', zh: '印度' }, 응급: '112', 경찰: '112', 위기: [] },   /* gov.uk India health(112) · India ERSS(112 · 내무부) */
+    GB: { 이름: { ko: '영국', en: 'United Kingdom', es: 'Reino Unido', ja: 'イギリス', zh: '英国' }, 응급: '999', 경찰: '999', 위기: [] },   /* gov.uk · NHS 999 */
+    XX: { 이름: { ko: '그 밖', en: 'Other', es: 'Otro', ja: 'その他', zh: '其他' }, 응급: null, 경찰: null, 위기: [] }   /* 11-04 Main — 모르는 나라는 누르는 번호 없음(112 기본값 없앰) */
+  };
+  function 고른곳() { try { var v = JSON.parse(localStorage.getItem('mn.place') || 'null'); if (v && v.country) return 표[v.country] ? v.country : 'XX'; } catch (e) {} return null; }
+  window.메디나눔위기번호 = { 판: '2026-11-04b', 표: 표, 고른곳: 고른곳 };   /* 판 — 표를 쓰는 앱은 다시 읽기만 */
+})();
+/* ▲▲ 위기번호 표 끝 ▲▲ */
 /* ▼▼ 설정 부품 시작 ▼▼ */
 /* ═══ 설정 뼈대 — 메디나눔 다섯 앱 같은 순서·같은 꼴 (2026-11-03 현욱님 「100점 검수 라운드 2」 · 주인: 길동무 세션)
    요청서 docs/requests/20261103_100점_검수_라운드2.md A·D
@@ -2839,6 +2876,8 @@ try { 이용량.설치({ 앱: 'yakjido', 켜짐: false, 주소: 'https://uszalzc
     NZ: ['뉴질랜드', 'New Zealand', 'Nueva Zelanda', 'ニュージーランド', '新西兰'], IE: ['아일랜드', 'Ireland', 'Irlanda', 'アイルランド', '爱尔兰'], IN: ['인도', 'India', 'India', 'インド', '印度'],
     SG: ['싱가포르', 'Singapore', 'Singapur', 'シンガポール', '新加坡'], PH: ['필리핀', 'Philippines', 'Filipinas', 'フィリピン', '菲律宾'], EU: ['유럽(EU)', 'Europe (EU)', 'Europa (UE)', 'ヨーロッパ（EU）', '欧洲（欧盟）'],
     XX: ['그 밖의 나라', 'Another country', 'Otro país', 'その他の国', '其他国家'] };
+  /* 약지도 덧붙임(11-04b — 정본에 올릴 것): 공용 위기번호 표에 있는 나라 이름을 고르개에 보탠다 */
+  try { var 위표 = window.메디나눔위기번호 && window.메디나눔위기번호.표; if (위표) Object.keys(위표).forEach(function (k) { var n = 위표[k].이름; if (!나라이름[k] && n) 나라이름[k] = [n.ko, n.en, n.es, n.ja, n.zh]; }); } catch (e) {}
   var 곁에나라들 = ['KR', 'US', 'ES', 'JP', 'CN', 'MX', 'HK', 'XX'];   /* 곁에 나라 표(11-03) 그대로 — 앱이 나라들로 더 줄 수 있다 */
   var 나라말 = { KR: 'ko', US: 'en', GB: 'en', CA: 'en', AU: 'en', NZ: 'en', IE: 'en', SG: 'en', PH: 'en', IN: 'en', ES: 'es', MX: 'es', JP: 'ja', CN: 'zh', HK: 'zh' };
   var 말이름들 = { ko: ['한국어', 'Korean', 'coreano', '韓国語', '韩语'], en: ['영어', 'English', 'inglés', '英語', '英语'], es: ['스페인어', 'Spanish', 'español', 'スペイン語', '西班牙语'],
@@ -3018,11 +3057,11 @@ try { 이용량.설치({ 앱: 'yakjido', 켜짐: false, 주소: 'https://uszalzc
 
 /* 11-04 현욱님 「쓰는 말 · 사는 나라 · 그 나라 말」(요청서 yozm-health docs/requests/20261104_언어나라_묻기.md) — 공용 부품(길동무 정본 _도구/설정_부품.js·응급카드_부품.js)을 그대로 심음.
    약지도는 출처가 따로라 같은 열쇠(mn.place)·같은 모양으로 이 안에 저장한다. 나라는 app-shell CC 가 mn.place.country 를 먼저 본다(응급 번호·약 이름 나라 한 곳).
-   약지도 응급 번호 표가 있는 나라만 고르게(KR·US·ES·JP·CN·그 밖) — 표에 없는 나라는 그 밖(112)으로. */
+   고르개: 약지도 표(KR·US·ES·JP·CN) + 공용 위기번호 표 나라. 표에 없는 나라는 번호 없음(누르는 단추 없이 「그 나라 응급 번호」). */
 try {
   설정판.설치({ app: 'yakjido', 언어: () => window.LANG || 'ko', 말과나라: {
     기본: () => ({ lang: window.LANG || 'ko', country: window.CC || 'KR' }),
-    나라들: ['KR', 'US', 'ES', 'JP', 'CN', 'XX'],
+    나라들: ['KR', 'US', 'ES', 'JP', 'CN', 'MX', 'HK', 'VN', 'TH', 'PH', 'ID', 'NP', 'UZ', 'KH', 'MN', 'LK', 'BD', 'IN', 'GB', 'XX'],
     바꿈: (v) => { if (v && (v.lang !== window.LANG || v.country !== window.CC)) { try { localStorage.setItem('yakjido.lang', v.lang); localStorage.setItem('yakjido.cc', v.country); } catch (e) {} location.reload(); } else route(); } } });
   응급카드.설치({ 통역줄: [
     { 번호: '119', 말: { en: 'Ask 119 for an interpreter.', es: 'Pida al 119 un intérprete.', ja: '119に通訳を頼んでください。', zh: '请向119要求翻译。' } },
