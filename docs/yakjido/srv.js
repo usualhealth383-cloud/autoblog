@@ -2792,7 +2792,7 @@ try { 이용량.설치({ 앱: 'yakjido', 켜짐: false, 주소: 'https://uszalzc
    ⛔ 지우기·계정 지우기는 앱의 확인 화면으로만 간다(이 부품이 직접 지우지 않는다). */
 (function () {
   if (window.설정판 && window.설정판.__v) return;
-  var 판 = '2026-11-04b';
+  var 판 = '2026-11-04c';
   var 설정 = { app: 'app', 언어: null, 줄: null, 아이콘: null, 다시그리기: null };
   var 글표 = {
     ko: { 맞추기: '나에게 맞추기', 알림: '알림', 화면: '화면과 언어', 기록: '내 기록', 앱: '이 앱',
@@ -2876,8 +2876,6 @@ try { 이용량.설치({ 앱: 'yakjido', 켜짐: false, 주소: 'https://uszalzc
     NZ: ['뉴질랜드', 'New Zealand', 'Nueva Zelanda', 'ニュージーランド', '新西兰'], IE: ['아일랜드', 'Ireland', 'Irlanda', 'アイルランド', '爱尔兰'], IN: ['인도', 'India', 'India', 'インド', '印度'],
     SG: ['싱가포르', 'Singapore', 'Singapur', 'シンガポール', '新加坡'], PH: ['필리핀', 'Philippines', 'Filipinas', 'フィリピン', '菲律宾'], EU: ['유럽(EU)', 'Europe (EU)', 'Europa (UE)', 'ヨーロッパ（EU）', '欧洲（欧盟）'],
     XX: ['그 밖의 나라', 'Another country', 'Otro país', 'その他の国', '其他国家'] };
-  /* 약지도 덧붙임(11-04b — 정본에 올릴 것): 공용 위기번호 표에 있는 나라 이름을 고르개에 보탠다 */
-  try { var 위표 = window.메디나눔위기번호 && window.메디나눔위기번호.표; if (위표) Object.keys(위표).forEach(function (k) { var n = 위표[k].이름; if (!나라이름[k] && n) 나라이름[k] = [n.ko, n.en, n.es, n.ja, n.zh]; }); } catch (e) {}
   var 곁에나라들 = ['KR', 'US', 'ES', 'JP', 'CN', 'MX', 'HK', 'XX'];   /* 곁에 나라 표(11-03) 그대로 — 앱이 나라들로 더 줄 수 있다 */
   var 나라말 = { KR: 'ko', US: 'en', GB: 'en', CA: 'en', AU: 'en', NZ: 'en', IE: 'en', SG: 'en', PH: 'en', IN: 'en', ES: 'es', MX: 'es', JP: 'ja', CN: 'zh', HK: 'zh' };
   var 말이름들 = { ko: ['한국어', 'Korean', 'coreano', '韓国語', '韩语'], en: ['영어', 'English', 'inglés', '英語', '英语'], es: ['스페인어', 'Spanish', 'español', 'スペイン語', '西班牙语'],
@@ -2901,22 +2899,30 @@ try { 이용량.설치({ 앱: 'yakjido', 켜짐: false, 주소: 'https://uszalzc
     try { var tz = Intl.DateTimeFormat().resolvedOptions().timeZone || '';
       var 표 = { 'Asia/Seoul': 'KR', 'Asia/Tokyo': 'JP', 'Asia/Shanghai': 'CN', 'Asia/Chongqing': 'CN', 'Asia/Urumqi': 'CN', 'Asia/Hong_Kong': 'HK', 'Europe/Madrid': 'ES', 'Atlantic/Canary': 'ES', 'Africa/Ceuta': 'ES',
         'America/Mexico_City': 'MX', 'America/Monterrey': 'MX', 'America/Merida': 'MX', 'America/Cancun': 'MX', 'America/Chihuahua': 'MX', 'America/Mazatlan': 'MX', 'America/Hermosillo': 'MX', 'America/Tijuana': 'MX',
-        'Europe/London': 'GB', 'Europe/Dublin': 'IE', 'Asia/Singapore': 'SG', 'Asia/Manila': 'PH', 'Asia/Kolkata': 'IN', 'Asia/Calcutta': 'IN', 'Pacific/Auckland': 'NZ' };
+        'Europe/London': 'GB', 'Europe/Dublin': 'IE', 'Asia/Singapore': 'SG', 'Asia/Manila': 'PH', 'Asia/Kolkata': 'IN', 'Asia/Calcutta': 'IN', 'Pacific/Auckland': 'NZ',
+        'Asia/Ho_Chi_Minh': 'VN', 'Asia/Saigon': 'VN', 'Asia/Bangkok': 'TH', 'Asia/Jakarta': 'ID', 'Asia/Makassar': 'ID', 'Asia/Jayapura': 'ID', 'Asia/Kathmandu': 'NP', 'Asia/Katmandu': 'NP', 'Asia/Tashkent': 'UZ', 'Asia/Samarkand': 'UZ',
+        'Asia/Phnom_Penh': 'KH', 'Asia/Ulaanbaatar': 'MN', 'Asia/Ulan_Bator': 'MN', 'Asia/Colombo': 'LK', 'Asia/Dhaka': 'BD' };   /* 11-04c 공용 표의 나라 */
       if (표[tz]) return 표[tz];
       if (/^America\/(New_York|Chicago|Denver|Los_Angeles|Phoenix|Anchorage|Detroit|Indiana|Kentucky|Boise|Juneau|Sitka|Nome|Adak|Menominee|North_Dakota)|^Pacific\/Honolulu$/.test(tz)) return 'US';
       if (/^America\/(Toronto|Vancouver|Edmonton|Winnipeg|Halifax|St_Johns|Regina|Montreal)/.test(tz)) return 'CA';
       if (/^Australia\//.test(tz)) return 'AU';
     } catch (e) {}
     var n = String((navigator.languages && navigator.languages[0]) || navigator.language || ''), m = /-([A-Za-z]{2})\b/.exec(n), c = m ? m[1].toUpperCase() : '';
-    if (나라이름[c]) return c; if (c) return 'XX';   /* 기기가 밝힌 나라가 목록에 없으면 말로 짐작하지 않는다(곁에 11-03) */
+    표합치기(); if (나라이름[c]) return c; if (c) return 'XX';   /* 기기가 밝힌 나라가 목록에 없으면 말로 짐작하지 않는다(곁에 11-03) */
     return { ko: 'KR', ja: 'JP', zh: 'CN' }[n.slice(0, 2).toLowerCase()] || 'XX';
   }
   function 곳기본() {
+    표합치기();
     var o = 설정.말과나라 || {}, d = 값(o.기본) || {}, l = d.lang || 말();
     if (말순.indexOf(l) < 0) l = 'en';
     return { lang: l, country: (d.country && 나라이름[d.country]) ? d.country : 나라짐작() };
   }
-  function 나라목록() { var o = 설정.말과나라 || {}, a = (값(o.나라들) || 곁에나라들).filter(function (k) { return 나라이름[k]; }); if (a.indexOf('XX') < 0) a.push('XX'); return a; }
+  /* 11-04c — 공용 위기번호 표(window.메디나눔위기번호 · _도구/위기번호_표.js)의 나라도 고르개에 — 베트남·태국 등이 「그 밖」으로 묶이지 않게 */
+  function 공용표() { try { return (window.메디나눔위기번호 && 메디나눔위기번호.표) || null; } catch (e) { return null; } }
+  function 표합치기() { var t = 공용표(); if (!t) return; Object.keys(t).forEach(function (k) { if (나라이름[k] || !t[k] || !t[k].이름) return; 나라이름[k] = 말순.map(function (l) { return t[k].이름[l] || t[k].이름.en || k; }); }); }
+  function 나라목록() { 표합치기(); var o = 설정.말과나라 || {}, a = (값(o.나라들) || 곁에나라들).filter(function (k) { return 나라이름[k]; }), t = 공용표();
+    if (t) Object.keys(t).forEach(function (k) { if (k !== 'XX' && a.indexOf(k) < 0 && 나라이름[k]) a.push(k); });
+    a = a.filter(function (k) { return k !== 'XX'; }); a.push('XX'); return a; }
   var 고르는중 = null;
   function 수준묻나(p) { return 나라말[p.country] !== p.lang; }
   function 곳그림() {
@@ -2935,7 +2941,7 @@ try { 이용량.설치({ 앱: 'yakjido', 켜짐: false, 주소: 'https://uszalzc
       '<button type="button" class="mnp-ok" onclick="설정판.말과나라맞아요()"' + (수준묻나(p) && !p.level ? ' disabled aria-disabled="true"' : '') + '>' + 곳('맞아요', l) + '</button></div>';
   }
   function 곳열기() {
-    스타일(); var 지금 = 곳읽기(), d = 곳기본();
+    스타일(); 표합치기(); var 지금 = 곳읽기(), d = 곳기본();
     고르는중 = 지금 ? { lang: d.lang, country: 나라이름[지금.country] ? 지금.country : 'XX', level: 지금.level } : { lang: d.lang, country: d.country, level: '' };
     if (!수준묻나(고르는중)) 고르는중.level = 'ok'; else if (고르는중.level === 'ok' && !지금) 고르는중.level = '';
     var el = document.getElementById('mnPlace'); if (!el) { el = document.createElement('div'); el.id = 'mnPlace'; el.className = 'mnp'; document.body.appendChild(el); }
@@ -2952,7 +2958,7 @@ try { 이용량.설치({ 앱: 'yakjido', 켜짐: false, 주소: 'https://uszalzc
     다시();
   }
   function 곳줄() {
-    var o = 설정.말과나라; if (!o) return ''; var v = 곳읽기();
+    var o = 설정.말과나라; if (!o) return ''; 표합치기(); var v = 곳읽기();
     var 값글 = v ? (나라이름[v.country] || 나라이름.XX)[칸(말())] + (v.level === 'ok' ? '' : ' · ' + 곳('수준들')[v.level === 'some' ? 1 : 2]) : 곳('안정함');
     return 줄('globe', 곳('줄'), 곳('줄설명'), 값글, '설정판.말과나라열기()');
   }
@@ -2985,7 +2991,7 @@ try { 이용량.설치({ 앱: 'yakjido', 켜짐: false, 주소: 'https://uszalzc
     말과나라열기: 곳열기, 말과나라맞아요: 곳맞아요,
     말과나라고름: function (k, v) { if (!고르는중) return; 고르는중[k] = v; if (k !== 'level') { if (!수준묻나(고르는중)) 고르는중.level = 'ok'; else if (고르는중.level === 'ok') 고르는중.level = ''; } 곳그림(); },
     말과나라확인: function () { if (곳읽기() || navigator.webdriver || document.getElementById('mnPlace')) return false; 곳열기(); return true; },
-    나라이름: function (k, l) { var n = 나라이름[k]; return n ? n[칸(l || 말())] : ''; },
+    나라이름: function (k, l) { 표합치기(); var n = 나라이름[k]; return n ? n[칸(l || 말())] : ''; },
     말이름: function (k, l) { var n = 말이름들[k]; return n ? n[칸(l || 말())] : ''; }
   };
 })();
