@@ -1768,8 +1768,8 @@ background-repeat:no-repeat;background-position:right 9px center;background-size
 <script>
 window.__YAKJIDO_OK__ = true;
 const D = JSON.parse(document.getElementById('data').textContent || '{}');
-const BUILD = '2026-11-04 06:26';
-const DATAV = 'b6091df6cd'.indexOf('__') === 0 ? BUILD : 'b6091df6cd';
+const BUILD = '2026-11-04 08:40';
+const DATAV = 'd06fdffdee'.indexOf('__') === 0 ? BUILD : 'd06fdffdee';
 const BRANDMARK = (typeof window !== 'undefined' && window.__BRANDMARK__) || 'icon-192.png';
 let CORE = 0, CORE_P = null;
 function mergeCore(c){
@@ -6396,7 +6396,7 @@ return `${topBar({ back:'이전' })}
 <div class="eyebrow">약국에서 보여드리기</div>
 <h1 style="font-size:1.375rem">이 화면을 약사님께 보여 주세요</h1>
 ${rf ? rfClNote + `<details class="why-more" style="margin-top:12px"><summary>그래도 약 목록 보기${I.chev}</summary>` : ''}
-<div class="show-card">
+<div class="show-card"${LANG !== 'ko' && CC === 'KR' ? ' data-ko lang="ko"' : ''}>
 <div class="show-head">${esc(s.name)}${f.length ? ` · ${f.map(k => esc(FLAG_LABEL[k])).join(' · ')}` : ''}${alg.length || ME.allergyUnknown ? `<small class="show-mine">약 알레르기: ${alg.length ? alg.map(esc).join(', ') : '있었어요(성분은 몰라요)'}</small>` : ''}${mine.length ? `<small class="show-mine">제가 먹는 약 ${mine.length}가지: ${mine.map(esc).join(', ')}</small>` : ''}</div>
 ${inf ? inf : `<ol class="show-list">${bk.map(x => {
 const prod = prodName(x.product);
@@ -6409,7 +6409,7 @@ return `<li${x.blocked || x.cab ? ' class="show-ask-row"' : ''}><span class="n">
 }).join('')}</ol>`}
 ${droppedNote(bk) ? `<p class="show-ask" style="color:var(--alert)">${esc(droppedNote(bk))}</p>` : ''}
 <p class="show-ask">성분·함량·제형이 같으면 다른 제품도 괜찮아요.<br>겹치는 성분이 없게 봐 주세요.</p>
-${achLine(bk.map(x => x.d))}
+${achLine(bk.map(x => x.d))}${ext('물을말')}
 </div>
 ${f.length ? `<div class="note" style="margin-top:12px">${I.alert}<span>제 상태를 꼭 말씀드리세요 — <b>${f.map(k => esc(FLAG_LABEL[k])).join(', ')}</b></span></div>` : ''}
 <div class="actions"><button class="btn line" onclick="go('/check/${s.id}')">${I.shield} 다른 걸 권하시면 여기서 확인</button><button class="btn ghost" onclick="shareMemo('${s.id}')">${I.cart} 메모로 복사·전송</button><button class="btn ghost" onclick="go('/send?s=${s.id}')">${I.family} 가족에게 보내기</button></div>${rf ? '</details>' : ''}

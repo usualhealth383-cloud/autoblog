@@ -3089,5 +3089,24 @@ window.addEventListener('mn:place', () => { try { route(); } catch (e) {} });
 const 곳확인 = () => { try { if (consentRec() && /^#\/(home)?$|^$/.test(location.hash || '')) 설정판.말과나라확인(); } catch (e) {} };
 window.addEventListener('hashchange', () => setTimeout(곳확인, 300)); setTimeout(곳확인, 900);
 
+/* 11-04 현욱님 「압도적 매력」 ② 약국 앞 한 장 — 묻고 싶은 것 한 줄(이 기기에만). 카드 안은 약사에게 보이는 말(한국에 사는 외국어 사용자는 카드가 한국어로 남고 사용자 말 풀이를 아래에) */
+const ASK_KEY = 'yakjido.ask';
+window.물을말 = () => { let v = ''; try { v = localStorage.getItem(ASK_KEY) || ''; } catch (e) {}
+  const ko = (window.LANG || 'ko') !== 'ko' && window.CC === 'KR';
+  const 풀이 = { en: 'This card stays in Korean so the pharmacist can read it.', es: 'Esta tarjeta se queda en coreano para que la lea el farmacéutico.', ja: 'このカードは薬剤師が読めるよう韓国語のままです。', zh: '这张卡片保留韩语，方便药剂师阅读。' }[window.LANG];
+  return `<div class="show-q"><p class="show-ask"><b>물어보고 싶은 것</b>${v ? '<br>' + esc(v) : ''}</p>
+    <div data-noko>${ko && 풀이 ? `<p class="small muted" lang="${window.LANG}">${esc(풀이)}</p>` : ''}<label class="small" for="askIn" style="display:block;margin-top:8px">약사님께 묻고 싶은 것 한 줄 <small class="muted">선택 · 이 휴대폰에만</small></label>
+    <input id="askIn" maxlength="120" value="${esc(v)}" placeholder="예) 졸리지 않은 약으로 주세요" style="width:100%;min-height:48px;margin-top:4px" onchange="물을말저장(this.value)"></div></div>`; };
+window.물을말저장 = v => { try { v = String(v || '').replace(/[<>]/g, '').trim().slice(0, 120); if (v) localStorage.setItem(ASK_KEY, v); else localStorage.removeItem(ASK_KEY); } catch (e) {} route(); };
+
+/* 11-04 「압도적 매력」 ① 약 이름 몰라도 등록 — 알약 찾기(각인·모양·색 → 식약처 사진)로 담은 뒤, 약이 둘 이상이면 바로 「겹치는지 보기」 */
+['togglePub', 'addPubIx'].forEach(fn => { const 원 = window[fn]; if (typeof 원 !== 'function') return;
+  window[fn] = async (...a) => { const 전 = (ME.taking || []).length; const r = await 원(...a); const 후 = (ME.taking || []).length;
+    if (후 > 전 && 후 >= 2) setTimeout(() => { if (!/^#\/(pill|pub|photo|drugs|search)/.test(location.hash) || document.getElementById('mixNudge')) return;
+      const v = document.getElementById('view'); if (!v) return; const d = document.createElement('div'); d.id = 'mixNudge'; d.className = 'note'; d.style.margin = '12px 0';
+      d.innerHTML = `${I.shield}<span>내 약통에 담았어요. 지금 드시는 약 ${후}가지가 서로 겹치거나 부딪히지 않는지 바로 볼 수 있어요. <button type="button" class="link" style="min-height:44px" onclick="go('/together')">겹치는지 보기</button><br><small class="muted">사진과 각인이 확실하지 않으면 약 봉투나 약국에서 확인하세요.</small></span>`;
+      v.prepend(d); try { if (window.I18N && I18N.tr) I18N.tr(d); } catch (e) {} }, 400);
+    return r; }; });
+
 /* 내 정보·동의·로그인·약관 화면을 보고 있었으면 다시 그린다(이 파일이 늦게 오므로) */
 try { if (/^#\/(me|consent|login|notify|sgoal|sstage|doc|hello\/3|supp$|supp\?|sgoal|sstage|rx|about|search|myths|askdoc|talk|p\/|p\?|p$)/.test(location.hash)) route(); } catch (e) {}

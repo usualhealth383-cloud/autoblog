@@ -131,6 +131,7 @@
     while ((n = w.nextNode())) todo.push(n);
     todo.forEach(function (n) {
       if (n.parentNode && /^(SCRIPT|STYLE|TEXTAREA)$/.test(n.parentNode.nodeName)) return;
+      var 칸ko = n.parentNode && n.parentNode.closest ? n.parentNode.closest('[data-ko],[data-noko]') : null; if (칸ko && 칸ko.hasAttribute('data-ko')) return;   /* 11-04 약사에게 보여 줄 한국어 칸(한국에 사는 외국어 사용자) — 번역하지 않음 */
       var v = n.nodeValue, t = L !== 'ko' ? 글(v) : null;
       if (t != null) { var lead = v.match(/^\s*/)[0], tail = v.match(/\s*$/)[0]; if (/^[.,:;!?。，、．）)]/.test(t)) lead = ''; v = lead + t + tail; }   /* 굵은 글씨로 나뉜 문장 — 「labels .」 빈칸 없애기 */
       v = 번호(v); if (v !== n.nodeValue) n.nodeValue = v;
