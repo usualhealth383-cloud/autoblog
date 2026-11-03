@@ -17,6 +17,9 @@ with sync_playwright() as p:
             pg.add_init_script(SEED + f";localStorage.setItem('yakjido.lang','{L}');localStorage.setItem('yakjido.cc','{CC}')")
             pg.goto(URL + '#/home'); pg.wait_for_function("()=>typeof CORE!=='undefined'&&CORE===2", timeout=20000)
             if L != 'ko': pg.wait_for_function("()=>window.I18N", timeout=10000); pg.evaluate("()=>I18N.ready"); pg.wait_for_timeout(500)
+            # 11-03 아래 탭 글이 칸 밖으로 나가 옆 탭과 겹치는지(넘침 검사는 이걸 못 잡았다)
+            tab = pg.evaluate("""()=>[...document.querySelectorAll('nav.tabbar button')].filter(x=>x.offsetParent).filter(x=>{const b=x.getBoundingClientRect(),r=document.createRange();r.selectNodeContents(x);const t=r.getBoundingClientRect();return t.left<b.left-1||t.right>b.right+1||t.height>b.height+1}).map(x=>x.innerText.replace(/\\n/g,' '))""")
+            if tab: fails.append(f'{L} {W} 아래 탭 글 겹침 {tab}')
             for r in ROUTES:
                 pg.evaluate("h=>{location.hash=h;route()}", r); pg.wait_for_timeout(600 if r != '/talk' else 1600)
                 o = pg.evaluate(OVER)
