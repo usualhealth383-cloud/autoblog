@@ -1953,7 +1953,7 @@ function famCard(q){
         <dt>받은 정보는</dt><dd>안부 확인에만 써 주세요. 연결을 끊거나 필요 없어지면 휴대폰에서 지워 주세요. 이미 도착한 알림은 자동으로 지워지지 않아요</dd>
         <dt>잠금화면</dt><dd>호칭과 복용 시각이 이 휴대폰 잠금화면에 보일 수 있어요. 원하지 않으면 휴대폰 설정에서 알림 미리보기를 꺼 주세요</dd>
         <dt>해외 전달</dt><dd>알림은 이 휴대폰의 브라우저·기기 회사 알림 서버(미국 등)를 거쳐 와요</dd>
-        <dt>동의하지 않으면</dt><dd>연결하지 않아도 돼요. 다른 기능은 그대로 쓸 수 있어요</dd></dl></details>
+        <dt>동의하지 않으면</dt><dd>연결하지 않아도 돼요. 다른 기능은 그대로 쓸 수 있어요</dd></dl></details>${pushNote()}
       <label class="door-ck"><input id="famJoinOk" type="checkbox"><span><b>내 계정 이메일을 상대에게 보여 주고, 위 내용으로 알림을 받는 데 동의해요 ${tag}</b></span></label>
       <p class="small muted">상대가 허락하면 알림이 시작돼요. 알림 허락을 한 번 여쭤요.</p>
       <button type="button" class="btn primary" onclick="famJoin()">동의하고 연결 요청하기</button></div>` : '';
@@ -1975,6 +1975,8 @@ function famSetHTML(){ const p = famPrefs();
 function famSet(ch){ if (ch.qs != null && !/^([01]\d|2[0-3]):[0-5]\d$/.test(ch.qs + '') || ch.qe != null && !/^([01]\d|2[0-3]):[0-5]\d$/.test(ch.qe + '')) { FAMQ.msg = '시각을 다시 골라 주세요.'; route(); return; }
   famSave(ch); 서버.올리기().catch(() => {}); FAMQ.msg = '저장했어요. 다음 확인부터 이대로 보내요.'; route(); }
 /* 본인: 앱을 닫아도 제시간에(웹 — 설치 앱은 휴대폰 자체 알람이라 필요 없다) */
+/* 11-03 공용 푸시 부품 동의HTML 과 같은 뜻 — 켜는 칸 아래 한 줄 + 약지도 처리방침(국외 이전 7절) */
+const pushNote = () => '<p class="small muted">켜면 이 기기의 알림 받을 주소·언어·시간대를 서버에 둡니다. 끄면 바로 지워요. <a href="privacy.html#s7" target="_blank" rel="noopener">처리방침</a></p>';
 function doseSrvHTML(){
   if (!famOn() || (typeof NATIVE !== 'undefined' && NATIVE)) return '';
   const on = famPrefs().dose && srvLoggedIn();
@@ -1985,7 +1987,7 @@ function doseSrvHTML(){
       : on ? `<p class="fam-msg">켜져 있어요</p><button type="button" class="link" onclick="doseSrv(false)">끄기</button>`
       : `<label class="door-ck"><input id="doseOk" type="checkbox"><span><b>정시 알림을 전달하려고 알림 내용(복용 시각, 켠 경우 약 이름)이 이 휴대폰 브라우저 회사의 해외 알림 서버를 거치는 데 동의해요 <em class="door-tag">선택</em></b><small>동의하지 않아도 앱이 열려 있을 때의 알림은 그대로예요.</small></span></label>
          <button type="button" class="btn primary" onclick="doseSrv(true)">동의하고 켜기</button>`}
-    ${famIos()}</section>`; }
+    ${pushNote()}${famIos()}</section>`; }
 function doseSrv(on){
   if (on && !document.getElementById('doseOk')?.checked) { FAMQ.msg = '켜려면 동의에 체크해 주세요.'; route(); return; }
   (on ? famPush() : Promise.resolve()).then(() => { famSave({ dose: !!on, doseAt: on ? new Date().toISOString() : null }); return 서버.올리기(); })
