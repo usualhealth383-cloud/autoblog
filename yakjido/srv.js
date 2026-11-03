@@ -1368,7 +1368,8 @@ window.언어칸 = function () {
   var CN = [['KR', '한국 · 119'], ['US', 'USA · 911'], ['ES', 'España · 112'], ['JP', '日本 · 119'], ['CN', '中国 · 120']];
   var b = function (on, js, t) { return '<button type="button" class="' + (on ? 'on' : '') + '" aria-pressed="' + on + '" onclick="' + js + '">' + t + '</button>'; };
   return '<section class="sec card" style="margin-top:16px"><h2>언어 · Language</h2><div class="fs-seg lang-seg" role="group" aria-label="언어" style="flex-wrap:wrap">' + LN.map(function (x) { return b(window.LANG === x[0], "setLang('" + x[0] + "')", x[1]); }).join('') + '</div>' +
-    '<p class="small muted" style="margin-top:10px">사는 나라 · Country — 응급 번호</p><div class="fs-seg lang-seg" role="group" aria-label="나라" style="flex-wrap:wrap">' + CN.map(function (x) { return b(window.CC === x[0], "setLang(window.LANG,'" + x[0] + "')", x[1]); }).join('') + '</div></section>';
+    '<p class="small muted" style="margin-top:10px">사는 나라 · Country — 응급 번호</p><div class="fs-seg lang-seg" role="group" aria-label="나라" style="flex-wrap:wrap">' + CN.map(function (x) { return b(window.CC === x[0], "setLang(window.LANG,'" + x[0] + "')", x[1]); }).join('') + '</div>' +
+    (window.설정판 && 설정판.말과나라열기 ? '<button type="button" class="link" style="margin-top:10px;min-height:44px" onclick="설정판.말과나라열기()">말과 나라 · 그 나라 말을 얼마나 하는지</button>' : '') + '</section>';
 };
 /* ▼▼ 대화 부품 시작 ▼▼ */
 /* ═══ 메디나눔 대화 부품 — AI 없이 «대화하는 느낌» (2026-10-27 Main · 요청서 docs/requests/20261027_메디나눔_전앱_대화형.md) ═══
@@ -2728,6 +2729,316 @@ try { 통합찾기.설치({ 앱: 'yakjido', 열기: function (url) { location.hr
 /* ▲▲ 이용량 부품 끝 ▲▲ */
 /* 10-26 현욱님 「월 정액 시범 → 이용량 보고 결정」 — 꺼진 채(처리방침 「익명 이용 통계」 줄 시행 뒤에 켬) */
 try { 이용량.설치({ 앱: 'yakjido', 켜짐: false, 주소: 'https://uszalzczpmyifzbamjno.supabase.co', 공개키: 'sb_publishable_YQSz-D-RCXzHGUhso06rMg_GOIIRDuV' }); 이용량.센다('open'); } catch (e) {}
+
+/* ▼▼ 설정 부품 시작 ▼▼ */
+/* ═══ 설정 뼈대 — 메디나눔 다섯 앱 같은 순서·같은 꼴 (2026-11-03 현욱님 「100점 검수 라운드 2」 · 주인: 길동무 세션)
+   요청서 docs/requests/20261103_100점_검수_라운드2.md A·D
+   순서(고정): ① 계정 카드 ② 회원권 줄 ③ 나에게 맞추기(앱 고유) ④ 알림 ⑤ 화면과 언어(언어 · 글자 크기 3단 · 화면 밝기 3단 — 글자·밝기는 이 자리에서 바로 고름)
+               ⑥ 내 기록(동의 · 내 기록 파일로 받기(JSON) · 옮기기·되살리기 · 모두 지우기 · 앱 고유) ⑦ 이 앱(처리방침 · 앱 정보 · 문의)
+   꼴: 줄은 앱의 줄 그리기 함수(줄:)로 그린다 — 앱 고유의 줄 모양·아이콘을 그대로. 묶음 제목·표준 줄 이름은 부품이 다섯 말로 들고 다닌다.
+   쓰는 법(앱 끝, 계정·회원권 부품 뒤):
+     설정판.설치({ app:'gildongmu', 언어: function(){ return 'ko' },
+       줄: function(아이콘, 제목, 설명, 값, 부름){ return '<button …>' },   // 앱의 줄 모양
+       아이콘: function(이름){ return '<svg…>' },                          // 이름: user · card · hands · bell · globe · text · sun · shield · download · copy · trash · doc · info · chat · plane · heart
+       계정: function(){ return 계정.카드HTML() }, 회원권: true,
+       나에게: [{ 아이콘:'hands', 제목:'…', 설명:'…', 값:'…', 부름:"openSettings('role')" }, …],
+       알림: { 설명:'…', 값:'켜짐', 부름:"openSettings('noti')" },
+       언어: { 값:'한국어', 부름:"openSettings('lang')" },
+       글자: { 값: function(){ return 0|1|2 }, 바꿈: function(n){…} },
+       밝기: { 값: function(){ return 'light'|'dark'|'auto' }, 바꿈: function(v){…}, 준비: true },   // 준비:false 면 「어둡게」를 「준비 중」으로(되는 척 금지)
+       동의: { 값:'…', 부름:"openSettings('consent')" },
+       파일: { 부름:'saveBackupFile()' }, 옮기기: { 부름:'openBackup()' }, 지우기: { 부름:"openSettings('data')" },
+       기록더: [{…}],                                                       // 앱 고유(기내에서 쓰기 · 사연 보내기 등)
+       처리방침: 'https://medinanum.com/privacy-gildongmu.html', 정보: { 부름:'openAbout()' }, 문의: { 부름:"openSettings('help')" },
+       아래말: '…', 다시그리기: function(){ openSettings('menu') } });
+     화면: 설정판.HTML()  — 시트 맨 위 제목 아래에 통째로.
+   ⛔ 지우기·계정 지우기는 앱의 확인 화면으로만 간다(이 부품이 직접 지우지 않는다). */
+(function () {
+  if (window.설정판 && window.설정판.__v) return;
+  var 판 = '2026-11-04';
+  var 설정 = { app: 'app', 언어: null, 줄: null, 아이콘: null, 다시그리기: null };
+  var 글표 = {
+    ko: { 맞추기: '나에게 맞추기', 알림: '알림', 화면: '화면과 언어', 기록: '내 기록', 앱: '이 앱',
+      알림제목: '알림', 언어: '언어 · Language', 글자: '글자 크기', 글자들: ['기본', '조금 크게', '가장 크게'], 밝기: '화면 밝기', 밝기들: ['밝게', '어둡게', '기기 설정 따라'], 준비중: '준비 중',
+      동의: '내 동의 내용', 동의설명: '동의를 바꾸거나 철회', 파일: '내 기록 파일로 받기', 파일설명: '모든 기록을 파일 하나(JSON)로 이 기기에 저장', 옮기기: '옮기기 · 되살리기', 옮기기설명: '복사해 두었다가 다른 기기에서 되살리기',
+      지우기: '모두 지우기', 지우기설명: '이 기기의 기록과 설정 — 확인 뒤 지워요', 처리방침: '개인정보 처리방침', 처리방침설명: '무엇을 · 왜 · 언제까지', 정보: '이 앱에 대하여', 정보설명: '의료기기 아님 · 근거 자료 · 약관', 문의: '문의하고 잘못된 내용 알리기', 문의설명: '고쳐야 할 것을 알려 주세요' },
+    en: { 맞추기: 'Personalize', 알림: 'Notifications', 화면: 'Display and language', 기록: 'My records', 앱: 'This app',
+      알림제목: 'Notifications', 언어: 'Language · 언어', 글자: 'Text size', 글자들: ['Default', 'Larger', 'Largest'], 밝기: 'Screen brightness', 밝기들: ['Light', 'Dark', 'Follow device'], 준비중: 'Coming soon',
+      동의: 'My consents', 동의설명: 'Change or withdraw consent', 파일: 'Download my records', 파일설명: 'Save all records to this device as one file (JSON)', 옮기기: 'Move · restore', 옮기기설명: 'Copy and restore on another device',
+      지우기: 'Delete everything', 지우기설명: 'Records and settings on this device — deleted after you confirm', 처리방침: 'Privacy policy', 처리방침설명: 'What, why and for how long', 정보: 'About this app', 정보설명: 'Not a medical device · sources · terms', 문의: 'Contact us and report errors', 문의설명: 'Tell us what needs fixing' },
+    es: { 맞추기: 'Ajustado a mí', 알림: 'Avisos', 화면: 'Pantalla e idioma', 기록: 'Mis registros', 앱: 'Esta app',
+      알림제목: 'Avisos', 언어: 'Idioma · 언어', 글자: 'Tamaño del texto', 글자들: ['Normal', 'Más grande', 'Lo más grande'], 밝기: 'Pantalla', 밝기들: ['Clara', 'Oscura', 'Según el dispositivo'], 준비중: 'Muy pronto',
+      동의: 'Mis consentimientos', 동의설명: 'Cambiar o retirar el consentimiento', 파일: 'Descargar mis registros', 파일설명: 'Guardar todos los registros en este dispositivo en un archivo (JSON)', 옮기기: 'Mover · restaurar', 옮기기설명: 'Copiar y restaurar en otro dispositivo',
+      지우기: 'Borrar todo', 지우기설명: 'Registros y ajustes de este dispositivo: se borran tras confirmar', 처리방침: 'Política de privacidad', 처리방침설명: 'Qué, por qué y hasta cuándo', 정보: 'Sobre esta app', 정보설명: 'No es un producto sanitario · fuentes · condiciones', 문의: 'Contacto y notificación de errores', 문의설명: 'Díganos qué hay que corregir' },
+    ja: { 맞추기: '自分に合わせる', 알림: '通知', 화면: '画面と言語', 기록: '自分の記録', 앱: 'このアプリ',
+      알림제목: '通知', 언어: '言語 · 언어', 글자: '文字の大きさ', 글자들: ['標準', '少し大きく', 'いちばん大きく'], 밝기: '画面の明るさ', 밝기들: ['明るく', '暗く', '端末の設定に合わせる'], 준비중: '準備中',
+      동의: '同意の内容', 동의설명: '同意の変更・撤回', 파일: '記録をファイルで受け取る', 파일설명: 'すべての記録を1つのファイル（JSON）でこの端末に保存', 옮기기: '移す · 戻す', 옮기기설명: 'コピーして別の端末で戻す',
+      지우기: 'すべて消す', 지우기설명: 'この端末の記録と設定 — 確認してから消します', 처리방침: '個人情報の取り扱い', 처리방침설명: '何を・なぜ・いつまで', 정보: 'このアプリについて', 정보설명: '医療機器ではありません · 根拠 · 規約', 문의: 'お問い合わせ・誤りの報告', 문의설명: '直すべきところを教えてください' },
+    zh: { 맞추기: '为我调整', 알림: '提醒', 화면: '显示和语言', 기록: '我的记录', 앱: '本应用',
+      알림제목: '提醒', 언어: '语言 · 언어', 글자: '字体大小', 글자들: ['标准', '大一些', '最大'], 밝기: '屏幕亮度', 밝기들: ['浅色', '深色', '跟随设备'], 준비중: '即将推出',
+      동의: '我的同意', 동의설명: '更改或撤回同意', 파일: '把记录下载为文件', 파일설명: '把全部记录以一个文件（JSON）保存到本设备', 옮기기: '转移 · 恢复', 옮기기설명: '复制后在其他设备恢复',
+      지우기: '全部删除', 지우기설명: '本设备上的记录和设置——确认后删除', 처리방침: '隐私政策', 처리방침설명: '收集什么、为什么、保存多久', 정보: '关于本应用', 정보설명: '不是医疗器械 · 依据 · 条款', 문의: '联系我们、报告错误', 문의설명: '告诉我们需要改正的地方' }
+  };
+  function 말() { var l = null; try { if (typeof 설정.언어 === 'function') l = 설정.언어(); } catch (e) {} if (!l) l = (document.documentElement && document.documentElement.lang) || 'ko'; l = String(l).toLowerCase().slice(0, 2); return 글표[l] ? l : 'ko'; }
+  function 글(k) { var t = 글표[말()][k]; return t == null ? 글표.ko[k] : t; }
+  function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
+  function 값(v) { try { return typeof v === 'function' ? v() : v; } catch (e) { return null; } }
+  function 아이콘(n) { try { if (typeof 설정.아이콘 === 'function') return 설정.아이콘(n) || ''; } catch (e) {} return ''; }
+  function 줄(a, 제목, 설명, 값글, 부름) {
+    if (!부름) return '';
+    try { if (typeof 설정.줄 === 'function') return 설정.줄(아이콘(a), 제목, 설명 || '', 값글 || '', 부름); } catch (e) {}
+    return '<button type="button" class="ms-row" onclick="' + esc(부름) + '"><span class="ms-rt"><b>' + 제목 + '</b>' + (설명 ? '<span>' + 설명 + '</span>' : '') + '</span>' + (값글 ? '<span class="ms-rv">' + 값글 + '</span>' : '') + '</button>';
+  }
+  function 묶음(제목, 안) { return 안 ? '<div class="ms-group"><h3 class="ms-h">' + 제목 + '</h3><div class="menu">' + 안 + '</div></div>' : ''; }
+  function 고름(이름, 목록, 지금, 부름, 막힘) {
+    return '<div class="ms-seg" role="group" aria-label="' + esc(이름) + '"><span class="ms-sl">' + 이름 + '</span><div class="ms-sb">' + 목록.map(function (x, i) {
+      var 끔 = 막힘 && 막힘(i), on = !끔 && 지금 === i;
+      return '<button type="button" class="' + (on ? 'on' : '') + '" aria-pressed="' + on + '"' + (끔 ? ' disabled aria-disabled="true"' : ' onclick="' + 부름 + '(' + i + ')"') + '>' + x + (끔 ? ' <span class="ms-soon">' + 글('준비중') + '</span>' : '') + '</button>';
+    }).join('') + '</div></div>';
+  }
+  var 밝기값 = ['light', 'dark', 'auto'];
+  function HTML() {
+    스타일();
+    var o = 설정, h = '';
+    h += 값(o.계정) || '';
+    if (o.회원권 && window.회원권) { var q = 회원권.줄(); h += '<div class="menu">' + 줄('card', q.제목, q.설명, q.값, '회원권.열기()') + '</div>'; }
+    h += 묶음(글('맞추기'), (값(o.나에게) || []).map(function (x) { return 줄(x.아이콘, 값(x.제목), 값(x.설명), 값(x.값), x.부름); }).join(''));
+    if (o.알림) h += 묶음(글('알림'), 줄('bell', 글('알림제목'), 값(o.알림.설명), 값(o.알림.값), o.알림.부름));
+    var 화 = '';
+    if (o.언어) 화 += 줄('globe', 글('언어'), 값(o.언어.설명), 값(o.언어.값), o.언어.부름);
+    화 += 곳줄();
+    var 고름칸 = '';
+    if (o.글자) 고름칸 += 고름(글('글자'), 글('글자들'), Number(값(o.글자.값)) || 0, '설정판.글자');
+    if (o.밝기) { var 준비 = o.밝기.준비 !== false; 고름칸 += 고름(글('밝기'), 글('밝기들'), 밝기값.indexOf(값(o.밝기.값) || 'light'), '설정판.밝기', function (i) { return !준비 && i > 0; }); }
+    if (화 || 고름칸) h += '<div class="ms-group"><h3 class="ms-h">' + 글('화면') + '</h3>' + (화 ? '<div class="menu">' + 화 + '</div>' : '') + (고름칸 ? '<div class="ms-segs">' + 고름칸 + '</div>' : '') + '</div>';
+    var 기 = '';
+    if (o.동의) 기 += 줄('shield', 글('동의'), 값(o.동의.설명) || 글('동의설명'), 값(o.동의.값), o.동의.부름);
+    if (o.파일) 기 += 줄('download', 글('파일'), 글('파일설명'), 값(o.파일.값), o.파일.부름);
+    if (o.옮기기) 기 += 줄('copy', 글('옮기기'), 글('옮기기설명'), 값(o.옮기기.값), o.옮기기.부름);
+    (값(o.기록더) || []).forEach(function (x) { 기 += 줄(x.아이콘, 값(x.제목), 값(x.설명), 값(x.값), x.부름); });
+    if (o.지우기) 기 += 줄('trash', 글('지우기'), 글('지우기설명'), 값(o.지우기.값), o.지우기.부름);
+    h += 묶음(글('기록'), 기);
+    var 앱 = '';
+    if (o.처리방침) 앱 += 줄('doc', 글('처리방침'), 글('처리방침설명'), '', "window.open('" + String(o.처리방침).replace(/'/g, '') + "','_blank','noopener')");
+    if (o.정보) 앱 += 줄('info', 글('정보'), 값(o.정보.설명) || 글('정보설명'), '', o.정보.부름);
+    if (o.문의) 앱 += 줄('chat', 글('문의'), 글('문의설명'), '', o.문의.부름);
+    h += 묶음(글('앱'), 앱);
+    if (o.아래말) h += '<p class="tiny ms-foot">' + 값(o.아래말) + '</p>';
+    return '<div class="ms" id="msSettings">' + h + '</div>';
+  }
+  /* ── 말과 나라(2026-11-04 현욱님 「진행」 · docs/requests/20261104_언어나라_묻기.md) ──
+     앱 말 · 사는 나라 · 그 나라 말 수준을 한 화면 세 줄로(미리 채움 · 「맞아요」 한 번 · 건너뛰기 없음).
+     값: localStorage mn.place = {lang, country, level('ok'|'some'|'none'), at} — 다섯 앱 같은 열쇠. 읽기 설정판.말과나라() · 바뀌면 window 에 'mn:place' 이벤트.
+     앱이 주는 것(설치의 말과나라: {…}): 기본() → {lang, country} 미리 채울 값 · 바꿈(값, 말바뀜, 나라바뀜) → 앱 말·나라에 반영 · 나라들: ['KR', …] 고를 목록.
+     첫 실행: 앱이 동의를 마친 뒤 설정판.말과나라확인() — 값이 없을 때만 연다. 자동 시험(navigator.webdriver)에서는 스스로 열지 않는다(설정판.말과나라열기() 로 연다). */
+  var 말이름 = { ko: '한국어', en: 'English', es: 'Español', ja: '日本語', zh: '中文' }, 말순 = ['ko', 'en', 'es', 'ja', 'zh'];
+  var 나라이름 = {
+    KR: ['한국', 'South Korea', 'Corea del Sur', '韓国', '韩国'], US: ['미국', 'United States', 'Estados Unidos', 'アメリカ', '美国'], ES: ['스페인', 'Spain', 'España', 'スペイン', '西班牙'],
+    JP: ['일본', 'Japan', 'Japón', '日本', '日本'], CN: ['중국', 'China', 'China', '中国', '中国'], MX: ['멕시코', 'Mexico', 'México', 'メキシコ', '墨西哥'], HK: ['홍콩', 'Hong Kong', 'Hong Kong', '香港', '香港'],
+    GB: ['영국', 'United Kingdom', 'Reino Unido', 'イギリス', '英国'], CA: ['캐나다', 'Canada', 'Canadá', 'カナダ', '加拿大'], AU: ['호주', 'Australia', 'Australia', 'オーストラリア', '澳大利亚'],
+    NZ: ['뉴질랜드', 'New Zealand', 'Nueva Zelanda', 'ニュージーランド', '新西兰'], IE: ['아일랜드', 'Ireland', 'Irlanda', 'アイルランド', '爱尔兰'], IN: ['인도', 'India', 'India', 'インド', '印度'],
+    SG: ['싱가포르', 'Singapore', 'Singapur', 'シンガポール', '新加坡'], PH: ['필리핀', 'Philippines', 'Filipinas', 'フィリピン', '菲律宾'], EU: ['유럽(EU)', 'Europe (EU)', 'Europa (UE)', 'ヨーロッパ（EU）', '欧洲（欧盟）'],
+    XX: ['그 밖의 나라', 'Another country', 'Otro país', 'その他の国', '其他国家'] };
+  var 곁에나라들 = ['KR', 'US', 'ES', 'JP', 'CN', 'MX', 'HK', 'XX'];   /* 곁에 나라 표(11-03) 그대로 — 앱이 나라들로 더 줄 수 있다 */
+  var 나라말 = { KR: 'ko', US: 'en', GB: 'en', CA: 'en', AU: 'en', NZ: 'en', IE: 'en', SG: 'en', PH: 'en', IN: 'en', ES: 'es', MX: 'es', JP: 'ja', CN: 'zh', HK: 'zh' };
+  var 말이름들 = { ko: ['한국어', 'Korean', 'coreano', '韓国語', '韩语'], en: ['영어', 'English', 'inglés', '英語', '英语'], es: ['스페인어', 'Spanish', 'español', 'スペイン語', '西班牙语'],
+    ja: ['일본어', 'Japanese', 'japonés', '日本語', '日语'], zh: ['중국어', 'Chinese', 'chino', '中国語', '中文'] };
+  var 곳글 = {
+    ko: { 제목: '쓰는 말과 사는 나라', 설명: '맞는 응급 번호와 안내를 드리려고 여쭤요. 맞으면 한 번만 눌러 주세요.', 앱말: '앱을 볼 말', 나라: '지금 사는 나라', 수준: '{말}를 얼마나 하세요?', 수준일반: '그 나라 말을 얼마나 하세요?',
+      수준들: ['편해요', '조금 해요', '거의 못해요'], 맞아요: '맞아요', 줄: '말과 나라', 줄설명: '응급 번호와 안내를 이 값으로 맞춰요', 안정함: '아직 안 정함' },
+    en: { 제목: 'Your language and country', 설명: 'We ask so we can show the right emergency numbers and guidance. If this looks right, tap once.', 앱말: 'App language', 나라: 'Country you live in now', 수준: 'How well do you speak {말}?', 수준일반: 'How well do you speak the local language?',
+      수준들: ['Comfortably', 'A little', 'Hardly at all'], 맞아요: 'Looks right', 줄: 'Language and country', 줄설명: 'Emergency numbers and guidance follow these', 안정함: 'Not set yet' },
+    es: { 제목: 'Su idioma y su país', 설명: 'Se lo preguntamos para mostrarle los números de emergencia y la información correctos. Si es correcto, pulse una vez.', 앱말: 'Idioma de la app', 나라: 'País donde vive ahora', 수준: '¿Qué tal habla {말}?', 수준일반: '¿Qué tal habla el idioma del país?',
+      수준들: ['Con soltura', 'Un poco', 'Casi nada'], 맞아요: 'Es correcto', 줄: 'Idioma y país', 줄설명: 'Los números de emergencia y la información siguen estos datos', 안정함: 'Sin elegir' },
+    ja: { 제목: '使う言葉と住んでいる国', 설명: '正しい緊急番号と案内をお伝えするためにお聞きしています。合っていれば一度押してください。', 앱말: 'アプリの言葉', 나라: '今住んでいる国', 수준: '{말}はどのくらい話せますか？', 수준일반: 'その国の言葉はどのくらい話せますか？',
+      수준들: ['問題なく話せる', '少し話せる', 'ほとんど話せない'], 맞아요: 'これで合っています', 줄: '言葉と国', 줄설명: '緊急番号と案内をこの内容に合わせます', 안정함: 'まだ選んでいません' },
+    zh: { 제목: '您的语言和所在国家', 설명: '为了向您显示正确的急救电话和信息，我们需要了解这些。如果没问题，请点一下。', 앱말: '应用语言', 나라: '目前居住的国家', 수준: '您的{말}水平如何？', 수준일반: '您的当地语言水平如何？',
+      수준들: ['很流利', '会一点', '几乎不会'], 맞아요: '没问题', 줄: '语言和国家', 줄설명: '急救电话和信息会按此设置', 안정함: '尚未选择' } };
+  function 곳(k, l) { l = l || 말(); return (곳글[l] || 곳글.ko)[k]; }
+  function 칸(l) { var i = 말순.indexOf(l); return i < 0 ? 0 : i; }
+  var 곳열쇠 = 'mn.place';
+  function 곳읽기() { try { var v = JSON.parse(localStorage.getItem(곳열쇠) || 'null'); return v && v.lang && v.country && v.level ? v : null; } catch (e) { return null; } }
+  function 나라짐작() {
+    try { var tz = Intl.DateTimeFormat().resolvedOptions().timeZone || '';
+      var 표 = { 'Asia/Seoul': 'KR', 'Asia/Tokyo': 'JP', 'Asia/Shanghai': 'CN', 'Asia/Chongqing': 'CN', 'Asia/Urumqi': 'CN', 'Asia/Hong_Kong': 'HK', 'Europe/Madrid': 'ES', 'Atlantic/Canary': 'ES', 'Africa/Ceuta': 'ES',
+        'America/Mexico_City': 'MX', 'America/Monterrey': 'MX', 'America/Merida': 'MX', 'America/Cancun': 'MX', 'America/Chihuahua': 'MX', 'America/Mazatlan': 'MX', 'America/Hermosillo': 'MX', 'America/Tijuana': 'MX',
+        'Europe/London': 'GB', 'Europe/Dublin': 'IE', 'Asia/Singapore': 'SG', 'Asia/Manila': 'PH', 'Asia/Kolkata': 'IN', 'Asia/Calcutta': 'IN', 'Pacific/Auckland': 'NZ' };
+      if (표[tz]) return 표[tz];
+      if (/^America\/(New_York|Chicago|Denver|Los_Angeles|Phoenix|Anchorage|Detroit|Indiana|Kentucky|Boise|Juneau|Sitka|Nome|Adak|Menominee|North_Dakota)|^Pacific\/Honolulu$/.test(tz)) return 'US';
+      if (/^America\/(Toronto|Vancouver|Edmonton|Winnipeg|Halifax|St_Johns|Regina|Montreal)/.test(tz)) return 'CA';
+      if (/^Australia\//.test(tz)) return 'AU';
+    } catch (e) {}
+    var n = String((navigator.languages && navigator.languages[0]) || navigator.language || ''), m = /-([A-Za-z]{2})\b/.exec(n), c = m ? m[1].toUpperCase() : '';
+    if (나라이름[c]) return c; if (c) return 'XX';   /* 기기가 밝힌 나라가 목록에 없으면 말로 짐작하지 않는다(곁에 11-03) */
+    return { ko: 'KR', ja: 'JP', zh: 'CN' }[n.slice(0, 2).toLowerCase()] || 'XX';
+  }
+  function 곳기본() {
+    var o = 설정.말과나라 || {}, d = 값(o.기본) || {}, l = d.lang || 말();
+    if (말순.indexOf(l) < 0) l = 'en';
+    return { lang: l, country: (d.country && 나라이름[d.country]) ? d.country : 나라짐작() };
+  }
+  function 나라목록() { var o = 설정.말과나라 || {}, a = (값(o.나라들) || 곁에나라들).filter(function (k) { return 나라이름[k]; }); if (a.indexOf('XX') < 0) a.push('XX'); return a; }
+  var 고르는중 = null;
+  function 수준묻나(p) { return 나라말[p.country] !== p.lang; }
+  function 곳그림() {
+    var p = 고르는중, l = p.lang, el = document.getElementById('mnPlace'); if (!el) return;
+    var 나말 = 나라말[p.country], 질문 = 나말 ? 곳('수준', l).replace('{말}', 말이름들[나말][칸(l)]) : 곳('수준일반', l);
+    var 목 = 나라목록(); if (목.indexOf(p.country) < 0) 목.unshift(p.country);
+    el.innerHTML = '<div class="mnp-box" role="dialog" aria-modal="true" aria-labelledby="mnpT" lang="' + l + '">' +
+      '<h2 id="mnpT">' + 곳('제목', l) + '</h2><p class="mnp-sub">' + 곳('설명', l) + '</p>' +
+      '<label class="mnp-l" for="mnpLang">' + 곳('앱말', l) + '</label><select id="mnpLang" class="mnp-sel" onchange="설정판.말과나라고름(\'lang\',this.value)">' +
+        말순.map(function (k) { return '<option value="' + k + '"' + (k === l ? ' selected' : '') + '>' + 말이름[k] + '</option>'; }).join('') + '</select>' +
+      '<label class="mnp-l" for="mnpCountry">' + 곳('나라', l) + '</label><select id="mnpCountry" class="mnp-sel" onchange="설정판.말과나라고름(\'country\',this.value)">' +
+        목.map(function (k) { return '<option value="' + k + '"' + (k === p.country ? ' selected' : '') + '>' + 나라이름[k][칸(l)] + '</option>'; }).join('') + '</select>' +
+      (수준묻나(p) ? '<div class="ms-seg mnp-lv" role="group" aria-label="' + esc(질문) + '"><span class="ms-sl">' + 질문 + '</span><div class="ms-sb">' +
+        곳('수준들', l).map(function (x, i) { var v = ['ok', 'some', 'none'][i], on = p.level === v; return '<button type="button" class="' + (on ? 'on' : '') + '" aria-pressed="' + on + '" onclick="설정판.말과나라고름(\'level\',\'' + v + '\')">' + x + '</button>'; }).join('') + '</div></div>' : '') +
+      '<button type="button" class="mnp-ok" onclick="설정판.말과나라맞아요()"' + (수준묻나(p) && !p.level ? ' disabled aria-disabled="true"' : '') + '>' + 곳('맞아요', l) + '</button></div>';
+  }
+  function 곳열기() {
+    스타일(); var 지금 = 곳읽기(), d = 곳기본();
+    고르는중 = 지금 ? { lang: d.lang, country: 지금.country, level: 지금.level } : { lang: d.lang, country: d.country, level: '' };
+    if (!수준묻나(고르는중)) 고르는중.level = 'ok'; else if (고르는중.level === 'ok' && !지금) 고르는중.level = '';
+    var el = document.getElementById('mnPlace'); if (!el) { el = document.createElement('div'); el.id = 'mnPlace'; el.className = 'mnp'; document.body.appendChild(el); }
+    곳그림(); try { el.querySelector('select').focus(); } catch (e) {}
+  }
+  function 곳맞아요() {
+    var p = 고르는중; if (!p) return; if (!수준묻나(p)) p.level = 'ok'; if (!p.level) return;
+    var 옛 = 곳읽기(), 새 = { lang: p.lang, country: p.country, level: p.level, at: new Date().toISOString().slice(0, 10) };
+    try { localStorage.setItem(곳열쇠, JSON.stringify(새)); } catch (e) {}
+    var el = document.getElementById('mnPlace'); if (el) el.remove(); 고르는중 = null;
+    try { window.dispatchEvent(new CustomEvent('mn:place', { detail: 새 })); } catch (e) {}
+    var o = 설정.말과나라 || {}, 기 = 곳기본();
+    try { if (typeof o.바꿈 === 'function') o.바꿈(새, 새.lang !== 말(), !옛 || 옛.country !== 새.country); } catch (e) {}
+    다시();
+  }
+  function 곳줄() {
+    var o = 설정.말과나라; if (!o) return ''; var v = 곳읽기();
+    var 값글 = v ? 나라이름[v.country][칸(말())] + (v.level === 'ok' ? '' : ' · ' + 곳('수준들')[v.level === 'some' ? 1 : 2]) : 곳('안정함');
+    return 줄('globe', 곳('줄'), 곳('줄설명'), 값글, '설정판.말과나라열기()');
+  }
+  function 다시() { try { if (typeof 설정.다시그리기 === 'function') 설정.다시그리기(); } catch (e) {} }
+  var 스타일됨 = false;
+  function 스타일() {
+    if (스타일됨 || !document.head) return; 스타일됨 = true;
+    var A = 'var(--ms-accent,var(--accent,currentColor))', L = 'var(--ms-line,var(--line,rgba(127,127,127,.28)))', D = 'var(--ms-dim,var(--ink2,inherit))', C = 'var(--ms-card,var(--card,transparent))';
+    var st = document.createElement('style'); st.id = 'ms-style';
+    st.textContent = '.ms{word-break:keep-all;overflow-wrap:anywhere}.ms-group{margin-top:18px}.ms-h{font-size:.84em;font-weight:800;letter-spacing:.02em;color:' + D + ';margin:0 4px 8px}' +
+      '.ms-segs{display:flex;flex-direction:column;gap:12px;margin-top:10px;padding:14px;border-radius:16px;background:' + C + ';border:1px solid ' + L + '}' +
+      '.ms-sl{display:block;font-weight:700;margin-bottom:8px}.ms-sb{display:flex;flex-wrap:wrap;gap:6px}' +
+      '.ms-sb button{flex:1 1 90px;min-height:48px;padding:6px 10px;border-radius:12px;border:1px solid ' + L + ';background:transparent;color:inherit;font:inherit;font-weight:600;cursor:pointer;line-height:1.25}' +
+      '.ms-sb button.on{border:2px solid ' + A + ';color:' + A + ';font-weight:800}.ms-sb button[disabled]{opacity:.6;cursor:default}.ms-soon{display:inline-block;font-size:.78em;font-weight:700}' +
+      '.ms-row{display:flex;gap:10px;align-items:center;width:100%;min-height:56px;padding:12px;border:0;border-bottom:1px solid ' + L + ';background:transparent;color:inherit;font:inherit;text-align:left;cursor:pointer}' +
+      '.ms-rt{flex:1;min-width:0;display:flex;flex-direction:column}.ms-rt>span{font-size:.88em;color:' + D + '}.ms-rv{flex:none;font-size:.86em;color:' + A + ';font-weight:700}.ms-foot{margin-top:16px}' +
+      '.mnp{position:fixed;inset:0;z-index:2147483000;background:var(--bg,#fff);color:var(--ink,inherit);overflow:auto;display:flex;justify-content:center;padding:max(24px,env(safe-area-inset-top)) 16px 32px;word-break:keep-all;overflow-wrap:anywhere}' +
+      '.mnp-box{width:100%;max-width:480px;margin:auto 0}.mnp-box h2{margin:0 0 8px;font-size:1.35em;line-height:1.3}.mnp-sub{margin:0 0 18px;color:' + D + ';line-height:1.55}' +
+      '.mnp-l{display:block;font-weight:700;margin:14px 0 6px}.mnp-sel{width:100%;min-height:52px;padding:10px 12px;border-radius:12px;border:1px solid ' + L + ';background:' + C + ';color:inherit;font:inherit;font-size:16px;max-width:100%}' +
+      '.mnp-lv{margin-top:16px}.mnp-ok{display:block;width:100%;min-height:56px;margin-top:22px;border:0;border-radius:14px;background:' + A + ';color:var(--ms-on-accent,#fff);font:inherit;font-size:1.05em;font-weight:800;cursor:pointer}.mnp-ok[disabled]{opacity:.45;cursor:default}';
+    document.head.appendChild(st);
+  }
+  window.설정판 = {
+    __v: 판, 판: 판, HTML: HTML,
+    설치: function (o) { o = o || {}; Object.keys(o).forEach(function (k) { 설정[k] = o[k]; }); return window.설정판; },
+    글자: function (n) { try { 설정.글자.바꿈(n); } catch (e) {} 다시(); },
+    밝기: function (i) { try { 설정.밝기.바꿈(밝기값[i] || 'light'); } catch (e) {} 다시(); },
+    글: 글,
+    말과나라: function () { return 곳읽기(); },
+    말과나라열기: 곳열기, 말과나라맞아요: 곳맞아요,
+    말과나라고름: function (k, v) { if (!고르는중) return; 고르는중[k] = v; if (k !== 'level') { if (!수준묻나(고르는중)) 고르는중.level = 'ok'; else if (고르는중.level === 'ok') 고르는중.level = ''; } 곳그림(); },
+    말과나라확인: function () { if (곳읽기() || navigator.webdriver || document.getElementById('mnPlace')) return false; 곳열기(); return true; },
+    나라이름: function (k, l) { var n = 나라이름[k]; return n ? n[칸(l || 말())] : ''; },
+    말이름: function (k, l) { var n = 말이름들[k]; return n ? n[칸(l || 말())] : ''; }
+  };
+})();
+/* ▲▲ 설정 부품 끝 ▲▲ */
+/* ▼▼ 응급카드 부품 시작 ▼▼ */
+/* ═══ 응급 카드 — 그 나라 말이 서툰 분께 「119 에 이렇게 말하세요」 (2026-11-04 현욱님 「진행」 · 주인: 길동무 세션)
+   요청서 docs/requests/20261104_언어나라_묻기.md 「차별점 — 응급 카드」
+   보이는 때: 설정판.말과나라() 가 country 'KR' · level 'some'|'none' · lang 이 한국어가 아닐 때만. 그 밖에는 빈 글('').
+   모양: 큰 한국어 문장(상대에게 보여 줘도 되게) + 그 아래 본인 말. 적어 둔 주소가 있으면 한 줄 더(주소는 이 기기 localStorage mn.addr 에만 — 서버로 보내지 않는다).
+   통역 번호 줄: 설치의 통역줄 [{ko, 말:{en,es,ja,zh}, 번호}] — 기본은 비어 있다(Main 이 공식 확인한 번호만 넣는다).
+   쓰는 법: 응급카드.설치({ 통역줄: [] }) · 응급·위기 화면 맨 위에 응급카드.HTML()  — 「주소 적어 두기」는 카드 안에서 바로.
+   ⛔ 이모지 0 · « » 0 · 단추 44px 이상 · 320 넘침 0. */
+(function () {
+  if (window.응급카드 && window.응급카드.__v) return;
+  var 판 = '2026-11-04', 설정 = { 통역줄: [] }, 주소열쇠 = 'mn.addr';
+  var 말이름ko = { en: '영어', es: '스페인어', ja: '일본어', zh: '중국어' };
+  var 글표 = {
+    en: { 머리: 'Say this to 119, or show them this screen', 나: 'I am a foreigner. I do not speak Korean well. I need an English interpreter.', 주소: 'Address', 적기: 'Save your address', 고치기: 'Change address', 저장: 'Save', 칸: 'Address in Korea (e.g. street, building, unit)' },
+    es: { 머리: 'Diga esto al 119 o muestre esta pantalla', 나: 'Soy extranjero o extranjera. No hablo bien coreano. Necesito un intérprete de español.', 주소: 'Dirección', 적기: 'Guardar mi dirección', 고치기: 'Cambiar la dirección', 저장: 'Guardar', 칸: 'Dirección en Corea (calle, edificio, piso)' },
+    ja: { 머리: '119にはこう伝えてください（この画面を見せても大丈夫です）', 나: '外国人です。韓国語があまり話せません。日本語の通訳が必要です。', 주소: '住所', 적기: '住所を書いておく', 고치기: '住所を直す', 저장: '保存', 칸: '韓国の住所（通り・建物・部屋番号）' },
+    zh: { 머리: '请这样告诉119，或把这个画面给对方看', 나: '我是外国人。我韩语说得不好。我需要中文翻译。', 주소: '地址', 적기: '记下我的地址', 고치기: '修改地址', 저장: '保存', 칸: '在韩国的地址（街道、楼名、房间号）' }
+  };
+  function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
+  function 곳() { try { return window.설정판 && 설정판.말과나라 ? 설정판.말과나라() : null; } catch (e) { return null; } }
+  function 주소() { try { return String(localStorage.getItem(주소열쇠) || '').trim(); } catch (e) { return ''; } }
+  function 보일까() { var p = 곳(); return !!(p && p.country === 'KR' && (p.level === 'some' || p.level === 'none') && 글표[p.lang]); }
+  var 스타일됨 = false;
+  function 스타일() {
+    if (스타일됨 || !document.head) return; 스타일됨 = true;
+    var st = document.createElement('style'); st.id = 'ec-style';
+    st.textContent = '.ec:first-child{margin-top:34px}.ec{margin:0 0 16px;padding:16px;border-radius:16px;border:2px solid var(--ec-line,var(--warn,#b3261e));background:var(--ec-bg,var(--card,transparent));word-break:keep-all;overflow-wrap:anywhere}' +
+      '.ec-h{margin:0 0 10px;font-size:.92em;font-weight:800;color:var(--ec-line,var(--warn,#b3261e))}.ec-ko{margin:0;font-size:1.32em;font-weight:800;line-height:1.5}' +
+      '.ec-me{margin:8px 0 0;line-height:1.55;color:var(--ink2,inherit)}.ec-addr{margin:12px 0 0;padding-top:10px;border-top:1px solid var(--line,rgba(127,127,127,.28))}' +
+      '.ec-addr .ec-ko{font-size:1.18em}.ec-row{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}.ec-btn{min-height:48px;padding:8px 14px;border-radius:12px;border:1px solid var(--line,rgba(127,127,127,.4));background:transparent;color:inherit;font:inherit;font-weight:700;cursor:pointer}' +
+      '.ec-in{flex:1 1 200px;min-width:0;min-height:48px;padding:8px 12px;border-radius:12px;border:1px solid var(--line,rgba(127,127,127,.4));background:transparent;color:inherit;font:inherit;font-size:16px}' +
+      '.ec-tl{margin:10px 0 0;font-size:.95em}.ec-tl a{font-weight:800}';
+    document.head.appendChild(st);
+  }
+  function HTML() {
+    if (!보일까()) return '';
+    스타일();
+    var p = 곳(), l = p.lang, t = 글표[l], a = 주소();
+    var h = '<section class="ec" id="ecCard" aria-label="' + esc(t.머리) + '"><p class="ec-h">' + esc(t.머리) + '</p>' +
+      '<p class="ec-ko" lang="ko" translate="no">외국인입니다. 한국어를 잘 못해요. ' + 말이름ko[l] + ' 통역이 필요해요.</p>' +
+      '<p class="ec-me" lang="' + l + '">' + esc(t.나) + '</p>';
+    if (a) h += '<div class="ec-addr"><p class="ec-ko" lang="ko" translate="no">주소: ' + esc(a) + '</p><p class="ec-me" lang="' + l + '">' + esc(t.주소) + ': ' + esc(a) + '</p></div>';
+    (설정.통역줄 || []).forEach(function (x) {   /* Main 이 공식 확인한 번호만(기본 비어 있음) */
+      if (!x || !x.번호) return;
+      h += '<p class="ec-tl"><a href="tel:' + esc(String(x.번호).replace(/[^\d+]/g, '')) + '">' + esc(x.번호) + '</a> ' + esc((x.말 && x.말[l]) || '') + '</p>';
+    });
+    h += '<div class="ec-row" id="ecAddrRow"><button type="button" class="ec-btn" onclick="응급카드.주소열기()">' + esc(a ? t.고치기 : t.적기) + '</button></div></section>';
+    return h;
+  }
+  function 주소열기() {
+    var p = 곳(), t = p && 글표[p.lang], r = document.getElementById('ecAddrRow'); if (!t || !r) return;
+    r.innerHTML = '<input id="ecAddrIn" class="ec-in" type="text" autocomplete="street-address" aria-label="' + esc(t.칸) + '" placeholder="' + esc(t.칸) + '" value="' + esc(주소()) + '">' +
+      '<button type="button" class="ec-btn" onclick="응급카드.주소저장()">' + esc(t.저장) + '</button>';
+    try { document.getElementById('ecAddrIn').focus(); } catch (e) {}
+  }
+  function 주소저장() {
+    var i = document.getElementById('ecAddrIn'), v = i ? String(i.value || '').trim().slice(0, 200) : '';
+    try { if (v) localStorage.setItem(주소열쇠, v); else localStorage.removeItem(주소열쇠); } catch (e) {}
+    var c = document.getElementById('ecCard'); if (c) { var d = document.createElement('div'); d.innerHTML = HTML(); if (d.firstChild) c.parentNode.replaceChild(d.firstChild, c); else c.remove(); }
+  }
+  window.응급카드 = { __v: 판, 판: 판, HTML: HTML, 보일까: 보일까, 주소열기: 주소열기, 주소저장: 주소저장, 주소: 주소,
+    설치: function (o) { o = o || {}; Object.keys(o).forEach(function (k) { 설정[k] = o[k]; }); return window.응급카드; } };
+})();
+/* ▲▲ 응급카드 부품 끝 ▲▲ */
+
+/* 11-04 현욱님 「쓰는 말 · 사는 나라 · 그 나라 말」(요청서 yozm-health docs/requests/20261104_언어나라_묻기.md) — 공용 부품(길동무 정본 _도구/설정_부품.js·응급카드_부품.js)을 그대로 심음.
+   약지도는 출처가 따로라 같은 열쇠(mn.place)·같은 모양으로 이 안에 저장한다. 나라는 app-shell CC 가 mn.place.country 를 먼저 본다(응급 번호·약 이름 나라 한 곳).
+   약지도 응급 번호 표가 있는 나라만 고르게(KR·US·ES·JP·CN·그 밖) — 표에 없는 나라는 그 밖(112)으로. */
+try {
+  설정판.설치({ app: 'yakjido', 언어: () => window.LANG || 'ko', 말과나라: {
+    기본: () => ({ lang: window.LANG || 'ko', country: window.CC || 'KR' }),
+    나라들: ['KR', 'US', 'ES', 'JP', 'CN', 'XX'],
+    바꿈: (v) => { if (v && (v.lang !== window.LANG || v.country !== window.CC)) { try { localStorage.setItem('yakjido.lang', v.lang); localStorage.setItem('yakjido.cc', v.country); } catch (e) {} location.reload(); } else route(); } } });
+  응급카드.설치({ 통역줄: [
+    { 번호: '119', 말: { en: 'Ask 119 for an interpreter.', es: 'Pida al 119 un intérprete.', ja: '119に通訳を頼んでください。', zh: '请向119要求翻译。' } },
+    { 번호: '1345', 말: { en: 'Immigration Contact Center (Ministry of Justice) — weekdays 09:00~22:00, 20 languages (after 18:00 only Korean, English and Chinese). For daily-life and admin help, not emergencies.',
+      es: 'Centro de Atención a Extranjeros (Ministerio de Justicia): días laborables 09:00~22:00, 20 idiomas (después de las 18:00 solo coreano, inglés y chino). Ayuda para la vida diaria y trámites, no para urgencias.',
+      ja: '外国人総合案内センター（法務部）— 平日 09:00~22:00・20の言葉（18時以降は韓国語・英語・中国語のみ）。救急ではなく生活・行政の手助けです。',
+      zh: '外国人综合咨询中心（法务部）——工作日 09:00~22:00，20种语言（18点以后只有韩语·英语·中文）。用于生活·行政帮助，不用于急救。' } } ] });
+} catch (e) {}
+window.응급칸 = () => (window.응급카드 ? 응급카드.HTML() : '');
+try { const st = document.createElement('style'); st.textContent = 'html .ec .ec-ko{word-break:keep-all!important;overflow-wrap:break-word!important}'; document.head.appendChild(st); } catch (e) {}   /* 일본어·중국어 화면의 글자 단위 줄바꿈이 한국어 문장까지 자르지 않게 */
+/* 옛 설정의 언어·나라 단추(setLang)도 같은 값(mn.place)을 고치게 */
+(() => { const 원 = window.setLang; if (typeof 원 !== 'function') return;
+  window.setLang = (l, cc) => { try { const p = JSON.parse(localStorage.getItem('mn.place') || 'null'); if (p) localStorage.setItem('mn.place', JSON.stringify(Object.assign(p, { lang: l, country: cc || p.country, at: new Date().toISOString() }))); } catch (e) {} 원(l, cc); }; })();
+window.addEventListener('mn:place', () => { try { route(); } catch (e) {} });
+/* 첫 실행 — 동의를 마친 뒤 홈에 오면 한 번(값이 있으면 열지 않음 · 자동 시험에서는 열지 않음) */
+const 곳확인 = () => { try { if (consentRec() && /^#\/(home)?$|^$/.test(location.hash || '')) 설정판.말과나라확인(); } catch (e) {} };
+window.addEventListener('hashchange', () => setTimeout(곳확인, 300)); setTimeout(곳확인, 900);
 
 /* 내 정보·동의·로그인·약관 화면을 보고 있었으면 다시 그린다(이 파일이 늦게 오므로) */
 try { if (/^#\/(me|consent|login|notify|sgoal|sstage|doc|hello\/3|supp$|supp\?|sgoal|sstage|rx|about|search|myths|askdoc|talk|p\/|p\?|p$)/.test(location.hash)) route(); } catch (e) {}

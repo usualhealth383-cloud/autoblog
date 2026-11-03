@@ -2491,9 +2491,10 @@ function psSwap(root){
   });
 }
 /* 다섯 언어(10-27) — 언어는 기기·설정, 번호는 «있는 나라». 한국어·한국이면 번역 장치를 받지 않는다(i18n.js) */
-const LANG = (() => { try { const v = localStorage.getItem('yakjido.lang'); if (/^(ko|en|es|ja|zh)$/.test(v)) return v; } catch (e) {} const n = (navigator.language || 'ko').slice(0, 2).toLowerCase(); return /^(ko|en|es|ja|zh)$/.test(n) ? n : 'ko'; })();
-/* 나라 = 응급 번호. ① 고른 나라 ② 기기 시간대(영어 폰을 쓰는 한국 거주자도 119 — 10-27 곁에에서 발견) ③ 언어 지역 꼬리. 시간대가 표 밖 나라면 'XX'(모르는 나라 → 112) */
-const CC = (() => { try { const v = localStorage.getItem('yakjido.cc'); if (v) return v; } catch (e) {}
+const MP = (() => { try { return JSON.parse(localStorage.getItem('mn.place')) || {}; } catch (e) { return {}; } })();
+const LANG = (() => { try { const v = MP.lang || localStorage.getItem('yakjido.lang'); if (/^(ko|en|es|ja|zh)$/.test(v)) return v; } catch (e) {} const n = (navigator.language || 'ko').slice(0, 2).toLowerCase(); return /^(ko|en|es|ja|zh)$/.test(n) ? n : 'ko'; })();
+/* 나라 = 응급 번호: ① 말과 나라(mn.place) ② 고른 나라 ③ 시간대 ④ 언어 꼬리. 표 밖 → XX(112) */
+const CC = (() => { try { const v = MP.country || localStorage.getItem('yakjido.cc'); if (v) return v; } catch (e) {}
   let tz = ''; try { tz = Intl.DateTimeFormat().resolvedOptions().timeZone || ''; } catch (e) {}
   if (tz) { if (tz === 'Asia/Seoul') return 'KR'; if (tz === 'Asia/Tokyo') return 'JP'; if (/^Asia\/(Shanghai|Chongqing|Chungking|Harbin|Urumqi|Kashgar)$|^PRC$/.test(tz)) return 'CN';
     if (/^(Europe\/Madrid|Atlantic\/Canary|Africa\/Ceuta)$/.test(tz)) return 'ES';
@@ -3466,7 +3467,7 @@ function vHome(){
     <p>증상을 고르시면 약국에서 무엇을 찾으면 되는지, 병원에 가야 할 신호는 무엇인지 알려 드려요.</p>
   </section>`}
   ${ext('대화줄')}
-  <a class="er-line" href="tel:119">${I.alert}<span>가슴이 조이듯 아프거나, 숨이 많이 차거나, 말이 어눌하고 한쪽에 힘이 빠지면 <b>바로 119</b></span></a>
+  ${ext('응급칸')}<a class="er-line" href="tel:119">${I.alert}<span>가슴이 조이듯 아프거나, 숨이 많이 차거나, 말이 어눌하고 한쪽에 힘이 빠지면 <b>바로 119</b></span></a>
   ${condOn().length || ME.condskip ? '' : `<div class="cond-line"><button type="button" onclick="go('/me?t=body')">${I.user}<span>앓는 병이 있으면 알려 주세요 — <b>피해야 할 약을 걸러 드려요</b></span>${I.chev}</button><button type="button" class="x" aria-label="이 안내 닫기" onclick="ME.condskip=true;saveMe();route()">${I.x}</button></div>`}
   ${storeBar()}
   ${svOn() ? '' : regionGrid()}
@@ -3514,7 +3515,7 @@ function copyName(n){
 
 /* 어르신이 실제로 치시는 말 — 띄어쓰기가 틀리고, 병 이름 대신 「어디가 아픈지」를 쓰신다.
    음성 입력에서도 「머리 아파」처럼 들어온다. */
-var SEARCH_CORPUS = '';   /* var — 아티팩트는 본문을 먼저 심어 두어 본문 합치기가 이 줄보다 먼저 돈다(let 이면 초기화 전 접근 오류, 10-14) */
+var SEARCH_CORPUS = '';   /* var: let 이면 아티팩트에서 초기화 전 접근 오류(10-14) */
 const SEARCH_SYN = {
   '머리아파':'두통', '머리아픔':'두통', '머리가아파':'두통', '골치':'두통', '편두통':'두통',
   '배아파':'복통', '배가아파':'복통', '배아픔':'복통', '속아파':'속쓰림', '속쓰려':'속쓰림', '신물':'속쓰림',
@@ -4509,7 +4510,7 @@ function vSymptomS(s){
   return `${topBar({ back:'증상', unreviewed:s.reviewed === false })}
   <div class="${gcls(s.group)}"><div class="eyebrow" style="color:var(--gfg,var(--primary))"><span class="gdot"></span>${esc(s.group)}</div><h1>${esc(s.name)}</h1></div>
   <div class="sv-top"><p class="sv-lead">${inf ? '약보다 진료가 먼저예요' : noBuy ? '약국에서 살 약은 없어요' : unrev ? '약국에서 이렇게 상의하세요' : '약국에서 이렇게 사세요'}</p>${viewSeg('simple')}</div>
-  ${redflagCheck(s)}
+  ${ext('응급칸')}${redflagCheck(s)}
   ${svFit(s)}
   <section class="sec answer sv-ans" aria-label="바로 답">
     <div class="ans-head"><div class="eyebrow">${inf ? '진료가 먼저예요' : noBuy ? '이렇게 하세요' : !nb ? '해당할 때만 사세요' : unrev ? `약국에서 상의할 것 ${nb}가지` : main.some(x => x.mix) ? `이 ${nb}가지를 약사와 확인하고 사세요` : `이 ${nb}가지를 사세요`}</div><button class="speak" onclick="speakAnswer('${s.id}', this)" aria-label="핵심 읽어 주기">${I.info}읽어 주기</button></div>
@@ -4619,7 +4620,7 @@ function vSymptom(id, q){
   <div class="${gcls(s.group)}"><div class="eyebrow" style="color:var(--gfg,var(--primary))"><span class="gdot"></span>${esc(s.group)}</div>
   <h1>${esc(s.name)}</h1></div>
   ${viewSeg('detail')}
-  ${redflagCheck(s)}
+  ${ext('응급칸')}${redflagCheck(s)}
   ${triageCard(s, ban)}
   ${workedCard(s)}
   ${fitChips(s)}
@@ -6819,7 +6820,7 @@ function vDrug(id, q = {}){
   const top = prodTop(d, q.p), dupTop = !!top && (d.contains || []).length > 0;   /* 복합제 항목은 이름이 곧 제품 이름 */
   return `${topBar({ back:'약 사전', unreviewed:d.reviewed === false })}${top}
   <div class="drug-hero">${c ? `<a class="cls link" href="#/class/${c.id}">${esc(c.name)} ›</a>` : ''}${dupTop ? '' : `<h1>${esc(d.name)}</h1>`}
-    ${(() => { /* 3-3 ① — 대표 제품을 제목 바로 아래(NHS 「Other common brands」). 영어 이름은 근거 탭으로 내렸다 */
+    ${(() => { /* 3-3 ① 대표 제품을 제목 아래(NHS) */
       const P = (d.products || []).slice(0, 3); if (!P.length || dupTop) return '';
       /* 4차 뒤 자체 대조 — 단일 성분 약에 복합제(우루사 옆 「베아제·훼스탈 등 소화제」)를 같은 줄로 두면 같은 약으로 읽힌다. 복합제는 따로 부른다 */
       const mix = x => !(d.contains || []).length && !d.prodMix && !/단일제/.test(x.name) && (/복합|소화제/.test(x.name + ' ' + (x.amount || '')) || MIXBRAND.test(x.name)), S = P.filter(x => !mix(x)), M = P.filter(mix);
@@ -7641,7 +7642,7 @@ function vBag(){
     ${sc ? `<p class="show-big ${lv}">${lv === 'ok' ? I.info : I.alert}<span>항콜린 부담 ${sc}점 · ${ACH_LV_WORD[lv]}<small>${al.filter(x => x.e.ach).map(x => esc(x.e.n)).slice(0, 6).join(' · ')}${lv === 'ok' ? '' : ' — 입마름·변비·어지럼·기억 흐림이 있으면 말씀하세요'}</small></span></p>` : ''}
     ${res.unknown.length ? `<p class="small muted" style="margin-top:8px">성분을 확인하지 못한 약 ${res.unknown.length}가지는 판정에서 빠져 있어요.</p>` : ''}
   </div>
-  ${(() => { /* 메디나눔 감사 ③-10(10-22) — 약이 다섯 가지를 넘으면 한 번에 점검을 권한다(여러 약 함께 드시는 분) */
+  ${(() => { /* 감사 ③-10: 약 다섯 가지 넘으면 점검 권함 */
     const m = items.filter(x => !String(x.id).startsWith('supp:')).length; return m >= 5 ? `<p class="note" style="margin-top:12px">${I.info}<span><b>드시는 약이 ${m}가지예요.</b> 다섯 가지가 넘으면 약사에게 한 번에 점검을 받아 보세요 — 단골 약국에 약봉투를 모두 가져가시거나, 아래 「내가 먹는 약! 한눈에」로 병원·약국에서 받은 약을 함께 보세요.</span></p>` : ''; })()}
   ${aeCard()}
   ${adhCard()}
