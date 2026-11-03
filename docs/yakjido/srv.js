@@ -1479,7 +1479,7 @@ window.언어칸 = function () {
       var 상태 = { 값: {}, 단계: 0, 기록: [] };
       function 풍선(글, 누구, 위험) {
         var d = document.createElement('div'); d.className = 'mnc-b ' + (누구 === 'me' ? 'me' : 'bot') + (위험 ? ' sos' : '');
-        if (위험) d.innerHTML = esc(위험.말) + (위험.전화 ? '<br><a href="tel:' + esc(위험.전화) + '">' + esc(위험.전화) + '</a>' : '');
+        if (위험) d.innerHTML = esc(위험.말) + (위험.전화 && /^[\d+]/.test(위험.전화) ? '<br><a href="tel:' + esc(위험.전화) + '">' + esc(위험.전화) + '</a>' : '');
         else d.textContent = 글;
         로그.appendChild(d); 상태.기록.push([누구, 위험 ? 위험.말 : 글]); if (상태.기록.length > 60) 상태.기록.shift();
         try { d.scrollIntoView({ block: 'end', behavior: 'smooth' }); } catch (e) {}
@@ -1579,7 +1579,9 @@ window.언어칸 = function () {
     zh: { hr: ['（24小时）', '（服务时间因地区而异）'], s: function (e) { return '如果是为了伤害自己而服药，或者叫不醒、呼吸困难、抽搐，请立即拨打 ' + e + '。不要独处，不要自己开车。请带上药盒和剩下的药。'; }, p: function (P, e) { return '如果是误服过量，且人清醒、呼吸正常，即使没有症状也请现在联系' + P + '。如果是为了伤害自己而服药，或出现呼吸困难、抽搐、昏倒、叫不醒，请拨打 ' + e + '。不要催吐，请带上药盒和剩下的药。对乙酰氨基酚刚开始可能没有不适，但数小时到数天后可能出现肝损伤。'; }, o: function (e) { return '如果服用过量，即使感觉没事，也请现在拨打 ' + e + ' 咨询。不要催吐。请带上药盒和剩下的药，不要自己开车。对乙酰氨基酚刚开始可能没有不适，但数小时到数天后可能出现肝损伤。'; }, m: function (p, e) { return '听起来您现在非常难受。请不要一个人扛着——现在拨打 ' + p + '，会有人倾听您（24小时）。如果情况紧急，请拨打 ' + e + '。'; }, b: function (e) { return '不满3个月的婴儿体温达到38°C或以上，应先就医，而不是先用退烧药。请立即去急诊或拨打 ' + e + '。'; }, h: function (e) { return '体温达到41°C或以上，请立即去急诊或拨打 ' + e + '。'; }, c: function (e) { return '抗癌治疗期间体温达到38°C或以上，需要立即告知医院。请联系治疗医院的急诊电话或拨打 ' + e + '。'; }, r: function (e) { return '比起用药，您需要先就医。请立即拨打 ' + e + ' 或去急诊。请不要自己开车。'; } }
   };
   function 위험(글, 값) {
-    var t = String(글 || ''), N = (window.I18N && window.I18N.emg) || { e: '119', m: ['109', '1577-0199'] }, M = 위험말[window.LANG] || 위험말.ko, p = N.m[0] || N.e;
+    var t = String(글 || ''), N = (window.I18N && window.I18N.emg) || { e: '119', m: ['109', '1577-0199'] }, M = 위험말[window.LANG] || 위험말.ko;
+    if (!N.e) N = { e: ({ ko: '그 나라 응급 번호', en: 'the local emergency number', es: 'el número de emergencias del país', ja: '現地の緊急番号', zh: '当地急救电话' })[window.LANG] || 'the local emergency number', m: [] };   /* 11-04 번호 모르는 나라 — 글만, 전화 단추 없음 */
+    var p = N.m[0] || N.e;
     var 의도 = 마음.test(t) || 마음다국.test(t), L = 위험말[window.LANG] ? window.LANG : 'ko';
     /* 이미 삼킨 것이 먼저(10-28 곁에 교훈). 바깥 검수 9차(10-28): 스스로 해치려고 먹었거나 의식·숨·경련 이상이면 응급 번호,
        증상 없는 실수 복용은 그 나라 중독 상담(있는 나라만 — 미국·스페인·일본). 한국·중국·모르는 나라는 응급 번호 */
