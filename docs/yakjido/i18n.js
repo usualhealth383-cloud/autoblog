@@ -24,6 +24,7 @@
   /* ja·zh 는 기기 글꼴(10-27 바깥 파일 0 — 중국은 구글 글꼴이 막히고 Noto CJK 는 너무 커서 싣지 않는다) */
   var st = document.createElement('style');
   st.textContent = '.lang-ja body,.lang-ja button,.lang-ja input,.lang-ja textarea{font-family:"Hiragino Sans","Hiragino Kaku Gothic ProN","Noto Sans CJK JP","Noto Sans JP","Yu Gothic UI","Meiryo","Pretendard Variable",system-ui,sans-serif}.lang-zh body,.lang-zh button,.lang-zh input,.lang-zh textarea{font-family:"PingFang SC","Hiragino Sans GB","Noto Sans CJK SC","Noto Sans SC","Microsoft YaHei","Pretendard Variable",system-ui,sans-serif}' +
+    'html:not(.lang-ko) nav.tabbar button{white-space:normal;text-align:center;font-size:12.5px;line-height:1.15;padding-inline:2px;overflow-wrap:normal;hyphens:auto;letter-spacing:-.01em}@media (min-width:1024px){html:not(.lang-ko) nav.tabbar button{text-align:left;font-size:1rem}}' +
     '.lang-ja *,.lang-zh *{word-break:normal!important;line-break:strict;overflow-wrap:anywhere}.lang-en *,.lang-es *{word-break:normal!important;overflow-wrap:break-word}' +
     'html:not(.lang-ko) .review-stamp{white-space:normal;flex:0 1 auto;min-width:0;text-align:right;line-height:1.25}html:not(.lang-ko) .chip,html:not(.lang-ko) .hq-c{white-space:normal;max-width:100%;min-width:0;overflow-wrap:anywhere}' +
     '.i18n-note{display:flex;flex-wrap:wrap;gap:4px 10px;align-items:center;margin:24px 0 8px;padding-top:10px;border-top:1px solid var(--hairline);font-size:.8125rem;color:var(--muted)}.i18n-note button{color:var(--primary);font-weight:600;min-height:36px}';
@@ -79,6 +80,10 @@
     if (CC === 'KR') return s;
     return s.replace(/1577-0199/g, N.m[1] || N.m[0] || N.e).replace(/(^|[^\d-])109(?![\d-])/g, function (a, p) { return p + (N.m[0] || N.e); }).replace(/(^|[^\d-])119(?![\d-])/g, function (a, p) { return p + N.e; });
   }
+  /* 11-03 아래 탭은 칸이 좁아 긴 번역이 겹친다 — 탭에만 짧은 이름(화면 제목은 그대로) */
+  var TABS = { en: { 'Medicine dictionary': 'Medicines', 'My information': 'My info' }, es: { 'Diccionario de medicamentos': 'Medicinas' } };
+  function 탭() { var m = TABS[L], nav = document.querySelector('nav.tabbar'); if (!m || !nav || innerWidth >= 1024) return;
+    var w = document.createTreeWalker(nav, NodeFilter.SHOW_TEXT, null), n; while ((n = w.nextNode())) { var k = n.nodeValue.trim(); if (m[k]) n.nodeValue = n.nodeValue.replace(k, m[k]); } }
   function 바꾸기(el) {
     if (!el) return;
     var w = document.createTreeWalker(el, NodeFilter.SHOW_TEXT, null), n, todo = [];
@@ -106,7 +111,7 @@
     lang: L, cc: CC, emg: N,
     tr: function (el) { if (DICT && el) 바꾸기(el); },   /* 11-03 늦게 채우는 칸(기내용 받아 두기 등) */
     t: function (s) { var r = L !== 'ko' ? 글(s) : null; return 번호(r != null ? r : s); },   /* 11-03 그린 뒤에 넣는 글(로그인 필수 안내 등) */
-    apply: function (view) { if (!DICT) return; 본문(); 바꾸기(view); 바꾸기(document.querySelector('nav.tabbar')); 알림줄(view); },
+    apply: function (view) { if (!DICT) return; 본문(); 바꾸기(view); 바꾸기(document.querySelector('nav.tabbar')); 탭(); 알림줄(view); },
     ready: 받기().then(function () { 본문(); if (typeof route === 'function') route(); })
   };
 })();
