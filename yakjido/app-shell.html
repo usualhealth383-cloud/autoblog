@@ -3584,7 +3584,7 @@ function comboName(name){
 const EXPORT = /수출\s*용/;
 /* 외부 검수 2차 #28 — 한 항목의 제품끼리 사는 곳이 다르면(판피린티정 편의점 · 판피린큐액 약국) 항목 전체에 한 배지를 붙이지 않고 제품마다 */
 const RXW = { 안전상비:'편의점 가능', 일반:'약국', 전문:'처방' };
-const QS = /으?로 끝나(요|는 안약이에요)|이에요|예요|이 들어 있어요/g;
+const QS = /으?로 끝나요|이에요|예요|이 들어 있어요/g;
 const rxMix = d => { const L = (d?.products || []).filter(p => RXW[p.rx]); return new Set(L.map(p => p.rx)).size > 1 ? L.map(p => pubShort(p.name) + ' ' + RXW[p.rx]).join(' · ') : ''; };
 function search(q, noFix){
   q = (q || '').toLowerCase().trim(); const qIn = q;

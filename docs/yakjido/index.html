@@ -1768,8 +1768,8 @@ background-repeat:no-repeat;background-position:right 9px center;background-size
 <script>
 window.__YAKJIDO_OK__ = true;
 const D = JSON.parse(document.getElementById('data').textContent || '{}');
-const BUILD = '2026-11-03 22:02';
-const DATAV = 'eb4cb5f026'.indexOf('__') === 0 ? BUILD : 'eb4cb5f026';
+const BUILD = '2026-11-03 22:15';
+const DATAV = '95168f5e6e'.indexOf('__') === 0 ? BUILD : '95168f5e6e';
 const BRANDMARK = (typeof window !== 'undefined' && window.__BRANDMARK__) || 'icon-192.png';
 let CORE = 0, CORE_P = null;
 function mergeCore(c){
@@ -3091,7 +3091,7 @@ return c.length > 0 && c.every(p => (p.i || []).length > 1);
 }
 const EXPORT = /수출\s*용/;
 const RXW = { 안전상비:'편의점 가능', 일반:'약국', 전문:'처방' };
-const QS = /으?로 끝나(요|는 안약이에요)|이에요|예요|이 들어 있어요/g;
+const QS = /으?로 끝나요|이에요|예요|이 들어 있어요/g;
 const rxMix = d => { const L = (d?.products || []).filter(p => RXW[p.rx]); return new Set(L.map(p => p.rx)).size > 1 ? L.map(p => pubShort(p.name) + ' ' + RXW[p.rx]).join(' · ') : ''; };
 function search(q, noFix){
 q = (q || '').toLowerCase().trim(); const qIn = q;
@@ -5744,7 +5744,7 @@ ${d.ach ? `<div class="usebar" style="${d.ach >= 2 ? '' : 'background:var(--tint
 ${aeRemind(d)}
 ${d.reviewed === false ? `<div class="note" style="margin-top:12px">${I.alert}<span><b>아직 의사 검수를 받지 않은 약 화면이에요.</b> 식약처 허가사항과 연구를 바탕으로 정리했습니다. 참고만 하시고 약사·의사와 상의하세요.</span></div>` : ''}
 ${picts(d.pict)}
-${(() => { const pr = (d.products || []).find(x => pimg(x.name)); return pr ? `<div class="drug-photo">${imgTag(pimg(pr.name), '', pr.name)}<div><b>${esc(pr.name)}</b><small>${esc(pr.maker || '')} · ${esc(pr.amount || '')}</small><small style="display:block;margin-top:2px">사진: 식약처·약학정보원 낱알식별</small></div></div>` : ''; })()}
+${(() => { const pr = (d.products || []).find(x => pimg(x.name)); return pr ? `<div class="drug-photo">${imgTag(pimg(pr.name), '', pr.name)}<div><b>${esc(pr.name)}</b><small>${esc(pr.maker || '')} · ${esc(pr.amount || '')}</small><small style="display:block;margin-top:2px">사진: 식약처 낱알식별</small></div></div>` : ''; })()}
 ${(() => {
 const cells = [];
 if ((d.for || []).length) cells.push(`<div><small>이런 때</small><b>${esc(d.for.join(', '))}</b></div>`);
@@ -5956,7 +5956,7 @@ ${active ? `<button class="chip" onclick="Object.assign(PILLQ,{sh:'',c:'',txt:''
 ${nq ? `<section class="sec"><h2>제품 이름으로 찾은 것 <small>물약·가루약도 함께</small></h2>${nh.length ? `<div class="card results">${hitsHtml(nh)}</div>` : ''}<button class="btn line" style="margin-top:8px" onclick="go('/search?q='+encodeURIComponent(PILLQ.txt.trim()))">${I.search} 이름으로 모두 찾기</button></section>` : ''}
 <section class="sec"><h2>${active ? `${nq ? '알약 모양·글자로 찾은 ' : ''}후보 ${res.length.toLocaleString()}개` : '고르면 여기에 사진이 나와요'} <small>${res.length > 30 ? '30개만 표시 — 글자나 색을 더 고르면 줄어요' : PILLQ.rx ? `약국약 ${(PUB.pills || []).length.toLocaleString()} + 처방약 ${(PUB.rx || []).length.toLocaleString()}건에서` : `약국약 ${(PUB.pills || []).length.toLocaleString()}건에서`}</small></h2>
 ${shown.length ? `<div class="pill-grid">${shown.map(([sc, p]) => pillCard(p, sc)).join('')}</div>` : active ? '<div class="empty"><b>조건에 맞는 약이 없어요</b>이름이면 앞 두세 글자만 쳐 보세요(베시케어 → 베시). 각인이면 글자를 줄이거나 색을 바꿔 보세요.</div>' : ''}
-<div class="srcs"><span class="src-chip">${I.link}출처: 식약처 의약품 낱알식별 정보 · 사진 약학정보원</span></div></section>
+<div class="srcs"><span class="src-chip">${I.link}출처: 식약처 의약품 낱알식별 정보(사진 포함)</span></div></section>
 ${disclaimer('낱알 사진과 각인은 참고용이에요. 같은 모양의 다른 약도 있으니, 확실하지 않으면 약사에게 실물을 보여 주세요.')}`;
 }
 function pillFm(p){ const t = (p.fm || '') + ' ' + (p.n || ''); return /연질/.test(t) ? 'soft' : /캡슐|캅셀/.test(t) ? 'cap' : 'tab'; }
@@ -6027,7 +6027,7 @@ return `<section class="sec"><div class="ach ${e.ach >= 3 ? 'warn' : 'ok'}"><div
 })()}
 <div class="actions"><button class="btn ${taking ? 'line' : ''}" onclick="togglePub('${p.seq}')">${taking ? I.check + ' 내 약통에 있어요 (빼기)' : I.pill + ' 내 약통에 담기'}</button>${taking && takingItems().length >= 2 ? `<button class="btn ghost" onclick="go('/together')">${I.shield} 다른 약과 같이 먹어도 되는지 보기</button>` : ''}${taking ? `<button class="btn ghost" onclick="go('/schedule')">${I.clock} 복용 시간 알림 만들기</button>` : ''}</div>
 <div class="links" style="display:flex;gap:6px;flex-wrap:wrap;margin-top:12px"><a class="plink" href="https://nedrug.mfds.go.kr/pbp/CCBBB01/getItemDetail?itemSeq=${esc(p.seq)}" target="_blank" rel="noopener">${I.link}식약처 허가정보</a><a class="plink" href="https://www.health.kr/searchDrug/search_detail.asp" target="_blank" rel="noopener" onclick="copyName('${esc(p.n.replace(/\(.*?\)/g, '')).replace(/'/g, "\\'")}')">${I.search}약학정보원에서 찾기</a></div>
-<div class="srcs"><span class="src-chip">${I.link}출처: 식약처 의약품 낱알식별 정보 · 사진 약학정보원</span></div>
+<div class="srcs"><span class="src-chip">${I.link}출처: 식약처 의약품 낱알식별 정보(사진 포함)</span></div>
 ${disclaimer('낱알 정보는 참고용이에요. 같은 모양의 다른 약도 있으니 확실하지 않으면 약사에게 실물을 보여 주세요.')}`;
 }
 const pubNorm = t => String(t || '').replace(/\(.*?\)|[\s\-·.]/g, '').toLowerCase();
