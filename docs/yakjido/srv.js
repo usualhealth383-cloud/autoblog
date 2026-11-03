@@ -2755,7 +2755,7 @@ try { 이용량.설치({ 앱: 'yakjido', 켜짐: false, 주소: 'https://uszalzc
    ⛔ 지우기·계정 지우기는 앱의 확인 화면으로만 간다(이 부품이 직접 지우지 않는다). */
 (function () {
   if (window.설정판 && window.설정판.__v) return;
-  var 판 = '2026-11-04';
+  var 판 = '2026-11-04b';
   var 설정 = { app: 'app', 언어: null, 줄: null, 아이콘: null, 다시그리기: null };
   var 글표 = {
     ko: { 맞추기: '나에게 맞추기', 알림: '알림', 화면: '화면과 언어', 기록: '내 기록', 앱: '이 앱',
@@ -2883,6 +2883,7 @@ try { 이용량.설치({ 앱: 'yakjido', 켜짐: false, 주소: 'https://uszalzc
   function 곳그림() {
     var p = 고르는중, l = p.lang, el = document.getElementById('mnPlace'); if (!el) return;
     var 나말 = 나라말[p.country], 질문 = 나말 ? 곳('수준', l).replace('{말}', 말이름들[나말][칸(l)]) : 곳('수준일반', l);
+    if (!나라이름[p.country]) p.country = 'XX';   /* 11-04b 목록 밖 나라(BR·VN 등)는 그 밖(국제 안내)으로 */
     var 목 = 나라목록(); if (목.indexOf(p.country) < 0) 목.unshift(p.country);
     el.innerHTML = '<div class="mnp-box" role="dialog" aria-modal="true" aria-labelledby="mnpT" lang="' + l + '">' +
       '<h2 id="mnpT">' + 곳('제목', l) + '</h2><p class="mnp-sub">' + 곳('설명', l) + '</p>' +
@@ -2896,7 +2897,7 @@ try { 이용량.설치({ 앱: 'yakjido', 켜짐: false, 주소: 'https://uszalzc
   }
   function 곳열기() {
     스타일(); var 지금 = 곳읽기(), d = 곳기본();
-    고르는중 = 지금 ? { lang: d.lang, country: 지금.country, level: 지금.level } : { lang: d.lang, country: d.country, level: '' };
+    고르는중 = 지금 ? { lang: d.lang, country: 나라이름[지금.country] ? 지금.country : 'XX', level: 지금.level } : { lang: d.lang, country: d.country, level: '' };
     if (!수준묻나(고르는중)) 고르는중.level = 'ok'; else if (고르는중.level === 'ok' && !지금) 고르는중.level = '';
     var el = document.getElementById('mnPlace'); if (!el) { el = document.createElement('div'); el.id = 'mnPlace'; el.className = 'mnp'; document.body.appendChild(el); }
     곳그림(); try { el.querySelector('select').focus(); } catch (e) {}
@@ -2913,7 +2914,7 @@ try { 이용량.설치({ 앱: 'yakjido', 켜짐: false, 주소: 'https://uszalzc
   }
   function 곳줄() {
     var o = 설정.말과나라; if (!o) return ''; var v = 곳읽기();
-    var 값글 = v ? 나라이름[v.country][칸(말())] + (v.level === 'ok' ? '' : ' · ' + 곳('수준들')[v.level === 'some' ? 1 : 2]) : 곳('안정함');
+    var 값글 = v ? (나라이름[v.country] || 나라이름.XX)[칸(말())] + (v.level === 'ok' ? '' : ' · ' + 곳('수준들')[v.level === 'some' ? 1 : 2]) : 곳('안정함');
     return 줄('globe', 곳('줄'), 곳('줄설명'), 값글, '설정판.말과나라열기()');
   }
   function 다시() { try { if (typeof 설정.다시그리기 === 'function') 설정.다시그리기(); } catch (e) {} }
