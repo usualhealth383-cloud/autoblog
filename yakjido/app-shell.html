@@ -3584,6 +3584,7 @@ function comboName(name){
 const EXPORT = /수출\s*용/;
 /* 외부 검수 2차 #28 — 한 항목의 제품끼리 사는 곳이 다르면(판피린티정 편의점 · 판피린큐액 약국) 항목 전체에 한 배지를 붙이지 않고 제품마다 */
 const RXW = { 안전상비:'편의점 가능', 일반:'약국', 전문:'처방' };
+const QS = /으?로 끝나(요|는 안약이에요)|이에요|예요|이 들어 있어요/g;
 const rxMix = d => { const L = (d?.products || []).filter(p => RXW[p.rx]); return new Set(L.map(p => p.rx)).size > 1 ? L.map(p => pubShort(p.name) + ' ' + RXW[p.rx]).join(' · ') : ''; };
 function search(q, noFix){
   q = (q || '').toLowerCase().trim(); const qIn = q;
@@ -3690,7 +3691,7 @@ function search(q, noFix){
   (D.ingredients?.quick || []).forEach(g => {
     const hitSub = (g.subs || []).find(x => m(x.n) || (x.aka || []).some(m));
     if (m(g.n) || hitSub || mAll(g.n, (g.subs || []).map(x => x.n).join(' '))) {
-      const label = hitSub ? hitSub.n.replace(/으?로 끝나(요|는 안약이에요)|이에요|예요|이 들어 있어요/g, '').trim() : g.n;
+      const label = hitSub ? hitSub.n.replace(QS, '').trim() : g.n;
       out.push({ k:'종류', c:'s', t:`${g.n}${hitSub ? ' — ' + label : ''}`,
                  d:'이름을 몰라도 종류만 고르면 겹치는지 봐 드려요', h:'/kinds/' + g.id, w:2 });
     }
@@ -7246,7 +7247,7 @@ async function toggleQuick(qid){ ME.taking = ME.taking || []; const id = 'cls:' 
 function toggleShort(id){ ME.short = ME.short || {}; if (ME.short[id]) delete ME.short[id]; else ME.short[id] = 1; saveMe(); route(); }
 /* Z7 B9 — 담은 것이 그 제품이면 제품의 용법(아스피린프로텍트 100 mg: 하루 1번 1정)을, 성분 용법(진통 500 mg)보다 먼저 */
 const prodSimple = (d, name) => (d?.products || []).find(p => p.simple && pubStem(p.name) === pubStem(name))?.simple || '';
-function takingItems(){ const SH = ME.short || {}; return (ME.taking || []).map(id => { if (id.startsWith('supp:')) { const s = supp(id.slice(5)); return s ? { id, name: s.name, simple: '영양제 — 제품 라벨대로', supp: s } : null; } if (id.startsWith('cls:')) { const q = quickSub(id.slice(4)); if (!q) return null; return { id, name: q.g.n + ' — ' + q.x.n.replace(/으?로 끝나(요|는 안약이에요)|이에요|예요|이 들어 있어요/g, '').trim(), quick: q, approx: true, simple: '처방대로 (약봉투 용법)' }; } if (id.startsWith('pub:')) { const x = (ME.pub || {})[id]; if (!x) return null;
+function takingItems(){ const SH = ME.short || {}; return (ME.taking || []).map(id => { if (id.startsWith('supp:')) { const s = supp(id.slice(5)); return s ? { id, name: s.name, simple: '영양제 — 제품 라벨대로', supp: s } : null; } if (id.startsWith('cls:')) { const q = quickSub(id.slice(4)); if (!q) return null; return { id, name: q.g.n + ' — ' + q.x.n.replace(QS, '').trim(), quick: q, approx: true, simple: '처방대로 (약봉투 용법)' }; } if (id.startsWith('pub:')) { const x = (ME.pub || {})[id]; if (!x) return null;
   /* 저장할 때 붙인 연결은 낡을 수 있다(연결 규칙을 고치면) — 성분이 있으면 지금 규칙으로 다시 잇는다 */
 const d = x.ingr ? pubDrug(x.ingr, x) : (x.drugId ? drug(x.drugId) : null); const ps = x.rx ? '' : prodSimple(d, x.name); return { id, name: x.name, simple: x.rx ? '처방대로 (약봉투 용법)' : (ps || d?.simple || '라벨대로'), psim: !!ps, d, pub: x }; } const d = drug(id); return d ? { id, name: d.name, simple: d.simple || '', d } : null; }).filter(Boolean).map(x => (x.short = !!SH[x.id], x)); }
 document.addEventListener('input', e => { if (e.target.id === 'mq') { MQ = e.target.value; clearTimeout(window._mt); window._mt = setTimeout(() => { const pos = e.target.selectionStart; route(); const el = document.getElementById('mq'); if (el) { el.focus(); el.setSelectionRange(pos, pos); } }, 300); }
@@ -8142,7 +8143,7 @@ function vMe(_, q){
     <div class="util" style="margin-top:8px">${urow(I.pill, '이름을 몰라도 종류만 골라 담기', '', "go('/kinds')", '고르기')}${rxMine().map(g => urow(I.book, RX_NAME[g] + ' 드시는 분께', '먹는 법 · 깜빡했을 때 · 조심할 약', `go('/rx/${g}')`, '보기')).join('')}${urow(I.pill, '영양제도 담기', '같이 먹어도 되나요에서 약과 함께 봐요', "go('/supp')", '고르기')}</div>
     <div class="search" style="margin-top:12px">${I.search}<input id="mq" aria-label="약 이름으로 찾아 내 약통에 담기" placeholder="약 이름" value="${esc(MQ)}" autocomplete="off"></div>
     ${MQ.trim() ? `<div class="card rows" style="margin-top:8px">${mqHits(MQ.trim()).map(h => { if (h.pub) { const p = h.pub; return mqRow((ME.taking || []).includes('pub:' + pubKeyOf(p)), `addPubIx(${p.id})`, pubShort(p.n), `식약처 제품 · 성분 ${(p.i || []).length}가지(${esc((p.i || []).slice(0, 4).map(t => t.replace(INGR_STRIP, '')).join('·'))}${(p.i || []).length > 4 ? ' 등' : ''}) — 눌러서 담기`); }
-      if (h.qk) { const { g, x } = h.qk; return mqRow((ME.taking || []).includes('cls:' + x.id), `toggleQuick('${x.id}')`, g.n + ' — ' + x.n.replace(/으?로 끝나(요|는 안약이에요)|이에요|예요|이 들어 있어요/g, '').trim(), '종류로 담기 — 이름을 몰라도 겹치는지 봐 드려요'); }
+      if (h.qk) { const { g, x } = h.qk; return mqRow((ME.taking || []).includes('cls:' + x.id), `toggleQuick('${x.id}')`, g.n + ' — ' + x.n.replace(QS, '').trim(), '종류로 담기 — 이름을 몰라도 겹치는지 봐 드려요'); }
       if (h.rxn) { const [n, seq, , rx] = h.rxn, ig = (n.match(/\((.+?)\)/) || [])[1]; return mqRow((ME.taking || []).includes('pub:' + seq), `mqRx('${esc(seq)}')`, pubShort(n), `${rx === 0 ? '약국 약' : '처방약'}${ig ? ' · ' + esc(ig) : ''} — 눌러서 담기`); }
       const id = h.h.slice(6); return mqRow((ME.taking || []).includes(id), `toggleTaking('${id}')`, h.t, '눌러서 내 약통에 담기'); }).join('') || (PUB.index ? '<div class="empty">찾는 약이 없어요 — <a class="link" href="#/kinds">종류로 담기</a></div>' : '<p class="loading">식약처 제품 목록을 불러오는 중…</p>')}</div>` : ''}
     ${items.length ? `<p class="small muted" style="margin-top:8px">항생제·감기약처럼 <b>며칠만</b> 드시는 약은 ‘며칠만’을 눌러 두세요. 매일 드시는 약과 구분해서 부담을 따로 세어요.</p>` : ''}
