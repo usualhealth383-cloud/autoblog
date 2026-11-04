@@ -1768,8 +1768,8 @@ background-repeat:no-repeat;background-position:right 9px center;background-size
 <script>
 window.__YAKJIDO_OK__ = true;
 const D = JSON.parse(document.getElementById('data').textContent || '{}');
-const BUILD = '2026-11-05 08:33';
-const DATAV = '20b2dc6f4b'.indexOf('__') === 0 ? BUILD : '20b2dc6f4b';
+const BUILD = '2026-11-05 08:45';
+const DATAV = '367a3377d5'.indexOf('__') === 0 ? BUILD : '367a3377d5';
 const BRANDMARK = (typeof window !== 'undefined' && window.__BRANDMARK__) || 'icon-192.png';
 let CORE = 0, CORE_P = null;
 function mergeCore(c){
@@ -2551,7 +2551,7 @@ for (const a of (e.aka || [])) {
 const base = String(a || '').toLowerCase().replace(/\s/g, '').replace(/[()\[\]{}<>,./|·+-]/g, '');
 if ((e.exact || []).includes(a)) { if (base) exact.push([base, e]); continue; }
 if (base) roots.push([base, e]);
-const r = norm(a); if (r && r !== base && r.length >= 3 && !ACID_ONLY.has(r) && !salt.includes(r)) roots.push([r, e]);   /* 「나트륨」만 남으면 빼기(와파린나트륨) */
+const r = norm(a); if (r && r !== base && r.length >= 3 && !ACID_ONLY.has(r) && !salt.includes(r)) roots.push([r, e]);
 }
 }
 roots.sort((a, b) => b[0].length - a[0].length);
@@ -3028,7 +3028,7 @@ if (p && p.then) p.then(ok, no); else ok();
 } catch (e) { no(); }
 }
 
-var SEARCH_CORPUS = '';   /* var: let 이면 아티팩트에서 초기화 전 접근 오류(10-14) */
+var SEARCH_CORPUS = '';
 const SEARCH_SYN = {
 '머리아파':'두통', '머리아픔':'두통', '머리가아파':'두통', '골치':'두통', '편두통':'두통',
 '배아파':'복통', '배가아파':'복통', '배아픔':'복통', '속아파':'속쓰림', '속쓰려':'속쓰림', '신물':'속쓰림',
@@ -3348,7 +3348,7 @@ const hard = d ? [...new Set((d.avoid || []).filter(a => !narrowAv(a)).flatMap(a
 if (hard.length) { if (!p.optional) dropped.push({ name: ingrName(d), why: 'avoid', fl: hard }); return null; }
 const kid = kidMode || kidSlot(p);
 const product = p.prod && !swapped ? p.prod : kid ? (kidProds(d)[0] || (kidMode && kidAdultOk(d) ? d?.products?.[0]?.name : '') || '') : (p.prod && (d?.products || []).some(pr => pr.name === p.prod) ? p.prod : d?.products?.[0]?.name);
-return { slot: p.slot, title: p.title || '', i: p._i, d, optional: !!p.optional, either: p.either || '', withSlot: p.withSlot || '', swapped, achWarn, nsaidWarn, senWarn, kid,
+return { slot: p.slot, title: p.title || '', sk: p._k?.slot ?? p.slot, tk: p._k?.title ?? p.title ?? '', i: p._i, d, optional: !!p.optional, either: p.either || '', withSlot: p.withSlot || '', swapped, achWarn, nsaidWarn, senWarn, kid,
 blocked: blocked || !!algCls || kidAsk, why: blocked ? whyOf(pick).concat(allergic(pick) ? ['allergy'] : []) : algCls ? ['allergycls'] : kidAsk ? ['kidage'] : [], again: !!p.again,
 options: p.options, product, cau: cauOf(d) };
 }).filter(x => x && x.d);
@@ -3362,7 +3362,7 @@ Object.assign(x, { d: alt, swapped: x.swapped || 'dup', blocked: false, why: [],
 }
 seen.push({ either: x.either, again: x.again, ks: drugKeys(x.d) }); out.push(x);
 }
-for (let k = out.length - 1; k >= 0; k--) if (out[k].withSlot && !out.some(y => y.slot === out[k].withSlot && !y.blocked)) out.splice(k, 1);
+for (let k = out.length - 1; k >= 0; k--) if (out[k].withSlot && !out.some(y => y.sk === out[k].withSlot && !y.blocked)) out.splice(k, 1);
 const cab = ov ? new Map() : cabMap();
 if (cab.size) for (const x of out) {
 const ks = drugKeys(x.d), hit = ks.filter(k => cab.has(k)); if (!hit.length) continue;
@@ -3567,7 +3567,7 @@ const ing = ingrName(x.d);
 const title = x.d.combo ? ing : (ing || prod || x.d.name);
 const ex = prodNames(x.d, 3, x.kid).filter(n => n !== title);
 const p2 = x.d.combo ? prodNames(x.d, 2, x.kid) : [], subL = x.d.combo ? (p2.length ? '이 성분이 든 제품' : '') : ex.length ? (x.d.prodMix ? '이런 제품이 있어요(제품마다 성분·함량이 달라요)' : '같은 성분 제품 예' + (amtDiff(x.d, ex) ? '(한 알 양이 달라요)' : '')) : '';
-const subN = x.d.combo ? p2.join(' · ') : ex.map(n => wAmt(x.d, n)).join(' · ');   /* 11-05 머리말·제품 이름을 나눠 머리말만 번역(제품 이름은 약국에서 그대로 찾게) */
+const subN = x.d.combo ? p2.join(' · ') : ex.map(n => wAmt(x.d, n)).join(' · ');
 const badge = buyBadge(x);
 return `<button class="buy-item ${x.optional ? 'opt' : ''} ${pimg(x.product) ? 'has-img' : ''} ${open ? 'open' : ''}" onclick="OPEN_BUY=OPEN_BUY==='${x.d.id}'?'':'${x.d.id}';route()" aria-expanded="${open}">
 <span class="bi-t">
@@ -3758,7 +3758,7 @@ famotidine:'위산 줄이는 약', omeprazole:'위산 줄이는 약', 'gi-acid':
 spasm:'배 아픈 데 푸는 약', combo:'종합감기약', 'coughs-combo':'기침약', cold:'가래약', dextromethorphan:'기침약', yonggaksan:'기침약', pseudoephedrine:'코막힘 약', antihistamine:'콧물·알레르기 약', xylometazoline:'코에 뿌리는 약',
 sleep:'잠 오는 약', dimenhydrinate:'멀미약', scopolamine:'멀미약', topical:'파스·바르는 약', flurbiprofen:'목 아픈 데 녹여 먹는 약' };
 const catName = x => { const d = x.d, c = CATN[d.id] || CATN[d.class];
-if (c === '위산 줄이는 약' && /위보호|위 지키/.test(x.slot + (x.title || ''))) return '위장약(속쓰림 덜기)';
+if (c === '위산 줄이는 약' && /위보호|위 지키/.test((x.sk ?? x.slot) + (x.tk ?? x.title ?? ''))) return '위장약(속쓰림 덜기)';
 return c || (/^(skin|oral)$/.test(d.class) ? d.name.split(' (')[0] : String(cls(d.class)?.name || ingrName(d)).replace(/\s*\(.*$/, '')); };
 const rxAsk = d => { const f = activeFlags(); return !!d && [...(d.avoid || []).filter(a => !narrowAv(a)), ...(d.caution || []).filter(a => a && a.label === 'avoid')].some(a => (a.flags || []).some(x => f.includes(x))); };
 function svRow(x){
@@ -3844,7 +3844,7 @@ const narrowAv = a => String(a.flags) === 'asthma' && /(아스피린|소염진�
 const yK = t => window.yKo?.(t), banList = (L, b) => !b || !Array.isArray(L) ? L : L.filter(t => !b.hit(yK(t) ?? (typeof t === 'object' ? (t.q || '') + ' ' + (t.a || '') + ' ' + (t.t || t.text || '') : t)));
 const banProse = (t, b) => !b || !t ? t : window.yBanP?.(t, b) ?? String(t).replace(/([.!?])\s+/g, '$1\u0001').split('\u0001').filter(x => !b.hit(x)).join(' ');
 const flagTop = L => (L || []).filter(x => !(x === 'heart' && L.includes('hf')) && !(x === 'liver' && L.includes('lvs')) && !(x === 'ulcer' && L.includes('bleed')));
-const bnm = L => L.map(n => `<b>${esc(n)}</b>`).join('·'), bfl = L => flagTop(L).map(x => `<span>${esc(FLAG_LABEL[x] || x)}</span>`).join(', ');   /* 11-05 이름·조건을 한 칸씩 — 번역 사전이 낱낱이 찾게 */
+const bnm = L => L.map(n => `<b>${esc(n)}</b>`).join('·'), bfl = L => flagTop(L).map(x => `<span>${esc(FLAG_LABEL[x] || x)}</span>`).join(', ');
 const banNote = b => !b ? '' : (b.names.length ? `<p class="note ban-note">${I.alert}<span><span>내 몸 조건 때문에 이 약 안내는 뺐어요 — 다른 약도 먹기 전에 약사·의사와 먼저 상의하세요.</span> ${bnm(b.names)} <small>(${bfl(b.why)})</small></span></p>` : '')
 + ((b.askNames || []).length ? `<p class="note ban-note">${I.alert}<span><span>내 몸 조건에서는 이 약을 먹기 전에 약사·의사와 먼저 확인하세요 — 그래서 먹는 법·양 안내는 뺐어요.</span> ${bnm(b.askNames)} <small>(${bfl(b.askWhy)})</small></span></p>` : '');
 function vSymptom(id, q){
@@ -5720,7 +5720,7 @@ if (!PUB.index) pubIndexSoon();
 const pub = (PUB.index || []).filter(p => (p.map || []).includes(d.id));
 const pubHtml = pub.length ? `<h3 style="margin-top:20px">식약처 등록 제품 <small class="muted" style="font-weight:500">${pub.length}개 · e약은요 공공데이터${pub.length > 30 ? ' · 30개만 표시' : ''}</small></h3>${(() => { const rowP = p => `<button class="row" onclick="go('/pub/${p.id}')">${pubThumb(p)}<div class="body"><b>${esc(p.n)}</b><span>${esc(p.m)}${p.map.length > 1 ? ' · 복합제(' + p.map.length + '성분)' : ''}</span></div>${p.cvs ? '<span class="badge cvs">편의점</span>' : ''}${I.chev}</button>`;
 const L = pub.slice(0, 30); return `<div class="rows">${L.slice(0, 5).map(rowP).join('')}</div>${L.length > 5 ? `<details class="more-rows"><summary>제품 더 보기 <span class="muted">${L.length - 5}개</span>${I.chev}</summary><div class="rows">${L.slice(5).map(rowP).join('')}</div></details>` : ''}`; })()}` : (PUB.index ? '' : '<p class="loading">식약처 제품 목록을 불러오는 중…</p>');
-const top = prodTop(d, q.p), dupTop = !!top && (d.contains || []).length > 0;   /* 복합제 항목은 이름이 곧 제품 이름 */
+const top = prodTop(d, q.p), dupTop = !!top && (d.contains || []).length > 0;
 return `${topBar({ back:'약 사전', unreviewed:d.reviewed === false })}${top}
 <div class="drug-hero">${c ? `<a class="cls link" href="#/class/${c.id}">${esc(c.name)} ›</a>` : ''}${dupTop ? '' : `<h1>${esc(d.name)}</h1>`}
 ${(() => { /* 3-3 ① 대표 제품을 제목 아래(NHS) */
@@ -6641,7 +6641,7 @@ if (pts.length >= 3 && new Set(pts.map(d => d.risk.gi + ',' + d.risk.cv)).size <
 return `<section class="sec card"><h2>위·심장 부담은 어떤가요</h2><p>이 계열은 <b>${pts.length}가지가 모두 비슷해요</b> — 위나 심장 부담으로는 갈리지 않아요. 그래서 막대 대신 <b>아래 「한눈에 비교」</b>를 보시면 돼요. 고르는 기준이 거기 적혀 있어요.</p>${srcChips(c.chartSources)}</section>`;
 return ''; })()}
 ${c.table?.length ? (() => {
-const buyK = cols.find(k => k.key === 'otc'), rest = cols.filter(k => k !== buyK).sort((a, b) => (b.key === 'pick') - (a.key === 'pick'));   /* 「이런 분께·고를 때」가 먼저 */
+const buyK = cols.find(k => k.key === 'otc'), rest = cols.filter(k => k !== buyK).sort((a, b) => (b.key === 'pick') - (a.key === 'pick'));
 const chip = t => { const w = String(t || '').split('(')[0].trim(); return w ? `<span class="badge ${/^처방/.test(w) ? 'rx' : /^편의점/.test(w) ? 'cvs' : /^(약국|마트)/.test(w) ? 'otc' : 'soft'}">${esc(w)}</span>` : ''; };
 const RS = clsRoles(c), grp = RS.length > 1;
 return `<section class="sec"><h2 class="sec-h">한눈에 비교 <small>${c.table.length}가지 · 누르면 펼쳐져요</small></h2>${RS.map(g => `${grp ? `<h3 class="sq-h3">${esc(g)}</h3>` : ''}<div class="card cmpr-list">${c.table.filter(r => clsRole(c, r) === g).map(r => { const d = drug(r.drug), w = String(r.otc || '').split('(')[0].trim();
