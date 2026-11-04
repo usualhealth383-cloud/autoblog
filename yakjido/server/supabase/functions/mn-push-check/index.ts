@@ -1,4 +1,4 @@
-// 메디나눔 공용 푸시 — 15분마다(pg_cron → 이 함수) 다섯 앱 판정 모듈을 차례로 돌려 웹 푸시를 보낸다 · 2026-11-03
+// 메디나눔 공용 푸시 — 5분마다(pg_cron → 이 함수 · 11-04 15분에서 바꿈) 다섯 앱 판정 모듈을 차례로 돌려 웹 푸시를 보낸다 · 2026-11-03
 // 표: yakjido/server/supabase/medinanum/메디나눔_공용푸시_1103.sql(mn_push_subs · mn_push_sent) · 앱 모듈: ./modules/<앱>.ts
 // 배포: supabase functions deploy mn-push-check --no-verify-jwt (예약 작업이 부르므로 x-cron-secret 머리글로 막음)
 // 비밀은 yak-family-check 와 같은 Vault 값을 공용으로 쓴다: yak_family_cron_secret · yak_vapid_public · yak_vapid_private(저장소엔 값 없음)

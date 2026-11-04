@@ -4,7 +4,7 @@
 export const PER_DAY = 2;              // 가족 한 분당 하루 2번까지
 export const STALE_DAYS = 3;           // 본인 기록이 3일 넘게 안 올라오면 가족 알림을 보내지 않는다
 export const NOSYNC_EXTRA = 30;        // 복용 시각 뒤로 기록이 한 번도 안 올라왔으면 30분 더 기다린다(오프라인 체크 오알림 줄이기)
-export const DOSE_WIN = 7;             // 본인 정시 알림: 복용 시각 ±7분 안의 확인 때 한 번(15분마다 확인)
+export const DOSE_WIN = 3;             // 본인 정시 알림: 복용 시각 ±3분 안의 확인 때 한 번(11-04 5분마다 확인 — mn_push_sent 로 한 번만)
 export const DEF = { tz: 'Asia/Seoul', lang: 'ko', wait: 2, qs: '22:00', qe: '07:00' };
 export const LANGS = ['ko', 'en', 'es', 'ja', 'zh'];
 
