@@ -59,7 +59,7 @@
   var 공표 = window.메디나눔위기번호 && window.메디나눔위기번호.표, 공 = 공표 && 공표[CC];
   var N = EMG[CC] || (공 && 공.응급 ? { e: 공.응급, m: 공.위기 || [] } : { e: null, m: [], unknown: true });
   var 현지 = { ko: '그 나라 응급 번호', en: 'the local emergency number', es: 'el número de emergencias del país', ja: '現地の緊急番号', zh: '当地急救电话' }[L] || 'the local emergency number';
-  var DICT = null, ui = {}, uiN = {}, REV = {};
+  var DICT = null, ui = {}, uiN = {}, REV = {}, KO = new Map();   /* KO — 번역 글 → 바꾸기 전 한국어(그릴 때마다 다시 얹어도 남게 한 번만 만든다) */
   var NOTE = { en: 'Translation not yet reviewed by our medical team', es: 'Traducción aún no revisada por nuestro equipo médico', ja: '翻訳は医療スタッフの確認前です', zh: '翻译尚未经医疗团队审核' };
   var ORIG = { en: 'Show Korean original', es: 'Ver original en coreano', ja: '韓国語の原文を見る', zh: '查看韩文原文' };
   var KRNOTE = { en: 'Medicine doses follow Korean approval — check with a pharmacist or doctor where you live.', es: 'Las dosis siguen la aprobación de Corea: confírmelas con un farmacéutico o médico de su país.', ja: '薬の量は韓国の承認基準です。お住まいの国の薬剤師・医師に確認してください。', zh: '药物剂量依据韩国批准标准，请向您所在国家的药师或医生确认。' };
@@ -101,13 +101,20 @@
     });
     /* 11-02 본문 — 많이 보는 증상부터 주마다(장부). 안전 칸과 따로 body 에 두고 칸마다 번호로 맞춘다. 빈 칸·모자란 칸은 한국어 그대로 */
     var B = DICT.body || {};
+    /* 11-05 금기 거르기는 한국어 약 이름으로 문장을 찾는다 — 번역 글은 바꾸기 전 한국어를 KO 에 두고 그걸로 거른다(yKo·yBanP · app-shell banList·banProse·medTips) */
+    var ko = function (n, o) { if (n !== o && o) KO.set(n, o); return n; };
+    window.yKo = function (t) { return t && typeof t === 'object' ? t._ko : KO.get(t); };
+    window.yBanP = function (t, b) { var k = KO.get(t); if (k == null) return null;
+      var sp = function (x) { return String(x).replace(/([.!?])\s+|([。！？])\s*/g, function (m, a, c) { return (a || c) + '\u0001'; }).split('\u0001').filter(function (y) { return y.trim(); }); };
+      var ks = sp(k), hs = ks.map(function (x) { return b.hit(x); }); if (!hs.some(Boolean)) return t;
+      var ts = sp(t); return ts.length === ks.length ? ts.filter(function (x, i) { return !hs[i]; }).join(' ') : '';   /* 문장 수가 다르면 그 칸을 통째로 뺀다(안전 쪽) */ };
     (D.symptoms || []).forEach(function (s) {
       var b = B[s.id]; if (!b) return;
-      ['lead', 'planTitle', 'planLabel'].forEach(function (k) { if (b[k] && s[k]) s[k] = b[k]; });
-      ['how', 'pharmacy', 'selfcare', 'avoid'].forEach(function (k) { if (b[k] && Array.isArray(s[k])) s[k] = s[k].map(function (x, i) { return b[k][i] || x; }); });
-      if (b.plan && Array.isArray(s.plan)) s.plan.forEach(function (o, i) { var x = b.plan[i]; if (x) ['slot', 'title', 'why', 'either'].forEach(function (f) { if (x[f] && o[f] && o[f] !== x[f]) { if (f !== 'why') REV[x[f]] = o[f]; o[f] = x[f]; } }); });
-      if (b.notWorking && s.notWorking) { if (b.notWorking.title) s.notWorking.title = b.notWorking.title; if (b.notWorking.steps && s.notWorking.steps) s.notWorking.steps = s.notWorking.steps.map(function (x, i) { return b.notWorking.steps[i] || x; }); }
-      if (b.faq && Array.isArray(s.faq)) s.faq.forEach(function (o, i) { var x = b.faq[i]; if (x) { if (x.q) o.q = x.q; if (x.a) o.a = x.a; } });
+      ['lead', 'planTitle', 'planLabel'].forEach(function (k) { if (b[k] && s[k]) s[k] = ko(b[k], s[k]); });
+      ['how', 'pharmacy', 'selfcare', 'avoid'].forEach(function (k) { if (b[k] && Array.isArray(s[k])) s[k] = s[k].map(function (x, i) { return b[k][i] ? ko(b[k][i], x) : x; }); });
+      if (b.plan && Array.isArray(s.plan)) s.plan.forEach(function (o, i) { var x = b.plan[i]; if (x) ['slot', 'title', 'why', 'either'].forEach(function (f) { if (x[f] && o[f] && o[f] !== x[f]) { if (f !== 'why') REV[x[f]] = o[f]; o[f] = ko(x[f], o[f]); } }); });
+      if (b.notWorking && s.notWorking) { if (b.notWorking.title) s.notWorking.title = b.notWorking.title; if (b.notWorking.steps && s.notWorking.steps) s.notWorking.steps = s.notWorking.steps.map(function (x, i) { return b.notWorking.steps[i] ? ko(b.notWorking.steps[i], x) : x; }); }
+      if (b.faq && Array.isArray(s.faq)) s.faq.forEach(function (o, i) { var x = b.faq[i]; if (x) { if (o._ko == null) o._ko = (o.q || '') + ' ' + (o.a || ''); if (x.q) o.q = x.q; if (x.a) o.a = x.a; } });
     });
     var R = typeof RXG !== 'undefined' ? RXG : window.RXG, RX = DICT.rx || {};
     if (R && R.guides) {

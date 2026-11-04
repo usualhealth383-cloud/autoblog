@@ -1768,8 +1768,8 @@ background-repeat:no-repeat;background-position:right 9px center;background-size
 <script>
 window.__YAKJIDO_OK__ = true;
 const D = JSON.parse(document.getElementById('data').textContent || '{}');
-const BUILD = '2026-11-05 02:03';
-const DATAV = '45381557b5'.indexOf('__') === 0 ? BUILD : '45381557b5';
+const BUILD = '2026-11-05 08:18';
+const DATAV = 'a9c1153d4b'.indexOf('__') === 0 ? BUILD : 'a9c1153d4b';
 const BRANDMARK = (typeof window !== 'undefined' && window.__BRANDMARK__) || 'icon-192.png';
 let CORE = 0, CORE_P = null;
 function mergeCore(c){
@@ -3571,7 +3571,7 @@ const sub = x.d.combo ? (prodNames(x.d, 2, x.kid).length ? '이 성분이 든 �
 const badge = buyBadge(x);
 return `<button class="buy-item ${x.optional ? 'opt' : ''} ${pimg(x.product) ? 'has-img' : ''} ${open ? 'open' : ''}" onclick="OPEN_BUY=OPEN_BUY==='${x.d.id}'?'':'${x.d.id}';route()" aria-expanded="${open}">
 <span class="bi-t">
-<small class="role">${esc(x.slot)}${x.optional ? ' · 도움될 수 있어요' : ''}${SYM_NOW && isWorked(SYM_NOW, x.d.id) ? ' · 효과 봤던 약' : ''}</small>
+<small class="role">${esc(x.slot)}${x.optional ? ' · <span>도움될 수 있어요</span>' : ''}${SYM_NOW && isWorked(SYM_NOW, x.d.id) ? ' · <span>효과 봤던 약</span>' : ''}</small>
 <b>${esc(nbu(title))}</b>${sub ? `<small class="sub">${esc(nbu(sub))}</small>` : ''}${badge}${x.cau ? `<small class="cau">${I.alert}${esc(x.cau)}</small>` : ''}${mixH(x)}
 </span>
 ${imgTag(pimg(x.product), 'pimg', x.product)}
@@ -3703,7 +3703,7 @@ if (late.length) out.push(`<div class="consult-grp"><div class="consult-h">${I.a
 return out.join('');
 }
 const isMedTip = p => p.otc !== false && !(p.options || []).length && (p.hideFlags || []).length > 0;
-function medTips(s){ const ban = tipBan(s); return (s.plan || []).filter(p => isMedTip(p) && !slotHidden(p) && !(ban && ban.hit(p.why))).map(p => `<div class="med-tip">${fold(esc(p.title || p.slot), `<p class="why">${fmt(p.why)}</p>`)}</div>`).join(''); }
+function medTips(s){ const ban = tipBan(s); return (s.plan || []).filter(p => isMedTip(p) && !slotHidden(p) && !(ban && ban.hit(yK(p.why) ?? p.why))).map(p => `<div class="med-tip">${fold(esc(p.title || p.slot), `<p class="why">${fmt(p.why)}</p>`)}</div>`).join(''); }
 function doRows(s){
 const rows = (s.plan || []).filter(p => p.otc !== false && !(p.options || []).length && !slotHidden(p) && !isMedTip(p));
 if (!rows.length) return '';
@@ -3841,11 +3841,12 @@ const nm = L => [...new Set(L.map(o => ingrName(drug(o))))];
 return { hit, ids: all, names: nm(bad), why: why(bad), askNames: nm(ask), askWhy: why(ask) };
 }
 const narrowAv = a => String(a.flags) === 'asthma' && /(아스피린|소염진통제|감기약)[^.]*(적이 있|있었던|생긴 적|온 적)/.test(a.text || '') && !/그 밖의 천식도 설명서/.test(a.text || '');
-const banList = (L, b) => !b || !Array.isArray(L) ? L : L.filter(t => !b.hit(typeof t === 'object' ? (t.q || '') + ' ' + (t.a || '') + ' ' + (t.t || t.text || '') : t));
-const banProse = (t, b) => !b || !t ? t : String(t).replace(/([.!?])\s+/g, '$1\u0001').split('\u0001').filter(x => !b.hit(x)).join(' ');
+const yK = t => window.yKo?.(t), banList = (L, b) => !b || !Array.isArray(L) ? L : L.filter(t => !b.hit(yK(t) ?? (typeof t === 'object' ? (t.q || '') + ' ' + (t.a || '') + ' ' + (t.t || t.text || '') : t)));
+const banProse = (t, b) => !b || !t ? t : window.yBanP?.(t, b) ?? String(t).replace(/([.!?])\s+/g, '$1\u0001').split('\u0001').filter(x => !b.hit(x)).join(' ');
 const flagTop = L => (L || []).filter(x => !(x === 'heart' && L.includes('hf')) && !(x === 'liver' && L.includes('lvs')) && !(x === 'ulcer' && L.includes('bleed')));
-const banNote = b => !b ? '' : (b.names.length ? `<p class="note ban-note">${I.alert}<span>내 몸 조건(${esc(flagTop(b.why).map(x => FLAG_LABEL[x] || x).join(', '))}) 때문에 <b>${esc(b.names.join('·'))}</b> 안내는 뺐어요 — 다른 약도 먹기 전에 약사·의사와 먼저 상의하세요.</span></p>` : '')
-+ ((b.askNames || []).length ? `<p class="note ban-note">${I.alert}<span>내 몸 조건(${esc(flagTop(b.askWhy).map(x => FLAG_LABEL[x] || x).join(', '))})에서는 <b>${esc(b.askNames.join('·'))}</b>${josa(b.askNames[b.askNames.length - 1], '을', '를')} 먹기 전에 약사·의사와 먼저 확인하세요 — 그래서 먹는 법·양 안내는 뺐어요.</span></p>` : '');
+const bnm = L => L.map(n => `<b>${esc(n)}</b>`).join('·'), bfl = L => flagTop(L).map(x => `<span>${esc(FLAG_LABEL[x] || x)}</span>`).join(', ');   /* 11-05 이름·조건을 한 칸씩 — 번역 사전이 낱낱이 찾게 */
+const banNote = b => !b ? '' : (b.names.length ? `<p class="note ban-note">${I.alert}<span><span>내 몸 조건 때문에 이 약 안내는 뺐어요 — 다른 약도 먹기 전에 약사·의사와 먼저 상의하세요.</span> ${bnm(b.names)} <small>(${bfl(b.why)})</small></span></p>` : '')
++ ((b.askNames || []).length ? `<p class="note ban-note">${I.alert}<span><span>내 몸 조건에서는 이 약을 먹기 전에 약사·의사와 먼저 확인하세요 — 그래서 먹는 법·양 안내는 뺐어요.</span> ${bnm(b.askNames)} <small>(${bfl(b.askWhy)})</small></span></p>` : '');
 function vSymptom(id, q){
 const s = byId(D.symptoms, id); if (!s) return vHome();
 if (svOn(q)) return vSymptomS(s);
@@ -3926,7 +3927,7 @@ ${B('faq')?.length ? xcard('faq', 'info', '자주 묻는 질문', B('faq'), faqL
 <div class="pane" id="sp4">
 ${erOnly()}
 <div class="how-body">
-${ban ? `<p class="note ban-note">${I.alert}<span>아래는 진료실에서 처방하는 방식이에요. 내 몸 조건에 피하거나 먼저 확인할 약(<b>${esc(ban.names.concat(ban.askNames).join('·'))}</b>)이 있어요 — 따라 사지 마시고 의사와 먼저 상의하세요.</span></p>` : ''}
+${ban ? `<p class="note ban-note">${I.alert}<span><span>아래는 진료실에서 처방하는 방식이에요. 내 몸 조건에 피하거나 먼저 확인할 약이 있어요 — 따라 사지 마시고 의사와 먼저 상의하세요.</span> ${bnm(ban.names.concat(ban.askNames))}</span></p>` : ''}
 <p class="lead-p">${fmt(banProse(s.lead, ban))}</p>
 <section class="sec">
 <div class="rx-card">
