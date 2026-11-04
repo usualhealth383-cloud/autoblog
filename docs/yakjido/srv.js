@@ -1985,7 +1985,7 @@ function doseSrvHTML(){
   if (!famOn() || (typeof NATIVE !== 'undefined' && NATIVE)) return '';
   const on = famPrefs().dose && srvLoggedIn();
   return `<section class="sec card fam">${'<h2 class="fam-h">앱을 닫아도 제시간에</h2>'}
-    <p>앱을 닫아 두어도 약 드실 시간에 알려 드려요. 서버가 15분마다 확인해서 복용 시각 앞뒤 7분 안에 한 번 보내요. 알림에서 바로 「먹었어요」·「10분 뒤 다시」를 누를 수 있어요.</p>
+    <p>앱을 닫아 두어도 약 드실 시간에 알려 드려요. 서버가 5분마다 확인해서 복용 시각 앞뒤 3분 안에 한 번 보내요. 알림에서 바로 「먹었어요」·「10분 뒤 다시」를 누를 수 있어요.</p>
     <p class="small muted">약 이름은 「알림에 약 이름 보이기」를 켰을 때만 넣어요 — 잠금화면에 보일 수 있어요.</p>
     ${!srvLoggedIn() ? `<button type="button" class="btn line" onclick="go('/login')">${I.user} 로그인하고 켜기</button>`
       : on ? `<p class="fam-msg">켜져 있어요</p><button type="button" class="link" onclick="doseSrv(false)">끄기</button>`

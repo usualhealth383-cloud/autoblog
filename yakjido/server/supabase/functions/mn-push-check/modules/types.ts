@@ -1,5 +1,5 @@
 // 메디나눔 공용 푸시 — 앱 판정 모듈이 받는 것(11-03)
-// 모듈 하나 = 앱 하나. run() 은 15분마다 한 번 불린다. 보낼 것을 찾으면 ctx.push 로 보낸다(같은 일은 once 로 한 번만).
+// 모듈 하나 = 앱 하나. run() 은 5분마다 한 번 불린다(11-04 — 15분에서 바꿈). 보낼 것을 찾으면 ctx.push 로 보낸다(같은 일은 once 로 한 번만).
 export type Payload = { title: string; body: string; kind?: string; key?: string; day?: string; tag?: string; go?: string; acts?: string[] };
 export type Once = { kind: string; day: string; slot: string };
 export interface Ctx {

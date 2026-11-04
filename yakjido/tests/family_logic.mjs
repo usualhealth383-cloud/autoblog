@@ -20,9 +20,9 @@ ok(J(missedSlots({ taking: ['a'], sched: { a: ['25:00', 'x'] } }, { day, min: 14
 const old = { day, min: 7 * 60 };
 ok(J(missedSlots(me, { day, min: 10 * 60 + 29 }, 2, old)) === '[]' && J(missedSlots(me, { day, min: 10 * 60 + 30 }, 2, old)) === '["08:00"]', '동기화 없으면 30분 더');
 ok(J(missedSlots(me, { day, min: 10 * 60 + 30 }, 2, null)) === '["08:00"]', '동기화 시각 모름 → 30분 더 뒤 보냄');
-// 본인 정시 알림 ±7분
-ok(J(dueNow(me, { day, min: 8 * 60 - 7 }).map((x) => x.key)) === '["ibu@08:00"]', '정시 -7분(먹은 met 빼고 한 장)');
-ok(dueNow(me, { day, min: 8 * 60 + 8 }).length === 0 && dueNow(me, { day, min: 8 * 60 - 8 }).length === 0, '±8분은 아님');
+// 본인 정시 알림 ±3분(11-04 5분마다 확인)
+ok(J(dueNow(me, { day, min: 8 * 60 - 3 }).map((x) => x.key)) === '["ibu@08:00"]', '정시 -3분(먹은 met 빼고 한 장)');
+ok(dueNow(me, { day, min: 8 * 60 + 4 }).length === 0 && dueNow(me, { day, min: 8 * 60 - 4 }).length === 0, '±4분은 아님');
 ok(J(dueNow({ ...me, taken: {} }, { day, min: 8 * 60 }).map((x) => x.key)) === '["ibu@08:00,met@08:00"]', '같은 시각 두 약 한 장 · 앱 알림과 같은 key');
 // 시간대 세 곳 + 서머타임 경계
 let s = localNow(new Date('2026-11-02T15:30:00Z'), 'Asia/Seoul'); ok(s.day === '2026-11-03' && s.min === 30, '서울 날짜 넘어감 ' + J(s));

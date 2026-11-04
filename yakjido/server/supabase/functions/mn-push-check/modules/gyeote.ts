@@ -1,7 +1,22 @@
-// 곁에 판정 모듈 — 자리만(11-03). 곁에 세션이 채운다(요청서 A: 각 앱이 심기).
-// 쓰는 법: ctx.sql 로 records(app='gyeote') 의 기록을 읽고, 보낼 때가 되면
-//   await ctx.push(userId, (lang) => ({ title, body, tag, go: '#/…' }), { kind: '종류', day: 'YYYY-MM-DD(그 사람 시각)', slot: 'HH:MM 또는 구분자' })
-// 시간대·말은 기기 구독(mn_push_subs.lang·tz) 또는 앱 설정 기록에서. 하루 상한은 ctx.sentCount. 판정은 순수 함수로 따로 두고 단위 시험(약지도 logic.ts·tests/family_logic.mjs 처럼).
+// 곁에 판정 — 11-04 Main 「앱을 닫아도 알림」. 복약 시각 ±3분에 「약 드실 시간이에요」(약 이름 없음).
+// 기록: records(app='gyeote', key='gy.remind') = { on, times:['HH:MM',…], tz, lang } — 형식은 kg_logic.ts 머리. 끈 사람(on:false)은 안 감.
 import type { Module } from './types.ts';
-const mod: Module = { app: 'gyeote', async run() { return 0; } };
+import { gyeoteDue, gyeoteMessage, pickLang } from './kg_logic.ts';
+
+const mod: Module = {
+  app: 'gyeote',
+  async run(ctx) {
+    let n = 0;
+    const rows = await ctx.sql`select user_id, value from public.records where app = 'gyeote' and key = 'gy.remind'`;
+    for (const x of rows) {
+      const rem = ctx.parse(x.value);
+      for (const d of gyeoteDue(rem, ctx.now)) {
+        const ok = await ctx.push(x.user_id, (l) => ({ ...gyeoteMessage(rem?.lang ? pickLang(rem.lang) : l), kind: 'gyeote-dose', tag: 'gyeote-dose@' + d.slot, go: '#/' }),
+          { kind: 'gyeote-dose', day: d.day, slot: d.slot });
+        if (ok) n++;
+      }
+    }
+    return n;
+  },
+};
 export default mod;
