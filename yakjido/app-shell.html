@@ -4234,13 +4234,13 @@ function buyItem(x){
   /* Z4 #19 — 광고처럼 읽히지 않게: 성분을 크게, 제품은 「같은 성분 제품 예」로 나란히(한 제품만 크게 강조하지 않는다) */
   const title = x.d.combo ? ing : (ing || prod || x.d.name);
   const ex = prodNames(x.d, 3, x.kid).filter(n => n !== title);
-  const sub = x.d.combo ? (prodNames(x.d, 2, x.kid).length ? '이 성분이 든 제품: ' + prodNames(x.d, 2, x.kid).join(' · ') : '')
-    : (ex.length ? `${x.d.prodMix ? '이런 제품이 있어요(제품마다 성분·함량이 달라요)' : '같은 성분 제품 예' + (amtDiff(x.d, ex) ? '(한 알 양이 달라요)' : '')}: ` + ex.map(n => wAmt(x.d, n)).join(' · ') : '');
+  const p2 = x.d.combo ? prodNames(x.d, 2, x.kid) : [], subL = x.d.combo ? (p2.length ? '이 성분이 든 제품' : '') : ex.length ? (x.d.prodMix ? '이런 제품이 있어요(제품마다 성분·함량이 달라요)' : '같은 성분 제품 예' + (amtDiff(x.d, ex) ? '(한 알 양이 달라요)' : '')) : '';
+  const subN = x.d.combo ? p2.join(' · ') : ex.map(n => wAmt(x.d, n)).join(' · ');   /* 11-05 머리말·제품 이름을 나눠 머리말만 번역(제품 이름은 약국에서 그대로 찾게) */
   const badge = buyBadge(x);
   return `<button class="buy-item ${x.optional ? 'opt' : ''} ${pimg(x.product) ? 'has-img' : ''} ${open ? 'open' : ''}" onclick="OPEN_BUY=OPEN_BUY==='${x.d.id}'?'':'${x.d.id}';route()" aria-expanded="${open}">
     <span class="bi-t">
       <small class="role">${esc(x.slot)}${x.optional ? ' · <span>도움될 수 있어요</span>' : ''}${SYM_NOW && isWorked(SYM_NOW, x.d.id) ? ' · <span>효과 봤던 약</span>' : ''}</small>
-      <b>${esc(nbu(title))}</b>${sub ? `<small class="sub">${esc(nbu(sub))}</small>` : ''}${badge}${x.cau ? `<small class="cau">${I.alert}${esc(x.cau)}</small>` : ''}${mixH(x)}
+      <b>${esc(nbu(title))}</b>${subL ? `<small class="sub"><span>${esc(subL)}</span>: ${esc(nbu(subN))}</small>` : ''}${badge}${x.cau ? `<small class="cau">${I.alert}${esc(x.cau)}</small>` : ''}${mixH(x)}
     </span>
     ${imgTag(pimg(x.product), 'pimg', x.product)}
     <span class="bi-r">${I.chev}</span></button>
