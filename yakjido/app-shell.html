@@ -3457,7 +3457,7 @@ function vHome(){
   const T = (D.tips || []), tip = T.length ? T[new Date().getDate() % T.length] : null;
   /* 10-31 — 오늘 약이 맨 위(매일 쓸 이유) */
   const dh = doseHome();
-  return `${topBar()}
+  return `${topBar()}${ext('가족대화줄')}
   ${dh ? dh + homeQuick(n) : homeQuick(n)}
   ${svOn() ? `<section class="hero"><div class="eyebrow">${esc(hello)}</div><h1 class="greet">어디가 불편하세요?</h1><p class="sv-lead">누르면 사야 할 약을 바로 알려 드려요</p></section>
   <div class="sv-tiles">${SV_HOME.map(id => byId(D.symptoms, id)).filter(Boolean).map(s => `<button class="sv-tile ${gcls(s.group)}" onclick="go('/symptom/${s.id}')"><span class="ic">${sicon(s)}</span><b>${esc(s.name.split(' (')[0])}</b></button>`).join('')}</div>

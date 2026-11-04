@@ -496,7 +496,7 @@
       return 준비().then(function () { return typeof 설정.지우기전 === 'function' ? Promise.resolve(설정.지우기전(sb, 세션)).catch(function () {}) : null; }).then(function () { return sb.rpc('yak_family_end_all').then(function () {}, function () {}); }).then(function () { return sb.rpc('delete_own_account', { p_app: 설정.app }); }).then(function (r) {
         if (r && r.error) throw r.error;
         try { 내열쇠().forEach(function (k) { localStorage.removeItem(k); }); } catch (e) {}
-        try { localStorage.removeItem('_srv_' + 설정.app); localStorage.removeItem(구독키()); ['yakjido.ask', 'mn.addr'].forEach(function (k) { localStorage.removeItem(k); }); } catch (e) {}   /* 11-04 묻고 싶은 것·응급 카드 주소도 */
+        try { localStorage.removeItem('_srv_' + 설정.app); localStorage.removeItem(구독키()); ['yakjido.ask', 'mn.addr', 'mn.chat.on.yakjido'].forEach(function (k) { localStorage.removeItem(k); }); } catch (e) {}   /* 11-04 묻고 싶은 것·응급 카드 주소도 */
         세션 = null; try { sb.auth.signOut(); } catch (e) {}
         알림(r && r.data && r.data.account_deleted === false ? '약지도의 서버 기록과 이 휴대폰의 기록을 지웠어요. 다른 메디나눔 앱 기록이 남아 있어 계정은 그대로예요.' : '계정과 약지도 서버 기록을 지웠어요. 이 휴대폰에 있던 약지도 기록도 비웠어요.');
         화면갱신();
@@ -1930,10 +1930,10 @@ function famCard(q){
     ? `<li><span><b>코드 ${esc(x.code)}</b><small>${esc(famWhen(x.code_expires))}까지 · 받은 분이 넣으면 연결 요청이 와요</small></span><span class="fam-b"><button type="button" class="btn line" onclick="famShare('${esc(x.code)}')">보내기</button><button type="button" class="link" onclick="famEnd('${x.id}')">취소</button></span></li>`
     : x.status === 'asking'
     ? `<li class="fam-hot"><span><b>코드를 받은 분이 연결을 요청했어요</b><small>계정 이메일: <span>${esc(x.other_email || '')}</span><br>이 분께 내 약 체크 알림을 보내도 될까요?</small></span><span class="fam-b"><button type="button" class="btn primary" onclick="famApprove('${x.id}',true)">연결 허락</button><button type="button" class="link" onclick="famApprove('${x.id}',false)">거절</button></span></li>`
-    : `<li><span><b>${esc(x.other_email || '가족')}</b><small>연결됨 · 체크 기록이 없으면 이 분께 알려요</small></span><span class="fam-b"><button type="button" class="link" onclick="famEnd('${x.id}')">끊기</button></span></li>`;
+    : `<li><span><b>${esc(x.other_email || '가족')}</b><small>연결됨 · 체크 기록이 없으면 이 분께 알려요</small></span><span class="fam-b">${대화단추(x.id)}<button type="button" class="link" onclick="famEnd('${x.id}')">끊기</button></span></li>`;
   const watchRow = x => x.status === 'asking'
     ? `<li><span><b>${esc(x.label)}</b><small>상대가 허락하면 알림이 시작돼요</small></span><span class="fam-b"><button type="button" class="link" onclick="famEnd('${x.id}')">취소</button></span></li>`
-    : `<li${q.fam ? ' class="fam-hot"' : ''}><span><b>${esc(x.label)}</b><small>${x.muted_today ? '오늘은 이 분의 새 알림을 보내지 않아요. 연결은 유지돼요.' : '약 체크 기록이 없으면 이 휴대폰으로 알려 드려요'}</small></span><span class="fam-b">${x.muted_today ? '' : `<button type="button" class="btn line" onclick="famMute('${x.id}')">이 분 알림 오늘만 끄기</button>`}<button type="button" class="link" onclick="famEnd('${x.id}')">끊기</button></span></li>`;
+    : `<li${q.fam ? ' class="fam-hot"' : ''}><span><b>${esc(x.label)}</b><small>${x.muted_today ? '오늘은 이 분의 새 알림을 보내지 않아요. 연결은 유지돼요.' : '약 체크 기록이 없으면 이 휴대폰으로 알려 드려요'}</small></span><span class="fam-b">${대화단추(x.id)}${x.muted_today ? '' : `<button type="button" class="btn line" onclick="famMute('${x.id}')">이 분 알림 오늘만 끄기</button>`}<button type="button" class="link" onclick="famEnd('${x.id}')">끊기</button></span></li>`;
   const tag = '<em class="door-tag">선택</em>';
   const invite = FAMQ.open === 'invite' ? `<div class="fam-form">
       <label class="fam-l" for="famLabel">가족 화면에 보일 내 이름</label><input id="famLabel" maxlength="20" placeholder="예) 엄마" autocomplete="off">
@@ -2159,7 +2159,7 @@ try {
     if (await saveFile(`약지도-내기록-${todayKey()}.json`, JSON.stringify(payload, null, 1), 'application/json'))
       toast('파일로 받았어요 — 새 휴대폰에서 「가져오기」로 넣으시면 돼요');
   };
-  wipeMe = async function () { await wipe0(); try { if (!localStorage.getItem(ME_KEY)) { localStorage.removeItem(HX_KEY); localStorage.removeItem(FAM_KEY); ['yakjido.ask', 'mn.addr'].forEach(k => localStorage.removeItem(k)); } } catch (e) {} };   /* 11-04 묻고 싶은 것·응급 카드 주소도 */
+  wipeMe = async function () { await wipe0(); try { if (!localStorage.getItem(ME_KEY)) { localStorage.removeItem(HX_KEY); localStorage.removeItem(FAM_KEY); ['yakjido.ask', 'mn.addr', 'mn.chat.on.yakjido'].forEach(k => localStorage.removeItem(k)); } } catch (e) {} };   /* 11-04 묻고 싶은 것·응급 카드 주소도 */
   importMe = async function (file) {
     let j = null; try { j = file && file.size <= 3e6 ? JSON.parse(await file.text()) : null; } catch (e) {}
     const before = JSON.stringify(ME); await im0(file);
@@ -3164,6 +3164,281 @@ window.주간칸 = () => { try {
   return `<div class="wk"><div class="wk-t"><b>이번 주</b><small>7일 중 ${full}일 다 챙김</small></div><div class="wk-bars">${days.map(bar).join('')}</div>${축}</div>`;
 } catch (e) { return ''; } };
 try { const st = document.createElement('style'); st.textContent = '.wk{padding:12px 16px 14px;border-top:1px solid var(--hairline)}.wk-t{display:flex;justify-content:space-between;align-items:baseline;gap:8px}.wk-t small{color:var(--muted)}.wk-bars{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin-top:8px;height:64px}.wk-d{display:flex;flex-direction:column;justify-content:flex-end;align-items:center;gap:4px;min-width:0}.wk-d small{font-size:.75rem;color:var(--muted)}.wk-d.now small{color:var(--primary);font-weight:700}.wk-b{display:block;width:100%;max-width:28px;border-radius:6px 6px 3px 3px;background:var(--primary)}.wk-b.part{background:var(--caution)}.wk-b.miss{background:var(--hairline)}.wk-b.none{background:transparent;border:1px dashed var(--hairline);height:8px!important}.wk-cele{margin-top:8px;font-size:.875rem;color:var(--primary-deep)}'; document.head.appendChild(st); } catch (e) {}
+
+/* ▼▼ 가족대화 부품 시작 ▼▼ */
+/* ═══ 가족 대화 — 이미 이어진 가족(약지도 yak_family_links · 소아 care_links)끼리 짧은 글 (2026-11-04 현욱님 「완벽하게 다듬어」 · 주인: 길동무 세션)
+   설계 docs/requests/20261104_가족대화.md — 90일 지난 글은 서버가 지움 · 소아는 보호자끼리 먼저(학생은 2단계).
+   서버 함수(Main): mn_chat_enable(p_app) · mn_chat_disable(p_app) · mn_chat_send(p_app, p_link, p_body, p_kind 'text'|'quick'|'card') → id
+                    mn_chat_list(p_app, p_link, p_before(지금 보이는 가장 작은 id · 처음은 null), p_limit) → [{id, mine, kind, body, created_at}] 최신부터 · mn_chat_rooms(p_app) → [{link_id, other_on, last_at, unread}]
+   서버 오류 글: 'login required' → 로그인 안내 · 'chat off' → 동의 한 장 · 'not allowed' → 「연결이 끝난 대화예요」 · 'too many'(시간당 60개) → 「잠시 뒤에 보내 주세요」
+   쓰는 법(앱 끝, 서버 부품 뒤):
+     가족대화.설치({ app:'yakjido'|'kids', 준비: function(){ return 서버.준비() },          // supabase 손잡이(로그인 세션이 붙은 것)를 주는 Promise
+       로그인됨: function(){ return !!서버.세션() }, 말: function(){ return 'ko' },          // ko·en·es·ja·zh
+       이름: function(link_id){ return '아빠' },                                            // 방 이름(상대) — 앱이 안다
+       칩: null })                                                                          // 없으면 앱별 기본 빠른 말(다섯 말). 앱이 주면 [{ko,en,es,ja,zh}] 또는 ['…'] · {시각} 은 지금 HH:MM
+     가족대화.열기()             — 첫 화면(처음이면 동의 한 장 → 방 목록) · 가족대화.방열기(link_id) — 바로 그 방
+     가족대화.카드보내기(link_id, 글) — 앱이 자동으로 붙이는 한 줄(「08:02 아침 약 먹었어요」) · 켜 둔 분만 보낸다(꺼져 있으면 아무것도 안 함)
+     가족대화.안읽음() → Promise<수>  — 입구 단추의 숫자 · 가족대화.켜짐() → true|false
+   ⛔ 글·이름은 textContent 로만 넣는다(innerHTML 금지 — 남이 쓴 글이다) · 이모지 0 · « » 0 · 단추 44px 이상 · 320 넘침 0 · 열려 있을 때만 15초마다 새로 받는다.
+   ── 공용 부품 공통 약속 ── 판: 코드의 판 한 곳 · 심기·비교: python3 _도구/공용부품_심기.py · 앱 사본을 직접 고치지 않는다. */
+(function () {
+  if (window.가족대화 && window.가족대화.__v) return;
+  var 판 = '2026-11-04b', 설정 = { app: 'app', 준비: null, 로그인됨: null, 말: null, 이름: null, 칩: null }, 최대 = 500, 주기 = 15000;
+  var 말순 = ['ko', 'en', 'es', 'ja', 'zh'];
+  var 글표 = {
+    ko: { 제목: '가족 대화', 닫기: '닫기', 뒤로: '방 목록', 동의제목: '가족 대화를 켤까요?',
+      동의: ['보낸 글은 이어진 가족에게 전하려고 서버에 저장돼요.', '90일이 지난 글은 자동으로 지워져요.', '대화를 끄면 내가 보낸 글은 바로 지워져요.', '건강 이야기가 섞일 수 있어요. 꼭 필요한 것만 적어 주세요.'],
+      켜기: '동의하고 켜기', 나중: '나중에', 방들: '대화할 가족', 방없음: '아직 이어진 가족이 없어요. 가족 연결에서 먼저 이어 주세요.', 새글: '새 글 {n}', 상대꺼짐: '상대가 아직 대화를 켜지 않았어요',
+      빈방: '아직 주고받은 글이 없어요. 아래 빠른 말로 시작해 보세요.', 쓰기: '글 쓰기', 보내기: '보내기', 실패: '보내지 못했어요', 다시: '다시', 더보기: '이전 글 더 보기',
+      끄기: '대화 끄기', 끄기확인: '끄면 내가 보낸 글이 지워져요. 다시 누르면 꺼요.', 로그인: '로그인한 뒤에 쓸 수 있어요.', 안됨: '지금은 대화를 불러오지 못했어요. 잠시 뒤 다시 해 주세요.', 나: '나', 빠른말: '빠른 말', 연결끝: '연결이 끝난 대화예요. 새 글은 보낼 수 없어요.', 많음: '잠시 뒤에 보내 주세요' },
+    en: { 제목: 'Family chat', 닫기: 'Close', 뒤로: 'Chats', 동의제목: 'Turn on family chat?',
+      동의: ['Messages you send are stored on our server so they can reach your linked family.', 'Messages older than 90 days are deleted automatically.', 'If you turn chat off, the messages you sent are deleted right away.', 'Health details may come up — please share only what is needed.'],
+      켜기: 'Agree and turn on', 나중: 'Not now', 방들: 'Family to chat with', 방없음: 'No family is linked yet. Link family first in Family connections.', 새글: '{n} new', 상대꺼짐: 'They have not turned on chat yet',
+      빈방: 'No messages yet. Start with a quick message below.', 쓰기: 'Write a message', 보내기: 'Send', 실패: 'Could not send', 다시: 'Retry', 더보기: 'Show earlier messages',
+      끄기: 'Turn off chat', 끄기확인: 'Turning it off deletes the messages you sent. Tap again to turn off.', 로그인: 'Sign in to use this.', 안됨: 'Could not load the chat right now. Please try again in a moment.', 나: 'Me', 빠른말: 'Quick messages', 연결끝: 'This connection has ended. You can no longer send messages here.', 많음: 'Please wait a moment before sending more' },
+    es: { 제목: 'Chat familiar', 닫기: 'Cerrar', 뒤로: 'Chats', 동의제목: '¿Activar el chat familiar?',
+      동의: ['Los mensajes que envíe se guardan en nuestro servidor para que lleguen a su familia vinculada.', 'Los mensajes de más de 90 días se borran automáticamente.', 'Si desactiva el chat, los mensajes que envió se borran enseguida.', 'Pueden salir temas de salud: comparta solo lo necesario.'],
+      켜기: 'Aceptar y activar', 나중: 'Ahora no', 방들: 'Familia con quien hablar', 방없음: 'Aún no hay familia vinculada. Vincúlela primero en Conexiones familiares.', 새글: '{n} nuevos', 상대꺼짐: 'Todavía no ha activado el chat',
+      빈방: 'Aún no hay mensajes. Empiece con un mensaje rápido de abajo.', 쓰기: 'Escribir un mensaje', 보내기: 'Enviar', 실패: 'No se pudo enviar', 다시: 'Reintentar', 더보기: 'Ver mensajes anteriores',
+      끄기: 'Desactivar el chat', 끄기확인: 'Al desactivarlo se borran los mensajes que envió. Pulse otra vez para desactivar.', 로그인: 'Inicie sesión para usarlo.', 안됨: 'No se pudo cargar el chat ahora. Inténtelo de nuevo en un momento.', 나: 'Yo', 빠른말: 'Mensajes rápidos', 연결끝: 'Esta conexión ha terminado. Ya no puede enviar mensajes aquí.', 많음: 'Espere un momento antes de enviar más' },
+    ja: { 제목: '家族のトーク', 닫기: '閉じる', 뒤로: 'トーク一覧', 동의제목: '家族のトークをオンにしますか？',
+      동의: ['送ったメッセージは、つながっている家族に届けるためにサーバーに保存されます。', '90日を過ぎたメッセージは自動で消えます。', 'トークをオフにすると、自分が送ったメッセージはすぐ消えます。', '健康の話が含まれることがあります。必要なことだけ書いてください。'],
+      켜기: '同意してオンにする', 나중: 'あとで', 방들: 'トークする家族', 방없음: 'まだつながっている家族がいません。先に家族の連携でつないでください。', 새글: '新着 {n}', 상대꺼짐: '相手はまだトークをオンにしていません',
+      빈방: 'まだメッセージはありません。下のクイックメッセージから始めてみてください。', 쓰기: 'メッセージを書く', 보내기: '送る', 실패: '送れませんでした', 다시: 'もう一度', 더보기: '前のメッセージを見る',
+      끄기: 'トークをオフにする', 끄기확인: 'オフにすると自分が送ったメッセージが消えます。もう一度押すとオフになります。', 로그인: 'ログインすると使えます。', 안됨: '今はトークを読み込めませんでした。少ししてからもう一度お試しください。', 나: '自分', 빠른말: 'クイックメッセージ', 연결끝: 'この連携は終わっています。新しいメッセージは送れません。', 많음: '少し時間をおいてから送ってください' },
+    zh: { 제목: '家人聊天', 닫기: '关闭', 뒤로: '聊天列表', 동의제목: '要开启家人聊天吗？',
+      동의: ['您发送的消息会保存在服务器上，以便送达已关联的家人。', '超过90天的消息会自动删除。', '关闭聊天后，您发送的消息会立即删除。', '内容可能涉及健康信息，请只写必要的内容。'],
+      켜기: '同意并开启', 나중: '以后再说', 방들: '可以聊天的家人', 방없음: '还没有关联的家人。请先在家人关联中建立关联。', 새글: '{n} 条新消息', 상대꺼짐: '对方还没有开启聊天',
+      빈방: '还没有消息。可以先用下面的快捷消息开始。', 쓰기: '写消息', 보내기: '发送', 실패: '发送失败', 다시: '重试', 더보기: '查看更早的消息',
+      끄기: '关闭聊天', 끄기확인: '关闭后您发送的消息会被删除。再按一次即关闭。', 로그인: '登录后才能使用。', 안됨: '暂时无法加载聊天，请稍后再试。', 나: '我', 빠른말: '快捷消息', 연결끝: '这个关联已经结束，无法再发送新消息。', 많음: '请稍后再发送' }
+  };
+  var 기본칩 = {
+    yakjido: [{ ko: '약 드셨어요?', en: 'Did you take your medicine?', es: '¿Se tomó la medicina?', ja: '薬は飲みましたか？', zh: '吃药了吗？' },
+      { ko: '먹었어요', en: 'I took it', es: 'Ya me la tomé', ja: '飲みました', zh: '吃过了' },
+      { ko: '약 드세요', en: 'Time to take your medicine', es: 'Es hora de tomar la medicina', ja: '薬を飲んでくださいね', zh: '该吃药了' },
+      { ko: '병원 같이 갈까요?', en: 'Shall we go to the hospital together?', es: '¿Vamos juntos al hospital?', ja: '一緒に病院に行きましょうか？', zh: '要一起去医院吗？' }],
+    kids: [{ ko: '해열제 먹였어요({시각})', en: 'Gave fever medicine ({시각})', es: 'Le di el antitérmico ({시각})', ja: '解熱剤を飲ませました（{시각}）', zh: '已经喂了退烧药（{시각}）' },
+      { ko: '열 몇 도예요?', en: 'What is the temperature?', es: '¿Cuánta fiebre tiene?', ja: '熱は何度ですか？', zh: '现在体温多少度？' },
+      { ko: '병원 다녀올게요', en: 'I am taking them to the clinic', es: 'Voy con él al médico', ja: '病院に行ってきます', zh: '我带孩子去医院' }]
+  };
+  function 말() { var l = null; try { if (typeof 설정.말 === 'function') l = 설정.말(); } catch (e) {} return 말순.indexOf(l) >= 0 ? l : 'ko'; }
+  function 글(k) { var t = (글표[말()] || 글표.ko)[k]; return t == null ? 글표.ko[k] : t; }
+  function 켬열쇠() { return 'mn.chat.on.' + 설정.app; }
+  function 켜짐() { try { return localStorage.getItem(켬열쇠()) === '1'; } catch (e) { return false; } }
+  function 로그인됨() { try { return typeof 설정.로그인됨 === 'function' ? !!설정.로그인됨() : true; } catch (e) { return false; } }
+  function 지금() { var d = new Date(); return String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0'); }
+  function rpc(fn, args) {
+    if (typeof 설정.준비 !== 'function') return Promise.reject(new Error('준비 없음'));
+    return Promise.resolve(설정.준비()).then(function (sb) { if (!sb || !sb.rpc) throw new Error('서버 없음'); return sb.rpc(fn, args); })
+      .then(function (r) { if (r && r.error) throw r.error; return r ? r.data : null; });
+  }
+  function 오류(e) { var t = String((e && (e.message || e.details || e.hint)) || e || '').toLowerCase();
+    return /chat off/.test(t) ? 'off' : /not allowed/.test(t) ? 'gone' : /too many/.test(t) ? 'many' : /login required/.test(t) ? 'login' : 'etc'; }
+  function 꺼짐처리() { try { localStorage.removeItem(켬열쇠()); } catch (e) {} 멈춤(); 지금방 = null; 동의(); }
+  function 로그인안내() { 멈춤(); 지금방 = null; 틀열기(); 머리(글('제목'), false); 비움(); 몸.appendChild(칸('p', 'fc-p', 글('로그인'))); }
+  function 연결끝() { 멈춤(); if (!몸 || 몸.querySelector('.fc-gone')) return; var p = 칸('p', 'fc-p fc-gone', 글('연결끝')); p.setAttribute('role', 'status'); 몸.appendChild(p); if (발) 발.style.display = 'none'; }
+  function 이름(id) { try { var n = typeof 설정.이름 === 'function' ? 설정.이름(id) : ''; return n ? String(n) : '—'; } catch (e) { return '—'; } }
+  function 칩들() {
+    var a = 설정.칩 || 기본칩[설정.app] || [], l = 말();
+    return a.map(function (x) { var t = typeof x === 'string' ? x : (x[l] || x.ko || ''); return String(t).replace(/\{시각\}/g, 지금()); }).filter(Boolean);
+  }
+  /* ── 그리기 도구: 글은 textContent 로만 ── */
+  function 칸(tag, cls, 글자) { var e = document.createElement(tag); if (cls) e.className = cls; if (글자 != null) e.textContent = 글자; return e; }
+  function 단추(글자, cls, 누름) { var b = 칸('button', cls, 글자); b.type = 'button'; b.addEventListener('click', 누름); return b; }
+  var 스타일됨 = false;
+  function 스타일() {
+    if (스타일됨 || !document.head) return; 스타일됨 = true;
+    var A = 'var(--fc-accent,var(--accent,#2f6b5a))', L = 'var(--fc-line,var(--line,rgba(127,127,127,.3)))', C = 'var(--fc-card,var(--card,#fff))', D = 'var(--fc-dim,var(--ink2,#666))';
+    var st = document.createElement('style'); st.id = 'fc-style';
+    st.textContent = '.fc{position:fixed;inset:0;z-index:2147482000;background:var(--bg,#fff);color:var(--ink,inherit);display:flex;flex-direction:column;word-break:keep-all;overflow-wrap:anywhere}' +
+      '.fc-hd{display:flex;align-items:center;gap:8px;padding:max(10px,env(safe-area-inset-top)) 12px 10px;border-bottom:1px solid ' + L + '}.fc-hd h2{flex:1;min-width:0;margin:0;font-size:1.15em;line-height:1.3}' +
+      '.fc-x,.fc-bk{min-height:44px;min-width:44px;padding:6px 12px;border-radius:12px;border:1px solid ' + L + ';background:transparent;color:inherit;font:inherit;font-weight:700;cursor:pointer}' +
+      '.fc-bd{flex:1;overflow:auto;padding:14px 16px}.fc-p{margin:0 0 10px;line-height:1.55}.fc-dim{color:' + D + '}.fc-ul{margin:0 0 16px;padding:0;list-style:none}.fc-ul li{display:flex;gap:8px;padding:6px 0;line-height:1.55}.fc-ul li:before{content:"";flex:none;width:6px;height:6px;margin-top:.62em;border-radius:50%;background:' + A + '}' +
+      '.fc-main{display:block;width:100%;min-height:52px;margin-top:10px;border:0;border-radius:14px;background:' + A + ';color:#fff;font:inherit;font-weight:800;cursor:pointer}.fc-sub{display:block;width:100%;min-height:48px;margin-top:8px;border:1px solid ' + L + ';border-radius:14px;background:transparent;color:inherit;font:inherit;font-weight:700;cursor:pointer}' +
+      '.fc-room{display:flex;align-items:center;gap:10px;width:100%;min-height:60px;padding:12px;margin-bottom:8px;border:1px solid ' + L + ';border-radius:14px;background:' + C + ';color:inherit;font:inherit;text-align:left;cursor:pointer}.fc-room b{flex:1;min-width:0}.fc-room small{display:block;font-weight:500;color:' + D + '}' +
+      '.fc-new{flex:none;min-width:24px;padding:2px 8px;border-radius:999px;background:' + A + ';color:#fff;font-size:.82em;font-weight:800;text-align:center}' +
+      '.fc-msgs{display:flex;flex-direction:column;gap:8px}.fc-day{align-self:center;margin:6px 0;font-size:.8em;color:' + D + '}.fc-m{max-width:82%;align-self:flex-start}.fc-m.me{align-self:flex-end}' +
+      '.fc-b{padding:9px 12px;border-radius:16px 16px 16px 4px;background:' + C + ';border:1px solid ' + L + ';line-height:1.5;white-space:pre-wrap}.fc-m.me .fc-b{border-radius:16px 16px 4px 16px;background:' + A + ';color:#fff;border-color:transparent}' +
+      '.fc-m.card .fc-b{border-style:dashed}.fc-t{display:block;margin-top:2px;font-size:.76em;color:' + D + '}.fc-m.me .fc-t{text-align:right}.fc-fail{display:flex;gap:6px;align-items:center;justify-content:flex-end;margin-top:4px;font-size:.84em;color:var(--alarm,#b3261e)}' +
+      '.fc-fail button{min-height:44px;padding:4px 12px;border-radius:10px;border:1px solid currentColor;background:transparent;color:inherit;font:inherit;font-weight:700;cursor:pointer}' +
+      '.fc-ft{border-top:1px solid ' + L + ';padding:10px 12px max(10px,env(safe-area-inset-bottom))}.fc-chips{display:flex;gap:6px;overflow-x:auto;padding-bottom:8px}.fc-chip{flex:none;min-height:44px;padding:6px 12px;border-radius:999px;border:1px solid ' + A + ';background:transparent;color:' + A + ';font:inherit;font-weight:700;cursor:pointer;white-space:nowrap}' +
+      '.fc-row{display:flex;gap:8px;align-items:flex-end}.fc-in{flex:1;min-width:0;min-height:48px;max-height:30vh;padding:10px 12px;border-radius:14px;border:1px solid ' + L + ';background:' + C + ';color:inherit;font:inherit;font-size:16px;resize:none}' +
+      '.fc-send{flex:none;min-height:48px;min-width:64px;padding:6px 14px;border:0;border-radius:14px;background:' + A + ';color:#fff;font:inherit;font-weight:800;cursor:pointer}.fc-send[disabled]{opacity:.45}.fc-n{display:block;margin-top:4px;font-size:.76em;color:' + D + ';text-align:right}' +
+      '.fc-more{display:block;margin:0 auto 10px;min-height:44px;padding:4px 14px;border-radius:12px;border:1px solid ' + L + ';background:transparent;color:inherit;font:inherit;cursor:pointer}.fc-off{display:block;margin:18px auto 0;min-height:44px;padding:4px 14px;border:0;background:transparent;color:' + D + ';font:inherit;text-decoration:underline;cursor:pointer}';
+    document.head.appendChild(st);
+  }
+  /* ── 틀 ── */
+  var 틀 = null, 몸 = null, 발 = null, 머리글 = null, 지금방 = null, 타이머 = 0, 메시지 = [], 끝 = false, 끄기누름 = 0;
+  function 틀열기() {
+    스타일();
+    if (!틀) {
+      틀 = 칸('div', 'fc'); 틀.id = 'mnFamChat'; 틀.setAttribute('role', 'dialog'); 틀.setAttribute('aria-modal', 'true');
+      var hd = 칸('div', 'fc-hd'); 머리글 = 칸('h2'); 머리글.id = 'fcT'; 틀.setAttribute('aria-labelledby', 'fcT');
+      hd.appendChild(머리글); 틀.appendChild(hd); 몸 = 칸('div', 'fc-bd'); 틀.appendChild(몸); 발 = 칸('div', 'fc-ft'); 틀.appendChild(발);
+      document.body.appendChild(틀);
+    }
+    틀.setAttribute('lang', 말()); return 틀;
+  }
+  function 머리(제목, 뒤로) {
+    var hd = 틀.querySelector('.fc-hd'); hd.textContent = '';
+    if (뒤로) hd.appendChild(단추(글('뒤로'), 'fc-bk', function () { 방목록(); }));
+    머리글.textContent = 제목; hd.appendChild(머리글); hd.appendChild(단추(글('닫기'), 'fc-x', 닫기));
+  }
+  function 닫기() { 멈춤(); 지금방 = null; if (틀) { 틀.remove(); 틀 = null; } }
+  function 멈춤() { clearInterval(타이머); 타이머 = 0; }
+  function 비움() { 몸.textContent = ''; 발.textContent = ''; 발.style.display = 'none'; }
+  /* ── 동의 한 장 ── */
+  function 동의() {
+    틀열기(); 머리(글('동의제목'), false); 비움();
+    var ul = 칸('ul', 'fc-ul'); 글('동의').forEach(function (t) { ul.appendChild(칸('li', '', t)); }); 몸.appendChild(ul);
+    var 말칸 = 칸('p', 'fc-p fc-dim'); 말칸.setAttribute('role', 'status'); 몸.appendChild(말칸);
+    var 켜 = 단추(글('켜기'), 'fc-main', function () {
+      켜.disabled = true; 말칸.textContent = '';
+      rpc('mn_chat_enable', { p_app: 설정.app }).then(function () { try { localStorage.setItem(켬열쇠(), '1'); } catch (e) {} 방목록(); })
+        .catch(function (e) { 켜.disabled = false; 말칸.textContent = 오류(e) === 'login' ? 글('로그인') : 글('안됨'); });
+    });
+    몸.appendChild(켜); 몸.appendChild(단추(글('나중'), 'fc-sub', 닫기));
+  }
+  /* ── 방 목록 ── */
+  function 방목록() {
+    멈춤(); 지금방 = null; 틀열기(); 머리(글('제목'), false); 비움();
+    몸.appendChild(칸('p', 'fc-p fc-dim', '…'));
+    return rpc('mn_chat_rooms', { p_app: 설정.app }).then(function (rows) {
+      if (!틀 || 지금방) return; 몸.textContent = '';
+      rows = rows || [];
+      if (!rows.length) { 몸.appendChild(칸('p', 'fc-p', 글('방없음'))); }
+      else {
+        몸.appendChild(칸('p', 'fc-p fc-dim', 글('방들')));
+        rows.forEach(function (r) {
+          var b = 단추('', 'fc-room', function () { 방열기(r.link_id); });
+          var t = 칸('b', '', 이름(r.link_id)); if (!r.other_on) t.appendChild(칸('small', '', 글('상대꺼짐')));
+          b.appendChild(t); if (r.unread > 0) b.appendChild(칸('span', 'fc-new', 글('새글').replace('{n}', String(r.unread))));
+          몸.appendChild(b);
+        });
+      }
+      몸.appendChild(단추(글('끄기'), 'fc-off', 끄기));
+    }).catch(function (e) { if (!틀) return; var k = 오류(e); if (k === 'off') return 꺼짐처리(); if (k === 'login') return 로그인안내(); 몸.textContent = ''; 몸.appendChild(칸('p', 'fc-p', 글('안됨'))); });
+  }
+  function 끄기(e) {
+    var 단 = e && e.currentTarget;
+    if (Date.now() - 끄기누름 > 8000) { 끄기누름 = Date.now(); if (단) 단.textContent = 글('끄기확인'); return; }
+    끄기누름 = 0;
+    rpc('mn_chat_disable', { p_app: 설정.app }).then(function () { try { localStorage.removeItem(켬열쇠()); } catch (e) {} 닫기(); })
+      .catch(function () { if (단) 단.textContent = 글('안됨'); });
+  }
+  /* ── 방 ── */
+  function 날글(d) { try { return d.toLocaleDateString({ ko: 'ko-KR', en: 'en-US', es: 'es-ES', ja: 'ja-JP', zh: 'zh-CN' }[말()], { month: 'long', day: 'numeric', weekday: 'short' }); } catch (e) { return d.toISOString().slice(0, 10); } }
+  function 시글(d) { return String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0'); }
+  function 그리기() {
+    var 칸들 = 몸.querySelector('.fc-msgs'); if (!칸들) return;
+    var 아래 = 몸.scrollHeight - 몸.scrollTop - 몸.clientHeight < 60;
+    칸들.textContent = ''; var 앞날 = '';
+    if (!메시지.length) 칸들.appendChild(칸('p', 'fc-p fc-dim', 글('빈방')));
+    메시지.forEach(function (m) {
+      var d = new Date(m.created_at || Date.now()), 날 = 날글(d);
+      if (날 !== 앞날) { 칸들.appendChild(칸('div', 'fc-day', 날)); 앞날 = 날; }
+      var w = 칸('div', 'fc-m' + (m.mine ? ' me' : '') + (m.kind === 'card' ? ' card' : ''));
+      w.appendChild(칸('div', 'fc-b', m.body)); w.appendChild(칸('span', 'fc-t', 시글(d)));
+      if (m.실패) { var f = 칸('div', 'fc-fail', m.이유 || 글('실패')); f.appendChild(단추(글('다시'), '', function () { 보내기(m.body, m.kind, m); })); w.appendChild(f); }
+      칸들.appendChild(w);
+    });
+    if (아래) 몸.scrollTop = 몸.scrollHeight;
+  }
+  function 합치기(rows) {   /* 서버가 준 것(최신부터)을 오래된 것부터로 · 같은 id 는 하나 · 보내는 중·실패한 내 글은 끝에 둔다 */
+    var 있음 = {}; 메시지.forEach(function (m) { if (m.id) 있음[m.id] = m; });
+    (rows || []).forEach(function (r) { if (!있음[r.id]) 있음[r.id] = { id: r.id, mine: !!r.mine, kind: r.kind || 'text', body: String(r.body == null ? '' : r.body), created_at: r.created_at }; });
+    var 서버것 = Object.keys(있음).map(function (k) { return 있음[k]; }).sort(function (a, b) { var x = Number(a.id), y = Number(b.id); return (isFinite(x) && isFinite(y)) ? x - y : String(a.created_at).localeCompare(String(b.created_at)); });
+    메시지 = 서버것.concat(메시지.filter(function (m) { return !m.id; }));
+  }
+  function 받기() {
+    if (!지금방 || document.visibilityState === 'hidden') return Promise.resolve();
+    var 방 = 지금방;
+    return rpc('mn_chat_list', { p_app: 설정.app, p_link: 방, p_before: null, p_limit: 50 }).then(function (rows) { if (방 !== 지금방) return; 합치기(rows); 그리기(); }).catch(function (e) { if (방 !== 지금방) return; var k = 오류(e); if (k === 'off') 꺼짐처리(); else if (k === 'gone') 연결끝(); else if (k === 'login') 로그인안내(); });
+  }
+  function 더받기(btn) {
+    var ids = 메시지.filter(function (m) { return m.id != null; }).map(function (m) { return Number(m.id); }).filter(function (n) { return isFinite(n); }); if (!ids.length) return;
+    btn.disabled = true;   /* 11-04b Main — p_before 는 지금 보이는 가장 작은 메시지 id(bigint) */
+    rpc('mn_chat_list', { p_app: 설정.app, p_link: 지금방, p_before: Math.min.apply(null, ids), p_limit: 50 }).then(function (rows) {
+      var h = 몸.scrollHeight; 합치기(rows); 그리기(); 몸.scrollTop += 몸.scrollHeight - h; btn.disabled = false; if (!rows || rows.length < 50) btn.remove();
+    }).catch(function (e) { btn.disabled = false; var k = 오류(e); if (k === 'off') 꺼짐처리(); else if (k === 'gone') 연결끝(); });
+  }
+  function 방열기(id) {
+    if (!켜짐()) return 동의();
+    틀열기(); 지금방 = id; 메시지 = []; 머리(이름(id), true); 비움();
+    var 더 = 단추(글('더보기'), 'fc-more', function () { 더받기(더); }); 몸.appendChild(더);
+    var 칸들 = 칸('div', 'fc-msgs'); 칸들.setAttribute('aria-live', 'polite'); 몸.appendChild(칸들);
+    발.style.display = '';
+    var 칩칸 = 칸('div', 'fc-chips'); 칩칸.setAttribute('role', 'group'); 칩칸.setAttribute('aria-label', 글('빠른말'));
+    칩들().forEach(function (t, i) { 칩칸.appendChild(단추(t, 'fc-chip', function () { 보내기(칩들()[i] || t, 'quick'); })); });   /* {시각}은 누른 때로 다시 */
+    발.appendChild(칩칸);
+    var 줄 = 칸('div', 'fc-row'), 입 = 칸('textarea', 'fc-in'); 입.rows = 1; 입.maxLength = 최대; 입.setAttribute('aria-label', 글('쓰기')); 입.placeholder = 글('쓰기');
+    var 수 = 칸('span', 'fc-n', '0/' + 최대), 보 = 단추(글('보내기'), 'fc-send', function () { var t = 입.value.trim(); if (!t) return; 입.value = ''; 수.textContent = '0/' + 최대; 보.disabled = true; 보내기(t, 'text'); });
+    보.disabled = true;
+    입.addEventListener('input', function () { if (입.value.length > 최대) 입.value = 입.value.slice(0, 최대); 수.textContent = 입.value.length + '/' + 최대; 보.disabled = !입.value.trim(); });
+    줄.appendChild(입); 줄.appendChild(보); 발.appendChild(줄); 발.appendChild(수);
+    그리기(); 받기().then(function () { if (메시지.filter(function (m) { return m.id; }).length < 50) 더.remove(); 몸.scrollTop = 몸.scrollHeight; });   /* 50개보다 적으면 더 볼 것이 없다 */
+    멈춤(); 타이머 = setInterval(받기, 주기);
+  }
+  function 보내기(글자, kind, 다시칸) {
+    var t = String(글자 || '').trim().slice(0, 최대); if (!t || !지금방) return Promise.resolve(null);
+    var m = 다시칸 || { mine: true, kind: kind || 'text', body: t, created_at: new Date().toISOString() };
+    m.실패 = false; if (!다시칸) 메시지.push(m); 그리기(); 몸.scrollTop = 몸.scrollHeight;
+    var 방 = 지금방;
+    return rpc('mn_chat_send', { p_app: 설정.app, p_link: 방, p_body: t, p_kind: m.kind }).then(function (id) {
+      m.id = (id && typeof id === 'object' && id.id) ? id.id : id; if (방 === 지금방) { 메시지 = 메시지.filter(function (x) { return x !== m; }); 합치기([m]); 그리기(); } return m.id;
+    }).catch(function (e) { var k = 오류(e); if (k === 'off') { 꺼짐처리(); return null; } if (k === 'login') { 로그인안내(); return null; }
+      if (k === 'gone') { 메시지 = 메시지.filter(function (x) { return x !== m; }); 그리기(); 연결끝(); return null; }
+      m.실패 = true; m.이유 = k === 'many' ? 글('많음') : ''; 그리기(); return null; });
+  }
+  function 열기() {
+    if (!로그인됨()) { 틀열기(); 머리(글('제목'), false); 비움(); 몸.appendChild(칸('p', 'fc-p', 글('로그인'))); return; }
+    return 켜짐() ? 방목록() : 동의();
+  }
+  function 카드보내기(link, 글자) {
+    if (!켜짐() || !로그인됨() || !link) return Promise.resolve(null);
+    var t = String(글자 || '').trim().slice(0, 최대); if (!t) return Promise.resolve(null);
+    return rpc('mn_chat_send', { p_app: 설정.app, p_link: link, p_body: t, p_kind: 'card' }).catch(function () { return null; });
+  }
+  function 안읽음() {
+    if (!켜짐() || !로그인됨()) return Promise.resolve(0);
+    return rpc('mn_chat_rooms', { p_app: 설정.app }).then(function (rows) { return (rows || []).reduce(function (s, r) { return s + (r.unread > 0 ? +r.unread : 0); }, 0); }).catch(function () { return 0; });
+  }
+  document.addEventListener('visibilitychange', function () { if (document.visibilityState === 'visible' && 지금방) 받기(); });
+  window.가족대화 = { __v: 판, 판: 판, 열기: 열기, 방열기: 방열기, 닫기: 닫기, 카드보내기: 카드보내기, 안읽음: 안읽음, 켜짐: 켜짐,
+    설치: function (o) { o = o || {}; Object.keys(o).forEach(function (k) { 설정[k] = o[k]; }); return window.가족대화; } };
+})();
+/* ▲▲ 가족대화 부품 끝 ▲▲ */
+
+/* 11-04 Main 「가족 대화」 — 공용 부품(yozm-health _도구/가족대화_부품.js · 주인 길동무)을 그대로 심고 아래에서만 잇는다.
+   방 = 허락까지 끝난 가족 연결(yak_family_links) 하나 · 이름 = 연결의 이름표(챙기는 분 → 그 분 호칭, 내 체크를 받는 가족 → 계정 이메일).
+   입구: 알림 설정의 연결마다 「대화」 · 홈은 안 읽은 글이 있을 때만 맨 위 한 줄 · 「먹었어요」는 대화를 켠 분만 「아침 약 먹었어요 · 08:02」 카드(약 이름·양 없음, 하루 한 회차 한 번). */
+const 대화된연결 = x => x && x.status !== 'waiting' && x.status !== 'asking';
+const 대화방이름 = id => { const x = (FAMQ.list || []).find(r => String(r.id) === String(id)); return !x ? '가족' : x.role === 'member' ? (x.label || '가족') : (x.other_email || '가족'); };
+const 대화단추 = id => window.가족대화 ? `<button type="button" class="btn line" onclick="가족대화.방열기('${esc(String(id))}')">대화</button>` : '';
+try { if (window.가족대화) 가족대화.설치({ app: 'yakjido', 준비: () => 서버.준비(), 로그인됨: () => { try { return srvLoggedIn(); } catch (e) { return false; } }, 말: () => window.LANG || 'ko', 이름: 대화방이름 }); } catch (e) {}
+const 대화점 = { n: 0, at: 0 };
+window.가족대화줄 = () => { try {
+  if (!famOn() || !window.가족대화 || !가족대화.켜짐() || !srvLoggedIn()) return '';
+  if (FAMQ.list == null) famLoad();
+  if (Date.now() - 대화점.at > 60000) { 대화점.at = Date.now();
+    가족대화.안읽음().then(n => { n = n > 0 ? n : 0; if (n !== 대화점.n) { 대화점.n = n; if (/^#\/(home)?$|^$/.test(location.hash || '')) route(); } }).catch(() => {}); }
+  return 대화점.n > 0 ? `<button type="button" class="famdot" onclick="가족대화.열기()" aria-label="가족 대화 새 글 ${대화점.n}"><b>${대화점.n}</b><span>가족 대화 새 글</span></button>` : '';
+} catch (e) { return ''; } };
+const 대화카드 = keys => { try {
+  if (!famOn() || !window.가족대화 || !가족대화.켜짐() || !srvLoggedIn() || !keys || !keys.length) return;
+  const day = todayKey(), CK = 'yakjido.chatcard'; let 보냄 = {}; try { 보냄 = JSON.parse(localStorage.getItem(CK) || '{}') || {}; } catch (e) {}
+  const 오늘 = (보냄.d === day ? 보냄.k : []) || [], 새 = keys.map(k => String(k).split('@')[1]).filter(t => t && !오늘.includes(t));
+  if (!새.length) return;
+  const t = [...new Set(새)].sort()[0], h = +t.slice(0, 2), L = window.LANG || 'ko', now = new Date(), hm = String(now.getHours()).padStart(2, '0') + ':' + String(now.getMinutes()).padStart(2, '0');
+  const 때 = { ko: ['아침', '점심', '저녁', '자기 전'], en: ['Morning', 'Midday', 'Evening', 'Bedtime'], es: ['De la mañana', 'Del mediodía', 'De la tarde', 'De la noche'], ja: ['朝', '昼', '夕', '寝る前'], zh: ['早上', '中午', '晚上', '睡前'] }[L] || ['아침', '점심', '저녁', '자기 전'];
+  const i = h < 11 ? 0 : h < 15 ? 1 : h < 20 ? 2 : 3;
+  const 글 = { ko: `${때[i]} 약 먹었어요 · ${hm}`, en: `${때[i]} medicine taken · ${hm}`, es: `${때[i]}: medicina tomada · ${hm}`, ja: `${때[i]}の薬を飲みました · ${hm}`, zh: `${때[i]}的药吃了 · ${hm}` }[L] || `${때[i]} 약 먹었어요 · ${hm}`;
+  try { localStorage.setItem(CK, JSON.stringify({ d: day, k: 오늘.concat(새) })); } catch (e) {}
+  famRpc('yak_family_list').then(d => { FAMQ.list = d || FAMQ.list; (d || []).filter(x => x.role === 'owner' && 대화된연결(x)).forEach(x => { try { 가족대화.카드보내기(x.id, 글); } catch (e) {} }); }).catch(() => {});
+} catch (e) {} };
+(() => { const 원 = window.tick; if (typeof 원 === 'function') window.tick = (id, t) => { const k = id + '@' + t, 전 = (((ME.taken || {})[todayKey()]) || []).includes(k); 원(id, t); if (!전 && (((ME.taken || {})[todayKey()]) || []).includes(k)) 대화카드([k]); };
+  const 원2 = window.tickFromNote; if (typeof 원2 === 'function') window.tickFromNote = (key, day) => { const k0 = day || todayKey(), 전 = [...(((ME.taken || {})[k0]) || [])]; 원2(key, day); if (k0 === todayKey()) 대화카드((((ME.taken || {})[k0]) || []).filter(x => !전.includes(x))); }; })();
+try { const st = document.createElement('style'); st.textContent = '.famdot{display:flex;align-items:center;gap:10px;width:100%;margin:8px 0 4px;min-height:48px;padding:10px 14px;border:1px solid var(--hairline);border-radius:14px;background:var(--card,#fff);color:inherit;font:inherit;text-align:left;cursor:pointer}.famdot b{display:inline-grid;place-items:center;min-width:26px;height:26px;padding:0 6px;border-radius:13px;background:var(--accent,#2f6b5a);color:#fff;font-size:.86em}'; document.head.appendChild(st); } catch (e) {}
 
 /* 내 정보·동의·로그인·약관 화면을 보고 있었으면 다시 그린다(이 파일이 늦게 오므로) */
 try { if (/^#\/(me|consent|login|notify|sgoal|sstage|doc|hello\/3|supp$|supp\?|sgoal|sstage|rx|about|search|myths|askdoc|talk|p\/|p\?|p$)/.test(location.hash)) route(); } catch (e) {}
