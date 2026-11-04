@@ -2802,14 +2802,14 @@ try { 이용량.설치({ 앱: 'yakjido', 켜짐: false, 주소: 'https://uszalzc
      화면: 설정판.HTML()  — 시트 맨 위 제목 아래에 통째로.
    ⛔ 지우기·계정 지우기는 앱의 확인 화면으로만 간다(이 부품이 직접 지우지 않는다).
    ── 공용 부품 셋(위기번호 표 · 설정 부품 · 응급카드 부품) 공통 약속 · 주인: 길동무 세션 ──
-   판: 이 파일 안 «판» 한 곳(코드의 판 값). 고치면 판을 올리고 다섯 앱에 다시 심는다. 지금 판 2026-11-04d.
+   판: 이 파일 안 «판» 한 곳(코드의 판 값). 고치면 판을 올리고 다섯 앱에 다시 심는다. 지금 판 2026-11-04e.
    심는 순서(앱마다 같다): ① 위기번호 표 → ② 설정 부품 → ③ 응급카드 부품 — 표가 앞에 있어야 말과 나라 고르개·응급 번호가 표를 쓴다.
    심기·비교: python3 _도구/공용부품_심기.py 비교 · python3 _도구/공용부품_심기.py <소아|곁에|길동무|CS> · 다른 저장소(약지도): python3 _도구/공용부품_심기.py 파일 <경로>
    ⛔ 앱 사본을 직접 고치지 않는다 — 이 파일을 고치고 다시 심는다(심기 스크립트는 정본과 다른 사본을 보면 멈춘다).
 */
 (function () {
   if (window.설정판 && window.설정판.__v) return;
-  var 판 = '2026-11-04d';   /* 11-04d 머리 주석 정리(동작 같음) */
+  var 판 = '2026-11-04e';   /* 11-04e 기본 줄 이스케이프(보안) · 11-04d 머리 주석 정리 */
   var 설정 = { app: 'app', 언어: null, 줄: null, 아이콘: null, 다시그리기: null };
   var 글표 = {
     ko: { 맞추기: '나에게 맞추기', 알림: '알림', 화면: '화면과 언어', 기록: '내 기록', 앱: '이 앱',
@@ -2841,7 +2841,8 @@ try { 이용량.설치({ 앱: 'yakjido', 켜짐: false, 주소: 'https://uszalzc
   function 줄(a, 제목, 설명, 값글, 부름) {
     if (!부름) return '';
     try { if (typeof 설정.줄 === 'function') return 설정.줄(아이콘(a), 제목, 설명 || '', 값글 || '', 부름); } catch (e) {}
-    return '<button type="button" class="ms-row" onclick="' + esc(부름) + '"><span class="ms-rt"><b>' + 제목 + '</b>' + (설명 ? '<span>' + 설명 + '</span>' : '') + '</span>' + (값글 ? '<span class="ms-rv">' + 값글 + '</span>' : '') + '</button>';
+    /* 11-04e 보안 — 기본 줄은 앱이 준 설명·값(병원 이름·사용자가 적은 글일 수 있다)을 글자로만 넣는다 */
+    return '<button type="button" class="ms-row" onclick="' + esc(부름) + '"><span class="ms-rt"><b>' + 제목 + '</b>' + (설명 ? '<span>' + esc(설명) + '</span>' : '') + '</span>' + (값글 ? '<span class="ms-rv">' + esc(값글) + '</span>' : '') + '</button>';
   }
   function 묶음(제목, 안) { return 안 ? '<div class="ms-group"><h3 class="ms-h">' + 제목 + '</h3><div class="menu">' + 안 + '</div></div>' : ''; }
   function 고름(이름, 목록, 지금, 부름, 막힘) {
