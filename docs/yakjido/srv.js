@@ -2802,14 +2802,14 @@ try { 이용량.설치({ 앱: 'yakjido', 켜짐: false, 주소: 'https://uszalzc
      화면: 설정판.HTML()  — 시트 맨 위 제목 아래에 통째로.
    ⛔ 지우기·계정 지우기는 앱의 확인 화면으로만 간다(이 부품이 직접 지우지 않는다).
    ── 공용 부품 셋(위기번호 표 · 설정 부품 · 응급카드 부품) 공통 약속 · 주인: 길동무 세션 ──
-   판: 이 파일 안 «판» 한 곳(코드의 판 값). 고치면 판을 올리고 다섯 앱에 다시 심는다. 지금 판 2026-11-04g.
+   판: 이 파일 안 «판» 한 곳(코드의 판 값). 고치면 판을 올리고 다섯 앱에 다시 심는다. 지금 판 2026-11-04h.
    심는 순서(앱마다 같다): ① 위기번호 표 → ② 설정 부품 → ③ 응급카드 부품 — 표가 앞에 있어야 말과 나라 고르개·응급 번호가 표를 쓴다.
    심기·비교: python3 _도구/공용부품_심기.py 비교 · python3 _도구/공용부품_심기.py <소아|곁에|길동무|CS> · 다른 저장소(약지도): python3 _도구/공용부품_심기.py 파일 <경로>
    ⛔ 앱 사본을 직접 고치지 않는다 — 이 파일을 고치고 다시 심는다(심기 스크립트는 정본과 다른 사본을 보면 멈춘다).
 */
 (function () {
   if (window.설정판 && window.설정판.__v) return;
-  var 판 = '2026-11-04g';   /* 11-04g 응급번호()·번호HTML() · 11-04f 제목·설명 이스케이프 · 11-04e 기본 줄 값 이스케이프 · 11-04d 머리 주석 정리 */
+  var 판 = '2026-11-04h';   /* 11-04h 기기 언어로 나라 짐작 안 함(모르면 빈칸·번호 없음) · 11-04g 응급번호()·번호HTML() · 11-04f 제목·설명 이스케이프 · 11-04e 기본 줄 값 이스케이프 · 11-04d 머리 주석 정리 */
   var 설정 = { app: 'app', 언어: null, 줄: null, 아이콘: null, 다시그리기: null };
   var 글표 = {
     ko: { 맞추기: '나에게 맞추기', 알림: '알림', 화면: '화면과 언어', 기록: '내 기록', 앱: '이 앱',
@@ -2902,15 +2902,15 @@ try { 이용량.설치({ 앱: 'yakjido', 켜짐: false, 주소: 'https://uszalzc
     ja: ['일본어', 'Japanese', 'japonés', '日本語', '日语'], zh: ['중국어', 'Chinese', 'chino', '中国語', '中文'] };
   var 곳글 = {
     ko: { 제목: '쓰는 말과 사는 나라', 설명: '맞는 응급 번호와 안내를 드리려고 여쭤요. 맞으면 한 번만 눌러 주세요.', 앱말: '앱을 볼 말', 나라: '지금 사는 나라', 수준: '{말}를 얼마나 하세요?', 수준일반: '그 나라 말을 얼마나 하세요?',
-      수준들: ['편해요', '조금 해요', '거의 못해요'], 맞아요: '맞아요', 줄: '말과 나라', 줄설명: '응급 번호와 안내를 이 값으로 맞춰요', 안정함: '아직 안 정함' },
+      수준들: ['편해요', '조금 해요', '거의 못해요'], 맞아요: '맞아요', 나라고름: '나라를 골라 주세요', 줄: '말과 나라', 줄설명: '응급 번호와 안내를 이 값으로 맞춰요', 안정함: '아직 안 정함' },
     en: { 제목: 'Your language and country', 설명: 'We ask so we can show the right emergency numbers and guidance. If this looks right, tap once.', 앱말: 'App language', 나라: 'Country you live in now', 수준: 'How well do you speak {말}?', 수준일반: 'How well do you speak the local language?',
-      수준들: ['Comfortably', 'A little', 'Hardly at all'], 맞아요: 'Looks right', 줄: 'Language and country', 줄설명: 'Emergency numbers and guidance follow these', 안정함: 'Not set yet' },
+      수준들: ['Comfortably', 'A little', 'Hardly at all'], 맞아요: 'Looks right', 나라고름: 'Choose your country', 줄: 'Language and country', 줄설명: 'Emergency numbers and guidance follow these', 안정함: 'Not set yet' },
     es: { 제목: 'Su idioma y su país', 설명: 'Se lo preguntamos para mostrarle los números de emergencia y la información correctos. Si es correcto, pulse una vez.', 앱말: 'Idioma de la app', 나라: 'País donde vive ahora', 수준: '¿Qué tal habla {말}?', 수준일반: '¿Qué tal habla el idioma del país?',
-      수준들: ['Con soltura', 'Un poco', 'Casi nada'], 맞아요: 'Es correcto', 줄: 'Idioma y país', 줄설명: 'Los números de emergencia y la información siguen estos datos', 안정함: 'Sin elegir' },
+      수준들: ['Con soltura', 'Un poco', 'Casi nada'], 맞아요: 'Es correcto', 나라고름: 'Elija su país', 줄: 'Idioma y país', 줄설명: 'Los números de emergencia y la información siguen estos datos', 안정함: 'Sin elegir' },
     ja: { 제목: '使う言葉と住んでいる国', 설명: '正しい緊急番号と案内をお伝えするためにお聞きしています。合っていれば一度押してください。', 앱말: 'アプリの言葉', 나라: '今住んでいる国', 수준: '{말}はどのくらい話せますか？', 수준일반: 'その国の言葉はどのくらい話せますか？',
-      수준들: ['問題なく話せる', '少し話せる', 'ほとんど話せない'], 맞아요: 'これで合っています', 줄: '言葉と国', 줄설명: '緊急番号と案内をこの内容に合わせます', 안정함: 'まだ選んでいません' },
+      수준들: ['問題なく話せる', '少し話せる', 'ほとんど話せない'], 맞아요: 'これで合っています', 나라고름: '国を選んでください', 줄: '言葉と国', 줄설명: '緊急番号と案内をこの内容に合わせます', 안정함: 'まだ選んでいません' },
     zh: { 제목: '您的语言和所在国家', 설명: '为了向您显示正确的急救电话和信息，我们需要了解这些。如果没问题，请点一下。', 앱말: '应用语言', 나라: '目前居住的国家', 수준: '您的{말}水平如何？', 수준일반: '您的当地语言水平如何？',
-      수준들: ['很流利', '会一点', '几乎不会'], 맞아요: '没问题', 줄: '语言和国家', 줄설명: '急救电话和信息会按此设置', 안정함: '尚未选择' } };
+      수준들: ['很流利', '会一点', '几乎不会'], 맞아요: '没问题', 나라고름: '请选择国家', 줄: '语言和国家', 줄설명: '急救电话和信息会按此设置', 안정함: '尚未选择' } };
   function 곳(k, l) { l = l || 말(); return (곳글[l] || 곳글.ko)[k]; }
   function 칸(l) { var i = 말순.indexOf(l); return i < 0 ? 0 : i; }
   var 곳열쇠 = 'mn.place';
@@ -2927,15 +2927,16 @@ try { 이용량.설치({ 앱: 'yakjido', 켜짐: false, 주소: 'https://uszalzc
       if (/^America\/(Toronto|Vancouver|Edmonton|Winnipeg|Halifax|St_Johns|Regina|Montreal)/.test(tz)) return 'CA';
       if (/^Australia\//.test(tz)) return 'AU';
     } catch (e) {}
-    var n = String((navigator.languages && navigator.languages[0]) || navigator.language || ''), m = /-([A-Za-z]{2})\b/.exec(n), c = m ? m[1].toUpperCase() : '';
-    표합치기(); if (나라이름[c]) return c; if (c) return 'XX';   /* 기기가 밝힌 나라가 목록에 없으면 말로 짐작하지 않는다(곁에 11-03) */
-    return { ko: 'KR', ja: 'JP', zh: 'CN' }[n.slice(0, 2).toLowerCase()] || 'XX';
+    /* 11-04h Main 결정 — 기기 언어의 지역(ko-KR·en-US)으로 짐작하지 않는다: 크롬 기본 en-US 인 기기가 많아 미국 밖 사람에게 911, 해외의 ko-KR 기기에 119 가 나갈 수 있다.
+       시간대 표에 없으면 모름(XX) → 번호 없이 「현지 응급 번호」, 말과 나라 화면은 「나라를 골라 주세요」 빈칸 */
+    return 'XX';
   }
   function 곳기본() {
     표합치기();
     var o = 설정.말과나라 || {}, d = 값(o.기본) || {}, l = d.lang || 말();
     if (말순.indexOf(l) < 0) l = 'en';
-    return { lang: l, country: (d.country && 나라이름[d.country]) ? d.country : 나라짐작() };
+    var c = (d.country && 나라이름[d.country] && d.country !== 'XX') ? d.country : 나라짐작();
+    return { lang: l, country: c === 'XX' ? '' : c };   /* 모르면 빈칸 — 사용자가 고른다(그 밖의 나라도 고를 수 있다) */
   }
   /* 11-04c — 공용 위기번호 표(window.메디나눔위기번호 · _도구/위기번호_표.js)의 나라도 고르개에 — 베트남·태국 등이 「그 밖」으로 묶이지 않게 */
   function 공용표() { try { return (window.메디나눔위기번호 && 메디나눔위기번호.표) || null; } catch (e) { return null; } }
@@ -2948,17 +2949,17 @@ try { 이용량.설치({ 앱: 'yakjido', 켜짐: false, 주소: 'https://uszalzc
   function 곳그림() {
     var p = 고르는중, l = p.lang, el = document.getElementById('mnPlace'); if (!el) return;
     var 나말 = 나라말[p.country], 질문 = 나말 ? 곳('수준', l).replace('{말}', 말이름들[나말][칸(l)]) : 곳('수준일반', l);
-    if (!나라이름[p.country]) p.country = 'XX';   /* 11-04b 목록 밖 나라(BR·VN 등)는 그 밖(국제 안내)으로 */
-    var 목 = 나라목록(); if (목.indexOf(p.country) < 0) 목.unshift(p.country);
+    if (p.country && !나라이름[p.country]) p.country = 'XX';   /* 11-04b 목록 밖 나라(BR·VN 등)는 그 밖(국제 안내)으로 · 11-04h 빈칸('')은 아직 안 고름 */
+    var 목 = 나라목록(); if (p.country && 목.indexOf(p.country) < 0) 목.unshift(p.country);
     el.innerHTML = '<div class="mnp-box" role="dialog" aria-modal="true" aria-labelledby="mnpT" lang="' + l + '">' +
       '<h2 id="mnpT">' + 곳('제목', l) + '</h2><p class="mnp-sub">' + 곳('설명', l) + '</p>' +
       '<label class="mnp-l" for="mnpLang">' + 곳('앱말', l) + '</label><select id="mnpLang" class="mnp-sel" onchange="설정판.말과나라고름(\'lang\',this.value)">' +
         말순.map(function (k) { return '<option value="' + k + '"' + (k === l ? ' selected' : '') + '>' + 말이름[k] + '</option>'; }).join('') + '</select>' +
-      '<label class="mnp-l" for="mnpCountry">' + 곳('나라', l) + '</label><select id="mnpCountry" class="mnp-sel" onchange="설정판.말과나라고름(\'country\',this.value)">' +
+      '<label class="mnp-l" for="mnpCountry">' + 곳('나라', l) + '</label><select id="mnpCountry" class="mnp-sel" onchange="설정판.말과나라고름(\'country\',this.value)">' + (p.country ? '' : '<option value="" selected disabled>' + 곳('나라고름', l) + '</option>') +
         목.map(function (k) { return '<option value="' + k + '"' + (k === p.country ? ' selected' : '') + '>' + 나라이름[k][칸(l)] + '</option>'; }).join('') + '</select>' +
-      (수준묻나(p) ? '<div class="ms-seg mnp-lv" role="group" aria-label="' + esc(질문) + '"><span class="ms-sl">' + 질문 + '</span><div class="ms-sb">' +
+      (p.country && 수준묻나(p) ? '<div class="ms-seg mnp-lv" role="group" aria-label="' + esc(질문) + '"><span class="ms-sl">' + 질문 + '</span><div class="ms-sb">' +
         곳('수준들', l).map(function (x, i) { var v = ['ok', 'some', 'none'][i], on = p.level === v; return '<button type="button" class="' + (on ? 'on' : '') + '" aria-pressed="' + on + '" onclick="설정판.말과나라고름(\'level\',\'' + v + '\')">' + x + '</button>'; }).join('') + '</div></div>' : '') +
-      '<button type="button" class="mnp-ok" onclick="설정판.말과나라맞아요()"' + (수준묻나(p) && !p.level ? ' disabled aria-disabled="true"' : '') + '>' + 곳('맞아요', l) + '</button></div>';
+      '<button type="button" class="mnp-ok" onclick="설정판.말과나라맞아요()"' + (!p.country || (수준묻나(p) && !p.level) ? ' disabled aria-disabled="true"' : '') + '>' + 곳('맞아요', l) + '</button></div>';
   }
   function 곳열기() {
     스타일(); 표합치기(); var 지금 = 곳읽기(), d = 곳기본();
@@ -2968,7 +2969,7 @@ try { 이용량.설치({ 앱: 'yakjido', 켜짐: false, 주소: 'https://uszalzc
     곳그림(); try { el.querySelector('select').focus(); } catch (e) {}
   }
   function 곳맞아요() {
-    var p = 고르는중; if (!p) return; if (!수준묻나(p)) p.level = 'ok'; if (!p.level) return;
+    var p = 고르는중; if (!p || !p.country) return; if (!수준묻나(p)) p.level = 'ok'; if (!p.level) return;
     var 옛 = 곳읽기(), 새 = { lang: p.lang, country: p.country, level: p.level, at: new Date().toISOString().slice(0, 10) };
     try { localStorage.setItem(곳열쇠, JSON.stringify(새)); } catch (e) {}
     var el = document.getElementById('mnPlace'); if (el) el.remove(); 고르는중 = null;
@@ -3032,7 +3033,7 @@ try { 이용량.설치({ 앱: 'yakjido', 켜짐: false, 주소: 'https://uszalzc
     말과나라확인: function () { if (곳읽기() || navigator.webdriver || document.getElementById('mnPlace')) return false; 곳열기(); return true; },
     나라이름: function (k, l) { 표합치기(); var n = 나라이름[k]; return n ? n[칸(l || 말())] : ''; },
     말이름: function (k, l) { var n = 말이름들[k]; return n ? n[칸(l || 말())] : ''; },
-    응급번호: 응급번호, 번호HTML: 번호HTML
+    응급번호: 응급번호, 번호HTML: 번호HTML, 나라짐작: 나라짐작
   };
 })();
 /* ▲▲ 설정 부품 끝 ▲▲ */
