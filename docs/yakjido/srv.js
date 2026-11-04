@@ -2737,10 +2737,17 @@ try { 이용량.설치({ 앱: 'yakjido', 켜짐: false, 주소: 'https://uszalzc
 /* ═══ 메디나눔 위기·응급 번호 표 — 나라 기준(말 기준 아님) · 2026-11-04 곁에에서 꺼냄(다섯 앱 공용 · 길동무 「말과 나라」가 재사용)
    나라: ISO 2자. 위기[0] = 한국 109(자살예방) 자리, 위기[1] = 한국 1577-0199(정신건강) 자리. 위기가 비면 응급 번호로.
    확인된 번호만 넣는다(멕시코는 응급 911 만 · 위기 전용 번호 확인 전). 표에 없는 나라는 XX — 번호 null: 누르는 단추 없이 「그 나라 응급 번호로 전화하세요」 글만.
-   판 2026-11-04b: XX 112 기본값 없앰 · 응급 번호 12나라(VN TH PH ID NP UZ KH MN LK BD IN GB) — 출처는 줄 옆.
-   나라 고르는 순서: ① localStorage mn.place.country(사용자가 「말과 나라」에서 고른 값) ② 앱이 가진 값 ③ 시간대·기기 지역 짐작. */
+   11-04b: XX 112 기본값 없앰 · 응급 번호 12나라(VN TH PH ID NP UZ KH MN LK BD IN GB) — 출처는 줄 옆.
+   나라 고르는 순서: ① localStorage mn.place.country(사용자가 「말과 나라」에서 고른 값) ② 앱이 가진 값 ③ 시간대·기기 지역 짐작.
+   ── 공용 부품 셋(위기번호 표 · 설정 부품 · 응급카드 부품) 공통 약속 · 주인: 길동무 세션 ──
+   판: 이 파일 안 «판» 한 곳(코드의 판 값). 고치면 판을 올리고 다섯 앱에 다시 심는다. 지금 판 2026-11-04c.
+   심는 순서(앱마다 같다): ① 위기번호 표 → ② 설정 부품 → ③ 응급카드 부품 — 표가 앞에 있어야 말과 나라 고르개·응급 번호가 표를 쓴다.
+   심기·비교: python3 _도구/공용부품_심기.py 비교 · python3 _도구/공용부품_심기.py <소아|곁에|길동무|CS> · 다른 저장소(약지도): python3 _도구/공용부품_심기.py 파일 <경로>
+   ⛔ 앱 사본을 직접 고치지 않는다 — 이 파일을 고치고 다시 심는다(심기 스크립트는 정본과 다른 사본을 보면 멈춘다).
+*/
 (function () {
   if (window.메디나눔위기번호) return;
+  var 판 = '2026-11-04c';   /* 11-04c 머리 주석 정리(동작 같음) */
   var 표 = {
     KR: { 이름: { ko: '한국', en: 'Korea', es: 'Corea', ja: '韓国', zh: '韩国' }, 응급: '119', 경찰: '112', 위기: ['109', '1577-0199'] },
     US: { 이름: { ko: '미국', en: 'United States', es: 'Estados Unidos', ja: 'アメリカ', zh: '美国' }, 응급: '911', 경찰: '911', 위기: ['988'] },
@@ -2767,7 +2774,7 @@ try { 이용량.설치({ 앱: 'yakjido', 켜짐: false, 주소: 'https://uszalzc
     XX: { 이름: { ko: '그 밖', en: 'Other', es: 'Otro', ja: 'その他', zh: '其他' }, 응급: null, 경찰: null, 위기: [] }   /* 11-04 Main — 모르는 나라는 누르는 번호 없음(112 기본값 없앰) */
   };
   function 고른곳() { try { var v = JSON.parse(localStorage.getItem('mn.place') || 'null'); if (v && v.country) return 표[v.country] ? v.country : 'XX'; } catch (e) {} return null; }
-  window.메디나눔위기번호 = { 판: '2026-11-04b', 표: 표, 고른곳: 고른곳 };   /* 판 — 표를 쓰는 앱은 다시 읽기만 */
+  window.메디나눔위기번호 = { 판: 판, 표: 표, 고른곳: 고른곳 };   /* 표를 쓰는 앱은 읽기만 */
 })();
 /* ▲▲ 위기번호 표 끝 ▲▲ */
 /* ▼▼ 설정 부품 시작 ▼▼ */
@@ -2792,10 +2799,16 @@ try { 이용량.설치({ 앱: 'yakjido', 켜짐: false, 주소: 'https://uszalzc
        처리방침: 'https://medinanum.com/privacy-gildongmu.html', 정보: { 부름:'openAbout()' }, 문의: { 부름:"openSettings('help')" },
        아래말: '…', 다시그리기: function(){ openSettings('menu') } });
      화면: 설정판.HTML()  — 시트 맨 위 제목 아래에 통째로.
-   ⛔ 지우기·계정 지우기는 앱의 확인 화면으로만 간다(이 부품이 직접 지우지 않는다). */
+   ⛔ 지우기·계정 지우기는 앱의 확인 화면으로만 간다(이 부품이 직접 지우지 않는다).
+   ── 공용 부품 셋(위기번호 표 · 설정 부품 · 응급카드 부품) 공통 약속 · 주인: 길동무 세션 ──
+   판: 이 파일 안 «판» 한 곳(코드의 판 값). 고치면 판을 올리고 다섯 앱에 다시 심는다. 지금 판 2026-11-04d.
+   심는 순서(앱마다 같다): ① 위기번호 표 → ② 설정 부품 → ③ 응급카드 부품 — 표가 앞에 있어야 말과 나라 고르개·응급 번호가 표를 쓴다.
+   심기·비교: python3 _도구/공용부품_심기.py 비교 · python3 _도구/공용부품_심기.py <소아|곁에|길동무|CS> · 다른 저장소(약지도): python3 _도구/공용부품_심기.py 파일 <경로>
+   ⛔ 앱 사본을 직접 고치지 않는다 — 이 파일을 고치고 다시 심는다(심기 스크립트는 정본과 다른 사본을 보면 멈춘다).
+*/
 (function () {
   if (window.설정판 && window.설정판.__v) return;
-  var 판 = '2026-11-04c';
+  var 판 = '2026-11-04d';   /* 11-04d 머리 주석 정리(동작 같음) */
   var 설정 = { app: 'app', 언어: null, 줄: null, 아이콘: null, 다시그리기: null };
   var 글표 = {
     ko: { 맞추기: '나에게 맞추기', 알림: '알림', 화면: '화면과 언어', 기록: '내 기록', 앱: '이 앱',
@@ -3004,12 +3017,29 @@ try { 이용량.설치({ 앱: 'yakjido', 켜짐: false, 주소: 'https://uszalzc
    요청서 docs/requests/20261104_언어나라_묻기.md 「차별점 — 응급 카드」
    보이는 때: 설정판.말과나라() 가 country 'KR' · level 'some'|'none' · lang 이 한국어가 아닐 때만. 그 밖에는 빈 글('').
    모양: 큰 한국어 문장(상대에게 보여 줘도 되게) + 그 아래 본인 말. 적어 둔 주소가 있으면 한 줄 더(주소는 이 기기 localStorage mn.addr 에만 — 서버로 보내지 않는다).
-   통역 번호 줄: 설치의 통역줄 [{ko, 말:{en,es,ja,zh}, 번호}] — 기본은 비어 있다(Main 이 공식 확인한 번호만 넣는다).
-   쓰는 법: 응급카드.설치({ 통역줄: [] }) · 응급·위기 화면 맨 위에 응급카드.HTML()  — 「주소 적어 두기」는 카드 안에서 바로.
-   ⛔ 이모지 0 · « » 0 · 단추 44px 이상 · 320 넘침 0. */
+   통역 줄(11-04 Main 확인 · 설계안): 「119 에 통역을 부탁하세요」 · 1345 외국인종합안내센터(법무부 — 생활·행정 도움, 평일 09:00~22:00 · 20개 말 · 18시 뒤 한·영·중 · immigration.go.kr/immigration/1530/subview.do)
+     · 1330 관광 통역(24시간 영·일·중 — 통역 도움으로만, 119 연결을 약속하지 않는다). 1577-0071 은 넣지 않는다. 앱이 통역줄로 바꿀 수 있다.
+   쓰는 법: 화면에 <div id="mn-ecard"></div> 자리만 두면 부품이 채운다(응급카드.채우기() · mn:place 이벤트 · 자리가 새로 그려지면 스스로).
+            문자열이 필요하면 응급카드.HTML(). 「주소 적어 두기」는 카드 안에서 바로.
+   ⛔ 이모지 0 · « » 0 · 단추 44px 이상 · 320 넘침 0.
+   ── 공용 부품 셋(위기번호 표 · 설정 부품 · 응급카드 부품) 공통 약속 · 주인: 길동무 세션 ──
+   판: 이 파일 안 «판» 한 곳(코드의 판 값). 고치면 판을 올리고 다섯 앱에 다시 심는다. 지금 판 2026-11-04b.
+   심는 순서(앱마다 같다): ① 위기번호 표 → ② 설정 부품 → ③ 응급카드 부품 — 표가 앞에 있어야 말과 나라 고르개·응급 번호가 표를 쓴다.
+   심기·비교: python3 _도구/공용부품_심기.py 비교 · python3 _도구/공용부품_심기.py <소아|곁에|길동무|CS> · 다른 저장소(약지도): python3 _도구/공용부품_심기.py 파일 <경로>
+   ⛔ 앱 사본을 직접 고치지 않는다 — 이 파일을 고치고 다시 심는다(심기 스크립트는 정본과 다른 사본을 보면 멈춘다).
+*/
 (function () {
   if (window.응급카드 && window.응급카드.__v) return;
-  var 판 = '2026-11-04', 설정 = { 통역줄: [] }, 주소열쇠 = 'mn.addr';
+  var 판 = '2026-11-04b', 주소열쇠 = 'mn.addr';   /* 11-04b 머리 주석 정리(동작 같음) · 11-04 첫 판은 통역 줄 없음 */
+  var 기본통역줄 = [
+    { 번호: '119', 말: { en: 'Ask 119 for an interpreter.', es: 'Pida un intérprete al 119.', ja: '119に通訳をお願いしてください。', zh: '请向119要求翻译服务。' } },
+    { 번호: '1345', 말: { en: 'Immigration Contact Center (Ministry of Justice) — help with daily life and paperwork, not emergencies. Weekdays 09:00–22:00 in 20 languages; after 18:00 Korean, English and Chinese only. From abroad +82-2-1345.',
+      es: 'Centro de Atención a Extranjeros (Ministerio de Justicia): ayuda con la vida diaria y los trámites, no con emergencias. De lunes a viernes de 09:00 a 22:00 en 20 idiomas; después de las 18:00, solo coreano, inglés y chino. Desde el extranjero +82-2-1345.',
+      ja: '外国人総合案内センター（法務部）— 生活や手続きの相談（緊急ではないとき）。平日09:00〜22:00・20言語、18時以降は韓国語・英語・中国語のみ。海外から+82-2-1345。',
+      zh: '外国人综合咨询中心（法务部）——生活和行政事务咨询（非紧急情况）。工作日09:00～22:00，20种语言；18:00以后仅限韩语、英语、中文。从海外拨打+82-2-1345。' } },
+    { 번호: '1330', 말: { en: 'Korea Travel Hotline — interpretation help 24 hours in English, Japanese and Chinese.', es: 'Línea de turismo de Corea: ayuda con la interpretación las 24 horas en inglés, japonés y chino.',
+      ja: '観光通訳案内 — 英語・日本語・中国語は24時間、通訳の手助けをします。', zh: '旅游咨询热线——英语、日语、中文24小时提供口译帮助。' } } ];
+  var 설정 = { 통역줄: 기본통역줄 };
   var 말이름ko = { en: '영어', es: '스페인어', ja: '일본어', zh: '중국어' };
   var 글표 = {
     en: { 머리: 'Say this to 119, or show them this screen', 나: 'I am a foreigner. I do not speak Korean well. I need an English interpreter.', 주소: 'Address', 적기: 'Save your address', 고치기: 'Change address', 저장: 'Save', 칸: 'Address in Korea (e.g. street, building, unit)' },
@@ -3041,7 +3071,7 @@ try { 이용량.설치({ 앱: 'yakjido', 켜짐: false, 주소: 'https://uszalzc
       '<p class="ec-ko" lang="ko" translate="no">외국인입니다. 한국어를 잘 못해요. ' + 말이름ko[l] + ' 통역이 필요해요.</p>' +
       '<p class="ec-me" lang="' + l + '">' + esc(t.나) + '</p>';
     if (a) h += '<div class="ec-addr"><p class="ec-ko" lang="ko" translate="no">주소: ' + esc(a) + '</p><p class="ec-me" lang="' + l + '">' + esc(t.주소) + ': ' + esc(a) + '</p></div>';
-    (설정.통역줄 || []).forEach(function (x) {   /* Main 이 공식 확인한 번호만(기본 비어 있음) */
+    (설정.통역줄 || []).forEach(function (x) {   /* Main 이 공식 확인한 번호만 */
       if (!x || !x.번호) return;
       h += '<p class="ec-tl"><a href="tel:' + esc(String(x.번호).replace(/[^\d+]/g, '')) + '">' + esc(x.번호) + '</a> ' + esc((x.말 && x.말[l]) || '') + '</p>';
     });
@@ -3057,9 +3087,18 @@ try { 이용량.설치({ 앱: 'yakjido', 켜짐: false, 주소: 'https://uszalzc
   function 주소저장() {
     var i = document.getElementById('ecAddrIn'), v = i ? String(i.value || '').trim().slice(0, 200) : '';
     try { if (v) localStorage.setItem(주소열쇠, v); else localStorage.removeItem(주소열쇠); } catch (e) {}
+    var 자 = document.getElementById('mn-ecard'); if (자 && 자.contains(document.getElementById('ecCard'))) { 자.removeAttribute('data-ec'); 채우기(); return; }
     var c = document.getElementById('ecCard'); if (c) { var d = document.createElement('div'); d.innerHTML = HTML(); if (d.firstChild) c.parentNode.replaceChild(d.firstChild, c); else c.remove(); }
   }
-  window.응급카드 = { __v: 판, 판: 판, HTML: HTML, 보일까: 보일까, 주소열기: 주소열기, 주소저장: 주소저장, 주소: 주소,
+  function 채우기() {
+    var el = document.getElementById('mn-ecard'); if (!el) return false;
+    var h = HTML(); if (el.getAttribute('data-ec') === h) return true;
+    el.innerHTML = h; el.setAttribute('data-ec', h); return true;
+  }
+  try { window.addEventListener('mn:place', 채우기); } catch (e) {}
+  try { var 예약 = 0; new MutationObserver(function () { var el = document.getElementById('mn-ecard'); if (el && !el.hasAttribute('data-ec')) { clearTimeout(예약); 예약 = setTimeout(채우기, 0); } })
+    .observe(document.documentElement, { childList: true, subtree: true }); } catch (e) {}
+  window.응급카드 = { __v: 판, 판: 판, HTML: HTML, 채우기: 채우기, 보일까: 보일까, 주소열기: 주소열기, 주소저장: 주소저장, 주소: 주소,
     설치: function (o) { o = o || {}; Object.keys(o).forEach(function (k) { 설정[k] = o[k]; }); return window.응급카드; } };
 })();
 /* ▲▲ 응급카드 부품 끝 ▲▲ */
