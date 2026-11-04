@@ -120,7 +120,7 @@ body = txt()
 hits = [w for w in BANNED if w in (body + ''.join(TITLES)).replace('개념완성', '')]   # 책 이름 'EBS 개념완성'은 허용
 assert not hits, f'쓰지 않기로 한 말: {hits}'
 old = (HERE.parent / 'blog-16' / 'kit.html').read_text(encoding='utf-8')
-head = old[:old.index('<div class="wrap">')]
+head = old[:old.index('<div class="wrap">')].replace('<title>박찬 통합과학 블로그 글</title>', '<title>박찬 통합과학 첫 글 수정판</title>')
 script = old[old.index('<script>'):]
 nimg = sum(1 for b in POST if b[0] == 'img')
 titles = ''.join(f'<div class="row"><span class="k">{"AB"[i]}</span><span class="t">{html.escape(t)}</span><button class="cp" data-text="{html.escape(t)}">복사</button></div>' for i, t in enumerate(TITLES))
