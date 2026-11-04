@@ -4239,7 +4239,7 @@ function buyItem(x){
   const badge = buyBadge(x);
   return `<button class="buy-item ${x.optional ? 'opt' : ''} ${pimg(x.product) ? 'has-img' : ''} ${open ? 'open' : ''}" onclick="OPEN_BUY=OPEN_BUY==='${x.d.id}'?'':'${x.d.id}';route()" aria-expanded="${open}">
     <span class="bi-t">
-      <small class="role">${esc(x.slot)}${x.optional ? ' · 도움될 수 있어요' : ''}${SYM_NOW && isWorked(SYM_NOW, x.d.id) ? ' · 효과 봤던 약' : ''}</small>
+      <small class="role">${esc(x.slot)}${x.optional ? ' · <span>도움될 수 있어요</span>' : ''}${SYM_NOW && isWorked(SYM_NOW, x.d.id) ? ' · <span>효과 봤던 약</span>' : ''}</small>
       <b>${esc(nbu(title))}</b>${sub ? `<small class="sub">${esc(nbu(sub))}</small>` : ''}${badge}${x.cau ? `<small class="cau">${I.alert}${esc(x.cau)}</small>` : ''}${mixH(x)}
     </span>
     ${imgTag(pimg(x.product), 'pimg', x.product)}
