@@ -59,7 +59,7 @@
   var 공표 = window.메디나눔위기번호 && window.메디나눔위기번호.표, 공 = 공표 && 공표[CC];
   var N = EMG[CC] || (공 && 공.응급 ? { e: 공.응급, m: 공.위기 || [] } : { e: null, m: [], unknown: true });
   var 현지 = { ko: '그 나라 응급 번호', en: 'the local emergency number', es: 'el número de emergencias del país', ja: '現地の緊急番号', zh: '当地急救电话' }[L] || 'the local emergency number';
-  var DICT = null, ui = {}, uiN = {};
+  var DICT = null, ui = {}, uiN = {}, REV = {};
   var NOTE = { en: 'Translation not yet reviewed by our medical team', es: 'Traducción aún no revisada por nuestro equipo médico', ja: '翻訳は医療スタッフの確認前です', zh: '翻译尚未经医疗团队审核' };
   var ORIG = { en: 'Show Korean original', es: 'Ver original en coreano', ja: '韓国語の原文を見る', zh: '查看韩文原文' };
   var KRNOTE = { en: 'Medicine doses follow Korean approval — check with a pharmacist or doctor where you live.', es: 'Las dosis siguen la aprobación de Corea: confírmelas con un farmacéutico o médico de su país.', ja: '薬の量は韓国の承認基準です。お住まいの国の薬剤師・医師に確認してください。', zh: '药物剂量依据韩国批准标准，请向您所在国家的药师或医生确认。' };
@@ -94,7 +94,7 @@
     var S = DICT.sym || {};
     (D.symptoms || []).forEach(function (s) {
       var t = S[s.id]; if (!t) return;   /* 본문(core.json)이 늦게 와 덮을 수 있어 그릴 때마다 다시 얹는다(값이 같으면 그대로) */
-      if (t.name) s.name = t.name; if (t.short) s.short = t.short;
+      if (t.name && s.name !== t.name) { REV[t.name] = s.name; s.name = t.name; } if (t.short) s.short = t.short;   /* REV — 약사에게 보일 한국어 칸(data-ko)에서 되돌리려고 */
       if (s.care) ['er', 'clinic', 'pharmacy'].forEach(function (k) { if (t[k] && s.care[k]) s.care[k] = s.care[k].map(function (x, i) { return t[k][i] || x; }); });
       if (s.triage && t.escalate) s.triage.escalate = t.escalate;
       if (t.find && !s._find) { s._find = 1; s.tags = (s.tags || []).concat(t.find); }   /* 안 보이는 찾는 말 — 검색에서만(화면엔 안 보임) */
@@ -105,7 +105,7 @@
       var b = B[s.id]; if (!b) return;
       ['lead', 'planTitle', 'planLabel'].forEach(function (k) { if (b[k] && s[k]) s[k] = b[k]; });
       ['how', 'pharmacy', 'selfcare', 'avoid'].forEach(function (k) { if (b[k] && Array.isArray(s[k])) s[k] = s[k].map(function (x, i) { return b[k][i] || x; }); });
-      if (b.plan && Array.isArray(s.plan)) s.plan.forEach(function (o, i) { var x = b.plan[i]; if (x) ['slot', 'title', 'why', 'either'].forEach(function (f) { if (x[f] && o[f]) o[f] = x[f]; }); });
+      if (b.plan && Array.isArray(s.plan)) s.plan.forEach(function (o, i) { var x = b.plan[i]; if (x) ['slot', 'title', 'why', 'either'].forEach(function (f) { if (x[f] && o[f] && o[f] !== x[f]) { if (f !== 'why') REV[x[f]] = o[f]; o[f] = x[f]; } }); });
       if (b.notWorking && s.notWorking) { if (b.notWorking.title) s.notWorking.title = b.notWorking.title; if (b.notWorking.steps && s.notWorking.steps) s.notWorking.steps = s.notWorking.steps.map(function (x, i) { return b.notWorking.steps[i] || x; }); }
       if (b.faq && Array.isArray(s.faq)) s.faq.forEach(function (o, i) { var x = b.faq[i]; if (x) { if (x.q) o.q = x.q; if (x.a) o.a = x.a; } });
     });
@@ -133,6 +133,13 @@
   var TABS = { en: { 'Medicine dictionary': 'Medicines', 'My information': 'My info' }, es: { 'Diccionario de medicamentos': 'Medicinas' } };
   function 탭() { var m = TABS[L], nav = document.querySelector('nav.tabbar'); if (!m || !nav || innerWidth >= 1024) return;
     var w = document.createTreeWalker(nav, NodeFilter.SHOW_TEXT, null), n; while ((n = w.nextNode())) { var k = n.nodeValue.trim(); if (m[k]) n.nodeValue = n.nodeValue.replace(k, m[k]); } }
+  /* 11-04 약사에게 보여 줄 한국어 칸(data-ko) — 자료 단계에서 번역된 증상 이름·처방 칸 이름을 한국어로 되돌린다 */
+  function 한국어칸(el) { if (!el || !el.querySelectorAll) return; var ks = Object.keys(REV).filter(function (k) { return k.length > 2; }).sort(function (a, b) { return b.length - a.length; });
+    el.querySelectorAll('[data-ko]').forEach(function (c) { var w = document.createTreeWalker(c, NodeFilter.SHOW_TEXT, null), n;
+      while ((n = w.nextNode())) { if (n.parentNode.closest && n.parentNode.closest('[data-noko]')) continue; var v = n.nodeValue, t = v.trim(); if (!t) continue;
+        if (REV[t]) { n.nodeValue = v.replace(t, REV[t]); continue; }
+        for (var i = 0; i < ks.length; i++) if (v.indexOf(ks[i]) >= 0) v = v.split(ks[i]).join(REV[ks[i]]);
+        if (v !== n.nodeValue) n.nodeValue = v; } }); }
   function 바꾸기(el) {
     if (!el) return;
     var w = document.createTreeWalker(el, NodeFilter.SHOW_TEXT, null), n, todo = [];
@@ -163,7 +170,7 @@
     lang: L, cc: CC, emg: N,
     tr: function (el) { if (DICT && el) 바꾸기(el); },   /* 11-03 늦게 채우는 칸(기내용 받아 두기 등) */
     t: function (s) { var r = L !== 'ko' ? 글(s) : null; return 번호(r != null ? r : s); },   /* 11-03 그린 뒤에 넣는 글(로그인 필수 안내 등) */
-    apply: function (view) { if (!DICT) return; 본문(); 바꾸기(view); 바꾸기(document.querySelector('nav.tabbar')); 탭(); 알림줄(view); },
+    apply: function (view) { if (!DICT) return; 본문(); 바꾸기(view); 바꾸기(document.querySelector('nav.tabbar')); 탭(); 한국어칸(view); 알림줄(view); },
     ready: 받기().then(function () { 본문(); if (typeof route === 'function') route(); })
   };
 })();

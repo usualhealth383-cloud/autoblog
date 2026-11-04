@@ -496,7 +496,7 @@
       return 준비().then(function () { return typeof 설정.지우기전 === 'function' ? Promise.resolve(설정.지우기전(sb, 세션)).catch(function () {}) : null; }).then(function () { return sb.rpc('yak_family_end_all').then(function () {}, function () {}); }).then(function () { return sb.rpc('delete_own_account', { p_app: 설정.app }); }).then(function (r) {
         if (r && r.error) throw r.error;
         try { 내열쇠().forEach(function (k) { localStorage.removeItem(k); }); } catch (e) {}
-        try { localStorage.removeItem('_srv_' + 설정.app); localStorage.removeItem(구독키()); } catch (e) {}
+        try { localStorage.removeItem('_srv_' + 설정.app); localStorage.removeItem(구독키()); ['yakjido.ask', 'mn.addr'].forEach(function (k) { localStorage.removeItem(k); }); } catch (e) {}   /* 11-04 묻고 싶은 것·응급 카드 주소도 */
         세션 = null; try { sb.auth.signOut(); } catch (e) {}
         알림(r && r.data && r.data.account_deleted === false ? '약지도의 서버 기록과 이 휴대폰의 기록을 지웠어요. 다른 메디나눔 앱 기록이 남아 있어 계정은 그대로예요.' : '계정과 약지도 서버 기록을 지웠어요. 이 휴대폰에 있던 약지도 기록도 비웠어요.');
         화면갱신();
@@ -2159,7 +2159,7 @@ try {
     if (await saveFile(`약지도-내기록-${todayKey()}.json`, JSON.stringify(payload, null, 1), 'application/json'))
       toast('파일로 받았어요 — 새 휴대폰에서 「가져오기」로 넣으시면 돼요');
   };
-  wipeMe = async function () { await wipe0(); try { if (!localStorage.getItem(ME_KEY)) { localStorage.removeItem(HX_KEY); localStorage.removeItem(FAM_KEY); } } catch (e) {} };
+  wipeMe = async function () { await wipe0(); try { if (!localStorage.getItem(ME_KEY)) { localStorage.removeItem(HX_KEY); localStorage.removeItem(FAM_KEY); ['yakjido.ask', 'mn.addr'].forEach(k => localStorage.removeItem(k)); } } catch (e) {} };   /* 11-04 묻고 싶은 것·응급 카드 주소도 */
   importMe = async function (file) {
     let j = null; try { j = file && file.size <= 3e6 ? JSON.parse(await file.text()) : null; } catch (e) {}
     const before = JSON.stringify(ME); await im0(file);
