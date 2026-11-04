@@ -24,9 +24,16 @@ const mod: Module = {
       }
     }
     // ② 복약 시각
-    const rem = await ctx.sql`select user_id, value from public.records where app = 'gyeote' and key = 'gy.remind'`;
+    // 곁에 앱은 gyeote_pushset.dose = {on, times} 로 쓴다(11-04 곁에 세션) — 그것을 먼저, 없으면 gy.remind
+    const rem = await ctx.sql`select user_id, key, value from public.records where app = 'gyeote' and key in ('gyeote_pushset', 'gy.remind')`;
+    const pick = new Map<string, any>();
     for (const x of rem) {
-      const v = ctx.parse(x.value);
+      const v = ctx.parse(x.value) as any;
+      if (x.key === 'gyeote_pushset') { if (v && v.dose && typeof v.dose === 'object') pick.set(x.user_id, { ...v.dose, tz: v.dose.tz || v.tz, lang: v.dose.lang || v.lang }); }
+      else if (!pick.has(x.user_id)) pick.set(x.user_id, v);
+    }
+    for (const [user_id, v] of pick) {
+      const x = { user_id };
       for (const dd of gyeoteDue(v, ctx.now)) {
         const ok = await ctx.push(x.user_id, (l) => ({ ...gyeoteMessage(v?.lang ? pickLang(v.lang) : l), kind: 'gyeote-dose', tag: 'gyeote-dose@' + dd.slot, go: '#/' }),
           { kind: 'gyeote-dose', day: dd.day, slot: dd.slot });
