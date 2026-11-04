@@ -17,6 +17,23 @@ for p in sorted((ROOT / 'content').glob('*.json')):
     if key in data and isinstance(v, list): data[key].extend(v)
     elif key in data and isinstance(v, dict): data[key].update(v)
     else: data[key] = v
+# 임신과 수유를 나눈다(2026-10-19, 3차 외부 검수 #16) — 예전엔 「임신·수유 중」 한 칸이라 수유 중인 분께도 「임신 20주 이후」 금기가 걸려 이부프로펜이 빠졌다.
+#  ① 「임신」 표시 문장 중 수유·젖을 말하는 것만 수유(nursing)에도 건다  ② 약마다 정리된 수유 근거(lact — 설명서·LactMed)로 수유 주의 한 줄
+#  ③ 수유 근거가 없는데 임신 경고가 있는 약은 「자료가 부족해요 — 상의」. 수유 줄은 모두 «주의»(전처럼) — 금기 단정은 설명서 문장에만.
+for _d in data.get('drugs', []):
+    _has = False
+    for _k in ('avoid', 'caution'):
+        for _e in _d.get(_k) or []:
+            if isinstance(_e, dict) and 'pregnant' in (_e.get('flags') or []) and re.search(r'수유|젖', _e.get('text', '')):
+                if 'nursing' not in _e['flags']: _e['flags'] = _e['flags'] + ['nursing']
+                _has = True
+    if _has: continue
+    _l = _d.get('lact') or {}
+    if _l.get('lv') in ('avoid', 'caution') and _l.get('t'): _t = '수유 중이시면 — ' + _l['t']
+    elif _l.get('lv') == 'none' or (not _l and any('pregnant' in (e.get('flags') or []) for k in ('avoid', 'caution') for e in (_d.get(k) or []) if isinstance(e, dict))):
+        _t = '수유 중 자료가 부족해요 — 드시기 전에 약사·의사와 상의하세요'
+    else: continue
+    _d.setdefault('caution', []).append({'flags': ['nursing'], 'text': _t})
 pub = ROOT.parent / 'docs' / 'yakjido' / 'data'   # 공공데이터는 import_public_data.py 가 여기에 직접 쓴다
 if (pub / 'meta.json').exists():
     data['public'] = json.loads((pub / 'meta.json').read_text(encoding='utf-8'))  # 건수·출처만 인라인, 본문은 data/ 로 지연 로드
@@ -48,6 +65,15 @@ if (pub / 'pills-rx.json').exists() and (pub / 'pills.json').exists() and (pub /
     _rxl = [[x[0], x[1], ''] + x[3:] for x in _rxl]   # 회사 이름은 뺀다(같은 이름은 함량이 이름에 있어 구별된다) — 약 화면에서 낱알 자료로 보인다
     (pub / 'names-rx.json').write_text(json.dumps(_rxl, ensure_ascii=False, separators=(',', ':')), encoding='utf-8')
     data['public'].update({'prod_otc': _otc, 'prod_rx': sum(1 for x in _rxl if len(x) == 3)})
+# ⛔ 약학정보원 자료 끔(2026-10-21, 현욱님 「저작권에 위배되는 사항이 없는지 잘 확인」) — 약학정보원 「법적 책임의 한계」(https://www.health.kr/notice/legal):
+#   「제공하는 모든 정보…의 저작권은 법인에 있습니다. 허락 없이 사용할 경우 법적 제재」, 이용약관(/notice/terms): 「얻은 정보를 가공, 판매하는 행위 등… 상업적으로 사용할 수 없습니다」.
+#   약지도는 유료 앱이라 복약정보(1만 9천 건)·상자 사진(common.health.kr)·그림 표시를 싣지 않는다. 「약학정보원에서 보기」 링크는 남긴다(링크는 복제가 아님).
+#   정식 이용 허락(약학정보원 광고/제휴 문의)을 받으면 True. 모으던 스크립트(kpic_*.py — 휴대폰 브라우저 위장·토큰 추출, 약관 32조②11·14호 위험)는 지웠다:
+#   허락을 받으면 약학정보원이 정한 방식(제공 파일·API)으로 받는다. 옛 스크립트는 git 기록(2026-10-21 이전)에만 있다.
+KPIC_USE = False
+if not KPIC_USE:
+    data['productImages'] = {k: v for k, v in (data.get('productImages') or {}).items() if 'health.kr' not in str(v.get('img', ''))}
+    if isinstance(data.get('meta'), dict): data['meta']['kpic'] = False
 # 낱알 사진은 식약처 서버 주소를 그대로 쓴다(저장 안 함). docs/yakjido/img/ 에 파일이 있을 때만 그것을 우선.
 imgdir = ROOT.parent / 'docs' / 'yakjido' / 'img'
 for v in (data.get('productImages') or {}).values():
@@ -56,7 +82,9 @@ for v in (data.get('productImages') or {}).values():
         if (imgdir / (iid + ext)).exists(): v['img'] = 'img/' + iid + ext; break
 # 약학정보원 복약정보(tools/kpic_detail.py) — 제품 화면이 그 제품 조각만 받게 16개로 나눈다(2026-09-30)
 kg = pub / 'kpic-guide.json'
-if kg.exists():
+if not KPIC_USE:
+    import shutil; shutil.rmtree(pub / 'kg', ignore_errors=True); (pub / 'kpic.json').write_text('{}', encoding='utf-8')
+elif kg.exists():
     _g = json.loads(kg.read_text(encoding='utf-8')); _kd = pub / 'kg'; _kd.mkdir(exist_ok=True)
     if (pub / 'kpic-extra.json').exists():   # 약 사전 대표 제품(tools/kpic_rep.py) — 수집 파일과 따로 받은 것
         for _s, _v in json.loads((pub / 'kpic-extra.json').read_text(encoding='utf-8')).items():
@@ -75,7 +103,8 @@ if not (pub / 'kpic.json').exists(): (pub / 'kpic.json').write_text('{}', encodi
 # 파일이 없으면 D.art 목록에 안 들어가서 화면에 빈 자리도 안 생긴다.
 ART_NAMES = ['hero-home', 'guide-1-where', 'guide-2-pharmacy', 'guide-3-take', 'photo-guide',
              'pill-search', 'schedule', 'supp-label', 'kids-dose', 'easy-mode',
-             'me-safety', 'tips', 'empty-search']
+             'me-safety', 'tips', 'empty-search',
+             'empty-bag', 'done-today']   # 10-28 현욱님이 그려 주실 두 장(빈 화면 · 다 드신 순간) — 넣으면 바로 뜬다
 artsrc = ROOT / 'art'
 artdst = ROOT.parent / 'docs' / 'yakjido' / 'art'
 MAXW = {'easy-mode': 300}                  # 88px 원형이라 작게, 나머지는 900px 이면 2배 화면까지 충분
@@ -111,7 +140,7 @@ SLIM = {
     'tips':        ['id', 'group', 'icon', 'title'],
     'askdoc':      ['id', 'icon', 'q'],               # 홈은 개수·검색은 질문만 — 대답은 본문과 함께(2026-10-13 검수 반영으로 첫 화면 220 KB)   # 홈은 제목만 쓴다 — 본문은 팁 화면(본문 받은 뒤)에서(2026-10-06 첫 화면 220 KB)
 }
-CORE_KEYS = ['sources', 'ingredients', 'interactions', 'kids', 'productImages', 'suppRules', 'myths', 'recalls', 'drugRep']   # drugRep: 약 화면(본문 받은 뒤)에서만 씀 — 첫 화면 220 KB 예산
+CORE_KEYS = ['sources', 'ingredients', 'interactions', 'kids', 'productImages', 'suppRules', 'suppGoals', 'suppStages', 'myths', 'recalls', 'drugRep']   # drugRep: 약 화면(본문 받은 뒤)에서만 씀 — 첫 화면 220 KB 예산
 # 약 화면에서만 쓰는 칸(자주 묻는 질문·부작용 빈도)은 data/detail.json 으로 한 번 더 뺀다.
 # 본문과 «동시에» 받기 시작하고, 약 화면만 이것까지 기다린다 — core.json 400 KB 예산(2026-10-04)
 DETAIL = {'drugs': ['faq', 'sideFreq', 'lact', 'tips', 'interactions', 'riskNote', 'sideEffects', 'stop', 'lead', 'onset', 'duration'],   # lead·onset·duration: 자세한 약 화면(vDrug)에서만 — 10-14 외부 검수 2차 반영(제품 용법·메타 본문 이동)으로 core 401 KB   # sideEffects·stop: 약 화면(읽어 주기 포함)에서만 — 10-14 투석·출처 보강으로 core 401 KB   # tips·interactions: 약 화면에서만(2026-10-13 검수 반영으로 core 400 KB) · riskNote: 약 화면 「부담 정도」 막대 아래 설명만(10-13 아이 나이 칸·병용 규칙 추가로 core 400 KB)
@@ -137,11 +166,48 @@ for k, v in data.items():
 # meta 의 「이 앱에 대해(about)·이렇게 만들었어요(method)」는 설정 화면(본문을 받은 뒤에만 그려짐)에서만 쓴다 — 본문에는 meta 전체를 싣고
 # (mergeCore 가 D.meta 를 본문 것으로 바꾼다) 첫 화면에서는 뺀다(2026-10-14 외부 검수 2차 반영으로 첫 화면 예산, 압축 약 0.9 KB)
 if isinstance(inline.get('meta'), dict):
-    core['meta'] = inline['meta']; inline['meta'] = {k: v for k, v in inline['meta'].items() if k not in ('about', 'method')}
+    core['meta'] = inline['meta']; inline['meta'] = {k: v for k, v in inline['meta'].items() if k not in ('about', 'method', 'oss')}
 
+# 처방약 길잡이(혈압·당뇨·콜레스테롤·갑상선·잠과 마음, 10-22) — #/rx 를 열 때만 받는 따로 파일(첫 화면·본문 예산 밖)
+_rx = json.loads((ROOT / 'rxguide.json').read_text(encoding='utf-8')); _rx.pop('_about', None)
+(ROOT.parent / 'docs' / 'yakjido' / 'data' / 'rxguide.json').write_text(json.dumps(_rx, ensure_ascii=False, separators=(',', ':')), encoding='utf-8')
+# 메디나눔 통합 찾기 목록(10-26 Main) — 다른 네 앱이 약지도 글을 찾을 때 받는 작은 목록. 본문은 빼고 제목·한 줄·찾는 말·길만(100 KB 안쪽)
+def _mnx():
+    import glob as _g
+    S, Dg = [], []
+    for f in sorted(_g.glob(str(ROOT / 'content' / 'symptoms*.json'))):
+        d = json.loads(open(f, encoding='utf-8').read()); S += d if isinstance(d, list) else d.get('symptoms', [])
+    for f in sorted(_g.glob(str(ROOT / 'content' / 'drugs*.json'))):
+        d = json.loads(open(f, encoding='utf-8').read()); Dg += d if isinstance(d, list) else d.get('drugs', [])
+    def one(t): return re.sub(r'\*\*', '', str(t or '')).split('\n')[0][:70]
+    H = []
+    for s_ in S:
+        H.append({'id': 's:' + s_['id'], 't': s_['name'], 's': one(s_.get('short') or s_.get('lead')), 'k': (s_.get('tags') or [])[:8], 'u': '#/symptom/' + s_['id']})
+    for d_ in Dg:
+        k_ = list(d_.get('for') or [])[:6] + [p_.get('name', '').split(' ')[0] for p_ in (d_.get('products') or [])[:4] if isinstance(p_, dict)]
+        H.append({'id': 'd:' + d_['id'], 't': d_.get('name') or d_['id'], 's': one(d_.get('tagline')), 'k': [x for x in k_ if x][:10], 'u': '#/drug/' + d_['id']})
+    for gid, g_ in _rx.get('guides', {}).items():
+        H.append({'id': 'rx:' + gid, 't': g_.get('title', ''), 's': one(g_.get('short')), 'k': ['처방약', '복용법'], 'u': '#/rx/' + gid})
+    o = json.dumps({'앱': 'yakjido', '판': datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=9))).strftime('%Y-%m-%d'), '항목': H}, ensure_ascii=False, separators=(',', ':'))
+    (ROOT.parent / 'docs' / 'yakjido' / 'medinanum-search.json').write_text(o, encoding='utf-8')
+    print(f'통합 찾기 목록 {len(H)}개 · {len(o.encode()) // 1024} KB')
+_mnx()
+# 다섯 언어 사전(10-27) — yakjido/i18n/<lang>.json → docs/yakjido/data/i18n/<lang>.json (한국어·한국이면 받지 않음)
+_i18 = ROOT.parent / 'docs' / 'yakjido' / 'data' / 'i18n'; _i18.mkdir(parents=True, exist_ok=True)
+for _f in sorted((ROOT / 'i18n').glob('[a-z][a-z].json')) if (ROOT / 'i18n').exists() else []:
+    _d = json.loads(_f.read_text(encoding='utf-8'))
+    # 안 보이는 찾는 말(seo.json · 10-27 Main) — 그 언어로 검색할 때만 쓰는 숨은 태그(번역 이름이 「発熱」「发烧」 같은 말과 달라도 찾게)
+    _sp = ROOT / 'seo.json'
+    if _sp.exists():
+        for _k, _v in json.loads(_sp.read_text(encoding='utf-8')).items():
+            _kind, _id = _k.split(':', 1); _w = (_v.get('찾는말') or {}).get(_f.stem)
+            if _w and _kind == 'sym': _d.setdefault('sym', {}).setdefault(_id, {})['find'] = _w
+    (_i18 / _f.name).write_text(json.dumps(_d, ensure_ascii=False, separators=(',', ':')), encoding='utf-8')
 jc = json.dumps(core, ensure_ascii=False, separators=(',', ':'))
 j = json.dumps(inline, ensure_ascii=False, separators=(',', ':')).replace('</', '<\\/')
-stamp = datetime.date.today().isoformat()
+# 10-21 검수자가 판을 구분하도록 한국 시각 날짜·시:분(컨테이너는 UTC 라 하루 늦게 찍혔다)
+_kst = datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=9)))
+stamp = _kst.strftime('%Y-%m-%d %H:%M')
 # 낱알식별(pills.json) 중 성분 칸이 빈 일반약을 «같은 품목기준코드(seq)»의 e약은요 성분으로 채운다 — 이름 짐작 없이 코드가 같을 때만.
 # 사진으로 담은 약의 겹침 판정(같은 성분 두 번)이 성분을 몰라 초록으로 나오던 것(2026-10-13 자체 검수 3-03). 다시 돌려도 같은 결과.
 _pd = ROOT.parent / 'docs' / 'yakjido' / 'data'
@@ -190,6 +256,76 @@ pages.mkdir(parents=True, exist_ok=True)
 (pages / 'data' / 'core.json').write_text(jc, encoding='utf-8')
 (pages / 'data' / 'detail.json').write_text(jd, encoding='utf-8')
 print(f'첫 화면 {len(out)/1024:.0f} KB · 본문 data/core.json {len(jc)/1024:.0f} KB')
+# 기내 모드(10-27) — 받아 둘 파일 목록·크기(설정 「기내에서 쓰기」가 읽는다)
+_dd = ROOT.parent / 'docs' / 'yakjido' / 'data'
+_off = [{'n': f.name, 'b': f.stat().st_size} for f in sorted(_dd.glob('*.json')) if f.name != 'offline.json']
+_off_i = [{'n': f.name, 'b': f.stat().st_size} for f in sorted((_dd / 'i18n').glob('*.json'))] if (_dd / 'i18n').exists() else []
+_off_x = [{'n': str(f.relative_to(ROOT)), 'b': f.stat().st_size} for _d in ('fonts', 'vendor') if (ROOT / _d).exists() for f in sorted((ROOT / _d).rglob('*')) if f.is_file()]
+(_dd / 'offline.json').write_text(json.dumps({'data': _off, 'i18n': _off_i, 'ext': _off_x}, ensure_ascii=False, separators=(',', ':')), encoding='utf-8')
+# 찾아오기(10-27 Main · 요청서 20261027_찾아오기_중국) — medinanum.com 짧은 판 재료. 화면엔 안 보임. seo.json(검색제목·검색설명·찾는말 다섯 언어) + 글 첫 단락·할 일·이럴 땐 바로·주소·출처
+def _seo():
+    import re as _re
+    sp = ROOT / 'seo.json'   # content/ 밖 — content/*.json 은 첫 화면에 실린다
+    if not sp.exists(): return
+    seo = json.loads(sp.read_text(encoding='utf-8'))
+    plain = lambda t: _re.sub(r'\s+', ' ', _re.sub(r'\*\*|<[^>]+>', '', str(t or ''))).strip()
+    def cut(t, n):   # 문장 끝에서 자른다(한 문장이 넘치면 비움 — 말을 중간에 끊지 않는다)
+        t = plain(t); out = ''
+        for m in _re.finditer(r'[^.!?。？！]+(?:[.!?。？！]["”’」)]*)?', t):
+            if len(out + m.group(0)) > n: break
+            out += m.group(0)
+        return out.strip()
+    act = lambda t: bool(_re.search(r'(세요|마세요|두세요|하세요)[.!]?$', t))   # 할일 = 이용자가 지금 할 행동(동사로 끝남) — 설명 문장(「도움이 돼요」)은 넣지 않는다(10-27 Main)
+    first = lambda t: (_re.match(r'[^.!?。？！]+(?:[.!?。？！]["”’」)]*)?', plain(t)) or [''])[0].strip()
+    srcs = {}
+    for f in sorted((ROOT / 'content').glob('sources*.json')): srcs.update(json.loads(f.read_text(encoding='utf-8')))
+    def src1(ids):
+        ids = [x for x in (ids or []) if x in srcs]
+        g = [x for x in ids if '지침' in srcs[x].get('type', '')] or ids
+        return _re.sub(r'\s*\(.*?\)\s*$', '', srcs[g[0]]['label']).strip() if g else ''
+    syms = {}
+    for f in sorted((ROOT / 'content').glob('symptoms*.json')):
+        v = json.loads(f.read_text(encoding='utf-8')); v = v if isinstance(v, list) else v.get('symptoms', [])
+        for x in v: syms.setdefault(x['id'], {}).update(x)
+    rx = json.loads((ROOT / 'rxguide.json').read_text(encoding='utf-8')).get('guides', {})
+    dicts = {L: json.loads((ROOT / 'i18n' / f'{L}.json').read_text(encoding='utf-8')) for L in ('en', 'es', 'ja', 'zh') if (ROOT / 'i18n' / f'{L}.json').exists()}
+    for L in ('ko', 'en', 'es', 'ja', 'zh'):
+        out = {}
+        for key, v in seo.items():
+            kind, gid = key.split(':', 1)
+            if L not in v.get('검색제목', {}): continue
+            e = {'검색제목': v['검색제목'][L], '검색설명': v['검색설명'][L], '찾는말': v.get('찾는말', {}).get(L, [])[:10]}
+            T = dicts.get(L, {})
+            if kind == 'sym' and gid in syms:
+                s0 = syms[gid]; t = T.get('sym', {}).get(gid, {})
+                e['첫단락'] = cut(s0.get('lead'), 200) if L == 'ko' else cut(t.get('short', ''), 200)
+                # 증상의 먹는 법 줄은 뒤 문장이 조건·예외(「설명서는 함께 먹지 말라고 해요」)라 첫 문장만 떼면 위험 — 한 줄 전체가 40자 안인 것만
+                # 먹는 법(how) 다음 스스로 돌보기(selfcare) — 한 줄 전체가 행동 문장인 것만(조건 문장이 잘리지 않게)
+                e['할일'] = list(dict.fromkeys(plain(h) for h in (s0.get('how') or []) + (s0.get('selfcare') or []) if 0 < len(plain(h)) <= 40 and act(plain(h))))[:3] if L == 'ko' else []
+                er = (s0.get('care') or {}).get('er') or []
+                e['바로'] = plain(er[0]) if L == 'ko' and er else plain((t.get('er') or [''])[0])
+                if L == 'ko' and e['바로'] and '119' not in e['바로']: e['바로'] += ' → 바로 119'
+                e['주소'] = '#/symptom/' + gid; e['출처'] = src1(s0.get('sources'))
+            elif kind == 'rx' and gid in rx:
+                g = rx[gid]; t = T.get('rx', {}).get(gid, {})
+                e['첫단락'] = cut(g.get('lead'), 200) if L == 'ko' else cut(t.get('lead', ''), 200)
+                ko_do = [first(o.get('t')) for o in g.get('do', [])]; ok_i = [i for i, h in enumerate(ko_do) if 0 < len(h) <= 40 and act(h)][:3]   # 다른 언어는 한국어에서 고른 같은 줄만
+                tr_do = t.get('do') or []
+                e['할일'] = [ko_do[i] for i in ok_i] if L == 'ko' else [first(tr_do[i]) for i in ok_i if i < len(tr_do) and first(tr_do[i])]
+                if L == 'ko' and len(e['할일']) < 2:   # 하나뿐이면 같은 줄들의 뒷문장에서 스스로 선 행동 문장을 더 찾는다(10-27 Main) — 없으면 그대로
+                    for o in g.get('do', []):
+                        for m in list(_re.finditer(r'[^.!?。？！]+(?:[.!?。？！]["”’」)]*)?', plain(o.get('t'))))[1:]:
+                            h = m.group(0).strip()
+                            if 0 < len(h) <= 40 and act(h) and h not in e['할일'] and len(e['할일']) < 3: e['할일'].append(h)
+                ers = [o.get('t') for o in g.get('er', [])] if L == 'ko' else (t.get('er') or [])
+                e['바로'] = plain(ers[0]) if ers else ''
+                e['주소'] = '#/rx/' + gid; e['출처'] = src1(g.get('src'))
+            else: continue
+            e['할일'] = [h for h in e['할일'] if h not in e.get('첫단락', '') and h not in e.get('바로', '')]   # 첫단락·바로와 겹치지 않게
+            out[key] = e
+        if out: (pages / f'medinanum-seo.{L}.json').write_text(json.dumps(out, ensure_ascii=False, indent=1), encoding='utf-8')
+    print('찾아오기 medinanum-seo:', len(seo), '편')
+_seo()
 # 서비스워커 캐시 이름 = 배포 파일 내용의 해시 — 내용이 같으면 같은 이름(파이썬 hash() 는 실행마다 달라 매번 바뀌던 것, 2026-10-13)
 _srvjs = (ROOT / 'srv.js').read_text(encoding='utf-8') if (ROOT / 'srv.js').exists() else ''
 _srvjs += (ROOT / 'find.js').read_text(encoding='utf-8') if (ROOT / 'find.js').exists() else ''   # 찾기 부품도 바뀌면 캐시 이름이 바뀌게(10-14)
@@ -197,9 +333,13 @@ _srvjs += ''.join((ROOT / f).read_text(encoding='utf-8') for f in ('terms.html',
 cache_id = hashlib.sha1((out + jc + jd + _srvjs).encode('utf-8')).hexdigest()[:8]
 sw = ROOT / 'sw.js'
 if sw.exists():
-    s = re.sub(r"const CACHE = '[^']*'", f"const CACHE = 'yakjido-{stamp}-{cache_id}'", sw.read_text(encoding='utf-8'))
+    s = re.sub(r"const CACHE = '[^']*'", f"const CACHE = 'yakjido-{stamp.replace(' ', 'T')}-{cache_id}'", sw.read_text(encoding='utf-8'))
     (pages / 'sw.js').write_text(s, encoding='utf-8')
-for name in ('manifest.webmanifest', 'privacy.html', 'terms.html', 'delete-account.html', 'srv.js', 'find.js'):   # terms.html = 약지도 이용약관(첫 동의 화면·설정에서 앱 안으로 읽음, 10-14)   # find.js = 공용 찾기 부품 + 약지도 쪽(검색을 처음 쓸 때 받음, Z8)
+# 바깥 파일 0(10-27 · 중국·인터넷 막힌 곳) — 글꼴(Pretendard 부분 글꼴 92조각, SIL OFL)·로그인 프로그램(supabase-js)을 배포 묶음 안에
+import shutil as _sh
+for _d in ('fonts', 'vendor'):
+    if (ROOT / _d).exists(): _sh.copytree(ROOT / _d, pages / _d, dirs_exist_ok=True)
+for name in ('manifest.webmanifest', 'privacy.html', 'terms.html', 'delete-account.html', 'srv.js', 'find.js', 'i18n.js'):   # terms.html = 약지도 이용약관(첫 동의 화면·설정에서 앱 안으로 읽음, 10-14)   # find.js = 공용 찾기 부품 + 약지도 쪽(검색을 처음 쓸 때 받음, Z8)
     # delete-account.html = 스토어 「계정 삭제 URL」(메디나눔 안내 2026-10-13)   # srv.js = 계정·기록 이어 두기(따로 받는 파일)   # privacy.html = 스토어에 적는 개인정보처리방침 주소
     src = ROOT / name
     if src.exists():

@@ -32,6 +32,12 @@ CHROME = os.environ.get('CHROME', '/opt/pw-browsers/chromium-1194/chrome-linux/c
 if not os.path.exists(CHROME): CHROME = None
 LAUNCH = {'executable_path': CHROME} if CHROME else {}
 
+# 시험 브라우저는 한국어로 연다(10-27 — 안 정하면 en-US 라 영어 화면이 된다). 시간대는 그대로(UTC — 알림 시험이 이 시계에 맞춰져 있다, UTC 는 나라 판단에서 건너뛰어 ko-KR → KR). en-US+서울 → 119 는 i18n.py 가 따로 본다
+from playwright.sync_api import Browser as _B
+_np, _nc = _B.new_page, _B.new_context
+_B.new_page = lambda self, **k: _np(self, **{'locale': 'ko-KR', **k})
+_B.new_context = lambda self, **k: _nc(self, **{'locale': 'ko-KR', **k})
+
 class _Quiet(http.server.SimpleHTTPRequestHandler):
     def log_message(self, *a, **k): pass          # 접속 기록으로 결과를 가리지 않는다
 
@@ -72,7 +78,9 @@ CONTRAST_JS = """()=>{
    const st=getComputedStyle(e);if(st.visibility==='hidden'||st.display==='none'||+st.opacity===0)continue;
    const L1=lum(st.color),L2=lum(bg(e));const r=(Math.max(L1,L2)+.05)/(Math.min(L1,L2)+.05);
    const size=parseFloat(st.fontSize),bold=parseInt(st.fontWeight)>=700;const need=(size>=24||(size>=18.66&&bold))?3:4.5;
-   if(r<need)out.push({t:t.slice(0,24),r:+r.toFixed(2),need,cls:(''+e.className).slice(0,18)});}
+   if(r<need)out.push({t:t.slice(0,24),r:+r.toFixed(2),need,cls:(''+e.className).slice(0,18)});
+   /* 10-19 — 글자 최소 14 px(디자인 리서치 1019 #1 · NHS 휴대폰 작은 글씨 14 px). 그림 속 글자는 뺀다 */
+   if(size<13.9&&e.getClientRects().length&&!e.closest('svg'))out.push({t:t.slice(0,24),r:'글자 '+size+'px',need:'14px',cls:(''+e.className).slice(0,18)});}
  return out;}"""
 
 # 글자 말고 «조작 부품»의 대비 — WCAG 1.4.11(3:1).
@@ -154,7 +162,7 @@ RULES_JS = """()=>{
     ixItems([]).forEach(it=>it.ings.forEach(e=>{(e.cls||[]).forEach(x=>c.add(x)); if(e.k)k.add(e.k);}));
     info[id]={c,k}; }
   const hit=(id,g)=>g.some(t=>t.startsWith('k:')?info[id].k.has(t.slice(2)):info[id].c.has(t));
-  const F=['heart','diabetes','ulcer','kidney','liver','anticoag','glaucoma','bph','asthma','alcohol','gout','pregnant','senior'];
+  const F=['heart','diabetes','ulcer','kidney','liver','anticoag','glaucoma','bph','asthma','alcohol','gout','pregnant','nursing','senior'];
   const bad=[];
   for(const r of rules){
     let pick=[],ok=true;
@@ -357,7 +365,7 @@ def alarm_z6(br, url, fails):
     b = ph.query_selector('.skip-l button')
     if not b: fails.append('Z6 건너뛰기: 복용 시간 화면에 지난 회차 「건너뛰기」 단추가 없습니다')
     else:
-        b.click(); ph.wait_for_timeout(400)
+        ph.locator('.skip-l button').first.click(); ph.wait_for_timeout(400)  # 화면이 다시 그려지면 쥔 단추가 떨어진다 — 찾아서 누르기
         if not ph.evaluate("()=>((ME.skipped||{})[todayKey()]||[]).length") or not ph.query_selector('.dose-tick.skip'): fails.append('Z6 건너뛰기: 단추를 눌러도 건너뜀으로 적히지 않습니다')
     ph.close()
     if zerr: fails.append(f'Z6 알림: JS 오류 {zerr[:2]}')
@@ -437,7 +445,7 @@ def z7_checks(br, url, fails):
       for (const sid of ['cold','fever','headache','allergy']) if (ids(sid).some(isNsaid)) bad.push('2개월 '+sid+': 소염진통제를 권함');
       kid(5,7); for (const sid of ['cold','fever','headache','msk']) if (ids(sid).some(isNsaid)) bad.push('5개월 '+sid+': 소염진통제(이부프로펜 등)를 권함');
       location.hash='#/symptom/fever'; route(); const k5=(document.querySelector('.answer .kid-line')||{}).innerText||''; if (!/이부프로펜 시럽은 생후 6개월부터/.test(k5)) bad.push('5개월: kg 줄에 이부프로펜 6개월 안내 없음 — '+k5.slice(0,60));
-      kid(48,16); location.hash='#/symptom/fever'; route(); if (!/설명서 표/.test([...document.querySelectorAll('.answer .kid-over')].map(e=>e.innerText).join(''))) bad.push('4세 16 kg: 이부프로펜 설명서 표 넘음 경고 없음');
+      kid(48,16); location.hash='#/symptom/fever'; route(); { const t=[...document.querySelectorAll('.answer .kid-over, .answer .kid-line')].map(e=>e.innerText).join(' '); if (!/나이 표에 맞췄어요/.test(t) || !/이부프로펜 시럽 4\.0~7\.5 mL/.test(t)) bad.push('4세 16 kg: 이부프로펜이 나이 표(5~7.5 mL)와 몸무게 셈 가운데 작은 쪽이 아님(공통 숫자표) — '+t.slice(0,160)); }
       for (const sid of ['cold','allergy','cough','constipation','diarrhea']) for (const x of basket(byId(D.symptoms,sid))) { if (/500 ?mg|정$|캡슐/.test(x.product||'') && !kidAdultOk(x.d)) bad.push('4세 '+sid+': 어른 제품 '+x.product); if (minAgeOf(x.d)!=null && minAgeOf(x.d)>48) bad.push('4세 '+sid+': '+x.d.id+'('+minAgeOf(x.d)+'개월부터)'); }
       kid(168,50); for (const sid of ['allergy','diarrhea','cold']) for (const x of basket(byId(D.symptoms,sid))) if ((x.why||[]).includes('child') && minAgeOf(x.d)!=null) bad.push('14세 '+sid+': 나이 기준이 있는데 「소아」로 막음 '+x.d.id);
       kid(null,5); location.hash='#/symptom/fever'; route(); if (!/생후 3개월 안팎/.test([...document.querySelectorAll('.answer .kid-over')].map(e=>e.innerText).join(''))) bad.push('생년월일 없음 5 kg: 「생후 3개월 안팎」 경고 없음');
@@ -609,7 +617,7 @@ def z9_checks(br, url, fails):
     go('/drug/ciclopirox-shampoo')
     if pz.query_selector('.dose-hero') and pz.inner_text('.dose-hero').split('\n')[-1].strip().startswith('—'): fails.append('시클로피록스 용량 칸에 「—」 한 글자가 값처럼 보입니다')
     # C12 — 아이 처음 안내: 어른 조건 칩 없음 · 생년월일·몸무게 칸
-    go('/hello/1'); pz.click('button.hello-big:has-text("아이가 먹을 약이에요")'); pz.wait_for_timeout(120)
+    go('/hello/1'); pz.click('button.hello-big:has-text("아이가 아파요")'); pz.wait_for_timeout(120)
     t = txt()
     if '임신' in t or '전립선' in t or '술을' in t: fails.append('아이 처음 안내 2단계에 임신·전립선·술 칩이 나옵니다')
     if not pz.query_selector('#k-birth') or not pz.query_selector('#k-w'): fails.append('아이 처음 안내에 생년월일·몸무게 칸이 없습니다')
@@ -690,14 +698,14 @@ def simple_checks(br, url, fails):
     if '와파린' not in pz.evaluate("()=>[...document.querySelectorAll('.ixline,.ix-h b')].map(x=>x.innerText).join(' ')"): fails.append('간단히: 와파린을 담았는데 근육통 화면에 같이 먹기 경고가 없습니다')
     pz.evaluate("()=>{ ME.taking=[]; saveMe(); }")
     # 약 화면 — 먹지 말 때(내 조건은 빠짐없이)·자세히 보기
-    pz.evaluate("()=>{ ME.ulcer=true; saveMe(); }"); go('/drug/ibuprofen')
+    pz.evaluate("()=>{ ME.bleed=true; saveMe(); }"); go('/drug/ibuprofen')
     t = pz.inner_text('#view')
     me_li = pz.inner_text('.sv-no li.me') if pz.query_selector('.sv-no li.me') else ''
-    if '한 번에' not in t or '위궤양' not in me_li: fails.append('간단히 약 화면: 용량 칸이나 내 조건(위궤양) 금기 줄이 없습니다')
+    if '한 번에' not in t or '위궤양' not in me_li: fails.append('간단히 약 화면: 용량 칸이나 내 조건(위장출혈·위궤양) 금기 줄이 없습니다')
     if pz.query_selector('.dtabs'): fails.append('간단히 약 화면에 자세한 탭이 그대로 나옵니다')
     go('/drug/ibuprofen?full=1')
     if not pz.query_selector('.dtabs'): fails.append('간단히 약 화면 「자세히 보기」(?full=1)가 자세한 화면을 열지 않습니다')
-    pz.evaluate("()=>{ ME.ulcer=false; saveMe(); }")
+    pz.evaluate("()=>{ ME.bleed=false; saveMe(); }")
     # (d) 증상 화면 단추와 설정 단추가 ME.view 를 바꾼다
     go('/symptom/headache'); pz.click('.view-seg button:has-text("자세히")'); pz.wait_for_timeout(120)
     if pz.evaluate("()=>ME.view") != 'detail' or not pz.query_selector('.stabs'): fails.append('증상 화면 「자세히」 단추가 화면 보기를 바꾸지 않습니다')
@@ -713,14 +721,14 @@ def simple_checks(br, url, fails):
     if len(pz.query_selector_all('.sv-tile')) < 8: fails.append('간단히 홈에 큰 증상 칸 8개가 없습니다')
     # (e) 넘침·잘림 — 390·360·320 × 16·22 px, 그리고 명암비·44px(두 테마)
     R = ['/home', '/symptom/msk', '/symptom/headache', '/symptom/cold', '/symptom/heartburn', '/symptom/insomnia', '/symptom/diarrhea', '/symptom/fever', '/drug/ibuprofen', '/drug/relax-combo', '/hello/3', '/me?t=set']
-    for fs in ('16px', '22px'):
+    for fs in ('17px', '23px'):
         pz.evaluate("v=>{ localStorage.setItem('yakjido.fs',v); document.documentElement.style.setProperty('--fs',v); }", fs)
         for w in (390, 360, 320):
             pz.set_viewport_size({'width': w, 'height': 800})
             for r in R:
                 go(r); pz.wait_for_timeout(60); o = pz.evaluate(OVERFLOW_JS)
                 if o['ov'] or o['clip']: fails.append(f'간단히 넘침 {w}px·{fs} {r}: {o["ov"][:2]} {o["clip"][:2]}')
-    pz.evaluate("()=>{ localStorage.setItem('yakjido.fs','16px'); document.documentElement.style.setProperty('--fs','16px'); }"); pz.set_viewport_size({'width': 390, 'height': 844})
+    pz.evaluate("()=>{ localStorage.setItem('yakjido.fs','17px'); document.documentElement.style.setProperty('--fs','17px'); }"); pz.set_viewport_size({'width': 390, 'height': 844})
     for theme in ('light', 'dark'):
         pz.emulate_media(color_scheme=theme); pz.evaluate("t=>setTheme(t)", theme); bad = []; tap = []
         for r in ['/home', '/symptom/msk', '/symptom/cold', '/drug/ibuprofen', '/hello/3']:
@@ -845,6 +853,85 @@ def r2a2_checks(br, url, fails):
 #   처음 오면 동의 화면 · 필수 둘 전엔 단추가 막힘 · 모두 동의가 둘을 켜고 끔 · 링크로 온 주소는 동의 뒤에 이어짐 · 옛 판이면 다시 물음 ·
 #   설정의 약관·개인정보 칸 · 로그인 문(바깥 요청 0 — 누르기 전엔 서버에 안 닿음) · 1280 px 왼쪽 메뉴·아래 탭 없음·가로 넘침 0
 CONSENT_SEED = "localStorage.setItem('yakjido.hello.v1','1');localStorage.setItem('yakjido.consent.v1',JSON.stringify({v:'2026-10-20',at:'2026-10-14',terms:1,privacy:1}))"
+# 외부 검수 5차(2026-10-22) — 다시 들어오지 않게
+#   #1 위궤양 두 칸: 「앓은 적」은 사기 칸에 상의로 남고 팁의 먹는 법은 빠짐 / 「위장출혈·지금 위궤양」은 빠진 약
+#   #2 처방 조합 카드·처방 칸 설명도 같은 거르개 · #3 고른 어린이 제품은 어른 용량 대신 몸무게 계산
+#   #4 소화효소제 「같은 성분」 없음 · #5 칼슘 ↔ 레보티록신 최소 4시간 · #6 보내기 「자세히」 → 처리방침 보내기 항목
+def r5_checks(br, url, fails):
+    import re
+    zerr = []
+    pz = br.new_page(viewport={'width': 390, 'height': 844}); pz.on('pageerror', lambda e: zerr.append(str(e)))
+    pz.add_init_script("localStorage.setItem('yakjido.hello.v1','1');localStorage.setItem('yakjido.consent.v1',JSON.stringify({v:'2026-10-20',at:'2026-10-14',terms:1,privacy:1}))")
+    pz.goto(url + '#/home'); pz.wait_for_function("()=>typeof CORE!=='undefined' && CORE===2 && DETAIL===2", timeout=20000)
+    def go(h):
+        pz.evaluate("h=>{ location.hash=h; route(); }", h); pz.wait_for_timeout(150)
+    def me(js):
+        pz.evaluate("()=>{ for (const k of Object.keys(FLAG_LABEL)) if (k!=='senior'&&k!=='child') ME[k]=false; ME.age='adult'; ME.easy=false; ME.taking=[]; RF.sid=''; " + js + "; saveMe(); }")
+    def txt(sel='#view'):
+        return pz.evaluate("s=>{let t='';document.querySelectorAll(s).forEach(e=>t+=' '+e.textContent);return t.replace(/\\s+/g,' ')}", sel)
+    me("ME.ulcer=true; ME.view='detail'"); go('/symptom/msk')
+    if re.search(r'이부프로펜 400|400 mg 한 알|근이완제 복합제를 더하', txt('#sp3')): fails.append('5차 #1 위궤양 앓은 적: 팁 탭에 소염제 먹는 법이 남았습니다')
+    if not ('이부프로펜' in txt('#sp1') and '상의' in txt('#sp1')): fails.append('5차 #1 위궤양 앓은 적: 사기 칸에 소염제가 「상의」로 남지 않습니다')
+    me("ME.bleed=true; ME.view='detail'"); go('/symptom/msk')
+    if '빠진 약' not in txt('#sp1'): fails.append('5차 #1 위장출혈·지금 위궤양: 소염제가 「빠진 약」으로 가지 않습니다')
+    me("ME.hf=true; ME.view='detail'"); go('/symptom/msk')
+    if '염증을 꺼요' in txt('#sp4 .rxc') or '어느 것이든 한 가지만' in txt('#sp4 .rx-card'): fails.append('5차 #2 심한 심장병: 진료실 처방 탭이 소염제를 그대로 권합니다')
+    for v in ('simple', 'detail'):
+        me(f"ME.view='{v}'"); go('/drug/acetaminophen?p=' + '어린이 타이레놀 현탁액')
+        t = txt()
+        if '1~2정' in t or '몸무게' not in t: fails.append(f'5차 #3 어린이 현탁액({v})에 어른 정제 용량이 나옵니다')
+    go('/search?q=타이레놀')
+    h = pz.evaluate("()=>[...document.querySelectorAll('#view [onclick]')].map(a=>a.getAttribute('onclick')).filter(x=>/\\/drug\\/acetaminophen/.test(x))")
+    if not h or any('p=' not in x for x in h): fails.append(f'5차 #3 검색 제품 줄이 고른 제품을 약 화면에 넘기지 않습니다: {h[:2]}')
+    me("ME.view='simple'"); go('/symptom/dyspepsia')
+    if re.search('같은 성분[^.]{0,30}베아제', txt()): fails.append('5차 #4 소화불량 간단히 보기에 「같은 성분 베아제정」이 남았습니다')
+    go('/show/dyspepsia')
+    if re.search('같은 성분[^:]{0,30}:[^.]{0,30}베아제', txt()): fails.append('5차 #4 약국 카드에 「같은 성분 … 베아제정」이 남았습니다')
+    me("ME.view='detail'"); go('/supp/calcium'); pz.evaluate("()=>document.querySelectorAll('details').forEach(d=>d.open=true)")
+    t = txt()
+    if '최소 4시간' not in t or '2~4시간' in t: fails.append('5차 #5 칼슘 화면에 레보티록신 「최소 4시간」이 없거나 「2~4시간」이 남았습니다')
+    if 'privacy.html#share' not in pz.content() and "방침주소())}#share" not in open(__file__.replace('tests/run.py', 'app-shell.html'), encoding='utf-8').read():
+        fails.append('5차 #6 보내기 동의 「자세히」가 처리방침 보내기 항목으로 가지 않습니다')
+    if 'id="share"' not in open(__file__.replace('tests/run.py', 'privacy.html'), encoding='utf-8').read(): fails.append('5차 #6 처리방침에 보내기 항목(id=share)이 없습니다')
+    go('/show/msk')
+    if re.search('니다[.]', txt()): fails.append('5차 #7 약국 카드에 합니다체가 남았습니다')
+    # 처방약 길잡이(10-22 ③) — 다섯 화면이 열리고, 「이렇게 드세요」·「이럴 땐 바로」가 맨 위, 검수 전 표시, 입구 셋(약 종류·내 약통·검색)
+    me("ME.view='detail'; ME.taking=['cls:bp.acei']")
+    for g in ('bp', 'dm', 'chol', 'blood', 'thy', 'mind', 'gi', 'bone', 'resp', 'pros', 'gout', 'blad', 'ster', 'dem', 'eye', 'park', 'pain', 'abx', 'derm', 'herb'):
+        go('/rx/' + g); pz.wait_for_function("()=>!document.querySelector('#view').innerText.includes('불러오는 중')", timeout=10000)
+        t = txt()
+        if '이렇게 드세요' not in t or '이럴 땐 바로' not in t or '깜빡했을 때' not in t: fails.append(f'처방약 길잡이 /rx/{g} 화면이 비었거나 칸이 빠졌습니다')
+        _RG = json.load(open(pathlib.Path(__file__).resolve().parent.parent / 'rxguide.json', encoding='utf-8')); _rv = _RG['guides'][g].get('reviewed', _RG.get('reviewed'))
+        # 10-26 현욱님 답 9 — 검수가 끝나면(reviewed) 「의사 확인 중」이 없어야, 그 전엔 있어야 한다
+        if _rv and '의사 확인 중' in pz.evaluate("()=>document.querySelector('.top')?.innerText||''"): fails.append(f'처방약 길잡이 /rx/{g} 에 검수 끝났는데 「의사 확인 중」이 남았습니다')
+        if not _rv and '의사 확인 중' not in t: fails.append(f'처방약 길잡이 /rx/{g} 에 검수 전 표시가 없습니다')
+    go('/rx/bp')
+    if '내 약' not in txt(): fails.append('처방약 길잡이: 내 약통의 …프릴 약에 「내 약」 표시가 없습니다')
+    go('/kinds/bp')
+    if '혈압약 드시는 분께' not in txt(): fails.append('약 종류(혈압) 화면에 처방약 길잡이 입구가 없습니다')
+    go('/search?q=당뇨약')
+    if not pz.evaluate("()=>[...document.querySelectorAll('#view [onclick]')].some(a=>/\\/rx\\/dm/.test(a.getAttribute('onclick')))"): fails.append('「당뇨약」 검색에 처방약 길잡이가 없습니다')
+    # 외부 검수 6차(10-22) — 처방 서두·칸 제목·간단히 보기 용량, 제품별 하루 한도 글, 제형 다른 검색 합치기, 골다공증약 간격, 받는 화면 설명서 단서, 하루 최대 설명, 합니다체, 꺼 둔 날씨 방침
+    for fl in ('bleed', 'ulcer', 'asthma'):
+        me(f"ME['{fl}']=true; ME.view='detail'"); go('/symptom/toothache')
+        if '이부프로펜 400 mg' in txt('#sp4'): fails.append(f'6차 #1 {fl}: 치통 진료실 처방 탭에 이부프로펜 400 mg 이 남았습니다')
+    me("ME.lvs=true; ME.view='simple'"); go('/symptom/msk')
+    if re.search(r'하루 8정|500 mg 1~2정', txt('.answer')): fails.append('6차 #1 심한 간질환: 간단히 보기에 아세트아미노펜 먹는 양이 남았습니다')
+    for nm in ('어린이 타이레놀 현탁액', '타이레놀 8시간 이알서방정'):
+        me("ME.view='detail'"); go('/drug/acetaminophen?p=' + nm)
+        pz.evaluate("()=>{document.querySelectorAll('details').forEach(d=>d.open=true);document.querySelectorAll('.dtabs .tab').forEach(t=>t.click())}")
+        if re.search(r'하루 4,000 mg 을 넘기지 말고, 4시간|하루 4 g을 넘기[면거]', txt()): fails.append(f'6차 #2 {nm}: 어른 일반정 하루 한도·간격 글이 남았습니다')
+    go('/search?q=타이레놀')
+    if '식약처 이름 어린이타이레놀산' in txt(): fails.append('6차 #3 현탁액에 산제 식약처 이름이 붙습니다')
+    me("ME.view='detail'"); go('/supp/calcium'); pz.evaluate("()=>document.querySelectorAll('details').forEach(d=>d.open=true)")
+    if '이반드론산은 최소 60분' not in txt(): fails.append('6차 #4 칼슘 화면에 이반드론산 60분이 없습니다')
+    pz.evaluate("()=>{const d=new Date();d.setMonth(d.getMonth()-48);ME.age='child';ME.child={name:'',birth:d.toISOString().slice(0,10),weight:16};saveMe()}"); go('/kids')
+    if '하루 640 mg이지만' not in txt(): fails.append('6차 #6 16 kg 이부프로펜 하루 최대 설명이 640 mg(몸무게)·600 mg(설명서)을 가르지 않습니다')
+    pz.evaluate("()=>{ME.age='adult';ME.child={};saveMe()}")
+    if 'Open-Meteo' in open(__file__.replace('tests/run.py', 'privacy.html'), encoding='utf-8').read(): fails.append('6차 #8 꺼 둔 날씨(Open-Meteo)가 처리방침에 남았습니다')
+    if zerr: fails.append(f'5차 화면 JS 오류: {zerr[:2]}')
+    pz.close()
+
 def consent_checks(br, url, fails):
     def page(w=390, init=''):
         ctx = br.new_context(viewport={'width': w, 'height': 900}); pg = ctx.new_page(); errs = []; ext = []
@@ -860,27 +947,20 @@ def consent_checks(br, url, fails):
     pg.goto(url); pg.wait_for_selector('#csGo', timeout=15000)
     if pg.evaluate('location.hash') != '#/consent': fails.append('동의: 처음 오신 분에게 동의 화면이 먼저 나오지 않습니다 — ' + pg.evaluate('location.hash'))
     if pg.is_visible('nav.tabbar'): fails.append('동의: 동의 화면에 아래 탭이 보입니다(누르면 동의를 건너뜀)')
-    if not pg.is_disabled('#csGo'): fails.append('동의: 필수 둘을 체크하기 전인데 「동의하고 시작하기」가 눌립니다')
-    pg.click('.cs-row[data-k=terms]')
-    if not pg.is_disabled('#csGo'): fails.append('동의: 이용약관만 체크했는데 단추가 눌립니다')
-    pg.click('.cs-row[data-k=privacy]')
-    if pg.is_disabled('#csGo') or pg.get_attribute('.cs-all', 'aria-checked') != 'true': fails.append('동의: 필수 둘을 체크했는데 단추가 막혀 있거나 「모두 동의」가 켜지지 않습니다')
-    pg.click('.cs-all')
-    if pg.evaluate(rows) != 'false,false' or not pg.is_disabled('#csGo'): fails.append('동의: 「모두 동의」를 다시 누르면 둘 다 꺼져야 합니다')
-    pg.click('.cs-all')
-    if pg.evaluate(rows) != 'true,true' or pg.is_disabled('#csGo'): fails.append('동의: 「모두 동의」가 필수 둘을 켜지 않습니다')
+    # 2026-10-29 「첫 진입 동의 벽 금지」 — 체크박스 목록 없이 큰 단추 한 번(필수 둘), 내용은 「자세히」 안
+    if pg.query_selector('.cs-row') or pg.query_selector('.cs-all'): fails.append('동의: 첫 화면에 체크박스 목록이 남아 있습니다(단추 한 번이어야 함)')
+    if pg.is_disabled('#csGo') or '동의하고 시작' not in pg.inner_text('#csGo'): fails.append('동의: 「약관·처리방침에 동의하고 시작」 단추가 없거나 막혀 있습니다')
     for theme in ('light', 'dark'):
         pg.evaluate("t=>{ document.documentElement.dataset.theme=t; }", theme)
         bad = pg.evaluate(CONTRAST_JS); tap = pg.evaluate(TAP_JS)
         if bad: fails.append(f'동의: 명암비({theme}) {bad[:3]}')
         if tap: fails.append(f'동의: 44px 미만({theme}) {tap[:4]}')
-    pg.evaluate("()=>{ document.documentElement.dataset.theme='light'; document.querySelector('.cs-more').open=true; }")
-    pg.click('.cs-more .cs-doc'); pg.wait_for_selector('.docv h1', timeout=8000); pg.wait_for_timeout(500)
+    pg.evaluate("()=>{ document.documentElement.dataset.theme='light'; document.querySelector('.cs-detail').open=true; }")
+    pg.click('.cs-detail .cs-doc'); pg.wait_for_selector('.docv h1', timeout=8000); pg.wait_for_timeout(500)
     if '제1조' not in pg.inner_text('#view'): fails.append('동의: 동의 전에 약관 전문이 앱 안에서 열리지 않습니다')
     o = pg.evaluate(OVERFLOW_JS)
     if o['ov'] or o['clip']: fails.append(f'동의: 약관 전문 넘침·잘림 {o}')
     pg.click('.top .back'); pg.wait_for_selector('#csGo', timeout=5000)
-    if pg.evaluate(rows) != 'true,true': fails.append('동의: 전문을 보고 돌아오니 체크가 풀렸습니다')
     pg.click('#csGo'); pg.wait_for_timeout(500)
     if not pg.evaluate('location.hash').startswith('#/hello'): fails.append('동의: 처음 오신 분이 동의 뒤 처음 안내로 가지 않습니다 — ' + pg.evaluate('location.hash'))
     rec = pg.evaluate("JSON.parse(localStorage.getItem('yakjido.consent.v1'))") or {}
@@ -890,11 +970,11 @@ def consent_checks(br, url, fails):
     ctx.close()
     # 링크로 온 주소 · 이미 쓰던 분(「동의하고 계속하기」) · 옛 판이면 다시
     ctx, pg, errs, ext = page()
-    pg.goto(url + '#/drug/ibuprofen'); pg.wait_for_selector('#csGo', timeout=15000); pg.click('.cs-all'); pg.click('#csGo'); pg.wait_for_timeout(1200)
+    pg.goto(url + '#/drug/ibuprofen'); pg.wait_for_selector('#csGo', timeout=15000); pg.click('#csGo'); pg.wait_for_timeout(1200)
     if pg.evaluate('location.hash') != '#/drug/ibuprofen': fails.append('동의: 링크로 온 약 화면이 동의 뒤에 이어지지 않습니다 — ' + pg.evaluate('location.hash'))
     pg.evaluate("localStorage.setItem('yakjido.consent.v1', JSON.stringify({v:'2026-10-01',at:'2026-10-01',terms:1,privacy:1}))"); pg.goto(url + '#/drugs'); pg.reload(); pg.wait_for_timeout(1500)
-    if not pg.query_selector('#csGo') or '동의하고 계속하기' not in pg.inner_text('#csGo') or not pg.query_selector('.cs-new'): fails.append('동의: 옛 판에 동의한 분(처음 안내를 마친 분)에게 「동의하고 계속하기」로 다시 묻지 않습니다')
-    pg.click('.cs-all'); pg.click('#csGo'); pg.wait_for_timeout(800)
+    if not pg.query_selector('#csGo') or '확인하고 계속' not in pg.inner_text('#csGo') or not pg.query_selector('.cs-again'): fails.append('동의: 옛 판에 동의한 분(처음 안내를 마친 분)에게 「동의하고 계속하기」로 다시 묻지 않습니다')
+    pg.click('#csGo'); pg.wait_for_timeout(800)
     if pg.evaluate('location.hash') != '#/drugs': fails.append('동의: 다시 동의한 뒤 가려던 화면으로 가지 않습니다 — ' + pg.evaluate('location.hash'))
     if errs: fails.append(f'동의(링크): JS 오류 {errs[:2]}')
     ctx.close()
@@ -907,15 +987,27 @@ def consent_checks(br, url, fails):
     if pg.is_visible('nav.tabbar'): fails.append('로그인 문: 아래 탭이 보입니다')
     if '로그인 없이 계속 쓰기' not in pg.inner_text('#view'): fails.append('로그인 문: 「로그인 없이 계속 쓰기」가 없습니다(로그인은 고르는 것)')
     if pg.get_attribute('#srvEmail', 'autocomplete') != 'email' or pg.get_attribute('#srvEmail', 'inputmode') != 'email' or pg.get_attribute('#srvPw', 'autocomplete') != 'current-password': fails.append('로그인 문: 이메일·비밀번호 autocomplete/inputmode 가 다릅니다')
-    if not pg.is_disabled('#srvDoorGo'): fails.append('로그인 문: 「서버에 저장하기」 동의 전인데 로그인이 눌립니다')
+    # 11-03 현욱님 폰 — 잠긴 단추는 눌러도 반응이 없어 「진행이 안 돼요」였다. 단추는 늘 눌리고, 빠진 필수 칸 아래 빨간 안내 + 그 칸 테두리, 진행은 막힌다
+    pg.click('#srvDoorGo'); pg.wait_for_timeout(300)
+    _nd = pg.evaluate("()=>({msg:(document.querySelector('.door-need-msg')||{}).textContent||'', need:!!document.querySelector('#srvAgree').closest('label.door-need'), door:!!document.querySelector('#srvbox[data-door]')})")
+    if not ('서버에 저장하기' in _nd['msg'] and _nd['need'] and _nd['door']): fails.append(f'로그인 문: 동의 전 「메일로 계속하기」를 누르면 그 칸 아래 안내가 떠야 합니다 — {_nd}')
+    for _sb in pg.query_selector_all('.door-soc'):
+        _sb.click(); pg.wait_for_timeout(200)
+        if '서버에 저장하기' not in (pg.evaluate("()=>(document.querySelector('.door-need-msg')||{}).textContent||''")): fails.append('로그인 문: 동의 전 소셜 단추를 눌러도 안내가 없습니다')
     pg.click('.door-eye')
     if pg.get_attribute('#srvPw', 'type') != 'text': fails.append('로그인 문: 비밀번호 보이기가 안 됩니다')
-    pg.click('.door-seg [role=tab]:nth-child(2)'); pg.wait_for_timeout(100)
-    if not pg.query_selector('#srvAge') or not pg.query_selector('#srvAgree') or pg.get_attribute('#srvPw', 'autocomplete') != 'new-password': fails.append('로그인 문: 회원가입에 만 14세·서버 저장 동의·new-password 가 없습니다')
+    # 2026-10-29 현욱님 — 로그인/회원가입 갈림 없이 「메일로 계속하기」 하나. 만 14세는 «처음 만들 때 필수»라 단추를 막지 않고, 만들기 직전에 확인한다
+    if pg.query_selector('.door-seg'): fails.append('로그인 문: 로그인/회원가입 탭이 아직 있습니다(메일로 계속하기 하나여야 함)')
+    if not pg.query_selector('#srvAge') or not pg.query_selector('#srvAgree'): fails.append('로그인 문: 만 14세 확인·서버 저장 동의가 한 화면에 없습니다')
+    if '메일로 계속하기' not in (pg.inner_text('#srvDoorGo') or ''): fails.append('로그인 문: 단추가 「메일로 계속하기」가 아닙니다')
     pg.check('#srvAgree')
-    if not pg.is_disabled('#srvDoorGo'): fails.append('로그인 문: 만 14세 확인 전인데 「계정 만들기」가 눌립니다')
-    pg.check('#srvAge')
-    if pg.is_disabled('#srvDoorGo'): fails.append('로그인 문: 필수를 다 체크했는데 「계정 만들기」가 막혀 있습니다')
+    if pg.is_disabled('#srvDoorGo'): fails.append('로그인 문: 서버 저장에 동의했는데 「메일로 계속하기」가 막혀 있습니다')
+    pg.goto(url + '#/home'); pg.wait_for_timeout(500)
+    if not pg.query_selector('.top .acct-btn'): fails.append('홈: 머리 오른쪽에 계정 단추가 없습니다(현욱님 10-29)')
+    pg.goto(url + '#/me?t=set'); pg.wait_for_timeout(600)
+    _first = pg.evaluate("()=>{const c=document.querySelector('#view .sec.card');return c?c.className:''}")
+    if 'acct-card' not in _first: fails.append(f'설정: 맨 위 첫 칸이 계정 카드가 아닙니다 — {_first!r}')
+    pg.goto(url + '#/login'); pg.wait_for_selector('#srvbox[data-door]', timeout=8000); pg.check('#srvAgree')
     if any('supabase' in u for u in ext): fails.append('로그인 문: 단추를 누르기 전에 서버·라이브러리에 닿았습니다')
     for theme in ('light', 'dark'):
         pg.evaluate("t=>{ document.documentElement.dataset.theme=t; }", theme)
@@ -972,7 +1064,7 @@ def main():
             except Exception: fails.append('본문 자료(core.json)를 못 받았습니다 — ' + pg.url)
         pg.goto(url); ready(); pg.wait_for_timeout(1200)
         pg.evaluate("localStorage.setItem('yakjido.hello.v1','1');localStorage.setItem('yakjido.consent.v1',JSON.stringify({v:'2026-10-20',at:'2026-10-14',terms:1,privacy:1}));localStorage.setItem('yakjido.me.v1',JSON.stringify({age:'senior',view:'detail',taking:['cls:bp.arb'],pub:{}}))")
-        routes = pg.evaluate("()=>['/home','/drugs','/tips','/me','/together','/kinds','/kinds/bp','/pill','/supp','/kids','/mix','/hello/1','/hello/3','/photo','/schedule','/about','/bag','/rxout','/senior','/myths','/askdoc','/askdoc?open=gout','/vitals','/visits','/me?t=meds','/me?t=set','/drugs?cat=all','/drugs?cat=nsaid','/senior?w=rx','/supp?t=label','/supp?t=stack','/tips?g=5','/myths?g=3','/schedule?t=sc2','/schedule?t=sc4','/pub/0','/pub/5']" +
+        routes = pg.evaluate("()=>['/home','/drugs','/tips','/me','/together','/kinds','/kinds/bp','/pill','/supp','/kids','/mix','/hello/1','/hello/3','/photo','/schedule','/about','/bag','/rxout','/senior','/myths','/askdoc','/askdoc?open=gout','/vitals','/visits','/me?t=meds','/me?t=set','/drugs?cat=all','/drugs?cat=nsaid','/senior?w=rx','/supp?t=label','/supp?t=stack','/sgoal/fatigue','/sgoal/bone','/sgoal/joint','/sstage/preg-plan','/sstage/over50','/tips?g=5','/myths?g=3','/schedule?t=sc2','/schedule?t=sc4','/pub/0','/pub/5']" +
                              ".concat(D.symptoms.map(s=>'/symptom/'+s.id)).concat(D.drugs.map(d=>'/drug/'+d.id)).concat(D.classes.map(c=>'/class/'+c.id)).concat(D.classes.map(c=>'/drugs?cat='+c.id)).concat((D.myths||[]).map(m=>'/myths?open='+m.id))")
         # 1~3. 모든 화면
         for r in routes:
@@ -1083,14 +1175,14 @@ def main():
         _fl = pg.evaluate("""()=>{
           const txt = document.getElementById('view').innerText;
           /* 칸의 문구는 조금씩 다르다 — 핵심 낱말로 본다 */
-          const need = {pregnant:'임신', ulcer:'위궤양', kidney:'신장', liver:'간 질환', heart:'심장',
+          const need = {pregnant:'임신', nursing:'수유', ulcer:'위궤양', kidney:'신장', liver:'간 질환', heart:'심장',
                         asthma:'천식', anticoag:'항응고', glaucoma:'녹내장', bph:'전립선', gout:'통풍', diabetes:'당뇨'};
           return Object.keys(need).filter(k => !txt.includes(need[k]));}""")
         if _fl: fails.append(f'내 정보에서 켤 수 없는 몸 상태가 있습니다: {_fl}')
         # 5a-10b. ClinicScore 문법(2026-09-29 현욱님) — 내 정보는 탭 셋, 건강 상태는 누르는 단추.
         #         누르면 그 자리에서 켜지고(맨 위로 튀지 않고) 「켜 둔 것」에 설명이 붙어야 한다.
         _mt = pg.evaluate("""()=>{
-          ['heart','diabetes','ulcer','kidney','liver','anticoag','glaucoma','bph','asthma','alcohol','gout','pregnant'].forEach(f=>{ME[f]=false;}); saveMe(); route();
+          ['heart','hf','diabetes','ulcer','kidney','liver','lvs','anticoag','glaucoma','bph','asthma','alcohol','gout','pregnant','nursing'].forEach(f=>{ME[f]=false;}); saveMe(); route();
           const tabs=[...document.querySelectorAll('.metabs .tab')].map(b=>b.innerText.trim().replace(/\\s*\\d+$/,''));
           window.scrollTo(0,400); const y=window.scrollY;
           const chip=[...document.querySelectorAll('.chip-m')].find(b=>b.innerText.includes('전립선비대')); chip.click();
@@ -1099,7 +1191,7 @@ def main():
           const off=ME.bph===false && !document.querySelector('.cond-on');
           return {tabs, on, desc, stay, off, chips:document.querySelectorAll('.chip-m').length};}""")
         if _mt['tabs'] != ['내 몸', '내 약통', '설정']: fails.append(f'내 정보 탭이 셋이 아닙니다: {_mt["tabs"]}')   # 3-20 이름 하나로 — 「먹는 약」 → 「내 약통」
-        if _mt['chips'] != 12 or not _mt['on'] or not _mt['off']: fails.append(f'건강 상태 단추가 켜지고 꺼지지 않습니다: {_mt}')
+        if _mt['chips'] != 16 or not _mt['on'] or not _mt['off']: fails.append(f'건강 상태 단추가 켜지고 꺼지지 않습니다: {_mt}')
         if '소변이 막힐 수' not in _mt['desc']: fails.append('건강 상태를 눌러도 「켜 둔 것」 설명이 안 붙습니다')
         if not _mt['stay']: fails.append('건강 상태를 누르면 화면이 맨 위로 튑니다')
         pg.goto(url + '#/me?t=meds'); ready(); pg.wait_for_timeout(300)
@@ -1108,17 +1200,18 @@ def main():
         _st = pg.inner_text('#view')
         for kw in ('글자 크기', '화면 밝기', '휴대폰을 바꾸실 때', '개인정보처리방침'):
             if kw not in _st: fails.append(f'내 정보 「설정」 탭에 {kw} 없음')
-        # 홈 — 탭을 누르면 그 묶음만. 전체 = 검수 끝난 증상 전부, 검수 대기는 따로
+        # 홈 — 탭을 누르면 그 묶음만. 전체 = 증상 전부(의사 확인 중은 이름표로 섞임)
         pg.goto(url + '#/home'); ready(); pg.wait_for_timeout(300)
         _hm = pg.evaluate("""()=>{
           const n=()=>document.querySelectorAll('#hlist .srow').length, S=D.symptoms||[];
           const tab=k=>{ const b=[...document.querySelectorAll('.htabs .tab')].find(x=>x.dataset.k===k); b.click(); return n(); };
-          const r={top:tab('top'), pain:tab('g:통증'), all:tab('all'), wait:tab('wait'),
-            wantPain:S.filter(s=>s.group==='통증'&&s.reviewed!==false).length, wantAll:S.filter(s=>s.reviewed!==false).length, wantWait:S.filter(s=>s.reviewed===false).length,
+          const r={top:tab('top'), pain:tab('g:허리·관절·근육'), all:tab('all'), wait:0, groups:[...document.querySelectorAll('.htabs .tab')].filter(x=>x.dataset.k.startsWith('g:')).length,
+            wantPain:S.filter(s=>s.group==='허리·관절·근육').length, wantAll:S.length, wantWait:0,
             oneOn:document.querySelectorAll('.htabs .tab.on').length};
           tab('top'); return r;}""")
         if _hm['top'] != 12: fails.append(f'홈 「자주 찾는」이 12가지가 아닙니다: {_hm["top"]}')
         if _hm['pain'] != _hm['wantPain'] or _hm['all'] != _hm['wantAll'] or _hm['wait'] != _hm['wantWait']: fails.append(f'홈 탭 목록 수가 어긋납니다: {_hm}')
+        if _hm['groups'] != 8: fails.append(f'홈 갈래가 몸 위치 8칸이 아닙니다: {_hm}')   # 10-19 몸 위치 8칸 · 「의사 확인 중」은 칸 안에 이름표로
         if _hm['oneOn'] != 1: fails.append('홈 탭에서 고른 것이 하나가 아닙니다')
         # 5a-10c. 증상·약 상세도 탭(2026-09-30 현욱님 「증상상세 약 상세도 잘 정리하자」) — 탭마다 내용이 있고 넘침·잘림이 없어야 한다
         for _r in ['/symptom/cold', '/symptom/bph', '/symptom/fever', '/drug/ibuprofen', '/drug/acetaminophen']:
@@ -1142,17 +1235,16 @@ def main():
         pg.goto(url + '#/symptom/cold'); ready(); pg.wait_for_timeout(300)
         if pg.evaluate("()=>{openCare();return getComputedStyle(document.getElementById('sp2')).display!=='none'&&document.querySelector('.tab[data-p=sp2]').classList.contains('on')}") is not True:
             fails.append('증상 화면: 「이럴 땐 병원으로」를 눌러도 병원 탭이 열리지 않습니다')
-        # 약학정보원 사진(2026-09-30 현욱님 「그냥 쓰자」) — 짝 자료가 있으면 그 사진·그 제품 페이지로, 없으면 식약처 사진·검색 화면
+        # 약학정보원 사진·제품 링크는 2026-10-21 저작권 점검으로 뺐다 — 사진은 식약처 것만, 약학정보원은 «이름으로 찾기» 링크만 남는다
         pg.goto(url + '#/pill'); ready(); pg.wait_for_timeout(300)
         _kp = pg.evaluate("""async()=>{ await pubPills(); const p=(PUB.pills||[]).find(x=>x.img); if(!p) return {skip:true};
-          const before=pillImg(p); KPIC={[p.seq]:['2013062800004','201306280000401.jpg']};
-          const after=pillImg(p); location.hash='#/pillinfo/'+p.seq; route();
-          const a=[...document.querySelectorAll('a.plink')].find(x=>/health\.kr/.test(x.href));
-          const r={before, after, link:a&&a.href}; KPIC={}; return r; }""")
+          const img=pillImg(p); location.hash='#/pillinfo/'+p.seq; route();
+          const a=[...document.querySelectorAll('a.plink')].find(x=>/health\\.kr/.test(x.href));
+          return {img, link:a&&a.href, kp:[...document.querySelectorAll('#view img')].some(x=>/health\\.kr/.test(x.src))}; }""")
         if not _kp.get('skip'):
-            if 'nedrug' not in (_kp['before'] or ''): fails.append(f'약학정보원 짝이 없을 때 식약처 사진을 안 씁니다: {_kp["before"]}')
-            if _kp['after'] != 'https://common.health.kr/shared/images/sb_photo/big3/201306280000401.jpg': fails.append(f'약학정보원 사진 주소가 틀립니다: {_kp["after"]}')
-            if 'result_drug.asp?drug_cd=2013062800004' not in (_kp['link'] or ''): fails.append(f'약학정보원 제품 페이지 링크가 없습니다: {_kp["link"]}')
+            if 'nedrug' not in (_kp['img'] or ''): fails.append(f'낱알 사진이 식약처 사진이 아닙니다: {_kp["img"]}')
+            if _kp['kp']: fails.append('약학정보원 사진이 화면에 다시 나옵니다(저작권 — KPIC_USE)')
+            if 'result_drug.asp' in (_kp['link'] or ''): fails.append(f'약학정보원 제품 페이지로 바로 잇습니다(이름으로 찾기만): {_kp["link"]}')
         # 식약처 제품 화면(e약은요) — 탭(약사 안내·허가 내용·성분 해설) 칸마다 내용이 있고 날것 코드(${)가 보이면 안 된다(2026-09-30)
         pg.goto(url + '#/pub/0'); ready(); pg.wait_for_timeout(1500)
         _pb = pg.evaluate("""()=>['pb1','pb2','pb3'].filter(k=>document.getElementById(k)).map(k=>{const t=document.getElementById(k).textContent; return [k, t.trim().length, t.includes('${')];})""")
@@ -1232,7 +1324,7 @@ def main():
         pg.goto(url + '#/symptom/cold'); ready(); pg.wait_for_timeout(400)
         _s = pg.evaluate("""()=>{
           /* 앞 검사가 켜 둔 몸 상태가 남아 있으면 「약사와 상의」 배지가 먼저 붙는다 — 비우고 본다 */
-          ['heart','diabetes','ulcer','kidney','liver','anticoag','glaucoma','bph','asthma','alcohol','gout','pregnant'].forEach(f=>{ME[f]=false;});
+          ['heart','hf','diabetes','ulcer','kidney','liver','lvs','anticoag','glaucoma','bph','asthma','alcohol','gout','pregnant','nursing'].forEach(f=>{ME[f]=false;});
           const has = a => { ME.age=a; ME.taking=[]; ME.pub={}; route();
             return [...document.querySelectorAll('.buy-item')]
               .some(e=>/이부프로펜|나프록센|덱시부프로펜/.test(e.innerText) && /어르신 주의/.test(e.innerText)); };
@@ -1245,7 +1337,7 @@ def main():
         #        같은 증상에 아세트아미노펜 칸이 있으면 그 칸이 1번. 증상 화면과 약국 카드(#/show)가 같은 순서.
         _q5 = pg.evaluate("""()=>{
           const keep = JSON.stringify(ME), bad = [], NS = /이부프로펜|나프록센|덱시부프로펜/;
-          ['diabetes','ulcer','kidney','liver','glaucoma','bph','asthma','alcohol','gout','pregnant'].forEach(f=>{ME[f]=false;});
+          ['diabetes','ulcer','kidney','liver','glaucoma','bph','asthma','alcohol','gout','pregnant','nursing'].forEach(f=>{ME[f]=false;});
           ME.age='senior'; ME.heart=true; ME.anticoag=true; ME.taking=[]; ME.pub={}; ME.allergy=[]; ME.allergyUnknown=false;
           for (const sid of ['headache','msk','cold']) {
             location.hash = '#/symptom/' + sid; route();
@@ -1291,7 +1383,7 @@ def main():
         if _n['errs']: fails.append(f'약 알림이 터집니다: {_n["errs"][:2]}')
         if not _n['fired']: fails.append('약 알림이 하나도 만들어지지 않습니다 — 시간이 돼도 안 옵니다')
         # 5b. 어르신 모드(글자 20px·큰 단추) — 넘침·잘림은 큰 글씨에서 먼저 터진다
-        pg.evaluate("localStorage.setItem('yakjido.fs','22px');localStorage.setItem('yakjido.me.v1',JSON.stringify({age:'senior',easy:true,view:'detail',taking:['cls:bp.arb','ibuprofen'],pub:{}}))")
+        pg.evaluate("localStorage.setItem('yakjido.fs','23px');localStorage.setItem('yakjido.me.v1',JSON.stringify({age:'senior',easy:true,view:'detail',taking:['cls:bp.arb','ibuprofen'],pub:{}}))")
         for r in SC + ['/bag', '/schedule', '/symptom/cramp', '/symptom/sprain', '/drug/acetaminophen', '/kinds/bp', '/vitals', '/visits', '/me?t=meds', '/me?t=set']:
             pg.goto(url + '#' + r); pg.reload(); ready(); pg.wait_for_timeout(500)
             o = pg.evaluate(OVERFLOW_JS)
@@ -1306,7 +1398,7 @@ def main():
             if o['ov']: fails.append(f'좁은 화면 가로 넘침 {r}: {o["ov"][:2]}')
             if o['clip']: fails.append(f'좁은 화면 글자 잘림 {r}: {o["clip"][:2]}')
         pg.set_viewport_size({'width': 390, 'height': 844})
-        pg.evaluate("localStorage.setItem('yakjido.fs','16px')")
+        pg.evaluate("localStorage.setItem('yakjido.fs','17px')")
         # 6. 병용 판정 시나리오 (이름 없이 종류로)
         CASES = [(['bp.arb', 'bp.diur'], '/symptom/arthritis', '콩팥'), (['blood.warf'], '/symptom/msk', '와파린'),
                  (['pros.alpha'], '/symptom/cold', '전립선'), (['dem.ache', 'blad.oab'], '/together', '치매약'), (['bp.any'], '/symptom/arthritis', '혈압약')]
@@ -1526,6 +1618,7 @@ def main():
         r2_checks(br, url, fails)
         r2a2_checks(br, url, fails)
         consent_checks(br, url, fails)
+        r5_checks(br, url, fails)
         # 6b-2. 성분표에 없던 공공 제품 — 클로닉신(먹는 소염제 26개 제품)·돔페리돈이 약통에서 실제로 걸려야 한다(2026-09-23)
         _pb = {'노리스정 + 와파린': ({'taking':['pub:1','cls:blood.warf'],'pub':{'pub:1':{'name':'노리스정','full':'노리스정(클로닉신리시네이트)','ingr':'클로닉신리시네이트','rx':0,'seq':'1','drugId':''}}}, 'warfarin-nsaid'),
                '노리스정 + 이부프로펜': ({'taking':['pub:1','ibuprofen'],'pub':{'pub:1':{'name':'노리스정','full':'노리스정','ingr':'클로닉신리시네이트','rx':0,'seq':'1','drugId':''}}}, 'nsaid-dup'),
@@ -1584,7 +1677,7 @@ def main():
             fails.append(f'추천 바구니가 스스로 겹침 {sid}: {msgs[0][:70]}')
         # 6c-2. 조건을 켠 바구니도(한 가지·두 가지 조합 전부) 스스로 겹치지 않는지 — 위 조건에서 감기 거담제가 구아이페네신으로 바뀌어
         #       「이 중 하나만」 묶음의 콜대원과 겹치던 것을 잡는다(2026-10-13)
-        pdup2 = pg.evaluate("""()=>{ const FL=['senior','ulcer','kidney','heart','anticoag','pregnant','liver','asthma','alcohol','glaucoma','bph','gout'];
+        pdup2 = pg.evaluate("""()=>{ const FL=['senior','ulcer','kidney','heart','anticoag','pregnant','nursing','liver','asthma','alcohol','glaucoma','bph','gout'];
           const cs=FL.map(a=>[a]); for(let i=0;i<FL.length;i++) for(let j=i+1;j<FL.length;j++) cs.push([FL[i],FL[j]]); const out=[];
           for(const fl of cs) for(const s of (D.symptoms||[])){ const m=planDup(basket(s,{flags:fl})); if(m.length) out.push(s.id+' ['+fl.join('+')+'] '+String(m[0]).slice(0,60)); }
           return out; }""")
@@ -1593,8 +1686,14 @@ def main():
         _pd = pg.evaluate("""()=>[planDup([{d:drug('ibuprofen'),slot:'가'},{d:drug('naproxen'),slot:'나'}]).length, planDup([{d:drug('ibuprofen'),slot:'가'},{d:drug('relax-combo'),slot:'나'}]).length]""")
         if _pd[0] == 0: fails.append('소염제 두 가지(이부프로펜+나프록센) 겹침 경고가 사라짐 — 규칙이 죽었는지 확인')
         if _pd[1] != 0: fails.append('이부프로펜+신신플렉스에 겹침 경고가 뜸 — 현욱님 답과 어긋남')
-        # 9. 날씨 카드
+        # 9-0. 기본은 Open-Meteo 끔(2026-10-21 약관: 무료는 비상업만) — 기상청 워커가 없으면 날씨 줄도, 바깥 요청도 없어야 한다
+        _om = [0]; pg.on('request', lambda r: 'open-meteo.com' in r.url and _om.__setitem__(0, _om[0] + 1))
+        pg.evaluate("localStorage.removeItem('yakjido.wx.v1')"); pg.goto(url + '#/home'); pg.reload(); ready(); pg.wait_for_timeout(1500)
+        if _om[0]: fails.append(f'Open-Meteo 를 껐는데 요청이 {_om[0]}번 나감')
+        if pg.evaluate("()=>!!document.querySelector('.wx')"): fails.append('날씨 받을 길이 없는데 날씨 줄이 보임')
+        # 9. 날씨 카드(스위치를 켠 상태에서 — 상업 요금제·기상청 워커가 생기면 같은 화면이 된다)
         pg.goto(url + '#/home'); pg.reload(); ready(); pg.wait_for_timeout(1000)
+        pg.evaluate("()=>{D.meta.openMeteo=true;WX_TRIED='';route()}"); pg.wait_for_timeout(1500)
         wx = pg.evaluate("()=>document.querySelector('.wx')?.innerText||''")
         for kw in ['일교차', '14℃', '미세먼지', '나쁨']:
             if kw not in wx: fails.append(f'날씨 카드에 "{kw}" 없음: {wx[:80]!r}')
@@ -1603,6 +1702,7 @@ def main():
         _NULL = json.dumps({'current': {'temperature_2m': None, 'apparent_temperature': None, 'relative_humidity_2m': None, 'weather_code': None}, 'daily': {'temperature_2m_max': [None], 'temperature_2m_min': [None]}})
         pg.route('**/api.open-meteo.com/**', lambda rt: rt.fulfill(status=200, content_type='application/json', body=_NULL if 'kma_seamless' in rt.request.url else FC))
         pg.evaluate("localStorage.removeItem('yakjido.wx.v1')"); pg.goto(url + '#/home'); pg.reload(); ready(); pg.wait_for_timeout(1500)
+        pg.evaluate("()=>{D.meta.openMeteo=true;WX_TRIED='';route()}"); pg.wait_for_timeout(1500)
         wx = pg.evaluate("()=>document.querySelector('.wx')?.innerText||''")
         if '0℃' in wx.split('\n')[0][:4] or '일교차 —' in wx or '14℃' not in wx: fails.append(f'기상청 모델이 빈 값을 보낼 때 날씨가 틀립니다: {wx[:80]!r}')
         pg.unroute('**/api.open-meteo.com/**')
@@ -1611,7 +1711,8 @@ def main():
         pg.unroute('**/api.open-meteo.com/**'); pg.unroute('**/air-quality-api.open-meteo.com/**')
         cnt = [0]
         pg.route('**/*open-meteo.com/**', lambda rt: (cnt.__setitem__(0, cnt[0] + 1), rt.abort()))
-        pg.evaluate("localStorage.removeItem('yakjido.wx.v1')"); pg.goto(url + '#/home'); pg.reload(); ready(); pg.wait_for_timeout(3000)
+        pg.evaluate("localStorage.removeItem('yakjido.wx.v1')"); pg.goto(url + '#/home'); pg.reload(); ready(); pg.wait_for_timeout(500)
+        pg.evaluate("()=>{D.meta.openMeteo=true;WX_TRIED='';route()}"); pg.wait_for_timeout(3000)
         if cnt[0] > 6: fails.append(f'날씨 실패 시 요청 반복 {cnt[0]}회/3초 (6회 이하여야)')
         wx = pg.evaluate("()=>document.querySelector('.wx')?.innerText||''")
         if '못 받았어요' not in wx: fails.append(f'날씨 실패 문구 없음: {wx[:60]!r}')
@@ -1621,14 +1722,17 @@ def main():
         # 10. 소아 용량 계산 — 아세트아미노펜 10~15 mg/kg(하루 75, 두 돌 전 60), 이부프로펜 5~10 mg/kg(하루 40), 상한
         #     우리집 소아과 계산기와 같은 식이다(현욱님 지시 2026-09-23) — 몸무게로 걸린 별도 한도는 두지 않는다.
         kd = pg.evaluate("()=>[[15,36],[8,5],[40,150],[10,20]].map(([w,m])=>['apap','ibu'].map(k=>{const r=kidDose(k,w,m);return [r.lo,r.hi,r.day]}))")
-        want = [[[150, 225, 1125], [75, 150, 600]], [[80, 120, 480], [40, 80, 320]], [[400, 600, 3000], [200, 400, 1600]], [[100, 150, 600], [50, 100, 400]]]
+        want = [[[150, 225, 1125], [75, 150, 500]], [[80, 120, 480], [40, 80, 320]], [[400, 600, 3000], [200, 250, 1000]], [[100, 150, 600], [50, 100, 400]]]   # 40 kg·150개월 이부프로펜 = 나이 표(만 11~14세 1회 250·하루 1,000 mg)로 «작은 쪽»(공통 숫자표, 10-22)
         if kd != want: fails.append(f'소아 용량 계산 불일치: {kd} ≠ {want}')
         # 10b. 우리집 소아과와 같은 답인지 — 그 앱의 doseRange 를 그대로 옮긴 식과 몸무게 4~70 kg 전부 비교.
         #      그리고 「하루 1번」 같은 횟수 문장·맥시부펜 계산 카드가 다시 생기면 안 된다.
         pg.goto(url + '#/kids'); ready(); pg.wait_for_timeout(400)
-        kc = pg.evaluate("""()=>{const DR={apap:{pk:[10,15],day:75,capDose:1000,capDay:4000},ibu:{pk:[5,10],day:40,capDose:400,capDay:2400}};
+        kc = pg.evaluate("""()=>{const DR={apap:{pk:[10,15],day:75,capDose:1000,capDay:4000},ibu:{pk:[5,10],day:40,capDose:400,capDay:1600}};
           const bad=[]; for(let w=4;w<=70;w+=0.5) for(const m of [12,48]) for(const k of ['apap','ibu']){ const D=DR[k];
-            const perKg=(k==='apap'&&m<24)?60:D.day; const lo=Math.round(Math.min(w*D.pk[0],D.capDose)), hi=Math.round(Math.min(w*D.pk[1],D.capDose)), day=Math.round(Math.min(w*perKg,D.capDay));
+            /* 우리집 소아과 doseRange(10-21 이부허가표 — 몸무게 셈과 나이 표 가운데 작은 쪽) 그대로 */
+            const 표=[[12,36,50,100,400],[36,84,100,150,600],[84,132,150,200,800],[132,180,200,250,1000]], 칸=k==='ibu'?(표.find(x=>m>=x[0]&&m<x[1])||null):null;
+            const 위끝=칸?Math.min(D.capDose,칸[3]):D.capDose;
+            const perKg=(k==='apap'&&m<24)?60:D.day; const lo=Math.round(Math.min(w*D.pk[0],위끝)), hi=Math.round(Math.min(w*D.pk[1],위끝)), day=Math.round(Math.min(w*perKg,D.capDay,칸?칸[4]:Infinity,(k==='ibu'&&w<30)?500:Infinity));
             const r=kidDose(k,w,m); if(r.lo!==lo||r.hi!==hi||r.day!==day) bad.push(k+' '+w+'kg '+[r.lo,r.hi,r.day]+' ≠ '+[lo,hi,day]); }
           ME.age='child'; ME.child={name:'',birth:'2016-03-01',weight:28}; route();
           const txt=document.getElementById('view').innerText; ME.age='adult'; ME.child={}; saveMe();

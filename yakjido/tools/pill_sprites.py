@@ -7,7 +7,7 @@
 
   · 일반약 낱알 5,660장 + 제품 사진(e약은요·productImages) → 140×76 작은 사진, 64장씩 한 판(8×8)
   · 알약은 모양·색 순으로 묶는다 — 낱알 검색은 모양·색으로 거르므로 한 번에 몇 판만 받으면 된다
-  · 낱알 사진은 위 눈금자·아래 띠를 잘라 알약만 크게. 제품 상자는 흰 바탕에 통째로.
+  · 낱알 사진은 위 눈금자만 자른다 — 아래 「약학정보원」 띠(찍은 곳 표시)는 남긴다(2026-10-21). 제품 상자는 흰 바탕에 통째로, 약학정보원 상자 사진은 빼고.
   · 받은 원본은 <out>/raw 에 두어 이어 돌릴 수 있게.
 
 사용:  python3 yakjido/tools/pill_sprites.py <out 폴더> [--workers 6]
@@ -38,8 +38,8 @@ def fetch(url, dst):
 
 def thumb(path, pill):
     im = Image.open(path).convert('RGB')
-    if pill:   # 식약처 낱알 사진: 위 눈금자(~9%)·아래 약학정보원 띠(~13%)를 잘라 알약만
-        w, h = im.size; im = im.crop((int(w * .02), int(h * .09), int(w * .98), int(h * .86)))
+    if pill:   # 식약처 낱알 사진: 위 눈금자(~9%)만 자른다. 아래 「약학정보원」 띠는 찍은 곳 표시라 남긴다(2026-10-21 저작권 점검 — 출처 지우기 금지)
+        w, h = im.size; im = im.crop((int(w * .02), int(h * .09), int(w * .98), h))
         r = max(W / im.width, H / im.height); im = im.resize((round(im.width * r), round(im.height * r)), Image.LANCZOS)
         l, t = (im.width - W) // 2, (im.height - H) // 2
         return im.crop((l, t, l + W, t + H))
@@ -60,6 +60,7 @@ def main():
         u = e.get('img') or ''
         if u.startswith('http') and u not in seen: jobs.append(('e:' + str(e.get('seq')), u, True)); seen.add(u)
     for name, v in json.loads((ROOT / 'content' / 'productImages.json').read_text(encoding='utf-8')).items():
+        if 'health.kr' in v.get('img', ''): continue   # 약학정보원 상자 사진은 싣지 않는다(2026-10-21 약관: 상업적 사용·복제 금지)
         if v.get('img', '').startswith('http') and v['img'] not in seen: jobs.append(('p:' + name, v['img'], 'itemImageDownload' in v['img'])); seen.add(v['img'])
     fn = lambda u: raw / (hashlib.sha1(u.encode()).hexdigest()[:16] + '.jpg')
     t0 = time.time(); ok = {}

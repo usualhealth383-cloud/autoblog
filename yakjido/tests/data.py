@@ -187,7 +187,7 @@ for d in D:
 
 # 「내 정보」 조건 이름은 정해진 13가지뿐이다. 없는 이름을 쓰면 그 주의는 «영원히 안 뜬다».
 # 실제로 달걀 알레르기에 없는 이름(allergy)을 쓴 곳이 있었다.
-VALID_FLAG = {'pregnant', 'ulcer', 'heart', 'anticoag', 'kidney', 'liver', 'alcohol',
+VALID_FLAG = {'pregnant', 'nursing', 'ulcer', 'bleed', 'heart', 'hf', 'lvs', 'anticoag', 'kidney', 'liver', 'alcohol',
               'asthma', 'glaucoma', 'bph', 'gout', 'diabetes', 'senior', 'child'}
 for d in D:
     for a in (d.get('avoid') or []) + (d.get('caution') or []):
@@ -310,13 +310,31 @@ for _pf in ('pills.json', 'pills-rx.json'):
 import gzip as _gz
 _idx = ROOT.parent / 'docs' / 'yakjido' / 'index.html'
 _core = ROOT.parent / 'docs' / 'yakjido' / 'data' / 'core.json'
+# 임신·수유 나눔(2026-10-19 3차 검수 #16) — 수유 줄이 빌드에서 생기고, 임신에만 해당하는 문장이 수유에 걸리지 않아야 한다
+if _core.exists():
+    _cd = {d['id']: d for d in json.loads(_core.read_text(encoding='utf-8')).get('drugs', [])}
+    _ib = _cd.get('ibuprofen', {})
+    if not any('nursing' in (e.get('flags') or []) for e in _ib.get('caution') or []): fails.append('이부프로펜에 수유 중 주의(설명서·LactMed)가 없습니다 — build.py 임신·수유 나눔')
+    for _d in _cd.values():
+        for _k in ('avoid', 'caution'):
+            for _e in _d.get(_k) or []:
+                if isinstance(_e, dict) and {'pregnant', 'nursing'} <= set(_e.get('flags') or []) and not re.search(r'수유|젖', _e.get('text', '')):
+                    fails.append(f'{_d["id"]}: 임신 문장이 수유에도 걸려 있습니다 — {_e.get("text", "")[:30]}')
 if _idx.exists():
     _b = _idx.read_bytes(); _gzkb = len(_gz.compress(_b, 6)) / 1024
     # 2026-10-13 220 → 224 KB: 복용 진행 고리·알약 그림·약국 쪽지 머리(디자인 리서치) +2 KB. 3G(초당 약 50 KB)에서 0.1초 미만.
     #   본문은 이미 data/core.json 으로 뺐고(askdoc 대답·약 tips 도 이날 뺌), 남은 것은 화면 코드다.
     # 2026-10-14 224 → 228 KB: 어르신 «간단히 보기»(현욱님 최우선 — 홈 큰 칸·증상 한 장·약 한 장·처음 안내 고르기) +3 KB. 화면 코드라 본문으로 뺄 수 없다.
-    if _gzkb > 228:
-        fails.append(f'첫 화면이 무겁습니다 — index.html 압축 {_gzkb:.0f} KB (한계 228 KB). 본문은 data/core.json 으로 빼야 합니다')
+    # 2026-10-21 229 → 230 KB: 외부 검수 3차 결과 P1 #4 판정(제품 설명서 금기만·「먼저 상의」 한 줄)·#7 그래프 글자·#9 응급 제목 — 안전 고침이라 화면 코드에 둔다.
+    # 2026-10-19 228 → 229 KB: 3차 외부 검수 P0 #1(응급 체크 뒤 한눈 보기 「약국」 줄·탭 이름 숨김) + 탭 aria-selected. 안전 고침이라 화면 코드에 둔다(+0.2 KB).
+    # 2026-10-21 230 → 232 KB: 외부 검수 4차 P0 #1(응급·금기 약을 팁·처방 탭·읽어 주기에서도 거르기)·#4 이름 줄기 고르기·#5 기준선 줄 — 안전 고침이라 화면 코드에 둔다.
+    # 2026-10-22 232 → 233 KB: 외부 검수 5차 #1·#2(위궤양 두 칸·상의 약 먹는 법 빼기·처방 조합 카드)·#3(고른 어린이 제품은 몸무게 계산) — 안전 고침이라 화면 코드에 둔다.
+    # 2026-10-29 233 → 234 KB: 현욱님 「로그인이 설정 안에 숨어 있으면 말이 되냐」 — 홈 머리 계정 단추(첫 그림에 있어야 해서 뺄 수 없다, +0.3 KB). 카드·서명 모양은 srv.js 로 옮김.
+    # 2026-10-29 정규식 뒤돌아보기((?<! (?<=)는 iOS 16.4 전 Safari 에서 스크립트 전체가 열리지 않는다(곁에 13곳 사고)
+    for _f in list(_idx.parent.glob('*.js')) + [_idx]:
+        if re.search(r'\(\?<[!=]', _f.read_text(encoding='utf-8', errors='ignore')): fails.append(f'옛 Safari 에서 멈추는 정규식 뒤돌아보기가 있습니다 — {_f.name}')
+    if _gzkb > 234:
+        fails.append(f'첫 화면이 무겁습니다 — index.html 압축 {_gzkb:.0f} KB (한계 234 KB). 본문은 data/core.json 으로 빼야 합니다')
     if not _core.exists():
         fails.append('docs/yakjido/data/core.json 이 없습니다 — 빌드를 다시 돌리세요')
     else:
@@ -498,6 +516,9 @@ for _name in ('lexicon', 'qa', 'nutrients', 'brands', 'mixes'):
     _raw = _p.read_text(encoding='utf-8')
     for _ch in '«»『』':
         if _ch in _raw: fails.append(f'data/{_name}.json 에 {_ch} 가 있습니다 — 메디나눔 글 규칙은 「 」'); break
+    # 2026-10-21 「~합니다」체 약 1,600곳을 「~해요」체로 바꿨다 — 다시 섞이지 않게(글 규칙: 해요체)
+    _hm = re.search(r'.{0,12}[가-힣]*(습니다|십시오)', _raw) or next((m for m in re.finditer(r'.{0,12}([가-힣])니다', _raw) if (ord(m.group(1)) - 0xAC00) % 28 == 17 and '메트로니다졸' not in m.group(0)), None)
+    if _hm: fails.append(f'data/{_name}.json 에 「~합니다」체가 있습니다 — 글 규칙은 해요체: «{_hm.group(0)}»')
     _bad = []
     def _lz(o, key, path):
         if isinstance(o, str):
@@ -642,6 +663,63 @@ for _m in _MIX:
             fails.append(f'같이 먹기 {_m["id"]} 출처 주소가 의약품안전나라 첫 화면·검색 화면입니다 — 품목 상세로')
 for _s in sorted(_MIX_SRC_PENDING - _mix_seen): fails.append(f'data.py _MIX_SRC_PENDING 의 「{_s[:40]}」 는 이제 mixes.json 에 없어요 — 지우세요')
 
+# 영양제 두 입구(10-20) — 성분·출처·증상 고리, 아이콘, 자리표시 남음 없음
+for _fn in ('suppGoals.json', 'suppStages.json'):
+    for _g in json.load(open(C / _fn, encoding='utf-8')):
+        _t = json.dumps(_g, ensure_ascii=False)
+        if re.search(r'MFDS:|_LINE|FOLATE_', _t): fails.append(f'{_fn} {_g["id"]}: 확인 전 자리표시가 남아 있습니다')
+        if _g.get('icon') and _g['icon'] not in icons: fails.append(f'{_fn} {_g["id"]}: 없는 아이콘 {_g["icon"]}')
+        if _g.get('symptom') and _g['symptom'] not in sid: fails.append(f'{_fn} {_g["id"]}: 없는 증상 {_g["symptom"]}')
+        for _x in (_g.get('picks') or []) + (_g.get('skip') or []):
+            if not str(_x['supp']).startswith('nut:') and _x['supp'] not in supid: fails.append(f'{_fn} {_g["id"]}: 없는 영양제 {_x["supp"]}')
+            src_ok(f'{_fn} {_g["id"]}', _x.get('src'))
+# 메디나눔 감사(10-22) — 본문 자료(content)에도 「~습니다·~십시오」가 1,456곳 남아 있었다 → 해요체로 바꿈. 「 」 안의 인용(허가 문구)과 출처는 빼고 본다
+_HM_SKIP = {'id', 'en', 'src', 'sources', 'url', 'label', 'k', 'kw', 'go', 'drug', 'supp', 'pick', 'options', 'icon', 'slot', 'flags'}
+def _hm_walk(o, f, key=''):
+    if isinstance(o, dict):
+        for k, v in o.items():
+            if k not in _HM_SKIP: _hm_walk(v, f, k)
+    elif isinstance(o, list):
+        for v in o: _hm_walk(v, f, key)
+    elif isinstance(o, str):
+        _m = re.search(r'[가-힣]{0,8}(습니다|십시오)', re.sub(r'「[^」]*」', '', o))
+        if _m: fails.append(f'{f} {key}: 「~합니다」체가 있습니다 — 해요체로: «{_m.group(0)}»')
+for _f in sorted(C.glob('*.json')):
+    if _f.name.startswith('sources'): continue
+    _hm_walk(json.loads(_f.read_text(encoding='utf-8')), _f.name)
+# 외부 검수 4차 #3(10-21) — 위보호 문구는 한 문장으로 맞췄다(현욱님 ⑪ 「위보호는 좁히기」). 옛 문턱(「소염제 3일 이상」·「속쓰림·위 부담을 덜려면」)이 다시 들어오지 않게
+for _f in sorted(C.glob('*.json')):
+    _t = _f.read_text(encoding='utf-8')
+    for _w in ('3일 이상 쓰거나', '3일 이상 먹거나', '속쓰림·위 부담을 덜려면 약국 파모티딘'):
+        if _w in _t: fails.append(f'{_f.name}: 옛 위보호 문구 「{_w}」 — 「65세 이상이시거나 피 묽게 하는 약·스테로이드를 함께 드시면 …」 한 문장으로')
+# 처방약 길잡이(10-22 현욱님 ③ 「출시 전에 혈압·당뇨·고지혈·수면·갑상선」) — 출처 고리·글 규칙·약 종류 고리
+_RX = json.load(open(C.parent / 'rxguide.json', encoding='utf-8'))
+_qsub = {x['id'] for g in json.load(open(C / 'ingredients.json', encoding='utf-8'))['quick'] for x in g['subs']}
+_qgrp = {g['id'] for g in json.load(open(C / 'ingredients.json', encoding='utf-8'))['quick']}
+for _id in _RX['order']:
+    _g = _RX['guides'].get(_id)
+    if not _g: fails.append(f'rxguide: order 의 {_id} 가 guides 에 없습니다'); continue
+    if _id not in _qgrp: fails.append(f'rxguide {_id}: 약 종류(ingredients.quick)에 없는 묶음')
+    for _f in ('title', 'lead', 'do', 'miss', 'er', 'src'):
+        if not _g.get(_f): fails.append(f'rxguide {_id}: {_f} 칸이 비었습니다')
+    for _k in _g.get('kinds') or []:
+        if _k['k'] not in _qsub: fails.append(f'rxguide {_id}: 없는 약 종류 {_k["k"]}')
+    def _rxw(o, path):
+        if isinstance(o, dict):
+            for k, v in o.items():
+                if k == 'src': src_ok(f'rxguide {path}', v)
+                elif k not in ('k', 'go'): _rxw(v, path + '.' + k)
+        elif isinstance(o, list):
+            for i, v in enumerate(o): _rxw(v, f'{path}[{i}]')
+        elif isinstance(o, str):
+            _t = re.sub(r'「[^」]*」', '', o)
+            if re.search('[«»『』]', o): fails.append(f'rxguide {path}: « » 『 』 금지')
+            if '무료' in o: fails.append(f'rxguide {path}: 「무료」 금지')
+            if re.search(r'(습니다|십시오|[가-힣]ㅂ니다)', _t) or next((m for m in re.finditer(r'([가-힣])니다', _t) if (ord(m.group(1)) - 0xAC00) % 28 == 17), None): fails.append(f'rxguide {path}: 「~합니다」체 — 해요체로')
+            _ab = re.search(r'(?<![A-Za-z])[A-Z]{2,}(?![A-Za-z])', _t)
+            if _ab: fails.append(f'rxguide {path}: 영어 약자 {_ab.group(0)}')
+            if re.search(r'\d(mg|g|mL|mmHg|kg)\b', o): fails.append(f'rxguide {path}: 숫자와 단위는 띄어 쓰기')
+    _rxw(_g, _id)
 print(f'증상 {len(S)} · 약 {len(D)} · 계열 {len(K)} · 영양제 {len(SUP)} · 팁 {len(T)} · 그런줄 {len(_MY)} · 규칙 {len(IX["rules"])} · 출처 {len(SRC)}')
 if fails:
     print('실패', len(fails)); [print('  ✗', f) for f in fails]; sys.exit(1)

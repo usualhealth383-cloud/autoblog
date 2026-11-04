@@ -9,11 +9,14 @@
                        판이 같으면 캐시 그대로, 판이 바뀌면 새로 받아 넣고 옛 판은 지운다(prune).
    판 없는 옛 주소는 «캐시 먼저» — 한 번 받은 것은 즉시 열리고, 뒤에서 조용히 새로 받아 둔다.
    인터넷이 안 되면 어느 캐시에든 있는 사본을 준다(5-01 — 첫 방문 뒤 비행기 모드에서 본문이 안 뜨던 것). */
-const CACHE = 'yakjido-2026-10-14-99dc9ab1';
+const CACHE = 'yakjido-2026-11-04T22:11-ab6c11f2';
 const DATA = 'yakjido-data-v1';
+/* 기내 모드·바깥 파일 0(10-27) — 글꼴(fonts/)·로그인 프로그램(vendor/)은 배포 묶음 안. 판이 박힌 꾸러미라 내용이 안 바뀌니 «캐시 먼저», 앱 판이 바뀌어도 지우지 않는다(EXT).
+   바깥 주소는 하나도 담지 않는다 — 서버 응답(supabase REST)·날씨는 그대로 지나간다(09-22 원칙) */
+const EXT = 'yakjido-ext-v1';
 /* 본문(core·detail)은 여기서 받지 않는다 — 첫 방문에 페이지가 이미 받은 것을 한 번 더 받던 것(5-03). 페이지가 워커에 연결되면 같은 주소로 다시 불러 캐시에 넣는다. */
 /* terms.html·privacy.html — 첫 동의 화면과 설정의 「약관·개인정보」가 앱 안에서 읽는다(비행기 모드에서도 열리게, 10-14) */
-const ASSETS = ['./', './index.html', './manifest.webmanifest', './srv.js', './find.js', './terms.html', './privacy.html', './icon-192.png', './icon-512.png', './icon-180.png', './icon-maskable-512.png'];
+const ASSETS = ['./', './index.html', './manifest.webmanifest', './srv.js', './find.js', './i18n.js', './terms.html', './privacy.html', './icon-192.png', './icon-512.png', './icon-180.png', './icon-maskable-512.png'];
 
 self.addEventListener('install', (e) => {
   /* HTTP 캐시를 건너뛰고 서버에서 새로 — 몇 시간 묵은 srv.js 가 새 캐시 이름에 갇히지 않게(5-03) */
@@ -23,7 +26,7 @@ self.addEventListener('activate', (e) => {
   e.waitUntil(caches.keys()
     /* 자료 캐시는 남긴다 — 이것까지 지우면 17 MB 를 다시 받게 된다.
        같은 주소(github.io)를 쓰는 다른 앱의 캐시는 건드리지 않는다 — 「yakjido-」로 시작하는 약지도 것만 지운다(2026-10-14 외부 검수 2차 #23) */
-    .then((keys) => Promise.all(keys.filter((k) => k.startsWith('yakjido-') && k !== CACHE && k !== DATA).map((k) => caches.delete(k))))
+    .then((keys) => Promise.all(keys.filter((k) => k.startsWith('yakjido-') && k !== CACHE && k !== DATA && k !== EXT).map((k) => caches.delete(k))))
     .then(() => self.clients.claim()));
 });
 
@@ -44,7 +47,11 @@ function netOrCache(req, net) {
 self.addEventListener('fetch', (e) => {
   if (e.request.method !== 'GET') return;
   const url = new URL(e.request.url);
-  if (url.origin !== location.origin) return;     // 폰트·날씨 같은 바깥 것은 건드리지 않는다
+  if (url.origin !== location.origin) return;     // 날씨·서버·지도 같은 바깥 것은 건드리지 않는다
+  if (/\/(fonts|vendor)\//.test(url.pathname)) {
+    e.respondWith(caches.open(EXT).then((c) => c.match(e.request, { ignoreVary: true }).then((hit) => hit || fetch(e.request).then((res) => { if (res && res.ok) c.put(e.request, res.clone()).catch(() => {}); return res; }))));
+    return;
+  }
 
   if (url.pathname.includes('/data/')) {
     const core = /\/data\/(core|detail)\.json$/.test(url.pathname);
@@ -81,6 +88,24 @@ self.addEventListener('fetch', (e) => {
   })());
 });
 
+/* 11-02 가족 알림 — 서버(yak-family-check)가 보낸 웹 푸시. 글은 약 이름 없이 「○○ · 오후 8:00 약 체크가 아직 없어요」 */
+self.addEventListener('push', (e) => {
+  let m = {}; try { m = e.data ? e.data.json() : {}; } catch (x) {}
+  /* 11-03 본인 정시 알림 — 앱 안 알림과 같은 tag(약id@HH:MM,…)라 앱이 열려 있어 둘 다 와도 한 장으로 합쳐진다. 「먹었어요」·「10분 뒤 다시」는 아래 notificationclick 이 그대로 처리 */
+  const KEY = /^[A-Za-z0-9가-힣_.:\-]{1,80}@([01]\d|2[0-3]):[0-5]\d(,[A-Za-z0-9가-힣_.:\-]{1,80}@([01]\d|2[0-3]):[0-5]\d){0,30}$/;
+  if (m.kind === 'dose' && KEY.test(m.key || '')) {
+    const day = /^\d{4}-\d{2}-\d{2}$/.test(m.day || '') ? m.day : '';
+    e.waitUntil(self.registration.showNotification(String(m.title || '약지도 · 약 드실 시간').slice(0, 60), {
+      body: String(m.body || '').slice(0, 200), tag: m.key, renotify: false, requireInteraction: true, icon: 'icon-192.png', badge: 'icon-192.png',
+      data: { key: m.key, day, go: '' }, actions: [{ action: 'took', title: String((m.acts || [])[0] || '먹었어요').slice(0, 20) }, { action: 'later', title: String((m.acts || [])[1] || '10분 뒤 다시').slice(0, 20) }] }));   // 단추 글도 본인 말로(11-03)
+    return;
+  }
+  const go = /^#\/notify(\?[a-z0-9=&]*)?$/.test(m.go || '') ? m.go : '#/notify?fam=1';
+  e.waitUntil(self.registration.showNotification(String(m.title || '약지도 가족 알림').slice(0, 60), {
+    body: String(m.body || '').slice(0, 200), tag: String(m.tag || 'yakjido-family').slice(0, 80), renotify: true,
+    icon: 'icon-192.png', badge: 'icon-192.png', data: { go } }));
+});
+
 /* 약 알림 — 안드로이드 크롬은 페이지의 new Notification() 을 막는다(서비스워커로만 띄울 수 있다).
    그래서 알림은 여기서 띄우고, 「먹었어요」를 누르면 앱을 열어 그 복용을 체크한다(2026-09-23).
    체크는 그 알림의 날짜로 적는다(5-16 — 밤 알림을 다음 날 아침에 눌러도 어제 것으로). */
@@ -91,13 +116,14 @@ self.addEventListener('notificationclick', (e) => {
   // Z6 — 「10분 뒤 다시」: 서비스워커는 10분을 기다려 주지 않아(브라우저가 몇 분 안에 멈춤) 열린 창에 타이머를 맡긴다. 창이 없으면 그 창을 열어 맡긴다
   const later = e.action === 'later' && d.key;
   const q = () => encodeURIComponent(d.key) + (d.day ? '&day=' + encodeURIComponent(d.day) : '');
-  const hash = took ? '#/schedule?tick=' + q() : later ? '#/schedule?later=' + q() : (d.go === '#/visits' ? '#/visits' : '#/schedule');   // 진료 예약 알림은 예약 화면으로(2026-10-13)
+  const goOk = /^#\/(visits|notify)(\?[a-z0-9=&]*)?$/.test(d.go || '');   // 진료 예약 알림 · 가족 알림(11-02)
+  const hash = took ? '#/schedule?tick=' + q() : later ? '#/schedule?later=' + q() : (goOk ? d.go : '#/schedule');   // 진료 예약 알림은 예약 화면으로(2026-10-13)
   e.waitUntil((async () => {
     /* 같은 주소의 다른 앱 창이 먼저 잡히던 것 — 이 워커가 맡은 범위(약지도 주소) 안의 창만 고른다. 없으면 약지도를 새로 연다(2026-10-14 외부 검수 2차 #24) */
     const all = (await self.clients.matchAll({ type: 'window', includeUncontrolled: true })).filter((c) => String(c.url || '').startsWith(self.registration.scope));
     for (const c of all) {
       if (later) { try { c.postMessage({ type: 'yakjido-later', key: d.key, day: d.day || '', title: e.notification.title || '', body: e.notification.body || '' }); } catch (x) {} return; }
-      if ('focus' in c) { try { c.postMessage({ type: 'yakjido-tick', key: took ? d.key : '', day: d.day || '', go: d.go === '#/visits' ? '/visits' : '' }); } catch (x) {} return c.focus(); }
+      if ('focus' in c) { try { c.postMessage({ type: 'yakjido-tick', key: took ? d.key : '', day: d.day || '', go: goOk ? d.go.slice(1) : '' }); } catch (x) {} return c.focus(); }
     }
     return self.clients.openWindow('./' + hash);
   })());

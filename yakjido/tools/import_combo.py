@@ -18,7 +18,7 @@ LEXP = ROOT.parent / 'docs' / 'yakjido' / 'data' / 'lexicon.json'
 # 약지도에 대응 증상이 없어 새로 넣는 것 (손으로 대조해 고름)
 NEW = ['sprain', 'tendon', 'plantar', 'coldsore', 'eczema', 'acne', 'vaginitis', 'pms', 'meno', 'fatigue']
 
-GROUP = {'근골격계': '통증', '피부': '알레르기·피부', '여성': '여성 건강', '기타': '수면·기타'}
+GROUP = {'근골격계': '허리·관절·근육', '피부': '피부·머리카락', '여성': '소변·생리·갱년기', '기타': '잠·마음·생활'}   # 10-19 몸 위치 8칸
 ICON = {'sprain': 'band', 'tendon': 'band', 'plantar': 'band', 'coldsore': 'cross', 'eczema': 'leaf',
         'acne': 'flower', 'vaginitis': 'drop', 'pms': 'moon', 'meno': 'temp', 'fatigue': 'leaf'}
 TAGS = {
@@ -85,7 +85,7 @@ def main():
                 plan.append({'slot': '처방', 'title': '병원에서는 이렇게 합니다',
                              'why': clean(dr.get('text')), 'options': opts, 'otc': False})
         s = {
-            'id': sid, 'group': GROUP.get(c['grp'], '수면·기타'), 'icon': ICON.get(sid, 'pill'),
+            'id': sid, 'group': GROUP.get(c['grp'], '잠·마음·생활'), 'icon': ICON.get(sid, 'pill'),
             'name': c['t'], 'short': c['s'], 'tags': TAGS.get(sid, []),
             'lead': clean(c.get('pharm', [''])[0]),
             'planTitle': c['t'] + ' — 이렇게 하세요', 'planLabel': c['s'],

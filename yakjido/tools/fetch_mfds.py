@@ -42,12 +42,12 @@ def _xml_items(raw):
     return int(root.findtext('.//totalCount') or 0), items
 
 
-def page(op, n, k, rows=ROWS, extra=None):
+def page(op, n, k, rows=ROWS, extra=None, tries=6, tmo=90):
     base = op if op.startswith('http') else BASE + op
     q = urllib.parse.urlencode({'serviceKey': k, 'pageNo': n, 'numOfRows': rows, 'type': 'json', '_type': 'json', **(extra or {})})
-    for i in range(6):
+    for i in range(tries):
         try:
-            with urllib.request.urlopen(urllib.request.Request(base + '?' + q, headers={'Accept': 'application/json'}), timeout=90) as r:
+            with urllib.request.urlopen(urllib.request.Request(base + '?' + q, headers={'Accept': 'application/json'}), timeout=tmo) as r:
                 raw = r.read().decode('utf-8')
             if raw.lstrip().startswith('<'):   # 키 오류·XML 만 주는 서비스(국립중앙의료원)
                 return _xml_items(raw)
@@ -59,7 +59,7 @@ def page(op, n, k, rows=ROWS, extra=None):
             return int(body.get('totalCount') or 0), items
         except RuntimeError: raise
         except Exception as e:
-            if i == 5: raise
+            if i == tries - 1: raise
             time.sleep(2 ** i)
 
 
@@ -163,6 +163,62 @@ def quasi(k):
     return out
 
 
+# 처방약 길잡이 출처를 식약처 원문으로(10-22 Main·현욱님 「내용 충실도 100 — ③근거」) — 성분마다 국내 대표 제품 하나의
+# 허가 상세(효능·용법·사용상의 주의사항)를 받아 yakjido/tools/rxlabels.json 에 둔다(앱에 싣지 않음 — 길잡이 글 대조용).
+# 상세 오퍼레이션 이름은 서비스 판마다 달라 아는 이름을 차례로 시도한다.
+RX_LABEL_SEQ = {'amlodipine': '200610660', 'losartan': '200811814', 'ramipril': '199200883', 'bisoprolol': '200008764',
+                'hctz': '196000008', 'metformin': '198500321', 'glimepiride': '199600863', 'sitagliptin': '200710758',
+                'empagliflozin': '201403744', 'simvastatin': '200807527', 'rosuvastatin': '200210097', 'levothyroxine': '197400278',
+                'zolpidem': '200700634', 'sertraline': '200511068', 'alprazolam': '200410869',
+                'apixaban': '201305918', 'rivaroxaban': '201201271', 'dabigatran': '201100747', 'clopidogrel': '200700907', 'warfarin': '200502107',
+                'alendronate': '200009061', 'ibandronate': '200607634', 'risedronate': '200200772', 'raloxifene': '200108676',
+                'esomeprazole': '200009026', 'lansoprazole': '199907311', 'tegoprazan': '201802815',
+                'budesonide_formoterol': '200109101', 'tiotropium': '200811444', 'salbutamol': '199906869'}
+DTL_OPS = ['DrugPrdtPrmsnInfoService08/getDrugPrdtPrmsnDtlInq07', 'DrugPrdtPrmsnInfoService08/getDrugPrdtPrmsnDtlInq08',
+           'DrugPrdtPrmsnInfoService07/getDrugPrdtPrmsnDtlInq06', 'DrugPrdtPrmsnInfoService06/getDrugPrdtPrmsnDtlInq05',
+           'DrugPrdtPrmsnInfoService05/getDrugPrdtPrmsnDtlInq04']
+
+
+def _doc_text(x):
+    """허가 문서 칸(EE_DOC_DATA·UD_DOC_DATA·NB_DOC_DATA)은 XML 글 — 태그를 걷고 문단만 남긴다"""
+    t = s(x).replace('<![CDATA[', '').replace(']]>', '')   # 문단 글은 CDATA 안에 있다 — 먼저 벗겨야 태그 지우기에 글이 같이 지워지지 않는다(10-22)
+    t = re.sub(r'<(PARAGRAPH|ARTICLE)[^>]*title="([^"]*)"[^>]*>', lambda m: '\n' + m.group(2) + '\n', t)
+    t = re.sub(r'<[^>]+>', '\n', t); t = t.replace('&nbsp;', ' ').replace('&lt;', '<').replace('&gt;', '>').replace('&amp;', '&')
+    return re.sub(r'\n\s*\n+', '\n', t).strip()
+
+
+def rx_labels(k, have=None):
+    out, op_ok = dict(have or {}), next((v.get('op') for v in (have or {}).values() if v.get('op')), None)   # 10-26 이미 받은 것은 건너뛰고(20분 제한), 지난번에 된 오퍼레이션부터
+    for key_, seq in RX_LABEL_SEQ.items():
+        if key_ in out and out[key_].get('seq') == seq: continue
+        for op in (([op_ok] + [o for o in DTL_OPS if o != op_ok]) if op_ok else DTL_OPS):
+            try:
+                n, items = page(op, 1, k, rows=1, extra={'item_seq': seq}, tries=2, tmo=25)
+            except Exception as e:
+                print('  ', op, '실패:', str(e)[:80]); continue
+            it = next((x for x in items if s(x.get('ITEM_SEQ')) == seq), items[0] if items else None)
+            if it and not (it.get('NB_DOC_DATA') or it.get('UD_DOC_DATA')) and it.get('NB_DOC_ID'):
+                print(f'   {key_} 문서 주소 모양: {str(it.get("NB_DOC_ID"))[:60]}')
+                # 10-26 새 허가 문서는 본문 칸이 비고 PDF 주소(…_DOC_ID)만 있다 — PDF 를 받아 글자를 뽑는다(pypdf)
+                for _c in ('EE', 'UD', 'NB'):
+                    try:
+                        import io as _io, pypdf as _pp
+                        _u = str(it[_c + '_DOC_ID']); _u = _u if _u.startswith('http') else 'https://nedrug.mfds.go.kr' + ('' if _u.startswith('/') else '/') + _u
+                        with urllib.request.urlopen(urllib.request.Request(_u, headers={'User-Agent': 'Mozilla/5.0'}), timeout=40) as _r: _b = _r.read()
+                        it[_c + '_DOC_DATA'] = '\n'.join((pg.extract_text() or '') for pg in _pp.PdfReader(_io.BytesIO(_b)).pages)
+                    except Exception as _e: print(f'   {key_} {_c} PDF 실패: {str(_e)[:80]}')
+            if not it or not (it.get('NB_DOC_DATA') or it.get('UD_DOC_DATA')): print(f'   {key_} {op.split("/")[-1]}: {n}건 · 문서 칸 {sorted(k_ for k_ in (it or {}) if "DOC" in k_)} · {[(k_, len(str(v_))) for k_, v_ in (it or {}).items() if "DOC" in k_]}')
+            if not it or not (it.get('NB_DOC_DATA') or it.get('UD_DOC_DATA')): continue
+            op_ok = op
+            out[key_] = {'seq': seq, 'name': s(it.get('ITEM_NAME')), 'entp': s(it.get('ENTP_NAME')), 'op': op,
+                         'ee': _doc_text(it.get('EE_DOC_DATA')), 'ud': _doc_text(it.get('UD_DOC_DATA')), 'nb': _doc_text(it.get('NB_DOC_DATA'))}
+            print(f'  {key_}: {out[key_]["name"]} — 주의사항 {len(out[key_]["nb"]):,}자')
+            break
+        else:
+            print(f'  {key_}: 받지 못함')
+    return out
+
+
 def main():
     only = sys.argv[sys.argv.index('--only') + 1] if '--only' in sys.argv else ''
     k = key(); today = datetime.date.today().isoformat()
@@ -206,6 +262,12 @@ def main():
             print(f'의약외품(정상) {len(Q):,}건')
         except (Exception, SystemExit) as e:
             print('의약외품 받기 실패 — 건너뜀:', e)
+    if only == 'labels':   # 전체 받기('')에는 넣지 않는다 — 따로 돌린다
+        _old = ROOT / 'tools' / 'rxlabels.json'
+        L = rx_labels(k, json.loads(_old.read_text(encoding='utf-8')).get('labels', {}) if _old.exists() else {})
+        if not L: sys.exit('처방약 허가 상세를 하나도 받지 못했습니다 — 오퍼레이션 이름 확인 필요')
+        (ROOT / 'tools' / 'rxlabels.json').write_text(json.dumps({'fetched': today, 'labels': L}, ensure_ascii=False, indent=1), encoding='utf-8')
+        print(f'처방약 허가 상세 {len(L)}/{len(RX_LABEL_SEQ)} → yakjido/tools/rxlabels.json'); return
     meta_p.write_text(json.dumps(meta, ensure_ascii=False, indent=1), encoding='utf-8')
 
 
