@@ -1,7 +1,7 @@
 // 소아·곁에 알림 판정(순수 함수 · 11-04) — 시험: yakjido/tests/push_kids_gyeote.mjs
 // 소아 기록 records(app='kids', key='kh.remind@<아이>') = { on, next: { acet?: ISO, ibu?: ISO }, tz, lang }
 //   next = 그 해열제를 «다시 먹일 수 있는 가장 이른 시각»(앱이 마지막 먹인 시각 + 간격으로 계산해 올림). 양·아이 이름은 알림에 넣지 않는다.
-// 곁에 기록 records(app='gyeote', key='gy.remind') = { on, times: ['HH:MM', …], tz, lang }  — 약 이름 없이 「약 드실 시간」만.
+// 곁에 복약은 곁에 형식(gyeote_pushset.dose)이라 gyeote_logic.ts 에 있다(11-04 곁에 세션 요청).
 import { localNow, validTz } from './yak_logic.ts';
 export const WIN = 3;                 // ±3분(5분마다 확인 · 같은 일은 mn_push_sent 로 한 번)
 export const KIDS_PER_DAY = 12;       // 받는 사람 한 명당 하루 상한(아세트아미노펜 5 + 이부프로펜 4 보다 넉넉히)
@@ -34,25 +34,5 @@ export function kidsMessage(ing: 'acet' | 'ibu', l = 'ko') {
     ja: ['解熱剤の時間', `${n}をまた飲ませてよい時間です。熱がなく元気に遊んでいれば、飲ませなくても大丈夫です。`],
     zh: ['退烧药时间', `现在可以再次给${n}了。如果没有发烧、玩得很好，不一定要给。`] };
   return { title: t[l][0], body: t[l][1] };
-}
-/** 곁에 — 지금 ±WIN 분 안의 복약 시각(같은 시각 여러 개는 하나) */
-export function gyeoteDue(rem: any, now: Date) {
-  if (!rem || rem.on !== true || !Array.isArray(rem.times)) return [];
-  const n = localNow(now, tzOf(rem.tz)), seen = new Set<string>(), out: { day: string; slot: string }[] = [];
-  for (const s of rem.times) {
-    const m = /^([01]\d|2[0-3]):([0-5]\d)$/.exec(String(s)); if (!m) continue;
-    const t = +m[1] * 60 + +m[2]; let d = n.min - t, day = n.day;
-    if (d > 720) d -= 1440; if (d < -720) d += 1440;   // 자정 넘김(23:59 ↔ 00:01)
-    if (Math.abs(d) > WIN || seen.has(s)) continue;
-    if (n.min - t < -720) { const x = new Date(Date.parse(n.day + 'T00:00:00Z') - 86400000); day = x.toISOString().slice(0, 10); }   // 00:01 에 본 23:59 → 어제 몫
-    if (n.min - t > 720) { const x = new Date(Date.parse(n.day + 'T00:00:00Z') + 86400000); day = x.toISOString().slice(0, 10); }   // 23:59 에 본 00:01 → 내일 몫
-    seen.add(s); out.push({ day, slot: s });
-  }
-  return out;
-}
-export function gyeoteMessage(l = 'ko') {
-  l = lang(l);
-  return ({ ko: { title: '곁에', body: '약 드실 시간이에요.' }, en: { title: 'Gyeote', body: 'It’s time to take your medicine.' }, es: { title: 'Gyeote', body: 'Es hora de tomar su medicamento.' },
-    ja: { title: 'Gyeote', body: 'お薬の時間です。' }, zh: { title: 'Gyeote', body: '该吃药了。' } } as Record<string, { title: string; body: string }>)[l];
 }
 export { lang as pickLang };

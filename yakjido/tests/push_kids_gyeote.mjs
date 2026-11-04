@@ -1,5 +1,6 @@
 // 소아·곁에 알림 판정 시험 — node --experimental-strip-types yakjido/tests/push_kids_gyeote.mjs
-import { kidsDue, kidsMessage, gyeoteDue, gyeoteMessage, WIN } from '../server/supabase/functions/mn-push-check/modules/kg_logic.ts';
+import { kidsDue, kidsMessage, WIN } from '../server/supabase/functions/mn-push-check/modules/kg_logic.ts';
+import { due, text } from '../server/supabase/functions/mn-push-check/modules/gyeote_logic.ts';
 let bad = 0, n = 0; const ok = (c, m) => { n++; if (!c) { bad++; console.log('✗', m); } };
 const T = s => new Date(s);
 // 소아
@@ -23,23 +24,21 @@ ok(kidsDue({ on: true, next: { acet: '2026-11-04T23:00:00Z' }, tz: 'Bad/Zone' },
 // 글: 성분 이름만, 숫자(양) 없음
 for (const l of ['ko', 'en', 'es', 'ja', 'zh', 'xx']) { const m = kidsMessage('ibu', l); ok(m.title && m.body && !/\d/.test(m.body), '소아 글 ' + l); }
 ok(/이부프로펜/.test(kidsMessage('ibu', 'ko').body), '성분 이름');
-// 곁에
-const g = { on: true, times: ['08:00', '21:00', '08:00'], tz: 'Asia/Seoul', lang: 'ko' };
-ok(gyeoteDue(g, T('2026-11-03T23:00:00Z')).length === 1, '08:00 서울 = 23:00Z 한 건(같은 시각 겹침 하나)');
-ok(gyeoteDue(g, T('2026-11-03T23:02:00Z')).length === 1, '+2분');
-ok(gyeoteDue(g, T('2026-11-03T23:05:00Z')).length === 0, '+5분 밖');
-ok(gyeoteDue({ ...g, on: false }, T('2026-11-03T23:00:00Z')).length === 0, '곁에 끈 사람 안 감');
-ok(gyeoteDue({ on: true, times: ['25:00', 'x'] }, T('2026-11-03T23:00:00Z')).length === 0, '이상한 시각 무시');
-const a = gyeoteDue({ on: true, times: ['23:59'], tz: 'Asia/Seoul' }, T('2026-11-04T15:01:00Z'))[0];   // 서울 00:01 에 본 23:59
-ok(a && a.day === '2026-11-04' && a.slot === '23:59', '00:01 에 본 23:59 → 어제 몫 ' + JSON.stringify(a));
-const b = gyeoteDue({ on: true, times: ['00:01'], tz: 'Asia/Seoul' }, T('2026-11-04T14:59:00Z'))[0];   // 서울 23:59 에 본 00:01
-ok(b && b.day === '2026-11-05' && b.slot === '00:01', '23:59 에 본 00:01 → 내일 몫 ' + JSON.stringify(b));
-// 중복: 5분마다 확인 — 같은 시각은 같은 (day, slot) 이라 mn_push_sent 가 한 번만 받는다
-const s1 = gyeoteDue(g, T('2026-11-03T22:58:00Z'))[0], s2 = gyeoteDue(g, T('2026-11-03T23:03:00Z'))[0];
-ok(s1 && s2 && s1.day === s2.day && s1.slot === s2.slot, '두 번 확인해도 같은 열쇠(중복 막힘)');
+// 곁에 — 곁에 형식(gyeote_pushset.dose · 11-04) · 정한 시각부터 WINDOW 안 첫 확인에 한 번
+const set = { v: 1, tz: 'Asia/Seoul', dose: { on: true, times: ['08:30', '21:00', '08:30'] } };
+const D = (iso) => due(set, {}, {}, null, T(iso)).list.filter((x) => x.kind === 'dose');
+ok(D('2026-11-03T23:30:00Z').length === 1 && D('2026-11-03T23:30:00Z')[0].slot === '08:30', '08:30 서울 한 건(같은 시각 겹침 하나)');
+ok(D('2026-11-03T23:34:00Z').length === 1, '+4분(5분 확인)');
+ok(D('2026-11-03T23:29:00Z').length === 0, '1분 전 안 감');
+ok(due({ ...set, dose: undefined }, {}, {}, null, T('2026-11-03T23:30:00Z')).list.length === 0, '끈 사람(칸 빠짐) 안 감');
+ok(due({ ...set, dose: { on: false, times: ['08:30'] } }, {}, {}, null, T('2026-11-03T23:30:00Z')).list.length === 0, 'on:false 안 감');
+ok(due({ ...set, dose: { on: true, times: ['8:30', 'x'] } }, {}, {}, null, T('2026-11-03T23:30:00Z')).list.length === 0, '이상한 시각 무시');
+const d1 = D('2026-11-03T23:31:00Z')[0], d2 = D('2026-11-03T23:36:00Z')[0];
+ok(d1 && d2 && d1.slot === d2.slot && due(set, {}, {}, null, T('2026-11-03T23:31:00Z')).day === due(set, {}, {}, null, T('2026-11-03T23:36:00Z')).day, '두 번 확인해도 같은 열쇠(중복 막힘)');
+ok(due({ ...set, tz: 'America/New_York' }, {}, {}, null, T('2026-11-04T13:30:00Z')).list.some((x) => x.kind === 'dose' && x.slot === '08:30'), '뉴욕 08:30');
+for (const l of ['ko', 'en', 'es', 'ja', 'zh']) { const m = text('dose', l); ok(m.body && m.title && m.tag === 'gyeote-dose' && !/\d/.test(m.body), '곁에 복약 글 ' + l); }
 const k1 = kidsDue(rem, T('2026-11-04T10:58:00Z'))[0], k2 = kidsDue(rem, T('2026-11-04T11:03:00Z'))[0];
 ok(k1 && k2 && k1.slot === k2.slot && k1.day === k2.day, '소아 두 번 확인 같은 열쇠');
-for (const l of ['ko', 'en', 'es', 'ja', 'zh']) ok(gyeoteMessage(l).body && !/\d/.test(gyeoteMessage(l).body), '곁에 글 ' + l);
 ok(WIN === 3, '창 ±3분');
 console.log(bad ? `✗ ${bad}개 실패` : `✓ 소아·곁에 알림 판정 ${n}가지(시간대·자정 넘김·중복·끈 사람)`);
 process.exit(bad ? 1 : 0);
