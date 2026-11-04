@@ -173,7 +173,8 @@ RX_LABEL_SEQ = {'amlodipine': '200610660', 'losartan': '200811814', 'ramipril': 
                 'apixaban': '201305918', 'rivaroxaban': '201201271', 'dabigatran': '201100747', 'clopidogrel': '200700907', 'warfarin': '200502107',
                 'alendronate': '200009061', 'ibandronate': '200607634', 'risedronate': '200200772', 'raloxifene': '200108676',
                 'esomeprazole': '200009026', 'lansoprazole': '199907311', 'tegoprazan': '201802815',
-                'budesonide_formoterol': '200109101', 'tiotropium': '200811444', 'salbutamol': '199906869'}
+                'budesonide_formoterol': '200109101', 'tiotropium': '200811444', 'salbutamol': '199906869',
+                'propranolol': '197400040', 'allopurinol': '197000050', 'imidafenacin': '200812014'}   # 11-05 원문 대조(편두통·떨림 효능 · 유전자 문구 · 항콜린 부담)
 DTL_OPS = ['DrugPrdtPrmsnInfoService08/getDrugPrdtPrmsnDtlInq07', 'DrugPrdtPrmsnInfoService08/getDrugPrdtPrmsnDtlInq08',
            'DrugPrdtPrmsnInfoService07/getDrugPrdtPrmsnDtlInq06', 'DrugPrdtPrmsnInfoService06/getDrugPrdtPrmsnDtlInq05',
            'DrugPrdtPrmsnInfoService05/getDrugPrdtPrmsnDtlInq04']
