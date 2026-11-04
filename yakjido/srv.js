@@ -2802,14 +2802,14 @@ try { 이용량.설치({ 앱: 'yakjido', 켜짐: false, 주소: 'https://uszalzc
      화면: 설정판.HTML()  — 시트 맨 위 제목 아래에 통째로.
    ⛔ 지우기·계정 지우기는 앱의 확인 화면으로만 간다(이 부품이 직접 지우지 않는다).
    ── 공용 부품 셋(위기번호 표 · 설정 부품 · 응급카드 부품) 공통 약속 · 주인: 길동무 세션 ──
-   판: 이 파일 안 «판» 한 곳(코드의 판 값). 고치면 판을 올리고 다섯 앱에 다시 심는다. 지금 판 2026-11-04f.
+   판: 이 파일 안 «판» 한 곳(코드의 판 값). 고치면 판을 올리고 다섯 앱에 다시 심는다. 지금 판 2026-11-04g.
    심는 순서(앱마다 같다): ① 위기번호 표 → ② 설정 부품 → ③ 응급카드 부품 — 표가 앞에 있어야 말과 나라 고르개·응급 번호가 표를 쓴다.
    심기·비교: python3 _도구/공용부품_심기.py 비교 · python3 _도구/공용부품_심기.py <소아|곁에|길동무|CS> · 다른 저장소(약지도): python3 _도구/공용부품_심기.py 파일 <경로>
    ⛔ 앱 사본을 직접 고치지 않는다 — 이 파일을 고치고 다시 심는다(심기 스크립트는 정본과 다른 사본을 보면 멈춘다).
 */
 (function () {
   if (window.설정판 && window.설정판.__v) return;
-  var 판 = '2026-11-04f';   /* 11-04f 제목·설명 이스케이프 · 11-04e 기본 줄 값 이스케이프 · 11-04d 머리 주석 정리 */
+  var 판 = '2026-11-04g';   /* 11-04g 응급번호()·번호HTML() · 11-04f 제목·설명 이스케이프 · 11-04e 기본 줄 값 이스케이프 · 11-04d 머리 주석 정리 */
   var 설정 = { app: 'app', 언어: null, 줄: null, 아이콘: null, 다시그리기: null };
   var 글표 = {
     ko: { 맞추기: '나에게 맞추기', 알림: '알림', 화면: '화면과 언어', 기록: '내 기록', 앱: '이 앱',
@@ -2977,6 +2977,25 @@ try { 이용량.설치({ 앱: 'yakjido', 켜짐: false, 주소: 'https://uszalzc
     try { if (typeof o.바꿈 === 'function') o.바꿈(새, 새.lang !== 말(), !옛 || 옛.country !== 새.country); } catch (e) {}
     다시();
   }
+  /* 11-04g — 동의 전 첫 화면에서도 쓰는 «사는 나라 응급 번호» 한 곳(Main · CS·소아·약지도가 부른다)
+     나라: ① mn.place.country(말과 나라에서 고른 값) ② 시간대·기기 지역 짐작 — 자동 시험(navigator.webdriver)이고 고른 값이 없으면 한국(곁에 약속)
+     번호: 공용 위기번호 표(window.메디나눔위기번호 — 표가 앞에 심겨 있어야 한다). 표 밖·번호 null 이면 번호 없음 → 누르는 단추 없이 「현지 응급 번호」 글.
+     설정판.응급번호() → { 나라, 이름, 응급, 경찰, 위기1, 위기2, 고름 }   (번호는 '119' 같은 글 또는 null · 고름: 사용자가 고른 나라인지)
+     설정판.번호HTML('응급'|'경찰'|'위기1'|'위기2', 꾸밈) → 번호가 있으면 <a href="tel:…">번호</a>, 없으면 그 말의 「현지 응급 번호」 글(링크 없음) */
+  var 현지 = { ko: '현지 응급 번호', en: 'the local emergency number', es: 'el número de emergencias local', ja: '現地の救急番号', zh: '当地急救电话' };
+  function 응급번호() {
+    var 곳 = 곳읽기(), c = 곳 && 곳.country, 고름 = !!c;
+    if (!c) c = navigator.webdriver ? 'KR' : 나라짐작();
+    var 표 = 공용표() || {}, N = 표[c] || 표.XX || {};
+    if (!표[c]) c = 'XX';
+    var 위 = (N.위기 || []).filter(Boolean), 응 = N.응급 || null;
+    return { 나라: c, 이름: (N.이름 && (N.이름[말()] || N.이름.en)) || '', 응급: 응, 경찰: N.경찰 || 응, 위기1: 위[0] || 응, 위기2: 위[1] || 위[0] || 응, 고름: 고름 };
+  }
+  function 번호HTML(k, 꾸밈) {
+    var n = 응급번호()[k || '응급'];
+    if (!n) return '<span class="ms-local">' + 현지[말()] + '</span>';
+    return '<a href="tel:' + esc(String(n).replace(/[^\d+]/g, '')) + '"' + (꾸밈 ? ' class="' + esc(꾸밈) + '"' : '') + '>' + esc(n) + '</a>';
+  }
   function 곳줄() {
     var o = 설정.말과나라; if (!o) return ''; 표합치기(); var v = 곳읽기();
     var 값글 = v ? (나라이름[v.country] || 나라이름.XX)[칸(말())] + (v.level === 'ok' ? '' : ' · ' + 곳('수준들')[v.level === 'some' ? 1 : 2]) : 곳('안정함');
@@ -3012,7 +3031,8 @@ try { 이용량.설치({ 앱: 'yakjido', 켜짐: false, 주소: 'https://uszalzc
     말과나라고름: function (k, v) { if (!고르는중) return; 고르는중[k] = v; if (k !== 'level') { if (!수준묻나(고르는중)) 고르는중.level = 'ok'; else if (고르는중.level === 'ok') 고르는중.level = ''; } 곳그림(); },
     말과나라확인: function () { if (곳읽기() || navigator.webdriver || document.getElementById('mnPlace')) return false; 곳열기(); return true; },
     나라이름: function (k, l) { 표합치기(); var n = 나라이름[k]; return n ? n[칸(l || 말())] : ''; },
-    말이름: function (k, l) { var n = 말이름들[k]; return n ? n[칸(l || 말())] : ''; }
+    말이름: function (k, l) { var n = 말이름들[k]; return n ? n[칸(l || 말())] : ''; },
+    응급번호: 응급번호, 번호HTML: 번호HTML
   };
 })();
 /* ▲▲ 설정 부품 끝 ▲▲ */
