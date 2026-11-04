@@ -1964,7 +1964,7 @@ function mergeCore(c){
   }
   /* 나머지 칸은 통째로 받는다 — 새 자료를 core 로 빼도 여기를 또 고칠 필요가 없게 */
   for (const k of Object.keys(c)) if (!['symptoms', 'drugs', 'supplements', 'classes', 'tips', 'askdoc'].includes(k)) D[k] = c[k];
-  CORE = 2; window.__READY__ = true; SEARCH_CORPUS = '';   /* 본문이 오면 검색 말뭉치를 새로(영어 이름·쓰임 칸은 본문에 있다, 10-14) */
+  CORE = 2; window.__READY__ = true; SEARCH_CORPUS = '';
   /* Z6 — 알림 글(약 이름·「물 한 컵과 함께」)은 본문 자료가 있어야 맞다. 본문이 늦게 왔으면 알림을 한 번 다시 건다 */
   setTimeout(() => { try { if ((ME.taking || []).length) armNotifications(); } catch (e) {} }, 0);
   /* 첫 화면을 이미 그린 뒤에 자료가 왔다면 — 약통 개수처럼 본문이 있어야 맞는 것들을 다시 그린다 */
@@ -2496,11 +2496,9 @@ const LANG = (() => { try { const v = MP.lang || localStorage.getItem('yakjido.l
 /* 나라 = 응급 번호: ① 말과 나라(mn.place) ② 고른 나라 ③ 시간대 ④ 언어 꼬리. 표 밖 → XX(112) */
 const CC = (() => { try { const v = MP.country || localStorage.getItem('yakjido.cc'); if (v) return v; } catch (e) {}
   let tz = ''; try { tz = Intl.DateTimeFormat().resolvedOptions().timeZone || ''; } catch (e) {}
-  if (tz) { if (tz === 'Asia/Seoul') return 'KR'; if (tz === 'Asia/Tokyo') return 'JP'; if (/^Asia\/(Shanghai|Chongqing|Chungking|Harbin|Urumqi|Kashgar)$|^PRC$/.test(tz)) return 'CN';
-    if (/^(Europe\/Madrid|Atlantic\/Canary|Africa\/Ceuta)$/.test(tz)) return 'ES';
-    if (/^America\/(New_York|Chicago|Denver|Los_Angeles|Phoenix|Anchorage|Juneau|Sitka|Metlakatla|Yakutat|Nome|Adak|Boise|Detroit|Menominee|Indiana\/.+|Kentucky\/.+|North_Dakota\/.+)$|^Pacific\/Honolulu$|^US\//.test(tz)) return 'US';
-    if (tz !== 'UTC' && tz !== 'Etc/UTC') return 'XX'; }
-  const m = (navigator.language || '').match(/-([A-Za-z]{2})\b/); return m ? m[1].toUpperCase() : ({ ko:'KR', en:'US', es:'ES', ja:'JP', zh:'CN' })[LANG]; })();
+  /* 11-04 시간대로만(공용 나라짐작 표) · 모르면 XX — 기기 언어로 짐작하지 않는다 */
+  const S = ' Asia/Seoul KR Asia/Tokyo JP Asia/Shanghai CN Asia/Chongqing CN Asia/Urumqi CN Asia/Hong_Kong HK Europe/Madrid ES Atlantic/Canary ES Africa/Ceuta ES America/Mexico_City MX America/Monterrey MX America/Merida MX America/Cancun MX America/Chihuahua MX America/Mazatlan MX America/Hermosillo MX America/Tijuana MX Europe/London GB Asia/Manila PH Asia/Kolkata IN Asia/Calcutta IN Asia/Ho_Chi_Minh VN Asia/Saigon VN Asia/Bangkok TH Asia/Jakarta ID Asia/Makassar ID Asia/Jayapura ID Asia/Kathmandu NP Asia/Katmandu NP Asia/Tashkent UZ Asia/Samarkand UZ Asia/Phnom_Penh KH Asia/Ulaanbaatar MN Asia/Ulan_Bator MN Asia/Colombo LK Asia/Dhaka BD ', k = S.indexOf(' ' + tz + ' ');
+  return tz && k >= 0 ? S.substr(k + tz.length + 2, 2) : /^America\/(New_York|Chicago|Denver|Los_Angeles|Phoenix|Anchorage|Juneau|Sitka|Nome|Adak|Boise|Detroit|Menominee|Indiana|Kentucky|North_Dakota)\b|^Pacific\/Honolulu$|^US\//.test(tz) ? 'US' : 'XX'; })();
 window.LANG = LANG; window.CC = CC;
 function setLang(l, cc){ try { localStorage.setItem('yakjido.lang', l); if (cc) localStorage.setItem('yakjido.cc', cc); } catch (e) {} location.reload(); }
 if (LANG !== 'ko' || CC !== 'KR') { const s = document.createElement('script'); s.src = 'i18n.js'; document.head.appendChild(s); }
@@ -2532,7 +2530,7 @@ function route(){
   /* 10-14 제품 화면 하나로 — 약지도 약 화면의 제품이면 그 화면으로 바꿔 연다(뒤로 가기가 여기로 되돌아오지 않게 replace). 제품 사전이 와야 판정한다 */
   if (seg[0] === 'brand' && seg[1] && LEX.brand) { const t = prodTarget(decodeURIComponent(seg[1])); if (t[1] === 'd') { if (HIST[HIST.length - 1] === path) HIST.pop(); location.replace(location.href.split('#')[0] + '#' + t); return; } }
   /* 영양제 상세도 음식·필요량 칸이 detail.json 에 있다 */
-  if ((seg[0] === 'drug' || seg[0] === 'class' || (seg[0] === 'supp' && seg[1])) && DETAIL < 2 && !window.__DETAIL_SKIP__) {   /* 계열 비교의 표·알아두면 좋은 것도 detail(10-14) */
+  if ((seg[0] === 'drug' || seg[0] === 'class' || (seg[0] === 'supp' && seg[1])) && DETAIL < 2 && !window.__DETAIL_SKIP__) {
     /* 실패했으면 두 칸 없이 그리고, 다음에 다시 받아 본다 */
     if (DETAIL === 3) { window.__DETAIL_SKIP__ = true; ensureDetail(); }
     else { view.innerHTML = topBar({ back:'뒤로', nosearch:true }) + `<section class="sec"><p class="loading">자료를 불러오는 중이에요…</p></section>`; ensureDetail().then(route); return; }
@@ -2686,7 +2684,7 @@ function fmt(t){ return esc(t).replace(/\*\*(.+?)\*\*/g, '<b>$1</b>').replace(/\
     (m, w, cb, sp, num) => `${w}${cb || ''}${sp}<a class="call-in" href="tel:${num}">${num}</a>`)
   /* 119 는 본문 어디에 나와도 누르면 걸리게. 이 앱의 모든 119 는 «지금 전화하세요»라는 뜻이고,
      용량·개수로 119 가 쓰인 곳은 없다(검사로 확인). 이미 링크가 된 것은 건드리지 않는다. */
-  .replace(/119(?![\d-])/g, (m, i, all) => /(tel:|[\d>-])$/.test(all.slice(Math.max(0, i - 4), i)) ? m : '<a class="call-in" href="tel:119">119</a>'); }   /* 10-29 뒤돌아보기 정규식은 iOS 16.4 전 Safari 에서 스크립트 전체를 멈춘다 */
+  .replace(/119(?![\d-])/g, (m, i, all) => /(tel:|[\d>-])$/.test(all.slice(Math.max(0, i - 4), i)) ? m : '<a class="call-in" href="tel:119">119</a>'); }
 /* 여러 성분의 「내 정보 기준」 경고를 한 목록으로 — 성분 이름을 앞에 붙인다 */
 function meWarningsMany(list){
   const f = activeFlags(); if (!f.length) return '';
@@ -4630,7 +4628,7 @@ function vSymptom(id, q){
     const hasHow = ['how', 'pharmacy', 'selfcare', 'avoid', 'faq'].some(k => (B(k) || []).length) || nw?.length || ban;
     const hasRx = (s.plan || []).length || s.rxCombo || s.lead;
     const nsrc = (s.sources || []).length + (s.srcText || []).length;
-    const T = [['sp1', noBuy ? '먼저 할 일' : '약국에서 사기'], ...(hasHow ? [['sp3', '드시는 법·팁']] : []), ...(hasRx ? [['sp4', '진료실 처방']] : []), ['sp2', '병원 갈 때', cn], ...(nsrc ? [['sp5', '근거', nsrc]] : [])];   /* 탭 순서: 약국에서 사기 → 드시는 법·팁 → 진료실 처방 → 병원 갈 때(현욱님 10-14) */
+    const T = [['sp1', noBuy ? '먼저 할 일' : '약국에서 사기'], ...(hasHow ? [['sp3', '드시는 법·팁']] : []), ...(hasRx ? [['sp4', '진료실 처방']] : []), ['sp2', '병원 갈 때', cn], ...(nsrc ? [['sp5', '근거', nsrc]] : [])];
     return `<nav class="tabs stabs" role="tablist" aria-label="이 증상">${T.map(([k, n, c], i) => `<button class="tab ${i ? '' : 'on'}" role="tab" data-p="${k}">${n}${c ? `<span class="n">${c}</span>` : ''}</button>`).join('')}</nav>`; })()}
   <div class="pane on" id="sp1">
   <section class="sec answer" aria-label="바로 답" style="margin-top:8px">
@@ -6268,14 +6266,14 @@ function vTogether(){
     ${disclaimer('이 판정은 참고용이에요. 약을 스스로 끊거나 바꾸지 마시고, 걸리는 것이 있으면 약사·의사와 상의하세요.')}`;
 }
 
-let MIXT = 0;   /* 같이 먹기 목록에서 고른 묶음 — 조합을 보고 돌아와도 그 묶음 */
+let MIXT = 0;
 function vMix(id){
   if (!LEX.mix) { lexLoad(); return `${topBar({ back:'약 사전' })}<p class="loading">불러오는 중…</p>`; }
   if (!id) {
     return `${topBar({ back:'약 사전' })}
     <div class="eyebrow">같이 먹어도 되나요</div><h1>이 약, 같이 먹어도 될까요?</h1>
     <p style="margin-top:8px">두 가지를 같이 드시기 전에 한 번 보세요. 흔히 겹치는 <b>${(LEX.mix || []).length}가지</b>를 정리했어요.</p>
-    ${(() => { /* 3-7 — 37가지가 한 화면에 모두 펼쳐져 있었다 → 묶음별 가로 탭(고른 묶음만) */
+    ${(() => {
       const G = MIX_KINDS.map(k => [k, (LEX.mix || []).filter(x => x.kind === k)]).filter(g => g[1].length);
       if (!(MIXT < G.length)) MIXT = 0;
       return `<nav class="tabs" role="tablist" aria-label="같이 먹기 묶음" style="margin-top:16px">${G.map(([k, L], i) => `<button class="tab ${i === MIXT ? 'on' : ''}" role="tab" data-p="mx${i}" onclick="MIXT=${i}">${esc(k)}<span class="n">${L.length}</span></button>`).join('')}</nav>

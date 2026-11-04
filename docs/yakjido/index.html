@@ -1768,7 +1768,7 @@ background-repeat:no-repeat;background-position:right 9px center;background-size
 <script>
 window.__YAKJIDO_OK__ = true;
 const D = JSON.parse(document.getElementById('data').textContent || '{}');
-const BUILD = '2026-11-04 22:11';
+const BUILD = '2026-11-05 02:03';
 const DATAV = '45381557b5'.indexOf('__') === 0 ? BUILD : '45381557b5';
 const BRANDMARK = (typeof window !== 'undefined' && window.__BRANDMARK__) || 'icon-192.png';
 let CORE = 0, CORE_P = null;
@@ -1778,7 +1778,7 @@ const by = new Map((D[k] || []).map(x => [x.id, x]));
 (c[k] || []).forEach(o => { const t = by.get(o.id); if (t) Object.assign(t, o); else if (o.name || o.title || o.q) (D[k] = D[k] || []).push(o); });
 }
 for (const k of Object.keys(c)) if (!['symptoms', 'drugs', 'supplements', 'classes', 'tips', 'askdoc'].includes(k)) D[k] = c[k];
-CORE = 2; window.__READY__ = true; SEARCH_CORPUS = '';   /* 본문이 오면 검색 말뭉치를 새로(영어 이름·쓰임 칸은 본문에 있다, 10-14) */
+CORE = 2; window.__READY__ = true; SEARCH_CORPUS = '';
 setTimeout(() => { try { if ((ME.taking || []).length) armNotifications(); } catch (e) {} }, 0);
 try { if (typeof route === 'function' && document.getElementById('view')?.innerHTML) redraw(); } catch (e) {}
 }
@@ -2218,11 +2218,8 @@ const MP = (() => { try { return JSON.parse(localStorage.getItem('mn.place')) ||
 const LANG = (() => { try { const v = MP.lang || localStorage.getItem('yakjido.lang'); if (/^(ko|en|es|ja|zh)$/.test(v)) return v; } catch (e) {} const n = (navigator.language || 'ko').slice(0, 2).toLowerCase(); return /^(ko|en|es|ja|zh)$/.test(n) ? n : 'ko'; })();
 const CC = (() => { try { const v = MP.country || localStorage.getItem('yakjido.cc'); if (v) return v; } catch (e) {}
 let tz = ''; try { tz = Intl.DateTimeFormat().resolvedOptions().timeZone || ''; } catch (e) {}
-if (tz) { if (tz === 'Asia/Seoul') return 'KR'; if (tz === 'Asia/Tokyo') return 'JP'; if (/^Asia\/(Shanghai|Chongqing|Chungking|Harbin|Urumqi|Kashgar)$|^PRC$/.test(tz)) return 'CN';
-if (/^(Europe\/Madrid|Atlantic\/Canary|Africa\/Ceuta)$/.test(tz)) return 'ES';
-if (/^America\/(New_York|Chicago|Denver|Los_Angeles|Phoenix|Anchorage|Juneau|Sitka|Metlakatla|Yakutat|Nome|Adak|Boise|Detroit|Menominee|Indiana\/.+|Kentucky\/.+|North_Dakota\/.+)$|^Pacific\/Honolulu$|^US\//.test(tz)) return 'US';
-if (tz !== 'UTC' && tz !== 'Etc/UTC') return 'XX'; }
-const m = (navigator.language || '').match(/-([A-Za-z]{2})\b/); return m ? m[1].toUpperCase() : ({ ko:'KR', en:'US', es:'ES', ja:'JP', zh:'CN' })[LANG]; })();
+const S = ' Asia/Seoul KR Asia/Tokyo JP Asia/Shanghai CN Asia/Chongqing CN Asia/Urumqi CN Asia/Hong_Kong HK Europe/Madrid ES Atlantic/Canary ES Africa/Ceuta ES America/Mexico_City MX America/Monterrey MX America/Merida MX America/Cancun MX America/Chihuahua MX America/Mazatlan MX America/Hermosillo MX America/Tijuana MX Europe/London GB Asia/Manila PH Asia/Kolkata IN Asia/Calcutta IN Asia/Ho_Chi_Minh VN Asia/Saigon VN Asia/Bangkok TH Asia/Jakarta ID Asia/Makassar ID Asia/Jayapura ID Asia/Kathmandu NP Asia/Katmandu NP Asia/Tashkent UZ Asia/Samarkand UZ Asia/Phnom_Penh KH Asia/Ulaanbaatar MN Asia/Ulan_Bator MN Asia/Colombo LK Asia/Dhaka BD ', k = S.indexOf(' ' + tz + ' ');
+return tz && k >= 0 ? S.substr(k + tz.length + 2, 2) : /^America\/(New_York|Chicago|Denver|Los_Angeles|Phoenix|Anchorage|Juneau|Sitka|Nome|Adak|Boise|Detroit|Menominee|Indiana|Kentucky|North_Dakota)\b|^Pacific\/Honolulu$|^US\//.test(tz) ? 'US' : 'XX'; })();
 window.LANG = LANG; window.CC = CC;
 function setLang(l, cc){ try { localStorage.setItem('yakjido.lang', l); if (cc) localStorage.setItem('yakjido.cc', cc); } catch (e) {} location.reload(); }
 if (LANG !== 'ko' || CC !== 'KR') { const s = document.createElement('script'); s.src = 'i18n.js'; document.head.appendChild(s); }
@@ -2247,7 +2244,7 @@ ensureCore().then(route);
 return;
 }
 if (seg[0] === 'brand' && seg[1] && LEX.brand) { const t = prodTarget(decodeURIComponent(seg[1])); if (t[1] === 'd') { if (HIST[HIST.length - 1] === path) HIST.pop(); location.replace(location.href.split('#')[0] + '#' + t); return; } }
-if ((seg[0] === 'drug' || seg[0] === 'class' || (seg[0] === 'supp' && seg[1])) && DETAIL < 2 && !window.__DETAIL_SKIP__) {   /* 계열 비교의 표·알아두면 좋은 것도 detail(10-14) */
+if ((seg[0] === 'drug' || seg[0] === 'class' || (seg[0] === 'supp' && seg[1])) && DETAIL < 2 && !window.__DETAIL_SKIP__) {
 if (DETAIL === 3) { window.__DETAIL_SKIP__ = true; ensureDetail(); }
 else { view.innerHTML = topBar({ back:'뒤로', nosearch:true }) + `<section class="sec"><p class="loading">자료를 불러오는 중이에요…</p></section>`; ensureDetail().then(route); return; }
 }
@@ -2364,7 +2361,7 @@ function fmt(t){ return esc(t).replace(/\*\*(.+?)\*\*/g, '<b>$1</b>').replace(/\
 .replace(/\[([^\[\]]*확인 필요[^\[\]]*)\]/g, '<span class="chk">$1</span>')
 .replace(/(자살예방상담|정신건강상담|생명의전화|응급의료정보센터|중독관리)(<\/b>)?(\s*)(109|119|1339|129|1588-9191)/g,
 (m, w, cb, sp, num) => `${w}${cb || ''}${sp}<a class="call-in" href="tel:${num}">${num}</a>`)
-.replace(/119(?![\d-])/g, (m, i, all) => /(tel:|[\d>-])$/.test(all.slice(Math.max(0, i - 4), i)) ? m : '<a class="call-in" href="tel:119">119</a>'); }   /* 10-29 뒤돌아보기 정규식은 iOS 16.4 전 Safari 에서 스크립트 전체를 멈춘다 */
+.replace(/119(?![\d-])/g, (m, i, all) => /(tel:|[\d>-])$/.test(all.slice(Math.max(0, i - 4), i)) ? m : '<a class="call-in" href="tel:119">119</a>'); }
 function meWarningsMany(list){
 const f = activeFlags(); if (!f.length) return '';
 const rows = [];
@@ -3881,7 +3878,7 @@ const cn = (s.care?.clinic?.length || 0) + (s.care?.er?.length || 0) + (s.care ?
 const hasHow = ['how', 'pharmacy', 'selfcare', 'avoid', 'faq'].some(k => (B(k) || []).length) || nw?.length || ban;
 const hasRx = (s.plan || []).length || s.rxCombo || s.lead;
 const nsrc = (s.sources || []).length + (s.srcText || []).length;
-const T = [['sp1', noBuy ? '먼저 할 일' : '약국에서 사기'], ...(hasHow ? [['sp3', '드시는 법·팁']] : []), ...(hasRx ? [['sp4', '진료실 처방']] : []), ['sp2', '병원 갈 때', cn], ...(nsrc ? [['sp5', '근거', nsrc]] : [])];   /* 탭 순서: 약국에서 사기 → 드시는 법·팁 → 진료실 처방 → 병원 갈 때(현욱님 10-14) */
+const T = [['sp1', noBuy ? '먼저 할 일' : '약국에서 사기'], ...(hasHow ? [['sp3', '드시는 법·팁']] : []), ...(hasRx ? [['sp4', '진료실 처방']] : []), ['sp2', '병원 갈 때', cn], ...(nsrc ? [['sp5', '근거', nsrc]] : [])];
 return `<nav class="tabs stabs" role="tablist" aria-label="이 증상">${T.map(([k, n, c], i) => `<button class="tab ${i ? '' : 'on'}" role="tab" data-p="${k}">${n}${c ? `<span class="n">${c}</span>` : ''}</button>`).join('')}</nav>`; })()}
 <div class="pane on" id="sp1">
 <section class="sec answer" aria-label="바로 답" style="margin-top:8px">
@@ -5249,14 +5246,14 @@ ${N ? `<details class="ix-infos" id="ixg-info"><summary>알아 두기<small>${N}
 ${disclaimer('이 판정은 참고용이에요. 약을 스스로 끊거나 바꾸지 마시고, 걸리는 것이 있으면 약사·의사와 상의하세요.')}`;
 }
 
-let MIXT = 0;   /* 같이 먹기 목록에서 고른 묶음 — 조합을 보고 돌아와도 그 묶음 */
+let MIXT = 0;
 function vMix(id){
 if (!LEX.mix) { lexLoad(); return `${topBar({ back:'약 사전' })}<p class="loading">불러오는 중…</p>`; }
 if (!id) {
 return `${topBar({ back:'약 사전' })}
 <div class="eyebrow">같이 먹어도 되나요</div><h1>이 약, 같이 먹어도 될까요?</h1>
 <p style="margin-top:8px">두 가지를 같이 드시기 전에 한 번 보세요. 흔히 겹치는 <b>${(LEX.mix || []).length}가지</b>를 정리했어요.</p>
-${(() => { /* 3-7 — 37가지가 한 화면에 모두 펼쳐져 있었다 → 묶음별 가로 탭(고른 묶음만) */
+${(() => {
 const G = MIX_KINDS.map(k => [k, (LEX.mix || []).filter(x => x.kind === k)]).filter(g => g[1].length);
 if (!(MIXT < G.length)) MIXT = 0;
 return `<nav class="tabs" role="tablist" aria-label="같이 먹기 묶음" style="margin-top:16px">${G.map(([k, L], i) => `<button class="tab ${i === MIXT ? 'on' : ''}" role="tab" data-p="mx${i}" onclick="MIXT=${i}">${esc(k)}<span class="n">${L.length}</span></button>`).join('')}</nav>
