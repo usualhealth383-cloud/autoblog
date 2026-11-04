@@ -38,6 +38,17 @@ const d1 = D('2026-11-03T23:31:00Z')[0], d2 = D('2026-11-03T23:36:00Z')[0];
 ok(d1 && d2 && d1.slot === d2.slot && due(set, {}, {}, null, T('2026-11-03T23:31:00Z')).day === due(set, {}, {}, null, T('2026-11-03T23:36:00Z')).day, '두 번 확인해도 같은 열쇠(중복 막힘)');
 ok(due({ ...set, tz: 'America/New_York' }, {}, {}, null, T('2026-11-04T13:30:00Z')).list.some((x) => x.kind === 'dose' && x.slot === '08:30'), '뉴욕 08:30');
 for (const l of ['ko', 'en', 'es', 'ja', 'zh']) { const m = text('dose', l); ok(m.body && m.title && m.tag === 'gyeote-dose' && !/\d/.test(m.body), '곁에 복약 글 ' + l); }
+// 곁에 한 달에 한 번(monthly · 11-04)
+const ms = { v: 1, tz: 'Asia/Seoul', monthly: { on: true, day: 5, t: '11:00' } };
+const MO = (iso, st = ms) => due(st, {}, {}, null, T(iso)).list.filter((x) => x.kind === 'monthly');
+ok(MO('2026-11-05T02:00:00Z').length === 1 && MO('2026-11-05T02:00:00Z')[0].slot === '2026-11', '매달 5일 11:00 서울 → slot 2026-11');
+ok(MO('2026-11-05T02:20:00Z')[0]?.slot === MO('2026-11-05T02:40:00Z')[0]?.slot, '그달 같은 열쇠(한 번만)');
+ok(MO('2026-11-04T02:00:00Z').length === 0, '다른 날 안 감');
+ok(MO('2026-11-05T01:30:00Z').length === 0, '정한 시각 전 안 감');
+ok(MO('2026-11-05T02:00:00Z', { ...ms, monthly: undefined }).length === 0, '끈 사람(칸 빠짐) 안 감');
+ok(MO('2026-11-04T23:00:00Z', { v: 1, tz: 'Asia/Seoul', monthly: { on: true, day: 5, t: '08:00' } }).length === 0, '낮(10시) 전이면 안 감');
+ok(MO('2026-11-05T02:00:00Z', { v: 1, tz: 'Asia/Seoul', monthly: { on: true, day: 5 } }).length === 1, '시각 없으면 11:00');
+for (const l of ['ko', 'en', 'es', 'ja', 'zh']) { const m = text('monthly', l); ok(m.title && m.body && m.tag === 'gyeote-monthly', '곁에 달 글 ' + l); }
 const k1 = kidsDue(rem, T('2026-11-04T11:01:00Z'))[0], k2 = kidsDue(rem, T('2026-11-04T11:06:00Z'))[0];
 ok(k1 && k2 && k1.slot === k2.slot && k1.day === k2.day, '소아 두 번 확인 같은 열쇠');
 ok(WIN === 3, '창 ±3분');

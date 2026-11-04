@@ -4,9 +4,9 @@
 //   gyeote_battery { 'YYYY-M-D': 0~100 } · gyeote_moods { 'YYYY-M-D': … } — 오늘 남겼으면 저녁 알림을 보내지 않는다
 //   gyeote_retest [{ go, t, at(ms) }] — 「다음 주에 다시 재 보기」. 검사 이름(t)은 알림에 넣지 않는다
 // 알림 글에는 마음 상태·검사 이름·병명을 담지 않는다(잠금 화면은 옆 사람도 본다).
-export type Set = { eve?: { on?: boolean; t?: string }; week?: { on?: boolean; t?: string; dow?: number }; tz?: string; dose?: { on?: boolean; times?: string[] } };   // dose — 11-04 곁에(첫 6주 길잡이 + 복약 알림 켠 분만, 끄면 칸이 빠짐)
+export type Set = { eve?: { on?: boolean; t?: string }; week?: { on?: boolean; t?: string; dow?: number }; tz?: string; dose?: { on?: boolean; times?: string[] }; monthly?: { on?: boolean; day?: number; t?: string } };   // monthly — 11-04 곁에(한 달에 한 번 조용한 다시 재기 · 끄면 칸이 빠짐)   // dose — 11-04 곁에(첫 6주 길잡이 + 복약 알림 켠 분만, 끄면 칸이 빠짐)
 export type Retest = { go?: string; t?: string; at?: number };
-export type Due = { kind: 'eve' | 'week' | 'retest' | 'dose'; slot: string };
+export type Due = { kind: 'eve' | 'week' | 'retest' | 'dose' | 'monthly'; slot: string };
 
 export const WINDOW = 120;               // 정한 시간부터 이만큼(분) 안에서만 — 서버가 늦게 돌아도 밤늦게 뒤늦은 알림이 가지 않게
 export const RETEST_FROM = 10 * 60, RETEST_TO = 21 * 60;   // 다시 재 볼 날 알림은 낮에만
@@ -32,6 +32,10 @@ export function due(set: Set | null, battery: Record<string, unknown> | null, mo
     const seen = new Set<string>();
     for (const t of set.dose.times.slice(0, 4)) { if (typeof t === 'string' && !seen.has(t) && inWin(L.min, t)) { seen.add(t); list.push({ kind: 'dose', slot: t }); } }
   }
+  if (set.monthly?.on) {   // 11-04 매달 그날 · 정한 시각부터 WINDOW 안 · 낮에만(RETEST_FROM~TO) · slot 'YYYY-MM'(그달 한 번)
+    const md = Number(set.monthly.day), t = typeof set.monthly.t === 'string' && toMin(set.monthly.t) >= 0 ? set.monthly.t : '11:00';
+    if (Number.isInteger(md) && md >= 1 && md <= 28 && Number(L.day.slice(8, 10)) === md && inWin(L.min, t) && L.min >= RETEST_FROM && L.min < RETEST_TO) list.push({ kind: 'monthly', slot: L.day.slice(0, 7) });
+  }
   if (Array.isArray(retest) && L.min >= RETEST_FROM && L.min < RETEST_TO) {
     const t = now.getTime();
     const r = retest.filter((x) => x && typeof x.at === 'number' && x.at <= t && t - x.at < RETEST_STALE_DAYS * 864e5).sort((a, c) => a.at! - c.at!)[0];
@@ -47,6 +51,8 @@ const T: Record<Due['kind'], Record<string, [string, string]>> = {
   week: { ko: ['', '이번 주 마음 카드가 나왔어요.'], en: ['', 'This week’s mind card is ready.'], es: ['', 'Ya está la tarjeta de ánimo de esta semana.'],
           ja: ['', '今週のこころカードができました。'], zh: ['', '本周心情卡出来了。'] },
   dose: { ko: ['', '약 드실 시간이에요'], en: ['', 'Time for your medicine'], es: ['', 'Es hora de su medicación'], ja: ['', 'お薬の時間です'], zh: ['', '该吃药了'] },
+  monthly: { ko: ['지난달과 견줘 볼까요?', '2분이면 돼요'], en: ['Compare with last month?', 'It only takes 2 minutes'], es: ['¿Lo comparamos con el mes pasado?', 'Solo son 2 minutos'],
+             ja: ['先月と比べてみませんか？', '2分でできます'], zh: ['和上个月比一比？', '只要2分钟'] },
   retest: { ko: ['다시 재 볼 날이에요', '일주일 전과 견줘 봐요'], en: ['Time to check again', 'Compare with a week ago'], es: ['Hoy toca volver a medir', 'Compare con hace una semana'],
             ja: ['もう一度はかる日です', '1週間前と比べてみましょう'], zh: ['今天该再测一次了', '和一周前比一比'] },
 };
