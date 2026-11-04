@@ -3151,5 +3151,19 @@ window.물을말저장 = v => { try { v = String(v || '').replace(/[<>]/g, '').t
       v.prepend(d); try { if (window.I18N && I18N.tr) I18N.tr(d); } catch (e) {} }, 400);
     return r; }; });
 
+/* 11-04 현욱님 「매일 돌아올 이유」 — 이번 주 지킴 막대(진짜 기록 dayStat · 코드로 그림) + 7일·14일·30일 이어질 때 조용한 한 줄.
+   막대: 다 챙긴 날 가득 · 일부 반 · 빠진 날 빈 칸 · 정해 둔 약이 없던 날 점선. 숫자는 「7일 중 N일」(자연빈도). */
+window.주간칸 = () => { try {
+  const W = '일월화수목금토', days = [];
+  for (let i = 6; i >= 0; i--) { const k = dayBefore(i), st = dayStat(k), d = new Date(k + 'T12:00:00'); days.push({ k, s: st.s, w: W[d.getDay()], today: i === 0 }); }
+  const plan = days.filter(x => x.s !== 'none'); if (plan.length < 2) return '';   /* 기록이 쌓이기 전엔 보이지 않게 */
+  const full = days.filter(x => x.s === 'full' || x.s === 'skip').length, stk = streakDays();
+  const h = s => s === 'full' || s === 'skip' ? 100 : s === 'part' ? 50 : s === 'miss' ? 8 : 0;
+  const bar = x => `<span class="wk-d${x.today ? ' now' : ''}" role="img" aria-label="${x.w}요일 ${x.s === 'full' || x.s === 'skip' ? '다 챙김' : x.s === 'part' ? '일부' : x.s === 'miss' ? '못 챙김' : '정해 둔 약 없음'}"><i class="wk-b ${x.s}" style="height:${Math.max(h(x.s), 8)}%"></i><small>${x.w}</small></span>`;
+  const 축 = stk >= 7 && [7, 14, 21, 30, 60, 90, 180, 365].includes(stk) ? `<p class="wk-cele">${stk === 7 ? '일주일' : stk + '일'}을 채우셨어요 · 꾸준함이 약효를 지켜요</p>` : '';
+  return `<div class="wk"><div class="wk-t"><b>이번 주</b><small>7일 중 ${full}일 다 챙김</small></div><div class="wk-bars">${days.map(bar).join('')}</div>${축}</div>`;
+} catch (e) { return ''; } };
+try { const st = document.createElement('style'); st.textContent = '.wk{padding:12px 16px 14px;border-top:1px solid var(--hairline)}.wk-t{display:flex;justify-content:space-between;align-items:baseline;gap:8px}.wk-t small{color:var(--muted)}.wk-bars{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin-top:8px;height:64px}.wk-d{display:flex;flex-direction:column;justify-content:flex-end;align-items:center;gap:4px;min-width:0}.wk-d small{font-size:.75rem;color:var(--muted)}.wk-d.now small{color:var(--primary);font-weight:700}.wk-b{display:block;width:100%;max-width:28px;border-radius:6px 6px 3px 3px;background:var(--primary)}.wk-b.part{background:var(--caution)}.wk-b.miss{background:var(--hairline)}.wk-b.none{background:transparent;border:1px dashed var(--hairline);height:8px!important}.wk-cele{margin-top:8px;font-size:.875rem;color:var(--primary-deep)}'; document.head.appendChild(st); } catch (e) {}
+
 /* 내 정보·동의·로그인·약관 화면을 보고 있었으면 다시 그린다(이 파일이 늦게 오므로) */
 try { if (/^#\/(me|consent|login|notify|sgoal|sstage|doc|hello\/3|supp$|supp\?|sgoal|sstage|rx|about|search|myths|askdoc|talk|p\/|p\?|p$)/.test(location.hash)) route(); } catch (e) {}
