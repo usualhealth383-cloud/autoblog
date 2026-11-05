@@ -105,7 +105,7 @@
     var ko = function (n, o) { if (n !== o && o) KO.set(n, o); return n; };
     window.yKo = function (t) { return t && typeof t === 'object' ? t._ko : KO.get(t); };
     window.yBanP = function (t, b) { var k = KO.get(t); if (k == null) return null;
-      var sp = function (x) { return String(x).replace(/([.!?])\s+|([。！？])\s*/g, function (m, a, c) { return (a || c) + '\u0001'; }).split('\u0001').filter(function (y) { return y.trim(); }); };
+      var sp = function (x) { return String(x).replace(/([.!?](?:\*\*)?)\s+|([。！？](?:\*\*)?)\s*/g, function (m, a, c) { return (a || c) + '\u0001'; }).split('\u0001').filter(function (y) { return y.trim(); }); };
       var ks = sp(k), hs = ks.map(function (x) { return b.hit(x); }); if (!hs.some(Boolean)) return t;
       var ts = sp(t); return ts.length === ks.length ? ts.filter(function (x, i) { return !hs[i]; }).join(' ') : '';   /* 문장 수가 다르면 그 칸을 통째로 뺀다(안전 쪽) */ };
     (D.symptoms || []).forEach(function (s) {
@@ -114,7 +114,7 @@
       ['how', 'pharmacy', 'selfcare', 'avoid'].forEach(function (k) { if (b[k] && Array.isArray(s[k])) s[k] = s[k].map(function (x, i) { return b[k][i] ? ko(b[k][i], x) : x; }); });
       if (b.plan && Array.isArray(s.plan)) s.plan.forEach(function (o, i) { var x = b.plan[i]; if (x && !o._k) o._k = { slot: o.slot, title: o.title };   /* 11-05 칸 이름으로 맞추는 곳(withSlot·catName)은 한국어 _k 로 */ if (x) ['slot', 'title', 'why', 'either'].forEach(function (f) { if (x[f] && o[f] && o[f] !== x[f]) { if (f !== 'why') REV[x[f]] = o[f]; o[f] = ko(x[f], o[f]); } }); });
       if (b.notWorking && s.notWorking) { if (b.notWorking.title) s.notWorking.title = b.notWorking.title; if (b.notWorking.steps && s.notWorking.steps) s.notWorking.steps = s.notWorking.steps.map(function (x, i) { return b.notWorking.steps[i] ? ko(b.notWorking.steps[i], x) : x; }); }
-      if (b.clinic && s.triage && s.triage.clinic) s.triage.clinic = ko(b.clinic, s.triage.clinic);   /* 11-05 「병원에서는」 칸 */
+      if (b.clinic && s.triage && s.triage.clinic) s.triage.clinic = ko(b.clinic, s.triage.clinic); if (b.pharm && s.triage && s.triage.pharmacy) s.triage.pharmacy = ko(b.pharm, s.triage.pharmacy);   /* 「약국에서는」 — banProse 가 KO 로 거름 */   /* 11-05 「병원에서는」 칸 */
       if (b.faq && Array.isArray(s.faq)) s.faq.forEach(function (o, i) { var x = b.faq[i]; if (x) { if (o._ko == null) o._ko = (o.q || '') + ' ' + (o.a || ''); if (x.q) o.q = x.q; if (x.a) o.a = x.a; } });
     });
     var R = typeof RXG !== 'undefined' ? RXG : window.RXG, RX = DICT.rx || {};
