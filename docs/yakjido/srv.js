@@ -3077,14 +3077,14 @@ try { 이용량.설치({ 앱: 'yakjido', 켜짐: false, 주소: 'https://uszalzc
             문자열이 필요하면 응급카드.HTML(). 「주소 적어 두기」는 카드 안에서 바로.
    ⛔ 이모지 0 · « » 0 · 단추 44px 이상 · 320 넘침 0.
    ── 공용 부품 셋(위기번호 표 · 설정 부품 · 응급카드 부품) 공통 약속 · 주인: 길동무 세션 ──
-   판: 이 파일 안 «판» 한 곳(코드의 판 값). 고치면 판을 올리고 다섯 앱에 다시 심는다. 지금 판 2026-11-05b.
+   판: 이 파일 안 «판» 한 곳(코드의 판 값). 고치면 판을 올리고 다섯 앱에 다시 심는다. 지금 판 2026-11-05c.
    심는 순서(앱마다 같다): ① 위기번호 표 → ② 설정 부품 → ③ 응급카드 부품 — 표가 앞에 있어야 말과 나라 고르개·응급 번호가 표를 쓴다.
    심기·비교: python3 _도구/공용부품_심기.py 비교 · python3 _도구/공용부품_심기.py <소아|곁에|길동무|CS> · 다른 저장소(약지도): python3 _도구/공용부품_심기.py 파일 <경로>
    ⛔ 앱 사본을 직접 고치지 않는다 — 이 파일을 고치고 다시 심는다(심기 스크립트는 정본과 다른 사본을 보면 멈춘다).
 */
 (function () {
   if (window.응급카드 && window.응급카드.__v) return;
-  var 판 = '2026-11-05b', 주소열쇠 = 'mn.addr';   /* 11-05b 1345 시간 말별·1330 시간 뺌 · 11-05a 내 말 응급 카드(10개 말) 합침 · 11-04b 머리 주석 정리 · 11-04 첫 판은 통역 줄 없음 */
+  var 판 = '2026-11-05c', 주소열쇠 = 'mn.addr';   /* 11-05c 1330 필리핀어 표시 뺌(1330 이 필리핀어를 하지 않음) · 11-05b 1345 시간 말별·1330 시간 뺌 · 11-05a 내 말 응급 카드(10개 말) 합침 · 11-04b 머리 주석 정리 · 11-04 첫 판은 통역 줄 없음 */
   var 기본통역줄 = [
     { 번호: '119', 말: { en: 'Ask 119 for an interpreter.', es: 'Pida un intérprete al 119.', ja: '119に通訳をお願いしてください。', zh: '请向119要求翻译服务。' } },
     { 번호: '1345', 말: { en: 'Immigration Contact Center (Ministry of Justice) — help with daily life and paperwork, not emergencies. In English on weekdays 09:00–22:00. From abroad +82-2-1345.',
@@ -3143,7 +3143,7 @@ try { 이용량.설치({ 앱: 'yakjido', 켜짐: false, 주소: 'https://uszalzc
   var 내말표 = {
     vi: { n: 'Tiếng Việt', t: 'Trợ giúp khẩn cấp bằng tiếng Việt', d: 'Nếu đang gặp nguy hiểm, hãy gọi ngay', a: 'cấp cứu', p: 'cảnh sát', s: 'Muốn nói chuyện khi lòng nặng nề', k: '24 giờ, tiếng Hàn', m: 'Hỗ trợ bằng tiếng Việt', w: 'ngày thường 9–18 giờ', h: '7–24 giờ', l: 'Hãy gọi số khẩn cấp của nơi bạn đang sống.', c: 'Gọi' },
     th: { n: 'ภาษาไทย', t: 'ความช่วยเหลือฉุกเฉินเป็นภาษาไทย', d: 'ถ้ากำลังอยู่ในอันตราย โทรทันที', a: 'รถพยาบาล', p: 'ตำรวจ', s: 'อยากคุยกับใครสักคนเมื่อใจหนักอึ้ง', k: '24 ชั่วโมง ภาษาเกาหลี', m: 'ความช่วยเหลือเป็นภาษาไทย', w: 'วันธรรมดา 9–18 น.', h: '7–24 น.', l: 'โทรหมายเลขฉุกเฉินของประเทศที่คุณอาศัยอยู่', c: 'โทร' },
-    tl: { n: 'Filipino', t: 'Tulong pang-emergency sa Filipino', d: 'Kung nasa panganib ka ngayon, tumawag agad', a: 'ambulansya', p: 'pulis', s: 'Kung gusto mong may makausap kapag mabigat ang loob mo', k: '24 oras, sa wikang Korean', m: 'Tulong sa wikang Filipino', w: 'Lunes–Biyernes 9–18', h: '7–24', l: 'Tumawag sa emergency number ng bansang tinitirhan mo.', c: 'Tawagan' },
+    tl: { n: 'Filipino', t: 'Tulong pang-emergency sa Filipino', d: 'Kung nasa panganib ka ngayon, tumawag agad', a: 'ambulansya', p: 'pulis', s: 'Kung gusto mong may makausap kapag mabigat ang loob mo', k: '24 oras, sa wikang Korean', m: 'Tulong sa wikang Filipino', w: 'Lunes–Biyernes 9–18', l: 'Tumawag sa emergency number ng bansang tinitirhan mo.', c: 'Tawagan' },
     id: { n: 'Bahasa Indonesia', t: 'Bantuan darurat dalam bahasa Indonesia', d: 'Jika sedang dalam bahaya, segera telepon', a: 'ambulans', p: 'polisi', s: 'Ingin bicara saat hati terasa berat', k: '24 jam, bahasa Korea', m: 'Bantuan dalam bahasa Indonesia', w: 'hari kerja 09.00–18.00', h: '07.00–24.00', l: 'Telepon nomor darurat di negara tempat Anda tinggal.', c: 'Telepon' },
     ne: { n: 'नेपाली', t: 'नेपालीमा आपतकालीन सहायता', d: 'अहिले खतरामा हुनुहुन्छ भने तुरुन्तै फोन गर्नुहोस्', a: 'एम्बुलेन्स', p: 'प्रहरी', s: 'मन भारी हुँदा कसैसँग कुरा गर्न', k: '24 घण्टा, कोरियाली भाषामा', m: 'नेपाली भाषामा सहायता', w: 'सोमबार–शुक्रबार 9–18 बजे', h: '', l: 'तपाईं बस्ने देशको आपतकालीन नम्बरमा फोन गर्नुहोस्।', c: 'फोन' },
     uz: { n: 'Oʻzbekcha', t: 'Oʻzbek tilida favqulodda yordam', d: 'Hozir xavf ostida boʻlsangiz, darhol qoʻngʻiroq qiling', a: 'tez yordam', p: 'politsiya', s: 'Koʻnglingiz ogʻir boʻlsa, gaplashish uchun', k: '24 soat, koreys tilida', m: '', w: '', h: '', l: 'Yashayotgan mamlakatingizdagi favqulodda raqamga qoʻngʻiroq qiling.', c: 'Qoʻngʻiroq' },
