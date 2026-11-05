@@ -115,7 +115,8 @@ head = old[:old.index('<div class="wrap">')].replace('<title>박찬 통합과학
 script = old[old.index('<script>'):]
 nimg = sum(1 for b in POST if b[0] == 'img')
 titles = ''.join(f'<div class="row"><span class="k">{"AB"[i]}</span><span class="t">{html.escape(t)}</span><button class="cp" data-text="{html.escape(t)}">복사</button></div>' for i, t in enumerate(TITLES))
-tags = ''.join(f'<span>{t}</span>' for t in TAGS)
+tags = ''.join(f'<button class="cp tg" data-text="{t}">{t}</button>' for t in TAGS)
+head = head.replace('</style>', '.tags button.tg{font-size:14px;min-height:40px;padding:0 12px;background:var(--soft);color:var(--navy);font-weight:700}.tags button.tg.done{opacity:.4}\n</style>', 1)
 page = f'''{head}<div class="wrap">
 <section class="box"><h1>박찬 통합과학 · 첫 글 수정판</h1><p class="sub">개강일 · '3월 입학 전 확실히' · 월별 진도 그림을 빼고 수업 시간 · 교재 · 새 인사말을 넣은 판 · 합니다체 · 사진 {nimg}장</p></section>
 <section class="box"><h2>① 제목 — 하나 고르기</h2>{titles}</section>
@@ -123,7 +124,8 @@ page = f'''{head}<div class="wrap">
 <p class="note">네이버가 일부 서식을 빼면 '글자만 복사'(사진 자리 표시가 들어 있음)를 쓰십시오.</p>
 <details style="margin-top:10px"><summary style="font-size:14px;color:var(--muted);cursor:pointer">글자만 복사 (서식 없음)</summary><textarea id="bodyTxt" readonly style="margin-top:8px">{html.escape(body)}</textarea><button class="cp big" data-copy="bodyTxt">글자만 복사</button></details>
 <button class="cp big" id="richBtn2" style="background:var(--soft);color:var(--ink);border:1px solid var(--line)">사진이 안 들어가면 — 사진을 글 안에 담아 복사</button></section>
-<section class="box"><h2>③ 태그 — 한 번에 붙여 넣기</h2><div class="tags">{tags}</div><button class="cp big" data-copy="tagTxt">태그 한 번에 복사 (#붙임)</button><p class="note">네이버 글쓰기 맨 아래 태그 칸을 누르고 그대로 붙여 넣으십시오. 하나로 붙으면 마지막에 띄어쓰기를 한 번 누르십시오.</p><textarea id="tagTxt" readonly style="display:none">{" ".join("#" + t for t in TAGS)}</textarea></section>
+<section class="box"><h2>③ 태그 — 하나씩 눌러 붙여 넣기</h2><p class="note" style="margin:0 0 10px">네이버 태그 칸은 여러 개를 한 번에 붙이면 하나로 뭉칩니다. 아래 태그를 하나 누르면 복사됩니다 → 태그 칸에 붙여 넣고 <b>Enter</b> → 다음 태그를 누르기. 누른 태그는 흐리게 바뀝니다.</p><div class="tags">{tags}</div>
+<details style="margin-top:12px"><summary style="font-size:14px;color:var(--muted);cursor:pointer">쉼표로 한 번에 붙여 보기 (네이버가 나눠 줄 수도 있음)</summary><button class="cp big" data-copy="tagTxt">쉼표로 구분해 복사</button><textarea id="tagTxt" readonly style="display:none">{", ".join(TAGS)}</textarea></details></section>
 <section class="box"><h2>④ 네이버에서 고치는 법</h2><ol class="how">
 <li>블로그의 첫 글을 열어 <b>수정</b>을 누르고, 본문을 모두 지운 뒤 ②를 붙여 넣기</li>
 <li>또는 새 글로 올리고 옛 글은 비공개로 두기</li>
@@ -133,7 +135,7 @@ page = f'''{head}<div class="wrap">
 <section class="box"><h2>미리보기</h2><article class="post">{prev()}</article></section>
 </div>
 <template id="rich">{rich(False)}</template><template id="rich2">{rich(True)}</template>
-{script}'''
+{script}<script>document.addEventListener('click',e=>{{const b=e.target.closest('button.tg');if(b)setTimeout(()=>b.classList.add('done'),50)}});</script>'''
 (HERE / 'kit.html').write_text(page, encoding='utf-8')
 (HERE / 'post.txt').write_text(body + '\n', encoding='utf-8')
 (HERE / 'titles.txt').write_text('\n'.join(TITLES) + '\n', encoding='utf-8')
