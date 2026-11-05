@@ -13,9 +13,9 @@
 - 계정 삭제 안내: https://medinanum.com/delete-account-yakjido.html
 
 ## 설치 앱 권한 한 줄 점검 (틀 5-1절 · 11-05 · app-native/android/app/src/main/AndroidManifest.xml)
-- 있음: 인터넷 ✔ · 알림(POST_NOTIFICATIONS) ✔ · 부팅 뒤 예약(RECEIVE_BOOT_COMPLETED) ✔ · 진동(VIBRATE)·깨우기(WAKE_LOCK — 알림 부품이 씀) · **정확한 알람(SCHEDULE_EXACT_ALARM) ✘ 틀과 어긋남** · 결제 — 아직 없음(결제를 켜는 날 BILLING 더함)
+- 있음: 인터넷 ✔ · 알림(POST_NOTIFICATIONS) ✔ · 부팅 뒤 예약(RECEIVE_BOOT_COMPLETED) ✔ · 진동(VIBRATE)·깨우기(WAKE_LOCK — 알림 부품이 씀) · 정확한 알람(SCHEDULE_EXACT_ALARM — 아래 이유로 둠) · 결제 — 아직 없음(결제를 켜는 날 BILLING 더함)
 - 없음: 위치 ✔(11-05 뺌) · 광고 ID ✔ · 카메라 ✔(카메라 앱을 띄워 찍은 사진만 받음) · 저장소 ✔(사진 선택기)
-- 정확한 알람: 앱은 허용되면 정시 알림, 아니면 「도즈에서도 울리는(allowWhileIdle)」 알림으로 이미 물러남(app-shell NATIVE_EXACT). 빼면 복용 알림이 몇 분 늦을 수 있음 — **뺄지 Main 결정 대기**(정확한 알람 신고가 필요한 것은 USE_EXACT_ALARM 이고 우리는 쓰지 않음)
+- **정확한 알람(SCHEDULE_EXACT_ALARM): 둔다(11-05 Main 결정)** — 복용 시각 알림용, 사용자가 허락할 때만 · 거절하면 「도즈에서도 울리는(allowWhileIdle)」 알림으로 물러나 몇 분 늦을 수 있음. 신고 대상인 USE_EXACT_ALARM 은 쓰지 않음
 - 미검증: 플러그인이 덧붙이는 권한(merged manifest)은 이 컨테이너에 node_modules·안드로이드 SDK 가 없어 못 봄 → 첫 APK 빌드 때 `aapt dump permissions` 로 다시 확인
 
 ## 그림
@@ -102,5 +102,5 @@
 | 민감 정보 서버 저장 — 계정 | 계정은 선택 · 「서버에 저장하기」는 계정 만들기와 **따로** 묻는 동의 · 거두면 서버 기록 즉시 삭제 · 앱 안 「계정 지우기」 + 웹 삭제 안내 쪽 · 방침 1·3·4·9항. 데이터 보안 답(위 「계정」 표)과 앱 안 문구가 같아야 함 — 앱 안에 「서버에 두지 않아요」 같은 옛 문장이 남지 않았는지 제출 전 확인 |
 | 위치 권한 | **없음**(11-05 Main 결정) — 홈 날씨가 꺼져 있어 매니페스트에서 ACCESS_COARSE_LOCATION 을 뺌 · 데이터 보안 「위치 아니오」. **날씨를 켜는 날** 대략 위치 권한을 다시 넣고 데이터 보안을 「대략 위치 · 일시 처리」로, 처리방침 1절에도 같은 날 더함 |
 | 계정 유형 — 건강 앱 | 고객센터 13634885: 건강·의료 앱은 조직 계정을 쓰는 것이 **권장**(should). 출시-체크리스트 A3 의 갈래 A/B 참고 |
-| 정확한 알람 권한 | 우리는 **SCHEDULE_EXACT_ALARM**(사용자가 설정에서 허용)만 쓰고, 플레이 정책상 선언이 필요한 **USE_EXACT_ALARM**(알람·캘린더 앱 전용)은 쓰지 않아요 — 권한 선언서 필요 없음(안드로이드 개발자 문서 「Schedule exact alarms are denied by default」, 2026-10-08 확인). 허용 안 하면 몇 분 늦게 울릴 뿐이고, 그때만 「정확한 시각에 울리기 → 허용」 단추가 보여요. 알림 플러그인(@capacitor/local-notifications 8.3.1)이 합쳐 넣는 권한도 같은 것 |
+| 정확한 알람 권한 | **SCHEDULE_EXACT_ALARM 만**(사용자가 설정에서 허락할 때만 · 복용 시각 알림용 — 약지도의 핵심 기능). 거절하면 allowWhileIdle 알림으로 물러나 몇 분 늦을 수 있음. 플레이 정책상 신고가 필요한 USE_EXACT_ALARM(알람·캘린더 앱 전용)은 쓰지 않음 |
 | 알림 권한 사전 요청 | 처음 켤 때 묻지 않고, 알림을 켜는 순간에만 |
