@@ -6777,9 +6777,9 @@ const kidDoseBtn = d => d.kidSel ? `<button class="btn" style="margin-top:10px" 
 /* 외부 검수 6차 #2 — 제품을 골랐으면 주의·같이 먹기·묻고 답하기의 «어른 일반정» 숫자(하루 4,000 mg·4시간)도 그 제품 말로 */
 const pAdj = (d, kid, er) => { const R = kid ? [[/하루 4,000 mg 을 넘기지 말고, 4시간 이상 띄우세요/g, '하루 한도는 아이 몸무게와 제품 설명서로 확인하세요'], [/하루 4 g을 넘기거나/g, '아이 하루 한도(몸무게로 정해요)를 넘기거나'], [/합쳐서 하루 4 g을 넘기지 마세요/g, '합쳐서 아이 하루 한도를 넘기지 마세요(몸무게로 계산해요)'], [/하루 4 g을 넘기면/g, '아이 하루 한도(몸무게로 정해요)를 넘기면']]
     : er ? [[/하루 4 g을 넘기면/g, '하루 총량(이 서방정은 6정 3,900 mg까지)을 넘기면'], [/하루 4 g을 넘기거나/g, '하루 총량(이 서방정은 6정까지)을 넘기거나'], [/합쳐서 하루 4 g을 넘기지 마세요/g, '합쳐서 하루 총량을 넘기지 마세요(이 서방정은 6정까지)'], [/하루 4,000 mg 을 넘기지 말고, 4시간 이상 띄우세요/g, '하루 총량을 넘기지 말고, 서방정은 8시간마다 드세요 — 다른 아세트아미노펜 제품으로 바꿔 먹는 간격은 약사에게 확인하세요']] : [];
-  if (!R.length) return {}; const f = t => typeof t === 'string' ? R.reduce((x, [a, b]) => x.replace(a, b), t) : t;
+  if (!R.length) return {}; const f = t => { if (typeof t !== 'string') return t; const k = yK(t), r = R.reduce((x, [a, b]) => x.replace(a, b), k ?? t); return k != null && r === k ? t : r; };
   const m = L => (L || []).map(x => typeof x === 'string' ? f(x) : Object.fromEntries(Object.entries(x).map(([k, v]) => [k, f(v)])));
-  const o = { lead: f(d.lead), avoid: m(d.avoid), caution: m(d.caution), interactions: m(d.interactions), faq: (d.faq || []).filter(x => !kid || !/\d\s*(~\s*\d+\s*)?(정|알|캡슐)/.test((x.q || '') + ' ' + (x.a || ''))).map(x => ({ ...x, a: f(x.a) })), riskNote: d.riskNote && Object.fromEntries(Object.entries(d.riskNote).map(([k, v]) => [k, f(v)])) };
+  const o = { lead: f(d.lead), avoid: m(d.avoid), caution: m(d.caution), interactions: m(d.interactions), faq: (d.faq || []).filter(x => !kid || !/\d\s*(~\s*\d+\s*)?(정|알|캡슐)/.test(x._ko ?? (x.q || '') + ' ' + (x.a || ''))).map(x => ({ ...x, a: f(x.a) })), riskNote: d.riskNote && Object.fromEntries(Object.entries(d.riskNote).map(([k, v]) => [k, f(v)])) };
   return Object.fromEntries(Object.entries(o).filter(([k]) => d[k] !== undefined)); };
 const pView = (d, n) => { const p = n && ((d.products || []).find(x => x.name === n) || prodDrug(n)?.p); const mine = p && (d.products || []).includes(p);
   if (mine && p.dose) return Object.assign(Object.create(d), pAdj(d, false, /8시간/.test(p.dose.interval || '')), { simple: p.simple || d.simple, dose: p.dose, pSel: p });

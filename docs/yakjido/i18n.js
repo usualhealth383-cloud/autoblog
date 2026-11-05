@@ -117,6 +117,13 @@
       if (b.clinic && s.triage && s.triage.clinic) s.triage.clinic = ko(b.clinic, s.triage.clinic); if (b.pharm && s.triage && s.triage.pharmacy) s.triage.pharmacy = ko(b.pharm, s.triage.pharmacy);   /* 「약국에서는」 — banProse 가 KO 로 거름 */   /* 11-05 「병원에서는」 칸 */
       if (b.faq && Array.isArray(s.faq)) s.faq.forEach(function (o, i) { var x = b.faq[i]; if (x) { if (o._ko == null) o._ko = (o.q || '') + ' ' + (o.a || ''); if (x.q) o.q = x.q; if (x.a) o.a = x.a; } });
     });
+    /* 11-05 약 설명(보이기만 하는 칸) — 용량·주의·금기·simple 은 아직 한국어(판정·약사 카드가 그 글을 읽는다). pAdj 는 yKo 로 한국어 원문에 규칙을 건다 */
+    var DG = DICT.drug || {};
+    (D.drugs || []).forEach(function (d) { var b = DG[d.id]; if (!b) return;
+      ['tagline', 'lead', 'children', 'onset', 'duration'].forEach(function (k) { if (b[k] && d[k]) d[k] = ko(b[k], d[k]); });
+      ['for', 'sideEffects', 'stop', 'tips'].forEach(function (k) { if (b[k] && Array.isArray(d[k])) d[k] = d[k].map(function (x, i) { return b[k][i] ? ko(b[k][i], x) : x; }); });
+      if (b.faq && Array.isArray(d.faq)) d.faq.forEach(function (o, i) { var x = b.faq[i]; if (x) { if (o._ko == null) o._ko = (o.q || '') + ' ' + (o.a || ''); if (x.q) o.q = ko(x.q, o.q); if (x.a) o.a = ko(x.a, o.a); } });
+    });
     var R = typeof RXG !== 'undefined' ? RXG : window.RXG, RX = DICT.rx || {};
     if (R && R.guides) {
       for (var g in RX) { var G = R.guides[g]; if (!G) continue; var x = RX[g];
