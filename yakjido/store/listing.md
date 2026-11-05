@@ -12,6 +12,12 @@
 - 개인정보처리방침: https://medinanum.com/privacy-yakjido.html
 - 계정 삭제 안내: https://medinanum.com/delete-account-yakjido.html
 
+## 설치 앱 권한 한 줄 점검 (틀 5-1절 · 11-05 · app-native/android/app/src/main/AndroidManifest.xml)
+- 있음: 인터넷 ✔ · 알림(POST_NOTIFICATIONS) ✔ · 부팅 뒤 예약(RECEIVE_BOOT_COMPLETED) ✔ · 진동(VIBRATE)·깨우기(WAKE_LOCK — 알림 부품이 씀) · **정확한 알람(SCHEDULE_EXACT_ALARM) ✘ 틀과 어긋남** · 결제 — 아직 없음(결제를 켜는 날 BILLING 더함)
+- 없음: 위치 ✔(11-05 뺌) · 광고 ID ✔ · 카메라 ✔(카메라 앱을 띄워 찍은 사진만 받음) · 저장소 ✔(사진 선택기)
+- 정확한 알람: 앱은 허용되면 정시 알림, 아니면 「도즈에서도 울리는(allowWhileIdle)」 알림으로 이미 물러남(app-shell NATIVE_EXACT). 빼면 복용 알림이 몇 분 늦을 수 있음 — **뺄지 Main 결정 대기**(정확한 알람 신고가 필요한 것은 USE_EXACT_ALARM 이고 우리는 쓰지 않음)
+- 미검증: 플러그인이 덧붙이는 권한(merged manifest)은 이 컨테이너에 node_modules·안드로이드 SDK 가 없어 못 봄 → 첫 APK 빌드 때 `aapt dump permissions` 로 다시 확인
+
 ## 그림
 - 아이콘 512×512: `icon-512.png` · 피처 그래픽 1024×500: `feature-1024x500.png`
 - 휴대폰 사진 6장: `shots/ko-01-home.png`·`02-symptom`·`03-drug`·`04-together`·`05-schedule`·`06-kids`(1080×2160 · 360×720 화면 3배 — 구글 플레이는 긴 변이 짧은 변의 2배를 넘지 못해 360×780 대신 2:1). 옛 8장(01-home … 08-bag)은 10-09 판
