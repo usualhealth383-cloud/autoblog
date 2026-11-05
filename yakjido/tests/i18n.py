@@ -39,13 +39,15 @@ with sync_playwright() as p:
             pg.close()
         if L != 'ko': rep.append(f'{L}: 한국어가 남은 글 덩어리 {ko_left[0]}/{ko_left[1]} ({ko_left[0]/max(1,ko_left[1]):.0%}) — 본문 번역 전 몫')
     # 영어 폰을 쓰는 한국 거주자(10-27 Main) — 나라를 고르지 않았으면 기기 시간대로: en-US + Asia/Seoul → 119
-    for tz, want in (('Asia/Seoul', '119'), ('America/New_York', '911'), ('Europe/Paris', None)):
-        pg = b.new_page(locale='en-US', timezone_id=tz); pg.add_init_script(SEED)
+    # 11-04 Main 실측 — 시간대만으로 짐작(기기 언어로 짐작 금지) · 모르는 시간대는 번호 없이 글만 · 크롬은 베트남을 Asia/Saigon 으로 돌려준다
+    for loc, tz, want in (('en-US', 'Asia/Seoul', '119'), ('en-US', 'America/New_York', '911'), ('en-US', 'Europe/Paris', None),
+                          ('ko-KR', 'UTC', None), ('en-US', 'UTC', None), ('ko-KR', 'Asia/Saigon', '115')):
+        pg = b.new_page(locale=loc, timezone_id=tz); pg.add_init_script(SEED)
         pg.goto(URL + '#/home'); pg.wait_for_function("()=>typeof CORE!=='undefined'&&CORE===2", timeout=20000)
         if pg.evaluate("()=>!!window.I18N"): pg.evaluate("()=>I18N.ready"); pg.wait_for_timeout(400)
         got = pg.evaluate("()=>{route();return [window.LANG, window.CC, (document.querySelector('#view a.er-line')||{}).getAttribute?.('href')]}")
-        if got[2] != (want and 'tel:' + want): fails.append(f'en-US + {tz}: 응급 번호 {got} (기대 {want})')
-        else: rep.append(f'en-US + {tz} → {got[1]} · {got[2]}')
+        if got[2] != (want and 'tel:' + want): fails.append(f'{loc} + {tz}: 응급 번호 {got} (기대 {want})')
+        else: rep.append(f'{loc} + {tz} → {got[1]} · {got[2]}')
         pg.close()
     b.close()
 for r in rep: print(' ', r)
