@@ -24,7 +24,7 @@ with sync_playwright() as p:
                 pg.evaluate("h=>{location.hash=h;route()}", r); pg.wait_for_timeout(600 if r != '/talk' else 1600)
                 o = pg.evaluate(OVER)
                 if o: fails.append(f'{L} {W} {r} 넘침 {o}')
-                if L != 'ko' and not pg.query_selector('#view .i18n-note'): fails.append(f'{L} {W} {r} 「번역 검수 전」 줄 없음')
+                if L != 'ko' and not pg.query_selector('#view .i18n-note'): fails.append(f'{L} {W} {r} 「번역 안내」 줄 없음')
                 tels = pg.eval_on_selector_all('#view a[href^="tel:"]', 'a=>a.map(x=>x.getAttribute("href").slice(4))')
                 bad = [t for t in tels if t in ('119', '911', '112', '120') and t != emg]
                 if bad: fails.append(f'{L}/{CC} {W} {r} 응급 번호 {bad} (기대 {emg})')
@@ -52,4 +52,4 @@ with sync_playwright() as p:
     b.close()
 for r in rep: print(' ', r)
 if fails: print('결함', len(fails)); [print('  ✗', f) for f in fails[:40]]; sys.exit(1)
-print(f'✓ 다섯 언어 × 320·390·1280 · 화면 {len(ROUTES)}개 — 넘침 0 · JS 오류 0 · 나라별 응급 번호 · 검수 전 줄')
+print(f'✓ 다섯 언어 × 320·390·1280 · 화면 {len(ROUTES)}개 — 넘침 0 · JS 오류 0 · 나라별 응급 번호 · 번역 안내 줄')

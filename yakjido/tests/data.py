@@ -721,6 +721,12 @@ for _id in _RX['order']:
             if re.search(r'\d(mg|g|mL|mmHg|kg)\b', o): fails.append(f'rxguide {path}: 숫자와 단위는 띄어 쓰기')
     _rxw(_g, _id)
 print(f'증상 {len(S)} · 약 {len(D)} · 계열 {len(K)} · 영양제 {len(SUP)} · 팁 {len(T)} · 그런줄 {len(_MY)} · 규칙 {len(IX["rules"])} · 출처 {len(SRC)}')
+# 11-05 현욱님 결정 — 화면에 「확인 필요」 칩·「자료 확인 중」 딱지를 띄우지 않는다. 원문을 못 본 값은 싣지 않고 chk_list.py 내부 목록으로.
+for _f in sorted((ROOT / 'content').glob('*.json')):
+    if 'sources' in _f.name: continue
+    if '[확인 필요]' in _f.read_text(encoding='utf-8'):
+        fails.append(f'{_f.name} 에 「[확인 필요]」가 있습니다 — 화면에 칩이 뜹니다. 값을 확인해 채우거나 빼고 tools/chk_list.py 목록으로')
+
 if fails:
     print('실패', len(fails)); [print('  ✗', f) for f in fails]; sys.exit(1)
 print('✓ 자료 고리 전부 연결')

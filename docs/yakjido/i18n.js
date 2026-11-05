@@ -48,7 +48,7 @@
    ① 그 언어 사전(data/i18n/<lang>.json)을 받아 — 증상 응급·진료 신호, 처방약 길잡이 응급 칸(안전 먼저), 화면 글
    ② 그린 화면의 글을 사전으로 바꾼다(없는 글은 한국어 그대로 — 안전 칸을 숨기지 않는다)
    ③ 응급·마음 위기 번호를 «있는 나라» 표로 바꾼다(언어가 아니라 나라 — 표에 있는 숫자만)
-   ④ 한국어가 아닌 화면 맨 위에 「번역은 의료진 검수 전」 한 줄 + 원문 보기 */
+   ④ 한국어가 아닌 화면 맨 아래에 「한국어 원문에서 번역」 한 줄 + 원문 보기(11-05 「검수 전」 꼬리 뗌) */
 (function () {
   if (window.I18N) return;
   var L = window.LANG || 'ko', CC = window.CC || 'KR';
@@ -60,7 +60,7 @@
   var N = EMG[CC] || (공 && 공.응급 ? { e: 공.응급, m: 공.위기 || [] } : { e: null, m: [], unknown: true });
   var 현지 = { ko: '그 나라 응급 번호', en: 'the local emergency number', es: 'el número de emergencias del país', ja: '現地の緊急番号', zh: '当地急救电话' }[L] || 'the local emergency number';
   var DICT = null, ui = {}, uiN = {}, REV = {}, KO = new Map();   /* KO — 번역 글 → 바꾸기 전 한국어(그릴 때마다 다시 얹어도 남게 한 번만 만든다) */
-  var NOTE = { en: 'Translation not yet reviewed by our medical team', es: 'Traducción aún no revisada por nuestro equipo médico', ja: '翻訳は医療スタッフの確認前です', zh: '翻译尚未经医疗团队审核' };
+  var NOTE = { en: 'Translated from the Korean original', es: 'Traducido del original en coreano', ja: '韓国語の原文からの翻訳です', zh: '译自韩文原文' };   /* 11-05 현욱님·Main 「검수 전」 꼬리 떼기 — 번역이라는 사실만 */
   var ORIG = { en: 'Show Korean original', es: 'Ver original en coreano', ja: '韓国語の原文を見る', zh: '查看韩文原文' };
   var KRNOTE = { en: 'Medicine doses follow Korean approval — check with a pharmacist or doctor where you live.', es: 'Las dosis siguen la aprobación de Corea: confírmelas con un farmacéutico o médico de su país.', ja: '薬の量は韓国の承認基準です。お住まいの国の薬剤師・医師に確認してください。', zh: '药物剂量依据韩国批准标准，请向您所在国家的药师或医生确认。' };
   var key = function (t) { return String(t).replace(/\s+/g, ' ').trim(); };
