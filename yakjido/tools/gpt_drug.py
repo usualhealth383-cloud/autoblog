@@ -110,10 +110,14 @@ def make():
 
 BAN = {'en': r'\bfree\b', 'es': r'\bgratis\b|gratuit|[«»]', 'ja': r'無料', 'zh': r'免费'}
 def nums(s): return sorted(re.findall(r'\d+(?:[.,]\d+)?', s.replace(',', '')))
+BR = None
 def check(ko, v, L):
+    global BR
+    if BR is None: BR = sorted(brands(drugs()[0]), key=len, reverse=True)
     e = []
     if re.search('[가-힣]', v): e.append('한글')
-    if ko.count('**') != v.count('**'): e.append('굵게')
+    if v.count('**') and ko.count('**') != v.count('**'): e.append('굵게')   # GPT 화면에서 복사하면 ** 가 통째로 사라진다 — 하나도 없으면 받는다(뜻은 같음), 수가 어긋나면 걸림
+    for b in BR: ko = ko.replace(b, ' ')   # 「이지엔6」의 6 처럼 상품 이름 속 숫자는 성분 이름으로 바뀌며 사라진다
     if len(re.findall(r'\n+', ko)) != v.count('¶'): e.append('문단')
     for n in ('119', '109', '1577-0199'):
         if ko.count(n) != v.count(n): e.append('번호 ' + n)
