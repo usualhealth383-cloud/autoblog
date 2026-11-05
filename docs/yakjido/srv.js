@@ -2445,7 +2445,7 @@ window.vAskDocS = function(_, q){
       <div class="actions" style="margin-top:10px">${speakBtn(`(D.askdoc.find(y=>y.id==='${x.id}')||{}).a`, '답 읽어 주기')}${x.go ? `<a class="btn ghost" href="#${x.go}">${I.chev} ${esc(x.goText || '자세히')}</a>` : ''}</div>
     </div></details>`;
   return `${topBar({ back:'홈' })}<div class="eyebrow">진료실 답</div><h1>의사에게 물었어요</h1>
-  <p style="margin-top:6px">약국·진료실에서 자주 듣는 질문에, <b>이 앱을 검수하는 응급실 의사가 실제로 하는 대답</b>을 그대로 옮겼어요. 모두 ${A.length}가지.</p>
+  <p style="margin-top:6px">약국·진료실에서 자주 듣는 질문에, <b>진료실에서 의사가 실제로 하는 대답</b>을 그대로 옮겼어요. 모두 ${A.length}가지.</p>
   <section class="sec"><div class="explore">${A.map(item).join('')}</div></section>
   <section class="sec"><div class="note">${I.info}<span>일반적인 설명이에요. <b>드시는 약이나 몸 상태에 따라 답이 달라질 수 있어</b> 약사·의사와 상의하세요.</span></div></section>`;
 };
@@ -2747,7 +2747,7 @@ try { 이용량.설치({ 앱: 'yakjido', 켜짐: false, 주소: 'https://uszalzc
 */
 (function () {
   if (window.메디나눔위기번호) return;
-  var 판 = '2026-11-05a';   /* 11-04d 라오스 LA 구급 1195 · TH 1669·VN 115·KH 119 gov.uk 다시 확인 · 11-04c 머리 주석 정리 */
+  var 판 = '2026-11-05b';   /* 11-05b 유럽연합 26나라(스페인 빼고) 112 · 11-04d 라오스 LA 구급 1195 · TH 1669·VN 115·KH 119 gov.uk 다시 확인 · 11-04c 머리 주석 정리 */
   var 표 = {
     KR: { 이름: { ko: '한국', en: 'Korea', es: 'Corea', ja: '韓国', zh: '韩国' }, 응급: '119', 경찰: '112', 위기: ['109', '1577-0199'] },
     US: { 이름: { ko: '미국', en: 'United States', es: 'Estados Unidos', ja: 'アメリカ', zh: '美国' }, 응급: '911', 경찰: '911', 위기: ['988'] },
@@ -2772,6 +2772,33 @@ try { 이용량.설치({ 앱: 'yakjido', 켜짐: false, 주소: 'https://uszalzc
     BD: { 이름: { ko: '방글라데시', en: 'Bangladesh', es: 'Bangladés', ja: 'バングラデシュ', zh: '孟加拉国' }, 응급: '999', 경찰: '999', 위기: [] },   /* gov.uk Bangladesh getting-help · 999.gov.bd */
     IN: { 이름: { ko: '인도', en: 'India', es: 'India', ja: 'インド', zh: '印度' }, 응급: '112', 경찰: '112', 위기: ['14416'] },   /* 11-05 위기 Tele-MANAS 14416(보건가족복지부) — pib.gov.in PRID 2022057 · PRID 1919200 · gov.uk India health(112) · India ERSS(112 · 내무부) */
     GB: { 이름: { ko: '영국', en: 'United Kingdom', es: 'Reino Unido', ja: 'イギリス', zh: '英国' }, 응급: '999', 경찰: '999', 위기: ['116 123'] },   /* gov.uk · NHS 999 · 11-05 위기 Samaritans 116 123 24시간 — phw.nhs.wales · 111.wales.nhs.uk · cntw.nhs.uk */
+    /* 11-05 현욱님 결정(소아 경유) — 유럽연합 27개국 공통 응급 번호 112(유럽 지침 2002/22/EC 제26조 · (EU) 2018/1972 제109조). 위기 상담은 나라마다 달라 빈칸(→ 응급 번호), 경찰도 빈칸. 스페인은 위에 024 와 함께 있다 */
+    AT: { 이름: { ko: '오스트리아', en: 'Austria', es: 'Austria', ja: 'オーストリア', zh: '奥地利' }, 응급: '112', 경찰: null, 위기: [] },
+    BE: { 이름: { ko: '벨기에', en: 'Belgium', es: 'Bélgica', ja: 'ベルギー', zh: '比利时' }, 응급: '112', 경찰: null, 위기: [] },
+    BG: { 이름: { ko: '불가리아', en: 'Bulgaria', es: 'Bulgaria', ja: 'ブルガリア', zh: '保加利亚' }, 응급: '112', 경찰: null, 위기: [] },
+    HR: { 이름: { ko: '크로아티아', en: 'Croatia', es: 'Croacia', ja: 'クロアチア', zh: '克罗地亚' }, 응급: '112', 경찰: null, 위기: [] },
+    CY: { 이름: { ko: '키프로스', en: 'Cyprus', es: 'Chipre', ja: 'キプロス', zh: '塞浦路斯' }, 응급: '112', 경찰: null, 위기: [] },
+    CZ: { 이름: { ko: '체코', en: 'Czechia', es: 'Chequia', ja: 'チェコ', zh: '捷克' }, 응급: '112', 경찰: null, 위기: [] },
+    DK: { 이름: { ko: '덴마크', en: 'Denmark', es: 'Dinamarca', ja: 'デンマーク', zh: '丹麦' }, 응급: '112', 경찰: null, 위기: [] },
+    EE: { 이름: { ko: '에스토니아', en: 'Estonia', es: 'Estonia', ja: 'エストニア', zh: '爱沙尼亚' }, 응급: '112', 경찰: null, 위기: [] },
+    FI: { 이름: { ko: '핀란드', en: 'Finland', es: 'Finlandia', ja: 'フィンランド', zh: '芬兰' }, 응급: '112', 경찰: null, 위기: [] },
+    FR: { 이름: { ko: '프랑스', en: 'France', es: 'Francia', ja: 'フランス', zh: '法国' }, 응급: '112', 경찰: null, 위기: [] },
+    DE: { 이름: { ko: '독일', en: 'Germany', es: 'Alemania', ja: 'ドイツ', zh: '德国' }, 응급: '112', 경찰: null, 위기: [] },
+    GR: { 이름: { ko: '그리스', en: 'Greece', es: 'Grecia', ja: 'ギリシャ', zh: '希腊' }, 응급: '112', 경찰: null, 위기: [] },
+    HU: { 이름: { ko: '헝가리', en: 'Hungary', es: 'Hungría', ja: 'ハンガリー', zh: '匈牙利' }, 응급: '112', 경찰: null, 위기: [] },
+    IE: { 이름: { ko: '아일랜드', en: 'Ireland', es: 'Irlanda', ja: 'アイルランド', zh: '爱尔兰' }, 응급: '112', 경찰: null, 위기: [] },
+    IT: { 이름: { ko: '이탈리아', en: 'Italy', es: 'Italia', ja: 'イタリア', zh: '意大利' }, 응급: '112', 경찰: null, 위기: [] },
+    LV: { 이름: { ko: '라트비아', en: 'Latvia', es: 'Letonia', ja: 'ラトビア', zh: '拉脱维亚' }, 응급: '112', 경찰: null, 위기: [] },
+    LT: { 이름: { ko: '리투아니아', en: 'Lithuania', es: 'Lituania', ja: 'リトアニア', zh: '立陶宛' }, 응급: '112', 경찰: null, 위기: [] },
+    LU: { 이름: { ko: '룩셈부르크', en: 'Luxembourg', es: 'Luxemburgo', ja: 'ルクセンブルク', zh: '卢森堡' }, 응급: '112', 경찰: null, 위기: [] },
+    MT: { 이름: { ko: '몰타', en: 'Malta', es: 'Malta', ja: 'マルタ', zh: '马耳他' }, 응급: '112', 경찰: null, 위기: [] },
+    NL: { 이름: { ko: '네덜란드', en: 'Netherlands', es: 'Países Bajos', ja: 'オランダ', zh: '荷兰' }, 응급: '112', 경찰: null, 위기: [] },
+    PL: { 이름: { ko: '폴란드', en: 'Poland', es: 'Polonia', ja: 'ポーランド', zh: '波兰' }, 응급: '112', 경찰: null, 위기: [] },
+    PT: { 이름: { ko: '포르투갈', en: 'Portugal', es: 'Portugal', ja: 'ポルトガル', zh: '葡萄牙' }, 응급: '112', 경찰: null, 위기: [] },
+    RO: { 이름: { ko: '루마니아', en: 'Romania', es: 'Rumanía', ja: 'ルーマニア', zh: '罗马尼亚' }, 응급: '112', 경찰: null, 위기: [] },
+    SK: { 이름: { ko: '슬로바키아', en: 'Slovakia', es: 'Eslovaquia', ja: 'スロバキア', zh: '斯洛伐克' }, 응급: '112', 경찰: null, 위기: [] },
+    SI: { 이름: { ko: '슬로베니아', en: 'Slovenia', es: 'Eslovenia', ja: 'スロベニア', zh: '斯洛文尼亚' }, 응급: '112', 경찰: null, 위기: [] },
+    SE: { 이름: { ko: '스웨덴', en: 'Sweden', es: 'Suecia', ja: 'スウェーデン', zh: '瑞典' }, 응급: '112', 경찰: null, 위기: [] },
     XX: { 이름: { ko: '그 밖', en: 'Other', es: 'Otro', ja: 'その他', zh: '其他' }, 응급: null, 경찰: null, 위기: [] }   /* 11-04 Main — 모르는 나라는 누르는 번호 없음(112 기본값 없앰) */
   };
   function 고른곳() { try { var v = JSON.parse(localStorage.getItem('mn.place') || 'null'); if (v && v.country) return 표[v.country] ? v.country : 'XX'; } catch (e) {} return null; }
@@ -2802,14 +2829,14 @@ try { 이용량.설치({ 앱: 'yakjido', 켜짐: false, 주소: 'https://uszalzc
      화면: 설정판.HTML()  — 시트 맨 위 제목 아래에 통째로.
    ⛔ 지우기·계정 지우기는 앱의 확인 화면으로만 간다(이 부품이 직접 지우지 않는다).
    ── 공용 부품 셋(위기번호 표 · 설정 부품 · 응급카드 부품) 공통 약속 · 주인: 길동무 세션 ──
-   판: 이 파일 안 «판» 한 곳(코드의 판 값). 고치면 판을 올리고 다섯 앱에 다시 심는다. 지금 판 2026-11-04i.
+   판: 이 파일 안 «판» 한 곳(코드의 판 값). 고치면 판을 올리고 다섯 앱에 다시 심는다. 지금 판 2026-11-05a.
    심는 순서(앱마다 같다): ① 위기번호 표 → ② 설정 부품 → ③ 응급카드 부품 — 표가 앞에 있어야 말과 나라 고르개·응급 번호가 표를 쓴다.
    심기·비교: python3 _도구/공용부품_심기.py 비교 · python3 _도구/공용부품_심기.py <소아|곁에|길동무|CS> · 다른 저장소(약지도): python3 _도구/공용부품_심기.py 파일 <경로>
    ⛔ 앱 사본을 직접 고치지 않는다 — 이 파일을 고치고 다시 심는다(심기 스크립트는 정본과 다른 사본을 보면 멈춘다).
 */
 (function () {
   if (window.설정판 && window.설정판.__v) return;
-  var 판 = '2026-11-04i';   /* 11-04i 묶음 제목 h3→h2(화면 읽기 머리글 건너뜀 없게 · 곁에가 찾음) */   /* 11-04h 기기 언어로 나라 짐작 안 함(모르면 빈칸·번호 없음) · 11-04g 응급번호()·번호HTML() · 11-04f 제목·설명 이스케이프 · 11-04e 기본 줄 값 이스케이프 · 11-04d 머리 주석 정리 */
+  var 판 = '2026-11-05a';   /* 11-05a 유럽연합 시간대 */   /* 11-04i 묶음 제목 h3→h2(화면 읽기 머리글 건너뜀 없게 · 곁에가 찾음) */   /* 11-04h 기기 언어로 나라 짐작 안 함(모르면 빈칸·번호 없음) · 11-04g 응급번호()·번호HTML() · 11-04f 제목·설명 이스케이프 · 11-04e 기본 줄 값 이스케이프 · 11-04d 머리 주석 정리 */
   var 설정 = { app: 'app', 언어: null, 줄: null, 아이콘: null, 다시그리기: null };
   var 글표 = {
     ko: { 맞추기: '나에게 맞추기', 알림: '알림', 화면: '화면과 언어', 기록: '내 기록', 앱: '이 앱',
@@ -2921,7 +2948,8 @@ try { 이용량.설치({ 앱: 'yakjido', 켜짐: false, 주소: 'https://uszalzc
         'America/Mexico_City': 'MX', 'America/Monterrey': 'MX', 'America/Merida': 'MX', 'America/Cancun': 'MX', 'America/Chihuahua': 'MX', 'America/Mazatlan': 'MX', 'America/Hermosillo': 'MX', 'America/Tijuana': 'MX',
         'Europe/London': 'GB', 'Europe/Dublin': 'IE', 'Asia/Singapore': 'SG', 'Asia/Manila': 'PH', 'Asia/Kolkata': 'IN', 'Asia/Calcutta': 'IN', 'Pacific/Auckland': 'NZ',
         'Asia/Ho_Chi_Minh': 'VN', 'Asia/Saigon': 'VN', 'Asia/Bangkok': 'TH', 'Asia/Jakarta': 'ID', 'Asia/Makassar': 'ID', 'Asia/Jayapura': 'ID', 'Asia/Kathmandu': 'NP', 'Asia/Katmandu': 'NP', 'Asia/Tashkent': 'UZ', 'Asia/Samarkand': 'UZ',
-        'Asia/Phnom_Penh': 'KH', 'Asia/Ulaanbaatar': 'MN', 'Asia/Ulan_Bator': 'MN', 'Asia/Colombo': 'LK', 'Asia/Dhaka': 'BD' };   /* 11-04c 공용 표의 나라 */
+        'Asia/Phnom_Penh': 'KH', 'Asia/Ulaanbaatar': 'MN', 'Asia/Ulan_Bator': 'MN', 'Asia/Colombo': 'LK', 'Asia/Dhaka': 'BD',
+        'Europe/Berlin': 'DE', 'Europe/Busingen': 'DE', 'Europe/Paris': 'FR', 'Europe/Rome': 'IT', 'Europe/Amsterdam': 'NL', 'Europe/Brussels': 'BE', 'Europe/Vienna': 'AT', 'Europe/Warsaw': 'PL', 'Europe/Prague': 'CZ', 'Europe/Stockholm': 'SE', 'Europe/Copenhagen': 'DK', 'Europe/Helsinki': 'FI', 'Europe/Lisbon': 'PT', 'Atlantic/Madeira': 'PT', 'Atlantic/Azores': 'PT', 'Europe/Athens': 'GR', 'Europe/Budapest': 'HU', 'Europe/Bucharest': 'RO', 'Europe/Sofia': 'BG', 'Europe/Zagreb': 'HR', 'Europe/Ljubljana': 'SI', 'Europe/Bratislava': 'SK', 'Europe/Vilnius': 'LT', 'Europe/Riga': 'LV', 'Europe/Tallinn': 'EE', 'Europe/Luxembourg': 'LU', 'Europe/Malta': 'MT', 'Asia/Nicosia': 'CY', 'Asia/Famagusta': 'CY', 'Europe/Nicosia': 'CY', 'Europe/Mariehamn': 'FI' };   /* 11-05 유럽연합(소아 경유 현욱님 결정) */   /* 11-04c 공용 표의 나라 */
       if (표[tz]) return 표[tz];
       if (/^America\/(New_York|Chicago|Denver|Los_Angeles|Phoenix|Anchorage|Detroit|Indiana|Kentucky|Boise|Juneau|Sitka|Nome|Adak|Menominee|North_Dakota)|^Pacific\/Honolulu$/.test(tz)) return 'US';
       if (/^America\/(Toronto|Vancouver|Edmonton|Winnipeg|Halifax|St_Johns|Regina|Montreal)/.test(tz)) return 'CA';
@@ -3043,27 +3071,28 @@ try { 이용량.설치({ 앱: 'yakjido', 켜짐: false, 주소: 'https://uszalzc
    보이는 때: 설정판.말과나라() 가 country 'KR' · level 'some'|'none' · lang 이 한국어가 아닐 때만. 그 밖에는 빈 글('').
    모양: 큰 한국어 문장(상대에게 보여 줘도 되게) + 그 아래 본인 말. 적어 둔 주소가 있으면 한 줄 더(주소는 이 기기 localStorage mn.addr 에만 — 서버로 보내지 않는다).
    통역 줄(11-04 Main 확인 · 설계안): 「119 에 통역을 부탁하세요」 · 1345 외국인종합안내센터(법무부 — 생활·행정 도움, 평일 09:00~22:00 · 20개 말 · 18시 뒤 한·영·중 · immigration.go.kr/immigration/1530/subview.do)
-     · 1330 관광 통역(24시간 영·일·중 — 통역 도움으로만, 119 연결을 약속하지 않는다). 1577-0071 은 넣지 않는다. 앱이 통역줄로 바꿀 수 있다.
+     · 11-05 확정: 1345 영·중 「평일 9~22시」 · 스·일 「평일 9~18시」(18시 뒤는 한·영·중만) · 1330 관광 통역(시간은 적지 않음 — 출처가 갈림 · 통역 도움으로만, 119 연결을 약속하지 않는다). 1577-0071 은 넣지 않는다. 앱이 통역줄로 바꿀 수 있다.
+   내 말 카드: 기기 말이 다섯 말 밖(vi·th·tl·id·ne·uz·km·mn·ru·my)이면 #mn-ecard 맨 위에 그 말로(응급카드.내말카드HTML() 로 따로도).
    쓰는 법: 화면에 <div id="mn-ecard"></div> 자리만 두면 부품이 채운다(응급카드.채우기() · mn:place 이벤트 · 자리가 새로 그려지면 스스로).
             문자열이 필요하면 응급카드.HTML(). 「주소 적어 두기」는 카드 안에서 바로.
    ⛔ 이모지 0 · « » 0 · 단추 44px 이상 · 320 넘침 0.
    ── 공용 부품 셋(위기번호 표 · 설정 부품 · 응급카드 부품) 공통 약속 · 주인: 길동무 세션 ──
-   판: 이 파일 안 «판» 한 곳(코드의 판 값). 고치면 판을 올리고 다섯 앱에 다시 심는다. 지금 판 2026-11-04b.
+   판: 이 파일 안 «판» 한 곳(코드의 판 값). 고치면 판을 올리고 다섯 앱에 다시 심는다. 지금 판 2026-11-05b.
    심는 순서(앱마다 같다): ① 위기번호 표 → ② 설정 부품 → ③ 응급카드 부품 — 표가 앞에 있어야 말과 나라 고르개·응급 번호가 표를 쓴다.
    심기·비교: python3 _도구/공용부품_심기.py 비교 · python3 _도구/공용부품_심기.py <소아|곁에|길동무|CS> · 다른 저장소(약지도): python3 _도구/공용부품_심기.py 파일 <경로>
    ⛔ 앱 사본을 직접 고치지 않는다 — 이 파일을 고치고 다시 심는다(심기 스크립트는 정본과 다른 사본을 보면 멈춘다).
 */
 (function () {
   if (window.응급카드 && window.응급카드.__v) return;
-  var 판 = '2026-11-04b', 주소열쇠 = 'mn.addr';   /* 11-04b 머리 주석 정리(동작 같음) · 11-04 첫 판은 통역 줄 없음 */
+  var 판 = '2026-11-05b', 주소열쇠 = 'mn.addr';   /* 11-05b 1345 시간 말별·1330 시간 뺌 · 11-05a 내 말 응급 카드(10개 말) 합침 · 11-04b 머리 주석 정리 · 11-04 첫 판은 통역 줄 없음 */
   var 기본통역줄 = [
     { 번호: '119', 말: { en: 'Ask 119 for an interpreter.', es: 'Pida un intérprete al 119.', ja: '119に通訳をお願いしてください。', zh: '请向119要求翻译服务。' } },
-    { 번호: '1345', 말: { en: 'Immigration Contact Center (Ministry of Justice) — help with daily life and paperwork, not emergencies. Weekdays 09:00–22:00 in 20 languages; after 18:00 Korean, English and Chinese only. From abroad +82-2-1345.',
-      es: 'Centro de Atención a Extranjeros (Ministerio de Justicia): ayuda con la vida diaria y los trámites, no con emergencias. De lunes a viernes de 09:00 a 22:00 en 20 idiomas; después de las 18:00, solo coreano, inglés y chino. Desde el extranjero +82-2-1345.',
-      ja: '外国人総合案内センター（法務部）— 生活や手続きの相談（緊急ではないとき）。平日09:00〜22:00・20言語、18時以降は韓国語・英語・中国語のみ。海外から+82-2-1345。',
-      zh: '外国人综合咨询中心（法务部）——生活和行政事务咨询（非紧急情况）。工作日09:00～22:00，20种语言；18:00以后仅限韩语、英语、中文。从海外拨打+82-2-1345。' } },
-    { 번호: '1330', 말: { en: 'Korea Travel Hotline — interpretation help 24 hours in English, Japanese and Chinese.', es: 'Línea de turismo de Corea: ayuda con la interpretación las 24 horas en inglés, japonés y chino.',
-      ja: '観光通訳案内 — 英語・日本語・中国語は24時間、通訳の手助けをします。', zh: '旅游咨询热线——英语、日语、中文24小时提供口译帮助。' } } ];
+    { 번호: '1345', 말: { en: 'Immigration Contact Center (Ministry of Justice) — help with daily life and paperwork, not emergencies. In English on weekdays 09:00–22:00. From abroad +82-2-1345.',
+      es: 'Centro de Atención a Extranjeros (Ministerio de Justicia): ayuda con la vida diaria y los trámites, no con emergencias. En español, de lunes a viernes de 09:00 a 18:00. Desde el extranjero +82-2-1345.',
+      ja: '外国人総合案内センター（法務部）— 生活や手続きの相談（緊急ではないとき）。日本語は平日09:00〜18:00。海外から+82-2-1345。',
+      zh: '外国人综合咨询中心（法务部）——生活和行政事务咨询（非紧急情况）。中文服务工作日09:00～22:00。从海外拨打+82-2-1345。' } },
+    { 번호: '1330', 말: { en: 'Korea Travel Hotline — interpretation help in English, Japanese and Chinese.', es: 'Línea de turismo de Corea: ayuda con la interpretación en inglés, japonés y chino.',
+      ja: '観光通訳案内 — 英語・日本語・中国語で通訳の手助けをします。', zh: '旅游咨询热线——提供英语、日语、中文口译帮助。' } } ];
   var 설정 = { 통역줄: 기본통역줄 };
   var 말이름ko = { en: '영어', es: '스페인어', ja: '일본어', zh: '중국어' };
   var 글표 = {
@@ -3085,7 +3114,9 @@ try { 이용량.설치({ 앱: 'yakjido', 켜짐: false, 주소: 'https://uszalzc
       '.ec-me{margin:8px 0 0;line-height:1.55;color:var(--ink2,inherit)}.ec-addr{margin:12px 0 0;padding-top:10px;border-top:1px solid var(--line,rgba(127,127,127,.28))}' +
       '.ec-addr .ec-ko{font-size:1.18em}.ec-row{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}.ec-btn{min-height:48px;padding:8px 14px;border-radius:12px;border:1px solid var(--line,rgba(127,127,127,.4));background:transparent;color:inherit;font:inherit;font-weight:700;cursor:pointer}' +
       '.ec-in{flex:1 1 200px;min-width:0;min-height:48px;padding:8px 12px;border-radius:12px;border:1px solid var(--line,rgba(127,127,127,.4));background:transparent;color:inherit;font:inherit;font-size:16px}' +
-      '.ec-tl{margin:10px 0 0;font-size:.95em}.ec-tl a{font-weight:800}';
+      '.ec-tl{margin:10px 0 0;font-size:.95em}.ec-tl a{font-weight:800}' +
+      '.mnl-card{margin:0 0 14px;padding:14px 16px;border-radius:16px;border:1px solid var(--ec-line,var(--warn,#b3261e));background:var(--ec-bg,var(--card,transparent));line-height:1.55;word-break:keep-all;overflow-wrap:anywhere}.mnl-card p{margin:0 0 8px}.mnl-t{font-weight:800}' +
+      '.mnl-r{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 10px}.mnl-card a.mnl-b{display:inline-flex;align-items:center;min-height:44px;padding:0 14px;border-radius:999px;background:var(--ec-line,var(--warn,#b3261e));color:#fff;font-weight:700;text-decoration:none}';
     document.head.appendChild(st);
   }
   function HTML() {
@@ -3103,6 +3134,48 @@ try { 이용량.설치({ 앱: 'yakjido', 켜짐: false, 주소: 'https://uszalzc
     h += '<div class="ec-row" id="ecAddrRow"><button type="button" class="ec-btn" onclick="응급카드.주소열기()">' + esc(a ? t.고치기 : t.적기) + '</button></div></section>';
     return h;
   }
+
+  /* ── 내 말 응급 카드(11-05 현욱님 「베트남인이 한국에 살면 베트남어로 한국 응급번호」 · 곁에에서 가져와 합침) ──
+     화면 말(다섯 말) 밖의 말을 쓰는 분 — 기기 언어(navigator.languages)로 판정 — 께 그 말로 짧은 카드. 번호는 사는 나라(설정판.응급번호()) 기준.
+     한국: 119 구급·112 경찰 · 109 자살예방 24시간(한국어 — 외국어 통역은 확인 못 함, 그렇게 적음) · 1345 외국인종합안내(이 말이 목록에 있을 때만) · 1330 관광통역안내.
+     1345 시간(11-05 확정 · 법무부 immigration.go.kr/immigration/1530): 평일 09:00~22:00, 단 18시 뒤는 한·영·중만 → 이 10개 말은 「평일 9~18시」(w).
+     1330: 출처가 갈려(질병관리청 07~24시 · 지자체 08~19시) 시간은 적지 않고 번호만 — h 는 「1330 이 이 말을 하는지」 표시로만 쓴다. 글은 언어층이 건드리지 않게 data-raw. */
+  var 내말표 = {
+    vi: { n: 'Tiếng Việt', t: 'Trợ giúp khẩn cấp bằng tiếng Việt', d: 'Nếu đang gặp nguy hiểm, hãy gọi ngay', a: 'cấp cứu', p: 'cảnh sát', s: 'Muốn nói chuyện khi lòng nặng nề', k: '24 giờ, tiếng Hàn', m: 'Hỗ trợ bằng tiếng Việt', w: 'ngày thường 9–18 giờ', h: '7–24 giờ', l: 'Hãy gọi số khẩn cấp của nơi bạn đang sống.', c: 'Gọi' },
+    th: { n: 'ภาษาไทย', t: 'ความช่วยเหลือฉุกเฉินเป็นภาษาไทย', d: 'ถ้ากำลังอยู่ในอันตราย โทรทันที', a: 'รถพยาบาล', p: 'ตำรวจ', s: 'อยากคุยกับใครสักคนเมื่อใจหนักอึ้ง', k: '24 ชั่วโมง ภาษาเกาหลี', m: 'ความช่วยเหลือเป็นภาษาไทย', w: 'วันธรรมดา 9–18 น.', h: '7–24 น.', l: 'โทรหมายเลขฉุกเฉินของประเทศที่คุณอาศัยอยู่', c: 'โทร' },
+    tl: { n: 'Filipino', t: 'Tulong pang-emergency sa Filipino', d: 'Kung nasa panganib ka ngayon, tumawag agad', a: 'ambulansya', p: 'pulis', s: 'Kung gusto mong may makausap kapag mabigat ang loob mo', k: '24 oras, sa wikang Korean', m: 'Tulong sa wikang Filipino', w: 'Lunes–Biyernes 9–18', h: '7–24', l: 'Tumawag sa emergency number ng bansang tinitirhan mo.', c: 'Tawagan' },
+    id: { n: 'Bahasa Indonesia', t: 'Bantuan darurat dalam bahasa Indonesia', d: 'Jika sedang dalam bahaya, segera telepon', a: 'ambulans', p: 'polisi', s: 'Ingin bicara saat hati terasa berat', k: '24 jam, bahasa Korea', m: 'Bantuan dalam bahasa Indonesia', w: 'hari kerja 09.00–18.00', h: '07.00–24.00', l: 'Telepon nomor darurat di negara tempat Anda tinggal.', c: 'Telepon' },
+    ne: { n: 'नेपाली', t: 'नेपालीमा आपतकालीन सहायता', d: 'अहिले खतरामा हुनुहुन्छ भने तुरुन्तै फोन गर्नुहोस्', a: 'एम्बुलेन्स', p: 'प्रहरी', s: 'मन भारी हुँदा कसैसँग कुरा गर्न', k: '24 घण्टा, कोरियाली भाषामा', m: 'नेपाली भाषामा सहायता', w: 'सोमबार–शुक्रबार 9–18 बजे', h: '', l: 'तपाईं बस्ने देशको आपतकालीन नम्बरमा फोन गर्नुहोस्।', c: 'फोन' },
+    uz: { n: 'Oʻzbekcha', t: 'Oʻzbek tilida favqulodda yordam', d: 'Hozir xavf ostida boʻlsangiz, darhol qoʻngʻiroq qiling', a: 'tez yordam', p: 'politsiya', s: 'Koʻnglingiz ogʻir boʻlsa, gaplashish uchun', k: '24 soat, koreys tilida', m: '', w: '', h: '', l: 'Yashayotgan mamlakatingizdagi favqulodda raqamga qoʻngʻiroq qiling.', c: 'Qoʻngʻiroq' },
+    km: { n: 'ខ្មែរ', t: 'ជំនួយបន្ទាន់ជាភាសាខ្មែរ', d: 'បើកំពុងមានគ្រោះថ្នាក់ សូមទូរសព្ទភ្លាម', a: 'រថយន្តសង្គ្រោះ', p: 'ប៉ូលិស', s: 'ចង់និយាយជាមួយនរណាម្នាក់ពេលចិត្តធ្ងន់', k: '24 ម៉ោង ភាសាកូរ៉េ', m: 'ជំនួយជាភាសាខ្មែរ', w: 'ថ្ងៃធ្វើការ 9–18 ម៉ោង', h: '', l: 'សូមទូរសព្ទទៅលេខបន្ទាន់នៃប្រទេសដែលអ្នករស់នៅ។', c: 'ទូរសព្ទ' },
+    mn: { n: 'Монгол', t: 'Монгол хэлээр яаралтай тусламж', d: 'Одоо аюулд байгаа бол шууд залгаарай', a: 'түргэн тусламж', p: 'цагдаа', s: 'Сэтгэл хүнд үед хэн нэгэнтэй ярилцмаар байвал', k: '24 цаг, солонгос хэлээр', m: 'Монгол хэлээр тусламж', w: 'ажлын өдөр 9–18 цаг', h: '', l: 'Амьдарч буй улсынхаа яаралтай дугаарт залгаарай.', c: 'Залгах' },
+    ru: { n: 'Русский', t: 'Экстренная помощь на русском', d: 'Если вы в опасности, звоните сразу', a: 'скорая', p: 'полиция', s: 'Если тяжело на душе и хочется поговорить', k: 'круглосуточно, на корейском', m: 'Помощь на русском', w: 'будни 9–18', h: '7–24', l: 'Позвоните по экстренному номеру страны, где вы живёте.', c: 'Позвонить' },
+    my: { n: 'မြန်မာ', t: 'မြန်မာဘာသာဖြင့် အရေးပေါ်အကူအညီ', d: 'အခု အန္တရာယ်ရှိနေရင် ချက်ချင်း ဖုန်းဆက်ပါ', a: 'လူနာတင်ယာဉ်', p: 'ရဲ', s: 'စိတ်လေးလံနေချိန် တစ်ယောက်ယောက်နဲ့ စကားပြောချင်ရင်', k: '24 နာရီ၊ ကိုရီးယားဘာသာ', m: 'မြန်မာဘာသာဖြင့် အကူအညီ', w: 'ရုံးဖွင့်ရက် 9–18 နာရီ', h: '', l: 'သင်နေထိုင်ရာ နိုင်ငံ၏ အရေးပေါ်နံပါတ်ကို ဖုန်းဆက်ပါ။', c: 'ဖုန်းဆက်' }
+  };
+  function 내말() {
+    try {
+      var 화면 = (곳() || {}).lang || String(document.documentElement.lang || 'ko').slice(0, 2);
+      var L = 설정.기기말 || (navigator.languages && navigator.languages.length ? navigator.languages : [navigator.language || '']);
+      for (var i = 0; i < L.length; i++) { var c = String(L[i] || '').toLowerCase().split('-')[0]; if (c === 'fil') c = 'tl'; if (c === 'ms') c = 'id';
+        if (['ko', 'en', 'es', 'ja', 'zh'].indexOf(c) >= 0) return null; if (내말표[c] && c !== 화면) return c; }
+    } catch (e) {}
+    return null;
+  }
+  function 내말단추(n, 이름, c) { var d = String(n).replace(/[^\d]/g, ''); return '<a class="mnl-b" href="tel:' + d + '">' + esc(c + ' ' + n + (이름 ? ' · ' + 이름 : '')) + '</a>'; }
+  function 내말카드HTML() {
+    var c = 내말(); if (!c) return '';
+    스타일();
+    var M = 내말표[c], 번 = {}; try { 번 = window.설정판 && 설정판.응급번호 ? 설정판.응급번호() : {}; } catch (e) {}
+    var 나라 = 번.나라 || 'KR', 안 = '<p class="mnl-t">' + esc(M.t) + '</p>';
+    if (나라 === 'KR') {
+      안 += '<p>' + esc(M.d) + '</p><div class="mnl-r">' + 내말단추('119', M.a, M.c) + 내말단추('112', M.p, M.c) + '</div>' +
+        '<p>' + esc(M.s) + ' — 109 (' + esc(M.k) + ')</p><div class="mnl-r">' + 내말단추('109', '', M.c) + '</div>';
+      if (M.m) 안 += '<p>' + esc(M.m) + ': 1345 (' + esc(M.w) + ')' + (M.h ? ' · 1330' : '') + '</p><div class="mnl-r">' + 내말단추('1345', '', M.c) + (M.h ? 내말단추('1330', '', M.c) : '') + '</div>';
+    } else if (번.응급) {
+      안 += '<p>' + esc(M.d) + '</p><div class="mnl-r">' + 내말단추(번.응급, M.a, M.c) + (번.위기1 && 번.위기1 !== 번.응급 ? 내말단추(번.위기1, '', M.c) : '') + '</div>';
+    } else { 안 += '<p>' + esc(M.l) + '</p>'; }
+    return '<div class="mnl-card" data-raw="1" translate="no" lang="' + c + '" role="region" aria-label="' + esc(M.t) + '">' + 안 + '</div>';
+  }
   function 주소열기() {
     var p = 곳(), t = p && 글표[p.lang], r = document.getElementById('ecAddrRow'); if (!t || !r) return;
     r.innerHTML = '<input id="ecAddrIn" class="ec-in" type="text" autocomplete="street-address" aria-label="' + esc(t.칸) + '" placeholder="' + esc(t.칸) + '" value="' + esc(주소()) + '">' +
@@ -3117,13 +3190,13 @@ try { 이용량.설치({ 앱: 'yakjido', 켜짐: false, 주소: 'https://uszalzc
   }
   function 채우기() {
     var el = document.getElementById('mn-ecard'); if (!el) return false;
-    var h = HTML(); if (el.getAttribute('data-ec') === h) return true;
+    var h = 내말카드HTML() + HTML(); if (el.getAttribute('data-ec') === h) return true;   /* 11-05 내 말 카드가 맨 위 */
     el.innerHTML = h; el.setAttribute('data-ec', h); return true;
   }
   try { window.addEventListener('mn:place', 채우기); } catch (e) {}
   try { var 예약 = 0; new MutationObserver(function () { var el = document.getElementById('mn-ecard'); if (el && !el.hasAttribute('data-ec')) { clearTimeout(예약); 예약 = setTimeout(채우기, 0); } })
     .observe(document.documentElement, { childList: true, subtree: true }); } catch (e) {}
-  window.응급카드 = { __v: 판, 판: 판, HTML: HTML, 채우기: 채우기, 보일까: 보일까, 주소열기: 주소열기, 주소저장: 주소저장, 주소: 주소,
+  window.응급카드 = { __v: 판, 판: 판, HTML: HTML, 채우기: 채우기, 내말카드HTML: 내말카드HTML, 내말: 내말, 내말표: 내말표, 보일까: 보일까, 주소열기: 주소열기, 주소저장: 주소저장, 주소: 주소,
     설치: function (o) { o = o || {}; Object.keys(o).forEach(function (k) { 설정[k] = o[k]; }); return window.응급카드; } };
 })();
 /* ▲▲ 응급카드 부품 끝 ▲▲ */

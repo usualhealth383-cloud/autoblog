@@ -48,7 +48,7 @@
    ① 그 언어 사전(data/i18n/<lang>.json)을 받아 — 증상 응급·진료 신호, 처방약 길잡이 응급 칸(안전 먼저), 화면 글
    ② 그린 화면의 글을 사전으로 바꾼다(없는 글은 한국어 그대로 — 안전 칸을 숨기지 않는다)
    ③ 응급·마음 위기 번호를 «있는 나라» 표로 바꾼다(언어가 아니라 나라 — 표에 있는 숫자만)
-   ④ 한국어가 아닌 화면 맨 위에 「번역은 의료진 검수 전」 한 줄 + 원문 보기 */
+   ④ 한국어가 아닌 화면 맨 아래에 「한국어 원문에서 번역」 한 줄 + 원문 보기(11-05 「검수 전」 꼬리 뗌) */
 (function () {
   if (window.I18N) return;
   var L = window.LANG || 'ko', CC = window.CC || 'KR';
@@ -60,7 +60,7 @@
   var N = EMG[CC] || (공 && 공.응급 ? { e: 공.응급, m: 공.위기 || [] } : { e: null, m: [], unknown: true });
   var 현지 = { ko: '그 나라 응급 번호', en: 'the local emergency number', es: 'el número de emergencias del país', ja: '現地の緊急番号', zh: '当地急救电话' }[L] || 'the local emergency number';
   var DICT = null, ui = {}, uiN = {}, REV = {}, KO = new Map();   /* KO — 번역 글 → 바꾸기 전 한국어(그릴 때마다 다시 얹어도 남게 한 번만 만든다) */
-  var NOTE = { en: 'Translation not yet reviewed by our medical team', es: 'Traducción aún no revisada por nuestro equipo médico', ja: '翻訳は医療スタッフの確認前です', zh: '翻译尚未经医疗团队审核' };
+  var NOTE = { en: 'Translated from the Korean original', es: 'Traducido del original en coreano', ja: '韓国語の原文からの翻訳です', zh: '译自韩文原文' };   /* 11-05 현욱님·Main 「검수 전」 꼬리 떼기 — 번역이라는 사실만 */
   var ORIG = { en: 'Show Korean original', es: 'Ver original en coreano', ja: '韓国語の原文を見る', zh: '查看韩文原文' };
   var KRNOTE = { en: 'Medicine doses follow Korean approval — check with a pharmacist or doctor where you live.', es: 'Las dosis siguen la aprobación de Corea: confírmelas con un farmacéutico o médico de su país.', ja: '薬の量は韓国の承認基準です。お住まいの国の薬剤師・医師に確認してください。', zh: '药物剂量依据韩国批准标准，请向您所在国家的药师或医生确认。' };
   var key = function (t) { return String(t).replace(/\s+/g, ' ').trim(); };
@@ -105,7 +105,7 @@
     var ko = function (n, o) { if (n !== o && o) KO.set(n, o); return n; };
     window.yKo = function (t) { return t && typeof t === 'object' ? t._ko : KO.get(t); };
     window.yBanP = function (t, b) { var k = KO.get(t); if (k == null) return null;
-      var sp = function (x) { return String(x).replace(/([.!?])\s+|([。！？])\s*/g, function (m, a, c) { return (a || c) + '\u0001'; }).split('\u0001').filter(function (y) { return y.trim(); }); };
+      var sp = function (x) { return String(x).replace(/([.!?](?:\*\*)?)\s+|([。！？](?:\*\*)?)\s*/g, function (m, a, c) { return (a || c) + '\u0001'; }).split('\u0001').filter(function (y) { return y.trim(); }); };
       var ks = sp(k), hs = ks.map(function (x) { return b.hit(x); }); if (!hs.some(Boolean)) return t;
       var ts = sp(t); return ts.length === ks.length ? ts.filter(function (x, i) { return !hs[i]; }).join(' ') : '';   /* 문장 수가 다르면 그 칸을 통째로 뺀다(안전 쪽) */ };
     (D.symptoms || []).forEach(function (s) {
@@ -114,8 +114,15 @@
       ['how', 'pharmacy', 'selfcare', 'avoid'].forEach(function (k) { if (b[k] && Array.isArray(s[k])) s[k] = s[k].map(function (x, i) { return b[k][i] ? ko(b[k][i], x) : x; }); });
       if (b.plan && Array.isArray(s.plan)) s.plan.forEach(function (o, i) { var x = b.plan[i]; if (x && !o._k) o._k = { slot: o.slot, title: o.title };   /* 11-05 칸 이름으로 맞추는 곳(withSlot·catName)은 한국어 _k 로 */ if (x) ['slot', 'title', 'why', 'either'].forEach(function (f) { if (x[f] && o[f] && o[f] !== x[f]) { if (f !== 'why') REV[x[f]] = o[f]; o[f] = ko(x[f], o[f]); } }); });
       if (b.notWorking && s.notWorking) { if (b.notWorking.title) s.notWorking.title = b.notWorking.title; if (b.notWorking.steps && s.notWorking.steps) s.notWorking.steps = s.notWorking.steps.map(function (x, i) { return b.notWorking.steps[i] ? ko(b.notWorking.steps[i], x) : x; }); }
-      if (b.clinic && s.triage && s.triage.clinic) s.triage.clinic = ko(b.clinic, s.triage.clinic);   /* 11-05 「병원에서는」 칸 */
+      if (b.clinic && s.triage && s.triage.clinic) s.triage.clinic = ko(b.clinic, s.triage.clinic); if (b.pharm && s.triage && s.triage.pharmacy) s.triage.pharmacy = ko(b.pharm, s.triage.pharmacy);   /* 「약국에서는」 — banProse 가 KO 로 거름 */   /* 11-05 「병원에서는」 칸 */
       if (b.faq && Array.isArray(s.faq)) s.faq.forEach(function (o, i) { var x = b.faq[i]; if (x) { if (o._ko == null) o._ko = (o.q || '') + ' ' + (o.a || ''); if (x.q) o.q = x.q; if (x.a) o.a = x.a; } });
+    });
+    /* 11-05 약 설명(보이기만 하는 칸) — 용량·주의·금기·simple 은 아직 한국어(판정·약사 카드가 그 글을 읽는다). pAdj 는 yKo 로 한국어 원문에 규칙을 건다 */
+    var DG = DICT.drug || {};
+    (D.drugs || []).forEach(function (d) { var b = DG[d.id]; if (!b) return;
+      ['tagline', 'lead', 'children', 'onset', 'duration'].forEach(function (k) { if (b[k] && d[k]) d[k] = ko(b[k], d[k]); });
+      ['for', 'sideEffects', 'stop', 'tips'].forEach(function (k) { if (b[k] && Array.isArray(d[k])) d[k] = d[k].map(function (x, i) { return b[k][i] ? ko(b[k][i], x) : x; }); });
+      if (b.faq && Array.isArray(d.faq)) d.faq.forEach(function (o, i) { var x = b.faq[i]; if (x) { if (o._ko == null) o._ko = (o.q || '') + ' ' + (o.a || ''); if (x.q) o.q = ko(x.q, o.q); if (x.a) o.a = ko(x.a, o.a); } });
     });
     var R = typeof RXG !== 'undefined' ? RXG : window.RXG, RX = DICT.rx || {};
     if (R && R.guides) {
