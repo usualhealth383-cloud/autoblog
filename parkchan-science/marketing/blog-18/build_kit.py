@@ -123,7 +123,7 @@ page = f'''{head}<div class="wrap">
 <p class="note">네이버가 일부 서식을 빼면 '글자만 복사'(사진 자리 표시가 들어 있음)를 쓰십시오.</p>
 <details style="margin-top:10px"><summary style="font-size:14px;color:var(--muted);cursor:pointer">글자만 복사 (서식 없음)</summary><textarea id="bodyTxt" readonly style="margin-top:8px">{html.escape(body)}</textarea><button class="cp big" data-copy="bodyTxt">글자만 복사</button></details>
 <button class="cp big" id="richBtn2" style="background:var(--soft);color:var(--ink);border:1px solid var(--line)">사진이 안 들어가면 — 사진을 글 안에 담아 복사</button></section>
-<section class="box"><h2>③ 태그 — 하나씩 입력 후 Enter</h2><div class="tags">{tags}</div><button class="cp big" data-copy="tagTxt">태그 복사(띄어쓰기로 구분)</button><textarea id="tagTxt" readonly style="display:none">{" ".join(TAGS)}</textarea></section>
+<section class="box"><h2>③ 태그 — 한 번에 붙여 넣기</h2><div class="tags">{tags}</div><button class="cp big" data-copy="tagTxt">태그 한 번에 복사 (#붙임)</button><p class="note">네이버 글쓰기 맨 아래 태그 칸을 누르고 그대로 붙여 넣으십시오. 하나로 붙으면 마지막에 띄어쓰기를 한 번 누르십시오.</p><textarea id="tagTxt" readonly style="display:none">{" ".join("#" + t for t in TAGS)}</textarea></section>
 <section class="box"><h2>④ 네이버에서 고치는 법</h2><ol class="how">
 <li>블로그의 첫 글을 열어 <b>수정</b>을 누르고, 본문을 모두 지운 뒤 ②를 붙여 넣기</li>
 <li>또는 새 글로 올리고 옛 글은 비공개로 두기</li>
