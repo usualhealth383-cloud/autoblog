@@ -2445,7 +2445,7 @@ window.vAskDocS = function(_, q){
       <div class="actions" style="margin-top:10px">${speakBtn(`(D.askdoc.find(y=>y.id==='${x.id}')||{}).a`, '답 읽어 주기')}${x.go ? `<a class="btn ghost" href="#${x.go}">${I.chev} ${esc(x.goText || '자세히')}</a>` : ''}</div>
     </div></details>`;
   return `${topBar({ back:'홈' })}<div class="eyebrow">진료실 답</div><h1>의사에게 물었어요</h1>
-  <p style="margin-top:6px">약국·진료실에서 자주 듣는 질문에, <b>이 앱을 검수하는 응급실 의사가 실제로 하는 대답</b>을 그대로 옮겼어요. 모두 ${A.length}가지.</p>
+  <p style="margin-top:6px">약국·진료실에서 자주 듣는 질문에, <b>진료실에서 의사가 실제로 하는 대답</b>을 그대로 옮겼어요. 모두 ${A.length}가지.</p>
   <section class="sec"><div class="explore">${A.map(item).join('')}</div></section>
   <section class="sec"><div class="note">${I.info}<span>일반적인 설명이에요. <b>드시는 약이나 몸 상태에 따라 답이 달라질 수 있어</b> 약사·의사와 상의하세요.</span></div></section>`;
 };

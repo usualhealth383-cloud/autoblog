@@ -1768,8 +1768,8 @@ background-repeat:no-repeat;background-position:right 9px center;background-size
 <script>
 window.__YAKJIDO_OK__ = true;
 const D = JSON.parse(document.getElementById('data').textContent || '{}');
-const BUILD = '2026-11-05 10:22';
-const DATAV = 'a21568717e'.indexOf('__') === 0 ? BUILD : 'a21568717e';
+const BUILD = '2026-11-05 10:38';
+const DATAV = '078dc00296'.indexOf('__') === 0 ? BUILD : '078dc00296';
 const BRANDMARK = (typeof window !== 'undefined' && window.__BRANDMARK__) || 'icon-192.png';
 let CORE = 0, CORE_P = null;
 function mergeCore(c){
@@ -3145,7 +3145,7 @@ if (rq) out.push({ k:'기능', c:'s', t:RX_NAME[rq[0]] + ' 드시는 분께', d:
 if (kidQ && /열|해열/.test(q0)) out.push({ k:'기능', c:'s', t:'아이 해열제, 몇 mL 먹이지?', d:'몸무게·생년월일로 시럽 mL·간격·하루 한도', h:'/kids', w:8 });
 for (const id of (SEARCH_DRUG[qs] || [])) { const d = drug(id); if (d) out.push({ k:'성분', c:'', t:d.name, d:(cls(d.class)?.name || '') + ' · ' + (rxMix(d) || d.rx), h:'/drug/' + d.id, w:qs === '진통제' ? 7 : 3.5 }); }
 (D.symptoms || []).forEach(s => { if (m(s.name) || (s.tags || []).some(m) || mAll(s.name, (s.tags || []).join(' '), s.short)) out.push({ k:'증상', c:'s', t:s.name, d:s.short || '', h:'/symptom/' + s.id, w:3 }); });
-(D.askdoc || []).forEach(x => { if (mAll(x.q)) out.push({ k:'의사 답', c:'', t:x.q, d:'응급실 의사가 실제로 한 대답', h:'/askdoc?open=' + x.id, w:1 }); });
+(D.askdoc || []).forEach(x => { if (mAll(x.q)) out.push({ k:'의사 답', c:'', t:x.q, d:'진료실에서 의사가 실제로 하는 대답', h:'/askdoc?open=' + x.id, w:1 }); });
 (D.drugs || []).forEach(d => {
 const hitFor = (d.for || []).find(m);
 if (m(d.name) || m(d.en) || mAll(d.name, d.en, d.tagline)) out.push({ k:'성분', c:'', t:d.name, d:(cls(d.class)?.name || '') + ' · ' + (rxMix(d) || d.rx), h:'/drug/' + d.id, w:2 });
@@ -6932,7 +6932,7 @@ ${lrow(I.book, '근거·확인 기준', `참고 문헌 ${Object.keys(D.sources |
 ${ext('계정칸')}
 ${ext('약관칸')}
 <section class="sec card"><h2>이 앱에 대해</h2><p class="small" style="margin-top:6px">${esc(D.meta?.about || '')}</p><p class="small muted" style="margin-top:10px">${savedWhere()}</p><div class="lk48"><a class="link" href="${esc(방침주소())}"${NATIVE ? ' target="_blank" rel="noopener"' : ''}>개인정보처리방침</a>${D.meta?.contact?.email ? `<a class="link" href="mailto:${esc(D.meta.contact.email)}">문의 · ${esc(D.meta.contact.email)}</a>${D.meta.contact.operator ? `<span class="small muted">운영 ${esc(D.meta.contact.operator)}</span>` : ''}` : ''}</div></section>
-<p class="small mn-sign" style="margin-top:20px;text-align:center"><b><svg class="mn-logo" viewBox="0 0 1024 1024" aria-hidden="true"><rect class="mn-tile" x="12" y="12" width="1000" height="1000" rx="226"/><path d="M790 470 V760"/><path d="M256 760 V410 C256 296 350 258 424 312 C478 352 494 520 566 548 C648 580 790 250 790 460"/></svg>메디나눔</b> · 응급 판단 기준을 응급실 의사가 함께 검토한, 우리 가족 건강 앱</p>
+<p class="small mn-sign" style="margin-top:20px;text-align:center"><b><svg class="mn-logo" viewBox="0 0 1024 1024" aria-hidden="true"><rect class="mn-tile" x="12" y="12" width="1000" height="1000" rx="226"/><path d="M790 470 V760"/><path d="M256 760 V410 C256 296 350 258 424 312 C478 352 494 520 566 548 C648 580 790 250 790 460"/></svg>메디나눔</b> · 화면마다 근거와 확인한 달을 적어 둔, 우리 가족 건강 앱</p>
 <p class="small muted" style="margin-top:6px;text-align:center">약지도 v${esc(D.meta?.version || '')} · 빌드 ${BUILD}<br>${(() => { const P = D.public || {}, ds = ['easy_source', 'pills_source', 'permits_source'].map(k => `<span style="white-space:nowrap">${esc(String(P[k] || '').match(/\d{4}-\d\d-\d\d|\d{8}/)?.[0] || '확인일 기록 필요')}</span>`);
 return `식약처 제품 이름 자료 받은 날 — ${new Set(ds).size === 1 ? ds[0] + '(e약은요·낱알식별·허가 정보)' : `e약은요 ${ds[0]} · 낱알식별 ${ds[1]} · 허가 정보 ${ds[2]}`}<br>약 설명 ${esc(D.meta?.reviewLabel || '근거 확인')} ${esc(D.meta?.reviewed || '')}${D.meta?.nextReview ? ` · 다음 검토 ${esc(D.meta.nextReview)}` : ''}`; })()}</p>`;
 return `${topBar()}
