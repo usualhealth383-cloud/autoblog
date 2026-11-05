@@ -37,6 +37,8 @@ Choose where you feel unwell, and Yakjido shows you, step by step, what to do at
 · 886 references and guidelines — pooled analyses, large comparative trials, clinical guidelines and Korean product labels
 · Medicine information follows the Korean approved label; where overseas guidelines differ, both are shown
 · Your medicines and records are stored on this phone first. Only if you log in and agree separately are they copied to a server in Seoul, Korea, so you can continue on a new phone
-· No ads or analytics tools
+· We haven't added ads or user-analytics tools; if we ever do, we'll tell you first and update the privacy policy
 
-Yakjido is not a medical device. It doesn't identify or cure any condition — it's reference guidance to help you choose and keep track of medicines, and it doesn't replace medical care. When you buy medicine, always tell the pharmacist about your conditions and the medicines you take, and see a doctor if symptoms continue. In an emergency, such as trouble breathing or confusion, call 119 at once.
+Yakjido is reference guidance to help you choose and keep track of medicines, and it doesn't replace medical care. When you buy medicine, always tell the pharmacist about your conditions and the medicines you take, and see a doctor if symptoms continue. In an emergency, such as trouble breathing or confusion, call 119 at once.
+
+Yakjido is not a medical device and does not diagnose, treat, cure, or prevent any medical condition. If something feels wrong, talk to your care team.

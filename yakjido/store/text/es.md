@@ -37,6 +37,8 @@ Elija dónde se encuentra mal y Yakjido le muestra paso a paso qué hacer en cas
 · 886 referencias y guías: análisis conjuntos, grandes ensayos comparativos, guías clínicas y fichas técnicas coreanas
 · La información de cada medicamento sigue su ficha técnica coreana; si las guías extranjeras difieren, se muestran ambas
 · Sus medicamentos y registros se guardan primero en este teléfono. Solo si inicia sesión y lo acepta aparte se copian a un servidor en Seúl (Corea) para continuar en otro teléfono
-· Sin anuncios ni herramientas de análisis
+· No hemos incluido publicidad ni herramientas de análisis de usuarios; si algún día lo hacemos, se lo diremos antes y lo añadiremos a la política de privacidad
 
-Yakjido no es un producto sanitario. No identifica ni cura enfermedades: es una guía de referencia para ayudarle a elegir y llevar el control de sus medicamentos, y no sustituye la atención médica. Al comprar medicamentos, cuente siempre al farmacéutico sus enfermedades y lo que toma, y vaya al médico si los síntomas continúan. En una urgencia, como dificultad para respirar o confusión, llame enseguida al 119.
+Yakjido es una guía de referencia para ayudarle a elegir y llevar el control de sus medicamentos, y no sustituye la atención médica. Al comprar medicamentos, cuente siempre al farmacéutico sus enfermedades y lo que toma, y vaya al médico si los síntomas continúan. En una urgencia, como dificultad para respirar o confusión, llame enseguida al 119.
+
+Yakjido no es un producto sanitario y no diagnostica, trata, cura ni previene ninguna enfermedad. Si nota algo raro, consulte con su equipo médico.
