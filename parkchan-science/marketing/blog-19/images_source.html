@@ -1,0 +1,115 @@
+<!doctype html><html lang="ko"><head><meta charset="utf-8"><style>
+@font-face{font-family:S;font-weight:400;src:url(file:///root/.fonts/static/NotoSansKR-400.ttf)}
+@font-face{font-family:S;font-weight:500;src:url(file:///root/.fonts/static/NotoSansKR-500.ttf)}
+@font-face{font-family:S;font-weight:700;src:url(file:///root/.fonts/static/NotoSansKR-700.ttf)}
+@font-face{font-family:S;font-weight:900;src:url(file:///root/.fonts/static/NotoSansKR-900.ttf)}
+@font-face{font-family:P;src:url(file:///root/.fonts/NanumPenScript.ttf)}
+:root{--cream:#FBF5EA;--paper:#FFFDF7;--kraft:#F1E5CF;--line:#E9DCC4;--ink:#2B3245;--navy:#24406F;--blue:#3B6AD0;--butter:#FFE287;--butter2:#FFF2C2;--peach:#F7CDB0;--leaf:#9CC4A6;--sky:#CFE0F7;--body:#4A4F5C;--muted:#8A7F6E}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#bbb;font-family:S,sans-serif;color:var(--ink);word-break:keep-all;-webkit-font-smoothing:antialiased}
+.card{width:1080px;position:relative;overflow:hidden;margin-bottom:40px;
+  background-color:var(--cream);background-image:radial-gradient(rgba(150,120,80,.10) 1.6px,transparent 1.7px);background-size:28px 28px}
+.pad{padding:84px 84px 88px;position:relative;z-index:2}
+.pen{font-family:P,cursive;font-weight:400;color:var(--blue)}
+.hi{background:linear-gradient(transparent 58%,var(--butter) 58%,var(--butter) 92%,transparent 92%);padding:0 4px}
+.note{position:relative;background:var(--paper);border-radius:18px;box-shadow:0 2px 0 rgba(120,90,50,.08),0 18px 36px rgba(120,90,50,.12)}
+.tape{position:absolute;width:150px;height:44px;background:rgba(255,226,135,.85);top:-20px;left:50%;transform:translateX(-50%) rotate(-3deg);border-radius:3px}
+.tape.b{background:rgba(207,224,247,.9)}.tape.p{background:rgba(247,205,176,.9)}
+.foot{position:absolute;left:0;right:0;bottom:46px;text-align:center;font-size:25px;color:var(--muted);font-weight:500;z-index:2}
+.foot b{color:var(--navy);font-weight:900}
+.doodle{position:absolute;z-index:1;fill:none;stroke-linecap:round;stroke-linejoin:round}
+h2{font-size:58px;font-weight:900;line-height:1.3;letter-spacing:-.02em;color:var(--navy)}
+@font-face{font-family:S;font-weight:800;src:url(file:///root/.fonts/static/NotoSansKR-800.ttf)}
+.card{height:1080px}
+.c{text-align:center}
+.kick{font-size:30px;font-weight:700;color:var(--blue);letter-spacing:.02em}
+/* 1 대표 */
+#b1 .note{margin:96px 60px 0;padding:96px 64px 84px;transform:rotate(-1deg);text-align:center}
+#b1 h1{font-size:86px;font-weight:900;line-height:1.28;letter-spacing:-.035em;color:var(--navy);margin-top:26px}
+#b1 .pen{font-size:58px;margin-top:40px;display:block}
+#b1 .who{font-size:30px;color:var(--body);margin-top:30px;line-height:1.6}
+/* 2 비교 */
+#b2 h2{text-align:center}
+#b2 .rows{display:grid;gap:26px;margin-top:50px}
+#b2 .r{display:grid;grid-template-columns:1fr 70px 1.25fr;align-items:center}
+#b2 .r .note{padding:30px 30px 28px;min-height:200px;display:flex;flex-direction:column;justify-content:center}
+#b2 .lab{font-size:24px;font-weight:700;color:var(--muted);margin-bottom:10px}
+#b2 .q{font-size:32px;font-weight:700;line-height:1.42;color:var(--ink)}
+#b2 .hs{background:var(--butter2)}#b2 .hs .lab{color:var(--blue)}#b2 .hs .q{color:var(--navy);font-weight:900}
+#b2 .ar{font-size:54px;color:var(--blue);text-align:center;font-weight:900}
+#b2 .tp{font-size:25px;font-weight:900;color:var(--navy);background:var(--paper);border:3px solid var(--navy);border-radius:40px;padding:4px 20px;display:inline-block;margin-bottom:14px}
+/* 3 공부 방법 */
+#b3 h2{text-align:center}
+#b3 .steps{display:grid;grid-template-columns:1fr 1fr 1fr;gap:30px;margin-top:70px}
+#b3 .note{padding:70px 26px 40px;text-align:center;min-height:430px}
+#b3 .n{width:84px;height:84px;border-radius:50%;margin:0 auto 26px;display:grid;place-items:center;font-size:42px;font-weight:900;color:var(--navy)}
+#b3 h3{font-size:38px;font-weight:900;color:var(--navy);line-height:1.3}
+#b3 p{font-size:26px;line-height:1.6;color:var(--body);margin-top:18px}
+#b3 .pen.l{display:block;text-align:center;font-size:52px;margin-top:64px}
+/* 4 안내 */
+#b4 h2{text-align:center}
+#b4 .two{display:grid;grid-template-columns:1fr 1fr;gap:30px;margin-top:56px}
+#b4 .two .note{padding:60px 30px 44px;text-align:center}
+#b4 .d{font-size:30px;font-weight:700;color:var(--muted)}
+#b4 .day{font-size:64px;font-weight:900;color:var(--navy);line-height:1.2;margin-top:8px}
+#b4 .free{margin-top:44px;padding:44px 40px;text-align:center;background:var(--butter2)}
+#b4 .free b{display:block;font-size:46px;font-weight:900;color:var(--navy)}
+#b4 .free span{display:block;font-size:28px;color:var(--body);margin-top:12px;line-height:1.55}
+#b4 .tel{margin-top:40px;text-align:center;font-size:30px;color:var(--body)}#b4 .tel b{font-size:52px;color:var(--navy);font-weight:900;margin-left:10px}
+.fineC{position:absolute;left:0;right:0;bottom:22px;text-align:center;font-size:20px;font-weight:500;color:#A39A8C;z-index:2}
+#b2 .pad,#b3 .pad{height:1080px;display:flex;flex-direction:column;justify-content:center;padding-top:40px;padding-bottom:60px}
+#b2 .src{text-align:center;margin-top:40px;font-size:22px}
+#b2 .rows{gap:34px}
+
+/* 수능 비교 */
+#s3 .pad{height:1080px;display:flex;flex-direction:column;justify-content:center;padding-top:30px;padding-bottom:50px}
+#s3 h2{text-align:center}
+#s3 .hd,#s3 .rw{display:grid;grid-template-columns:150px 1fr 1fr;gap:18px;align-items:stretch}
+#s3 .hd{margin-top:46px;margin-bottom:14px}
+#s3 .hd div{text-align:center;font-size:28px;font-weight:900;padding:14px 8px;border-radius:14px}
+#s3 .hd .o{color:var(--muted);background:var(--kraft)}#s3 .hd .n{color:#fff;background:var(--navy)}
+#s3 .rws{display:grid;gap:16px}
+#s3 .k{font-size:28px;font-weight:900;color:var(--navy);display:grid;place-items:center}
+#s3 .rw .note{padding:24px 22px;font-size:27px;line-height:1.45;text-align:center;display:grid;place-items:center;min-height:120px}
+#s3 .rw .o{color:var(--body)}#s3 .rw .n{background:var(--butter2);color:var(--navy);font-weight:900}
+#s3 .src{text-align:center;margin-top:30px;font-size:21px}
+/* 모집 */
+#s5 .pad{height:1080px;display:flex;flex-direction:column;justify-content:center;padding-top:20px;padding-bottom:70px}
+#s5 h2{text-align:center}
+#s5 .tt{margin-top:50px;padding:46px 56px;display:grid;gap:18px}
+#s5 .tt div{display:flex;gap:26px;align-items:baseline;font-size:36px;color:var(--body)}
+#s5 .tt b{flex:0 0 150px;font-weight:900;color:var(--navy)}#s5 .tt .m{font-weight:900;color:var(--ink)}
+#s5 .free{margin-top:36px;padding:40px;text-align:center;background:var(--butter2)}
+#s5 .free b{display:block;font-size:44px;font-weight:900;color:var(--navy)}
+#s5 .free span{display:block;font-size:28px;color:var(--body);margin-top:10px}
+#s5 .tel{margin-top:40px;text-align:center;font-size:30px;color:var(--body)}#s5 .tel b{font-size:54px;color:var(--navy);font-weight:900;margin-left:10px}
+</style>
+<section class="card" id="b1"><div class="pad"><div class="note"><span class="tape"></span>
+ <div class="kick">현 중3 학부모님께</div>
+ <h1>통합과학,<br>무엇이 달라질까요</h1>
+ <span class="pen">중학교 과학과 견주고<br>지금까지의 수능과 견주어</span>
+ <div class="who">대구 월성동 박찬 통합과학 학원</div></div></div></section>
+
+<section class="card" id="s3"><div class="pad">
+ <h2>수능 과학, 이렇게 바뀝니다</h2>
+ <div class="hd"><div></div><div class="o">지금까지</div><div class="n">2028학년도부터</div></div>
+ <div class="rws">
+  <div class="rw"><div class="k">과목</div><div class="note o">물리학, 화학, 생명과학,<br>지구과학 가운데 골라서</div><div class="note n">모든 학생이<br>통합과학 한 과목</div></div>
+  <div class="rw"><div class="k">범위</div><div class="note o">고르는 과목마다 다름</div><div class="note n">고1 통합과학 1·2</div></div>
+  <div class="rw"><div class="k">시간</div><div class="note o">20문항, 30분</div><div class="note n">25문항, 40분</div></div>
+  <div class="rw"><div class="k">배점</div><div class="note o">2점, 3점</div><div class="note n">1.5점, 2점, 2.5점</div></div>
+ </div>
+ <p class="src">교육부·한국교육과정평가원 2025년 1월 20일 발표 · 현재 발표 기준</p>
+</div></section>
+
+<section class="card" id="s5"><div class="pad">
+ <h2>고1 예비반 수강생 모집 중</h2>
+ <div class="note tt"><span class="tape"></span>
+  <div><b>화금반</b><span>화, 금 <span class="m">오후 5시 30분</span></span></div>
+  <div><b>수토반</b><span>수 <span class="m">오후 5시 30분</span>, 토 <span class="m">오후 3시 30분</span></span></div>
+  <div><b>수업</b><span>주 2회</span></div>
+ </div>
+ <div class="note free"><b>일주일 무료 수강</b><span>먼저 들어 보시고 등록을 결정하셔도 됩니다</span></div>
+ <div class="tel">상담 <b>053-213-3577</b></div>
+</div>
+<div class="fineC">남교입 제2019-115호 · 교습비(월) 중등부 210,000 / 267,000원 · 고등부 220,000 / 317,000원</div></section>
