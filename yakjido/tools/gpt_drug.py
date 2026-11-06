@@ -117,7 +117,8 @@ def check(ko, v, L):
     e = []
     if re.search('[가-힣]', v): e.append('한글')
     if v.count('**') and ko.count('**') != v.count('**'): e.append('굵게')   # GPT 화면에서 복사하면 ** 가 통째로 사라진다 — 하나도 없으면 받는다(뜻은 같음), 수가 어긋나면 걸림
-    for b in BR: ko = ko.replace(b, ' ')   # 「이지엔6」의 6 처럼 상품 이름 속 숫자는 성분 이름으로 바뀌며 사라진다
+    for b in BR: ko = ko.replace(b, ' ')
+    ko = re.sub(r'\d+\s*(차|세대)', ' ', ko)   # 「1차 치료」「1세대」 → first-line · first-generation 처럼 말로 바뀜   # 「이지엔6」의 6 처럼 상품 이름 속 숫자는 성분 이름으로 바뀌며 사라진다
     if len(re.findall(r'\n+', ko)) != v.count('¶'): e.append('문단')
     for n in ('119', '109', '1577-0199'):
         if ko.count(n) != v.count(n): e.append('번호 ' + n)
@@ -133,7 +134,8 @@ def apply(real):
         for line in open(f, encoding='utf-8'):
             m = re.match(r'^\s*\|?\s*(Y\d-\d{3})\s*(\t|\|)(.*)$', line.rstrip('\n'))
             if not m: continue
-            c = [x.strip() for x in (m.group(3).split('\t') if m.group(2) == '\t' else m.group(3).rstrip(' |').split('|'))]
+            body = m.group(3).replace('\\|', '\x00')   # 표 속 링크 [[drug:x\|이름]] 의 \| 는 칸 나눔이 아님
+            c = [x.strip().replace('\x00', '|') for x in (body.split('\t') if m.group(2) == '\t' else body.rstrip(' |').split('|'))]
             if len(c) >= 4: got[m.group(1)] = dict(zip(LANGS, c[:4]))
     if not got: print('답 파일이 없어요 — yakjido/GPT_번역/약지도_<번호>_답.txt 로 붙여 넣어 주세요.'); sys.exit(1)
     src = json.load(open(os.path.join(I, 'drug', '_src-drug.json'), encoding='utf-8'))
