@@ -3536,5 +3536,76 @@ const 대화카드 = keys => { try {
   const 원2 = window.tickFromNote; if (typeof 원2 === 'function') window.tickFromNote = (key, day) => { const k0 = day || todayKey(), 전 = [...(((ME.taken || {})[k0]) || [])]; 원2(key, day); if (k0 === todayKey()) 대화카드((((ME.taken || {})[k0]) || []).filter(x => !전.includes(x))); }; })();
 try { const st = document.createElement('style'); st.textContent = '.famdot{display:flex;align-items:center;gap:10px;width:100%;margin:8px 0 4px;min-height:48px;padding:10px 14px;border:1px solid var(--hairline);border-radius:14px;background:var(--card,#fff);color:inherit;font:inherit;text-align:left;cursor:pointer}.famdot b{display:inline-grid;place-items:center;min-width:26px;height:26px;padding:0 6px;border-radius:13px;background:var(--accent,#2f6b5a);color:#fff;font-size:.86em}'; document.head.appendChild(st); } catch (e) {}
 
+/* 11-09 실사용 검수 A1 — 「잊었을 때」와 짝인 한 화면. 근거: NHS 파라세타몰(«최대량을 넘겼으면 괜찮아도 곧바로 응급실 — 간 손상은 늦게»)·NHS 중독(«토하게 하지 말 것·포장을 가져갈 것»).
+   ⛔ 번호는 119·응급실만 — 1339 는 질병관리청 감염병 상담이라 중독 번호가 아니다(한국 일반인용 단일 중독센터는 확인 전). 적은 것은 이 기기에만(od.v1) */
+var OD_KEY = 'yakjido.od.v1';
+window.odGet = function(){ try { return JSON.parse(localStorage.getItem(OD_KEY) || '{}') || {}; } catch (e) { return {}; } };
+window.odSet = function(k, v){ const o = odGet(); o[k] = String(v || '').slice(0, 80); try { localStorage.setItem(OD_KEY, JSON.stringify(o)); } catch (e) {} };
+window.odNow = function(){ const t = new Date(), v = String(t.getHours()).padStart(2, '0') + ':' + String(t.getMinutes()).padStart(2, '0'); odSet('at', v); const el = document.getElementById('od-at'); if (el) el.value = v; };
+window.vOdS = function(_, q){ q = q || {};
+  const o = odGet(), kid = q.kid === '1';
+  const fld = (k, label, ph, id) => `<label class="od-f"><span>${label}</span><input type="text"${id ? ` id="${id}"` : ''} value="${esc(o[k] || '')}" placeholder="${ph}" oninput="odSet('${k}',this.value)"></label>`;
+  const kidCard = `<section class="sec card od-c"><h2>아이가 먹었어요</h2><p>양이 적어 보여도 <b>바로 119</b>에 전화하세요. 아이 <b>몸무게</b>와 먹은 약·양을 알려 주시면 위험한 양인지 바로 판단해요.</p><a class="call" href="tel:119">${I.alert} 119 전화</a></section>`;
+  return `${topBar({ back:'뒤로' })}
+  <section class="sec"><h1>많이 먹었을 때 · 두 번 먹었을 때</h1></section>
+  <div class="flag od-top" role="alert">${I.alert}<div><b>증상이 없어도 지금 119에 전화하거나 응급실로 가세요.</b><p>약 상자와 남은 약을 들고 가세요. 억지로 토하게 하지 마시고, 직접 운전해서 가지 마세요.</p><a class="call" href="tel:119">${I.alert} 119 전화</a></div></div>
+  ${kid ? kidCard : ''}
+  <section class="sec card od-c"><h2>아세트아미노펜(타이레놀 등)이라면</h2><p><b>하루 최대량을 넘겨 드셨다면 아프지 않아도 지금 응급실</b>로 가세요. 첫날은 증상이 거의 없어요. 해독제는 빨리 쓸수록 잘 들어요.</p><p class="small muted">감기약·몸살약·복합진통제에도 들어 있어요. 여러 개를 함께 드셨다면 모두 더해 보세요.</p></section>
+  ${kid ? '' : kidCard}
+  <section class="sec card od-c"><h2>한 번 몫을 더 먹었어요</h2><p>다음 차례는 <b>건너뛰고</b> 원래 시간으로 돌아가세요. 한 번 몫을 또 드시지 마세요.</p><p>이럴 땐 지금 <b>119</b>에 전화해 상담하세요 — 아세트아미노펜이 하루 최대량을 넘었을 때, 혈압약·당뇨약·심장약·피를 묽게 하는 약·수면제·신경안정제를 두 번 드셨을 때, 어지럽거나 가슴이 두근거리거나 몹시 졸릴 때.</p></section>
+  <section class="sec card od-c"><h2>119에 알릴 것 적어 두기</h2><div class="od-fs">${fld('drug', '먹은 약', '예: 타이레놀 500 mg')}${fld('amt', '먹은 양', '예: 6알')}${fld('at', '먹은 시각', '예: 14:30', 'od-at')}${fld('kg', '몸무게(아이)', '예: 14 kg')}</div><button type="button" class="btn line" onclick="odNow()">지금 시각 넣기</button><p class="small muted">이 기기에만 저장돼요.</p></section>
+  <p class="small muted od-src">근거: 영국 국민보건서비스(NHS) 중독 안내 · 파라세타몰 안내</p>
+  ${disclaimer()}`;
+};
+try { const st = document.createElement('style'); st.textContent = '.od-fs{display:grid;gap:10px;margin:8px 0 12px}.od-f{display:grid;gap:4px}.od-f input{width:100%;box-sizing:border-box;min-height:48px;padding:0 12px;border:1px solid var(--hairline);border-radius:12px;font:inherit}.od-c .call,.od-top .call{margin-top:10px}'; document.head.appendChild(st); } catch (e) {}
+
+/* 11-09 앱 껍데기에서 옮김(첫 화면 예산) */
+window.vVitalsS = function(){
+  const k = VT.k, L = vitals(), mine = L.map((x, i) => ({ ...x, i })).filter(x => x.k === k).reverse();
+  const av = bpAvg(7), hiAvg = av && av.n >= 3 && (av.s >= VREF.bp.s || av.d >= VREF.bp.d);
+  const takesBp = takingItems().some(d => ingOf(d).ings.some(e => (e.cls || []).some(c => ['arb', 'acei', 'ccb', 'beta', 'diuretic', 'bp-any'].includes(c))));
+  const lastBp = L.filter(x => x.k === 'bp').slice(-1)[0];
+  const form = k === 'bp' ? `
+    <div class="vt-row"><label class="vt-f"><span>위 혈압</span><input id="vs" type="number" inputmode="numeric" min="60" max="260" placeholder="128" aria-label="위 혈압(수축기)"></label>
+      <b class="vt-sl">/</b><label class="vt-f"><span>아래 혈압</span><input id="vd" type="number" inputmode="numeric" min="30" max="160" placeholder="82" aria-label="아래 혈압(이완기)"></label>
+      <label class="vt-f"><span>맥박 <small>(선택)</small></span><input id="vp" type="number" inputmode="numeric" min="30" max="220" placeholder="72" aria-label="맥박(선택)"></label></div>
+    <div class="times vt-wchips" style="margin-top:10px">${['아침', '낮', '저녁'].map(w => `<button class="chip ${(VT.w || slotWord(new Date())) === w ? 'on' : ''}" data-w="${w}" aria-pressed="${(VT.w || slotWord(new Date())) === w}" onclick="VT.w='${w}';document.querySelectorAll('.vt-wchips .chip').forEach(b=>{const on=b===this;b.classList.toggle('on',on);b.setAttribute('aria-pressed',on)})">${w}</button>`).join('')}</div>${vtWhenBox()}`
+  : `<div class="vt-row"><label class="vt-f"><span>혈당 (mg/dL)</span><input id="vg" type="number" inputmode="numeric" min="20" max="600" placeholder="110" aria-label="혈당"></label></div>
+    <div class="times vt-gchips" style="margin-top:10px">${['공복', '식후 2시간', '그 밖'].map(w => `<button class="chip ${(VT.gw || '공복') === w ? 'on' : ''}" aria-pressed="${(VT.gw || '공복') === w}" onclick="VT.gw='${w}';document.querySelectorAll('.vt-gchips .chip').forEach(b=>{const on=b===this;b.classList.toggle('on',on);b.setAttribute('aria-pressed',on)})">${w}</button>`).join('')}</div>${vtWhenBox()}`;
+  return `${topBar({ back:'내 정보' })}<div class="eyebrow">혈압·혈당 수첩</div><h1>재 두신 숫자, 진료 때 한눈에</h1>
+  <p style="margin-top:6px">집에서 잰 혈압·혈당을 적어 두면 <b>2주 흐름</b>과 <b>7일 평균</b>을 보여 드려요. ${savedWhere()}</p>
+  <div class="seg" style="margin-top:14px" role="group" aria-label="무엇을 적을까요">${[['bp', '혈압'], ['bg', '혈당']].map(([v, n]) => `<button class="${k === v ? 'on' : ''}" onclick="VT.k='${v}';VT.alert=null;route()" aria-pressed="${k === v}">${n}</button>`).join('')}</div>
+  ${vitalAlert()}
+  <section class="sec card"><h2>지금 잰 값 적기</h2>${form}
+    <div class="actions" style="margin-top:12px"><button class="btn" onclick="vitalSave()">${I.check} 적어 두기</button></div></section>
+  ${k === 'bp' && av ? `<section class="sec card vt-sum"><div class="vt-big"><span>최근 7일 평균</span><b>${av.s}<small>/</small>${av.d}</b><em>mmHg · ${av.days}일 ${av.n}번</em></div>
+    ${hiAvg ? `<div class="note" style="margin-top:10px">${I.info}<span><b>가정혈압 기준(135/85)보다 높은 편이에요.</b> ${takesBp ? '혈압약을 드시고 계시니, 이 기록을 <b>다음 진료 때 보여 주세요.</b>' : '며칠 더 재 보시고, 계속 높으면 <b>내과 진료</b>를 받아 보세요.'}</span></div>` : av.n < 3 ? `<p class="small muted" style="margin-top:8px">아침·저녁으로 며칠 더 적으시면 평균이 믿을 만해져요.</p>` : ''}
+    ${lastBp && hiAvg ? `<p class="small muted" style="margin-top:8px">코막힘약(슈도에페드린·페닐레프린·에페드린)은 혈압을 올릴 수 있어요 — 약국에서 「혈압이 높다」고 말씀하세요.</p>` : ''}
+  </section>` : ''}
+  <section class="sec card"><h2>2주 흐름</h2>${잠김('trend') ? `<button class="btn line" style="margin-top:8px" onclick="구독.막힘('trend')">2주 흐름 그림은 구독하면 보여요${I.chev}</button>` : vitalChart(k)}</section>
+  ${k === 'bp' && NATIVE ? `<section class="sec card"><div class="toggle"><div class="t"><b>혈압 재기 알림</b><span>${((ME.vitalRemind || {}).bp || []).length ? '아침 7:30 · 저녁 9:00 — 켜져 있어요' : '매일 아침·저녁 잴 시간을 알려 드려요'}</span></div><button class="btn ghost" style="width:auto;min-height:46px;padding:0 14px" onclick="vitalRemindToggle()">${((ME.vitalRemind || {}).bp || []).length ? '끄기' : '켜기'}</button></div></section>` : ''}
+  <section class="sec card"><h2>적은 기록 <small>${mine.length}번</small></h2>
+    ${mine.length ? `<div class="vt-list">${mine.slice(0, 30).map(x => `<div class="vt-li"><span class="vt-t">${x.t.slice(5, 10).replace('-', '/')} <small>${x.t.slice(11)} · ${esc(x.w || '')}</small></span><b>${k === 'bp' ? `${x.s}/${x.d}<small> mmHg${x.p ? ` · 맥박 ${x.p}` : ''}</small>` : `${x.v}<small> mg/dL${bgTag(x)}</small>`}</b><button class="vt-x" onclick="vitalDel(${x.i})" aria-label="이 기록 지우기">${I.x}</button></div>`).join('')}</div>` : `<div class="empty"><span class="em-ic">${I.heart}</span><b>아직 적은 기록이 없어요</b>오늘 한 번이 시작이에요. 위에서 적어 보세요.</div>`}
+    ${mine.length && !NATIVE ? `<div class="actions" style="margin-top:12px"><button class="btn line" onclick="잠김('visitdoc')?구독.막힘('visitdoc'):window.print()">${I.book} 진료 때 보여 드리기(인쇄·PDF)</button></div>` : ''}
+  </section>
+  <details class="why-more sec" ${vitals().filter(x => x.k === k).length < 3 || VT.alert === 'bp-first' ? 'open' : ''}><summary>${k === 'bp' ? '혈압, 바르게 재는 법' : '혈당, 언제 재고 어떻게 볼까요'}${I.chev}</summary>
+    ${k === 'bp' ? `<ul class="how-list">
+      <li><b>등을 기대고 앉아 5분 쉰 뒤</b> 재세요. 발은 바닥에, 다리는 꼬지 않아요.</li>
+      <li><b>팔을 탁자에 올려 커프가 심장 높이</b>에 오게 하세요. 팔을 늘어뜨려 낮게 재면 높게 나와요.</li>
+      <li><b>커프는 맨팔에, 손가락 하나가 들어갈 만큼만</b> 감으세요. 세게 감으면 높게 나와요.</li>
+      <li>재는 동안 <b>말하지 않기</b>. 한 번 더 재서 두 번을 적으면 더 정확해요.</li>
+      <li><b>아침</b> — 일어나 1시간 안, 소변 본 뒤, 혈압약 먹기 전 · <b>저녁</b> — 잠자기 전. <b>주 5일 이상</b> 재서 평균을 봐요.</li>
+    </ul><p class="why" style="margin-top:6px">가정혈압은 <b>135/85 mmHg 이상</b>이면 높은 것으로 봐요.</p>${srcChips(VREF.bp.src, true)}`
+    : `<ul class="how-list">
+      <li><b>공복</b> — 아침 식사 전. 당뇨가 있으면 목표 <b>80~130 mg/dL</b></li>
+      <li><b>식후 2시간</b> — 식사를 시작하고 2시간 뒤. 당뇨가 있으면 목표 <b>180 mg/dL 미만</b></li>
+      <li><b>${VREF.bg.hi} mg/dL 이상</b> — 증상(구토·숨참·심한 갈증·처짐)이 있으면 바로 진료, 없으면 다시 재세요.</li>
+      <li><b>70 mg/dL 미만이면 저혈당</b> — 당분 15~20 g(주스 반 컵 정도)을 드시고 15분 뒤 다시 재세요.</li>
+    </ul><p class="why" style="margin-top:6px">목표는 사람마다 다를 수 있어요 — <b>담당 의사가 따로 정해 준 숫자가 있으면 그것이 우선</b>이에요.</p>${srcChips(VREF.bg.src, true)}`}
+  </details>
+  <div class="note soft" style="margin-top:12px">${I.alert}<span><b>갑자기 심한 두통·가슴 통증·숨참·한쪽 팔다리 힘 빠짐·말이 어눌함</b>이 있으면 숫자와 상관없이 <b>119</b>에 연락하세요.</span></div>
+  ${disclaimer('기록은 진료를 돕는 참고 자료예요. 약을 늘리거나 줄이는 것은 의사와 상의하세요.')}`;
+};
+
 /* 내 정보·동의·로그인·약관 화면을 보고 있었으면 다시 그린다(이 파일이 늦게 오므로) */
-try { if (/^#\/(me|consent|login|notify|sgoal|sstage|doc|hello\/3|supp$|supp\?|sgoal|sstage|rx|about|search|myths|askdoc|talk|p\/|p\?|p$)/.test(location.hash)) route(); } catch (e) {}
+try { if (/^#\/(od|vitals|me|consent|login|notify|sgoal|sstage|doc|hello\/3|supp$|supp\?|sgoal|sstage|rx|about|search|myths|askdoc|talk|p\/|p\?|p$)/.test(location.hash)) route(); } catch (e) {}
