@@ -709,7 +709,7 @@
       동의준비: '(필수) 14일 체험은 {날}에 끝나요. 결제가 시작되기 전에 요금·결제일을 보여 드리고 다시 동의를 받아요.',
       요금: '요금', 학생기본: '학생', 학생인증준비: '인증은 준비 중이에요', 학생인증단추: '학생 인증하기',
       출시가: '출시 기념가', 출시조건: '출시 3개월 안에 가입하면 첫 1년', 회원권: '메디나눔 회원권', 회원권설명: '다섯 앱을 함께 쓰는 이용권', 회원권자격: 'ClinicScore 의료인 기능은 의료인 확인 뒤 열려요',
-      곧: '곧 열려요', 출시값: '{값}(출시 기념가 · 첫 1년, 둘째 해부터 {정가})', 출시값둘: '출시 기념가 {값} — 첫 1년, 둘째 해부터 {정가}', 초대중: '<b>초대 코드로 체험 중</b> · {날}까지', 초대뒤: '이 기간에는 결제되지 않아요. 기간이 끝나면 일반 상태로 돌아가요.', 회원권시작: '회원권으로 시작', 회원권연시작: '회원권 1년으로 시작 · {값}', 회원권중: '메디나눔 회원권으로 열려 있어요.',
+      곧: '곧 열려요', 자동: '14일 체험 뒤 자동 결제돼요 · 부가세 포함 · 설정에서 언제든 해지', 출시값: '{값}(출시 기념가 · 첫 1년, 둘째 해부터 {정가})', 출시값둘: '출시 기념가 {값} — 첫 1년, 둘째 해부터 {정가}', 초대중: '<b>초대 코드로 체험 중</b> · {날}까지', 초대뒤: '이 기간에는 결제되지 않아요. 기간이 끝나면 일반 상태로 돌아가요.', 회원권시작: '회원권으로 시작', 회원권연시작: '회원권 1년으로 시작 · {값}', 회원권중: '메디나눔 회원권으로 열려 있어요.',
       이유: { login: '먼저 로그인해 주세요.', verify: '메일함의 확인 링크를 먼저 눌러 주세요. 확인한 계정에서 체험이 시작돼요.',
               used_account: '이 계정은 14일 체험을 이미 쓰셨어요.', used_device: '이 기기에서는 14일 체험을 이미 쓰셨어요.',
               device: '이 브라우저에서는 체험을 시작할 수 없어요. 다른 브라우저로 해 주세요.', app: '잠시 문제가 있었어요. 다시 해 주세요.',
@@ -763,7 +763,7 @@
       동의준비: '(Required) The 14-day trial ends on {날}. Before any payment starts, we will show you the price and billing date and ask for your consent again.',
       요금: 'Price', 학생기본: 'students', 학생인증준비: 'verification is coming soon', 학생인증단추: 'Verify student status',
       출시가: 'Launch price', 출시조건: 'first year, if you join within 3 months of launch', 회원권: 'MediNanum pass', 회원권설명: 'one plan for all five apps', 회원권자격: 'ClinicScore professional tools open after the professional check',
-      곧: 'coming soon', 출시값: '{값} (launch price for the first year; {정가} from the second year)', 출시값둘: 'launch price {값} for the first year; {정가} from the second year', 초대중: '<b>Invite access</b> · until {날}', 초대뒤: 'Nothing is charged during this period. Afterwards it returns to normal.', 회원권시작: 'Start with the pass', 회원권연시작: 'Start a 1-year pass · {값}', 회원권중: 'Open through your MediNanum pass.',
+      곧: 'coming soon', 자동: 'Billed automatically after the 14-day trial · VAT included · cancel any time in Settings', 출시값: '{값} (launch price for the first year; {정가} from the second year)', 출시값둘: 'launch price {값} for the first year; {정가} from the second year', 초대중: '<b>Invite access</b> · until {날}', 초대뒤: 'Nothing is charged during this period. Afterwards it returns to normal.', 회원권시작: 'Start with the pass', 회원권연시작: 'Start a 1-year pass · {값}', 회원권중: 'Open through your MediNanum pass.',
       이유: { login: 'Please sign in first.', verify: 'Please open the confirmation link in your email first. The trial starts on a confirmed account.',
               used_account: 'This account has already used the 14-day trial.', used_device: 'This device has already used the 14-day trial.',
               device: 'The trial cannot be started in this browser. Please try another browser.', app: 'Something went wrong. Please try again.',
@@ -889,10 +889,12 @@
       var 회값 = [월값(회.월)]; if (회.연) 회값.push(연값(회.연));
       var 회출 = []; if (회.출시월) 회출.push(월값(회.출시월)); if (회.출시연) 회출.push(연값(회.출시연));
       칸.push('<b>' + 말글('회원권') + '</b>(' + 말글('회원권설명') + ') ' + 회값.join(' · ') +
-        (회출.length ? ' — ' + 말글('출시가') + ' ' + 회출.join(' · ') : '') + (회원권판매() ? '' : ' — ' + 말글('곧')) + ' (' + 말글('회원권자격') + ')');   /* 2026-10-22 회원권 = 결제 권한, 들어갈 자격은 따로 */
+        (회출.length ? ' — ' + 말글('출시가') + ' ' + 회출.join(' · ') : '') + ' (' + 말글('회원권자격') + ')');   /* 2026-10-22 회원권 = 결제 권한, 들어갈 자격은 따로 */
     }
     if (!칸.length) return '';
-    return 작은('<span class="subprice">' + 말글('요금') + ' ' + 칸.join(' · ') + '</span>') +
+    /* 11-09 전자상거래법 8·13조(현욱님 검수) — 판매 전 「곧 열려요」는 값 위, 값 바로 아래 자동 결제·부가세·해지 한 줄(회원권 부품 2026-11-09a 와 같은 글) */
+    return (회 && 회.월 && !회원권판매() ? 작은('<b>' + 말글('곧') + '</b>') : '') +
+      작은('<span class="subprice">' + 말글('요금') + ' ' + 칸.join(' · ') + '</span>') + 작은(말글('자동')) +
       (회원권판매() ? 줄(단추(말글('회원권시작'), "구독.회원권구매()", false) + (설정.회원권.연 ? 단추(말글('회원권연시작', { 값: 연값(설정.회원권.연) }), "구독.회원권구매('year')", false) : '')) : '') +
       (typeof 설정.학생인증 === 'function' && (g.학생월 || g.학생연) ? 줄(단추(말글('학생인증단추'), '구독.학생인증()', false)) : '');
   }
@@ -1842,21 +1844,22 @@ window.문_consent = () => {
     <li>${I.heart}<span>진단·처방을 대신하지 않아요. 급하면 119, 그리고 의사·약사와 상의하세요.</span></li>
   </ul>
   <p class="cs-sum">의료기기가 아니에요 · 기록은 먼저 이 휴대폰에 저장돼요 · 광고·분석에 쓰지 않아요</p>
-  <button type="button" class="door-go" id="csGo" onclick="동의한번()">${다시 ? '약관·처리방침에 동의하고 계속' : '약관·처리방침에 동의하고 시작'}</button>
-  <details class="cs-more cs-detail"><summary>자세히 — 무엇에 동의하나요${I.chev}</summary>
-    <h3>이용약관</h3><p>의료기기가 아니에요. 약 정보를 드리고 기록을 도와요. 약을 고르고 드시는 결정은 의사·약사와 함께 하세요.</p><ul>${['약 설명은 <b>식약처 허가 설명서</b>가 기본이에요. 해외 지침이나 진료실 관행이 다르면 둘 다 보여 드려요.',
+  <!-- 11-09 실사용 검수 B2(개인정보보호법 22·23조) — 필수 둘을 따로 보이고, 「모두 동의」 한 번으로도 된다(10-29 「동의 벽 금지」와 함께). 서버 저장(지병·드시는 약)은 선택이라 계정 만들 때 따로 -->
+  <button type="button" class="cs-row cs-all" role="checkbox" aria-checked="false" onclick="동의누름('all')"><span class="cs-bx">${I.check}</span><span class="cs-tx"><b>모두 동의</b></span></button>
+  ${동의줄('terms', '이용약관', '의료기기가 아니에요 · 약 설명은 식약처 허가 설명서가 기본', ['약 설명은 <b>식약처 허가 설명서</b>가 기본이에요. 해외 지침이나 진료실 관행이 다르면 둘 다 보여 드려요.',
     '위험 신호가 있으면 약보다 진료가 먼저예요. 급하면 119예요.',
     '약을 팔거나 건네지 않아요. 약은 약국에서 약사와 상의해 사세요.',
     '계정은 고르실 수 있고, 만 14세 이상만 만들 수 있어요.',
-    '지금은 돈을 내는 기능이 없어요. 생기면 요금과 해지·환불 조건을 미리 알리고 따로 동의를 받아요.'].map(x => `<li>${x}</li>`).join('')}</ul><button type="button" class="cs-doc" onclick="go('/doc/terms')">약관 전문 보기${I.chev}</button>
-    <h3>개인정보 처리방침</h3><p>드시는 약·기록·몸 상태는 먼저 쓰시는 휴대폰에 저장되고, 광고·분석에 쓰지 않아요. 계정을 만들고 따로 동의하실 때만 메디나눔 서버(서울)에 복사돼요.</p><ul>${['로그인하지 않고도 대부분의 기능을 쓰실 수 있어요.',
+    '지금은 돈을 내는 기능이 없어요. 생기면 요금과 해지·환불 조건을 미리 알리고 따로 동의를 받아요.'], '약관 전문 보기')}
+  ${동의줄('privacy', '개인정보 처리방침', '드시는 약·기록·몸 상태는 먼저 이 휴대폰에', ['로그인하지 않고도 대부분의 기능을 쓰실 수 있어요.',
     '광고나 이용자 분석 도구를 넣게 되면 먼저 알려요.',
     '서버 저장은 계정을 만들 때 「서버에 저장하기」에 따로 동의하셔야 해요. 거두시면 서버 기록을 바로 지워요.',
     '「부모님께 보내기」를 링크로 보내실 때만 고른 약 목록·호칭·메모가 7일 동안 서버에 머문 뒤 지워져요.',
     '약 사진은 휴대폰 안에서 글자를 읽는 데만 쓰고 보내지 않아요.',
-    '기록은 내 정보 → 설정에서 언제든 지우실 수 있어요.'].map(x => `<li>${x}</li>`).join('')}</ul><button type="button" class="cs-doc" onclick="go('/doc/privacy')">전문 보기${I.chev}</button>
-    <p class="cs-note">건강에 관한 기록을 서버에 저장하는 것은 계정을 만들 때 따로 여쭤요.</p>
-  </details>
+    '기록은 내 정보 → 설정에서 언제든 지우실 수 있어요.'], '처리방침 전문 보기')}
+  <p class="cs-opt">선택 — 지병·드시는 약을 서버에 저장하는 것은 계정을 만들 때 따로 여쭤요</p>
+  <button type="button" class="door-go" id="csGo" disabled onclick="동의하기()">시작하기</button>
+  <p class="cs-why" id="csWhy">필수 두 가지에 동의하시면 시작할 수 있어요</p>
   <p class="cs-foot">동의 내용은 설정 → 약관·개인정보에서 언제든 다시 보실 수 있어요 · 약지도 v${esc(D.meta?.version || '')}</p>
 </div>`;
 };
@@ -1889,6 +1892,7 @@ window.문_notify = (_, q) => {
     ${row(I.cal, '진료 예약', vn ? `예약 ${vn}건 · 전날 저녁 7시와 2시간 전` : '진료 예약을 적어 두면 전날과 2시간 전에', noteOn('visit'), `setNoteOn('visit',${!noteOn('visit')})`)}
     ${row(I.check, '저녁 9시 하루 정리', '그날 체크 안 한 약이 있을 때만 · 기본 꺼짐', eveningOn(), `setEvening(${!eveningOn()})`)}
   </section>
+  ${famOn() ? `<button type="button" class="link fam-jump" style="margin-top:10px" onclick="document.getElementById('fam')?.scrollIntoView({behavior:'smooth'})">가족에게 알리기 — 약 체크가 없으면 가족에게 ›</button>` : ''}
   <div class="actions two"><button class="btn line" onclick="go('/schedule?t=sc1')">${I.clock} 약마다 시간 고르기</button><button class="btn line" onclick="go('/schedule?t=sc2')">${I.pill} 남은 알 수 넣기</button></div>
   <p class="small muted" style="margin-top:12px">알림이 늦거나 안 오면 <button type="button" class="link" onclick="go('/schedule?t=sc4')">알림이 늦어요 도움말</button>을 봐 주세요.</p>
   ${doseSrvHTML()}${famCard(q || {})}`;
@@ -2177,7 +2181,8 @@ try { const st3 = document.createElement('style'); st3.textContent = '@media (ma
 try { const st2 = document.createElement('style'); st2.textContent = '.fam-h{display:flex;align-items:center;justify-content:flex-start;gap:8px;margin:0 0 6px;font-size:1.125rem}.fam-h .i{width:22px;height:22px}.fam-s{margin:14px 0 4px;font-size:1rem;color:var(--muted)}.fam-ul{list-style:none;margin:0;padding:0}.fam-ul li{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;padding:10px 0;border-top:1px solid var(--hairline)}.fam-ul li>span:first-child{min-width:0}.fam-ul b{display:block;overflow-wrap:anywhere}.fam-ul small{display:block;color:var(--muted);font-size:.875rem}.fam-b{display:flex;align-items:center;gap:6px}.fam-b .btn{width:auto;min-height:44px;padding:0 14px;margin:0}.fam-b .link{min-height:44px;padding:0 8px}.fam-hot{background:var(--caution-tint);border-radius:12px;padding:10px!important}.fam-form{display:flex;flex-direction:column;gap:8px;margin-top:12px;padding-top:12px;border-top:1px dashed var(--hairline)}.fam-l{font-weight:700}.fam-form input:not([type=checkbox]){min-height:48px;padding:10px 12px;border:1.5px solid var(--ui-line);border-radius:12px;font:inherit;background:var(--card);color:var(--text)}.fam-rule{margin:6px 0 4px;padding-left:1.1em;color:var(--body);font-size:.9375rem;line-height:1.6}.fam-det{margin:4px 0;border:1px solid var(--hairline);border-radius:12px;padding:8px 12px}.fam-det summary{font-weight:700;cursor:pointer;min-height:40px;display:flex;align-items:center}.fam-det dl{margin:6px 0 0}.fam-det dt{font-weight:700;margin-top:8px}.fam-det dd{margin:2px 0 0;color:var(--body);font-size:.9375rem;line-height:1.6}.fam-off{display:block;min-height:44px;margin-top:6px}.fam-seg{display:flex;gap:6px}.fam-seg button{flex:1;min-height:44px;border:1.5px solid var(--ui-line);border-radius:12px;background:var(--card);color:var(--text);font:inherit;font-weight:700}.fam-seg button.on{background:var(--primary);color:var(--on-primary);border-color:var(--primary)}.fam-q{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.fam-q input{min-height:44px;padding:6px 10px;border:1.5px solid var(--ui-line);border-radius:12px;font:inherit;background:var(--card);color:var(--text)}.fam-q .btn{width:auto;margin:0;min-height:44px}.fam-ios{margin-top:10px}.fam-msg{padding:10px 12px;border-radius:12px;background:var(--accent-tint);color:var(--accent-text)}.nt-perm{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:10px 0 4px;padding:12px 14px;border-radius:14px;background:var(--accent-tint);color:var(--accent-text);font-size:1rem}.nt-perm.ok{background:var(--normal-tint);color:var(--normal)}.nt-perm .btn{width:auto;margin:0 0 0 auto;min-height:44px}.nt-list{padding:4px 16px}.nt-row{display:flex;align-items:center;gap:12px;padding:14px 0;border-top:1px solid var(--hairline)}.nt-row:first-child{border-top:0}.nt-ic{flex:none;width:40px;height:40px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;background:var(--tint);color:var(--primary-deep)}.nt-t{flex:1;min-width:0;display:flex;flex-direction:column}.nt-t b{font-size:1.0625rem}.nt-t small{color:var(--muted);font-size:.9375rem;margin-top:2px}.nt-row .sw{flex:none}'; document.head.appendChild(st2); } catch (e) {}
 window.계정카드 = () => { if (D.meta?.account !== true) return ''; const 나 = srvLoggedIn(), m = 나 ? (서버.세션()?.user?.email || '') : '';
   if (!나) return `<section class="sec card acct-card"><div class="acct-hd"><span class="acct-ic" aria-hidden="true">${I.user}</span><span><b>메디나눔 계정</b><small>폰을 바꿔도 약통·복용 기록을 이어 봐요 · 선택</small></span></div>
-    <button type="button" class="btn primary acct-go" onclick="go('/login')">로그인 · 계정 만들기</button></section>`;
+    <button type="button" class="btn primary acct-go" onclick="go('/login')">로그인 · 계정 만들기</button>
+    <a class="link acct-del" href="delete-account.html" style="display:inline-block;margin-top:12px;min-height:44px;line-height:44px">계정과 기록 지우기 ›</a></section>`;   /* 11-09 B4 — 로그인 전에도 늘(심사관: 계정 삭제 길이 안 보임). 웹 삭제 주소와 같은 말 */
   return `<section class="sec card acct-card"><div class="acct-hd"><span class="acct-av" aria-hidden="true">${esc(m.charAt(0).toUpperCase())}</span><span><b>${esc(m)}</b><small>로그인돼 있어요 · 이어 보기 켜짐</small></span></div>
     ${window.이용권줄HTML ? 이용권줄HTML() : ''}
     <div class="acct-act"><button type="button" class="btn line" onclick="계정동작('sync')">지금 맞추기</button><button type="button" class="btn line" onclick="계정동작('logout');setTimeout(route,600)">로그아웃</button></div>
@@ -2248,7 +2253,7 @@ try { const css = document.createElement('style'); css.textContent = `
 .cs-row{display:flex;gap:12px;align-items:flex-start;width:100%;text-align:left;padding:14px 16px;min-height:56px;border-radius:14px;color:var(--text)}
 .cs-all{background:var(--tint)}
 .cs-all .cs-tx b{font-size:1.0625rem}
-.cs-item{margin-top:10px;border:1.5px solid var(--hairline);border-radius:14px;background:var(--card)}
+.cs-opt{margin:10px 2px 0;font-size:.875rem;color:var(--muted)}.cs-why{margin:8px 2px 0;font-size:.875rem;color:var(--muted);text-align:center}.cs-all{margin-top:14px;border:1.5px solid var(--hairline);background:var(--card)}.cs-item{margin-top:10px;border:1.5px solid var(--hairline);border-radius:14px;background:var(--card)}
 .cs-bx{flex:none;width:24px;height:24px;margin-top:1px;border-radius:7px;border:2px solid var(--ui-line);background:var(--card);display:grid;place-items:center;color:transparent}
 .cs-bx svg.i{width:16px;height:16px;stroke-width:3}
 [aria-checked=true]>.cs-bx{background:var(--primary);border-color:var(--primary);color:var(--on-primary)}
@@ -3534,5 +3539,78 @@ const 대화카드 = keys => { try {
   const 원2 = window.tickFromNote; if (typeof 원2 === 'function') window.tickFromNote = (key, day) => { const k0 = day || todayKey(), 전 = [...(((ME.taken || {})[k0]) || [])]; 원2(key, day); if (k0 === todayKey()) 대화카드((((ME.taken || {})[k0]) || []).filter(x => !전.includes(x))); }; })();
 try { const st = document.createElement('style'); st.textContent = '.famdot{display:flex;align-items:center;gap:10px;width:100%;margin:8px 0 4px;min-height:48px;padding:10px 14px;border:1px solid var(--hairline);border-radius:14px;background:var(--card,#fff);color:inherit;font:inherit;text-align:left;cursor:pointer}.famdot b{display:inline-grid;place-items:center;min-width:26px;height:26px;padding:0 6px;border-radius:13px;background:var(--accent,#2f6b5a);color:#fff;font-size:.86em}'; document.head.appendChild(st); } catch (e) {}
 
+/* 11-09 실사용 검수 A1 — 「잊었을 때」와 짝인 한 화면. 근거: NHS 파라세타몰(«최대량을 넘겼으면 괜찮아도 곧바로 응급실 — 간 손상은 늦게»)·NHS 중독(«토하게 하지 말 것·포장을 가져갈 것»).
+   ⛔ 번호는 119·응급실만 — 1339 는 질병관리청 감염병 상담이라 중독 번호가 아니다(한국 일반인용 단일 중독센터는 확인 전). 적은 것은 이 기기에만(od.v1) */
+var OD_KEY = 'yakjido.od.v1';
+window.odGet = function(){ try { return JSON.parse(localStorage.getItem(OD_KEY) || '{}') || {}; } catch (e) { return {}; } };
+window.odSet = function(k, v){ const o = odGet(); o[k] = String(v || '').slice(0, 80); try { localStorage.setItem(OD_KEY, JSON.stringify(o)); } catch (e) {} };
+window.odNow = function(){ const t = new Date(), v = String(t.getHours()).padStart(2, '0') + ':' + String(t.getMinutes()).padStart(2, '0'); odSet('at', v); const el = document.getElementById('od-at'); if (el) el.value = v; };
+window.vOdS = function(_, q){ q = q || {};
+  const o = odGet(), kid = q.kid === '1';
+  const fld = (k, label, ph, id) => `<label class="od-f"><span>${label}</span><input type="text"${id ? ` id="${id}"` : ''} value="${esc(o[k] || '')}" placeholder="${ph}" oninput="odSet('${k}',this.value)"></label>`;
+  const kidCard = `<section class="sec card od-c"><h2>아이가 먹었어요</h2><p>양이 적어 보여도 <b>바로 119</b>에 전화하세요. 아이 <b>몸무게</b>와 먹은 약·양을 알려 주시면 위험한 양인지 바로 판단해요.</p><a class="call" href="tel:119">${I.alert} 119 전화</a></section>`;
+  return `${topBar({ back:'뒤로' })}
+  <section class="sec"><h1>많이 먹었을 때 · 두 번 먹었을 때</h1></section>
+  <div class="flag od-top" role="alert">${I.alert}<div><b>증상이 없어도 지금 119에 전화하거나 응급실로 가세요.</b><p>약 상자와 남은 약을 들고 가세요. 억지로 토하게 하지 마시고, 직접 운전해서 가지 마세요.</p><a class="call" href="tel:119">${I.alert} 119 전화</a></div></div>
+  ${kid ? kidCard : ''}
+  <section class="sec card od-c"><h2>아세트아미노펜(타이레놀 등)이라면</h2><p><b>하루 최대량을 넘겨 드셨다면 아프지 않아도 지금 응급실</b>로 가세요. 첫날은 증상이 거의 없어요. 해독제는 빨리 쓸수록 잘 들어요.</p><p class="small muted">감기약·몸살약·복합진통제에도 들어 있어요. 여러 개를 함께 드셨다면 모두 더해 보세요.</p></section>
+  ${kid ? '' : kidCard}
+  <section class="sec card od-c"><h2>한 번 몫을 더 먹었어요</h2><p>다음 차례는 <b>건너뛰고</b> 원래 시간으로 돌아가세요. 한 번 몫을 또 드시지 마세요.</p><p>이럴 땐 지금 <b>119</b>에 전화해 상담하세요 — 아세트아미노펜이 하루 최대량을 넘었을 때, 혈압약·당뇨약·심장약·피를 묽게 하는 약·수면제·신경안정제를 두 번 드셨을 때, 어지럽거나 가슴이 두근거리거나 몹시 졸릴 때.</p></section>
+  <section class="sec card od-c"><h2>119에 알릴 것 적어 두기</h2><div class="od-fs">${fld('drug', '먹은 약', '예: 타이레놀 500 mg')}${fld('amt', '먹은 양', '예: 6알')}${fld('at', '먹은 시각', '예: 14:30', 'od-at')}${fld('kg', '몸무게(아이)', '예: 14 kg')}</div><button type="button" class="btn line" onclick="odNow()">지금 시각 넣기</button><p class="small muted">이 기기에만 저장돼요.</p></section>
+  <p class="small muted od-src">근거: 영국 국민보건서비스(NHS) 중독 안내 · 파라세타몰 안내</p>
+  ${disclaimer()}`;
+};
+try { const st = document.createElement('style'); st.textContent = '.od-fs{display:grid;gap:10px;margin:8px 0 12px}.od-f{display:grid;gap:4px}.od-f input{width:100%;box-sizing:border-box;min-height:48px;padding:0 12px;border:1px solid var(--hairline);border-radius:12px;font:inherit}.od-c .call,.od-top .call{margin-top:10px}'; document.head.appendChild(st); } catch (e) {}
+
+/* 11-09 앱 껍데기에서 옮김(첫 화면 예산) */
+window.vVitalsS = function(){
+  const k = VT.k, L = vitals(), mine = L.map((x, i) => ({ ...x, i })).filter(x => x.k === k).reverse();
+  const av = bpAvg(7), hiAvg = av && av.n >= 3 && (av.s >= VREF.bp.s || av.d >= VREF.bp.d);
+  const takesBp = takingItems().some(d => ingOf(d).ings.some(e => (e.cls || []).some(c => ['arb', 'acei', 'ccb', 'beta', 'diuretic', 'bp-any'].includes(c))));
+  const lastBp = L.filter(x => x.k === 'bp').slice(-1)[0];
+  const form = k === 'bp' ? `
+    <div class="vt-row"><label class="vt-f"><span>위 혈압</span><input id="vs" type="number" inputmode="numeric" min="60" max="260" placeholder="128" aria-label="위 혈압(수축기)"></label>
+      <b class="vt-sl">/</b><label class="vt-f"><span>아래 혈압</span><input id="vd" type="number" inputmode="numeric" min="30" max="160" placeholder="82" aria-label="아래 혈압(이완기)"></label>
+      <label class="vt-f"><span>맥박 <small>(선택)</small></span><input id="vp" type="number" inputmode="numeric" min="30" max="220" placeholder="72" aria-label="맥박(선택)"></label></div>
+    <div class="times vt-wchips" style="margin-top:10px">${['아침', '낮', '저녁'].map(w => `<button class="chip ${(VT.w || slotWord(new Date())) === w ? 'on' : ''}" data-w="${w}" aria-pressed="${(VT.w || slotWord(new Date())) === w}" onclick="VT.w='${w}';document.querySelectorAll('.vt-wchips .chip').forEach(b=>{const on=b===this;b.classList.toggle('on',on);b.setAttribute('aria-pressed',on)})">${w}</button>`).join('')}</div>${vtWhenBox()}`
+  : `<div class="vt-row"><label class="vt-f"><span>혈당 (mg/dL)</span><input id="vg" type="number" inputmode="numeric" min="20" max="600" placeholder="110" aria-label="혈당"></label></div>
+    <div class="times vt-gchips" style="margin-top:10px">${['공복', '식후 2시간', '그 밖'].map(w => `<button class="chip ${(VT.gw || '공복') === w ? 'on' : ''}" aria-pressed="${(VT.gw || '공복') === w}" onclick="VT.gw='${w}';document.querySelectorAll('.vt-gchips .chip').forEach(b=>{const on=b===this;b.classList.toggle('on',on);b.setAttribute('aria-pressed',on)})">${w}</button>`).join('')}</div>${vtWhenBox()}`;
+  return `${topBar({ back:'내 정보' })}<div class="eyebrow">혈압·혈당 수첩</div><h1>재 두신 숫자, 진료 때 한눈에</h1>
+  <p style="margin-top:6px">집에서 잰 혈압·혈당을 적어 두면 <b>2주 흐름</b>과 <b>7일 평균</b>을 보여 드려요. ${savedWhere()}</p>
+  <div class="seg" style="margin-top:14px" role="group" aria-label="무엇을 적을까요">${[['bp', '혈압'], ['bg', '혈당']].map(([v, n]) => `<button class="${k === v ? 'on' : ''}" onclick="VT.k='${v}';VT.alert=null;route()" aria-pressed="${k === v}">${n}</button>`).join('')}</div>
+  ${vitalAlert()}
+  <section class="sec card"><h2>지금 잰 값 적기</h2>${form}
+    <div class="actions" style="margin-top:12px"><button class="btn" onclick="vitalSave()">${I.check} 적어 두기</button></div></section>
+  ${k === 'bp' && av ? `<section class="sec card vt-sum"><div class="vt-big"><span>최근 7일 평균</span><b>${av.s}<small>/</small>${av.d}</b><em>mmHg · ${av.days}일 ${av.n}번</em></div>
+    ${hiAvg ? `<div class="note" style="margin-top:10px">${I.info}<span><b>가정혈압 기준(135/85)보다 높은 편이에요.</b> ${takesBp ? '혈압약을 드시고 계시니, 이 기록을 <b>다음 진료 때 보여 주세요.</b>' : '며칠 더 재 보시고, 계속 높으면 <b>내과 진료</b>를 받아 보세요.'}</span></div>` : av.n < 3 ? `<p class="small muted" style="margin-top:8px">아침·저녁으로 며칠 더 적으시면 평균이 믿을 만해져요.</p>` : ''}
+    ${lastBp && hiAvg ? `<p class="small muted" style="margin-top:8px">코막힘약(슈도에페드린·페닐레프린·에페드린)은 혈압을 올릴 수 있어요 — 약국에서 「혈압이 높다」고 말씀하세요.</p>` : ''}
+  </section>` : ''}
+  <section class="sec card"><h2>2주 흐름</h2>${잠김('trend') ? `<button class="btn line" style="margin-top:8px" onclick="구독.막힘('trend')">2주 흐름 그림은 구독하면 보여요${I.chev}</button>` : vitalChart(k)}</section>
+  ${k === 'bp' && NATIVE ? `<section class="sec card"><div class="toggle"><div class="t"><b>혈압 재기 알림</b><span>${((ME.vitalRemind || {}).bp || []).length ? '아침 7:30 · 저녁 9:00 — 켜져 있어요' : '매일 아침·저녁 잴 시간을 알려 드려요'}</span></div><button class="btn ghost" style="width:auto;min-height:46px;padding:0 14px" onclick="vitalRemindToggle()">${((ME.vitalRemind || {}).bp || []).length ? '끄기' : '켜기'}</button></div></section>` : ''}
+  <section class="sec card"><h2>적은 기록 <small>${mine.length}번</small></h2>
+    ${mine.length ? `<div class="vt-list">${mine.slice(0, 30).map(x => `<div class="vt-li"><span class="vt-t">${x.t.slice(5, 10).replace('-', '/')} <small>${x.t.slice(11)} · ${esc(x.w || '')}</small></span><b>${k === 'bp' ? `${x.s}/${x.d}<small> mmHg${x.p ? ` · 맥박 ${x.p}` : ''}</small>` : `${x.v}<small> mg/dL${bgTag(x)}</small>`}</b><button class="vt-x" onclick="vitalDel(${x.i})" aria-label="이 기록 지우기">${I.x}</button></div>`).join('')}</div>` : `<div class="empty"><span class="em-ic">${I.heart}</span><b>아직 적은 기록이 없어요</b>오늘 한 번이 시작이에요. 위에서 적어 보세요.</div>`}
+    ${mine.length && !NATIVE ? `<div class="actions" style="margin-top:12px"><button class="btn line" onclick="잠김('visitdoc')?구독.막힘('visitdoc'):window.print()">${I.book} 진료 때 보여 드리기(인쇄·PDF)</button></div>` : ''}
+  </section>
+  <details class="why-more sec" ${vitals().filter(x => x.k === k).length < 3 || VT.alert === 'bp-first' ? 'open' : ''}><summary>${k === 'bp' ? '혈압, 바르게 재는 법' : '혈당, 언제 재고 어떻게 볼까요'}${I.chev}</summary>
+    ${k === 'bp' ? `<ul class="how-list">
+      <li><b>등을 기대고 앉아 5분 쉰 뒤</b> 재세요. 발은 바닥에, 다리는 꼬지 않아요.</li>
+      <li><b>팔을 탁자에 올려 커프가 심장 높이</b>에 오게 하세요. 팔을 늘어뜨려 낮게 재면 높게 나와요.</li>
+      <li><b>커프는 맨팔에, 손가락 하나가 들어갈 만큼만</b> 감으세요. 세게 감으면 높게 나와요.</li>
+      <li>재는 동안 <b>말하지 않기</b>. 한 번 더 재서 두 번을 적으면 더 정확해요.</li>
+      <li><b>아침</b> — 일어나 1시간 안, 소변 본 뒤, 혈압약 먹기 전 · <b>저녁</b> — 잠자기 전. <b>주 5일 이상</b> 재서 평균을 봐요.</li>
+    </ul><p class="why" style="margin-top:6px">가정혈압은 <b>135/85 mmHg 이상</b>이면 높은 것으로 봐요.</p>${srcChips(VREF.bp.src, true)}`
+    : `<ul class="how-list">
+      <li><b>공복</b> — 아침 식사 전. 당뇨가 있으면 목표 <b>80~130 mg/dL</b></li>
+      <li><b>식후 2시간</b> — 식사를 시작하고 2시간 뒤. 당뇨가 있으면 목표 <b>180 mg/dL 미만</b></li>
+      <li><b>${VREF.bg.hi} mg/dL 이상</b> — 증상(구토·숨참·심한 갈증·처짐)이 있으면 바로 진료, 없으면 다시 재세요.</li>
+      <li><b>70 mg/dL 미만이면 저혈당</b> — 당분 15~20 g(주스 반 컵 정도)을 드시고 15분 뒤 다시 재세요.</li>
+    </ul><p class="why" style="margin-top:6px">목표는 사람마다 다를 수 있어요 — <b>담당 의사가 따로 정해 준 숫자가 있으면 그것이 우선</b>이에요.</p>${srcChips(VREF.bg.src, true)}`}
+  </details>
+  <div class="note soft" style="margin-top:12px">${I.alert}<span><b>갑자기 심한 두통·가슴 통증·숨참·한쪽 팔다리 힘 빠짐·말이 어눌함</b>이 있으면 숫자와 상관없이 <b>119</b>에 연락하세요.</span></div>
+  ${disclaimer('기록은 진료를 돕는 참고 자료예요. 약을 늘리거나 줄이는 것은 의사와 상의하세요.')}`;
+};
+
+/* 11-09 C2 — 말과 나라 창 「맞아요」 단추: 공용 강조색(갈색 #B5711C, 흰 글자 대비 3.9:1) 대신 약지도 청록(대비 5.8:1) */
+try { const st = document.createElement('style'); st.textContent = ':root{--ms-accent:#0B6E8F;--ms-on-accent:#fff}'; document.head.appendChild(st); } catch (e) {}
 /* 내 정보·동의·로그인·약관 화면을 보고 있었으면 다시 그린다(이 파일이 늦게 오므로) */
-try { if (/^#\/(me|consent|login|notify|sgoal|sstage|doc|hello\/3|supp$|supp\?|sgoal|sstage|rx|about|search|myths|askdoc|talk|p\/|p\?|p$)/.test(location.hash)) route(); } catch (e) {}
+try { if (/^#\/(od|vitals|me|consent|login|notify|sgoal|sstage|doc|hello\/3|supp$|supp\?|sgoal|sstage|rx|about|search|myths|askdoc|talk|p\/|p\?|p$)/.test(location.hash)) route(); } catch (e) {}

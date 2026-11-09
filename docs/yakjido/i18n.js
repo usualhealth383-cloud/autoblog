@@ -59,7 +59,7 @@
   var 공표 = window.메디나눔위기번호 && window.메디나눔위기번호.표, 공 = 공표 && 공표[CC];
   var N = EMG[CC] || (공 && 공.응급 ? { e: 공.응급, m: 공.위기 || [] } : { e: null, m: [], unknown: true });
   var 현지 = { ko: '그 나라 응급 번호', en: 'the local emergency number', es: 'el número de emergencias del país', ja: '現地の緊急番号', zh: '当地急救电话' }[L] || 'the local emergency number';
-  var DICT = null, ui = {}, uiN = {}, REV = {}, KO = new Map();   /* KO — 번역 글 → 바꾸기 전 한국어(그릴 때마다 다시 얹어도 남게 한 번만 만든다) */
+  var DICT = null, ui = {}, uiN = {}, UH = {}, UHN = {}, REV = {}, KO = new Map();   /* KO — 번역 글 → 바꾸기 전 한국어(그릴 때마다 다시 얹어도 남게 한 번만 만든다) */
   var NOTE = { en: 'Translated from the Korean original', es: 'Traducido del original en coreano', ja: '韓国語の原文からの翻訳です', zh: '译自韩文原文' };   /* 11-05 현욱님·Main 「검수 전」 꼬리 떼기 — 번역이라는 사실만 */
   var ORIG = { en: 'Show Korean original', es: 'Ver original en coreano', ja: '韓国語の原文を見る', zh: '查看韩文原文' };
   var KRNOTE = { en: 'Medicine doses follow Korean approval — check with a pharmacist or doctor where you live.', es: 'Las dosis siguen la aprobación de Corea: confírmelas con un farmacéutico o médico de su país.', ja: '薬の量は韓国の承認基準です。お住まいの国の薬剤師・医師に確認してください。', zh: '药物剂量依据韩国批准标准，请向您所在国家的药师或医生确认。' };
@@ -75,7 +75,7 @@
     'html:not(.lang-ko) nav.tabbar button{white-space:normal;text-align:center;font-size:12.5px;line-height:1.15;padding-inline:2px;overflow-wrap:normal;hyphens:auto;letter-spacing:-.01em}@media (min-width:1024px){html:not(.lang-ko) nav.tabbar button{text-align:left;font-size:1rem}}' +
     '.lang-ja *,.lang-zh *{word-break:normal!important;line-break:strict;overflow-wrap:anywhere}.lang-en *,.lang-es *{word-break:normal!important;overflow-wrap:break-word}' +
     'html:not(.lang-ko) .review-stamp{white-space:normal;flex:0 1 auto;min-width:0;text-align:right;line-height:1.25}html:not(.lang-ko) .chip,html:not(.lang-ko) .hq-c{white-space:normal;max-width:100%;min-width:0;overflow-wrap:anywhere}' +
-    '.i18n-note{display:flex;flex-wrap:wrap;gap:4px 10px;align-items:center;margin:24px 0 8px;padding-top:10px;border-top:1px solid var(--hairline);font-size:.8125rem;color:var(--muted)}.i18n-note button{color:var(--primary);font-weight:600;min-height:36px}';
+    '.i18n-kr{margin:0 0 8px;padding:8px 10px;border-radius:10px;background:var(--alert-tint);color:var(--alert);font-size:.875rem;font-weight:700;line-height:1.4}.i18n-note{display:flex;flex-wrap:wrap;gap:4px 10px;align-items:center;margin:24px 0 8px;padding-top:10px;border-top:1px solid var(--hairline);font-size:.8125rem;color:var(--muted)}.i18n-note button{color:var(--primary);font-weight:600;min-height:36px}';
   document.head.appendChild(st);
 
   function 받기() {
@@ -83,7 +83,7 @@
     var d = window.__I18N__ && window.__I18N__[L];   /* 아티팩트(파일 하나)는 사전을 안에 싣는다 */
     var p = d ? Promise.resolve(d) : fetch('data/i18n/' + L + '.json').then(function (r) { return r.ok ? r.json() : {}; }).catch(function () { return {}; });
     return p.then(function (j) {
-      DICT = j || {}; ui = DICT.ui || {};
+      DICT = j || {}; ui = DICT.ui || {}; UH = DICT.uiH || {}; for (var h in UH) if (/\d/.test(h)) UHN[numKey(h)] = UH[h];
       /* 숫자만 다른 글 — 번역의 숫자도 틀(#)로 바꿔 둔다. 숫자 개수가 원문과 다르면(°F 병기 등) 틀로 쓰지 않는다(같은 글일 때만 씀) */
       for (var k in ui) if (/\d/.test(k)) { var a = k.match(/\d[\d,.]*/g) || [], b = String(ui[k]).match(/\d[\d,.]*/g) || []; if (a.length === b.length) uiN[numKey(k)] = numKey(String(ui[k])); }
     });
@@ -155,8 +155,17 @@
         if (REV[t]) { n.nodeValue = v.replace(t, REV[t]); continue; }
         for (var i = 0; i < ks.length; i++) if (v.indexOf(ks[i]) >= 0) v = v.split(ks[i]).join(REV[ks[i]]);
         if (v !== n.nodeValue) n.nodeValue = v; } }); }
+  /* 11-05 굵은 글씨가 낀 문단은 문단째(uiH: 「…**굵게**…」 → 번역) — 조각마다 옮기면 어순이 깨진다 */
+  function 문단(el) { if (L === 'ko' || !el.querySelectorAll) return;
+    el.querySelectorAll('p,li,span,small,div').forEach(function (e) { var c = e.childNodes, k = '', b = 0;
+      if (c.length < 2 || (e.closest && e.closest('[data-ko]'))) return;
+      for (var i = 0; i < c.length; i++) { var x = c[i]; if (x.nodeType === 3) k += x.nodeValue; else if (/^(B|STRONG)$/.test(x.nodeName) && !x.children.length) { k += '**' + x.textContent + '**'; b++; } else return; }
+      k = key(k); if (!b || !/[가-힣]/.test(k)) return;
+      var v = UH[k], nums = k.match(/\d[\d,.-]*/g) || [], j = 0; if (v == null && (v = UHN[numKey(k)]) != null) v = v.replace(/\d[\d,.-]*/g, function () { return nums[j++] || ''; });
+      if (v != null) e.innerHTML = v.replace(/[&<>]/g, function (m) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;' }[m]; }).replace(/\*\*(.+?)\*\*/g, '<b>$1</b>'); }); }
   function 바꾸기(el) {
     if (!el) return;
+    문단(el);
     var w = document.createTreeWalker(el, NodeFilter.SHOW_TEXT, null), n, todo = [];
     while ((n = w.nextNode())) todo.push(n);
     todo.forEach(function (n) {
@@ -179,7 +188,7 @@
     d.innerHTML = '<span>' + NOTE[L] + '</span><button type="button" onclick="setLang(\'ko\')">' + ORIG[L] + '</button>';
     view.appendChild(d);   /* 11-03 Main — 첫 3초에 경고가 먼저 보이지 않게 화면 맨 아래 작은 한 줄로(첫 진입 경고 벽 금지) */
     /* 약 용량 칸 — 「한국 허가 기준 — 사는 나라 약사와 확인」 */
-    view.querySelectorAll('.dose-card,.dose-hero,.sv-dose').forEach(function (c) { if (c.querySelector('.i18n-kr')) return; var p = document.createElement('p'); p.className = 'i18n-kr small muted'; p.textContent = KRNOTE[L]; c.appendChild(p); });
+    view.querySelectorAll('.dose-card,.dose-hero,.sv-dose').forEach(function (c) { if (c.querySelector('.i18n-kr')) return; var p = document.createElement('p'); p.className = 'i18n-kr'; p.textContent = KRNOTE[L]; c.insertBefore(p, c.firstChild); });   /* 11-09 C3 — 용량 줄 위에 눈에 띄게 */
   }
   window.I18N = {
     lang: L, cc: CC, emg: N,
