@@ -12,8 +12,8 @@
 <link rel="apple-touch-icon" href="icon-180.png">
 <link rel="icon" href="icon-192.png">
 <script>
-/* Z8 — 메디나눔 공통(10-14 현욱님): 처음은 밝게. 「어둡게」·「기기 따라」는 내 정보 → 설정에서 고르고 이 기기에 기억한다 */
-try { var th0 = localStorage.getItem('yakjido.theme'), de0 = document.documentElement;
+/* 11-10 Main 결정(다섯 앱): 처음은 기기 설정 따라(전에는 처음은 밝게). 「어둡게」·「기기 따라」는 내 정보 → 설정에서 고르고 이 기기에 기억한다 */
+try { var th0 = localStorage.getItem('yakjido.theme') || 'auto', de0 = document.documentElement;
   if (th0 === 'dark' || th0 === 'auto') { if (th0 === 'dark') de0.dataset.theme = 'dark'; else de0.removeAttribute('data-theme');
     if (th0 === 'dark' || matchMedia('(prefers-color-scheme: dark)').matches) document.querySelector('meta[name="theme-color"]').content = '#161A1C'; } } catch (e) {}
 /* 오래된 안드로이드 웹뷰·브라우저(크롬 80 미만)는 아래 큰 묶음을 읽다 멈춰 흰 화면만 남긴다(2026-10-08 출시 점검).
@@ -8106,7 +8106,7 @@ function setEasy(on){ ME.easy = !!on; saveMe(); try { armNotifications(); } catc
   if (on) { if (parseFloat(cur) < parseFloat(EASY_FS)) { try { localStorage.setItem('yakjido.fs.before', cur); } catch (e) {} setFs(EASY_FS); return; } }
   else { const b = lsGet('yakjido.fs.before'); try { localStorage.removeItem('yakjido.fs.before'); } catch (e) {} if (b && cur === EASY_FS) { setFs(b); return; } }
   route(); }
-/* 기기 따라(auto) = 휴대폰 설정을 따름 · 고른 것이 없으면 밝게(Z8 — 메디나눔 공통 10-14) */
+/* 기기 따라(auto) = 휴대폰 설정을 따름 · 고른 것이 없으면 기기 따라(11-10 다섯 앱 Main 결정) */
 function setTheme(v){
   try { localStorage.setItem('yakjido.theme', v); } catch (e) {}
   if (v === 'auto') delete document.documentElement.dataset.theme; else document.documentElement.dataset.theme = v;
@@ -8118,7 +8118,7 @@ function setTheme(v){
 /* 휴대폰 밝기 설정이 바뀌면(「자동」일 때) 머리 색·상태 표시줄도 따라간다 */
 try { const mq = matchMedia('(prefers-color-scheme: dark)'), onTheme = () => { if (themeNow() !== 'auto') return; const m = document.querySelector('meta[name="theme-color"]'); if (m) m.content = mq.matches ? '#161A1C' : '#0B6E8F'; try { nativeBars(); } catch (e) {} };
   mq.addEventListener ? mq.addEventListener('change', onTheme) : mq.addListener && mq.addListener(onTheme); } catch (e) {}
-const themeNow = () => { try { const t = localStorage.getItem('yakjido.theme'); return t === 'dark' || t === 'auto' ? t : 'light'; } catch (e) { return 'light'; } };
+const themeNow = () => { try { const t = localStorage.getItem('yakjido.theme'); return t === 'dark' || t === 'light' ? t : 'auto'; } catch (e) { return 'auto'; } };
 /* 10-29 화면 헌법 「본문 17px 이상」 — 글자 단계를 한 칸씩 올렸다(16·18·20·22 → 17·19·21·23). 예전에 고른 값도 한 번 옮긴다 */
 try { let fs = localStorage.getItem('yakjido.fs'); if (fs && !localStorage.getItem('yakjido.fs.v2')) { const m = { '16px': '17px', '18px': '19px', '20px': '21px', '22px': '23px' }; if (m[fs]) { fs = m[fs]; localStorage.setItem('yakjido.fs', fs); } } localStorage.setItem('yakjido.fs.v2', '1'); if (fs) document.documentElement.style.setProperty('--fs', fs); } catch (e) {}
 /* 화면 밝기는 휴대폰 설정만 따라가고 있었다. 눈이 부시거나(백내장) 어두운 화면이
