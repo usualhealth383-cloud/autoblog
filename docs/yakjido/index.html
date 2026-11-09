@@ -12,7 +12,7 @@
 <link rel="apple-touch-icon" href="icon-180.png">
 <link rel="icon" href="icon-192.png">
 <script>
-try { var th0 = localStorage.getItem('yakjido.theme') || 'auto', de0 = document.documentElement;
+try { var th0 = localStorage.getItem('yakjido.theme'), de0 = document.documentElement;
 if (th0 === 'dark' || th0 === 'auto') { if (th0 === 'dark') de0.dataset.theme = 'dark'; else de0.removeAttribute('data-theme');
 if (th0 === 'dark' || matchMedia('(prefers-color-scheme: dark)').matches) document.querySelector('meta[name="theme-color"]').content = '#161A1C'; } } catch (e) {}
 (function(){
@@ -1768,8 +1768,8 @@ background-repeat:no-repeat;background-position:right 9px center;background-size
 <script>
 window.__YAKJIDO_OK__ = true;
 const D = JSON.parse(document.getElementById('data').textContent || '{}');
-const BUILD = '2026-11-10 06:58';
-const DATAV = '706cad8c36'.indexOf('__') === 0 ? BUILD : '706cad8c36';
+const BUILD = '2026-11-10 06:50';
+const DATAV = 'a6da4d92bf'.indexOf('__') === 0 ? BUILD : 'a6da4d92bf';
 const BRANDMARK = (typeof window !== 'undefined' && window.__BRANDMARK__) || 'icon-192.png';
 let CORE = 0, CORE_P = null;
 function mergeCore(c){
@@ -6839,7 +6839,7 @@ route();
 }
 try { const mq = matchMedia('(prefers-color-scheme: dark)'), onTheme = () => { if (themeNow() !== 'auto') return; const m = document.querySelector('meta[name="theme-color"]'); if (m) m.content = mq.matches ? '#161A1C' : '#0B6E8F'; try { nativeBars(); } catch (e) {} };
 mq.addEventListener ? mq.addEventListener('change', onTheme) : mq.addListener && mq.addListener(onTheme); } catch (e) {}
-const themeNow = () => { try { const t = localStorage.getItem('yakjido.theme'); return t === 'dark' || t === 'light' ? t : 'auto'; } catch (e) { return 'auto'; } };
+const themeNow = () => { try { const t = localStorage.getItem('yakjido.theme'); return t === 'dark' || t === 'auto' ? t : 'light'; } catch (e) { return 'light'; } };
 try { let fs = localStorage.getItem('yakjido.fs'); if (fs && !localStorage.getItem('yakjido.fs.v2')) { const m = { '16px': '17px', '18px': '19px', '20px': '21px', '22px': '23px' }; if (m[fs]) { fs = m[fs]; localStorage.setItem('yakjido.fs', fs); } } localStorage.setItem('yakjido.fs.v2', '1'); if (fs) document.documentElement.style.setProperty('--fs', fs); } catch (e) {}
 setTimeout(() => { try { const c = navigator.connection; if (c && (c.saveData || /2g/.test(c.effectiveType || ''))) return; } catch (e) {} Promise.all([ensureCore(), ensureDetail()]).then(() => setTimeout(() => { lexLoad(true); pubIndexSoon(); }, 800)); }, 3500);
 
