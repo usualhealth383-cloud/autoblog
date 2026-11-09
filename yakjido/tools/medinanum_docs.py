@@ -43,7 +43,7 @@ priv = f'''<!doctype html>
 
 <div class="발">
   <p>메디나눔 · 운영자 박민욱</p>
-  <p>문의 usualhealth383@gmail.com</p>
+  <p>문의 contact@medinanum.com</p>
   <p>시행일 {eff}</p>
 </div>
 </div>
