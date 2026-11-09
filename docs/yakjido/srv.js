@@ -1844,21 +1844,22 @@ window.문_consent = () => {
     <li>${I.heart}<span>진단·처방을 대신하지 않아요. 급하면 119, 그리고 의사·약사와 상의하세요.</span></li>
   </ul>
   <p class="cs-sum">의료기기가 아니에요 · 기록은 먼저 이 휴대폰에 저장돼요 · 광고·분석에 쓰지 않아요</p>
-  <button type="button" class="door-go" id="csGo" onclick="동의한번()">${다시 ? '약관·처리방침에 동의하고 계속' : '약관·처리방침에 동의하고 시작'}</button>
-  <details class="cs-more cs-detail"><summary>자세히 — 무엇에 동의하나요${I.chev}</summary>
-    <h3>이용약관</h3><p>의료기기가 아니에요. 약 정보를 드리고 기록을 도와요. 약을 고르고 드시는 결정은 의사·약사와 함께 하세요.</p><ul>${['약 설명은 <b>식약처 허가 설명서</b>가 기본이에요. 해외 지침이나 진료실 관행이 다르면 둘 다 보여 드려요.',
+  <!-- 11-09 실사용 검수 B2(개인정보보호법 22·23조) — 필수 둘을 따로 보이고, 「모두 동의」 한 번으로도 된다(10-29 「동의 벽 금지」와 함께). 서버 저장(지병·드시는 약)은 선택이라 계정 만들 때 따로 -->
+  <button type="button" class="cs-row cs-all" role="checkbox" aria-checked="false" onclick="동의누름('all')"><span class="cs-bx">${I.check}</span><span class="cs-tx"><b>모두 동의</b></span></button>
+  ${동의줄('terms', '이용약관', '의료기기가 아니에요 · 약 설명은 식약처 허가 설명서가 기본', ['약 설명은 <b>식약처 허가 설명서</b>가 기본이에요. 해외 지침이나 진료실 관행이 다르면 둘 다 보여 드려요.',
     '위험 신호가 있으면 약보다 진료가 먼저예요. 급하면 119예요.',
     '약을 팔거나 건네지 않아요. 약은 약국에서 약사와 상의해 사세요.',
     '계정은 고르실 수 있고, 만 14세 이상만 만들 수 있어요.',
-    '지금은 돈을 내는 기능이 없어요. 생기면 요금과 해지·환불 조건을 미리 알리고 따로 동의를 받아요.'].map(x => `<li>${x}</li>`).join('')}</ul><button type="button" class="cs-doc" onclick="go('/doc/terms')">약관 전문 보기${I.chev}</button>
-    <h3>개인정보 처리방침</h3><p>드시는 약·기록·몸 상태는 먼저 쓰시는 휴대폰에 저장되고, 광고·분석에 쓰지 않아요. 계정을 만들고 따로 동의하실 때만 메디나눔 서버(서울)에 복사돼요.</p><ul>${['로그인하지 않고도 대부분의 기능을 쓰실 수 있어요.',
+    '지금은 돈을 내는 기능이 없어요. 생기면 요금과 해지·환불 조건을 미리 알리고 따로 동의를 받아요.'], '약관 전문 보기')}
+  ${동의줄('privacy', '개인정보 처리방침', '드시는 약·기록·몸 상태는 먼저 이 휴대폰에', ['로그인하지 않고도 대부분의 기능을 쓰실 수 있어요.',
     '광고나 이용자 분석 도구를 넣게 되면 먼저 알려요.',
     '서버 저장은 계정을 만들 때 「서버에 저장하기」에 따로 동의하셔야 해요. 거두시면 서버 기록을 바로 지워요.',
     '「부모님께 보내기」를 링크로 보내실 때만 고른 약 목록·호칭·메모가 7일 동안 서버에 머문 뒤 지워져요.',
     '약 사진은 휴대폰 안에서 글자를 읽는 데만 쓰고 보내지 않아요.',
-    '기록은 내 정보 → 설정에서 언제든 지우실 수 있어요.'].map(x => `<li>${x}</li>`).join('')}</ul><button type="button" class="cs-doc" onclick="go('/doc/privacy')">전문 보기${I.chev}</button>
-    <p class="cs-note">건강에 관한 기록을 서버에 저장하는 것은 계정을 만들 때 따로 여쭤요.</p>
-  </details>
+    '기록은 내 정보 → 설정에서 언제든 지우실 수 있어요.'], '처리방침 전문 보기')}
+  <p class="cs-opt">선택 — 지병·드시는 약을 서버에 저장하는 것은 계정을 만들 때 따로 여쭤요</p>
+  <button type="button" class="door-go" id="csGo" disabled onclick="동의하기()">시작하기</button>
+  <p class="cs-why" id="csWhy">필수 두 가지에 동의하시면 시작할 수 있어요</p>
   <p class="cs-foot">동의 내용은 설정 → 약관·개인정보에서 언제든 다시 보실 수 있어요 · 약지도 v${esc(D.meta?.version || '')}</p>
 </div>`;
 };
@@ -1891,6 +1892,7 @@ window.문_notify = (_, q) => {
     ${row(I.cal, '진료 예약', vn ? `예약 ${vn}건 · 전날 저녁 7시와 2시간 전` : '진료 예약을 적어 두면 전날과 2시간 전에', noteOn('visit'), `setNoteOn('visit',${!noteOn('visit')})`)}
     ${row(I.check, '저녁 9시 하루 정리', '그날 체크 안 한 약이 있을 때만 · 기본 꺼짐', eveningOn(), `setEvening(${!eveningOn()})`)}
   </section>
+  ${famOn() ? `<button type="button" class="link fam-jump" style="margin-top:10px" onclick="document.getElementById('fam')?.scrollIntoView({behavior:'smooth'})">가족에게 알리기 — 약 체크가 없으면 가족에게 ›</button>` : ''}
   <div class="actions two"><button class="btn line" onclick="go('/schedule?t=sc1')">${I.clock} 약마다 시간 고르기</button><button class="btn line" onclick="go('/schedule?t=sc2')">${I.pill} 남은 알 수 넣기</button></div>
   <p class="small muted" style="margin-top:12px">알림이 늦거나 안 오면 <button type="button" class="link" onclick="go('/schedule?t=sc4')">알림이 늦어요 도움말</button>을 봐 주세요.</p>
   ${doseSrvHTML()}${famCard(q || {})}`;
@@ -2179,7 +2181,8 @@ try { const st3 = document.createElement('style'); st3.textContent = '@media (ma
 try { const st2 = document.createElement('style'); st2.textContent = '.fam-h{display:flex;align-items:center;justify-content:flex-start;gap:8px;margin:0 0 6px;font-size:1.125rem}.fam-h .i{width:22px;height:22px}.fam-s{margin:14px 0 4px;font-size:1rem;color:var(--muted)}.fam-ul{list-style:none;margin:0;padding:0}.fam-ul li{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;padding:10px 0;border-top:1px solid var(--hairline)}.fam-ul li>span:first-child{min-width:0}.fam-ul b{display:block;overflow-wrap:anywhere}.fam-ul small{display:block;color:var(--muted);font-size:.875rem}.fam-b{display:flex;align-items:center;gap:6px}.fam-b .btn{width:auto;min-height:44px;padding:0 14px;margin:0}.fam-b .link{min-height:44px;padding:0 8px}.fam-hot{background:var(--caution-tint);border-radius:12px;padding:10px!important}.fam-form{display:flex;flex-direction:column;gap:8px;margin-top:12px;padding-top:12px;border-top:1px dashed var(--hairline)}.fam-l{font-weight:700}.fam-form input:not([type=checkbox]){min-height:48px;padding:10px 12px;border:1.5px solid var(--ui-line);border-radius:12px;font:inherit;background:var(--card);color:var(--text)}.fam-rule{margin:6px 0 4px;padding-left:1.1em;color:var(--body);font-size:.9375rem;line-height:1.6}.fam-det{margin:4px 0;border:1px solid var(--hairline);border-radius:12px;padding:8px 12px}.fam-det summary{font-weight:700;cursor:pointer;min-height:40px;display:flex;align-items:center}.fam-det dl{margin:6px 0 0}.fam-det dt{font-weight:700;margin-top:8px}.fam-det dd{margin:2px 0 0;color:var(--body);font-size:.9375rem;line-height:1.6}.fam-off{display:block;min-height:44px;margin-top:6px}.fam-seg{display:flex;gap:6px}.fam-seg button{flex:1;min-height:44px;border:1.5px solid var(--ui-line);border-radius:12px;background:var(--card);color:var(--text);font:inherit;font-weight:700}.fam-seg button.on{background:var(--primary);color:var(--on-primary);border-color:var(--primary)}.fam-q{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.fam-q input{min-height:44px;padding:6px 10px;border:1.5px solid var(--ui-line);border-radius:12px;font:inherit;background:var(--card);color:var(--text)}.fam-q .btn{width:auto;margin:0;min-height:44px}.fam-ios{margin-top:10px}.fam-msg{padding:10px 12px;border-radius:12px;background:var(--accent-tint);color:var(--accent-text)}.nt-perm{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:10px 0 4px;padding:12px 14px;border-radius:14px;background:var(--accent-tint);color:var(--accent-text);font-size:1rem}.nt-perm.ok{background:var(--normal-tint);color:var(--normal)}.nt-perm .btn{width:auto;margin:0 0 0 auto;min-height:44px}.nt-list{padding:4px 16px}.nt-row{display:flex;align-items:center;gap:12px;padding:14px 0;border-top:1px solid var(--hairline)}.nt-row:first-child{border-top:0}.nt-ic{flex:none;width:40px;height:40px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;background:var(--tint);color:var(--primary-deep)}.nt-t{flex:1;min-width:0;display:flex;flex-direction:column}.nt-t b{font-size:1.0625rem}.nt-t small{color:var(--muted);font-size:.9375rem;margin-top:2px}.nt-row .sw{flex:none}'; document.head.appendChild(st2); } catch (e) {}
 window.계정카드 = () => { if (D.meta?.account !== true) return ''; const 나 = srvLoggedIn(), m = 나 ? (서버.세션()?.user?.email || '') : '';
   if (!나) return `<section class="sec card acct-card"><div class="acct-hd"><span class="acct-ic" aria-hidden="true">${I.user}</span><span><b>메디나눔 계정</b><small>폰을 바꿔도 약통·복용 기록을 이어 봐요 · 선택</small></span></div>
-    <button type="button" class="btn primary acct-go" onclick="go('/login')">로그인 · 계정 만들기</button></section>`;
+    <button type="button" class="btn primary acct-go" onclick="go('/login')">로그인 · 계정 만들기</button>
+    <a class="link acct-del" href="delete-account.html" style="display:inline-block;margin-top:12px;min-height:44px;line-height:44px">계정과 기록 지우기 ›</a></section>`;   /* 11-09 B4 — 로그인 전에도 늘(심사관: 계정 삭제 길이 안 보임). 웹 삭제 주소와 같은 말 */
   return `<section class="sec card acct-card"><div class="acct-hd"><span class="acct-av" aria-hidden="true">${esc(m.charAt(0).toUpperCase())}</span><span><b>${esc(m)}</b><small>로그인돼 있어요 · 이어 보기 켜짐</small></span></div>
     ${window.이용권줄HTML ? 이용권줄HTML() : ''}
     <div class="acct-act"><button type="button" class="btn line" onclick="계정동작('sync')">지금 맞추기</button><button type="button" class="btn line" onclick="계정동작('logout');setTimeout(route,600)">로그아웃</button></div>
@@ -2250,7 +2253,7 @@ try { const css = document.createElement('style'); css.textContent = `
 .cs-row{display:flex;gap:12px;align-items:flex-start;width:100%;text-align:left;padding:14px 16px;min-height:56px;border-radius:14px;color:var(--text)}
 .cs-all{background:var(--tint)}
 .cs-all .cs-tx b{font-size:1.0625rem}
-.cs-item{margin-top:10px;border:1.5px solid var(--hairline);border-radius:14px;background:var(--card)}
+.cs-opt{margin:10px 2px 0;font-size:.875rem;color:var(--muted)}.cs-why{margin:8px 2px 0;font-size:.875rem;color:var(--muted);text-align:center}.cs-all{margin-top:14px;border:1.5px solid var(--hairline);background:var(--card)}.cs-item{margin-top:10px;border:1.5px solid var(--hairline);border-radius:14px;background:var(--card)}
 .cs-bx{flex:none;width:24px;height:24px;margin-top:1px;border-radius:7px;border:2px solid var(--ui-line);background:var(--card);display:grid;place-items:center;color:transparent}
 .cs-bx svg.i{width:16px;height:16px;stroke-width:3}
 [aria-checked=true]>.cs-bx{background:var(--primary);border-color:var(--primary);color:var(--on-primary)}
@@ -3607,5 +3610,7 @@ window.vVitalsS = function(){
   ${disclaimer('기록은 진료를 돕는 참고 자료예요. 약을 늘리거나 줄이는 것은 의사와 상의하세요.')}`;
 };
 
+/* 11-09 C2 — 말과 나라 창 「맞아요」 단추: 공용 강조색(갈색 #B5711C, 흰 글자 대비 3.9:1) 대신 약지도 청록(대비 5.8:1) */
+try { const st = document.createElement('style'); st.textContent = ':root{--ms-accent:#0B6E8F;--ms-on-accent:#fff}'; document.head.appendChild(st); } catch (e) {}
 /* 내 정보·동의·로그인·약관 화면을 보고 있었으면 다시 그린다(이 파일이 늦게 오므로) */
 try { if (/^#\/(od|vitals|me|consent|login|notify|sgoal|sstage|doc|hello\/3|supp$|supp\?|sgoal|sstage|rx|about|search|myths|askdoc|talk|p\/|p\?|p$)/.test(location.hash)) route(); } catch (e) {}

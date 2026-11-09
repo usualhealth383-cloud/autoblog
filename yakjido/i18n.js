@@ -75,7 +75,7 @@
     'html:not(.lang-ko) nav.tabbar button{white-space:normal;text-align:center;font-size:12.5px;line-height:1.15;padding-inline:2px;overflow-wrap:normal;hyphens:auto;letter-spacing:-.01em}@media (min-width:1024px){html:not(.lang-ko) nav.tabbar button{text-align:left;font-size:1rem}}' +
     '.lang-ja *,.lang-zh *{word-break:normal!important;line-break:strict;overflow-wrap:anywhere}.lang-en *,.lang-es *{word-break:normal!important;overflow-wrap:break-word}' +
     'html:not(.lang-ko) .review-stamp{white-space:normal;flex:0 1 auto;min-width:0;text-align:right;line-height:1.25}html:not(.lang-ko) .chip,html:not(.lang-ko) .hq-c{white-space:normal;max-width:100%;min-width:0;overflow-wrap:anywhere}' +
-    '.i18n-note{display:flex;flex-wrap:wrap;gap:4px 10px;align-items:center;margin:24px 0 8px;padding-top:10px;border-top:1px solid var(--hairline);font-size:.8125rem;color:var(--muted)}.i18n-note button{color:var(--primary);font-weight:600;min-height:36px}';
+    '.i18n-kr{margin:0 0 8px;padding:8px 10px;border-radius:10px;background:var(--alert-tint);color:var(--alert);font-size:.875rem;font-weight:700;line-height:1.4}.i18n-note{display:flex;flex-wrap:wrap;gap:4px 10px;align-items:center;margin:24px 0 8px;padding-top:10px;border-top:1px solid var(--hairline);font-size:.8125rem;color:var(--muted)}.i18n-note button{color:var(--primary);font-weight:600;min-height:36px}';
   document.head.appendChild(st);
 
   function 받기() {
@@ -188,7 +188,7 @@
     d.innerHTML = '<span>' + NOTE[L] + '</span><button type="button" onclick="setLang(\'ko\')">' + ORIG[L] + '</button>';
     view.appendChild(d);   /* 11-03 Main — 첫 3초에 경고가 먼저 보이지 않게 화면 맨 아래 작은 한 줄로(첫 진입 경고 벽 금지) */
     /* 약 용량 칸 — 「한국 허가 기준 — 사는 나라 약사와 확인」 */
-    view.querySelectorAll('.dose-card,.dose-hero,.sv-dose').forEach(function (c) { if (c.querySelector('.i18n-kr')) return; var p = document.createElement('p'); p.className = 'i18n-kr small muted'; p.textContent = KRNOTE[L]; c.appendChild(p); });
+    view.querySelectorAll('.dose-card,.dose-hero,.sv-dose').forEach(function (c) { if (c.querySelector('.i18n-kr')) return; var p = document.createElement('p'); p.className = 'i18n-kr'; p.textContent = KRNOTE[L]; c.insertBefore(p, c.firstChild); });   /* 11-09 C3 — 용량 줄 위에 눈에 띄게 */
   }
   window.I18N = {
     lang: L, cc: CC, emg: N,
