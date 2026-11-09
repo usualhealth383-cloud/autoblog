@@ -3554,7 +3554,7 @@ window.vOdS = function(_, q){ q = q || {};
   const kidCard = `<section class="sec card od-c"><h2>아이가 먹었어요</h2><p>양이 적어 보여도 <b>바로 119</b>에 전화하세요. 아이 <b>몸무게</b>와 먹은 약·양을 알려 주시면 위험한 양인지 바로 판단해요.</p><a class="call" href="tel:119"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M6.6 10.8a15 15 0 0 0 6.6 6.6l2.2-2.2a1 1 0 0 1 1-.25 11.4 11.4 0 0 0 3.6.57 1 1 0 0 1 1 1V20a1 1 0 0 1-1 1A17 17 0 0 1 3 4a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1c0 1.25.2 2.45.57 3.57a1 1 0 0 1-.25 1z" fill="currentColor"/></svg> 119 전화</a></section>`;
   return `${topBar({ back:'뒤로' })}
   <section class="sec"><h1>많이 먹었을 때 · 두 번 먹었을 때</h1></section>
-  <div class="flag od-top" role="alert">${I.alert}<div><b>증상이 없어도 지금 119에 전화하거나 응급실로 가세요.</b><p>약 상자와 남은 약을 들고 가세요. 억지로 토하게 하지 마시고, 직접 운전해서 가지 마세요.</p><a class="call" href="tel:119"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M6.6 10.8a15 15 0 0 0 6.6 6.6l2.2-2.2a1 1 0 0 1 1-.25 11.4 11.4 0 0 0 3.6.57 1 1 0 0 1 1 1V20a1 1 0 0 1-1 1A17 17 0 0 1 3 4a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1c0 1.25.2 2.45.57 3.57a1 1 0 0 1-.25 1z" fill="currentColor"/></svg> 119 전화</a></div></div>
+  <div class="flag od-top" role="alert">${I.alert}<div><b>증상이 없어도 지금 119에 전화하거나 응급실로 가세요.</b><p>약 상자와 남은 약을 들고 가세요. 억지로 토하게 하지 마시고, 직접 운전해서 가지 마세요.</p></div></div><a class="call od-big" href="tel:119"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M6.6 10.8a15 15 0 0 0 6.6 6.6l2.2-2.2a1 1 0 0 1 1-.25 11.4 11.4 0 0 0 3.6.57 1 1 0 0 1 1 1V20a1 1 0 0 1-1 1A17 17 0 0 1 3 4a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1c0 1.25.2 2.45.57 3.57a1 1 0 0 1-.25 1z" fill="currentColor"/></svg> 119 전화</a>
   ${kid ? kidCard : ''}
   <section class="sec card od-c"><h2>아세트아미노펜(타이레놀 등)이라면</h2><p><b>하루 최대량을 넘겨 드셨다면 아프지 않아도 지금 응급실</b>로 가세요. 첫날은 증상이 거의 없어요. 해독제는 빨리 쓸수록 잘 들어요.</p><p class="small muted">감기약·몸살약·복합진통제에도 들어 있어요. 여러 개를 함께 드셨다면 모두 더해 보세요.</p></section>
   ${kid ? '' : kidCard}
@@ -3563,7 +3563,7 @@ window.vOdS = function(_, q){ q = q || {};
   <p class="small muted od-src">근거: 영국 국민보건서비스(NHS) 중독 안내 · 파라세타몰 안내</p>
   ${disclaimer()}`;
 };
-try { const st = document.createElement('style'); st.textContent = '.od-fs{display:grid;gap:10px;margin:8px 0 12px}.od-f{display:grid;gap:4px}.od-f input{width:100%;box-sizing:border-box;min-height:48px;padding:0 12px;border:1px solid var(--hairline);border-radius:12px;font:inherit}.od-c .call,.od-top .call{margin-top:12px;display:flex;width:100%;min-height:56px;justify-content:center;font-size:1.0625rem;background:var(--alert)!important;color:var(--on-alert,#fff)!important;text-decoration:none!important;border-radius:14px}'; document.head.appendChild(st); } catch (e) {}
+try { const st = document.createElement('style'); st.textContent = '.od-fs{display:grid;gap:10px;margin:8px 0 12px}.od-f{display:grid;gap:4px}.od-f input{width:100%;box-sizing:border-box;min-height:48px;padding:0 12px;border:1px solid var(--hairline);border-radius:12px;font:inherit}.od-c .call{margin-left:calc(-1 * var(--s4));margin-right:calc(-1 * var(--s4));width:calc(100% + 2 * var(--s4))!important;border-radius:0!important}.od-big{margin-top:10px!important}.od-c .call,.od-top .call,.od-big{margin-top:12px;display:flex;width:100%;min-height:56px;justify-content:center;font-size:1.0625rem;background:var(--alert)!important;color:var(--on-alert,#fff)!important;text-decoration:none!important;border-radius:14px}'; document.head.appendChild(st); } catch (e) {}
 
 /* 11-09 앱 껍데기에서 옮김(첫 화면 예산) */
 window.vVitalsS = function(){
