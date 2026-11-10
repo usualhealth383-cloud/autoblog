@@ -1768,8 +1768,8 @@ background-repeat:no-repeat;background-position:right 9px center;background-size
 <script>
 window.__YAKJIDO_OK__ = true;
 const D = JSON.parse(document.getElementById('data').textContent || '{}');
-const BUILD = '2026-11-11 07:15';
-const DATAV = '8b79657766'.indexOf('__') === 0 ? BUILD : '8b79657766';
+const BUILD = '2026-11-11 07:49';
+const DATAV = '05c254a5b3'.indexOf('__') === 0 ? BUILD : '05c254a5b3';
 const BRANDMARK = (typeof window !== 'undefined' && window.__BRANDMARK__) || 'icon-192.png';
 let CORE = 0, CORE_P = null;
 function mergeCore(c){
@@ -2041,7 +2041,7 @@ const c = allergyClassHit(d);
 return c ? `<div class="note" style="margin-top:12px">${I.alert}<span><b>알레르기가 있었던 성분과 같은 계열이라 약사와 상의</b>하세요 — ${esc(ingrNameK(c))}. 같은 계열은 같은 반응이 날 수 있어요.</span></div>` : '';
 }
 const ingrNameK = n => String(n || '').replace(/\s*\(.*$/, '').trim();
-function activeFlags(){ const f = Object.keys(FLAG_LABEL).filter(k => k !== 'senior' && k !== 'child' && ME[k] === true);
+function activeFlags(){ if (ENTRY?.from === 'kids') return ['child']; const f = Object.keys(FLAG_LABEL).filter(k => k !== 'senior' && k !== 'child' && ME[k] === true);
 if (ME.age === 'senior') f.push('senior'); if (ME.age === 'child') f.push('child');
 if (f.includes('hf') && !f.includes('heart')) f.push('heart'); if (f.includes('lvs') && !f.includes('liver')) f.push('liver'); if (f.includes('bleed') && !f.includes('ulcer')) f.push('ulcer'); return f; }
 
@@ -2223,6 +2223,22 @@ return tz && k >= 0 ? S.substr(k + tz.length + 2, 2) : /^America\/(New_York|Chic
 window.LANG = LANG; window.CC = CC;
 function setLang(l, cc){ try { localStorage.setItem('yakjido.lang', l); if (cc) localStorage.setItem('yakjido.cc', cc); } catch (e) {} location.reload(); }
 if (LANG !== 'ko' || CC !== 'KR') { const s = document.createElement('script'); s.src = 'i18n.js'; document.head.appendChild(s); }
+const ENTRY_APPS = { kids: ['우리 집 소아과', 'https://kids.medinanum.com/'], gildongmu: ['길동무', 'https://gildongmu.medinanum.com/'], gyeote: ['곁에', 'https://gyeote.medinanum.com/'], clinicscore: ['ClinicScore', 'https://cs.medinanum.com/'] };
+var ENTRY = (() => { try { return JSON.parse(sessionStorage.getItem('yakjido.entry') || 'null'); } catch (e) { return null; } })();
+function entryTake(q){ if (!q.from || !ENTRY_APPS[q.from]) return; const ag = /^\d{1,3}$/.test(q.age || '') ? +q.age : null; ENTRY = { from: q.from, age: ag }; try { sessionStorage.setItem('yakjido.entry', JSON.stringify(ENTRY)); } catch (e) {} }
+function entryOff(){ ENTRY = null; try { sessionStorage.removeItem('yakjido.entry'); } catch (e) {} const h = location.hash.replace(/([?&])(from|age)=[^&]*/g, '$1').replace(/[?&]+$/, '').replace(/\?&+/, '?'); if (h !== location.hash) location.replace(location.href.split('#')[0] + h); else route(); }
+function entryBand(s){
+if (!ENTRY || !ENTRY_APPS[ENTRY.from]) return ''; const [nm, url] = ENTRY_APPS[ENTRY.from], m = ENTRY.age;
+const back = `<a class="link" href="${url}">${esc(nm)}로 돌아가기 ›</a>`;
+if (ENTRY.from === 'kids') return `<section class="sec card entry-band"><b>${esc(nm)}에서 오셨어요 — 아이 기준으로 보여 드려요</b>
+<p class="small" style="margin-top:6px">${m != null ? (m >= 24 ? '만 ' + Math.floor(m / 12) + '세' : '생후 ' + m + '개월') + ' 기준으로, 설명서상 이 나이에 쓰지 않는 약은 뺐어요.' : '나이를 몰라서 12세부터 먹는 약만 뺐어요. 해열제 양은 몸무게로 정해요.'} 엄마·아빠의 몸 조건은 넣지 않았어요.</p>
+<div class="actions two" style="margin-top:8px"><button class="btn line" onclick="go('/kids')">아이 해열제 양 보기</button><button class="btn line" onclick="entryOff()">어른 기준으로 보기</button></div>${back}</section>`;
+if (ENTRY.from === 'gildongmu') return `<section class="sec card entry-band"><b>${esc(nm)}에서 오셨어요 — 항암 치료 중이시면 먼저 보세요</b>
+<ul class="plain" style="margin-top:6px"><li><b>38.0도 이상 열</b>이면 해열제로 기다리지 말고 바로 치료받는 병원에 연락하거나 응급실로 가세요. 백혈구가 낮을 때의 열은 빨리 치료할수록 좋아요.</li>
+<li>혈소판이 낮다고 들으셨거나 멍·코피가 잘 나면, <b>아스피린·이부프로펜이 든 약</b>은 피를 잘 안 멈추게 할 수 있어요. 드시기 전에 치료받는 병원에 먼저 물어보세요.</li></ul>
+${srcChips(['idsa_fn2011', 'nci_bleeding'])}${back}</section>`;
+return `<section class="sec card entry-band"><b>${esc(nm)}에서 오셨어요</b> ${back}</section>`;
+}
 function route(){
 const h = location.hash.replace(/^#\/?/, '') || 'home';
 const [path, qs] = h.split('?');
@@ -2231,7 +2247,7 @@ const seg = path.split('/');
 if (consentGate(seg[0], h)) return;
 if (seg[0] === 'hello' && helloDone() && (() => { try { return sessionStorage.getItem(HELLO_FIN); } catch (e) { return null; } })()) { try { location.replace(location.href.split('#')[0] + '#/home'); return; } catch (e) {} }
 document.body.classList.toggle('no-nav', /^(hello|consent|login|doc)$/.test(seg[0])); document.body.classList.toggle('is-door', /^(consent|login)$/.test(seg[0]));
-const q = Object.fromEntries(new URLSearchParams(qs || ''));
+const q = Object.fromEntries(new URLSearchParams(qs || '')); entryTake(q);
 const tab = { send:'home', p:'home', show:'home', check:'home', home:'home', symptom:'home', drugs:'drugs', drug:'drugs', class:'drugs', search:'drugs', pub:'drugs', pill:'drugs', guide:'home', kids:'home', tips:'home', myths:'home', schedule:'me', notify:'me', photo:'drugs', pillinfo:'drugs', supp:'supp', sgoal:'supp', sstage:'supp', compare:'supp', me:'me', about:'me', ingr:'drugs', brand:'drugs', nut:'supp', hello:'home', mix:'drugs', together:'me', kinds:'me', rx:'me', rxout:'drugs', senior:'drugs', askdoc:'home', talk:'home', login:'login' }[seg[0]] || 'home';
 document.querySelectorAll('nav.tabbar button').forEach(b => { const on = b.dataset.tab === tab; b.classList.toggle('on', on); on ? b.setAttribute('aria-current', 'page') : b.removeAttribute('aria-current'); });
 if (CORE !== 2 && !CORE_SAFE.has(seg[0])) {
@@ -3306,7 +3322,7 @@ ${more.length ? `<div id="${id}" class="chips hide" style="margin-top:8px">${mor
 ${top.length && ME.age !== 'senior' ? `<button class="fit-me" onclick="go('/me')">${I.user}<span>매번 누르기 번거로우시면 <b>내 정보</b>에 미리 정해 두세요</span>${I.chev}</button>` : ''}
 </div>`;
 }
-const kidMon = () => monthsFrom(ME.child?.birth);
+const kidMon = () => ENTRY?.from === 'kids' && Number.isFinite(ENTRY.age) ? ENTRY.age : monthsFrom(ME.child?.birth);
 function minAgeOf(d){ if (!d) return null; if (Number.isFinite(d.minAgeMonths)) return d.minAgeMonths; const k = (D_KIDS().drugs || []).find(x => x.drugId === d.id); return k && Number.isFinite(k.minMonths) ? k.minMonths : null; }
 const KID_PROD = /어린이|소아|키즈|베이비|시럽|현탁/;
 const kidProds = d => [d?.kidForm, ...(d?.products || []).map(p => p.name).filter(n => KID_PROD.test(n))].filter(Boolean);
@@ -3793,7 +3809,7 @@ const row = x => svRow(x) + ((x.alts || []).length ? `<div class="sv-or"><small>
 const oix = x => optPicked(s.id, x.i) ? '' : ixLine([x.d]);
 const optFold = !opt.length ? '' : `<details class="opt-fold" ${OPT_FOLD === s.id || nOpt || opt.some(oix) ? 'open' : ''} ontoggle="OPT_FOLD=this.open?'${s.id}':(OPT_FOLD==='${s.id}'?'':OPT_FOLD)"><summary><span><b>이런 증상도 있으면 더하기</b><small>${nOpt ? nOpt + '가지 넣었어요' : opt.length + '가지'}</small></span>${I.chev}</summary>
 ${opt.map(x => { const on = optPicked(s.id, x.i); return `<div class="opt-one ${on ? 'on' : ''}"><button type="button" class="opt-add sv-opt ${on ? 'on' : ''}" role="checkbox" aria-checked="${on}" onclick="optToggle('${s.id}',${x.i})"><i class="opt-box">${on ? I.check : ''}</i><span><b>${esc(nbu(catName(x) + ' — ' + (prodName(x.product) || ingrName(x.d))))}</b><small>${esc(x.title || x.slot)}</small></span></button>${on ? svRow(x) : ''}${oix(x)}</div>`; }).join('')}</details>`;
-return `${topBar({ back:'증상', nosearch:true, unreviewed:s.reviewed === false })}
+return `${topBar({ back:'증상', nosearch:true, unreviewed:s.reviewed === false })}${entryBand(s)}
 <div class="${gcls(s.group)}"><div class="eyebrow" style="color:var(--gfg,var(--primary))"><span class="gdot"></span>${esc(s.group)}</div><h1>${esc(s.name)}</h1></div>
 <div class="sv-top"><p class="sv-lead">${inf ? '약보다 진료가 먼저예요' : noBuy ? '약국에서 살 약은 없어요' : unrev ? '약국에서 이렇게 상의하세요' : '약국에서 이 성분을 물어보세요'}</p>${viewSeg('simple')}</div>
 ${ext('응급칸')}
@@ -3877,15 +3893,15 @@ const allBan = (p.options || []).length && ban && (p.options || []).every(o => b
 return `<div class="slot"><div class="n ${kind}">${esc(p.slot)}</div><div>
 <h3>${esc(allBan ? p.slot + ' — 내 몸 조건엔 먼저 상의' : (p.title || p.slot))} ${p.otc === false ? '<span class="badge rx">처방 필요</span>' : !(p.options || []).length ? '<span class="badge cvs">약 없이 할 일</span>' : p.optional ? '<span class="badge soft">도움될 수 있어요</span>' : '<span class="badge otc">약국 구입</span>'}</h3>
 ${allBan ? `<p class="why">내 몸 조건에서는 이 칸 약을 먹기 전에 의사와 먼저 상의하세요.</p>` : whyHtml(banProse(p.why, ban))}
-<div class="opts">${(p.options || []).map(oid => { const d = drug(oid); if (!d) return ''; const warn = d.avoid?.some(a => a.flags?.some(x => f.includes(x)));
-if (warn) return `<span class="opt-pill no">${esc(ingrName(d))} <span class="badge stop">내 몸 조건엔 피하세요</span></span>`; return `<a class="opt-pill ${p.pick === oid ? 'pick' : ''}" href="#${String(oid).startsWith('lex:') ? '/ingr/' + String(oid).slice(4) : '/drug/' + oid}">${p.pick === oid ? '<span class="dot"></span>' : ''}${esc(d.name)}${warn ? ' <span class="badge stop">내 정보 주의</span>' : ''}</a>`; }).join('')}</div>
+<div class="opts">${(p.options || []).map(oid => { const d = drug(oid); if (!d) return ''; const yg = f.includes('child') && kidTooYoung(d, kidMon()), warn = yg || d.avoid?.some(a => a.flags?.some(x => f.includes(x)));
+if (warn) return `<span class="opt-pill no">${esc(ingrName(d))} <span class="badge stop">${yg ? '이 나이엔 쓰지 않아요' : '내 몸 조건엔 피하세요'}</span></span>`; return `<a class="opt-pill ${p.pick === oid ? 'pick' : ''}" href="#${String(oid).startsWith('lex:') ? '/ingr/' + String(oid).slice(4) : '/drug/' + oid}">${p.pick === oid ? '<span class="dot"></span>' : ''}${esc(d.name)}${warn ? ' <span class="badge stop">내 정보 주의</span>' : ''}</a>`; }).join('')}</div>
 ${p.alt ? `<p class="alt">${fmt(p.alt)}</p>` : ''}
 </div></div>`;
 };
 const clinic = (s.care?.clinic || []).slice(0, 2), er = (s.care?.er || []).slice(0, 1);
 const inf = infStop(s);
 const buyHtml = inf ? '' : planRows(s); const noBuy = !buyHtml.trim();
-return `${topBar({ back:'증상', unreviewed:s.reviewed === false })}
+return `${topBar({ back:'증상', unreviewed:s.reviewed === false })}${entryBand(s)}
 <div class="${gcls(s.group)}"><div class="eyebrow" style="color:var(--gfg,var(--primary))"><span class="gdot"></span>${esc(s.group)}</div>
 <h1>${esc(s.name)}</h1></div>
 ${viewSeg('detail')}
@@ -3951,7 +3967,7 @@ ${ban ? `<p class="note ban-note">${I.alert}<span><span>아래는 진료실에�
 <section class="sec">
 <div class="rx-card">
 <div class="rx-head"><div><h2>${esc(s.planTitle || '진료실에서 처방하는 방식')}</h2><div class="lbl">${esc(s.planLabel || '같은 원리로 약국에서 고르면 돼요')}</div></div><span class="rx-stamp${s.reviewed === false ? ' wait' : ''}">${s.reviewed === false ? '의사 확인 중' : esc(D.meta?.stamp || '의사 검수')}</span></div>
-${(s.plan || []).filter(p => !slotHidden(p)).map(slotHtml).join('')}
+${(s.plan || []).filter(p => !slotHidden(p) && !(ENTRY?.from === 'kids' && (p.otc === false || p.adult || (p.either && /성인|어른/.test(p.slot || '')) || (!(p.options || []).length && kidMon() != null && kidMon() < 6 && /이부프로펜/.test((p.title || '') + (p.why || '')))))).map(slotHtml).join('')}
 </div>
 </section>
 ${rxComboCard(s.rxCombo, ban)}
