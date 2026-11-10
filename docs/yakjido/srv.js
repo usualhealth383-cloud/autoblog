@@ -2616,7 +2616,7 @@ try {
    보내는 길(위에서부터 되는 것):
      ① kakaoJsKey 가 있고 글이 200자 이하 → Kakao.Share.sendDefault(텍스트 템플릿 · 링크 버튼 하나)
         (카카오 텍스트 템플릿은 글 200자까지 — 넘으면 ②로. 키가 없으면 SDK 를 아예 불러오지 않는다)
-     ② navigator.share({text}) — 안드로이드·아이폰 공유창에 카카오톡이 뜬다
+     ② navigator.share({text}) — 안드로이드·아이폰 공유창에 카카오톡이 뜬다 · 설치 앱은 Capacitor Share 플러그인(@capacitor/share, _껍데기/package.json)
      ③ 문자(sms:?body=) · 복사
    지킬 것: 주민등록번호·이메일은 기본으로 지운다. 앱이 이름 목록(빼기)을 주면 그 이름도 「보호자」 같은 말로 바꾼다.
             보낸 글은 부품이 어디에도 저장하지 않는다. 카카오 키를 켜면 보내는 글이 카카오(주) 서버를 거친다(처리방침 사실 메모 _서버/보내기_카카오_문서사실.md).
@@ -2629,7 +2629,7 @@ try {
    SDK: 카카오 공식 CDN t1.kakaocdn.net 2.8.2 · 무결성(sha384) 고정. */
 (function () {
   if (window.보내기 && window.보내기.판) return;   /* 11-11b 소아 — 앱에 같은 이름 전역 함수가 있으면 덮지 않고 window.mn보내기 로만 */
-  var 판 = '2026-11-11b';
+  var 판 = '2026-11-11c';   /* 11-11c 약지도 — 설치 앱(껍데기)에는 navigator.share 가 없다 → Capacitor Share 플러그인 · 설치 앱에서는 카카오 SDK 대신 공유창(웹뷰에서 카카오톡이 안 열리는 일이 있다) */
   var 값표 = { kakaoJsKey: '', sdk: 'https://t1.kakaocdn.net/kakao_js_sdk/2.8.2/kakao.min.js', sdkSri: 'sha384-zt/G7/KfaRQ9dT/QIkS0ujMtzouJqzuSJcXVQu50x0rl/+mD1dc70AeOejVbMD9E', 카카오글한도: 200 };
   var 설정 = { app: '', 앱이름: '', 링크: 'https://medinanum.com/', 언어: null, 시트열기: null, 시트닫기: null, 알림: null, 빼기: null };
   var 말 = {
@@ -2673,8 +2673,17 @@ try {
   }
   function 알림(m) { try { if (typeof 설정.알림 === 'function') return 설정.알림(m); } catch (e) {} try { alert(m); } catch (e) {} }
   function 지금글() { var t = document.getElementById('mnSendTx'); return t ? String(t.value || '') : ''; }
+  function 네이티브() { try { var C = window.Capacitor; return !!(C && typeof C.isNativePlatform === 'function' && C.isNativePlatform()); } catch (e) { return false; } }
+  function 앱공유() {
+    try { var C = window.Capacitor; if (!네이티브()) return null;
+      if (C.Plugins && C.Plugins.Share) return C.Plugins.Share;
+      if (typeof C.registerPlugin === 'function') return C.registerPlugin('Share'); } catch (e) {}
+    return null;
+  }
   function 공유창(t) {
     try { if (navigator.share) { return navigator.share({ text: t }).then(function () { return true; }, function (e) { return !(e && e.name !== 'AbortError') ? true : false; }); } } catch (e) {}
+    try { var P = 앱공유(); if (P && typeof P.share === 'function') {   /* 설치 앱 — @capacitor/share */
+      return P.share({ text: t, dialogTitle: 글('카톡') }).then(function () { return true; }, function (e) { return /cancel/i.test(String((e && (e.message || e.code)) || '')); }); } } catch (e) {}
     return Promise.resolve(false);
   }
   function 복사(t) {
@@ -2686,7 +2695,7 @@ try {
   function 카톡() {
     var t = 지금글(); if (!t.trim()) return;
     var 링크 = 설정.링크 || 'https://medinanum.com/';
-    var 카카오되나 = !!키() && t.length <= 값표.카카오글한도;
+    var 카카오되나 = !!키() && t.length <= 값표.카카오글한도 && !네이티브();   /* 설치 앱은 공유창(카카오톡이 그 안에 뜸) */
     var 길 = 카카오되나 ? sdk().then(function (K) {
         K.Share.sendDefault({ objectType: 'text', text: t, link: { mobileWebUrl: 링크, webUrl: 링크 }, buttonTitle: 글('버튼') });
         return true;
@@ -2743,10 +2752,7 @@ try {
 })();
 /* ▲▲ 보내기 부품 끝 ▲▲ */
 /* 11-11 Main(현욱님) — 카카오톡으로 보내기 공용 부품. 키는 빈칸(없으면 카카오 SDK 를 부르지 않고 휴대폰 공유창 → 문자·복사).
-   설치 앱(웹뷰)에는 navigator.share 가 없어(10-13) 부품의 공유창이 복사로만 빠진다 — 앱의 Share 플러그인으로 같은 자리를 채운다. */
-try {
-  if (!navigator.share && typeof plug === 'function' && plug('Share')) navigator.share = function (o) { return plug('Share').share({ title: o.title || '', text: o.text || '', dialogTitle: '어디로 보낼까요' }); };
-} catch (e) {}
+   설치 앱(웹뷰)은 11-11c 부품이 Capacitor Share 플러그인으로 공유창을 연다(껍데기 @capacitor/share 8). */
 try {
   mn보내기.설치({ app: 'yakjido', 앱이름: '약지도', 링크: 'https://yakjido.medinanum.com/',
     언어: function () { return window.LANG || 'ko'; },
