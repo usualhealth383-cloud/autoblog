@@ -3606,7 +3606,7 @@ window.물을말 = () => { let v = ''; try { v = localStorage.getItem(ASK_KEY) |
   const ko = (window.LANG || 'ko') !== 'ko' && window.CC === 'KR';
   const 풀이 = { en: 'This card stays in Korean so the pharmacist can read it.', es: 'Esta tarjeta se queda en coreano para que la lea el farmacéutico.', ja: 'このカードは薬剤師が読めるよう韓国語のままです。', zh: '这张卡片保留韩语，方便药剂师阅读。' }[window.LANG];
   return `<div class="show-q"><p class="show-ask"><b>물어보고 싶은 것</b>${v ? '<br>' + esc(v) : ''}</p>
-    <div data-noko>${ko && 풀이 ? `<p class="small muted" lang="${window.LANG}">${esc(풀이)}</p>` : ''}<label class="small" for="askIn" style="display:block;margin-top:8px">약사님께 묻고 싶은 것 한 줄 <small class="muted">선택 · 이 휴대폰에만</small></label>
+    <div data-noko>${ko && 풀이 ? `<p class="small muted" lang="${window.LANG}">${esc(풀이)}</p>` : ''}<label class="small" for="askIn" style="display:block;margin-top:8px">약사님께 묻고 싶은 것 한 줄 <small class="muted">선택 · 서버에 올리지 않아요</small></label>
     <input id="askIn" maxlength="120" value="${esc(v)}" placeholder="예) 졸리지 않은 약으로 주세요" style="width:100%;min-height:48px;margin-top:4px" onchange="물을말저장(this.value)"></div></div>`; };
 window.물을말저장 = v => { try { v = String(v || '').replace(/[<>]/g, '').trim().slice(0, 120); if (v) localStorage.setItem(ASK_KEY, v); else localStorage.removeItem(ASK_KEY); } catch (e) {} route(); };
 
@@ -3925,7 +3925,7 @@ window.vOdS = function(_, q){ q = q || {};
   <section class="sec card od-c"><h2>아세트아미노펜(타이레놀 등)이라면</h2><p><b>하루 최대량을 넘겨 드셨다면 아프지 않아도 지금 응급실</b>로 가세요. 첫날은 증상이 거의 없어요. 해독제는 빨리 쓸수록 잘 들어요.</p><p class="small muted">감기약·몸살약·복합진통제에도 들어 있어요. 여러 개를 함께 드셨다면 모두 더해 보세요.</p></section>
   ${kid ? '' : kidCard}
   <section class="sec card od-c"><h2>한 번 몫을 더 먹었어요</h2><p>다음 차례는 <b>건너뛰고</b> 원래 시간으로 돌아가세요. 한 번 몫을 또 드시지 마세요.</p><p>이럴 땐 지금 <b>119</b>에 전화해 상담하세요 — 아세트아미노펜이 하루 최대량을 넘었을 때, 혈압약·당뇨약·심장약·피를 묽게 하는 약·수면제·신경안정제를 두 번 드셨을 때, 어지럽거나 가슴이 두근거리거나 몹시 졸릴 때.</p></section>
-  <section class="sec card od-c"><h2>119에 알릴 것 적어 두기</h2><div class="od-fs">${fld('drug', '먹은 약', '예: 타이레놀 500 mg')}${fld('amt', '먹은 양', '예: 6알')}${fld('at', '먹은 시각', '예: 14:30', 'od-at')}${fld('kg', '몸무게(아이)', '예: 14 kg')}</div><button type="button" class="btn line" onclick="odNow()">지금 시각 넣기</button><p class="small muted">이 기기에만 저장돼요.</p></section>
+  <section class="sec card od-c"><h2>119에 알릴 것 적어 두기</h2><div class="od-fs">${fld('drug', '먹은 약', '예: 타이레놀 500 mg')}${fld('amt', '먹은 양', '예: 6알')}${fld('at', '먹은 시각', '예: 14:30', 'od-at')}${fld('kg', '몸무게(아이)', '예: 14 kg')}</div><button type="button" class="btn line" onclick="odNow()">지금 시각 넣기</button><p class="small muted">적은 내용은 서버에 올리지 않아요.</p></section>
   <p class="small muted od-src">근거: 영국 국민보건서비스(NHS) 중독 안내 · 파라세타몰 안내</p>
   ${disclaimer()}`;
 };

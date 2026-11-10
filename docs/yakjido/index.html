@@ -1768,7 +1768,7 @@ background-repeat:no-repeat;background-position:right 9px center;background-size
 <script>
 window.__YAKJIDO_OK__ = true;
 const D = JSON.parse(document.getElementById('data').textContent || '{}');
-const BUILD = '2026-11-11 03:16';
+const BUILD = '2026-11-11 03:24';
 const DATAV = '8b79657766'.indexOf('__') === 0 ? BUILD : '8b79657766';
 const BRANDMARK = (typeof window !== 'undefined' && window.__BRANDMARK__) || 'icon-192.png';
 let CORE = 0, CORE_P = null;
@@ -6795,7 +6795,7 @@ ${lrow(I.info, '처음 안내 다시 보기', '앱 쓰는 법 세 장', "helloAg
 ${lrow(I.book, '근거·확인 기준', `참고 문헌 ${Object.keys(D.sources || {}).length}건`, "go('/about')")}
 </div>
 <section class="sec card"><h2>휴대폰을 바꾸실 때</h2>
-<p class="small" style="margin-top:6px">${srvLoggedIn() && srvAgreed() ? '메디나눔 계정으로 이어 보기를 켜 두셨어요 — 새 휴대폰에서 <b>같은 이메일로 로그인</b>하시면 그대로 이어져요. 따로 보관하고 싶으시면 파일로도 받아 두실 수 있어요.' : '지금은 기록이 <b>이 휴대폰에만</b> 있어요. 휴대폰을 바꾸시면 담아 둔 약·복용 기록·불편했던 일이 함께 사라지니, 아래 「계정」으로 이어 보기를 켜시거나 <b>파일 하나로 받아 두셨다가</b> 새 휴대폰에서 넣으세요. 그 파일은 온전히 본인 것이에요.'}</p>
+<p class="small" style="margin-top:6px">${srvLoggedIn() && srvAgreed() ? '메디나눔 계정으로 이어 보기를 켜 두셨어요 — 새 휴대폰에서 <b>같은 이메일로 로그인</b>하시면 그대로 이어져요. 따로 보관하고 싶으시면 파일로도 받아 두실 수 있어요.' : '지금은 기록이 <b>이 휴대폰에</b> 있어요. 휴대폰을 바꾸시면 담아 둔 약·복용 기록·불편했던 일이 함께 사라지니, 아래 「계정」으로 이어 보기를 켜시거나 <b>파일 하나로 받아 두셨다가</b> 새 휴대폰에서 넣으세요. 그 파일은 온전히 본인 것이에요.'}</p>
 <div class="actions two"><button class="btn ghost" onclick="exportMe()">${I.book} 파일로 받기</button>
 <button class="btn ghost" onclick="document.getElementById('mefile').click()">${I.user} 파일에서 가져오기</button></div>
 <input id="mefile" type="file" accept="application/json,.json" style="position:absolute;width:1px;height:1px;opacity:0;pointer-events:none" aria-label="약지도 기록 파일 고르기" onchange="importMe(this.files[0]);this.value=''">
@@ -6807,7 +6807,7 @@ ${lrow(I.book, '근거·확인 기준', `참고 문헌 ${Object.keys(D.sources |
 </section>
 ${ext('계정칸')}
 ${ext('약관칸')}
-<section class="sec card"><h2>이 앱에 대해</h2><p class="small" style="margin-top:6px">${esc(D.meta?.about || '')}</p><p class="small muted" style="margin-top:10px">${savedWhere()}</p><div class="lk48"><a class="link" href="${esc(방침주소())}"${NATIVE ? ' target="_blank" rel="noopener"' : ''}>개인정보처리방침</a>${D.meta?.contact?.email ? `<a class="link" href="mailto:${esc(D.meta.contact.email)}">문의 · ${esc(D.meta.contact.email)}</a>${D.meta.contact.operator ? `<span class="small muted">운영 ${esc(D.meta.contact.operator)}</span>` : ''}` : ''}</div></section>
+<section class="sec card"><h2>이 앱에 대해</h2><p class="small" style="margin-top:6px">${esc(D.meta?.about || '')}</p><p class="small muted" style="margin-top:10px">${savedWhere()}</p><div class="lk48"><a class="link" href="${esc(방침주소())}"${NATIVE ? ' target="_blank" rel="noopener"' : ''}>개인정보처리방침</a>${D.meta?.contact?.email ? `<span class="small" style="display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px;overflow-wrap:anywhere">문의 · ${esc(D.meta.contact.email)}<button type="button" class="chip" style="min-height:40px" onclick="navigator.clipboard?.writeText('${esc(D.meta.contact.email)}').then(()=>toast('문의 주소를 복사했어요'),()=>{})">복사</button></span><span class="small muted">운영 메디나눔</span>` : ''}</div></section>
 <p class="small mn-sign" style="margin-top:20px;text-align:center"><b><svg class="mn-logo" viewBox="0 0 1024 1024" aria-hidden="true"><rect class="mn-tile" x="12" y="12" width="1000" height="1000" rx="226"/><path d="M790 470 V760"/><path d="M256 760 V410 C256 296 350 258 424 312 C478 352 494 520 566 548 C648 580 790 250 790 460"/></svg>메디나눔</b> · 화면마다 근거와 확인한 달을 적어 둔, 우리 가족 건강 앱</p>
 <p class="small muted" style="margin-top:6px;text-align:center">약지도 v${esc(D.meta?.version || '')} · 빌드 ${BUILD}<br>${(() => { const P = D.public || {}, ds = ['easy_source', 'pills_source', 'permits_source'].map(k => `<span style="white-space:nowrap">${esc(String(P[k] || '').match(/\d{4}-\d\d-\d\d|\d{8}/)?.[0] || '확인일 기록 필요')}</span>`);
 return `식약처 제품 이름 자료 받은 날 — ${new Set(ds).size === 1 ? ds[0] + '(e약은요·낱알식별·허가 정보)' : `e약은요 ${ds[0]} · 낱알식별 ${ds[1]} · 허가 정보 ${ds[2]}`}<br>약 설명 ${esc(D.meta?.reviewLabel || '근거 확인')} ${esc(D.meta?.reviewed || '')}${D.meta?.nextReview ? ` · 다음 검토 ${esc(D.meta.nextReview)}` : ''}`; })()}</p>`;
@@ -6852,7 +6852,7 @@ const acctBtn = () => { if (D.meta?.account !== true) return ''; const m = acctM
 return `<button type="button" class="acct-btn${m ? ' on' : ''}" aria-label="${m ? `계정 ${esc(m)}` : '로그인'}" onclick="go('/login')">${m ? esc(m[0].toUpperCase()) : I.user + '<span class="ab-t">로그인</span>'}</button>`; };
 function srvLoggedIn(){ try { return !!(window.서버 && 서버.세션 && 서버.세션()); } catch (e) { return false; } }
 window.방침주소 = function(){ return NATIVE ? (D.meta?.share?.app || 'https://usualhealth383-cloud.github.io/autoblog/yakjido/') + 'privacy.html' : 'privacy.html'; };
-function savedWhere(){ return srvLoggedIn() && srvAgreed() ? '이 휴대폰과 내 메디나눔 계정(서울 서버)에 저장돼요.' : '이 휴대폰에만 저장돼요.'; }
+function savedWhere(){ return srvLoggedIn() && srvAgreed() ? '이 휴대폰과 내 메디나눔 계정(서울 서버)에 저장돼요.' : '로그인하지 않으면 이 휴대폰에 저장돼요.'; }   /* 11-11 「기기에만」류 금지 — 로그인하면 서버에도 */
 
 const CONSENT_VER = '2026-10-20', CONSENT_KEY = 'yakjido.consent.v1', CONSENT_NEXT = 'yakjido.consent.next';
 function consentRec(){ try { return JSON.parse(localStorage.getItem(CONSENT_KEY) || 'null'); } catch (e) { return null; } }
