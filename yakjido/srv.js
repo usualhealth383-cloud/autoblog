@@ -299,7 +299,7 @@
       h += '<div class="srvrow"><b>' + 이메일 + '</b><span>로그인됨 · 마지막 동기화 ' + 언제 + '</span></div>' + 이용권줄()
         + '<div class="srvbtns"><button type="button" onclick="계정동작(\'sync\')">지금 동기화</button><button type="button" onclick="계정동작(\'logout\')">로그아웃</button></div>'
         + '<p class="srvtiny">기록은 이 휴대폰과 메디나눔 서버(서울)에 함께 있어요. 폰을 바꿔도 같은 이메일로 로그인하시면 이어져요. 메디나눔의 다른 앱과 계정은 하나지만 기록은 앱마다 따로예요.</p>'
-        + '<button type="button" class="srvlink" onclick="계정동작(\'delete\')">계정 지우기 — 약지도의 서버 기록을 지웁니다</button>';
+        + '<button type="button" class="srvlink" onclick="window.계정&&계정.지우기?계정.지우기():계정동작(\'delete\')">계정 지우기 — 약지도의 서버 기록을 지웁니다</button>';
     } else {
       /* 2026-09-21 — 바로 위 화면 설명이 같은 말을 이미 하고 있었다(한 화면에 두 번). */
       h += '<input id="srvEmail" type="email" inputmode="email" autocomplete="email" enterkeyhint="next" aria-label="이메일" placeholder="이메일" value="' + (st.email || '') + '">'
@@ -1357,7 +1357,7 @@ try {
     회원권: { 월: 12900, 연: 99000, 출시월: 9900, 출시연: 79000, 판매: false },
     잠금: { sync: '여러 기기에서 이어 보기', trend: '혈압·혈당 2주 흐름 그림', visitdoc: '진료실 한 장 종이로 뽑기', rx: '처방약 길잡이' },   /* 10-22 현욱님 잠금 A — 약 개수로는 막지 않는다 */
     응급: ['emergency', 'redflag', 'call119', 'find', 'bag', 'schedule', 'together'],
-    문구: { 응급안내: '약 찾기·약봉투 읽기·복약 알림·응급 신호와 겹침 확인은 언제나 열려 있어요.' },
+    문구: { 응급안내: '약 찾기·약봉투 읽기·복약 알림·응급 신호와 겹침 확인은 언제나 열려 있어요.', 막힘앞: function (id) { return window.회원권 ? 회원권.강조HTML(id) : ''; } },   /* 11-11 회원권 부품 */
     결제사: null, 인증: { 휴대폰: false, 공동: false },
     시트열기: function (html, 제목) { var v = document.getElementById('view'); if (!v) return; v.innerHTML = topBar({ back: '뒤로' }) + '<h1>' + esc(제목 || '구독') + '</h1>' + html; scrollTo(0, 0); },
     시트닫기: function () { route(); },
@@ -1729,6 +1729,885 @@ try {
     시트닫기: function () { route(); },
     알림: function (t) { try { toast(t); } catch (e) {} },
     모양: { 줄: 'actions', 주: 'btn', 보조: 'btn line', 작은글: 'small muted' } });
+} catch (e) {}
+/* ▼▼ 계정 부품 시작 ▼▼ */
+/* ═══ 계정 단추 · 계정 시트 · 설정 계정 카드 — 메디나눔 다섯 앱 공통 규격 (2026-10-29 현욱님 「설정 안에 숨겨 놓으면 어떡해 · 로그인할 수 있는 시스템을 명확하게」)
+   규격(Main 10-29 A)
+   1. 홈 머리 오른쪽 계정 단추가 늘 보인다 — 로그인 전 「로그인」, 로그인 뒤 메일 첫 글자 동그라미. 누르면 계정 시트.
+   2. 계정 시트 한 화면 — 「메일로 계속하기」 하나(처음이면 계정을 만들고, 있으면 로그인). 서버 저장 동의는 이 시트 안 체크 한 줄.
+      「설정 → 내 동의 내용 → 서버 저장 동의 → 계속」 같은 숨은 앞 단계가 없다.
+   3. 설정 맨 위 첫 칸 = 계정 카드(로그인 전 큰 단추 · 로그인 뒤 메일·이용권·동기화·로그아웃·계정 지우기는 맨 아래 작게).
+   4. 온보딩 끝 — 「로그인 · 계정 만들기」와 「로그인 없이 둘러보기」 같은 크기 두 단추(벽 금지).
+   기댐: 서버 부품(window.서버 · window.계정동작) — 이 부품은 서버 부품을 고치지 않고 그 위에 얹는다.
+   쓰는 법(앱):
+     계정.설치({ app:'gildongmu', 앱이름:'길동무', 웹주소:'https://gildongmu.medinanum.com/',   // 메일 링크가 돌아올 웹 주소(설치 앱 localhost 막기)
+       열림: function(){ return 서버 켜짐 && !만14미만 },            // false 면 시트가 까닭을 말한다(되는 척 금지)
+       닫힘까닭: function(){ return '만 14세 미만은 …' },
+       동의됨: fn, 동의하기: fn, 동의글: '증상·체온… 기록을 암호화된 연결로 보내 메디나눔 서버(서울)에 저장하고 …', 처리방침: fn,
+       시트열기: function(html, 제목){…}, 시트닫기: fn, 알림: function(t){…}, 다시그리기: fn, 이용권글: function(){ return '체험 중 · 5일 남음' | '' },
+       동의이름: '건강정보(민감정보) 서버 저장', 나이글: '만 14세 이상이에요',   // 선택 — 동의 칸 제목 · 만 14세 확인 칸(둘 다 필수로 그려진다)
+       앱동의됨: function(){ return 이 앱 첫 화면 약관 동의를 지금 판으로 했나 },   // 「이 앱 가입」을 조용히(메일 확인·소셜·다른 기기 모두)
+       말: { en: { '길동무': 'Wayfellow' } } });   // 선택 — 부품 다섯 말 사전에 앱 이름·앱 글을 보탠다(부품 글은 부품이 이미 옮김)
+     머리: '<span class="acctslot"></span>' 자리에 계정.머리단추HTML() — 상태가 바뀌면 부품이 .acctbtn 을 스스로 고친다.
+     설정 맨 위: 계정.카드HTML() · 온보딩 끝: 계정.시작단추HTML(둘러보기부름) */
+(function () {
+  if (window.계정 && window.계정.__v) return;
+  var 설정 = { 말: null, 앱동의됨: null, 프로필켜짐: false, 프로필필수: ['name', 'gender', 'age_range'], app: 'app', 앱이름: '이 앱', 웹주소: '', 열림: null, 닫힘까닭: null, 동의됨: null, 동의하기: null, 동의글: '', 처리방침: null, 시트열기: null, 시트닫기: null, 알림: null, 다시그리기: null, 이용권글: null };
+  /* 10-29 Main — 부품 글은 부품이 다섯 말(ko·en·es·ja·zh)로 들고 다닌다. 말은 <html lang> 으로 고르고, 앱은 설치({ 말: { en: { '길동무': 'Wayfellow', 앱 동의글: '…' } } }) 로 앱 이름·앱 글을 보탤 수 있다.
+     앱 쪽 번역층이 같은 한국어를 또 옮기려 해도, 이미 옮긴 글이라 겹치지 않는다. */
+  var 사전 = {"en":{"로그인":"Log in","로그인 · 계정 만들기":"Log in · Create account","내 계정":"My account","계정":"Account","이용권":"Plan","동기화":"Sync","아직":"Not yet","로그인 전이에요":"You're not logged in","기록은 이 기기에 있어요. 로그인하면 폰을 바꿔도 이어져요.":"Your records are on this device. Log in to keep them when you change phones.","로그인됨":"Logged in","지금 동기화":"Sync now","로그아웃":"Log out","계정 지우기":"Delete account","지금은 계정을 쓸 수 없어요. 기록은 이 기기에 그대로 있어요.":"Accounts aren't available right now. Your records are still on this device.","계정은 준비 중이에요. 기록은 이 기기에 그대로 있어요.":"Accounts are coming soon. Your records are still on this device.","이메일":"Email","비밀번호":"Password","(6자 이상)":"(6+ characters)","필수":"Required","무엇을 · 왜 · 언제까지 — 처리방침 보기":"What · why · how long — read the privacy policy","메일로 계속하기":"Continue with email","처음이시면 계정이 만들어지고, 있으시면 로그인돼요. 처음이면 메일함에 확인 링크가 가요.":"If you're new, an account is created; if you already have one, you're logged in. New accounts get a confirmation link by email.","비밀번호를 잊으셨나요":"Forgot your password?","계속하려면 서버 저장 동의에 체크해 주세요. 체크하지 않으셔도 이 기기에서 그대로 쓰실 수 있어요.":"To continue, please check the server storage consent. Without it you can still use the app on this device.","이메일을 적어 주세요.":"Please enter your email.","비밀번호는 6자 이상이에요.":"Passwords need at least 6 characters.","확인하는 중…":"Checking…","로그인했어요. 기록을 맞추는 중이에요.":"You're logged in. Syncing your records.","메일함의 확인 링크를 먼저 눌러 주세요. 메일이 안 보이면 스팸함도 봐 주세요.":"Please tap the confirmation link in your email first. If you can't find it, check your spam folder.","이 메일로 만든 계정이 있어요. 비밀번호를 다시 확인해 주세요. 잊으셨으면 「비밀번호를 잊으셨나요」를 눌러 주세요.":"There's already an account with this email. Please check your password. If you forgot it, tap “Forgot your password?”.","계정을 만들었어요. 기록을 올리는 중이에요.":"Account created. Uploading your records.","처음이시군요. 메일함에 확인 링크를 보냈어요. 링크를 누른 뒤 여기서 다시 「메일로 계속하기」를 눌러 주세요.":"Welcome! We sent a confirmation link to your email. Tap it, then come back and tap “Continue with email” again.","인터넷에 닿지 않아요. 연결된 뒤 다시 눌러 주세요. 기록은 이 기기에 그대로 있어요.":"Can't reach the internet. Please try again once you're connected. Your records are still on this device.","잠시 너무 여러 번 시도했어요. 몇 분 뒤 다시 해 주세요.":"Too many attempts. Please try again in a few minutes.","로그인이 되지 않았어요. 잠시 뒤 다시 해 주세요.":"Couldn't log in. Please try again shortly.","비밀번호를 다시 정할 메일 주소를 위 칸에 적어 주세요.":"Enter the email to reset the password in the box above.","메일함에 비밀번호를 다시 정하는 링크를 보냈어요.":"We sent a password reset link to your email.","메일을 보내지 못했어요. 잠시 뒤 다시 해 주세요.":"Couldn't send the email. Please try again shortly.","로그인 없이 둘러보기":"Look around without logging in","둘러보셔도 기록은 이 기기에 남아요. 로그인은 언제든 화면 맨 위 「로그인」에서 하실 수 있어요.":"Your records stay on this device while you look around. You can log in anytime with “Log in” at the top.","{앱} 기록을 계정에 이어 두면 <b>폰을 바꿔도 그대로</b>예요.":"Link your {앱} records to an account and <b>they stay with you even if you change phones</b>.","내 계정 — {메일}":"My account — {메일}","만 14세 이상이에요":"I'm 14 or older","만 14세 이상만 계정을 만들 수 있어요. 아니시면 로그인 없이 이 기기에서 그대로 쓰실 수 있어요.":"Only people aged 14 or older can create an account. If you're younger, you can keep using the app on this device without logging in.","건강정보(민감정보) 서버 저장":"Storing health information (sensitive data) on the server","기록을 암호화된 연결로 보내 메디나눔 서버(서울)에 저장하고, 로그인한 기기에서 이어 쓰는 데 동의해요.":"I agree to have my records sent over an encrypted connection and stored on the Medinanum server in Seoul, and to continue them on devices where I log in.","만 14세 미만":"Under 14","14~19세":"14–19","20대":"20s","30대":"30s","40대":"40s","50대":"50s","60대":"60s","70대 이상":"70 or older","처음 한 번만 여쭤요. 나중에 설정에서 고치실 수 있어요.":"We only ask once. You can change this later in Settings.","고치실 것만 바꾸고 저장해 주세요.":"Change what you need, then save.","이름":"Name","성별":"Sex","여성":"Female","남성":"Male","연령대":"Age range","생일":"Birthday","(선택 · 생일 알림)":"(optional · birthday reminder)","월":"Month","일":"Day","연락 이메일":"Contact email","(선택)":"(optional)","로그인한 서비스의 프로필 사진 쓰기":"Use the profile photo from the service you logged in with","저장":"Save","저장하는 중…":"Saving…","이름·성별·연령대는 계정을 쓰는 데 필요해요. 생일·이메일·사진은 넣지 않으셔도 돼요.":"Name, sex and age range are needed for your account. Birthday, email and photo are optional.","프로필 만들기":"Create your profile","프로필 고치기":"Edit profile","만 14세 미만은 계정을 쓸 수 없어요. 로그인 없이 이 기기에서 그대로 쓰실 수 있어요.":"Under-14s can't use an account. You can keep using the app on this device without logging in.","이름을 적어 주세요.":"Please enter your name.","성별을 골라 주세요.":"Please choose your sex.","연령대를 골라 주세요.":"Please choose your age range.","생일은 월과 일을 함께 골라 주세요. 넣지 않으셔도 돼요.":"Please choose both month and day for your birthday — or leave it blank.","이메일을 다시 확인해 주세요. 넣지 않으셔도 돼요.":"Please check the email — or leave it blank.","프로필을 저장했어요.":"Profile saved.","저장하지 못했어요. 잠시 뒤 다시 해 주세요.":"Couldn't save. Please try again shortly.","운영자 · 모든 기능":"Operator · all features","또는":"or","Google로 계속하기":"Continue with Google","카카오로 계속하기":"Continue with Kakao","네이버로 계속하기":"Continue with Naver","또는 메일로":"or with email","만 14세 이상인지 체크해 주세요. 아니시면 로그인 없이 이 기기에서 그대로 쓰실 수 있어요.":"Please confirm you are 14 or older. If not, you can keep using the app on this device without logging in.","계속하려면 이 칸에 체크해 주세요. 체크하지 않으셔도 이 기기에서 그대로 쓰실 수 있어요.":"To continue, please tick this box. Without it, you can keep using the app on this device.","내 기기":"My devices","이 기기":"This device","마지막 사용":"Last used","내보내기":"Sign out device","이 기기에서는 로그아웃":"Log out on this device instead","이 계정으로 로그인한 기기예요. 이용권 하나로 두 대까지 쓸 수 있고, 가족과 나눠 쓰셔도 돼요.":"These devices are logged in to this account. One pass covers up to two devices, and you may share it with family.","이 계정은 이미 두 대에서 쓰고 있어요. 이 기기에서 쓰시려면 한 대를 내보내 주세요. 내보낸 기기는 로그아웃되고, 기록은 계정에 그대로 있어요.":"This account is already in use on two devices. To use it here, sign out one of them. That device will be logged out; your records stay in the account.","가장 오래 안 쓴 기기":"Unused the longest","내보냈어요. 이 기기에서 이어서 쓰실 수 있어요.":"Done. You can keep using it on this device.","내보냈어요.":"Signed out.","다른 기기에서 이 기기를 내보냈어요. 다시 로그인하시면 이어서 쓸 수 있어요.":"This device was signed out from another device. Log in again to continue.","기기 목록을 불러오지 못했어요. 잠시 뒤 다시 해 주세요.":"Couldn't load the device list. Please try again shortly.","기기":"Device","Android 폰":"Android phone","Android 태블릿":"Android tablet","어떻게 지울까요?":"How would you like to delete?","이 앱에서만 탈퇴":"Leave this app only","이 앱의 서버 기록과 가입만 지워요. 다른 메디나눔 앱은 그대로 써요.":"Deletes only this app’s server records and membership. Other MediNanum apps keep working.","메디나눔 계정 전체 삭제":"Delete my whole MediNanum account","다섯 앱의 서버 기록과 계정을 모두 지워요. 되돌릴 수 없어요.":"Deletes the server records of all five apps and your account. This cannot be undone.","이 앱의 서버 기록과 가입을 지울까요? 되돌릴 수 없어요.":"Delete this app’s server records and membership? This cannot be undone.","이 앱에서 탈퇴했어요.":"You have left this app.","지우지 못했어요. 잠시 뒤 다시 해 주세요.":"Couldn’t delete. Please try again shortly."},"es":{"로그인":"Iniciar sesión","로그인 · 계정 만들기":"Iniciar sesión · Crear cuenta","내 계정":"Mi cuenta","계정":"Cuenta","이용권":"Plan","동기화":"Sincronización","아직":"Todavía no","로그인 전이에요":"No ha iniciado sesión","기록은 이 기기에 있어요. 로그인하면 폰을 바꿔도 이어져요.":"Sus registros están en este dispositivo. Inicie sesión para conservarlos al cambiar de móvil.","로그인됨":"Sesión iniciada","지금 동기화":"Sincronizar ahora","로그아웃":"Cerrar sesión","계정 지우기":"Eliminar cuenta","지금은 계정을 쓸 수 없어요. 기록은 이 기기에 그대로 있어요.":"Ahora no se pueden usar cuentas. Sus registros siguen en este dispositivo.","계정은 준비 중이에요. 기록은 이 기기에 그대로 있어요.":"Las cuentas llegarán pronto. Sus registros siguen en este dispositivo.","이메일":"Correo electrónico","비밀번호":"Contraseña","(6자 이상)":"(mínimo 6 caracteres)","필수":"Obligatorio","무엇을 · 왜 · 언제까지 — 처리방침 보기":"Qué · por qué · hasta cuándo: ver la política de privacidad","메일로 계속하기":"Continuar con correo","처음이시면 계정이 만들어지고, 있으시면 로그인돼요. 처음이면 메일함에 확인 링크가 가요.":"Si es nuevo, se crea una cuenta; si ya tiene una, inicia sesión. Si es nueva, le llegará un enlace de confirmación al correo.","비밀번호를 잊으셨나요":"¿Ha olvidado la contraseña?","계속하려면 서버 저장 동의에 체크해 주세요. 체크하지 않으셔도 이 기기에서 그대로 쓰실 수 있어요.":"Para continuar, marque el consentimiento de almacenamiento. Sin marcarlo puede seguir usando la app en este dispositivo.","이메일을 적어 주세요.":"Escriba su correo electrónico.","비밀번호는 6자 이상이에요.":"La contraseña debe tener al menos 6 caracteres.","확인하는 중…":"Comprobando…","로그인했어요. 기록을 맞추는 중이에요.":"Ha iniciado sesión. Sincronizando sus registros.","메일함의 확인 링크를 먼저 눌러 주세요. 메일이 안 보이면 스팸함도 봐 주세요.":"Pulse primero el enlace de confirmación del correo. Si no lo ve, mire en spam.","이 메일로 만든 계정이 있어요. 비밀번호를 다시 확인해 주세요. 잊으셨으면 「비밀번호를 잊으셨나요」를 눌러 주세요.":"Ya hay una cuenta con este correo. Revise la contraseña. Si la ha olvidado, pulse “¿Ha olvidado la contraseña?”.","계정을 만들었어요. 기록을 올리는 중이에요.":"Cuenta creada. Subiendo sus registros.","처음이시군요. 메일함에 확인 링크를 보냈어요. 링크를 누른 뒤 여기서 다시 「메일로 계속하기」를 눌러 주세요.":"¡Bienvenido! Le hemos enviado un enlace de confirmación. Púlselo y vuelva aquí a pulsar “Continuar con correo”.","인터넷에 닿지 않아요. 연결된 뒤 다시 눌러 주세요. 기록은 이 기기에 그대로 있어요.":"No hay conexión a internet. Vuelva a intentarlo cuando tenga conexión. Sus registros siguen en este dispositivo.","잠시 너무 여러 번 시도했어요. 몇 분 뒤 다시 해 주세요.":"Demasiados intentos. Vuelva a intentarlo en unos minutos.","로그인이 되지 않았어요. 잠시 뒤 다시 해 주세요.":"No se pudo iniciar sesión. Vuelva a intentarlo en un momento.","비밀번호를 다시 정할 메일 주소를 위 칸에 적어 주세요.":"Escriba arriba el correo para restablecer la contraseña.","메일함에 비밀번호를 다시 정하는 링크를 보냈어요.":"Le hemos enviado un enlace para restablecer la contraseña.","메일을 보내지 못했어요. 잠시 뒤 다시 해 주세요.":"No se pudo enviar el correo. Vuelva a intentarlo en un momento.","로그인 없이 둘러보기":"Explorar sin iniciar sesión","둘러보셔도 기록은 이 기기에 남아요. 로그인은 언제든 화면 맨 위 「로그인」에서 하실 수 있어요.":"Mientras explora, sus registros se quedan en este dispositivo. Puede iniciar sesión cuando quiera con “Iniciar sesión” arriba.","{앱} 기록을 계정에 이어 두면 <b>폰을 바꿔도 그대로</b>예요.":"Si vincula sus registros de {앱} a una cuenta, <b>se conservan aunque cambie de teléfono</b>.","내 계정 — {메일}":"Mi cuenta — {메일}","만 14세 이상이에요":"Tengo 14 años o más","만 14세 이상만 계정을 만들 수 있어요. 아니시면 로그인 없이 이 기기에서 그대로 쓰실 수 있어요.":"Solo las personas de 14 años o más pueden crear una cuenta. Si es menor, puede seguir usando la app en este dispositivo sin iniciar sesión.","건강정보(민감정보) 서버 저장":"Guardar información de salud (datos sensibles) en el servidor","기록을 암호화된 연결로 보내 메디나눔 서버(서울)에 저장하고, 로그인한 기기에서 이어 쓰는 데 동의해요.":"Acepto que mis registros se envíen por una conexión cifrada y se guarden en el servidor de Medinanum en Seúl, y seguir usándolos en los dispositivos donde inicie sesión.","만 14세 미만":"Menor de 14","14~19세":"14–19 años","20대":"20–29","30대":"30–39","40대":"40–49","50대":"50–59","60대":"60–69","70대 이상":"70 o más","처음 한 번만 여쭤요. 나중에 설정에서 고치실 수 있어요.":"Solo se lo preguntamos una vez. Puede cambiarlo después en Ajustes.","고치실 것만 바꾸고 저장해 주세요.":"Cambie lo que necesite y guarde.","이름":"Nombre","성별":"Sexo","여성":"Mujer","남성":"Hombre","연령대":"Edad","생일":"Cumpleaños","(선택 · 생일 알림)":"(opcional · aviso de cumpleaños)","월":"Mes","일":"Día","연락 이메일":"Correo de contacto","(선택)":"(opcional)","로그인한 서비스의 프로필 사진 쓰기":"Usar la foto de perfil del servicio con el que inició sesión","저장":"Guardar","저장하는 중…":"Guardando…","이름·성별·연령대는 계정을 쓰는 데 필요해요. 생일·이메일·사진은 넣지 않으셔도 돼요.":"El nombre, el sexo y la edad son necesarios para la cuenta. El cumpleaños, el correo y la foto son opcionales.","프로필 만들기":"Crear su perfil","프로필 고치기":"Editar perfil","만 14세 미만은 계정을 쓸 수 없어요. 로그인 없이 이 기기에서 그대로 쓰실 수 있어요.":"Los menores de 14 no pueden usar una cuenta. Puede seguir usando la app en este dispositivo sin iniciar sesión.","이름을 적어 주세요.":"Escriba su nombre.","성별을 골라 주세요.":"Elija su sexo.","연령대를 골라 주세요.":"Elija su edad.","생일은 월과 일을 함께 골라 주세요. 넣지 않으셔도 돼요.":"Elija mes y día de su cumpleaños, o déjelo en blanco.","이메일을 다시 확인해 주세요. 넣지 않으셔도 돼요.":"Revise el correo, o déjelo en blanco.","프로필을 저장했어요.":"Perfil guardado.","저장하지 못했어요. 잠시 뒤 다시 해 주세요.":"No se pudo guardar. Inténtelo de nuevo en un momento.","운영자 · 모든 기능":"Operador · todas las funciones","또는":"o","Google로 계속하기":"Continuar con Google","카카오로 계속하기":"Continuar con Kakao","네이버로 계속하기":"Continuar con Naver","또는 메일로":"o con correo","만 14세 이상인지 체크해 주세요. 아니시면 로그인 없이 이 기기에서 그대로 쓰실 수 있어요.":"Confirma que tienes 14 años o más. Si no, puedes seguir usando la app en este dispositivo sin iniciar sesión.","계속하려면 이 칸에 체크해 주세요. 체크하지 않으셔도 이 기기에서 그대로 쓰실 수 있어요.":"Para continuar, marca esta casilla. Sin ella, puedes seguir usando la app en este dispositivo.","내 기기":"Mis dispositivos","이 기기":"Este dispositivo","마지막 사용":"Último uso","내보내기":"Cerrar sesión ahí","이 기기에서는 로그아웃":"Cerrar sesión en este dispositivo","이 계정으로 로그인한 기기예요. 이용권 하나로 두 대까지 쓸 수 있고, 가족과 나눠 쓰셔도 돼요.":"Estos dispositivos tienen la sesión iniciada en esta cuenta. Un pase sirve para dos dispositivos y puede compartirlo con su familia.","이 계정은 이미 두 대에서 쓰고 있어요. 이 기기에서 쓰시려면 한 대를 내보내 주세요. 내보낸 기기는 로그아웃되고, 기록은 계정에 그대로 있어요.":"Esta cuenta ya se usa en dos dispositivos. Para usarla aquí, cierre la sesión en uno de ellos. Ese dispositivo saldrá de la cuenta; sus registros siguen en la cuenta.","가장 오래 안 쓴 기기":"El que lleva más tiempo sin usarse","내보냈어요. 이 기기에서 이어서 쓰실 수 있어요.":"Hecho. Puede seguir usándola en este dispositivo.","내보냈어요.":"Sesión cerrada.","다른 기기에서 이 기기를 내보냈어요. 다시 로그인하시면 이어서 쓸 수 있어요.":"Se cerró la sesión de este dispositivo desde otro. Inicie sesión de nuevo para continuar.","기기 목록을 불러오지 못했어요. 잠시 뒤 다시 해 주세요.":"No se pudo cargar la lista de dispositivos. Inténtelo de nuevo en un momento.","기기":"Dispositivo","Android 폰":"Teléfono Android","Android 태블릿":"Tableta Android","어떻게 지울까요?":"¿Cómo quiere borrar?","이 앱에서만 탈퇴":"Salir solo de esta app","이 앱의 서버 기록과 가입만 지워요. 다른 메디나눔 앱은 그대로 써요.":"Borra solo los registros del servidor y la inscripción de esta app. Las demás apps de MediNanum siguen igual.","메디나눔 계정 전체 삭제":"Borrar toda la cuenta MediNanum","다섯 앱의 서버 기록과 계정을 모두 지워요. 되돌릴 수 없어요.":"Borra los registros del servidor de las cinco apps y la cuenta. No se puede deshacer.","이 앱의 서버 기록과 가입을 지울까요? 되돌릴 수 없어요.":"¿Borrar los registros del servidor y la inscripción de esta app? No se puede deshacer.","이 앱에서 탈퇴했어요.":"Ha salido de esta app.","지우지 못했어요. 잠시 뒤 다시 해 주세요.":"No se pudo borrar. Inténtelo de nuevo en un momento."},"ja":{"로그인":"ログイン","로그인 · 계정 만들기":"ログイン · アカウント作成","내 계정":"マイアカウント","계정":"アカウント","이용권":"利用券","동기화":"同期","아직":"まだ","로그인 전이에요":"ログイン前です","기록은 이 기기에 있어요. 로그인하면 폰을 바꿔도 이어져요.":"記録はこの端末にあります。ログインすれば機種変更しても続きます。","로그인됨":"ログイン中","지금 동기화":"今すぐ同期","로그아웃":"ログアウト","계정 지우기":"アカウントを削除","지금은 계정을 쓸 수 없어요. 기록은 이 기기에 그대로 있어요.":"今はアカウントを使えません。記録はこの端末にそのままあります。","계정은 준비 중이에요. 기록은 이 기기에 그대로 있어요.":"アカウントは準備中です。記録はこの端末にそのままあります。","이메일":"メールアドレス","비밀번호":"パスワード","(6자 이상)":"（6文字以上）","필수":"必須","무엇을 · 왜 · 언제까지 — 처리방침 보기":"何を · なぜ · いつまで — 処理方針を見る","메일로 계속하기":"メールで続ける","처음이시면 계정이 만들어지고, 있으시면 로그인돼요. 처음이면 메일함에 확인 링크가 가요.":"初めてならアカウントが作られ、すでにあればログインします。初めてのときはメールに確認リンクが届きます。","비밀번호를 잊으셨나요":"パスワードをお忘れですか","계속하려면 서버 저장 동의에 체크해 주세요. 체크하지 않으셔도 이 기기에서 그대로 쓰실 수 있어요.":"続けるにはサーバー保存の同意にチェックしてください。チェックしなくてもこの端末でそのまま使えます。","이메일을 적어 주세요.":"メールアドレスを入力してください。","비밀번호는 6자 이상이에요.":"パスワードは6文字以上です。","확인하는 중…":"確認しています…","로그인했어요. 기록을 맞추는 중이에요.":"ログインしました。記録を合わせています。","메일함의 확인 링크를 먼저 눌러 주세요. 메일이 안 보이면 스팸함도 봐 주세요.":"まずメールの確認リンクを押してください。見当たらなければ迷惑メールも見てください。","이 메일로 만든 계정이 있어요. 비밀번호를 다시 확인해 주세요. 잊으셨으면 「비밀번호를 잊으셨나요」를 눌러 주세요.":"このメールで作ったアカウントがあります。パスワードをもう一度確認してください。お忘れなら「パスワードをお忘れですか」を押してください。","계정을 만들었어요. 기록을 올리는 중이에요.":"アカウントを作りました。記録を上げています。","처음이시군요. 메일함에 확인 링크를 보냈어요. 링크를 누른 뒤 여기서 다시 「메일로 계속하기」를 눌러 주세요.":"はじめまして。メールに確認リンクを送りました。リンクを押したあと、ここでもう一度「メールで続ける」を押してください。","인터넷에 닿지 않아요. 연결된 뒤 다시 눌러 주세요. 기록은 이 기기에 그대로 있어요.":"インターネットにつながりません。つながってからもう一度押してください。記録はこの端末にそのままあります。","잠시 너무 여러 번 시도했어요. 몇 분 뒤 다시 해 주세요.":"短い間に何度も試しました。数分後にもう一度お試しください。","로그인이 되지 않았어요. 잠시 뒤 다시 해 주세요.":"ログインできませんでした。少ししてからもう一度お試しください。","비밀번호를 다시 정할 메일 주소를 위 칸에 적어 주세요.":"パスワードを設定し直すメールアドレスを上の欄に書いてください。","메일함에 비밀번호를 다시 정하는 링크를 보냈어요.":"パスワードを設定し直すリンクをメールに送りました。","메일을 보내지 못했어요. 잠시 뒤 다시 해 주세요.":"メールを送れませんでした。少ししてからもう一度お試しください。","로그인 없이 둘러보기":"ログインせずに見てみる","둘러보셔도 기록은 이 기기에 남아요. 로그인은 언제든 화면 맨 위 「로그인」에서 하실 수 있어요.":"見ている間も記録はこの端末に残ります。ログインはいつでも画面上の「ログイン」からできます。","{앱} 기록을 계정에 이어 두면 <b>폰을 바꿔도 그대로</b>예요.":"{앱}の記録をアカウントにつないでおけば、<b>スマホを替えてもそのまま</b>です。","내 계정 — {메일}":"マイアカウント — {메일}","만 14세 이상이에요":"14歳以上です","만 14세 이상만 계정을 만들 수 있어요. 아니시면 로그인 없이 이 기기에서 그대로 쓰실 수 있어요.":"アカウントを作れるのは14歳以上の方だけです。そうでない方も、ログインせずにこの端末でそのまま使えます。","건강정보(민감정보) 서버 저장":"健康情報（要配慮個人情報）のサーバー保存","기록을 암호화된 연결로 보내 메디나눔 서버(서울)에 저장하고, 로그인한 기기에서 이어 쓰는 데 동의해요.":"記録を暗号化された接続で送り、メディナヌムのサーバー（ソウル）に保存して、ログインした端末で続けて使うことに同意します。","만 14세 미만":"14歳未満","14~19세":"14〜19歳","20대":"20代","30대":"30代","40대":"40代","50대":"50代","60대":"60代","70대 이상":"70代以上","처음 한 번만 여쭤요. 나중에 설정에서 고치실 수 있어요.":"最初に一度だけお尋ねします。あとで設定から直せます。","고치실 것만 바꾸고 저장해 주세요.":"直したいところだけ変えて保存してください。","이름":"名前","성별":"性別","여성":"女性","남성":"男性","연령대":"年代","생일":"誕生日","(선택 · 생일 알림)":"（任意 · 誕生日のお知らせ）","월":"月","일":"日","연락 이메일":"連絡用メール","(선택)":"（任意）","로그인한 서비스의 프로필 사진 쓰기":"ログインしたサービスのプロフィール写真を使う","저장":"保存","저장하는 중…":"保存中…","이름·성별·연령대는 계정을 쓰는 데 필요해요. 생일·이메일·사진은 넣지 않으셔도 돼요.":"名前・性別・年代はアカウントに必要です。誕生日・メール・写真は入れなくても大丈夫です。","프로필 만들기":"プロフィールを作る","프로필 고치기":"プロフィールを直す","만 14세 미만은 계정을 쓸 수 없어요. 로그인 없이 이 기기에서 그대로 쓰실 수 있어요.":"14歳未満の方はアカウントを使えません。ログインせずにこの端末でそのまま使えます。","이름을 적어 주세요.":"名前を入力してください。","성별을 골라 주세요.":"性別を選んでください。","연령대를 골라 주세요.":"年代を選んでください。","생일은 월과 일을 함께 골라 주세요. 넣지 않으셔도 돼요.":"誕生日は月と日を一緒に選んでください。入れなくても大丈夫です。","이메일을 다시 확인해 주세요. 넣지 않으셔도 돼요.":"メールをもう一度確かめてください。入れなくても大丈夫です。","프로필을 저장했어요.":"プロフィールを保存しました。","저장하지 못했어요. 잠시 뒤 다시 해 주세요.":"保存できませんでした。少したってからもう一度お試しください。","운영자 · 모든 기능":"運営者 · すべての機能","또는":"または","Google로 계속하기":"Googleで続ける","카카오로 계속하기":"Kakaoで続ける","네이버로 계속하기":"NAVERで続ける","또는 메일로":"またはメールで","만 14세 이상인지 체크해 주세요. 아니시면 로그인 없이 이 기기에서 그대로 쓰실 수 있어요.":"14歳以上であることにチェックしてください。そうでない場合は、ログインせずにこの端末でそのままお使いいただけます。","계속하려면 이 칸에 체크해 주세요. 체크하지 않으셔도 이 기기에서 그대로 쓰실 수 있어요.":"続けるには、この項目にチェックしてください。チェックしなくても、この端末でそのままお使いいただけます。","내 기기":"わたしの端末","이 기기":"この端末","마지막 사용":"最後に使った日","내보내기":"ログアウトさせる","이 기기에서는 로그아웃":"この端末でログアウトする","이 계정으로 로그인한 기기예요. 이용권 하나로 두 대까지 쓸 수 있고, 가족과 나눠 쓰셔도 돼요.":"このアカウントでログインしている端末です。会員パス一つで二台まで使え、家族と分け合ってもかまいません。","이 계정은 이미 두 대에서 쓰고 있어요. 이 기기에서 쓰시려면 한 대를 내보내 주세요. 내보낸 기기는 로그아웃되고, 기록은 계정에 그대로 있어요.":"このアカウントはすでに二台で使われています。この端末で使うには、一台をログアウトさせてください。その端末はログアウトし、記録はアカウントにそのまま残ります。","가장 오래 안 쓴 기기":"いちばん長く使っていない端末","내보냈어요. 이 기기에서 이어서 쓰실 수 있어요.":"ログアウトさせました。この端末で続けて使えます。","내보냈어요.":"ログアウトさせました。","다른 기기에서 이 기기를 내보냈어요. 다시 로그인하시면 이어서 쓸 수 있어요.":"別の端末からこの端末がログアウトされました。もう一度ログインすれば続けて使えます。","기기 목록을 불러오지 못했어요. 잠시 뒤 다시 해 주세요.":"端末の一覧を読み込めませんでした。少ししてからもう一度お試しください。","기기":"端末","Android 폰":"Androidスマホ","Android 태블릿":"Androidタブレット","어떻게 지울까요?":"どのように消しますか？","이 앱에서만 탈퇴":"このアプリだけ退会","이 앱의 서버 기록과 가입만 지워요. 다른 메디나눔 앱은 그대로 써요.":"このアプリのサーバーの記録と登録だけを消します。ほかのメディナヌムのアプリはそのまま使えます。","메디나눔 계정 전체 삭제":"メディナヌムのアカウントをすべて消す","다섯 앱의 서버 기록과 계정을 모두 지워요. 되돌릴 수 없어요.":"5つのアプリのサーバーの記録とアカウントをすべて消します。元に戻せません。","이 앱의 서버 기록과 가입을 지울까요? 되돌릴 수 없어요.":"このアプリのサーバーの記録と登録を消しますか？元に戻せません。","이 앱에서 탈퇴했어요.":"このアプリを退会しました。","지우지 못했어요. 잠시 뒤 다시 해 주세요.":"消せませんでした。少ししてからもう一度お試しください。"},"zh":{"로그인":"登录","로그인 · 계정 만들기":"登录 · 创建账号","내 계정":"我的账号","계정":"账户","이용권":"使用权","동기화":"同步","아직":"尚未","로그인 전이에요":"尚未登录","기록은 이 기기에 있어요. 로그인하면 폰을 바꿔도 이어져요.":"记录在这台设备上。登录后换手机也能接着用。","로그인됨":"已登录","지금 동기화":"立即同步","로그아웃":"退出登录","계정 지우기":"删除账号","지금은 계정을 쓸 수 없어요. 기록은 이 기기에 그대로 있어요.":"现在无法使用账号。记录还在这台设备上。","계정은 준비 중이에요. 기록은 이 기기에 그대로 있어요.":"账号功能即将推出。记录还在这台设备上。","이메일":"邮箱","비밀번호":"密码","(6자 이상)":"（6 位以上）","필수":"必选","무엇을 · 왜 · 언제까지 — 처리방침 보기":"什么 · 为什么 · 保存多久——查看隐私政策","메일로 계속하기":"用邮箱继续","처음이시면 계정이 만들어지고, 있으시면 로그인돼요. 처음이면 메일함에 확인 링크가 가요.":"第一次使用会创建账号，已有账号就直接登录。新账号会收到一封确认链接邮件。","비밀번호를 잊으셨나요":"忘记密码了吗","계속하려면 서버 저장 동의에 체크해 주세요. 체크하지 않으셔도 이 기기에서 그대로 쓰실 수 있어요.":"要继续，请勾选服务器存储同意。不勾选也可以在这台设备上照常使用。","이메일을 적어 주세요.":"请填写邮箱。","비밀번호는 6자 이상이에요.":"密码至少 6 位。","확인하는 중…":"正在确认…","로그인했어요. 기록을 맞추는 중이에요.":"已登录。正在同步记录。","메일함의 확인 링크를 먼저 눌러 주세요. 메일이 안 보이면 스팸함도 봐 주세요.":"请先点邮件里的确认链接。找不到的话也看看垃圾邮件箱。","이 메일로 만든 계정이 있어요. 비밀번호를 다시 확인해 주세요. 잊으셨으면 「비밀번호를 잊으셨나요」를 눌러 주세요.":"这个邮箱已有账号。请再确认密码。忘记了就点“忘记密码了吗”。","계정을 만들었어요. 기록을 올리는 중이에요.":"账号已创建。正在上传记录。","처음이시군요. 메일함에 확인 링크를 보냈어요. 링크를 누른 뒤 여기서 다시 「메일로 계속하기」를 눌러 주세요.":"欢迎！确认链接已发到您的邮箱。点了链接后，回来再点一次“用邮箱继续”。","인터넷에 닿지 않아요. 연결된 뒤 다시 눌러 주세요. 기록은 이 기기에 그대로 있어요.":"连不上网络。联网后再点一次。记录还在这台设备上。","잠시 너무 여러 번 시도했어요. 몇 분 뒤 다시 해 주세요.":"尝试次数过多。请过几分钟再试。","로그인이 되지 않았어요. 잠시 뒤 다시 해 주세요.":"没能登录。请稍后再试。","비밀번호를 다시 정할 메일 주소를 위 칸에 적어 주세요.":"请在上面填写要重设密码的邮箱。","메일함에 비밀번호를 다시 정하는 링크를 보냈어요.":"重设密码的链接已发到您的邮箱。","메일을 보내지 못했어요. 잠시 뒤 다시 해 주세요.":"邮件没发出去。请稍后再试。","로그인 없이 둘러보기":"不登录先看看","둘러보셔도 기록은 이 기기에 남아요. 로그인은 언제든 화면 맨 위 「로그인」에서 하실 수 있어요.":"浏览期间记录也会留在这台设备上。随时可以在页面顶部的“登录”登录。","{앱} 기록을 계정에 이어 두면 <b>폰을 바꿔도 그대로</b>예요.":"把{앱}的记录接到账号上，<b>换手机也不会丢</b>。","내 계정 — {메일}":"我的账号 — {메일}","만 14세 이상이에요":"我已满14岁","만 14세 이상만 계정을 만들 수 있어요. 아니시면 로그인 없이 이 기기에서 그대로 쓰실 수 있어요.":"只有年满14岁的人可以创建账号。未满14岁也可以不登录，在这台设备上照常使用。","건강정보(민감정보) 서버 저장":"在服务器上保存健康信息（敏感信息）","기록을 암호화된 연결로 보내 메디나눔 서버(서울)에 저장하고, 로그인한 기기에서 이어 쓰는 데 동의해요.":"我同意通过加密连接把记录发送并保存在 Medinanum 服务器（首尔），并在登录的设备上继续使用。","만 14세 미만":"未满14岁","14~19세":"14–19岁","20대":"20多岁","30대":"30多岁","40대":"40多岁","50대":"50多岁","60대":"60多岁","70대 이상":"70岁以上","처음 한 번만 여쭤요. 나중에 설정에서 고치실 수 있어요.":"只问一次，之后可以在设置里修改。","고치실 것만 바꾸고 저장해 주세요.":"只改需要改的地方，然后保存。","이름":"姓名","성별":"性别","여성":"女","남성":"男","연령대":"年龄段","생일":"生日","(선택 · 생일 알림)":"（可选 · 生日提醒）","월":"月","일":"日","연락 이메일":"联系邮箱","(선택)":"（可选）","로그인한 서비스의 프로필 사진 쓰기":"使用登录服务的头像","저장":"保存","저장하는 중…":"正在保存…","이름·성별·연령대는 계정을 쓰는 데 필요해요. 생일·이메일·사진은 넣지 않으셔도 돼요.":"姓名、性别、年龄段是使用账号所需的。生日、邮箱、照片可以不填。","프로필 만들기":"创建个人资料","프로필 고치기":"修改个人资料","만 14세 미만은 계정을 쓸 수 없어요. 로그인 없이 이 기기에서 그대로 쓰실 수 있어요.":"未满14岁不能使用账号。不登录也可以在这台设备上照常使用。","이름을 적어 주세요.":"请填写姓名。","성별을 골라 주세요.":"请选择性别。","연령대를 골라 주세요.":"请选择年龄段。","생일은 월과 일을 함께 골라 주세요. 넣지 않으셔도 돼요.":"生日请同时选择月和日，也可以不填。","이메일을 다시 확인해 주세요. 넣지 않으셔도 돼요.":"请再检查一下邮箱，也可以不填。","프로필을 저장했어요.":"个人资料已保存。","저장하지 못했어요. 잠시 뒤 다시 해 주세요.":"保存失败，请稍后再试。","운영자 · 모든 기능":"运营者 · 全部功能","또는":"或","Google로 계속하기":"使用 Google 继续","카카오로 계속하기":"使用 Kakao 继续","네이버로 계속하기":"使用 NAVER 继续","또는 메일로":"或使用邮箱","만 14세 이상인지 체크해 주세요. 아니시면 로그인 없이 이 기기에서 그대로 쓰실 수 있어요.":"请勾选确认您已满14岁。如未满，可以不登录，继续在本设备上使用。","계속하려면 이 칸에 체크해 주세요. 체크하지 않으셔도 이 기기에서 그대로 쓰실 수 있어요.":"如需继续，请勾选此项。不勾选也可以继续在本设备上使用。","내 기기":"我的设备","이 기기":"本设备","마지막 사용":"最近使用","내보내기":"移出","이 기기에서는 로그아웃":"改为在本设备退出登录","이 계정으로 로그인한 기기예요. 이용권 하나로 두 대까지 쓸 수 있고, 가족과 나눠 쓰셔도 돼요.":"这些设备登录了此账号。一份会员可用于两台设备，也可以和家人共用。","이 계정은 이미 두 대에서 쓰고 있어요. 이 기기에서 쓰시려면 한 대를 내보내 주세요. 내보낸 기기는 로그아웃되고, 기록은 계정에 그대로 있어요.":"此账号已在两台设备上使用。要在本设备使用，请移出其中一台。被移出的设备会退出登录，记录仍保留在账号中。","가장 오래 안 쓴 기기":"最久未使用","내보냈어요. 이 기기에서 이어서 쓰실 수 있어요.":"已移出。可以在本设备继续使用。","내보냈어요.":"已移出。","다른 기기에서 이 기기를 내보냈어요. 다시 로그인하시면 이어서 쓸 수 있어요.":"此设备已被其他设备移出。重新登录即可继续使用。","기기 목록을 불러오지 못했어요. 잠시 뒤 다시 해 주세요.":"无法加载设备列表。请稍后再试。","기기":"设备","Android 폰":"安卓手机","Android 태블릿":"安卓平板","어떻게 지울까요?":"要怎样删除？","이 앱에서만 탈퇴":"只退出此应用","이 앱의 서버 기록과 가입만 지워요. 다른 메디나눔 앱은 그대로 써요.":"只删除此应用在服务器上的记录和注册。其他 Medinanum 应用照常使用。","메디나눔 계정 전체 삭제":"删除整个 Medinanum 账号","다섯 앱의 서버 기록과 계정을 모두 지워요. 되돌릴 수 없어요.":"删除五个应用在服务器上的全部记录和账号，无法恢复。","이 앱의 서버 기록과 가입을 지울까요? 되돌릴 수 없어요.":"删除此应用在服务器上的记录和注册？无法恢复。","이 앱에서 탈퇴했어요.":"已退出此应用。","지우지 못했어요. 잠시 뒤 다시 해 주세요.":"删除失败。请稍后再试。"}};
+  function 말언어() { var l = String((document.documentElement && document.documentElement.lang) || 'ko').toLowerCase().slice(0, 2); return 사전[l] ? l : 'ko'; }
+  function 말(k) { var l = 말언어(); if (l === 'ko' || k == null) return k; if (사전[l][k]) return 사전[l][k]; var a = null; try { a = typeof 설정.말 === 'function' ? 설정.말(k, l) : (설정.말 && 설정.말[l] && 설정.말[l][k]); } catch (e) {} return a || k; }   /* 부품 사전이 먼저 — 앱 사전에서 「빠진 말」로 잘못 세지 않게 */   /* 설정.말 = { en: {…} } 또는 function(한국어, 말) — 앱 사전을 그대로 빌려 쓸 수 있다 */
+  function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
+  function 부름(f, 기본) { try { return typeof f === 'function' ? f() : 기본; } catch (e) { return 기본; } }
+  function 알림(t) {
+    // 11-03 현욱님 「메일로 계속하기 눌러도 안 넘어간다」 — 앱 알림 띠가 시트 뒤에 가려져 안내가 안 보였다. 시트 안 안내 줄에도 같은 글을 쓴다.
+    try { var say = document.getElementById('acct-say'); if (say) { say.textContent = 말(t); say.hidden = false; if (say.scrollIntoView) say.scrollIntoView({ block: 'nearest', behavior: 'smooth' }); } } catch (e) {}
+    try { if (typeof 설정.알림 === 'function') return 설정.알림(말(t)); } catch (e) {}
+  }
+  function 시트(html, 제목) { try { if (typeof 설정.시트열기 === 'function') return 설정.시트열기(html, 제목); } catch (e) {} }
+  function 닫기() { try { if (typeof 설정.시트닫기 === 'function') 설정.시트닫기(); } catch (e) {} }
+  function 서버() { return window.서버 && typeof window.서버.준비 === 'function' ? window.서버 : null; }
+  function 켜짐() { var s = 서버(); try { return !!(s && (!s.준비됨 || s.준비됨())); } catch (e) { return false; } }
+  function 열림() { return 켜짐() && 부름(설정.열림, true) !== false; }
+  function 세션() { var s = 서버(); try { return s && s.세션 ? s.세션() : null; } catch (e) { return null; } }
+  function 상태() { try { return JSON.parse(localStorage.getItem('_srv_' + 설정.app) || '{}') || {}; } catch (e) { return {}; } }
+  function 상태쓰기(o) { try { localStorage.setItem('_srv_' + 설정.app, JSON.stringify(o)); } catch (e) {} }
+  function 메일() { var s = 세션(); if (!s || !s.user) return ''; var u = s.user, m = u.user_metadata || {}; return u.email || m.email || m.name || '계정'; }
+  function 첫글자() { var m = 메일(); return m ? m.charAt(0).toUpperCase() : ''; }
+  /* 메일 속 돌아올 주소 — 설치 앱은 location 이 https://localhost 라 메일 링크가 죽는다(허브 §3) → 앱이 준 웹 주소를 먼저 */
+  function 네이티브() { try { return !!(window.Capacitor && typeof window.Capacitor.isNativePlatform === 'function' && window.Capacitor.isNativePlatform()); } catch (e) { return false; } }
+  function 앱주소() { try { if (설정.웹주소) return 설정.웹주소; if (네이티브() || /localhost|127\.0\.0\.1/.test(location.hostname)) return ''; return /^https?:/.test(location.protocol) ? location.origin + location.pathname : ''; } catch (e) { return ''; } }
+
+  var 사람 = '<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="8.5" r="3.8"/><path d="M4.5 20c1.4-3.6 4.2-5.5 7.5-5.5s6.1 1.9 7.5 5.5"/></svg>';
+  /* ── 머리 단추 ── */
+  function 머리단추HTML() {
+    var 글 = 첫글자();
+    return 글 ? '<button type="button" class="acctbtn in" onclick="계정.열기()" aria-label="' + esc(말('내 계정 — {메일}').replace('{메일}', 메일())) + '"><span aria-hidden="true">' + esc(글) + '</span></button>'
+      : '<button type="button" class="acctbtn" onclick="계정.열기()" aria-label="' + 말('로그인 · 계정 만들기') + '">' + 사람.replace('<svg ', '<svg class="acct-ic" ') + '<span class="acct-lb">' + 말('로그인') + '</span></button>';   /* 아주 좁은 폰은 앱 CSS 가 글 대신 사람 그림만 */
+  }
+  var 지난 = null;
+  function 머리단추새로(굳이) {
+    var 지금 = 메일();
+    if (!굳이 && 지금 === 지난) return;
+    if (지난 === '' && 지금 && !굳이) setTimeout(프로필확인, 600);
+    if ((지난 === '' || 지난 === null) && 지금 && !굳이) setTimeout(function () { 기기확인(false); }, 1100);   /* 기기두대1110 — 앱을 열 때·소셜 로그인으로 돌아온 때 */   /* 프로필1030 — 소셜 로그인으로 돌아와 로그인이 막 생긴 때 */
+    if (!지금) { 프.줄 = null; 프.읽음 = false; }
+    지난 = 지금;
+    var 새 = 머리단추HTML();
+    [].forEach.call(document.querySelectorAll('.acctbtn'), function (b) { var t = document.createElement('div'); t.innerHTML = 새; b.parentNode.replaceChild(t.firstChild, b); });
+    var 카 = document.getElementById('acctcard'); if (카) 카.outerHTML = 카드HTML();
+  }
+
+  /* ── 이용권 · 동기화 줄 ── */
+  function 이용권() { var t = 부름(설정.이용권글, ''); try { if (window.가입 && 가입.운영자 && 가입.운영자()) t = 말('운영자 · 모든 기능'); } catch (e) {}   /* 10-30 */ return t ? '<div class="acct-row"><i>' + 말('이용권') + '</i><b>' + esc(t) + '</b></div>' : ''; }
+  function 동기화줄() {
+    var st = 서버() && 서버().상태 ? 부름(서버().상태, {}) : 상태(), t = st && (st.last_push || st.last_pull);
+    var 언제 = t ? new Date(t).toLocaleString(말언어() === 'ko' ? 'ko-KR' : 말언어(), { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : 말('아직');
+    return '<div class="acct-row"><i>' + 말('동기화') + '</i><b>' + esc(언제) + '</b></div>';
+  }
+
+  /* 10-30 현욱님 실사용 — 「가입 동의 전이라 동기화를 멈춰 두었어요」가 떴다. 이 앱 약관은 첫 화면에서 이미 동의했으니 가입 부품이 조용히 가입하게,
+     표시를 localStorage 에 둔다(메일 확인 링크로 새 탭에 돌아옴 · 소셜 돌아옴 · 다른 기기에서 로그인 — 그 기기에서도 첫 화면 동의를 했으니). 가입 부품이 가입한 뒤 지운다. */
+  function 가입표시() { try { localStorage.setItem('_join_signup_' + 설정.app, '1'); } catch (e) {} }
+  /* 프로필1030 — 가입 프로필 한 화면. 설정.프로필켜짐(함수 또는 참/거짓)이 참일 때만 묻고 보인다 */
+  var 나이칸 = [['u14', '만 14세 미만'], ['14-19', '14~19세'], ['20-29', '20대'], ['30-39', '30대'], ['40-49', '40대'], ['50-59', '50대'], ['60-69', '60대'], ['70+', '70대 이상']];
+  var 프 = { 줄: null, 읽음: false, 고름: {} };
+  function 프로필켜짐() { return 열림() && 부름(typeof 설정.프로필켜짐 === 'function' ? 설정.프로필켜짐 : function () { return !!설정.프로필켜짐; }, false) === true; }
+  function 사용자() { var s = 세션(); return s && s.user ? s.user : null; }
+  function 소셜() { var u = 사용자(); var p = u && u.app_metadata && u.app_metadata.provider; return p && p !== 'email' ? p : ''; }
+  function 미리값() {   /* 소셜이 준 값 — 구글(full_name·picture) · 카카오(name/nickname·avatar_url) · 네이버(naver-login 이 둔 name·gender·age_range·birthday·contact_email·avatar_url) */
+    var u = 사용자() || {}, m = u.user_metadata || {};
+    var 나 = String(m.age_range || '').replace(/^(\d0)-(\d)9$/, '$1-$29');
+    var 생 = String(m.birthday || '').replace(/^(\d{2})(\d{2})$/, '$1-$2');
+    return { name: String(m.full_name || m.name || m.nickname || m.user_name || '').slice(0, 40),
+      gender: /^(f|female|여)/i.test(m.gender || '') ? 'female' : /^(m|male|남)/i.test(m.gender || '') ? 'male' : '',
+      age_range: 나칸있나(나) ? 나 : '', birthday: /^(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])$/.test(생) ? 생 : '',
+      contact_email: 소셜() ? String(m.contact_email || m.email || u.email || '').slice(0, 254) : '',
+      avatar_url: /^https:\/\//.test(m.avatar_url || m.picture || '') ? String(m.avatar_url || m.picture).slice(0, 500) : '' };
+  }
+  function 필수(k) { return (설정.프로필필수 || []).indexOf(k) >= 0 || k === 'age_range'; }   /* 연령대는 만 14세 확인이라 늘 필수 */
+  function 나칸있나(v) { return 나이칸.some(function (x) { return x[0] === v && v !== 'u14'; }); }
+  function 프로필읽기() {
+    var u = 사용자(); if (!u || !서버()) return Promise.resolve(null);
+    return 서버().준비().then(function (sb) { return sb.from('profiles').select('name,gender,age_range,birthday,contact_email,avatar_url').eq('user_id', u.id).maybeSingle(); })
+      .then(function (r) { 프.읽음 = true; 프.줄 = r && !r.error ? r.data : null; return 프.줄; }, function () { return null; });
+  }
+  function 프로필확인() {   /* 로그인 직후 — 비었으면 한 화면 */
+    if (!프로필켜짐() || !사용자()) return;
+    프로필읽기().then(function (줄) { if (!줄 || !줄.age_range || (필수('name') && !줄.name) || (필수('gender') && !줄.gender)) 프로필열기(true); });
+  }
+  function 칩(묶음, v, 글, on) { return '<button type="button" class="acct-chip' + (on ? ' on' : '') + '" aria-pressed="' + (on ? 'true' : 'false') + '" onclick="계정.프로필고름(\'' + 묶음 + '\',\'' + v + '\',this)">' + esc(말(글)) + '</button>'; }
+  function 프로필열기(처음) {
+    if (!프로필켜짐()) return;
+    var 줄 = 프.줄 || {}, 미 = 미리값(), 값 = {}; ['name', 'gender', 'age_range', 'birthday', 'contact_email', 'avatar_url'].forEach(function (k) { 값[k] = 줄[k] || 미[k] || ''; });
+    프.고름 = { gender: 값.gender, age_range: 값.age_range, avatar: !!값.avatar_url, avatar_url: 값.avatar_url };
+    var 달 = 값.birthday ? 값.birthday.slice(0, 2) : '', 날 = 값.birthday ? 값.birthday.slice(3, 5) : '';
+    function 고르개(id, 끝, 고른, 글) { var o = '<option value="">' + esc(말(글)) + '</option>'; for (var i = 1; i <= 끝; i++) { var v = (i < 10 ? '0' : '') + i; o += '<option value="' + v + '"' + (v === 고른 ? ' selected' : '') + '>' + i + '</option>'; } return '<select id="' + id + '" class="acct-sel">' + o + '</select>'; }
+    var h = '<div class="acctsheet acct-prof">'
+      + '<p class="acct-lead">' + 말(처음 ? '처음 한 번만 여쭤요. 나중에 설정에서 고치실 수 있어요.' : '고치실 것만 바꾸고 저장해 주세요.') + '</p>'
+      + '<label for="pfName">' + 말('이름') + (필수('name') ? ' <span class="acct-req">' + 말('필수') + '</span>' : ' <span class="acct-dim">' + 말('(선택)') + '</span>') + '</label><input id="pfName" type="text" autocomplete="name" maxlength="40" value="' + esc(값.name) + '">'
+      + '<label>' + 말('성별') + (필수('gender') ? ' <span class="acct-req">' + 말('필수') + '</span>' : ' <span class="acct-dim">' + 말('(선택)') + '</span>') + '</label><div class="acct-chips" role="group">' + 칩('gender', 'female', '여성', 값.gender === 'female') + 칩('gender', 'male', '남성', 값.gender === 'male') + '</div>'
+      + '<label>' + 말('연령대') + ' <span class="acct-req">' + 말('필수') + '</span></label><div class="acct-chips" role="group">' + 나이칸.map(function (x) { return 칩('age_range', x[0], x[1], 값.age_range === x[0]); }).join('') + '</div>'
+      + '<label>' + 말('생일') + ' <span class="acct-dim">' + 말('(선택 · 생일 알림)') + '</span></label><div class="acct-birth">' + 고르개('pfMon', 12, 달, '월') + 고르개('pfDay', 31, 날, '일') + '</div>'
+      + (소셜() ? '<label for="pfMail">' + 말('연락 이메일') + ' <span class="acct-dim">' + 말('(선택)') + '</span></label><input id="pfMail" type="email" inputmode="email" autocomplete="email" value="' + esc(값.contact_email) + '">' : '')
+      + (값.avatar_url ? '<label class="acct-chk"><input type="checkbox" id="pfPic"' + (프.고름.avatar ? ' checked' : '') + '><span>' + 말('로그인한 서비스의 프로필 사진 쓰기') + ' <span class="acct-dim">' + 말('(선택)') + '</span></span></label>' : '')
+      + '<button type="button" class="acct-main" id="pfGo" onclick="계정.프로필저장()">' + 말('저장') + '</button>'
+      + '<p class="acct-tiny">' + 말('이름·성별·연령대는 계정을 쓰는 데 필요해요. 생일·이메일·사진은 넣지 않으셔도 돼요.') + '</p>'
+      + '</div>';
+    시트(h, 말(처음 ? '프로필 만들기' : '프로필 고치기'));
+  }
+  function 프로필고름(묶음, v, b) {
+    프.고름[묶음] = v;
+    if (b && b.parentNode) [].forEach.call(b.parentNode.querySelectorAll('.acct-chip'), function (x) { var on = x === b; x.classList.toggle('on', on); x.setAttribute('aria-pressed', on ? 'true' : 'false'); });
+    if (묶음 === 'age_range' && v === 'u14') 알림('만 14세 미만은 계정을 쓸 수 없어요. 로그인 없이 이 기기에서 그대로 쓰실 수 있어요.');
+  }
+  function 프로필저장() {
+    var 이름 = String((document.getElementById('pfName') || {}).value || '').trim().slice(0, 40);
+    var 고 = 프.고름 || {};
+    if (!이름 && 필수('name')) { 알림('이름을 적어 주세요.'); return; }
+    if (!고.gender && 필수('gender')) { 알림('성별을 골라 주세요.'); return; }
+    if (!고.age_range) { 알림('연령대를 골라 주세요.'); return; }
+    if (고.age_range === 'u14') { 알림('만 14세 미만은 계정을 쓸 수 없어요. 로그인 없이 이 기기에서 그대로 쓰실 수 있어요.'); 닫기(); 나가기(); return; }
+    var 달 = (document.getElementById('pfMon') || {}).value || '', 날 = (document.getElementById('pfDay') || {}).value || '';
+    if ((달 && !날) || (!달 && 날)) { 알림('생일은 월과 일을 함께 골라 주세요. 넣지 않으셔도 돼요.'); return; }
+    var 메 = String((document.getElementById('pfMail') || {}).value || '').trim();
+    if (메 && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(메)) { 알림('이메일을 다시 확인해 주세요. 넣지 않으셔도 돼요.'); return; }
+    var 사진 = document.getElementById('pfPic');
+    var u = 사용자(); if (!u || !서버()) return;
+    var 줄 = { user_id: u.id, name: 이름 || null, gender: 고.gender || null, age_range: 고.age_range, birthday: 달 && 날 ? 달 + '-' + 날 : null,
+      contact_email: 메 || null, avatar_url: 사진 && 사진.checked ? (고.avatar_url || null) : null, source: 소셜() || 'email' };
+    var b = document.getElementById('pfGo'); if (b) { b.disabled = true; b.textContent = 말('저장하는 중…'); }
+    서버().준비().then(function (sb) { return sb.from('profiles').upsert(줄, { onConflict: 'user_id' }); }).then(function (r) {
+      if (r && r.error) throw r.error;
+      프.줄 = 줄; 프.읽음 = true; 알림('프로필을 저장했어요.'); 닫기(); 머리단추새로(true);
+    }).catch(function () { 알림('저장하지 못했어요. 잠시 뒤 다시 해 주세요.'); if (b) { b.disabled = false; b.textContent = 말('저장'); } });
+  }
+
+  /* ── 설정 맨 위 카드 ── */
+  function 카드HTML() {
+    var h = '<div id="acctcard" class="acctcard">';
+    if (!열림()) return h + '<div class="acct-me"><span class="acct-av off" aria-hidden="true">' + 사람 + '</span><div><b>' + 말('계정') + '</b><span>' + esc(닫힘까닭()) + '</span></div></div></div>';
+    var m = 메일();
+    if (!m) return h + '<div class="acct-me"><span class="acct-av off" aria-hidden="true">' + 사람 + '</span><div><b>' + 말('로그인 전이에요') + '</b><span>' + 말('기록은 이 기기에 있어요. 로그인하면 폰을 바꿔도 이어져요.') + '</span></div></div>'
+      + '<button type="button" class="acct-main" onclick="계정.열기()">' + 말('로그인 · 계정 만들기') + '</button></div>';
+    return h + '<div class="acct-me"><span class="acct-av" aria-hidden="true">' + esc(첫글자()) + '</span><div><b>' + esc(m) + '</b><span>' + 말('로그인됨') + '</span></div></div>'
+      + 이용권() + 동기화줄()
+      + (프로필켜짐() ? '<button type="button" class="acct-link" onclick="계정.프로필()">' + 말('프로필 고치기') + '</button>' : '')   /* 프로필1030 */
+      + '<div class="acct-btns"><button type="button" onclick="계정.동기화()">' + 말('지금 동기화') + '</button><button type="button" onclick="계정.나가기()">' + 말('로그아웃') + '</button></div>'
+      + '<button type="button" class="acct-del" onclick="계정.지우기()">' + 말('계정 지우기') + '</button></div>';
+  }
+  function 닫힘까닭() { var t = 부름(설정.닫힘까닭, ''); return t || 말(켜짐() ? '지금은 계정을 쓸 수 없어요. 기록은 이 기기에 그대로 있어요.' : '계정은 준비 중이에요. 기록은 이 기기에 그대로 있어요.'); }
+
+  /* ── 계정 시트 (한 화면) ── */
+  function 로그인HTML() {
+    var st = 상태(), 동 = 부름(설정.동의됨, false);
+    var 소 = 소셜HTML();   /* 10-31 소아 검수 — 소셜 단추를 맨 위로(어르신은 한 번 누르기가 쉽다). 순서: 동의 체크 → 소셜 → 「또는 메일로」 → 메일 칸 */
+    var 체크 = ''
+      + (동 || !설정.나이글 ? '' : '<label class="acct-chk"><input type="checkbox" id="acctAge"><span>' + esc(말(설정.나이글)) + ' <span class="acct-req">' + 말('필수') + '</span></span></label>')   /* 10-29 한 번 시작 — 만 14세 확인은 계정 만들 때 */
+      + (동 ? '' : '<label class="acct-chk"><input type="checkbox" id="acctAgree"><span>' + (설정.동의이름 ? '<b>' + esc(말(설정.동의이름)) + '</b> — ' : '') + esc(말(설정.동의글 || '기록을 암호화된 연결로 보내 메디나눔 서버(서울)에 저장하고, 로그인한 기기에서 이어 쓰는 데 동의해요.')) + ' <span class="acct-req">' + 말('필수') + '</span></label>'
+          + (설정.처리방침 ? '<button type="button" class="acct-link" onclick="계정.처리방침()">' + 말('무엇을 · 왜 · 언제까지 — 처리방침 보기') + '</button>' : ''));
+    return '<div class="acctsheet">'
+      + '<p class="acct-lead">' + 말('{앱} 기록을 계정에 이어 두면 <b>폰을 바꿔도 그대로</b>예요.').replace('{앱}', esc(말(설정.앱이름))) + '</p>'
+      + (소 ? 체크 + 소 + '<div class="acct-or"><span>' + 말('또는 메일로') + '</span></div>' : '')
+      + '<label for="srvEmail">' + 말('이메일') + '</label><input id="srvEmail" type="email" inputmode="email" autocomplete="email" enterkeyhint="next" value="' + esc(st.email || '') + '">'
+      + '<label for="srvPw">' + 말('비밀번호') + ' <span class="acct-dim">' + 말('(6자 이상)') + '</span></label><input id="srvPw" type="password" autocomplete="current-password" enterkeyhint="go">'
+      + (소 ? '' : 체크)
+      + '<button type="button" class="acct-main" id="acctGo" onclick="계정.계속()">' + 말('메일로 계속하기') + '</button><p id="acct-say" class="acct-say" role="status" aria-live="polite" hidden></p>'
+      + '<p class="acct-tiny">' + 말('처음이시면 계정이 만들어지고, 있으시면 로그인돼요. 처음이면 메일함에 확인 링크가 가요.') + '</p>'
+      + '<button type="button" class="acct-link" onclick="계정.비번()">' + 말('비밀번호를 잊으셨나요') + '</button>'
+      + '</div>';
+  }
+  /* 소셜 로그인 단추 — 서버 부품이 켠 것만. 동의 체크는 메일과 같은 자리·같은 검사(동의확인)를 거친다 */
+  var 소셜글 = { google: 'Google로 계속하기', kakao: '카카오로 계속하기', naver: '네이버로 계속하기' };
+  var 소셜꼴 = { google: 'background:#fff;color:#1f1f1f;border:1px solid #747775', kakao: 'background:#FEE500;color:rgba(0,0,0,.85);border:0', naver: 'background:#03C75A;color:#fff;border:0' };
+  var 소셜그림 = { google: '<svg viewBox="0 0 48 48" width="18" height="18" aria-hidden="true"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>',
+    kakao: '<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path fill="#000" d="M12 3C6.48 3 2 6.58 2 11c0 2.85 1.86 5.35 4.66 6.77l-.95 3.5c-.08.3.26.54.52.37l4.14-2.75c.53.07 1.08.11 1.63.11 5.52 0 10-3.58 10-8S17.52 3 12 3z"/></svg>',
+    naver: '<svg viewBox="0 0 24 24" width="14" height="14" aria-hidden="true"><path fill="#fff" d="M16.273 12.845 7.376 0H0v24h7.726V11.156L16.624 24H24V0h-7.727z"/></svg>' };
+  function 소셜목록() { try { return window.서버 && typeof window.서버.소셜 === 'function' ? window.서버.소셜() : []; } catch (e) { return []; } }
+  function 소셜HTML() {
+    var l = 소셜목록().filter(function (p) { return 소셜글[p]; }); if (!l.length) return '';
+    return l.map(function (p) {
+      return '<button type="button" class="acct-soc" style="' + 소셜꼴[p] + '" onclick="계정.소셜(\'' + p + '\')">' + 소셜그림[p] + '<span>' + 말(소셜글[p]) + '</span></button>';
+    }).join('');
+  }
+  function 소셜(p) {
+    if (소셜목록().indexOf(p) < 0) return;
+    if (!동의확인()) return;
+    try { if (window.가입 && typeof 가입.이앱가입 === 'function') 가입.이앱가입(); } catch (e) {}
+    가입표시();
+    동작(p);
+  }
+  function 열기() {
+    if (!열림()) { 시트('<div class="acctsheet">' + 카드HTML() + '</div>', 말('계정')); return; }
+    if (메일()) { 시트('<div class="acctsheet">' + 카드HTML() + '</div>', 말('내 계정')); return; }
+    시트(로그인HTML(), 말('로그인 · 계정 만들기'));
+    if (!소셜목록().length) setTimeout(function () { var e = document.getElementById(상태().email ? 'srvPw' : 'srvEmail'); if (e) try { e.focus({ preventScroll: true }); } catch (x) {} }, 120);
+  }
+  var 바쁨 = false;
+  function 단추글(t, 끔) { var b = document.getElementById('acctGo'); if (b) { b.textContent = 말(t); b.disabled = !!끔; } }
+  /* 11-03 — 알림 띠는 시트 뒤에 깔려 안 보였다(현욱님 폰: 「눌러도 진행이 안 돼요」). 빠진 체크 칸 바로 아래에 빨간 글로 알리고 그 칸으로 데려간다 */
+  function 칸경고(c, 글) {
+    var 칸 = c && c.closest ? c.closest('.acct-chk') : null;
+    try { [].forEach.call(document.querySelectorAll('.acct-err'), function (e) { e.remove(); }); [].forEach.call(document.querySelectorAll('.acct-chk.bad'), function (e) { e.classList.remove('bad'); }); } catch (e) {}
+    if (!칸) { 알림(글); return; }
+    칸.classList.add('bad');
+    var p = document.createElement('p'); p.className = 'acct-err'; p.setAttribute('role', 'alert'); p.textContent = 말(글);
+    칸.parentNode.insertBefore(p, 칸.nextSibling);
+    try { 칸.scrollIntoView({ block: 'center', behavior: 'smooth' }); } catch (e) {}
+    try { c.focus({ preventScroll: true }); } catch (e) {}
+    c.addEventListener('change', function 풀기() { if (c.checked) { 칸.classList.remove('bad'); if (p.parentNode) p.remove(); } }, { once: true });
+  }
+  function 동의확인() {
+    if (부름(설정.동의됨, false)) return true;
+    var 나 = document.getElementById('acctAge');
+    if (나 && !나.checked) { 칸경고(나, '만 14세 이상인지 체크해 주세요. 아니시면 로그인 없이 이 기기에서 그대로 쓰실 수 있어요.'); return false; }
+    var c = document.getElementById('acctAgree');
+    if (!c || !c.checked) { 칸경고(c, '계속하려면 이 칸에 체크해 주세요. 체크하지 않으셔도 이 기기에서 그대로 쓰실 수 있어요.'); return false; }
+    try { if (typeof 설정.동의하기 === 'function') 설정.동의하기(); } catch (e) {}
+    return true;
+  }
+  function 성공(말) {
+    var st = 상태(), m = 메일(); if (m && m.indexOf('@') > 0) st.email = m; 상태쓰기(st);
+    알림(말); 머리단추새로(true);
+    try { if (typeof 설정.다시그리기 === 'function') 설정.다시그리기(); } catch (e) {}
+    닫기();
+    setTimeout(프로필확인, 400);   /* 프로필1030 */
+    setTimeout(function () { 기기확인(true); }, 900);   /* 기기두대1110 */
+  }
+  function 계속() {
+    if (바쁨) return;
+    var email = String((document.getElementById('srvEmail') || {}).value || '').trim(), pw = String((document.getElementById('srvPw') || {}).value || '');
+    if (!email || email.indexOf('@') < 1) { 알림('이메일을 적어 주세요.'); return; }
+    if (pw.length < 6) { 알림('비밀번호는 6자 이상이에요.'); return; }
+    if (!동의확인()) return;
+    var st = 상태(); st.email = email; 상태쓰기(st);
+    /* 앱 약관은 첫 화면에서 이미 동의했다 — 가입 부품이 로그인 뒤 「이 앱 가입」 시트를 또 띄우지 않고 조용히 가입하게 표시해 둔다 */
+    try { if (window.가입 && typeof 가입.이앱가입 === 'function') 가입.이앱가입(); } catch (e) {}
+    가입표시();   /* 10-30 — sessionStorage 만으로는 메일 확인 링크(새 탭)에서 사라졌다 */
+    바쁨 = true; 단추글('확인하는 중…', true);
+    var sbr = null;
+    서버().준비().then(function (sb) { sbr = sb; return sb.auth.signInWithPassword({ email: email, password: pw }); }).then(function (r) {
+      if (r && !r.error) return 성공('로그인했어요. 기록을 맞추는 중이에요.');
+      var m = String((r && r.error && r.error.message) || '');
+      if (/not confirmed/i.test(m)) { 알림('메일함의 확인 링크를 먼저 눌러 주세요. 메일이 안 보이면 스팸함도 봐 주세요.'); return; }
+      if (!/invalid login credentials/i.test(m)) throw r.error;
+      /* 없는 계정이거나 비밀번호가 틀렸다 — 만들어 보고, 이미 있으면(identities 빈 배열) 비밀번호 탓이라고 말한다 */
+      var 주소 = 앱주소();
+      return sbr.auth.signUp(주소 ? { email: email, password: pw, options: { emailRedirectTo: 주소 } } : { email: email, password: pw }).then(function (r2) {
+        if (r2 && r2.error) { if (/already registered|already exists/i.test(r2.error.message || '')) { 알림('이 메일로 만든 계정이 있어요. 비밀번호를 다시 확인해 주세요. 잊으셨으면 「비밀번호를 잊으셨나요」를 눌러 주세요.'); return; } throw r2.error; }
+        var u = r2 && r2.data && r2.data.user;
+        if (u && Array.isArray(u.identities) && u.identities.length === 0) { 알림('이 메일로 만든 계정이 있어요. 비밀번호를 다시 확인해 주세요. 잊으셨으면 「비밀번호를 잊으셨나요」를 눌러 주세요.'); return; }
+        if (r2 && r2.data && r2.data.session) return 성공('계정을 만들었어요. 기록을 올리는 중이에요.');
+        알림('처음이시군요. 메일함에 확인 링크를 보냈어요. 링크를 누른 뒤 여기서 다시 「메일로 계속하기」를 눌러 주세요.');
+      });
+    }).catch(function (e) {
+      var m = String((e && e.message) || '');
+      알림(/fetch|network|lib/i.test(m) ? '인터넷에 닿지 않아요. 연결된 뒤 다시 눌러 주세요. 기록은 이 기기에 그대로 있어요.' : /rate|too many/i.test(m) ? '잠시 너무 여러 번 시도했어요. 몇 분 뒤 다시 해 주세요.' : '로그인이 되지 않았어요. 잠시 뒤 다시 해 주세요.');
+    }).then(function () { 바쁨 = false; 단추글('메일로 계속하기', false); });
+  }
+  function 비번() {
+    var email = String((document.getElementById('srvEmail') || {}).value || '').trim();
+    if (!email || email.indexOf('@') < 1) { 알림('비밀번호를 다시 정할 메일 주소를 위 칸에 적어 주세요.'); var e = document.getElementById('srvEmail'); if (e) e.focus(); return; }
+    if (!동의확인()) return;
+    var 주소 = 앱주소();
+    서버().준비().then(function (sb) { return 주소 ? sb.auth.resetPasswordForEmail(email, { redirectTo: 주소 }) : sb.auth.resetPasswordForEmail(email); })
+      .then(function (r) { if (r && r.error) throw r.error; 알림('메일함에 비밀번호를 다시 정하는 링크를 보냈어요.'); })
+      .catch(function () { 알림('메일을 보내지 못했어요. 잠시 뒤 다시 해 주세요.'); });
+  }
+  function 동작(what) { try { if (typeof window.계정동작 === 'function') return Promise.resolve(window.계정동작(what)); } catch (e) {} return Promise.resolve(); }
+  function 나가기() { return 동작('logout').then(function () { 머리단추새로(true); try { if (typeof 설정.다시그리기 === 'function') 설정.다시그리기(); } catch (e) {} }); }
+  function 동기화() { return 동작('sync').then(function () { 머리단추새로(true); }); }
+  function 지우기전부() { return 동작('delete').then(function () { setTimeout(function () { 머리단추새로(true); }, 400); }); }
+  /* 11-11 현욱님 「앱별 가입」 — 지우기 둘: 이 앱에서만 탈퇴(그 앱 기록·가입만 · delete_own_account(p_app)) / 메디나눔 계정 전체 삭제(앱의 기존 지우기). 설치({ 지우기둘: true })일 때만 */
+  function 지우기() {
+    if (부름(설정.지우기둘, false) !== true && 설정.지우기둘 !== true) return 지우기전부();
+    시트('<div class="acctsheet"><p class="acct-lead">' + esc(말('어떻게 지울까요?')) + '</p>'
+      + '<button type="button" class="acct-alt" onclick="계정.이앱탈퇴()">' + esc(말('이 앱에서만 탈퇴')) + '</button><p class="acct-tiny">' + esc(말('이 앱의 서버 기록과 가입만 지워요. 다른 메디나눔 앱은 그대로 써요.')) + '</p>'
+      + '<button type="button" class="acct-alt" onclick="계정.전부지우기()">' + esc(말('메디나눔 계정 전체 삭제')) + '</button><p class="acct-tiny">' + esc(말('다섯 앱의 서버 기록과 계정을 모두 지워요. 되돌릴 수 없어요.')) + '</p></div>', 말('계정 지우기'));
+    return Promise.resolve();
+  }
+  function 이앱탈퇴() {
+    if (!window.confirm || !confirm(말('이 앱의 서버 기록과 가입을 지울까요? 되돌릴 수 없어요.'))) return Promise.resolve(false);
+    return 서버().준비().then(function (sb) { return sb.rpc('delete_own_account', { p_app: 설정.app }); }).then(function (r) {
+      if (r && r.error) throw r.error; 닫기(); 알림(말('이 앱에서 탈퇴했어요.')); return 나가기(); }).catch(function () { 알림(말('지우지 못했어요. 잠시 뒤 다시 해 주세요.')); });
+  }
+
+  /* ── 온보딩 끝 두 단추 — 같은 크기, 둘러보기도 떳떳하게 ── */
+  function 시작단추HTML(둘러보기) {
+    if (!열림()) return '';
+    return '<div class="acct-start"><button type="button" class="acct-main" onclick="' + esc(둘러보기 || '') + ';계정.열기()">' + 말('로그인 · 계정 만들기') + '</button>'
+      + '<button type="button" class="acct-alt" onclick="' + esc(둘러보기 || '') + '">' + 말('로그인 없이 둘러보기') + '</button>'
+      + '<p class="acct-tiny">' + 말('둘러보셔도 기록은 이 기기에 남아요. 로그인은 언제든 화면 맨 위 「로그인」에서 하실 수 있어요.') + '</p></div>';
+  }
+
+  /* ── 기기 두 대(11-10 현욱님 「이용권 하나 = 기기 두 대까지 · 가족과 나눠 써도 됨」) ──
+     설치({ 기기두대: true })일 때만 돈다(서버 _서버/메디나눔_기기두대_1110.sql 을 붙인 뒤 · 유료화 켜기 전에). 셈은 앱마다 따로.
+     로그인 직후·앱을 열 때 device_touch → 가득이면 기기 목록 시트(오래 안 쓴 것 먼저)에서 하나를 내보낸다 · 내보내진 기기는 다음 확인 때 로그아웃. */
+  var 기기 = { 본: '', 가득: false };
+  function 기기켜짐() { var v = 설정.기기두대; return (typeof v === 'function' ? 부름(v, false) : v) === true && 열림(); }
+  function 기기아이디() {
+    try { var v = localStorage.getItem('_dev_' + 설정.app); if (v && v.length >= 16) return v;
+      var a = new Uint8Array(16); (window.crypto || {}).getRandomValues ? crypto.getRandomValues(a) : a.forEach(function (_, i) { a[i] = Math.random() * 256; });
+      v = 'd' + [].map.call(a, function (b) { return ('0' + b.toString(16)).slice(-2); }).join(''); localStorage.setItem('_dev_' + 설정.app, v); return v; } catch (e) { return ''; }
+  }
+  function 기기갈래() { var u = navigator.userAgent || ''; return /iPhone/.test(u) ? 'iPhone' : /iPad/.test(u) ? 'iPad' : /Android/.test(u) ? (/Mobile/.test(u) ? 'Android 폰' : 'Android 태블릿') : /Windows/.test(u) ? 'Windows PC' : /Mac OS X/.test(u) ? 'Mac' : '기기'; }
+  function 기기날(t) { try { var d = new Date(t); return d.getFullYear() + '.' + (d.getMonth() + 1) + '.' + d.getDate(); } catch (e) { return ''; } }
+  function 기기확인(굳이) {
+    if (!기기켜짐()) return; var m = 메일(); if (!m || (!굳이 && 기기.본 === m)) return; 기기.본 = m;
+    var id = 기기아이디(); if (!id) return;
+    서버().준비().then(function (sb) { return sb.rpc('device_touch', { p_app: 설정.app, p_device: id, p_label: 기기갈래() }); }).then(function (r) {
+      var d = r && r.data; if (!d || d.ok) { 기기.가득 = false; return; }
+      if (d.why === 'revoked') { 알림(말('다른 기기에서 이 기기를 내보냈어요. 다시 로그인하시면 이어서 쓸 수 있어요.')); 기기.본 = ''; 나가기(); return; }
+      if (d.why === 'full') { 기기.가득 = true; 기기시트(d.devices || []); }
+    }).catch(function () {});
+  }
+  function 기기시트(목록) {
+    var 나 = 기기아이디(), 가득 = 기기.가득;
+    var h = '<div class="acctsheet"><p class="acct-lead">' + esc(말(가득 ? '이 계정은 이미 두 대에서 쓰고 있어요. 이 기기에서 쓰시려면 한 대를 내보내 주세요. 내보낸 기기는 로그아웃되고, 기록은 계정에 그대로 있어요.' : '이 계정으로 로그인한 기기예요. 이용권 하나로 두 대까지 쓸 수 있고, 가족과 나눠 쓰셔도 돼요.')) + '</p>'
+      + 목록.map(function (x, i) { var 이 = x.device === 나;
+          return '<div class="acctcard"><div class="acct-row"><b>' + esc(x.label ? 말(x.label) : 말('기기')) + (이 ? ' · ' + esc(말('이 기기')) : '') + '</b>'
+            + (가득 && i === 0 ? '<i>' + esc(말('가장 오래 안 쓴 기기')) + '</i>' : '') + '</div>'
+            + '<div class="acct-row"><i>' + esc(말('마지막 사용')) + '</i><b>' + esc(기기날(x.last_at)) + '</b></div>'
+            + '<button type="button" class="acct-alt" onclick="계정.기기내보내기(\'' + esc(x.device) + '\')">' + esc(말('내보내기')) + '</button></div>'; }).join('')
+      + (가득 ? '<button type="button" class="acct-link" onclick="계정.나가기();계정.기기닫기()">' + esc(말('이 기기에서는 로그아웃')) + '</button>' : '') + '</div>';
+    시트(h, 말('내 기기'));
+  }
+  function 기기열기() {
+    if (!기기켜짐() || !메일()) return;
+    기기.가득 = false;
+    서버().준비().then(function (sb) { return sb.rpc('device_list', { p_app: 설정.app }); }).then(function (r) {
+      if (!r || r.error || !Array.isArray(r.data)) throw 0; 기기시트(r.data); }).catch(function () { 알림(말('기기 목록을 불러오지 못했어요. 잠시 뒤 다시 해 주세요.')); });
+  }
+  function 기기내보내기(id) {
+    var 나 = 기기아이디();
+    서버().준비().then(function (sb) { return sb.rpc('device_release', { p_app: 설정.app, p_device: id }); }).then(function (r) {
+      if (!r || r.error) throw 0;
+      if (id === 나) { 닫기(); 기기.본 = ''; 나가기(); return; }
+      if (기기.가득) { 기기.가득 = false; 닫기(); 알림(말('내보냈어요. 이 기기에서 이어서 쓰실 수 있어요.')); 기기확인(true); return; }
+      알림(말('내보냈어요.')); 기기열기();
+    }).catch(function () { 알림(말('기기 목록을 불러오지 못했어요. 잠시 뒤 다시 해 주세요.')); });
+  }
+
+  window.계정 = { __v: 1,
+    설치: function (o) {
+      for (var k in o) if (Object.prototype.hasOwnProperty.call(o, k)) 설정[k] = o[k];
+      if (부름(설정.앱동의됨, false) === true) 가입표시();   /* 10-30 — 가입 부품의 첫 확인(설치 600ms 뒤)보다 먼저 */
+      document.addEventListener('keydown', function (e) {
+        if (e.key !== 'Enter' || e.isComposing || !e.target || !e.target.closest || !e.target.closest('.acctsheet')) return;
+        if (e.target.id === 'srvEmail') { e.preventDefault(); e.stopPropagation(); var p = document.getElementById('srvPw'); if (p) p.focus(); }
+        else if (e.target.id === 'srvPw') { e.preventDefault(); e.stopPropagation(); 계속(); }
+      }, true);
+      setInterval(function () { 머리단추새로(false); }, 2000);
+      document.addEventListener('visibilitychange', function () { if (document.visibilityState === 'visible') 머리단추새로(false); });
+      var css = document.createElement('style');
+      css.textContent = ''
+        + '.acctbtn{flex:0 0 auto;min-width:44px;height:44px;padding:0 12px;border:1px solid var(--line,rgba(0,0,0,.15));border-radius:999px;background:var(--card,#fff);color:var(--accent,#2f5d50);font-weight:700;font-size:15px;line-height:1;font-family:inherit;cursor:pointer;white-space:nowrap}'
+        + '.acctbtn .acct-ic{display:none}.acctbtn{display:inline-flex;align-items:center;justify-content:center}.acctbtn.in{width:44px;padding:0;border:0;background:var(--accent,#2f5d50);color:var(--on-accent,#fff);font-size:17px}'
+        + '.acctcard,.acctsheet{display:flex;flex-direction:column;gap:10px}'
+        + '.acctcard{padding:16px;margin-bottom:12px;border:1px solid var(--line,rgba(0,0,0,.12));border-radius:16px;background:var(--card,#fff)}'
+        + '.acctsheet .acctcard{margin-bottom:0}'
+        + '.acct-me{display:flex;align-items:center;gap:12px}.acct-me>div{display:flex;flex-direction:column;gap:2px;min-width:0}.acct-me b{font-size:16px;word-break:break-all}.acct-me span{font-size:15px;opacity:.75;line-height:1.5;word-break:keep-all}'
+        + '.acct-av{flex:0 0 44px;width:44px;height:44px;border-radius:50%;display:grid;place-items:center;background:var(--accent,#2f5d50);color:var(--on-accent,#fff);font-weight:700;font-size:18px}.acct-av.off{background:var(--sage-t,var(--line,#eee));color:var(--accent,#333)}'
+        + '.acct-row{display:flex;justify-content:space-between;gap:12px;font-size:15px;padding:2px 0}.acct-row i{font-style:normal;opacity:.7}.acct-row b{font-weight:600;text-align:right}'
+        + '.acct-btns{display:flex;gap:8px}.acct-say{margin:10px 0 0;padding:12px 14px;border-radius:12px;background:var(--accent-soft,rgba(47,111,104,.10));color:inherit;font-size:15px;line-height:1.55;word-break:keep-all;overflow-wrap:anywhere}.acct-btns button{flex:1;min-height:44px;display:inline-flex;align-items:center;justify-content:center;text-align:center;padding:0 12px;border:1px solid var(--line,rgba(0,0,0,.18));border-radius:999px;background:transparent;color:inherit;font-weight:600;font-size:15px;line-height:1;font-family:inherit;cursor:pointer}'
+        + '.acct-del{align-self:flex-start;background:none;border:0;min-height:40px;padding:6px 0;color:inherit;opacity:.6;font:inherit;font-size:15px;cursor:pointer;text-decoration:none}'
+        + '.acct-main,.acct-alt{width:100%;min-height:52px;border-radius:14px;font-weight:700;font-size:17px;line-height:1.2;font-family:inherit;cursor:pointer}'
+        + '.acct-or{display:flex;align-items:center;gap:10px;margin:6px 0 2px;font-size:14px;opacity:.7}.acct-or:before,.acct-or:after{content:"";flex:1;border-top:1px solid currentColor;opacity:.35}'
+        + '.acct-soc{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;min-height:48px;border-radius:12px;font-size:16px;font-weight:600;cursor:pointer;font-family:inherit}'
+        + '.acct-main{border:0;background:var(--accent,#2f5d50);color:var(--on-accent,#fff)}.acct-main:disabled{opacity:.6;cursor:wait}'
+        + '.acct-alt{border:1px solid var(--line,rgba(0,0,0,.18));background:var(--card,#fff);color:inherit}'
+        + '.acct-start{display:flex;flex-direction:column;gap:10px;margin-top:14px}'
+        + '.acctsheet label{font-weight:600;font-size:15px;margin-top:2px}.acctsheet input[type=email],.acctsheet input[type=password]{width:100%;box-sizing:border-box;min-height:48px;padding:10px 12px;border:1px solid var(--line,rgba(0,0,0,.18));border-radius:12px;font:inherit;background:var(--card,#fff);color:inherit}'
+        + '.acct-chk.bad{outline:2px solid #c0392b;outline-offset:4px;border-radius:8px}.acct-err{margin:4px 0 2px 32px;color:#c0392b;font-size:15px;font-weight:600;line-height:1.5}.acct-chk{display:flex;align-items:flex-start;gap:10px;font-weight:400 !important;line-height:1.55;cursor:pointer;margin-top:4px}.acct-chk input{flex:none;width:22px;height:22px;margin:1px 0 0;accent-color:var(--accent,#2f5d50)}'
+        + '.acct-req{display:inline-block;margin-left:4px;padding:0 6px;border-radius:6px;font-size:15px;font-weight:700;background:var(--clay-t,#f6e3dc);color:var(--clay-ink,#8a3b22)}'
+        + '.acct-lead{margin:0 0 4px;line-height:1.6;word-break:keep-all}.acct-dim{font-weight:400;opacity:.7}.acct-tiny{margin:0;font-size:15px;opacity:.75;line-height:1.6;word-break:keep-all}'
+        + '.acct-chips{display:flex;flex-wrap:wrap;gap:8px}.acct-chip{min-height:44px;padding:0 16px;border:1px solid var(--line,rgba(0,0,0,.18));border-radius:999px;background:var(--card,#fff);color:inherit;font-weight:600;font-size:15px;line-height:1.2;font-family:inherit;cursor:pointer}.acct-chip.on{border-color:var(--accent,#2f5d50);box-shadow:0 0 0 2px var(--accent,#2f5d50) inset;color:var(--accent,#2f5d50)}'
+        + '.acct-birth{display:flex;gap:8px}.acct-sel{flex:1;min-height:48px;padding:0 10px;border:1px solid var(--line,rgba(0,0,0,.18));border-radius:12px;background:var(--card,#fff);color:inherit;font-size:16px;font-family:inherit}.acct-pic{width:28px;height:28px;border-radius:50%;vertical-align:middle;object-fit:cover}'
+        + '.acctsheet input[type=text]{width:100%;box-sizing:border-box;min-height:48px;padding:10px 12px;border:1px solid var(--line,rgba(0,0,0,.18));border-radius:12px;font:inherit;background:var(--card,#fff);color:inherit}'
+        + '.acct-link{align-self:flex-start;background:none;border:0;min-height:40px;padding:6px 0;color:var(--accent,inherit);font:inherit;font-size:15px;font-weight:700;cursor:pointer;text-decoration:none}';
+      document.head.appendChild(css);
+    },
+    머리단추HTML: 머리단추HTML, 머리단추새로: function () { 머리단추새로(true); }, 카드HTML: 카드HTML, 시작단추HTML: 시작단추HTML,
+    열기: 열기, 계속: 계속, 소셜: 소셜, 비번: 비번, 나가기: 나가기, 동기화: 동기화, 지우기: 지우기,
+    처리방침: function () { try { if (typeof 설정.처리방침 === 'function') 설정.처리방침(); } catch (e) {} },
+    로그인됨: function () { return !!메일(); }, 열림: 열림,
+    프로필: function () { 프로필읽기().then(function () { 프로필열기(false); }); }, 프로필고름: 프로필고름, 프로필저장: 프로필저장, 프로필확인: 프로필확인   /* 프로필1030 */,
+    기기켜짐: 기기켜짐, 기기확인: function () { 기기확인(true); }, 기기열기: 기기열기, 기기내보내기: 기기내보내기, 기기닫기: 닫기,   /* 기기두대1110 */
+    이앱탈퇴: 이앱탈퇴, 전부지우기: function () { 닫기(); return 지우기전부(); }   /* 앱별가입1111 */
+  };
+})();
+/* ▲▲ 계정 부품 끝 ▲▲ */
+/* ▼▼ 회원권 부품 시작 ▼▼ */
+/* ═══ 메디나눔 회원권 — 「가입하면 뭐가 좋은지」 한 장 시트 · 다섯 앱 공용 (2026-11-03 현욱님 「가장 중요한 것」 · 주인: 길동무 세션)
+   요청서 docs/requests/20261103_메디나눔_회원권_혜택화면.md
+   1등은 이렇게 한다 → 우리는 여기서 앞선다
+     · 결제 화면 1등(Headspace·Calm·Apple One·Medisafe)은 혜택 3개 이하 · 가격 한 줄 · 체험 강조 · 해지 쉬움.
+       혜택을 길게 늘어놓으면 체험 수락이 떨어진다(Strava 시험, lazyweb.com/research/strava-low-density-trial-paywall).
+     · 체험이 「며칠째 무엇이 일어나는지」 보여 주는 곳은 결제 화면 1,204개 중 3.2%뿐(lazyweb.com/research/is-a-7-day-free-trial-the-default).
+     · 우리: 한 번 가입으로 가족 건강 다섯 갈래(아이·암·마음·약·진료 계산)가 열리고, 응급·안전 기능은 늘 열림 — 첫 줄에서 느끼게.
+       잠긴 기능을 누르면 그 기능이 강조된 채 「어디서 쓰는지」 경로까지 · 회원이면 같은 자리에서 바로 열기(회원이 기능을 못 찾는 일 막기).
+   시트 한 장(위에서 아래로): 머리(한 줄 · 값 · 14일 체험) → 좋은 점 셋 → 이 앱에서 열리는 것(경로·작은 그림·회원이면 열기)
+     → 다른 네 앱 → 늘 열려 있는 것 → 14일 흐름 → 단추(판매 전 「열리면 알려 주세요」 · 판매 뒤 「14일 써 보기」) · 해지·환불 작은 글
+   들어오는 길: 설정 줄(회원권.줄() · 회원권.줄HTML()) · 홈 띠(회원권.띠HTML() — 닫으면 7일 · 처음 쓰신 날부터 이틀 뒤에) · 잠긴 기능(구독.막힘 을 감싼다)
+   기댐: 구독 부품(window.구독 — 상태·회원권구매·관리열기·막힘) · 가입 부품(운영자). 없어도 시트는 열린다(값과 「곧 열려요」).
+   ⛔ 판매 전에는 결제 단추 없음(되는 척 금지) · 돈 안 드는 뜻의 그 낱말 없음 · 이중 꺾쇠 없음 · 이모지 없음.
+
+   쓰는 법(앱 끝, 구독.설치 · 가입.설치 뒤):
+     회원권.설치({ app:'gildongmu',
+       언어: function(){ return 'ko'|'en'|'es'|'ja'|'zh' },            // 없으면 <html lang>
+       가격: { 월:12900, 연:99000, 출시월:9900, 출시연:79000 },          // 구독.설치 의 회원권 값과 같게
+       판매: function(){ return false },                               // 스토어 상품 등록 뒤 true — 그때부터 「14일 써 보기」
+       자료: { 앱:'gildongmu', 정체:{ko:'…',en:'…',es,ja,zh},
+               기능:[{ id:'labs', 이름:{…}, 쓸모:{…}, 어디서:{…}, 그림:'trend', 가기:"closeSheet();openSheet('tool-labs')" }, …],   // 3~5개 · id = 구독 잠금 id
+               늘열림:[{…}, {…}, {…}] },                                // 회원이 아니어도 늘 열린 안전 기능 2~4개
+       시트열기: function(html, 제목){…}, 시트닫기: function(){…}, 알림: function(t){…},
+       알림받기: function(){…},     // 선택 — 「열리면 알려 주세요」를 누른 뒤 앱 알림 설정을 열고 싶으면
+       모양: { 주:'btn wide', 보조:'btn line wide' } });                 // 앱의 기존 단추 클래스(새 색 없음)
+     설정 줄:  회원권.줄() → { 제목, 설명, 값 } 을 앱의 줄 모양으로 · 또는 회원권.줄HTML()
+     홈 띠:    회원권.띠HTML() (조건이 안 맞으면 '')
+     잠긴 기능: 구독.설치 문구에 막힘앞: function(id){ return window.회원권 ? 회원권.강조HTML(id) : ''; } 한 줄 — 막힘 시트 맨 위에
+                그 기능(강조·어디서)과 「회원권 하나로 다섯 앱」 줄이 얹힌다. 이 앱 체험·로그인·동의 흐름은 구독 부품 그대로.
+                (가로채기:true 면 막힘 시트 대신 회원권 시트를 연다 — 판매 시작 뒤 고를 일)
+     그림 이름: sync · trend · paper · cal · family · book · leaf · star · copy · case · bell · chart
+
+   다섯 앱 자료 틀(각 앱 세션이 자기 앱 설치에 채운다 — 이름·쓸모·어디서는 다섯 말 {ko,en,es,ja,zh})
+     kids        기능: sync(동기화·여러 기기) · kids3(아이 셋째부터) · growth(성장곡선 백분위 추이, trend) · baby_trend(아기 하루 7일 넘는 이력·주간 그래프, chart) · ics(접종 달력, cal) · visit(진료 준비 한 장 PDF, paper)   (유료화 v2 · 11-03 소아)
+                 늘열림: 지금 병원에 가야 하는지 · 해열제 양 계산 · 응급실 찾기
+     gildongmu   기능: sync · labs(피검사 추이, trend) · visit(진료 준비 한 장·PDF, paper) · calendar(달력 내보내기, cal)
+                 늘열림: 체온과 열날 때 할 일 · 위험 신호와 지금 연락 · 응급실 찾기·마음 위기 · 암 정보 글
+     clinicscore 기능: sync · trend(검사 추이, chart) · cases(사례집, case) · fav(즐겨찾기 6개째부터, star) · handoff(인계용 복사, copy) · deep(깊은 해설, book)
+                 늘열림: 모든 계산기 · 응급 알고리즘
+     gyeote      기능: sync · tests(유형 검사 전부) · history(결과 보관·추이, trend) · report(마음 리포트, chart) · visit(진료 준비 한 장·PDF, paper) · garden(마음 정원 꾸미기, leaf)
+                 늘열림: 힘들 땐(109 · 1577-0199 · 119) · 숨 고르기 · 나만의 안전 계획
+     yakjido     (약지도 세션이 같은 꼴로 따로 — 가족 약통 · 가족 알림)
+*/
+(function () {
+  if (window.회원권 && window.회원권.__v) return;
+  var 판 = '2026-11-11a';
+  /* 값은 여기 한 곳(원칙_결정 10-21·11-03) — 앱 하나: 월 5,900 · 연 49,000(출시 4,900 · 39,900) / 다섯 앱 회원권: 월 12,900 · 연 99,000(출시 9,900 · 79,000) · 체험 14일 */
+  var 값표 = { 앱: { 월: 5900, 연: 49000, 출시월: 4900, 출시연: 39900 }, 회원권: { 월: 12900, 연: 99000, 출시월: 9900, 출시연: 79000 } };
+  var 설정 = { app: 'app', 가로채기: false, 언어: null, 가격: 값표.회원권, 앱가격: 값표.앱, 판매: null, 자료: null,
+               시트열기: null, 시트닫기: null, 알림: null, 알림받기: null, 모양: {} };
+  var 말들 = ['ko', 'en', 'es', 'ja', 'zh'];
+
+  /* 다섯 앱 — 다른 앱 카드(정체 한 줄 · 회원이면 열리는 대표 하나). 아이콘은 공개 누리집의 앱 아이콘(못 받으면 첫 글자 동그라미) */
+  var 앱들 = {
+    kids: { 주소: 'https://kids.medinanum.com/', 그림: 'https://medinanum.com/img/kids.png', 색: '#E58F65',
+      이름: { ko: '우리 집 소아과', en: 'Our Home Pediatrics', es: 'Our Home Pediatrics', ja: 'Our Home Pediatrics', zh: 'Our Home Pediatrics' },
+      정체: { ko: '아이가 아플 때 — 지금 병원에 가야 하는지부터', en: 'When your child is unwell — starting with whether to go now', es: 'Cuando su hijo se pone malo: primero, si hay que ir ya', ja: '子どもの具合が悪いとき — まず今すぐ受診すべきかから', zh: '孩子不舒服时——先判断要不要马上就医' },
+      대표: { ko: '성장곡선 백분위 추이', en: 'Growth percentile trends', es: 'Evolución de los percentiles de crecimiento', ja: '成長曲線のパーセンタイル推移', zh: '生长曲线百分位变化' } },
+    gildongmu: { 주소: 'https://gildongmu.medinanum.com/', 그림: 'https://medinanum.com/img/gildongmu.png', 색: '#356A63',
+      이름: { ko: '길동무', en: 'Wayfellow', es: 'Wayfellow', ja: 'Wayfellow', zh: 'Wayfellow' },
+      정체: { ko: '암과 함께 걷는 길 — 체온·증상·진료 준비', en: 'Walking alongside cancer — temperature, symptoms, visit prep', es: 'Acompañarle con el cáncer: temperatura, síntomas y consultas', ja: 'がんと歩む道 — 体温・症状・受診の準備', zh: '与癌同行——体温、症状、就诊准备' },
+      대표: { ko: '피검사 추이', en: 'Blood test trends', es: 'Evolución de los análisis de sangre', ja: '血液検査の推移', zh: '血液检查变化趋势' } },
+    clinicscore: { 주소: 'https://cs.medinanum.com/', 그림: 'https://medinanum.com/img/cs.png', 색: '#2F4C7A',
+      이름: { ko: 'ClinicScore', en: 'ClinicScore', es: 'ClinicScore', ja: 'ClinicScore', zh: 'ClinicScore' },
+      정체: { ko: '의료인용 임상 점수 — 계산 뒤 할 일까지', en: 'Clinical scores for clinicians — including what to do next', es: 'Escalas clínicas para profesionales, con el paso siguiente', ja: '医療者向けの臨床スコア — 計算の後にすることまで', zh: '面向医务人员的临床评分——连同下一步该做什么' },
+      대표: { ko: '사례집 · 깊은 해설', en: 'Case library · in-depth notes', es: 'Casos clínicos · notas a fondo', ja: '症例集 · くわしい解説', zh: '病例集 · 深度解析' } },
+    gyeote: { 주소: 'https://gyeote.medinanum.com/', 그림: 'https://medinanum.com/img/gyeote.png', 색: '#7A6AA8',
+      이름: { ko: '곁에', en: 'Gyeote', es: 'Gyeote', ja: 'Gyeote', zh: 'Gyeote' },
+      정체: { ko: '마음이 힘들 때 곁에서 — 살펴보기와 나만의 계획', en: 'Beside you when your mind is heavy — check-ins and your own plan', es: 'A su lado cuando la mente pesa: autoevaluación y su propio plan', ja: '心がつらいときにそばで — セルフチェックと自分の計画', zh: '心里难受时陪在身边——自我检查和自己的计划' },
+      대표: { ko: '마음 리포트', en: 'Mood report', es: 'Informe del estado de ánimo', ja: 'こころのレポート', zh: '心情报告' } },
+    yakjido: { 주소: 'https://yakjido.medinanum.com/', 그림: 'https://medinanum.com/img/yakjido.png', 색: '#3D7A5A',
+      이름: { ko: '약지도', en: 'Yakjido', es: 'Yakjido', ja: 'Yakjido', zh: 'Yakjido' },
+      정체: { ko: '집에서 할 일 · 약국 약 · 진료 신호를 차례로', en: 'Home care, pharmacy medicines and when to see a doctor — in order', es: 'Qué hacer en casa, qué pedir en la farmacia y cuándo ir al médico', ja: '家でできること・薬局の薬・受診のサインを順番に', zh: '居家处理、药店用药、就医信号——依次告诉你' },
+      대표: { ko: '가족 약통 · 가족 알림', en: 'Family medicine box · family reminders', es: 'Botiquín familiar · avisos para la familia', ja: '家族の薬箱 · 家族への通知', zh: '家庭药箱 · 家人提醒' } }
+  };
+  var 앱차례 = ['kids', 'gildongmu', 'yakjido', 'gyeote', 'clinicscore'];
+
+  var 글표 = {
+    ko: { 강조줄: '이 기능을 포함해 다섯 앱의 회원 기능 · 값과 늘 열린 것 보기', 제목: '메디나눔 회원권', 머리: '회원권 하나로 <b>다섯 앱</b>이 모두 열려요', 갈래: '아이 · 암 · 마음 · 약 · 진료 계산 — 가족 건강 다섯 갈래를 한 번에',
+      월: '월 {n}원', 연: '연 {n}원', 출시: '출시 기념가', 출시뒤: '출시 3개월 안에 가입하면 첫해 동안 · 그 뒤 {월} · {연}', 체험: '14일 써 보고 정하세요', 이앱하나: '이 앱 하나', 회원권다섯: '다섯 앱 회원권', 그뒤: '그 뒤 {월} · {연}', 출시때: '출시 기념가는 회원권이 열리는 날부터 3개월 안에 가입하면 첫해 동안이에요', 두대: '기기 두 대까지 · 가족과 나눠 쓰셔도 돼요', 자동: '14일 체험 뒤 자동 결제돼요 · 부가세 포함 · 설정에서 언제든 해지', 자동곧: '열리면 이렇게 결제돼요 — 체험 14일이 끝나는 날 고르신 요금이 자동 결제 · 부가세 포함 · 설정에서 언제든 해지',
+      좋은점: '회원이 되면', 좋1: '폰을 바꿔도 기록이 그대로', 좋1말: '계정에 저장해 새 폰·다른 기기에서 이어서 써요', 좋2: '진료 갈 때 한 장으로', 좋2말: '그동안의 기록을 한 장·PDF로 정리해 보여 드려요', 좋3: '가족과 함께', 좋3말: '아이 여럿 · 가족 약 알림까지 한 계정으로',
+      이앱: '{앱}에서 열리는 것', 지금: '지금 누르신 기능', 강조말: '이 기능은 회원권으로 열려요. 어디서 쓰는지 아래에 적어 두었어요.', 어디서: '어디서', 열기: '열기',
+      다른: '다른 네 앱에서도', 앱열기: '열어 보기', 회원이면: '회원이면', 늘: '늘 열려 있는 것', 늘말: '응급·안전 기능은 회원이 아니어도 <b>늘 열려 있어요</b>.',
+      흐름: '14일 체험은 이렇게', 흐1: '<b>오늘</b> — 다섯 앱이 모두 열려요', 흐2: '<b>12일째</b> — 끝나기 2일 전에 앱에서 미리 알려 드려요', 흐3: '<b>14일째</b> — 해지하지 않으면 고르신 요금으로 이어져요',
+      곧: '곧 열려요', 곧말: '회원권은 스토어 등록을 마치는 대로 열려요. 지금은 값과 내용을 미리 보여 드려요.', 알림받기: '열리면 알려 주세요', 알림됨: '열리면 이 앱에서 알려 드릴게요',
+      시작: '14일 써 보기', 연시작: '1년으로 시작 · {값}', 이앱만: '이 앱만 쓰기', 해지: '언제든 해지할 수 있어요', 환불: '환불 규정',
+      회원: '회원 · 다섯 앱 열림', 까지: '{날}까지', 회원말: '이 앱에서 바로 쓸 수 있어요', 운영자: '운영자 · 모든 기능', 관리: '구독 관리',
+      이앱구독: '이 앱은 구독으로 열려 있어요. 회원권으로 바꾸면 다른 네 앱도 함께 열려요.',
+      줄설명: '다섯 앱이 한 번에 열려요 · 무엇이 열리는지', 띠: '회원권 하나로 다섯 앱이 모두 열려요', 띠열림: '메디나눔 회원권이 열렸어요', 띠보기: '무엇이 열리나', 닫기: '닫기', 날: '{m}월 {d}일' },
+    en: { 강조줄: 'This feature and the member features of all five apps · price and what stays open', 제목: 'Medinanum Pass', 머리: 'One pass opens <b>all five apps</b>', 갈래: 'Children · cancer · mind · medicines · clinical scores — five sides of family health at once',
+      월: '₩{n}/month', 연: '₩{n}/year', 출시: 'Launch price', 출시뒤: 'Join within 3 months of launch for your first year · then {월} · {연}', 체험: 'Try it for 14 days, then decide', 이앱하나: 'This app only', 회원권다섯: 'Five-app pass', 그뒤: 'then {월} · {연}', 출시때: 'Launch prices apply for your first year if you join within 3 months of the day the pass opens', 두대: 'Up to two devices · you may share it with family', 자동: 'Billed automatically after the 14-day trial · VAT included · cancel any time in Settings', 자동곧: 'When it opens, billing works like this — the plan you choose is charged automatically on the day the 14-day trial ends · VAT included · cancel any time in Settings',
+      좋은점: 'As a member', 좋1: 'Your records stay when you change phones', 좋1말: 'Saved to your account so you can carry on on a new phone or another device', 좋2: 'One page for your visit', 좋2말: 'Your records gathered on one page or a PDF to show your doctor', 좋3: 'Together with family', 좋3말: 'Several children and family medicine reminders under one account',
+      이앱: 'What opens in {앱}', 지금: 'The feature you just tapped', 강조말: 'This feature opens with the pass. Where to find it is written below.', 어디서: 'Where', 열기: 'Open',
+      다른: 'Also in the other four apps', 앱열기: 'Take a look', 회원이면: 'Members get', 늘: 'Always open', 늘말: 'Emergency and safety features are <b>always open</b>, member or not.',
+      흐름: 'How the 14-day trial works', 흐1: '<b>Today</b> — all five apps open', 흐2: '<b>Day 12</b> — the app reminds you 2 days before the trial ends', 흐3: '<b>Day 14</b> — unless you cancel, it continues at the price you chose',
+      곧: 'Coming soon', 곧말: 'The pass opens as soon as store registration is done. For now you can see the price and what it includes.', 알림받기: 'Tell me when it opens', 알림됨: "We'll let you know in this app when it opens",
+      시작: 'Try 14 days', 연시작: 'Start yearly · {값}', 이앱만: 'Just this app', 해지: 'Cancel any time', 환불: 'Refund policy',
+      회원: 'Member · all five apps open', 까지: 'until {날}', 회원말: 'You can use these in this app now', 운영자: 'Operator · all features', 관리: 'Manage subscription',
+      이앱구독: 'This app is open with its own subscription. Switch to the pass and the other four apps open too.',
+      줄설명: 'All five apps at once · see what opens', 띠: 'One pass opens all five apps', 띠열림: 'The Medinanum Pass is now open', 띠보기: 'See what opens', 닫기: 'Close', 날: '{mon} {d}' },
+    es: { 강조줄: 'Esta función y las funciones para miembros de las cinco apps · precio y lo que sigue abierto', 제목: 'Pase Medinanum', 머리: 'Un solo pase abre <b>las cinco apps</b>', 갈래: 'Niños · cáncer · salud mental · medicamentos · escalas clínicas: cinco áreas de la salud familiar a la vez',
+      월: '₩{n} al mes', 연: '₩{n} al año', 출시: 'Precio de lanzamiento', 출시뒤: 'Si se suscribe en los 3 primeros meses, durante el primer año · después {월} · {연}', 체험: 'Pruébelo 14 días y luego decida', 이앱하나: 'Solo esta app', 회원권다섯: 'Pase de cinco apps', 그뒤: 'después {월} · {연}', 출시때: 'El precio de lanzamiento se aplica el primer año si se suscribe en los 3 meses siguientes al día en que se abre el pase', 두대: 'Hasta dos dispositivos · puede compartirlo con su familia', 자동: 'Se cobra automáticamente al terminar la prueba de 14 días · IVA incluido · cancele cuando quiera en Ajustes', 자동곧: 'Cuando se abra, el cobro será así: el plan elegido se cobra automáticamente el día en que termina la prueba de 14 días · IVA incluido · cancele cuando quiera en Ajustes',
+      좋은점: 'Como miembro', 좋1: 'Sus registros se quedan aunque cambie de móvil', 좋1말: 'Se guardan en su cuenta para seguir en un móvil nuevo u otro dispositivo', 좋2: 'Una hoja para la consulta', 좋2말: 'Sus registros reunidos en una hoja o un PDF para enseñar al médico', 좋3: 'En familia', 좋3말: 'Varios hijos y avisos de medicación familiar en una sola cuenta',
+      이앱: 'Lo que se abre en {앱}', 지금: 'La función que acaba de tocar', 강조말: 'Esta función se abre con el pase. Abajo le indicamos dónde encontrarla.', 어디서: 'Dónde', 열기: 'Abrir',
+      다른: 'También en las otras cuatro apps', 앱열기: 'Ver', 회원이면: 'Con el pase', 늘: 'Siempre abierto', 늘말: 'Las funciones de urgencia y seguridad están <b>siempre abiertas</b>, sea o no miembro.',
+      흐름: 'Así funciona la prueba de 14 días', 흐1: '<b>Hoy</b>: se abren las cinco apps', 흐2: '<b>Día 12</b>: la app le avisa 2 días antes de que termine', 흐3: '<b>Día 14</b>: si no cancela, continúa con el precio que eligió',
+      곧: 'Muy pronto', 곧말: 'El pase se abrirá en cuanto terminemos el registro en la tienda. Por ahora puede ver el precio y lo que incluye.', 알림받기: 'Avísenme cuando se abra', 알림됨: 'Le avisaremos en esta app cuando se abra',
+      시작: 'Probar 14 días', 연시작: 'Empezar con el plan anual · {값}', 이앱만: 'Solo esta app', 해지: 'Puede cancelar cuando quiera', 환불: 'Política de reembolso',
+      회원: 'Miembro · cinco apps abiertas', 까지: 'hasta el {날}', 회원말: 'Puede usarlas ya en esta app', 운영자: 'Operador · todas las funciones', 관리: 'Gestionar la suscripción',
+      이앱구독: 'Esta app está abierta con su propia suscripción. Con el pase se abren también las otras cuatro.',
+      줄설명: 'Las cinco apps a la vez · qué se abre', 띠: 'Un solo pase abre las cinco apps', 띠열림: 'El Pase Medinanum ya está abierto', 띠보기: 'Qué se abre', 닫기: 'Cerrar', 날: '{d} de {mes}' },
+    ja: { 강조줄: 'この機能を含む5つのアプリの会員機能 · 料金といつでも使えるもの', 제목: 'メディナヌム会員パス', 머리: 'パスひとつで<b>5つのアプリ</b>がすべて使えます', 갈래: '子ども・がん・こころ・薬・臨床スコア — 家族の健康の5つの分野をまとめて',
+      월: '月額₩{n}', 연: '年額₩{n}', 출시: '発売記念価格', 출시뒤: '発売から3か月以内の登録で最初の1年間 · その後は{월} · {연}', 체험: '14日間使ってから決めてください', 이앱하나: 'このアプリだけ', 회원권다섯: '5つのアプリの会員パス', 그뒤: 'その後は{월} · {연}', 출시때: '発売記念価格は、会員パスが始まる日から3か月以内に登録すると最初の1年間適用されます', 두대: '端末は二台まで · 家族と分け合ってもかまいません', 자동: '14日間の体験後に自動で課金されます · 税込 · 設定からいつでも解約', 자동곧: '開始後はこのように課金されます — 14日間の体験が終わる日に選んだ料金を自動課金 · 税込 · 設定からいつでも解約',
+      좋은점: '会員になると', 좋1: 'スマホを替えても記録はそのまま', 좋1말: 'アカウントに保存され、新しいスマホや別の端末で続けられます', 좋2: '受診のときは1枚にまとめて', 좋2말: 'これまでの記録を1枚・PDFにまとめて見せられます', 좋3: '家族と一緒に', 좋3말: '子ども複数人・家族の薬の通知までひとつのアカウントで',
+      이앱: '{앱}で使えるようになるもの', 지금: 'いまタップした機能', 강조말: 'この機能は会員パスで使えます。どこで使うかを下に書いてあります。', 어디서: '場所', 열기: '開く',
+      다른: 'ほかの4つのアプリでも', 앱열기: '見てみる', 회원이면: '会員なら', 늘: 'いつでも使えるもの', 늘말: '緊急・安全の機能は会員でなくても<b>いつでも使えます</b>。',
+      흐름: '14日間の体験の流れ', 흐1: '<b>今日</b> — 5つのアプリがすべて使えます', 흐2: '<b>12日目</b> — 終わる2日前にアプリでお知らせします', 흐3: '<b>14日目</b> — 解約しなければ選んだ料金で続きます',
+      곧: 'まもなく開始', 곧말: '会員パスはストアへの登録が済みしだい始まります。いまは料金と内容を先にご覧いただけます。', 알림받기: '始まったら知らせてください', 알림됨: '始まったらこのアプリでお知らせします',
+      시작: '14日間使ってみる', 연시작: '年額で始める · {값}', 이앱만: 'このアプリだけ使う', 해지: 'いつでも解約できます', 환불: '返金の規定',
+      회원: '会員 · 5つのアプリが使えます', 까지: '{날}まで', 회원말: 'このアプリですぐに使えます', 운영자: '運営者 · すべての機能', 관리: 'サブスクリプションの管理',
+      이앱구독: 'このアプリは個別のサブスクリプションでご利用いただけます。会員パスに替えるとほかの4つのアプリも使えます。',
+      줄설명: '5つのアプリがまとめて使えます · 中身を見る', 띠: 'パスひとつで5つのアプリがすべて使えます', 띠열림: 'メディナヌム会員パスが始まりました', 띠보기: '中身を見る', 닫기: '閉じる', 날: '{m}月{d}日' },
+    zh: { 강조줄: '包括这个功能在内的五个应用会员功能 · 价格和一直开放的功能', 제목: 'Medinanum 会员卡', 머리: '一份会员订阅即可使用<b>全部五个应用</b>的会员功能', 갈래: '儿童 · 癌症 · 心理 · 用药 · 临床评分——家庭健康的五个方面一次全开',
+      월: '每月₩{n}', 연: '每年₩{n}', 출시: '上线纪念价', 출시뒤: '上线 3 个月内加入，第一年适用 · 之后{월} · {연}', 체험: '先用 14 天再决定', 이앱하나: '仅此应用', 회원권다섯: '五个应用会员', 그뒤: '之后{월} · {연}', 출시때: '自会员开放之日起 3 个月内加入，第一年享受上线纪念价', 두대: '最多两台设备 · 可以和家人共用', 자동: '14 天试用结束后自动扣费 · 含增值税 · 可随时在设置中取消', 자동곧: '开放后将这样扣费——14 天试用结束当天自动扣除所选方案的费用 · 含增值税 · 可随时在设置中取消',
+      좋은점: '成为会员后', 좋1: '换手机记录也还在', 좋1말: '保存在账号里，换新手机或其他设备也能接着用', 좋2: '就诊时一页就够', 좋2말: '把这段时间的记录整理成一页或 PDF 给医生看', 좋3: '和家人一起', 좋3말: '多个孩子、家人的用药提醒都在一个账号里',
+      이앱: '{앱}里会打开的功能', 지금: '您刚才点的功能', 강조말: '这个功能需要会员卡。在哪里使用写在下面。', 어디서: '位置', 열기: '打开',
+      다른: '另外四个应用里也有', 앱열기: '去看看', 회원이면: '会员可用', 늘: '一直开放的功能', 늘말: '急救和安全功能不是会员也<b>一直开放</b>。',
+      흐름: '14 天试用是这样的', 흐1: '<b>今天</b>——即可使用全部五个应用的会员功能', 흐2: '<b>第 12 天</b>——结束前 2 天在应用里提前提醒您', 흐3: '<b>第 14 天</b>——如果不取消，就按您选的价格继续',
+      곧: '即将开放', 곧말: '会员卡在应用商店登记完成后就会开放。现在可以先看价格和内容。', 알림받기: '开放时通知我', 알림됨: '开放时会在这个应用里通知您',
+      시작: '试用 14 天', 연시작: '按年开始 · {값}', 이앱만: '只用这个应用', 해지: '随时可以取消', 환불: '退款规定',
+      회원: '会员 · 已开通五个应用的会员功能', 까지: '到{날}', 회원말: '在这个应用里马上就能用', 운영자: '运营者 · 全部功能', 관리: '管理订阅',
+      이앱구독: '您已单独订阅此应用。改用会员订阅后，也可使用另外四个应用的会员功能。',
+      줄설명: '五个应用一次全开 · 看看有什么', 띠: '一份会员订阅即可使用全部五个应用的会员功能', 띠열림: 'Medinanum 会员卡已开放', 띠보기: '看看有什么', 닫기: '关闭', 날: '{m}月{d}日' }
+  };
+  var 달en = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  var 달es = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
+
+  function 언어() {
+    var l = null;
+    try { if (typeof 설정.언어 === 'function') l = 설정.언어(); } catch (e) {}
+    if (!l) l = (document.documentElement && document.documentElement.lang) || 'ko';
+    l = String(l).toLowerCase().slice(0, 2);
+    return 말들.indexOf(l) >= 0 ? l : 'ko';
+  }
+  function 채움(t, o) { return String(t).replace(/\{([^{}]+)\}/g, function (m, k) { return o && k in o ? o[k] : m; }); }
+  function 글(k, o) { var t = 글표[언어()][k]; if (t == null) t = 글표.en[k]; if (t == null) t = 글표.ko[k]; return 채움(t, o); }
+  function 골라(v) {   /* 앱이 준 글 — 글 · {ko,en,es,ja,zh} */
+    if (v == null) return '';
+    if (typeof v !== 'object') return String(v);
+    var l = 언어(); return v[l] != null ? v[l] : (v.en != null && l !== 'ko' ? v.en : (v.ko != null ? v.ko : ''));
+  }
+  function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
+  function 수(n) { var l = 언어(); return Number(n || 0).toLocaleString(l === 'es' ? 'es-ES' : (l === 'ko' ? 'ko-KR' : 'en-US')); }
+  function 월값(n) { return 글('월', { n: 수(n) }); }
+  function 연값(n) { return 글('연', { n: 수(n) }); }
+  function 날(t) {
+    var d = new Date(t), l = 언어();
+    return 글('날', { m: d.getMonth() + 1, d: d.getDate(), mon: 달en[d.getMonth()], mes: 달es[d.getMonth()] });
+  }
+  function 모(k, 기본) { var a = 설정.모양 && 설정.모양[k]; return a && a !== 기본 ? a + ' ' + 기본 : 기본; }   /* 11-10 — 앱 클래스가 그 자리에서만 꾸며지는 앱(곁에 .p)도 부품 단추 모양은 늘 */
+  function 판매() { try { return typeof 설정.판매 === 'function' ? !!설정.판매() : !!설정.판매; } catch (e) { return false; } }
+  function 키(k) { return '_pass_' + k + '_' + 설정.app; }
+  function 읽(k) { try { return localStorage.getItem(키(k)); } catch (e) { return null; } }
+  function 씀(k, v) { try { if (v == null) localStorage.removeItem(키(k)); else localStorage.setItem(키(k), String(v)); } catch (e) {} }
+  function 알림(t) { try { if (typeof 설정.알림 === 'function') 설정.알림(t); } catch (e) {} }
+  function 닫기() { try { if (typeof 설정.시트닫기 === 'function') 설정.시트닫기(); } catch (e) {} }
+
+  function 구독() { return window.구독 && typeof window.구독.상태 === 'function' ? window.구독 : null; }
+  function 운영자() { try { return !!(window.가입 && 가입.운영자 && 가입.운영자()); } catch (e) { return false; } }
+  function 지금상태() {   /* 'op' 운영자 · 'pass' 회원권 · 'app' 이 앱만 구독 · null */
+    if (운영자()) return { 종류: 'op' };
+    var g = 구독(); if (!g) return null;
+    try { var s = g.상태(); if (s && s.열림) return { 종류: s.회원권 ? 'pass' : 'app', until: s.until || null, status: s.status }; } catch (e) {}
+    return null;
+  }
+  function 회원() { var s = 지금상태(); return !!(s && (s.종류 === 'pass' || s.종류 === 'op')); }
+
+  /* ── 작은 그림 — 한 줄 획(앱 색을 따른다) ── */
+  var 그림들 = {
+    sync: '<rect x="6" y="6" width="14" height="24" rx="3"/><rect x="36" y="10" width="14" height="24" rx="3"/><path d="M22 14h10l-3-3M34 24H24l3 3"/>',
+    trend: '<path d="M6 32h44M6 32V6"/><path d="M10 26l9-7 8 4 10-10 9 3"/><circle cx="19" cy="19" r="1.6"/><circle cx="27" cy="23" r="1.6"/><circle cx="37" cy="13" r="1.6"/>',
+    chart: '<path d="M6 32h44"/><rect x="10" y="20" width="6" height="12" rx="1"/><rect x="22" y="12" width="6" height="20" rx="1"/><rect x="34" y="16" width="6" height="16" rx="1"/>',
+    paper: '<path d="M14 4h20l8 8v22H14z"/><path d="M34 4v8h8M19 16h16M19 22h16M19 28h10"/>',
+    cal: '<rect x="8" y="8" width="40" height="26" rx="3"/><path d="M8 15h40M16 5v6M40 5v6"/><path d="M15 21h4M26 21h4M37 21h4M15 28h4M26 28h4"/>',
+    family: '<circle cx="18" cy="12" r="5"/><circle cx="38" cy="12" r="5"/><circle cx="28" cy="20" r="3.6"/><path d="M8 34c0-7 4-11 10-11s8 3 8 6M48 34c0-7-4-11-10-11s-8 3-8 6M22 34c0-4 2.5-6.5 6-6.5s6 2.5 6 6.5"/>',
+    book: '<path d="M28 10c-5-3-12-4-20-3v24c8-1 15 0 20 3 5-3 12-4 20-3V7c-8-1-15 0-20 3z"/><path d="M28 10v24"/>',
+    leaf: '<path d="M12 32C12 16 24 6 46 6c0 22-12 30-26 30"/><path d="M12 32c8-8 16-14 24-18"/>',
+    star: '<path d="M28 5l6.5 13 14 2-10 9.8 2.4 14L28 37.3 15.1 43.8l2.4-14-10-9.8 14-2z" transform="scale(.82) translate(6 -1)"/>',
+    copy: '<rect x="10" y="10" width="22" height="24" rx="3"/><path d="M18 10V6h22a3 3 0 0 1 3 3v19h-11"/>',
+    case: '<path d="M6 12h16l4 4h24v18H6z"/><path d="M6 18h44"/>',
+    bell: '<path d="M18 28V18a10 10 0 0 1 20 0v10l4 4H14z"/><path d="M24 35a4 4 0 0 0 8 0"/>'
+  };
+  function 그림(n, 클) { var p = 그림들[n] || 그림들.paper; return '<svg class="' + (클 || 'mb-pic') + '" viewBox="0 0 56 40" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' + p + '</svg>'; }
+  var 닫기그림 = '<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>';
+
+  function 앱아이콘(k) {
+    var a = 앱들[k]; if (!a) return '';
+    var 첫 = esc(String(골라(a.이름)).charAt(0));
+    return '<span class="mb-ic" style="background:' + a.색 + '"><span aria-hidden="true">' + 첫 + '</span><img src="' + a.그림 + '" alt="" width="40" height="40" loading="lazy" onerror="this.remove()"></span>';
+  }
+
+  /* ── 시트 ── */
+  function 줄값(g, 이름, 강조) {
+    return '<div class="mb-plan' + (강조 ? ' on' : '') + '"><b class="mb-pn">' + 이름 + '</b>'
+      + (g.출시월 ? '<span class="mb-chip">' + 글('출시') + '</span><p class="mb-price"><b>' + 월값(g.출시월) + '</b>' + (g.출시연 ? '<b>' + 연값(g.출시연) + '</b>' : '') + '</p>'
+          + '<p class="mb-after">' + 글('그뒤', { 월: 월값(g.월), 연: 연값(g.연) }) + '</p>'
+        : '<p class="mb-price"><b>' + 월값(g.월) + '</b>' + (g.연 ? '<b>' + 연값(g.연) + '</b>' : '') + '</p>') + '</div>';
+  }
+  function 값머리() {
+    var g = 설정.가격 || 값표.회원권, a = 설정.앱가격 || 값표.앱, 앱 = 앱들[(설정.자료 && 설정.자료.앱) || 설정.app], h = '';
+    /* 전자상거래법 8·13조(11-09): 결제 전이면 「곧 열려요」를 값보다 위에 · 값 바로 아래 자동 결제·부가세·해지 한 줄 · 기념가는 기간과 그 뒤 값을 한 줄로
+       11-10 Main — 「이 앱 하나」와 「다섯 앱 회원권」을 이름 붙여 나란히(값은 값표 한 곳) */
+    if (!판매()) h += '<p class="mb-soonchip"><span class="mb-chip">' + 글('곧') + '</span></p>';
+    h += '<div class="mb-plans">' + 줄값(a, 글('이앱하나') + (앱 ? ' · ' + esc(골라(앱.이름)) : ''), false) + 줄값(g, 글('회원권다섯'), true) + '</div>';
+    if (g.출시월 || a.출시월) h += '<p class="mb-small">' + 글('출시때') + '</p>';
+    h += '<p class="mb-auto">' + 글(판매() ? '자동' : '자동곧') + '</p>';
+    var 덧 = 설정.자료 && 설정.자료.덧말;   /* 11-10 — 앱별 덧말 한 줄(예: CS 학생 요금) */
+    if (덧) h += '<p class="mb-small mb-add">' + 골라(덧) + '</p>';
+    return h;
+  }
+  function 좋은점() {
+    var 줄 = [['sync', '좋1', '좋1말'], ['paper', '좋2', '좋2말'], ['family', '좋3', '좋3말']];
+    return '<h3 class="mb-h">' + 글('좋은점') + '</h3><ul class="mb-three">' + 줄.map(function (r) {
+      return '<li>' + 그림(r[0], 'mb-ico') + '<span><b>' + 글(r[1]) + '</b><span>' + 글(r[2]) + '</span></span></li>';
+    }).join('') + '</ul>';
+  }
+  function 기능목록(강조, 열림) {
+    var d = 설정.자료 || {}, 목 = (d.기능 || []).slice(), 앱 = 앱들[d.앱 || 설정.app];
+    if (!목.length) return '';
+    if (강조) 목.sort(function (a, b) { return (b.id === 강조) - (a.id === 강조); });
+    var 이름 = 앱 ? 골라(앱.이름) : (골라(d.이름) || '');
+    return '<h3 class="mb-h">' + 글('이앱', { 앱: esc(이름) }) + '</h3>' + (열림 ? '<p class="mb-small">' + 글('회원말') + '</p>' : '')
+      + '<ul class="mb-feats">' + 목.map(function (f) {
+        var on = 강조 && f.id === 강조;
+        var 가기 = 열림 && f.가기 ? '<button type="button" class="mb-open" onclick="회원권.가기(\'' + esc(f.id) + '\')">' + 글('열기') + ' <span aria-hidden="true">›</span></button>' : '';
+        return '<li class="mb-feat' + (on ? ' on' : '') + '" data-id="' + esc(f.id) + '">' + 그림(f.그림) +
+          '<span class="mb-ft">' + (on ? '<span class="mb-chip">' + 글('지금') + '</span>' : '') + '<b>' + 골라(f.이름) + '</b>' +
+          (f.쓸모 ? '<span>' + 골라(f.쓸모) + '</span>' : '') +
+          (f.어디서 ? '<span class="mb-path"><span class="mb-pk">' + 글('어디서') + '</span> ' + 골라(f.어디서) + '</span>' : '') + '</span>' + 가기 + '</li>';
+      }).join('') + '</ul>';
+  }
+  function 다른앱(열림) {
+    var 지금 = (설정.자료 && 설정.자료.앱) || 설정.app;
+    return '<h3 class="mb-h">' + 글('다른') + '</h3><ul class="mb-apps">' + 앱차례.filter(function (k) { return k !== 지금; }).map(function (k) {
+      var a = 앱들[k];
+      return '<li><a class="mb-app" href="' + a.주소 + '" target="_blank" rel="noopener">' + 앱아이콘(k) +
+        '<span class="mb-at"><b>' + esc(골라(a.이름)) + '</b><span>' + 골라(a.정체) + '</span>' +
+        '<span class="mb-rep">' + 글('회원이면') + ' · ' + 골라(a.대표) + '</span></span><span class="mb-go">' + 글('앱열기') + ' <span aria-hidden="true">›</span></span></a></li>';
+    }).join('') + '</ul>';
+  }
+  function 늘열림() {
+    var 목 = (설정.자료 && 설정.자료.늘열림) || [];
+    return '<div class="mb-always"><h3 class="mb-h">' + 글('늘') + '</h3><p>' + 글('늘말') + '</p>' +
+      (목.length ? '<ul>' + 목.map(function (x) { return '<li>' + 골라(x) + '</li>'; }).join('') + '</ul>' : '') + '</div>';
+  }
+  function 흐름() {
+    return '<h3 class="mb-h">' + 글('흐름') + '</h3><ol class="mb-flow"><li>' + 글('흐1') + '</li><li>' + 글('흐2') + '</li><li>' + 글('흐3') + '</li></ol>';
+  }
+  function 단추들(강조) {
+    var g = 구독(), h = '', 앱만 = '';
+    if (g && typeof g.켜짐 === 'function' && g.켜짐()) 앱만 = '<button type="button" class="' + 모('보조', 'mb-btn2') + '" onclick="회원권.이앱만(\'' + esc(강조 || '') + '\')">' + 글('이앱만') + '</button>';
+    if (판매()) {
+      var 연 = (설정.가격 || {}).연;
+      h = '<button type="button" class="' + 모('주', 'mb-btn') + '" onclick="회원권.시작()">' + 글('시작') + '</button>' +
+        (연 ? '<button type="button" class="' + 모('보조', 'mb-btn2') + '" onclick="회원권.시작(\'year\')">' + 글('연시작', { 값: 연값((설정.가격 || {}).출시연 || 연) }) + '</button>' : '') + 앱만 +
+        '<p class="mb-small mb-c">' + 글('해지') + ' · <a href="https://medinanum.com/refund.html" target="_blank" rel="noopener">' + 글('환불') + '</a></p>';
+    } else {
+      var 됨 = !!읽('notify');
+      h = '<p class="mb-soon">' + 글('곧말') + '</p>' +
+        '<button type="button" id="mbNotify" class="' + 모(됨 ? '보조' : '주', 됨 ? 'mb-btn2' : 'mb-btn') + '" onclick="회원권.알림받기()"' + (됨 ? ' disabled aria-disabled="true"' : '') + '>' + 글(됨 ? '알림됨' : '알림받기') + '</button>' + 앱만 +
+        '<p class="mb-small mb-c">' + 글('해지') + ' · <a href="https://medinanum.com/refund.html" target="_blank" rel="noopener">' + 글('환불') + '</a></p>';
+    }
+    return '<div class="mb-cta">' + h + '</div>';
+  }
+  function 시트HTML(강조) {
+    var s = 지금상태(), 열림 = !!(s && (s.종류 === 'pass' || s.종류 === 'op'));
+    var h = '<div class="mb" id="mbSheet"><div class="mb-xbar"><button type="button" class="mb-x" aria-label="' + 글('닫기') + '" onclick="회원권.닫기()">' + 닫기그림 + '</button></div>';
+    if (열림) {
+      h += '<div class="mb-head mb-member"><p class="mb-lead"><b>' + 글(s.종류 === 'op' ? '운영자' : '회원') + '</b>' + (s.until && s.종류 !== 'op' ? ' · ' + 글('까지', { 날: 날(s.until) }) : '') + '</p>' +
+        '<p class="mb-small">' + 글('갈래') + '</p></div>' + 기능목록(강조, true) + 다른앱(true) + 늘열림() +
+        (s.종류 === 'pass' && 구독() && 구독().관리열기 ? '<div class="mb-cta"><button type="button" class="' + 모('보조', 'mb-btn2') + '" onclick="구독.관리열기()">' + 글('관리') + '</button></div>' : '');
+    } else {
+      var 이유 = (설정.자료 && 설정.자료.이유) || [];   /* 11-10 — 이 앱에서 회원권이 좋은 까닭 세 줄을 먼저 */
+      if (이유.length) h += '<ul class="mb-why">' + 이유.slice(0, 3).map(function (x) { return '<li>' + 골라(x) + '</li>'; }).join('') + '</ul>';
+      h += '<div class="mb-head"><p class="mb-lead">' + 글('머리') + '</p><p class="mb-small">' + 글('갈래') + '</p>' + 값머리() + '<p class="mb-trial">' + 글('체험') + '</p><p class="mb-small">' + 글('두대') + '</p></div>' +
+        (강조 ? '<p class="mb-note">' + 글('강조말') + '</p>' : '') +
+        (s && s.종류 === 'app' ? '<p class="mb-note">' + 글('이앱구독') + '</p>' : '') +
+        (강조 ? 기능목록(강조, false) + 좋은점() : 좋은점() + 기능목록(null, false)) + 다른앱(false) + 늘열림() + 흐름() + 단추들(강조);
+    }
+    return h + '</div>';
+  }
+  var 키걸림 = false;
+  function 열기(강조) {
+    스타일();
+    if (!키걸림) { 키걸림 = true; try { document.addEventListener('keydown', function (e) { if ((e.key === 'Escape' || e.key === 'Esc') ) { var m = document.getElementById('mbSheet'); if (m && m.getClientRects().length) 닫기(); } }); } catch (e) {} }
+    try { if (typeof 설정.시트열기 === 'function') 설정.시트열기(시트HTML(강조 || null), 글('제목')); } catch (e) {}
+    if (강조) setTimeout(function () { try { var el = document.querySelector('#mbSheet .mb-feat.on'); if (el && el.scrollIntoView) el.scrollIntoView({ block: 'center' }); } catch (e) {} }, 80);
+    setTimeout(function () { try {   /* 11-10 — 앱 시트에 늘 보이는 닫기가 이미 있으면 부품 ✕ 는 숨긴다(✕ 하나) */
+      var m = document.getElementById('mbSheet'), x = m && m.querySelector('.mb-xbar'); if (!x) return;
+      var 위 = m.parentElement, 있음 = false;
+      var sc = m.parentElement; while (sc && sc !== document.body && !(sc.scrollHeight > sc.clientHeight + 2 && /auto|scroll/.test(getComputedStyle(sc).overflowY))) sc = sc.parentElement;
+      function 늘보임(b) { if (sc && sc !== document.body && !sc.contains(b)) return true; for (var e = b; e && e !== sc; e = e.parentElement) { if (/sticky|fixed/.test(getComputedStyle(e).position)) return true; } return false; }   /* 내려도 보이는 닫기만 센다 */
+      while (위 && 위 !== document.body && !있음) { 있음 = [].some.call(위.querySelectorAll('button[aria-label]'), function (b) { return !m.contains(b) && /^(닫기|Close|Cerrar|閉じる|关闭)$/.test(b.getAttribute('aria-label')) && b.getClientRects().length && getComputedStyle(b).visibility !== 'hidden' && 늘보임(b); }); 위 = 위.parentElement; }
+      if (있음) { x.hidden = true; x.style.display = 'none'; } } catch (e) {} }, 60);
+    return false;
+  }
+
+  /* ── 잠긴 기능 칸 — 구독 막힘 시트 맨 위(구독.설치 문구.막힘앞)에 얹는다. 이 앱 체험·로그인·동의 흐름은 구독 부품 그대로 ── */
+  function 강조HTML(id) {
+    스타일();
+    var f = ((설정.자료 || {}).기능 || []).filter(function (x) { return x.id === id; })[0];
+    var 칸 = f ? '<ul class="mb-feats"><li class="mb-feat on" data-id="' + esc(f.id) + '">' + 그림(f.그림) + '<span class="mb-ft"><b>' + 골라(f.이름) + '</b>' +
+      (f.쓸모 ? '<span>' + 골라(f.쓸모) + '</span>' : '') + (f.어디서 ? '<span class="mb-path"><span class="mb-pk">' + 글('어디서') + '</span> ' + 골라(f.어디서) + '</span>' : '') + '</span></li></ul>' : '';
+    return '<div class="mb mb-lock">' + 칸 + '<button type="button" class="mb-row mb-passlink" onclick="회원권.열기(\'' + esc(id || '') + '\')">' + 그림('family', 'mb-ico') +
+      '<span class="mb-rt"><b>' + 글('띠') + '</b><span>' + 글('강조줄') + '</span></span><span aria-hidden="true" class="mb-rc">›</span></button></div>';
+  }
+
+  /* ── 설정 줄 · 홈 띠 ── */
+  function 줄() {
+    var s = 지금상태();
+    if (s && s.종류 === 'op') return { 제목: 글('제목'), 설명: 글('운영자'), 값: '' };
+    if (s && s.종류 === 'pass') return { 제목: 글('제목'), 설명: 글('회원'), 값: s.until ? 글('까지', { 날: 날(s.until) }) : '' };
+    return { 제목: 글('제목'), 설명: 글('줄설명'), 값: 판매() ? '' : 글('곧') };
+  }
+  function 줄HTML() {
+    스타일();   /* 11-03 CS — 줄만 먼저 그리면 그림이 화면 폭만큼 커졌다 */
+    var r = 줄();
+    return '<button type="button" class="mb-row" onclick="회원권.열기()">' + 그림('family', 'mb-ico') + '<span class="mb-rt"><b>' + r.제목 + '</b><span>' + r.설명 + '</span></span>' + (r.값 ? '<span class="mb-rv">' + r.값 + '</span>' : '') + '<span aria-hidden="true" class="mb-rc">›</span></button>';
+  }
+  function 띠HTML() {
+    스타일();
+    if (회원()) return '';
+    var now = Date.now(), 첫 = Number(읽('first') || 0);
+    if (!첫) { 씀('first', now); 첫 = now; }
+    if (판매() && 읽('notify') && !읽('told')) {   /* 「열리면 알려 주세요」를 누른 분께 — 열린 뒤 한 번 */
+      return '<div class="mb-band" id="mbBand"><button type="button" class="mb-band-go" onclick="회원권.띠열기(\'told\')">' + 그림('bell', 'mb-bico') + '<span>' + 글('띠열림') + '</span><span aria-hidden="true">›</span></button>' +
+        '<button type="button" class="mb-band-x" aria-label="' + 글('닫기') + '" onclick="회원권.띠닫기(\'told\')">' + 닫기그림 + '</button></div>';
+    }
+    if (now - 첫 < 2 * 864e5) return '';                       /* 처음 이틀은 조용히 — 앱부터 써 보시게 */
+    var 닫음 = Number(읽('band') || 0); if (닫음 && now - 닫음 < 7 * 864e5) return '';
+    return '<div class="mb-band" id="mbBand"><button type="button" class="mb-band-go" onclick="회원권.띠열기()">' + 그림('family', 'mb-bico') + '<span>' + 글('띠') + ' · <b>' + 글('띠보기') + '</b></span><span aria-hidden="true">›</span></button>' +
+      '<button type="button" class="mb-band-x" aria-label="' + 글('닫기') + '" onclick="회원권.띠닫기()">' + 닫기그림 + '</button></div>';
+  }
+  function 띠닫기(k) { 씀(k === 'told' ? 'told' : 'band', Date.now()); try { var b = document.getElementById('mbBand'); if (b) b.remove(); } catch (e) {} }
+
+  /* ── 잠긴 기능 → 이 시트(강조) ── */
+  function 감싸기() {
+    var g = window.구독; if (!g || typeof g.막힘 !== 'function' || g.막힘.__회원권) return;
+    var 원 = g.막힘;
+    var 새 = function (id) { try { if (g.열림(id)) return true; } catch (e) {} 열기(id); return false; };
+    새.__회원권 = true; 새.원 = 원; g.막힘 = 새;
+  }
+  function 이앱만(id) {
+    var g = window.구독; if (!g) return;
+    var 원 = g.막힘 && g.막힘.원;
+    if (id && 원) return 원(id);
+    if (typeof g.관리열기 === 'function') g.관리열기();
+  }
+
+  var 스타일됨 = false;
+  function 스타일() {
+    if (스타일됨 || !document.head) return; 스타일됨 = true;
+    var A = 'var(--mb-accent,var(--accent,var(--teal,#23685A)))', L = 'var(--mb-line,var(--line,rgba(127,127,127,.28)))', S = 'var(--mb-soft,var(--accent-soft,rgba(47,93,80,.08)))', D = 'var(--mb-dim,var(--ink2,inherit))', C = 'var(--mb-card,var(--card,transparent))';
+    var st = document.createElement('style'); st.id = 'mb-style';
+    st.textContent =
+      '.mb{word-break:keep-all;overflow-wrap:anywhere;line-height:1.55}.mb p{margin:0 0 8px}.mb ul,.mb ol{list-style:none;margin:0;padding:0}' +
+      '.mb-head{padding:4px 0 6px}.mb-lead{font-size:1.18em;font-weight:800;line-height:1.4;margin:0 0 6px!important}.mb-lead b{color:' + A + '}' +
+      '.mb-small{font-size:.86em;color:' + D + '}.mb-c{text-align:center;margin-top:10px!important}.mb-small a{color:' + A + ';font-weight:700;text-decoration:none}' +
+      '.mb-plans{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:10px 0 6px}.mb-plan{padding:12px;border:1.5px solid ' + L + ';border-radius:14px}.mb-plan.on{border-color:' + A + '}.mb-pn{display:block;font-size:.92em;margin-bottom:4px}.mb-plan .mb-price{margin:6px 0 2px!important;font-size:1.02em}.mb-plan .mb-price b{display:block;white-space:nowrap}.mb-plan .mb-after{font-size:.9em;margin:0!important}@media (max-width:359px){.mb-plans{grid-template-columns:1fr}}' +
+      '.mb-why{list-style:none;margin:0 0 12px;padding:12px 14px;border-radius:14px;background:' + S + ';display:flex;flex-direction:column;gap:6px}.mb-why li{font-weight:700;line-height:1.5}.mb-after{font-size:1.02em;margin:2px 0 6px!important}.mb-auto{font-weight:800;font-size:1.02em;line-height:1.5;margin:8px 0 6px!important}.mb-plans{width:100%}.mb-soonchip{margin:8px 0 0!important}.mb-auto{margin-top:2px!important}.mb-price{font-size:1.02em;margin:10px 0 2px!important}.mb-trial{font-weight:700;color:' + A + ';margin-top:8px!important}' +
+      '.mb-chip{display:inline-block;font-size:.82em;font-weight:800;padding:2px 8px;border-radius:999px;background:' + S + ';color:' + A + ';vertical-align:1px;margin-right:4px}' +
+      '.mb-h{font-size:.98em;font-weight:800;margin:20px 0 8px}' +
+      '.mb-three li{display:flex;gap:12px;align-items:flex-start;padding:8px 0}.mb-three li>span{display:flex;flex-direction:column;min-width:0}.mb-three li>span>span{font-size:.88em;color:' + D + '}' +
+      '.mb-ico{flex:none;width:34px;height:26px;color:' + A + ';margin-top:2px}' +
+      '.mb-feats li{display:flex;flex-wrap:wrap;gap:10px 12px;align-items:flex-start;padding:12px;border:1px solid ' + L + ';border-radius:14px;margin:0 0 8px;background:' + C + '}' +
+      '.mb-feat.on{border:2px solid ' + A + ';background:' + S + '}.mb-feat.on .mb-chip{background:' + A + ';color:var(--mb-on-accent,var(--on-accent,Canvas))}' +
+      '.mb-lead b{font-weight:800}.mb-three b,.mb-ft>b,.mb-at>b,.mb-rt>b{font-weight:700}' +
+      '.mb-pic{flex:none;width:52px;height:38px;color:' + A + ';background:' + S + ';border-radius:10px;padding:4px}' +
+      '.mb-ft{flex:1 1 180px;min-width:0;display:flex;flex-direction:column;gap:2px}.mb-ft>span{font-size:.88em;color:' + D + '}.mb-ft .mb-chip{align-self:flex-start;margin-bottom:2px}' +
+      '.mb-path{margin-top:2px}.mb-pk{font-weight:800;color:' + A + '}' +
+      '.mb-open{flex:none;margin-left:auto;min-height:44px;padding:0 16px;border-radius:12px;border:1px solid ' + A + ';background:transparent;color:' + A + ';font:inherit;font-weight:800;cursor:pointer}' +
+      '.mb-apps li{margin:0 0 8px}.mb-app{display:flex;gap:12px;align-items:center;padding:12px;border:1px solid ' + L + ';border-radius:14px;color:inherit;text-decoration:none;background:' + C + '}' +
+      '.mb-ic{position:relative;flex:none;width:40px;height:40px;border-radius:11px;overflow:hidden;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800}' +
+      '.mb-ic img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}' +
+      '.mb-at{flex:1;min-width:0;display:flex;flex-direction:column;gap:1px}.mb-at>span{font-size:.86em;color:' + D + '}.mb-at .mb-rep{color:' + A + ';font-weight:700}' +
+      '.mb-go{flex:none;font-size:.86em;font-weight:800;color:' + A + ';white-space:nowrap}' +
+      '.mb-always{margin-top:16px;padding:12px 14px;border-radius:14px;background:' + S + '}.mb-always .mb-h{margin-top:0}.mb-always li{position:relative;padding:3px 0 3px 16px;font-size:.92em}' +
+      '.mb-always li:before{content:"";position:absolute;left:2px;top:.75em;width:7px;height:7px;border-radius:50%;background:' + A + '}' +
+      '.mb-flow{counter-reset:mb}.mb-flow li{position:relative;padding:6px 0 6px 34px;font-size:.92em}.mb-flow li:before{counter-increment:mb;content:counter(mb);position:absolute;left:0;top:5px;width:24px;height:24px;border-radius:50%;background:' + S + ';color:' + A + ';font-weight:800;font-size:.85em;display:flex;align-items:center;justify-content:center}' +
+      '.mb-note{padding:10px 12px;border-radius:12px;background:' + S + ';font-size:.92em}' +
+      '.mb-cta{margin-top:18px;display:flex;flex-direction:column;gap:8px}.mb-soon{font-size:.9em;color:' + D + '}' +
+      '.mb-btn,.mb-btn2{min-height:52px;border-radius:14px;font:inherit;font-weight:800;cursor:pointer;width:100%}.mb-btn{border:0;background:' + A + ';color:var(--mb-on-accent,var(--on-accent,Canvas))}.mb-btn2{border:1px solid ' + A + ';background:transparent;color:' + A + '}' +
+      '.mb-cta button[disabled]{opacity:.7;cursor:default}' +
+      '.mb-lock{margin:0 0 12px}.mb-lock .mb-feats li{margin-bottom:8px}.mb-row{display:flex;gap:12px;align-items:center;width:100%;padding:14px 12px;border:1px solid ' + L + ';border-radius:14px;background:' + C + ';color:inherit;font:inherit;text-align:left;cursor:pointer}' +
+      '.mb-rt{flex:1;min-width:0;display:flex;flex-direction:column}.mb-rt>span{font-size:.94em;color:' + D + '}.mb-rv{flex:none;font-size:.94em;font-weight:800;color:' + A + '}.mb-rc{flex:none;color:' + D + '}' +
+      '.mb-band{display:flex;align-items:stretch;gap:4px;margin:12px 0;border-radius:14px;background:' + S + '}' +
+      '.mb-band-go{flex:1;min-width:0;display:flex;gap:10px;align-items:center;min-height:48px;padding:8px 4px 8px 12px;border:0;background:transparent;color:inherit;font:inherit;font-size:.92em;text-align:left;cursor:pointer;word-break:keep-all}' +
+      '.mb-band-go>span:nth-child(2){flex:1;min-width:0}.mb-band-go b{color:' + A + '}.mb-bico{flex:none;width:30px;height:22px;color:' + A + '}' +
+      '.mb-xbar:not([hidden])+*>:first-child{padding-right:48px}' +   /* 11-10 — 위 ✕ 가 첫 상자 글을 가리지 않게 */
+      '.mb-xbar{position:sticky;top:0;z-index:6;height:0;display:flex;justify-content:flex-end;pointer-events:none}' +
+      '.mb-x{pointer-events:auto;width:44px;height:44px;margin:-4px -6px 0 0;border:1px solid ' + L + ';border-radius:50%;background:var(--mb-card,var(--card,var(--bg,#fff)));color:inherit;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(0,0,0,.12)}' +
+      '.mb-band-x{flex:none;width:44px;border:0;background:transparent;color:' + D + ';cursor:pointer;display:flex;align-items:center;justify-content:center;border-radius:0 14px 14px 0}';
+    document.head.appendChild(st);
+  }
+
+  function 설치(o) {
+    o = o || {};
+    Object.keys(o).forEach(function (k) { 설정[k] = o[k]; });
+    if (설정.자료 && 설정.자료.앱 && !o.app) 설정.app = 설정.자료.앱;
+    if (설정.가로채기) { 감싸기(); try { document.addEventListener('DOMContentLoaded', 감싸기); } catch (e) {} }
+    return window.회원권;
+  }
+
+  window.회원권 = {
+    __v: 판, 판: 판, 값표: 값표, 설치: 설치, 열기: 열기, 닫기: 닫기, 강조HTML: 강조HTML, 시트HTML: 시트HTML, 줄: 줄, 줄HTML: 줄HTML, 띠HTML: 띠HTML, 띠닫기: 띠닫기, 회원: 회원, 상태: 지금상태, 앱들: 앱들,
+    띠열기: function (k) { if (k === 'told') 씀('told', Date.now()); 열기(); },
+    가기: function (id) {
+      var f = ((설정.자료 || {}).기능 || []).filter(function (x) { return x.id === id; })[0];
+      if (!f || !f.가기) return;
+      닫기();
+      setTimeout(function () { try { if (typeof f.가기 === 'function') f.가기(); else (new Function(f.가기))(); } catch (e) {} }, 60);
+    },
+    알림받기: function () {
+      씀('notify', Date.now());
+      var b = document.getElementById('mbNotify');
+      if (b) { b.textContent = 글('알림됨'); b.disabled = true; b.setAttribute('aria-disabled', 'true'); b.className = 모('보조', 'mb-btn2'); }
+      알림(글('알림됨'));
+      try { if (typeof 설정.알림받기 === 'function') 설정.알림받기(); } catch (e) {}
+    },
+    시작: function (plan) { var g = 구독(); if (g && typeof g.회원권구매 === 'function') return g.회원권구매(plan); 알림(글('곧')); },
+    이앱만: 이앱만,
+    글: 글
+  };
+})();
+/* ▲▲ 회원권 부품 끝 ▲▲ */
+/* 11-11 Main(현욱님) — 공용 계정 부품 · 회원권 부품. 약지도의 로그인 문·계정 카드는 그대로 두고, 「계정 지우기」만 계정.지우기() 를 거친다.
+   지우기둘 은 끈 채 — 서버(delete_own_account(p_app) 두 갈래)를 붙인 뒤 켠다. 꺼져 있으면 지금처럼 계정동작('delete'). 회원권 판매도 끈 채(「곧 열려요」). */
+try {
+  계정.설치({ app: 'yakjido', 앱이름: '약지도', 웹주소: 'https://yakjido.medinanum.com/', 지우기둘: false,
+    열림: function () { return D.meta && D.meta.account === true; },
+    동의됨: function () { return srvAgreed(); },
+    동의하기: function () { try { localStorage.setItem(AGREE_KEY, JSON.stringify({ server: true, at: new Date().toISOString() })); } catch (e) {} },
+    동의이름: '건강정보(민감정보) 서버 저장', 나이글: '만 14세 이상이에요',
+    동의글: '드시는 약·복용 기록·몸 상태 같은 기록을 암호화된 연결로 보내 메디나눔 서버(서울)에 저장하고, 로그인한 기기에서 이어 보는 데 동의해요.',
+    앱동의됨: function () { try { return !!localStorage.getItem('yakjido.consent.v1'); } catch (e) { return false; } },
+    처리방침: function () { location.href = 'privacy.html'; },
+    시트열기: function (html, 제목) { var v = document.getElementById('view'); if (!v) return; v.innerHTML = topBar({ back: '뒤로' }) + '<h1>' + esc(제목 || '계정') + '</h1>' + html; scrollTo(0, 0); },
+    시트닫기: function () { route(); },
+    알림: function (t) { try { toast(t); } catch (e) {} },
+    다시그리기: function () { try { route(); } catch (e) {} },
+    이용권글: function () { try { var sv = window.구독 && 구독.상태 && 구독.상태(); return sv && sv.status === 'active' ? '구독 중' : ''; } catch (e) { return ''; } } });
+} catch (e) {}
+try {
+  var 약말 = function (ko, en) { return { ko: ko, en: en }; };
+  회원권.설치({ app: 'yakjido', 언어: function () { return window.LANG || 'ko'; },
+    가격: { 월: 12900, 연: 99000, 출시월: 9900, 출시연: 79000 }, 판매: function () { return false; },
+    자료: { 앱: 'yakjido', 정체: 약말('먹는 약을 쉽게 풀어 알려 주는 약 안내', 'Plain-language guide to the medicines you take'),
+      기능: [
+        { id: 'sync', 그림: 'sync', 가기: "go('/me?t=set')", 이름: 약말('여러 기기에서 이어 보기', 'Continue on several devices'), 쓸모: 약말('약통·복용 기록을 계정에 두고 새 폰에서도 그대로', 'Keep your medicine box and dose log in your account, the same on a new phone'), 어디서: 약말('내 정보 → 설정 → 맨 위 계정 칸', 'My info → Settings → account box at the top') },
+        { id: 'trend', 그림: 'trend', 가기: "go('/vitals')", 이름: 약말('혈압·혈당 2주 흐름 그림', 'Two-week blood pressure and sugar chart'), 쓸모: 약말('적어 둔 혈압·혈당이 어떻게 움직였는지 한 장으로', 'See how your readings have moved on one chart'), 어디서: 약말('홈 → 혈압·혈당 수첩', 'Home → Blood pressure and sugar log') },
+        { id: 'visitdoc', 그림: 'paper', 가기: "go('/bag')", 이름: 약말('진료실 한 장 종이로 뽑기', 'One-page sheet for your doctor'), 쓸모: 약말('드시는 약과 기록을 진료 때 보여 드릴 종이 한 장으로', 'Your medicines and log on one page to show at the visit'), 어디서: 약말('약통 → 진료 때 보여 드리기', 'Medicine box → Show at your visit') },
+        { id: 'rx', 그림: 'book', 가기: "go('/rx')", 이름: 약말('처방약 길잡이', 'Prescription medicine guide'), 쓸모: 약말('혈압·당뇨·콜레스테롤 약을 왜·어떻게 드시는지 쉽게', 'Why and how you take blood pressure, diabetes and cholesterol medicines'), 어디서: 약말('홈 → 처방약 길잡이', 'Home → Prescription medicine guide') }
+      ],
+      늘열림: [ 약말('약 찾기·약봉투 읽기', 'Medicine search and reading your medicine bag'), 약말('복약 알림', 'Dose reminders'), 약말('응급 신호와 겹침 확인', 'Emergency signs and overlap check') ] },
+    시트열기: function (html, 제목) { var v = document.getElementById('view'); if (!v) return; v.innerHTML = topBar({ back: '뒤로' }) + '<h1>' + esc(제목 || '메디나눔 회원권') + '</h1>' + html; scrollTo(0, 0); },
+    시트닫기: function () { route(); },
+    알림: function (t) { try { toast(t); } catch (e) {} },
+    알림받기: function () { go('/notify'); },
+    모양: { 주: 'btn primary', 보조: 'btn line' } });
 } catch (e) {}
 /* 다섯 언어(10-27) — 설정의 언어·나라 칸. 언어를 바꾸면 다시 연다. 나라는 응급·위기 번호를 고른다(요청서 표) */
 window.언어칸 = function () {
@@ -2243,7 +3122,7 @@ window.계정칸 = () => D.meta?.account !== true ? '' : `<section class="sec ca
   </section>`;
 /* 2026-10-29 현욱님 — 설정 맨 위 첫 칸 = 계정 카드. 로그인 전엔 큰 단추 하나, 뒤엔 메일 · 이용권 · 동기화 · 로그아웃 · 계정 지우기(작게). 상세 칸(#acct)은 아래 그대로 */
 /* 계정 카드·메디나눔 서명 모양 — 첫 화면 예산 때문에 여기서 붙인다 */
-try { const st = document.createElement('style'); st.textContent = ".acct-card .acct-hd{display:flex;align-items:center;gap:12px}.acct-card .acct-hd>span:last-child{display:flex;flex-direction:column;min-width:0}.acct-card .acct-hd b{font-size:1.0625rem;overflow-wrap:anywhere}.acct-card .acct-hd small{color:var(--muted);font-size:.875rem;margin-top:2px}.acct-ic,.acct-av{flex:none;width:44px;height:44px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;background:var(--tint);color:var(--primary-deep)}.acct-av{background:var(--primary);color:var(--on-primary,#fff);font-weight:700;font-size:1.125rem}.acct-card .acct-go{width:100%;margin-top:14px;min-height:52px;font-size:1.0625rem}.acct-card .acct-act{display:flex;gap:10px;margin-top:14px}.acct-card .acct-act .btn{flex:1;margin:0;min-height:48px}.acct-card .srvrow{margin-top:12px}.acct-card .acct-del{margin-top:6px;font-size:.8125rem}.mn-logo{width:1.35em;height:1.35em;vertical-align:-.3em;margin-right:5px;color:#1A2B4A}.mn-logo path{fill:none;stroke:currentColor;stroke-width:236;stroke-linecap:round;stroke-linejoin:round}.mn-logo .mn-tile{fill:#FFFFFF;stroke:#CBD2DC;stroke-width:24}:root[data-theme=\"dark\"] .mn-logo .mn-tile{display:none}:root[data-theme=\"dark\"] .mn-logo{color:#FFFFFF}@media (prefers-color-scheme:dark){ :root:not([data-theme=\"light\"]) .mn-logo{color:#FFFFFF} :root:not([data-theme=\"light\"]) .mn-logo .mn-tile{display:none} }"; document.head.appendChild(st); } catch (e) {}
+try { const st = document.createElement('style'); st.textContent = ".acct-card .acct-hd{display:flex;align-items:center;gap:12px}.acct-card .acct-hd>span:last-child{display:flex;flex-direction:column;min-width:0}.acct-card .acct-hd b{font-size:1.0625rem;overflow-wrap:anywhere}.acct-card .acct-hd small{color:var(--muted);font-size:.875rem;margin-top:2px}.acct-card .acct-ic,.acct-card .acct-av{flex:none;width:44px;height:44px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;background:var(--tint);color:var(--primary-deep)}.acct-card .acct-av{background:var(--primary);color:var(--on-primary,#fff);font-weight:700;font-size:1.125rem}.acct-card .acct-go{width:100%;margin-top:14px;min-height:52px;font-size:1.0625rem}.acct-card .acct-act{display:flex;gap:10px;margin-top:14px}.acct-card .acct-act .btn{flex:1;margin:0;min-height:48px}.acct-card .srvrow{margin-top:12px}.acct-card .acct-del{margin-top:6px;font-size:.8125rem;opacity:1;color:var(--primary);font-weight:600}.mn-logo{width:1.35em;height:1.35em;vertical-align:-.3em;margin-right:5px;color:#1A2B4A}.mn-logo path{fill:none;stroke:currentColor;stroke-width:236;stroke-linecap:round;stroke-linejoin:round}.mn-logo .mn-tile{fill:#FFFFFF;stroke:#CBD2DC;stroke-width:24}:root[data-theme=\"dark\"] .mn-logo .mn-tile{display:none}:root[data-theme=\"dark\"] .mn-logo{color:#FFFFFF}@media (prefers-color-scheme:dark){ :root:not([data-theme=\"light\"]) .mn-logo{color:#FFFFFF} :root:not([data-theme=\"light\"]) .mn-logo .mn-tile{display:none} }"; document.head.appendChild(st); } catch (e) {}
 /* 10-30 현욱님 「알림 설정은?」 — 알림 한 화면: 무엇을 · 언제 · 켜기/끄기(다섯 앱 같은 꼴: 머리 + 권한 줄 + 종류별 스위치 행) */
 window.문_notify = (_, q) => {
   const n = takingItems().length, timed = takingItems().filter(d => !schedUnset(d)).length;
@@ -2550,13 +3429,13 @@ try { const st3 = document.createElement('style'); st3.textContent = '@media (ma
 try { const st2 = document.createElement('style'); st2.textContent = '.fam-h{display:flex;align-items:center;justify-content:flex-start;gap:8px;margin:0 0 6px;font-size:1.125rem}.fam-h .i{width:22px;height:22px}.fam-s{margin:14px 0 4px;font-size:1rem;color:var(--muted)}.fam-ul{list-style:none;margin:0;padding:0}.fam-ul li{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;padding:10px 0;border-top:1px solid var(--hairline)}.fam-ul li>span:first-child{min-width:0}.fam-ul b{display:block;overflow-wrap:anywhere}.fam-ul small{display:block;color:var(--muted);font-size:.875rem}.fam-b{display:flex;align-items:center;gap:6px}.fam-b .btn{width:auto;min-height:44px;padding:0 14px;margin:0}.fam-b .link{min-height:44px;padding:0 8px}.fam-hot{background:var(--caution-tint);border-radius:12px;padding:10px!important}.fam-form{display:flex;flex-direction:column;gap:8px;margin-top:12px;padding-top:12px;border-top:1px dashed var(--hairline)}.fam-l{font-weight:700}.fam-form input:not([type=checkbox]){min-height:48px;padding:10px 12px;border:1.5px solid var(--ui-line);border-radius:12px;font:inherit;background:var(--card);color:var(--text)}.fam-rule{margin:6px 0 4px;padding-left:1.1em;color:var(--body);font-size:.9375rem;line-height:1.6}.fam-det{margin:4px 0;border:1px solid var(--hairline);border-radius:12px;padding:8px 12px}.fam-det summary{font-weight:700;cursor:pointer;min-height:40px;display:flex;align-items:center}.fam-det dl{margin:6px 0 0}.fam-det dt{font-weight:700;margin-top:8px}.fam-det dd{margin:2px 0 0;color:var(--body);font-size:.9375rem;line-height:1.6}.fam-off{display:block;min-height:44px;margin-top:6px}.fam-seg{display:flex;gap:6px}.fam-seg button{flex:1;min-height:44px;border:1.5px solid var(--ui-line);border-radius:12px;background:var(--card);color:var(--text);font:inherit;font-weight:700}.fam-seg button.on{background:var(--primary);color:var(--on-primary);border-color:var(--primary)}.fam-q{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.fam-q input{min-height:44px;padding:6px 10px;border:1.5px solid var(--ui-line);border-radius:12px;font:inherit;background:var(--card);color:var(--text)}.fam-q .btn{width:auto;margin:0;min-height:44px}.fam-ios{margin-top:10px}.fam-msg{padding:10px 12px;border-radius:12px;background:var(--accent-tint);color:var(--accent-text)}.nt-perm{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:10px 0 4px;padding:12px 14px;border-radius:14px;background:var(--accent-tint);color:var(--accent-text);font-size:1rem}.nt-perm.ok{background:var(--normal-tint);color:var(--normal)}.nt-perm .btn{width:auto;margin:0 0 0 auto;min-height:44px}.nt-list{padding:4px 16px}.nt-row{display:flex;align-items:center;gap:12px;padding:14px 0;border-top:1px solid var(--hairline)}.nt-row:first-child{border-top:0}.nt-ic{flex:none;width:40px;height:40px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;background:var(--tint);color:var(--primary-deep)}.nt-t{flex:1;min-width:0;display:flex;flex-direction:column}.nt-t b{font-size:1.0625rem}.nt-t small{color:var(--muted);font-size:.9375rem;margin-top:2px}.nt-row .sw{flex:none}.sw-st{flex:none;font-size:.875rem;font-weight:700;color:var(--muted);margin-right:2px}'; document.head.appendChild(st2); } catch (e) {}
 window.계정카드 = () => { if (D.meta?.account !== true) return ''; const 나 = srvLoggedIn(), m = 나 ? (서버.세션()?.user?.email || '') : '';
   if (!나) return `<section class="sec card acct-card"><div class="acct-hd"><span class="acct-ic" aria-hidden="true">${I.user}</span><span><b>메디나눔 계정</b><small>폰을 바꿔도 약통·복용 기록을 이어 봐요 · 선택</small></span></div>
-    <button type="button" class="btn primary acct-go" onclick="go('/login')">로그인 · 계정 만들기</button>
+    <button type="button" class="btn primary acct-go" onclick="go('/login')">로그인 · 계정 만들기</button>${window.회원권 ? (() => { try { return '<div style="margin-top:12px">' + 회원권.줄HTML() + '</div>'; } catch (e) { return ''; } })() : ''}
     <a class="link acct-del" href="delete-account.html" style="display:inline-block;margin-top:12px;min-height:44px;line-height:44px">계정과 기록 지우기 ›</a></section>`;   /* 11-09 B4 — 로그인 전에도 늘(심사관: 계정 삭제 길이 안 보임). 웹 삭제 주소와 같은 말 */
   return `<section class="sec card acct-card"><div class="acct-hd"><span class="acct-av" aria-hidden="true">${esc(m.charAt(0).toUpperCase())}</span><span><b>${esc(m)}</b><small>로그인돼 있어요 · 이어 보기 켜짐</small></span></div>
-    ${window.이용권줄HTML ? 이용권줄HTML() : ''}${window.가입 && 가입.대기HTML ? (() => { try { return 가입.대기HTML() || ''; } catch (e) { return ''; } })() : ''}
+    ${window.이용권줄HTML ? 이용권줄HTML() : ''}${window.회원권 ? (() => { try { return '<div style="margin-top:12px">' + 회원권.줄HTML() + '</div>'; } catch (e) { return ''; } })() : ''}${window.가입 && 가입.대기HTML ? (() => { try { return 가입.대기HTML() || ''; } catch (e) { return ''; } })() : ''}
     <div class="acct-act"><button type="button" class="btn line" onclick="계정동작('sync')">지금 맞추기</button><button type="button" class="btn line" onclick="계정동작('logout');setTimeout(route,600)">로그아웃</button></div>
     <button type="button" class="srvlink acct-del" onclick="go('/me?t=set');setTimeout(()=>document.getElementById('acct')?.scrollIntoView({block:'start'}),300)">계정 지우기·동의 거두기는 아래 「계정」 칸에서</button></section>`; };
-window.계정줄 = () => D.meta?.account !== true ? '' : `<div class="rows-l acct-row">${srvLoggedIn() ? lrow(I.user, '메디나눔 계정', esc((서버.세션()?.user?.email || '') + ' · 이어 보기 켜짐'), "go('/login')") : lrow(I.user, '계정 만들기 · 로그인 <em class="door-tag">선택</em>', '폰을 바꿔도 이어 봐요', "go('/login')")}</div>`;
+window.계정줄 = () => D.meta?.account !== true ? '' : `<div class="rows-l acct-line">${srvLoggedIn() ? lrow(I.user, '메디나눔 계정', esc((서버.세션()?.user?.email || '') + ' · 이어 보기 켜짐'), "go('/login')") : lrow(I.user, '계정 만들기 · 로그인 <em class="door-tag">선택</em>', '폰을 바꿔도 이어 봐요', "go('/login')")}</div>`;
 window.처음계정 = () => D.meta?.account !== true || srvLoggedIn() ? '' : `<div class="hello-acct"><b>계정 만들기 · 로그인 <em class="door-tag">선택</em></b><span>폰을 바꿔도 이어 봐요</span>
   <div class="actions two"><button class="btn line" onclick="helloFinish();go('/login')">${I.user} 로그인 · 계정 만들기</button><button class="btn line" onclick="helloFinish()">둘러보기</button></div></div>`;
 /* 넓은 화면 왼쪽 메뉴의 앱 표시(아티팩트는 BRANDMARK 가 다르다) · 계정이 꺼져 있으면 메뉴의 계정 칸을 뺀다 */
@@ -2687,7 +3566,7 @@ try { const css = document.createElement('style'); css.textContent = `
 .hello-hi p,.hello-close{margin-left:auto;margin-right:auto}}
 @media (hover:hover){nav.tabbar button:hover{background:var(--tint2);color:var(--text)}nav.tabbar button.on:hover{background:var(--tint)}.srow:hover,.util-row:hover,.hello-big:hover,.card .row:hover{background:var(--tint2)}}
 .srvdoor{min-height:48px;margin-bottom:6px;border-radius:12px;border:1.5px solid var(--ui-line);background:var(--card);color:var(--text);font-weight:700}
-.acct-row{margin-top:12px}.hello-acct{margin-top:var(--s5);padding:16px;border-radius:14px;border:1px solid var(--hairline);background:var(--card)}.hello-acct>b{display:block}.hello-acct>span{display:block;font-size:.875rem;color:var(--muted)}.hello-acct .actions{margin-top:12px}
+.acct-line{margin-top:12px}.hello-acct{margin-top:var(--s5);padding:16px;border-radius:14px;border:1px solid var(--hairline);background:var(--card)}.hello-acct>b{display:block}.hello-acct>span{display:block;font-size:.875rem;color:var(--muted)}.hello-acct .actions{margin-top:12px}
 .door-skip{display:block;width:100%;min-height:52px;margin-top:14px;border-radius:12px;border:1.5px solid var(--hairline);background:var(--card);color:var(--body);font-weight:700}
 .docv{max-width:42em}
 .docv h1{font-size:1.5rem;margin:4px 0 6px}
