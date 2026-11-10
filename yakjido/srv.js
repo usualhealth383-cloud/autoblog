@@ -1845,7 +1845,7 @@ window.문_consent = () => {
   </ul>
   <p class="cs-sum">의료기기가 아니에요 · 기록은 먼저 이 휴대폰에 저장돼요 · 광고·분석에 쓰지 않아요</p>
   <!-- 11-09 실사용 검수 B2(개인정보보호법 22·23조) — 필수 둘을 따로 보이고, 「모두 동의」 한 번으로도 된다(10-29 「동의 벽 금지」와 함께). 서버 저장(지병·드시는 약)은 선택이라 계정 만들 때 따로 -->
-  <button type="button" class="cs-row cs-all" role="checkbox" aria-checked="false" onclick="동의누름('all')"><span class="cs-bx">${I.check}</span><span class="cs-tx"><b>모두 동의</b></span></button>
+  <button type="button" class="cs-row cs-all" role="checkbox" aria-checked="${both ? 'true' : (동의칸.terms || 동의칸.privacy) ? 'mixed' : 'false'}" onclick="동의누름('all')"><span class="cs-bx">${I.check}</span><span class="cs-tx"><b>모두 동의</b></span></button>
   ${동의줄('terms', '이용약관', '의료기기가 아니에요 · 식약처 공개 허가 정보를 쉽게 풀어 쓴 것(식약처가 확인한 내용은 아님)', ['약 설명은 <b>식약처 허가 설명서</b>가 기본이에요. 해외 지침이나 진료실 관행이 다르면 둘 다 보여 드려요.',
     '위험 신호가 있으면 약보다 진료가 먼저예요. 급하면 119예요.',
     '약을 팔거나 건네지 않아요. 약은 약국에서 약사와 상의해 사세요.',
@@ -1859,8 +1859,8 @@ window.문_consent = () => {
     '기록은 내 정보 → 설정에서 언제든 지우실 수 있어요.'], '처리방침 전문 보기')}
   <p class="cs-opt">선택 — 지병·드시는 약을 서버에 저장하는 것은 계정을 만들 때 따로 여쭤요. 그 동의를 하지 않아도 앱은 그대로 쓸 수 있어요(서버 저장만 안 돼요).</p>
   <p class="cs-opt">아이 정보는 보호자가 대신 입력해요 · 만 14세 미만은 본인이 계정을 만들 수 없어요</p>
-  <button type="button" class="door-go" id="csGo" disabled onclick="동의하기()">시작하기</button>
-  <p class="cs-why" id="csWhy">필수 두 가지에 동의하시면 시작할 수 있어요</p>
+  <button type="button" class="door-go" id="csGo"${both ? '' : ' disabled'} onclick="동의하기()">시작하기</button>
+  <p class="cs-why" id="csWhy"${both ? ' hidden' : ''}>필수 두 가지에 동의하시면 시작할 수 있어요</p>
   <p class="cs-foot">동의 내용은 설정 → 약관·개인정보에서 언제든 다시 보실 수 있어요 · 약지도 v${esc(D.meta?.version || '')}</p>
 </div>`;
 };
@@ -3614,7 +3614,7 @@ window.vVitalsS = function(){
 };
 
 /* 11-09 C2 — 말과 나라 창 「맞아요」 단추: 공용 강조색(갈색 #B5711C, 흰 글자 대비 3.9:1) 대신 약지도 청록(대비 5.8:1) */
-try { const st = document.createElement('style'); st.textContent = ':root{--ms-accent:#0B6E8F;--ms-on-accent:#fff}'; document.head.appendChild(st); } catch (e) {}
+try { const st = document.createElement('style'); st.textContent = ':root{--ms-accent:#0B6E8F;--ms-on-accent:#fff}.mnp{align-items:flex-start!important}.mnp-box{margin-top:8px!important}.mnp .ms-sb{display:flex!important;flex-wrap:wrap;gap:8px;justify-content:flex-start}.mnp .ms-sb button{flex:0 0 auto!important;font-size:1rem!important;padding:0 16px;min-height:48px}';   /* 11-10 첫 실행 사진 대조 — 위 빈 띠·칩 크기 제각각 */ document.head.appendChild(st); } catch (e) {}
 /* 11-10 앱 껍데기에서 옮김(첫 화면 예산) */
 window.vSuppDetailS = function(id){
   const s = supp(id); if (!s) return vSupp();

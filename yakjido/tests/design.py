@@ -131,11 +131,26 @@ def main():
                 go(pg, r); al = pg.evaluate(ALIGN)
                 if al: fails.append(f'⑦ 정렬 {w}·{fs}·{th} {r}: {al}')
             pg.close()
+        # ⑧ 첫 실행(11-10 사진 대조) — 저장소 빈 새 기기: 「모두 동의」 → 다시 그림 → 2초 → 「시작하기」가 눌리고 넘어가는지 · 말과 나라 창 위 빈 띠 · 칩 글자 크기
+        for w in (360, 390):
+            ctx = b.new_context(viewport={'width': w, 'height': 780}); pg = ctx.new_page()
+            pg.goto(URL); pg.wait_for_selector('.cs-all', timeout=20000); pg.click('.cs-all')
+            pg.evaluate("()=>route()"); pg.wait_for_timeout(2000)
+            ok = pg.evaluate("()=>{const g=document.getElementById('csGo');return !!g&&!g.disabled&&document.querySelector('.cs-all').getAttribute('aria-checked')==='true'}")
+            if not ok: fails.append(f'⑧ 첫 실행 {w}: 「모두 동의」가 다시 그린 뒤 풀림 — 「시작하기」가 잠김')
+            else:
+                pg.click('#csGo'); pg.wait_for_timeout(800)
+                if '#/consent' in pg.url: fails.append(f'⑧ 첫 실행 {w}: 「시작하기」를 눌러도 넘어가지 않음')
+            pg.evaluate("()=>{try{설정판.말과나라열기();설정판.말과나라고름('country','US')}catch(e){}}"); pg.wait_for_timeout(500)
+            m = pg.evaluate("()=>{const b=document.querySelector('.mnp-box');if(!b)return null;const fs=[...document.querySelectorAll('.mnp-lv button')].map(x=>getComputedStyle(x).fontSize);return {top:Math.round(b.getBoundingClientRect().top),fs:[...new Set(fs)]}}")
+            if m and m['top'] > 120: fails.append(f'⑧ 말과 나라 {w}: 위 빈 띠 {m["top"]}px')
+            if m and len(m['fs']) > 1: fails.append(f'⑧ 말과 나라 {w}: 칩 글자 크기 제각각 {m["fs"]}')
+            ctx.close()
         b.close()
     print(f'디자인 점검 — 화면 {len(ROUTES)}개')
     if fails:
         print('결함', len(fails)); [print('  ✗', f) for f in fails]; sys.exit(1)
-    print('✓ 결함 0 — 손가락 36px · 칸 속의 칸 · 글자 크기 · 320 넘침 · 빈 화면 · 행동 깊이 · 정렬(가운데·잘림·왼쪽 끝·겹침·빈 띠·아이콘)')
+    print('✓ 결함 0 — 손가락 36px · 칸 속의 칸 · 글자 크기 · 320 넘침 · 빈 화면 · 행동 깊이 · 정렬(가운데·잘림·왼쪽 끝·겹침·빈 띠·아이콘) · 첫 실행(모두 동의·말과 나라)')
 
 if __name__ == '__main__':
     main()
