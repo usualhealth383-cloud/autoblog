@@ -8,6 +8,8 @@
   ④ 넘침 — 320px · 가장 크게에서 가로 넘침(스크롤 상자 안은 뺌)
   ⑤ 빈 화면 — 기록 없는 사람으로 열었을 때 누를 것이 하나도 없는 화면
   ⑥ 행동 깊이 — 첫 누를 것(뒤로·탭·검색 빼고)이 처음 화면 높이의 몇 배 아래에 있나(1.5 넘으면 결함)
+  ⑦ 정렬(11-10 현욱님 「정렬 깨진 것 없는지 쭉 확인」) — 폭 60% 넘는 단추 글자 가운데(중심 차 ≤ 6px) · 글자 잘림 0 · 같은 목록 왼쪽 끝 일치 · 보이는 글자 겹침 0 · 위쪽 빈 띠 200px 이상 0 · 아이콘·글자 세로 가운데(≤ 3px)
+     320·360·390·420 × 보통·가장 크게(밝게) + 390 어둡게
 쓰는 법: python3 yakjido/tests/design.py  (docs/yakjido 를 띄워 잰다 — 빌드 뒤에)
 """
 import http.server, socketserver, threading, functools, pathlib, sys
@@ -56,6 +58,35 @@ DEPTH = """()=>{const H=innerHeight;window.scrollTo(0,0);let best=null;for(const
  if(el.closest('.top,.topfind,.tabs,.stabs,.dtabs,.back,.search,.view-seg,.crumb')) continue; const r=el.getBoundingClientRect(); if(!r.width||!r.height) continue;
  const y=r.top+scrollY; if(best===null||y<best) best=y;} return best===null?null:+(best/H).toFixed(2);}"""
 
+ALIGN = r"""()=>{const W=document.documentElement.clientWidth, V=document.getElementById('view')||document.body, out=[];
+const vis=e=>{const r=e.getBoundingClientRect();if(!r.width||!r.height)return null;const cs=getComputedStyle(e);if(cs.visibility==='hidden'||cs.display==='none'||+cs.opacity===0)return null;if(r.width<=2&&r.height<=2||cs.clip&&cs.clip!=='auto')return null;let d=e.closest('details');while(d){if(!d.open){const sm=d.querySelector(':scope>summary');if(!(sm&&sm.contains(e)))return null;}d=d.parentElement&&d.parentElement.closest('details');}return r;};
+const tx=e=>{const R=document.createRange(),w=document.createTreeWalker(e,NodeFilter.SHOW_TEXT);let L=null,n;while((n=w.nextNode())){if(!n.textContent.trim()||n.parentElement.closest('svg'))continue;{const pr=n.parentElement.getBoundingClientRect();if(pr.width<=2&&pr.height<=2)continue;}R.selectNodeContents(n);const b=R.getBoundingClientRect();if(b.width){L=L?{l:Math.min(L.l,b.left),r:Math.max(L.r,b.right),t:Math.min(L.t,b.top),b:Math.max(L.b,b.bottom)}:{l:b.left,r:b.right,t:b.top,b:b.bottom};}}return L;};
+const tr=e=>{const R=document.createRange();let L=null;for(const n of e.childNodes){if(n.nodeType===3&&n.textContent.trim()){R.selectNodeContents(n);const b=R.getBoundingClientRect();if(b.width){L=L?{l:Math.min(L.l,b.left),r:Math.max(L.r,b.right),t:Math.min(L.t,b.top),b:Math.max(L.b,b.bottom)}:{l:b.left,r:b.right,t:b.top,b:b.bottom};}}}return L;};
+const nm=e=>(e.className&&typeof e.className==='string'?e.className.split(' ')[0]:e.tagName.toLowerCase())+' «'+(e.innerText||'').trim().slice(0,14)+'»';
+/* ① 넓은 단추 글자 가운데 */
+for(const e of V.querySelectorAll('.btn,.call,.door-go,.go-cart')){const r=vis(e);if(!r||r.width<W*0.6)continue;const t=(()=>{const R=document.createRange();R.selectNodeContents(e);const b=R.getBoundingClientRect();return b.width?{l:b.left,r:b.right,h:b.height}:null;})();if(!t)continue;if(t.h>parseFloat(getComputedStyle(e).fontSize)*1.9)continue;   /* 두 줄로 꺾인 단추는 줄마다 가운데라 묶음 중심이 어긋나 보여도 정상 */
+ const d=Math.abs((t.l+t.r)/2-(r.left+r.right)/2);if(d>6)out.push('가운데 '+Math.round(d)+'px '+nm(e));}
+/* ② 글자 잘림 */
+for(const e of V.querySelectorAll('*')){if(e.children.length)continue;const r=vis(e);if(!r||!(e.textContent||'').trim())continue;const cs=getComputedStyle(e);
+ if((cs.textOverflow==='ellipsis'||cs.overflow==='hidden'||cs.overflowX==='hidden')&&e.scrollWidth>e.clientWidth+1&&!e.closest('svg'))out.push('잘림 '+nm(e));}
+/* ③ 같은 목록 왼쪽 끝 */
+for(const L of V.querySelectorAll('ul,ol,.rows,.rows-l,.buy,.dose-list,.chips.s4')){const ks=[...L.children].map(c=>[c,vis(c)]).filter(x=>x[1]&&getComputedStyle(x[0]).position!=='absolute');if(ks.length<2)continue;
+ const g=getComputedStyle(L);if(g.display==='flex'&&g.flexDirection.startsWith('row')||g.display.includes('grid')&&g.gridTemplateColumns.split(' ').length>1)continue;
+ const l0=ks[0][1].left;const bad=ks.filter(x=>Math.abs(x[1].left-l0)>2);if(bad.length)out.push('왼쪽 끝 '+nm(L)+' '+Math.round(bad[0][1].left-l0)+'px');}
+/* ④ 보이는 글자 겹침 — 줄마다의 글 상자(getClientRects)끼리. 여러 줄로 꺾인 글을 한 상자로 보면 옆 줄 굵은 글과 겹친 것처럼 보인다 */
+const T=[], LR=[];for(const e of V.querySelectorAll('*')){if(e.closest('svg,.sr,.toast,[aria-hidden="true"]'))continue;const t=tr(e);if(!t||!vis(e))continue;if(t.r-t.l<2)continue;T.push([e,t]);
+ const R=document.createRange(),rs=[];for(const n of e.childNodes){if(n.nodeType===3&&n.textContent.trim()){R.selectNodeContents(n);for(const q of R.getClientRects())if(q.width>2)rs.push(q);}}LR.push([e,rs]);}
+const fixd=e=>{for(let x=e;x&&x!==document.body;x=x.parentElement){const p=getComputedStyle(x).position;if(p==='sticky'||p==='fixed')return true;}return false;};
+for(let i=0;i<LR.length&&out.length<40;i++)for(let j=i+1;j<LR.length;j++){const [a,A]=LR[i],[b,B]=LR[j];if(a.contains(b)||b.contains(a))continue;let hit=false;
+ for(const p of A){for(const q of B){const ox=Math.min(p.right,q.right)-Math.max(p.left,q.left), oy=Math.min(p.bottom,q.bottom)-Math.max(p.top,q.top);if(ox>4&&oy>0.4*Math.min(p.height,q.height)){hit=true;break;}}if(hit)break;}
+ if(hit&&!fixd(a)&&!fixd(b)){out.push('겹침 '+nm(a)+' × '+nm(b));break;}}
+/* ⑤ 위쪽 빈 띠 */
+const tops=[...T.map(x=>x[1]),...[...V.querySelectorAll('img,svg,canvas,input,select,button,.card,.sec')].map(e=>vis(e)).filter(Boolean).map(r=>({t:r.top,b:r.bottom}))].filter(t=>t.t>0&&t.t<1600).map(t=>[t.t,t.b]).sort((a,b)=>a[0]-b[0]);let lb=null;for(const [t,b] of tops){if(lb!=null&&t-lb>=200){out.push('빈 띠 '+Math.round(t-lb)+'px @'+Math.round(lb));break;}lb=lb==null?b:Math.max(lb,b);}
+/* ⑥ 아이콘·글자 세로 가운데 */
+for(const e of V.querySelectorAll('button,a,summary,.chip,.badge')){const r=vis(e);if(!r)continue;const s=[...e.children].find(c=>c.tagName==='svg'||c.tagName==='SVG');if(!s)continue;const t=tx(e);if(!t)continue;const sr=s.getBoundingClientRect();if(!sr.height)continue;
+ if(t.b-t.t>parseFloat(getComputedStyle(e).fontSize)*1.9)continue;   /* 두 줄 이상이면 아이콘은 첫 줄·가운데 어느 쪽도 정상 */ const d=Math.abs((sr.top+sr.bottom)/2-(t.t+t.b)/2);if(d>3)out.push('아이콘 세로 '+Math.round(d)+'px '+nm(e));}
+return [...new Set(out)].slice(0,8);}"""
+
 def main():
     fails = []
     with sync_playwright() as p:
@@ -93,11 +124,18 @@ def main():
                 go(pg, r); o = pg.evaluate(OVER)
                 if o: fails.append(f'④ 넘침 320·가장 크게·{th} {r}: {o}')
             pg.close()
+        # ⑦ 정렬 — 320·360·390·420 × 보통·가장 크게(밝게) + 390 어둡게
+        for w, fs, th in [(w, fs, 'light') for w in (320, 360, 390, 420) for fs in ('17px', '23px')] + [(390, '17px', 'dark'), (390, '23px', 'dark')]:
+            pg = page(w, fs, th)
+            for r in ROUTES:
+                go(pg, r); al = pg.evaluate(ALIGN)
+                if al: fails.append(f'⑦ 정렬 {w}·{fs}·{th} {r}: {al}')
+            pg.close()
         b.close()
     print(f'디자인 점검 — 화면 {len(ROUTES)}개')
     if fails:
         print('결함', len(fails)); [print('  ✗', f) for f in fails]; sys.exit(1)
-    print('✓ 결함 0 — 손가락 36px · 칸 속의 칸 · 글자 크기 · 320 넘침 · 빈 화면 · 행동 깊이')
+    print('✓ 결함 0 — 손가락 36px · 칸 속의 칸 · 글자 크기 · 320 넘침 · 빈 화면 · 행동 깊이 · 정렬(가운데·잘림·왼쪽 끝·겹침·빈 띠·아이콘)')
 
 if __name__ == '__main__':
     main()
