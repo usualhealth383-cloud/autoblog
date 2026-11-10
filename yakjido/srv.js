@@ -2628,8 +2628,8 @@ try {
    키: 아래 값표 kakaoJsKey 한 곳(기본 빈칸 — 현욱님이 Kakao Developers 에 앱·도메인 등록 뒤 넣는다). 설치({kakaoJsKey}) 로 앱별로 덮을 수도 있다.
    SDK: 카카오 공식 CDN t1.kakaocdn.net 2.8.2 · 무결성(sha384) 고정. */
 (function () {
-  if (window.보내기) return;
-  var 판 = '2026-11-11a';
+  if (window.보내기 && window.보내기.판) return;   /* 11-11b 소아 — 앱에 같은 이름 전역 함수가 있으면 덮지 않고 window.mn보내기 로만 */
+  var 판 = '2026-11-11b';
   var 값표 = { kakaoJsKey: '', sdk: 'https://t1.kakaocdn.net/kakao_js_sdk/2.8.2/kakao.min.js', sdkSri: 'sha384-zt/G7/KfaRQ9dT/QIkS0ujMtzouJqzuSJcXVQu50x0rl/+mD1dc70AeOejVbMD9E', 카카오글한도: 200 };
   var 설정 = { app: '', 앱이름: '', 링크: 'https://medinanum.com/', 언어: null, 시트열기: null, 시트닫기: null, 알림: null, 빼기: null };
   var 말 = {
@@ -2715,12 +2715,12 @@ try {
     return '<div class="mnsend">' + (o.설명 !== false ? '<p class="mnsend-sub">' + esc(o.설명 || 글('미리')) + '</p>' : '')
       + '<label class="sr-only" for="mnSendTx" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">' + esc(글('보낼글')) + '</label>'
       + '<textarea id="mnSendTx" rows="6" data-raw="1">' + esc(d.글) + '</textarea>'
-      + '<button type="button" class="mnsend-kk" onclick="보내기.카톡()">' + 말풍선 + esc(글('카톡')) + '</button>'
-      + '<div class="mnsend-sm"><span>' + esc(글('또는')) + '</span><button type="button" onclick="보내기.문자()">' + esc(글('문자')) + '</button><span aria-hidden="true">·</span><button type="button" onclick="보내기.복사()">' + esc(글('복사')) + '</button></div>'
+      + '<button type="button" class="mnsend-kk" onclick="mn보내기.카톡()">' + 말풍선 + esc(글('카톡')) + '</button>'
+      + '<div class="mnsend-sm"><span>' + esc(글('또는')) + '</span><button type="button" onclick="mn보내기.문자()">' + esc(글('문자')) + '</button><span aria-hidden="true">·</span><button type="button" onclick="mn보내기.복사()">' + esc(글('복사')) + '</button></div>'
       + (d.뺐다 ? '<p class="mnsend-note">' + esc(글('뺌')) + '</p>' : '')
       + '<p class="mnsend-note">' + esc(글('조용')) + (키() ? ' ' + esc(글('카조용')) : '') + '</p></div>';
   }
-  window.보내기 = {
+  var 손잡이 = {
     판: 판, 값표: 값표,
     설치: function (o) { o = o || {}; for (var k in o) if (Object.prototype.hasOwnProperty.call(o, k)) 설정[k] = o[k]; return this; },
     열기: function (o) {
@@ -2737,6 +2737,9 @@ try {
     다듬기: function (t) { return 다듬기(t).글; },
     키있나: function () { return !!키(); }
   };
+  window.mn보내기 = 손잡이;
+  if (window.보내기) { try { console.warn('보내기 부품: 앱에 같은 이름(보내기)이 있어 window.mn보내기 로만 엽니다'); } catch (e) {} }
+  else window.보내기 = 손잡이;
 })();
 /* ▲▲ 보내기 부품 끝 ▲▲ */
 /* 11-11 Main(현욱님) — 카카오톡으로 보내기 공용 부품. 키는 빈칸(없으면 카카오 SDK 를 부르지 않고 휴대폰 공유창 → 문자·복사).
@@ -2745,7 +2748,7 @@ try {
   if (!navigator.share && typeof plug === 'function' && plug('Share')) navigator.share = function (o) { return plug('Share').share({ title: o.title || '', text: o.text || '', dialogTitle: '어디로 보낼까요' }); };
 } catch (e) {}
 try {
-  보내기.설치({ app: 'yakjido', 앱이름: '약지도', 링크: 'https://yakjido.medinanum.com/',
+  mn보내기.설치({ app: 'yakjido', 앱이름: '약지도', 링크: 'https://yakjido.medinanum.com/',
     언어: function () { return window.LANG || 'ko'; },
     시트열기: function (html, 제목) { var v = document.getElementById('view'); if (!v) return; v.innerHTML = topBar({ back: '뒤로' }) + html.replace(/^<h2>/, '<h1>').replace(/<\/h2>/, '</h1>'); scrollTo(0, 0); },
     시트닫기: function () { route(); },
