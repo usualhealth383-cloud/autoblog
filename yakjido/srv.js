@@ -2609,6 +2609,148 @@ try {
     알림받기: function () { go('/notify'); },
     모양: { 주: 'btn primary', 보조: 'btn line' } });
 } catch (e) {}
+/* ▼▼ 보내기 부품 시작 ▼▼ */
+/* ═══ 보내기 — 카카오톡으로 보내기 · 문자 · 복사 (다섯 앱 공용 부품, 2026-11-11 현욱님 「카카오톡으로 보내기」) ═══
+   흐름: 앱이 보낼 글을 만든다 → 이 부품이 «미리보기 시트»를 띄운다(받는 사람이 보는 글 그대로 · 고쳐 쓰기) →
+         사용자가 누를 때만 보낸다(자동 발송 없음).
+   보내는 길(위에서부터 되는 것):
+     ① kakaoJsKey 가 있고 글이 200자 이하 → Kakao.Share.sendDefault(텍스트 템플릿 · 링크 버튼 하나)
+        (카카오 텍스트 템플릿은 글 200자까지 — 넘으면 ②로. 키가 없으면 SDK 를 아예 불러오지 않는다)
+     ② navigator.share({text}) — 안드로이드·아이폰 공유창에 카카오톡이 뜬다
+     ③ 문자(sms:?body=) · 복사
+   지킬 것: 주민등록번호·이메일은 기본으로 지운다. 앱이 이름 목록(빼기)을 주면 그 이름도 「보호자」 같은 말로 바꾼다.
+            보낸 글은 부품이 어디에도 저장하지 않는다. 카카오 키를 켜면 보내는 글이 카카오(주) 서버를 거친다(처리방침 사실 메모 _서버/보내기_카카오_문서사실.md).
+   쓰는 법(앱 끝):
+     보내기.설치({ app:'gildongmu', 앱이름:'길동무', 링크:'https://gildongmu.medinanum.com/',
+                   언어: function(){ return 'ko'; }, 시트열기: openSheetHTML, 시트닫기: closeSheet, 알림: function(m){...},
+                   빼기: function(){ return [내 이름, ...]; } });
+     보내기.열기({ 제목:'가족에게 보내기', 설명:'받는 분에게 이렇게 보여요', 글: '...' });
+   키: 아래 값표 kakaoJsKey 한 곳(기본 빈칸 — 현욱님이 Kakao Developers 에 앱·도메인 등록 뒤 넣는다). 설치({kakaoJsKey}) 로 앱별로 덮을 수도 있다.
+   SDK: 카카오 공식 CDN t1.kakaocdn.net 2.8.2 · 무결성(sha384) 고정. */
+(function () {
+  if (window.보내기) return;
+  var 판 = '2026-11-11a';
+  var 값표 = { kakaoJsKey: '', sdk: 'https://t1.kakaocdn.net/kakao_js_sdk/2.8.2/kakao.min.js', sdkSri: 'sha384-zt/G7/KfaRQ9dT/QIkS0ujMtzouJqzuSJcXVQu50x0rl/+mD1dc70AeOejVbMD9E', 카카오글한도: 200 };
+  var 설정 = { app: '', 앱이름: '', 링크: 'https://medinanum.com/', 언어: null, 시트열기: null, 시트닫기: null, 알림: null, 빼기: null };
+  var 말 = {
+    ko: { 카톡: '카카오톡으로 보내기', 문자: '문자로', 복사: '복사', 또는: '또는', 복사됨: '복사했어요 — 카카오톡이나 문자에 붙여 넣어 보내 주세요', 못함: '이 기기에서는 바로 보낼 수 없어요. 글을 길게 눌러 복사해 주세요.',
+          미리: '받는 분에게 이렇게 보여요. 고쳐서 보내셔도 돼요.', 조용: '보내는 글은 이 기기에서 만들어지고, 앱은 보관하지 않아요. 누르실 때만 보내져요.', 카조용: '카카오톡으로 보내기를 누르시면 이 글이 카카오를 거쳐 전달돼요.', 뺌: '주민등록번호·이메일처럼 알아볼 수 있는 정보는 빼고 담았어요.', 버튼: '앱에서 보기', 보낼글: '보낼 글' },
+    en: { 카톡: 'Send via KakaoTalk', 문자: 'Text message', 복사: 'Copy', 또는: 'or', 복사됨: 'Copied — paste it into KakaoTalk or a text message', 못함: 'This device can’t send it directly. Press and hold the text to copy it.',
+          미리: 'This is what they’ll see. You can edit it before sending.', 조용: 'The message is made on this device and the app doesn’t keep it. It is only sent when you tap.', 카조용: 'If you tap Send via KakaoTalk, this message passes through Kakao to be delivered.', 뺌: 'Identifying details such as ID numbers and email addresses have been left out.', 버튼: 'Open the app', 보낼글: 'Message to send' },
+    es: { 카톡: 'Enviar por KakaoTalk', 문자: 'Por SMS', 복사: 'Copiar', 또는: 'o', 복사됨: 'Copiado: péguelo en KakaoTalk o en un SMS', 못함: 'Este dispositivo no puede enviarlo directamente. Mantenga pulsado el texto para copiarlo.',
+          미리: 'Así lo verá quien lo reciba. Puede editarlo antes de enviar.', 조용: 'El mensaje se crea en este dispositivo y la app no lo guarda. Solo se envía cuando usted pulsa.', 카조용: 'Si pulsa Enviar por KakaoTalk, el mensaje pasa por Kakao para entregarse.', 뺌: 'Se han quitado datos identificativos como números de identidad o correos.', 버튼: 'Abrir la app', 보낼글: 'Mensaje para enviar' },
+    ja: { 카톡: 'カカオトークで送る', 문자: 'SMSで', 복사: 'コピー', 또는: 'または', 복사됨: 'コピーしました — カカオトークやSMSに貼り付けて送ってください', 못함: 'この端末からは直接送れません。文字を長押ししてコピーしてください。',
+          미리: '受け取る人にはこう見えます。直してから送ってもかまいません。', 조용: '送る文はこの端末で作られ、アプリは保存しません。押したときだけ送られます。', 카조용: 'カカオトークで送るを押すと、この文はカカオを通って届きます。', 뺌: '住民登録番号・メールアドレスなど、個人がわかる情報は外しました。', 버튼: 'アプリで見る', 보낼글: '送る文' },
+    zh: { 카톡: '用 KakaoTalk 发送', 문자: '发短信', 복사: '复制', 또는: '或', 복사됨: '已复制——请粘贴到 KakaoTalk 或短信里发送', 못함: '这台设备无法直接发送。请长按文字复制。',
+          미리: '对方看到的就是这样。发送前可以修改。', 조용: '要发送的内容在本设备上生成，应用不会保存。只有您点按时才会发送。', 카조용: '点按“用 KakaoTalk 发送”时，这条内容会经由 Kakao 传送。', 뺌: '身份证号、邮箱等可识别个人的信息已去掉。', 버튼: '在应用中查看', 보낼글: '要发送的内容' }
+  };
+  function 언() { var l = 'ko'; try { l = (설정.언어 && 설정.언어()) || document.documentElement.lang || 'ko'; } catch (e) {} l = String(l).slice(0, 2); return 말[l] ? l : 'ko'; }
+  function 글(k) { return (말[언()] || 말.ko)[k] || 말.ko[k]; }
+  function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
+  function 키() { return 설정.kakaoJsKey || 값표.kakaoJsKey || ''; }
+  /* 알아볼 수 있는 정보 빼기 — 주민등록번호 · 이메일 · 앱이 준 이름 */
+  function 다듬기(t) {
+    var s = String(t || ''), 뺐다 = false;
+    var 주 = /\b\d{6}\s?-\s?[1-8]\d{6}\b/g, 메 = /[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}/g;
+    if (주.test(s) || 메.test(s)) { 뺐다 = true; s = s.replace(주, '').replace(메, ''); }
+    try { var 이름들 = typeof 설정.빼기 === 'function' ? (설정.빼기() || []) : [];
+      이름들.forEach(function (n) { n = String(n || '').trim(); if (n.length < 2) return; if (s.indexOf(n) >= 0) { 뺐다 = true; s = s.split(n).join(''); } }); } catch (e) {}
+    return { 글: s.replace(/[ \t]+\n/g, '\n').replace(/\n{3,}/g, '\n\n').trim(), 뺐다: 뺐다 };
+  }
+  /* 카카오 SDK — 키가 있을 때만, 처음 누를 때 한 번 */
+  var sdk약속 = null;
+  function sdk() {
+    if (!키()) return Promise.reject(new Error('nokey'));
+    if (window.Kakao && window.Kakao.Share) { try { if (!Kakao.isInitialized()) Kakao.init(키()); } catch (e) {} return Promise.resolve(window.Kakao); }
+    if (sdk약속) return sdk약속;
+    sdk약속 = new Promise(function (res, rej) {
+      var sc = document.createElement('script'); sc.src = 값표.sdk; sc.integrity = 값표.sdkSri; sc.crossOrigin = 'anonymous'; sc.async = true;
+      sc.onload = function () { try { if (!Kakao.isInitialized()) Kakao.init(키()); res(window.Kakao); } catch (e) { rej(e); } };
+      sc.onerror = function () { sdk약속 = null; rej(new Error('sdk')); };
+      document.head.appendChild(sc);
+    });
+    return sdk약속;
+  }
+  function 알림(m) { try { if (typeof 설정.알림 === 'function') return 설정.알림(m); } catch (e) {} try { alert(m); } catch (e) {} }
+  function 지금글() { var t = document.getElementById('mnSendTx'); return t ? String(t.value || '') : ''; }
+  function 공유창(t) {
+    try { if (navigator.share) { return navigator.share({ text: t }).then(function () { return true; }, function (e) { return !(e && e.name !== 'AbortError') ? true : false; }); } } catch (e) {}
+    return Promise.resolve(false);
+  }
+  function 복사(t) {
+    function 옛() { try { var a = document.createElement('textarea'); a.value = t; a.setAttribute('readonly', ''); a.style.cssText = 'position:fixed;left:-9999px'; document.body.appendChild(a); a.select(); var ok = document.execCommand('copy'); a.remove(); return ok; } catch (e) { return false; } }
+    try { if (navigator.clipboard && navigator.clipboard.writeText) return navigator.clipboard.writeText(t).then(function () { 알림(글('복사됨')); }, function () { if (옛()) 알림(글('복사됨')); else 알림(글('못함')); }); } catch (e) {}
+    if (옛()) 알림(글('복사됨')); else 알림(글('못함'));
+    return Promise.resolve();
+  }
+  function 카톡() {
+    var t = 지금글(); if (!t.trim()) return;
+    var 링크 = 설정.링크 || 'https://medinanum.com/';
+    var 카카오되나 = !!키() && t.length <= 값표.카카오글한도;
+    var 길 = 카카오되나 ? sdk().then(function (K) {
+        K.Share.sendDefault({ objectType: 'text', text: t, link: { mobileWebUrl: 링크, webUrl: 링크 }, buttonTitle: 글('버튼') });
+        return true;
+      }) : Promise.reject(new Error('skip'));
+    return 길.catch(function () { return 공유창(t); }).then(function (됨) { if (!됨) return 복사(t); });
+  }
+  function 문자() {
+    var t = 지금글(); if (!t.trim()) return;
+    try { location.href = 'sms:?body=' + encodeURIComponent(t); } catch (e) { 복사(t); }
+  }
+  function 스타일() {
+    if (document.getElementById('mnsend-css')) return;
+    var A = 'var(--accent,var(--teal,#23685A))', L = 'var(--line,rgba(127,127,127,.28))', D = 'var(--ink2,var(--muted,inherit))';
+    var st = document.createElement('style'); st.id = 'mnsend-css';
+    st.textContent = '.mnsend{word-break:keep-all;overflow-wrap:anywhere}.mnsend-sub{margin:0 0 10px;color:' + D + ';line-height:1.55}'
+      + '.mnsend textarea{display:block;box-sizing:border-box;width:100%;min-height:140px;padding:14px;border-radius:16px;border:1px solid ' + L + ';background:var(--card,transparent);color:inherit;font:inherit;font-size:17px;line-height:1.6;resize:vertical}'
+      + '.mnsend-kk{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;min-height:56px;margin-top:12px;border:0;border-radius:14px;background:#FEE500;color:#191919;font:inherit;font-size:1.05em;font-weight:800;cursor:pointer}'
+      + '.mnsend-kk svg{width:22px;height:22px;flex:none}'
+      + '.mnsend-sm{display:flex;justify-content:center;align-items:center;gap:6px;margin-top:8px;color:' + D + ';font-size:.92em}'
+      + '.mnsend-sm button{min-height:44px;padding:0 10px;border:0;background:none;color:' + A + ';font:inherit;font-weight:700;cursor:pointer}'
+      + '.mnsend-note{margin:8px 0 0;font-size:.82em;line-height:1.5;color:' + D + '}';
+    document.head.appendChild(st);
+  }
+  var 말풍선 = '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path fill="#191919" d="M12 3.5c-5 0-9 3.2-9 7.1 0 2.5 1.6 4.7 4.1 6l-1 3.6c-.1.3.3.6.6.4l4.2-2.8c.4 0 .7.1 1.1.1 5 0 9-3.2 9-7.2S17 3.5 12 3.5z"/></svg>';
+  function 시트HTML(o, d) {
+    return '<div class="mnsend">' + (o.설명 !== false ? '<p class="mnsend-sub">' + esc(o.설명 || 글('미리')) + '</p>' : '')
+      + '<label class="sr-only" for="mnSendTx" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">' + esc(글('보낼글')) + '</label>'
+      + '<textarea id="mnSendTx" rows="6" data-raw="1">' + esc(d.글) + '</textarea>'
+      + '<button type="button" class="mnsend-kk" onclick="보내기.카톡()">' + 말풍선 + esc(글('카톡')) + '</button>'
+      + '<div class="mnsend-sm"><span>' + esc(글('또는')) + '</span><button type="button" onclick="보내기.문자()">' + esc(글('문자')) + '</button><span aria-hidden="true">·</span><button type="button" onclick="보내기.복사()">' + esc(글('복사')) + '</button></div>'
+      + (d.뺐다 ? '<p class="mnsend-note">' + esc(글('뺌')) + '</p>' : '')
+      + '<p class="mnsend-note">' + esc(글('조용')) + (키() ? ' ' + esc(글('카조용')) : '') + '</p></div>';
+  }
+  window.보내기 = {
+    판: 판, 값표: 값표,
+    설치: function (o) { o = o || {}; for (var k in o) if (Object.prototype.hasOwnProperty.call(o, k)) 설정[k] = o[k]; return this; },
+    열기: function (o) {
+      o = o || {}; 스타일();
+      var d = 다듬기(typeof o.글 === 'function' ? o.글() : o.글);
+      var h = (o.제목 ? '<h2>' + esc(o.제목) + '</h2>' : '') + 시트HTML(o, d);
+      if (typeof 설정.시트열기 === 'function') { try { 설정.시트열기(h, o.제목 || 글('카톡')); return; } catch (e) {} }
+      var v = document.getElementById('mnSendSheet'); if (v) v.remove();
+      v = document.createElement('div'); v.id = 'mnSendSheet'; v.setAttribute('role', 'dialog'); v.setAttribute('aria-modal', 'true'); v.setAttribute('aria-label', o.제목 || 글('카톡'));
+      v.style.cssText = 'position:fixed;left:0;right:0;bottom:0;max-height:88vh;overflow:auto;z-index:2147482000;padding:16px;background:var(--bg,#fff);border-top:1px solid rgba(0,0,0,.15)';
+      v.innerHTML = h; document.body.appendChild(v);
+    },
+    카톡: 카톡, 문자: 문자, 복사: function () { var t = 지금글(); if (t.trim()) 복사(t); },
+    다듬기: function (t) { return 다듬기(t).글; },
+    키있나: function () { return !!키(); }
+  };
+})();
+/* ▲▲ 보내기 부품 끝 ▲▲ */
+/* 11-11 Main(현욱님) — 카카오톡으로 보내기 공용 부품. 키는 빈칸(없으면 카카오 SDK 를 부르지 않고 휴대폰 공유창 → 문자·복사).
+   설치 앱(웹뷰)에는 navigator.share 가 없어(10-13) 부품의 공유창이 복사로만 빠진다 — 앱의 Share 플러그인으로 같은 자리를 채운다. */
+try {
+  if (!navigator.share && typeof plug === 'function' && plug('Share')) navigator.share = function (o) { return plug('Share').share({ title: o.title || '', text: o.text || '', dialogTitle: '어디로 보낼까요' }); };
+} catch (e) {}
+try {
+  보내기.설치({ app: 'yakjido', 앱이름: '약지도', 링크: 'https://yakjido.medinanum.com/',
+    언어: function () { return window.LANG || 'ko'; },
+    시트열기: function (html, 제목) { var v = document.getElementById('view'); if (!v) return; v.innerHTML = topBar({ back: '뒤로' }) + html.replace(/^<h2>/, '<h1>').replace(/<\/h2>/, '</h1>'); scrollTo(0, 0); },
+    시트닫기: function () { route(); },
+    알림: function (t) { try { toast(t); } catch (e) {} } });
+} catch (e) {}
 /* 다섯 언어(10-27) — 설정의 언어·나라 칸. 언어를 바꾸면 다시 연다. 나라는 응급·위기 번호를 고른다(요청서 표) */
 window.언어칸 = function () {
   var LN = [['ko', '한국어'], ['en', 'English'], ['es', 'Español'], ['ja', '日本語'], ['zh', '简体中文']];

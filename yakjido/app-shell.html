@@ -4075,7 +4075,7 @@ function memoText(s){
   const dn = droppedNote(bk), alg = (ME.allergy || []).map(x => ingrNameK(ingIndex().byKey[x.ing]?.n || x.ing));
   return `[약지도] ${s.name}\n${items.map(t => '· ' + t).join('\n')}${dn ? '\n' + dn : ''}${alg.length || ME.allergyUnknown ? '\n약 알레르기: ' + (alg.length ? alg.join(', ') : '있었어요(성분은 몰라요)') : ''}\n${say ? '\n' + say : ''}\n\n소염제는 한 가지만 · 아세트아미노펜 하루 4 g 이내`;
 }
-async function shareMemo(id){ const s = byId(D.symptoms, id); const t = memoText(s); try { if (await shareOut({ title: '약국 메모 · ' + s.name, text: t })) return; } catch (e) { return; } try { await navigator.clipboard.writeText(t); toast('약국 메모를 복사했어요'); } catch (e) { appCopy('아래 글을 길게 눌러 복사해서 쓰세요', t); } }
+async function shareMemo(id){ const s = byId(D.symptoms, id); const t = memoText(s); if (window.보내기) return 보내기.열기({ 제목: '약사에게 보여 드릴 메모', 글: t }); try { if (await shareOut({ title: '약국 메모 · ' + s.name, text: t })) return; } catch (e) { return; } try { await navigator.clipboard.writeText(t); toast('약국 메모를 복사했어요'); } catch (e) { appCopy('아래 글을 길게 눌러 복사해서 쓰세요', t); } }
 function prodSeq(name){ return D.productImages?.[name]?.seq || ''; }
 /* 회수 공지 — tools/mfds_recalls.py 가 식약처 «회수·폐기» 목록을 품목코드로 받아 둔 것(content/recalls.json).
    회수는 «특정 제조번호»만이라 제품에 빨간 딱지를 붙이지 않는다. 제조번호를 적어 «집에 있는 약을 확인»하게 한다. */
@@ -7498,6 +7498,7 @@ async function doSend(){
     } catch (e) { toast('링크를 만들지 못해 글로 보내요'); }
   }
   const t = sendText(items, label, note, link, sendDropped(SEND_Q));
+  if (window.보내기) return 보내기.열기({ 제목: '부모님께 보내기', 글: t });   /* 11-11 카카오톡으로 보내기 공용 부품 — 미리보기·고쳐 쓰기 */
   try { if (await shareOut({ title: '약지도 · 약 좀 사 주세요', text: t })) return; } catch (e) { return; }
   try { await navigator.clipboard.writeText(t); toast('복사했어요 — 카카오톡이나 문자에 붙여 넣으세요'); } catch (e) { appCopy('아래 글을 길게 눌러 복사해서 보내세요', t); }
 }
@@ -7676,7 +7677,7 @@ function bagText(){
   L.push('앱이 미리 본 것이라 참고용이에요. 약사·의사 판단이 우선이에요.');
   return L.join('\n');
 }
-async function shareBag(){ const t = bagText(); try { if (await shareOut({ title: '약지도 · 제가 먹는 약', text: t })) return; } catch (e) { return; } try { await navigator.clipboard.writeText(t); toast('약 목록을 복사했어요'); } catch (e) { appCopy('아래 글을 길게 눌러 복사해서 쓰세요', t); } }
+async function shareBag(){ const t = bagText(); if (window.보내기) return 보내기.열기({ 제목: '제가 먹는 약 한 장', 글: t }); try { if (await shareOut({ title: '약지도 · 제가 먹는 약', text: t })) return; } catch (e) { return; } try { await navigator.clipboard.writeText(t); toast('약 목록을 복사했어요'); } catch (e) { appCopy('아래 글을 길게 눌러 복사해서 쓰세요', t); } }
 
 /* ───────── 약사님이 권한 약 확인 ───────── */
 /* 성분명을 모르는 어르신이 카운터에서 바로 확인할 수 있게 — 이름만 넣으면 같은 약인지 판정한다. */
