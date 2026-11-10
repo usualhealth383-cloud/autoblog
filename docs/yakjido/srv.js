@@ -1868,7 +1868,7 @@ window.문_consent = () => {
 /* 설정의 「약관·개인정보」 칸 · 내 정보 맨 위 계정 줄 · 처음 안내 끝의 계정 칸 — index 는 ext('이름') 으로 부른다(첫 화면 예산) */
 window.약관칸 = () => { const c = consentRec(); return `<section class="sec card" id="legal"><h2>약관·개인정보</h2><div class="rows-l" style="margin-top:10px">${lrow(I.book, '이용약관', '약지도를 쓰실 때의 약속', "go('/doc/terms')")}${lrow(I.lock, '개인정보 처리방침', '무엇을 어디에 두는지', "go('/doc/privacy')")}</div>
   <p class="small muted" style="margin-top:8px">${c && c.at ? `동의한 날 ${esc(c.at)} · 판 ${esc(c.v || '')}` : '동의 기록이 이 휴대폰에 없어요'}</p>
-  <p class="small muted" style="margin-top:4px">운영 메디나눔 · 사업자 등록 대기 중 · 문의 ${esc(D.meta?.contact?.email || 'contact@medinanum.com')}</p></section>`; };   /* 11-10 C4 — 등록증이 오면 Main 이 다섯 앱 한 번에(대표·상호·번호) */
+  <details class="small muted biz" style="margin-top:6px"><summary style="min-height:44px;display:flex;align-items:center;cursor:pointer">사업자 정보 · 메디나눔${I.chev}</summary><p>상호 메디나눔 · 대표 박민욱</p><p>사업자등록번호 799-14-03176</p><p>통신판매업 신고번호 준비 중</p><p>주소 서울특별시 강동구 천중로 147, 204호(천호동, 성심하이빌)</p><p>전화 준비 중 · 문의 ${esc(D.meta?.contact?.email || 'contact@medinanum.com')}</p></details></section>`; };   /* 11-10 C4 — 등록증이 오면 Main 이 다섯 앱 한 번에(대표·상호·번호) */
 /* 설정의 계정 칸(meta.account 가 켜졌을 때만) — 10-14 app-shell 에서 옮김(첫 화면 예산). 내용은 그대로 */
 window.계정칸 = () => D.meta?.account !== true ? '' : `<section class="sec card" id="acct"><h2>계정 <small>폰을 바꿔도 이어 보기 · 선택</small></h2>
     <p class="small muted" style="margin:4px 0 12px">로그인하지 않아도 약지도는 쓰실 수 있어요. 로그인하시면 기록을 메디나눔 서버(서울)에 복사해 두어 다른 폰에서 이어 받아요.</p>
