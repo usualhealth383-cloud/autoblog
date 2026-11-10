@@ -709,7 +709,7 @@
       동의준비: '(필수) 14일 체험은 {날}에 끝나요. 결제가 시작되기 전에 요금·결제일을 보여 드리고 다시 동의를 받아요.',
       요금: '요금', 학생기본: '학생', 학생인증준비: '인증은 준비 중이에요', 학생인증단추: '학생 인증하기',
       출시가: '출시 기념가', 출시조건: '출시 3개월 안에 가입하면 첫 1년', 회원권: '메디나눔 회원권', 회원권설명: '다섯 앱을 함께 쓰는 이용권', 회원권자격: 'ClinicScore 의료인 기능은 의료인 확인 뒤 열려요',
-      곧: '곧 열려요', 자동: '14일 체험 뒤 자동 결제돼요 · 부가세 포함 · 설정에서 언제든 해지', 출시값: '{값}(출시 기념가 · 첫 1년, 둘째 해부터 {정가})', 출시값둘: '출시 기념가 {값} — 첫 1년, 둘째 해부터 {정가}', 초대중: '<b>초대 코드로 체험 중</b> · {날}까지', 초대뒤: '이 기간에는 결제되지 않아요. 기간이 끝나면 일반 상태로 돌아가요.', 회원권시작: '회원권으로 시작', 회원권연시작: '회원권 1년으로 시작 · {값}', 회원권중: '메디나눔 회원권으로 열려 있어요.',
+      회원권권함: '다섯 앱을 함께 쓰시면 메디나눔 회원권이 더 알뜰해요 — 앱 하나 {앱값} · 다섯 앱 {회원권값}', 곧: '곧 열려요', 자동: '14일 체험 뒤 자동 결제돼요 · 부가세 포함 · 설정에서 언제든 해지', 출시값: '{값}(출시 기념가 · 첫 1년, 둘째 해부터 {정가})', 출시값둘: '출시 기념가 {값} — 첫 1년, 둘째 해부터 {정가}', 초대중: '<b>초대 코드로 체험 중</b> · {날}까지', 초대뒤: '이 기간에는 결제되지 않아요. 기간이 끝나면 일반 상태로 돌아가요.', 회원권시작: '회원권으로 시작', 회원권연시작: '회원권 1년으로 시작 · {값}', 회원권중: '메디나눔 회원권으로 열려 있어요.',
       이유: { login: '먼저 로그인해 주세요.', verify: '메일함의 확인 링크를 먼저 눌러 주세요. 확인한 계정에서 체험이 시작돼요.',
               used_account: '이 계정은 14일 체험을 이미 쓰셨어요.', used_device: '이 기기에서는 14일 체험을 이미 쓰셨어요.',
               device: '이 브라우저에서는 체험을 시작할 수 없어요. 다른 브라우저로 해 주세요.', app: '잠시 문제가 있었어요. 다시 해 주세요.',
@@ -763,7 +763,7 @@
       동의준비: '(Required) The 14-day trial ends on {날}. Before any payment starts, we will show you the price and billing date and ask for your consent again.',
       요금: 'Price', 학생기본: 'students', 학생인증준비: 'verification is coming soon', 학생인증단추: 'Verify student status',
       출시가: 'Launch price', 출시조건: 'first year, if you join within 3 months of launch', 회원권: 'MediNanum pass', 회원권설명: 'one plan for all five apps', 회원권자격: 'ClinicScore professional tools open after the professional check',
-      곧: 'coming soon', 자동: 'Billed automatically after the 14-day trial · VAT included · cancel any time in Settings', 출시값: '{값} (launch price for the first year; {정가} from the second year)', 출시값둘: 'launch price {값} for the first year; {정가} from the second year', 초대중: '<b>Invite access</b> · until {날}', 초대뒤: 'Nothing is charged during this period. Afterwards it returns to normal.', 회원권시작: 'Start with the pass', 회원권연시작: 'Start a 1-year pass · {값}', 회원권중: 'Open through your MediNanum pass.',
+      회원권권함: 'Using several apps? The MediNanum pass is better value — one app {앱값} · five apps {회원권값}', 곧: 'coming soon', 자동: 'Billed automatically after the 14-day trial · VAT included · cancel any time in Settings', 출시값: '{값} (launch price for the first year; {정가} from the second year)', 출시값둘: 'launch price {값} for the first year; {정가} from the second year', 초대중: '<b>Invite access</b> · until {날}', 초대뒤: 'Nothing is charged during this period. Afterwards it returns to normal.', 회원권시작: 'Start with the pass', 회원권연시작: 'Start a 1-year pass · {값}', 회원권중: 'Open through your MediNanum pass.',
       이유: { login: 'Please sign in first.', verify: 'Please open the confirmation link in your email first. The trial starts on a confirmed account.',
               used_account: 'This account has already used the 14-day trial.', used_device: 'This device has already used the 14-day trial.',
               device: 'The trial cannot be started in this browser. Please try another browser.', app: 'Something went wrong. Please try again.',
@@ -1079,7 +1079,7 @@
       단 = (typeof 설정.로그인열기 === 'function' ? 단추(말글('로그인하러'), '구독.로그인()', true) : '') + 단추(말글('닫기'), '구독.닫기()', false);
     } else if (!s.status) {
       몸 = '<p>' + 전환말(끝) + '</p>';
-      동 = 동의줄('subAgreeT');
+      동 = 동의줄('subAgreeT') + ((설정.회원권 && 설정.회원권.월 && 설정.가격 && 설정.가격.월) ? 작은(말글('회원권권함', { 앱값: 월값(설정.가격.월), 회원권값: 월값(설정.회원권.월) })) : '');   /* 11-11 — 체험 시작 직전 한 줄만. 기본 선택은 누른 상품 그대로, 압박 말 없음 */
       단 = 단추(말글('체험시작'), '구독.체험시작()', true) + (연있나() ? 단추(말글('연시작', { 값: 첫연값() }), "구독.체험시작('year')", false) : '') + 단추(말글('닫기'), '구독.닫기()', false);
     } else {
       몸 = '<p>' + (s.status === 'trial' ? 말글('체험끝') : 말글('기간끝')) + ' ' + 말글('기록그대로') + '</p>';
@@ -1341,7 +1341,8 @@ window.mergeMe = function (localRaw, serverRaw) {
 };
 try {
   /* 준비됨 = meta.json 의 account 스위치 — 공용 서버에 약지도 칸(메디나눔_약지도_추가_1013.sql)이 열린 뒤에 true 로 켠다. 그 전엔 「준비 중」 한 줄(되는 척 금지). */
-  서버.설치({ app: 'yakjido', 열쇠: /^yakjido\.(me|fam|hx)\.v1$/, 병합: function (k, mine, theirs) { return k === 'yakjido.me.v1' && typeof mergeMe === 'function' ? mergeMe(mine, theirs) : null; },   /* 11-03 fam.v1 = 알림 설정(시간대·기다리는 시간·쉬는 시간·정시 알림) — 서버 알림 함수가 읽는다 */ 준비됨: function () { return !!(typeof D !== 'undefined' && D.meta && D.meta.account === true); }, 허용: srvAgreed, 다시그리기: srvReload,
+  서버.설치({ app: 'yakjido', 동기화허용: function () { return !window.가입 || 가입.됨(); },   /* 11-11 가입 전에는 올리지 않는다 */
+    열쇠: /^yakjido\.(me|fam|hx)\.v1$/, 병합: function (k, mine, theirs) { return k === 'yakjido.me.v1' && typeof mergeMe === 'function' ? mergeMe(mine, theirs) : null; },   /* 11-03 fam.v1 = 알림 설정(시간대·기다리는 시간·쉬는 시간·정시 알림) — 서버 알림 함수가 읽는다 */ 준비됨: function () { return !!(typeof D !== 'undefined' && D.meta && D.meta.account === true); }, 허용: srvAgreed, 다시그리기: srvReload,
     가입확인: { 글: '만 14세 이상이에요', 설명: '메디나눔 계정은 만 14세 이상만 만들 수 있어요. 아이 약은 보호자 계정에 담아 주세요.' },
     /* 2026-10-14 로그인 문의 「서버에 저장하기」 체크 — 설정의 서버동의켜기와 같은 꼴로 적는다 */
     동의기록: function () { try { localStorage.setItem(AGREE_KEY, JSON.stringify({ server: true, at: new Date().toISOString() })); } catch (e) {} } });
@@ -1363,6 +1364,371 @@ try {
     알림: function (t) { try { toast(t); } catch (e) {} },
     로그인열기: function () { go('/login'); },
     바뀜: function () { try { if (/^#\/me/.test(location.hash)) route(); } catch (e) {} } });
+} catch (e) {}
+/* ▼▼ 가입 부품 시작 ▼▼ */
+/* ═══ 앱별 가입 · 초대 코드 · 관리자 — 다섯 앱 공용 부품 (2026-10-21) ═══════════════════════
+   요청: docs/requests/20261021_메디나눔_앱별가입·초대코드·관리자.md · 서버: _서버/메디나눔_가입초대관리_1021.sql
+   · 계정은 하나(메디나눔 공용 서버), 앱 이용은 앱마다 «가입(그 앱 약관 동의)» 기록이 따로(app_members).
+     다른 앱에서 만든 계정으로 처음 로그인하면 바로 들어가지 않고 「<앱> 가입」 시트를 거친다. 가입 전에는 동기화를 멈춘다(가입.됨()).
+     이 앱에서 «가입 동의를 하고» 계정을 만든 분은 다시 묻지 않는다(설치 옵션 가입표시 — 앱의 가입 단추에서 가입.이앱가입() 을 부른다).
+   · 초대 코드 — 로그인한 가입자만. 서버 함수 redeem_invite 로만(앱이 표를 직접 고치지 못한다). 받은 기간은 구독 부품이
+     subscription_status 의 plan 'invite' 로 알아보고 「초대 코드로 체험 중 · ○월 ○일까지」로 보인다.
+   · 관리자 — 서버 admins 표에 있는 계정에만 「관리자」 단추가 보인다(아니면 자리 자체가 없다). 화면의 모든 일은 서버가 다시 확인한다(is_admin).
+   · 서버 부품(window.서버 — 준비 · 세션)이 없거나 준비 중이면 조용히 비활성.
+   쓰는 법(앱 끝, 서버.설치 · 구독.설치 뒤):
+     가입.설치({ app:'clinicscore', 약관판:'2026-10-21', 이름:{ko:'ClinicScore',en:'ClinicScore'},
+                 말:function(){return 'ko';}, 약관:'…주소', 처리방침:'…주소',
+                 추가동의:[{ko:'(필수) 의료인 또는 의료 관련 학생입니다', en:'…'}],      // 앱마다 더 받을 확인(모두 필수)
+                 시트열기:function(html, 제목){…}, 시트닫기:function(){…}, 알림:function(말){…},
+                 모양:{ 줄:'rcta', 주:'p', 보조:'s', 작은글:'bandnote' } });
+     화면:  가입.초대HTML() (설정 → 구독 아래) · 가입.관리자HTML() (설정 맨 아래 — 관리자에게만 단추 하나)
+     동기화: 서버.설치({ 동기화허용: function(){ return !window.가입 || 가입.됨(); } })
+   ⛔ 「돈 안 드는」 뜻의 그 낱말(원칙 금지어)을 쓰지 않는다 — 초대는 「초대 코드로 체험」. */
+(function () {
+  var 판 = '2026-10-21';   /* 부품 판 11-11a — 앱별 민감 동의 · 회원권이면 동의 한 번 · 두 번째 앱 회원권 한 줄 */
+  var 앱들 = ['kids', 'gildongmu', 'clinicscore', 'gyeote', 'yakjido'];
+  var 앱이름 = { kids: '우리 집 소아과', gildongmu: '길동무', clinicscore: 'ClinicScore', gyeote: '곁에', yakjido: '약지도' };
+  var 설정 = { 초대길: null, app: 'app', 약관판: '', 이름: null, 말: null, 약관: '', 처리방침: '', 추가동의: [], 민감동의: null, 서버1111: false, 시트열기: null, 시트닫기: null, 알림: null, 모양: {} };   /* 11-11 민감동의(앱 글 {ko,en}) · 서버1111(join_app2 쓰기 — SQL 적용 뒤 켬) */
+  var 글 = {
+    ko: {
+      가입제목: '{앱} 가입', 가입말: '이 계정은 메디나눔의 다른 앱에서 만들어졌어요. {앱}을(를) 쓰시려면 이 앱의 약관에 따로 동의해 주세요. 다른 앱의 기록은 이 앱에 보이지 않아요.',
+      가입동의: '(필수) {앱} <a href="{약관}" target="_blank" rel="noopener">이용약관</a>과 <a href="{처리방침}" target="_blank" rel="noopener">개인정보 처리방침</a>에 동의합니다',
+      회원권가입말: '메디나눔 회원권으로 다섯 앱이 열려 있어요. {앱}에서는 이 앱의 동의만 한 번 받을게요 — 다른 앱의 기록은 이 앱에 보이지 않아요.', 회원권권함: '다섯 앱을 함께 쓰시면 메디나눔 회원권이 더 알뜰해요 — 앱 하나 월 {앱값} · 다섯 앱 월 {회원권값}', 회원권보기: '회원권 보기', 민감없음: '건강정보 동의에 체크해 주세요. 이 앱은 건강정보를 다뤄서, 회원권이어도 따로 여쭤요.',
+      가입단추: '동의하고 가입', 나중: '로그아웃', 가입됨: '{앱}에 가입했어요.', 체크: '필수 항목에 모두 체크해 주세요.', 문제: '잠시 문제가 있었어요. 다시 해 주세요.',
+      인터넷: '인터넷이 닿지 않아요. 연결되면 다시 해 주세요.', 가입대기: '{앱} 가입 동의 전이라 동기화를 멈춰 두었어요.', 가입열기: '가입 동의하기',
+      초대: '초대 코드', 초대말: '받으신 초대 코드가 있으면 넣어 주세요.', 초대넣기: '코드 넣기', 초대칸: '예: MN-AB12-CD34',
+      초대됨: '초대 코드가 확인됐어요. {날}까지 모든 기능을 쓸 수 있어요.', 초대중: '<b>초대 코드로 체험 중</b> · {날}까지',
+      초대꺼짐: '지금은 모든 기능이 열려 있어요. 결제가 시작되어도 이 코드로 받은 기간 동안은 그대로 열려요.',
+      초대시험: '시험용 계정에는 실제 환자 정보를 넣지 마세요.',
+      이유: { login: '먼저 로그인해 주세요.', member: '먼저 이 앱에 가입해 주세요.', rate: '오늘은 더 넣을 수 없어요. 내일 다시 해 주세요.',
+              notfound: '맞는 코드가 없어요. 글자를 다시 확인해 주세요.', off: '사용이 멈춘 코드예요.', expired: '기한이 지난 코드예요.',
+              full: '정해진 인원이 다 쓴 코드예요.', scope: '이 앱에는 쓸 수 없는 코드예요.', used: '이미 쓰신 코드예요.', app: '잠시 문제가 있었어요.' },
+      관리자: '관리자', 관리제목: '관리자', 앱별: '앱별 숫자', 가입자: '가입', 체험: '체험', 구독: '구독', 초대받음: '초대', 문의대기: '답 기다리는 문의',
+      회원권: '회원권', 계정: '계정', 새코드: '새 초대 코드', 범위: '쓸 수 있는 앱', 모든앱: '다섯 앱 모두', 기간: '받는 기간(일)', 인원: '쓸 수 있는 사람 수',
+      유효: '코드 유효(일, 비우면 끝없음)', 메모: '메모(누구에게 주나)', 만들기: '만들기', 만듦: '만들었어요: {코드}', 복사: '복사',
+      코드들: '초대 코드', 사용: '사용', 켜짐: '쓰는 중', 꺼짐: '멈춤', 멈추기: '멈추기', 다시켜기: '다시 켜기', 사람: '받은 사람', 회수: '거두기',
+      회수확인: '한 번 더 누르면 거둬요', 회수됨: '거뒀어요.', 문의: '문의', 모든문의: '모든 앱', 없음: '아직 없어요.', 닫기: '닫기', 새로: '새로 고침', 까지: '{날}까지',
+      /* 관리자다듬기1030 */
+      만들제목: '초대 코드 만들기', 받는기간: '받는 기간', 일30: '30일', 일90: '90일', 년1: '1년', 앱칸: '쓸 수 있는 앱', 다섯모두: '다섯 앱 모두', 이앱만: '끄면 {앱}에서만 써요',
+      메모칸: '메모 (선택)', 메모예: '예: 사연 주신 ○○님', 자세히: '자세히', 사람수: '쓸 수 있는 사람 수', 넣는기간: '코드를 넣을 수 있는 기간 (일)', 코드만들기: '코드 만들기', 만드는중: '만드는 중…',
+      새코드카드: '새 초대 코드', 넣어야: '{날}까지 넣어야 해요', 기한없음: '넣는 기한 없음', 코드복사: '코드 복사', 답장복사: '답장 문장 복사', 복사됨: '복사했어요.',
+      만든코드: '만든 코드', 메모없음: '메모 없음', 남은날: '{n}일 남음', 기한지남: '넣는 기한 지남', 받은사람보기: '받은 사람 보기', 숫자제목: '앱별 숫자',
+      답장: '안녕하세요, 메디나눔 운영팀이에요.\n보내 주신 이야기 잘 읽었어요. 아래 초대 코드를 넣으시면 {기간} 동안 {앱}의 모든 기능을 쓰실 수 있어요.\n\n초대 코드: {코드}\n넣는 곳: {길}\n{날}까지 넣어 주세요.\n\n치료하시는 길에 늘 함께할게요.\n— 메디나눔 운영팀',
+      다섯앱이름: '메디나눔 다섯 앱', 기본길: '설정 → 초대 코드', 운영자줄: '운영자 · 모든 기능'
+    },
+    en: {
+      가입제목: 'Join {앱}', 가입말: 'This account was created in another MediNanum app. To use {앱}, please agree to this app’s terms separately. Records from other apps are not shown here.',
+      가입동의: '(Required) I agree to the {앱} <a href="{약관}" target="_blank" rel="noopener">Terms</a> and <a href="{처리방침}" target="_blank" rel="noopener">Privacy Policy</a>',
+      회원권가입말: 'Your MediNanum pass opens all five apps. {앱} just needs your consent once for this app — records from other apps are not shown here.', 회원권권함: 'Using several apps? The MediNanum pass is better value — one app {앱값}/month · five apps {회원권값}/month', 회원권보기: 'See the pass', 민감없음: 'Please tick the health information consent. This app handles health information, so we ask separately even with the pass.',
+      가입단추: 'Agree and join', 나중: 'Sign out', 가입됨: 'You joined {앱}.', 체크: 'Please tick all required boxes.', 문제: 'Something went wrong. Please try again.',
+      인터넷: 'No connection. Please try again when you are online.', 가입대기: 'Sync is paused until you agree to {앱}’s terms.', 가입열기: 'Agree and join',
+      초대: 'Invite code', 초대말: 'If you received an invite code, enter it here.', 초대넣기: 'Apply code', 초대칸: 'e.g. MN-AB12-CD34',
+      초대됨: 'Invite code accepted. Everything is open until {날}.', 초대중: '<b>Invite access</b> · until {날}',
+      초대꺼짐: 'Everything is open right now. When billing starts, this code keeps it open for the period it gives.',
+      초대시험: 'Please do not enter real patient information in test accounts.',
+      이유: { login: 'Please sign in first.', member: 'Please join this app first.', rate: 'Too many tries today. Please try tomorrow.',
+              notfound: 'That code was not found. Please check the letters.', off: 'This code has been switched off.', expired: 'This code has expired.',
+              full: 'This code has been used by everyone it was meant for.', scope: 'This code is not for this app.', used: 'You already used this code.', app: 'Something went wrong.' },
+      관리자: 'Admin', 관리제목: 'Admin', 앱별: 'By app', 가입자: 'Joined', 체험: 'Trial', 구독: 'Paid', 초대받음: 'Invited', 문의대기: 'Open questions',
+      회원권: 'Pass', 계정: 'Accounts', 새코드: 'New invite code', 범위: 'Apps', 모든앱: 'All five apps', 기간: 'Access (days)', 인원: 'People',
+      유효: 'Code valid (days, blank = no end)', 메모: 'Note (who it is for)', 만들기: 'Create', 만듦: 'Created: {코드}', 복사: 'Copy',
+      코드들: 'Invite codes', 사용: 'Used', 켜짐: 'Active', 꺼짐: 'Stopped', 멈추기: 'Stop', 다시켜기: 'Turn on', 사람: 'People', 회수: 'Revoke',
+      회수확인: 'Tap again to revoke', 회수됨: 'Revoked.', 문의: 'Questions', 모든문의: 'All apps', 없음: 'Nothing yet.', 닫기: 'Close', 새로: 'Refresh', 까지: 'until {날}',
+      만들제목: 'Create an invite code', 받는기간: 'Access period', 일30: '30 days', 일90: '90 days', 년1: '1 year', 앱칸: 'Apps', 다섯모두: 'All five apps', 이앱만: 'Off = {앱} only',
+      메모칸: 'Note (optional)', 메모예: 'e.g. for Ms. Kim who wrote to us', 자세히: 'Details', 사람수: 'How many people can use it', 넣는기간: 'Days the code can be entered', 코드만들기: 'Create code', 만드는중: 'Creating…',
+      새코드카드: 'New invite code', 넣어야: 'Must be entered by {날}', 기한없음: 'No entry deadline', 코드복사: 'Copy code', 답장복사: 'Copy reply', 복사됨: 'Copied.',
+      만든코드: 'Codes', 메모없음: 'No note', 남은날: '{n} days left', 기한지남: 'Entry deadline passed', 받은사람보기: 'See who used it', 숫자제목: 'By app',
+      답장: 'Hello, this is the MediNanum team.\nThank you for sharing your story with us. Enter the invite code below to use every feature of {앱} for {기간}.\n\nInvite code: {코드}\nWhere: {길}\nPlease enter it by {날}.\n\nWe are with you on this path.\n— The MediNanum team',
+      다섯앱이름: 'all five MediNanum apps', 기본길: 'Settings → Invite code', 운영자줄: 'Operator · all features'
+    }
+  };
+  function 말() { try { return typeof 설정.말 === 'function' && 설정.말() === 'en' ? 'en' : 'ko'; } catch (e) { return 'ko'; } }
+  function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
+  function 두벌(v) { if (v == null) return ''; if (typeof v === 'object') return v[말()] || v.ko || ''; return String(v); }
+  function 이앱() { return 두벌(설정.이름) || 앱이름[설정.app] || 설정.app; }
+  function 말글(k, 값) {
+    var t = 글[말()][k]; if (t == null) t = 글.ko[k]; t = String(t == null ? '' : t);
+    var v = { 앱: esc(이앱()) }; for (var a in 값 || {}) v[a] = 값[a];
+    return t.replace(/\{([^}]+)\}/g, function (_, n) { return v[n] != null ? v[n] : ''; });
+  }
+  function 날(t) { var d = new Date(t); if (isNaN(d)) return '—'; return 말() === 'en' ? d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0') : (d.getMonth() + 1) + '월 ' + d.getDate() + '일'; }
+  function 모(k) { return (설정.모양 && 설정.모양[k]) || ''; }
+  function 단추(t, 부름, 주, 이름) { var c = 주 ? 모('주') : 모('보조'); return '<button type="button"' + (c ? ' class="' + c + '"' : '') + (이름 ? ' aria-label="' + esc(이름) + '"' : '') + ' onclick="' + 부름 + '">' + esc(t) + '</button>'; }
+  function 줄(안) { return '<div class="' + 모('줄') + '">' + 안 + '</div>'; }
+  function 작은(t) { return '<p class="' + 모('작은글') + '">' + t + '</p>'; }
+  function 알림(t) { try { if (typeof 설정.알림 === 'function') return 설정.알림(t); } catch (e) {} }
+  function 시트열기(html, 제목) { try { if (typeof 설정.시트열기 === 'function') return 설정.시트열기(html, 제목); } catch (e) {} }
+  function 시트닫기() { try { if (typeof 설정.시트닫기 === 'function') 설정.시트닫기(); } catch (e) {} }
+
+  /* ── 서버 ── */
+  function 서버() { return window.서버 && typeof window.서버.준비 === 'function' && (!window.서버.준비됨 || window.서버.준비됨()) ? window.서버 : null; }
+  function 세션() { try { var s = 서버(); return s && s.세션 ? s.세션() : null; } catch (e) { return null; } }
+  function 사용자() { var s = 세션(); return s && s.user ? s.user.id : null; }
+  function 키() { return '_join_' + 설정.app; }
+  function 읽기() { var o = null; try { o = JSON.parse(localStorage.getItem(키()) || 'null'); } catch (e) {} var u = 사용자(); return o && u && o.user === u ? o : null; }
+  function 쓰기(o) { try { if (o) localStorage.setItem(키(), JSON.stringify(o)); else localStorage.removeItem(키()); } catch (e) {} }
+  function rpc(이름, 인자) {
+    var s = 서버(); if (!s) return Promise.reject(new Error('noserver'));
+    return s.준비().then(function (sb) { if (!sb) throw new Error('noserver'); return sb.rpc(이름, 인자 || {}); }).then(function (r) {
+      if (r && r.error) throw r.error; return r ? r.data : null;
+    });
+  }
+  var 확인중 = null, 시트떴다 = false;
+  function 확인(조용히) {
+    if (!사용자()) return Promise.resolve(null);
+    if (확인중) return 확인중;
+    확인중 = rpc('my_app', { p_app: 설정.app }).then(function (d) {
+      if (!d || d.why) return null;
+      var o = { user: 사용자(), member: !!d.member, grant_until: d.grant_until ? Date.parse(d.grant_until) : null, admin: !!d.admin, pass: !!d.pass, apps: +d.apps || 0, at: Date.now() };   /* 11-11 pass·apps(서버 1111 뒤에만 옴) */
+      if (!o.member && 이앱가입표시()) {   /* 이 앱에서 가입 동의를 하고 계정을 만든 분 — 다시 묻지 않고 기록만 */
+        return rpc('join_app', { p_app: 설정.app, p_terms: 설정.약관판 || 판 }).then(function (r) { if (r && r.ok) { o.member = true; 가입표시지움(); } 쓰기(o); return o; });
+      }
+      쓰기(o); return o;
+    }).then(function (o) {
+      확인중 = null; 바뀜();
+      if (o && !o.member && !조용히 && !시트떴다) { 시트떴다 = true; 가입열기(); }
+      return o;
+    }, function () { 확인중 = null; return null; });
+    return 확인중;
+  }
+  function 이앱가입표시() { try { return sessionStorage.getItem('_join_signup_' + 설정.app) === '1' || localStorage.getItem('_join_signup_' + 설정.app) === '1'; } catch (e) { return false; } }
+  function 가입표시지움() { try { sessionStorage.removeItem('_join_signup_' + 설정.app); localStorage.removeItem('_join_signup_' + 설정.app); } catch (e) {} }
+  function 바뀜() {
+    try { var el = document.getElementById('joininv'); if (el) el.outerHTML = 초대HTML(); } catch (e) {}
+    try { var el2 = document.getElementById('joinadmbtn'); if (el2) el2.outerHTML = 관리자HTML(); } catch (e) {}
+    try { var el3 = document.getElementById('joinwait'); if (el3) el3.outerHTML = 대기HTML(); } catch (e) {}
+  }
+
+  /* ── 가입 ── */
+  function 됨() { if (!사용자()) return true; var o = 읽기(); return !!(o && o.member); }
+  function 원(n) { n = +n || 0; return 말() === 'en' ? '₩' + n.toLocaleString('en-US') : n.toLocaleString('ko-KR') + '원'; }
+  function 가입HTML() {
+    var o = 읽기() || {};
+    var 칸 = '<label class="subagree"><input type="checkbox" class="joinchk"> <span>' + 말글('가입동의', { 약관: esc(설정.약관 || '#'), 처리방침: esc(설정.처리방침 || '#') }) + '</span></label>';
+    (설정.추가동의 || []).forEach(function (x) { 칸 += '<label class="subagree"><input type="checkbox" class="joinchk"> <span>' + esc(두벌(x)) + '</span></label>'; });
+    if (설정.민감동의) 칸 += '<label class="subagree"><input type="checkbox" class="joinchk joinsens"> <span>' + esc(두벌(설정.민감동의)) + '</span></label>';   /* 11-11 — 앱마다 따로 · 회원권이어도 생략 안 함 */
+    /* 11-11 회원권 권하기 — 두 번째 앱부터 작은 한 줄(압박 말 없음 · 가입 단추는 그대로) */
+    var 권함 = (!o.pass && o.apps >= 1 && window.회원권 && 회원권.열기)
+      ? 작은(말글('회원권권함', { 앱값: 원((window.회원권.값표 && 회원권.값표.앱 && 회원권.값표.앱.월) || 5900), 회원권값: 원((window.회원권.값표 && 회원권.값표.회원권 && 회원권.값표.회원권.월) || 12900) }) + ' <button type="button" class="' + (모('보조') || '') + '" onclick="회원권.열기()">' + esc(말글('회원권보기')) + '</button>') : '';
+    return '<div id="joinbox"><p>' + 말글(o.pass ? '회원권가입말' : '가입말') + '</p>' + 칸 + 줄(단추(말글('가입단추'), '가입.가입하기()', true) + 단추(말글('나중'), '가입.나가기()', false)) + 권함 + '</div>';
+  }
+  function 가입열기() { 시트열기(가입HTML(), 말글('가입제목')); }
+  function 가입하기() {
+    var 칸 = document.querySelectorAll('#joinbox .joinchk'), 다 = 칸.length > 0;
+    for (var i = 0; i < 칸.length; i++) if (!칸[i].checked) 다 = false;
+    if (!다) { 알림(말글(document.querySelector('#joinbox .joinsens:not(:checked)') ? '민감없음' : '체크')); return Promise.resolve(false); }
+    var 민감 = !!document.querySelector('#joinbox .joinsens:checked');
+    return (설정.서버1111 ? rpc('join_app2', { p_app: 설정.app, p_terms: 설정.약관판 || 판, p_sensitive: 민감 }) : rpc('join_app', { p_app: 설정.app, p_terms: 설정.약관판 || 판 })).then(function (r) {
+      if (r && r.why === 'sensitive') { 알림(말글('민감없음')); return false; }
+      if (!r || !r.ok) { 알림(말글('문제')); return false; }
+      var o = 읽기() || { user: 사용자() }; o.member = true; o.at = Date.now(); 쓰기(o);
+      시트닫기(); 알림(말글('가입됨')); 바뀜();
+      try { var 동 = window.서버 && window.서버.동기화 ? window.서버.동기화() : null; if (동 && 동.catch) 동.catch(function () {}); } catch (e) {}
+      return true;
+    }, function () { 알림(navigator.onLine === false ? 말글('인터넷') : 말글('문제')); return false; });
+  }
+  function 나가기() { 시트닫기(); try { if (typeof window.계정동작 === 'function') return window.계정동작('logout'); } catch (e) {} }
+  function 대기HTML() {
+    if (!사용자() || 됨()) return '<span id="joinwait"></span>';
+    return '<div id="joinwait">' + 작은(말글('가입대기')) + 줄(단추(말글('가입열기'), '가입.가입열기()', true)) + '</div>';
+  }
+
+  /* ── 초대 코드 ── */
+  function 운영자() { var o = 읽기(); return !!(o && o.admin); }   /* 10-30 현욱님 — 관리자는 다섯 앱 모든 기능(서버 grants all·admin) */
+  function 초대HTML() {
+    if (!서버() || !사용자()) return '<div id="joininv"></div>';
+    if (운영자()) return '<div id="joininv" class="joininv jadm-op"><b>' + 말글('운영자줄') + '</b></div>';   /* 회원권·체험·초대 코드 글 대신 한 줄 */
+    var o = 읽기(), 지금 = Date.now(), h = '<div id="joininv" class="joininv"><b>' + 말글('초대') + '</b>';
+    if (o && o.grant_until && o.grant_until > 지금) {
+      h += '<p>' + 말글('초대중', { 날: 날(o.grant_until) }) + '</p>' + (구독꺼짐() ? 작은(말글('초대꺼짐')) : '') + 작은(말글('초대시험'));
+    } else {
+      h += 작은(말글('초대말')) + '<div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">' +
+        '<input id="joinInvIn" type="text" autocomplete="off" autocapitalize="characters" spellcheck="false" maxlength="32" style="flex:1;min-width:0" ' +
+        'placeholder="' + esc(말글('초대칸')) + '" aria-label="' + esc(말글('초대')) + '" onkeydown="if(event.key===\'Enter\'&&!event.isComposing){event.preventDefault();가입.초대넣기();}">' +
+        단추(말글('초대넣기'), '가입.초대넣기()', false) + '</div>';
+    }
+    return h + '</div>';
+  }
+  function 구독꺼짐() { try { return !(window.구독 && 구독.켜짐 && 구독.켜짐()); } catch (e) { return true; } }
+  var 넣는중 = false;
+  function 초대넣기() {
+    var el = document.getElementById('joinInvIn'), v = el ? String(el.value || '').trim() : '';
+    if (!v || 넣는중) return Promise.resolve(false);
+    if (!됨()) { 알림(글[말()].이유.member); 가입열기(); return Promise.resolve(false); }
+    넣는중 = true;
+    return rpc('redeem_invite', { p_code: v, p_app: 설정.app }).then(function (r) {
+      넣는중 = false;
+      if (!r || !r.ok) { 알림(글[말()].이유[(r && r.why) || 'app'] || 말글('문제')); return false; }
+      var o = 읽기() || { user: 사용자(), member: true }; o.grant_until = Date.parse(r.until); o.at = Date.now(); 쓰기(o);
+      알림(말글('초대됨', { 날: 날(o.grant_until) })); 바뀜();
+      try { if (window.구독 && 구독.조회) 구독.조회(); } catch (e) {}
+      return true;
+    }, function () { 넣는중 = false; 알림(navigator.onLine === false ? 말글('인터넷') : 말글('문제')); return false; });
+  }
+
+  /* ── 관리자 ── */
+  function 관리자HTML() {
+    var o = 읽기();
+    if (!o || !o.admin) return '<span id="joinadmbtn"></span>';   /* 관리자가 아니면 자리 자체가 없다 */
+    return '<span id="joinadmbtn">' + 줄(단추(말글('관리자'), '가입.관리자열기()', false)) + '</span>';
+  }
+  var 관 = { stats: null, codes: [], 사람: {}, 문의: [], 문의앱: null, 새코드: '', 회수대기: '' };
+  function 관리자열기() { 시트열기('<div id="joinadm">' + 관리몸() + '</div>', 말글('관리제목')); return 관리새로(); }
+  function 관리그리기() { var el = document.getElementById('joinadm'); if (el) el.innerHTML = 관리몸(); }
+  function 관리새로() {
+    return Promise.all([rpc('admin_stats'), rpc('admin_invites'), rpc('admin_inquiries', { p_app: 관.문의앱, p_limit: 30 })]).then(function (r) {
+      관.stats = r[0] || {}; 관.codes = r[1] || []; 관.문의 = r[2] || []; 관리그리기();
+    }, function () { 알림(말글('문제')); });
+  }
+  /* 관리자다듬기1030 — 만들기 한 장 → 새 코드 카드 → 만든 코드 행 → (접기) 문의 · 앱별 숫자 */
+  function 기간글(d) { return d >= 365 ? 말글('년1') : d === 30 ? 말글('일30') : d === 90 ? 말글('일90') : d + (말() === 'en' ? ' days' : '일'); }
+  function 남은(c) { if (!c.expires_at) return 말글('기한없음'); var n = Math.ceil((Date.parse(c.expires_at) - Date.now()) / 86400000); return n > 0 ? 말글('남은날', { n: n }) : 말글('기한지남'); }
+  function 관리몸() {
+    var s = 관.stats, h = '<div class="jadm">', 기 = 관.기간 || 90;
+    h += '<section class="jadm-card"><h3>' + 말글('만들제목') + '</h3>'
+      + '<p class="jadm-lab">' + 말글('받는기간') + '</p><div class="jadm-chips" role="group">'
+      + [30, 90, 365].map(function (d) { var on = 기 === d; return '<button type="button" class="jadm-chip' + (on ? ' on' : '') + '" aria-pressed="' + on + '" onclick="가입.관리기간(' + d + ')">' + esc(기간글(d)) + '</button>'; }).join('') + '</div>'
+      + '<div class="jadm-grp"><p class="jadm-lab">' + 말글('앱칸') + '</p><label class="jadm-tog"><input type="checkbox" id="jaAll"' + (관.모두 ? ' checked' : '') + ' onchange="가입.관리모두(this.checked)"><span>' + 말글('다섯모두') + '</span></label>'
+      + '<p class="jadm-dim">' + esc(관.모두 ? 말글('다섯앱이름') : 말글('이앱만', { 앱: 앱이름[설정.app] || 설정.app })) + '</p>' + '</div>'
+      + '<label class="jadm-lab" for="jaNote">' + 말글('메모칸') + '</label><input id="jaNote" class="jadm-in" type="text" maxlength="200" placeholder="' + esc(말글('메모예')) + '" value="' + esc(관.메모 || '') + '">'
+      + '<details class="jadm-more"><summary>' + 말글('자세히') + '</summary>'
+      + '<label class="jadm-lab" for="jaMax">' + 말글('사람수') + '</label><input id="jaMax" class="jadm-in" type="number" inputmode="numeric" min="1" max="1000" value="1">'
+      + '<label class="jadm-lab" for="jaValid">' + 말글('넣는기간') + '</label><input id="jaValid" class="jadm-in" type="number" inputmode="numeric" min="1" max="366" value="14"></details>'
+      + '<button type="button" class="jadm-go" id="jaGo" onclick="가입.관리만들기()">' + 말글('코드만들기') + '</button></section>';
+    if (관.새) {
+      var n = 관.새;
+      h += '<section class="jadm-new" id="jaNew"><p class="jadm-lab">' + 말글('새코드카드') + '</p><p class="jadm-code">' + esc(n.code) + '</p>'
+        + '<p class="jadm-due">' + (n.expires_at ? 말글('넣어야', { 날: 날(n.expires_at) }) : 말글('기한없음')) + '</p>'
+        + '<p class="jadm-dim">' + esc(기간글(n.days | 0)) + ' · ' + esc(n.scope === 'all' ? 말글('다섯앱이름') : (앱이름[n.scope] || n.scope)) + (n.note ? ' · ' + esc(n.note) : '') + '</p>'
+        + '<div class="jadm-two"><button type="button" class="jadm-go" onclick="가입.관리복사(\'' + esc(n.code) + '\')">' + 말글('코드복사') + '</button>'
+        + '<button type="button" class="jadm-alt" onclick="가입.관리답장()">' + 말글('답장복사') + '</button></div></section>';
+    }
+    h += '<h3 class="jadm-h">' + 말글('만든코드') + '</h3>';
+    if (!관.codes.length) h += '<p class="jadm-dim">' + 말글('없음') + '</p>';
+    관.codes.forEach(function (c) {
+      var 사람 = 관.사람[c.code];
+      h += '<div class="jadm-row' + (c.active ? '' : ' off') + '"><div class="jadm-rowtx"><b class="jadm-mono">' + esc(c.code) + '</b>'
+        + '<span>' + esc(c.note || 말글('메모없음')) + '</span>'
+        + '<span class="jadm-dim jadm-pcs">' + [esc(기간글(c.days | 0)), esc(c.scope === 'all' ? 말글('모든앱') : (앱이름[c.scope] || c.scope)), esc(남은(c)), 말글('사용') + ' ' + (c.used_count | 0) + '/' + (c.max_uses | 0), (c.active ? 말글('켜짐') : 말글('꺼짐'))].map(function (x) { return '<span class="jadm-pc">' + x + '</span>'; }).join(' · ') + '</span>'   /* 10-30 — 조각 단위로만 줄이 바뀐다 */
+        + '<button type="button" class="jadm-link" onclick="가입.관리사람(\'' + esc(c.code) + '\')">' + 말글('받은사람보기') + '</button></div>'
+        + '<button type="button" class="jadm-stop" onclick="가입.관리켜기(\'' + esc(c.code) + '\',' + (c.active ? 'false' : 'true') + ')">' + (c.active ? 말글('멈추기') : 말글('다시켜기')) + '</button></div>';
+      if (사람) {
+        h += '<div class="jadm-people">' + (사람.length ? '' : '<p class="jadm-dim">' + 말글('없음') + '</p>');
+        사람.forEach(function (u) {
+          var 열림 = u.grant_until && Date.parse(u.grant_until) > Date.now(), 키 = u.user_id;
+          h += '<p>' + esc(u.email || '—') + ' · ' + esc(앱이름[u.app] || u.app) + (u.grant_until ? ' · ' + 말글('까지', { 날: 날(u.grant_until) }) : '')
+            + (열림 ? ' <button type="button" class="jadm-link" onclick="가입.관리회수(\'' + esc(키) + '\',\'' + esc(c.code) + '\')">' + (관.회수대기 === 키 ? 말글('회수확인') : 말글('회수')) + '</button>' : '') + '</p>';
+        });
+        h += '</div>';
+      }
+    });
+    h += '<details class="jadm-more"><summary>' + 말글('문의') + ' (' + 관.문의.length + ')</summary>'
+      + '<select id="joinAdmInqApp" class="jadm-in" onchange="가입.관리문의앱(this.value)"><option value="">' + 말글('모든문의') + '</option>'
+      + 앱들.map(function (a) { return '<option value="' + a + '"' + (관.문의앱 === a ? ' selected' : '') + '>' + esc(앱이름[a]) + '</option>'; }).join('') + '</select>'
+      + (관.문의.length ? 관.문의.map(function (q) { return '<div class="jadm-inq"><p class="jadm-dim">' + esc(앱이름[q.app] || q.app) + ' · ' + esc(String(q.created_at || '').slice(0, 10)) + (q.screen ? ' · ' + esc(q.screen) : '') + '</p><p>' + esc(q.text) + '</p></div>'; }).join('') : '<p class="jadm-dim">' + 말글('없음') + '</p>')
+      + '</details>';
+    h += '<details class="jadm-more"><summary>' + 말글('숫자제목') + '</summary>';
+    if (s) {
+      h += '<div style="overflow-x:auto"><table class="jadm-tab"><tr><th></th><th>' + 말글('가입자') + '</th><th>' + 말글('체험') + '</th><th>' + 말글('구독') + '</th><th>' + 말글('초대받음') + '</th><th>' + 말글('문의대기') + '</th></tr>';
+      앱들.forEach(function (a) { var x = s[a] || {}; h += '<tr><th>' + esc(앱이름[a]) + '</th><td>' + (x.members | 0) + '</td><td>' + (x.trial | 0) + '</td><td>' + (x.active | 0) + '</td><td>' + (x.invited | 0) + '</td><td>' + (x.inquiries_open | 0) + '</td></tr>'; });
+      h += '</table></div><p class="jadm-dim">' + esc(말글('회원권')) + ' ' + (s.pass | 0) + ' · ' + esc(말글('계정')) + ' ' + (s.accounts | 0) + '</p>';
+    } else h += '<p class="jadm-dim">…</p>';
+    return h + '</details></div>';
+  }
+  function 관리기간(d) { 관.기간 = d; 관.메모 = (document.getElementById('jaNote') || {}).value || 관.메모 || ''; 관리그리기(); }
+  function 관리모두(v) { 관.모두 = !!v; 관.메모 = (document.getElementById('jaNote') || {}).value || 관.메모 || ''; 관리그리기(); }
+  function 관리답장() {
+    var n = 관.새; if (!n) return;
+    var 길 = 설정.초대길 ? 두벌(설정.초대길) : 말글('기본길');
+    var t = 말글('답장', { 기간: 기간글(n.days | 0), 앱: n.scope === 'all' ? 말글('다섯앱이름') : (앱이름[n.scope] || n.scope), 코드: n.code, 길: 길, 날: n.expires_at ? 날(n.expires_at) : '—' }).replace(/\\n/g, '\n');
+    try { navigator.clipboard.writeText(t).then(function () { 알림(말글('복사됨')); }, function () { 알림(t); }); } catch (e) { 알림(t); }
+  }
+  function 숫자(id, 기본) { var el = document.getElementById(id), n = el ? parseInt(el.value, 10) : NaN; return isNaN(n) ? 기본 : n; }
+  function 관리만들기() {
+    var sc = 관.모두 ? 'all' : 설정.app, 메 = String((document.getElementById('jaNote') || {}).value || '').trim().slice(0, 200), 기 = 관.기간 || 90;
+    var 유값 = Math.max(1, Math.min(366, 숫자('jaValid', 14))), 사람수 = Math.max(1, Math.min(1000, 숫자('jaMax', 1)));
+    var b = document.getElementById('jaGo'); if (b) { b.disabled = true; b.textContent = 말글('만드는중'); }
+    return rpc('admin_create_invite', { p_scope: sc, p_days: 기, p_max_uses: 사람수, p_valid_days: 유값, p_note: 메 }).then(function (r) {
+      var code = (r && r.code) || ''; 관.메모 = '';
+      return 관리새로().then(function () {
+        var c = 관.codes.filter(function (x) { return x.code === code; })[0];
+        관.새 = c || { code: code, days: 기, scope: sc, note: 메, expires_at: new Date(Date.now() + 유값 * 86400000).toISOString() };
+        관리그리기(); try { var el = document.getElementById('jaNew'); if (el) el.scrollIntoView({ block: 'start', behavior: 'smooth' }); } catch (e) {}
+      });
+    }, function () { 알림(말글('문제')); if (b) { b.disabled = false; b.textContent = 말글('코드만들기'); } });
+  }
+  function 관리켜기(code, 켜) { return rpc('admin_set_invite', { p_code: code, p_active: !!켜 }).then(관리새로, function () { 알림(말글('문제')); }); }
+  function 관리사람(code) {
+    return rpc('admin_invite_users', { p_code: code }).then(function (r) { 관.사람[code] = r || []; 관리그리기(); }, function () { 알림(말글('문제')); });
+  }
+  function 관리회수(user, code) {
+    if (관.회수대기 !== user) { 관.회수대기 = user; 관리그리기(); return Promise.resolve(false); }   /* 두 번 누름 */
+    관.회수대기 = '';
+    return rpc('admin_revoke', { p_user: user, p_scope: null }).then(function () { 알림(말글('회수됨')); return 관리사람(code); }, function () { 알림(말글('문제')); });
+  }
+  function 관리문의앱(a) { 관.문의앱 = a || null; return rpc('admin_inquiries', { p_app: 관.문의앱, p_limit: 30 }).then(function (r) { 관.문의 = r || []; 관리그리기(); }, function () { 알림(말글('문제')); }); }
+  function 관리복사(t) { try { navigator.clipboard.writeText(t).then(function () { 알림(t); }); } catch (e) { 알림(t); } }
+
+  /* ── 로그인 갈고리 — 로그인·가입·소셜 뒤 앱 가입을 확인한다 ── */
+  function 갈고리() {
+    var f = window.계정동작; if (typeof f !== 'function' || f.__가입) return;
+    var g = function (what) {
+      if (what === 'signup') { try { sessionStorage.setItem('_join_signup_' + 설정.app, '1'); localStorage.setItem('_join_signup_' + 설정.app, '1'); } catch (e) {} }
+      if (what === 'logout') { 쓰기(null); 시트떴다 = false; }
+      var r = f.apply(this, arguments);
+      if (what === 'login' || what === 'signup') Promise.resolve(r).then(function () { setTimeout(function () { 확인(); }, 400); });
+      return r;
+    };
+    g.__가입 = true; window.계정동작 = g;
+  }
+
+  window.가입 = {
+    판: 판,
+    설치: function (o) {
+      o = o || {};
+      ['app', '약관판', '이름', '말', '약관', '처리방침', '추가동의', '민감동의', '서버1111', '시트열기', '시트닫기', '알림', '모양', '초대길'].forEach(function (k) { if (k in o) 설정[k] = o[k]; });
+      if (앱들.indexOf(설정.app) < 0) return;
+      if (!document.getElementById('jadm-css')) { var 꼴 = document.createElement('style'); 꼴.id = 'jadm-css'; 꼴.textContent = ''   /* 관리자다듬기1030 — 왼쪽 선 하나 · 칸 48 · 간격 12 · 17px */
+        + '.jadm{--g:12px;display:flex;flex-direction:column;gap:var(--g);font-size:17px;line-height:1.55}.jadm h3{margin:0;font-size:19px}.jadm .jadm-h{margin-top:8px}'
+        + '.jadm-card,.jadm-new{display:flex;flex-direction:column;gap:var(--g);padding:18px;border:1px solid var(--line,rgba(0,0,0,.14));border-radius:16px;background:var(--card,#fff)}'
+        + '.jadm-new{border-color:var(--accent,#2f5d50);box-shadow:0 0 0 1px var(--accent,#2f5d50) inset}'
+        + '.jadm-pc{white-space:nowrap}.jadm-grp{display:flex;flex-direction:column;gap:4px}.jadm-lab{margin:0;font-weight:700;font-size:15px;display:block}.jadm-dim{margin:0;font-size:15px;opacity:.72;word-break:keep-all}'
+        + '.jadm-chips{display:flex;gap:8px}.jadm-chip{flex:1;min-height:48px;border:1px solid var(--line,rgba(0,0,0,.18));border-radius:12px;background:var(--card,#fff);color:inherit;font-weight:700;font-size:17px;line-height:1.2;font-family:inherit;cursor:pointer}'
+        + '.jadm-chip.on{border-color:var(--accent,#2f5d50);box-shadow:0 0 0 2px var(--accent,#2f5d50) inset;color:var(--accent,#2f5d50)}'
+        + '.jadm-tog{display:flex;align-items:center;gap:10px;min-height:48px;font-size:17px;cursor:pointer}.jadm-tog input{width:24px;height:24px;margin:0;accent-color:var(--accent,#2f5d50)}'
+        + '.jadm-in{width:100%;box-sizing:border-box;min-height:48px;padding:0 14px;border:1px solid var(--line,rgba(0,0,0,.18));border-radius:12px;background:var(--card,#fff);color:inherit;font-size:17px;font-family:inherit}'
+        + '.jadm-go,.jadm-alt{width:100%;min-height:52px;border-radius:14px;font-weight:700;font-size:17px;line-height:1.2;font-family:inherit;cursor:pointer}.jadm-go{border:0;background:var(--accent,#2f5d50);color:var(--on-accent,#fff)}.jadm-go:disabled{opacity:.6}'
+        + '.jadm-alt{border:1px solid var(--accent,#2f5d50);background:var(--card,#fff);color:var(--accent,#2f5d50)}.jadm-two{display:flex;flex-direction:column;gap:8px}'
+        + '.jadm-code{margin:0;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:28px;font-weight:800;letter-spacing:.06em;word-break:break-all}.jadm-due{margin:0;font-size:19px;font-weight:800;color:var(--clay-ink,#8a3b22)}'
+        + '.jadm-more{border:0}.jadm-more>summary{min-height:48px;display:flex;align-items:center;font-weight:700;font-size:15px;color:var(--accent,#2f5d50);cursor:pointer}.jadm-more[open]{display:flex;flex-direction:column;gap:var(--g)}'
+        + '.jadm-row{display:flex;align-items:flex-start;gap:12px;padding:14px 16px;border:1px solid var(--line,rgba(0,0,0,.14));border-radius:14px;background:var(--card,#fff)}.jadm-row.off{opacity:.62}'
+        + '.jadm-rowtx{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}.jadm-mono{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:17px;letter-spacing:.04em}'
+        + '.jadm-stop{flex:none;min-height:44px;padding:0 14px;border:1px solid var(--line,rgba(0,0,0,.2));border-radius:999px;background:transparent;color:inherit;font-weight:700;font-size:15px;font-family:inherit;cursor:pointer}'
+        + '.jadm-link{align-self:flex-start;min-height:40px;padding:0;border:0;background:none;color:var(--accent,#2f5d50);font-weight:700;font-size:15px;font-family:inherit;cursor:pointer}'
+        + '.jadm-people{padding:0 16px;font-size:15px}.jadm-inq{padding:12px 0;border-top:1px solid var(--line,rgba(0,0,0,.1))}.jadm-inq p{margin:0}.jadm-tab{border-collapse:collapse;font-size:15px}.jadm-tab th,.jadm-tab td{padding:6px 10px;text-align:right;white-space:nowrap}.jadm-tab th:first-child{text-align:left}';
+        document.head.appendChild(꼴); }
+      갈고리(); setTimeout(갈고리, 0);   /* 다른 부품이 계정동작을 늦게 감쌀 때 */
+      setTimeout(function () { if (사용자()) 확인(); else { var s = 서버(); if (s) s.준비().then(function () { if (사용자()) 확인(); }, function () {}); } }, 600);
+      document.addEventListener('visibilitychange', function () { if (document.visibilityState === 'visible' && 사용자()) 확인(true); });
+    },
+    됨: 됨, 운영자: 운영자, 확인: 확인, 상태: 읽기, 가입열기: 가입열기, 가입하기: 가입하기, 나가기: 나가기, 대기HTML: 대기HTML, 이앱가입: function () { try { sessionStorage.setItem('_join_signup_' + 설정.app, '1'); } catch (e) {} },
+    초대HTML: 초대HTML, 초대넣기: 초대넣기,
+    관리자HTML: 관리자HTML, 관리자열기: 관리자열기, 관리기간: 관리기간, 관리모두: 관리모두, 관리답장: 관리답장, 관리새로: 관리새로, 관리만들기: 관리만들기, 관리켜기: 관리켜기, 관리사람: 관리사람, 관리회수: 관리회수, 관리문의앱: 관리문의앱, 관리복사: 관리복사,
+    닫기: 시트닫기
+  };
+})();
+/* ▲▲ 가입 부품 끝 ▲▲ */
+/* 11-11 현욱님 결정 「앱별 가입 + 메디나눔 회원권 때 통합」 — 공용 가입 부품(11-11a, 길동무 정본 그대로). 서버1111 은 서버 적용 뒤 켠다.
+   약지도는 건강정보를 서버에 두므로 민감정보 동의(개인정보 보호법 23조)를 따로 받는다. 약지도 문에서 만든 계정도 이 시트에서 한 번 더 — 그 문에는 민감 동의 칸이 없다. */
+try {
+  가입.설치({ app: 'yakjido', 약관판: (typeof CONSENT_VER !== 'undefined' ? CONSENT_VER : '2026-10-20'), 이름: { ko: '약지도', en: 'Yakjido' },
+    말: function () { return window.LANG === 'ko' || !window.LANG ? 'ko' : 'en'; }, 약관: 'terms.html', 처리방침: 'privacy.html',
+    민감동의: { ko: '(필수) 드시는 약·지병·복용 기록 같은 건강정보(민감정보)를 약 안내·복약 알림·기기 사이 이어 보기에 쓰는 데 동의합니다', en: '(Required) I agree to the use of my health information (sensitive data) such as my medicines, conditions and dose records for medicine guidance, dose reminders and syncing between devices' },
+    서버1111: false,
+    시트열기: function (html, 제목) { var v = document.getElementById('view'); if (!v) return; v.innerHTML = topBar({ back: '뒤로' }) + '<h1>' + esc(제목 || '가입') + '</h1>' + html; scrollTo(0, 0); },
+    시트닫기: function () { route(); },
+    알림: function (t) { try { toast(t); } catch (e) {} },
+    모양: { 줄: 'actions', 주: 'btn', 보조: 'btn line', 작은글: 'small muted' } });
 } catch (e) {}
 /* 다섯 언어(10-27) — 설정의 언어·나라 칸. 언어를 바꾸면 다시 연다. 나라는 응급·위기 번호를 고른다(요청서 표) */
 window.언어칸 = function () {
@@ -2187,7 +2553,7 @@ window.계정카드 = () => { if (D.meta?.account !== true) return ''; const 나
     <button type="button" class="btn primary acct-go" onclick="go('/login')">로그인 · 계정 만들기</button>
     <a class="link acct-del" href="delete-account.html" style="display:inline-block;margin-top:12px;min-height:44px;line-height:44px">계정과 기록 지우기 ›</a></section>`;   /* 11-09 B4 — 로그인 전에도 늘(심사관: 계정 삭제 길이 안 보임). 웹 삭제 주소와 같은 말 */
   return `<section class="sec card acct-card"><div class="acct-hd"><span class="acct-av" aria-hidden="true">${esc(m.charAt(0).toUpperCase())}</span><span><b>${esc(m)}</b><small>로그인돼 있어요 · 이어 보기 켜짐</small></span></div>
-    ${window.이용권줄HTML ? 이용권줄HTML() : ''}
+    ${window.이용권줄HTML ? 이용권줄HTML() : ''}${window.가입 && 가입.대기HTML ? (() => { try { return 가입.대기HTML() || ''; } catch (e) { return ''; } })() : ''}
     <div class="acct-act"><button type="button" class="btn line" onclick="계정동작('sync')">지금 맞추기</button><button type="button" class="btn line" onclick="계정동작('logout');setTimeout(route,600)">로그아웃</button></div>
     <button type="button" class="srvlink acct-del" onclick="go('/me?t=set');setTimeout(()=>document.getElementById('acct')?.scrollIntoView({block:'start'}),300)">계정 지우기·동의 거두기는 아래 「계정」 칸에서</button></section>`; };
 window.계정줄 = () => D.meta?.account !== true ? '' : `<div class="rows-l acct-row">${srvLoggedIn() ? lrow(I.user, '메디나눔 계정', esc((서버.세션()?.user?.email || '') + ' · 이어 보기 켜짐'), "go('/login')") : lrow(I.user, '계정 만들기 · 로그인 <em class="door-tag">선택</em>', '폰을 바꿔도 이어 봐요', "go('/login')")}</div>`;
