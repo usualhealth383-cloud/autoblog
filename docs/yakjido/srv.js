@@ -2755,6 +2755,7 @@ try {
    설치 앱(웹뷰)은 11-11c 부품이 Capacitor Share 플러그인으로 공유창을 연다(껍데기 @capacitor/share 8). */
 try {
   mn보내기.설치({ app: 'yakjido', 앱이름: '약지도', 링크: 'https://yakjido.medinanum.com/',
+    kakaoJsKey: '07a59184ffa26f6894c241191f0013b6',   /* 11-11 카카오 JavaScript 키(공개용 · yakjido.medinanum.com 등록) — 여기 한 곳 */
     언어: function () { return window.LANG || 'ko'; },
     시트열기: function (html, 제목) { var v = document.getElementById('view'); if (!v) return; v.innerHTML = topBar({ back: '뒤로' }) + html.replace(/^<h2>/, '<h1>').replace(/<\/h2>/, '</h1>'); scrollTo(0, 0); },
     시트닫기: function () { route(); },
