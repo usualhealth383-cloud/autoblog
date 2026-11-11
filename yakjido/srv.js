@@ -3235,15 +3235,10 @@ window.문_consent = () => {
   <h1>약지도</h1>
   <p class="door-s">어디가 불편한지 고르면, 집에서 할 일 · 약국에서 찾을 약 · 진료가 필요한 신호를 차례로 알려 드려요</p>
   ${다시 ? `<p class="cs-new">${I.info}<span>약지도에 이용약관과 개인정보 처리방침이 새로 생겼어요. 한 번만 확인해 주세요.</span></p>` : ''}
-  <ul class="cs-list">
-    <li>${I.pill}<span>증상에 맞는 약국 약과 먹는 법을 <b>식약처 공개 허가 정보</b>를 쉽게 풀어 써서 알려 드려요(식약처가 확인한 내용은 아니에요).</span></li>
-    <li>${I.shield}<span>드시는 약끼리 성분이 겹치거나 함께 드시면 안 되는 조합을 살펴 드려요.</span></li>
-    <li>${I.heart}<span>진단·처방을 대신하지 않아요. 급하면 119, 그리고 의사·약사와 상의하세요.</span></li>
-  </ul>
-  <p class="cs-sum">의료기기가 아니에요 · 기록은 먼저 이 휴대폰에 저장돼요 · 광고·분석에 쓰지 않아요</p>
+  <p class="cs-sum">약 설명은 식약처 허가 자료를 쉽게 바꾼 거예요 · 진단·처방을 대신하지 않아요 · 급하면 119</p>
   <!-- 11-09 실사용 검수 B2(개인정보보호법 22·23조) — 필수 둘을 따로 보이고, 「모두 동의」 한 번으로도 된다(10-29 「동의 벽 금지」와 함께). 서버 저장(지병·드시는 약)은 선택이라 계정 만들 때 따로 -->
   <button type="button" class="cs-row cs-all" role="checkbox" aria-checked="${both ? 'true' : (동의칸.terms || 동의칸.privacy) ? 'mixed' : 'false'}" onclick="동의누름('all')"><span class="cs-bx">${I.check}</span><span class="cs-tx"><b>모두 동의</b></span></button>
-  ${동의줄('terms', '이용약관', '의료기기가 아니에요 · 식약처 공개 허가 정보를 쉽게 풀어 쓴 것(식약처가 확인한 내용은 아님)', ['약 설명은 <b>식약처 허가 설명서</b>가 기본이에요. 해외 지침이나 진료실 관행이 다르면 둘 다 보여 드려요.',
+  ${동의줄('terms', '이용약관', '의료기기가 아니에요 · 약 설명은 식약처 허가 자료를 쉽게 바꾼 거예요', ['약 설명은 <b>식약처 허가 설명서</b>가 기본이에요. 해외 지침이나 진료실 관행이 다르면 둘 다 보여 드려요.',
     '위험 신호가 있으면 약보다 진료가 먼저예요. 급하면 119예요.',
     '약을 팔거나 건네지 않아요. 약은 약국에서 약사와 상의해 사세요.',
     '계정은 고르실 수 있고, 만 14세 이상만 만들 수 있어요.',
@@ -3253,9 +3248,9 @@ window.문_consent = () => {
     '서버 저장은 계정을 만들 때 「서버에 저장하기」에 따로 동의하셔야 해요. 거두시면 서버 기록을 바로 지워요.',
     '「부모님께 보내기」를 링크로 보내실 때만 고른 약 목록·호칭·메모가 7일 동안 서버에 머문 뒤 지워져요.',
     '약 사진은 휴대폰 안에서 글자를 읽는 데만 쓰고 보내지 않아요.',
-    '기록은 내 정보 → 설정에서 언제든 지우실 수 있어요.'], '처리방침 전문 보기')}
-  <p class="cs-opt">선택 — 지병·드시는 약을 서버에 저장하는 것은 계정을 만들 때 따로 여쭤요. 그 동의를 하지 않아도 앱은 그대로 쓸 수 있어요(서버 저장만 안 돼요).</p>
-  <p class="cs-opt">아이 정보는 보호자가 대신 입력해요 · 만 14세 미만은 본인이 계정을 만들 수 없어요</p>
+    '기록은 내 정보 → 설정에서 언제든 지우실 수 있어요.',
+    '선택 — 지병·드시는 약을 서버에 저장하는 것은 계정을 만들 때 따로 여쭤요. 그 동의를 하지 않아도 앱은 그대로 쓸 수 있어요.',
+    '아이 정보는 보호자가 대신 입력해요. 만 14세 미만은 본인이 계정을 만들 수 없어요.'], '처리방침 전문 보기')}
   <button type="button" class="door-go" id="csGo"${both ? '' : ' disabled'} onclick="동의하기()">시작하기</button>
   <p class="cs-why" id="csWhy"${both ? ' hidden' : ''}>필수 두 가지에 동의하시면 시작할 수 있어요</p>
   <p class="cs-foot">동의 내용은 설정 → 약관·개인정보에서 언제든 다시 보실 수 있어요 · 약지도 v${esc(D.meta?.version || '')}</p>
@@ -3677,7 +3672,7 @@ try { const css = document.createElement('style'); css.textContent = `
 .door-why[hidden],.door-msg[hidden]{display:none}
 .cs-again .cs-list li>span{display:flex;flex-direction:column}.cs-again .cs-list b{font-size:1.0625rem}.cs-again .cs-list small{color:var(--muted);font-size:.9375rem;margin-top:2px}.cs-again h1{margin-top:6px}
 .cs-sum{margin-top:18px;text-align:center;font-size:1rem;line-height:1.6;color:var(--body)}.cs-detail{margin-top:10px;padding:0}.cs-detail>summary{min-height:48px;justify-content:center;width:100%;font-size:1rem}.cs-detail h3{font-size:1.0625rem;margin:16px 0 4px}.cs-detail p,.cs-detail li{font-size:1rem;line-height:1.65}.cs-detail ul{padding-left:1.1em;margin:6px 0}.cs-note{margin-top:14px;color:var(--muted)}
-.cs-foot{margin-top:18px;text-align:center;font-size:.875rem;color:var(--muted);line-height:1.6}
+.cs #csGo{position:sticky;bottom:calc(10px + env(safe-area-inset-bottom));z-index:3;box-shadow:0 6px 18px rgba(0,0,0,.18)}.cs-foot{margin-top:18px;text-align:center;font-size:.875rem;color:var(--muted);line-height:1.6}
 .cs-foot .cs-doc{font-size:.875rem}
 .lg h1{font-size:1.5rem}
 .door-back{display:flex}
