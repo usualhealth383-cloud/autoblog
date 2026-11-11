@@ -12,7 +12,7 @@
      320·360·390·420 × 보통·가장 크게(밝게) + 390 어둡게
 쓰는 법: python3 yakjido/tests/design.py  (docs/yakjido 를 띄워 잰다 — 빌드 뒤에)
 """
-import http.server, socketserver, threading, functools, pathlib, sys
+import os, http.server, socketserver, threading, functools, pathlib, sys
 from playwright.sync_api import sync_playwright
 
 # 시험 브라우저는 한국어로 연다(10-27 — 안 정하면 en-US 라 영어 화면이 된다). 시간대는 그대로(UTC — 알림 시험이 이 시계에 맞춰져 있다, UTC 는 나라 판단에서 건너뛰어 ko-KR → KR). en-US+서울 → 119 는 i18n.py 가 따로 본다
@@ -28,6 +28,12 @@ srv = socketserver.TCPServer(('127.0.0.1', 0), functools.partial(Q, directory=st
 threading.Thread(target=srv.serve_forever, daemon=True).start()
 URL = f'http://127.0.0.1:{srv.server_address[1]}/'
 SEED = "localStorage.setItem('yakjido.hello.v1','1');localStorage.setItem('yakjido.consent.v1',JSON.stringify({v:'2026-10-20',at:'2026-10-14',terms:1,privacy:1}))"
+# 11-11 Main — 「기록 있는 상태」로도 본다: YJ_REC=1 이면 약 넷·복용 시간·오늘 먹은 표시·혈압 셋·영양제를 넣고 같은 점검을 돈다
+if os.environ.get('YJ_REC') == '1':
+    SEED += (";(function(){var d=new Date(),k=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');"
+             "var me={age:'senior',taking:['acetaminophen','cls:bp.arb','omeprazole','cls:bp.diur'],sched:{'cls:bp.arb':['08:00'],'omeprazole':['08:00'],'cls:bp.diur':['08:00','19:00']},"
+             "taken:{},vitals:[{t:k+'T07:30',k:'bp',s:132,d:84,p:72,w:'아침'},{t:k+'T21:00',k:'bp',s:128,d:80,p:70,w:'저녁'},{t:k+'T07:40',k:'bg',v:118,w:'아침'}],pub:{}};"
+             "me.taken[k]=['cls:bp.arb@08:00'];localStorage.setItem('yakjido.me.v1',JSON.stringify(me));})()")
 ROUTES = ['/home', '/symptom/headache', '/symptom/msk', '/symptom/cold', '/symptom/diarrhea', '/symptom/fever', '/show/headache', '/send',
           '/bag', '/drug/acetaminophen', '/drug/ibuprofen?full=1', '/search?q=타이레놀', '/supp', '/supp/calcium', '/kids', '/schedule',
           '/vitals', '/me?t=meds', '/me?t=body', '/me?t=set', '/together', '/kinds', '/kinds/bp', '/rx', '/rx/bp', '/about', '/myths', '/drugs']
