@@ -3947,7 +3947,7 @@ function basket(s, ov){
   const onco = x => !ov && ENTRY?.from === 'gildongmu' && isNsaid(drug(x));
   const bad = x => whyOf(x).length > 0 || allergic(x) || algC(x) || young(x) || onco(x);
   const kidSlot = p => p.kid || /소아|어린이/.test(p.slot || '');
-  const cauOf = d => [cauLine(d, f), kidMode ? askLine(d, km) : ''].filter(Boolean).join(' · ');
+  const cauOf = d => [String(d?.useNote || '').replace(/\*\*/g, ''), cauLine(d, f), kidMode ? askLine(d, km) : ''].filter(Boolean).join(' · ');   /* 11-11 Main ③ — 쓰는 조건(로페라마이드 등)을 카드·공유 글에 함께 */
   const dropped = [];
   const rows = (s.plan || []).map((p, i) => Object.assign({}, p, { _i:i }))
     /* Z4 #3 — 자료가 「이 조건이면 이 칸을 보이지 말 것」(hideFlags)을 적어 둔 칸은 통째로 뺀다(소염진통제를 더하거나 번갈아 먹는 칸 — 임신·위·콩팥·항응고제) */
@@ -4391,7 +4391,7 @@ function triageCard(s, ban){
   const row = ([k, ic, lab, txt]) => `<div class="tg-row ${k}"><b>${lab}</b><p>${fmt(txt)}</p></div>`;
   const fold = rows.filter(r => r[0] !== 'esc'), keep = rows.filter(r => r[0] === 'esc');
   return `<section class="triage" aria-label="이 증상을 보는 법">
-    ${fold.length ? `<details class="tg-fold"><summary><b>${fold.map(r => r[2]).join(' · ')}</b><span>의사가 처방하는 방식과 약국에서 채우는 법</span></summary>${fold.map(row).join('')}</details>` : ''}
+    ${fold.length ? `<details class="tg-fold"><summary><b>${fold.map(r => r[2]).join(' · ')}</b><span>병원·약국에서 확인하는 것</span></summary>${fold.map(row).join('')}</details>` : ''}
     ${keep.map(row).join('')}
   </section>`;
 }

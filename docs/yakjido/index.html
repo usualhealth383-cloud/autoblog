@@ -1768,8 +1768,8 @@ background-repeat:no-repeat;background-position:right 9px center;background-size
 <script>
 window.__YAKJIDO_OK__ = true;
 const D = JSON.parse(document.getElementById('data').textContent || '{}');
-const BUILD = '2026-11-11 10:37';
-const DATAV = '2af4c24f7b'.indexOf('__') === 0 ? BUILD : '2af4c24f7b';
+const BUILD = '2026-11-11 12:54';
+const DATAV = '66a67a79db'.indexOf('__') === 0 ? BUILD : '66a67a79db';
 const BRANDMARK = (typeof window !== 'undefined' && window.__BRANDMARK__) || 'icon-192.png';
 let CORE = 0, CORE_P = null;
 function mergeCore(c){
@@ -3357,7 +3357,7 @@ const rxOnly = x => ['전문', '제품별'].includes(drug(x)?.rx);
 const onco = x => !ov && ENTRY?.from === 'gildongmu' && isNsaid(drug(x));
 const bad = x => whyOf(x).length > 0 || allergic(x) || algC(x) || young(x) || onco(x);
 const kidSlot = p => p.kid || /소아|어린이/.test(p.slot || '');
-const cauOf = d => [cauLine(d, f), kidMode ? askLine(d, km) : ''].filter(Boolean).join(' · ');
+const cauOf = d => [String(d?.useNote || '').replace(/\*\*/g, ''), cauLine(d, f), kidMode ? askLine(d, km) : ''].filter(Boolean).join(' · ');   /* 11-11 Main ③ — 쓰는 조건(로페라마이드 등)을 카드·공유 글에 함께 */
 const dropped = [];
 const rows = (s.plan || []).map((p, i) => Object.assign({}, p, { _i:i }))
 .filter(p => p.otc !== false && p.options?.length && !slotHidden(p, f) && !(!ov && (p.hideFlags || []).length && allergyNsaid()))
@@ -3691,7 +3691,7 @@ if (!rows.length) return '';
 const row = ([k, ic, lab, txt]) => `<div class="tg-row ${k}"><b>${lab}</b><p>${fmt(txt)}</p></div>`;
 const fold = rows.filter(r => r[0] !== 'esc'), keep = rows.filter(r => r[0] === 'esc');
 return `<section class="triage" aria-label="이 증상을 보는 법">
-${fold.length ? `<details class="tg-fold"><summary><b>${fold.map(r => r[2]).join(' · ')}</b><span>의사가 처방하는 방식과 약국에서 채우는 법</span></summary>${fold.map(row).join('')}</details>` : ''}
+${fold.length ? `<details class="tg-fold"><summary><b>${fold.map(r => r[2]).join(' · ')}</b><span>병원·약국에서 확인하는 것</span></summary>${fold.map(row).join('')}</details>` : ''}
 ${keep.map(row).join('')}
 </section>`;
 }
