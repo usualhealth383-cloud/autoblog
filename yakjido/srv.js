@@ -5137,4 +5137,29 @@ window.vPubS = function(id){
 };
 
 /* 내 정보·동의·로그인·약관 화면을 보고 있었으면 다시 그린다(이 파일이 늦게 오므로) */
+/* ▼ 11-11 다른 앱 입구 — 띠·아이 설명(app-shell 에서 옮김) */
+window.KID_TRI = { clinic: '병원에서는 아이가 얼마나 마시고 소변을 보는지, 열과 다른 병의 신호가 있는지 먼저 살펴봐요. 검사나 약은 아이 상태에 따라 필요한 경우에만 써요.',
+  pharmacy: '아이 약은 나이와 몸무게에 따라 달라요. 약국에서는 아이 나이(개월 수)와 몸무게를 먼저 말씀하시고 약사와 함께 골라요. 어른 약을 줄여서 먹이지 마세요.',
+  escalate: '아이가 축 처지거나, 잘 마시지 못하거나, 소변이 크게 줄면 바로 진료를 받으세요.' };
+window.symKS = s => ENTRY?.from !== 'kids' || !s ? s : Object.assign({}, s, { triage: Object.assign({}, KID_TRI, s.kid?.triage || {}), care: s.kid?.care ? Object.assign({}, s.care, s.kid.care) : s.care, lead: s.kid?.lead || s.lead });
+window.KID_AGES = [['3개월 전', 2], ['3~5개월', 4], ['6~11개월', 8], ['1세', 12], ['2~4세', 36], ['5~11세', 84], ['12세 넘음', 144]];
+window.entryAge = function (m){ if (!ENTRY) return; ENTRY.age = m; try { sessionStorage.setItem('yakjido.entry', JSON.stringify(ENTRY)); } catch (e) {} route(); }
+window.entryBandS = function (s){
+  if (!ENTRY || !ENTRY_APPS[ENTRY.from]) return ''; const [nm, url] = ENTRY_APPS[ENTRY.from], m = ENTRY.age;
+  const back = `<a class="link" href="${url}">${esc(nm)}로 돌아가기 ›</a>`;
+  if (ENTRY.from === 'kids') return `<section class="sec entry-band eb-kid"><details><summary><b>${esc(nm)}에서 · ${m != null ? (m >= 24 ? '만 ' + Math.floor(m / 12) + '세' : '생후 ' + m + '개월') + ' 기준' : '아이 기준'}</b>${I.chev}</summary>
+    <p class="small" style="margin-top:6px">${m != null ? '설명서상 이 나이에 쓰지 않는 약은 뺐어요.' : '아이 나이를 모르면 나이·몸무게 확인이 필요한 약과 양은 보여 드리지 않아요. 물·전해질 같은 기본 돌봄과 진료 신호는 그대로예요.'} 보호자의 건강정보는 아이에게 적용하지 않았어요. 아이의 알레르기·앓고 있는 병·먹는 약은 따로 확인해 주세요.</p>
+    <div class="actions two" style="margin-top:8px"><button class="btn line" onclick="go('/kids')">아이 해열제 양 보기</button><button class="btn line" onclick="entryOff()">어른 기준으로 보기</button></div>${back}</details>
+    ${m == null ? `<div class="chips" role="group" aria-label="아이 나이" style="margin-top:8px">${KID_AGES.map(([t, v]) => `<button class="chip" onclick="entryAge(${v})">${t}</button>`).join('')}</div>` : ''}
+    ${s && s.id === 'fever' && m != null && m >= 3 && m < 6 ? `<p style="margin-top:8px"><b>생후 ${m}개월 아기가 38도 이상이면 오늘 의료진에게 먼저 연락해 진료 시점을 확인하세요.</b> 해열제 양을 확인하더라도 진료를 미루지 마세요.</p>` : ''}</section>`;   /* 11-11 Main 사진 재검증 — 한 줄로 접어 119 상자가 첫 화면 위쪽에 */
+  if (ENTRY.from === 'gildongmu') return `<section class="sec card entry-band"><b>${esc(nm)}에서 오셨어요 — 항암 치료 중이시면 먼저 보세요</b>
+    <ul class="plain" style="margin-top:6px"><li><b>38.0도 이상 열이 한 번이라도</b> 나면 해열제로 기다리지 말고 바로 치료받는 병원에 연락하거나 응급실로 가세요. 항암 중 열은 응급이에요.</li>
+    <li><b>새 진통제·감기약은 드시기 전에 치료팀에 확인</b>하세요. 아스피린·이부프로펜·나프록센은 출혈 위험을 높일 수 있어요. 혈소판이 낮거나 멍·코피가 늘면 특히요. 심장·뇌혈관 때문에 처방받아 드시는 아스피린은 임의로 끊지 마세요.</li>
+    <li>관장약·항문 좌약은 치료팀이 괜찮다고 하기 전에는 쓰지 마세요.</li>
+    <li>처음 생긴 증상이나 평소와 다른 증상은 횟수를 기다리지 말고 오늘 치료팀에 알려 주세요.</li></ul>
+    ${srcChips(['cdc_chemo_fever', 'idsa_fn2011', 'medline_cancer_bleed', 'nci_bleeding'])}${back}</section>`;
+  return `<section class="sec card entry-band"><b>${esc(nm)}에서 오셨어요</b> ${back}</section>`;
+}
+/* ▲ */
+try { if (window.ENTRY && /^#\/(symptom|send)/.test(location.hash)) route(); } catch (e) {}
 try { if (/^#\/(od|vitals|pillinfo|pub|supp\/|me|consent|login|notify|sgoal|sstage|doc|hello\/3|supp$|supp\?|sgoal|sstage|rx|about|search|myths|askdoc|talk|p\/|p\?|p$)/.test(location.hash)) route(); } catch (e) {}

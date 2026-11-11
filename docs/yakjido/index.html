@@ -1768,8 +1768,8 @@ background-repeat:no-repeat;background-position:right 9px center;background-size
 <script>
 window.__YAKJIDO_OK__ = true;
 const D = JSON.parse(document.getElementById('data').textContent || '{}');
-const BUILD = '2026-11-11 23:02';
-const DATAV = '19ea6eb084'.indexOf('__') === 0 ? BUILD : '19ea6eb084';
+const BUILD = '2026-11-11 23:20';
+const DATAV = 'b683bb4d36'.indexOf('__') === 0 ? BUILD : 'b683bb4d36';
 const BRANDMARK = (typeof window !== 'undefined' && window.__BRANDMARK__) || 'icon-192.png';
 let CORE = 0, CORE_P = null;
 function mergeCore(c){
@@ -2227,28 +2227,8 @@ const ENTRY_APPS = { kids: ['우리 집 소아과', 'https://kids.medinanum.com/
 var ENTRY = (() => { try { return JSON.parse(sessionStorage.getItem('yakjido.entry') || 'null'); } catch (e) { return null; } })();
 function entryTake(q){ if (!q.from || !ENTRY_APPS[q.from]) return; const ag = /^\d{1,3}$/.test(q.age || '') ? +q.age : null, wv = parseFloat(q.w), w = /^\d{1,2}(\.\d)?$/.test(q.w || '') && wv >= 2 && wv <= 60 ? wv : null; ENTRY = { from: q.from, age: ag, w }; try { sessionStorage.setItem('yakjido.entry', JSON.stringify(ENTRY)); } catch (e) {} }
 function entryOff(){ ENTRY = null; try { sessionStorage.removeItem('yakjido.entry'); } catch (e) {} const h = location.hash.replace(/([?&])(from|age)=[^&]*/g, '$1').replace(/[?&]+$/, '').replace(/\?&+/, '?'); if (h !== location.hash) location.replace(location.href.split('#')[0] + h); else route(); }
-const KID_TRI = { clinic: '병원에서는 아이가 얼마나 마시고 소변을 보는지, 열과 다른 병의 신호가 있는지 먼저 살펴봐요. 검사나 약은 아이 상태에 따라 필요한 경우에만 써요.',
-pharmacy: '아이 약은 나이와 몸무게에 따라 달라요. 약국에서는 아이 나이(개월 수)와 몸무게를 먼저 말씀하시고 약사와 함께 골라요. 어른 약을 줄여서 먹이지 마세요.',
-escalate: '아이가 축 처지거나, 잘 마시지 못하거나, 소변이 크게 줄면 바로 진료를 받으세요.' };
-const symK = s => ENTRY?.from !== 'kids' || !s ? s : Object.assign({}, s, { triage: Object.assign({}, KID_TRI, s.kid?.triage || {}), care: s.kid?.care ? Object.assign({}, s.care, s.kid.care) : s.care, lead: s.kid?.lead || s.lead });
-const KID_AGES = [['3개월 전', 2], ['3~5개월', 4], ['6~11개월', 8], ['1세', 12], ['2~4세', 36], ['5~11세', 84], ['12세 넘음', 144]];
-function entryAge(m){ if (!ENTRY) return; ENTRY.age = m; try { sessionStorage.setItem('yakjido.entry', JSON.stringify(ENTRY)); } catch (e) {} route(); }
-function entryBand(s){
-if (!ENTRY || !ENTRY_APPS[ENTRY.from]) return ''; const [nm, url] = ENTRY_APPS[ENTRY.from], m = ENTRY.age;
-const back = `<a class="link" href="${url}">${esc(nm)}로 돌아가기 ›</a>`;
-if (ENTRY.from === 'kids') return `<section class="sec entry-band eb-kid"><details><summary><b>${esc(nm)}에서 · ${m != null ? (m >= 24 ? '만 ' + Math.floor(m / 12) + '세' : '생후 ' + m + '개월') + ' 기준' : '아이 기준'}</b>${I.chev}</summary>
-<p class="small" style="margin-top:6px">${m != null ? '설명서상 이 나이에 쓰지 않는 약은 뺐어요.' : '아이 나이를 모르면 나이·몸무게 확인이 필요한 약과 양은 보여 드리지 않아요. 물·전해질 같은 기본 돌봄과 진료 신호는 그대로예요.'} 보호자의 건강정보는 아이에게 적용하지 않았어요. 아이의 알레르기·앓고 있는 병·먹는 약은 따로 확인해 주세요.</p>
-<div class="actions two" style="margin-top:8px"><button class="btn line" onclick="go('/kids')">아이 해열제 양 보기</button><button class="btn line" onclick="entryOff()">어른 기준으로 보기</button></div>${back}</details>
-${m == null ? `<div class="chips" role="group" aria-label="아이 나이" style="margin-top:8px">${KID_AGES.map(([t, v]) => `<button class="chip" onclick="entryAge(${v})">${t}</button>`).join('')}</div>` : ''}
-${s && s.id === 'fever' && m != null && m >= 3 && m < 6 ? `<p style="margin-top:8px"><b>생후 ${m}개월 아기가 38도 이상이면 오늘 의료진에게 먼저 연락해 진료 시점을 확인하세요.</b> 해열제 양을 확인하더라도 진료를 미루지 마세요.</p>` : ''}</section>`;   /* 11-11 Main 사진 재검증 — 한 줄로 접어 119 상자가 첫 화면 위쪽에 */
-if (ENTRY.from === 'gildongmu') return `<section class="sec card entry-band"><b>${esc(nm)}에서 오셨어요 — 항암 치료 중이시면 먼저 보세요</b>
-<ul class="plain" style="margin-top:6px"><li><b>38.0도 이상 열이 한 번이라도</b> 나면 해열제로 기다리지 말고 바로 치료받는 병원에 연락하거나 응급실로 가세요. 항암 중 열은 응급이에요.</li>
-<li><b>새 진통제·감기약은 드시기 전에 치료팀에 확인</b>하세요. 아스피린·이부프로펜·나프록센은 출혈 위험을 높일 수 있어요. 혈소판이 낮거나 멍·코피가 늘면 특히요. 심장·뇌혈관 때문에 처방받아 드시는 아스피린은 임의로 끊지 마세요.</li>
-<li>관장약·항문 좌약은 치료팀이 괜찮다고 하기 전에는 쓰지 마세요.</li>
-<li>처음 생긴 증상이나 평소와 다른 증상은 횟수를 기다리지 말고 오늘 치료팀에 알려 주세요.</li></ul>
-${srcChips(['cdc_chemo_fever', 'idsa_fn2011', 'medline_cancer_bleed', 'nci_bleeding'])}${back}</section>`;
-return `<section class="sec card entry-band"><b>${esc(nm)}에서 오셨어요</b> ${back}</section>`;
-}
+const symK = s => window.symKS ? symKS(s) : s;
+function entryBand(s){ return window.entryBandS ? entryBandS(s) : ''; }
 function route(){
 const h = location.hash.replace(/^#\/?/, '') || 'home';
 const [path, qs] = h.split('?');
@@ -3845,7 +3825,7 @@ ${noBuy && !inf ? '<p class="nobuy">이 증상은 약국 약으로 해결되지 
 ${droppedNote(bk) ? `<p class="note drop-note" style="margin-top:10px">${I.alert}<span>${esc(droppedNote(bk))}</span></p>` : ''}
 ${ME.allergyUnknown ? `<p class="note drop-note" style="margin-top:10px">${I.alert}<span>약 알레르기가 있었다고 적어 두셨어요 — 약국에서 <b>「약 알레르기가 있었어요」</b>라고 꼭 말씀하세요.</span></p>` : ''}
 ${inf ? '' : kidLine() + buyChecks(s, bk, true)}
-${noBuy ? '' : `<button class="btn ghost go-cart" onclick="go('/send?s=${s.id}')">${I.family} 부모님께 보내기</button>`}
+${noBuy ? '' : `<button class="btn ghost go-cart" onclick="go('/send?s=${s.id}')">${I.family} ${ENTRY?.from === 'kids' ? '가족에게 보내기' : '부모님께 보내기'}</button>`}
 ${main[0] && !main[0].consult && !inf ? `<button class="btn line sv-remind" onclick="(ME.taking.includes('${main[0].d.id}')||ME.taking.push('${main[0].d.id}'));saveMe();go('/schedule?t=sc1')">${I.clock} 이 약 알림 받기</button>` : ''}
 ${noBuy ? '' : `<div class="sv-show-gap" aria-hidden="true"></div><button class="btn go-cart sv-show" onclick="go('/show/${s.id}')"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16v11H9l-5 4z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg> 약국에서 이 화면 보여 주기</button>`}
 </section>
@@ -5032,7 +5012,7 @@ ${art('guide-3-take', 'spot')}
 <div class="eyebrow">약을 누르면 복용법이 나와요</div>
 <div class="buy">${planRows(s)}</div>
 ${kidLine()}
-<div class="memo-actions"><button class="btn" onclick="shareMemo('${s.id}')">${I.cart} 약국에 보여줄 메모 만들기</button><button class="btn line" onclick="go('/send?s=${s.id}')">${I.family} 부모님께 보내기</button></div>
+<div class="memo-actions"><button class="btn" onclick="shareMemo('${s.id}')">${I.cart} 약국에 보여줄 메모 만들기</button><button class="btn line" onclick="go('/send?s=${s.id}')">${I.family} ${ENTRY?.from === 'kids' ? '가족에게 보내기' : '부모님께 보내기'}</button></div>
 </section>
 <section class="sec" id="care"><h2>어디까지 약국, 어디부터 병원인가요</h2>${careCards(s.care)}</section>
 <div class="actions"><button class="btn line" onclick="go('/symptom/${s.id}')">왜 이 조합인지 자세히 보기</button><button class="btn ghost" onclick="go('/guide/1')">다른 증상 고르기</button></div>
@@ -6262,7 +6242,8 @@ const SEND_FQ = [['senior', '65세 이상이세요'], ['heart', '혈압·심장�
 const SEND_XL = { alg: '받는 분은 약 알레르기가 있었어요 — 약사님께 꼭 말씀하세요.', meds: '받는 분이 드시는 약이 있어요 — 약봉투를 약사님께 같이 보여 주세요.', unk: '받는 분의 지병과 약은 아직 확인하지 않았어요. 약사에게 목록을 보여 주세요.' };
 const sendXL = () => SEND_F.map(k => SEND_XL[k]).filter(Boolean).concat(SEND_Q?.s && rfOf(SEND_Q.s) === 'cl' ? ['진료를 받으셔야 하는 신호가 있다고 표시했어요 — 약보다 진료가 먼저예요.'] : []);
 let SEND_F = ['senior'], SEND_LBL = '', SEND_NOTE = '';
-function sendBasket(q){ const sy = q?.s ? byId(D.symptoms, q.s) : null; if (!sy) return null; const fl = SEND_F.slice(); if (fl.includes('hf') && !fl.includes('heart')) fl.push('heart'); if (fl.includes('lvs') && !fl.includes('liver')) fl.push('liver'); if (fl.includes('bleed') && !fl.includes('ulcer')) fl.push('ulcer'); return basketPicked(sy, basket(sy, { flags: fl })); }
+function sendBasket(q){ const sy = q?.s ? byId(D.symptoms, q.s) : null; if (!sy) return null; if (ENTRY?.from === 'kids') return basketPicked(sy, basket(sy));   /* 11-11 Main 라이브 점검 — 아이 입구에서 보내는 글이 어른 알약을 담던 것 */
+const fl = SEND_F.slice(); if (fl.includes('hf') && !fl.includes('heart')) fl.push('heart'); if (fl.includes('lvs') && !fl.includes('liver')) fl.push('liver'); if (fl.includes('bleed') && !fl.includes('ulcer')) fl.push('ulcer'); return basketPicked(sy, basket(sy, { flags: fl })); }
 function sendItems(q){
 if (q?.s) { const bk = sendBasket(q); if (!bk) return [];
 const all = bk.filter(x => !x.blocked && x.d && !x.again);
@@ -6275,11 +6256,12 @@ const sendCau = q => [...new Set((sendBasket(q) || []).filter(x => !x.blocked &&
 const sendDropLine = (dr, sent) => dr.length ? `몸 상태 때문에 ${dr.join(', ')}${josa(dr[dr.length - 1], '은', '는')} 목록에서 ${sent ? '제외했어요' : '뺐어요'} — 약사님과 상의하세요.` : '';
 function sendText(items, label, note, link, dropped){
 const who = label ? label + ', ' : '';
+const mlT = x => { const dd = x.d || drug(x.id), h = dd ? svMl(dd, false) : ''; const m = h.match(/<b class="sv-ml">([^<]+)<\/b><small class="sv-ml-s">([^<]+)<\/small>/); return m ? ` — ${m[1]}(${m[2].replace(/&amp;/g, '&')})` : ''; };
 const dl = sendDropLine(dropped || [], 1);
 const cl = [...sendCau(SEND_Q), ...sendXL()];
 const er1 = (SEND_Q?.s ? byId(D.symptoms, SEND_Q.s)?.care?.er?.[0] : '') || '';
 if (er1) cl.push(`이럴 땐 약 대신 바로 119 — ${er1.replace(/\*\*/g, '')}`);
-return `[약지도] ${who}약국에서 이 약 좀 사 주세요\n${items.map(x => '· ' + (x.product ? x.product + ' (' + x.name + ')' : x.name)).join('\n')}${cl.length ? '\n' + cl.map(t => '※ ' + t).join('\n') : ''}${dl ? '\n' + dl : ''}${note ? '\n\n' + note : ''}\n\n약사님께 이 목록을 보여 주시고, 앓고 계신 병과 드시는 약을 꼭 말씀하세요.${link ? '\n' + link : '\n가까운 문 연 약국: ' + GO_LINK.open[0]}`;
+return `[약지도] ${who}약국에서 이 약 좀 사 주세요\n${items.map(x => '· ' + (x.product ? x.product + ' (' + x.name + ')' : x.name) + mlT(x)).join('\n')}${cl.length ? '\n' + cl.map(t => '※ ' + t).join('\n') : ''}${dl ? '\n' + dl : ''}${note ? '\n\n' + note : ''}\n\n약사님께 이 목록을 보여 주시고, 앓고 계신 병과 드시는 약을 꼭 말씀하세요.${link ? '\n' + link : '\n가까운 문 연 약국: ' + GO_LINK.open[0]}`;
 }
 function sendFlag(k){ SEND_F = SEND_F.includes(k) ? SEND_F.filter(x => x !== k) : [...SEND_F, k]; route(); }
 let SEND_Q = null;
@@ -6288,9 +6270,9 @@ if (JSON.stringify(q || {}) !== JSON.stringify(SEND_Q || {})) { SEND_F = ['senio
 SEND_Q = q; const items = sendItems(q); const srv = !!SHARE().fn; const dropped = sendDropped(q);
 const sy = q?.s ? byId(D.symptoms, q.s) : null;
 if (sy && rfOf(sy.id) === 'er') return rfStop(sy.id);
-return `${topBar({ back:'이전' })}<div class="eyebrow">${sy ? esc(sy.name) : '약 보내기'}</div><h1>부모님께 보내기</h1>
+return `${topBar({ back:'이전' })}<div class="eyebrow">${sy ? esc(sy.name) : '약 보내기'}</div><h1>${ENTRY?.from === 'kids' ? '가족에게 보내기' : '부모님께 보내기'}</h1>
 <p style="margin-top:6px">고른 약을 카카오톡·문자로 보내 드려요. 부모님은 받은 화면을 <b>약사님께 그대로 보여 주시면</b> 근처 약국에서 사실 수 있어요.</p>${sy && rfOf(sy.id) ? rfClNote : ''}
-${sy ? `<section class="sec card"><h2>받는 분 몸 상태 <small>해당하면 누르세요</small></h2>
+${sy && ENTRY?.from === 'kids' ? `<p class="small muted" style="margin-top:8px">아이 기준(${Number.isFinite(ENTRY.age) ? (ENTRY.age >= 24 ? '만 ' + Math.floor(ENTRY.age / 12) + '세' : '생후 ' + ENTRY.age + '개월') : '나이 모름'}${ENTRY.w ? ' · ' + ENTRY.w + ' kg' : ''})으로 화면과 같은 약을 담았어요.</p>` : ''}${sy && ENTRY?.from !== 'kids' ? `<section class="sec card"><h2>받는 분 몸 상태 <small>해당하면 누르세요</small></h2>
 <p class="small" style="margin-top:6px">약은 <b>받는 분</b> 몸 상태에 맞춰 골라요. 누르면 아래 목록이 바뀌어요.</p>
 <div class="chips" role="group" aria-label="받는 분 몸 상태" style="margin-top:10px">${SEND_FQ.map(([k, t]) => `<button class="chip ${SEND_F.includes(k) ? 'on' : ''}" aria-pressed="${SEND_F.includes(k)}" onclick="sendFlag('${k}')">${SEND_F.includes(k) ? I.check : I.circle}${t}</button>`).join('')}</div></section>` : ''}
 ${items.length ? `<section class="sec card"><h2>보낼 약 <small>${items.length}가지</small></h2>${list(items.map(x => (x.product ? '**' + x.product + '** — ' : '') + x.name))}${[...sendCau(q), ...sendXL()].map(t => `<p class="small cau-l">${I.alert}<span>${esc(t)}</span></p>`).join('')}${dropped.length ? `<div class="note" style="margin-top:10px">${I.alert}<span>${esc(sendDropLine(dropped))}</span></div>` : ''}</section>` : `<section class="sec"><div class="empty">보낼 약이 없어요. ${dropped.length ? esc(sendDropLine(dropped)) : '어떤 증상의 약을 보내 드릴까요?'}</div>
@@ -6326,7 +6308,7 @@ link = (S.app || location.href.split('#')[0]) + '#/p/' + j.code;
 } catch (e) { toast('링크를 만들지 못해 글로 보내요'); }
 }
 const t = sendText(items, label, note, link, sendDropped(SEND_Q));
-if (window.mn보내기) return mn보내기.열기({ 제목: '부모님께 보내기', 글: t });   /* 11-11 카카오톡으로 보내기 공용 부품 — 미리보기·고쳐 쓰기 */
+if (window.mn보내기) return mn보내기.열기({ 제목: ENTRY?.from === 'kids' ? '가족에게 보내기' : '부모님께 보내기', 글: t });   /* 11-11 카카오톡으로 보내기 공용 부품 — 미리보기·고쳐 쓰기 */
 try { if (await shareOut({ title: '약지도 · 약 좀 사 주세요', text: t })) return; } catch (e) { return; }
 try { await navigator.clipboard.writeText(t); toast('복사했어요 — 카카오톡이나 문자에 붙여 넣으세요'); } catch (e) { appCopy('아래 글을 길게 눌러 복사해서 보내세요', t); }
 }
