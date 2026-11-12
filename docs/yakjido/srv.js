@@ -5113,7 +5113,7 @@ window.필요약줄 = function () { try {
 } catch (e) { return ''; } };
 /* 11-12 매일 쓸 이유(10-30 현욱님) — 약통이 빈 분께 홈 첫 화면에 「오늘의 한 장」과 「약 담으면 매일 체크·연속 기록」 */
 window.오늘한장 = function () { try {
-  if (takingItems().length) return ''; const T = D.tips || []; if (!T.length) return ''; const t = T[new Date().getDate() % T.length];
+  if (takingItems().length || (window.LANG && window.LANG !== 'ko')) return ''; const T = D.tips || []; if (!T.length) return '';   /* 약 상식 글은 한국어만 있어 외국어 화면에서는 뺀다 */ const t = T[new Date().getDate() % T.length];
   return `<div class="rows-l today-one" style="margin-top:10px">${lrow(icon(t.icon), '오늘의 한 장 — ' + esc(t.title), '하루 한 가지, 1분이면 읽어요', `go('/tips?open=${t.id}')`)}</div>`;
 } catch (e) { return ''; } };
 window.약담기권함 = function () { try { return takingItems().length ? '' : `<div class="rows-l" style="margin-top:10px">${lrow(I.clock, '드시는 약이 있으면 담아 두세요', '매일 「드셨어요」 체크와 연속 기록이 생겨요', "go('/kinds')")}</div>`; } catch (e) { return ''; } };

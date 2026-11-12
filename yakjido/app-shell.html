@@ -2697,7 +2697,7 @@ const topBar = (opts = {}) => `
     <div class="brand"><div class="mark"><img src="${BRANDMARK}" alt="" width="34" height="34"></div><div><b>약지도</b><span>증상에 맞는 약 · 복약 알림</span></div></div>`}
     ${opts.unreviewed || opts.unv ? `<a class="review-stamp unrev" href="#/about">${I.info}<span>자료 확인 중</span></a>` : `<a class="review-stamp" href="#/about" aria-label="출처 보기">${I.book}<span class="rs-t">출처 보기</span></a>`}${!opts.back ? acctBtn() : ''}
   </div>
-  ${opts.nosearch ? '' : `<div class="topfind">${I.search}<input id="gq" aria-label="증상이나 약 이름으로 찾기" placeholder="${bigFs() || innerWidth < 380 ? '증상이나 약 이름' : '증상·약 이름으로 찾기 (예: 허리, 타이레놀)'}" autocomplete="off" enterkeyhint="search" value="${esc(GQ)}"><button class="gq-x ${GQ ? '' : 'hide'}" onclick="GQ='';route()" aria-label="지우기">${I.x}</button></div>`}<!--TOPEND-->`;
+  ${opts.nosearch ? '' : `<div class="topfind">${I.search}<input id="gq" aria-label="증상이나 약 이름으로 찾기" placeholder="${bigFs() || innerWidth < 380 || LANG !== 'ko' ? '증상이나 약 이름' : '증상·약 이름으로 찾기 (예: 허리, 타이레놀)'}" autocomplete="off" enterkeyhint="search" value="${esc(GQ)}"><button class="gq-x ${GQ ? '' : 'hide'}" onclick="GQ='';route()" aria-label="지우기">${I.x}</button></div>`}<!--TOPEND-->`;
 /* 출처 칩은 「저자·연도」까지만. 예전 규칙은 괄호 「(」에서만 잘라서, 「—」로 쓴 출처 44개가
    문장째로 화면에 깔렸다(어지럼 화면이 출처 문단 여섯 개로 끝나고 있었다).
    연도(19xx·20xx)를 만나면 거기서 끊고, 연도가 없으면 「—」·「·」 앞에서 끊는다. */
