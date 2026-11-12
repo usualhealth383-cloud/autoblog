@@ -678,12 +678,10 @@ def simple_checks(br, url, fails):
         if not r['cart']: fails.append(f'간단히 {sid}: 「약국에서 이 화면 보여 주기」 단추가 없습니다')
         if '클로르족사존' in ' '.join(pz.eval_on_selector_all('.answer .buy-item.sv b', 'e=>e.map(x=>x.innerText)')): fails.append(f'간단히 {sid}: 큰 글씨에 성분 이름(클로르족사존)이 나옵니다')
     # (b) 응급 신호 → 살 약 줄·약국 단추가 숨는다(자세히와 같은 규칙) · 진료 신호 → 「진료가 먼저예요」
-    go('/symptom/msk'); pz.click('.rf-list .rf-i input'); pz.wait_for_timeout(120)
-    vis = pz.evaluate("()=>[...document.querySelectorAll('.answer .buy-item.sv, .answer .go-cart')].some(e=>e.offsetParent!==null)")
-    if vis or not pz.is_visible('.rf-er-h') or not pz.is_visible('.rf-hit.er'): fails.append('간단히: 응급 신호를 체크해도 살 약이 보이거나 119 안내가 없습니다')
-    pz.evaluate("()=>{ RF.sid=''; }"); go('/home'); go('/symptom/msk')   # 체크는 같은 증상 안에서만 남는다 — 비우고 본다
-    pz.evaluate("()=>{ document.querySelector('.rf-cl').open=true; }"); pz.click('.rf-cl .rf-i input'); pz.wait_for_timeout(120)
-    if not pz.is_visible('.answer .rf-dim-h') or pz.evaluate("()=>document.querySelector('.answer .buy').offsetParent!==null"): fails.append('간단히: 진료 신호를 체크해도 「지금은 약보다 진료가 먼저예요」로 접히지 않습니다')
+    # 11-09 디자인 검수 뒤 간단히 보기는 체크 목록 대신 「이 중 하나면 약 말고 119」 카드(sv-er) — 같은 자료(care.er)·119 단추가 있는지 본다(11-12 고침)
+    go('/symptom/msk')
+    er = pz.evaluate("()=>{ const c=document.querySelector('.sv-er'); return c ? {tel: !!c.querySelector('a[href^=\"tel:\"]'), first: (byId(D.symptoms,'msk').care.er||[])[0]||'', txt: c.innerText} : null; }")
+    if not er or not er['tel'] or er['first'][:6] not in er['txt']: fails.append('간단히: 「이 중 하나면 약 말고 119」 카드가 없거나 119 단추·응급 신호가 자세히와 다릅니다')
     pz.evaluate("()=>{ RF.sid=''; }"); go('/home')
     # (c) 임신 — 소염제가 빠지고 자세히와 같은 약
     pz.evaluate("()=>{ ME.pregnant=true; saveMe(); }")
