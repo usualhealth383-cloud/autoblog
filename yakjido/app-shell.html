@@ -2447,7 +2447,7 @@ let GQ = '', MQ = '', LASTPATH = '', HINT = 0;
 let GQ_Y = null;
 /* 11-12 사용자25 치명 #2·#3 — 문장 검색에 위기·응급 낱말이 있으면 결과보다 먼저 전화 카드(낱말 범위·문구 강도는 의사-질문-1112) */
 const Q_CRISIS = /자살|자해|죽고\s*싶|죽을\s*래|목숨|극단적|스스로\s*해치|살기\s*싫/;
-const Q_ER = /가슴.{0,6}(답답|아프|아파|통증|조이|조여|짓눌|쥐어)|식은\s*땀|숨.{0,4}(차|막히|쉬기\s*힘|못\s*쉬)|호흡\s*곤란|경련|발작|마비|의식.{0,4}(없|잃|흐)|쓰러|피를?\s*토|토혈|말이?\s*어눌|한쪽.{0,6}(힘|저리)|입술.{0,4}(파래|파랗)|숨.{0,4}(쌕쌕|가빠)/;
+const Q_ER = /가슴.{0,6}(답답|아프|아파|통증|조이|조여|짓눌|쥐어)|식은\s*땀|숨.{0,4}(차|막히|쉬기\s*힘|못\s*쉬)|호흡\s*곤란|경련|발작|마비|의식.{0,4}(없|잃|흐)|쓰러|피를?\s*토|토혈|말이?\s*어눌|한쪽.{0,6}(힘|저리)|입술.{0,4}(파래|파랗)|숨.{0,4}(쌕쌕|가빠)|혈변|변에\s*피|피.{0,3}(섞인\s*변|똥)|축\s*(늘어|처)|늘어져|처져\s*(요|있)/;   /* 11-12 Main 잠정 1 — 혈변·아이 처짐 더함 */
 const Q_RISK = /와파린|항응고|피\s*묽|신장|콩팥|투석|두\s*번|두번|많이\s*먹|과량|과다|임신|수유|감기약|종합감기/;
 function qSafe(q){
   q = String(q || '');
@@ -5871,7 +5871,7 @@ function bgTag(x){ const B = VREF.bg; if (x.v < B.hypo) return ' · 저혈당'; 
   if (x.w === '식후 2시간') return x.v < B.pHi ? ' · 목표 안' : ' · 목표보다 높음'; return ''; }
 function vitalAlert(){
   const a = VT.alert; if (!a) return '';
-  if (a === 'bp-first') return `<div class="note" style="margin-top:14px">${I.alert}<span><b>높게 나왔어요 — 먼저 바르게 쟀는지 확인해 주세요.</b> 커프를 세게 감지 않았는지, 팔이 심장 높이였는지 보시고 <b>등을 기대고 5분 쉰 뒤 다시 재서</b> 적어 주세요.</span></div>`;
+  if (a === 'bp-first') return `<div class="note" style="margin-top:14px">${I.alert}<span><b>높게 나왔어요 — 먼저 바르게 쟀는지 확인해 주세요.</b> 커프를 세게 감지 않았는지, 팔이 심장 높이였는지 보시고 <b>등을 기대고 5분 쉰 뒤 다시 재서</b> 적어 주세요. 다만 지금 <b>심한 두통·가슴 통증·숨참·한쪽 팔다리 마비·말 어눌함</b>이 있으면 다시 재지 말고 <b>바로 119</b>예요.</span></div>`;   /* 11-12 Main 잠정 7 */
   if (a === 'bp-again') return `<div class="note alert" style="margin-top:14px">${I.alert}<span><b>쉬고 다시 재도 ${VREF.bp.hs}/${VREF.bp.hd} 이상이에요.</b> 심한 두통·가슴 통증·숨참·한쪽 팔다리 마비·말 어눌함이 있으면 <b>바로 119</b>에 연락하세요. 증상이 없어도 <b>오늘 안에 진료</b>를 받으세요.</span></div>`;
   if (a === 'bp-low') return `<div class="note bp-lo" style="margin-top:14px">${I.info}<div><b>90/60보다 낮아요</b> — 어지럽지 않으면 대개 괜찮아요. 어지럽거나 쓰러질 것 같으면 앉거나 누우시고, 되풀이되면 진료를 받으세요.${srcChips(['nhs_hypotension'], true)}</div></div>`;
   if (a === 'bg-high') { const S = VT.bgs || [], m = VT.bgm, sym = S.some(i => i < 4), chip = (k, v, t, on) => `<button class="chip ${on ? 'on' : ''}" aria-pressed="${on}" onclick="bgPick('${k}',${typeof v === 'string' ? `'${v}'` : v})">${t}</button>`;
@@ -5899,31 +5899,7 @@ function bpAvg(days){
   return { s: avg('s'), d: avg('d'), n: L.length, days: new Set(L.map(x => x.t.slice(0, 10))).size };
 }
 /* 추세 그림 — 그림도 진짜 숫자로만 그린다. 한 축(mmHg 또는 mg/dL), 기준선은 점선 + 글자 */
-function vitalChart(k){
-  const L = vitals().filter(x => x.k === k && x.t.slice(0, 10) >= dayBefore(13)).sort((a, b) => a.t.localeCompare(b.t));
-  if (L.length < 2) return `<p class="small muted" style="margin-top:8px">두 번 이상 적으시면 2주 흐름을 그림으로 보여 드려요.</p>`;
-  /* 3차 #7 — 축 글자도 최소 14 px, 글자 크기 설정을 따라 커지고 여백도 함께 */
-  const fz = Math.max(14, Math.round((parseFloat(getComputedStyle(document.documentElement).fontSize) || 16) * .875));
-  const W = Math.round(Math.min(560, Math.max(280, (innerWidth || 390) - 72))), H = 170 + fz * 2, pl = Math.ceil(fz * 1.9) + 8, pr = 12, pt = fz + 4, pb = fz + 14;
-  const t0 = new Date(dayBefore(13) + 'T00:00').getTime(), t1 = new Date(dayKey(new Date()) + 'T23:59').getTime();
-  const X = t => pl + (new Date(t).getTime() - t0) / (t1 - t0) * (W - pl - pr);
-  const vals = k === 'bp' ? L.flatMap(x => [x.s, x.d]) : L.map(x => x.v);
-  const ref = k === 'bp' ? [VREF.bp.s, VREF.bp.d] : [];
-  let lo = Math.min(...vals, ...ref), hi = Math.max(...vals, ...ref);
-  const step = k === 'bp' ? 20 : 50; lo = Math.floor((lo - 5) / step) * step; hi = Math.ceil((hi + 5) / step) * step;
-  const Y = v => pt + (hi - v) / (hi - lo) * (H - pt - pb);
-  const ticks = []; for (let v = lo; v <= hi; v += step) ticks.push(v);
-  const grid = ticks.map(v => `<line x1="${pl}" x2="${W - pr}" y1="${Y(v)}" y2="${Y(v)}" class="vz-grid"/><text x="${pl - 6}" y="${Y(v) + 4}" text-anchor="end" class="vz-ax">${v}</text>`).join('');
-  const days = [13, 6, 0].map(n => { const d = new Date(); d.setDate(d.getDate() - n); return `<text x="${Math.max(pl + fz * 1.3, Math.min(W - pr - fz * 1.3, X(dayKey(d) + 'T12:00')))}" y="${H - 6}" text-anchor="middle" class="vz-ax">${d.getMonth() + 1}/${d.getDate()}</text>`; }).join('');
-  const refs = ref.map((v, i) => `<line x1="${pl}" x2="${W - pr}" y1="${Y(v)}" y2="${Y(v)}" class="vz-ref"/>`).join('');
-  const line = (f, c) => `<polyline points="${L.map(x => `${X(x.t).toFixed(1)},${Y(x[f]).toFixed(1)}`).join(' ')}" class="vz-line ${c}"/>` +
-    L.map(x => `<circle cx="${X(x.t).toFixed(1)}" cy="${Y(x[f]).toFixed(1)}" r="4.5" class="vz-dot ${c}"><title>${x.t.slice(5, 10).replace('-', '/')} ${x.t.slice(11)} · ${k === 'bp' ? x.s + '/' + x.d + ' mmHg' : x.v + ' mg/dL'}</title></circle>`).join('');
-  const series = k === 'bp' ? line('s', 'v1') + line('d', 'v2') : line('v', 'v1');
-  const legend = k === 'bp' ? `<div class="vz-legend"><span><i class="v1"></i>위 혈압(수축기)</span><span><i class="v2"></i>아래 혈압(이완기)</span></div>` : '';
-  /* 외부 검수 4차 #5 — 가장 큰 글씨에서 기준선 글자(위 135·아래 85)가 마지막 점과 겹쳤다. 글자는 그래프 위 한 줄로, 그래프 안에는 점선만 */
-  const refLine = k === 'bp' ? `<p class="vz-refl"><i class="ref"></i>가정혈압 기준: 위 ${VREF.bp.s} / 아래 ${VREF.bp.d}</p>` : '';
-  return `${refLine}<svg class="vz" style="--vz:${fz}px" viewBox="0 0 ${W} ${H}" role="img" aria-label="최근 2주 ${k === 'bp' ? '혈압' : '혈당'} 흐름 — 아래 목록에 같은 숫자가 있어요">${grid}${refs}${days}${series}</svg>${legend}`;
-}
+/* vitalChart 는 srv.js 로(11-12 · 혈당 공복·식후 따로) */
 /* 혈압·혈당 기록 화면은 srv.js 의 vVitalsS(첫 화면 예산 · 11-09) */
 function vVitals(_, q){ return window.vVitalsS ? vVitalsS(_, q) : `${topBar({ back:'뒤로' })}<p class="loading" style="margin-top:8px">불러오는 중이에요…</p>`; }
 

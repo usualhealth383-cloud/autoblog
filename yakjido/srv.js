@@ -4948,17 +4948,46 @@ window.vOdS = function(_, q){ q = q || {};
   const kidCard = `<section class="sec card od-c"><h2>아이가 먹었어요</h2><p>양이 적어 보여도 <b>바로 119</b>에 전화하세요. 아이 <b>몸무게</b>와 먹은 약·양을 알려 주시면 위험한 양인지 바로 판단해요.</p><a class="call" href="tel:119"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M6.6 10.8a15 15 0 0 0 6.6 6.6l2.2-2.2a1 1 0 0 1 1-.25 11.4 11.4 0 0 0 3.6.57 1 1 0 0 1 1 1V20a1 1 0 0 1-1 1A17 17 0 0 1 3 4a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1c0 1.25.2 2.45.57 3.57a1 1 0 0 1-.25 1z" fill="currentColor"/></svg> 119 전화</a></section>`;
   return `${topBar({ back:'뒤로' })}
   <section class="sec"><h1>많이 먹었을 때 · 두 번 먹었을 때</h1></section>
-  <div class="flag od-top" role="alert">${I.alert}<div><b>증상이 없어도 지금 119에 전화하거나 응급실로 가세요.</b><p>약 상자와 남은 약을 들고 가세요. 억지로 토하게 하지 마시고, 직접 운전해서 가지 마세요.</p></div></div><a class="call od-big" href="tel:119"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M6.6 10.8a15 15 0 0 0 6.6 6.6l2.2-2.2a1 1 0 0 1 1-.25 11.4 11.4 0 0 0 3.6.57 1 1 0 0 1 1 1V20a1 1 0 0 1-1 1A17 17 0 0 1 3 4a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1c0 1.25.2 2.45.57 3.57a1 1 0 0 1-.25 1z" fill="currentColor"/></svg> 119 전화</a>
+  <div class="flag od-top" role="alert">${I.alert}<div><b>많이 먹었거나, 얼마나 먹었는지 모르거나, 아이가 먹었다면 — 증상이 없어도 지금 119에 전화하거나 응급실로 가세요.</b><p>약 상자와 남은 약을 들고 가세요. 억지로 토하게 하지 마시고, 직접 운전해서 가지 마세요.</p></div></div><a class="call od-big" href="tel:119"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M6.6 10.8a15 15 0 0 0 6.6 6.6l2.2-2.2a1 1 0 0 1 1-.25 11.4 11.4 0 0 0 3.6.57 1 1 0 0 1 1 1V20a1 1 0 0 1-1 1A17 17 0 0 1 3 4a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1c0 1.25.2 2.45.57 3.57a1 1 0 0 1-.25 1z" fill="currentColor"/></svg> 119 전화</a>
   ${kid ? kidCard : ''}
+  <section class="sec card od-c"><h2>한 번 몫을 더 먹었어요</h2><p>다음 차례는 <b>건너뛰고</b> 원래 시간으로 돌아가세요. 한 번 몫을 또 드시지 마세요.</p><p>이럴 땐 지금 <b>119</b>에 전화해 상담하세요 — 아세트아미노펜이 하루 최대량을 넘었을 때, 혈압약·당뇨약·심장약·피를 묽게 하는 약·수면제·신경안정제를 두 번 드셨을 때, 어지럽거나 가슴이 두근거리거나 몹시 졸릴 때.</p></section>
   <section class="sec card od-c"><h2>아세트아미노펜(타이레놀 등)이라면</h2><p><b>하루 최대량을 넘겨 드셨다면 아프지 않아도 지금 응급실</b>로 가세요. 첫날은 증상이 거의 없어요. 해독제는 빨리 쓸수록 잘 들어요.</p><p class="small muted">감기약·몸살약·복합진통제에도 들어 있어요. 여러 개를 함께 드셨다면 모두 더해 보세요.</p></section>
   ${kid ? '' : kidCard}
-  <section class="sec card od-c"><h2>한 번 몫을 더 먹었어요</h2><p>다음 차례는 <b>건너뛰고</b> 원래 시간으로 돌아가세요. 한 번 몫을 또 드시지 마세요.</p><p>이럴 땐 지금 <b>119</b>에 전화해 상담하세요 — 아세트아미노펜이 하루 최대량을 넘었을 때, 혈압약·당뇨약·심장약·피를 묽게 하는 약·수면제·신경안정제를 두 번 드셨을 때, 어지럽거나 가슴이 두근거리거나 몹시 졸릴 때.</p></section>
   <section class="sec card od-c"><h2>119에 알릴 것 적어 두기</h2><div class="od-fs">${fld('drug', '먹은 약', '예: 타이레놀 500 mg')}${fld('amt', '먹은 양', '예: 6알')}${fld('at', '먹은 시각', '예: 14:30', 'od-at')}${fld('kg', '몸무게(아이)', '예: 14 kg')}</div><button type="button" class="btn line" onclick="odNow()">지금 시각 넣기</button><p class="small muted">적은 내용은 서버에 올리지 않아요.</p></section>
   <p class="small muted od-src">근거: 영국 국민보건서비스(NHS) 중독 안내 · 파라세타몰 안내</p>
   ${disclaimer()}`;
 };
 try { const st = document.createElement('style'); st.textContent = '.od-fs{display:grid;gap:10px;margin:8px 0 12px}.od-f{display:grid;gap:4px}.od-f input{width:100%;box-sizing:border-box;min-height:48px;padding:0 12px;border:1px solid var(--hairline);border-radius:12px;font:inherit}.od-c .call{margin-left:calc(-1 * var(--s4));margin-right:calc(-1 * var(--s4));width:calc(100% + 2 * var(--s4))!important;border-radius:0!important}.od-big{margin-top:10px!important}.od-c .call,.od-top .call,.od-big{margin-top:12px;display:flex;width:100%;min-height:56px;justify-content:center;font-size:1.0625rem;background:var(--alert)!important;color:var(--on-alert,#fff)!important;text-decoration:none!important;border-radius:14px}'; document.head.appendChild(st); } catch (e) {}
 
+/* 11-12 앱 껍데기에서 옮김 + 혈당 공복·식후 따로 · 7일 평균 */
+window.vitalChart = function (k){
+  const L = vitals().filter(x => x.k === k && x.t.slice(0, 10) >= dayBefore(13)).sort((a, b) => a.t.localeCompare(b.t));
+  if (L.length < 2) return `<p class="small muted" style="margin-top:8px">두 번 이상 적으시면 2주 흐름을 그림으로 보여 드려요.</p>`;
+  /* 3차 #7 — 축 글자도 최소 14 px, 글자 크기 설정을 따라 커지고 여백도 함께 */
+  const fz = Math.max(14, Math.round((parseFloat(getComputedStyle(document.documentElement).fontSize) || 16) * .875));
+  const W = Math.round(Math.min(560, Math.max(280, (innerWidth || 390) - 72))), H = 170 + fz * 2, pl = Math.ceil(fz * 1.9) + 8, pr = 12, pt = fz + 4, pb = fz + 14;
+  const t0 = new Date(dayBefore(13) + 'T00:00').getTime(), t1 = new Date(dayKey(new Date()) + 'T23:59').getTime();
+  const X = t => pl + (new Date(t).getTime() - t0) / (t1 - t0) * (W - pl - pr);
+  const vals = k === 'bp' ? L.flatMap(x => [x.s, x.d]) : L.map(x => x.v);
+  const ref = k === 'bp' ? [VREF.bp.s, VREF.bp.d] : [];
+  let lo = Math.min(...vals, ...ref), hi = Math.max(...vals, ...ref);
+  const step = k === 'bp' ? 20 : 50; lo = Math.floor((lo - 5) / step) * step; hi = Math.ceil((hi + 5) / step) * step;
+  const Y = v => pt + (hi - v) / (hi - lo) * (H - pt - pb);
+  const ticks = []; for (let v = lo; v <= hi; v += step) ticks.push(v);
+  const grid = ticks.map(v => `<line x1="${pl}" x2="${W - pr}" y1="${Y(v)}" y2="${Y(v)}" class="vz-grid"/><text x="${pl - 6}" y="${Y(v) + 4}" text-anchor="end" class="vz-ax">${v}</text>`).join('');
+  const days = [13, 6, 0].map(n => { const d = new Date(); d.setDate(d.getDate() - n); return `<text x="${Math.max(pl + fz * 1.3, Math.min(W - pr - fz * 1.3, X(dayKey(d) + 'T12:00')))}" y="${H - 6}" text-anchor="middle" class="vz-ax">${d.getMonth() + 1}/${d.getDate()}</text>`; }).join('');
+  const refs = ref.map((v, i) => `<line x1="${pl}" x2="${W - pr}" y1="${Y(v)}" y2="${Y(v)}" class="vz-ref"/>`).join('');
+  const line = (f, c, LL = L) => `<polyline points="${LL.map(x => `${X(x.t).toFixed(1)},${Y(x[f]).toFixed(1)}`).join(' ')}" class="vz-line ${c}"/>` +
+    LL.map(x => `<circle cx="${X(x.t).toFixed(1)}" cy="${Y(x[f]).toFixed(1)}" r="4.5" class="vz-dot ${c}"><title>${x.t.slice(5, 10).replace('-', '/')} ${x.t.slice(11)} · ${k === 'bp' ? x.s + '/' + x.d + ' mmHg' : x.v + ' mg/dL'}</title></circle>`).join('');
+  const sub = w => L.filter(x => (x.w || '') === w), oth = L.filter(x => !['공복', '식후 2시간'].includes(x.w || ''));
+  const series = k === 'bp' ? line('s', 'v1') + line('d', 'v2') : line('v', 'v1', sub('공복')) + line('v', 'v2', sub('식후 2시간')) + oth.map(x => `<circle cx="${X(x.t).toFixed(1)}" cy="${Y(x.v).toFixed(1)}" r="4.5" class="vz-dot v3"><title>${x.t.slice(5, 10).replace('-', '/')} ${esc(x.w || '')} · ${x.v} mg/dL</title></circle>`).join('');   /* 11-12 Main 잠정 8 — 공복·식후를 한 선으로 잇지 않는다 */
+  const legend = k === 'bp' ? `<div class="vz-legend"><span><i class="v1"></i>위 혈압(수축기)</span><span><i class="v2"></i>아래 혈압(이완기)</span></div>` : `<div class="vz-legend"><span><i class="v1"></i>공복</span><span><i class="v2"></i>식후 2시간</span>${oth.length ? '<span><i class="v3"></i>그 밖(점만)</span>' : ''}</div>`;
+  /* 외부 검수 4차 #5 — 가장 큰 글씨에서 기준선 글자(위 135·아래 85)가 마지막 점과 겹쳤다. 글자는 그래프 위 한 줄로, 그래프 안에는 점선만 */
+  const L7 = vitals().filter(x => x.k === 'bg' && x.t.slice(0, 10) >= dayBefore(6)), avg = w => { const v = L7.filter(x => x.w === w).map(x => x.v); return v.length ? Math.round(v.reduce((a, b) => a + b, 0) / v.length) + ` (${v.length}번)` : ''; };
+  const refLine = k === 'bp' ? `<p class="vz-refl"><i class="ref"></i>가정혈압 기준: 위 ${VREF.bp.s} / 아래 ${VREF.bp.d}</p>` : (avg('공복') || avg('식후 2시간') ? `<p class="vz-refl">최근 7일 평균 — ${[avg('공복') && '공복 ' + avg('공복'), avg('식후 2시간') && '식후 2시간 ' + avg('식후 2시간')].filter(Boolean).join(' · ')} mg/dL</p>` : '');
+  return `${refLine}<svg class="vz" style="--vz:${fz}px" viewBox="0 0 ${W} ${H}" role="img" aria-label="최근 2주 ${k === 'bp' ? '혈압' : '혈당'} 흐름 — 아래 목록에 같은 숫자가 있어요">${grid}${refs}${days}${series}</svg>${legend}`;
+}
+try { const st = document.createElement('style'); st.textContent = '.vz-dot.v3{fill:var(--muted)}.vz-legend i.v3{background:var(--muted)}'; document.head.appendChild(st); } catch (e) {}
 /* 11-09 앱 껍데기에서 옮김(첫 화면 예산) */
 window.vVitalsS = function(){
   const k = VT.k, L = vitals(), mine = L.map((x, i) => ({ ...x, i })).filter(x => x.k === k).reverse();
