@@ -1782,7 +1782,7 @@ background-repeat:no-repeat;background-position:right 9px center;background-size
 .door-why{margin-top:8px;text-align:center;font-size:.875rem;color:var(--muted)}
 .door-why[hidden],.door-msg[hidden]{display:none}
 .cs-again .cs-list li>span{display:flex;flex-direction:column}.cs-again .cs-list b{font-size:1.0625rem}.cs-again .cs-list small{color:var(--muted);font-size:.9375rem;margin-top:2px}.cs-again h1{margin-top:6px}
-.cs-sum{margin-top:18px;text-align:center;font-size:1rem;line-height:1.6;color:var(--body)}.cs-detail{margin-top:10px;padding:0}.cs-detail>summary{min-height:48px;justify-content:center;width:100%;font-size:1rem}.cs-detail h3{font-size:1.0625rem;margin:16px 0 4px}.cs-detail p,.cs-detail li{font-size:1rem;line-height:1.65}.cs-detail ul{padding-left:1.1em;margin:6px 0}.cs-note{margin-top:14px;color:var(--muted)}
+.cs-call{display:flex;justify-content:center;margin-top:10px}.cs-call a{min-height:48px;border-radius:14px;display:inline-flex;align-items:center;gap:6px;padding:0 18px;font-weight:700;text-decoration:none}.cs-call a.tel-none{display:none}.cs-sum{margin-top:18px;text-align:center;font-size:1rem;line-height:1.6;color:var(--body)}.cs-detail{margin-top:10px;padding:0}.cs-detail>summary{min-height:48px;justify-content:center;width:100%;font-size:1rem}.cs-detail h3{font-size:1.0625rem;margin:16px 0 4px}.cs-detail p,.cs-detail li{font-size:1rem;line-height:1.65}.cs-detail ul{padding-left:1.1em;margin:6px 0}.cs-note{margin-top:14px;color:var(--muted)}
 .door.cs{padding-bottom:84px}.cs #csGo{position:sticky;bottom:calc(10px + env(safe-area-inset-bottom));z-index:3;box-shadow:0 6px 18px rgba(0,0,0,.18)}.cs-foot{margin-top:18px;text-align:center;font-size:.875rem;color:var(--muted);line-height:1.6}
 .cs-foot .cs-doc{font-size:.875rem}
 </style>
@@ -1809,8 +1809,8 @@ background-repeat:no-repeat;background-position:right 9px center;background-size
 <script>
 window.__YAKJIDO_OK__ = true;
 const D = JSON.parse(document.getElementById('data').textContent || '{}');
-const BUILD = '2026-11-12 23:45';
-const DATAV = '2b52e5c802'.indexOf('__') === 0 ? BUILD : '2b52e5c802';
+const BUILD = '2026-11-13 00:02';
+const DATAV = 'c8a4069ab4'.indexOf('__') === 0 ? BUILD : 'c8a4069ab4';
 const BRANDMARK = (typeof window !== 'undefined' && window.__BRANDMARK__) || 'icon-192.png';
 let CORE = 0, CORE_P = null;
 function mergeCore(c){
@@ -6774,6 +6774,8 @@ return `<div class="door cs">
 <p class="door-s">어디가 불편한지 고르면, 집에서 할 일 · 약국에서 찾을 약 · 진료가 필요한 신호를 차례로 알려 드려요</p>
 ${다시 ? `<p class="cs-new">${I.info}<span>약지도에 이용약관과 개인정보 처리방침이 새로 생겼어요. 한 번만 확인해 주세요.</span></p>` : ''}
 <p class="cs-sum">약 설명은 식약처 허가 자료를 쉽게 바꾼 거예요 · 진단·처방을 대신하지 않아요 · 급하면 119</p>
+<!-- 11-12 Main 「느린 4G 에서 119 무반응」 점검 — 첫 화면(동의)에도 누르면 바로 걸리는 맨 tel: 링크. 처리기 없이 동작, 해외는 i18n.js 가 번호를 바꾸거나 단추를 끈다 -->
+<p class="cs-call"><a class="sos-call" href="tel:119">${I.alert}<span>119 전화</span></a></p>
 <!-- 11-09 실사용 검수 B2(개인정보보호법 22·23조) — 필수 둘을 따로 보이고, 「모두 동의」 한 번으로도 된다(10-29 「동의 벽 금지」와 함께). 서버 저장(지병·드시는 약)은 선택이라 계정 만들 때 따로 -->
 <button type="button" class="cs-row cs-all" role="checkbox" aria-checked="${both ? 'true' : (동의칸.terms || 동의칸.privacy) ? 'mixed' : 'false'}" onclick="동의누름('all')"><span class="cs-bx">${I.check}</span><span class="cs-tx"><b>모두 동의</b></span></button>
 ${동의줄('terms', '이용약관', '의료기기가 아니에요 · 약 설명은 식약처 허가 자료를 쉽게 바꾼 거예요', ['약 설명은 <b>식약처 허가 설명서</b>가 기본이에요. 해외 지침이나 진료실 관행이 다르면 둘 다 보여 드려요.',
