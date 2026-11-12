@@ -654,6 +654,8 @@
    판 2026-11-13c — 체험 끝 3일 전 알림(약지도에서 옮김 · 약관 「자동 결제 전 알림」 약속). 구독.체험끝날() · 구독.체험끝줄HTML() (홈 한 줄) ·
     기기 알림은 부품이 스스로 건다 — 안드로이드 예약 알림(Capacitor LocalNotifications, 허락받은 경우만) · 웹 알림(탭이 열려 있고 허락받은 경우만).
     해지 예약자·스위치 꺼짐이면 아무것도 없다. 전환 카드도 3일 전부터(전엔 2일).
+  판 2026-11-13d — 알림 번호 864003 → 2864003. 864003 은 약지도 「내 약 알림(<900000)」 범위라 그 앱의 옛 알림 지우기에 걸렸다(Main 11-13).
+    지금 앱들이 쓰는 범위: 알림 부품 100000~189999 · 990001 · 길동무 200000~289999·300000000~1199999999 · 약지도 <900000 — 2,000,000번대는 비어 있다. extra.구독 표시는 그대로.
   판 2026-11-03 — 체험 14일(약관 11-29-1 덧붙임 · Main 11-03). 판 2026-10-08(결제 다리) — 스토어 껍데기(_껍데기/src/껍데기.js)가 window.껍데기.결제 를 내놓으면 결제 자리를 그것으로 쓴다(앱 설치 줄은 그대로 결제사:null).
      · 스위치(유료화)가 꺼져 있으면 껍데기가 있어도 아무것도 바뀌지 않는다(껍데기결제() 가 null).
      · 「14일 체험 시작」·「다시 구독하기」 → 껍데기.결제.구매('<app>_month') → 웹훅이 서버 표를 고치면 subscription_status 를 다시 읽는다(몇 번 되읽음).
@@ -677,7 +679,7 @@
        다섯 앱이 공용 서버의 같은 계정 id 로 RevenueCat 에 들어가므로 다른 앱에서 산 회원권도 보인다. 서버 표는 pass_subscriptions(plan 'pass_month' · 'pass_year').
      · 초대 코드(가입 부품 _도구/가입_부품.js) — 서버가 plan 'invite' 로 돌려주면 「초대 코드로 체험 중 · ○월 ○일까지」(결제 글 없음). */
 (function () {
-  var 판 = '2026-11-13c';
+  var 판 = '2026-11-13d';
   var 응급기본 = ['crisis', 'sos', 'emergency', 'danger', 'call109', 'call119', 'call15770199', 'safety_plan', 'er', 'er_find', 'where'];
   var 설정 = { app: 'app', 유료화: false, 가격: { 월: 0 }, 회원권: null, 잠금: {}, 면제: null, 응급: [], 결제사: null, 결제: null, 계정: true, 말: null, 문구: {}, 학생인증: null,
                인증: { 휴대폰: false, 공동: false }, 시트열기: null, 시트닫기: null, 알림: null, 로그인열기: null, 바뀜: null,
@@ -1234,7 +1236,7 @@
     var t = 체험끝날(); if (!t || t.days == null || t.days > 3 || 운영자()) return '';
     return '<button type="button" class="' + 모('줄') + ' subline" onclick="구독.관리열기()">' + 체험끝글(t.days) + '</button>';
   }
-  var 알림번호 = 864003, 웹알림틀 = null;
+  var 알림번호 = 2864003, 옛번호 = 864003, 웹알림틀 = null;   /* 11-13d 어느 앱 범위와도 안 겹치는 자리 */
   function 알림키() { return '_sub_te_' + 설정.app; }
   function 기기알림() { var C = window.Capacitor; if (!C) return null; var p = C.Plugins && C.Plugins.LocalNotifications;
     if (!p && typeof C.registerPlugin === 'function') { try { if (!C.isPluginAvailable || C.isPluginAvailable('LocalNotifications')) p = C.registerPlugin('LocalNotifications'); } catch (e) {} } return p || null; }
@@ -1248,7 +1250,7 @@
     /* 안드로이드 — 허락받은 경우만 건다(여기서 허락을 묻지 않는다). 바뀌었을 때만 다시 건다 */
     var LN = 기기알림();
     if (LN && 걸림 !== 열쇠) {
-      Promise.resolve().then(function () { return 걸림 ? LN.cancel({ notifications: [{ id: 알림번호 }] }) : null; }).catch(function () {})
+      Promise.resolve().then(function () { return 걸림 ? LN.cancel({ notifications: [{ id: 알림번호 }, { id: 옛번호 }] }) : null; }).catch(function () {})
         .then(function () { if (!at) return null; return LN.checkPermissions().then(function (p) { if (!p || p.display !== 'granted') return null;
           return LN.schedule({ notifications: [{ id: 알림번호, title: 제목, body: 몸, schedule: { at: at, allowWhileIdle: true }, extra: { 구독: 'trial-end' } }] }); }); })
         .then(function () { try { if (열쇠) localStorage.setItem(알림키(), 열쇠); else localStorage.removeItem(알림키()); } catch (e) {} }).catch(function () {});
