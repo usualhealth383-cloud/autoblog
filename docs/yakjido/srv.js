@@ -1353,11 +1353,12 @@ try {
    잠금 목록 = 현욱님 10-22 답 A(기록을 쌓아 보는 것만). */
 try {
   구독.설치({ app: 'yakjido', 유료화: false,
-    가격: { 월: 5900, 연: 49000, 출시: { 월: 4900, 연: 39900 } },
+    가격: { 월: 4900, 연: 39900 },   /* 11-12 현욱님 결정 — 월 4,900 · 연 39,900, 기념가 없음 · 단건 없음(근거 yozm-health _시안/요금판단_1112/요금_yak.md) */
     회원권: { 월: 12900, 연: 99000, 출시월: 9900, 출시연: 79000, 판매: false },
-    잠금: { sync: '여러 기기에서 이어 보기', trend: '혈압·혈당 2주 흐름 그림', visitdoc: '진료실 한 장 종이로 뽑기', rx: '처방약 길잡이' },   /* 10-22 현욱님 잠금 A — 약 개수로는 막지 않는다 */
+    /* 11-12 현욱님 잠금 추천안 — 찾아보기·위험 경고·병용 확인·낱알 식별·약통·매일 복약 알림은 늘 열림. 이용권 = 아래 일곱. 약 개수로는 막지 않는다 */
+    잠금: { family: '가족·보호자와 함께 보기', refill: '남은 약 떨어지기 전 알림', trend: '혈압·혈당 흐름 그림', visitdoc: '진료 준비 한 장(첫 장은 그냥 드려요)', sync: '여러 기기에서 이어 보기', suppcap: '영양제 상한 나란히 비교', history: '7일 넘는 복약 기록' },
     응급: ['emergency', 'redflag', 'call119', 'find', 'bag', 'schedule', 'together'],
-    문구: { 응급안내: '약 찾기·약봉투 읽기·복약 알림·응급 신호와 겹침 확인은 언제나 열려 있어요.', 막힘앞: function (id) { return window.회원권 ? 회원권.강조HTML(id) : ''; } },   /* 11-11 회원권 부품 */
+    문구: { 응급안내: '약 찾기·위험 신호·같이 먹어도 되는지 확인·낱알로 약 찾기·약통·매일 복약 알림은 언제나 열려 있어요.', 막힘앞: function (id) { return window.회원권 ? 회원권.강조HTML(id) : ''; } },   /* 11-11 회원권 부품 */
     결제사: null, 인증: { 휴대폰: false, 공동: false },
     시트열기: function (html, 제목) { var v = document.getElementById('view'); if (!v) return; v.innerHTML = topBar({ back: '뒤로' }) + '<h1>' + esc(제목 || '구독') + '</h1>' + html; scrollTo(0, 0); },
     시트닫기: function () { route(); },
@@ -3332,7 +3333,7 @@ function doseSrv(on){
 const famErr = e => { const m = String((e && (e.message || e.code)) || e); return /family limit/.test(m) ? '가족은 3명까지 연결할 수 있어요.' : /too many/.test(m) ? '코드를 너무 여러 번 넣었어요. 한 시간 뒤에 다시 해 주세요.' : /self/.test(m) ? '내가 만든 코드예요. 가족 휴대폰에서 넣어 주세요.' : /already/.test(m) ? '이미 연결된 분이에요.' : /nopush/.test(m) ? '이 브라우저는 알림을 받을 수 없어요. 아이폰은 사파리 공유 → 홈 화면에 추가한 뒤 그 아이콘으로 열어 주세요.' : /denied/.test(m) ? '알림이 막혀 있어요. 위의 안내대로 알림을 허용한 뒤 다시 눌러 주세요.' : '잠시 뒤 다시 해 주세요.'; };
 function famShare(code){ const url = (D.meta?.webUrl || 'https://yakjido.medinanum.com/') + '#/notify?code=' + code;
   shareOut({ title: '약지도 가족 알림', text: `[약지도] 제 약 체크를 놓치면 알려 주는 가족 알림 코드예요: ${code} (24시간)\n약지도 → 내 정보 → 알림 설정 → 받은 코드 넣기\n${url}` }).catch(() => {}); }
-function famInvite(){ const ok = document.getElementById('famOk'), ok2 = document.getElementById('famOk2'); if (!ok || !ok.checked || !ok2 || !ok2.checked) { FAMQ.msg = '가족 알림을 쓰려면 두 가지 동의에 모두 체크해 주세요. 동의하지 않아도 다른 기능은 그대로 쓸 수 있어요.'; route(); return; }
+function famInvite(){ if (잠김('family')) return 구독.막힘('family'); const ok = document.getElementById('famOk'), ok2 = document.getElementById('famOk2'); if (!ok || !ok.checked || !ok2 || !ok2.checked) { FAMQ.msg = '가족 알림을 쓰려면 두 가지 동의에 모두 체크해 주세요. 동의하지 않아도 다른 기능은 그대로 쓸 수 있어요.'; route(); return; }
   const label = (document.getElementById('famLabel')?.value || '').trim() || '가족';
   famRpc('yak_family_invite', { p_label: label, p_consent: true }).then(d => { const c = d && d[0] && d[0].code; FAMQ.open = ''; FAMQ.msg = c ? `코드 ${c} 를 만들었어요. 가족에게 보내 주세요.` : ''; FAMQ.list = null; if (c) famShare(c); })
     .catch(e => { FAMQ.msg = famErr(e); }).finally(() => route()); }
@@ -3347,7 +3348,7 @@ async function famPush(){
   await famRpc('mn_push_save', { p_app: 'yakjido', p_endpoint: j.endpoint, p_p256dh: j.keys.p256dh, p_auth: j.keys.auth, p_lang: typeof LANG !== 'undefined' ? LANG : 'ko', p_tz: Intl.DateTimeFormat().resolvedOptions().timeZone || 'Asia/Seoul' });
   try { await famRpc('yak_push_save', { p_endpoint: j.endpoint, p_p256dh: j.keys.p256dh, p_auth: j.keys.auth }); } catch (e) {}
 }
-function famJoin(){ const c = (document.getElementById('famCode')?.value || '').replace(/\D/g, ''); FAMQ.code = c;
+function famJoin(){ if (잠김('family')) return 구독.막힘('family'); const c = (document.getElementById('famCode')?.value || '').replace(/\D/g, ''); FAMQ.code = c;
   if (c.length !== 6) { FAMQ.msg = '6자리 숫자를 넣어 주세요.'; route(); return; }
   if (!document.getElementById('famJoinOk')?.checked) { FAMQ.msg = '연결하려면 동의에 체크해 주세요. 연결하지 않아도 다른 기능은 그대로 쓸 수 있어요.'; route(); return; }
   famPush().then(() => famRpc('yak_family_accept', { p_code: c })).then(d => { if (!d || !d.length) { FAMQ.msg = '코드가 맞지 않거나 24시간이 지났어요. 가족에게 새 코드를 받아 주세요.'; return; }
@@ -4948,7 +4949,7 @@ window.vVitalsS = function(){
   ${k === 'bp' && NATIVE ? `<section class="sec card"><div class="toggle"><div class="t"><b>혈압 재기 알림</b><span>${((ME.vitalRemind || {}).bp || []).length ? '아침 7:30 · 저녁 9:00 — 켜져 있어요' : '매일 아침·저녁 잴 시간을 알려 드려요'}</span></div><button class="btn ghost" style="width:auto;min-height:46px;padding:0 14px" onclick="vitalRemindToggle()">${((ME.vitalRemind || {}).bp || []).length ? '끄기' : '켜기'}</button></div></section>` : ''}
   <section class="sec card"><h2>적은 기록 <small>${mine.length}번</small></h2>
     ${mine.length ? `<div class="vt-list">${mine.slice(0, 30).map(x => `<div class="vt-li"><span class="vt-t">${x.t.slice(5, 10).replace('-', '/')} <small>${x.t.slice(11)} · ${esc(x.w || '')}</small></span><b>${k === 'bp' ? `${x.s}/${x.d}<small> mmHg${x.p ? ` · 맥박 ${x.p}` : ''}</small>` : `${x.v}<small> mg/dL${bgTag(x)}</small>`}</b><button class="vt-x" onclick="vitalDel(${x.i})" aria-label="이 기록 지우기">${I.x}</button></div>`).join('')}</div>` : `<div class="empty"><span class="em-ic">${I.heart}</span><b>아직 적은 기록이 없어요</b>오늘 한 번이 시작이에요. 위에서 적어 보세요.</div>`}
-    ${mine.length && !NATIVE ? `<div class="actions" style="margin-top:12px"><button class="btn line" onclick="잠김('visitdoc')?구독.막힘('visitdoc'):window.print()">${I.book} 진료 때 보여 드리기(인쇄·PDF)</button></div>` : ''}
+    ${mine.length && !NATIVE ? `<div class="actions" style="margin-top:12px"><button class="btn line" onclick="진료장()">${I.book} 진료 때 보여 드리기(인쇄·PDF)</button></div>` : ''}
   </section>
   <details class="why-more sec" ${vitals().filter(x => x.k === k).length < 3 || VT.alert === 'bp-first' ? 'open' : ''}><summary>${k === 'bp' ? '혈압, 바르게 재는 법' : '혈당, 언제 재고 어떻게 볼까요'}${I.chev}</summary>
     ${k === 'bp' ? `<ul class="how-list">
@@ -5156,6 +5157,7 @@ window.vScheduleS = function (_, q){
     ${taking.map(d => { const dl = daysLeft(d.id), pl = prnLeft(d.id); return `<div class="sched-row"><div class="nm"><span>${esc(d.name)}</span>${dl != null ? `<b class="${dl <= 3 ? 'stockwarn' : 'stockok'}">${dl === 0 ? '오늘 떨어져요' : dl + '일치 남음'}</b>` : ''}${pl != null ? `<b class="${pl <= 3 ? 'stockwarn' : 'stockok'}">${pl === 0 ? '다 드셨어요' : pl + '번 분 남음'}</b>` : ''}</div>
       <div class="times stock-row"><input class="stock" type="number" inputmode="numeric" min="0" step="1" placeholder="남은 알 수" value="${stockOf(d.id) ? esc(String(stockOf(d.id).left)) : ''}" onchange="setStock('${d.id}', this.value)" aria-label="${esc(d.name)} 남은 알 수"><span class="stock-u" aria-hidden="true">알</span></div>
       ${isPrn(d.id) ? '' : `<div class="prn-qty" role="group" aria-label="${esc(d.name)} 한 번에 몇 알"><span>한 번에</span>${[1, 2].map(k => `<button class="${doseQty(d.id) === k ? 'on' : ''}" aria-pressed="${doseQty(d.id) === k}" onclick="setDoseQty('${d.id}',${k})">${k}알</button>`).join('')}</div>`}</div>`; }).join('')}
+    ${잠김('refill') ? `<button class="btn line" style="margin-top:10px" onclick="구독.막힘('refill')">${I.clock} 떨어지기 전 알림은 이용권으로 받아요${I.chev}</button>` : ''}
     ${lowStock().length ? `<div class="note" style="margin-top:10px">${I.alert}<span><b>곧 떨어져요</b> — ${lowStock().map(x => esc(x.n) + ' ' + x.days + '일치').join(' · ')}. 처방약이면 <b>미리 진료를 잡아 두세요.</b> <a class="link" href="#/visits">진료 예약 적기</a></span></div>` : ''}
   </section></div>` : ''}
   ${taking.length ? `<div class="pane${schOn('sc3')}" id="sc3">${calCard()}</div>` : ''}
@@ -5358,3 +5360,9 @@ window.entryBandS = function (s){
 try { if (window.ENTRY && /^#\/(symptom|send)/.test(location.hash)) route(); } catch (e) {}
 try { if (/^(#\/?(home)?)?$/.test(location.hash) && (window.오늘한장 || window.필요약줄)) route(); } catch (e) {}   /* 11-12 홈의 오늘 한 장·필요할 때 약 줄은 srv.js 가 온 뒤 다시 그린다 */
 try { if (/^#\/(drug\/|schedule|together|od|vitals|pillinfo|pub|supp\/|me|consent|login|notify|sgoal|sstage|doc|hello\/3|supp$|supp\?|sgoal|sstage|rx|about|search|myths|askdoc|talk|p\/|p\?|p$)/.test(location.hash)) route(); } catch (e) {}
+
+/* 11-12 현욱님 — 체험 끝 3일 전 알림 필수. 공용 구독 부품에는 없어 약지도 쪽에 둔다(부품 원본에 넣으면 이것을 지운다).
+   유료화 스위치(구독.켜짐)가 꺼져 있으면 늘 null — 아무것도 나오지 않는다. 해지 예약을 해 두신 분께는 알리지 않는다 */
+window.체험끝날 = function () { try { if (!window.구독 || !구독.켜짐()) return null; var s = 구독.상태(); if (!s || s.status !== 'trial' || !s.until || s.cancel) return null; return { until: new Date(s.until), days: s.days }; } catch (e) { return null; } };
+window.체험끝줄 = function () { var t = 체험끝날(); if (!t || t.days == null || t.days > 3) return '';
+  return '<button type="button" class="od-line" onclick="구독.관리열기()">' + I.info + '<span>14일 체험이 ' + (t.days ? t.days + '일 뒤' : '오늘') + ' 끝나요 · 요금(월 4,900원)과 해지 방법 보기</span>' + I.chev + '</button>'; };

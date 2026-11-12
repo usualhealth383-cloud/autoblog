@@ -3551,7 +3551,7 @@ function vHome(){
   const dot = `<a class="sos-dot" href="tel:119" aria-label="119 전화">119</a>`;
   const odL = `<button type="button" class="od-line" onclick="go('/od')">${I.alert}<span>많이 먹었을 때 · 두 번 먹었을 때</span>${I.chev}</button>`;
   return `${topBar()}${ext('가족대화줄')}
-  ${dh || ''}
+  ${dh || ''}${ext('체험끝줄')}
   ${svOn() ? `<section class="hero home-q">${dot}<div class="eyebrow">${esc(hello)}</div><h1 class="greet">어디가 불편하세요?</h1><p class="sv-lead">약국에서 물어볼 약을 알려 드려요</p></section>${ER_LINE()}${kidHome()}${ext('오늘한장')}
   <div class="sv-tiles one">${SV_HOME.map(id => byId(D.symptoms, id)).filter(Boolean).map(s => `<button class="sv-tile ${gcls(s.group)}" onclick="go('/symptom/${s.id}')"><span class="ic">${sicon(s)}</span><b>${esc(s.name.split(' (')[0])}</b></button>`).join('')}</div>
   <button class="btn ghost sv-all" onclick="homeTab('all');jumpTo('hlist')">다른 증상 모두 보기${I.chev}</button>` : `<section class="hero home-q">${dot}
@@ -5393,6 +5393,8 @@ async function nativeArmOnce(){
         list.push({ id: 600000 + id++, title, body: body.slice(0, 120), channelId: ch, extra: { visit: v.id }, isExactNotification: exact, schedule: { at: when, allowWhileIdle: true } });
       }
     }
+    { const te = window.체험끝날 && 체험끝날(); const teAt = te ? new Date(te.until.getTime() - 3 * 864e5) : null; if (teAt) teAt.setHours(10, 0, 0, 0);   /* 11-12 현욱님 — 체험 끝 3일 전 알림 필수(유료화 스위치 꺼진 동안은 te 가 늘 null) */
+      if (teAt && teAt.getTime() > now) list.push({ id: 800001, title: '약지도 · 체험이 3일 뒤 끝나요', body: '이어 쓰지 않으시려면 그 전에 해지하세요. 요금과 해지 방법은 내 정보 → 구독에서 볼 수 있어요.', channelId: ch, isExactNotification: exact, schedule: { at: teAt, allowWhileIdle: true } }); }
     /* 혈압 재기 알림 — 수첩에서 켜 두신 분만. 지침의 «아침·저녁» 측정에 맞춘다 */
     for (const t of ((ME.vitalRemind || {}).bp || [])) { const [h, m] = t.split(':').map(Number);
       list.push({ id: 700000 + id++, title: '약지도 · 혈압 잴 시간', body: t < '12:00' ? '일어나 1시간 안, 소변 본 뒤, 혈압약 먹기 전에 재 주세요.' : '잠자기 전에 재 주세요. 앉아서 몇 분 쉰 뒤에요.',
@@ -5502,6 +5504,7 @@ function armNotifications(){
   if (eveningOn() && ev > now) NOTI_TIMERS.push(setTimeout(() => { const L = eveningLeft(todayKey(), true); if (L.length && webQuota(true)) showNote('오늘 약 체크', eveningBody(L), 'yakjido-evening', '', '#/schedule'); }, ev - now));
   /* 진료 예약 — 앱(탭)이 열려 있는 동안만 전날 저녁 7시·2시간 전(3-10). 닫아 두시면 「달력에 넣기」가 대신한다 */
   for (const v of (noteOn('visit') ? visits() : [])) for (const [when, title] of visitTimes(v)) { const ms = when - now; if (ms > 0 && ms < 2147000000) NOTI_TIMERS.push(setTimeout(() => showNote(title, visitWord(v), 'visit-' + v.id, '', true), ms)); }
+  { const te = window.체험끝날 && 체험끝날(); const teAt = te ? new Date(te.until.getTime() - 3 * 864e5) : null; if (teAt) teAt.setHours(10, 0, 0, 0);   /* 11-12 현욱님 — 체험 끝 3일 전 알림 필수(유료화 스위치 꺼진 동안은 te 가 늘 null) */ const ms = teAt ? teAt - now : -1; if (ms > 0 && ms < 2147000000) NOTI_TIMERS.push(setTimeout(() => showNote('약지도 · 체험이 3일 뒤 끝나요', '이어 쓰지 않으시려면 그 전에 해지하세요. 요금과 해지 방법은 내 정보 → 구독에서 볼 수 있어요.', 'trial-end', '', true), ms)); }
   /* 자정을 넘기면 내일 알림을 다시 건다(켜 둔 채 밤을 넘겨도 다음 날 08:00 이 울리게) */
   const mid = new Date(now); mid.setHours(24, 0, 1, 0);
   NOTI_TIMERS.push(setTimeout(() => dayCheck(), mid - now));
@@ -5586,7 +5589,7 @@ function careReport(){
     (low.length ? `\n\n※ 곧 떨어져요: ${low.map(x => `${x.n} ${x.days}일치`).join(', ')}` : '') +
     `\n\n— 약지도에서 보냄`;
 }
-async function sendCare(){
+async function sendCare(){ if (잠김('family')) return 구독.막힘('family');
   const text = careReport();
   try {
     if (await shareOut({ title: '오늘 약', text })) return;
@@ -5618,7 +5621,8 @@ function prnLeft(id){
   let used = 0; for (const k in (ME.prnLog || {})) if (k >= st.at) used += ME.prnLog[k].filter(x => x.id === id).reduce((a, x) => a + (x.n || 1), 0);
   return Math.max(0, Math.floor(st.left - used));
 }
-function lowStock(){ return takingItems().map(d => ({ n: d.name, days: daysLeft(d.id) })).filter(x => x.days != null && x.days <= 5); }
+function lowStock(){ if (잠김('refill')) return [];   /* 11-12 남은 약 알림은 이용권(유료화 스위치 꺼진 동안은 늘 열림) */
+  return takingItems().map(d => ({ n: d.name, days: daysLeft(d.id) })).filter(x => x.days != null && x.days <= 5); }
 
 /* 고르신 시간이 약의 «최소 간격»보다 촘촘하면 알려 드린다.
    칩을 네 개 다 누르면 하루 4번이 되는데, 6~8시간짜리 약은 그러면 안 된다.
@@ -5701,7 +5705,7 @@ function calCard(){
   const end = new Date(today); end.setDate(end.getDate() + (6 - today.getDay()));
   const cells = [];
   for (let i = 34; i >= 0; i--) { const d = new Date(end); d.setDate(d.getDate() - i); cells.push(d); }
-  const a = adherence(30);
+  const H7 = 잠김('history'), a = adherence(H7 ? 7 : 30), AN = H7 ? 7 : 30;   /* 11-12 7일 넘는 기록 보기는 이용권 — 기록은 지우지 않고 그대로 둔다 */
   const LBL = { full: '다 드셨어요', part: '일부만', miss: '빠짐', skip: '건너뛴 것 있음', none: '정해 둔 것 없음', soon: '아직 남은 시간이 있어요' };
   const grid = cells.map(d => {
     const k = dayKey(d);
@@ -5714,18 +5718,20 @@ function calCard(){
     const say = future ? '' : `${d.getMonth() + 1}월 ${d.getDate()}일 — ${stat.plan ? `${LBL[st]}, ${stat.plan}번 중 ${Math.min(stat.done, stat.plan)}번` : LBL.none}`;
     /* 지난 날·오늘은 눌러서 그날 무엇을 드셨는지 아래 칸에 펼친다(5-19) — 단추라 키보드로도 열리고, 펼침 여부를 aria-expanded 로 알린다 */
     if (future) return `<div class="cal-d fut" role="listitem" aria-hidden="true"><span class="n">${d.getDate()}</span></div>`;
+    if (H7 && (today - d) / 864e5 >= 7) return `<div class="cal-d none" role="listitem" aria-hidden="true"><span class="n">${d.getDate()}</span></div>`;
     return `<div class="cal-li" role="listitem"><button type="button" class="cal-d ${st}${k === todayKey() ? ' cal-now' : ''}" onclick="calPick('${k}')" aria-expanded="${CAL_PICK === k}" aria-controls="cal-day" title="${say}" aria-label="${say}">
       <span class="n">${d.getDate()}</span>${CAL_MARK[st] ? `<span class="cm" aria-hidden="true">${CAL_MARK[st]}</span>` : ''}</button></div>`;
   }).join('');
   const first = cells[0], last = new Date(today);
   const span = `${first.getMonth() + 1}월 ${first.getDate()}일 — ${last.getMonth() + 1}월 ${last.getDate()}일`;
   return `<section class="sec card"><h2>지난 기록 <small>${DAYS_KEEP}일까지 보관</small></h2>
-  ${a.days ? `<p style="margin-top:6px"><b>어제까지 30일 가운데 약을 드시기로 한 날이 ${a.days}일</b>이었고, 그중 <b>${a.full}일</b>은 빠짐없이 드셨어요.${a.doses ? ` 전체로는 ${a.doses}번 중 ${a.took}번이에요.` : ''}${a.skip ? ` 일부러 건너뛴 것은 ${a.skip}번이에요.` : ''}</p>`
+  ${a.days ? `<p style="margin-top:6px"><b>어제까지 ${AN}일 가운데 약을 드시기로 한 날이 ${a.days}일</b>이었고, 그중 <b>${a.full}일</b>은 빠짐없이 드셨어요.${a.doses ? ` 전체로는 ${a.doses}번 중 ${a.took}번이에요.` : ''}${a.skip ? ` 일부러 건너뛴 것은 ${a.skip}번이에요.` : ''}</p>`
     : `<p style="margin-top:6px">아직 기록이 없어요. 위에서 시간을 고르고 드실 때마다 눌러 두시면 여기에 쌓여요.</p>`}
   <div class="cal-span">${span}</div>
   <div class="cal-dow">${DOW.map(x => `<span>${x}</span>`).join('')}</div>
-  <div class="cal" role="list" aria-label="${a.days ? `지난 30일 중 ${a.days}일이 복용일이었고 ${a.full}일은 모두 드셨습니다` : '아직 복용 기록이 없습니다'}">${grid}</div>
+  <div class="cal" role="list" aria-label="${a.days ? `지난 ${AN}일 중 ${a.days}일이 복용일이었고 ${a.full}일은 모두 드셨습니다` : '아직 복용 기록이 없습니다'}">${grid}</div>
   <p class="small muted cal-tip">날짜를 누르면 그날 드신 약을 아래에 보여 드려요.</p>
+  ${H7 ? `<button class="btn line" style="margin-top:8px" onclick="구독.막힘('history')">${I.clock} 7일보다 앞선 기록은 이용권으로 봐요 · 기록은 그대로 있어요${I.chev}</button>` : ''}
   ${calDay(CAL_PICK)}
   ${slotLine()}
   <div class="cal-key">${[['full', '다 드심'], ['part', '일부'], ['skip', '건너뜀'], ['miss', '빠짐'], ['none', '정해 둔 것 없음'], ['cal-now', '오늘']].map(([c, n]) => `<span class="ki"><span class="k ${c}" aria-hidden="true">${CAL_MARK[c] || ''}</span>${n}</span>`).join('')}</div>
@@ -7457,7 +7463,7 @@ function vBag(){
   ${adhCard()}
   ${vitalsCard()}
   ${nextVisit() ? `<p class="small muted" style="margin-top:10px">다음 진료 — ${esc(visitWord(nextVisit()))}</p>` : ''}
-  <div class="actions"><button class="btn ghost" onclick="shareBag()">${I.cart} 메모로 복사·전송</button>${NATIVE ? '' : `<button class="btn ghost" onclick="잠김('visitdoc')?구독.막힘('visitdoc'):window.print()">${I.book} 종이로 뽑기</button>`}<button class="btn ghost" onclick="go('/together')">${I.shield} 자세한 판정 보기</button></div>
+  <div class="actions"><button class="btn ghost" onclick="shareBag()">${I.cart} 메모로 복사·전송</button>${NATIVE ? '' : `<button class="btn ghost" onclick="진료장()">${I.book} 종이로 뽑기</button>`}<button class="btn ghost" onclick="go('/together')">${I.shield} 자세한 판정 보기</button></div>
   <details class="why-more" style="margin-top:12px" ${items.filter(x => !String(x.id).startsWith('supp:')).length >= 5 ? 'open' : ''}><summary>병원·약국에서 받은 약까지 한 번에 보려면 — 나라 서비스${I.chev}</summary><div class="why" style="margin-top:8px">
     <p>이 약통은 <b>직접 담으신 약</b>만 봐요. <b>건강보험심사평가원 「내가 먹는 약! 한눈에」</b>에서는 지난 1년 동안 병원·약국에서 받은 약을 볼 수 있고(간편인증 로그인), <b>「의약품 안전사용 서비스(DUR) 국민 체험관」</b>에서는 약 이름을 넣어 함께 먹으면 안 되는 조합을 직접 확인해 볼 수 있어요.</p>
     <div class="gl" style="display:flex;flex-wrap:wrap;gap:8px;margin-top:8px"><a class="btn line" href="https://www.hira.or.kr/rb/dur/form.do?pgmid=HIRAA050300000100" target="_blank" rel="noopener">내가 먹는 약! 한눈에</a><a class="btn line" href="https://www.hira.or.kr/ra/medi/form.do?pgmid=HIRAA030029000000" target="_blank" rel="noopener">DUR 국민 체험관</a></div>
@@ -7765,7 +7771,7 @@ function cmpRows(heads, rows, o = {}){
   return `<div class="cr-box"><div class="cr-n">${rows.slice(0, open).map(it).join('')}${rows.length > open ? fold(`${o.more || '자세히'} <span class="muted">${rows.slice(open).map(r => r[0]).join(' · ')}</span>`, rows.slice(open).map(it).join('')) : ''}</div>
   <div class="cr-w"><table class="cmp"><thead><tr><th>${o.first || ''}</th>${heads.map(h => `<th>${h}</th>`).join('')}</tr></thead><tbody>${rows.map(([lab, v]) => `<tr><td>${lab}</td>${heads.map((_, i) => `<td>${v[i] || '—'}</td>`).join('')}</tr>`).join('')}</tbody></table></div></div>`;
 }
-function vCompare(_, q){
+function vCompare(_, q){ if (잠김('suppcap')) { setTimeout(() => 구독.막힘('suppcap'), 0); return `${topBar({ back:'뒤로' })}<h1>영양제 나란히 비교</h1>`; }
   const ids = (q.ids || '').split(',').filter(Boolean); const items = ids.map(supp).filter(Boolean);
   if (!items.length) return vSupp();
   /* 3-10 — 근거·유효 용량·하루 상한·복용 시점 넷을 먼저, 용도·좋은 제형·주의는 「자세히」 안에 */
@@ -8114,6 +8120,8 @@ const vDoor = (a, q) => { const f = window['문_' + (location.hash.match(/^#\/?(
 const ext = n => window[n] ? window[n]() : '';
 /* 구독 잠금(스위치가 꺼져 있으면 늘 false — 잠금 목록은 srv.js 구독.설치) */
 const 잠김 = k => !!(window.구독 && !구독.열림(k));
+/* 11-12 진료 준비 한 장 — 첫 장은 맛보기로 그냥 드린다(이용권 없이 한 번). 기록은 이 휴대폰 칸 하나 */
+function 진료장(){ if (잠김('visitdoc')) { let n = 0; try { n = +localStorage.getItem('yakjido.visitdoc.n') || 0; } catch (e) {} if (n >= 1) return 구독.막힘('visitdoc'); try { localStorage.setItem('yakjido.visitdoc.n', String(n + 1)); } catch (e) {} } window.print(); }
 
 /* ───────── 시작 ───────── */
 try { if (!helloDone() && !location.hash) { location.hash = '#/hello/1'; } } catch (e) {}
