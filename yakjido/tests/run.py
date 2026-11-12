@@ -959,6 +959,7 @@ def consent_checks(br, url, fails):
     o = pg.evaluate(OVERFLOW_JS)
     if o['ov'] or o['clip']: fails.append(f'동의: 약관 전문 넘침·잘림 {o}')
     pg.click('.top .back'); pg.wait_for_selector('#csGo', timeout=5000)
+    if pg.evaluate("()=>document.getElementById('csGo').disabled"): pg.click('.cs-all')   # 11-09 필수 체크 뒤에만 시작(동의 화면 바뀜)
     pg.click('#csGo'); pg.wait_for_timeout(500)
     if not pg.evaluate('location.hash').startswith('#/hello'): fails.append('동의: 처음 오신 분이 동의 뒤 처음 안내로 가지 않습니다 — ' + pg.evaluate('location.hash'))
     rec = pg.evaluate("JSON.parse(localStorage.getItem('yakjido.consent.v1'))") or {}
