@@ -1768,8 +1768,8 @@ background-repeat:no-repeat;background-position:right 9px center;background-size
 <script>
 window.__YAKJIDO_OK__ = true;
 const D = JSON.parse(document.getElementById('data').textContent || '{}');
-const BUILD = '2026-11-11 23:20';
-const DATAV = 'b683bb4d36'.indexOf('__') === 0 ? BUILD : 'b683bb4d36';
+const BUILD = '2026-11-12 09:57';
+const DATAV = 'be2569d530'.indexOf('__') === 0 ? BUILD : 'be2569d530';
 const BRANDMARK = (typeof window !== 'undefined' && window.__BRANDMARK__) || 'icon-192.png';
 let CORE = 0, CORE_P = null;
 function mergeCore(c){
@@ -2176,14 +2176,27 @@ const art = (n, cls = '') => hasArt(n) ? `<figure class="art ${cls}"><img src="a
 
 let GQ = '', MQ = '', LASTPATH = '', HINT = 0;
 let GQ_Y = null;
+const Q_CRISIS = /자살|자해|죽고\s*싶|죽을\s*래|목숨|극단적|스스로\s*해치|살기\s*싫/;
+const Q_ER = /가슴.{0,6}(답답|아프|아파|통증|조이|조여|짓눌|쥐어)|식은\s*땀|숨.{0,4}(차|막히|쉬기\s*힘|못\s*쉬)|호흡\s*곤란|경련|발작|마비|의식.{0,4}(없|잃|흐)|쓰러|피를?\s*토|토혈|말이?\s*어눌|한쪽.{0,6}(힘|저리)|입술.{0,4}(파래|파랗)|숨.{0,4}(쌕쌕|가빠)/;
+const Q_RISK = /와파린|항응고|피\s*묽|신장|콩팥|투석|두\s*번|두번|많이\s*먹|과량|과다|임신|수유|감기약|종합감기/;
+function qSafe(q){
+q = String(q || '');
+if (Q_CRISIS.test(q)) { const T = CC === 'KR' ? { 응급: '119', 위기: ['109', '1577-0199'] } : (window.메디나눔위기번호?.표?.[CC] || null);
+const nums = T ? [...(T.위기 || []).map(n => [n, n === '109' ? '자살예방 상담 109' : n === '1577-0199' ? '정신건강 위기상담 1577-0199' : n]), ...(T.응급 ? [[T.응급, T.응급]] : [])] : [];
+return `<section class="sec rf q-safe" role="alert"><b class="rf-h">${I.heart}혼자 견디지 않으셔도 돼요</b><p style="margin-top:6px">지금 마음이 많이 힘드시면 바로 이야기할 곳이 있어요. 24시간 받아요.</p>
+${nums.length ? `<div class="gl" style="margin-top:10px">${nums.map(([n, t]) => `<a class="call" href="tel:${n.replace(/[^\d+]/g, '')}">${esc(t)}</a>`).join('')}</div>` : '<p style="margin-top:8px"><b>그 나라 응급 번호로 전화하세요.</b></p>'}</section>`; }
+if (Q_ER.test(q)) return `<section class="sec rf q-safe" role="alert"><b class="rf-h">${I.alert}이런 증상은 약보다 119가 먼저예요</b><p style="margin-top:6px">가슴이 답답하거나 아프고 식은땀이 나거나, 숨이 많이 차거나, 경련·마비·의식이 흐려짐이 있으면 지금 119에 전화하세요. 직접 운전하지 마세요.</p>
+<div class="gl" style="margin-top:10px"><a class="call" href="tel:119">${I.alert} 119 전화</a>${goA('er')}</div></section>`;
+return '';
+}
 function gqPanel(){
 const q = GQ.trim(); if (q.length < 1) { if (GQ_Y != null) { const y = GQ_Y; GQ_Y = null; requestAnimationFrame(() => window.scrollTo({ top: y })); } return ''; }
 if (GQ_Y == null) GQ_Y = window.scrollY;
 lexLoad(); pubIndexSoon(); findLoad();
 const hitsAll = search(q), [gh, gn] = hitsAll.length ? hitsGroups(hitsAll, q, 3) : ['', 0], hits = hitsAll;
-const a = qaFind(q);
+let a = qaFind(q); const rk = q.match(Q_RISK); if (a && rk && !((a.k || []).join('') + (a.a || '')).replace(/\s/g, '').includes(rk[0].replace(/\s/g, ''))) a = null;   /* 11-12 치명 #1 — 질문 속 위험 낱말(와파린·신장·두 번·감기약…)을 다루지 않는 직답은 띄우지 않는다 */
 const goHref = a?.go ? (a.go[0] === 'ing' ? (lexOf(a.go[1])?.drug && drug(lexOf(a.go[1]).drug) ? '/drug/' + lexOf(a.go[1]).drug : '/ingr/' + a.go[1]) : '') : '';
-return `<section class="sec findpanel">
+return `<section class="sec findpanel">${qSafe(q)}
 ${a ? `<div class="qa-card"><div class="qa-h">${I.info}<b>이 질문에 대한 답</b></div><p>${lexMark(a.a)}</p>${goHref ? `<button class="btn line" style="margin-top:10px" onclick="go('${goHref}')">${I.pill} 자세히 보기</button>` : ''}</div>` : ''}
 <h2>‘${esc(q)}’ 검색 <small>${gn ? gn + '건' : (LEX.loading ? '찾는 중…' : '')}</small></h2><button class="btn line gq-close" onclick="GQ='';route()">${I.x} 검색 닫기 · 이전 화면</button>
 ${hits.length && hitsAll.fix ? `<p class="small" style="margin:4px 0 8px">혹시 <b>‘${esc(hitsAll.fix)}’</b>${josa(hitsAll.fix, '을', '를')} 찾으세요? 그 말로 찾은 결과예요.</p>` : ''}
@@ -3263,7 +3276,7 @@ function vSearch(_, q){
 lexLoad(); pubIndexSoon(); findLoad();
 const s = (q.q || '').trim(), hits = s ? search(s) : [], [html, n] = s ? hitsGroups(hits, s, 5) : ['', 0];
 if (!s) return `${topBar({ back:'뒤로' })}<h1>약 찾기</h1><p style="margin:6px 0 14px">위 칸에 증상이나 약 이름을 쳐 주세요.</p>${gqPop()}`;
-return `${topBar({ back:'뒤로' })}<h1>‘${esc(s)}’ 검색 <small class="muted" style="font-size:.875rem">${n ? n + '건' : ''}</small></h1>${hits.fix ? `<p class="small" style="margin-top:6px">혹시 <b>‘${esc(hits.fix)}’</b>${josa(hits.fix, '을', '를')} 찾으세요? 그 말로 찾은 결과예요.</p>` : ''}${html || `<div class="card results" style="margin-top:16px"><div class="empty"><b>검색 결과가 없어요</b>증상 이름(허리·두통·생리통)이나 성분 이름으로 찾아보세요.</div></div>`}<div id="xsearch"></div>${(setTimeout(() => { if (window.통합찾기) 통합찾기.붙이기(document.getElementById('xsearch'), s); }, 0), '')}`;
+return `${topBar({ back:'뒤로' })}<h1>‘${esc(s)}’ 검색 <small class="muted" style="font-size:.875rem">${n ? n + '건' : ''}</small></h1>${qSafe(s)}${hits.fix ? `<p class="small" style="margin-top:6px">혹시 <b>‘${esc(hits.fix)}’</b>${josa(hits.fix, '을', '를')} 찾으세요? 그 말로 찾은 결과예요.</p>` : ''}${html || `<div class="card results" style="margin-top:16px"><div class="empty"><b>검색 결과가 없어요</b>증상 이름(허리·두통·생리통)이나 성분 이름으로 찾아보세요.</div></div>`}<div id="xsearch"></div>${(setTimeout(() => { if (window.통합찾기) 통합찾기.붙이기(document.getElementById('xsearch'), s); }, 0), '')}`;
 }
 
 const FLAG_Q = {
