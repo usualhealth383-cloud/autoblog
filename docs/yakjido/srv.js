@@ -5170,6 +5170,15 @@ window.vPubS = function(id){
 (function(){ let pv = null; try { pv = localStorage.getItem('yakjido.lang.prev'); } catch (e) {} const W = { en: 'Back to English', es: 'Volver al español', ja: '日本語に戻す', zh: '返回中文' };
   if (pv && W[pv] && (localStorage.getItem('yakjido.lang') || 'ko') === 'ko') (() => { const b = document.createElement('button'); b.type = 'button'; b.className = 'lang-back'; b.textContent = W[pv]; b.onclick = () => { try { localStorage.removeItem('yakjido.lang.prev'); } catch (e) {} setLang(pv); }; document.body.appendChild(b); })(); })();
 try { const st = document.createElement('style'); st.textContent = '.lang-back{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(84px + env(safe-area-inset-bottom));z-index:40;min-height:44px;padding:0 16px;border-radius:22px;border:1px solid var(--hairline);background:var(--card);color:var(--primary);font:inherit;font-weight:700;box-shadow:0 4px 14px rgba(0,0,0,.15)}'; document.head.appendChild(st); } catch (e) {}
+/* 11-12 사용자25 #35 — 같은 때 약 여러 개를 한 번에 「먹음」 */
+window.tickAll = function (keys) { const arr = takenSet(), L = String(keys || '').split(',').filter(Boolean); for (const k of L) if (!arr.includes(k)) arr.push(k); unskip(todayKey(), L); rollDay(); saveMe(); if (NATIVE) nativeArm(); toast(L.length + '가지를 먹음으로 적었어요'); route(); };
+try { const st = document.createElement('style'); st.textContent = '.dp-h{display:flex;align-items:center;justify-content:space-between;gap:8px}.dp-all{min-height:40px;padding:0 12px;border-radius:20px;border:1px solid var(--hairline);background:var(--card);color:var(--primary);font:inherit;font-size:.875rem;font-weight:700}'; document.head.appendChild(st); } catch (e) {}
+/* 11-12 사용자25 #37 — 필요할 때만 드시는 약(아이 해열제 포함): 홈에 마지막 먹은 시각과 다음 가능 시각 한 줄 */
+window.필요약줄 = function () { try {
+  const L = takingItems().filter(d => isPrn(d.id)).map(d => [d, prnState(d)]).filter(([, st]) => st.last); if (!L.length) return '';
+  const kid = ME.age === 'child', now = new Date();
+  return `<section class="sec card prn-home"><div class="rows-l">${L.slice(0, 3).map(([d, st]) => lrow(I.clock, esc(d.name), `마지막 ${hhmm(st.last)}${st.last.getDate() !== now.getDate() ? '(어제)' : ''} · ${st.next && st.next > now ? `다음은 ${hhmm(st.next)}부터` : `지금 ${kid ? '먹여도' : '드셔도'} 되는 간격이에요`}${st.max ? ` · 오늘 ${st.count}/${st.max}번` : ''}`, "go('/schedule')")).join('')}</div></section>`;
+} catch (e) { return ''; } };
 /* ▼ 11-11 다른 앱 입구 — 띠·아이 설명(app-shell 에서 옮김) */
 window.KID_TRI = { clinic: '병원에서는 아이가 얼마나 마시고 소변을 보는지, 열과 다른 병의 신호가 있는지 먼저 살펴봐요. 검사나 약은 아이 상태에 따라 필요한 경우에만 써요.',
   pharmacy: '아이 약은 나이와 몸무게에 따라 달라요. 약국에서는 아이 나이(개월 수)와 몸무게를 먼저 말씀하시고 약사와 함께 골라요. 어른 약을 줄여서 먹이지 마세요.',

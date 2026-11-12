@@ -1768,7 +1768,7 @@ background-repeat:no-repeat;background-position:right 9px center;background-size
 <script>
 window.__YAKJIDO_OK__ = true;
 const D = JSON.parse(document.getElementById('data').textContent || '{}');
-const BUILD = '2026-11-12 18:20';
+const BUILD = '2026-11-12 18:22';
 const DATAV = 'd7d6fed541'.indexOf('__') === 0 ? BUILD : 'd7d6fed541';
 const BRANDMARK = (typeof window !== 'undefined' && window.__BRANDMARK__) || 'icon-192.png';
 let CORE = 0, CORE_P = null;
@@ -3015,7 +3015,7 @@ ${svOn() ? `<section class="hero home-q">${dot}<div class="eyebrow">${esc(hello)
 <p>증상을 고르면 약국에서 물어볼 약을 알려 드려요.</p>
 </section>`}
 ${svOn() ? '' : kidHome() + regionGrid()}
-${odL}${homeQuick(n)}
+${ext('필요약줄')}${odL}${homeQuick(n)}
 ${ext('대화줄')}
 ${ext('응급칸')}${svOn() ? '' : ER_LINE()}
 ${condOn().length || ME.condskip ? '' : `<div class="cond-line"><button type="button" onclick="go('/me?t=body')">${I.user}<span>앓는 병이 있으면 알려 주세요 — <b>피해야 할 약을 걸러 드려요</b></span>${I.chev}</button><button type="button" class="x" aria-label="이 안내 닫기" onclick="ME.condskip=true;saveMe();route()">${I.x}</button></div>`}
@@ -4784,7 +4784,7 @@ return `${topBar({ back:'내 정보' })}<div class="eyebrow">복용 시간 알�
 ${leadHtml('먹는 약마다 시간을 고르면 오늘 할 일이 체크 목록으로 나오고, 시간이 되면 알려드려요. **시간을 정한 약만** 알려 드려요 — 설명서·안내 간격대로 시간을 제안해 드리니 맞으면 「이 시간으로 정하기」를 누르세요.', 'margin-top:6px', todays.length || taking.length ? 'small muted' : '')}
 ${taking.filter(schedUnset).length ? `<div class="note" style="margin-top:10px">${I.clock}<span><b>시간을 아직 정하지 않은 약이 ${taking.filter(schedUnset).length}가지 있어요</b> — 아래 「약마다 시간 고르기」에서 매일 드시는지, 필요할 때만 드시는지 골라 주세요.</span></div>` : ''}
 ${!taking.length ? `<section class="sec card"><div class="empty"><b>아직 담아 둔 약이 없어요</b>약 사전에서 약을 찾아 ‘내 약통에 담기’를 누르면 여기 나와요.</div><div class="actions"><button class="btn ghost" onclick="go('/drugs')">${I.search} 약 찾기</button></div></section>` : ''}
-${todays.length ? `<section class="sec"><h2>오늘 <small>${now.getMonth() + 1}월 ${now.getDate()}일 · ${todays.filter(x => x.done).length}/${todays.length} 완료</small></h2>${daypartGroups(todays).map(([part, list]) => `<div class="dp"><div class="dp-h">${part}</div><div class="dose-list">${list.map(x => `<button class="dose-tick ${x.done ? 'done' : x.skip ? 'skip' : (x.min < nowMin - 60 ? 'late' : '')}" onclick="tick('${x.d.id}','${x.t}')" aria-pressed="${x.done}"><span class="bx">${x.done ? I.check : x.skip ? '–' : ''}</span><span class="n"><b>${esc(x.d.name)}</b><small>${x.done ? '<b>먹음</b> · ' : x.skip ? '' : '아직 · '}<span class="t">${x.t}</span> · ${x.skip ? '건너뛰었어요 — 드셨으면 눌러 주세요' : fmt((x.d.simple || '').split('.')[0])}</small></span></button>`).join('')}</div></div>`).join('')}${todays.length && todays.every(x => x.done) ? `<div class="care ok" style="margin-top:12px"><div class="hd">${I.check}오늘 약 다 드셨어요 · 수고하셨어요</div><div class="bd"><button class="btn line" style="width:100%;min-height:48px" onclick="sendCare()">${I.family} 보호자에게 오늘 상태 보내기</button></div></div>` : ''}${lateL.length ? `<details class="why-more" style="margin-top:10px"><summary>드셨는지 기억이 안 나요${I.chev}</summary><div class="why" style="margin-top:6px"><p>확실하지 않으면 <b>이번 회는 건너뛰고</b> 다음 시간부터 원래대로 드세요. 대부분의 약은 <b>두 번 드시는 쪽이 더 위험</b>해요. 피임약·항생제처럼 놓치면 곤란한 약은 약사에게 물어보세요. 앞으로는 드시자마자 위 칸을 눌러 두시면 헷갈리지 않아요.</p>
+${todays.length ? `<section class="sec"><h2>오늘 <small>${now.getMonth() + 1}월 ${now.getDate()}일 · ${todays.filter(x => x.done).length}/${todays.length} 완료</small></h2>${daypartGroups(todays).map(([part, list]) => `<div class="dp"><div class="dp-h">${part}${(L => L.length > 1 ? `<button class="dp-all" onclick="window.tickAll&&tickAll('${L.join(',')}')">모두 먹음</button>` : '')(list.filter(x => !x.done && !x.skip).map(x => x.d.id + '@' + x.t))}</div><div class="dose-list">${list.map(x => `<button class="dose-tick ${x.done ? 'done' : x.skip ? 'skip' : (x.min < nowMin - 60 ? 'late' : '')}" onclick="tick('${x.d.id}','${x.t}')" aria-pressed="${x.done}"><span class="bx">${x.done ? I.check : x.skip ? '–' : ''}</span><span class="n"><b>${esc(x.d.name)}</b><small>${x.done ? '<b>먹음</b> · ' : x.skip ? '' : '아직 · '}<span class="t">${x.t}</span> · ${x.skip ? '건너뛰었어요 — 드셨으면 눌러 주세요' : fmt((x.d.simple || '').split('.')[0])}</small></span></button>`).join('')}</div></div>`).join('')}${todays.length && todays.every(x => x.done) ? `<div class="care ok" style="margin-top:12px"><div class="hd">${I.check}오늘 약 다 드셨어요 · 수고하셨어요</div><div class="bd"><button class="btn line" style="width:100%;min-height:48px" onclick="sendCare()">${I.family} 보호자에게 오늘 상태 보내기</button></div></div>` : ''}${lateL.length ? `<details class="why-more" style="margin-top:10px"><summary>드셨는지 기억이 안 나요${I.chev}</summary><div class="why" style="margin-top:6px"><p>확실하지 않으면 <b>이번 회는 건너뛰고</b> 다음 시간부터 원래대로 드세요. 대부분의 약은 <b>두 번 드시는 쪽이 더 위험</b>해요. 피임약·항생제처럼 놓치면 곤란한 약은 약사에게 물어보세요. 앞으로는 드시자마자 위 칸을 눌러 두시면 헷갈리지 않아요.</p>
 <p style="margin-top:8px">건너뛰기로 하셨으면 눌러 두세요 — <b>못 드신 것과 따로</b> 적어서 진료 때 구분돼요.</p><div class="skip-l">${lateL.map(x => `<button type="button" class="btn line" onclick="skipDose('${x.d.id}','${x.t}')">${esc(hourWord(x.t))} ${esc(x.d.name)} — 건너뛰기</button>`).join('')}</div></div></details>` : ''}</section>` : ''}
 ${taking.filter(d => isPrn(d.id)).length ? `<section class="sec card"><h2>필요할 때 드신 약</h2>
 <p class="small muted" style="margin-top:4px">아플 때만 드시는 약은 드실 때마다 눌러 적어 두세요. <b>다음은 몇 시부터</b>인지, 오늘 몇 번째인지 알려 드려요.</p>
