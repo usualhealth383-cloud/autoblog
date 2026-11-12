@@ -41,6 +41,22 @@ _B.new_context = lambda self, **k: _nc(self, **{'locale': 'ko-KR', **k})
 class _Quiet(http.server.SimpleHTTPRequestHandler):
     def log_message(self, *a, **k): pass          # 접속 기록으로 결과를 가리지 않는다
 
+# 11-12 — 한 갈래가 멈춰도 나머지를 끝까지 돈다(멈춤은 실패로 적는다) · 동의 화면은 필수 체크 뒤에만 「시작하기」(11-09)
+def _safe(fn, *a):
+    try: fn(*a)
+    except Exception as e: a[-1].append(f'{fn.__name__}: 시험이 멈춤 — {str(e).splitlines()[0][:160]}')
+try:
+    from playwright.sync_api import Page as _P
+    _oc = _P.click
+    def _click(self, sel, *a, **k):
+        if sel == '#csGo':
+            try:
+                if self.evaluate("()=>{ const b=document.getElementById('csGo'); return !!(b && b.disabled); }"): _oc(self, '.cs-all')
+            except Exception: pass
+        return _oc(self, sel, *a, **k)
+    _P.click = _click
+except Exception: pass
+
 def serve():
     handler = functools.partial(_Quiet, directory=str(DOCS))
     srv = socketserver.TCPServer(('127.0.0.1', 0), handler)
@@ -1610,14 +1626,14 @@ def main():
         if nerr: fails.append(f'앱 알람: JS 오류 {nerr[:2]}')
         pn.close()
         alarm_z6(br, url, fails)
-        z7_checks(br, url, fails)
-        z9_checks(br, url, fails)
-        z10_checks(br, url, fails)
-        simple_checks(br, url, fails)
-        r2_checks(br, url, fails)
-        r2a2_checks(br, url, fails)
-        consent_checks(br, url, fails)
-        r5_checks(br, url, fails)
+        _safe(z7_checks, br, url, fails)
+        _safe(z9_checks, br, url, fails)
+        _safe(z10_checks, br, url, fails)
+        _safe(simple_checks, br, url, fails)
+        _safe(r2_checks, br, url, fails)
+        _safe(r2a2_checks, br, url, fails)
+        _safe(consent_checks, br, url, fails)
+        _safe(r5_checks, br, url, fails)
         # 6b-2. 성분표에 없던 공공 제품 — 클로닉신(먹는 소염제 26개 제품)·돔페리돈이 약통에서 실제로 걸려야 한다(2026-09-23)
         _pb = {'노리스정 + 와파린': ({'taking':['pub:1','cls:blood.warf'],'pub':{'pub:1':{'name':'노리스정','full':'노리스정(클로닉신리시네이트)','ingr':'클로닉신리시네이트','rx':0,'seq':'1','drugId':''}}}, 'warfarin-nsaid'),
                '노리스정 + 이부프로펜': ({'taking':['pub:1','ibuprofen'],'pub':{'pub:1':{'name':'노리스정','full':'노리스정','ingr':'클로닉신리시네이트','rx':0,'seq':'1','drugId':''}}}, 'nsaid-dup'),
