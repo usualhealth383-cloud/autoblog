@@ -55,6 +55,13 @@ try:
             except Exception: pass
         return _oc(self, sel, *a, **k)
     _P.click = _click
+    _og = _P.goto
+    def _goto(self, *a, **k):
+        r = _og(self, *a, **k)
+        try: self.wait_for_function("()=>!!window.vScheduleS || !!document.querySelector('#csGo') || !!document.querySelector('.door')", timeout=8000)
+        except Exception: pass
+        return r
+    _P.goto = _goto
 except Exception: pass
 
 def serve():
@@ -461,7 +468,7 @@ def z7_checks(br, url, fails):
       for (const sid of ['cold','fever','headache','allergy']) if (ids(sid).some(isNsaid)) bad.push('2개월 '+sid+': 소염진통제를 권함');
       kid(5,7); for (const sid of ['cold','fever','headache','msk']) if (ids(sid).some(isNsaid)) bad.push('5개월 '+sid+': 소염진통제(이부프로펜 등)를 권함');
       location.hash='#/symptom/fever'; route(); const k5=(document.querySelector('.answer .kid-line')||{}).innerText||''; if (!/이부프로펜 시럽은 생후 6개월부터/.test(k5)) bad.push('5개월: kg 줄에 이부프로펜 6개월 안내 없음 — '+k5.slice(0,60));
-      kid(48,16); location.hash='#/symptom/fever'; route(); { const t=[...document.querySelectorAll('.answer .kid-over, .answer .kid-line')].map(e=>e.innerText).join(' '); if (!/나이 표에 맞췄어요/.test(t) || !/이부프로펜 시럽 4\.0~7\.5 mL/.test(t)) bad.push('4세 16 kg: 이부프로펜이 나이 표(5~7.5 mL)와 몸무게 셈 가운데 작은 쪽이 아님(공통 숫자표) — '+t.slice(0,160)); }
+      kid(48,16); location.hash='#/symptom/fever'; route(); { const t=[...document.querySelectorAll('.answer .kid-over, .answer .kid-line')].map(e=>e.innerText).join(' '); if (!/나이 표에 맞췄어요/.test(t) || !/이부프로펜 시럽[^]*?4\.0~7\.5 mL/.test(t)) bad.push('4세 16 kg: 이부프로펜이 나이 표(5~7.5 mL)와 몸무게 셈 가운데 작은 쪽이 아님(공통 숫자표) — '+t.slice(0,160)); }
       for (const sid of ['cold','allergy','cough','constipation','diarrhea']) for (const x of basket(byId(D.symptoms,sid))) { if (/500 ?mg|정$|캡슐/.test(x.product||'') && !kidAdultOk(x.d)) bad.push('4세 '+sid+': 어른 제품 '+x.product); if (minAgeOf(x.d)!=null && minAgeOf(x.d)>48) bad.push('4세 '+sid+': '+x.d.id+'('+minAgeOf(x.d)+'개월부터)'); }
       kid(168,50); for (const sid of ['allergy','diarrhea','cold']) for (const x of basket(byId(D.symptoms,sid))) if ((x.why||[]).includes('child') && minAgeOf(x.d)!=null) bad.push('14세 '+sid+': 나이 기준이 있는데 「소아」로 막음 '+x.d.id);
       kid(null,5); location.hash='#/symptom/fever'; route(); if (!/생후 3개월 안팎/.test([...document.querySelectorAll('.answer .kid-over')].map(e=>e.innerText).join(''))) bad.push('생년월일 없음 5 kg: 「생후 3개월 안팎」 경고 없음');
@@ -696,8 +703,8 @@ def simple_checks(br, url, fails):
     # (b) 응급 신호 → 살 약 줄·약국 단추가 숨는다(자세히와 같은 규칙) · 진료 신호 → 「진료가 먼저예요」
     # 11-09 디자인 검수 뒤 간단히 보기는 체크 목록 대신 「이 중 하나면 약 말고 119」 카드(sv-er) — 같은 자료(care.er)·119 단추가 있는지 본다(11-12 고침)
     go('/symptom/msk')
-    er = pz.evaluate("()=>{ const c=document.querySelector('.sv-er'); return c ? {tel: !!c.querySelector('a[href^=\"tel:\"]'), first: (byId(D.symptoms,'msk').care.er||[])[0]||'', txt: c.innerText} : null; }")
-    if not er or not er['tel'] or er['first'][:6] not in er['txt']: fails.append('간단히: 「이 중 하나면 약 말고 119」 카드가 없거나 119 단추·응급 신호가 자세히와 다릅니다')
+    er = pz.evaluate("()=>{ const c=document.querySelector('.sv-er'); return c ? {tel: !!c.querySelector('a[href^=\"tel:\"]'), ers: (byId(D.symptoms,'msk').care.er||[]).map(t=>t.replace(/\\*\\*/g,'').slice(0,6)), txt: c.innerText} : null; }")
+    if not er or not er['tel'] or not any(t in er['txt'] for t in er['ers']): fails.append('간단히: 「이 중 하나면 약 말고 119」 카드가 없거나 119 단추·응급 신호가 자세히와 다릅니다')
     pz.evaluate("()=>{ RF.sid=''; }"); go('/home')
     # (c) 임신 — 소염제가 빠지고 자세히와 같은 약
     pz.evaluate("()=>{ ME.pregnant=true; saveMe(); }")
@@ -961,9 +968,9 @@ def consent_checks(br, url, fails):
     pg.goto(url); pg.wait_for_selector('#csGo', timeout=15000)
     if pg.evaluate('location.hash') != '#/consent': fails.append('동의: 처음 오신 분에게 동의 화면이 먼저 나오지 않습니다 — ' + pg.evaluate('location.hash'))
     if pg.is_visible('nav.tabbar'): fails.append('동의: 동의 화면에 아래 탭이 보입니다(누르면 동의를 건너뜀)')
-    # 2026-10-29 「첫 진입 동의 벽 금지」 — 체크박스 목록 없이 큰 단추 한 번(필수 둘), 내용은 「자세히」 안
-    if pg.query_selector('.cs-row') or pg.query_selector('.cs-all'): fails.append('동의: 첫 화면에 체크박스 목록이 남아 있습니다(단추 한 번이어야 함)')
-    if pg.is_disabled('#csGo') or '동의하고 시작' not in pg.inner_text('#csGo'): fails.append('동의: 「약관·처리방침에 동의하고 시작」 단추가 없거나 막혀 있습니다')
+    # 11-09 실사용 검수 B2(개인정보보호법 22·23조 · 현욱님 10-14 결정) — 필수 둘을 따로 + 「모두 동의」 한 번, 체크 전에는 「시작하기」가 막힘
+    if len(pg.query_selector_all('.cs-row')) < 3 or not pg.query_selector('.cs-all'): fails.append('동의: 「모두 동의」와 필수 두 칸이 따로 보이지 않습니다')
+    if not pg.is_disabled('#csGo'): fails.append('동의: 필수 체크 전인데 「시작하기」가 눌립니다')
     for theme in ('light', 'dark'):
         pg.evaluate("t=>{ document.documentElement.dataset.theme=t; }", theme)
         bad = pg.evaluate(CONTRAST_JS); tap = pg.evaluate(TAP_JS)
@@ -1913,7 +1920,7 @@ def main():
         else:
             _ap.check('#srvAge')
             if _ap.is_disabled('#srvSignup'): fails.append('만 14세 확인 뒤에도 「계정 만들기」가 막혀 있습니다')
-        if '이 휴대폰에만 저장돼요' not in _ap.inner_text('#view'): fails.append('로그인 전인데 저장 위치 문구가 「이 휴대폰에만」이 아닙니다')
+        if '이 휴대폰에 저장돼요' not in _ap.inner_text('#view'): fails.append('로그인 전인데 저장 위치 문구(「로그인하지 않으면 이 휴대폰에 저장돼요」)가 없습니다')   # 「기기에만」류 금지(CLAUDE.md)
         if _aerr: fails.append(f'계정 칸 JS 오류: {_aerr[:2]}')
         _ac.close()
         # 9f. 둘러보기(#/demo) — 외부 검수자가 링크 하나로 채워진 화면을 만지게(2026-10-13). 예시를 담고, 화면이 터지지 않고, 「예시 지우기」로 비워져야 한다.
