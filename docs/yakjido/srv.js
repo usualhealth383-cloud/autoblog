@@ -622,8 +622,9 @@
      서버 부품의 window.구독상태 · 구독조회 와는 따로 논다(저장 열쇠도 다르다: _sub_<app>).
    쓰는 법(앱 끝, 서버.설치 뒤):
      구독.설치({ app:'gyeote', 유료화:false,
-                 가격:{ 월:5900, 연:49000, 학생월:4900, 학생연:39000,     // 월만 꼭. 연·학생월·학생연은 있으면 막힘 시트·관리 화면에 함께 보인다
-                        출시:{ 월:4900, 연:39900 } },                   // 출시 기념가(출시 3개월 안 가입 · 첫 1년) — 있으면 한 줄 더
+                 기본:'year',                                     // (11-13) 결제 화면 주 단추 — 'year'(기본) | 'month'
+                 가격:{ 월:4900, 연:39900, 학생연:29900,                 // 월만 꼭. 연·학생월·학생연은 있으면 막힘 시트·관리 화면에 함께 보인다(11-13 — 학생 월 상품 없음)
+                        출시:null },                                     // 출시 기념가 — 11-13 앱 하나는 없앰(있으면 한 줄 더)
                  회원권:{ 월:12900, 연:99000, 출시월:9900, 출시연:79000, 판매:false },   // 다섯 앱 공용. 판매:false 면 「곧 열려요」
                  잠금:{ sync:'서버 동기화·여러 기기', lab:{ ko:'검사 추이', en:'Lab trends' }, … },   // id → 화면에 보일 이름(글 또는 {ko,en})
                  응급:['crisis', …],                                // 늘 열림(기본 목록에 더해진다)
@@ -632,7 +633,7 @@
                                                                     //   「계정이 열리면 체험을 시작할 수 있어요」로 사실대로
                  말:function(){ return 'ko'; },                     // 'ko' | 'en' — 부품 글 두 벌 중 고른다(CS: 앱의 ko())
                  문구:{ 응급안내:'…', 막힘앞:'…', 막힘뒤:'…', 관리뒤:'…',   // ⬅ 앱별 말 끼울 자리(HTML · {ko,en} · function(id, 말){…})
-                        학생:{ko:'학생·수련의', en:'students and trainees'}, 학생조건:{ko:'학교·병원 이메일 인증 뒤', en:'…'} },
+                        학생:{ko:'학생·수련의', en:'students and trainees'}, 학생조건:{ko:'학교·병원 메일 인증 뒤', en:'…'} },
                  학생인증:null,                                     // ⬅ 학생 인증 화면이 생기면 여는 함수. 없으면 「인증은 준비 중」으로 사실대로
                  결제사:null,                                        // 결제사가 정해지면 이름(예: 'toss')
                  결제:{ 등록:function(){ … } },                      // ⬅ 결제사 붙일 자리 — 결제수단 등록 창을 여는 함수.
@@ -644,13 +645,16 @@
                  알림:function(말){…}, 로그인열기:function(){…}, 바뀜:function(상태){…},
                  모양:{ 카드:'blk', 줄:'rcta', 주:'p', 보조:'s', 작은글:'bandnote' } });   // 앱의 기존 클래스(새 색·크기 없음)
      진입점:  if (!구독.열림('sync')) return 구독.막힘('sync');
-     화면:    구독.전환카드HTML() (홈 맨 위) · 구독.관리HTML() (설정) · 구독.가입동의HTML() (가입 화면)
+     화면:    구독.전환카드HTML() (홈 맨 위 · 체험 끝 3일 전부터) · 구독.체험끝줄HTML() (홈 한 줄을 따로 둘 때) · 구독.관리HTML() (설정) · 구독.가입동의HTML() (가입 화면)
    ⚠️ 서버 동기화 잠금은 서버 부품이 `동기화허용` 갈고리를 받을 때만 자동 동기화까지 멈춘다(곁에 서버 부품에 있음).
       이 부품은 「지금 동기화」 단추(계정동작('sync'))와 가입 동의 체크만 감싼다.
    ⚠️ 영어 글도 우리말과 같은 금지 낱말 규칙을 따른다(요금이 없다는 뜻의 낱말을 쓰지 않는다).
    판 2026-09-23b(검수 #7) — 결제사 없을 때 「결제됩니다」 대신 「다시 동의를 받아요」 · 잠금 이름 뒤 조사(은/는)를 받침으로 고른다.
      검증은 구독.판 으로 새 부품인지 본다(다시 심기 전 앱은 구독.판 이 없다).
-   판 2026-10-08(결제 다리) — 스토어 껍데기(_껍데기/src/껍데기.js)가 window.껍데기.결제 를 내놓으면 결제 자리를 그것으로 쓴다(앱 설치 줄은 그대로 결제사:null).
+   판 2026-11-13c — 체험 끝 3일 전 알림(약지도에서 옮김 · 약관 「자동 결제 전 알림」 약속). 구독.체험끝날() · 구독.체험끝줄HTML() (홈 한 줄) ·
+    기기 알림은 부품이 스스로 건다 — 안드로이드 예약 알림(Capacitor LocalNotifications, 허락받은 경우만) · 웹 알림(탭이 열려 있고 허락받은 경우만).
+    해지 예약자·스위치 꺼짐이면 아무것도 없다. 전환 카드도 3일 전부터(전엔 2일).
+  판 2026-11-03 — 체험 14일(약관 11-29-1 덧붙임 · Main 11-03). 판 2026-10-08(결제 다리) — 스토어 껍데기(_껍데기/src/껍데기.js)가 window.껍데기.결제 를 내놓으면 결제 자리를 그것으로 쓴다(앱 설치 줄은 그대로 결제사:null).
      · 스위치(유료화)가 꺼져 있으면 껍데기가 있어도 아무것도 바뀌지 않는다(껍데기결제() 가 null).
      · 「14일 체험 시작」·「다시 구독하기」 → 껍데기.결제.구매('<app>_month') → 웹훅이 서버 표를 고치면 subscription_status 를 다시 읽는다(몇 번 되읽음).
        start_trial RPC 는 스토어 길에서는 부르지 않는다(체험은 스토어 상품의 14일 체험이다).
@@ -673,7 +677,7 @@
        다섯 앱이 공용 서버의 같은 계정 id 로 RevenueCat 에 들어가므로 다른 앱에서 산 회원권도 보인다. 서버 표는 pass_subscriptions(plan 'pass_month' · 'pass_year').
      · 초대 코드(가입 부품 _도구/가입_부품.js) — 서버가 plan 'invite' 로 돌려주면 「초대 코드로 체험 중 · ○월 ○일까지」(결제 글 없음). */
 (function () {
-  var 판 = '2026-10-21';
+  var 판 = '2026-11-13c';
   var 응급기본 = ['crisis', 'sos', 'emergency', 'danger', 'call109', 'call119', 'call15770199', 'safety_plan', 'er', 'er_find', 'where'];
   var 설정 = { app: 'app', 유료화: false, 가격: { 월: 0 }, 회원권: null, 잠금: {}, 면제: null, 응급: [], 결제사: null, 결제: null, 계정: true, 말: null, 문구: {}, 학생인증: null,
                인증: { 휴대폰: false, 공동: false }, 시트열기: null, 시트닫기: null, 알림: null, 로그인열기: null, 바뀜: null,
@@ -693,6 +697,7 @@
       전환: '14일 체험이 끝나면 {값}이 결제됩니다. 그 전에 언제든 해지할 수 있습니다.',
       동의: '(필수) 14일 체험이 끝나는 {날}에 {값}이 결제됩니다. 그 전에 언제든 해지할 수 있습니다.',
       체험끝: '14일 체험이 끝났어요.', 기간끝: '구독 기간이 끝났어요.', 기록그대로: '그동안 남긴 기록은 그대로 있어요.', 기록그대로2: '남긴 기록은 그대로 있어요.',
+      회원권권함: '앱을 3개 이상 쓰시면 메디나눔 회원권이 더 알뜰해요 — 다섯 앱을 월 {회원권값}에', 회원권보기: '회원권 보기',
       로그인하러: '로그인하러 가기', 닫기: '닫기', 체험시작: '14일 체험 시작', 결제수단: '결제수단 등록',
       결제준비: '결제 준비 중이에요. 지금은 결제되지 않아요.', 결제준비짧게: '결제 준비 중이에요.',
       /* 2026-10-20 — 결제 단추 바로 위 고지(전자상거래법 13조 · Play 구독 정책). 요청 20261020_ClinicScore_메디나눔_구독부품글표 */
@@ -709,9 +714,9 @@
       동의준비: '(필수) 14일 체험은 {날}에 끝나요. 결제가 시작되기 전에 요금·결제일을 보여 드리고 다시 동의를 받아요.',
       요금: '요금', 학생기본: '학생', 학생인증준비: '인증은 준비 중이에요', 학생인증단추: '학생 인증하기',
       출시가: '출시 기념가', 출시조건: '출시 3개월 안에 가입하면 첫 1년', 회원권: '메디나눔 회원권', 회원권설명: '다섯 앱을 함께 쓰는 이용권', 회원권자격: 'ClinicScore 의료인 기능은 의료인 확인 뒤 열려요',
-      회원권권함: '다섯 앱을 함께 쓰시면 메디나눔 회원권이 더 알뜰해요 — 앱 하나 {앱값} · 다섯 앱 {회원권값}', 곧: '곧 열려요', 자동: '14일 체험 뒤 자동 결제돼요 · 부가세 포함 · 설정에서 언제든 해지', 출시값: '{값}(출시 기념가 · 첫 1년, 둘째 해부터 {정가})', 출시값둘: '출시 기념가 {값} — 첫 1년, 둘째 해부터 {정가}', 초대중: '<b>초대 코드로 체험 중</b> · {날}까지', 초대뒤: '이 기간에는 결제되지 않아요. 기간이 끝나면 일반 상태로 돌아가요.', 회원권시작: '회원권으로 시작', 회원권연시작: '회원권 1년으로 시작 · {값}', 회원권중: '메디나눔 회원권으로 열려 있어요.',
+      곧: '곧 열려요', 출시값: '{값}(출시 기념가 · 첫 1년, 둘째 해부터 {정가})', 출시값둘: '출시 기념가 {값} — 첫 1년, 둘째 해부터 {정가}', 초대중: '<b>초대 코드로 체험 중</b> · {날}까지', 초대뒤: '이 기간에는 결제되지 않아요. 기간이 끝나면 일반 상태로 돌아가요.', 회원권시작: '회원권으로 시작', 회원권연시작: '회원권 1년으로 시작 · {값}', 회원권중: '메디나눔 회원권으로 열려 있어요.',
       이유: { login: '먼저 로그인해 주세요.', verify: '메일함의 확인 링크를 먼저 눌러 주세요. 확인한 계정에서 체험이 시작돼요.',
-              used_account: '이 계정은 14일 체험을 이미 쓰셨어요.', used_device: '이 기기에서는 14일 체험을 이미 쓰셨어요.',
+              used_account: '이 계정은 14일 체험을 이미 쓰셨어요.', used_device: '이 기기에서는 14일 체험을 이미 쓰셨어요.', used_person: '이 계정의 메일이나 로그인 정보로 14일 체험을 이미 쓰셨어요.',
               device: '이 브라우저에서는 체험을 시작할 수 없어요. 다른 브라우저로 해 주세요.', app: '잠시 문제가 있었어요. 다시 해 주세요.',
               noacct: '계정이 열리면 체험을 시작할 수 있어요.' },
       체크: '결제 안내를 확인하고 체크해 주세요.', 인터넷: '인터넷이 닿지 않아요. 연결되면 다시 해 주세요.',
@@ -733,7 +738,8 @@
       결제취소: '결제를 취소했어요. 바뀐 것은 없어요.', 결제안됨: '결제가 되지 않았어요. 잠시 뒤 다시 해 주세요.',
       결제반영중: '결제는 끝났어요. 구독 상태가 곧 반영돼요. 잠시 뒤 다시 열어 주세요.', 구독됨: '구독을 시작했어요. 바로 모두 쓸 수 있어요.',
       관리전환둘: '14일 체험 뒤 고르신 요금({값})이 결제됩니다. 그 전에 언제든 해지할 수 있습니다.',
-      연시작: '1년으로 시작 · {값}', 연구독: '1년으로 구독 · {값}',
+      체험끝줄: '14일 체험이 {n}일 뒤 끝나요 · 요금·해지 방법 보기', 체험끝줄내일: '14일 체험이 내일 끝나요 · 요금·해지 방법 보기', 체험끝줄오늘: '14일 체험이 오늘 끝나요 · 요금·해지 방법 보기', 체험끝제목: '체험이 3일 뒤 끝나요', 체험끝몸: '이어 쓰지 않으시려면 {날} 전에 해지하세요. 요금과 해지 방법은 앱의 구독 화면에 있어요.', 
+      연시작: '1년으로 시작 · {값}', 연구독: '1년으로 구독 · {값}', 월시작: '1개월로 시작 · {값}', 월구독: '1개월로 구독 · {값}', 꼴: '{값} 꼴',
       동의둘: '(필수) 14일 체험이 끝나는 {날}에 고르신 요금({값})이 결제됩니다. 그 전에 언제든 해지할 수 있습니다.',
       전환둘날: '14일 체험 뒤 {날}부터 고르신 요금({값})이 결제됩니다. 그 전에 언제든 해지할 수 있습니다.',
       복원됨: '구매를 복원했어요.', 복원없음: '복원할 구매가 없어요. 구매한 Google 계정이 이 폰에 로그인되어 있는지 확인해 주세요.'
@@ -748,6 +754,7 @@
       전환: 'When the 14-day trial ends, {값} will be charged. You can cancel any time before then.',
       동의: '(Required) When the 14-day trial ends on {날}, {값} will be charged. You can cancel any time before then.',
       체험끝: 'Your 14-day trial has ended.', 기간끝: 'Your subscription period has ended.', 기록그대로: 'Everything you recorded is still here.', 기록그대로2: 'Everything you recorded is still here.',
+      회원권권함: 'Using three or more apps? The MediNanum pass is better value — all five apps for {회원권값} a month', 회원권보기: 'See the pass',
       로그인하러: 'Sign in', 닫기: 'Close', 체험시작: 'Start 14-day trial', 결제수단: 'Add payment method',
       결제준비: 'Payments are not set up yet. Nothing is charged now.', 결제준비짧게: 'Payments are not set up yet.',
       고지첫결제: 'First charge — {값} on {날}, when the 14-day trial ends.',
@@ -763,9 +770,9 @@
       동의준비: '(Required) The 14-day trial ends on {날}. Before any payment starts, we will show you the price and billing date and ask for your consent again.',
       요금: 'Price', 학생기본: 'students', 학생인증준비: 'verification is coming soon', 학생인증단추: 'Verify student status',
       출시가: 'Launch price', 출시조건: 'first year, if you join within 3 months of launch', 회원권: 'MediNanum pass', 회원권설명: 'one plan for all five apps', 회원권자격: 'ClinicScore professional tools open after the professional check',
-      회원권권함: 'Using several apps? The MediNanum pass is better value — one app {앱값} · five apps {회원권값}', 곧: 'coming soon', 자동: 'Billed automatically after the 14-day trial · VAT included · cancel any time in Settings', 출시값: '{값} (launch price for the first year; {정가} from the second year)', 출시값둘: 'launch price {값} for the first year; {정가} from the second year', 초대중: '<b>Invite access</b> · until {날}', 초대뒤: 'Nothing is charged during this period. Afterwards it returns to normal.', 회원권시작: 'Start with the pass', 회원권연시작: 'Start a 1-year pass · {값}', 회원권중: 'Open through your MediNanum pass.',
+      곧: 'coming soon', 출시값: '{값} (launch price for the first year; {정가} from the second year)', 출시값둘: 'launch price {값} for the first year; {정가} from the second year', 초대중: '<b>Invite access</b> · until {날}', 초대뒤: 'Nothing is charged during this period. Afterwards it returns to normal.', 회원권시작: 'Start with the pass', 회원권연시작: 'Start a 1-year pass · {값}', 회원권중: 'Open through your MediNanum pass.',
       이유: { login: 'Please sign in first.', verify: 'Please open the confirmation link in your email first. The trial starts on a confirmed account.',
-              used_account: 'This account has already used the 14-day trial.', used_device: 'This device has already used the 14-day trial.',
+              used_account: 'This account has already used the 14-day trial.', used_device: 'This device has already used the 14-day trial.', used_person: 'The 14-day trial has already been used with this email or sign-in.',
               device: 'The trial cannot be started in this browser. Please try another browser.', app: 'Something went wrong. Please try again.',
               noacct: 'You can start the trial once accounts open.' },
       체크: 'Please read the billing notice and tick the box.', 인터넷: 'Cannot reach the internet. Please try again once you are connected.',
@@ -787,14 +794,19 @@
       결제취소: 'Payment cancelled. Nothing has changed.', 결제안됨: 'The payment did not go through. Please try again in a moment.',
       결제반영중: 'Payment complete. Your subscription will show up shortly. Please reopen in a moment.', 구독됨: 'Your subscription has started. Everything is open now.',
       관리전환둘: 'After the 14-day trial, the plan you choose ({값}) will be charged. You can cancel any time before then.',
-      연시작: 'Start with 1 year · {값}', 연구독: 'Subscribe for 1 year · {값}',
+      체험끝줄: 'Your 14-day trial ends in {n} days · See price and how to cancel', 체험끝줄내일: 'Your 14-day trial ends tomorrow · See price and how to cancel', 체험끝줄오늘: 'Your 14-day trial ends today · See price and how to cancel', 체험끝제목: 'Your trial ends in 3 days', 체험끝몸: 'If you do not want to continue, cancel before {날}. The price and how to cancel are on the Subscription screen in the app.', 
+      연시작: 'Start with 1 year · {값}', 연구독: 'Subscribe for 1 year · {값}', 월시작: 'Start with 1 month · {값}', 월구독: 'Subscribe for 1 month · {값}', 꼴: 'about {값}',
       동의둘: '(Required) When the 14-day trial ends on {날}, the plan you choose ({값}) will be charged. You can cancel any time before then.',
       전환둘날: 'After the 14-day trial, the plan you choose ({값}) will be charged from {날}. You can cancel any time before then.',
       복원됨: 'Purchases restored.', 복원없음: 'No purchases to restore. Please check that the Google account you bought with is signed in on this phone.'
-    }
+    },
+    /* 11-03 소아 요청 — es·ja·zh(다섯 앱 막힘 시트·관리·고지) */
+    es: {"체험끝줄": "Su prueba de 14 días termina en {n} días · Ver precio y cómo cancelar", "체험끝줄내일": "Su prueba de 14 días termina mañana · Ver precio y cómo cancelar", "체험끝줄오늘": "Su prueba de 14 días termina hoy · Ver precio y cómo cancelar", "체험끝제목": "Su prueba termina en 3 días", "체험끝몸": "Si no quiere continuar, cancele antes del {날}. El precio y cómo cancelar están en la pantalla Suscripción de la app.", "꼴": "unos {값}", "구독": "Suscripción", "이기능": "Esta función", "잠김": "<b>{이름}</b> forma parte de la suscripción.", "응급기본": "La ayuda de urgencia siempre está abierta.", "계정으로": "La prueba empieza desde una cuenta. Inicie sesión y confirme su correo para usarlo todo durante 14 días.", "계정없음": "La prueba y la suscripción aún se están preparando. Esta función todavía no se puede abrir.", "전환날": "Tras la prueba de 14 días, se cobrará {값} a partir del {날}. Puede cancelar cuando quiera antes de esa fecha.", "전환": "Cuando termine la prueba de 14 días, se cobrará {값}. Puede cancelar cuando quiera antes.", "동의": "(Obligatorio) Cuando la prueba de 14 días termine el {날}, se cobrará {값}. Puede cancelar cuando quiera antes de esa fecha.", "체험끝": "Su prueba de 14 días ha terminado.", "기간끝": "Su periodo de suscripción ha terminado.", "기록그대로": "Todo lo que anotó sigue aquí.", "기록그대로2": "Todo lo que anotó sigue aquí.", "로그인하러": "Iniciar sesión", "닫기": "Cerrar", "체험시작": "Empezar la prueba de 14 días", "결제수단": "Añadir método de pago", "결제준비": "Los pagos aún no están configurados. Ahora no se cobra nada.", "결제준비짧게": "Los pagos aún no están configurados.", "고지첫결제": "Primer cobro: {값} el {날}, cuando termine la prueba de 14 días.", "고지첫결제날없음": "Primer cobro: {값} el día en que termine la prueba de 14 días.", "고지갱신": "Renovación: se renueva automáticamente cada {주기}. Se cobra hasta que cancele.", "고지주기월": "mes", "고지주기연": "año", "고지해지스토어": "Cancelar: cuando quiera, en la tienda donde la compró: Google Play “Pagos y suscripciones → Suscripciones”, App Store “Cuenta → Suscripciones”. Borrar la app no la cancela.", "고지해지앱": "Cancelar: cuando quiera, en la pantalla “Suscripción y pagos” de esta app. Borrar la app no la cancela.", "고지검토": "<b>Vista previa de revisión</b>: esto es lo que aparecerá sobre el botón de pago cuando se abran los pagos. Ahora no se cobra nada.", "고지복원": "Restaurar: si cambia de teléfono o reinstala, “Restaurar compra” recupera su suscripción.", "약관": "Condiciones del servicio", "처리방침": "Política de privacidad", "환불안내": "Reembolsos y cancelación", "다시동의": "Antes de que empiece cualquier pago, le mostraremos el precio y la fecha de cobro y volveremos a pedirle su consentimiento.", "동의준비": "(Obligatorio) La prueba de 14 días termina el {날}. Antes de que empiece cualquier pago, le mostraremos el precio y la fecha de cobro y volveremos a pedirle su consentimiento.", "요금": "Precio", "학생기본": "estudiantes", "학생인증준비": "la verificación llegará pronto", "학생인증단추": "Verificar que es estudiante", "출시가": "Precio de lanzamiento", "출시조건": "el primer año, si se suscribe en los 3 meses siguientes al lanzamiento", "회원권": "Pase MediNanum", "회원권설명": "un plan para las cinco apps", "회원권자격": "Las herramientas profesionales de ClinicScore se abren tras la verificación profesional", "곧": "muy pronto", "출시값": "{값} (precio de lanzamiento el primer año; {정가} desde el segundo año)", "출시값둘": "precio de lanzamiento {값} el primer año; {정가} desde el segundo año", "초대중": "<b>Acceso por invitación</b> · hasta el {날}", "초대뒤": "Durante este periodo no se cobra nada. Después vuelve a lo normal.", "회원권시작": "Empezar con el pase", "회원권연시작": "Empezar un pase de 1 año · {값}", "회원권중": "Abierto con su pase MediNanum.", "이유": {"login": "Inicie sesión primero.", "verify": "Abra primero el enlace de confirmación de su correo. La prueba empieza en una cuenta confirmada.", "used_account": "Esta cuenta ya usó la prueba de 14 días.", "used_device": "Este dispositivo ya usó la prueba de 14 días.", "used_person": "La prueba de 14 días ya se usó con este correo o inicio de sesión.", "device": "No se puede empezar la prueba en este navegador. Pruebe con otro navegador.", "app": "Algo salió mal. Inténtelo de nuevo.", "noacct": "Podrá empezar la prueba cuando se abran las cuentas."}, "체크": "Lea el aviso de cobro y marque la casilla.", "인터넷": "No hay conexión a internet. Inténtelo de nuevo cuando esté conectado.", "체험됨": "Su prueba de 14 días ha empezado. Todo está abierto hasta el {날}.", "해지취소됨": "Cancelación retirada. Su plan continúa.", "해지됨": "Cancelado. ", "까지그대로": "Puede seguir usándolo hasta el {날}.", "카드결제": "Se cobrará {값} el {날}. Si no lo desea, puede cancelar antes.", "카드준비": "Su prueba de 14 días termina el {날}. Antes de que empiece cualquier pago, le mostraremos el precio y la fecha de cobro y volveremos a pedirle su consentimiento.", "해지자세히": "Cancelar · detalles", "카드닫기이름": "Cerrar aviso de cobro", "관리로그인": "Inicie sesión para ver su suscripción.", "관리계정없음": "Cuando se abran las cuentas, podrá empezar la prueba y ver aquí su suscripción.", "아직": "Todavía no ha empezado la prueba.", "관리전환": "Tras la prueba de 14 días, se cobrará {값}. Puede cancelar cuando quiera antes.", "구독중": "Suscrito", "체험중": "En prueba", "남음": " · quedan {n} días", "까지괄호": " (hasta el {날})", "해지예약": "Cancelación programada. ", "해지예약뒤": "Puede seguir usándolo hasta el {날} y después no se cobrará nada.", "해지취소": "Deshacer la cancelación", "다음결제": "Próximo pago {날} · {값}", "해지하기": "Cancelar", "해지해도": "Aunque cancele, puede seguir usándolo hasta el {날}.", "기간끝말": "el final del periodo", "휴대폰": "Verificar por teléfono", "공동": "Verificar con certificado", "미연결": "Aún no está conectado.", "문제": "Algo salió mal.", "복원": "Restaurar compras", "다시구독": "Suscribirse de nuevo", "스토어관리": "Gestionar en la tienda", "스토어해지": "Cancele desde los ajustes de suscripción de la tienda. Aunque cancele, puede seguir usándolo hasta el {날}.", "결제취소": "Pago cancelado. No ha cambiado nada.", "결제안됨": "El pago no se completó. Inténtelo de nuevo en un momento.", "결제반영중": "Pago completado. Su suscripción aparecerá en breve. Vuelva a abrir en un momento.", "구독됨": "Su suscripción ha empezado. Ya está todo abierto.", "관리전환둘": "Tras la prueba de 14 días, se cobrará el plan que elija ({값}). Puede cancelar cuando quiera antes.", "연시작": "Empezar con 1 año · {값}", "연구독": "Suscribirse por 1 año · {값}", "월시작": "Empezar con 1 mes · {값}", "월구독": "Suscribirse por 1 mes · {값}", "동의둘": "(Obligatorio) Cuando la prueba de 14 días termine el {날}, se cobrará el plan que elija ({값}). Puede cancelar cuando quiera antes de esa fecha.", "전환둘날": "Tras la prueba de 14 días, se cobrará el plan que elija ({값}) a partir del {날}. Puede cancelar cuando quiera antes de esa fecha.", "복원됨": "Compras restauradas.", "복원없음": "No hay compras que restaurar. Compruebe que la cuenta de Google con la que compró tiene la sesión iniciada en este teléfono.", "회원권권함": "¿Usa tres apps o más? El pase MediNanum sale más a cuenta: las cinco apps por {회원권값} al mes", "회원권보기": "Ver el pase"},
+    ja: {"체험끝줄": "14日間の体験はあと{n}日で終わります · 料金と解約方法を見る", "체험끝줄내일": "14日間の体験は明日で終わります · 料金と解約方法を見る", "체험끝줄오늘": "14日間の体験は今日で終わります · 料金と解約方法を見る", "체험끝제목": "体験はあと3日で終わります", "체험끝몸": "続けない場合は{날}より前に解約してください。料金と解約方法はアプリの定期購入画面にあります。", "꼴": "{값}ほど", "구독": "定期購入", "이기능": "この機能", "잠김": "<b>{이름}</b>は定期購入の機能です。", "응급기본": "緊急時の連絡はいつでも使えます。", "계정으로": "お試しはアカウントから始まります。ログインしてメールの確認を済ませると、14日間すべて使えます。", "계정없음": "お試しと定期購入はまだ準備中です。この機能はまだ開けません。", "전환날": "14日間のお試しのあと、{날}から{값}が請求されます。それまではいつでも解約できます。", "전환": "14日間のお試しが終わると{값}が請求されます。それまではいつでも解約できます。", "동의": "（必須）14日間のお試しが終わる{날}に{값}が請求されます。それまではいつでも解約できます。", "체험끝": "14日間のお試しが終わりました。", "기간끝": "定期購入の期間が終わりました。", "기록그대로": "これまでの記録はそのまま残っています。", "기록그대로2": "記録はそのまま残っています。", "로그인하러": "ログインする", "닫기": "閉じる", "체험시작": "14日間のお試しを始める", "결제수단": "支払い方法を登録", "결제준비": "支払いはまだ準備中です。今は何も請求されません。", "결제준비짧게": "支払いはまだ準備中です。", "고지첫결제": "初回の請求 — 14日間のお試しが終わる{날}に{값}。", "고지첫결제날없음": "初回の請求 — 14日間のお試しが終わる日に{값}。", "고지갱신": "更新 — {주기}ごとに自動で更新されます。解約するまで請求されます。", "고지주기월": "1か月", "고지주기연": "1年", "고지해지스토어": "解約 — 購入したストアでいつでも：Google Play「お支払いと定期購入 → 定期購入」、App Store「アカウント → サブスクリプション」。アプリを削除しても解約にはなりません。", "고지해지앱": "解約 — このアプリの「定期購入と支払い」画面でいつでも。アプリを削除しても解約にはなりません。", "고지검토": "<b>確認用プレビュー</b> — 支払いが始まると、支払いボタンの上にこの内容が表示されます。今は何も請求されません。", "고지복원": "復元 — スマホを替えたり入れ直したりしたときは「購入を復元」で定期購入が戻ります。", "약관": "利用規約", "처리방침": "個人情報の取り扱い", "환불안내": "返金と解約", "다시동의": "支払いが始まる前に、料金と請求日をお見せして、もう一度同意をいただきます。", "동의준비": "（必須）14日間のお試しは{날}に終わります。支払いが始まる前に、料金と請求日をお見せして、もう一度同意をいただきます。", "요금": "料金", "학생기본": "学生", "학생인증준비": "確認はまもなく始まります", "학생인증단추": "学生であることを確認", "출시가": "発売記念価格", "출시조건": "発売から3か月以内の登録で最初の1年間", "회원권": "メディナヌム会員パス", "회원권설명": "5つのアプリをまとめて使えるプラン", "회원권자격": "ClinicScore の専門家向け機能は、医療者の確認のあとに使えます", "곧": "まもなく開始", "출시값": "{값}（最初の1年は発売記念価格、2年目から{정가}）", "출시값둘": "発売記念価格 {값} — 最初の1年、2年目から{정가}", "초대중": "<b>招待コードでお試し中</b> · {날}まで", "초대뒤": "この期間は何も請求されません。その後は通常に戻ります。", "회원권시작": "会員パスで始める", "회원권연시작": "1年の会員パスで始める · {값}", "회원권중": "メディナヌム会員パスで使えています。", "이유": {"login": "先にログインしてください。", "verify": "先にメールの確認リンクを開いてください。確認済みのアカウントでお試しが始まります。", "used_account": "このアカウントは14日間のお試しをすでに使っています。", "used_device": "この端末は14日間のお試しをすでに使っています。", "used_person": "このメールやログイン情報で14日間のお試しをすでに使っています。", "device": "このブラウザではお試しを始められません。別のブラウザでお試しください。", "app": "問題が起きました。もう一度お試しください。", "noacct": "アカウントが使えるようになると、お試しを始められます。"}, "체크": "請求のお知らせを読んで、チェックを入れてください。", "인터넷": "インターネットにつながりません。つながってからもう一度お試しください。", "체험됨": "14日間のお試しを始めました。{날}まですべて使えます。", "해지취소됨": "解約を取り消しました。プランは続きます。", "해지됨": "解約しました。", "까지그대로": "{날}までそのまま使えます。", "카드결제": "{날}に{값}が請求されます。望まない場合は、その前に解約できます。", "카드준비": "14日間のお試しは{날}に終わります。支払いが始まる前に、料金と請求日をお見せして、もう一度同意をいただきます。", "해지자세히": "解約 · くわしく", "카드닫기이름": "請求のお知らせを閉じる", "관리로그인": "ログインすると定期購入の状態を確認できます。", "관리계정없음": "アカウントが使えるようになると、ここでお試しを始めて定期購入を確認できます。", "아직": "まだお試しを始めていません。", "관리전환": "14日間のお試しのあと、{값}が請求されます。それまではいつでも解約できます。", "구독중": "定期購入中", "체험중": "お試し中", "남음": " · 残り{n}日", "까지괄호": "（{날}まで）", "해지예약": "解約を予約しました。", "해지예약뒤": "{날}までそのまま使え、その後は請求されません。", "해지취소": "解約を取り消す", "다음결제": "次回の支払い {날} · {값}", "해지하기": "解約する", "해지해도": "解約しても{날}までは使えます。", "기간끝말": "期間の終わり", "휴대폰": "電話番号で確認", "공동": "証明書で確認", "미연결": "まだつながっていません。", "문제": "問題が起きました。", "복원": "購入を復元", "다시구독": "もう一度購入する", "스토어관리": "ストアで管理", "스토어해지": "ストアの定期購入設定から解約してください。解約しても{날}までは使えます。", "결제취소": "支払いを取り消しました。何も変わっていません。", "결제안됨": "支払いが完了しませんでした。少ししてからもう一度お試しください。", "결제반영중": "支払いが完了しました。まもなく定期購入が表示されます。少ししてから開き直してください。", "구독됨": "定期購入が始まりました。すべて使えます。", "관리전환둘": "14日間のお試しのあと、選んだ料金（{값}）が請求されます。それまではいつでも解約できます。", "연시작": "1年で始める · {값}", "연구독": "1年で購入する · {값}", "월시작": "1か月で始める · {값}", "월구독": "1か月で購入する · {값}", "동의둘": "（必須）14日間のお試しが終わる{날}に、選んだ料金（{값}）が請求されます。それまではいつでも解約できます。", "전환둘날": "14日間のお試しのあと、{날}から選んだ料金（{값}）が請求されます。それまではいつでも解約できます。", "복원됨": "購入を復元しました。", "복원없음": "復元できる購入がありません。購入したGoogleアカウントがこのスマホでログインしているか確認してください。", "회원권권함": "アプリを3つ以上使うなら、メディナヌム会員パスがお得です — 5つのアプリが月{회원권값}で", "회원권보기": "会員パスを見る"},
+    zh: {"체험끝줄": "14天体验还有{n}天结束 · 查看价格和取消方法", "체험끝줄내일": "14天体验明天结束 · 查看价格和取消方法", "체험끝줄오늘": "14天体验今天结束 · 查看价格和取消方法", "체험끝제목": "体验还有3天结束", "체험끝몸": "如果不想继续，请在{날}之前取消。价格和取消方法在应用的订阅页面。", "꼴": "约{값}", "구독": "订阅", "이기능": "这个功能", "잠김": "<b>{이름}</b>属于订阅功能。", "응급기본": "紧急求助始终开放。", "계정으로": "试用从账号开始。登录并完成邮箱确认后，14 天内可使用全部功能。", "계정없음": "试用和订阅仍在准备中。这个功能暂时还不能打开。", "전환날": "14 天试用结束后，将从{날}起收取{값}。在此之前可随时取消。", "전환": "14 天试用结束后将收取{값}。在此之前可随时取消。", "동의": "（必选）14 天试用于{날}结束时将收取{값}。在此之前可随时取消。", "체험끝": "14 天试用已结束。", "기간끝": "订阅期已结束。", "기록그대로": "您记下的内容都还在。", "기록그대로2": "记录都还在。", "로그인하러": "去登录", "닫기": "关闭", "체험시작": "开始 14 天试用", "결제수단": "添加付款方式", "결제준비": "付款尚未开通。现在不会收取任何费用。", "결제준비짧게": "付款尚未开通。", "고지첫결제": "首次扣款——14 天试用结束的{날}收取{값}。", "고지첫결제날없음": "首次扣款——14 天试用结束当天收取{값}。", "고지갱신": "续订——每{주기}自动续订。取消前会持续扣款。", "고지주기월": "个月", "고지주기연": "年", "고지해지스토어": "取消——可随时在购买的应用商店取消：Google Play「付款和订阅 → 订阅」，App Store「账户 → 订阅」。删除应用不会取消订阅。", "고지해지앱": "取消——可随时在本应用的「订阅与付款」页面取消。删除应用不会取消订阅。", "고지검토": "<b>审核预览</b>——开通付款后，付款按钮上方会显示这些内容。现在不会收取任何费用。", "고지복원": "恢复——换手机或重新安装时，点「恢复购买」即可找回订阅。", "약관": "服务条款", "처리방침": "隐私政策", "환불안내": "退款与取消", "다시동의": "在开始任何扣款之前，我们会向您展示价格和扣款日期，并再次征得您的同意。", "동의준비": "（必选）14 天试用于{날}结束。在开始任何扣款之前，我们会向您展示价格和扣款日期，并再次征得您的同意。", "요금": "价格", "학생기본": "学生", "학생인증준비": "认证即将开放", "학생인증단추": "认证学生身份", "출시가": "上线纪念价", "출시조건": "上线 3 个月内订阅，第一年适用", "회원권": "MediNanum 会员卡", "회원권설명": "五个应用通用的方案", "회원권자격": "ClinicScore 专业工具需通过医务人员认证后开放", "곧": "即将开放", "출시값": "{값}（第一年为上线纪念价，第二年起{정가}）", "출시값둘": "上线纪念价{값}——第一年，第二年起{정가}", "초대중": "<b>邀请码试用中</b> · 至{날}", "초대뒤": "此期间不收取任何费用。之后恢复正常。", "회원권시작": "用会员卡开始", "회원권연시작": "开始 1 年会员卡 · {값}", "회원권중": "已通过 MediNanum 会员卡开放。", "이유": {"login": "请先登录。", "verify": "请先打开邮件中的确认链接。试用从已确认的账号开始。", "used_account": "这个账号已使用过 14 天试用。", "used_device": "这台设备已使用过 14 天试用。", "used_person": "这个邮箱或登录信息已使用过 14 天试用。", "device": "无法在这个浏览器中开始试用。请换一个浏览器。", "app": "出了点问题。请再试一次。", "noacct": "账号开放后即可开始试用。"}, "체크": "请阅读扣款说明并勾选。", "인터넷": "无法连接网络。联网后请再试一次。", "체험됨": "14 天试用已开始。至{날}可使用全部功能。", "해지취소됨": "已撤回取消。您的方案将继续。", "해지됨": "已取消。", "까지그대로": "至{날}仍可继续使用。", "카드결제": "将于{날}收取{값}。如不需要，可在此之前取消。", "카드준비": "14 天试用于{날}结束。在开始任何扣款之前，我们会向您展示价格和扣款日期，并再次征得您的同意。", "해지자세히": "取消 · 详情", "카드닫기이름": "关闭扣款说明", "관리로그인": "登录后可查看订阅状态。", "관리계정없음": "账号开放后，可在这里开始试用并查看订阅。", "아직": "您还没有开始试用。", "관리전환": "14 天试用结束后将收取{값}。在此之前可随时取消。", "구독중": "订阅中", "체험중": "试用中", "남음": " · 剩余 {n} 天", "까지괄호": "（至{날}）", "해지예약": "已预约取消。", "해지예약뒤": "至{날}仍可使用，之后不再扣款。", "해지취소": "撤回取消", "다음결제": "下次扣款 {날} · {값}", "해지하기": "取消订阅", "해지해도": "即使取消，至{날}仍可使用。", "기간끝말": "期满", "휴대폰": "用手机认证", "공동": "用证书认证", "미연결": "尚未连接。", "문제": "出了点问题。", "복원": "恢复购买", "다시구독": "重新订阅", "스토어관리": "在商店管理", "스토어해지": "请在应用商店的订阅设置中取消。即使取消，至{날}仍可使用。", "결제취소": "已取消付款。没有任何变化。", "결제안됨": "付款未完成。请稍后再试。", "결제반영중": "付款完成。订阅很快就会显示。请稍后重新打开。", "구독됨": "订阅已开始。现在全部开放。", "관리전환둘": "14 天试用结束后，将收取您选择的方案（{값}）。在此之前可随时取消。", "연시작": "按 1 年开始 · {값}", "연구독": "订阅 1 年 · {값}", "월시작": "按 1 个月开始 · {값}", "월구독": "订阅 1 个月 · {값}", "동의둘": "（必选）14 天试用于{날}结束时，将收取您选择的方案（{값}）。在此之前可随时取消。", "전환둘날": "14 天试用结束后，将从{날}起收取您选择的方案（{값}）。在此之前可随时取消。", "복원됨": "已恢复购买。", "복원없음": "没有可恢复的购买。请确认购买时使用的 Google 账号已在这台手机上登录。", "회원권권함": "使用三个及以上应用时，Medinanum 会员更划算——五个应用每月{회원권값}", "회원권보기": "查看会员"}
   };
   var 달이름 = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-  function 말() { try { if (typeof 설정.말 === 'function' && 설정.말() === 'en') return 'en'; } catch (e) {} return 'ko'; }
+  function 말() { try { var l = typeof 설정.말 === 'function' ? 설정.말() : 'ko'; if (l === 'en' || l === 'es' || l === 'ja' || l === 'zh') return l; } catch (e) {} return 'ko'; }   /* 11-03 다섯 말 */
   function 채움(t, o) { return String(t).replace(/\{(\w+|[가-힣]+)\}/g, function (m, k) { return o && k in o ? o[k] : m; }); }
   function 말글(k, o) { var 표 = 글표[말()], t = 표[k]; if (t == null) t = 글표.ko[k]; return 채움(t, o); }
   function 두벌(v, id) {   /* 앱이 준 글 — 글 · {ko,en} · function(id, 말) */
@@ -808,10 +820,10 @@
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return '&#' + c.charCodeAt(0) + ';'; }); }
   function 켜짐() { return !!(설정.유료화 || 검토); }
   function 응급(id) { return 응급기본.indexOf(id) >= 0 || (설정.응급 || []).indexOf(id) >= 0; }
-  function 원(n) { n = Number(n || 0); return 말() === 'en' ? '₩' + n.toLocaleString('en-US') : n.toLocaleString('ko-KR') + '원'; }
-  function 월값(n) { n = n == null ? (설정.가격 || {}).월 : n; return 말() === 'en' ? 원(n) + '/month' : '월 ' + 원(n); }
-  function 연값(n) { return 말() === 'en' ? 원(n) + '/year' : '연 ' + 원(n); }
-  function 날(t) { var d = new Date(t); return 말() === 'en' ? 달이름[d.getMonth()] + ' ' + d.getDate() : (d.getMonth() + 1) + '월 ' + d.getDate() + '일'; }
+  function 원(n) { n = Number(n || 0); var l = 말(); return l === 'ko' ? n.toLocaleString('ko-KR') + '원' : '₩' + n.toLocaleString(l === 'es' ? 'es-ES' : 'en-US'); }
+  function 월값(n) { n = n == null ? (설정.가격 || {}).월 : n; var l = 말(); return l === 'en' ? 원(n) + '/month' : l === 'es' ? 원(n) + ' al mes' : l === 'ja' ? '月額' + 원(n) : l === 'zh' ? '每月' + 원(n) : '월 ' + 원(n); }
+  function 연값(n) { var l = 말(); return l === 'en' ? 원(n) + '/year' : l === 'es' ? 원(n) + ' al año' : l === 'ja' ? '年額' + 원(n) : l === 'zh' ? '每年' + 원(n) : '연 ' + 원(n); }
+  function 날(t) { var d = new Date(t), l = 말(); return l === 'en' ? 달이름[d.getMonth()] + ' ' + d.getDate() : l === 'es' ? d.getDate() + ' de ' + ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'][d.getMonth()] : (l === 'ja' || l === 'zh') ? (d.getMonth() + 1) + '月' + d.getDate() + '日' : (d.getMonth() + 1) + '월 ' + d.getDate() + '일'; }
   function 계정있나() { return 설정.계정 !== false; }
   function 이름(id) { return 두벌(설정.잠금 && 설정.잠금[id]) || 말글('이기능'); }
   /* 결제사가 실제로 붙었나 — 이름(결제사)과 등록 함수(결제.등록)가 둘 다 있을 때만. 아니면 「결제됩니다」를 말하지 않는다.
@@ -824,7 +836,17 @@
   var 회원권권한 = 'medinanum_pass';
   function 회원권상품(plan) { return 회원권권한 + (plan === 'year' ? '_year' : '_month'); }
   function 회원권판매() { var g = 설정.회원권; return !!(g && g.판매 === true && g.월 && 껍데기결제()); }   /* 스토어 상품을 등록한 뒤에만 판다 */   /* 스토어 상품 id — store-webhook 이 앞머리(<app>_)로 앱을 가른다 */
+  /* 11-13 현욱님 — 결제 화면 기본 선택은 1년(월 환산 함께). 설정.기본: 'month' 이면 예전처럼 1개월이 주 단추 */
+  function 연기본() { return 연있나() && (!!설정.기본연 || 설정.기본 !== 'month'); }
+  function 연환산() { var g = 설정.가격 || {}; return g.연 ? ' (' + 말글('꼴', { 값: 월값(Math.round(g.연 / 12)) }) + ')' : ''; }
+  function 시작단추(부르기) {   /* 부르기: 'subscribe' → 체험시작 · 'again' → 결제등록 */
+    var 함 = 부르기 === 'again' ? '구독.결제등록' : '구독.체험시작';
+    if (연기본()) return 단추(말글(부르기 === 'again' ? '연구독' : '연시작', { 값: 첫연값() + 연환산() }), 함 + "('year')", true) + 단추(말글(부르기 === 'again' ? '월구독' : '월시작', { 값: 첫월값() }), 함 + '()', false);
+    if (부르기 === 'again') return 단추(말글('다시구독'), 함 + '()', true) + (연있나() ? 단추(말글('연구독', { 값: 첫연값() }), 함 + "('year')", false) : '');
+    return 단추(말글('체험시작'), 함 + '()', true) + (연있나() ? 단추(말글('연시작', { 값: 첫연값() }), 함 + "('year')", false) : '');
+  }
   function 연있나() { return !!(껍데기결제() && 설정.가격 && 설정.가격.연); }   /* 2026-10-13 — 스토어 길에서 1년 이용권도 판다 */
+  function 연먼저() { return 연기본(); }   /* 11-12 곁에(기본연:true) 와 11-13 기본 연 — 같은 판단 하나로 */
   /* 2026-10-21 곁에·길동무 요청 — 첫 결제를 말하는 자리(고지·동의·전환·시작 단추)는 출시 기념가가 있으면 그 값과 둘째 해 값을 함께.
      가격.출시.까지('YYYY-MM-DD', 그날까지 가입)가 지나면 정가만. 요금줄(정가·출시 기념가 나란히)은 그대로. */
   function 출시중() { var o = (설정.가격 || {}).출시; if (!o) return null; if (o.까지) { var d = Date.parse(o.까지 + 'T23:59:59+09:00'); if (!isNaN(d) && Date.now() > d) return null; } return o; }
@@ -849,7 +871,7 @@
   /* 조사 — 낱말 끝 받침으로 고른다(「추이는」「사례집은」「6개째부터는」). 끝의 괄호 덧말「(Lab)」은 보지 않는다.
      짝은 '은/는' · '이/가' · '을/를' 처럼 받침 있는 쪽을 앞에. 우리말·숫자로 끝나지 않으면 「은(는)」 꼴로 둔다. */
   function 받침(w) {
-    w = String(w || '').replace(/\s*\([^()]*\)\s*$/, '').replace(/[\s.,·'"’”」』]+$/, '');
+    w = String(w || '').replace(/\s*\([^()]*\)\s*$/, '').replace(/[\s.,·'"’”」\u300F]+$/, '');
     if (!w) return -1;
     var c = w.charCodeAt(w.length - 1);
     if (c >= 0xAC00 && c <= 0xD7A3) return (c - 0xAC00) % 28 ? 1 : 0;
@@ -889,12 +911,10 @@
       var 회값 = [월값(회.월)]; if (회.연) 회값.push(연값(회.연));
       var 회출 = []; if (회.출시월) 회출.push(월값(회.출시월)); if (회.출시연) 회출.push(연값(회.출시연));
       칸.push('<b>' + 말글('회원권') + '</b>(' + 말글('회원권설명') + ') ' + 회값.join(' · ') +
-        (회출.length ? ' — ' + 말글('출시가') + ' ' + 회출.join(' · ') : '') + ' (' + 말글('회원권자격') + ')');   /* 2026-10-22 회원권 = 결제 권한, 들어갈 자격은 따로 */
+        (회출.length ? ' — ' + 말글('출시가') + ' ' + 회출.join(' · ') : '') + (회원권판매() ? '' : ' — ' + 말글('곧')) + ' (' + 말글('회원권자격') + ')');   /* 2026-10-22 회원권 = 결제 권한, 들어갈 자격은 따로 */
     }
     if (!칸.length) return '';
-    /* 11-09 전자상거래법 8·13조(현욱님 검수) — 판매 전 「곧 열려요」는 값 위, 값 바로 아래 자동 결제·부가세·해지 한 줄(회원권 부품 2026-11-09a 와 같은 글) */
-    return (회 && 회.월 && !회원권판매() ? 작은('<b>' + 말글('곧') + '</b>') : '') +
-      작은('<span class="subprice">' + 말글('요금') + ' ' + 칸.join(' · ') + '</span>') + 작은(말글('자동')) +
+    return 작은('<span class="subprice">' + 말글('요금') + ' ' + 칸.join(' · ') + '</span>') +
       (회원권판매() ? 줄(단추(말글('회원권시작'), "구독.회원권구매()", false) + (설정.회원권.연 ? 단추(말글('회원권연시작', { 값: 연값(설정.회원권.연) }), "구독.회원권구매('year')", false) : '')) : '') +
       (typeof 설정.학생인증 === 'function' && (g.학생월 || g.학생연) ? 줄(단추(말글('학생인증단추'), '구독.학생인증()', false)) : '');
   }
@@ -951,6 +971,7 @@
   function 바뀜알림() {
     if (typeof 설정.바뀜 === 'function') { try { 설정.바뀜(상태()); } catch (e) {} }
     try { var el = document.getElementById('subman'); if (el) el.outerHTML = 관리HTML(); } catch (e) {}
+    try { 체험알림걸기(); } catch (e) {}   /* 11-13c */
   }
   function 조회() {
     if (!켜짐() || !서버있나()) return Promise.resolve(null);
@@ -1043,7 +1064,7 @@
     if (typeof 설정.시트열기 === 'function') { try { return 설정.시트열기(html, 제목); } catch (e) {} }
     시트닫기();   /* 앱이 시트를 주지 않았을 때만 — 색·크기는 앱 것을 물려받는다 */
     var v = document.createElement('div'); v.id = 'subsheet'; v.setAttribute('role', 'dialog'); v.setAttribute('aria-modal', 'true'); v.setAttribute('aria-label', 제목 || 말글('구독'));
-    v.style.cssText = 'position:fixed;left:0;right:0;bottom:0;max-height:85vh;overflow:auto;z-index:2147482000;padding:16px;background:inherit;border-top:1px solid rgba(0,0,0,.15)';
+    v.style.cssText = 'position:fixed;left:0;right:0;bottom:0;max-height:85vh;overflow:auto;overscroll-behavior:contain;z-index:2147482000;padding:16px;background:inherit;border-top:1px solid rgba(0,0,0,.15)';
     v.innerHTML = '<div class="srvbox"><b>' + esc(제목 || '') + '</b>' + html + '</div>';
     document.body.appendChild(v); 내시트 = v;
   }
@@ -1052,13 +1073,13 @@
     if (typeof 설정.시트닫기 === 'function') { try { 설정.시트닫기(); } catch (e) {} }
   }
   function 동의줄(id) {
-    var 끝 = Date.now() + 7 * 864e5;
+    var 끝 = Date.now() + 14 * 864e5;
     return '<label class="subagree"><input type="checkbox" id="' + id + '"> <span>' + (연있나() ? 말글('동의둘', { 날: 날(끝), 값: 두요금() }) : 말글(결제있나() ? '동의' : '동의준비', { 날: 날(끝), 값: 첫월값() })) + '</span></label>';
   }
   function 결제줄(s) {
     if (껍데기결제()) {
       /* 2026-10-08 스토어 결제 — 체험 전에는 「14일 체험 시작」이 곧 스토어 구매라 단추를 겹치지 않는다. 끝난 뒤(체험 끝·기간 끝)에만 「다시 구독하기」 */
-      return (s && s.status && !s.열림) ? 줄(단추(말글('다시구독'), '구독.결제등록()', true) + (연있나() ? 단추(말글('연구독', { 값: 첫연값() }), "구독.결제등록('year')", false) : '')) : '';
+      return (s && s.status && !s.열림) ? 줄(시작단추('again')) : '';
     }
     if (결제있나()) {
       /* 결제사가 붙은 뒤: 설정.결제.등록() 이 결제수단 등록 창을 연다 */
@@ -1066,8 +1087,13 @@
     }
     return 작은(말글('결제준비'));
   }
+  function 회원권권함() {
+    try { if (!window.회원권 || !회원권.열기 || !설정.가격 || !설정.가격.월) return '';
+      var 회 = (회원권.값표 && 회원권.값표.회원권 && 회원권.값표.회원권.월) || (설정.회원권 && 설정.회원권.월) || 12900;
+      return '<p class="' + (모('작은글') || '') + '">' + 말글('회원권권함', { 앱값: 원(설정.가격.월), 회원권값: 원(회) }) + ' <button type="button" class="' + (모('보조') || '') + '" onclick="회원권.열기()">' + esc(말글('회원권보기')) + '</button></p>'; } catch (e) { return ''; }
+  }
   function 막힘HTML(id) {
-    var s = 상태(), 끝 = Date.now() + 7 * 864e5, 몸 = '', 단 = '', 동 = '';
+    var s = 상태(), 끝 = Date.now() + 14 * 864e5, 몸 = '', 단 = '', 동 = '';
     var 응 = 문('응급안내', id) || 말글('응급기본');
     var 스토어길 = !!껍데기결제();   /* 2026-10-13 — 스토어 길은 계정 없이도 체험·구독을 시작한다 */
     if (!계정있나() && !스토어길) {
@@ -1079,8 +1105,8 @@
       단 = (typeof 설정.로그인열기 === 'function' ? 단추(말글('로그인하러'), '구독.로그인()', true) : '') + 단추(말글('닫기'), '구독.닫기()', false);
     } else if (!s.status) {
       몸 = '<p>' + 전환말(끝) + '</p>';
-      동 = 동의줄('subAgreeT') + ((설정.회원권 && 설정.회원권.월 && 설정.가격 && 설정.가격.월) ? 작은(말글('회원권권함', { 앱값: 월값(설정.가격.월), 회원권값: 월값(설정.회원권.월) })) : '');   /* 11-11 — 체험 시작 직전 한 줄만. 기본 선택은 누른 상품 그대로, 압박 말 없음 */
-      단 = 단추(말글('체험시작'), '구독.체험시작()', true) + (연있나() ? 단추(말글('연시작', { 값: 첫연값() }), "구독.체험시작('year')", false) : '') + 단추(말글('닫기'), '구독.닫기()', false);
+      동 = 동의줄('subAgreeT') + 회원권권함();   /* 11-11 — 기본 선택은 누른 상품 그대로, 한 줄만 */
+      단 = 시작단추('subscribe') + 단추(말글('닫기'), '구독.닫기()', false);
     } else {
       몸 = '<p>' + (s.status === 'trial' ? 말글('체험끝') : 말글('기간끝')) + ' ' + 말글('기록그대로') + '</p>';
       단 = 단추(말글('닫기'), '구독.닫기()', false);
@@ -1112,7 +1138,7 @@
         var d = r && r.data; if (Array.isArray(d)) d = d[0];
         if (r && r.error) { 알림(이유('app')); return false; }
         if (!d || !d.ok) { 알림(이유((d && d.why) || 'app')); return false; }
-        return 조회().then(function () { 시트닫기(); 알림(말글('체험됨', { 날: 날(때(d.until) || Date.now() + 7 * 864e5) })); return true; });
+        return 조회().then(function () { 시트닫기(); 알림(말글('체험됨', { 날: 날(때(d.until) || Date.now() + 14 * 864e5) })); return true; });
       });
     }).catch(function () { 알림(말글('인터넷')); return false; })
       .then(function (x) { 체험중 = false; return x; });
@@ -1141,7 +1167,7 @@
       var 뒤 = 상태().열림 ? Promise.resolve(상태()) : (세션() ? (쓰기(null), 다시조회(4)) : 스토어조회().then(function () { return 상태(); }));
       return 뒤.then(function (s) { 바뀜알림();
         시트닫기();
-        알림(s.열림 ? (s.status === 'trial' ? 말글('체험됨', { 날: 날(s.until || Date.now() + 7 * 864e5) }) : 말글('구독됨')) : 말글('결제반영중'));
+        알림(s.열림 ? (s.status === 'trial' ? 말글('체험됨', { 날: 날(s.until || Date.now() + 14 * 864e5) }) : 말글('구독됨')) : 말글('결제반영중'));
         return true;
       });
     }).catch(function (e) { 알림(결제오류말(e)); return false; })
@@ -1184,16 +1210,58 @@
 
   /* ── 화면 조각 ── */
   function 카드키() { return '_sub_card_' + 설정.app; }
+  function 운영자() { try { return !!(window.가입 && 가입.운영자 && 가입.운영자()); } catch (e) { return false; } }   /* 10-30 */
   function 전환카드HTML() {
-    if (!켜짐()) return '';
+    if (!켜짐() || 운영자()) return '';
     var s = 상태(); if (s.status !== 'trial' || s.cancel || !s.열림) return '';
-    var t = s.converts_at || s.until, now = Date.now(); if (!t || t <= now || t - now > 2 * 864e5) return '';
+    var t = s.converts_at || s.until, now = Date.now(); if (!t || t <= now || t - now > 3 * 864e5) return '';   /* 11-13c 3일 전부터(약관 약속) */
     var 닫음 = null; try { 닫음 = localStorage.getItem(카드키()); } catch (e) {}
     if (닫음 === String(t)) return '';   /* 이 주기에는 이미 닫았다 */
     var 스토어 = /^(google|apple)$/.test(String(s.source || ''));   /* 2026-10-08 — 스토어에서 산 체험은 스토어가 결제수단을 쥐고 있다 */
     var 글 = ((s.pay_ready || 스토어) && 결제있나()) ? 말글('카드결제', { 날: 날(t), 값: 첫값(s) }) : 말글('카드준비', { 날: 날(t) });   /* 결제사가 없으면 서버가 pay_ready 라 해도 「결제됩니다」를 말하지 않는다 */
-    return '<div class="' + 모('카드') + ' subcard" id="subcard" role="status"><p>' + 글 + '</p>' +
+    return '<div class="' + 모('카드') + ' subcard" id="subcard" role="status"><p><b>' + 체험끝머리(s) + '</b></p><p>' + 글 + '</p>' +
       줄(단추(말글('해지자세히'), '구독.관리열기()', false) + 단추(말글('닫기'), '구독.카드닫기()', false, 말글('카드닫기이름'))) + '</div>';
+  }
+
+  /* ── 11-13c 체험 끝 3일 전 알림(약지도 11-12 에서 옮김) — 스위치 꺼짐·해지 예약·체험 아님이면 늘 null ── */
+  function 체험끝날() {
+    try { if (!켜짐()) return null; var s = 상태(); if (!s || s.status !== 'trial' || !s.until || s.cancel) return null;
+      return { until: new Date(s.converts_at || s.until), days: s.days }; } catch (e) { return null; }
+  }
+  function 체험끝글(n) { return n > 1 ? 말글('체험끝줄', { n: n }) : n === 1 ? 말글('체험끝줄내일') : 말글('체험끝줄오늘'); }
+  function 체험끝머리(s) { return 체험끝글(s && s.days).split(' · ')[0]; }
+  function 체험끝줄HTML() {
+    var t = 체험끝날(); if (!t || t.days == null || t.days > 3 || 운영자()) return '';
+    return '<button type="button" class="' + 모('줄') + ' subline" onclick="구독.관리열기()">' + 체험끝글(t.days) + '</button>';
+  }
+  var 알림번호 = 864003, 웹알림틀 = null;
+  function 알림키() { return '_sub_te_' + 설정.app; }
+  function 기기알림() { var C = window.Capacitor; if (!C) return null; var p = C.Plugins && C.Plugins.LocalNotifications;
+    if (!p && typeof C.registerPlugin === 'function') { try { if (!C.isPluginAvailable || C.isPluginAvailable('LocalNotifications')) p = C.registerPlugin('LocalNotifications'); } catch (e) {} } return p || null; }
+  function 체험알림걸기() {
+    var t = 체험끝날(), 걸림 = null; try { 걸림 = localStorage.getItem(알림키()); } catch (e) {}
+    var at = t ? new Date(t.until.getTime() - 3 * 864e5) : null; if (at) at.setHours(10, 0, 0, 0);
+    if (at && at.getTime() <= Date.now()) at = null;   /* 이미 3일 안이면 홈 줄·카드가 대신한다 */
+    var 열쇠 = at ? String(at.getTime()) : '';
+    if (웹알림틀) { clearTimeout(웹알림틀); 웹알림틀 = null; }
+    var 제목 = 말글('체험끝제목'), 몸 = t ? 말글('체험끝몸', { 날: 날(t.until) }) : '';
+    /* 안드로이드 — 허락받은 경우만 건다(여기서 허락을 묻지 않는다). 바뀌었을 때만 다시 건다 */
+    var LN = 기기알림();
+    if (LN && 걸림 !== 열쇠) {
+      Promise.resolve().then(function () { return 걸림 ? LN.cancel({ notifications: [{ id: 알림번호 }] }) : null; }).catch(function () {})
+        .then(function () { if (!at) return null; return LN.checkPermissions().then(function (p) { if (!p || p.display !== 'granted') return null;
+          return LN.schedule({ notifications: [{ id: 알림번호, title: 제목, body: 몸, schedule: { at: at, allowWhileIdle: true }, extra: { 구독: 'trial-end' } }] }); }); })
+        .then(function () { try { if (열쇠) localStorage.setItem(알림키(), 열쇠); else localStorage.removeItem(알림키()); } catch (e) {} }).catch(function () {});
+    }
+    /* 웹 — 탭이 열려 있는 동안만, 허락받은 경우만 */
+    if (!LN && at && window.Notification && Notification.permission === 'granted') {
+      var ms = at.getTime() - Date.now();
+      if (ms > 0 && ms < 2147000000) 웹알림틀 = setTimeout(function () {
+        if (!체험끝날()) return;
+        try { if (navigator.serviceWorker && navigator.serviceWorker.ready) navigator.serviceWorker.ready.then(function (r) { r.showNotification(제목, { body: 몸, tag: 'sub-trial-end' }); }).catch(function () { new Notification(제목, { body: 몸, tag: 'sub-trial-end' }); });
+          else new Notification(제목, { body: 몸, tag: 'sub-trial-end' }); } catch (e) {}
+      }, ms);
+    }
   }
   function 카드닫기() {
     var s = 상태(), t = s.converts_at || s.until;
@@ -1201,10 +1269,11 @@
     var el = document.getElementById('subcard'); if (el) el.remove();
   }
   function 관리HTML() {
+    if (운영자()) return '<div id="subman" class="subman"><p><b>' + (({ en: 'Operator · all features', es: 'Operador · todas las funciones', ja: '運営者 · すべての機能', zh: '运营者 · 全部功能' })[말()] || '운영자 · 모든 기능') + '</b></p></div>';   /* 10-30 — 회원권·체험 글 대신 */
     if (!켜짐()) return '';
     var s = 상태(), h = '', 스토어길 = !!껍데기결제();
     /* 2026-10-20 — 사는 자리에서만 고지한다(아직 시작 안 함 · 끝남). 구독 중이면 「다음 결제일」이 이미 말한다. */
-    var 고지 = (!s.status || !s.열림) ? 결제고지(!s.status ? Date.now() + 7 * 864e5 : null) : '';
+    var 고지 = (!s.status || !s.열림) ? 결제고지(!s.status ? Date.now() + 14 * 864e5 : null) : '';
     if (!계정있나() && !스토어길) {
       h = '<p>' + 말글('관리계정없음') + '</p><p>' + (결제있나() ? 말글('관리전환', { 값: 첫월값() }) : 말글('다시동의')) + '</p>' + 요금줄();
     } else if (!스토어길 && (!서버있나() || !s.로그인)) {
@@ -1212,7 +1281,7 @@
     } else if (!s.status) {
       h = '<p><b>' + 말글('아직') + '</b></p><p>' + (결제있나() ? (연있나() ? 말글('관리전환둘', { 값: 두요금() }) : 말글('관리전환', { 값: 첫월값() })) : 말글('다시동의')) + '</p>' + 요금줄() + 동의줄('subAgreeT') +
         고지 +
-        줄(단추(말글('체험시작'), '구독.체험시작()', true) + (연있나() ? 단추(말글('연시작', { 값: 첫연값() }), "구독.체험시작('year')", false) : ''));
+        줄(시작단추('subscribe'));
       고지 = '';   /* 단추 위에 이미 넣었다 */
     } else if (s.열림 && s.초대) {   /* 2026-10-21 초대 코드(가입 부품) — 결제가 없다. 날짜만 */
       h = '<p>' + 말글('초대중', { 날: s.until ? 날(s.until) : '—' }) + '</p>' + 작은(말글('초대뒤'));
@@ -1243,7 +1312,7 @@
   /* ── 설치 ── */
   function 설치(o) {
     o = o || {};
-    ['app', '유료화', '가격', '회원권', '면제', '결제사', '결제', '인증', '시트열기', '시트닫기', '알림', '로그인열기', '바뀜', '계정', '말', '학생인증'].forEach(function (k) { if (k in o) 설정[k] = o[k]; });
+    ['app', '유료화', '가격', '회원권', '면제', '결제사', '결제', '인증', '시트열기', '시트닫기', '알림', '로그인열기', '바뀜', '계정', '말', '학생인증', '기본연'].forEach(function (k) { if (k in o) 설정[k] = o[k]; });
     if (o.모양) 설정.모양 = o.모양;
     설정.문구 = o.문구 && typeof o.문구 === 'object' ? o.문구 : {};
     설정.응급 = (o.응급 || []).slice();
@@ -1260,7 +1329,7 @@
       css.textContent = '.subagree{display:flex;gap:10px;align-items:flex-start;min-height:44px;padding:8px 0;cursor:pointer;line-height:1.6}' +
         '.subagree input{flex:none;width:22px;height:22px;margin:2px 0 0}.subsheet p,.subman p,.subcard p{margin:0 0 8px}' +
         /* 2026-10-20 결제 고지 — 점 없이 줄마다 「첫 결제 —」 같은 이름이 붙어 있어 목록 점을 쓰지 않는다 */
-        '.subnotice{margin:8px 0 10px;padding:0;list-style:none;font-size:14px;line-height:1.65}' +
+        '.subnotice{margin:8px 0 10px;padding:0;list-style:none;font-size:15px;line-height:1.65}' +
         '.subnotice li{margin:0 0 6px}.subnotice li:last-child{margin:0}';
       document.head.appendChild(css);
     } catch (e) {}
@@ -1294,7 +1363,7 @@
   window.구독 = {
     판: 판, 설치: 설치, 켜짐: 켜짐, 열림: 열림, 막힘: 막힘, 상태: 상태, 조회: 조회,
     체험시작: 체험시작, 해지: function () { return 해지(false); }, 해지취소: function () { return 해지(true); },
-    전환카드HTML: 전환카드HTML, 카드닫기: 카드닫기, 관리HTML: 관리HTML, 가입동의HTML: 가입동의HTML,
+    전환카드HTML: 전환카드HTML, 카드닫기: 카드닫기, 체험끝날: 체험끝날, 체험끝줄HTML: 체험끝줄HTML, 체험알림걸기: 체험알림걸기, 관리HTML: 관리HTML, 가입동의HTML: 가입동의HTML,
     관리열기: function () { 시트열기(관리HTML(), 말글('구독')); 스토어조회(); },
     닫기: 시트닫기,
     로그인: function () { 시트닫기(); try { if (계정있나() && typeof 설정.로그인열기 === 'function') 설정.로그인열기(); } catch (e) {} },
@@ -5361,8 +5430,3 @@ try { if (window.ENTRY && /^#\/(symptom|send)/.test(location.hash)) route(); } c
 try { if (/^(#\/?(home)?)?$/.test(location.hash) && (window.오늘한장 || window.필요약줄)) route(); } catch (e) {}   /* 11-12 홈의 오늘 한 장·필요할 때 약 줄은 srv.js 가 온 뒤 다시 그린다 */
 try { if (/^#\/(drug\/|schedule|together|od|vitals|pillinfo|pub|supp\/|me|consent|login|notify|sgoal|sstage|doc|hello\/3|supp$|supp\?|sgoal|sstage|rx|about|search|myths|askdoc|talk|p\/|p\?|p$)/.test(location.hash)) route(); } catch (e) {}
 
-/* 11-12 현욱님 — 체험 끝 3일 전 알림 필수. 공용 구독 부품에는 없어 약지도 쪽에 둔다(부품 원본에 넣으면 이것을 지운다).
-   유료화 스위치(구독.켜짐)가 꺼져 있으면 늘 null — 아무것도 나오지 않는다. 해지 예약을 해 두신 분께는 알리지 않는다 */
-window.체험끝날 = function () { try { if (!window.구독 || !구독.켜짐()) return null; var s = 구독.상태(); if (!s || s.status !== 'trial' || !s.until || s.cancel) return null; return { until: new Date(s.until), days: s.days }; } catch (e) { return null; } };
-window.체험끝줄 = function () { var t = 체험끝날(); if (!t || t.days == null || t.days > 3) return '';
-  return '<button type="button" class="od-line" onclick="구독.관리열기()">' + I.info + '<span>14일 체험이 ' + (t.days ? t.days + '일 뒤' : '오늘') + ' 끝나요 · 요금(월 4,900원)과 해지 방법 보기</span>' + I.chev + '</button>'; };

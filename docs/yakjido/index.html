@@ -1809,7 +1809,7 @@ background-repeat:no-repeat;background-position:right 9px center;background-size
 <script>
 window.__YAKJIDO_OK__ = true;
 const D = JSON.parse(document.getElementById('data').textContent || '{}');
-const BUILD = '2026-11-13 05:16';
+const BUILD = '2026-11-13 05:52';
 const DATAV = '6596a7ee7a'.indexOf('__') === 0 ? BUILD : '6596a7ee7a';
 const BRANDMARK = (typeof window !== 'undefined' && window.__BRANDMARK__) || 'icon-192.png';
 let CORE = 0, CORE_P = null;
@@ -3061,7 +3061,7 @@ const dh = doseHome();
 const dot = `<a class="sos-dot" href="tel:119" aria-label="119 전화">119</a>`;
 const odL = `<button type="button" class="od-line" onclick="go('/od')">${I.alert}<span>많이 먹었을 때 · 두 번 먹었을 때</span>${I.chev}</button>`;
 return `${topBar()}${ext('가족대화줄')}
-${dh || ''}${ext('체험끝줄')}
+${dh || ''}${window.구독?.체험끝줄HTML ? 구독.체험끝줄HTML() : ''}
 ${svOn() ? `<section class="hero home-q">${dot}<div class="eyebrow">${esc(hello)}</div><h1 class="greet">어디가 불편하세요?</h1><p class="sv-lead">약국에서 물어볼 약을 알려 드려요</p></section>${ER_LINE()}${kidHome()}${ext('오늘한장')}
 <div class="sv-tiles one">${SV_HOME.map(id => byId(D.symptoms, id)).filter(Boolean).map(s => `<button class="sv-tile ${gcls(s.group)}" onclick="go('/symptom/${s.id}')"><span class="ic">${sicon(s)}</span><b>${esc(s.name.split(' (')[0])}</b></button>`).join('')}</div>
 <button class="btn ghost sv-all" onclick="homeTab('all');jumpTo('hlist')">다른 증상 모두 보기${I.chev}</button>` : `<section class="hero home-q">${dot}
@@ -4453,7 +4453,7 @@ const LN = plug('LocalNotifications'); if (!LN) return;
 await (NATIVE_READY = NATIVE_READY || nativeSetup());
 try {
 const pend = (await LN.getPending()).notifications || [];
-const ours = pend.filter(p => p.id < 900000);
+const ours = pend.filter(p => p.id < 900000 && !(p.extra && p.extra.구독));   /* 11-13 공용 구독 부품의 체험 끝 알림(864003, extra.구독)은 부품 것 — 약 알림을 다시 걸 때 지우지 않는다 */
 if (NATIVE_PERM !== 'granted') { if (ours.length) await LN.cancel({ notifications: ours.map(p => ({ id: p.id })) }); return; }
 const exact = NATIVE_EXACT === 'granted', list = [], now = Date.now(), ch = noteCh(); let id = 1;
 const groups = slotGroups().slice(0, 1440), ev = eveningOn() && groups.some(g => g.t < '21:00');
@@ -4490,8 +4490,6 @@ if (when.getTime() <= now) continue;
 list.push({ id: 600000 + id++, title, body: body.slice(0, 120), channelId: ch, extra: { visit: v.id }, isExactNotification: exact, schedule: { at: when, allowWhileIdle: true } });
 }
 }
-{ const te = window.체험끝날 && 체험끝날(); const teAt = te ? new Date(te.until.getTime() - 3 * 864e5) : null; if (teAt) teAt.setHours(10, 0, 0, 0);   /* 11-12 현욱님 — 체험 끝 3일 전 알림 필수(유료화 스위치 꺼진 동안은 te 가 늘 null) */
-if (teAt && teAt.getTime() > now) list.push({ id: 800001, title: '약지도 · 체험이 3일 뒤 끝나요', body: '이어 쓰지 않으시려면 그 전에 해지하세요. 요금과 해지 방법은 내 정보 → 구독에서 볼 수 있어요.', channelId: ch, isExactNotification: exact, schedule: { at: teAt, allowWhileIdle: true } }); }
 for (const t of ((ME.vitalRemind || {}).bp || [])) { const [h, m] = t.split(':').map(Number);
 list.push({ id: 700000 + id++, title: '약지도 · 혈압 잴 시간', body: t < '12:00' ? '일어나 1시간 안, 소변 본 뒤, 혈압약 먹기 전에 재 주세요.' : '잠자기 전에 재 주세요. 앉아서 몇 분 쉰 뒤에요.',
 channelId: ch, extra: { vitals: 'bp' }, isExactNotification: exact, schedule: { on: { hour: h, minute: m }, allowWhileIdle: true } }); }
@@ -4579,7 +4577,6 @@ const again = new Date(at.getTime() + AGAIN_MIN * 60000); if (again > now && not
 const ev = new Date(now); ev.setHours(21, 0, 0, 0);
 if (eveningOn() && ev > now) NOTI_TIMERS.push(setTimeout(() => { const L = eveningLeft(todayKey(), true); if (L.length && webQuota(true)) showNote('오늘 약 체크', eveningBody(L), 'yakjido-evening', '', '#/schedule'); }, ev - now));
 for (const v of (noteOn('visit') ? visits() : [])) for (const [when, title] of visitTimes(v)) { const ms = when - now; if (ms > 0 && ms < 2147000000) NOTI_TIMERS.push(setTimeout(() => showNote(title, visitWord(v), 'visit-' + v.id, '', true), ms)); }
-{ const te = window.체험끝날 && 체험끝날(); const teAt = te ? new Date(te.until.getTime() - 3 * 864e5) : null; if (teAt) teAt.setHours(10, 0, 0, 0);   /* 11-12 현욱님 — 체험 끝 3일 전 알림 필수(유료화 스위치 꺼진 동안은 te 가 늘 null) */ const ms = teAt ? teAt - now : -1; if (ms > 0 && ms < 2147000000) NOTI_TIMERS.push(setTimeout(() => showNote('약지도 · 체험이 3일 뒤 끝나요', '이어 쓰지 않으시려면 그 전에 해지하세요. 요금과 해지 방법은 내 정보 → 구독에서 볼 수 있어요.', 'trial-end', '', true), ms)); }
 const mid = new Date(now); mid.setHours(24, 0, 1, 0);
 NOTI_TIMERS.push(setTimeout(() => dayCheck(), mid - now));
 }
