@@ -198,3 +198,6 @@
     ready: 받기().then(function () { 본문(); if (typeof route === 'function') route(); })
   };
 })();
+/* 11-12 사용자25 #21 — 영어 문장 검색 낱말 바꾸기(app-shell 의 enQ 가 부른다) */
+var EN_Q = [[/blood\s*pressure|hypertension/g, '혈압약'], [/cold\s*(medicine|medication|remedy)|flu\s*medicine/g, '감기약'], [/pain\s*(killer|reliever|medicine)|analgesic/g, '진통제'], [/head\s*ache|migraine/g, '두통'], [/heart\s*burn|acid\s*reflux/g, '속쓰림'], [/indigestion|upset\s*stomach/g, '소화불량'], [/diarrh?o?ea/g, '설사'], [/constipation/g, '변비'], [/cough/g, '기침'], [/sore\s*throat/g, '목 아픔'], [/runny\s*nose|stuffy\s*nose|congestion/g, '코막힘'], [/fever/g, '열'], [/insomnia|can'?t\s*sleep|sleep/g, '잠이 안 올 때'], [/allerg\w*/g, '알레르기'], [/back\s*pain/g, '허리'], [/period\s*pain|cramps/g, '생리통'], [/hangover/g, '숙취'], [/diabetes|blood\s*sugar/g, '당뇨약'], [/\b(cold)\b/g, '감기'], [/\b(pills?|tablets?|medicines?|medication|drugs?|for|with|and|the|a|my)\b/g, ' ']];
+window.enQS = q => /[가-힣]/.test(q) || !/[a-z]/i.test(q) ? q : EN_Q.reduce((s, [r, k]) => s.replace(r, ' ' + k + ' '), q.toLowerCase()).replace(/\s+/g, ' ').trim() || q;
