@@ -3425,6 +3425,10 @@ function seasonPick(){
    예전에는 증상 62가지를 모두 펼쳐 휴대폰 15장 길이였고, 큰 타일·색 점·색색 글자 링크가 한 화면에 섞여 있었다. */
 /* 간단히 보기 홈의 큰 칸 8개 — 어르신이 가장 많이 찾는 것(10-14 현욱님 「허리 아프다 하면 뭐 먹어야 되노」) */
 const SV_HOME = ['headache', 'cold', 'msk', 'heartburn', 'dyspepsia', 'diarrhea', 'constipation', 'insomnia'];
+/* 11-12 사용자25 #10 — 아이 모드 홈: 아이 몸무게·나이 한 줄 + 아이에게 흔한 증상 칸 */
+const KID_HOME = ['fever', 'cold', 'cough', 'diarrhea', 'gastroenteritis', 'allergy'];
+const kidHome = () => { if (ME.age !== 'child') return ''; const c = ME.child || {}, m = kidMon(), w = parseFloat(c.weight);
+  return `<section class="sec card kid-home"><b>${esc(c.name || '아이')} 기준${m != null ? ' · ' + (m >= 24 ? '만 ' + Math.floor(m / 12) + '세' : '생후 ' + m + '개월') : ''}${w > 0 ? ' · ' + w + ' kg' : ''}</b> <a class="link" href="#/kids">${w > 0 ? '해열제 양 보기' : '몸무게 넣고 해열제 양 보기'} ›</a><div class="sv-tiles" style="margin-top:10px">${KID_HOME.map(id => byId(D.symptoms, id)).filter(Boolean).map(s => `<button class="sv-tile ${gcls(s.group)}" onclick="go('/symptom/${s.id}')"><span class="ic">${sicon(s)}</span><b>${esc(s.name.split(' (')[0])}</b></button>`).join('')}</div></section>`; };
 const HOME_TOP = ['cold', 'fever', 'headache', 'msk', 'heartburn', 'dyspepsia', 'diarrhea', 'constipation', 'cough', 'rhinitis', 'allergy', 'insomnia'];
 let HTAB = (() => { try { return sessionStorage.getItem('yakjido.htab') || 'top'; } catch (e) { return 'top'; } })();
 /* 한 줄 행 — ClinicScore 의 .ask-cta 와 같은 틀. 오른쪽 낱말은 누르면 무슨 일이 생기는지 */
@@ -3490,14 +3494,14 @@ function vHome(){
   const odL = `<button type="button" class="od-line" onclick="go('/od')">${I.alert}<span>많이 먹었을 때 · 두 번 먹었을 때</span>${I.chev}</button>`;
   return `${topBar()}${ext('가족대화줄')}
   ${dh || ''}
-  ${svOn() ? `<section class="hero home-q">${dot}<div class="eyebrow">${esc(hello)}</div><h1 class="greet">어디가 불편하세요?</h1><p class="sv-lead">약국에서 물어볼 약을 알려 드려요</p></section>${ER_LINE()}
+  ${svOn() ? `<section class="hero home-q">${dot}<div class="eyebrow">${esc(hello)}</div><h1 class="greet">어디가 불편하세요?</h1><p class="sv-lead">약국에서 물어볼 약을 알려 드려요</p></section>${ER_LINE()}${kidHome()}
   <div class="sv-tiles one">${SV_HOME.map(id => byId(D.symptoms, id)).filter(Boolean).map(s => `<button class="sv-tile ${gcls(s.group)}" onclick="go('/symptom/${s.id}')"><span class="ic">${sicon(s)}</span><b>${esc(s.name.split(' (')[0])}</b></button>`).join('')}</div>
   <button class="btn ghost sv-all" onclick="homeTab('all');jumpTo('hlist')">다른 증상 모두 보기${I.chev}</button>` : `<section class="hero home-q">${dot}
     <div class="eyebrow">${esc(hello)}</div>
     <h1 class="greet">어디가 불편하세요?</h1>
     <p>증상을 고르면 약국에서 물어볼 약을 알려 드려요.</p>
   </section>`}
-  ${svOn() ? '' : regionGrid()}
+  ${svOn() ? '' : kidHome() + regionGrid()}
   ${odL}${homeQuick(n)}
   ${ext('대화줄')}
   ${ext('응급칸')}${svOn() ? '' : ER_LINE()}
@@ -5741,8 +5745,8 @@ function vSchedule(_, q){
   const todays = []; for (const d of taking) for (const t of schedOf(d.id, d)) { const [h, m] = t.split(':').map(Number); todays.push({ d, t, min: h * 60 + m, done: taken.includes(d.id + '@' + t), skip: isSkipped(d.id + '@' + t) }); }
   todays.sort((a, b) => a.min - b.min);
   const lateL = todays.filter(x => !x.done && !x.skip && x.min < nowMin - 60);
-  return `${topBar({ back:'내 정보' })}<div class="eyebrow">복용 시간 알림 · <button type="button" class="link" onclick="go('/notify')">알림 설정</button></div><h1>오늘 약, 잊지 않게</h1>${todays.length ? todayHero(todays, nowMin) : art('schedule', 'banner')}
-  ${leadHtml('먹는 약마다 시간을 고르면 오늘 할 일이 체크 목록으로 나오고, 시간이 되면 알려드려요. **시간을 정한 약만** 알려 드려요 — 설명서·안내 간격대로 시간을 제안해 드리니 맞으면 「이 시간으로 정하기」를 누르세요.', 'margin-top:6px', todays.length ? 'small muted' : '')}
+  return `${topBar({ back:'내 정보' })}<div class="eyebrow">복용 시간 알림 · <button type="button" class="link" onclick="go('/notify')">알림 설정</button></div><h1>오늘 약, 잊지 않게</h1>${todays.length ? todayHero(todays, nowMin) : taking.length ? '' : art('schedule', 'banner')}
+  ${leadHtml('먹는 약마다 시간을 고르면 오늘 할 일이 체크 목록으로 나오고, 시간이 되면 알려드려요. **시간을 정한 약만** 알려 드려요 — 설명서·안내 간격대로 시간을 제안해 드리니 맞으면 「이 시간으로 정하기」를 누르세요.', 'margin-top:6px', todays.length || taking.length ? 'small muted' : '')}
   ${taking.filter(schedUnset).length ? `<div class="note" style="margin-top:10px">${I.clock}<span><b>시간을 아직 정하지 않은 약이 ${taking.filter(schedUnset).length}가지 있어요</b> — 아래 「약마다 시간 고르기」에서 매일 드시는지, 필요할 때만 드시는지 골라 주세요.</span></div>` : ''}
   ${!taking.length ? `<section class="sec card"><div class="empty"><b>아직 담아 둔 약이 없어요</b>약 사전에서 약을 찾아 ‘내 약통에 담기’를 누르면 여기 나와요.</div><div class="actions"><button class="btn ghost" onclick="go('/drugs')">${I.search} 약 찾기</button></div></section>` : ''}
   ${todays.length ? `<section class="sec"><h2>오늘 <small>${now.getMonth() + 1}월 ${now.getDate()}일 · ${todays.filter(x => x.done).length}/${todays.length} 완료</small></h2>${daypartGroups(todays).map(([part, list]) => `<div class="dp"><div class="dp-h">${part}</div><div class="dose-list">${list.map(x => `<button class="dose-tick ${x.done ? 'done' : x.skip ? 'skip' : (x.min < nowMin - 60 ? 'late' : '')}" onclick="tick('${x.d.id}','${x.t}')" aria-pressed="${x.done}"><span class="bx">${x.done ? I.check : x.skip ? '–' : ''}</span><span class="n"><b>${esc(x.d.name)}</b><small>${x.done ? '<b>먹음</b> · ' : x.skip ? '' : '아직 · '}<span class="t">${x.t}</span> · ${x.skip ? '건너뛰었어요 — 드셨으면 눌러 주세요' : fmt((x.d.simple || '').split('.')[0])}</small></span></button>`).join('')}</div></div>`).join('')}${todays.length && todays.every(x => x.done) ? `<div class="care ok" style="margin-top:12px"><div class="hd">${I.check}오늘 약 다 드셨어요 · 수고하셨어요</div><div class="bd"><button class="btn line" style="width:100%;min-height:48px" onclick="sendCare()">${I.family} 보호자에게 오늘 상태 보내기</button></div></div>` : ''}${lateL.length ? `<details class="why-more" style="margin-top:10px"><summary>드셨는지 기억이 안 나요${I.chev}</summary><div class="why" style="margin-top:6px"><p>확실하지 않으면 <b>이번 회는 건너뛰고</b> 다음 시간부터 원래대로 드세요. 대부분의 약은 <b>두 번 드시는 쪽이 더 위험</b>해요. 피임약·항생제처럼 놓치면 곤란한 약은 약사에게 물어보세요. 앞으로는 드시자마자 위 칸을 눌러 두시면 헷갈리지 않아요.</p>
