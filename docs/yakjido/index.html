@@ -225,7 +225,7 @@ ol.tl li:last-child{padding-bottom:0}
 .view-row .t span{display:block;font-size:.875rem;color:var(--muted)}
 .fs-seg{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end;min-width:0}
 .fs-seg button{min-width:52px;min-height:48px;border-radius:12px;background:var(--tint2);color:var(--muted);font-weight:800}
-.fs-seg button.on{background:var(--primary);color:var(--on-primary)}.fs-seg button small{display:block;font-size:14px;font-weight:600}
+.fs-seg button.on{background:var(--primary);color:var(--on-primary)}.fs-seg button small{display:block;font-size:max(14px,.75rem);font-weight:600}
 .fs-seg button:nth-child(1){font-size:.875rem} .fs-seg button:nth-child(2){font-size:1.0625rem} .fs-seg button:nth-child(3){font-size:1.25rem} .fs-seg button:nth-child(4){font-size:1.4375rem}
 .fs-seg button{min-width:46px}
 .hello-fs{margin-top:var(--s3);padding:14px;border-radius:14px;background:var(--tint2);display:flex;align-items:center;justify-content:space-between;gap:10px}
@@ -1768,7 +1768,7 @@ background-repeat:no-repeat;background-position:right 9px center;background-size
 <script>
 window.__YAKJIDO_OK__ = true;
 const D = JSON.parse(document.getElementById('data').textContent || '{}');
-const BUILD = '2026-11-12 19:30';
+const BUILD = '2026-11-12 19:59';
 const DATAV = 'd7d6fed541'.indexOf('__') === 0 ? BUILD : 'd7d6fed541';
 const BRANDMARK = (typeof window !== 'undefined' && window.__BRANDMARK__) || 'icon-192.png';
 let CORE = 0, CORE_P = null;
@@ -3342,12 +3342,13 @@ const rawOf = t => { const r = new Map(); if (t.pub?.ingr) for (const x of t.pub
 function cabMap(){ const m = new Map(); for (const t of takingItems()) { const raw = rawOf(t); for (const e of ingOf(t).ings) if (!e.topical && !e.approx && !m.has(e.k)) m.set(e.k, { from: t.name, raw: raw.get(e.k) }); } return m; }
 const ingNm = k => ingrNameK(ingIndex().byKey[k]?.n || k);
 const AC_NSAID = '금기는 아니지만 위장관 출혈 가능성이 있어 주의해요. 처방한 의사와 먼저 상의하세요';
-const cauLine = (d, f) => d && f.includes('anticoag') && isNsaid(d) ? AC_NSAID : '';
+const KD_NSAID = '콩팥이 안 좋으면 소염진통제가 콩팥 기능을 더 떨어뜨릴 수 있어요. 금기는 아니지만 주의 — 심한 신부전이면 먹지 마세요(설명서). 먹기 전에 의사·약사와 상의하세요';
+const cauLine = (d, f) => !d || !isNsaid(d) ? '' : [f.includes('anticoag') ? AC_NSAID : '', f.includes('kidney') ? KD_NSAID : ''].filter(Boolean).join(' · ');
 const askLine = (d, m) => { const a = d?.ageAskMonths; return Number.isFinite(a) && (m == null || m < a) ? `${a >= 24 ? '만 ' + Math.floor(a / 12) + '세' : '생후 ' + a + '개월'} 전에는 먹이기 전에 의사·약사와 상의하세요` : ''; };
 function basket(s, ov){
 const f = ov ? ov.flags : activeFlags(); const senior = ov ? f.includes('senior') : ME.age === 'senior';
 const kidMode = !ov && f.includes('child'), km = kidMode ? kidMon() : null;
-const whyOf = x => { const d = drug(x); return [...new Set([...(d?.avoid || []), ...(d?.caution || []).filter(c => c?.ask)].flatMap(a => (a.flags || []).filter(fl => f.includes(fl) && !(fl === 'child' && kidMode && minAgeOf(d) != null))))]; };
+const whyOf = x => { const d = drug(x); return [...new Set([...(d?.avoid || []), ...(d?.caution || []).filter(c => c?.ask)].flatMap(a => (a.flags || []).filter(fl => f.includes(fl) && !(fl === 'child' && kidMode && minAgeOf(d) != null) && !(fl === 'kidney' && isNsaid(d)))))]; };
 const alg = ov ? [] : allergyKeys();
 const allergic = x => alg.length && drugKeys(drug(x)).some(k => alg.includes(k));
 const algC = x => !ov && !!allergyClassHit(drug(x));
@@ -3381,7 +3382,7 @@ const blocked = d ? whyOf(pick).length > 0 : false;
 if (d && allergic(pick)) { dropped.push({ name: ingrName(d), why: 'allergy' }); return null; }
 const algCls = d && algC(pick);
 if (d && blocked && f.includes('pregnant') && isNsaid(d) && whyOf(pick).includes('pregnant')) { dropped.push({ name: ingrName(d), why: 'pregnant' }); return null; }
-const hard = d ? [...new Set((d.avoid || []).filter(a => !narrowAv(a)).flatMap(a => (a.flags || []).filter(fl => f.includes(fl) && !(fl === 'child' && kidMode && minAgeOf(d) != null))))] : [];
+const hard = d ? [...new Set((d.avoid || []).filter(a => !narrowAv(a)).flatMap(a => (a.flags || []).filter(fl => f.includes(fl) && !(fl === 'child' && kidMode && minAgeOf(d) != null) && !(fl === 'kidney' && isNsaid(d)))))] : [];   /* 11-12 결정 2 — 신장은 소염제를 빼지 않고 주의 */
 if (hard.length) { if (!p.optional) dropped.push({ name: ingrName(d), why: 'avoid', fl: hard }); return null; }
 const kid = kidMode || kidSlot(p);
 const product = p.prod && !swapped ? p.prod : kid ? (kidProds(d)[0] || (kidMode && kidAdultOk(d) ? d?.products?.[0]?.name : '') || '') : (p.prod && (d?.products || []).some(pr => pr.name === p.prod) ? p.prod : d?.products?.[0]?.name);
@@ -3912,7 +3913,7 @@ const allBan = (p.options || []).length && ban && (p.options || []).every(o => b
 return `<div class="slot"><div class="n ${kind}">${esc(p.slot)}</div><div>
 <h3>${esc(allBan ? p.slot + ' — 내 몸 조건엔 먼저 상의' : (p.title || p.slot))} ${p.otc === false ? '<span class="badge rx">처방 필요</span>' : !(p.options || []).length ? '<span class="badge cvs">약 없이 할 일</span>' : p.optional ? '<span class="badge soft">도움될 수 있어요</span>' : '<span class="badge otc">약국 구입</span>'}</h3>
 ${allBan ? `<p class="why">내 몸 조건에서는 이 칸 약을 먹기 전에 의사와 먼저 상의하세요.</p>` : whyHtml(banProse(p.why, ban))}
-<div class="opts">${(p.options || []).map(oid => { const d = drug(oid); if (!d) return ''; const yg = f.includes('child') && kidTooYoung(d, kidMon()), oc = ENTRY?.from === 'gildongmu' && isNsaid(d), warn = yg || oc || d.avoid?.some(a => a.flags?.some(x => f.includes(x)));
+<div class="opts">${(p.options || []).map(oid => { const d = drug(oid); if (!d) return ''; const yg = f.includes('child') && kidTooYoung(d, kidMon()), oc = ENTRY?.from === 'gildongmu' && isNsaid(d), warn = yg || oc || d.avoid?.some(a => a.flags?.some(x => f.includes(x) && !(x === 'kidney' && isNsaid(d))));
 if (warn) return `<span class="opt-pill no">${esc(ingrName(d))} <span class="badge stop">${yg ? '이 나이엔 쓰지 않아요' : oc ? '치료팀에 먼저 확인' : '내 몸 조건엔 피하세요'}</span></span>`; return `<a class="opt-pill ${p.pick === oid ? 'pick' : ''}" href="#${String(oid).startsWith('lex:') ? '/ingr/' + String(oid).slice(4) : '/drug/' + oid}">${p.pick === oid ? '<span class="dot"></span>' : ''}${esc(d.name)}${warn ? ' <span class="badge stop">내 정보 주의</span>' : ''}</a>`; }).join('')}</div>
 ${p.alt ? `<p class="alt">${fmt(p.alt)}</p>` : ''}
 </div></div>`;
