@@ -1809,8 +1809,8 @@ background-repeat:no-repeat;background-position:right 9px center;background-size
 <script>
 window.__YAKJIDO_OK__ = true;
 const D = JSON.parse(document.getElementById('data').textContent || '{}');
-const BUILD = '2026-11-13 01:31';
-const DATAV = '69789131ef'.indexOf('__') === 0 ? BUILD : '69789131ef';
+const BUILD = '2026-11-13 01:41';
+const DATAV = '6596a7ee7a'.indexOf('__') === 0 ? BUILD : '6596a7ee7a';
 const BRANDMARK = (typeof window !== 'undefined' && window.__BRANDMARK__) || 'icon-192.png';
 let CORE = 0, CORE_P = null;
 function mergeCore(c){
@@ -1860,7 +1860,8 @@ if (window.__SRC__) { mergeSrc(window.__SRC__); return (SRC_P = Promise.resolve(
 SRC_P = fetch('data/src.json?v=' + DATAV).then(r => { if (!r.ok) throw 0; return r.json(); }).then(mergeSrc).catch(() => { SRC = 3; SRC_P = null; });
 return SRC_P;
 }
-ensureCore(); ensureDetail(); ensureSrc();
+const DATA_GO = new Promise(go => { setTimeout(go, 1200); try { document.fonts.ready.then(() => setTimeout(go, 0)); } catch (e) {} });
+DATA_GO.then(() => { ensureCore(); ensureDetail(); ensureSrc(); });
 const byId = (arr, id) => (arr || []).find(x => x.id === id);
 function lexAsDrug(lid){
 if (!LEX.ing) { lexLoad(); return null; }
@@ -6828,12 +6829,12 @@ route();
 if ('serviceWorker' in navigator && location.protocol.startsWith('http') && !NATIVE) {
 navigator.serviceWorker.register('sw.js').catch(() => {});
 const warmCore = () => { if (warmCore.done) return; warmCore.done = true; for (const f of ['core', 'detail', 'src']) fetch(`data/${f}.json?v=${DATAV}`).catch(() => { warmCore.done = false; }); };
-if (navigator.serviceWorker.controller) Promise.all([ensureCore(), ensureDetail()]).then(() => setTimeout(warmCore, 800));
+if (navigator.serviceWorker.controller) DATA_GO.then(() => Promise.all([ensureCore(), ensureDetail()])).then(() => setTimeout(warmCore, 800));
 else navigator.serviceWorker.addEventListener('controllerchange', () => setTimeout(warmCore, 300));
 const warm = () => { ['lexicon.json', 'brands.json', 'qa.json', 'mixes.json', 'nutrients.json', 'easy-index.json', 'pills.json']
 .forEach((f, i) => setTimeout(() => fetch(dataPath(f), { cache:'force-cache' }).catch(() => {}), i * 1200)); };
 const warmLater = () => { try { const c = navigator.connection; if (c && (c.saveData || /2g/.test(c.effectiveType || ''))) return; } catch (e) {} if ('requestIdleCallback' in window) requestIdleCallback(warm, { timeout:8000 }); else setTimeout(warm, 4000); };
-Promise.all([ensureCore(), ensureDetail()]).then(() => setTimeout(warmLater, 1500));
+DATA_GO.then(() => Promise.all([ensureCore(), ensureDetail()])).then(() => setTimeout(warmLater, 1500));
 }
 </script>
 <script src="srv.js" defer></script>   <!-- 계정·기록 이어 두기(메디나눔 공용 서버) — 첫 화면 예산 밖으로 -->

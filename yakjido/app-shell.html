@@ -2054,8 +2054,10 @@ function ensureSrc(){
   SRC_P = fetch('data/src.json?v=' + DATAV).then(r => { if (!r.ok) throw 0; return r.json(); }).then(mergeSrc).catch(() => { SRC = 3; SRC_P = null; });
   return SRC_P;
 }
-/* 첫 화면을 그리는 것과 동시에 시작한다 — 기다리는 시간이 겹치게 */
-ensureCore(); ensureDetail(); ensureSrc();
+/* 11-12 첫 화면 글꼴이 먼저 — 본문·약 칸·출처(압축 500 KB)가 글꼴과 선을 나눠 쓰면 첫 화면 글씨가 늦게 바뀌었다(측정 LCP 7.5초).
+   글꼴이 준비되면(늦어도 1.2초) 받기 시작한다. 본문이 필요한 화면(증상·약)은 route 가 곧바로 ensureCore 를 불러 기다리지 않는다 */
+const DATA_GO = new Promise(go => { setTimeout(go, 1200); try { document.fonts.ready.then(() => setTimeout(go, 0)); } catch (e) {} });
+DATA_GO.then(() => { ensureCore(); ensureDetail(); ensureSrc(); });
 const byId = (arr, id) => (arr || []).find(x => x.id === id);
 /* 사전에만 있는 성분도 조합에 넣을 수 있게 — 'lex:id' 는 최소한의 약 객체로 만들어 준다 */
 function lexAsDrug(lid){
@@ -8135,7 +8137,7 @@ if ('serviceWorker' in navigator && location.protocol.startsWith('http') && !NAT
   /* 첫 방문에는 본문을 워커가 붙기 전에 받아 어느 캐시에도 없었다 — 그래서 첫 방문 뒤 비행기 모드로 열면 「자료를 불러오지 못했어요」(5-01).
      워커가 이 화면을 맡으면 같은 주소로 한 번 더 불러(대개 브라우저 캐시에서 바로 온다) 워커 캐시에 넣는다. */
   const warmCore = () => { if (warmCore.done) return; warmCore.done = true; for (const f of ['core', 'detail', 'src']) fetch(`data/${f}.json?v=${DATAV}`).catch(() => { warmCore.done = false; }); };
-  if (navigator.serviceWorker.controller) Promise.all([ensureCore(), ensureDetail()]).then(() => setTimeout(warmCore, 800));
+  if (navigator.serviceWorker.controller) DATA_GO.then(() => Promise.all([ensureCore(), ensureDetail()])).then(() => setTimeout(warmCore, 800));
   else navigator.serviceWorker.addEventListener('controllerchange', () => setTimeout(warmCore, 300));
   /* 설치된 앱이 비행기 모드에서도 쓸 수 있게, 한가할 때 핵심 자료를 미리 받아 캐시에 넣는다.
      서비스워커의 fetch 처리가 응답을 캐시하므로 여기서는 「부르기만」 하면 된다. */
@@ -8144,7 +8146,7 @@ if ('serviceWorker' in navigator && location.protocol.startsWith('http') && !NAT
       /* 앱이 받을 때와 같은 판 주소로 — 워커 캐시에 그대로 맞물린다 */
   /* 본문·약 칸이 다 온 뒤, 2G급이 아닐 때만(2026-10-08) — 17 MB 자료가 본문과 선을 나눠 쓰지 않게 */
   const warmLater = () => { try { const c = navigator.connection; if (c && (c.saveData || /2g/.test(c.effectiveType || ''))) return; } catch (e) {} if ('requestIdleCallback' in window) requestIdleCallback(warm, { timeout:8000 }); else setTimeout(warm, 4000); };
-  Promise.all([ensureCore(), ensureDetail()]).then(() => setTimeout(warmLater, 1500));
+  DATA_GO.then(() => Promise.all([ensureCore(), ensureDetail()])).then(() => setTimeout(warmLater, 1500));
 }
 </script>
 <script src="srv.js" defer></script>   <!-- 계정·기록 이어 두기(메디나눔 공용 서버) — 첫 화면 예산 밖으로 -->
