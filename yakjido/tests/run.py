@@ -924,8 +924,10 @@ def r5_checks(br, url, fails):
         if '이렇게 드세요' not in t or '이럴 땐 바로' not in t or '깜빡했을 때' not in t: fails.append(f'처방약 길잡이 /rx/{g} 화면이 비었거나 칸이 빠졌습니다')
         _RG = json.load(open(pathlib.Path(__file__).resolve().parent.parent / 'rxguide.json', encoding='utf-8')); _rv = _RG['guides'][g].get('reviewed', _RG.get('reviewed'))
         # 10-26 현욱님 답 9 — 검수가 끝나면(reviewed) 「의사 확인 중」이 없어야, 그 전엔 있어야 한다
-        if _rv and '의사 확인 중' in pz.evaluate("()=>document.querySelector('.top')?.innerText||''"): fails.append(f'처방약 길잡이 /rx/{g} 에 검수 끝났는데 「의사 확인 중」이 남았습니다')
-        if not _rv and '의사 확인 중' not in t: fails.append(f'처방약 길잡이 /rx/{g} 에 검수 전 표시가 없습니다')
+        # 11-13 도장 글은 「자료 확인 중」(예전 「의사 확인 중」) — 둘 다 검수 전 표시로 본다
+        _top = pz.evaluate("()=>document.querySelector('.top')?.innerText||''"); _unv = lambda x: '의사 확인 중' in x or '자료 확인 중' in x
+        if _rv and _unv(_top): fails.append(f'처방약 길잡이 /rx/{g} 에 검수 끝났는데 검수 전 도장이 남았습니다')
+        if not _rv and not _unv(_top): fails.append(f'처방약 길잡이 /rx/{g} 에 검수 전 표시가 없습니다')
     go('/rx/bp')
     if '내 약' not in txt(): fails.append('처방약 길잡이: 내 약통의 …프릴 약에 「내 약」 표시가 없습니다')
     go('/kinds/bp')
