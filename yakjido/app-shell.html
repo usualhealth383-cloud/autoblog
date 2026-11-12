@@ -249,7 +249,7 @@ ol.tl li:last-child{padding-bottom:0}
 .view-row .t span{display:block;font-size:.875rem;color:var(--muted)}
 .fs-seg{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end;min-width:0}
 .fs-seg button{min-width:52px;min-height:48px;border-radius:12px;background:var(--tint2);color:var(--muted);font-weight:800}
-.fs-seg button.on{background:var(--primary);color:var(--on-primary)}
+.fs-seg button.on{background:var(--primary);color:var(--on-primary)}.fs-seg button small{display:block;font-size:.6875rem;font-weight:600}
 .fs-seg button:nth-child(1){font-size:.875rem} .fs-seg button:nth-child(2){font-size:1.0625rem} .fs-seg button:nth-child(3){font-size:1.25rem} .fs-seg button:nth-child(4){font-size:1.4375rem}
 .fs-seg button{min-width:46px}
 .hello-fs{margin-top:var(--s3);padding:14px;border-radius:14px;background:var(--tint2);display:flex;align-items:center;justify-content:space-between;gap:10px}
@@ -3494,14 +3494,14 @@ function vHome(){
   const odL = `<button type="button" class="od-line" onclick="go('/od')">${I.alert}<span>많이 먹었을 때 · 두 번 먹었을 때</span>${I.chev}</button>`;
   return `${topBar()}${ext('가족대화줄')}
   ${dh || ''}
-  ${svOn() ? `<section class="hero home-q">${dot}<div class="eyebrow">${esc(hello)}</div><h1 class="greet">어디가 불편하세요?</h1><p class="sv-lead">약국에서 물어볼 약을 알려 드려요</p></section>${ER_LINE()}${kidHome()}
+  ${svOn() ? `<section class="hero home-q">${dot}<div class="eyebrow">${esc(hello)}</div><h1 class="greet">어디가 불편하세요?</h1><p class="sv-lead">약국에서 물어볼 약을 알려 드려요</p></section>${ER_LINE()}${kidHome()}${ext('오늘한장')}
   <div class="sv-tiles one">${SV_HOME.map(id => byId(D.symptoms, id)).filter(Boolean).map(s => `<button class="sv-tile ${gcls(s.group)}" onclick="go('/symptom/${s.id}')"><span class="ic">${sicon(s)}</span><b>${esc(s.name.split(' (')[0])}</b></button>`).join('')}</div>
   <button class="btn ghost sv-all" onclick="homeTab('all');jumpTo('hlist')">다른 증상 모두 보기${I.chev}</button>` : `<section class="hero home-q">${dot}
     <div class="eyebrow">${esc(hello)}</div>
     <h1 class="greet">어디가 불편하세요?</h1>
     <p>증상을 고르면 약국에서 물어볼 약을 알려 드려요.</p>
   </section>`}
-  ${svOn() ? '' : kidHome() + regionGrid()}
+  ${svOn() ? '' : kidHome() + ext('오늘한장') + regionGrid()}${ext('약담기권함')}
   ${ext('필요약줄')}${odL}${homeQuick(n)}
   ${ext('대화줄')}
   ${ext('응급칸')}${svOn() ? '' : ER_LINE()}
@@ -7928,7 +7928,7 @@ function vCompare(_, q){
 const FS_STEPS = [['17px', '보통'], ['19px', '크게'], ['21px', '더 크게'], ['23px', '가장 크게']];
 /* 사이트 저장이 막힌 브라우저에서는 localStorage 를 읽기만 해도 오류라 설정 화면이 통째로 깨졌다(5-10) */
 const lsGet = k => { try { return localStorage.getItem(k); } catch (e) { return null; } };
-const fsSeg = () => `<div class="fs-seg" role="group" aria-label="글자 크기">${FS_STEPS.map(([k, n]) => `<button class="${(lsGet('yakjido.fs') || '17px') === k ? 'on' : ''}" aria-pressed="${(lsGet('yakjido.fs') || '17px') === k}" onclick="setFs('${k}');route()" aria-label="글자 ${esc(n)}">가</button>`).join('')}</div>`;
+const fsSeg = () => `<div class="fs-seg" role="group" aria-label="글자 크기">${FS_STEPS.map(([k, n]) => `<button class="${(lsGet('yakjido.fs') || '17px') === k ? 'on' : ''}" aria-pressed="${(lsGet('yakjido.fs') || '17px') === k}" onclick="setFs('${k}');route()" aria-label="글자 ${esc(n)}">가<small>${esc(n)}</small></button>`).join('')}</div>`;
 /* ── 내 기록을 파일 하나로 옮기기 ──
    기록을 서버에 두지 않기로 했으니, 휴대폰을 바꾸면 그대로 사라진다.
    복약 달력 60일치와 불편했던 일까지 쌓이기 시작하면 그 손실이 크다.

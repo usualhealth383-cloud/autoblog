@@ -5179,6 +5179,12 @@ window.필요약줄 = function () { try {
   const kid = ME.age === 'child', now = new Date();
   return `<section class="sec card prn-home"><div class="rows-l">${L.slice(0, 3).map(([d, st]) => lrow(I.clock, esc(d.name), `마지막 ${hhmm(st.last)}${st.last.getDate() !== now.getDate() ? '(어제)' : ''} · ${st.next && st.next > now ? `다음은 ${hhmm(st.next)}부터` : `지금 ${kid ? '먹여도' : '드셔도'} 되는 간격이에요`}${st.max ? ` · 오늘 ${st.count}/${st.max}번` : ''}`, "go('/schedule')")).join('')}</div></section>`;
 } catch (e) { return ''; } };
+/* 11-12 매일 쓸 이유(10-30 현욱님) — 약통이 빈 분께 홈 첫 화면에 「오늘의 한 장」과 「약 담으면 매일 체크·연속 기록」 */
+window.오늘한장 = function () { try {
+  if (takingItems().length) return ''; const T = D.tips || []; if (!T.length) return ''; const t = T[new Date().getDate() % T.length];
+  return `<div class="rows-l today-one" style="margin-top:10px">${lrow(icon(t.icon), '오늘의 한 장 — ' + esc(t.title), '하루 한 가지, 1분이면 읽어요', `go('/tips?open=${t.id}')`)}</div>`;
+} catch (e) { return ''; } };
+window.약담기권함 = function () { try { return takingItems().length ? '' : `<div class="rows-l" style="margin-top:10px">${lrow(I.clock, '드시는 약이 있으면 담아 두세요', '매일 「드셨어요」 체크와 연속 기록이 생겨요', "go('/kinds')")}</div>`; } catch (e) { return ''; } };
 /* ▼ 11-11 다른 앱 입구 — 띠·아이 설명(app-shell 에서 옮김) */
 window.KID_TRI = { clinic: '병원에서는 아이가 얼마나 마시고 소변을 보는지, 열과 다른 병의 신호가 있는지 먼저 살펴봐요. 검사나 약은 아이 상태에 따라 필요한 경우에만 써요.',
   pharmacy: '아이 약은 나이와 몸무게에 따라 달라요. 약국에서는 아이 나이(개월 수)와 몸무게를 먼저 말씀하시고 약사와 함께 골라요. 어른 약을 줄여서 먹이지 마세요.',
@@ -5204,4 +5210,5 @@ window.entryBandS = function (s){
 }
 /* ▲ */
 try { if (window.ENTRY && /^#\/(symptom|send)/.test(location.hash)) route(); } catch (e) {}
+try { if (/^(#\/?(home)?)?$/.test(location.hash) && (window.오늘한장 || window.필요약줄)) route(); } catch (e) {}   /* 11-12 홈의 오늘 한 장·필요할 때 약 줄은 srv.js 가 온 뒤 다시 그린다 */
 try { if (/^#\/(od|vitals|pillinfo|pub|supp\/|me|consent|login|notify|sgoal|sstage|doc|hello\/3|supp$|supp\?|sgoal|sstage|rx|about|search|myths|askdoc|talk|p\/|p\?|p$)/.test(location.hash)) route(); } catch (e) {}
