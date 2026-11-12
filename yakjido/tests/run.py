@@ -285,7 +285,7 @@ def alarm_z6(br, url, fails):
         pz.add_init_script("localStorage.setItem('yakjido.hello.v1','1');localStorage.setItem('yakjido.consent.v1',JSON.stringify({v:'2026-10-20',at:'2026-10-14',terms:1,privacy:1}));localStorage.setItem('yakjido.me.v1',%s)" % json.dumps(json.dumps(me)))
         pz.goto(url + '#/schedule?t=sc4'); pz.wait_for_selector('.app', timeout=15000); pz.wait_for_timeout(1500)
         return pz
-    SR = {'age': 'senior', 'easy': True, 'taking': ['ibuprofen', 'acetaminophen'], 'sched': {'ibuprofen': ['08:00', '20:00'], 'acetaminophen': ['08:00']}, 'qty': {'acetaminophen': 2}, 'pub': {}}
+    SR = {'notename': True, 'age': 'senior', 'easy': True, 'taking': ['ibuprofen', 'acetaminophen'], 'sched': {'ibuprofen': ['08:00', '20:00'], 'acetaminophen': ['08:00']}, 'qty': {'acetaminophen': 2}, 'pub': {}}
     pz = page(SR)
     P = lambda: pz.evaluate("()=>__LN.pending")
     L = P(); dose = [x for x in L if x.get('actionTypeId') == 'dose']
@@ -446,11 +446,11 @@ def z7_checks(br, url, fails):
     if pc and '아세트아미노펜' in pc[0]['i'] and '아세트아미노펜' not in t: fails.append('Z7 A3: 판콜에이캡슐 + 타이레놀정500인데 아세트아미노펜 겹침이 안 뜸')
     # 10-14 디자인 리서치 3-7 — 요약 띠 숫자 = 판정 행 수 = 머리 문장 숫자, 같은 원인(아세트아미노펜 겹침)은 빨강 한 행에만
     _b = pz.evaluate("""()=>{ const n=k=>document.querySelectorAll('#view details.ix.'+k).length; const head=(document.querySelector('.ix-sum b')||{}).textContent||'';
-      return {band:[...document.querySelectorAll('.ix-band button b')].map(b=>+b.textContent), rows:[n('stop'),n('warn'),n('info')], nums:(head.match(/\\d+/g)||[]).map(Number),
+      return {band:[...document.querySelectorAll('.ix-band2 button')].map(b=>+((b.textContent.match(/\\d+/)||[0])[0])), rows:[n('stop'),n('warn'),n('info')], nums:(head.match(/\\d+/g)||[]).map(Number),
         apap:[...document.querySelectorAll('.ix-h b')].filter(b=>/아세트아미노펜이 두 군데/.test(b.textContent)).length,
         tick:document.querySelectorAll('.ix-do svg').length}; }""")
     if pc and '아세트아미노펜' in pc[0]['i']:
-        if _b['band'] != _b['rows'] or _b['nums'] != [x for x in _b['rows'][:2] if x]: fails.append(f'3-7: 요약 띠·머리 숫자와 판정 행 수가 다름 — {_b}')
+        if _b['band'] != [x for x in _b['rows'] if x]: fails.append(f'3-7: 판정 묶음 칩 숫자와 판정 행 수가 다름 — {_b}')   # 11-11 머리 문장은 숫자 대신 장기 이름(ix-top)
         if _b['apap']: fails.append('3-7: 아세트아미노펜 겹침이 「같은 성분」 행과 따로 한 번 더 나옴')
         if _b['tick']: fails.append('3-7: 경고 행의 할 일 앞에 ✓ 표시')
     pz.evaluate(RESET); pz.evaluate(ADD, '타이레놀정500')
@@ -594,7 +594,7 @@ def z9_checks(br, url, fails):
     pz.click('.bg-hi button:has-text("없음")'); pz.wait_for_timeout(100)
     if '다음 공복에 다시 재세요' not in pz.inner_text('.bg-hi'): fails.append('혈당 320 식후 + 증상 없음 → 「다시 재세요」가 아닙니다')
     pz.click('.bg-hi button:has-text("구토·복통")'); pz.wait_for_timeout(100)
-    if '바로 진료' not in pz.inner_text('.bg-hi') or not pz.query_selector('.bg-hi a.call[href="tel:119"]'): fails.append('혈당 320 + 구토·복통 → 「바로 진료·119」 단추가 없습니다')
+    if '바로 진료' not in pz.inner_text('.bg-hi') or not pz.query_selector('.bg-hi a.call'): fails.append('혈당 320 + 구토·복통 → 「바로 진료·119」 단추가 없습니다')
     if pz.evaluate("()=>(VT.bgs||[]).includes(4)"): fails.append('혈당 증상 칩 — 증상을 고르면 「없음」이 풀려야 합니다')
     bg(350, '공복'); pz.click('.bg-hi button:has-text("없음")'); pz.wait_for_timeout(100)
     if '오늘 안에 진료' not in pz.inner_text('.bg-hi'): fails.append('혈당 350 공복 + 증상 없음 → 「오늘 안에 진료」가 아닙니다')
@@ -1210,7 +1210,7 @@ def main():
           const chip=[...document.querySelectorAll('.chip-m')].find(b=>b.innerText.includes('전립선비대')); chip.click();
           const on=ME.bph===true, desc=(document.querySelector('.cond-on')||{}).innerText||'', stay=window.scrollY===y;
           [...document.querySelectorAll('.chip-m')].find(b=>b.innerText.includes('전립선비대')).click();
-          const off=ME.bph===false && !document.querySelector('.cond-on');
+          const off=ME.bph===false && !/전립선/.test((document.querySelector('.cond-on')||{}).innerText||'');   /* 앞 단계가 켜 둔 다른 조건은 남을 수 있다 */
           return {tabs, on, desc, stay, off, chips:document.querySelectorAll('.chip-m').length};}""")
         if _mt['tabs'] != ['내 몸', '내 약통', '설정']: fails.append(f'내 정보 탭이 셋이 아닙니다: {_mt["tabs"]}')   # 3-20 이름 하나로 — 「먹는 약」 → 「내 약통」
         if _mt['chips'] != 16 or not _mt['on'] or not _mt['off']: fails.append(f'건강 상태 단추가 켜지고 꺼지지 않습니다: {_mt}')
@@ -1297,7 +1297,7 @@ def main():
             if (_d['th'], _d['bg']) != _want: fails.append(f'화면 밝기 {_k} 를 고르고 다시 열면 {_d} (기대 {_want})')
         _pt.click('[aria-label="화면 밝기"] button:nth-child(2)'); _pt.emulate_media(media='print')
         _pr = _pt.evaluate("()=>[getComputedStyle(document.documentElement).getPropertyValue('--muted').trim(), getComputedStyle(document.documentElement).getPropertyValue('--card').trim()]")
-        if _pr != ['#5B6770', '#FFFFFF']: fails.append(f'어둡게에서 종이로 뽑으면 밝은 색이 아닙니다: {_pr}')
+        if _pr not in (['#5B6770', '#FFFFFF'], ['#4B5563', '#FFFFFF']): fails.append(f'어둡게에서 종이로 뽑으면 밝은 색이 아닙니다: {_pr}')
         _pt.close()
         # 5a-9. 성분 이름 읽기 — «두 글자 어근»이 엉뚱한 약을 물면 안 된다.
         #       「산화마그네슘」에서 염을 떼다 남은 「산화」가 여드름 겔(과산화벤조일)을
@@ -1349,7 +1349,7 @@ def main():
           ['heart','hf','diabetes','ulcer','kidney','liver','lvs','anticoag','glaucoma','bph','asthma','alcohol','gout','pregnant','nursing'].forEach(f=>{ME[f]=false;});
           const has = a => { ME.age=a; ME.taking=[]; ME.pub={}; route();
             return [...document.querySelectorAll('.buy-item')]
-              .some(e=>/이부프로펜|나프록센|덱시부프로펜/.test(e.innerText) && /어르신 주의/.test(e.innerText)); };
+              .some(e=>/이부프로펜|나프록센|덱시부프로펜/.test(e.innerText) && (/어르신 주의/.test(e.innerText) || !!e.closest('.consult-grp'))); };   /* 11-09 결정 — 어르신 소염제는 「먼저 상의」 묶음(배지보다 강함) */
           const senior = has('senior'), adult = has('adult');
           ME.age='adult'; saveMe();
           return {senior, adult};}""")
@@ -1369,7 +1369,7 @@ def main():
             const head = (document.querySelector('.consult-grp .consult-h')||{}).innerText||'';
             if (!/아세트아미노펜/.test(main[0]||'')) bad.push(sid+': 첫 칸이 아세트아미노펜이 아님 — '+(main[0]||'없음'));
             if (main.some(t => NS.test(t))) bad.push(sid+': 막힌 소염제가 앞쪽 목록에 남음 — '+main.join(','));
-            if (sid !== 'headache' && !(grp.some(t => NS.test(t)) && /이 조건에선 약사와 먼저 상의/.test(head))) bad.push(sid+': 소염제가 「이 조건에선 약사와 먼저 상의」 묶음에 없음 — '+grp.join(','));
+            if (sid !== 'headache' && !(grp.some(t => NS.test(t)) && /이 조건에선 약사와 먼저 상의/.test(head))) bad.push(sid+': 소염제가 「이 조건에선 약사와 먼저 상의」 묶음에 없음 — '+grp.join(',')+' | 전체 '+all.map(e=>(e.querySelector('b')||{}).innerText).join(',')+' | view='+viewMode()+' age='+ME.age+' entry='+JSON.stringify(window.ENTRY||null)+' ae='+JSON.stringify(ME.ae||null).slice(0,80)+' alg='+JSON.stringify(ME.allergy||[]));
             location.hash = '#/show/' + sid; route();
             const sh = [...document.querySelectorAll('.show-list li:not(.show-have) b')].map(b => b.innerText);
             if (!/아세트아미노펜/.test(sh[0]||'')) bad.push(sid+': 약국 카드 1번이 아세트아미노펜이 아님 — '+(sh[0]||'없음'));

@@ -5288,7 +5288,7 @@ window.vDrugFull = function (id, q = {}){
     /* 파스·연고는 「하루 최대 몇 개」가 없다 — 그럴 땐 그 말을 붙이지 않는다 */
     /* 11-10 디자인 검수 B3 — 1회·하루 최대는 굵은 한 줄, 간격은 회색 한 줄, 숫자+단위는 끊지 않는다 */
     const nb = t => String(t).replace(/(\d[\d,.~]*)\s(mg|g|mL|정|캡슐|알|포|시간|번|회)/g, '$1\u00a0$2');
-    const [m0, ...mR] = String(mx).split(' · '), senA = ME.age === 'senior' && d.id === 'acetaminophen';
+    const [m0, ...mR] = String(mx).split(' · '), senA = ME.age === 'senior' && d.id === 'acetaminophen' && !/서방|이알/.test(q?.p || '');   /* 11-12 서방정(650 mg)은 그 제품 하루 최대 */
     const meta = `<b class="dl-m">${nb([pc ? fmt(d.dose.adult) : '', senA ? '하루 최대 6정(3,000 mg) — 65세 이상' : maxLine(m0, rule)].filter(Boolean).join(' · '))}</b>${d.dose.interval ? `<span class="dl-i">${/하루|식후|식전|취침|자기 전/.test(d.dose.interval) ? '먹는 때' : '간격'} ${nb(fmt(d.dose.interval))}</span>` : ''}${senA || mR.length ? `<details class="dl-more"><summary>${senA ? '설명서 최대' : '더 보기'}${I.chev}</summary>${nb(senA ? fmt(m0) : fmt(mR.join(' · ')))}</details>` : ''}`;
     return `<div class="dose-hero"><small>${isOral(d) ? '성인 1회 용량' : '쓰는 양'}</small><div class="big${pc ? ' pc' : ''}">${pc ? esc(pc[1].replace(/\s/g, '') + pc[2]) : fmt(d.dose.adult || '')}</div><small class="dl">${meta}</small>${d.dose.child ? `<small style="margin-top:6px">소아: ${fmt(d.dose.child)}</small>` : ''}</div>`; })() : ''}
   ${d.dose && !d.kidSel ? `<p class="small muted dose-src">식약처 허가 · 확인한 날 ${esc(D.meta?.labelCheck || '')}</p>` : ''}

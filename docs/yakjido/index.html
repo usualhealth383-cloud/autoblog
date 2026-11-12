@@ -1768,7 +1768,7 @@ background-repeat:no-repeat;background-position:right 9px center;background-size
 <script>
 window.__YAKJIDO_OK__ = true;
 const D = JSON.parse(document.getElementById('data').textContent || '{}');
-const BUILD = '2026-11-12 19:18';
+const BUILD = '2026-11-12 19:30';
 const DATAV = 'd7d6fed541'.indexOf('__') === 0 ? BUILD : 'd7d6fed541';
 const BRANDMARK = (typeof window !== 'undefined' && window.__BRANDMARK__) || 'icon-192.png';
 let CORE = 0, CORE_P = null;
@@ -2342,7 +2342,7 @@ const topBar = (opts = {}) => `
 <div class="top">
 ${opts.back ? `<button class="back" onclick="goBack()">${I.prev}${esc(opts.back)}</button>` : `
 <div class="brand"><div class="mark"><img src="${BRANDMARK}" alt="" width="34" height="34"></div><div><b>약지도</b><span>증상에 맞는 약 · 복약 알림</span></div></div>`}
-${`<a class="review-stamp" href="#/about" aria-label="출처 보기">${I.book}<span class="rs-t">출처 보기</span></a>`}${!opts.back ? acctBtn() : ''}
+${opts.unreviewed || opts.unv ? `<a class="review-stamp unrev" href="#/about">${I.info}<span>자료 확인 중</span></a>` : `<a class="review-stamp" href="#/about" aria-label="출처 보기">${I.book}<span class="rs-t">출처 보기</span></a>`}${!opts.back ? acctBtn() : ''}
 </div>
 ${opts.nosearch ? '' : `<div class="topfind">${I.search}<input id="gq" aria-label="증상이나 약 이름으로 찾기" placeholder="${bigFs() || innerWidth < 380 ? '증상이나 약 이름' : '증상·약 이름으로 찾기 (예: 허리, 타이레놀)'}" autocomplete="off" enterkeyhint="search" value="${esc(GQ)}"><button class="gq-x ${GQ ? '' : 'hide'}" onclick="GQ='';route()" aria-label="지우기">${I.x}</button></div>`}<!--TOPEND-->`;
 const srcShort = t => {
@@ -5584,7 +5584,7 @@ return `${topBar({ back:'약 사전', unreviewed:d.reviewed === false })}${prodT
 ${allergyWarn(d)}${ixLine([d])}
 ${d.useNote ? `<div class="usebar">${I.alert}<span>${fmt(d.useNote)}</span></div>` : ''}
 ${(d.for || []).length || d.tagline ? `<div class="kv" style="grid-template-columns:1fr"><div><small>무엇에 ${oral ? '먹는' : '쓰는'} 약</small><b>${esc((d.for || []).join(', ') || d.tagline)}</b></div></div>` : ''}
-${d.kidSel ? `<div class="dose-hero"><small>먹는 양</small><div class="sv-dose">${esc(KIDDOSE)}</div></div>` : how ? `<div class="dose-hero"><small>한 번에 · 하루에</small><div class="big sv-dose">${fmt(how)}</div>${senMaxH(d)}${ME.age === 'child' && d.dose?.child ? `<small>소아: ${fmt(d.dose.child)}</small>` : ''}</div>` : ''}${kidDoseBtn(d)}
+${d.kidSel ? `<div class="dose-hero"><small>먹는 양</small><div class="sv-dose">${esc(KIDDOSE)}</div></div>` : how ? `<div class="dose-hero"><small>한 번에 · 하루에</small><div class="big sv-dose">${fmt(how)}</div>${(/서방|이알/.test(q.p || '') ? '' : senMaxH(d))}${ME.age === 'child' && d.dose?.child ? `<small>소아: ${fmt(d.dose.child)}</small>` : ''}</div>` : ''}${kidDoseBtn(d)}
 ${av.length || C.length ? `<section class="sec card sv-no"><h2>이럴 땐 ${oral ? '먹지' : '쓰지'} 마세요</h2><ul class="plain x">${li(hit, 'me')}${li(gen)}</ul>${other.length ? fold(`다른 경우 ${other.length}가지 더 보기`, `<ul class="plain x">${li(other)}</ul>`) : ''}
 ${cau.length ? `<p class="sv-cau">${esc(flagWords([...new Set(cau.flatMap(a => a.flags.filter(x => f.includes(x))))]))} — 먼저 약사·의사와 상의하세요</p><ul class="plain">${li(cau)}</ul>` : ''}
 ${gc.length ? `<p class="sv-cau">누구나 알아 둘 주의</p><ul class="plain">${li(gc)}</ul>` : ''}${oc.length ? fold(`다른 조건의 주의 ${oc.length}가지 보기`, `<ul class="plain">${li(oc)}</ul>`) : ''}</section>` : ''}
