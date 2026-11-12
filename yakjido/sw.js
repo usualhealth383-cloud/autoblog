@@ -54,7 +54,7 @@ self.addEventListener('fetch', (e) => {
   }
 
   if (url.pathname.includes('/data/')) {
-    const core = /\/data\/(core|detail)\.json$/.test(url.pathname);
+    const core = /\/data\/(core|detail|src)\.json$/.test(url.pathname);
     /* 앱은 모든 자료를 「?v=판」 주소로 받는다(5-02). 판이 박힌 주소는 내용이 바뀌지 않으니 캐시에 있으면 그것이 곧 정답 */
     const ver = url.searchParams.has('v');
     e.respondWith(caches.open(core ? CACHE : DATA).then((c) => c.match(e.request).then((hit) => {

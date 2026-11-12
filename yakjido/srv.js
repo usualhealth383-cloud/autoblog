@@ -3841,6 +3841,7 @@ window.vAboutS = function(){
     /* 4-01 — 출처 메모(원문 인용·확인 날짜)는 줄 안에 늘어놓지 않고 작은 접이로. PMID 는 줄에 그대로 */
     const row = ([k, v]) => { const note = String(v.note || '').trim(), extra = note.replace(/PMID\s*\d+/g, '').replace(/[\s·—\-.,]/g, '').length > 0;
       return `<a class="row" href="${esc(v.url)}" target="_blank" rel="noopener" style="text-decoration:none"><div class="body"><b>${fmt(v.label)}</b><span>${esc(v.type || '')}${(m => m ? ' · ' + esc(m[0]) : '')(note.match(/PMID\s*\d+/))}</span></div>${I.link}</a>${extra ? `<details class="src-note"><summary>원문 메모 보기</summary><p>${esc(note)}</p></details>` : ''}`; };
+    if (!Object.keys(S).length && typeof SRC !== 'undefined' && SRC !== 3) return `<section class="sec"><h2>참고 문헌·지침</h2><p class="muted">출처 목록을 받는 중이에요.</p></section>`;   /* 11-12 출처는 data/src.json — 오면 이 화면만 다시 그린다 */
     return `<section class="sec"><h2>참고 문헌·지침 <small>${Object.keys(S).length}건</small></h2>
       <p class="small muted" style="margin-bottom:8px">근거가 센 것부터 묶어 두었어요. 갈래를 누르면 펼쳐져요.</p>
       ${keys.map(t => `<details class="acc"><summary>${esc(t)}<small>${g.get(t).length}건</small>${I.chev}</summary><div class="bd"><div class="rows">${g.get(t).map(row).join('')}</div></div></details>`).join('')}

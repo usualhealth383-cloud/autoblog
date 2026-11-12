@@ -1809,8 +1809,8 @@ background-repeat:no-repeat;background-position:right 9px center;background-size
 <script>
 window.__YAKJIDO_OK__ = true;
 const D = JSON.parse(document.getElementById('data').textContent || '{}');
-const BUILD = '2026-11-13 00:02';
-const DATAV = 'c8a4069ab4'.indexOf('__') === 0 ? BUILD : 'c8a4069ab4';
+const BUILD = '2026-11-13 01:31';
+const DATAV = '69789131ef'.indexOf('__') === 0 ? BUILD : '69789131ef';
 const BRANDMARK = (typeof window !== 'undefined' && window.__BRANDMARK__) || 'icon-192.png';
 let CORE = 0, CORE_P = null;
 function mergeCore(c){
@@ -1847,7 +1847,20 @@ const got = fetch('data/detail.json?v=' + DATAV).then(r => { if (!r.ok) throw 0;
 DETAIL_P = Promise.all([got, ensureCore()]).then(([c]) => mergeDetail(c)).catch(() => { DETAIL = 3; DETAIL_P = null; });
 return DETAIL_P;
 }
-ensureCore(); ensureDetail();
+let SRC = 0, SRC_P = null;
+function mergeSrc(c){
+D.sources = Object.assign(D.sources || {}, c || {}); SRC = 2;
+document.querySelectorAll('[data-sid]').forEach(e => { if (D.sources[e.dataset.sid]) { const t = document.createElement('template'); t.innerHTML = srcChip1(e.dataset.sid); e.replaceWith(t.content); } });
+try { if (/^#\/about/.test(location.hash)) redraw(); } catch (e) {}
+}
+function ensureSrc(){
+if (SRC_P) return SRC_P;
+SRC = 1;
+if (window.__SRC__) { mergeSrc(window.__SRC__); return (SRC_P = Promise.resolve()); }
+SRC_P = fetch('data/src.json?v=' + DATAV).then(r => { if (!r.ok) throw 0; return r.json(); }).then(mergeSrc).catch(() => { SRC = 3; SRC_P = null; });
+return SRC_P;
+}
+ensureCore(); ensureDetail(); ensureSrc();
 const byId = (arr, id) => (arr || []).find(x => x.id === id);
 function lexAsDrug(lid){
 if (!LEX.ing) { lexLoad(); return null; }
@@ -2398,7 +2411,7 @@ return one.length > 46 ? one.slice(0, 44).replace(/[\s,·]+$/, '') + '…' : one
 }
 return x.length > 46 ? x.slice(0, 44).replace(/[\s,·]+$/, '') + '…' : x;
 };
-const srcChip1 = id => { const s = D.sources?.[id]; if (!s) return `<span class="src-chip">${I.link}출처: ${esc(id)}</span>`; const full = String(s.label || '').replace(/\*\*/g, ''); return `<a class="src-chip" href="${esc(s.url)}" target="_blank" rel="noopener" title="${esc(full)}" aria-label="출처: ${esc(srcShort(s.label))} — ${esc(full)}">${I.link}출처: ${esc(srcShort(s.label))}</a>`; };
+const srcChip1 = id => { const s = D.sources?.[id]; if (!s) return SRC === 3 || SRC === 2 ? `<span class="src-chip">${I.link}출처: ${esc(id)}</span>` : `<span class="src-chip" data-sid="${esc(id)}">${I.link}출처</span>`; const full = String(s.label || '').replace(/\*\*/g, ''); return `<a class="src-chip" href="${esc(s.url)}" target="_blank" rel="noopener" title="${esc(full)}" aria-label="출처: ${esc(srcShort(s.label))} — ${esc(full)}">${I.link}출처: ${esc(srcShort(s.label))}</a>`; };
 const srcChips = (ids, open) => !(ids || []).length ? '' : !open ? fold(`근거·출처 <span class="muted">${ids.length}건</span>`, ids.map(srcChip1).join(''), { cls:'src-fold', bd:'srcs' }) : `<div class="srcs">${ids.slice(0, 3).map(srcChip1).join('')}${ids.length > 3 ? `<details class="src-more"><summary>근거 ${ids.length - 3}개 더${I.chev}</summary>${ids.slice(3).map(srcChip1).join('')}</details>` : ''}</div>`;
 const txtSrcs = L => { const U = /원문 확인 중|미확인|검수 전|검수 필요/, ok = (L || []).filter(t => !U.test(t)), un = (L || []).filter(t => U.test(t));
 const one = t => { const u = (String(t).match(/https?:\/\/\S+/) || [])[0], x = String(t).replace(u, '').replace(/[\s—·-]+$/, '').trim(); return u ? `<a class="src-chip" href="${esc(u)}" target="_blank" rel="noopener" title="${esc(x)}">${I.link}${esc(srcShort(x))}</a>` : `<span class="src-chip">${I.link}${esc(srcShort(x))}</span>`; };
@@ -6814,7 +6827,7 @@ el.innerHTML = '<b>약지도</b>'
 route();
 if ('serviceWorker' in navigator && location.protocol.startsWith('http') && !NATIVE) {
 navigator.serviceWorker.register('sw.js').catch(() => {});
-const warmCore = () => { if (warmCore.done) return; warmCore.done = true; for (const f of ['core', 'detail']) fetch(`data/${f}.json?v=${DATAV}`).catch(() => { warmCore.done = false; }); };
+const warmCore = () => { if (warmCore.done) return; warmCore.done = true; for (const f of ['core', 'detail', 'src']) fetch(`data/${f}.json?v=${DATAV}`).catch(() => { warmCore.done = false; }); };
 if (navigator.serviceWorker.controller) Promise.all([ensureCore(), ensureDetail()]).then(() => setTimeout(warmCore, 800));
 else navigator.serviceWorker.addEventListener('controllerchange', () => setTimeout(warmCore, 300));
 const warm = () => { ['lexicon.json', 'brands.json', 'qa.json', 'mixes.json', 'nutrients.json', 'easy-index.json', 'pills.json']

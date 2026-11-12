@@ -9,7 +9,7 @@
                        판이 같으면 캐시 그대로, 판이 바뀌면 새로 받아 넣고 옛 판은 지운다(prune).
    판 없는 옛 주소는 «캐시 먼저» — 한 번 받은 것은 즉시 열리고, 뒤에서 조용히 새로 받아 둔다.
    인터넷이 안 되면 어느 캐시에든 있는 사본을 준다(5-01 — 첫 방문 뒤 비행기 모드에서 본문이 안 뜨던 것). */
-const CACHE = 'yakjido-2026-11-13T00:02-1a35aa7b';
+const CACHE = 'yakjido-2026-11-13T01:31-07fb7ffc';
 const DATA = 'yakjido-data-v1';
 /* 기내 모드·바깥 파일 0(10-27) — 글꼴(fonts/)·로그인 프로그램(vendor/)은 배포 묶음 안. 판이 박힌 꾸러미라 내용이 안 바뀌니 «캐시 먼저», 앱 판이 바뀌어도 지우지 않는다(EXT).
    바깥 주소는 하나도 담지 않는다 — 서버 응답(supabase REST)·날씨는 그대로 지나간다(09-22 원칙) */
@@ -54,7 +54,7 @@ self.addEventListener('fetch', (e) => {
   }
 
   if (url.pathname.includes('/data/')) {
-    const core = /\/data\/(core|detail)\.json$/.test(url.pathname);
+    const core = /\/data\/(core|detail|src)\.json$/.test(url.pathname);
     /* 앱은 모든 자료를 「?v=판」 주소로 받는다(5-02). 판이 박힌 주소는 내용이 바뀌지 않으니 캐시에 있으면 그것이 곧 정답 */
     const ver = url.searchParams.has('v');
     e.respondWith(caches.open(core ? CACHE : DATA).then((c) => c.match(e.request).then((hit) => {

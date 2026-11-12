@@ -1082,7 +1082,7 @@ def main():
         pg.route('**/air-quality-api.open-meteo.com/**', lambda rt: rt.fulfill(status=200, content_type='application/json', body=AQ))
         def ready(ms=8000):
             # 본문 자료(data/core.json)는 첫 화면이 뜬 뒤에 받는다 — 다 받을 때까지 기다린다
-            try: pg.wait_for_function('window.__READY__===true && (typeof DETAIL==="undefined" || DETAIL===2)', timeout=ms)   # 약 화면 칸(detail.json)까지
+            try: pg.wait_for_function('window.__READY__===true && (typeof DETAIL==="undefined" || DETAIL===2) && (typeof SRC==="undefined" || SRC===2)', timeout=ms)   # 약 화면 칸(detail.json)까지
             except Exception: fails.append('본문 자료(core.json)를 못 받았습니다 — ' + pg.url)
         pg.goto(url); ready(); pg.wait_for_timeout(1200)
         pg.evaluate("localStorage.setItem('yakjido.hello.v1','1');localStorage.setItem('yakjido.consent.v1',JSON.stringify({v:'2026-10-20',at:'2026-10-14',terms:1,privacy:1}));localStorage.setItem('yakjido.me.v1',JSON.stringify({age:'senior',view:'detail',taking:['cls:bp.arb'],pub:{}}))")

@@ -203,6 +203,9 @@ for _f in sorted((ROOT / 'i18n').glob('[a-z][a-z].json')) if (ROOT / 'i18n').exi
             _kind, _id = _k.split(':', 1); _w = (_v.get('찾는말') or {}).get(_f.stem)
             if _w and _kind == 'sym': _d.setdefault('sym', {}).setdefault(_id, {})['find'] = _w
     (_i18 / _f.name).write_text(json.dumps(_d, ensure_ascii=False, separators=(',', ':')), encoding='utf-8')
+# 11-12 core.json 나누기 1단계 — 출처(압축 약 90 KB)는 data/src.json. 출처 칩만 쓰므로 본문과 동시에 받되 화면은 기다리지 않는다(칩은 도착하면 그 자리에서 바뀐다)
+src = core.pop('sources', {})
+js_src = json.dumps(src, ensure_ascii=False, separators=(',', ':'))
 jc = json.dumps(core, ensure_ascii=False, separators=(',', ':'))
 j = json.dumps(inline, ensure_ascii=False, separators=(',', ':')).replace('</', '<\\/')
 # 10-21 검수자가 판을 구분하도록 한국 시각 날짜·시:분(컨테이너는 UTC 라 하루 늦게 찍혔다)
@@ -239,8 +242,8 @@ if (_pd / 'pills.json').exists() and (_pd / 'easy-index.json').exists():
         if _m: (_pd / 'pills-rx.json').write_text(json.dumps(_pr, ensure_ascii=False, separators=(',', ':')), encoding='utf-8'); print(f'처방약 낱알 성분 {_m}건 허가 목록대로')
 jd = json.dumps(detail, ensure_ascii=False, separators=(',', ':'))
 # 본문 판(DATAV)은 core·detail·지연 로드 자료 내용의 해시 — 같은 날 두 번 빌드해도 내용이 바뀌면 휴대폰이 새 본문을 받는다(2026-10-13 자체 검수 5-02)
-_lazy = b''.join(f.read_bytes() for f in sorted((ROOT.parent / 'docs' / 'yakjido' / 'data').rglob('*.json')) if f.name not in ('core.json', 'detail.json') or f.parent.name != 'data')   # 지연 로드 자료도 바뀌면 판이 바뀐다(5-02)
-datav = hashlib.sha1((jc + jd).encode('utf-8') + _lazy).hexdigest()[:10]
+_lazy = b''.join(f.read_bytes() for f in sorted((ROOT.parent / 'docs' / 'yakjido' / 'data').rglob('*.json')) if f.name not in ('core.json', 'detail.json', 'src.json') or f.parent.name != 'data')   # 지연 로드 자료도 바뀌면 판이 바뀐다(5-02)
+datav = hashlib.sha1((jc + jd + js_src).encode('utf-8') + _lazy).hexdigest()[:10]
 out = shell.replace('<!--DATA-->', j).replace('__BUILD__', stamp).replace('__DATAV__', datav)
 # 2026-10-13 상용화 점검 — 배포본에서는 «줄 전체가 주석»인 /* … */ 덩어리를 뺀다(원본은 그대로). 휴대폰마다 개발 메모 수백 개를 내려받던 것 —
 # 첫 화면 압축 225 → 192 KB. 줄 중간·코드 뒤의 주석은 건드리지 않는다(문자열 안일 수 있어서).
@@ -255,6 +258,7 @@ pages.mkdir(parents=True, exist_ok=True)
 (pages / 'data').mkdir(parents=True, exist_ok=True)
 (pages / 'data' / 'core.json').write_text(jc, encoding='utf-8')
 (pages / 'data' / 'detail.json').write_text(jd, encoding='utf-8')
+(pages / 'data' / 'src.json').write_text(js_src, encoding='utf-8')
 print(f'첫 화면 {len(out)/1024:.0f} KB · 본문 data/core.json {len(jc)/1024:.0f} KB')
 # 기내 모드(10-27) — 받아 둘 파일 목록·크기(설정 「기내에서 쓰기」가 읽는다)
 _dd = ROOT.parent / 'docs' / 'yakjido' / 'data'
