@@ -3674,7 +3674,7 @@ try { const css = document.createElement('style'); css.textContent = `
 .door-why[hidden],.door-msg[hidden]{display:none}
 .cs-again .cs-list li>span{display:flex;flex-direction:column}.cs-again .cs-list b{font-size:1.0625rem}.cs-again .cs-list small{color:var(--muted);font-size:.9375rem;margin-top:2px}.cs-again h1{margin-top:6px}
 .cs-sum{margin-top:18px;text-align:center;font-size:1rem;line-height:1.6;color:var(--body)}.cs-detail{margin-top:10px;padding:0}.cs-detail>summary{min-height:48px;justify-content:center;width:100%;font-size:1rem}.cs-detail h3{font-size:1.0625rem;margin:16px 0 4px}.cs-detail p,.cs-detail li{font-size:1rem;line-height:1.65}.cs-detail ul{padding-left:1.1em;margin:6px 0}.cs-note{margin-top:14px;color:var(--muted)}
-.cs #csGo{position:sticky;bottom:calc(10px + env(safe-area-inset-bottom));z-index:3;box-shadow:0 6px 18px rgba(0,0,0,.18)}.cs-foot{margin-top:18px;text-align:center;font-size:.875rem;color:var(--muted);line-height:1.6}
+.door.cs{padding-bottom:84px}.cs #csGo{position:sticky;bottom:calc(10px + env(safe-area-inset-bottom));z-index:3;box-shadow:0 6px 18px rgba(0,0,0,.18)}.cs-foot{margin-top:18px;text-align:center;font-size:.875rem;color:var(--muted);line-height:1.6}
 .cs-foot .cs-doc{font-size:.875rem}
 .lg h1{font-size:1.5rem}
 .door-back{display:flex}

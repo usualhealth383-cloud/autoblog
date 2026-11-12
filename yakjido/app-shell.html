@@ -1399,7 +1399,7 @@ details.cmpr .link{display:inline-flex;align-items:center;min-height:48px;margin
 .pick-more{margin-top:16px}.pick-more .bd>.sec.card{box-shadow:none;border:1px solid var(--hairline);margin-top:12px}
 /* 위 줄의 display:block 이 「바르는 약」 꼬리표를 칸 너비로 늘렸다 */
 .prod span.ftag{display:inline-flex;font-size:.875rem}
-.tabs{display:flex;gap:6px;margin:var(--s4) 0 var(--s3);overflow-x:auto;scrollbar-width:none;padding-bottom:2px}
+.tabs{display:flex;gap:6px;margin:var(--s4) 0 var(--s3);overflow-x:auto;scrollbar-width:none;padding-bottom:2px}.tabs.schtabs{flex-wrap:wrap;overflow:visible}
 .tabs::-webkit-scrollbar{display:none}
 /* 44 딱 맞추면 소수점 배치에서 43.9999 로 재져 손가락 기준에 걸렸다(2026-10-06) — 다른 단추처럼 46 */
 .tab{flex:none;padding:9px 15px;border-radius:var(--r-pill);font-size:.9375rem;font-weight:600;color:var(--muted);background:var(--tint2);min-height:48px}
@@ -2473,7 +2473,7 @@ function gqPanel(){
     ${hits.length && hitsAll.fix ? `<p class="small" style="margin:4px 0 8px">혹시 <b>‘${esc(hitsAll.fix)}’</b>${josa(hitsAll.fix, '을', '를')} 찾으세요? 그 말로 찾은 결과예요.</p>` : ''}
     ${hits.length ? gh
       : LEX.loading ? '<p class="loading">성분·제품 사전을 불러오는 중…</p>'
-      : `<div class="empty card"><b>찾는 것이 없어요</b>다른 말로 해 보세요. 예: 허리, 목감기, 타이레놀, 유산균</div>
+      : a ? '' : `<div class="empty card"><b>찾는 것이 없어요</b>다른 말로 해 보세요. 예: 허리, 목감기, 타이레놀, 유산균</div>
         <div class="util" style="margin-top:10px">${urow(I.eye, '약 사진 찍기', '상자·약봉투로 찾기', "go('/photo')", '찍기')}${urow(I.pill, '이름을 몰라도 종류로 담기', '“혈압약 먹어요”까지만 아셔도 돼요', "go('/kinds')", '고르기')}${urow(I.search, '여기 없어요', '질문 두 번으로 찾기', "go('/guide/1')", '시작')}</div>`}
   </section>`;
 }
@@ -3897,7 +3897,7 @@ const flagBtn = k => isAgeFlag(k)
   : `<button class="chip ${ME[k] ? 'on' : ''}" aria-pressed="${!!ME[k]}" onclick="ME['${k}']=!ME['${k}'];saveMe();route()">${ME[k] ? I.check : I.circle}${esc(FLAG_Q[k])}</button>`;
 /* 내 정보를 이미 정해 둔 분께는 칩 그리드 대신 한 줄 — 첫 화면에 답이 올라온다(감사 #10) */
 let FIT_OPEN = '';
-const S4L = { kidney:'콩팥', ulcer:'위·십이지장 궤양', liver:'간', anticoag:'피 묽게 하는 약' };
+const S4L = { kidney:'콩팥(신장) 질환', ulcer:'위·십이지장 궤양', liver:'간 질환', anticoag:'피 묽게 하는 약' };   /* 11-12 사용자25 #42 — 다른 칩(신장 질환·간 질환)과 같은 말로 */
 function fitChips(s){
   let { top, more } = askFlags(s, 4);
   /* 11-10 디자인 검수 A7 — 65세 이상은 소염제를 가르는 네 가지(콩팥·위궤양·간·피 묽게 하는 약)를 큰 칩으로 먼저. 나이만으로는 「내 정보 기준」 띠로 접지 않는다 */
@@ -5465,7 +5465,7 @@ function icsText(){
   const pad = n => String(n).padStart(2, '0'); const d0 = new Date(); const ds = `${d0.getFullYear()}${pad(d0.getMonth() + 1)}${pad(d0.getDate())}`;
   let out = ['BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//yakjido//ko', 'CALSCALE:GREGORIAN'];
   for (const id in (ME.sched || {})) for (const t of ME.sched[id]) { const d = takingItems().find(x => x.id === id); if (!d) continue; const [h, m] = t.split(':');
-    out.push('BEGIN:VEVENT', `UID:yakjido-${id}-${t}@yakjido`, `DTSTAMP:${ds}T000000`, `DTSTART:${ds}T${h}${m}00`, `DURATION:PT10M`, 'RRULE:FREQ=DAILY', `SUMMARY:💊 ${d.name} 드실 시간`, `DESCRIPTION:${(d.simple || '').replace(/,/g, '\\,')}`, 'BEGIN:VALARM', 'TRIGGER:PT0M', 'ACTION:DISPLAY', `DESCRIPTION:${d.name}`, 'END:VALARM',
+    out.push('BEGIN:VEVENT', `UID:yakjido-${id}-${t}@yakjido`, `DTSTAMP:${ds}T000000`, `DTSTART:${ds}T${h}${m}00`, `DURATION:PT10M`, 'RRULE:FREQ=DAILY', `SUMMARY:${d.name} 드실 시간`, `DESCRIPTION:${(d.simple || '').replace(/,/g, '\\,')}`, 'BEGIN:VALARM', 'TRIGGER:PT0M', 'ACTION:DISPLAY', `DESCRIPTION:${d.name}`, 'END:VALARM',
       /* 30분 뒤 한 번 더(애플 건강 «복용 기록이 없으면 30분 뒤 다시 알림»과 같은 자리). 달력은 드셨는지 모르니 문구로 가른다 */
       'BEGIN:VALARM', 'TRIGGER:PT30M', 'ACTION:DISPLAY', `DESCRIPTION:${d.name} — 아직 안 드셨다면 지금(이미 드셨으면 넘기세요)`, 'END:VALARM', 'END:VEVENT'); }
   out.push('END:VCALENDAR'); return out.join('\r\n');
