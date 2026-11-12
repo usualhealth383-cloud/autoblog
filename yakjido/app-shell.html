@@ -3934,14 +3934,16 @@ function cabMap(){ const m = new Map(); for (const t of takingItems()) { const r
 const ingNm = k => ingrNameK(ingIndex().byKey[k]?.n || k);
 /* §101 — 항응고제·항혈소판제 + 먹는 소염진통제: 막지 않고 한 줄 */
 const AC_NSAID = '금기는 아니지만 위장관 출혈 가능성이 있어 주의해요. 처방한 의사와 먼저 상의하세요';
-const cauLine = (d, f) => d && f.includes('anticoag') && isNsaid(d) ? AC_NSAID : '';
+/* 11-12 현욱님 결정 2 — 신장 질환이어도 소염진통제는 추천 칸에 남기고 주의 한 줄(설명서 금기는 「심한 신부전」) */
+const KD_NSAID = '콩팥이 안 좋으면 소염진통제가 콩팥 기능을 더 떨어뜨릴 수 있어요. 금기는 아니지만 주의 — 심한 신부전이면 먹지 마세요(설명서). 먹기 전에 의사·약사와 상의하세요';
+const cauLine = (d, f) => !d || !isNsaid(d) ? '' : [f.includes('anticoag') ? AC_NSAID : '', f.includes('kidney') ? KD_NSAID : ''].filter(Boolean).join(' · ');
 /* 내용 조 ageAskMonths — 이 나이 전에는 막지 않고 「의사·약사와 상의」 한 줄(금기만 막고 주의는 아래 한 줄). 나이를 모르면 같이 */
 const askLine = (d, m) => { const a = d?.ageAskMonths; return Number.isFinite(a) && (m == null || m < a) ? `${a >= 24 ? '만 ' + Math.floor(a / 12) + '세' : '생후 ' + a + '개월'} 전에는 먹이기 전에 의사·약사와 상의하세요` : ''; };
 function basket(s, ov){
   const f = ov ? ov.flags : activeFlags(); const senior = ov ? f.includes('senior') : ME.age === 'senior';
   const kidMode = !ov && f.includes('child'), km = kidMode ? kidMon() : null;
   /* 막힌 까닭 — 켜 둔 조건 전부가 아니라 이 약을 막은 조건만(3-14). 아이 모드에서 나이(개월) 기준이 있는 약은 「소아」 표시 대신 나이로 본다(Z7 A4) */
-  const whyOf = x => { const d = drug(x); return [...new Set([...(d?.avoid || []), ...(d?.caution || []).filter(c => c?.ask)].flatMap(a => (a.flags || []).filter(fl => f.includes(fl) && !(fl === 'child' && kidMode && minAgeOf(d) != null))))]; };
+  const whyOf = x => { const d = drug(x); return [...new Set([...(d?.avoid || []), ...(d?.caution || []).filter(c => c?.ask)].flatMap(a => (a.flags || []).filter(fl => f.includes(fl) && !(fl === 'child' && kidMode && minAgeOf(d) != null) && !(fl === 'kidney' && isNsaid(d)))))]; };
   /* Z4 #13 — 약 알레르기·부작용이 있었던 성분(받는 분 조건으로 계산할 때는 보내는 사람 알레르기를 쓰지 않는다) */
   const alg = ov ? [] : allergyKeys();
   const allergic = x => alg.length && drugKeys(drug(x)).some(k => alg.includes(k));
