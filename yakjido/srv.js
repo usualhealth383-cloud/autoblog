@@ -3888,7 +3888,7 @@ window.vMythsS = function(_, q){
 /* 근거와 검수 기준(app-shell 에서 옮김 — 첫 화면 예산) */
 window.vAboutS = function(){
   const S = D.sources || {};
-  return `${topBar({ back:'내 정보' })}<h1>근거와 검수 기준</h1>
+  return `${topBar({ back:'뒤로' })}<h1>근거와 검수 기준</h1>
   <section class="sec card"><h2>이렇게 만들었어요</h2>${list(D.meta?.method || [])}</section>
   ${(() => {
     /* 출처 242건을 한 줄로 늘어놓으면 화면이 25,000픽셀(폰 30장)이 된다 —
@@ -5001,7 +5001,7 @@ window.vVitalsS = function(){
     <div class="times vt-wchips" style="margin-top:10px">${['아침', '낮', '저녁'].map(w => `<button class="chip ${(VT.w || slotWord(new Date())) === w ? 'on' : ''}" data-w="${w}" aria-pressed="${(VT.w || slotWord(new Date())) === w}" onclick="VT.w='${w}';document.querySelectorAll('.vt-wchips .chip').forEach(b=>{const on=b===this;b.classList.toggle('on',on);b.setAttribute('aria-pressed',on)})">${w}</button>`).join('')}</div>${vtWhenBox()}`
   : `<div class="vt-row"><label class="vt-f"><span>혈당 (mg/dL)</span><input id="vg" type="number" inputmode="numeric" min="20" max="600" placeholder="110" aria-label="혈당"></label></div>
     <div class="times vt-gchips" style="margin-top:10px">${['공복', '식후 2시간', '그 밖'].map(w => `<button class="chip ${(VT.gw || '공복') === w ? 'on' : ''}" aria-pressed="${(VT.gw || '공복') === w}" onclick="VT.gw='${w}';document.querySelectorAll('.vt-gchips .chip').forEach(b=>{const on=b===this;b.classList.toggle('on',on);b.setAttribute('aria-pressed',on)})">${w}</button>`).join('')}</div>${vtWhenBox()}`;
-  return `${topBar({ back:'내 정보' })}<div class="eyebrow">혈압·혈당 수첩</div><h1>재 두신 숫자, 진료 때 한눈에</h1>
+  return `${topBar({ back:'내 정보' })}<div class="eyebrow">혈압·혈당 수첩</div><h1>적어 두신 숫자, 진료 때 한눈에</h1>
   <p style="margin-top:6px">집에서 잰 혈압·혈당을 적어 두면 <b>2주 흐름</b>과 <b>7일 평균</b>을 보여 드려요. ${savedWhere()}</p>
   <div class="seg" style="margin-top:14px" role="group" aria-label="무엇을 적을까요">${[['bp', '혈압'], ['bg', '혈당']].map(([v, n]) => `<button class="${k === v ? 'on' : ''}" onclick="VT.k='${v}';VT.alert=null;route()" aria-pressed="${k === v}">${n}</button>`).join('')}</div>
   ${vitalAlert()}
