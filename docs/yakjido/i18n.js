@@ -185,7 +185,7 @@
   function 알림줄(view) {
     if (L === 'ko' || !view || view.querySelector('.i18n-note')) return;
     var d = document.createElement('div'); d.className = 'i18n-note';
-    d.innerHTML = '<span>' + NOTE[L] + '</span><button type="button" onclick="setLang(\'ko\')">' + ORIG[L] + '</button>';
+    d.innerHTML = '<span>' + NOTE[L] + '</span><button type="button" onclick="try{localStorage.setItem(\'yakjido.lang.prev\',\'' + L + '\')}catch(e){};setLang(\'ko\')">' + ORIG[L] + '</button>';
     view.appendChild(d);   /* 11-03 Main — 첫 3초에 경고가 먼저 보이지 않게 화면 맨 아래 작은 한 줄로(첫 진입 경고 벽 금지) */
     /* 약 용량 칸 — 「한국 허가 기준 — 사는 나라 약사와 확인」 */
     view.querySelectorAll('.dose-card,.dose-hero,.sv-dose').forEach(function (c) { if (c.querySelector('.i18n-kr')) return; var p = document.createElement('p'); p.className = 'i18n-kr'; p.textContent = KRNOTE[L]; c.insertBefore(p, c.firstChild); });   /* 11-09 C3 — 용량 줄 위에 눈에 띄게 */

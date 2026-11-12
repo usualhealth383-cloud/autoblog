@@ -1452,7 +1452,7 @@ table.cmp td:first-child{font-weight:700;word-break:keep-all;min-width:6em}
 .checkrow{display:flex;align-items:center;gap:var(--s3);padding:12px 0;border-bottom:1px solid var(--hairline);min-height:52px}
 .checkrow:last-child{border-bottom:0}
 .lang-pill{float:right;min-height:40px;padding:0 10px;border:1px solid var(--hairline);border-radius:999px;background:var(--card);color:var(--text);font:inherit;font-size:.875rem}
-.checkrow{position:relative}.checkrow label::before{content:"";position:absolute;inset:0}
+.checkrow{position:relative}.checkrow label::before{content:"";position:absolute;inset:0}.checkrow>button,.checkrow>a{position:relative;z-index:1}.lang-back{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(84px + env(safe-area-inset-bottom));z-index:40;min-height:44px;padding:0 16px;border-radius:22px;border:1px solid var(--hairline);background:var(--card);color:var(--primary);font:inherit;font-weight:700;box-shadow:0 4px 14px rgba(0,0,0,.15)}
 .checkrow input{width:20px;height:20px;accent-color:var(--primary);flex:none}
 .checkrow label{flex:1;min-width:0;font-size:.9375rem;font-weight:600;overflow-wrap:anywhere}
 .checkrow small{color:var(--muted);font-weight:500;display:block;font-size:.875rem}
@@ -2514,6 +2514,9 @@ const CC = (() => { try { const v = MP.country || localStorage.getItem('yakjido.
   const S = ' Asia/Seoul KR Asia/Tokyo JP Asia/Shanghai CN Asia/Chongqing CN Asia/Urumqi CN Asia/Hong_Kong HK Europe/Madrid ES Atlantic/Canary ES Africa/Ceuta ES America/Mexico_City MX America/Monterrey MX America/Merida MX America/Cancun MX America/Chihuahua MX America/Mazatlan MX America/Hermosillo MX America/Tijuana MX Europe/London GB Asia/Manila PH Asia/Kolkata IN Asia/Calcutta IN Asia/Ho_Chi_Minh VN Asia/Saigon VN Asia/Bangkok TH Asia/Jakarta ID Asia/Makassar ID Asia/Jayapura ID Asia/Kathmandu NP Asia/Katmandu NP Asia/Tashkent UZ Asia/Samarkand UZ Asia/Phnom_Penh KH Asia/Ulaanbaatar MN Asia/Ulan_Bator MN Asia/Colombo LK Asia/Dhaka BD ', k = S.indexOf(' ' + tz + ' ');
   return tz && k >= 0 ? S.substr(k + tz.length + 2, 2) : /^America\/(New_York|Chicago|Denver|Los_Angeles|Phoenix|Anchorage|Juneau|Sitka|Nome|Adak|Boise|Detroit|Menominee|Indiana|Kentucky|North_Dakota)\b|^Pacific\/Honolulu$|^US\//.test(tz) ? 'US' : 'XX'; })();
 window.LANG = LANG; window.CC = CC;
+/* 11-12 사용자25 #20 — 「한국어 원문 보기」로 바꾼 뒤 원래 말로 돌아갈 단추(그 말로 적음) */
+(function(){ let pv = null; try { pv = localStorage.getItem('yakjido.lang.prev'); } catch (e) {} const W = { en: 'Back to English', es: 'Volver al español', ja: '日本語に戻す', zh: '返回中文' };
+  if (pv && W[pv] && (localStorage.getItem('yakjido.lang') || 'ko') === 'ko') addEventListener('DOMContentLoaded', () => { const b = document.createElement('button'); b.type = 'button'; b.className = 'lang-back'; b.textContent = W[pv]; b.onclick = () => { try { localStorage.removeItem('yakjido.lang.prev'); } catch (e) {} setLang(pv); }; document.body.appendChild(b); }); })();
 function setLang(l, cc){ try { localStorage.setItem('yakjido.lang', l); if (cc) localStorage.setItem('yakjido.cc', cc); } catch (e) {} location.reload(); }
 if (LANG !== 'ko' || CC !== 'KR') { const s = document.createElement('script'); s.src = 'i18n.js'; document.head.appendChild(s); }
 /* 11-11 다른 메디나눔 앱에서 넘어온 입구(약지도_입구주소.md) — ?from=kids|gildongmu|gyeote|clinicscore&age=개월 수|adult.
@@ -3096,6 +3099,7 @@ function achPanel(extra, opts){
   opts = opts || {};
   const items = achList(extra), n = achScore(items), lv = achLevel(n), unk = achUnknown();
   if (!opts.always && (lv === 'ok' || !items.length)) return '';
+  if (!items.length && !takingItems().length && !(extra || []).length) return '';   /* 11-12 사용자25 #6 — 약이 없는데 「부담 없음 0점」 안심을 보이지 않는다 */
   const unkBox = unk.length ? `<p class="ach-unk">${I.info}<span><b>${unk.length}가지</b>는 성분을 확인하지 못했어요 — <b>0점이라는 뜻이 아닙니다</b>. ${esc(unk.slice(0, 3).join(', '))}${unk.length > 3 ? ' 외' : ''}. 약봉투 이름으로 다시 담으시면 함께 계산해 드려요.</span></p>` : '';
   if (!items.length) return `<div class="ach ok"><div class="ach-h">${I.check}<b>항콜린 부담 없음</b><span class="ach-n">0점</span></div>
     <p class="ach-w">확인한 성분 중에는 입마름·변비·기억력에 부담을 주는 것이 없어요.</p>${unkBox}</div>`;
@@ -3473,6 +3477,8 @@ function homeQuick(n){
   const cell = (ic, t, sub, to) => `<button type="button" class="hq-c" onclick="go('${to}')"><span class="ic">${ic}</span><b>${t}</b><small>${sub}</small></button>`;
   return `<div class="hq-chips" aria-label="바로 쓰기"><button type="button" class="chip" onclick="go('/photo')">${I.search}약 찾기</button><button type="button" class="chip" onclick="go('${n ? '/schedule' : '/me?t=meds'}')">${I.clock}${sched ? '오늘 약 · 알림' : '약 알림 받기'}</button></div>`;
 }
+/* 11-12 사용자25 #13 — 간단히(어르신) 홈은 가슴 통증·숨참·마비 119 줄을 인사 바로 밑에 */
+const ER_LINE = () => `<a class="er-line" href="tel:119">${I.alert}<span>가슴이 조이듯 아프거나, 숨이 많이 차거나, 말이 어눌하고 한쪽에 힘이 빠지면 <b>바로 119</b></span></a>`;
 function vHome(){
   const hour = new Date().getHours();
   const hello = hour < 5 ? '늦은 밤이네요' : hour < 11 ? '좋은 아침이에요' : hour < 18 ? '안녕하세요' : '편안한 저녁이에요';
@@ -3487,7 +3493,7 @@ function vHome(){
   const odL = `<button type="button" class="od-line" onclick="go('/od')">${I.alert}<span>많이 먹었을 때 · 두 번 먹었을 때</span>${I.chev}</button>`;
   return `${topBar()}${ext('가족대화줄')}
   ${dh || ''}
-  ${svOn() ? `<section class="hero home-q">${dot}<div class="eyebrow">${esc(hello)}</div><h1 class="greet">어디가 불편하세요?</h1><p class="sv-lead">약국에서 물어볼 약을 알려 드려요</p></section>
+  ${svOn() ? `<section class="hero home-q">${dot}<div class="eyebrow">${esc(hello)}</div><h1 class="greet">어디가 불편하세요?</h1><p class="sv-lead">약국에서 물어볼 약을 알려 드려요</p></section>${ER_LINE()}
   <div class="sv-tiles one">${SV_HOME.map(id => byId(D.symptoms, id)).filter(Boolean).map(s => `<button class="sv-tile ${gcls(s.group)}" onclick="go('/symptom/${s.id}')"><span class="ic">${sicon(s)}</span><b>${esc(s.name.split(' (')[0])}</b></button>`).join('')}</div>
   <button class="btn ghost sv-all" onclick="homeTab('all');jumpTo('hlist')">다른 증상 모두 보기${I.chev}</button>` : `<section class="hero home-q">${dot}
     <div class="eyebrow">${esc(hello)}</div>
@@ -3497,7 +3503,7 @@ function vHome(){
   ${svOn() ? '' : regionGrid()}
   ${odL}${homeQuick(n)}
   ${ext('대화줄')}
-  ${ext('응급칸')}<a class="er-line" href="tel:119">${I.alert}<span>가슴이 조이듯 아프거나, 숨이 많이 차거나, 말이 어눌하고 한쪽에 힘이 빠지면 <b>바로 119</b></span></a>
+  ${ext('응급칸')}${svOn() ? '' : ER_LINE()}
   ${condOn().length || ME.condskip ? '' : `<div class="cond-line"><button type="button" onclick="go('/me?t=body')">${I.user}<span>앓는 병이 있으면 알려 주세요 — <b>피해야 할 약을 걸러 드려요</b></span>${I.chev}</button><button type="button" class="x" aria-label="이 안내 닫기" onclick="ME.condskip=true;saveMe();route()">${I.x}</button></div>`}
   ${storeBar()}
   <div class="util" aria-label="다른 방법으로 찾기">

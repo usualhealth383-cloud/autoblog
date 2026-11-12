@@ -4608,7 +4608,7 @@ try { 이용량.설치({ 앱: 'yakjido', 켜짐: false, 주소: 'https://uszalzc
    고르개: 약지도 표(KR·US·ES·JP·CN) + 공용 위기번호 표 나라. 표에 없는 나라는 번호 없음(누르는 단추 없이 「그 나라 응급 번호」). */
 try {
   설정판.설치({ app: 'yakjido', 언어: () => window.LANG || 'ko', 말과나라: {
-    기본: () => ({ lang: window.LANG || 'ko', country: window.CC || 'KR' }),
+    기본: () => ({ lang: window.LANG || 'ko', country: window.CC && window.CC !== 'XX' ? window.CC : ((window.LANG || 'ko') === 'ko' ? 'KR' : 'XX') }),   /* 11-12 사용자25 #4 — 나라를 못 맞히면(XX) 한국어 사용자는 한국으로 미리 채움(고칠 수 있음) */
     나라들: ['KR', 'US', 'ES', 'JP', 'CN', 'MX', 'HK', 'VN', 'TH', 'PH', 'ID', 'NP', 'UZ', 'KH', 'MN', 'LK', 'BD', 'IN', 'GB', 'XX'],
     바꿈: (v) => { if (v && (v.lang !== window.LANG || v.country !== window.CC)) { try { localStorage.setItem('yakjido.lang', v.lang); localStorage.setItem('yakjido.cc', v.country); } catch (e) {} location.reload(); } else route(); } } });
   응급카드.설치({ 통역줄: [
