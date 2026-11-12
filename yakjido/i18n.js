@@ -48,7 +48,7 @@
    ① 그 언어 사전(data/i18n/<lang>.json)을 받아 — 증상 응급·진료 신호, 처방약 길잡이 응급 칸(안전 먼저), 화면 글
    ② 그린 화면의 글을 사전으로 바꾼다(없는 글은 한국어 그대로 — 안전 칸을 숨기지 않는다)
    ③ 응급·마음 위기 번호를 «있는 나라» 표로 바꾼다(언어가 아니라 나라 — 표에 있는 숫자만)
-   ④ 한국어가 아닌 화면 맨 위에 「번역은 의료진 검수 전」 한 줄 + 원문 보기 */
+   ④ 한국어가 아닌 화면 맨 아래에 「한국어 원문에서 번역」 한 줄 + 원문 보기(11-05 「검수 전」 꼬리 뗌) */
 (function () {
   if (window.I18N) return;
   var L = window.LANG || 'ko', CC = window.CC || 'KR';
@@ -59,8 +59,8 @@
   var 공표 = window.메디나눔위기번호 && window.메디나눔위기번호.표, 공 = 공표 && 공표[CC];
   var N = EMG[CC] || (공 && 공.응급 ? { e: 공.응급, m: 공.위기 || [] } : { e: null, m: [], unknown: true });
   var 현지 = { ko: '그 나라 응급 번호', en: 'the local emergency number', es: 'el número de emergencias del país', ja: '現地の緊急番号', zh: '当地急救电话' }[L] || 'the local emergency number';
-  var DICT = null, ui = {}, uiN = {}, REV = {}, KO = new Map();   /* KO — 번역 글 → 바꾸기 전 한국어(그릴 때마다 다시 얹어도 남게 한 번만 만든다) */
-  var NOTE = { en: 'Translation not yet reviewed by our medical team', es: 'Traducción aún no revisada por nuestro equipo médico', ja: '翻訳は医療スタッフの確認前です', zh: '翻译尚未经医疗团队审核' };
+  var DICT = null, ui = {}, uiN = {}, UH = {}, UHN = {}, REV = {}, KO = new Map();   /* KO — 번역 글 → 바꾸기 전 한국어(그릴 때마다 다시 얹어도 남게 한 번만 만든다) */
+  var NOTE = { en: 'Translated from the Korean original', es: 'Traducido del original en coreano', ja: '韓国語の原文からの翻訳です', zh: '译自韩文原文' };   /* 11-05 현욱님·Main 「검수 전」 꼬리 떼기 — 번역이라는 사실만 */
   var ORIG = { en: 'Show Korean original', es: 'Ver original en coreano', ja: '韓国語の原文を見る', zh: '查看韩文原文' };
   var KRNOTE = { en: 'Medicine doses follow Korean approval — check with a pharmacist or doctor where you live.', es: 'Las dosis siguen la aprobación de Corea: confírmelas con un farmacéutico o médico de su país.', ja: '薬の量は韓国の承認基準です。お住まいの国の薬剤師・医師に確認してください。', zh: '药物剂量依据韩国批准标准，请向您所在国家的药师或医生确认。' };
   var key = function (t) { return String(t).replace(/\s+/g, ' ').trim(); };
@@ -75,7 +75,7 @@
     'html:not(.lang-ko) nav.tabbar button{white-space:normal;text-align:center;font-size:12.5px;line-height:1.15;padding-inline:2px;overflow-wrap:normal;hyphens:auto;letter-spacing:-.01em}@media (min-width:1024px){html:not(.lang-ko) nav.tabbar button{text-align:left;font-size:1rem}}' +
     '.lang-ja *,.lang-zh *{word-break:normal!important;line-break:strict;overflow-wrap:anywhere}.lang-en *,.lang-es *{word-break:normal!important;overflow-wrap:break-word}' +
     'html:not(.lang-ko) .review-stamp{white-space:normal;flex:0 1 auto;min-width:0;text-align:right;line-height:1.25}html:not(.lang-ko) .chip,html:not(.lang-ko) .hq-c{white-space:normal;max-width:100%;min-width:0;overflow-wrap:anywhere}' +
-    '.i18n-note{display:flex;flex-wrap:wrap;gap:4px 10px;align-items:center;margin:24px 0 8px;padding-top:10px;border-top:1px solid var(--hairline);font-size:.8125rem;color:var(--muted)}.i18n-note button{color:var(--primary);font-weight:600;min-height:36px}';
+    '.i18n-kr{margin:0 0 8px;padding:8px 10px;border-radius:10px;background:var(--alert-tint);color:var(--alert);font-size:.875rem;font-weight:700;line-height:1.4}.i18n-note{display:flex;flex-wrap:wrap;gap:4px 10px;align-items:center;margin:24px 0 8px;padding-top:10px;border-top:1px solid var(--hairline);font-size:.8125rem;color:var(--muted)}.i18n-note button{color:var(--primary);font-weight:600;min-height:36px}';
   document.head.appendChild(st);
 
   function 받기() {
@@ -83,7 +83,7 @@
     var d = window.__I18N__ && window.__I18N__[L];   /* 아티팩트(파일 하나)는 사전을 안에 싣는다 */
     var p = d ? Promise.resolve(d) : fetch('data/i18n/' + L + '.json').then(function (r) { return r.ok ? r.json() : {}; }).catch(function () { return {}; });
     return p.then(function (j) {
-      DICT = j || {}; ui = DICT.ui || {};
+      DICT = j || {}; ui = DICT.ui || {}; UH = DICT.uiH || {}; for (var h in UH) if (/\d/.test(h)) UHN[numKey(h)] = UH[h];
       /* 숫자만 다른 글 — 번역의 숫자도 틀(#)로 바꿔 둔다. 숫자 개수가 원문과 다르면(°F 병기 등) 틀로 쓰지 않는다(같은 글일 때만 씀) */
       for (var k in ui) if (/\d/.test(k)) { var a = k.match(/\d[\d,.]*/g) || [], b = String(ui[k]).match(/\d[\d,.]*/g) || []; if (a.length === b.length) uiN[numKey(k)] = numKey(String(ui[k])); }
     });
@@ -105,7 +105,7 @@
     var ko = function (n, o) { if (n !== o && o) KO.set(n, o); return n; };
     window.yKo = function (t) { return t && typeof t === 'object' ? t._ko : KO.get(t); };
     window.yBanP = function (t, b) { var k = KO.get(t); if (k == null) return null;
-      var sp = function (x) { return String(x).replace(/([.!?])\s+|([。！？])\s*/g, function (m, a, c) { return (a || c) + '\u0001'; }).split('\u0001').filter(function (y) { return y.trim(); }); };
+      var sp = function (x) { return String(x).replace(/([.!?](?:\*\*)?)\s+|([。！？](?:\*\*)?)\s*/g, function (m, a, c) { return (a || c) + '\u0001'; }).split('\u0001').filter(function (y) { return y.trim(); }); };
       var ks = sp(k), hs = ks.map(function (x) { return b.hit(x); }); if (!hs.some(Boolean)) return t;
       var ts = sp(t); return ts.length === ks.length ? ts.filter(function (x, i) { return !hs[i]; }).join(' ') : '';   /* 문장 수가 다르면 그 칸을 통째로 뺀다(안전 쪽) */ };
     (D.symptoms || []).forEach(function (s) {
@@ -114,8 +114,15 @@
       ['how', 'pharmacy', 'selfcare', 'avoid'].forEach(function (k) { if (b[k] && Array.isArray(s[k])) s[k] = s[k].map(function (x, i) { return b[k][i] ? ko(b[k][i], x) : x; }); });
       if (b.plan && Array.isArray(s.plan)) s.plan.forEach(function (o, i) { var x = b.plan[i]; if (x && !o._k) o._k = { slot: o.slot, title: o.title };   /* 11-05 칸 이름으로 맞추는 곳(withSlot·catName)은 한국어 _k 로 */ if (x) ['slot', 'title', 'why', 'either'].forEach(function (f) { if (x[f] && o[f] && o[f] !== x[f]) { if (f !== 'why') REV[x[f]] = o[f]; o[f] = ko(x[f], o[f]); } }); });
       if (b.notWorking && s.notWorking) { if (b.notWorking.title) s.notWorking.title = b.notWorking.title; if (b.notWorking.steps && s.notWorking.steps) s.notWorking.steps = s.notWorking.steps.map(function (x, i) { return b.notWorking.steps[i] ? ko(b.notWorking.steps[i], x) : x; }); }
-      if (b.clinic && s.triage && s.triage.clinic) s.triage.clinic = ko(b.clinic, s.triage.clinic);   /* 11-05 「병원에서는」 칸 */
+      if (b.clinic && s.triage && s.triage.clinic) s.triage.clinic = ko(b.clinic, s.triage.clinic); if (b.pharm && s.triage && s.triage.pharmacy) s.triage.pharmacy = ko(b.pharm, s.triage.pharmacy);   /* 「약국에서는」 — banProse 가 KO 로 거름 */   /* 11-05 「병원에서는」 칸 */
       if (b.faq && Array.isArray(s.faq)) s.faq.forEach(function (o, i) { var x = b.faq[i]; if (x) { if (o._ko == null) o._ko = (o.q || '') + ' ' + (o.a || ''); if (x.q) o.q = x.q; if (x.a) o.a = x.a; } });
+    });
+    /* 11-05 약 설명(보이기만 하는 칸) — 용량·주의·금기·simple 은 아직 한국어(판정·약사 카드가 그 글을 읽는다). pAdj 는 yKo 로 한국어 원문에 규칙을 건다 */
+    var DG = DICT.drug || {};
+    (D.drugs || []).forEach(function (d) { var b = DG[d.id]; if (!b) return;
+      ['tagline', 'lead', 'children', 'onset', 'duration'].forEach(function (k) { if (b[k] && d[k]) d[k] = ko(b[k], d[k]); });
+      ['for', 'sideEffects', 'stop', 'tips'].forEach(function (k) { if (b[k] && Array.isArray(d[k])) d[k] = d[k].map(function (x, i) { return b[k][i] ? ko(b[k][i], x) : x; }); });
+      if (b.faq && Array.isArray(d.faq)) d.faq.forEach(function (o, i) { var x = b.faq[i]; if (x) { if (o._ko == null) o._ko = (o.q || '') + ' ' + (o.a || ''); if (x.q) o.q = ko(x.q, o.q); if (x.a) o.a = ko(x.a, o.a); } });
     });
     var R = typeof RXG !== 'undefined' ? RXG : window.RXG, RX = DICT.rx || {};
     if (R && R.guides) {
@@ -137,6 +144,8 @@
     var E = N.e || 현지;
     return s.replace(/1577-0199/g, N.m[1] || N.m[0] || E).replace(/(^|[^\d-])109(?![\d-])/g, function (a, p) { return p + (N.m[0] || E); }).replace(/(^|[^\d-])119(?![\d-])/g, function (a, p) { return p + E; });
   }
+  /* 11-12 홈 빨간 동그라미(56px) — 번호를 모르는 나라면 긴 「그 나라 응급 번호」 대신 짧은 말 */
+  function 동그라미() { if (CC === 'KR' || N.e) return; document.querySelectorAll('.sos-dot').forEach(function (a) { a.textContent = { ko: '응급', en: 'SOS', es: 'SOS', ja: '緊急', zh: '急救' }[L] || 'SOS'; }); }
   /* 11-03 아래 탭은 칸이 좁아 긴 번역이 겹친다 — 탭에만 짧은 이름(화면 제목은 그대로) */
   var TABS = { en: { 'Medicine dictionary': 'Medicines', 'My information': 'My info' }, es: { 'Diccionario de medicamentos': 'Medicinas' } };
   function 탭() { var m = TABS[L], nav = document.querySelector('nav.tabbar'); if (!m || !nav || innerWidth >= 1024) return;
@@ -148,8 +157,17 @@
         if (REV[t]) { n.nodeValue = v.replace(t, REV[t]); continue; }
         for (var i = 0; i < ks.length; i++) if (v.indexOf(ks[i]) >= 0) v = v.split(ks[i]).join(REV[ks[i]]);
         if (v !== n.nodeValue) n.nodeValue = v; } }); }
+  /* 11-05 굵은 글씨가 낀 문단은 문단째(uiH: 「…**굵게**…」 → 번역) — 조각마다 옮기면 어순이 깨진다 */
+  function 문단(el) { if (L === 'ko' || !el.querySelectorAll) return;
+    el.querySelectorAll('p,li,span,small,div').forEach(function (e) { var c = e.childNodes, k = '', b = 0;
+      if (c.length < 2 || (e.closest && e.closest('[data-ko]'))) return;
+      for (var i = 0; i < c.length; i++) { var x = c[i]; if (x.nodeType === 3) k += x.nodeValue; else if (/^(B|STRONG)$/.test(x.nodeName) && !x.children.length) { k += '**' + x.textContent + '**'; b++; } else return; }
+      k = key(k); if (!b || !/[가-힣]/.test(k)) return;
+      var v = UH[k], nums = k.match(/\d[\d,.-]*/g) || [], j = 0; if (v == null && (v = UHN[numKey(k)]) != null) v = v.replace(/\d[\d,.-]*/g, function () { return nums[j++] || ''; });
+      if (v != null) e.innerHTML = v.replace(/[&<>]/g, function (m) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;' }[m]; }).replace(/\*\*(.+?)\*\*/g, '<b>$1</b>'); }); }
   function 바꾸기(el) {
     if (!el) return;
+    문단(el);
     var w = document.createTreeWalker(el, NodeFilter.SHOW_TEXT, null), n, todo = [];
     while ((n = w.nextNode())) todo.push(n);
     todo.forEach(function (n) {
@@ -169,16 +187,19 @@
   function 알림줄(view) {
     if (L === 'ko' || !view || view.querySelector('.i18n-note')) return;
     var d = document.createElement('div'); d.className = 'i18n-note';
-    d.innerHTML = '<span>' + NOTE[L] + '</span><button type="button" onclick="setLang(\'ko\')">' + ORIG[L] + '</button>';
+    d.innerHTML = '<span>' + NOTE[L] + '</span><button type="button" onclick="try{localStorage.setItem(\'yakjido.lang.prev\',\'' + L + '\')}catch(e){};setLang(\'ko\')">' + ORIG[L] + '</button>';
     view.appendChild(d);   /* 11-03 Main — 첫 3초에 경고가 먼저 보이지 않게 화면 맨 아래 작은 한 줄로(첫 진입 경고 벽 금지) */
     /* 약 용량 칸 — 「한국 허가 기준 — 사는 나라 약사와 확인」 */
-    view.querySelectorAll('.dose-card,.dose-hero,.sv-dose').forEach(function (c) { if (c.querySelector('.i18n-kr')) return; var p = document.createElement('p'); p.className = 'i18n-kr small muted'; p.textContent = KRNOTE[L]; c.appendChild(p); });
+    view.querySelectorAll('.dose-card,.dose-hero,.sv-dose').forEach(function (c) { if (c.querySelector('.i18n-kr')) return; var p = document.createElement('p'); p.className = 'i18n-kr'; p.textContent = KRNOTE[L]; c.insertBefore(p, c.firstChild); });   /* 11-09 C3 — 용량 줄 위에 눈에 띄게 */
   }
   window.I18N = {
     lang: L, cc: CC, emg: N,
     tr: function (el) { if (DICT && el) 바꾸기(el); },   /* 11-03 늦게 채우는 칸(기내용 받아 두기 등) */
     t: function (s) { var r = L !== 'ko' ? 글(s) : null; return 번호(r != null ? r : s); },   /* 11-03 그린 뒤에 넣는 글(로그인 필수 안내 등) */
-    apply: function (view) { if (!DICT) return; 본문(); 바꾸기(view); 바꾸기(document.querySelector('nav.tabbar')); 탭(); 한국어칸(view); 알림줄(view); },
+    apply: function (view) { if (!DICT) return; 본문(); 바꾸기(view); 바꾸기(document.querySelector('nav.tabbar')); 탭(); 한국어칸(view); 알림줄(view); 동그라미(); },
     ready: 받기().then(function () { 본문(); if (typeof route === 'function') route(); })
   };
 })();
+/* 11-12 사용자25 #21 — 영어 문장 검색 낱말 바꾸기(app-shell 의 enQ 가 부른다) */
+var EN_Q = [[/blood\s*pressure|hypertension/g, '혈압약'], [/cold\s*(medicine|medication|remedy)|flu\s*medicine/g, '감기약'], [/pain\s*(killer|reliever|medicine)|analgesic/g, '진통제'], [/head\s*ache|migraine/g, '두통'], [/heart\s*burn|acid\s*reflux/g, '속쓰림'], [/indigestion|upset\s*stomach/g, '소화불량'], [/diarrh?o?ea/g, '설사'], [/constipation/g, '변비'], [/cough/g, '기침'], [/sore\s*throat/g, '목 아픔'], [/runny\s*nose|stuffy\s*nose|congestion/g, '코막힘'], [/fever/g, '열'], [/insomnia|can'?t\s*sleep|sleep/g, '잠이 안 올 때'], [/allerg\w*/g, '알레르기'], [/back\s*pain/g, '허리'], [/period\s*pain|cramps/g, '생리통'], [/hangover/g, '숙취'], [/diabetes|blood\s*sugar/g, '당뇨약'], [/\b(cold)\b/g, '감기'], [/\b(pills?|tablets?|medicines?|medication|drugs?|for|with|and|the|a|my)\b/g, ' ']];
+window.enQS = q => /[가-힣]/.test(q) || !/[a-z]/i.test(q) ? q : EN_Q.reduce((s, [r, k]) => s.replace(r, ' ' + k + ' '), q.toLowerCase()).replace(/\s+/g, ' ').trim() || q;
