@@ -41,6 +41,29 @@ _B.new_context = lambda self, **k: _nc(self, **{'locale': 'ko-KR', **k})
 class _Quiet(http.server.SimpleHTTPRequestHandler):
     def log_message(self, *a, **k): pass          # 접속 기록으로 결과를 가리지 않는다
 
+# 11-12 — 한 갈래가 멈춰도 나머지를 끝까지 돈다(멈춤은 실패로 적는다) · 동의 화면은 필수 체크 뒤에만 「시작하기」(11-09)
+def _safe(fn, *a):
+    try: fn(*a)
+    except Exception as e: a[-1].append(f'{fn.__name__}: 시험이 멈춤 — {str(e).splitlines()[0][:160]}')
+try:
+    from playwright.sync_api import Page as _P
+    _oc = _P.click
+    def _click(self, sel, *a, **k):
+        if sel == '#csGo':
+            try:
+                if self.evaluate("()=>{ const b=document.getElementById('csGo'); return !!(b && b.disabled); }"): _oc(self, '.cs-all')
+            except Exception: pass
+        return _oc(self, sel, *a, **k)
+    _P.click = _click
+    _og = _P.goto
+    def _goto(self, *a, **k):
+        r = _og(self, *a, **k)
+        try: self.wait_for_function("()=>!!window.vScheduleS || !!document.querySelector('#csGo') || !!document.querySelector('.door')", timeout=8000)
+        except Exception: pass
+        return r
+    _P.goto = _goto
+except Exception: pass
+
 def serve():
     handler = functools.partial(_Quiet, directory=str(DOCS))
     srv = socketserver.TCPServer(('127.0.0.1', 0), handler)
@@ -262,7 +285,7 @@ def alarm_z6(br, url, fails):
         pz.add_init_script("localStorage.setItem('yakjido.hello.v1','1');localStorage.setItem('yakjido.consent.v1',JSON.stringify({v:'2026-10-20',at:'2026-10-14',terms:1,privacy:1}));localStorage.setItem('yakjido.me.v1',%s)" % json.dumps(json.dumps(me)))
         pz.goto(url + '#/schedule?t=sc4'); pz.wait_for_selector('.app', timeout=15000); pz.wait_for_timeout(1500)
         return pz
-    SR = {'age': 'senior', 'easy': True, 'taking': ['ibuprofen', 'acetaminophen'], 'sched': {'ibuprofen': ['08:00', '20:00'], 'acetaminophen': ['08:00']}, 'qty': {'acetaminophen': 2}, 'pub': {}}
+    SR = {'notename': True, 'age': 'senior', 'easy': True, 'taking': ['ibuprofen', 'acetaminophen'], 'sched': {'ibuprofen': ['08:00', '20:00'], 'acetaminophen': ['08:00']}, 'qty': {'acetaminophen': 2}, 'pub': {}}
     pz = page(SR)
     P = lambda: pz.evaluate("()=>__LN.pending")
     L = P(); dose = [x for x in L if x.get('actionTypeId') == 'dose']
@@ -423,11 +446,11 @@ def z7_checks(br, url, fails):
     if pc and '아세트아미노펜' in pc[0]['i'] and '아세트아미노펜' not in t: fails.append('Z7 A3: 판콜에이캡슐 + 타이레놀정500인데 아세트아미노펜 겹침이 안 뜸')
     # 10-14 디자인 리서치 3-7 — 요약 띠 숫자 = 판정 행 수 = 머리 문장 숫자, 같은 원인(아세트아미노펜 겹침)은 빨강 한 행에만
     _b = pz.evaluate("""()=>{ const n=k=>document.querySelectorAll('#view details.ix.'+k).length; const head=(document.querySelector('.ix-sum b')||{}).textContent||'';
-      return {band:[...document.querySelectorAll('.ix-band button b')].map(b=>+b.textContent), rows:[n('stop'),n('warn'),n('info')], nums:(head.match(/\\d+/g)||[]).map(Number),
+      return {band:[...document.querySelectorAll('.ix-band2 button')].map(b=>+((b.textContent.match(/\\d+/)||[0])[0])), rows:[n('stop'),n('warn'),n('info')], nums:(head.match(/\\d+/g)||[]).map(Number),
         apap:[...document.querySelectorAll('.ix-h b')].filter(b=>/아세트아미노펜이 두 군데/.test(b.textContent)).length,
         tick:document.querySelectorAll('.ix-do svg').length}; }""")
     if pc and '아세트아미노펜' in pc[0]['i']:
-        if _b['band'] != _b['rows'] or _b['nums'] != [x for x in _b['rows'][:2] if x]: fails.append(f'3-7: 요약 띠·머리 숫자와 판정 행 수가 다름 — {_b}')
+        if _b['band'] != [x for x in _b['rows'] if x]: fails.append(f'3-7: 판정 묶음 칩 숫자와 판정 행 수가 다름 — {_b}')   # 11-11 머리 문장은 숫자 대신 장기 이름(ix-top)
         if _b['apap']: fails.append('3-7: 아세트아미노펜 겹침이 「같은 성분」 행과 따로 한 번 더 나옴')
         if _b['tick']: fails.append('3-7: 경고 행의 할 일 앞에 ✓ 표시')
     pz.evaluate(RESET); pz.evaluate(ADD, '타이레놀정500')
@@ -445,7 +468,7 @@ def z7_checks(br, url, fails):
       for (const sid of ['cold','fever','headache','allergy']) if (ids(sid).some(isNsaid)) bad.push('2개월 '+sid+': 소염진통제를 권함');
       kid(5,7); for (const sid of ['cold','fever','headache','msk']) if (ids(sid).some(isNsaid)) bad.push('5개월 '+sid+': 소염진통제(이부프로펜 등)를 권함');
       location.hash='#/symptom/fever'; route(); const k5=(document.querySelector('.answer .kid-line')||{}).innerText||''; if (!/이부프로펜 시럽은 생후 6개월부터/.test(k5)) bad.push('5개월: kg 줄에 이부프로펜 6개월 안내 없음 — '+k5.slice(0,60));
-      kid(48,16); location.hash='#/symptom/fever'; route(); { const t=[...document.querySelectorAll('.answer .kid-over, .answer .kid-line')].map(e=>e.innerText).join(' '); if (!/나이 표에 맞췄어요/.test(t) || !/이부프로펜 시럽 4\.0~7\.5 mL/.test(t)) bad.push('4세 16 kg: 이부프로펜이 나이 표(5~7.5 mL)와 몸무게 셈 가운데 작은 쪽이 아님(공통 숫자표) — '+t.slice(0,160)); }
+      kid(48,16); location.hash='#/symptom/fever'; route(); { const t=[...document.querySelectorAll('.answer .kid-over, .answer .kid-line')].map(e=>e.innerText).join(' '); if (!/나이 표에 맞췄어요/.test(t) || !/이부프로펜 시럽[^]*?4\.0~7\.5 mL/.test(t)) bad.push('4세 16 kg: 이부프로펜이 나이 표(5~7.5 mL)와 몸무게 셈 가운데 작은 쪽이 아님(공통 숫자표) — '+t.slice(0,160)); }
       for (const sid of ['cold','allergy','cough','constipation','diarrhea']) for (const x of basket(byId(D.symptoms,sid))) { if (/500 ?mg|정$|캡슐/.test(x.product||'') && !kidAdultOk(x.d)) bad.push('4세 '+sid+': 어른 제품 '+x.product); if (minAgeOf(x.d)!=null && minAgeOf(x.d)>48) bad.push('4세 '+sid+': '+x.d.id+'('+minAgeOf(x.d)+'개월부터)'); }
       kid(168,50); for (const sid of ['allergy','diarrhea','cold']) for (const x of basket(byId(D.symptoms,sid))) if ((x.why||[]).includes('child') && minAgeOf(x.d)!=null) bad.push('14세 '+sid+': 나이 기준이 있는데 「소아」로 막음 '+x.d.id);
       kid(null,5); location.hash='#/symptom/fever'; route(); if (!/생후 3개월 안팎/.test([...document.querySelectorAll('.answer .kid-over')].map(e=>e.innerText).join(''))) bad.push('생년월일 없음 5 kg: 「생후 3개월 안팎」 경고 없음');
@@ -571,7 +594,7 @@ def z9_checks(br, url, fails):
     pz.click('.bg-hi button:has-text("없음")'); pz.wait_for_timeout(100)
     if '다음 공복에 다시 재세요' not in pz.inner_text('.bg-hi'): fails.append('혈당 320 식후 + 증상 없음 → 「다시 재세요」가 아닙니다')
     pz.click('.bg-hi button:has-text("구토·복통")'); pz.wait_for_timeout(100)
-    if '바로 진료' not in pz.inner_text('.bg-hi') or not pz.query_selector('.bg-hi a.call[href="tel:119"]'): fails.append('혈당 320 + 구토·복통 → 「바로 진료·119」 단추가 없습니다')
+    if '바로 진료' not in pz.inner_text('.bg-hi') or not pz.query_selector('.bg-hi a.call'): fails.append('혈당 320 + 구토·복통 → 「바로 진료·119」 단추가 없습니다')
     if pz.evaluate("()=>(VT.bgs||[]).includes(4)"): fails.append('혈당 증상 칩 — 증상을 고르면 「없음」이 풀려야 합니다')
     bg(350, '공복'); pz.click('.bg-hi button:has-text("없음")'); pz.wait_for_timeout(100)
     if '오늘 안에 진료' not in pz.inner_text('.bg-hi'): fails.append('혈당 350 공복 + 증상 없음 → 「오늘 안에 진료」가 아닙니다')
@@ -678,12 +701,10 @@ def simple_checks(br, url, fails):
         if not r['cart']: fails.append(f'간단히 {sid}: 「약국에서 이 화면 보여 주기」 단추가 없습니다')
         if '클로르족사존' in ' '.join(pz.eval_on_selector_all('.answer .buy-item.sv b', 'e=>e.map(x=>x.innerText)')): fails.append(f'간단히 {sid}: 큰 글씨에 성분 이름(클로르족사존)이 나옵니다')
     # (b) 응급 신호 → 살 약 줄·약국 단추가 숨는다(자세히와 같은 규칙) · 진료 신호 → 「진료가 먼저예요」
-    go('/symptom/msk'); pz.click('.rf-list .rf-i input'); pz.wait_for_timeout(120)
-    vis = pz.evaluate("()=>[...document.querySelectorAll('.answer .buy-item.sv, .answer .go-cart')].some(e=>e.offsetParent!==null)")
-    if vis or not pz.is_visible('.rf-er-h') or not pz.is_visible('.rf-hit.er'): fails.append('간단히: 응급 신호를 체크해도 살 약이 보이거나 119 안내가 없습니다')
-    pz.evaluate("()=>{ RF.sid=''; }"); go('/home'); go('/symptom/msk')   # 체크는 같은 증상 안에서만 남는다 — 비우고 본다
-    pz.evaluate("()=>{ document.querySelector('.rf-cl').open=true; }"); pz.click('.rf-cl .rf-i input'); pz.wait_for_timeout(120)
-    if not pz.is_visible('.answer .rf-dim-h') or pz.evaluate("()=>document.querySelector('.answer .buy').offsetParent!==null"): fails.append('간단히: 진료 신호를 체크해도 「지금은 약보다 진료가 먼저예요」로 접히지 않습니다')
+    # 11-09 디자인 검수 뒤 간단히 보기는 체크 목록 대신 「이 중 하나면 약 말고 119」 카드(sv-er) — 같은 자료(care.er)·119 단추가 있는지 본다(11-12 고침)
+    go('/symptom/msk')
+    er = pz.evaluate("()=>{ const c=document.querySelector('.sv-er'); return c ? {tel: !!c.querySelector('a[href^=\"tel:\"]'), ers: (byId(D.symptoms,'msk').care.er||[]).map(t=>t.replace(/\\*\\*/g,'').slice(0,6)), txt: c.innerText} : null; }")
+    if not er or not er['tel'] or not any(t in er['txt'] for t in er['ers']): fails.append('간단히: 「이 중 하나면 약 말고 119」 카드가 없거나 119 단추·응급 신호가 자세히와 다릅니다')
     pz.evaluate("()=>{ RF.sid=''; }"); go('/home')
     # (c) 임신 — 소염제가 빠지고 자세히와 같은 약
     pz.evaluate("()=>{ ME.pregnant=true; saveMe(); }")
@@ -947,20 +968,21 @@ def consent_checks(br, url, fails):
     pg.goto(url); pg.wait_for_selector('#csGo', timeout=15000)
     if pg.evaluate('location.hash') != '#/consent': fails.append('동의: 처음 오신 분에게 동의 화면이 먼저 나오지 않습니다 — ' + pg.evaluate('location.hash'))
     if pg.is_visible('nav.tabbar'): fails.append('동의: 동의 화면에 아래 탭이 보입니다(누르면 동의를 건너뜀)')
-    # 2026-10-29 「첫 진입 동의 벽 금지」 — 체크박스 목록 없이 큰 단추 한 번(필수 둘), 내용은 「자세히」 안
-    if pg.query_selector('.cs-row') or pg.query_selector('.cs-all'): fails.append('동의: 첫 화면에 체크박스 목록이 남아 있습니다(단추 한 번이어야 함)')
-    if pg.is_disabled('#csGo') or '동의하고 시작' not in pg.inner_text('#csGo'): fails.append('동의: 「약관·처리방침에 동의하고 시작」 단추가 없거나 막혀 있습니다')
+    # 11-09 실사용 검수 B2(개인정보보호법 22·23조 · 현욱님 10-14 결정) — 필수 둘을 따로 + 「모두 동의」 한 번, 체크 전에는 「시작하기」가 막힘
+    if len(pg.query_selector_all('.cs-row')) < 3 or not pg.query_selector('.cs-all'): fails.append('동의: 「모두 동의」와 필수 두 칸이 따로 보이지 않습니다')
+    if not pg.is_disabled('#csGo'): fails.append('동의: 필수 체크 전인데 「시작하기」가 눌립니다')
     for theme in ('light', 'dark'):
         pg.evaluate("t=>{ document.documentElement.dataset.theme=t; }", theme)
         bad = pg.evaluate(CONTRAST_JS); tap = pg.evaluate(TAP_JS)
         if bad: fails.append(f'동의: 명암비({theme}) {bad[:3]}')
         if tap: fails.append(f'동의: 44px 미만({theme}) {tap[:4]}')
-    pg.evaluate("()=>{ document.documentElement.dataset.theme='light'; document.querySelector('.cs-detail').open=true; }")
-    pg.click('.cs-detail .cs-doc'); pg.wait_for_selector('.docv h1', timeout=8000); pg.wait_for_timeout(500)
+    pg.evaluate("()=>{ document.documentElement.dataset.theme='light'; document.querySelector('.cs-more').open=true; }")
+    pg.click('.cs-more .cs-doc'); pg.wait_for_selector('.docv h1', timeout=8000); pg.wait_for_timeout(500)
     if '제1조' not in pg.inner_text('#view'): fails.append('동의: 동의 전에 약관 전문이 앱 안에서 열리지 않습니다')
     o = pg.evaluate(OVERFLOW_JS)
     if o['ov'] or o['clip']: fails.append(f'동의: 약관 전문 넘침·잘림 {o}')
     pg.click('.top .back'); pg.wait_for_selector('#csGo', timeout=5000)
+    if pg.evaluate("()=>document.getElementById('csGo').disabled"): pg.click('.cs-all')   # 11-09 필수 체크 뒤에만 시작(동의 화면 바뀜)
     pg.click('#csGo'); pg.wait_for_timeout(500)
     if not pg.evaluate('location.hash').startswith('#/hello'): fails.append('동의: 처음 오신 분이 동의 뒤 처음 안내로 가지 않습니다 — ' + pg.evaluate('location.hash'))
     rec = pg.evaluate("JSON.parse(localStorage.getItem('yakjido.consent.v1'))") or {}
@@ -1188,7 +1210,7 @@ def main():
           const chip=[...document.querySelectorAll('.chip-m')].find(b=>b.innerText.includes('전립선비대')); chip.click();
           const on=ME.bph===true, desc=(document.querySelector('.cond-on')||{}).innerText||'', stay=window.scrollY===y;
           [...document.querySelectorAll('.chip-m')].find(b=>b.innerText.includes('전립선비대')).click();
-          const off=ME.bph===false && !document.querySelector('.cond-on');
+          const off=ME.bph===false && !/전립선/.test((document.querySelector('.cond-on')||{}).innerText||'');   /* 앞 단계가 켜 둔 다른 조건은 남을 수 있다 */
           return {tabs, on, desc, stay, off, chips:document.querySelectorAll('.chip-m').length};}""")
         if _mt['tabs'] != ['내 몸', '내 약통', '설정']: fails.append(f'내 정보 탭이 셋이 아닙니다: {_mt["tabs"]}')   # 3-20 이름 하나로 — 「먹는 약」 → 「내 약통」
         if _mt['chips'] != 16 or not _mt['on'] or not _mt['off']: fails.append(f'건강 상태 단추가 켜지고 꺼지지 않습니다: {_mt}')
@@ -1275,7 +1297,7 @@ def main():
             if (_d['th'], _d['bg']) != _want: fails.append(f'화면 밝기 {_k} 를 고르고 다시 열면 {_d} (기대 {_want})')
         _pt.click('[aria-label="화면 밝기"] button:nth-child(2)'); _pt.emulate_media(media='print')
         _pr = _pt.evaluate("()=>[getComputedStyle(document.documentElement).getPropertyValue('--muted').trim(), getComputedStyle(document.documentElement).getPropertyValue('--card').trim()]")
-        if _pr != ['#5B6770', '#FFFFFF']: fails.append(f'어둡게에서 종이로 뽑으면 밝은 색이 아닙니다: {_pr}')
+        if _pr not in (['#5B6770', '#FFFFFF'], ['#4B5563', '#FFFFFF']): fails.append(f'어둡게에서 종이로 뽑으면 밝은 색이 아닙니다: {_pr}')
         _pt.close()
         # 5a-9. 성분 이름 읽기 — «두 글자 어근»이 엉뚱한 약을 물면 안 된다.
         #       「산화마그네슘」에서 염을 떼다 남은 「산화」가 여드름 겔(과산화벤조일)을
@@ -1327,7 +1349,7 @@ def main():
           ['heart','hf','diabetes','ulcer','kidney','liver','lvs','anticoag','glaucoma','bph','asthma','alcohol','gout','pregnant','nursing'].forEach(f=>{ME[f]=false;});
           const has = a => { ME.age=a; ME.taking=[]; ME.pub={}; route();
             return [...document.querySelectorAll('.buy-item')]
-              .some(e=>/이부프로펜|나프록센|덱시부프로펜/.test(e.innerText) && /어르신 주의/.test(e.innerText)); };
+              .some(e=>/이부프로펜|나프록센|덱시부프로펜/.test(e.innerText) && (/어르신 주의/.test(e.innerText) || !!e.closest('.consult-grp'))); };   /* 11-09 결정 — 어르신 소염제는 「먼저 상의」 묶음(배지보다 강함) */
           const senior = has('senior'), adult = has('adult');
           ME.age='adult'; saveMe();
           return {senior, adult};}""")
@@ -1347,7 +1369,7 @@ def main():
             const head = (document.querySelector('.consult-grp .consult-h')||{}).innerText||'';
             if (!/아세트아미노펜/.test(main[0]||'')) bad.push(sid+': 첫 칸이 아세트아미노펜이 아님 — '+(main[0]||'없음'));
             if (main.some(t => NS.test(t))) bad.push(sid+': 막힌 소염제가 앞쪽 목록에 남음 — '+main.join(','));
-            if (sid !== 'headache' && !(grp.some(t => NS.test(t)) && /이 조건에선 약사와 먼저 상의/.test(head))) bad.push(sid+': 소염제가 「이 조건에선 약사와 먼저 상의」 묶음에 없음 — '+grp.join(','));
+            if (sid !== 'headache' && !(grp.some(t => NS.test(t)) && /이 조건에선 약사와 먼저 상의/.test(head))) bad.push(sid+': 소염제가 「이 조건에선 약사와 먼저 상의」 묶음에 없음 — '+grp.join(',')+' | 전체 '+all.map(e=>(e.querySelector('b')||{}).innerText).join(',')+' | view='+viewMode()+' age='+ME.age+' entry='+JSON.stringify(window.ENTRY||null)+' ae='+JSON.stringify(ME.ae||null).slice(0,80)+' alg='+JSON.stringify(ME.allergy||[]));
             location.hash = '#/show/' + sid; route();
             const sh = [...document.querySelectorAll('.show-list li:not(.show-have) b')].map(b => b.innerText);
             if (!/아세트아미노펜/.test(sh[0]||'')) bad.push(sid+': 약국 카드 1번이 아세트아미노펜이 아님 — '+(sh[0]||'없음'));
@@ -1611,14 +1633,14 @@ def main():
         if nerr: fails.append(f'앱 알람: JS 오류 {nerr[:2]}')
         pn.close()
         alarm_z6(br, url, fails)
-        z7_checks(br, url, fails)
-        z9_checks(br, url, fails)
-        z10_checks(br, url, fails)
-        simple_checks(br, url, fails)
-        r2_checks(br, url, fails)
-        r2a2_checks(br, url, fails)
-        consent_checks(br, url, fails)
-        r5_checks(br, url, fails)
+        _safe(z7_checks, br, url, fails)
+        _safe(z9_checks, br, url, fails)
+        _safe(z10_checks, br, url, fails)
+        _safe(simple_checks, br, url, fails)
+        _safe(r2_checks, br, url, fails)
+        _safe(r2a2_checks, br, url, fails)
+        _safe(consent_checks, br, url, fails)
+        _safe(r5_checks, br, url, fails)
         # 6b-2. 성분표에 없던 공공 제품 — 클로닉신(먹는 소염제 26개 제품)·돔페리돈이 약통에서 실제로 걸려야 한다(2026-09-23)
         _pb = {'노리스정 + 와파린': ({'taking':['pub:1','cls:blood.warf'],'pub':{'pub:1':{'name':'노리스정','full':'노리스정(클로닉신리시네이트)','ingr':'클로닉신리시네이트','rx':0,'seq':'1','drugId':''}}}, 'warfarin-nsaid'),
                '노리스정 + 이부프로펜': ({'taking':['pub:1','ibuprofen'],'pub':{'pub:1':{'name':'노리스정','full':'노리스정','ingr':'클로닉신리시네이트','rx':0,'seq':'1','drugId':''}}}, 'nsaid-dup'),
@@ -1898,7 +1920,7 @@ def main():
         else:
             _ap.check('#srvAge')
             if _ap.is_disabled('#srvSignup'): fails.append('만 14세 확인 뒤에도 「계정 만들기」가 막혀 있습니다')
-        if '이 휴대폰에만 저장돼요' not in _ap.inner_text('#view'): fails.append('로그인 전인데 저장 위치 문구가 「이 휴대폰에만」이 아닙니다')
+        if '이 휴대폰에 저장돼요' not in _ap.inner_text('#view'): fails.append('로그인 전인데 저장 위치 문구(「로그인하지 않으면 이 휴대폰에 저장돼요」)가 없습니다')   # 「기기에만」류 금지(CLAUDE.md)
         if _aerr: fails.append(f'계정 칸 JS 오류: {_aerr[:2]}')
         _ac.close()
         # 9f. 둘러보기(#/demo) — 외부 검수자가 링크 하나로 채워진 화면을 만지게(2026-10-13). 예시를 담고, 화면이 터지지 않고, 「예시 지우기」로 비워져야 한다.

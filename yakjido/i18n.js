@@ -144,6 +144,8 @@
     var E = N.e || 현지;
     return s.replace(/1577-0199/g, N.m[1] || N.m[0] || E).replace(/(^|[^\d-])109(?![\d-])/g, function (a, p) { return p + (N.m[0] || E); }).replace(/(^|[^\d-])119(?![\d-])/g, function (a, p) { return p + E; });
   }
+  /* 11-12 홈 빨간 동그라미(56px) — 번호를 모르는 나라면 긴 「그 나라 응급 번호」 대신 짧은 말 */
+  function 동그라미() { if (CC === 'KR' || N.e) return; document.querySelectorAll('.sos-dot').forEach(function (a) { a.textContent = { ko: '응급', en: 'SOS', es: 'SOS', ja: '緊急', zh: '急救' }[L] || 'SOS'; }); }
   /* 11-03 아래 탭은 칸이 좁아 긴 번역이 겹친다 — 탭에만 짧은 이름(화면 제목은 그대로) */
   var TABS = { en: { 'Medicine dictionary': 'Medicines', 'My information': 'My info' }, es: { 'Diccionario de medicamentos': 'Medicinas' } };
   function 탭() { var m = TABS[L], nav = document.querySelector('nav.tabbar'); if (!m || !nav || innerWidth >= 1024) return;
@@ -185,7 +187,7 @@
   function 알림줄(view) {
     if (L === 'ko' || !view || view.querySelector('.i18n-note')) return;
     var d = document.createElement('div'); d.className = 'i18n-note';
-    d.innerHTML = '<span>' + NOTE[L] + '</span><button type="button" onclick="setLang(\'ko\')">' + ORIG[L] + '</button>';
+    d.innerHTML = '<span>' + NOTE[L] + '</span><button type="button" onclick="try{localStorage.setItem(\'yakjido.lang.prev\',\'' + L + '\')}catch(e){};setLang(\'ko\')">' + ORIG[L] + '</button>';
     view.appendChild(d);   /* 11-03 Main — 첫 3초에 경고가 먼저 보이지 않게 화면 맨 아래 작은 한 줄로(첫 진입 경고 벽 금지) */
     /* 약 용량 칸 — 「한국 허가 기준 — 사는 나라 약사와 확인」 */
     view.querySelectorAll('.dose-card,.dose-hero,.sv-dose').forEach(function (c) { if (c.querySelector('.i18n-kr')) return; var p = document.createElement('p'); p.className = 'i18n-kr'; p.textContent = KRNOTE[L]; c.insertBefore(p, c.firstChild); });   /* 11-09 C3 — 용량 줄 위에 눈에 띄게 */
@@ -194,7 +196,10 @@
     lang: L, cc: CC, emg: N,
     tr: function (el) { if (DICT && el) 바꾸기(el); },   /* 11-03 늦게 채우는 칸(기내용 받아 두기 등) */
     t: function (s) { var r = L !== 'ko' ? 글(s) : null; return 번호(r != null ? r : s); },   /* 11-03 그린 뒤에 넣는 글(로그인 필수 안내 등) */
-    apply: function (view) { if (!DICT) return; 본문(); 바꾸기(view); 바꾸기(document.querySelector('nav.tabbar')); 탭(); 한국어칸(view); 알림줄(view); },
+    apply: function (view) { if (!DICT) return; 본문(); 바꾸기(view); 바꾸기(document.querySelector('nav.tabbar')); 탭(); 한국어칸(view); 알림줄(view); 동그라미(); },
     ready: 받기().then(function () { 본문(); if (typeof route === 'function') route(); })
   };
 })();
+/* 11-12 사용자25 #21 — 영어 문장 검색 낱말 바꾸기(app-shell 의 enQ 가 부른다) */
+var EN_Q = [[/blood\s*pressure|hypertension/g, '혈압약'], [/cold\s*(medicine|medication|remedy)|flu\s*medicine/g, '감기약'], [/pain\s*(killer|reliever|medicine)|analgesic/g, '진통제'], [/head\s*ache|migraine/g, '두통'], [/heart\s*burn|acid\s*reflux/g, '속쓰림'], [/indigestion|upset\s*stomach/g, '소화불량'], [/diarrh?o?ea/g, '설사'], [/constipation/g, '변비'], [/cough/g, '기침'], [/sore\s*throat/g, '목 아픔'], [/runny\s*nose|stuffy\s*nose|congestion/g, '코막힘'], [/fever/g, '열'], [/insomnia|can'?t\s*sleep|sleep/g, '잠이 안 올 때'], [/allerg\w*/g, '알레르기'], [/back\s*pain/g, '허리'], [/period\s*pain|cramps/g, '생리통'], [/hangover/g, '숙취'], [/diabetes|blood\s*sugar/g, '당뇨약'], [/\b(cold)\b/g, '감기'], [/\b(pills?|tablets?|medicines?|medication|drugs?|for|with|and|the|a|my)\b/g, ' ']];
+window.enQS = q => /[가-힣]/.test(q) || !/[a-z]/i.test(q) ? q : EN_Q.reduce((s, [r, k]) => s.replace(r, ' ' + k + ' '), q.toLowerCase()).replace(/\s+/g, ' ').trim() || q;
