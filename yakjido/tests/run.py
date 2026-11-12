@@ -701,10 +701,10 @@ def simple_checks(br, url, fails):
         if not r['cart']: fails.append(f'간단히 {sid}: 「약국에서 이 화면 보여 주기」 단추가 없습니다')
         if '클로르족사존' in ' '.join(pz.eval_on_selector_all('.answer .buy-item.sv b', 'e=>e.map(x=>x.innerText)')): fails.append(f'간단히 {sid}: 큰 글씨에 성분 이름(클로르족사존)이 나옵니다')
     # (b) 응급 신호 → 살 약 줄·약국 단추가 숨는다(자세히와 같은 규칙) · 진료 신호 → 「진료가 먼저예요」
-    # 11-09 디자인 검수 뒤 간단히 보기는 체크 목록 대신 「이 중 하나면 약 말고 119」 카드(sv-er) — 같은 자료(care.er)·119 단추가 있는지 본다(11-12 고침)
+    # (나라를 모르면 전화 칸 대신 「그 나라 응급 번호」) 11-09 디자인 검수 뒤 간단히 보기는 체크 목록 대신 「이 중 하나면 약 말고 119」 카드(sv-er) — 같은 자료(care.er)·119 단추가 있는지 본다(11-12 고침)
     go('/symptom/msk')
     er = pz.evaluate("()=>{ const c=document.querySelector('.sv-er'); return c ? {tel: !!c.querySelector('a[href^=\"tel:\"]'), ers: (byId(D.symptoms,'msk').care.er||[]).map(t=>t.replace(/\\*\\*/g,'').slice(0,6)), txt: c.innerText} : null; }")
-    if not er or not (er['tel'] or '응급 번호' in er['txt']) or not any(t in er['txt'] for t in er['ers']):   # 나라를 모르면 전화 칸 대신 「그 나라 응급 번호」 fails.append(f'간단히: 「이 중 하나면 약 말고 119」 카드가 없거나 119 단추·응급 신호가 자세히와 다릅니다 — {str(er)[:300]} view=' + pz.evaluate('()=>viewMode()'))
+    if not er or not (er['tel'] or '응급 번호' in er['txt']) or not any(t in er['txt'] for t in er['ers']): fails.append(f'간단히: 「이 중 하나면 약 말고 119」 카드가 없거나 119 단추·응급 신호가 자세히와 다릅니다 — {str(er)[:300]} view=' + pz.evaluate('()=>viewMode()'))
     pz.evaluate("()=>{ RF.sid=''; }"); go('/home')
     # (c) 임신 — 소염제가 빠지고 자세히와 같은 약
     pz.evaluate("()=>{ ME.pregnant=true; saveMe(); }")
