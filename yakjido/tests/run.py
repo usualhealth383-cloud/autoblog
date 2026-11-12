@@ -704,7 +704,7 @@ def simple_checks(br, url, fails):
     # 11-09 디자인 검수 뒤 간단히 보기는 체크 목록 대신 「이 중 하나면 약 말고 119」 카드(sv-er) — 같은 자료(care.er)·119 단추가 있는지 본다(11-12 고침)
     go('/symptom/msk')
     er = pz.evaluate("()=>{ const c=document.querySelector('.sv-er'); return c ? {tel: !!c.querySelector('a[href^=\"tel:\"]'), ers: (byId(D.symptoms,'msk').care.er||[]).map(t=>t.replace(/\\*\\*/g,'').slice(0,6)), txt: c.innerText} : null; }")
-    if not er or not er['tel'] or not any(t in er['txt'] for t in er['ers']): fails.append('간단히: 「이 중 하나면 약 말고 119」 카드가 없거나 119 단추·응급 신호가 자세히와 다릅니다')
+    if not er or not er['tel'] or not any(t in er['txt'] for t in er['ers']): fails.append(f'간단히: 「이 중 하나면 약 말고 119」 카드가 없거나 119 단추·응급 신호가 자세히와 다릅니다 — {str(er)[:300]} view=' + pz.evaluate('()=>viewMode()'))
     pz.evaluate("()=>{ RF.sid=''; }"); go('/home')
     # (c) 임신 — 소염제가 빠지고 자세히와 같은 약
     pz.evaluate("()=>{ ME.pregnant=true; saveMe(); }")
@@ -785,7 +785,7 @@ def r2_checks(br, url, fails):
     if ER not in txt('.phead'): fails.append('#1 간단히 서방정 화면 머리에 고른 제품 이름이 없습니다')
     pz.click('.sv-more'); pz.wait_for_timeout(300)
     if 'p=' not in pz.evaluate('location.hash'): fails.append('#1 「자세히 보기」로 가면 고른 제품(p)이 빠집니다')
-    t = txt('.dose-hero')
+    t = txt('.dose-hero').replace('\xa0', ' ')
     if '3,900 mg' not in t or '8시간' not in t or '4,000 mg' in t: fails.append(f'#1 자세히 서방정 화면의 하루 최대·간격이 서방정 것이 아닙니다: {t[:100]!r}')
     me("ME.view='simple'"); go('/drug/acetaminophen')
     if '8정' not in txt('.dose-hero'): fails.append('#1 제품을 고르지 않은 아세트아미노펜 화면의 일반정 용법이 사라졌습니다')
@@ -1347,7 +1347,7 @@ def main():
         _s = pg.evaluate("""()=>{
           /* 앞 검사가 켜 둔 몸 상태가 남아 있으면 「약사와 상의」 배지가 먼저 붙는다 — 비우고 본다 */
           ['heart','hf','diabetes','ulcer','kidney','liver','lvs','anticoag','glaucoma','bph','asthma','alcohol','gout','pregnant','nursing'].forEach(f=>{ME[f]=false;});
-          const has = a => { ME.age=a; ME.taking=[]; ME.pub={}; route();
+          const has = a => { Object.keys(FLAG_LABEL).forEach(f=>{ if (f!=='senior'&&f!=='child') ME[f]=false; }); ME.age=a; ME.taking=[]; ME.pub={}; route();
             return [...document.querySelectorAll('.buy-item')]
               .some(e=>/이부프로펜|나프록센|덱시부프로펜/.test(e.innerText) && (/어르신 주의/.test(e.innerText) || !!e.closest('.consult-grp'))); };   /* 11-09 결정 — 어르신 소염제는 「먼저 상의」 묶음(배지보다 강함) */
           const senior = has('senior'), adult = has('adult');
@@ -1359,7 +1359,7 @@ def main():
         #        같은 증상에 아세트아미노펜 칸이 있으면 그 칸이 1번. 증상 화면과 약국 카드(#/show)가 같은 순서.
         _q5 = pg.evaluate("""()=>{
           const keep = JSON.stringify(ME), bad = [], NS = /이부프로펜|나프록센|덱시부프로펜/;
-          ['diabetes','ulcer','kidney','liver','glaucoma','bph','asthma','alcohol','gout','pregnant','nursing'].forEach(f=>{ME[f]=false;});
+          Object.keys(FLAG_LABEL).forEach(f=>{ if (f!=='senior'&&f!=='child') ME[f]=false; });   /* 앞 단계가 켠 조건(위장출혈 등)까지 비운다 */
           ME.age='senior'; ME.heart=true; ME.anticoag=true; ME.taking=[]; ME.pub={}; ME.allergy=[]; ME.allergyUnknown=false;
           for (const sid of ['headache','msk','cold']) {
             location.hash = '#/symptom/' + sid; route();
