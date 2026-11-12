@@ -1452,7 +1452,7 @@ table.cmp td:first-child{font-weight:700;word-break:keep-all;min-width:6em}
 .checkrow{display:flex;align-items:center;gap:var(--s3);padding:12px 0;border-bottom:1px solid var(--hairline);min-height:52px}
 .checkrow:last-child{border-bottom:0}
 .lang-pill{float:right;min-height:40px;padding:0 10px;border:1px solid var(--hairline);border-radius:999px;background:var(--card);color:var(--text);font:inherit;font-size:.875rem}
-.checkrow{position:relative}.checkrow label::before{content:"";position:absolute;inset:0}.checkrow>button,.checkrow>a{position:relative;z-index:1}.lang-back{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(84px + env(safe-area-inset-bottom));z-index:40;min-height:44px;padding:0 16px;border-radius:22px;border:1px solid var(--hairline);background:var(--card);color:var(--primary);font:inherit;font-weight:700;box-shadow:0 4px 14px rgba(0,0,0,.15)}
+.checkrow{position:relative}.checkrow label::before{content:"";position:absolute;inset:0}.checkrow>button,.checkrow>a{position:relative;z-index:1}
 .checkrow input{width:20px;height:20px;accent-color:var(--primary);flex:none}
 .checkrow label{flex:1;min-width:0;font-size:.9375rem;font-weight:600;overflow-wrap:anywhere}
 .checkrow small{color:var(--muted);font-weight:500;display:block;font-size:.875rem}
@@ -2514,9 +2514,6 @@ const CC = (() => { try { const v = MP.country || localStorage.getItem('yakjido.
   const S = ' Asia/Seoul KR Asia/Tokyo JP Asia/Shanghai CN Asia/Chongqing CN Asia/Urumqi CN Asia/Hong_Kong HK Europe/Madrid ES Atlantic/Canary ES Africa/Ceuta ES America/Mexico_City MX America/Monterrey MX America/Merida MX America/Cancun MX America/Chihuahua MX America/Mazatlan MX America/Hermosillo MX America/Tijuana MX Europe/London GB Asia/Manila PH Asia/Kolkata IN Asia/Calcutta IN Asia/Ho_Chi_Minh VN Asia/Saigon VN Asia/Bangkok TH Asia/Jakarta ID Asia/Makassar ID Asia/Jayapura ID Asia/Kathmandu NP Asia/Katmandu NP Asia/Tashkent UZ Asia/Samarkand UZ Asia/Phnom_Penh KH Asia/Ulaanbaatar MN Asia/Ulan_Bator MN Asia/Colombo LK Asia/Dhaka BD ', k = S.indexOf(' ' + tz + ' ');
   return tz && k >= 0 ? S.substr(k + tz.length + 2, 2) : /^America\/(New_York|Chicago|Denver|Los_Angeles|Phoenix|Anchorage|Juneau|Sitka|Nome|Adak|Boise|Detroit|Menominee|Indiana|Kentucky|North_Dakota)\b|^Pacific\/Honolulu$|^US\//.test(tz) ? 'US' : 'XX'; })();
 window.LANG = LANG; window.CC = CC;
-/* 11-12 사용자25 #20 — 「한국어 원문 보기」로 바꾼 뒤 원래 말로 돌아갈 단추(그 말로 적음) */
-(function(){ let pv = null; try { pv = localStorage.getItem('yakjido.lang.prev'); } catch (e) {} const W = { en: 'Back to English', es: 'Volver al español', ja: '日本語に戻す', zh: '返回中文' };
-  if (pv && W[pv] && (localStorage.getItem('yakjido.lang') || 'ko') === 'ko') addEventListener('DOMContentLoaded', () => { const b = document.createElement('button'); b.type = 'button'; b.className = 'lang-back'; b.textContent = W[pv]; b.onclick = () => { try { localStorage.removeItem('yakjido.lang.prev'); } catch (e) {} setLang(pv); }; document.body.appendChild(b); }); })();
 function setLang(l, cc){ try { localStorage.setItem('yakjido.lang', l); if (cc) localStorage.setItem('yakjido.cc', cc); } catch (e) {} location.reload(); }
 if (LANG !== 'ko' || CC !== 'KR') { const s = document.createElement('script'); s.src = 'i18n.js'; document.head.appendChild(s); }
 /* 11-11 다른 메디나눔 앱에서 넘어온 입구(약지도_입구주소.md) — ?from=kids|gildongmu|gyeote|clinicscore&age=개월 수|adult.

@@ -5137,6 +5137,10 @@ window.vPubS = function(id){
 };
 
 /* 내 정보·동의·로그인·약관 화면을 보고 있었으면 다시 그린다(이 파일이 늦게 오므로) */
+/* 11-12 사용자25 #20 — 「한국어 원문 보기」로 바꾼 뒤 원래 말로 돌아갈 단추(그 말로 적음) */
+(function(){ let pv = null; try { pv = localStorage.getItem('yakjido.lang.prev'); } catch (e) {} const W = { en: 'Back to English', es: 'Volver al español', ja: '日本語に戻す', zh: '返回中文' };
+  if (pv && W[pv] && (localStorage.getItem('yakjido.lang') || 'ko') === 'ko') (() => { const b = document.createElement('button'); b.type = 'button'; b.className = 'lang-back'; b.textContent = W[pv]; b.onclick = () => { try { localStorage.removeItem('yakjido.lang.prev'); } catch (e) {} setLang(pv); }; document.body.appendChild(b); })(); })();
+try { const st = document.createElement('style'); st.textContent = '.lang-back{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(84px + env(safe-area-inset-bottom));z-index:40;min-height:44px;padding:0 16px;border-radius:22px;border:1px solid var(--hairline);background:var(--card);color:var(--primary);font:inherit;font-weight:700;box-shadow:0 4px 14px rgba(0,0,0,.15)}'; document.head.appendChild(st); } catch (e) {}
 /* ▼ 11-11 다른 앱 입구 — 띠·아이 설명(app-shell 에서 옮김) */
 window.KID_TRI = { clinic: '병원에서는 아이가 얼마나 마시고 소변을 보는지, 열과 다른 병의 신호가 있는지 먼저 살펴봐요. 검사나 약은 아이 상태에 따라 필요한 경우에만 써요.',
   pharmacy: '아이 약은 나이와 몸무게에 따라 달라요. 약국에서는 아이 나이(개월 수)와 몸무게를 먼저 말씀하시고 약사와 함께 골라요. 어른 약을 줄여서 먹이지 마세요.',
