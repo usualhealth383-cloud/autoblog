@@ -48,6 +48,7 @@ for b in POST:
 
 C = 'margin:0;line-height:1.9;'
 TD = 'border:1px solid #D9CFBD;padding:8px 10px;vertical-align:top;'
+HASH = ' '.join('#' + t for t in TAGS)
 def rich(data_uri):
     out, k = [], 0
     for b in POST:
@@ -61,6 +62,7 @@ def rich(data_uri):
             rows = ''.join(f'<tr><td style="{TD}background:{"#FFF2C2" if i == b[2] else "#FFFFFF"};font-weight:700;{"color:"+BLUE+";" if i == b[2] else ""}">{l}</td><td style="{TD}background:{"#FFF2C2" if i == b[2] else "#FFFFFF"};{"font-weight:700;" if i == b[2] else ""}">{inline(v, "rich")}</td></tr>' for i, (l, v) in enumerate(b[1]))
             out.append(f'<table style="border-collapse:collapse;width:100%;margin:0 0 18px;font-size:15px;line-height:1.6">{rows}</table>\n<p><br></p>')
         elif t == 'fine': out.append(f'<p style="margin:0;font-size:13px;line-height:1.6;color:#9A9A9A;text-align:center">{b[1]}</p>')
+    out.append(f'<p style="color:#1a73e8;margin-top:22px">{HASH}</p>')
     return '\n'.join(out)
 
 def txt():
@@ -72,6 +74,7 @@ def txt():
         elif t == 'img': k += 1; out.append(f'【사진 {k} · {b[1]}.png】')
         elif t == 'tbl': out.append('\n'.join(f'{l.replace("<br>", " · ")}: {inline(v, "txt").replace(chr(10), " · ")}' for l, v in b[1]))
         elif t == 'fine': out.append('\n'.join('【작은 글씨】' + x for x in b[1].split('<br>')))
+    out.append(HASH)
     return '\n\n'.join(out)
 
 def prev():
@@ -102,11 +105,7 @@ page = f'''{head}<div class="wrap">
 <p class="note">네이버가 일부 서식을 빼면 '글자만 복사'(사진 자리 표시가 들어 있음)를 쓰십시오.</p>
 <details style="margin-top:10px"><summary style="font-size:14px;color:var(--muted);cursor:pointer">글자만 복사 (서식 없음)</summary><textarea id="bodyTxt" readonly style="margin-top:8px">{html.escape(body)}</textarea><button class="cp big" data-copy="bodyTxt">글자만 복사</button></details>
 <button class="cp big" id="richBtn2" style="background:var(--soft);color:var(--ink);border:1px solid var(--line)">사진이 안 들어가면 — 사진을 글 안에 담아 복사</button></section>
-<section class="box"><h2>③ 태그 — 하나씩 눌러 붙여 넣기</h2><p class="note" style="margin:0 0 10px">네이버 태그 칸은 여러 개를 한 번에 붙이면 하나로 뭉칩니다. 아래 태그를 하나 누르면 복사됩니다 → 태그 칸에 붙여 넣고 <b>Enter</b> → 다음 태그를 누르기. 누른 태그는 흐리게 바뀝니다.</p><div class="tags">{tags}</div>
-<div style="margin-top:14px;padding:12px;border:1px dashed var(--line);border-radius:6px"><p class="note" style="margin:0 0 8px"><b>한 번에 붙이기 시험</b> — 아래 셋 중 하나가 네이버 태그 칸에서 태그로 나뉘면, 그 방식만 쓰시면 됩니다. 어느 것이 되는지 알려 주시면 그 하나만 남기겠습니다.</p>
-<button class="cp big" data-copy="tagNL">① 줄바꿈으로 나눠 복사</button><textarea id="tagNL" readonly style="display:none">{chr(10).join(TAGS)}</textarea>
-<button class="cp big" data-copy="tagTxt">② 쉼표로 나눠 복사</button><textarea id="tagTxt" readonly style="display:none">{", ".join(TAGS)}</textarea>
-<button class="cp big" data-copy="tagSP">③ 띄어쓰기로 나눠 복사 (# 없이)</button><textarea id="tagSP" readonly style="display:none">{" ".join(TAGS)}</textarea></div></section>
+<section class="box"><h2>③ 태그 — 따로 할 일 없음</h2><p class="note" style="margin:0 0 10px">②로 본문을 붙여 넣으면 맨 끝 파란 줄(#태그)이 같이 들어가고, 네이버가 그 줄을 태그로 등록합니다. 붙인 뒤 맨 아래 태그 칸에 태그가 들어왔는지만 보십시오. 안 들어왔으면 아래 태그를 하나씩 눌러 넣으십시오.</p><div class="tags">{tags}</div></section>
 <section class="box"><h2>④ 네이버에서 고치는 법</h2><ol class="how">
 <li><b>새 글</b>을 열고 제목 칸에 ①, 본문 칸에 ②를 붙여 넣기</li>
 <li>붙인 뒤 <b>사진 1</b>을 눌러 <b>대표</b>로 지정</li>
