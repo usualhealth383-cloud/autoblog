@@ -103,7 +103,10 @@ page = f'''{head}<div class="wrap">
 <details style="margin-top:10px"><summary style="font-size:14px;color:var(--muted);cursor:pointer">글자만 복사 (서식 없음)</summary><textarea id="bodyTxt" readonly style="margin-top:8px">{html.escape(body)}</textarea><button class="cp big" data-copy="bodyTxt">글자만 복사</button></details>
 <button class="cp big" id="richBtn2" style="background:var(--soft);color:var(--ink);border:1px solid var(--line)">사진이 안 들어가면 — 사진을 글 안에 담아 복사</button></section>
 <section class="box"><h2>③ 태그 — 하나씩 눌러 붙여 넣기</h2><p class="note" style="margin:0 0 10px">네이버 태그 칸은 여러 개를 한 번에 붙이면 하나로 뭉칩니다. 아래 태그를 하나 누르면 복사됩니다 → 태그 칸에 붙여 넣고 <b>Enter</b> → 다음 태그를 누르기. 누른 태그는 흐리게 바뀝니다.</p><div class="tags">{tags}</div>
-<details style="margin-top:12px"><summary style="font-size:14px;color:var(--muted);cursor:pointer">쉼표로 한 번에 붙여 보기 (네이버가 나눠 줄 수도 있음)</summary><button class="cp big" data-copy="tagTxt">쉼표로 구분해 복사</button><textarea id="tagTxt" readonly style="display:none">{", ".join(TAGS)}</textarea></details></section>
+<div style="margin-top:14px;padding:12px;border:1px dashed var(--line);border-radius:6px"><p class="note" style="margin:0 0 8px"><b>한 번에 붙이기 시험</b> — 아래 셋 중 하나가 네이버 태그 칸에서 태그로 나뉘면, 그 방식만 쓰시면 됩니다. 어느 것이 되는지 알려 주시면 그 하나만 남기겠습니다.</p>
+<button class="cp big" data-copy="tagNL">① 줄바꿈으로 나눠 복사</button><textarea id="tagNL" readonly style="display:none">{chr(10).join(TAGS)}</textarea>
+<button class="cp big" data-copy="tagTxt">② 쉼표로 나눠 복사</button><textarea id="tagTxt" readonly style="display:none">{", ".join(TAGS)}</textarea>
+<button class="cp big" data-copy="tagSP">③ 띄어쓰기로 나눠 복사 (# 없이)</button><textarea id="tagSP" readonly style="display:none">{" ".join(TAGS)}</textarea></div></section>
 <section class="box"><h2>④ 네이버에서 고치는 법</h2><ol class="how">
 <li><b>새 글</b>을 열고 제목 칸에 ①, 본문 칸에 ②를 붙여 넣기</li>
 <li>붙인 뒤 <b>사진 1</b>을 눌러 <b>대표</b>로 지정</li>
