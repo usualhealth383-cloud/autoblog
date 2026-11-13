@@ -176,7 +176,8 @@ RX_LABEL_SEQ = {'amlodipine': '200610660', 'losartan': '200811814', 'ramipril': 
                 'budesonide_formoterol': '200109101', 'tiotropium': '200811444', 'salbutamol': '199906869',
                 'propranolol': '197400040', 'allopurinol': '197000050', 'imidafenacin': '200812014',
                 'lex_triamcinolone_oral': '198500023', 'lex_berberine': '200202423', 'lex_tolfenamic': '198601438', 'lex_mefenamic': '199100581', 'lex_aciclovir_cream': '199101996',
-                'lex_chondroitin': '199901507', 'lex_vitb': '198500049', 'lex_cipro': '198801052'}   # 11-05 원문 대조(편두통·떨림 효능 · 유전자 문구 · 항콜린 부담)
+                'lex_chondroitin': '199901507', 'lex_vitb': '198500049', 'lex_cipro': '198801052',
+                'bazedoxifene': '201110095', 'teriparatide': '200209623', 'ipratropium': '199304302'}   # 11-13 약지식창고 대조(뼈 약·흡입기 길잡이 칸)   # 11-05 원문 대조(편두통·떨림 효능 · 유전자 문구 · 항콜린 부담)
 DTL_OPS = ['DrugPrdtPrmsnInfoService08/getDrugPrdtPrmsnDtlInq07', 'DrugPrdtPrmsnInfoService08/getDrugPrdtPrmsnDtlInq08',
            'DrugPrdtPrmsnInfoService07/getDrugPrdtPrmsnDtlInq06', 'DrugPrdtPrmsnInfoService06/getDrugPrdtPrmsnDtlInq05',
            'DrugPrdtPrmsnInfoService05/getDrugPrdtPrmsnDtlInq04']
