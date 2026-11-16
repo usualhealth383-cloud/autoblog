@@ -186,7 +186,7 @@
   function 번호(s) {
     if (CC === 'KR') return s;
     var E = N.e || 현지;
-    return s.replace(/1577-0199/g, N.m[1] || N.m[0] || E).replace(/(^|[^\d-])109(?![\d-])/g, function (a, p) { return p + (N.m[0] || E); }).replace(/(^|[^\d-])119(?![\d-])/g, function (a, p) { return p + E; });
+    return s.replace(/1577-0199/g, N.m[1] || N.m[0] || E).replace(/(^|[^\d-])109(?![\d-])/g, function (a, p) { return p + (N.m[0] || E); }).replace(/(^|[^\d-])119(?![\d-])/g, function (a, p, off, str) { return /한국에서는\s?$/.test(str.slice(Math.max(0, off - 7), off + p.length)) ? a : p + E; });   /* 11-17 「현지 응급 번호(한국에서는 119)」 안의 119 는 다시 바꾸지 않는다(다시 그릴 때마다 겹쳐 쌓이던 것) */
   }
   /* 11-12 홈 빨간 동그라미(56px) — 번호를 모르는 나라면 긴 「그 나라 응급 번호」 대신 짧은 말 */
   function 동그라미() { if (CC === 'KR' || N.e) return; document.querySelectorAll('.sos-dot').forEach(function (a) { a.textContent = { ko: '응급', en: 'SOS', es: 'SOS', ja: '緊急', zh: '急救' }[L] || 'SOS'; }); }
