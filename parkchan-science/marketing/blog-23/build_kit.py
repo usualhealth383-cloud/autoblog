@@ -96,7 +96,7 @@ head = head.replace('</style>', '.tags button.tg{font-size:14px;min-height:40px;
 page = f'''{head}<div class="wrap">
 <section class="box"><h1>박찬 통합과학 · 원장 인사말</h1><p class="sub">원장님 글 다듬은 판 · 원장 인사말 — 박찬 통합과학 학원을 소개합니다 · 사진 {nimg}장</p></section>
 <section class="box" style="border-color:#E0A800"><h2>⚠ 올리기 전 확인</h2><ol class="how"><li>'대구 최초'는 근거가 없으면 표시광고 문제가 될 수 있어 뺐습니다</li><li>공통과학 강의 경험 문단은 원장님 원문 그대로 살렸습니다</li></ol></section>
-<section class="box"><h2>① 제목 — 하나 고르기</h2>{titles}</section>
+<section class="box"><h2>① 제목</h2>{titles}</section>
 <section class="box"><h2>② 본문 — 통째로 복사</h2><button class="cp big" id="richBtn">본문 통째로 복사 — 사진 · 표 · 굵게 · 색 포함</button>
 <p class="note">네이버가 일부 서식을 빼면 '글자만 복사'(사진 자리 표시가 들어 있음)를 쓰십시오.</p>
 <details style="margin-top:10px"><summary style="font-size:14px;color:var(--muted);cursor:pointer">글자만 복사 (서식 없음)</summary><textarea id="bodyTxt" readonly style="margin-top:8px">{html.escape(body)}</textarea><button class="cp big" data-copy="bodyTxt">글자만 복사</button></details>

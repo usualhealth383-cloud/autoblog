@@ -100,7 +100,7 @@ head = head.replace('</style>', '.tags button.tg{font-size:14px;min-height:40px;
 page = f'''{head}<div class="wrap">
 <section class="box"><h1>박찬 통합과학 · 고3 예비 수능 준비반 안내</h1><p class="sub">원장님 글 다듬은 판 · 고3 예비(현 고2) 2028 수능 통합과학 준비반 안내 · 사진 {nimg}장</p></section>
 <section class="box" style="border-color:#E0A800"><h2>⚠ 올리기 전 확인</h2><ol class="how"><li>강의 시간은 강의 시간표(12월 19일 토, 20일 일)에 맞췄습니다</li><li>EBS 수능특강 출간 시기('1월 출간 예정')를 확인해 주십시오</li><li>'모든 글에서 교재를 뺀다'와 달리 이 글은 원장님 강의 계획이라 EBS 교재를 남겼습니다</li></ol></section>
-<section class="box"><h2>① 제목 — 하나 고르기</h2>{titles}</section>
+<section class="box"><h2>① 제목</h2>{titles}</section>
 <section class="box"><h2>② 본문 — 통째로 복사</h2><button class="cp big" id="richBtn">본문 통째로 복사 — 사진 · 표 · 굵게 · 색 포함</button>
 <p class="note">네이버가 일부 서식을 빼면 '글자만 복사'(사진 자리 표시가 들어 있음)를 쓰십시오.</p>
 <details style="margin-top:10px"><summary style="font-size:14px;color:var(--muted);cursor:pointer">글자만 복사 (서식 없음)</summary><textarea id="bodyTxt" readonly style="margin-top:8px">{html.escape(body)}</textarea><button class="cp big" data-copy="bodyTxt">글자만 복사</button></details>
