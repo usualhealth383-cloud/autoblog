@@ -3314,23 +3314,92 @@ window.언어칸 = function () {
     if (뜻 && 뜻.id === 'together') return { 말: ['드시는 약 이름을 둘 이상 적어 주세요. 예) 타이레놀이랑 판콜'] };
     return null;
   }
+  /* 11-16 현욱님 「질문하면 앱이 답한다」 — 내 질문 말풍선(오른쪽) → 약지도 답 한 장(왼쪽: 결론 한 줄 · 할 일 3줄 안 · 단추 · 자세히 ›).
+     답은 앱에 이미 있는 글(증상·약·겹침 규칙·길잡이)만 꺼내 온다 — 새 임상 문장·AI 없음, 이 폰 안에서 낱말 맞추기. 위험 낱말은 맨 먼저(위험()). */
+  var 예시 = ['목이 아파요', '타이레놀이랑 판콜에이 같이 먹어도 돼요?', '소화가 안 되고 더부룩해요', '이부프로펜이랑 아스피린', '혈압약 먹는데 감기약 먹어도 돼요?', '술 마신 뒤 타이레놀 먹어도 돼요?', '잠이 안 와요', '아이 해열제 몇 mL 먹여요?'];
+  var 묻기 = { log: [], 약: [], 기다림: null };
+  var 첫문장 = function (t) { t = String(t || '').replace(/\s+/g, ' ').trim(); var m = t.match(/^.+?(?:요|다)[.!]?(?=\s|$)/); return m ? m[0] : t; };
+  var 짧게 = function (t) { return fmt(String(t || '')); };
+  var 문맥 = [[/술|음주|마시/, /술|음주/], [/임신|임산부/, /임신/], [/수유|모유/, /수유|모유/], [/아이|아기|애기|어린이|소아/, /아이|소아|어린이|세 미만|개월/], [/어르신|노인|65/, /어르신|65세|고령/], [/콩팥|신장/, /콩팥|신장/], [/간\b|간이|간질환/, /간/], [/위장|속쓰|위궤양/, /위|궤양/], [/혈압/, /혈압/], [/당뇨|혈당/, /당뇨|혈당/]];
+  function 단추(글, 할, 주) { return { 글: 글, 할: 할, 주: !!주 }; }
+  function 약카드(d, t) {
+    var 줄 = [], 줄글 = function (x) { return typeof x === 'string' ? x : (x && x.text) || ''; };
+    if (d.simple) 줄.push('먹는 법 — ' + d.simple);
+    var 주의 = [].concat(d.avoid || [], d.caution || []).map(줄글).filter(Boolean);
+    var 맞춤 = 문맥.filter(function (x) { return x[0].test(t); }).map(function (x) { return 주의.filter(function (c) { return x[1].test(c); })[0]; }).filter(Boolean);
+    (맞춤.length ? 맞춤 : 주의.slice(0, 1)).slice(0, 2).forEach(function (c) { 줄.push('조심 — ' + c); });
+    return { 결: d.tagline ? String(d.tagline) : d.name, 할: 줄.slice(0, 3),
+      단: [단추('먹는 법 자세히', '/drug/' + d.id, 1), 단추((ME.taking || []).indexOf(d.id) >= 0 ? '내 약통에 있어요' : '내 약통에 담기', function () { ME.taking = ME.taking || []; if (ME.taking.indexOf(d.id) < 0) { ME.taking.push(d.id); saveMe(); try { toast('내 약통에 담았어요'); } catch (e) {} } })],
+      더: (d.stop || []).length ? '<p class="small muted">이럴 땐 그만 드시고 진료</p><ul class="plain">' + d.stop.slice(0, 4).map(function (x) { return '<li>' + 짧게(x) + '</li>'; }).join('') + '</ul>' : '' };
+  }
+  function 겹침카드(ids) {
+    var ds = ids.map(function (i) { return drug(i); }).filter(Boolean), T = ME.taking, 결;
+    ME.taking = []; try { 결 = ixCards(ixRun(ds)); } finally { ME.taking = T; }
+    var 센 = 결.filter(function (c) { return c.lv === 'stop' || c.lv === 'warn'; }), 멈 = 센.some(function (c) { return c.lv === 'stop'; });
+    return { 결: ds.map(function (d) { return 짧은이름(d.name); }).join(' + ') + ' — ' + (멈 ? '같이 드시면 안 되는 것이 있어요.' : 센.length ? '조심할 것이 있어요.' : '겹치는 성분이나 조심할 조합은 안 보여요.'), 위: 멈,
+      할: 센.length ? 센.slice(0, 3).map(function (c) { return c.t; }) : ['다른 약을 더 드시면 그 약까지 함께 봐야 해요.'],
+      단: [단추('내 약통에 담고 자세히', function () { ME.taking = ME.taking || []; ids.forEach(function (i) { if (ME.taking.indexOf(i) < 0) ME.taking.push(i); }); saveMe(); go('/together'); }, 1)].concat(ds.slice(0, 2).map(function (d) { return 단추(짧은이름(d.name) + ' 자세히', '/drug/' + d.id); })),
+      더: 센.length ? 센.slice(0, 3).map(function (c) { return '<div class="ask-ix"><b>' + esc(c.t) + '</b>' + (typeof c.do === 'string' ? c.do : '') + '</div>'; }).join('') : '' };
+  }
+  function 증상카드(s) {
+    var tri = s.triage && s.triage.pharmacy, 할 = (s.how || []).slice(0, 2), er = s.care && s.care.er && s.care.er[0];
+    if (er) 할.push('응급 신호 — ' + er + ' 등은 약 말고 119');
+    return { 결: 첫문장(tri || s.lead || s.short || s.name), 할: 할.slice(0, 3),
+      단: [단추('이렇게 하세요 — ' + s.name, '/symptom/' + s.id, 1)],
+      더: [(s.pharmacy || []).length ? '<p class="small muted">약국에서</p><ul class="plain">' + s.pharmacy.slice(0, 3).map(function (x) { return '<li>' + 짧게(x) + '</li>'; }).join('') + '</ul>' : '',
+           (s.selfcare || []).length ? '<p class="small muted">집에서</p><ul class="plain">' + s.selfcare.slice(0, 3).map(function (x) { return '<li>' + 짧게(x) + '</li>'; }).join('') + '</ul>' : ''].join('') };
+  }
+  function 답짓기(t) {
+    var 앎 = { 글: t, 뜻: [], 값: window.대화 && 대화.만들기 ? (function () { try { return 대화.만들기({ 앱: 'yakjido', 약: [] }).이해(t).값 || {}; } catch (e) { return {}; } })() : {} };
+    var w = 위험(t, 앎.값); if (w) return { 위험: w };
+    var ids = 약찾기(t), 같이 = /같이|함께|이랑|랑\s|하고|병용|먹어도|먹은\s*뒤|먹었는데|또\s*먹/.test(t);
+    if (묻기.기다림 && ids.length === 1 && 묻기.약.length) { var 모 = 묻기.약.concat(ids.filter(function (i) { return 묻기.약.indexOf(i) < 0; })); 묻기.기다림 = null; 묻기.약 = 모; return 겹침카드(모); }
+    var 갈 = Object.keys(갈래).filter(function (k) { return t.indexOf(k) >= 0; })[0], rx = 처방갈래.filter(function (x) { return x[1].test(t); })[0];
+    if (rx) { var G = typeof RXG !== 'undefined' && RXG && RXG.guides && RXG.guides[rx[0]]; return { 결: RX_NAME[rx[0]] + '을 드시는군요. 처방약과 약국 약을 함께 드실 때 조심할 것을 길잡이에 모아 두었어요.', 할: G && G.short ? [G.short] : [], 단: [단추(RX_NAME[rx[0]] + ' 길잡이', '/rx/' + rx[0], 1)] }; }
+    if (ids.length >= 2) { 묻기.약 = ids; return 겹침카드(ids); }
+    if (ids.length === 1 && 갈 && 같이) { 묻기.약 = ids; 묻기.기다림 = 갈; return { 결: 갈래[갈].묻기 + ' 이름을 알면 겹치는지 바로 볼게요.', 할: [], 단: [], 칩: 갈래[갈].칩 }; }
+    if (/아이|아기|애기|우리\s*애|애가|[0-9]+\s*개월/.test(t) && /얼마|몇|양|mL|ml|먹여|해열/i.test(t)) return { 결: '아이 해열제는 몸무게로 양을 정해요.', 할: ['계산 화면에서 시럽 mL·간격·하루 한도를 바로 볼 수 있어요.'], 단: [단추('아이 해열제 계산', '/kids', 1)] };
+    if (ids.length === 1) { 묻기.약 = ids; var d = drug(ids[0]); if (d) return 약카드(d, t); }
+    var sid = 증상찾기(t), s = sid && (D.symptoms || []).filter(function (x) { return x.id === sid; })[0];
+    if (s) return 증상카드(s);
+    if (/알약|낱알|각인|써\s*있|적혀/.test(t)) return { 결: '색·모양·앞뒤 글자로 찾을 수 있어요. 사진으로 약봉투를 읽을 수도 있어요.', 할: [], 단: [단추('알약 찾기', '/pill', 1), 단추('사진으로 읽기', '/photo')] };
+    return null;
+  }
+  function 답그리기(r) {
+    if (r.위험) return '<article class="ask-ans sos" role="alert"><p class="ask-c">' + esc(r.위험.말) + '</p>' + (r.위험.전화 ? '<a class="btn ask-call" href="tel:' + esc(String(r.위험.전화).replace(/[^\d+]/g, '')) + '">' + I.alert + ' ' + esc(r.위험.전화) + ' 전화</a>' : '') + '</article>';
+    if (!r.결) return '<article class="ask-ans"><p class="ask-c">아직 이 질문은 찾지 못했어요. 이렇게 물어보시면 찾을 수 있어요.</p><div class="ask-chips">' + 예시.slice(0, 4).map(칩).join('') + '</div></article>';
+    var 단 = (r.단 || []).map(function (b, i) { var k = 'a' + 묻기.log.length + '_' + i; 묻기.할일[k] = b.할; return '<button type="button" class="btn ' + (b.주 ? '' : 'line') + '" onclick="묻기단추(\'' + k + '\')">' + esc(b.글) + (b.주 ? I.chev : '') + '</button>'; }).join('');
+    return '<article class="ask-ans' + (r.위 ? ' warn' : '') + '"><p class="ask-c">' + 짧게(r.결) + '</p>' + ((r.할 || []).length ? '<ol class="ask-do">' + r.할.map(function (x) { return '<li>' + 짧게(x) + '</li>'; }).join('') + '</ol>' : '') +
+      (단 ? '<div class="ask-act">' + 단 + '</div>' : '') + ((r.칩 || []).length ? '<div class="ask-chips">' + r.칩.map(칩).join('') + '</div>' : '') +
+      (r.더 ? '<details class="ask-more"><summary>자세히' + I.chev + '</summary>' + r.더 + '</details>' : '') + '</article>';
+  }
+  function 칩(c) { return '<button type="button" class="chip" onclick="묻기보냄(this.textContent)">' + esc(c) + '</button>'; }
+  묻기.할일 = {};
+  window.묻기단추 = function (k) { var f = 묻기.할일[k]; if (typeof f === 'function') f(); else if (f) go(f); };
+  window.묻기보냄 = function (글) {
+    글 = String(글 || '').trim(); if (!글) return;
+    var 보 = function () { var r = null; try { r = 답짓기(글); } catch (e) { r = null; } 묻기.log.push({ q: 글, html: 답그리기(r || {}) }); if (묻기.log.length > 30) 묻기.log.shift(); 그림(); };
+    (typeof ensureCore === 'function' && CORE !== 2 ? ensureCore() : Promise.resolve()).then(보, 보);
+  };
+  function 그림() {
+    var 곳 = document.getElementById('asklog'); if (!곳) return;
+    곳.innerHTML = 묻기.log.map(function (x) { return '<div class="ask-me"><span>' + esc(x.q) + '</span></div>' + x.html; }).join('');
+    var 끝 = 곳.lastElementChild; if (끝) try { (끝.previousElementSibling || 끝).scrollIntoView({ block: 'start', behavior: 'smooth' }); } catch (e) {}
+    var 처음 = document.getElementById('askfirst'); if (처음) 처음.hidden = 묻기.log.length > 0;
+  }
   window.vTalkS = function () {
-    setTimeout(function () {
-      var 곳 = document.getElementById('talk'); if (!곳 || !window.대화) return;
-      /* 화면을 다시 그려도(자료가 늦게 와 route() 가 다시 돌 때) 하던 대화를 그대로 — 같은 대화 칸을 다시 끼운다 */
-      if (window._talkNode && window._talkNode !== 곳) { 곳.replaceWith(window._talkNode); return; }
-      window._talkNode = 곳;
-      var 봇 = 대화.만들기({ 앱: 'yakjido', 언어: window.LANG || 'ko', 뜻: 뜻목록(), 약: Object.keys(이름들()), 위험: 위험, 처리: 처리 });
-      봇.붙이기(곳, { 말: ['어떤 약이 궁금하세요? 어디가 아프세요?', '편하게 적어 주세요. 예) 타이레놀이랑 감기약 같이 먹어도 돼?'], 칩: ['같이 먹어도 되나', '아이 해열제', '이 알약 뭐지'] });
-      var q = (location.hash.match(/[?&]q=([^&]+)/) || [])[1]; if (q) setTimeout(function () { 봇.보냄(decodeURIComponent(q)); }, 900);
-      window.약지도대화 = { 위험: 위험, 처리: 처리, 약찾기: 약찾기, 봇: 봇 };
-    }, 0);
-    return topBar({ back: '홈' }) + '<h1>물어보기</h1><p class="small muted" style="margin:4px 0 12px">사람 상담이 아니라 앱 안의 안내예요. 이 폰 안에서만 읽고 어디로도 보내지 않아요.</p><div id="talk" class="talk"></div>' + disclaimer();
+    var q = (location.hash.match(/[?&]q=([^&]+)/) || [])[1];
+    setTimeout(function () { 그림(); if (q && !묻기.log.some(function (x) { return x.q === decodeURIComponent(q); })) 묻기보냄(decodeURIComponent(q)); }, 0);
+    window.약지도대화 = { 위험: 위험, 처리: 처리, 약찾기: 약찾기, 답짓기: 답짓기 };
+    return topBar({ back: '홈' }) + '<h1>물어보기</h1><p class="small muted" style="margin:4px 0 12px">사람 상담이 아니라 앱 안의 안내예요. 이 폰 안에서만 읽고 어디로도 보내지 않아요.</p>' +
+      '<form class="ask-in" onsubmit="event.preventDefault();var i=this.querySelector(\'input\');묻기보냄(i.value);i.value=\'\';i.blur()"><input type="text" enterkeyhint="send" placeholder="예) 목이 아파요" aria-label="어디가 아프세요? 어떤 약이 궁금하세요?"><button type="submit" class="btn">묻기</button></form>' +
+      '<div id="askfirst"><p class="small muted" style="margin:12px 0 6px">이렇게 물어보세요</p><div class="ask-chips">' + 예시.map(칩).join('') + '</div></div>' +
+      '<div id="asklog" class="ask-log" aria-live="polite"></div>' + disclaimer();
   };
   /* 대화의 뜻 고르기·답은 아직 한국어만(다섯 언어 말뭉치는 다음 회차) — 한국어가 아닌 화면에는 홈 입구를 내지 않는다. 위험 낱말은 다섯 언어 다 본다 */
   window.대화줄 = function () { if (window.LANG && window.LANG !== 'ko') return ''; return '<a class="talk-door" href="#/talk"><span class="b">어떤 약이 궁금하세요? 어디가 아프세요?</span><span class="small muted">「타이레놀이랑 감기약 같이 먹어도 돼?」처럼 편하게 물어보세요 ›</span></a>'; };
   var cs = document.createElement('style');
-  cs.textContent = '.talk-door{display:flex;flex-direction:column;gap:4px;margin:12px 0 4px;padding:14px 16px;border-radius:18px 18px 18px 6px;background:var(--tint);color:var(--ink);text-decoration:none;min-height:48px}.talk-door .b{font-weight:700}.talk{min-height:50vh}';
+  cs.textContent = '.ask-in{display:flex;gap:8px}.ask-in input{flex:1;min-width:0;min-height:52px;padding:0 14px;border-radius:14px;border:1px solid var(--hairline);background:var(--card);font-size:max(16px,1rem)}.ask-in .btn{width:auto;min-height:52px;padding:0 18px}.ask-chips{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0}.ask-chips .chip{min-height:44px;white-space:normal;text-align:left}.ask-log{display:flex;flex-direction:column;gap:10px;margin-top:14px}.ask-me{display:flex;justify-content:flex-end}.ask-me span{max-width:84%;padding:10px 14px;border-radius:18px 18px 6px 18px;background:var(--primary);color:var(--on-primary,#fff);font-weight:600;word-break:keep-all;overflow-wrap:anywhere}.ask-ans{max-width:94%;padding:14px 16px;border-radius:18px 18px 18px 6px;background:var(--card);border:1px solid var(--hairline);word-break:keep-all;overflow-wrap:anywhere}.ask-ans.warn{border-color:var(--caution)}.ask-ans.sos{background:var(--alert-tint);border-color:var(--alert)}.ask-ans.sos .ask-c{color:var(--alert)}.ask-c{font-weight:700;font-size:1.0625rem;line-height:1.5}.ask-do{margin:8px 0 0;padding-left:1.2em}.ask-do li{margin:4px 0;line-height:1.55}.ask-act{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}.ask-act .btn{width:auto;min-height:46px;padding:0 14px;display:inline-flex;align-items:center;gap:4px}.ask-call{display:flex;justify-content:center;align-items:center;gap:6px;margin-top:10px;min-height:52px;background:var(--alert)!important;color:var(--on-alert,#fff)!important;text-decoration:none}.ask-more{margin-top:10px}.ask-more summary{display:inline-flex;align-items:center;min-height:44px;color:var(--primary);font-weight:600;cursor:pointer;list-style:none}.ask-more summary::-webkit-details-marker{display:none}.ask-ix{margin:8px 0}.ask-ix p{margin:4px 0}'+'.talk-door{display:flex;flex-direction:column;gap:4px;margin:12px 0 4px;padding:14px 16px;border-radius:18px 18px 18px 6px;background:var(--tint);color:var(--ink);text-decoration:none;min-height:48px}.talk-door .b{font-weight:700}.talk{min-height:50vh}';
   document.head.appendChild(cs);
 })();
 
