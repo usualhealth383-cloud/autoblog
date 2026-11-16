@@ -11,13 +11,13 @@ BLUE = '#2F5FC4'
 TITLES = ['월성동 과학학원 | 중등부 통합과학 특강반 수강 안내', '대구 중등 과학 | 겨울방학 중등부 통합과학 특강반 — 박찬 통합과학']
 TAGS = (HERE.parent / 'blog-16' / 'tags.txt').read_text(encoding='utf-8').split()
 
-POST = [('c', '중등부 학부모님, 안녕하십니까.<br>박찬 통합과학 학원 원장입니다.'),
+POST = [('img', 'cover_middle', '중등부 통합과학 특강반 안내'),
+ ('c', '중등부 학부모님, 안녕하십니까.<br>박찬 통합과학 학원 원장입니다.'),
  ('c', '아이가 과학을 어려워하나요?<br>혹시 지루해하지는 않나요?'),
  ('c', '과학은 ==기본 개념과 원리부터 차근차근== 공부하면<br>이해가 잘 되고, 이해가 되면 재미가 생깁니다.<br>재미가 붙으면 실력도 자연스럽게 따라옵니다.'),
  ('c', '그렇게 공부할 수 있도록 제가 직접 가르치겠습니다.<br>소중한 겨울방학, 알차게 지도하겠습니다.'),
  ('q', '강의 시간 (겨울방학 개강)'),
- ('tbl', [('토요반', '오후 1시부터'),
- ('목요반', '오후 2시부터')], None),
+ ('tbl', [('목요반', '오후 1시 ~ 4시'), ('일요반', '오후 1시 ~ 4시')], None),
  ('q', '강의 특징'),
  ('p', '==①== 기본 개념과 원리 중심 강의<br>==②== 이해 중심 강의<br>==③== EBS 강의와 같은 강의실 시스템으로 효과적인 수업'),
  ('c', '상담 문의 **053-213-3577**<br>매일 오후 2시 ~ 오후 10시'),
@@ -93,7 +93,7 @@ tags = ''.join(f'<button class="cp tg" data-text="{t}">{t}</button>' for t in TA
 head = head.replace('</style>', '.tags button.tg{font-size:14px;min-height:40px;padding:0 12px;background:var(--soft);color:var(--navy);font-weight:700}.tags button.tg.done{opacity:.4}\n</style>', 1)
 page = f'''{head}<div class="wrap">
 <section class="box"><h1>박찬 통합과학 · 중등부 특강반 안내</h1><p class="sub">원장님 글 다듬은 판 · 중등부 통합과학 특강반 수강 안내 · 사진 {nimg}장</p></section>
-<section class="box" style="border-color:#E0A800"><h2>⚠ 올리기 전 확인</h2><ol class="how"><li>중등부 시간(토 오후 1시, 목 오후 2시)이 시간표 그림(목·일 오후 1~4시)과 다릅니다 — 어느 쪽이 맞는지 확인해 주십시오</li></ol></section>
+<section class="box" style="border-color:#E0A800"><h2>⚠ 올리기 전 확인</h2><ol class="how"><li>강의 시간은 강의 시간표(11월 12일 기준)에 맞췄습니다</li></ol></section>
 <section class="box"><h2>① 제목 — 하나 고르기</h2>{titles}</section>
 <section class="box"><h2>② 본문 — 통째로 복사</h2><button class="cp big" id="richBtn">본문 통째로 복사 — 사진 · 표 · 굵게 · 색 포함</button>
 <p class="note">네이버가 일부 서식을 빼면 '글자만 복사'(사진 자리 표시가 들어 있음)를 쓰십시오.</p>
