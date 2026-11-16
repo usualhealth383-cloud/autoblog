@@ -1809,8 +1809,8 @@ background-repeat:no-repeat;background-position:right 9px center;background-size
 <script>
 window.__YAKJIDO_OK__ = true;
 const D = JSON.parse(document.getElementById('data').textContent || '{}');
-const BUILD = '2026-11-16 23:39';
-const DATAV = '1af7c03710'.indexOf('__') === 0 ? BUILD : '1af7c03710';
+const BUILD = '2026-11-16 23:57';
+const DATAV = '6729c57807'.indexOf('__') === 0 ? BUILD : '6729c57807';
 const BRANDMARK = (typeof window !== 'undefined' && window.__BRANDMARK__) || 'icon-192.png';
 let CORE = 0, CORE_P = null;
 function mergeCore(c){
@@ -2399,7 +2399,7 @@ ${opts.back ? `<button class="back" onclick="goBack()">${I.prev}${esc(opts.back)
 <div class="brand"><div class="mark"><img src="${BRANDMARK}" alt="" width="34" height="34"></div><div><b>약지도</b><span>증상에 맞는 약 · 복약 알림</span></div></div>`}
 ${opts.unreviewed || opts.unv ? `<a class="review-stamp unrev" href="#/about">${I.info}<span>자료 확인 중</span></a>` : `<a class="review-stamp" href="#/about" aria-label="출처 보기">${I.book}<span class="rs-t">출처 보기</span></a>`}${!opts.back ? acctBtn() : ''}
 </div>
-${opts.nosearch ? '' : `<div class="topfind">${I.search}<input id="gq" aria-label="증상이나 약 이름으로 찾기" placeholder="${bigFs() || innerWidth < 380 || LANG !== 'ko' ? '증상이나 약 이름' : '증상·약 이름으로 찾기 (예: 허리, 타이레놀)'}" autocomplete="off" enterkeyhint="search" value="${esc(GQ)}"><button class="gq-x ${GQ ? '' : 'hide'}" onclick="GQ='';route()" aria-label="지우기">${I.x}</button></div>`}<!--TOPEND-->`;
+${opts.nosearch ? '' : `<div class="topfind">${I.search}<input id="gq" aria-label="증상이나 약 이름으로 찾기" placeholder="${LANG !== 'ko' ? '증상이나 약 이름' : bigFs() || innerWidth < 380 ? '증상·약 이름·궁금한 것' : '증상·약 이름, 무엇이든 물어보세요'}" autocomplete="off" enterkeyhint="search" value="${esc(GQ)}"><button class="gq-x ${GQ ? '' : 'hide'}" onclick="GQ='';route()" aria-label="지우기">${I.x}</button></div>`}<!--TOPEND-->`;
 const srcShort = t => {
 let x = String(t || '').replace(/\*\*/g, '').split(' (')[0];
 const m = x.match(/^(.{0,60}?(?:19|20)\d{2}[a-z]?)\b/);
@@ -3069,9 +3069,9 @@ ${svOn() ? `<section class="hero home-q">${dot}<div class="eyebrow">${esc(hello)
 <h1 class="greet">어디가 불편하세요?</h1>
 <p>증상을 고르면 약국에서 물어볼 약을 알려 드려요.</p>
 </section>`}
+${ext('대화줄')}
 ${svOn() ? '' : kidHome() + ext('오늘한장') + regionGrid()}${ext('약담기권함')}
 ${ext('필요약줄')}${odL}${homeQuick(n)}
-${ext('대화줄')}
 ${ext('응급칸')}${svOn() ? '' : ER_LINE()}
 ${condOn().length || ME.condskip ? '' : `<div class="cond-line"><button type="button" onclick="go('/me?t=body')">${I.user}<span>앓는 병이 있으면 알려 주세요 — <b>피해야 할 약을 걸러 드려요</b></span>${I.chev}</button><button type="button" class="x" aria-label="이 안내 닫기" onclick="ME.condskip=true;saveMe();route()">${I.x}</button></div>`}
 ${storeBar()}
@@ -3101,6 +3101,7 @@ ${ext('기내줄')}
 ${disclaimer()}`;
 }
 document.addEventListener('keydown', e => { if (e.target.id === 'q' && e.key === 'Enter') go('/search?q=' + encodeURIComponent(e.target.value.trim())); });
+document.addEventListener('keydown', e => { if (e.target.id === 'gq' && e.key === 'Enter' && !e.isComposing && e.target.value.trim()) { const v = e.target.value.trim(); GQ = ''; go('/talk?q=' + encodeURIComponent(v)); } });
 
 const esc0 = t => short(String(t || '').replace(/「|」/g, ''), 60);
 function copyName(n){

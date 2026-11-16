@@ -2713,7 +2713,7 @@ const topBar = (opts = {}) => `
     <div class="brand"><div class="mark"><img src="${BRANDMARK}" alt="" width="34" height="34"></div><div><b>약지도</b><span>증상에 맞는 약 · 복약 알림</span></div></div>`}
     ${opts.unreviewed || opts.unv ? `<a class="review-stamp unrev" href="#/about">${I.info}<span>자료 확인 중</span></a>` : `<a class="review-stamp" href="#/about" aria-label="출처 보기">${I.book}<span class="rs-t">출처 보기</span></a>`}${!opts.back ? acctBtn() : ''}
   </div>
-  ${opts.nosearch ? '' : `<div class="topfind">${I.search}<input id="gq" aria-label="증상이나 약 이름으로 찾기" placeholder="${bigFs() || innerWidth < 380 || LANG !== 'ko' ? '증상이나 약 이름' : '증상·약 이름으로 찾기 (예: 허리, 타이레놀)'}" autocomplete="off" enterkeyhint="search" value="${esc(GQ)}"><button class="gq-x ${GQ ? '' : 'hide'}" onclick="GQ='';route()" aria-label="지우기">${I.x}</button></div>`}<!--TOPEND-->`;
+  ${opts.nosearch ? '' : `<div class="topfind">${I.search}<input id="gq" aria-label="증상이나 약 이름으로 찾기" placeholder="${LANG !== 'ko' ? '증상이나 약 이름' : bigFs() || innerWidth < 380 ? '증상·약 이름·궁금한 것' : '증상·약 이름, 무엇이든 물어보세요'}" autocomplete="off" enterkeyhint="search" value="${esc(GQ)}"><button class="gq-x ${GQ ? '' : 'hide'}" onclick="GQ='';route()" aria-label="지우기">${I.x}</button></div>`}<!--TOPEND-->`;
 /* 출처 칩은 「저자·연도」까지만. 예전 규칙은 괄호 「(」에서만 잘라서, 「—」로 쓴 출처 44개가
    문장째로 화면에 깔렸다(어지럼 화면이 출처 문단 여섯 개로 끝나고 있었다).
    연도(19xx·20xx)를 만나면 거기서 끊고, 연도가 없으면 「—」·「·」 앞에서 끊는다. */
@@ -3559,9 +3559,9 @@ function vHome(){
     <h1 class="greet">어디가 불편하세요?</h1>
     <p>증상을 고르면 약국에서 물어볼 약을 알려 드려요.</p>
   </section>`}
+  ${ext('대화줄')}
   ${svOn() ? '' : kidHome() + ext('오늘한장') + regionGrid()}${ext('약담기권함')}
   ${ext('필요약줄')}${odL}${homeQuick(n)}
-  ${ext('대화줄')}
   ${ext('응급칸')}${svOn() ? '' : ER_LINE()}
   ${condOn().length || ME.condskip ? '' : `<div class="cond-line"><button type="button" onclick="go('/me?t=body')">${I.user}<span>앓는 병이 있으면 알려 주세요 — <b>피해야 할 약을 걸러 드려요</b></span>${I.chev}</button><button type="button" class="x" aria-label="이 안내 닫기" onclick="ME.condskip=true;saveMe();route()">${I.x}</button></div>`}
   ${storeBar()}
@@ -3591,6 +3591,8 @@ function vHome(){
   ${disclaimer()}`;
 }
 document.addEventListener('keydown', e => { if (e.target.id === 'q' && e.key === 'Enter') go('/search?q=' + encodeURIComponent(e.target.value.trim())); });
+/* 11-16 맨 위 찾기 칸 = 물어보기 겸용 — 치는 동안은 지금처럼 바로 찾고, 엔터를 누르면 물어보기 답 한 장으로 */
+document.addEventListener('keydown', e => { if (e.target.id === 'gq' && e.key === 'Enter' && !e.isComposing && e.target.value.trim()) { const v = e.target.value.trim(); GQ = ''; go('/talk?q=' + encodeURIComponent(v)); } });
 
 /* ───────── 검색 ───────── */
 const esc0 = t => short(String(t || '').replace(/「|」/g, ''), 60);
