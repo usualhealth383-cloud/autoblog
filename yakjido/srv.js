@@ -1573,6 +1573,132 @@
   };
 })();
 /* ▲▲ 홈보내기 부품 끝 ▲▲ */
+/* ▼▼ 잉크 얼굴 부품 시작 ▼▼ */
+/* ═══ 메디나눔 「잉크」 — 공용 얼굴(캐릭터) + 잉크 번짐 면 (2026-11-17 현욱님 · 디자인 언어 _시안/ink/잉크_디자인_언어.md)
+   참고 원본: _시안/ink/참고_ink_시안.html(지인 작품 — 현욱님 「저작권은 나에게 있다, 써도 된다」 11-17). 번짐 계산은 원본과 같다.
+   하는 일
+     · 얼굴: 잉크 번진 모양 + 5.2초마다 깜빡이는 두 눈 · 누르면 살짝 커지며 웃음. 모양만 앱마다(아래 모양표), 눈·질감은 같다.
+     · 면: [data-ink] 칸(답 말풍선·주요 단추·카드)에 번진 가장자리를 그린다. data-ink="solid" 은 강조색 면, 그 밖은 회색 테(안쪽 2.5px).
+       번짐은 가장자리 1.5px 안(세 번 상자 흐림 반경 0.6px) — 가운데는 단색이라 글자 대비(흰 글 4.5:1↑)는 강조색 그대로다. 움직임 줄이기면 눈도 멈춘다.
+     · 토큰: <html data-ink> 이면 공용 부품(계정·가입 시트·설정·알림 띠·뒤로 알약·회원권)이 쓰는 --card · --line · --accent 등을 잉크 값으로.
+   쓰는 법
+     잉크.설치({ 색: '#E8452C' })                         // 앱 강조색(없으면 CSS --ink-accent)
+     el.innerHTML = 잉크.얼굴HTML('heart', { 크기: 64, 라벨: '메디나눔' })   // heart · house · leaf · drops · pill · shield · sprout · cross
+     잉크.그리기(뿌리)                                      // 새로 그린 화면 뒤 한 번(설치하면 바뀜을 지켜보며 저절로도 그린다)
+   판 2026-11-17a — 첫 판 */
+(function () {
+  if (window.잉크 && window.잉크.판) return;
+  var 판 = '2026-11-17a';
+  var 설정 = { 색: '', 지켜보기: true };
+  /* 모양표 — 120×112 안. 눈 y 는 모양마다 */
+  var 모양 = {
+    heart: { d: 'M60 108 C60 108 8 76 8 40 C8 20 22 8 38 8 C48 8 56 14 60 22 C64 14 72 8 82 8 C98 8 112 20 112 40 C112 76 60 108 60 108 Z', 눈: 36 },
+    house: { d: 'M60 8 L112 50 L100 50 L100 106 L20 106 L20 50 L8 50 Z', 눈: 56 },
+    leaf: { d: 'M60 108 C24 96 8 62 22 30 C34 6 82 2 106 14 C116 52 100 94 60 108 Z', 눈: 40 },
+    drops: { d: 'M10 66 A26 26 0 1 0 62 66 A26 26 0 1 0 10 66 Z M56 52 A30 30 0 1 0 116 52 A30 30 0 1 0 56 52 Z', 눈: 44 },
+    pill: { d: 'M34 28 H86 A28 28 0 0 1 86 84 H34 A28 28 0 0 1 34 28 Z', 눈: 44 },
+    shield: { d: 'M60 6 L108 22 C108 64 92 94 60 108 C28 94 12 64 12 22 Z', 눈: 40 },
+    sprout: { d: 'M60 108 C28 108 14 86 14 66 C14 44 34 32 60 32 C86 32 106 44 106 66 C106 86 92 108 60 108 Z M58 34 C56 16 42 6 26 8 C28 24 42 34 58 34 Z M62 34 C64 16 78 6 94 8 C92 24 78 34 62 34 Z', 눈: 56 },
+    cross: { d: 'M44 6 H76 V38 H108 V74 H76 V106 H44 V74 H12 V38 H44 Z', 눈: 40 }
+  };
+  function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
+  function 얼굴HTML(m, o) {
+    o = o || {}; var M = 모양[m] || 모양.heart, y = M.눈, k = o.크기 || 64;
+    return '<svg class="ink-face' + (o.cls ? ' ' + esc(o.cls) : '') + '" data-shape="' + esc(모양[m] ? m : 'heart') + '" viewBox="0 0 120 112" width="' + k + '" height="' + Math.round(k * 112 / 120) + '"'
+      + (o.색 ? ' style="--ink-c:' + esc(o.색) + '"' : '') + (o.라벨 ? ' role="img" aria-label="' + esc(o.라벨) + '"' : ' aria-hidden="true"') + ' focusable="false">'
+      + '<g class="ink-body"><image data-ink-face/><g class="ink-eyes"><rect class="ink-eye l" x="40" y="' + y + '" width="10" height="23" rx="5" fill="#fff"/><rect class="ink-eye r" x="70" y="' + y + '" width="10" height="23" rx="5" fill="#fff"/></g>'
+      + '<g class="ink-smile" fill="none" stroke="#fff" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"><path d="M38 ' + (y + 14) + ' L45 ' + (y + 6) + ' L52 ' + (y + 14) + '"/><path d="M68 ' + (y + 14) + ' L75 ' + (y + 6) + ' L82 ' + (y + 14) + '"/></g></g></svg>';
+  }
+  /* ── 번짐 계산(원본과 같은 수식) ── */
+  function rng(seed) { return function () { seed = seed + 0x6D2B79F5 | 0; var t = Math.imul(seed ^ seed >>> 15, 1 | seed); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+  function 색값(str) { str = String(str || '').trim(); if (/^#[0-9a-f]{6}$/i.test(str)) return [parseInt(str.substr(1, 2), 16), parseInt(str.substr(3, 2), 16), parseInt(str.substr(5, 2), 16)];
+    var m = str.match(/\d+(\.\d+)?/g); if (!m || m.length < 3 || (m.length > 3 && +m[3] === 0)) return null; return [+m[0], +m[1], +m[2]]; }
+  function 바탕색(el) { for (; el && el.nodeType === 1; el = el.parentElement) { var c = 색값(getComputedStyle(el).backgroundColor); if (c && !(el.querySelector(':scope > canvas.ink'))) return c; } return [255, 255, 255]; }
+  function blur(a, w, h, r) {
+    if (r < 1) return a; var t = new Float32Array(a.length), k, x, y, sum, n = 2 * r + 1;
+    for (k = 0; k < 3; k++) {
+      for (y = 0; y < h; y++) { sum = 0; var row = y * w; for (x = -r; x <= r; x++) sum += a[row + Math.min(w - 1, Math.max(0, x))];
+        for (x = 0; x < w; x++) { t[row + x] = sum / n; sum += a[row + Math.min(w - 1, x + r + 1)] - a[row + Math.max(0, x - r)]; } }
+      for (x = 0; x < w; x++) { sum = 0; for (y = -r; y <= r; y++) sum += t[Math.min(h - 1, Math.max(0, y)) * w + x];
+        for (y = 0; y < h; y++) { a[y * w + x] = sum / n; sum += t[Math.min(h - 1, y + r + 1) * w + x] - t[Math.max(0, y - r) * w + x]; } }
+    }
+    return a;
+  }
+  function field(w, h, draw, r) { var c = document.createElement('canvas'); c.width = w; c.height = h; var x = c.getContext('2d'); x.fillStyle = '#000'; draw(x);
+    var d = x.getImageData(0, 0, w, h).data, a = new Float32Array(w * h); for (var i = 0; i < a.length; i++) a[i] = d[i * 4 + 3] / 255; return blur(a, w, h, r); }
+  function grainy(a, g, rand) { var band = 4 * a * (1 - a); if (band > 0.001) { a += (rand() * 2 - 1) * g * band * 0.5; a = a < 0 ? 0 : a > 1 ? 1 : a; } return a; }
+  function paint(w, h, outer, inner, r, g, fill, core, seed) {
+    var out = document.createElement('canvas'); out.width = w; out.height = h; var ctx = out.getContext('2d'), img = ctx.createImageData(w, h), p = img.data, rand = rng(seed);
+    var A = field(w, h, outer, r), B = inner ? field(w, h, inner, Math.max(1, Math.round(r * .7))) : null;
+    for (var i = 0; i < A.length; i++) { var a = grainy(A[i], g, rand), c = fill;
+      if (B) { var b = grainy(B[i], g, rand); c = [fill[0] + (core[0] - fill[0]) * b, fill[1] + (core[1] - fill[1]) * b, fill[2] + (core[2] - fill[2]) * b]; }
+      p[i * 4] = c[0]; p[i * 4 + 1] = c[1]; p[i * 4 + 2] = c[2]; p[i * 4 + 3] = a * 255; }
+    ctx.putImageData(img, 0, 0); return out;
+  }
+  function 강조(el) { var v = ''; try { v = getComputedStyle(el).getPropertyValue('--ink-c') || getComputedStyle(el).getPropertyValue('--ink-accent'); } catch (e) {}
+    return 색값(v) || 색값(설정.색) || [232, 69, 44]; }
+  var 길 = {};
+  function 얼굴그리기(뿌리) {
+    var dpr = window.devicePixelRatio || 1, seed = 1;
+    (뿌리 || document).querySelectorAll('svg.ink-face image[data-ink-face]').forEach(function (im) {
+      var svg = im.ownerSVGElement, px = svg.getBoundingClientRect().width; if (!px) return;
+      var m = svg.getAttribute('data-shape') || 'heart', c0 = 강조(svg), 열쇠 = m + '|' + Math.round(px) + '|' + c0.join(',');
+      if (im.getAttribute('data-k') === 열쇠) return;
+      var s = px / 120 * dpr, pad = 14, sigma = Math.max(1, Math.round(4.2 * s)), W = Math.ceil((120 + 2 * pad) * s), H = Math.ceil((112 + 2 * pad) * s);
+      var P = 길[m] || (길[m] = new Path2D((모양[m] || 모양.heart).d));
+      var c = paint(W, H, function (x) { x.setTransform(s, 0, 0, s, pad * s, pad * s); x.fill(P); }, null, sigma, 1.15, c0, null, (seed++) * 7919);
+      im.setAttribute('href', c.toDataURL()); im.setAttribute('x', -pad); im.setAttribute('y', -pad); im.setAttribute('width', 120 + 2 * pad); im.setAttribute('height', 112 + 2 * pad);
+      im.setAttribute('data-k', 열쇠); svg.style.overflow = 'visible';
+    });
+  }
+  function 면그리기(뿌리) {
+    var dpr = window.devicePixelRatio || 1, seed = 100;
+    var 테 = 색값(getComputedStyle(document.documentElement).getPropertyValue('--ink-rim')) || [200, 200, 200];
+    (뿌리 || document).querySelectorAll('[data-ink]:not(html)').forEach(function (el) {
+      var 바탕 = 바탕색(el.parentElement), w = el.offsetWidth, h = el.offsetHeight; if (!w || !h) return;
+      var solid = el.getAttribute('data-ink') === 'solid', c0 = solid ? 강조(el) : 테, 열쇠 = w + 'x' + h + '|' + c0.join(',') + '|' + 바탕.join(',');
+      var 옛 = el.querySelector(':scope > canvas.ink'); if (옛 && el.getAttribute('data-ink-k') === 열쇠) return; if (옛) 옛.remove();
+      var st = getComputedStyle(el), rad = ['borderTopLeftRadius', 'borderTopRightRadius', 'borderBottomRightRadius', 'borderBottomLeftRadius'].map(function (k) { return Math.min(parseFloat(st[k]) || 0, h / 2, w / 2); });
+      var pad = 6, soft = 0.6, rimW = 2.4, W = Math.round((w + 2 * pad) * dpr), H = Math.round((h + 2 * pad) * dpr);
+      function rr(inset) { return function (x) { x.setTransform(dpr, 0, 0, dpr, 0, 0); x.beginPath(); if (x.roundRect) x.roundRect(pad + inset, pad + inset, w - 2 * inset, h - 2 * inset, rad.map(function (r) { return Math.max(0, r - inset); })); else x.rect(pad + inset, pad + inset, w - 2 * inset, h - 2 * inset); x.fill(); }; }
+      var c = paint(W, H, rr(0), solid ? null : rr(rimW), Math.max(1, Math.round(soft * dpr)), 0.95, c0, solid ? null : 바탕, (seed++) * 104729);
+      c.className = 'ink'; c.setAttribute('aria-hidden', 'true'); c.style.cssText = 'left:' + (-pad) + 'px;top:' + (-pad) + 'px;width:' + (w + 2 * pad) + 'px;height:' + (h + 2 * pad) + 'px';
+      el.insertBefore(c, el.firstChild); el.setAttribute('data-ink-k', 열쇠);
+    });
+  }
+  function 그리기(뿌리) { try { 얼굴그리기(뿌리); 면그리기(뿌리); } catch (e) {} }
+  var CSS = ''
+    + '.ink-face{display:inline-block;overflow:visible;cursor:pointer;-webkit-tap-highlight-color:transparent;vertical-align:middle}'
+    + '.ink-face .ink-body{transform-origin:50% 55%;transition:transform .35s cubic-bezier(.3,1.6,.5,1)}.ink-face.pop .ink-body{transform:scale(1.06)}'
+    + '.ink-eye{transform-box:fill-box;transform-origin:50% 50%;animation:inkBlink 5.2s infinite}.ink-eye.r{animation-delay:.04s}'
+    + '@keyframes inkBlink{0%,94%,100%{transform:scaleY(1)}96.5%{transform:scaleY(.1)}}'
+    + '.ink-face .ink-smile{opacity:0;transition:opacity .15s}.ink-face.pop .ink-smile{opacity:1}.ink-face.pop .ink-eyes{opacity:0}.ink-eyes{transition:opacity .15s}'
+    + '[data-ink]:not(html){position:relative;isolation:isolate}[data-ink]>canvas.ink{position:absolute;z-index:-1;pointer-events:none}'
+    + '[data-ink]:not(html):has(>canvas.ink){background:transparent!important;box-shadow:none!important}'
+    + '@media (prefers-reduced-motion:reduce){.ink-eye{animation:none}.ink-face .ink-body{transition:none}}'
+    /* 잉크 테마 토큰 — 공용 부품(계정·가입·설정·알림 띠·뒤로 알약·회원권)이 읽는 이름을 잉크 값으로 */
+    + 'html[data-ink] body{background:var(--ink-bg);color:var(--ink-fg)}html[data-ink]{--ink-bg:#FFFFFF;--ink-fg:#141414;--ink-mute:#8A8A8A;--ink-line:#EFEFEF;--ink-rim:#C8C8C8;'
+    + '--bg:var(--ink-bg);--surface:var(--ink-bg);--card:var(--ink-bg);--line:var(--ink-line);--ink:var(--ink-fg);--muted:var(--ink-mute);--accent:var(--ink-accent,#E8452C);--on-accent:#fff;--ms-bg:var(--ink-bg);--nt-accent:var(--ink-accent,#E8452C)}'
+    + '@media (prefers-color-scheme:dark){html[data-ink]:not([data-theme="light"]){--ink-bg:#141414;--ink-fg:#F2F2F2;--ink-mute:#8C8C8C;--ink-line:#242424;--ink-rim:#4A4A4A}}'
+    + 'html[data-ink][data-theme="dark"]{--ink-bg:#141414;--ink-fg:#F2F2F2;--ink-mute:#8C8C8C;--ink-line:#242424;--ink-rim:#4A4A4A}';
+  var 설치됨 = false, 틀 = null;
+  function 나중() { clearTimeout(틀); 틀 = setTimeout(function () { 그리기(); }, 150); }
+  function 설치(o) {
+    o = o || {}; for (var k in o) if (Object.prototype.hasOwnProperty.call(o, k)) 설정[k] = o[k];
+    if (설치됨) { 나중(); return; } 설치됨 = true;
+    try { var st = document.createElement('style'); st.id = 'ink-css'; st.textContent = CSS; document.head.appendChild(st); } catch (e) {}
+    document.addEventListener('click', function (ev) { var f = ev.target.closest && ev.target.closest('svg.ink-face'); if (!f) return; f.classList.add('pop'); clearTimeout(f._t); f._t = setTimeout(function () { f.classList.remove('pop'); }, 900); });
+    (document.fonts && document.fonts.ready ? document.fonts.ready : Promise.resolve()).then(function () { 그리기(); });
+    window.addEventListener('resize', 나중);
+    try { matchMedia('(prefers-color-scheme: dark)').addEventListener('change', 나중); } catch (e) {}
+    if (설정.지켜보기 && window.MutationObserver) { try { new MutationObserver(function (ms) { for (var i = 0; i < ms.length; i++) { var t = ms[i].target; if (t && t.nodeName === 'CANVAS') continue; 나중(); return; } }).observe(document.body, { childList: true, subtree: true }); } catch (e) {} }
+  }
+  window.잉크 = { 판: 판, 설치: 설치, 얼굴HTML: 얼굴HTML, 그리기: 그리기, 모양: Object.keys(모양) };
+})();
+/* ▲▲ 잉크 얼굴 부품 끝 ▲▲ */
+/* 11-17 잉크 판일 때만 — 얼굴·번진 면. 색 토큰은 약지도 ink.css 가 맡는다(공용 토큰의 흐린 글 #8A8A8A 는 흰 바탕 4.5:1 미달이라 html[data-ink] 를 쓰지 않는다) */
+try { if (document.documentElement.classList.contains('ink')) 잉크.설치({ 색: '#0B6E8F' }); } catch (e) {}
+
 /* 11-13 메디나눔 홈 2단계 — 수첩의 혈압·혈당(P8)을 사용자가 누를 때만 「내 홈」으로 넘긴다. 스위치 꺼짐(법무 판단 전 비공개).
    원래 기록은 이 앱이 정본 — 꾸러미는 사본 보기용. 모양은 부품이 다시 검사한다 */
 try {
@@ -3398,7 +3524,8 @@ window.언어칸 = function () {
   function 답그리기(r) {
     if (r.위험) return '<article class="ask-ans sos" role="alert"><p class="ask-c">' + esc(r.위험.말) + '</p>' + (r.위험.전화 && /^[\d+][\d\s-]*$/.test(String(r.위험.전화)) ? '<a class="btn ask-call" href="tel:' + esc(String(r.위험.전화).replace(/[^\d+]/g, '')) + '">' + I.alert + ' ' + esc(r.위험.전화) + ' 전화</a>' : '') + '</article>';
     if (!r.결) return '<article class="ask-ans"><p class="ask-c">아직 이 질문은 찾지 못했어요. 이렇게 물어보시면 찾을 수 있어요.</p><div class="ask-chips">' + 예시.slice(0, 4).map(칩).join('') + '</div></article>';
-    var 단 = (r.단 || []).map(function (b, i) { var k = 'a' + 묻기.log.length + '_' + i; 묻기.할일[k] = b.할; return '<button type="button" class="btn ' + (b.주 ? '' : 'line') + '" onclick="묻기단추(\'' + k + '\')">' + esc(b.글) + (b.주 ? I.chev : '') + '</button>'; }).join('');
+    /* 11-17 주요 단추 하나 + 나머지는 글 링크 */
+    var 단 = (r.단 || []).map(function (b, i) { var k = 'a' + 묻기.log.length + '_' + i + '_' + Date.now() % 100000; 묻기.할일[k] = b.할; return i === 0 ? '<button type="button" class="btn" data-ink="solid" onclick="묻기단추(\'' + k + '\')">' + esc(b.글) + I.chev + '</button>' : '<button type="button" class="ask-link" onclick="묻기단추(\'' + k + '\')">' + esc(b.글) + ' ›</button>'; }).join('');
     return '<article class="ask-ans' + (r.위 ? ' warn' : '') + '"><p class="ask-c">' + 짧게(r.결) + '</p>' + ((r.할 || []).length ? '<ol class="ask-do">' + r.할.map(function (x) { return '<li>' + 짧게(x) + '</li>'; }).join('') + '</ol>' : '') +
       (단 ? '<div class="ask-act">' + 단 + '</div>' : '') + ((r.칩 || []).length ? '<div class="ask-chips">' + r.칩.map(칩).join('') + '</div>' : '') +
       (r.더 ? '<details class="ask-more"><summary>자세히' + I.chev + '</summary>' + r.더 + '</details>' : '') + '</article>';
@@ -3418,19 +3545,46 @@ window.언어칸 = function () {
     var 처음 = document.getElementById('askfirst'); if (처음) 처음.hidden = 묻기.log.length > 0;
   }
   /* 11-17 잉크 판 — 얼굴(알약 + 깜빡이는 두 눈, 누르면 웃음)과 대화가 뼈대인 홈. 공용 잉크_얼굴 부품이 오면 그것으로 바꾼다 */
-  window.잉크얼굴 = function (cls) { return '<svg class="ink-face ' + (cls || '') + '" viewBox="0 0 120 90" role="img" aria-label="약지도" onclick="var e=this;e.classList.add(\'pop\');setTimeout(function(){e.classList.remove(\'pop\')},700)"><g class="body"><rect x="6" y="14" width="108" height="62" rx="31" fill="var(--primary)"/><g class="eyes"><rect class="eye l" x="44" y="30" width="9" height="22" rx="4.5" fill="#fff"/><rect class="eye r" x="67" y="30" width="9" height="22" rx="4.5" fill="#fff"/></g><g class="smile" fill="none" stroke="#fff" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"><path d="M42 45 L48.5 37 L55 45"/><path d="M65 45 L71.5 37 L78 45"/></g></g></svg>'; };
+  window.잉크얼굴 = function (k, cls) { return window.잉크 && 잉크.얼굴HTML ? 잉크.얼굴HTML('pill', { 크기: k || 30, cls: cls || '', 라벨: k >= 60 ? '약지도' : '' }) : ''; };   /* 공용 잉크 얼굴 부품(11-17a) 의 알약 */
   /* 11-17 설정 → 화면 → 잉크 판(새 디자인 미리 보기). 끄면 옛 판 그대로 */
   window.잉크칸 = function () { var on = document.documentElement.classList.contains('ink');
     return '<div class="view-row" style="border-top:1px solid var(--hairline)"><div class="t"><b>새 디자인 미리 보기</b><span>흰 바탕·가는 선의 잉크 판 — 끄면 지금 화면 그대로</span></div><button class="sw ' + (on ? 'on' : '') + '" role="switch" aria-checked="' + on + '" aria-label="새 디자인 미리 보기" onclick="try{localStorage.setItem(\'yakjido.ink\',\'' + (on ? '0' : '1') + '\')}catch(e){};location.reload()"></button></div>'; };
-  var 홈예 = ['목이 아파요', '타이레놀이랑 판콜에이 같이 먹어도 돼요?', '졸음 껌 성분이 뭐예요?'];
+  /* 11-17 잉크 홈 — 첫 화면 규칙 7(현욱님 「글이 많고 줄글 목록은 아무도 안 누른다 · 첫 이미지와 임팩트」):
+     얼굴 + 제목 12자 안 + 보조 한 줄 + 묻는 창 하나 → 그 자리에서 답 한 장(화면 이동 없음) · 약을 담은 분은 「다음 약」 한 줄 ·
+     그 아래 몸 부위 큰 그림 단추 여섯(그림 + 낱말 하나) → 누르면 그 자리에서 증상 고르기. 오늘의 한 장·증상 줄줄이·설명 문장은 탭 뒤로 */
+  var 부위 = [['감기·열·목', '감기·열'], ['머리·눈·귀·코', '머리·눈·코'], ['배·소화', '배·소화'], ['허리·관절·근육', '허리·관절'], ['피부·머리카락', '피부'], ['잠·마음·생활', '잠·마음']];
+  function 다음약() {
+    try { var taking = takingItems(); if (!taking.length) return ''; rollDay();
+      var taken = takenSet(), now = new Date(), nm = now.getHours() * 60 + now.getMinutes(), rows = [];
+      taking.forEach(function (d) { schedOf(d.id, d).forEach(function (t) { var hm = t.split(':').map(Number); rows.push({ d: d, t: t, min: hm[0] * 60 + hm[1], done: taken.indexOf(d.id + '@' + t) >= 0, skip: isSkipped(d.id + '@' + t) }); }); });
+      if (!rows.length) return ''; rows.sort(function (a, b) { return a.min - b.min; });
+      var left = rows.filter(function (r) { return !r.done && !r.skip; }), n = left[0], low = lowStock();
+      var 줄 = !n ? '<p class="ink-today"><b>오늘 약, 다 드셨어요</b></p>'
+        : '<p class="ink-today"><span>' + (n.min <= nm + 30 ? '지금' : '다음') + ' <b>' + esc(n.t) + ' · ' + esc(짧은이름(n.d.name)) + '</b></span><button type="button" class="btn ink-tick" onclick="tick(\'' + n.d.id + '\',\'' + n.t + '\')">먹었어요</button></p>';
+      return 줄 + (low.length ? '<p class="ink-low">곧 떨어져요 — ' + low.slice(0, 2).map(function (x) { return esc(짧은이름(x.n)); }).join(' · ') + ' <a href="#/schedule?t=sc2">›</a></p>' : '');
+    } catch (e) { return ''; }
+  }
+  window.잉크부위 = function (g) {
+    var 곳 = document.getElementById('inkpick'); if (!곳) return;
+    if (곳.dataset.g === g) { 곳.innerHTML = ''; 곳.dataset.g = ''; return; }
+    var L = (D.symptoms || []).filter(function (s) { return s.group === g; });
+    곳.dataset.g = g; 곳.innerHTML = '<div class="ask-chips">' + L.map(function (s) { return '<a class="chip" href="#/symptom/' + s.id + '">' + esc(String(s.name).split(' (')[0]) + '</a>'; }).join('') + '</div>';
+    document.querySelectorAll('.ink-parts button').forEach(function (b) { b.setAttribute('aria-pressed', b.dataset.g === g); });
+  };
+  window.잉크묻기 = function (v) {
+    v = String(v || '').trim(); var 곳 = document.getElementById('inkans'); if (!v || !곳) return;
+    var 보 = function () { var r = null; try { r = 답짓기(v); } catch (e) {} 곳.innerHTML = '<div class="ask-me"><span>' + esc(v) + '</span></div><div class="ask-row">' + 잉크얼굴(30) + 답그리기(r || {}) + '</div><a class="ink-more" href="#/talk?q=' + encodeURIComponent(v) + '">물어보기에서 이어서 ›</a>'; };
+    (CORE !== 2 ? ensureCore() : Promise.resolve()).then(보, 보);
+  };
   window.잉크홈 = function () {
-    var 쌍 = 홈예.map(function (q, i) { var r = null; try { r = CORE === 2 ? 답짓기(q) : null; } catch (e) {} 묻기.기다림 = null; 묻기.약 = [];
-      var 답 = r && r.결 ? String(r.결).replace(/\*\*/g, '') : '물어보시면 바로 답해 드려요.';
-      return '<div class="ink-row me' + (i ? ' turn' : '') + '"><span class="ink-b">' + esc(q) + '</span></div><div class="ink-row it">' + 잉크얼굴() + '<a class="ink-b" href="#/talk?q=' + encodeURIComponent(q) + '"><b>' + esc(답) + '</b><u>답 한 장 열기</u></a></div>'; }).join('');
+    var S = D.symptoms || [];
     return '<p class="ink-sos">급할 때 <a href="tel:119">119</a> · 마음이 힘들 때 <a href="tel:109">109</a> · <a href="tel:15770199">1577-0199</a></p>' +
-      '<section class="ink-hero">' + 잉크얼굴() + '<h1>어디가 불편하세요?</h1><p>증상이나 약 이름을 그대로 물어보세요.</p></section>' +
-      '<form class="ask-in" onsubmit="event.preventDefault();var v=this.querySelector(\'input\').value.trim();if(v)go(\'/talk?q=\'+encodeURIComponent(v))"><input type="text" enterkeyhint="send" placeholder="예) 목이 아파요" aria-label="어디가 아프세요? 어떤 약이 궁금하세요?"><button type="submit" class="btn">묻기</button></form>' +
-      '<div class="ink-chat">' + 쌍 + '</div><a class="ink-more" href="#/talk">다른 질문 하기 ›</a>';
+      '<section class="ink-hero">' + 잉크얼굴(96) + '<h1>어디가 불편하세요?</h1><p>증상이나 약 이름을 넣어 보세요</p></section>' +
+      다음약() +
+      '<form class="ask-in" onsubmit="event.preventDefault();잉크묻기(this.querySelector(\'input\').value)"><input type="text" enterkeyhint="send" placeholder="예) 목이 아파요 · 타이레놀" aria-label="어디가 아프세요? 어떤 약이 궁금하세요?"><button type="submit" class="btn" data-ink="solid">묻기</button></form>' +
+      '<div id="inkans" class="ink-ans" aria-live="polite"></div>' +
+      '<div class="ink-parts" role="group" aria-label="어디가 불편하세요">' + 부위.map(function (p) { var L = S.filter(function (s) { return s.group === p[0]; }); return L.length ? '<button type="button" data-g="' + esc(p[0]) + '" aria-pressed="false" onclick="잉크부위(this.dataset.g)"><span class="ic">' + (typeof sicon === 'function' ? sicon(L[0]) : '') + '</span><b>' + esc(p[1]) + '</b></button>' : ''; }).join('') + '</div>' +
+      '<div id="inkpick"></div>';
   };
   window.vTalkS = function () {
     var q = (location.hash.match(/[?&]q=([^&]+)/) || [])[1];
@@ -3445,7 +3599,7 @@ window.언어칸 = function () {
   /* 11-16 Main — 홈에서는 예시 칩 셋만(누르면 물어보기 답 한 장), 나머지는 물어보기 화면에. 맨 위 찾기 칸에 치고 엔터를 눌러도 같은 화면 */
   window.대화줄 = function () { if (window.LANG && window.LANG !== 'ko') return ''; return '<div class="talk-door"><span class="b">무엇이든 물어보세요</span><div class="ask-chips">' + ['목이 아파요', '타이레놀이랑 판콜에이 같이 먹어도 돼요?', '졸음 껌 성분이 뭐예요?'].map(function (c) { return '<a class="chip" href="#/talk?q=' + encodeURIComponent(c) + '">' + esc(c) + '</a>'; }).join('') + '</div><a class="small link" href="#/talk">다른 질문 하기 ›</a></div>'; };
   var cs = document.createElement('style');
-  cs.textContent = 'html:not(.ink) .ask-row .ink-face{display:none}.ask-row{display:flex;gap:8px;align-items:flex-start}.ask-row .ask-ans{flex:1;min-width:0;max-width:none}.ask-face{flex:none;width:32px;height:32px;border-radius:10px;margin-top:2px}.ask-morechips summary,.ask-disc summary{display:inline-flex;align-items:center;min-height:44px;color:var(--primary);font-weight:600;cursor:pointer;list-style:none}.ask-morechips summary::-webkit-details-marker,.ask-disc summary::-webkit-details-marker{display:none}.ask-disc{margin-top:16px}.ask-disc summary{color:var(--muted);font-weight:500;font-size:.875rem}.talk-door .ask-chips{margin:6px 0 2px}.talk-door .chip{text-decoration:none;background:var(--card);border:1px solid var(--hairline);color:var(--ink);font-weight:600;min-height:44px;padding:8px 14px;border-radius:999px;display:inline-flex;align-items:center}.ask-in{display:flex;gap:8px}.ask-in input{flex:1;min-width:0;min-height:52px;padding:0 14px;border-radius:14px;border:1px solid var(--hairline);background:var(--card);font-size:max(16px,1rem)}.ask-in .btn{width:auto;min-height:52px;padding:0 18px}.ask-chips{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0}.ask-chips .chip{min-height:44px;white-space:normal;text-align:left}.ask-log{display:flex;flex-direction:column;gap:10px;margin-top:14px}.ask-me{display:flex;justify-content:flex-end}.ask-me span{max-width:84%;padding:10px 14px;border-radius:18px 18px 6px 18px;background:var(--primary);color:var(--on-primary,#fff);font-weight:600;word-break:keep-all;overflow-wrap:anywhere}.ask-ans{max-width:94%;padding:14px 16px;border-radius:18px 18px 18px 6px;background:var(--card);border:1px solid var(--hairline);word-break:keep-all;overflow-wrap:anywhere}.ask-ans.warn{border-color:var(--caution)}.ask-ans.sos{background:var(--alert-tint);border-color:var(--alert)}.ask-ans.sos .ask-c{color:var(--alert)}.ask-c{font-weight:700;font-size:1.0625rem;line-height:1.5}.ask-do{margin:8px 0 0;padding-left:1.2em}.ask-do li{margin:4px 0;line-height:1.55}.ask-act{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}.ask-act .btn{width:auto;min-height:46px;padding:0 14px;display:inline-flex;align-items:center;gap:4px}.ask-call{display:flex;justify-content:center;align-items:center;gap:6px;margin-top:10px;min-height:52px;background:var(--alert)!important;color:var(--on-alert,#fff)!important;text-decoration:none}.ask-more{margin-top:10px}.ask-more summary{display:inline-flex;align-items:center;min-height:44px;color:var(--primary);font-weight:600;cursor:pointer;list-style:none}.ask-more summary::-webkit-details-marker{display:none}.ask-ix{margin:8px 0}.ask-ix p{margin:4px 0}'+'.talk-door{display:flex;flex-direction:column;gap:4px;margin:12px 0 4px;padding:14px 16px;border-radius:18px 18px 18px 6px;background:var(--tint);color:var(--ink);text-decoration:none;min-height:48px}.talk-door .b{font-weight:700}.talk{min-height:50vh}';
+  cs.textContent = '.ask-link{min-height:44px;padding:0 4px;background:none;border:0;color:var(--primary);font-weight:600;font-size:.9375rem;cursor:pointer}html:not(.ink) .ask-row .ink-face{display:none}.ask-row{display:flex;gap:8px;align-items:flex-start}.ask-row .ask-ans{flex:1;min-width:0;max-width:none}.ask-face{flex:none;width:32px;height:32px;border-radius:10px;margin-top:2px}.ask-morechips summary,.ask-disc summary{display:inline-flex;align-items:center;min-height:44px;color:var(--primary);font-weight:600;cursor:pointer;list-style:none}.ask-morechips summary::-webkit-details-marker,.ask-disc summary::-webkit-details-marker{display:none}.ask-disc{margin-top:16px}.ask-disc summary{color:var(--muted);font-weight:500;font-size:.875rem}.talk-door .ask-chips{margin:6px 0 2px}.talk-door .chip{text-decoration:none;background:var(--card);border:1px solid var(--hairline);color:var(--ink);font-weight:600;min-height:44px;padding:8px 14px;border-radius:999px;display:inline-flex;align-items:center}.ask-in{display:flex;gap:8px}.ask-in input{flex:1;min-width:0;min-height:52px;padding:0 14px;border-radius:14px;border:1px solid var(--hairline);background:var(--card);font-size:max(16px,1rem)}.ask-in .btn{width:auto;min-height:52px;padding:0 18px}.ask-chips{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0}.ask-chips .chip{min-height:44px;white-space:normal;text-align:left}.ask-log{display:flex;flex-direction:column;gap:10px;margin-top:14px}.ask-me{display:flex;justify-content:flex-end}.ask-me span{max-width:84%;padding:10px 14px;border-radius:18px 18px 6px 18px;background:var(--primary);color:var(--on-primary,#fff);font-weight:600;word-break:keep-all;overflow-wrap:anywhere}.ask-ans{max-width:94%;padding:14px 16px;border-radius:18px 18px 18px 6px;background:var(--card);border:1px solid var(--hairline);word-break:keep-all;overflow-wrap:anywhere}.ask-ans.warn{border-color:var(--caution)}.ask-ans.sos{background:var(--alert-tint);border-color:var(--alert)}.ask-ans.sos .ask-c{color:var(--alert)}.ask-c{font-weight:700;font-size:1.0625rem;line-height:1.5}.ask-do{margin:8px 0 0;padding-left:1.2em}.ask-do li{margin:4px 0;line-height:1.55}.ask-act{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}.ask-act .btn{width:auto;min-height:46px;padding:0 14px;display:inline-flex;align-items:center;gap:4px}.ask-call{display:flex;justify-content:center;align-items:center;gap:6px;margin-top:10px;min-height:52px;background:var(--alert)!important;color:var(--on-alert,#fff)!important;text-decoration:none}.ask-more{margin-top:10px}.ask-more summary{display:inline-flex;align-items:center;min-height:44px;color:var(--primary);font-weight:600;cursor:pointer;list-style:none}.ask-more summary::-webkit-details-marker{display:none}.ask-ix{margin:8px 0}.ask-ix p{margin:4px 0}'+'.talk-door{display:flex;flex-direction:column;gap:4px;margin:12px 0 4px;padding:14px 16px;border-radius:18px 18px 18px 6px;background:var(--tint);color:var(--ink);text-decoration:none;min-height:48px}.talk-door .b{font-weight:700}.talk{min-height:50vh}';
   document.head.appendChild(cs);
 })();
 
@@ -5740,40 +5894,3 @@ try { if (window.ENTRY && /^#\/(symptom|send)/.test(location.hash)) route(); } c
 try { if (/^(#\/?(home)?)?$/.test(location.hash) && (window.오늘한장 || window.필요약줄)) route(); } catch (e) {}   /* 11-12 홈의 오늘 한 장·필요할 때 약 줄은 srv.js 가 온 뒤 다시 그린다 */
 try { if (/^#\/(drug\/|schedule|together|od|vitals|pillinfo|pub|supp\/|me|consent|login|notify|sgoal|sstage|doc|hello\/3|supp$|supp\?|sgoal|sstage|rx|about|search|myths|askdoc|talk|p\/|p\?|p$)/.test(location.hash)) route(); } catch (e) {}
 
-/* 11-17 잉크 판 질감 — 참고 시안(지인 작품 · 현욱님 사용 허락 11-17)의 번진 가장자리 그리기를 옮김.
-   강조색 면(답 말풍선)에만 · 가장자리 번짐 1.4px(2px 안) · 가운데는 단색이라 글자 대비 그대로 · 잉크 판일 때만 */
-(function () {
-  function rng(seed) { return function () { seed = seed + 0x6D2B79F5 | 0; var t = Math.imul(seed ^ seed >>> 15, 1 | seed); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
-  function rgb(str) { var m = String(str).match(/\d+(\.\d+)?/g); return m ? [+m[0], +m[1], +m[2]] : [11, 110, 143]; }
-  function blur(a, w, h, r) { if (r < 1) return a; var t = new Float32Array(a.length), k, x, y, sum, n = 2 * r + 1;
-    for (k = 0; k < 3; k++) { for (y = 0; y < h; y++) { sum = 0; var row = y * w; for (x = -r; x <= r; x++) sum += a[row + Math.min(w - 1, Math.max(0, x))];
-        for (x = 0; x < w; x++) { t[row + x] = sum / n; sum += a[row + Math.min(w - 1, x + r + 1)] - a[row + Math.max(0, x - r)]; } }
-      for (x = 0; x < w; x++) { sum = 0; for (y = -r; y <= r; y++) sum += t[Math.min(h - 1, Math.max(0, y)) * w + x];
-        for (y = 0; y < h; y++) { a[y * w + x] = sum / n; sum += t[Math.min(h - 1, y + r + 1) * w + x] - t[Math.max(0, y - r) * w + x]; } } }
-    return a; }
-  function paint(W, H, draw, r, g, fill, seed) {
-    var c = document.createElement('canvas'); c.width = W; c.height = H; var x = c.getContext('2d'); x.fillStyle = '#000'; draw(x);
-    var d = x.getImageData(0, 0, W, H).data, a = new Float32Array(W * H), i; for (i = 0; i < a.length; i++) a[i] = d[i * 4 + 3] / 255; blur(a, W, H, r);
-    var out = document.createElement('canvas'); out.width = W; out.height = H; var o = out.getContext('2d'), img = o.createImageData(W, H), p = img.data, rand = rng(seed);
-    for (i = 0; i < a.length; i++) { var v = a[i], band = 4 * v * (1 - v); if (band > 0.001) { v += (rand() * 2 - 1) * g * band * 0.5; v = v < 0 ? 0 : v > 1 ? 1 : v; }
-      p[i * 4] = fill[0]; p[i * 4 + 1] = fill[1]; p[i * 4 + 2] = fill[2]; p[i * 4 + 3] = v * 255; }
-    o.putImageData(img, 0, 0); return out; }
-  var seedN = 100;
-  function 칠하기() {
-    if (!document.documentElement.classList.contains('ink')) return;
-    var dpr = Math.min(2, window.devicePixelRatio || 1);
-    document.querySelectorAll('.ink-row.it .ink-b, .ask-ans .ask-c').forEach(function (el) {
-      var w = el.offsetWidth, h = el.offsetHeight; if (!w || !h || el.dataset.inked === w + 'x' + h) return;
-      var st = getComputedStyle(el), fill = rgb(st.backgroundColor); if (!/rgb/.test(st.backgroundColor) || /,\s*0\)$/.test(st.backgroundColor)) fill = rgb(el.dataset.inkFill || st.backgroundColor);
-      el.dataset.inkFill = st.backgroundColor;
-      var rad = ['borderTopLeftRadius', 'borderTopRightRadius', 'borderBottomRightRadius', 'borderBottomLeftRadius'].map(function (k) { return Math.min(parseFloat(st[k]) || 0, h / 2, w / 2); });
-      var pad = 6, W = Math.round((w + 2 * pad) * dpr), H = Math.round((h + 2 * pad) * dpr);
-      var cv = paint(W, H, function (x) { x.setTransform(dpr, 0, 0, dpr, 0, 0); x.beginPath(); if (x.roundRect) x.roundRect(pad, pad, w, h, rad); else x.rect(pad, pad, w, h); x.fill(); }, Math.max(1, Math.round(1.4 * dpr)), 0.95, fill, seedN++ * 7919);
-      cv.className = 'ink-cv'; cv.style.cssText = 'position:absolute;left:' + (-pad) + 'px;top:' + (-pad) + 'px;width:' + (w + 2 * pad) + 'px;height:' + (h + 2 * pad) + 'px;z-index:-1;pointer-events:none';
-      var old = el.querySelector(':scope > canvas.ink-cv'); if (old) old.remove();
-      el.classList.add('inked'); el.appendChild(cv); el.dataset.inked = w + 'x' + h;
-    });
-  }
-  var 틀 = null; function 곧() { clearTimeout(틀); 틀 = setTimeout(칠하기, 60); }
-  try { new MutationObserver(곧).observe(document.body, { childList: true, subtree: true }); addEventListener('resize', 곧); 곧(); } catch (e) {}
-})();

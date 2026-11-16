@@ -3554,6 +3554,8 @@ function vHome(){
   const dot = `<a class="sos-dot" href="tel:119" aria-label="119 전화">119</a>`;
   const INK = document.documentElement.classList.contains('ink');
   const odL = `<button type="button" class="od-line" onclick="go('/od')">${I.alert}<span>많이 먹었을 때 · 두 번 먹었을 때</span>${I.chev}</button>`;
+  /* 11-17 잉크 판 자세히 보기 홈 — 첫 화면 규칙: 얼굴·묻는 창 하나·다음 약 한 줄·몸 부위 여섯만. 나머지는 탭 뒤로 */
+  if (INK && !svOn() && window.잉크홈) return `${topBar({ nosearch:true })}${ext('가족대화줄')}${window.구독?.체험끝줄HTML ? 구독.체험끝줄HTML() : ''}${ext('잉크홈')}`;
   return `${topBar()}${ext('가족대화줄')}
   ${dh || ''}${window.구독?.체험끝줄HTML ? 구독.체험끝줄HTML() : ''}
   ${svOn() ? `<section class="hero home-q">${dot}<div class="eyebrow">${esc(hello)}</div><h1 class="greet">어디가 불편하세요?</h1><p class="sv-lead">약국에서 물어볼 약을 알려 드려요</p></section>${ER_LINE()}${kidHome()}${ext('오늘한장')}
