@@ -3587,7 +3587,8 @@ window.언어칸 = function () {
       '<form class="ask-in" onsubmit="event.preventDefault();잉크묻기(this.querySelector(\'input\').value)"><input type="text" enterkeyhint="send" value="' + esc(잉크글) + '" oninput="잉크글칸(this.value)" placeholder="예) 목이 아파요 · 타이레놀" aria-label="어디가 아프세요? 어떤 약이 궁금하세요?"><button type="submit" class="btn" data-ink="solid">묻기</button></form>' +
       '<div id="inkans" class="ink-ans" aria-live="polite">' + (잉크마지막 && CORE === 2 ? 잉크답(잉크마지막) : '') + '</div>' +
       '<div class="ink-parts" role="group" aria-label="어디가 불편하세요">' + 부위.map(function (p) { var L = S.filter(function (s) { return s.group === p[0]; }); return L.length ? '<button type="button" data-g="' + esc(p[0]) + '" aria-pressed="false" onclick="잉크부위(this.dataset.g)"><span class="ic">' + (typeof sicon === 'function' ? sicon(L[0]) : '') + '</span><b>' + esc(p[1]) + '</b></button>' : ''; }).join('') + '</div>' +
-      '<div id="inkpick"></div>';
+      '<p class="ink-also"><button type="button" data-g="입·이" onclick="잉크부위(this.dataset.g)">입·이</button> · <button type="button" data-g="소변·생리·갱년기" onclick="잉크부위(this.dataset.g)">소변·생리</button> · <a href="#/pill">알약 모양으로 찾기 ›</a></p>' +
+      '<div id="inkpick"></div>';   /* 11-17 3초 시험 — 생리·알약 식별이 첫 화면에 없던 것 */
   };
   window.vTalkS = function () {
     var q = (location.hash.match(/[?&]q=([^&]+)/) || [])[1];
