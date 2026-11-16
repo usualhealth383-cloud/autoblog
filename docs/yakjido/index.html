@@ -1786,7 +1786,7 @@ background-repeat:no-repeat;background-position:right 9px center;background-size
 .cs-call{display:flex;justify-content:center;margin-top:10px}.cs-call a{min-height:48px;border-radius:14px;display:inline-flex;align-items:center;gap:6px;padding:0 18px;font-weight:700;text-decoration:none}.cs-call a.tel-none{display:none}.cs-sum{margin-top:18px;text-align:center;font-size:1rem;line-height:1.6;color:var(--body)}.cs-detail{margin-top:10px;padding:0}.cs-detail>summary{min-height:48px;justify-content:center;width:100%;font-size:1rem}.cs-detail h3{font-size:1.0625rem;margin:16px 0 4px}.cs-detail p,.cs-detail li{font-size:1rem;line-height:1.65}.cs-detail ul{padding-left:1.1em;margin:6px 0}.cs-note{margin-top:14px;color:var(--muted)}
 .door.cs{padding-bottom:84px}.cs #csGo{position:sticky;bottom:calc(10px + env(safe-area-inset-bottom));z-index:3;box-shadow:0 6px 18px rgba(0,0,0,.18)}.cs-foot{margin-top:18px;text-align:center;font-size:.875rem;color:var(--muted);line-height:1.6}
 .cs-foot .cs-doc{font-size:.875rem}
-</style>
+html:not(.ink) .rf-none{display:none}</style>
 
 <div class="app">
 <div id="printhead" aria-hidden="true"></div>
@@ -1810,8 +1810,8 @@ background-repeat:no-repeat;background-position:right 9px center;background-size
 <script>
 window.__YAKJIDO_OK__ = true;
 const D = JSON.parse(document.getElementById('data').textContent || '{}');
-const BUILD = '2026-11-17 01:40';
-const DATAV = '6839bc5453'.indexOf('__') === 0 ? BUILD : '6839bc5453';
+const BUILD = '2026-11-17 02:07';
+const DATAV = 'df24dbeeed'.indexOf('__') === 0 ? BUILD : 'df24dbeeed';
 const BRANDMARK = (typeof window !== 'undefined' && window.__BRANDMARK__) || 'icon-192.png';
 let CORE = 0, CORE_P = null;
 function mergeCore(c){
@@ -3721,6 +3721,7 @@ function rfApply(){
 const er = RF.er.size > 0, cl = RF.cl.size > 0;
 const r = document.querySelector('#view .rf'); if (r) { r.classList.toggle('hit-er', er); r.classList.toggle('hit-cl', !er && cl); r.classList.toggle('rf-any', er || cl); }
 const a = document.querySelector('#view .answer'); if (a) { a.classList.toggle('rf-on', er || cl); a.classList.toggle('rf-er', er); if (!(er || cl) || er) a.classList.remove('rf-peek'); }
+document.getElementById('view')?.classList.toggle('rf-ok', window.RF_OK === RF.sid);   /* 11-17 잉크 판 — 「하나도 없어요」를 누른 증상만 답을 연다 */
 document.querySelector('#view .triage')?.classList.toggle('tg-er', er); const t1 = document.querySelector('#view .stabs .tab[data-p=sp1]'); if (t1) t1.textContent = er ? '먼저 할 일' : (t1.dataset.n0 ||= t1.textContent);
 const sw = (q, t) => document.querySelectorAll('#view ' + q).forEach(e => { e.dataset.n0 ??= e.textContent; e.textContent = er ? t : e.dataset.n0; });
 document.querySelectorAll('#view #sp3, #view #sp4').forEach(e => e.classList.toggle('rf-er-on', er));
@@ -3737,6 +3738,7 @@ const box = (k, L) => L.map((t, i) => `<label class="rf-i" for="rf-${esc(s.id)}-
 return `<section class="rf" aria-label="위험 신호 먼저 확인">
 <b class="rf-h">${I.alert}먼저 확인 — 이 중 하나라도 있나요?</b>
 <div class="rf-list">${box('er', er)}</div>
+<button type="button" class="btn rf-none" onclick="rfNone('${esc(s.id)}')">하나도 없어요</button>
 <div class="rf-hit er"><p><b>약보다 진료가 먼저예요.</b> 지금 119에 전화하거나 응급실로 가세요. 직접 운전하지 마세요. 이럴 때는 약을 사서 버티지 마세요.</p>
 <div class="gl"><a class="call" href="tel:119">${I.alert} 119 전화</a>${goA('er')}</div></div>
 ${cl.length ? `<p class="rf-no">응급 신호가 없다면, 아래 진료가 필요한 경우도 확인해 주세요.</p><details class="rf-cl" ${RF.cl.size ? 'open' : ''}><summary><span><b>진료가 필요한 경우</b> — ${esc(clean(cl[0]))}${cl.length > 1 ? ` <small>외 ${cl.length - 1}가지</small>` : ''}</span></summary><div class="rf-list">${box('cl', cl)}</div></details>
@@ -4763,7 +4765,7 @@ return `<div class="cal-li" role="listitem"><button type="button" class="cal-d $
 const first = cells[0], last = new Date(today);
 const span = `${first.getMonth() + 1}월 ${first.getDate()}일 — ${last.getMonth() + 1}월 ${last.getDate()}일`;
 return `<section class="sec card"><h2>지난 기록 <small>${DAYS_KEEP}일까지 보관</small></h2>
-${a.days ? `<p style="margin-top:6px"><b>어제까지 ${AN}일 가운데 약을 드시기로 한 날이 ${a.days}일</b>이었고, 그중 <b>${a.full}일</b>은 빠짐없이 드셨어요.${a.doses ? ` 전체로는 ${a.doses}번 중 ${a.took}번이에요.` : ''}${a.skip ? ` 일부러 건너뛴 것은 ${a.skip}번이에요.` : ''}</p>`
+${window.잉크달력요약 && document.documentElement.classList.contains('ink') ? 잉크달력요약(a, AN) : a.days ? `<p style="margin-top:6px"><b>어제까지 ${AN}일 가운데 약을 드시기로 한 날이 ${a.days}일</b>이었고, 그중 <b>${a.full}일</b>은 빠짐없이 드셨어요.${a.doses ? ` 전체로는 ${a.doses}번 중 ${a.took}번이에요.` : ''}${a.skip ? ` 일부러 건너뛴 것은 ${a.skip}번이에요.` : ''}</p>`
 : `<p style="margin-top:6px">아직 기록이 없어요. 위에서 시간을 고르고 드실 때마다 눌러 두시면 여기에 쌓여요.</p>`}
 <div class="cal-span">${span}</div>
 <div class="cal-dow">${DOW.map(x => `<span>${x}</span>`).join('')}</div>
@@ -4773,7 +4775,7 @@ ${H7 ? `<button class="btn line" style="margin-top:8px" onclick="구독.막힘('
 ${calDay(CAL_PICK)}
 ${slotLine()}
 <div class="cal-key">${[['full', '다 드심'], ['part', '일부'], ['skip', '건너뜀'], ['miss', '빠짐'], ['none', '정해 둔 것 없음'], ['cal-now', '오늘']].map(([c, n]) => `<span class="ki"><span class="k ${c}" aria-hidden="true">${CAL_MARK[c] || ''}</span>${n}</span>`).join('')}</div>
-<p class="small muted" style="margin-top:10px">진료 때 이 화면을 그대로 보여 주시면 돼요. <b>못 드신 날을 탓하려고 만든 것이 아니에요</b> — 언제 왜 놓치시는지 의사·약사가 보면 약을 더 쉬운 쪽으로 바꿔 드릴 수 있어요.</p>
+${window.잉크달력요약 && document.documentElement.classList.contains('ink') ? '<details class="ink-fold"><summary>진료 때 이 화면을 보여 주세요 ›</summary>진료 때 이 화면을 그대로 보여 주시면 돼요. <b>못 드신 날을 탓하려고 만든 것이 아니에요</b> — 언제 왜 놓치시는지 의사·약사가 보면 약을 더 쉬운 쪽으로 바꿔 드릴 수 있어요.</details>' : `<p class="small muted" style="margin-top:10px">진료 때 이 화면을 그대로 보여 주시면 돼요. <b>못 드신 날을 탓하려고 만든 것이 아니에요</b> — 언제 왜 놓치시는지 의사·약사가 보면 약을 더 쉬운 쪽으로 바꿔 드릴 수 있어요.</p>`}
 </section>`
 }
 const PANE = {};

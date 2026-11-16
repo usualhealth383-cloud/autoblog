@@ -3547,6 +3547,13 @@ window.언어칸 = function () {
   /* 11-17 잉크 판 — 얼굴(알약 + 깜빡이는 두 눈, 누르면 웃음)과 대화가 뼈대인 홈. 공용 잉크_얼굴 부품이 오면 그것으로 바꾼다 */
   window.잉크얼굴 = function (k, cls) { return window.잉크 && 잉크.얼굴HTML ? 잉크.얼굴HTML('pill', { 크기: k || 30, cls: cls || '', 라벨: k >= 60 ? '약지도' : '' }) : ''; };   /* 공용 잉크 얼굴 부품(11-17a) 의 알약 */
   /* 11-17 설정 → 화면 → 잉크 판(새 디자인 미리 보기). 끄면 옛 판 그대로 */
+  /* 11-17 잉크 달력 요약 — 숫자가 주인공(빠짐없이 드신 날 / 드시기로 한 날) + 작은 한 줄 */
+  window.잉크달력요약 = function (a, AN) {
+    if (!a || !a.days) return '<p style="margin-top:6px">아직 기록이 없어요. 위에서 시간을 고르고 드실 때마다 눌러 두시면 여기에 쌓여요.</p>';
+    return '<div class="ink-num"><b>' + a.full + '</b><span> / ' + a.days + '일</span></div><p class="small muted">어제까지 ' + AN + '일 가운데 빠짐없이 드신 날' + (a.doses ? ' · ' + a.doses + '번 중 ' + a.took + '번' : '') + (a.skip ? ' · 일부러 건너뜀 ' + a.skip + '번' : '') + '</p>';
+  };
+  /* 11-17 잉크 판 증상 화면 — 위험 신호를 보고 「하나도 없어요」를 눌러야 「이렇게 드세요」가 열린다(확인 없이 안심 문구 없음). 옛 판은 이 단추가 숨어 있고 답도 그대로 */
+  window.rfNone = function (sid) { window.RF_OK = sid; try { rfApply(); } catch (e) {} var t = document.querySelector('#view .stabs') || document.querySelector('#view .answer'); if (t) setTimeout(function () { try { t.scrollIntoView({ behavior: 'smooth', block: 'start' }); } catch (e) {} }, 60); };
   window.잉크칸 = function () { var on = document.documentElement.classList.contains('ink');
     return '<div class="view-row" style="border-top:1px solid var(--hairline)"><div class="t"><b>새 디자인 미리 보기</b><span>흰 바탕·가는 선의 잉크 판 — 끄면 지금 화면 그대로</span></div><button class="sw ' + (on ? 'on' : '') + '" role="switch" aria-checked="' + on + '" aria-label="새 디자인 미리 보기" onclick="try{localStorage.setItem(\'yakjido.ink\',\'' + (on ? '0' : '1') + '\')}catch(e){};location.reload()"></button></div>'; };
   /* 11-17 잉크 홈 — 첫 화면 규칙 7(현욱님 「글이 많고 줄글 목록은 아무도 안 누른다 · 첫 이미지와 임팩트」):
@@ -3574,6 +3581,12 @@ window.언어칸 = function () {
   var 잉크마지막 = '', 잉크글 = '';
   window.잉크글칸 = function (v) { 잉크글 = v; };
   function 잉크답(v) { var r = null; try { r = 답짓기(v); } catch (e) {} return '<div class="ask-me"><span>' + esc(v) + '</span></div><div class="ask-row">' + 잉크얼굴(30) + 답그리기(r || {}) + '</div><a class="ink-more" href="#/talk?q=' + encodeURIComponent(v) + '">물어보기에서 이어서 ›</a>'; }
+  window.잉크돌봄 = function () {
+    var 곳 = document.getElementById('inkpick'); if (!곳) return;
+    if (곳.dataset.g === 'care') { 곳.innerHTML = ''; 곳.dataset.g = ''; return; }
+    곳.dataset.g = 'care'; document.querySelectorAll('.ink-parts button').forEach(function (b) { b.setAttribute('aria-pressed', 'false'); });
+    곳.innerHTML = '<div class="ask-chips"><a class="chip" href="#/send">부모님께 약 보내기</a><a class="chip" href="#/notify" onclick="setTimeout(function(){var f=document.getElementById(\'fam\');if(f)f.scrollIntoView({behavior:\'smooth\'})},700)">약 체크가 없으면 가족에게 알리기</a><a class="chip" href="#/bag">부모님 약통 정리</a></div>';
+  };
   window.잉크묻기 = function (v) {
     v = String(v || '').trim(); var 곳 = document.getElementById('inkans'); if (!v || !곳) return;
     잉크마지막 = v; var 보 = function () { 곳.innerHTML = 잉크답(v); };
@@ -3588,7 +3601,8 @@ window.언어칸 = function () {
       '<div id="inkans" class="ink-ans" aria-live="polite">' + (잉크마지막 && CORE === 2 ? 잉크답(잉크마지막) : '') + '</div>' +
       '<div class="ink-parts" role="group" aria-label="어디가 불편하세요">' + 부위.map(function (p) { var L = S.filter(function (s) { return s.group === p[0]; }); return L.length ? '<button type="button" data-g="' + esc(p[0]) + '" aria-pressed="false" onclick="잉크부위(this.dataset.g)"><span class="ic">' + (typeof sicon === 'function' ? sicon(L[0]) : '') + '</span><b>' + esc(p[1]) + '</b></button>' : ''; }).join('') + '</div>' +
       '<p class="ink-also"><button type="button" data-g="입·이" onclick="잉크부위(this.dataset.g)">입·이</button> · <button type="button" data-g="소변·생리·갱년기" onclick="잉크부위(this.dataset.g)">소변·생리</button> · <a href="#/pill">알약 모양으로 찾기 ›</a></p>' +
-      '<div id="inkpick"></div>';   /* 11-17 3초 시험 — 생리·알약 식별이 첫 화면에 없던 것 */
+      '<p class="ink-also ink-care"><button type="button" onclick="잉크돌봄()">부모님 약 챙기기 ›</button></p>' +
+      '<div id="inkpick"></div>';   /* 11-17 3초 시험 20명의 남은 △ — 보호자 길 */   /* 11-17 3초 시험 — 생리·알약 식별이 첫 화면에 없던 것 */
   };
   window.vTalkS = function () {
     var q = (location.hash.match(/[?&]q=([^&]+)/) || [])[1];
