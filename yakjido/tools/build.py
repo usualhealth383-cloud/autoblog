@@ -332,7 +332,8 @@ def _seo():
 _seo()
 # 서비스워커 캐시 이름 = 배포 파일 내용의 해시 — 내용이 같으면 같은 이름(파이썬 hash() 는 실행마다 달라 매번 바뀌던 것, 2026-10-13)
 _srvjs = (ROOT / 'srv.js').read_text(encoding='utf-8') if (ROOT / 'srv.js').exists() else ''
-_srvjs += (ROOT / 'find.js').read_text(encoding='utf-8') if (ROOT / 'find.js').exists() else ''   # 찾기 부품도 바뀌면 캐시 이름이 바뀌게(10-14)
+_srvjs += (ROOT / 'find.js').read_text(encoding='utf-8') if (ROOT / 'find.js').exists() else ''
+_srvjs += (ROOT / 'ink.css').read_text(encoding='utf-8') if (ROOT / 'ink.css').exists() else ''   # 11-17 잉크 판도 바뀌면 캐시 이름이 바뀌게   # 찾기 부품도 바뀌면 캐시 이름이 바뀌게(10-14)
 _srvjs += ''.join((ROOT / f).read_text(encoding='utf-8') for f in ('terms.html', 'privacy.html') if (ROOT / f).exists())   # 앱 안에서 읽는 약관·방침도(오프라인 캐시, 10-14)
 cache_id = hashlib.sha1((out + jc + jd + _srvjs).encode('utf-8')).hexdigest()[:8]
 sw = ROOT / 'sw.js'
@@ -343,7 +344,7 @@ if sw.exists():
 import shutil as _sh
 for _d in ('fonts', 'vendor'):
     if (ROOT / _d).exists(): _sh.copytree(ROOT / _d, pages / _d, dirs_exist_ok=True)
-for name in ('manifest.webmanifest', 'privacy.html', 'terms.html', 'delete-account.html', 'srv.js', 'find.js', 'i18n.js'):   # terms.html = 약지도 이용약관(첫 동의 화면·설정에서 앱 안으로 읽음, 10-14)   # find.js = 공용 찾기 부품 + 약지도 쪽(검색을 처음 쓸 때 받음, Z8)
+for name in ('manifest.webmanifest', 'privacy.html', 'terms.html', 'delete-account.html', 'srv.js', 'find.js', 'i18n.js', 'ink.css'):   # terms.html = 약지도 이용약관(첫 동의 화면·설정에서 앱 안으로 읽음, 10-14)   # find.js = 공용 찾기 부품 + 약지도 쪽(검색을 처음 쓸 때 받음, Z8)
     # delete-account.html = 스토어 「계정 삭제 URL」(메디나눔 안내 2026-10-13)   # srv.js = 계정·기록 이어 두기(따로 받는 파일)   # privacy.html = 스토어에 적는 개인정보처리방침 주소
     src = ROOT / name
     if src.exists():

@@ -1406,21 +1406,29 @@
    쓰는 법(홈):
      홈보내기.받기설치({ 켜짐:false, 허용:['https://yakjido.medinanum.com', …], 받음: function(꾸러미){ … } });
      홈보내기.파일읽기(file) → Promise<꾸러미>(모양 검사 통과만)
-   판 2026-11-13a — 첫 판. */
+   판 2026-11-13a — 첫 판.
+   판 2026-11-13b — 아이 대상(가족·보호자 설계 §2·§4 · 현욱님 11-13 추천안 확정) — 소아가 쓴다.
+     꾸러미 subject 는 'self' 또는 'child'. child 이면 who:{ref(무작위 8~32자), name(부르는 이름 20자), born:'YYYY-MM'} 필수.
+     · 아이 대상으로 보낼 수 있는 칸은 P9(체온)·P11(건강 수첩)뿐. 마음 칸은 이 부품에 아예 없다.
+     · 만 14세가 된 아이(보낸 날 기준, 태어난 달 1일로 셈)는 child 로 받지 않는다 — 기록의 주인이 아이 자신으로 넘어가기 때문(§4).
+     · 받는 쪽은 받기설치({대상:['self','child']})로 child 를 따로 열어야 받는다(기본 self 만). 홈은 who.ref 로 아이별 칸에만 넣고,
+       대상을 확신하지 못하면 시간축에 넣지 않는다(설계서 v2 §9-3).
+     · 모으기[칸](인자) 는 배열(본인) 또는 { subject:'child', who, items } 를 돌려준다. 보내기(칸, 인자) — 인자는 앱이 고른 아이 등. */
 (function () {
   'use strict';
-  var 판 = '2026-11-13a';
+  var 판 = '2026-11-13b';
   var 설정 = { app: '', 켜짐: false, 홈: '', 모으기: {}, 묻기: null, 말: null };
-  var 받기 = { 켜짐: false, 허용: [], 받음: null, 설치됨: false };
+  var 받기 = { 켜짐: false, 허용: [], 받음: null, 설치됨: false, 대상: ['self'] };
+  var 아이칸 = { P9: 1, P11: 1 };
   var 칸목록 = { P8: 1, P9: 1, P11: 1 };
   var 최대항목 = 2000, 최대글 = 80, 최대크기 = 200000;
 
   var 글 = {
     ko: { 요약: '{칸} {n}건을 메디나눔 「내 홈」으로 보낼까요?\n이 기기에서 홈 화면으로만 넘어가고, 서버로 가지 않아요. 원래 기록은 이 앱에 그대로 있어요.',
-          P8: '혈압·혈당', P9: '체온', P11: '건강 수첩', 없음: '보낼 기록이 아직 없어요.', 꺼짐: '아직 준비 중이에요.',
+          누구: '{이름}의 ', P8: '혈압·혈당', P9: '체온', P11: '건강 수첩', 없음: '보낼 기록이 아직 없어요.', 꺼짐: '아직 준비 중이에요.',
           됨: '내 홈으로 보냈어요({n}건).', 파일: '창이 열리지 않아 파일로 내려받았어요. 내 홈에서 「파일 가져오기」로 넣어 주세요.' },
     en: { 요약: 'Send {n} {칸} records to your MediNanum Home?\nThey move only on this device to the Home screen, not to a server. The original records stay in this app.',
-          P8: 'blood pressure and glucose', P9: 'temperature', P11: 'health notebook', 없음: 'There is nothing to send yet.', 꺼짐: 'This is not ready yet.',
+          누구: '{이름}: ', P8: 'blood pressure and glucose', P9: 'temperature', P11: 'health notebook', 없음: 'There is nothing to send yet.', 꺼짐: 'This is not ready yet.',
           됨: 'Sent to your Home ({n}).', 파일: 'The window did not open, so a file was downloaded. Use “Import file” in your Home.' }
   };
   function 말() { try { var l = typeof 설정.말 === 'function' ? 설정.말() : 'ko'; return 글[l] ? l : (l === 'ko' ? 'ko' : 'en'); } catch (e) { return 'ko'; } }
@@ -1449,23 +1457,40 @@
     }
     return false;
   }
+  /* 아이 — 만 14세 미만만(보낸 날 기준). 태어난 달만 받으므로 그달 1일로 세어 14세 생일을 «일찍» 잡는다(넘겨줄 나이를 넘기지 않게) */
+  function 만나이(born, 날) { var b = /^(\d{4})-(\d{2})$/.exec(born || ''), d = new Date(날); if (!b || isNaN(d)) return null;
+    var y = +b[1], m = +b[2]; if (m < 1 || m > 12) return null; var 나 = d.getUTCFullYear() - y - ((d.getUTCMonth() + 1) < m ? 1 : 0); return 나 >= 0 ? 나 : null; }
+  function 아이검사(w, 날) {
+    if (!w || typeof w !== 'object' || Array.isArray(w)) return null;
+    if (Object.keys(w).some(function (k) { return !/^(ref|name|born)$/.test(k); })) return null;
+    if (!/^[A-Za-z0-9_-]{8,32}$/.test(w.ref) || !글자(w.name, 20) || !w.name.trim()) return null;
+    var 나 = 만나이(w.born, 날); if (나 == null || 나 >= 14) return null;
+    return { ref: w.ref, name: w.name, born: w.born };
+  }
   function 꾸러미검사(o) {
     try {
       if (!o || typeof o !== 'object' || o.mnx !== 1) return null;
-      if (!칸목록[o.kind] || !/^[a-z]{2,20}$/.test(o.app) || o.subject !== 'self' || !/^\d{4}-\d{2}-\d{2}T/.test(o.made)) return null;
+      if (!칸목록[o.kind] || !/^[a-z]{2,20}$/.test(o.app) || !/^\d{4}-\d{2}-\d{2}T/.test(o.made)) return null;
+      var who = null;
+      if (o.subject === 'child') { who = 아이검사(o.who, o.made); if (!who || !아이칸[o.kind]) return null; }
+      else if (o.subject !== 'self' || o.who != null) return null;
       if (!Array.isArray(o.items) || o.items.length > 최대항목) return null;
-      if (Object.keys(o).some(function (k) { return !/^(mnx|app|kind|subject|made|items)$/.test(k); })) return null;
+      if (Object.keys(o).some(function (k) { return !/^(mnx|app|kind|subject|who|made|items)$/.test(k); })) return null;
       if (JSON.stringify(o).length > 최대크기) return null;
       for (var i = 0; i < o.items.length; i++) if (!항목검사(o.kind, o.items[i])) return null;
-      return { mnx: 1, app: o.app, kind: o.kind, subject: 'self', made: o.made, items: o.items.slice() };
+      var 꾸 = { mnx: 1, app: o.app, kind: o.kind, subject: o.subject, made: o.made, items: o.items.slice() }; if (who) 꾸.who = who; return 꾸;
     } catch (e) { return null; }
   }
 
   /* ── 보내는 쪽 ── */
-  function 꾸리기(칸) {
+  function 꾸리기(칸, 인자) {
     var f = 설정.모으기[칸]; if (typeof f !== 'function') return null;
-    var items = []; try { items = (f() || []).filter(function (x) { return 항목검사(칸, x); }).slice(-최대항목); } catch (e) { items = []; }
-    return 꾸러미검사({ mnx: 1, app: 설정.app, kind: 칸, subject: 'self', made: new Date().toISOString(), items: items });
+    var 받 = null; try { 받 = f(인자); } catch (e) { 받 = null; }
+    var 아이 = 받 && !Array.isArray(받) && 받.subject === 'child', 목록 = 아이 ? 받.items : 받;
+    var items = (Array.isArray(목록) ? 목록 : []).filter(function (x) { return 항목검사(칸, x); }).slice(-최대항목);
+    var o = { mnx: 1, app: 설정.app, kind: 칸, subject: 아이 ? 'child' : 'self', made: new Date().toISOString(), items: items };
+    if (아이) o.who = 받.who;
+    return 꾸러미검사(o);   /* 14세 이상 아이·틀린 who 면 null — 보내지 않는다 */
   }
   function 파일로(꾸) {
     var 이름 = 'medinanum-home-' + 꾸.app + '-' + 꾸.kind + '-' + 꾸.made.slice(0, 10) + '.json';
@@ -1491,11 +1516,11 @@
       window.addEventListener('message', 귀);
     });
   }
-  function 보내기(칸) {
+  function 보내기(칸, 인자) {
     if (!설정.켜짐) { 알림(말글('꺼짐')); return Promise.resolve('off'); }
-    var 꾸 = 꾸리기(칸); if (!꾸) return Promise.resolve('bad');
+    var 꾸 = 꾸리기(칸, 인자); if (!꾸) return Promise.resolve('bad');
     if (!꾸.items.length) { 알림(말글('없음')); return Promise.resolve('empty'); }
-    var 요약 = 말글('요약', { 칸: 말글(칸), n: 꾸.items.length });
+    var 요약 = (꾸.who ? 말글('누구', { 이름: 꾸.who.name }) : '') + 말글('요약', { 칸: 말글(칸), n: 꾸.items.length });
     var 묻 = typeof 설정.묻기 === 'function' ? 설정.묻기(요약, 꾸) : Promise.resolve(window.confirm(요약));
     return Promise.resolve(묻).then(function (좋아) {
       if (!좋아) return 'cancel';
@@ -1511,10 +1536,12 @@
   /* ── 받는 쪽(홈) ── */
   function 받기설치(o) {
     o = o || {}; 받기.켜짐 = !!o.켜짐; 받기.허용 = (o.허용 || []).map(원).filter(Boolean); 받기.받음 = o.받음;
+    받기.대상 = (o.대상 || ['self']).filter(function (x) { return x === 'self' || x === 'child'; });
     if (받기.설치됨) return; 받기.설치됨 = true;
     window.addEventListener('message', function (ev) {
       if (!받기.켜짐 || 받기.허용.indexOf(ev.origin) < 0 || !ev.source || ev.source !== window.opener) return;   /* 허용 주소 + 이 창을 연 앱만 */
       var 꾸 = 꾸러미검사(ev.data);
+      if (꾸 && 받기.대상.indexOf(꾸.subject) < 0) 꾸 = null;   /* 홈이 아직 아이 칸을 열지 않았으면 받지 않는다 */
       if (!꾸) { try { ev.source.postMessage({ mnx: 'refused' }, ev.origin); } catch (e) {} return; }
       var ok = false; try { ok = 받기.받음 ? 받기.받음(꾸, ev.origin) !== false : false; } catch (e) { ok = false; }
       try { ev.source.postMessage(ok ? { mnx: 'got', n: 꾸.items.length } : { mnx: 'refused' }, ev.origin); } catch (e) {}
@@ -1532,7 +1559,7 @@
       if (!받기.켜짐) return 막(new Error('off'));
       if (!file || file.size > 최대크기) return 막(new Error('size'));
       var r = new FileReader();
-      r.onload = function () { var o = null; try { o = JSON.parse(String(r.result)); } catch (e) {} var 꾸 = 꾸러미검사(o); if (꾸) 풀(꾸); else 막(new Error('shape')); };
+      r.onload = function () { var o = null; try { o = JSON.parse(String(r.result)); } catch (e) {} var 꾸 = 꾸러미검사(o); if (꾸 && 받기.대상.indexOf(꾸.subject) < 0) return 막(new Error('subject')); if (꾸) 풀(꾸); else 막(new Error('shape')); };
       r.onerror = function () { 막(new Error('read')); };
       r.readAsText(file);
     });
@@ -2353,7 +2380,7 @@ try {
         + '.acctcard,.acctsheet{display:flex;flex-direction:column;gap:10px}'
         + '.acctcard{padding:16px;margin-bottom:12px;border:1px solid var(--line,rgba(0,0,0,.12));border-radius:16px;background:var(--card,#fff)}'
         + '.acctsheet .acctcard{margin-bottom:0}'
-        + '.acct-me{display:flex;align-items:center;gap:12px}.acct-me>div{display:flex;flex-direction:column;gap:2px;min-width:0}.acct-me b{font-size:16px;word-break:break-all}.acct-me span{font-size:15px;opacity:.75;line-height:1.5;word-break:keep-all}'
+        + '.acct-me{display:flex;align-items:center;gap:12px}.acct-me>div{display:flex;flex-direction:column;gap:2px;min-width:0}.acct-me b{font-size:16px;word-break:keep-all;overflow-wrap:anywhere}.acct-me span{font-size:15px;opacity:.75;line-height:1.5;word-break:keep-all}'
         + '.acct-av{flex:0 0 44px;width:44px;height:44px;border-radius:50%;display:grid;place-items:center;background:var(--accent,#2f5d50);color:var(--on-accent,#fff);font-weight:700;font-size:18px}.acct-av.off{background:var(--sage-t,var(--line,#eee));color:var(--accent,#333)}'
         + '.acct-row{display:flex;justify-content:space-between;gap:12px;font-size:15px;padding:2px 0}.acct-row i{font-style:normal;opacity:.7}.acct-row b{font-weight:600;text-align:right}'
         + '.acct-btns{display:flex;gap:8px}.acct-say{margin:10px 0 0;padding:12px 14px;border-radius:12px;background:var(--accent-soft,rgba(47,111,104,.10));color:inherit;font-size:15px;line-height:1.55;word-break:keep-all;overflow-wrap:anywhere}.acct-btns button{flex:1;min-height:44px;display:inline-flex;align-items:center;justify-content:center;text-align:center;padding:0 12px;border:1px solid var(--line,rgba(0,0,0,.18));border-radius:999px;background:transparent;color:inherit;font-weight:600;font-size:15px;line-height:1;font-family:inherit;cursor:pointer}'
@@ -3226,7 +3253,7 @@ window.언어칸 = function () {
   };
   function 위험(글, 값) {
     var t = String(글 || ''), N = (window.I18N && window.I18N.emg) || { e: '119', m: ['109', '1577-0199'] }, M = 위험말[window.LANG] || 위험말.ko;
-    if (!N.e) N = { e: ({ ko: '그 나라 응급 번호', en: 'the local emergency number', es: 'el número de emergencias del país', ja: '現地の緊急番号', zh: '当地急救电话' })[window.LANG] || 'the local emergency number', m: [] };   /* 11-04 번호 모르는 나라 — 글만, 전화 단추 없음 */
+    if (!N.e) N = { e: ({ ko: '현지 응급 번호(한국에서는 119)', en: 'the local emergency number', es: 'el número de emergencias del país', ja: '現地の緊急番号', zh: '当地急救电话' })[window.LANG] || 'the local emergency number', m: [] };   /* 11-04 번호 모르는 나라 — 글만, 전화 단추 없음 */
     var p = N.m[0] || N.e;
     var 의도 = 마음.test(t) || 마음다국.test(t), L = 위험말[window.LANG] ? window.LANG : 'ko';
     /* 이미 삼킨 것이 먼저(10-28 곁에 교훈). 바깥 검수 9차(10-28): 스스로 해치려고 먹었거나 의식·숨·경련 이상이면 응급 번호,
@@ -3369,7 +3396,7 @@ window.언어칸 = function () {
     return null;
   }
   function 답그리기(r) {
-    if (r.위험) return '<article class="ask-ans sos" role="alert"><p class="ask-c">' + esc(r.위험.말) + '</p>' + (r.위험.전화 ? '<a class="btn ask-call" href="tel:' + esc(String(r.위험.전화).replace(/[^\d+]/g, '')) + '">' + I.alert + ' ' + esc(r.위험.전화) + ' 전화</a>' : '') + '</article>';
+    if (r.위험) return '<article class="ask-ans sos" role="alert"><p class="ask-c">' + esc(r.위험.말) + '</p>' + (r.위험.전화 && /^[\d+][\d\s-]*$/.test(String(r.위험.전화)) ? '<a class="btn ask-call" href="tel:' + esc(String(r.위험.전화).replace(/[^\d+]/g, '')) + '">' + I.alert + ' ' + esc(r.위험.전화) + ' 전화</a>' : '') + '</article>';
     if (!r.결) return '<article class="ask-ans"><p class="ask-c">아직 이 질문은 찾지 못했어요. 이렇게 물어보시면 찾을 수 있어요.</p><div class="ask-chips">' + 예시.slice(0, 4).map(칩).join('') + '</div></article>';
     var 단 = (r.단 || []).map(function (b, i) { var k = 'a' + 묻기.log.length + '_' + i; 묻기.할일[k] = b.할; return '<button type="button" class="btn ' + (b.주 ? '' : 'line') + '" onclick="묻기단추(\'' + k + '\')">' + esc(b.글) + (b.주 ? I.chev : '') + '</button>'; }).join('');
     return '<article class="ask-ans' + (r.위 ? ' warn' : '') + '"><p class="ask-c">' + 짧게(r.결) + '</p>' + ((r.할 || []).length ? '<ol class="ask-do">' + r.할.map(function (x) { return '<li>' + 짧게(x) + '</li>'; }).join('') + '</ol>' : '') +
@@ -3386,10 +3413,22 @@ window.언어칸 = function () {
   };
   function 그림() {
     var 곳 = document.getElementById('asklog'); if (!곳) return;
-    곳.innerHTML = 묻기.log.map(function (x) { return '<div class="ask-me"><span>' + esc(x.q) + '</span></div><div class="ask-row"><img class="ask-face" src="' + esc(BRANDMARK) + '" alt="약지도" width="32" height="32">' + x.html + '</div>'; }).join('');
+    곳.innerHTML = 묻기.log.map(function (x) { return '<div class="ask-me"><span>' + esc(x.q) + '</span></div><div class="ask-row">' + 잉크얼굴() + '<img class="ask-face" src="' + esc(BRANDMARK) + '" alt="약지도" width="32" height="32">' + x.html + '</div>'; }).join('');
     var 끝 = 곳.lastElementChild; if (끝) try { (끝.previousElementSibling || 끝).scrollIntoView({ block: 'start', behavior: 'smooth' }); } catch (e) {}
     var 처음 = document.getElementById('askfirst'); if (처음) 처음.hidden = 묻기.log.length > 0;
   }
+  /* 11-17 잉크 판 — 얼굴(알약 + 깜빡이는 두 눈, 누르면 웃음)과 대화가 뼈대인 홈. 공용 잉크_얼굴 부품이 오면 그것으로 바꾼다 */
+  window.잉크얼굴 = function (cls) { return '<svg class="ink-face ' + (cls || '') + '" viewBox="0 0 120 90" role="img" aria-label="약지도" onclick="var e=this;e.classList.add(\'pop\');setTimeout(function(){e.classList.remove(\'pop\')},700)"><g class="body"><rect x="6" y="14" width="108" height="62" rx="31" fill="var(--primary)"/><g class="eyes"><rect class="eye l" x="44" y="30" width="9" height="22" rx="4.5" fill="#fff"/><rect class="eye r" x="67" y="30" width="9" height="22" rx="4.5" fill="#fff"/></g><g class="smile" fill="none" stroke="#fff" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"><path d="M42 45 L48.5 37 L55 45"/><path d="M65 45 L71.5 37 L78 45"/></g></g></svg>'; };
+  var 홈예 = ['목이 아파요', '타이레놀이랑 판콜에이 같이 먹어도 돼요?', '졸음 껌 성분이 뭐예요?'];
+  window.잉크홈 = function () {
+    var 쌍 = 홈예.map(function (q, i) { var r = null; try { r = CORE === 2 ? 답짓기(q) : null; } catch (e) {} 묻기.기다림 = null; 묻기.약 = [];
+      var 답 = r && r.결 ? String(r.결).replace(/\*\*/g, '') : '물어보시면 바로 답해 드려요.';
+      return '<div class="ink-row me' + (i ? ' turn' : '') + '"><span class="ink-b">' + esc(q) + '</span></div><div class="ink-row it">' + 잉크얼굴() + '<a class="ink-b" href="#/talk?q=' + encodeURIComponent(q) + '"><b>' + esc(답) + '</b><u>답 한 장 열기</u></a></div>'; }).join('');
+    return '<p class="ink-sos">급할 때 <a href="tel:119">119</a> · 마음이 힘들 때 <a href="tel:109">109</a> · <a href="tel:15770199">1577-0199</a></p>' +
+      '<section class="ink-hero">' + 잉크얼굴() + '<h1>어디가 불편하세요?</h1><p>증상이나 약 이름을 그대로 물어보세요.</p></section>' +
+      '<form class="ask-in" onsubmit="event.preventDefault();var v=this.querySelector(\'input\').value.trim();if(v)go(\'/talk?q=\'+encodeURIComponent(v))"><input type="text" enterkeyhint="send" placeholder="예) 목이 아파요" aria-label="어디가 아프세요? 어떤 약이 궁금하세요?"><button type="submit" class="btn">묻기</button></form>' +
+      '<div class="ink-chat">' + 쌍 + '</div><a class="ink-more" href="#/talk">다른 질문 하기 ›</a>';
+  };
   window.vTalkS = function () {
     var q = (location.hash.match(/[?&]q=([^&]+)/) || [])[1];
     setTimeout(function () { 그림(); if (q && !묻기.log.some(function (x) { return x.q === decodeURIComponent(q); })) 묻기보냄(decodeURIComponent(q)); }, 0);
@@ -3403,7 +3442,7 @@ window.언어칸 = function () {
   /* 11-16 Main — 홈에서는 예시 칩 셋만(누르면 물어보기 답 한 장), 나머지는 물어보기 화면에. 맨 위 찾기 칸에 치고 엔터를 눌러도 같은 화면 */
   window.대화줄 = function () { if (window.LANG && window.LANG !== 'ko') return ''; return '<div class="talk-door"><span class="b">무엇이든 물어보세요</span><div class="ask-chips">' + ['목이 아파요', '타이레놀이랑 판콜에이 같이 먹어도 돼요?', '졸음 껌 성분이 뭐예요?'].map(function (c) { return '<a class="chip" href="#/talk?q=' + encodeURIComponent(c) + '">' + esc(c) + '</a>'; }).join('') + '</div><a class="small link" href="#/talk">다른 질문 하기 ›</a></div>'; };
   var cs = document.createElement('style');
-  cs.textContent = '.ask-row{display:flex;gap:8px;align-items:flex-start}.ask-row .ask-ans{flex:1;min-width:0;max-width:none}.ask-face{flex:none;width:32px;height:32px;border-radius:10px;margin-top:2px}.ask-morechips summary,.ask-disc summary{display:inline-flex;align-items:center;min-height:44px;color:var(--primary);font-weight:600;cursor:pointer;list-style:none}.ask-morechips summary::-webkit-details-marker,.ask-disc summary::-webkit-details-marker{display:none}.ask-disc{margin-top:16px}.ask-disc summary{color:var(--muted);font-weight:500;font-size:.875rem}.talk-door .ask-chips{margin:6px 0 2px}.talk-door .chip{text-decoration:none;background:var(--card);border:1px solid var(--hairline);color:var(--ink);font-weight:600;min-height:44px;padding:8px 14px;border-radius:999px;display:inline-flex;align-items:center}.ask-in{display:flex;gap:8px}.ask-in input{flex:1;min-width:0;min-height:52px;padding:0 14px;border-radius:14px;border:1px solid var(--hairline);background:var(--card);font-size:max(16px,1rem)}.ask-in .btn{width:auto;min-height:52px;padding:0 18px}.ask-chips{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0}.ask-chips .chip{min-height:44px;white-space:normal;text-align:left}.ask-log{display:flex;flex-direction:column;gap:10px;margin-top:14px}.ask-me{display:flex;justify-content:flex-end}.ask-me span{max-width:84%;padding:10px 14px;border-radius:18px 18px 6px 18px;background:var(--primary);color:var(--on-primary,#fff);font-weight:600;word-break:keep-all;overflow-wrap:anywhere}.ask-ans{max-width:94%;padding:14px 16px;border-radius:18px 18px 18px 6px;background:var(--card);border:1px solid var(--hairline);word-break:keep-all;overflow-wrap:anywhere}.ask-ans.warn{border-color:var(--caution)}.ask-ans.sos{background:var(--alert-tint);border-color:var(--alert)}.ask-ans.sos .ask-c{color:var(--alert)}.ask-c{font-weight:700;font-size:1.0625rem;line-height:1.5}.ask-do{margin:8px 0 0;padding-left:1.2em}.ask-do li{margin:4px 0;line-height:1.55}.ask-act{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}.ask-act .btn{width:auto;min-height:46px;padding:0 14px;display:inline-flex;align-items:center;gap:4px}.ask-call{display:flex;justify-content:center;align-items:center;gap:6px;margin-top:10px;min-height:52px;background:var(--alert)!important;color:var(--on-alert,#fff)!important;text-decoration:none}.ask-more{margin-top:10px}.ask-more summary{display:inline-flex;align-items:center;min-height:44px;color:var(--primary);font-weight:600;cursor:pointer;list-style:none}.ask-more summary::-webkit-details-marker{display:none}.ask-ix{margin:8px 0}.ask-ix p{margin:4px 0}'+'.talk-door{display:flex;flex-direction:column;gap:4px;margin:12px 0 4px;padding:14px 16px;border-radius:18px 18px 18px 6px;background:var(--tint);color:var(--ink);text-decoration:none;min-height:48px}.talk-door .b{font-weight:700}.talk{min-height:50vh}';
+  cs.textContent = 'html:not(.ink) .ask-row .ink-face{display:none}.ask-row{display:flex;gap:8px;align-items:flex-start}.ask-row .ask-ans{flex:1;min-width:0;max-width:none}.ask-face{flex:none;width:32px;height:32px;border-radius:10px;margin-top:2px}.ask-morechips summary,.ask-disc summary{display:inline-flex;align-items:center;min-height:44px;color:var(--primary);font-weight:600;cursor:pointer;list-style:none}.ask-morechips summary::-webkit-details-marker,.ask-disc summary::-webkit-details-marker{display:none}.ask-disc{margin-top:16px}.ask-disc summary{color:var(--muted);font-weight:500;font-size:.875rem}.talk-door .ask-chips{margin:6px 0 2px}.talk-door .chip{text-decoration:none;background:var(--card);border:1px solid var(--hairline);color:var(--ink);font-weight:600;min-height:44px;padding:8px 14px;border-radius:999px;display:inline-flex;align-items:center}.ask-in{display:flex;gap:8px}.ask-in input{flex:1;min-width:0;min-height:52px;padding:0 14px;border-radius:14px;border:1px solid var(--hairline);background:var(--card);font-size:max(16px,1rem)}.ask-in .btn{width:auto;min-height:52px;padding:0 18px}.ask-chips{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0}.ask-chips .chip{min-height:44px;white-space:normal;text-align:left}.ask-log{display:flex;flex-direction:column;gap:10px;margin-top:14px}.ask-me{display:flex;justify-content:flex-end}.ask-me span{max-width:84%;padding:10px 14px;border-radius:18px 18px 6px 18px;background:var(--primary);color:var(--on-primary,#fff);font-weight:600;word-break:keep-all;overflow-wrap:anywhere}.ask-ans{max-width:94%;padding:14px 16px;border-radius:18px 18px 18px 6px;background:var(--card);border:1px solid var(--hairline);word-break:keep-all;overflow-wrap:anywhere}.ask-ans.warn{border-color:var(--caution)}.ask-ans.sos{background:var(--alert-tint);border-color:var(--alert)}.ask-ans.sos .ask-c{color:var(--alert)}.ask-c{font-weight:700;font-size:1.0625rem;line-height:1.5}.ask-do{margin:8px 0 0;padding-left:1.2em}.ask-do li{margin:4px 0;line-height:1.55}.ask-act{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}.ask-act .btn{width:auto;min-height:46px;padding:0 14px;display:inline-flex;align-items:center;gap:4px}.ask-call{display:flex;justify-content:center;align-items:center;gap:6px;margin-top:10px;min-height:52px;background:var(--alert)!important;color:var(--on-alert,#fff)!important;text-decoration:none}.ask-more{margin-top:10px}.ask-more summary{display:inline-flex;align-items:center;min-height:44px;color:var(--primary);font-weight:600;cursor:pointer;list-style:none}.ask-more summary::-webkit-details-marker{display:none}.ask-ix{margin:8px 0}.ask-ix p{margin:4px 0}'+'.talk-door{display:flex;flex-direction:column;gap:4px;margin:12px 0 4px;padding:14px 16px;border-radius:18px 18px 18px 6px;background:var(--tint);color:var(--ink);text-decoration:none;min-height:48px}.talk-door .b{font-weight:700}.talk{min-height:50vh}';
   document.head.appendChild(cs);
 })();
 
@@ -4402,7 +4441,7 @@ try { 이용량.설치({ 앱: 'yakjido', 켜짐: false, 주소: 'https://uszalzc
 */
 (function () {
   if (window.메디나눔위기번호) return;
-  var 판 = '2026-11-05b';   /* 11-05b 유럽연합 26나라(스페인 빼고) 112 · 11-04d 라오스 LA 구급 1195 · TH 1669·VN 115·KH 119 gov.uk 다시 확인 · 11-04c 머리 주석 정리 */
+  var 판 = '2026-11-16a';   /* 11-05b 유럽연합 26나라(스페인 빼고) 112 · 11-04d 라오스 LA 구급 1195 · TH 1669·VN 115·KH 119 gov.uk 다시 확인 · 11-04c 머리 주석 정리 */
   var 표 = {
     KR: { 이름: { ko: '한국', en: 'Korea', es: 'Corea', ja: '韓国', zh: '韩国' }, 응급: '119', 경찰: '112', 위기: ['109', '1577-0199'] },
     US: { 이름: { ko: '미국', en: 'United States', es: 'Estados Unidos', ja: 'アメリカ', zh: '美国' }, 응급: '911', 경찰: '911', 위기: ['988'] },
@@ -4456,8 +4495,25 @@ try { 이용량.설치({ 앱: 'yakjido', 켜짐: false, 주소: 'https://uszalzc
     SE: { 이름: { ko: '스웨덴', en: 'Sweden', es: 'Suecia', ja: 'スウェーデン', zh: '瑞典' }, 응급: '112', 경찰: null, 위기: [] },
     XX: { 이름: { ko: '그 밖', en: 'Other', es: 'Otro', ja: 'その他', zh: '其他' }, 응급: null, 경찰: null, 위기: [] }   /* 11-04 Main — 모르는 나라는 누르는 번호 없음(112 기본값 없앰) */
   };
+  /* 11-16 Main 결정(안전 쪽) — 나라 짐작은 이 한 곳에서. 시간대가 표에 있으면 그 나라 · 시간대는 읽히는데 표에 없으면 XX(「현지 응급 번호」 — 해외에서 119 가 안 통하는 나라가 많다) ·
+     시간대를 «못 읽을 때만» 한국어 화면은 KR(119). 기기 언어의 지역(ko-KR·en-US)으로는 짐작하지 않는다(11-04h). 앱은 고른 나라(mn.place) → 이 짐작 순으로 쓴다 */
+  var 시간대표 = { 'Asia/Seoul': 'KR', 'Asia/Tokyo': 'JP', 'Asia/Shanghai': 'CN', 'Asia/Chongqing': 'CN', 'Asia/Urumqi': 'CN', 'Asia/Hong_Kong': 'HK', 'Europe/Madrid': 'ES', 'Atlantic/Canary': 'ES', 'Africa/Ceuta': 'ES',
+        'America/Mexico_City': 'MX', 'America/Monterrey': 'MX', 'America/Merida': 'MX', 'America/Cancun': 'MX', 'America/Chihuahua': 'MX', 'America/Mazatlan': 'MX', 'America/Hermosillo': 'MX', 'America/Tijuana': 'MX',
+        'Europe/London': 'GB', 'Europe/Dublin': 'IE', 'Asia/Singapore': 'SG', 'Asia/Manila': 'PH', 'Asia/Kolkata': 'IN', 'Asia/Calcutta': 'IN', 'Pacific/Auckland': 'NZ',
+        'Asia/Ho_Chi_Minh': 'VN', 'Asia/Saigon': 'VN', 'Asia/Bangkok': 'TH', 'Asia/Jakarta': 'ID', 'Asia/Makassar': 'ID', 'Asia/Jayapura': 'ID', 'Asia/Kathmandu': 'NP', 'Asia/Katmandu': 'NP', 'Asia/Tashkent': 'UZ', 'Asia/Samarkand': 'UZ',
+        'Asia/Phnom_Penh': 'KH', 'Asia/Ulaanbaatar': 'MN', 'Asia/Ulan_Bator': 'MN', 'Asia/Colombo': 'LK', 'Asia/Dhaka': 'BD',
+        'Europe/Berlin': 'DE', 'Europe/Busingen': 'DE', 'Europe/Paris': 'FR', 'Europe/Rome': 'IT', 'Europe/Amsterdam': 'NL', 'Europe/Brussels': 'BE', 'Europe/Vienna': 'AT', 'Europe/Warsaw': 'PL', 'Europe/Prague': 'CZ', 'Europe/Stockholm': 'SE', 'Europe/Copenhagen': 'DK', 'Europe/Helsinki': 'FI', 'Europe/Lisbon': 'PT', 'Atlantic/Madeira': 'PT', 'Atlantic/Azores': 'PT', 'Europe/Athens': 'GR', 'Europe/Budapest': 'HU', 'Europe/Bucharest': 'RO', 'Europe/Sofia': 'BG', 'Europe/Zagreb': 'HR', 'Europe/Ljubljana': 'SI', 'Europe/Bratislava': 'SK', 'Europe/Vilnius': 'LT', 'Europe/Riga': 'LV', 'Europe/Tallinn': 'EE', 'Europe/Luxembourg': 'LU', 'Europe/Malta': 'MT', 'Asia/Nicosia': 'CY', 'Asia/Famagusta': 'CY', 'Europe/Nicosia': 'CY', 'Europe/Mariehamn': 'FI' };
+  function 나라짐작(말) {
+    var tz = ''; try { tz = Intl.DateTimeFormat().resolvedOptions().timeZone || ''; } catch (e) { tz = ''; }
+    if (!tz) return String(말 || '').slice(0, 2) === 'ko' ? 'KR' : 'XX';
+    if (시간대표[tz]) return 시간대표[tz];
+    if (/^America\/(New_York|Chicago|Denver|Los_Angeles|Phoenix|Anchorage|Detroit|Indiana|Kentucky|Boise|Juneau|Sitka|Nome|Adak|Menominee|North_Dakota)|^Pacific\/Honolulu$/.test(tz)) return 'US';
+    if (/^America\/(Toronto|Vancouver|Edmonton|Winnipeg|Halifax|St_Johns|Regina|Montreal)/.test(tz)) return 'CA';
+    if (/^Australia\//.test(tz)) return 'AU';
+    return 'XX';
+  }
   function 고른곳() { try { var v = JSON.parse(localStorage.getItem('mn.place') || 'null'); if (v && v.country) return 표[v.country] ? v.country : 'XX'; } catch (e) {} return null; }
-  window.메디나눔위기번호 = { 판: 판, 표: 표, 고른곳: 고른곳 };   /* 표를 쓰는 앱은 읽기만 */
+  window.메디나눔위기번호 = { 판: 판, 표: 표, 고른곳: 고른곳, 나라짐작: 나라짐작, 시간대표: 시간대표 };   /* 표를 쓰는 앱은 읽기만 */
 })();
 /* ▲▲ 위기번호 표 끝 ▲▲ */
 /* ▼▼ 설정 부품 시작 ▼▼ */

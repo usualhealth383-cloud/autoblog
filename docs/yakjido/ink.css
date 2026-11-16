@@ -1,0 +1,98 @@
+/* 약지도 「잉크 판」(2026-11-17 현욱님 「AI 로 만든 티가 난다」 · 디자인 언어 yozm-health _시안/ink/잉크_디자인_언어.md)
+   옛 판을 지우지 않고 <html class="ink"> 일 때만 얹는다(주소 ?ink=1 · 설정 → 화면 → 잉크 판). 지우면 옛 판 그대로.
+   원칙: 흰 바탕 · 먹색 글 · 강조색 하나(바다 파랑 = 지금 --primary) · 그림자·그라데이션·연한 색 상자·장식 아이콘 걷기 ·
+         카드 대신 여백과 1px 선 · 알약 단추 · 빨강은 응급에만. 흐린 글은 흰 바탕 4.5:1 넘게(#6B6B6B). */
+html.ink{
+  --surface:#FFFFFF; --card:#FFFFFF; --ground:#FFFFFF;
+  --text:#141414; --body:#141414; --muted:#6B6B6B; --faint:#707070;
+  --hairline:#EFEFEF; --rim:#C8C8C8; --tint:#FFFFFF; --tint2:#FFFFFF;
+  --accent:#0B6E8F; --accent-text:#0B6E8F; --accent-tint:#FFFFFF;
+  --normal-tint:#FFFFFF; --caution-tint:#FFFFFF; --rx:#141414; --rx-tint:#FFFFFF;
+  --shadow-card:none; --shadow-raised:none; --r-card:20px;
+}
+@media (prefers-color-scheme:dark){ html.ink:not([data-theme="light"]){ --surface:#141414; --card:#141414; --ground:#141414; --text:#F2F2F2; --body:#F2F2F2; --muted:#A3A3A3; --faint:#9A9A9A; --hairline:#242424; --rim:#4A4A4A; --tint:#141414; --tint2:#141414; --accent-tint:#141414; --normal-tint:#141414; --caution-tint:#141414; --rx-tint:#141414; } }
+html.ink[data-theme="dark"]{ --surface:#141414; --card:#141414; --ground:#141414; --text:#F2F2F2; --body:#F2F2F2; --muted:#A3A3A3; --faint:#9A9A9A; --hairline:#242424; --rim:#4A4A4A; --tint:#141414; --tint2:#141414; --accent-tint:#141414; --normal-tint:#141414; --caution-tint:#141414; --rx-tint:#141414; }
+html.ink body{background:var(--surface);color:var(--text);letter-spacing:-.01em}
+html.ink #app,html.ink main,html.ink #view{background:transparent}
+
+/* 1 · 그림자·그라데이션 걷기(떠 있는 시트만 예외) */
+html.ink *{box-shadow:none!important}   /* 특정도를 낮게(아래 회색 테 규칙이 이기게) */
+html.ink .today,html.ink .wx.quiet{background:var(--card)!important}
+/* 2 · 갈래 색(초록·분홍·노랑 띠) → 흑백. 응급 빨강은 그대로 */
+html.ink [class*="g-"]{--gbg:transparent!important;--gfg:var(--text)!important}
+/* 3 · 카드 → 여백과 가는 선. 칸 속 칸이 되지 않게 겉 테두리만 1px */
+html.ink .card,html.ink .sec.card,html.ink .xc,html.ink .today,html.ink .today-hero,html.ink .od-line,html.ink .er-line,html.ink .cond-line button,html.ink .lrow,html.ink .rows-l>*,html.ink .talk-door,html.ink .note,html.ink .answer,html.ink .ask-ans{background:transparent!important;border:0!important;border-radius:0!important}
+html.ink .sec{padding-top:24px;margin-top:24px;border-top:1px solid var(--hairline)}
+html.ink .sec:first-of-type{border-top:0}
+html.ink .note{padding:10px 0!important;border-top:1px solid var(--hairline)!important;border-bottom:1px solid var(--hairline)!important}
+html.ink .er-line{padding:12px 0!important;border-top:1px solid var(--hairline)!important;border-bottom:1px solid var(--hairline)!important;font-weight:500}
+html.ink .od-line{padding:0!important;border-bottom:1px solid var(--hairline)!important;min-height:52px}
+/* 4 · 장식 아이콘 걷기 — 뜻 있는 아이콘(탭·검색·응급·닫기·화살표)만 남긴다 */
+html.ink .sv-tile .ic,html.ink .rg-t .ic,html.ink .tile .ic,html.ink .xc>summary .ic,html.ink .today-hero .done-art,html.ink .hero .art,html.ink .eb-art,html.ink .sv-art,html.ink .art-wrap,html.ink .hello-art,html.ink .lrow>svg:first-child{display:none!important}
+/* 5 · 타일 격자 → 왼쪽 굵은 낱말 + 오른쪽 흐린 설명, 줄 사이 1px 선 */
+html.ink .rg,html.ink .sv-tiles{display:block!important;margin-top:8px}
+html.ink .rg-t,html.ink .sv-tile{display:flex!important;flex-direction:row!important;align-items:baseline!important;gap:14px!important;width:100%;min-height:52px!important;padding:12px 0!important;border-radius:0!important;background:transparent!important;border:0!important;border-bottom:1px solid var(--hairline)!important;text-align:left}
+html.ink .rg-t b,html.ink .sv-tile b{flex:none;min-width:8.5em;font-size:1rem!important;font-weight:600!important;color:var(--text)!important}
+html.ink .rg-t small,html.ink .sv-tile small,html.ink .sv-tile span{color:var(--muted)!important;font-size:.9375rem!important}
+/* 6 · 단추 — 알약 모양, 주요 단추는 강조색 단색, 나머지는 회색 테 */
+html.ink .btn{border-radius:999px!important}
+html.ink .btn:not(.line):not(.ghost){background:var(--primary)!important;color:var(--on-primary)!important;border:0!important}
+html.ink .btn.line,html.ink .btn.ghost{background:transparent!important;color:var(--text)!important;border:0!important;box-shadow:inset 0 0 0 2px var(--rim)!important}
+html.ink .chip{border-radius:999px!important;background:transparent!important;border:0!important;box-shadow:inset 0 0 0 2px var(--rim)!important;color:var(--text)!important;font-weight:500}
+html.ink .chip.on,html.ink .chip[aria-pressed="true"]{box-shadow:none!important;background:var(--primary)!important;color:var(--on-primary)!important}
+/* 7 · 글자 — 제목 굵게 -0.03em, 작은 이름표 흐린 색 */
+html.ink h1{font-size:clamp(1.5rem,6.5vw,1.875rem)!important;letter-spacing:-.03em;font-weight:700;line-height:1.3}
+html.ink h2,html.ink .sec-h{letter-spacing:-.02em}
+html.ink .eyebrow{color:var(--muted)!important;font-weight:500;letter-spacing:.02em}
+html.ink .topfind{background:transparent!important;border:0!important;box-shadow:inset 0 0 0 2px var(--rim)!important;border-radius:999px!important}
+html.ink nav.tabbar{background:var(--surface)!important;border-top:1px solid var(--hairline)!important}
+html.ink nav.tabbar button.on{background:transparent!important;color:var(--primary)!important}
+html.ink .tabs .tab{border-radius:999px!important}
+/* 응급·위기 — 맨 위 한 줄은 조용히, 119 원은 응급 빨강 그대로 */
+html.ink .sos-dot{width:48px;height:48px;font-size:1rem}
+html.ink .ink-sos{font-size:.8125rem;color:var(--muted);text-align:center;padding:2px 0 10px}
+html.ink .ink-sos a{color:var(--text);font-weight:700;text-decoration:none}
+
+/* 얼굴 — 알약 모양 + 깜빡이는 두 눈(5.2초) · 누르면 살짝 커지며 웃음 · 움직임 줄이기면 멈춤 */
+.ink-face{display:block;overflow:visible;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.ink-face .body{transform-origin:50% 50%;transition:transform .35s cubic-bezier(.3,1.6,.5,1)}
+.ink-face.pop .body{transform:scale(1.06)}
+.ink-face .eye{transform-box:fill-box;transform-origin:50% 50%;animation:inkblink 5.2s infinite}
+.ink-face .eye.r{animation-delay:.04s}
+.ink-face .smile{opacity:0;transition:opacity .15s}.ink-face.pop .smile{opacity:1}.ink-face.pop .eyes{opacity:0}.ink-face .eyes{transition:opacity .15s}
+@keyframes inkblink{0%,94%,100%{transform:scaleY(1)}96.5%{transform:scaleY(.1)}}
+@media (prefers-reduced-motion:reduce){.ink-face .eye{animation:none}.ink-face .body{transition:none}}
+
+/* 홈 — 대화가 뼈대 */
+html.ink .ink-hero{text-align:center;padding:28px 0 8px}
+html.ink .ink-hero .ink-face{margin:0 auto;width:96px;height:72px}
+html.ink .ink-hero h1{margin-top:20px}
+html.ink .ink-hero p{color:var(--muted);margin-top:8px}
+html.ink .ink-chat{display:flex;flex-direction:column;margin:20px 0 8px}
+html.ink .ink-row{display:flex;align-items:flex-end;gap:10px}
+html.ink .ink-row+.ink-row{margin-top:8px}
+html.ink .ink-row.turn{margin-top:20px}
+html.ink .ink-row.me{justify-content:flex-end}
+html.ink .ink-b{max-width:82%;padding:11px 16px;border-radius:20px;font-size:.9375rem;line-height:1.55;word-break:keep-all;overflow-wrap:anywhere;text-decoration:none;color:inherit}
+html.ink .ink-row.me .ink-b{background:var(--surface);box-shadow:inset 0 0 0 2.5px var(--rim)!important;border-bottom-right-radius:6px}
+html.ink .ink-row.it .ink-b{background:var(--primary);color:var(--on-primary);border-bottom-left-radius:6px}
+html.ink .ink-row.it .ink-b b{display:block;font-weight:700}
+html.ink .ink-row.it .ink-b u{display:inline-block;margin-top:6px;font-size:.8125rem;text-decoration:none;border-bottom:1px solid rgba(255,255,255,.6)}
+html.ink .ink-row .ink-face{flex:none;width:30px;height:24px}
+html.ink .ink-more{display:inline-flex;align-items:center;min-height:44px;margin-top:6px;color:var(--primary);font-weight:600;text-decoration:none}
+
+/* 물어보기 — 내 말 오른쪽 흰 말풍선(회색 테) · 답 왼쪽: 결론은 강조색 말풍선, 할 일·단추는 그 아래 흑백 */
+html.ink .ask-in input{border:0!important;box-shadow:inset 0 0 0 2px var(--rim)!important;border-radius:999px!important;background:var(--surface)!important}
+html.ink .ask-in .btn{border-radius:999px!important}
+html.ink .ask-me span{background:var(--surface)!important;color:var(--text)!important;box-shadow:inset 0 0 0 2.5px var(--rim)!important;border-radius:20px 20px 6px 20px!important;font-weight:500!important}
+html.ink .ask-row{align-items:flex-start}
+html.ink .ask-ans{padding:0!important;max-width:100%!important}
+html.ink .ask-ans .ask-c{display:inline-block;background:var(--primary);color:var(--on-primary);padding:11px 16px;border-radius:20px 20px 20px 6px;font-weight:700;font-size:1rem}
+html.ink .ask-ans.sos .ask-c{background:var(--alert);color:var(--on-alert)}
+html.ink .ask-ans.warn .ask-c{background:var(--primary)}
+html.ink .ask-do{padding-left:1.2em;margin-top:12px!important}
+html.ink .ask-do li+li{border-top:1px solid var(--hairline);padding-top:6px}
+html.ink .ask-face{display:none}
+html.ink .ask-row .ink-face{flex:none;width:30px;height:24px;margin-top:10px}
+html.ink .tabs .tab.on,html.ink .vtab.on,html.ink [role="tab"][aria-selected="true"]{background:var(--primary)!important;color:var(--on-primary)!important;border:0!important}
+html.ink .tabs .tab:not(.on),html.ink [role="tab"][aria-selected="false"]{background:transparent!important;border:0!important;box-shadow:inset 0 0 0 2px var(--rim)!important}

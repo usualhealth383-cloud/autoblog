@@ -28,6 +28,8 @@ srv = socketserver.TCPServer(('127.0.0.1', 0), functools.partial(Q, directory=st
 threading.Thread(target=srv.serve_forever, daemon=True).start()
 URL = f'http://127.0.0.1:{srv.server_address[1]}/'
 SEED = "localStorage.setItem('yakjido.hello.v1','1');localStorage.setItem('yakjido.consent.v1',JSON.stringify({v:'2026-10-20',at:'2026-10-14',terms:1,privacy:1}))"
+# 11-17 잉크 판 — YJ_INK=1 이면 잉크 판(ink.css)으로 같은 점검(옛 판·잉크 판 둘 다 결함 0)
+if os.environ.get('YJ_INK') == '1': SEED += ";localStorage.setItem('yakjido.ink','1')"
 # 11-11 Main — 「기록 있는 상태」로도 본다: YJ_REC=1 이면 약 넷·복용 시간·오늘 먹은 표시·혈압 셋·영양제를 넣고 같은 점검을 돈다
 if os.environ.get('YJ_REC') == '1':
     SEED += (";(function(){var d=new Date(),k=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');"
