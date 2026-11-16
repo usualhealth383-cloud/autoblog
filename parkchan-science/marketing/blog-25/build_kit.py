@@ -8,7 +8,7 @@ HERE = pathlib.Path(__file__).resolve().parent
 PUB = HERE.parents[2] / 'docs' / 'marketing' / 'blog-25'
 URL = 'https://usualhealth383-cloud.github.io/autoblog/marketing/blog-25/'
 BLUE = '#2F5FC4'
-TITLES = ['월성동 과학학원 | 고3 예비(현 고2) 2028 수능 통합과학 준비반 안내', '대구 통합과학 수능 | 고3 예비반 12월 19일·20일 개강 — 박찬 통합과학']
+TITLES = ['2028 수능 통합과학, 고2 겨울부터 함께 — 고3 예비반']
 TAGS = (HERE.parent / 'blog-16' / 'tags.txt').read_text(encoding='utf-8').split()
 
 POST = [('img', 'cover_go3_b', '고3 예비(현 고2) 수능 준비반 안내'),

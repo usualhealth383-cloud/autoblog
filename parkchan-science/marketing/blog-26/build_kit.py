@@ -8,7 +8,7 @@ HERE = pathlib.Path(__file__).resolve().parent
 PUB = HERE.parents[2] / 'docs' / 'marketing' / 'blog-26'
 URL = 'https://usualhealth383-cloud.github.io/autoblog/marketing/blog-26/'
 BLUE = '#2F5FC4'
-TITLES = ['월성동 과학학원 | 중등부 통합과학 특강반 수강 안내', '대구 중등 과학 | 겨울방학 중등부 통합과학 특강반 — 박찬 통합과학']
+TITLES = ['중학교 과학을 단단하게, 겨울방학 중등부 특강반']
 TAGS = (HERE.parent / 'blog-16' / 'tags.txt').read_text(encoding='utf-8').split()
 
 POST = [('img', 'cover_middle_b', '중등부 통합과학 특강반 안내'),
