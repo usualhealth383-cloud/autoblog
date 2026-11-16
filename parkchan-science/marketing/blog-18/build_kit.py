@@ -8,8 +8,7 @@ HERE = pathlib.Path(__file__).resolve().parent
 PUB = HERE.parents[2] / 'docs' / 'marketing' / 'blog-18'
 URL = 'https://usualhealth383-cloud.github.io/autoblog/marketing/blog-18/'
 BLUE = '#2F5FC4'
-TITLES = ['월성동 과학학원 | 현 중3 고1 예비반, 처음 만나는 통합과학을 차근차근 — 박찬 통합과학',
-          '대구 과학학원 | 고1 예비반 수강생 모집 중, 개념부터 차근차근 — 월성동 박찬 통합과학']
+TITLES = ['고1 예비반 수업을 안내드립니다']
 TAGS = (HERE.parent / 'blog-16' / 'tags.txt').read_text(encoding='utf-8').split()
 
 POST = [
@@ -110,7 +109,7 @@ tags = ''.join(f'<button class="cp tg" data-text="{t}">{t}</button>' for t in TA
 head = head.replace('</style>', '.tags button.tg{font-size:14px;min-height:40px;padding:0 12px;background:var(--soft);color:var(--navy);font-weight:700}.tags button.tg.done{opacity:.4}\n</style>', 1)
 page = f'''{head}<div class="wrap">
 <section class="box"><h1>박찬 통합과학 · 첫 글 수정판</h1><p class="sub">개강일 · '3월 입학 전 확실히' · 월별 진도 그림을 빼고 수업 시간 · 교재 · 새 인사말을 넣은 판 · 합니다체 · 사진 {nimg}장</p></section>
-<section class="box"><h2>① 제목 — 하나 고르기</h2>{titles}</section>
+<section class="box"><h2>① 제목</h2>{titles}</section>
 <section class="box"><h2>② 본문 — 통째로 복사</h2><button class="cp big" id="richBtn">본문 통째로 복사 — 사진 · 표 · 굵게 · 색 포함</button>
 <p class="note">네이버가 일부 서식을 빼면 '글자만 복사'(사진 자리 표시가 들어 있음)를 쓰십시오.</p>
 <details style="margin-top:10px"><summary style="font-size:14px;color:var(--muted);cursor:pointer">글자만 복사 (서식 없음)</summary><textarea id="bodyTxt" readonly style="margin-top:8px">{html.escape(body)}</textarea><button class="cp big" data-copy="bodyTxt">글자만 복사</button></details>

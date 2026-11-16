@@ -8,7 +8,7 @@ HERE = pathlib.Path(__file__).resolve().parent
 PUB = HERE.parents[2] / 'docs' / 'marketing' / 'blog-21'
 URL = 'https://usualhealth383-cloud.github.io/autoblog/marketing/blog-21/'
 BLUE = '#2F5FC4'
-TITLES = ['월성동 과학학원 | 고등학교 과학 시험, 왜 그래프 문제가 많을까요 — 박찬 통합과학', '대구 과학학원 | 달걀 떨어뜨리기로 보는 고1 통합과학 그래프 문제 — 월성동 박찬 통합과학']
+TITLES = ['고등학교 과학 시험, 왜 그래프 문제가 많을까요']
 TAGS = (HERE.parent / 'blog-16' / 'tags.txt').read_text(encoding='utf-8').split()
 
 POST = [
@@ -100,7 +100,7 @@ tags = ''.join(f'<button class="cp tg" data-text="{t}">{t}</button>' for t in TA
 head = head.replace('</style>', '.tags button.tg{font-size:14px;min-height:40px;padding:0 12px;background:var(--soft);color:var(--navy);font-weight:700}.tags button.tg.done{opacity:.4}\n</style>', 1)
 page = f'''{head}<div class="wrap">
 <section class="box"><h1>박찬 통합과학 · 네 번째 글</h1><p class="sub">고등학교 과학 시험, 왜 그래프 문제가 많을까요 · 합니다체 · 사진 {nimg}장</p></section>
-<section class="box"><h2>① 제목 — 하나 고르기</h2>{titles}</section>
+<section class="box"><h2>① 제목</h2>{titles}</section>
 <section class="box"><h2>② 본문 — 통째로 복사</h2><button class="cp big" id="richBtn">본문 통째로 복사 — 사진 · 표 · 굵게 · 색 포함</button>
 <p class="note">네이버가 일부 서식을 빼면 '글자만 복사'(사진 자리 표시가 들어 있음)를 쓰십시오.</p>
 <details style="margin-top:10px"><summary style="font-size:14px;color:var(--muted);cursor:pointer">글자만 복사 (서식 없음)</summary><textarea id="bodyTxt" readonly style="margin-top:8px">{html.escape(body)}</textarea><button class="cp big" data-copy="bodyTxt">글자만 복사</button></details>
