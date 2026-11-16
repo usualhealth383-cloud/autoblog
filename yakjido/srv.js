@@ -3419,6 +3419,9 @@ window.언어칸 = function () {
   }
   /* 11-17 잉크 판 — 얼굴(알약 + 깜빡이는 두 눈, 누르면 웃음)과 대화가 뼈대인 홈. 공용 잉크_얼굴 부품이 오면 그것으로 바꾼다 */
   window.잉크얼굴 = function (cls) { return '<svg class="ink-face ' + (cls || '') + '" viewBox="0 0 120 90" role="img" aria-label="약지도" onclick="var e=this;e.classList.add(\'pop\');setTimeout(function(){e.classList.remove(\'pop\')},700)"><g class="body"><rect x="6" y="14" width="108" height="62" rx="31" fill="var(--primary)"/><g class="eyes"><rect class="eye l" x="44" y="30" width="9" height="22" rx="4.5" fill="#fff"/><rect class="eye r" x="67" y="30" width="9" height="22" rx="4.5" fill="#fff"/></g><g class="smile" fill="none" stroke="#fff" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"><path d="M42 45 L48.5 37 L55 45"/><path d="M65 45 L71.5 37 L78 45"/></g></g></svg>'; };
+  /* 11-17 설정 → 화면 → 잉크 판(새 디자인 미리 보기). 끄면 옛 판 그대로 */
+  window.잉크칸 = function () { var on = document.documentElement.classList.contains('ink');
+    return '<div class="view-row" style="border-top:1px solid var(--hairline)"><div class="t"><b>새 디자인 미리 보기</b><span>흰 바탕·가는 선의 잉크 판 — 끄면 지금 화면 그대로</span></div><button class="sw ' + (on ? 'on' : '') + '" role="switch" aria-checked="' + on + '" aria-label="새 디자인 미리 보기" onclick="try{localStorage.setItem(\'yakjido.ink\',\'' + (on ? '0' : '1') + '\')}catch(e){};location.reload()"></button></div>'; };
   var 홈예 = ['목이 아파요', '타이레놀이랑 판콜에이 같이 먹어도 돼요?', '졸음 껌 성분이 뭐예요?'];
   window.잉크홈 = function () {
     var 쌍 = 홈예.map(function (q, i) { var r = null; try { r = CORE === 2 ? 답짓기(q) : null; } catch (e) {} 묻기.기다림 = null; 묻기.약 = [];
@@ -5737,3 +5740,40 @@ try { if (window.ENTRY && /^#\/(symptom|send)/.test(location.hash)) route(); } c
 try { if (/^(#\/?(home)?)?$/.test(location.hash) && (window.오늘한장 || window.필요약줄)) route(); } catch (e) {}   /* 11-12 홈의 오늘 한 장·필요할 때 약 줄은 srv.js 가 온 뒤 다시 그린다 */
 try { if (/^#\/(drug\/|schedule|together|od|vitals|pillinfo|pub|supp\/|me|consent|login|notify|sgoal|sstage|doc|hello\/3|supp$|supp\?|sgoal|sstage|rx|about|search|myths|askdoc|talk|p\/|p\?|p$)/.test(location.hash)) route(); } catch (e) {}
 
+/* 11-17 잉크 판 질감 — 참고 시안(지인 작품 · 현욱님 사용 허락 11-17)의 번진 가장자리 그리기를 옮김.
+   강조색 면(답 말풍선)에만 · 가장자리 번짐 1.4px(2px 안) · 가운데는 단색이라 글자 대비 그대로 · 잉크 판일 때만 */
+(function () {
+  function rng(seed) { return function () { seed = seed + 0x6D2B79F5 | 0; var t = Math.imul(seed ^ seed >>> 15, 1 | seed); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+  function rgb(str) { var m = String(str).match(/\d+(\.\d+)?/g); return m ? [+m[0], +m[1], +m[2]] : [11, 110, 143]; }
+  function blur(a, w, h, r) { if (r < 1) return a; var t = new Float32Array(a.length), k, x, y, sum, n = 2 * r + 1;
+    for (k = 0; k < 3; k++) { for (y = 0; y < h; y++) { sum = 0; var row = y * w; for (x = -r; x <= r; x++) sum += a[row + Math.min(w - 1, Math.max(0, x))];
+        for (x = 0; x < w; x++) { t[row + x] = sum / n; sum += a[row + Math.min(w - 1, x + r + 1)] - a[row + Math.max(0, x - r)]; } }
+      for (x = 0; x < w; x++) { sum = 0; for (y = -r; y <= r; y++) sum += t[Math.min(h - 1, Math.max(0, y)) * w + x];
+        for (y = 0; y < h; y++) { a[y * w + x] = sum / n; sum += t[Math.min(h - 1, y + r + 1) * w + x] - t[Math.max(0, y - r) * w + x]; } } }
+    return a; }
+  function paint(W, H, draw, r, g, fill, seed) {
+    var c = document.createElement('canvas'); c.width = W; c.height = H; var x = c.getContext('2d'); x.fillStyle = '#000'; draw(x);
+    var d = x.getImageData(0, 0, W, H).data, a = new Float32Array(W * H), i; for (i = 0; i < a.length; i++) a[i] = d[i * 4 + 3] / 255; blur(a, W, H, r);
+    var out = document.createElement('canvas'); out.width = W; out.height = H; var o = out.getContext('2d'), img = o.createImageData(W, H), p = img.data, rand = rng(seed);
+    for (i = 0; i < a.length; i++) { var v = a[i], band = 4 * v * (1 - v); if (band > 0.001) { v += (rand() * 2 - 1) * g * band * 0.5; v = v < 0 ? 0 : v > 1 ? 1 : v; }
+      p[i * 4] = fill[0]; p[i * 4 + 1] = fill[1]; p[i * 4 + 2] = fill[2]; p[i * 4 + 3] = v * 255; }
+    o.putImageData(img, 0, 0); return out; }
+  var seedN = 100;
+  function 칠하기() {
+    if (!document.documentElement.classList.contains('ink')) return;
+    var dpr = Math.min(2, window.devicePixelRatio || 1);
+    document.querySelectorAll('.ink-row.it .ink-b, .ask-ans .ask-c').forEach(function (el) {
+      var w = el.offsetWidth, h = el.offsetHeight; if (!w || !h || el.dataset.inked === w + 'x' + h) return;
+      var st = getComputedStyle(el), fill = rgb(st.backgroundColor); if (!/rgb/.test(st.backgroundColor) || /,\s*0\)$/.test(st.backgroundColor)) fill = rgb(el.dataset.inkFill || st.backgroundColor);
+      el.dataset.inkFill = st.backgroundColor;
+      var rad = ['borderTopLeftRadius', 'borderTopRightRadius', 'borderBottomRightRadius', 'borderBottomLeftRadius'].map(function (k) { return Math.min(parseFloat(st[k]) || 0, h / 2, w / 2); });
+      var pad = 6, W = Math.round((w + 2 * pad) * dpr), H = Math.round((h + 2 * pad) * dpr);
+      var cv = paint(W, H, function (x) { x.setTransform(dpr, 0, 0, dpr, 0, 0); x.beginPath(); if (x.roundRect) x.roundRect(pad, pad, w, h, rad); else x.rect(pad, pad, w, h); x.fill(); }, Math.max(1, Math.round(1.4 * dpr)), 0.95, fill, seedN++ * 7919);
+      cv.className = 'ink-cv'; cv.style.cssText = 'position:absolute;left:' + (-pad) + 'px;top:' + (-pad) + 'px;width:' + (w + 2 * pad) + 'px;height:' + (h + 2 * pad) + 'px;z-index:-1;pointer-events:none';
+      var old = el.querySelector(':scope > canvas.ink-cv'); if (old) old.remove();
+      el.classList.add('inked'); el.appendChild(cv); el.dataset.inked = w + 'x' + h;
+    });
+  }
+  var 틀 = null; function 곧() { clearTimeout(틀); 틀 = setTimeout(칠하기, 60); }
+  try { new MutationObserver(곧).observe(document.body, { childList: true, subtree: true }); addEventListener('resize', 곧); 곧(); } catch (e) {}
+})();
