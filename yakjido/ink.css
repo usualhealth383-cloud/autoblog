@@ -111,3 +111,34 @@ html.ink #inkpick:not(:empty){margin-top:12px}
 html.ink .ask-act{align-items:center}
 html.ink .ink-also{margin:10px 0 0;text-align:center;font-size:.875rem;color:var(--muted)}
 html.ink .ink-also button,html.ink .ink-also a{min-height:44px;padding:0 4px;background:none;border:0;color:var(--text);font-weight:600;font-size:.875rem;text-decoration:none;cursor:pointer}
+
+/* 11-17 작은 부품 본보기(yozm-health _시안/ink/부품_본보기.html) — 복약 달력 · 오늘 고리 · 스위치 */
+/* 달력: 칸 선·배경 없음 · 오늘 = 먹색 테 · 기록 = 아래 점(다 드심 채운 점 · 일부 빈 고리 · 건너뜀 회색 점 · 빠짐 회색 줄) · 일요일만 붉게.
+   점 모양을 넷으로 가른 이유: 본보기는 「기록 있음」 하나지만 복약은 다 드심/일부/건너뜀/빠짐이 진료에 쓰이는 정보라 색 대신 모양으로 남긴다 */
+html.ink .cal{gap:2px}
+html.ink .cal-d{background:transparent!important;border:0!important;color:var(--text)!important;border-radius:999px!important;font-variant-numeric:tabular-nums;position:relative}
+html.ink .cal-d .cm{display:none}
+html.ink .cal-d.fut{color:var(--muted)!important}
+html.ink .cal-d::after{content:"";position:absolute;left:50%;bottom:3px;transform:translateX(-50%);width:6px;height:6px;border-radius:50%}
+html.ink .cal-d.full::after{background:var(--primary)}
+html.ink .cal-d.part::after{box-shadow:inset 0 0 0 1.5px var(--primary)!important}
+html.ink .cal-d.skip::after{background:var(--rim)}
+html.ink .cal-d.miss::after{width:8px;height:2px;border-radius:1px;background:var(--muted);bottom:5px}
+html.ink .cal-d.cal-now{box-shadow:inset 0 0 0 2px var(--text)!important;font-weight:800}
+html.ink .cal-d[aria-expanded="true"]{background:var(--primary)!important;color:var(--on-primary)!important}
+html.ink .cal-d[aria-expanded="true"]::after{background:var(--on-primary)}
+html.ink .cal .cal-li:nth-child(7n+1) .n,html.ink .cal>.cal-d:nth-child(7n+1) .n,html.ink .cal-dow span:first-child{color:var(--alert)!important}
+html.ink .cal-key .k{background:transparent!important;border:0!important;position:relative;font-size:0!important}
+html.ink .cal-key .k::after{content:"";position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:7px;height:7px;border-radius:50%}
+html.ink .cal-key .k.full::after{background:var(--primary)}
+html.ink .cal-key .k.part::after{box-shadow:inset 0 0 0 1.5px var(--primary)!important}
+html.ink .cal-key .k.skip::after{background:var(--rim)}
+html.ink .cal-key .k.miss::after{width:9px;height:2px;border-radius:1px;background:var(--muted)}
+html.ink .cal-key .k.cal-now{box-shadow:inset 0 0 0 2px var(--text)!important;border-radius:50%}
+/* 오늘 고리 — 한 색 한 줄, 숫자가 주인공 */
+html.ink .ring circle:first-child{stroke:var(--hairline)!important}
+html.ink .ring circle+circle{stroke:var(--primary)!important}
+html.ink .today-hero{padding:16px 0!important;border-top:1px solid var(--hairline)!important;border-bottom:1px solid var(--hairline)!important}
+/* 스위치 — 강조색 하나 */
+html.ink .sw.on::before{background:var(--primary)}
+html.ink .dh-tick,html.ink .tick-btn{border-radius:999px!important}
