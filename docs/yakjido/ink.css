@@ -175,3 +175,20 @@ html.ink .rf-i:has(input:checked){box-shadow:inset 0 0 0 2.5px var(--alert)!impo
 html.ink .rf-none{display:flex!important;width:100%;justify-content:center;margin-top:10px;min-height:52px}
 html.ink #view.rf-ok .rf-none,html.ink .rf.rf-any .rf-none{display:none!important}
 html.ink #view:has(.rf):not(.rf-ok):not(:has(.rf.rf-any)) :is(.stabs,.pane,.answer){display:none!important}
+
+/* 11-17 약 화면(잉크) — 맨 위 큰 숫자(1회 용량·하루 최대) → 「내 정보 때문에 살펴볼 것」 한 줄 → 나머지.
+   제품 목록 둘째 줄은 감춤(바로 위 「대표 제품」 줄이 누르면 전체 목록을 연다 — 내용은 그대로). 안전 문장은 접이 안에 그대로 */
+html.ink #view:has(>.dose-hero){display:flex;flex-direction:column}
+html.ink #view:has(>.dose-hero)>*{order:10}
+html.ink #view:has(>.dose-hero)>.top{order:0}
+html.ink #view:has(>.dose-hero)>.topfind{order:1}
+html.ink #view:has(>.dose-hero)>.drug-hero{order:2}
+html.ink #view:has(>.dose-hero)>.dose-hero{order:3}
+html.ink #view:has(>.dose-hero)>.dose-src{order:4}
+html.ink #view:has(>.dose-hero)>.me-sum{order:5}
+html.ink .drug-hero .en{display:none}
+html.ink .me-sum{padding:0!important;margin-top:8px!important}
+html.ink .me-sum>.eyebrow{display:none}
+html.ink .me-sum .me-more>summary{min-height:48px;padding:10px 0;color:var(--caution);font-weight:700;border-bottom:1px solid var(--hairline)}
+html.ink .dose-hero{background:transparent!important;border:0!important;padding:8px 0 0!important}
+html.ink .dose-hero b,html.ink .dose-hero .big{font-variant-numeric:tabular-nums}

@@ -3594,7 +3594,12 @@ window.언어칸 = function () {
   };
   window.잉크홈 = function () {
     var S = D.symptoms || [];
-    return '<p class="ink-sos">급할 때 <a href="tel:119">119</a> · 마음이 힘들 때 <a href="tel:109">109</a> · <a href="tel:15770199">1577-0199</a></p>' +
+    /* 11-17 맨 위 한 줄 — 나라별 번호(공용 위기번호 표 · i18n.js 의 emg). 번호를 모르는 나라는 글만(전화 단추 없음) */
+    var KR = !window.CC || window.CC === 'KR', N = (window.I18N && window.I18N.emg) || null, 줄;
+    if (KR) 줄 = '급할 때 <a href="tel:119">119</a> · 마음이 힘들 때 <a href="tel:109">109</a> · <a href="tel:15770199">1577-0199</a>';
+    else if (N && N.e) 줄 = '급할 때 <a href="tel:' + esc(N.e) + '">' + esc(N.e) + '</a>' + (N.m && N.m[0] && N.m[0] !== N.e ? ' · 마음이 힘들 때 <a href="tel:' + esc(String(N.m[0]).replace(/[^\d+]/g, '')) + '">' + esc(N.m[0]) + '</a>' : '');
+    else 줄 = '급할 때 현지 응급 번호(한국에서는 119)';
+    return '<p class="ink-sos" data-num="1">' + 줄 + '</p>' +
       '<section class="ink-hero">' + 잉크얼굴(96) + '<h1>어디가 불편하세요?</h1><p>증상이나 약 이름을 넣어 보세요</p></section>' +
       다음약() +
       '<form class="ask-in" onsubmit="event.preventDefault();잉크묻기(this.querySelector(\'input\').value)"><input type="text" enterkeyhint="send" value="' + esc(잉크글) + '" oninput="잉크글칸(this.value)" placeholder="예) 목이 아파요 · 타이레놀" aria-label="어디가 아프세요? 어떤 약이 궁금하세요?"><button type="submit" class="btn" data-ink="solid">묻기</button></form>' +
