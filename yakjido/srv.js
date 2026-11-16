@@ -3609,6 +3609,8 @@ window.언어칸 = function () {
       '<p class="ink-also ink-care"><button type="button" onclick="잉크돌봄()">부모님 약 챙기기 ›</button></p>' +
       '<div id="inkpick"></div>';   /* 11-17 3초 시험 20명의 남은 △ — 보호자 길 */   /* 11-17 3초 시험 — 생리·알약 식별이 첫 화면에 없던 것 */
   };
+  /* 11-17 잉크 증상 화면 — 확인 뒤 맨 위 「그래서 뭘 하면 되나」 한 줄. 화면에 이미 있는 약국 판단(triage.pharmacy)의 첫 문장 그대로(새 문장 없음) */
+  window.잉크결론 = function (s) { var t = s && ((s.triage && s.triage.pharmacy) || s.lead); if (!t) return ''; return '<p class="ink-conc">' + fmt(첫문장(String(t))) + '</p>'; };
   window.vTalkS = function () {
     var q = (location.hash.match(/[?&]q=([^&]+)/) || [])[1];
     setTimeout(function () { 그림(); if (q && !묻기.log.some(function (x) { return x.q === decodeURIComponent(q); })) 묻기보냄(decodeURIComponent(q)); }, 0);

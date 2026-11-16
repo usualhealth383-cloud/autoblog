@@ -17,8 +17,9 @@ H = functools.partial(_Q, directory=str(D))
 srv = socketserver.TCPServer(('127.0.0.1', 0), H); threading.Thread(target=srv.serve_forever, daemon=True).start()
 URL = f'http://127.0.0.1:{srv.server_address[1]}/'
 SEED = "localStorage.setItem('yakjido.hello.v1','1');localStorage.setItem('yakjido.consent.v1',JSON.stringify({v:'2026-10-20',at:'2026-10-14',terms:1,privacy:1}))"
-SYMS = ['fever', 'headache', 'cold', 'diarrhea', 'sorethroat', 'dyspepsia', 'msk', 'insomnia']
-VIS = "()=>[...document.querySelectorAll('#view .answer, #view .stabs, #view .pane')].some(e=>e.offsetParent!==null)"
+import json
+SYMS = [x['id'] for x in json.load(open(D / 'data' / 'core.json', encoding='utf-8'))['symptoms']]   # 11-17 전 증상
+VIS = "()=>[...document.querySelectorAll('#view .answer, #view .stabs, #view .pane, #view .ink-conc')].some(e=>e.offsetParent!==null)"
 fails, n = [], 0
 with sync_playwright() as p:
     b = p.chromium.launch(executable_path='/opt/pw-browsers/chromium-1194/chrome-linux/chrome', args=['--no-sandbox'])
