@@ -3571,9 +3571,12 @@ window.언어칸 = function () {
     곳.dataset.g = g; 곳.innerHTML = '<div class="ask-chips">' + L.map(function (s) { return '<a class="chip" href="#/symptom/' + s.id + '">' + esc(String(s.name).split(' (')[0]) + '</a>'; }).join('') + '</div>';
     document.querySelectorAll('.ink-parts button').forEach(function (b) { b.setAttribute('aria-pressed', b.dataset.g === g); });
   };
+  var 잉크마지막 = '', 잉크글 = '';
+  window.잉크글칸 = function (v) { 잉크글 = v; };
+  function 잉크답(v) { var r = null; try { r = 답짓기(v); } catch (e) {} return '<div class="ask-me"><span>' + esc(v) + '</span></div><div class="ask-row">' + 잉크얼굴(30) + 답그리기(r || {}) + '</div><a class="ink-more" href="#/talk?q=' + encodeURIComponent(v) + '">물어보기에서 이어서 ›</a>'; }
   window.잉크묻기 = function (v) {
     v = String(v || '').trim(); var 곳 = document.getElementById('inkans'); if (!v || !곳) return;
-    var 보 = function () { var r = null; try { r = 답짓기(v); } catch (e) {} 곳.innerHTML = '<div class="ask-me"><span>' + esc(v) + '</span></div><div class="ask-row">' + 잉크얼굴(30) + 답그리기(r || {}) + '</div><a class="ink-more" href="#/talk?q=' + encodeURIComponent(v) + '">물어보기에서 이어서 ›</a>'; };
+    잉크마지막 = v; var 보 = function () { 곳.innerHTML = 잉크답(v); };
     (CORE !== 2 ? ensureCore() : Promise.resolve()).then(보, 보);
   };
   window.잉크홈 = function () {
@@ -3581,10 +3584,11 @@ window.언어칸 = function () {
     return '<p class="ink-sos">급할 때 <a href="tel:119">119</a> · 마음이 힘들 때 <a href="tel:109">109</a> · <a href="tel:15770199">1577-0199</a></p>' +
       '<section class="ink-hero">' + 잉크얼굴(96) + '<h1>어디가 불편하세요?</h1><p>증상이나 약 이름을 넣어 보세요</p></section>' +
       다음약() +
-      '<form class="ask-in" onsubmit="event.preventDefault();잉크묻기(this.querySelector(\'input\').value)"><input type="text" enterkeyhint="send" placeholder="예) 목이 아파요 · 타이레놀" aria-label="어디가 아프세요? 어떤 약이 궁금하세요?"><button type="submit" class="btn" data-ink="solid">묻기</button></form>' +
-      '<div id="inkans" class="ink-ans" aria-live="polite"></div>' +
+      '<form class="ask-in" onsubmit="event.preventDefault();잉크묻기(this.querySelector(\'input\').value)"><input type="text" enterkeyhint="send" value="' + esc(잉크글) + '" oninput="잉크글칸(this.value)" placeholder="예) 목이 아파요 · 타이레놀" aria-label="어디가 아프세요? 어떤 약이 궁금하세요?"><button type="submit" class="btn" data-ink="solid">묻기</button></form>' +
+      '<div id="inkans" class="ink-ans" aria-live="polite">' + (잉크마지막 && CORE === 2 ? 잉크답(잉크마지막) : '') + '</div>' +
       '<div class="ink-parts" role="group" aria-label="어디가 불편하세요">' + 부위.map(function (p) { var L = S.filter(function (s) { return s.group === p[0]; }); return L.length ? '<button type="button" data-g="' + esc(p[0]) + '" aria-pressed="false" onclick="잉크부위(this.dataset.g)"><span class="ic">' + (typeof sicon === 'function' ? sicon(L[0]) : '') + '</span><b>' + esc(p[1]) + '</b></button>' : ''; }).join('') + '</div>' +
-      '<div id="inkpick"></div>';
+      '<p class="ink-also"><button type="button" data-g="입·이" onclick="잉크부위(this.dataset.g)">입·이</button> · <button type="button" data-g="소변·생리·갱년기" onclick="잉크부위(this.dataset.g)">소변·생리</button> · <a href="#/pill">알약 모양으로 찾기 ›</a></p>' +
+      '<div id="inkpick"></div>';   /* 11-17 3초 시험 — 생리·알약 식별이 첫 화면에 없던 것 */
   };
   window.vTalkS = function () {
     var q = (location.hash.match(/[?&]q=([^&]+)/) || [])[1];

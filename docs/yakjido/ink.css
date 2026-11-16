@@ -53,19 +53,10 @@ html.ink .sos-dot{width:48px;height:48px;font-size:1rem}
 html.ink .ink-sos{font-size:.8125rem;color:var(--muted);text-align:center;padding:2px 0 10px}
 html.ink .ink-sos a{color:var(--text);font-weight:700;text-decoration:none}
 
-/* 얼굴 — 알약 모양 + 깜빡이는 두 눈(5.2초) · 누르면 살짝 커지며 웃음 · 움직임 줄이기면 멈춤 */
-.ink-face{display:block;overflow:visible;cursor:pointer;-webkit-tap-highlight-color:transparent}
-.ink-face .body{transform-origin:50% 50%;transition:transform .35s cubic-bezier(.3,1.6,.5,1)}
-.ink-face.pop .body{transform:scale(1.06)}
-.ink-face .eye{transform-box:fill-box;transform-origin:50% 50%;animation:inkblink 5.2s infinite}
-.ink-face .eye.r{animation-delay:.04s}
-.ink-face .smile{opacity:0;transition:opacity .15s}.ink-face.pop .smile{opacity:1}.ink-face.pop .eyes{opacity:0}.ink-face .eyes{transition:opacity .15s}
-@keyframes inkblink{0%,94%,100%{transform:scaleY(1)}96.5%{transform:scaleY(.1)}}
-@media (prefers-reduced-motion:reduce){.ink-face .eye{animation:none}.ink-face .body{transition:none}}
-
+/* 얼굴은 공용 잉크 얼굴 부품(11-17a 'pill')이 그린다 */
 /* 홈 — 대화가 뼈대 */
 html.ink .ink-hero{text-align:center;padding:28px 0 8px}
-html.ink .ink-hero .ink-face{margin:0 auto;width:96px;height:72px}
+html.ink .ink-hero .ink-face{display:block;margin:0 auto}
 html.ink .ink-hero h1{margin-top:20px}
 html.ink .ink-hero p{color:var(--muted);margin-top:8px}
 html.ink .ink-chat{display:flex;flex-direction:column;margin:20px 0 8px}
@@ -78,7 +69,7 @@ html.ink .ink-row.me .ink-b{background:var(--surface);box-shadow:inset 0 0 0 2.5
 html.ink .ink-row.it .ink-b{background:var(--primary);color:var(--on-primary);border-bottom-left-radius:6px}
 html.ink .ink-row.it .ink-b b{display:block;font-weight:700}
 html.ink .ink-row.it .ink-b u{display:inline-block;margin-top:6px;font-size:.8125rem;text-decoration:none;border-bottom:1px solid rgba(255,255,255,.6)}
-html.ink .ink-row .ink-face{flex:none;width:30px;height:24px}
+html.ink .ink-row .ink-face{flex:none}
 html.ink .ink-more{display:inline-flex;align-items:center;min-height:44px;margin-top:6px;color:var(--primary);font-weight:600;text-decoration:none}
 
 /* 물어보기 — 내 말 오른쪽 흰 말풍선(회색 테) · 답 왼쪽: 결론은 강조색 말풍선, 할 일·단추는 그 아래 흑백 */
@@ -93,6 +84,28 @@ html.ink .ask-ans.warn .ask-c{background:var(--primary)}
 html.ink .ask-do{padding-left:1.2em;margin-top:12px!important}
 html.ink .ask-do li+li{border-top:1px solid var(--hairline);padding-top:6px}
 html.ink .ask-face{display:none}
-html.ink .ask-row .ink-face{flex:none;width:30px;height:24px;margin-top:10px}
+html.ink .ask-row .ink-face{flex:none;margin-top:6px}
 html.ink .tabs .tab.on,html.ink .vtab.on,html.ink [role="tab"][aria-selected="true"]{background:var(--primary)!important;color:var(--on-primary)!important;border:0!important}
 html.ink .tabs .tab:not(.on),html.ink [role="tab"][aria-selected="false"]{background:transparent!important;border:0!important;box-shadow:inset 0 0 0 2px var(--rim)!important}
+/* 질감 — 강조색 면은 캔버스가 뒤에서 그린다(번진 가장자리). 캔버스가 붙은 뒤에만 배경을 비운다(못 그리면 단색 그대로) */
+html.ink .inked{position:relative;isolation:isolate;background:transparent!important}
+
+/* 11-17 잉크 홈 — 첫 화면 규칙 */
+html.ink .ink-hero{padding:20px 0 4px}
+html.ink .ink-hero h1{margin-top:16px}
+html.ink .ink-hero p{font-size:.9375rem}
+html.ink .ink-today{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:18px 0 0;padding:10px 0;border-top:1px solid var(--hairline);border-bottom:1px solid var(--hairline);font-size:.9375rem}
+html.ink .ink-today b{font-weight:700}
+html.ink .ink-tick{width:auto!important;min-height:44px!important;padding:0 18px!important;flex:none}
+html.ink .ink-low{margin:6px 0 0;font-size:.875rem;color:var(--muted)}
+html.ink .ink-low a{color:var(--primary);font-weight:700;text-decoration:none;padding:0 6px}
+html.ink .ask-in{margin-top:18px}
+html.ink .ink-ans:not(:empty){margin-top:14px;display:flex;flex-direction:column;gap:10px}
+html.ink .ink-parts{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:28px}
+html.ink .ink-parts button{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;min-height:96px;padding:12px 4px;border:0;border-radius:20px;background:transparent;box-shadow:inset 0 0 0 2px var(--hairline)!important;color:var(--text);cursor:pointer}
+html.ink .ink-parts button .ic{display:block;color:var(--primary)}
+html.ink .ink-parts button .ic svg{width:34px;height:34px;stroke-width:1.75}
+html.ink .ink-parts button b{font-size:.9375rem;font-weight:600;word-break:keep-all;text-align:center;line-height:1.3}
+html.ink .ink-parts button[aria-pressed="true"]{box-shadow:inset 0 0 0 2.5px var(--primary)!important}
+html.ink #inkpick:not(:empty){margin-top:12px}
+html.ink .ask-act{align-items:center}
