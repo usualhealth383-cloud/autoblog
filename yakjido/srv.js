@@ -1796,7 +1796,7 @@ try {
      동기화: 서버.설치({ 동기화허용: function(){ return !window.가입 || 가입.됨(); } })
    ⛔ 「돈 안 드는」 뜻의 그 낱말(원칙 금지어)을 쓰지 않는다 — 초대는 「초대 코드로 체험」. */
 (function () {
-  var 판 = '2026-11-17e';   /* 11-17e 묶음 상품 폐지 */   /* 부품 판 11-11a — 앱별 민감 동의 · 회원권이면 동의 한 번 · 두 번째 앱 회원권 한 줄 */
+  var 판 = '2026-11-17g';   /* 11-17g 남은 회원권 글 둘 걷기(한·영) */   /* 11-17e 묶음 상품 폐지 */   /* 부품 판 11-11a — 앱별 민감 동의 · 회원권이면 동의 한 번 · 두 번째 앱 회원권 한 줄 */
   var 앱들 = ['kids', 'gildongmu', 'clinicscore', 'gyeote', 'yakjido'];
   var 앱이름 = { kids: '우리 집 소아과', gildongmu: '길동무', clinicscore: 'ClinicScore', gyeote: '곁에', yakjido: '약지도' };
   var 설정 = { 초대길: null, app: 'app', 약관판: '', 이름: null, 말: null, 약관: '', 처리방침: '', 추가동의: [], 민감동의: null, 서버1111: false, 시트열기: null, 시트닫기: null, 알림: null, 모양: {} };   /* 11-11 민감동의(앱 글 {ko,en}) · 서버1111(join_app2 쓰기 — SQL 적용 뒤 켬) */
@@ -1804,7 +1804,7 @@ try {
     ko: {
       가입제목: '{앱} 가입', 가입말: '이 계정은 메디나눔의 다른 앱에서 만들어졌어요. {앱}을(를) 쓰시려면 이 앱의 약관에 따로 동의해 주세요. 다른 앱의 기록은 이 앱에 보이지 않아요.',
       가입동의: '(필수) {앱} <a href="{약관}" target="_blank" rel="noopener">이용약관</a>과 <a href="{처리방침}" target="_blank" rel="noopener">개인정보 처리방침</a>에 동의합니다',
-      회원권가입말: '다른 메디나눔 앱에서 쓰시던 계정이에요. {앱}에서는 이 앱의 동의만 한 번 받을게요 — 다른 앱의 기록은 이 앱에 보이지 않아요.', 회원권권함: '다른 메디나눔 앱을 정기 결제하고 계시면, 이 앱은 월 1,000원 덜 내요(준비 중)', 회원권보기: '회원권 보기', 민감없음: '건강정보 동의에 체크해 주세요. 이 앱은 건강정보를 다뤄서, 회원권이어도 따로 여쭤요.',
+      회원권가입말: '다른 메디나눔 앱에서 쓰시던 계정이에요. {앱}에서는 이 앱의 동의만 한 번 받을게요 — 다른 앱의 기록은 이 앱에 보이지 않아요.', 회원권권함: '다른 메디나눔 앱을 정기 결제하고 계시면, 이 앱은 월 1,000원 덜 내요(준비 중)', 회원권보기: '요금 보기', 민감없음: '건강정보 동의에 체크해 주세요. 이 앱은 건강정보를 다뤄서, 다른 앱에서 동의하셨어도 이 앱에서 따로 여쭤요.',
       가입단추: '동의하고 가입', 나중: '로그아웃', 가입됨: '{앱}에 가입했어요.', 체크: '필수 항목에 모두 체크해 주세요.', 문제: '잠시 문제가 있었어요. 다시 해 주세요.',
       인터넷: '인터넷이 닿지 않아요. 연결되면 다시 해 주세요.', 가입대기: '{앱} 가입 동의 전이라 동기화를 멈춰 두었어요.', 가입열기: '가입 동의하기',
       초대: '초대 코드', 초대말: '받으신 초대 코드가 있으면 넣어 주세요.', 초대넣기: '코드 넣기', 초대칸: '예: MN-AB12-CD34',
@@ -1830,7 +1830,7 @@ try {
     en: {
       가입제목: 'Join {앱}', 가입말: 'This account was created in another MediNanum app. To use {앱}, please agree to this app’s terms separately. Records from other apps are not shown here.',
       가입동의: '(Required) I agree to the {앱} <a href="{약관}" target="_blank" rel="noopener">Terms</a> and <a href="{처리방침}" target="_blank" rel="noopener">Privacy Policy</a>',
-      회원권가입말: 'You already use this account in another MediNanum app. {앱} just needs your consent once for this app — records from other apps are not shown here.', 회원권권함: 'If you subscribe to another MediNanum app, this app is ₩1,000 less a month (coming soon)', 회원권보기: 'See the pass', 민감없음: 'Please tick the health information consent. This app handles health information, so we ask separately even with the pass.',
+      회원권가입말: 'You already use this account in another MediNanum app. {앱} just needs your consent once for this app — records from other apps are not shown here.', 회원권권함: 'If you subscribe to another MediNanum app, this app is ₩1,000 less a month (coming soon)', 회원권보기: 'See prices', 민감없음: 'Please tick the health information consent. This app handles health information, so we ask in this app even if you agreed in another app.',
       가입단추: 'Agree and join', 나중: 'Sign out', 가입됨: 'You joined {앱}.', 체크: 'Please tick all required boxes.', 문제: 'Something went wrong. Please try again.',
       인터넷: 'No connection. Please try again when you are online.', 가입대기: 'Sync is paused until you agree to {앱}’s terms.', 가입열기: 'Agree and join',
       초대: 'Invite code', 초대말: 'If you received an invite code, enter it here.', 초대넣기: 'Apply code', 초대칸: 'e.g. MN-AB12-CD34',
