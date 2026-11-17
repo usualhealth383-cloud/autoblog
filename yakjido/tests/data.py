@@ -339,7 +339,12 @@ if _idx.exists():
         fails.append('docs/yakjido/data/core.json 이 없습니다 — 빌드를 다시 돌리세요')
     else:
         _c = json.loads(_core.read_text(encoding='utf-8'))
-        for _k in ('symptoms', 'drugs', 'sources', 'ingredients', 'interactions'):
+        for _k in ('symptoms', 'drugs', 'ingredients', 'interactions'):
+            if not _c.get(_k): fails.append(f'core.json 에 {_k} 가 비어 있습니다')
+        _sj = _core.parent / 'src.json'
+        if not _sj.exists() or len(json.loads(_sj.read_text(encoding='utf-8'))) < 100: fails.append('data/src.json(출처)이 없거나 비었습니다 — 빌드를 다시 돌리세요')
+        if 'sources' in _c: fails.append('core.json 에 출처(sources)가 다시 들어갔습니다 — data/src.json 으로')
+        for _k in ():
             if not _c.get(_k): fails.append(f'core.json 에 {_k} 가 비어 있습니다')
         # 본문도 첫 화면에서 바로 받는다 — 여기가 커지면 신호 약한 곳에서 그대로 기다림이 된다.
         # (식약처 낱알 목록·성분 사전은 3.5초 뒤나 검색할 때 받으므로 첫 화면과 경쟁하지 않는다)

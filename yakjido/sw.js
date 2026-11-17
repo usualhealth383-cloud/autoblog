@@ -16,7 +16,7 @@ const DATA = 'yakjido-data-v1';
 const EXT = 'yakjido-ext-v1';
 /* 본문(core·detail)은 여기서 받지 않는다 — 첫 방문에 페이지가 이미 받은 것을 한 번 더 받던 것(5-03). 페이지가 워커에 연결되면 같은 주소로 다시 불러 캐시에 넣는다. */
 /* terms.html·privacy.html — 첫 동의 화면과 설정의 「약관·개인정보」가 앱 안에서 읽는다(비행기 모드에서도 열리게, 10-14) */
-const ASSETS = ['./', './index.html', './manifest.webmanifest', './srv.js', './find.js', './i18n.js', './terms.html', './privacy.html', './icon-192.png', './icon-512.png', './icon-180.png', './icon-maskable-512.png'];
+const ASSETS = ['./', './index.html', './manifest.webmanifest', './srv.js', './find.js', './i18n.js', './ink.css', './terms.html', './privacy.html', './icon-192.png', './icon-512.png', './icon-180.png', './icon-maskable-512.png'];
 
 self.addEventListener('install', (e) => {
   /* HTTP 캐시를 건너뛰고 서버에서 새로 — 몇 시간 묵은 srv.js 가 새 캐시 이름에 갇히지 않게(5-03) */
@@ -54,7 +54,7 @@ self.addEventListener('fetch', (e) => {
   }
 
   if (url.pathname.includes('/data/')) {
-    const core = /\/data\/(core|detail)\.json$/.test(url.pathname);
+    const core = /\/data\/(core|detail|src)\.json$/.test(url.pathname);
     /* 앱은 모든 자료를 「?v=판」 주소로 받는다(5-02). 판이 박힌 주소는 내용이 바뀌지 않으니 캐시에 있으면 그것이 곧 정답 */
     const ver = url.searchParams.has('v');
     e.respondWith(caches.open(core ? CACHE : DATA).then((c) => c.match(e.request).then((hit) => {

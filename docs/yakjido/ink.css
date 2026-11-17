@@ -1,0 +1,209 @@
+/* 약지도 「잉크 판」(2026-11-17 현욱님 「AI 로 만든 티가 난다」 · 디자인 언어 yozm-health _시안/ink/잉크_디자인_언어.md)
+   옛 판을 지우지 않고 <html class="ink"> 일 때만 얹는다(주소 ?ink=1 · 설정 → 화면 → 잉크 판). 지우면 옛 판 그대로.
+   원칙: 흰 바탕 · 먹색 글 · 강조색 하나(바다 파랑 = 지금 --primary) · 그림자·그라데이션·연한 색 상자·장식 아이콘 걷기 ·
+         카드 대신 여백과 1px 선 · 알약 단추 · 빨강은 응급에만. 흐린 글은 흰 바탕 4.5:1 넘게(#6B6B6B). */
+html.ink{
+  --surface:#FFFFFF; --card:#FFFFFF; --ground:#FFFFFF;
+  --text:#141414; --body:#141414; --muted:#6B6B6B; --faint:#707070;
+  --hairline:#EFEFEF; --rim:#C8C8C8; --tint:#FFFFFF; --tint2:#FFFFFF;
+  --accent:#0B6E8F; --accent-text:#0B6E8F; --accent-tint:#FFFFFF;
+  --normal-tint:#FFFFFF; --caution-tint:#FFFFFF; --rx:#141414; --rx-tint:#FFFFFF;
+  --shadow-card:none; --shadow-raised:none; --r-card:20px;
+}
+@media (prefers-color-scheme:dark){ html.ink:not([data-theme="light"]){ --surface:#141414; --card:#141414; --ground:#141414; --text:#F2F2F2; --body:#F2F2F2; --muted:#A3A3A3; --faint:#9A9A9A; --hairline:#242424; --rim:#4A4A4A; --tint:#141414; --tint2:#141414; --accent-tint:#141414; --normal-tint:#141414; --caution-tint:#141414; --rx-tint:#141414; } }
+html.ink[data-theme="dark"]{ --surface:#141414; --card:#141414; --ground:#141414; --text:#F2F2F2; --body:#F2F2F2; --muted:#A3A3A3; --faint:#9A9A9A; --hairline:#242424; --rim:#4A4A4A; --tint:#141414; --tint2:#141414; --accent-tint:#141414; --normal-tint:#141414; --caution-tint:#141414; --rx-tint:#141414; }
+html.ink body{background:var(--surface);color:var(--text);letter-spacing:-.01em}
+html.ink #app,html.ink main,html.ink #view{background:transparent}
+
+/* 1 · 그림자·그라데이션 걷기(떠 있는 시트만 예외) */
+html.ink *{box-shadow:none!important}   /* 특정도를 낮게(아래 회색 테 규칙이 이기게) */
+html.ink .today,html.ink .wx.quiet{background:var(--card)!important}
+/* 2 · 갈래 색(초록·분홍·노랑 띠) → 흑백. 응급 빨강은 그대로 */
+html.ink [class*="g-"]{--gbg:transparent!important;--gfg:var(--text)!important}
+/* 3 · 카드 → 여백과 가는 선. 칸 속 칸이 되지 않게 겉 테두리만 1px */
+html.ink .card,html.ink .sec.card,html.ink .xc,html.ink .today,html.ink .today-hero,html.ink .od-line,html.ink .er-line,html.ink .cond-line button,html.ink .lrow,html.ink .rows-l>*,html.ink .talk-door,html.ink .note,html.ink .answer,html.ink .ask-ans{background:transparent!important;border:0!important;border-radius:0!important}
+html.ink .sec{padding-top:24px;margin-top:24px;border-top:1px solid var(--hairline)}
+html.ink .sec:first-of-type{border-top:0}
+html.ink .note{padding:10px 0!important;border-top:1px solid var(--hairline)!important;border-bottom:1px solid var(--hairline)!important}
+html.ink .er-line{padding:12px 0!important;border-top:1px solid var(--hairline)!important;border-bottom:1px solid var(--hairline)!important;font-weight:500}
+html.ink .od-line{padding:0!important;border-bottom:1px solid var(--hairline)!important;min-height:52px}
+/* 4 · 장식 아이콘 걷기 — 뜻 있는 아이콘(탭·검색·응급·닫기·화살표)만 남긴다 */
+html.ink .sv-tile .ic,html.ink .rg-t .ic,html.ink .tile .ic,html.ink .xc>summary .ic,html.ink .today-hero .done-art,html.ink .hero .art,html.ink .eb-art,html.ink .sv-art,html.ink .art-wrap,html.ink .hello-art,html.ink .lrow>svg:first-child{display:none!important}
+/* 5 · 타일 격자 → 왼쪽 굵은 낱말 + 오른쪽 흐린 설명, 줄 사이 1px 선 */
+html.ink .rg,html.ink .sv-tiles{display:block!important;margin-top:8px}
+html.ink .rg-t,html.ink .sv-tile{display:flex!important;flex-direction:row!important;align-items:baseline!important;gap:14px!important;width:100%;min-height:52px!important;padding:12px 0!important;border-radius:0!important;background:transparent!important;border:0!important;border-bottom:1px solid var(--hairline)!important;text-align:left}
+html.ink .rg-t b,html.ink .sv-tile b{flex:none;min-width:8.5em;font-size:1rem!important;font-weight:600!important;color:var(--text)!important}
+html.ink .rg-t small,html.ink .sv-tile small,html.ink .sv-tile span{color:var(--muted)!important;font-size:.9375rem!important}
+/* 6 · 단추 — 알약 모양, 주요 단추는 강조색 단색, 나머지는 회색 테 */
+html.ink .btn{border-radius:999px!important}
+html.ink .btn:not(.line):not(.ghost){background:var(--primary)!important;color:var(--on-primary)!important;border:0!important}
+html.ink .btn.line,html.ink .btn.ghost{background:transparent!important;color:var(--text)!important;border:0!important;box-shadow:inset 0 0 0 2px var(--rim)!important}
+html.ink .chip{border-radius:999px!important;background:transparent!important;border:0!important;box-shadow:inset 0 0 0 2px var(--rim)!important;color:var(--text)!important;font-weight:500}
+html.ink .chip.on,html.ink .chip[aria-pressed="true"]{box-shadow:none!important;background:var(--primary)!important;color:var(--on-primary)!important}
+/* 7 · 글자 — 제목 굵게 -0.03em, 작은 이름표 흐린 색 */
+html.ink h1{font-size:clamp(1.5rem,6.5vw,1.875rem)!important;letter-spacing:-.03em;font-weight:700;line-height:1.3}
+html.ink h2,html.ink .sec-h{letter-spacing:-.02em}
+html.ink .eyebrow{color:var(--muted)!important;font-weight:500;letter-spacing:.02em}
+html.ink .topfind{background:transparent!important;border:0!important;box-shadow:inset 0 0 0 2px var(--rim)!important;border-radius:999px!important}
+html.ink nav.tabbar{background:var(--surface)!important;border-top:1px solid var(--hairline)!important}
+html.ink nav.tabbar button.on{background:transparent!important;color:var(--primary)!important}
+html.ink .tabs .tab{border-radius:999px!important}
+/* 응급·위기 — 맨 위 한 줄은 조용히, 119 원은 응급 빨강 그대로 */
+html.ink .sos-dot{width:48px;height:48px;font-size:1rem}
+html.ink .ink-sos{font-size:.8125rem;color:var(--muted);text-align:center;padding:2px 0 10px}
+html.ink .ink-sos a{color:var(--text);font-weight:700;text-decoration:none}
+
+/* 얼굴은 공용 잉크 얼굴 부품(11-17a 'pill')이 그린다 */
+/* 홈 — 대화가 뼈대 */
+html.ink .ink-hero{text-align:center;padding:28px 0 8px}
+html.ink .ink-hero .ink-face{display:block;margin:0 auto}
+html.ink .ink-hero h1{margin-top:20px}
+html.ink .ink-hero p{color:var(--muted);margin-top:8px}
+html.ink .ink-chat{display:flex;flex-direction:column;margin:20px 0 8px}
+html.ink .ink-row{display:flex;align-items:flex-end;gap:10px}
+html.ink .ink-row+.ink-row{margin-top:8px}
+html.ink .ink-row.turn{margin-top:20px}
+html.ink .ink-row.me{justify-content:flex-end}
+html.ink .ink-b{max-width:82%;padding:11px 16px;border-radius:20px;font-size:.9375rem;line-height:1.55;word-break:keep-all;overflow-wrap:anywhere;text-decoration:none;color:inherit}
+html.ink .ink-row.me .ink-b{background:var(--surface);box-shadow:inset 0 0 0 2.5px var(--rim)!important;border-bottom-right-radius:6px}
+html.ink .ink-row.it .ink-b{background:var(--primary);color:var(--on-primary);border-bottom-left-radius:6px}
+html.ink .ink-row.it .ink-b b{display:block;font-weight:700}
+html.ink .ink-row.it .ink-b u{display:inline-block;margin-top:6px;font-size:.8125rem;text-decoration:none;border-bottom:1px solid rgba(255,255,255,.6)}
+html.ink .ink-row .ink-face{flex:none}
+html.ink .ink-more{display:inline-flex;align-items:center;min-height:44px;margin-top:6px;color:var(--primary);font-weight:600;text-decoration:none}
+
+/* 물어보기 — 내 말 오른쪽 흰 말풍선(회색 테) · 답 왼쪽: 결론은 강조색 말풍선, 할 일·단추는 그 아래 흑백 */
+html.ink .ask-in input{border:0!important;box-shadow:inset 0 0 0 2px var(--rim)!important;border-radius:999px!important;background:var(--surface)!important}
+html.ink .ask-in .btn{border-radius:999px!important}
+html.ink .ask-me span{background:var(--surface)!important;color:var(--text)!important;box-shadow:inset 0 0 0 2.5px var(--rim)!important;border-radius:20px 20px 6px 20px!important;font-weight:500!important}
+html.ink .ask-row{align-items:flex-start}
+html.ink .ask-ans{padding:0!important;max-width:100%!important}
+html.ink .ask-ans .ask-c{display:inline-block;background:var(--primary);color:var(--on-primary);padding:11px 16px;border-radius:20px 20px 20px 6px;font-weight:700;font-size:1rem}
+html.ink .ask-ans.sos .ask-c{background:var(--alert);color:var(--on-alert)}
+html.ink .ask-ans.warn .ask-c{background:var(--primary)}
+html.ink .ask-do{padding-left:1.2em;margin-top:12px!important}
+html.ink .ask-do li+li{border-top:1px solid var(--hairline);padding-top:6px}
+html.ink .ask-face{display:none}
+html.ink .ask-row .ink-face{flex:none;margin-top:6px}
+html.ink .tabs .tab.on,html.ink .vtab.on,html.ink [role="tab"][aria-selected="true"]{background:var(--primary)!important;color:var(--on-primary)!important;border:0!important}
+html.ink .tabs .tab:not(.on),html.ink [role="tab"][aria-selected="false"]{background:transparent!important;border:0!important;box-shadow:inset 0 0 0 2px var(--rim)!important}
+/* 질감 — 강조색 면은 캔버스가 뒤에서 그린다(번진 가장자리). 캔버스가 붙은 뒤에만 배경을 비운다(못 그리면 단색 그대로) */
+html.ink .inked{position:relative;isolation:isolate;background:transparent!important}
+
+/* 11-17 잉크 홈 — 첫 화면 규칙 */
+html.ink .ink-hero{padding:20px 0 4px}
+html.ink .ink-hero h1{margin-top:16px}
+html.ink .ink-hero p{font-size:.9375rem}
+html.ink .ink-today{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:18px 0 0;padding:10px 0;border-top:1px solid var(--hairline);border-bottom:1px solid var(--hairline);font-size:.9375rem}
+html.ink .ink-today b{font-weight:700}
+html.ink .ink-tick{width:auto!important;min-height:44px!important;padding:0 18px!important;flex:none}
+html.ink .ink-low{margin:6px 0 0;font-size:.875rem;color:var(--muted)}
+html.ink .ink-low a{color:var(--primary);font-weight:700;text-decoration:none;padding:0 6px}
+html.ink .ask-in{margin-top:18px}
+html.ink .ink-ans:not(:empty){margin-top:14px;display:flex;flex-direction:column;gap:10px}
+html.ink .ink-parts{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:28px}
+html.ink .ink-parts button{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;min-height:96px;padding:12px 4px;border:0;border-radius:20px;background:transparent;box-shadow:inset 0 0 0 2px var(--hairline)!important;color:var(--text);cursor:pointer}
+html.ink .ink-parts button .ic{display:block;color:var(--primary)}
+html.ink .ink-parts button .ic svg{width:34px;height:34px;stroke-width:1.75}
+html.ink .ink-parts button b{font-size:.9375rem;font-weight:600;word-break:keep-all;text-align:center;line-height:1.3}
+html.ink .ink-parts button[aria-pressed="true"]{box-shadow:inset 0 0 0 2.5px var(--primary)!important}
+html.ink #inkpick:not(:empty){margin-top:12px}
+html.ink .ask-act{align-items:center}
+html.ink .ink-also{margin:10px 0 0;text-align:center;font-size:.875rem;color:var(--muted)}
+html.ink .ink-also button,html.ink .ink-also a{display:inline-flex;align-items:center;min-height:44px;padding:0 4px;background:none;border:0;color:var(--text);font-weight:600;font-size:.875rem;text-decoration:none;cursor:pointer}
+
+/* 11-17 작은 부품 본보기(yozm-health _시안/ink/부품_본보기.html) — 복약 달력 · 오늘 고리 · 스위치 */
+/* 달력: 칸 선·배경 없음 · 오늘 = 먹색 테 · 기록 = 아래 점(다 드심 채운 점 · 일부 빈 고리 · 건너뜀 회색 점 · 빠짐 회색 줄) · 일요일만 붉게.
+   점 모양을 넷으로 가른 이유: 본보기는 「기록 있음」 하나지만 복약은 다 드심/일부/건너뜀/빠짐이 진료에 쓰이는 정보라 색 대신 모양으로 남긴다 */
+html.ink .cal{gap:2px}
+html.ink .cal-d{background:transparent!important;border:0!important;color:var(--text)!important;border-radius:999px!important;font-variant-numeric:tabular-nums;position:relative}
+html.ink .cal-d .cm{display:none}
+html.ink .cal-d.fut{color:var(--muted)!important}
+html.ink .cal-d::after{content:"";position:absolute;left:50%;bottom:3px;transform:translateX(-50%);width:6px;height:6px;border-radius:50%}
+html.ink .cal-d.full::after{background:var(--primary)}
+html.ink .cal-d.part::after{box-shadow:inset 0 0 0 1.5px var(--primary)!important}
+html.ink .cal-d.skip::after{background:var(--rim)}
+html.ink .cal-d.miss::after{width:8px;height:2px;border-radius:1px;background:var(--muted);bottom:5px}
+html.ink .cal-d.cal-now{box-shadow:inset 0 0 0 2px var(--text)!important;font-weight:800}
+html.ink .cal-d[aria-expanded="true"]{background:var(--primary)!important;color:var(--on-primary)!important}
+html.ink .cal-d[aria-expanded="true"]::after{background:var(--on-primary)}
+html.ink .cal .cal-li:nth-child(7n+1) .n,html.ink .cal>.cal-d:nth-child(7n+1) .n,html.ink .cal-dow span:first-child{color:var(--alert)!important}
+html.ink .cal-key .k{background:transparent!important;border:0!important;position:relative;font-size:0!important}
+html.ink .cal-key .k::after{content:"";position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:7px;height:7px;border-radius:50%}
+html.ink .cal-key .k.full::after{background:var(--primary)}
+html.ink .cal-key .k.part::after{box-shadow:inset 0 0 0 1.5px var(--primary)!important}
+html.ink .cal-key .k.skip::after{background:var(--rim)}
+html.ink .cal-key .k.miss::after{width:9px;height:2px;border-radius:1px;background:var(--muted)}
+html.ink .cal-key .k.cal-now{box-shadow:inset 0 0 0 2px var(--text)!important;border-radius:50%}
+/* 오늘 고리 — 한 색 한 줄, 숫자가 주인공 */
+html.ink .ring circle:first-child{stroke:var(--hairline)!important}
+html.ink .ring circle+circle{stroke:var(--primary)!important}
+html.ink .today-hero{padding:16px 0!important;border-top:1px solid var(--hairline)!important;border-bottom:1px solid var(--hairline)!important}
+/* 스위치 — 강조색 하나 */
+html.ink .sw.on::before{background:var(--primary)}
+html.ink .dh-tick,html.ink .tick-btn{border-radius:999px!important}
+
+/* 11-17 증상·약 화면 — 같은 내용, 덜 시끄럽게(색 테·아이콘 줄·둥근 상자 걷기) */
+html.ink .fitme .chip{min-height:44px!important;padding:8px 14px!important;font-size:.875rem!important;text-align:left;white-space:normal}
+html.ink .fitme .chip svg,html.ink .fitme .chip .rd{display:none}
+html.ink .buy-item{background:transparent!important;border:0!important;box-shadow:inset 0 0 0 2px var(--hairline)!important;border-radius:20px!important}
+html.ink .opt-one.on .buy-item,html.ink .buy-item.on{box-shadow:inset 0 0 0 2.5px var(--primary)!important}
+html.ink .acts{border-top:1px solid var(--hairline)}
+html.ink .act{background:transparent!important;border:0!important;border-bottom:1px solid var(--hairline)!important;border-radius:0!important;padding:12px 0!important}
+html.ink .act>svg:first-child,html.ink .act .ic{display:none!important}
+html.ink .triage .tg-row{background:transparent!important;border:0!important;border-bottom:1px solid var(--hairline)!important;border-radius:0!important}
+html.ink .triage .tg-row.esc b,html.ink .triage .tg-row.esc strong{color:var(--alert)}
+html.ink .go-cart{border-radius:999px!important}
+html.ink .stabs{gap:6px}
+html.ink .xc{border-top:1px solid var(--hairline)!important}
+html.ink .xc>summary{padding:14px 0!important}
+/* 11-17 달력 요약 — 큰 숫자 */
+html.ink .ink-num{margin-top:10px;font-variant-numeric:tabular-nums;line-height:1}
+html.ink .ink-num b{font-size:3rem;font-weight:800;letter-spacing:-.03em;color:var(--text)}
+html.ink .ink-num span{font-size:1.25rem;font-weight:600;color:var(--muted)}
+html.ink .ink-fold{margin-top:12px;border-top:1px solid var(--hairline)}
+html.ink .ink-fold summary{display:flex;align-items:center;min-height:44px;color:var(--muted);font-size:.875rem;cursor:pointer;list-style:none}
+html.ink .ink-fold summary::-webkit-details-marker{display:none}
+html.ink .ink-fold p,html.ink .ink-fold{font-size:.875rem;color:var(--muted)}
+
+/* 11-17 증상 화면(잉크) — 위험 신호는 큰 누름 칸 + 「하나도 없어요」, 누른 뒤에야 답(확인 없이 안심 문구 없음) */
+html.ink .rf{background:transparent!important;border:0!important;padding:0!important}
+html.ink .rf-h{display:flex;align-items:center;gap:6px;color:var(--alert)!important;font-size:1.0625rem}
+html.ink .rf-i{display:flex!important;align-items:center;gap:12px;min-height:56px;margin:8px 0!important;padding:12px 16px!important;border:0!important;border-radius:16px!important;background:transparent!important;box-shadow:inset 0 0 0 2px var(--rim)!important;font-weight:600;line-height:1.45;cursor:pointer}
+html.ink .rf-i input{flex:none;width:22px;height:22px;accent-color:var(--alert)}
+html.ink .rf-i:has(input:checked){box-shadow:inset 0 0 0 2.5px var(--alert)!important;color:var(--alert)}
+html.ink .rf-none{display:flex!important;width:100%;justify-content:center;margin-top:10px;min-height:52px}
+html.ink #view.rf-ok .rf-none,html.ink .rf.rf-any .rf-none{display:none!important}
+html.ink #view:has(.rf):not(.rf-ok):not(:has(.rf.rf-any)) :is(.stabs,.pane,.answer){display:none!important}
+
+/* 11-17 약 화면(잉크) — 맨 위 큰 숫자(1회 용량·하루 최대) → 「내 정보 때문에 살펴볼 것」 한 줄 → 나머지.
+   제품 목록 둘째 줄은 감춤(바로 위 「대표 제품」 줄이 누르면 전체 목록을 연다 — 내용은 그대로). 안전 문장은 접이 안에 그대로 */
+html.ink #view:has(>.dose-hero){display:flex;flex-direction:column}
+html.ink #view:has(>.dose-hero)>*{order:10}
+html.ink #view:has(>.dose-hero)>.top{order:0}
+html.ink #view:has(>.dose-hero)>.topfind{order:1}
+html.ink #view:has(>.dose-hero)>.drug-hero{order:2}
+html.ink #view:has(>.dose-hero)>.dose-hero{order:3}
+html.ink #view:has(>.dose-hero)>.dose-src{order:4}
+html.ink #view:has(>.dose-hero)>.me-sum{order:5}
+html.ink .drug-hero .en{display:none}
+html.ink .me-sum{padding:0!important;margin-top:8px!important}
+html.ink .me-sum>.eyebrow{display:none}
+html.ink .me-sum .me-more>summary{min-height:48px;padding:10px 0;color:var(--caution);font-weight:700;border-bottom:1px solid var(--hairline)}
+html.ink .dose-hero{background:transparent!important;border:0!important;padding:8px 0 0!important}
+html.ink .dose-hero b,html.ink .dose-hero .big{font-variant-numeric:tabular-nums}
+
+/* 11-17 증상 화면 다듬기 — 결론 한 줄 · 위험 신호 칸 전체 누름(네모 없이) · 간단히|자세히 칸막이 알약 */
+.ink-conc{display:none}
+html.ink .ink-conc{display:block;margin:20px 0 12px;font-size:1.375rem;font-weight:800;line-height:1.4;letter-spacing:-.02em;word-break:keep-all}
+html.ink #view:has(.rf):not(.rf-ok):not(:has(.rf.rf-any)) .ink-conc{display:none!important}
+html.ink .rf-i{position:relative}
+html.ink .rf-i input{position:absolute;opacity:0;width:1px;height:1px;margin:0;pointer-events:none}
+html.ink .rf-i:has(input:checked){background:var(--text)!important;color:var(--surface)!important;box-shadow:none!important}
+html.ink .rf-i:has(input:focus-visible){outline:3px solid var(--primary);outline-offset:2px}
+html.ink .view-seg{display:inline-flex!important;padding:4px;border-radius:999px;background:transparent!important;border:0!important;box-shadow:inset 0 0 0 2px var(--rim)!important;gap:2px}
+html.ink .view-seg button{border:0!important;border-radius:999px!important;background:transparent!important;color:var(--muted)!important;padding:0 18px!important;min-height:40px!important;font-weight:600}
+html.ink .view-seg button.on{background:var(--text)!important;color:var(--surface)!important}
+
+/* 11-17 PC — 잉크는 한 단 560~600px(디자인 언어 「한 줄 폭 560px 한 단」). 옆 메뉴는 그대로 */
+@media (min-width:1024px){ html.ink #view{max-width:600px;margin-left:auto;margin-right:auto} }

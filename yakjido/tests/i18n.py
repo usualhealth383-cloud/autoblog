@@ -4,6 +4,7 @@
 import sys, pathlib
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
 from design import URL, SEED, OVER, sync_playwright
+SEED += ";localStorage.setItem('yakjido.ink','0')"   # 11-17 잉크가 기본 — 이 시험은 옛 판 기능을 본다(잉크는 design.py·ink_safety.py)
 LANGS = [('ko', 'KR', '119'), ('en', 'US', '911'), ('es', 'ES', '112'), ('ja', 'JP', '119'), ('zh', 'CN', '120')]
 ROUTES = ['/home', '/symptom/fever', '/symptom/headache', '/drug/acetaminophen', '/kids', '/rx/bp', '/bag', '/me?t=set', '/talk', '/together', '/supp']
 HANGUL = """()=>{let a=0,k=0;const w=document.createTreeWalker(document.querySelector('#view'),NodeFilter.SHOW_TEXT);while(w.nextNode()){const t=w.currentNode.textContent.trim();if(!t||!w.currentNode.parentElement.offsetParent)continue;a++;if(/[가-힣]/.test(t))k++;}return [k,a]}"""
