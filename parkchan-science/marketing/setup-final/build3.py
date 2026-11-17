@@ -18,8 +18,8 @@ P=[('23','원장 인사말 — 새 글로 한 번 더 (카드 맨 앞으로)','�
 ('21','그래프 문제 글','통합과학 이야기','수정 (여유 있을 때)',['글은 그대로 · 사진 3장을 고화질로']),
 ('19','중학교 비교 글','통합과학 이야기','수정 (여유 있을 때)',['글은 그대로 · 사진 4장을 고화질로'])]
 import base64
-COVERS=[('원장 인사말','03_원장인사말_표지'),('반별 안내','10_반별안내_사진1_표지'),('고1 예비반','07_고1예비반_사진1_표지'),('고3 수능 준비반','04_고3예비반_표지'),('중등부 특강반','05_중등부_표지'),('강의 시간표','06_강의시간표'),('그래프 문제 글','08_그래프글_사진1'),('중학교 비교 글','09_중학교비교글_사진1')]
-def b64(f): return 'data:image/png;base64,'+base64.b64encode(open(M/'hires'/(f+'.png'),'rb').read()).decode()
+COVERS=[('원장 인사말','../covers-03/card_1_원장인사말'),('고1 예비반','../covers-03/card_2_고1예비반'),('고3 수능 준비반','../covers-03/card_3_고3수능준비반'),('중등부 특강반','../covers-03/card_4_중등부특강반'),('강의 시간표','../covers-03/card_5_강의시간표')]
+def b64(f): return 'data:image/png;base64,'+base64.b64encode(open((M/'hires'/(f+'.png')).resolve(),'rb').read()).decode()
 CV=''.join(f'<div class="cvr"><img src="{b64(f)}" alt="{t} 대표 사진"><div><b>{t}</b><button class="big" onclick="cpImg(this)">이 사진 복사</button></div></div>' for t,f in COVERS)
 TT={'23':'원장 인사말','27':'고1 예비반','25':'고3 수능 준비반','26':'중등부 특강반','22':'강의 시간표','28':'반별 안내','21':'그래프 문제 글','19':'중학교 비교 글'}
 TLIST=''.join(f'<div class="cp"><div class="cph"><b>{TT[n]}</b><button onclick="cpy(this)">복사</button></div><pre>{html.escape((M/f"blog-{n}/titles.txt").read_text().strip())}</pre></div>' for n in ['23','27','25','26','22','28','21','19'])
@@ -69,8 +69,13 @@ details summary{{cursor:pointer;font-weight:700;font-size:14px;color:var(--sub)}
 </div>
 <section class="fix"><b>카드 제목 — 앞 글자만 봐도 무슨 글인지</b><p class="lead" style="margin:6px 0 10px">첫 화면 카드는 제목 앞 9 ~ 10자만 보입니다. 글마다 <b>수정 → 제목만 바꾸기 → 발행</b>(순서는 그대로 유지됩니다).</p><div style="display:flex;flex-direction:column;gap:8px">{TLIST}</div></section>
 <section class="fix"><b>첫 화면 아래 빈칸 채우기 — 위젯 2개</b><p class="lead" style="margin:6px 0 10px">관리 → 꾸미기 설정 → <b>레이아웃·위젯 설정</b> → 오른쪽 아래 <b>위젯직접등록</b> → 위젯명 「상담 문의」, 코드 붙여 넣기 → 다음 → 등록. 「오시는 길」도 같게. 회색 판 맨 아래에 생긴 두 위젯을 <b>RSS/ATOM 오른쪽</b>(프로필 · 검색 · RSS 와 같은 줄)으로 끌어 놓고 → <b>적용</b>.</p><div style="display:flex;flex-direction:column;gap:8px">{WIDGETS}</div></section>
-<section class="fix" id="cover"><b>첫 화면을 예쁘게 — 글마다 대표 사진 한 장 (Ctrl+V 한 번)</b>
-<p class="lead" style="margin:6px 0 10px">첫 화면 큰 사진 · 사진 카드에는 네이버에 직접 들어간 사진만 나옵니다. 사진 버튼 · 파일 찾기 없이, 여기서 <b>이 사진 복사</b> → 글 수정 화면에서 맨 위 표지 사진을 눌러 <b>Delete</b> → 그 자리에 <b>Ctrl+V</b> → 발행. 그러면 네이버 사진(고화질)으로 바뀝니다. <b>원장 인사말 하나만 해도</b> 첫 화면이 「큰 사진 + 인사말」로 바뀝니다.</p>
+<section class="fix" id="wide"><b>A. 첫 화면을 넓게 — 맨 위 남색 띠 (함께 보낸 박찬_첫화면_그림3장.zip)</b><ol style="padding-left:20px;margin-top:6px;font-size:14.5px;display:flex;flex-direction:column;gap:4px">
+<li>관리 → 꾸미기 설정 → 세부 디자인 설정 → 리모콘 <b>스킨배경 → 직접등록</b> → 상단 영역 지우고 <b>2_스킨배경_상단_남색.png</b> (하단 컬러 F6F2E9 그대로)</li>
+<li>리모콘 <b>타이틀 → 직접등록</b> → 지금 그림 지우고 <b>1_타이틀_남색.png</b> (높이 300, 블로그 제목 표시 끔 그대로)</li>
+<li>리모콘 <b>네이버 메뉴</b> → <b>흰 글씨</b> 디자인(남색 위에서 보이게)</li><li>리모콘 맨 아래 <b>적용</b></li>
+<li>기본 설정 → 블로그 정보 → 프로필 이미지 <b>3_프로필.png</b> (남색 글자 많은 그림 → 깔끔한 「박찬」) → 확인</li></ol></section>
+<section class="fix" id="cover"><b>B. 카드 5장을 색 카드로 — 글마다 Ctrl+V 한 번</b>
+<p class="lead" style="margin:6px 0 10px"><b>이 사진 복사</b> → 그 글 수정 → 맨 위 표지를 눌러 <b>Delete</b> → <b>Ctrl+V</b> → 발행. 강의 시간표 글은 표지가 없으니 <b>맨 위 첫 줄(인사 위)</b>에 Ctrl+V 해서 시간표 그림 위에 놓습니다(카드엔 첫 사진이 나옴).</p>
 <div class="cvs">{CV}</div></section>
 <div class="bar">진행 <i id="cnt">0</i> / {len(P)}</div>
 <ol class="steps">{''.join(cards)}</ol>
