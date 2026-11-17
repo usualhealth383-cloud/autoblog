@@ -26,8 +26,8 @@ plain28=(M/'blog-28/post.txt').read_text()
 def RT(n):
     k=(M/f'blog-{n}/kit.html').read_text();return re.search(r'<template id="rich">(.*?)</template>',k,re.S).group(1),(M/f'blog-{n}/post.txt').read_text()
 rich21,plain21=RT(21);rich19,plain19=RT(19)
-DONE=['원장 인사말 · 고3 · 중등부 표지 사진 (네이버 사진으로 확인)','반별 안내 글 올림 (사진 2장 정상 · 「반별 안내」 메뉴에 뜸)','간판(파란 박찬 + 남색 통합과학학원)','미색 바탕 · 1단 레이아웃','단추 5개(학원 소개 · 반별 안내 · 강의 시간표 · 통합과학 이야기 · 상담)','위 메뉴 줄(학원 소개 · 반별 안내 · 학원 공지사항 · 통합과학 이야기)','블로그 이름 · 프로필(남색) · 소개글','옛 첫 글 비공개','글 제목 7개 · 카테고리','휴대폰: 맨 위 공지(강의 시간표) · 소개']
-TODO=['고1 새 반 날짜: <b>토요반 11월 21일(토)</b>가 맞는데, 강의 시간표 글 · 반별 안내 글에 「일요반 11월 22일」로 들어가 있음 → 6 · 9번 칸','강의 시간표 글: 사진 0장, 중등부 표 「토요반」 한 칸 → 6번 칸 본문 복사 한 번','고1 예비반 글: 첫 글 합친 판으로 → 7번 칸 본문 복사 한 번','그래프 · 중학교 비교 글: 사진이 링크라 첫 화면 카드에 안 잡힘 → 10 · 11번 칸 (여유 있을 때)']
+DONE=['원장 인사말 · 고3 · 중등부 표지 사진 (네이버 사진으로 확인)','반별 안내 글 (일요반 22일 · 사진 2장 정상 · 메뉴에 뜸) — 고칠 것 없음','간판(파란 박찬 + 남색 통합과학학원)','미색 바탕 · 1단 레이아웃','단추 5개(학원 소개 · 반별 안내 · 강의 시간표 · 통합과학 이야기 · 상담)','위 메뉴 줄(학원 소개 · 반별 안내 · 학원 공지사항 · 통합과학 이야기)','블로그 이름 · 프로필(남색) · 소개글','옛 첫 글 비공개','글 제목 7개 · 카테고리','휴대폰: 맨 위 공지(강의 시간표) · 소개']
+TODO=['강의 시간표 글: 사진 0장, 중등부 표 「토요반」 한 칸 → 6번 칸 본문 복사 한 번 (고1 일요반 22일은 이미 맞음)','고1 예비반 글: 강의 시간이 토요반 21일로 남아 있음 + 첫 글 합친 판으로 → 7번 칸 본문 복사 한 번','그래프 · 중학교 비교 글: 사진이 링크라 첫 화면 카드에 안 잡힘 → 8 · 9번 칸 (여유 있을 때)']
 HOW='''<div class="how"><b>사진 바꾸는 법 (모든 글 같음)</b><ol>
 <li>블로그에서 그 글을 엽니다 → 글 위쪽(또는 아래쪽) <b>수정</b>.</li>
 <li>글쓰기 화면에서 바꿀 사진을 <b>한 번 누릅니다</b> → 키보드 <b>Delete</b> (사진이 지워집니다).</li>
@@ -47,12 +47,12 @@ B=[
 st('원장 인사말 — 표지 사진 1장','글: 박찬 통합과학 원장이 학부모님께 드리는 글 (학원 소개)','<p>위 「사진 바꾸는 법」대로, 맨 위 표지 사진을 아래 그림으로 바꿉니다.</p>'+img(M/'blog-23/images/cover_greeting_b.png','원장 인사말 표지',700)),
 st('고3 예비반 — 표지 사진 1장','글: 2028 수능 통합과학, 고2 겨울부터 함께 — 고3 예비반 (반별 안내 › 고3 예비반)','<p>맨 위 표지 사진을 아래 그림으로 바꿉니다.</p>'+img(M/'blog-25/images/cover_go3_b.png','고3 예비반 표지',700)),
 st('중등부 특강반 — 표지 사진 1장','글: 중학교 과학을 단단하게, 겨울방학 중등부 특강반 (반별 안내 › 중등부반)','<p>맨 위 표지 사진을 아래 그림으로 바꿉니다.</p>'+img(M/'blog-26/images/cover_middle_b.png','중등부 특강반 표지',700)),
-st('강의 시간표 — 본문 통째로 바꾸기','글: 박찬 통합과학 학원 강의 시간표 (학원 공지사항)','''<p class="nt">내용은 지금 올라간 글과 같습니다. 다른 곳은 세 군데뿐입니다 — ① 고1 새 반 「일요반 11월 22일」 → <b>토요반 11월 21일(토)</b> ② 중등부 표 둘째 줄 「토요반」 → <b>일요반</b> (같은 글 문장 「목요반과 일요반」, 원장님 손글씨 시간표, 중등부 글이 모두 목·일) ③ 시간표 사진(토요일 판)이 함께 들어갑니다(지금 이 글에는 사진이 한 장도 없음).</p>
+st('강의 시간표 — 본문 통째로 바꾸기','글: 박찬 통합과학 학원 강의 시간표 (학원 공지사항)','''<p class="nt">내용은 지금 올라간 글과 같습니다. 다른 곳은 두 군데뿐입니다 — ① 중등부 표 둘째 줄 「토요반」 → <b>일요반</b> (같은 글 문장 「목요반과 일요반」, 원장님 손글씨 시간표, 중등부 글이 모두 목·일) ② 시간표 사진이 함께 들어갑니다(지금 이 글에는 사진이 한 장도 없음).</p>
 <ol class="in"><li>글 → <b>수정</b> → 본문 아무 곳 누르고 <b>Ctrl+A</b> → <b>Delete</b> (제목은 그대로).</li>
 <li>아래 <b>「본문 복사」</b> → <b>Ctrl+V</b>.</li><li><b>발행</b> → <b>발행</b>.</li></ol>
 <button class="big" data-rich="rich22" data-txt="txt22">본문 복사 (서식 포함)</button>
-<details><summary>서식이 빠지면 — 글자만 복사</summary><textarea id="txt22" readonly>'''+html.escape(plain22)+'''</textarea><button class="big alt" onclick="cpyT('txt22')">글자만 복사</button></details>'''+img(R/'parkchan-science/marketing/repair-01/t04.png','강의 시간표 (고1 새 반 토요반 11월 21일)',900)),
-st('고1 예비반 — 본문 통째로 바꾸기 (첫 글 내용 합친 판)','글: 처음 만나는 통합과학, 차근차근 함께 — 고1 예비반 (반별 안내 › 고1 예비반)','''<p class="nt">비공개로 돌린 첫 글의 내용(고등학교 과학이 바뀌는 세 가지 · 문제 풀이 강의 · 직접 가르치고 상담 · 오시는 길 · 맺음말 · 교습비)을 이 글에 합쳤고, 강의 시간을 강의 시간표 글대로 <b>토요반 11월 21일(토)</b>로 맞췄습니다. 첫 글의 「특별 보충 수업」은 원장님이 정하지 않은 내용이라 뺐습니다.</p>
+<details><summary>서식이 빠지면 — 글자만 복사</summary><textarea id="txt22" readonly>'''+html.escape(plain22)+'''</textarea><button class="big alt" onclick="cpyT('txt22')">글자만 복사</button></details>'''+img(R/'parkchan-science/marketing/repair-01/t04.png','강의 시간표 (고1 새 반 일요반 11월 22일)',900)),
+st('고1 예비반 — 본문 통째로 바꾸기 (첫 글 내용 합친 판)','글: 처음 만나는 통합과학, 차근차근 함께 — 고1 예비반 (반별 안내 › 고1 예비반)','''<p class="nt">비공개로 돌린 첫 글의 내용(고등학교 과학이 바뀌는 세 가지 · 문제 풀이 강의 · 직접 가르치고 상담 · 오시는 길 · 맺음말 · 교습비)을 이 글에 합쳤고, 강의 시간을 강의 시간표 글대로 <b>일요반 11월 22일(일)</b>로 맞췄습니다. 첫 글의 「특별 보충 수업」은 원장님이 정하지 않은 내용이라 뺐습니다.</p>
 <ol class="in"><li>글 → <b>수정</b>.</li><li>본문 아무 곳이나 누르고 <b>Ctrl+A</b>(전체 선택) → <b>Delete</b>. 제목은 그대로 둡니다.</li>
 <li>아래 <b>「본문 복사」</b> 버튼 → 본문 칸에 <b>Ctrl+V</b>. 표·굵은 글씨·파란 글씨·태그 줄까지 들어갑니다.</li>
 <li>사진 3장도 본문과 함께 들어갑니다(고화질). 사진이 빠진 칸이 있으면 그 자리에서 <b>사진</b> 버튼으로 zip의 같은 번호 그림을 올립니다.</li>
@@ -61,10 +61,6 @@ st('고1 예비반 — 본문 통째로 바꾸기 (첫 글 내용 합친 판)','
 <button class="big" data-rich="rich" data-txt="bodyTxt">본문 복사 (서식 포함)</button>
 <details><summary>붙여 넣었는데 서식이 빠지면 — 글자만 복사</summary><textarea id="bodyTxt" readonly>'''+html.escape(plain)+'''</textarea><button class="big alt" onclick="cpyT('bodyTxt')">글자만 복사</button></details>'''
 +img(M/'blog-27/images/cover_go1_b.png','사진 1 · 표지',700)+img(M/'blog-27/images/04_change.png','사진 2 · 고등학교 과학, 이렇게 바뀝니다',700)+img(M/'blog-27/images/07_visit_b.png','사진 3 · 오시는 길',700)),
-st('반별 안내 — 본문 통째로 바꾸기 (고1 새 반 날짜 바로잡기)','글: 박찬 통합과학 학원 반별 안내 (반별 안내)','''<p class="nt">올리신 글의 고1 새 반이 「일요반 11월 22일」로 들어가 있습니다. <b>토요반 11월 21일(토)</b>로 바로잡은 본문입니다. 시간표 사진도 토요일 판으로 바뀌어 함께 들어갑니다.</p>
-<ol class="in"><li>글 → <b>수정</b> → 본문 아무 곳 누르고 <b>Ctrl+A</b> → <b>Delete</b> (제목은 그대로).</li><li>아래 <b>「본문 복사」</b> → <b>Ctrl+V</b>.</li><li><b>발행</b> → <b>발행</b>.</li></ol>
-<button class="big" data-rich="rich28" data-txt="txt28">본문 복사 (사진 · 서식 포함)</button>
-<details><summary>서식이 빠지면 — 글자만 복사</summary><textarea id="txt28" readonly>'''+html.escape(plain28)+'''</textarea><button class="big alt" onclick="cpyT('txt28')">글자만 복사</button></details>'''),
 st('그래프 문제 글 — 본문 통째로 바꾸기','글: 고등학교 과학 시험, 왜 그래프 문제가 많을까요? (통합과학 이야기)','''<p class="nt">내용은 지금 올라간 글과 같고, 사진만 네이버 사진으로 들어가게 바꾼 본문입니다(사진 3장, 고화질).</p>
 <ol class="in"><li>글 → <b>수정</b> → 본문 아무 곳 누르고 <b>Ctrl+A</b> → <b>Delete</b> (제목은 그대로).</li><li>아래 <b>「본문 복사」</b> → <b>Ctrl+V</b>.</li><li><b>발행</b> → <b>발행</b>.</li></ol>
 <button class="big" data-rich="rich21" data-txt="txt21">본문 복사 (사진 · 서식 포함)</button>
@@ -108,7 +104,7 @@ details summary{{cursor:pointer;font-weight:700;font-size:14px;color:var(--pt)}}
 <h2>1부 · 설정 2가지 <small>5분</small></h2><ol class="steps">{''.join(A)}</ol>
 <h2>2부 · 글 고치기 <small>글마다 1~5분 · 위 1~5번이 중요, 6·7번은 여유 있을 때</small></h2>{HOW}<ol class="steps">{''.join(B)}</ol>
 <p class="lead">끝나면 「끝」이라고만 보내 주세요. PC와 휴대폰 화면을 제가 직접 열어 확인하고 결과를 알려 드립니다.</p></div>
-<template id="rich">{rich}</template><template id="rich22">{rich22}</template><template id="rich28">{rich28}</template><template id="rich21">{rich21}</template><template id="rich19">{rich19}</template>
+<template id="rich">{rich}</template><template id="rich22">{rich22}</template><template id="rich21">{rich21}</template><template id="rich19">{rich19}</template>
 <script>
 function cpy(b){{const t=b.closest('.cp').querySelector('pre').textContent;navigator.clipboard.writeText(t).then(()=>{{b.textContent='복사됨';setTimeout(()=>b.textContent='복사',1500)}},()=>{{const r=document.createRange();r.selectNodeContents(b.closest('.cp').querySelector('pre'));const s=getSelection();s.removeAllRanges();s.addRange(r);b.textContent='Ctrl+C'}})}}
 function cpyT(id){{const t=document.getElementById(id);navigator.clipboard.writeText(t.value).catch(()=>{{t.focus();t.select()}})}}
