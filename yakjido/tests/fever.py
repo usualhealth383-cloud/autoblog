@@ -32,9 +32,9 @@ with sync_playwright() as p:
     ok(r['nover'] == 0, f"쉽게 보기 한 숫자 ≤ 범위 위 끝 — 넘는 곳 {r['nover']} {r['over']}")
     pg2 = b.new_page(locale='ko-KR', timezone_id='Asia/Seoul'); pg2.add_init_script(SEED + f"localStorage.setItem('yakjido.me.v1',JSON.stringify({{child:{{name:'',birth:'{y}-{mo:02d}-{min(d.day,28):02d}',weight:5}}}}))")
     pg2.goto(URL + '#/kids'); pg2.wait_for_function('!!window.메디나눔해열제', timeout=20000); pg2.wait_for_timeout(800)
-    t = ' '.join(pg2.locator('.dose-card').all_inner_texts())
+    t = pg2.inner_text('#view')
     import re
-    ok('진료가 먼저' in t and not re.search(r'\d+(\.\d)?\s*mL', t), '생후 2개월 — 해열제 칸에 mL 숫자 없이 진료 먼저')
+    ok(pg2.locator('.dose-card').count() == 0 and '3개월이 지나면 여기에' in t and '지금 응급실' in t and not re.search(r'1회\s*\d', t), '생후 2개월 — 용량 칸 없이 위 경고 하나(응급실·119)')
     b.close()
 srv.shutdown()
 print('해열제 숫자:', '흠 ' + str(len(bad)) if bad else '전부 통과')
