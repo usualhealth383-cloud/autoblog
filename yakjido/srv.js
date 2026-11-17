@@ -3632,6 +3632,22 @@ window.언어칸 = function () {
     잉크마지막 = v; var 보 = function () { 곳.innerHTML = 잉크답(v); };
     (CORE !== 2 ? ensureCore() : Promise.resolve()).then(보, 보);
   };
+  /* 11-17 저녁 현욱님 방향 전환 1단계(?job=1 시안 — 기본 꺼짐) — 「하나의 일」 = 내 약.
+     한 번 담으면 기억 · 새 약이 들어오면 내 약통 전체와 바로 겹침 판정(겹침 규칙 69) · 먹을 때 알림 · 가족 · 진료·약국에 내 약 한 장.
+     새 임상 문장 없음 — 판정은 ixRun/ixCards(약 화면·같이 먹어도 되나요와 같은 엔진) */
+  function 내약칸() {
+    var items = []; try { items = takingItems(); } catch (e) {}
+    if (!items.length) return '<section class="job-hero">' + 잉크얼굴(72) + '<h1>내 약을 담아 두세요</h1><p>한 번 담으면 기억해요. 새 약이 들어오면 <b>같이 먹으면 안 되는 것</b>을 바로 알려 드려요.</p>' +
+      '<div class="job-add"><button type="button" class="btn" data-ink="solid" onclick="go(\'/photo\')">약봉투·처방전 사진으로</button><button type="button" class="btn line" onclick="go(\'/together\')">약 이름으로 찾기</button></div>' +
+      '<p class="job-small"><a href="#/kinds">이름을 몰라도 종류만 골라 담기 ›</a></p></section>';
+    var 판 = '', n = items.length, stop = 0, warn = 0;
+    try { var C = ixCards(ixRun([])); stop = C.filter(function (c) { return c.lv === 'stop'; }).length; warn = C.filter(function (c) { return c.lv === 'warn'; }).length; } catch (e) {}
+    판 = stop ? '<a class="job-verdict stop" href="#/together"><b>같이 드시면 안 되는 것 ' + stop + '</b>' + (warn ? ' · 조심할 것 ' + warn : '') + ' ›</a>'
+      : warn ? '<a class="job-verdict warn" href="#/together"><b>조심할 것 ' + warn + '</b> ›</a>'
+      : '<a class="job-verdict ok" href="#/together">겹치거나 조심할 조합이 안 보여요 ›</a>';
+    return '<section class="job-box"><div class="job-h"><h1>내 약 ' + n + '가지</h1><button type="button" class="btn" data-ink="solid" onclick="go(\'/together\')">+ 약 더하기</button></div>' + 판 + 다음약() +
+      '<div class="job-row"><a href="#/notify">알림</a><a href="#/send">가족에게</a><a href="#/bag">내 약 한 장</a><a href="#/me?t=meds">약통</a></div></section>';
+  }
   window.잉크홈 = function () {
     var S = D.symptoms || [];
     /* 11-17 맨 위 한 줄 — 나라별 번호(공용 위기번호 표 · i18n.js 의 emg). 번호를 모르는 나라는 글만(전화 단추 없음) */
@@ -3640,8 +3656,9 @@ window.언어칸 = function () {
     else if (N && N.e) 줄 = '급할 때 <a href="tel:' + esc(N.e) + '">' + esc(N.e) + '</a>' + (N.m && N.m[0] && N.m[0] !== N.e ? ' · 마음이 힘들 때 <a href="tel:' + esc(String(N.m[0]).replace(/[^\d+]/g, '')) + '">' + esc(N.m[0]) + '</a>' : '');
     else 줄 = '급할 때 현지 응급 번호(한국에서는 119)';
     return '<p class="ink-sos" data-num="1">' + 줄 + '</p>' +
+      (document.documentElement.classList.contains('job') ? 내약칸() + '<h2 class="job-ask">어디가 불편하세요?</h2>' :
       '<section class="ink-hero">' + 잉크얼굴(96) + '<h1>어디가 불편하세요?</h1><p>증상이나 약 이름을 넣어 보세요</p></section>' +
-      다음약() +
+      다음약()) +
       '<form class="ask-in" onsubmit="event.preventDefault();잉크묻기(this.querySelector(\'input\').value)"><input type="text" enterkeyhint="send" value="' + esc(잉크글) + '" oninput="잉크글칸(this.value)" placeholder="예) 목이 아파요 · 타이레놀" aria-label="어디가 아프세요? 어떤 약이 궁금하세요?"><button type="submit" class="btn" data-ink="solid">묻기</button></form>' +
       '<div id="inkans" class="ink-ans" aria-live="polite">' + (잉크마지막 && CORE === 2 ? 잉크답(잉크마지막) : '') + '</div>' +
       '<div class="ink-parts" role="group" aria-label="어디가 불편하세요">' + 부위.map(function (p) { var L = S.filter(function (s) { return s.group === p[0]; }); return L.length ? '<button type="button" data-g="' + esc(p[0]) + '" aria-pressed="false" onclick="잉크부위(this.dataset.g)"><span class="ic">' + (typeof sicon === 'function' ? sicon(L[0]) : '') + '</span><b>' + esc(p[1]) + '</b></button>' : ''; }).join('') + '</div>' +
