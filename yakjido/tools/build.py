@@ -429,6 +429,10 @@ if src_icon:
     except Exception as e:
         print('아이콘 재생성 건너뜀:', e)
 
+# 11-17 현욱님 새 로고(흰 바탕 + 물색 알약 잉크 얼굴 · yozm-health med/_아이콘/약지도_*.png) — 주신 파일을 그대로 쓴다.
+# 위에서 art/icon-1024.png 로 구운 것(옛 파란 바탕용 maskable 계산 포함)을 icons/ 의 주신 크기로 덮는다. 옛 아이콘은 yakjido/_옛아이콘/
+for ic in (ROOT / 'icons').glob('icon-*.png'):
+    (pages / ic.name).write_bytes(ic.read_bytes())
 counts = {k: (len(v) if isinstance(v, (list, dict)) else 1) for k, v in data.items()}
 print(f'배포본 → {pages}/index.html · {len(out)//1024} KB · {counts}')
 print('삽화:', ', '.join(found) if found else '없음 (yakjido/art/ 에 PNG 를 넣으면 자동 반영)')
