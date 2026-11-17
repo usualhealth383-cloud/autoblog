@@ -50,6 +50,10 @@ for b in POST:
         imgs[b[1]] = (f'{URL}{b[1]}.jpg?v={hashlib.sha1(data).hexdigest()[:8]}', 'data:image/jpeg;base64,' + base64.b64encode(data).decode())
 (PUB / 'manifest.json').write_text(json.dumps({k + '.png': v[0].split('/')[-1] for k, v in imgs.items()}, ensure_ascii=False, indent=1), encoding='utf-8')
 
+HI_IMG={'cover_go1_b': 'hires/07_고1예비반_사진1_표지.png', '04_change': 'hires/07_고1예비반_사진2_고등학교과학.png', '07_visit_b': 'hires/07_고1예비반_사진3_오시는길.png'}
+for _k,_p in HI_IMG.items():
+    _im=Image.open(HERE.parent/_p).convert('RGB');_b=io.BytesIO();_im.save(_b,'JPEG',quality=92)
+    imgs[_k]=(imgs[_k][0],'data:image/jpeg;base64,'+base64.b64encode(_b.getvalue()).decode())
 C = 'margin:0;line-height:1.9;'
 TD = 'border:1px solid #D9CFBD;padding:8px 10px;vertical-align:top;'
 HASH = ' '.join('#' + t for t in TAGS)
@@ -109,7 +113,7 @@ page = f'''{head}<div class="wrap">
 <section class="box"><h1>고1 예비반 — 두 글을 하나로</h1><p class="sub">첫 글(10월 12일)과 고1 예비반 글(11월 16일)을 합친 판 · 사진 {nimg}장 · 좋아요 받은 첫 글의 내용(고등학교 과학 변화 · 문제 풀이 · 오시는 길 · 교습비)을 모두 옮겼습니다</p></section>
 <section class="box" style="border-color:#E0A800"><h2>⚠ 바뀐 점</h2><ol class="how"><li>첫 글에서 옮긴 것: 고등학교 과학이 바뀌는 세 가지(그림 포함) · 문제 풀이 강의 · 처음부터 끝까지 직접 가르치고 상담 · 상담 안내 · 오시는 길(그림 포함) · 맺음말 · 교습비</li><li>뺀 것: 첫 글의 '특별 보충 수업'(원장님이 아직 정하지 않은 내용)</li><li>새 반은 블로그에 올라간 강의 시간표 글대로 <b>일요반 11월 22일(일)</b></li></ol></section>
 <section class="box"><h2>① 제목</h2>{titles}</section>
-<section class="box"><h2>② 본문 — 통째로 복사</h2><button class="cp big" id="richBtn">본문 통째로 복사 — 표 · 굵게 · 색 포함 (사진 자리는 노란 칸)</button>
+<section class="box"><h2>② 본문 — 통째로 복사</h2><button class="cp big" id="richBtn">본문 통째로 복사 — 사진 · 표 · 굵게 · 색 포함</button>
 <p class="note">네이버가 일부 서식을 빼면 '글자만 복사'(사진 자리 표시가 들어 있음)를 쓰십시오.</p>
 <details style="margin-top:10px"><summary style="font-size:14px;color:var(--muted);cursor:pointer">글자만 복사 (서식 없음)</summary><textarea id="bodyTxt" readonly style="margin-top:8px">{html.escape(body)}</textarea><button class="cp big" data-copy="bodyTxt">글자만 복사</button></details>
 </section>
@@ -123,7 +127,7 @@ page = f'''{head}<div class="wrap">
 </ol><p class="note">사진을 링크로 붙이면 네이버가 사진으로 받지 않아 첫 화면 그림 카드에 안 뜹니다. 꼭 파일로 올려 주세요.</p></section>
 <section class="box"><h2>미리보기</h2><article class="post">{prev()}</article></section>
 </div>
-<button id="richBtn2" hidden></button><template id="rich">{rich(False)}</template><template id="rich2">{rich(True)}</template>
+<button id="richBtn2" hidden></button><template id="rich">{rich(True)}</template><template id="rich2">{rich(True)}</template>
 {script}<script>document.addEventListener('click',e=>{{const b=e.target.closest('button.tg');if(b)setTimeout(()=>b.classList.add('done'),50)}});</script>'''
 (HERE / 'kit.html').write_text(page, encoding='utf-8')
 (HERE / 'post.txt').write_text(body + '\n', encoding='utf-8')

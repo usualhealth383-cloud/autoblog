@@ -14,12 +14,12 @@ TAGS = (HERE.parent / 'blog-16' / 'tags.txt').read_text(encoding='utf-8').split(
 POST = [
  ('c', '안녕하십니까.<br>대구 월성동 박찬 통합과학 학원입니다.'),
  ('c', '반별 강의 시간을 한눈에 보실 수 있도록<br>**강의 시간표**를 정리해 드립니다.'),
- ('img', 't03_timetable', '박찬 통합과학 강의 시간표 — 고1 예비반, 고3 예비 수능 준비반, 중등부 통합과학 특강반'),
+ ('img', 't04_timetable', '박찬 통합과학 강의 시간표 — 고1 예비반, 고3 예비 수능 준비반, 중등부 통합과학 특강반'),
  ('q', '고1 예비반 (현 중3)'),
- ('c', '==토요반이 새로 열립니다.==<br>11월 21일(토)부터 **오후 1시 ~ 4시**,<br>통합과학을 처음부터 시작합니다.'),
+ ('c', '==일요반이 새로 열립니다.==<br>11월 22일(일)부터 **오후 1시 ~ 4시**,<br>통합과학을 처음부터 시작합니다.'),
  ('c', '지금 수업 중인 **화요반, 수요반, 금요반**은<br>오후 5시 30분에 시작하며,<br>**물질과 규칙성**부터 이어서 진행합니다.<br>(11월 12일(목) 기준)'),
  ('c', '겨울방학에는 **수요반(오후 2시 ~ 5시)**이<br>처음부터 새로 시작합니다.<br>개강일은 정해지는 대로 다시 안내해 드리겠습니다.'),
- ('tbl', [('토요반', '오후 1시 ~ 4시 · **11월 21일(토) 개강** · 처음부터'),
+ ('tbl', [('일요반', '오후 1시 ~ 4시 · **11월 22일(일) 개강** · 처음부터'),
           ('화요반 · 수요반 · 금요반', '오후 5시 30분 · 수업 중 · 물질과 규칙성부터 이어서 (11월 12일(목) 기준)'),
           ('수요반 (겨울방학)', '오후 2시 ~ 5시 · 겨울방학 개강 · 처음부터')], 0),
  ('q', '고3 예비 수능 준비반 (현 고2)'),
@@ -51,6 +51,10 @@ for b in POST:
         imgs[b[1]] = (f'{URL}{b[1]}.jpg?v={hashlib.sha1(data).hexdigest()[:8]}', 'data:image/jpeg;base64,' + base64.b64encode(data).decode())
 (PUB / 'manifest.json').write_text(json.dumps({k + '.png': v[0].split('/')[-1] for k, v in imgs.items()}, ensure_ascii=False, indent=1), encoding='utf-8')
 
+HI_IMG={'t04_timetable': 'hires/06_강의시간표.png'}
+for _k,_p in HI_IMG.items():
+    _im=Image.open(HERE.parent/_p).convert('RGB');_b=io.BytesIO();_im.save(_b,'JPEG',quality=92)
+    imgs[_k]=(imgs[_k][0],'data:image/jpeg;base64,'+base64.b64encode(_b.getvalue()).decode())
 C = 'margin:0;line-height:1.9;'
 TD = 'border:1px solid #D9CFBD;padding:8px 10px;vertical-align:top;'
 HASH = ' '.join('#' + t for t in TAGS)
@@ -61,8 +65,8 @@ def rich(data_uri):
         if t in ('c', 'p'): out.append(f'<p style="{C}{"text-align:center;" if t == "c" else ""}">{inline(b[1], "rich")}</p>\n<p><br></p>')
         elif t == 'q': out.append(f'<p><br></p><p style="margin:0;text-align:center;font-size:19px;font-weight:700;line-height:1.6;color:#24406F;border-top:1px solid #3B6AD0;border-bottom:1px solid #3B6AD0;padding:14px 0">{b[1]}</p>')   # 줄 간격은 앞에 빈 줄 하나만(2026-11-04 현욱님 「항상 공간이 넓다」)
         elif t == 'img':
-            src = imgs[b[1]][1 if data_uri else 0]
-            out.append(f'<p style="margin:0;text-align:center"><img src="{src}" alt="{html.escape(b[2])}" width="1080" style="width:100%;max-width:100%;height:auto"></p>')
+            k += 1
+            out.append(f'<p style="margin:0;text-align:center"><img src="{imgs[b[1]][1]}" alt="{html.escape(b[2])}" width="1080" style="width:100%;max-width:100%;height:auto"></p>' if data_uri else f'<p>【사진 {k}】</p>')
         elif t == 'tbl':
             rows = ''.join(f'<tr><td style="{TD}background:{"#FFF2C2" if i == b[2] else "#FFFFFF"};font-weight:700;{"color:"+BLUE+";" if i == b[2] else ""}">{l}</td><td style="{TD}background:{"#FFF2C2" if i == b[2] else "#FFFFFF"};{"font-weight:700;" if i == b[2] else ""}">{inline(v, "rich")}</td></tr>' for i, (l, v) in enumerate(b[1]))
             out.append(f'<table style="border-collapse:collapse;width:100%;margin:0 0 18px;font-size:15px;line-height:1.6">{rows}</table>\n<p><br></p>')
@@ -118,7 +122,7 @@ page = f'''{head}<div class="wrap">
 </ol></section>
 <section class="box"><h2>미리보기</h2><article class="post">{prev()}</article></section>
 </div>
-<template id="rich">{rich(False)}</template><template id="rich2">{rich(True)}</template>
+<template id="rich">{rich(True)}</template><template id="rich2">{rich(True)}</template>
 {script}<script>document.addEventListener('click',e=>{{const b=e.target.closest('button.tg');if(b)setTimeout(()=>b.classList.add('done'),50)}});</script>'''
 (HERE / 'kit.html').write_text(page, encoding='utf-8')
 (HERE / 'post.txt').write_text(body + '\n', encoding='utf-8')

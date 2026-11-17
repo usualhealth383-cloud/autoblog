@@ -52,6 +52,10 @@ for b in POST:
         imgs[b[1]] = (f'{URL}{b[1]}.jpg?v={hashlib.sha1(data).hexdigest()[:8]}', 'data:image/jpeg;base64,' + base64.b64encode(data).decode())
 (PUB / 'manifest.json').write_text(json.dumps({k + '.png': v[0].split('/')[-1] for k, v in imgs.items()}, ensure_ascii=False, indent=1), encoding='utf-8')
 
+HI_IMG={'cover_classes': 'blog-28/hi_1_반별안내_표지.png', 'timetable_sun': 'blog-28/hi_2_강의시간표.png'}
+for _k,_p in HI_IMG.items():
+    _im=Image.open(HERE.parent/_p).convert('RGB');_b=io.BytesIO();_im.save(_b,'JPEG',quality=92)
+    imgs[_k]=(imgs[_k][0],'data:image/jpeg;base64,'+base64.b64encode(_b.getvalue()).decode())
 C = 'margin:0;line-height:1.9;'
 TD = 'border:1px solid #D9CFBD;padding:8px 10px;vertical-align:top;'
 HASH = ' '.join('#' + t for t in TAGS)
@@ -111,7 +115,7 @@ page = f'''{head}<div class="wrap">
 <section class="box"><h1>반별 안내 — 세 반 한눈에</h1><p class="sub">상위 카테고리 「반별 안내」에 직접 올리는 글 · 메뉴와 단추 02를 누르면 「작성된 글이 없습니다」 대신 이 글이 뜹니다 · 사진 {nimg}장</p></section>
 <section class="box" style="border-color:#E0A800"><h2>⚠ 이 글이 필요한 까닭</h2><ol class="how"><li>세 반 글은 하위 카테고리(고1 예비반 · 고3 예비반 · 중등부반)에 있어서, 위 메뉴 「반별 안내」나 단추 02를 누르면 「작성된 글이 없습니다」가 뜹니다(직접 확인).</li><li>이 글을 <b>상위 「반별 안내」</b>에 올리면 그 자리에 세 반 요약 · 시간 · 각 반 글로 가는 링크 · 시간표가 뜹니다.</li><li>요일 · 시간은 블로그에 올라간 강의 시간표 글과 같습니다(고1 새 반 일요반 11월 22일).</li></ol></section>
 <section class="box"><h2>① 제목</h2>{titles}</section>
-<section class="box"><h2>② 본문 — 통째로 복사</h2><button class="cp big" id="richBtn">본문 통째로 복사 — 표 · 굵게 · 색 포함 (사진 자리는 노란 칸)</button>
+<section class="box"><h2>② 본문 — 통째로 복사</h2><button class="cp big" id="richBtn">본문 통째로 복사 — 사진 · 표 · 굵게 · 색 포함</button>
 <p class="note">네이버가 일부 서식을 빼면 '글자만 복사'(사진 자리 표시가 들어 있음)를 쓰십시오.</p>
 <details style="margin-top:10px"><summary style="font-size:14px;color:var(--muted);cursor:pointer">글자만 복사 (서식 없음)</summary><textarea id="bodyTxt" readonly style="margin-top:8px">{html.escape(body)}</textarea><button class="cp big" data-copy="bodyTxt">글자만 복사</button></details>
 </section>
@@ -125,7 +129,7 @@ page = f'''{head}<div class="wrap">
 <p class="note">링크 주소 — 고1: https://blog.naver.com/parkchan3577/224480077519 · 고3: https://blog.naver.com/parkchan3577/224480078183 · 중등부: https://blog.naver.com/parkchan3577/224480078542</p></section>
 <section class="box"><h2>미리보기</h2><article class="post">{prev()}</article></section>
 </div>
-<button id="richBtn2" hidden></button><template id="rich">{rich(False)}</template><template id="rich2">{rich(True)}</template>
+<button id="richBtn2" hidden></button><template id="rich">{rich(True)}</template><template id="rich2">{rich(True)}</template>
 {script}<script>document.addEventListener('click',e=>{{const b=e.target.closest('button.tg');if(b)setTimeout(()=>b.classList.add('done'),50)}});</script>'''
 (HERE / 'kit.html').write_text(page, encoding='utf-8')
 (HERE / 'post.txt').write_text(body + '\n', encoding='utf-8')
