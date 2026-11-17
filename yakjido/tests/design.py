@@ -142,12 +142,7 @@ def main():
         # ⑧ 첫 실행(11-10 사진 대조) — 저장소 빈 새 기기: 「모두 동의」 → 다시 그림 → 2초 → 「시작하기」가 눌리고 넘어가는지 · 말과 나라 창 위 빈 띠 · 칩 글자 크기
         for w in (360, 390):
             ctx = b.new_context(viewport={'width': w, 'height': 780}); pg = ctx.new_page()
-            if os.environ.get('YJ_INK') != '0':   # 11-17 잉크 판(기본) — 첫 화면에 동의 벽 없음 · 동의는 처음 저장할 때(그 화면은 아래에서 따로 연다)
-                pg.goto(URL); pg.wait_for_selector('.ask-in', timeout=20000)
-                if '#/consent' in pg.url: fails.append(f'⑧ 첫 실행 {w}: 잉크 판인데 동의 벽이 먼저 뜸')
-                pg.goto(URL + '#/consent')
-            else: pg.goto(URL + '?old=1')   # 빈 새 기기는 잉크가 기본 — 옛 판 첫 실행은 ?old=1
-            pg.wait_for_selector('.cs-all', timeout=20000); pg.click('.cs-all')
+            pg.goto(URL); pg.wait_for_selector('.cs-all', timeout=20000); pg.click('.cs-all')
             pg.evaluate("()=>route()"); pg.wait_for_timeout(2000)
             ok = pg.evaluate("()=>{const g=document.getElementById('csGo');return !!g&&!g.disabled&&document.querySelector('.cs-all').getAttribute('aria-checked')==='true'}")
             if not ok: fails.append(f'⑧ 첫 실행 {w}: 「모두 동의」가 다시 그린 뒤 풀림 — 「시작하기」가 잠김')

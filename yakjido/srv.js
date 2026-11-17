@@ -1697,7 +1697,7 @@
 })();
 /* ▲▲ 잉크 얼굴 부품 끝 ▲▲ */
 /* 11-17 잉크 판일 때만 — 얼굴·번진 면. 색 토큰은 약지도 ink.css 가 맡는다(공용 토큰의 흐린 글 #8A8A8A 는 흰 바탕 4.5:1 미달이라 html[data-ink] 를 쓰지 않는다) */
-try { if (document.documentElement.classList.contains('ink')) 잉크.설치({ 색: '#1F86A8' })   /* 11-17 한가족 — 알약 얼굴은 로고와 같은 물색 */; } catch (e) {}
+try { if (document.documentElement.classList.contains('ink')) 잉크.설치({ 색: document.documentElement.classList.contains('fam') ? '#1F86A8' : '#0B6E8F' })   /* 11-17 한가족 — 알약 얼굴은 로고와 같은 물색 */; } catch (e) {}
 
 /* 11-13 메디나눔 홈 2단계 — 수첩의 혈압·혈당(P8)을 사용자가 누를 때만 「내 홈」으로 넘긴다. 스위치 꺼짐(법무 판단 전 비공개).
    원래 기록은 이 앱이 정본 — 꾸러미는 사본 보기용. 모양은 부품이 다시 검사한다 */
@@ -3615,8 +3615,8 @@ window.언어칸 = function () {
       '<div class="ink-parts" role="group" aria-label="어디가 불편하세요">' + 부위.map(function (p) { var L = S.filter(function (s) { return s.group === p[0]; }); return L.length ? '<button type="button" data-g="' + esc(p[0]) + '" aria-pressed="false" onclick="잉크부위(this.dataset.g)"><span class="ic">' + (typeof sicon === 'function' ? sicon(L[0]) : '') + '</span><b>' + esc(p[1]) + '</b></button>' : ''; }).join('') + '</div>' +
       '<p class="ink-also"><button type="button" data-g="입·이" onclick="잉크부위(this.dataset.g)">입·이</button> · <button type="button" data-g="소변·생리·갱년기" onclick="잉크부위(this.dataset.g)">소변·생리</button> · <a href="#/pill">알약 모양으로 찾기 ›</a></p>' +
       '<p class="ink-also ink-care"><button type="button" onclick="잉크돌봄()">부모님 약 챙기기 ›</button></p>' +
-      '<div id="inkpick"></div>' +
-      '<p class="ink-legal">둘러보기는 그냥 쓰셔도 돼요 · 약을 담거나 기록할 때 약관·개인정보 동의를 받아요 <a href="#/doc/terms">약관</a> · <a href="#/doc/privacy">처리방침</a></p>';   /* 11-17 3초 시험 20명의 남은 △ — 보호자 길 */   /* 11-17 3초 시험 — 생리·알약 식별이 첫 화면에 없던 것 */
+      '<div id="inkpick"></div>' + (document.documentElement.classList.contains('fam') ?
+      '<p class="ink-legal">둘러보기는 그냥 쓰셔도 돼요 · 약을 담거나 기록할 때 약관·개인정보 동의를 받아요 <a href="#/doc/terms">약관</a> · <a href="#/doc/privacy">처리방침</a></p>' : '');   /* 11-17 한가족 — ?fam=1 일 때만(디자인 동결) */   /* 11-17 3초 시험 20명의 남은 △ — 보호자 길 */   /* 11-17 3초 시험 — 생리·알약 식별이 첫 화면에 없던 것 */
   };
   /* 11-17 잉크 증상 화면 — 확인 뒤 맨 위 「그래서 뭘 하면 되나」 한 줄. 화면에 이미 있는 약국 판단(triage.pharmacy)의 첫 문장 그대로(새 문장 없음) */
   window.잉크결론 = function (s) { var t = s && ((s.triage && s.triage.pharmacy) || s.lead); if (!t) return ''; return '<p class="ink-conc">' + fmt(첫문장(String(t))) + '</p>'; };
