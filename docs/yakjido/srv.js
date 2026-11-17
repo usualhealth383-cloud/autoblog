@@ -1730,6 +1730,29 @@ try {
 } catch (e) {}
 
 
+/* 11-17 */
+window.profOthers = function (){ let P = null; try { P = JSON.parse(localStorage.getItem('yakjido.profiles.v1') || 'null'); } catch (e) {} if (!P || !Array.isArray(P.list)) return [];
+  const act = P.active || 'me', out = [];
+  P.list.forEach((p, n) => { if (!p || p.id === act || !/^[a-z0-9]{1,12}$/.test(p.id)) return; let raw = null; try { raw = localStorage.getItem(ME_KEY + '@' + p.id); } catch (e) {} if (!raw) return;
+    out.push({ id: p.id, n, name: String(p.name || '').trim().slice(0, 12) || '가족', me: loadMe(raw) }); });
+  return out; }
+window.withMe = function (m, f){ const keep = ME; ME = m; try { return f(); } finally { ME = keep; } }
+/* 11-17 */
+window.PROF_REL = /^(어머니|아버지|엄마|아빠|아이|아기|첫째|둘째|셋째|배우자|남편|아내|할머니|할아버지|외할머니|외할아버지|시어머니|시아버지|장모님|장인어른|딸|아들|큰딸|작은딸|큰아들|작은아들|언니|오빠|누나|형|동생)$/;
+window.profCall = n => { n = String(n || '').trim(); return window.PROF_REL.test(n) ? n : n + ' 님'; };
+window.profWho = o => o.id === 'me' ? '내' : profCall(o.name);
+window.profKey = key => { const m = (Array.isArray(key) ? key.join(',') : String(key || '')).match(/^p=([a-z0-9]{1,12});(.*)$/); return m ? { id: m[1], keys: m[2] } : null; };
+window.profTick = function (pk, day, how){ const keys = noteKeys(pk.keys); if (!keys.length) return; const k = day || todayKey();
+  if (k !== todayKey() && k !== dayBefore(1)) { toast('지난 알림이라 기록하지 않았어요 — 그분으로 바꿔 복용 시간 화면에서 눌러 주세요'); return; }
+  const o = profOthers().find(x => x.id === pk.id); if (!o) return; const m = o.me;
+  const box = how === 'took' ? (m.taken = m.taken || {}) : (m.skipped = m.skipped || {}), arr = box[k] = box[k] || [];
+  keys.forEach(x => { if (!arr.includes(x)) arr.push(x); });
+  if (how === 'took' && m.skipped && m.skipped[k]) m.skipped[k] = m.skipped[k].filter(x => !keys.includes(x));
+  try { localStorage.setItem(ME_KEY + '@' + pk.id, JSON.stringify(m)); } catch (e) { toast('저장하지 못했어요'); return; }
+  toast(`${profWho(o)} 약을 ${how === 'took' ? '먹었다고' : '건너뛰었다고'} 적어 두었어요`); if (NATIVE) nativeArm(); else armNotifications(); }
+/* 11-17 */
+window.profAct = () => { try { return (JSON.parse(localStorage.getItem('yakjido.profiles.v1') || 'null') || {}).active || 'me'; } catch (e) { return 'me'; } };
+try { if (typeof NATIVE !== 'undefined' && NATIVE && typeof nativeArm === 'function') setTimeout(nativeArm, 0); else if (typeof armNotifications === 'function') setTimeout(armNotifications, 0); } catch (e) {}   /* 가족 알림 함수가 온 뒤 다시 건다 */
 /* 11-17 Main ① 가족 여러 명 약을 한 앱에서 — 기기 안 프로필(나·어머니·아이). 겹침 판정은 사람마다.
    지금 보는 사람의 기록은 늘 yakjido.me.v1 에 둔다(홈·겹침·알림·약통이 그대로 쓴다). 다른 사람 것은 yakjido.me.v1@<id> 에 쉬어 둔다.
    서버 이어 보기·가족 알림(보호자에게 알리기)은 「나」일 때만 — 다른 사람 기록이 내 계정·내 보호자에게 섞이지 않게. 복용 알림은 모든 분 것(app-shell profOthers) */

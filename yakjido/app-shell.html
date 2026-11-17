@@ -1135,7 +1135,7 @@ main > .answer + *, main > .sec + .care, main > .card + .care, main > .rx-card +
 /* 경고·레드플래그 */
 .flag{display:flex;gap:var(--s3);padding:var(--s4);border-radius:var(--r-card);background:var(--alert-tint);border:1px solid rgba(182,54,41,.25)}
 .flag svg.i{color:var(--alert);margin-top:2px}.call svg.i,.flag .call svg.i{color:var(--on-alert,#fff)!important;margin-top:0}
-.flag b{color:var(--alert);display:block;font-size:.9375rem}.flag li b{display:inline;font-size:inherit}.nu{white-space:nowrap}@media(max-width:400px){.top .brand span{display:none}}.sos-pill{display:inline-flex;align-items:center;min-height:36px;padding:0 12px;border-radius:999px;background:var(--alert);color:var(--on-alert,#fff);font-weight:800;font-size:.875rem;text-decoration:none;white-space:nowrap}.flag p b,.young-stop p b{display:inline;font-size:inherit;margin:0}
+.flag b{color:var(--alert);display:block;font-size:.9375rem}.flag li b{display:inline;font-size:inherit}.nu{white-space:nowrap}@media(max-width:400px){.top .brand span{display:none}}.sos-pill{display:inline-flex;align-items:center;flex:none;min-height:44px;padding:0 12px;border-radius:999px;background:var(--alert);color:var(--on-alert,#fff);font-weight:800;font-size:14px;text-decoration:none;white-space:nowrap}.sos-pill.tel-none{display:none}.top .brand{min-width:0;flex:1 1 auto}.top .brand b{overflow-wrap:anywhere}@media(max-width:360px){.top .review-stamp{display:none}}.flag p b,.young-stop p b{display:inline;font-size:inherit;margin:0}
 .flag p{font-size:.875rem;margin-top:2px}
 .flag ul.plain li::before{background:var(--alert)}
 .note{display:flex;gap:var(--s2);padding:var(--s3) var(--s4);border-radius:var(--r-input);background:var(--caution-tint);color:var(--caution);font-size:.875rem;font-weight:600;line-height:1.5}
@@ -5238,29 +5238,8 @@ function unskip(k, keys){ const L = (ME.skipped || {})[k]; if (!L) return; for (
 function skipKeys(keys, day){ const k = day || todayKey(); const T = (ME.taken || {})[k] || [], L = skippedSet(k); let n = 0;
   for (const x of keys) if (!T.includes(x) && !L.includes(x)) { L.push(x); n++; } return n; }
 function skipDose(id, t){ if (skipKeys([id + '@' + t])) { rollDay(); saveMe(); if (NATIVE) nativeArm(); toast('이번 회는 건너뛴 것으로 적었어요 — 다음 시간부터 원래대로 드세요'); } route(); }
-/* 11-17 */
-function profOthers(){ let P = null; try { P = JSON.parse(localStorage.getItem('yakjido.profiles.v1') || 'null'); } catch (e) {} if (!P || !Array.isArray(P.list)) return [];
-  const act = P.active || 'me', out = [];
-  P.list.forEach((p, n) => { if (!p || p.id === act || !/^[a-z0-9]{1,12}$/.test(p.id)) return; let raw = null; try { raw = localStorage.getItem(ME_KEY + '@' + p.id); } catch (e) {} if (!raw) return;
-    out.push({ id: p.id, n, name: String(p.name || '').trim().slice(0, 12) || '가족', me: loadMe(raw) }); });
-  return out; }
-function withMe(m, f){ const keep = ME; ME = m; try { return f(); } finally { ME = keep; } }
-/* 11-17 */
-const PROF_REL = /^(어머니|아버지|엄마|아빠|아이|아기|첫째|둘째|셋째|배우자|남편|아내|할머니|할아버지|외할머니|외할아버지|시어머니|시아버지|장모님|장인어른|딸|아들|큰딸|작은딸|큰아들|작은아들|언니|오빠|누나|형|동생)$/;
-const profCall = n => { n = String(n || '').trim(); return PROF_REL.test(n) ? n : n + ' 님'; };
-const profWho = o => o.id === 'me' ? '내' : profCall(o.name);
-const profKey = key => { const m = (Array.isArray(key) ? key.join(',') : String(key || '')).match(/^p=([a-z0-9]{1,12});(.*)$/); return m ? { id: m[1], keys: m[2] } : null; };
-function profTick(pk, day, how){ const keys = noteKeys(pk.keys); if (!keys.length) return; const k = day || todayKey();
-  if (k !== todayKey() && k !== dayBefore(1)) { toast('지난 알림이라 기록하지 않았어요 — 그분으로 바꿔 복용 시간 화면에서 눌러 주세요'); return; }
-  const o = profOthers().find(x => x.id === pk.id); if (!o) return; const m = o.me;
-  const box = how === 'took' ? (m.taken = m.taken || {}) : (m.skipped = m.skipped || {}), arr = box[k] = box[k] || [];
-  keys.forEach(x => { if (!arr.includes(x)) arr.push(x); });
-  if (how === 'took' && m.skipped && m.skipped[k]) m.skipped[k] = m.skipped[k].filter(x => !keys.includes(x));
-  try { localStorage.setItem(ME_KEY + '@' + pk.id, JSON.stringify(m)); } catch (e) { toast('저장하지 못했어요'); return; }
-  toast(`${profWho(o)} 약을 ${how === 'took' ? '먹었다고' : '건너뛰었다고'} 적어 두었어요`); if (NATIVE) nativeArm(); else armNotifications(); }
-/* 11-17 */
-const profAct = () => { try { return (JSON.parse(localStorage.getItem('yakjido.profiles.v1') || 'null') || {}).active || 'me'; } catch (e) { return 'me'; } };
-function skipFromNote(key, day){ const pk = profKey(key); if (pk) { if (pk.id !== profAct()) return profTick(pk, day, 'skip'); key = pk.keys; } const keys = noteKeys(key); if (!keys.length) return; const k = day || todayKey();
+/* 11-17 가족 알림 도움 함수(profOthers·withMe·profWho·profCall·profKey·profTick·profAct)는 srv.js — 첫 화면 예산 */
+function skipFromNote(key, day){ const pk = window.profKey ? profKey(key) : null; if (pk) { if (pk.id !== profAct()) return profTick(pk, day, 'skip'); key = pk.keys; } const keys = noteKeys(key); if (!keys.length) return; const k = day || todayKey();
   if (k !== todayKey() && k !== dayBefore(1)) { toast('지난 알림이라 기록하지 않았어요 — 복용 시간 화면에서 눌러 주세요'); return; }
   if (skipKeys(keys, k)) { saveMe(); toast('이번 회는 건너뛴 것으로 적었어요'); if (NATIVE) nativeArm(); } }
 const isSkipped = (key, k) => ((ME.skipped || {})[k || todayKey()] || []).includes(key);
@@ -5489,7 +5468,7 @@ async function nativeArmOnce(){
       if (ag.getTime() <= now && items.some(d => !taken.includes(d.id + '@' + t) && !skipped.includes(d.id + '@' + t))) used++; }
     for (const x of capDay(med, nSlot, used)) { delete x.day; delete x.r; list.push(x); }
     /* 11-17 */
-    for (const o of profOthers()) { const m2 = []; let used2 = 0, n2 = 0;
+    for (const o of (window.profOthers ? profOthers() : [])) { const m2 = []; let used2 = 0, n2 = 0;
       withMe(o.me, () => { if (!noteOn('dose')) return; const g = slotGroups().slice(0, 400), tk = takenSet(), sk = skippedSet(), base = 100000 + (o.n % 10) * 20000; n2 = g.length;
         const D2 = g.length ? Math.max(1, Math.min(7, Math.floor(200 / (g.length + 1)))) : 0;
         g.forEach(({ t, items }, i) => { const [h, m] = t.split(':').map(Number);
@@ -5585,7 +5564,7 @@ function armNotifications(){
     const again = new Date(at.getTime() + againMin() * 60000); if (again > now && noteOn('dose') && noteOn('again')) NOTI_TIMERS.push(setTimeout(() => fire(true), again - now));
   }
   /* 11-17 */
-  for (const o of profOthers()) for (const { t, items } of withMe(o.me, () => noteOn('dose') ? slotGroups() : [])) {
+  for (const o of (window.profOthers ? profOthers() : [])) for (const { t, items } of withMe(o.me, () => noteOn('dose') ? slotGroups() : [])) {
     const [h, m] = t.split(':').map(Number); const at = new Date(); at.setHours(h, m, 0, 0); if (at <= now) continue; const day = dayKey(at);
     NOTI_TIMERS.push(setTimeout(() => { const o2 = profOthers().find(x => x.id === o.id); if (!o2) return;
       const L = withMe(o2.me, () => items.filter(d => !takenSet().includes(d.id + '@' + t) && !isSkipped(d.id + '@' + t)));
@@ -5602,7 +5581,7 @@ function armNotifications(){
 /* 알림의 「먹었어요」 — 앱이 열려 있으면 메시지로, 닫혀 있었으면 #/schedule?tick= 으로 들어온다.
    그 알림의 «날짜»에 적는다(5-16) — 밤 10시 알림을 다음 날 아침에 누르면 오늘 저녁 약이 먹은 것으로 적히던 것. 오늘·어제가 아니면 적지 않는다. */
 function tickFromNote(key, day){
-  const pk = profKey(key); if (pk) { if (pk.id !== profAct()) return profTick(pk, day, 'took'); key = pk.keys; }
+  const pk = window.profKey ? profKey(key) : null; if (pk) { if (pk.id !== profAct()) return profTick(pk, day, 'took'); key = pk.keys; }
   const keys = noteKeys(key); if (!keys.length) return; const k = day || todayKey();
   if (k !== todayKey() && k !== dayBefore(1)) { toast('지난 알림이라 기록하지 않았어요 — 복용 시간 화면에서 눌러 주세요'); return; }
   ME.taken = ME.taken || {}; const arr = ME.taken[k] = ME.taken[k] || [];
@@ -5610,7 +5589,7 @@ function tickFromNote(key, day){
   if (add.length) { arr.push(...add); unskip(k, add); rollDay(); saveMe(); toast(k === todayKey() ? '먹었다고 적어 두었어요' : '어제 기록으로 적어 두었어요'); if (NATIVE) nativeArm(); }
 }
 /* Z6 — 웹 알림의 「10분 뒤 다시」: 서비스워커는 10분을 기다려 주지 않으므로 열린 창이 타이머를 건다(창이 닫혀 있으면 서비스워커가 이 화면을 연다) */
-function webSnooze(key, day, title, body){ if (profKey(key)) { setTimeout(() => showNote(title || '약지도 · 약 드실 시간', body || '', key, day), 10 * 60000); toast('10분 뒤에 다시 알려 드릴게요'); return; } const keys = noteKeys(key); if (!keys.length) return;
+function webSnooze(key, day, title, body){ if (window.profKey && profKey(key)) { setTimeout(() => showNote(title || '약지도 · 약 드실 시간', body || '', key, day), 10 * 60000); toast('10분 뒤에 다시 알려 드릴게요'); return; } const keys = noteKeys(key); if (!keys.length) return;
   setTimeout(() => { const k = day || todayKey(), L = keys.filter(x => !((ME.taken || {})[k] || []).includes(x) && !isSkipped(x, k)); if (L.length) showNote(title || '약지도 · 약 드실 시간', body || '약 드실 시간이에요', L.join(','), k); }, 10 * 60000);
   toast('10분 뒤에 다시 알려 드릴게요'); }
 try { navigator.serviceWorker && navigator.serviceWorker.addEventListener('message', ev => { if (ev.data && ev.data.type === 'yakjido-later') { webSnooze(ev.data.key, ev.data.day, ev.data.title, ev.data.body); return; } if (ev.data && ev.data.type === 'yakjido-tick') { if (ev.data.go) { go(ev.data.go); route(); return; } tickFromNote(ev.data.key, ev.data.day); go('/schedule'); route(); } }); } catch (e) {}
@@ -7533,7 +7512,7 @@ function vBag(){
   const tone = stops ? 'stop' : warns || lv !== 'ok' || res.unknown.length ? 'warn' : 'ok';
   return `${topBar({ back:'이전' })}
   <div class="eyebrow">진료실·약국에서</div>
-  <h1 style="font-size:1.375rem">${window.profIsMe && !profIsMe() ? esc(profCall(profName())) + ' 약이에요' : '제가 먹는 약이에요'}</h1>
+  <h1 style="font-size:1.375rem">${window.profIsMe && !profIsMe() ? esc(window.profCall ? profCall(profName()) : profName()) + ' 약이에요' : '제가 먹는 약이에요'}</h1>
   ${!items.length ? `<div class="empty">${emptyArt()}<p><b>아직 담아 두신 약이 없어요.</b><br>약봉투 이름이나 약 사진으로 담으시면 여기 한 장으로 정리돼요.</p><div class="ix-cta"><a class="btn" href="#/photo">${I.eye}약봉투·약 사진으로 담기</a><a class="btn line" href="#/pill">${I.search}이름으로 찾아 담기</a><a class="btn line" href="#/kinds">${I.pill}이름을 모르면 — 종류만 고르기</a></div></div>`
   : `<div class="show-card">
     <div class="show-head">지금 먹는 약 ${items.length}가지${f.length ? ' · ' + f.map(k => esc(FLAG_LABEL[k])).join(' · ') : ''}</div>

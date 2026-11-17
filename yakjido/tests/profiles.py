@@ -15,12 +15,12 @@ with sync_playwright() as p:
     b = p.chromium.launch(executable_path='/opt/pw-browsers/chromium-1194/chrome-linux/chrome', args=['--no-sandbox']); pg = b.new_page(viewport={'width': 390, 'height': 840}, locale='ko-KR')
     errs = []; pg.on('pageerror', lambda e: errs.append(str(e)))
     pg.add_init_script(SEED)
-    pg.goto(URL + '#/home'); pg.wait_for_selector('.job-box', timeout=20000)
-    ok(pg.locator('.prof-row').count() == 0 and pg.locator('a[href="#/people"]').count() == 1, '한 분일 때 이름 줄 없음 · 가족 길 하나')
-    pg.click('a[href="#/people"]'); pg.wait_for_selector('#profName')
+    pg.goto(URL + '#/home'); pg.wait_for_selector('.job-box, .th-mine', timeout=20000)
+    ok(pg.locator('.prof-row').count() == 0 and pg.locator('a[href="#/people"]').count() <= 1, '한 분일 때 이름 줄 없음 · 가족 길 하나')
+    pg.click('text=더 ›'); pg.click('.th-sheet a[href="#/people"]'); pg.wait_for_selector('#profName')   # 11-18 정리 — 가족은 「더 ›」 시트 안
     pg.click('button:has-text("어머니")'); pg.wait_for_timeout(200)
     ok(pg.locator('[aria-label="약을 드실 분의 나이"] button.on').inner_text().strip() == '65세 이상', '어머니 → 65세 이상 기본')
-    pg.click('button:has-text("더하고 그분 약 담기")'); pg.wait_for_load_state('load'); pg.wait_for_selector('.job-hero, .job-box', timeout=20000)
+    pg.click('button:has-text("더하고 그분 약 담기")'); pg.wait_for_load_state('load'); pg.wait_for_selector('.job-hero, .job-box, .th-mine', timeout=20000)
     st = pg.evaluate("({p: JSON.parse(localStorage.getItem('yakjido.profiles.v1')), me: JSON.parse(localStorage.getItem('yakjido.me.v1')), stash: JSON.parse(localStorage.getItem('yakjido.me.v1@me')||'null'), allow: window.profIsMe()})")
     ok(st['p']['active'] != 'me' and len(st['p']['list']) == 2, '어머니가 지금 사람')
     ok(not (st['me'].get('taking') or []) and st['me'].get('age') == 'senior', '어머니 기록은 비어 있고 65세 이상')
@@ -29,11 +29,11 @@ with sync_playwright() as p:
     ok('어머니 약을 담아 두세요' in pg.inner_text('.job-hero'), '머리글이 어머니 님')
     ok(pg.locator('.prof-chip').count() == 3 and pg.locator('.prof-note').count() == 1, '이름 줄 · 알림 안내')
     pg.evaluate("ME.taking=['ibuprofen'];saveMe()")
-    pg.click('.prof-chip:has-text("나")'); pg.wait_for_load_state('load'); pg.wait_for_selector('.job-box', timeout=20000)
+    pg.click('.prof-chip:has-text("나")'); pg.wait_for_load_state('load'); pg.wait_for_selector('.job-box, .th-mine', timeout=20000)
     st = pg.evaluate("({me: JSON.parse(localStorage.getItem('yakjido.me.v1')), keys: Object.keys(localStorage).filter(k=>k.startsWith('yakjido.me.v1@'))})")
     ok(st['me'].get('taking') == ['acetaminophen'], '나로 돌아오면 내 약 그대로')
     ok(len(st['keys']) == 1 and 'ibuprofen' in json.loads(pg.evaluate(f"localStorage.getItem('{st['keys'][0]}')"))['taking'], '어머니 약은 따로 남음')
-    ok('내 약 1가지' in pg.inner_text('.job-box'), '홈 머리글 내 약 1가지')
+    ok('내 약 1가지' in pg.inner_text('.th-mine'), '홈 머리글 내 약 1가지')
     pg.goto(URL + '#/people'); pg.wait_for_selector('.prof-list')
     ok(pg.locator('.prof-list li').count() == 2, '담아 둔 분 둘')
 
@@ -56,7 +56,7 @@ with sync_playwright() as p:
     L2 = pn.evaluate("()=>__LN.pending")
     ok(not any(x.get('title') == '어머니 약 드실 시간' and x['schedule']['at'].startswith('2026-09-28') for x in L2), '먹은 오늘 회차 알림은 지움')
 
-    pn.goto(URL + '#/home'); pn.wait_for_selector('.job-box', timeout=20000); pn.wait_for_timeout(500)
+    pn.goto(URL + '#/home'); pn.wait_for_selector('.job-box, .th-mine', timeout=20000); pn.wait_for_timeout(500)
     ft = pn.inner_text('.fam-today') if pn.locator('.fam-today').count() else ''
     ok('어머니' in ft and '님' not in ft and '오늘 약 다 챙겼어요' in ft, f'오늘 가족 약 — 어머니 다 챙김 표시 ({ft[:40]})')
 
