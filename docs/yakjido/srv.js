@@ -2599,7 +2599,7 @@ try {
 */
 (function () {
   if (window.회원권 && window.회원권.__v) return;
-  var 판 = '2026-11-17d';   /* 11-17d 현욱님 결정 「회원권 폐지 · 앱마다 출시」 — 시트는 앱별 정기 결제 안내 + 다른 앱 1,000원 할인(준비 중) · 홈 띠 끔 · 이름은 그대로(부르는 앱 코드 안 깨지게) */   /* 11-17c 앱 이름 바꿈 — 너스텝(현욱님) */   /* 11-17b 표에 없는 말은 영어 받침 */   /* 11-17a 새 앱 둘(산부인과·너스텝) 스위치 꺼진 채 — 설치({일곱앱:true}) 때만 일곱 앱 */   /* 11-11c 법무 — 가족 나눠 쓰기 문구 폐기(기기 두 대 · 각자 계정) · 두 구독 겹침 결제 안내 */   /* 11-11b 베이지 상자 안쪽 여백 고정(앱 ul 초기화에 지지 않게) · 제목 왼쪽 */
+  var 판 = '2026-11-17e';   /* 11-17e 옛 글표의 묶음 상품 글 걷기(곁에 보고) */   /* 11-17d 현욱님 결정 「회원권 폐지 · 앱마다 출시」 — 시트는 앱별 정기 결제 안내 + 다른 앱 1,000원 할인(준비 중) · 홈 띠 끔 · 이름은 그대로(부르는 앱 코드 안 깨지게) */   /* 11-17c 앱 이름 바꿈 — 너스텝(현욱님) */   /* 11-17b 표에 없는 말은 영어 받침 */   /* 11-17a 새 앱 둘(산부인과·너스텝) 스위치 꺼진 채 — 설치({일곱앱:true}) 때만 일곱 앱 */   /* 11-11c 법무 — 가족 나눠 쓰기 문구 폐기(기기 두 대 · 각자 계정) · 두 구독 겹침 결제 안내 */   /* 11-11b 베이지 상자 안쪽 여백 고정(앱 ul 초기화에 지지 않게) · 제목 왼쪽 */
   /* 값은 여기 한 곳(원칙_결정 10-21·11-03) — 앱 하나: 월 5,900 · 연 49,000(출시 4,900 · 39,900) / 다섯 앱 회원권: 월 12,900 · 연 99,000(출시 9,900 · 79,000) · 체험 14일 */
   var 값표 = { 앱: { 월: 4900, 연: 39900 }, 회원권: { 월: 12900, 연: 99000, 출시월: 9900, 출시연: 79000 } };   /* 11-13 현욱님 — 앱 하나 늘 4,900·39,900(기념가 없음) · 회원권 그대로 */
   var 설정 = { app: 'app', 가로채기: false, 언어: null, 가격: 값표.회원권, 앱가격: 값표.앱, 판매: null, 자료: null,
@@ -2649,61 +2649,61 @@ try {
   function 차례() { return (일곱() || 폐지()) ? 다섯차례.concat(['obgyn', 'nursmart']) : 다섯차례; }
 
   var 글표 = {
-    ko: { 강조줄: '이 기능을 포함해 다섯 앱의 회원 기능 · 값과 늘 열린 것 보기', 제목: '메디나눔 회원권', 머리: '회원권 하나로 <b>다섯 앱</b>이 모두 열려요', 갈래: '아이 · 암 · 마음 · 약 · 진료 계산',
-      월: '월 {n}원', 연: '연 {n}원', 출시: '출시 기념가', 출시뒤: '출시 3개월 안에 가입하면 첫해 동안 · 그 뒤 {월} · {연}', 체험: '14일 써 보고 정하세요', 이앱하나: '이 앱 하나', 회원권다섯: '다섯 앱 회원권', 그뒤: '그 뒤 {월} · {연}', 출시때: '열린 날부터 3개월 안에 가입하면 첫해 이 값이에요', 겹침: '앱 이용권을 쓰고 계시면, 회원권으로 바꿀 때 스토어에서 앱 이용권을 해지해 주세요(둘 다 결제되지 않게)', 두대: '계정 하나로 기기 두 대까지 · 가족은 각자 계정으로', 자동: '14일 체험 뒤 자동 결제돼요 · 부가세 포함 · 설정에서 언제든 해지', 자동곧: '체험 14일 뒤 자동 결제 · 부가세 포함 · 언제든 해지',
+    ko: { 강조줄: '이 기능을 포함해 정기 결제로 열리는 것 · 값과 늘 열린 것 보기', 제목: '이용 요금', 머리: '필요한 앱만 <b>정기 결제</b>해요', 갈래: '아이 · 암 · 마음 · 약 · 진료 계산',
+      월: '월 {n}원', 연: '연 {n}원', 출시: '출시 기념가', 출시뒤: '출시 3개월 안에 가입하면 첫해 동안 · 그 뒤 {월} · {연}', 체험: '14일 써 보고 정하세요', 이앱하나: '이 앱 하나', 회원권다섯: '다른 앱 할인', 그뒤: '그 뒤 {월} · {연}', 출시때: '열린 날부터 3개월 안에 가입하면 첫해 이 값이에요', 겹침: '앱마다 따로 결제하고 따로 해지해요. 할인은 같은 계정으로 확인되면 적용돼요.', 두대: '계정 하나로 기기 두 대까지 · 가족은 각자 계정으로', 자동: '14일 체험 뒤 자동 결제돼요 · 부가세 포함 · 설정에서 언제든 해지', 자동곧: '체험 14일 뒤 자동 결제 · 부가세 포함 · 언제든 해지',
       좋은점: '회원이 되면', 좋1: '폰을 바꿔도 기록이 그대로', 좋1말: '계정에 저장해 새 폰·다른 기기에서 이어서 써요', 좋2: '진료 갈 때 한 장으로', 좋2말: '그동안의 기록을 한 장·PDF로 정리해 보여 드려요', 좋3: '가족과 함께', 좋3말: '아이 여럿 · 가족 약 알림까지 한 계정으로',
-      이앱: '{앱}에서 열리는 것', 지금: '지금 누르신 기능', 강조말: '이 기능은 회원권으로 열려요.', 어디서: '어디서', 열기: '열기',
+      이앱: '{앱}에서 열리는 것', 지금: '지금 누르신 기능', 강조말: '이 기능은 정기 결제로 열려요.', 어디서: '어디서', 열기: '열기',
       다른: '다른 네 앱에서도', 앱열기: '열어 보기', 회원이면: '회원이면', 늘: '늘 열려 있는 것', 늘말: '응급·안전 기능은 회원이 아니어도 <b>늘 열려 있어요</b>.',
-      흐름: '14일 체험은 이렇게', 흐1: '<b>오늘</b> — 다섯 앱이 모두 열려요', 흐2: '<b>12일째</b> — 끝나기 2일 전에 앱에서 미리 알려 드려요', 흐3: '<b>14일째</b> — 해지하지 않으면 고르신 요금으로 이어져요',
+      흐름: '14일 체험은 이렇게', 흐1: '<b>오늘</b> — 이 앱의 기능이 모두 열려요', 흐2: '<b>12일째</b> — 끝나기 2일 전에 앱에서 미리 알려 드려요', 흐3: '<b>14일째</b> — 해지하지 않으면 고르신 요금으로 이어져요',
       곧: '곧 열려요', 곧말: '스토어 등록을 마치면 열려요. 값과 내용을 먼저 보여 드려요.', 알림받기: '열리면 알려 주세요', 알림됨: '열리면 이 앱에서 알려 드릴게요',
       시작: '14일 써 보기', 연시작: '1년으로 시작 · {값}', 이앱만: '이 앱만 쓰기', 해지: '언제든 해지할 수 있어요', 환불: '환불 규정',
-      회원: '회원 · 다섯 앱 열림', 까지: '{날}까지', 회원말: '이 앱에서 바로 쓸 수 있어요', 운영자: '운영자 · 모든 기능', 관리: '구독 관리',
-      이앱구독: '이 앱은 구독으로 열려 있어요. 회원권으로 바꾸면 다른 네 앱도 함께 열려요.',
-      줄설명: '다섯 앱이 한 번에 열려요 · 무엇이 열리는지', 띠: '회원권 하나로 다섯 앱이 모두 열려요', 띠열림: '메디나눔 회원권이 열렸어요', 띠보기: '무엇이 열리나', 닫기: '닫기', 날: '{m}월 {d}일' },
-    en: { 강조줄: 'This feature and the member features of all five apps · price and what stays open', 제목: 'Medinanum Pass', 머리: 'One pass opens <b>all five apps</b>', 갈래: 'Children · cancer · mind · medicines · clinical scores — five sides of family health at once',
-      월: '₩{n}/month', 연: '₩{n}/year', 출시: 'Launch price', 출시뒤: 'Join within 3 months of launch for your first year · then {월} · {연}', 체험: 'Try it for 14 days, then decide', 이앱하나: 'This app only', 회원권다섯: 'Five-app pass', 그뒤: 'then {월} · {연}', 출시때: 'Launch prices apply for your first year if you join within 3 months of the day the pass opens', 겹침: 'If you already subscribe to a single-app plan, both subscriptions may be charged — when switching to the pass, cancel the app plan in your store’s subscription settings', 두대: 'One account on up to two devices · family members each use their own account (records are visible on a shared account)', 자동: 'Billed automatically after the 14-day trial · VAT included · cancel any time in Settings', 자동곧: 'When it opens, billing works like this — the plan you choose is charged automatically on the day the 14-day trial ends · VAT included · cancel any time in Settings',
-      좋은점: 'As a member', 좋1: 'Your records stay when you change phones', 좋1말: 'Saved to your account so you can carry on on a new phone or another device', 좋2: 'One page for your visit', 좋2말: 'Your records gathered on one page or a PDF to show your doctor', 좋3: 'Together with family', 좋3말: 'Several children and family medicine reminders under one account',
-      이앱: 'What opens in {앱}', 지금: 'The feature you just tapped', 강조말: 'This feature opens with the pass. Where to find it is written below.', 어디서: 'Where', 열기: 'Open',
-      다른: 'Also in the other four apps', 앱열기: 'Take a look', 회원이면: 'Members get', 늘: 'Always open', 늘말: 'Emergency and safety features are <b>always open</b>, member or not.',
-      흐름: 'How the 14-day trial works', 흐1: '<b>Today</b> — all five apps open', 흐2: '<b>Day 12</b> — the app reminds you 2 days before the trial ends', 흐3: '<b>Day 14</b> — unless you cancel, it continues at the price you chose',
-      곧: 'Coming soon', 곧말: 'The pass opens as soon as store registration is done. For now you can see the price and what it includes.', 알림받기: 'Tell me when it opens', 알림됨: "We'll let you know in this app when it opens",
+      회원: '정기 결제 중', 까지: '{날}까지', 회원말: '이 앱에서 바로 쓸 수 있어요', 운영자: '운영자 · 모든 기능', 관리: '구독 관리',
+      이앱구독: '',
+      줄설명: '앱마다 정기 결제 · 무엇이 열리는지', 띠: '정기 결제하면 열리는 것', 띠열림: '정기 결제가 열렸어요', 띠보기: '무엇이 열리나', 닫기: '닫기', 날: '{m}월 {d}일' },
+    en: { 강조줄: 'This feature and what a subscription opens · price and what stays open', 제목: 'Pricing', 머리: 'Subscribe <b>only to the apps you need</b>', 갈래: 'While you subscribe to one app, each other MediNanum app is ₩1,000 less a month (coming soon)',
+      월: '₩{n}/month', 연: '₩{n}/year', 출시: 'Launch price', 출시뒤: 'Join within 3 months of launch for your first year · then {월} · {연}', 체험: 'Try it for 14 days, then decide', 이앱하나: 'This app only', 회원권다섯: 'Multi-app discount', 그뒤: 'then {월} · {연}', 출시때: '', 겹침: 'Each app is billed and cancelled on its own. The discount applies once the same account is confirmed.', 두대: 'One account on up to two devices · family members each use their own account (records are visible on a shared account)', 자동: 'Billed automatically after the 14-day trial · VAT included · cancel any time in Settings', 자동곧: 'When it opens, billing works like this — the plan you choose is charged automatically on the day the 14-day trial ends · VAT included · cancel any time in Settings',
+      좋은점: 'With a subscription', 좋1: 'Your records stay when you change phones', 좋1말: 'Saved to your account so you can carry on on a new phone or another device', 좋2: 'One page for your visit', 좋2말: 'Your records gathered on one page or a PDF to show your doctor', 좋3: 'Together with family', 좋3말: 'Several children and family medicine reminders under one account',
+      이앱: 'What opens in {앱}', 지금: 'The feature you just tapped', 강조말: 'This feature opens with a subscription.', 어디서: 'Where', 열기: 'Open',
+      다른: 'Other MediNanum apps — ₩1,000 less a month (coming soon)', 앱열기: 'Take a look', 회원이면: 'Members get', 늘: 'Always open', 늘말: 'Emergency and safety features <b>always stay open</b>, without paying.',
+      흐름: 'How the 14-day trial works', 흐1: '<b>Today</b> — everything in this app opens', 흐2: '<b>Day 12</b> — the app reminds you 2 days before the trial ends', 흐3: '<b>Day 14</b> — unless you cancel, it continues at the price you chose',
+      곧: 'Coming soon', 곧말: 'Subscriptions open as soon as store registration is done. For now you can see the price and what opens.', 알림받기: 'Tell me when it opens', 알림됨: "We'll let you know in this app when it opens",
       시작: 'Try 14 days', 연시작: 'Start yearly · {값}', 이앱만: 'Just this app', 해지: 'Cancel any time', 환불: 'Refund policy',
-      회원: 'Member · all five apps open', 까지: 'until {날}', 회원말: 'You can use these in this app now', 운영자: 'Operator · all features', 관리: 'Manage subscription',
-      이앱구독: 'This app is open with its own subscription. Switch to the pass and the other four apps open too.',
-      줄설명: 'All five apps at once · see what opens', 띠: 'One pass opens all five apps', 띠열림: 'The Medinanum Pass is now open', 띠보기: 'See what opens', 닫기: 'Close', 날: '{mon} {d}' },
-    es: { 강조줄: 'Esta función y las funciones para miembros de las cinco apps · precio y lo que sigue abierto', 제목: 'Pase Medinanum', 머리: 'Un solo pase abre <b>las cinco apps</b>', 갈래: 'Niños · cáncer · salud mental · medicamentos · escalas clínicas: cinco áreas de la salud familiar a la vez',
-      월: '₩{n} al mes', 연: '₩{n} al año', 출시: 'Precio de lanzamiento', 출시뒤: 'Si se suscribe en los 3 primeros meses, durante el primer año · después {월} · {연}', 체험: 'Pruébelo 14 días y luego decida', 이앱하나: 'Solo esta app', 회원권다섯: 'Pase de cinco apps', 그뒤: 'después {월} · {연}', 출시때: 'El precio de lanzamiento se aplica el primer año si se suscribe en los 3 meses siguientes al día en que se abre el pase', 겹침: 'Si ya está suscrito al plan de una app, pueden cobrarse las dos suscripciones; al pasar al pase, cancele el plan de la app en la gestión de suscripciones de la tienda', 두대: 'Una cuenta en hasta dos dispositivos · cada familiar con su propia cuenta (en una cuenta compartida los registros se ven)', 자동: 'Se cobra automáticamente al terminar la prueba de 14 días · IVA incluido · cancele cuando quiera en Ajustes', 자동곧: 'Cuando se abra, el cobro será así: el plan elegido se cobra automáticamente el día en que termina la prueba de 14 días · IVA incluido · cancele cuando quiera en Ajustes',
+      회원: 'Subscribed', 까지: 'until {날}', 회원말: 'You can use these in this app now', 운영자: 'Operator · all features', 관리: 'Manage subscription',
+      이앱구독: '',
+      줄설명: 'Per-app subscription · what opens', 띠: 'What a subscription opens', 띠열림: 'Subscriptions are open', 띠보기: 'See what opens', 닫기: 'Close', 날: '{mon} {d}' },
+    es: { 강조줄: 'Esta función y lo que abre la suscripción · precio y lo que sigue abierto', 제목: 'Pase Medinanum', 머리: 'Suscríbase <b>solo a las apps que necesita</b>', 갈래: 'Mientras esté suscrito a una app, las demás apps de MediNanum cuestan ₩1.000 menos al mes (próximamente)',
+      월: '₩{n} al mes', 연: '₩{n} al año', 출시: 'Precio de lanzamiento', 출시뒤: 'Si se suscribe en los 3 primeros meses, durante el primer año · después {월} · {연}', 체험: 'Pruébelo 14 días y luego decida', 이앱하나: 'Solo esta app', 회원권다섯: 'Descuento entre apps', 그뒤: 'después {월} · {연}', 출시때: '', 겹침: 'Cada app se paga y se cancela por separado. El descuento se aplica al confirmar la misma cuenta.', 두대: 'Una cuenta en hasta dos dispositivos · cada familiar con su propia cuenta (en una cuenta compartida los registros se ven)', 자동: 'Se cobra automáticamente al terminar la prueba de 14 días · IVA incluido · cancele cuando quiera en Ajustes', 자동곧: 'Cuando se abra, el cobro será así: el plan elegido se cobra automáticamente el día en que termina la prueba de 14 días · IVA incluido · cancele cuando quiera en Ajustes',
       좋은점: 'Como miembro', 좋1: 'Sus registros se quedan aunque cambie de móvil', 좋1말: 'Se guardan en su cuenta para seguir en un móvil nuevo u otro dispositivo', 좋2: 'Una hoja para la consulta', 좋2말: 'Sus registros reunidos en una hoja o un PDF para enseñar al médico', 좋3: 'En familia', 좋3말: 'Varios hijos y avisos de medicación familiar en una sola cuenta',
-      이앱: 'Lo que se abre en {앱}', 지금: 'La función que acaba de tocar', 강조말: 'Esta función se abre con el pase. Abajo le indicamos dónde encontrarla.', 어디서: 'Dónde', 열기: 'Abrir',
-      다른: 'También en las otras cuatro apps', 앱열기: 'Ver', 회원이면: 'Con el pase', 늘: 'Siempre abierto', 늘말: 'Las funciones de urgencia y seguridad están <b>siempre abiertas</b>, sea o no miembro.',
-      흐름: 'Así funciona la prueba de 14 días', 흐1: '<b>Hoy</b>: se abren las cinco apps', 흐2: '<b>Día 12</b>: la app le avisa 2 días antes de que termine', 흐3: '<b>Día 14</b>: si no cancela, continúa con el precio que eligió',
-      곧: 'Muy pronto', 곧말: 'El pase se abrirá en cuanto terminemos el registro en la tienda. Por ahora puede ver el precio y lo que incluye.', 알림받기: 'Avísenme cuando se abra', 알림됨: 'Le avisaremos en esta app cuando se abra',
+      이앱: 'Lo que se abre en {앱}', 지금: 'La función que acaba de tocar', 강조말: 'Esta función se abre con la suscripción.', 어디서: 'Dónde', 열기: 'Abrir',
+      다른: 'Otras apps de MediNanum — ₩1.000 menos al mes (próximamente)', 앱열기: 'Ver', 회원이면: 'Con la suscripción', 늘: 'Siempre abierto', 늘말: 'Las funciones de urgencia y seguridad están <b>siempre abiertas</b>, sea o no miembro.',
+      흐름: 'Así funciona la prueba de 14 días', 흐1: '<b>Hoy</b> — se abre todo en esta app', 흐2: '<b>Día 12</b>: la app le avisa 2 días antes de que termine', 흐3: '<b>Día 14</b>: si no cancela, continúa con el precio que eligió',
+      곧: 'Muy pronto', 곧말: 'La suscripción se abrirá en cuanto terminemos el registro en la tienda. Por ahora puede ver el precio y lo que se abre.', 알림받기: 'Avísenme cuando se abra', 알림됨: 'Le avisaremos en esta app cuando se abra',
       시작: 'Probar 14 días', 연시작: 'Empezar con el plan anual · {값}', 이앱만: 'Solo esta app', 해지: 'Puede cancelar cuando quiera', 환불: 'Política de reembolso',
-      회원: 'Miembro · cinco apps abiertas', 까지: 'hasta el {날}', 회원말: 'Puede usarlas ya en esta app', 운영자: 'Operador · todas las funciones', 관리: 'Gestionar la suscripción',
-      이앱구독: 'Esta app está abierta con su propia suscripción. Con el pase se abren también las otras cuatro.',
-      줄설명: 'Las cinco apps a la vez · qué se abre', 띠: 'Un solo pase abre las cinco apps', 띠열림: 'El Pase Medinanum ya está abierto', 띠보기: 'Qué se abre', 닫기: 'Cerrar', 날: '{d} de {mes}' },
-    ja: { 강조줄: 'この機能を含む5つのアプリの会員機能 · 料金といつでも使えるもの', 제목: 'メディナヌム会員パス', 머리: 'パスひとつで<b>5つのアプリ</b>がすべて使えます', 갈래: '子ども・がん・こころ・薬・臨床スコア — 家族の健康の5つの分野をまとめて',
-      월: '月額₩{n}', 연: '年額₩{n}', 출시: '発売記念価格', 출시뒤: '発売から3か月以内の登録で最初の1年間 · その後は{월} · {연}', 체험: '14日間使ってから決めてください', 이앱하나: 'このアプリだけ', 회원권다섯: '5つのアプリの会員パス', 그뒤: 'その後は{월} · {연}', 출시때: '発売記念価格は、会員パスが始まる日から3か月以内に登録すると最初の1年間適用されます', 겹침: 'すでにアプリの利用プランを購読中なら、会員パスと二つの購読が両方課金されることがあります — 会員パスに切り替えるときは、ストアの定期購入の管理でアプリのプランを解約してください', 두대: 'アカウント一つで端末二台まで · 家族の記録はそれぞれのアカウントで（同じアカウントだと見えます）', 자동: '14日間の体験後に自動で課金されます · 税込 · 設定からいつでも解約', 자동곧: '開始後はこのように課金されます — 14日間の体験が終わる日に選んだ料金を自動課金 · 税込 · 設定からいつでも解約',
-      좋은점: '会員になると', 좋1: 'スマホを替えても記録はそのまま', 좋1말: 'アカウントに保存され、新しいスマホや別の端末で続けられます', 좋2: '受診のときは1枚にまとめて', 좋2말: 'これまでの記録を1枚・PDFにまとめて見せられます', 좋3: '家族と一緒に', 좋3말: '子ども複数人・家族の薬の通知までひとつのアカウントで',
-      이앱: '{앱}で使えるようになるもの', 지금: 'いまタップした機能', 강조말: 'この機能は会員パスで使えます。どこで使うかを下に書いてあります。', 어디서: '場所', 열기: '開く',
-      다른: 'ほかの4つのアプリでも', 앱열기: '見てみる', 회원이면: '会員なら', 늘: 'いつでも使えるもの', 늘말: '緊急・安全の機能は会員でなくても<b>いつでも使えます</b>。',
-      흐름: '14日間の体験の流れ', 흐1: '<b>今日</b> — 5つのアプリがすべて使えます', 흐2: '<b>12日目</b> — 終わる2日前にアプリでお知らせします', 흐3: '<b>14日目</b> — 解約しなければ選んだ料金で続きます',
-      곧: 'まもなく開始', 곧말: '会員パスはストアへの登録が済みしだい始まります。いまは料金と内容を先にご覧いただけます。', 알림받기: '始まったら知らせてください', 알림됨: '始まったらこのアプリでお知らせします',
+      회원: 'Suscrito', 까지: 'hasta el {날}', 회원말: 'Puede usarlas ya en esta app', 운영자: 'Operador · todas las funciones', 관리: 'Gestionar la suscripción',
+      이앱구독: '',
+      줄설명: 'Suscripción por app · qué se abre', 띠: 'Qué abre la suscripción', 띠열림: 'El Pase Medinanum ya está abierto', 띠보기: 'Qué se abre', 닫기: 'Cerrar', 날: '{d} de {mes}' },
+    ja: { 강조줄: 'この機能を含め定期購入で使えるもの · 料金といつも使えるもの', 제목: '料金', 머리: '<b>必要なアプリだけ</b>定期購入', 갈래: '1つのアプリを定期購入している間、ほかのメディナヌムのアプリは月₩1,000引き(準備中)',
+      월: '月額₩{n}', 연: '年額₩{n}', 출시: '発売記念価格', 출시뒤: '発売から3か月以内の登録で最初の1年間 · その後は{월} · {연}', 체험: '14日間使ってから決めてください', 이앱하나: 'このアプリだけ', 회원권다섯: 'アプリ間割引', 그뒤: 'その後は{월} · {연}', 출시때: '', 겹침: 'アプリごとに支払い・解約します。割引は同じアカウントの確認後に適用されます。', 두대: 'アカウント一つで端末二台まで · 家族の記録はそれぞれのアカウントで（同じアカウントだと見えます）', 자동: '14日間の体験後に自動で課金されます · 税込 · 設定からいつでも解約', 자동곧: '開始後はこのように課金されます — 14日間の体験が終わる日に選んだ料金を自動課金 · 税込 · 設定からいつでも解約',
+      좋은점: '定期購入すると', 좋1: 'スマホを替えても記録はそのまま', 좋1말: 'アカウントに保存され、新しいスマホや別の端末で続けられます', 좋2: '受診のときは1枚にまとめて', 좋2말: 'これまでの記録を1枚・PDFにまとめて見せられます', 좋3: '家族と一緒に', 좋3말: '子ども複数人・家族の薬の通知までひとつのアカウントで',
+      이앱: '{앱}で使えるようになるもの', 지금: 'いまタップした機能', 강조말: 'この機能は定期購入で使えます。', 어디서: '場所', 열기: '開く',
+      다른: 'ほかの4つのアプリでも', 앱열기: '見てみる', 회원이면: '定期購入すると', 늘: 'いつでも使えるもの', 늘말: '緊急・安全の機能は支払わなくても<b>いつでも使えます</b>。',
+      흐름: '14日間の体験の流れ', 흐1: '<b>今日</b> — このアプリの機能がすべて使えます', 흐2: '<b>12日目</b> — 終わる2日前にアプリでお知らせします', 흐3: '<b>14日目</b> — 解約しなければ選んだ料金で続きます',
+      곧: 'まもなく開始', 곧말: 'ストアへの登録が済みしだい定期購入が始まります。いまは料金と内容を先にご覧いただけます。', 알림받기: '始まったら知らせてください', 알림됨: '始まったらこのアプリでお知らせします',
       시작: '14日間使ってみる', 연시작: '年額で始める · {값}', 이앱만: 'このアプリだけ使う', 해지: 'いつでも解約できます', 환불: '返金の規定',
-      회원: '会員 · 5つのアプリが使えます', 까지: '{날}まで', 회원말: 'このアプリですぐに使えます', 운영자: '運営者 · すべての機能', 관리: 'サブスクリプションの管理',
-      이앱구독: 'このアプリは個別のサブスクリプションでご利用いただけます。会員パスに替えるとほかの4つのアプリも使えます。',
-      줄설명: '5つのアプリがまとめて使えます · 中身を見る', 띠: 'パスひとつで5つのアプリがすべて使えます', 띠열림: 'メディナヌム会員パスが始まりました', 띠보기: '中身を見る', 닫기: '閉じる', 날: '{m}月{d}日' },
-    zh: { 강조줄: '包括这个功能在内的五个应用会员功能 · 价格和一直开放的功能', 제목: 'Medinanum 会员卡', 머리: '一份会员订阅即可使用<b>全部五个应用</b>的会员功能', 갈래: '儿童 · 癌症 · 心理 · 用药 · 临床评分——家庭健康的五个方面一次全开',
-      월: '每月₩{n}', 연: '每年₩{n}', 출시: '上线纪念价', 출시뒤: '上线 3 个月内加入，第一年适用 · 之后{월} · {연}', 체험: '先用 14 天再决定', 이앱하나: '仅此应用', 회원권다섯: '五个应用会员', 그뒤: '之后{월} · {연}', 출시때: '自会员开放之日起 3 个月内加入，第一年享受上线纪念价', 겹침: '如果已订阅单个应用的方案，会员和该订阅可能会同时扣费——改用会员时，请在应用商店的订阅管理中取消单个应用方案', 두대: '一个账号最多两台设备 · 家人各用自己的账号（同一账号记录会互相看到）', 자동: '14 天试用结束后自动扣费 · 含增值税 · 可随时在设置中取消', 자동곧: '开放后将这样扣费——14 天试用结束当天自动扣除所选方案的费用 · 含增值税 · 可随时在设置中取消',
-      좋은점: '成为会员后', 좋1: '换手机记录也还在', 좋1말: '保存在账号里，换新手机或其他设备也能接着用', 좋2: '就诊时一页就够', 좋2말: '把这段时间的记录整理成一页或 PDF 给医生看', 좋3: '和家人一起', 좋3말: '多个孩子、家人的用药提醒都在一个账号里',
-      이앱: '{앱}里会打开的功能', 지금: '您刚才点的功能', 강조말: '这个功能需要会员卡。在哪里使用写在下面。', 어디서: '位置', 열기: '打开',
-      다른: '另外四个应用里也有', 앱열기: '去看看', 회원이면: '会员可用', 늘: '一直开放的功能', 늘말: '急救和安全功能不是会员也<b>一直开放</b>。',
-      흐름: '14 天试用是这样的', 흐1: '<b>今天</b>——即可使用全部五个应用的会员功能', 흐2: '<b>第 12 天</b>——结束前 2 天在应用里提前提醒您', 흐3: '<b>第 14 天</b>——如果不取消，就按您选的价格继续',
-      곧: '即将开放', 곧말: '会员卡在应用商店登记完成后就会开放。现在可以先看价格和内容。', 알림받기: '开放时通知我', 알림됨: '开放时会在这个应用里通知您',
+      회원: '定期購入中', 까지: '{날}まで', 회원말: 'このアプリですぐに使えます', 운영자: '運営者 · すべての機能', 관리: 'サブスクリプションの管理',
+      이앱구독: '',
+      줄설명: 'アプリごとの定期購入 · 使えるもの', 띠: '定期購入で使えるもの', 띠열림: '定期購入が始まりました', 띠보기: '中身を見る', 닫기: '閉じる', 날: '{m}月{d}日' },
+    zh: { 강조줄: '此功能及订阅后开放的内容 · 价格与始终开放的内容', 제목: '价格', 머리: '<b>只订阅需要的应用</b>', 갈래: '订阅一个应用期间，其他 MediNanum 应用每月少付 ₩1,000（即将推出）',
+      월: '每月₩{n}', 연: '每年₩{n}', 출시: '上线纪念价', 출시뒤: '上线 3 个月内加入，第一年适用 · 之后{월} · {연}', 체험: '先用 14 天再决定', 이앱하나: '仅此应用', 회원권다섯: '多应用优惠', 그뒤: '之后{월} · {연}', 출시때: '', 겹침: '每个应用单独付费、单独取消。确认为同一账号后适用优惠。', 두대: '一个账号最多两台设备 · 家人各用自己的账号（同一账号记录会互相看到）', 자동: '14 天试用结束后自动扣费 · 含增值税 · 可随时在设置中取消', 자동곧: '开放后将这样扣费——14 天试用结束当天自动扣除所选方案的费用 · 含增值税 · 可随时在设置中取消',
+      좋은점: '订阅后', 좋1: '换手机记录也还在', 좋1말: '保存在账号里，换新手机或其他设备也能接着用', 좋2: '就诊时一页就够', 좋2말: '把这段时间的记录整理成一页或 PDF 给医生看', 좋3: '和家人一起', 좋3말: '多个孩子、家人的用药提醒都在一个账号里',
+      이앱: '{앱}里会打开的功能', 지금: '您刚才点的功能', 강조말: '此功能需订阅后开放。', 어디서: '位置', 열기: '打开',
+      다른: '其他 MediNanum 应用 — 每月少付 ₩1,000（即将推出）', 앱열기: '去看看', 회원이면: '订阅后', 늘: '一直开放的功能', 늘말: '急救与安全功能<b>始终开放</b>，无需付费。',
+      흐름: '14 天试用是这样的', 흐1: '<b>今天</b> — 此应用的功能全部开放', 흐2: '<b>第 12 天</b>——结束前 2 天在应用里提前提醒您', 흐3: '<b>第 14 天</b>——如果不取消，就按您选的价格继续',
+      곧: '即将开放', 곧말: '应用商店登记完成后即可订阅。现在可以先看价格和内容。', 알림받기: '开放时通知我', 알림됨: '开放时会在这个应用里通知您',
       시작: '试用 14 天', 연시작: '按年开始 · {값}', 이앱만: '只用这个应用', 해지: '随时可以取消', 환불: '退款规定',
-      회원: '会员 · 已开通五个应用的会员功能', 까지: '到{날}', 회원말: '在这个应用里马上就能用', 운영자: '运营者 · 全部功能', 관리: '管理订阅',
-      이앱구독: '您已单独订阅此应用。改用会员订阅后，也可使用另外四个应用的会员功能。',
-      줄설명: '五个应用一次全开 · 看看有什么', 띠: '一份会员订阅即可使用全部五个应用的会员功能', 띠열림: 'Medinanum 会员卡已开放', 띠보기: '看看有什么', 닫기: '关闭', 날: '{m}月{d}日' }
+      회원: '订阅中', 까지: '到{날}', 회원말: '在这个应用里马上就能用', 운영자: '运营者 · 全部功能', 관리: '管理订阅',
+      이앱구독: '',
+      줄설명: '按应用订阅 · 开放内容', 띠: '订阅后开放的内容', 띠열림: '订阅已开放', 띠보기: '看看有什么', 닫기: '关闭', 날: '{m}月{d}日' }
   };
 
   /* 11-17d 폐지글 — 묶음 상품이 없어진 뒤 보이는 글(이 표에 있는 열쇠가 먼저) */
@@ -2824,7 +2824,7 @@ try {
     if (폐지()) h += '<div class="mb-plans">' + 줄값(a, 글('이앱하나') + (앱 ? ' · ' + esc(골라(앱.이름)) : ''), true) + '<div class="mb-plan"><b class="mb-pn">' + 글('할인칸') + '</b><span class="mb-chip">' + 글('할인곧') + '</span><p class="mb-price"><b>' + 월값(Math.max(0, (a.월 || 0) - 1000)) + '</b></p></div></div>';
     else h += '<div class="mb-plans">' + 줄값(a, 글('이앱하나') + (앱 ? ' · ' + esc(골라(앱.이름)) : ''), false) + 줄값(g, 글('회원권다섯'), true) + '</div>';
     var 지금앱 = (설정.자료 && 설정.자료.앱) || 설정.app;
-    if (새앱들[지금앱] && !일곱() && !폐지()) h += '<p class="mb-small">' + ({ ko: '이 앱은 곧 회원권에 들어가요. 지금은 「이 앱 하나」로 쓰실 수 있어요.', en: 'This app will join the membership soon. For now, use the single-app plan.', es: 'Esta app se sumará pronto a la membresía. Por ahora, use el plan de una app.', ja: 'このアプリはまもなく会員権に加わります。今は「このアプリだけ」で使えます。', zh: '此应用即将加入会员。目前请使用「单个应用」方案。' }[언어()] || '') + '</p>';   /* 11-17 — 새 앱 안에서 회원권이 이 앱을 연다고 말하지 않게 */
+    /* 11-17e — 새 앱 「곧 회원권에 들어가요」 줄은 묶음 상품 폐지로 걷음 */
     if (폐지() ? a.출시월 : (g.출시월 || a.출시월)) h += '<p class="mb-small">' + 글('출시때') + '</p>';
     h += '<p class="mb-auto">' + 글(판매() ? '자동' : '자동곧') + '</p>';
     h += '<p class="mb-auto">' + 글('겹침') + '</p>';   /* 11-11 법무 — 앱 이용권과 회원권이 함께 결제될 수 있음 · 바꾸는 법 */
