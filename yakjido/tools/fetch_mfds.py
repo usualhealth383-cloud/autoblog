@@ -266,6 +266,20 @@ def main():
             print(f'의약외품(정상) {len(Q):,}건')
         except (Exception, SystemExit) as e:
             print('의약외품 받기 실패 — 건너뜀:', e)
+    if only == 'updates':   # 11-17 내용 대조 ① — 우리 e약은요 사본(2026-10-13) 뒤에 식약처가 고친 품목 목록만(본문은 받지 않음)
+        BASE = '2026-10-13'
+        rows = fetch_all(EASY_OP, k, 'e약은요 갱신일')
+        use = set()
+        if (OUT / 'easy-index.json').exists():
+            for x in json.loads((OUT / 'easy-index.json').read_text(encoding='utf-8')):
+                if x.get('map'): use.add(x.get('seq'))
+        def d(v):
+            v = re.sub(r'[^0-9]', '', s(v))[:8]; return (v[:4] + '-' + v[4:6] + '-' + v[6:8]) if len(v) == 8 else ''
+        ch = sorted(({'seq': s(r.get('itemSeq')), 'n': s(r.get('itemName')), 'm': s(r.get('entpName')), 'upd': d(r.get('updateDe')), 'open': d(r.get('openDe')),
+                      'app': s(r.get('itemSeq')) in use} for r in rows if d(r.get('updateDe')) > BASE), key=lambda x: (not x['app'], x['upd']), reverse=False)
+        out = {'fetched': time.strftime('%Y-%m-%d'), 'base': BASE, 'total': len(rows), 'changed': len(ch), 'changed_in_app': sum(1 for x in ch if x['app']), 'items': ch}
+        (ROOT / 'tools' / 'easy-updates.json').write_text(json.dumps(out, ensure_ascii=False, indent=1), encoding='utf-8')
+        print(f'  e약은요 {len(rows)}건 중 {BASE} 뒤 갱신 {len(ch)}건(앱이 쓰는 성분 연결 {out["changed_in_app"]}건)')
     if only == 'labels':   # 전체 받기('')에는 넣지 않는다 — 따로 돌린다
         _old = ROOT / 'tools' / 'rxlabels.json'
         L = rx_labels(k, json.loads(_old.read_text(encoding='utf-8')).get('labels', {}) if _old.exists() else {})

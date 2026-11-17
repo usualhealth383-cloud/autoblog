@@ -33,11 +33,12 @@ jobs:
           if [ -z "$DATA_GO_KR_KEY" ]; then echo "::error::Secrets 에 DATA_GO_KR_KEY 가 없습니다"; exit 1; fi
           pip install -q pypdf
           python3 -u yakjido/tools/fetch_mfds.py --only labels
+          python3 -u yakjido/tools/fetch_mfds.py --only updates || echo '갱신일 받기 실패'
       - name: 작업 가지에 올리기
         run: |
           git config user.name "yakjido-data-bot"
           git config user.email "yakjido-data-bot@users.noreply.github.com"
-          git add yakjido/tools/rxlabels.json
+          git add yakjido/tools/rxlabels.json yakjido/tools/easy-updates.json 2>/dev/null || git add yakjido/tools/rxlabels.json
           if git diff --cached --quiet; then echo "바뀐 것 없음"; exit 0; fi
           git commit -m "약지도 — 처방약 길잡이 대조용 식약처 허가 상세(OpenAPI)"
           ok=0; for i in 1 2 3; do if git pull --rebase origin "${GITHUB_REF_NAME}" && git push origin "HEAD:${GITHUB_REF_NAME}"; then ok=1; break; fi; sleep 5; done
