@@ -679,7 +679,7 @@
        다섯 앱이 공용 서버의 같은 계정 id 로 RevenueCat 에 들어가므로 다른 앱에서 산 회원권도 보인다. 서버 표는 pass_subscriptions(plan 'pass_month' · 'pass_year').
      · 초대 코드(가입 부품 _도구/가입_부품.js) — 서버가 plan 'invite' 로 돌려주면 「초대 코드로 체험 중 · ○월 ○일까지」(결제 글 없음). */
 (function () {
-  var 판 = '2026-11-13d';
+  var 판 = '2026-11-17e';   /* 11-17e 묶음 상품 폐지 — 다른 앱 1,000원 할인 안내(준비 중) */
   var 응급기본 = ['crisis', 'sos', 'emergency', 'danger', 'call109', 'call119', 'call15770199', 'safety_plan', 'er', 'er_find', 'where'];
   var 설정 = { app: 'app', 유료화: false, 가격: { 월: 0 }, 회원권: null, 잠금: {}, 면제: null, 응급: [], 결제사: null, 결제: null, 계정: true, 말: null, 문구: {}, 학생인증: null,
                인증: { 휴대폰: false, 공동: false }, 시트열기: null, 시트닫기: null, 알림: null, 로그인열기: null, 바뀜: null,
@@ -699,7 +699,7 @@
       전환: '14일 체험이 끝나면 {값}이 결제됩니다. 그 전에 언제든 해지할 수 있습니다.',
       동의: '(필수) 14일 체험이 끝나는 {날}에 {값}이 결제됩니다. 그 전에 언제든 해지할 수 있습니다.',
       체험끝: '14일 체험이 끝났어요.', 기간끝: '구독 기간이 끝났어요.', 기록그대로: '그동안 남긴 기록은 그대로 있어요.', 기록그대로2: '남긴 기록은 그대로 있어요.',
-      회원권권함: '앱을 3개 이상 쓰시면 메디나눔 회원권이 더 알뜰해요 — 다섯 앱을 월 {회원권값}에', 회원권보기: '회원권 보기',
+      회원권권함: '다른 메디나눔 앱도 쓰시면 — 한 앱을 정기 결제하는 동안 다른 앱은 월 1,000원 덜 내요(준비 중)', 회원권보기: '요금 보기',
       로그인하러: '로그인하러 가기', 닫기: '닫기', 체험시작: '14일 체험 시작', 결제수단: '결제수단 등록',
       결제준비: '결제 준비 중이에요. 지금은 결제되지 않아요.', 결제준비짧게: '결제 준비 중이에요.',
       /* 2026-10-20 — 결제 단추 바로 위 고지(전자상거래법 13조 · Play 구독 정책). 요청 20261020_ClinicScore_메디나눔_구독부품글표 */
@@ -715,8 +715,8 @@
       다시동의: '결제가 시작되기 전에 요금·결제일을 보여 드리고 다시 동의를 받아요.',
       동의준비: '(필수) 14일 체험은 {날}에 끝나요. 결제가 시작되기 전에 요금·결제일을 보여 드리고 다시 동의를 받아요.',
       요금: '요금', 학생기본: '학생', 학생인증준비: '인증은 준비 중이에요', 학생인증단추: '학생 인증하기',
-      출시가: '출시 기념가', 출시조건: '출시 3개월 안에 가입하면 첫 1년', 회원권: '메디나눔 회원권', 회원권설명: '다섯 앱을 함께 쓰는 이용권', 회원권자격: 'ClinicScore 의료인 기능은 의료인 확인 뒤 열려요',
-      곧: '곧 열려요', 출시값: '{값}(출시 기념가 · 첫 1년, 둘째 해부터 {정가})', 출시값둘: '출시 기념가 {값} — 첫 1년, 둘째 해부터 {정가}', 초대중: '<b>초대 코드로 체험 중</b> · {날}까지', 초대뒤: '이 기간에는 결제되지 않아요. 기간이 끝나면 일반 상태로 돌아가요.', 회원권시작: '회원권으로 시작', 회원권연시작: '회원권 1년으로 시작 · {값}', 회원권중: '메디나눔 회원권으로 열려 있어요.',
+      출시가: '출시 기념가', 출시조건: '출시 3개월 안에 가입하면 첫 1년', 회원권: '다른 앱 할인', 회원권설명: '다른 메디나눔 앱을 정기 결제 중이면', 회원권자격: 'ClinicScore 의료인 기능은 의료인 확인 뒤 열려요',
+      곧: '곧 열려요', 출시값: '{값}(출시 기념가 · 첫 1년, 둘째 해부터 {정가})', 출시값둘: '출시 기념가 {값} — 첫 1년, 둘째 해부터 {정가}', 초대중: '<b>초대 코드로 체험 중</b> · {날}까지', 초대뒤: '이 기간에는 결제되지 않아요. 기간이 끝나면 일반 상태로 돌아가요.', 회원권시작: '정기 결제로 시작', 회원권연시작: '1년 정기 결제로 시작 · {값}', 회원권중: '정기 결제로 열려 있어요.',
       이유: { login: '먼저 로그인해 주세요.', verify: '메일함의 확인 링크를 먼저 눌러 주세요. 확인한 계정에서 체험이 시작돼요.',
               used_account: '이 계정은 14일 체험을 이미 쓰셨어요.', used_device: '이 기기에서는 14일 체험을 이미 쓰셨어요.', used_person: '이 계정의 메일이나 로그인 정보로 14일 체험을 이미 쓰셨어요.',
               device: '이 브라우저에서는 체험을 시작할 수 없어요. 다른 브라우저로 해 주세요.', app: '잠시 문제가 있었어요. 다시 해 주세요.',
@@ -756,7 +756,7 @@
       전환: 'When the 14-day trial ends, {값} will be charged. You can cancel any time before then.',
       동의: '(Required) When the 14-day trial ends on {날}, {값} will be charged. You can cancel any time before then.',
       체험끝: 'Your 14-day trial has ended.', 기간끝: 'Your subscription period has ended.', 기록그대로: 'Everything you recorded is still here.', 기록그대로2: 'Everything you recorded is still here.',
-      회원권권함: 'Using three or more apps? The MediNanum pass is better value — all five apps for {회원권값} a month', 회원권보기: 'See the pass',
+      회원권권함: 'Use another MediNanum app too? While you subscribe to one app, each other app is ₩1,000 less a month (coming soon)', 회원권보기: 'See prices',
       로그인하러: 'Sign in', 닫기: 'Close', 체험시작: 'Start 14-day trial', 결제수단: 'Add payment method',
       결제준비: 'Payments are not set up yet. Nothing is charged now.', 결제준비짧게: 'Payments are not set up yet.',
       고지첫결제: 'First charge — {값} on {날}, when the 14-day trial ends.',
@@ -771,8 +771,8 @@
       다시동의: 'Before any payment starts, we will show you the price and billing date and ask for your consent again.',
       동의준비: '(Required) The 14-day trial ends on {날}. Before any payment starts, we will show you the price and billing date and ask for your consent again.',
       요금: 'Price', 학생기본: 'students', 학생인증준비: 'verification is coming soon', 학생인증단추: 'Verify student status',
-      출시가: 'Launch price', 출시조건: 'first year, if you join within 3 months of launch', 회원권: 'MediNanum pass', 회원권설명: 'one plan for all five apps', 회원권자격: 'ClinicScore professional tools open after the professional check',
-      곧: 'coming soon', 출시값: '{값} (launch price for the first year; {정가} from the second year)', 출시값둘: 'launch price {값} for the first year; {정가} from the second year', 초대중: '<b>Invite access</b> · until {날}', 초대뒤: 'Nothing is charged during this period. Afterwards it returns to normal.', 회원권시작: 'Start with the pass', 회원권연시작: 'Start a 1-year pass · {값}', 회원권중: 'Open through your MediNanum pass.',
+      출시가: 'Launch price', 출시조건: 'first year, if you join within 3 months of launch', 회원권: 'Multi-app discount', 회원권설명: 'if you subscribe to another MediNanum app', 회원권자격: 'ClinicScore professional tools open after the professional check',
+      곧: 'coming soon', 출시값: '{값} (launch price for the first year; {정가} from the second year)', 출시값둘: 'launch price {값} for the first year; {정가} from the second year', 초대중: '<b>Invite access</b> · until {날}', 초대뒤: 'Nothing is charged during this period. Afterwards it returns to normal.', 회원권시작: 'Start subscription', 회원권연시작: 'Start a 1-year subscription · {값}', 회원권중: 'Open through your subscription.',
       이유: { login: 'Please sign in first.', verify: 'Please open the confirmation link in your email first. The trial starts on a confirmed account.',
               used_account: 'This account has already used the 14-day trial.', used_device: 'This device has already used the 14-day trial.', used_person: 'The 14-day trial has already been used with this email or sign-in.',
               device: 'The trial cannot be started in this browser. Please try another browser.', app: 'Something went wrong. Please try again.',
@@ -803,9 +803,9 @@
       복원됨: 'Purchases restored.', 복원없음: 'No purchases to restore. Please check that the Google account you bought with is signed in on this phone.'
     },
     /* 11-03 소아 요청 — es·ja·zh(다섯 앱 막힘 시트·관리·고지) */
-    es: {"체험끝줄": "Su prueba de 14 días termina en {n} días · Ver precio y cómo cancelar", "체험끝줄내일": "Su prueba de 14 días termina mañana · Ver precio y cómo cancelar", "체험끝줄오늘": "Su prueba de 14 días termina hoy · Ver precio y cómo cancelar", "체험끝제목": "Su prueba termina en 3 días", "체험끝몸": "Si no quiere continuar, cancele antes del {날}. El precio y cómo cancelar están en la pantalla Suscripción de la app.", "꼴": "unos {값}", "구독": "Suscripción", "이기능": "Esta función", "잠김": "<b>{이름}</b> forma parte de la suscripción.", "응급기본": "La ayuda de urgencia siempre está abierta.", "계정으로": "La prueba empieza desde una cuenta. Inicie sesión y confirme su correo para usarlo todo durante 14 días.", "계정없음": "La prueba y la suscripción aún se están preparando. Esta función todavía no se puede abrir.", "전환날": "Tras la prueba de 14 días, se cobrará {값} a partir del {날}. Puede cancelar cuando quiera antes de esa fecha.", "전환": "Cuando termine la prueba de 14 días, se cobrará {값}. Puede cancelar cuando quiera antes.", "동의": "(Obligatorio) Cuando la prueba de 14 días termine el {날}, se cobrará {값}. Puede cancelar cuando quiera antes de esa fecha.", "체험끝": "Su prueba de 14 días ha terminado.", "기간끝": "Su periodo de suscripción ha terminado.", "기록그대로": "Todo lo que anotó sigue aquí.", "기록그대로2": "Todo lo que anotó sigue aquí.", "로그인하러": "Iniciar sesión", "닫기": "Cerrar", "체험시작": "Empezar la prueba de 14 días", "결제수단": "Añadir método de pago", "결제준비": "Los pagos aún no están configurados. Ahora no se cobra nada.", "결제준비짧게": "Los pagos aún no están configurados.", "고지첫결제": "Primer cobro: {값} el {날}, cuando termine la prueba de 14 días.", "고지첫결제날없음": "Primer cobro: {값} el día en que termine la prueba de 14 días.", "고지갱신": "Renovación: se renueva automáticamente cada {주기}. Se cobra hasta que cancele.", "고지주기월": "mes", "고지주기연": "año", "고지해지스토어": "Cancelar: cuando quiera, en la tienda donde la compró: Google Play “Pagos y suscripciones → Suscripciones”, App Store “Cuenta → Suscripciones”. Borrar la app no la cancela.", "고지해지앱": "Cancelar: cuando quiera, en la pantalla “Suscripción y pagos” de esta app. Borrar la app no la cancela.", "고지검토": "<b>Vista previa de revisión</b>: esto es lo que aparecerá sobre el botón de pago cuando se abran los pagos. Ahora no se cobra nada.", "고지복원": "Restaurar: si cambia de teléfono o reinstala, “Restaurar compra” recupera su suscripción.", "약관": "Condiciones del servicio", "처리방침": "Política de privacidad", "환불안내": "Reembolsos y cancelación", "다시동의": "Antes de que empiece cualquier pago, le mostraremos el precio y la fecha de cobro y volveremos a pedirle su consentimiento.", "동의준비": "(Obligatorio) La prueba de 14 días termina el {날}. Antes de que empiece cualquier pago, le mostraremos el precio y la fecha de cobro y volveremos a pedirle su consentimiento.", "요금": "Precio", "학생기본": "estudiantes", "학생인증준비": "la verificación llegará pronto", "학생인증단추": "Verificar que es estudiante", "출시가": "Precio de lanzamiento", "출시조건": "el primer año, si se suscribe en los 3 meses siguientes al lanzamiento", "회원권": "Pase MediNanum", "회원권설명": "un plan para las cinco apps", "회원권자격": "Las herramientas profesionales de ClinicScore se abren tras la verificación profesional", "곧": "muy pronto", "출시값": "{값} (precio de lanzamiento el primer año; {정가} desde el segundo año)", "출시값둘": "precio de lanzamiento {값} el primer año; {정가} desde el segundo año", "초대중": "<b>Acceso por invitación</b> · hasta el {날}", "초대뒤": "Durante este periodo no se cobra nada. Después vuelve a lo normal.", "회원권시작": "Empezar con el pase", "회원권연시작": "Empezar un pase de 1 año · {값}", "회원권중": "Abierto con su pase MediNanum.", "이유": {"login": "Inicie sesión primero.", "verify": "Abra primero el enlace de confirmación de su correo. La prueba empieza en una cuenta confirmada.", "used_account": "Esta cuenta ya usó la prueba de 14 días.", "used_device": "Este dispositivo ya usó la prueba de 14 días.", "used_person": "La prueba de 14 días ya se usó con este correo o inicio de sesión.", "device": "No se puede empezar la prueba en este navegador. Pruebe con otro navegador.", "app": "Algo salió mal. Inténtelo de nuevo.", "noacct": "Podrá empezar la prueba cuando se abran las cuentas."}, "체크": "Lea el aviso de cobro y marque la casilla.", "인터넷": "No hay conexión a internet. Inténtelo de nuevo cuando esté conectado.", "체험됨": "Su prueba de 14 días ha empezado. Todo está abierto hasta el {날}.", "해지취소됨": "Cancelación retirada. Su plan continúa.", "해지됨": "Cancelado. ", "까지그대로": "Puede seguir usándolo hasta el {날}.", "카드결제": "Se cobrará {값} el {날}. Si no lo desea, puede cancelar antes.", "카드준비": "Su prueba de 14 días termina el {날}. Antes de que empiece cualquier pago, le mostraremos el precio y la fecha de cobro y volveremos a pedirle su consentimiento.", "해지자세히": "Cancelar · detalles", "카드닫기이름": "Cerrar aviso de cobro", "관리로그인": "Inicie sesión para ver su suscripción.", "관리계정없음": "Cuando se abran las cuentas, podrá empezar la prueba y ver aquí su suscripción.", "아직": "Todavía no ha empezado la prueba.", "관리전환": "Tras la prueba de 14 días, se cobrará {값}. Puede cancelar cuando quiera antes.", "구독중": "Suscrito", "체험중": "En prueba", "남음": " · quedan {n} días", "까지괄호": " (hasta el {날})", "해지예약": "Cancelación programada. ", "해지예약뒤": "Puede seguir usándolo hasta el {날} y después no se cobrará nada.", "해지취소": "Deshacer la cancelación", "다음결제": "Próximo pago {날} · {값}", "해지하기": "Cancelar", "해지해도": "Aunque cancele, puede seguir usándolo hasta el {날}.", "기간끝말": "el final del periodo", "휴대폰": "Verificar por teléfono", "공동": "Verificar con certificado", "미연결": "Aún no está conectado.", "문제": "Algo salió mal.", "복원": "Restaurar compras", "다시구독": "Suscribirse de nuevo", "스토어관리": "Gestionar en la tienda", "스토어해지": "Cancele desde los ajustes de suscripción de la tienda. Aunque cancele, puede seguir usándolo hasta el {날}.", "결제취소": "Pago cancelado. No ha cambiado nada.", "결제안됨": "El pago no se completó. Inténtelo de nuevo en un momento.", "결제반영중": "Pago completado. Su suscripción aparecerá en breve. Vuelva a abrir en un momento.", "구독됨": "Su suscripción ha empezado. Ya está todo abierto.", "관리전환둘": "Tras la prueba de 14 días, se cobrará el plan que elija ({값}). Puede cancelar cuando quiera antes.", "연시작": "Empezar con 1 año · {값}", "연구독": "Suscribirse por 1 año · {값}", "월시작": "Empezar con 1 mes · {값}", "월구독": "Suscribirse por 1 mes · {값}", "동의둘": "(Obligatorio) Cuando la prueba de 14 días termine el {날}, se cobrará el plan que elija ({값}). Puede cancelar cuando quiera antes de esa fecha.", "전환둘날": "Tras la prueba de 14 días, se cobrará el plan que elija ({값}) a partir del {날}. Puede cancelar cuando quiera antes de esa fecha.", "복원됨": "Compras restauradas.", "복원없음": "No hay compras que restaurar. Compruebe que la cuenta de Google con la que compró tiene la sesión iniciada en este teléfono.", "회원권권함": "¿Usa tres apps o más? El pase MediNanum sale más a cuenta: las cinco apps por {회원권값} al mes", "회원권보기": "Ver el pase"},
-    ja: {"체험끝줄": "14日間の体験はあと{n}日で終わります · 料金と解約方法を見る", "체험끝줄내일": "14日間の体験は明日で終わります · 料金と解約方法を見る", "체험끝줄오늘": "14日間の体験は今日で終わります · 料金と解約方法を見る", "체험끝제목": "体験はあと3日で終わります", "체험끝몸": "続けない場合は{날}より前に解約してください。料金と解約方法はアプリの定期購入画面にあります。", "꼴": "{값}ほど", "구독": "定期購入", "이기능": "この機能", "잠김": "<b>{이름}</b>は定期購入の機能です。", "응급기본": "緊急時の連絡はいつでも使えます。", "계정으로": "お試しはアカウントから始まります。ログインしてメールの確認を済ませると、14日間すべて使えます。", "계정없음": "お試しと定期購入はまだ準備中です。この機能はまだ開けません。", "전환날": "14日間のお試しのあと、{날}から{값}が請求されます。それまではいつでも解約できます。", "전환": "14日間のお試しが終わると{값}が請求されます。それまではいつでも解約できます。", "동의": "（必須）14日間のお試しが終わる{날}に{값}が請求されます。それまではいつでも解約できます。", "체험끝": "14日間のお試しが終わりました。", "기간끝": "定期購入の期間が終わりました。", "기록그대로": "これまでの記録はそのまま残っています。", "기록그대로2": "記録はそのまま残っています。", "로그인하러": "ログインする", "닫기": "閉じる", "체험시작": "14日間のお試しを始める", "결제수단": "支払い方法を登録", "결제준비": "支払いはまだ準備中です。今は何も請求されません。", "결제준비짧게": "支払いはまだ準備中です。", "고지첫결제": "初回の請求 — 14日間のお試しが終わる{날}に{값}。", "고지첫결제날없음": "初回の請求 — 14日間のお試しが終わる日に{값}。", "고지갱신": "更新 — {주기}ごとに自動で更新されます。解約するまで請求されます。", "고지주기월": "1か月", "고지주기연": "1年", "고지해지스토어": "解約 — 購入したストアでいつでも：Google Play「お支払いと定期購入 → 定期購入」、App Store「アカウント → サブスクリプション」。アプリを削除しても解約にはなりません。", "고지해지앱": "解約 — このアプリの「定期購入と支払い」画面でいつでも。アプリを削除しても解約にはなりません。", "고지검토": "<b>確認用プレビュー</b> — 支払いが始まると、支払いボタンの上にこの内容が表示されます。今は何も請求されません。", "고지복원": "復元 — スマホを替えたり入れ直したりしたときは「購入を復元」で定期購入が戻ります。", "약관": "利用規約", "처리방침": "個人情報の取り扱い", "환불안내": "返金と解約", "다시동의": "支払いが始まる前に、料金と請求日をお見せして、もう一度同意をいただきます。", "동의준비": "（必須）14日間のお試しは{날}に終わります。支払いが始まる前に、料金と請求日をお見せして、もう一度同意をいただきます。", "요금": "料金", "학생기본": "学生", "학생인증준비": "確認はまもなく始まります", "학생인증단추": "学生であることを確認", "출시가": "発売記念価格", "출시조건": "発売から3か月以内の登録で最初の1年間", "회원권": "メディナヌム会員パス", "회원권설명": "5つのアプリをまとめて使えるプラン", "회원권자격": "ClinicScore の専門家向け機能は、医療者の確認のあとに使えます", "곧": "まもなく開始", "출시값": "{값}（最初の1年は発売記念価格、2年目から{정가}）", "출시값둘": "発売記念価格 {값} — 最初の1年、2年目から{정가}", "초대중": "<b>招待コードでお試し中</b> · {날}まで", "초대뒤": "この期間は何も請求されません。その後は通常に戻ります。", "회원권시작": "会員パスで始める", "회원권연시작": "1年の会員パスで始める · {값}", "회원권중": "メディナヌム会員パスで使えています。", "이유": {"login": "先にログインしてください。", "verify": "先にメールの確認リンクを開いてください。確認済みのアカウントでお試しが始まります。", "used_account": "このアカウントは14日間のお試しをすでに使っています。", "used_device": "この端末は14日間のお試しをすでに使っています。", "used_person": "このメールやログイン情報で14日間のお試しをすでに使っています。", "device": "このブラウザではお試しを始められません。別のブラウザでお試しください。", "app": "問題が起きました。もう一度お試しください。", "noacct": "アカウントが使えるようになると、お試しを始められます。"}, "체크": "請求のお知らせを読んで、チェックを入れてください。", "인터넷": "インターネットにつながりません。つながってからもう一度お試しください。", "체험됨": "14日間のお試しを始めました。{날}まですべて使えます。", "해지취소됨": "解約を取り消しました。プランは続きます。", "해지됨": "解約しました。", "까지그대로": "{날}までそのまま使えます。", "카드결제": "{날}に{값}が請求されます。望まない場合は、その前に解約できます。", "카드준비": "14日間のお試しは{날}に終わります。支払いが始まる前に、料金と請求日をお見せして、もう一度同意をいただきます。", "해지자세히": "解約 · くわしく", "카드닫기이름": "請求のお知らせを閉じる", "관리로그인": "ログインすると定期購入の状態を確認できます。", "관리계정없음": "アカウントが使えるようになると、ここでお試しを始めて定期購入を確認できます。", "아직": "まだお試しを始めていません。", "관리전환": "14日間のお試しのあと、{값}が請求されます。それまではいつでも解約できます。", "구독중": "定期購入中", "체험중": "お試し中", "남음": " · 残り{n}日", "까지괄호": "（{날}まで）", "해지예약": "解約を予約しました。", "해지예약뒤": "{날}までそのまま使え、その後は請求されません。", "해지취소": "解約を取り消す", "다음결제": "次回の支払い {날} · {값}", "해지하기": "解約する", "해지해도": "解約しても{날}までは使えます。", "기간끝말": "期間の終わり", "휴대폰": "電話番号で確認", "공동": "証明書で確認", "미연결": "まだつながっていません。", "문제": "問題が起きました。", "복원": "購入を復元", "다시구독": "もう一度購入する", "스토어관리": "ストアで管理", "스토어해지": "ストアの定期購入設定から解約してください。解約しても{날}までは使えます。", "결제취소": "支払いを取り消しました。何も変わっていません。", "결제안됨": "支払いが完了しませんでした。少ししてからもう一度お試しください。", "결제반영중": "支払いが完了しました。まもなく定期購入が表示されます。少ししてから開き直してください。", "구독됨": "定期購入が始まりました。すべて使えます。", "관리전환둘": "14日間のお試しのあと、選んだ料金（{값}）が請求されます。それまではいつでも解約できます。", "연시작": "1年で始める · {값}", "연구독": "1年で購入する · {값}", "월시작": "1か月で始める · {값}", "월구독": "1か月で購入する · {값}", "동의둘": "（必須）14日間のお試しが終わる{날}に、選んだ料金（{값}）が請求されます。それまではいつでも解約できます。", "전환둘날": "14日間のお試しのあと、{날}から選んだ料金（{값}）が請求されます。それまではいつでも解約できます。", "복원됨": "購入を復元しました。", "복원없음": "復元できる購入がありません。購入したGoogleアカウントがこのスマホでログインしているか確認してください。", "회원권권함": "アプリを3つ以上使うなら、メディナヌム会員パスがお得です — 5つのアプリが月{회원권값}で", "회원권보기": "会員パスを見る"},
-    zh: {"체험끝줄": "14天体验还有{n}天结束 · 查看价格和取消方法", "체험끝줄내일": "14天体验明天结束 · 查看价格和取消方法", "체험끝줄오늘": "14天体验今天结束 · 查看价格和取消方法", "체험끝제목": "体验还有3天结束", "체험끝몸": "如果不想继续，请在{날}之前取消。价格和取消方法在应用的订阅页面。", "꼴": "约{값}", "구독": "订阅", "이기능": "这个功能", "잠김": "<b>{이름}</b>属于订阅功能。", "응급기본": "紧急求助始终开放。", "계정으로": "试用从账号开始。登录并完成邮箱确认后，14 天内可使用全部功能。", "계정없음": "试用和订阅仍在准备中。这个功能暂时还不能打开。", "전환날": "14 天试用结束后，将从{날}起收取{값}。在此之前可随时取消。", "전환": "14 天试用结束后将收取{값}。在此之前可随时取消。", "동의": "（必选）14 天试用于{날}结束时将收取{값}。在此之前可随时取消。", "체험끝": "14 天试用已结束。", "기간끝": "订阅期已结束。", "기록그대로": "您记下的内容都还在。", "기록그대로2": "记录都还在。", "로그인하러": "去登录", "닫기": "关闭", "체험시작": "开始 14 天试用", "결제수단": "添加付款方式", "결제준비": "付款尚未开通。现在不会收取任何费用。", "결제준비짧게": "付款尚未开通。", "고지첫결제": "首次扣款——14 天试用结束的{날}收取{값}。", "고지첫결제날없음": "首次扣款——14 天试用结束当天收取{값}。", "고지갱신": "续订——每{주기}自动续订。取消前会持续扣款。", "고지주기월": "个月", "고지주기연": "年", "고지해지스토어": "取消——可随时在购买的应用商店取消：Google Play「付款和订阅 → 订阅」，App Store「账户 → 订阅」。删除应用不会取消订阅。", "고지해지앱": "取消——可随时在本应用的「订阅与付款」页面取消。删除应用不会取消订阅。", "고지검토": "<b>审核预览</b>——开通付款后，付款按钮上方会显示这些内容。现在不会收取任何费用。", "고지복원": "恢复——换手机或重新安装时，点「恢复购买」即可找回订阅。", "약관": "服务条款", "처리방침": "隐私政策", "환불안내": "退款与取消", "다시동의": "在开始任何扣款之前，我们会向您展示价格和扣款日期，并再次征得您的同意。", "동의준비": "（必选）14 天试用于{날}结束。在开始任何扣款之前，我们会向您展示价格和扣款日期，并再次征得您的同意。", "요금": "价格", "학생기본": "学生", "학생인증준비": "认证即将开放", "학생인증단추": "认证学生身份", "출시가": "上线纪念价", "출시조건": "上线 3 个月内订阅，第一年适用", "회원권": "MediNanum 会员卡", "회원권설명": "五个应用通用的方案", "회원권자격": "ClinicScore 专业工具需通过医务人员认证后开放", "곧": "即将开放", "출시값": "{값}（第一年为上线纪念价，第二年起{정가}）", "출시값둘": "上线纪念价{값}——第一年，第二年起{정가}", "초대중": "<b>邀请码试用中</b> · 至{날}", "초대뒤": "此期间不收取任何费用。之后恢复正常。", "회원권시작": "用会员卡开始", "회원권연시작": "开始 1 年会员卡 · {값}", "회원권중": "已通过 MediNanum 会员卡开放。", "이유": {"login": "请先登录。", "verify": "请先打开邮件中的确认链接。试用从已确认的账号开始。", "used_account": "这个账号已使用过 14 天试用。", "used_device": "这台设备已使用过 14 天试用。", "used_person": "这个邮箱或登录信息已使用过 14 天试用。", "device": "无法在这个浏览器中开始试用。请换一个浏览器。", "app": "出了点问题。请再试一次。", "noacct": "账号开放后即可开始试用。"}, "체크": "请阅读扣款说明并勾选。", "인터넷": "无法连接网络。联网后请再试一次。", "체험됨": "14 天试用已开始。至{날}可使用全部功能。", "해지취소됨": "已撤回取消。您的方案将继续。", "해지됨": "已取消。", "까지그대로": "至{날}仍可继续使用。", "카드결제": "将于{날}收取{값}。如不需要，可在此之前取消。", "카드준비": "14 天试用于{날}结束。在开始任何扣款之前，我们会向您展示价格和扣款日期，并再次征得您的同意。", "해지자세히": "取消 · 详情", "카드닫기이름": "关闭扣款说明", "관리로그인": "登录后可查看订阅状态。", "관리계정없음": "账号开放后，可在这里开始试用并查看订阅。", "아직": "您还没有开始试用。", "관리전환": "14 天试用结束后将收取{값}。在此之前可随时取消。", "구독중": "订阅中", "체험중": "试用中", "남음": " · 剩余 {n} 天", "까지괄호": "（至{날}）", "해지예약": "已预约取消。", "해지예약뒤": "至{날}仍可使用，之后不再扣款。", "해지취소": "撤回取消", "다음결제": "下次扣款 {날} · {값}", "해지하기": "取消订阅", "해지해도": "即使取消，至{날}仍可使用。", "기간끝말": "期满", "휴대폰": "用手机认证", "공동": "用证书认证", "미연결": "尚未连接。", "문제": "出了点问题。", "복원": "恢复购买", "다시구독": "重新订阅", "스토어관리": "在商店管理", "스토어해지": "请在应用商店的订阅设置中取消。即使取消，至{날}仍可使用。", "결제취소": "已取消付款。没有任何变化。", "결제안됨": "付款未完成。请稍后再试。", "결제반영중": "付款完成。订阅很快就会显示。请稍后重新打开。", "구독됨": "订阅已开始。现在全部开放。", "관리전환둘": "14 天试用结束后，将收取您选择的方案（{값}）。在此之前可随时取消。", "연시작": "按 1 年开始 · {값}", "연구독": "订阅 1 年 · {값}", "월시작": "按 1 个月开始 · {값}", "월구독": "订阅 1 个月 · {값}", "동의둘": "（必选）14 天试用于{날}结束时，将收取您选择的方案（{값}）。在此之前可随时取消。", "전환둘날": "14 天试用结束后，将从{날}起收取您选择的方案（{값}）。在此之前可随时取消。", "복원됨": "已恢复购买。", "복원없음": "没有可恢复的购买。请确认购买时使用的 Google 账号已在这台手机上登录。", "회원권권함": "使用三个及以上应用时，Medinanum 会员更划算——五个应用每月{회원권값}", "회원권보기": "查看会员"}
+    es: {"체험끝줄": "Su prueba de 14 días termina en {n} días · Ver precio y cómo cancelar", "체험끝줄내일": "Su prueba de 14 días termina mañana · Ver precio y cómo cancelar", "체험끝줄오늘": "Su prueba de 14 días termina hoy · Ver precio y cómo cancelar", "체험끝제목": "Su prueba termina en 3 días", "체험끝몸": "Si no quiere continuar, cancele antes del {날}. El precio y cómo cancelar están en la pantalla Suscripción de la app.", "꼴": "unos {값}", "구독": "Suscripción", "이기능": "Esta función", "잠김": "<b>{이름}</b> forma parte de la suscripción.", "응급기본": "La ayuda de urgencia siempre está abierta.", "계정으로": "La prueba empieza desde una cuenta. Inicie sesión y confirme su correo para usarlo todo durante 14 días.", "계정없음": "La prueba y la suscripción aún se están preparando. Esta función todavía no se puede abrir.", "전환날": "Tras la prueba de 14 días, se cobrará {값} a partir del {날}. Puede cancelar cuando quiera antes de esa fecha.", "전환": "Cuando termine la prueba de 14 días, se cobrará {값}. Puede cancelar cuando quiera antes.", "동의": "(Obligatorio) Cuando la prueba de 14 días termine el {날}, se cobrará {값}. Puede cancelar cuando quiera antes de esa fecha.", "체험끝": "Su prueba de 14 días ha terminado.", "기간끝": "Su periodo de suscripción ha terminado.", "기록그대로": "Todo lo que anotó sigue aquí.", "기록그대로2": "Todo lo que anotó sigue aquí.", "로그인하러": "Iniciar sesión", "닫기": "Cerrar", "체험시작": "Empezar la prueba de 14 días", "결제수단": "Añadir método de pago", "결제준비": "Los pagos aún no están configurados. Ahora no se cobra nada.", "결제준비짧게": "Los pagos aún no están configurados.", "고지첫결제": "Primer cobro: {값} el {날}, cuando termine la prueba de 14 días.", "고지첫결제날없음": "Primer cobro: {값} el día en que termine la prueba de 14 días.", "고지갱신": "Renovación: se renueva automáticamente cada {주기}. Se cobra hasta que cancele.", "고지주기월": "mes", "고지주기연": "año", "고지해지스토어": "Cancelar: cuando quiera, en la tienda donde la compró: Google Play “Pagos y suscripciones → Suscripciones”, App Store “Cuenta → Suscripciones”. Borrar la app no la cancela.", "고지해지앱": "Cancelar: cuando quiera, en la pantalla “Suscripción y pagos” de esta app. Borrar la app no la cancela.", "고지검토": "<b>Vista previa de revisión</b>: esto es lo que aparecerá sobre el botón de pago cuando se abran los pagos. Ahora no se cobra nada.", "고지복원": "Restaurar: si cambia de teléfono o reinstala, “Restaurar compra” recupera su suscripción.", "약관": "Condiciones del servicio", "처리방침": "Política de privacidad", "환불안내": "Reembolsos y cancelación", "다시동의": "Antes de que empiece cualquier pago, le mostraremos el precio y la fecha de cobro y volveremos a pedirle su consentimiento.", "동의준비": "(Obligatorio) La prueba de 14 días termina el {날}. Antes de que empiece cualquier pago, le mostraremos el precio y la fecha de cobro y volveremos a pedirle su consentimiento.", "요금": "Precio", "학생기본": "estudiantes", "학생인증준비": "la verificación llegará pronto", "학생인증단추": "Verificar que es estudiante", "출시가": "Precio de lanzamiento", "출시조건": "el primer año, si se suscribe en los 3 meses siguientes al lanzamiento", "회원권": "Descuento entre apps", "회원권설명": "si está suscrito a otra app de MediNanum", "회원권자격": "Las herramientas profesionales de ClinicScore se abren tras la verificación profesional", "곧": "muy pronto", "출시값": "{값} (precio de lanzamiento el primer año; {정가} desde el segundo año)", "출시값둘": "precio de lanzamiento {값} el primer año; {정가} desde el segundo año", "초대중": "<b>Acceso por invitación</b> · hasta el {날}", "초대뒤": "Durante este periodo no se cobra nada. Después vuelve a lo normal.", "회원권시작": "Empezar la suscripción", "회원권연시작": "Empezar 1 año · {값}", "회원권중": "Abierto con su suscripción.", "이유": {"login": "Inicie sesión primero.", "verify": "Abra primero el enlace de confirmación de su correo. La prueba empieza en una cuenta confirmada.", "used_account": "Esta cuenta ya usó la prueba de 14 días.", "used_device": "Este dispositivo ya usó la prueba de 14 días.", "used_person": "La prueba de 14 días ya se usó con este correo o inicio de sesión.", "device": "No se puede empezar la prueba en este navegador. Pruebe con otro navegador.", "app": "Algo salió mal. Inténtelo de nuevo.", "noacct": "Podrá empezar la prueba cuando se abran las cuentas."}, "체크": "Lea el aviso de cobro y marque la casilla.", "인터넷": "No hay conexión a internet. Inténtelo de nuevo cuando esté conectado.", "체험됨": "Su prueba de 14 días ha empezado. Todo está abierto hasta el {날}.", "해지취소됨": "Cancelación retirada. Su plan continúa.", "해지됨": "Cancelado. ", "까지그대로": "Puede seguir usándolo hasta el {날}.", "카드결제": "Se cobrará {값} el {날}. Si no lo desea, puede cancelar antes.", "카드준비": "Su prueba de 14 días termina el {날}. Antes de que empiece cualquier pago, le mostraremos el precio y la fecha de cobro y volveremos a pedirle su consentimiento.", "해지자세히": "Cancelar · detalles", "카드닫기이름": "Cerrar aviso de cobro", "관리로그인": "Inicie sesión para ver su suscripción.", "관리계정없음": "Cuando se abran las cuentas, podrá empezar la prueba y ver aquí su suscripción.", "아직": "Todavía no ha empezado la prueba.", "관리전환": "Tras la prueba de 14 días, se cobrará {값}. Puede cancelar cuando quiera antes.", "구독중": "Suscrito", "체험중": "En prueba", "남음": " · quedan {n} días", "까지괄호": " (hasta el {날})", "해지예약": "Cancelación programada. ", "해지예약뒤": "Puede seguir usándolo hasta el {날} y después no se cobrará nada.", "해지취소": "Deshacer la cancelación", "다음결제": "Próximo pago {날} · {값}", "해지하기": "Cancelar", "해지해도": "Aunque cancele, puede seguir usándolo hasta el {날}.", "기간끝말": "el final del periodo", "휴대폰": "Verificar por teléfono", "공동": "Verificar con certificado", "미연결": "Aún no está conectado.", "문제": "Algo salió mal.", "복원": "Restaurar compras", "다시구독": "Suscribirse de nuevo", "스토어관리": "Gestionar en la tienda", "스토어해지": "Cancele desde los ajustes de suscripción de la tienda. Aunque cancele, puede seguir usándolo hasta el {날}.", "결제취소": "Pago cancelado. No ha cambiado nada.", "결제안됨": "El pago no se completó. Inténtelo de nuevo en un momento.", "결제반영중": "Pago completado. Su suscripción aparecerá en breve. Vuelva a abrir en un momento.", "구독됨": "Su suscripción ha empezado. Ya está todo abierto.", "관리전환둘": "Tras la prueba de 14 días, se cobrará el plan que elija ({값}). Puede cancelar cuando quiera antes.", "연시작": "Empezar con 1 año · {값}", "연구독": "Suscribirse por 1 año · {값}", "월시작": "Empezar con 1 mes · {값}", "월구독": "Suscribirse por 1 mes · {값}", "동의둘": "(Obligatorio) Cuando la prueba de 14 días termine el {날}, se cobrará el plan que elija ({값}). Puede cancelar cuando quiera antes de esa fecha.", "전환둘날": "Tras la prueba de 14 días, se cobrará el plan que elija ({값}) a partir del {날}. Puede cancelar cuando quiera antes de esa fecha.", "복원됨": "Compras restauradas.", "복원없음": "No hay compras que restaurar. Compruebe que la cuenta de Google con la que compró tiene la sesión iniciada en este teléfono.", "회원권권함": "¿Usa otra app de MediNanum? Mientras esté suscrito a una, las demás cuestan ₩1.000 menos al mes (próximamente)", "회원권보기": "Ver precios"},
+    ja: {"체험끝줄": "14日間の体験はあと{n}日で終わります · 料金と解約方法を見る", "체험끝줄내일": "14日間の体験は明日で終わります · 料金と解約方法を見る", "체험끝줄오늘": "14日間の体験は今日で終わります · 料金と解約方法を見る", "체험끝제목": "体験はあと3日で終わります", "체험끝몸": "続けない場合は{날}より前に解約してください。料金と解約方法はアプリの定期購入画面にあります。", "꼴": "{값}ほど", "구독": "定期購入", "이기능": "この機能", "잠김": "<b>{이름}</b>は定期購入の機能です。", "응급기본": "緊急時の連絡はいつでも使えます。", "계정으로": "お試しはアカウントから始まります。ログインしてメールの確認を済ませると、14日間すべて使えます。", "계정없음": "お試しと定期購入はまだ準備中です。この機能はまだ開けません。", "전환날": "14日間のお試しのあと、{날}から{값}が請求されます。それまではいつでも解約できます。", "전환": "14日間のお試しが終わると{값}が請求されます。それまではいつでも解約できます。", "동의": "（必須）14日間のお試しが終わる{날}に{값}が請求されます。それまではいつでも解約できます。", "체험끝": "14日間のお試しが終わりました。", "기간끝": "定期購入の期間が終わりました。", "기록그대로": "これまでの記録はそのまま残っています。", "기록그대로2": "記録はそのまま残っています。", "로그인하러": "ログインする", "닫기": "閉じる", "체험시작": "14日間のお試しを始める", "결제수단": "支払い方法を登録", "결제준비": "支払いはまだ準備中です。今は何も請求されません。", "결제준비짧게": "支払いはまだ準備中です。", "고지첫결제": "初回の請求 — 14日間のお試しが終わる{날}に{값}。", "고지첫결제날없음": "初回の請求 — 14日間のお試しが終わる日に{값}。", "고지갱신": "更新 — {주기}ごとに自動で更新されます。解約するまで請求されます。", "고지주기월": "1か月", "고지주기연": "1年", "고지해지스토어": "解約 — 購入したストアでいつでも：Google Play「お支払いと定期購入 → 定期購入」、App Store「アカウント → サブスクリプション」。アプリを削除しても解約にはなりません。", "고지해지앱": "解約 — このアプリの「定期購入と支払い」画面でいつでも。アプリを削除しても解約にはなりません。", "고지검토": "<b>確認用プレビュー</b> — 支払いが始まると、支払いボタンの上にこの内容が表示されます。今は何も請求されません。", "고지복원": "復元 — スマホを替えたり入れ直したりしたときは「購入を復元」で定期購入が戻ります。", "약관": "利用規約", "처리방침": "個人情報の取り扱い", "환불안내": "返金と解約", "다시동의": "支払いが始まる前に、料金と請求日をお見せして、もう一度同意をいただきます。", "동의준비": "（必須）14日間のお試しは{날}に終わります。支払いが始まる前に、料金と請求日をお見せして、もう一度同意をいただきます。", "요금": "料金", "학생기본": "学生", "학생인증준비": "確認はまもなく始まります", "학생인증단추": "学生であることを確認", "출시가": "発売記念価格", "출시조건": "発売から3か月以内の登録で最初の1年間", "회원권": "アプリ間割引", "회원권설명": "ほかのメディナヌムのアプリを定期購入中なら", "회원권자격": "ClinicScore の専門家向け機能は、医療者の確認のあとに使えます", "곧": "まもなく開始", "출시값": "{값}（最初の1年は発売記念価格、2年目から{정가}）", "출시값둘": "発売記念価格 {값} — 最初の1年、2年目から{정가}", "초대중": "<b>招待コードでお試し中</b> · {날}まで", "초대뒤": "この期間は何も請求されません。その後は通常に戻ります。", "회원권시작": "定期購入で始める", "회원권연시작": "1年の定期購入で始める · {값}", "회원권중": "定期購入で使えています。", "이유": {"login": "先にログインしてください。", "verify": "先にメールの確認リンクを開いてください。確認済みのアカウントでお試しが始まります。", "used_account": "このアカウントは14日間のお試しをすでに使っています。", "used_device": "この端末は14日間のお試しをすでに使っています。", "used_person": "このメールやログイン情報で14日間のお試しをすでに使っています。", "device": "このブラウザではお試しを始められません。別のブラウザでお試しください。", "app": "問題が起きました。もう一度お試しください。", "noacct": "アカウントが使えるようになると、お試しを始められます。"}, "체크": "請求のお知らせを読んで、チェックを入れてください。", "인터넷": "インターネットにつながりません。つながってからもう一度お試しください。", "체험됨": "14日間のお試しを始めました。{날}まですべて使えます。", "해지취소됨": "解約を取り消しました。プランは続きます。", "해지됨": "解約しました。", "까지그대로": "{날}までそのまま使えます。", "카드결제": "{날}に{값}が請求されます。望まない場合は、その前に解約できます。", "카드준비": "14日間のお試しは{날}に終わります。支払いが始まる前に、料金と請求日をお見せして、もう一度同意をいただきます。", "해지자세히": "解約 · くわしく", "카드닫기이름": "請求のお知らせを閉じる", "관리로그인": "ログインすると定期購入の状態を確認できます。", "관리계정없음": "アカウントが使えるようになると、ここでお試しを始めて定期購入を確認できます。", "아직": "まだお試しを始めていません。", "관리전환": "14日間のお試しのあと、{값}が請求されます。それまではいつでも解約できます。", "구독중": "定期購入中", "체험중": "お試し中", "남음": " · 残り{n}日", "까지괄호": "（{날}まで）", "해지예약": "解約を予約しました。", "해지예약뒤": "{날}までそのまま使え、その後は請求されません。", "해지취소": "解約を取り消す", "다음결제": "次回の支払い {날} · {값}", "해지하기": "解約する", "해지해도": "解約しても{날}までは使えます。", "기간끝말": "期間の終わり", "휴대폰": "電話番号で確認", "공동": "証明書で確認", "미연결": "まだつながっていません。", "문제": "問題が起きました。", "복원": "購入を復元", "다시구독": "もう一度購入する", "스토어관리": "ストアで管理", "스토어해지": "ストアの定期購入設定から解約してください。解約しても{날}までは使えます。", "결제취소": "支払いを取り消しました。何も変わっていません。", "결제안됨": "支払いが完了しませんでした。少ししてからもう一度お試しください。", "결제반영중": "支払いが完了しました。まもなく定期購入が表示されます。少ししてから開き直してください。", "구독됨": "定期購入が始まりました。すべて使えます。", "관리전환둘": "14日間のお試しのあと、選んだ料金（{값}）が請求されます。それまではいつでも解約できます。", "연시작": "1年で始める · {값}", "연구독": "1年で購入する · {값}", "월시작": "1か月で始める · {값}", "월구독": "1か月で購入する · {값}", "동의둘": "（必須）14日間のお試しが終わる{날}に、選んだ料金（{값}）が請求されます。それまではいつでも解約できます。", "전환둘날": "14日間のお試しのあと、{날}から選んだ料金（{값}）が請求されます。それまではいつでも解約できます。", "복원됨": "購入を復元しました。", "복원없음": "復元できる購入がありません。購入したGoogleアカウントがこのスマホでログインしているか確認してください。", "회원권권함": "ほかのメディナヌムのアプリも使うなら — 1つを定期購入している間、ほかのアプリは月₩1,000引きです(準備中)", "회원권보기": "料金を見る"},
+    zh: {"체험끝줄": "14天体验还有{n}天结束 · 查看价格和取消方法", "체험끝줄내일": "14天体验明天结束 · 查看价格和取消方法", "체험끝줄오늘": "14天体验今天结束 · 查看价格和取消方法", "체험끝제목": "体验还有3天结束", "체험끝몸": "如果不想继续，请在{날}之前取消。价格和取消方法在应用的订阅页面。", "꼴": "约{값}", "구독": "订阅", "이기능": "这个功能", "잠김": "<b>{이름}</b>属于订阅功能。", "응급기본": "紧急求助始终开放。", "계정으로": "试用从账号开始。登录并完成邮箱确认后，14 天内可使用全部功能。", "계정없음": "试用和订阅仍在准备中。这个功能暂时还不能打开。", "전환날": "14 天试用结束后，将从{날}起收取{값}。在此之前可随时取消。", "전환": "14 天试用结束后将收取{값}。在此之前可随时取消。", "동의": "（必选）14 天试用于{날}结束时将收取{값}。在此之前可随时取消。", "체험끝": "14 天试用已结束。", "기간끝": "订阅期已结束。", "기록그대로": "您记下的内容都还在。", "기록그대로2": "记录都还在。", "로그인하러": "去登录", "닫기": "关闭", "체험시작": "开始 14 天试用", "결제수단": "添加付款方式", "결제준비": "付款尚未开通。现在不会收取任何费用。", "결제준비짧게": "付款尚未开通。", "고지첫결제": "首次扣款——14 天试用结束的{날}收取{값}。", "고지첫결제날없음": "首次扣款——14 天试用结束当天收取{값}。", "고지갱신": "续订——每{주기}自动续订。取消前会持续扣款。", "고지주기월": "个月", "고지주기연": "年", "고지해지스토어": "取消——可随时在购买的应用商店取消：Google Play「付款和订阅 → 订阅」，App Store「账户 → 订阅」。删除应用不会取消订阅。", "고지해지앱": "取消——可随时在本应用的「订阅与付款」页面取消。删除应用不会取消订阅。", "고지검토": "<b>审核预览</b>——开通付款后，付款按钮上方会显示这些内容。现在不会收取任何费用。", "고지복원": "恢复——换手机或重新安装时，点「恢复购买」即可找回订阅。", "약관": "服务条款", "처리방침": "隐私政策", "환불안내": "退款与取消", "다시동의": "在开始任何扣款之前，我们会向您展示价格和扣款日期，并再次征得您的同意。", "동의준비": "（必选）14 天试用于{날}结束。在开始任何扣款之前，我们会向您展示价格和扣款日期，并再次征得您的同意。", "요금": "价格", "학생기본": "学生", "학생인증준비": "认证即将开放", "학생인증단추": "认证学生身份", "출시가": "上线纪念价", "출시조건": "上线 3 个月内订阅，第一年适用", "회원권": "多应用优惠", "회원권설명": "如已订阅其他 MediNanum 应用", "회원권자격": "ClinicScore 专业工具需通过医务人员认证后开放", "곧": "即将开放", "출시값": "{값}（第一年为上线纪念价，第二年起{정가}）", "출시값둘": "上线纪念价{값}——第一年，第二年起{정가}", "초대중": "<b>邀请码试用中</b> · 至{날}", "초대뒤": "此期间不收取任何费用。之后恢复正常。", "회원권시작": "开始订阅", "회원권연시작": "开始 1 年订阅 · {값}", "회원권중": "已通过订阅开放。", "이유": {"login": "请先登录。", "verify": "请先打开邮件中的确认链接。试用从已确认的账号开始。", "used_account": "这个账号已使用过 14 天试用。", "used_device": "这台设备已使用过 14 天试用。", "used_person": "这个邮箱或登录信息已使用过 14 天试用。", "device": "无法在这个浏览器中开始试用。请换一个浏览器。", "app": "出了点问题。请再试一次。", "noacct": "账号开放后即可开始试用。"}, "체크": "请阅读扣款说明并勾选。", "인터넷": "无法连接网络。联网后请再试一次。", "체험됨": "14 天试用已开始。至{날}可使用全部功能。", "해지취소됨": "已撤回取消。您的方案将继续。", "해지됨": "已取消。", "까지그대로": "至{날}仍可继续使用。", "카드결제": "将于{날}收取{값}。如不需要，可在此之前取消。", "카드준비": "14 天试用于{날}结束。在开始任何扣款之前，我们会向您展示价格和扣款日期，并再次征得您的同意。", "해지자세히": "取消 · 详情", "카드닫기이름": "关闭扣款说明", "관리로그인": "登录后可查看订阅状态。", "관리계정없음": "账号开放后，可在这里开始试用并查看订阅。", "아직": "您还没有开始试用。", "관리전환": "14 天试用结束后将收取{값}。在此之前可随时取消。", "구독중": "订阅中", "체험중": "试用中", "남음": " · 剩余 {n} 天", "까지괄호": "（至{날}）", "해지예약": "已预约取消。", "해지예약뒤": "至{날}仍可使用，之后不再扣款。", "해지취소": "撤回取消", "다음결제": "下次扣款 {날} · {값}", "해지하기": "取消订阅", "해지해도": "即使取消，至{날}仍可使用。", "기간끝말": "期满", "휴대폰": "用手机认证", "공동": "用证书认证", "미연결": "尚未连接。", "문제": "出了点问题。", "복원": "恢复购买", "다시구독": "重新订阅", "스토어관리": "在商店管理", "스토어해지": "请在应用商店的订阅设置中取消。即使取消，至{날}仍可使用。", "결제취소": "已取消付款。没有任何变化。", "결제안됨": "付款未完成。请稍后再试。", "결제반영중": "付款完成。订阅很快就会显示。请稍后重新打开。", "구독됨": "订阅已开始。现在全部开放。", "관리전환둘": "14 天试用结束后，将收取您选择的方案（{값}）。在此之前可随时取消。", "연시작": "按 1 年开始 · {값}", "연구독": "订阅 1 年 · {값}", "월시작": "按 1 个月开始 · {값}", "월구독": "订阅 1 个月 · {값}", "동의둘": "（必选）14 天试用于{날}结束时，将收取您选择的方案（{값}）。在此之前可随时取消。", "전환둘날": "14 天试用结束后，将从{날}起收取您选择的方案（{값}）。在此之前可随时取消。", "복원됨": "已恢复购买。", "복원없음": "没有可恢复的购买。请确认购买时使用的 Google 账号已在这台手机上登录。", "회원권권함": "也在用其他 MediNanum 应用？订阅一个应用期间，其他应用每月少付 ₩1,000（即将推出）", "회원권보기": "查看价格"}
   };
   var 달이름 = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
   function 말() { try { var l = typeof 설정.말 === 'function' ? 설정.말() : 'ko'; if (l === 'en' || l === 'es' || l === 'ja' || l === 'zh') return l; } catch (e) {} return 'ko'; }   /* 11-03 다섯 말 */
@@ -837,7 +837,7 @@
   function 상품(plan) { return 설정.app + (plan === 'year' ? '_year' : '_month'); }
   var 회원권권한 = 'medinanum_pass';
   function 회원권상품(plan) { return 회원권권한 + (plan === 'year' ? '_year' : '_month'); }
-  function 회원권판매() { var g = 설정.회원권; return !!(g && g.판매 === true && g.월 && 껍데기결제()); }   /* 스토어 상품을 등록한 뒤에만 판다 */   /* 스토어 상품 id — store-webhook 이 앞머리(<app>_)로 앱을 가른다 */
+  function 회원권판매() { return false; }   /* 11-17 밤 현욱님 — 메디나눔 묶음 상품 폐지 · 팔지 않는다(앱마다 정기 결제) */   /* 스토어 상품을 등록한 뒤에만 판다 */   /* 스토어 상품 id — store-webhook 이 앞머리(<app>_)로 앱을 가른다 */
   /* 11-13 현욱님 — 결제 화면 기본 선택은 1년(월 환산 함께). 설정.기본: 'month' 이면 예전처럼 1개월이 주 단추 */
   function 연기본() { return 연있나() && (!!설정.기본연 || 설정.기본 !== 'month'); }
   function 연환산() { var g = 설정.가격 || {}; return g.연 ? ' (' + 말글('꼴', { 값: 월값(Math.round(g.연 / 12)) }) + ')' : ''; }
@@ -909,11 +909,8 @@
       칸.push(말글('출시가') + ' ' + 출.join(' · ') + ' (' + 말글('출시조건') + ')');
     }
     var 회 = 설정.회원권;
-    if (회 && 회.월) {
-      var 회값 = [월값(회.월)]; if (회.연) 회값.push(연값(회.연));
-      var 회출 = []; if (회.출시월) 회출.push(월값(회.출시월)); if (회.출시연) 회출.push(연값(회.출시연));
-      칸.push('<b>' + 말글('회원권') + '</b>(' + 말글('회원권설명') + ') ' + 회값.join(' · ') +
-        (회출.length ? ' — ' + 말글('출시가') + ' ' + 회출.join(' · ') : '') + (회원권판매() ? '' : ' — ' + 말글('곧')) + ' (' + 말글('회원권자격') + ')');   /* 2026-10-22 회원권 = 결제 권한, 들어갈 자격은 따로 */
+    if (회 && 회.월 && g.월) {   /* 11-17 밤 현욱님 — 묶음 상품 내림: 다른 앱을 정기 결제 중이면 이 앱 월 1,000원 덜(같은 계정 확인 · 준비 중) */
+      칸.push('<b>' + 말글('회원권') + '</b>(' + 말글('회원권설명') + ') ' + 월값(Math.max(0, g.월 - 1000)) + ' — ' + 말글('곧'));
     }
     if (!칸.length) return '';
     return 작은('<span class="subprice">' + 말글('요금') + ' ' + 칸.join(' · ') + '</span>') +
@@ -1090,9 +1087,9 @@
     return 작은(말글('결제준비'));
   }
   function 회원권권함() {
-    try { if (!window.회원권 || !회원권.열기 || !설정.가격 || !설정.가격.월) return '';
+    try { if (!설정.가격 || !설정.가격.월) return '';
       var 회 = (회원권.값표 && 회원권.값표.회원권 && 회원권.값표.회원권.월) || (설정.회원권 && 설정.회원권.월) || 12900;
-      return '<p class="' + (모('작은글') || '') + '">' + 말글('회원권권함', { 앱값: 원(설정.가격.월), 회원권값: 원(회) }) + ' <button type="button" class="' + (모('보조') || '') + '" onclick="회원권.열기()">' + esc(말글('회원권보기')) + '</button></p>'; } catch (e) { return ''; }
+      return '<p class="' + (모('작은글') || '') + '">' + 말글('회원권권함', { 앱값: 원(설정.가격.월), 회원권값: 원(회) }) + '</p>';   /* 11-17 밤 — 묶음 상품 보기 단추 내림 */ } catch (e) { return ''; }
   }
   function 막힘HTML(id) {
     var s = 상태(), 끝 = Date.now() + 14 * 864e5, 몸 = '', 단 = '', 동 = '';
@@ -1578,34 +1575,38 @@
    참고 원본: _시안/ink/참고_ink_시안.html(지인 작품 — 현욱님 「저작권은 나에게 있다, 써도 된다」 11-17). 번짐 계산은 원본과 같다.
    하는 일
      · 얼굴: 잉크 번진 모양 + 5.2초마다 깜빡이는 두 눈 · 누르면 살짝 커지며 웃음. 모양만 앱마다(아래 모양표), 눈·질감은 같다.
-     · 면: [data-ink] 칸(답 말풍선·주요 단추·카드)에 번진 가장자리를 그린다. data-ink="solid" 은 강조색 면, 그 밖은 회색 테(안쪽 2.5px).
+     · 면: [data-mn-ink] 칸(답 말풍선·주요 단추·카드)에 번진 가장자리를 그린다. data-mn-ink="solid" 은 강조색 면, 빈 값은 회색 테(안쪽 2.5px).
+       11-17h 이름 바꿈 — 앱 자체 표시(소아 data-ink="1")와 겹쳐 글 전체에 테가 그려졌다. 옛 이름 data-ink 는 값이 빈칸·solid 일 때만 받는다(넘어가는 동안). html[data-ink] 는 앱이 켜는 잉크 스위치 그대로.
        번짐은 가장자리 1.5px 안(세 번 상자 흐림 반경 0.6px) — 가운데는 단색이라 글자 대비(흰 글 4.5:1↑)는 강조색 그대로다. 움직임 줄이기면 눈도 멈춘다.
-     · 토큰: <html data-ink> 이면 공용 부품(계정·가입 시트·설정·알림 띠·뒤로 알약·회원권)이 쓰는 --card · --line · --accent 등을 잉크 값으로.
+     · 토큰: <html data-ink> 이면 공용 부품(계정·가입 시트·설정·알림 띠·뒤로 알약·요금 시트)이 쓰는 --card · --line · --accent 등을 잉크 값으로.
    쓰는 법
-     잉크.설치({ 색: '#E8452C' })                         // 앱 강조색(없으면 CSS --ink-accent)
+     잉크.설치({ 색: '#1F5E46', 어두운색: '#5FB08F' })    // 앱 강조색(·어두운 바탕 색). 앱 CSS 가 같은 토큰을 정하면 앱이 이긴다(head 맨 앞 :root 규칙)
      el.innerHTML = 잉크.얼굴HTML('heart', { 크기: 64, 라벨: '메디나눔' })   // heart · house · leaf · drops · pill · shield · sprout · cross
      잉크.그리기(뿌리)                                      // 새로 그린 화면 뒤 한 번(설치하면 바뀜을 지켜보며 저절로도 그린다)
-   판 2026-11-17a — 첫 판 */
+   판 2026-11-17a — 첫 판 · 11-17k seed2(씨앗+싹 — 산부인과 확정) · 11-17j 얼굴HTML(모양,{또렷:true}) — 아이콘·작은 크기용 또렷한 가장자리 · 11-17i 모양 둘 더(moon·seed — 산부인과 시안) · 11-17h 면 표시 data-mn-ink(옛 data-ink 는 빈칸·solid 만) · 11-17g 강조색은 인라인 대신 :root 규칙(head 맨 앞 — 앱 규칙이 이김)·설치({색, 어두운색}) · 11-17f 어두운 바탕에선 얼굴 번짐 반경 1.8(밝은 바탕 4.2)·결 0.6 — 흐릿하던 것 · 11-17e 새싹 꼴·강조색은 설치 색일 때만 · 11-17d 공용 고르기·켜고끄기·목록 잉크 모양 · 11-17c 잎 모양 · 11-17b 자리 규칙은 :where 로(앱의 position:absolute 단추를 덮지 않게) */
 (function () {
   if (window.잉크 && window.잉크.판) return;
-  var 판 = '2026-11-17a';
+  var 판 = '2026-11-17k';
   var 설정 = { 색: '', 지켜보기: true };
   /* 모양표 — 120×112 안. 눈 y 는 모양마다 */
   var 모양 = {
     heart: { d: 'M60 108 C60 108 8 76 8 40 C8 20 22 8 38 8 C48 8 56 14 60 22 C64 14 72 8 82 8 C98 8 112 20 112 40 C112 76 60 108 60 108 Z', 눈: 36 },
     house: { d: 'M60 8 L112 50 L100 50 L100 106 L20 106 L20 50 L8 50 Z', 눈: 56 },
-    leaf: { d: 'M60 108 C24 96 8 62 22 30 C34 6 82 2 106 14 C116 52 100 94 60 108 Z', 눈: 40 },
+    leaf: { d: 'M22 100 C8 62 24 22 64 10 C82 5 100 6 114 4 C116 22 112 46 100 66 C84 92 54 104 22 100 Z M24 96 L8 110 L12 112 L30 100 Z', 눈: 44 },   /* 11-17b 잎 — 끝이 뾰족한 잎 + 꼭지(덩어리·방패로 보이던 것) */
     drops: { d: 'M10 66 A26 26 0 1 0 62 66 A26 26 0 1 0 10 66 Z M56 52 A30 30 0 1 0 116 52 A30 30 0 1 0 56 52 Z', 눈: 44 },
     pill: { d: 'M34 28 H86 A28 28 0 0 1 86 84 H34 A28 28 0 0 1 34 28 Z', 눈: 44 },
     shield: { d: 'M60 6 L108 22 C108 64 92 94 60 108 C28 94 12 64 12 22 Z', 눈: 40 },
-    sprout: { d: 'M60 108 C28 108 14 86 14 66 C14 44 34 32 60 32 C86 32 106 44 106 66 C106 86 92 108 60 108 Z M58 34 C56 16 42 6 26 8 C28 24 42 34 58 34 Z M62 34 C64 16 78 6 94 8 C92 24 78 34 62 34 Z', 눈: 56 },
+    sprout: { d: 'M60 34C55 18 42 10 27 12c2 15 15 24 33 22z M60 34c5-16 18-24 33-22-2 15-15 24-33 22z M56.5 31.5a3.5 3.5 0 0 1 7 0V40.5a3.5 3.5 0 0 1-7 0Z M22 74a38 34 0 1 0 76 0a38 34 0 1 0-76 0Z', 눈: 60 },   /* 11-17d 산부인과 앱 그림 꼴 — 둥근 몸 + 짧은 줄기 + 위로 벌어진 잎 둘(귀 달린 덩어리처럼 보이던 것) */
+    moon: { d: 'M71.1 11.7 A50 50 0 1 0 107.3 51.6 A32 32 0 0 1 71.1 11.7 Z', 눈: 56 },   /* 11-17i 산부인과 시안 — 초승달(달마다 돌아오는 주기) */
+    seed: { d: 'M60 16 C90 16 106 46 106 72 C106 96 86 108 60 108 C34 108 14 96 14 72 C14 46 30 16 60 16 Z M60 18 C62 6 74 0 86 4 C82 14 72 20 60 18 Z', 눈: 58 },   /* 11-17i 산부인과 시안 — 씨앗(둥근 몸 + 작은 잎) */
+    seed2: { d: 'M60 30 C84 30 104 50 104 74 C104 98 86 110 60 110 C34 110 16 98 16 74 C16 50 36 30 60 30 Z M56.5 33 L56.5 22 A3.5 3.5 0 0 1 63.5 22 L63.5 33 Z M61 22 C63 9 76 2 94 5 C90 19 77 25 61 22 Z', 눈: 70 },   /* 11-17k 산부인과 확정 — 씨앗 + 싹(한가족 규칙 · 장밋빛 #B85679) */
     cross: { d: 'M44 6 H76 V38 H108 V74 H76 V106 H44 V74 H12 V38 H44 Z', 눈: 40 }
   };
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
   function 얼굴HTML(m, o) {
     o = o || {}; var M = 모양[m] || 모양.heart, y = M.눈, k = o.크기 || 64;
     return '<svg class="ink-face' + (o.cls ? ' ' + esc(o.cls) : '') + '" data-shape="' + esc(모양[m] ? m : 'heart') + '" viewBox="0 0 120 112" width="' + k + '" height="' + Math.round(k * 112 / 120) + '"'
-      + (o.색 ? ' style="--ink-c:' + esc(o.색) + '"' : '') + (o.라벨 ? ' role="img" aria-label="' + esc(o.라벨) + '"' : ' aria-hidden="true"') + ' focusable="false">'
+      + (o.또렷 ? ' data-sharp="1"' : '') + (o.색 ? ' style="--ink-c:' + esc(o.색) + '"' : '') + (o.라벨 ? ' role="img" aria-label="' + esc(o.라벨) + '"' : ' aria-hidden="true"') + ' focusable="false">'
       + '<g class="ink-body"><image data-ink-face/><g class="ink-eyes"><rect class="ink-eye l" x="40" y="' + y + '" width="10" height="23" rx="5" fill="#fff"/><rect class="ink-eye r" x="70" y="' + y + '" width="10" height="23" rx="5" fill="#fff"/></g>'
       + '<g class="ink-smile" fill="none" stroke="#fff" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"><path d="M38 ' + (y + 14) + ' L45 ' + (y + 6) + ' L52 ' + (y + 14) + '"/><path d="M68 ' + (y + 14) + ' L75 ' + (y + 6) + ' L82 ' + (y + 14) + '"/></g></g></svg>';
   }
@@ -1637,16 +1638,17 @@
   }
   function 강조(el) { var v = ''; try { v = getComputedStyle(el).getPropertyValue('--ink-c') || getComputedStyle(el).getPropertyValue('--ink-accent'); } catch (e) {}
     return 색값(v) || 색값(설정.색) || [232, 69, 44]; }
+  function 어두움() { var h = document.documentElement, t = h.getAttribute('data-theme'); if (t === 'dark') return true; if (t === 'light') return false; try { return matchMedia('(prefers-color-scheme: dark)').matches; } catch (e) { return false; } }   /* 11-17f */
   var 길 = {};
   function 얼굴그리기(뿌리) {
     var dpr = window.devicePixelRatio || 1, seed = 1;
     (뿌리 || document).querySelectorAll('svg.ink-face image[data-ink-face]').forEach(function (im) {
       var svg = im.ownerSVGElement, px = svg.getBoundingClientRect().width; if (!px) return;
-      var m = svg.getAttribute('data-shape') || 'heart', c0 = 강조(svg), 열쇠 = m + '|' + Math.round(px) + '|' + c0.join(',');
+      var 밤 = 어두움() || svg.getAttribute('data-sharp') === '1', m = svg.getAttribute('data-shape') || 'heart', c0 = 강조(svg), 열쇠 = m + '|' + Math.round(px) + '|' + c0.join(',') + (밤 ? '|d' : '');
       if (im.getAttribute('data-k') === 열쇠) return;
-      var s = px / 120 * dpr, pad = 14, sigma = Math.max(1, Math.round(4.2 * s)), W = Math.ceil((120 + 2 * pad) * s), H = Math.ceil((112 + 2 * pad) * s);
+      var s = px / 120 * dpr, pad = 14, sigma = Math.max(1, Math.round((밤 ? 1.8 : 4.2) * s)), W = Math.ceil((120 + 2 * pad) * s), H = Math.ceil((112 + 2 * pad) * s);
       var P = 길[m] || (길[m] = new Path2D((모양[m] || 모양.heart).d));
-      var c = paint(W, H, function (x) { x.setTransform(s, 0, 0, s, pad * s, pad * s); x.fill(P); }, null, sigma, 1.15, c0, null, (seed++) * 7919);
+      var c = paint(W, H, function (x) { x.setTransform(s, 0, 0, s, pad * s, pad * s); x.fill(P); }, null, sigma, 밤 ? 0.6 : 1.15, c0, null, (seed++) * 7919);
       im.setAttribute('href', c.toDataURL()); im.setAttribute('x', -pad); im.setAttribute('y', -pad); im.setAttribute('width', 120 + 2 * pad); im.setAttribute('height', 112 + 2 * pad);
       im.setAttribute('data-k', 열쇠); svg.style.overflow = 'visible';
     });
@@ -1654,14 +1656,14 @@
   function 면그리기(뿌리) {
     var dpr = window.devicePixelRatio || 1, seed = 100;
     var 테 = 색값(getComputedStyle(document.documentElement).getPropertyValue('--ink-rim')) || [200, 200, 200];
-    (뿌리 || document).querySelectorAll('[data-ink]:not(html)').forEach(function (el) {
+    (뿌리 || document).querySelectorAll('[data-mn-ink],[data-ink=""]:not(html),[data-ink="solid"]:not(html)').forEach(function (el) {
       var 바탕 = 바탕색(el.parentElement), w = el.offsetWidth, h = el.offsetHeight; if (!w || !h) return;
-      var solid = el.getAttribute('data-ink') === 'solid', c0 = solid ? 강조(el) : 테, 열쇠 = w + 'x' + h + '|' + c0.join(',') + '|' + 바탕.join(',');
+      var solid = (el.getAttribute('data-mn-ink') || el.getAttribute('data-ink')) === 'solid', c0 = solid ? 강조(el) : 테, 열쇠 = w + 'x' + h + '|' + c0.join(',') + '|' + 바탕.join(',');
       var 옛 = el.querySelector(':scope > canvas.ink'); if (옛 && el.getAttribute('data-ink-k') === 열쇠) return; if (옛) 옛.remove();
       var st = getComputedStyle(el), rad = ['borderTopLeftRadius', 'borderTopRightRadius', 'borderBottomRightRadius', 'borderBottomLeftRadius'].map(function (k) { return Math.min(parseFloat(st[k]) || 0, h / 2, w / 2); });
       var pad = 6, soft = 0.6, rimW = 2.4, W = Math.round((w + 2 * pad) * dpr), H = Math.round((h + 2 * pad) * dpr);
       function rr(inset) { return function (x) { x.setTransform(dpr, 0, 0, dpr, 0, 0); x.beginPath(); if (x.roundRect) x.roundRect(pad + inset, pad + inset, w - 2 * inset, h - 2 * inset, rad.map(function (r) { return Math.max(0, r - inset); })); else x.rect(pad + inset, pad + inset, w - 2 * inset, h - 2 * inset); x.fill(); }; }
-      var c = paint(W, H, rr(0), solid ? null : rr(rimW), Math.max(1, Math.round(soft * dpr)), 0.95, c0, solid ? null : 바탕, (seed++) * 104729);
+      var c = paint(W, H, rr(0), solid ? null : rr(rimW), Math.max(1, Math.round(soft * dpr)), solid ? 0.95 : 0.6, c0, solid ? null : 바탕, (seed++) * 104729);
       c.className = 'ink'; c.setAttribute('aria-hidden', 'true'); c.style.cssText = 'left:' + (-pad) + 'px;top:' + (-pad) + 'px;width:' + (w + 2 * pad) + 'px;height:' + (h + 2 * pad) + 'px';
       el.insertBefore(c, el.firstChild); el.setAttribute('data-ink-k', 열쇠);
     });
@@ -1673,24 +1675,39 @@
     + '.ink-eye{transform-box:fill-box;transform-origin:50% 50%;animation:inkBlink 5.2s infinite}.ink-eye.r{animation-delay:.04s}'
     + '@keyframes inkBlink{0%,94%,100%{transform:scaleY(1)}96.5%{transform:scaleY(.1)}}'
     + '.ink-face .ink-smile{opacity:0;transition:opacity .15s}.ink-face.pop .ink-smile{opacity:1}.ink-face.pop .ink-eyes{opacity:0}.ink-eyes{transition:opacity .15s}'
-    + '[data-ink]:not(html){position:relative;isolation:isolate}[data-ink]>canvas.ink{position:absolute;z-index:-1;pointer-events:none}'
-    + '[data-ink]:not(html):has(>canvas.ink){background:transparent!important;box-shadow:none!important}'
+    + ':where([data-mn-ink],[data-ink=""]:not(html),[data-ink="solid"]:not(html)){position:relative;isolation:isolate}canvas.ink{position:absolute;z-index:-1;pointer-events:none}'
+    + ':is([data-mn-ink],[data-ink=""]:not(html),[data-ink="solid"]:not(html)):has(>canvas.ink){background:transparent!important;box-shadow:none!important}'
     + '@media (prefers-reduced-motion:reduce){.ink-eye{animation:none}.ink-face .ink-body{transition:none}}'
-    /* 잉크 테마 토큰 — 공용 부품(계정·가입·설정·알림 띠·뒤로 알약·회원권)이 읽는 이름을 잉크 값으로 */
+    /* 잉크 테마 토큰 — 공용 부품(계정·가입·설정·알림 띠·뒤로 알약·요금 시트)이 읽는 이름을 잉크 값으로 */
     + 'html[data-ink] body{background:var(--ink-bg);color:var(--ink-fg)}html[data-ink]{--ink-bg:#FFFFFF;--ink-fg:#141414;--ink-mute:#8A8A8A;--ink-line:#EFEFEF;--ink-rim:#C8C8C8;'
-    + '--bg:var(--ink-bg);--surface:var(--ink-bg);--card:var(--ink-bg);--line:var(--ink-line);--ink:var(--ink-fg);--muted:var(--ink-mute);--accent:var(--ink-accent,#E8452C);--on-accent:#fff;--ms-bg:var(--ink-bg);--nt-accent:var(--ink-accent,#E8452C)}'
+    + '--bg:var(--ink-bg);--surface:var(--ink-bg);--card:var(--ink-bg);--line:var(--ink-line);--ink:var(--ink-fg);--muted:var(--ink-mute);--ms-bg:var(--ink-bg)}'
     + '@media (prefers-color-scheme:dark){html[data-ink]:not([data-theme="light"]){--ink-bg:#141414;--ink-fg:#F2F2F2;--ink-mute:#8C8C8C;--ink-line:#242424;--ink-rim:#4A4A4A}}'
-    + 'html[data-ink][data-theme="dark"]{--ink-bg:#141414;--ink-fg:#F2F2F2;--ink-mute:#8C8C8C;--ink-line:#242424;--ink-rim:#4A4A4A}';
+    + 'html[data-ink][data-theme="dark"]{--ink-bg:#141414;--ink-fg:#F2F2F2;--ink-mute:#8C8C8C;--ink-line:#242424;--ink-rim:#4A4A4A}'
+    /* 11-17 부품 본보기(_시안/ink/부품_본보기.html) — 공용 부품의 고르기·켜고 끄기·목록을 잉크 모양으로(설정 · 알림) */
+    + 'html[data-ink] .ms-segs{background:transparent!important;border:0!important;padding:0!important}'
+    + 'html[data-ink] .ms-sb{display:inline-flex!important;flex-wrap:nowrap!important;gap:0!important;padding:4px;border-radius:999px;box-shadow:inset 0 0 0 1.5px var(--ink-rim)}'
+    + 'html[data-ink] .ms-sb button{flex:1 1 auto!important;min-height:44px!important;border:0!important;border-radius:999px!important;padding:6px 16px!important;font-weight:600!important;color:var(--ink-fg)!important}'
+    + 'html[data-ink] .ms-sb button.on{background:var(--ink-fg)!important;color:var(--ink-bg)!important;border:0!important}'
+    + 'html[data-ink] .nt-row{border:0!important;border-bottom:1px solid var(--ink-line)!important;border-radius:0!important;background:transparent!important;padding:14px 2px!important}'
+    + 'html[data-ink] .nt-knob i{box-shadow:none!important}'
+    + 'html[data-ink] .ms-row{border-bottom-color:var(--ink-line)!important}html[data-ink] .ms-row b{color:var(--ink-fg)!important}';
   var 설치됨 = false, 틀 = null;
   function 나중() { clearTimeout(틀); 틀 = setTimeout(function () { 그리기(); }, 150); }
   function 설치(o) {
     o = o || {}; for (var k in o) if (Object.prototype.hasOwnProperty.call(o, k)) 설정[k] = o[k];
+    try {   /* 11-17g 강조색은 :root 규칙(특이도 낮음)으로 — 앱의 어두운 화면 규칙(html.night{…} 등)이 이길 수 있게(너스텝). 어두운색을 주면 어두운 바탕에서 그 색 */
+      var 옛 = document.getElementById('ink-accent-css'); if (옛) 옛.remove();
+      if (설정.색) { var c = 설정.색, d = 설정.어두운색, t = ':root{--ink-accent:' + c + ';--accent:' + c + ';--nt-accent:' + c + ';--on-accent:#fff}';
+        if (d) t += '@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--ink-accent:' + d + ';--accent:' + d + ';--nt-accent:' + d + '}}:root[data-theme="dark"]{--ink-accent:' + d + ';--accent:' + d + ';--nt-accent:' + d + '}';
+        var st0 = document.createElement('style'); st0.id = 'ink-accent-css'; st0.textContent = t; (document.head || document.documentElement).insertBefore(st0, (document.head || document.documentElement).firstChild); }
+    } catch (e) {}
     if (설치됨) { 나중(); return; } 설치됨 = true;
     try { var st = document.createElement('style'); st.id = 'ink-css'; st.textContent = CSS; document.head.appendChild(st); } catch (e) {}
     document.addEventListener('click', function (ev) { var f = ev.target.closest && ev.target.closest('svg.ink-face'); if (!f) return; f.classList.add('pop'); clearTimeout(f._t); f._t = setTimeout(function () { f.classList.remove('pop'); }, 900); });
     (document.fonts && document.fonts.ready ? document.fonts.ready : Promise.resolve()).then(function () { 그리기(); });
     window.addEventListener('resize', 나중);
     try { matchMedia('(prefers-color-scheme: dark)').addEventListener('change', 나중); } catch (e) {}
+    try { new MutationObserver(나중).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] }); } catch (e) {}
     if (설정.지켜보기 && window.MutationObserver) { try { new MutationObserver(function (ms) { for (var i = 0; i < ms.length; i++) { var t = ms[i].target; if (t && t.nodeName === 'CANVAS') continue; 나중(); return; } }).observe(document.body, { childList: true, subtree: true }); } catch (e) {} }
   }
   window.잉크 = { 판: 판, 설치: 설치, 얼굴HTML: 얼굴HTML, 그리기: 그리기, 모양: Object.keys(모양) };
@@ -1779,7 +1796,7 @@ try {
      동기화: 서버.설치({ 동기화허용: function(){ return !window.가입 || 가입.됨(); } })
    ⛔ 「돈 안 드는」 뜻의 그 낱말(원칙 금지어)을 쓰지 않는다 — 초대는 「초대 코드로 체험」. */
 (function () {
-  var 판 = '2026-10-21';   /* 부품 판 11-11a — 앱별 민감 동의 · 회원권이면 동의 한 번 · 두 번째 앱 회원권 한 줄 */
+  var 판 = '2026-11-17e';   /* 11-17e 묶음 상품 폐지 */   /* 부품 판 11-11a — 앱별 민감 동의 · 회원권이면 동의 한 번 · 두 번째 앱 회원권 한 줄 */
   var 앱들 = ['kids', 'gildongmu', 'clinicscore', 'gyeote', 'yakjido'];
   var 앱이름 = { kids: '우리 집 소아과', gildongmu: '길동무', clinicscore: 'ClinicScore', gyeote: '곁에', yakjido: '약지도' };
   var 설정 = { 초대길: null, app: 'app', 약관판: '', 이름: null, 말: null, 약관: '', 처리방침: '', 추가동의: [], 민감동의: null, 서버1111: false, 시트열기: null, 시트닫기: null, 알림: null, 모양: {} };   /* 11-11 민감동의(앱 글 {ko,en}) · 서버1111(join_app2 쓰기 — SQL 적용 뒤 켬) */
@@ -1787,7 +1804,7 @@ try {
     ko: {
       가입제목: '{앱} 가입', 가입말: '이 계정은 메디나눔의 다른 앱에서 만들어졌어요. {앱}을(를) 쓰시려면 이 앱의 약관에 따로 동의해 주세요. 다른 앱의 기록은 이 앱에 보이지 않아요.',
       가입동의: '(필수) {앱} <a href="{약관}" target="_blank" rel="noopener">이용약관</a>과 <a href="{처리방침}" target="_blank" rel="noopener">개인정보 처리방침</a>에 동의합니다',
-      회원권가입말: '메디나눔 회원권으로 다섯 앱이 열려 있어요. {앱}에서는 이 앱의 동의만 한 번 받을게요 — 다른 앱의 기록은 이 앱에 보이지 않아요.', 회원권권함: '앱을 3개 이상 쓰시면 메디나눔 회원권이 더 알뜰해요 — 다섯 앱을 월 {회원권값}에', 회원권보기: '회원권 보기', 민감없음: '건강정보 동의에 체크해 주세요. 이 앱은 건강정보를 다뤄서, 회원권이어도 따로 여쭤요.',
+      회원권가입말: '다른 메디나눔 앱에서 쓰시던 계정이에요. {앱}에서는 이 앱의 동의만 한 번 받을게요 — 다른 앱의 기록은 이 앱에 보이지 않아요.', 회원권권함: '다른 메디나눔 앱을 정기 결제하고 계시면, 이 앱은 월 1,000원 덜 내요(준비 중)', 회원권보기: '회원권 보기', 민감없음: '건강정보 동의에 체크해 주세요. 이 앱은 건강정보를 다뤄서, 회원권이어도 따로 여쭤요.',
       가입단추: '동의하고 가입', 나중: '로그아웃', 가입됨: '{앱}에 가입했어요.', 체크: '필수 항목에 모두 체크해 주세요.', 문제: '잠시 문제가 있었어요. 다시 해 주세요.',
       인터넷: '인터넷이 닿지 않아요. 연결되면 다시 해 주세요.', 가입대기: '{앱} 가입 동의 전이라 동기화를 멈춰 두었어요.', 가입열기: '가입 동의하기',
       초대: '초대 코드', 초대말: '받으신 초대 코드가 있으면 넣어 주세요.', 초대넣기: '코드 넣기', 초대칸: '예: MN-AB12-CD34',
@@ -1798,7 +1815,7 @@ try {
               notfound: '맞는 코드가 없어요. 글자를 다시 확인해 주세요.', off: '사용이 멈춘 코드예요.', expired: '기한이 지난 코드예요.',
               full: '정해진 인원이 다 쓴 코드예요.', scope: '이 앱에는 쓸 수 없는 코드예요.', used: '이미 쓰신 코드예요.', app: '잠시 문제가 있었어요.' },
       관리자: '관리자', 관리제목: '관리자', 앱별: '앱별 숫자', 가입자: '가입', 체험: '체험', 구독: '구독', 초대받음: '초대', 문의대기: '답 기다리는 문의',
-      회원권: '회원권', 계정: '계정', 새코드: '새 초대 코드', 범위: '쓸 수 있는 앱', 모든앱: '다섯 앱 모두', 기간: '받는 기간(일)', 인원: '쓸 수 있는 사람 수',
+      회원권: '정기 결제', 계정: '계정', 새코드: '새 초대 코드', 범위: '쓸 수 있는 앱', 모든앱: '다섯 앱 모두', 기간: '받는 기간(일)', 인원: '쓸 수 있는 사람 수',
       유효: '코드 유효(일, 비우면 끝없음)', 메모: '메모(누구에게 주나)', 만들기: '만들기', 만듦: '만들었어요: {코드}', 복사: '복사',
       코드들: '초대 코드', 사용: '사용', 켜짐: '쓰는 중', 꺼짐: '멈춤', 멈추기: '멈추기', 다시켜기: '다시 켜기', 사람: '받은 사람', 회수: '거두기',
       회수확인: '한 번 더 누르면 거둬요', 회수됨: '거뒀어요.', 문의: '문의', 모든문의: '모든 앱', 없음: '아직 없어요.', 닫기: '닫기', 새로: '새로 고침', 까지: '{날}까지',
@@ -1813,7 +1830,7 @@ try {
     en: {
       가입제목: 'Join {앱}', 가입말: 'This account was created in another MediNanum app. To use {앱}, please agree to this app’s terms separately. Records from other apps are not shown here.',
       가입동의: '(Required) I agree to the {앱} <a href="{약관}" target="_blank" rel="noopener">Terms</a> and <a href="{처리방침}" target="_blank" rel="noopener">Privacy Policy</a>',
-      회원권가입말: 'Your MediNanum pass opens all five apps. {앱} just needs your consent once for this app — records from other apps are not shown here.', 회원권권함: 'Using three or more apps? The MediNanum pass is better value — all five apps for {회원권값} a month', 회원권보기: 'See the pass', 민감없음: 'Please tick the health information consent. This app handles health information, so we ask separately even with the pass.',
+      회원권가입말: 'You already use this account in another MediNanum app. {앱} just needs your consent once for this app — records from other apps are not shown here.', 회원권권함: 'If you subscribe to another MediNanum app, this app is ₩1,000 less a month (coming soon)', 회원권보기: 'See the pass', 민감없음: 'Please tick the health information consent. This app handles health information, so we ask separately even with the pass.',
       가입단추: 'Agree and join', 나중: 'Sign out', 가입됨: 'You joined {앱}.', 체크: 'Please tick all required boxes.', 문제: 'Something went wrong. Please try again.',
       인터넷: 'No connection. Please try again when you are online.', 가입대기: 'Sync is paused until you agree to {앱}’s terms.', 가입열기: 'Agree and join',
       초대: 'Invite code', 초대말: 'If you received an invite code, enter it here.', 초대넣기: 'Apply code', 초대칸: 'e.g. MN-AB12-CD34',
@@ -1824,7 +1841,7 @@ try {
               notfound: 'That code was not found. Please check the letters.', off: 'This code has been switched off.', expired: 'This code has expired.',
               full: 'This code has been used by everyone it was meant for.', scope: 'This code is not for this app.', used: 'You already used this code.', app: 'Something went wrong.' },
       관리자: 'Admin', 관리제목: 'Admin', 앱별: 'By app', 가입자: 'Joined', 체험: 'Trial', 구독: 'Paid', 초대받음: 'Invited', 문의대기: 'Open questions',
-      회원권: 'Pass', 계정: 'Accounts', 새코드: 'New invite code', 범위: 'Apps', 모든앱: 'All five apps', 기간: 'Access (days)', 인원: 'People',
+      회원권: 'Subscriptions', 계정: 'Accounts', 새코드: 'New invite code', 범위: 'Apps', 모든앱: 'All five apps', 기간: 'Access (days)', 인원: 'People',
       유효: 'Code valid (days, blank = no end)', 메모: 'Note (who it is for)', 만들기: 'Create', 만듦: 'Created: {코드}', 복사: 'Copy',
       코드들: 'Invite codes', 사용: 'Used', 켜짐: 'Active', 꺼짐: 'Stopped', 멈추기: 'Stop', 다시켜기: 'Turn on', 사람: 'People', 회수: 'Revoke',
       회수확인: 'Tap again to revoke', 회수됨: 'Revoked.', 문의: 'Questions', 모든문의: 'All apps', 없음: 'Nothing yet.', 닫기: 'Close', 새로: 'Refresh', 까지: 'until {날}',
@@ -1902,8 +1919,7 @@ try {
     (설정.추가동의 || []).forEach(function (x) { 칸 += '<label class="subagree"><input type="checkbox" class="joinchk"> <span>' + esc(두벌(x)) + '</span></label>'; });
     if (설정.민감동의) 칸 += '<label class="subagree"><input type="checkbox" class="joinchk joinsens"> <span>' + esc(두벌(설정.민감동의)) + '</span></label>';   /* 11-11 — 앱마다 따로 · 회원권이어도 생략 안 함 */
     /* 11-11 회원권 권하기 — 두 번째 앱부터 작은 한 줄(압박 말 없음 · 가입 단추는 그대로) */
-    var 권함 = (!o.pass && o.apps >= 1 && window.회원권 && 회원권.열기)
-      ? 작은(말글('회원권권함', { 앱값: 원((window.회원권.값표 && 회원권.값표.앱 && 회원권.값표.앱.월) || 4900), 회원권값: 원((window.회원권.값표 && 회원권.값표.회원권 && 회원권.값표.회원권.월) || 12900) }) + ' <button type="button" class="' + (모('보조') || '') + '" onclick="회원권.열기()">' + esc(말글('회원권보기')) + '</button>') : '';
+    var 권함 = (!o.pass && o.apps >= 1) ? 작은(말글('회원권권함')) : '';   /* 11-17 밤 — 묶음 상품 내림 · 다른 앱 할인 한 줄(준비 중) */
     return '<div id="joinbox"><p>' + 말글(o.pass ? '회원권가입말' : '가입말') + '</p>' + 칸 + 줄(단추(말글('가입단추'), '가입.가입하기()', true) + 단추(말글('나중'), '가입.나가기()', false)) + 권함 + '</div>';
   }
   function 가입열기() { 시트열기(가입HTML(), 말글('가입제목')); }
@@ -2583,7 +2599,7 @@ try {
 */
 (function () {
   if (window.회원권 && window.회원권.__v) return;
-  var 판 = '2026-11-13a';   /* 11-11c 법무 — 가족 나눠 쓰기 문구 폐기(기기 두 대 · 각자 계정) · 두 구독 겹침 결제 안내 */   /* 11-11b 베이지 상자 안쪽 여백 고정(앱 ul 초기화에 지지 않게) · 제목 왼쪽 */
+  var 판 = '2026-11-17d';   /* 11-17d 현욱님 결정 「회원권 폐지 · 앱마다 출시」 — 시트는 앱별 정기 결제 안내 + 다른 앱 1,000원 할인(준비 중) · 홈 띠 끔 · 이름은 그대로(부르는 앱 코드 안 깨지게) */   /* 11-17c 앱 이름 바꿈 — 너스텝(현욱님) */   /* 11-17b 표에 없는 말은 영어 받침 */   /* 11-17a 새 앱 둘(산부인과·너스텝) 스위치 꺼진 채 — 설치({일곱앱:true}) 때만 일곱 앱 */   /* 11-11c 법무 — 가족 나눠 쓰기 문구 폐기(기기 두 대 · 각자 계정) · 두 구독 겹침 결제 안내 */   /* 11-11b 베이지 상자 안쪽 여백 고정(앱 ul 초기화에 지지 않게) · 제목 왼쪽 */
   /* 값은 여기 한 곳(원칙_결정 10-21·11-03) — 앱 하나: 월 5,900 · 연 49,000(출시 4,900 · 39,900) / 다섯 앱 회원권: 월 12,900 · 연 99,000(출시 9,900 · 79,000) · 체험 14일 */
   var 값표 = { 앱: { 월: 4900, 연: 39900 }, 회원권: { 월: 12900, 연: 99000, 출시월: 9900, 출시연: 79000 } };   /* 11-13 현욱님 — 앱 하나 늘 4,900·39,900(기념가 없음) · 회원권 그대로 */
   var 설정 = { app: 'app', 가로채기: false, 언어: null, 가격: 값표.회원권, 앱가격: 값표.앱, 판매: null, 자료: null,
@@ -2613,16 +2629,33 @@ try {
       정체: { ko: '집에서 할 일 · 약국 약 · 진료 신호를 차례로', en: 'Home care, pharmacy medicines and when to see a doctor — in order', es: 'Qué hacer en casa, qué pedir en la farmacia y cuándo ir al médico', ja: '家でできること・薬局の薬・受診のサインを順番に', zh: '居家处理、药店用药、就医信号——依次告诉你' },
       대표: { ko: '가족 약통 · 가족 알림', en: 'Family medicine box · family reminders', es: 'Botiquín familiar · avisos para la familia', ja: '家族の薬箱 · 家族への通知', zh: '家庭药箱 · 家人提醒' } }
   };
-  var 앱차례 = ['kids', 'gildongmu', 'yakjido', 'gyeote', 'clinicscore'];
+  /* 11-17 Main — 새 앱 둘(산부인과·너스텝)을 스위치 꺼진 채 준비. 서버 앱 목록 다섯 개 규칙 · 「서버 적용해」 전이라 켜지 않는다.
+     켜기: 회원권.설치({ 일곱앱: true }) — 그때 목록·문구가 일곱 앱으로(다섯→일곱). 꺼져 있으면 지금 다섯 앱 그대로.
+     꺼져 있는 동안 새 앱 «안»에서: 「이 앱 하나」 줄에 자기 이름이 보이고, 회원권 줄 아래에 「이 앱은 곧 회원권에 들어가요」 한 줄(회원권이 이 앱을 연다고 말하지 않게). */
+  var 새앱들 = {
+    obgyn: { 주소: 'https://obgyn.medinanum.com/', 그림: 'https://medinanum.com/img/obgyn.png', 색: '#5E7F62',
+      이름: { ko: '우리 집 산부인과', en: 'Our Home OB-GYN', es: 'Our Home OB-GYN', ja: 'Our Home OB-GYN', zh: 'Our Home OB-GYN' },
+      정체: { ko: '초경부터 아이 예방접종까지 — 여성 건강을 기록하고 지금 필요한 것만', en: 'From a first period to a child\'s vaccines — log women\'s health and see only what you need now', es: 'Embarazo, parto y salud de la mujer: primero, si hay que ir ya', ja: '妊娠・出産・女性の健康 — まず今すぐ受診が必要か', zh: '怀孕、分娩与女性健康 — 先看是否需要马上就医' },
+      대표: { ko: '주차별 기록 · 진료 준비', en: 'Week-by-week log · visit prep', es: 'Registro semanal · preparar la consulta', ja: '週ごとの記録 · 受診の準備', zh: '按周记录 · 就诊准备' } },
+    nursmart: { 주소: 'https://nurse.medinanum.com/', 그림: 'https://medinanum.com/img/nursmart.png', 색: '#1F6F78',
+      이름: { ko: '너스텝', en: 'Nurstep', es: 'Nurstep', ja: 'Nurstep', zh: 'Nurstep' },
+      정체: { ko: '간호사·학생과 보호자 — 주사·약 쓰는 법과 집에서 돌보는 법', en: 'For nurses, students and caregivers — using injections and medicines, and caring at home', es: 'Para enfermería, estudiantes y cuidadores: cómo usar inyecciones y medicamentos y cuidar en casa', ja: '看護師・学生と家族へ — 注射・薬の使い方と家でのケア', zh: '面向护士、学生和照护者 — 注射与用药方法及居家照护' },
+      대표: { ko: '보호자 교육 한 장', en: 'One-page caregiver guide', es: 'Guía de una página para cuidadores', ja: '家族向け説明シート', zh: '照护者一页指南' } }
+  };
+  Object.keys(새앱들).forEach(function (k) { 앱들[k] = 새앱들[k]; });
+  function 일곱() { return !!설정.일곱앱; }
+  var 다섯차례 = ['kids', 'gildongmu', 'yakjido', 'gyeote', 'clinicscore'];
+  var 앱차례 = 다섯차례;
+  function 차례() { return (일곱() || 폐지()) ? 다섯차례.concat(['obgyn', 'nursmart']) : 다섯차례; }
 
   var 글표 = {
-    ko: { 강조줄: '이 기능을 포함해 다섯 앱의 회원 기능 · 값과 늘 열린 것 보기', 제목: '메디나눔 회원권', 머리: '회원권 하나로 <b>다섯 앱</b>이 모두 열려요', 갈래: '아이 · 암 · 마음 · 약 · 진료 계산 — 가족 건강 다섯 갈래를 한 번에',
-      월: '월 {n}원', 연: '연 {n}원', 출시: '출시 기념가', 출시뒤: '출시 3개월 안에 가입하면 첫해 동안 · 그 뒤 {월} · {연}', 체험: '14일 써 보고 정하세요', 이앱하나: '이 앱 하나', 회원권다섯: '다섯 앱 회원권', 그뒤: '그 뒤 {월} · {연}', 출시때: '출시 기념가는 회원권이 열리는 날부터 3개월 안에 가입하면 첫해 동안이에요', 겹침: '이미 앱 이용권을 구독 중이면 회원권과 두 구독이 함께 결제될 수 있어요 — 회원권으로 바꾸실 때는 스토어의 구독 관리에서 앱 이용권을 해지해 주세요', 두대: '계정 하나로 기기 두 대까지 · 가족의 기록은 각자 계정으로(같은 계정이면 서로 보여요)', 자동: '14일 체험 뒤 자동 결제돼요 · 부가세 포함 · 설정에서 언제든 해지', 자동곧: '열리면 이렇게 결제돼요 — 체험 14일이 끝나는 날 고르신 요금이 자동 결제 · 부가세 포함 · 설정에서 언제든 해지',
+    ko: { 강조줄: '이 기능을 포함해 다섯 앱의 회원 기능 · 값과 늘 열린 것 보기', 제목: '메디나눔 회원권', 머리: '회원권 하나로 <b>다섯 앱</b>이 모두 열려요', 갈래: '아이 · 암 · 마음 · 약 · 진료 계산',
+      월: '월 {n}원', 연: '연 {n}원', 출시: '출시 기념가', 출시뒤: '출시 3개월 안에 가입하면 첫해 동안 · 그 뒤 {월} · {연}', 체험: '14일 써 보고 정하세요', 이앱하나: '이 앱 하나', 회원권다섯: '다섯 앱 회원권', 그뒤: '그 뒤 {월} · {연}', 출시때: '열린 날부터 3개월 안에 가입하면 첫해 이 값이에요', 겹침: '앱 이용권을 쓰고 계시면, 회원권으로 바꿀 때 스토어에서 앱 이용권을 해지해 주세요(둘 다 결제되지 않게)', 두대: '계정 하나로 기기 두 대까지 · 가족은 각자 계정으로', 자동: '14일 체험 뒤 자동 결제돼요 · 부가세 포함 · 설정에서 언제든 해지', 자동곧: '체험 14일 뒤 자동 결제 · 부가세 포함 · 언제든 해지',
       좋은점: '회원이 되면', 좋1: '폰을 바꿔도 기록이 그대로', 좋1말: '계정에 저장해 새 폰·다른 기기에서 이어서 써요', 좋2: '진료 갈 때 한 장으로', 좋2말: '그동안의 기록을 한 장·PDF로 정리해 보여 드려요', 좋3: '가족과 함께', 좋3말: '아이 여럿 · 가족 약 알림까지 한 계정으로',
-      이앱: '{앱}에서 열리는 것', 지금: '지금 누르신 기능', 강조말: '이 기능은 회원권으로 열려요. 어디서 쓰는지 아래에 적어 두었어요.', 어디서: '어디서', 열기: '열기',
+      이앱: '{앱}에서 열리는 것', 지금: '지금 누르신 기능', 강조말: '이 기능은 회원권으로 열려요.', 어디서: '어디서', 열기: '열기',
       다른: '다른 네 앱에서도', 앱열기: '열어 보기', 회원이면: '회원이면', 늘: '늘 열려 있는 것', 늘말: '응급·안전 기능은 회원이 아니어도 <b>늘 열려 있어요</b>.',
       흐름: '14일 체험은 이렇게', 흐1: '<b>오늘</b> — 다섯 앱이 모두 열려요', 흐2: '<b>12일째</b> — 끝나기 2일 전에 앱에서 미리 알려 드려요', 흐3: '<b>14일째</b> — 해지하지 않으면 고르신 요금으로 이어져요',
-      곧: '곧 열려요', 곧말: '회원권은 스토어 등록을 마치는 대로 열려요. 지금은 값과 내용을 미리 보여 드려요.', 알림받기: '열리면 알려 주세요', 알림됨: '열리면 이 앱에서 알려 드릴게요',
+      곧: '곧 열려요', 곧말: '스토어 등록을 마치면 열려요. 값과 내용을 먼저 보여 드려요.', 알림받기: '열리면 알려 주세요', 알림됨: '열리면 이 앱에서 알려 드릴게요',
       시작: '14일 써 보기', 연시작: '1년으로 시작 · {값}', 이앱만: '이 앱만 쓰기', 해지: '언제든 해지할 수 있어요', 환불: '환불 규정',
       회원: '회원 · 다섯 앱 열림', 까지: '{날}까지', 회원말: '이 앱에서 바로 쓸 수 있어요', 운영자: '운영자 · 모든 기능', 관리: '구독 관리',
       이앱구독: '이 앱은 구독으로 열려 있어요. 회원권으로 바꾸면 다른 네 앱도 함께 열려요.',
@@ -2672,6 +2705,41 @@ try {
       이앱구독: '您已单独订阅此应用。改用会员订阅后，也可使用另外四个应用的会员功能。',
       줄설명: '五个应用一次全开 · 看看有什么', 띠: '一份会员订阅即可使用全部五个应用的会员功能', 띠열림: 'Medinanum 会员卡已开放', 띠보기: '看看有什么', 닫기: '关闭', 날: '{m}月{d}日' }
   };
+
+  /* 11-17d 폐지글 — 묶음 상품이 없어진 뒤 보이는 글(이 표에 있는 열쇠가 먼저) */
+  var 폐지글 = {
+    ko: { 제목: '이용 요금', 머리: '필요한 앱만 <b>정기 결제</b>해요', 갈래: '한 앱을 정기 결제하는 동안 다른 메디나눔 앱은 월 1,000원 덜 내요(준비 중)',
+      이앱하나: '이 앱', 할인칸: '다른 앱을 정기 결제 중이면', 할인곧: '할인 준비 중', 겹침: '앱마다 따로 결제하고 따로 해지해요. 할인은 같은 계정으로 확인되면 적용돼요.', 두대: '계정 하나로 기기 두 대까지 · 가족은 각자 계정으로',
+      좋은점: '정기 결제하면', 강조말: '이 기능은 정기 결제로 열려요.', 강조줄: '이 기능을 포함해 정기 결제로 열리는 것 · 값과 늘 열린 것 보기',
+      다른: '다른 메디나눔 앱 — 월 1,000원 덜(준비 중)', 회원이면: '정기 결제하면', 늘말: '응급·안전 기능은 결제하지 않아도 <b>늘 열려 있어요</b>.',
+      흐1: '<b>오늘</b> — 이 앱의 기능이 모두 열려요', 회원: '정기 결제 중', 이앱구독: '', 줄설명: '앱마다 정기 결제 · 무엇이 열리는지', 띠: '정기 결제하면 열리는 것', 띠열림: '정기 결제가 열렸어요',
+      시작: '14일 써 보기', 연시작: '1년으로 시작 · {값}', 이앱만: '이 앱 정기 결제' },
+    en: { 제목: 'Pricing', 머리: 'Subscribe <b>only to the apps you need</b>', 갈래: 'While you subscribe to one app, each other MediNanum app is ₩1,000 less a month (coming soon)',
+      이앱하나: 'This app', 할인칸: 'If you subscribe to another app', 할인곧: 'Discount coming soon', 겹침: 'Each app is billed and cancelled on its own. The discount applies once the same account is confirmed.', 두대: 'One account on up to two devices · family members use their own accounts',
+      좋은점: 'With a subscription', 강조말: 'This feature opens with a subscription.', 강조줄: 'This feature and what a subscription opens · price and what stays open',
+      다른: 'Other MediNanum apps — ₩1,000 less a month (coming soon)', 회원이면: 'With a subscription', 늘말: 'Emergency and safety features <b>always stay open</b>, without paying.',
+      흐1: '<b>Today</b> — everything in this app opens', 회원: 'Subscribed', 이앱구독: '', 줄설명: 'Per-app subscription · what opens', 띠: 'What a subscription opens', 띠열림: 'Subscriptions are open',
+      시작: 'Try 14 days', 연시작: 'Start with 1 year · {값}', 이앱만: 'Subscribe to this app' },
+    es: { 제목: 'Precios', 머리: 'Suscríbase <b>solo a las apps que necesita</b>', 갈래: 'Mientras esté suscrito a una app, las demás apps de MediNanum cuestan ₩1.000 menos al mes (próximamente)',
+      이앱하나: 'Esta app', 할인칸: 'Si está suscrito a otra app', 할인곧: 'Descuento próximamente', 겹침: 'Cada app se paga y se cancela por separado. El descuento se aplica al confirmar la misma cuenta.',
+      좋은점: 'Con la suscripción', 강조말: 'Esta función se abre con la suscripción.', 강조줄: 'Esta función y lo que abre la suscripción · precio y lo que sigue abierto',
+      다른: 'Otras apps de MediNanum — ₩1.000 menos al mes (próximamente)', 회원이면: 'Con la suscripción', 늘말: 'Las funciones de emergencia y seguridad <b>siempre están abiertas</b>, sin pagar.',
+      흐1: '<b>Hoy</b> — se abre todo en esta app', 회원: 'Suscrito', 이앱구독: '', 줄설명: 'Suscripción por app · qué se abre', 띠: 'Qué abre la suscripción', 띠열림: 'Las suscripciones ya están abiertas',
+      이앱만: 'Suscribirse a esta app' },
+    ja: { 제목: '料金', 머리: '<b>必要なアプリだけ</b>定期購入', 갈래: '1つのアプリを定期購入している間、ほかのメディナヌムのアプリは月₩1,000引き(準備中)',
+      이앱하나: 'このアプリ', 할인칸: 'ほかのアプリを定期購入中なら', 할인곧: '割引は準備中', 겹침: 'アプリごとに支払い・解約します。割引は同じアカウントの確認後に適用されます。',
+      좋은점: '定期購入すると', 강조말: 'この機能は定期購入で使えます。', 강조줄: 'この機能を含め定期購入で使えるもの · 料金といつも使えるもの',
+      다른: 'ほかのメディナヌムのアプリ — 月₩1,000引き(準備中)', 회원이면: '定期購入すると', 늘말: '緊急・安全の機能は支払わなくても<b>いつでも使えます</b>。',
+      흐1: '<b>今日</b> — このアプリの機能がすべて使えます', 회원: '定期購入中', 이앱구독: '', 줄설명: 'アプリごとの定期購入 · 使えるもの', 띠: '定期購入で使えるもの', 띠열림: '定期購入が始まりました',
+      이앱만: 'このアプリを定期購入' },
+    zh: { 제목: '价格', 머리: '<b>只订阅需要的应用</b>', 갈래: '订阅一个应用期间，其他 MediNanum 应用每月少付 ₩1,000（即将推出）',
+      이앱하나: '此应用', 할인칸: '如已订阅其他应用', 할인곧: '优惠即将推出', 겹침: '每个应用单独付费、单独取消。确认为同一账号后适用优惠。',
+      좋은점: '订阅后', 강조말: '此功能需订阅后开放。', 강조줄: '此功能及订阅后开放的内容 · 价格与始终开放的内容',
+      다른: '其他 MediNanum 应用 — 每月少付 ₩1,000（即将推出）', 회원이면: '订阅后', 늘말: '急救与安全功能<b>始终开放</b>，无需付费。',
+      흐1: '<b>今天</b> — 此应用的功能全部开放', 회원: '订阅中', 이앱구독: '', 줄설명: '按应用订阅 · 开放内容', 띠: '订阅后开放的内容', 띠열림: '订阅已开放',
+      이앱만: '订阅此应用' }
+  };
+  function 폐지() { return 설정.폐지 !== false; }
   var 달en = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
   var 달es = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
 
@@ -2680,10 +2748,12 @@ try {
     try { if (typeof 설정.언어 === 'function') l = 설정.언어(); } catch (e) {}
     if (!l) l = (document.documentElement && document.documentElement.lang) || 'ko';
     l = String(l).toLowerCase().slice(0, 2);
-    return 말들.indexOf(l) >= 0 ? l : 'ko';
+    return 말들.indexOf(l) >= 0 ? l : 'en';   /* 11-17b 표에 없는 말(vi·tl·th 등)은 영어로 — 한국어로 떨어지던 것 */
   }
   function 채움(t, o) { return String(t).replace(/\{([^{}]+)\}/g, function (m, k) { return o && k in o ? o[k] : m; }); }
-  function 글(k, o) { var t = 글표[언어()][k]; if (t == null) t = 글표.en[k]; if (t == null) t = 글표.ko[k]; return 채움(t, o); }
+  function 글(k, o) { var t = 폐지() && 폐지글[언어()] && 폐지글[언어()][k] != null ? 폐지글[언어()][k] : (폐지() && 폐지글.en[k] != null && 언어() !== 'ko' && 글표[언어()][k] == null ? 폐지글.en[k] : 글표[언어()][k]); if (t == null && 폐지() && 폐지글.en[k] != null) t = 폐지글.en[k]; if (t == null) t = 글표.en[k]; if (t == null) t = 글표.ko[k]; t = 채움(t, o);
+    if (일곱()) t = String(t).replace(/다섯/g, '일곱').replace(/\bfive\b/g, 'seven').replace(/\bFive\b/g, 'Seven').replace(/\bcinco\b/g, 'siete').replace(/5つ/g, '7つ').replace(/五个/g, '七个').replace(/五款/g, '七款');
+    return t; }
   function 골라(v) {   /* 앱이 준 글 — 글 · {ko,en,es,ja,zh} */
     if (v == null) return '';
     if (typeof v !== 'object') return String(v);
@@ -2713,7 +2783,7 @@ try {
     try { var s = g.상태(); if (s && s.열림) return { 종류: s.회원권 ? 'pass' : 'app', until: s.until || null, status: s.status }; } catch (e) {}
     return null;
   }
-  function 회원() { var s = 지금상태(); return !!(s && (s.종류 === 'pass' || s.종류 === 'op')); }
+  function 회원() { var s = 지금상태(); return !!(s && (s.종류 === 'pass' || s.종류 === 'op' || (폐지() && s.종류 === 'app'))); }
 
   /* ── 작은 그림 — 한 줄 획(앱 색을 따른다) ── */
   var 그림들 = {
@@ -2751,8 +2821,11 @@ try {
     /* 전자상거래법 8·13조(11-09): 결제 전이면 「곧 열려요」를 값보다 위에 · 값 바로 아래 자동 결제·부가세·해지 한 줄 · 기념가는 기간과 그 뒤 값을 한 줄로
        11-10 Main — 「이 앱 하나」와 「다섯 앱 회원권」을 이름 붙여 나란히(값은 값표 한 곳) */
     if (!판매()) h += '<p class="mb-soonchip"><span class="mb-chip">' + 글('곧') + '</span></p>';
-    h += '<div class="mb-plans">' + 줄값(a, 글('이앱하나') + (앱 ? ' · ' + esc(골라(앱.이름)) : ''), false) + 줄값(g, 글('회원권다섯'), true) + '</div>';
-    if (g.출시월 || a.출시월) h += '<p class="mb-small">' + 글('출시때') + '</p>';
+    if (폐지()) h += '<div class="mb-plans">' + 줄값(a, 글('이앱하나') + (앱 ? ' · ' + esc(골라(앱.이름)) : ''), true) + '<div class="mb-plan"><b class="mb-pn">' + 글('할인칸') + '</b><span class="mb-chip">' + 글('할인곧') + '</span><p class="mb-price"><b>' + 월값(Math.max(0, (a.월 || 0) - 1000)) + '</b></p></div></div>';
+    else h += '<div class="mb-plans">' + 줄값(a, 글('이앱하나') + (앱 ? ' · ' + esc(골라(앱.이름)) : ''), false) + 줄값(g, 글('회원권다섯'), true) + '</div>';
+    var 지금앱 = (설정.자료 && 설정.자료.앱) || 설정.app;
+    if (새앱들[지금앱] && !일곱() && !폐지()) h += '<p class="mb-small">' + ({ ko: '이 앱은 곧 회원권에 들어가요. 지금은 「이 앱 하나」로 쓰실 수 있어요.', en: 'This app will join the membership soon. For now, use the single-app plan.', es: 'Esta app se sumará pronto a la membresía. Por ahora, use el plan de una app.', ja: 'このアプリはまもなく会員権に加わります。今は「このアプリだけ」で使えます。', zh: '此应用即将加入会员。目前请使用「单个应用」方案。' }[언어()] || '') + '</p>';   /* 11-17 — 새 앱 안에서 회원권이 이 앱을 연다고 말하지 않게 */
+    if (폐지() ? a.출시월 : (g.출시월 || a.출시월)) h += '<p class="mb-small">' + 글('출시때') + '</p>';
     h += '<p class="mb-auto">' + 글(판매() ? '자동' : '자동곧') + '</p>';
     h += '<p class="mb-auto">' + 글('겹침') + '</p>';   /* 11-11 법무 — 앱 이용권과 회원권이 함께 결제될 수 있음 · 바꾸는 법 */
     var 덧 = 설정.자료 && 설정.자료.덧말;   /* 11-10 — 앱별 덧말 한 줄(예: CS 학생 요금) */
@@ -2782,7 +2855,7 @@ try {
   }
   function 다른앱(열림) {
     var 지금 = (설정.자료 && 설정.자료.앱) || 설정.app;
-    return '<h3 class="mb-h">' + 글('다른') + '</h3><ul class="mb-apps">' + 앱차례.filter(function (k) { return k !== 지금; }).map(function (k) {
+    return '<h3 class="mb-h">' + 글('다른') + '</h3><ul class="mb-apps">' + 차례().filter(function (k) { return k !== 지금; }).map(function (k) {
       var a = 앱들[k];
       return '<li><a class="mb-app" href="' + a.주소 + '" target="_blank" rel="noopener">' + 앱아이콘(k) +
         '<span class="mb-at"><b>' + esc(골라(a.이름)) + '</b><span>' + 골라(a.정체) + '</span>' +
@@ -2799,7 +2872,7 @@ try {
   }
   function 단추들(강조) {
     var g = 구독(), h = '', 앱만 = '';
-    if (g && typeof g.켜짐 === 'function' && g.켜짐()) 앱만 = '<button type="button" class="' + 모('보조', 'mb-btn2') + '" onclick="회원권.이앱만(\'' + esc(강조 || '') + '\')">' + 글('이앱만') + '</button>';
+    if (g && typeof g.켜짐 === 'function' && g.켜짐() && !폐지()) 앱만 = '<button type="button" class="' + 모('보조', 'mb-btn2') + '" onclick="회원권.이앱만(\'' + esc(강조 || '') + '\')">' + 글('이앱만') + '</button>';
     if (판매()) {
       var 연 = (설정.가격 || {}).연;
       h = '<button type="button" class="' + 모('주', 'mb-btn') + '" onclick="회원권.시작()">' + 글('시작') + '</button>' +
@@ -2814,18 +2887,18 @@ try {
     return '<div class="mb-cta">' + h + '</div>';
   }
   function 시트HTML(강조) {
-    var s = 지금상태(), 열림 = !!(s && (s.종류 === 'pass' || s.종류 === 'op'));
+    var s = 지금상태(), 열림 = 회원();
     var h = '<div class="mb" id="mbSheet"><div class="mb-xbar"><button type="button" class="mb-x" aria-label="' + 글('닫기') + '" onclick="회원권.닫기()">' + 닫기그림 + '</button></div>';
     if (열림) {
       h += '<div class="mb-head mb-member"><p class="mb-lead"><b>' + 글(s.종류 === 'op' ? '운영자' : '회원') + '</b>' + (s.until && s.종류 !== 'op' ? ' · ' + 글('까지', { 날: 날(s.until) }) : '') + '</p>' +
         '<p class="mb-small">' + 글('갈래') + '</p></div>' + 기능목록(강조, true) + 다른앱(true) + 늘열림() +
-        (s.종류 === 'pass' && 구독() && 구독().관리열기 ? '<div class="mb-cta"><button type="button" class="' + 모('보조', 'mb-btn2') + '" onclick="구독.관리열기()">' + 글('관리') + '</button></div>' : '');
+        ((s.종류 === 'pass' || s.종류 === 'app') && 구독() && 구독().관리열기 ? '<div class="mb-cta"><button type="button" class="' + 모('보조', 'mb-btn2') + '" onclick="구독.관리열기()">' + 글('관리') + '</button></div>' : '');
     } else {
       var 이유 = (설정.자료 && 설정.자료.이유) || [];   /* 11-10 — 이 앱에서 회원권이 좋은 까닭 세 줄을 먼저 */
       if (이유.length) h += '<ul class="mb-why">' + 이유.slice(0, 3).map(function (x) { return '<li>' + 골라(x) + '</li>'; }).join('') + '</ul>';
       h += '<div class="mb-head"><p class="mb-lead">' + 글('머리') + '</p><p class="mb-small">' + 글('갈래') + '</p>' + 값머리() + '<p class="mb-trial">' + 글('체험') + '</p><p class="mb-small">' + 글('두대') + '</p></div>' +
         (강조 ? '<p class="mb-note">' + 글('강조말') + '</p>' : '') +
-        (s && s.종류 === 'app' ? '<p class="mb-note">' + 글('이앱구독') + '</p>' : '') +
+        (s && s.종류 === 'app' && 글('이앱구독') ? '<p class="mb-note">' + 글('이앱구독') + '</p>' : '') +
         (강조 ? 기능목록(강조, false) + 좋은점() : 좋은점() + 기능목록(null, false)) + 다른앱(false) + 늘열림() + 흐름() + 단추들(강조);
     }
     return h + '</div>';
@@ -2860,7 +2933,7 @@ try {
   function 줄() {
     var s = 지금상태();
     if (s && s.종류 === 'op') return { 제목: 글('제목'), 설명: 글('운영자'), 값: '' };
-    if (s && s.종류 === 'pass') return { 제목: 글('제목'), 설명: 글('회원'), 값: s.until ? 글('까지', { 날: 날(s.until) }) : '' };
+    if (s && (s.종류 === 'pass' || (폐지() && s.종류 === 'app'))) return { 제목: 글('제목'), 설명: 글('회원'), 값: s.until ? 글('까지', { 날: 날(s.until) }) : '' };
     return { 제목: 글('제목'), 설명: 글('줄설명'), 값: 판매() ? '' : 글('곧') };
   }
   function 줄HTML() {
@@ -2870,6 +2943,7 @@ try {
   }
   function 띠HTML() {
     스타일();
+    if (폐지()) return '';   /* 11-17d — 묶음 상품 권하는 홈 띠 끔 */
     if (회원()) return '';
     var now = Date.now(), 첫 = Number(읽('first') || 0);
     if (!첫) { 씀('first', now); 첫 = now; }
@@ -2968,7 +3042,7 @@ try {
       알림(글('알림됨'));
       try { if (typeof 설정.알림받기 === 'function') 설정.알림받기(); } catch (e) {}
     },
-    시작: function (plan) { var g = 구독(); if (g && typeof g.회원권구매 === 'function') return g.회원권구매(plan); 알림(글('곧')); },
+    시작: function (plan) { var g = 구독(); if (폐지()) { if (g && typeof g.관리열기 === 'function') return g.관리열기(); return 알림(글('곧')); } if (g && typeof g.회원권구매 === 'function') return g.회원권구매(plan); 알림(글('곧')); },
     이앱만: 이앱만,
     글: 글
   };
@@ -4706,7 +4780,7 @@ try { 이용량.설치({ 앱: 'yakjido', 켜짐: false, 주소: 'https://uszalzc
 */
 (function () {
   if (window.메디나눔위기번호) return;
-  var 판 = '2026-11-16a';   /* 11-05b 유럽연합 26나라(스페인 빼고) 112 · 11-04d 라오스 LA 구급 1195 · TH 1669·VN 115·KH 119 gov.uk 다시 확인 · 11-04c 머리 주석 정리 */
+  var 판 = '2026-11-17a';   /* 11-17a 영국 위기[1] NHS 111(2번) · 방글라데시 Kaan Pete Roi(시간 있음) · 나라 「안내」 한 줄(안내(나라, 말)) */   /* 11-05b 유럽연합 26나라(스페인 빼고) 112 · 11-04d 라오스 LA 구급 1195 · TH 1669·VN 115·KH 119 gov.uk 다시 확인 · 11-04c 머리 주석 정리 */
   var 표 = {
     KR: { 이름: { ko: '한국', en: 'Korea', es: 'Corea', ja: '韓国', zh: '韩国' }, 응급: '119', 경찰: '112', 위기: ['109', '1577-0199'] },
     US: { 이름: { ko: '미국', en: 'United States', es: 'Estados Unidos', ja: 'アメリカ', zh: '美国' }, 응급: '911', 경찰: '911', 위기: ['988'] },
@@ -4728,9 +4802,9 @@ try { 이용량.설치({ 앱: 'yakjido', 켜짐: false, 주소: 'https://uszalzc
     LA: { 이름: { ko: '라오스', en: 'Laos', es: 'Laos', ja: 'ラオス', zh: '老挝' }, 응급: '1195', 경찰: null, 위기: [] },   /* 11-04d 구급 1195(경찰 1191·화재 1190 따로) — gov.uk/foreign-travel-advice/laos/getting-help · travel.gc.ca Laos 둘 다 1195. 일부 생활 안내의 195 는 공식 아님 */
     MN: { 이름: { ko: '몽골', en: 'Mongolia', es: 'Mongolia', ja: 'モンゴル', zh: '蒙古' }, 응급: '103', 경찰: null, 위기: [] },   /* gov.uk Mongolia getting-help · mn.usembassy.gov */
     LK: { 이름: { ko: '스리랑카', en: 'Sri Lanka', es: 'Sri Lanka', ja: 'スリランカ', zh: '斯里兰卡' }, 응급: '1990', 경찰: null, 위기: ['1926'] },   /* 11-05 위기 국립정신건강연구소 1926 24시간(보건부 소속) — NIMH 연차보고 2022 · sundaytimes.lk · gov.uk Sri Lanka health · lk.usembassy.gov(1990 Suwa Seriya) */
-    BD: { 이름: { ko: '방글라데시', en: 'Bangladesh', es: 'Bangladés', ja: 'バングラデシュ', zh: '孟加拉国' }, 응급: '999', 경찰: '999', 위기: [] },   /* gov.uk Bangladesh getting-help · 999.gov.bd */
+    BD: { 이름: { ko: '방글라데시', en: 'Bangladesh', es: 'Bangladés', ja: 'バングラデシュ', zh: '孟加拉国' }, 응급: '999', 경찰: '999', 위기: ['09612-119911'], 안내: { ko: '목숨이 위험하면 먼저 999 · Kaan Pete Roi(마음 상담) 09612-119911 은 매일 오후 3시~새벽 3시', en: 'If a life is at risk, call 999 first · Kaan Pete Roi (emotional support) 09612-119911 is open daily 3 pm–3 am', es: 'Si hay riesgo para la vida, llame primero al 999 · Kaan Pete Roi (apoyo emocional) 09612-119911 atiende cada día de 15:00 a 3:00', ja: '命に危険があるときはまず999 · Kaan Pete Roi(心の相談)09612-119911 は毎日 午後3時〜午前3時', zh: '有生命危险请先拨999 · Kaan Pete Roi(情绪支持)09612-119911 每天下午3点至凌晨3点' } },   /* 11-17 위기 Kaan Pete Roi — kaanpeteroi.org(공식 · 매일 15:00~03:00 · 휴일 없음) · LifeLine International 같은 값. 24시간이 아니라서 응급 999 먼저 */   /* gov.uk Bangladesh getting-help · 999.gov.bd */
     IN: { 이름: { ko: '인도', en: 'India', es: 'India', ja: 'インド', zh: '印度' }, 응급: '112', 경찰: '112', 위기: ['14416'] },   /* 11-05 위기 Tele-MANAS 14416(보건가족복지부) — pib.gov.in PRID 2022057 · PRID 1919200 · gov.uk India health(112) · India ERSS(112 · 내무부) */
-    GB: { 이름: { ko: '영국', en: 'United Kingdom', es: 'Reino Unido', ja: 'イギリス', zh: '英国' }, 응급: '999', 경찰: '999', 위기: ['116 123'] },   /* gov.uk · NHS 999 · 11-05 위기 Samaritans 116 123 24시간 — phw.nhs.wales · 111.wales.nhs.uk · cntw.nhs.uk */
+    GB: { 이름: { ko: '영국', en: 'United Kingdom', es: 'Reino Unido', ja: 'イギリス', zh: '英国' }, 응급: '999', 경찰: '999', 위기: ['116 123', '111'], 안내: { ko: '111 은 걸고 2번 — 정신건강 위기(잉글랜드 · 24시간) · 목숨이 위험하면 999', en: 'For 111, press 2 — mental health crisis (England, 24 hours) · If a life is at risk, call 999', es: 'En el 111, pulse 2: crisis de salud mental (Inglaterra, 24 horas) · Si hay riesgo para la vida, llame al 999', ja: '111 はかけたら2番 — 心の危機(イングランド・24時間)· 命に危険があるときは999', zh: '拨打111后按2 — 心理危机(英格兰,24小时)· 有生命危险请拨999' } },   /* gov.uk · NHS 999 · 11-05 위기 Samaritans 116 123 24시간 — phw.nhs.wales · 111.wales.nhs.uk · cntw.nhs.uk */   /* 11-17 위기[1] NHS 111 「2번 — 정신건강」 잉글랜드 24시간 · 모든 나이 — england.nhs.uk/2024/08(NHS 111 offering crisis mental health support) · 지역 NHS 안내(111 → 2) */
     /* 11-05 현욱님 결정(소아 경유) — 유럽연합 27개국 공통 응급 번호 112(유럽 지침 2002/22/EC 제26조 · (EU) 2018/1972 제109조). 위기 상담은 나라마다 달라 빈칸(→ 응급 번호), 경찰도 빈칸. 스페인은 위에 024 와 함께 있다 */
     AT: { 이름: { ko: '오스트리아', en: 'Austria', es: 'Austria', ja: 'オーストリア', zh: '奥地利' }, 응급: '112', 경찰: null, 위기: [] },
     BE: { 이름: { ko: '벨기에', en: 'Belgium', es: 'Bélgica', ja: 'ベルギー', zh: '比利时' }, 응급: '112', 경찰: null, 위기: [] },
@@ -4778,7 +4852,8 @@ try { 이용량.설치({ 앱: 'yakjido', 켜짐: false, 주소: 'https://uszalzc
     return 'XX';
   }
   function 고른곳() { try { var v = JSON.parse(localStorage.getItem('mn.place') || 'null'); if (v && v.country) return 표[v.country] ? v.country : 'XX'; } catch (e) {} return null; }
-  window.메디나눔위기번호 = { 판: 판, 표: 표, 고른곳: 고른곳, 나라짐작: 나라짐작, 시간대표: 시간대표 };   /* 표를 쓰는 앱은 읽기만 */
+  function 안내(나라, 말) { var n = 표[나라]; if (!n || !n.안내) return ''; var k = String(말 || 'ko').slice(0, 2); return n.안내[k] || n.안내.en || ''; }   /* 번호만으로 모자랄 때(누른 뒤 몇 번 · 여는 시간) 화면에 한 줄 */
+  window.메디나눔위기번호 = { 판: 판, 표: 표, 고른곳: 고른곳, 나라짐작: 나라짐작, 시간대표: 시간대표, 안내: 안내 };   /* 표를 쓰는 앱은 읽기만 */
 })();
 /* ▲▲ 위기번호 표 끝 ▲▲ */
 /* ▼▼ 설정 부품 시작 ▼▼ */
