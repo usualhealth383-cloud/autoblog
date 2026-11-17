@@ -34,6 +34,15 @@ LAUNCH = {'executable_path': CHROME} if CHROME else {}
 
 # 시험 브라우저는 한국어로 연다(10-27 — 안 정하면 en-US 라 영어 화면이 된다). 시간대는 그대로(UTC — 알림 시험이 이 시계에 맞춰져 있다, UTC 는 나라 판단에서 건너뛰어 ko-KR → KR). en-US+서울 → 119 는 i18n.py 가 따로 본다
 from playwright.sync_api import Browser as _B
+# 11-17 잉크 판이 기본 — 이 시험은 옛 판의 기능·흐름을 본다(잉크 판은 design.py·ink_safety.py)
+from playwright.sync_api import BrowserContext as _BC0
+_ink0_nc, _ink0_np = _B.new_context, _B.new_page
+def _ink0(x):
+    try: x.add_init_script("try{localStorage.setItem('yakjido.ink','0')}catch(e){}")
+    except Exception: pass
+    return x
+_B.new_context = lambda self, *a, **k: _ink0(_ink0_nc(self, *a, **k))
+_B.new_page = lambda self, *a, **k: _ink0(_ink0_np(self, *a, **k))
 _np, _nc = _B.new_page, _B.new_context
 _B.new_page = lambda self, **k: _np(self, **{'locale': 'ko-KR', **k})
 _B.new_context = lambda self, **k: _nc(self, **{'locale': 'ko-KR', **k})

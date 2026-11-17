@@ -3555,7 +3555,7 @@ window.언어칸 = function () {
   /* 11-17 잉크 판 증상 화면 — 위험 신호를 보고 「하나도 없어요」를 눌러야 「이렇게 드세요」가 열린다(확인 없이 안심 문구 없음). 옛 판은 이 단추가 숨어 있고 답도 그대로 */
   window.rfNone = function (sid) { window.RF_OK = sid; try { rfApply(); } catch (e) {} var t = document.querySelector('#view .stabs') || document.querySelector('#view .answer'); if (t) setTimeout(function () { try { t.scrollIntoView({ behavior: 'smooth', block: 'start' }); } catch (e) {} }, 60); };
   window.잉크칸 = function () { var on = document.documentElement.classList.contains('ink');
-    return '<div class="view-row" style="border-top:1px solid var(--hairline)"><div class="t"><b>새 디자인 미리 보기</b><span>흰 바탕·가는 선의 잉크 판 — 끄면 지금 화면 그대로</span></div><button class="sw ' + (on ? 'on' : '') + '" role="switch" aria-checked="' + on + '" aria-label="새 디자인 미리 보기" onclick="try{localStorage.setItem(\'yakjido.ink\',\'' + (on ? '0' : '1') + '\')}catch(e){};location.reload()"></button></div>'; };
+    return '<div class="view-row" style="border-top:1px solid var(--hairline)"><div class="t"><b>새 디자인</b><span>흰 바탕·가는 선의 잉크 판 — 끄면 예전 화면</span></div><button class="sw ' + (on ? 'on' : '') + '" role="switch" aria-checked="' + on + '" aria-label="새 디자인 미리 보기" onclick="try{localStorage.setItem(\'yakjido.ink\',\'' + (on ? '0' : '1') + '\')}catch(e){};location.reload()"></button></div>'; };
   /* 11-17 잉크 홈 — 첫 화면 규칙 7(현욱님 「글이 많고 줄글 목록은 아무도 안 누른다 · 첫 이미지와 임팩트」):
      얼굴 + 제목 12자 안 + 보조 한 줄 + 묻는 창 하나 → 그 자리에서 답 한 장(화면 이동 없음) · 약을 담은 분은 「다음 약」 한 줄 ·
      그 아래 몸 부위 큰 그림 단추 여섯(그림 + 낱말 하나) → 누르면 그 자리에서 증상 고르기. 오늘의 한 장·증상 줄줄이·설명 문장은 탭 뒤로 */
