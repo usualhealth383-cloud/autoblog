@@ -9,21 +9,21 @@ PUB = HERE.parents[2] / 'docs' / 'marketing' / 'blog-26'
 URL = 'https://usualhealth383-cloud.github.io/autoblog/marketing/blog-26/'
 BLUE = '#2F5FC4'
 TITLES = ['중학교 과학을 단단하게, 겨울방학 중등부 특강반']
-TAGS = (HERE.parent / 'blog-16' / 'tags.txt').read_text(encoding='utf-8').split()
+TAGS = ['월성동과학학원', '대구과학학원', '달서구과학학원', '월성동학원', '중등부과학', '중등과학', '중학생과학', '겨울방학특강', '과학학원', '월배과학학원', '진천동과학학원', '상인동과학학원', '박찬통합과학학원']
 
-POST = [('img', 'cover_middle_b', '중등부 통합과학 특강반 안내'),
+POST = [('img', 'cover_middle_c', '중등부 특강반 안내'),
  ('c', '중등부 학부모님, 안녕하십니까.<br>박찬 통합과학 학원 원장입니다.'),
  ('c', '아이가 과학을 어려워하나요?<br>혹시 지루해하지는 않나요?'),
  ('c', '과학은 ==기본 개념과 원리부터 차근차근== 공부하면<br>이해가 잘 되고, 이해가 되면 재미가 생깁니다.<br>재미가 붙으면 실력도 자연스럽게 따라옵니다.'),
  ('c', '그렇게 공부할 수 있도록 제가 직접 가르치겠습니다.<br>소중한 겨울방학, 알차게 지도하겠습니다.'),
  ('q', '강의 시간 (겨울방학 개강)'),
- ('tbl', [('목요반', '오후 1시 ~ 4시'), ('일요반', '오후 1시 ~ 4시')], None),
+ ('tbl', [('목요반', '오후 2시'), ('토요반', '오후 1시')], None),
  ('q', '강의 특징'),
  ('p', '==①== 기본 개념과 원리 중심 강의<br>==②== 이해 중심 강의<br>==③== EBS 강의와 같은 강의실 시스템으로 효과적인 수업'),
  ('c', '상담 문의 **053-213-3577**<br>매일 오후 2시 ~ 오후 10시'),
  ('c', '감사합니다.')]
 
-BANNED = ['무료', '선행', '1등급', '대구 최초', '반드시', '확실히', '꼭 좋은']
+BANNED = ['무료', '선행', '1등급', '대구 최초', '반드시', '확실히', '꼭 좋은', '중등부 통합과학', '고등학교', '고1', '수능', '일요반']
 def inline(s, mode):   # mode: rich | prev | txt
     if mode == 'txt':
         return re.sub(r'\*\*|==', '', s).replace('<br>', '\n')
@@ -39,6 +39,10 @@ for b in POST:
         imgs[b[1]] = (f'{URL}{b[1]}.jpg?v={hashlib.sha1(data).hexdigest()[:8]}', 'data:image/jpeg;base64,' + base64.b64encode(data).decode())
 (PUB / 'manifest.json').write_text(json.dumps({k + '.png': v[0].split('/')[-1] for k, v in imgs.items()}, ensure_ascii=False, indent=1), encoding='utf-8')
 
+HI_IMG={'cover_middle_c': 'hires/05_중등부_표지.png'}
+for _k,_p in HI_IMG.items():
+    _im=Image.open(HERE.parent/_p).convert('RGB');_b=io.BytesIO();_im.save(_b,'JPEG',quality=92)
+    imgs[_k]=(imgs[_k][0],'data:image/jpeg;base64,'+base64.b64encode(_b.getvalue()).decode())
 C = 'margin:0;line-height:1.9;'
 TD = 'border:1px solid #D9CFBD;padding:8px 10px;vertical-align:top;'
 HASH = ' '.join('#' + t for t in TAGS)
@@ -50,7 +54,7 @@ def rich(data_uri):
         elif t == 'q': out.append(f'<p><br></p><p style="margin:0;text-align:center;font-size:19px;font-weight:700;line-height:1.6;color:#24406F;border-top:1px solid #3B6AD0;border-bottom:1px solid #3B6AD0;padding:14px 0">{b[1]}</p>')   # 줄 간격은 앞에 빈 줄 하나만(2026-11-04 현욱님 「항상 공간이 넓다」)
         elif t == 'img':
             src = imgs[b[1]][1 if data_uri else 0]
-            out.append(f'<p style="margin:0;text-align:center"><img src="{src}" alt="{html.escape(b[2])}" width="1080" style="width:100%;max-width:100%;height:auto"></p>')
+            out.append(f'<p style="margin:0;text-align:center"><img src="{src}" alt="{html.escape(b[2])}" width="2160" style="width:100%;max-width:100%;height:auto"></p>')
         elif t == 'tbl':
             rows = ''.join(f'<tr><td style="{TD}background:{"#FFF2C2" if i == b[2] else "#FFFFFF"};font-weight:700;{"color:"+BLUE+";" if i == b[2] else ""}">{l}</td><td style="{TD}background:{"#FFF2C2" if i == b[2] else "#FFFFFF"};{"font-weight:700;" if i == b[2] else ""}">{inline(v, "rich")}</td></tr>' for i, (l, v) in enumerate(b[1]))
             out.append(f'<table style="border-collapse:collapse;width:100%;margin:0 0 18px;font-size:15px;line-height:1.6">{rows}</table>\n<p><br></p>')
@@ -92,7 +96,7 @@ titles = ''.join(f'<div class="row"><span class="k">{"AB"[i]}</span><span class=
 tags = ''.join(f'<button class="cp tg" data-text="{t}">{t}</button>' for t in TAGS)
 head = head.replace('</style>', '.tags button.tg{font-size:14px;min-height:40px;padding:0 12px;background:var(--soft);color:var(--navy);font-weight:700}.tags button.tg.done{opacity:.4}\n</style>', 1)
 page = f'''{head}<div class="wrap">
-<section class="box"><h1>박찬 통합과학 · 중등부 특강반 안내</h1><p class="sub">원장님 글 다듬은 판 · 중등부 통합과학 특강반 수강 안내 · 사진 {nimg}장</p></section>
+<section class="box"><h1>박찬 통합과학 · 중등부 특강반 안내</h1><p class="sub">원장님 글 다듬은 판 · 중등부 특강반 수강 안내 · 사진 {nimg}장</p></section>
 <section class="box" style="border-color:#E0A800"><h2>⚠ 올리기 전 확인</h2><ol class="how"><li>강의 시간은 강의 시간표(11월 12일 기준)에 맞췄습니다</li></ol></section>
 <section class="box"><h2>① 제목</h2>{titles}</section>
 <section class="box"><h2>② 본문 — 통째로 복사</h2><button class="cp big" id="richBtn">본문 통째로 복사 — 사진 · 표 · 굵게 · 색 포함</button>
@@ -107,7 +111,7 @@ page = f'''{head}<div class="wrap">
 </ol></section>
 <section class="box"><h2>미리보기</h2><article class="post">{prev()}</article></section>
 </div>
-<template id="rich">{rich(False)}</template><template id="rich2">{rich(True)}</template>
+<template id="rich">{rich(True)}</template><template id="rich2">{rich(True)}</template>
 {script}<script>document.addEventListener('click',e=>{{const b=e.target.closest('button.tg');if(b)setTimeout(()=>b.classList.add('done'),50)}});</script>'''
 (HERE / 'kit.html').write_text(page, encoding='utf-8')
 (HERE / 'post.txt').write_text(body + '\n', encoding='utf-8')

@@ -8,15 +8,15 @@ HERE = pathlib.Path(__file__).resolve().parent
 PUB = HERE.parents[2] / 'docs' / 'marketing' / 'blog-25'
 URL = 'https://usualhealth383-cloud.github.io/autoblog/marketing/blog-25/'
 BLUE = '#2F5FC4'
-TITLES = ['2028 수능 통합과학, 고2 겨울부터 함께 — 고3 예비반']
+TITLES = ['2028 수능 통합과학, 고2 겨울부터 함께 — 고3 수능 준비반']
 TAGS = (HERE.parent / 'blog-16' / 'tags.txt').read_text(encoding='utf-8').split()
 
-POST = [('img', 'cover_go3_b', '고3 예비(현 고2) 수능 준비반 안내'),
- ('p', '안녕하십니까. 고3 예비(현 고2) 학부모님,<br>박찬 통합과학 학원 원장입니다.'),
+POST = [('img', 'cover_go3_c', '고3 수능 준비반(현 고2) 안내'),
+ ('p', '안녕하십니까. 고3 수능을 준비하는 현 고2 학부모님,<br>박찬 통합과학 학원 원장입니다.'),
  ('p', '2028학년도 수능부터 새로 치르는 통합과학 때문에 궁금하신 점도, 걱정도 많으시지요.<br>처음 치르는 시험이라 지금은 누구도 문제 수준이나 출제 경향을 장담할 수 없습니다.'),
  ('p', '다만 평가원이 공개한 예시문항을 분석해 보면,<br>==물리, 화학, 생명과학, 지구과학을 과목별로 따로 묻기보다 서로 엮은 융합형 문제==로 나올 것은 분명해 보입니다.'),
  ('q', '어떻게 준비할까요'),
- ('p', '고3 예비반 강의를 준비하며, 어떻게 가르쳐야 할지 오래 고민했습니다.<br>아직 시중에서는 2028 수능 통합과학에 맞춘 문제집을 찾기 어렵습니다.<br>그래서 수능 연계 교재인 **EBS 수능특강**(1월 출간 예정)과 그 뒤에 나오는 **EBS 수능완성**이 가장 중요한 길잡이가 될 것으로 봅니다.'),
+ ('p', '고3 수능 준비반 강의를 준비하며, 어떻게 가르쳐야 할지 오래 고민했습니다.<br>아직 시중에서는 2028 수능 통합과학에 맞춘 문제집을 찾기 어렵습니다.<br>그래서 수능 연계 교재인 **EBS 수능특강**(1월 출간 예정)과 그 뒤에 나오는 **EBS 수능완성**이 가장 중요한 길잡이가 될 것으로 봅니다.'),
  ('q', '강의 계획'),
  ('tbl', [('12월 ~ 2월', '**통합과학 이론 정리** · 10주, 일주일에 한 번 3시간'),
  ('3월 ~ 4월', 'EBS 수능특강'),
@@ -29,7 +29,7 @@ POST = [('img', 'cover_go3_b', '고3 예비(현 고2) 수능 준비반 안내'),
  ('c', '상담 문의 **053-213-3577**<br>매일 오후 2시 ~ 오후 10시'),
  ('c', '최선을 다해 지도하겠습니다.<br>감사합니다.')]
 
-BANNED = ['무료', '선행', '1등급', '대구 최초', '반드시', '확실히', '꼭 좋은']
+BANNED = ['고3 예비', '무료', '선행', '1등급', '대구 최초', '반드시', '확실히', '꼭 좋은']
 def inline(s, mode):   # mode: rich | prev | txt
     if mode == 'txt':
         return re.sub(r'\*\*|==', '', s).replace('<br>', '\n')
@@ -45,6 +45,10 @@ for b in POST:
         imgs[b[1]] = (f'{URL}{b[1]}.jpg?v={hashlib.sha1(data).hexdigest()[:8]}', 'data:image/jpeg;base64,' + base64.b64encode(data).decode())
 (PUB / 'manifest.json').write_text(json.dumps({k + '.png': v[0].split('/')[-1] for k, v in imgs.items()}, ensure_ascii=False, indent=1), encoding='utf-8')
 
+HI_IMG={'cover_go3_c': 'hires/04_고3예비반_표지.png'}
+for _k,_p in HI_IMG.items():
+    _im=Image.open(HERE.parent/_p).convert('RGB');_b=io.BytesIO();_im.save(_b,'JPEG',quality=92)
+    imgs[_k]=(imgs[_k][0],'data:image/jpeg;base64,'+base64.b64encode(_b.getvalue()).decode())
 C = 'margin:0;line-height:1.9;'
 TD = 'border:1px solid #D9CFBD;padding:8px 10px;vertical-align:top;'
 HASH = ' '.join('#' + t for t in TAGS)
@@ -56,7 +60,7 @@ def rich(data_uri):
         elif t == 'q': out.append(f'<p><br></p><p style="margin:0;text-align:center;font-size:19px;font-weight:700;line-height:1.6;color:#24406F;border-top:1px solid #3B6AD0;border-bottom:1px solid #3B6AD0;padding:14px 0">{b[1]}</p>')   # 줄 간격은 앞에 빈 줄 하나만(2026-11-04 현욱님 「항상 공간이 넓다」)
         elif t == 'img':
             src = imgs[b[1]][1 if data_uri else 0]
-            out.append(f'<p style="margin:0;text-align:center"><img src="{src}" alt="{html.escape(b[2])}" width="1080" style="width:100%;max-width:100%;height:auto"></p>')
+            out.append(f'<p style="margin:0;text-align:center"><img src="{src}" alt="{html.escape(b[2])}" width="2160" style="width:100%;max-width:100%;height:auto"></p>')
         elif t == 'tbl':
             rows = ''.join(f'<tr><td style="{TD}background:{"#FFF2C2" if i == b[2] else "#FFFFFF"};font-weight:700;{"color:"+BLUE+";" if i == b[2] else ""}">{l}</td><td style="{TD}background:{"#FFF2C2" if i == b[2] else "#FFFFFF"};{"font-weight:700;" if i == b[2] else ""}">{inline(v, "rich")}</td></tr>' for i, (l, v) in enumerate(b[1]))
             out.append(f'<table style="border-collapse:collapse;width:100%;margin:0 0 18px;font-size:15px;line-height:1.6">{rows}</table>\n<p><br></p>')
@@ -113,7 +117,7 @@ page = f'''{head}<div class="wrap">
 </ol></section>
 <section class="box"><h2>미리보기</h2><article class="post">{prev()}</article></section>
 </div>
-<template id="rich">{rich(False)}</template><template id="rich2">{rich(True)}</template>
+<template id="rich">{rich(True)}</template><template id="rich2">{rich(True)}</template>
 {script}<script>document.addEventListener('click',e=>{{const b=e.target.closest('button.tg');if(b)setTimeout(()=>b.classList.add('done'),50)}});</script>'''
 (HERE / 'kit.html').write_text(page, encoding='utf-8')
 (HERE / 'post.txt').write_text(body + '\n', encoding='utf-8')

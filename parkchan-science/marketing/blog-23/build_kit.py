@@ -22,7 +22,7 @@ POST = [('img', 'cover_greeting_b', '원장 인사말 — 통합과학만 전문
  ('p', '2028학년도부터 치르는 통합과학은 그때보다 교과 내용이 많이 달라져 조금 더 어렵습니다.<br>평가원 예시문항을 풀어 보면 물리, 화학, 생명과학, 지구과학을 따로 묻기보다 ==서로 엮은 융합형 문제==로 나올 것으로 보입니다.'),
  ('q', '공부하는 방법은 분명합니다'),
  ('p', '난이도는 아직 누구도 장담할 수 없습니다.<br>하지만 공부하는 방법은 분명합니다.<br>==통합과학 전체의 흐름을 잡고, 과목과 과목이 어떻게 이어지는지를 함께 공부하는 것==입니다.'),
- ('c', '중등부반, 고1 예비반, 고1 내신반, 고3 수능 준비반.<br>학년마다 필요한 것이 다른 만큼<br>각 반의 성격에 맞게 정성껏 가르쳐<br>학생들이 통합과학에 자신감을 갖도록 최선을 다하겠습니다.'),
+ ('c', '중등부 특강반, 고1 예비반, 고1 내신반, 고3 수능 준비반.<br>학년마다 필요한 것이 다른 만큼<br>각 반의 성격에 맞게 정성껏 가르쳐<br>학생들이 과학에 자신감을 갖도록 최선을 다하겠습니다.'),
  ('c', '감사합니다.<br>**박찬 통합과학 학원 원장 드림**')]
 
 BANNED = ['무료', '선행', '1등급', '대구 최초', '반드시', '확실히', '꼭 좋은']
@@ -41,6 +41,10 @@ for b in POST:
         imgs[b[1]] = (f'{URL}{b[1]}.jpg?v={hashlib.sha1(data).hexdigest()[:8]}', 'data:image/jpeg;base64,' + base64.b64encode(data).decode())
 (PUB / 'manifest.json').write_text(json.dumps({k + '.png': v[0].split('/')[-1] for k, v in imgs.items()}, ensure_ascii=False, indent=1), encoding='utf-8')
 
+HI_IMG={'cover_greeting_b': 'hires/03_원장인사말_표지.png'}
+for _k,_p in HI_IMG.items():
+    _im=Image.open(HERE.parent/_p).convert('RGB');_b=io.BytesIO();_im.save(_b,'JPEG',quality=92)
+    imgs[_k]=(imgs[_k][0],'data:image/jpeg;base64,'+base64.b64encode(_b.getvalue()).decode())
 C = 'margin:0;line-height:1.9;'
 TD = 'border:1px solid #D9CFBD;padding:8px 10px;vertical-align:top;'
 HASH = ' '.join('#' + t for t in TAGS)
@@ -52,7 +56,7 @@ def rich(data_uri):
         elif t == 'q': out.append(f'<p><br></p><p style="margin:0;text-align:center;font-size:19px;font-weight:700;line-height:1.6;color:#24406F;border-top:1px solid #3B6AD0;border-bottom:1px solid #3B6AD0;padding:14px 0">{b[1]}</p>')   # 줄 간격은 앞에 빈 줄 하나만(2026-11-04 현욱님 「항상 공간이 넓다」)
         elif t == 'img':
             src = imgs[b[1]][1 if data_uri else 0]
-            out.append(f'<p style="margin:0;text-align:center"><img src="{src}" alt="{html.escape(b[2])}" width="1080" style="width:100%;max-width:100%;height:auto"></p>')
+            out.append(f'<p style="margin:0;text-align:center"><img src="{src}" alt="{html.escape(b[2])}" width="2160" style="width:100%;max-width:100%;height:auto"></p>')
         elif t == 'tbl':
             rows = ''.join(f'<tr><td style="{TD}background:{"#FFF2C2" if i == b[2] else "#FFFFFF"};font-weight:700;{"color:"+BLUE+";" if i == b[2] else ""}">{l}</td><td style="{TD}background:{"#FFF2C2" if i == b[2] else "#FFFFFF"};{"font-weight:700;" if i == b[2] else ""}">{inline(v, "rich")}</td></tr>' for i, (l, v) in enumerate(b[1]))
             out.append(f'<table style="border-collapse:collapse;width:100%;margin:0 0 18px;font-size:15px;line-height:1.6">{rows}</table>\n<p><br></p>')
@@ -109,7 +113,7 @@ page = f'''{head}<div class="wrap">
 </ol></section>
 <section class="box"><h2>미리보기</h2><article class="post">{prev()}</article></section>
 </div>
-<template id="rich">{rich(False)}</template><template id="rich2">{rich(True)}</template>
+<template id="rich">{rich(True)}</template><template id="rich2">{rich(True)}</template>
 {script}<script>document.addEventListener('click',e=>{{const b=e.target.closest('button.tg');if(b)setTimeout(()=>b.classList.add('done'),50)}});</script>'''
 (HERE / 'kit.html').write_text(page, encoding='utf-8')
 (HERE / 'post.txt').write_text(body + '\n', encoding='utf-8')

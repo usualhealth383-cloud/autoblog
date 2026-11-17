@@ -11,7 +11,7 @@ BLUE = '#2F5FC4'
 TITLES = ['박찬 통합과학 학원 반별 안내']
 TAGS = (HERE.parent / 'blog-16' / 'tags.txt').read_text(encoding='utf-8').split()
 
-POST = [('img', 'cover_classes', '반별 안내 — 세 반 한눈에 보기'),
+POST = [('img', 'cover_classes_c', '반별 안내 — 세 반 한눈에 보기'),
  ('p', '안녕하십니까.<br>대구 월성동 박찬 통합과학 학원입니다.<br>저희 학원은 <b>세 반</b>을 원장이 직접 가르칩니다. 아이 학년에 맞는 반을 보시고, 자세한 내용은 반마다 붙은 안내 글에서 확인해 주십시오.'),
  ('q', '고1 예비반 (현 중3)'),
  ('p', '고1 내신부터 고3 수능까지 이어지는 통합과학을 ==처음부터 차근차근== 공부하는 반입니다.'),
@@ -19,15 +19,15 @@ POST = [('img', 'cover_classes', '반별 안내 — 세 반 한눈에 보기'),
  ('화 · 수 · 금 (기존 반)', '오후 5시 30분 · 물질과 규칙성부터 이어서 (11월 12일(목) 기준)'),
  ('수요반 (겨울방학)', '오후 2시 ~ 5시 · 처음부터 · 개강일은 따로 안내해 드리겠습니다')], 0),
  ('c', '<a href="https://blog.naver.com/parkchan3577/224480077519">고1 예비반 자세히 보기 ›</a>'),
- ('q', '고3 예비 수능 준비반 (현 고2)'),
+ ('q', '고3 수능 준비반 (현 고2)'),
  ('p', '2028학년도 ==첫 통합과학 수능==을 준비하는 반입니다. 이론 정리부터 시작합니다.'),
  ('tbl', [('토요반', '**12월 19일(토) 개강** · 오후 4시 ~ 7시'),
  ('일요반', '**12월 20일(일) 개강** · 오후 4시 ~ 7시')], None),
- ('c', '<a href="https://blog.naver.com/parkchan3577/224480078183">고3 예비 수능 준비반 자세히 보기 ›</a>'),
- ('q', '중등부 통합과학 특강반'),
- ('p', '고등학교 과학으로 이어지는 ==기본 개념과 원리==를 다지는 반입니다.'),
- ('tbl', [('목요반', '오후 1시 ~ 4시 · 겨울방학 개강'),
- ('일요반', '오후 1시 ~ 4시 · 겨울방학 개강')], None),
+ ('c', '<a href="https://blog.naver.com/parkchan3577/224480078183">고3 수능 준비반 자세히 보기 ›</a>'),
+ ('q', '중등부 특강반'),
+ ('p', '==기본 개념과 원리==를 탄탄히 다지는 반입니다.'),
+ ('tbl', [('목요반', '오후 2시 · 겨울방학 개강'),
+ ('토요반', '오후 1시 · 겨울방학 개강')], None),
  ('c', '<a href="https://blog.naver.com/parkchan3577/224480078542">중등부 특강반 자세히 보기 ›</a>'),
  ('q', '강의 시간표'),
  ('img', 'timetable_sun', '박찬 통합과학 강의 시간표'),
@@ -35,7 +35,7 @@ POST = [('img', 'cover_classes', '반별 안내 — 세 반 한눈에 보기'),
  ('c', '**상담 문의 053-213-3577**<br>매일 오후 2시 ~ 오후 10시<br>대구 달서구 조암로 25 그루타워 501호 (월성 CGV 옆)'),
  ('c', '감사합니다.')]
 
-BANNED = ['11월 21일', '토요반 (새로', '토요반이 새로', '무료', '선행', '1등급', '대구 최초', '반드시', '확실히', '꼭 좋은', '보충', '진도', '미리', '교재', '일주일']
+BANNED = ['중등부 통합과학', '고3 예비', '11월 21일', '토요반 (새로', '토요반이 새로', '무료', '선행', '1등급', '대구 최초', '반드시', '확실히', '꼭 좋은', '보충', '진도', '미리', '교재', '일주일']
 def inline(s, mode):   # mode: rich | prev | txt
     if mode == 'txt':
         s = re.sub(r'<a href="([^"]+)">([^<]+)</a>', r'\2 \1', s)
@@ -52,7 +52,7 @@ for b in POST:
         imgs[b[1]] = (f'{URL}{b[1]}.jpg?v={hashlib.sha1(data).hexdigest()[:8]}', 'data:image/jpeg;base64,' + base64.b64encode(data).decode())
 (PUB / 'manifest.json').write_text(json.dumps({k + '.png': v[0].split('/')[-1] for k, v in imgs.items()}, ensure_ascii=False, indent=1), encoding='utf-8')
 
-HI_IMG={'cover_classes': 'blog-28/hi_1_반별안내_표지.png', 'timetable_sun': 'blog-28/hi_2_강의시간표.png'}
+HI_IMG={'cover_classes_c': 'blog-28/hi_1_반별안내_표지.png', 'timetable_sun': 'blog-28/hi_2_강의시간표.png'}
 for _k,_p in HI_IMG.items():
     _im=Image.open(HERE.parent/_p).convert('RGB');_b=io.BytesIO();_im.save(_b,'JPEG',quality=92)
     imgs[_k]=(imgs[_k][0],'data:image/jpeg;base64,'+base64.b64encode(_b.getvalue()).decode())
@@ -68,7 +68,7 @@ def rich(data_uri):
         elif t == 'img':
             k += 1
             if data_uri:
-                out.append(f'<p style="margin:0;text-align:center"><img src="{imgs[b[1]][1]}" alt="{html.escape(b[2])}" width="1080" style="width:100%;max-width:100%;height:auto"></p>')
+                out.append(f'<p style="margin:0;text-align:center"><img src="{imgs[b[1]][1]}" alt="{html.escape(b[2])}" width="2160" style="width:100%;max-width:100%;height:auto"></p>')
             else:
                 out.append(f'<p style="margin:0;text-align:center;background:#FFF2C2;color:#8A5A00;font-weight:700;padding:14px 0">【사진 {k} 자리 — 여기에 사진 {k} 파일을 올려 주세요】</p>')
         elif t == 'tbl':

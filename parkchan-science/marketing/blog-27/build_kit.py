@@ -66,7 +66,7 @@ def rich(data_uri):
         elif t == 'img':
             k += 1
             if data_uri:
-                out.append(f'<p style="margin:0;text-align:center"><img src="{imgs[b[1]][1]}" alt="{html.escape(b[2])}" width="1080" style="width:100%;max-width:100%;height:auto"></p>')
+                out.append(f'<p style="margin:0;text-align:center"><img src="{imgs[b[1]][1]}" alt="{html.escape(b[2])}" width="2160" style="width:100%;max-width:100%;height:auto"></p>')
             else:
                 out.append(f'<p style="margin:0;text-align:center;background:#FFF2C2;color:#8A5A00;font-weight:700;padding:14px 0">【사진 {k} 자리 — 여기에 사진 {k} 파일을 올려 주세요】</p>')
         elif t == 'tbl':

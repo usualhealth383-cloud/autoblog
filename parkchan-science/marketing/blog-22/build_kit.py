@@ -22,20 +22,20 @@ POST = [
  ('tbl', [('일요반', '오후 1시 ~ 4시 · **11월 22일(일) 개강** · 처음부터'),
           ('화요반 · 수요반 · 금요반', '오후 5시 30분 · 수업 중 · 물질과 규칙성부터 이어서 (11월 12일(목) 기준)'),
           ('수요반 (겨울방학)', '오후 2시 ~ 5시 · 겨울방학 개강 · 처음부터')], 0),
- ('q', '고3 예비 수능 준비반 (현 고2)'),
+ ('q', '고3 수능 준비반 (현 고2)'),
  ('c', '첫 통합과학 수능을 준비하는 반입니다.<br>토요반과 일요반, 모두 **오후 4시 ~ 7시**입니다.'),
  ('tbl', [('토요반', '오후 4시 ~ 7시 · **12월 19일(토) 개강**'),
           ('일요반', '오후 4시 ~ 7시 · **12월 20일(일) 개강**')], None),
- ('q', '중등부 통합과학 특강반'),
- ('c', '고등학교 과학으로 이어지는 기초를 다지는 반입니다.<br>목요반과 일요반, 모두 **오후 1시 ~ 4시**이며<br>겨울방학에 개강합니다.'),
- ('tbl', [('목요반', '오후 1시 ~ 4시 · 겨울방학 개강'),
-          ('일요반', '오후 1시 ~ 4시 · 겨울방학 개강')], None),
+ ('q', '중등부 특강반'),
+ ('c', '기본 개념과 원리를 탄탄히 다지는 반입니다.<br>**목요반 오후 2시, 토요반 오후 1시**에 수업하며<br>겨울방학에 개강합니다.'),
+ ('tbl', [('목요반', '오후 2시 · 겨울방학 개강'),
+          ('토요반', '오후 1시 · 겨울방학 개강')], None),
  ('q', '상담 안내'),
  ('c', '어느 반이 맞을지,<br>지금 아이에게 무엇이 필요한지<br>편하게 상담해 드리겠습니다.'),
  ('c', '상담 문의 **053-213-3577**<br>상담 시간 매일 오후 2시 ~ 오후 10시<br>대구 달서구 조암로 25 그루타워 501호 (월성 CGV 옆)'),
  ('c', '감사합니다.'),
 ]
-BANNED = ['11월 21일', '토요반이 새로', '교재', '완자', 'EBS', '943제', '무료', '일주일', '주 2회', '주 1회', '7시 30분', '내일', '시작되었', '동영상', '보충자료', '2시간', '7시 30분', '공통과학', '네 단계', '3월 입학 전', '확실히', '11월 3일', '11월 4일', '2027년 2월', '선행', '진도', '미리', '1등급', '완성']
+BANNED = ['중등부 통합과학', '고3 예비', '11월 21일', '토요반이 새로', '교재', '완자', 'EBS', '943제', '무료', '일주일', '주 2회', '주 1회', '7시 30분', '내일', '시작되었', '동영상', '보충자료', '2시간', '7시 30분', '공통과학', '네 단계', '3월 입학 전', '확실히', '11월 3일', '11월 4일', '2027년 2월', '선행', '진도', '미리', '1등급', '완성']
 def inline(s, mode):   # mode: rich | prev | txt
     if mode == 'txt':
         return re.sub(r'\*\*|==', '', s).replace('<br>', '\n')
@@ -66,7 +66,7 @@ def rich(data_uri):
         elif t == 'q': out.append(f'<p><br></p><p style="margin:0;text-align:center;font-size:19px;font-weight:700;line-height:1.6;color:#24406F;border-top:1px solid #3B6AD0;border-bottom:1px solid #3B6AD0;padding:14px 0">{b[1]}</p>')   # 줄 간격은 앞에 빈 줄 하나만(2026-11-04 현욱님 「항상 공간이 넓다」)
         elif t == 'img':
             k += 1
-            out.append(f'<p style="margin:0;text-align:center"><img src="{imgs[b[1]][1]}" alt="{html.escape(b[2])}" width="1080" style="width:100%;max-width:100%;height:auto"></p>' if data_uri else f'<p>【사진 {k}】</p>')
+            out.append(f'<p style="margin:0;text-align:center"><img src="{imgs[b[1]][1]}" alt="{html.escape(b[2])}" width="2160" style="width:100%;max-width:100%;height:auto"></p>' if data_uri else f'<p>【사진 {k}】</p>')
         elif t == 'tbl':
             rows = ''.join(f'<tr><td style="{TD}background:{"#FFF2C2" if i == b[2] else "#FFFFFF"};font-weight:700;{"color:"+BLUE+";" if i == b[2] else ""}">{l}</td><td style="{TD}background:{"#FFF2C2" if i == b[2] else "#FFFFFF"};{"font-weight:700;" if i == b[2] else ""}">{inline(v, "rich")}</td></tr>' for i, (l, v) in enumerate(b[1]))
             out.append(f'<table style="border-collapse:collapse;width:100%;margin:0 0 18px;font-size:15px;line-height:1.6">{rows}</table>\n<p><br></p>')
