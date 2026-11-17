@@ -177,7 +177,7 @@ RX_LABEL_SEQ = {'amlodipine': '200610660', 'losartan': '200811814', 'ramipril': 
                 'propranolol': '197400040', 'allopurinol': '197000050', 'imidafenacin': '200812014',
                 'lex_triamcinolone_oral': '198500023', 'lex_berberine': '200202423', 'lex_tolfenamic': '198601438', 'lex_mefenamic': '199100581', 'lex_aciclovir_cream': '199101996',
                 'lex_chondroitin': '199901507', 'lex_vitb': '198500049', 'lex_cipro': '198801052',
-                'bazedoxifene': '201110095', 'teriparatide': '200209623', 'ipratropium': '199304302'}   # 11-13 약지식창고 대조(뼈 약·흡입기 길잡이 칸)   # 11-05 원문 대조(편두통·떨림 효능 · 유전자 문구 · 항콜린 부담)
+                'bazedoxifene': '201110095', 'teriparatide': '200209623', 'ipratropium': '199304302', 'lithium': '197300172', 'metronidazole': '196500004', 'methotrexate': '197900145', 'colchicine': '198801219', 'digoxin': '196300001', 'theophylline': '199800976', 'donepezil': '200000796', 'pregabalin': '200511057', 'prednisolone': '199602982', 'tamsulosin': '200606210', 'solifenacin': '200703674', 'famotidine': '198600114', 'nicorandil': '198500125', 'isosorbide': '200308344', 'cilostazol': '199002440', 'valproate': '199504171', 'lamotrigine': '200209641', 'levetiracetam': '200209893', 'tadalafil': '200108678', 'montelukast': '200009062', 'levocetirizine': '200604084', 'fexofenadine': '200001279', 'fluconazole': '200511060', 'itraconazole': '202105228', 'cotrimoxazole': '197000049', 'pioglitazone': '200108671', 'voglibose': '199501072', 'ezetimibe': '200410337', 'fenofibrate': '200308577', 'amoxicillin': '197500015', 'cefaclor': '199702232', 'oseltamivir': '200008798', 'valaciclovir': '200511001'}   # 11-13 약지식창고 대조(뼈 약·흡입기 길잡이 칸)   # 11-05 원문 대조(편두통·떨림 효능 · 유전자 문구 · 항콜린 부담)
 DTL_OPS = ['DrugPrdtPrmsnInfoService08/getDrugPrdtPrmsnDtlInq07', 'DrugPrdtPrmsnInfoService08/getDrugPrdtPrmsnDtlInq08',
            'DrugPrdtPrmsnInfoService07/getDrugPrdtPrmsnDtlInq06', 'DrugPrdtPrmsnInfoService06/getDrugPrdtPrmsnDtlInq05',
            'DrugPrdtPrmsnInfoService05/getDrugPrdtPrmsnDtlInq04']
@@ -266,6 +266,41 @@ def main():
             print(f'의약외품(정상) {len(Q):,}건')
         except (Exception, SystemExit) as e:
             print('의약외품 받기 실패 — 건너뜀:', e)
+    if only == 'updates':   # 11-17 내용 대조 ① — 우리 e약은요 사본(2026-10-13) 뒤에 식약처가 고친 품목 목록만(본문은 받지 않음)
+        BASE = '2026-10-13'
+        rows = fetch_all(EASY_OP, k, 'e약은요 갱신일')
+        use = set()
+        if (OUT / 'easy-index.json').exists():
+            for x in json.loads((OUT / 'easy-index.json').read_text(encoding='utf-8')):
+                if x.get('map'): use.add(x.get('seq'))
+        def d(v):
+            v = re.sub(r'[^0-9]', '', s(v))[:8]; return (v[:4] + '-' + v[4:6] + '-' + v[6:8]) if len(v) == 8 else ''
+        ch = sorted(({'seq': s(r.get('itemSeq')), 'n': s(r.get('itemName')), 'm': s(r.get('entpName')), 'upd': d(r.get('updateDe')), 'open': d(r.get('openDe')),
+                      'app': s(r.get('itemSeq')) in use} for r in rows if d(r.get('updateDe')) > BASE), key=lambda x: (not x['app'], x['upd']), reverse=False)
+        # 갱신일만 바뀐 것과 글이 실제로 바뀐 것을 가른다 — 지금 앱 사본(easy-N.json)과 칸마다 맞대 본다
+        idx = {x['seq']: x for x in json.loads((OUT / 'easy-index.json').read_text(encoding='utf-8'))} if (OUT / 'easy-index.json').exists() else {}
+        cache, byseq = {}, {s(r.get('itemSeq')): r for r in rows}
+        def clean(t):
+            t = re.sub(r'<[^>]+>', '', s(t)).replace('|', ', ')
+            return re.sub(r'\.(?=[가-힣A-Za-z(])', '.\n', t)
+        F = {'e': 'efcyQesitm', 'u': 'useMethodQesitm', 'x': 'intrcQesitm', 's': 'seQesitm', 'k': 'depositMethodQesitm'}
+        norm = lambda t: re.sub(r'\s+', '', t or '')
+        for it in ch:
+            x = idx.get(it['seq']); r = byseq.get(it['seq'])
+            if not x or not r: continue
+            c = x['id'] // 200
+            if c not in cache:
+                f = OUT / f'easy-{c}.json'; cache[c] = json.loads(f.read_text(encoding='utf-8')) if f.exists() else []
+            cur = cache[c][x['id'] % 200] if x['id'] % 200 < len(cache[c]) else {}
+            new = {kk: clean(r.get(v)) for kk, v in F.items()}
+            warn, atpn = clean(r.get('atpnWarnQesitm')), clean(r.get('atpnQesitm'))
+            new['c'] = (warn + '\n' + atpn).strip() if warn else atpn
+            diff = {kk: {'old': cur.get(kk, ''), 'new': new[kk]} for kk in new if norm(new[kk]) != norm(cur.get(kk, ''))}
+            it['diff'] = diff
+        out = {'fetched': time.strftime('%Y-%m-%d'), 'base': BASE, 'total': len(rows), 'changed': len(ch), 'changed_in_app': sum(1 for x in ch if x['app']),
+               'text_changed': sum(1 for x in ch if x.get('diff')), 'text_changed_in_app': sum(1 for x in ch if x.get('diff') and x['app']), 'items': ch}
+        (ROOT / 'tools' / 'easy-updates.json').write_text(json.dumps(out, ensure_ascii=False, indent=1), encoding='utf-8')
+        print(f'  e약은요 {len(rows)}건 중 {BASE} 뒤 갱신 {len(ch)}건(앱이 쓰는 성분 연결 {out["changed_in_app"]}건)')
     if only == 'labels':   # 전체 받기('')에는 넣지 않는다 — 따로 돌린다
         _old = ROOT / 'tools' / 'rxlabels.json'
         L = rx_labels(k, json.loads(_old.read_text(encoding='utf-8')).get('labels', {}) if _old.exists() else {})
