@@ -1732,7 +1732,7 @@ try {
 
 /* 11-17 Main ① 가족 여러 명 약을 한 앱에서 — 기기 안 프로필(나·어머니·아이). 겹침 판정은 사람마다.
    지금 보는 사람의 기록은 늘 yakjido.me.v1 에 둔다(홈·겹침·알림·약통이 그대로 쓴다). 다른 사람 것은 yakjido.me.v1@<id> 에 쉬어 둔다.
-   서버 이어 보기·가족 알림(보호자에게 알리기)은 「나」일 때만 — 다른 사람 기록이 내 계정·내 보호자에게 섞이지 않게. 알림은 지금 보는 한 사람 약으로만 운다 */
+   서버 이어 보기·가족 알림(보호자에게 알리기)은 「나」일 때만 — 다른 사람 기록이 내 계정·내 보호자에게 섞이지 않게. 복용 알림은 모든 분 것(app-shell profOthers) */
 const PROF_KEY = 'yakjido.profiles.v1';
 function profAll(){ let j = null; try { j = JSON.parse(localStorage.getItem(PROF_KEY) || 'null'); } catch (e) {}
   const list = (j && Array.isArray(j.list) ? j.list : []).filter(p => p && /^[a-z0-9]{1,12}$/.test(p.id) && typeof p.name === 'string' && p.name.trim()).map(p => ({ id: p.id, name: p.name.trim().slice(0, 12) }));
@@ -1767,10 +1767,44 @@ async function profDel(id){ const P = profAll(), p = P.list.find(x => x.id === i
 window.profDel = profDel;
 let PROFQ = { name: '', age: '' };
 window.profPick = function (k, v) { PROFQ[k] = v; if (k === 'name') { const i = document.getElementById('profName'); if (i) i.value = v; } if (k === 'name' && !PROFQ.age) PROFQ.age = v === '아이' ? 'child' : /어머니|아버지|할머니|할아버지/.test(v) ? 'senior' : ''; route(); };
+/* 11-17 1등 로드맵 2 — 오늘 가족 약 한 장: 사람을 바꾸지 않고 가족의 다음 남은 회차를 보고 바로 체크 */
+window.famToday = function () { if (typeof profOthers !== 'function') return ''; const os = profOthers(); if (!os.length) return '';
+  const tk = todayKey(), rows = [];
+  for (const o of os) { const r = withMe(o.me, () => { const g = slotGroups(); if (!g.length) return null; const tset = takenSet();
+      const left = g.map(({ t, items }) => ({ t, its: items.filter(d => !tset.includes(d.id + '@' + t) && !isSkipped(d.id + '@' + t)) })).filter(x => x.its.length);
+      return { all: g.length, left }; });
+    if (!r) continue; const nx = r.left[0], who = esc(profWho(o));
+    rows.push(nx ? `<li><span class="ft-n"><b>${who}</b> ${nx.t} · 약 ${nx.its.length}가지${r.left.length > 1 ? ` <small>남은 회차 ${r.left.length}</small>` : ''}</span><button type="button" class="btn line" onclick="profTick({id:'${o.id}',keys:'${nx.its.map(d => d.id + '@' + nx.t).join(',')}'},'${tk}','took');route()">먹었어요</button></li>`
+      : `<li><span class="ft-n"><b>${who}</b> 오늘 약 다 챙겼어요</span></li>`); }
+  return rows.length ? `<div class="fam-today"><h2>오늘 가족 약</h2><ul>${rows.join('')}</ul></div>` : ''; };
+/* 11-17 1등 로드맵 3 — 새 약 받았어요 한 흐름: 담자마자 «이 약과 지금 약» 겹침 → 알림 시간 → (가족이면 누구 약통인지) 를 한 카드에.
+   예전에는 「담았어요」 토스트 + 10초 뒤 사라지는 시간 묻기 토스트뿐이라, 겹침은 따로 찾아가야 했다. 닫을 때까지 남는다(어르신 읽을 시간) */
+window.afterAdd = function (id) { try {
+  if (ME.demo) return; const item = takingItems().find(x => x.id === id); if (!item) return;
+  document.querySelector('.after-add')?.remove(); document.querySelector('.toast')?.remove();
+  let C = []; try { C = ixCards(ixRun([])).filter(c => (c.items || []).some(it => it && (it.id === id || (it.d && it.d.id === id)))); } catch (e) {}
+  const stop = C.filter(c => c.lv === 'stop').length, warn = C.filter(c => c.lv === 'warn').length;
+  const L = !isPrn(id) && schedUnset(item) ? defaultSlots(item) : [], nm = String(item.name).split(' (')[0];
+  const who = typeof profIsMe === 'function' && !profIsMe() ? esc(profName()) + ' 님 약통에 ' : '';
+  const el = document.createElement('div'); el.className = 'after-add'; el.setAttribute('role', 'dialog'); el.setAttribute('aria-label', '새로 담은 약');
+  el.innerHTML = `<div class="aa-h"><b>${who}${esc(nm)} 담았어요</b><button type="button" class="aa-x" aria-label="닫기">${I.x || '×'}</button></div>`
+    + (stop ? `<a class="aa-v stop" href="#/together"><span><b>${esc(C.find(c => c.lv === 'stop').t)}</b>${stop + warn > 1 ? ` <small>외 ${stop + warn - 1}가지</small>` : ''} ›</span></a>`
+      : warn ? `<a class="aa-v warn" href="#/together"><span><b>${esc(C.find(c => c.lv === 'warn').t)}</b>${warn > 1 ? ` <small>외 ${warn - 1}가지</small>` : ''} ›</span></a>`
+      : `<p class="aa-v ok">지금 드시는 약과 겹치거나 조심할 조합이 안 보여요.</p>`)
+    + (L.length ? `<div class="aa-t"><span>${L.join(' · ')}에 알려 드릴까요?</span><button type="button" class="btn aa-go">이 시간으로</button></div>` : '')
+    + (isPrn(id) ? `<p class="aa-s">아플 때만 드시는 약이라 「필요할 때만」으로 두었어요.</p>` : '')
+    + (stop ? `<p class="aa-s">드시기 전에 의사·약사와 상의하세요 — 눌러서 자세히 보실 수 있어요.</p>` : '');
+  el.querySelector('.aa-x').onclick = () => el.remove();
+  const go = el.querySelector('.aa-go'); if (go) go.onclick = () => { el.remove(); schedConfirm(id); };
+  el.querySelectorAll('a').forEach(a => a.addEventListener('click', () => el.remove()));
+  document.body.appendChild(el);
+  const sr = document.getElementById('sr'); if (sr) { sr.textContent = ''; setTimeout(() => { sr.textContent = el.innerText.replace(/\s+/g, ' '); }, 60); }
+  addEventListener('hashchange', function h() { if (!/together|schedule/.test(location.hash)) el.remove(); removeEventListener('hashchange', h); });
+} catch (e) { try { askRemind(id); } catch (e2) {} } };
 /* 홈 「내 약」 칸 맨 위 — 두 분 이상일 때만 이름 줄. 한 분이면 칸 아래 조용한 길 하나 */
 window.profRow = function () { const P = profAll(); if (P.list.length < 2) return '';
   return '<div class="prof-row" role="group" aria-label="누구 약을 볼까요">' + P.list.map(p => `<button type="button" class="prof-chip${p.id === P.active ? ' on' : ''}" aria-pressed="${p.id === P.active}" onclick="profSwitch('${p.id}')">${esc(p.name)}</button>`).join('') + '<a class="prof-chip add" href="#/people">+ 가족</a></div>'
-    + (P.active === 'me' ? '' : `<p class="prof-note">지금 <b>${esc(profName())}</b> 님 약을 보고 계세요. 알림은 이분 약으로 울려요 — 내 약 알림은 <button type="button" class="link" onclick="profSwitch('me')">나로 돌아오면</button> 다시 울려요.</p>`); };
+    + (P.active === 'me' ? '' : `<p class="prof-note">지금 <b>${esc(profName())}</b> 님 약을 보고 계세요. 알림은 가족 모두의 약 시간에 사람 이름을 붙여 울려요. <button type="button" class="link" onclick="profSwitch('me')">내 약으로 돌아가기</button></p>`); };
 window.profLink = function () { return profAll().list.length < 2 ? '<p class="job-small"><a href="#/people">어머니·아이 약도 따로 담기 ›</a></p>' : ''; };
 window.문_people = function () { const P = profAll();
   const 이름들 = ['어머니', '아버지', '아이', '배우자', '할머니', '할아버지'], 나이 = [['adult', '성인'], ['senior', '65세 이상'], ['child', '소아·청소년']];
@@ -1780,9 +1814,9 @@ window.문_people = function () { const P = profAll();
       <label class="small" for="profName" style="display:block;margin-top:12px">이름(바꿔 쓰셔도 돼요)</label><input id="profName" type="text" maxlength="12" autocomplete="off" style="width:100%;min-height:48px;font-size:1.0625rem;margin-top:6px;padding:0 14px;border:1.5px solid var(--ui-line,#C9D3D8);border-radius:12px;background:var(--card,#fff);color:var(--text);box-sizing:border-box" value="${esc(PROFQ.name)}" oninput="PROFQ_set(this.value)" placeholder="예: 큰딸">
       <h3 style="margin-top:14px">나이</h3><div class="seg" role="group" aria-label="약을 드실 분의 나이" style="margin-top:8px">${나이.map(([k, n]) => `<button type="button" class="${(PROFQ.age || 'adult') === k ? 'on' : ''}" aria-pressed="${(PROFQ.age || 'adult') === k}" onclick="profPick('age','${k}')">${n}</button>`).join('')}</div>
       <div class="actions" style="margin-top:16px"><button type="button" class="btn" onclick="profAdd()">더하고 그분 약 담기</button></div></section>`
-    + `<section class="sec">${fold('자세히', `<p class="small">· 알림은 <b>지금 보고 있는 한 분</b> 약으로만 울려요. 내 약 알림이 필요하면 「나」로 돌아와 주세요.<br>· 메디나눔 계정 이어 보기와 보호자 알림에는 <b>「나」의 기록만</b> 올라가요. 가족 기록은 이 휴대폰에만 있어요.<br>· 아이 약은 체중이 중요해요 — 그분으로 바꾼 뒤 약통에서 몸무게를 넣어 주세요.</p>`)}</section>`; };
+    + `<section class="sec">${fold('자세히', `<p class="small">· 알림은 담아 둔 <b>모든 분</b>의 약 시간에 울려요 — 「어머니 님 약 드실 시간」처럼 이름을 붙여서. 알림의 「먹었어요」는 그분 기록에 적혀요.<br>· 메디나눔 계정 이어 보기와 보호자 알림에는 <b>「나」의 기록만</b> 올라가요. 가족 기록은 이 휴대폰에만 있어요.<br>· 아이 약은 체중이 중요해요 — 그분으로 바꾼 뒤 약통에서 몸무게를 넣어 주세요.</p>`)}</section>`; };
 window.PROFQ_set = function (v) { PROFQ.name = String(v || '').slice(0, 12); };
-try { const ps = document.createElement('style'); ps.id = 'prof-css'; ps.textContent = '.prof-row{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 12px}.prof-chip{display:inline-flex;align-items:center;min-height:44px;padding:0 16px;border-radius:999px;border:1.5px solid var(--ui-line,#C9D3D8);background:transparent;color:var(--text);font:inherit;font-weight:600;text-decoration:none}.prof-chip.on{background:var(--primary,#0B6E8F);border-color:var(--primary,#0B6E8F);color:#fff}.prof-chip.add{color:var(--primary,#0B6E8F)}.prof-note{margin:0 0 12px;padding:10px 12px;border-radius:12px;background:var(--normal-tint,#F2F8FA);line-height:1.6;word-break:keep-all}.prof-note .link{display:inline;min-height:0;padding:0;color:var(--primary);font:inherit;font-weight:700;background:none;border:0;text-decoration:underline}.prof-list{list-style:none;margin:10px 0 0;padding:0}.prof-list li{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:56px;border-bottom:1px solid var(--hairline,#E3E8EB)}.prof-list small{color:var(--muted);margin-left:6px}.prof-act{display:flex;align-items:center;gap:8px}.prof-act .btn{min-height:44px;width:auto;padding:0 16px}.prof-act .link{min-height:44px;padding:0 8px}.seg.wrap{flex-wrap:wrap}'; document.head.appendChild(ps); } catch (e) {}
+try { const ps = document.createElement('style'); ps.id = 'prof-css'; ps.textContent = '.prof-row{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 12px}.prof-chip{display:inline-flex;align-items:center;min-height:44px;padding:0 16px;border-radius:999px;border:1.5px solid var(--ui-line,#C9D3D8);background:transparent;color:var(--text);font:inherit;font-weight:600;text-decoration:none}.prof-chip.on{background:var(--primary,#0B6E8F);border-color:var(--primary,#0B6E8F);color:#fff}.prof-chip.add{color:var(--primary,#0B6E8F)}.prof-note{margin:0 0 12px;padding:10px 12px;border-radius:12px;background:var(--normal-tint,#F2F8FA);line-height:1.6;word-break:keep-all}.prof-note .link{display:inline;min-height:0;padding:0;color:var(--primary);font:inherit;font-weight:700;background:none;border:0;text-decoration:underline}.prof-list{list-style:none;margin:10px 0 0;padding:0}.prof-list li{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:56px;border-bottom:1px solid var(--hairline,#E3E8EB)}.prof-list small{color:var(--muted);margin-left:6px}.prof-act{display:flex;align-items:center;gap:8px}.prof-act .btn{min-height:44px;width:auto;padding:0 16px}.prof-act .link{min-height:44px;padding:0 8px}.seg.wrap{flex-wrap:wrap}.after-add{position:fixed;left:12px;right:12px;bottom:84px;z-index:21;max-width:560px;margin:0 auto;padding:14px 14px 12px;border-radius:16px;background:var(--card,#fff);color:var(--text);border:1px solid var(--hairline,#E3E8EB);box-shadow:0 10px 30px rgba(0,0,0,.18);word-break:keep-all}.after-add .aa-h{display:flex;align-items:center;justify-content:space-between;gap:8px}.after-add .aa-h b{font-size:1.0625rem;line-height:1.45}.aa-x{flex:none;width:44px;height:44px;border:0;background:none;color:var(--muted);font-size:1.25rem;border-radius:50%}.aa-x svg{width:20px;height:20px}.aa-v{display:flex;align-items:center;min-height:48px;margin:8px 0 0;padding:8px 12px;border-radius:12px;text-decoration:none;color:var(--text);line-height:1.5}.aa-v.stop{border:2px solid var(--alert,#D93A2B);color:var(--alert,#B42318)}.aa-v.warn{border:1.5px solid var(--warn,#B7791F)}.aa-v.ok{background:var(--normal-tint,#F2F8FA)}.aa-t{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:10px}.aa-t span{flex:1;min-width:0;line-height:1.5}.aa-t .btn{min-height:48px;width:auto;flex:0 0 auto;padding:0 16px}.aa-s{margin:8px 0 0;font-size:.9375rem;color:var(--muted)}.fam-today{margin:14px 0 2px;text-align:left}.fam-today h2{font-size:1rem;margin:0 0 6px;color:var(--muted)}.fam-today ul{list-style:none;margin:0;padding:0}.fam-today li{display:flex;align-items:center;justify-content:space-between;gap:10px;min-height:56px;border-top:1px solid var(--hairline,#E3E8EB)}.fam-today .ft-n{flex:1;min-width:0;line-height:1.5;word-break:keep-all}.fam-today small{color:var(--muted)}.fam-today .btn{min-height:44px;width:auto;flex:0 0 auto;padding:0 14px}'; document.head.appendChild(ps); } catch (e) {}
 
 /* 약지도 — 두 폰 합치기(app-shell 의 sanitizeMe 를 씀). 2026-10-13 상용화 점검 */
 window.mergeMe = function (localRaw, serverRaw) {
@@ -3768,7 +3802,7 @@ window.언어칸 = function () {
     var items = []; try { items = takingItems(); } catch (e) {}
     if (!items.length) return '<section class="job-hero' + (document.documentElement.classList.contains('ink') ? '' : ' card') + '">' + profRow() + 잉크얼굴(72) + '<h1>' + (profIsMe() ? '내 약을 담아 두세요' : esc(profName()) + ' 님 약을 담아 두세요') + '</h1><p>한 번 담으면 기억해요. 새 약이 들어오면 <b>같이 먹으면 안 되는 것</b>을 바로 알려 드려요.</p>' +
       '<div class="job-add"><button type="button" class="btn" ' + DI('solid') + ' onclick="go(\'/photo\')">약봉투·처방전 사진으로</button><button type="button" class="btn line" onclick="go(\'/together\')">약 이름으로 찾기</button></div>' +
-      '<p class="job-small"><a href="#/kinds">이름을 몰라도 종류만 골라 담기 ›</a></p>' + profLink() + '</section>';
+      '<p class="job-small"><a href="#/kinds">이름을 몰라도 종류만 골라 담기 ›</a></p>' + famToday() + profLink() + '</section>';
     var 판 = '', n = items.length, stop = 0, warn = 0;
     try { var C = ixCards(ixRun([])); stop = C.filter(function (c) { return c.lv === 'stop'; }).length; warn = C.filter(function (c) { return c.lv === 'warn'; }).length; } catch (e) {}
     판 = stop ? '<a class="job-verdict stop" href="#/together"><b>같이 드시면 안 되는 것 ' + stop + '</b>' + (warn ? ' · 조심할 것 ' + warn : '') + ' ›</a>'
@@ -3788,7 +3822,7 @@ window.언어칸 = function () {
     /* 11-17 Main — 간단히 보기: 큰 글씨 · 내 약을 쉬운 갈래 이름과 함께(사진 없는 줄 목록) · 단추 둘씩 크게. 겹침 판정·마음 한 줄은 같다 */
     var sv = typeof svOn === 'function' && svOn(), 목록 = sv ? '<ul class="job-list">' + items.slice(0, 6).map(function (d) { var dk = d.class || ((typeof drug === 'function' && drug(d.id)) || {}).class, c0 = (D.classes || []).filter(function (c) { return c.id === dk; })[0], g = d.quick ? d.quick.g.n : c0 ? String(c0.name).split('(')[0].trim() : ''; return '<li><b>' + esc(짧은이름(d.name)) + '</b>' + (g ? '<span>' + esc(g) + '</span>' : '') + '</li>'; }).join('') + (items.length > 6 ? '<li><a href="#/me?t=meds">' + (items.length - 6) + '가지 더 ›</a></li>' : '') + '</ul>' : '';
     return '<section class="job-box' + (sv ? ' sv' : '') + (document.documentElement.classList.contains('ink') ? '' : ' card') + '">' + profRow() + '<div class="job-h"><h1>' + (profIsMe() ? '내 약' : esc(profName()) + ' 님 약') + ' ' + n + '가지</h1><button type="button" class="btn" ' + DI('solid') + ' onclick="go(\'/together\')">+ 약 더하기</button></div>' + 판 + 목록 + (마음.indexOf('오늘도 잘 챙기셨어요') >= 0 || !document.documentElement.classList.contains('ink') ? '' : 다음약()) + 마음 +
-      '<div class="job-row"><a href="#/notify">알림</a><a href="#/send">가족에게</a><a href="#/bag">내 약 한 장</a><a href="#/me?t=meds">약통</a></div>' + profLink() + '</section>';
+      famToday() + '<div class="job-row"><a href="#/notify">알림</a><a href="#/send">가족에게</a><a href="#/bag">내 약 한 장</a><a href="#/me?t=meds">약통</a></div>' + profLink() + '</section>';
   }
   /* 11-17 밤 — 원래 판의 「내 약」 칸 모양(잉크 판은 ink.css) */
   try { var jst = document.createElement('style'); jst.id = 'job-css'; jst.textContent = 'html:not(.ink) .job-hero,html:not(.ink) .job-box{margin:12px 0 4px;padding:18px 16px}html:not(.ink) .job-hero{text-align:center}html:not(.ink) .job-hero .ink-face{display:block;margin:0 auto 10px}html:not(.ink) .job-hero h1{font-size:1.375rem}html:not(.ink) .job-hero p{margin-top:6px;color:var(--muted)}'

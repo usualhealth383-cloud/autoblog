@@ -1810,7 +1810,7 @@ html:not(.ink) .rf-none{display:none}</style>
 <script>
 window.__YAKJIDO_OK__ = true;
 const D = JSON.parse(document.getElementById('data').textContent || '{}');
-const BUILD = '2026-11-18 00:36';
+const BUILD = '2026-11-18 01:29';
 const DATAV = 'ebf9e087db'.indexOf('__') === 0 ? BUILD : 'ebf9e087db';
 const BRANDMARK = (typeof window !== 'undefined' && window.__BRANDMARK__) || 'icon-192.png';
 let CORE = 0, CORE_P = null;
@@ -4348,7 +4348,24 @@ function unskip(k, keys){ const L = (ME.skipped || {})[k]; if (!L) return; for (
 function skipKeys(keys, day){ const k = day || todayKey(); const T = (ME.taken || {})[k] || [], L = skippedSet(k); let n = 0;
 for (const x of keys) if (!T.includes(x) && !L.includes(x)) { L.push(x); n++; } return n; }
 function skipDose(id, t){ if (skipKeys([id + '@' + t])) { rollDay(); saveMe(); if (NATIVE) nativeArm(); toast('이번 회는 건너뛴 것으로 적었어요 — 다음 시간부터 원래대로 드세요'); } route(); }
-function skipFromNote(key, day){ const keys = noteKeys(key); if (!keys.length) return; const k = day || todayKey();
+function profOthers(){ let P = null; try { P = JSON.parse(localStorage.getItem('yakjido.profiles.v1') || 'null'); } catch (e) {} if (!P || !Array.isArray(P.list)) return [];
+const act = P.active || 'me', out = [];
+P.list.forEach((p, n) => { if (!p || p.id === act || !/^[a-z0-9]{1,12}$/.test(p.id)) return; let raw = null; try { raw = localStorage.getItem(ME_KEY + '@' + p.id); } catch (e) {} if (!raw) return;
+out.push({ id: p.id, n, name: String(p.name || '').trim().slice(0, 12) || '가족', me: loadMe(raw) }); });
+return out; }
+function withMe(m, f){ const keep = ME; ME = m; try { return f(); } finally { ME = keep; } }
+const profWho = o => o.id === 'me' ? '내' : o.name + ' 님';
+const profKey = key => { const m = (Array.isArray(key) ? key.join(',') : String(key || '')).match(/^p=([a-z0-9]{1,12});(.*)$/); return m ? { id: m[1], keys: m[2] } : null; };
+function profTick(pk, day, how){ const keys = noteKeys(pk.keys); if (!keys.length) return; const k = day || todayKey();
+if (k !== todayKey() && k !== dayBefore(1)) { toast('지난 알림이라 기록하지 않았어요 — 그분으로 바꿔 복용 시간 화면에서 눌러 주세요'); return; }
+const o = profOthers().find(x => x.id === pk.id); if (!o) return; const m = o.me;
+const box = how === 'took' ? (m.taken = m.taken || {}) : (m.skipped = m.skipped || {}), arr = box[k] = box[k] || [];
+keys.forEach(x => { if (!arr.includes(x)) arr.push(x); });
+if (how === 'took' && m.skipped && m.skipped[k]) m.skipped[k] = m.skipped[k].filter(x => !keys.includes(x));
+try { localStorage.setItem(ME_KEY + '@' + pk.id, JSON.stringify(m)); } catch (e) { toast('저장하지 못했어요'); return; }
+toast(`${profWho(o)} 약을 ${how === 'took' ? '먹었다고' : '건너뛰었다고'} 적어 두었어요`); if (NATIVE) nativeArm(); else armNotifications(); }
+const profAct = () => { try { return (JSON.parse(localStorage.getItem('yakjido.profiles.v1') || 'null') || {}).active || 'me'; } catch (e) { return 'me'; } };
+function skipFromNote(key, day){ const pk = profKey(key); if (pk) { if (pk.id !== profAct()) return profTick(pk, day, 'skip'); key = pk.keys; } const keys = noteKeys(key); if (!keys.length) return; const k = day || todayKey();
 if (k !== todayKey() && k !== dayBefore(1)) { toast('지난 알림이라 기록하지 않았어요 — 복용 시간 화면에서 눌러 주세요'); return; }
 if (skipKeys(keys, k)) { saveMe(); toast('이번 회는 건너뛴 것으로 적었어요'); if (NATIVE) nativeArm(); } }
 const isSkipped = (key, k) => ((ME.skipped || {})[k || todayKey()] || []).includes(key);
@@ -4521,6 +4538,19 @@ let used = 0; for (const { t, items } of groups) { if (t > nowHm) continue; used
 const [h, m] = t.split(':').map(Number), ag = new Date(now); ag.setHours(h, m + againMin(), 0, 0);
 if (ag.getTime() <= now && items.some(d => !taken.includes(d.id + '@' + t) && !skipped.includes(d.id + '@' + t))) used++; }
 for (const x of capDay(med, nSlot, used)) { delete x.day; delete x.r; list.push(x); }
+for (const o of profOthers()) { const m2 = []; let used2 = 0, n2 = 0;
+withMe(o.me, () => { if (!noteOn('dose')) return; const g = slotGroups().slice(0, 400), tk = takenSet(), sk = skippedSet(), base = 100000 + (o.n % 10) * 20000; n2 = g.length;
+const D2 = g.length ? Math.max(1, Math.min(7, Math.floor(200 / (g.length + 1)))) : 0;
+g.forEach(({ t, items }, i) => { const [h, m] = t.split(':').map(Number);
+for (let k = 0; k < D2; k++) { const at = new Date(); at.setDate(at.getDate() + k); at.setHours(h, m, 0, 0); const day = dayKey(at);
+const its = k === 0 ? items.filter(d => !tk.includes(d.id + '@' + t) && !sk.includes(d.id + '@' + t)) : items; if (!its.length) continue;
+const kk = 'p=' + o.id + ';' + its.map(d => d.id + '@' + t).join(','), extra = { key: kk, keys: kk, day, prof: o.id };
+if (at.getTime() > now) m2.push({ id: base + i * 20 + k, title: `${profWho(o)} 약 드실 시간`, body: slotBody(t, its), channelId: ch, actionTypeId: 'dose', extra, isExactNotification: exact, schedule: { at, allowWhileIdle: true }, day, r: 0 });
+const again = new Date(at.getTime() + againMin() * 60000);
+if (again.getTime() > now && noteOn('again')) m2.push({ id: base + 10 + i * 20 + k, title: `${profWho(o)} 약, 아직 체크가 없어요`, body: slotBody(t, its, true), channelId: ch, actionTypeId: 'dose', extra: { ...extra, again: day }, isExactNotification: exact, schedule: { at: again, allowWhileIdle: true }, day, r: 3 }); } });
+for (const { t, items } of g) { if (t > nowHm) continue; used2++; const [h, m] = t.split(':').map(Number), ag = new Date(now); ag.setHours(h, m + againMin(), 0, 0);
+if (ag.getTime() <= now && items.some(d => !tk.includes(d.id + '@' + t) && !sk.includes(d.id + '@' + t))) used2++; } });
+for (const x of capDay(m2, n2, used2)) { delete x.day; delete x.r; list.push(x); } }
 const CAP = 480 - pend.filter(p => p.id >= 900000).length;
 if (list.length > CAP) { const open = list.find(x => x.id === 599999); const tm = x => x.schedule.at ? new Date(x.schedule.at).getTime() : 0;
 list.splice(0, list.length, ...list.filter(x => x !== open).sort((a, b) => tm(a) - tm(b)).slice(0, CAP - (open ? 1 : 0)), ...(open ? [open] : [])); }
@@ -4588,6 +4618,11 @@ const fire = again => { const L = left(t, items); if (L.length && webQuota(again
 if (at > now && noteOn('dose')) NOTI_TIMERS.push(setTimeout(() => fire(false), at - now));
 const again = new Date(at.getTime() + againMin() * 60000); if (again > now && noteOn('dose') && noteOn('again')) NOTI_TIMERS.push(setTimeout(() => fire(true), again - now));
 }
+for (const o of profOthers()) for (const { t, items } of withMe(o.me, () => noteOn('dose') ? slotGroups() : [])) {
+const [h, m] = t.split(':').map(Number); const at = new Date(); at.setHours(h, m, 0, 0); if (at <= now) continue; const day = dayKey(at);
+NOTI_TIMERS.push(setTimeout(() => { const o2 = profOthers().find(x => x.id === o.id); if (!o2) return;
+const L = withMe(o2.me, () => items.filter(d => !takenSet().includes(d.id + '@' + t) && !isSkipped(d.id + '@' + t)));
+if (L.length) showNote(`${profWho(o2)} 약 드실 시간`, withMe(o2.me, () => slotBody(t, L)), 'p=' + o.id + ';' + L.map(d => d.id + '@' + t).join(','), day); }, at - now)); }
 const ev = new Date(now); ev.setHours(21, 0, 0, 0);
 if (eveningOn() && ev > now) NOTI_TIMERS.push(setTimeout(() => { const L = eveningLeft(todayKey(), true); if (L.length && webQuota(true)) showNote('오늘 약 체크', eveningBody(L), 'yakjido-evening', '', '#/schedule'); }, ev - now));
 for (const v of (noteOn('visit') ? visits() : [])) for (const [when, title] of visitTimes(v)) { const ms = when - now; if (ms > 0 && ms < 2147000000) NOTI_TIMERS.push(setTimeout(() => showNote(title, visitWord(v), 'visit-' + v.id, '', true), ms)); }
@@ -4595,13 +4630,14 @@ const mid = new Date(now); mid.setHours(24, 0, 1, 0);
 NOTI_TIMERS.push(setTimeout(() => dayCheck(), mid - now));
 }
 function tickFromNote(key, day){
+const pk = profKey(key); if (pk) { if (pk.id !== profAct()) return profTick(pk, day, 'took'); key = pk.keys; }
 const keys = noteKeys(key); if (!keys.length) return; const k = day || todayKey();
 if (k !== todayKey() && k !== dayBefore(1)) { toast('지난 알림이라 기록하지 않았어요 — 복용 시간 화면에서 눌러 주세요'); return; }
 ME.taken = ME.taken || {}; const arr = ME.taken[k] = ME.taken[k] || [];
 const add = keys.filter(x => !arr.includes(x));
 if (add.length) { arr.push(...add); unskip(k, add); rollDay(); saveMe(); toast(k === todayKey() ? '먹었다고 적어 두었어요' : '어제 기록으로 적어 두었어요'); if (NATIVE) nativeArm(); }
 }
-function webSnooze(key, day, title, body){ const keys = noteKeys(key); if (!keys.length) return;
+function webSnooze(key, day, title, body){ if (profKey(key)) { setTimeout(() => showNote(title || '약지도 · 약 드실 시간', body || '', key, day), 10 * 60000); toast('10분 뒤에 다시 알려 드릴게요'); return; } const keys = noteKeys(key); if (!keys.length) return;
 setTimeout(() => { const k = day || todayKey(), L = keys.filter(x => !((ME.taken || {})[k] || []).includes(x) && !isSkipped(x, k)); if (L.length) showNote(title || '약지도 · 약 드실 시간', body || '약 드실 시간이에요', L.join(','), k); }, 10 * 60000);
 toast('10분 뒤에 다시 알려 드릴게요'); }
 try { navigator.serviceWorker && navigator.serviceWorker.addEventListener('message', ev => { if (ev.data && ev.data.type === 'yakjido-later') { webSnooze(ev.data.key, ev.data.day, ev.data.title, ev.data.body); return; } if (ev.data && ev.data.type === 'yakjido-tick') { if (ev.data.go) { go(ev.data.go); route(); return; } tickFromNote(ev.data.key, ev.data.day); go('/schedule'); route(); } }); } catch (e) {}
@@ -5708,7 +5744,7 @@ setTimeout(() => el.remove(), 7000);
 }
 async function toggleTaking(id){ ME.taking = ME.taking || []; const adding = !ME.taking.includes(id);
 if (!adding) { if (!(await confirmRemove(id))) return; const snap = JSON.stringify(ME); ME.taking = ME.taking.filter(x => x !== id); saveMe(); armNotifications(); route(); undoToast('내 약통에서 뺐어요', snap); return; }
-ME.taking = [...ME.taking, id]; const prn = markPrnIfNew(id); saveMe(); route(); toast(prn ? '내 약통에 담았어요 — 아플 때만 드시는 약이라 「필요할 때만」으로 두었어요' : '내 약통에 담았어요'); if (!prn) setTimeout(() => askRemind(id), 1800); }
+ME.taking = [...ME.taking, id]; const prn = markPrnIfNew(id); saveMe(); route(); toast(prn ? '내 약통에 담았어요 — 아플 때만 드시는 약이라 「필요할 때만」으로 두었어요' : '내 약통에 담았어요'); setTimeout(() => (window.afterAdd ? afterAdd(id) : prn ? 0 : askRemind(id)), 900); }
 function toast(t){ document.querySelector('.toast')?.remove(); const el = document.createElement('div'); el.className = 'toast'; el.setAttribute('aria-hidden', 'true'); el.style.pointerEvents = 'none'; el.textContent = t; document.body.appendChild(el);
 const sr = document.getElementById('sr'); if (sr) { sr.textContent = ''; setTimeout(() => { sr.textContent = t; }, 60); }
 setTimeout(() => el.remove(), 4000); }
@@ -5881,7 +5917,7 @@ function addPubIx(i){ const p = (PUB.index || [])[+i]; if (!p) return; const id 
 if (ME.taking.includes(id)) { toast('이미 내 약통에 있어요'); return; }
 const ingr = (p.i || []).join('|'); const d = pubDrug(ingr, p);
 ME.taking.push(id); ME.pub[id] = { name: pubShort(p.n), full: p.n, ingr, rx: '', seq: p.seq || '', drugId: d?.id || '' }; markPrnIfNew(id);
-saveMe(); toast('내 약통에 담았어요'); setTimeout(() => askRemind(id), 1800); }
+saveMe(); toast('내 약통에 담았어요'); setTimeout(() => (window.afterAdd ? afterAdd(id) : askRemind(id)), 900); }
 function pubIngrFill(){
 const P = ME.pub || {}; const empty = Object.keys(P).filter(k => !P[k].ingr && !P[k].manual && (ME.taking || []).includes(k));
 if (!empty.length) return false;
@@ -5895,7 +5931,7 @@ if (ME.taking.includes(id)) { if (!(await confirmRemove(id))) return; const snap
 if (!p.n) return;
 const [ingr, est] = p.ingr ? [p.ingr, 0] : pubIngrGuess(p.seq, p.n); const d = pubDrug(ingr, p);
 ME.taking.push(id); ME.pub[id] = { name: p.n.replace(/\(.*?\)/g, '').replace(/[()]/g, '').trim(), full: p.n, ingr, rx: p.rx, seq, drugId: d?.id || '', ...(est && ingr ? { est: true } : {}) }; markPrnIfNew(id);
-saveMe(); route(); toast('내 약통에 담았어요'); setTimeout(() => askRemind(id), 1800);
+saveMe(); route(); toast('내 약통에 담았어요'); setTimeout(() => (window.afterAdd ? afterAdd(id) : askRemind(id)), 900);
 if (!ingr) { pubIngrFill.tried = false; pubIngrFill(); } }
 function quickSub(qid){ for (const g of (D.ingredients?.quick || [])) for (const x of (g.subs || [])) if (x.id === qid) return { g, x }; return null; }
 async function toggleQuick(qid){ ME.taking = ME.taking || []; const id = 'cls:' + qid;

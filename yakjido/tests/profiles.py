@@ -36,6 +36,36 @@ with sync_playwright() as p:
     ok('내 약 1가지' in pg.inner_text('.job-box'), '홈 머리글 내 약 1가지')
     pg.goto(URL + '#/people'); pg.wait_for_selector('.prof-list')
     ok(pg.locator('.prof-list li').count() == 2, '담아 둔 분 둘')
+
+    # 1등 로드맵 1 — 가족 모두의 알림(설치 앱 알람 흉내)
+    import re as _re
+    cap = _re.search(r'^CAP_MOCK = """(.*?)^"""', open(pathlib.Path(__file__).with_name('run.py')).read(), _re.S | _re.M).group(1)
+    pn = b.new_page(viewport={'width': 390, 'height': 840}, locale='ko-KR'); pn.clock.install(time='2026-09-28T10:00:00')
+    pn.add_init_script(cap)
+    pn.add_init_script("localStorage.setItem('yakjido.hello.v1','1');localStorage.setItem('yakjido.consent.v1',JSON.stringify({v:'2026-10-20',at:'2026-10-14',terms:1,privacy:1}));localStorage.setItem('yakjido.me.v1',JSON.stringify({taking:['ibuprofen'],sched:{ibuprofen:['08:00','20:00']}}));localStorage.setItem('yakjido.profiles.v1',JSON.stringify({active:'me',list:[{id:'me',name:'나'},{id:'mom1',name:'어머니'}]}));localStorage.setItem('yakjido.me.v1@mom1',JSON.stringify({age:'senior',taking:['acetaminophen'],sched:{acetaminophen:['12:00']}}))")
+    pn.goto(URL + '#/schedule'); pn.wait_for_selector('.app', timeout=20000); pn.wait_for_timeout(1800)
+    L = pn.evaluate("()=>__LN.pending")
+    mom = [x for x in L if x.get('title') == '어머니 님 약 드실 시간']
+    mine = [x for x in L if x.get('title') == '약지도 · 약 드실 시간']
+    ok(len(mom) >= 7 and all(str(x['extra']['keys']).startswith('p=mom1;') for x in mom), f'어머니 약 알림이 7일치 걸림 — {len(mom)}')
+    ok(len(mine) == 13, f'내 알림은 그대로 13 — {len(mine)}')
+    ok(len({x['id'] for x in L}) == len(L), '알림 번호 겹침 없음')
+    pn.evaluate("()=>tickFromNote('p=mom1;acetaminophen@12:00','2026-09-28')"); pn.wait_for_timeout(800)
+    t = pn.evaluate("()=>({mom: JSON.parse(localStorage.getItem('yakjido.me.v1@mom1')).taken, me: ME.taken})")
+    ok('acetaminophen@12:00' in (t['mom'] or {}).get('2026-09-28', []) and 'acetaminophen@12:00' not in str(t['me']), '알림의 먹었어요는 어머니 기록에만')
+    L2 = pn.evaluate("()=>__LN.pending")
+    ok(not any(x.get('title') == '어머니 님 약 드실 시간' and x['schedule']['at'].startswith('2026-09-28') for x in L2), '먹은 오늘 회차 알림은 지움')
+
+    pn.goto(URL + '#/home'); pn.wait_for_selector('.job-box', timeout=20000); pn.wait_for_timeout(500)
+    ft = pn.inner_text('.fam-today') if pn.locator('.fam-today').count() else ''
+    ok('어머니 님' in ft and '오늘 약 다 챙겼어요' in ft, f'오늘 가족 약 — 어머니 다 챙김 표시 ({ft[:40]})')
+
+    # 1등 로드맵 3 — 담자마자 겹침 카드
+    pg2 = b.new_page(viewport={'width': 360, 'height': 760}, locale='ko-KR'); pg2.add_init_script(SEED)
+    pg2.goto(URL + '#/drugs'); pg2.wait_for_selector('.app', timeout=20000); pg2.wait_for_timeout(1200)
+    pg2.evaluate("toggleTaking('pancol-a')"); pg2.wait_for_selector('.after-add', timeout=5000)
+    ok('같은 성분이 두 군데' in pg2.inner_text('.after-add'), '판콜에이를 담으면 타이레놀과 같은 성분 카드가 곧바로')
+    pg2.click('.aa-x'); ok(pg2.locator('.after-add').count() == 0, '닫기')
     ok(not errs, '스크립트 오류 없음 ' + ' | '.join(errs[:2]))
     b.close()
 srv.shutdown()
