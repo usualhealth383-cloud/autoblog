@@ -277,7 +277,28 @@ def main():
             v = re.sub(r'[^0-9]', '', s(v))[:8]; return (v[:4] + '-' + v[4:6] + '-' + v[6:8]) if len(v) == 8 else ''
         ch = sorted(({'seq': s(r.get('itemSeq')), 'n': s(r.get('itemName')), 'm': s(r.get('entpName')), 'upd': d(r.get('updateDe')), 'open': d(r.get('openDe')),
                       'app': s(r.get('itemSeq')) in use} for r in rows if d(r.get('updateDe')) > BASE), key=lambda x: (not x['app'], x['upd']), reverse=False)
-        out = {'fetched': time.strftime('%Y-%m-%d'), 'base': BASE, 'total': len(rows), 'changed': len(ch), 'changed_in_app': sum(1 for x in ch if x['app']), 'items': ch}
+        # 갱신일만 바뀐 것과 글이 실제로 바뀐 것을 가른다 — 지금 앱 사본(easy-N.json)과 칸마다 맞대 본다
+        idx = {x['seq']: x for x in json.loads((OUT / 'easy-index.json').read_text(encoding='utf-8'))} if (OUT / 'easy-index.json').exists() else {}
+        cache, byseq = {}, {s(r.get('itemSeq')): r for r in rows}
+        def clean(t):
+            t = re.sub(r'<[^>]+>', '', s(t)).replace('|', ', ')
+            return re.sub(r'\.(?=[가-힣A-Za-z(])', '.\n', t)
+        F = {'e': 'efcyQesitm', 'u': 'useMethodQesitm', 'x': 'intrcQesitm', 's': 'seQesitm', 'k': 'depositMethodQesitm'}
+        norm = lambda t: re.sub(r'\s+', '', t or '')
+        for it in ch:
+            x = idx.get(it['seq']); r = byseq.get(it['seq'])
+            if not x or not r: continue
+            c = x['id'] // 200
+            if c not in cache:
+                f = OUT / f'easy-{c}.json'; cache[c] = json.loads(f.read_text(encoding='utf-8')) if f.exists() else []
+            cur = cache[c][x['id'] % 200] if x['id'] % 200 < len(cache[c]) else {}
+            new = {kk: clean(r.get(v)) for kk, v in F.items()}
+            warn, atpn = clean(r.get('atpnWarnQesitm')), clean(r.get('atpnQesitm'))
+            new['c'] = (warn + '\n' + atpn).strip() if warn else atpn
+            diff = {kk: {'old': cur.get(kk, ''), 'new': new[kk]} for kk in new if norm(new[kk]) != norm(cur.get(kk, ''))}
+            it['diff'] = diff
+        out = {'fetched': time.strftime('%Y-%m-%d'), 'base': BASE, 'total': len(rows), 'changed': len(ch), 'changed_in_app': sum(1 for x in ch if x['app']),
+               'text_changed': sum(1 for x in ch if x.get('diff')), 'text_changed_in_app': sum(1 for x in ch if x.get('diff') and x['app']), 'items': ch}
         (ROOT / 'tools' / 'easy-updates.json').write_text(json.dumps(out, ensure_ascii=False, indent=1), encoding='utf-8')
         print(f'  e약은요 {len(rows)}건 중 {BASE} 뒤 갱신 {len(ch)}건(앱이 쓰는 성분 연결 {out["changed_in_app"]}건)')
     if only == 'labels':   # 전체 받기('')에는 넣지 않는다 — 따로 돌린다
