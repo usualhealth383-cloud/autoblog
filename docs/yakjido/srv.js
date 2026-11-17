@@ -1818,6 +1818,112 @@ window.문_people = function () { const P = profAll();
 window.PROFQ_set = function (v) { PROFQ.name = String(v || '').slice(0, 12); };
 try { const ps = document.createElement('style'); ps.id = 'prof-css'; ps.textContent = '.prof-row{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 12px}.prof-chip{display:inline-flex;align-items:center;min-height:44px;padding:0 16px;border-radius:999px;border:1.5px solid var(--ui-line,#C9D3D8);background:transparent;color:var(--text);font:inherit;font-weight:600;text-decoration:none}.prof-chip.on{background:var(--primary,#0B6E8F);border-color:var(--primary,#0B6E8F);color:#fff}.prof-chip.add{color:var(--primary,#0B6E8F)}.prof-note{margin:0 0 12px;padding:10px 12px;border-radius:12px;background:var(--normal-tint,#F2F8FA);line-height:1.6;word-break:keep-all}.prof-note .link{display:inline;min-height:0;padding:0;color:var(--primary);font:inherit;font-weight:700;background:none;border:0;text-decoration:underline}.prof-list{list-style:none;margin:10px 0 0;padding:0}.prof-list li{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:56px;border-bottom:1px solid var(--hairline,#E3E8EB)}.prof-list small{color:var(--muted);margin-left:6px}.prof-act{display:flex;align-items:center;gap:8px}.prof-act .btn{min-height:44px;width:auto;padding:0 16px}.prof-act .link{min-height:44px;padding:0 8px}.seg.wrap{flex-wrap:wrap}.after-add{position:fixed;left:12px;right:12px;bottom:84px;z-index:21;max-width:560px;margin:0 auto;padding:14px 14px 12px;border-radius:16px;background:var(--card,#fff);color:var(--text);border:1px solid var(--hairline,#E3E8EB);box-shadow:0 10px 30px rgba(0,0,0,.18);word-break:keep-all}.after-add .aa-h{display:flex;align-items:center;justify-content:space-between;gap:8px}.after-add .aa-h b{font-size:1.0625rem;line-height:1.45}.aa-x{flex:none;width:44px;height:44px;border:0;background:none;color:var(--muted);font-size:1.25rem;border-radius:50%}.aa-x svg{width:20px;height:20px}.aa-v{display:flex;align-items:center;min-height:48px;margin:8px 0 0;padding:8px 12px;border-radius:12px;text-decoration:none;color:var(--text);line-height:1.5}.aa-v.stop{border:2px solid var(--alert,#D93A2B);color:var(--alert,#B42318)}.aa-v.warn{border:1.5px solid var(--warn,#B7791F)}.aa-v.ok{background:var(--normal-tint,#F2F8FA)}.aa-t{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:10px}.aa-t span{flex:1;min-width:0;line-height:1.5}.aa-t .btn{min-height:48px;width:auto;flex:0 0 auto;padding:0 16px}.aa-s{margin:8px 0 0;font-size:.9375rem;color:var(--muted)}.fam-today{margin:14px 0 2px;text-align:left}.fam-today h2{font-size:1rem;margin:0 0 6px;color:var(--muted)}.fam-today ul{list-style:none;margin:0;padding:0}.fam-today li{display:flex;align-items:center;justify-content:space-between;gap:10px;min-height:56px;border-top:1px solid var(--hairline,#E3E8EB)}.fam-today .ft-n{flex:1;min-width:0;line-height:1.5;word-break:keep-all}.fam-today small{color:var(--muted)}.fam-today .btn{min-height:44px;width:auto;flex:0 0 auto;padding:0 14px}'; document.head.appendChild(ps); } catch (e) {}
 
+/* ▼▼ 해열제 부품 시작 ▼▼ */
+/* ═══ 메디나눔 해열제 계산 부품 — 정본(2026-11-17 소아에서 꺼냄 · Main 「숫자 갈림 방지」) ═══
+   쓰는 곳: 우리 집 소아과(부모 화면) · ClinicScore(의료인 화면 — 값은 그대로, 표시만 얹는다).
+   ⛔ 앱 사본을 직접 고치지 않는다 — 이 파일을 고치고 판을 올린 뒤 다시 심는다: python3 _도구/해열제_부품_심기.py <소아|CS|파일경로>
+   이 부품에는 화면·저장소 코드가 없다. 숫자와 순수 함수만(같은 입력이면 같은 답).
+   값마다 출처는 아래 출처표(열쇠 → 한 줄). 화면은 출처칩(열쇠)로 꺼내 쓴다.
+   ── 아직 정하지 않은 값(A/B) — 지금 앱 값 그대로, 여기 「결정대기」 한 곳에서만 바꾼다 ──
+     ① 아세트아미노펜 하루 최대 — 두 돌 전 60 mg/kg(지금) vs 75 mg/kg
+     ② 이부프로펜 간격 — 6시간(지금) vs 8시간
+*/
+(function () {
+  if (window.메디나눔해열제) return;
+  var 판 = '2026-11-17b';   /* 17b — mL 은 안쪽으로만 둥글림(mL범위) · 양 끝이 같은 상한일 때 31.3 mL(1,001.6 mg)로 넘던 것 내림 · mL() 기본 내림 */
+  var 결정대기 = {
+    두돌전_아세트아미노펜_하루mgkg: 60,   /* A/B ① — 75 로 바꾸면 두 돌 전도 일반 하루 최대와 같아진다 */
+    이부프로펜_간격시간: 6                 /* A/B ② — 8 로 바꾸면 다음 시각·누적 판정이 함께 바뀐다 */
+  };
+  /* 약 표 — n 이름 · b 국내 제품 예 · pk 1회 mg/kg [아래, 위] · gap 최소 간격(시간) · day 하루 mg/kg · min 쓸 수 있는 개월 · conc 시럽 mg/mL · capDose 1회 상한 mg · capDay 하루 상한 mg */
+  var DRUGS = {
+    apap: { n: '아세트아미노펜', b: '타이레놀·세토펜', pk: [10, 15], gap: 4, day: 75, min: 4, conc: 32, capDose: 1000, capDay: 4000 },
+    ibu: { n: '이부프로펜', b: '부루펜', pk: [5, 10], gap: 결정대기.이부프로펜_간격시간, day: 40, min: 6, conc: 20, capDose: 400, capDay: 1600 }
+  };
+  /* 식약처 어린이부루펜시럽 허가 나이 표 — [시작 개월, 끝 개월(미만), 나이, 1회 아래 mg, 1회 위 mg, 하루 최대 mg] */
+  var IBU_허가표 = [[12, 36, '만 1~2세', 50, 100, 400], [36, 84, '만 3~6세', 100, 150, 600], [84, 132, '만 7~10세', 150, 200, 800], [132, 180, '만 11~14세', 200, 250, 1000]];
+  /* 식약처 어린이타이레놀현탁액(32 mg/mL) 허가 용법 — [최소 kg, 최대 kg, mg, mL, 나이 안내] */
+  var APAP_표 = [
+    [7, 7.9, 80, 2.5, '4~6개월'], [8, 11.9, 120, 3.5, '7~23개월'], [12, 15.9, 160, 5.0, '만 2~3세'], [16, 22.9, 240, 7.5, '만 4~6세'],
+    [23, 29.9, 320, 10.0, '만 7~8세'], [30, 37.9, 400, 12.5, '만 9~10세'], [38, 42.9, 480, 15.0, '만 11세'], [43, 999, 640, 20.0, '만 12세']
+  ];
+  var APAP_하루횟수 = 5;   /* 제품 표시 「1일 5회」 */
+  var 진료먼저_개월 = 3;   /* 이 개월 미만의 열은 해열제보다 진료가 먼저 — 두 약 모두 숫자를 내지 않는다 */
+  var 출처표 = {
+    apap_pk: '1회 10~15 mg/kg — Nelson 소아과학 표 93.6 · 식약처 어린이타이레놀현탁액 허가 용법',
+    apap_gap: '4시간 이상 간격 — 식약처 어린이타이레놀현탁액 허가 용법',
+    apap_day: '하루 75 mg/kg(두 돌 전 60 mg/kg) — Nelson 소아과학 표 93.6',
+    apap_cap: '어른 상한 1회 1,000 mg · 하루 4,000 mg — Nelson 소아과학 표 93.6',
+    apap_times: '하루 5회까지 — 식약처 어린이타이레놀현탁액 제품 표시',
+    apap_table: '몸무게별 mg·mL — 식약처 의약품통합정보 어린이타이레놀현탁액(160 mg/5 mL) 허가 용법',
+    apap_min: '생후 4개월부터(허가 표 첫 칸) — 식약처 어린이타이레놀현탁액',
+    ibu_pk: '1회 5~10 mg/kg — Nelson 소아과학 표 93.6 · 식약처 어린이부루펜시럽',
+    ibu_gap: '간격 6시간(결정대기 ② — 6 vs 8) — 식약처 어린이부루펜시럽 허가 용법',
+    ibu_day: '하루 40 mg/kg — Nelson 소아과학 표 93.6',
+    ibu_cap: '1회 400 mg · 하루 1,600 mg — 식약처 성인 용법(경증 동통·감기 1회 200~400 mg, 1일 3~4회)',
+    ibu_table: '나이별 1회·하루 최대 — 식약처 어린이부루펜시럽 허가 용법(만 1~14세)',
+    ibu_min: '생후 6개월부터 · 돌 전은 의사가 정한 양 — 식약처 어린이부루펜시럽 허가 문구',
+    under3m: '생후 3개월 미만의 열은 해열제보다 진료 먼저 — 홍창의 소아과학 12판 · 미국소아과학회'
+  };
+  function dayPerKg(k, m) { if (k === 'apap' && m != null && m < 24) return 결정대기.두돌전_아세트아미노펜_하루mgkg; return DRUGS[k].day; }
+  function 이부허가칸(m) { return (m == null) ? null : (IBU_허가표.find(function (x) { return m >= x[0] && m < x[1]; }) || null); }
+  /* 몸무게로 곱한 값과 상한 중 작은 쪽 — 왜 줄었는지도 함께(소아 앱 doseRange 그대로) */
+  function doseRange(k, w, m) {
+    var D = DRUGS[k];
+    var 칸 = (k === 'ibu') ? 이부허가칸(m) : null;
+    var 생lo = w * D.pk[0], 생hi = w * D.pk[1];
+    var 위끝 = 칸 ? Math.min(D.capDose, 칸[4]) : D.capDose;
+    var lo = Math.round(Math.min(생lo, 위끝)), hi = Math.round(Math.min(생hi, 위끝));
+    var perKg = dayPerKg(k, m);
+    var 생일 = w * perKg;
+    var 체중칸 = Infinity;   /* 현욱님결정1105 — 현행 허가(용법 2025-09-10)엔 30kg·500mg 상한이 없어 뺌 */
+    var day = Math.round(Math.min(생일, D.capDay, 칸 ? 칸[5] : Infinity, 체중칸));
+    return { lo: lo, hi: hi, day: day, perKg: perKg, 체중막힘: 생일 > 체중칸 + 0.5 && 체중칸 <= Math.min(D.capDay, 칸 ? 칸[5] : Infinity), 허가칸: 칸, 허가막힘: !!칸 && (생hi > 칸[4] + 0.5 || 생일 > 칸[5] + 0.5), 생hi위끝: Math.min(생hi, 위끝),
+      회막힘: 생hi > D.capDose + 0.5, 일막힘: 생일 > D.capDay + 0.5, 생hi: Math.round(생hi), 생일: Math.round(생일) };
+  }
+  /* 아세트아미노펜 허가 표의 칸 — 칸 아래 끝만 본다(7.95 kg 이 비지 않게) */
+  function 표시용량(w) { var x = parseFloat(w); if (!isFinite(x)) return null; for (var i = APAP_표.length - 1; i >= 0; i--) { var r = APAP_표[i]; if (x >= r[0]) return { mg: r[2], mL: r[3], 나이: r[4], lo: r[0], hi: r[1] }; } return null; }
+  /* mg → 시럽 mL(소수 한 자리). ⚠️ 한 값만 바꿀 때는 기본이 «내림» — 반올림하면 위 끝이 상한을 넘는다(210 mg → 6.6 mL = 211 mg).
+     아래 끝을 바꿀 때만 방향 '올림'. 범위는 mL범위() 를 쓴다. */
+  function mL(k, mg, conc, 방향) { var c = conc || DRUGS[k].conc, x = mg / c * 10; return ((방향 === '올림' ? Math.ceil(x - 1e-9) : Math.floor(x + 1e-9)) / 10).toFixed(1); }
+  /* 1회 mL 범위 — 허가 범위(mg/kg) «안쪽»으로만: 아래 끝 올림 · 위 끝 내림(10-20 현욱님 결정). 남은하루: 오늘 하루 한도까지 남은 mg(없으면 Infinity).
+     양 끝이 뒤집히면(상한이 같은 값으로 묶일 때) 위 끝 내림 값 하나로 — 어떤 경우에도 mL × 농도가 1회 상한·허가 위 끝·남은 하루 양을 넘지 않는다. */
+  function mL범위(k, w, m, 남은하루) {
+    var D = DRUGS[k], DR = doseRange(k, w, m); if (남은하루 == null) 남은하루 = Infinity;
+    var 생lo = Math.min(w * D.pk[0], D.capDose, DR.생hi위끝), 생hi = Math.min(DR.생hi위끝, 남은하루);
+    var lo = (Math.ceil(생lo / D.conc * 10 - 1e-9) / 10).toFixed(1), hi = (Math.floor(생hi / D.conc * 10 + 1e-9) / 10).toFixed(1);
+    if (+lo > +hi) lo = hi;
+    return { lo: lo, hi: hi, 생lo: 생lo, 생hi: 생hi, 남은줄임: 남은하루 < DR.hi };
+  }
+  /* 이 나이에 쓸 수 있나 — 막는 이유와 출처 열쇠 */
+  function 쓸수있나(k, m) {
+    if (m != null && m < 진료먼저_개월) return { ok: false, 이유: '진료먼저', 출처: 'under3m' };
+    if (k === 'ibu' && m != null && m < DRUGS.ibu.min) return { ok: false, 이유: '이부프로펜나이', 출처: 'ibu_min' };
+    if (k === 'ibu' && m != null && m < 12) return { ok: true, 이유: '돌전의사양', 출처: 'ibu_min' };
+    return { ok: true, 이유: null, 출처: null };
+  }
+  /* 먹여도 되나 — 간격 · 24시간 누적 mg · 24시간 횟수(소아 앱 먹임판정 그대로, 기록만 바깥에서 받는다)
+     rows24: 최근 24시간 이 약 기록 [{t, mg}] · 마지막t: 이 약의 가장 늦은 기록 시각(24시간 밖이어도) · 지금: ms */
+  function 판정(k, w, m, rows24, 마지막t, 지금) {
+    var D = DRUGS[k], DR = doseRange(k, w, m); 지금 = 지금 || Date.now();
+    var rows = (rows24 || []).slice().sort(function (a, b) { return a.t - b.t; });
+    var mgOf = function (x) { return isFinite(Number(x.mg)) ? Number(x.mg) : 0; };
+    var used = rows.reduce(function (s, x) { return s + mgOf(x); }, 0);
+    var 걸림 = [], 풀림 = 0;
+    var nt = (마지막t && D.gap) ? 마지막t + D.gap * 36e5 : null;
+    if (nt && nt > 지금) { 걸림.push('간격'); 풀림 = Math.max(풀림, nt); }
+    if (used + DR.lo > DR.day) { 걸림.push('누적'); var u = used, t0 = 0; for (var i = 0; i < rows.length; i++) { var x = rows[i]; if (u + DR.lo <= DR.day) break; u -= mgOf(x); t0 = x.t + 864e5; } 풀림 = Math.max(풀림, t0); }
+    var 한도회 = (k === 'apap') ? APAP_하루횟수 : null;
+    if (한도회 && rows.length >= 한도회) { 걸림.push('횟수'); 풀림 = Math.max(풀림, rows[rows.length - 한도회].t + 864e5); }
+    return { ok: !걸림.length, 걸림: 걸림, 풀림: 걸림.length ? 풀림 : null, used: used, cap: DR.day, 번: rows.length, 한도회: 한도회, gap: D.gap };
+  }
+  window.메디나눔해열제 = { 판: 판, 결정대기: 결정대기, DRUGS: DRUGS, IBU_허가표: IBU_허가표, APAP_표: APAP_표, APAP_하루횟수: APAP_하루횟수, 진료먼저_개월: 진료먼저_개월,
+    출처표: 출처표, 출처칩: function (열쇠) { return 출처표[열쇠] || ''; },
+    dayPerKg: dayPerKg, 이부허가칸: 이부허가칸, doseRange: doseRange, 표시용량: 표시용량, mL: mL, mL범위: mL범위, 쓸수있나: 쓸수있나, 판정: 판정 };
+})();
+/* ▲▲ 해열제 부품 끝 ▲▲ */
+/* 해열제 부품이 오면 — 아이 계산·약 화면을 정본 숫자로 다시 그린다 */
+try { if (/^#\/(kids|drug|symptom|home)/.test(location.hash || '#/home') && typeof route === 'function') setTimeout(route, 0); } catch (e) {}
 /* 약지도 — 두 폰 합치기(app-shell 의 sanitizeMe 를 씀). 2026-10-13 상용화 점검 */
 window.mergeMe = function (localRaw, serverRaw) {
   let a, b; try { a = sanitizeMe(JSON.parse(localRaw)); b = sanitizeMe(JSON.parse(serverRaw)); } catch (e) { return null; }

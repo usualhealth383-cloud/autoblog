@@ -423,7 +423,7 @@ ul.steps li::before{content:counter(s);position:absolute;left:0;top:2px;width:24
 .kid-form input:focus,.kid-form select:focus{outline:2px solid var(--primary);outline-offset:1px}
 .dose-card{background:var(--card);border:1px solid var(--hairline);border-radius:var(--r-card);box-shadow:var(--shadow-card);padding:var(--s4);margin-top:var(--s3)}
 .dose-card .eyebrow{margin-bottom:4px}
-.dose-big{display:flex;flex-wrap:wrap;align-items:baseline;gap:0 8px;margin-top:6px}
+.dose-gap{margin:4px 0 6px;font-weight:700;font-size:1.0625rem;word-break:keep-all}.dose-big{display:flex;flex-wrap:wrap;align-items:baseline;gap:0 8px;margin-top:6px}
 .dose-big b{font-size:2.25rem;font-weight:800;letter-spacing:-.02em;color:var(--primary-deep);line-height:1.1}
 .dose-big span{color:var(--muted);font-size:.9375rem}
 .dose-meta{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;margin-top:12px}
@@ -1810,7 +1810,7 @@ html:not(.ink) .rf-none{display:none}</style>
 <script>
 window.__YAKJIDO_OK__ = true;
 const D = JSON.parse(document.getElementById('data').textContent || '{}');
-const BUILD = '2026-11-18 02:42';
+const BUILD = '2026-11-18 03:17';
 const DATAV = 'ebf9e087db'.indexOf('__') === 0 ? BUILD : 'ebf9e087db';
 const BRANDMARK = (typeof window !== 'undefined' && window.__BRANDMARK__) || 'icon-192.png';
 let CORE = 0, CORE_P = null;
@@ -3833,6 +3833,13 @@ const on = (ME.taking || []).includes(id);
 return `<button class="btn ${on ? 'line' : 'ghost'}" onclick="toggleTaking('${id}')">${on ? I.check + ' 내 약통에 있어요 (빼기)' : I.pill + ' ' + esc(label || '내 약통에 담기')}</button>`;
 }
 const ibuRow = m => m == null ? null : (D_KIDS().ibuLabelTable || []).find(([a, b]) => m >= a && m <= b) || null;
+const kidOne = r => { const [lo, hi] = mlRange(r), c = r.D.conc[0].mgPerMl; let v = null, from = '';
+if (r.D.id === 'apap') { const row = (D_KIDS().apapLabelTable || []).find(([a, b]) => r.w >= a && r.w <= b + .099); if (row) { v = row[3]; from = 'table'; } }
+else if (r.m != null) { const row = ibuRow(r.m); if (row) { v = row[4]; from = 'age'; } }
+if (v == null) { v = +lo; from = 'low'; } v = Math.min(v, +hi);
+const t = (Math.floor(v * 10 + 1e-9) / 10); return { ml: t % 1 ? t.toFixed(1) : String(t), mg: Math.round(t * c), from };
+};
+const kidGap = r => r.D.id === 'apap' ? `${(window.메디나눔해열제?.DRUGS.apap.gap) || r.D.gapH}시간 이상 띄우고 하루 ${r.D.maxPerDay}번까지` : `${(window.메디나눔해열제?.DRUGS.ibu.gap) || r.D.gapH}시간 이상 띄우고 하루 ${r.D.maxPerDay}번까지`;
 const ibuOver = (r, m) => { const row = ibuRow(m), c = r.D.conc[0].mgPerMl; return row && (r.hi / c > row[4] + .05 || r.day / c > row[5] + .05) ? row : null; };
 const INF_SYM = new Set(['fever', 'cold', 'cough', 'sorethroat', 'diarrhea', 'gastroenteritis']);
 function infStop(s){ if (ME.age !== 'child' || !INF_SYM.has(s.id)) return ''; const m = kidMon(); if (m == null || m >= 3) return '';
@@ -3844,13 +3851,14 @@ if (m != null && m < 3) return `<div class="kid-line">${I.alert}<span><b>생후 
 const noB = m == null ? ' 생년월일을 넣으면 나이에 맞는 약만 골라 드려요.' : '';
 if (!(w > 0)) return `<div class="kid-line">${I.user}<span>소아·청소년이면 약은 몸무게로 정해요.${noB} <a class="link" href="#/kids">몸무게를 넣고 시럽 mL 계산 ›</a></span></div>`;
 const a = kidDose('apap', w, m), i = kidDose('ibu', w, m); if (!a) return '';
-const ml = r => { const [a, b] = mlRange(r); return `${a === b ? a : a + '~' + b} mL`; };
+const ml = r => `${kidOne(r).ml} mL`;   /* 11-17 쉽게 보기 한 숫자 */
 const ok = r => r && (m == null || m >= r.D.minMonths);
-const line = (r, nm, tail) => !r ? '' : ok(r) ? `${nm} 시럽(${esc(r.D.conc[0].label)}) <b>1회 ${ml(r)}</b> · ${tail}` : `${nm} 시럽은 <b>생후 ${r.D.minMonths}개월부터</b> — 그 전에는 진료에서 확인`;
+if (m != null && m < 3) return `<div class="kid-over kid-young" role="note">${I.alert}<span><b>생후 3개월 미만</b>의 열은 해열제보다 <b>진료가 먼저</b>예요 — 지금 응급실로 가거나 119에 전화하세요.</span></div>`;   /* 11-17 현욱님 — 숫자 대신 진료 먼저 */
+const line = (r, nm, tail) => !r ? '' : !ok(r) ? `${nm} 시럽은 <b>생후 ${r.D.minMonths}개월부터</b> — 그 전에는 진료에서 확인` : r.D.id === 'ibu' && m != null && m < 12 ? `${nm} 시럽은 <b>돌 전에는 의사가 정한 양</b>으로` : `${nm} 시럽(${esc(r.D.conc[0].label)}) <b>1회 ${ml(r)}</b> · ${tail}`;
 const over = ok(i) ? ibuOver(i, m) : null;
 const warn = [m == null && w < 6 ? '생후 3개월 안팎일 수 있어요 — 생년월일을 넣어 주세요. 생후 3개월 미만 아기의 열은 해열제보다 지금 응급실이 먼저예요.' : '',
 over ? `이부프로펜 계산이 설명서 표(${over[2]} 1회 ${over[3]}~${over[4]} mL · 하루 ${over[5]} mL)보다 많아요 — 먹이기 전에 약사·의사와 확인하세요.` : i?.ageCap ? `이부프로펜은 몸무게 셈이 설명서 나이 표(${i.ageCap[2]})보다 많아 나이 표에 맞췄어요.` : ''].filter(Boolean);
-return `${warn.map(t => `<div class="kid-over kid-young" role="note">${I.alert}<span>${t}</span></div>`).join('')}<div class="kid-line">${I.user}<span><b>${esc(ME.child?.name || '아이')} ${w} kg</b> 기준 — 한 가지만 고르세요${[line(a, '아세트아미노펜', `${a.D.gapText} 간격, 하루 ${a.D.maxPerDay}회`), line(i, '이부프로펜', `${i?.D.gapText} 간격`)].filter(Boolean).map(t => `<span class="kl-row">${t}</span>`).join('')}<span class="kl-row">어른 정제·복합감기약은 아이에게 쓰지 마세요.${noB} <a class="link" href="#/kids">자세히 ›</a></span></span></div>`;
+return `${warn.map(t => `<div class="kid-over kid-young" role="note">${I.alert}<span>${t}</span></div>`).join('')}<div class="kid-line">${I.user}<span><b>${esc(ME.child?.name || '아이')} ${w} kg</b> 기준 — 한 가지만 고르세요${[line(a, '아세트아미노펜', kidGap(a)), line(i, '이부프로펜', i ? kidGap(i) : '')].filter(Boolean).map(t => `<span class="kl-row">${t}</span>`).join('')}<span class="kl-row">어른 정제·복합감기약은 아이에게 쓰지 마세요.${noB} <a class="link" href="#/kids">자세히 ›</a></span></span></div>`;
 }
 
 function xcard(kind, ico, title, items, body, open){
@@ -3881,8 +3889,8 @@ const rxAsk = d => { const f = activeFlags(); return !!d && [...(d.avoid || []).
 function svMl(d, askNow){
 if (askNow || ENTRY?.from !== 'kids' || !ENTRY.w) return ''; const K = (D_KIDS().drugs || []).find(x => x.drugId === d.id); if (!K) return '';
 const m = Number.isFinite(ENTRY.age) ? ENTRY.age : null, warn = kidWeightSanity(ENTRY.w, m); if (warn) return `<small class="sv-ml-w">${esc(warn)}</small>`;
-if (m != null && m < K.minMonths) return ''; const r = kidDose(K.id, ENTRY.w, m); if (!r) return ''; const [lo, hi] = mlRange(r);
-return `<b class="sv-ml">1회 ${lo}~${hi} mL</b><small class="sv-ml-s">${esc(r.D.conc[0].label)} 기준 · 우리 집 소아과에 적힌 몸무게 ${ENTRY.w} kg 기준</small>`;
+if (m != null && m < K.minMonths) return ''; const r = kidDose(K.id, ENTRY.w, m); if (!r) return ''; const one = kidOne(r);
+return `<b class="sv-ml">1회 ${one.ml} mL · ${kidGap(r)}</b><small class="sv-ml-s">${esc(r.D.conc[0].label)} 기준 · 우리 집 소아과에 적힌 몸무게 ${ENTRY.w} kg 기준</small>`;
 }
 function svRow(x){
 const d = x.d, names = prodNames(d, 3, x.kid), prod = d.combo ? '' : (prodName(x.product) || names[0] || ''), ing = ingrName(d);
@@ -4076,7 +4084,9 @@ ${disclaimer()}`;
 function monthsFrom(birth){ if (!birth) return null; const b = new Date(birth); if (isNaN(b)) return null; const n = new Date(); let m = (n.getFullYear() - b.getFullYear()) * 12 + (n.getMonth() - b.getMonth()); if (n.getDate() < b.getDate()) m--; return m >= 0 ? m : null; }
 function kidAgeText(m){ if (m == null) return ''; return m < 24 ? `생후 ${m}개월` : `만 ${Math.floor(m / 12)}세 ${m % 12 ? (m % 12) + '개월' : ''}`.trim(); }
 const mlTxt = x => { const v = Math.floor(x * 2 + 1e-9) / 2; return (v % 1 ? v.toFixed(1) : String(v)); };
-const mlRange = r => { const c = r.D.conc[0].mgPerMl, hi = Math.floor(r.hi / c * 10 + 1e-9) / 10, lo = Math.min(hi, Math.ceil(r.lo / c * 10 - 1e-9) / 10); return [lo.toFixed(1), hi.toFixed(1), Math.round(lo * c), Math.round(hi * c)]; };
+const mlRange = r => { const P = window.메디나눔해열제, c = r.D.conc[0].mgPerMl;
+if (P && r.w > 0) { const q = P.mL범위(r.D.id, r.w, r.m); return [q.lo, q.hi, Math.round(+q.lo * c), Math.round(+q.hi * c)]; }
+const H = r.rawHiC != null ? r.rawHiC : r.hi, L = r.rawLoC != null ? r.rawLoC : r.lo, hi = Math.floor(H / c * 10 + 1e-9) / 10, lo = Math.min(hi, Math.ceil(L / c * 10 - 1e-9) / 10); return [lo.toFixed(1), hi.toFixed(1), Math.round(lo * c), Math.round(hi * c)]; };
 function kidDose(k, w, m){
 const D = (D_KIDS().drugs || []).find(x => x.id === k); if (!D || !(w > 0)) return null;
 const rawLo = w * D.perKg[0], rawHi = w * D.perKg[1];
@@ -4087,8 +4097,9 @@ const rawDay = w * perKgDay; let day = Math.round(Math.min(rawDay, capDay));
 let L = lo, H = hi, ageCap = null;
 if (k === 'ibu' && m != null) { const row = ibuRow(m), c = D.conc[0].mgPerMl;
 if (row && (hi > row[4] * c + .5 || day > row[5] * c + .5)) { ageCap = row; H = Math.min(hi, Math.round(row[4] * c)); L = Math.min(lo, H); day = Math.min(day, Math.round(row[5] * c)); } }
-let cap30 = false; if (k === 'ibu' && w < 30 && D.under30Day && day > D.under30Day) { day = D.under30Day; cap30 = true; }
-return { D, lo: L, hi: H, day, perKgDay, capDay, ageCap, cap30,
+const rawHiC = Math.min(rawHi, D.capDose, ageCap ? ageCap[4] * D.conc[0].mgPerMl : Infinity), rawLoC = Math.min(rawLo, rawHiC);
+const cap30 = false; try { const P = window.메디나눔해열제; if (P) { const g = P.doseRange(k, w, m); L = g.lo; H = g.hi; day = g.day; ageCap = g.허가막힘 ? g.허가칸 : null; } } catch (e) {}
+return { D, w, m, rawHiC, rawLoC, lo: L, hi: H, day, perKgDay, capDay, ageCap, cap30,
 capped: rawHi > D.capDose + .5 || rawDay > capDay + .5,
 rawHi: Math.round(rawHi), rawDay: Math.round(rawDay) };
 }
@@ -4129,24 +4140,29 @@ else if (m < 12) rev = `<p class="kid-rev">최근 개정(2026년 3월 약병 설
 if (k === 'ibu' && m == null && (K.ibuLabelTable || []).length) rev = `<div class="kid-rev"><p><b>나이별 설명서 표</b>(2026년 3월 약병 설명서) — 아래 계산이 아이 나이 칸보다 많으면 먹이기 전에 약사·의사와 확인하세요.</p><ul class="kid-tbl">${K.ibuLabelTable.map(r => `<li><b>${esc(r[2])}</b> 1회 ${r[3]}~${r[4]} mL · 하루 ${r[5]} mL</li>`).join('')}</ul></div>`;
 if (k === 'ibu' && m != null && m < 12 && !tooYoung) return `<div class="dose-card young"><div class="eyebrow">${esc(D.name)} · ${esc(D.brand)}</div><div class="young-stop">${I.alert}<div><b>돌 전 아기는 의사가 정한 양으로</b><p>생후 6~11개월은 약병 설명서 나이 표에 없어 이 앱이 양을 계산하지 않아요. <b>진료에서 정해 준 양</b>을 따르시고, 열에는 아세트아미노펜이 먼저예요.</p></div></div></div>`;
 if (tooYoung) return `<div class="dose-card young"><div class="eyebrow">${esc(D.name)} · ${esc(D.brand)}</div>
-<div class="young-stop">${I.alert}<div><b>이 약은 아직 이릅니다</b>
-<p>${esc(D.name)}${josa(D.name, '은', '는')} 보통 <b>생후 ${D.minMonths}개월 이후</b>부터 씁니다. 그 전에는 <b>임의로 먹이지 마시고 진료를 받으세요.</b></p></div></div>
-<details class="why-more" style="margin-top:10px"><summary>그래도 숫자를 보시려면${I.chev}</summary>
+<div class="young-stop">${I.alert}<div>${m != null && m < 3 ? `<b>생후 3개월 미만은 해열제보다 진료가 먼저예요</b><p>열이 나면 지금 응급실로 가거나 119에 전화하세요. 이 앱은 숫자를 드리지 않아요.</p></div></div>` : `<b>이 약은 아직 이릅니다</b>
+<p>${esc(D.name)}${josa(D.name, '은', '는')} 보통 <b>생후 ${D.minMonths}개월 이후</b>부터 씁니다. 그 전에는 <b>임의로 먹이지 마시고 진료를 받으세요.</b></p></div></div>`}
+${m != null && m < 3 ? '' : `<details class="why-more" style="margin-top:10px"><summary>그래도 숫자를 보시려면${I.chev}</summary>
 <p class="why" style="margin-top:6px">진료에서 「몇 mL 먹여도 되는지」 확인하실 때 참고용이에요. 몸무게 ${w} kg 기준 <b>1회 ${mlLo === mlHi ? mlLo : mlLo + '~' + mlHi} mL</b>(${mlRange(r)[2]}~${mlRange(r)[3]} mg), ${esc(D.gapText)} 간격, 하루 ${D.maxPerDay}회·${r.day} mg까지.
-${esc(conc.label)} 기준이에요.</p></details>
+${esc(conc.label)} 기준이에요.</p></details>`}
 <p class="small muted" style="margin-top:8px">${esc(D.note)}</p></div>`;
+const one = kidOne(r), P = window.메디나눔해열제, SRC = P ? P.출처표 : {}, sk = k === 'apap' ? ['apap_table', 'apap_pk', 'apap_gap', 'apap_day', 'apap_times', 'apap_min'] : ['ibu_table', 'ibu_pk', 'ibu_gap', 'ibu_day', 'ibu_min'];
+const why1 = one.from === 'table' ? `약 상자 표의 몸무게 칸 값이에요.` : one.from === 'age' ? `약 상자 표의 나이 칸(${esc((ibuRow(m) || [])[2] || '')}) 값이에요 — 몸무게 범위를 넘지 않게 맞췄어요.` : `약 상자 표에 맞는 칸이 없어(${k === 'ibu' ? '나이를 몰라서' : '7 kg 미만'}) 몸무게 범위의 아래 끝으로 보였어요.`;
 return `<div class="dose-card"><div class="eyebrow">${esc(D.name)} · ${esc(D.brand)}</div>
-<div class="dose-big"><b>${mlLo === mlHi ? mlLo : mlLo + '~' + mlHi}</b><span>mL · 한 번에</span></div>
-${overLine}
+<div class="dose-big"><b>${one.ml}</b><span>mL · 한 번에</span></div>
+<p class="dose-gap">${kidGap(r)}</p>
 <p class="small muted">${esc(conc.label)} 기준. 가지고 계신 약병의 농도를 꼭 확인하세요.${D.conc.length > 1 ? ' 다른 제품: ' + D.conc.slice(1).map(x => esc(x.label)).join(', ') : ''}</p>
-<div class="dose-meta"><div><small>성분량</small><b>${mlRange(r)[2]}~${mlRange(r)[3]} mg</b></div><div><small>간격</small><b>${esc(D.gapText)} 이상</b></div><div><small>하루 최대</small><b>${mlTxt(r.day / conc.mgPerMl)} mL</b></div></div>
+${fold('자세히 — 정확한 범위·하루 최대·근거', `<p class="small" style="margin-top:6px"><b>쉽게 보기 숫자 ${one.ml} mL</b>(${one.mg} mg)는 ${why1}</p>
+<p class="small" style="margin-top:6px">몸무게 ${w} kg 기준 정확한 범위 — <b>1회 ${mlLo === mlHi ? mlLo : mlLo + '~' + mlHi} mL</b> (1회 ${D.perKg[0]}~${D.perKg[1]} mg/kg)</p>
+<div class="dose-meta"><div><small>성분량</small><b>${mlRange(r)[2]}~${mlRange(r)[3]} mg</b></div><div><small>간격</small><b>${D.gapH}시간 이상</b></div><div><small>하루 최대</small><b>${mlTxt(r.day / conc.mgPerMl)} mL</b></div></div>
 <p class="small muted" style="margin-top:6px">${(() => { const dm = mlTxt(r.day / conc.mgPerMl), mg = Math.round(dm * conc.mgPerMl).toLocaleString();
 return r.cap30 ? `몸무게로 계산하면 하루 ${Math.min(r.rawDay, r.capDay).toLocaleString()} mg이지만, 30 kg 미만은 설명서 하루 한도에 맞춰 ${mg} mg(${dm} mL)까지로 표시했어요` : r.ageCap && r.day < Math.min(r.rawDay, r.capDay) - .5 ? `몸무게로 계산하면 하루 ${Math.min(r.rawDay, r.capDay).toLocaleString()} mg이지만, 이 제품 설명서의 하루 한도(${esc(r.ageCap[2])})에 맞춰 ${mg} mg(${dm} mL)까지로 표시했어요` : r.rawDay > r.capDay + .5 ? `몸무게 계산값은 하루 ${r.rawDay.toLocaleString()} mg이지만, 성인 상한을 적용해 하루 최대 ${mg} mg(${dm} mL)까지만 표시했어요` : `하루 최대 ${dm} mL(${mg} mg)는 <b>몸무게 ${w} kg × ${r.perKgDay} mg/kg</b> 기준이에요`; })()}${k === 'apap' ? ` · 하루 ${D.maxPerDay}번까지` : ''}.</p>
-${label}
-<p class="small muted" style="margin-top:8px">${esc(D.note)}</p>
-${fold('계산 근거', `${r.capped ? `<div class="note" style="margin-top:8px">${I.info}<span>몸무게로만 곱하면 1회 ${r.rawHi} mg·하루 ${r.rawDay} mg이지만, 어른 상한(1회 ${D.capDose}·하루 ${D.capDay} mg)에서 멈춰요.</span></div>` : ''}
-${k === 'apap' && m != null && m < 24 ? `<p class="small muted" style="margin-top:8px">두 돌 전이라 하루 한도를 60 mg/kg으로 봤어요(그 뒤 75 mg/kg).</p>` : ''}`)}
+${overLine}${label}
+${r.capped ? `<div class="note" style="margin-top:8px">${I.info}<span>몸무게로만 곱하면 1회 ${r.rawHi} mg·하루 ${r.rawDay} mg이지만, 어른 상한(1회 ${D.capDose}·하루 ${D.capDay} mg)에서 멈춰요.</span></div>` : ''}
+${k === 'apap' && m != null && m < 24 ? `<p class="small muted" style="margin-top:8px">두 돌 전이라 하루 한도를 60 mg/kg으로 봤어요(그 뒤 75 mg/kg).</p>` : ''}
 ${rev}
+${sk.filter(x => SRC[x]).length ? `<ul class="small muted" style="margin:8px 0 0;padding-left:18px">${sk.filter(x => SRC[x]).map(x => `<li>${esc(SRC[x])}</li>`).join('')}</ul>` : ''}`)}
+<p class="small muted" style="margin-top:8px">${esc(D.note)}</p>
 <a class="link small" href="#/drug/${D.drugId}">성분 자세히 ›</a></div>`; };
 return `${topBar({ back:'홈' })}
 <div class="eyebrow">소아 용량</div><h1>아이 해열제, 몇 mL 먹이지?</h1>
@@ -4262,7 +4278,7 @@ function schedOf(id, item){ ME.sched = ME.sched || {}; if (isPrn(id)) return [];
 const schedUnset = item => !isPrn(item.id) && !((ME.sched || {})[item.id] || []).length;
 function schedConfirm(id){ const item = takingItems().find(x => x.id === id); const L = defaultSlots(item); if (!L.length) return; ME.sched = ME.sched || {}; ME.sched[id] = L.slice(); saveMe(); rollDay(); armNotifications(); route(); toast(`${L.join(' · ')}에 알려 드릴게요`); }
 const kidFever = id => ME.age === 'child' && ['acetaminophen', 'ibuprofen', 'dexibuprofen'].includes(id);
-const kidPrnMl = id => { const K = (D_KIDS().drugs || []).find(x => x.drugId === id), w = parseFloat(ME.child?.weight); if (!K || !(w > 0)) return ''; const r = kidDose(K.id, w, kidMon()); if (!r) return ''; const [lo, hi] = mlRange(r); return `1회 ${lo}~${hi} mL`; };
+const kidPrnMl = id => { const K = (D_KIDS().drugs || []).find(x => x.drugId === id), w = parseFloat(ME.child?.weight); if (!K || !(w > 0)) return ''; const r = kidDose(K.id, w, kidMon()); if (!r) return ''; return `1회 ${kidOne(r).ml} mL`; };
 const isPrn = id => !!(ME.prn || {})[id] || kidFever(id);
 const hhmm = d => `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
 function prnLog(k){ ME.prnLog = ME.prnLog || {}; k = k || todayKey(); ME.prnLog[k] = ME.prnLog[k] || []; return ME.prnLog[k]; }
