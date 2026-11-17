@@ -1697,7 +1697,7 @@
 })();
 /* ▲▲ 잉크 얼굴 부품 끝 ▲▲ */
 /* 11-17 잉크 판일 때만 — 얼굴·번진 면. 색 토큰은 약지도 ink.css 가 맡는다(공용 토큰의 흐린 글 #8A8A8A 는 흰 바탕 4.5:1 미달이라 html[data-ink] 를 쓰지 않는다) */
-try { if (document.documentElement.classList.contains('ink')) 잉크.설치({ 색: '#0B6E8F' }); } catch (e) {}
+try { if (document.documentElement.classList.contains('ink')) 잉크.설치({ 색: '#1F86A8' })   /* 11-17 한가족 — 알약 얼굴은 로고와 같은 물색 */; } catch (e) {}
 
 /* 11-13 메디나눔 홈 2단계 — 수첩의 혈압·혈당(P8)을 사용자가 누를 때만 「내 홈」으로 넘긴다. 스위치 꺼짐(법무 판단 전 비공개).
    원래 기록은 이 앱이 정본 — 꾸러미는 사본 보기용. 모양은 부품이 다시 검사한다 */

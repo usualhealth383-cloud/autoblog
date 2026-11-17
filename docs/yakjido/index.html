@@ -1810,7 +1810,7 @@ html:not(.ink) .rf-none{display:none}</style>
 <script>
 window.__YAKJIDO_OK__ = true;
 const D = JSON.parse(document.getElementById('data').textContent || '{}');
-const BUILD = '2026-11-17 12:21';
+const BUILD = '2026-11-17 13:01';
 const DATAV = '5aa8f42240'.indexOf('__') === 0 ? BUILD : '5aa8f42240';
 const BRANDMARK = (typeof window !== 'undefined' && window.__BRANDMARK__) || 'icon-192.png';
 let CORE = 0, CORE_P = null;
@@ -6772,7 +6772,7 @@ try { saveMe(); } catch (e) {}   /* 11-17 동의 전에 누른 것(약 담기 �
 let n = ''; try { n = sessionStorage.getItem(CONSENT_NEXT) || ''; sessionStorage.removeItem(CONSENT_NEXT); } catch (e) {}
 if (/^(consent|doc|login)(\/|\?|$)/.test(n)) n = '';
 HIST.length = 0;   /* 뒤로 가기가 동의 화면으로 돌아가지 않게 */
-const to = n || (helloDone() ? 'home' : 'hello/1');
+const to = n || (helloDone() || document.documentElement.classList.contains('ink') ? 'home' : 'hello/1');
 try { location.replace(location.href.split('#')[0] + '#/' + to); } catch (e) { go('/' + to); }
 };
 const 동의줄 = (k, t, s, L, 링크) => `<div class="cs-item"><button type="button" class="cs-row" role="checkbox" aria-checked="${!!동의칸[k]}" data-k="${k}" onclick="동의누름('${k}')"><span class="cs-bx">${I.check}</span><span class="cs-tx"><b><span class="cs-tag">필수</span>${t}</b><span>${s}</span></span></button>
@@ -6828,7 +6828,7 @@ const ext = n => window[n] ? window[n]() : '';
 const 잠김 = k => !!(window.구독 && !구독.열림(k));
 function 진료장(){ if (잠김('visitdoc')) { let n = 0; try { n = +localStorage.getItem('yakjido.visitdoc.n') || 0; } catch (e) {} if (n >= 1) return 구독.막힘('visitdoc'); try { localStorage.setItem('yakjido.visitdoc.n', String(n + 1)); } catch (e) {} } window.print(); }
 
-try { if (!helloDone() && !location.hash) { location.hash = '#/hello/1'; } } catch (e) {}
+try { if (!helloDone() && !location.hash && !document.documentElement.classList.contains('ink')) { location.hash = '#/hello/1'; } } catch (e) {}   /* 11-17 한가족 §4 — 잉크 판은 안내 화면 없이 첫 화면부터 */
 try { rollDay(); } catch (e) {}
 try { nativeInit(); } catch (e) {}
 armNotifications();
