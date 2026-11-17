@@ -2201,7 +2201,8 @@ const STORE_OK = (() => { try { const k = 'yakjido.__t'; localStorage.setItem(k,
 let STORE_HIDE = (() => { try { return sessionStorage.getItem('yakjido.storehide') === '1'; } catch (e) { return false; } })();
 /* 2026-10-13 상용화 점검 — 두 폰 동기화: 기록 전체가 한 덩어리라 서로 덮었다. 칸마다 «마지막으로 바뀐 때»(_mt)를 적어 두고 합칠 때 쓴다. */
 let ME_SNAP = {};
-const saveMe = () => { try {
+const saveMe = () => { if (document.documentElement.classList.contains('ink') && !consentOk()) { try { window.저장문 && window.저장문(); } catch (e) {} return; }   /* 11-17 잉크 판 — 동의 전에는 이 휴대폰에 쓰지 않는다(저장문이 동의 한 장을 띄움) */
+  try {
   const now = Date.now(); ME._mt = ME._mt || {};
   for (const k of Object.keys(ME)) { if (k === '_mt') continue; const j = JSON.stringify(ME[k]); if (ME_SNAP[k] !== undefined && ME_SNAP[k] !== j) ME._mt[k] = now; ME_SNAP[k] = j; }
   for (const k of Object.keys(ME_SNAP)) if (!(k in ME)) { ME._mt[k] = now; delete ME_SNAP[k]; }
@@ -2713,8 +2714,8 @@ const bigFs = () => { try { return parseFloat(localStorage.getItem('yakjido.fs')
 const topBar = (opts = {}) => `
   <div class="top">
     ${opts.back ? `<button class="back" onclick="goBack()">${I.prev}${esc(opts.back)}</button>` : `
-    <div class="brand"><div class="mark"><img src="${BRANDMARK}" alt="" width="34" height="34"></div><div><b>약지도</b><span>증상에 맞는 약 · 복약 알림</span></div></div>`}
-    ${opts.unreviewed || opts.unv ? `<a class="review-stamp unrev" href="#/about">${I.info}<span>자료 확인 중</span></a>` : `<a class="review-stamp" href="#/about" aria-label="출처 보기">${I.book}<span class="rs-t">출처 보기</span></a>`}${!opts.back ? acctBtn() : ''}
+    <div class="brand"><div class="mark">${document.documentElement.classList.contains('ink') && window.잉크얼굴 ? 잉크얼굴(24) : `<img src="${BRANDMARK}" alt="" width="34" height="34">`}</div><div><b>약지도</b><span>증상에 맞는 약 · 복약 알림</span></div></div>`}
+    ${opts.unreviewed || opts.unv ? `<a class="review-stamp unrev" href="#/about">${I.info}<span>자료 확인 중</span></a>` : document.documentElement.classList.contains('ink') ? '' : `<a class="review-stamp" href="#/about" aria-label="출처 보기">${I.book}<span class="rs-t">출처 보기</span></a>`}${document.documentElement.classList.contains('ink') ? `<a class="ink-119" href="tel:119" aria-label="119 전화">119</a><button type="button" class="ink-gear" onclick="go('/me?t=set')" aria-label="설정"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M12 2.5v2.5M12 19v2.5M4.6 4.6l1.8 1.8M17.6 17.6l1.8 1.8M2.5 12H5M19 12h2.5M4.6 19.4l1.8-1.8M17.6 6.4l1.8-1.8"/></svg></button>` : !opts.back ? acctBtn() : ''}
   </div>
   ${opts.nosearch ? '' : `<div class="topfind">${I.search}<input id="gq" aria-label="증상이나 약 이름으로 찾기" placeholder="${LANG !== 'ko' ? '증상이나 약 이름' : bigFs() || innerWidth < 380 ? '증상·약 이름·궁금한 것' : '증상·약 이름, 무엇이든 물어보세요'}" autocomplete="off" enterkeyhint="search" value="${esc(GQ)}"><button class="gq-x ${GQ ? '' : 'hide'}" onclick="GQ='';route()" aria-label="지우기">${I.x}</button></div>`}<!--TOPEND-->`;
 /* 출처 칩은 「저자·연도」까지만. 예전 규칙은 괄호 「(」에서만 잘라서, 「—」로 쓴 출처 44개가
@@ -8048,6 +8049,8 @@ function consentOk(){ if (window.__동의됨 === CONSENT_VER) return true; try {
   const c = consentRec(); return !!(c && c.terms && c.privacy && String(c.v || '') >= CONSENT_VER); }
 /* 동의 전엔 동의 화면과 전문 읽기만 — 가려던 주소(링크로 온 약 화면 등)는 들고 있다가 동의 뒤에 연다 */
 function consentGate(s, h){ const ok = consentOk();
+  /* 11-17 한가족 규칙 — 잉크 판은 동의 벽 없이 둘러보기. 동의는 기록을 처음 남길 때(srv.js 의 saveMe 문지기). 둘러보는 동안은 이 휴대폰에도 아무것도 쓰지 않는다 */
+  if (!ok && document.documentElement.classList.contains('ink') && s !== 'consent' && s !== 'doc') return false;
   if (ok ? s !== 'consent' : s === 'consent' || s === 'doc') return false;
   if (!ok) try { sessionStorage.setItem(CONSENT_NEXT, h); } catch (e) {}
   try { location.replace(location.href.split('#')[0] + (ok ? '#/home' : '#/consent')); } catch (e) {} return true; }
@@ -8067,6 +8070,7 @@ window.동의하기 = () => {
   if (!(동의칸.terms && 동의칸.privacy)) return;
   try { localStorage.setItem(CONSENT_KEY, JSON.stringify({ v: CONSENT_VER, at: dayKey(new Date()), terms: 1, privacy: 1 })); } catch (e) {}
   window.__동의됨 = CONSENT_VER;   /* 저장이 막힌 브라우저에서도 이번에는 들어가게 */
+  try { saveMe(); } catch (e) {}   /* 11-17 동의 전에 누른 것(약 담기 등)을 이제 저장 */
   let n = ''; try { n = sessionStorage.getItem(CONSENT_NEXT) || ''; sessionStorage.removeItem(CONSENT_NEXT); } catch (e) {}
   if (/^(consent|doc|login)(\/|\?|$)/.test(n)) n = '';
   HIST.length = 0;   /* 뒤로 가기가 동의 화면으로 돌아가지 않게 */
