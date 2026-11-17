@@ -13,7 +13,7 @@ SEED = "localStorage.setItem('yakjido.hello.v1','1');localStorage.setItem('yakji
 qs, rx, part = [], [], 0
 for l in (R / 'search_queries.txt').read_text(encoding='utf-8').splitlines():
     if l.startswith('#'): part += 1; continue
-    if l.strip(): (rx if part >= 2 else qs).append(l.strip())
+    if l.strip(): (rx if part >= 3 else qs).append(l.strip())
 P = json.load(open(R.parent / 'tools' / 'permits.json', encoding='utf-8'))
 full = []
 for q in rx:
@@ -24,7 +24,7 @@ with sync_playwright() as p:
     pg.wait_for_function("()=>typeof search==='function' && typeof D!=='undefined' && D.drugs && D.drugs.length")
     pg.evaluate("()=>{lexLoad();pubIndexSoon();findLoad();}"); pg.wait_for_timeout(1500)
     pg.wait_for_function("()=>!LEX.loading && PUB.index && PUB.index.length>100", timeout=60000); pg.wait_for_timeout(1500)
-    zero = pg.evaluate("L=>L.filter(q=>!search(q).length)", qs + rx)
+    zero = pg.evaluate("L=>L.filter(q=>!search(q).length && !(Q_CRISIS.test(q) && qSafe(q)))", qs + rx)   # 위기 문장은 위기 카드(109·1577-0199)가 뜨면 통과
     nocls = pg.evaluate("L=>L.filter(t=>!ingFind(t).length)", full)
     b.close()
 print(f'검색 재고 — 일상 {len(qs)} · 처방 성분 {len(rx)}')
