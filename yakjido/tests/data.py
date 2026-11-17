@@ -732,6 +732,10 @@ for _f in sorted((ROOT / 'content').glob('*.json')):
     if '[확인 필요]' in _f.read_text(encoding='utf-8'):
         fails.append(f'{_f.name} 에 「[확인 필요]」가 있습니다 — 화면에 칩이 뜹니다. 값을 확인해 채우거나 빼고 tools/chk_list.py 목록으로')
 
+# 11-17 Main — 배포 묶음이 부르는 파일이 다 있고, js·css·json 이 HTML(첫 화면 대신 감)이 아닌지(정본 yozm-health _도구/묶음파일검사.py · 사본 tools/bundle_check.py)
+sys.path.insert(0, str(ROOT / 'tools')); import io, contextlib, importlib; _bc = importlib.import_module('bundle_check'); _buf = io.StringIO()
+with contextlib.redirect_stdout(_buf): _nb = _bc.검사(str(ROOT.parent / 'docs' / 'yakjido'), True)
+if _nb: fails.append('배포 묶음 파일 결함 ' + str(_nb) + ' — ' + _buf.getvalue().strip().replace(chr(10), ' / ')[:300])
 if fails:
     print('실패', len(fails)); [print('  ✗', f) for f in fails]; sys.exit(1)
 print('✓ 자료 고리 전부 연결')
