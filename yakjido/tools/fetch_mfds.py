@@ -191,6 +191,16 @@ def _doc_text(x):
     return re.sub(r'\n\s*\n+', '\n', t).strip()
 
 
+def fields_probe(k):   # 11-17 바코드 등록 조사 — 허가 목록·상세 응답에 표준코드(바코드)·보험코드 칸이 있는지 칸 이름과 예시만 남긴다
+    out = {}
+    for op, extra in ((PERMIT_OP, {'item_seq': '197900145'}), (DTL_OPS[-1], {'item_seq': '197700120'}), (PERMIT_OP, {'item_name': '타이레놀정500밀리그람'})):
+        try:
+            n, items = page(op, 1, k, rows=3, extra=extra, tries=2, tmo=25)
+            it = items[0] if items else {}
+            out[op.split('/')[-1] + ' ' + str(extra)] = {'칸': sorted(it.keys()), '코드 칸': {kk: str(v)[:300] for kk, v in it.items() if re.search('BAR|EDI|STD|CODE|PACK|UNIT', kk)}}
+        except Exception as e: out[op] = {'오류': str(e)[:200]}
+    return out
+
 def rx_labels(k, have=None):
     out, op_ok = dict(have or {}), next((v.get('op') for v in (have or {}).values() if v.get('op')), None)   # 10-26 이미 받은 것은 건너뛰고(20분 제한), 지난번에 된 오퍼레이션부터
     for key_, seq in RX_LABEL_SEQ.items():
@@ -301,6 +311,9 @@ def main():
                'text_changed': sum(1 for x in ch if x.get('diff')), 'text_changed_in_app': sum(1 for x in ch if x.get('diff') and x['app']), 'items': ch}
         (ROOT / 'tools' / 'easy-updates.json').write_text(json.dumps(out, ensure_ascii=False, indent=1), encoding='utf-8')
         print(f'  e약은요 {len(rows)}건 중 {BASE} 뒤 갱신 {len(ch)}건(앱이 쓰는 성분 연결 {out["changed_in_app"]}건)')
+    if only == 'labels':
+        try: (ROOT / 'tools' / 'fields-probe.json').write_text(json.dumps(fields_probe(k), ensure_ascii=False, indent=1), encoding='utf-8')
+        except Exception as e: print('칸 조사 실패:', e)
     if only == 'labels':   # 전체 받기('')에는 넣지 않는다 — 따로 돌린다
         _old = ROOT / 'tools' / 'rxlabels.json'
         L = rx_labels(k, json.loads(_old.read_text(encoding='utf-8')).get('labels', {}) if _old.exists() else {})

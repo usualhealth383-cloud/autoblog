@@ -171,6 +171,23 @@ if isinstance(inline.get('meta'), dict):
 # 처방약 길잡이(혈압·당뇨·콜레스테롤·갑상선·잠과 마음, 10-22) — #/rx 를 열 때만 받는 따로 파일(첫 화면·본문 예산 밖)
 _rx = json.loads((ROOT / 'rxguide.json').read_text(encoding='utf-8')); _rx.pop('_about', None)
 (ROOT.parent / 'docs' / 'yakjido' / 'data' / 'rxguide.json').write_text(json.dumps(_rx, ensure_ascii=False, separators=(',', ':')), encoding='utf-8')
+# 11-17 Main — 겹침 규칙을 다른 앱(ClinicScore 등)과 나눠 쓰는 꼴: 규칙 + 그 규칙이 쓰는 성분→계열 표 + 규칙이 다는 출처만 한 파일로.
+#   정본은 그대로 content/interactions.json · ingredients.json · sources*.json — 이 파일은 짓기 산출물(손으로 고치지 않음).
+try:
+    import glob as _gl
+    _ix = json.loads((ROOT / 'content' / 'interactions.json').read_text(encoding='utf-8'))
+    _ing = json.loads((ROOT / 'content' / 'ingredients.json').read_text(encoding='utf-8'))
+    _src = {}
+    for _f in sorted(_gl.glob(str(ROOT / 'content' / 'sources*.json'))): _src.update(json.loads(open(_f, encoding='utf-8').read()))
+    _use = sorted({k for r in _ix['rules'] for k in r.get('src', [])})
+    _share = {'_about': '약지도 겹침 규칙 공유판 — 짓기 산출물(정본: yakjido/content). need: [[조건 묶음…], …] 각 묶음은 계열(cls) 또는 「k:성분열쇠」 중 하나라도 · count: 같은 계열 n개 · flags: 내 몸 조건 · lv: stop/warn/info · src: 출처 열쇠',
+              'built': datetime.date.today().isoformat(), 'rules': _ix['rules'],
+              'ingredients': [{'k': e['k'], 'n': e.get('n'), 'aka': e.get('aka', []), 'cls': e.get('cls', [])} for e in _ing['ing']],
+              'quick': [{'id': x['id'], 'n': x.get('n'), 'cls': x.get('cls', []), 'k': x.get('k')} for g in _ing['quick'] for x in g['subs']],
+              'sources': {k: _src[k] for k in _use if k in _src}}
+    (ROOT.parent / 'docs' / 'yakjido' / 'data' / 'ix-shared.json').write_text(json.dumps(_share, ensure_ascii=False, separators=(',', ':')), encoding='utf-8')
+    print('겹침 규칙 공유판:', len(_share['rules']), '규칙 ·', len(_share['ingredients']), '성분 ·', len(_share['sources']), '출처')
+except Exception as _e: print('겹침 규칙 공유판 실패:', _e)
 # 메디나눔 통합 찾기 목록(10-26 Main) — 다른 네 앱이 약지도 글을 찾을 때 받는 작은 목록. 본문은 빼고 제목·한 줄·찾는 말·길만(100 KB 안쪽)
 def _mnx():
     import glob as _g
