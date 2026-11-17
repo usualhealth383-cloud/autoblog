@@ -23,8 +23,11 @@ plain22=(M/'blog-22/post.txt').read_text()
 kit28=(M/'blog-28/kit.html').read_text()
 rich28=re.search(r'<template id="rich">(.*?)</template>',kit28,re.S).group(1)
 plain28=(M/'blog-28/post.txt').read_text()
-DONE=['간판(파란 박찬 + 남색 통합과학학원)','미색 바탕 · 1단 레이아웃','단추 5개(학원 소개 · 반별 안내 · 강의 시간표 · 통합과학 이야기 · 상담)','위 메뉴 줄(학원 소개 · 반별 안내 · 학원 공지사항 · 통합과학 이야기)','블로그 이름 · 프로필(남색) · 소개글','옛 첫 글 비공개','글 제목 7개 · 카테고리','휴대폰: 맨 위 공지(강의 시간표) · 소개']
-TODO=['PC 첫 화면 그림 카드 자리에 「등록된 사진이 없습니다」 — 글 사진이 링크로 붙어 있어 네이버가 사진으로 보지 않음 (2부로 해결)','휴대폰 첫 화면: 커버 그림의 큰 글씨 위에 네이버가 블로그 이름·버튼을 겹쳐 올려 글자끼리 겹침 (1부 2번)','휴대폰 인기글·전체글도 사진 없이 글자만 (2부로 해결)','고1 예비반 글: 강의 시간이 토요반 21일 — 강의 시간표 글(일요반 22일)과 다름 (2부 5번)','강의 시간표 글: 고1 새 반 요일과 중등부 표 한 칸이 다른 글들과 다름, 사진 없음 (2부 4번)']
+def RT(n):
+    k=(M/f'blog-{n}/kit.html').read_text();return re.search(r'<template id="rich">(.*?)</template>',k,re.S).group(1),(M/f'blog-{n}/post.txt').read_text()
+rich21,plain21=RT(21);rich19,plain19=RT(19)
+DONE=['원장 인사말 · 고3 · 중등부 표지 사진 (네이버 사진으로 확인)','반별 안내 글 (사진 2장 정상 · 「반별 안내」 메뉴에 뜸)','간판(파란 박찬 + 남색 통합과학학원)','미색 바탕 · 1단 레이아웃','단추 5개(학원 소개 · 반별 안내 · 강의 시간표 · 통합과학 이야기 · 상담)','위 메뉴 줄(학원 소개 · 반별 안내 · 학원 공지사항 · 통합과학 이야기)','블로그 이름 · 프로필(남색) · 소개글','옛 첫 글 비공개','글 제목 7개 · 카테고리','휴대폰: 맨 위 공지(강의 시간표) · 소개']
+TODO=['강의 시간표 글: 사진이 처음 올린 11월 13일부터 0장 (그때 제가 드린 사진이 링크 방식이라 붙지 않았던 것) + 중등부 표 「토요반」 한 칸 → 6번 칸 본문 복사 한 번','고1 예비반 글: 첫 글 합친 판으로 바꾸기 → 7번 칸 본문 복사 한 번','그래프 · 중학교 비교 글: 사진이 링크라 첫 화면 카드에 안 잡힘 → 9 · 10번 칸 본문 복사 한 번 (여유 있을 때)']
 HOW='''<div class="how"><b>사진 바꾸는 법 (모든 글 같음)</b><ol>
 <li>블로그에서 그 글을 엽니다 → 글 위쪽(또는 아래쪽) <b>수정</b>.</li>
 <li>글쓰기 화면에서 바꿀 사진을 <b>한 번 누릅니다</b> → 키보드 <b>Delete</b> (사진이 지워집니다).</li>
@@ -63,8 +66,14 @@ st('반별 안내 — 새 글 하나 쓰기 (세 반 한눈에)','새 글쓰기 
 <li>사진 2장도 본문과 함께 들어갑니다. 빠지면 zip의 10번 그림을 그 자리에 올립니다.</li>
 <li><b>발행</b> → 카테고리 <b>반별 안내</b>(맨 위 칸) → <b>발행</b>.</li></ol>'''+cp('제목','박찬 통합과학 학원 반별 안내')+'''<button class="big" data-rich="rich28" data-txt="txt28">본문 복사 (서식 포함)</button>
 <details><summary>서식이 빠지면 — 글자만 복사</summary><textarea id="txt28" readonly>'''+html.escape(plain28)+'''</textarea><button class="big alt" onclick="cpyT('txt28')">글자만 복사</button></details>'''),
-st('그래프 문제 글 — 사진 3장','글: 고등학교 과학 시험, 왜 그래프 문제가 많을까요? (통합과학 이야기)','<p>글 속 사진 3장을 위에서부터 차례로 아래 1·2·3으로 바꿉니다. (지금도 보이지만 링크라 첫 화면 카드에 안 잡힙니다.)</p>'+''.join(img(M/f'blog-21/images/{n}.png',f'사진 {i}',600) for i,n in enumerate(['c01_cover','c02_graph_b','c03_answer_b'],1))),
-st('중학교 비교 글 — 사진 4장','글: 통합과학, 중학교 과학과 무엇이 다를까요? (통합과학 이야기)','<p>글 속 사진 4장을 위에서부터 차례로 아래 1·2·3·4로 바꿉니다.</p>'+''.join(img(M/f'blog-19/images/{n}.png',f'사진 {i}',600) for i,n in enumerate(['a01_cover','a02_question','a03_suneung','a04_study'],1))),
+st('그래프 문제 글 — 본문 통째로 바꾸기','글: 고등학교 과학 시험, 왜 그래프 문제가 많을까요? (통합과학 이야기)','''<p class="nt">내용은 지금 올라간 글과 같고, 사진만 네이버 사진으로 들어가게 바꾼 본문입니다(사진 3장, 고화질).</p>
+<ol class="in"><li>글 → <b>수정</b> → 본문 아무 곳 누르고 <b>Ctrl+A</b> → <b>Delete</b> (제목은 그대로).</li><li>아래 <b>「본문 복사」</b> → <b>Ctrl+V</b>.</li><li><b>발행</b> → <b>발행</b>.</li></ol>
+<button class="big" data-rich="rich21" data-txt="txt21">본문 복사 (사진 · 서식 포함)</button>
+<details><summary>서식이 빠지면 — 글자만 복사</summary><textarea id="txt21" readonly>'''+html.escape(plain21)+'''</textarea><button class="big alt" onclick="cpyT('txt21')">글자만 복사</button></details>'''),
+st('중학교 비교 글 — 본문 통째로 바꾸기','글: 통합과학, 중학교 과학과 무엇이 다를까요? (통합과학 이야기)','''<p class="nt">내용은 지금 올라간 글과 같고, 사진만 네이버 사진으로 들어가게 바꾼 본문입니다(사진 4장, 고화질).</p>
+<ol class="in"><li>글 → <b>수정</b> → 본문 아무 곳 누르고 <b>Ctrl+A</b> → <b>Delete</b> (제목은 그대로).</li><li>아래 <b>「본문 복사」</b> → <b>Ctrl+V</b>.</li><li><b>발행</b> → <b>발행</b>.</li></ol>
+<button class="big" data-rich="rich19" data-txt="txt19">본문 복사 (사진 · 서식 포함)</button>
+<details><summary>서식이 빠지면 — 글자만 복사</summary><textarea id="txt19" readonly>'''+html.escape(plain19)+'''</textarea><button class="big alt" onclick="cpyT('txt19')">글자만 복사</button></details>'''),
 ]
 H=f'''<title>박찬 블로그 마무리</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap">
@@ -98,9 +107,9 @@ details summary{{cursor:pointer;font-weight:700;font-size:14px;color:var(--pt)}}
 <section class="state"><div class="ok"><h3>✔ 끝난 것 (11월 17일 제가 블로그를 직접 열어 확인)</h3><ul>{''.join(f"<li>{x}</li>" for x in DONE)}</ul></div><div class="no"><h3>✘ 남은 문제</h3><ul>{''.join(f"<li>{x}</li>" for x in TODO)}</ul></div></section>
 <div class="bar">진행 <i id="cnt">0</i> / {uid[0]}</div>
 <h2>1부 · 설정 2가지 <small>5분</small></h2><ol class="steps">{''.join(A)}</ol>
-<h2>2부 · 글 고치기 7 + 새 글 1 <small>글마다 1~5분 · 위 1~5번이 중요, 6·7번은 여유 있을 때</small></h2>{HOW}<ol class="steps">{''.join(B)}</ol>
+<h2>2부 · 글 고치기 <small>글마다 1~5분 · 위 1~5번이 중요, 6·7번은 여유 있을 때</small></h2>{HOW}<ol class="steps">{''.join(B)}</ol>
 <p class="lead">끝나면 「끝」이라고만 보내 주세요. PC와 휴대폰 화면을 제가 직접 열어 확인하고 결과를 알려 드립니다.</p></div>
-<template id="rich">{rich}</template><template id="rich22">{rich22}</template><template id="rich28">{rich28}</template>
+<template id="rich">{rich}</template><template id="rich22">{rich22}</template><template id="rich28">{rich28}</template><template id="rich21">{rich21}</template><template id="rich19">{rich19}</template>
 <script>
 function cpy(b){{const t=b.closest('.cp').querySelector('pre').textContent;navigator.clipboard.writeText(t).then(()=>{{b.textContent='복사됨';setTimeout(()=>b.textContent='복사',1500)}},()=>{{const r=document.createRange();r.selectNodeContents(b.closest('.cp').querySelector('pre'));const s=getSelection();s.removeAllRanges();s.addRange(r);b.textContent='Ctrl+C'}})}}
 function cpyT(id){{const t=document.getElementById(id);navigator.clipboard.writeText(t.value).catch(()=>{{t.focus();t.select()}})}}
