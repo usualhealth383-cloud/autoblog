@@ -8,7 +8,7 @@ HERE = pathlib.Path(__file__).resolve().parent
 PUB = HERE.parents[2] / 'docs' / 'marketing' / 'blog-21'
 URL = 'https://usualhealth383-cloud.github.io/autoblog/marketing/blog-21/'
 BLUE = '#2F5FC4'
-TITLES = ['고등학교 과학 시험, 왜 그래프 문제가 많을까요']
+TITLES = ['그래프 문제가 많은 이유 · 고등학교 과학 시험']
 TAGS = (HERE.parent / 'blog-16' / 'tags.txt').read_text(encoding='utf-8').split()
 
 POST = [
