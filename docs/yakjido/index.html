@@ -6,7 +6,7 @@
 <meta name="description" content="증상별 일반의약품 선택 가이드·성분 비교·영양제 비교. 임상에서 처방하는 조합을 약국 구입 기준으로 풀어드립니다.">
 <link rel="manifest" href="manifest.webmanifest">
 <meta name="theme-color" content="#0B6E8F"><meta name="color-scheme" content="light dark">
-<script>/* 11-17 잉크 판이 기본(현욱님 배포 승인) — 옛 판은 ?old=1 · ?ink=0 · 설정에서 끔 */try{var _q=location.search.match(/[?&]ink=([01])/);if(/[?&]old=1/.test(location.search))_q=[0,'0'];if(_q)localStorage.setItem('yakjido.ink',_q[1]);var _f=location.search.match(/[?&]fam=([01])/);if(_f)localStorage.setItem('yakjido.fam',_f[1]);if(localStorage.getItem('yakjido.ink')!=='0'){document.documentElement.classList.add('ink');if(localStorage.getItem('yakjido.fam')==='1')document.documentElement.classList.add('fam');document.write('<link rel="stylesheet" href="ink.css">')}}catch(e){}</script>
+<script>/* 11-17 밤 현욱님 결정 — 기본은 원래 약지도 판. 잉크 판은 ?ink=1 · 설정에서 켤 때만(보관). ?old=1 은 원래 판 */try{var _q=location.search.match(/[?&]ink=([01])/);if(/[?&]old=1/.test(location.search))_q=[0,'0'];if(_q)localStorage.setItem('yakjido.ink',_q[1]);var _f=location.search.match(/[?&]fam=([01])/);if(_f)localStorage.setItem('yakjido.fam',_f[1]);var _j=location.search.match(/[?&]job=([01])/);if(_j)localStorage.setItem('yakjido.job',_j[1]);if(localStorage.getItem('yakjido.ink')==='1'){document.documentElement.classList.add('ink');if(localStorage.getItem('yakjido.fam')==='1')document.documentElement.classList.add('fam');if(localStorage.getItem('yakjido.job')==='1')document.documentElement.classList.add('job');document.write('<link rel="stylesheet" href="ink.css">')}}catch(e){}</script>
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="약지도">
@@ -1810,7 +1810,7 @@ html:not(.ink) .rf-none{display:none}</style>
 <script>
 window.__YAKJIDO_OK__ = true;
 const D = JSON.parse(document.getElementById('data').textContent || '{}');
-const BUILD = '2026-11-17 19:33';
+const BUILD = '2026-11-17 20:59';
 const DATAV = '74e855bac8'.indexOf('__') === 0 ? BUILD : '74e855bac8';
 const BRANDMARK = (typeof window !== 'undefined' && window.__BRANDMARK__) || 'icon-192.png';
 let CORE = 0, CORE_P = null;
@@ -3066,7 +3066,7 @@ const INK = document.documentElement.classList.contains('ink');
 const odL = `<button type="button" class="od-line" onclick="go('/od')">${I.alert}<span>많이 먹었을 때 · 두 번 먹었을 때</span>${I.chev}</button>`;
 if (INK && window.잉크홈) return `${topBar({ nosearch:true })}${ext('가족대화줄')}${window.구독?.체험끝줄HTML ? 구독.체험끝줄HTML() : ''}${ext('잉크홈')}`;
 return `${topBar()}${ext('가족대화줄')}
-${dh || ''}${window.구독?.체험끝줄HTML ? 구독.체험끝줄HTML() : ''}
+${ext('내약칸')}${dh || ''}${window.구독?.체험끝줄HTML ? 구독.체험끝줄HTML() : ''}
 ${svOn() ? `<section class="hero home-q">${dot}<div class="eyebrow">${esc(hello)}</div><h1 class="greet">어디가 불편하세요?</h1><p class="sv-lead">약국에서 물어볼 약을 알려 드려요</p></section>${ER_LINE()}${kidHome()}${ext('오늘한장')}
 <div class="sv-tiles one">${SV_HOME.map(id => byId(D.symptoms, id)).filter(Boolean).map(s => `<button class="sv-tile ${gcls(s.group)}" onclick="go('/symptom/${s.id}')"><span class="ic">${sicon(s)}</span><b>${esc(s.name.split(' (')[0])}</b></button>`).join('')}</div>
 <button class="btn ghost sv-all" onclick="homeTab('all');jumpTo('hlist')">다른 증상 모두 보기${I.chev}</button>` : INK && window.잉크홈 ? ext('잉크홈') : `<section class="hero home-q">${dot}

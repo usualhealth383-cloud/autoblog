@@ -10,7 +10,7 @@ class _Q(http.server.SimpleHTTPRequestHandler):
     def log_message(self, *a): pass
 srv = socketserver.TCPServer(('127.0.0.1', 0), functools.partial(_Q, directory=str(D))); threading.Thread(target=srv.serve_forever, daemon=True).start()
 URL = f'http://127.0.0.1:{srv.server_address[1]}/'
-SEED = "localStorage.setItem('yakjido.hello.v1','1');localStorage.setItem('yakjido.consent.v1',JSON.stringify({v:'2026-10-20',at:'2026-11-17',terms:1,privacy:1}))"
+SEED = "localStorage.setItem('yakjido.hello.v1','1');localStorage.setItem('yakjido.consent.v1',JSON.stringify({v:'2026-10-20',at:'2026-11-17',terms:1,privacy:1}));localStorage.setItem('yakjido.ink','1')"   # 11-17 밤 — 기본은 원래 판, 묻기 칸 첫 화면은 잉크 판에 있다
 SOS = ['가슴이 조이고 식은땀이 나요', '벌에 쏘였는데 숨이 차요', '입술이 붓고 숨이 차요', '아이가 약을 많이 먹었어요', ('죽고 싶어요', '109'),
        '2개월 아기 열이 38도예요', '4개월 아기 열이 39도예요', '5개월 아기가 39.5도예요', '한쪽 팔다리에 힘이 빠져요', '아이가 경련해요', '피를 토했어요', '열이 41도예요']
 TOP = [('임신 중 두통약', r'아세트아미노펜', r'이부프로펜\s*400'), ('임산부 감기약', r'임신|아세트아미노펜', None), ('임신했는데 허리가 아파요', r'임신', r'이부프로펜\s*400'),
