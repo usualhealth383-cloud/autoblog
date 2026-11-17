@@ -4887,31 +4887,34 @@ try { 이용량.설치({ 앱: 'yakjido', 켜짐: false, 주소: 'https://uszalzc
 */
 (function () {
   if (window.설정판 && window.설정판.__v) return;
-  var 판 = '2026-11-05a';   /* 11-05a 유럽연합 시간대 */   /* 11-04i 묶음 제목 h3→h2(화면 읽기 머리글 건너뜀 없게 · 곁에가 찾음) */   /* 11-04h 기기 언어로 나라 짐작 안 함(모르면 빈칸·번호 없음) · 11-04g 응급번호()·번호HTML() · 11-04f 제목·설명 이스케이프 · 11-04e 기본 줄 값 이스케이프 · 11-04d 머리 주석 정리 */
+  var 판 = '2026-11-17a';   /* 11-17a 새 말 셋(vi·tl·th) — 글표·말과 나라·사업자·통계·급함·현지(소아가 쓰는 말 · 없으면 한국어로 떨어지던 것) */   /* 11-12d 어두운 화면 — 말과 나라 바탕(--bg 없으면 --surface)·단추 글자(--on-accent) */   /* 11-12c 방문 통계 한 줄(설정판.통계말) */   /* 11-12a 말과 나라 창 — 회색 「맞아요」 이유 한 줄 · 「나중에 정할게요」(이번 실행 동안 다시 안 엶) */   /* 11-11c 말과 나라 창에 응급 번호 한 줄(창이 화면을 막는 동안) */   /* 11-11b 사업자 정보 메일·복사 누르는 칸 44px */   /* 11-11a 사업자 정보 안쪽 여백 · 메일 본문색·밑줄 없음 + 복사 단추 · 말과나라 제목·설명 왼쪽 */   /* 11-10g 강조색 대체(곁에 「맞아요」 안 보임) */   /* 11-10e 말과 나라 첫 화면 — 위에서 시작 · 단추 글 가운데 · 포커스 한 겹 */   /* 11-10d 사업자 정보 접힘(사업자표) */   /* 11-10c 밝기 기본 표시 = 밝게(10-14 현욱님 「기본 밝게」 · 11-10b 되돌림) */   /* 11-10a 내 기기 줄(계정 부품 기기두대 켜졌을 때만) */   /* 11-09a 지우기 줄 → 계정과 기록 지우기(심사 — 로그인 전에도 계정 삭제 길) */   /* 11-05a 유럽연합 시간대 */   /* 11-04i 묶음 제목 h3→h2(화면 읽기 머리글 건너뜀 없게 · 곁에가 찾음) */   /* 11-04h 기기 언어로 나라 짐작 안 함(모르면 빈칸·번호 없음) · 11-04g 응급번호()·번호HTML() · 11-04f 제목·설명 이스케이프 · 11-04e 기본 줄 값 이스케이프 · 11-04d 머리 주석 정리 */
   var 설정 = { app: 'app', 언어: null, 줄: null, 아이콘: null, 다시그리기: null };
   var 글표 = {
     ko: { 맞추기: '나에게 맞추기', 알림: '알림', 화면: '화면과 언어', 기록: '내 기록', 앱: '이 앱',
       알림제목: '알림', 언어: '언어 · Language', 글자: '글자 크기', 글자들: ['기본', '조금 크게', '가장 크게'], 밝기: '화면 밝기', 밝기들: ['밝게', '어둡게', '기기 설정 따라'], 준비중: '준비 중',
       동의: '내 동의 내용', 동의설명: '동의를 바꾸거나 철회', 파일: '내 기록 파일로 받기', 파일설명: '모든 기록을 파일 하나(JSON)로 이 기기에 저장', 옮기기: '옮기기 · 되살리기', 옮기기설명: '복사해 두었다가 다른 기기에서 되살리기',
-      지우기: '모두 지우기', 지우기설명: '이 기기의 기록과 설정 — 확인 뒤 지워요', 처리방침: '개인정보 처리방침', 처리방침설명: '무엇을 · 왜 · 언제까지', 정보: '이 앱에 대하여', 정보설명: '의료기기 아님 · 근거 자료 · 약관', 문의: '문의하고 잘못된 내용 알리기', 문의설명: '고쳐야 할 것을 알려 주세요' },
+      지우기: '계정과 기록 지우기', 기기: '내 기기', 기기설명: '이 계정으로 쓰는 기기 · 두 대까지 · 내보내기', 지우기설명: '이 기기의 기록 · 로그인하셨다면 계정과 서버 기록까지 — 확인 뒤 지워요', 처리방침: '개인정보 처리방침', 처리방침설명: '무엇을 · 왜 · 언제까지', 정보: '이 앱에 대하여', 정보설명: '의료기기 아님 · 근거 자료 · 약관', 문의: '문의하고 잘못된 내용 알리기', 문의설명: '고쳐야 할 것을 알려 주세요' },
     en: { 맞추기: 'Personalize', 알림: 'Notifications', 화면: 'Display and language', 기록: 'My records', 앱: 'This app',
       알림제목: 'Notifications', 언어: 'Language · 언어', 글자: 'Text size', 글자들: ['Default', 'Larger', 'Largest'], 밝기: 'Screen brightness', 밝기들: ['Light', 'Dark', 'Follow device'], 준비중: 'Coming soon',
       동의: 'My consents', 동의설명: 'Change or withdraw consent', 파일: 'Download my records', 파일설명: 'Save all records to this device as one file (JSON)', 옮기기: 'Move · restore', 옮기기설명: 'Copy and restore on another device',
-      지우기: 'Delete everything', 지우기설명: 'Records and settings on this device — deleted after you confirm', 처리방침: 'Privacy policy', 처리방침설명: 'What, why and for how long', 정보: 'About this app', 정보설명: 'Not a medical device · sources · terms', 문의: 'Contact us and report errors', 문의설명: 'Tell us what needs fixing' },
+      지우기: 'Delete account and records', 기기: 'My devices', 기기설명: 'Devices using this account · up to two · sign one out', 지우기설명: 'Records on this device, and your account and server records if you logged in — deleted after you confirm', 처리방침: 'Privacy policy', 처리방침설명: 'What, why and for how long', 정보: 'About this app', 정보설명: 'Not a medical device · sources · terms', 문의: 'Contact us and report errors', 문의설명: 'Tell us what needs fixing' },
     es: { 맞추기: 'Ajustado a mí', 알림: 'Avisos', 화면: 'Pantalla e idioma', 기록: 'Mis registros', 앱: 'Esta app',
       알림제목: 'Avisos', 언어: 'Idioma · 언어', 글자: 'Tamaño del texto', 글자들: ['Normal', 'Más grande', 'Lo más grande'], 밝기: 'Pantalla', 밝기들: ['Clara', 'Oscura', 'Según el dispositivo'], 준비중: 'Muy pronto',
       동의: 'Mis consentimientos', 동의설명: 'Cambiar o retirar el consentimiento', 파일: 'Descargar mis registros', 파일설명: 'Guardar todos los registros en este dispositivo en un archivo (JSON)', 옮기기: 'Mover · restaurar', 옮기기설명: 'Copiar y restaurar en otro dispositivo',
-      지우기: 'Borrar todo', 지우기설명: 'Registros y ajustes de este dispositivo: se borran tras confirmar', 처리방침: 'Política de privacidad', 처리방침설명: 'Qué, por qué y hasta cuándo', 정보: 'Sobre esta app', 정보설명: 'No es un producto sanitario · fuentes · condiciones', 문의: 'Contacto y notificación de errores', 문의설명: 'Díganos qué hay que corregir' },
+      지우기: 'Borrar cuenta y registros', 기기: 'Mis dispositivos', 기기설명: 'Dispositivos con esta cuenta · hasta dos · cerrar sesión en uno', 지우기설명: 'Registros de este dispositivo y, si inició sesión, su cuenta y los registros del servidor: se borran tras confirmar', 처리방침: 'Política de privacidad', 처리방침설명: 'Qué, por qué y hasta cuándo', 정보: 'Sobre esta app', 정보설명: 'No es un producto sanitario · fuentes · condiciones', 문의: 'Contacto y notificación de errores', 문의설명: 'Díganos qué hay que corregir' },
     ja: { 맞추기: '自分に合わせる', 알림: '通知', 화면: '画面と言語', 기록: '自分の記録', 앱: 'このアプリ',
       알림제목: '通知', 언어: '言語 · 언어', 글자: '文字の大きさ', 글자들: ['標準', '少し大きく', 'いちばん大きく'], 밝기: '画面の明るさ', 밝기들: ['明るく', '暗く', '端末の設定に合わせる'], 준비중: '準備中',
       동의: '同意の内容', 동의설명: '同意の変更・撤回', 파일: '記録をファイルで受け取る', 파일설명: 'すべての記録を1つのファイル（JSON）でこの端末に保存', 옮기기: '移す · 戻す', 옮기기설명: 'コピーして別の端末で戻す',
-      지우기: 'すべて消す', 지우기설명: 'この端末の記録と設定 — 確認してから消します', 처리방침: '個人情報の取り扱い', 처리방침설명: '何を・なぜ・いつまで', 정보: 'このアプリについて', 정보설명: '医療機器ではありません · 根拠 · 規約', 문의: 'お問い合わせ・誤りの報告', 문의설명: '直すべきところを教えてください' },
+      지우기: 'アカウントと記録を消す', 기기: 'わたしの端末', 기기설명: 'このアカウントで使う端末 · 二台まで · ログアウトさせる', 지우기설명: 'この端末の記録と、ログインしていればアカウントとサーバーの記録も — 確認してから消します', 처리방침: '個人情報の取り扱い', 처리방침설명: '何を・なぜ・いつまで', 정보: 'このアプリについて', 정보설명: '医療機器ではありません · 根拠 · 規約', 문의: 'お問い合わせ・誤りの報告', 문의설명: '直すべきところを教えてください' },
     zh: { 맞추기: '为我调整', 알림: '提醒', 화면: '显示和语言', 기록: '我的记录', 앱: '本应用',
       알림제목: '提醒', 언어: '语言 · 언어', 글자: '字体大小', 글자들: ['标准', '大一些', '最大'], 밝기: '屏幕亮度', 밝기들: ['浅色', '深色', '跟随设备'], 준비중: '即将推出',
       동의: '我的同意', 동의설명: '更改或撤回同意', 파일: '把记录下载为文件', 파일설명: '把全部记录以一个文件（JSON）保存到本设备', 옮기기: '转移 · 恢复', 옮기기설명: '复制后在其他设备恢复',
-      지우기: '全部删除', 지우기설명: '本设备上的记录和设置——确认后删除', 처리방침: '隐私政策', 처리방침설명: '收集什么、为什么、保存多久', 정보: '关于本应用', 정보설명: '不是医疗器械 · 依据 · 条款', 문의: '联系我们、报告错误', 문의설명: '告诉我们需要改正的地方' }
+      지우기: '删除账号和记录', 기기: '我的设备', 기기설명: '使用此账号的设备 · 最多两台 · 移出', 지우기설명: '本设备上的记录；如已登录，也包括账号和服务器上的记录——确认后删除', 처리방침: '隐私政策', 처리방침설명: '收集什么、为什么、保存多久', 정보: '关于本应用', 정보설명: '不是医疗器械 · 依据 · 条款', 문의: '联系我们、报告错误', 문의설명: '告诉我们需要改正的地方' },
+    vi: {"맞추기": "Cá nhân hóa", "알림": "Thông báo", "화면": "Hiển thị và ngôn ngữ", "기록": "Hồ sơ của tôi", "앱": "Ứng dụng này", "알림제목": "Thông báo", "언어": "Ngôn ngữ · 언어", "글자": "Cỡ chữ", "글자들": ["Mặc định", "Lớn hơn", "Lớn nhất"], "밝기": "Độ sáng màn hình", "밝기들": ["Sáng", "Tối", "Theo thiết bị"], "준비중": "Sắp có", "동의": "Các đồng ý của tôi", "동의설명": "Thay đổi hoặc rút lại đồng ý", "파일": "Tải hồ sơ của tôi", "파일설명": "Lưu mọi hồ sơ vào thiết bị này thành một tệp (JSON)", "옮기기": "Chuyển · khôi phục", "옮기기설명": "Sao chép rồi khôi phục trên thiết bị khác", "지우기": "Xóa tài khoản và hồ sơ", "기기": "Thiết bị của tôi", "기기설명": "Thiết bị dùng tài khoản này · tối đa hai · đăng xuất một máy", "지우기설명": "Hồ sơ trên thiết bị này, và tài khoản cùng hồ sơ trên máy chủ nếu bạn đã đăng nhập — xóa sau khi bạn xác nhận", "처리방침": "Chính sách quyền riêng tư", "처리방침설명": "Thu thập gì, vì sao và trong bao lâu", "정보": "Về ứng dụng này", "정보설명": "Không phải thiết bị y tế · nguồn tài liệu · điều khoản", "문의": "Liên hệ và báo lỗi", "문의설명": "Cho chúng tôi biết điều cần sửa"},
+    tl: {"맞추기": "Iangkop sa akin", "알림": "Mga abiso", "화면": "Display at wika", "기록": "Aking mga tala", "앱": "Ang app na ito", "알림제목": "Mga abiso", "언어": "Wika · 언어", "글자": "Laki ng teksto", "글자들": ["Karaniwan", "Mas malaki", "Pinakamalaki"], "밝기": "Liwanag ng screen", "밝기들": ["Maliwanag", "Madilim", "Sundin ang device"], "준비중": "Malapit na", "동의": "Aking mga pahintulot", "동의설명": "Baguhin o bawiin ang pahintulot", "파일": "I-download ang aking mga tala", "파일설명": "I-save ang lahat ng tala sa device na ito bilang isang file (JSON)", "옮기기": "Ilipat · ibalik", "옮기기설명": "Kopyahin at ibalik sa ibang device", "지우기": "Burahin ang account at mga tala", "기기": "Aking mga device", "기기설명": "Mga device na gumagamit ng account na ito · hanggang dalawa · mag-sign out ng isa", "지우기설명": "Mga tala sa device na ito, at ang iyong account at mga tala sa server kung naka-log in ka — buburahin matapos mong kumpirmahin", "처리방침": "Patakaran sa privacy", "처리방침설명": "Ano, bakit at hanggang kailan", "정보": "Tungkol sa app na ito", "정보설명": "Hindi medical device · mga sanggunian · mga tuntunin", "문의": "Makipag-ugnayan at mag-ulat ng mali", "문의설명": "Sabihin sa amin kung ano ang dapat ayusin"},
+    th: {"맞추기": "ปรับให้เหมาะกับฉัน", "알림": "การแจ้งเตือน", "화면": "การแสดงผลและภาษา", "기록": "บันทึกของฉัน", "앱": "แอปนี้", "알림제목": "การแจ้งเตือน", "언어": "ภาษา · 언어", "글자": "ขนาดตัวอักษร", "글자들": ["ปกติ", "ใหญ่ขึ้น", "ใหญ่ที่สุด"], "밝기": "ความสว่างหน้าจอ", "밝기들": ["สว่าง", "มืด", "ตามอุปกรณ์"], "준비중": "เร็ว ๆ นี้", "동의": "ความยินยอมของฉัน", "동의설명": "เปลี่ยนหรือถอนความยินยอม", "파일": "ดาวน์โหลดบันทึกของฉัน", "파일설명": "บันทึกทุกอย่างลงอุปกรณ์นี้เป็นไฟล์เดียว (JSON)", "옮기기": "ย้าย · กู้คืน", "옮기기설명": "คัดลอกแล้วกู้คืนบนอุปกรณ์อื่น", "지우기": "ลบบัญชีและบันทึก", "기기": "อุปกรณ์ของฉัน", "기기설명": "อุปกรณ์ที่ใช้บัญชีนี้ · สูงสุดสองเครื่อง · ออกจากระบบหนึ่งเครื่อง", "지우기설명": "บันทึกในอุปกรณ์นี้ และบัญชีกับบันทึกบนเซิร์ฟเวอร์หากคุณเข้าสู่ระบบ — ลบหลังจากคุณยืนยัน", "처리방침": "นโยบายความเป็นส่วนตัว", "처리방침설명": "เก็บอะไร เพราะอะไร และนานแค่ไหน", "정보": "เกี่ยวกับแอปนี้", "정보설명": "ไม่ใช่เครื่องมือแพทย์ · แหล่งข้อมูล · ข้อกำหนด", "문의": "ติดต่อและแจ้งข้อผิดพลาด", "문의설명": "บอกเราว่าต้องแก้ไขอะไร"}
   };
-  function 말() { var l = null; try { if (typeof 설정.언어 === 'function') l = 설정.언어(); } catch (e) {} if (!l) l = (document.documentElement && document.documentElement.lang) || 'ko'; l = String(l).toLowerCase().slice(0, 2); return 글표[l] ? l : 'ko'; }
+  function 말() { var l = null; try { if (typeof 설정.언어 === 'function') l = 설정.언어(); } catch (e) {} if (!l) l = (document.documentElement && document.documentElement.lang) || 'ko'; l = String(l).toLowerCase(); if (/^fil/.test(l)) l = 'tl'; l = l.slice(0, 2); return 글표[l] ? l : 'ko'; }   /* 11-17a 필리핀어는 html lang=fil — tl 로 */
   function 글(k) { var t = 글표[말()][k]; return t == null ? 글표.ko[k] : t; }
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
   function 값(v) { try { return typeof v === 'function' ? v() : v; } catch (e) { return null; } }
@@ -4948,6 +4951,7 @@ try { 이용량.설치({ 앱: 'yakjido', 켜짐: false, 주소: 'https://uszalzc
     if (화 || 고름칸) h += '<div class="ms-group"><h2 class="ms-h">' + 글('화면') + '</h2>' + (화 ? '<div class="menu">' + 화 + '</div>' : '') + (고름칸 ? '<div class="ms-segs">' + 고름칸 + '</div>' : '') + '</div>';
     var 기 = '';
     if (o.동의) 기 += 줄('shield', 글('동의'), 값(o.동의.설명) || 글('동의설명'), 값(o.동의.값), o.동의.부름);
+    try { if (window.계정 && 계정.기기켜짐 && 계정.기기켜짐() && 계정.로그인됨 && 계정.로그인됨()) 기 += 줄('user', 글('기기'), 글('기기설명'), '', '계정.기기열기()'); } catch (e) {}   /* 11-10 기기 두 대 — 계정 부품이 켜졌고 로그인했을 때만 */
     if (o.파일) 기 += 줄('download', 글('파일'), 글('파일설명'), 값(o.파일.값), o.파일.부름);
     if (o.옮기기) 기 += 줄('copy', 글('옮기기'), 글('옮기기설명'), 값(o.옮기기.값), o.옮기기.부름);
     (값(o.기록더) || []).forEach(function (x) { 기 += 줄(x.아이콘, 값(x.제목), 값(x.설명), 값(x.값), x.부름); });
@@ -4959,7 +4963,38 @@ try { 이용량.설치({ 앱: 'yakjido', 켜짐: false, 주소: 'https://uszalzc
     if (o.문의) 앱 += 줄('chat', 글('문의'), 글('문의설명'), '', o.문의.부름);
     h += 묶음(글('앱'), 앱);
     if (o.아래말) h += '<p class="tiny ms-foot">' + 값(o.아래말) + '</p>';
+    h += '<p class="tiny ms-foot ms-stat">' + esc(통계글()) + '</p>';   /* 11-12 현욱님 「Cloudflare 통계 켜 두기」 — 약속을 사실에 맞춘 정본 한 줄(다섯 앱 같은 말) */
+    if (o.사업자 !== false) h += 사업자HTML();   /* 11-10 사업자등록 — 다섯 앱 같은 값(아래 사업자표 한 곳) */
     return '<div class="ms" id="msSettings">' + h + '</div>';
+  }
+  /* ── 사업자 정보(11-10 사업자등록증 · 정본 _서버/운영자.json 과 같게 — 바뀌면 여기 한 곳만 고치고 다섯 앱에 심는다) ──
+     ⛔ 생년월일 등 등록증의 다른 개인정보는 싣지 않는다. 「준비 중」은 그 말 그대로(지어내지 않음) */
+  var 사업자표 = { 상호: '메디나눔', 대표: '박민욱', 번호: '799-14-03176', 통신판매: '', 주소: '서울특별시 강동구 천중로 147, 204호(천호동, 성심하이빌)', 전화: '', 메일: 'contact@medinanum.com', 호스팅: 'Cloudflare' };
+  var 사업자말 = { ko: ['사업자 정보', '상호', '대표', '사업자등록번호', '통신판매업 신고', '주소', '전화', '문의 메일', '호스팅', '준비 중', '복사', '복사했어요'],
+    en: ['Business information', 'Business name', 'Representative', 'Business registration no.', 'Mail-order business report', 'Address', 'Phone', 'Contact email', 'Hosting', 'In preparation', 'Copy', 'Copied'],
+    es: ['Datos de la empresa', 'Nombre comercial', 'Representante', 'N.º de registro mercantil', 'Registro de venta a distancia', 'Dirección', 'Teléfono', 'Correo de contacto', 'Alojamiento', 'En preparación', 'Copiar', 'Copiado'],
+    ja: ['事業者情報', '商号', '代表', '事業者登録番号', '通信販売業届出', '住所', '電話', 'お問い合わせメール', 'ホスティング', '準備中', 'コピー', 'コピーしました'],
+    zh: ['经营者信息', '商号', '代表', '营业执照号', '通信销售业申报', '地址', '电话', '联系邮箱', '托管', '准备中', '复制', '已复制'],
+    vi: ["Thông tin doanh nghiệp", "Tên doanh nghiệp", "Người đại diện", "Số đăng ký kinh doanh", "Đăng ký bán hàng từ xa", "Địa chỉ", "Điện thoại", "Email liên hệ", "Máy chủ", "Đang chuẩn bị", "Sao chép", "Đã sao chép"],
+    tl: ["Impormasyon ng negosyo", "Pangalan ng negosyo", "Kinatawan", "Business registration no.", "Ulat sa mail-order na negosyo", "Address", "Telepono", "Email para sa contact", "Hosting", "Inihahanda pa", "Kopyahin", "Nakopya na"],
+    th: ["ข้อมูลธุรกิจ", "ชื่อกิจการ", "ผู้แทน", "เลขทะเบียนธุรกิจ", "การแจ้งธุรกิจขายทางไกล", "ที่อยู่", "โทรศัพท์", "อีเมลติดต่อ", "โฮสติ้ง", "อยู่ระหว่างเตรียมการ", "คัดลอก", "คัดลอกแล้ว"]
+  };
+  var 통계말 = { ko: '광고는 없어요. 방문 수 같은 통계만 개인을 알아볼 수 없는 방식(쿠키 없음)으로 세어요.',
+    en: "No ads. We count only visit statistics, in a way that can't identify you (no cookies).",
+    es: 'Sin anuncios. Solo contamos estadísticas de visitas, de forma que no permite identificarle (sin cookies).',
+    ja: '広告はありません。訪問数などの統計だけを、個人を特定できない方法(クッキーなし)で数えています。',
+    zh: '没有广告。我们只以无法识别个人的方式(不使用 Cookie)统计访问量等数据。',
+    vi: "Không có quảng cáo. Chúng tôi chỉ đếm số lượt truy cập theo cách không nhận diện được bạn (không dùng cookie).",
+    tl: "Walang ads. Bilang lang ng mga pagbisita ang binibilang namin, sa paraang hindi ka makikilala (walang cookies).",
+    th: "ไม่มีโฆษณา เรานับเพียงสถิติการเข้าชมด้วยวิธีที่ระบุตัวคุณไม่ได้ (ไม่ใช้คุกกี้)"
+  };
+  function 통계글(l) { return 통계말[l || 말()] || 통계말.ko; }
+  function 사업자HTML() {
+    var m = 사업자말[말()] || 사업자말.ko, x = 사업자표, 준 = m[9];
+    function 줄(k, v) { return '<div class="ms-bz"><span>' + esc(k) + '</span><b>' + esc(v || 준) + '</b></div>'; }
+    return '<details class="ms-biz"><summary>' + esc(m[0]) + '</summary>'
+      + 줄(m[1], x.상호) + 줄(m[2], x.대표) + 줄(m[3], x.번호) + 줄(m[4], x.통신판매) + 줄(m[5], x.주소) + 줄(m[6], x.전화)
+      + '<div class="ms-bz"><span>' + esc(m[7]) + '</span><b class="ms-mail"><a href="mailto:' + esc(x.메일) + '">' + esc(x.메일) + '</a><button type="button" class="ms-copy" onclick="설정판.메일복사(this)">' + esc(m[10]) + '</button></b></div>' + 줄(m[8], x.호스팅) + '</details>';
   }
   /* ── 말과 나라(2026-11-04 현욱님 「진행」 · docs/requests/20261104_언어나라_묻기.md) ──
      앱 말 · 사는 나라 · 그 나라 말 수준을 한 화면 세 줄로(미리 채움 · 「맞아요」 한 번 · 건너뛰기 없음).
@@ -4988,12 +5023,17 @@ try { 이용량.설치({ 앱: 'yakjido', 켜짐: false, 주소: 'https://uszalzc
     ja: { 제목: '使う言葉と住んでいる国', 설명: '正しい緊急番号と案内をお伝えするためにお聞きしています。合っていれば一度押してください。', 앱말: 'アプリの言葉', 나라: '今住んでいる国', 수준: '{말}はどのくらい話せますか？', 수준일반: 'その国の言葉はどのくらい話せますか？',
       수준들: ['問題なく話せる', '少し話せる', 'ほとんど話せない'], 맞아요: 'これで合っています', 나라고름: '国を選んでください', 줄: '言葉と国', 줄설명: '緊急番号と案内をこの内容に合わせます', 안정함: 'まだ選んでいません' },
     zh: { 제목: '您的语言和所在国家', 설명: '为了向您显示正确的急救电话和信息，我们需要了解这些。如果没问题，请点一下。', 앱말: '应用语言', 나라: '目前居住的国家', 수준: '您的{말}水平如何？', 수준일반: '您的当地语言水平如何？',
-      수준들: ['很流利', '会一点', '几乎不会'], 맞아요: '没问题', 나라고름: '请选择国家', 줄: '语言和国家', 줄설명: '急救电话和信息会按此设置', 안정함: '尚未选择' } };
+      수준들: ['很流利', '会一点', '几乎不会'], 맞아요: '没问题', 나라고름: '请选择国家', 줄: '语言和国家', 줄설명: '急救电话和信息会按此设置', 안정함: '尚未选择' },
+    vi: {"제목": "Ngôn ngữ và quốc gia của bạn", "설명": "Chúng tôi hỏi để hiện đúng số khẩn cấp và hướng dẫn. Nếu đúng, chỉ cần chạm một lần.", "앱말": "Ngôn ngữ ứng dụng", "나라": "Quốc gia bạn đang sống", "수준": "Bạn nói {말} tốt đến đâu?", "수준일반": "Bạn nói tiếng địa phương tốt đến đâu?", "수준들": ["Thoải mái", "Một chút", "Hầu như không"], "맞아요": "Đúng rồi", "나라고름": "Chọn quốc gia", "줄": "Ngôn ngữ và quốc gia", "줄설명": "Số khẩn cấp và hướng dẫn theo các giá trị này", "안정함": "Chưa chọn"},
+    tl: {"제목": "Iyong wika at bansa", "설명": "Nagtatanong kami para maipakita ang tamang emergency number at gabay. Kung tama, pindutin nang isang beses.", "앱말": "Wika ng app", "나라": "Bansang tinitirhan mo ngayon", "수준": "Gaano ka kahusay mag-{말}?", "수준일반": "Gaano ka kahusay sa lokal na wika?", "수준들": ["Komportable", "Kaunti", "Halos hindi"], "맞아요": "Tama", "나라고름": "Piliin ang bansa", "줄": "Wika at bansa", "줄설명": "Sinusunod nito ang emergency number at gabay", "안정함": "Hindi pa napili"},
+    th: {"제목": "ภาษาและประเทศของคุณ", "설명": "เราถามเพื่อแสดงหมายเลขฉุกเฉินและคำแนะนำที่ถูกต้อง ถ้าถูกแล้ว แตะครั้งเดียว", "앱말": "ภาษาของแอป", "나라": "ประเทศที่คุณอาศัยอยู่ตอนนี้", "수준": "คุณพูด{말}ได้แค่ไหน", "수준일반": "คุณพูดภาษาท้องถิ่นได้แค่ไหน", "수준들": ["คล่อง", "นิดหน่อย", "แทบไม่ได้"], "맞아요": "ถูกต้อง", "나라고름": "เลือกประเทศ", "줄": "ภาษาและประเทศ", "줄설명": "หมายเลขฉุกเฉินและคำแนะนำจะเป็นไปตามนี้", "안정함": "ยังไม่ได้เลือก"}
+  };
   function 곳(k, l) { l = l || 말(); return (곳글[l] || 곳글.ko)[k]; }
   function 칸(l) { var i = 말순.indexOf(l); return i < 0 ? 0 : i; }
   var 곳열쇠 = 'mn.place';
   function 곳읽기() { try { var v = JSON.parse(localStorage.getItem(곳열쇠) || 'null'); return v && v.lang && v.country && v.level ? v : null; } catch (e) { return null; } }
   function 나라짐작() {
+    try { if (window.메디나눔위기번호 && typeof 메디나눔위기번호.나라짐작 === 'function') return 메디나눔위기번호.나라짐작((document.documentElement.lang || 'ko')); } catch (e) {}   /* 11-16 공용 짐작 한 곳(시간대 못 읽으면 한국어 화면만 KR) */
     try { var tz = Intl.DateTimeFormat().resolvedOptions().timeZone || '';
       var 표 = { 'Asia/Seoul': 'KR', 'Asia/Tokyo': 'JP', 'Asia/Shanghai': 'CN', 'Asia/Chongqing': 'CN', 'Asia/Urumqi': 'CN', 'Asia/Hong_Kong': 'HK', 'Europe/Madrid': 'ES', 'Atlantic/Canary': 'ES', 'Africa/Ceuta': 'ES',
         'America/Mexico_City': 'MX', 'America/Monterrey': 'MX', 'America/Merida': 'MX', 'America/Cancun': 'MX', 'America/Chihuahua': 'MX', 'America/Mazatlan': 'MX', 'America/Hermosillo': 'MX', 'America/Tijuana': 'MX',
@@ -5025,20 +5065,42 @@ try { 이용량.설치({ 앱: 'yakjido', 켜짐: false, 주소: 'https://uszalzc
     a = a.filter(function (k) { return k !== 'XX'; }); a.push('XX'); return a; }
   var 고르는중 = null;
   function 수준묻나(p) { return 나라말[p.country] !== p.lang; }
+  /* 11-11c 사용자25 #5 — 이 창이 화면을 막는 동안에도 응급 번호 한 줄(고른 나라 → 없으면 짐작) */
+  var 급함말 = { ko: '급하면 지금 {n}에 전화', en: 'In an emergency, call {n} now', es: 'Si es urgente, llame ahora al {n}', ja: '緊急なら今すぐ{n}に電話', zh: '紧急情况请立即拨打{n}',
+    vi: "Nếu khẩn cấp, hãy gọi {n} ngay",
+    tl: "Kung emergency, tumawag agad sa {n}",
+    th: "หากฉุกเฉิน โทร {n} ทันที"
+  };
+  var 곳뒤말 = { ko: { 답: '위 질문에 답하시면 눌러져요', 나중: '나중에 정할게요' }, en: { 답: 'Answer the question above to continue', 나중: 'Decide later' }, es: { 답: 'Responda a la pregunta de arriba para seguir', 나중: 'Decidir más tarde' }, ja: { 답: '上の質問に答えると押せます', 나중: 'あとで決める' }, zh: { 답: '回答上面的问题后即可继续', 나중: '以后再定' },
+    vi: {"답": "Trả lời câu hỏi bên trên để tiếp tục", "나중": "Để sau"},
+    tl: {"답": "Sagutin ang tanong sa itaas para magpatuloy", "나중": "Mamaya na lang"},
+    th: {"답": "ตอบคำถามด้านบนเพื่อดำเนินการต่อ", "나중": "ไว้ทีหลัง"}
+  };
+  function 곳나중() { var el = document.getElementById('mnPlace'); if (el) el.remove(); 고르는중 = null; try { sessionStorage.setItem('mn.place.later', '1'); } catch (e) {} }
+  function 곳급함(l) {
+    try { var c = (고르는중 && 고르는중.country && 고르는중.country !== 'XX') ? 고르는중.country : null, 표 = 공용표() || {}, N = c ? 표[c] : null, 번 = N && N.응급;
+      if (!번) { var r = 응급번호(); 번 = r.응급; }
+      if (!번) return '';
+      var d = String(번).replace(/\s/g, '');
+      return '<a class="mnp-sos" href="tel:' + esc(d) + '">' + esc((급함말[l] || 급함말.en).replace('{n}', 번)) + '</a>'; } catch (e) { return ''; }
+  }
   function 곳그림() {
     var p = 고르는중, l = p.lang, el = document.getElementById('mnPlace'); if (!el) return;
     var 나말 = 나라말[p.country], 질문 = 나말 ? 곳('수준', l).replace('{말}', 말이름들[나말][칸(l)]) : 곳('수준일반', l);
     if (p.country && !나라이름[p.country]) p.country = 'XX';   /* 11-04b 목록 밖 나라(BR·VN 등)는 그 밖(국제 안내)으로 · 11-04h 빈칸('')은 아직 안 고름 */
     var 목 = 나라목록(); if (p.country && 목.indexOf(p.country) < 0) 목.unshift(p.country);
     el.innerHTML = '<div class="mnp-box" role="dialog" aria-modal="true" aria-labelledby="mnpT" lang="' + l + '">' +
-      '<p class="mnp-eb" style="margin:0 0 4px;font-weight:700;color:var(--ms-accent,inherit)">Language · 언어</p><h2 id="mnpT">' + 곳('제목', l) + '</h2><p class="mnp-sub">' + 곳('설명', l) + '</p>' +
+      '<h2 id="mnpT">' + 곳('제목', l) + '</h2><p class="mnp-sub">' + 곳('설명', l) + '</p>' +
       '<label class="mnp-l" for="mnpLang">' + 곳('앱말', l) + '</label><select id="mnpLang" class="mnp-sel" onchange="설정판.말과나라고름(\'lang\',this.value)">' +
         말순.map(function (k) { return '<option value="' + k + '"' + (k === l ? ' selected' : '') + '>' + 말이름[k] + '</option>'; }).join('') + '</select>' +
       '<label class="mnp-l" for="mnpCountry">' + 곳('나라', l) + '</label><select id="mnpCountry" class="mnp-sel" onchange="설정판.말과나라고름(\'country\',this.value)">' + (p.country ? '' : '<option value="" selected disabled>' + 곳('나라고름', l) + '</option>') +
         목.map(function (k) { return '<option value="' + k + '"' + (k === p.country ? ' selected' : '') + '>' + 나라이름[k][칸(l)] + '</option>'; }).join('') + '</select>' +
       (p.country && 수준묻나(p) ? '<div class="ms-seg mnp-lv" role="group" aria-label="' + esc(질문) + '"><span class="ms-sl">' + 질문 + '</span><div class="ms-sb">' +
         곳('수준들', l).map(function (x, i) { var v = ['ok', 'some', 'none'][i], on = p.level === v; return '<button type="button" class="' + (on ? 'on' : '') + '" aria-pressed="' + on + '" onclick="설정판.말과나라고름(\'level\',\'' + v + '\')">' + x + '</button>'; }).join('') + '</div></div>' : '') +
-      '<button type="button" class="mnp-ok" onclick="설정판.말과나라맞아요()"' + (!p.country || (수준묻나(p) && !p.level) ? ' disabled aria-disabled="true"' : '') + '>' + 곳('맞아요', l) + '</button></div>';
+      '<button type="button" class="mnp-ok" onclick="설정판.말과나라맞아요()"' + (!p.country || (수준묻나(p) && !p.level) ? ' disabled aria-disabled="true"' : '') + '>' + 곳('맞아요', l) + '</button>'
+      + (!p.country ? '<p class="mnp-why" role="status">' + 곳('나라고름', l) + '</p>' : (수준묻나(p) && !p.level) ? '<p class="mnp-why" role="status">' + (곳뒤말[l] || 곳뒤말.en).답 + '</p>' : '')   /* 11-12 약지도 사용자25 — 회색 단추 이유 */
+      + 곳급함(l)
+      + '<button type="button" class="mnp-later" onclick="설정판.말과나라나중에()">' + (곳뒤말[l] || 곳뒤말.en).나중 + '</button></div>';   /* 11-12 — 닫는 길(첫 실행 6명이 막힘) */
   }
   function 곳열기() {
     스타일(); 표합치기(); var 지금 = 곳읽기(), d = 곳기본();
@@ -5062,7 +5124,7 @@ try { 이용량.설치({ 앱: 'yakjido', 켜짐: false, 주소: 'https://uszalzc
      번호: 공용 위기번호 표(window.메디나눔위기번호 — 표가 앞에 심겨 있어야 한다). 표 밖·번호 null 이면 번호 없음 → 누르는 단추 없이 「현지 응급 번호」 글.
      설정판.응급번호() → { 나라, 이름, 응급, 경찰, 위기1, 위기2, 고름 }   (번호는 '119' 같은 글 또는 null · 고름: 사용자가 고른 나라인지)
      설정판.번호HTML('응급'|'경찰'|'위기1'|'위기2', 꾸밈) → 번호가 있으면 <a href="tel:…">번호</a>, 없으면 그 말의 「현지 응급 번호」 글(링크 없음) */
-  var 현지 = { ko: '현지 응급 번호', en: 'the local emergency number', es: 'el número de emergencias local', ja: '現地の救急番号', zh: '当地急救电话' };
+  var 현지 = { ko: '현지 응급 번호(한국에서는 1\u206019)',   /* 11-16 Main — 작게 「한국에서는 119」 · 1 과 19 사이 낱말 잇기표(U+2060)는 119 글자 바꿈이 다시 걸리지 않게 */ en: 'the local emergency number', es: 'el número de emergencias local', ja: '現地の救急番号', zh: '当地急救电话', vi: "số khẩn cấp tại nơi bạn ở", tl: "ang lokal na emergency number", th: "หมายเลขฉุกเฉินในพื้นที่" };
   function 응급번호() {
     var 곳 = 곳읽기(), c = 곳 && 곳.country, 고름 = !!c;
     if (!c) c = navigator.webdriver ? 'KR' : 나라짐작();
@@ -5085,7 +5147,7 @@ try { 이용량.설치({ 앱: 'yakjido', 켜짐: false, 주소: 'https://uszalzc
   var 스타일됨 = false;
   function 스타일() {
     if (스타일됨 || !document.head) return; 스타일됨 = true;
-    var A = 'var(--ms-accent,var(--accent,currentColor))', L = 'var(--ms-line,var(--line,rgba(127,127,127,.28)))', D = 'var(--ms-dim,var(--ink2,inherit))', C = 'var(--ms-card,var(--card,transparent))';
+    var A = 'var(--ms-accent,var(--accent,var(--teal,#23685A)))', L = 'var(--ms-line,var(--line,rgba(127,127,127,.28)))', D = 'var(--ms-dim,var(--ink2,inherit))', C = 'var(--ms-card,var(--card,transparent))';
     var st = document.createElement('style'); st.id = 'ms-style';
     st.textContent = '.ms{word-break:keep-all;overflow-wrap:anywhere}.ms-group{margin-top:18px}.ms-h,#msSettings h2.ms-h{font-size:.84em;font-weight:800;letter-spacing:.02em;line-height:1.4;font-family:inherit;text-transform:none;color:' + D + ';margin:0 4px 8px;padding:0;border:0;background:none}' +
       '.ms-segs{display:flex;flex-direction:column;gap:12px;margin-top:10px;padding:14px;border-radius:16px;background:' + C + ';border:1px solid ' + L + '}' +
@@ -5093,11 +5155,15 @@ try { 이용량.설치({ 앱: 'yakjido', 켜짐: false, 주소: 'https://uszalzc
       '.ms-sb button{flex:1 1 90px;min-height:48px;padding:6px 10px;border-radius:12px;border:1px solid ' + L + ';background:transparent;color:inherit;font:inherit;font-weight:600;cursor:pointer;line-height:1.25}' +
       '.ms-sb button.on{border:2px solid ' + A + ';color:' + A + ';font-weight:800}.ms-sb button[disabled]{opacity:.6;cursor:default}.ms-soon{display:inline-block;font-size:.78em;font-weight:700}' +
       '.ms-row{display:flex;gap:10px;align-items:center;width:100%;min-height:56px;padding:12px;border:0;border-bottom:1px solid ' + L + ';background:transparent;color:inherit;font:inherit;text-align:left;cursor:pointer}' +
+      '.ms-biz{margin:10px 0 0;font-size:15px;border:1px solid ' + L + ';border-radius:14px;background:' + C + ';overflow:hidden}.ms-biz>summary{min-height:48px;display:flex;align-items:center;cursor:pointer;font-weight:700;color:' + D + ';padding:0 14px !important}.ms-bz{display:flex;flex-direction:column;gap:2px;padding:8px 14px !important;border-top:1px solid ' + L + '}' +
+      '.ms-mail{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.ms-mail a{color:inherit !important;text-decoration:none !important;font-weight:600;display:inline-flex;align-items:center;min-height:44px}.ms-copy{min-height:44px;padding:0 12px;border-radius:10px;border:1px solid ' + L + ';background:transparent;color:' + A + ';font:inherit;font-size:.86em;font-weight:700;cursor:pointer}' +
+      '.mnp-box,.mnp-box h2,.mnp-sub,.mnp-l{text-align:left !important}.ms-bz span{font-size:.88em;color:' + D + '}.ms-bz b{font-weight:600;word-break:keep-all;overflow-wrap:anywhere}' +
       '.ms-rt{flex:1;min-width:0;display:flex;flex-direction:column}.ms-rt>span{font-size:.88em;color:' + D + '}.ms-rv{flex:none;font-size:.86em;color:' + A + ';font-weight:700}.ms-foot{margin-top:16px}' +
-      '.mnp{position:fixed;inset:0;z-index:2147483000;background:var(--bg,#fff);color:var(--ink,inherit);overflow:auto;display:flex;justify-content:center;padding:max(24px,env(safe-area-inset-top)) 16px 32px;word-break:keep-all;overflow-wrap:anywhere}' +
-      '.mnp-box{width:100%;max-width:480px;margin:auto 0}.mnp-box h2{margin:0 0 8px;font-size:1.35em;line-height:1.3}.mnp-sub{margin:0 0 18px;color:' + D + ';line-height:1.55}' +
+      '.mnp{position:fixed;inset:0;z-index:2147483000;background:var(--ms-bg,var(--bg,var(--surface,#fff)));color:var(--ms-ink,var(--ink,inherit));overflow:auto;overscroll-behavior:contain;display:flex;align-items:flex-start;justify-content:center;padding:max(24px,env(safe-area-inset-top)) 16px 32px;word-break:keep-all;overflow-wrap:anywhere}' +
+      '.mnp-box{width:100%;max-width:480px;margin:clamp(16px,6vh,56px) 0 auto}.mnp-box h2{margin:0 0 8px;font-size:1.35em;line-height:1.3}.mnp-sub{margin:0 0 18px;color:' + D + ';line-height:1.55}' +
       '.mnp-l{display:block;font-weight:700;margin:14px 0 6px}.mnp-sel{width:100%;min-height:52px;padding:10px 12px;border-radius:12px;border:1px solid ' + L + ';background:' + C + ';color:inherit;font:inherit;font-size:16px;max-width:100%}' +
-      '.mnp-lv{margin-top:16px}.mnp-ok{display:block;width:100%;min-height:56px;margin-top:22px;border:0;border-radius:14px;background:' + A + ';color:var(--ms-on-accent,#fff);font:inherit;font-size:1.05em;font-weight:800;cursor:pointer}.mnp-ok[disabled]{opacity:.45;cursor:default}';
+      '.mnp-sel:focus,.mnp-sel:focus-visible{outline:none !important;box-shadow:none !important;border:2px solid ' + A + ' !important}' +   /* 11-10 — 포커스 링 한 겹 */
+      '.mnp-lv{margin-top:16px}.mnp-ok{display:flex !important;align-items:center;justify-content:center;text-align:center !important;width:100%;min-height:56px;margin-top:22px;padding:0 16px;border:0;border-radius:14px;background:' + A + ';color:var(--ms-on-accent,var(--on-accent,#fff));font:inherit;font-size:1.05em;font-weight:800;cursor:pointer}.mnp-ok[disabled]{opacity:.45;cursor:default}.mnp-why{margin:8px 0 0;font-size:.92em;color:var(--ms-dim,var(--ink2,inherit));text-align:center !important}.mnp-later{display:block;margin:10px auto 0;min-height:44px;padding:0 14px;border:0;background:none;color:var(--ms-dim,var(--ink2,inherit));font:inherit;font-weight:700;text-decoration:underline;text-underline-offset:3px;cursor:pointer}.mnp-sos{display:flex;align-items:center;justify-content:center;min-height:52px;margin-top:12px;border:2px solid var(--alarm,#B4442B);border-radius:14px;color:var(--alarm,#B4442B);font-weight:800;text-decoration:none}';
     document.head.appendChild(st);
   }
   window.설정판 = {
@@ -5108,8 +5174,13 @@ try { 이용량.설치({ 앱: 'yakjido', 켜짐: false, 주소: 'https://uszalzc
     글: 글,
     말과나라: function () { return 곳읽기(); },
     말과나라열기: 곳열기, 말과나라맞아요: 곳맞아요,
+    통계말: function (l) { return 통계글(l); },
+    메일복사: function (bt) { var m = 사업자말[말()] || 사업자말.ko, 쓰 = 사업자표.메일, 됨 = function () { try { bt.textContent = m[11]; setTimeout(function () { bt.textContent = m[10]; }, 1800); } catch (e) {} };
+      try { if (navigator.clipboard && navigator.clipboard.writeText) { navigator.clipboard.writeText(쓰).then(됨, 됨); return; } } catch (e) {}
+      try { var t = document.createElement('textarea'); t.value = 쓰; document.body.appendChild(t); t.select(); document.execCommand('copy'); t.remove(); 됨(); } catch (e) {} },
     말과나라고름: function (k, v) { if (!고르는중) return; 고르는중[k] = v; if (k !== 'level') { if (!수준묻나(고르는중)) 고르는중.level = 'ok'; else if (고르는중.level === 'ok') 고르는중.level = ''; } 곳그림(); },
-    말과나라확인: function () { if (곳읽기() || navigator.webdriver || document.getElementById('mnPlace')) return false; 곳열기(); return true; },
+    말과나라확인: function () { var 뒤 = false; try { 뒤 = sessionStorage.getItem('mn.place.later') === '1'; } catch (e) {} if (곳읽기() || 뒤 || navigator.webdriver || document.getElementById('mnPlace')) return false; 곳열기(); return true; },
+    말과나라나중에: 곳나중,
     나라이름: function (k, l) { 표합치기(); var n = 나라이름[k]; return n ? n[칸(l || 말())] : ''; },
     말이름: function (k, l) { var n = 말이름들[k]; return n ? n[칸(l || 말())] : ''; },
     응급번호: 응급번호, 번호HTML: 번호HTML, 나라짐작: 나라짐작
