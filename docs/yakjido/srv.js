@@ -1697,7 +1697,7 @@
 })();
 /* ▲▲ 잉크 얼굴 부품 끝 ▲▲ */
 /* 11-17 잉크 판일 때만 — 얼굴·번진 면. 색 토큰은 약지도 ink.css 가 맡는다(공용 토큰의 흐린 글 #8A8A8A 는 흰 바탕 4.5:1 미달이라 html[data-ink] 를 쓰지 않는다) */
-try { if (document.documentElement.classList.contains('ink')) 잉크.설치({ 색: document.documentElement.classList.contains('fam') ? '#1F86A8' : '#0B6E8F' })   /* 11-17 한가족 — 알약 얼굴은 로고와 같은 물색 */; } catch (e) {}
+try { 잉크.설치({ 색: document.documentElement.classList.contains('fam') ? '#1F86A8' : '#0B6E8F' })   /* 11-17 밤 — 얼굴은 원래 판에서도(동반자·답·빈 화면), 약지도 원래 색 */   /* 11-17 한가족 — 알약 얼굴은 로고와 같은 물색 */; } catch (e) {}
 
 /* 11-13 메디나눔 홈 2단계 — 수첩의 혈압·혈당(P8)을 사용자가 누를 때만 「내 홈」으로 넘긴다. 스위치 꺼짐(법무 판단 전 비공개).
    원래 기록은 이 앱이 정본 — 꾸러미는 사본 보기용. 모양은 부품이 다시 검사한다 */
@@ -3503,6 +3503,7 @@ window.언어칸 = function () {
       더: [(s.pharmacy || []).length ? '<p class="small muted">약국에서</p><ul class="plain">' + s.pharmacy.slice(0, 3).map(function (x) { return '<li>' + 짧게(x) + '</li>'; }).join('') + '</ul>' : '',
            (s.selfcare || []).length ? '<p class="small muted">집에서</p><ul class="plain">' + s.selfcare.slice(0, 3).map(function (x) { return '<li>' + 짧게(x) + '</li>'; }).join('') + '</ul>' : ''].join('') };
   }
+  var DI = function (v) { return document.documentElement.classList.contains('ink') ? 'data-ink="' + v + '"' : ''; };   /* 11-17 밤 — 원래 판에서는 잉크 번짐 면을 그리지 않는다(얼굴만) */
   function 상황답(t, 값) {
     var 달 = 값 && 값.나이개월 != null ? 값.나이개월 : (function () { var m = String(t).match(/(?:생후\s*)?(\d{1,2})\s*개월/); return m ? +m[1] : null; })();
     var sid = null, s = null; try { sid = 증상찾기(t); s = sid && (D.symptoms || []).filter(function (x) { return x.id === sid; })[0]; } catch (e) {}
@@ -3557,7 +3558,7 @@ window.언어칸 = function () {
     if (r.위험) return '<article class="ask-ans sos" role="alert"><p class="ask-c">' + esc(r.위험.말) + '</p>' + (r.위험.전화 && /^[\d+][\d\s-]*$/.test(String(r.위험.전화)) ? '<a class="btn ask-call" href="tel:' + esc(String(r.위험.전화).replace(/[^\d+]/g, '')) + '">' + I.alert + ' ' + esc(r.위험.전화) + ' 전화</a>' : '') + '</article>';
     if (!r.결) return '<article class="ask-ans"><p class="ask-c">아직 이 질문은 찾지 못했어요. 이렇게 물어보시면 찾을 수 있어요.</p><div class="ask-chips">' + 예시.slice(0, 4).map(칩).join('') + '</div></article>';
     /* 11-17 주요 단추 하나 + 나머지는 글 링크 */
-    var 단 = (r.단 || []).map(function (b, i) { var k = 'a' + 묻기.log.length + '_' + i + '_' + Date.now() % 100000; 묻기.할일[k] = b.할; return i === 0 ? '<button type="button" class="btn" data-ink="solid" onclick="묻기단추(\'' + k + '\')">' + esc(b.글) + I.chev + '</button>' : '<button type="button" class="ask-link" onclick="묻기단추(\'' + k + '\')">' + esc(b.글) + ' ›</button>'; }).join('');
+    var 단 = (r.단 || []).map(function (b, i) { var k = 'a' + 묻기.log.length + '_' + i + '_' + Date.now() % 100000; 묻기.할일[k] = b.할; return i === 0 ? '<button type="button" class="btn" ' + DI('solid') + ' onclick="묻기단추(\'' + k + '\')">' + esc(b.글) + I.chev + '</button>' : '<button type="button" class="ask-link" onclick="묻기단추(\'' + k + '\')">' + esc(b.글) + ' ›</button>'; }).join('');
     return '<article class="ask-ans' + (r.위 ? ' warn' : '') + '"><p class="ask-c">' + 짧게(r.결) + '</p>' + ((r.할 || []).length ? '<ol class="ask-do">' + r.할.map(function (x) { return '<li>' + 짧게(x) + '</li>'; }).join('') + '</ol>' : '') +
       (단 ? '<div class="ask-act">' + 단 + '</div>' : '') + ((r.칩 || []).length ? '<div class="ask-chips">' + r.칩.map(칩).join('') + '</div>' : '') +
       (r.더 ? '<details class="ask-more"><summary>자세히' + I.chev + '</summary>' + r.더 + '</details>' : '') + '</article>';
@@ -3637,8 +3638,8 @@ window.언어칸 = function () {
      새 임상 문장 없음 — 판정은 ixRun/ixCards(약 화면·같이 먹어도 되나요와 같은 엔진) */
   function 내약칸() {
     var items = []; try { items = takingItems(); } catch (e) {}
-    if (!items.length) return '<section class="job-hero">' + 잉크얼굴(72) + '<h1>내 약을 담아 두세요</h1><p>한 번 담으면 기억해요. 새 약이 들어오면 <b>같이 먹으면 안 되는 것</b>을 바로 알려 드려요.</p>' +
-      '<div class="job-add"><button type="button" class="btn" data-ink="solid" onclick="go(\'/photo\')">약봉투·처방전 사진으로</button><button type="button" class="btn line" onclick="go(\'/together\')">약 이름으로 찾기</button></div>' +
+    if (!items.length) return '<section class="job-hero' + (document.documentElement.classList.contains('ink') ? '' : ' card') + '">' + 잉크얼굴(72) + '<h1>내 약을 담아 두세요</h1><p>한 번 담으면 기억해요. 새 약이 들어오면 <b>같이 먹으면 안 되는 것</b>을 바로 알려 드려요.</p>' +
+      '<div class="job-add"><button type="button" class="btn" ' + DI('solid') + ' onclick="go(\'/photo\')">약봉투·처방전 사진으로</button><button type="button" class="btn line" onclick="go(\'/together\')">약 이름으로 찾기</button></div>' +
       '<p class="job-small"><a href="#/kinds">이름을 몰라도 종류만 골라 담기 ›</a></p></section>';
     var 판 = '', n = items.length, stop = 0, warn = 0;
     try { var C = ixCards(ixRun([])); stop = C.filter(function (c) { return c.lv === 'stop'; }).length; warn = C.filter(function (c) { return c.lv === 'warn'; }).length; } catch (e) {}
@@ -3651,15 +3652,27 @@ window.언어칸 = function () {
       var tk = takenSet(), rows = []; items.forEach(function (d) { schedOf(d.id, d).forEach(function (t) { rows.push(d.id + '@' + t); }); });
       var 다 = rows.length && rows.every(function (k) { return tk.indexOf(k) >= 0 || isSkipped(k); });
       var w = adherence(7), 주 = w && w.days >= 2 ? (w.full === w.days ? '지난 한 주, 드시기로 한 ' + w.days + '일을 빠짐없이 챙기셨어요.' : '지난 한 주, ' + w.days + '일 중 ' + w.full + '일 챙기셨어요.') : '';   /* 11-17 Main — 「빠짐없이」는 전부일 때만 */
+      if (!document.documentElement.classList.contains('ink')) 주 = '';   /* 원래 판은 오늘 약 칸에 연속·이번 주가 이미 있다 */
       if (다) 마음 = '<div class="job-heart"><p><b>오늘도 잘 챙기셨어요.</b>' + (주 ? ' ' + 주 : '') + '</p><button type="button" class="link" onclick="shareOut({title:\'약지도\',text:\'오늘 약을 다 챙겨 먹었어요. — 약지도\'})">가족에게 알리기 ›</button></div>';
       else if (n >= 5) 마음 = '<div class="job-heart"><p>약이 많으면 누구나 헷갈려요.</p><a href="#/bag">한 장으로 정리해 드릴게요 ›</a></div>';
       else if (주) 마음 = '<div class="job-heart"><p>' + 주 + '</p></div>';
     } catch (e) {}
     /* 11-17 Main — 간단히 보기: 큰 글씨 · 내 약을 쉬운 갈래 이름과 함께(사진 없는 줄 목록) · 단추 둘씩 크게. 겹침 판정·마음 한 줄은 같다 */
     var sv = typeof svOn === 'function' && svOn(), 목록 = sv ? '<ul class="job-list">' + items.slice(0, 6).map(function (d) { var dk = d.class || ((typeof drug === 'function' && drug(d.id)) || {}).class, c0 = (D.classes || []).filter(function (c) { return c.id === dk; })[0], g = d.quick ? d.quick.g.n : c0 ? String(c0.name).split('(')[0].trim() : ''; return '<li><b>' + esc(짧은이름(d.name)) + '</b>' + (g ? '<span>' + esc(g) + '</span>' : '') + '</li>'; }).join('') + (items.length > 6 ? '<li><a href="#/me?t=meds">' + (items.length - 6) + '가지 더 ›</a></li>' : '') + '</ul>' : '';
-    return '<section class="job-box' + (sv ? ' sv' : '') + '"><div class="job-h"><h1>내 약 ' + n + '가지</h1><button type="button" class="btn" data-ink="solid" onclick="go(\'/together\')">+ 약 더하기</button></div>' + 판 + 목록 + (마음.indexOf('오늘도 잘 챙기셨어요') >= 0 ? '' : 다음약()) + 마음 +
+    return '<section class="job-box' + (sv ? ' sv' : '') + (document.documentElement.classList.contains('ink') ? '' : ' card') + '"><div class="job-h"><h1>내 약 ' + n + '가지</h1><button type="button" class="btn" ' + DI('solid') + ' onclick="go(\'/together\')">+ 약 더하기</button></div>' + 판 + 목록 + (마음.indexOf('오늘도 잘 챙기셨어요') >= 0 || !document.documentElement.classList.contains('ink') ? '' : 다음약()) + 마음 +
       '<div class="job-row"><a href="#/notify">알림</a><a href="#/send">가족에게</a><a href="#/bag">내 약 한 장</a><a href="#/me?t=meds">약통</a></div></section>';
   }
+  /* 11-17 밤 — 원래 판의 「내 약」 칸 모양(잉크 판은 ink.css) */
+  try { var jst = document.createElement('style'); jst.id = 'job-css'; jst.textContent = 'html:not(.ink) .job-hero,html:not(.ink) .job-box{margin:12px 0 4px;padding:18px 16px}html:not(.ink) .job-hero{text-align:center}html:not(.ink) .job-hero .ink-face{display:block;margin:0 auto 10px}html:not(.ink) .job-hero h1{font-size:1.375rem}html:not(.ink) .job-hero p{margin-top:6px;color:var(--muted)}'
+    + 'html:not(.ink) .job-add{display:flex;flex-direction:column;gap:10px;margin-top:16px}html:not(.ink) .job-add .btn{min-height:52px;width:100%}html:not(.ink) .job-small a{display:inline-flex;align-items:center;min-height:44px;color:var(--primary);text-decoration:none}'
+    + 'html:not(.ink) .job-h{display:flex;align-items:center;justify-content:space-between;gap:12px}html:not(.ink) .job-h h1{font-size:1.375rem;margin:0;white-space:nowrap}html:not(.ink) .job-h .btn{min-height:44px;width:auto;flex:0 0 auto;padding:0 16px}'
+    + 'html:not(.ink) .job-verdict{display:flex;align-items:center;min-height:48px;margin:12px 0 4px;padding:0 14px;border-radius:12px;text-decoration:none;color:var(--text);border:1.5px solid var(--ui-line)}html:not(.ink) .job-verdict.stop{border:2px solid var(--alert,#D93A2B);color:var(--alert,#B42318);font-weight:700}html:not(.ink) .job-verdict.warn{border:2px solid #B54708;color:#93370D;font-weight:700}'
+    + 'html:not(.ink) .job-heart{margin:10px 0 2px;padding:12px 14px;border-radius:12px;background:var(--normal-tint,#F2F8FA)}html:not(.ink) .job-heart p{margin:0;line-height:1.6}html:not(.ink) .job-heart a,html:not(.ink) .job-heart .link{display:inline-flex;align-items:center;min-height:44px;color:var(--primary);text-decoration:none;font-weight:600;background:none;border:0;padding:0;cursor:pointer}'
+    + 'html:not(.ink) .job-row{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-top:12px}html:not(.ink) .job-row a{display:flex;align-items:center;justify-content:center;min-height:48px;border-radius:999px;border:1.5px solid var(--ui-line);color:var(--text);text-decoration:none;font-weight:600;font-size:.9375rem;text-align:center}'
+    + 'html:not(.ink) .job-box.sv .job-h h1{font-size:1.75rem}html:not(.ink) .job-box.sv .job-verdict,html:not(.ink) .job-box.sv .job-heart p{font-size:1.1875rem}html:not(.ink) .job-box.sv .job-row{grid-template-columns:repeat(2,1fr);gap:10px}html:not(.ink) .job-box.sv .job-row a{min-height:56px;font-size:1.125rem}'
+    + 'html:not(.ink) .job-list{list-style:none;margin:12px 0 4px;padding:0}html:not(.ink) .job-list li{display:flex;align-items:baseline;justify-content:space-between;gap:12px;min-height:48px;padding:10px 2px;border-bottom:1px solid var(--hairline);font-size:1.1875rem}html:not(.ink) .job-list li span{color:var(--muted);font-size:1rem;text-align:right}html:not(.ink) .job-list li a{color:var(--primary);text-decoration:none}';
+    document.head.appendChild(jst); } catch (e) {}
+  window.내약칸 = 내약칸;   /* 11-17 밤 — 원래 판 홈 맨 위(기본) */
   window.잉크홈 = function () {
     var S = D.symptoms || [];
     /* 11-17 맨 위 한 줄 — 나라별 번호(공용 위기번호 표 · i18n.js 의 emg). 번호를 모르는 나라는 글만(전화 단추 없음) */
