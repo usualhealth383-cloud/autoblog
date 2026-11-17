@@ -34,6 +34,15 @@ LAUNCH = {'executable_path': CHROME} if CHROME else {}
 
 # 시험 브라우저는 한국어로 연다(10-27 — 안 정하면 en-US 라 영어 화면이 된다). 시간대는 그대로(UTC — 알림 시험이 이 시계에 맞춰져 있다, UTC 는 나라 판단에서 건너뛰어 ko-KR → KR). en-US+서울 → 119 는 i18n.py 가 따로 본다
 from playwright.sync_api import Browser as _B
+# 11-17 잉크 판이 기본 — 이 시험은 옛 판의 기능·흐름을 본다(잉크 판은 design.py·ink_safety.py)
+from playwright.sync_api import BrowserContext as _BC0
+_ink0_nc, _ink0_np = _B.new_context, _B.new_page
+def _ink0(x):
+    try: x.add_init_script("try{localStorage.setItem('yakjido.ink','0')}catch(e){}")
+    except Exception: pass
+    return x
+_B.new_context = lambda self, *a, **k: _ink0(_ink0_nc(self, *a, **k))
+_B.new_page = lambda self, *a, **k: _ink0(_ink0_np(self, *a, **k))
 _np, _nc = _B.new_page, _B.new_context
 _B.new_page = lambda self, **k: _np(self, **{'locale': 'ko-KR', **k})
 _B.new_context = lambda self, **k: _nc(self, **{'locale': 'ko-KR', **k})
@@ -701,10 +710,10 @@ def simple_checks(br, url, fails):
         if not r['cart']: fails.append(f'간단히 {sid}: 「약국에서 이 화면 보여 주기」 단추가 없습니다')
         if '클로르족사존' in ' '.join(pz.eval_on_selector_all('.answer .buy-item.sv b', 'e=>e.map(x=>x.innerText)')): fails.append(f'간단히 {sid}: 큰 글씨에 성분 이름(클로르족사존)이 나옵니다')
     # (b) 응급 신호 → 살 약 줄·약국 단추가 숨는다(자세히와 같은 규칙) · 진료 신호 → 「진료가 먼저예요」
-    # 11-09 디자인 검수 뒤 간단히 보기는 체크 목록 대신 「이 중 하나면 약 말고 119」 카드(sv-er) — 같은 자료(care.er)·119 단추가 있는지 본다(11-12 고침)
+    # (나라를 모르면 전화 칸 대신 「그 나라 응급 번호」) 11-09 디자인 검수 뒤 간단히 보기는 체크 목록 대신 「이 중 하나면 약 말고 119」 카드(sv-er) — 같은 자료(care.er)·119 단추가 있는지 본다(11-12 고침)
     go('/symptom/msk')
     er = pz.evaluate("()=>{ const c=document.querySelector('.sv-er'); return c ? {tel: !!c.querySelector('a[href^=\"tel:\"]'), ers: (byId(D.symptoms,'msk').care.er||[]).map(t=>t.replace(/\\*\\*/g,'').slice(0,6)), txt: c.innerText} : null; }")
-    if not er or not er['tel'] or not any(t in er['txt'] for t in er['ers']): fails.append('간단히: 「이 중 하나면 약 말고 119」 카드가 없거나 119 단추·응급 신호가 자세히와 다릅니다')
+    if not er or not (er['tel'] or '응급 번호' in er['txt']) or not any(t in er['txt'] for t in er['ers']): fails.append(f'간단히: 「이 중 하나면 약 말고 119」 카드가 없거나 119 단추·응급 신호가 자세히와 다릅니다 — {str(er)[:300]} view=' + pz.evaluate('()=>viewMode()'))
     pz.evaluate("()=>{ RF.sid=''; }"); go('/home')
     # (c) 임신 — 소염제가 빠지고 자세히와 같은 약
     pz.evaluate("()=>{ ME.pregnant=true; saveMe(); }")
@@ -785,7 +794,7 @@ def r2_checks(br, url, fails):
     if ER not in txt('.phead'): fails.append('#1 간단히 서방정 화면 머리에 고른 제품 이름이 없습니다')
     pz.click('.sv-more'); pz.wait_for_timeout(300)
     if 'p=' not in pz.evaluate('location.hash'): fails.append('#1 「자세히 보기」로 가면 고른 제품(p)이 빠집니다')
-    t = txt('.dose-hero')
+    t = txt('.dose-hero').replace('\xa0', ' ')
     if '3,900 mg' not in t or '8시간' not in t or '4,000 mg' in t: fails.append(f'#1 자세히 서방정 화면의 하루 최대·간격이 서방정 것이 아닙니다: {t[:100]!r}')
     me("ME.view='simple'"); go('/drug/acetaminophen')
     if '8정' not in txt('.dose-hero'): fails.append('#1 제품을 고르지 않은 아세트아미노펜 화면의 일반정 용법이 사라졌습니다')
@@ -924,8 +933,10 @@ def r5_checks(br, url, fails):
         if '이렇게 드세요' not in t or '이럴 땐 바로' not in t or '깜빡했을 때' not in t: fails.append(f'처방약 길잡이 /rx/{g} 화면이 비었거나 칸이 빠졌습니다')
         _RG = json.load(open(pathlib.Path(__file__).resolve().parent.parent / 'rxguide.json', encoding='utf-8')); _rv = _RG['guides'][g].get('reviewed', _RG.get('reviewed'))
         # 10-26 현욱님 답 9 — 검수가 끝나면(reviewed) 「의사 확인 중」이 없어야, 그 전엔 있어야 한다
-        if _rv and '의사 확인 중' in pz.evaluate("()=>document.querySelector('.top')?.innerText||''"): fails.append(f'처방약 길잡이 /rx/{g} 에 검수 끝났는데 「의사 확인 중」이 남았습니다')
-        if not _rv and '의사 확인 중' not in t: fails.append(f'처방약 길잡이 /rx/{g} 에 검수 전 표시가 없습니다')
+        # 11-13 도장 글은 「자료 확인 중」(예전 「의사 확인 중」) — 둘 다 검수 전 표시로 본다
+        _top = pz.evaluate("()=>document.querySelector('.top')?.innerText||''"); _unv = lambda x: '의사 확인 중' in x or '자료 확인 중' in x
+        if _rv and _unv(_top): fails.append(f'처방약 길잡이 /rx/{g} 에 검수 끝났는데 검수 전 도장이 남았습니다')
+        if not _rv and not _unv(_top): fails.append(f'처방약 길잡이 /rx/{g} 에 검수 전 표시가 없습니다')
     go('/rx/bp')
     if '내 약' not in txt(): fails.append('처방약 길잡이: 내 약통의 …프릴 약에 「내 약」 표시가 없습니다')
     go('/kinds/bp')
@@ -1082,7 +1093,7 @@ def main():
         pg.route('**/air-quality-api.open-meteo.com/**', lambda rt: rt.fulfill(status=200, content_type='application/json', body=AQ))
         def ready(ms=8000):
             # 본문 자료(data/core.json)는 첫 화면이 뜬 뒤에 받는다 — 다 받을 때까지 기다린다
-            try: pg.wait_for_function('window.__READY__===true && (typeof DETAIL==="undefined" || DETAIL===2)', timeout=ms)   # 약 화면 칸(detail.json)까지
+            try: pg.wait_for_function('window.__READY__===true && (typeof DETAIL==="undefined" || DETAIL===2) && (typeof SRC==="undefined" || SRC===2)', timeout=ms)   # 약 화면 칸(detail.json)까지
             except Exception: fails.append('본문 자료(core.json)를 못 받았습니다 — ' + pg.url)
         pg.goto(url); ready(); pg.wait_for_timeout(1200)
         pg.evaluate("localStorage.setItem('yakjido.hello.v1','1');localStorage.setItem('yakjido.consent.v1',JSON.stringify({v:'2026-10-20',at:'2026-10-14',terms:1,privacy:1}));localStorage.setItem('yakjido.me.v1',JSON.stringify({age:'senior',view:'detail',taking:['cls:bp.arb'],pub:{}}))")
@@ -1347,7 +1358,7 @@ def main():
         _s = pg.evaluate("""()=>{
           /* 앞 검사가 켜 둔 몸 상태가 남아 있으면 「약사와 상의」 배지가 먼저 붙는다 — 비우고 본다 */
           ['heart','hf','diabetes','ulcer','kidney','liver','lvs','anticoag','glaucoma','bph','asthma','alcohol','gout','pregnant','nursing'].forEach(f=>{ME[f]=false;});
-          const has = a => { ME.age=a; ME.taking=[]; ME.pub={}; route();
+          const has = a => { Object.keys(FLAG_LABEL).forEach(f=>{ if (f!=='senior'&&f!=='child') ME[f]=false; }); ME.age=a; ME.taking=[]; ME.pub={}; route();
             return [...document.querySelectorAll('.buy-item')]
               .some(e=>/이부프로펜|나프록센|덱시부프로펜/.test(e.innerText) && (/어르신 주의/.test(e.innerText) || !!e.closest('.consult-grp'))); };   /* 11-09 결정 — 어르신 소염제는 「먼저 상의」 묶음(배지보다 강함) */
           const senior = has('senior'), adult = has('adult');
@@ -1359,7 +1370,7 @@ def main():
         #        같은 증상에 아세트아미노펜 칸이 있으면 그 칸이 1번. 증상 화면과 약국 카드(#/show)가 같은 순서.
         _q5 = pg.evaluate("""()=>{
           const keep = JSON.stringify(ME), bad = [], NS = /이부프로펜|나프록센|덱시부프로펜/;
-          ['diabetes','ulcer','kidney','liver','glaucoma','bph','asthma','alcohol','gout','pregnant','nursing'].forEach(f=>{ME[f]=false;});
+          Object.keys(FLAG_LABEL).forEach(f=>{ if (f!=='senior'&&f!=='child') ME[f]=false; });   /* 앞 단계가 켠 조건(위장출혈 등)까지 비운다 */
           ME.age='senior'; ME.heart=true; ME.anticoag=true; ME.taking=[]; ME.pub={}; ME.allergy=[]; ME.allergyUnknown=false;
           for (const sid of ['headache','msk','cold']) {
             location.hash = '#/symptom/' + sid; route();

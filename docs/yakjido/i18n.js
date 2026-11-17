@@ -5,42 +5,86 @@
    11-04b: XX 112 기본값 없앰 · 응급 번호 12나라(VN TH PH ID NP UZ KH MN LK BD IN GB) — 출처는 줄 옆.
    나라 고르는 순서: ① localStorage mn.place.country(사용자가 「말과 나라」에서 고른 값) ② 앱이 가진 값 ③ 시간대·기기 지역 짐작.
    ── 공용 부품 셋(위기번호 표 · 설정 부품 · 응급카드 부품) 공통 약속 · 주인: 길동무 세션 ──
-   판: 이 파일 안 «판» 한 곳(코드의 판 값). 고치면 판을 올리고 다섯 앱에 다시 심는다. 지금 판 2026-11-04d.
+   판: 이 파일 안 «판» 한 곳(코드의 판 값). 고치면 판을 올리고 다섯 앱에 다시 심는다. 지금 판 2026-11-05a.
    심는 순서(앱마다 같다): ① 위기번호 표 → ② 설정 부품 → ③ 응급카드 부품 — 표가 앞에 있어야 말과 나라 고르개·응급 번호가 표를 쓴다.
    심기·비교: python3 _도구/공용부품_심기.py 비교 · python3 _도구/공용부품_심기.py <소아|곁에|길동무|CS> · 다른 저장소(약지도): python3 _도구/공용부품_심기.py 파일 <경로>
    ⛔ 앱 사본을 직접 고치지 않는다 — 이 파일을 고치고 다시 심는다(심기 스크립트는 정본과 다른 사본을 보면 멈춘다).
 */
 (function () {
   if (window.메디나눔위기번호) return;
-  var 판 = '2026-11-04d';   /* 11-04d 라오스 LA 구급 1195 · TH 1669·VN 115·KH 119 gov.uk 다시 확인 · 11-04c 머리 주석 정리 */
+  var 판 = '2026-11-16a';   /* 11-05b 유럽연합 26나라(스페인 빼고) 112 · 11-04d 라오스 LA 구급 1195 · TH 1669·VN 115·KH 119 gov.uk 다시 확인 · 11-04c 머리 주석 정리 */
   var 표 = {
     KR: { 이름: { ko: '한국', en: 'Korea', es: 'Corea', ja: '韓国', zh: '韩国' }, 응급: '119', 경찰: '112', 위기: ['109', '1577-0199'] },
     US: { 이름: { ko: '미국', en: 'United States', es: 'Estados Unidos', ja: 'アメリカ', zh: '美国' }, 응급: '911', 경찰: '911', 위기: ['988'] },
     ES: { 이름: { ko: '스페인', en: 'Spain', es: 'España', ja: 'スペイン', zh: '西班牙' }, 응급: '112', 경찰: '112', 위기: ['024'] },
     JP: { 이름: { ko: '일본', en: 'Japan', es: 'Japón', ja: '日本', zh: '日本' }, 응급: '119', 경찰: '110', 위기: ['0570-783-556', '0570-064-556'] }   /* 109(자살예방) 자리 → いのちの電話, 1577-0199(정신건강) 자리 → こころの健康相談統一ダイヤル */,
     CN: { 이름: { ko: '중국', en: 'China', es: 'China', ja: '中国', zh: '中国' }, 응급: '120', 경찰: '110', 위기: ['12356'] },
-    MX: { 이름: { ko: '멕시코', en: 'Mexico', es: 'México', ja: 'メキシコ', zh: '墨西哥' }, 응급: '911', 경찰: '911', 위기: [] },   /* 11-03 Main — 확인된 응급 911 만(위기 전용 번호는 확인 전이라 넣지 않음 → 위기 자리도 911) */
+    MX: { 이름: { ko: '멕시코', en: 'Mexico', es: 'México', ja: 'メキシコ', zh: '墨西哥' }, 응급: '911', 경찰: '911', 위기: ['800 911 2000'] },   /* 11-05 위기 Línea de la Vida 800 911 2000 24시간 — paho.org(25주년) · tabasco.gob.mx(주 보건부) · 11-03 Main — 확인된 응급 911 만(위기 전용 번호는 확인 전이라 넣지 않음 → 위기 자리도 911) */
     HK: { 이름: { ko: '홍콩', en: 'Hong Kong', es: 'Hong Kong', ja: '香港', zh: '香港' }, 응급: '999', 경찰: '999', 위기: ['2896 0000'] },   /* 10-27 Main 표 — The Samaritans(英文) */
     /* 11-04 Main — 한국에 많이 사는 나라부터 «응급(구급) 번호만». 공식 출처 두 곳이 맞는 것만. 위기 상담 번호는 아직 넣지 않음(위기 자리도 응급 번호).
        경찰은 한 번호로 모두 받는 나라만 같은 번호, 나머지는 null(→ 글로 「그 나라 경찰 번호」, 누르는 단추 없음).
        뺀 나라: 미얀마(영국 정부 192 · 미국 대사관은 192 를 고속도로 번호로·다른 번호와 엇갈림) → 그 밖. */
     VN: { 이름: { ko: '베트남', en: 'Vietnam', es: 'Vietnam', ja: 'ベトナム', zh: '越南' }, 응급: '115', 경찰: null, 위기: [] },   /* gov.uk/foreign-travel-advice/vietnam/getting-help · vietnam.travel(베트남 관광청) — 115 구급, 112 아님 */
-    TH: { 이름: { ko: '태국', en: 'Thailand', es: 'Tailandia', ja: 'タイ', zh: '泰国' }, 응급: '1669', 경찰: null, 위기: [] },   /* gov.uk Thailand health(1669 보건부) · th.usembassy.gov */
-    PH: { 이름: { ko: '필리핀', en: 'Philippines', es: 'Filipinas', ja: 'フィリピン', zh: '菲律宾' }, 응급: '911', 경찰: '911', 위기: [] },   /* gov.uk Philippines getting-help(911 구급·소방·경찰) · ph.usembassy.gov */
+    TH: { 이름: { ko: '태국', en: 'Thailand', es: 'Tailandia', ja: 'タイ', zh: '泰国' }, 응급: '1669', 경찰: null, 위기: ['1323'] },   /* 11-05 위기 정신건강국 1323 24시간 — thailand.go.th · nationthailand.com · gov.uk Thailand health(1669 보건부) · th.usembassy.gov */
+    PH: { 이름: { ko: '필리핀', en: 'Philippines', es: 'Filipinas', ja: 'フィリピン', zh: '菲律宾' }, 응급: '911', 경찰: '911', 위기: ['1553'] },   /* 11-05 위기 NCMH Crisis Hotline 1553(보건부) 24시간 — lusog-isip.deped.gov.ph · DOH 발표(mb.com.ph 2026-01) · gov.uk Philippines getting-help(911 구급·소방·경찰) · ph.usembassy.gov */
     ID: { 이름: { ko: '인도네시아', en: 'Indonesia', es: 'Indonesia', ja: 'インドネシア', zh: '印度尼西亚' }, 응급: '118', 경찰: null, 위기: [] },   /* gov.uk Indonesia getting-help(118) · indonesia.travel(118·119) */
     NP: { 이름: { ko: '네팔', en: 'Nepal', es: 'Nepal', ja: 'ネパール', zh: '尼泊尔' }, 응급: '102', 경찰: null, 위기: [] },   /* gov.uk Nepal getting-help · np.usembassy.gov · heoc.mohp.gov.np */
     UZ: { 이름: { ko: '우즈베키스탄', en: 'Uzbekistan', es: 'Uzbekistán', ja: 'ウズベキスタン', zh: '乌兹别克斯坦' }, 응급: '103', 경찰: null, 위기: [] },   /* gov.uk Uzbekistan getting-help · uzbekistan.travel */
     KH: { 이름: { ko: '캄보디아', en: 'Cambodia', es: 'Camboya', ja: 'カンボジア', zh: '柬埔寨' }, 응급: '119', 경찰: null, 위기: [] },   /* gov.uk Cambodia getting-help · travel.state.gov Cambodia */
     LA: { 이름: { ko: '라오스', en: 'Laos', es: 'Laos', ja: 'ラオス', zh: '老挝' }, 응급: '1195', 경찰: null, 위기: [] },   /* 11-04d 구급 1195(경찰 1191·화재 1190 따로) — gov.uk/foreign-travel-advice/laos/getting-help · travel.gc.ca Laos 둘 다 1195. 일부 생활 안내의 195 는 공식 아님 */
     MN: { 이름: { ko: '몽골', en: 'Mongolia', es: 'Mongolia', ja: 'モンゴル', zh: '蒙古' }, 응급: '103', 경찰: null, 위기: [] },   /* gov.uk Mongolia getting-help · mn.usembassy.gov */
-    LK: { 이름: { ko: '스리랑카', en: 'Sri Lanka', es: 'Sri Lanka', ja: 'スリランカ', zh: '斯里兰卡' }, 응급: '1990', 경찰: null, 위기: [] },   /* gov.uk Sri Lanka health · lk.usembassy.gov(1990 Suwa Seriya) */
+    LK: { 이름: { ko: '스리랑카', en: 'Sri Lanka', es: 'Sri Lanka', ja: 'スリランカ', zh: '斯里兰卡' }, 응급: '1990', 경찰: null, 위기: ['1926'] },   /* 11-05 위기 국립정신건강연구소 1926 24시간(보건부 소속) — NIMH 연차보고 2022 · sundaytimes.lk · gov.uk Sri Lanka health · lk.usembassy.gov(1990 Suwa Seriya) */
     BD: { 이름: { ko: '방글라데시', en: 'Bangladesh', es: 'Bangladés', ja: 'バングラデシュ', zh: '孟加拉国' }, 응급: '999', 경찰: '999', 위기: [] },   /* gov.uk Bangladesh getting-help · 999.gov.bd */
-    IN: { 이름: { ko: '인도', en: 'India', es: 'India', ja: 'インド', zh: '印度' }, 응급: '112', 경찰: '112', 위기: [] },   /* gov.uk India health(112) · India ERSS(112 · 내무부) */
-    GB: { 이름: { ko: '영국', en: 'United Kingdom', es: 'Reino Unido', ja: 'イギリス', zh: '英国' }, 응급: '999', 경찰: '999', 위기: [] },   /* gov.uk · NHS 999 */
+    IN: { 이름: { ko: '인도', en: 'India', es: 'India', ja: 'インド', zh: '印度' }, 응급: '112', 경찰: '112', 위기: ['14416'] },   /* 11-05 위기 Tele-MANAS 14416(보건가족복지부) — pib.gov.in PRID 2022057 · PRID 1919200 · gov.uk India health(112) · India ERSS(112 · 내무부) */
+    GB: { 이름: { ko: '영국', en: 'United Kingdom', es: 'Reino Unido', ja: 'イギリス', zh: '英国' }, 응급: '999', 경찰: '999', 위기: ['116 123'] },   /* gov.uk · NHS 999 · 11-05 위기 Samaritans 116 123 24시간 — phw.nhs.wales · 111.wales.nhs.uk · cntw.nhs.uk */
+    /* 11-05 현욱님 결정(소아 경유) — 유럽연합 27개국 공통 응급 번호 112(유럽 지침 2002/22/EC 제26조 · (EU) 2018/1972 제109조). 위기 상담은 나라마다 달라 빈칸(→ 응급 번호), 경찰도 빈칸. 스페인은 위에 024 와 함께 있다 */
+    AT: { 이름: { ko: '오스트리아', en: 'Austria', es: 'Austria', ja: 'オーストリア', zh: '奥地利' }, 응급: '112', 경찰: null, 위기: [] },
+    BE: { 이름: { ko: '벨기에', en: 'Belgium', es: 'Bélgica', ja: 'ベルギー', zh: '比利时' }, 응급: '112', 경찰: null, 위기: [] },
+    BG: { 이름: { ko: '불가리아', en: 'Bulgaria', es: 'Bulgaria', ja: 'ブルガリア', zh: '保加利亚' }, 응급: '112', 경찰: null, 위기: [] },
+    HR: { 이름: { ko: '크로아티아', en: 'Croatia', es: 'Croacia', ja: 'クロアチア', zh: '克罗地亚' }, 응급: '112', 경찰: null, 위기: [] },
+    CY: { 이름: { ko: '키프로스', en: 'Cyprus', es: 'Chipre', ja: 'キプロス', zh: '塞浦路斯' }, 응급: '112', 경찰: null, 위기: [] },
+    CZ: { 이름: { ko: '체코', en: 'Czechia', es: 'Chequia', ja: 'チェコ', zh: '捷克' }, 응급: '112', 경찰: null, 위기: [] },
+    DK: { 이름: { ko: '덴마크', en: 'Denmark', es: 'Dinamarca', ja: 'デンマーク', zh: '丹麦' }, 응급: '112', 경찰: null, 위기: [] },
+    EE: { 이름: { ko: '에스토니아', en: 'Estonia', es: 'Estonia', ja: 'エストニア', zh: '爱沙尼亚' }, 응급: '112', 경찰: null, 위기: [] },
+    FI: { 이름: { ko: '핀란드', en: 'Finland', es: 'Finlandia', ja: 'フィンランド', zh: '芬兰' }, 응급: '112', 경찰: null, 위기: [] },
+    FR: { 이름: { ko: '프랑스', en: 'France', es: 'Francia', ja: 'フランス', zh: '法国' }, 응급: '112', 경찰: null, 위기: [] },
+    DE: { 이름: { ko: '독일', en: 'Germany', es: 'Alemania', ja: 'ドイツ', zh: '德国' }, 응급: '112', 경찰: null, 위기: [] },
+    GR: { 이름: { ko: '그리스', en: 'Greece', es: 'Grecia', ja: 'ギリシャ', zh: '希腊' }, 응급: '112', 경찰: null, 위기: [] },
+    HU: { 이름: { ko: '헝가리', en: 'Hungary', es: 'Hungría', ja: 'ハンガリー', zh: '匈牙利' }, 응급: '112', 경찰: null, 위기: [] },
+    IE: { 이름: { ko: '아일랜드', en: 'Ireland', es: 'Irlanda', ja: 'アイルランド', zh: '爱尔兰' }, 응급: '112', 경찰: null, 위기: [] },
+    IT: { 이름: { ko: '이탈리아', en: 'Italy', es: 'Italia', ja: 'イタリア', zh: '意大利' }, 응급: '112', 경찰: null, 위기: [] },
+    LV: { 이름: { ko: '라트비아', en: 'Latvia', es: 'Letonia', ja: 'ラトビア', zh: '拉脱维亚' }, 응급: '112', 경찰: null, 위기: [] },
+    LT: { 이름: { ko: '리투아니아', en: 'Lithuania', es: 'Lituania', ja: 'リトアニア', zh: '立陶宛' }, 응급: '112', 경찰: null, 위기: [] },
+    LU: { 이름: { ko: '룩셈부르크', en: 'Luxembourg', es: 'Luxemburgo', ja: 'ルクセンブルク', zh: '卢森堡' }, 응급: '112', 경찰: null, 위기: [] },
+    MT: { 이름: { ko: '몰타', en: 'Malta', es: 'Malta', ja: 'マルタ', zh: '马耳他' }, 응급: '112', 경찰: null, 위기: [] },
+    NL: { 이름: { ko: '네덜란드', en: 'Netherlands', es: 'Países Bajos', ja: 'オランダ', zh: '荷兰' }, 응급: '112', 경찰: null, 위기: [] },
+    PL: { 이름: { ko: '폴란드', en: 'Poland', es: 'Polonia', ja: 'ポーランド', zh: '波兰' }, 응급: '112', 경찰: null, 위기: [] },
+    PT: { 이름: { ko: '포르투갈', en: 'Portugal', es: 'Portugal', ja: 'ポルトガル', zh: '葡萄牙' }, 응급: '112', 경찰: null, 위기: [] },
+    RO: { 이름: { ko: '루마니아', en: 'Romania', es: 'Rumanía', ja: 'ルーマニア', zh: '罗马尼亚' }, 응급: '112', 경찰: null, 위기: [] },
+    SK: { 이름: { ko: '슬로바키아', en: 'Slovakia', es: 'Eslovaquia', ja: 'スロバキア', zh: '斯洛伐克' }, 응급: '112', 경찰: null, 위기: [] },
+    SI: { 이름: { ko: '슬로베니아', en: 'Slovenia', es: 'Eslovenia', ja: 'スロベニア', zh: '斯洛文尼亚' }, 응급: '112', 경찰: null, 위기: [] },
+    SE: { 이름: { ko: '스웨덴', en: 'Sweden', es: 'Suecia', ja: 'スウェーデン', zh: '瑞典' }, 응급: '112', 경찰: null, 위기: [] },
     XX: { 이름: { ko: '그 밖', en: 'Other', es: 'Otro', ja: 'その他', zh: '其他' }, 응급: null, 경찰: null, 위기: [] }   /* 11-04 Main — 모르는 나라는 누르는 번호 없음(112 기본값 없앰) */
   };
+  /* 11-16 Main 결정(안전 쪽) — 나라 짐작은 이 한 곳에서. 시간대가 표에 있으면 그 나라 · 시간대는 읽히는데 표에 없으면 XX(「현지 응급 번호」 — 해외에서 119 가 안 통하는 나라가 많다) ·
+     시간대를 «못 읽을 때만» 한국어 화면은 KR(119). 기기 언어의 지역(ko-KR·en-US)으로는 짐작하지 않는다(11-04h). 앱은 고른 나라(mn.place) → 이 짐작 순으로 쓴다 */
+  var 시간대표 = { 'Asia/Seoul': 'KR', 'Asia/Tokyo': 'JP', 'Asia/Shanghai': 'CN', 'Asia/Chongqing': 'CN', 'Asia/Urumqi': 'CN', 'Asia/Hong_Kong': 'HK', 'Europe/Madrid': 'ES', 'Atlantic/Canary': 'ES', 'Africa/Ceuta': 'ES',
+        'America/Mexico_City': 'MX', 'America/Monterrey': 'MX', 'America/Merida': 'MX', 'America/Cancun': 'MX', 'America/Chihuahua': 'MX', 'America/Mazatlan': 'MX', 'America/Hermosillo': 'MX', 'America/Tijuana': 'MX',
+        'Europe/London': 'GB', 'Europe/Dublin': 'IE', 'Asia/Singapore': 'SG', 'Asia/Manila': 'PH', 'Asia/Kolkata': 'IN', 'Asia/Calcutta': 'IN', 'Pacific/Auckland': 'NZ',
+        'Asia/Ho_Chi_Minh': 'VN', 'Asia/Saigon': 'VN', 'Asia/Bangkok': 'TH', 'Asia/Jakarta': 'ID', 'Asia/Makassar': 'ID', 'Asia/Jayapura': 'ID', 'Asia/Kathmandu': 'NP', 'Asia/Katmandu': 'NP', 'Asia/Tashkent': 'UZ', 'Asia/Samarkand': 'UZ',
+        'Asia/Phnom_Penh': 'KH', 'Asia/Ulaanbaatar': 'MN', 'Asia/Ulan_Bator': 'MN', 'Asia/Colombo': 'LK', 'Asia/Dhaka': 'BD',
+        'Europe/Berlin': 'DE', 'Europe/Busingen': 'DE', 'Europe/Paris': 'FR', 'Europe/Rome': 'IT', 'Europe/Amsterdam': 'NL', 'Europe/Brussels': 'BE', 'Europe/Vienna': 'AT', 'Europe/Warsaw': 'PL', 'Europe/Prague': 'CZ', 'Europe/Stockholm': 'SE', 'Europe/Copenhagen': 'DK', 'Europe/Helsinki': 'FI', 'Europe/Lisbon': 'PT', 'Atlantic/Madeira': 'PT', 'Atlantic/Azores': 'PT', 'Europe/Athens': 'GR', 'Europe/Budapest': 'HU', 'Europe/Bucharest': 'RO', 'Europe/Sofia': 'BG', 'Europe/Zagreb': 'HR', 'Europe/Ljubljana': 'SI', 'Europe/Bratislava': 'SK', 'Europe/Vilnius': 'LT', 'Europe/Riga': 'LV', 'Europe/Tallinn': 'EE', 'Europe/Luxembourg': 'LU', 'Europe/Malta': 'MT', 'Asia/Nicosia': 'CY', 'Asia/Famagusta': 'CY', 'Europe/Nicosia': 'CY', 'Europe/Mariehamn': 'FI' };
+  function 나라짐작(말) {
+    var tz = ''; try { tz = Intl.DateTimeFormat().resolvedOptions().timeZone || ''; } catch (e) { tz = ''; }
+    if (!tz) return String(말 || '').slice(0, 2) === 'ko' ? 'KR' : 'XX';
+    if (시간대표[tz]) return 시간대표[tz];
+    if (/^America\/(New_York|Chicago|Denver|Los_Angeles|Phoenix|Anchorage|Detroit|Indiana|Kentucky|Boise|Juneau|Sitka|Nome|Adak|Menominee|North_Dakota)|^Pacific\/Honolulu$/.test(tz)) return 'US';
+    if (/^America\/(Toronto|Vancouver|Edmonton|Winnipeg|Halifax|St_Johns|Regina|Montreal)/.test(tz)) return 'CA';
+    if (/^Australia\//.test(tz)) return 'AU';
+    return 'XX';
+  }
   function 고른곳() { try { var v = JSON.parse(localStorage.getItem('mn.place') || 'null'); if (v && v.country) return 표[v.country] ? v.country : 'XX'; } catch (e) {} return null; }
-  window.메디나눔위기번호 = { 판: 판, 표: 표, 고른곳: 고른곳 };   /* 표를 쓰는 앱은 읽기만 */
+  window.메디나눔위기번호 = { 판: 판, 표: 표, 고른곳: 고른곳, 나라짐작: 나라짐작, 시간대표: 시간대표 };   /* 표를 쓰는 앱은 읽기만 */
 })();
 /* ▲▲ 위기번호 표 끝 ▲▲ */
 /* ═══ 약지도 다섯 언어(ko · en · es · ja · zh) — 10-27 현욱님 · 요청서 yozm-health docs/requests/20261027_메디나눔_전앱_다섯언어.md ═══
@@ -58,7 +102,7 @@
   /* 11-04b 약지도 표(KR·US·ES·JP·CN) 먼저, 없으면 공용 위기번호 표(_도구/위기번호_표.js). 표에도 없으면 번호 없음(null) — 누르는 단추 없이 「그 나라 응급 번호」 글 */
   var 공표 = window.메디나눔위기번호 && window.메디나눔위기번호.표, 공 = 공표 && 공표[CC];
   var N = EMG[CC] || (공 && 공.응급 ? { e: 공.응급, m: 공.위기 || [] } : { e: null, m: [], unknown: true });
-  var 현지 = { ko: '그 나라 응급 번호', en: 'the local emergency number', es: 'el número de emergencias del país', ja: '現地の緊急番号', zh: '当地急救电话' }[L] || 'the local emergency number';
+  var 현지 = { ko: '현지 응급 번호(한국에서는 119)', en: 'the local emergency number', es: 'el número de emergencias del país', ja: '現地の緊急番号', zh: '当地急救电话' }[L] || 'the local emergency number';
   var DICT = null, ui = {}, uiN = {}, UH = {}, UHN = {}, REV = {}, KO = new Map();   /* KO — 번역 글 → 바꾸기 전 한국어(그릴 때마다 다시 얹어도 남게 한 번만 만든다) */
   var NOTE = { en: 'Translated from the Korean original', es: 'Traducido del original en coreano', ja: '韓国語の原文からの翻訳です', zh: '译自韩文原文' };   /* 11-05 현욱님·Main 「검수 전」 꼬리 떼기 — 번역이라는 사실만 */
   var ORIG = { en: 'Show Korean original', es: 'Ver original en coreano', ja: '韓国語の原文を見る', zh: '查看韩文原文' };
@@ -142,7 +186,7 @@
   function 번호(s) {
     if (CC === 'KR') return s;
     var E = N.e || 현지;
-    return s.replace(/1577-0199/g, N.m[1] || N.m[0] || E).replace(/(^|[^\d-])109(?![\d-])/g, function (a, p) { return p + (N.m[0] || E); }).replace(/(^|[^\d-])119(?![\d-])/g, function (a, p) { return p + E; });
+    return s.replace(/1577-0199/g, N.m[1] || N.m[0] || E).replace(/(^|[^\d-])109(?![\d-])/g, function (a, p) { return p + (N.m[0] || E); }).replace(/(^|[^\d-])119(?![\d-])/g, function (a, p, off, str) { return /한국에서는\s?$/.test(str.slice(Math.max(0, off - 7), off + p.length)) ? a : p + E; });   /* 11-17 「현지 응급 번호(한국에서는 119)」 안의 119 는 다시 바꾸지 않는다(다시 그릴 때마다 겹쳐 쌓이던 것) */
   }
   /* 11-12 홈 빨간 동그라미(56px) — 번호를 모르는 나라면 긴 「그 나라 응급 번호」 대신 짧은 말 */
   function 동그라미() { if (CC === 'KR' || N.e) return; document.querySelectorAll('.sos-dot').forEach(function (a) { a.textContent = { ko: '응급', en: 'SOS', es: 'SOS', ja: '緊急', zh: '急救' }[L] || 'SOS'; }); }

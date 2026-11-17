@@ -4,6 +4,7 @@
 import sys, pathlib
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
 from design import URL, SEED, sync_playwright
+SEED += ";localStorage.setItem('yakjido.ink','0')"   # 11-17 잉크가 기본 — 이 시험은 옛 판 기능을 본다(잉크는 design.py·ink_safety.py)
 ROUTES = ['/home', '/symptom/headache', '/symptom/fever', '/drug/acetaminophen', '/search?q=타이레놀', '/bag', '/kids', '/rx', '/rx/bp', '/kinds/bp', '/supp', '/drugs', '/me?t=set', '/myths', '/about']
 fails = []
 with sync_playwright() as p:
