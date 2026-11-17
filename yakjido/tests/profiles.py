@@ -66,6 +66,14 @@ with sync_playwright() as p:
     pg2.evaluate("toggleTaking('pancol-a')"); pg2.wait_for_selector('.after-add', timeout=5000)
     ok('같은 성분이 두 군데' in pg2.inner_text('.after-add'), '판콜에이를 담으면 타이레놀과 같은 성분 카드가 곧바로')
     pg2.click('.aa-x'); ok(pg2.locator('.after-add').count() == 0, '닫기')
+
+    # 로드맵 4 · 6 — 영양제끼리 겹침 · 약 바꾼 날
+    pg2.evaluate("ME.taking=[...ME.taking,'supp:zinc'];saveMe();ME.taking=[...ME.taking,'supp:lutein'];saveMe()")
+    ok(any('구리' in c[1] for c in pg2.evaluate("ixCards(ixRun([])).map(c=>[c.lv,c.t])")), '루테인 + 아연 → 구리 결핍 카드')
+    ok(pg2.evaluate("(ME.chg||[]).filter(c=>c.a===1).map(c=>c.id).join(',')").endswith('supp:zinc,supp:lutein'), '담은 날 적힘')
+    pg2.evaluate("(()=>{for(let i=6;i>=0;i-=2){const x=new Date();x.setDate(x.getDate()-i);ME.vitals=(ME.vitals||[]);ME.vitals.push({k:'bp',t:dayKey(x)+' 08:00',s:130+i,d:85,w:'아침'});}saveMe();})()")
+    pg2.goto(URL + '#/vitals'); pg2.wait_for_selector('.vz', timeout=10000)
+    ok(pg2.locator('.vz-chg').count() >= 1 and '약 바꾼 날' in pg2.inner_text('.vz-chgl'), '그래프에 약 바꾼 날 점선')
     ok(not errs, '스크립트 오류 없음 ' + ' | '.join(errs[:2]))
     b.close()
 srv.shutdown()

@@ -1810,7 +1810,7 @@ html:not(.ink) .rf-none{display:none}</style>
 <script>
 window.__YAKJIDO_OK__ = true;
 const D = JSON.parse(document.getElementById('data').textContent || '{}');
-const BUILD = '2026-11-18 01:29';
+const BUILD = '2026-11-18 01:51';
 const DATAV = 'ebf9e087db'.indexOf('__') === 0 ? BUILD : 'ebf9e087db';
 const BRANDMARK = (typeof window !== 'undefined' && window.__BRANDMARK__) || 'icon-192.png';
 let CORE = 0, CORE_P = null;
@@ -1980,6 +1980,7 @@ r._mt = {}; for (const [k, v] of Object.entries(obj(o._mt))) if (num(v, 0, 9e15)
 r.allergyUnknown = o.allergyUnknown === true;
 r.noteOff = {}; for (const [k, v] of Object.entries(obj(o.noteOff))) if (/^[a-z]{2,20}$/.test(k) && v) r.noteOff[k] = 1;
 if ([10, 30, 60].includes(o.againMin)) r.againMin = o.againMin;
+r.chg = (Array.isArray(o.chg) ? o.chg : []).filter(c => c && /^\d{4}-\d{2}-\d{2}$/.test(c.d) && SAFE_ID.test(c.id) && (c.a === 0 || c.a === 1)).slice(-60).map(c => ({ d: c.d, id: c.id, a: c.a }));   /* 11-17 로드맵 6 — 약 시작·뺀 날(그래프 표시) */
 r.taking = r.taking.filter(id => !id.startsWith('pub:') || r.pub[id]);
 return r;
 }
@@ -1990,6 +1991,9 @@ let STORE_HIDE = (() => { try { return sessionStorage.getItem('yakjido.storehide
 let ME_SNAP = {};
 const saveMe = () => { if (document.documentElement.classList.contains('fam') && !consentOk()) { try { window.저장문 && window.저장문(); } catch (e) {} return; }   /* 11-17 잉크 판 — 동의 전에는 이 휴대폰에 쓰지 않는다(저장문이 동의 한 장을 띄움) */
 try {
+try { if (ME_SNAP.taking !== undefined) { const prev = JSON.parse(ME_SNAP.taking) || [], cur = ME.taking || [], d0 = dayKey(new Date());   /* 11-17 로드맵 6 — 약을 담은 날·뺀 날을 적어 둔다(그래프의 점선) */
+const ch = [...cur.filter(id => !prev.includes(id)).map(id => ({ d: d0, id, a: 1 })), ...prev.filter(id => !cur.includes(id)).map(id => ({ d: d0, id, a: 0 }))];
+if (ch.length && ch.length <= 5) ME.chg = [...(ME.chg || []), ...ch].slice(-60); } } catch (e) {}
 const now = Date.now(); ME._mt = ME._mt || {};
 for (const k of Object.keys(ME)) { if (k === '_mt') continue; const j = JSON.stringify(ME[k]); if (ME_SNAP[k] !== undefined && ME_SNAP[k] !== j) ME._mt[k] = now; ME_SNAP[k] = j; }
 for (const k of Object.keys(ME_SNAP)) if (!(k in ME)) { ME._mt[k] = now; delete ME_SNAP[k]; }
@@ -2696,9 +2700,14 @@ const SUPP_IX = [['sx-omega3', 'warn', [['anticoag', 'antiplt'], ['supp-omega3']
 ['sx-mela', 'warn', [['k:warfarin'], ['supp-melatonin']], '와파린에 멜라토닌이 더해졌어요', /와파린·뇌/, 'melatonin'],
 ['sx-feca', 'info', [['supp-iron'], ['supp-calcium']], '철분과 칼슘은 시간을 띄우세요', /철 \+ 칼슘/],
 ['sx-mgkid', 'stop', [['supp-mg']], '콩팥이 안 좋으신데 마그네슘 영양제가 있어요', /신장 질환/, 'mg', ['kidney']]];
+const SUPP_OV = [['vitd', 'calcium', 'info', '칼슘제와 비타민 D — 두 제품의 비타민 D를 합쳐 보세요'], ['vitd', 'multi', 'info', '종합비타민과 비타민 D — 합쳐서 하루 상한 안인지 보세요'],
+['omega3', 'vitd', 'info', '오메가3 제품에 비타민 D가 들었는지 보세요'], ['zinc', 'multi', 'info', '종합비타민과 아연 — 합쳐서 하루 35 mg 안인지 보세요'],
+['zinc', 'lutein', 'warn', '루테인 복합제와 아연 — 겹치면 구리가 모자랄 수 있어요'], ['vitb', 'multi', 'info', '종합비타민과 비타민 B — 비타민 B6가 많아지기 쉬워요'],
+['iron', 'mg', 'info', '철분과 마그네슘은 시간을 나누세요'], ['mg', 'calcium', 'info', '칼슘과 마그네슘 — 많이 드시면 시간을 나누세요']];
 function suppIxRules(){ const R = D.suppRules || {};
 return SUPP_IX.map(([id, lv, need, t, re, sid, flags]) => { const line = [...(R.stack || []), ...(supp(sid)?.cautions || [])].find(x => re.test(x));
-return line && { id, lv, need, t, do: line, src: R.sources, ...(flags ? { flags } : {}) }; }).filter(Boolean); }
+return line && { id, lv, need, t, do: line, src: R.sources, ...(flags ? { flags } : {}) }; }).filter(Boolean).concat(SUPP_OV.map(([a, b, lv, t]) => { const ov = (R.overlaps || []).find(x => x.ids.includes(a) && x.ids.includes(b));   /* 11-17 1등 로드맵 4 — 영양제끼리 같은 성분(상한)도 내 약통 판정에 */
+return ov && { id: 'sv-' + a + '-' + b, lv, need: [['supp-' + a], ['supp-' + b]], t, do: ov.text, src: R.sources }; }).filter(Boolean)); }
 const ACH_WORD = ['', '약함', '중간', '강함'];
 function achOfDrug(d){
 if (!d) return 0;
@@ -6275,7 +6284,7 @@ const warns = res.hits.filter(h => h.r.lv === 'warn').length + res.cond.filter(c
 const tone = stops ? 'stop' : warns || lv !== 'ok' || res.unknown.length ? 'warn' : 'ok';
 return `${topBar({ back:'이전' })}
 <div class="eyebrow">진료실·약국에서</div>
-<h1 style="font-size:1.375rem">제가 먹는 약이에요</h1>
+<h1 style="font-size:1.375rem">${window.profIsMe && !profIsMe() ? esc(profName()) + ' 님이 드시는 약이에요' : '제가 먹는 약이에요'}</h1>
 ${!items.length ? `<div class="empty">${emptyArt()}<p><b>아직 담아 두신 약이 없어요.</b><br>약봉투 이름이나 약 사진으로 담으시면 여기 한 장으로 정리돼요.</p><div class="ix-cta"><a class="btn" href="#/photo">${I.eye}약봉투·약 사진으로 담기</a><a class="btn line" href="#/pill">${I.search}이름으로 찾아 담기</a><a class="btn line" href="#/kinds">${I.pill}이름을 모르면 — 종류만 고르기</a></div></div>`
 : `<div class="show-card">
 <div class="show-head">지금 먹는 약 ${items.length}가지${f.length ? ' · ' + f.map(k => esc(FLAG_LABEL[k])).join(' · ') : ''}</div>

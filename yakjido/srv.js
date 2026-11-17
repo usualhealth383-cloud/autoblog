@@ -5795,9 +5795,15 @@ window.vitalChart = function (k){
   /* 외부 검수 4차 #5 — 가장 큰 글씨에서 기준선 글자(위 135·아래 85)가 마지막 점과 겹쳤다. 글자는 그래프 위 한 줄로, 그래프 안에는 점선만 */
   const L7 = vitals().filter(x => x.k === 'bg' && x.t.slice(0, 10) >= dayBefore(6)), avg = w => { const v = L7.filter(x => x.w === w).map(x => x.v); return v.length ? Math.round(v.reduce((a, b) => a + b, 0) / v.length) + ` (${v.length}번)` : ''; };
   const refLine = k === 'bp' ? `<p class="vz-refl"><i class="ref"></i>가정혈압 기준: 위 ${VREF.bp.s} / 아래 ${VREF.bp.d}</p>` : (avg('공복') || avg('식후 2시간') ? `<p class="vz-refl">최근 7일 평균 — ${[avg('공복') && '공복 ' + avg('공복'), avg('식후 2시간') && '식후 2시간 ' + avg('식후 2시간')].filter(Boolean).join(' · ')} mg/dL</p>` : '');
-  return `${refLine}<svg class="vz" style="--vz:${fz}px" viewBox="0 0 ${W} ${H}" role="img" aria-label="최근 2주 ${k === 'bp' ? '혈압' : '혈당'} 흐름 — 아래 목록에 같은 숫자가 있어요">${grid}${refs}${days}${series}</svg>${legend}`;
+  /* 11-17 1등 로드맵 6 — 약을 담은 날·뺀 날을 세로 점선으로(혈압·혈당 변화와 약 바꾼 날을 한눈에). 같은 날은 하나로 */
+  const CH = {}; for (const c of (ME.chg || [])) if (c.d >= dayBefore(13)) (CH[c.d] = CH[c.d] || []).push(c);
+  const nmOf = id => { const it = takingItems().find(x => x.id === id) || (typeof drug === 'function' && drug(id)); return it ? String(it.name).split(' (')[0] : '약'; };
+  const marks = Object.keys(CH).sort().map(d => { const x = X(d + 'T12:00').toFixed(1), t = CH[d].map(c => (c.a ? '시작 ' : '뺌 ') + nmOf(c.id)).join(' · ');
+    return `<line x1="${x}" x2="${x}" y1="${pt}" y2="${H - pb}" class="vz-chg"><title>${d.slice(5).replace('-', '/')} ${esc(t)}</title></line><circle cx="${x}" cy="${pt}" r="4" class="vz-chgd"/>`; }).join('');
+  const chList = Object.keys(CH).sort().map(d => `${d.slice(5).replace('-', '/')} ${CH[d].map(c => (c.a ? '시작 ' : '뺌 ') + esc(nmOf(c.id))).join(' · ')}`);
+  return `${refLine}<svg class="vz" style="--vz:${fz}px" viewBox="0 0 ${W} ${H}" role="img" aria-label="최근 2주 ${k === 'bp' ? '혈압' : '혈당'} 흐름 — 아래 목록에 같은 숫자가 있어요">${grid}${refs}${days}${marks}${series}</svg>${legend}${chList.length ? `<p class="vz-chgl"><i></i>약 바꾼 날 — ${chList.join(' / ')}</p>` : ''}`;
 }
-try { const st = document.createElement('style'); st.textContent = '.vz-dot.v3{fill:var(--muted)}.vz-legend i.v3{background:var(--muted)}'; document.head.appendChild(st); } catch (e) {}
+try { const st = document.createElement('style'); st.textContent = '.vz-dot.v3{fill:var(--muted)}.vz-legend i.v3{background:var(--muted)}.vz-chg{stroke:var(--muted);stroke-width:1.5;stroke-dasharray:4 4}.vz-chgd{fill:var(--muted)}.vz-chgl{margin:8px 0 0;font-size:.9375rem;color:var(--muted);line-height:1.6;word-break:keep-all}.vz-chgl i{display:inline-block;width:14px;height:0;border-top:2px dashed var(--muted);vertical-align:middle;margin-right:6px}'; document.head.appendChild(st); } catch (e) {}
 /* 11-09 앱 껍데기에서 옮김(첫 화면 예산) */
 window.vVitalsS = function(){
   const k = VT.k, L = vitals(), mine = L.map((x, i) => ({ ...x, i })).filter(x => x.k === k).reverse();
