@@ -55,8 +55,8 @@ HI_IMG={'a01_cover': 'hires/09_중학교비교글_사진1.png', 'a02_question': 
 for _k,_p in HI_IMG.items():
     _im=Image.open(HERE.parent/_p).convert('RGB');_b=io.BytesIO();_im.save(_b,'JPEG',quality=92)
     imgs[_k]=(imgs[_k][0],'data:image/jpeg;base64,'+base64.b64encode(_b.getvalue()).decode())
-C = 'margin:0;line-height:1.9;'
-TD = 'border:1px solid #D9CFBD;padding:8px 10px;vertical-align:top;'
+C = 'margin:0;line-height:1.9;color:#333333;'
+TD = 'border:1px solid #D9CFBD;padding:8px 10px;vertical-align:top;color:#333333;'
 HASH = ' '.join('#' + t for t in TAGS)
 def rich(data_uri):
     out, k = [], 0
