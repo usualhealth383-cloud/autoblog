@@ -1732,7 +1732,7 @@ try {
 
 /* 11-17 Main ① 가족 여러 명 약을 한 앱에서 — 기기 안 프로필(나·어머니·아이). 겹침 판정은 사람마다.
    지금 보는 사람의 기록은 늘 yakjido.me.v1 에 둔다(홈·겹침·알림·약통이 그대로 쓴다). 다른 사람 것은 yakjido.me.v1@<id> 에 쉬어 둔다.
-   서버 이어 보기·가족 알림(보호자에게 알리기)은 「나」일 때만 — 다른 사람 기록이 내 계정·내 보호자에게 섞이지 않게. 알림은 지금 보는 한 사람 약으로만 운다 */
+   서버 이어 보기·가족 알림(보호자에게 알리기)은 「나」일 때만 — 다른 사람 기록이 내 계정·내 보호자에게 섞이지 않게. 복용 알림은 모든 분 것(app-shell profOthers) */
 const PROF_KEY = 'yakjido.profiles.v1';
 function profAll(){ let j = null; try { j = JSON.parse(localStorage.getItem(PROF_KEY) || 'null'); } catch (e) {}
   const list = (j && Array.isArray(j.list) ? j.list : []).filter(p => p && /^[a-z0-9]{1,12}$/.test(p.id) && typeof p.name === 'string' && p.name.trim()).map(p => ({ id: p.id, name: p.name.trim().slice(0, 12) }));
@@ -1761,16 +1761,50 @@ function profAdd(){ const P = profAll(); if (P.list.length >= 8) { toast('여덟
   PROFQ = { name: '', age: '' }; profSwitch(id); }
 window.profAdd = profAdd;
 async function profDel(id){ const P = profAll(), p = P.list.find(x => x.id === id); if (!p || id === 'me' || id === P.active) return;
-  if (!(await appConfirm(`${p.name} 님의 약과 기록을 이 휴대폰에서 지워요. 되돌릴 수 없어요.`, { ok: '지우기', cancel: '그만둘게요', danger: true }))) return;
+  if (!(await appConfirm(`${profCall(p.name)}의 약과 기록을 이 휴대폰에서 지워요. 되돌릴 수 없어요.`, { ok: '지우기', cancel: '그만둘게요', danger: true }))) return;
   try { localStorage.removeItem(ME_KEY + '@' + id); localStorage.setItem(PROF_KEY, JSON.stringify({ active: P.active, list: P.list.filter(x => x.id !== id) })); } catch (e) {}
   toast('지웠어요'); route(); }
 window.profDel = profDel;
 let PROFQ = { name: '', age: '' };
 window.profPick = function (k, v) { PROFQ[k] = v; if (k === 'name') { const i = document.getElementById('profName'); if (i) i.value = v; } if (k === 'name' && !PROFQ.age) PROFQ.age = v === '아이' ? 'child' : /어머니|아버지|할머니|할아버지/.test(v) ? 'senior' : ''; route(); };
+/* 11-17 1등 로드맵 2 — 오늘 가족 약 한 장: 사람을 바꾸지 않고 가족의 다음 남은 회차를 보고 바로 체크 */
+window.famToday = function () { if (typeof profOthers !== 'function') return ''; const os = profOthers(); if (!os.length) return '';
+  const tk = todayKey(), rows = [];
+  for (const o of os) { const r = withMe(o.me, () => { const g = slotGroups(); if (!g.length) return null; const tset = takenSet();
+      const left = g.map(({ t, items }) => ({ t, its: items.filter(d => !tset.includes(d.id + '@' + t) && !isSkipped(d.id + '@' + t)) })).filter(x => x.its.length);
+      return { all: g.length, left }; });
+    if (!r) continue; const nx = r.left[0], who = esc(o.id === 'me' ? '나' : profWho(o));
+    rows.push(nx ? `<li><span class="ft-n"><b>${who}</b> ${nx.t} · 약 ${nx.its.length}가지${r.left.length > 1 ? ` <small>남은 회차 ${r.left.length}</small>` : ''}</span><button type="button" class="btn line" onclick="profTick({id:'${o.id}',keys:'${nx.its.map(d => d.id + '@' + nx.t).join(',')}'},'${tk}','took');route()">먹었어요</button></li>`
+      : `<li><span class="ft-n"><b>${who}</b> 오늘 약 다 챙겼어요</span></li>`); }
+  return rows.length ? `<div class="fam-today"><h2>오늘 가족 약</h2><ul>${rows.join('')}</ul></div>` : ''; };
+/* 11-17 1등 로드맵 3 — 새 약 받았어요 한 흐름: 담자마자 «이 약과 지금 약» 겹침 → 알림 시간 → (가족이면 누구 약통인지) 를 한 카드에.
+   예전에는 「담았어요」 토스트 + 10초 뒤 사라지는 시간 묻기 토스트뿐이라, 겹침은 따로 찾아가야 했다. 닫을 때까지 남는다(어르신 읽을 시간) */
+window.afterAdd = function (id) { try {
+  if (ME.demo) return; const item = takingItems().find(x => x.id === id); if (!item) return;
+  document.querySelector('.after-add')?.remove(); document.querySelector('.toast')?.remove();
+  let C = []; try { C = ixCards(ixRun([])).filter(c => (c.items || []).some(it => it && (it.id === id || (it.d && it.d.id === id)))); } catch (e) {}
+  const stop = C.filter(c => c.lv === 'stop').length, warn = C.filter(c => c.lv === 'warn').length;
+  const L = !isPrn(id) && schedUnset(item) ? defaultSlots(item) : [], nm = String(item.name).split(' (')[0];
+  const who = typeof profIsMe === 'function' && !profIsMe() ? esc(profCall(profName())) + ' 약통에 ' : '';
+  const el = document.createElement('div'); el.className = 'after-add'; el.setAttribute('role', 'dialog'); el.setAttribute('aria-label', '새로 담은 약');
+  el.innerHTML = `<div class="aa-h"><b>${who}${esc(nm)} 담았어요</b><button type="button" class="aa-x" aria-label="닫기">${I.x || '×'}</button></div>`
+    + (stop ? `<a class="aa-v stop" href="#/together"><span><b>${esc(C.find(c => c.lv === 'stop').t)}</b>${stop + warn > 1 ? ` <small>외 ${stop + warn - 1}가지</small>` : ''} ›</span></a>`
+      : warn ? `<a class="aa-v warn" href="#/together"><span><b>${esc(C.find(c => c.lv === 'warn').t)}</b>${warn > 1 ? ` <small>외 ${warn - 1}가지</small>` : ''} ›</span></a>`
+      : `<p class="aa-v ok">지금 드시는 약과 겹치거나 조심할 조합이 안 보여요.</p>`)
+    + (L.length ? `<div class="aa-t"><span>${L.join(' · ')}에 알려 드릴까요?</span><button type="button" class="btn aa-go">이 시간으로</button></div>` : '')
+    + (isPrn(id) ? `<p class="aa-s">아플 때만 드시는 약이라 「필요할 때만」으로 두었어요.</p>` : '')
+    + (stop ? `<p class="aa-s">드시기 전에 의사·약사와 상의하세요 — 눌러서 자세히 보실 수 있어요.</p>` : '');
+  el.querySelector('.aa-x').onclick = () => el.remove();
+  const go = el.querySelector('.aa-go'); if (go) go.onclick = () => { el.remove(); schedConfirm(id); };
+  el.querySelectorAll('a').forEach(a => a.addEventListener('click', () => el.remove()));
+  document.body.appendChild(el);
+  const sr = document.getElementById('sr'); if (sr) { sr.textContent = ''; setTimeout(() => { sr.textContent = el.innerText.replace(/\s+/g, ' '); }, 60); }
+  addEventListener('hashchange', function h() { if (!/together|schedule/.test(location.hash)) el.remove(); removeEventListener('hashchange', h); });
+} catch (e) { try { askRemind(id); } catch (e2) {} } };
 /* 홈 「내 약」 칸 맨 위 — 두 분 이상일 때만 이름 줄. 한 분이면 칸 아래 조용한 길 하나 */
 window.profRow = function () { const P = profAll(); if (P.list.length < 2) return '';
   return '<div class="prof-row" role="group" aria-label="누구 약을 볼까요">' + P.list.map(p => `<button type="button" class="prof-chip${p.id === P.active ? ' on' : ''}" aria-pressed="${p.id === P.active}" onclick="profSwitch('${p.id}')">${esc(p.name)}</button>`).join('') + '<a class="prof-chip add" href="#/people">+ 가족</a></div>'
-    + (P.active === 'me' ? '' : `<p class="prof-note">지금 <b>${esc(profName())}</b> 님 약을 보고 계세요. 알림은 이분 약으로 울려요 — 내 약 알림은 <button type="button" class="link" onclick="profSwitch('me')">나로 돌아오면</button> 다시 울려요.</p>`); };
+    + (P.active === 'me' ? '' : `<p class="prof-note">지금 <b>${esc(profCall(profName()))}</b> 약을 보고 계세요. 알림은 가족 모두의 약 시간에 사람 이름을 붙여 울려요. <button type="button" class="link" onclick="profSwitch('me')">내 약으로 돌아가기</button></p>`); };
 window.profLink = function () { return profAll().list.length < 2 ? '<p class="job-small"><a href="#/people">어머니·아이 약도 따로 담기 ›</a></p>' : ''; };
 window.문_people = function () { const P = profAll();
   const 이름들 = ['어머니', '아버지', '아이', '배우자', '할머니', '할아버지'], 나이 = [['adult', '성인'], ['senior', '65세 이상'], ['child', '소아·청소년']];
@@ -1780,9 +1814,9 @@ window.문_people = function () { const P = profAll();
       <label class="small" for="profName" style="display:block;margin-top:12px">이름(바꿔 쓰셔도 돼요)</label><input id="profName" type="text" maxlength="12" autocomplete="off" style="width:100%;min-height:48px;font-size:1.0625rem;margin-top:6px;padding:0 14px;border:1.5px solid var(--ui-line,#C9D3D8);border-radius:12px;background:var(--card,#fff);color:var(--text);box-sizing:border-box" value="${esc(PROFQ.name)}" oninput="PROFQ_set(this.value)" placeholder="예: 큰딸">
       <h3 style="margin-top:14px">나이</h3><div class="seg" role="group" aria-label="약을 드실 분의 나이" style="margin-top:8px">${나이.map(([k, n]) => `<button type="button" class="${(PROFQ.age || 'adult') === k ? 'on' : ''}" aria-pressed="${(PROFQ.age || 'adult') === k}" onclick="profPick('age','${k}')">${n}</button>`).join('')}</div>
       <div class="actions" style="margin-top:16px"><button type="button" class="btn" onclick="profAdd()">더하고 그분 약 담기</button></div></section>`
-    + `<section class="sec">${fold('자세히', `<p class="small">· 알림은 <b>지금 보고 있는 한 분</b> 약으로만 울려요. 내 약 알림이 필요하면 「나」로 돌아와 주세요.<br>· 메디나눔 계정 이어 보기와 보호자 알림에는 <b>「나」의 기록만</b> 올라가요. 가족 기록은 이 휴대폰에만 있어요.<br>· 아이 약은 체중이 중요해요 — 그분으로 바꾼 뒤 약통에서 몸무게를 넣어 주세요.</p>`)}</section>`; };
+    + `<section class="sec">${fold('자세히', `<p class="small">· 알림은 담아 둔 <b>모든 분</b>의 약 시간에 울려요 — 「어머니 약 드실 시간」처럼 이름을 붙여서. 알림의 「먹었어요」는 그분 기록에 적혀요.<br>· 메디나눔 계정 이어 보기와 보호자 알림에는 <b>「나」의 기록만</b> 올라가요. 가족 기록은 이 휴대폰에만 있어요.<br>· 아이 약은 체중이 중요해요 — 그분으로 바꾼 뒤 약통에서 몸무게를 넣어 주세요.</p>`)}</section>`; };
 window.PROFQ_set = function (v) { PROFQ.name = String(v || '').slice(0, 12); };
-try { const ps = document.createElement('style'); ps.id = 'prof-css'; ps.textContent = '.prof-row{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 12px}.prof-chip{display:inline-flex;align-items:center;min-height:44px;padding:0 16px;border-radius:999px;border:1.5px solid var(--ui-line,#C9D3D8);background:transparent;color:var(--text);font:inherit;font-weight:600;text-decoration:none}.prof-chip.on{background:var(--primary,#0B6E8F);border-color:var(--primary,#0B6E8F);color:#fff}.prof-chip.add{color:var(--primary,#0B6E8F)}.prof-note{margin:0 0 12px;padding:10px 12px;border-radius:12px;background:var(--normal-tint,#F2F8FA);line-height:1.6;word-break:keep-all}.prof-note .link{display:inline;min-height:0;padding:0;color:var(--primary);font:inherit;font-weight:700;background:none;border:0;text-decoration:underline}.prof-list{list-style:none;margin:10px 0 0;padding:0}.prof-list li{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:56px;border-bottom:1px solid var(--hairline,#E3E8EB)}.prof-list small{color:var(--muted);margin-left:6px}.prof-act{display:flex;align-items:center;gap:8px}.prof-act .btn{min-height:44px;width:auto;padding:0 16px}.prof-act .link{min-height:44px;padding:0 8px}.seg.wrap{flex-wrap:wrap}'; document.head.appendChild(ps); } catch (e) {}
+try { const ps = document.createElement('style'); ps.id = 'prof-css'; ps.textContent = '.prof-row{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 12px}.prof-chip{display:inline-flex;align-items:center;min-height:44px;padding:0 16px;border-radius:999px;border:1.5px solid var(--ui-line,#C9D3D8);background:transparent;color:var(--text);font:inherit;font-weight:600;text-decoration:none}.prof-chip.on{background:var(--primary,#0B6E8F);border-color:var(--primary,#0B6E8F);color:#fff}.prof-chip.add{color:var(--primary,#0B6E8F)}.prof-note{margin:0 0 12px;padding:10px 12px;border-radius:12px;background:var(--normal-tint,#F2F8FA);line-height:1.6;word-break:keep-all}.prof-note .link{display:inline;min-height:0;padding:0;color:var(--primary);font:inherit;font-weight:700;background:none;border:0;text-decoration:underline}.prof-list{list-style:none;margin:10px 0 0;padding:0}.prof-list li{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:56px;border-bottom:1px solid var(--hairline,#E3E8EB)}.prof-list small{color:var(--muted);margin-left:6px}.prof-act{display:flex;align-items:center;gap:8px}.prof-act .btn{min-height:44px;width:auto;padding:0 16px}.prof-act .link{min-height:44px;padding:0 8px}.seg.wrap{flex-wrap:wrap}.after-add{position:fixed;left:12px;right:12px;bottom:84px;z-index:21;max-width:560px;margin:0 auto;padding:14px 14px 12px;border-radius:16px;background:var(--card,#fff);color:var(--text);border:1px solid var(--hairline,#E3E8EB);box-shadow:0 10px 30px rgba(0,0,0,.18);word-break:keep-all}.after-add .aa-h{display:flex;align-items:center;justify-content:space-between;gap:8px}.after-add .aa-h b{font-size:1.0625rem;line-height:1.45}.aa-x{flex:none;width:44px;height:44px;border:0;background:none;color:var(--muted);font-size:1.25rem;border-radius:50%}.aa-x svg{width:20px;height:20px}.aa-v{display:flex;align-items:center;min-height:48px;margin:8px 0 0;padding:8px 12px;border-radius:12px;text-decoration:none;color:var(--text);line-height:1.5}.aa-v.stop{border:2px solid var(--alert,#D93A2B);color:var(--alert,#B42318)}.aa-v.warn{border:1.5px solid var(--warn,#B7791F)}.aa-v.ok{background:var(--normal-tint,#F2F8FA)}.aa-t{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:10px}.aa-t span{flex:1;min-width:0;line-height:1.5}.aa-t .btn{min-height:48px;width:auto;flex:0 0 auto;padding:0 16px}.aa-s{margin:8px 0 0;font-size:.9375rem;color:var(--muted)}.fam-today{margin:14px 0 2px;text-align:left}.fam-today h2{font-size:1rem;margin:0 0 6px;color:var(--muted)}.fam-today ul{list-style:none;margin:0;padding:0}.fam-today li{display:flex;align-items:center;justify-content:space-between;gap:10px;min-height:56px;border-top:1px solid var(--hairline,#E3E8EB)}.fam-today .ft-n{flex:1;min-width:0;line-height:1.5;word-break:keep-all}.fam-today small{color:var(--muted)}.fam-today .btn{min-height:44px;width:auto;flex:0 0 auto;padding:0 14px}'; document.head.appendChild(ps); } catch (e) {}
 
 /* 약지도 — 두 폰 합치기(app-shell 의 sanitizeMe 를 씀). 2026-10-13 상용화 점검 */
 window.mergeMe = function (localRaw, serverRaw) {
@@ -3637,7 +3671,15 @@ window.언어칸 = function () {
     var sid = null, s = null; try { sid = 증상찾기(t); s = sid && (D.symptoms || []).filter(function (x) { return x.id === sid; })[0]; } catch (e) {}
     var er = s && s.care && s.care.er && s.care.er[0], 증단 = s ? [단추('이렇게 하세요 — ' + s.name, '/symptom/' + s.id, 1)] : [];
     /* 기록 말 → 그 도구로 */
-    if (/(약|약들|약봉투).*(정리|목록)|병원에\s*보여|진료\s*때\s*보여|약국에\s*보여|약\s*한\s*장|먹는\s*약\s*(목록|정리)/.test(t)) return { 결: '드시는 약을 내 약통에 담아 두면, 진료·약국에 보여 줄 「내 약 한 장」이 바로 만들어져요.', 할: ['약봉투·처방전 사진이나 약 이름으로 담으세요.', '부모님 약이면 「부모님께 약 보내기」로 함께 볼 수 있어요.'], 단: [단추('내 약 한 장 보기', '/bag', 1), 단추('약 담기', '/together')] };
+    if (/(약|약들|약봉투).*(정리|목록)|병원에\s*보여|진료\s*때\s*보여|약국에\s*보여|약\s*한\s*장|먹는\s*약\s*(목록|정리)/.test(t)) return { 결: '드시는 약을 내 약통에 담아 두면, 진료·약국에 보여 줄 「내 약 한 장」이 바로 만들어져요.', 할: ['약봉투·처방전 사진이나 약 이름으로 담으세요.', /(엄마|어머니|아버지|아빠|부모님|아이|할머니|할아버지|남편|아내)/.test(t) ? '가족 약은 「가족 약 따로 담기」로 그분 약통을 따로 만들면, 그분 이름으로 한 장이 나와요.' : '부모님 약이면 「부모님께 약 보내기」로 함께 볼 수 있어요.'], 단: /(엄마|어머니|아버지|아빠|부모님|아이|할머니|할아버지|남편|아내)/.test(t) ? [단추('가족 약 따로 담기', '/people', 1), 단추('내 약 한 장 보기', '/bag')] : [단추('내 약 한 장 보기', '/bag', 1), 단추('약 담기', '/together')] };
+    /* 11-17 로드맵 4 — 약 × 영양제 겹침 */
+    if (/영양제/.test(t) && /(겹치|겹쳐|같이|함께|먹어도|섞)/.test(t)) {   /* 「칼슘이랑 갑상선약」처럼 성분을 말하면 아래 성분 답(더 구체적)으로 */
+      var 가 = /(엄마|어머니|아버지|아빠|부모님|아이|할머니|할아버지|남편|아내)/.test(t);
+      return { 결: '영양제도 내 약통에 담으면 약과 영양제, 영양제끼리 겹치는 것을 함께 살펴봐요.', 할: ['드시는 약과 영양제를 모두 담으세요 — 띄워 먹을 것(철분·칼슘 ↔ 갑상선약·항생제)과 같은 성분 겹침(비타민 D·아연)을 알려 드려요.'].concat(가 ? ['가족 것이면 「가족 약 따로 담기」로 그분 약통에 담으세요.'] : []), 단: (가 ? [단추('가족 약 따로 담기', '/people', 1)] : []).concat([단추('영양제 담기', '/supp', !가), 단추('내 약통 겹침 보기', '/together')]) };
+    }
+    /* 11-17 로드맵 — 가족 약 따로(기기 안 프로필) */
+    if (/(엄마|어머니|아버지|아빠|부모님|아이|아기|애기|남편|아내|가족|할머니|할아버지|시어머니|시아버지|장모|장인)/.test(t) && /약/.test(t) && /(관리|따로|챙겨|챙기|한\s*앱|여러\s*명|알림|알려|섞일|누가)/.test(t) && !/(정리|보여|두\s*배|과량|많이\s*먹)/.test(t))
+      return { 결: '가족 약은 사람마다 따로 담아요 — 겹침은 그분 약끼리 보고, 알림은 「어머니 약 드실 시간」처럼 이름을 붙여 울려요.', 할: ['홈 「내 약」 칸 아래 「어머니·아이 약도 따로 담기」에서 더하세요.', '오늘 가족 약은 홈에서 사람을 바꾸지 않고 「먹었어요」로 체크해요.'], 단: [단추('가족 약 따로 담기', '/people', 1)] };
     if (/알림|알려\s*(줘|주|주세요|줄)|깜빡|먹었는지|안\s*잊/.test(t) && /약|먹/.test(t)) return { 결: '약 먹을 시간을 알려 드리고, 「먹었어요」로 오늘 체크를 남겨요.', 할: ['드시는 약을 담고 시간을 고르면 그 시간에 알려 드려요.', '약 체크가 없으면 가족에게 알리는 것도 켤 수 있어요.'], 단: [단추('알림 설정', '/notify', 1), 단추('먹는 시간 정하기', '/schedule')] };
     if (/새로\s*(처방|받은|받았)|새\s*약|지금\s*(먹는|먹고\s*있는)\s*약|먹고\s*있는\s*약/.test(t)) { var n = (ME.taking || []).length;
       return { 결: n ? '내 약통의 약 ' + n + '가지와 새 약을 바로 맞대 볼게요 — 새 약을 담으면 겹치는 것을 곧바로 알려 드려요.' : '지금 드시는 약을 먼저 내 약통에 담아 두면, 새 약을 넣을 때마다 겹치는 것을 곧바로 알려 드려요.', 할: ['약 이름을 적거나 약봉투 사진으로 담으세요.'], 단: [단추('약 담기', '/together', 1), 단추('사진으로 담기', '/photo')] }; }
@@ -3766,9 +3808,9 @@ window.언어칸 = function () {
      새 임상 문장 없음 — 판정은 ixRun/ixCards(약 화면·같이 먹어도 되나요와 같은 엔진) */
   function 내약칸() {
     var items = []; try { items = takingItems(); } catch (e) {}
-    if (!items.length) return '<section class="job-hero' + (document.documentElement.classList.contains('ink') ? '' : ' card') + '">' + profRow() + 잉크얼굴(72) + '<h1>' + (profIsMe() ? '내 약을 담아 두세요' : esc(profName()) + ' 님 약을 담아 두세요') + '</h1><p>한 번 담으면 기억해요. 새 약이 들어오면 <b>같이 먹으면 안 되는 것</b>을 바로 알려 드려요.</p>' +
+    if (!items.length) return '<section class="job-hero' + (document.documentElement.classList.contains('ink') ? '' : ' card') + '">' + profRow() + 잉크얼굴(72) + '<h1>' + (profIsMe() ? '내 약을 담아 두세요' : esc(profCall(profName())) + ' 약을 담아 두세요') + '</h1><p>한 번 담으면 기억해요. 새 약이 들어오면 <b>같이 먹으면 안 되는 것</b>을 바로 알려 드려요.</p>' +
       '<div class="job-add"><button type="button" class="btn" ' + DI('solid') + ' onclick="go(\'/photo\')">약봉투·처방전 사진으로</button><button type="button" class="btn line" onclick="go(\'/together\')">약 이름으로 찾기</button></div>' +
-      '<p class="job-small"><a href="#/kinds">이름을 몰라도 종류만 골라 담기 ›</a></p>' + profLink() + '</section>';
+      '<p class="job-small"><a href="#/kinds">이름을 몰라도 종류만 골라 담기 ›</a></p>' + famToday() + profLink() + '</section>';
     var 판 = '', n = items.length, stop = 0, warn = 0;
     try { var C = ixCards(ixRun([])); stop = C.filter(function (c) { return c.lv === 'stop'; }).length; warn = C.filter(function (c) { return c.lv === 'warn'; }).length; } catch (e) {}
     판 = stop ? '<a class="job-verdict stop" href="#/together"><b>같이 드시면 안 되는 것 ' + stop + '</b>' + (warn ? ' · 조심할 것 ' + warn : '') + ' ›</a>'
@@ -3787,8 +3829,8 @@ window.언어칸 = function () {
     } catch (e) {}
     /* 11-17 Main — 간단히 보기: 큰 글씨 · 내 약을 쉬운 갈래 이름과 함께(사진 없는 줄 목록) · 단추 둘씩 크게. 겹침 판정·마음 한 줄은 같다 */
     var sv = typeof svOn === 'function' && svOn(), 목록 = sv ? '<ul class="job-list">' + items.slice(0, 6).map(function (d) { var dk = d.class || ((typeof drug === 'function' && drug(d.id)) || {}).class, c0 = (D.classes || []).filter(function (c) { return c.id === dk; })[0], g = d.quick ? d.quick.g.n : c0 ? String(c0.name).split('(')[0].trim() : ''; return '<li><b>' + esc(짧은이름(d.name)) + '</b>' + (g ? '<span>' + esc(g) + '</span>' : '') + '</li>'; }).join('') + (items.length > 6 ? '<li><a href="#/me?t=meds">' + (items.length - 6) + '가지 더 ›</a></li>' : '') + '</ul>' : '';
-    return '<section class="job-box' + (sv ? ' sv' : '') + (document.documentElement.classList.contains('ink') ? '' : ' card') + '">' + profRow() + '<div class="job-h"><h1>' + (profIsMe() ? '내 약' : esc(profName()) + ' 님 약') + ' ' + n + '가지</h1><button type="button" class="btn" ' + DI('solid') + ' onclick="go(\'/together\')">+ 약 더하기</button></div>' + 판 + 목록 + (마음.indexOf('오늘도 잘 챙기셨어요') >= 0 || !document.documentElement.classList.contains('ink') ? '' : 다음약()) + 마음 +
-      '<div class="job-row"><a href="#/notify">알림</a><a href="#/send">가족에게</a><a href="#/bag">내 약 한 장</a><a href="#/me?t=meds">약통</a></div>' + profLink() + '</section>';
+    return '<section class="job-box' + (sv ? ' sv' : '') + (document.documentElement.classList.contains('ink') ? '' : ' card') + '">' + profRow() + '<div class="job-h"><h1>' + (profIsMe() ? '내 약' : esc(profCall(profName())) + ' 약') + ' ' + n + '가지</h1><button type="button" class="btn" ' + DI('solid') + ' onclick="go(\'/together\')">+ 약 더하기</button></div>' + 판 + 목록 + (마음.indexOf('오늘도 잘 챙기셨어요') >= 0 || !document.documentElement.classList.contains('ink') ? '' : 다음약()) + 마음 +
+      famToday() + '<div class="job-row"><a href="#/notify">알림</a><a href="#/send">가족에게</a><a href="#/bag">내 약 한 장</a><a href="#/me?t=meds">약통</a></div>' + profLink() + '</section>';
   }
   /* 11-17 밤 — 원래 판의 「내 약」 칸 모양(잉크 판은 ink.css) */
   try { var jst = document.createElement('style'); jst.id = 'job-css'; jst.textContent = 'html:not(.ink) .job-hero,html:not(.ink) .job-box{margin:12px 0 4px;padding:18px 16px}html:not(.ink) .job-hero{text-align:center}html:not(.ink) .job-hero .ink-face{display:block;margin:0 auto 10px}html:not(.ink) .job-hero h1{font-size:1.375rem}html:not(.ink) .job-hero p{margin-top:6px;color:var(--muted)}'
@@ -5761,9 +5803,15 @@ window.vitalChart = function (k){
   /* 외부 검수 4차 #5 — 가장 큰 글씨에서 기준선 글자(위 135·아래 85)가 마지막 점과 겹쳤다. 글자는 그래프 위 한 줄로, 그래프 안에는 점선만 */
   const L7 = vitals().filter(x => x.k === 'bg' && x.t.slice(0, 10) >= dayBefore(6)), avg = w => { const v = L7.filter(x => x.w === w).map(x => x.v); return v.length ? Math.round(v.reduce((a, b) => a + b, 0) / v.length) + ` (${v.length}번)` : ''; };
   const refLine = k === 'bp' ? `<p class="vz-refl"><i class="ref"></i>가정혈압 기준: 위 ${VREF.bp.s} / 아래 ${VREF.bp.d}</p>` : (avg('공복') || avg('식후 2시간') ? `<p class="vz-refl">최근 7일 평균 — ${[avg('공복') && '공복 ' + avg('공복'), avg('식후 2시간') && '식후 2시간 ' + avg('식후 2시간')].filter(Boolean).join(' · ')} mg/dL</p>` : '');
-  return `${refLine}<svg class="vz" style="--vz:${fz}px" viewBox="0 0 ${W} ${H}" role="img" aria-label="최근 2주 ${k === 'bp' ? '혈압' : '혈당'} 흐름 — 아래 목록에 같은 숫자가 있어요">${grid}${refs}${days}${series}</svg>${legend}`;
+  /* 11-17 1등 로드맵 6 — 약을 담은 날·뺀 날을 세로 점선으로(혈압·혈당 변화와 약 바꾼 날을 한눈에). 같은 날은 하나로 */
+  const CH = {}; for (const c of (ME.chg || [])) if (c.d >= dayBefore(13)) (CH[c.d] = CH[c.d] || []).push(c);
+  const nmOf = id => { const it = takingItems().find(x => x.id === id) || (typeof drug === 'function' && drug(id)); return it ? String(it.name).split(' (')[0] : '약'; };
+  const marks = Object.keys(CH).sort().map(d => { const x = X(d + 'T12:00').toFixed(1), t = CH[d].map(c => (c.a ? '시작 ' : '뺌 ') + nmOf(c.id)).join(' · ');
+    return `<line x1="${x}" x2="${x}" y1="${pt}" y2="${H - pb}" class="vz-chg"><title>${d.slice(5).replace('-', '/')} ${esc(t)}</title></line><g class="vz-chgt" aria-hidden="true"><rect x="${(+x - fz * .75).toFixed(1)}" y="1" width="${(fz * 1.5).toFixed(1)}" height="${fz + 1}" rx="${((fz + 1) / 2).toFixed(1)}"/><text x="${x}" y="${(fz * .82 + 1).toFixed(1)}" text-anchor="middle">약</text></g>`; }).join('');
+  const chList = Object.keys(CH).sort().map(d => `${d.slice(5).replace('-', '/')} ${CH[d].map(c => (c.a ? '시작 ' : '뺌 ') + esc(nmOf(c.id))).join(' · ')}`);
+  return `${refLine}<svg class="vz" style="--vz:${fz}px" viewBox="0 0 ${W} ${H}" role="img" aria-label="최근 2주 ${k === 'bp' ? '혈압' : '혈당'} 흐름 — 아래 목록에 같은 숫자가 있어요">${grid}${refs}${days}${marks}${series}</svg>${legend}${chList.length ? `<p class="vz-chgl"><b>약</b><i></i>약 바꾼 날 — ${chList.join(' / ')}</p>` : ''}`;
 }
-try { const st = document.createElement('style'); st.textContent = '.vz-dot.v3{fill:var(--muted)}.vz-legend i.v3{background:var(--muted)}'; document.head.appendChild(st); } catch (e) {}
+try { const st = document.createElement('style'); st.textContent = '.vz-dot.v3{fill:var(--muted)}.vz-legend i.v3{background:var(--muted)}.vz-chg{stroke:var(--muted);stroke-width:1.5;stroke-dasharray:4 4}.vz-chgt rect{fill:var(--card,#fff);stroke:var(--muted);stroke-width:1.2}.vz-chgt text{fill:var(--muted);font-size:calc(var(--vz) * .78);font-weight:700}.vz-chgl{margin:8px 0 0;font-size:.9375rem;color:var(--muted);line-height:1.6;word-break:keep-all}.vz-chgl i{display:inline-block;width:14px;height:0;border-top:2px dashed var(--muted);vertical-align:middle;margin-right:6px}.vz-chgl b{display:inline-block;padding:0 6px;margin-right:4px;border:1.2px solid var(--muted);border-radius:999px;font-size:.8125rem;line-height:1.4}'; document.head.appendChild(st); } catch (e) {}
 /* 11-09 앱 껍데기에서 옮김(첫 화면 예산) */
 window.vVitalsS = function(){
   const k = VT.k, L = vitals(), mine = L.map((x, i) => ({ ...x, i })).filter(x => x.k === k).reverse();
