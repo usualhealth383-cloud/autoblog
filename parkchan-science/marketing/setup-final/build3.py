@@ -69,6 +69,14 @@ details summary{{cursor:pointer;font-weight:700;font-size:14px;color:var(--sub)}
 </div>
 <section class="fix"><b>카드 제목 — 앞 글자만 봐도 무슨 글인지</b><p class="lead" style="margin:6px 0 10px">첫 화면 카드는 제목 앞 9 ~ 10자만 보입니다. 글마다 <b>수정 → 제목만 바꾸기 → 발행</b>(순서는 그대로 유지됩니다).</p><div style="display:flex;flex-direction:column;gap:8px">{TLIST}</div></section>
 <section class="fix"><b>첫 화면 아래 빈칸 채우기 — 위젯 2개</b><p class="lead" style="margin:6px 0 10px">관리 → 꾸미기 설정 → <b>레이아웃·위젯 설정</b> → 오른쪽 아래 <b>위젯직접등록</b> → 위젯명 「상담 문의」, 코드 붙여 넣기 → 다음 → 등록. 「오시는 길」도 같게. 회색 판 맨 아래에 생긴 두 위젯을 <b>RSS/ATOM 오른쪽</b>(프로필 · 검색 · RSS 와 같은 줄)으로 끌어 놓고 → <b>적용</b>.</p><div style="display:flex;flex-direction:column;gap:8px">{WIDGETS}</div></section>
+<section class="fix" id="small"><b>작은 고치기 — 본문 다시 붙이지 말고 그 부분만 (표지 사진이 그대로 남도록)</b>
+<table class="tb" style="margin-top:8px;font-size:14px;border-collapse:collapse;width:100%"><tr><th style="text-align:left;border:1px solid var(--bd);padding:6px">글</th><th style="text-align:left;border:1px solid var(--bd);padding:6px">고칠 곳</th></tr>
+<tr><td style="border:1px solid var(--bd);padding:6px">고1 예비반</td><td style="border:1px solid var(--bd);padding:6px">① 맨 아래 작은 회색 <b>남교입 … 교습비 3줄</b>을 드래그 → Delete<br>② 「지금 <b>아이에게</b> 무엇이」 → <b>학생에게</b><br>③ 「<b>아이가</b> 자신 있게」 → <b>학생이</b></td></tr>
+<tr><td style="border:1px solid var(--bd);padding:6px">반별 안내</td><td style="border:1px solid var(--bd);padding:6px">① 「<b>아이</b> 학년에 맞는」 → <b>학생</b><br>② 「지금 <b>아이에게</b>」 → <b>학생에게</b><br>③ 맨 끝 「감사합니다.」 아래 빈 줄에 아래 <b>교습비 3줄 복사</b> → Ctrl+V (작은 회색 글씨로 들어감)</td></tr>
+<tr><td style="border:1px solid var(--bd);padding:6px">강의 시간표</td><td style="border:1px solid var(--bd);padding:6px">「지금 <b>아이에게</b>」 → <b>학생에게</b></td></tr>
+<tr><td style="border:1px solid var(--bd);padding:6px">중등부 특강반</td><td style="border:1px solid var(--bd);padding:6px">「<b>아이가</b> 과학을 어려워하나요?」 → <b>학생이</b></td></tr></table>
+<button class="big" data-rich="rFine" data-txt="tFine" style="margin-top:10px">교습비 3줄 복사 (작은 회색 글씨)</button><textarea id="tFine" hidden>남교입 제2019-115호 · 교습비(월) / 총 교습시간\n중등부 21만 원 / 1,042분 · 26만 7,000원 / 1,303분\n고등부 22만 원 / 912분 · 31만 7,000원 / 1,303분</textarea>
+<p class="lead" style="margin-top:6px">글마다 수정 → 고치고 → 발행. 이 페이지의 본문 복사 칸들도 같은 내용으로 고쳐 두었습니다.</p></section>
 <section class="fix" id="wide"><b>A. 첫 화면을 넓게 — 맨 위 남색 띠 (함께 보낸 박찬_첫화면_그림3장.zip)</b><ol style="padding-left:20px;margin-top:6px;font-size:14.5px;display:flex;flex-direction:column;gap:4px">
 <li>관리 → 꾸미기 설정 → 세부 디자인 설정 → 리모콘 <b>스킨배경 → 직접등록</b> → 상단 영역 지우고 <b>2_스킨배경_상단_남색.png</b> (하단 컬러 F6F2E9 그대로)</li>
 <li>리모콘 <b>타이틀 → 직접등록</b> → 지금 그림 지우고 <b>1_타이틀_남색.png</b> (높이 300, 블로그 제목 표시 끔 그대로)</li>
@@ -81,7 +89,7 @@ details summary{{cursor:pointer;font-weight:700;font-size:14px;color:var(--sub)}
 <ol class="steps">{''.join(cards)}</ol>
 <div class="fix"><b>카테고리 이름 하나 (선택)</b><ul><li>관리 → 메뉴·글·동영상 관리 → 블로그 → 카테고리 관리 → <b>고3 예비반</b>을 눌러 이름을 <b>고3 수능 준비반</b>으로 → 확인</li></ul></div>
 </div>
-{''.join(tpl)}
+{''.join(tpl)}<template id="rFine"><p style="margin:0;font-size:13px;line-height:1.6;color:#9A9A9A;text-align:center">남교입 제2019-115호 · 교습비(월) / 총 교습시간<br>중등부 21만 원 / 1,042분 · 26만 7,000원 / 1,303분<br>고등부 22만 원 / 912분 · 31만 7,000원 / 1,303분</p></template>
 <script>
 function cpy(b){{const t=b.closest('.cp').querySelector('pre').textContent;navigator.clipboard.writeText(t).then(()=>{{b.textContent='복사됨';setTimeout(()=>b.textContent='복사',1500)}},()=>{{const r=document.createRange();r.selectNodeContents(b.closest('.cp').querySelector('pre'));const s=getSelection();s.removeAllRanges();s.addRange(r);b.textContent='Ctrl+C'}})}}
 async function cpImg(b){{const src=b.closest('.cvr').querySelector('img').src,old=b.textContent;try{{const bl=await (await fetch(src)).blob();await navigator.clipboard.write([new ClipboardItem({{'image/png':bl}})]);b.textContent='복사됨 · 표지 자리에 Ctrl+V'}}catch(e){{b.textContent='복사가 막혔어요 · 사진 위 오른쪽 클릭 → 이미지 복사'}}setTimeout(()=>b.textContent=old,2600)}}
