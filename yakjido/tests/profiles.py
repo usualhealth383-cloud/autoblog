@@ -26,7 +26,7 @@ with sync_playwright() as p:
     ok(not (st['me'].get('taking') or []) and st['me'].get('age') == 'senior', '어머니 기록은 비어 있고 65세 이상')
     ok('acetaminophen' in (st['stash'] or {}).get('taking', []), '내 약은 따로 쉬어 둠')
     ok(st['allow'] is False, '서버 이어 보기 꺼짐(나 아님)')
-    ok('어머니 님 약을 담아 두세요' in pg.inner_text('.job-hero'), '머리글이 어머니 님')
+    ok('어머니 약을 담아 두세요' in pg.inner_text('.job-hero'), '머리글이 어머니 님')
     ok(pg.locator('.prof-chip').count() == 3 and pg.locator('.prof-note').count() == 1, '이름 줄 · 알림 안내')
     pg.evaluate("ME.taking=['ibuprofen'];saveMe()")
     pg.click('.prof-chip:has-text("나")'); pg.wait_for_load_state('load'); pg.wait_for_selector('.job-box', timeout=20000)
@@ -45,7 +45,7 @@ with sync_playwright() as p:
     pn.add_init_script("localStorage.setItem('yakjido.hello.v1','1');localStorage.setItem('yakjido.consent.v1',JSON.stringify({v:'2026-10-20',at:'2026-10-14',terms:1,privacy:1}));localStorage.setItem('yakjido.me.v1',JSON.stringify({taking:['ibuprofen'],sched:{ibuprofen:['08:00','20:00']}}));localStorage.setItem('yakjido.profiles.v1',JSON.stringify({active:'me',list:[{id:'me',name:'나'},{id:'mom1',name:'어머니'}]}));localStorage.setItem('yakjido.me.v1@mom1',JSON.stringify({age:'senior',taking:['acetaminophen'],sched:{acetaminophen:['12:00']}}))")
     pn.goto(URL + '#/schedule'); pn.wait_for_selector('.app', timeout=20000); pn.wait_for_timeout(1800)
     L = pn.evaluate("()=>__LN.pending")
-    mom = [x for x in L if x.get('title') == '어머니 님 약 드실 시간']
+    mom = [x for x in L if x.get('title') == '어머니 약 드실 시간']
     mine = [x for x in L if x.get('title') == '약지도 · 약 드실 시간']
     ok(len(mom) >= 7 and all(str(x['extra']['keys']).startswith('p=mom1;') for x in mom), f'어머니 약 알림이 7일치 걸림 — {len(mom)}')
     ok(len(mine) == 13, f'내 알림은 그대로 13 — {len(mine)}')
@@ -54,11 +54,11 @@ with sync_playwright() as p:
     t = pn.evaluate("()=>({mom: JSON.parse(localStorage.getItem('yakjido.me.v1@mom1')).taken, me: ME.taken})")
     ok('acetaminophen@12:00' in (t['mom'] or {}).get('2026-09-28', []) and 'acetaminophen@12:00' not in str(t['me']), '알림의 먹었어요는 어머니 기록에만')
     L2 = pn.evaluate("()=>__LN.pending")
-    ok(not any(x.get('title') == '어머니 님 약 드실 시간' and x['schedule']['at'].startswith('2026-09-28') for x in L2), '먹은 오늘 회차 알림은 지움')
+    ok(not any(x.get('title') == '어머니 약 드실 시간' and x['schedule']['at'].startswith('2026-09-28') for x in L2), '먹은 오늘 회차 알림은 지움')
 
     pn.goto(URL + '#/home'); pn.wait_for_selector('.job-box', timeout=20000); pn.wait_for_timeout(500)
     ft = pn.inner_text('.fam-today') if pn.locator('.fam-today').count() else ''
-    ok('어머니 님' in ft and '오늘 약 다 챙겼어요' in ft, f'오늘 가족 약 — 어머니 다 챙김 표시 ({ft[:40]})')
+    ok('어머니' in ft and '님' not in ft and '오늘 약 다 챙겼어요' in ft, f'오늘 가족 약 — 어머니 다 챙김 표시 ({ft[:40]})')
 
     # 1등 로드맵 3 — 담자마자 겹침 카드
     pg2 = b.new_page(viewport={'width': 360, 'height': 760}, locale='ko-KR'); pg2.add_init_script(SEED)
