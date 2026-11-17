@@ -2599,7 +2599,7 @@ try {
 */
 (function () {
   if (window.회원권 && window.회원권.__v) return;
-  var 판 = '2026-11-17d';   /* 11-17d 현욱님 결정 「회원권 폐지 · 앱마다 출시」 — 시트는 앱별 정기 결제 안내 + 다른 앱 1,000원 할인(준비 중) · 홈 띠 끔 · 이름은 그대로(부르는 앱 코드 안 깨지게) */   /* 11-17c 앱 이름 바꿈 — 너스텝(현욱님) */   /* 11-17b 표에 없는 말은 영어 받침 */   /* 11-17a 새 앱 둘(산부인과·너스텝) 스위치 꺼진 채 — 설치({일곱앱:true}) 때만 일곱 앱 */   /* 11-11c 법무 — 가족 나눠 쓰기 문구 폐기(기기 두 대 · 각자 계정) · 두 구독 겹침 결제 안내 */   /* 11-11b 베이지 상자 안쪽 여백 고정(앱 ul 초기화에 지지 않게) · 제목 왼쪽 */
+  var 판 = '2026-11-17e';   /* 11-17e 옛 글표의 묶음 상품 글 걷기(곁에 보고) */   /* 11-17d 현욱님 결정 「회원권 폐지 · 앱마다 출시」 — 시트는 앱별 정기 결제 안내 + 다른 앱 1,000원 할인(준비 중) · 홈 띠 끔 · 이름은 그대로(부르는 앱 코드 안 깨지게) */   /* 11-17c 앱 이름 바꿈 — 너스텝(현욱님) */   /* 11-17b 표에 없는 말은 영어 받침 */   /* 11-17a 새 앱 둘(산부인과·너스텝) 스위치 꺼진 채 — 설치({일곱앱:true}) 때만 일곱 앱 */   /* 11-11c 법무 — 가족 나눠 쓰기 문구 폐기(기기 두 대 · 각자 계정) · 두 구독 겹침 결제 안내 */   /* 11-11b 베이지 상자 안쪽 여백 고정(앱 ul 초기화에 지지 않게) · 제목 왼쪽 */
   /* 값은 여기 한 곳(원칙_결정 10-21·11-03) — 앱 하나: 월 5,900 · 연 49,000(출시 4,900 · 39,900) / 다섯 앱 회원권: 월 12,900 · 연 99,000(출시 9,900 · 79,000) · 체험 14일 */
   var 값표 = { 앱: { 월: 4900, 연: 39900 }, 회원권: { 월: 12900, 연: 99000, 출시월: 9900, 출시연: 79000 } };   /* 11-13 현욱님 — 앱 하나 늘 4,900·39,900(기념가 없음) · 회원권 그대로 */
   var 설정 = { app: 'app', 가로채기: false, 언어: null, 가격: 값표.회원권, 앱가격: 값표.앱, 판매: null, 자료: null,
@@ -2649,61 +2649,61 @@ try {
   function 차례() { return (일곱() || 폐지()) ? 다섯차례.concat(['obgyn', 'nursmart']) : 다섯차례; }
 
   var 글표 = {
-    ko: { 강조줄: '이 기능을 포함해 다섯 앱의 회원 기능 · 값과 늘 열린 것 보기', 제목: '메디나눔 회원권', 머리: '회원권 하나로 <b>다섯 앱</b>이 모두 열려요', 갈래: '아이 · 암 · 마음 · 약 · 진료 계산',
-      월: '월 {n}원', 연: '연 {n}원', 출시: '출시 기념가', 출시뒤: '출시 3개월 안에 가입하면 첫해 동안 · 그 뒤 {월} · {연}', 체험: '14일 써 보고 정하세요', 이앱하나: '이 앱 하나', 회원권다섯: '다섯 앱 회원권', 그뒤: '그 뒤 {월} · {연}', 출시때: '열린 날부터 3개월 안에 가입하면 첫해 이 값이에요', 겹침: '앱 이용권을 쓰고 계시면, 회원권으로 바꿀 때 스토어에서 앱 이용권을 해지해 주세요(둘 다 결제되지 않게)', 두대: '계정 하나로 기기 두 대까지 · 가족은 각자 계정으로', 자동: '14일 체험 뒤 자동 결제돼요 · 부가세 포함 · 설정에서 언제든 해지', 자동곧: '체험 14일 뒤 자동 결제 · 부가세 포함 · 언제든 해지',
+    ko: { 강조줄: '이 기능을 포함해 정기 결제로 열리는 것 · 값과 늘 열린 것 보기', 제목: '이용 요금', 머리: '필요한 앱만 <b>정기 결제</b>해요', 갈래: '아이 · 암 · 마음 · 약 · 진료 계산',
+      월: '월 {n}원', 연: '연 {n}원', 출시: '출시 기념가', 출시뒤: '출시 3개월 안에 가입하면 첫해 동안 · 그 뒤 {월} · {연}', 체험: '14일 써 보고 정하세요', 이앱하나: '이 앱 하나', 회원권다섯: '다른 앱 할인', 그뒤: '그 뒤 {월} · {연}', 출시때: '열린 날부터 3개월 안에 가입하면 첫해 이 값이에요', 겹침: '앱마다 따로 결제하고 따로 해지해요. 할인은 같은 계정으로 확인되면 적용돼요.', 두대: '계정 하나로 기기 두 대까지 · 가족은 각자 계정으로', 자동: '14일 체험 뒤 자동 결제돼요 · 부가세 포함 · 설정에서 언제든 해지', 자동곧: '체험 14일 뒤 자동 결제 · 부가세 포함 · 언제든 해지',
       좋은점: '회원이 되면', 좋1: '폰을 바꿔도 기록이 그대로', 좋1말: '계정에 저장해 새 폰·다른 기기에서 이어서 써요', 좋2: '진료 갈 때 한 장으로', 좋2말: '그동안의 기록을 한 장·PDF로 정리해 보여 드려요', 좋3: '가족과 함께', 좋3말: '아이 여럿 · 가족 약 알림까지 한 계정으로',
-      이앱: '{앱}에서 열리는 것', 지금: '지금 누르신 기능', 강조말: '이 기능은 회원권으로 열려요.', 어디서: '어디서', 열기: '열기',
+      이앱: '{앱}에서 열리는 것', 지금: '지금 누르신 기능', 강조말: '이 기능은 정기 결제로 열려요.', 어디서: '어디서', 열기: '열기',
       다른: '다른 네 앱에서도', 앱열기: '열어 보기', 회원이면: '회원이면', 늘: '늘 열려 있는 것', 늘말: '응급·안전 기능은 회원이 아니어도 <b>늘 열려 있어요</b>.',
-      흐름: '14일 체험은 이렇게', 흐1: '<b>오늘</b> — 다섯 앱이 모두 열려요', 흐2: '<b>12일째</b> — 끝나기 2일 전에 앱에서 미리 알려 드려요', 흐3: '<b>14일째</b> — 해지하지 않으면 고르신 요금으로 이어져요',
+      흐름: '14일 체험은 이렇게', 흐1: '<b>오늘</b> — 이 앱의 기능이 모두 열려요', 흐2: '<b>12일째</b> — 끝나기 2일 전에 앱에서 미리 알려 드려요', 흐3: '<b>14일째</b> — 해지하지 않으면 고르신 요금으로 이어져요',
       곧: '곧 열려요', 곧말: '스토어 등록을 마치면 열려요. 값과 내용을 먼저 보여 드려요.', 알림받기: '열리면 알려 주세요', 알림됨: '열리면 이 앱에서 알려 드릴게요',
       시작: '14일 써 보기', 연시작: '1년으로 시작 · {값}', 이앱만: '이 앱만 쓰기', 해지: '언제든 해지할 수 있어요', 환불: '환불 규정',
-      회원: '회원 · 다섯 앱 열림', 까지: '{날}까지', 회원말: '이 앱에서 바로 쓸 수 있어요', 운영자: '운영자 · 모든 기능', 관리: '구독 관리',
-      이앱구독: '이 앱은 구독으로 열려 있어요. 회원권으로 바꾸면 다른 네 앱도 함께 열려요.',
-      줄설명: '다섯 앱이 한 번에 열려요 · 무엇이 열리는지', 띠: '회원권 하나로 다섯 앱이 모두 열려요', 띠열림: '메디나눔 회원권이 열렸어요', 띠보기: '무엇이 열리나', 닫기: '닫기', 날: '{m}월 {d}일' },
-    en: { 강조줄: 'This feature and the member features of all five apps · price and what stays open', 제목: 'Medinanum Pass', 머리: 'One pass opens <b>all five apps</b>', 갈래: 'Children · cancer · mind · medicines · clinical scores — five sides of family health at once',
-      월: '₩{n}/month', 연: '₩{n}/year', 출시: 'Launch price', 출시뒤: 'Join within 3 months of launch for your first year · then {월} · {연}', 체험: 'Try it for 14 days, then decide', 이앱하나: 'This app only', 회원권다섯: 'Five-app pass', 그뒤: 'then {월} · {연}', 출시때: 'Launch prices apply for your first year if you join within 3 months of the day the pass opens', 겹침: 'If you already subscribe to a single-app plan, both subscriptions may be charged — when switching to the pass, cancel the app plan in your store’s subscription settings', 두대: 'One account on up to two devices · family members each use their own account (records are visible on a shared account)', 자동: 'Billed automatically after the 14-day trial · VAT included · cancel any time in Settings', 자동곧: 'When it opens, billing works like this — the plan you choose is charged automatically on the day the 14-day trial ends · VAT included · cancel any time in Settings',
-      좋은점: 'As a member', 좋1: 'Your records stay when you change phones', 좋1말: 'Saved to your account so you can carry on on a new phone or another device', 좋2: 'One page for your visit', 좋2말: 'Your records gathered on one page or a PDF to show your doctor', 좋3: 'Together with family', 좋3말: 'Several children and family medicine reminders under one account',
-      이앱: 'What opens in {앱}', 지금: 'The feature you just tapped', 강조말: 'This feature opens with the pass. Where to find it is written below.', 어디서: 'Where', 열기: 'Open',
-      다른: 'Also in the other four apps', 앱열기: 'Take a look', 회원이면: 'Members get', 늘: 'Always open', 늘말: 'Emergency and safety features are <b>always open</b>, member or not.',
-      흐름: 'How the 14-day trial works', 흐1: '<b>Today</b> — all five apps open', 흐2: '<b>Day 12</b> — the app reminds you 2 days before the trial ends', 흐3: '<b>Day 14</b> — unless you cancel, it continues at the price you chose',
-      곧: 'Coming soon', 곧말: 'The pass opens as soon as store registration is done. For now you can see the price and what it includes.', 알림받기: 'Tell me when it opens', 알림됨: "We'll let you know in this app when it opens",
+      회원: '정기 결제 중', 까지: '{날}까지', 회원말: '이 앱에서 바로 쓸 수 있어요', 운영자: '운영자 · 모든 기능', 관리: '구독 관리',
+      이앱구독: '',
+      줄설명: '앱마다 정기 결제 · 무엇이 열리는지', 띠: '정기 결제하면 열리는 것', 띠열림: '정기 결제가 열렸어요', 띠보기: '무엇이 열리나', 닫기: '닫기', 날: '{m}월 {d}일' },
+    en: { 강조줄: 'This feature and what a subscription opens · price and what stays open', 제목: 'Pricing', 머리: 'Subscribe <b>only to the apps you need</b>', 갈래: 'While you subscribe to one app, each other MediNanum app is ₩1,000 less a month (coming soon)',
+      월: '₩{n}/month', 연: '₩{n}/year', 출시: 'Launch price', 출시뒤: 'Join within 3 months of launch for your first year · then {월} · {연}', 체험: 'Try it for 14 days, then decide', 이앱하나: 'This app only', 회원권다섯: 'Multi-app discount', 그뒤: 'then {월} · {연}', 출시때: '', 겹침: 'Each app is billed and cancelled on its own. The discount applies once the same account is confirmed.', 두대: 'One account on up to two devices · family members each use their own account (records are visible on a shared account)', 자동: 'Billed automatically after the 14-day trial · VAT included · cancel any time in Settings', 자동곧: 'When it opens, billing works like this — the plan you choose is charged automatically on the day the 14-day trial ends · VAT included · cancel any time in Settings',
+      좋은점: 'With a subscription', 좋1: 'Your records stay when you change phones', 좋1말: 'Saved to your account so you can carry on on a new phone or another device', 좋2: 'One page for your visit', 좋2말: 'Your records gathered on one page or a PDF to show your doctor', 좋3: 'Together with family', 좋3말: 'Several children and family medicine reminders under one account',
+      이앱: 'What opens in {앱}', 지금: 'The feature you just tapped', 강조말: 'This feature opens with a subscription.', 어디서: 'Where', 열기: 'Open',
+      다른: 'Other MediNanum apps — ₩1,000 less a month (coming soon)', 앱열기: 'Take a look', 회원이면: 'Members get', 늘: 'Always open', 늘말: 'Emergency and safety features <b>always stay open</b>, without paying.',
+      흐름: 'How the 14-day trial works', 흐1: '<b>Today</b> — everything in this app opens', 흐2: '<b>Day 12</b> — the app reminds you 2 days before the trial ends', 흐3: '<b>Day 14</b> — unless you cancel, it continues at the price you chose',
+      곧: 'Coming soon', 곧말: 'Subscriptions open as soon as store registration is done. For now you can see the price and what opens.', 알림받기: 'Tell me when it opens', 알림됨: "We'll let you know in this app when it opens",
       시작: 'Try 14 days', 연시작: 'Start yearly · {값}', 이앱만: 'Just this app', 해지: 'Cancel any time', 환불: 'Refund policy',
-      회원: 'Member · all five apps open', 까지: 'until {날}', 회원말: 'You can use these in this app now', 운영자: 'Operator · all features', 관리: 'Manage subscription',
-      이앱구독: 'This app is open with its own subscription. Switch to the pass and the other four apps open too.',
-      줄설명: 'All five apps at once · see what opens', 띠: 'One pass opens all five apps', 띠열림: 'The Medinanum Pass is now open', 띠보기: 'See what opens', 닫기: 'Close', 날: '{mon} {d}' },
-    es: { 강조줄: 'Esta función y las funciones para miembros de las cinco apps · precio y lo que sigue abierto', 제목: 'Pase Medinanum', 머리: 'Un solo pase abre <b>las cinco apps</b>', 갈래: 'Niños · cáncer · salud mental · medicamentos · escalas clínicas: cinco áreas de la salud familiar a la vez',
-      월: '₩{n} al mes', 연: '₩{n} al año', 출시: 'Precio de lanzamiento', 출시뒤: 'Si se suscribe en los 3 primeros meses, durante el primer año · después {월} · {연}', 체험: 'Pruébelo 14 días y luego decida', 이앱하나: 'Solo esta app', 회원권다섯: 'Pase de cinco apps', 그뒤: 'después {월} · {연}', 출시때: 'El precio de lanzamiento se aplica el primer año si se suscribe en los 3 meses siguientes al día en que se abre el pase', 겹침: 'Si ya está suscrito al plan de una app, pueden cobrarse las dos suscripciones; al pasar al pase, cancele el plan de la app en la gestión de suscripciones de la tienda', 두대: 'Una cuenta en hasta dos dispositivos · cada familiar con su propia cuenta (en una cuenta compartida los registros se ven)', 자동: 'Se cobra automáticamente al terminar la prueba de 14 días · IVA incluido · cancele cuando quiera en Ajustes', 자동곧: 'Cuando se abra, el cobro será así: el plan elegido se cobra automáticamente el día en que termina la prueba de 14 días · IVA incluido · cancele cuando quiera en Ajustes',
+      회원: 'Subscribed', 까지: 'until {날}', 회원말: 'You can use these in this app now', 운영자: 'Operator · all features', 관리: 'Manage subscription',
+      이앱구독: '',
+      줄설명: 'Per-app subscription · what opens', 띠: 'What a subscription opens', 띠열림: 'Subscriptions are open', 띠보기: 'See what opens', 닫기: 'Close', 날: '{mon} {d}' },
+    es: { 강조줄: 'Esta función y lo que abre la suscripción · precio y lo que sigue abierto', 제목: 'Pase Medinanum', 머리: 'Suscríbase <b>solo a las apps que necesita</b>', 갈래: 'Mientras esté suscrito a una app, las demás apps de MediNanum cuestan ₩1.000 menos al mes (próximamente)',
+      월: '₩{n} al mes', 연: '₩{n} al año', 출시: 'Precio de lanzamiento', 출시뒤: 'Si se suscribe en los 3 primeros meses, durante el primer año · después {월} · {연}', 체험: 'Pruébelo 14 días y luego decida', 이앱하나: 'Solo esta app', 회원권다섯: 'Descuento entre apps', 그뒤: 'después {월} · {연}', 출시때: '', 겹침: 'Cada app se paga y se cancela por separado. El descuento se aplica al confirmar la misma cuenta.', 두대: 'Una cuenta en hasta dos dispositivos · cada familiar con su propia cuenta (en una cuenta compartida los registros se ven)', 자동: 'Se cobra automáticamente al terminar la prueba de 14 días · IVA incluido · cancele cuando quiera en Ajustes', 자동곧: 'Cuando se abra, el cobro será así: el plan elegido se cobra automáticamente el día en que termina la prueba de 14 días · IVA incluido · cancele cuando quiera en Ajustes',
       좋은점: 'Como miembro', 좋1: 'Sus registros se quedan aunque cambie de móvil', 좋1말: 'Se guardan en su cuenta para seguir en un móvil nuevo u otro dispositivo', 좋2: 'Una hoja para la consulta', 좋2말: 'Sus registros reunidos en una hoja o un PDF para enseñar al médico', 좋3: 'En familia', 좋3말: 'Varios hijos y avisos de medicación familiar en una sola cuenta',
-      이앱: 'Lo que se abre en {앱}', 지금: 'La función que acaba de tocar', 강조말: 'Esta función se abre con el pase. Abajo le indicamos dónde encontrarla.', 어디서: 'Dónde', 열기: 'Abrir',
-      다른: 'También en las otras cuatro apps', 앱열기: 'Ver', 회원이면: 'Con el pase', 늘: 'Siempre abierto', 늘말: 'Las funciones de urgencia y seguridad están <b>siempre abiertas</b>, sea o no miembro.',
-      흐름: 'Así funciona la prueba de 14 días', 흐1: '<b>Hoy</b>: se abren las cinco apps', 흐2: '<b>Día 12</b>: la app le avisa 2 días antes de que termine', 흐3: '<b>Día 14</b>: si no cancela, continúa con el precio que eligió',
-      곧: 'Muy pronto', 곧말: 'El pase se abrirá en cuanto terminemos el registro en la tienda. Por ahora puede ver el precio y lo que incluye.', 알림받기: 'Avísenme cuando se abra', 알림됨: 'Le avisaremos en esta app cuando se abra',
+      이앱: 'Lo que se abre en {앱}', 지금: 'La función que acaba de tocar', 강조말: 'Esta función se abre con la suscripción.', 어디서: 'Dónde', 열기: 'Abrir',
+      다른: 'Otras apps de MediNanum — ₩1.000 menos al mes (próximamente)', 앱열기: 'Ver', 회원이면: 'Con la suscripción', 늘: 'Siempre abierto', 늘말: 'Las funciones de urgencia y seguridad están <b>siempre abiertas</b>, sea o no miembro.',
+      흐름: 'Así funciona la prueba de 14 días', 흐1: '<b>Hoy</b> — se abre todo en esta app', 흐2: '<b>Día 12</b>: la app le avisa 2 días antes de que termine', 흐3: '<b>Día 14</b>: si no cancela, continúa con el precio que eligió',
+      곧: 'Muy pronto', 곧말: 'La suscripción se abrirá en cuanto terminemos el registro en la tienda. Por ahora puede ver el precio y lo que se abre.', 알림받기: 'Avísenme cuando se abra', 알림됨: 'Le avisaremos en esta app cuando se abra',
       시작: 'Probar 14 días', 연시작: 'Empezar con el plan anual · {값}', 이앱만: 'Solo esta app', 해지: 'Puede cancelar cuando quiera', 환불: 'Política de reembolso',
-      회원: 'Miembro · cinco apps abiertas', 까지: 'hasta el {날}', 회원말: 'Puede usarlas ya en esta app', 운영자: 'Operador · todas las funciones', 관리: 'Gestionar la suscripción',
-      이앱구독: 'Esta app está abierta con su propia suscripción. Con el pase se abren también las otras cuatro.',
-      줄설명: 'Las cinco apps a la vez · qué se abre', 띠: 'Un solo pase abre las cinco apps', 띠열림: 'El Pase Medinanum ya está abierto', 띠보기: 'Qué se abre', 닫기: 'Cerrar', 날: '{d} de {mes}' },
-    ja: { 강조줄: 'この機能を含む5つのアプリの会員機能 · 料金といつでも使えるもの', 제목: 'メディナヌム会員パス', 머리: 'パスひとつで<b>5つのアプリ</b>がすべて使えます', 갈래: '子ども・がん・こころ・薬・臨床スコア — 家族の健康の5つの分野をまとめて',
-      월: '月額₩{n}', 연: '年額₩{n}', 출시: '発売記念価格', 출시뒤: '発売から3か月以内の登録で最初の1年間 · その後は{월} · {연}', 체험: '14日間使ってから決めてください', 이앱하나: 'このアプリだけ', 회원권다섯: '5つのアプリの会員パス', 그뒤: 'その後は{월} · {연}', 출시때: '発売記念価格は、会員パスが始まる日から3か月以内に登録すると最初の1年間適用されます', 겹침: 'すでにアプリの利用プランを購読中なら、会員パスと二つの購読が両方課金されることがあります — 会員パスに切り替えるときは、ストアの定期購入の管理でアプリのプランを解約してください', 두대: 'アカウント一つで端末二台まで · 家族の記録はそれぞれのアカウントで（同じアカウントだと見えます）', 자동: '14日間の体験後に自動で課金されます · 税込 · 設定からいつでも解約', 자동곧: '開始後はこのように課金されます — 14日間の体験が終わる日に選んだ料金を自動課金 · 税込 · 設定からいつでも解約',
-      좋은점: '会員になると', 좋1: 'スマホを替えても記録はそのまま', 좋1말: 'アカウントに保存され、新しいスマホや別の端末で続けられます', 좋2: '受診のときは1枚にまとめて', 좋2말: 'これまでの記録を1枚・PDFにまとめて見せられます', 좋3: '家族と一緒に', 좋3말: '子ども複数人・家族の薬の通知までひとつのアカウントで',
-      이앱: '{앱}で使えるようになるもの', 지금: 'いまタップした機能', 강조말: 'この機能は会員パスで使えます。どこで使うかを下に書いてあります。', 어디서: '場所', 열기: '開く',
-      다른: 'ほかの4つのアプリでも', 앱열기: '見てみる', 회원이면: '会員なら', 늘: 'いつでも使えるもの', 늘말: '緊急・安全の機能は会員でなくても<b>いつでも使えます</b>。',
-      흐름: '14日間の体験の流れ', 흐1: '<b>今日</b> — 5つのアプリがすべて使えます', 흐2: '<b>12日目</b> — 終わる2日前にアプリでお知らせします', 흐3: '<b>14日目</b> — 解約しなければ選んだ料金で続きます',
-      곧: 'まもなく開始', 곧말: '会員パスはストアへの登録が済みしだい始まります。いまは料金と内容を先にご覧いただけます。', 알림받기: '始まったら知らせてください', 알림됨: '始まったらこのアプリでお知らせします',
+      회원: 'Suscrito', 까지: 'hasta el {날}', 회원말: 'Puede usarlas ya en esta app', 운영자: 'Operador · todas las funciones', 관리: 'Gestionar la suscripción',
+      이앱구독: '',
+      줄설명: 'Suscripción por app · qué se abre', 띠: 'Qué abre la suscripción', 띠열림: 'El Pase Medinanum ya está abierto', 띠보기: 'Qué se abre', 닫기: 'Cerrar', 날: '{d} de {mes}' },
+    ja: { 강조줄: 'この機能を含め定期購入で使えるもの · 料金といつも使えるもの', 제목: '料金', 머리: '<b>必要なアプリだけ</b>定期購入', 갈래: '1つのアプリを定期購入している間、ほかのメディナヌムのアプリは月₩1,000引き(準備中)',
+      월: '月額₩{n}', 연: '年額₩{n}', 출시: '発売記念価格', 출시뒤: '発売から3か月以内の登録で最初の1年間 · その後は{월} · {연}', 체험: '14日間使ってから決めてください', 이앱하나: 'このアプリだけ', 회원권다섯: 'アプリ間割引', 그뒤: 'その後は{월} · {연}', 출시때: '', 겹침: 'アプリごとに支払い・解約します。割引は同じアカウントの確認後に適用されます。', 두대: 'アカウント一つで端末二台まで · 家族の記録はそれぞれのアカウントで（同じアカウントだと見えます）', 자동: '14日間の体験後に自動で課金されます · 税込 · 設定からいつでも解約', 자동곧: '開始後はこのように課金されます — 14日間の体験が終わる日に選んだ料金を自動課金 · 税込 · 設定からいつでも解約',
+      좋은점: '定期購入すると', 좋1: 'スマホを替えても記録はそのまま', 좋1말: 'アカウントに保存され、新しいスマホや別の端末で続けられます', 좋2: '受診のときは1枚にまとめて', 좋2말: 'これまでの記録を1枚・PDFにまとめて見せられます', 좋3: '家族と一緒に', 좋3말: '子ども複数人・家族の薬の通知までひとつのアカウントで',
+      이앱: '{앱}で使えるようになるもの', 지금: 'いまタップした機能', 강조말: 'この機能は定期購入で使えます。', 어디서: '場所', 열기: '開く',
+      다른: 'ほかの4つのアプリでも', 앱열기: '見てみる', 회원이면: '定期購入すると', 늘: 'いつでも使えるもの', 늘말: '緊急・安全の機能は支払わなくても<b>いつでも使えます</b>。',
+      흐름: '14日間の体験の流れ', 흐1: '<b>今日</b> — このアプリの機能がすべて使えます', 흐2: '<b>12日目</b> — 終わる2日前にアプリでお知らせします', 흐3: '<b>14日目</b> — 解約しなければ選んだ料金で続きます',
+      곧: 'まもなく開始', 곧말: 'ストアへの登録が済みしだい定期購入が始まります。いまは料金と内容を先にご覧いただけます。', 알림받기: '始まったら知らせてください', 알림됨: '始まったらこのアプリでお知らせします',
       시작: '14日間使ってみる', 연시작: '年額で始める · {값}', 이앱만: 'このアプリだけ使う', 해지: 'いつでも解約できます', 환불: '返金の規定',
-      회원: '会員 · 5つのアプリが使えます', 까지: '{날}まで', 회원말: 'このアプリですぐに使えます', 운영자: '運営者 · すべての機能', 관리: 'サブスクリプションの管理',
-      이앱구독: 'このアプリは個別のサブスクリプションでご利用いただけます。会員パスに替えるとほかの4つのアプリも使えます。',
-      줄설명: '5つのアプリがまとめて使えます · 中身を見る', 띠: 'パスひとつで5つのアプリがすべて使えます', 띠열림: 'メディナヌム会員パスが始まりました', 띠보기: '中身を見る', 닫기: '閉じる', 날: '{m}月{d}日' },
-    zh: { 강조줄: '包括这个功能在内的五个应用会员功能 · 价格和一直开放的功能', 제목: 'Medinanum 会员卡', 머리: '一份会员订阅即可使用<b>全部五个应用</b>的会员功能', 갈래: '儿童 · 癌症 · 心理 · 用药 · 临床评分——家庭健康的五个方面一次全开',
-      월: '每月₩{n}', 연: '每年₩{n}', 출시: '上线纪念价', 출시뒤: '上线 3 个月内加入，第一年适用 · 之后{월} · {연}', 체험: '先用 14 天再决定', 이앱하나: '仅此应用', 회원권다섯: '五个应用会员', 그뒤: '之后{월} · {연}', 출시때: '自会员开放之日起 3 个月内加入，第一年享受上线纪念价', 겹침: '如果已订阅单个应用的方案，会员和该订阅可能会同时扣费——改用会员时，请在应用商店的订阅管理中取消单个应用方案', 두대: '一个账号最多两台设备 · 家人各用自己的账号（同一账号记录会互相看到）', 자동: '14 天试用结束后自动扣费 · 含增值税 · 可随时在设置中取消', 자동곧: '开放后将这样扣费——14 天试用结束当天自动扣除所选方案的费用 · 含增值税 · 可随时在设置中取消',
-      좋은점: '成为会员后', 좋1: '换手机记录也还在', 좋1말: '保存在账号里，换新手机或其他设备也能接着用', 좋2: '就诊时一页就够', 좋2말: '把这段时间的记录整理成一页或 PDF 给医生看', 좋3: '和家人一起', 좋3말: '多个孩子、家人的用药提醒都在一个账号里',
-      이앱: '{앱}里会打开的功能', 지금: '您刚才点的功能', 강조말: '这个功能需要会员卡。在哪里使用写在下面。', 어디서: '位置', 열기: '打开',
-      다른: '另外四个应用里也有', 앱열기: '去看看', 회원이면: '会员可用', 늘: '一直开放的功能', 늘말: '急救和安全功能不是会员也<b>一直开放</b>。',
-      흐름: '14 天试用是这样的', 흐1: '<b>今天</b>——即可使用全部五个应用的会员功能', 흐2: '<b>第 12 天</b>——结束前 2 天在应用里提前提醒您', 흐3: '<b>第 14 天</b>——如果不取消，就按您选的价格继续',
-      곧: '即将开放', 곧말: '会员卡在应用商店登记完成后就会开放。现在可以先看价格和内容。', 알림받기: '开放时通知我', 알림됨: '开放时会在这个应用里通知您',
+      회원: '定期購入中', 까지: '{날}まで', 회원말: 'このアプリですぐに使えます', 운영자: '運営者 · すべての機能', 관리: 'サブスクリプションの管理',
+      이앱구독: '',
+      줄설명: 'アプリごとの定期購入 · 使えるもの', 띠: '定期購入で使えるもの', 띠열림: '定期購入が始まりました', 띠보기: '中身を見る', 닫기: '閉じる', 날: '{m}月{d}日' },
+    zh: { 강조줄: '此功能及订阅后开放的内容 · 价格与始终开放的内容', 제목: '价格', 머리: '<b>只订阅需要的应用</b>', 갈래: '订阅一个应用期间，其他 MediNanum 应用每月少付 ₩1,000（即将推出）',
+      월: '每月₩{n}', 연: '每年₩{n}', 출시: '上线纪念价', 출시뒤: '上线 3 个月内加入，第一年适用 · 之后{월} · {연}', 체험: '先用 14 天再决定', 이앱하나: '仅此应用', 회원권다섯: '多应用优惠', 그뒤: '之后{월} · {연}', 출시때: '', 겹침: '每个应用单独付费、单独取消。确认为同一账号后适用优惠。', 두대: '一个账号最多两台设备 · 家人各用自己的账号（同一账号记录会互相看到）', 자동: '14 天试用结束后自动扣费 · 含增值税 · 可随时在设置中取消', 자동곧: '开放后将这样扣费——14 天试用结束当天自动扣除所选方案的费用 · 含增值税 · 可随时在设置中取消',
+      좋은점: '订阅后', 좋1: '换手机记录也还在', 좋1말: '保存在账号里，换新手机或其他设备也能接着用', 좋2: '就诊时一页就够', 좋2말: '把这段时间的记录整理成一页或 PDF 给医生看', 좋3: '和家人一起', 좋3말: '多个孩子、家人的用药提醒都在一个账号里',
+      이앱: '{앱}里会打开的功能', 지금: '您刚才点的功能', 강조말: '此功能需订阅后开放。', 어디서: '位置', 열기: '打开',
+      다른: '其他 MediNanum 应用 — 每月少付 ₩1,000（即将推出）', 앱열기: '去看看', 회원이면: '订阅后', 늘: '一直开放的功能', 늘말: '急救与安全功能<b>始终开放</b>，无需付费。',
+      흐름: '14 天试用是这样的', 흐1: '<b>今天</b> — 此应用的功能全部开放', 흐2: '<b>第 12 天</b>——结束前 2 天在应用里提前提醒您', 흐3: '<b>第 14 天</b>——如果不取消，就按您选的价格继续',
+      곧: '即将开放', 곧말: '应用商店登记完成后即可订阅。现在可以先看价格和内容。', 알림받기: '开放时通知我', 알림됨: '开放时会在这个应用里通知您',
       시작: '试用 14 天', 연시작: '按年开始 · {값}', 이앱만: '只用这个应用', 해지: '随时可以取消', 환불: '退款规定',
-      회원: '会员 · 已开通五个应用的会员功能', 까지: '到{날}', 회원말: '在这个应用里马上就能用', 운영자: '运营者 · 全部功能', 관리: '管理订阅',
-      이앱구독: '您已单独订阅此应用。改用会员订阅后，也可使用另外四个应用的会员功能。',
-      줄설명: '五个应用一次全开 · 看看有什么', 띠: '一份会员订阅即可使用全部五个应用的会员功能', 띠열림: 'Medinanum 会员卡已开放', 띠보기: '看看有什么', 닫기: '关闭', 날: '{m}月{d}日' }
+      회원: '订阅中', 까지: '到{날}', 회원말: '在这个应用里马上就能用', 운영자: '运营者 · 全部功能', 관리: '管理订阅',
+      이앱구독: '',
+      줄설명: '按应用订阅 · 开放内容', 띠: '订阅后开放的内容', 띠열림: '订阅已开放', 띠보기: '看看有什么', 닫기: '关闭', 날: '{m}月{d}日' }
   };
 
   /* 11-17d 폐지글 — 묶음 상품이 없어진 뒤 보이는 글(이 표에 있는 열쇠가 먼저) */
@@ -2824,7 +2824,7 @@ try {
     if (폐지()) h += '<div class="mb-plans">' + 줄값(a, 글('이앱하나') + (앱 ? ' · ' + esc(골라(앱.이름)) : ''), true) + '<div class="mb-plan"><b class="mb-pn">' + 글('할인칸') + '</b><span class="mb-chip">' + 글('할인곧') + '</span><p class="mb-price"><b>' + 월값(Math.max(0, (a.월 || 0) - 1000)) + '</b></p></div></div>';
     else h += '<div class="mb-plans">' + 줄값(a, 글('이앱하나') + (앱 ? ' · ' + esc(골라(앱.이름)) : ''), false) + 줄값(g, 글('회원권다섯'), true) + '</div>';
     var 지금앱 = (설정.자료 && 설정.자료.앱) || 설정.app;
-    if (새앱들[지금앱] && !일곱() && !폐지()) h += '<p class="mb-small">' + ({ ko: '이 앱은 곧 회원권에 들어가요. 지금은 「이 앱 하나」로 쓰실 수 있어요.', en: 'This app will join the membership soon. For now, use the single-app plan.', es: 'Esta app se sumará pronto a la membresía. Por ahora, use el plan de una app.', ja: 'このアプリはまもなく会員権に加わります。今は「このアプリだけ」で使えます。', zh: '此应用即将加入会员。目前请使用「单个应用」方案。' }[언어()] || '') + '</p>';   /* 11-17 — 새 앱 안에서 회원권이 이 앱을 연다고 말하지 않게 */
+    /* 11-17e — 새 앱 「곧 회원권에 들어가요」 줄은 묶음 상품 폐지로 걷음 */
     if (폐지() ? a.출시월 : (g.출시월 || a.출시월)) h += '<p class="mb-small">' + 글('출시때') + '</p>';
     h += '<p class="mb-auto">' + 글(판매() ? '자동' : '자동곧') + '</p>';
     h += '<p class="mb-auto">' + 글('겹침') + '</p>';   /* 11-11 법무 — 앱 이용권과 회원권이 함께 결제될 수 있음 · 바꾸는 법 */
@@ -4887,31 +4887,34 @@ try { 이용량.설치({ 앱: 'yakjido', 켜짐: false, 주소: 'https://uszalzc
 */
 (function () {
   if (window.설정판 && window.설정판.__v) return;
-  var 판 = '2026-11-05a';   /* 11-05a 유럽연합 시간대 */   /* 11-04i 묶음 제목 h3→h2(화면 읽기 머리글 건너뜀 없게 · 곁에가 찾음) */   /* 11-04h 기기 언어로 나라 짐작 안 함(모르면 빈칸·번호 없음) · 11-04g 응급번호()·번호HTML() · 11-04f 제목·설명 이스케이프 · 11-04e 기본 줄 값 이스케이프 · 11-04d 머리 주석 정리 */
+  var 판 = '2026-11-17a';   /* 11-17a 새 말 셋(vi·tl·th) — 글표·말과 나라·사업자·통계·급함·현지(소아가 쓰는 말 · 없으면 한국어로 떨어지던 것) */   /* 11-12d 어두운 화면 — 말과 나라 바탕(--bg 없으면 --surface)·단추 글자(--on-accent) */   /* 11-12c 방문 통계 한 줄(설정판.통계말) */   /* 11-12a 말과 나라 창 — 회색 「맞아요」 이유 한 줄 · 「나중에 정할게요」(이번 실행 동안 다시 안 엶) */   /* 11-11c 말과 나라 창에 응급 번호 한 줄(창이 화면을 막는 동안) */   /* 11-11b 사업자 정보 메일·복사 누르는 칸 44px */   /* 11-11a 사업자 정보 안쪽 여백 · 메일 본문색·밑줄 없음 + 복사 단추 · 말과나라 제목·설명 왼쪽 */   /* 11-10g 강조색 대체(곁에 「맞아요」 안 보임) */   /* 11-10e 말과 나라 첫 화면 — 위에서 시작 · 단추 글 가운데 · 포커스 한 겹 */   /* 11-10d 사업자 정보 접힘(사업자표) */   /* 11-10c 밝기 기본 표시 = 밝게(10-14 현욱님 「기본 밝게」 · 11-10b 되돌림) */   /* 11-10a 내 기기 줄(계정 부품 기기두대 켜졌을 때만) */   /* 11-09a 지우기 줄 → 계정과 기록 지우기(심사 — 로그인 전에도 계정 삭제 길) */   /* 11-05a 유럽연합 시간대 */   /* 11-04i 묶음 제목 h3→h2(화면 읽기 머리글 건너뜀 없게 · 곁에가 찾음) */   /* 11-04h 기기 언어로 나라 짐작 안 함(모르면 빈칸·번호 없음) · 11-04g 응급번호()·번호HTML() · 11-04f 제목·설명 이스케이프 · 11-04e 기본 줄 값 이스케이프 · 11-04d 머리 주석 정리 */
   var 설정 = { app: 'app', 언어: null, 줄: null, 아이콘: null, 다시그리기: null };
   var 글표 = {
     ko: { 맞추기: '나에게 맞추기', 알림: '알림', 화면: '화면과 언어', 기록: '내 기록', 앱: '이 앱',
       알림제목: '알림', 언어: '언어 · Language', 글자: '글자 크기', 글자들: ['기본', '조금 크게', '가장 크게'], 밝기: '화면 밝기', 밝기들: ['밝게', '어둡게', '기기 설정 따라'], 준비중: '준비 중',
       동의: '내 동의 내용', 동의설명: '동의를 바꾸거나 철회', 파일: '내 기록 파일로 받기', 파일설명: '모든 기록을 파일 하나(JSON)로 이 기기에 저장', 옮기기: '옮기기 · 되살리기', 옮기기설명: '복사해 두었다가 다른 기기에서 되살리기',
-      지우기: '모두 지우기', 지우기설명: '이 기기의 기록과 설정 — 확인 뒤 지워요', 처리방침: '개인정보 처리방침', 처리방침설명: '무엇을 · 왜 · 언제까지', 정보: '이 앱에 대하여', 정보설명: '의료기기 아님 · 근거 자료 · 약관', 문의: '문의하고 잘못된 내용 알리기', 문의설명: '고쳐야 할 것을 알려 주세요' },
+      지우기: '계정과 기록 지우기', 기기: '내 기기', 기기설명: '이 계정으로 쓰는 기기 · 두 대까지 · 내보내기', 지우기설명: '이 기기의 기록 · 로그인하셨다면 계정과 서버 기록까지 — 확인 뒤 지워요', 처리방침: '개인정보 처리방침', 처리방침설명: '무엇을 · 왜 · 언제까지', 정보: '이 앱에 대하여', 정보설명: '의료기기 아님 · 근거 자료 · 약관', 문의: '문의하고 잘못된 내용 알리기', 문의설명: '고쳐야 할 것을 알려 주세요' },
     en: { 맞추기: 'Personalize', 알림: 'Notifications', 화면: 'Display and language', 기록: 'My records', 앱: 'This app',
       알림제목: 'Notifications', 언어: 'Language · 언어', 글자: 'Text size', 글자들: ['Default', 'Larger', 'Largest'], 밝기: 'Screen brightness', 밝기들: ['Light', 'Dark', 'Follow device'], 준비중: 'Coming soon',
       동의: 'My consents', 동의설명: 'Change or withdraw consent', 파일: 'Download my records', 파일설명: 'Save all records to this device as one file (JSON)', 옮기기: 'Move · restore', 옮기기설명: 'Copy and restore on another device',
-      지우기: 'Delete everything', 지우기설명: 'Records and settings on this device — deleted after you confirm', 처리방침: 'Privacy policy', 처리방침설명: 'What, why and for how long', 정보: 'About this app', 정보설명: 'Not a medical device · sources · terms', 문의: 'Contact us and report errors', 문의설명: 'Tell us what needs fixing' },
+      지우기: 'Delete account and records', 기기: 'My devices', 기기설명: 'Devices using this account · up to two · sign one out', 지우기설명: 'Records on this device, and your account and server records if you logged in — deleted after you confirm', 처리방침: 'Privacy policy', 처리방침설명: 'What, why and for how long', 정보: 'About this app', 정보설명: 'Not a medical device · sources · terms', 문의: 'Contact us and report errors', 문의설명: 'Tell us what needs fixing' },
     es: { 맞추기: 'Ajustado a mí', 알림: 'Avisos', 화면: 'Pantalla e idioma', 기록: 'Mis registros', 앱: 'Esta app',
       알림제목: 'Avisos', 언어: 'Idioma · 언어', 글자: 'Tamaño del texto', 글자들: ['Normal', 'Más grande', 'Lo más grande'], 밝기: 'Pantalla', 밝기들: ['Clara', 'Oscura', 'Según el dispositivo'], 준비중: 'Muy pronto',
       동의: 'Mis consentimientos', 동의설명: 'Cambiar o retirar el consentimiento', 파일: 'Descargar mis registros', 파일설명: 'Guardar todos los registros en este dispositivo en un archivo (JSON)', 옮기기: 'Mover · restaurar', 옮기기설명: 'Copiar y restaurar en otro dispositivo',
-      지우기: 'Borrar todo', 지우기설명: 'Registros y ajustes de este dispositivo: se borran tras confirmar', 처리방침: 'Política de privacidad', 처리방침설명: 'Qué, por qué y hasta cuándo', 정보: 'Sobre esta app', 정보설명: 'No es un producto sanitario · fuentes · condiciones', 문의: 'Contacto y notificación de errores', 문의설명: 'Díganos qué hay que corregir' },
+      지우기: 'Borrar cuenta y registros', 기기: 'Mis dispositivos', 기기설명: 'Dispositivos con esta cuenta · hasta dos · cerrar sesión en uno', 지우기설명: 'Registros de este dispositivo y, si inició sesión, su cuenta y los registros del servidor: se borran tras confirmar', 처리방침: 'Política de privacidad', 처리방침설명: 'Qué, por qué y hasta cuándo', 정보: 'Sobre esta app', 정보설명: 'No es un producto sanitario · fuentes · condiciones', 문의: 'Contacto y notificación de errores', 문의설명: 'Díganos qué hay que corregir' },
     ja: { 맞추기: '自分に合わせる', 알림: '通知', 화면: '画面と言語', 기록: '自分の記録', 앱: 'このアプリ',
       알림제목: '通知', 언어: '言語 · 언어', 글자: '文字の大きさ', 글자들: ['標準', '少し大きく', 'いちばん大きく'], 밝기: '画面の明るさ', 밝기들: ['明るく', '暗く', '端末の設定に合わせる'], 준비중: '準備中',
       동의: '同意の内容', 동의설명: '同意の変更・撤回', 파일: '記録をファイルで受け取る', 파일설명: 'すべての記録を1つのファイル（JSON）でこの端末に保存', 옮기기: '移す · 戻す', 옮기기설명: 'コピーして別の端末で戻す',
-      지우기: 'すべて消す', 지우기설명: 'この端末の記録と設定 — 確認してから消します', 처리방침: '個人情報の取り扱い', 처리방침설명: '何を・なぜ・いつまで', 정보: 'このアプリについて', 정보설명: '医療機器ではありません · 根拠 · 規約', 문의: 'お問い合わせ・誤りの報告', 문의설명: '直すべきところを教えてください' },
+      지우기: 'アカウントと記録を消す', 기기: 'わたしの端末', 기기설명: 'このアカウントで使う端末 · 二台まで · ログアウトさせる', 지우기설명: 'この端末の記録と、ログインしていればアカウントとサーバーの記録も — 確認してから消します', 처리방침: '個人情報の取り扱い', 처리방침설명: '何を・なぜ・いつまで', 정보: 'このアプリについて', 정보설명: '医療機器ではありません · 根拠 · 規約', 문의: 'お問い合わせ・誤りの報告', 문의설명: '直すべきところを教えてください' },
     zh: { 맞추기: '为我调整', 알림: '提醒', 화면: '显示和语言', 기록: '我的记录', 앱: '本应用',
       알림제목: '提醒', 언어: '语言 · 언어', 글자: '字体大小', 글자들: ['标准', '大一些', '最大'], 밝기: '屏幕亮度', 밝기들: ['浅色', '深色', '跟随设备'], 준비중: '即将推出',
       동의: '我的同意', 동의설명: '更改或撤回同意', 파일: '把记录下载为文件', 파일설명: '把全部记录以一个文件（JSON）保存到本设备', 옮기기: '转移 · 恢复', 옮기기설명: '复制后在其他设备恢复',
-      지우기: '全部删除', 지우기설명: '本设备上的记录和设置——确认后删除', 처리방침: '隐私政策', 처리방침설명: '收集什么、为什么、保存多久', 정보: '关于本应用', 정보설명: '不是医疗器械 · 依据 · 条款', 문의: '联系我们、报告错误', 문의설명: '告诉我们需要改正的地方' }
+      지우기: '删除账号和记录', 기기: '我的设备', 기기설명: '使用此账号的设备 · 最多两台 · 移出', 지우기설명: '本设备上的记录；如已登录，也包括账号和服务器上的记录——确认后删除', 처리방침: '隐私政策', 처리방침설명: '收集什么、为什么、保存多久', 정보: '关于本应用', 정보설명: '不是医疗器械 · 依据 · 条款', 문의: '联系我们、报告错误', 문의설명: '告诉我们需要改正的地方' },
+    vi: {"맞추기": "Cá nhân hóa", "알림": "Thông báo", "화면": "Hiển thị và ngôn ngữ", "기록": "Hồ sơ của tôi", "앱": "Ứng dụng này", "알림제목": "Thông báo", "언어": "Ngôn ngữ · 언어", "글자": "Cỡ chữ", "글자들": ["Mặc định", "Lớn hơn", "Lớn nhất"], "밝기": "Độ sáng màn hình", "밝기들": ["Sáng", "Tối", "Theo thiết bị"], "준비중": "Sắp có", "동의": "Các đồng ý của tôi", "동의설명": "Thay đổi hoặc rút lại đồng ý", "파일": "Tải hồ sơ của tôi", "파일설명": "Lưu mọi hồ sơ vào thiết bị này thành một tệp (JSON)", "옮기기": "Chuyển · khôi phục", "옮기기설명": "Sao chép rồi khôi phục trên thiết bị khác", "지우기": "Xóa tài khoản và hồ sơ", "기기": "Thiết bị của tôi", "기기설명": "Thiết bị dùng tài khoản này · tối đa hai · đăng xuất một máy", "지우기설명": "Hồ sơ trên thiết bị này, và tài khoản cùng hồ sơ trên máy chủ nếu bạn đã đăng nhập — xóa sau khi bạn xác nhận", "처리방침": "Chính sách quyền riêng tư", "처리방침설명": "Thu thập gì, vì sao và trong bao lâu", "정보": "Về ứng dụng này", "정보설명": "Không phải thiết bị y tế · nguồn tài liệu · điều khoản", "문의": "Liên hệ và báo lỗi", "문의설명": "Cho chúng tôi biết điều cần sửa"},
+    tl: {"맞추기": "Iangkop sa akin", "알림": "Mga abiso", "화면": "Display at wika", "기록": "Aking mga tala", "앱": "Ang app na ito", "알림제목": "Mga abiso", "언어": "Wika · 언어", "글자": "Laki ng teksto", "글자들": ["Karaniwan", "Mas malaki", "Pinakamalaki"], "밝기": "Liwanag ng screen", "밝기들": ["Maliwanag", "Madilim", "Sundin ang device"], "준비중": "Malapit na", "동의": "Aking mga pahintulot", "동의설명": "Baguhin o bawiin ang pahintulot", "파일": "I-download ang aking mga tala", "파일설명": "I-save ang lahat ng tala sa device na ito bilang isang file (JSON)", "옮기기": "Ilipat · ibalik", "옮기기설명": "Kopyahin at ibalik sa ibang device", "지우기": "Burahin ang account at mga tala", "기기": "Aking mga device", "기기설명": "Mga device na gumagamit ng account na ito · hanggang dalawa · mag-sign out ng isa", "지우기설명": "Mga tala sa device na ito, at ang iyong account at mga tala sa server kung naka-log in ka — buburahin matapos mong kumpirmahin", "처리방침": "Patakaran sa privacy", "처리방침설명": "Ano, bakit at hanggang kailan", "정보": "Tungkol sa app na ito", "정보설명": "Hindi medical device · mga sanggunian · mga tuntunin", "문의": "Makipag-ugnayan at mag-ulat ng mali", "문의설명": "Sabihin sa amin kung ano ang dapat ayusin"},
+    th: {"맞추기": "ปรับให้เหมาะกับฉัน", "알림": "การแจ้งเตือน", "화면": "การแสดงผลและภาษา", "기록": "บันทึกของฉัน", "앱": "แอปนี้", "알림제목": "การแจ้งเตือน", "언어": "ภาษา · 언어", "글자": "ขนาดตัวอักษร", "글자들": ["ปกติ", "ใหญ่ขึ้น", "ใหญ่ที่สุด"], "밝기": "ความสว่างหน้าจอ", "밝기들": ["สว่าง", "มืด", "ตามอุปกรณ์"], "준비중": "เร็ว ๆ นี้", "동의": "ความยินยอมของฉัน", "동의설명": "เปลี่ยนหรือถอนความยินยอม", "파일": "ดาวน์โหลดบันทึกของฉัน", "파일설명": "บันทึกทุกอย่างลงอุปกรณ์นี้เป็นไฟล์เดียว (JSON)", "옮기기": "ย้าย · กู้คืน", "옮기기설명": "คัดลอกแล้วกู้คืนบนอุปกรณ์อื่น", "지우기": "ลบบัญชีและบันทึก", "기기": "อุปกรณ์ของฉัน", "기기설명": "อุปกรณ์ที่ใช้บัญชีนี้ · สูงสุดสองเครื่อง · ออกจากระบบหนึ่งเครื่อง", "지우기설명": "บันทึกในอุปกรณ์นี้ และบัญชีกับบันทึกบนเซิร์ฟเวอร์หากคุณเข้าสู่ระบบ — ลบหลังจากคุณยืนยัน", "처리방침": "นโยบายความเป็นส่วนตัว", "처리방침설명": "เก็บอะไร เพราะอะไร และนานแค่ไหน", "정보": "เกี่ยวกับแอปนี้", "정보설명": "ไม่ใช่เครื่องมือแพทย์ · แหล่งข้อมูล · ข้อกำหนด", "문의": "ติดต่อและแจ้งข้อผิดพลาด", "문의설명": "บอกเราว่าต้องแก้ไขอะไร"}
   };
-  function 말() { var l = null; try { if (typeof 설정.언어 === 'function') l = 설정.언어(); } catch (e) {} if (!l) l = (document.documentElement && document.documentElement.lang) || 'ko'; l = String(l).toLowerCase().slice(0, 2); return 글표[l] ? l : 'ko'; }
+  function 말() { var l = null; try { if (typeof 설정.언어 === 'function') l = 설정.언어(); } catch (e) {} if (!l) l = (document.documentElement && document.documentElement.lang) || 'ko'; l = String(l).toLowerCase(); if (/^fil/.test(l)) l = 'tl'; l = l.slice(0, 2); return 글표[l] ? l : 'ko'; }   /* 11-17a 필리핀어는 html lang=fil — tl 로 */
   function 글(k) { var t = 글표[말()][k]; return t == null ? 글표.ko[k] : t; }
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
   function 값(v) { try { return typeof v === 'function' ? v() : v; } catch (e) { return null; } }
@@ -4948,6 +4951,7 @@ try { 이용량.설치({ 앱: 'yakjido', 켜짐: false, 주소: 'https://uszalzc
     if (화 || 고름칸) h += '<div class="ms-group"><h2 class="ms-h">' + 글('화면') + '</h2>' + (화 ? '<div class="menu">' + 화 + '</div>' : '') + (고름칸 ? '<div class="ms-segs">' + 고름칸 + '</div>' : '') + '</div>';
     var 기 = '';
     if (o.동의) 기 += 줄('shield', 글('동의'), 값(o.동의.설명) || 글('동의설명'), 값(o.동의.값), o.동의.부름);
+    try { if (window.계정 && 계정.기기켜짐 && 계정.기기켜짐() && 계정.로그인됨 && 계정.로그인됨()) 기 += 줄('user', 글('기기'), 글('기기설명'), '', '계정.기기열기()'); } catch (e) {}   /* 11-10 기기 두 대 — 계정 부품이 켜졌고 로그인했을 때만 */
     if (o.파일) 기 += 줄('download', 글('파일'), 글('파일설명'), 값(o.파일.값), o.파일.부름);
     if (o.옮기기) 기 += 줄('copy', 글('옮기기'), 글('옮기기설명'), 값(o.옮기기.값), o.옮기기.부름);
     (값(o.기록더) || []).forEach(function (x) { 기 += 줄(x.아이콘, 값(x.제목), 값(x.설명), 값(x.값), x.부름); });
@@ -4959,7 +4963,38 @@ try { 이용량.설치({ 앱: 'yakjido', 켜짐: false, 주소: 'https://uszalzc
     if (o.문의) 앱 += 줄('chat', 글('문의'), 글('문의설명'), '', o.문의.부름);
     h += 묶음(글('앱'), 앱);
     if (o.아래말) h += '<p class="tiny ms-foot">' + 값(o.아래말) + '</p>';
+    h += '<p class="tiny ms-foot ms-stat">' + esc(통계글()) + '</p>';   /* 11-12 현욱님 「Cloudflare 통계 켜 두기」 — 약속을 사실에 맞춘 정본 한 줄(다섯 앱 같은 말) */
+    if (o.사업자 !== false) h += 사업자HTML();   /* 11-10 사업자등록 — 다섯 앱 같은 값(아래 사업자표 한 곳) */
     return '<div class="ms" id="msSettings">' + h + '</div>';
+  }
+  /* ── 사업자 정보(11-10 사업자등록증 · 정본 _서버/운영자.json 과 같게 — 바뀌면 여기 한 곳만 고치고 다섯 앱에 심는다) ──
+     ⛔ 생년월일 등 등록증의 다른 개인정보는 싣지 않는다. 「준비 중」은 그 말 그대로(지어내지 않음) */
+  var 사업자표 = { 상호: '메디나눔', 대표: '박민욱', 번호: '799-14-03176', 통신판매: '', 주소: '서울특별시 강동구 천중로 147, 204호(천호동, 성심하이빌)', 전화: '', 메일: 'contact@medinanum.com', 호스팅: 'Cloudflare' };
+  var 사업자말 = { ko: ['사업자 정보', '상호', '대표', '사업자등록번호', '통신판매업 신고', '주소', '전화', '문의 메일', '호스팅', '준비 중', '복사', '복사했어요'],
+    en: ['Business information', 'Business name', 'Representative', 'Business registration no.', 'Mail-order business report', 'Address', 'Phone', 'Contact email', 'Hosting', 'In preparation', 'Copy', 'Copied'],
+    es: ['Datos de la empresa', 'Nombre comercial', 'Representante', 'N.º de registro mercantil', 'Registro de venta a distancia', 'Dirección', 'Teléfono', 'Correo de contacto', 'Alojamiento', 'En preparación', 'Copiar', 'Copiado'],
+    ja: ['事業者情報', '商号', '代表', '事業者登録番号', '通信販売業届出', '住所', '電話', 'お問い合わせメール', 'ホスティング', '準備中', 'コピー', 'コピーしました'],
+    zh: ['经营者信息', '商号', '代表', '营业执照号', '通信销售业申报', '地址', '电话', '联系邮箱', '托管', '准备中', '复制', '已复制'],
+    vi: ["Thông tin doanh nghiệp", "Tên doanh nghiệp", "Người đại diện", "Số đăng ký kinh doanh", "Đăng ký bán hàng từ xa", "Địa chỉ", "Điện thoại", "Email liên hệ", "Máy chủ", "Đang chuẩn bị", "Sao chép", "Đã sao chép"],
+    tl: ["Impormasyon ng negosyo", "Pangalan ng negosyo", "Kinatawan", "Business registration no.", "Ulat sa mail-order na negosyo", "Address", "Telepono", "Email para sa contact", "Hosting", "Inihahanda pa", "Kopyahin", "Nakopya na"],
+    th: ["ข้อมูลธุรกิจ", "ชื่อกิจการ", "ผู้แทน", "เลขทะเบียนธุรกิจ", "การแจ้งธุรกิจขายทางไกล", "ที่อยู่", "โทรศัพท์", "อีเมลติดต่อ", "โฮสติ้ง", "อยู่ระหว่างเตรียมการ", "คัดลอก", "คัดลอกแล้ว"]
+  };
+  var 통계말 = { ko: '광고는 없어요. 방문 수 같은 통계만 개인을 알아볼 수 없는 방식(쿠키 없음)으로 세어요.',
+    en: "No ads. We count only visit statistics, in a way that can't identify you (no cookies).",
+    es: 'Sin anuncios. Solo contamos estadísticas de visitas, de forma que no permite identificarle (sin cookies).',
+    ja: '広告はありません。訪問数などの統計だけを、個人を特定できない方法(クッキーなし)で数えています。',
+    zh: '没有广告。我们只以无法识别个人的方式(不使用 Cookie)统计访问量等数据。',
+    vi: "Không có quảng cáo. Chúng tôi chỉ đếm số lượt truy cập theo cách không nhận diện được bạn (không dùng cookie).",
+    tl: "Walang ads. Bilang lang ng mga pagbisita ang binibilang namin, sa paraang hindi ka makikilala (walang cookies).",
+    th: "ไม่มีโฆษณา เรานับเพียงสถิติการเข้าชมด้วยวิธีที่ระบุตัวคุณไม่ได้ (ไม่ใช้คุกกี้)"
+  };
+  function 통계글(l) { return 통계말[l || 말()] || 통계말.ko; }
+  function 사업자HTML() {
+    var m = 사업자말[말()] || 사업자말.ko, x = 사업자표, 준 = m[9];
+    function 줄(k, v) { return '<div class="ms-bz"><span>' + esc(k) + '</span><b>' + esc(v || 준) + '</b></div>'; }
+    return '<details class="ms-biz"><summary>' + esc(m[0]) + '</summary>'
+      + 줄(m[1], x.상호) + 줄(m[2], x.대표) + 줄(m[3], x.번호) + 줄(m[4], x.통신판매) + 줄(m[5], x.주소) + 줄(m[6], x.전화)
+      + '<div class="ms-bz"><span>' + esc(m[7]) + '</span><b class="ms-mail"><a href="mailto:' + esc(x.메일) + '">' + esc(x.메일) + '</a><button type="button" class="ms-copy" onclick="설정판.메일복사(this)">' + esc(m[10]) + '</button></b></div>' + 줄(m[8], x.호스팅) + '</details>';
   }
   /* ── 말과 나라(2026-11-04 현욱님 「진행」 · docs/requests/20261104_언어나라_묻기.md) ──
      앱 말 · 사는 나라 · 그 나라 말 수준을 한 화면 세 줄로(미리 채움 · 「맞아요」 한 번 · 건너뛰기 없음).
@@ -4988,12 +5023,17 @@ try { 이용량.설치({ 앱: 'yakjido', 켜짐: false, 주소: 'https://uszalzc
     ja: { 제목: '使う言葉と住んでいる国', 설명: '正しい緊急番号と案内をお伝えするためにお聞きしています。合っていれば一度押してください。', 앱말: 'アプリの言葉', 나라: '今住んでいる国', 수준: '{말}はどのくらい話せますか？', 수준일반: 'その国の言葉はどのくらい話せますか？',
       수준들: ['問題なく話せる', '少し話せる', 'ほとんど話せない'], 맞아요: 'これで合っています', 나라고름: '国を選んでください', 줄: '言葉と国', 줄설명: '緊急番号と案内をこの内容に合わせます', 안정함: 'まだ選んでいません' },
     zh: { 제목: '您的语言和所在国家', 설명: '为了向您显示正确的急救电话和信息，我们需要了解这些。如果没问题，请点一下。', 앱말: '应用语言', 나라: '目前居住的国家', 수준: '您的{말}水平如何？', 수준일반: '您的当地语言水平如何？',
-      수준들: ['很流利', '会一点', '几乎不会'], 맞아요: '没问题', 나라고름: '请选择国家', 줄: '语言和国家', 줄설명: '急救电话和信息会按此设置', 안정함: '尚未选择' } };
+      수준들: ['很流利', '会一点', '几乎不会'], 맞아요: '没问题', 나라고름: '请选择国家', 줄: '语言和国家', 줄설명: '急救电话和信息会按此设置', 안정함: '尚未选择' },
+    vi: {"제목": "Ngôn ngữ và quốc gia của bạn", "설명": "Chúng tôi hỏi để hiện đúng số khẩn cấp và hướng dẫn. Nếu đúng, chỉ cần chạm một lần.", "앱말": "Ngôn ngữ ứng dụng", "나라": "Quốc gia bạn đang sống", "수준": "Bạn nói {말} tốt đến đâu?", "수준일반": "Bạn nói tiếng địa phương tốt đến đâu?", "수준들": ["Thoải mái", "Một chút", "Hầu như không"], "맞아요": "Đúng rồi", "나라고름": "Chọn quốc gia", "줄": "Ngôn ngữ và quốc gia", "줄설명": "Số khẩn cấp và hướng dẫn theo các giá trị này", "안정함": "Chưa chọn"},
+    tl: {"제목": "Iyong wika at bansa", "설명": "Nagtatanong kami para maipakita ang tamang emergency number at gabay. Kung tama, pindutin nang isang beses.", "앱말": "Wika ng app", "나라": "Bansang tinitirhan mo ngayon", "수준": "Gaano ka kahusay mag-{말}?", "수준일반": "Gaano ka kahusay sa lokal na wika?", "수준들": ["Komportable", "Kaunti", "Halos hindi"], "맞아요": "Tama", "나라고름": "Piliin ang bansa", "줄": "Wika at bansa", "줄설명": "Sinusunod nito ang emergency number at gabay", "안정함": "Hindi pa napili"},
+    th: {"제목": "ภาษาและประเทศของคุณ", "설명": "เราถามเพื่อแสดงหมายเลขฉุกเฉินและคำแนะนำที่ถูกต้อง ถ้าถูกแล้ว แตะครั้งเดียว", "앱말": "ภาษาของแอป", "나라": "ประเทศที่คุณอาศัยอยู่ตอนนี้", "수준": "คุณพูด{말}ได้แค่ไหน", "수준일반": "คุณพูดภาษาท้องถิ่นได้แค่ไหน", "수준들": ["คล่อง", "นิดหน่อย", "แทบไม่ได้"], "맞아요": "ถูกต้อง", "나라고름": "เลือกประเทศ", "줄": "ภาษาและประเทศ", "줄설명": "หมายเลขฉุกเฉินและคำแนะนำจะเป็นไปตามนี้", "안정함": "ยังไม่ได้เลือก"}
+  };
   function 곳(k, l) { l = l || 말(); return (곳글[l] || 곳글.ko)[k]; }
   function 칸(l) { var i = 말순.indexOf(l); return i < 0 ? 0 : i; }
   var 곳열쇠 = 'mn.place';
   function 곳읽기() { try { var v = JSON.parse(localStorage.getItem(곳열쇠) || 'null'); return v && v.lang && v.country && v.level ? v : null; } catch (e) { return null; } }
   function 나라짐작() {
+    try { if (window.메디나눔위기번호 && typeof 메디나눔위기번호.나라짐작 === 'function') return 메디나눔위기번호.나라짐작((document.documentElement.lang || 'ko')); } catch (e) {}   /* 11-16 공용 짐작 한 곳(시간대 못 읽으면 한국어 화면만 KR) */
     try { var tz = Intl.DateTimeFormat().resolvedOptions().timeZone || '';
       var 표 = { 'Asia/Seoul': 'KR', 'Asia/Tokyo': 'JP', 'Asia/Shanghai': 'CN', 'Asia/Chongqing': 'CN', 'Asia/Urumqi': 'CN', 'Asia/Hong_Kong': 'HK', 'Europe/Madrid': 'ES', 'Atlantic/Canary': 'ES', 'Africa/Ceuta': 'ES',
         'America/Mexico_City': 'MX', 'America/Monterrey': 'MX', 'America/Merida': 'MX', 'America/Cancun': 'MX', 'America/Chihuahua': 'MX', 'America/Mazatlan': 'MX', 'America/Hermosillo': 'MX', 'America/Tijuana': 'MX',
@@ -5025,20 +5065,42 @@ try { 이용량.설치({ 앱: 'yakjido', 켜짐: false, 주소: 'https://uszalzc
     a = a.filter(function (k) { return k !== 'XX'; }); a.push('XX'); return a; }
   var 고르는중 = null;
   function 수준묻나(p) { return 나라말[p.country] !== p.lang; }
+  /* 11-11c 사용자25 #5 — 이 창이 화면을 막는 동안에도 응급 번호 한 줄(고른 나라 → 없으면 짐작) */
+  var 급함말 = { ko: '급하면 지금 {n}에 전화', en: 'In an emergency, call {n} now', es: 'Si es urgente, llame ahora al {n}', ja: '緊急なら今すぐ{n}に電話', zh: '紧急情况请立即拨打{n}',
+    vi: "Nếu khẩn cấp, hãy gọi {n} ngay",
+    tl: "Kung emergency, tumawag agad sa {n}",
+    th: "หากฉุกเฉิน โทร {n} ทันที"
+  };
+  var 곳뒤말 = { ko: { 답: '위 질문에 답하시면 눌러져요', 나중: '나중에 정할게요' }, en: { 답: 'Answer the question above to continue', 나중: 'Decide later' }, es: { 답: 'Responda a la pregunta de arriba para seguir', 나중: 'Decidir más tarde' }, ja: { 답: '上の質問に答えると押せます', 나중: 'あとで決める' }, zh: { 답: '回答上面的问题后即可继续', 나중: '以后再定' },
+    vi: {"답": "Trả lời câu hỏi bên trên để tiếp tục", "나중": "Để sau"},
+    tl: {"답": "Sagutin ang tanong sa itaas para magpatuloy", "나중": "Mamaya na lang"},
+    th: {"답": "ตอบคำถามด้านบนเพื่อดำเนินการต่อ", "나중": "ไว้ทีหลัง"}
+  };
+  function 곳나중() { var el = document.getElementById('mnPlace'); if (el) el.remove(); 고르는중 = null; try { sessionStorage.setItem('mn.place.later', '1'); } catch (e) {} }
+  function 곳급함(l) {
+    try { var c = (고르는중 && 고르는중.country && 고르는중.country !== 'XX') ? 고르는중.country : null, 표 = 공용표() || {}, N = c ? 표[c] : null, 번 = N && N.응급;
+      if (!번) { var r = 응급번호(); 번 = r.응급; }
+      if (!번) return '';
+      var d = String(번).replace(/\s/g, '');
+      return '<a class="mnp-sos" href="tel:' + esc(d) + '">' + esc((급함말[l] || 급함말.en).replace('{n}', 번)) + '</a>'; } catch (e) { return ''; }
+  }
   function 곳그림() {
     var p = 고르는중, l = p.lang, el = document.getElementById('mnPlace'); if (!el) return;
     var 나말 = 나라말[p.country], 질문 = 나말 ? 곳('수준', l).replace('{말}', 말이름들[나말][칸(l)]) : 곳('수준일반', l);
     if (p.country && !나라이름[p.country]) p.country = 'XX';   /* 11-04b 목록 밖 나라(BR·VN 등)는 그 밖(국제 안내)으로 · 11-04h 빈칸('')은 아직 안 고름 */
     var 목 = 나라목록(); if (p.country && 목.indexOf(p.country) < 0) 목.unshift(p.country);
     el.innerHTML = '<div class="mnp-box" role="dialog" aria-modal="true" aria-labelledby="mnpT" lang="' + l + '">' +
-      '<p class="mnp-eb" style="margin:0 0 4px;font-weight:700;color:var(--ms-accent,inherit)">Language · 언어</p><h2 id="mnpT">' + 곳('제목', l) + '</h2><p class="mnp-sub">' + 곳('설명', l) + '</p>' +
+      '<h2 id="mnpT">' + 곳('제목', l) + '</h2><p class="mnp-sub">' + 곳('설명', l) + '</p>' +
       '<label class="mnp-l" for="mnpLang">' + 곳('앱말', l) + '</label><select id="mnpLang" class="mnp-sel" onchange="설정판.말과나라고름(\'lang\',this.value)">' +
         말순.map(function (k) { return '<option value="' + k + '"' + (k === l ? ' selected' : '') + '>' + 말이름[k] + '</option>'; }).join('') + '</select>' +
       '<label class="mnp-l" for="mnpCountry">' + 곳('나라', l) + '</label><select id="mnpCountry" class="mnp-sel" onchange="설정판.말과나라고름(\'country\',this.value)">' + (p.country ? '' : '<option value="" selected disabled>' + 곳('나라고름', l) + '</option>') +
         목.map(function (k) { return '<option value="' + k + '"' + (k === p.country ? ' selected' : '') + '>' + 나라이름[k][칸(l)] + '</option>'; }).join('') + '</select>' +
       (p.country && 수준묻나(p) ? '<div class="ms-seg mnp-lv" role="group" aria-label="' + esc(질문) + '"><span class="ms-sl">' + 질문 + '</span><div class="ms-sb">' +
         곳('수준들', l).map(function (x, i) { var v = ['ok', 'some', 'none'][i], on = p.level === v; return '<button type="button" class="' + (on ? 'on' : '') + '" aria-pressed="' + on + '" onclick="설정판.말과나라고름(\'level\',\'' + v + '\')">' + x + '</button>'; }).join('') + '</div></div>' : '') +
-      '<button type="button" class="mnp-ok" onclick="설정판.말과나라맞아요()"' + (!p.country || (수준묻나(p) && !p.level) ? ' disabled aria-disabled="true"' : '') + '>' + 곳('맞아요', l) + '</button></div>';
+      '<button type="button" class="mnp-ok" onclick="설정판.말과나라맞아요()"' + (!p.country || (수준묻나(p) && !p.level) ? ' disabled aria-disabled="true"' : '') + '>' + 곳('맞아요', l) + '</button>'
+      + (!p.country ? '<p class="mnp-why" role="status">' + 곳('나라고름', l) + '</p>' : (수준묻나(p) && !p.level) ? '<p class="mnp-why" role="status">' + (곳뒤말[l] || 곳뒤말.en).답 + '</p>' : '')   /* 11-12 약지도 사용자25 — 회색 단추 이유 */
+      + 곳급함(l)
+      + '<button type="button" class="mnp-later" onclick="설정판.말과나라나중에()">' + (곳뒤말[l] || 곳뒤말.en).나중 + '</button></div>';   /* 11-12 — 닫는 길(첫 실행 6명이 막힘) */
   }
   function 곳열기() {
     스타일(); 표합치기(); var 지금 = 곳읽기(), d = 곳기본();
@@ -5062,7 +5124,7 @@ try { 이용량.설치({ 앱: 'yakjido', 켜짐: false, 주소: 'https://uszalzc
      번호: 공용 위기번호 표(window.메디나눔위기번호 — 표가 앞에 심겨 있어야 한다). 표 밖·번호 null 이면 번호 없음 → 누르는 단추 없이 「현지 응급 번호」 글.
      설정판.응급번호() → { 나라, 이름, 응급, 경찰, 위기1, 위기2, 고름 }   (번호는 '119' 같은 글 또는 null · 고름: 사용자가 고른 나라인지)
      설정판.번호HTML('응급'|'경찰'|'위기1'|'위기2', 꾸밈) → 번호가 있으면 <a href="tel:…">번호</a>, 없으면 그 말의 「현지 응급 번호」 글(링크 없음) */
-  var 현지 = { ko: '현지 응급 번호', en: 'the local emergency number', es: 'el número de emergencias local', ja: '現地の救急番号', zh: '当地急救电话' };
+  var 현지 = { ko: '현지 응급 번호(한국에서는 1\u206019)',   /* 11-16 Main — 작게 「한국에서는 119」 · 1 과 19 사이 낱말 잇기표(U+2060)는 119 글자 바꿈이 다시 걸리지 않게 */ en: 'the local emergency number', es: 'el número de emergencias local', ja: '現地の救急番号', zh: '当地急救电话', vi: "số khẩn cấp tại nơi bạn ở", tl: "ang lokal na emergency number", th: "หมายเลขฉุกเฉินในพื้นที่" };
   function 응급번호() {
     var 곳 = 곳읽기(), c = 곳 && 곳.country, 고름 = !!c;
     if (!c) c = navigator.webdriver ? 'KR' : 나라짐작();
@@ -5085,7 +5147,7 @@ try { 이용량.설치({ 앱: 'yakjido', 켜짐: false, 주소: 'https://uszalzc
   var 스타일됨 = false;
   function 스타일() {
     if (스타일됨 || !document.head) return; 스타일됨 = true;
-    var A = 'var(--ms-accent,var(--accent,currentColor))', L = 'var(--ms-line,var(--line,rgba(127,127,127,.28)))', D = 'var(--ms-dim,var(--ink2,inherit))', C = 'var(--ms-card,var(--card,transparent))';
+    var A = 'var(--ms-accent,var(--accent,var(--teal,#23685A)))', L = 'var(--ms-line,var(--line,rgba(127,127,127,.28)))', D = 'var(--ms-dim,var(--ink2,inherit))', C = 'var(--ms-card,var(--card,transparent))';
     var st = document.createElement('style'); st.id = 'ms-style';
     st.textContent = '.ms{word-break:keep-all;overflow-wrap:anywhere}.ms-group{margin-top:18px}.ms-h,#msSettings h2.ms-h{font-size:.84em;font-weight:800;letter-spacing:.02em;line-height:1.4;font-family:inherit;text-transform:none;color:' + D + ';margin:0 4px 8px;padding:0;border:0;background:none}' +
       '.ms-segs{display:flex;flex-direction:column;gap:12px;margin-top:10px;padding:14px;border-radius:16px;background:' + C + ';border:1px solid ' + L + '}' +
@@ -5093,11 +5155,15 @@ try { 이용량.설치({ 앱: 'yakjido', 켜짐: false, 주소: 'https://uszalzc
       '.ms-sb button{flex:1 1 90px;min-height:48px;padding:6px 10px;border-radius:12px;border:1px solid ' + L + ';background:transparent;color:inherit;font:inherit;font-weight:600;cursor:pointer;line-height:1.25}' +
       '.ms-sb button.on{border:2px solid ' + A + ';color:' + A + ';font-weight:800}.ms-sb button[disabled]{opacity:.6;cursor:default}.ms-soon{display:inline-block;font-size:.78em;font-weight:700}' +
       '.ms-row{display:flex;gap:10px;align-items:center;width:100%;min-height:56px;padding:12px;border:0;border-bottom:1px solid ' + L + ';background:transparent;color:inherit;font:inherit;text-align:left;cursor:pointer}' +
+      '.ms-biz{margin:10px 0 0;font-size:15px;border:1px solid ' + L + ';border-radius:14px;background:' + C + ';overflow:hidden}.ms-biz>summary{min-height:48px;display:flex;align-items:center;cursor:pointer;font-weight:700;color:' + D + ';padding:0 14px !important}.ms-bz{display:flex;flex-direction:column;gap:2px;padding:8px 14px !important;border-top:1px solid ' + L + '}' +
+      '.ms-mail{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.ms-mail a{color:inherit !important;text-decoration:none !important;font-weight:600;display:inline-flex;align-items:center;min-height:44px}.ms-copy{min-height:44px;padding:0 12px;border-radius:10px;border:1px solid ' + L + ';background:transparent;color:' + A + ';font:inherit;font-size:.86em;font-weight:700;cursor:pointer}' +
+      '.mnp-box,.mnp-box h2,.mnp-sub,.mnp-l{text-align:left !important}.ms-bz span{font-size:.88em;color:' + D + '}.ms-bz b{font-weight:600;word-break:keep-all;overflow-wrap:anywhere}' +
       '.ms-rt{flex:1;min-width:0;display:flex;flex-direction:column}.ms-rt>span{font-size:.88em;color:' + D + '}.ms-rv{flex:none;font-size:.86em;color:' + A + ';font-weight:700}.ms-foot{margin-top:16px}' +
-      '.mnp{position:fixed;inset:0;z-index:2147483000;background:var(--bg,#fff);color:var(--ink,inherit);overflow:auto;display:flex;justify-content:center;padding:max(24px,env(safe-area-inset-top)) 16px 32px;word-break:keep-all;overflow-wrap:anywhere}' +
-      '.mnp-box{width:100%;max-width:480px;margin:auto 0}.mnp-box h2{margin:0 0 8px;font-size:1.35em;line-height:1.3}.mnp-sub{margin:0 0 18px;color:' + D + ';line-height:1.55}' +
+      '.mnp{position:fixed;inset:0;z-index:2147483000;background:var(--ms-bg,var(--bg,var(--surface,#fff)));color:var(--ms-ink,var(--ink,inherit));overflow:auto;overscroll-behavior:contain;display:flex;align-items:flex-start;justify-content:center;padding:max(24px,env(safe-area-inset-top)) 16px 32px;word-break:keep-all;overflow-wrap:anywhere}' +
+      '.mnp-box{width:100%;max-width:480px;margin:clamp(16px,6vh,56px) 0 auto}.mnp-box h2{margin:0 0 8px;font-size:1.35em;line-height:1.3}.mnp-sub{margin:0 0 18px;color:' + D + ';line-height:1.55}' +
       '.mnp-l{display:block;font-weight:700;margin:14px 0 6px}.mnp-sel{width:100%;min-height:52px;padding:10px 12px;border-radius:12px;border:1px solid ' + L + ';background:' + C + ';color:inherit;font:inherit;font-size:16px;max-width:100%}' +
-      '.mnp-lv{margin-top:16px}.mnp-ok{display:block;width:100%;min-height:56px;margin-top:22px;border:0;border-radius:14px;background:' + A + ';color:var(--ms-on-accent,#fff);font:inherit;font-size:1.05em;font-weight:800;cursor:pointer}.mnp-ok[disabled]{opacity:.45;cursor:default}';
+      '.mnp-sel:focus,.mnp-sel:focus-visible{outline:none !important;box-shadow:none !important;border:2px solid ' + A + ' !important}' +   /* 11-10 — 포커스 링 한 겹 */
+      '.mnp-lv{margin-top:16px}.mnp-ok{display:flex !important;align-items:center;justify-content:center;text-align:center !important;width:100%;min-height:56px;margin-top:22px;padding:0 16px;border:0;border-radius:14px;background:' + A + ';color:var(--ms-on-accent,var(--on-accent,#fff));font:inherit;font-size:1.05em;font-weight:800;cursor:pointer}.mnp-ok[disabled]{opacity:.45;cursor:default}.mnp-why{margin:8px 0 0;font-size:.92em;color:var(--ms-dim,var(--ink2,inherit));text-align:center !important}.mnp-later{display:block;margin:10px auto 0;min-height:44px;padding:0 14px;border:0;background:none;color:var(--ms-dim,var(--ink2,inherit));font:inherit;font-weight:700;text-decoration:underline;text-underline-offset:3px;cursor:pointer}.mnp-sos{display:flex;align-items:center;justify-content:center;min-height:52px;margin-top:12px;border:2px solid var(--alarm,#B4442B);border-radius:14px;color:var(--alarm,#B4442B);font-weight:800;text-decoration:none}';
     document.head.appendChild(st);
   }
   window.설정판 = {
@@ -5108,8 +5174,13 @@ try { 이용량.설치({ 앱: 'yakjido', 켜짐: false, 주소: 'https://uszalzc
     글: 글,
     말과나라: function () { return 곳읽기(); },
     말과나라열기: 곳열기, 말과나라맞아요: 곳맞아요,
+    통계말: function (l) { return 통계글(l); },
+    메일복사: function (bt) { var m = 사업자말[말()] || 사업자말.ko, 쓰 = 사업자표.메일, 됨 = function () { try { bt.textContent = m[11]; setTimeout(function () { bt.textContent = m[10]; }, 1800); } catch (e) {} };
+      try { if (navigator.clipboard && navigator.clipboard.writeText) { navigator.clipboard.writeText(쓰).then(됨, 됨); return; } } catch (e) {}
+      try { var t = document.createElement('textarea'); t.value = 쓰; document.body.appendChild(t); t.select(); document.execCommand('copy'); t.remove(); 됨(); } catch (e) {} },
     말과나라고름: function (k, v) { if (!고르는중) return; 고르는중[k] = v; if (k !== 'level') { if (!수준묻나(고르는중)) 고르는중.level = 'ok'; else if (고르는중.level === 'ok') 고르는중.level = ''; } 곳그림(); },
-    말과나라확인: function () { if (곳읽기() || navigator.webdriver || document.getElementById('mnPlace')) return false; 곳열기(); return true; },
+    말과나라확인: function () { var 뒤 = false; try { 뒤 = sessionStorage.getItem('mn.place.later') === '1'; } catch (e) {} if (곳읽기() || 뒤 || navigator.webdriver || document.getElementById('mnPlace')) return false; 곳열기(); return true; },
+    말과나라나중에: 곳나중,
     나라이름: function (k, l) { 표합치기(); var n = 나라이름[k]; return n ? n[칸(l || 말())] : ''; },
     말이름: function (k, l) { var n = 말이름들[k]; return n ? n[칸(l || 말())] : ''; },
     응급번호: 응급번호, 번호HTML: 번호HTML, 나라짐작: 나라짐작
