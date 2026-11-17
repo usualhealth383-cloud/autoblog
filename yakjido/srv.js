@@ -3650,12 +3650,14 @@ window.언어칸 = function () {
     try {
       var tk = takenSet(), rows = []; items.forEach(function (d) { schedOf(d.id, d).forEach(function (t) { rows.push(d.id + '@' + t); }); });
       var 다 = rows.length && rows.every(function (k) { return tk.indexOf(k) >= 0 || isSkipped(k); });
-      var w = adherence(7), 주 = w && w.days >= 2 ? '지난 한 주, 드시기로 한 ' + w.days + '일 중 ' + w.full + '일 빠짐없이 챙기셨어요.' : '';
+      var w = adherence(7), 주 = w && w.days >= 2 ? (w.full === w.days ? '지난 한 주, 드시기로 한 ' + w.days + '일을 빠짐없이 챙기셨어요.' : '지난 한 주, ' + w.days + '일 중 ' + w.full + '일 챙기셨어요.') : '';   /* 11-17 Main — 「빠짐없이」는 전부일 때만 */
       if (다) 마음 = '<div class="job-heart"><p><b>오늘도 잘 챙기셨어요.</b>' + (주 ? ' ' + 주 : '') + '</p><button type="button" class="link" onclick="shareOut({title:\'약지도\',text:\'오늘 약을 다 챙겨 먹었어요. — 약지도\'})">가족에게 알리기 ›</button></div>';
       else if (n >= 5) 마음 = '<div class="job-heart"><p>약이 많으면 누구나 헷갈려요.</p><a href="#/bag">한 장으로 정리해 드릴게요 ›</a></div>';
       else if (주) 마음 = '<div class="job-heart"><p>' + 주 + '</p></div>';
     } catch (e) {}
-    return '<section class="job-box"><div class="job-h"><h1>내 약 ' + n + '가지</h1><button type="button" class="btn" data-ink="solid" onclick="go(\'/together\')">+ 약 더하기</button></div>' + 판 + (마음.indexOf('오늘도 잘 챙기셨어요') >= 0 ? '' : 다음약()) + 마음 +
+    /* 11-17 Main — 간단히 보기: 큰 글씨 · 내 약을 쉬운 갈래 이름과 함께(사진 없는 줄 목록) · 단추 둘씩 크게. 겹침 판정·마음 한 줄은 같다 */
+    var sv = typeof svOn === 'function' && svOn(), 목록 = sv ? '<ul class="job-list">' + items.slice(0, 6).map(function (d) { var dk = d.class || ((typeof drug === 'function' && drug(d.id)) || {}).class, c0 = (D.classes || []).filter(function (c) { return c.id === dk; })[0], g = d.quick ? d.quick.g.n : c0 ? String(c0.name).split('(')[0].trim() : ''; return '<li><b>' + esc(짧은이름(d.name)) + '</b>' + (g ? '<span>' + esc(g) + '</span>' : '') + '</li>'; }).join('') + (items.length > 6 ? '<li><a href="#/me?t=meds">' + (items.length - 6) + '가지 더 ›</a></li>' : '') + '</ul>' : '';
+    return '<section class="job-box' + (sv ? ' sv' : '') + '"><div class="job-h"><h1>내 약 ' + n + '가지</h1><button type="button" class="btn" data-ink="solid" onclick="go(\'/together\')">+ 약 더하기</button></div>' + 판 + 목록 + (마음.indexOf('오늘도 잘 챙기셨어요') >= 0 ? '' : 다음약()) + 마음 +
       '<div class="job-row"><a href="#/notify">알림</a><a href="#/send">가족에게</a><a href="#/bag">내 약 한 장</a><a href="#/me?t=meds">약통</a></div></section>';
   }
   window.잉크홈 = function () {
