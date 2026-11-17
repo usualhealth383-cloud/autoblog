@@ -1957,7 +1957,7 @@ window.SUPP_OV = [['vitd', 'calcium', 'info', '칼슘제와 비타민 D — 두 
   ['omega3', 'vitd', 'info', '오메가3 제품에 비타민 D가 들었는지 보세요'], ['zinc', 'multi', 'info', '종합비타민과 아연 — 합쳐서 하루 35 mg 안인지 보세요'],
   ['zinc', 'lutein', 'warn', '루테인 복합제와 아연 — 겹치면 구리가 모자랄 수 있어요'], ['vitb', 'multi', 'info', '종합비타민과 비타민 B — 비타민 B6가 많아지기 쉬워요'],
   ['iron', 'mg', 'info', '철분과 마그네슘은 시간을 나누세요'], ['mg', 'calcium', 'info', '칼슘과 마그네슘 — 많이 드시면 시간을 나누세요']];
-try { if (/^#\/(together|home|bag)/.test(location.hash || '#/home') && typeof route === 'function') setTimeout(route, 0); } catch (e) {}
+try { if (/^#\/(together|home|bag|check)/.test(location.hash || '#/home') && typeof route === 'function') setTimeout(route, 0); } catch (e) {}
 window.kidOneS = r => { const [lo, hi] = mlRange(r), c = r.D.conc[0].mgPerMl; let v = null, from = '';
   if (r.D.id === 'apap') { const row = (D_KIDS().apapLabelTable || []).find(([a, b]) => r.w >= a && r.w <= b + .099); if (row) { v = row[3]; from = 'table'; } }
   else if (r.m != null) { const row = ibuRow(r.m); if (row) { v = row[4]; from = 'age'; } }

@@ -2608,6 +2608,7 @@ function route(){
   const seg = path.split('/');
   /* 10-14 첫 동의(이용약관·개인정보) 전에는 동의 화면부터 */
   if (consentGate(seg[0], h)) return;
+  if (!window.SUPP_OV && /^(together|bag|check)$/.test(seg[0]) && (ME.taking || []).filter(x => String(x).startsWith('supp:')).length > 1) { view.innerHTML = topBar({ back:'뒤로', nosearch:true }) + '<section class="sec"><p class="loading">겹침 확인 중…</p></section>'; return; }   /* 11-18 — 영양제끼리 겹침 표(srv.js)가 오기 전 «겹침 없음» 거짓 안심 막기 */
   if (seg[0] === 'hello' && helloDone() && (() => { try { return sessionStorage.getItem(HELLO_FIN); } catch (e) { return null; } })()) { try { location.replace(location.href.split('#')[0] + '#/home'); return; } catch (e) {} }
   /* 처음 안내 중에는 아래 탭을 감춘다 — 누르면 안내가 반쯤 끝났다(3-24) */
   document.body.classList.toggle('no-nav', /^(hello|consent|login|doc)$/.test(seg[0])); document.body.classList.toggle('is-door', /^(consent|login)$/.test(seg[0]));
@@ -5486,7 +5487,7 @@ async function nativeArmOnce(){
     if (list.length > CAP) { const open = list.find(x => x.id === 599999); const tm = x => x.schedule.at ? new Date(x.schedule.at).getTime() : 0;
       list.splice(0, list.length, ...list.filter(x => x !== open).sort((a, b) => tm(a) - tm(b)).slice(0, CAP - (open ? 1 : 0)), ...(open ? [open] : [])); }
     /* 이번에 다시 걸지 않는 옛 알림만 지운다 — 같은 번호는 schedule 이 덮어쓴다 */
-    const keep = new Set(list.map(x => x.id)), stale = ours.filter(p => !keep.has(p.id));
+    const keep = new Set(list.map(x => x.id)), stale = ours.filter(p => !keep.has(p.id) && (window.profOthers || p.id < 100000 || p.id >= 300000));   /* srv.js 전에는 가족 알림(10만~30만)을 지우지 않는다 */
     if (stale.length) await LN.cancel({ notifications: stale.map(p => ({ id: p.id })) });
     if (list.length) await LN.schedule({ notifications: list });
   } catch (e) { console.warn('알림을 걸지 못했습니다', e); }

@@ -74,6 +74,21 @@ with sync_playwright() as p:
     pg2.evaluate("(()=>{for(let i=6;i>=0;i-=2){const x=new Date();x.setDate(x.getDate()-i);ME.vitals=(ME.vitals||[]);ME.vitals.push({k:'bp',t:dayKey(x)+' 08:00',s:130+i,d:85,w:'아침'});}saveMe();})()")
     pg2.goto(URL + '#/vitals'); pg2.wait_for_selector('.vz', timeout=10000)
     ok(pg2.locator('.vz-chg').count() >= 1 and '약 바꾼 날' in pg2.inner_text('.vz-chgl'), '그래프에 약 바꾼 날 점선')
+
+    # 11-18 Main — srv.js 가 오기 전: «겹침 없음» 거짓 안심 0 · 이미 걸린 가족 알림은 지우지 않음
+    pb = b.new_page(viewport={'width': 360, 'height': 760}, locale='ko-KR', timezone_id='Asia/Seoul')
+    pb.route('**/srv.js*', lambda rt: rt.abort())   # srv.js 를 막아 «오기 전»에 머물게
+    pb.add_init_script(cap)
+    pb.add_init_script(SEED + ";localStorage.setItem('yakjido.me.v1',JSON.stringify({taking:['supp:zinc','supp:lutein','acetaminophen'],sched:{acetaminophen:['09:00']}}));localStorage.setItem('yakjido.profiles.v1',JSON.stringify({active:'me',list:[{id:'me',name:'나'},{id:'mom1',name:'어머니'}]}));localStorage.setItem('yakjido.me.v1@mom1',JSON.stringify({taking:['ibuprofen'],sched:{ibuprofen:['12:00']}}))")
+    nope = []
+    for h in ('#/home', '#/bag', '#/together', '#/check'):
+        pb.goto(URL + h, wait_until='commit'); pb.wait_for_timeout(2500)
+        t = pb.inner_text('body')
+        if '겹침 없음' in t or '조합이 안 보여요' in t or '겹치는 것이 없' in t: nope.append(h)
+    ok(not nope, f'srv.js 전 «겹침 없음» 0 — {nope}')
+    pb.evaluate("()=>{ __LN.pending.push({id:100005,title:'어머니 약 드실 시간',schedule:{at:new Date(Date.now()+3600e3).toISOString()},extra:{}}); }")
+    pb.evaluate("()=>window.nativeArm && nativeArm()"); pb.wait_for_timeout(800)
+    ok(pb.evaluate("()=>__LN.pending.some(x=>x.id===100005)"), 'srv.js 전 다시 걸어도 가족 알림(100005)은 남음')
     ok(not errs, '스크립트 오류 없음 ' + ' | '.join(errs[:2]))
     b.close()
 srv.shutdown()

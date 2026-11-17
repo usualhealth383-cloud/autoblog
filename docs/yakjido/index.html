@@ -1810,7 +1810,7 @@ html:not(.ink) .rf-none{display:none}</style>
 <script>
 window.__YAKJIDO_OK__ = true;
 const D = JSON.parse(document.getElementById('data').textContent || '{}');
-const BUILD = '2026-11-18 06:46';
+const BUILD = '2026-11-18 07:12';
 const DATAV = 'ebf9e087db'.indexOf('__') === 0 ? BUILD : 'ebf9e087db';
 const BRANDMARK = (typeof window !== 'undefined' && window.__BRANDMARK__) || 'icon-192.png';
 let CORE = 0, CORE_P = null;
@@ -2317,6 +2317,7 @@ const [path, qs] = h.split('?');
 if (path !== LASTPATH) { SCROLL[LASTPATH] = window.scrollY; GQ = ''; GQ_Y = null; LASTPATH = path; try { if (!path.startsWith('photo')) PH.img = ''; } catch (e) {} }
 const seg = path.split('/');
 if (consentGate(seg[0], h)) return;
+if (!window.SUPP_OV && /^(together|bag|check)$/.test(seg[0]) && (ME.taking || []).filter(x => String(x).startsWith('supp:')).length > 1) { view.innerHTML = topBar({ back:'뒤로', nosearch:true }) + '<section class="sec"><p class="loading">겹침 확인 중…</p></section>'; return; }   /* 11-18 — 영양제끼리 겹침 표(srv.js)가 오기 전 «겹침 없음» 거짓 안심 막기 */
 if (seg[0] === 'hello' && helloDone() && (() => { try { return sessionStorage.getItem(HELLO_FIN); } catch (e) { return null; } })()) { try { location.replace(location.href.split('#')[0] + '#/home'); return; } catch (e) {} }
 document.body.classList.toggle('no-nav', /^(hello|consent|login|doc)$/.test(seg[0])); document.body.classList.toggle('is-door', /^(consent|login)$/.test(seg[0]));
 const q = Object.fromEntries(new URLSearchParams(qs || '')); entryTake(q); try { if (q.all === '1') sessionStorage.setItem('yakjido.all', '1'); else if (q.all === '0') sessionStorage.removeItem('yakjido.all'); } catch (e) {}
@@ -4561,7 +4562,7 @@ for (const x of capDay(m2, n2, used2)) { delete x.day; delete x.r; list.push(x);
 const CAP = 480 - pend.filter(p => p.id >= 900000).length;
 if (list.length > CAP) { const open = list.find(x => x.id === 599999); const tm = x => x.schedule.at ? new Date(x.schedule.at).getTime() : 0;
 list.splice(0, list.length, ...list.filter(x => x !== open).sort((a, b) => tm(a) - tm(b)).slice(0, CAP - (open ? 1 : 0)), ...(open ? [open] : [])); }
-const keep = new Set(list.map(x => x.id)), stale = ours.filter(p => !keep.has(p.id));
+const keep = new Set(list.map(x => x.id)), stale = ours.filter(p => !keep.has(p.id) && (window.profOthers || p.id < 100000 || p.id >= 300000));   /* srv.js 전에는 가족 알림(10만~30만)을 지우지 않는다 */
 if (stale.length) await LN.cancel({ notifications: stale.map(p => ({ id: p.id })) });
 if (list.length) await LN.schedule({ notifications: list });
 } catch (e) { console.warn('알림을 걸지 못했습니다', e); }
