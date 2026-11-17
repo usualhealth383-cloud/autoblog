@@ -1697,7 +1697,7 @@
 })();
 /* ▲▲ 잉크 얼굴 부품 끝 ▲▲ */
 /* 11-17 잉크 판일 때만 — 얼굴·번진 면. 색 토큰은 약지도 ink.css 가 맡는다(공용 토큰의 흐린 글 #8A8A8A 는 흰 바탕 4.5:1 미달이라 html[data-ink] 를 쓰지 않는다) */
-try { if (document.documentElement.classList.contains('ink')) 잉크.설치({ 색: '#0B6E8F' }); } catch (e) {}
+try { if (document.documentElement.classList.contains('ink')) 잉크.설치({ 색: document.documentElement.classList.contains('fam') ? '#1F86A8' : '#0B6E8F' })   /* 11-17 한가족 — 알약 얼굴은 로고와 같은 물색 */; } catch (e) {}
 
 /* 11-13 메디나눔 홈 2단계 — 수첩의 혈압·혈당(P8)을 사용자가 누를 때만 「내 홈」으로 넘긴다. 스위치 꺼짐(법무 판단 전 비공개).
    원래 기록은 이 앱이 정본 — 꾸러미는 사본 보기용. 모양은 부품이 다시 검사한다 */
@@ -3554,6 +3554,14 @@ window.언어칸 = function () {
   };
   /* 11-17 잉크 판 증상 화면 — 위험 신호를 보고 「하나도 없어요」를 눌러야 「이렇게 드세요」가 열린다(확인 없이 안심 문구 없음). 옛 판은 이 단추가 숨어 있고 답도 그대로 */
   window.rfNone = function (sid) { window.RF_OK = sid; try { rfApply(); } catch (e) {} var t = document.querySelector('#view .stabs') || document.querySelector('#view .answer'); if (t) setTimeout(function () { try { t.scrollIntoView({ behavior: 'smooth', block: 'start' }); } catch (e) {} }, 60); };
+  /* 11-17 한가족 규칙 — 잉크 판 동의 문지기. 동의 전에는 이 휴대폰에 쓰지 않고(개인정보·건강정보 수집 없음),
+     사람이 직접 누른 저장(약 담기·기록·알림 켜기)일 때만 동의 한 장을 띄운다. 동의하면 그때 저장한다(동의하기 → saveMe).
+     근거: 개인정보 보호법 15조·23조 — 수집·민감정보 처리 «전에» 동의. 둘러보기는 수집이 없어 동의가 필요 없다 */
+  window.저장문 = function () {
+    var 손 = navigator.userActivation ? navigator.userActivation.isActive : true; if (!손) return;
+    try { sessionStorage.setItem(CONSENT_NEXT, location.hash.replace(/^#\/?/, '') || 'home'); } catch (x) {}
+    if (!/^#\/consent/.test(location.hash)) setTimeout(function () { location.hash = '#/consent'; }, 0);
+  };
   window.잉크칸 = function () { var on = document.documentElement.classList.contains('ink');
     return '<div class="view-row" style="border-top:1px solid var(--hairline)"><div class="t"><b>새 디자인</b><span>흰 바탕·가는 선의 잉크 판 — 끄면 예전 화면</span></div><button class="sw ' + (on ? 'on' : '') + '" role="switch" aria-checked="' + on + '" aria-label="새 디자인 미리 보기" onclick="try{localStorage.setItem(\'yakjido.ink\',\'' + (on ? '0' : '1') + '\')}catch(e){};location.reload()"></button></div>'; };
   /* 11-17 잉크 홈 — 첫 화면 규칙 7(현욱님 「글이 많고 줄글 목록은 아무도 안 누른다 · 첫 이미지와 임팩트」):
@@ -3607,7 +3615,8 @@ window.언어칸 = function () {
       '<div class="ink-parts" role="group" aria-label="어디가 불편하세요">' + 부위.map(function (p) { var L = S.filter(function (s) { return s.group === p[0]; }); return L.length ? '<button type="button" data-g="' + esc(p[0]) + '" aria-pressed="false" onclick="잉크부위(this.dataset.g)"><span class="ic">' + (typeof sicon === 'function' ? sicon(L[0]) : '') + '</span><b>' + esc(p[1]) + '</b></button>' : ''; }).join('') + '</div>' +
       '<p class="ink-also"><button type="button" data-g="입·이" onclick="잉크부위(this.dataset.g)">입·이</button> · <button type="button" data-g="소변·생리·갱년기" onclick="잉크부위(this.dataset.g)">소변·생리</button> · <a href="#/pill">알약 모양으로 찾기 ›</a></p>' +
       '<p class="ink-also ink-care"><button type="button" onclick="잉크돌봄()">부모님 약 챙기기 ›</button></p>' +
-      '<div id="inkpick"></div>';   /* 11-17 3초 시험 20명의 남은 △ — 보호자 길 */   /* 11-17 3초 시험 — 생리·알약 식별이 첫 화면에 없던 것 */
+      '<div id="inkpick"></div>' + (document.documentElement.classList.contains('fam') ?
+      '<p class="ink-legal">둘러보기는 그냥 쓰셔도 돼요 · 약을 담거나 기록할 때 약관·개인정보 동의를 받아요 <a href="#/doc/terms">약관</a> · <a href="#/doc/privacy">처리방침</a></p>' : '');   /* 11-17 한가족 — ?fam=1 일 때만(디자인 동결) */   /* 11-17 3초 시험 20명의 남은 △ — 보호자 길 */   /* 11-17 3초 시험 — 생리·알약 식별이 첫 화면에 없던 것 */
   };
   /* 11-17 잉크 증상 화면 — 확인 뒤 맨 위 「그래서 뭘 하면 되나」 한 줄. 화면에 이미 있는 약국 판단(triage.pharmacy)의 첫 문장 그대로(새 문장 없음) */
   window.잉크결론 = function (s) { var t = s && ((s.triage && s.triage.pharmacy) || s.lead); if (!t) return ''; return '<p class="ink-conc">' + fmt(첫문장(String(t))) + '</p>'; };
