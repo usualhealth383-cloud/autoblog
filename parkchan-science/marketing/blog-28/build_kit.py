@@ -8,11 +8,11 @@ HERE = pathlib.Path(__file__).resolve().parent
 PUB = HERE.parents[2] / 'docs' / 'marketing' / 'blog-28'
 URL = 'https://usualhealth383-cloud.github.io/autoblog/marketing/blog-28/'
 BLUE = '#2F5FC4'
-TITLES = ['반별 안내 · 세 반 한눈에 보기']
+TITLES = ['반별 안내 · 강의 시간 안내']
 TAGS = (HERE.parent / 'blog-16' / 'tags.txt').read_text(encoding='utf-8').split()
 
-POST = [('img', 'cover_classes_c', '반별 안내 — 세 반 한눈에 보기'),
- ('p', '안녕하십니까.<br>대구 월성동 박찬 통합과학 학원입니다.<br>저희 학원은 <b>세 반</b>을 원장이 직접 가르칩니다. 학생 학년에 맞는 반을 보시고, 자세한 내용은 반마다 붙은 안내 글에서 확인해 주십시오.'),
+POST = [('img', 'cover_classes_c', '반별 안내 — 강의 시간 안내'),
+ ('p', '안녕하십니까.<br>대구 월성동 박찬 통합과학 학원입니다.<br>저희 학원은 <b>모든 반</b>을 원장이 직접 가르칩니다. 학생 학년에 맞는 반과 강의 시간을 보시고, 자세한 내용은 반마다 붙은 안내 글에서 확인해 주십시오.'),
  ('q', '고1 예비반 (현 중3)'),
  ('p', '고1 내신부터 고3 수능까지 이어지는 통합과학을 ==처음부터 차근차근== 공부하는 반입니다.'),
  ('tbl', [('일요반 (새로 시작하는 반)', '**11월 22일(일) 개강** · 오후 1시 ~ 4시 · 처음부터'),
@@ -113,7 +113,7 @@ titles = ''.join(f'<div class="row"><span class="k">{"AB"[i]}</span><span class=
 tags = ''.join(f'<button class="cp tg" data-text="{t}">{t}</button>' for t in TAGS)
 head = head.replace('</style>', '.tags button.tg{font-size:14px;min-height:40px;padding:0 12px;background:var(--soft);color:var(--navy);font-weight:700}.tags button.tg.done{opacity:.4}\n</style>', 1)
 page = f'''{head}<div class="wrap">
-<section class="box"><h1>반별 안내 — 세 반 한눈에</h1><p class="sub">상위 카테고리 「반별 안내」에 직접 올리는 글 · 메뉴와 단추 02를 누르면 「작성된 글이 없습니다」 대신 이 글이 뜹니다 · 사진 {nimg}장</p></section>
+<section class="box"><h1>반별 안내 — 강의 시간 안내</h1><p class="sub">상위 카테고리 「반별 안내」에 직접 올리는 글 · 메뉴와 단추 02를 누르면 「작성된 글이 없습니다」 대신 이 글이 뜹니다 · 사진 {nimg}장</p></section>
 <section class="box" style="border-color:#E0A800"><h2>⚠ 이 글이 필요한 까닭</h2><ol class="how"><li>세 반 글은 하위 카테고리(고1 예비반 · 고3 예비반 · 중등부반)에 있어서, 위 메뉴 「반별 안내」나 단추 02를 누르면 「작성된 글이 없습니다」가 뜹니다(직접 확인).</li><li>이 글을 <b>상위 「반별 안내」</b>에 올리면 그 자리에 세 반 요약 · 시간 · 각 반 글로 가는 링크 · 시간표가 뜹니다.</li><li>요일 · 시간은 블로그에 올라간 강의 시간표 글과 같습니다(고1 새 반 일요반 11월 22일).</li></ol></section>
 <section class="box"><h2>① 제목</h2>{titles}</section>
 <section class="box"><h2>② 본문 — 통째로 복사</h2><button class="cp big" id="richBtn">본문 통째로 복사 — 사진 · 표 · 굵게 · 색 포함</button>
