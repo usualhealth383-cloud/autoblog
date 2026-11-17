@@ -477,7 +477,7 @@ def z7_checks(br, url, fails):
       for (const sid of ['cold','fever','headache','allergy']) if (ids(sid).some(isNsaid)) bad.push('2개월 '+sid+': 소염진통제를 권함');
       kid(5,7); for (const sid of ['cold','fever','headache','msk']) if (ids(sid).some(isNsaid)) bad.push('5개월 '+sid+': 소염진통제(이부프로펜 등)를 권함');
       location.hash='#/symptom/fever'; route(); const k5=(document.querySelector('.answer .kid-line')||{}).innerText||''; if (!/이부프로펜 시럽은 생후 6개월부터/.test(k5)) bad.push('5개월: kg 줄에 이부프로펜 6개월 안내 없음 — '+k5.slice(0,60));
-      kid(48,16); location.hash='#/symptom/fever'; route(); { const t=[...document.querySelectorAll('.answer .kid-over, .answer .kid-line')].map(e=>e.innerText).join(' '); if (!/나이 표에 맞췄어요/.test(t) || !/이부프로펜 시럽[^]*?4\.0~7\.5 mL/.test(t)) bad.push('4세 16 kg: 이부프로펜이 나이 표(5~7.5 mL)와 몸무게 셈 가운데 작은 쪽이 아님(공통 숫자표) — '+t.slice(0,160)); }
+      kid(48,16); location.hash='#/symptom/fever'; route(); { const t=[...document.querySelectorAll('.answer .kid-over, .answer .kid-line')].map(e=>e.innerText).join(' '); if (!/나이 표에 맞췄어요/.test(t) || !/이부프로펜 시럽[^]*?1회 7\.5 mL/.test(t)) bad.push('4세 16 kg: 이부프로펜 쉽게 보기 한 숫자가 나이 표 위 끝(7.5 mL)·몸무게 범위 안이 아님(11-17 두 층) — '+t.slice(0,160)); }
       for (const sid of ['cold','allergy','cough','constipation','diarrhea']) for (const x of basket(byId(D.symptoms,sid))) { if (/500 ?mg|정$|캡슐/.test(x.product||'') && !kidAdultOk(x.d)) bad.push('4세 '+sid+': 어른 제품 '+x.product); if (minAgeOf(x.d)!=null && minAgeOf(x.d)>48) bad.push('4세 '+sid+': '+x.d.id+'('+minAgeOf(x.d)+'개월부터)'); }
       kid(168,50); for (const sid of ['allergy','diarrhea','cold']) for (const x of basket(byId(D.symptoms,sid))) if ((x.why||[]).includes('child') && minAgeOf(x.d)!=null) bad.push('14세 '+sid+': 나이 기준이 있는데 「소아」로 막음 '+x.d.id);
       kid(null,5); location.hash='#/symptom/fever'; route(); if (!/생후 3개월 안팎/.test([...document.querySelectorAll('.answer .kid-over')].map(e=>e.innerText).join(''))) bad.push('생년월일 없음 5 kg: 「생후 3개월 안팎」 경고 없음');
@@ -833,6 +833,7 @@ def r2_checks(br, url, fails):
     by = pz.evaluate("()=>new Date().getFullYear()-13")
     pz.fill('#k-birth', f'{by}-01-01'); pz.fill('#k-w', '72'); pz.click('button:has-text("계산하기")'); pz.wait_for_timeout(200)
     if pz.evaluate('ME.age') != 'adult': fails.append('#4 아이 계산이 보호자 나이를 바꿉니다')
+    pz.evaluate("()=>document.querySelectorAll('.dose-card details').forEach(d=>d.open=true)")   # 11-17 두 층 — 근거 문장은 «자세히» 안
     t = txt()
     if '위 범위 안이라' in t or '약병 표시와 몸무게 계산값이 달라요' not in t: fails.append('#6 13세 72 kg: 약병 20 mL 가 계산 범위 밖인데 «범위 안»이라고 합니다')
     if '성인 상한을 적용해' not in t: fails.append('#32 성인 상한에 걸린 하루 최대를 몸무게 × mg/kg 등식처럼 씁니다')
@@ -1755,7 +1756,7 @@ def main():
         # 10. 소아 용량 계산 — 아세트아미노펜 10~15 mg/kg(하루 75, 두 돌 전 60), 이부프로펜 5~10 mg/kg(하루 40), 상한
         #     우리집 소아과 계산기와 같은 식이다(현욱님 지시 2026-09-23) — 몸무게로 걸린 별도 한도는 두지 않는다.
         kd = pg.evaluate("()=>[[15,36],[8,5],[40,150],[10,20]].map(([w,m])=>['apap','ibu'].map(k=>{const r=kidDose(k,w,m);return [r.lo,r.hi,r.day]}))")
-        want = [[[150, 225, 1125], [75, 150, 500]], [[80, 120, 480], [40, 80, 320]], [[400, 600, 3000], [200, 250, 1000]], [[100, 150, 600], [50, 100, 400]]]   # 40 kg·150개월 이부프로펜 = 나이 표(만 11~14세 1회 250·하루 1,000 mg)로 «작은 쪽»(공통 숫자표, 10-22)
+        want = [[[150, 225, 1125], [75, 150, 600]], [[80, 120, 480], [40, 80, 320]], [[400, 600, 3000], [200, 250, 1000]], [[100, 150, 600], [50, 100, 400]]]   # 40 kg·150개월 이부프로펜 = 나이 표(만 11~14세 1회 250·하루 1,000 mg)로 «작은 쪽»(공통 숫자표, 10-22)
         if kd != want: fails.append(f'소아 용량 계산 불일치: {kd} ≠ {want}')
         # 10b. 우리집 소아과와 같은 답인지 — 그 앱의 doseRange 를 그대로 옮긴 식과 몸무게 4~70 kg 전부 비교.
         #      그리고 「하루 1번」 같은 횟수 문장·맥시부펜 계산 카드가 다시 생기면 안 된다.
@@ -1765,7 +1766,7 @@ def main():
             /* 우리집 소아과 doseRange(10-21 이부허가표 — 몸무게 셈과 나이 표 가운데 작은 쪽) 그대로 */
             const 표=[[12,36,50,100,400],[36,84,100,150,600],[84,132,150,200,800],[132,180,200,250,1000]], 칸=k==='ibu'?(표.find(x=>m>=x[0]&&m<x[1])||null):null;
             const 위끝=칸?Math.min(D.capDose,칸[3]):D.capDose;
-            const perKg=(k==='apap'&&m<24)?60:D.day; const lo=Math.round(Math.min(w*D.pk[0],위끝)), hi=Math.round(Math.min(w*D.pk[1],위끝)), day=Math.round(Math.min(w*perKg,D.capDay,칸?칸[4]:Infinity,(k==='ibu'&&w<30)?500:Infinity));
+            const perKg=(k==='apap'&&m<24)?60:D.day; const lo=Math.round(Math.min(w*D.pk[0],위끝)), hi=Math.round(Math.min(w*D.pk[1],위끝)), day=Math.round(Math.min(w*perKg,D.capDay,칸?칸[4]:Infinity,Infinity));   /* 11-17 부품 17b — 30 kg·500 mg 상한 뺌(현욱님 11-05) */
             const r=kidDose(k,w,m); if(r.lo!==lo||r.hi!==hi||r.day!==day) bad.push(k+' '+w+'kg '+[r.lo,r.hi,r.day]+' ≠ '+[lo,hi,day]); }
           ME.age='child'; ME.child={name:'',birth:'2016-03-01',weight:28}; route();
           const txt=document.getElementById('view').innerText; ME.age='adult'; ME.child={}; saveMe();
