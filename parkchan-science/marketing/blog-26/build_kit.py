@@ -28,7 +28,7 @@ def inline(s, mode):   # mode: rich | prev | txt
     if mode == 'txt':
         return re.sub(r'\*\*|==', '', s).replace('<br>', '\n')
     s = re.sub(r'\*\*(.+?)\*\*', r'<b>\1</b>', s)
-    return re.sub(r'==(.+?)==', (rf'<b style="color:{BLUE}">\1</b>' if mode == 'rich' else r'<b class="em">\1</b>'), s)
+    return re.sub(r'==(.+?)==', (r'<b>\1</b>' if mode == 'rich' else r'<b class="em">\1</b>'), s)
 
 imgs, n = {}, 0
 PUB.mkdir(parents=True, exist_ok=True)
@@ -59,7 +59,7 @@ def rich(data_uri):
             rows = ''.join(f'<tr><td style="{TD}background:{"#FFF2C2" if i == b[2] else "#FFFFFF"};font-weight:700;{"color:"+BLUE+";" if i == b[2] else ""}">{l}</td><td style="{TD}background:{"#FFF2C2" if i == b[2] else "#FFFFFF"};{"font-weight:700;" if i == b[2] else ""}">{inline(v, "rich")}</td></tr>' for i, (l, v) in enumerate(b[1]))
             out.append(f'<table style="border-collapse:collapse;width:100%;margin:0 0 18px;font-size:15px;line-height:1.6">{rows}</table>\n<p><br></p>')
         elif t == 'fine': out.append(f'<p style="margin:0;font-size:13px;line-height:1.6;color:#9A9A9A;text-align:center">{b[1]}</p>')
-    out.append(f'<p style="color:#1a73e8;margin-top:22px">{HASH}</p>')
+    out.append(f'<p style="margin:0;line-height:1.9;">{HASH}</p>')
     return '\n'.join(out)
 
 def txt():
