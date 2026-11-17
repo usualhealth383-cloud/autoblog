@@ -15,12 +15,12 @@ with sync_playwright() as p:
     b = p.chromium.launch(executable_path='/opt/pw-browsers/chromium-1194/chrome-linux/chrome', args=['--no-sandbox']); pg = b.new_page(viewport={'width': 390, 'height': 840}, locale='ko-KR')
     errs = []; pg.on('pageerror', lambda e: errs.append(str(e)))
     pg.add_init_script(SEED)
-    pg.goto(URL + '#/home'); pg.wait_for_selector('.job-box', timeout=20000)
-    ok(pg.locator('.prof-row').count() == 0 and pg.locator('a[href="#/people"]').count() == 1, '한 분일 때 이름 줄 없음 · 가족 길 하나')
-    pg.click('a[href="#/people"]'); pg.wait_for_selector('#profName')
+    pg.goto(URL + '#/home'); pg.wait_for_selector('.job-box, .th-mine', timeout=20000)
+    ok(pg.locator('.prof-row').count() == 0 and pg.locator('a[href="#/people"]').count() <= 1, '한 분일 때 이름 줄 없음 · 가족 길 하나')
+    pg.click('text=더 ›'); pg.click('.th-sheet a[href="#/people"]'); pg.wait_for_selector('#profName')   # 11-18 정리 — 가족은 「더 ›」 시트 안
     pg.click('button:has-text("어머니")'); pg.wait_for_timeout(200)
     ok(pg.locator('[aria-label="약을 드실 분의 나이"] button.on').inner_text().strip() == '65세 이상', '어머니 → 65세 이상 기본')
-    pg.click('button:has-text("더하고 그분 약 담기")'); pg.wait_for_load_state('load'); pg.wait_for_selector('.job-hero, .job-box', timeout=20000)
+    pg.click('button:has-text("더하고 그분 약 담기")'); pg.wait_for_load_state('load'); pg.wait_for_selector('.job-hero, .job-box, .th-mine', timeout=20000)
     st = pg.evaluate("({p: JSON.parse(localStorage.getItem('yakjido.profiles.v1')), me: JSON.parse(localStorage.getItem('yakjido.me.v1')), stash: JSON.parse(localStorage.getItem('yakjido.me.v1@me')||'null'), allow: window.profIsMe()})")
     ok(st['p']['active'] != 'me' and len(st['p']['list']) == 2, '어머니가 지금 사람')
     ok(not (st['me'].get('taking') or []) and st['me'].get('age') == 'senior', '어머니 기록은 비어 있고 65세 이상')
@@ -29,11 +29,11 @@ with sync_playwright() as p:
     ok('어머니 약을 담아 두세요' in pg.inner_text('.job-hero'), '머리글이 어머니 님')
     ok(pg.locator('.prof-chip').count() == 3 and pg.locator('.prof-note').count() == 1, '이름 줄 · 알림 안내')
     pg.evaluate("ME.taking=['ibuprofen'];saveMe()")
-    pg.click('.prof-chip:has-text("나")'); pg.wait_for_load_state('load'); pg.wait_for_selector('.job-box', timeout=20000)
+    pg.click('.prof-chip:has-text("나")'); pg.wait_for_load_state('load'); pg.wait_for_selector('.job-box, .th-mine', timeout=20000)
     st = pg.evaluate("({me: JSON.parse(localStorage.getItem('yakjido.me.v1')), keys: Object.keys(localStorage).filter(k=>k.startsWith('yakjido.me.v1@'))})")
     ok(st['me'].get('taking') == ['acetaminophen'], '나로 돌아오면 내 약 그대로')
     ok(len(st['keys']) == 1 and 'ibuprofen' in json.loads(pg.evaluate(f"localStorage.getItem('{st['keys'][0]}')"))['taking'], '어머니 약은 따로 남음')
-    ok('내 약 1가지' in pg.inner_text('.job-box'), '홈 머리글 내 약 1가지')
+    ok('내 약 1가지' in pg.inner_text('.th-mine'), '홈 머리글 내 약 1가지')
     pg.goto(URL + '#/people'); pg.wait_for_selector('.prof-list')
     ok(pg.locator('.prof-list li').count() == 2, '담아 둔 분 둘')
 
@@ -56,7 +56,7 @@ with sync_playwright() as p:
     L2 = pn.evaluate("()=>__LN.pending")
     ok(not any(x.get('title') == '어머니 약 드실 시간' and x['schedule']['at'].startswith('2026-09-28') for x in L2), '먹은 오늘 회차 알림은 지움')
 
-    pn.goto(URL + '#/home'); pn.wait_for_selector('.job-box', timeout=20000); pn.wait_for_timeout(500)
+    pn.goto(URL + '#/home'); pn.wait_for_selector('.job-box, .th-mine', timeout=20000); pn.wait_for_timeout(500)
     ft = pn.inner_text('.fam-today') if pn.locator('.fam-today').count() else ''
     ok('어머니' in ft and '님' not in ft and '오늘 약 다 챙겼어요' in ft, f'오늘 가족 약 — 어머니 다 챙김 표시 ({ft[:40]})')
 
@@ -74,6 +74,21 @@ with sync_playwright() as p:
     pg2.evaluate("(()=>{for(let i=6;i>=0;i-=2){const x=new Date();x.setDate(x.getDate()-i);ME.vitals=(ME.vitals||[]);ME.vitals.push({k:'bp',t:dayKey(x)+' 08:00',s:130+i,d:85,w:'아침'});}saveMe();})()")
     pg2.goto(URL + '#/vitals'); pg2.wait_for_selector('.vz', timeout=10000)
     ok(pg2.locator('.vz-chg').count() >= 1 and '약 바꾼 날' in pg2.inner_text('.vz-chgl'), '그래프에 약 바꾼 날 점선')
+
+    # 11-18 Main — srv.js 가 오기 전: «겹침 없음» 거짓 안심 0 · 이미 걸린 가족 알림은 지우지 않음
+    pb = b.new_page(viewport={'width': 360, 'height': 760}, locale='ko-KR', timezone_id='Asia/Seoul')
+    pb.route('**/srv.js*', lambda rt: rt.abort())   # srv.js 를 막아 «오기 전»에 머물게
+    pb.add_init_script(cap)
+    pb.add_init_script(SEED + ";localStorage.setItem('yakjido.me.v1',JSON.stringify({taking:['supp:zinc','supp:lutein','acetaminophen'],sched:{acetaminophen:['09:00']}}));localStorage.setItem('yakjido.profiles.v1',JSON.stringify({active:'me',list:[{id:'me',name:'나'},{id:'mom1',name:'어머니'}]}));localStorage.setItem('yakjido.me.v1@mom1',JSON.stringify({taking:['ibuprofen'],sched:{ibuprofen:['12:00']}}))")
+    nope = []
+    for h in ('#/home', '#/bag', '#/together', '#/check'):
+        pb.goto(URL + h, wait_until='commit'); pb.wait_for_timeout(2500)
+        t = pb.inner_text('body')
+        if '겹침 없음' in t or '조합이 안 보여요' in t or '겹치는 것이 없' in t: nope.append(h)
+    ok(not nope, f'srv.js 전 «겹침 없음» 0 — {nope}')
+    pb.evaluate("()=>{ __LN.pending.push({id:100005,title:'어머니 약 드실 시간',schedule:{at:new Date(Date.now()+3600e3).toISOString()},extra:{}}); }")
+    pb.evaluate("()=>window.nativeArm && nativeArm()"); pb.wait_for_timeout(800)
+    ok(pb.evaluate("()=>__LN.pending.some(x=>x.id===100005)"), 'srv.js 전 다시 걸어도 가족 알림(100005)은 남음')
     ok(not errs, '스크립트 오류 없음 ' + ' | '.join(errs[:2]))
     b.close()
 srv.shutdown()

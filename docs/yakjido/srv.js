@@ -1730,6 +1730,29 @@ try {
 } catch (e) {}
 
 
+/* 11-17 */
+window.profOthers = function (){ let P = null; try { P = JSON.parse(localStorage.getItem('yakjido.profiles.v1') || 'null'); } catch (e) {} if (!P || !Array.isArray(P.list)) return [];
+  const act = P.active || 'me', out = [];
+  P.list.forEach((p, n) => { if (!p || p.id === act || !/^[a-z0-9]{1,12}$/.test(p.id)) return; let raw = null; try { raw = localStorage.getItem(ME_KEY + '@' + p.id); } catch (e) {} if (!raw) return;
+    out.push({ id: p.id, n, name: String(p.name || '').trim().slice(0, 12) || '가족', me: loadMe(raw) }); });
+  return out; }
+window.withMe = function (m, f){ const keep = ME; ME = m; try { return f(); } finally { ME = keep; } }
+/* 11-17 */
+window.PROF_REL = /^(어머니|아버지|엄마|아빠|아이|아기|첫째|둘째|셋째|배우자|남편|아내|할머니|할아버지|외할머니|외할아버지|시어머니|시아버지|장모님|장인어른|딸|아들|큰딸|작은딸|큰아들|작은아들|언니|오빠|누나|형|동생)$/;
+window.profCall = n => { n = String(n || '').trim(); return window.PROF_REL.test(n) ? n : n + ' 님'; };
+window.profWho = o => o.id === 'me' ? '내' : profCall(o.name);
+window.profKey = key => { const m = (Array.isArray(key) ? key.join(',') : String(key || '')).match(/^p=([a-z0-9]{1,12});(.*)$/); return m ? { id: m[1], keys: m[2] } : null; };
+window.profTick = function (pk, day, how){ const keys = noteKeys(pk.keys); if (!keys.length) return; const k = day || todayKey();
+  if (k !== todayKey() && k !== dayBefore(1)) { toast('지난 알림이라 기록하지 않았어요 — 그분으로 바꿔 복용 시간 화면에서 눌러 주세요'); return; }
+  const o = profOthers().find(x => x.id === pk.id); if (!o) return; const m = o.me;
+  const box = how === 'took' ? (m.taken = m.taken || {}) : (m.skipped = m.skipped || {}), arr = box[k] = box[k] || [];
+  keys.forEach(x => { if (!arr.includes(x)) arr.push(x); });
+  if (how === 'took' && m.skipped && m.skipped[k]) m.skipped[k] = m.skipped[k].filter(x => !keys.includes(x));
+  try { localStorage.setItem(ME_KEY + '@' + pk.id, JSON.stringify(m)); } catch (e) { toast('저장하지 못했어요'); return; }
+  toast(`${profWho(o)} 약을 ${how === 'took' ? '먹었다고' : '건너뛰었다고'} 적어 두었어요`); if (NATIVE) nativeArm(); else armNotifications(); }
+/* 11-17 */
+window.profAct = () => { try { return (JSON.parse(localStorage.getItem('yakjido.profiles.v1') || 'null') || {}).active || 'me'; } catch (e) { return 'me'; } };
+try { if (typeof NATIVE !== 'undefined' && NATIVE && typeof nativeArm === 'function') setTimeout(nativeArm, 0); else if (typeof armNotifications === 'function') setTimeout(armNotifications, 0); } catch (e) {}   /* 가족 알림 함수가 온 뒤 다시 건다 */
 /* 11-17 Main ① 가족 여러 명 약을 한 앱에서 — 기기 안 프로필(나·어머니·아이). 겹침 판정은 사람마다.
    지금 보는 사람의 기록은 늘 yakjido.me.v1 에 둔다(홈·겹침·알림·약통이 그대로 쓴다). 다른 사람 것은 yakjido.me.v1@<id> 에 쉬어 둔다.
    서버 이어 보기·가족 알림(보호자에게 알리기)은 「나」일 때만 — 다른 사람 기록이 내 계정·내 보호자에게 섞이지 않게. 복용 알림은 모든 분 것(app-shell profOthers) */
@@ -1924,6 +1947,23 @@ try { const ps = document.createElement('style'); ps.id = 'prof-css'; ps.textCon
 /* ▲▲ 해열제 부품 끝 ▲▲ */
 /* 해열제 부품이 오면 — 아이 계산·약 화면을 정본 숫자로 다시 그린다 */
 try { if (/^#\/(kids|drug|symptom|home)/.test(location.hash || '#/home') && typeof route === 'function') setTimeout(route, 0); } catch (e) {}
+/* 11-18 정리 — 설정 일곱 줄 모양 · 오늘 약 히어로(첫 화면 예산이라 여기) */
+try { const st = document.createElement('style'); st.textContent = '.th{margin:12px 0 0;padding:20px}.th-eb{display:block;font-size:.875rem;font-weight:700;color:var(--primary-deep)}.th-big{display:block;margin-top:4px;font-size:1.5rem;line-height:1.35;font-weight:800;word-break:keep-all}.th-b.due .th-big{color:var(--primary-deep)}.th-sub{margin:6px 0 0;color:var(--muted);line-height:1.6;word-break:keep-all}.th-go{margin-top:16px;width:100%;min-height:56px;font-size:1.125rem}.th-share{display:inline-flex;align-items:center;min-height:44px;margin-top:8px;color:var(--primary);font-weight:700;background:none;border:0;padding:0}.th-low{display:flex;gap:8px;margin:12px 0 0;font-size:.9375rem;line-height:1.6}.th-low svg{flex:none;color:var(--alert)}.th-mine{margin:12px 0 0;padding:4px 16px 8px}.th-m{display:flex;align-items:center;gap:4px;min-height:56px;text-decoration:none;color:var(--text);font-size:1.0625rem}.th-m span{flex:1;color:var(--muted)}.th-stop{color:var(--alert,#B42318)}.th-warn{color:#8A5A00}.th-act{display:flex;justify-content:space-between;border-top:1px solid var(--hairline)}.th-act .link{min-height:48px;padding:0 4px;background:none;border:0;color:var(--primary);font:inherit;font-weight:700}.th-sheet{position:fixed;left:12px;right:12px;bottom:12px;max-width:520px;margin:0 auto;padding:8px 16px 16px;border-radius:20px}.th-row{display:flex;align-items:center;justify-content:space-between;gap:8px;min-height:60px;border-bottom:1px solid var(--hairline);text-decoration:none;color:var(--text)}.th-row b{display:block}.th-row small{display:block;color:var(--muted);font-size:.875rem}.set-list{margin-top:12px;padding:0 16px;background:var(--card);border:1px solid var(--hairline);border-radius:20px}.set-list>.tidy,.set-list>.set-a{margin:0;border-top:1px solid var(--hairline)}.set-list>:first-child{border-top:0}.set-a{display:flex;align-items:center;justify-content:space-between;gap:8px;min-height:64px;text-decoration:none;color:var(--text)}.set-list>.tidy>summary{width:100%;max-width:none;min-height:64px;justify-content:space-between;color:var(--text);padding:0}.sl{display:flex;flex-direction:column;gap:2px;padding:10px 0;text-align:left}.sl b{font-size:1.0625rem;font-weight:700}.sl small{font-size:.875rem;font-weight:400;color:var(--muted);line-height:1.5}.set-list>.tidy[open]>summary b{color:var(--primary-deep)}.set-list>.tidy>*:not(summary){margin-bottom:16px}'; document.head.appendChild(st); } catch (e) {}
+/* 11-18 정리 2차 — 영양제 성분 찾기(자주 찾는 6 + 찾기 · 나머지는 접이). 치면 접이를 펼치고 이름이 맞는 줄만 */
+window.suppFind = function (v) { v = String(v || '').trim().toLowerCase(); var d = document.querySelector('details[data-k=spick]'); if (d && v) d.open = true;
+  document.querySelectorAll('.checkrow[data-n]').forEach(function (r) { r.style.display = !v || r.dataset.n.toLowerCase().indexOf(v) >= 0 ? '' : 'none'; }); };
+/* 영양제끼리 — suppRules.overlaps 의 글(출처 있음)을 그대로 쓴다. 흔한 조합이라 «합쳐 보기»는 info, 구리 결핍처럼 해가 되는 것만 warn */
+window.SUPP_OV = [['vitd', 'calcium', 'info', '칼슘제와 비타민 D — 두 제품의 비타민 D를 합쳐 보세요'], ['vitd', 'multi', 'info', '종합비타민과 비타민 D — 합쳐서 하루 상한 안인지 보세요'],
+  ['omega3', 'vitd', 'info', '오메가3 제품에 비타민 D가 들었는지 보세요'], ['zinc', 'multi', 'info', '종합비타민과 아연 — 합쳐서 하루 35 mg 안인지 보세요'],
+  ['zinc', 'lutein', 'warn', '루테인 복합제와 아연 — 겹치면 구리가 모자랄 수 있어요'], ['vitb', 'multi', 'info', '종합비타민과 비타민 B — 비타민 B6가 많아지기 쉬워요'],
+  ['iron', 'mg', 'info', '철분과 마그네슘은 시간을 나누세요'], ['mg', 'calcium', 'info', '칼슘과 마그네슘 — 많이 드시면 시간을 나누세요']];
+try { if (/^#\/(together|home|bag|check)/.test(location.hash || '#/home') && typeof route === 'function') setTimeout(route, 0); } catch (e) {}
+window.kidOneS = r => { const [lo, hi] = mlRange(r), c = r.D.conc[0].mgPerMl; let v = null, from = '';
+  if (r.D.id === 'apap') { const row = (D_KIDS().apapLabelTable || []).find(([a, b]) => r.w >= a && r.w <= b + .099); if (row) { v = row[3]; from = 'table'; } }
+  else if (r.m != null) { const row = ibuRow(r.m); if (row) { v = row[4]; from = 'age'; } }
+  if (v == null) { v = +lo; from = 'low'; } v = Math.min(v, +hi);
+  const t = (Math.floor(v * 10 + 1e-9) / 10); return { ml: t % 1 ? t.toFixed(1) : String(t), mg: Math.round(t * c), from };
+};
 /* 약지도 — 두 폰 합치기(app-shell 의 sanitizeMe 를 씀). 2026-10-13 상용화 점검 */
 window.mergeMe = function (localRaw, serverRaw) {
   let a, b; try { a = sanitizeMe(JSON.parse(localRaw)); b = sanitizeMe(JSON.parse(serverRaw)); } catch (e) { return null; }
@@ -3912,8 +3952,35 @@ window.언어칸 = function () {
   /* 11-17 저녁 현욱님 방향 전환 1단계(?job=1 시안 — 기본 꺼짐) — 「하나의 일」 = 내 약.
      한 번 담으면 기억 · 새 약이 들어오면 내 약통 전체와 바로 겹침 판정(겹침 규칙 69) · 먹을 때 알림 · 가족 · 진료·약국에 내 약 한 장.
      새 임상 문장 없음 — 판정은 ixRun/ixCards(약 화면·같이 먹어도 되나요와 같은 엔진) */
+  function 오늘히어로(items) {
+    var tk = takenSet(), now = new Date(), nm = now.getHours() * 60 + now.getMinutes(), rows = [];
+    items.forEach(function (d) { schedOf(d.id, d).forEach(function (t) { var hm = t.split(':'); rows.push({ d: d, t: t, min: +hm[0] * 60 + +hm[1], k: d.id + '@' + t }); }); });
+    rows.sort(function (a, b) { return a.min - b.min; });
+    var left = rows.filter(function (r) { return tk.indexOf(r.k) < 0 && !isSkipped(r.k); }), stk = 0; try { stk = streakDays(); } catch (e) {}
+    var nx = left[0], slot = nx ? left.filter(function (r) { return r.t === nx.t; }) : [], due = nx && nx.min <= nm + 30;
+    var nmz = function (r) { return esc(String(r.d.simple && !r.d.name ? r.d.simple : r.d.name || '').split(' (')[0]); };
+    var 위 = '';
+    if (!rows.length) 위 = '<div class="th-b"><span class="th-eb">오늘 약</span><b class="th-big">필요할 때 드시는 약만 있어요</b><p class="th-sub">드실 때 「먹었어요」로 적어 두면 간격을 알려 드려요.</p><a class="btn th-go" href="#/schedule">드신 것 적기</a></div>';
+    else if (!nx) 위 = '<div class="th-b ok"><span class="th-eb">오늘 약</span><b class="th-big">오늘 약을 다 챙기셨어요</b><p class="th-sub">' + (stk >= 2 ? stk + '일째 이어지고 있어요. ' : '') + '내일 ' + rows[0].t + '에 다시 알려 드릴게요.</p><button type="button" class="link th-share" onclick="shareOut({title:\'약지도\',text:\'오늘 약을 다 챙겨 먹었어요. — 약지도\'})">가족에게 알리기 ›</button></div>';
+    else 위 = '<div class="th-b' + (due ? ' due' : '') + '"><span class="th-eb">오늘 약' + (stk >= 2 ? ' · ' + stk + '일째' : '') + '</span><b class="th-big">' + (due ? (nx.min <= nm ? '지금 드실 시간' : '곧 드실 시간') + ' · ' + nx.t : '다음은 ' + nx.t) + '</b><p class="th-sub">' + slot.map(nmz).join(' · ') + ' · 오늘 ' + left.length + '번 남았어요</p>'
+      + '<button type="button" class="btn th-go" ' + DI('solid') + ' onclick="tickFromNote(\'' + slot.map(function (r) { return r.k; }).join(',') + '\');armNotifications();route()">먹었어요</button></div>';
+    var low = []; try { low = lowStock(); } catch (e) {}
+    var 판 = '', stop = 0, warn = 0; try { var C = ixCards(ixRun([])); stop = C.filter(function (c) { return c.lv === 'stop'; }).length; warn = C.filter(function (c) { return c.lv === 'warn'; }).length; } catch (e) {}
+    판 = stop ? '<b class="th-stop">같이 드시면 안 되는 것 ' + stop + '</b>' : warn ? '<b class="th-warn">조심할 것 ' + warn + '</b>' : '겹침 없음';
+    var 누구 = profIsMe() ? '내 약' : esc(profCall(profName())) + ' 약';
+    return '<section class="th card">' + profRow() + 위 + famToday()
+      + (low.length ? '<p class="th-low">' + I.alert + '<span><b>곧 떨어져요</b> — ' + low.map(function (x) { return esc(x.n) + ' ' + x.days + '일치'; }).join(' · ') + '</span></p>' : '') + '</section>'
+      + '<section class="th-mine card"><a class="th-m" href="#/together"><b>' + 누구 + ' ' + items.length + '가지</b><span> · ' + 판 + '</span>' + I.chev + '</a>'
+      + '<div class="th-act"><button type="button" class="link" onclick="go(\'/together\')">+ 약 더하기</button><button type="button" class="link" onclick="내약더()">더 ›</button></div></section>';
+  }
+  window.내약더 = function () { var o = document.createElement('div'); o.className = 'dlg-bg'; o.setAttribute('role', 'dialog'); o.setAttribute('aria-label', '내 약 더 보기');
+    var L = [['#/notify', '알림', '약 시간 · 다시 알림 · 약 떨어짐'], ['#/send', '가족에게', '부모님께 약 보내기 · 함께 보기'], ['#/bag', '내 약 한 장', '진료·약국에 보여 줄 한 장'], ['#/me?t=meds', '약통', '담은 약 고치기 · 빼기'], ['#/people', '가족 약 따로 담기', '어머니·아이 약을 사람마다']];
+    o.innerHTML = '<div class="card th-sheet">' + L.map(function (x) { return '<a class="th-row" href="' + x[0] + '"><span><b>' + x[1] + '</b><small>' + x[2] + '</small></span>' + I.chev + '</a>'; }).join('') + '<button type="button" class="btn line" style="margin-top:12px;width:100%">닫기</button></div>';
+    o.addEventListener('click', function (e) { if (e.target === o || e.target.tagName === 'BUTTON' || e.target.closest('a')) o.remove(); }); document.body.appendChild(o); var f = o.querySelector('a'); if (f) f.focus(); };
   function 내약칸() {
     var items = []; try { items = takingItems(); } catch (e) {}
+    /* 11-18 Main 정리 2차 — 원래 판(간단히 보기 아님): 맨 위 = 「오늘 약」 히어로(다음 회차 + 큰 먹었어요 한 단추 · 가족 한 줄), 그 아래 내 약 한 줄 카드. 단추 넷은 「더 ›」 시트로 */
+    if (items.length && !document.documentElement.classList.contains('ink') && !(typeof svOn === 'function' && svOn()) && !ALLV()) return 오늘히어로(items);
     if (!items.length) return '<section class="job-hero' + (document.documentElement.classList.contains('ink') ? '' : ' card') + '">' + profRow() + 잉크얼굴(72) + '<h1>' + (profIsMe() ? '내 약을 담아 두세요' : esc(profCall(profName())) + ' 약을 담아 두세요') + '</h1><p>한 번 담으면 기억해요. 새 약이 들어오면 <b>같이 먹으면 안 되는 것</b>을 바로 알려 드려요.</p>' +
       '<div class="job-add"><button type="button" class="btn" ' + DI('solid') + ' onclick="go(\'/photo\')">약봉투·처방전 사진으로</button><button type="button" class="btn line" onclick="go(\'/together\')">약 이름으로 찾기</button></div>' +
       '<p class="job-small"><a href="#/kinds">이름을 몰라도 종류만 골라 담기 ›</a></p>' + famToday() + profLink() + '</section>';
@@ -4591,7 +4658,7 @@ const 영양칸 = (x, sub) => `<div class="sg-pick"><button type="button" class=
 const 값못함 = L => (L || []).length ? `<section class="sec"><div class="sech"><h2 class="sec-h">따로 드실 이유가 적은 것</h2></div><div class="card rows">${L.map(x => `<div class="sg-skip"><button type="button" class="sg-h" onclick="${영양길(x)}"><b>${esc(영양이름(x))}</b>${I.chev}</button><p>${fmt(x.why)}</p>${(x.src || []).length ? srcChips(x.src) : ''}</div>`).join('')}</div></section>` : '';
 window.영양입구 = () => { const G = D.suppGoals || [], S = D.suppStages || []; if (!G.length) return '';
   return `<section class="sec"><div class="sech"><h2 class="sec-h">무엇이 불편해서요?</h2></div><div class="rg">${G.map(g => `<button class="rg-t ${g.tone || ''}" onclick="go('/sgoal/${g.id}')"><span class="ic">${icon(g.icon)}</span><b>${esc(g.name)}</b></button>`).join('')}</div></section>
-  <section class="sec"><div class="sech"><h2 class="sec-h">누구세요?</h2><span class="secn">나이·시기별로 챙길 것</span></div><div class="rows-l">${S.map(x => lrow(icon(x.icon), esc(x.name), esc(x.line), `go('/sstage/${x.id}')`)).join('')}${lrow(I.family, '아이·10대예요', '아이 영양은 우리 집 소아과와 같은 기준으로 봐요', "go('/kids')")}</div></section>`; };
+  <section class="sec">${tidy(`나이·시기별로 챙길 것 — 임신 준비·50세·65세… <span class="muted">${S.length + 1}가지</span>`, `<div class="sech"><h2 class="sec-h">누구세요?</h2></div><div class="rows-l">${S.map(x => lrow(icon(x.icon), esc(x.name), esc(x.line), `go('/sstage/${x.id}')`)).join('')}${lrow(I.family, '아이·10대예요', '아이 영양은 우리 집 소아과와 같은 기준으로 봐요', "go('/kids')")}</div>`, 'sstage')}</section>`; };   /* 11-18 정리 — 시기별은 접어 둔다 */
 window.문_sgoal = id => { const g = byId(D.suppGoals, id); if (!g) return `${topBar({ back:'영양제' })}<p class="loading">찾는 항목이 없어요.</p>`;
   return `${topBar({ back:'영양제' })}<div class="${g.tone || ''}"><div class="eyebrow" style="color:var(--gfg,var(--primary))">무엇이 불편해서요?</div><h1>${esc(g.name)}</h1></div>
   <div class="note" role="note" style="margin-top:12px">${I.info}<span><b>${fmt(g.first.line)}</b></span></div>
