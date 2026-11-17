@@ -16,6 +16,10 @@ P=[('22','강의 시간표','학원 공지사항','수정',['고3 반 이름 「
 
 ('21','그래프 문제 글','통합과학 이야기','수정 (여유 있을 때)',['글은 그대로 · 사진 3장을 고화질로']),
 ('19','중학교 비교 글','통합과학 이야기','수정 (여유 있을 때)',['글은 그대로 · 사진 4장을 고화질로'])]
+import base64
+COVERS=[('원장 인사말','03_원장인사말_표지'),('반별 안내','10_반별안내_사진1_표지'),('고1 예비반','07_고1예비반_사진1_표지'),('고3 수능 준비반','04_고3예비반_표지'),('중등부 특강반','05_중등부_표지'),('강의 시간표','06_강의시간표'),('그래프 문제 글','08_그래프글_사진1'),('중학교 비교 글','09_중학교비교글_사진1')]
+def b64(f): return 'data:image/png;base64,'+base64.b64encode(open(M/'hires'/(f+'.png'),'rb').read()).decode()
+CV=''.join(f'<div class="cvr"><img src="{b64(f)}" alt="{t} 대표 사진"><div><b>{t}</b><button class="big" onclick="cpImg(this)">이 사진 복사</button></div></div>' for t,f in COVERS)
 cards,tpl=[],[]
 for i,(n,name,cat,act,chg) in enumerate(P,1):
     r,t,title=kit(n);tpl.append(f'<template id="r{n}">{r}</template>')
@@ -49,12 +53,15 @@ li.st{{background:var(--card);border:1px solid var(--bd);border-radius:14px;padd
 button.big{{font:inherit;font-weight:900;font-size:16px;padding:14px;border-radius:12px;border:none;background:var(--pt);color:#fff;cursor:pointer;width:100%}} button.big.alt{{background:var(--soft);color:var(--fg);margin-top:8px}}
 textarea{{width:100%;height:140px;font:inherit;font-size:13px;border:1px solid var(--bd);border-radius:8px;padding:8px;background:var(--code);color:var(--fg);margin-top:8px;box-sizing:border-box}}
 details summary{{cursor:pointer;font-weight:700;font-size:14px;color:var(--sub)}}
-.bar{{position:sticky;top:env(safe-area-inset-top,0px);background:var(--bg);padding:8px 0;z-index:2;font-size:14px;font-weight:700;color:var(--sub)}} .bar i{{font-style:normal;color:var(--ok)}}.ph{{background:var(--soft);border-radius:10px;padding:10px 14px;font-size:14.5px}} .ph ol{{padding-left:20px;margin-top:4px}} h3 small{{font-size:13px;color:var(--sub);font-weight:500}}</style>
+.bar{{position:sticky;top:env(safe-area-inset-top,0px);background:var(--bg);padding:8px 0;z-index:2;font-size:14px;font-weight:700;color:var(--sub)}} .bar i{{font-style:normal;color:var(--ok)}}.ph{{background:var(--soft);border-radius:10px;padding:10px 14px;font-size:14.5px}} .ph ol{{padding-left:20px;margin-top:4px}} h3 small{{font-size:13px;color:var(--sub);font-weight:500}}.cvs{{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px}} .cvr{{display:flex;flex-direction:column;gap:6px;min-width:0}} .cvr img{{width:100%;aspect-ratio:1;object-fit:cover;object-position:top;border:1px solid var(--bd);border-radius:8px}} .cvr b{{font-size:14px}} .cvr .big{{font-size:14px;padding:10px}}</style>
 <div class="w"><header><h1>박찬 블로그 글 최종본 — 복사해서 붙이기만</h1><p class="lead">원장님 글(A·B·C·D)과 오늘 확인하신 내용으로 8편을 모두 고쳤습니다. 디자인은 글을 다 고친 뒤 한꺼번에 바꿉니다(그림만 갈아 끼우면 되게 준비해 둠).</p></header>
 <div class="fix"><b>이번에 바뀐 기준</b><ul><li>고1 예비반 새 반: <b>일요반 11월 22일(일)</b> 오후 1시 ~ 4시 · 기존 화 · 수 · 금 오후 5시 30분 · 겨울방학 수요반 오후 2시 ~ 5시 (주 몇 회인지는 쓰지 않음)</li>
 <li>고3: <b>고3 수능 준비반 (현 고2)</b> · 토요반 12월 19일 · 일요반 12월 20일 오후 4시 ~ 7시</li><li>중등부: <b>중등부 특강반</b> — 「통합과학」 글자 없음 · <b>목요반 오후 2시 ~ 5시 · 토요반 오후 1시 ~ 4시</b> · 겨울방학 개강</li></ul></div>
 <div class="how"><b>글마다 똑같이</b><ol><li>블로그에서 그 글 → <b>수정</b></li><li>제목 칸: 아래 <b>제목 복사</b> → 기존 제목 지우고 붙여 넣기</li><li>본문 아무 곳 → <b>Ctrl+A</b> → <b>Delete</b></li><li>아래 <b>본문 복사</b> → 본문 칸에 <b>Ctrl+V</b> — 사진(고화질) · 표 · 가운데/왼쪽 정렬 · 태그가 한 번에 들어갑니다</li><li>오른쪽 위 <b>발행</b> → 카테고리 확인 → <b>발행</b></li></ol><p class="lead" style="margin-top:6px">모든 문단에 정렬과 글자색을 하나하나 박아 두어, 지운 글의 서식(파란 글씨 · 가운데 정렬)이 남아 있어도 덮어씁니다.</p>
 </div>
+<section class="fix" id="cover"><b>첫 화면을 예쁘게 — 글마다 대표 사진 한 장 (Ctrl+V 한 번)</b>
+<p class="lead" style="margin:6px 0 10px">첫 화면 큰 사진 · 사진 카드에는 네이버에 직접 들어간 사진만 나옵니다. 사진 버튼 · 파일 찾기 없이, 여기서 <b>이 사진 복사</b> → 글 수정 화면에서 맨 위 표지 사진을 눌러 <b>Delete</b> → 그 자리에 <b>Ctrl+V</b> → 발행. 그러면 네이버 사진(고화질)으로 바뀝니다. <b>원장 인사말 하나만 해도</b> 첫 화면이 「큰 사진 + 인사말」로 바뀝니다.</p>
+<div class="cvs">{CV}</div></section>
 <div class="bar">진행 <i id="cnt">0</i> / {len(P)}</div>
 <ol class="steps">{''.join(cards)}</ol>
 <div class="fix"><b>카테고리 이름 하나 (선택)</b><ul><li>관리 → 메뉴·글·동영상 관리 → 블로그 → 카테고리 관리 → <b>고3 예비반</b>을 눌러 이름을 <b>고3 수능 준비반</b>으로 → 확인</li></ul></div>
@@ -62,6 +69,7 @@ details summary{{cursor:pointer;font-weight:700;font-size:14px;color:var(--sub)}
 {''.join(tpl)}
 <script>
 function cpy(b){{const t=b.closest('.cp').querySelector('pre').textContent;navigator.clipboard.writeText(t).then(()=>{{b.textContent='복사됨';setTimeout(()=>b.textContent='복사',1500)}},()=>{{const r=document.createRange();r.selectNodeContents(b.closest('.cp').querySelector('pre'));const s=getSelection();s.removeAllRanges();s.addRange(r);b.textContent='Ctrl+C'}})}}
+async function cpImg(b){{const src=b.closest('.cvr').querySelector('img').src,old=b.textContent;try{{const bl=await (await fetch(src)).blob();await navigator.clipboard.write([new ClipboardItem({{'image/png':bl}})]);b.textContent='복사됨 · 표지 자리에 Ctrl+V'}}catch(e){{b.textContent='복사가 막혔어요 · 사진 위 오른쪽 클릭 → 이미지 복사'}}setTimeout(()=>b.textContent=old,2600)}}
 function cpyT(id){{const t=document.getElementById(id);navigator.clipboard.writeText(t.value).catch(()=>{{t.focus();t.select()}})}}
 document.querySelectorAll('button[data-rich]').forEach(btn=>btn.addEventListener('click',async e=>{{const b=e.currentTarget,h=document.getElementById(b.dataset.rich).innerHTML,old=b.textContent;let ok=false;
 try{{await navigator.clipboard.write([new ClipboardItem({{'text/html':new Blob([h],{{type:'text/html'}}),'text/plain':new Blob([document.getElementById(b.dataset.txt).value],{{type:'text/plain'}})}})]);ok=true}}catch(_){{}}
