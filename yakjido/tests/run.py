@@ -741,7 +741,7 @@ def simple_checks(br, url, fails):
     if pz.evaluate("()=>ME.view") != 'detail' or not pz.query_selector('.stabs'): fails.append('증상 화면 「자세히」 단추가 화면 보기를 바꾸지 않습니다')
     pz.click('.view-seg button:has-text("간단히")'); pz.wait_for_timeout(120)
     if pz.evaluate("()=>JSON.parse(localStorage.getItem('yakjido.me.v1')).view") != 'simple' or not pz.query_selector('.sv-ans'): fails.append('증상 화면 「간단히」 단추가 화면 보기를 바꾸지 않습니다(저장 포함)')
-    go('/me?t=set'); pz.click('.view-row .view-seg button:has-text("자세히")'); pz.wait_for_timeout(120)
+    go('/me?t=set&all=1'); pz.click('.view-row .view-seg button:has-text("자세히")'); pz.wait_for_timeout(120)
     if pz.evaluate("()=>ME.view") != 'detail': fails.append('설정 「화면 보기 — 자세히」가 ME.view 를 바꾸지 않습니다')
     pz.click('.view-row .view-seg button:has-text("간단히")'); pz.wait_for_timeout(120)
     if pz.evaluate("()=>ME.view") != 'simple': fails.append('설정 「화면 보기 — 간단히」가 ME.view 를 바꾸지 않습니다')
@@ -866,7 +866,7 @@ def r2a2_checks(br, url, fails):
     if '와파린' not in a: fails.append(f'2차 #16: 내 약통에서 고른 와파린 제품이 성분과 함께 담기지 않습니다 — {a!r}')
     ex = pg.evaluate("()=>[...search('게보린'), ...search('뉴파린'), ...search('헵세스')].map(h=>h.t).concat(mqHits('게보린').map(h=>h.t||h.rxn?.[0]||''), mqHits('뉴파린').map(h=>h.t||h.rxn?.[0]||'')).filter(t=>/수출\\s*용/.test(t))")
     if ex: fails.append(f'2차 #26: 수출용 품목이 사는 약 후보에 나옵니다 — {ex[:3]}')
-    pg.evaluate("()=>{ location.hash='#/me?t=set'; route(); }"); pg.wait_for_timeout(150)
+    pg.evaluate("()=>{ location.hash='#/me?t=set&all=1'; route(); }"); pg.wait_for_timeout(150)
     fs = pg.evaluate("()=>[...document.querySelectorAll('.fs-seg[aria-label=\"글자 크기\"] button')].map(b=>b.getAttribute('aria-pressed'))")
     if len(fs) < 3 or fs.count('true') != 1: fails.append(f'2차 #50: 글자 크기 단추에 선택 상태(aria-pressed)가 없습니다 — {fs}')
     lk = pg.evaluate("()=>[...document.querySelectorAll('.lk48 a')].map(a=>a.getBoundingClientRect().height)")
@@ -1014,7 +1014,7 @@ def consent_checks(br, url, fails):
     ctx.close()
     # 설정의 약관·개인정보 칸 · 로그인 문
     ctx, pg, errs, ext = page(init=CONSENT_SEED)
-    pg.goto(url + '#/me?t=set'); pg.wait_for_selector('#legal', timeout=15000)
+    pg.goto(url + '#/me?t=set&all=1'); pg.wait_for_selector('#legal', timeout=15000)
     t = pg.inner_text('#legal')
     if not ('이용약관' in t and '개인정보 처리방침' in t and '2026-10-14' in t): fails.append(f'설정: 약관·개인정보 칸에 두 문서와 동의한 날이 없습니다 — {t[:60]!r}')
     pg.goto(url + '#/login'); pg.wait_for_selector('#srvbox[data-door]', timeout=8000)
@@ -1038,7 +1038,7 @@ def consent_checks(br, url, fails):
     if pg.is_disabled('#srvDoorGo'): fails.append('로그인 문: 서버 저장에 동의했는데 「메일로 계속하기」가 막혀 있습니다')
     pg.goto(url + '#/home'); pg.wait_for_timeout(500)
     if not pg.query_selector('.top .acct-btn'): fails.append('홈: 머리 오른쪽에 계정 단추가 없습니다(현욱님 10-29)')
-    pg.goto(url + '#/me?t=set'); pg.wait_for_timeout(600)
+    pg.goto(url + '#/me?t=set&all=1'); pg.wait_for_timeout(600)
     _first = pg.evaluate("()=>{const c=document.querySelector('#view .sec.card');return c?c.className:''}")
     if 'acct-card' not in _first: fails.append(f'설정: 맨 위 첫 칸이 계정 카드가 아닙니다 — {_first!r}')
     pg.goto(url + '#/login'); pg.wait_for_selector('#srvbox[data-door]', timeout=8000); pg.check('#srvAgree')
@@ -1057,7 +1057,7 @@ def consent_checks(br, url, fails):
     for w in (360, 390, 768, 1280, 1440):
         ctx, pg, errs, ext = page(w, CONSENT_SEED)
         pg.goto(url + '#/home'); pg.wait_for_function('window.__READY__===true', timeout=15000); pg.wait_for_timeout(1000)
-        for r in ('/home', '/drug/ibuprofen', '/symptom/msk', '/drugs', '/me?t=set', '/login', '/doc/terms', '/doc/privacy', '/hello/3'):
+        for r in ('/home', '/drug/ibuprofen', '/symptom/msk', '/drugs', '/me?t=set&all=1', '/login', '/doc/terms', '/doc/privacy', '/hello/3'):
             pg.goto(url + '#' + r); pg.wait_for_timeout(500)
             ov = pg.evaluate('()=>document.documentElement.scrollWidth-document.documentElement.clientWidth')
             if ov > 0: fails.append(f'넓은 화면: {w}px {r} 가로로 {ov}px 넘칩니다')
@@ -1230,7 +1230,7 @@ def main():
         if not _mt['stay']: fails.append('건강 상태를 누르면 화면이 맨 위로 튑니다')
         pg.goto(url + '#/me?t=meds'); ready(); pg.wait_for_timeout(300)
         if not pg.query_selector('#mq') or '복용 시간 알림' not in pg.inner_text('#view'): fails.append('내 정보 「내 약통」 탭에 약 담기·알림이 없습니다')
-        pg.goto(url + '#/me?t=set'); ready(); pg.wait_for_timeout(300)
+        pg.goto(url + '#/me?t=set&all=1'); ready(); pg.wait_for_timeout(300)
         _st = pg.inner_text('#view')
         for kw in ('글자 크기', '화면 밝기', '휴대폰을 바꾸실 때', '개인정보처리방침'):
             if kw not in _st: fails.append(f'내 정보 「설정」 탭에 {kw} 없음')
@@ -1298,7 +1298,7 @@ def main():
             fails.append(f'화면 밝기 고르기가 듣지 않습니다: {_th}')
         # 5a-11b. Z8 — 처음은 밝게(휴대폰이 어둡게여도) · 세 가지(밝게·어둡게·기기 따라)를 이 기기에 기억 · 다시 열어도 그대로 · 어둡게여도 종이에는 밝게
         _pt = br.new_page(viewport={'width': 390, 'height': 844}, color_scheme='dark')
-        _pt.add_init_script("localStorage.setItem('yakjido.hello.v1','1');localStorage.setItem('yakjido.consent.v1',JSON.stringify({v:'2026-10-20',at:'2026-10-14',terms:1,privacy:1}))"); _pt.goto(url + '#/me?t=set'); _pt.wait_for_timeout(1500)
+        _pt.add_init_script("localStorage.setItem('yakjido.hello.v1','1');localStorage.setItem('yakjido.consent.v1',JSON.stringify({v:'2026-10-20',at:'2026-10-14',terms:1,privacy:1}))"); _pt.goto(url + '#/me?t=set&all=1'); _pt.wait_for_timeout(1500)
         _bg = "()=>({th:document.documentElement.dataset.theme||'(없음)', bg:getComputedStyle(document.body).backgroundColor, seg:[...document.querySelectorAll('[aria-label=\"화면 밝기\"] button')].map(b=>b.textContent+(b.getAttribute('aria-pressed')==='true'?'*':''))})"
         _d0 = _pt.evaluate(_bg)
         if _d0['th'] != 'light' or _d0['bg'] != 'rgb(239, 235, 227)': fails.append(f'처음 화면이 밝게가 아닙니다(휴대폰 어둡게): {_d0}')
@@ -1918,7 +1918,7 @@ def main():
         _ap.route('**/cdn.jsdelivr.net/npm/@supabase/**', lambda rt: (_hits.append(rt.request.url), rt.abort()))
         _ap.goto(url + '#/home'); _ap.wait_for_function('window.__READY__===true && DETAIL===2', timeout=15000)
         _ap.evaluate("localStorage.setItem('yakjido.hello.v1','1');localStorage.setItem('yakjido.consent.v1',JSON.stringify({v:'2026-10-20',at:'2026-10-14',terms:1,privacy:1}))")
-        _ap.goto(url + '#/me?t=set'); _ap.reload(); _ap.wait_for_function('window.__READY__===true', timeout=15000); _ap.wait_for_timeout(1500)
+        _ap.goto(url + '#/me?t=set&all=1'); _ap.reload(); _ap.wait_for_function('window.__READY__===true', timeout=15000); _ap.wait_for_timeout(1500)
         if _ap.query_selector('#acct') and not _ap.evaluate('D.meta.account === true'): fails.append('공용 서버가 열리기 전(meta.account=false)인데 계정 칸이 보입니다')
         if not _ap.query_selector('#acct') and _ap.evaluate('D.meta.account === true'): fails.append('계정이 켜졌는데(meta.account=true) 계정 칸이 안 보입니다')
         _ap.evaluate("()=>{ D.meta.account = true; route(); }"); _ap.wait_for_timeout(400)   # 서버가 열린 뒤의 모습
