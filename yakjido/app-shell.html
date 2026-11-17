@@ -2190,6 +2190,9 @@ function sanitizeMe(m){
   /* Z4 #13 — 약 알레르기·부작용이 있었던 성분: [{ing:성분 열쇠(글자), r:반응 코드(글자)}], 성분은 모르지만 있었다(참/거짓). 꼴을 그대로 지킨다 */
   { const seenA = new Set(); r.allergy = (Array.isArray(o.allergy) ? o.allergy : []).filter(x => x && typeof x.ing === 'string' && SAFE_ID.test(x.ing) && typeof x.r === 'string' && ALG_R[x.r] && !seenA.has(x.ing) && seenA.add(x.ing)).map(x => ({ ing: x.ing, r: x.r })).slice(0, 30); }
   r.allergyUnknown = o.allergyUnknown === true;
+  /* 11-17 — 알림 켜고 끄기(noteOff)가 다시 열면 사라지던 것(살균에서 빠져 있었다) · 다시 알림 간격(10·30·60분) */
+  r.noteOff = {}; for (const [k, v] of Object.entries(obj(o.noteOff))) if (/^[a-z]{2,20}$/.test(k) && v) r.noteOff[k] = 1;
+  if ([10, 30, 60].includes(o.againMin)) r.againMin = o.againMin;
   r.taking = r.taking.filter(id => !id.startsWith('pub:') || r.pub[id]);
   return r;
 }
@@ -5260,7 +5263,8 @@ function slotGroups(){ const g = {}; for (const d of takingItems()) for (const t
 const noteSenior = () => !!ME.easy || (ME.age === 'senior' && ME.easy !== false);
 const NOTE_CH_SR = 'dose_senior';
 const noteCh = () => noteSenior() ? NOTE_CH_SR : NOTE_CH;
-const AGAIN_MIN = 30;
+const againMin = () => [10, 30, 60].includes(ME.againMin) ? ME.againMin : 30;   /* 11-17 Main — 다시 알림 10·30·60분(기본 30) */
+function setAgainMin(n){ ME.againMin = n; saveMe(); armNotifications(); route(); }
 /* 저녁 9시 하루 정리 — 누구에게나 기본 꺼짐, 직접 켠 분만 */
 const eveningOn = () => ME.evening === true;
 /* 10-30 현욱님 「알림 설정은?」 — 종류별 끄기(기본은 모두 켜짐, 저녁 정리만 기본 꺼짐) */
@@ -5382,7 +5386,7 @@ async function nativeArmOnce(){
         if (at.getTime() > now && noteOn('dose')) { med.push({ id: 1 + i * 20 + k, title: '약지도 · 약 드실 시간', body: slotBody(t, its), channelId: ch, actionTypeId: 'dose',
           extra, isExactNotification: exact, schedule: { at, allowWhileIdle: true }, day, r: 0 }); lastAt = Math.max(lastAt, at.getTime()); }
         /* 체크가 없을 때만 30분 뒤 한 번(애플 건강 「후속 알림」과 같은 자리). 어르신도 더 자주 하지 않는다 */
-        const again = new Date(at.getTime() + AGAIN_MIN * 60000);
+        const again = new Date(at.getTime() + againMin() * 60000);
         if (again.getTime() > now && noteOn('dose') && noteOn('again')) med.push({ id: 11 + i * 20 + k, title: '아직 안 드셨어요', body: slotBody(t, its, true), channelId: ch, actionTypeId: 'dose',
           extra: { ...extra, again: day }, isExactNotification: exact, schedule: { at: again, allowWhileIdle: true }, day, r: 3 });
       }
@@ -5392,6 +5396,9 @@ async function nativeArmOnce(){
       const L = eveningLeft(dayKey(at), k === 0); if (!L.length) continue;
       /* 직접 켠 분만 — 다시 알림보다 먼저(하루를 한 장으로 정리) */
       med.push({ id: 590000 + k, title: '오늘 약 체크', body: eveningBody(L), channelId: ch, extra: { evening: dayKey(at) }, isExactNotification: exact, schedule: { at, allowWhileIdle: true }, day: dayKey(at), r: 2.5 }); }
+    /* 11-17 Main — 놓친 약 다음 날 아침 정리: 오늘 남은(체크 없는) 회차가 있으면 내일 아침 8시에 한 장. 다그치지 않고, 두 번 몫을 한꺼번에 먹지 않게 */
+    if (noteOn('dose') && noteOn('morning')) { const L0 = eveningLeft(todayKey(), true), at = new Date(); at.setDate(at.getDate() + 1); at.setHours(8, 0, 0, 0);
+      if (L0.length) med.push({ id: 595000, title: '어제 못 챙긴 약이 있어요', body: `어제 ${L0.length}번 체크가 없었어요. 놓친 약은 한꺼번에 두 번 드시지 말고, 오늘 시간에 맞춰 드세요.`, channelId: ch, extra: { morning: todayKey() }, isExactNotification: exact, schedule: { at, allowWhileIdle: true }, day: dayKey(at), r: 2.6 }); }
     id = 1 + groups.length * 20;
     /* 알람이 끊기지 않게 하는 것만 — 걸어 둔 날이 끝날 때 한 번. 앱을 열면 다시 7일 뒤로 밀린다(그래서 7일 넘게 안 여셨을 때만 울린다) */
     if (lastAt) { const at = new Date(lastAt + 60 * 60000);
@@ -5425,7 +5432,7 @@ async function nativeArmOnce(){
     const nSlot = groups.length, nowHm = hhmm(new Date(now));
     /* 오늘 이미 울렸을 것: 지난 시각마다 제시간 1장 + 30분이 지났는데 아직 체크 안 한 약이 있으면 다시 알림 1장 */
     let used = 0; for (const { t, items } of groups) { if (t > nowHm) continue; used++;
-      const [h, m] = t.split(':').map(Number), ag = new Date(now); ag.setHours(h, m + AGAIN_MIN, 0, 0);
+      const [h, m] = t.split(':').map(Number), ag = new Date(now); ag.setHours(h, m + againMin(), 0, 0);
       if (ag.getTime() <= now && items.some(d => !taken.includes(d.id + '@' + t) && !skipped.includes(d.id + '@' + t))) used++; }
     for (const x of capDay(med, nSlot, used)) { delete x.day; delete x.r; list.push(x); }
     /* 어떤 경우에도 휴대폰 한도(앱당 500개)를 넘기지 않는다 — 「10분 뒤 다시」·시험 알림 자리를 남기고 가까운 것부터 */
@@ -5508,7 +5515,7 @@ function armNotifications(){
     const fire = again => { const L = left(t, items); if (L.length && webQuota(again)) showNote(again ? '아직 안 드셨어요' : '약지도 · 약 드실 시간', slotBody(t, L, again), L.map(d => d.id + '@' + t).join(','), day); };
     if (at > now && noteOn('dose')) NOTI_TIMERS.push(setTimeout(() => fire(false), at - now));
     /* 체크가 없을 때만 30분 뒤 한 번 */
-    const again = new Date(at.getTime() + AGAIN_MIN * 60000); if (again > now && noteOn('dose') && noteOn('again')) NOTI_TIMERS.push(setTimeout(() => fire(true), again - now));
+    const again = new Date(at.getTime() + againMin() * 60000); if (again > now && noteOn('dose') && noteOn('again')) NOTI_TIMERS.push(setTimeout(() => fire(true), again - now));
   }
   /* 저녁 9시 하루 정리(Z6) */
   const ev = new Date(now); ev.setHours(21, 0, 0, 0);
