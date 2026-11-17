@@ -1810,8 +1810,8 @@ html:not(.ink) .rf-none{display:none}</style>
 <script>
 window.__YAKJIDO_OK__ = true;
 const D = JSON.parse(document.getElementById('data').textContent || '{}');
-const BUILD = '2026-11-18 00:14';
-const DATAV = '9aa3e0b26e'.indexOf('__') === 0 ? BUILD : '9aa3e0b26e';
+const BUILD = '2026-11-18 00:27';
+const DATAV = 'ebf9e087db'.indexOf('__') === 0 ? BUILD : 'ebf9e087db';
 const BRANDMARK = (typeof window !== 'undefined' && window.__BRANDMARK__) || 'icon-192.png';
 let CORE = 0, CORE_P = null;
 function mergeCore(c){
@@ -2311,7 +2311,7 @@ if (consentGate(seg[0], h)) return;
 if (seg[0] === 'hello' && helloDone() && (() => { try { return sessionStorage.getItem(HELLO_FIN); } catch (e) { return null; } })()) { try { location.replace(location.href.split('#')[0] + '#/home'); return; } catch (e) {} }
 document.body.classList.toggle('no-nav', /^(hello|consent|login|doc)$/.test(seg[0])); document.body.classList.toggle('is-door', /^(consent|login)$/.test(seg[0]));
 const q = Object.fromEntries(new URLSearchParams(qs || '')); entryTake(q);
-const tab = { send:'home', p:'home', show:'home', check:'home', home:'home', symptom:'home', drugs:'drugs', drug:'drugs', class:'drugs', search:'drugs', pub:'drugs', pill:'drugs', guide:'home', kids:'home', tips:'home', myths:'home', schedule:'me', notify:'me', photo:'drugs', pillinfo:'drugs', supp:'supp', sgoal:'supp', sstage:'supp', compare:'supp', me:'me', about:'me', ingr:'drugs', brand:'drugs', nut:'supp', hello:'home', mix:'drugs', together:'me', kinds:'me', rx:'me', rxout:'drugs', senior:'drugs', askdoc:'home', talk:'home', login:'login' }[seg[0]] || 'home';
+const tab = { people:'home', send:'home', p:'home', show:'home', check:'home', home:'home', symptom:'home', drugs:'drugs', drug:'drugs', class:'drugs', search:'drugs', pub:'drugs', pill:'drugs', guide:'home', kids:'home', tips:'home', myths:'home', schedule:'me', notify:'me', photo:'drugs', pillinfo:'drugs', supp:'supp', sgoal:'supp', sstage:'supp', compare:'supp', me:'me', about:'me', ingr:'drugs', brand:'drugs', nut:'supp', hello:'home', mix:'drugs', together:'me', kinds:'me', rx:'me', rxout:'drugs', senior:'drugs', askdoc:'home', talk:'home', login:'login' }[seg[0]] || 'home';
 document.querySelectorAll('nav.tabbar button').forEach(b => { const on = b.dataset.tab === tab; b.classList.toggle('on', on); on ? b.setAttribute('aria-current', 'page') : b.removeAttribute('aria-current'); });
 if (CORE !== 2 && !CORE_SAFE.has(seg[0])) {
 if (CORE === 3) {
@@ -2327,7 +2327,7 @@ if ((seg[0] === 'drug' || seg[0] === 'class' || (seg[0] === 'supp' && seg[1])) &
 if (DETAIL === 3) { window.__DETAIL_SKIP__ = true; ensureDetail(); }
 else { view.innerHTML = topBar({ back:'뒤로', nosearch:true }) + `<section class="sec"><p class="loading">자료를 불러오는 중이에요…</p></section>`; ensureDetail().then(route); return; }
 }
-const R = { od:vOd, send:vSend, p:vParentShare, show:vShow, check:vCheck, home:vHome, symptom:vSymptom, drugs:vDrugs, drug:vDrug, class:vClass, search:vSearch, pub:vPub, pill:vPill, guide:vGuide, kids:vKids, tips:vTips, myths:vMyths, schedule:vSchedule, notify:vDoor, photo:vPhoto, pillinfo:vPillInfo, supp:vSupp, sgoal:vDoor, sstage:vDoor, compare:vCompare, me:vMe, about:vAbout, ingr:vIngr, brand:vBrand, nut:vNut, hello:vHello, mix:vMix, together:vTogether, kinds:vKinds, rx:vRx, bag:vBag, rxout:vRxOut, senior:vSenior, askdoc:vAskDoc, talk:vTalk, vitals:vVitals, visits:vVisits, demo:vDemo, consent:vDoor, login:vDoor, doc:vDoor };
+const R = { od:vOd, send:vSend, p:vParentShare, show:vShow, check:vCheck, home:vHome, symptom:vSymptom, drugs:vDrugs, drug:vDrug, class:vClass, search:vSearch, pub:vPub, pill:vPill, guide:vGuide, kids:vKids, tips:vTips, myths:vMyths, schedule:vSchedule, notify:vDoor, photo:vPhoto, pillinfo:vPillInfo, supp:vSupp, sgoal:vDoor, sstage:vDoor, compare:vCompare, me:vMe, about:vAbout, ingr:vIngr, brand:vBrand, nut:vNut, hello:vHello, mix:vMix, together:vTogether, kinds:vKinds, rx:vRx, bag:vBag, rxout:vRxOut, senior:vSenior, askdoc:vAskDoc, talk:vTalk, vitals:vVitals, visits:vVisits, demo:vDemo, consent:vDoor, login:vDoor, doc:vDoor, people:vDoor };
 let html;
 if (R[seg[0]]) try { window.이용량?.센다('v_' + seg[0]); } catch (e) {}
 try { html = (R[seg[0]] || vHome)(seg[1], q); }
@@ -6553,12 +6553,12 @@ const payload = { app:'yakjido', v:1, at:new Date().toISOString(), me:ME };
 if (await saveFile(`약지도-내기록-${todayKey()}.json`, JSON.stringify(payload, null, 1), 'application/json'))
 toast('파일로 받았어요 — 새 휴대폰에서 「가져오기」로 넣으시면 돼요');
 }
-const WIPE_LIST = '담아 둔 약(영양제 포함)·복용 기록(건너뛴 것 포함)·불편했던 일·알레르기·혈압·혈당 수첩·진료 예약·아이 정보·건강 상태·알림과 어르신 모드 설정·날씨 위치';
+const WIPE_LIST = '담아 둔 약(영양제 포함·따로 담은 가족 약까지)·복용 기록(건너뛴 것 포함)·불편했던 일·알레르기·혈압·혈당 수첩·진료 예약·아이 정보·건강 상태·알림과 어르신 모드 설정·날씨 위치';
 async function wipeMe(){
 const n = (ME.taking || []).length, d = Object.keys(ME.taken || {}).length;
 const srv = srvLoggedIn();
 if (!(await appConfirm(`이 휴대폰의 약지도 기록을 「모두」 지워요.${srv ? ' 로그인해 두셔서 메디나눔 서버에 있는 약지도 기록도 함께 지워요(계정은 남아요).' : ''}\n\n약 ${n}가지 · 복용 기록 ${d}일치 · ${WIPE_LIST.replace(/^.*?복용 기록[^·]*·/, '')}\n\n되돌릴 수 없어요. 지울까요?`, { ok:'모두 지우기', cancel:'그만둘게요', danger:true }))) return;
-try { localStorage.removeItem(ME_KEY); localStorage.removeItem(WX_KEY); } catch (e) {}
+try { localStorage.removeItem(ME_KEY); localStorage.removeItem(WX_KEY); Object.keys(localStorage).filter(k => k.startsWith(ME_KEY + '@') || k === 'yakjido.profiles.v1').forEach(k => localStorage.removeItem(k)); } catch (e) {}   /* 11-17 가족 프로필까지 */
 if (srv || srvHasAccount()) { try { 서버.전부지움(); } catch (e) {} }
 ME = { ...ME_DEF }; WX = {};
 NOTI_TIMERS.forEach(clearTimeout); NOTI_TIMERS = [];

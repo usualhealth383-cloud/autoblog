@@ -2601,7 +2601,7 @@ function route(){
   /* 처음 안내 중에는 아래 탭을 감춘다 — 누르면 안내가 반쯤 끝났다(3-24) */
   document.body.classList.toggle('no-nav', /^(hello|consent|login|doc)$/.test(seg[0])); document.body.classList.toggle('is-door', /^(consent|login)$/.test(seg[0]));
   const q = Object.fromEntries(new URLSearchParams(qs || '')); entryTake(q);
-  const tab = { send:'home', p:'home', show:'home', check:'home', home:'home', symptom:'home', drugs:'drugs', drug:'drugs', class:'drugs', search:'drugs', pub:'drugs', pill:'drugs', guide:'home', kids:'home', tips:'home', myths:'home', schedule:'me', notify:'me', photo:'drugs', pillinfo:'drugs', supp:'supp', sgoal:'supp', sstage:'supp', compare:'supp', me:'me', about:'me', ingr:'drugs', brand:'drugs', nut:'supp', hello:'home', mix:'drugs', together:'me', kinds:'me', rx:'me', rxout:'drugs', senior:'drugs', askdoc:'home', talk:'home', login:'login' }[seg[0]] || 'home';
+  const tab = { people:'home', send:'home', p:'home', show:'home', check:'home', home:'home', symptom:'home', drugs:'drugs', drug:'drugs', class:'drugs', search:'drugs', pub:'drugs', pill:'drugs', guide:'home', kids:'home', tips:'home', myths:'home', schedule:'me', notify:'me', photo:'drugs', pillinfo:'drugs', supp:'supp', sgoal:'supp', sstage:'supp', compare:'supp', me:'me', about:'me', ingr:'drugs', brand:'drugs', nut:'supp', hello:'home', mix:'drugs', together:'me', kinds:'me', rx:'me', rxout:'drugs', senior:'drugs', askdoc:'home', talk:'home', login:'login' }[seg[0]] || 'home';
   /* 지금 탭을 색으로만 보이지 않게 — 화면낭독기가 「현재 페이지」라고 읽는다(5-18) */
   document.querySelectorAll('nav.tabbar button').forEach(b => { const on = b.dataset.tab === tab; b.classList.toggle('on', on); on ? b.setAttribute('aria-current', 'page') : b.removeAttribute('aria-current'); });
   /* 본문 자료가 아직이면 — 첫 화면과 인사만 먼저 그리고, 나머지는 받은 뒤에 다시 그린다.
@@ -2623,7 +2623,7 @@ function route(){
     if (DETAIL === 3) { window.__DETAIL_SKIP__ = true; ensureDetail(); }
     else { view.innerHTML = topBar({ back:'뒤로', nosearch:true }) + `<section class="sec"><p class="loading">자료를 불러오는 중이에요…</p></section>`; ensureDetail().then(route); return; }
   }
-  const R = { od:vOd, send:vSend, p:vParentShare, show:vShow, check:vCheck, home:vHome, symptom:vSymptom, drugs:vDrugs, drug:vDrug, class:vClass, search:vSearch, pub:vPub, pill:vPill, guide:vGuide, kids:vKids, tips:vTips, myths:vMyths, schedule:vSchedule, notify:vDoor, photo:vPhoto, pillinfo:vPillInfo, supp:vSupp, sgoal:vDoor, sstage:vDoor, compare:vCompare, me:vMe, about:vAbout, ingr:vIngr, brand:vBrand, nut:vNut, hello:vHello, mix:vMix, together:vTogether, kinds:vKinds, rx:vRx, bag:vBag, rxout:vRxOut, senior:vSenior, askdoc:vAskDoc, talk:vTalk, vitals:vVitals, visits:vVisits, demo:vDemo, consent:vDoor, login:vDoor, doc:vDoor };
+  const R = { od:vOd, send:vSend, p:vParentShare, show:vShow, check:vCheck, home:vHome, symptom:vSymptom, drugs:vDrugs, drug:vDrug, class:vClass, search:vSearch, pub:vPub, pill:vPill, guide:vGuide, kids:vKids, tips:vTips, myths:vMyths, schedule:vSchedule, notify:vDoor, photo:vPhoto, pillinfo:vPillInfo, supp:vSupp, sgoal:vDoor, sstage:vDoor, compare:vCompare, me:vMe, about:vAbout, ingr:vIngr, brand:vBrand, nut:vNut, hello:vHello, mix:vMix, together:vTogether, kinds:vKinds, rx:vRx, bag:vBag, rxout:vRxOut, senior:vSenior, askdoc:vAskDoc, talk:vTalk, vitals:vVitals, visits:vVisits, demo:vDemo, consent:vDoor, login:vDoor, doc:vDoor, people:vDoor };
   /* 한 화면이 그리다 터져도 앱 전체가 멈춘 것처럼 보이지 않게 — 자료 한 줄의 흠이 흰 화면이 되지 않도록(2026-10-08 출시 점검) */
   let html;
   /* 익명 이용 통계(공용 이용량 부품 · 기본 꺼짐) — 화면 «종류» 이름만 센다. 약 이름·증상·검색어는 세지 않는다 */
@@ -7815,12 +7815,12 @@ async function exportMe(){
     toast('파일로 받았어요 — 새 휴대폰에서 「가져오기」로 넣으시면 돼요');
 }
 /* 기록 모두 지우기 — 글자 크기·화면 밝기 같은 보기 설정은 개인 기록이 아니라 남긴다. Z9 C18: 지우는 것을 모두 적는다(ME 전체 + 날씨) */
-const WIPE_LIST = '담아 둔 약(영양제 포함)·복용 기록(건너뛴 것 포함)·불편했던 일·알레르기·혈압·혈당 수첩·진료 예약·아이 정보·건강 상태·알림과 어르신 모드 설정·날씨 위치';
+const WIPE_LIST = '담아 둔 약(영양제 포함·따로 담은 가족 약까지)·복용 기록(건너뛴 것 포함)·불편했던 일·알레르기·혈압·혈당 수첩·진료 예약·아이 정보·건강 상태·알림과 어르신 모드 설정·날씨 위치';
 async function wipeMe(){
   const n = (ME.taking || []).length, d = Object.keys(ME.taken || {}).length;
   const srv = srvLoggedIn();
   if (!(await appConfirm(`이 휴대폰의 약지도 기록을 「모두」 지워요.${srv ? ' 로그인해 두셔서 메디나눔 서버에 있는 약지도 기록도 함께 지워요(계정은 남아요).' : ''}\n\n약 ${n}가지 · 복용 기록 ${d}일치 · ${WIPE_LIST.replace(/^.*?복용 기록[^·]*·/, '')}\n\n되돌릴 수 없어요. 지울까요?`, { ok:'모두 지우기', cancel:'그만둘게요', danger:true }))) return;
-  try { localStorage.removeItem(ME_KEY); localStorage.removeItem(WX_KEY); } catch (e) {}
+  try { localStorage.removeItem(ME_KEY); localStorage.removeItem(WX_KEY); Object.keys(localStorage).filter(k => k.startsWith(ME_KEY + '@') || k === 'yakjido.profiles.v1').forEach(k => localStorage.removeItem(k)); } catch (e) {}   /* 11-17 가족 프로필까지 */
   /* 로그인 전이면 「지움」 표시를 남겨 다음 로그인 때 서버에서도 지운다 */
   if (srv || srvHasAccount()) { try { 서버.전부지움(); } catch (e) {} }
   ME = { ...ME_DEF }; WX = {};
