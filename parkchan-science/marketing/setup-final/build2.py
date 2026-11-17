@@ -1,10 +1,13 @@
 import base64,io,html,pathlib,re
+exec(open('files.py').read())
 from PIL import Image
 R=pathlib.Path('/home/user/autoblog');M=R/'parkchan-science/marketing'
 def d(p,w=1080):
     im=Image.open(p).convert('RGB');im.thumbnail((w,9999));b=io.BytesIO();im.save(b,'JPEG',quality=88);return 'data:image/jpeg;base64,'+base64.b64encode(b.getvalue()).decode()
+N={str(p):n for n,p in F}
 def img(p,name,w=1080):
-    return f'<figure class="im"><img src="{d(p,w)}" alt="{name}"><figcaption>{name}</figcaption></figure>'
+    fn=N.get(str(p),'')
+    return f'<figure class="im"><img src="{d(p,w)}" alt="{name}"><figcaption>{name} → 파일 <b class="fn">{fn}.jpg</b></figcaption></figure>'
 def cp(label,text):
     return f'<div class="cp"><div class="cph"><b>{label}</b><button onclick="cpy(this)">복사</button></div><pre>{html.escape(text)}</pre></div>'
 uid=[0]
@@ -22,14 +25,14 @@ HOW='''<div class="how"><b>사진 바꾸는 법 (모든 글 같음)</b><ol>
 <li>커서가 그 자리(빈 줄)에 있는 채로 화면 <b>맨 위 도구 막대의 「사진」</b> 버튼 → 내 PC → 아래에서 저장해 둔 그림 선택 → <b>열기</b>.</li>
 <li>사진이 여러 장인 글은 2~3을 순서대로 반복합니다.</li>
 <li>오른쪽 위 초록 <b>발행</b> → 뜬 창에서 카테고리 확인 → 창 아래 <b>발행</b>. 처음 올린 사진이 대표 사진(첫 화면 카드)이 됩니다.</li></ol>
-<p>그림 저장: 이 페이지의 그림 위에서 <b>오른쪽 클릭 → 「이미지를 다른 이름으로 저장」</b>. 파일 이름은 아무거나 괜찮습니다.</p></div>'''
+<p>그림 파일: 함께 보내 드린 <b>박찬_블로그_마무리_사진.zip</b>을 풀면 파일 이름 앞 번호가 이 페이지의 칸 번호와 같습니다(예: 03_원장인사말_표지.jpg → 3번 칸). 각 그림 아래에 올릴 파일 이름이 적혀 있습니다.</p></div>'''
 A=[
 st('첫 화면 그림 카드 줄 수','관리 → 메뉴·글·동영상 관리 → 프롤로그','''<ol class="in"><li>형태: <b>이미지 강조</b> 그대로 (글 강조로 바꾸지 않습니다 — 글자가 먼저 나오고 메인목록이 3줄부터라 맞지 않음).</li>
 <li>오른쪽 칸을 아래처럼 맞춥니다. 카테고리는 <b>변경</b>(밑줄 글씨)을 눌러 고르고, 줄 수는 <b>노출수</b> 칸(▾)에서 고릅니다.</li></ol>
 <div style="overflow-x:auto"><table class="tb"><tr><th>줄</th><th>사용설정</th><th>카테고리</th><th>노출수</th></tr><tr><td>① 메인 이미지목록</td><td>필수</td><td>전체보기</td><td><b>2줄</b></td></tr><tr><td>② 글목록</td><td>✔ 체크</td><td>학원 공지사항</td><td>1줄</td></tr><tr><td>③ 글목록</td><td>☐ 체크 안 함</td><td>(상관없음)</td><td>–</td></tr></table></div>
 <ol class="in" start="3"><li>맨 아래 초록 <b>확인</b>.</li></ol><p class="nt">이렇게 해도 2부(사진 다시 올리기)를 하기 전에는 「등록된 사진이 없습니다」가 그대로 보입니다. 정상입니다.</p>'''),
 st('휴대폰 커버를 글자 없는 그림으로','관리 → 기본 설정 → 블로그 정보 → 「모바일앱 커버 이미지」','''<p class="nt">휴대폰에서는 네이버가 커버 위에 블로그 이름·프로필·이웃추가 버튼을 겹쳐 올립니다. 그래서 커버 그림에 큰 글씨가 있으면 글자끼리 겹쳐 지저분합니다(제가 휴대폰 화면으로 확인). 이름은 네이버가 얹어 주니 커버는 글자 없는 남색 그림으로 바꿉니다.</p>
-<ol class="in"><li>아래 그림을 저장합니다.</li><li>「모바일앱 커버 이미지」 오른쪽 <b>삭제</b> → <b>등록</b> → 저장한 그림 선택.</li><li>페이지 맨 아래 <b>확인</b>.</li></ol>'''+img(M/'homepage-04/올릴그림/4_모바일커버_글자없음.png','휴대폰 커버 (글자 없는 남색)',600)),
+<ol class="in"><li>zip의 <b>02_휴대폰커버.jpg</b>를 씁니다.</li><li>「모바일앱 커버 이미지」 오른쪽 <b>삭제</b> → <b>등록</b> → 저장한 그림 선택.</li><li>페이지 맨 아래 <b>확인</b>.</li></ol>'''+img(M/'homepage-04/올릴그림/4_모바일커버_글자없음.png','휴대폰 커버 (글자 없는 남색)',600)),
 ]
 B=[
 st('원장 인사말 — 표지 사진 1장','글: 박찬 통합과학 원장이 학부모님께 드리는 글 (학원 소개)','<p>위 「사진 바꾸는 법」대로, 맨 위 표지 사진을 아래 그림으로 바꿉니다.</p>'+img(M/'blog-23/images/cover_greeting_b.png','원장 인사말 표지',700)),
@@ -75,11 +78,11 @@ ol.in{{padding-left:20px;font-size:15px;display:flex;flex-direction:column;gap:5
 .cph button{{font:inherit;font-size:13px;font-weight:700;padding:5px 14px;border-radius:8px;border:none;background:var(--pt);color:#fff;cursor:pointer}} .cp pre{{padding:10px 12px;white-space:pre-wrap;font-family:inherit;font-size:14.5px}}
 button.big{{font:inherit;font-weight:900;font-size:16px;padding:14px;border-radius:12px;border:none;background:var(--pt);color:#fff;cursor:pointer;width:100%}} button.big.alt{{background:var(--soft);color:var(--fg);margin-top:8px}}
 textarea{{width:100%;height:160px;font:inherit;font-size:13px;border:1px solid var(--bd);border-radius:8px;padding:8px;background:var(--code);color:var(--fg);margin-top:8px;box-sizing:border-box}}
-figure.im{{display:flex;flex-direction:column;gap:4px}} figure.im img{{width:100%;max-width:420px;border:1px solid var(--bd);border-radius:8px}} figcaption{{font-size:13.5px;font-weight:700}}
+figure.im{{display:flex;flex-direction:column;gap:4px}} figure.im img{{width:100%;max-width:420px;border:1px solid var(--bd);border-radius:8px}} figcaption{{font-size:13.5px;font-weight:700}} .fn{{color:var(--pt)}}
 details summary{{cursor:pointer;font-weight:700;font-size:14px;color:var(--pt)}}
 .bar{{position:sticky;top:env(safe-area-inset-top,0px);background:var(--bg);padding:8px 0;z-index:2;font-size:14px;font-weight:700;color:var(--sub)}} .bar i{{font-style:normal;color:var(--ok)}}
 @media (max-width:600px){{.state{{grid-template-columns:1fr}}}}</style>
-<div class="w"><header><h1>박찬 블로그 마무리 — 이 한 장만 보세요</h1><p class="lead">이전에 보낸 순서표·사진 묶음·안내는 모두 잊으셔도 됩니다. 이 페이지에 필요한 글·사진·순서가 다 있습니다. 위에서부터 하고, 끝낸 칸은 왼쪽 네모를 누르세요. 모두 PC에서 합니다.</p></header>
+<div class="w"><header><h1>박찬 블로그 마무리 — 이 한 장만 보세요</h1><p class="lead">이전에 보낸 순서표·사진 묶음·안내는 모두 잊으셔도 됩니다. 이 페이지와 함께 보낸 사진 zip 하나면 됩니다. zip 파일 앞 번호 = 이 페이지 칸 번호. 위에서부터 하고, 끝낸 칸은 왼쪽 네모를 누르세요. 모두 PC에서 합니다.</p></header>
 <section class="state"><div class="ok"><h3>✔ 끝난 것 (11월 17일 제가 블로그를 직접 열어 확인)</h3><ul>{''.join(f"<li>{x}</li>" for x in DONE)}</ul></div><div class="no"><h3>✘ 남은 문제</h3><ul>{''.join(f"<li>{x}</li>" for x in TODO)}</ul></div></section>
 <div class="bar">진행 <i id="cnt">0</i> / {uid[0]}</div>
 <h2>1부 · 설정 2가지 <small>5분</small></h2><ol class="steps">{''.join(A)}</ol>
