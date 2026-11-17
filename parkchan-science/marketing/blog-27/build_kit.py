@@ -123,7 +123,7 @@ page = f'''{head}<div class="wrap">
 </ol><p class="note">사진을 링크로 붙이면 네이버가 사진으로 받지 않아 첫 화면 그림 카드에 안 뜹니다. 꼭 파일로 올려 주세요.</p></section>
 <section class="box"><h2>미리보기</h2><article class="post">{prev()}</article></section>
 </div>
-<template id="rich">{rich(False)}</template><template id="rich2">{rich(True)}</template>
+<button id="richBtn2" hidden></button><template id="rich">{rich(False)}</template><template id="rich2">{rich(True)}</template>
 {script}<script>document.addEventListener('click',e=>{{const b=e.target.closest('button.tg');if(b)setTimeout(()=>b.classList.add('done'),50)}});</script>'''
 (HERE / 'kit.html').write_text(page, encoding='utf-8')
 (HERE / 'post.txt').write_text(body + '\n', encoding='utf-8')
