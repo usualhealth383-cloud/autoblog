@@ -1924,6 +1924,8 @@ try { const ps = document.createElement('style'); ps.id = 'prof-css'; ps.textCon
 /* ▲▲ 해열제 부품 끝 ▲▲ */
 /* 해열제 부품이 오면 — 아이 계산·약 화면을 정본 숫자로 다시 그린다 */
 try { if (/^#\/(kids|drug|symptom|home)/.test(location.hash || '#/home') && typeof route === 'function') setTimeout(route, 0); } catch (e) {}
+/* 11-18 정리 — 설정 일곱 줄 모양(첫 화면 예산이라 여기) */
+try { const st = document.createElement('style'); st.textContent = '.set-list{margin-top:8px;border-top:1px solid var(--hairline)}.set-list>.rows-l{margin-top:0!important}.set-list>.tidy{margin:0;border-bottom:1px solid var(--hairline)}.set-list>.tidy>summary{width:100%;max-width:none;min-height:60px;justify-content:space-between;font-size:1.0625rem;font-weight:700;color:var(--text);padding:0 4px}.set-list>.tidy[open]>summary{color:var(--primary-deep)}.set-list>.tidy>*:not(summary){margin-bottom:16px}'; document.head.appendChild(st); } catch (e) {}
 /* 약지도 — 두 폰 합치기(app-shell 의 sanitizeMe 를 씀). 2026-10-13 상용화 점검 */
 window.mergeMe = function (localRaw, serverRaw) {
   let a, b; try { a = sanitizeMe(JSON.parse(localRaw)); b = sanitizeMe(JSON.parse(serverRaw)); } catch (e) { return null; }
@@ -4591,7 +4593,7 @@ const 영양칸 = (x, sub) => `<div class="sg-pick"><button type="button" class=
 const 값못함 = L => (L || []).length ? `<section class="sec"><div class="sech"><h2 class="sec-h">따로 드실 이유가 적은 것</h2></div><div class="card rows">${L.map(x => `<div class="sg-skip"><button type="button" class="sg-h" onclick="${영양길(x)}"><b>${esc(영양이름(x))}</b>${I.chev}</button><p>${fmt(x.why)}</p>${(x.src || []).length ? srcChips(x.src) : ''}</div>`).join('')}</div></section>` : '';
 window.영양입구 = () => { const G = D.suppGoals || [], S = D.suppStages || []; if (!G.length) return '';
   return `<section class="sec"><div class="sech"><h2 class="sec-h">무엇이 불편해서요?</h2></div><div class="rg">${G.map(g => `<button class="rg-t ${g.tone || ''}" onclick="go('/sgoal/${g.id}')"><span class="ic">${icon(g.icon)}</span><b>${esc(g.name)}</b></button>`).join('')}</div></section>
-  <section class="sec"><div class="sech"><h2 class="sec-h">누구세요?</h2><span class="secn">나이·시기별로 챙길 것</span></div><div class="rows-l">${S.map(x => lrow(icon(x.icon), esc(x.name), esc(x.line), `go('/sstage/${x.id}')`)).join('')}${lrow(I.family, '아이·10대예요', '아이 영양은 우리 집 소아과와 같은 기준으로 봐요', "go('/kids')")}</div></section>`; };
+  <section class="sec">${tidy(`나이·시기별로 챙길 것 — 임신 준비·50세·65세… <span class="muted">${S.length + 1}가지</span>`, `<div class="sech"><h2 class="sec-h">누구세요?</h2></div><div class="rows-l">${S.map(x => lrow(icon(x.icon), esc(x.name), esc(x.line), `go('/sstage/${x.id}')`)).join('')}${lrow(I.family, '아이·10대예요', '아이 영양은 우리 집 소아과와 같은 기준으로 봐요', "go('/kids')")}</div>`, 'sstage')}</section>`; };   /* 11-18 정리 — 시기별은 접어 둔다 */
 window.문_sgoal = id => { const g = byId(D.suppGoals, id); if (!g) return `${topBar({ back:'영양제' })}<p class="loading">찾는 항목이 없어요.</p>`;
   return `${topBar({ back:'영양제' })}<div class="${g.tone || ''}"><div class="eyebrow" style="color:var(--gfg,var(--primary))">무엇이 불편해서요?</div><h1>${esc(g.name)}</h1></div>
   <div class="note" role="note" style="margin-top:12px">${I.info}<span><b>${fmt(g.first.line)}</b></span></div>

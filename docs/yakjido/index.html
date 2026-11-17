@@ -1810,7 +1810,7 @@ html:not(.ink) .rf-none{display:none}</style>
 <script>
 window.__YAKJIDO_OK__ = true;
 const D = JSON.parse(document.getElementById('data').textContent || '{}');
-const BUILD = '2026-11-18 04:28';
+const BUILD = '2026-11-18 05:48';
 const DATAV = 'ebf9e087db'.indexOf('__') === 0 ? BUILD : 'ebf9e087db';
 const BRANDMARK = (typeof window !== 'undefined' && window.__BRANDMARK__) || 'icon-192.png';
 let CORE = 0, CORE_P = null;
@@ -1991,7 +1991,7 @@ let STORE_HIDE = (() => { try { return sessionStorage.getItem('yakjido.storehide
 let ME_SNAP = {};
 const saveMe = () => { if (document.documentElement.classList.contains('fam') && !consentOk()) { try { window.저장문 && window.저장문(); } catch (e) {} return; }   /* 11-17 잉크 판 — 동의 전에는 이 휴대폰에 쓰지 않는다(저장문이 동의 한 장을 띄움) */
 try {
-try { if (ME_SNAP.taking !== undefined) { const prev = JSON.parse(ME_SNAP.taking) || [], cur = ME.taking || [], d0 = dayKey(new Date());   /* 11-17 로드맵 6 — 약을 담은 날·뺀 날을 적어 둔다(그래프의 점선) */
+try { if (ME_SNAP.taking !== undefined) { const prev = JSON.parse(ME_SNAP.taking) || [], cur = ME.taking || [], d0 = dayKey(new Date());   /* 11-17 */
 const ch = [...cur.filter(id => !prev.includes(id)).map(id => ({ d: d0, id, a: 1 })), ...prev.filter(id => !cur.includes(id)).map(id => ({ d: d0, id, a: 0 }))];
 if (ch.length && ch.length <= 5) ME.chg = [...(ME.chg || []), ...ch].slice(-60); } } catch (e) {}
 const now = Date.now(); ME._mt = ME._mt || {};
@@ -2308,6 +2308,9 @@ const symK = s => window.symKS ? symKS(s) : s;
 function entryBand(s){ return window.entryBandS ? entryBandS(s) : ''; }
 const NU_RE = /(\d[\d,.]*)( )((?:mg\/dL|mmHg|mg|mL|kg|µg|μg|mcg|IU|cm|mm|g|L|℃|%|국제단위|개월|시간|캡슐|정|포|알|번|가지|회|세|분|일|명|잔)(?![A-Za-z]))/g;
 function numUnit(h){ try { return String(h).replace(/>([^<]+)</g, (m, t) => '>' + t.replace(NU_RE, '<span class="nu">$1 $3</span>') + '<'); } catch (e) { return h; } }
+const ALLV = () => { try { return sessionStorage.getItem('yakjido.all') === '1'; } catch (e) { return false; } };
+const TIDY = {};
+const tidy = (label, html, key, open) => !String(html || '').trim() ? '' : ALLV() ? html : `<details class="more-rows tidy"${open || (key && TIDY[key]) ? ' open' : ''}${key ? ` data-k="${key}" ontoggle="TIDY[this.dataset.k]=this.open"` : ''}><summary>${label}${I.chev}</summary>${html}</details>`;
 function route(){
 const h = location.hash.replace(/^#\/?/, '') || 'home';
 const [path, qs] = h.split('?');
@@ -2316,7 +2319,7 @@ const seg = path.split('/');
 if (consentGate(seg[0], h)) return;
 if (seg[0] === 'hello' && helloDone() && (() => { try { return sessionStorage.getItem(HELLO_FIN); } catch (e) { return null; } })()) { try { location.replace(location.href.split('#')[0] + '#/home'); return; } catch (e) {} }
 document.body.classList.toggle('no-nav', /^(hello|consent|login|doc)$/.test(seg[0])); document.body.classList.toggle('is-door', /^(consent|login)$/.test(seg[0]));
-const q = Object.fromEntries(new URLSearchParams(qs || '')); entryTake(q);
+const q = Object.fromEntries(new URLSearchParams(qs || '')); entryTake(q); try { if (q.all === '1') sessionStorage.setItem('yakjido.all', '1'); else if (q.all === '0') sessionStorage.removeItem('yakjido.all'); } catch (e) {}
 const tab = { people:'home', send:'home', p:'home', show:'home', check:'home', home:'home', symptom:'home', drugs:'drugs', drug:'drugs', class:'drugs', search:'drugs', pub:'drugs', pill:'drugs', guide:'home', kids:'home', tips:'home', myths:'home', schedule:'me', notify:'me', photo:'drugs', pillinfo:'drugs', supp:'supp', sgoal:'supp', sstage:'supp', compare:'supp', me:'me', about:'me', ingr:'drugs', brand:'drugs', nut:'supp', hello:'home', mix:'drugs', together:'me', kinds:'me', rx:'me', rxout:'drugs', senior:'drugs', askdoc:'home', talk:'home', login:'login' }[seg[0]] || 'home';
 document.querySelectorAll('nav.tabbar button').forEach(b => { const on = b.dataset.tab === tab; b.classList.toggle('on', on); on ? b.setAttribute('aria-current', 'page') : b.removeAttribute('aria-current'); });
 if (CORE !== 2 && !CORE_SAFE.has(seg[0])) {
@@ -3053,6 +3056,7 @@ return `<div id="hlist" role="tabpanel" aria-label="증상 목록">${body}</div>
 }
 function homeTab(k){
 HTAB = k; try { sessionStorage.setItem('yakjido.htab', k); } catch (e) {}
+TIDY.hsym = 1; document.querySelector('[data-k=hsym]')?.setAttribute('open', '');
 const el = document.getElementById('hlist'); if (!el) return route();
 el.outerHTML = homeList();
 document.querySelectorAll('.htabs .tab').forEach(b => { const on = b.dataset.k === k; b.classList.toggle('on', on); b.setAttribute('aria-selected', on); });
@@ -3090,33 +3094,34 @@ ${svOn() ? `<section class="hero home-q">${dot}<div class="eyebrow">${esc(hello)
 </section>`}
 ${INK ? '' : ext('대화줄')}
 ${svOn() ? '' : kidHome() + ext('오늘한장') + regionGrid()}${ext('약담기권함')}
-${ext('필요약줄')}${odL}${homeQuick(n)}
+${ext('필요약줄')}${odL}${ALLV() ? homeQuick(n) : ''}
 ${ext('응급칸')}${svOn() ? '' : ER_LINE()}
 ${condOn().length || ME.condskip ? '' : `<div class="cond-line"><button type="button" onclick="go('/me?t=body')">${I.user}<span>앓는 병이 있으면 알려 주세요 — <b>피해야 할 약을 걸러 드려요</b></span>${I.chev}</button><button type="button" class="x" aria-label="이 안내 닫기" onclick="ME.condskip=true;saveMe();route()">${I.x}</button></div>`}
 ${storeBar()}
 <div class="util" aria-label="다른 방법으로 찾기">
 ${v && vd <= 3 ? urow(I.cal, `${vd <= 0 ? '오늘' : vd === 1 ? '내일' : vd + '일 뒤'} 진료`, `${esc(visitWord(v, false))} · 내 약 한 장 챙기기`, "go('/visits')", '보기', 'visit-soon') : ''}
 ${urow(I.search, '여기 없어요', '질문 두 번으로 찾기', "go('/guide/1')", '시작')}
-${urow(I.pill, n ? `내 약통 ${n}가지` : '내 약통에 약 담기', n ? '겹치는지 확인' : '겹치는 약 살펴보기', `go('${n ? '/together' : '/kinds'}')`, n ? '확인' : '담기')}
+${ALLV() || (INK && !window.내약칸) ? urow(I.pill, n ? `내 약통 ${n}가지` : '내 약통에 약 담기', n ? '겹치는지 확인' : '겹치는 약 살펴보기', `go('${n ? '/together' : '/kinds'}')`, n ? '확인' : '담기') : ''}
 ${wxCard()}
 </div>
 ${workedHome()}
-<nav class="tabs htabs" role="tablist" aria-label="증상 묶음">${homeTabs().map(t => `<button class="tab ${HTAB === t.k ? 'on' : ''}" role="tab" aria-selected="${HTAB === t.k}" data-k="${esc(t.k)}" onclick="homeTab(this.dataset.k)">${t.ic || ''}${esc(t.n)}<span class="n">${t.c}</span></button>`).join('')}</nav>
-${homeList()}
-<div class="sech"><h2 class="sec-h">바로 가기</h2></div>
+${tidy(`증상 모두 보기 <span class="muted">${(D.symptoms || []).length}가지</span>`, `  <nav class="tabs htabs" role="tablist" aria-label="증상 묶음">${homeTabs().map(t => `<button class="tab ${HTAB === t.k ? 'on' : ''}" role="tab" aria-selected="${HTAB === t.k}" data-k="${esc(t.k)}" onclick="homeTab(this.dataset.k)">${t.ic || ''}${esc(t.n)}<span class="n">${t.c}</span></button>`).join('')}</nav>
+${homeList()}`, 'hsym')}
+${tidy('바로 가기 — 알아두면 좋은 것·약 이름 몰라도 담기·아이 해열제 <span class="muted">8가지</span>', `  <div class="sech"><h2 class="sec-h">바로 가기</h2></div>
 <div class="rows-l">
 ${tip ? lrow(icon(tip.icon), '알아두면 좋은 것', esc(tip.title), `go('/tips?open=${tip.id}')`) : ''}
 ${lrow(I.pill, '약 이름을 몰라도 담기', '“혈압약 먹어요”까지만 아셔도 위험한 조합 일부를 먼저 살펴봐요', "go('/kinds')")}
 ${lrow(I.scale, '그런 줄 알았는데', `흔히 듣는 말 ${(D.myths || []).length || 18}가지를 근거로 다시 봤어요`, "go('/myths')")}
 ${(D.askdoc || []).length ? lrow(I.user, '의사에게 물었어요', `자주 묻는 ${D.askdoc.length}가지 — 진료실에서 하는 대답 그대로`, "go('/askdoc')") : ''}
 </div>
-<details class="more-rows"><summary>바로 가기 더 보기 <span class="muted">4가지</span>${I.chev}</summary><div class="rows-l">
+<div class="rows-l">
 ${lrow(I.scale, '소염진통제, 무엇이 위장에 덜 부담일까', '이부프로펜·나프록센·덱시부프로펜·셀레콕시브 비교', "go('/class/nsaid')")}
 ${lrow(I.user, '아이 해열제, 몇 mL 먹이지?', '몸무게·개월로 시럽 용량 계산 · 우리집 소아과 연동', "go('/kids')")}
 ${lrow(I.leaf, '내 영양제 성분 겹치는지 보기', '제형·함량·상한 기준으로 비교', "go('/supp')")}
 ${lrow(I.cart, '편의점에서 살 수 있는 약', '안전상비의약품 13종', "go('/drugs?cat=cvs')")}
-</div></details>
-${ext('기내줄')}
+</div>
+`, 'hgo')}
+${ALLV() ? ext('기내줄') : ''}
 ${disclaimer()}`;
 }
 document.addEventListener('keydown', e => { if (e.target.id === 'q' && e.key === 'Enter') go('/search?q=' + encodeURIComponent(e.target.value.trim())); });
@@ -5527,7 +5532,8 @@ ${lrow(I.book || I.search, '제품 이름으로 찾기', `게보린·판피린·
 </div>
 <nav class="tabs" role="tablist" aria-label="약 묶음" style="margin-top:20px">${tabs.map(([k, n, ic, c]) => `<button class="tab ${cat === k ? 'on' : ''}" role="tab" aria-selected="${cat === k}" onclick="go('/drugs?cat=${k}')">${ic}${esc(n)}<span class="n">${c}</span></button>`).join('')}</nav>
 ${cat === 'grid' ? `<div class="sech"><h2 class="sec-h">갈래별로 보기</h2><span class="secn">${CL.length}갈래</span></div><p class="viewnote">갈래를 누르면 그 약만 모아 보여 드려요</p>
-<div class="cgrid">${CL.map(c => { const L = (D.drugs || []).filter(d => d.class === c.id); return `<button class="cg" onclick="go('/drugs?cat=${c.id}')"><span class="ab">${icon(c.icon || 'pill')}</span><b>${esc(c.short || c.name)}</b><small>${L.length}가지</small></button>`; }).join('')}</div>`
+${(() => { const cg = c => { const L = (D.drugs || []).filter(d => d.class === c.id); return `<button class="cg" onclick="go('/drugs?cat=${c.id}')"><span class="ab">${icon(c.icon || 'pill')}</span><b>${esc(c.short || c.name)}</b><small>${L.length}가지</small></button>`; };
+return ALLV() ? `<div class="cgrid">${CL.map(cg).join('')}</div>` : `<div class="cgrid">${CL.slice(0, 9).map(cg).join('')}</div>${tidy(`갈래 모두 보기 <span class="muted">${CL.length - 9}가지 더</span>`, `<div class="cgrid">${CL.slice(9).map(cg).join('')}</div>`, 'dcat')}`; })()}`
 : `${c0 ? `<div class="sech"><h2 class="sec-h">${esc(c0.name)}</h2><span class="secn">${items.length}가지</span></div><div class="rows-l" style="margin-bottom:12px">${lrow(I.scale, `${esc(c0.name)} 한눈에 비교`, esc(c0.short2 || (cat === 'nsaid' ? '위장·심혈관 부담, 지속시간, 구입 방법' : '상황별로 고르는 법, 구입 방법')), `go('/class/${cat}')`)}</div>`
 : `<div class="sech"><h2 class="sec-h">${cat === 'cvs' ? '편의점에서 살 수 있는 약' : '전체'}</h2><span class="secn">${items.length}가지</span></div>`}
 <div class="card rows">${items.map(rowOf).join('') || '<div class="empty">아직 등록된 약이 없어요.</div>'}</div>`}
@@ -6666,10 +6672,14 @@ const CONDS = [
 ['bph', '전립선비대', '코감기약·항히스타민제로 소변이 막힐 수 있어요'],
 ];
 const condOn = () => CONDS.filter(([k]) => ME[k] === true);
+const COND_TOP = ['pregnant', 'nursing', 'ulcer', 'kidney', 'liver', 'heart', 'diabetes', 'anticoag'];
 function condBox(){
 const on = condOn();
 return `<div id="condbox">
-<div class="chips-m" role="group" aria-label="건강 상태">${CONDS.map(([k, t]) => `<button class="chip-m ${ME[k] ? 'on' : ''}" aria-pressed="${!!ME[k]}" onclick="condToggle('${k}')">${ME[k] ? I.check : ''}${esc(t)}</button>`).join('')}</div>
+${(() => { /* 11-18 정리 */
+const chip = ([k, t]) => `<button class="chip-m ${ME[k] ? 'on' : ''}" aria-pressed="${!!ME[k]}" onclick="condToggle('${k}')">${ME[k] ? I.check : ''}${esc(t)}</button>`;
+const A = CONDS.filter(([k]) => COND_TOP.includes(k)), B = CONDS.filter(([k]) => !COND_TOP.includes(k));
+return `<div class="chips-m" role="group" aria-label="건강 상태">${(ALLV() ? CONDS : A).map(chip).join('')}</div>${ALLV() ? '' : tidy(`다른 건강 상태 <span class="muted">${B.length}가지</span>`, `<div class="chips-m" role="group" aria-label="다른 건강 상태" style="margin-top:4px">${B.map(chip).join('')}</div>`, 'cond2', B.some(([k]) => ME[k]))}`; })()}
 ${on.length ? `<div class="cond-on"><b>켜 둔 것 ${on.length}가지</b>${on.map(([, t, d]) => `<p><b>${esc(t)}</b> — ${esc(d)}</p>`).join('')}</div>`
 : '<p class="viewnote" style="margin-top:10px">해당하는 것이 없으면 그대로 두세요.</p>'}
 </div>`;
@@ -6742,22 +6752,17 @@ ${lrow(I.heart, '혈압·혈당 수첩', '2주 흐름·7일 평균', "go('/vital
 ${lrow(I.cal, '진료 예약', nextVisit() ? esc(visitWord(nextVisit())) : '전날·2시간 전에 알려 드려요', "go('/visits')")}
 </div>`;
 else body = `
-${ext('계정카드')}
+<div class="set-list">
 <div class="rows-l" style="margin-top:12px">${lrow(I.clock, '알림 설정', '약 시간 · 다시 알림 · 약 떨어짐 · 진료 예약 · 가족에게 알리기', "go('/notify')")}</div>
-<section class="sec card" style="padding-top:10px;padding-bottom:10px"><div class="view-row col"><div class="t"><b>글자 크기</b><span>지금 이 글씨가 작으면 키우세요</span></div>${fsSeg()}</div>
+${tidy('계정 · 이용 요금', `${ext('계정카드')}${ext('구독관리')}${ext('계정칸')}`, 'sacct')}
+${tidy('글자 크기 · 화면 밝기 · 보기', `  <section class="sec card" style="padding-top:10px;padding-bottom:10px"><div class="view-row col"><div class="t"><b>글자 크기</b><span>지금 이 글씨가 작으면 키우세요</span></div>${fsSeg()}</div>
 <div class="view-row col" style="border-top:1px solid var(--hairline)"><div class="t"><b>화면 밝기</b><span>눈이 부시면 어둡게, 휴대폰 설정을 따르려면 기기 따라를 고르세요</span></div>
 <div class="fs-seg" role="group" aria-label="화면 밝기">${[['light','밝게'],['dark','어둡게'],['auto','기기 따라']].map(([k, n]) => `<button class="${themeNow() === k ? 'on' : ''}" style="min-width:auto;min-height:46px;padding:0 10px;font-size:.875rem" aria-pressed="${themeNow() === k}" onclick="setTheme('${k}')">${n}</button>`).join('')}</div></div>
 <div class="view-row" style="border-top:1px solid var(--hairline)"><div class="t"><b>어르신 모드</b><span>큰 글씨 · 홈 맨 위에 「오늘 약 체크」</span></div><button class="sw ${ME.easy ? 'on' : ''}" role="switch" aria-checked="${!!ME.easy}" aria-label="어르신 모드" onclick="setEasy(!ME.easy)"></button></div>
 <div class="view-row col" style="border-top:1px solid var(--hairline)"><div class="t"><b>화면 보기</b><span>간단히 — 사야 할 약만 사진과 함께 · 자세히 — 왜 그런지·근거까지</span></div>${viewSeg()}</div>${ext('잉크칸')}</section>
-${ext('구독관리')}
-${ext('언어칸')}
-${ext('기내칸')}
-<div class="rows-l" style="margin-top:16px">
-${lrow(I.info, '알아두면 좋은 것', `짧은 건강정보 ${(D.tips || []).length}가지`, "go('/tips')")}
-${lrow(I.info, '처음 안내 다시 보기', '앱 쓰는 법 세 장', "helloAgain()")}
-${lrow(I.book, '근거·확인 기준', `참고 문헌 ${Object.keys(D.sources || {}).length}건`, "go('/about')")}
-</div>
-<section class="sec card"><h2>휴대폰을 바꾸실 때</h2>
+`, 'sview')}
+${tidy('언어 · 나라', `${ext('언어칸')}`, 'slang')}
+${tidy('휴대폰 바꿀 때 · 인터넷 없을 때', `  <section class="sec card"><h2>휴대폰을 바꾸실 때</h2>
 <p class="small" style="margin-top:6px">${srvLoggedIn() && srvAgreed() ? '메디나눔 계정으로 이어 보기를 켜 두셨어요 — 새 휴대폰에서 <b>같은 이메일로 로그인</b>하시면 그대로 이어져요. 따로 보관하고 싶으시면 파일로도 받아 두실 수 있어요.' : '지금은 기록이 <b>이 휴대폰에</b> 있어요. 휴대폰을 바꾸시면 담아 둔 약·복용 기록·불편했던 일이 함께 사라지니, 아래 「계정」으로 이어 보기를 켜시거나 <b>파일 하나로 받아 두셨다가</b> 새 휴대폰에서 넣으세요. 그 파일은 온전히 본인 것이에요.'}</p>
 <div class="actions two"><button class="btn ghost" onclick="exportMe()">${I.book} 파일로 받기</button>
 <button class="btn ghost" onclick="document.getElementById('mefile').click()">${I.user} 파일에서 가져오기</button></div>
@@ -6768,14 +6773,21 @@ ${lrow(I.book, '근거·확인 기준', `참고 문헌 ${Object.keys(D.sources |
 <div class="actions"><button class="btn ghost" onclick="wipeMe()">${I.x} 모두 지우기</button></div>
 </details>
 </section>
-${ext('계정칸')}
-${ext('약관칸')}
+${ext('기내칸')}`, 'sphone')}
+${tidy('도움말 · 알아두면 좋은 것', `  <div class="rows-l" style="margin-top:16px">
+${lrow(I.info, '알아두면 좋은 것', `짧은 건강정보 ${(D.tips || []).length}가지`, "go('/tips')")}
+${lrow(I.info, '처음 안내 다시 보기', '앱 쓰는 법 세 장', "helloAgain()")}
+${lrow(I.book, '근거·확인 기준', `참고 문헌 ${Object.keys(D.sources || {}).length}건`, "go('/about')")}
+</div>
+`, 'shelp')}
+${tidy('약관 · 개인정보 · 이 앱에 대해', `  ${ext('약관칸')}
 <section class="sec card"><h2>이 앱에 대해</h2><p class="small" style="margin-top:6px">${esc(D.meta?.about || '')}</p><p class="small muted" style="margin-top:10px">${savedWhere()}</p><div class="lk48"><a class="link" href="${esc(방침주소())}"${NATIVE ? ' target="_blank" rel="noopener"' : ''}>개인정보처리방침</a>${D.meta?.contact?.email ? `<span class="small" style="display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px;overflow-wrap:anywhere">문의 · ${esc(D.meta.contact.email)}<button type="button" class="chip" style="min-height:40px" onclick="navigator.clipboard?.writeText('${esc(D.meta.contact.email)}').then(()=>toast('문의 주소를 복사했어요'),()=>{})">복사</button></span><span class="small muted">운영 메디나눔</span>` : ''}</div></section>
 <p class="small mn-sign" style="margin-top:20px;text-align:center"><b><svg class="mn-logo" viewBox="0 0 1024 1024" aria-hidden="true"><rect class="mn-tile" x="12" y="12" width="1000" height="1000" rx="226"/><path d="M790 470 V760"/><path d="M256 760 V410 C256 296 350 258 424 312 C478 352 494 520 566 548 C648 580 790 250 790 460"/></svg>메디나눔</b> · 화면마다 근거와 확인한 달을 적어 둔, 우리 가족 건강 앱</p>
 <p class="small muted" style="margin-top:6px;text-align:center">약지도 v${esc(D.meta?.version || '')} · 빌드 ${BUILD}<br>${(() => { const P = D.public || {}, ds = ['easy_source', 'pills_source', 'permits_source'].map(k => `<span style="white-space:nowrap">${esc(String(P[k] || '').match(/\d{4}-\d\d-\d\d|\d{8}/)?.[0] || '확인일 기록 필요')}</span>`);
-return `식약처 제품 이름 자료 받은 날 — ${new Set(ds).size === 1 ? ds[0] + '(e약은요·낱알식별·허가 정보)' : `e약은요 ${ds[0]} · 낱알식별 ${ds[1]} · 허가 정보 ${ds[2]}`}<br>약 설명 ${esc(D.meta?.reviewLabel || '근거 확인')} ${esc(D.meta?.reviewed || '')}${D.meta?.nextReview ? ` · 다음 검토 ${esc(D.meta.nextReview)}` : ''}`; })()}</p>`;
+return `식약처 제품 이름 자료 받은 날 — ${new Set(ds).size === 1 ? ds[0] + '(e약은요·낱알식별·허가 정보)' : `e약은요 ${ds[0]} · 낱알식별 ${ds[1]} · 허가 정보 ${ds[2]}`}<br>약 설명 ${esc(D.meta?.reviewLabel || '근거 확인')} ${esc(D.meta?.reviewed || '')}${D.meta?.nextReview ? ` · 다음 검토 ${esc(D.meta.nextReview)}` : ''}`; })()}</p>`, 'sterms')}
+</div>`;
 return `${topBar()}
-<h1>내 정보</h1>${tab === 'set' ? '' : ext('계정줄')}
+<h1>내 정보</h1>${tab === 'set' || !ALLV() ? '' : ext('계정줄')}
 <nav class="tabs metabs" role="tablist" aria-label="내 정보 칸">${TABS.map(([k, n, ic, c]) => `<button class="tab ${tab === k ? 'on' : ''}" role="tab" aria-selected="${tab === k}" data-k="${k}" onclick="go('/me?t=${k}')">${ic}${n}<span class="n">${c}</span></button>`).join('')}</nav>
 ${body}`;
 }
