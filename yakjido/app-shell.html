@@ -5397,7 +5397,7 @@ async function nativeArmOnce(){
       /* 직접 켠 분만 — 다시 알림보다 먼저(하루를 한 장으로 정리) */
       med.push({ id: 590000 + k, title: '오늘 약 체크', body: eveningBody(L), channelId: ch, extra: { evening: dayKey(at) }, isExactNotification: exact, schedule: { at, allowWhileIdle: true }, day: dayKey(at), r: 2.5 }); }
     /* 11-17 Main — 놓친 약 다음 날 아침 정리: 오늘 남은(체크 없는) 회차가 있으면 내일 아침 8시에 한 장. 다그치지 않고, 두 번 몫을 한꺼번에 먹지 않게 */
-    if (noteOn('dose') && noteOn('morning')) { const L0 = eveningLeft(todayKey(), true), at = new Date(); at.setDate(at.getDate() + 1); at.setHours(8, 0, 0, 0);
+    if (noteOn('dose') && ME.morning === true) { const L0 = eveningLeft(todayKey(), true), at = new Date(); at.setDate(at.getDate() + 1); at.setHours(8, 0, 0, 0);
       if (L0.length) med.push({ id: 595000, title: '어제 못 챙긴 약이 있어요', body: `어제 ${L0.length}번 체크가 없었어요. 놓친 약은 한꺼번에 두 번 드시지 말고, 오늘 시간에 맞춰 드세요.`, channelId: ch, extra: { morning: todayKey() }, isExactNotification: exact, schedule: { at, allowWhileIdle: true }, day: dayKey(at), r: 2.6 }); }
     id = 1 + groups.length * 20;
     /* 알람이 끊기지 않게 하는 것만 — 걸어 둔 날이 끝날 때 한 번. 앱을 열면 다시 7일 뒤로 밀린다(그래서 7일 넘게 안 여셨을 때만 울린다) */

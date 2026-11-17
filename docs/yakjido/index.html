@@ -1810,7 +1810,7 @@ html:not(.ink) .rf-none{display:none}</style>
 <script>
 window.__YAKJIDO_OK__ = true;
 const D = JSON.parse(document.getElementById('data').textContent || '{}');
-const BUILD = '2026-11-18 00:27';
+const BUILD = '2026-11-18 00:36';
 const DATAV = 'ebf9e087db'.indexOf('__') === 0 ? BUILD : 'ebf9e087db';
 const BRANDMARK = (typeof window !== 'undefined' && window.__BRANDMARK__) || 'icon-192.png';
 let CORE = 0, CORE_P = null;
@@ -4490,7 +4490,7 @@ extra: { ...extra, again: day }, isExactNotification: exact, schedule: { at: aga
 if (ev) for (let k = 0; k < DAYS; k++) { const at = new Date(); at.setDate(at.getDate() + k); at.setHours(21, 0, 0, 0); if (at.getTime() <= now) continue;
 const L = eveningLeft(dayKey(at), k === 0); if (!L.length) continue;
 med.push({ id: 590000 + k, title: '오늘 약 체크', body: eveningBody(L), channelId: ch, extra: { evening: dayKey(at) }, isExactNotification: exact, schedule: { at, allowWhileIdle: true }, day: dayKey(at), r: 2.5 }); }
-if (noteOn('dose') && noteOn('morning')) { const L0 = eveningLeft(todayKey(), true), at = new Date(); at.setDate(at.getDate() + 1); at.setHours(8, 0, 0, 0);
+if (noteOn('dose') && ME.morning === true) { const L0 = eveningLeft(todayKey(), true), at = new Date(); at.setDate(at.getDate() + 1); at.setHours(8, 0, 0, 0);
 if (L0.length) med.push({ id: 595000, title: '어제 못 챙긴 약이 있어요', body: `어제 ${L0.length}번 체크가 없었어요. 놓친 약은 한꺼번에 두 번 드시지 말고, 오늘 시간에 맞춰 드세요.`, channelId: ch, extra: { morning: todayKey() }, isExactNotification: exact, schedule: { at, allowWhileIdle: true }, day: dayKey(at), r: 2.6 }); }
 id = 1 + groups.length * 20;
 if (lastAt) { const at = new Date(lastAt + 60 * 60000);

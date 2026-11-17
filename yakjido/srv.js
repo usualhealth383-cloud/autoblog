@@ -3970,7 +3970,7 @@ window.문_notify = (_, q) => {
     ${row(I.clock, '약 드실 시간', n ? `시간을 정한 약 ${timed}가지 · 정한 시각에` : '약통에 약을 담고 시간을 고르면 울려요', noteOn('dose'), `setNoteOn('dose',${!noteOn('dose')})`)}
     ${row(I.alert, '아직 안 드셨을 때 한 번 더', '체크가 없으면 ' + againMin() + '분 뒤 한 번만', noteOn('dose') && noteOn('again'), `setNoteOn('again',${!noteOn('again')})`)}
     ${noteOn('dose') && noteOn('again') ? `<div class="seg" role="group" aria-label="다시 알림 간격" style="margin:2px 0 8px">${[10, 30, 60].map(m => `<button type="button" class="${againMin() === m ? 'on' : ''}" aria-pressed="${againMin() === m}" onclick="setAgainMin(${m})">${m === 60 ? '1시간' : m + '분'} 뒤</button>`).join('')}</div>` : ''}
-    ${row(I.cal, '못 챙긴 약 다음 날 아침 정리', '체크가 없던 회차가 있으면 아침 8시에 한 번', noteOn('dose') && noteOn('morning'), `setNoteOn('morning',${!noteOn('morning')})`)}
+    ${row(I.cal, '못 챙긴 약 다음 날 아침 정리', '켜 두시면 체크가 없던 회차가 있을 때 아침 8시에 한 번', noteOn('dose') && ME.morning === true, `ME.morning=${ME.morning !== true};saveMe();armNotifications();route()`)}
     ${row(I.pill, '약이 떨어지기 전에', '남은 알 수를 넣은 약 · 5일분 남는 날 아침 9시', noteOn('stock'), `setNoteOn('stock',${!noteOn('stock')})`)}
     ${row(I.cal, '진료 예약', vn ? `예약 ${vn}건 · 전날 저녁 7시와 2시간 전` : '진료 예약을 적어 두면 전날과 2시간 전에', noteOn('visit'), `setNoteOn('visit',${!noteOn('visit')})`)}
     ${row(I.check, '저녁 9시 하루 정리', '그날 체크 안 한 약이 있을 때만 · 기본 꺼짐', eveningOn(), `setEvening(${!eveningOn()})`)}
