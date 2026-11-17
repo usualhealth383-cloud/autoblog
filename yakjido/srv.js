@@ -3645,7 +3645,17 @@ window.언어칸 = function () {
     판 = stop ? '<a class="job-verdict stop" href="#/together"><b>같이 드시면 안 되는 것 ' + stop + '</b>' + (warn ? ' · 조심할 것 ' + warn : '') + ' ›</a>'
       : warn ? '<a class="job-verdict warn" href="#/together"><b>조심할 것 ' + warn + '</b> ›</a>'
       : '<a class="job-verdict ok" href="#/together">겹치거나 조심할 조합이 안 보여요 ›</a>';
-    return '<section class="job-box"><div class="job-h"><h1>내 약 ' + n + '가지</h1><button type="button" class="btn" data-ink="solid" onclick="go(\'/together\')">+ 약 더하기</button></div>' + 판 + 다음약() +
+    /* 11-17 밤 마음 층(화면당 한 줄 · 사실만 · 이모지 0) — ① 해낸 것(오늘 다 챙김·지난 한 주 조용한 흐름, 빠진 날은 말하지 않음) ② 함께(다 챙기면 가족에게 알리기 — 본인이 고른 곳으로만) ③ 알아줌(약이 많을 때) */
+    var 마음 = '';
+    try {
+      var tk = takenSet(), rows = []; items.forEach(function (d) { schedOf(d.id, d).forEach(function (t) { rows.push(d.id + '@' + t); }); });
+      var 다 = rows.length && rows.every(function (k) { return tk.indexOf(k) >= 0 || isSkipped(k); });
+      var w = adherence(7), 주 = w && w.days >= 2 ? '지난 한 주, 드시기로 한 ' + w.days + '일 중 ' + w.full + '일 빠짐없이 챙기셨어요.' : '';
+      if (다) 마음 = '<div class="job-heart"><p><b>오늘도 잘 챙기셨어요.</b>' + (주 ? ' ' + 주 : '') + '</p><button type="button" class="link" onclick="shareOut({title:\'약지도\',text:\'오늘 약을 다 챙겨 먹었어요. — 약지도\'})">가족에게 알리기 ›</button></div>';
+      else if (n >= 5) 마음 = '<div class="job-heart"><p>약이 많으면 누구나 헷갈려요.</p><a href="#/bag">한 장으로 정리해 드릴게요 ›</a></div>';
+      else if (주) 마음 = '<div class="job-heart"><p>' + 주 + '</p></div>';
+    } catch (e) {}
+    return '<section class="job-box"><div class="job-h"><h1>내 약 ' + n + '가지</h1><button type="button" class="btn" data-ink="solid" onclick="go(\'/together\')">+ 약 더하기</button></div>' + 판 + (마음.indexOf('오늘도 잘 챙기셨어요') >= 0 ? '' : 다음약()) + 마음 +
       '<div class="job-row"><a href="#/notify">알림</a><a href="#/send">가족에게</a><a href="#/bag">내 약 한 장</a><a href="#/me?t=meds">약통</a></div></section>';
   }
   window.잉크홈 = function () {
