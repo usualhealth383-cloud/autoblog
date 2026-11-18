@@ -1847,21 +1847,23 @@ try { const ps = document.createElement('style'); ps.id = 'prof-css'; ps.textCon
    ⛔ 앱 사본을 직접 고치지 않는다 — 이 파일을 고치고 판을 올린 뒤 다시 심는다: python3 _도구/해열제_부품_심기.py <소아|CS|파일경로>
    이 부품에는 화면·저장소 코드가 없다. 숫자와 순수 함수만(같은 입력이면 같은 답).
    값마다 출처는 아래 출처표(열쇠 → 한 줄). 화면은 출처칩(열쇠)로 꺼내 쓴다.
-   ── 아직 정하지 않은 값(A/B) — 지금 앱 값 그대로, 여기 「결정대기」 한 곳에서만 바꾼다 ──
-     ① 아세트아미노펜 하루 최대 — 두 돌 전 60 mg/kg(지금) vs 75 mg/kg
-     ② 이부프로펜 간격 — 6시간(지금) vs 8시간
+   ── 정한 값(11-18 현욱님 확정) — 「확정」 한 곳에만 둔다 ──
+     ① 아세트아미노펜 하루 최대 — 두 돌 전 60 mg/kg(75 아님)
+     ② 이부프로펜 간격 — 6시간(8 아님)
+     (예전 이름 「결정대기」는 바깥 코드가 깨지지 않게 같은 값을 가리키는 별명으로 남긴다)
 */
 (function () {
   if (window.메디나눔해열제) return;
-  var 판 = '2026-11-17b';   /* 17b — mL 은 안쪽으로만 둥글림(mL범위) · 양 끝이 같은 상한일 때 31.3 mL(1,001.6 mg)로 넘던 것 내림 · mL() 기본 내림 */
-  var 결정대기 = {
-    두돌전_아세트아미노펜_하루mgkg: 60,   /* A/B ① — 75 로 바꾸면 두 돌 전도 일반 하루 최대와 같아진다 */
-    이부프로펜_간격시간: 6                 /* A/B ② — 8 로 바꾸면 다음 시각·누적 판정이 함께 바뀐다 */
+  var 판 = '2026-11-18a';   /* 18a — A/B 두 값 11-18 현욱님 확정(숫자는 그대로 · 이름만 결정대기 → 확정) */   /* 17c — 쉬운양(현욱님 11-17 「쉽게/자세하게」): 큰 숫자 하나 */   /* 17b — mL 은 안쪽으로만 둥글림(mL범위) · 양 끝이 같은 상한일 때 31.3 mL(1,001.6 mg)로 넘던 것 내림 · mL() 기본 내림 */
+  var 확정 = {   /* 11-18 현욱님 확정 */
+    두돌전_아세트아미노펜_하루mgkg: 60,   /* ① 두 돌 전 하루 최대 60 mg/kg 유지 */
+    이부프로펜_간격시간: 6                 /* ② 이부프로펜 간격 6시간 유지 — 다음 시각·누적 판정이 이 값을 쓴다 */
   };
+  var 결정대기 = 확정;   /* 예전 이름 — 같은 값 */
   /* 약 표 — n 이름 · b 국내 제품 예 · pk 1회 mg/kg [아래, 위] · gap 최소 간격(시간) · day 하루 mg/kg · min 쓸 수 있는 개월 · conc 시럽 mg/mL · capDose 1회 상한 mg · capDay 하루 상한 mg */
   var DRUGS = {
     apap: { n: '아세트아미노펜', b: '타이레놀·세토펜', pk: [10, 15], gap: 4, day: 75, min: 4, conc: 32, capDose: 1000, capDay: 4000 },
-    ibu: { n: '이부프로펜', b: '부루펜', pk: [5, 10], gap: 결정대기.이부프로펜_간격시간, day: 40, min: 6, conc: 20, capDose: 400, capDay: 1600 }
+    ibu: { n: '이부프로펜', b: '부루펜', pk: [5, 10], gap: 확정.이부프로펜_간격시간, day: 40, min: 6, conc: 20, capDose: 400, capDay: 1600 }
   };
   /* 식약처 어린이부루펜시럽 허가 나이 표 — [시작 개월, 끝 개월(미만), 나이, 1회 아래 mg, 1회 위 mg, 하루 최대 mg] */
   var IBU_허가표 = [[12, 36, '만 1~2세', 50, 100, 400], [36, 84, '만 3~6세', 100, 150, 600], [84, 132, '만 7~10세', 150, 200, 800], [132, 180, '만 11~14세', 200, 250, 1000]];
@@ -1875,20 +1877,20 @@ try { const ps = document.createElement('style'); ps.id = 'prof-css'; ps.textCon
   var 출처표 = {
     apap_pk: '1회 10~15 mg/kg — Nelson 소아과학 표 93.6 · 식약처 어린이타이레놀현탁액 허가 용법',
     apap_gap: '4시간 이상 간격 — 식약처 어린이타이레놀현탁액 허가 용법',
-    apap_day: '하루 75 mg/kg(두 돌 전 60 mg/kg) — Nelson 소아과학 표 93.6',
+    apap_day: '하루 75 mg/kg(두 돌 전 60 mg/kg · 의료진 검토 확정 2026-11-18) — Nelson 소아과학 표 93.6',
     apap_cap: '어른 상한 1회 1,000 mg · 하루 4,000 mg — Nelson 소아과학 표 93.6',
     apap_times: '하루 5회까지 — 식약처 어린이타이레놀현탁액 제품 표시',
     apap_table: '몸무게별 mg·mL — 식약처 의약품통합정보 어린이타이레놀현탁액(160 mg/5 mL) 허가 용법',
     apap_min: '생후 4개월부터(허가 표 첫 칸) — 식약처 어린이타이레놀현탁액',
     ibu_pk: '1회 5~10 mg/kg — Nelson 소아과학 표 93.6 · 식약처 어린이부루펜시럽',
-    ibu_gap: '간격 6시간(결정대기 ② — 6 vs 8) — 식약처 어린이부루펜시럽 허가 용법',
+    ibu_gap: '간격 6시간(의료진 검토 확정 2026-11-18) — 식약처 어린이부루펜시럽 허가 용법',
     ibu_day: '하루 40 mg/kg — Nelson 소아과학 표 93.6',
     ibu_cap: '1회 400 mg · 하루 1,600 mg — 식약처 성인 용법(경증 동통·감기 1회 200~400 mg, 1일 3~4회)',
     ibu_table: '나이별 1회·하루 최대 — 식약처 어린이부루펜시럽 허가 용법(만 1~14세)',
     ibu_min: '생후 6개월부터 · 돌 전은 의사가 정한 양 — 식약처 어린이부루펜시럽 허가 문구',
     under3m: '생후 3개월 미만의 열은 해열제보다 진료 먼저 — 홍창의 소아과학 12판 · 미국소아과학회'
   };
-  function dayPerKg(k, m) { if (k === 'apap' && m != null && m < 24) return 결정대기.두돌전_아세트아미노펜_하루mgkg; return DRUGS[k].day; }
+  function dayPerKg(k, m) { if (k === 'apap' && m != null && m < 24) return 확정.두돌전_아세트아미노펜_하루mgkg; return DRUGS[k].day; }
   function 이부허가칸(m) { return (m == null) ? null : (IBU_허가표.find(function (x) { return m >= x[0] && m < x[1]; }) || null); }
   /* 몸무게로 곱한 값과 상한 중 작은 쪽 — 왜 줄었는지도 함께(소아 앱 doseRange 그대로) */
   function doseRange(k, w, m) {
@@ -1918,6 +1920,26 @@ try { const ps = document.createElement('style'); ps.id = 'prof-css'; ps.textCon
     if (+lo > +hi) lo = hi;
     return { lo: lo, hi: hi, 생lo: 생lo, 생hi: 생hi, 남은줄임: 남은하루 < DR.hi };
   }
+  /* 쉬운양 — 현욱님 11-17 결정 「쉽게 / 자세하게」의 «쉽게» 숫자 하나.
+     ① 아세트아미노펜은 약 상자 허가 몸무게표 값(표시용량) — 단 1회 위 끝(mL범위 hi: mg/kg·상한·허가 칸·남은 하루 양)을 넘지 않을 때만
+     ② 아니면 mL범위 가운데 값을 0.5 mL 단위로 내림(아래 끝 밑이면 아래 끝)
+     ③ 3개월 미만 · 허가 나이 밑 · 돌 전 이부프로펜(의사가 정한 양) · 남은 하루 양 없음 → 숫자 없이 막힘 이유
+     어떤 경우에도 mL × 농도가 위 끝을 넘지 않는다(시험: _도구/시험_해열제쉬운양.mjs). */
+  function 쉬운양(k, w, m, 남은하루) {
+    var 가 = 쓸수있나(k, m), D = DRUGS[k];
+    if (!가.ok) return { 막힘: 가.이유, 출처: 가.출처 };
+    if (가.이유 === '돌전의사양') return { 막힘: '돌전의사양', 출처: 가.출처 };
+    if (k === 'apap' && m != null && m < D.min) return { 막힘: '아세트아미노펜나이', 출처: 'apap_min' };
+    var r = mL범위(k, w, m, 남은하루), lo = +r.lo, hi = +r.hi;
+    if (!(hi > 0)) return { 막힘: '남은양없음', 출처: null };
+    var 표 = (k === 'apap') ? 표시용량(w) : null, 값, 근거;
+    if (표 && 표.mL <= hi + 1e-9) { 값 = 표.mL; 근거 = '표'; }
+    else { 값 = Math.floor((lo + hi) / 2 * 2 + 1e-9) / 2; if (값 < lo - 1e-9) 값 = lo; 근거 = '범위'; }
+    if (값 > hi + 1e-9) 값 = hi;
+    var DR = doseRange(k, w, m);
+    return { mL: 값, mL글: (Math.round(값 * 10) % 10 === 0 ? String(Math.round(값)) : 값.toFixed(1)), mg: Math.round(값 * D.conc * 10) / 10, 근거: 근거, 출처: 근거 === '표' ? 'apap_table' : (k + '_pk'),
+      간격: D.gap, 하루번: k === 'apap' ? APAP_하루횟수 : null, 하루mL: Math.floor(DR.day / D.conc * 10 + 1e-9) / 10, 하루mg: DR.day, 범위: r };
+  }
   /* 이 나이에 쓸 수 있나 — 막는 이유와 출처 열쇠 */
   function 쓸수있나(k, m) {
     if (m != null && m < 진료먼저_개월) return { ok: false, 이유: '진료먼저', 출처: 'under3m' };
@@ -1940,9 +1962,9 @@ try { const ps = document.createElement('style'); ps.id = 'prof-css'; ps.textCon
     if (한도회 && rows.length >= 한도회) { 걸림.push('횟수'); 풀림 = Math.max(풀림, rows[rows.length - 한도회].t + 864e5); }
     return { ok: !걸림.length, 걸림: 걸림, 풀림: 걸림.length ? 풀림 : null, used: used, cap: DR.day, 번: rows.length, 한도회: 한도회, gap: D.gap };
   }
-  window.메디나눔해열제 = { 판: 판, 결정대기: 결정대기, DRUGS: DRUGS, IBU_허가표: IBU_허가표, APAP_표: APAP_표, APAP_하루횟수: APAP_하루횟수, 진료먼저_개월: 진료먼저_개월,
+  window.메디나눔해열제 = { 판: 판, 확정: 확정, 결정대기: 결정대기, DRUGS: DRUGS, IBU_허가표: IBU_허가표, APAP_표: APAP_표, APAP_하루횟수: APAP_하루횟수, 진료먼저_개월: 진료먼저_개월,
     출처표: 출처표, 출처칩: function (열쇠) { return 출처표[열쇠] || ''; },
-    dayPerKg: dayPerKg, 이부허가칸: 이부허가칸, doseRange: doseRange, 표시용량: 표시용량, mL: mL, mL범위: mL범위, 쓸수있나: 쓸수있나, 판정: 판정 };
+    dayPerKg: dayPerKg, 이부허가칸: 이부허가칸, doseRange: doseRange, 표시용량: 표시용량, mL: mL, mL범위: mL범위, 쉬운양: 쉬운양, 쓸수있나: 쓸수있나, 판정: 판정 };
 })();
 /* ▲▲ 해열제 부품 끝 ▲▲ */
 /* 해열제 부품이 오면 — 아이 계산·약 화면을 정본 숫자로 다시 그린다 */
@@ -1958,7 +1980,9 @@ window.SUPP_OV = [['vitd', 'calcium', 'info', '칼슘제와 비타민 D — 두 
   ['zinc', 'lutein', 'warn', '루테인 복합제와 아연 — 겹치면 구리가 모자랄 수 있어요'], ['vitb', 'multi', 'info', '종합비타민과 비타민 B — 비타민 B6가 많아지기 쉬워요'],
   ['iron', 'mg', 'info', '철분과 마그네슘은 시간을 나누세요'], ['mg', 'calcium', 'info', '칼슘과 마그네슘 — 많이 드시면 시간을 나누세요']];
 try { if (/^#\/(together|home|bag|check)/.test(location.hash || '#/home') && typeof route === 'function') setTimeout(route, 0); } catch (e) {}
-window.kidOneS = r => { const [lo, hi] = mlRange(r), c = r.D.conc[0].mgPerMl; let v = null, from = '';
+window.kidOneS = r => { const P = window.메디나눔해열제;   /* 11-18 — 정본 쉬운양(소아와 같은 숫자)이 있으면 그것 */
+  if (P && P.쉬운양 && r.w > 0) { const e = P.쉬운양(r.D.id, r.w, r.m); if (e && !e.막힘) return { ml: e.mL글, mg: Math.round(e.mg), from: e.근거 === '표' ? 'table' : 'range' }; }
+ const [lo, hi] = mlRange(r), c = r.D.conc[0].mgPerMl; let v = null, from = '';
   if (r.D.id === 'apap') { const row = (D_KIDS().apapLabelTable || []).find(([a, b]) => r.w >= a && r.w <= b + .099); if (row) { v = row[3]; from = 'table'; } }
   else if (r.m != null) { const row = ibuRow(r.m); if (row) { v = row[4]; from = 'age'; } }
   if (v == null) { v = +lo; from = 'low'; } v = Math.min(v, +hi);

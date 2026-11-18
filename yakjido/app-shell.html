@@ -4956,7 +4956,7 @@ function vKids(){
       <p class="small muted" style="margin-top:8px">${esc(D.note)}</p></div>`;
     /* 11-17 현욱님 — 두 층: 쉽게 보기 = 한 숫자(약 상자 허가 표 값 · 상한 안) + 간격 한 줄 / 자세히(접힘) = 정확한 범위·mg/kg·하루 최대·허가 나이·출처 */
     const one = kidOne(r), P = window.메디나눔해열제, SRC = P ? P.출처표 : {}, sk = k === 'apap' ? ['apap_table', 'apap_pk', 'apap_gap', 'apap_day', 'apap_times', 'apap_min'] : ['ibu_table', 'ibu_pk', 'ibu_gap', 'ibu_day', 'ibu_min'];
-    const why1 = one.from === 'table' ? `약 상자 표의 몸무게 칸 값이에요.` : one.from === 'age' ? `약 상자 표의 나이 칸(${esc((ibuRow(m) || [])[2] || '')}) 값이에요 — 몸무게 범위를 넘지 않게 맞췄어요.` : `약 상자 표에 맞는 칸이 없어(${k === 'ibu' ? '나이를 몰라서' : '7 kg 미만'}) 몸무게 범위의 아래 끝으로 보였어요.`;
+    const why1 = one.from === 'table' ? `약 상자 표의 몸무게 칸 값이에요.` : one.from === 'range' ? `몸무게 범위의 가운데 값을 0.5 mL 단위로 내린 값이에요.` : `약 상자 표에 맞는 칸이 없어(${k === 'ibu' ? '나이를 몰라서' : '7 kg 미만'}) 몸무게 범위의 아래 끝으로 보였어요.`;
     return `<div class="dose-card"><div class="eyebrow">${esc(D.name)} · ${esc(D.brand)}</div>
       <div class="dose-big"><b>${one.ml}</b><span>mL · 한 번에</span></div>
       <p class="dose-gap">${kidGap(r)}</p>
@@ -4971,7 +4971,7 @@ function vKids(){
 ${r.capped ? `<div class="note" style="margin-top:8px">${I.info}<span>몸무게로만 곱하면 1회 ${r.rawHi} mg·하루 ${r.rawDay} mg이지만, 어른 상한(1회 ${D.capDose}·하루 ${D.capDay} mg)에서 멈춰요.</span></div>` : ''}
 ${k === 'apap' && m != null && m < 24 ? `<p class="small muted" style="margin-top:8px">두 돌 전이라 하루 한도를 60 mg/kg으로 봤어요(그 뒤 75 mg/kg).</p>` : ''}
       ${rev}
-      ${sk.filter(x => SRC[x]).length ? `<ul class="small muted" style="margin:8px 0 0;padding-left:18px">${sk.filter(x => SRC[x]).map(x => `<li>${esc(SRC[x])}</li>`).join('')}</ul>` : ''}`)}
+      ${sk.filter(x => SRC[x]).length ? `<ul class="small muted" style="margin:8px 0 0;padding-left:18px">${sk.filter(x => SRC[x]).map(x => `<li>${esc(SRC[x].replace(/의료진 검토 확정/g, '기준 정함'))}</li>`).join('')}</ul>` : ''}`)}
       <p class="small muted" style="margin-top:8px">${esc(D.note)}</p>
       <a class="link small" href="#/drug/${D.drugId}">성분 자세히 ›</a></div>`; };
   /* 현욱님 10-13(Z2-2 → B) — 생년월일이 없고 6 kg 미만이면 결과 위에 「생후 3개월 안팎일 수 있어요」(접지 않음). 결과는 그대로 보인다 */

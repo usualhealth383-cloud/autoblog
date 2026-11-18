@@ -1810,8 +1810,8 @@ html:not(.ink) .rf-none{display:none}</style>
 <script>
 window.__YAKJIDO_OK__ = true;
 const D = JSON.parse(document.getElementById('data').textContent || '{}');
-const BUILD = '2026-11-18 07:12';
-const DATAV = 'ebf9e087db'.indexOf('__') === 0 ? BUILD : 'ebf9e087db';
+const BUILD = '2026-11-18 12:11';
+const DATAV = '8e5949b100'.indexOf('__') === 0 ? BUILD : '8e5949b100';
 const BRANDMARK = (typeof window !== 'undefined' && window.__BRANDMARK__) || 'icon-192.png';
 let CORE = 0, CORE_P = null;
 function mergeCore(c){
@@ -4147,7 +4147,7 @@ ${m != null && m < 3 ? '' : `<details class="why-more" style="margin-top:10px"><
 ${esc(conc.label)} 기준이에요.</p></details>`}
 <p class="small muted" style="margin-top:8px">${esc(D.note)}</p></div>`;
 const one = kidOne(r), P = window.메디나눔해열제, SRC = P ? P.출처표 : {}, sk = k === 'apap' ? ['apap_table', 'apap_pk', 'apap_gap', 'apap_day', 'apap_times', 'apap_min'] : ['ibu_table', 'ibu_pk', 'ibu_gap', 'ibu_day', 'ibu_min'];
-const why1 = one.from === 'table' ? `약 상자 표의 몸무게 칸 값이에요.` : one.from === 'age' ? `약 상자 표의 나이 칸(${esc((ibuRow(m) || [])[2] || '')}) 값이에요 — 몸무게 범위를 넘지 않게 맞췄어요.` : `약 상자 표에 맞는 칸이 없어(${k === 'ibu' ? '나이를 몰라서' : '7 kg 미만'}) 몸무게 범위의 아래 끝으로 보였어요.`;
+const why1 = one.from === 'table' ? `약 상자 표의 몸무게 칸 값이에요.` : one.from === 'range' ? `몸무게 범위의 가운데 값을 0.5 mL 단위로 내린 값이에요.` : `약 상자 표에 맞는 칸이 없어(${k === 'ibu' ? '나이를 몰라서' : '7 kg 미만'}) 몸무게 범위의 아래 끝으로 보였어요.`;
 return `<div class="dose-card"><div class="eyebrow">${esc(D.name)} · ${esc(D.brand)}</div>
 <div class="dose-big"><b>${one.ml}</b><span>mL · 한 번에</span></div>
 <p class="dose-gap">${kidGap(r)}</p>
@@ -4161,7 +4161,7 @@ ${overLine}${label}
 ${r.capped ? `<div class="note" style="margin-top:8px">${I.info}<span>몸무게로만 곱하면 1회 ${r.rawHi} mg·하루 ${r.rawDay} mg이지만, 어른 상한(1회 ${D.capDose}·하루 ${D.capDay} mg)에서 멈춰요.</span></div>` : ''}
 ${k === 'apap' && m != null && m < 24 ? `<p class="small muted" style="margin-top:8px">두 돌 전이라 하루 한도를 60 mg/kg으로 봤어요(그 뒤 75 mg/kg).</p>` : ''}
 ${rev}
-${sk.filter(x => SRC[x]).length ? `<ul class="small muted" style="margin:8px 0 0;padding-left:18px">${sk.filter(x => SRC[x]).map(x => `<li>${esc(SRC[x])}</li>`).join('')}</ul>` : ''}`)}
+${sk.filter(x => SRC[x]).length ? `<ul class="small muted" style="margin:8px 0 0;padding-left:18px">${sk.filter(x => SRC[x]).map(x => `<li>${esc(SRC[x].replace(/의료진 검토 확정/g, '기준 정함'))}</li>`).join('')}</ul>` : ''}`)}
 <p class="small muted" style="margin-top:8px">${esc(D.note)}</p>
 <a class="link small" href="#/drug/${D.drugId}">성분 자세히 ›</a></div>`; };
 return `${topBar({ back:'홈' })}
