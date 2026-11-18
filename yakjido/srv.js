@@ -2033,6 +2033,12 @@ const Q꼬리 = /\s*(먹어도\s*(돼|되)[요예나]?|먹어도\s*괜찮[아나
 window.qClean = function (q) { let s = String(q || '').replace(/·/g, ' '), k = 0; const a = s.replace(Q사람, ''); if (a.trim()) s = a; while (k++ < 4) { const b = s.replace(Q꼬리, ''); if (b === s || !b.trim()) break; s = b; } return s.trim() || q; };
 /* 11-18 — 이웃한 두 글자 자리 바뀜(루부펜→부루펜 · 키테미→키미테 · 보노민→노보민). 0건일 때만, 3글자 넘는 말에서 앞쪽부터 몇 개만 */
 window.qSwap = function (q) { const w = String(q || ''), out = []; for (let i = 0; i < Math.min(w.length - 1, 8); i++) { if (!/[가-힣]/.test(w[i]) || !/[가-힣]/.test(w[i + 1]) || w[i] === w[i + 1]) continue; out.push(w.slice(0, i) + w[i + 1] + w[i] + w.slice(i + 2)); } return w.length >= 3 ? out : []; };
+/* 11-18 Main(너스텝 교훈) — 찾기에서도 「A 말고/빼고/대신/아니고/아닌 B」: B 로 찾고 A 이름이 든 결과는 뺀다. B 가 없으면 A 의 갈래로 */
+try { const _찾기 = search; search = function (q, nf) { const 부 = window.__부정 && window.__부정(q); if (!부) return _찾기(q, nf);
+    let rest = 부.rest; if (!rest) { const d0 = 부.ids.map(i => drug(i)).filter(Boolean)[0], c0 = d0 && (D.classes || []).find(c => c.id === d0.class); rest = c0 ? (c0.short || c0.name) : ''; }
+    if (!rest) return [];
+    const k = String(부.ex).replace(/\s+/g, ''), r = _찾기(rest, nf), out = r.filter(h => !String(h.t || '').replace(/\s+/g, '').includes(k) && !부.ids.some(i => (h.h || '').split('?')[0] === '/drug/' + i));
+    if (r.fix) out.fix = r.fix; return out; }; } catch (e) {}
 /* 약지도 — 두 폰 합치기(app-shell 의 sanitizeMe 를 씀). 2026-10-13 상용화 점검 */
 window.mergeMe = function (localRaw, serverRaw) {
   let a, b; try { a = sanitizeMe(JSON.parse(localRaw)); b = sanitizeMe(JSON.parse(serverRaw)); } catch (e) { return null; }
@@ -3926,16 +3932,25 @@ window.언어칸 = function () {
     if (달 != null && 달 < 6 && /아기|아이|애기|개월|신생아/.test(t) && (s || /약|해열|시럽/.test(t))) return { 위: 1, 결: '생후 6개월이 안 된 아기는 약국 약을 먹이기 전에 소아과 진료가 먼저예요.', 할: ['생후 3개월 미만 38도 이상, 생후 3~5개월 39도 이상 → 바로 응급실', er ? '응급 신호 — ' + er + ' 등은 약 말고 119' : ''].filter(Boolean), 단: 증단 };
     return null;
   }
+  /* 11-18 Main(너스텝 교훈) — 「A 말고·말구·빼고·대신·아니고·아닌 B」: A 를 빼고 B 로 안내. B 가 비면 A 와 같은 갈래의 «다른 약»으로(A 는 빼고) */
+  var 부정꼴 = /^(.*?)(\S+?)\s*(말고는|말고|말구|빼고|제외하고|대신에|대신|아니고|아닌(?=\s|$))\s*(.*)$/;
+  window.__부정 = function (q) { var m = String(q || '').match(부정꼴); if (!m) return null; var ex = m[2], ids = 약찾기(ex), rest = (m[1] + ' ' + m[4]).replace(/\s+/g, ' ').trim();
+    var 꼬리없이 = typeof qClean === 'function' ? qClean(rest) : rest; if (/^(다른|딴|다른\s*거|뭐|뭘|무슨|어떤)?\s*(약|거|것)?\s*(먹어요|먹을\s*약|있어요|있나요)?$/.test(꼬리없이)) rest = '';
+    return { ex: ex, ids: ids, rest: rest }; };
   function 답짓기(t) {
     var 앎 = { 글: t, 뜻: [], 값: window.대화 && 대화.만들기 ? (function () { try { return 대화.만들기({ 앱: 'yakjido', 약: [] }).이해(t).값 || {}; } catch (e) { return {}; } })() : {} };
     var w = 위험(t, 앎.값); if (w) return { 위험: w };
+    var 부 = window.__부정(t), 빼기 = 부 ? 부.ids : [];
+    if (부 && !부.rest) { var d0 = 부.ids.map(function (i) { return drug(i); }).filter(Boolean)[0], c0 = d0 && (D.classes || []).filter(function (c) { return c.id === d0.class; })[0];
+      return { 결: 부.ex + ' 말고 다른 약이면 — ' + (c0 ? c0.name + ' 갈래에서 고르시되, ' : '') + '같은 성분이 든 제품은 빼고 보세요.', 할: ['다른 약을 드시고 있으면 약사에게 「' + 부.ex + '는 빼고」라고 말씀하세요.'], 단: c0 ? [단추(c0.name + ' 보기', '/drugs?cat=' + c0.id, 1)] : [] }; }
+    if (부) t = 부.rest;
     /* 11-17 Main 승인(20문항 대결 ⚠) — 질문 속 상황(임신·수유·생후 개월·피가 안 멎음·주운 알약·항생제 끊기·기록 말)을 먼저 본다.
        답은 앱에 이미 있는 글(겹침 규칙 preg-nsaid · 코피·피 묽게 하는 약 길잡이 · 항생제 길잡이)만 — 금기·응급이 맨 위, 용량은 뒤 */
     var 상 = 상황답(t, 앎.값); if (상) return 상;
     /* 11-16 졸음 껌·에너지 음료·커피 — 카페인 팁 한 장(식약처 하루 최대 권고량) */
     if (/졸음\s*껌|잠\s*깨는\s*껌|에너지\s*(음료|드링크)|핫식스|레드불|몬스터|카페인|커피\s*(몇|하루|얼마|많이)|고카페인/i.test(t)) { var tp = (D.tips || []).filter(function (x) { return x.id === 'caffeine'; })[0];
       if (tp) return { 결: '졸음 껌·에너지 음료·커피에서 잠을 깨우는 성분은 주로 카페인이에요.', 할: ['하루 최대 권고량(식약처) — 성인 400 mg · 임산부 300 mg · 어린이·청소년 몸무게 1 kg당 2.5 mg 이하', '졸음 껌은 식품이라 제품마다 달라요 — 포장의 카페인 함량 표시를 보세요', '일부 감기약·두통약에도 카페인이 있어요 — 합쳐 세고, 두근거림·불면이면 줄이기'], 단: [단추('카페인 한 장 자세히', '/tips?open=caffeine', 1), 단추('카페인 든 진통제', '/drug/caffeine')], 더: '<p>' + fmt(tp.body) + '</p>' }; }
-    var ids = 약찾기(t), 같이 = /같이|함께|이랑|랑\s|하고|병용|먹어도|먹은\s*뒤|먹었는데|또\s*먹/.test(t);
+    var ids = 약찾기(t).filter(function (i) { return 빼기.indexOf(i) < 0; }), 같이 = /같이|함께|이랑|랑\s|하고|병용|먹어도|먹은\s*뒤|먹었는데|또\s*먹/.test(t);
     if (묻기.기다림 && ids.length === 1 && 묻기.약.length) { var 모 = 묻기.약.concat(ids.filter(function (i) { return 묻기.약.indexOf(i) < 0; })); 묻기.기다림 = null; 묻기.약 = 모; return 겹침카드(모); }
     var 갈 = Object.keys(갈래).filter(function (k) { return t.indexOf(k) >= 0; })[0], rx = 처방갈래.filter(function (x) { return x[1].test(t); })[0];
     if (rx && !/먹는|먹고|복용|드시|드세|처방|먹어요/.test(t) && /사도|살까|사려|사야|추천|뭐/.test(t)) rx = null;   /* 11-17 「수면제 사도 돼요」는 이미 먹는 사람이 아니다 — 증상 답으로 */
