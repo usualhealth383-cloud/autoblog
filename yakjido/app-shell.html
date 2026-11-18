@@ -3717,8 +3717,10 @@ const QS = /으?로 끝나요|이에요|예요|이 들어 있어요/g;
 const rxMix = d => { const L = (d?.products || []).filter(p => RXW[p.rx]); return new Set(L.map(p => p.rx)).size > 1 ? L.map(p => pubShort(p.name) + ' ' + RXW[p.rx]).join(' · ') : ''; };
 /* 11-12 사용자25 #21 — 한글이 없는 영어 문장은 흔한 말을 한국어 낱말로 바꿔 찾는다(제품 이름은 그대로 남는다) */
 const enQ = q => window.enQS ? enQS(q) : q;   /* 영어 낱말 바꾸기는 i18n.js(첫 화면 예산) */
-function search(q, noFix){
-  q = enQ((q || '').toLowerCase().trim()); const qIn = q;
+/* 11-18 검색 5,000 시험 — 「골다공증·뼈가약해질때」처럼 낱말 줄이기·말끝 떼기가 서로를 되부르며 끝없이 돌던 것(스택 넘침). 깊이 6에서 멈춘다 */
+function search(q, noFix){ if ((search.d || 0) > 6) return []; search.d = (search.d || 0) + 1; try { return search0(q, noFix); } finally { search.d--; } }
+function search0(q, noFix){
+  q = enQ((q || '').toLowerCase().trim()); if (window.qClean) q = qClean(q); const qIn = q;
   /* Z7 — 「아이 기침」의 「아이」가 「아이봉·아이드롭」 제품에 걸리던 것: 아이를 뜻하는 말은 떼고 찾되(아이 쪽 거르개는 아래), 떼고 남는 말이 있을 때만 */
   const kidQ = KID_Q.test(q), kq = q.replace(/아기|애기|아가|어린이|소아|우리애|아이(?!페|오|소)/g, ' ').trim(); if (kidQ && kq) q = kq;
   /* 띄어쓰기를 틀려도 찾아진다 — 「타이 레놀」·「이부 프로펜」 */
@@ -3874,6 +3876,7 @@ function search(q, noFix){
   const fx = !noFix && findFix(qIn, res); if (fx) return fx;
   /* 그래도 0건이면 모음 하나를 바꿔 본다(ㅐ↔ㅔ 등) — 찾으면 「혹시 ○○?」로 알린다 */
   if (!res.length && !noFix && /[가-힣]/.test(qs)) for (const v of vowelVariants(qs)) { const r2 = search(v, true); if (r2.length) { r2.fix = v; return r2; } }
+  if (!res.length && !noFix && window.qSwap) for (const v of qSwap(qs)) { const r2 = search(v, true); if (r2.length) { r2.fix = v; return r2; } }
   return res;
 }
 /* Z8 — 메디나눔 공용 찾기 부품(find.js, 검색을 처음 쓸 때 따로 받음)은 «못 알아들은 말을 고치는 데만» 쓴다: 초성(ㅌㅇㄹㄴ)·오타(타이레롤·두퉁).
@@ -6124,9 +6127,9 @@ function ixItems(extra){
   }
   for (const d of (extra || [])) {
     if (d.supp) { out.unshift({ name: d.name, ings: ingOf(d).ings, known: true, from: '지금 보는 영양제', link: '#/supp/' + d.supp.id }); continue; }
-    const ings = drugIngs(d).slice();
+    const ings = (d.ings || drugIngs(d)).slice();
     if (!ings.length) ingFind(d.name).forEach(e => { if (!ings.includes(e)) ings.push(e); });
-    out.push({ name: ingrName(d), ings, known: ings.length > 0, from: '지금 보는 약', link: '#/drug/' + d.id });
+    out.push({ name: ingrName(d), ings, known: ings.length > 0, from: '지금 보는 약', link: d.link || '#/drug/' + d.id });
   }
   return out;
 }
