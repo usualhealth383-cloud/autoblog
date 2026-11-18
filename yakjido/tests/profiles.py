@@ -17,7 +17,7 @@ with sync_playwright() as p:
     pg.add_init_script(SEED)
     pg.goto(URL + '#/home'); pg.wait_for_selector('.job-box, .th-mine', timeout=20000)
     ok(pg.locator('.prof-row').count() == 0 and pg.locator('a[href="#/people"]').count() <= 1, '한 분일 때 이름 줄 없음 · 가족 길 하나')
-    pg.click('text=더 ›'); pg.click('.th-sheet a[href="#/people"]'); pg.wait_for_selector('#profName')   # 11-18 정리 — 가족은 「더 ›」 시트 안
+    pg.click('.scn-more'); pg.click('.th-sheet a[href="#/people"]'); pg.wait_for_selector('#profName')   # 11-18 정리 — 가족은 「더 ›」 시트 안
     pg.click('button:has-text("어머니")'); pg.wait_for_timeout(200)
     ok(pg.locator('[aria-label="약을 드실 분의 나이"] button.on').inner_text().strip() == '65세 이상', '어머니 → 65세 이상 기본')
     pg.click('button:has-text("더하고 그분 약 담기")'); pg.wait_for_load_state('load'); pg.wait_for_selector('.job-hero, .job-box, .th-mine', timeout=20000)
@@ -26,7 +26,7 @@ with sync_playwright() as p:
     ok(not (st['me'].get('taking') or []) and st['me'].get('age') == 'senior', '어머니 기록은 비어 있고 65세 이상')
     ok('acetaminophen' in (st['stash'] or {}).get('taking', []), '내 약은 따로 쉬어 둠')
     ok(st['allow'] is False, '서버 이어 보기 꺼짐(나 아님)')
-    ok('어머니 약을 담아 두세요' in pg.inner_text('.job-hero'), '머리글이 어머니 님')
+    ok('어머니 약을 담아 두세요' in pg.inner_text('.job-hero').replace('\n', ' '), '머리글이 어머니 님')
     ok(pg.locator('.prof-chip').count() == 3 and pg.locator('.prof-note').count() == 1, '이름 줄 · 알림 안내')
     pg.evaluate("ME.taking=['ibuprofen'];saveMe()")
     pg.click('.prof-chip:has-text("나")'); pg.wait_for_load_state('load'); pg.wait_for_selector('.job-box, .th-mine', timeout=20000)
