@@ -5327,7 +5327,7 @@ try { 이용량.설치({ 앱: 'yakjido', 켜짐: false, 주소: 'https://uszalzc
 */
 (function () {
   if (window.메디나눔위기번호) return;
-  var 판 = '2026-11-17a';   /* 11-17a 영국 위기[1] NHS 111(2번) · 방글라데시 Kaan Pete Roi(시간 있음) · 나라 「안내」 한 줄(안내(나라, 말)) */   /* 11-05b 유럽연합 26나라(스페인 빼고) 112 · 11-04d 라오스 LA 구급 1195 · TH 1669·VN 115·KH 119 gov.uk 다시 확인 · 11-04c 머리 주석 정리 */
+  var 판 = '2026-11-19b';   /* 11-17a 영국 위기[1] NHS 111(2번) · 방글라데시 Kaan Pete Roi(시간 있음) · 나라 「안내」 한 줄(안내(나라, 말)) */   /* 11-05b 유럽연합 26나라(스페인 빼고) 112 · 11-04d 라오스 LA 구급 1195 · TH 1669·VN 115·KH 119 gov.uk 다시 확인 · 11-04c 머리 주석 정리 */
   var 표 = {
     KR: { 이름: { ko: '한국', en: 'Korea', es: 'Corea', ja: '韓国', zh: '韩国' }, 응급: '119', 경찰: '112', 위기: ['109', '1577-0199'] },
     US: { 이름: { ko: '미국', en: 'United States', es: 'Estados Unidos', ja: 'アメリカ', zh: '美国' }, 응급: '911', 경찰: '911', 위기: ['988'] },
@@ -5363,7 +5363,10 @@ try { 이용량.설치({ 앱: 'yakjido', 켜짐: false, 주소: 'https://uszalzc
     EE: { 이름: { ko: '에스토니아', en: 'Estonia', es: 'Estonia', ja: 'エストニア', zh: '爱沙尼亚' }, 응급: '112', 경찰: null, 위기: [] },
     FI: { 이름: { ko: '핀란드', en: 'Finland', es: 'Finlandia', ja: 'フィンランド', zh: '芬兰' }, 응급: '112', 경찰: null, 위기: [] },
     FR: { 이름: { ko: '프랑스', en: 'France', es: 'Francia', ja: 'フランス', zh: '法国' }, 응급: '112', 경찰: null, 위기: [] },
-    DE: { 이름: { ko: '독일', en: 'Germany', es: 'Alemania', ja: 'ドイツ', zh: '德国' }, 응급: '112', 경찰: null, 위기: [] },
+    AU: { 이름: { ko: '호주', en: 'Australia', es: 'Australia', ja: 'オーストラリア', zh: '澳大利亚' }, 응급: '000', 경찰: '000', 위기: ['13 11 14'] },   /* 11-19 Lifeline · 원천: lifeline.org.au · healthdirect.gov.au(000) · findahelpline.com/countries/au */
+    CA: { 이름: { ko: '캐나다', en: 'Canada', es: 'Canadá', ja: 'カナダ', zh: '加拿大' }, 응급: '911', 경찰: '911', 위기: ['988'] },   /* 11-19 9-8-8 전화·문자 · 원천: 988.ca · crtc.gc.ca(911) · findahelpline.com/countries/ca */
+    NZ: { 이름: { ko: '뉴질랜드', en: 'New Zealand', es: 'Nueva Zelanda', ja: 'ニュージーランド', zh: '新西兰' }, 응급: '111', 경찰: '111', 위기: ['1737'] },   /* 11-19 1737 전화·문자 · 원천: 1737.org.nz · police.govt.nz(111) · findahelpline.com/countries/nz */
+    DE: { 이름: { ko: '독일', en: 'Germany', es: 'Alemania', ja: 'ドイツ', zh: '德国' }, 응급: '112', 경찰: '110', 위기: ['0800 111 0 111', '0800 111 0 222', '116 123'], 안내: { ko: '텔레폰제엘조르게 — 독일어 상담 · 24시간 · 통화료 없음', en: 'TelefonSeelsorge — German-language counselling · 24 hours · free call', es: 'TelefonSeelsorge — atención en alemán · 24 horas · llamada gratuita', ja: 'テレフォンゼールゾルゲ — ドイツ語の相談 · 24時間 · 通話料なし', zh: 'TelefonSeelsorge — 德语咨询 · 24小时 · 免费电话' } },   /* 11-19 Main · 원천 둘: findahelpline.com/organizations/telefonseelsorge · telefonseelsorge.de(둘 다 0800 111 0 111 · 0800 111 0 222 · 116 123). 경찰 110 */
     GR: { 이름: { ko: '그리스', en: 'Greece', es: 'Grecia', ja: 'ギリシャ', zh: '希腊' }, 응급: '112', 경찰: null, 위기: [] },
     HU: { 이름: { ko: '헝가리', en: 'Hungary', es: 'Hungría', ja: 'ハンガリー', zh: '匈牙利' }, 응급: '112', 경찰: null, 위기: [] },
     IE: { 이름: { ko: '아일랜드', en: 'Ireland', es: 'Irlanda', ja: 'アイルランド', zh: '爱尔兰' }, 응급: '112', 경찰: null, 위기: [] },
@@ -5383,7 +5386,7 @@ try { 이용량.설치({ 앱: 'yakjido', 켜짐: false, 주소: 'https://uszalzc
   };
   /* 11-16 Main 결정(안전 쪽) — 나라 짐작은 이 한 곳에서. 시간대가 표에 있으면 그 나라 · 시간대는 읽히는데 표에 없으면 XX(「현지 응급 번호」 — 해외에서 119 가 안 통하는 나라가 많다) ·
      시간대를 «못 읽을 때만» 한국어 화면은 KR(119). 기기 언어의 지역(ko-KR·en-US)으로는 짐작하지 않는다(11-04h). 앱은 고른 나라(mn.place) → 이 짐작 순으로 쓴다 */
-  var 시간대표 = { 'Asia/Seoul': 'KR', 'Asia/Tokyo': 'JP', 'Asia/Shanghai': 'CN', 'Asia/Chongqing': 'CN', 'Asia/Urumqi': 'CN', 'Asia/Hong_Kong': 'HK', 'Europe/Madrid': 'ES', 'Atlantic/Canary': 'ES', 'Africa/Ceuta': 'ES',
+  var 시간대표 = { 'Pacific/Auckland': 'NZ', 'Pacific/Chatham': 'NZ', 'Asia/Seoul': 'KR', 'Asia/Tokyo': 'JP', 'Asia/Shanghai': 'CN', 'Asia/Chongqing': 'CN', 'Asia/Urumqi': 'CN', 'Asia/Hong_Kong': 'HK', 'Europe/Madrid': 'ES', 'Atlantic/Canary': 'ES', 'Africa/Ceuta': 'ES',
         'America/Mexico_City': 'MX', 'America/Monterrey': 'MX', 'America/Merida': 'MX', 'America/Cancun': 'MX', 'America/Chihuahua': 'MX', 'America/Mazatlan': 'MX', 'America/Hermosillo': 'MX', 'America/Tijuana': 'MX',
         'Europe/London': 'GB', 'Europe/Dublin': 'IE', 'Asia/Singapore': 'SG', 'Asia/Manila': 'PH', 'Asia/Kolkata': 'IN', 'Asia/Calcutta': 'IN', 'Pacific/Auckland': 'NZ',
         'Asia/Ho_Chi_Minh': 'VN', 'Asia/Saigon': 'VN', 'Asia/Bangkok': 'TH', 'Asia/Jakarta': 'ID', 'Asia/Makassar': 'ID', 'Asia/Jayapura': 'ID', 'Asia/Kathmandu': 'NP', 'Asia/Katmandu': 'NP', 'Asia/Tashkent': 'UZ', 'Asia/Samarkand': 'UZ',

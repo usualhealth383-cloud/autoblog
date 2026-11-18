@@ -3,7 +3,7 @@
 import http.server, socketserver, threading, functools, pathlib, sys
 from playwright.sync_api import sync_playwright
 D = pathlib.Path(__file__).resolve().parents[2] / 'docs' / 'yakjido'
-C = [(l, t) for l in ('ko-KR', 'en-US', 'es-ES', 'ja-JP', 'zh-CN') for t in ('Asia/Seoul', 'America/New_York', 'Europe/Madrid', 'Asia/Tokyo', 'Asia/Shanghai', 'Africa/Nairobi')]
+C = [(l, t) for l in ('ko-KR', 'en-US', 'es-ES', 'ja-JP', 'zh-CN') for t in ('Asia/Seoul', 'America/New_York', 'Europe/Madrid', 'Asia/Tokyo', 'Asia/Shanghai', 'Australia/Sydney', 'America/Toronto', 'Pacific/Auckland', 'Africa/Nairobi')]
 class _Q(http.server.SimpleHTTPRequestHandler):
     def log_message(self, *a): pass
 srv = socketserver.TCPServer(('127.0.0.1', 0), functools.partial(_Q, directory=str(D))); threading.Thread(target=srv.serve_forever, daemon=True).start()
