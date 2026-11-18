@@ -4051,26 +4051,93 @@ window.언어칸 = function () {
   /* 11-17 저녁 현욱님 방향 전환 1단계(?job=1 시안 — 기본 꺼짐) — 「하나의 일」 = 내 약.
      한 번 담으면 기억 · 새 약이 들어오면 내 약통 전체와 바로 겹침 판정(겹침 규칙 69) · 먹을 때 알림 · 가족 · 진료·약국에 내 약 한 장.
      새 임상 문장 없음 — 판정은 ixRun/ixCards(약 화면·같이 먹어도 되나요와 같은 엔진) */
-  function 오늘히어로(items) {
+  /* 11-18 Main 「C 장면 그림」(허브 §6 장면 언어 · 소아 홈과 같은 말) — 약지도 장면 = 창가 햇살 드는 약상자 선반.
+     약을 다 챙긴 날마다 선반에 작은 화분·병 하나(지난 7일 · 빈 날은 빈 동그라미) · 7일 다 채우면 창밖 무지개 + 그 주 한 번 축하.
+     그림은 코드(SVG 도형)만 — 새 그림 파일 없음 · 높이 360폭에서 200 px 안팎(화면 40% 안) */
+  function 장면날() {
+    var o = []; for (var i = 6; i >= 0; i--) { var s = 'none'; try { s = dayStat(dayBefore(i)).s; } catch (e) {} o.push(s === 'full' || s === 'skip'); } return o;
+  }
+  function 장면그림(날, 무) {
+    var g = '', n = 0;
+    날.forEach(function (on, i) { var x = 30 + i * 30, y = 164;
+      if (!on) { g += '<circle cx="' + x + '" cy="' + (y - 12) + '" r="10" class="sc-empty"/>'; return; }
+      n++;
+      g += i % 2 ? '<g class="sc-bottle"><rect x="' + (x - 8) + '" y="' + (y - 26) + '" width="16" height="26" rx="5"/><rect class="sc-cap" x="' + (x - 6) + '" y="' + (y - 32) + '" width="12" height="7" rx="2"/><rect class="sc-lab" x="' + (x - 8) + '" y="' + (y - 18) + '" width="16" height="8"/></g>'
+        : '<g class="sc-pot"><path class="sc-leaf" d="M' + x + ' ' + (y - 18) + 'c-9-2-11-11-8-16 6 1 9 7 8 16zM' + x + ' ' + (y - 18) + 'c8-3 11-10 9-15-6 0-9 6-9 15z"/><path d="M' + (x - 10) + ' ' + (y - 18) + 'h20l-3 18h-14z"/></g>';
+    });
+    return '<svg class="sc-svg" viewBox="0 0 360 220" role="img" aria-label="약상자 선반 그림 — 지난 7일 중 ' + n + '일 챙김' + (무 ? ' · 창밖 무지개' : '') + '">'
+      + '<defs><linearGradient id="scw" x1="0" y1="0" x2="0" y2="1"><stop offset="0" class="sc-w1"/><stop offset="1" class="sc-w2"/></linearGradient>'
+      + '<linearGradient id="scs" x1="0" y1="0" x2="0" y2="1"><stop offset="0" class="sc-s1"/><stop offset="1" class="sc-s2"/></linearGradient>'
+      + '<clipPath id="scc"><rect x="236" y="16" width="104" height="84" rx="14"/></clipPath></defs>'
+      + '<rect width="360" height="220" fill="url(#scw)"/>'
+      + '<path class="sc-beam" d="M236 100 L340 100 L214 164 L56 164 Z"/>'
+      + '<g clip-path="url(#scc)"><rect x="236" y="16" width="104" height="84" fill="url(#scs)"/><circle class="sc-sun" cx="312" cy="40" r="12"/>'
+      + (무 ? '<g class="sc-rb" fill="none" stroke-width="5"><path d="M250 100a38 38 0 0 1 76 0" stroke="#E8735A"/><path d="M256 100a32 32 0 0 1 64 0" stroke="#F2B544"/><path d="M262 100a26 26 0 0 1 52 0" stroke="#7DBE7A"/><path d="M268 100a20 20 0 0 1 40 0" stroke="#5FA8D3"/></g>' : '')
+      + '<path class="sc-hill" d="M236 92c22-12 46-12 66-4 14 5 26 4 38-2v14h-104z"/></g>'
+      + '<rect class="sc-frame" x="236" y="16" width="104" height="84" rx="14"/><path class="sc-bar" d="M288 16v84M236 58h104"/>'
+      + '<g class="sc-box"><rect x="254" y="118" width="72" height="46" rx="10"/><rect class="sc-lid" x="250" y="110" width="80" height="13" rx="6"/><path class="sc-cross" d="M290 129v24M278 141h24"/></g>'
+      + g
+      + '<rect class="sc-shelf" x="8" y="164" width="344" height="10" rx="4"/><rect class="sc-edge" x="8" y="171" width="344" height="3"/>'
+      + '</svg>';
+  }
+  function 약장면(o) {
+    var 날 = 장면날(); if (o.todayDone) 날[6] = true; var n = 날.filter(Boolean).length, 무 = n === 7;
+    if (무) { try { var wk = dayBefore(0).slice(0, 7) + ':' + Math.floor((new Date()).getDate() / 7); if (localStorage.getItem('yakjido.scene.rb') !== wk) { localStorage.setItem('yakjido.scene.rb', wk); setTimeout(function () { try { toast('7일 모두 챙기셨어요 — 무지개가 떴어요'); } catch (e) {} }, 600); } } catch (e) {} }
+    return '<div class="scn' + (o.sv ? ' sv' : '') + '">' + 장면그림(날, 무)
+      + '<div class="scn-say"><span class="th-eb">' + o.cap + '</span><h2 class="th-big">' + o.big + '</h2></div>'
+      + '<span class="scn-cnt">지난 7일 중 챙긴 날 ' + n + '일</span></div>' + (o.sub ? '<p class="th-sub scn-sub">' + o.sub + '</p>' : '');
+  }
+  function 장면타일(L) {
+    return '<div class="scn-tiles">' + L.map(function (x) { var a = x[0].charAt(0) === '#' ? '<a class="scn-t' + (x[4] ? ' ' + x[4] : '') + '" href="' + x[0] + '">' : '<button type="button" class="scn-t' + (x[4] ? ' ' + x[4] : '') + '" onclick="' + x[0] + '">';
+      return a + '<span class="scn-ic">' + (I[x[1]] || '') + '</span><b>' + x[2] + '</b>' + (x[3] ? '<small>' + x[3] + '</small>' : '') + (x[0].charAt(0) === '#' ? '</a>' : '</button>'); }).join('') + '</div>';
+  }
+  window.약장면 = 약장면;
+  try { var sct = document.createElement('style'); sct.id = 'scene-css'; sct.textContent =
+      ':root{--sc-w1:#FFF6E8;--sc-w2:#FBE7CF;--sc-s1:#BFE3F4;--sc-s2:#FFF3DA;--sc-wood:#C68B59;--sc-wood2:#A86F42;--sc-frame:#FFFFFF;--sc-box:#FFFFFF;--sc-lid:#E9F3F5;--sc-cross:#0B6E8F;--sc-pot:#D9875F;--sc-leaf:#5E9E6A;--sc-bot:#F2C98A;--sc-cap:#0B6E8F;--sc-lab:#FFFFFF;--sc-empty:#C9A98A;--sc-beam:rgba(255,236,190,.55);--sc-sun:#FFC94D;--sc-hill:#A9D39A;--sc-ink:#3A2A1E;--sc-sub:#6B5444;--sc-chip:rgba(255,255,255,.86);--tile:#FFFFFF;--tile-ic:#E7F2F5}'
+    + '@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--sc-w1:#2B2420;--sc-w2:#221C19;--sc-s1:#1D3A4C;--sc-s2:#3A3326;--sc-wood:#7A5638;--sc-wood2:#5E422B;--sc-frame:#3B332D;--sc-box:#3A3734;--sc-lid:#2C3A3E;--sc-cross:#7CC6DC;--sc-pot:#A8664A;--sc-leaf:#6FAE7B;--sc-bot:#B89466;--sc-cap:#7CC6DC;--sc-lab:#3A3734;--sc-empty:#7A6656;--sc-beam:rgba(255,220,160,.10);--sc-sun:#E3B04A;--sc-hill:#4F7448;--sc-ink:#F5ECE4;--sc-sub:#CDBBAE;--sc-chip:rgba(30,26,23,.78);--tile:#1E2427;--tile-ic:#243439}}'
+    + ':root[data-theme="dark"]{--sc-w1:#2B2420;--sc-w2:#221C19;--sc-s1:#1D3A4C;--sc-s2:#3A3326;--sc-wood:#7A5638;--sc-wood2:#5E422B;--sc-frame:#3B332D;--sc-box:#3A3734;--sc-lid:#2C3A3E;--sc-cross:#7CC6DC;--sc-pot:#A8664A;--sc-leaf:#6FAE7B;--sc-bot:#B89466;--sc-cap:#7CC6DC;--sc-lab:#3A3734;--sc-empty:#7A6656;--sc-beam:rgba(255,220,160,.10);--sc-sun:#E3B04A;--sc-hill:#4F7448;--sc-ink:#F5ECE4;--sc-sub:#CDBBAE;--sc-chip:rgba(30,26,23,.78);--tile:#1E2427;--tile-ic:#243439}'
+    + '.scn-wrap{margin:12px 0 0}.scn{position:relative;display:grid;border-radius:28px;overflow:hidden;background:var(--sc-w1)}.sc-svg{grid-area:1/1;align-self:end;display:block;width:100%;height:auto}.sc-edge{fill:var(--sc-wood2)}'
+    + '.sc-w1{stop-color:var(--sc-w1)}.sc-w2{stop-color:var(--sc-w2)}.sc-s1{stop-color:var(--sc-s1)}.sc-s2{stop-color:var(--sc-s2)}.sc-beam{fill:var(--sc-beam)}.sc-sun{fill:var(--sc-sun)}.sc-hill{fill:var(--sc-hill)}'
+    + '.sc-frame{fill:none;stroke:var(--sc-frame);stroke-width:6}.sc-bar{stroke:var(--sc-frame);stroke-width:4}.sc-box>rect{fill:var(--sc-box)}.sc-box .sc-lid{fill:var(--sc-lid)}.sc-cross{stroke:var(--sc-cross);stroke-width:7;stroke-linecap:round}'
+    + '.sc-shelf{fill:var(--sc-wood)}.sc-brk{fill:none;stroke:var(--sc-wood2);stroke-width:4;stroke-linecap:round}.sc-empty{fill:none;stroke:var(--sc-empty);stroke-width:2;stroke-dasharray:4 4}'
+    + '.sc-pot>path{fill:var(--sc-pot)}.sc-pot .sc-leaf{fill:var(--sc-leaf)}.sc-bottle>rect{fill:var(--sc-bot)}.sc-bottle .sc-cap{fill:var(--sc-cap)}.sc-bottle .sc-lab{fill:var(--sc-lab);opacity:.85}'
+    + '.scn-say{grid-area:1/1;align-self:start;position:relative;padding:16px 36% 27% 18px}.scn-say .th-eb{color:var(--sc-sub)}.scn-say .th-big{margin:2px 0 0;color:var(--sc-ink);font-size:1.3125rem;line-height:1.35}.scn-sub{margin:10px 2px 0;color:var(--muted);font-size:.9375rem;line-height:1.5;word-break:keep-all}'
+    + '.scn-cnt{position:absolute;left:14px;bottom:6px;padding:2px 10px;border-radius:999px;background:var(--sc-chip);color:var(--sc-ink);font-size:.8125rem;font-weight:700;line-height:1.5}'
+    + '.scn-go{text-decoration:none;display:flex;align-items:center;justify-content:center;width:100%;min-height:56px;margin:12px 0 0;font-size:1.125rem;font-weight:800;border-radius:18px}'
+    + '.scn-tiles{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:12px 0 4px}.scn-t{display:flex;flex-direction:column;align-items:flex-start;gap:6px;min-height:96px;padding:14px;border-radius:24px;background:var(--tile);border:0;box-shadow:none;color:var(--text);text-decoration:none;text-align:left;font:inherit;cursor:pointer;word-break:keep-all}'
+    + '.scn-t b{font-size:1rem;line-height:1.35}.scn-t small{color:var(--muted);font-size:.875rem;line-height:1.4}.scn-ic{display:inline-flex;align-items:center;justify-content:center;width:40px;height:40px;border-radius:50%;background:var(--tile-ic);color:var(--primary-deep)}.scn-ic .i{width:22px;height:22px}'
+    + '.scn-t.stop{outline:2px solid var(--alert,#D93A2B)}.scn-t.stop small{color:var(--alert,#B42318);font-weight:700}.scn-t.warn{outline:2px solid #B54708}.scn-t.warn small{color:#93370D;font-weight:700}'
+    + '.scn-safe{display:flex;align-items:center;gap:8px;min-height:48px;margin:0 0 10px;padding:10px 14px;border-radius:16px;text-decoration:none;font-weight:700}.scn-safe.stop{background:var(--alert-tint);color:var(--alert,#B42318)}.scn-safe.low{background:var(--normal-tint,#F2F8FA);color:var(--text);font-weight:600}'
+    + '.scn.sv .scn-say .th-big{font-size:1.5rem}.scn-wrap.sv .scn-sub{font-size:1.125rem}.scn.sv .scn-cnt{font-size:1rem}.scn-wrap.sv .scn-go{min-height:64px;font-size:1.3125rem}.scn-tiles.sv .scn-t b{font-size:1.1875rem}.scn-tiles.sv .scn-t small{font-size:1rem}'
+    + '@media (max-width:380px){.scn-say .th-big{font-size:1.1875rem}.scn.sv .scn-say .th-big{font-size:1.375rem}}';
+    document.head.appendChild(sct); } catch (e) {}
+  function 오늘히어로(items, sv) {
     var tk = takenSet(), now = new Date(), nm = now.getHours() * 60 + now.getMinutes(), rows = [];
     items.forEach(function (d) { schedOf(d.id, d).forEach(function (t) { var hm = t.split(':'); rows.push({ d: d, t: t, min: +hm[0] * 60 + +hm[1], k: d.id + '@' + t }); }); });
     rows.sort(function (a, b) { return a.min - b.min; });
     var left = rows.filter(function (r) { return tk.indexOf(r.k) < 0 && !isSkipped(r.k); }), stk = 0; try { stk = streakDays(); } catch (e) {}
     var nx = left[0], slot = nx ? left.filter(function (r) { return r.t === nx.t; }) : [], due = nx && nx.min <= nm + 30;
     var nmz = function (r) { return esc(String(r.d.simple && !r.d.name ? r.d.simple : r.d.name || '').split(' (')[0]); };
-    var 위 = '';
-    if (!rows.length) 위 = '<div class="th-b"><span class="th-eb">오늘 약</span><b class="th-big">필요할 때 드시는 약만 있어요</b><p class="th-sub">드실 때 「먹었어요」로 적어 두면 간격을 알려 드려요.</p><a class="btn th-go" href="#/schedule">드신 것 적기</a></div>';
-    else if (!nx) 위 = '<div class="th-b ok"><span class="th-eb">오늘 약</span><b class="th-big">오늘 약을 다 챙기셨어요</b><p class="th-sub">' + (stk >= 2 ? stk + '일째 이어지고 있어요. ' : '') + '내일 ' + rows[0].t + '에 다시 알려 드릴게요.</p><button type="button" class="link th-share" onclick="shareOut({title:\'약지도\',text:\'오늘 약을 다 챙겨 먹었어요. — 약지도\'})">가족에게 알리기 ›</button></div>';
-    else 위 = '<div class="th-b' + (due ? ' due' : '') + '"><span class="th-eb">오늘 약' + (stk >= 2 ? ' · ' + stk + '일째' : '') + '</span><b class="th-big">' + (due ? (nx.min <= nm ? '지금 드실 시간' : '곧 드실 시간') + ' · ' + nx.t : '다음은 ' + nx.t) + '</b><p class="th-sub">' + slot.map(nmz).join(' · ') + ' · 오늘 ' + left.length + '번 남았어요</p>'
-      + '<button type="button" class="btn th-go" ' + DI('solid') + ' onclick="tickFromNote(\'' + slot.map(function (r) { return r.k; }).join(',') + '\');armNotifications();route()">먹었어요</button></div>';
-    var low = []; try { low = lowStock(); } catch (e) {}
     var 판 = '', stop = 0, warn = 0; try { var C = ixCards(ixRun([])); stop = C.filter(function (c) { return c.lv === 'stop'; }).length; warn = C.filter(function (c) { return c.lv === 'warn'; }).length; } catch (e) {}
-    판 = stop ? '<b class="th-stop">같이 드시면 안 되는 것 ' + stop + '</b>' : warn ? '<b class="th-warn">조심할 것 ' + warn + '</b>' : '겹침 없음';
+    판 = stop ? '같이 드시면 안 되는 것 ' + stop : warn ? '조심할 것 ' + warn : '겹침 없음';
+    var low = []; try { low = lowStock(); } catch (e) {}
     var 누구 = profIsMe() ? '내 약' : esc(profCall(profName())) + ' 약';
-    return '<section class="th card">' + profRow() + 위 + famToday()
-      + (low.length ? '<p class="th-low">' + I.alert + '<span><b>곧 떨어져요</b> — ' + low.map(function (x) { return esc(x.n) + ' ' + x.days + '일치'; }).join(' · ') + '</span></p>' : '') + '</section>'
-      + '<section class="th-mine card"><a class="th-m" href="#/together"><b>' + 누구 + ' ' + items.length + '가지</b><span> · ' + 판 + '</span>' + I.chev + '</a>'
-      + '<div class="th-act"><button type="button" class="link" onclick="go(\'/together\')">+ 약 더하기</button><button type="button" class="link" onclick="내약더()">더 ›</button></div></section>';
+    /* 안전 줄 먼저(허브 §6 ⑤) — 같이 먹으면 안 되는 것 · 곧 떨어지는 약은 장면보다 위 */
+    var 안전 = (stop ? '<a class="scn-safe stop" href="#/together">' + I.alert + '<span>' + 누구 + ' 중 같이 드시면 안 되는 것 ' + stop + ' — 확인하기 ›</span></a>' : '')
+      + (low.length ? '<p class="scn-safe low">' + I.alert + '<span><b>곧 떨어져요</b> — ' + low.map(function (x) { return esc(x.n) + ' ' + x.days + '일치'; }).join(' · ') + '</span></p>' : '');
+    var cap = '오늘 약' + (stk >= 2 ? ' · ' + stk + '일째' : ''), big, sub = '', 단추, done = false;
+    if (!rows.length) { big = '필요할 때<br>드시는 약만 있어요'; sub = '드실 때 「먹었어요」로 적어 두면 간격을 알려 드려요.'; 단추 = '<a class="btn th-go scn-go" ' + DI('solid') + ' href="#/schedule">드신 것 적기</a>'; }
+    else if (!nx) { done = true; big = '오늘 약을<br>다 챙기셨어요'; sub = '내일 ' + rows[0].t + '에 다시 알려 드릴게요.'; 단추 = '<a class="btn th-go scn-go" ' + DI('solid') + ' href="#/together">약 찾기</a>'; }
+    else { big = due ? nx.t + ' 약<br>' + (nx.min <= nm ? '지금 드실 시간' : '곧 드실 시간') : '다음 약은<br>' + nx.t; sub = slot.map(nmz).join(' · ') + ' · 오늘 ' + left.length + '번 남았어요';
+      단추 = '<button type="button" class="btn th-go scn-go" ' + DI('solid') + ' onclick="tickFromNote(\'' + slot.map(function (r) { return r.k; }).join(',') + '\');armNotifications();route()">' + (due ? '먹었어요' : '오늘 약 챙기기 · 먹었어요') + '</button>'; }
+    var 타일 = [['#/together', 'pill', 누구 + ' ' + items.length + '가지', 판, stop ? 'stop' : warn ? 'warn' : ''], ['go(\'/together\')', 'cross', '약 더하기', '이름 · 사진 · 바코드'],
+      ['#/notify', 'clock', '알림', '약 시간 · 약 떨어짐'], ['#/send', 'heart', '가족에게', '약 보내기 · 함께 보기'],
+      ['#/bag', 'book', '내 약 한 장', '진료·약국에 보여 줄 한 장'], ['내약더()', 'chev', '더 보기', '약통 · 가족 약 따로', 'scn-more']];
+    return '<section class="th scn-wrap' + (sv ? ' sv' : '') + '">' + 안전 + profRow() + 약장면({ cap: cap, big: big, sub: sub, sv: sv, todayDone: done }) + 단추 + famToday() + '</section>'
+      + '<section class="th-mine' + (sv ? ' sv' : '') + '">' + 장면타일(타일).replace('class="scn-tiles"', 'class="scn-tiles' + (sv ? ' sv' : '') + '"') + (sv ? 쉬운목록(items) : '') + '</section>';
+  }
+  function 쉬운목록(items) {
+    return '<ul class="job-list">' + items.slice(0, 6).map(function (d) { var dk = d.class || ((typeof drug === 'function' && drug(d.id)) || {}).class, c0 = (D.classes || []).filter(function (c) { return c.id === dk; })[0], g = d.quick ? d.quick.g.n : c0 ? String(c0.name).split('(')[0].trim() : ''; return '<li><b>' + esc(짧은이름(d.name)) + '</b>' + (g ? '<span>' + esc(g) + '</span>' : '') + '</li>'; }).join('') + (items.length > 6 ? '<li><a href="#/me?t=meds">' + (items.length - 6) + '가지 더 ›</a></li>' : '') + '</ul>';
   }
   window.내약더 = function () { var o = document.createElement('div'); o.className = 'dlg-bg'; o.setAttribute('role', 'dialog'); o.setAttribute('aria-label', '내 약 더 보기');
     var L = [['#/notify', '알림', '약 시간 · 다시 알림 · 약 떨어짐'], ['#/send', '가족에게', '부모님께 약 보내기 · 함께 보기'], ['#/bag', '내 약 한 장', '진료·약국에 보여 줄 한 장'], ['#/me?t=meds', '약통', '담은 약 고치기 · 빼기'], ['#/barcode', '상자 바코드로 담기', '약 상자 옆 막대 무늬를 비춰서'], ['#/people', '가족 약 따로 담기', '어머니·아이 약을 사람마다']];
@@ -4079,7 +4146,13 @@ window.언어칸 = function () {
   function 내약칸() {
     var items = []; try { items = takingItems(); } catch (e) {}
     /* 11-18 Main 정리 2차 — 원래 판(간단히 보기 아님): 맨 위 = 「오늘 약」 히어로(다음 회차 + 큰 먹었어요 한 단추 · 가족 한 줄), 그 아래 내 약 한 줄 카드. 단추 넷은 「더 ›」 시트로 */
-    if (items.length && !document.documentElement.classList.contains('ink') && !(typeof svOn === 'function' && svOn()) && !ALLV()) return 오늘히어로(items);
+    var 잉 = document.documentElement.classList.contains('ink'), sv0 = typeof svOn === 'function' && svOn();
+    /* 11-18 Main 「C 장면 그림」 — 원래 판·간단히 보기 모두 같은 장면(간단히 보기는 글자 크게) · ?all=1 은 예전 판 */
+    if (items.length && !잉 && !ALLV()) return 오늘히어로(items, sv0);
+    if (!items.length && !잉 && !ALLV()) { var 누 = (profIsMe() ? '내 약을' : esc(profCall(profName())) + ' 약을') + '<br>담아 두세요';
+      return '<section class="job-hero scn-wrap' + (sv0 ? ' sv' : '') + '">' + profRow() + 약장면({ cap: '오늘 약', big: 누, sub: '한 번 담으면 기억해요. 새 약이 들어오면 <b>같이 먹으면 안 되는 것</b>을 바로 알려 드려요.', sv: sv0 })
+        + '<button type="button" class="btn th-go scn-go" ' + DI('solid') + ' onclick="go(\'/together\')">약 찾기</button>' + famToday() + '</section>'
+        + '<section class="th-mine' + (sv0 ? ' sv' : '') + '">' + 장면타일([['go(\'/photo\')', 'search', '사진으로 담기', '약봉투·처방전'], ['#/barcode', 'cross', '상자 바코드로', '상자 옆 막대 무늬'], ['#/kinds', 'pill', '종류만 골라 담기', '이름을 몰라도'], ['#/people', 'heart', '가족 약 따로', '어머니·아이 약']]).replace('class="scn-tiles"', 'class="scn-tiles' + (sv0 ? ' sv' : '') + '"') + '</section>'; }
     if (!items.length) return '<section class="job-hero' + (document.documentElement.classList.contains('ink') ? '' : ' card') + '">' + profRow() + 잉크얼굴(72) + '<h1>' + (profIsMe() ? '내 약을 담아 두세요' : esc(profCall(profName())) + ' 약을 담아 두세요') + '</h1><p>한 번 담으면 기억해요. 새 약이 들어오면 <b>같이 먹으면 안 되는 것</b>을 바로 알려 드려요.</p>' +
       '<div class="job-add"><button type="button" class="btn" ' + DI('solid') + ' onclick="go(\'/photo\')">약봉투·처방전 사진으로</button><button type="button" class="btn line" onclick="go(\'/together\')">약 이름으로 찾기</button></div>' +
       '<p class="job-small"><a href="#/kinds">이름을 몰라도 종류만 골라 담기 ›</a></p>' + famToday() + profLink() + '</section>';
