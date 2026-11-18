@@ -3889,6 +3889,8 @@ function findIx(){ if (FIND.ix || !window.약지도찾기 || !LEX.brand || CORE 
   /^#\/search/.test(location.hash) ? redraw() : lexRedraw(true); }
 function findFix(q, res){
   if (!FIND?.ix) return null; let f = null; try { f = 약지도찾기.고치기(FIND.ix, q, res.map(h => h.t)); } catch (e) {} if (!f) return null;
+  /* 11-18 숫자·%·용량이 다르면 오타로 고치지 않는다(160 → 100 · 너스텝 5% → 50% 사고) */
+  const N_ = w => (String(w).match(/\d+(\.\d+)?/g) || []).join(); if (N_(f.질의) !== N_(q)) return null; f.다른 = (f.다른 || []).filter(w => N_(w) === N_(q));
   /* 초성 하나만 쳤으면 다음 후보 둘도 몇 줄씩 — 새 결과를 더한 말만 「혹시 ○○·○○?」에 적는다 */
   const seen = new Set(), used = [], r2 = [];
   [f.질의, ...f.다른].forEach((w, i) => { const add = search(w, true).slice(0, i ? 3 : 99).filter(h => !seen.has(h.h + h.t) && seen.add(h.h + h.t)); if (add.length) { used.push(w); r2.push(...add); } });

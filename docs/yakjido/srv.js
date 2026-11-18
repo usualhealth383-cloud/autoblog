@@ -2033,6 +2033,13 @@ const Q꼬리 = /\s*(먹어도\s*(돼|되)[요예나]?|먹어도\s*괜찮[아나
 window.qClean = function (q) { let s = String(q || '').replace(/·/g, ' ').replace(/(^|\s)목이?\s*(아파|아프|아플|따가|따끔|칼칼|부었|부어)\S*(\s*때)?/, '$1목 아픔 ').replace(/(^|\s)배가?\s*(아파|아프|아플|쥐어짜|살살)\S*(\s*때)?/, '$1복통 '), k = 0;   /* 11-18 — 한 글자 몸 낱말(목·배)이 찾기에서 빠져 「아플 때」가 방광염으로 가던 것 */ const a = s.replace(Q사람, ''); if (a.trim()) s = a; const tm = s.replace(/^(밤에|밤마다|자기\s*전에?|아침에|아침마다|요즘|요새|어제부터|며칠째|며칠\s*전부터|갑자기)\s+/, ''); if (tm.trim()) s = tm; while (k++ < 4) { const b = s.replace(Q꼬리, ''); if (b === s || !b.trim()) break; s = b; } return s.trim() || q; };
 /* 11-18 — 이웃한 두 글자 자리 바뀜(루부펜→부루펜 · 키테미→키미테 · 보노민→노보민). 0건일 때만, 3글자 넘는 말에서 앞쪽부터 몇 개만 */
 window.qSwap = function (q) { const w = String(q || ''), out = []; for (let i = 0; i < Math.min(w.length - 1, 8); i++) { if (!/[가-힣]/.test(w[i]) || !/[가-힣]/.test(w[i + 1]) || w[i] === w[i + 1]) continue; out.push(w.slice(0, i) + w[i + 1] + w[i] + w.slice(i + 2)); } return w.length >= 3 ? out : []; };
+/* 11-18 Main(너스텝 교훈) — 검색어에 숫자(용량·%)가 있는데 1위 제품에 그 숫자가 없으면: 숫자를 뺀 이름으로 다시 찾아 그 숫자가 든 제품을 앞으로, 없으면 이름 그대로의 결과(브랜드·성분 화면)를. 다른 숫자 제품으로 보내지 않는다 */
+try { const _수 = search; search = function (q, nf) { const r = _수(q, nf); if (nf) return r; const N = String(q || '').match(/\d+(\.\d+)?/g); if (!N || !r.length) return r;
+  const nums = h => (String((h.t || '') + ' ' + decodeURIComponent(h.h || '')).match(/\d+(\.\d+)?/g) || []), has = h => nums(h).some(x => N.indexOf(x) >= 0);
+  if (has(r[0]) || !/^\/(drug|brand|pillinfo|pub)\//.test(r[0].h || '')) return r;
+  const base = String(q).replace(/\d+(\.\d+)?\s*(mg|mcg|ml|iu|g|%|㎎|정|알|캡슐|시간|\+)?/gi, ' ').replace(/\s+/g, ' ').trim(); if (!base) return r;
+  const rb = _수(base, true); if (!rb.length) return r;
+  const seen = new Set(), out = []; rb.filter(has).concat(r.filter(has), rb, r).forEach(h => { const k = h.h + '|' + h.t; if (!seen.has(k)) { seen.add(k); out.push(h); } }); if (r.fix) out.fix = r.fix; return out; }; } catch (e) {}
 /* 11-18 Main(너스텝 교훈) — 찾기에서도 「A 말고/빼고/대신/아니고/아닌 B」: B 로 찾고 A 이름이 든 결과는 뺀다. B 가 없으면 A 의 갈래로 */
 try { const _찾기 = search; search = function (q, nf) { const 부 = window.__부정 && window.__부정(q); if (!부) return _찾기(q, nf);
     let rest = 부.rest; if (!rest) { const d0 = 부.ids.map(i => drug(i)).filter(Boolean)[0], c0 = d0 && (D.classes || []).find(c => c.id === d0.class); rest = c0 ? (c0.short || c0.name) : ''; }

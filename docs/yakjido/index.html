@@ -1810,7 +1810,7 @@ html:not(.ink) .rf-none{display:none}</style>
 <script>
 window.__YAKJIDO_OK__ = true;
 const D = JSON.parse(document.getElementById('data').textContent || '{}');
-const BUILD = '2026-11-19 01:20';
+const BUILD = '2026-11-19 01:50';
 const DATAV = '67ebd68324'.indexOf('__') === 0 ? BUILD : '67ebd68324';
 const BRANDMARK = (typeof window !== 'undefined' && window.__BRANDMARK__) || 'icon-192.png';
 let CORE = 0, CORE_P = null;
@@ -3313,6 +3313,7 @@ try { FIND.ix = 약지도찾기.만들기(D, LEX, [...Object.keys(SEARCH_SYN), .
 /^#\/search/.test(location.hash) ? redraw() : lexRedraw(true); }
 function findFix(q, res){
 if (!FIND?.ix) return null; let f = null; try { f = 약지도찾기.고치기(FIND.ix, q, res.map(h => h.t)); } catch (e) {} if (!f) return null;
+const N_ = w => (String(w).match(/\d+(\.\d+)?/g) || []).join(); if (N_(f.질의) !== N_(q)) return null; f.다른 = (f.다른 || []).filter(w => N_(w) === N_(q));
 const seen = new Set(), used = [], r2 = [];
 [f.질의, ...f.다른].forEach((w, i) => { const add = search(w, true).slice(0, i ? 3 : 99).filter(h => !seen.has(h.h + h.t) && seen.add(h.h + h.t)); if (add.length) { used.push(w); r2.push(...add); } });
 if (!r2.length) return null; r2.fix = used.join('·'); return r2;
