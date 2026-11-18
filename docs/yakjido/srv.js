@@ -4096,7 +4096,7 @@ window.언어칸 = function () {
       ':root{--sc-w1:#FFF6E8;--sc-w2:#FBE7CF;--sc-s1:#BFE3F4;--sc-s2:#FFF3DA;--sc-wood:#C68B59;--sc-wood2:#A86F42;--sc-frame:#FFFFFF;--sc-box:#FFFFFF;--sc-lid:#E9F3F5;--sc-cross:#0B6E8F;--sc-pot:#D9875F;--sc-leaf:#5E9E6A;--sc-bot:#F2C98A;--sc-cap:#0B6E8F;--sc-lab:#FFFFFF;--sc-empty:#C9A98A;--sc-beam:rgba(255,236,190,.55);--sc-sun:#FFC94D;--sc-hill:#A9D39A;--sc-ink:#3A2A1E;--sc-sub:#6B5444;--sc-chip:rgba(255,255,255,.86);--tile:#FFFFFF;--tile-ic:#E7F2F5}'
     + '@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--sc-w1:#2B2420;--sc-w2:#221C19;--sc-s1:#1D3A4C;--sc-s2:#3A3326;--sc-wood:#7A5638;--sc-wood2:#5E422B;--sc-frame:#3B332D;--sc-box:#3A3734;--sc-lid:#2C3A3E;--sc-cross:#7CC6DC;--sc-pot:#A8664A;--sc-leaf:#6FAE7B;--sc-bot:#B89466;--sc-cap:#7CC6DC;--sc-lab:#3A3734;--sc-empty:#7A6656;--sc-beam:rgba(255,220,160,.10);--sc-sun:#E3B04A;--sc-hill:#4F7448;--sc-ink:#F5ECE4;--sc-sub:#CDBBAE;--sc-chip:rgba(30,26,23,.78);--tile:#1E2427;--tile-ic:#243439}}'
     + ':root[data-theme="dark"]{--sc-w1:#2B2420;--sc-w2:#221C19;--sc-s1:#1D3A4C;--sc-s2:#3A3326;--sc-wood:#7A5638;--sc-wood2:#5E422B;--sc-frame:#3B332D;--sc-box:#3A3734;--sc-lid:#2C3A3E;--sc-cross:#7CC6DC;--sc-pot:#A8664A;--sc-leaf:#6FAE7B;--sc-bot:#B89466;--sc-cap:#7CC6DC;--sc-lab:#3A3734;--sc-empty:#7A6656;--sc-beam:rgba(255,220,160,.10);--sc-sun:#E3B04A;--sc-hill:#4F7448;--sc-ink:#F5ECE4;--sc-sub:#CDBBAE;--sc-chip:rgba(30,26,23,.78);--tile:#1E2427;--tile-ic:#243439}'
-    + '.scn-wrap{margin:12px 0 0}.scn{position:relative;display:grid;border-radius:28px;overflow:hidden;background:var(--sc-w1)}.sc-svg{grid-area:1/1;align-self:end;display:block;width:100%;height:auto}.sc-edge{fill:var(--sc-wood2)}'
+    + '.th.scn-wrap,html:not(.ink) .job-hero.scn-wrap,.th-mine.scn-box{margin:12px 0 0;padding:0;background:none;border:0;box-shadow:none;text-align:left}.scn{position:relative;display:grid;border-radius:28px;overflow:hidden;background:var(--sc-w1)}.sc-svg{grid-area:1/1;align-self:end;display:block;width:100%;height:auto}.sc-edge{fill:var(--sc-wood2)}'
     + '.sc-w1{stop-color:var(--sc-w1)}.sc-w2{stop-color:var(--sc-w2)}.sc-s1{stop-color:var(--sc-s1)}.sc-s2{stop-color:var(--sc-s2)}.sc-beam{fill:var(--sc-beam)}.sc-sun{fill:var(--sc-sun)}.sc-hill{fill:var(--sc-hill)}'
     + '.sc-frame{fill:none;stroke:var(--sc-frame);stroke-width:6}.sc-bar{stroke:var(--sc-frame);stroke-width:4}.sc-box>rect{fill:var(--sc-box)}.sc-box .sc-lid{fill:var(--sc-lid)}.sc-cross{stroke:var(--sc-cross);stroke-width:7;stroke-linecap:round}'
     + '.sc-shelf{fill:var(--sc-wood)}.sc-brk{fill:none;stroke:var(--sc-wood2);stroke-width:4;stroke-linecap:round}.sc-empty{fill:none;stroke:var(--sc-empty);stroke-width:2;stroke-dasharray:4 4}'
@@ -4117,7 +4117,7 @@ window.언어칸 = function () {
     rows.sort(function (a, b) { return a.min - b.min; });
     var left = rows.filter(function (r) { return tk.indexOf(r.k) < 0 && !isSkipped(r.k); }), stk = 0; try { stk = streakDays(); } catch (e) {}
     var nx = left[0], slot = nx ? left.filter(function (r) { return r.t === nx.t; }) : [], due = nx && nx.min <= nm + 30;
-    var nmz = function (r) { return esc(String(r.d.simple && !r.d.name ? r.d.simple : r.d.name || '').split(' (')[0]); };
+    var nmz = function (r) { return esc(한이름(r.d.simple && !r.d.name ? r.d.simple : r.d.name)); };
     var 판 = '', stop = 0, warn = 0; try { var C = ixCards(ixRun([])); stop = C.filter(function (c) { return c.lv === 'stop'; }).length; warn = C.filter(function (c) { return c.lv === 'warn'; }).length; } catch (e) {}
     판 = stop ? '같이 드시면 안 되는 것 ' + stop : warn ? '조심할 것 ' + warn : '겹침 없음';
     var low = []; try { low = lowStock(); } catch (e) {}
@@ -4134,10 +4134,12 @@ window.언어칸 = function () {
       ['#/notify', 'clock', '알림', '약 시간 · 약 떨어짐'], ['#/send', 'heart', '가족에게', '약 보내기 · 함께 보기'],
       ['#/bag', 'book', '내 약 한 장', '진료·약국에 보여 줄 한 장'], ['내약더()', 'chev', '더 보기', '약통 · 가족 약 따로', 'scn-more']];
     return '<section class="th scn-wrap' + (sv ? ' sv' : '') + '">' + 안전 + profRow() + 약장면({ cap: cap, big: big, sub: sub, sv: sv, todayDone: done }) + 단추 + famToday() + '</section>'
-      + '<section class="th-mine' + (sv ? ' sv' : '') + '">' + 장면타일(타일).replace('class="scn-tiles"', 'class="scn-tiles' + (sv ? ' sv' : '') + '"') + (sv ? 쉬운목록(items) : '') + '</section>';
+      + '<section class="th-mine scn-box' + (sv ? ' sv' : '') + '">' + 장면타일(타일).replace('class="scn-tiles"', 'class="scn-tiles' + (sv ? ' sv' : '') + '"') + (sv ? 쉬운목록(items) : '') + '</section>';
   }
+  /* 11-18 Main — 한 약 이름에 성분 둘이 «·»로 붙은 묶음 항목(오메프라졸·에스오메프라졸 (강한 위산 억제제))은 두 약처럼 읽힌다 → 괄호 속 갈래 이름 */
+  function 한이름(n) { n = String(n || ''); var b = n.split(' (')[0], m = n.match(/\(([^)]+)\)/); return b.indexOf('·') >= 0 && m ? m[1] : b; }
   function 쉬운목록(items) {
-    return '<ul class="job-list">' + items.slice(0, 6).map(function (d) { var dk = d.class || ((typeof drug === 'function' && drug(d.id)) || {}).class, c0 = (D.classes || []).filter(function (c) { return c.id === dk; })[0], g = d.quick ? d.quick.g.n : c0 ? String(c0.name).split('(')[0].trim() : ''; return '<li><b>' + esc(짧은이름(d.name)) + '</b>' + (g ? '<span>' + esc(g) + '</span>' : '') + '</li>'; }).join('') + (items.length > 6 ? '<li><a href="#/me?t=meds">' + (items.length - 6) + '가지 더 ›</a></li>' : '') + '</ul>';
+    return '<ul class="job-list">' + items.slice(0, 6).map(function (d) { var dk = d.class || ((typeof drug === 'function' && drug(d.id)) || {}).class, c0 = (D.classes || []).filter(function (c) { return c.id === dk; })[0], g = d.quick ? d.quick.g.n : c0 ? String(c0.name).split('(')[0].trim() : ''; return '<li><b>' + esc(String(d.name || '').split(' (')[0].indexOf('·') >= 0 ? 한이름(d.name) : 짧은이름(d.name)) + '</b>' + (g ? '<span>' + esc(g) + '</span>' : '') + '</li>'; }).join('') + (items.length > 6 ? '<li><a href="#/me?t=meds">' + (items.length - 6) + '가지 더 ›</a></li>' : '') + '</ul>';
   }
   window.내약더 = function () { var o = document.createElement('div'); o.className = 'dlg-bg'; o.setAttribute('role', 'dialog'); o.setAttribute('aria-label', '내 약 더 보기');
     var L = [['#/notify', '알림', '약 시간 · 다시 알림 · 약 떨어짐'], ['#/send', '가족에게', '부모님께 약 보내기 · 함께 보기'], ['#/bag', '내 약 한 장', '진료·약국에 보여 줄 한 장'], ['#/me?t=meds', '약통', '담은 약 고치기 · 빼기'], ['#/barcode', '상자 바코드로 담기', '약 상자 옆 막대 무늬를 비춰서'], ['#/people', '가족 약 따로 담기', '어머니·아이 약을 사람마다']];
@@ -4152,7 +4154,7 @@ window.언어칸 = function () {
     if (!items.length && !잉 && !ALLV()) { var 누 = (profIsMe() ? '내 약을' : esc(profCall(profName())) + ' 약을') + '<br>담아 두세요';
       return '<section class="job-hero scn-wrap' + (sv0 ? ' sv' : '') + '">' + profRow() + 약장면({ cap: '오늘 약', big: 누, sub: '한 번 담으면 기억해요. 새 약이 들어오면 <b>같이 먹으면 안 되는 것</b>을 바로 알려 드려요.', sv: sv0 })
         + '<button type="button" class="btn th-go scn-go" ' + DI('solid') + ' onclick="go(\'/together\')">약 찾기</button>' + famToday() + '</section>'
-        + '<section class="th-mine' + (sv0 ? ' sv' : '') + '">' + 장면타일([['go(\'/photo\')', 'search', '사진으로 담기', '약봉투·처방전'], ['#/barcode', 'cross', '상자 바코드로', '상자 옆 막대 무늬'], ['#/kinds', 'pill', '종류만 골라 담기', '이름을 몰라도'], ['#/people', 'heart', '가족 약 따로', '어머니·아이 약']]).replace('class="scn-tiles"', 'class="scn-tiles' + (sv0 ? ' sv' : '') + '"') + '</section>'; }
+        + '<section class="th-mine scn-box' + (sv0 ? ' sv' : '') + '">' + 장면타일([['go(\'/photo\')', 'search', '사진으로 담기', '약봉투·처방전'], ['#/barcode', 'cross', '상자 바코드로', '상자 옆 막대 무늬'], ['#/kinds', 'pill', '종류만 골라 담기', '이름을 몰라도'], ['#/people', 'heart', '가족 약 따로', '어머니·아이 약']]).replace('class="scn-tiles"', 'class="scn-tiles' + (sv0 ? ' sv' : '') + '"') + '</section>'; }
     if (!items.length) return '<section class="job-hero' + (document.documentElement.classList.contains('ink') ? '' : ' card') + '">' + profRow() + 잉크얼굴(72) + '<h1>' + (profIsMe() ? '내 약을 담아 두세요' : esc(profCall(profName())) + ' 약을 담아 두세요') + '</h1><p>한 번 담으면 기억해요. 새 약이 들어오면 <b>같이 먹으면 안 되는 것</b>을 바로 알려 드려요.</p>' +
       '<div class="job-add"><button type="button" class="btn" ' + DI('solid') + ' onclick="go(\'/photo\')">약봉투·처방전 사진으로</button><button type="button" class="btn line" onclick="go(\'/together\')">약 이름으로 찾기</button></div>' +
       '<p class="job-small"><a href="#/kinds">이름을 몰라도 종류만 골라 담기 ›</a></p>' + famToday() + profLink() + '</section>';
