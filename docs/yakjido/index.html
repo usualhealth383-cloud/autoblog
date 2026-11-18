@@ -1810,8 +1810,8 @@ html:not(.ink) .rf-none{display:none}</style>
 <script>
 window.__YAKJIDO_OK__ = true;
 const D = JSON.parse(document.getElementById('data').textContent || '{}');
-const BUILD = '2026-11-18 12:54';
-const DATAV = '7279b4ecee'.indexOf('__') === 0 ? BUILD : '7279b4ecee';
+const BUILD = '2026-11-18 13:35';
+const DATAV = '67ebd68324'.indexOf('__') === 0 ? BUILD : '67ebd68324';
 const BRANDMARK = (typeof window !== 'undefined' && window.__BRANDMARK__) || 'icon-192.png';
 let CORE = 0, CORE_P = null;
 function mergeCore(c){
@@ -3053,7 +3053,7 @@ return `<div id="hlist" role="tabpanel" aria-label="증상 목록">${body}</div>
 }
 function homeTab(k){
 HTAB = k; try { sessionStorage.setItem('yakjido.htab', k); } catch (e) {}
-TIDY.hsym = 1; document.querySelector('[data-k=hsym]')?.setAttribute('open', '');
+TIDY.hsym = TIDY.hmore = 1; document.querySelectorAll('[data-k=hsym],[data-k=hmore]').forEach(d => d.setAttribute('open', ''));
 const el = document.getElementById('hlist'); if (!el) return route();
 el.outerHTML = homeList();
 document.querySelectorAll('.htabs .tab').forEach(b => { const on = b.dataset.k === k; b.classList.toggle('on', on); b.setAttribute('aria-selected', on); });
@@ -3061,7 +3061,7 @@ document.querySelectorAll('.htabs .tab').forEach(b => { const on = b.dataset.k =
 const storeBar = () => STORE_OK || STORE_HIDE ? '' : `<div class="note soft store-bar">${I.info}<span>이 브라우저에서는 기록이 저장되지 않아요 — 일반 창이나 설치한 앱에서 써 주세요</span><button type="button" class="store-x" onclick="storeHide()" aria-label="이 안내 닫기">${I.x}</button></div>`;
 function storeHide(){ STORE_HIDE = true; try { sessionStorage.setItem('yakjido.storehide', '1'); } catch (e) {} route(); const h = view.querySelector('h1'); if (h) { h.setAttribute('tabindex', '-1'); try { h.focus({ preventScroll: true }); } catch (e) {} } }
 const regionGrid = () => { const S = D.symptoms || [];
-return `<div class="rg" role="group" aria-label="어디가 불편하세요">${Object.keys(GROUP_CLS).slice(0, 8).map(g => { const L = S.filter(s => s.group === g); return L.length ? `<button class="rg-t ${GROUP_CLS[g]}" onclick="homeTab('g:${g}');jumpTo('hlist')"><span class="ic">${sicon(L[0])}</span><b>${esc(g)}</b><small>${L.slice(0, 2).map(s => esc(s.name.split(/ \(|·/)[0])).join(' · ')}</small></button>` : ''; }).join('')}</div>`; };
+return `<div class="rg" role="group" aria-label="어디가 불편하세요">${Object.keys(GROUP_CLS).slice(0, ALLV() ? 8 : 6).map(g => { const L = S.filter(s => s.group === g); return L.length ? `<button class="rg-t ${GROUP_CLS[g]}" onclick="homeTab('g:${g}');jumpTo('hlist')"><span class="ic">${sicon(L[0])}</span><b>${esc(g)}</b><small>${L.slice(0, 2).map(s => esc(s.name.split(/ \(|·/)[0])).join(' · ')}</small></button>` : ''; }).join('')}</div>`; };
 function homeQuick(n){
 const sched = n && takingItems().some(d => schedOf(d.id, d).length);
 const cell = (ic, t, sub, to) => `<button type="button" class="hq-c" onclick="go('${to}')"><span class="ic">${ic}</span><b>${t}</b><small>${sub}</small></button>`;
@@ -3089,14 +3089,15 @@ ${svOn() ? `<section class="hero home-q">${ALLV() ? dot : ''}<div class="eyebrow
 <h1 class="greet">어디가 불편하세요?</h1>
 <p>증상을 고르면 약국에서 물어볼 약을 알려 드려요.</p>
 </section>`}
-${INK ? '' : ext('대화줄')}
+${INK || !ALLV() ? '' : ext('대화줄')}
 ${svOn() ? '' : kidHome() + ext('오늘한장') + regionGrid()}${ext('약담기권함')}
 ${ext('필요약줄')}${odL}${ALLV() ? homeQuick(n) : ''}
 ${ext('응급칸')}${svOn() ? '' : ER_LINE()}
 ${condOn().length || ME.condskip ? '' : `<div class="cond-line"><button type="button" onclick="go('/me?t=body')">${I.user}<span>앓는 병이 있으면 알려 주세요 — <b>피해야 할 약을 걸러 드려요</b></span>${I.chev}</button><button type="button" class="x" aria-label="이 안내 닫기" onclick="ME.condskip=true;saveMe();route()">${I.x}</button></div>`}
+${v && vd <= 3 ? `<div class="util">${urow(I.cal, `${vd <= 0 ? '오늘' : vd === 1 ? '내일' : vd + '일 뒤'} 진료`, `${esc(visitWord(v, false))} · 내 약 한 장 챙기기`, "go('/visits')", '보기', 'visit-soon')}</div>` : ''}
+${tidy('더 보기 — 묻기 · 다른 증상 · 바로 가기', `${INK ? '' : ext('대화줄')}
 ${storeBar()}
 <div class="util" aria-label="다른 방법으로 찾기">
-${v && vd <= 3 ? urow(I.cal, `${vd <= 0 ? '오늘' : vd === 1 ? '내일' : vd + '일 뒤'} 진료`, `${esc(visitWord(v, false))} · 내 약 한 장 챙기기`, "go('/visits')", '보기', 'visit-soon') : ''}
 ${urow(I.search, '여기 없어요', '질문 두 번으로 찾기', "go('/guide/1')", '시작')}
 ${ALLV() || (INK && !window.내약칸) ? urow(I.pill, n ? `내 약통 ${n}가지` : '내 약통에 약 담기', n ? '겹치는지 확인' : '겹치는 약 살펴보기', `go('${n ? '/together' : '/kinds'}')`, n ? '확인' : '담기') : ''}
 ${wxCard()}
@@ -3118,6 +3119,7 @@ ${lrow(I.leaf, '내 영양제 성분 겹치는지 보기', '제형·함량·상�
 ${lrow(I.cart, '편의점에서 살 수 있는 약', '안전상비의약품 13종', "go('/drugs?cat=cvs')")}
 </div>
 `, 'hgo')}
+`, 'hmore')}
 ${ALLV() ? ext('기내줄') : ''}
 ${disclaimer()}`;
 }
