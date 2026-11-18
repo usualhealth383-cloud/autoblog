@@ -215,7 +215,7 @@
     var w = document.createTreeWalker(el, NodeFilter.SHOW_TEXT, null), n, todo = [];
     while ((n = w.nextNode())) todo.push(n);
     todo.forEach(function (n) {
-      if (n.parentNode && /^(SCRIPT|STYLE|TEXTAREA)$/.test(n.parentNode.nodeName)) return;
+      if (n.parentNode && (/^(SCRIPT|STYLE|TEXTAREA|NOSCRIPT|TEMPLATE)$/.test(n.parentNode.nodeName) || (n.parentNode.closest && n.parentNode.closest('script,style,textarea,noscript,template')))) return;   /* 11-18 Main(곁에 사고) — 붙은 script 안 글은 절대 바꾸지 않는다 */
       var 칸ko = n.parentNode && n.parentNode.closest ? n.parentNode.closest('[data-ko],[data-noko]') : null; if (칸ko && 칸ko.hasAttribute('data-ko')) return;   /* 11-04 약사에게 보여 줄 한국어 칸(한국에 사는 외국어 사용자) — 번역하지 않음 */
       var v = n.nodeValue, t = L !== 'ko' ? 글(v) : null;
       if (t != null) { var lead = v.match(/^\s*/)[0], tail = v.match(/\s*$/)[0]; if (/^[.,:;!?。，、．）)]/.test(t)) lead = ''; v = lead + t + tail; }   /* 굵은 글씨로 나뉜 문장 — 「labels .」 빈칸 없애기 */
