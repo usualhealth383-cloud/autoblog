@@ -1,0 +1,313 @@
+<title>AI 직원 처방전</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500;600&family=IBM+Plex+Sans+KR:wght@600;700&family=Noto+Sans+KR:wght@400;500;700&display=swap">
+<style>
+/* 레이아웃: 처방전 한 장 — 왼쪽 정렬 본문, 처방 번호(Rx)가 붙은 줄들, 아래 고정 신청 바 */
+:root{
+  --paper:#F2F6F5; --sheet:#FFFFFF; --ink:#14232B; --sub:#55666C; --line:#D3DDDB;
+  --teal:#0D7A71; --teal-soft:#E0EFEC; --live:#D2392B; --placeholder:#9A5B00; --ph-bg:#FFF4DE;
+  --f-display:"IBM Plex Sans KR","Noto Sans KR",system-ui,sans-serif;
+  --f-body:"Noto Sans KR","Apple SD Gothic Neo",system-ui,sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --paper:#0F171A; --sheet:#152126; --ink:#E6EEEC; --sub:#9DB0B2; --line:#26363B;
+  --teal:#3FC1B3; --teal-soft:#16312F; --live:#FF6B5C; --placeholder:#F2B35A; --ph-bg:#33280F; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --paper:#0F171A; --sheet:#152126; --ink:#E6EEEC; --sub:#9DB0B2; --line:#26363B;
+  --teal:#3FC1B3; --teal-soft:#16312F; --live:#FF6B5C; --placeholder:#F2B35A; --ph-bg:#33280F; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--paper);color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.7;word-break:keep-all;overflow-wrap:break-word}
+.wrap{max-width:760px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:0 120px}
+h1,h2,h3{font-family:var(--f-display);text-wrap:balance;margin:0;line-height:1.3}
+p{margin:0}
+.mono{font-family:var(--f-mono);font-variant-numeric:tabular-nums}
+.ph{background:var(--ph-bg);color:var(--placeholder);border-radius:4px;padding:0 6px;font-weight:500;white-space:nowrap}
+
+/* 머리 */
+.top{display:flex;justify-content:space-between;align-items:center;padding-block:20px;border-bottom:1px solid var(--line);font-size:13px;color:var(--sub)}
+.live{display:inline-flex;align-items:center;gap:6px;color:var(--live);font-weight:700;font-family:var(--f-mono);letter-spacing:.06em}
+.live i{width:8px;height:8px;border-radius:50%;background:var(--live);animation:blink 1.6s infinite}
+@keyframes blink{50%{opacity:.25}}
+@media (prefers-reduced-motion:reduce){.live i{animation:none}}
+
+.hero{padding-block:44px 36px;display:grid;gap:22px}
+.rx{font-family:var(--f-mono);color:var(--teal);font-size:14px;letter-spacing:.08em}
+.hero h1{font-size:clamp(30px,7.2vw,50px);font-weight:700;letter-spacing:-.02em}
+.hero h1 em{font-style:normal;color:var(--teal)}
+.lead{font-size:18px;color:var(--sub);max-width:34em}
+.facts{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));border-top:2px solid var(--ink);border-bottom:1px solid var(--line)}
+.facts div{padding:14px 12px 14px 0;min-width:0}
+.facts div+div{padding-left:14px;border-left:1px solid var(--line)}
+.facts dt{font-size:12px;color:var(--sub);letter-spacing:.04em}
+.facts dd{margin:2px 0 0;font-weight:700;font-size:16px}
+.cta{display:flex;flex-wrap:wrap;gap:12px;align-items:center}
+.btn{appearance:none;border:0;cursor:pointer;background:var(--teal);color:var(--sheet);font:700 17px/1 var(--f-body);padding:18px 28px;border-radius:12px;min-height:52px}
+.btn:focus-visible{outline:3px solid var(--ink);outline-offset:3px}
+.note{font-size:13px;color:var(--sub)}
+.msg{font-size:14px;color:var(--teal);font-weight:500}
+
+section{padding-block:48px;border-top:1px solid var(--line)}
+.eyebrow{font-family:var(--f-body);font-weight:700;font-size:13px;color:var(--teal);letter-spacing:.02em;margin-bottom:10px}
+section h2{font-size:clamp(24px,5.4vw,32px);margin-bottom:12px}
+.intro{color:var(--sub);margin-bottom:26px;max-width:36em}
+
+/* 실제 결과물 */
+.proof{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1px;background:var(--line);border:1px solid var(--line);border-radius:14px;overflow:hidden}
+.proof div{background:var(--sheet);padding:20px;min-width:0}
+.proof b{display:block;font-family:var(--f-display);font-size:30px;line-height:1.1;color:var(--teal)}
+.proof b small{font-size:15px;color:var(--ink);margin-left:2px}
+.proof span{display:block;font-weight:700;margin-top:8px}
+.proof p{font-size:14px;color:var(--sub);margin-top:4px}
+
+/* 업종 탭 */
+.tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px}
+.tab{appearance:none;border:1px solid var(--line);background:var(--sheet);color:var(--ink);font:500 15px var(--f-body);padding:10px 16px;border-radius:999px;cursor:pointer;min-height:44px}
+.tab[aria-selected="true"]{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.tab:focus-visible{outline:3px solid var(--teal);outline-offset:2px}
+.track{background:var(--sheet);border:1px solid var(--line);border-radius:14px;padding:6px 22px}
+.track li{display:grid;grid-template-columns:auto 1fr;gap:4px 14px;padding:16px 0;border-bottom:1px dashed var(--line)}
+.track li:last-child{border-bottom:0}
+.track .n{font-family:var(--f-mono);color:var(--teal);font-weight:600;grid-row:span 2;padding-top:2px}
+.track .before{color:var(--sub);font-size:14px;text-decoration:line-through;text-decoration-color:var(--line)}
+.track .after{font-weight:700}
+.track ol{list-style:none;margin:0;padding:0}
+.track-note{font-size:13px;color:var(--sub);margin-top:12px}
+
+/* 60분 진행표 */
+.agenda{list-style:none;margin:0;padding:0;display:grid;gap:0}
+.agenda li{display:grid;grid-template-columns:96px 1fr;gap:16px;padding:18px 0;border-bottom:1px solid var(--line)}
+.agenda time{font-family:var(--f-mono);font-size:14px;color:var(--sub);padding-top:3px}
+.agenda h3{font-size:18px}
+.agenda p{color:var(--sub);font-size:15px;margin-top:4px}
+.agenda .demo{display:inline-block;font-family:var(--f-mono);font-size:11px;letter-spacing:.06em;color:var(--teal);border:1px solid var(--teal);border-radius:4px;padding:0 6px;margin-left:6px;vertical-align:3px}
+
+/* 사례 */
+.case{background:var(--sheet);border:1px solid var(--line);border-radius:16px;padding:24px;display:grid;gap:16px}
+.case h3{font-size:20px}
+.case table{width:100%;border-collapse:collapse;font-size:15px}
+.case th,.case td{text-align:left;padding:10px 8px;border-bottom:1px solid var(--line);vertical-align:top}
+.case th{font-size:12px;color:var(--sub);font-weight:500;letter-spacing:.04em}
+.case td:first-child{font-weight:700;white-space:nowrap}
+.case .scroll{overflow-x:auto}
+
+/* 혜택 */
+.gifts{display:grid;gap:12px}
+.gift{display:grid;grid-template-columns:44px 1fr;gap:14px;align-items:start;padding:18px;border-radius:14px;background:var(--teal-soft)}
+.gift svg{width:44px;height:44px}
+.gift h3{font-size:17px}
+.gift p{font-size:14px;color:var(--sub);margin-top:2px}
+
+/* 강사 */
+.who{display:grid;grid-template-columns:120px 1fr;gap:22px;align-items:start}
+.avatar{aspect-ratio:1;max-width:100%;border-radius:50%;background:var(--teal-soft);display:grid;place-items:center;color:var(--teal);font:700 14px var(--f-mono);text-align:center}
+.who ul{margin:12px 0 0;padding-left:18px;color:var(--sub)}
+.who li{margin:4px 0}
+
+/* 질문 */
+details{border-bottom:1px solid var(--line);padding:16px 0}
+summary{cursor:pointer;font-weight:700;list-style:none;display:flex;justify-content:space-between;gap:12px}
+summary::-webkit-details-marker{display:none}
+summary::after{content:"+";font-family:var(--f-mono);color:var(--teal);font-size:20px;line-height:1}
+details[open] summary::after{content:"−"}
+details p{color:var(--sub);margin-top:10px;font-size:15px}
+
+.final{text-align:left;display:grid;gap:18px}
+.final h2{font-size:clamp(26px,6vw,36px)}
+.foot{font-size:12px;color:var(--sub);padding-block:24px;border-top:1px solid var(--line)}
+
+/* 아래 고정 신청 바 */
+.bar{position:fixed;left:0;right:0;bottom:0;z-index:20;background:var(--sheet);border-top:1px solid var(--line);
+  padding:12px max(16px,env(safe-area-inset-right,0px)) calc(12px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px))}
+.bar .in{max-width:760px;margin:0 auto;display:flex;gap:12px;align-items:center;justify-content:space-between}
+.bar .t{min-width:0;font-size:14px;line-height:1.4}
+.bar .t b{display:block;font-size:15px}
+.bar .btn{padding:14px 22px;font-size:16px;flex:none}
+
+@media (max-width:520px){
+  .facts{grid-template-columns:1fr}
+  .facts div+div{padding-left:0;border-left:0;border-top:1px solid var(--line)}
+  .proof{grid-template-columns:1fr}
+  .agenda li{grid-template-columns:1fr;gap:4px}
+  .who{grid-template-columns:1fr}
+  .avatar{max-width:96px}
+  .bar .t span{display:none}
+}
+</style>
+
+<div class="wrap">
+  <div class="top">
+    <span class="live"><i></i>LIVE 60분</span>
+    <span>비개발자를 위한 AI 업무 자동화</span>
+  </div>
+
+  <header class="hero">
+    <p class="rx">Rx · 처방 1건</p>
+    <h1>코딩 한 줄 몰라도<br>내 가게에 <em>AI 직원</em>을 둡니다</h1>
+    <p class="lead">진료하는 의사가 혼자서 앱 6개와 영상 채널 4개, 블로그 글쓰기를 AI로 돌리고 있습니다. 그 과정을 60분 동안 화면으로 그대로 보여 드립니다.</p>
+    <dl class="facts">
+      <div><dt>일시</dt><dd><span class="ph">[확인 필요]</span></dd></div>
+      <div><dt>방식</dt><dd>온라인 라이브</dd></div>
+      <div><dt>참가비</dt><dd><span class="ph">[확인 필요]</span></dd></div>
+    </dl>
+    <div class="cta">
+      <button class="btn" type="button" data-apply>라이브 신청하기</button>
+      <p class="note">병원 · 학원 · 가게 · 1인 사업, 업종 상관없이 들으실 수 있어요.</p>
+    </div>
+    <p class="msg" data-msg hidden>신청 창은 일정이 정해지면 이 버튼에 연결됩니다.</p>
+  </header>
+
+  <section>
+    <p class="eyebrow">지금 실제로 돌아가는 것</p>
+    <h2>말이 아니라 결과물로 보여 드립니다</h2>
+    <p class="intro">아래는 강사가 지금 직접 운영 중인 것들입니다. 라이브에서 이 화면들을 그대로 켜 놓고 설명합니다.</p>
+    <div class="proof">
+      <div><b class="mono">6<small>개</small></b><span>건강 앱 직접 개발</span><p>정신건강·소아 성장·임신 주차·암 환자 일정·진료 예약·의료 계산기. 웹과 안드로이드로 만들고 있어요.</p></div>
+      <div><b class="mono">4<small>개</small></b><span>영상 채널 자동 제작</span><p>주문서 파일 한 장을 올리면 원고·영상·업로드까지 컴퓨터가 알아서 만듭니다.</p></div>
+      <div><b class="mono">1<small>장</small></b><span>블로그 글 → 붙여넣기 한 번</span><p>글·표지·시간표 이미지를 한 페이지에 모아 복사 한 번으로 올립니다.</p></div>
+      <div><b class="mono">1<small>곳</small></b><span>동네 학원 온라인 정비</span><p>블로그 첫 화면, 지도 정보, 포스터, 간판 사진 보정까지 AI와 함께 끝냈어요.</p></div>
+    </div>
+  </section>
+
+  <section>
+    <p class="eyebrow">업종별로 이렇게 바뀝니다</p>
+    <h2>내 일에 맞춰 골라 보세요</h2>
+    <div class="tabs" role="tablist" aria-label="업종">
+      <button class="tab" role="tab" id="t-clinic" aria-selected="true" aria-controls="p-clinic">병원·의원</button>
+      <button class="tab" role="tab" id="t-academy" aria-selected="false" aria-controls="p-academy">학원·교습소</button>
+      <button class="tab" role="tab" id="t-shop" aria-selected="false" aria-controls="p-shop">가게·1인 사업</button>
+    </div>
+    <div class="track" role="tabpanel" id="p-clinic" aria-labelledby="t-clinic">
+      <ol>
+        <li><span class="n">Rx 1</span><span class="before">진료 끝나고 밤에 블로그 글 쓰기</span><span class="after">진료 메모만 주면 의료광고 기준을 지킨 글 초안이 나옵니다</span></li>
+        <li><span class="n">Rx 2</span><span class="before">같은 질문에 매번 같은 설명 반복</span><span class="after">자주 묻는 질문을 환자 안내 영상·카드로 한 번에</span></li>
+        <li><span class="n">Rx 3</span><span class="before">지도·스마트플레이스 정보가 엉망</span><span class="after">사진·소개글·소식을 한 자리에서 정리</span></li>
+      </ol>
+    </div>
+    <div class="track" role="tabpanel" id="p-academy" aria-labelledby="t-academy" hidden>
+      <ol>
+        <li><span class="n">Rx 1</span><span class="before">반 안내 글을 하나하나 손으로</span><span class="after">원장님 원글 하나로 반별 안내·시간표·표지 이미지까지</span></li>
+        <li><span class="n">Rx 2</span><span class="before">블로그가 그냥 글 목록</span><span class="after">블로그 첫 화면을 학원 홈페이지처럼</span></li>
+        <li><span class="n">Rx 3</span><span class="before">포스터·간판 사진이 흐리고 어두움</span><span class="after">티 나지 않게 밝히고, 깨진 글씨는 바로잡기</span></li>
+      </ol>
+    </div>
+    <div class="track" role="tabpanel" id="p-shop" aria-labelledby="t-shop" hidden>
+      <ol>
+        <li><span class="n">Rx 1</span><span class="before">홍보할 시간이 없음</span><span class="after">주문서 한 장으로 짧은 영상·카드뉴스 자동 제작</span></li>
+        <li><span class="n">Rx 2</span><span class="before">반복 문의 답장에 하루가 감</span><span class="after">자주 묻는 질문 답변 묶음과 안내 페이지</span></li>
+        <li><span class="n">Rx 3</span><span class="before">필요한 프로그램은 외주 견적부터</span><span class="after">간단한 계산기·예약 안내 페이지는 직접 만들기</span></li>
+      </ol>
+    </div>
+    <p class="track-note">라이브 중 채팅으로 업종을 알려 주시면 그 자리에서 하나를 직접 만들어 봅니다.</p>
+  </section>
+
+  <section>
+    <p class="eyebrow">60분 진행표</p>
+    <h2>설명은 짧게, 화면은 길게</h2>
+    <ol class="agenda">
+      <li><time class="mono">00 — 10분</time><div><h3>비개발자가 AI 직원을 두는 법</h3><p>무엇을 맡기고 무엇은 사람이 지켜야 하는지, 한 장으로 정리합니다.</p></div></li>
+      <li><time class="mono">10 — 25분</time><div><h3>글 하나로 블로그 한 편<span class="demo">시연</span></h3><p>원글 → 글·표지·표 이미지 → 복사 한 번 붙여넣기까지.</p></div></li>
+      <li><time class="mono">25 — 40분</time><div><h3>주문서 한 장으로 영상 자동 제작<span class="demo">시연</span></h3><p>파일 하나를 올리면 컴퓨터가 원고부터 업로드까지 처리하는 흐름.</p></div></li>
+      <li><time class="mono">40 — 50분</time><div><h3>지도·사진·포스터 정리<span class="demo">시연</span></h3><p>스마트플레이스 정보, 매장 사진 보정, 포스터 글씨 바로잡기.</p></div></li>
+      <li><time class="mono">50 — 60분</time><div><h3>내 업종 바로 진단</h3><p>채팅으로 받은 업종 하나를 골라 첫 자동화를 같이 설계합니다.</p></div></li>
+    </ol>
+  </section>
+
+  <section>
+    <p class="eyebrow">실제 진행 사례</p>
+    <h2>동네 과학 학원, 일주일의 기록</h2>
+    <div class="case">
+      <h3>원장님이 보낸 원글 네 편에서 시작했어요</h3>
+      <div class="scroll">
+        <table>
+          <thead><tr><th>할 일</th><th>전</th><th>후</th></tr></thead>
+          <tbody>
+            <tr><td>블로그</td><td>글 목록만 있는 기본 화면</td><td>첫 화면에 인사말과 반별 안내 카드 5장</td></tr>
+            <tr><td>안내 글</td><td>반마다 손으로 작성</td><td>반별 안내·시간표·표지 이미지 한 번에</td></tr>
+            <tr><td>지도 정보</td><td>사진 0장, 거리뷰만 보임</td><td>건물·입구·포스터 사진, 소개글 정리</td></tr>
+            <tr><td>사진</td><td>어둡고 비스듬한 간판</td><td>정면으로 펴고 티 나지 않게 밝힘</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="note">문의·등록 변화 숫자는 학원 동의를 받고 <span class="ph">[확인 필요]</span> 채워 넣습니다.</p>
+    </div>
+  </section>
+
+  <section>
+    <p class="eyebrow">참여하시는 분께</p>
+    <h2>끝까지 들으시면 드리는 것</h2>
+    <div class="gifts">
+      <div class="gift">
+        <svg viewBox="0 0 44 44" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--teal)" aria-hidden="true"><rect x="10" y="6" width="24" height="32" rx="3"/><path d="M16 15h12M16 21h12M16 27h7"/></svg>
+        <div><h3>주문서 양식 묶음</h3><p>블로그 글·영상·카드뉴스를 AI에게 맡길 때 쓰는 빈칸 양식. 그대로 복사해서 쓰시면 됩니다.</p></div>
+      </div>
+      <div class="gift">
+        <svg viewBox="0 0 44 44" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--teal)" aria-hidden="true"><path d="M8 12h28M8 22h28M8 32h18"/><circle cx="33" cy="32" r="4"/></svg>
+        <div><h3>업종별 지시문 모음</h3><p>병원·학원·가게에서 바로 쓰는 지시문 <span class="ph">[개수 확인 필요]</span>.</p></div>
+      </div>
+      <div class="gift">
+        <svg viewBox="0 0 44 44" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--teal)" aria-hidden="true"><circle cx="16" cy="17" r="6"/><circle cx="29" cy="17" r="6"/><path d="M6 36c1-6 5-9 10-9s9 3 10 9M22 36c1-6 4-9 7-9 5 0 8 3 9 9"/></svg>
+        <div><h3>1:1 자동화 진단</h3><p>참여자 중 <span class="ph">[N명 확인 필요]</span>을 골라 내 일에 맞는 첫 자동화를 함께 설계합니다.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <p class="eyebrow">강사</p>
+    <div class="who">
+      <div class="avatar">사진<br>자리</div>
+      <div>
+        <h2><span class="ph">[이름 확인 필요]</span></h2>
+        <p>현직 의사이자 비개발자. 진료 틈틈이 AI 하나로 앱·영상·블로그를 직접 만들고 운영합니다.</p>
+        <ul>
+          <li>주 4일 진료, 나머지 시간은 폰 한 줄 지시로 작업</li>
+          <li>건강 앱 6종 개발(웹·안드로이드)</li>
+          <li>영상 채널 4개 자동 제작 운영</li>
+          <li>지역 학원 온라인 홍보 정비</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <p class="eyebrow">자주 묻는 질문</p>
+    <h2>신청 전에 궁금한 것</h2>
+    <details><summary>컴퓨터를 잘 못 다뤄도 되나요?</summary><p>됩니다. 강사도 코딩을 배운 적이 없습니다. 라이브에서는 한국어로 지시하는 장면만 보여 드려요.</p></details>
+    <details><summary>따로 돈이 드는 프로그램이 있나요?</summary><p>AI 서비스 월 구독이 필요할 수 있습니다. 요금은 <span class="ph">[확인 필요]</span>. 라이브에서 꼭 필요한 것과 없어도 되는 것을 나눠 알려 드립니다.</p></details>
+    <details><summary>환자·학생 개인정보는 어떻게 하나요?</summary><p>개인정보는 AI에 넣지 않는 것이 원칙입니다. 이름·연락처를 빼고 일을 맡기는 방법을 함께 보여 드립니다.</p></details>
+    <details><summary>병원 홍보 글은 의료광고 규정에 걸리지 않나요?</summary><p>의료광고에서 쓰면 안 되는 표현을 AI가 먼저 걸러 내도록 지시하는 방법을 다룹니다. 최종 확인은 원장님 몫이에요.</p></details>
+    <details><summary>다시 보기가 있나요?</summary><p><span class="ph">[확인 필요]</span></p></details>
+  </section>
+
+  <section class="final">
+    <p class="eyebrow">Rx · 처방 요약</p>
+    <h2>반복되는 일은 AI 직원에게,<br>사람은 사람 일에</h2>
+    <div class="cta"><button class="btn" type="button" data-apply>라이브 신청하기</button></div>
+    <p class="msg" data-msg hidden>신청 창은 일정이 정해지면 이 버튼에 연결됩니다.</p>
+  </section>
+
+  <p class="foot">시안입니다. 노란 칸 <span class="ph">[확인 필요]</span>은 확정 후 채웁니다. 숫자는 실제로 확인된 것만 싣습니다.</p>
+</div>
+
+<div class="bar" role="region" aria-label="신청">
+  <div class="in">
+    <p class="t"><b>AI 직원 처방전 라이브</b><span>일시 · 참가비 [확인 필요]</span></p>
+    <button class="btn" type="button" data-apply>신청하기</button>
+  </div>
+</div>
+
+<script>
+(function(){
+  var tabs=[].slice.call(document.querySelectorAll('.tab'));
+  function pick(t){tabs.forEach(function(x){var on=x===t;x.setAttribute('aria-selected',on);document.getElementById(x.getAttribute('aria-controls')).hidden=!on;});}
+  tabs.forEach(function(t,i){
+    t.addEventListener('click',function(){pick(t)});
+    t.addEventListener('keydown',function(e){var d=e.key==='ArrowRight'?1:e.key==='ArrowLeft'?-1:0;if(d){var n=tabs[(i+d+tabs.length)%tabs.length];n.focus();pick(n);}});
+  });
+  document.querySelectorAll('[data-apply]').forEach(function(b){
+    b.addEventListener('click',function(){document.querySelectorAll('[data-msg]').forEach(function(m){m.hidden=false});});
+  });
+})();
+</script>
