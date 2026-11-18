@@ -3742,9 +3742,9 @@ window.언어칸 = function () {
   var 처방갈래 = [['bp', /혈압약|고혈압/], ['dm', /당뇨약|혈당약|메트포르민/], ['chol', /콜레스테롤약|고지혈|스타틴/], ['blood', /와파린|항응고|피\s*묽게|아스피린\s*프로텍트|엘리퀴스|자렐토|릭시아나/], ['thy', /갑상선/], ['mind', /수면제|우울증약|항우울|안정제/]];
   /* 위험 — 앱이 이미 쓰는 판정을 글로 옮긴 것(홈 응급 줄 · 증상 응급 줄 · 아이 3개월 38℃ · 41℃ · 항암 38℃ · 과다복용). 새 기준을 짓지 않는다 */
   var 마음 = /죽고\s*싶|자살|자해|끝내고\s*싶|없어지고\s*싶|사라지고\s*싶|살\s*이유|손목.*그|그었|모아서.*먹|약.*모아|목숨|살기\s*싫|살고\s*싶지\s*않|죽어\s*버리|삶을\s*끝|생을\s*마감|세상을\s*떠나고|사는\s*게\s*(의미|싫)/;   /* 11-18 5,000 시험 — 「목숨을 끊고 싶어요」가 니코틴 패치로 가던 것 */
-  var 응급 = [/가슴.*(쥐어|조이|짓누|아프|답답).*(땀|숨)|가슴.*(쥐어짜|조이듯|짓누르)/, /한쪽.*(힘|마비|저리|처)|말이\s*어눌|얼굴.*(처졌|비뚤)|발음이\s*이상/, /숨.*(차서|차요|차고|차다|차는|막|못\s*쉬|안\s*쉬|가빠|쌕쌕|힘들)|호흡\s*곤란/, /(입술|혀|목구멍|얼굴).*(부었|붓고|부어)/, /경련|발작|까무러/, /의식|깨워도|안\s*일어나|축\s*처지|쓰러지|쓰러졌|쓰러지셨|정신을\s*잃|기절/, /피를\s*토|토혈|변이\s*(새)?까|짜장\s*같|짜장처럼|(검은|까만|시커먼|새까만)\s*(변|똥|대변)|흑변|변이\s*검|피\s*(섞인|나오는)\s*(변|대변|토)|피\s*토|토(했|하|한).*(피|핏)|피가\s*섞여/, /머리.*(부딪|다친).*(토|구토)/, /(제일|가장|살면서).*심한\s*두통|벼락\s*두통|벼락\s*(치듯|같|맞)|머리가\s*(터질|깨질)\s*(것|듯)|갑자기.*(최악|처음\s*겪는).*(두통|머리)/, /배가\s*(딱딱|너무\s*아파서\s*못)/];
+  var 응급 = [/가슴.*(쥐어|조이|짓누|아프|답답).*(땀|숨)|가슴.*(쥐어짜|조이듯|짓누르)/, /한쪽.*(힘|마비|저리|처)|말이?\s*(갑자기\s*)?어눌|얼굴.*(처졌|비뚤)|발음이?\s*(이상|꼬)|한쪽\s*(팔|다리|손).*(못|안)\s*(들|움직|써|올)/, /숨.*(차서|차요|차고|차다|차는|막|못\s*쉬|안\s*쉬|가빠|쌕쌕|힘들)|호흡\s*곤란/, /(입술|혀|목구멍|얼굴).*(부었|붓고|부어)/, /경련|발작|까무러/, /숨이?\s*(너무\s*|자꾸\s*)?(느려|느리|약해|얕아|얕게)|깨우면\s*(다시\s*|또\s*)?잠|의식|깨워도|안\s*일어나|축\s*처지|쓰러지|쓰러졌|쓰러지셨|정신을\s*잃|기절/, /피를\s*토|토혈|변이\s*(새)?까|짜장\s*같|짜장처럼|(검은|까만|시커먼|새까만)\s*(변|똥|대변)|(검은|까만|시커먼)\S*\s*(끈적\S*\s*)?(변|똥)|끈적한\s*(검은\s*)?(변|똥)|흑변|변이\s*검|피\s*(섞인|나오는)\s*(변|대변|토)|피\s*토|토(했|하|한).*(피|핏)|피가\s*섞여/, /머리.*(부딪|다친).*(토|구토)/, /(제일|가장|살면서).*심한\s*두통|벼락\s*두통|벼락\s*(치듯|같|맞)|머리가\s*(터질|깨질)\s*(것|듯)|갑자기.*(최악|처음\s*겪는).*(두통|머리)/, /배가\s*(딱딱|너무\s*아파서\s*못)/];
   /* 이미 많이 먹었다·삼켰다(10-28 곁에 교훈) — 증상을 묻기 전에 119 상담 먼저. 문구는 약 화면 「너무 많이 드셨을 때」(NHS)와 같게 */
-  var 과다 = /(한\s*통|통째|[0-9]{2,}\s*(알|정|개|봉)|많이|잔뜩|한꺼번에|두\s*배|두\s*번|실수로|모르고\s*또).*(먹었|먹였|삼켰|먹여|먹어\s*버렸)|(아이|애기|아기|애)가.*(약|알약|약통|시럽).*(삼켰|주워\s*먹|꺼내\s*먹|먹어\s*버렸|다\s*먹)|(아이|애기|아기|애|우리\s*애)가.*(주워\s*먹|삼켰|꺼내\s*먹|먹어\s*버렸|다\s*먹었|한\s*통|여러\s*(알|개))|(세제|락스|표백제|농약|살충제|부동액|방향제|손\s*소독제|매니큐어|담배|건전지|배터리|자석).*(마셨|먹었|삼켰|먹어\s*버렸)|took (a lot|too many|the whole|all|double|twice)|swallowed|overdos|tom[ée] (muchas|demasiad|el doble|dos veces)|sobredosis|se (lo )?tragó|(薬|錠).*(たくさん|大量|全部|二回分|2回分).*飲|飲み込んだ|過量|吃了(很多|一整瓶|大量|一整盒|两次|双倍)|吞了|过量/i;
+  var 과다 = /(한\s*통|통째|한\s*움큼|움큼|여러\s*(개|알|정|봉)|(열|스무|서른|수십)\s*(알|개|정)).*(먹은|삼킨|먹었|삼켰)|(먹었|삼켰).*(열|스무|서른|여러|[0-9]{2,})\s*(알|개|정)\s*(쯤|정도|넘게|이상|가량|이나)|((두|세|네|다섯|여섯|일곱|[0-9]+)\s*살(배기)?|아이|애기|아기|애)(가|이|이가)?\s.*(약봉지|약봉투|패치|세제|캡슐|액상|젤리|혈압약|당뇨약|수면제|어른\s*약|할머니\s*약|할아버지\s*약|엄마\s*약|아빠\s*약).*(먹었|먹은|삼켰|씹었|깨물|빨아\s*먹|뜯어\s*먹|마셨|마신|핥)|(약봉지|약봉투|패치|세제|액상|젤리|혈압약|당뇨약|수면제).*((두|세|네|다섯|여섯)\s*살|아이|애|아기|애기)(가|이)?\s.*(먹었|먹은|삼켰|씹|깨물|빨아|뜯어)|패치.*(씹었|씹어|빨았|삼켰|먹었)|(세탁\s*세제|캡슐\s*세제|세제\s*캡슐|전자\s*담배|니코틴\s*액|액상\s*니코틴|락스|세제).*(마신|먹은|삼킨|깨물|씹었|빨아\s*먹|핥)|(한\s*통|통째|[0-9]{2,}\s*(알|정|개|봉)|많이|잔뜩|한꺼번에|두\s*배|두\s*번|실수로|모르고\s*또).*(먹었|먹였|삼켰|먹여|먹어\s*버렸)|(아이|애기|아기|애)가.*(약|알약|약통|시럽).*(삼켰|주워\s*먹|꺼내\s*먹|먹어\s*버렸|다\s*먹)|(아이|애기|아기|애|우리\s*애)가.*(주워\s*먹|삼켰|꺼내\s*먹|먹어\s*버렸|다\s*먹었|한\s*통|여러\s*(알|개))|(세제|락스|표백제|농약|살충제|부동액|방향제|손\s*소독제|매니큐어|담배|건전지|배터리|자석).*(마셨|먹었|삼켰|먹어\s*버렸)|took (a lot|too many|the whole|all|double|twice)|swallowed|overdos|tom[ée] (muchas|demasiad|el doble|dos veces)|sobredosis|se (lo )?tragó|(薬|錠).*(たくさん|大量|全部|二回分|2回分).*飲|飲み込んだ|過量|吃了(很多|一整瓶|大量|一整盒|两次|双倍)|吞了|过量/i;
   /* 다섯 언어 위험 낱말(10-27 Main — 한국어만 알아듣던 곳이 있었다). 언어와 상관없이 다 본다(영어 폰을 쓰는 한국 사람도 있다) */
   var 마음다국 = /suicid|kill(ing)? myself|want to die|end (my|it all)|self[- ]?harm|cut(ting)? myself|no reason to live|quiero morir|matarme|quitarme la vida|no quiero vivir|hacerme daño|autolesi|死にたい|自殺|消えたい|自傷|リストカット|想死|自杀|不想活|轻生|自残|割腕/i;
   var 응급다국 = [/chest (pain|hurts|tight|pressure)|can'?t breathe|cannot breathe|short(ness)? of breath|trouble breathing|struggling to breathe|wheez|face (is )?droop|slurred|one side.*(weak|numb)|(lips?|tongue|throat).*(swell|swollen|clos)|(swell|swollen).*(lips?|tongue|throat)|seizure|convuls|fit(ting)?\b.*child|unconscious|passed out|won'?t wake|unresponsive|floppy|(vomit|throw)(ing|ed)? (up )?blood|black (stool|poop)|worst headache|took (a lot|too many|the whole|all)|overdos|not breathing/i,
@@ -3757,7 +3757,10 @@ window.언어칸 = function () {
     JP: { 번호: '072-727-2499', 이름: { ko: '일본 중독110번(오사카 072-727-2499 / 쓰쿠바 029-852-9999, 두 곳 모두 365일 24시간)', en: 'the Japan Poison Information Center (Osaka 072-727-2499 / Tsukuba 029-852-9999, both open 24 hours, every day)', es: 'al Centro de Información Toxicológica de Japón (Osaka 072-727-2499 / Tsukuba 029-852-9999, ambos 24 horas, todos los días)', ja: '中毒110番（大阪 072-727-2499／つくば 029-852-9999、どちらも365日24時間対応）', zh: '日本中毒110（大阪 072-727-2499／筑波 029-852-9999，均为全年24小时）' } }
   };
   var 위험말 = {
-    ko: { hr: ['(24시간)', '(상담 시간은 지역마다 달라요)'], s: function (e) { return '스스로 해치려고 약을 먹었거나, 깨우기 어렵거나, 숨쉬기 어렵거나, 경련하면 지금 ' + e + '에 전화하세요. 혼자 있지 말고 직접 운전하지 마세요. 약 상자와 남은 약을 챙기세요.'; }, p: function (P, e) { return '실수로 많이 먹었고 깨어 있고 숨을 평소처럼 쉬면, 증상이 없어도 지금 ' + P + '에 연락하세요. 스스로 해치려고 먹었거나 숨쉬기 어렵거나 경련·쓰러짐·깨우기 어려움이 있으면 ' + e + '. 억지로 토하게 하지 마시고, 약 상자와 남은 약을 챙기세요. 아세트아미노펜은 처음엔 멀쩡해도 몇 시간~며칠 뒤 간이 상할 수 있어요.'; }, o: function (e) { return '약을 너무 많이 먹었거나 아이가 약을 주워 먹었다면 증상이 없어도 지금 ' + e + '에 연락하세요. 억지로 토하게 하지 마시고, 약 상자와 남은 약을 챙기세요. 직접 운전해서 가지 마세요. 아세트아미노펜은 처음엔 멀쩡해도 몇 시간~며칠 뒤 간이 상할 수 있어요.'; }, n: function (e) { return '지금 위험하면 ' + (/^\d/.test(e) ? '응급 번호 ' + e : e) + '에 전화하세요. 곁에 있는 사람에게도 지금 알려 주세요.'; }, m: function (p, e) { return '많이 힘드시군요. 혼자 견디지 마세요 — 지금 ' + p + '에 전화하면 바로 이야기를 들어 줘요(24시간). 위험이 급하면 ' + e + '.'; }, b: function (e) { return '3개월이 안 된 아기가 38℃ 이상이면 해열제보다 진료가 먼저예요. 지금 응급실로 가거나 ' + e + '에 전화하세요.'; }, i: function (e) { return '생후 3~5개월 아기가 39℃ 이상이면 해열제보다 진료가 먼저예요(우리 집 소아과와 같은 기준). 지금 응급실로 가거나 ' + e + '에 전화하세요.'; }, h: function (e) { return '41℃ 이상이면 지금 응급실로 가거나 ' + e + '에 전화하세요.'; }, c: function (e) { return '항암 치료 중 38℃ 이상은 바로 병원에 알려야 하는 열이에요. 치료받는 병원 응급 연락처나 ' + e + '로.'; }, r: function (e) { return '약보다 진료가 먼저예요. 지금 ' + e + '에 전화하거나 응급실로 가세요. 직접 운전하지 마세요.'; } },
+    ko: { hr: ['(24시간)', '(상담 시간은 지역마다 달라요)'], s: function (e) { return '스스로 해치려고 약을 먹었거나, 깨우기 어렵거나, 숨쉬기 어렵거나, 경련하면 지금 ' + e + '에 전화하세요. 혼자 있지 말고 직접 운전하지 마세요. 약 상자와 남은 약을 챙기세요.'; }, p: function (P, e) { return '실수로 많이 먹었고 깨어 있고 숨을 평소처럼 쉬면, 증상이 없어도 지금 ' + P + '에 연락하세요. 스스로 해치려고 먹었거나 숨쉬기 어렵거나 경련·쓰러짐·깨우기 어려움이 있으면 ' + e + '. 억지로 토하게 하지 마시고, 약 상자와 남은 약을 챙기세요. 아세트아미노펜은 처음엔 멀쩡해도 몇 시간~며칠 뒤 간이 상할 수 있어요.'; }, o: function (e) { return '약을 너무 많이 먹었거나 아이가 약을 주워 먹었다면 증상이 없어도 지금 ' + e + '에 연락하세요. 억지로 토하게 하지 마시고, 약 상자와 남은 약을 챙기세요. 직접 운전해서 가지 마세요. 아세트아미노펜은 처음엔 멀쩡해도 몇 시간~며칠 뒤 간이 상할 수 있어요.'; }, n: function (e) { return '지금 위험하면 ' + (/^\d/.test(e) ? '응급 번호 ' + e : e) + '에 전화하세요. 곁에 있는 사람에게도 지금 알려 주세요.'; }, m: function (p, e) { return '많이 힘드시군요. 혼자 견디지 마세요 — 지금 ' + p + '에 전화하면 바로 이야기를 들어 줘요(24시간). 위험이 급하면 ' + e + '.'; }, b: function (e) { return '3개월이 안 된 아기가 38℃ 이상이면 해열제보다 진료가 먼저예요. 지금 응급실로 가거나 ' + e + '에 전화하세요.'; }, i: function (e) { return '생후 3~5개월 아기가 39℃ 이상이면 해열제보다 진료가 먼저예요(우리 집 소아과와 같은 기준). 지금 응급실로 가거나 ' + e + '에 전화하세요.'; }, h: function (e) { return '41℃ 이상이면 지금 응급실로 가거나 ' + e + '에 전화하세요.'; }, c: function (e) { return '항암 치료 중 38℃ 이상은 바로 병원에 알려야 하는 열이에요. 치료받는 병원 응급 연락처나 ' + e + '로.'; }, r: function (e) { return '약보다 진료가 먼저예요. 지금 ' + e + '에 전화하거나 응급실로 가세요. 직접 운전하지 마세요.'; },
+      g: function (e) { return '인슐린을 많이 맞았거나 당뇨약을 먹고 식은땀·떨림이 나며 정신이 흐려지면 저혈당일 수 있어요. 지금 ' + e + '에 전화하세요. 깨어 있고 삼킬 수 있을 때만 사탕·주스·설탕물 같은 단 것을 바로 드세요 — 정신이 흐리거나 깨지 않으면 입으로 아무것도 주지 마세요. 혼자 있지 마세요.'; },
+      v: function (e) { return '피가 멈추지 않고 어지러우면 지금 ' + e + '에 전화하세요. 기다리는 동안 앉아서 고개를 앞으로 숙이고, 코피면 콧방울 아래 부드러운 곳을 계속 꾹 누르세요. 피 묽게 하는 약을 드신다고 꼭 알리세요.'; },
+      k: function (e) { return '약을 먹은 뒤 열이 나고 피부가 벗겨지거나 물집이 잡히고 입안·눈이 헐면 심한 약 피부 반응일 수 있어요. 그 약을 더 드시지 말고 지금 응급실로 가거나 ' + e + '에 전화하세요. 먹은 약 이름(약봉투)을 챙기세요.'; } },
     en: { hr: [' (24 hours)', ' (hours vary by region)'], s: function (e) { return 'If the medicine was taken to self-harm, or the person is hard to wake, has trouble breathing or is having a seizure, call ' + e + ' now. Do not stay alone and do not drive yourself. Bring the medicine box and any pills left.'; }, p: function (P, e) { return 'If this was accidental and the person is awake and breathing normally, call ' + P + ' now, even if there are no symptoms. For intentional self-harm, trouble breathing, seizures, collapse or difficulty waking, call ' + e + '. Do not make yourself vomit. Bring the medicine box and any pills left. With acetaminophen you can feel fine at first, but liver damage can show up hours to days later.'; }, o: function (e) { return 'If you took too much, call ' + e + ' now for advice even if you feel fine. Do not make yourself vomit. Bring the medicine box and any pills left. Do not drive yourself. With acetaminophen you can feel fine at first, but liver damage can show up hours to days later.'; }, n: function (e) { return 'If you are in danger now, call ' + (/^\d/.test(e) ? 'the emergency number ' + e : e) + '. Tell someone near you right now, too.'; }, m: function (p, e) { return "It sounds like things are really hard right now. You don't have to face this alone — call " + p + ' now to talk to someone (24 hours). If you are in immediate danger, call ' + e + '.'; }, b: function (e) { return 'A baby under 3 months with a temperature of 38°C or higher needs a doctor before any fever medicine. Go to the emergency room now or call ' + e + '.'; }, i: function (e) { return 'A baby aged 3 to 5 months with a temperature of 39°C or higher needs a doctor before any fever medicine. Go to the emergency room now or call ' + e + '.'; }, h: function (e) { return 'A temperature of 41°C or higher needs the emergency room now — or call ' + e + '.'; }, c: function (e) { return 'A temperature of 38°C or higher during cancer treatment must be reported right away. Call your treatment hospital’s emergency line or ' + e + '.'; }, r: function (e) { return 'See a doctor before taking any medicine. Call ' + e + ' or go to the emergency room now. Do not drive yourself.'; } },
     es: { hr: [' (24 horas)', ' (el horario varía según la región)'], s: function (e) { return 'Si tomó el medicamento para hacerse daño, o si cuesta despertarle, respira con dificultad o tiene convulsiones, llame ahora al ' + e + '. No se quede solo y no conduzca usted mismo. Lleve la caja del medicamento y las pastillas que queden.'; }, p: function (P, e) { return 'Si la ingestión fue accidental y la persona está consciente y respira con normalidad, llame ahora ' + P + ', aunque no tenga síntomas. Si fue para hacerse daño o hay dificultad para respirar, convulsiones, desmayo o cuesta despertarla, llame al ' + e + '. No se provoque el vómito. Lleve la caja del medicamento y las pastillas que queden. Con el paracetamol puede sentirse bien al principio, pero el daño en el hígado puede aparecer horas o días después.'; }, o: function (e) { return 'Si ha tomado demasiado, llame ahora al ' + e + ' para que le orienten, aunque se encuentre bien. No se provoque el vómito. Lleve la caja del medicamento y las pastillas que queden. No conduzca usted mismo. Con el paracetamol puede sentirse bien al principio, pero el daño en el hígado puede aparecer horas o días después.'; }, n: function (e) { return 'Si corre peligro ahora, llame ' + (/^\d/.test(e) ? 'al número de emergencias ' + e : 'a ' + e) + '. Avise también ahora a alguien que esté cerca.'; }, m: function (p, e) { return 'Parece que está pasando por un momento muy difícil. No tiene que afrontarlo solo: llame ahora al ' + p + ' para hablar con alguien (24 horas). Si corre peligro inmediato, llame al ' + e + '.'; }, b: function (e) { return 'Un bebé de menos de 3 meses con 38 °C o más necesita atención médica antes que cualquier antitérmico. Vaya a urgencias ahora o llame al ' + e + '.'; }, i: function (e) { return 'Un bebé de 3 a 5 meses con 39 °C o más necesita atención médica antes que cualquier antitérmico. Vaya a urgencias ahora o llame al ' + e + '.'; }, h: function (e) { return 'Con 41 °C o más, vaya a urgencias ahora o llame al ' + e + '.'; }, c: function (e) { return 'Durante un tratamiento contra el cáncer, 38 °C o más debe comunicarse enseguida. Llame al teléfono de urgencias de su hospital o al ' + e + '.'; }, r: function (e) { return 'Antes que cualquier medicamento, necesita atención médica. Llame ahora al ' + e + ' o vaya a urgencias. No conduzca usted mismo.'; } },
     ja: { hr: ['（24時間）', '（受付時間は地域によって異なります）'], s: function (e) { return '自分を傷つける目的で薬を飲んだ場合や、起こしても起きにくい・呼吸が苦しい・けいれんしている場合は、今すぐ ' + e + ' に電話してください。ひとりにならず、ご自分で運転しないでください。薬の箱と残りの薬を手元に置いてください。'; }, p: function (P, e) { return '誤って飲みすぎ、意識がはっきりしていて呼吸も普段どおりなら、症状がなくても' + P + 'へすぐ相談してください。自分を傷つける目的で飲んだ場合や、意識・呼吸の異常、けいれんがある場合は ' + e + ' へ。無理に吐かせず、薬の箱と残りの薬を手元に置いてください。アセトアミノフェンは最初は何ともなくても、数時間〜数日後に肝臓が傷むことがあります。'; }, o: function (e) { return '飲みすぎた場合は、平気そうでも今すぐ ' + e + ' に電話して相談してください。無理に吐かせないでください。薬の箱と残りの薬を持って行き、ご自分で運転しないでください。アセトアミノフェンは最初は何ともなくても、数時間〜数日後に肝臓が傷むことがあります。'; }, n: function (e) { return '今危険なときは' + (/^\d/.test(e) ? '緊急番号 ' + e + ' ' : e) + 'に電話してください。そばにいる人にも今すぐ知らせてください。'; }, m: function (p, e) { return 'とてもつらい状態なのですね。ひとりで抱え込まないでください。今すぐ ' + p + ' に電話すれば話を聞いてもらえます（24時間）。命の危険が迫っているときは ' + e + ' へ。'; }, b: function (e) { return '生後3か月未満の赤ちゃんが38℃以上なら、解熱剤より先に受診が必要です。今すぐ救急外来へ行くか ' + e + ' に電話してください。'; }, i: function (e) { return '生後3～5か月の赤ちゃんが39℃以上なら、解熱剤より先に受診が必要です。今すぐ救急外来へ行くか ' + e + ' に電話してください。'; }, h: function (e) { return '41℃以上なら今すぐ救急外来へ行くか ' + e + ' に電話してください。'; }, c: function (e) { return 'がん治療中の38℃以上の熱はすぐに病院へ連絡が必要です。治療中の病院の緊急連絡先か ' + e + ' へ。'; }, r: function (e) { return '薬より先に受診が必要です。今すぐ ' + e + ' に電話するか救急外来へ行ってください。ご自分で運転しないでください。'; } },
@@ -3768,12 +3771,19 @@ window.언어칸 = function () {
     if (!N.e) N = { e: ({ ko: '현지 응급 번호(한국에서는 119)', en: 'the local emergency number', es: 'el número de emergencias del país', ja: '現地の緊急番号', zh: '当地急救电话' })[window.LANG] || 'the local emergency number', m: [] };   /* 11-04 번호 모르는 나라 — 글만, 전화 단추 없음 */
     var p = N.m[0] || N.e;
     var 의도 = 마음.test(t) || 마음다국.test(t), L = 위험말[window.LANG] ? window.LANG : 'ko';
+    /* 11-18 질문 250 — 저혈당(인슐린 과량·당뇨약 뒤 식은땀·의식)과 심한 약 피부 반응은 과다 판정보다 먼저 그 카드로 */
+    if (/인슐린.*(많이|잘못|두\s*번|더|과량|실수).*(맞|놨|놓|주사|넣)|저혈당|(당뇨약|인슐린|혈당약).*(식은땀|떨리|정신이?\s*(흐|없|오락)|의식|안\s*깨)/.test(t)) return { 말: (M.g || 위험말.ko.g)(N.e), 전화: N.e };
+    if (/(약|바꾼|먹고|먹은|드시고|드신).*(피부|살갗).*(벗겨|허물|물집)|(피부|살갗).*(벗겨|물집).*(입안|입\s*안|입술|눈).*(헐|물집)/.test(t)) return { 말: (M.k || 위험말.ko.k)(N.e), 전화: N.e };
+    if (/죽겠다(고|며|면서)|죽으려(고)?|죽을\s*(거라|려고)/.test(t) && 과다.test(t)) 의도 = true;
+    if (/(피|코피).*(안\s*멎|안\s*멈|멈추지|멎지|계속\s*나|엄청).*(어지러|쓰러|식은땀|창백)|(어지러|쓰러).*(피|코피).*(안\s*멎|안\s*멈|멈추지)/.test(t)) return { 말: (M.v || 위험말.ko.v)(N.e), 전화: N.e };
     /* 이미 삼킨 것이 먼저(10-28 곁에 교훈). 바깥 검수 9차(10-28): 스스로 해치려고 먹었거나 의식·숨·경련 이상이면 응급 번호,
        증상 없는 실수 복용은 그 나라 중독 상담(있는 나라만 — 미국·스페인·일본). 한국·중국·모르는 나라는 응급 번호 */
-    if (과다.test(t)) {
+    /* 11-18 질문 250 — 「많이 먹여요?」「한 통에 섞어 먹여도」는 앞으로의 질문이지 이미 먹은 일이 아니다 */
+    var 앞질문 = /(먹여도|먹여요\s*\?|먹여야|먹일까|먹어도\s*(돼|되)|먹을까|섞어)/.test(t) && !/(먹었|삼켰|먹은|삼킨|마셨|마신|씹었|깨물)/.test(t);
+    if (!앞질문 && 과다.test(t)) {
       var t2 = t.replace(new RegExp(과다.source, 'gi'), ' ');   /* 「많이 먹었다」 낱말 자체는 중증 신호로 세지 않는다 */
-      var 중증 = 의도 || 응급.concat(응급다국).some(function (r) { return r.test(t2); }) || /의식|깨워도|안\s*깨|숨.*(못|안|힘들|차)|경련|쓰러|unconscious|won'?t wake|not breathing|seizure|inconsciente|no despierta|convuls|意識|けいれん|息をしていない|昏迷|叫不醒|抽搐|没有呼吸/i.test(t2);
-      if (중증) return { 말: M.s(N.e), 전화: N.e };
+      var 중증 = 의도 || 응급.concat(응급다국).some(function (r) { return r.test(t2); }) || /의식|깨워도|안\s*깨|숨.*(못|안|힘들|차|답답|느려|느리)|경련|쓰러|unconscious|won'?t wake|not breathing|seizure|inconsciente|no despierta|convuls|意識|けいれん|息をしていない|昏迷|叫不醒|抽搐|没有呼吸/i.test(t2);
+      if (중증) return { 말: M.s(N.e) + (의도 && L === 'ko' && N.m[0] && N.m[0] !== N.e ? ' 마음이 너무 힘든 이야기는 ' + N.m[0] + '에서 24시간 들어 줘요.' : ''), 전화: N.e };
       var P = 중독상담[window.CC];
       if (P) return { 말: M.p(P.이름[L] || P.이름.en, N.e), 전화: P.번호 };
       return { 말: M.o(N.e), 전화: N.e };
@@ -3782,6 +3792,9 @@ window.언어칸 = function () {
     if (의도 && (!N.m[0] || N.m[0] === N.e)) return { 말: M.n(N.e), 전화: N.e };   /* 11-04 Main — 위기 상담 번호가 없는 나라는 상담 문장 대신 응급 번호 */
     if (의도) { var 말 = M.m(p, N.e); if (!/^(KR|US|ES)$/.test(window.CC || 'KR')) 말 = 말.replace(M.hr[0], M.hr[1]); return { 말: 말, 전화: p }; }
     var 열 = 값 && 값.체온, 달 = 값 && 값.나이개월;
+    /* 11-18 질문 250 — 「생후 두 달 아기 38.1도」: 말로 쓴 개월·체온도 읽는다 */
+    if (!열) { var tm = t.match(/(3[89]|4[0-2])(\.\d)?\s*(도|℃|°)/); if (tm) 열 = parseFloat(tm[0]); }
+    if (달 == null) { var KN = { 한: 1, 두: 2, 세: 3, 네: 4, 다섯: 5 }, dm = t.match(/생후\s*(\d{1,2}|한|두|세|네|다섯)\s*(달|개월)|(\d{1,2}|한|두|세|네|다섯)\s*(달|개월)\s*(된|짜리|아기|애기|아가)/); if (dm) 달 = KN[dm[1] || dm[3]] || +(dm[1] || dm[3]); var dd = t.match(/(?:생후\s*)?(\d{1,3})\s*일\s*(된|째|짜리)/); if (dd && 달 == null) 달 = Math.floor(+dd[1] / 30); }
     if ((열 >= 38 && 달 != null && 달 < 3) || (열 >= 38 && /3\s*개월\s*(미만|안|전)|신생아|백일\s*전|newborn|recién nacido|新生児|新生儿/i.test(t))) return { 말: M.b(N.e), 전화: N.e };
     if (열 >= 39 && 달 != null && 달 >= 3 && 달 < 6) return { 말: (M.i || 위험말.ko.i)(N.e), 전화: N.e };   /* 11-17 Main 승인 — 소아 앱과 같은 기준 */
     if (열 >= 41) return { 말: M.h(N.e), 전화: N.e };
@@ -3884,10 +3897,11 @@ window.언어칸 = function () {
   }
   function 겹침카드(ids) {
     var ds = ids.map(function (i) { return String(i).indexOf('b:') === 0 ? 제품약(i) : drug(i); }).filter(Boolean), T = ME.taking, 결;
-    ME.taking = []; try { 결 = ixCards(ixRun(ds)); } finally { ME.taking = T; }
+    /* 11-18 Main 대화 — 내 약통의 약은 묻지 않고 함께 본다 */ var 통 = (T || []).filter(function (i) { return ids.indexOf(i) < 0; });
+    ME.taking = 통; try { 결 = ixCards(ixRun(ds)); } finally { ME.taking = T; }
     var 센 = 결.filter(function (c) { return c.lv === 'stop' || c.lv === 'warn'; }), 멈 = 센.some(function (c) { return c.lv === 'stop'; });
     return { 결: ds.map(function (d) { return 짧은이름(d.name); }).join(' + ') + ' — ' + (멈 ? '같이 드시면 안 되는 것이 있어요.' : 센.length ? '조심할 것이 있어요.' : '겹치는 성분이나 조심할 조합은 안 보여요.'), 위: 멈,
-      할: 센.length ? 센.slice(0, 3).map(function (c) { return c.t; }) : ['다른 약을 더 드시면 그 약까지 함께 봐야 해요.'],
+      할: (센.length ? 센.slice(0, 3).map(function (c) { return c.t; }) : ['다른 약을 더 드시면 그 약까지 함께 봐야 해요.']).concat(통.length ? ['내 약통의 약 ' + 통.length + '가지도 함께 봤어요.'] : []),
       단: [단추('내 약통에 담고 자세히', function () { ME.taking = ME.taking || []; ids.forEach(function (i) { if (ME.taking.indexOf(i) < 0) ME.taking.push(i); }); saveMe(); go('/together'); }, 1)].concat(ds.slice(0, 2).map(function (d) { return 단추(짧은이름(d.name) + ' 자세히', '/drug/' + d.id); })),
       더: 센.length ? 센.slice(0, 3).map(function (c) { return '<div class="ask-ix"><b>' + esc(c.t) + '</b>' + (typeof c.do === 'string' ? c.do : '') + '</div>'; }).join('') : '' };
   }
@@ -3900,6 +3914,30 @@ window.언어칸 = function () {
            (s.selfcare || []).length ? '<p class="small muted">집에서</p><ul class="plain">' + s.selfcare.slice(0, 3).map(function (x) { return '<li>' + 짧게(x) + '</li>'; }).join('') + '</ul>' : ''].join('') };
   }
   var DI = function (v) { return document.documentElement.classList.contains('ink') ? 'data-ink="' + v + '"' : ''; };   /* 11-17 밤 — 원래 판에서는 잉크 번짐 면을 그리지 않는다(얼굴만) */
+  /* 11-18 질문 250 — 앱 자료(약국 약)에 없는 처방약 짝. 문장은 허가 사항(병용 금기·주의)에 있는 것만 · 숫자는 허가에 적힌 것만(레보티록신 4시간) */
+  var 처방짝목록 = [
+    [/클로피도그렐|플라빅스/, /오메프라졸|에스오메프라졸|에소메프라졸|넥시움|오엠피|로섹/, 'stop', '클로피도그렐과 오메프라졸·에스오메프라졸은 같이 드시지 않는 게 좋아요 — 클로피도그렐 효과가 약해질 수 있어요.', ['스스로 끊지 마시고, 처방한 의사·약사에게 다른 위장약으로 바꿀 수 있는지 물어보세요.']],
+    [/씬지로이드|씬지록신|레보티록신|갑상선\s*(약|호르몬)/, /철분|칼슘|제산제|겔포스|마그밀|알마겔|마그네슘/, 'warn', '갑상선약은 철분·칼슘·제산제와 4시간 이상 띄워 드세요 — 같이 먹으면 갑상선약 흡수가 줄어요.', ['갑상선약은 아침 빈속에 먼저, 철분·칼슘은 점심이나 저녁으로 옮기면 쉬워요.']],
+    [/니트로|질산염|이소소르비드/, /타다라필|실데나필|시알리스|비아그라|발기/, 'stop', '같이 쓰면 안 돼요 — 혈압이 갑자기 크게 떨어질 수 있어요.', ['니트로 약을 처방받으셨다면 발기 약은 처방한 의사에게 먼저 물어보세요.', '가슴 통증으로 니트로를 쓴 날 발기 약을 먹었다면 지금 119에 알리세요.']],
+    [/알로푸리놀|자일로릭/, /아자티오프린|머캅토퓨린|이뮤란/, 'stop', '알로푸리놀과 아자티오프린을 같이 쓰면 아자티오프린 부작용(골수 억제)이 크게 늘어 용량을 줄여야 해요.', ['두 약을 처방한 의사가 같이 쓰는 걸 아는지 드시기 전에 꼭 확인하세요.', '열·목 아픔·멍이 잘 들면 바로 진료를 받으세요.']],
+    [/리팜피신|리팜핀/, /피임약|피임/, 'warn', '리팜피신은 먹는 피임약 효과를 떨어뜨려요 — 피임이 안 될 수 있어요.', ['리팜피신을 먹는 동안과 끝난 뒤 한동안은 콘돔 같은 다른 피임법을 함께 쓰세요. 기간은 처방한 의사에게 물어보세요.']],
+    [/트라마돌|울트라셋/, /우울|항우울|에스시탈로프람|설트랄린|플루옥세틴|파록세틴|벤라팍신|둘록세틴/, 'warn', '트라마돌과 우울증약 일부(세로토닌에 작용하는 약)는 같이 먹으면 세로토닌 증후군·경련 위험이 커져요.', ['처방한 의사·약사에게 우울증약 이름을 말하고 같이 먹어도 되는지 확인하세요.', '열·떨림·근육이 튀는 느낌·심한 초조함이 생기면 119.']],
+    [/전립선|탐스로신|하루날|소변\s*(약|보기)/, /멀미|키미테|스코폴라민|디멘히드리네이트/, 'warn', '멀미약 상당수는 소변을 보기 어렵게 할 수 있어요 — 전립선이 커서 약을 드시면 더 그래요.', ['멀미약을 사기 전에 약사에게 전립선약을 드신다고 말하고 고르세요.', '소변이 아예 안 나오고 아랫배가 부풀면 응급실로 가세요.']],
+    [/감초/, /이뇨|소변약|혈압약|이뇨제/, 'warn', '감초를 많이·오래 드시면 칼륨이 떨어지고 혈압이 오를 수 있어요 — 이뇨제와 같이면 칼륨이 더 떨어질 수 있어요.', ['한약을 지은 곳과 약사에게 지금 드시는 약을 알려 확인하세요.', '다리 힘이 빠지거나 쥐가 자주 나거나 가슴이 두근거리면 진료를 받으세요.']]
+  ];
+  function 처방짝(t) {
+    for (var i = 0; i < 처방짝목록.length; i++) { var x = 처방짝목록[i]; if (x[0].test(t) && x[1].test(t))
+      return { 결: (x[2] === 'stop' ? '' : '') + x[3], 할: x[4].concat(['근거: 식약처 허가 사항(병용 금기·주의) — 처방이 다를 수 있으니 처방한 의사·약사 말이 먼저예요.']), 단: [단추('내 약통에 담고 겹침 보기', '/together', 1)] }; }
+    return null;
+  }
+  /* 11-18 질문 250 — 가려움·연고 질문은 먹는 알레르기 약 답으로 보내지 않고 그 질문에 답한다 */
+  function 가려움답(t) {
+    if (/파스|패치/.test(t) && /(빨개|빨갛|가려|발진|따가|물집|두드러기)/.test(t) && !/숨|입술|목이?\s*조/.test(t)) return { 결: '파스를 떼고 그 자리를 물로 씻은 뒤 더 붙이지 마세요.', 할: ['붙인 모양대로 빨갛고 가려우면 파스 성분이나 접착제에 피부가 반응한 것일 수 있어요.', '번지거나 물집이 크게 잡히거나 며칠 지나도 그대로면 진료를 받으세요.', '다음에는 약사에게 이번 일을 말하고 다른 성분으로 고르세요.'], 단: [] };
+    if (/안약/.test(t) && /(집에|남이|쓰던|예전|형|언니|오빠|누나|엄마|아빠|있던|남은)/.test(t)) return { 결: '집에 있던 안약은 넣기 전에 누구 것인지·언제 뜯었는지부터 보세요.', 할: ['다른 사람에게 처방된 안약, 특히 스테로이드 안약은 아이에게 넣지 마세요.', '뜯은 지 오래된 안약은 오염될 수 있어 버리세요 — 뜯은 뒤 쓸 수 있는 기간은 설명서에 있어요.', '눈곱이 많거나 빨갛게 붓거나 아파하거나 잘 안 보이면 진료를 받으세요.'], 단: [] };
+    if (/무좀/.test(t) && /(그만|멈|끊|언제까지|며칠|계속)/.test(t)) return { 결: '가려움이 없어져도 설명서에 적힌 기간까지 바르세요.', 할: ['겉으로 나아 보여도 곰팡이가 남아 있으면 다시 생기기 쉬워요.', '씻고 잘 말린 뒤, 아픈 곳보다 조금 넓게 발라요.', '설명서 기간을 다 발라도 그대로면 무좀이 아닐 수 있어요 — 진료를 받으세요.'], 단: [] };
+    if (/스테로이드/.test(t) && /(없는|안\s*든|빼고|말고)/.test(t) && /가려|연고|크림|바르/.test(t)) return { 결: '스테로이드가 없는 가려움 연고도 있어요 — 약사에게 스테로이드 없는 것으로 달라고 하세요.', 할: ['벌레 물림·가벼운 가려움에는 가려움을 가라앉히는 성분이 든 연고·물약이 있어요.', '진물·고름이 있거나 둥글게 번지면 곰팡이·세균일 수 있어 진료가 먼저예요.', '온몸에 번지는 두드러기는 바르는 약보다 먹는 알레르기 약이 맞을 수 있어요.'], 단: [] };
+    return null;
+  }
   function 상황답(t, 값) {
     var 달 = 값 && 값.나이개월 != null ? 값.나이개월 : (function () { var m = String(t).match(/(?:생후\s*)?(\d{1,2})\s*개월/); return m ? +m[1] : null; })();
     var sid = null, s = null; try { sid = 증상찾기(t); s = sid && (D.symptoms || []).filter(function (x) { return x.id === sid; })[0]; } catch (e) {}
@@ -3940,7 +3978,7 @@ window.언어칸 = function () {
   window.__부정 = function (q) { var m = String(q || '').match(부정꼴); if (!m) return null; var ex = m[2], ids = 약찾기(ex), rest = (m[1] + ' ' + m[4]).replace(/\s+/g, ' ').trim();
     var 꼬리없이 = typeof qClean === 'function' ? qClean(rest) : rest; if (/^(다른|딴|다른\s*거|뭐|뭘|무슨|어떤)?\s*(약|거|것)?\s*(먹어요|먹을\s*약|있어요|있나요)?$/.test(꼬리없이)) rest = '';
     return { ex: ex, ids: ids, rest: rest }; };
-  function 답짓기(t) {
+  function 답짓기0(t) {
     var 앎 = { 글: t, 뜻: [], 값: window.대화 && 대화.만들기 ? (function () { try { return 대화.만들기({ 앱: 'yakjido', 약: [] }).이해(t).값 || {}; } catch (e) { return {}; } })() : {} };
     var w = 위험(t, 앎.값); if (w) return { 위험: w };
     var 부 = window.__부정(t), 빼기 = 부 ? 부.ids : [];
@@ -3949,6 +3987,8 @@ window.언어칸 = function () {
     if (부) t = 부.rest;
     /* 11-17 Main 승인(20문항 대결 ⚠) — 질문 속 상황(임신·수유·생후 개월·피가 안 멎음·주운 알약·항생제 끊기·기록 말)을 먼저 본다.
        답은 앱에 이미 있는 글(겹침 규칙 preg-nsaid · 코피·피 묽게 하는 약 길잡이 · 항생제 길잡이)만 — 금기·응급이 맨 위, 용량은 뒤 */
+    var 짝 = 처방짝(t); if (짝) return 짝;
+    var 가렵 = 가려움답(t); if (가렵) return 가렵;
     var 상 = 상황답(t, 앎.값); if (상) return 상;
     /* 11-16 졸음 껌·에너지 음료·커피 — 카페인 팁 한 장(식약처 하루 최대 권고량) */
     if (/졸음\s*껌|잠\s*깨는\s*껌|에너지\s*(음료|드링크)|핫식스|레드불|몬스터|카페인|커피\s*(몇|하루|얼마|많이)|고카페인/i.test(t)) { var tp = (D.tips || []).filter(function (x) { return x.id === 'caffeine'; })[0];
@@ -3965,16 +4005,58 @@ window.언어칸 = function () {
     if (ids.length === 1) { 묻기.약 = ids; var d = drug(ids[0]); if (d) return 약카드(d, t); }
     var sid = 증상찾기(t), s = sid && (D.symptoms || []).filter(function (x) { return x.id === sid; })[0];
     if (s) return 증상카드(s);
+    if (같이 && /약|제|정|린|롤|핀|신|틴|탄/.test(t) && !/알약|각인/.test(t)) return { 결: '이 조합은 앱 자료에 없어 판정하지 못했어요 — 같이 드시기 전에 약사나 처방한 의사에게 꼭 확인하세요.', 할: ['약봉투나 두 약의 이름을 그대로 보여 주세요.', '내 약통에 담아 두면 아는 성분끼리는 바로 겹침을 봐 드려요.'], 단: [단추('내 약통에 담고 겹침 보기', '/together', 1)] };
     if (/알약|낱알|각인|써\s*있|적혀/.test(t)) return { 결: '색·모양·앞뒤 글자로 찾을 수 있어요. 사진으로 약봉투를 읽을 수도 있어요.', 할: [], 단: [단추('알약 찾기', '/pill', 1), 단추('사진으로 읽기', '/photo')] };
     return null;
   }
   window.__답짓기 = function (q) { try { 묻기.기다림 = null; 묻기.약 = []; } catch (e) {} return 답짓기(q); };   /* 11-18 검색 대량 시험(tests/search5k.py)이 부른다 — 화면엔 영향 없음 */
+  /* 11-18 Main 「목록 말고 대화처럼」 — ① 알아들었다는 한 줄 ② 결론(결) ③ 할 일 ④ 되묻기 단추(누가 드시나요 — 누르면 앞 질문에 붙여 다시 답) ⑤ 자세히. 바깥 AI 없음 */
+  function 이름(i) { var d = String(i).indexOf('b:') === 0 ? 제품약(i) : drug(i); return d ? 짧은이름(d.name) : ''; }
+  function 받음(t, r) {
+    if (!r || r.위험 || !r.결) return '';
+    var 누 = /(엄마|어머니)/.test(t) ? '어머니' : /(아빠|아버지)/.test(t) ? '아버지' : /(할머니|할아버지|어르신)/.test(t) ? '어르신' : /(아이|애기|아기|애가|우리\s*애|[0-9]+\s*살|개월)/.test(t) ? '아이' : /임신|임산부/.test(t) ? '임신 중' : /수유|모유/.test(t) ? '수유 중' : '';
+    var 앞 = 누 === '임신 중' || 누 === '수유 중' ? 누 + '이시군요. ' : 누 ? 누 + ' 약이군요. ' : '';
+    for (var i = 0; i < 처방짝목록.length; i++) { var x = 처방짝목록[i]; if (x[0].test(t) && x[1].test(t)) { var a = t.match(x[0])[0], b = t.match(x[1])[0]; return 앞 + a + josa(a, '과', '와') + ' ' + b + josa(b, '을', '를') + ' 같이 드셔도 되는지 물으셨군요.'; } }
+    var ids = []; try { ids = 약찾기(t); } catch (e) {}
+    var ns = ids.map(이름).filter(Boolean).filter(function (n, k, A) { return A.indexOf(n) === k; });
+    var 같이 = /같이|함께|이랑|랑\s|하고|병용|동시에|한꺼번에/.test(t);
+    if (ns.length >= 2) return 앞 + ns[0] + josa(ns[0], '과', '와') + ' ' + ns[1] + josa(ns[1], '을', '를') + ' 같이 드시려는군요.';
+    if (ns.length === 1) return 앞 + ns[0] + josa(ns[0], '을', '를') + ' 물으셨군요.';
+    var sid = null; try { sid = 증상찾기(t); } catch (e) {}
+    var sy = sid && (D.symptoms || []).filter(function (x) { return x.id === sid; })[0];
+    if (sy) return 앞 + String(sy.name).split(/[·(]/)[0].trim() + ' 때문에 물으셨군요.';
+    return 앞 ? 앞.trim() : '';
+  }
+  function 되묻기(t, r) {
+    if (!r || r.위험 || !r.결) return [];
+    var c = [];
+    if (!/(아이|애기|아기|애가|우리\s*애|살|개월|어르신|할머니|할아버지|엄마|어머니|아빠|아버지|임신|임산부|수유|모유)/.test(t)) c.push('아이가 먹어요', '어르신이 드세요', '임신 중이에요');
+    if (!(ME.taking || []).length && !/같이|함께|이랑|하고/.test(t)) c.push('다른 약도 먹고 있어요');
+    return c;
+  }
+  function 답짓기(t) {
+    var r = 답짓기0(t);
+    if (r && !r.위험 && r.결) {   /* 누가 드시는지 말하면 답이 바뀐다 — 아이는 몸무게 계산 먼저, 어르신은 조심 한 줄 먼저 */
+      var 아 = /(아이|애기|아기|애가|애는|우리\s*애|[0-9]+\s*살|개월)/.test(t) && !/아이\s*해열제는 몸무게/.test(r.결), 어 = /(어르신|할머니|할아버지|노인|65\s*세|칠순|팔순|여든)/.test(t);
+      if (아 && !/몸무게/.test((r.할 || []).join(' '))) { var H0 = r.할 || [], 몸 = '아이는 어른 양이 아니라 몸무게로 양을 정해요 — 「아이 약 양 계산」에 몸무게를 넣어 보세요.'; r.할 = (H0.length ? [H0[0], 몸].concat(H0.slice(1)) : [몸]).slice(0, 4);   /* 안전 줄(첫 할 일)은 그대로 맨 위 */ r.단 = [단추('아이 약 양 계산', '/kids', 1)].concat(r.단 || []); }
+      else if (어) { var H1 = r.할 || [], 나 = '나이가 들면 같은 약도 콩팥·위에 부담이 커요 — 약사에게 나이와 드시는 약을 말하고 고르세요.'; r.할 = (H1.length ? [H1[0], 나].concat(H1.slice(1)) : [나]).slice(0, 4); }
+    }
+    if (r && !r.위험) { r.받 = r.받 || 받음(t, r); var 되 = 되묻기(t, r); if (되.length) r.칩 = (r.칩 || []).concat(되).filter(function (x, k, A) { return A.indexOf(x) === k; }).slice(0, 6); }
+    return r;
+  }
+  /* 앞 질문 이어 받기 — 「그럼 아이는?」·되묻기 단추는 앞 질문에 붙여 다시 답한다 */
+  function 이어(글) {
+    var 앞 = 묻기.앞; if (!앞) return 글;
+    if (/^(그럼|그러면|그런데|근데)\s|^(아이|애|아기|어르신|할머니|할아버지|엄마|아빠|임신|수유)\S{0,3}\s*(는|은)?\s*(요|요\?|\?)?$|는요\s*\??$|^(아이가 먹어요|어르신이 드세요|임신 중이에요)$/.test(글)) return 앞 + ' ' + 글.replace(/^(그럼|그러면|그런데|근데)\s*/, '');
+    return 글;
+  }
+  window.__이어 = function (앞, 글) { 묻기.앞 = 앞; var q = 이어(글); var r = 답짓기(q); return { q: q, r: r }; };
   function 답그리기(r) {
     if (r.위험) return '<article class="ask-ans sos" role="alert"><p class="ask-c">' + esc(r.위험.말) + '</p>' + (r.위험.전화 && /^[\d+][\d\s-]*$/.test(String(r.위험.전화)) ? '<a class="btn ask-call" href="tel:' + esc(String(r.위험.전화).replace(/[^\d+]/g, '')) + '">' + I.alert + ' ' + esc(r.위험.전화) + ' 전화</a>' : '') + '</article>';
     if (!r.결) return '<article class="ask-ans"><p class="ask-c">아직 이 질문은 찾지 못했어요. 이렇게 물어보시면 찾을 수 있어요.</p><div class="ask-chips">' + 예시.slice(0, 4).map(칩).join('') + '</div></article>';
     /* 11-17 주요 단추 하나 + 나머지는 글 링크 */
     var 단 = (r.단 || []).map(function (b, i) { var k = 'a' + 묻기.log.length + '_' + i + '_' + Date.now() % 100000; 묻기.할일[k] = b.할; return i === 0 ? '<button type="button" class="btn" ' + DI('solid') + ' onclick="묻기단추(\'' + k + '\')">' + esc(b.글) + I.chev + '</button>' : '<button type="button" class="ask-link" onclick="묻기단추(\'' + k + '\')">' + esc(b.글) + ' ›</button>'; }).join('');
-    return '<article class="ask-ans' + (r.위 ? ' warn' : '') + '"><p class="ask-c">' + 짧게(r.결) + '</p>' + ((r.할 || []).length ? '<ol class="ask-do">' + r.할.map(function (x) { return '<li>' + 짧게(x) + '</li>'; }).join('') + '</ol>' : '') +
+    return '<article class="ask-ans' + (r.위 ? ' warn' : '') + '">' + (r.받 ? '<p class="ask-got">' + esc(r.받) + '</p>' : '') + '<p class="ask-c">' + 짧게(r.결) + '</p>' + ((r.할 || []).length ? '<ol class="ask-do">' + r.할.map(function (x) { return '<li>' + 짧게(x) + '</li>'; }).join('') + '</ol>' : '') +
       (단 ? '<div class="ask-act">' + 단 + '</div>' : '') + ((r.칩 || []).length ? '<div class="ask-chips">' + r.칩.map(칩).join('') + '</div>' : '') +
       (r.더 ? '<details class="ask-more"><summary>자세히' + I.chev + '</summary>' + r.더 + '</details>' : '') + '</article>';
   }
@@ -3983,7 +4065,9 @@ window.언어칸 = function () {
   window.묻기단추 = function (k) { var f = 묻기.할일[k]; if (typeof f === 'function') f(); else if (f) go(f); };
   window.묻기보냄 = function (글) {
     글 = String(글 || '').trim(); if (!글) return;
-    var 보 = function () { var r = null; try { r = 답짓기(글); } catch (e) { r = null; } 묻기.log.push({ q: 글, html: 답그리기(r || {}) }); if (묻기.log.length > 30) 묻기.log.shift(); 그림(); };
+    if (글 === '다른 약도 먹고 있어요') { go('/together'); return; }
+    var 물음 = 이어(글);
+    var 보 = function () { var r = null; try { r = 답짓기(물음); } catch (e) { r = null; } if (r && !r.위험 && 물음 === 글) 묻기.앞 = 글; 묻기.log.push({ q: 글, html: 답그리기(r || {}) }); if (묻기.log.length > 30) 묻기.log.shift(); 그림(); };
     (typeof ensureCore === 'function' && CORE !== 2 ? ensureCore() : Promise.resolve()).then(보, 보);
   };
   function 그림() {
@@ -4227,7 +4311,7 @@ window.언어칸 = function () {
   /* 11-16 Main — 홈에서는 예시 칩 셋만(누르면 물어보기 답 한 장), 나머지는 물어보기 화면에. 맨 위 찾기 칸에 치고 엔터를 눌러도 같은 화면 */
   window.대화줄 = function () { if (window.LANG && window.LANG !== 'ko') return ''; return '<div class="talk-door"><span class="b">무엇이든 물어보세요</span><div class="ask-chips">' + ['목이 아파요', '타이레놀이랑 판콜에이 같이 먹어도 돼요?', '졸음 껌 성분이 뭐예요?'].map(function (c) { return '<a class="chip" href="#/talk?q=' + encodeURIComponent(c) + '">' + esc(c) + '</a>'; }).join('') + '</div><a class="small link" href="#/talk">다른 질문 하기 ›</a></div>'; };
   var cs = document.createElement('style');
-  cs.textContent = '.ask-link{min-height:44px;padding:0 4px;background:none;border:0;color:var(--primary);font-weight:600;font-size:.9375rem;cursor:pointer}html:not(.ink) .ask-row .ink-face{display:none}.ask-row{display:flex;gap:8px;align-items:flex-start}.ask-row .ask-ans{flex:1;min-width:0;max-width:none}.ask-face{flex:none;width:32px;height:32px;border-radius:10px;margin-top:2px}.ask-morechips summary,.ask-disc summary{display:inline-flex;align-items:center;min-height:44px;color:var(--primary);font-weight:600;cursor:pointer;list-style:none}.ask-morechips summary::-webkit-details-marker,.ask-disc summary::-webkit-details-marker{display:none}.ask-disc{margin-top:16px}.ask-disc summary{color:var(--muted);font-weight:500;font-size:.875rem}.talk-door .ask-chips{margin:6px 0 2px}.talk-door .chip{text-decoration:none;background:var(--card);border:1px solid var(--hairline);color:var(--ink);font-weight:600;min-height:44px;padding:8px 14px;border-radius:999px;display:inline-flex;align-items:center}.ask-in{display:flex;gap:8px}.ask-in input{flex:1;min-width:0;min-height:52px;padding:0 14px;border-radius:14px;border:1px solid var(--hairline);background:var(--card);font-size:max(16px,1rem)}.ask-in .btn{width:auto;min-height:52px;padding:0 18px}.ask-chips{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0}.ask-chips .chip{min-height:44px;white-space:normal;text-align:left}.ask-log{display:flex;flex-direction:column;gap:10px;margin-top:14px}.ask-me{display:flex;justify-content:flex-end}.ask-me span{max-width:84%;padding:10px 14px;border-radius:18px 18px 6px 18px;background:var(--primary);color:var(--on-primary,#fff);font-weight:600;word-break:keep-all;overflow-wrap:anywhere}.ask-ans{max-width:94%;padding:14px 16px;border-radius:18px 18px 18px 6px;background:var(--card);border:1px solid var(--hairline);word-break:keep-all;overflow-wrap:anywhere}.ask-ans.warn{border-color:var(--caution)}.ask-ans.sos{background:var(--alert-tint);border-color:var(--alert)}.ask-ans.sos .ask-c{color:var(--alert)}.ask-c{font-weight:700;font-size:1.0625rem;line-height:1.5}.ask-do{margin:8px 0 0;padding-left:1.2em}.ask-do li{margin:4px 0;line-height:1.55}.ask-act{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}.ask-act .btn{width:auto;min-height:46px;padding:0 14px;display:inline-flex;align-items:center;gap:4px}.ask-call{display:flex;justify-content:center;align-items:center;gap:6px;margin-top:10px;min-height:52px;background:var(--alert)!important;color:var(--on-alert,#fff)!important;text-decoration:none}.ask-more{margin-top:10px}.ask-more summary{display:inline-flex;align-items:center;min-height:44px;color:var(--primary);font-weight:600;cursor:pointer;list-style:none}.ask-more summary::-webkit-details-marker{display:none}.ask-ix{margin:8px 0}.ask-ix p{margin:4px 0}'+'.talk-door{display:flex;flex-direction:column;gap:4px;margin:12px 0 4px;padding:14px 16px;border-radius:18px 18px 18px 6px;background:var(--tint);color:var(--ink);text-decoration:none;min-height:48px}.talk-door .b{font-weight:700}.talk{min-height:50vh}';
+  cs.textContent = '.ask-got{margin:0 0 4px;color:var(--muted);font-size:.9375rem;line-height:1.5;word-break:keep-all}.ask-link{min-height:44px;padding:0 4px;background:none;border:0;color:var(--primary);font-weight:600;font-size:.9375rem;cursor:pointer}html:not(.ink) .ask-row .ink-face{display:none}.ask-row{display:flex;gap:8px;align-items:flex-start}.ask-row .ask-ans{flex:1;min-width:0;max-width:none}.ask-face{flex:none;width:32px;height:32px;border-radius:10px;margin-top:2px}.ask-morechips summary,.ask-disc summary{display:inline-flex;align-items:center;min-height:44px;color:var(--primary);font-weight:600;cursor:pointer;list-style:none}.ask-morechips summary::-webkit-details-marker,.ask-disc summary::-webkit-details-marker{display:none}.ask-disc{margin-top:16px}.ask-disc summary{color:var(--muted);font-weight:500;font-size:.875rem}.talk-door .ask-chips{margin:6px 0 2px}.talk-door .chip{text-decoration:none;background:var(--card);border:1px solid var(--hairline);color:var(--ink);font-weight:600;min-height:44px;padding:8px 14px;border-radius:999px;display:inline-flex;align-items:center}.ask-in{display:flex;gap:8px}.ask-in input{flex:1;min-width:0;min-height:52px;padding:0 14px;border-radius:14px;border:1px solid var(--hairline);background:var(--card);font-size:max(16px,1rem)}.ask-in .btn{width:auto;min-height:52px;padding:0 18px}.ask-chips{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0}.ask-chips .chip{min-height:44px;white-space:normal;text-align:left}.ask-log{display:flex;flex-direction:column;gap:10px;margin-top:14px}.ask-me{display:flex;justify-content:flex-end}.ask-me span{max-width:84%;padding:10px 14px;border-radius:18px 18px 6px 18px;background:var(--primary);color:var(--on-primary,#fff);font-weight:600;word-break:keep-all;overflow-wrap:anywhere}.ask-ans{max-width:94%;padding:14px 16px;border-radius:18px 18px 18px 6px;background:var(--card);border:1px solid var(--hairline);word-break:keep-all;overflow-wrap:anywhere}.ask-ans.warn{border-color:var(--caution)}.ask-ans.sos{background:var(--alert-tint);border-color:var(--alert)}.ask-ans.sos .ask-c{color:var(--alert)}.ask-c{font-weight:700;font-size:1.0625rem;line-height:1.5}.ask-do{margin:8px 0 0;padding-left:1.2em}.ask-do li{margin:4px 0;line-height:1.55}.ask-act{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}.ask-act .btn{width:auto;min-height:46px;padding:0 14px;display:inline-flex;align-items:center;gap:4px}.ask-call{display:flex;justify-content:center;align-items:center;gap:6px;margin-top:10px;min-height:52px;background:var(--alert)!important;color:var(--on-alert,#fff)!important;text-decoration:none}.ask-more{margin-top:10px}.ask-more summary{display:inline-flex;align-items:center;min-height:44px;color:var(--primary);font-weight:600;cursor:pointer;list-style:none}.ask-more summary::-webkit-details-marker{display:none}.ask-ix{margin:8px 0}.ask-ix p{margin:4px 0}'+'.talk-door{display:flex;flex-direction:column;gap:4px;margin:12px 0 4px;padding:14px 16px;border-radius:18px 18px 18px 6px;background:var(--tint);color:var(--ink);text-decoration:none;min-height:48px}.talk-door .b{font-weight:700}.talk{min-height:50vh}';
   document.head.appendChild(cs);
 })();
 
