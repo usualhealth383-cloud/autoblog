@@ -281,7 +281,7 @@ print(f'첫 화면 {len(out)/1024:.0f} KB · 본문 data/core.json {len(jc)/1024
 _dd = ROOT.parent / 'docs' / 'yakjido' / 'data'
 _off = [{'n': f.name, 'b': f.stat().st_size} for f in sorted(_dd.glob('*.json')) if f.name != 'offline.json']
 _off_i = [{'n': f.name, 'b': f.stat().st_size} for f in sorted((_dd / 'i18n').glob('*.json'))] if (_dd / 'i18n').exists() else []
-_off_x = [{'n': str(f.relative_to(ROOT)), 'b': f.stat().st_size} for _d in ('fonts', 'vendor') if (ROOT / _d).exists() for f in sorted((ROOT / _d).rglob('*')) if f.is_file()]
+_off_x = [{'n': str(f.relative_to(ROOT)), 'b': f.stat().st_size} for _d in ('fonts', 'vendor') if (ROOT / _d).exists() for f in sorted((ROOT / _d).rglob('*')) if f.is_file() and 'ocr' not in f.parts]   # 11-18 사진 글자 읽기 도구(약 12 MB)는 기내 받기에 넣지 않고 처음 쓸 때만
 (_dd / 'offline.json').write_text(json.dumps({'data': _off, 'i18n': _off_i, 'ext': _off_x}, ensure_ascii=False, separators=(',', ':')), encoding='utf-8')
 # 찾아오기(10-27 Main · 요청서 20261027_찾아오기_중국) — medinanum.com 짧은 판 재료. 화면엔 안 보임. seo.json(검색제목·검색설명·찾는말 다섯 언어) + 글 첫 단락·할 일·이럴 땐 바로·주소·출처
 def _seo():
@@ -369,6 +369,9 @@ for name in ('manifest.webmanifest', 'privacy.html', 'terms.html', 'delete-accou
 # 메디나눔 공통 이름(privacy-<앱>.html · delete-account-<앱>.html)으로도 같은 쪽을 둔다 — 옛 주소(privacy.html)는 스토어에 이미 적혀 있어 그대로 둔다
 for name, alias in (('privacy.html', 'privacy-yakjido.html'), ('terms.html', 'terms-yakjido.html'), ('delete-account.html', 'delete-account-yakjido.html')):
     if (pages / name).exists(): (pages / alias).write_text((pages / name).read_text(encoding='utf-8'), encoding='utf-8')
+# 11-18 스토어(TWA) — https://yakjido.medinanum.com/.well-known/assetlinks.json 자리(지문은 서명 뒤 well-known/assetlinks.json 에 넣는다)
+if (ROOT / 'well-known' / 'assetlinks.json').exists():
+    (pages / '.well-known').mkdir(exist_ok=True); (pages / '.well-known' / 'assetlinks.json').write_text((ROOT / 'well-known' / 'assetlinks.json').read_text(encoding='utf-8'), encoding='utf-8')
 for ic in (ROOT / 'icons').glob('*'):
     (pages / ic.name).write_bytes(ic.read_bytes())
 

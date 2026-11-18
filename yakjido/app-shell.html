@@ -2613,7 +2613,7 @@ function route(){
   /* 처음 안내 중에는 아래 탭을 감춘다 — 누르면 안내가 반쯤 끝났다(3-24) */
   document.body.classList.toggle('no-nav', /^(hello|consent|login|doc)$/.test(seg[0])); document.body.classList.toggle('is-door', /^(consent|login)$/.test(seg[0]));
   const q = Object.fromEntries(new URLSearchParams(qs || '')); entryTake(q); try { if (q.all === '1') sessionStorage.setItem('yakjido.all', '1'); else if (q.all === '0') sessionStorage.removeItem('yakjido.all'); } catch (e) {}
-  const tab = { people:'home', send:'home', p:'home', show:'home', check:'home', home:'home', symptom:'home', drugs:'drugs', drug:'drugs', class:'drugs', search:'drugs', pub:'drugs', pill:'drugs', guide:'home', kids:'home', tips:'home', myths:'home', schedule:'me', notify:'me', photo:'drugs', pillinfo:'drugs', supp:'supp', sgoal:'supp', sstage:'supp', compare:'supp', me:'me', about:'me', ingr:'drugs', brand:'drugs', nut:'supp', hello:'home', mix:'drugs', together:'me', kinds:'me', rx:'me', rxout:'drugs', senior:'drugs', askdoc:'home', talk:'home', login:'login' }[seg[0]] || 'home';
+  const tab = { barcode:'home', people:'home', send:'home', p:'home', show:'home', check:'home', home:'home', symptom:'home', drugs:'drugs', drug:'drugs', class:'drugs', search:'drugs', pub:'drugs', pill:'drugs', guide:'home', kids:'home', tips:'home', myths:'home', schedule:'me', notify:'me', photo:'drugs', pillinfo:'drugs', supp:'supp', sgoal:'supp', sstage:'supp', compare:'supp', me:'me', about:'me', ingr:'drugs', brand:'drugs', nut:'supp', hello:'home', mix:'drugs', together:'me', kinds:'me', rx:'me', rxout:'drugs', senior:'drugs', askdoc:'home', talk:'home', login:'login' }[seg[0]] || 'home';
   /* 지금 탭을 색으로만 보이지 않게 — 화면낭독기가 「현재 페이지」라고 읽는다(5-18) */
   document.querySelectorAll('nav.tabbar button').forEach(b => { const on = b.dataset.tab === tab; b.classList.toggle('on', on); on ? b.setAttribute('aria-current', 'page') : b.removeAttribute('aria-current'); });
   /* 본문 자료가 아직이면 — 첫 화면과 인사만 먼저 그리고, 나머지는 받은 뒤에 다시 그린다.
@@ -2635,7 +2635,7 @@ function route(){
     if (DETAIL === 3) { window.__DETAIL_SKIP__ = true; ensureDetail(); }
     else { view.innerHTML = topBar({ back:'뒤로', nosearch:true }) + `<section class="sec"><p class="loading">자료를 불러오는 중이에요…</p></section>`; ensureDetail().then(route); return; }
   }
-  const R = { od:vOd, send:vSend, p:vParentShare, show:vShow, check:vCheck, home:vHome, symptom:vSymptom, drugs:vDrugs, drug:vDrug, class:vClass, search:vSearch, pub:vPub, pill:vPill, guide:vGuide, kids:vKids, tips:vTips, myths:vMyths, schedule:vSchedule, notify:vDoor, photo:vPhoto, pillinfo:vPillInfo, supp:vSupp, sgoal:vDoor, sstage:vDoor, compare:vCompare, me:vMe, about:vAbout, ingr:vIngr, brand:vBrand, nut:vNut, hello:vHello, mix:vMix, together:vTogether, kinds:vKinds, rx:vRx, bag:vBag, rxout:vRxOut, senior:vSenior, askdoc:vAskDoc, talk:vTalk, vitals:vVitals, visits:vVisits, demo:vDemo, consent:vDoor, login:vDoor, doc:vDoor, people:vDoor };
+  const R = { od:vOd, send:vSend, p:vParentShare, show:vShow, check:vCheck, home:vHome, symptom:vSymptom, drugs:vDrugs, drug:vDrug, class:vClass, search:vSearch, pub:vPub, pill:vPill, guide:vGuide, kids:vKids, tips:vTips, myths:vMyths, schedule:vSchedule, notify:vDoor, photo:vPhoto, pillinfo:vPillInfo, supp:vSupp, sgoal:vDoor, sstage:vDoor, compare:vCompare, me:vMe, about:vAbout, ingr:vIngr, brand:vBrand, nut:vNut, hello:vHello, mix:vMix, together:vTogether, kinds:vKinds, rx:vRx, bag:vBag, rxout:vRxOut, senior:vSenior, askdoc:vAskDoc, talk:vTalk, vitals:vVitals, visits:vVisits, demo:vDemo, consent:vDoor, login:vDoor, doc:vDoor, people:vDoor, barcode:vDoor };
   /* 한 화면이 그리다 터져도 앱 전체가 멈춘 것처럼 보이지 않게 — 자료 한 줄의 흠이 흰 화면이 되지 않도록(2026-10-08 출시 점검) */
   let html;
   /* 익명 이용 통계(공용 이용량 부품 · 기본 꺼짐) — 화면 «종류» 이름만 센다. 약 이름·증상·검색어는 세지 않는다 */
@@ -3541,7 +3541,7 @@ function homeList(){
 }
 function homeTab(k){
   HTAB = k; try { sessionStorage.setItem('yakjido.htab', k); } catch (e) {}
-  TIDY.hsym = 1; document.querySelector('[data-k=hsym]')?.setAttribute('open', '');
+  TIDY.hsym = TIDY.hmore = 1; document.querySelectorAll('[data-k=hsym],[data-k=hmore]').forEach(d => d.setAttribute('open', ''));
   const el = document.getElementById('hlist'); if (!el) return route();
   el.outerHTML = homeList();
   document.querySelectorAll('.htabs .tab').forEach(b => { const on = b.dataset.k === k; b.classList.toggle('on', on); b.setAttribute('aria-selected', on); });
@@ -3550,7 +3550,7 @@ const storeBar = () => STORE_OK || STORE_HIDE ? '' : `<div class="note soft stor
 function storeHide(){ STORE_HIDE = true; try { sessionStorage.setItem('yakjido.storehide', '1'); } catch (e) {} route(); const h = view.querySelector('h1'); if (h) { h.setAttribute('tabindex', '-1'); try { h.focus({ preventScroll: true }); } catch (e) {} } }
 /* 10-19 몸 위치 8칸 격자(다음방향 리서치 5-3·5-4) — 고르면 그 칸 목록으로. 대표 증상 둘을 함께 보여 무엇이 드는지 안다 */
 const regionGrid = () => { const S = D.symptoms || [];
-  return `<div class="rg" role="group" aria-label="어디가 불편하세요">${Object.keys(GROUP_CLS).slice(0, 8).map(g => { const L = S.filter(s => s.group === g); return L.length ? `<button class="rg-t ${GROUP_CLS[g]}" onclick="homeTab('g:${g}');jumpTo('hlist')"><span class="ic">${sicon(L[0])}</span><b>${esc(g)}</b><small>${L.slice(0, 2).map(s => esc(s.name.split(/ \(|·/)[0])).join(' · ')}</small></button>` : ''; }).join('')}</div>`; };
+  return `<div class="rg" role="group" aria-label="어디가 불편하세요">${Object.keys(GROUP_CLS).slice(0, ALLV() ? 8 : 6).map(g => { const L = S.filter(s => s.group === g); return L.length ? `<button class="rg-t ${GROUP_CLS[g]}" onclick="homeTab('g:${g}');jumpTo('hlist')"><span class="ic">${sicon(L[0])}</span><b>${esc(g)}</b><small>${L.slice(0, 2).map(s => esc(s.name.split(/ \(|·/)[0])).join(' · ')}</small></button>` : ''; }).join('')}</div>`; };
 /* 현욱님 10-22(메디나눔 감사 ④-1) — 홈 맨 위에 지금 되는 두 가지를 크게: 약 찾기(이름·모양) · 오늘 약·알림.
    사진은 휴대폰 안에서 글자를 읽는 방식(tesseract.js)으로 된다 — 사진 화면에서 이름·모양 찾기로도 이어진다(서버 판독은 꺼져 있음) */
 function homeQuick(n){
@@ -3584,11 +3584,12 @@ function vHome(){
     <h1 class="greet">어디가 불편하세요?</h1>
     <p>증상을 고르면 약국에서 물어볼 약을 알려 드려요.</p>
   </section>`}
-  ${INK ? '' : ext('대화줄')}
+  ${INK || !ALLV() ? '' : ext('대화줄')}
   ${svOn() ? '' : kidHome() + ext('오늘한장') + regionGrid()}${ext('약담기권함')}
   ${ext('필요약줄')}${odL}${ALLV() ? homeQuick(n) : ''}
   ${ext('응급칸')}${svOn() ? '' : ER_LINE()}
   ${condOn().length || ME.condskip ? '' : `<div class="cond-line"><button type="button" onclick="go('/me?t=body')">${I.user}<span>앓는 병이 있으면 알려 주세요 — <b>피해야 할 약을 걸러 드려요</b></span>${I.chev}</button><button type="button" class="x" aria-label="이 안내 닫기" onclick="ME.condskip=true;saveMe();route()">${I.x}</button></div>`}
+  ${tidy('더 보기 — 묻기 · 다른 증상 · 바로 가기', `${INK ? '' : ext('대화줄')}
   ${storeBar()}
   <div class="util" aria-label="다른 방법으로 찾기">
     ${v && vd <= 3 ? urow(I.cal, `${vd <= 0 ? '오늘' : vd === 1 ? '내일' : vd + '일 뒤'} 진료`, `${esc(visitWord(v, false))} · 내 약 한 장 챙기기`, "go('/visits')", '보기', 'visit-soon') : ''}
@@ -3613,6 +3614,7 @@ function vHome(){
     ${lrow(I.cart, '편의점에서 살 수 있는 약', '안전상비의약품 13종', "go('/drugs?cat=cvs')")}
   </div>
 `, 'hgo')}
+`, 'hmore')}
   ${ALLV() ? ext('기내줄') : ''}
   ${disclaimer()}`;
 }
@@ -4956,7 +4958,7 @@ function vKids(){
       <p class="small muted" style="margin-top:8px">${esc(D.note)}</p></div>`;
     /* 11-17 현욱님 — 두 층: 쉽게 보기 = 한 숫자(약 상자 허가 표 값 · 상한 안) + 간격 한 줄 / 자세히(접힘) = 정확한 범위·mg/kg·하루 최대·허가 나이·출처 */
     const one = kidOne(r), P = window.메디나눔해열제, SRC = P ? P.출처표 : {}, sk = k === 'apap' ? ['apap_table', 'apap_pk', 'apap_gap', 'apap_day', 'apap_times', 'apap_min'] : ['ibu_table', 'ibu_pk', 'ibu_gap', 'ibu_day', 'ibu_min'];
-    const why1 = one.from === 'table' ? `약 상자 표의 몸무게 칸 값이에요.` : one.from === 'age' ? `약 상자 표의 나이 칸(${esc((ibuRow(m) || [])[2] || '')}) 값이에요 — 몸무게 범위를 넘지 않게 맞췄어요.` : `약 상자 표에 맞는 칸이 없어(${k === 'ibu' ? '나이를 몰라서' : '7 kg 미만'}) 몸무게 범위의 아래 끝으로 보였어요.`;
+    const why1 = one.from === 'table' ? `약 상자 표의 몸무게 칸 값이에요.` : one.from === 'range' ? `몸무게 범위의 가운데 값을 0.5 mL 단위로 내린 값이에요.` : `약 상자 표에 맞는 칸이 없어(${k === 'ibu' ? '나이를 몰라서' : '7 kg 미만'}) 몸무게 범위의 아래 끝으로 보였어요.`;
     return `<div class="dose-card"><div class="eyebrow">${esc(D.name)} · ${esc(D.brand)}</div>
       <div class="dose-big"><b>${one.ml}</b><span>mL · 한 번에</span></div>
       <p class="dose-gap">${kidGap(r)}</p>
@@ -4971,7 +4973,7 @@ function vKids(){
 ${r.capped ? `<div class="note" style="margin-top:8px">${I.info}<span>몸무게로만 곱하면 1회 ${r.rawHi} mg·하루 ${r.rawDay} mg이지만, 어른 상한(1회 ${D.capDose}·하루 ${D.capDay} mg)에서 멈춰요.</span></div>` : ''}
 ${k === 'apap' && m != null && m < 24 ? `<p class="small muted" style="margin-top:8px">두 돌 전이라 하루 한도를 60 mg/kg으로 봤어요(그 뒤 75 mg/kg).</p>` : ''}
       ${rev}
-      ${sk.filter(x => SRC[x]).length ? `<ul class="small muted" style="margin:8px 0 0;padding-left:18px">${sk.filter(x => SRC[x]).map(x => `<li>${esc(SRC[x])}</li>`).join('')}</ul>` : ''}`)}
+      ${sk.filter(x => SRC[x]).length ? `<ul class="small muted" style="margin:8px 0 0;padding-left:18px">${sk.filter(x => SRC[x]).map(x => `<li>${esc(SRC[x].replace(/의료진 검토 확정/g, '기준 정함'))}</li>`).join('')}</ul>` : ''}`)}
       <p class="small muted" style="margin-top:8px">${esc(D.note)}</p>
       <a class="link small" href="#/drug/${D.drugId}">성분 자세히 ›</a></div>`; };
   /* 현욱님 10-13(Z2-2 → B) — 생년월일이 없고 6 kg 미만이면 결과 위에 「생후 3개월 안팎일 수 있어요」(접지 않음). 결과는 그대로 보인다 */
@@ -7237,7 +7239,7 @@ function ocrLoad(){
   if (window.__ocrP) return window.__ocrP;
   window.__ocrP = new Promise((ok, no) => {
     const sc = document.createElement('script');
-    sc.src = 'https://cdnjs.cloudflare.com/ajax/libs/tesseract.js/5.1.0/tesseract.min.js';
+    sc.src = 'vendor/ocr/tesseract.min.js';   /* 11-18 출시판 «바깥 부르기 0» — 이 서버에서, 처음 쓸 때만 받음 */
     sc.onload = () => ok(window.Tesseract); sc.onerror = () => no(new Error('글자 읽기 도구를 받지 못했어요'));
     document.head.appendChild(sc);
   });
@@ -7283,7 +7285,7 @@ async function ocrRun(dataUrl){
     const T = await ocrLoad();
     PH.step = '사진에서 글자를 읽는 중이에요… 10~20초 걸려요'; route();
     const r = await T.recognize(dataUrl, 'kor+eng', {
-      langPath: 'https://cdn.jsdelivr.net/npm/@tesseract.js-data/kor@1.0.0/4.0.0_best_int',
+      langPath: new URL('vendor/ocr', location.href).href, corePath: new URL('vendor/ocr', location.href).href, workerPath: new URL('vendor/ocr/worker.min.js', location.href).href,   /* 일꾼 안에서도 같은 곳을 보게 온전한 주소로 */
       logger: m => { if (m.status === 'recognizing text') { PH.step = `글자를 읽는 중… ${Math.round((m.progress || 0) * 100)}%`; const el = document.querySelector('.ocr-step'); if (el) el.textContent = PH.step; } },
     });
     const text = (r?.data?.text || '').trim();

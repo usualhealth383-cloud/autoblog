@@ -1847,21 +1847,23 @@ try { const ps = document.createElement('style'); ps.id = 'prof-css'; ps.textCon
    ⛔ 앱 사본을 직접 고치지 않는다 — 이 파일을 고치고 판을 올린 뒤 다시 심는다: python3 _도구/해열제_부품_심기.py <소아|CS|파일경로>
    이 부품에는 화면·저장소 코드가 없다. 숫자와 순수 함수만(같은 입력이면 같은 답).
    값마다 출처는 아래 출처표(열쇠 → 한 줄). 화면은 출처칩(열쇠)로 꺼내 쓴다.
-   ── 아직 정하지 않은 값(A/B) — 지금 앱 값 그대로, 여기 「결정대기」 한 곳에서만 바꾼다 ──
-     ① 아세트아미노펜 하루 최대 — 두 돌 전 60 mg/kg(지금) vs 75 mg/kg
-     ② 이부프로펜 간격 — 6시간(지금) vs 8시간
+   ── 정한 값(11-18 현욱님 확정) — 「확정」 한 곳에만 둔다 ──
+     ① 아세트아미노펜 하루 최대 — 두 돌 전 60 mg/kg(75 아님)
+     ② 이부프로펜 간격 — 6시간(8 아님)
+     (예전 이름 「결정대기」는 바깥 코드가 깨지지 않게 같은 값을 가리키는 별명으로 남긴다)
 */
 (function () {
   if (window.메디나눔해열제) return;
-  var 판 = '2026-11-17b';   /* 17b — mL 은 안쪽으로만 둥글림(mL범위) · 양 끝이 같은 상한일 때 31.3 mL(1,001.6 mg)로 넘던 것 내림 · mL() 기본 내림 */
-  var 결정대기 = {
-    두돌전_아세트아미노펜_하루mgkg: 60,   /* A/B ① — 75 로 바꾸면 두 돌 전도 일반 하루 최대와 같아진다 */
-    이부프로펜_간격시간: 6                 /* A/B ② — 8 로 바꾸면 다음 시각·누적 판정이 함께 바뀐다 */
+  var 판 = '2026-11-18a';   /* 18a — A/B 두 값 11-18 현욱님 확정(숫자는 그대로 · 이름만 결정대기 → 확정) */   /* 17c — 쉬운양(현욱님 11-17 「쉽게/자세하게」): 큰 숫자 하나 */   /* 17b — mL 은 안쪽으로만 둥글림(mL범위) · 양 끝이 같은 상한일 때 31.3 mL(1,001.6 mg)로 넘던 것 내림 · mL() 기본 내림 */
+  var 확정 = {   /* 11-18 현욱님 확정 */
+    두돌전_아세트아미노펜_하루mgkg: 60,   /* ① 두 돌 전 하루 최대 60 mg/kg 유지 */
+    이부프로펜_간격시간: 6                 /* ② 이부프로펜 간격 6시간 유지 — 다음 시각·누적 판정이 이 값을 쓴다 */
   };
+  var 결정대기 = 확정;   /* 예전 이름 — 같은 값 */
   /* 약 표 — n 이름 · b 국내 제품 예 · pk 1회 mg/kg [아래, 위] · gap 최소 간격(시간) · day 하루 mg/kg · min 쓸 수 있는 개월 · conc 시럽 mg/mL · capDose 1회 상한 mg · capDay 하루 상한 mg */
   var DRUGS = {
     apap: { n: '아세트아미노펜', b: '타이레놀·세토펜', pk: [10, 15], gap: 4, day: 75, min: 4, conc: 32, capDose: 1000, capDay: 4000 },
-    ibu: { n: '이부프로펜', b: '부루펜', pk: [5, 10], gap: 결정대기.이부프로펜_간격시간, day: 40, min: 6, conc: 20, capDose: 400, capDay: 1600 }
+    ibu: { n: '이부프로펜', b: '부루펜', pk: [5, 10], gap: 확정.이부프로펜_간격시간, day: 40, min: 6, conc: 20, capDose: 400, capDay: 1600 }
   };
   /* 식약처 어린이부루펜시럽 허가 나이 표 — [시작 개월, 끝 개월(미만), 나이, 1회 아래 mg, 1회 위 mg, 하루 최대 mg] */
   var IBU_허가표 = [[12, 36, '만 1~2세', 50, 100, 400], [36, 84, '만 3~6세', 100, 150, 600], [84, 132, '만 7~10세', 150, 200, 800], [132, 180, '만 11~14세', 200, 250, 1000]];
@@ -1875,20 +1877,20 @@ try { const ps = document.createElement('style'); ps.id = 'prof-css'; ps.textCon
   var 출처표 = {
     apap_pk: '1회 10~15 mg/kg — Nelson 소아과학 표 93.6 · 식약처 어린이타이레놀현탁액 허가 용법',
     apap_gap: '4시간 이상 간격 — 식약처 어린이타이레놀현탁액 허가 용법',
-    apap_day: '하루 75 mg/kg(두 돌 전 60 mg/kg) — Nelson 소아과학 표 93.6',
+    apap_day: '하루 75 mg/kg(두 돌 전 60 mg/kg · 의료진 검토 확정 2026-11-18) — Nelson 소아과학 표 93.6',
     apap_cap: '어른 상한 1회 1,000 mg · 하루 4,000 mg — Nelson 소아과학 표 93.6',
     apap_times: '하루 5회까지 — 식약처 어린이타이레놀현탁액 제품 표시',
     apap_table: '몸무게별 mg·mL — 식약처 의약품통합정보 어린이타이레놀현탁액(160 mg/5 mL) 허가 용법',
     apap_min: '생후 4개월부터(허가 표 첫 칸) — 식약처 어린이타이레놀현탁액',
     ibu_pk: '1회 5~10 mg/kg — Nelson 소아과학 표 93.6 · 식약처 어린이부루펜시럽',
-    ibu_gap: '간격 6시간(결정대기 ② — 6 vs 8) — 식약처 어린이부루펜시럽 허가 용법',
+    ibu_gap: '간격 6시간(의료진 검토 확정 2026-11-18) — 식약처 어린이부루펜시럽 허가 용법',
     ibu_day: '하루 40 mg/kg — Nelson 소아과학 표 93.6',
     ibu_cap: '1회 400 mg · 하루 1,600 mg — 식약처 성인 용법(경증 동통·감기 1회 200~400 mg, 1일 3~4회)',
     ibu_table: '나이별 1회·하루 최대 — 식약처 어린이부루펜시럽 허가 용법(만 1~14세)',
     ibu_min: '생후 6개월부터 · 돌 전은 의사가 정한 양 — 식약처 어린이부루펜시럽 허가 문구',
     under3m: '생후 3개월 미만의 열은 해열제보다 진료 먼저 — 홍창의 소아과학 12판 · 미국소아과학회'
   };
-  function dayPerKg(k, m) { if (k === 'apap' && m != null && m < 24) return 결정대기.두돌전_아세트아미노펜_하루mgkg; return DRUGS[k].day; }
+  function dayPerKg(k, m) { if (k === 'apap' && m != null && m < 24) return 확정.두돌전_아세트아미노펜_하루mgkg; return DRUGS[k].day; }
   function 이부허가칸(m) { return (m == null) ? null : (IBU_허가표.find(function (x) { return m >= x[0] && m < x[1]; }) || null); }
   /* 몸무게로 곱한 값과 상한 중 작은 쪽 — 왜 줄었는지도 함께(소아 앱 doseRange 그대로) */
   function doseRange(k, w, m) {
@@ -1918,6 +1920,26 @@ try { const ps = document.createElement('style'); ps.id = 'prof-css'; ps.textCon
     if (+lo > +hi) lo = hi;
     return { lo: lo, hi: hi, 생lo: 생lo, 생hi: 생hi, 남은줄임: 남은하루 < DR.hi };
   }
+  /* 쉬운양 — 현욱님 11-17 결정 「쉽게 / 자세하게」의 «쉽게» 숫자 하나.
+     ① 아세트아미노펜은 약 상자 허가 몸무게표 값(표시용량) — 단 1회 위 끝(mL범위 hi: mg/kg·상한·허가 칸·남은 하루 양)을 넘지 않을 때만
+     ② 아니면 mL범위 가운데 값을 0.5 mL 단위로 내림(아래 끝 밑이면 아래 끝)
+     ③ 3개월 미만 · 허가 나이 밑 · 돌 전 이부프로펜(의사가 정한 양) · 남은 하루 양 없음 → 숫자 없이 막힘 이유
+     어떤 경우에도 mL × 농도가 위 끝을 넘지 않는다(시험: _도구/시험_해열제쉬운양.mjs). */
+  function 쉬운양(k, w, m, 남은하루) {
+    var 가 = 쓸수있나(k, m), D = DRUGS[k];
+    if (!가.ok) return { 막힘: 가.이유, 출처: 가.출처 };
+    if (가.이유 === '돌전의사양') return { 막힘: '돌전의사양', 출처: 가.출처 };
+    if (k === 'apap' && m != null && m < D.min) return { 막힘: '아세트아미노펜나이', 출처: 'apap_min' };
+    var r = mL범위(k, w, m, 남은하루), lo = +r.lo, hi = +r.hi;
+    if (!(hi > 0)) return { 막힘: '남은양없음', 출처: null };
+    var 표 = (k === 'apap') ? 표시용량(w) : null, 값, 근거;
+    if (표 && 표.mL <= hi + 1e-9) { 값 = 표.mL; 근거 = '표'; }
+    else { 값 = Math.floor((lo + hi) / 2 * 2 + 1e-9) / 2; if (값 < lo - 1e-9) 값 = lo; 근거 = '범위'; }
+    if (값 > hi + 1e-9) 값 = hi;
+    var DR = doseRange(k, w, m);
+    return { mL: 값, mL글: (Math.round(값 * 10) % 10 === 0 ? String(Math.round(값)) : 값.toFixed(1)), mg: Math.round(값 * D.conc * 10) / 10, 근거: 근거, 출처: 근거 === '표' ? 'apap_table' : (k + '_pk'),
+      간격: D.gap, 하루번: k === 'apap' ? APAP_하루횟수 : null, 하루mL: Math.floor(DR.day / D.conc * 10 + 1e-9) / 10, 하루mg: DR.day, 범위: r };
+  }
   /* 이 나이에 쓸 수 있나 — 막는 이유와 출처 열쇠 */
   function 쓸수있나(k, m) {
     if (m != null && m < 진료먼저_개월) return { ok: false, 이유: '진료먼저', 출처: 'under3m' };
@@ -1940,9 +1962,9 @@ try { const ps = document.createElement('style'); ps.id = 'prof-css'; ps.textCon
     if (한도회 && rows.length >= 한도회) { 걸림.push('횟수'); 풀림 = Math.max(풀림, rows[rows.length - 한도회].t + 864e5); }
     return { ok: !걸림.length, 걸림: 걸림, 풀림: 걸림.length ? 풀림 : null, used: used, cap: DR.day, 번: rows.length, 한도회: 한도회, gap: D.gap };
   }
-  window.메디나눔해열제 = { 판: 판, 결정대기: 결정대기, DRUGS: DRUGS, IBU_허가표: IBU_허가표, APAP_표: APAP_표, APAP_하루횟수: APAP_하루횟수, 진료먼저_개월: 진료먼저_개월,
+  window.메디나눔해열제 = { 판: 판, 확정: 확정, 결정대기: 결정대기, DRUGS: DRUGS, IBU_허가표: IBU_허가표, APAP_표: APAP_표, APAP_하루횟수: APAP_하루횟수, 진료먼저_개월: 진료먼저_개월,
     출처표: 출처표, 출처칩: function (열쇠) { return 출처표[열쇠] || ''; },
-    dayPerKg: dayPerKg, 이부허가칸: 이부허가칸, doseRange: doseRange, 표시용량: 표시용량, mL: mL, mL범위: mL범위, 쓸수있나: 쓸수있나, 판정: 판정 };
+    dayPerKg: dayPerKg, 이부허가칸: 이부허가칸, doseRange: doseRange, 표시용량: 표시용량, mL: mL, mL범위: mL범위, 쉬운양: 쉬운양, 쓸수있나: 쓸수있나, 판정: 판정 };
 })();
 /* ▲▲ 해열제 부품 끝 ▲▲ */
 /* 해열제 부품이 오면 — 아이 계산·약 화면을 정본 숫자로 다시 그린다 */
@@ -1958,12 +1980,52 @@ window.SUPP_OV = [['vitd', 'calcium', 'info', '칼슘제와 비타민 D — 두 
   ['zinc', 'lutein', 'warn', '루테인 복합제와 아연 — 겹치면 구리가 모자랄 수 있어요'], ['vitb', 'multi', 'info', '종합비타민과 비타민 B — 비타민 B6가 많아지기 쉬워요'],
   ['iron', 'mg', 'info', '철분과 마그네슘은 시간을 나누세요'], ['mg', 'calcium', 'info', '칼슘과 마그네슘 — 많이 드시면 시간을 나누세요']];
 try { if (/^#\/(together|home|bag|check)/.test(location.hash || '#/home') && typeof route === 'function') setTimeout(route, 0); } catch (e) {}
-window.kidOneS = r => { const [lo, hi] = mlRange(r), c = r.D.conc[0].mgPerMl; let v = null, from = '';
+window.kidOneS = r => { const P = window.메디나눔해열제;   /* 11-18 — 정본 쉬운양(소아와 같은 숫자)이 있으면 그것 */
+  if (P && P.쉬운양 && r.w > 0) { const e = P.쉬운양(r.D.id, r.w, r.m); if (e && !e.막힘) return { ml: e.mL글, mg: Math.round(e.mg), from: e.근거 === '표' ? 'table' : 'range' }; }
+ const [lo, hi] = mlRange(r), c = r.D.conc[0].mgPerMl; let v = null, from = '';
   if (r.D.id === 'apap') { const row = (D_KIDS().apapLabelTable || []).find(([a, b]) => r.w >= a && r.w <= b + .099); if (row) { v = row[3]; from = 'table'; } }
   else if (r.m != null) { const row = ibuRow(r.m); if (row) { v = row[4]; from = 'age'; } }
   if (v == null) { v = +lo; from = 'low'; } v = Math.min(v, +hi);
   const t = (Math.floor(v * 10 + 1e-9) / 10); return { ml: t % 1 ? t.toFixed(1) : String(t), mg: Math.round(t * c), from };
 };
+/* 11-18 상자 바코드로 담기(설계 공유/바코드_설계_1118.md) — 심평원 의약품표준코드 조각(data/barcode/<업체 4자리>.json · tools/barcode_build.py).
+   담기 전에 반드시 「이 약이 맞아요」로 확인 · 못 찾으면 사진·이름 길 · 카메라는 누를 때만, 숫자 13자리만 읽고 사진은 남기지 않음 */
+const 바코드검증 = c => { if (!/^880\d{10}$/.test(c)) return false; let s = 0; for (let i = 0; i < 12; i++) s += +c[i] * (i % 2 ? 3 : 1); return (10 - s % 10) % 10 === +c[12]; };
+const 바코드조각 = {};
+window.바코드찾기 = function (c) { c = String(c || '').replace(/\D/g, ''); if (!바코드검증(c)) return Promise.resolve({ 틀림: 1, c: c });
+  const k = c.slice(3, 7), p = 바코드조각[k] || (바코드조각[k] = fetch('data/barcode/' + k + '.json').then(r => r.ok ? r.json() : null).catch(() => { delete 바코드조각[k]; return null; }));
+  return p.then(j => { const i = j && j.c ? j.c[c.slice(7)] : null; if (i == null) return { 없음: 1, c: c }; const e = j.p[i]; return { c: c, seq: e[0], name: e[1], rx: e[2] === '전' }; }); };
+let BC = { r: null, cam: null };
+const 바코드끄기 = () => { try { if (BC.cam) BC.cam.getTracks().forEach(t => t.stop()); } catch (e) {} BC.cam = null; clearInterval(BC.t); };
+window.바코드보기 = function (c) { 바코드끄기(); const box = document.getElementById('bcres'); if (box) box.innerHTML = '<p class="loading">찾는 중…</p>';
+  바코드찾기(c).then(async r => { if (r.seq) { try { await Promise.all([pubIndex(), pubPills(), pubPillsRx()]); } catch (e) {} r.이음 = (PUB.index || []).some(p => p.seq === r.seq) || !!findPill(r.seq); }   /* 11-18 Main — 약지도 자료와 이어지지 않으면 담지 않고 이름으로 찾기로 */
+    BC.r = r; const b = document.getElementById('bcres'); if (!b) return;
+    const 누구 = typeof profIsMe === 'function' && !profIsMe() ? esc(profCall(profName())) + ' 약통에' : '내 약통에';
+    b.innerHTML = r.틀림 ? '<div class="note">' + I.alert + '<span><b>바코드 숫자가 맞지 않아요.</b> 상자 바코드 아래 숫자 13자리(880으로 시작)를 다시 확인해 주세요.</span></div>'
+      : r.seq && !r.이음 ? '<div class="card bc-card"><span class="eb">' + (r.rx ? '전문의약품(처방약)' : '일반의약품') + '</span><b class="bc-name">' + esc(r.name) + '</b><p class="small" style="margin-top:8px">이 바코드는 아직 약지도 목록에 없어 성분을 몰라요. 이름으로 찾아 담아 주세요.</p><a class="btn" style="margin-top:12px;width:100%;min-height:52px" href="#/search?q=' + encodeURIComponent(pubShort(r.name)) + '">이름으로 찾기</a></div>'
+      : r.없음 ? '<div class="card bc-card"><b>이 상자는 아직 목록에 없어요</b><p class="small" style="margin-top:6px">심평원 표준코드는 보험 약 위주라 약국 약 일부는 빠져 있어요. 다른 길로 담아 주세요.</p><div class="actions two" style="margin-top:12px"><a class="btn line" href="#/photo">사진으로</a><a class="btn line" href="#/pill">이름으로 찾기</a></div></div>'
+      : '<div class="card bc-card"><span class="eb">' + (r.rx ? '전문의약품(처방약)' : '일반의약품') + '</span><b class="bc-name">' + esc(r.name) + '</b><p class="small muted" style="margin-top:4px">바코드 ' + esc(r.c) + '</p>'
+        + '<button type="button" class="btn" style="margin-top:16px;width:100%;min-height:56px" onclick="바코드담기()">이 약이 맞아요 — ' + 누구 + ' 담기</button>'
+        + '<button type="button" class="link" style="display:block;margin:8px auto 0;min-height:44px;background:none;border:0;color:var(--primary);font:inherit;font-weight:700" onclick="BC.r=null;document.getElementById(\'bcres\').innerHTML=\'\'">아니에요</button></div>'; }); };
+window.바코드담기 = async function () { const r = BC.r; if (!r || !r.seq) return; try { await Promise.all([pubIndex(), pubPills(), pubPillsRx()]); } catch (e) {}
+  const id = 'pub:' + r.seq; ME.taking = ME.taking || []; if (ME.taking.includes(id)) { toast('이미 약통에 있어요'); return; }
+  const ix = (PUB.index || []).findIndex(p => p.seq === r.seq);
+  if (ix >= 0) { addPubIx(ix); go('/home'); return; }
+  if (findPill(r.seq)) { await togglePub(r.seq); go('/home'); return; }
+  go('/search?q=' + encodeURIComponent(pubShort(r.name))); };   /* 이어지지 않은 바코드는 담지 않고 이름 찾기로 */
+window.바코드카메라 = async function () { const v = document.getElementById('bcv'); if (!v) return;
+  if (!('BarcodeDetector' in window)) { toast('이 브라우저는 카메라로 바코드를 읽지 못해요 — 숫자를 넣어 주세요'); return; }
+  try { const det = new BarcodeDetector({ formats: ['ean_13'] }); BC.cam = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } }); v.srcObject = BC.cam; v.hidden = false; await v.play();
+    BC.t = setInterval(async () => { try { const f = await det.detect(v); const c = f && f[0] && f[0].rawValue; if (c && /^880\d{10}$/.test(c)) { v.hidden = true; const i = document.getElementById('bcin'); if (i) i.value = c; 바코드보기(c); } } catch (e) {} }, 300);
+  } catch (e) { 바코드끄기(); toast('카메라를 열지 못했어요 — 숫자를 넣어 주세요'); } };
+addEventListener('hashchange', () => { if (!/^#\/barcode/.test(location.hash)) 바코드끄기(); });
+window.문_barcode = function () { const cam = 'BarcodeDetector' in window;
+  return topBar({ back: '뒤로' }) + '<h1>상자 바코드로 담기</h1><p style="margin-top:8px">약 상자 옆 막대 무늬(바코드)를 비추거나, 그 아래 숫자 13자리를 넣어 주세요.</p>'
+    + (cam ? '<button type="button" class="btn" style="margin-top:16px;width:100%;min-height:56px" onclick="바코드카메라()">카메라로 비추기</button><video id="bcv" playsinline muted hidden style="width:100%;margin-top:12px;border-radius:16px;background:#000"></video>' : '')
+    + '<div class="topfind" style="margin-top:12px">' + I.search + '<input id="bcin" inputmode="numeric" maxlength="13" aria-label="바코드 숫자 13자리" placeholder="예: 880으로 시작하는 13자리" onkeydown="if(event.key===\'Enter\')바코드보기(this.value)"></div>'
+    + '<button type="button" class="btn line" style="margin-top:8px;width:100%" onclick="바코드보기(document.getElementById(\'bcin\').value)">찾기</button><div id="bcres" style="margin-top:16px" aria-live="polite"></div>'
+    + fold('자세히', '<p class="small">바코드 숫자만 읽고 사진은 남기지 않아요. 찾은 약은 「이 약이 맞아요」를 누르셔야 담겨요.</p><p class="small muted" style="margin-top:6px">출처: 건강보험심사평가원 약가마스터 의약품표준코드(공공데이터포털 15067462, 2026-08-31 기준) · 공공누리 출처표시</p>'); };
+try { const st = document.createElement('style'); st.textContent = '.bc-card{padding:20px}.bc-card .eb{display:block;font-size:.875rem;font-weight:700;color:var(--primary-deep)}.bc-name{display:block;margin-top:4px;font-size:1.375rem;line-height:1.4;word-break:keep-all}'; document.head.appendChild(st); } catch (e) {}
 /* 약지도 — 두 폰 합치기(app-shell 의 sanitizeMe 를 씀). 2026-10-13 상용화 점검 */
 window.mergeMe = function (localRaw, serverRaw) {
   let a, b; try { a = sanitizeMe(JSON.parse(localRaw)); b = sanitizeMe(JSON.parse(serverRaw)); } catch (e) { return null; }
@@ -3974,7 +4036,7 @@ window.언어칸 = function () {
       + '<div class="th-act"><button type="button" class="link" onclick="go(\'/together\')">+ 약 더하기</button><button type="button" class="link" onclick="내약더()">더 ›</button></div></section>';
   }
   window.내약더 = function () { var o = document.createElement('div'); o.className = 'dlg-bg'; o.setAttribute('role', 'dialog'); o.setAttribute('aria-label', '내 약 더 보기');
-    var L = [['#/notify', '알림', '약 시간 · 다시 알림 · 약 떨어짐'], ['#/send', '가족에게', '부모님께 약 보내기 · 함께 보기'], ['#/bag', '내 약 한 장', '진료·약국에 보여 줄 한 장'], ['#/me?t=meds', '약통', '담은 약 고치기 · 빼기'], ['#/people', '가족 약 따로 담기', '어머니·아이 약을 사람마다']];
+    var L = [['#/notify', '알림', '약 시간 · 다시 알림 · 약 떨어짐'], ['#/send', '가족에게', '부모님께 약 보내기 · 함께 보기'], ['#/bag', '내 약 한 장', '진료·약국에 보여 줄 한 장'], ['#/me?t=meds', '약통', '담은 약 고치기 · 빼기'], ['#/barcode', '상자 바코드로 담기', '약 상자 옆 막대 무늬를 비춰서'], ['#/people', '가족 약 따로 담기', '어머니·아이 약을 사람마다']];
     o.innerHTML = '<div class="card th-sheet">' + L.map(function (x) { return '<a class="th-row" href="' + x[0] + '"><span><b>' + x[1] + '</b><small>' + x[2] + '</small></span>' + I.chev + '</a>'; }).join('') + '<button type="button" class="btn line" style="margin-top:12px;width:100%">닫기</button></div>';
     o.addEventListener('click', function (e) { if (e.target === o || e.target.tagName === 'BUTTON' || e.target.closest('a')) o.remove(); }); document.body.appendChild(o); var f = o.querySelector('a'); if (f) f.focus(); };
   function 내약칸() {
@@ -6375,7 +6437,7 @@ window.vTogetherS = function (){
     <h1>같이 먹어도 되나요</h1>
     <p class="ix-lead">내 약통에 담아 두신 약들을 <b>성분</b>으로 풀어서, 서로 부딪히는 자리가 있는지 봐요. 처방약도 함께 봐요.</p>
     ${!n ? `<div class="empty">${emptyArt()}<p><b>아직 담아 두신 약이 없어요.</b><br>약봉투에 적힌 이름이나 약 사진으로 담으시면 바로 봐 드려요.</p>
-        <div class="ix-cta"><a class="btn" href="#/photo">${I.eye}약봉투·약 사진으로 담기</a><a class="btn line" href="#/pill">${I.search}이름으로 찾아 담기</a><a class="btn line" href="#/kinds">${I.pill}이름을 모르면 — 종류만 고르기</a></div></div>`
+        <div class="ix-cta"><a class="btn" href="#/photo">${I.eye}약봉투·약 사진으로 담기</a><a class="btn line" href="#/pill">${I.search}이름으로 찾아 담기</a><a class="btn line" href="#/barcode">${I.search}상자 바코드로 담기</a><a class="btn line" href="#/kinds">${I.pill}이름을 모르면 — 종류만 고르기</a></div></div>`
       : `${C0 ? topL + `<p class="ix-sub">${S ? '아래를 약봉투와 함께 약사님께 보여 드리세요.' : '끊으라는 뜻이 아니라, 한 번 여쭤볼 만하다는 뜻이에요.'}</p>` : head}${band}
       <button class="tog-cta" onclick="go('/bag')">${I.eye}<div><b>약사님께 보여드리기</b><span>내 약 목록과 이 판정을 큰 글씨 한 장으로</span></div>${I.chev}</button>
       <div class="ix-list">${res.items.map(it => `<span class="ix-chip ${it.approx || it.est ? 'approx' : it.known ? '' : 'unk'}">${it.link ? `<a href="${it.link}">${esc(it.name)}</a>` : esc(it.name)}${it.approx ? '<em>대략</em>' : !it.known ? '<em>성분 모름</em>' : it.est ? '<em>성분 추정</em>' : ''}</span>`).join('')}</div>
