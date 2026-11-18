@@ -369,6 +369,9 @@ for name in ('manifest.webmanifest', 'privacy.html', 'terms.html', 'delete-accou
 # 메디나눔 공통 이름(privacy-<앱>.html · delete-account-<앱>.html)으로도 같은 쪽을 둔다 — 옛 주소(privacy.html)는 스토어에 이미 적혀 있어 그대로 둔다
 for name, alias in (('privacy.html', 'privacy-yakjido.html'), ('terms.html', 'terms-yakjido.html'), ('delete-account.html', 'delete-account-yakjido.html')):
     if (pages / name).exists(): (pages / alias).write_text((pages / name).read_text(encoding='utf-8'), encoding='utf-8')
+# 11-18 스토어(TWA) — https://yakjido.medinanum.com/.well-known/assetlinks.json 자리(지문은 서명 뒤 well-known/assetlinks.json 에 넣는다)
+if (ROOT / 'well-known' / 'assetlinks.json').exists():
+    (pages / '.well-known').mkdir(exist_ok=True); (pages / '.well-known' / 'assetlinks.json').write_text((ROOT / 'well-known' / 'assetlinks.json').read_text(encoding='utf-8'), encoding='utf-8')
 for ic in (ROOT / 'icons').glob('*'):
     (pages / ic.name).write_bytes(ic.read_bytes())
 
