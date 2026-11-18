@@ -3589,10 +3589,10 @@ function vHome(){
   ${ext('필요약줄')}${odL}${ALLV() ? homeQuick(n) : ''}
   ${ext('응급칸')}${svOn() ? '' : ER_LINE()}
   ${condOn().length || ME.condskip ? '' : `<div class="cond-line"><button type="button" onclick="go('/me?t=body')">${I.user}<span>앓는 병이 있으면 알려 주세요 — <b>피해야 할 약을 걸러 드려요</b></span>${I.chev}</button><button type="button" class="x" aria-label="이 안내 닫기" onclick="ME.condskip=true;saveMe();route()">${I.x}</button></div>`}
+  ${v && vd <= 3 ? `<div class="util">${urow(I.cal, `${vd <= 0 ? '오늘' : vd === 1 ? '내일' : vd + '일 뒤'} 진료`, `${esc(visitWord(v, false))} · 내 약 한 장 챙기기`, "go('/visits')", '보기', 'visit-soon')}</div>` : ''}
   ${tidy('더 보기 — 묻기 · 다른 증상 · 바로 가기', `${INK ? '' : ext('대화줄')}
   ${storeBar()}
   <div class="util" aria-label="다른 방법으로 찾기">
-    ${v && vd <= 3 ? urow(I.cal, `${vd <= 0 ? '오늘' : vd === 1 ? '내일' : vd + '일 뒤'} 진료`, `${esc(visitWord(v, false))} · 내 약 한 장 챙기기`, "go('/visits')", '보기', 'visit-soon') : ''}
     ${urow(I.search, '여기 없어요', '질문 두 번으로 찾기', "go('/guide/1')", '시작')}
     ${ALLV() || (INK && !window.내약칸) ? urow(I.pill, n ? `내 약통 ${n}가지` : '내 약통에 약 담기', n ? '겹치는지 확인' : '겹치는 약 살펴보기', `go('${n ? '/together' : '/kinds'}')`, n ? '확인' : '담기') : ''}
     ${wxCard()}
