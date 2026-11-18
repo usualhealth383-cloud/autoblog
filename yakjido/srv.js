@@ -1998,9 +1998,11 @@ window.바코드찾기 = function (c) { c = String(c || '').replace(/\D/g, ''); 
 let BC = { r: null, cam: null };
 const 바코드끄기 = () => { try { if (BC.cam) BC.cam.getTracks().forEach(t => t.stop()); } catch (e) {} BC.cam = null; clearInterval(BC.t); };
 window.바코드보기 = function (c) { 바코드끄기(); const box = document.getElementById('bcres'); if (box) box.innerHTML = '<p class="loading">찾는 중…</p>';
-  바코드찾기(c).then(r => { BC.r = r; const b = document.getElementById('bcres'); if (!b) return;
+  바코드찾기(c).then(async r => { if (r.seq) { try { await Promise.all([pubIndex(), pubPills(), pubPillsRx()]); } catch (e) {} r.이음 = (PUB.index || []).some(p => p.seq === r.seq) || !!findPill(r.seq); }   /* 11-18 Main — 약지도 자료와 이어지지 않으면 담지 않고 이름으로 찾기로 */
+    BC.r = r; const b = document.getElementById('bcres'); if (!b) return;
     const 누구 = typeof profIsMe === 'function' && !profIsMe() ? esc(profCall(profName())) + ' 약통에' : '내 약통에';
     b.innerHTML = r.틀림 ? '<div class="note">' + I.alert + '<span><b>바코드 숫자가 맞지 않아요.</b> 상자 바코드 아래 숫자 13자리(880으로 시작)를 다시 확인해 주세요.</span></div>'
+      : r.seq && !r.이음 ? '<div class="card bc-card"><span class="eb">' + (r.rx ? '전문의약품(처방약)' : '일반의약품') + '</span><b class="bc-name">' + esc(r.name) + '</b><p class="small" style="margin-top:8px">이 바코드는 아직 약지도 목록에 없어 성분을 몰라요. 이름으로 찾아 담아 주세요.</p><a class="btn" style="margin-top:12px;width:100%;min-height:52px" href="#/search?q=' + encodeURIComponent(pubShort(r.name)) + '">이름으로 찾기</a></div>'
       : r.없음 ? '<div class="card bc-card"><b>이 상자는 아직 목록에 없어요</b><p class="small" style="margin-top:6px">심평원 표준코드는 보험 약 위주라 약국 약 일부는 빠져 있어요. 다른 길로 담아 주세요.</p><div class="actions two" style="margin-top:12px"><a class="btn line" href="#/photo">사진으로</a><a class="btn line" href="#/pill">이름으로 찾기</a></div></div>'
       : '<div class="card bc-card"><span class="eb">' + (r.rx ? '전문의약품(처방약)' : '일반의약품') + '</span><b class="bc-name">' + esc(r.name) + '</b><p class="small muted" style="margin-top:4px">바코드 ' + esc(r.c) + '</p>'
         + '<button type="button" class="btn" style="margin-top:16px;width:100%;min-height:56px" onclick="바코드담기()">이 약이 맞아요 — ' + 누구 + ' 담기</button>'
@@ -2010,8 +2012,7 @@ window.바코드담기 = async function () { const r = BC.r; if (!r || !r.seq) r
   const ix = (PUB.index || []).findIndex(p => p.seq === r.seq);
   if (ix >= 0) { addPubIx(ix); go('/home'); return; }
   if (findPill(r.seq)) { await togglePub(r.seq); go('/home'); return; }
-  ME.pub = ME.pub || {}; ME.taking.push(id); ME.pub[id] = { name: pubShort(r.name), full: r.name, ingr: '', rx: r.rx ? '전문' : '일반', seq: r.seq }; try { markPrnIfNew(id); } catch (e) {}
-  saveMe(); try { pubIngrFill(); } catch (e) {} toast('담았어요'); go('/home'); setTimeout(() => window.afterAdd && afterAdd(id), 900); };
+  go('/search?q=' + encodeURIComponent(pubShort(r.name))); };   /* 이어지지 않은 바코드는 담지 않고 이름 찾기로 */
 window.바코드카메라 = async function () { const v = document.getElementById('bcv'); if (!v) return;
   if (!('BarcodeDetector' in window)) { toast('이 브라우저는 카메라로 바코드를 읽지 못해요 — 숫자를 넣어 주세요'); return; }
   try { const det = new BarcodeDetector({ formats: ['ean_13'] }); BC.cam = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } }); v.srcObject = BC.cam; v.hidden = false; await v.play();

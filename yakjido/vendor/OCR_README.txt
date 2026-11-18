@@ -1,0 +1,1 @@
+사진 글자 읽기 도구(tesseract.js 5.1.0 · core 5.1.0 · kor/eng 4.0.0_best_int — Apache-2.0·MIT)는 저장소에 한 벌만 두려고 배포본 docs/yakjido/vendor/ocr/ 에만 둔다(11-18). build.py 는 그 폴더를 지우지 않고 기내 받기 목록에도 넣지 않는다. 판을 바꿀 땐 npm pack 으로 받아 그 폴더의 파일을 바꾼다.

@@ -1810,7 +1810,7 @@ html:not(.ink) .rf-none{display:none}</style>
 <script>
 window.__YAKJIDO_OK__ = true;
 const D = JSON.parse(document.getElementById('data').textContent || '{}');
-const BUILD = '2026-11-18 12:33';
+const BUILD = '2026-11-18 12:54';
 const DATAV = '7279b4ecee'.indexOf('__') === 0 ? BUILD : '7279b4ecee';
 const BRANDMARK = (typeof window !== 'undefined' && window.__BRANDMARK__) || 'icon-192.png';
 let CORE = 0, CORE_P = null;
@@ -6038,7 +6038,7 @@ if (window.Tesseract) return Promise.resolve(window.Tesseract);
 if (window.__ocrP) return window.__ocrP;
 window.__ocrP = new Promise((ok, no) => {
 const sc = document.createElement('script');
-sc.src = 'https://cdnjs.cloudflare.com/ajax/libs/tesseract.js/5.1.0/tesseract.min.js';
+sc.src = 'vendor/ocr/tesseract.min.js';   /* 11-18 출시판 «바깥 부르기 0» — 이 서버에서, 처음 쓸 때만 받음 */
 sc.onload = () => ok(window.Tesseract); sc.onerror = () => no(new Error('글자 읽기 도구를 받지 못했어요'));
 document.head.appendChild(sc);
 });
@@ -6081,7 +6081,7 @@ await lexLoad();
 const T = await ocrLoad();
 PH.step = '사진에서 글자를 읽는 중이에요… 10~20초 걸려요'; route();
 const r = await T.recognize(dataUrl, 'kor+eng', {
-langPath: 'https://cdn.jsdelivr.net/npm/@tesseract.js-data/kor@1.0.0/4.0.0_best_int',
+langPath: new URL('vendor/ocr', location.href).href, corePath: new URL('vendor/ocr', location.href).href, workerPath: new URL('vendor/ocr/worker.min.js', location.href).href,   /* 일꾼 안에서도 같은 곳을 보게 온전한 주소로 */
 logger: m => { if (m.status === 'recognizing text') { PH.step = `글자를 읽는 중… ${Math.round((m.progress || 0) * 100)}%`; const el = document.querySelector('.ocr-step'); if (el) el.textContent = PH.step; } },
 });
 const text = (r?.data?.text || '').trim();
