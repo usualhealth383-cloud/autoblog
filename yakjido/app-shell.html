@@ -6841,6 +6841,7 @@ function vDrugS(d, q){
   ${d.useNote ? `<div class="usebar">${I.alert}<span>${fmt(d.useNote)}</span></div>` : ''}
   ${(d.for || []).length || d.tagline ? `<div class="kv" style="grid-template-columns:1fr"><div><small>무엇에 ${oral ? '먹는' : '쓰는'} 약</small><b>${esc((d.for || []).join(', ') || d.tagline)}</b></div></div>` : ''}
   ${d.kidSel ? `<div class="dose-hero"><small>먹는 양</small><div class="sv-dose">${esc(KIDDOSE)}</div></div>` : how ? `<div class="dose-hero"><small>한 번에 · 하루에</small><div class="big sv-dose">${fmt(how)}</div>${(/서방|이알/.test(q.p || '') ? '' : senMaxH(d))}${ME.age === 'child' && d.dose?.child ? `<small>소아: ${fmt(d.dose.child)}</small>` : ''}</div>` : ''}${kidDoseBtn(d)}
+  <div class="sv-take">${takeBtn(d.id)}</div>
   ${av.length || C.length ? `<section class="sec card sv-no"><h2>이럴 땐 ${oral ? '먹지' : '쓰지'} 마세요</h2><ul class="plain x">${li(hit, 'me')}${li(gen)}</ul>${other.length ? fold(`다른 경우 ${other.length}가지 더 보기`, `<ul class="plain x">${li(other)}</ul>`) : ''}
     ${cau.length ? `<p class="sv-cau">${esc(flagWords([...new Set(cau.flatMap(a => a.flags.filter(x => f.includes(x))))]))} — 먼저 약사·의사와 상의하세요</p><ul class="plain">${li(cau)}</ul>` : ''}
     ${gc.length ? `<p class="sv-cau">누구나 알아 둘 주의</p><ul class="plain">${li(gc)}</ul>` : ''}${oc.length ? fold(`다른 조건의 주의 ${oc.length}가지 보기`, `<ul class="plain">${li(oc)}</ul>`) : ''}</section>` : ''}
@@ -7519,6 +7520,7 @@ function vBag(){
   return `${topBar({ back:'이전' })}
   <div class="eyebrow">진료실·약국에서</div>
   <h1 style="font-size:1.375rem">${window.profIsMe && !profIsMe() ? esc(window.profCall ? profCall(profName()) : profName()) + ' 약이에요' : '제가 먹는 약이에요'}</h1>
+  ${items.length ? ext('가방위') : ''}
   ${!items.length ? `<div class="empty">${emptyArt()}<p><b>아직 담아 두신 약이 없어요.</b><br>약봉투 이름이나 약 사진으로 담으시면 여기 한 장으로 정리돼요.</p><div class="ix-cta"><a class="btn" href="#/photo">${I.eye}약봉투·약 사진으로 담기</a><a class="btn line" href="#/pill">${I.search}이름으로 찾아 담기</a><a class="btn line" href="#/kinds">${I.pill}이름을 모르면 — 종류만 고르기</a></div></div>`
   : `<div class="show-card">
     <div class="show-head">지금 먹는 약 ${items.length}가지${f.length ? ' · ' + f.map(k => esc(FLAG_LABEL[k])).join(' · ') : ''}</div>

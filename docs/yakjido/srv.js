@@ -4092,6 +4092,8 @@ window.언어칸 = function () {
       return a + '<span class="scn-ic">' + (I[x[1]] || '') + '</span><b>' + x[2] + '</b>' + (x[3] ? '<small>' + x[3] + '</small>' : '') + (x[0].charAt(0) === '#' ? '</a>' : '</button>'); }).join('') + '</div>';
   }
   window.약장면 = 약장면;
+  /* 11-18 Main — 「내 약 한 장」 주 단추(보내기·종이로)를 첫 화면에. 아래 단추 줄은 그대로 */
+  window.가방위 = function () { return '<div class="bag-top"><button type="button" class="btn" onclick="shareBag()">' + I.cart + ' 메모로 보내기</button>' + (typeof NATIVE !== 'undefined' && NATIVE ? '' : '<button type="button" class="btn line" onclick="진료장()">' + I.book + ' 종이로 뽑기</button>') + '</div>'; };
   try { var sct = document.createElement('style'); sct.id = 'scene-css'; sct.textContent =
       ':root{--sc-w1:#FFF6E8;--sc-w2:#FBE7CF;--sc-s1:#BFE3F4;--sc-s2:#FFF3DA;--sc-wood:#C68B59;--sc-wood2:#A86F42;--sc-frame:#FFFFFF;--sc-box:#FFFFFF;--sc-lid:#E9F3F5;--sc-cross:#0B6E8F;--sc-pot:#D9875F;--sc-leaf:#5E9E6A;--sc-bot:#F2C98A;--sc-cap:#0B6E8F;--sc-lab:#FFFFFF;--sc-empty:#C9A98A;--sc-beam:rgba(255,236,190,.55);--sc-sun:#FFC94D;--sc-hill:#A9D39A;--sc-ink:#3A2A1E;--sc-sub:#6B5444;--sc-chip:rgba(255,255,255,.86);--tile:#FFFFFF;--tile-ic:#E7F2F5}'
     + '@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--sc-w1:#2B2420;--sc-w2:#221C19;--sc-s1:#1D3A4C;--sc-s2:#3A3326;--sc-wood:#7A5638;--sc-wood2:#5E422B;--sc-frame:#3B332D;--sc-box:#3A3734;--sc-lid:#2C3A3E;--sc-cross:#7CC6DC;--sc-pot:#A8664A;--sc-leaf:#6FAE7B;--sc-bot:#B89466;--sc-cap:#7CC6DC;--sc-lab:#3A3734;--sc-empty:#7A6656;--sc-beam:rgba(255,220,160,.10);--sc-sun:#E3B04A;--sc-hill:#4F7448;--sc-ink:#F5ECE4;--sc-sub:#CDBBAE;--sc-chip:rgba(30,26,23,.78);--tile:#1E2427;--tile-ic:#243439}}'
@@ -4109,6 +4111,7 @@ window.언어칸 = function () {
     + '.scn-t.stop{outline:2px solid var(--alert,#D93A2B)}.scn-t.stop small{color:var(--alert,#B42318);font-weight:700}.scn-t.warn{outline:2px solid #B54708}.scn-t.warn small{color:#93370D;font-weight:700}'
     + '.scn-safe{display:flex;align-items:center;gap:8px;min-height:48px;margin:0 0 10px;padding:10px 14px;border-radius:16px;text-decoration:none;font-weight:700}.scn-safe.stop{background:var(--alert-tint);color:var(--alert,#B42318)}.scn-safe.low{background:var(--normal-tint,#F2F8FA);color:var(--text);font-weight:600}'
     + '.scn.sv .scn-say .th-big{font-size:1.5rem}.scn-wrap.sv .scn-sub{font-size:1.125rem}.scn.sv .scn-cnt{font-size:1rem}.scn-wrap.sv .scn-go{min-height:64px;font-size:1.3125rem}.scn-tiles.sv .scn-t b{font-size:1.1875rem}.scn-tiles.sv .scn-t small{font-size:1rem}'
+    + '.bag-top{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0 12px}.bag-top .btn{flex:1 1 140px;min-height:48px;width:auto}.sv-take{margin:12px 0}.sv-take .btn{width:100%;min-height:52px}'
     + '@media (max-width:380px){.scn-say .th-big{font-size:1.1875rem}.scn.sv .scn-say .th-big{font-size:1.375rem}}';
     document.head.appendChild(sct); } catch (e) {}
   function 오늘히어로(items, sv) {
