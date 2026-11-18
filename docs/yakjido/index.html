@@ -1810,7 +1810,7 @@ html:not(.ink) .rf-none{display:none}</style>
 <script>
 window.__YAKJIDO_OK__ = true;
 const D = JSON.parse(document.getElementById('data').textContent || '{}');
-const BUILD = '2026-11-18 13:35';
+const BUILD = '2026-11-18 21:49';
 const DATAV = '67ebd68324'.indexOf('__') === 0 ? BUILD : '67ebd68324';
 const BRANDMARK = (typeof window !== 'undefined' && window.__BRANDMARK__) || 'icon-192.png';
 let CORE = 0, CORE_P = null;
@@ -3202,8 +3202,9 @@ const RXW = { 안전상비:'편의점 가능', 일반:'약국', 전문:'처방' 
 const QS = /으?로 끝나요|이에요|예요|이 들어 있어요/g;
 const rxMix = d => { const L = (d?.products || []).filter(p => RXW[p.rx]); return new Set(L.map(p => p.rx)).size > 1 ? L.map(p => pubShort(p.name) + ' ' + RXW[p.rx]).join(' · ') : ''; };
 const enQ = q => window.enQS ? enQS(q) : q;   /* 영어 낱말 바꾸기는 i18n.js(첫 화면 예산) */
-function search(q, noFix){
-q = enQ((q || '').toLowerCase().trim()); const qIn = q;
+function search(q, noFix){ if ((search.d || 0) > 6) return []; search.d = (search.d || 0) + 1; try { return search0(q, noFix); } finally { search.d--; } }
+function search0(q, noFix){
+q = enQ((q || '').toLowerCase().trim()); if (window.qClean) q = qClean(q); const qIn = q;
 const kidQ = KID_Q.test(q), kq = q.replace(/아기|애기|아가|어린이|소아|우리애|아이(?!페|오|소)/g, ' ').trim(); if (kidQ && kq) q = kq;
 const qs = q.replace(/\s+/g, '');
 const q0 = q;
@@ -3301,6 +3302,7 @@ if (!res.length && words.length > 1) return search([...words].sort((a, b) => b.l
 if (!res.length) { const st = SEARCH_SYN[stem(q)] || stem(q); if (st && st !== q) return search(st, noFix); }
 const fx = !noFix && findFix(qIn, res); if (fx) return fx;
 if (!res.length && !noFix && /[가-힣]/.test(qs)) for (const v of vowelVariants(qs)) { const r2 = search(v, true); if (r2.length) { r2.fix = v; return r2; } }
+if (!res.length && !noFix && window.qSwap) for (const v of qSwap(qs)) { const r2 = search(v, true); if (r2.length) { r2.fix = v; return r2; } }
 return res;
 }
 let FIND = null;
@@ -5098,9 +5100,9 @@ link: x.supp ? '#/supp/' + x.supp.id : x.d ? '#/drug/' + x.d.id : (x.pub ? (x.pu
 }
 for (const d of (extra || [])) {
 if (d.supp) { out.unshift({ name: d.name, ings: ingOf(d).ings, known: true, from: '지금 보는 영양제', link: '#/supp/' + d.supp.id }); continue; }
-const ings = drugIngs(d).slice();
+const ings = (d.ings || drugIngs(d)).slice();
 if (!ings.length) ingFind(d.name).forEach(e => { if (!ings.includes(e)) ings.push(e); });
-out.push({ name: ingrName(d), ings, known: ings.length > 0, from: '지금 보는 약', link: '#/drug/' + d.id });
+out.push({ name: ingrName(d), ings, known: ings.length > 0, from: '지금 보는 약', link: d.link || '#/drug/' + d.id });
 }
 return out;
 }

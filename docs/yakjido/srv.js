@@ -2026,6 +2026,13 @@ window.문_barcode = function () { const cam = 'BarcodeDetector' in window;
     + '<button type="button" class="btn line" style="margin-top:8px;width:100%" onclick="바코드보기(document.getElementById(\'bcin\').value)">찾기</button><div id="bcres" style="margin-top:16px" aria-live="polite"></div>'
     + fold('자세히', '<p class="small">바코드 숫자만 읽고 사진은 남기지 않아요. 찾은 약은 「이 약이 맞아요」를 누르셔야 담겨요.</p><p class="small muted" style="margin-top:6px">출처: 건강보험심사평가원 약가마스터 의약품표준코드(공공데이터포털 15067462, 2026-08-31 기준) · 공공누리 출처표시</p>'); };
 try { const st = document.createElement('style'); st.textContent = '.bc-card{padding:20px}.bc-card .eb{display:block;font-size:.875rem;font-weight:700;color:var(--primary-deep)}.bc-name{display:block;margin-top:4px;font-size:1.375rem;line-height:1.4;word-break:keep-all}'; document.head.appendChild(st); } catch (e) {}
+/* 11-18 검색 5,000 시험 — 「엄마가 ○○ 언제 먹어요」에서 사람 말(엄마가·어르신인데…)이 「부모님께 보내기」를 1위로 끌어올리고,
+   물음 꼬리(먹어도 돼요·하루 몇 번·효과 있어요…)가 «낱말 전부 맞추기»를 깨서 엉뚱한 낱말로 빠지던 것. 찾기 전에 떼고, 남는 말이 없으면 그대로 */
+const Q사람 = /^(우리\s*)?(엄마|아빠|어머니|아버지|할머니|할아버지|어르신|부모님|남편|아내|와이프|신랑|친구|자취생|직장인|학생|노인)(가|이|께서|는|도|인데|이신데|이세요|예요)?\s*|^(고혈압|혈압|당뇨|당뇨병|신장|간|위|심장)\s*(약\s*)?(먹는데|있는데|환자인데|약\s*먹는데)\s*|^약을?\s*여러\s*(개|가지)\s*(먹는데|먹고\s*있는데)\s*|^[가-힣]+인데\s+/;
+const Q꼬리 = /\s*(먹어도\s*(돼|되)[요예나]?|먹어도\s*괜찮[아나]?[요예]?|언제\s*먹어[요예]?|하루\s*몇\s*번|몇\s*번\s*먹어[요예]?|식후에\s*먹어[요예]?|식전에\s*먹어[요예]?|효과\s*(있어|있나|있어요|있어예)[요예]?|부작용|먹고\s*졸려[요예]?|추천(해\s*주세요|좀)?|있어[요예]|너무\s*심해[요예]|에\s*뭐\s*먹어[요예]?|뭐\s*먹어[요예]?|영양제|ㅠ+|ㅜ+|[?!.~]+)\s*$/;
+window.qClean = function (q) { let s = String(q || '').replace(/·/g, ' '), k = 0; const a = s.replace(Q사람, ''); if (a.trim()) s = a; while (k++ < 4) { const b = s.replace(Q꼬리, ''); if (b === s || !b.trim()) break; s = b; } return s.trim() || q; };
+/* 11-18 — 이웃한 두 글자 자리 바뀜(루부펜→부루펜 · 키테미→키미테 · 보노민→노보민). 0건일 때만, 3글자 넘는 말에서 앞쪽부터 몇 개만 */
+window.qSwap = function (q) { const w = String(q || ''), out = []; for (let i = 0; i < Math.min(w.length - 1, 8); i++) { if (!/[가-힣]/.test(w[i]) || !/[가-힣]/.test(w[i + 1]) || w[i] === w[i + 1]) continue; out.push(w.slice(0, i) + w[i + 1] + w[i] + w.slice(i + 2)); } return w.length >= 3 ? out : []; };
 /* 약지도 — 두 폰 합치기(app-shell 의 sanitizeMe 를 씀). 2026-10-13 상용화 점검 */
 window.mergeMe = function (localRaw, serverRaw) {
   let a, b; try { a = sanitizeMe(JSON.parse(localRaw)); b = sanitizeMe(JSON.parse(serverRaw)); } catch (e) { return null; }
@@ -3725,10 +3732,10 @@ window.언어칸 = function () {
   var 갈래 = { 감기약: { 묻기: '어떤 감기약인지 아세요?', 칩: ['판콜에이', '테라플루', '콜대원'] }, 진통제: { 묻기: '어떤 진통제인지 아세요?', 칩: ['타이레놀', '이부프로펜', '게보린'] }, 해열제: { 묻기: '어떤 해열제인지 아세요?', 칩: ['타이레놀', '이부프로펜'] }, 소화제: { 묻기: '어떤 소화제인지 아세요?', 칩: ['베아제', '훼스탈'] } };
   var 처방갈래 = [['bp', /혈압약|고혈압/], ['dm', /당뇨약|혈당약|메트포르민/], ['chol', /콜레스테롤약|고지혈|스타틴/], ['blood', /와파린|항응고|피\s*묽게|아스피린\s*프로텍트|엘리퀴스|자렐토|릭시아나/], ['thy', /갑상선/], ['mind', /수면제|우울증약|항우울|안정제/]];
   /* 위험 — 앱이 이미 쓰는 판정을 글로 옮긴 것(홈 응급 줄 · 증상 응급 줄 · 아이 3개월 38℃ · 41℃ · 항암 38℃ · 과다복용). 새 기준을 짓지 않는다 */
-  var 마음 = /죽고\s*싶|자살|자해|끝내고\s*싶|없어지고\s*싶|사라지고\s*싶|살\s*이유|손목.*그|그었|모아서.*먹|약.*모아/;
-  var 응급 = [/가슴.*(쥐어|조이|짓누|아프|답답).*(땀|숨)|가슴.*(쥐어짜|조이듯|짓누르)/, /한쪽.*(힘|마비|저리|처)|말이\s*어눌|얼굴.*(처졌|비뚤)|발음이\s*이상/, /숨.*(차서|차요|차고|차다|차는|막|못\s*쉬|안\s*쉬|가빠|쌕쌕|힘들)|호흡\s*곤란/, /(입술|혀|목구멍|얼굴).*(부었|붓고|부어)/, /경련|발작|까무러/, /의식|깨워도|안\s*일어나|축\s*처지/, /피를\s*토|토혈|변이\s*(새)?까|짜장\s*같|짜장처럼/, /머리.*(부딪|다친).*(토|구토)/, /(제일|가장|살면서).*심한\s*두통|벼락\s*두통/, /배가\s*(딱딱|너무\s*아파서\s*못)/];
+  var 마음 = /죽고\s*싶|자살|자해|끝내고\s*싶|없어지고\s*싶|사라지고\s*싶|살\s*이유|손목.*그|그었|모아서.*먹|약.*모아|목숨|살기\s*싫|죽어\s*버리|삶을\s*끝|생을\s*마감|세상을\s*떠나고/;   /* 11-18 5,000 시험 — 「목숨을 끊고 싶어요」가 니코틴 패치로 가던 것 */
+  var 응급 = [/가슴.*(쥐어|조이|짓누|아프|답답).*(땀|숨)|가슴.*(쥐어짜|조이듯|짓누르)/, /한쪽.*(힘|마비|저리|처)|말이\s*어눌|얼굴.*(처졌|비뚤)|발음이\s*이상/, /숨.*(차서|차요|차고|차다|차는|막|못\s*쉬|안\s*쉬|가빠|쌕쌕|힘들)|호흡\s*곤란/, /(입술|혀|목구멍|얼굴).*(부었|붓고|부어)/, /경련|발작|까무러/, /의식|깨워도|안\s*일어나|축\s*처지/, /피를\s*토|토혈|변이\s*(새)?까|짜장\s*같|짜장처럼|(검은|까만|시커먼|새까만)\s*(변|똥|대변)|흑변|변이\s*검|피\s*(섞인|나오는)\s*(변|대변|토)|피\s*토/, /머리.*(부딪|다친).*(토|구토)/, /(제일|가장|살면서).*심한\s*두통|벼락\s*두통|벼락\s*(치듯|같|맞)|머리가\s*(터질|깨질)\s*(것|듯)|갑자기.*(최악|처음\s*겪는).*(두통|머리)/, /배가\s*(딱딱|너무\s*아파서\s*못)/];
   /* 이미 많이 먹었다·삼켰다(10-28 곁에 교훈) — 증상을 묻기 전에 119 상담 먼저. 문구는 약 화면 「너무 많이 드셨을 때」(NHS)와 같게 */
-  var 과다 = /(한\s*통|통째|[0-9]{2,}\s*(알|정|개|봉)|많이|잔뜩|한꺼번에|두\s*배|두\s*번|실수로|모르고\s*또).*(먹었|먹였|삼켰|먹여|먹어\s*버렸)|(아이|애기|아기|애)가.*(약|알약|약통|시럽).*(삼켰|주워\s*먹|꺼내\s*먹|먹어\s*버렸|다\s*먹)|took (a lot|too many|the whole|all|double|twice)|swallowed|overdos|tom[ée] (muchas|demasiad|el doble|dos veces)|sobredosis|se (lo )?tragó|(薬|錠).*(たくさん|大量|全部|二回分|2回分).*飲|飲み込んだ|過量|吃了(很多|一整瓶|大量|一整盒|两次|双倍)|吞了|过量/i;
+  var 과다 = /(한\s*통|통째|[0-9]{2,}\s*(알|정|개|봉)|많이|잔뜩|한꺼번에|두\s*배|두\s*번|실수로|모르고\s*또).*(먹었|먹였|삼켰|먹여|먹어\s*버렸)|(아이|애기|아기|애)가.*(약|알약|약통|시럽).*(삼켰|주워\s*먹|꺼내\s*먹|먹어\s*버렸|다\s*먹)|(아이|애기|아기|애|우리\s*애)가.*(주워\s*먹|삼켰|꺼내\s*먹|먹어\s*버렸|다\s*먹었|한\s*통|여러\s*(알|개))|took (a lot|too many|the whole|all|double|twice)|swallowed|overdos|tom[ée] (muchas|demasiad|el doble|dos veces)|sobredosis|se (lo )?tragó|(薬|錠).*(たくさん|大量|全部|二回分|2回分).*飲|飲み込んだ|過量|吃了(很多|一整瓶|大量|一整盒|两次|双倍)|吞了|过量/i;
   /* 다섯 언어 위험 낱말(10-27 Main — 한국어만 알아듣던 곳이 있었다). 언어와 상관없이 다 본다(영어 폰을 쓰는 한국 사람도 있다) */
   var 마음다국 = /suicid|kill(ing)? myself|want to die|end (my|it all)|self[- ]?harm|cut(ting)? myself|no reason to live|quiero morir|matarme|quitarme la vida|no quiero vivir|hacerme daño|autolesi|死にたい|自殺|消えたい|自傷|リストカット|想死|自杀|不想活|轻生|自残|割腕/i;
   var 응급다국 = [/chest (pain|hurts|tight|pressure)|can'?t breathe|cannot breathe|short(ness)? of breath|trouble breathing|struggling to breathe|wheez|face (is )?droop|slurred|one side.*(weak|numb)|(lips?|tongue|throat).*(swell|swollen|clos)|(swell|swollen).*(lips?|tongue|throat)|seizure|convuls|fit(ting)?\b.*child|unconscious|passed out|won'?t wake|unresponsive|floppy|(vomit|throw)(ing|ed)? (up )?blood|black (stool|poop)|worst headache|took (a lot|too many|the whole|all)|overdos|not breathing/i,
@@ -3782,8 +3789,18 @@ window.언어칸 = function () {
     L.push({ id: 'together', 예문: ['같이 먹어도 되나요'], 태그: ['같이', '함께', '병용', '이랑', '하고'] });
     return L;
   }
+  /* 11-18 검색 5,000 시험 — 제품 사전(brands.json 356) 이름도 «긴 이름 먼저»로 — 「탁센아세트아미노펜정」이 앞 낱말 「탁센」(나프록센)으로 읽혀 아세트아미노펜 겹침을 놓치던 것 */
+  var 제품표 = null;
+  function 제품이름들() { if (제품표) return 제품표; var B = (typeof LEX !== 'undefined' && LEX.brand) || null; if (!B) return {}; 제품표 = {};
+    var 꼬리 = /(연질캡슐|서방정|필름코팅정|츄어블정|캡슐|내복액|현탁액|시럽|과립|정|액|산)$/;
+    (Array.isArray(B) ? B : Object.values(B)).forEach(function (b) { if (!b || !b.n || !b.comp) return; var n = String(b.n).replace(/\s+/g, ''), m = n.replace(꼬리, '');
+      [n, m].forEach(function (k) { if (k.length >= 3 && !제품표[k]) 제품표[k] = 'b:' + b.n; }); });
+    return 제품표; }
+  function 제품약(id) { var n = id.slice(2), B = (typeof LEX !== 'undefined' && LEX.brand) || [], b = (Array.isArray(B) ? B : Object.values(B)).filter(function (x) { return x && x.n === n; })[0]; if (!b) return null;
+    var ings = []; String(b.comp || '').replace(/\(.*?\)/g, '').replace(/^[^+]*?\s중\s/, '').replace(/(\d\s*(?:mg|g|mL|µg)?)\s*·/g, '$1+').split('+').forEach(function (s) { var nm = s.replace(/[\d.,]+\s*(mg|g|mL|µg|IU|단위)?.*$/i, '').trim(); if (nm) ingFind(nm).slice(0, 1).forEach(function (e) { if (ings.indexOf(e) < 0) ings.push(e); }); });
+    return { id: id, name: b.n, ings: ings, link: '#/brand/' + encodeURIComponent(b.n), brand: b }; }
   function 약찾기(글) {
-    var g = String(글 || '').toLowerCase().replace(/\s+/g, ''), T = 이름들(), 찾음 = [], ids = [];
+    var g = String(글 || '').toLowerCase().replace(/\s+/g, ''), T = Object.assign({}, 제품이름들(), 이름들()), 찾음 = [], ids = [];
     Object.keys(T).sort(function (a, b) { return b.length - a.length; }).forEach(function (n) {
       var k = n.toLowerCase().replace(/\s+/g, ''); if (g.indexOf(k) < 0) return;
       if (찾음.some(function (x) { return x.indexOf(k) >= 0; })) return;   /* 「타이레놀콜드」 안의 「타이레놀」은 따로 세지 않는다 */
@@ -3794,7 +3811,7 @@ window.언어칸 = function () {
   var 갈곳 = {};
   function 칩길(이름, 길) { 갈곳[이름] = 길; return 이름; }
     function 겹침(ids) {
-    var ds = ids.map(function (i) { return drug(i); }).filter(Boolean), T = ME.taking, 결;
+    var ds = ids.map(function (i) { return String(i).indexOf('b:') === 0 ? 제품약(i) : drug(i); }).filter(Boolean), T = ME.taking, 결;
     ME.taking = []; try { 결 = ixCards(ixRun(ds)); } finally { ME.taking = T; }
     var 센 = 결.filter(function (c) { return c.lv === 'stop' || c.lv === 'warn'; });
     var 말 = [ds.map(function (d) { return d.name; }).join(' · ') + ' — 같이 드시는지 볼게요.'];
@@ -3857,7 +3874,7 @@ window.언어칸 = function () {
       더: (d.stop || []).length ? '<p class="small muted">이럴 땐 그만 드시고 진료</p><ul class="plain">' + d.stop.slice(0, 4).map(function (x) { return '<li>' + 짧게(x) + '</li>'; }).join('') + '</ul>' : '' };
   }
   function 겹침카드(ids) {
-    var ds = ids.map(function (i) { return drug(i); }).filter(Boolean), T = ME.taking, 결;
+    var ds = ids.map(function (i) { return String(i).indexOf('b:') === 0 ? 제품약(i) : drug(i); }).filter(Boolean), T = ME.taking, 결;
     ME.taking = []; try { 결 = ixCards(ixRun(ds)); } finally { ME.taking = T; }
     var 센 = 결.filter(function (c) { return c.lv === 'stop' || c.lv === 'warn'; }), 멈 = 센.some(function (c) { return c.lv === 'stop'; });
     return { 결: ds.map(function (d) { return 짧은이름(d.name); }).join(' + ') + ' — ' + (멈 ? '같이 드시면 안 되는 것이 있어요.' : 센.length ? '조심할 것이 있어요.' : '겹치는 성분이나 조심할 조합은 안 보여요.'), 위: 멈,
@@ -3926,12 +3943,14 @@ window.언어칸 = function () {
     if (ids.length >= 2) { 묻기.약 = ids; return 겹침카드(ids); }
     if (ids.length === 1 && 갈 && 같이) { 묻기.약 = ids; 묻기.기다림 = 갈; return { 결: 갈래[갈].묻기 + ' 이름을 알면 겹치는지 바로 볼게요.', 할: [], 단: [], 칩: 갈래[갈].칩 }; }
     if (/아이|아기|애기|우리\s*애|애가|[0-9]+\s*개월/.test(t) && /얼마|몇|양|mL|ml|먹여|해열/i.test(t)) return { 결: '아이 해열제는 몸무게로 양을 정해요.', 할: ['계산 화면에서 시럽 mL·간격·하루 한도를 바로 볼 수 있어요.'], 단: [단추('아이 해열제 계산', '/kids', 1)] };
+    if (ids.length === 1 && String(ids[0]).indexOf('b:') === 0) { var bb = 제품약(ids[0]); if (bb) return { 결: bb.name + (bb.brand.use ? ' — ' + bb.brand.use : ''), 할: [bb.brand.how, bb.brand.who].filter(Boolean), 단: [단추(bb.name + ' 자세히', bb.link.slice(1), 1)] }; }
     if (ids.length === 1) { 묻기.약 = ids; var d = drug(ids[0]); if (d) return 약카드(d, t); }
     var sid = 증상찾기(t), s = sid && (D.symptoms || []).filter(function (x) { return x.id === sid; })[0];
     if (s) return 증상카드(s);
     if (/알약|낱알|각인|써\s*있|적혀/.test(t)) return { 결: '색·모양·앞뒤 글자로 찾을 수 있어요. 사진으로 약봉투를 읽을 수도 있어요.', 할: [], 단: [단추('알약 찾기', '/pill', 1), 단추('사진으로 읽기', '/photo')] };
     return null;
   }
+  window.__답짓기 = function (q) { try { 묻기.기다림 = null; 묻기.약 = []; } catch (e) {} return 답짓기(q); };   /* 11-18 검색 대량 시험(tests/search5k.py)이 부른다 — 화면엔 영향 없음 */
   function 답그리기(r) {
     if (r.위험) return '<article class="ask-ans sos" role="alert"><p class="ask-c">' + esc(r.위험.말) + '</p>' + (r.위험.전화 && /^[\d+][\d\s-]*$/.test(String(r.위험.전화)) ? '<a class="btn ask-call" href="tel:' + esc(String(r.위험.전화).replace(/[^\d+]/g, '')) + '">' + I.alert + ' ' + esc(r.위험.전화) + ' 전화</a>' : '') + '</article>';
     if (!r.결) return '<article class="ask-ans"><p class="ask-c">아직 이 질문은 찾지 못했어요. 이렇게 물어보시면 찾을 수 있어요.</p><div class="ask-chips">' + 예시.slice(0, 4).map(칩).join('') + '</div></article>';
