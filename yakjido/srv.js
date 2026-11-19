@@ -4175,6 +4175,13 @@ window.언어칸 = function () {
     if (부) t = 부.rest;
     /* 11-17 Main 승인(20문항 대결 ⚠) — 질문 속 상황(임신·수유·생후 개월·피가 안 멎음·주운 알약·항생제 끊기·기록 말)을 먼저 본다.
        답은 앱에 이미 있는 글(겹침 규칙 preg-nsaid · 코피·피 묽게 하는 약 길잡이 · 항생제 길잡이)만 — 금기·응급이 맨 위, 용량은 뒤 */
+    /* 11-19 현욱님 — 두드러기 걱정: 질문으로 가려 주기(응급 신호는 위 위험()이 먼저 119) */
+    if (/두드러기|담마진|피부가?\s*(부풀|부어\s*올|올록볼록)|모기\s*물린\s*것\s*같이\s*부/.test(t) && !/두드러기\s*약|임신|임산부|수유|모유/.test(t)) {   /* 임신·수유·약 질문은 그 답이 먼저 */
+      var 걱 = /에이즈|HIV|에치아이브이|옴|곰팡이|백선|성병|옮(을|는|았)|전염/.test(t);
+      return { 결: 걱 ? '두드러기는 자국 하나하나가 대개 24시간 안에 사라지고 다른 곳에 새로 나요 — 몇 시간 만에 옮겨 다니면 두드러기일 때가 많아요.' : '두드러기는 대부분 며칠 안에 가라앉아요 — 먼저 아래를 확인해 보세요.',
+        할: ['입술·혀·목이 붓거나, 숨이 차거나, 어지러우면 지금 119예요.', '음식·약·벌 쏘임 직후 몇 분~몇 시간 안에 시작됐다면, 그것을 적어 두고 다시 먹거나 쓰지 마세요.', '자국 하나가 몇 시간 안에 사라지고 다른 곳에 새로 나는지 — 같은 자리를 시간 간격으로 찍어 두면 보여요.', '가려우면 약사님께 먹는 알레르기약(항히스타민)을 물어보세요. 이틀이 지나도 나아지지 않거나 6주 넘게 반복되면 진료를 보세요.'].concat(걱 ? ['노출이 걱정되면 발진 모양과 상관없이 검사가 확인하는 길이에요 — 72시간 안이면 응급실·감염내과에서 예방약을 물어보세요.'] : []),
+        단: [단추('사진 일기 — 옮겨 다니나 보기', '/hives', 1), 단추('에이즈·옴·곰팡이 걱정될 때', '/tips?open=life-hives-worry'), 단추('알레르기·두드러기 — 이렇게 하세요', '/symptom/allergy')] };
+    }
     var 생 = 생활답(t); if (생) return 생;
     var 짝 = 처방짝(t); if (짝) return 짝;
     var 가렵 = 가려움답(t); if (가렵) return 가렵;
@@ -6880,6 +6887,51 @@ window.entryBandS = function (s){
   return `<section class="sec card entry-band"><b>${esc(nm)}에서 오셨어요</b> ${back}</section>`;
 }
 /* ▲ */
+/* 11-19 현욱님 — 두드러기 사진 일기. 사진은 이 휴대폰(IndexedDB)에만 두고 앱은 판정하지 않는다 · 밖으로 보내는 곳 0.
+   같은 자리를 시간 간격으로 찍어 «자국이 옮겨 다니나»를 나란히 보고, 진료 때 크게 보여 준다(미국피부과학회: 자국 하나는 대개 24시간 안에 사라지고 새로 난다) */
+const 두일 = { db: null, list: [] };
+function 두DB(){ if (두일.db) return Promise.resolve(두일.db);
+  return new Promise((ok, no) => { try { const r = indexedDB.open('yakjido-hives', 1); r.onupgradeneeded = () => r.result.createObjectStore('p', { keyPath: 'id' }); r.onsuccess = () => ok(두일.db = r.result); r.onerror = () => no(r.error); } catch (e) { no(e); } }); }
+function 두할(mode, fn){ return 두DB().then(db => new Promise((ok, no) => { const tx = db.transaction('p', mode), st = tx.objectStore('p'); const r = fn(st); tx.oncomplete = () => ok(r && r.result); tx.onerror = () => no(tx.error); })); }
+function 두읽기(){ return 두할('readonly', st => st.getAll()).then(L => { 두일.list = (L || []).sort((a, b) => a.at - b.at); return 두일.list; }); }
+function 두줄이기(file){ return new Promise((ok, no) => { const fr = new FileReader(); fr.onerror = () => no(fr.error); fr.onload = () => { const im = new Image(); im.onerror = () => no(new Error('사진을 읽지 못했어요'));
+  im.onload = () => { const k = Math.min(1, 900 / Math.max(im.width, im.height)), c = document.createElement('canvas'); c.width = Math.round(im.width * k); c.height = Math.round(im.height * k); c.getContext('2d').drawImage(im, 0, 0, c.width, c.height); ok(c.toDataURL('image/jpeg', 0.8)); }; im.src = fr.result; }; fr.readAsDataURL(file); }); }
+window.두찍음 = async function(inp){
+  const f = inp.files && inp.files[0]; if (!f) return;
+  try { const img = await 두줄이기(f), 곳 = (document.getElementById('hv-where') || {}).value || ''; await 두할('readwrite', st => st.put({ id: Date.now(), at: Date.now(), where: 곳.slice(0, 20), img })); toast('이 휴대폰에만 담았어요'); }
+  catch (e) { toast('사진을 담지 못했어요 — 저장 공간을 확인해 주세요'); }
+  inp.value = ''; await 두읽기().catch(() => {}); route();
+};
+window.두지움 = async function(id){ const ok = await appDialog('이 사진을 지울까요?', { ok: '지우기', cancel: '그만두기', danger: 1 }); if (!ok) return; await 두할('readwrite', st => st.delete(id)); await 두읽기().catch(() => {}); route(); };
+window.두모두지움 = async function(){ const ok = await appDialog('사진 일기를 모두 지울까요? 되돌릴 수 없어요.', { ok: '모두 지우기', cancel: '그만두기', danger: 1 }); if (!ok) return; await 두할('readwrite', st => st.clear()); 두일.list = []; route(); };
+function 두때(at){ const d = new Date(at), h = d.getHours(); return `${d.getMonth() + 1}월 ${d.getDate()}일 ${h < 12 ? '오전' : '오후'} ${h % 12 || 12}:${String(d.getMinutes()).padStart(2, '0')}`; }
+function 두사이(a, b){ const m = Math.round((b - a) / 60000); return m < 60 ? `${m}분 뒤` : m < 1440 ? `${Math.round(m / 60)}시간 뒤` : `${Math.round(m / 1440)}일 뒤`; }
+window.두보여줌 = function(){
+  const L = 두일.list; if (!L.length) return;
+  const el = document.createElement('div'); el.className = 'hv-show'; el.setAttribute('role', 'dialog'); el.setAttribute('aria-label', '진료 때 보여 주기');
+  el.innerHTML = `<div class="hv-sh-top"><b>두드러기 사진 ${L.length}장 · 시간 순서</b><button type="button" class="btn ghost" onclick="this.closest('.hv-show').remove()">닫기</button></div>
+    <div class="hv-sh-row">${L.map((p, i) => `<figure><img src="${p.img}" alt="${esc(두때(p.at))} 사진"><figcaption>${esc(두때(p.at))}${p.where ? ' · ' + esc(p.where) : ''}${i ? ' · 앞 사진에서 ' + 두사이(L[i - 1].at, p.at) : ''}</figcaption></figure>`).join('')}</div>`;
+  document.body.appendChild(el);
+};
+window.vHivesS = function(){
+  const L = 두일.list, emg = (window.I18N && I18N.emg && I18N.emg.e) || '119';
+  if (!두일.loaded) { 두일.loaded = 1; 두읽기().then(() => { if (/^#\/hives/.test(location.hash)) route(); }).catch(() => {}); }
+  const 날 = {}; L.forEach(p => { const k = new Date(p.at).toDateString(); (날[k] = 날[k] || []).push(p); });
+  const 칸 = Object.values(날).reverse().map(ps => `<section class="sec"><h2 class="h-sm">${esc(두때(ps[0].at).replace(/ (오전|오후).*/, ''))}</h2><div class="hv-grid">${ps.map((p, i) => `<figure class="hv-c"><img src="${p.img}" alt="${esc(두때(p.at))} 사진" loading="lazy"><figcaption><b>${esc(두때(p.at).replace(/^.*일 /, ''))}</b>${p.where ? ' · ' + esc(p.where) : ''}${i ? `<br><span class="muted">앞 사진에서 ${두사이(ps[i - 1].at, p.at)}</span>` : ''}</figcaption><button type="button" class="btn ghost hv-del" onclick="두지움(${p.id})" aria-label="${esc(두때(p.at))} 사진 지우기">지우기</button></figure>`).join('')}</div></section>`).join('');
+  return `${topBar({ back:'뒤로' })}
+  <section class="sec"><p class="eyebrow">두드러기</p><h1>사진 일기</h1>
+    <p class="lead">같은 자리를 몇 시간 간격으로 찍어 두면, 자국이 사라지고 다른 곳에 새로 나는지(옮겨 다니는지) 한눈에 보여요. 진료 때 보여 주시면 도움이 돼요.</p>
+    <p class="small muted">사진은 이 휴대폰 안에만 두고 어디로도 보내지 않아요. 앱은 사진을 보고 판정하지 않아요.</p></section>
+  <section class="sec card warn"><b>입술·혀·목이 붓거나, 숨이 차거나, 어지러우면</b> 사진보다 ${esc(emg)}가 먼저예요. <a class="btn" href="tel:${esc(emg)}">${esc(emg)}에 전화</a></section>
+  <section class="sec"><label class="small" for="hv-where">찍는 자리(고르지 않아도 돼요)</label>
+    <select id="hv-where" class="input"><option value="">—</option>${['팔', '다리', '배·등', '가슴', '목', '얼굴', '손·발'].map(x => `<option>${x}</option>`).join('')}</select>
+    <div class="actions" style="margin-top:10px"><label class="btn" for="hv-cam">사진 찍기</label><input id="hv-cam" type="file" accept="image/*" capture="environment" hidden onchange="두찍음(this)">
+    ${L.length ? `<button type="button" class="btn ghost" onclick="두보여줌()">진료 때 보여 주기</button>` : ''}</div></section>
+  ${L.length ? 칸 : '<section class="sec"><p class="muted">아직 사진이 없어요. 처음 찍고 2~3시간 뒤에 같은 자리를 한 번 더 찍어 보세요.</p></section>'}
+  <section class="sec"><a class="link" href="#/tips?open=life-hives-worry">두드러기 — 에이즈·옴·곰팡이 아닐까 걱정될 때 ›</a><br><a class="link" href="#/symptom/allergy">알레르기·두드러기 — 이렇게 하세요 ›</a>
+  ${L.length ? `<p style="margin-top:12px"><button type="button" class="btn ghost" onclick="두모두지움()">사진 모두 지우기</button></p>` : ''}</section>`;
+};
+(function(){ const st = document.createElement('style'); st.textContent = '.hv-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.hv-c{margin:0;display:flex;flex-direction:column;gap:6px}.hv-c img,.hv-show img{width:100%;border-radius:12px;object-fit:cover;aspect-ratio:1/1;background:var(--line,#eee)}.hv-c figcaption{font-size:14px;line-height:1.45;word-break:keep-all}.hv-del{min-height:44px}.hv-show{position:fixed;inset:0;z-index:999;background:var(--bg,#fff);overflow:auto;padding:16px}.hv-sh-top{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:12px}.hv-sh-row{display:flex;flex-direction:column;gap:16px}.hv-show figure{margin:0}.hv-show figcaption{font-size:17px;margin-top:6px;word-break:keep-all}'; document.head.appendChild(st); })();
 /* 11-19 Main — 첫 화면에서 옮겨 온 화면 본체 16개(app-shell 에는 «불러오는 중» 자리만). 이름은 그대로 두고 window.<이름>S 로 */
 window.vKidsS = function vKids(){
   const K = D_KIDS(); const c = KID_IN || ME.child || {}, bad = kidBad(c); const m = bad ? null : monthsFrom(c.birth); const w = bad ? NaN : parseFloat(c.weight);
@@ -7479,5 +7531,5 @@ ${ext('기내칸')}`, 'sphone')}
 };
 try { if (window.ENTRY && /^#\/(symptom|send)/.test(location.hash)) route(); } catch (e) {}
 try { if (/^(#\/?(home)?)?$/.test(location.hash) && (window.오늘한장 || window.필요약줄)) route(); } catch (e) {}   /* 11-12 홈의 오늘 한 장·필요할 때 약 줄은 srv.js 가 온 뒤 다시 그린다 */
-try { if (/^#\/(kids|bag|pill|show|send|ingr|mix|check|class|kinds|photo|senior|guide|drug\/|schedule|together|od|vitals|pillinfo|pub|supp\/|me|consent|login|notify|sgoal|sstage|doc|hello\/3|supp$|supp\?|sgoal|sstage|rx|about|search|myths|askdoc|talk|p\/|p\?|p$)/.test(location.hash)) route(); } catch (e) {}
+try { if (/^#\/(hives|kids|bag|pill|show|send|ingr|mix|check|class|kinds|photo|senior|guide|drug\/|schedule|together|od|vitals|pillinfo|pub|supp\/|me|consent|login|notify|sgoal|sstage|doc|hello\/3|supp$|supp\?|sgoal|sstage|rx|about|search|myths|askdoc|talk|p\/|p\?|p$)/.test(location.hash)) route(); } catch (e) {}
 
