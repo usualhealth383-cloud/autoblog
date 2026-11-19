@@ -8,7 +8,9 @@ import http.server, socketserver, threading, functools, pathlib, sys, re, json, 
 from playwright.sync_api import sync_playwright
 H = pathlib.Path(__file__).resolve().parent; D = H.parents[1] / 'docs' / 'yakjido'
 SET = sys.argv[1] if len(sys.argv) > 1 else '250'   # 250(전부) · 200(고칠 것) · 50(잣대 — 고칠 때 보지 않는다: 줄마다 답은 출력하지 않음)
-FN = {'250': '약지도_질문_1.tsv', '200': '약지도_질문_1_고칠200.tsv', '50': '약지도_질문_1_잣대50.tsv'}[SET]
+FN = {'250': '약지도_질문_1.tsv', '200': '약지도_질문_1_고칠200.tsv', '50': '약지도_질문_1_잣대50.tsv',
+      '1000': '약지도_질문_2.tsv', '2고칠': '약지도_질문_2_고칠200.tsv', '2잣대': '약지도_질문_2_잣대800.tsv'}[SET]   # 11-19 GPT 질문 251~1250
+RULER = SET in ('50', '2잣대')
 Q = [l.split('\t') for l in (H / 'q' / FN).read_text().strip().split('\n')[1:]]
 class _Q(http.server.SimpleHTTPRequestHandler):
     def log_message(self, *a): pass
@@ -38,6 +40,8 @@ for (n, q, who, cat, em, want), r in zip(Q, R):
     txt = ' '.join([r['w'], r['f'], r['h']])
     if cat == '응급':
         ok = bool(r['w'] and EMG.search(r['w'])); v = '통과' if ok else '응급 놓침'   # 11-18 Main — 묻기 첫 답이 응급 카드여야 통과(첫 줄·안전 줄만은 놓침)
+        if not ok:   # 11-19 Main — 놓침을 셋으로 나눔: 찾기 1위에만 · 답 안 안전 줄에만 · 어디에도 없음(=안전 놓침, 가장 나쁨)
+            v = '응급 놓침(1위엔 있음)' if EMG.search(r['top'] or '') else '응급 놓침(답 안 줄엔 있음)' if EMG.search(r['f'] + ' ' + r['h']) else '안전 놓침'
     elif cat == '같이 먹어도 되나':
         v = '모름' if r['n'] else '통과' if CAU.search(txt) else '거짓 안심' if SAFE.search(txt) else '조심 말 없음'
     else:
@@ -46,10 +50,10 @@ for (n, q, who, cat, em, want), r in zip(Q, R):
     st[cat][v] += 1; st['전체'][v] += 1
     if v != '통과': bad.append((n, cat, v, q, (r['w'] or r['f'])[:60]))
     out.append('\t'.join([n, cat, v, q, r['w'], r['f'], r['h'], r['top']]).replace('\n', ' '))
-if SET != '50': (H / 'q' / ('약지도_질문_1_답.tsv' if SET == '250' else '약지도_질문_1_고칠200_답.tsv')).write_text('\n'.join(out) + '\n')
+if not RULER: (H / 'q' / FN.replace('.tsv', '_답.tsv')).write_text('\n'.join(out) + '\n')
 for c in ['응급', '같이 먹어도 되나'] + sorted(k for k in st if k not in ('응급', '같이 먹어도 되나', '전체')) + ['전체']:
     s = st[c]; print(f'{c:10} {sum(s.values()):3} — 통과 {s["통과"]} · ' + ' · '.join(f'{k} {v}' for k, v in s.items() if k != '통과'))
-if SET != '50':
+if not RULER:
     print('— 통과 못 한 것 —')
     for x in bad: print(' ', *x)
-sys.exit(1 if st['응급']['응급 놓침'] or st['전체']['거짓 안심'] or st['전체']['오류'] else 0)
+sys.exit(1 if any(v for k, v in st['응급'].items() if k != '통과') or st['전체']['거짓 안심'] or st['전체']['오류'] else 0)
