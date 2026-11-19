@@ -1,0 +1,36 @@
+name: gildongmu-trials
+# 길동무 «임상시험 찾기» — 식약처 임상시험 OpenAPI(현욱님 활용신청 승인 11-19). gildongmu/trials/run.txt 를 바꿔 올리면 돈다(이 가지에서만).
+# 키는 Secrets DATA_GO_KR_KEY — 로그·파일 어디에도 남지 않는다. 받은 것은 공공데이터(식약처 · 이용허락범위 제한 없음)만 같은 가지에 커밋.
+on:
+  workflow_dispatch: {}
+  push:
+    branches: [claude/stoic-feynman-5le6d4]
+    paths:
+      - 'gildongmu/trials/run.txt'
+concurrency:
+  group: gildongmu-trials
+  cancel-in-progress: false
+permissions:
+  contents: write
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: 받기
+        env:
+          DATA_GO_KR_KEY: ${{ secrets.DATA_GO_KR_KEY }}
+        run: |
+          if [ -z "$DATA_GO_KR_KEY" ]; then echo "::notice::DATA_GO_KR_KEY 없음"; exit 0; fi
+          M=$(head -1 gildongmu/trials/run.txt | grep -oE 'probe|full' | head -1); python3 gildongmu/trials/fetch_trials.py ${M:-probe}
+      - name: 올리기
+        run: |
+          git config user.name "github-actions[bot]"; git config user.email "41898283+github-actions[bot]@users.noreply.github.com"
+          git add gildongmu/trials/*.json || true
+          if git diff --cached --quiet; then echo "바뀐 것 없음"; exit 0; fi
+          git commit -m "길동무 임상시험 — 식약처 OpenAPI 받기 결과"
+          for i in 1 2 3; do git pull --no-rebase origin claude/stoic-feynman-5le6d4 && git push origin HEAD:claude/stoic-feynman-5le6d4 && break; sleep 5; done
