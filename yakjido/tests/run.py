@@ -921,7 +921,7 @@ def r5_checks(br, url, fails):
     me("ME.view='detail'"); go('/supp/calcium'); pz.evaluate("()=>document.querySelectorAll('details').forEach(d=>d.open=true)")
     t = txt()
     if '최소 4시간' not in t or '2~4시간' in t: fails.append('5차 #5 칼슘 화면에 레보티록신 「최소 4시간」이 없거나 「2~4시간」이 남았습니다')
-    if 'privacy.html#share' not in pz.content() and "방침주소())}#share" not in open(__file__.replace('tests/run.py', 'app-shell.html'), encoding='utf-8').read():
+    if 'privacy.html#share' not in pz.content() and not any("방침주소())}#share" in open(__file__.replace('tests/run.py', f), encoding='utf-8').read() for f in ('app-shell.html', 'srv.js')):   # 11-19 보내기 화면 본체는 srv.js
         fails.append('5차 #6 보내기 동의 「자세히」가 처리방침 보내기 항목으로 가지 않습니다')
     if 'id="share"' not in open(__file__.replace('tests/run.py', 'privacy.html'), encoding='utf-8').read(): fails.append('5차 #6 처리방침에 보내기 항목(id=share)이 없습니다')
     go('/show/msk')
