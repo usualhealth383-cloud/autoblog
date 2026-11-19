@@ -2022,7 +2022,7 @@ addEventListener('hashchange', () => { if (!/^#\/barcode/.test(location.hash)) �
 /* 11-19 현욱님 — 나의건강기록 내보내기(PDF) 불러오기. 파일은 이 휴대폰 안에서만 읽고 서버로 보내지 않으며, 읽은 뒤 파일·글을 저장하지 않는다(고른 약만 내 약통에).
    읽기 도구: PDF.js 4.10.38(Apache-2.0 · vendor/pdf — 처음 쓸 때만 받음). 칸 모양은 실제 파일을 받기 전이라 넓게 읽는다: 조제일(날짜) · 약 이름(정·캡슐·시럽 …) · 일수 */
 const MHR = { rows: null, err: '', pw: 0, busy: 0, buf: null };
-async function mhrLib() { if (MHR.lib) return MHR.lib; const u = n => new URL('vendor/pdf/' + n, location.href).href; const m = await import(u('pdf.min.mjs')); m.GlobalWorkerOptions.workerSrc = u('pdf.worker.min.mjs'); MHR.lib = m; return m; }
+async function mhrLib() { if (MHR.lib) return MHR.lib; const u = n => new URL(n, location.href).href; const m = await import(u('vendor/pdf/pdf.min.mjs')); m.GlobalWorkerOptions.workerSrc = u('vendor/pdf/pdf.worker.min.mjs'); MHR.lib = m; return m; }
 async function mhrText(buf, password) {
   const L = await mhrLib(), doc = await L.getDocument({ data: buf.slice(0), password: password || undefined, isEvalSupported: false, cMapUrl: new URL('vendor/pdf/cmaps/', location.href).href, cMapPacked: true }).promise, pages = [];
   for (let p = 1; p <= Math.min(doc.numPages, 80); p++) { const tc = await (await doc.getPage(p)).getTextContent();
