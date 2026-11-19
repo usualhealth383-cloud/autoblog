@@ -89,8 +89,23 @@ def fix(k):   # 11-19 — 제외기준·시험책임자만 다시(item 안에 di
     json.dump(d, open(f, 'w', encoding='utf-8'), ensure_ascii=False, separators=(',', ':'))
     json.dump(d['meta'], open(os.path.join(OUT, 'cancer_meta.json'), 'w', encoding='utf-8'), ensure_ascii=False, indent=1)
     print('제외 있음', d['meta']['제외있음'], '기관 있음', d['meta']['기관있음'], '칸', sorted(칸), flush=True)
+
+def fix2(k):   # 11-19 — 제외기준 칸 이름 확인하며 다시
+    f = os.path.join(OUT, 'cancer_trials.json'); d = json.load(open(f, encoding='utf-8'))
+    번 = {x['CLNC_TEST_SN'] for x in d['시험']}; 제 = collections.defaultdict(list); 칸 = set(); 보기 = None
+    for x in fetch_all(API['제외기준'], k, '제외기준'):
+        x = 풀기(x); 칸 |= set(x); 보기 = 보기 or x; sn = s_(x.get('CLNC_TEST_SN'))
+        if sn in 번:
+            t = next((s_(v) for c, v in x.items() if 'STDR' in c and s_(v)), '')
+            if t: 제[sn].append({'CHOOSE_EXCL_STDR': t})
+    for x in d['시험']: x['제외'] = 제.get(x['CLNC_TEST_SN'], [])
+    d['meta']['제외칸'] = sorted(칸); d['meta']['제외있음'] = sum(1 for x in d['시험'] if x['제외']); d['meta']['제외보기'] = {c: str(v)[:60] for c, v in (보기 or {}).items()}
+    json.dump(d, open(f, 'w', encoding='utf-8'), ensure_ascii=False, separators=(',', ':'))
+    json.dump(d['meta'], open(os.path.join(OUT, 'cancer_meta.json'), 'w', encoding='utf-8'), ensure_ascii=False, indent=1)
+    print('제외 있음', d['meta']['제외있음'], sorted(칸), flush=True)
 if __name__ == '__main__':
     k = key(); m = (sys.argv[1:] or ['probe'])[0]
     if m == 'probe': probe(k)
     elif m == 'fix': fix(k)
+    elif m == 'fix2': fix2(k)
     else: full(k)
