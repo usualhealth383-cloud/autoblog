@@ -3358,7 +3358,7 @@ const flagBox = (title, items, sub) => items?.length ? `<div class="flag">${I.al
 /* 그룹마다 방 색을 정한다. 증상마다 고유 아이콘을 준다 — 통증 6개가 전부 뼈 아이콘이면 어르신은 못 고른다 */
 const GROUP_CLS = { '감기·열·목':'g-resp', '머리·눈·귀·코':'g-eye', '입·이':'g-oral', '배·소화':'g-gi', '허리·관절·근육':'g-pain', '피부·머리카락':'g-skin', '소변·생리·갱년기':'g-women', '잠·마음·생활':'g-etc',
   /* 약 상식 갈래 — 같은 팔레트를 다시 쓴다(새 색을 늘리지 않는다) */
-  '약 이름과 고르기':'g-etc', '제대로 드시는 법':'g-resp', '조심할 것':'g-pain', '열·감기·배탈일 때':'g-gi', '보관하고 버리기':'g-oral', '병원·헌혈 가실 때':'g-uro' };
+  '약 이름과 고르기':'g-etc', '제대로 드시는 법':'g-resp', '조심할 것':'g-pain', '열·감기·배탈일 때':'g-gi', '보관하고 버리기':'g-oral', '병원·헌혈 가실 때':'g-uro', '생활 상식':'g-resp' };
 const gcls = g => GROUP_CLS[g] || '';
 /* 아이콘은 content 의 icon 값 하나로 정한다 — 앱 안에 덮어쓰는 표를 두지 않는다 */
 const sicon = s => icon(s.icon);
@@ -3802,6 +3802,7 @@ function search0(q, noFix){
     return words.every(w => w.length === 1 ? one(w).test(raw) : hay.includes(w)); };
   /* Z4 #26 — 기능 바로가기: 「부모님」「가족」「보내기」로 부모님께 보내기를 못 찾던 것. 결과 맨 위에 */
   for (const f of FEATURE_GO) if (f.kw.some(k => qs.includes(k) || (qs.length >= 2 && qs.length >= k.length - 1 && k.startsWith(qs)))) out.push({ k:'기능', c:'s', t:f.t, d:f.d, h:f.h, w:9 });
+  if (window.생활찾기) 생활찾기(q, out);
   { const rq = [['bp', /혈압약|고혈압약/], ['dm', /당뇨약|혈당약/], ['chol', /콜레스테롤약|고지혈|스타틴/], ['blood', /항응고제|와파린|피 묽게|아픽사반|리바록사반|클로피도그렐/], ['thy', /갑상선약|레보티록신|씬지록신/], ['mind', /수면제|안정제|우울약|불안약|졸피뎀/], ['gi', /위산 억제|프라졸|프라잔|넥시움|케이캡|역류성/], ['bone', /골다공증약|드론산|포사맥스|본비바|악토넬/], ['resp', /흡입기|천식약|심비코트|벤토린|스피리바/], ['pros', /전립선약|탐스로신|하루날디|스테리드|아보다트/], ['gout', /통풍약|알로퓨리놀|자이로릭|페북소스타트|페브릭|콜히친/], ['blad', /방광약|과민방광|베시케어|솔리페나신|미라베그론|베타미가/], ['ster', /스테로이드약|프레드니솔론|소론도|메드롤/], ['dem', /치매약|도네페질|아리셉트|메만틴|에빅사/], ['eye', /녹내장|라타노프로스트|잘라탄|티몰롤/], ['park', /파킨슨약|레보도파|프라미펙솔|로피니롤|라사길린/], ['pain', /트라마돌|울트라셋|가바펜틴|프레가발린|리리카/], ['abx', /항생제를 받|플록사신|메트로니다졸|클라리스로마이신|코나졸/], ['derm', /이소트레티노인|로아큐탄|독시사이클린|미노사이클린/], ['herb', /한약|한방 과립|갈근탕|소청룡탕|작약감초탕/]].find(([, r]) => r.test(q0));
     if (rq) out.push({ k:'기능', c:'s', t:RX_NAME[rq[0]] + ' 드시는 분께', d:'먹는 법 · 깜빡했을 때 · 약국에서 조심할 약', h:'/rx/' + rq[0], w:7 }); }
   if (kidQ && /먹었|삼켰|먹어|먹음/.test(q0) && !out.some(o => o.h === '/od')) out.push({ k:'기능', c:'s', t:'아이가 약을 먹었어요', d:'양이 적어 보여도 바로 119 · 아이 몸무게와 먹은 양을 알려 주세요', h:'/od?kid=1', w:9 });
@@ -5008,7 +5009,7 @@ ${k === 'apap' && m != null && m < 24 ? `<p class="small muted" style="margin-to
 /* ───────── 알아두면 좋은 것(건강정보) ───────── */
 function vTips(_, q){
   const T = D.tips || [];
-  const TG = ['약 이름과 고르기', '제대로 드시는 법', '조심할 것', '열·감기·배탈일 때', '보관하고 버리기', '병원·헌혈 가실 때'];
+  const TG = ['생활 상식', '약 이름과 고르기', '제대로 드시는 법', '조심할 것', '열·감기·배탈일 때', '보관하고 버리기', '병원·헌혈 가실 때'];
   const card = t => `<details class="xc faq" id="tip-${t.id}" ${q.open === t.id ? 'open' : ''}><summary><div class="ic">${icon(t.icon)}</div><b>${esc(t.title)}</b><span class="pv">${esc(t.body.replace(/\*\*/g, '').slice(0, 44))}…</span><span class="cnt">읽기${I.chev}</span></summary><div class="bd"><p class="tip-body">${fmt(t.body)}</p><div class="actions" style="margin-top:2px">${speakBtn(`(D.tips.find(x=>x.id==='${t.id}')||{}).body`, t.title + ' 읽어 주기')}</div>${srcChips(t.src, true)}${t.link ? `<div class="actions"><a class="btn ghost" href="#${t.link}">${I.chev} ${esc(t.linkText || '관련 화면 보기')}</a></div>` : ''}</div></details>`;
   const groups = TG.map(g => [g, T.filter(t => t.group === g)]).filter(([, xs]) => xs.length);
   const rest = T.filter(t => !TG.includes(t.group));

@@ -3867,6 +3867,25 @@ window.언어칸 = function () {
     ['storage', /보관|냉장|실온|어디에\s*(두|둬)|약통에\s*(옮|미리|덜어|담아\s*두)|차\s*안에\s*(둬|두)|습기|햇빛/], ['missed-dose', /깜빡|놓쳤|잊고|잊어버|빼먹|못\s*먹었|건너뛰/],
     ['before-after-meal', /식전|식후|공복|빈\s*속|식사\s*(랑|와|하고)?\s*(상관|관계)|밥\s*(먹기\s*)?(전에|먹고|먹은\s*뒤)/], ['cut-pill', /쪼개|반으로|잘라|갈아서|가루로|빻아|캡슐.*(열어|까서|풀어)/],
     ['kidney-otc', /(신장|콩팥|투석)/], ['read-label', /약\s*봉투|약봉투|처방전.*(보는|읽|뜻)/], ['generic', /복제약|카피약|오리지널\s*약/], ['patch-howto', /파스.*(붙|떼|교체|바꿔|갈아|가려)/]];
+  /* 11-19 생활 상식(현욱님) — tips.life.json 의 ask 로 찾는다(본문이 와야 있음). 같이 먹는 질문은 겹침 답이 먼저(영양제 여러 개·감기약 겹침 글만 예외) */
+  /* 찾기는 질문 꼬리(「언제 가요?」)를 떼고 찾으므로, 생활 상식은 손님이 친 그대로의 말로 맞춘다 */
+  if (typeof search === 'function' && !search.__raw) { var _찾 = search; search = function (q, n) { if (!(search.d > 0)) window.__찾말 = q; return _찾(q, n); }; search.__raw = 1; }   /* 깊이 셈(search.d)은 원래 함수가 이 이름(search)에 적는다 */
+  window.생활찾기 = function (q, out) {   /* 찾기(search0)가 부른다 — 묻는 꼴이면 맨 위, 낱말 하나면 아래쪽 */
+    q = String(window.__찾말 || q);
+    var 묻는 = /\s/.test(q.trim()) || /[?？]|요$|까$|나$|죠$/.test(q.trim());
+    (D.tips || []).forEach(function (t) { if (t.ask && (t._re || (t._re = new RegExp(t.ask))).test(q)) out.push({ k: '생활 상식', c: 's', t: t.title, d: String(t.body || '').replace(/\*\*/g, '').split(/(?:요|다)\.\s/)[0] + '요.', h: '/tips?open=' + t.id, w: 묻는 ? 12 : 2 }); });
+  };
+  function 생활답(t) {
+    if (window.LANG && window.LANG !== 'ko') return null;
+    var 같이 = /같이|함께|이랑|랑\s|하고\s|병용/.test(t);
+    var tp = (D.tips || []).filter(function (x) { return x.ask && (x._re || (x._re = new RegExp(x.ask))).test(t) && (!같이 || /^life-(stack|cold-dup)$/.test(x.id)); })[0];
+    if (!tp) return null;
+    /* 약 이름·처방 갈래를 말하면(「데파스로 잠 안 오면 수면약을 더?」) 그 약 답이 먼저 — 영양제·코 스프레이·감기약 겹침 글만 예외 */
+    var 약말 = []; try { 약말 = 약찾기(t); } catch (e) {}
+    if ((약말.length || 처방갈래.some(function (x) { return x[1].test(t); }) || /데파스|졸피뎀|알프라졸람|로라제팜|클로나제팜|처방/.test(t)) && !/^life-(vit|iron|calcium|zinc|magnesium|stack|nasal|cold-dup|cold-abx)/.test(tp.id)) return null;
+    var 문 = String(tp.body).replace(/\n+/g, ' ').replace(/([요다]\.)\s+/g, '$1\u0001').split('\u0001').filter(Boolean);
+    return { 결: 문[0], 할: 문.slice(1, 5), 단: [단추('생활 상식 — ' + tp.title, '/tips?open=' + tp.id, 1)].concat(tp.link ? [단추(tp.linkText || '바로 가기', tp.link)] : []) };
+  }
   function 팁답(t, 약수) {
     if (window.LANG && window.LANG !== 'ko') return null;
     var hit = 팁말.filter(function (x) { return x[1].test(t); })[0]; if (!hit) return null;
@@ -4156,6 +4175,7 @@ window.언어칸 = function () {
     if (부) t = 부.rest;
     /* 11-17 Main 승인(20문항 대결 ⚠) — 질문 속 상황(임신·수유·생후 개월·피가 안 멎음·주운 알약·항생제 끊기·기록 말)을 먼저 본다.
        답은 앱에 이미 있는 글(겹침 규칙 preg-nsaid · 코피·피 묽게 하는 약 길잡이 · 항생제 길잡이)만 — 금기·응급이 맨 위, 용량은 뒤 */
+    var 생 = 생활답(t); if (생) return 생;
     var 짝 = 처방짝(t); if (짝) return 짝;
     var 가렵 = 가려움답(t); if (가렵) return 가렵;
     var 상 = 상황답(t, 앎.값); if (상) return 상;

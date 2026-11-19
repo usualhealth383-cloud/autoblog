@@ -163,6 +163,11 @@ for k, v in data.items():
         core[k] = v
     else:
         inline[k] = v                       # meta · art · public · tips 는 작아서 그대로 둔다
+# 11-19 생활 상식(tips.life.json · 갈래 '생활 상식')은 첫 화면 예산 밖 — 본문(core)으로 보내고 mergeCore 가 D.tips 에 더한다
+if isinstance(inline.get('tips'), list):
+    _life = [t for t in data['tips'] if t.get('group') == '생활 상식']; _lid = {t['id'] for t in _life}
+    inline['tips'] = [t for t in inline['tips'] if t['id'] not in _lid]
+    core['tips'] = [t for t in core.get('tips', []) if t.get('id') not in _lid] + _life
 # meta 의 「이 앱에 대해(about)·이렇게 만들었어요(method)」는 설정 화면(본문을 받은 뒤에만 그려짐)에서만 쓴다 — 본문에는 meta 전체를 싣고
 # (mergeCore 가 D.meta 를 본문 것으로 바꾼다) 첫 화면에서는 뺀다(2026-10-14 외부 검수 2차 반영으로 첫 화면 예산, 압축 약 0.9 KB)
 if isinstance(inline.get('meta'), dict):
