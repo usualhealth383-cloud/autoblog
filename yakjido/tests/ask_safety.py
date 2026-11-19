@@ -22,7 +22,7 @@ TOP = [('임신 중 두통약', r'아세트아미노펜', r'이부프로펜\s*40
        ('새로 처방받은 약 지금 먹는 약이랑 같이 먹어도 돼요', r'겹치는', None), ('엄마 약도 같이 관리하고 싶어요', r'사람마다', None), ('아이 약 알림도 따로 받고 싶어요', r'사람마다', None), ('어머니가 드시는 약이랑 영양제 겹치는지 보고 싶어요', r'영양제', r'찾지 못했'), ('잠이 안 와요 수면제 사도 돼요', r'잠|수면', r'드시는군요')]
 fails = []
 with sync_playwright() as p:
-    b = p.chromium.launch(executable_path='/opt/pw-browsers/chromium-1194/chrome-linux/chrome', args=['--no-sandbox'])
+    b = p.chromium.launch(executable_path='/opt/pw-browsers/chromium', args=['--no-sandbox'])
     pg = b.new_context(viewport={'width': 360, 'height': 780}, locale='ko-KR', timezone_id='Asia/Seoul', service_workers='block').new_page(); pg.add_init_script(SEED)
     errs = []; pg.on('pageerror', lambda e: errs.append(str(e)))
     def ask(q):

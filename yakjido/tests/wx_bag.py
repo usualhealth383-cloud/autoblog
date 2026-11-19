@@ -2,7 +2,7 @@ import functools,http.server,socketserver,threading,pathlib,json
 from playwright.sync_api import sync_playwright
 DOCS=pathlib.Path(__file__).resolve().parents[2]/'docs'/'yakjido'
 import os
-_CH='/opt/pw-browsers/chromium-1194/chrome-linux/chrome'; LAUNCH={'executable_path':_CH} if os.path.exists(_CH) else {}
+_CH='/opt/pw-browsers/chromium'; LAUNCH={'executable_path':_CH} if os.path.exists(_CH) else {}
 class Q(http.server.SimpleHTTPRequestHandler):
     def log_message(self,*a,**k):pass
 srv=socketserver.TCPServer(('127.0.0.1',0),functools.partial(Q,directory=str(DOCS)))

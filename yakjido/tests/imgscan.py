@@ -12,7 +12,7 @@ from playwright.sync_api import sync_playwright
 from PIL import Image
 b_=io.BytesIO(); Image.new('RGB',(300,300),(200,220,230)).save(b_,'PNG'); PNG=b_.getvalue()
 with sync_playwright() as p:
-    _c='/opt/pw-browsers/chromium-1194/chrome-linux/chrome'
+    _c='/opt/pw-browsers/chromium'
     b=p.chromium.launch(**({'executable_path':_c} if os.path.exists(_c) else {}))
     pg=b.new_page(viewport={'width':360,'height':800})
     pg.route('**/*', lambda r: r.fulfill(status=200,content_type='image/png',body=PNG) if r.request.resource_type=='image' and 'localhost' not in r.request.url else r.continue_())

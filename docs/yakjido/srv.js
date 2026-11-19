@@ -2019,6 +2019,103 @@ window.바코드카메라 = async function () { const v = document.getElementByI
     BC.t = setInterval(async () => { try { const f = await det.detect(v); const c = f && f[0] && f[0].rawValue; if (c && /^880\d{10}$/.test(c)) { v.hidden = true; const i = document.getElementById('bcin'); if (i) i.value = c; 바코드보기(c); } } catch (e) {} }, 300);
   } catch (e) { 바코드끄기(); toast('카메라를 열지 못했어요 — 숫자를 넣어 주세요'); } };
 addEventListener('hashchange', () => { if (!/^#\/barcode/.test(location.hash)) 바코드끄기(); });
+/* 11-19 현욱님 — 나의건강기록 내보내기(PDF) 불러오기. 파일은 이 휴대폰 안에서만 읽고 서버로 보내지 않으며, 읽은 뒤 파일·글을 저장하지 않는다(고른 약만 내 약통에).
+   읽기 도구: PDF.js 4.10.38(Apache-2.0 · vendor/pdf — 처음 쓸 때만 받음). 칸 모양은 실제 파일을 받기 전이라 넓게 읽는다: 조제일(날짜) · 약 이름(정·캡슐·시럽 …) · 일수 */
+const MHR = { rows: null, err: '', pw: 0, busy: 0, buf: null };
+async function mhrLib() { if (MHR.lib) return MHR.lib; const u = n => new URL('vendor/pdf/' + n, location.href).href; const m = await import(u('pdf.min.mjs')); m.GlobalWorkerOptions.workerSrc = u('pdf.worker.min.mjs'); MHR.lib = m; return m; }
+async function mhrText(buf, password) {
+  const L = await mhrLib(), doc = await L.getDocument({ data: buf.slice(0), password: password || undefined, isEvalSupported: false, cMapUrl: new URL('vendor/pdf/cmaps/', location.href).href, cMapPacked: true }).promise, pages = [];
+  for (let p = 1; p <= Math.min(doc.numPages, 80); p++) { const tc = await (await doc.getPage(p)).getTextContent();
+    pages.push(tc.items.filter(it => it.str && it.str.trim()).map(it => ({ x: it.transform[4], y: it.transform[5], w: it.width || 0, s: it.str }))); }
+  try { doc.destroy(); } catch (e) {}
+  return pages;
+}
+const MHR_DATE = /(20\d{2})\s*[.\-\/년]\s*(\d{1,2})\s*[.\-\/월]\s*(\d{1,2})\s*일?/;
+const MHR_NAME = /[가-힣A-Za-z][가-힣A-Za-z0-9·\-+\[\]]*(?:\s?[가-힣A-Za-z0-9·\-+]+)*?(이알서방정|서방정|연질캡슐|경질캡슐|캡슐|필름코팅정|장용정|구강붕해정|츄어블정|정|건조시럽|시럽|현탁액|내복액|액|과립|산|패치|겔|크림|연고|점안액|좌제)(\s*\(?\s*\d[\d.,]*\s*(mg|밀리그램|mL|㎎|g|그램|마이크로그램|mcg)\s*\)?)?/;
+/* 표 한 줄 = 날짜로 시작하는 줄부터 다음 날짜 줄 전까지. 칸 안에서 줄이 바뀐 글은 x 자리(칸)로 다시 잇는다 */
+function mhrRows(pages) {
+  const recs = [];
+  pages.forEach(items => {
+    /* 날짜 칸이 있는 높이 = 줄마다 한 번. 칸 안에서 줄이 바뀐 글(가운데 맞춤)은 가장 가까운 날짜 줄의 것 */
+    const ds = []; items.forEach(it => { if (MHR_DATE.test(it.s) && !ds.some(y => Math.abs(y - it.y) < 3)) ds.push(it.y); }); if (!ds.length) return;
+    ds.sort((a, b) => b - a); const gap = ds.length > 1 ? Math.min.apply(null, ds.slice(1).map((y, k) => ds[k] - y)) : 60;
+    const R = ds.map(() => []);
+    items.forEach(it => { let k = 0, best = 1e9; ds.forEach((y, q) => { const d = Math.abs(y - it.y); if (d < best) { best = d; k = q; } }); if (best <= gap * 0.6) R[k].push(it); });
+    R.forEach(a => { const xs = a.slice().sort((u, v) => u.x - v.x), cells = [];
+      xs.forEach(it => { const c = cells.find(c => it.x <= c.r + 4 && it.x + it.w >= c.l - 4); if (c) { c.t.push(it); c.l = Math.min(c.l, it.x); c.r = Math.max(c.r, it.x + it.w); } else cells.push({ l: it.x, r: it.x + it.w, t: [it] }); });
+      recs.push(cells.sort((u, v) => u.l - v.l).map(c => { c.t.sort((u, v) => v.y - u.y || u.x - v.x); let o = ''; c.t.forEach((z, k) => { const pv = c.t[k - 1]; o += !pv ? z.s : (Math.abs(pv.y - z.y) < 3 && z.x - (pv.x + pv.w) > 1 ? ' ' : '') + z.s; }); return o.replace(/\s+/g, ' ').trim(); })); });
+  });
+  return recs;
+}
+window.mhrParse = function (pages) {
+  const out = new Map(); let rows = mhrRows(pages);
+  if (!rows.length) rows = pages.map(items => items.map(z => z.s));   /* 표가 아니면 글 조각 그대로 */
+  rows.forEach(cells => { const all = cells.join(' | '), dm = all.match(MHR_DATE), date = dm ? dm[1] + '-' + dm[2].padStart(2, '0') + '-' + dm[3].padStart(2, '0') : '';
+    const ints = cells.map(c => c.replace(/\s*(일분|일치|일)$/, '')).filter(c => /^\d{1,3}$/.test(c)).map(Number).filter(n => n > 0 && n <= 365), days = ints.length ? ints[ints.length - 1] : 0;
+    cells.forEach(cell => { const c0 = cell.replace(MHR_DATE, ' '), nm = c0.match(MHR_NAME); if (!nm) return; if (/[가-힣]/.test(c0.charAt(nm.index + nm[0].length))) return;   /* 「암로디핀베실산염」처럼 낱말이 이어지면 약 이름이 아니라 성분 칸 */
+      const name = nm[0].replace(/\s+/g, ' ').trim(); if (name.length < 3 || /약국|병원|의원|처방|조제|투약|일수|횟수|성명|주민|기관|합계|페이지|건강보험|심사평가원/.test(name)) return;
+      const k = name.replace(/\s/g, ''), pv = out.get(k); if (!pv || (date && date > (pv.date || ''))) out.set(k, { name, date, days }); }); });
+  return [...out.values()].sort((a, b) => (b.date || '').localeCompare(a.date || ''));
+};
+function mhrMatch(r) {
+  /* 약 사전 맞추기 — 오타 고침 없이(noFix) · 밀리그램 → mg · 이름 그대로 → 용량 뺀 이름 → 꼴(정·캡슐) 뺀 이름 순. 이름 앞 세 글자가 같은 것만 «맞음», 같은 용량이 든 것을 먼저 */
+  const base = r.name.replace(/밀리그램|㎎/g, 'mg').replace(/마이크로그램/g, 'mcg').replace(/그램/g, 'g').replace(/[()\[\]]/g, ' ').replace(/\s+/g, ' ').trim();
+  const FORM = /(이알서방정|서방정|연질캡슐|경질캡슐|필름코팅정|장용정|구강붕해정|츄어블정|캡슐|정|건조시럽|시럽|현탁액|내복액|액|과립|산)$/;
+  const nameOnly = base.replace(/\s*\d.*$/, '').trim(), qs = [base.replace(/([가-힣])(\d)/, '$1 $2'), nameOnly, nameOnly.replace(FORM, '')].filter((q, k, A) => q && q.length >= 2 && A.indexOf(q) === k);
+  const core = x => String(x || '').replace(/\(.*?\)|\s/g, '').replace(FORM, '').replace(/(이알서방정|서방정|연질캡슐|캡슐|정|시럽|액)[\d].*$/, '').slice(0, 3);
+  const mg = (base.match(/(\d[\d.]*)\s*(mg|mcg|g)/i) || [])[1], want = core(nameOnly);
+  const title = h => decodeURIComponent(String(h.h).split('p=')[1] || '') || h.t;
+  let hs = [];
+  for (const q of qs) { let h = []; try { h = search(q, true).filter(x => /^\/(drug|pub|pillinfo|brand)\//.test(x.h || '')); } catch (e) {} hs = hs.concat(h); if (h.some(x => core(title(x)) === want)) break; }
+  const seen = new Set(), mgR = mg ? new RegExp('(^|[^\\d.])' + mg.replace('.', '\\.') + '(mg|mcg|g)') : null, sc = h => (core(title(h)) === want ? 2 : 0) + (mgR && mgR.test((title(h) + ' ' + h.t).replace(/\s/g, '').replace(/밀리그램|밀리그람|㎎/g, 'mg').replace(/마이크로그램/g, 'mcg')) ? 1 : 0);
+  r.cands = hs.filter(h => !seen.has(h.h) && seen.add(h.h)).sort((a, b) => sc(b) - sc(a)).slice(0, 3);
+  r.ok = r.cands[0] && core(title(r.cands[0])) === want ? r.cands[0] : null;
+}
+window.mhrFile = async function (inp) { const f = inp && inp.files && inp.files[0]; if (!f) return; MHR.err = ''; MHR.rows = null; MHR.pw = 0;
+  if (!/pdf$/i.test(f.name) && f.type !== 'application/pdf') { MHR.err = 'PDF 파일을 골라 주세요. 나의건강기록 앱에서 「PDF로 저장」한 파일이에요.'; route(); return; }
+  MHR.buf = new Uint8Array(await f.arrayBuffer()); inp.value = ''; mhrRead(''); };
+window.mhrPw = function () { const v = (document.getElementById('mhrpw') || {}).value || ''; if (v) mhrRead(v); };
+async function mhrRead(pw) { MHR.busy = 1; route();
+  try { await Promise.all([pubIndex(), pubPills(), pubPillsRx()]).catch(() => {}); try { lexLoad(); if (typeof pubIndexSoon === 'function') pubIndexSoon(); } catch (e) {}
+    await new Promise(ok => { const t0 = Date.now(); (function w() { if ((typeof LEX === 'undefined' || !LEX.loading) || Date.now() - t0 > 20000) ok(); else setTimeout(w, 120); })(); });   /* 약 이름 사전(낱알·허가 목록)이 다 올라온 뒤 맞춘다 */ const pages = await mhrText(MHR.buf, pw); const rows = mhrParse(pages); rows.forEach(mhrMatch);
+    const t = Date.now(), y1 = new Date(t - 365 * 864e5).toISOString().slice(0, 10);
+    MHR.rows = rows.filter(r => !r.date || r.date >= y1).map(r => { const end = r.date && r.days ? new Date(r.date).getTime() + r.days * 864e5 : 0; r.on = !!(r.ok && end && end >= t - 864e5); return r; });
+    MHR.pw = 0; MHR.buf = null; if (!MHR.rows.length) MHR.err = '이 파일에서 약 이름을 찾지 못했어요. 나의건강기록 「투약 이력」 PDF가 맞는지 봐 주세요.';
+  } catch (e) { const pwE = e && (e.name === 'PasswordException' || /password/i.test(e.message || '')); if (pwE) { MHR.pw = e.code === 2 ? 2 : 1; } else { MHR.err = '파일을 읽지 못했어요. 다시 저장해서 열어 보시거나 「사진으로 담기」를 써 주세요.'; MHR.buf = null; } }
+  MHR.busy = 0; route(); }
+window.mhrTick = function (i, on) { const r = (MHR.rows || [])[i]; if (r) r.on = on; const n = (MHR.rows || []).filter(x => x.on && x.ok).length, b = document.getElementById('mhrgo'); if (b) { b.textContent = n ? '고른 약 ' + n + '가지 내 약통에 담기' : '담을 약을 골라 주세요'; b.disabled = !n; } };
+window.mhrPick = function (i, j) { const r = (MHR.rows || [])[i]; if (!r) return; r.ok = j < 0 ? null : r.cands[j]; r.on = !!r.ok; route(); };
+window.mhrAdd = async function () { const R = (MHR.rows || []).filter(r => r.on && r.ok); let n = 0; ME.taking = ME.taking || [];
+  for (const r of R) { const h = r.ok.h; let m;
+    try { if ((m = h.match(/^\/drug\/([^?]+)/))) { if (!ME.taking.includes(m[1])) { ME.taking.push(m[1]); markPrnIfNew(m[1]); n++; } }
+      else if ((m = h.match(/^\/pub\/(\d+)/))) { addPubIx(+m[1]); n++; }
+      else if ((m = h.match(/^\/pillinfo\/(\w+)/))) { if (!ME.taking.includes('pub:' + m[1])) { await togglePub(m[1]); n++; } }
+      else if ((m = h.match(/^\/brand\/(.+)$/))) { const b = decodeURIComponent(m[1]), ix = (PUB.index || []).findIndex(p => p.n && p.n.replace(/\s/g, '').indexOf(b.replace(/\s/g, '')) === 0); if (ix >= 0) { addPubIx(ix); n++; } }
+    } catch (e) {} }
+  saveMe(); try { armNotifications(); } catch (e) {} MHR.rows = null; toast(n + '가지를 내 약통에 담았어요'); go('/together'); };
+window.문_mhr = function () {
+  const top = topBar({ back: '뒤로' }) + '<h1>나의건강기록 파일로 약 담기</h1>', R = MHR.rows;
+  const safe = '<p class="small muted" style="margin-top:12px">파일은 이 휴대폰 안에서만 읽어요 — 어디에도 보내거나 저장하지 않고, 고른 약만 내 약통에 담겨요.</p>';
+  if (MHR.busy) return top + '<p class="loading" style="margin-top:16px" aria-live="polite">파일을 읽고 있어요…</p>';
+  if (!R) return top + '<p style="margin-top:8px">나의건강기록 앱에서 받은 <b>투약 이력 PDF</b>를 열면, 최근 1년 약 가운데 지금 드시는 약만 골라 담을 수 있어요.</p>'
+    + '<ol class="plain" style="margin-top:12px"><li>나의건강기록 앱 → 투약 정보 → 저장(PDF)</li><li>아래 「PDF 파일 고르기」에서 그 파일을 열기</li><li>지금 드시는 약에 표시하고 담기</li></ol>'
+    + (MHR.pw ? '<div class="card" style="margin-top:16px;padding:16px"><label for="mhrpw"><b>' + (MHR.pw === 2 ? '암호가 맞지 않아요. 다시 넣어 주세요.' : '암호가 걸린 파일이에요. 암호를 넣어 주세요.') + '</b></label><input id="mhrpw" type="password" autocomplete="off" style="width:100%;min-height:48px;margin-top:8px" onkeydown="if(event.key===\'Enter\')mhrPw()"><button type="button" class="btn" style="margin-top:10px;width:100%;min-height:52px" onclick="mhrPw()">열기</button><p class="small muted" style="margin-top:6px">파일을 저장할 때 정한 암호예요. 암호도 저장하지 않아요.</p></div>'
+      : '<label class="btn" style="margin-top:16px;width:100%;min-height:56px;display:flex;align-items:center;justify-content:center;cursor:pointer">PDF 파일 고르기<input type="file" accept="application/pdf,.pdf" hidden onchange="mhrFile(this)"></label>')
+    + (MHR.err ? '<p class="note" role="alert" style="margin-top:12px">' + esc(MHR.err) + '</p>' : '') + safe
+    + '<p style="margin-top:12px"><a class="link" href="#/photo">약봉투 사진으로 담기 ›</a></p>';
+  const row = (r, i) => { const nm = r.ok ? esc(r.ok.t) : '';
+    return '<li class="mhr-r' + (r.ok ? '' : ' q') + '"><label class="mhr-l"><input type="checkbox" ' + (r.on ? 'checked ' : '') + (r.ok ? '' : 'disabled ') + 'onchange="mhrTick(' + i + ',this.checked)"><span><b>' + esc(r.name) + '</b><small>' + (r.date ? esc(r.date) + ' 조제' : '') + (r.days ? ' · ' + r.days + '일분' : '') + '</small>'
+      + (r.ok ? '<small class="mhr-m">약지도: ' + nm + '</small>' : '<small class="mhr-w">확인해 주세요 — 약지도에서 이 약을 찾지 못했어요</small>') + '</span></label>'
+      + (!r.ok && r.cands.length ? '<div class="ask-chips">' + r.cands.map((c, j) => '<button type="button" class="chip" onclick="mhrPick(' + i + ',' + j + ')">' + esc(c.t) + '</button>').join('') + '</div>' : '')
+      + (r.ok && r.cands.length > 1 ? '<button type="button" class="link small" onclick="mhrPick(' + i + ',-1)">다른 약이에요</button>' : '') + '</li>'; };
+  const n = R.filter(r => r.on && r.ok).length, q = R.filter(r => !r.ok).length;
+  return top + '<p style="margin-top:8px">최근 1년 약 ' + R.length + '가지를 찾았어요. <b>지금 드시는 약</b>에 표시해 주세요' + (q ? ' — 「확인해 주세요」 ' + q + '가지는 맞는 이름을 눌러 고르거나 그대로 두세요' : '') + '.</p>'
+    + '<ul class="plain mhr" style="margin-top:12px">' + R.map(row).join('') + '</ul>'
+    + '<button type="button" id="mhrgo" class="btn" style="margin-top:16px;width:100%;min-height:56px" ' + (n ? '' : 'disabled ') + 'onclick="mhrAdd()">' + (n ? '고른 약 ' + n + '가지 내 약통에 담기' : '담을 약을 골라 주세요') + '</button>'
+    + '<button type="button" class="link" style="margin-top:8px" onclick="MHR.rows=null;route()">다른 파일 열기</button>' + safe;
+};
+window.MHR = MHR;
+try { const ms = document.createElement('style'); ms.textContent = 'ul.mhr{list-style:none;padding:0}ul.mhr>li{padding-left:0}ul.mhr>li::before{content:none!important;display:none!important}.mhr-r{padding:12px 0;border-bottom:1px solid var(--hairline)}.mhr-l{display:flex;gap:12px;align-items:flex-start;min-height:44px;cursor:pointer}.mhr-l input{width:24px;height:24px;flex:0 0 24px;margin-top:2px}.mhr-l span{display:flex;flex-direction:column;gap:2px;word-break:keep-all}.mhr-l small{color:var(--muted)}.mhr-m{color:var(--primary-deep)!important}.mhr-w{color:#93370D!important;font-weight:700}.mhr-r .ask-chips{margin:8px 0 0 36px}.mhr-r .link{margin-left:36px;min-height:44px}'; document.head.appendChild(ms); } catch (e) {}
 window.문_barcode = function () { const cam = 'BarcodeDetector' in window;
   return topBar({ back: '뒤로' }) + '<h1>상자 바코드로 담기</h1><p style="margin-top:8px">약 상자 옆 막대 무늬(바코드)를 비추거나, 그 아래 숫자 13자리를 넣어 주세요.</p>'
     + (cam ? '<button type="button" class="btn" style="margin-top:16px;width:100%;min-height:56px" onclick="바코드카메라()">카메라로 비추기</button><video id="bcv" playsinline muted hidden style="width:100%;margin-top:12px;border-radius:16px;background:#000"></video>' : '')
@@ -4244,7 +4341,7 @@ window.언어칸 = function () {
     return '<ul class="job-list">' + items.slice(0, 6).map(function (d) { var dk = d.class || ((typeof drug === 'function' && drug(d.id)) || {}).class, c0 = (D.classes || []).filter(function (c) { return c.id === dk; })[0], g = d.quick ? d.quick.g.n : c0 ? String(c0.name).split('(')[0].trim() : ''; return '<li><b>' + esc(String(d.name || '').split(' (')[0].indexOf('·') >= 0 ? 한이름(d.name) : 짧은이름(d.name)) + '</b>' + (g ? '<span>' + esc(g) + '</span>' : '') + '</li>'; }).join('') + (items.length > 6 ? '<li><a href="#/me?t=meds">' + (items.length - 6) + '가지 더 ›</a></li>' : '') + '</ul>';
   }
   window.내약더 = function () { var o = document.createElement('div'); o.className = 'dlg-bg'; o.setAttribute('role', 'dialog'); o.setAttribute('aria-label', '내 약 더 보기');
-    var L = [['#/notify', '알림', '약 시간 · 다시 알림 · 약 떨어짐'], ['#/send', '가족에게', '부모님께 약 보내기 · 함께 보기'], ['#/bag', '내 약 한 장', '진료·약국에 보여 줄 한 장'], ['#/me?t=meds', '약통', '담은 약 고치기 · 빼기'], ['#/barcode', '상자 바코드로 담기', '약 상자 옆 막대 무늬를 비춰서'], ['#/people', '가족 약 따로 담기', '어머니·아이 약을 사람마다']];
+    var L = [['#/notify', '알림', '약 시간 · 다시 알림 · 약 떨어짐'], ['#/send', '가족에게', '부모님께 약 보내기 · 함께 보기'], ['#/bag', '내 약 한 장', '진료·약국에 보여 줄 한 장'], ['#/me?t=meds', '약통', '담은 약 고치기 · 빼기'], ['#/barcode', '상자 바코드로 담기', '약 상자 옆 막대 무늬를 비춰서'], ['#/mhr', '나의건강기록 파일로 담기', '최근 1년 투약 이력 PDF에서 골라'], ['#/people', '가족 약 따로 담기', '어머니·아이 약을 사람마다']];
     o.innerHTML = '<div class="card th-sheet">' + L.map(function (x) { return '<a class="th-row" href="' + x[0] + '"><span><b>' + x[1] + '</b><small>' + x[2] + '</small></span>' + I.chev + '</a>'; }).join('') + '<button type="button" class="btn line" style="margin-top:12px;width:100%">닫기</button></div>';
     o.addEventListener('click', function (e) { if (e.target === o || e.target.tagName === 'BUTTON' || e.target.closest('a')) o.remove(); }); document.body.appendChild(o); var f = o.querySelector('a'); if (f) f.focus(); };
   function 내약칸() {

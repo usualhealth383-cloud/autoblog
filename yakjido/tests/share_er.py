@@ -12,7 +12,7 @@ SEED="localStorage.setItem('yakjido.hello.v1','1');localStorage.setItem('yakjido
 VIS="()=>{const w=document.createTreeWalker(document.querySelector('#view'),NodeFilter.SHOW_TEXT);let o='';while(w.nextNode()){const p=w.currentNode.parentElement;if(p&&p.offsetParent!==null&&p.getClientRects().length){const r=p.getBoundingClientRect();if(r.width>0&&r.height>0)o+=w.currentNode.textContent}}return o.replace(/\\s+/g,' ')}"
 CAP=[]
 with sync_playwright() as p:
-    b=p.chromium.launch(executable_path='/opt/pw-browsers/chromium-1194/chrome-linux/chrome', args=['--no-sandbox'])
+    b=p.chromium.launch(executable_path='/opt/pw-browsers/chromium', args=['--no-sandbox'])
     ctx=b.new_context(viewport={'width':390,'height':844}); ctx.add_init_script(SEED)
     def h(route):
         body=json.loads(route.request.post_data or '{}'); CAP.append(body)

@@ -11,7 +11,7 @@ URL = f'http://127.0.0.1:{srv.server_address[1]}/'
 SEED = "localStorage.setItem('yakjido.hello.v1','1');localStorage.setItem('yakjido.consent.v1',JSON.stringify({v:'2026-10-20',at:'2026-11-18',terms:1,privacy:1}))"
 bad = 0
 with sync_playwright() as p:
-    b = p.chromium.launch(executable_path='/opt/pw-browsers/chromium-1194/chrome-linux/chrome', args=['--no-sandbox'])
+    b = p.chromium.launch(executable_path='/opt/pw-browsers/chromium', args=['--no-sandbox'])
     for loc, tz in C:
         c = b.new_context(locale=loc, timezone_id=tz, service_workers='block', viewport={'width': 360, 'height': 780}); pg = c.new_page(); err = []
         pg.on('pageerror', lambda e: err.append(str(e)[:80])); pg.add_init_script(SEED)

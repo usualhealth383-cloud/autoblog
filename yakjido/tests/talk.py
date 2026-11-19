@@ -21,7 +21,7 @@ JUDGE = """([t, want, slots]) => { const A = window.약지도대화, b = A.봇, 
   return '?'; }"""
 fails = []
 with sync_playwright() as p:
-    b = p.chromium.launch(executable_path='/opt/pw-browsers/chromium-1194/chrome-linux/chrome', args=['--no-sandbox'])
+    b = p.chromium.launch(executable_path='/opt/pw-browsers/chromium', args=['--no-sandbox'])
     pg = b.new_page(viewport={'width': 390, 'height': 844}); errs = []; pg.on('pageerror', lambda e: errs.append(str(e)))
     pg.add_init_script(SEED); pg.goto(URL + '#/home'); pg.wait_for_function("()=>typeof CORE!=='undefined'&&CORE===2", timeout=20000)
     if '어떤 약이 궁금하세요' not in pg.inner_text('#view'): fails.append('홈에 대화 입구 없음')

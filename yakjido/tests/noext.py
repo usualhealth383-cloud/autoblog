@@ -8,7 +8,7 @@ ROUTES = ['/home', '/symptom/fever', '/drug/acetaminophen', '/kids', '/rx/bp', '
 OK_OPTIONAL = ('open-meteo.com', 'medinanum.com', 'nedrug.mfds.go.kr')   # 연결되면 보이는 덤 — 날씨 · 형제 앱 통합 찾기 목록 · 식약처 낱알 사진(막혀도 화면·찾기는 그대로)
 fails = []
 with sync_playwright() as p:
-    b = p.chromium.launch(executable_path='/opt/pw-browsers/chromium-1194/chrome-linux/chrome', args=['--no-sandbox'])
+    b = p.chromium.launch(executable_path='/opt/pw-browsers/chromium', args=['--no-sandbox'])
     for L in ('ko', 'zh'):
         ctx = b.new_context(viewport={'width': 390, 'height': 844}); out = []
         ctx.route('**/*', lambda r: (out.append(r.request.url) or r.abort()) if not r.request.url.startswith(URL) else r.continue_())

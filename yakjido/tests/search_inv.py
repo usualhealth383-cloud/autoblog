@@ -19,7 +19,7 @@ full = []
 for q in rx:
     c = sorted({i for p in P for i in p[4].split('|') if q in i}, key=len); full.append(c[0] if c else q)
 with sync_playwright() as p:
-    b = p.chromium.launch(executable_path='/opt/pw-browsers/chromium-1194/chrome-linux/chrome', args=['--no-sandbox'])
+    b = p.chromium.launch(executable_path='/opt/pw-browsers/chromium', args=['--no-sandbox'])
     pg = b.new_context(locale='ko-KR', timezone_id='Asia/Seoul', service_workers='block').new_page(); pg.add_init_script(SEED); pg.goto(URL + '#/home')
     pg.wait_for_function("()=>typeof search==='function' && typeof D!=='undefined' && D.drugs && D.drugs.length")
     pg.evaluate("()=>{lexLoad();pubIndexSoon();findLoad();}"); pg.wait_for_timeout(1500)

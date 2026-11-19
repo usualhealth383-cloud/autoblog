@@ -8,7 +8,7 @@ SEED += ";localStorage.setItem('yakjido.ink','0')"   # 11-17 잉크가 기본 �
 ROUTES = ['/home', '/symptom/headache', '/symptom/fever', '/drug/acetaminophen', '/search?q=타이레놀', '/bag', '/kids', '/rx', '/rx/bp', '/kinds/bp', '/supp', '/drugs', '/me?t=set', '/myths', '/about']
 fails = []
 with sync_playwright() as p:
-    b = p.chromium.launch(executable_path='/opt/pw-browsers/chromium-1194/chrome-linux/chrome', args=['--no-sandbox'])
+    b = p.chromium.launch(executable_path='/opt/pw-browsers/chromium', args=['--no-sandbox'])
     for lang in ('ko', 'en'):
         ctx = b.new_context(viewport={'width': 390, 'height': 800}, service_workers='allow')
         ctx.add_init_script(SEED + f";localStorage.setItem('yakjido.lang','{lang}')")
