@@ -9,7 +9,7 @@ from playwright.sync_api import sync_playwright
 H = pathlib.Path(__file__).resolve().parent; D = H.parents[1] / 'docs' / 'yakjido'
 SET = sys.argv[1] if len(sys.argv) > 1 else '250'   # 250(전부) · 200(고칠 것) · 50(잣대 — 고칠 때 보지 않는다: 줄마다 답은 출력하지 않음)
 FN = {'250': '약지도_질문_1.tsv', '200': '약지도_질문_1_고칠200.tsv', '50': '약지도_질문_1_잣대50.tsv',
-      '1000': '약지도_질문_2.tsv', '2고칠': '약지도_질문_2_고칠200.tsv', '2잣대': '약지도_질문_2_잣대800.tsv'}[SET]   # 11-19 GPT 질문 251~1250
+      '1000': '약지도_질문_2.tsv', '2고칠': '약지도_질문_2_고칠200.tsv', '2잣대': '약지도_질문_2_잣대800.tsv', '2차': '약지도_질문_2_고칠2차_응급.tsv'}[SET]   # 11-19 GPT 질문 251~1250 · 2차 = 잣대 응급 중 짝수 번호 50을 옮김(나머지는 잣대)
 RULER = SET in ('50', '2잣대')
 Q = [l.split('\t') for l in (H / 'q' / FN).read_text().strip().split('\n')[1:]]
 class _Q(http.server.SimpleHTTPRequestHandler):
