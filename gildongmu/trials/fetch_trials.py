@@ -29,9 +29,13 @@ def probe(k):
 
 암말 = re.compile(r'암|종양|백혈병|림프종|골수종|육종|흑색종|교모세포|신경모세포|중피종|cancer|carcinoma|tumou?r|neoplasm|oncolog|leukemia|lymphoma|myeloma|sarcoma|melanoma|glioma|glioblastoma|malignan', re.I)
 def 풀기(it):   # 제외기준·시험책임자는 item 이 글(dict 모양)로 온다
-    if isinstance(it, dict) and set(it) == {'item'} and isinstance(it['item'], str):
-        try: return ast.literal_eval(it['item'])
-        except Exception: return {}
+    if isinstance(it, dict) and set(it) == {'item'}:
+        v = it['item']
+        if isinstance(v, str):
+            try: v = ast.literal_eval(v)
+            except Exception: return {}
+        if isinstance(v, list): v = v[0] if v else {}
+        return v if isinstance(v, dict) else {}
     return it
 s_ = lambda v: '' if v in (None, 'None') else str(v).strip()
 def full(k):
@@ -67,7 +71,26 @@ def full(k):
     json.dump({'meta': meta, '시험': out, '실시기관': 기관}, open(os.path.join(OUT, 'cancer_trials.json'), 'w', encoding='utf-8'), ensure_ascii=False, separators=(',', ':'))
     json.dump(meta, open(os.path.join(OUT, 'cancer_meta.json'), 'w', encoding='utf-8'), ensure_ascii=False, indent=1)
     print('암 시험', len(out), '/', len(plans), flush=True)
+
+def fix(k):   # 11-19 — 제외기준·시험책임자만 다시(item 안에 dict 로 오는 것을 못 풀었던 것)
+    f = os.path.join(OUT, 'cancer_trials.json'); d = json.load(open(f, encoding='utf-8'))
+    번 = {x['CLNC_TEST_SN'] for x in d['시험']}; 제 = collections.defaultdict(list); 책 = collections.defaultdict(set); 칸 = set()
+    for x in fetch_all(API['제외기준'], k, '제외기준'):
+        x = 풀기(x); sn = s_(x.get('CLNC_TEST_SN'))
+        if sn in 번 and s_(x.get('CHOOSE_EXCL_STDR')): 제[sn].append({'CHOOSE_EXCL_STDR': s_(x.get('CHOOSE_EXCL_STDR'))})
+    for x in fetch_all(API['시험책임자'], k, '시험책임자'):
+        x = 풀기(x); 칸 |= set(x); sn = s_(x.get('CLNC_TEST_SN'))
+        if sn in 번:
+            for c, v in x.items():   # 기관 칸만(사람 이름 칸은 싣지 않는다)
+                if re.search(r'INSTT|LAB_NAME|HOSP|ORG', c) and not re.search(r'BSSH|ORGN_DEV', c) and s_(v): 책[sn].add(s_(v))
+    for x in d['시험']:
+        x['제외'] = 제.get(x['CLNC_TEST_SN'], []); x['기관'] = sorted(책.get(x['CLNC_TEST_SN'], []))
+    d['meta']['시험책임자칸'] = sorted(칸); d['meta']['제외있음'] = sum(1 for x in d['시험'] if x['제외']); d['meta']['기관있음'] = sum(1 for x in d['시험'] if x['기관'])
+    json.dump(d, open(f, 'w', encoding='utf-8'), ensure_ascii=False, separators=(',', ':'))
+    json.dump(d['meta'], open(os.path.join(OUT, 'cancer_meta.json'), 'w', encoding='utf-8'), ensure_ascii=False, indent=1)
+    print('제외 있음', d['meta']['제외있음'], '기관 있음', d['meta']['기관있음'], '칸', sorted(칸), flush=True)
 if __name__ == '__main__':
     k = key(); m = (sys.argv[1:] or ['probe'])[0]
     if m == 'probe': probe(k)
+    elif m == 'fix': fix(k)
     else: full(k)
