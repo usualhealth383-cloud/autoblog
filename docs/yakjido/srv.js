@@ -6905,7 +6905,7 @@ window.두찍음 = async function(inp){
 window.두지움 = async function(id){ const ok = await appDialog('이 사진을 지울까요?', { ok: '지우기', cancel: '그만두기', danger: 1 }); if (!ok) return; await 두할('readwrite', st => st.delete(id)); await 두읽기().catch(() => {}); route(); };
 window.두모두지움 = async function(){ const ok = await appDialog('사진 일기를 모두 지울까요? 되돌릴 수 없어요.', { ok: '모두 지우기', cancel: '그만두기', danger: 1 }); if (!ok) return; await 두할('readwrite', st => st.clear()); 두일.list = []; route(); };
 function 두때(at){ const d = new Date(at), h = d.getHours(); return `${d.getMonth() + 1}월 ${d.getDate()}일 ${h < 12 ? '오전' : '오후'} ${h % 12 || 12}:${String(d.getMinutes()).padStart(2, '0')}`; }
-function 두사이(a, b){ const m = Math.round((b - a) / 60000); return m < 60 ? `${m}분 뒤` : m < 1440 ? `${Math.round(m / 60)}시간 뒤` : `${Math.round(m / 1440)}일 뒤`; }
+function 두사이(a, b){ const m = Math.round((b - a) / 60000); return m < 1 ? '1분 안' : m < 60 ? `${m}분 뒤` : m < 1440 ? `${Math.round(m / 60)}시간 뒤` : `${Math.round(m / 1440)}일 뒤`; }
 window.두보여줌 = function(){
   const L = 두일.list; if (!L.length) return;
   const el = document.createElement('div'); el.className = 'hv-show'; el.setAttribute('role', 'dialog'); el.setAttribute('aria-label', '진료 때 보여 주기');
@@ -6922,9 +6922,9 @@ window.vHivesS = function(){
   <section class="sec"><p class="eyebrow">두드러기</p><h1>사진 일기</h1>
     <p class="lead">같은 자리를 몇 시간 간격으로 찍어 두면, 자국이 사라지고 다른 곳에 새로 나는지(옮겨 다니는지) 한눈에 보여요. 진료 때 보여 주시면 도움이 돼요.</p>
     <p class="small muted">사진은 이 휴대폰 안에만 두고 어디로도 보내지 않아요. 앱은 사진을 보고 판정하지 않아요.</p></section>
-  <section class="sec card warn"><b>입술·혀·목이 붓거나, 숨이 차거나, 어지러우면</b> 사진보다 ${esc(emg)}가 먼저예요. <a class="btn" href="tel:${esc(emg)}">${esc(emg)}에 전화</a></section>
+  <section class="sec card warn"><b>입술·혀·목이 붓거나, 숨이 차거나, 어지러우면</b> 사진보다 ${esc(emg)}가 먼저예요.${/^[\d+][\d\s-]*$/.test(emg) ? ` <a class="btn" href="tel:${esc(emg.replace(/\s/g, ''))}">${esc(emg)}에 전화</a>` : ''}</section>
   <section class="sec"><label class="small" for="hv-where">찍는 자리(고르지 않아도 돼요)</label>
-    <select id="hv-where" class="input"><option value="">—</option>${['팔', '다리', '배·등', '가슴', '목', '얼굴', '손·발'].map(x => `<option>${x}</option>`).join('')}</select>
+    <select id="hv-where" class="input" style="display:block;width:100%;min-height:48px;margin-top:6px;font-size:17px"><option value="">—</option>${['팔', '다리', '배·등', '가슴', '목', '얼굴', '손·발'].map(x => `<option>${x}</option>`).join('')}</select>
     <div class="actions" style="margin-top:10px"><label class="btn" for="hv-cam">사진 찍기</label><input id="hv-cam" type="file" accept="image/*" capture="environment" hidden onchange="두찍음(this)">
     ${L.length ? `<button type="button" class="btn ghost" onclick="두보여줌()">진료 때 보여 주기</button>` : ''}</div></section>
   ${L.length ? 칸 : '<section class="sec"><p class="muted">아직 사진이 없어요. 처음 찍고 2~3시간 뒤에 같은 자리를 한 번 더 찍어 보세요.</p></section>'}
