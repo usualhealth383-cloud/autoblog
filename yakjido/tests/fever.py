@@ -16,7 +16,7 @@ def ok(c, m):
 d = datetime.date.today(); y, mo = d.year, d.month - 2
 if mo <= 0: mo += 12; y -= 1
 with sync_playwright() as p:
-    b = p.chromium.launch(executable_path='/opt/pw-browsers/chromium-1194/chrome-linux/chrome', args=['--no-sandbox'])
+    b = p.chromium.launch(executable_path='/opt/pw-browsers/chromium', args=['--no-sandbox'])
     pg = b.new_page(locale='ko-KR'); pg.add_init_script(SEED)
     pg.goto(URL + '#/kids'); pg.wait_for_function('!!window.메디나눔해열제', timeout=20000)
     r = pg.evaluate("""(()=>{const P=window.메디나눔해열제, out=[], fb=[], over=[];

@@ -2019,6 +2019,103 @@ window.바코드카메라 = async function () { const v = document.getElementByI
     BC.t = setInterval(async () => { try { const f = await det.detect(v); const c = f && f[0] && f[0].rawValue; if (c && /^880\d{10}$/.test(c)) { v.hidden = true; const i = document.getElementById('bcin'); if (i) i.value = c; 바코드보기(c); } } catch (e) {} }, 300);
   } catch (e) { 바코드끄기(); toast('카메라를 열지 못했어요 — 숫자를 넣어 주세요'); } };
 addEventListener('hashchange', () => { if (!/^#\/barcode/.test(location.hash)) 바코드끄기(); });
+/* 11-19 현욱님 — 나의건강기록 내보내기(PDF) 불러오기. 파일은 이 휴대폰 안에서만 읽고 서버로 보내지 않으며, 읽은 뒤 파일·글을 저장하지 않는다(고른 약만 내 약통에).
+   읽기 도구: PDF.js 4.10.38(Apache-2.0 · vendor/pdf — 처음 쓸 때만 받음). 칸 모양은 실제 파일을 받기 전이라 넓게 읽는다: 조제일(날짜) · 약 이름(정·캡슐·시럽 …) · 일수 */
+const MHR = { rows: null, err: '', pw: 0, busy: 0, buf: null };
+async function mhrLib() { if (MHR.lib) return MHR.lib; const u = n => new URL(n, location.href).href; const m = await import(u('vendor/pdf/pdf.min.mjs')); m.GlobalWorkerOptions.workerSrc = u('vendor/pdf/pdf.worker.min.mjs'); MHR.lib = m; return m; }
+async function mhrText(buf, password) {
+  const L = await mhrLib(), doc = await L.getDocument({ data: buf.slice(0), password: password || undefined, isEvalSupported: false, cMapUrl: new URL('vendor/pdf/cmaps/', location.href).href, cMapPacked: true }).promise, pages = [];
+  for (let p = 1; p <= Math.min(doc.numPages, 80); p++) { const tc = await (await doc.getPage(p)).getTextContent();
+    pages.push(tc.items.filter(it => it.str && it.str.trim()).map(it => ({ x: it.transform[4], y: it.transform[5], w: it.width || 0, s: it.str }))); }
+  try { doc.destroy(); } catch (e) {}
+  return pages;
+}
+const MHR_DATE = /(20\d{2})\s*[.\-\/년]\s*(\d{1,2})\s*[.\-\/월]\s*(\d{1,2})\s*일?/;
+const MHR_NAME = /[가-힣A-Za-z][가-힣A-Za-z0-9·\-+\[\]]*(?:\s?[가-힣A-Za-z0-9·\-+]+)*?(이알서방정|서방정|연질캡슐|경질캡슐|캡슐|필름코팅정|장용정|구강붕해정|츄어블정|정|건조시럽|시럽|현탁액|내복액|액|과립|산|패치|겔|크림|연고|점안액|좌제)(\s*\(?\s*\d[\d.,]*\s*(mg|밀리그램|mL|㎎|g|그램|마이크로그램|mcg)\s*\)?)?/;
+/* 표 한 줄 = 날짜로 시작하는 줄부터 다음 날짜 줄 전까지. 칸 안에서 줄이 바뀐 글은 x 자리(칸)로 다시 잇는다 */
+function mhrRows(pages) {
+  const recs = [];
+  pages.forEach(items => {
+    /* 날짜 칸이 있는 높이 = 줄마다 한 번. 칸 안에서 줄이 바뀐 글(가운데 맞춤)은 가장 가까운 날짜 줄의 것 */
+    const ds = []; items.forEach(it => { if (MHR_DATE.test(it.s) && !ds.some(y => Math.abs(y - it.y) < 3)) ds.push(it.y); }); if (!ds.length) return;
+    ds.sort((a, b) => b - a); const gap = ds.length > 1 ? Math.min.apply(null, ds.slice(1).map((y, k) => ds[k] - y)) : 60;
+    const R = ds.map(() => []);
+    items.forEach(it => { let k = 0, best = 1e9; ds.forEach((y, q) => { const d = Math.abs(y - it.y); if (d < best) { best = d; k = q; } }); if (best <= gap * 0.6) R[k].push(it); });
+    R.forEach(a => { const xs = a.slice().sort((u, v) => u.x - v.x), cells = [];
+      xs.forEach(it => { const c = cells.find(c => it.x <= c.r + 4 && it.x + it.w >= c.l - 4); if (c) { c.t.push(it); c.l = Math.min(c.l, it.x); c.r = Math.max(c.r, it.x + it.w); } else cells.push({ l: it.x, r: it.x + it.w, t: [it] }); });
+      recs.push(cells.sort((u, v) => u.l - v.l).map(c => { c.t.sort((u, v) => v.y - u.y || u.x - v.x); let o = ''; c.t.forEach((z, k) => { const pv = c.t[k - 1]; o += !pv ? z.s : (Math.abs(pv.y - z.y) < 3 && z.x - (pv.x + pv.w) > 1 ? ' ' : '') + z.s; }); return o.replace(/\s+/g, ' ').trim(); })); });
+  });
+  return recs;
+}
+window.mhrParse = function (pages) {
+  const out = new Map(); let rows = mhrRows(pages);
+  if (!rows.length) rows = pages.map(items => items.map(z => z.s));   /* 표가 아니면 글 조각 그대로 */
+  rows.forEach(cells => { const all = cells.join(' | '), dm = all.match(MHR_DATE), date = dm ? dm[1] + '-' + dm[2].padStart(2, '0') + '-' + dm[3].padStart(2, '0') : '';
+    const ints = cells.map(c => c.replace(/\s*(일분|일치|일)$/, '')).filter(c => /^\d{1,3}$/.test(c)).map(Number).filter(n => n > 0 && n <= 365), days = ints.length ? ints[ints.length - 1] : 0;
+    cells.forEach(cell => { const c0 = cell.replace(MHR_DATE, ' '), nm = c0.match(MHR_NAME); if (!nm) return; if (/[가-힣]/.test(c0.charAt(nm.index + nm[0].length))) return;   /* 「암로디핀베실산염」처럼 낱말이 이어지면 약 이름이 아니라 성분 칸 */
+      const name = nm[0].replace(/\s+/g, ' ').trim(); if (name.length < 3 || /약국|병원|의원|처방|조제|투약|일수|횟수|성명|주민|기관|합계|페이지|건강보험|심사평가원/.test(name)) return;
+      const k = name.replace(/\s/g, ''), pv = out.get(k); if (!pv || (date && date > (pv.date || ''))) out.set(k, { name, date, days }); }); });
+  return [...out.values()].sort((a, b) => (b.date || '').localeCompare(a.date || ''));
+};
+function mhrMatch(r) {
+  /* 약 사전 맞추기 — 오타 고침 없이(noFix) · 밀리그램 → mg · 이름 그대로 → 용량 뺀 이름 → 꼴(정·캡슐) 뺀 이름 순. 이름 앞 세 글자가 같은 것만 «맞음», 같은 용량이 든 것을 먼저 */
+  const base = r.name.replace(/밀리그램|㎎/g, 'mg').replace(/마이크로그램/g, 'mcg').replace(/그램/g, 'g').replace(/[()\[\]]/g, ' ').replace(/\s+/g, ' ').trim();
+  const FORM = /(이알서방정|서방정|연질캡슐|경질캡슐|필름코팅정|장용정|구강붕해정|츄어블정|캡슐|정|건조시럽|시럽|현탁액|내복액|액|과립|산)$/;
+  const nameOnly = base.replace(/\s*\d.*$/, '').trim(), qs = [base.replace(/([가-힣])(\d)/, '$1 $2'), nameOnly, nameOnly.replace(FORM, '')].filter((q, k, A) => q && q.length >= 2 && A.indexOf(q) === k);
+  const core = x => String(x || '').replace(/\(.*?\)|\s/g, '').replace(FORM, '').replace(/(이알서방정|서방정|연질캡슐|캡슐|정|시럽|액)[\d].*$/, '').slice(0, 3);
+  const mg = (base.match(/(\d[\d.]*)\s*(mg|mcg|g)/i) || [])[1], want = core(nameOnly);
+  const title = h => decodeURIComponent(String(h.h).split('p=')[1] || '') || h.t;
+  let hs = [];
+  for (const q of qs) { let h = []; try { h = search(q, true).filter(x => /^\/(drug|pub|pillinfo|brand)\//.test(x.h || '')); } catch (e) {} hs = hs.concat(h); if (h.some(x => core(title(x)) === want)) break; }
+  const seen = new Set(), mgR = mg ? new RegExp('(^|[^\\d.])' + mg.replace('.', '\\.') + '(mg|mcg|g)') : null, sc = h => (core(title(h)) === want ? 2 : 0) + (mgR && mgR.test((title(h) + ' ' + h.t).replace(/\s/g, '').replace(/밀리그램|밀리그람|㎎/g, 'mg').replace(/마이크로그램/g, 'mcg')) ? 1 : 0);
+  r.cands = hs.filter(h => !seen.has(h.h) && seen.add(h.h)).sort((a, b) => sc(b) - sc(a)).slice(0, 3);
+  r.ok = r.cands[0] && core(title(r.cands[0])) === want ? r.cands[0] : null;
+}
+window.mhrFile = async function (inp) { const f = inp && inp.files && inp.files[0]; if (!f) return; MHR.err = ''; MHR.rows = null; MHR.pw = 0;
+  if (!/pdf$/i.test(f.name) && f.type !== 'application/pdf') { MHR.err = 'PDF 파일을 골라 주세요. 나의건강기록 앱에서 「PDF로 저장」한 파일이에요.'; route(); return; }
+  MHR.buf = new Uint8Array(await f.arrayBuffer()); inp.value = ''; mhrRead(''); };
+window.mhrPw = function () { const v = (document.getElementById('mhrpw') || {}).value || ''; if (v) mhrRead(v); };
+async function mhrRead(pw) { MHR.busy = 1; route();
+  try { await Promise.all([pubIndex(), pubPills(), pubPillsRx()]).catch(() => {}); try { lexLoad(); if (typeof pubIndexSoon === 'function') pubIndexSoon(); } catch (e) {}
+    await new Promise(ok => { const t0 = Date.now(); (function w() { if ((typeof LEX === 'undefined' || !LEX.loading) || Date.now() - t0 > 20000) ok(); else setTimeout(w, 120); })(); });   /* 약 이름 사전(낱알·허가 목록)이 다 올라온 뒤 맞춘다 */ const pages = await mhrText(MHR.buf, pw); const rows = mhrParse(pages); rows.forEach(mhrMatch);
+    const t = Date.now(), y1 = new Date(t - 365 * 864e5).toISOString().slice(0, 10);
+    MHR.rows = rows.filter(r => !r.date || r.date >= y1).map(r => { const end = r.date && r.days ? new Date(r.date).getTime() + r.days * 864e5 : 0; r.on = !!(r.ok && end && end >= t - 864e5); return r; });
+    MHR.pw = 0; MHR.buf = null; if (!MHR.rows.length) MHR.err = '이 파일에서 약 이름을 찾지 못했어요. 나의건강기록 「투약 이력」 PDF가 맞는지 봐 주세요.';
+  } catch (e) { const pwE = e && (e.name === 'PasswordException' || /password/i.test(e.message || '')); if (pwE) { MHR.pw = e.code === 2 ? 2 : 1; } else { MHR.err = '파일을 읽지 못했어요. 다시 저장해서 열어 보시거나 「사진으로 담기」를 써 주세요.'; MHR.buf = null; } }
+  MHR.busy = 0; route(); }
+window.mhrTick = function (i, on) { const r = (MHR.rows || [])[i]; if (r) r.on = on; const n = (MHR.rows || []).filter(x => x.on && x.ok).length, b = document.getElementById('mhrgo'); if (b) { b.textContent = n ? '고른 약 ' + n + '가지 내 약통에 담기' : '담을 약을 골라 주세요'; b.disabled = !n; } };
+window.mhrPick = function (i, j) { const r = (MHR.rows || [])[i]; if (!r) return; r.ok = j < 0 ? null : r.cands[j]; r.on = !!r.ok; route(); };
+window.mhrAdd = async function () { const R = (MHR.rows || []).filter(r => r.on && r.ok); let n = 0; ME.taking = ME.taking || [];
+  for (const r of R) { const h = r.ok.h; let m;
+    try { if ((m = h.match(/^\/drug\/([^?]+)/))) { if (!ME.taking.includes(m[1])) { ME.taking.push(m[1]); markPrnIfNew(m[1]); n++; } }
+      else if ((m = h.match(/^\/pub\/(\d+)/))) { addPubIx(+m[1]); n++; }
+      else if ((m = h.match(/^\/pillinfo\/(\w+)/))) { if (!ME.taking.includes('pub:' + m[1])) { await togglePub(m[1]); n++; } }
+      else if ((m = h.match(/^\/brand\/(.+)$/))) { const b = decodeURIComponent(m[1]), ix = (PUB.index || []).findIndex(p => p.n && p.n.replace(/\s/g, '').indexOf(b.replace(/\s/g, '')) === 0); if (ix >= 0) { addPubIx(ix); n++; } }
+    } catch (e) {} }
+  saveMe(); try { armNotifications(); } catch (e) {} MHR.rows = null; toast(n + '가지를 내 약통에 담았어요'); go('/together'); };
+window.문_mhr = function () {
+  const top = topBar({ back: '뒤로' }) + '<h1>나의건강기록 파일로 약 담기</h1>', R = MHR.rows;
+  const safe = '<p class="small muted" style="margin-top:12px">파일은 이 휴대폰 안에서만 읽어요 — 어디에도 보내거나 저장하지 않고, 고른 약만 내 약통에 담겨요.</p>';
+  if (MHR.busy) return top + '<p class="loading" style="margin-top:16px" aria-live="polite">파일을 읽고 있어요…</p>';
+  if (!R) return top + '<p style="margin-top:8px">나의건강기록 앱에서 받은 <b>투약 이력 PDF</b>를 열면, 최근 1년 약 가운데 지금 드시는 약만 골라 담을 수 있어요.</p>'
+    + '<ol class="plain" style="margin-top:12px"><li>나의건강기록 앱 → 투약 정보 → 저장(PDF)</li><li>아래 「PDF 파일 고르기」에서 그 파일을 열기</li><li>지금 드시는 약에 표시하고 담기</li></ol>'
+    + (MHR.pw ? '<div class="card" style="margin-top:16px;padding:16px"><label for="mhrpw"><b>' + (MHR.pw === 2 ? '암호가 맞지 않아요. 다시 넣어 주세요.' : '암호가 걸린 파일이에요. 암호를 넣어 주세요.') + '</b></label><input id="mhrpw" type="password" autocomplete="off" style="width:100%;min-height:48px;margin-top:8px" onkeydown="if(event.key===\'Enter\')mhrPw()"><button type="button" class="btn" style="margin-top:10px;width:100%;min-height:52px" onclick="mhrPw()">열기</button><p class="small muted" style="margin-top:6px">파일을 저장할 때 정한 암호예요. 암호도 저장하지 않아요.</p></div>'
+      : '<label class="btn" style="margin-top:16px;width:100%;min-height:56px;display:flex;align-items:center;justify-content:center;cursor:pointer">PDF 파일 고르기<input type="file" accept="application/pdf,.pdf" hidden onchange="mhrFile(this)"></label>')
+    + (MHR.err ? '<p class="note" role="alert" style="margin-top:12px">' + esc(MHR.err) + '</p>' : '') + safe
+    + '<p style="margin-top:12px"><a class="link" href="#/photo">약봉투 사진으로 담기 ›</a></p>';
+  const row = (r, i) => { const nm = r.ok ? esc(r.ok.t) : '';
+    return '<li class="mhr-r' + (r.ok ? '' : ' q') + '"><label class="mhr-l"><input type="checkbox" ' + (r.on ? 'checked ' : '') + (r.ok ? '' : 'disabled ') + 'onchange="mhrTick(' + i + ',this.checked)"><span><b>' + esc(r.name) + '</b><small>' + (r.date ? esc(r.date) + ' 조제' : '') + (r.days ? ' · ' + r.days + '일분' : '') + '</small>'
+      + (r.ok ? '<small class="mhr-m">약지도: ' + nm + '</small>' : '<small class="mhr-w">확인해 주세요 — 약지도에서 이 약을 찾지 못했어요</small>') + '</span></label>'
+      + (!r.ok && r.cands.length ? '<div class="ask-chips">' + r.cands.map((c, j) => '<button type="button" class="chip" onclick="mhrPick(' + i + ',' + j + ')">' + esc(c.t) + '</button>').join('') + '</div>' : '')
+      + (r.ok && r.cands.length > 1 ? '<button type="button" class="link small" onclick="mhrPick(' + i + ',-1)">다른 약이에요</button>' : '') + '</li>'; };
+  const n = R.filter(r => r.on && r.ok).length, q = R.filter(r => !r.ok).length;
+  return top + '<p style="margin-top:8px">최근 1년 약 ' + R.length + '가지를 찾았어요. <b>지금 드시는 약</b>에 표시해 주세요' + (q ? ' — 「확인해 주세요」 ' + q + '가지는 맞는 이름을 눌러 고르거나 그대로 두세요' : '') + '.</p>'
+    + '<ul class="plain mhr" style="margin-top:12px">' + R.map(row).join('') + '</ul>'
+    + '<button type="button" id="mhrgo" class="btn" style="margin-top:16px;width:100%;min-height:56px" ' + (n ? '' : 'disabled ') + 'onclick="mhrAdd()">' + (n ? '고른 약 ' + n + '가지 내 약통에 담기' : '담을 약을 골라 주세요') + '</button>'
+    + '<button type="button" class="link" style="margin-top:8px" onclick="MHR.rows=null;route()">다른 파일 열기</button>' + safe;
+};
+window.MHR = MHR;
+try { const ms = document.createElement('style'); ms.textContent = 'ul.mhr{list-style:none;padding:0}ul.mhr>li{padding-left:0}ul.mhr>li::before{content:none!important;display:none!important}.mhr-r{padding:12px 0;border-bottom:1px solid var(--hairline)}.mhr-l{display:flex;gap:12px;align-items:flex-start;min-height:44px;cursor:pointer}.mhr-l input{width:24px;height:24px;flex:0 0 24px;margin-top:2px}.mhr-l span{display:flex;flex-direction:column;gap:2px;word-break:keep-all}.mhr-l small{color:var(--muted)}.mhr-m{color:var(--primary-deep)!important}.mhr-w{color:#93370D!important;font-weight:700}.mhr-r .ask-chips{margin:8px 0 0 36px}.mhr-r .link{margin-left:36px;min-height:44px}'; document.head.appendChild(ms); } catch (e) {}
 window.문_barcode = function () { const cam = 'BarcodeDetector' in window;
   return topBar({ back: '뒤로' }) + '<h1>상자 바코드로 담기</h1><p style="margin-top:8px">약 상자 옆 막대 무늬(바코드)를 비추거나, 그 아래 숫자 13자리를 넣어 주세요.</p>'
     + (cam ? '<button type="button" class="btn" style="margin-top:16px;width:100%;min-height:56px" onclick="바코드카메라()">카메라로 비추기</button><video id="bcv" playsinline muted hidden style="width:100%;margin-top:12px;border-radius:16px;background:#000"></video>' : '')
@@ -3746,12 +3843,54 @@ window.언어칸 = function () {
   }
   /* 갈래 낱말 — 제품을 모를 때. 처방약 갈래는 처방약 길잡이로 */
   var 갈래 = { 감기약: { 묻기: '어떤 감기약인지 아세요?', 칩: ['판콜에이', '테라플루', '콜대원'] }, 진통제: { 묻기: '어떤 진통제인지 아세요?', 칩: ['타이레놀', '이부프로펜', '게보린'] }, 해열제: { 묻기: '어떤 해열제인지 아세요?', 칩: ['타이레놀', '이부프로펜'] }, 소화제: { 묻기: '어떤 소화제인지 아세요?', 칩: ['베아제', '훼스탈'] } };
-  var 처방갈래 = [['bp', /혈압약|고혈압/], ['dm', /당뇨약|혈당약|메트포르민/], ['chol', /콜레스테롤약|고지혈|스타틴/], ['blood', /와파린|항응고|피\s*묽게|아스피린\s*프로텍트|엘리퀴스|자렐토|릭시아나/], ['thy', /갑상선/], ['mind', /수면제|우울증약|항우울|안정제/]];
+  var 처방갈래 = [['bp', /혈압약|고혈압/], ['dm', /당뇨약|혈당약|메트포르민/], ['chol', /콜레스테롤약|고지혈|스타틴/], ['blood', /와파린|항응고|피\s*묽게|아스피린\s*프로텍트|엘리퀴스|자렐토|릭시아나/], ['thy', /갑상선/], ['mind', /수면제|우울증약|항우울|안정제/],
+    /* 11-19 GPT 1,000 — 길잡이는 20갈래인데 질문에서 알아보는 말은 6갈래뿐이었다(「골다공증약 일주일 한 번」「에스오메프라졸 식전」이 답 없음) */
+    ['bone', /골다공증\s*약|골다공증약|알렌드로네이트|리세드로네이트|이반드로네이트|포사맥스|본비바|악토넬|비스포스포네이트/], ['gi', /위산\s*억제|[가-힣]*프라졸|[가-힣]*프라잔|역류성\s*식도염\s*약|넥시움|케이캡|펙수클루/],
+    ['resp', /흡입기|흡입약|흡입제|천식\s*약|천식약|심비코트|벤토린|세레타이드|스피리바|렐바/], ['pros', /전립선\s*약|전립선약|탐스로신|하루날|실로도신|두타스테리드|아보다트/], ['gout', /통풍\s*약|통풍약|알로푸리놀|페북소스타트|페브릭|자일로릭|콜히친/],
+    ['blad', /방광\s*약|방광약|과민성\s*방광|솔리페나신|베시케어|미라베그론|베타미가|페소테로딘/], ['ster', /먹는\s*스테로이드|스테로이드\s*(약을?|를|을)?\s*(먹|복용|처방)|프레드니솔론|메틸프레드니솔론|소론도|메드롤/],
+    ['dem', /치매\s*약|치매약|도네페질|아리셉트|메만틴|에빅사|갈란타민|리바스티그민/], ['eye', /녹내장/], ['park', /파킨슨/], ['pain', /병원\s*진통제|처방\s*진통제|트라마돌|울트라셋|프레가발린|리리카|가바펜틴|뉴론틴/],
+    ['derm', /이소트레티노인|로아큐탄|이소티논|독시사이클린|미노사이클린/], ['herb', /한약|한방\s*과립|탕약/]];
+  var 처방옛 = ['bp', 'dm', 'chol', 'blood', 'thy', 'mind'];
+  /* 11-19 — 길잡이 답은 질문과 가장 닮은 줄을 앞에(깜빡했으면 깜빡 줄) */
+  function 길잡이줄(g, t) {
+    var G = typeof RXG !== 'undefined' && RXG && RXG.guides && RXG.guides[g]; if (!G) return [];
+    var 줄 = (G.do || []).map(function (x) { return x.t; }).concat((G.kinds || []).map(function (x) { return x.n + ' — ' + x.t; }));
+    if (/깜빡|놓쳤|잊고|잊어|빼먹|못\s*먹었|건너뛰/.test(t) && G.miss && G.miss.t) return [G.miss.t];
+    var 낱 = String(t).replace(/[?？!.,]/g, ' ').split(/\s+/).filter(function (w) { return w.length >= 2; }).map(function (w) { return w.slice(0, 2); });
+    if (/다리|허벅|종아리|뻐근|쑤시|힘이?\s*(덜|빠|없)/.test(t)) 낱.push('근육'); if (/변비|변\s*봐|볼일|며칠에\s*한\s*번/.test(t)) 낱.push('변비'); if (/붓|부어|부었|양말\s*자국/.test(t)) 낱.push('붓'); if (/어지러|핑\s*돌|일어설/.test(t)) 낱.push('일어');
+    var 바뀜 = /시작하고|시작한\s*(뒤|후)|바꾸고|바꾼\s*(뒤|후)|먹고\s*나서|부작용|후로|뒤로|생겼/.test(t) ? ['새 약을 시작하거나 바꾼 뒤 생긴 변화는 약 때문일 수 있어요 — 스스로 끊지 말고 처방한 의사나 약사에게 말해 주세요.'] : [];
+    var 점 = 줄.map(function (l, i) { return { l: l, i: i, n: 낱.filter(function (w) { return l.indexOf(w) >= 0; }).length }; }).sort(function (a, b) { return b.n - a.n || a.i - b.i; });
+    return (점.length && 점[0].n ? [점[0].l] : []).concat(바뀜);
+  }
+  /* 11-19 GPT 1,000 — 앱에 이미 있는 약 상식 글(보관·기한·버리기·깜빡·식전 식후·쪼개기·콩팥·약봉투·복제약·파스)로 답한다. 한국어 글만 있어 한국어 화면에서만 */
+  var 팁말 = [['expiry', /유통\s*기한|사용\s*기한|개봉\s*(후|뒤|날짜|하고|한\s*지)|뜯은\s*(뒤|후|지)|뜯고\s*(얼마|언제|몇)|기한\s*(지난|넘은|이\s*지)/], ['dispose', /버려|버리|폐의약품|남은\s*약.*(처리|어떻게|어디)/],
+    ['storage', /보관|냉장|실온|어디에\s*(두|둬)|약통에\s*(옮|미리|덜어|담아\s*두)|차\s*안에\s*(둬|두)|습기|햇빛/], ['missed-dose', /깜빡|놓쳤|잊고|잊어버|빼먹|못\s*먹었|건너뛰/],
+    ['before-after-meal', /식전|식후|공복|빈\s*속|식사\s*(랑|와|하고)?\s*(상관|관계)|밥\s*(먹기\s*)?(전에|먹고|먹은\s*뒤)/], ['cut-pill', /쪼개|반으로|잘라|갈아서|가루로|빻아|캡슐.*(열어|까서|풀어)/],
+    ['kidney-otc', /(신장|콩팥|투석)/], ['read-label', /약\s*봉투|약봉투|처방전.*(보는|읽|뜻)/], ['generic', /복제약|카피약|오리지널\s*약/], ['patch-howto', /파스.*(붙|떼|교체|바꿔|갈아|가려)/]];
+  function 팁답(t, 약수) {
+    if (window.LANG && window.LANG !== 'ko') return null;
+    var hit = 팁말.filter(function (x) { return x[1].test(t); })[0]; if (!hit) return null;
+    if (약수 && !/^(expiry|storage|dispose)$/.test(hit[0])) return null;   /* 약 이름을 말하면 그 약 카드가 더 구체적 — 보관·기한·버리기만 상식 글로 */
+    var tp = (D.tips || []).filter(function (x) { return x.id === hit[0]; })[0]; if (!tp || !tp.body) return null;
+    var 문 = String(tp.body).replace(/\n+/g, ' ').replace(/([요다]\.)\s+/g, '$1\u0001').split('\u0001').filter(Boolean);
+    return { 결: (tp.group ? tp.group + ' · ' : '') + tp.title + ' — ' + 문[0], 할: 문.slice(1, 3), 단: [단추(tp.title + ' 자세히', '/tips?open=' + tp.id, 1)].concat(tp.link ? [단추(tp.linkText || '바로 가기', tp.link)] : []), 더: '<p>' + fmt(tp.body) + '</p>' };
+  }
   /* 위험 — 앱이 이미 쓰는 판정을 글로 옮긴 것(홈 응급 줄 · 증상 응급 줄 · 아이 3개월 38℃ · 41℃ · 항암 38℃ · 과다복용). 새 기준을 짓지 않는다 */
-  var 마음 = /죽고\s*싶|자살|자해|끝내고\s*싶|없어지고\s*싶|사라지고\s*싶|살\s*이유|손목.*그|그었|모아서.*먹|약.*모아|목숨|살기\s*싫|살고\s*싶지\s*않|죽어\s*버리|삶을\s*끝|생을\s*마감|세상을\s*떠나고|사는\s*게\s*(의미|싫)/;   /* 11-18 5,000 시험 — 「목숨을 끊고 싶어요」가 니코틴 패치로 가던 것 */
-  var 응급 = [/가슴.*(쥐어|조이|짓누|아프|답답).*(땀|숨)|가슴.*(쥐어짜|조이듯|짓누르)/, /한쪽.*(힘|마비|저리|처)|말이?\s*(갑자기\s*)?어눌|얼굴.*(처졌|비뚤)|발음이?\s*(이상|꼬)|한쪽\s*(팔|다리|손).*(못|안)\s*(들|움직|써|올)/, /숨.*(차서|차요|차고|차다|차는|막|못\s*쉬|안\s*쉬|가빠|쌕쌕|힘들)|호흡\s*곤란/, /(입술|혀|목구멍|얼굴).*(부었|붓고|부어)/, /경련|발작|까무러/, /숨이?\s*(너무\s*|자꾸\s*)?(느려|느리|약해|얕아|얕게)|깨우면\s*(다시\s*|또\s*)?잠|의식|깨워도|안\s*일어나|축\s*처지|쓰러지|쓰러졌|쓰러지셨|정신을\s*잃|기절/, /피를\s*토|토혈|변이\s*(새)?까|짜장\s*같|짜장처럼|(검은|까만|시커먼|새까만)\s*(변|똥|대변)|(검은|까만|시커먼)\S*\s*(끈적\S*\s*)?(변|똥)|끈적한\s*(검은\s*)?(변|똥)|흑변|변이\s*검|피\s*(섞인|나오는)\s*(변|대변|토)|피\s*토|토(했|하|한).*(피|핏)|피가\s*섞여/, /머리.*(부딪|다친).*(토|구토)/, /(제일|가장|살면서).*심한\s*두통|벼락\s*두통|벼락\s*(치듯|같|맞)|머리가\s*(터질|깨질)\s*(것|듯)|갑자기.*(최악|처음\s*겪는).*(두통|머리)/, /배가\s*(딱딱|너무\s*아파서\s*못)/];
+  var 마음 = /죽고\s*싶|자살|자해|끝내고\s*싶|없어지고\s*싶|사라지고\s*싶|살\s*이유|손목.*그|그었|모아서.*먹|약.*모아|목숨|살기\s*싫|살고\s*싶지\s*않|죽어\s*버리|삶을\s*끝|생을\s*마감|세상을\s*떠나고|사는\s*게\s*(의미|싫)|죽으려(고|\s*했|\s*한다)|약으로\s*(삶을\s*|다\s*)?끝내|끝내려(고)?\s*(약|했)|극단(적)?\s*선택|유서|마지막\s*인사|뛰어내리|약을?\s*(다|전부|한꺼번에|몽땅)\s*(모았|모아\s*뒀|먹어\s*버리고\s*싶|삼키고\s*싶)|해치고\s*싶|스스로\s*(목숨|생을)/;   /* 11-19 GPT 1,000 — 「죽으려고 약 먹었대요」「약으로 끝내려 했어요」. 11-18 5,000 시험 — 「목숨을 끊고 싶어요」가 니코틴 패치로 가던 것 */
+  var 응급 = [/가슴.*(쥐어|조이|짓누|아프|답답).*(땀|숨)|가슴.*(쥐어짜|조이듯|짓누르)/, /한쪽.*(힘|마비|저리|처)|말이?\s*(갑자기\s*)?어눌|얼굴.*(처졌|비뚤)|발음이?\s*(이상|꼬)|한쪽\s*(팔|다리|손).*(못|안)\s*(들|움직|써|올)/, /숨.*(차서|차요|차고|차다|차는|막|못\s*쉬|안\s*쉬|가빠|쌕쌕|힘들)|호흡\s*곤란/, /(입술|혀|목구멍|얼굴).*(부었|붓고|부어)/, /경련|발작|까무러/, /숨이?\s*(너무\s*|자꾸\s*)?(느려|느리|약해|얕아|얕게)|깨우면\s*(다시\s*|또\s*)?잠|의식|깨워도|안\s*일어나|축\s*처지|쓰러지|쓰러졌|쓰러지셨|정신을\s*잃|기절/, /피를\s*토|토혈|변이\s*(새)?까|짜장\s*같|짜장처럼|(검은|까만|시커먼|새까만)\s*(변|똥|대변)|(검은|까만|시커먼)\S*\s*(끈적\S*\s*)?(변|똥)|끈적한\s*(검은\s*)?(변|똥)|흑변|변이\s*검|피\s*(섞인|나오는)\s*(변|대변|토)|피\s*토|토(했|하|한).*(피|핏)|피가\s*섞여/, /머리.*(부딪|다친).*(토|구토)/, /(제일|가장|살면서).*심한\s*두통|벼락\s*두통|벼락\s*(치듯|같|맞)|머리가\s*(터질|깨질)\s*(것|듯)|갑자기.*(최악|처음\s*겪는).*(두통|머리)/, /배가\s*(딱딱|너무\s*아파서\s*못)/,
+    /* 11-19 GPT 1,000 고칠 200 — 의식 흐림을 여러 말로 · 입술 푸름 · 「부으면서」 · 호흡이 힘들 · 맥박 · 아기 소변 없음 · 아이 몸에 어른 패치 · 피 묽게 하는 약 먹고 넘어짐 · 옆에 빈 약봉지 */
+    /정신이?\s*(아득|혼미|가물|흐려|흐릿|없어|오락가락)|깨\s*있기\s*(가\s*)?힘들|자꾸\s*(잠들|정신을)|잠만\s*자려|말도?\s*(잘\s*)?안\s*나오|축\s*늘어|늘어져|앞이\s*안\s*보일\s*(정도|만큼)|눈앞이\s*(캄캄|까매)/,
+    /(입술|얼굴|손톱)이?\s*(푸르|파랗|파래|퍼렇|퍼래|보라)|청색증/, /(입술|혀|목구멍|얼굴|눈두덩).*(부으|부어오|붓는|퉁퉁)/, /호흡이?\s*(곤란|힘들|어렵|가빠|가쁘|안\s*돼|안\s*되)|숨\s*쉬기\s*(가\s*)?(힘들|어려)/,
+    /맥박이?\s*(너무\s*|아주\s*)?(느려|느리|약해|안\s*잡|빨라.*(어지러|쓰러))/, /(아기|아가|애기|아이|애).*(소변|오줌)\S*\s*(을\s*)?(이\s*)?(없|안\s*나|안\s*봐|안\s*누|안\s*싸|한\s*번도)|(아기|아가|애기|아이|애).*기저귀가?\s*(안\s*젖|마른|말라|뽀송)/,
+    /(아이|아기|애기|애)\S*\s*.*(몸|등|팔|다리|가슴)\S*\s*.*어른\S*\s*.*패치|(아이|아기|애기|애).*패치.*(멍|졸|잠|축|처지)/, /(항응고제|피\s*(를\s*)?묽게|피\s*(를\s*)?맑게|와파린|아픽사반|리바록사반|에독사반|다비가트란).*(넘어|부딪|머리를?\s*(찧|박)|낙상)/,
+    /(약봉지|약봉투|약통|약병|약\s*껍질)\S*\s*(가|이)?\s*(옆에|곁에|다\s*비|비어|빈\s*채)|빈\s*(약봉지|약통|약병)/,
+    /* 11-19 — 잣대 800 을 보지 않고 의학적 위험 신호를 원리대로 넓힘: 반응 없음 · 알레르기 쇼크 · 숨 · 피 기침 · 목 뻣뻣한 열 · 실신 · 심장 · 아이 탈수 */
+    /반응이?\s*없|불러도\s*(대답|반응|못)|대답을?\s*(안|못)\s*해|눈을?\s*못\s*떠|헛소리|횡설수설|혼수|실신|정신\s*(을\s*)?못\s*차/, /온몸에?\s*(두드러기|발진).*(숨|어지러|목|입술|토)|두드러기.*(숨|목이?\s*(조|막|붓))|아나필락시스|목이?\s*(조여|조이|막히|막혀|붓)|목구멍이?\s*(조|막|붓)/,
+    /숨을?\s*(헐떡|몰아\s*쉬|안\s*쉬|못\s*쉬)|숨소리가?\s*(이상|그르렁|쌕)|가슴이?\s*(조여|조이|짓눌|쥐어)/, /피\s*(가래|섞인\s*기침)|각혈|기침.*피가?\s*(나|섞)/,
+    /(열|고열).*(목이?\s*(뻣뻣|안\s*숙|굳)|보라색?\s*(반점|점)|눌러도\s*안\s*없어지)|목이?\s*뻣뻣.*(열|토)/, /심장이?\s*(멎|미친\s*듯|터질)|가슴이?\s*(너무\s*)?두근.*(어지러|쓰러|숨|아파)|맥이?\s*(안\s*잡|너무\s*느)/,
+    /(아기|아이|애기|아가).*(눈이?\s*쑥|입술이?\s*바싹|분수(처럼)?\s*토|하루\s*종일\s*(안\s*먹|못\s*먹|토)|못\s*깨|안\s*깨|기운이\s*하나도)/];
   /* 이미 많이 먹었다·삼켰다(10-28 곁에 교훈) — 증상을 묻기 전에 119 상담 먼저. 문구는 약 화면 「너무 많이 드셨을 때」(NHS)와 같게 */
-  var 과다 = /(한\s*통|통째|한\s*움큼|움큼|여러\s*(개|알|정|봉)|(열|스무|서른|수십)\s*(알|개|정)).*(먹은|삼킨|먹었|삼켰)|(먹었|삼켰).*(열|스무|서른|여러|[0-9]{2,})\s*(알|개|정)\s*(쯤|정도|넘게|이상|가량|이나)|((두|세|네|다섯|여섯|일곱|[0-9]+)\s*살(배기)?|아이|애기|아기|애)(가|이|이가)?\s.*(약봉지|약봉투|패치|세제|캡슐|액상|젤리|혈압약|당뇨약|수면제|어른\s*약|할머니\s*약|할아버지\s*약|엄마\s*약|아빠\s*약).*(먹었|먹은|삼켰|씹었|깨물|빨아\s*먹|뜯어\s*먹|마셨|마신|핥)|(약봉지|약봉투|패치|세제|액상|젤리|혈압약|당뇨약|수면제).*((두|세|네|다섯|여섯)\s*살|아이|애|아기|애기)(가|이)?\s.*(먹었|먹은|삼켰|씹|깨물|빨아|뜯어)|패치.*(씹었|씹어|빨았|삼켰|먹었)|(세탁\s*세제|캡슐\s*세제|세제\s*캡슐|전자\s*담배|니코틴\s*액|액상\s*니코틴|락스|세제).*(마신|먹은|삼킨|깨물|씹었|빨아\s*먹|핥)|(한\s*통|통째|[0-9]{2,}\s*(알|정|개|봉)|많이|잔뜩|한꺼번에|두\s*배|두\s*번|실수로|모르고\s*또).*(먹었|먹였|삼켰|먹여|먹어\s*버렸)|(아이|애기|아기|애)가.*(약|알약|약통|시럽).*(삼켰|주워\s*먹|꺼내\s*먹|먹어\s*버렸|다\s*먹)|(아이|애기|아기|애|우리\s*애)가.*(주워\s*먹|삼켰|꺼내\s*먹|먹어\s*버렸|다\s*먹었|한\s*통|여러\s*(알|개))|(세제|락스|표백제|농약|살충제|부동액|방향제|손\s*소독제|매니큐어|담배|건전지|배터리|자석).*(마셨|먹었|삼켰|먹어\s*버렸)|took (a lot|too many|the whole|all|double|twice)|swallowed|overdos|tom[ée] (muchas|demasiad|el doble|dos veces)|sobredosis|se (lo )?tragó|(薬|錠).*(たくさん|大量|全部|二回分|2回分).*飲|飲み込んだ|過量|吃了(很多|一整瓶|大量|一整盒|两次|双倍)|吞了|过量/i;
+  var 과다 = /(한\s*통|통째|한\s*움큼|움큼|여러\s*(개|알|정|봉)|(열|스무|서른|수십)\s*(알|개|정)).*(먹은|삼킨|먹었|삼켰)|(먹었|삼켰).*(열|스무|서른|여러|[0-9]{2,})\s*(알|개|정)\s*(쯤|정도|넘게|이상|가량|이나)|((두|세|네|다섯|여섯|일곱|[0-9]+)\s*살(배기)?|아이|애기|아기|애)(가|이|이가)?\s.*(약봉지|약봉투|패치|세제|캡슐|액상|젤리|혈압약|당뇨약|수면제|어른\s*약|할머니\s*약|할아버지\s*약|엄마\s*약|아빠\s*약).*(먹었|먹은|삼켰|씹었|깨물|빨아\s*먹|뜯어\s*먹|마셨|마신|핥)|(약봉지|약봉투|패치|세제|액상|젤리|혈압약|당뇨약|수면제).*((두|세|네|다섯|여섯)\s*살|아이|애|아기|애기)(가|이)?\s.*(먹었|먹은|삼켰|씹|깨물|빨아|뜯어)|패치.*(씹었|씹어|빨았|삼켰|먹었)|(세탁\s*세제|캡슐\s*세제|세제\s*캡슐|전자\s*담배|니코틴\s*액|액상\s*니코틴|락스|세제).*(마신|먹은|삼킨|깨물|씹었|빨아\s*먹|핥)|(한\s*통|통째|[0-9]{2,}\s*(알|정|개|봉)|많이|잔뜩|한꺼번에|두\s*배|(두|세|네|여러)\s*번|과하게|과량|중복(으로|해서)?|겹쳐서|실수로|모르고\s*또).*(먹었|먹였|삼켰|먹여|먹어\s*버렸|먹은\s*(뒤|후|다음))|(많이|잘못|전부|몽땅|더)\s*(먹었|먹였|삼켰)|과다\s*복용(했|한|해\s*버)|다\s*먹어\s*버렸|(두|세)\s*알\s*더\s*먹|(아이|애기|아기|애)가.*(약|알약|약통|시럽).*(삼켰|주워\s*먹|꺼내\s*먹|먹어\s*버렸|다\s*먹)|(아이|애기|아기|애|우리\s*애)가.*(주워\s*먹|삼켰|꺼내\s*먹|먹어\s*버렸|다\s*먹었|한\s*통|여러\s*(알|개))|(세제|락스|표백제|농약|살충제|부동액|방향제|손\s*소독제|매니큐어|담배|건전지|배터리|자석).*(마셨|먹었|삼켰|먹어\s*버렸)|took (a lot|too many|the whole|all|double|twice)|swallowed|overdos|tom[ée] (muchas|demasiad|el doble|dos veces)|sobredosis|se (lo )?tragó|(薬|錠).*(たくさん|大量|全部|二回分|2回分).*飲|飲み込んだ|過量|吃了(很多|一整瓶|大量|一整盒|两次|双倍)|吞了|过量/i;
   /* 다섯 언어 위험 낱말(10-27 Main — 한국어만 알아듣던 곳이 있었다). 언어와 상관없이 다 본다(영어 폰을 쓰는 한국 사람도 있다) */
   var 마음다국 = /suicid|kill(ing)? myself|want to die|end (my|it all)|self[- ]?harm|cut(ting)? myself|no reason to live|quiero morir|matarme|quitarme la vida|no quiero vivir|hacerme daño|autolesi|死にたい|自殺|消えたい|自傷|リストカット|想死|自杀|不想活|轻生|自残|割腕/i;
   var 응급다국 = [/chest (pain|hurts|tight|pressure)|can'?t breathe|cannot breathe|short(ness)? of breath|trouble breathing|struggling to breathe|wheez|face (is )?droop|slurred|one side.*(weak|numb)|(lips?|tongue|throat).*(swell|swollen|clos)|(swell|swollen).*(lips?|tongue|throat)|seizure|convuls|fit(ting)?\b.*child|unconscious|passed out|won'?t wake|unresponsive|floppy|(vomit|throw)(ing|ed)? (up )?blood|black (stool|poop)|worst headache|took (a lot|too many|the whole|all)|overdos|not breathing/i,
@@ -3788,7 +3927,7 @@ window.언어칸 = function () {
        증상 없는 실수 복용은 그 나라 중독 상담(있는 나라만 — 미국·스페인·일본). 한국·중국·모르는 나라는 응급 번호 */
     /* 11-18 질문 250 — 「많이 먹여요?」「한 통에 섞어 먹여도」는 앞으로의 질문이지 이미 먹은 일이 아니다 */
     /* 11-18 Main — 세제·락스 같은 생활용품은 약 과다 문장(아세트아미노펜 간 손상)과 나눈다: 연락 · 억지로 토하게 하지 않기 · 제품 통 챙기기까지만 */
-    if (!의도 && /(세탁\s*세제|캡슐\s*세제|세제\s*캡슐|세제|락스|표백제|농약|살충제|부동액|방향제|손\s*소독제|매니큐어|전자\s*담배|니코틴\s*액|액상\s*니코틴|액상|건전지|배터리|자석|담배)\S*\s*.*(마셨|마신|먹었|먹은|삼켰|삼킨|깨물|씹었|빨아\s*먹|빨아먹|핥|먹어\s*버렸)/.test(t)) { var P0 = 중독상담[window.CC]; return { 말: (M.x || 위험말.ko.x)(P0 ? P0.이름[L] || P0.이름.en : '', N.e), 전화: P0 ? P0.번호 : N.e }; }
+    if (!의도 && /(세탁\s*세제|캡슐\s*세제|세제\s*캡슐|세제|세정제|락스|표백제|곰팡이\s*제거제|배수구|변기\s*(세정|세제|클리너)|소독약|소독제|살균제|섬유\s*유연제|농약|살충제|부동액|방향제|손\s*소독제|매니큐어|아세톤|전자\s*담배|니코틴\s*액|액상\s*니코틴|액상|건전지|배터리|자석|담배)\S*\s*.*(마셨|마신|먹었|먹은|삼켰|삼킨|삼킴|마심|먹음|깨물|씹었|빨아\s*먹|빨아먹|핥|먹어\s*버렸|입에\s*(댔|대었|넣었|넣은|댄|들어갔))/.test(t)) { var P0 = 중독상담[window.CC]; return { 말: (M.x || 위험말.ko.x)(P0 ? P0.이름[L] || P0.이름.en : '', N.e), 전화: P0 ? P0.번호 : N.e }; }
     var 앞질문 = /(먹여도|먹여요\s*\?|먹여야|먹일까|먹어도\s*(돼|되)|먹을까|섞어)/.test(t) && !/(먹었|삼켰|먹은|삼킨|마셨|마신|씹었|깨물)/.test(t);
     if (!앞질문 && 과다.test(t)) {
       var t2 = t.replace(new RegExp(과다.source, 'gi'), ' ');   /* 「많이 먹었다」 낱말 자체는 중증 신호로 세지 않는다 */
@@ -3942,6 +4081,12 @@ window.언어칸 = function () {
   }
   /* 11-18 질문 250 — 가려움·연고 질문은 먹는 알레르기 약 답으로 보내지 않고 그 질문에 답한다 */
   function 가려움답(t) {
+    /* 11-19 GPT 1,000(Main 1순위 · 거짓 안심) — 「약 알레르기 기록·다음 처방 때 뭐라 말하죠」가 가려움약 답으로 가던 것 */
+    if (/(약|진통제|해열제|항생제|주사|조영제|마취).{0,12}(알레르기|부작용)|알레르기\s*(있었|났었|생겼었|기록|카드|메모)/.test(t) && /(기록|적어|적을|적나|적지|말하|말해|말씀|알리|알려야|메모|뭐라)/.test(t) && !/(숨|입술|목이?\s*(조|붓|막)|지금|방금)/.test(t))
+      return { 결: '약 알레르기는 「무슨 약을 · 언제 · 어떤 반응이 · 얼마나 심하게」 있었는지 적어 두고, 처방받을 때와 약을 살 때마다 먼저 말하세요.', 할: ['약 이름은 상품 이름과 성분 이름을 함께 적어 두면 같은 성분이 든 다른 제품도 피할 수 있어요.', '반응은 두드러기·가려움·붓기·숨참·어지러움처럼 실제로 겪은 것을 그대로 적어요 — 속쓰림 같은 흔한 불편과 알레르기는 다르게 다뤄질 수 있어요.', '적어 둔 것을 휴대폰에 두고 진료·약국에서 보여 주세요.'], 단: [단추('내 약 한 장', '/me?t=meds', 1)] };
+    /* 11-19 — 아이 피부 가려움·연고 질문에 어른 먹는 약 양(로라타딘 10 mg)이 먼저 나오던 것 */
+    if (/(아이|아기|애기|애가|우리\s*애|[0-9]+\s*살|개월)/.test(t) && /가려|간지|긁/.test(t) && /연고|크림|바르|바를|로션|부위|접히/.test(t) && !/(숨|입술|목이?\s*(조|붓)|온몸)/.test(t))
+      return { 결: '아이 피부 가려움에 바르는 약은 부위와 나이를 말하고 약사와 고르세요 — 얼굴·접히는 곳·기저귀 자리는 피부가 얇아 순한 것부터 써요.', 할: ['보습제를 하루 두 번 넘게 듬뿍 바르는 것이 기본이에요.', '먹는 알레르기약은 어른 양을 주지 말고, 아이 나이·몸무게에 맞는 제품과 양을 약사에게 물어보세요.', '진물·고름이 나거나 열이 나거나, 일주일 넘게 안 나으면 진료를 보세요.'], 단: [단추('아이 약 양 계산', '/kids', 1)] };
     if (/파스|패치/.test(t) && /(빨개|빨갛|가려|발진|따가|물집|두드러기)/.test(t) && !/숨|입술|목이?\s*조/.test(t)) return { 결: '파스를 떼고 그 자리를 물로 씻은 뒤 더 붙이지 마세요.', 할: ['붙인 모양대로 빨갛고 가려우면 파스 성분이나 접착제에 피부가 반응한 것일 수 있어요.', '번지거나 물집이 크게 잡히거나 며칠 지나도 그대로면 진료를 받으세요.', '다음에는 약사에게 이번 일을 말하고 다른 성분으로 고르세요.'], 단: [] };
     if (/안약/.test(t) && /(집에|남이|쓰던|예전|형|언니|오빠|누나|엄마|아빠|있던|남은)/.test(t)) return { 결: '집에 있던 안약은 넣기 전에 누구 것인지·언제 뜯었는지부터 보세요.', 할: ['다른 사람에게 처방된 안약, 특히 스테로이드 안약은 아이에게 넣지 마세요.', '뜯은 지 오래된 안약은 오염될 수 있어 버리세요 — 뜯은 뒤 쓸 수 있는 기간은 설명서에 있어요.', '눈곱이 많거나 빨갛게 붓거나 아파하거나 잘 안 보이면 진료를 받으세요.'], 단: [] };
     if (/무좀/.test(t) && /(그만|멈|끊|언제까지|며칠|계속)/.test(t)) return { 결: '가려움이 없어져도 설명서에 적힌 기간까지 바르세요.', 할: ['겉으로 나아 보여도 곰팡이가 남아 있으면 다시 생기기 쉬워요.', '씻고 잘 말린 뒤, 아픈 곳보다 조금 넓게 발라요.', '설명서 기간을 다 발라도 그대로면 무좀이 아닐 수 있어요 — 진료를 받으세요.'], 단: [] };
@@ -4008,7 +4153,9 @@ window.언어칸 = function () {
     if (묻기.기다림 && ids.length === 1 && 묻기.약.length) { var 모 = 묻기.약.concat(ids.filter(function (i) { return 묻기.약.indexOf(i) < 0; })); 묻기.기다림 = null; 묻기.약 = 모; return 겹침카드(모); }
     var 갈 = Object.keys(갈래).filter(function (k) { return t.indexOf(k) >= 0; })[0], rx = 처방갈래.filter(function (x) { return x[1].test(t); })[0];
     if (rx && !/먹는|먹고|복용|드시|드세|처방|먹어요/.test(t) && /사도|살까|사려|사야|추천|뭐/.test(t)) rx = null;   /* 11-17 「수면제 사도 돼요」는 이미 먹는 사람이 아니다 — 증상 답으로 */
-    if (rx) { var G = typeof RXG !== 'undefined' && RXG && RXG.guides && RXG.guides[rx[0]]; return { 결: RX_NAME[rx[0]] + '을 드시는군요. 처방약과 약국 약을 함께 드실 때 조심할 것을 길잡이에 모아 두었어요.', 할: G && G.short ? [G.short] : [], 단: [단추(RX_NAME[rx[0]] + ' 길잡이', '/rx/' + rx[0], 1)] }; }
+    if (rx && 처방옛.indexOf(rx[0]) < 0 && ids.length >= 2) rx = null;   /* 11-19 새 갈래는 약 두 가지를 말하면 겹침 카드가 먼저 */
+    if (rx) { var G = typeof RXG !== 'undefined' && RXG && RXG.guides && RXG.guides[rx[0]]; return { 결: RX_NAME[rx[0]] + '을 드시는군요. 처방약과 약국 약을 함께 드실 때 조심할 것을 길잡이에 모아 두었어요.', 할: 길잡이줄(rx[0], t).concat(G && G.short ? [G.short] : []), 단: [단추(RX_NAME[rx[0]] + ' 길잡이', '/rx/' + rx[0], 1)] }; }
+    if (ids.length < 2) { var 팁 = 팁답(t, ids.length); if (팁) return 팁; }
     if (ids.length >= 2) { 묻기.약 = ids; return 겹침카드(ids); }
     if (ids.length === 1 && 갈 && 같이) { 묻기.약 = ids; 묻기.기다림 = 갈; return { 결: 갈래[갈].묻기 + ' 이름을 알면 겹치는지 바로 볼게요.', 할: [], 단: [], 칩: 갈래[갈].칩 }; }
     if (/아이|아기|애기|우리\s*애|애가|[0-9]+\s*개월/.test(t) && /얼마|몇|양|mL|ml|먹여|해열/i.test(t)) return { 결: '아이 해열제는 몸무게로 양을 정해요.', 할: ['계산 화면에서 시럽 mL·간격·하루 한도를 바로 볼 수 있어요.'], 단: [단추('아이 해열제 계산', '/kids', 1)] };
@@ -4244,7 +4391,7 @@ window.언어칸 = function () {
     return '<ul class="job-list">' + items.slice(0, 6).map(function (d) { var dk = d.class || ((typeof drug === 'function' && drug(d.id)) || {}).class, c0 = (D.classes || []).filter(function (c) { return c.id === dk; })[0], g = d.quick ? d.quick.g.n : c0 ? String(c0.name).split('(')[0].trim() : ''; return '<li><b>' + esc(String(d.name || '').split(' (')[0].indexOf('·') >= 0 ? 한이름(d.name) : 짧은이름(d.name)) + '</b>' + (g ? '<span>' + esc(g) + '</span>' : '') + '</li>'; }).join('') + (items.length > 6 ? '<li><a href="#/me?t=meds">' + (items.length - 6) + '가지 더 ›</a></li>' : '') + '</ul>';
   }
   window.내약더 = function () { var o = document.createElement('div'); o.className = 'dlg-bg'; o.setAttribute('role', 'dialog'); o.setAttribute('aria-label', '내 약 더 보기');
-    var L = [['#/notify', '알림', '약 시간 · 다시 알림 · 약 떨어짐'], ['#/send', '가족에게', '부모님께 약 보내기 · 함께 보기'], ['#/bag', '내 약 한 장', '진료·약국에 보여 줄 한 장'], ['#/me?t=meds', '약통', '담은 약 고치기 · 빼기'], ['#/barcode', '상자 바코드로 담기', '약 상자 옆 막대 무늬를 비춰서'], ['#/people', '가족 약 따로 담기', '어머니·아이 약을 사람마다']];
+    var L = [['#/notify', '알림', '약 시간 · 다시 알림 · 약 떨어짐'], ['#/send', '가족에게', '부모님께 약 보내기 · 함께 보기'], ['#/bag', '내 약 한 장', '진료·약국에 보여 줄 한 장'], ['#/me?t=meds', '약통', '담은 약 고치기 · 빼기'], ['#/barcode', '상자 바코드로 담기', '약 상자 옆 막대 무늬를 비춰서'], ['#/mhr', '나의건강기록 파일로 담기', '최근 1년 투약 이력 PDF에서 골라'], ['#/people', '가족 약 따로 담기', '어머니·아이 약을 사람마다']];
     o.innerHTML = '<div class="card th-sheet">' + L.map(function (x) { return '<a class="th-row" href="' + x[0] + '"><span><b>' + x[1] + '</b><small>' + x[2] + '</small></span>' + I.chev + '</a>'; }).join('') + '<button type="button" class="btn line" style="margin-top:12px;width:100%">닫기</button></div>';
     o.addEventListener('click', function (e) { if (e.target === o || e.target.tagName === 'BUTTON' || e.target.closest('a')) o.remove(); }); document.body.appendChild(o); var f = o.querySelector('a'); if (f) f.focus(); };
   function 내약칸() {

@@ -17,7 +17,7 @@ def 검사(묶, 조용히=False):
     for 뿌리, _, 파일들 in os.walk(묶):
         for f in 파일들:
             if not f.endswith(글확장): continue
-            if os.path.join('vendor', 'ocr') in os.path.relpath(os.path.join(뿌리, f), 묶): continue   # 약지도: 사진 글자 읽기 남의 도구(압축본) 속 글자는 길이 아니다
+            if os.path.join('vendor', 'ocr') in os.path.relpath(os.path.join(뿌리, f), 묶) or os.path.join('vendor', 'pdf') in os.path.relpath(os.path.join(뿌리, f), 묶): continue   # 약지도: 사진 글자 읽기 남의 도구(압축본) 속 글자는 길이 아니다
             p = os.path.join(뿌리, f)
             try: s = open(p, encoding='utf-8', errors='ignore').read()
             except Exception: continue

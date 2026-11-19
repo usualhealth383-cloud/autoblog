@@ -12,7 +12,7 @@ def ok(c, m):
     print(('  ✓ ' if c else '  ✘ ') + m)
     if not c: bad.append(m)
 with sync_playwright() as p:
-    b = p.chromium.launch(executable_path='/opt/pw-browsers/chromium-1194/chrome-linux/chrome', args=['--no-sandbox']); pg = b.new_page(viewport={'width': 390, 'height': 840}, locale='ko-KR')
+    b = p.chromium.launch(executable_path='/opt/pw-browsers/chromium', args=['--no-sandbox']); pg = b.new_page(viewport={'width': 390, 'height': 840}, locale='ko-KR')
     errs = []; pg.on('pageerror', lambda e: errs.append(str(e)))
     pg.add_init_script(SEED)
     pg.goto(URL + '#/home'); pg.wait_for_selector('.job-box, .th-mine', timeout=20000)

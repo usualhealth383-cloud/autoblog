@@ -10,7 +10,7 @@ ROUTES = ['/home', '/symptom/fever', '/symptom/headache', '/drug/acetaminophen',
 HANGUL = """()=>{let a=0,k=0;const w=document.createTreeWalker(document.querySelector('#view'),NodeFilter.SHOW_TEXT);while(w.nextNode()){const t=w.currentNode.textContent.trim();if(!t||!w.currentNode.parentElement.offsetParent)continue;a++;if(/[가-힣]/.test(t))k++;}return [k,a]}"""
 fails = []; rep = []
 with sync_playwright() as p:
-    b = p.chromium.launch(executable_path='/opt/pw-browsers/chromium-1194/chrome-linux/chrome', args=['--no-sandbox'])
+    b = p.chromium.launch(executable_path='/opt/pw-browsers/chromium', args=['--no-sandbox'])
     for L, CC, emg in LANGS:
         ko_left = [0, 0]
         for W in (320, 390, 1280):

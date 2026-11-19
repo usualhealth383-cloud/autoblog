@@ -281,7 +281,7 @@ print(f'첫 화면 {len(out)/1024:.0f} KB · 본문 data/core.json {len(jc)/1024
 _dd = ROOT.parent / 'docs' / 'yakjido' / 'data'
 _off = [{'n': f.name, 'b': f.stat().st_size} for f in sorted(_dd.glob('*.json')) if f.name != 'offline.json']
 _off_i = [{'n': f.name, 'b': f.stat().st_size} for f in sorted((_dd / 'i18n').glob('*.json'))] if (_dd / 'i18n').exists() else []
-_off_x = [{'n': str(f.relative_to(ROOT)), 'b': f.stat().st_size} for _d in ('fonts', 'vendor') if (ROOT / _d).exists() for f in sorted((ROOT / _d).rglob('*')) if f.is_file() and 'ocr' not in f.parts]   # 11-18 사진 글자 읽기 도구(약 12 MB)는 기내 받기에 넣지 않고 처음 쓸 때만
+_off_x = [{'n': str(f.relative_to(ROOT)), 'b': f.stat().st_size} for _d in ('fonts', 'vendor') if (ROOT / _d).exists() for f in sorted((ROOT / _d).rglob('*')) if f.is_file() and 'ocr' not in f.parts and 'pdf' not in f.parts]   # 11-18 사진 글자 읽기 도구(약 12 MB)는 기내 받기에 넣지 않고 처음 쓸 때만
 (_dd / 'offline.json').write_text(json.dumps({'data': _off, 'i18n': _off_i, 'ext': _off_x}, ensure_ascii=False, separators=(',', ':')), encoding='utf-8')
 # 찾아오기(10-27 Main · 요청서 20261027_찾아오기_중국) — medinanum.com 짧은 판 재료. 화면엔 안 보임. seo.json(검색제목·검색설명·찾는말 다섯 언어) + 글 첫 단락·할 일·이럴 땐 바로·주소·출처
 def _seo():

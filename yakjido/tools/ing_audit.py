@@ -12,7 +12,7 @@ import argparse, functools, http.server, json, pathlib, socketserver, threading
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 DOCS = ROOT.parent / 'docs' / 'yakjido'
 import os
-CHROME = '/opt/pw-browsers/chromium-1194/chrome-linux/chrome'
+CHROME = '/opt/pw-browsers/chromium'
 LAUNCH = {'executable_path': CHROME} if os.path.exists(CHROME) else {}   # 다른 컴퓨터에서는 Playwright 기본 브라우저
 
 JS = """async (files) => {

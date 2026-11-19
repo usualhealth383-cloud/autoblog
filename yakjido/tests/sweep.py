@@ -17,7 +17,7 @@ ROUTE_JS=(R.group(1)+R.group(2)).replace('\\"','"')
 res={'contrast':{},'ov':{},'tap':{}}
 def add(kind,key,where): res[kind].setdefault(key,[]).append(where)
 with sync_playwright() as p:
-    _c='/opt/pw-browsers/chromium-1194/chrome-linux/chrome'
+    _c='/opt/pw-browsers/chromium'
     b=p.chromium.launch(**({'executable_path':_c} if os.path.exists(_c) else {}))
     pg=b.new_page(viewport={'width':A.w,'height':844})
     pg.goto('http://localhost:8765/index.html#/home'); pg.wait_for_timeout(2500)

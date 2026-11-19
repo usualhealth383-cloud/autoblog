@@ -27,7 +27,7 @@ import argparse, http.server, json, os, socketserver, sys, threading, pathlib, f
 
 ROOT = pathlib.Path(__file__).resolve().parents[2]
 DOCS = ROOT / 'docs' / 'yakjido'
-CHROME = os.environ.get('CHROME', '/opt/pw-browsers/chromium-1194/chrome-linux/chrome')
+CHROME = os.environ.get('CHROME', '/opt/pw-browsers/chromium')
 # 제작PC 등 다른 컴퓨터: 그 경로가 없으면 Playwright 기본 브라우저(`python -m playwright install chromium`)를 쓴다
 if not os.path.exists(CHROME): CHROME = None
 LAUNCH = {'executable_path': CHROME} if CHROME else {}

@@ -98,7 +98,7 @@ return [...new Set(out)].slice(0,8);}"""
 def main():
     fails = []
     with sync_playwright() as p:
-        b = p.chromium.launch(executable_path='/opt/pw-browsers/chromium-1194/chrome-linux/chrome', args=['--no-sandbox'])
+        b = p.chromium.launch(executable_path='/opt/pw-browsers/chromium', args=['--no-sandbox'])
         def page(w, fs='17px', theme='light'):
             pg = b.new_page(viewport={'width': w, 'height': 800})
             pg.add_init_script(SEED + f";localStorage.setItem('yakjido.fs','{fs}');localStorage.setItem('yakjido.theme','{theme}')")

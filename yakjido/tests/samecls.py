@@ -9,7 +9,7 @@ srv=socketserver.TCPServer(('127.0.0.1',0),functools.partial(Q,directory=D)); th
 U=f'http://127.0.0.1:{srv.server_address[1]}/'
 SEED="localStorage.setItem('yakjido.hello.v1','1');localStorage.setItem('yakjido.consent.v1',JSON.stringify({v:'2026-10-20',at:'2026-11-18',terms:1,privacy:1}));"
 with sync_playwright() as p:
-    b=p.chromium.launch(executable_path='/opt/pw-browsers/chromium-1194/chrome-linux/chrome',args=['--no-sandbox'])
+    b=p.chromium.launch(executable_path='/opt/pw-browsers/chromium',args=['--no-sandbox'])
     pg=b.new_page(); pg.add_init_script(SEED); pg.goto(U+'#/home'); pg.wait_for_function("()=>typeof ixRun==='function'&&D.drugs&&D.drugs.length")
     pg.evaluate("()=>{pubIndexSoon&&pubIndexSoon();}"); pg.wait_for_function("()=>PUB.index&&PUB.index.length>100",timeout=60000)
     r=pg.evaluate("""()=>{ME.taking=[];const dr=id=>D.drugs.find(d=>d.id===id);

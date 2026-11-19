@@ -18,7 +18,7 @@ AXE_SRC = AXE.read_text(encoding='utf-8')
 URL = os.environ.get('YAKJIDO_URL', 'http://localhost:8765/index.html')
 res = collections.defaultdict(lambda: {'n': 0, 'impact': '', 'help': '', 'where': [], 'nodes': []})
 with sync_playwright() as p:
-    _c = '/opt/pw-browsers/chromium-1194/chrome-linux/chrome'
+    _c = '/opt/pw-browsers/chromium'
     b = p.chromium.launch(**({'executable_path': _c} if os.path.exists(_c) else {}))
     pg = b.new_page(viewport={'width': 390, 'height': 844})
     pg.goto(URL + '#/home'); pg.wait_for_timeout(2000)

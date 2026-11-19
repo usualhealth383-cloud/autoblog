@@ -22,7 +22,7 @@ SYMS = [x['id'] for x in json.load(open(D / 'data' / 'core.json', encoding='utf-
 VIS = "()=>[...document.querySelectorAll('#view .answer, #view .stabs, #view .pane, #view .ink-conc')].some(e=>e.offsetParent!==null)"
 fails, n = [], 0
 with sync_playwright() as p:
-    b = p.chromium.launch(executable_path='/opt/pw-browsers/chromium-1194/chrome-linux/chrome', args=['--no-sandbox'])
+    b = p.chromium.launch(executable_path='/opt/pw-browsers/chromium', args=['--no-sandbox'])
     for ink in ('1', '0'):
         ctx = b.new_context(locale='ko-KR', timezone_id='Asia/Seoul', viewport={'width': 390, 'height': 844}, service_workers='block')
         pg = ctx.new_page(); errs = []; pg.on('pageerror', lambda e: errs.append(str(e)))
