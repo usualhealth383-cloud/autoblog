@@ -6488,7 +6488,7 @@ window.vVitalsS = function(){
       <li><b>커프는 맨팔에, 손가락 하나가 들어갈 만큼만</b> 감으세요. 세게 감으면 높게 나와요.</li>
       <li>재는 동안 <b>말하지 않기</b>. 한 번 더 재서 두 번을 적으면 더 정확해요.</li>
       <li><b>아침</b> — 일어나 1시간 안, 소변 본 뒤, 혈압약 먹기 전 · <b>저녁</b> — 잠자기 전. <b>주 5일 이상</b> 재서 평균을 봐요.</li>
-    </ul><p class="why" style="margin-top:6px">가정혈압은 <b>135/85 mmHg 이상</b>이면 높은 것으로 봐요(대한고혈압학회 2022년 판 기준 — 2026년 새 판 원문은 확인 중이에요).</p>${srcChips(VREF.bp.src, true)}`
+    </ul><p class="why" style="margin-top:6px">가정혈압은 <b>135/85 mmHg 이상</b>이면 높은 것으로 봐요(대한고혈압학회 2026 제6판 기준).</p>${srcChips(VREF.bp.src, true)}`
     : `<ul class="how-list">
       <li><b>공복</b> — 아침 식사 전. 당뇨가 있으면 목표 <b>80~130 mg/dL</b></li>
       <li><b>식후 2시간</b> — 식사를 시작하고 2시간 뒤. 당뇨가 있으면 목표 <b>180 mg/dL 미만</b></li>
