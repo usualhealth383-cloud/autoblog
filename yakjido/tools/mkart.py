@@ -5,6 +5,7 @@ ROOT = pathlib.Path(__file__).resolve().parents[2] / 'docs' / 'yakjido'
 _CLOUD = pathlib.Path('/tmp/claude-0/-home-user-autoblog/cf2f6625-dcb1-56a6-b544-ead87bbf0fa1/scratchpad')
 OUT = pathlib.Path(os.environ['YAKJIDO_ART']) if os.environ.get('YAKJIDO_ART') else (_CLOUD if _CLOUD.exists() else pathlib.Path(__file__).resolve().parents[1] / '.build') / 'artifact' / 'yakson.html'
 s = (ROOT/'index.html').read_text(encoding='utf-8')
+import re as _re; s = _re.sub(r'<meta http-equiv="Content-Security-Policy"[^>]*>\n?', '', s, count=1)   # 11-23 CSP 는 배포판만 — 아티팩트는 claude.ai 가 따로 가둔다
 # 1) strip the outer document wrapper (Artifact adds its own)
 s = re.sub(r'^<!doctype html>\s*|^<html[^>]*>\s*|</html>\s*$', '', s, flags=re.I|re.M)
 s = re.sub(r'</?(head|body)[^>]*>\s*', '', s, flags=re.I)

@@ -140,6 +140,10 @@
   function 본문() {
     if (!DICT || typeof D === 'undefined' || !D) return;   /* D·RXG 는 앱 스크립트의 전역 const — window 속성이 아니다 */
     var S = DICT.sym || {};
+    /* 11-23 약 상식·생활 상식 글 — 글 자료째 바꾼다(본문 속 숫자 칸 때문에 문단 사전이 안 걸림 · 목록 요약 줄도 같이). 본문이 늦게 와 덮을 수 있어 그릴 때마다 */
+    var TP = DICT.tips || {};
+    (D.tips || []).forEach(function (t) { var e = TP[t.id]; if (!e) return;
+      if (e[0] && t.title !== e[0]) { REV[e[0]] = t.title; t.title = e[0]; } if (e[1] && t.body && t.body !== e[1]) t.body = e[1]; if (e[2] && t.linkText) t.linkText = e[2]; });
     (D.symptoms || []).forEach(function (s) {
       var t = S[s.id]; if (!t) return;   /* 본문(core.json)이 늦게 와 덮을 수 있어 그릴 때마다 다시 얹는다(값이 같으면 그대로) */
       if (t.name && s.name !== t.name) { REV[t.name] = s.name; s.name = t.name; } if (t.short) s.short = t.short;   /* REV — 약사에게 보일 한국어 칸(data-ko)에서 되돌리려고 */

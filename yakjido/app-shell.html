@@ -5,6 +5,7 @@
 <title>약지도 · 증상에 맞는 약 찾기·복약 알림</title>
 <meta name="description" content="증상별 일반의약품 선택 가이드·성분 비교·영양제 비교. 임상에서 처방하는 조합을 약국 구입 기준으로 풀어드립니다.">
 <link rel="manifest" href="manifest.webmanifest">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval' blob: https://t1.kakaocdn.net; style-src 'self' 'unsafe-inline'; font-src 'self' data:; img-src 'self' data: blob: https://nedrug.mfds.go.kr https://medinanum.com https://*.medinanum.com; media-src 'self' data: blob:; connect-src 'self' https://uszalzczpmyifzbamjno.supabase.co https://*.medinanum.com https://api.open-meteo.com https://air-quality-api.open-meteo.com; worker-src 'self' blob:; manifest-src 'self'; object-src 'none'; base-uri 'none'; form-action 'self' https://sharer.kakao.com">
 <meta name="theme-color" content="#0B6E8F"><meta name="color-scheme" content="light dark">
 <script>/* 11-17 밤 현욱님 결정 — 기본은 원래 약지도 판. 잉크 판은 ?ink=1 · 설정에서 켤 때만(보관). ?old=1 은 원래 판 */try{var _q=location.search.match(/[?&]ink=([01])/);if(/[?&]old=1/.test(location.search))_q=[0,'0'];if(_q)localStorage.setItem('yakjido.ink',_q[1]);var _f=location.search.match(/[?&]fam=([01])/);if(_f)localStorage.setItem('yakjido.fam',_f[1]);var _j=location.search.match(/[?&]job=([01])/);if(_j)localStorage.setItem('yakjido.job',_j[1]);if(localStorage.getItem('yakjido.ink')==='1'){document.documentElement.classList.add('ink');if(localStorage.getItem('yakjido.fam')==='1')document.documentElement.classList.add('fam');if(localStorage.getItem('yakjido.job')==='1')document.documentElement.classList.add('job');document.write('<link rel="stylesheet" href="ink.css">')}}catch(e){}</script>
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -5818,12 +5819,12 @@ function vDemo(_, q){
 function vSchedule(_, q){ return window.vScheduleS ? vScheduleS(_, q) : `${topBar({ back:'뒤로' })}<p class="loading" style="margin-top:8px">불러오는 중이에요…</p>`; }
 /* ───────── 혈압·혈당 수첩 ─────────
    메디세이프의 「측정값 기록」 자리. 기록은 이 휴대폰에만 둔다(ME.vitals).
-   기준 숫자는 검증된 것만: 가정혈압 135/85 mmHg — 대한고혈압학회 2018·2022.
+   기준 숫자는 검증된 것만: 가정혈압 135/85 mmHg — 대한고혈압학회 2018·2022·2026 제6판(44쪽, 원문 확인 11-23).
    «위험한 숫자»(예: 180/120)는 지침 원문에서 확인하지 못해 숫자로 겁주지 않고, 증상으로만 안내한다.
    혈당 기준(공복 80~130 · 식후 2시간 180 미만 · 70 미만 저혈당)은 현욱님 승인(2026-09-29), 근거 ADA 2025.
    아주 높은 혈압(180/120)은 «바르게 재고, 5분 쉬고 다시 잰 값»으로만 판단한다 — 커프를 세게 감거나
    팔을 심장보다 낮게 두고 재서 높게 나오는 분이 많다(현욱님). */
-const VREF = { bp: { s: 135, d: 85, hs: 180, hd: 120, lo: 90, ld: 60, src: ['ksh2018hbpm', 'ksh2022'] }, bg: { fLo: 80, fHi: 130, pHi: 180, hypo: 70, hi: 300, src: ['ada2025glyc'], hiSrc: ['umpierrez2024hhs'] } };
+const VREF = { bp: { s: 135, d: 85, hs: 180, hd: 120, lo: 90, ld: 60, src: ['ksh2026', 'ksh2018hbpm'] }, bg: { fLo: 80, fHi: 130, pHi: 180, hypo: 70, hi: 300, src: ['ada2025glyc'], hiSrc: ['umpierrez2024hhs'] } };
 /* Z9 B6 — 아주 높은 혈당(300 이상, 현욱님 10-14 「증상에 따라 다르지, 케톤산증·고삼투압 감별, 식사에 따라 다르고」): 숫자만으로 겁주지 않고
    식사(공복/식후)와 증상 칩으로 나눈다. 증상 있으면 바로 진료·119, 없고 식후면 다시 재기, 없고 공복이면 오늘 진료. 고른 칩은 화면 기억만(저장 안 함) */
 const BG_SYM = ['구토·복통', '숨이 가쁘거나 숨에서 과일 냄새', '심한 갈증·소변이 많음', '기운이 없고 처짐·의식이 흐림', '없음'];

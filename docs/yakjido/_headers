@@ -1,0 +1,23 @@
+# 약지도 — 메디나눔 공용 보안 헤더(yozm-health _도구/보안_공용/_headers)에서. camera=(self): 바코드·약 사진 읽기 · geolocation=(self): 내 위치 날씨
+# 원본: 메디나눔 공용 보안 헤더 — 2026-11-23 (보안점검_1121 §3)
+# 쓰는 법: 이 파일을 그대로 각 앱의 _배포/ 맨 위에 「_headers」 라는 이름으로 둔다(이름에 확장자 없음).
+#          짓기 도구가 _배포/ 를 다시 만든다면, 짓기 끝에 이 파일을 복사하는 줄을 넣는다(안 그러면 다음 짓기에 사라진다).
+# 확인: 배포 뒤 `curl -sI https://<앱>.medinanum.com/ | grep -i -E 'x-frame|referrer|content-type-options|permissions|strict-transport'`
+# 주의: Content-Security-Policy 전체는 여기 두지 않는다 — 앱마다 다르므로 각 앱 HTML 의 meta 로 둔다(§2 · 본보기 csp_본보기.txt).
+#       여기 둔 frame-ancestors 는 meta 로는 적용되지 않아 헤더로만 걸 수 있는 항목이다.
+#
+# ⚠️ 11-23 길동무가 찾은 두 가지 — 그대로 복사하면 앱 기능이 죽는다. 자기 앱을 보고 정하라.
+#   · Permissions-Policy 의 geolocation : 「가까운 병원·응급실 찾기」가 있으면 반드시 geolocation=(self).
+#     그 기능이 없는 앱만 geolocation=() 로 좁힌다. 아래는 (self) 로 두었다.
+#   · Cross-Origin-Opener-Policy: same-origin 은 **아래에서 뺐다.** 앱끼리 window.opener 로 주고받는
+#     「홈 보내기」류 부품이 끊긴다(길동무·소아 해당). 그런 부품이 없는 앱만 직접 한 줄 더하라.
+#   · camera / microphone 도 쓰는 앱(사진 올리기·녹음)이 있으면 그 앱에서 (self) 로 바꾼다.
+# 넣은 뒤 반드시: 그 기능을 **실제로 한 번 써 보고** 되는지 확인한다.
+
+/*
+  X-Frame-Options: DENY
+  Content-Security-Policy: frame-ancestors 'none'
+  Referrer-Policy: strict-origin-when-cross-origin
+  X-Content-Type-Options: nosniff
+  Permissions-Policy: camera=(self), microphone=(), geolocation=(self), payment=(), usb=()
+  Strict-Transport-Security: max-age=31536000; includeSubDomains
