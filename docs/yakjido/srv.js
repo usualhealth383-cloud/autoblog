@@ -3449,7 +3449,8 @@ try {
       var f = ((설정.자료 || {}).기능 || []).filter(function (x) { return x.id === id; })[0];
       if (!f || !f.가기) return;
       닫기();
-      setTimeout(function () { try { if (typeof f.가기 === 'function') f.가기(); else (new Function(f.가기))(); } catch (e) {} }, 60);
+      setTimeout(function () { try { if (typeof f.가기 === 'function') f.가기(); else String(f.가기).split(';').forEach(function (c) {   /* 11-23 보안 — new Function 대신 이름 표(CSP 'unsafe-eval' 없이) */
+            var m = c.trim().match(/^(go|openSheet|closeSheet|toast)\((?:'([^']*)')?\)$/); if (m && typeof window[m[1]] === 'function') window[m[1]](m[2]); }); } catch (e) {} }, 60);
     },
     알림받기: function () {
       씀('notify', Date.now());
