@@ -43,6 +43,11 @@ def tally(S, tag):
 S = list(zip(Q, A))
 for k in sorted(BUN): tally([s for s in S if s[0]['묶음'] == k], f'묶음 {k}')
 if len(BUN) > 1: tally(S, '전체')
+if '--miss' in sys.argv:   # 문장은 찍지 않고 놓친 것의 갈래·간 곳만
+    mm = collections.Counter((x['갈래'], a['lv']) for x, a in S if x['급함'] == '지금119' and a['lv'] != '119')
+    tt = collections.Counter((x['갈래'], a['lv']) for x, a in S if x['급함'] == '오늘진료' and a['lv'] in ('집에서', '답없음'))
+    print('119 놓침 갈래:', ' · '.join(f'{g}→{l} {n}' for (g, l), n in mm.most_common()))
+    print('오늘진료→집 갈래:', ' · '.join(f'{g}→{l} {n}' for (g, l), n in tt.most_common()))
 if SHOW:
     out = ['번\t급함\t갈래\t함정\t애매\t앱\t말\t앱 첫 줄']
     for x, a in S: out.append('\t'.join(map(str, [x['번'], x['급함'], x['갈래'], x['함정'], x['애매'], a['lv'], x['말'], a['t'][:90]])).replace('\n', ' '))
