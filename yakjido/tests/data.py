@@ -19,7 +19,7 @@ SRC = {}
 for f in sorted(glob.glob(str(C / 'sources*.json'))): SRC.update(json.load(open(f, encoding='utf-8')))   # 빌드와 같이 part 파일을 합친다
 IX = json.load(open(C / 'interactions.json', encoding='utf-8'))
 ING = json.load(open(C / 'ingredients.json', encoding='utf-8'))
-shell = (ROOT / 'app-shell.html').read_text(encoding='utf-8')
+shell = (ROOT / 'app-shell.html').read_text(encoding='utf-8') + (ROOT / 'srv.js').read_text(encoding='utf-8')   # 11-19 화면 본체 일부가 srv.js 로
 icons = set(re.findall(r"\bI\.(\w+)\s*=", shell)) | set(re.findall(r"^\s*(\w+):\s*'<svg", shell, re.M))
 sid, did, kid, supid = {s['id'] for s in S}, {d['id'] for d in D}, {k['id'] for k in K}, {x['id'] for x in SUP}
 quick = {f"{g['id']}" for g in ING.get('quick', [])} | {s['id'] for g in ING.get('quick', []) for s in g.get('subs', [])}
@@ -48,7 +48,7 @@ for r in IX['rules']:
     if not r.get('organ') or r['organ']['ico'] not in icons: fails.append(f'규칙 {r["id"]} 장기 아이콘 없음 → {r.get("organ")}')
     if not re.search(r'\*\*', r.get('why', '') + r.get('do', '')): pass
 def route_ok(link):
-    m = re.match(r'^/(symptom|drug|class|supp|kinds|tips|me|schedule|pill|photo|together|bag|kids|mix|about|drugs|hello|senior|rxout)(?:/([^?]+))?', link or '')
+    m = re.match(r'^/(symptom|drug|class|supp|kinds|tips|me|schedule|pill|photo|together|bag|kids|mix|about|drugs|hello|senior|rxout|hives)(?:/([^?]+))?', link or '')
     if not m: return False
     kind, x = m.group(1), m.group(2)
     if kind == 'symptom': return x in sid
@@ -73,7 +73,7 @@ for d in D:
     if d.get('rx') == '전문' and not d.get('otcAlt'): fails.append(f'처방약 {d["id"]}: otcAlt 가 없습니다(약국에 없으면 has:false 로 적어 주세요)')
 
 # 팁에는 갈래(group)가 있어야 «알아두면 좋은 것» 화면에서 제자리에 들어간다
-TIPG = {'약 이름과 고르기', '제대로 드시는 법', '조심할 것', '열·감기·배탈일 때', '보관하고 버리기', '병원·헌혈 가실 때'}
+TIPG = {'약 이름과 고르기', '제대로 드시는 법', '조심할 것', '열·감기·배탈일 때', '보관하고 버리기', '병원·헌혈 가실 때', '생활 상식'}
 for t in T:
     if t.get('group') not in TIPG: fails.append(f'팁 {t["id"]} 갈래가 비었거나 모르는 이름 → {t.get("group")!r}')
 
@@ -559,7 +559,7 @@ for _name in ('lexicon', 'qa', 'nutrients', 'brands', 'mixes'):
     if _p.exists(): _sabbr(json.loads(_p.read_text(encoding='utf-8')), '', '', f'data/{_name}.json ')
 
 # ⑥ 같은 것을 화면마다 다르게 부르지 않는다(2026-10-13 자체 검수 3-20) — 담는 곳은 「내 약통」, 술은 「술을 자주 마셔요」.
-_SHELL = (ROOT / 'app-shell.html').read_text(encoding='utf-8')
+_SHELL = (ROOT / 'app-shell.html').read_text(encoding='utf-8') + (ROOT / 'srv.js').read_text(encoding='utf-8')
 for _old, _new in (('지금 먹는 약으로 등록', '내 약통에 담기'), ('먹는 약에 담기', '내 약통에 담기'), ('내 약에 담기', '내 약통에 담기'), ('약통에 넣기', '내 약통에 담기'), ('술을 자주 드세요', '술을 자주 마셔요')):
     if _old in _SHELL: fails.append(f'app-shell.html 에 옛 이름 「{_old}」 — 「{_new}」로 통일')
 
