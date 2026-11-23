@@ -29,13 +29,17 @@ def tally(S, tag):
     c = collections.Counter
     n119 = [x for x, a in S if x['급함'] == '지금119']; today = [x for x, a in S if x['급함'] == '오늘진료']
     m1 = sum(1 for x, a in S if x['급함'] == '지금119' and a['lv'] != '119')
+    m1a = sum(1 for x, a in S if x['급함'] == '지금119' and a['lv'] == '오늘진료'); m1b = m1 - m1a
     m2 = sum(1 for x, a in S if x['급함'] == '오늘진료' and a['lv'] in ('집에서', '답없음'))
     m3 = sum(1 for x, a in S if x['급함'] == '오늘진료' and a['lv'] == '119')
     m4 = sum(1 for x, a in S if x['함정'] and a['lv'] == '119')
     m5 = sum(1 for x, a in S if a['lv'] == '답없음')
     m6 = c(a['lv'] for x, a in S if x['애매'])
     home119 = sum(1 for x, a in S if x['급함'] in ('집에서', '며칠안') and not x['함정'] and a['lv'] == '119')
-    print(f"{tag}: ① 지금119 놓침 {m1}/{len(n119)} · ② 오늘진료→집에서 {m2}/{len(today)} · ③ 오늘진료→119 {m3} · ④ 함정 거짓 경보 {m4}/{sum(1 for x,a in S if x['함정'])} · 집에서·며칠안(함정 아님)→119 {home119} · 답 없음 {m5}/{len(S)} · ⑥ 애매 {dict(m6)}")
+    ok = lambda x, a: (x['급함'] == '지금119' and a['lv'] == '119') or (x['급함'] == '오늘진료' and a['lv'] == '오늘진료') or (x['급함'] == '며칠안' and a['lv'] in ('오늘진료', '집에서')) or (x['급함'] == '집에서' and a['lv'] in ('집에서', '답없음'))
+    acc = sum(1 for x, a in S if ok(x, a)); over = sum(1 for x, a in S if x['급함'] == '집에서' and a['lv'] == '오늘진료')
+    print(f"{tag}: 단계 정확도 {acc}/{len(S)} · 집에서→오늘진료(과하게) {over}")
+    print(f"{tag}: ① 지금119 놓침 {m1}/{len(n119)}(오늘로 {m1a} · 집·답없음 {m1b}) · ② 오늘진료→집에서 {m2}/{len(today)} · ③ 오늘진료→119 {m3} · ④ 함정 거짓 경보 {m4}/{sum(1 for x,a in S if x['함정'])} · 집에서·며칠안(함정 아님)→119 {home119} · 답 없음 {m5}/{len(S)} · ⑥ 애매 {dict(m6)}")
 S = list(zip(Q, A))
 for k in sorted(BUN): tally([s for s in S if s[0]['묶음'] == k], f'묶음 {k}')
 if len(BUN) > 1: tally(S, '전체')
