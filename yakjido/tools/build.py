@@ -193,6 +193,11 @@ try:
     (ROOT.parent / 'docs' / 'yakjido' / 'data' / 'ix-shared.json').write_text(json.dumps(_share, ensure_ascii=False, separators=(',', ':')), encoding='utf-8')
     print('겹침 규칙 공유판:', len(_share['rules']), '규칙 ·', len(_share['ingredients']), '성분 ·', len(_share['sources']), '출처')
 except Exception as _e: print('겹침 규칙 공유판 실패:', _e)
+# 11-25 2층 겹침(약손에서 옮김 · 출처 확인 중) — 약통 겹침을 볼 때만 받는 따로 파일
+_l2p = ROOT / 'content' / 'interactions.layer2.json'
+if _l2p.exists():
+    _l2 = json.loads(_l2p.read_text(encoding='utf-8'))
+    (ROOT.parent / 'docs' / 'yakjido' / 'data' / 'ix2.json').write_text(json.dumps({'pairs': _l2['pairs'], 'groups': _l2['groups']}, ensure_ascii=False, separators=(',', ':')), encoding='utf-8')
 # 메디나눔 통합 찾기 목록(10-26 Main) — 다른 네 앱이 약지도 글을 찾을 때 받는 작은 목록. 본문은 빼고 제목·한 줄·찾는 말·길만(100 KB 안쪽)
 def _mnx():
     import glob as _g

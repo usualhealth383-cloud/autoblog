@@ -1818,8 +1818,8 @@ html:not(.ink) .rf-none{display:none}</style>
 <script>
 window.__YAKJIDO_OK__ = true;
 const D = JSON.parse(document.getElementById('data').textContent || '{}');
-const BUILD = '2026-11-25 22:35';
-const DATAV = '5890b00d15'.indexOf('__') === 0 ? BUILD : '5890b00d15';
+const BUILD = '2026-11-25 22:46';
+const DATAV = '1270c7d0ca'.indexOf('__') === 0 ? BUILD : '1270c7d0ca';
 const BRANDMARK = (typeof window !== 'undefined' && window.__BRANDMARK__) || 'icon-192.png';
 let CORE = 0, CORE_P = null;
 function mergeCore(c){
@@ -5022,6 +5022,8 @@ out.push({ name: ingrName(d), ings, known: ings.length > 0, from: '지금 보는
 }
 return out;
 }
+const IX2 = { d: null, p: null };
+function ix2Load(){ if (IX2.d || IX2.p) return IX2.p; IX2.p = fetch('data/ix2.json').then(r => r.ok ? r.json() : null).then(j => { IX2.d = j; if (j && typeof route === 'function' && /#\/(me|check|home|drug|bag)/.test(location.hash)) try { route(); } catch (e) {} }).catch(() => {}); return IX2.p; }
 function ixMatch(item, group){
 for (const e of item.ings) {
 for (const g of group) {
@@ -5032,7 +5034,7 @@ else if ((e.cls || []).includes(g)) return e;
 return null;
 }
 function ixRun(extra){
-const items = ixItems(extra);
+const items = ixItems(extra); if (!IX2.d && items.length > 1) ix2Load();
 const rules = [...(D.interactions?.rules || []), ...suppIxRules()];
 const flags = activeFlags();
 const hits = [];
@@ -5075,7 +5077,15 @@ const mildE = e => !!e && (e.cls || []).length > 0 && e.cls.every(c => MILD_DUP.
 const nm = (g, e) => g.items.map(it => it.raw?.get(e.k)).find(Boolean) || e.n;
 const groups = [...pairs.values()].map(g => ({ items: g.items, es: g.es.filter(Boolean).sort((a, b) => (b.k === 'acetaminophen') - (a.k === 'acetaminophen')), all: g.items.every(it => sig(it) === sig(g.items[0])) }))
 .map(g => Object.assign(g, { mild: g.es.every(mildE), names: [...new Set(g.es.map(e => ingrNameK(nm(g, e))))] }));
-return { items, hits: keep, dupe: dupe.filter(d => !mildE(d.e)), dupeGroups: groups.filter(g => !g.mild), mild: groups.filter(g => g.mild), cond: ixCond(items, flags, keep), unknown: items.filter(x => !x.known) };
+const l2 = [], said2 = (x, y) => keep.some(h => h.items.includes(x) && h.items.includes(y)) || groups.some(g => g.items.includes(x) && g.items.includes(y));
+const sideM = (it, sd) => sd.k ? it.ings.some(e => e.k === sd.k) : sd.cls ? it.ings.some(e => (e.cls || []).some(c => sd.cls.includes(c))) : false;
+for (const r of [...(IX2.d?.pairs || []), ...(IX2.d?.groups || []).filter(g => g.갈래 !== '음식·기호품')]) {
+if (!r.보임) continue; const b = r.b || r.상대; if (!(r.a.k || r.a.cls) || !(b.k || b.cls)) continue;
+const x = items.find(it => sideM(it, r.a)); if (!x) continue; const y = items.find(it => it !== x && sideM(it, b)); if (!y || said2(x, y)) continue;
+if (l2.some(o => o.items.includes(x) && o.items.includes(y))) continue;
+l2.push({ r, items: [x, y] });
+}
+return { l2, items, hits: keep, dupe: dupe.filter(d => !mildE(d.e)), dupeGroups: groups.filter(g => !g.mild), mild: groups.filter(g => g.mild), cond: ixCond(items, flags, keep), unknown: items.filter(x => !x.known) };
 }
 const MILD_DUP = new Set(['gi-enzyme', 'gi-gas', 'udca', 'probiotic', 'supp', 'herbal', 'oral-gum']);
 function ixCond(items, f, hits){
@@ -5121,7 +5131,9 @@ for (const h of res.hits) if (!merged.includes(h)) C.push({ lv: h.r.lv, items: h
 organ: h.r.organ, do: `<p>${fmt(h.r.do)}</p>`, why: h.r.why ? `<p class="ix-why">${fmt(h.r.why)}</p>` : '', src: h.r.src });
 if (res.mild.length) C.push({ lv: 'info', items: [...new Set(res.mild.flatMap(g => g.items))], t: '비슷한 소화제가 겹쳐요',
 sub: res.mild.map(g => `<p class="ix-why">${res.mild.length > 1 ? `<b>${g.items.map(i => esc(i.name)).join(' + ')}</b> — ` : ''}${g.names.map(esc).join(' · ')}</p>`).join(''), do: '<p>함께 드실 필요는 없어요 — 한 가지만 드셔도 돼요.</p>' });
-return C.sort((a, b) => ORD.indexOf(a.lv) - ORD.indexOf(b.lv));
+for (const h of (res.l2 || [])) C.push({ lv: 'info', l2: 1, items: h.items, t: '함께 볼 필요가 있다고 적혀 있어요', tag: '근거 확인 중',
+do: '<p>근거는 아직 확인 중이에요 — 약사·의사에게 한 번 물어보세요.</p>', why: `<p>적혀 있는 내용: ${esc([].concat(h.r.원문 || []).join(' · ') || h.r.why || '')}</p>`, src: [] });
+return C.sort((a, b) => ORD.indexOf(a.lv) - ORD.indexOf(b.lv) || (a.l2 || 0) - (b.l2 || 0));
 }
 function ixJump(k){ const el = document.getElementById('ixg-' + k); if (!el) return; if (el.tagName === 'DETAILS') el.open = true;
 el.scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'start' }); }
