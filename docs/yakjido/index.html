@@ -1818,8 +1818,8 @@ html:not(.ink) .rf-none{display:none}</style>
 <script>
 window.__YAKJIDO_OK__ = true;
 const D = JSON.parse(document.getElementById('data').textContent || '{}');
-const BUILD = '2026-11-25 22:46';
-const DATAV = '1270c7d0ca'.indexOf('__') === 0 ? BUILD : '1270c7d0ca';
+const BUILD = '2026-11-25 23:01';
+const DATAV = '27587d7e8b'.indexOf('__') === 0 ? BUILD : '27587d7e8b';
 const BRANDMARK = (typeof window !== 'undefined' && window.__BRANDMARK__) || 'icon-192.png';
 let CORE = 0, CORE_P = null;
 function mergeCore(c){
@@ -5085,6 +5085,12 @@ const x = items.find(it => sideM(it, r.a)); if (!x) continue; const y = items.fi
 if (l2.some(o => o.items.includes(x) && o.items.includes(y))) continue;
 l2.push({ r, items: [x, y] });
 }
+for (const r of (IX2.d?.dups || [])) {
+if (!r.보임 || !(r.a.k || r.a.cls) || !(r.b.k || r.b.cls)) continue;
+const x = items.find(it => sideM(it, r.a)); if (!x) continue; const y = items.find(it => it !== x && sideM(it, r.b)); if (!y || said2(x, y)) continue;
+if (l2.some(o => o.items.includes(x) && o.items.includes(y))) continue;
+l2.push({ r, items: [x, y], dup: 1 });
+}
 return { l2, items, hits: keep, dupe: dupe.filter(d => !mildE(d.e)), dupeGroups: groups.filter(g => !g.mild), mild: groups.filter(g => g.mild), cond: ixCond(items, flags, keep), unknown: items.filter(x => !x.known) };
 }
 const MILD_DUP = new Set(['gi-enzyme', 'gi-gas', 'udca', 'probiotic', 'supp', 'herbal', 'oral-gum']);
@@ -5131,7 +5137,7 @@ for (const h of res.hits) if (!merged.includes(h)) C.push({ lv: h.r.lv, items: h
 organ: h.r.organ, do: `<p>${fmt(h.r.do)}</p>`, why: h.r.why ? `<p class="ix-why">${fmt(h.r.why)}</p>` : '', src: h.r.src });
 if (res.mild.length) C.push({ lv: 'info', items: [...new Set(res.mild.flatMap(g => g.items))], t: '비슷한 소화제가 겹쳐요',
 sub: res.mild.map(g => `<p class="ix-why">${res.mild.length > 1 ? `<b>${g.items.map(i => esc(i.name)).join(' + ')}</b> — ` : ''}${g.names.map(esc).join(' · ')}</p>`).join(''), do: '<p>함께 드실 필요는 없어요 — 한 가지만 드셔도 돼요.</p>' });
-for (const h of (res.l2 || [])) C.push({ lv: 'info', l2: 1, items: h.items, t: '함께 볼 필요가 있다고 적혀 있어요', tag: '근거 확인 중',
+for (const h of (res.l2 || [])) C.push({ lv: 'info', l2: 1, items: h.items, t: h.dup ? (/같은 일/.test(h.r.말투 || '') ? '같은 일을 하는 약이 겹칠 수 있어요' : '같은 성분이 두 번 들어갈 수 있어요') : '함께 볼 필요가 있다고 적혀 있어요', tag: '근거 확인 중',
 do: '<p>근거는 아직 확인 중이에요 — 약사·의사에게 한 번 물어보세요.</p>', why: `<p>적혀 있는 내용: ${esc([].concat(h.r.원문 || []).join(' · ') || h.r.why || '')}</p>`, src: [] });
 return C.sort((a, b) => ORD.indexOf(a.lv) - ORD.indexOf(b.lv) || (a.l2 || 0) - (b.l2 || 0));
 }
