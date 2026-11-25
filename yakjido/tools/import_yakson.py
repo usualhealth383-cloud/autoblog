@@ -1,89 +1,122 @@
-"""11-25 현욱님 결정(약손을 접고 약지도로) — 약손 겹침 자료를 약지도 2층으로 옮긴다.
-읽는 것: yozm-health med/약손_앱/_약지도로/겹침_성분.json · 겹침_분류.json(약손 쪽 정본, 지우지 않음)
-쓰는 것: yakjido/content/interactions.layer2.json (2층 · 출처 「확인중」 · 보임 false 는 숨김으로 남김)
-규칙: 1층(interactions.json)과 같은 짝이면 1층이 이기고 2층에서 뺀다. 방향은 적힌 그대로. 출처를 지어내지 않는다."""
-import json, re, sys, collections, pathlib
-ROOT = pathlib.Path(__file__).resolve().parents[1]
-Y = pathlib.Path(sys.argv[1] if len(sys.argv) > 1 else '/home/user/yozm-health/med/약손_앱/_약지도로')
-S = json.load(open(Y / '겹침_성분.json', encoding='utf-8'))['규칙']
-C = json.load(open(Y / '겹침_분류.json', encoding='utf-8'))['규칙']
-ING = json.load(open(ROOT / 'content/ingredients.json', encoding='utf-8'))['ing']
-R1 = json.load(open(ROOT / 'content/interactions.json', encoding='utf-8'))['rules']
-core = lambda n: re.sub(r'\s|\(.*?\)|（.*?）', '', n or '').split('·')[0].split('/')[0]
-idx = {}
-for e in ING:
-    for n in [e['n']] + e.get('aka', []): idx.setdefault(core(n), e)
-def ing_of(n):
-    c = core(n)
-    if not c: return None
-    if c in idx: return idx[c]
-    for k, e in idx.items():
-        if len(k) >= 3 and (k in c or (len(c) >= 3 and c in k)): return e
-    return None
-def side(n):
-    """성분이면 k, 갈래면 괄호 속 예시 성분들이 함께 가진 cls"""
-    e = ing_of(n)
-    inner = re.findall(r'[(（](.*?)[)）]', n or '')
-    ex = [ing_of(x) for x in re.split(r'[·,、]|\s등', inner[0])] if inner else []
-    ex = [x for x in ex if x]
-    if len(ex) >= 2:
-        common = set(ex[0].get('cls', []))
-        for x in ex[1:]: common &= set(x.get('cls', []))
-        common -= {'sed', 'supp'}
-        if common: return {'n': n, 'cls': sorted(common)}
-    if e: return {'n': n, 'k': e['k']}
-    return {'n': n}
-GKW = [('항응고', ['anticoag']), ('항혈소판', ['antiplt']), ('NSAID', ['nsaid']), ('소염진통', ['nsaid']), ('MAO', ['maob']), ('감초', ['herbal-licorice']),
-       ('QT', ['qt']), ('피임약', ['hormone']), ('에스트로겐', ['hormone']), ('수면제', ['sed']), ('신경안정제', ['sed']), ('진정제', ['sed']), ('항히스타민', ['anti1']),
-       ('항우울', ['antidep', 'ssri']), ('항부정맥', ['antiarrhythmic']), ('코막힘', ['decongest']), ('기침 억제', ['cough']), ('알파차단', ['alpha']),
-       ('오피오이드', ['opioid']), ('혈당약', ['dm']), ('피브레이트', ['fibrate']), ('젬피브로질', ['fibrate']), ('항진균', ['azole']), ('ARB', ['arb']),
-       ('PPI', ['ppi']), ('국소마취', ['anesthetic-top']), ('점안액', ['eye']), ('스테로이드', ['steroid'])]
-def side2(n):
-    s = side(n)
-    if s.get('k') or s.get('cls'): return s
-    cl = sorted({c for w, cs in GKW if w in (n or '') for c in cs})
-    return dict(s, cls=cl) if cl else s
-def m(s, group):
-    for g in group:
-        if g.startswith('k:'):
-            if s.get('k') == g[2:]: return True
-        else:
-            if g in (s.get('cls') or []): return True
-            if s.get('k') and g in next((e.get('cls', []) for e in ING if e['k'] == s['k']), []): return True
-    return False
-def in1(a, b):
-    for r in R1:
-        nd = r.get('need')
-        if nd and len(nd) == 2 and ((m(a, nd[0]) and m(b, nd[1])) or (m(b, nd[0]) and m(a, nd[1]))): return r['id']
-        if r.get('count') and (m(a, [r['count']['tag']]) and m(b, [r['count']['tag']])): return r['id']
-    return None
-pairs, drop, hitc = [], 0, collections.Counter()
-for r in S:
-    a, b = side(r['a이름']), side(r['b이름'])
-    h = in1(a, b)
-    if h: drop += 1; hitc[h] += 1; continue
-    pairs.append({'id': r['id'], 'a': a, 'b': b, '방향': 'both' if r.get('양쪽') else r.get('방향', 'a→b'), 'why': r.get('why', ''), '원문': r.get('원문', []), '보임': bool(r.get('보임')), '층': 2, '출처': '확인중'})
-groups, gdrop = [], 0
-for i, r in enumerate(C):
-    a = side(r['성분이름']); p = side2(r['상대'])
-    food = r.get('갈래') == '음식·기호품'
-    if r.get('갈래') == '같은 성분 중복' and in1(a, a): gdrop += 1; continue
-    if not food and in1(a, p): gdrop += 1; continue
-    groups.append({'id': 'g%03d' % i, 'a': a, '상대': p if not food else {'n': r['상대']}, '갈래': r.get('갈래'), 'why': r.get('why', ''), '원문': r.get('원문', ''), '보임': bool(r.get('보임')), '층': 2, '출처': '확인중'})
-HY = [('돕습니다', '도와요'), ('않습니다', '않아요'), ('없습니다', '없어요'), ('있습니다', '있어요'), ('됩니다', '돼요'), ('합니다', '해요'), ('입니다', '이에요')]
-def tidy(x):
-    if isinstance(x, list): return [tidy(v) for v in x]
-    if isinstance(x, dict): return {k: tidy(v) for k, v in x.items()}
-    if isinstance(x, str):
-        for a_, b_ in HY: x = x.replace(a_, b_)
-        return re.sub(r'(\d)(mg|g|mL|ml|kg|정|시간)\b', r'\1 \2', x)
-    return x
-pairs = tidy(pairs); groups = tidy(groups)
-can = lambda s: bool(s.get('k') or s.get('cls'))
-out = {'meta': {'about': '2층 — 약손(11-25 접음)에서 옮긴 겹침. 출처는 모두 확인중이라 화면에서 단정하지 않는다. 보임 false 는 숨김(데이터는 남김). 1층과 같은 짝은 뺐다.', 'from': 'yozm-health med/약손_앱/_약지도로 (11-25)'}, 'pairs': pairs, 'groups': groups}
-(ROOT / 'content/interactions.layer2.json').write_text(json.dumps(out, ensure_ascii=False, indent=1), encoding='utf-8')
-P = [p for p in pairs]; G = [g for g in groups]
-print('1층', len(R1))
-print('성분 짝 %d → 1층과 겹쳐 뺌 %d · 2층 %d (걸림 가능 %d · 안 걸림 %d / 보임 %d · 숨김 %d)' % (len(S), drop, len(P), sum(can(p['a']) and can(p['b']) for p in P), sum(not (can(p['a']) and can(p['b'])) for p in P), sum(p['보임'] for p in P), sum(not p['보임'] for p in P)))
-print('  겹친 1층:', hitc.most_common(10))
-print('분류 %d → 1층과 겹쳐 뺌 %d · 새 칸 %d (약 갈래 걸림 가능 %d · 음식 %d · 안 걸림 %d / 보임 %d · 숨김 %d)' % (len(C), gdrop, len(G), sum(g['갈래'] != '음식·기호품' and can(g['a']) and can(g['상대']) for g in G), sum(g['갈래'] == '음식·기호품' for g in G), sum(g['갈래'] != '음식·기호품' and not (can(g['a']) and can(g['상대'])) for g in G), sum(g['보임'] for g in G), sum(not g['보임'] for g in G)))
+#!/usr/bin/env python3
+"""약손 세션의 성분·제품·질문·영양제 사전을 약지도 데이터로 옮긴다.
+
+원본: yakjido/tools/yakson/*.json  (약손 검토본 아티팩트 2026-09-08판에서 추출)
+출력: docs/yakjido/data/{lexicon,brands,qa,nutrients}.json  — 앱이 검색을 처음 쓸 때 지연 로드한다.
+
+하는 일
+ 1) 약지도가 이미 깊게 쓴 성분(content/drugs*.json)과 이름·영문명으로 맞춰 `drug` 링크를 단다.
+    링크가 있으면 앱은 /ingr/ 대신 /drug/ 상세로 보낸다.
+ 2) 일반·전문 분류를 식약처 공공데이터(pills.json·pills-rx.json·easy-index.json)와 대조해 정정한다.
+ 3) 영양제도 같은 방식으로 약지도 supplements 와 연결한다.
+
+⚠️ (10-20) 배포본 lexicon.json 은 import 뒤 손으로 고친 것이 있다(글 규칙 다듬기 · 10-20 식약처 허가 품목
+   확인 출처 16곳 · 예시 제품 성분 불일치 5곳(더모픽스·프렌즈아이드롭·미안케어·코프로진·코앤쿨) · 치질 연고 d_hemo 를 허가 성분대로 다시 씀 — 예전 예시 파사렉트연고는 니트로글리세린 전문약이었다).
+   10-21 성분 사전·질문 답·영양 성분·같이 먹기 네 파일의 「~합니다」체 약 1,600곳을 「~해요」체로 바꿈.
+   다시 돌리면 이것이 사라진다. 고칠 땐 lexicon.json 을 직접 고친다.
+"""
+import json, glob, re, pathlib
+
+ROOT = pathlib.Path(__file__).resolve().parent.parent      # yakjido/
+SRC  = ROOT / 'tools' / 'yakson'
+OUT  = ROOT.parent / 'docs' / 'yakjido' / 'data'
+
+# 식약처 공공데이터 대조로 확인한 정정 (import 시점에 재확인 가능하도록 근거를 함께 적는다)
+FIX = {
+    'p_tol': ('rx',  '식약처 e약은요에 일반의약품이 없어 전문으로 바로잡았어요'),
+    'p_mcb': ('rx',  '식약처 e약은요에 일반의약품이 없어 전문으로 바로잡았어요'),
+    'r_bpp': ('otc', '식약처 낱알식별에 일반의약품(투렌정)이 있어 일반으로 바로잡았어요'),
+}
+NOTE = {
+    'pse': '단일제는 전문의약품이에요. 약국에서는 종합감기약 등 복합제 형태로만 살 수 있습니다(식약처 e약은요 확인).',
+}
+# 영문·한글 이름이 같아도 «제형·용도가 다르면 다른 약»이다. 이름만 보고 연결하면
+# 입술 포진에 먹는 대상포진약을, 발뒤꿈치에 인후통 트로키를 권하게 된다.
+# 여기 적힌 것은 약지도 해설로 보내지 않고 사전 항목 그대로 쓴다.
+NO_LINK = {
+    'u_acv': '크림(일반)과 먹는 약(전문)이 다르다 — 약지도 acyclovir 는 먹는 대상포진약',
+    'p_flb': '파스(외용)와 인후통 트로키가 다르다 — 약지도 flurbiprofen 은 트로키',
+    'dic':   '먹는 약(전문)과 바르는 겔(일반)이 다르다 — 사전은 둘을 묶어 설명한다',
+}
+RXW = {'otc': '일반', 'rx': '전문', 'both': '둘 다'}
+
+
+def load(name):
+    return json.loads((SRC / f'{name}.json').read_text(encoding='utf-8'))
+
+
+def yakjido_drugs():
+    out = {}
+    for f in sorted(glob.glob(str(ROOT / 'content' / 'drugs*.json'))):
+        for d in json.loads(pathlib.Path(f).read_text(encoding='utf-8')):
+            out[d['id']] = d
+    return out
+
+
+def main():
+    ING, BRAND, QADB, NUT = load('ING'), load('BRAND'), load('QADB'), load('NUT')
+    mine = yakjido_drugs()
+    by_en = {(d.get('en') or '').lower().split('(')[0].strip(): i for i, d in mine.items() if d.get('en')}
+    by_nm = {d['name'].split('(')[0].strip(): i for i, d in mine.items()}
+
+    # 생약·한방 처방은 «근거가 약하다»는 사실을 화면에서 숨기지 않는다.
+    # 추천 슬롯에는 넣지 않되, 약사가 권했을 때 무엇인지 알 수 있어야 한다.
+    HERB = ('생약', '한방')
+    lex = []
+    for x in ING:
+        k = FIX[x['id']][0] if x['id'] in FIX else x['k']
+        link = None if x['id'] in NO_LINK else (
+            by_en.get((x.get('en') or '').lower().split('(')[0].strip()) or by_nm.get(x['n'].split('(')[0].strip()))
+        o = {'id': x['id'], 'n': x['n'], 'en': x.get('en', ''), 'cls': x['cls'], 'rx': RXW[k],
+             'use': x.get('use', ''), 'dose': x.get('dose', ''), 'gap': x.get('gap', ''), 'max': x.get('max', ''),
+             'care': x.get('care', []), 'inter': x.get('inter', []), 'risk': x.get('risk', {}),
+             'preg': x.get('preg', ''), 'kid': x.get('kid', ''), 'ex': x.get('ex', []), 'src': x.get('src', [])}
+        if link:
+            o['drug'] = link
+        if x['id'] in FIX:
+            o['fixNote'] = FIX[x['id']][1]
+        if x['id'] in NOTE:
+            o['fixNote'] = NOTE[x['id']]
+        if any(h in x['cls'] for h in HERB):
+            o['herb'] = True
+        lex.append(o)
+
+    br = [{'n': b['n'], 'rx': RXW[b['k']], 'ing': b.get('ing', []), 'comp': b.get('comp', ''),
+           'use': b.get('use', ''), 'how': b.get('how', ''), 'who': b.get('who', '')} for b in BRAND]
+    qa = [{'k': q['k'], 'a': q['a'], 'go': q.get('go')} for q in QADB]
+
+    supps = []
+    for f in sorted(glob.glob(str(ROOT / 'content' / 'supplements*.json'))):
+        supps += json.loads(pathlib.Path(f).read_text(encoding='utf-8'))
+    norm = lambda t: re.sub(r'[\s·\-()]|비타민', '', t).lower()
+    smap = {}
+    for s in supps:
+        smap[norm(s['name'])] = s['id']
+        for part in re.split(r'[·/]', s['name']):
+            smap[norm(part)] = s['id']
+    nut = []
+    for x in NUT:
+        o = {k: x.get(k, '') for k in ('id', 'n', 'what', 'form', 'read', 'tip', 'with', 'ul')}
+        o['src'] = x.get('src', [])
+        hit = smap.get(norm(x['n'].split('(')[0]))
+        if hit:
+            o['supp'] = hit
+        nut.append(o)
+
+    OUT.mkdir(parents=True, exist_ok=True)
+    for name, data in [('lexicon', lex), ('brands', br), ('qa', qa), ('nutrients', nut)]:
+        p = OUT / f'{name}.json'
+        p.write_text(json.dumps(data, ensure_ascii=False, separators=(',', ':')), encoding='utf-8')
+        print(f'{name}.json  {len(data):4}건  {p.stat().st_size / 1024:.0f} KB')
+
+    meta = OUT / 'meta.json'
+    m = json.loads(meta.read_text(encoding='utf-8')) if meta.exists() else {}
+    m.update({'lexicon_count': len(lex), 'brands_count': len(br), 'qa_count': len(qa), 'nutrients_count': len(nut),
+              'lexicon_source': '약손 성분·제품 사전(2026-09-08판) — 식약처 허가사항·DUR 기준, '
+                                '분류는 식약처 e약은요·낱알식별과 대조해 정정'})
+    meta.write_text(json.dumps(m, ensure_ascii=False, indent=1), encoding='utf-8')
+    print(f'약지도 상세와 연결: 성분 {sum(1 for x in lex if x.get("drug"))}건 · 영양제 {sum(1 for x in nut if x.get("supp"))}건')
+
+
+if __name__ == '__main__':
+    main()
