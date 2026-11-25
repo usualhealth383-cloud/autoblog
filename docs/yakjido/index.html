@@ -398,6 +398,20 @@ a.link.crumb,.drug-hero a.cls,.sec>h2 small a.link{display:inline-flex;align-ite
 .row svg.chev{color:var(--faint)}
 .unote{display:flex;align-items:flex-start;gap:5px;font-size:.875rem;font-style:normal;font-weight:600;color:var(--caution);line-height:1.4;margin-top:4px;word-break:keep-all}
 .unote svg{width:14px;height:14px;flex:none;margin-top:2px}
+.fc{background:var(--card,#fff);border-radius:26px;padding:26px 20px 18px;text-align:center}
+.ring{width:150px;height:150px;margin:0 auto 14px;border-radius:50%;background:conic-gradient(var(--primary) 0 var(--pc,0%),var(--tint2) 0);display:grid;place-items:center}.ring>div{width:124px;height:124px;border-radius:50%;background:var(--card,#fff);display:grid;place-items:center}
+.ring b{font-size:34px;line-height:1;display:block}.ring b svg{width:40px;height:40px;color:var(--primary)}.ring small{display:block;font-size:15px;color:var(--muted);margin-top:4px}
+.fc-h{font-size:25px;margin:0 0 4px;line-height:1.3}.fc-s{font-size:17px;color:var(--muted);margin:0 0 18px}.fc-n{font-size:16.5px;line-height:1.6;margin:0 0 16px;word-break:keep-all}
+.strip{display:flex;justify-content:center;gap:10px;margin-bottom:12px}.strip .pop-pic{width:64px;height:64px;flex:none}.strip .pop-pic .pimg,.strip .pop-pic img{width:64px;height:64px}.more-n{align-self:center;font-weight:700;color:var(--muted)}
+.now-all{background:none;border:0;color:var(--primary);font-weight:700;font-size:16.5px;min-height:48px;margin-top:6px;cursor:pointer;width:100%}
+.nx{display:flex;align-items:center;width:100%;gap:12px;background:var(--card,#fff);border:0;border-radius:18px;padding:16px 18px;margin-top:12px;font:inherit;color:inherit;cursor:pointer;min-height:56px}.nx b{font-size:17px}.nx span{margin-left:auto;font-size:15px;color:var(--muted)}
+.streak{margin-top:12px;padding:14px 18px;border-radius:18px;background:var(--tint2);color:var(--primary-deep);font-size:16px;font-weight:700}
+.tl{position:relative;padding-left:28px;margin-top:16px}.tl:before{content:'';position:absolute;left:9px;top:12px;bottom:12px;width:2px;background:var(--line)}
+.sl{position:relative;margin-bottom:12px;display:block}.sl .dot{position:absolute;left:-28px;top:18px;width:20px;height:20px;border-radius:50%;background:var(--bg);border:2px solid var(--line)}
+.sl.done .dot{background:var(--ok,#2E6B47);border-color:var(--ok,#2E6B47)}.sl.now .dot{border-color:var(--primary);background:var(--primary);box-shadow:0 0 0 5px var(--tint2)}
+.sl .cl{background:var(--card,#fff);border-radius:16px;padding:14px 16px;display:flex;align-items:center;list-style:none;cursor:pointer;min-height:56px}.sl .cl::-webkit-details-marker{display:none}.sl .cl b{font-size:18px}.sl .cl>span:last-child{margin-left:auto;font-size:15px;color:var(--muted)}
+.sl.done .cl>span:last-child{color:var(--ok,#2E6B47);font-weight:700}.sl.late .cl>span:last-child{color:var(--danger,#B4362E);font-weight:700}.sl[open] .cl{border-radius:16px 16px 0 0}.sl>.now-i{background:var(--card,#fff)}.sl>.now-i:last-child{border-radius:0 0 16px 16px}
+.sl.now .big{background:var(--card,#fff);border-radius:18px;padding:18px;border:2px solid var(--primary)}.big small{font-size:15px;color:var(--primary-deep);font-weight:700}.big h2{font-size:22px;margin:2px 0 8px}.big .now-i{padding-left:0;padding-right:0}
 .now-t{font-size:15px;color:var(--muted);margin:4px 0 2px}.now-h{font-size:26px;line-height:1.3;margin:0 0 4px}.now-s{font-size:18px;margin:0 0 16px}
 .now-g{background:var(--card,#fff);border:1px solid var(--line);border-radius:16px;margin-bottom:10px;overflow:hidden}
 .now-g summary{list-style:none;display:flex;align-items:center;gap:12px;padding:14px;cursor:pointer;min-height:64px}.now-g summary::-webkit-details-marker{display:none}
@@ -1835,7 +1849,7 @@ html:not(.ink) .rf-none{display:none}</style>
 <script>
 window.__YAKJIDO_OK__ = true;
 const D = JSON.parse(document.getElementById('data').textContent || '{}');
-const BUILD = '2026-11-26 01:31';
+const BUILD = '2026-11-26 07:50';
 const DATAV = '95f42f29ff'.indexOf('__') === 0 ? BUILD : '95f42f29ff';
 const BRANDMARK = (typeof window !== 'undefined' && window.__BRANDMARK__) || 'icon-192.png';
 let CORE = 0, CORE_P = null;
@@ -2103,17 +2117,38 @@ const left = rows.filter(r => !r.done && !r.skip).sort((a, b) => a.min - b.min);
 const first = left.find(r => r.min <= nowMin + 30) || left[0];
 return { t: first.t, due: first.min <= nowMin + 30, rows: left.filter(r => r.t === first.t) };
 }
-function vNow(){
+function nowDay(){
+const taking = takingItems(), taken = takenSet(), now = new Date(), nowMin = now.getHours() * 60 + now.getMinutes(), M = new Map();
+for (const d of taking) for (const t of schedOf(d.id, d)) { const [h, m] = t.split(':').map(Number); if (!M.has(t)) M.set(t, { t, min: h * 60 + m, rows: [] }); M.get(t).rows.push({ d, t, done: taken.includes(d.id + '@' + t), skip: isSkipped(d.id + '@' + t) }); }
+return { nowMin, slots: [...M.values()].sort((a, b) => a.min - b.min) };
+}
+function nowRow(r){ return `<div class="now-i">${popPic(nowImg(r.d), r.d.name, 44)}<span><b>${esc(nowName(r.d.name))}</b><small>${esc([nowGroup(r.d), nowSim(r.d).split(/[.。]/)[0]].filter(Boolean).join(' · '))}</small></span><button class="now-more" onclick="go('/med/${encodeURIComponent(r.d.id)}')">자세히</button></div>`; }
+function vNow(a){
 nowPillsLoad(); const S = nowSlot();
 if (!S) return `${topBar({ back:'뒤로' })}<section class="sec now"><h1 class="now-h">드실 약을 담아 주세요</h1><p class="now-s">약을 담고 시간을 정하면 그때마다 알려 드려요.</p><button class="btn now-done" onclick="go('/schedule')">약 담고 시간 정하기</button></section>`;
-if (!S.rows.length) return `${topBar({ back:'뒤로' })}<section class="sec now"><h1 class="now-h">오늘 약은 다 챙기셨어요</h1><p class="now-s">잘하셨어요. 내일 다시 알려 드릴게요.</p></section>`;
-const G = new Map(); S.rows.forEach(r => { const g = nowGroup(r.d); if (!G.has(g)) G.set(g, []); G.get(g).push(r); });
-const n = S.rows.length, open = G.size <= 2 || n <= 4;
+const Dy = nowDay(), all = Dy.slots.flatMap(x => x.rows), done = all.filter(r => r.done).length, stk = streakDays();
+if (a === 'day') {   /* B — 하루 시간표 */
 return `${topBar({ back:'뒤로' })}<section class="sec now">
-<p class="now-t">${esc(hourWord(S.t))} · ${esc(S.t)}</p><h1 class="now-h">${S.due ? '지금 드실 약이에요' : '다음에 드실 약이에요'}</h1><p class="now-s">모두 ${n}가지</p>
-${[...G].map(([g, L]) => { const row = r => `<div class="now-i">${popPic(nowImg(r.d), r.d.name, 44)}<span>${L.length === 1 ? `<small class="now-gl">${esc(g)}</small>` : ''}<b>${esc(nowName(r.d.name))}</b>${nowSim(r.d) ? `<small>${esc(nowSim(r.d).split(/[.。]/)[0])}</small>` : ''}</span><button class="now-more" onclick="go('/med/${encodeURIComponent(r.d.id)}')">자세히 ›</button></div>`;
-return L.length === 1 ? `<div class="now-g one">${row(L[0])}</div>` : `<details class="now-g"${open ? ' open' : ''}><summary><span class="now-gi">${(NOW_G.find(x => x[0] === g) || [0, I.info])[1]}</span><span><b>${esc(g)}</b><small>${L.length}가지</small></span><i aria-hidden="true">${I.chev}</i></summary>${L.map(row).join('')}</details>`; }).join('')}
-${S.due ? `<button class="btn now-done" onclick="tickFromNote('${S.rows.map(r => r.d.id + '@' + r.t).join(',')}');toast('잘하셨어요 — 체크했어요');go('/home')">${n}가지 다 먹었어요</button><p class="now-n">하나만 드셨으면 약 화면에서 따로 체크할 수 있어요</p>` : ''}
+<p class="now-t">${esc(new Date().toLocaleDateString('ko-KR', { month: 'long', day: 'numeric', weekday: 'long' }))}</p><h1 class="now-h">오늘 약 ${Dy.slots.length}번 중 ${Dy.slots.filter(x => x.rows.every(r => r.done || r.skip)).length}번 드셨어요</h1>
+<div class="tl">${Dy.slots.map(x => { const ok = x.rows.every(r => r.done || r.skip), cur = S.rows.length && x.t === S.t, late = !ok && !cur && x.min < Dy.nowMin;
+if (cur) return `<div class="sl now"><span class="dot"></span><div class="big"><small>${S.due ? '지금' : '다음'} · ${esc(hourWord(x.t))}</small><h2>${x.rows.filter(r => !r.done && !r.skip).length}가지 드실 차례예요</h2>${x.rows.filter(r => !r.done && !r.skip).map(nowRow).join('')}
+${S.due ? `<button class="btn now-done" onclick="tickFromNote('${S.rows.map(r => r.d.id + '@' + r.t).join(',')}');toast('잘하셨어요 — 체크했어요');route()">${S.rows.length}가지 먹었어요</button>` : ''}</div></div>`;
+return `<details class="sl${ok ? ' done' : ''}${late ? ' late' : ''}"><summary class="cl"><span class="dot"></span><b>${esc(hourWord(x.t))} · ${x.rows.length}가지</b><span>${ok ? '드셨어요' : late ? '아직 안 드셨어요' : ''}</span></summary>${x.rows.map(nowRow).join('')}</details>`; }).join('')}</div>
+</section>`;
+}
+if (!S.rows.length) return `${topBar({ back:'뒤로' })}<section class="sec now"><div class="fc"><div class="ring" style="--pc:100%"><div><span><b>${I.check}</b><small>오늘</small></span></div></div><h1 class="fc-h">오늘 약은 다 챙기셨어요</h1><p class="fc-s">잘하셨어요. 내일 다시 알려 드릴게요.</p></div>
+${stk >= 2 ? `<div class="streak">${stk}일째 빠짐없이 드셨어요</div>` : ''}<button class="btn line now-all" onclick="go('/now/day')">오늘 시간표 보기</button></section>`;
+const nx = Dy.slots.find(x => x.min > (+S.t.split(':')[0] * 60 + +S.t.split(':')[1]) && x.rows.some(r => !r.done && !r.skip));
+const pc = all.length ? Math.round(done / all.length * 100) : 0;
+return `${topBar({ back:'뒤로' })}<section class="sec now">
+<div class="fc"><div class="ring" style="--pc:${pc}%" role="img" aria-label="오늘 약 ${all.length}가지 중 ${done}가지 드셨어요"><div><span><b>${esc(S.t)}</b><small>${esc(hourWord(S.t).split(' ')[0])}</small></span></div></div>
+<h1 class="fc-h">${S.due ? '지금 드실 약' : '다음에 드실 약'} ${S.rows.length}가지</h1>${(() => { const w = [...new Set(S.rows.map(r => nowSim(r.d)).filter(x => /식후|식전|식사|자기 전|취침|공복/.test(x)).map(x => (x.match(/(식후 ?\d*분?|식전 ?\d*분?|식사[^,.·]*|자기 전|취침 전|공복)/) || [])[0]).filter(Boolean))]; const allHave = S.rows.every(r => /식후|식전|식사|자기 전|취침|공복/.test(nowSim(r.d))); return `<p class="fc-s">${w.length === 1 && allHave ? esc(w[0]) + ' · ' : ''}물 한 컵과 함께</p>`; })()}
+<div class="strip">${S.rows.slice(0, 4).map(r => popPic(nowImg(r.d), r.d.name, 64)).join('')}${S.rows.length > 4 ? `<span class="more-n">+${S.rows.length - 4}</span>` : ''}</div>
+<p class="fc-n">${esc(S.rows.map(r => nowName(r.d.name).split(' ')[0]).join(' · '))}</p>
+${S.due ? `<button class="btn now-done" onclick="tickFromNote('${S.rows.map(r => r.d.id + '@' + r.t).join(',')}');toast('잘하셨어요 — 체크했어요');route()">${I.check} 먹었어요</button>` : ''}
+<button class="now-all" onclick="go('/now/day')">약 하나씩 보기 ›</button></div>
+${nx ? `<button class="nx" onclick="go('/now/day')"><b>다음은 ${esc(hourWord(nx.t))}</b><span>${nx.rows.length}가지</span></button>` : ''}
+${stk >= 2 ? `<div class="streak">${stk}일째 빠짐없이 드셨어요</div>` : ''}
 </section>`;
 }
 function medSpeech(id){ const it = takingItems().find(x => x.id === id); if (!it) return ''; return [it.name + '.', '이렇게 드세요.', ...medHow(it), '깜빡했을 때.', medMiss(it)].join(' ').replace(/\*\*/g, ''); }
