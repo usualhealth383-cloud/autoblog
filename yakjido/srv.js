@@ -6884,7 +6884,8 @@ window.vDrugFull = function (id, q = {}){
     return `<div class="dose-hero"><small>${isOral(d) ? '성인 1회 용량' : '쓰는 양'}</small><div class="big${pc ? ' pc' : ''}">${pc ? esc(pc[1].replace(/\s/g, '') + pc[2]) : fmt(d.dose.adult || '')}</div><small class="dl">${meta}</small>${d.dose.child ? `<small style="margin-top:6px">소아: ${fmt(d.dose.child)}</small>` : ''}</div>`; })() : ''}
   ${d.dose && !d.kidSel ? `<p class="small muted dose-src">식약처 허가 · 확인한 날 ${esc(D.meta?.labelCheck || '')}</p>` : ''}
   ${leadHtml(d.lead, 'margin-top:12px')}
-  ${d.erNote ? `<section class="ernote" aria-label="응급실 의사의 한마디" style="margin-top:12px;padding:14px 16px;border-radius:14px;background:var(--tint2);border-left:3px solid var(--primary)"><b style="display:block;font-size:15px;color:var(--primary-deep);margin-bottom:6px">응급실 의사의 한마디</b><div style="line-height:1.65;word-break:keep-all">${fmt(d.erNote)}</div></section>` : ''}
+  ${(() => { const E = Array.isArray(d.erNote) ? d.erNote : d.erNote ? [{ h: '', t: d.erNote }] : []; if (!E.length) return '';   /* 11-25 현욱님 「줄글이라 가독성이 떨어진다」 — 한 줄 요점 목록 · 누르면 설명 */
+    return `<section class="ernote" aria-label="응급실 의사의 한마디"><div class="ern-h">${I.user || ''}<b>응급실 의사의 한마디</b></div><ul class="ern-l">${E.map(x => x.t && x.h ? `<li><details><summary><span>${fmt(x.h)}</span><i aria-hidden="true">›</i></summary><div class="ern-t">${fmt(x.t)}</div></details></li>` : `<li><div class="ern-o">${fmt(x.h || x.t)}</div></li>`).join('')}</ul></section>`; })()}
   ${otcAltCard(d)}
   ${d.ach ? `<div class="usebar" style="${d.ach >= 2 ? '' : 'background:var(--tint2);color:var(--body)'}">${d.ach >= 2 ? I.alert : I.info}<span><b>항콜린 부담 ${esc(ACH_WORD[d.ach])}</b> — ${esc(d.achNote || '')}${d.achAlt ? '<br>' + fmt(d.achAlt) : ''}</span></div>` : ''}
   ${aeRemind(d)}

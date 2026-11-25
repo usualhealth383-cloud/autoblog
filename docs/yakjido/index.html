@@ -398,6 +398,13 @@ a.link.crumb,.drug-hero a.cls,.sec>h2 small a.link{display:inline-flex;align-ite
 .row svg.chev{color:var(--faint)}
 .unote{display:flex;align-items:flex-start;gap:5px;font-size:.875rem;font-style:normal;font-weight:600;color:var(--caution);line-height:1.4;margin-top:4px;word-break:keep-all}
 .unote svg{width:14px;height:14px;flex:none;margin-top:2px}
+.ernote{margin-top:14px;border-radius:14px;background:var(--tint2);padding:12px 14px 6px}
+.ern-h{display:flex;align-items:center;gap:6px;color:var(--primary-deep);font-size:14px;margin-bottom:4px}.ern-h svg{width:16px;height:16px}
+.ern-l{list-style:none;margin:0;padding:0}.ern-l li{border-top:1px solid var(--line,rgba(0,0,0,.06))}.ern-l li:first-child{border-top:0}
+.ern-l summary{display:flex;align-items:center;gap:8px;min-height:44px;padding:8px 0;font-weight:600;font-size:15.5px;line-height:1.45;cursor:pointer;list-style:none;word-break:keep-all}
+.ern-l summary::-webkit-details-marker{display:none}.ern-l summary span{flex:1}.ern-l summary i{font-style:normal;color:var(--muted,#888);transition:transform .15s}
+.ern-l details[open] summary i{transform:rotate(90deg)}.ern-t{padding:0 0 12px;line-height:1.65;font-size:15px;color:var(--body);word-break:keep-all}
+.ern-o{padding:10px 0;font-weight:600;font-size:15.5px;line-height:1.45;word-break:keep-all}
 .usebar{display:flex;align-items:flex-start;gap:8px;background:var(--caution-tint);color:var(--caution);border-radius:12px;padding:10px 12px;margin-top:10px;font-size:.875rem;font-weight:600;line-height:1.5;word-break:keep-all}
 .usebar svg{width:18px;height:18px;flex:none;margin-top:1px}
 ul.plain{list-style:none}
@@ -1811,8 +1818,8 @@ html:not(.ink) .rf-none{display:none}</style>
 <script>
 window.__YAKJIDO_OK__ = true;
 const D = JSON.parse(document.getElementById('data').textContent || '{}');
-const BUILD = '2026-11-25 22:31';
-const DATAV = '1266299640'.indexOf('__') === 0 ? BUILD : '1266299640';
+const BUILD = '2026-11-25 22:35';
+const DATAV = '5890b00d15'.indexOf('__') === 0 ? BUILD : '5890b00d15';
 const BRANDMARK = (typeof window !== 'undefined' && window.__BRANDMARK__) || 'icon-192.png';
 let CORE = 0, CORE_P = null;
 function mergeCore(c){
@@ -3264,7 +3271,7 @@ for (const id of (SEARCH_DRUG[qs] || [])) { const d = drug(id); if (d) out.push(
 (D.drugs || []).forEach(d => {
 const hitFor = (d.for || []).find(m);
 if (m(d.name) || m(d.en) || mAll(d.name, d.en, d.tagline)) out.push({ k:'성분', c:'', t:d.name, d:(cls(d.class)?.name || '') + ' · ' + (rxMix(d) || d.rx), h:'/drug/' + d.id, w:2 });
-else if (d.erNote && many && mAll(d.erNote) && !mAll(d.name, d.en, d.tagline, (d.for || []).join(' ')) && !hitFor) out.push({ k:'의사 한마디', c:'', t:d.name, d:'응급실 의사의 한마디에서 찾았어요', h:'/drug/' + d.id, w:1 });   /* 11-25 현욱님 — 약마다 응급실 의사 한마디도 찾기에 */
+else if (d.erNote && many && mAll([].concat(d.erNote).map(x => typeof x === 'string' ? x : (x.h || '') + ' ' + (x.t || '')).join(' ')) && !mAll(d.name, d.en, d.tagline, (d.for || []).join(' ')) && !hitFor) out.push({ k:'의사 한마디', c:'', t:d.name, d:'응급실 의사의 한마디에서 찾았어요', h:'/drug/' + d.id, w:1 });   /* 11-25 현욱님 — 약마다 응급실 의사 한마디도 찾기에 */
 else if (hitFor || mAll(d.name, d.en, d.tagline, (d.for || []).join(' '))) out.push({ k:'성분', c:'', t:d.name, d:(hitFor ? `‘${hitFor}’에 쓰는 · ` : '') + (cls(d.class)?.name || '') + ' · ' + (rxMix(d) || d.rx), h:'/drug/' + d.id, w:1 });
 (d.products || []).forEach(p => { if (!p.name.includes('·') && !p.name.includes(' 등') && m(p.name) && !(!(d.contains || []).length && comboName(p.name))) out.push({ k:'제품', c:'p', t:p.name, d:`${d.name} · ${p.amount || ''}`, h:'/drug/' + d.id + '?p=' + encodeURIComponent(p.name), w:2, seq:prodSeq(p.name) }); });
 });
