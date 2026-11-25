@@ -6884,8 +6884,15 @@ window.vDrugFull = function (id, q = {}){
     return `<div class="dose-hero"><small>${isOral(d) ? '성인 1회 용량' : '쓰는 양'}</small><div class="big${pc ? ' pc' : ''}">${pc ? esc(pc[1].replace(/\s/g, '') + pc[2]) : fmt(d.dose.adult || '')}</div><small class="dl">${meta}</small>${d.dose.child ? `<small style="margin-top:6px">소아: ${fmt(d.dose.child)}</small>` : ''}</div>`; })() : ''}
   ${d.dose && !d.kidSel ? `<p class="small muted dose-src">식약처 허가 · 확인한 날 ${esc(D.meta?.labelCheck || '')}</p>` : ''}
   ${leadHtml(d.lead, 'margin-top:12px')}
-  ${(() => { const E = Array.isArray(d.erNote) ? d.erNote : d.erNote ? [{ h: '', t: d.erNote }] : []; if (!E.length) return '';   /* 11-25 현욱님 「줄글이라 가독성이 떨어진다」 — 한 줄 요점 목록 · 누르면 설명 */
-    return `<section class="ernote" aria-label="응급실 의사의 한마디"><div class="ern-h">${I.user || ''}<b>응급실 의사의 한마디</b></div><ul class="ern-l">${E.map(x => x.t && x.h ? `<li><details><summary><span>${fmt(x.h)}</span><i aria-hidden="true">›</i></summary><div class="ern-t">${fmt(x.t)}</div></details></li>` : `<li><div class="ern-o">${fmt(x.h || x.t)}</div></li>`).join('')}</ul></section>`; })()}
+  ${(() => { const E = Array.isArray(d.erNote) ? d.erNote : d.erNote ? [{ s: d.erNote }] : []; if (!E.length) return '';   /* 11-25 현욱님 — 진료실 쪽지 꼴: 말하듯 두 문장 · 나머지는 더 보기 · 읽어 주기는 맨 아래 */
+    const say = x => fmt(x.s || x.h || x.t), top = E.slice(0, 2), rest = E.slice(2);
+    window.erSpeech = window.erSpeech || (id => { const z = drug(id); return z && z.erNote ? '응급실 의사가 드리는 말. ' + [].concat(z.erNote).map(x => (x.s || x.h || x.t || '').replace(/\*\*/g, '')).join(' ') : ''; });
+    return `<section class="ernote" aria-label="응급실 의사가 드리는 말"><div class="ern-h"><b>응급실 의사가 드리는 말</b><span>약 설명서에 덧붙여요</span></div>
+      ${top.map(x => `<p class="ern-s">${say(x)}</p>`).join('')}
+      ${rest.length ? `<details class="ern-more"><summary>더 보기 (${rest.length}가지) ›</summary>${rest.map(x => `<p class="ern-s">${say(x)}</p>`).join('')}</details>` : ''}
+      ${E.some(x => x.t) ? `<details class="ern-more ern-why"><summary>왜 그런지 자세히 ›</summary>${E.filter(x => x.t).map(x => `<p class="ern-t">${fmt(x.t)}</p>`).join('')}</details>` : ''}
+      <div class="ern-sg">— 응급의학과 의사 · 정답이 아니라 경험이에요</div>
+      ${speakBtn(`erSpeech('${d.id}')`, '의사의 말 읽어 주기')}</section>`; })()}
   ${otcAltCard(d)}
   ${d.ach ? `<div class="usebar" style="${d.ach >= 2 ? '' : 'background:var(--tint2);color:var(--body)'}">${d.ach >= 2 ? I.alert : I.info}<span><b>항콜린 부담 ${esc(ACH_WORD[d.ach])}</b> — ${esc(d.achNote || '')}${d.achAlt ? '<br>' + fmt(d.achAlt) : ''}</span></div>` : ''}
   ${aeRemind(d)}
