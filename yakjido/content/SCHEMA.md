@@ -71,3 +71,4 @@
 ## profile 필터 키(앱 내 저장, 전송 없음)
 `age`(성인/65세 이상/소아), `pregnant`, `ulcer`, `kidney`, `liver`, `heart`, `asthma`, `anticoag`, `alcohol`
 → drugs[].avoid/caution 에 위 키를 `flags:["ulcer","pregnant"]` 로 붙이면 화면에서 경고를 띄운다.
+- `erNote` (선택, 11-25 현욱님) — 응급실 의사의 한마디. 현욱님이 직접 쓴 글만(지어내지 않음). 해요체 · 글 규칙 그대로. 약 화면 첫 설명 바로 아래 카드 · 찾기에도 걸린다.

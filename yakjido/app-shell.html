@@ -3816,6 +3816,7 @@ function search0(q, noFix){
     /* 이름만 보면 「생리통」으로 찾아도 아세트아미노펜이 안 나왔다. 약마다 적힌 「이럴 때 씁니다(for)」도 본다. */
     const hitFor = (d.for || []).find(m);
     if (m(d.name) || m(d.en) || mAll(d.name, d.en, d.tagline)) out.push({ k:'성분', c:'', t:d.name, d:(cls(d.class)?.name || '') + ' · ' + (rxMix(d) || d.rx), h:'/drug/' + d.id, w:2 });
+    else if (d.erNote && many && mAll(d.erNote) && !mAll(d.name, d.en, d.tagline, (d.for || []).join(' ')) && !hitFor) out.push({ k:'의사 한마디', c:'', t:d.name, d:'응급실 의사의 한마디에서 찾았어요', h:'/drug/' + d.id, w:1 });   /* 11-25 현욱님 — 약마다 응급실 의사 한마디도 찾기에 */
     else if (hitFor || mAll(d.name, d.en, d.tagline, (d.for || []).join(' '))) out.push({ k:'성분', c:'', t:d.name, d:(hitFor ? `‘${hitFor}’에 쓰는 · ` : '') + (cls(d.class)?.name || '') + ' · ' + (rxMix(d) || d.rx), h:'/drug/' + d.id, w:1 });
     /* Z4 #1 — 단일 성분 항목의 제품 칸에 복합제 이름(구아이페네신 → 「판콜에이」)이 적혀 있다. 그 이름으로 찾으면 단일 성분 화면으로 가서
        내 약통에 구아이페네신 하나로 담기고, 속의 아세트아미노펜 겹침을 놓쳤다. 복합제 이름이면 단일 성분 쪽은 내지 않는다(복합제 항목·식약처 제품이 잡는다) */

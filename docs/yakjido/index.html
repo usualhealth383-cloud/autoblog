@@ -1811,8 +1811,8 @@ html:not(.ink) .rf-none{display:none}</style>
 <script>
 window.__YAKJIDO_OK__ = true;
 const D = JSON.parse(document.getElementById('data').textContent || '{}');
-const BUILD = '2026-11-24 00:15';
-const DATAV = 'b229253e17'.indexOf('__') === 0 ? BUILD : 'b229253e17';
+const BUILD = '2026-11-25 22:29';
+const DATAV = '5ad097ff02'.indexOf('__') === 0 ? BUILD : '5ad097ff02';
 const BRANDMARK = (typeof window !== 'undefined' && window.__BRANDMARK__) || 'icon-192.png';
 let CORE = 0, CORE_P = null;
 function mergeCore(c){
@@ -3264,6 +3264,7 @@ for (const id of (SEARCH_DRUG[qs] || [])) { const d = drug(id); if (d) out.push(
 (D.drugs || []).forEach(d => {
 const hitFor = (d.for || []).find(m);
 if (m(d.name) || m(d.en) || mAll(d.name, d.en, d.tagline)) out.push({ k:'성분', c:'', t:d.name, d:(cls(d.class)?.name || '') + ' · ' + (rxMix(d) || d.rx), h:'/drug/' + d.id, w:2 });
+else if (d.erNote && many && mAll(d.erNote) && !mAll(d.name, d.en, d.tagline, (d.for || []).join(' ')) && !hitFor) out.push({ k:'의사 한마디', c:'', t:d.name, d:'응급실 의사의 한마디에서 찾았어요', h:'/drug/' + d.id, w:1 });   /* 11-25 현욱님 — 약마다 응급실 의사 한마디도 찾기에 */
 else if (hitFor || mAll(d.name, d.en, d.tagline, (d.for || []).join(' '))) out.push({ k:'성분', c:'', t:d.name, d:(hitFor ? `‘${hitFor}’에 쓰는 · ` : '') + (cls(d.class)?.name || '') + ' · ' + (rxMix(d) || d.rx), h:'/drug/' + d.id, w:1 });
 (d.products || []).forEach(p => { if (!p.name.includes('·') && !p.name.includes(' 등') && m(p.name) && !(!(d.contains || []).length && comboName(p.name))) out.push({ k:'제품', c:'p', t:p.name, d:`${d.name} · ${p.amount || ''}`, h:'/drug/' + d.id + '?p=' + encodeURIComponent(p.name), w:2, seq:prodSeq(p.name) }); });
 });
