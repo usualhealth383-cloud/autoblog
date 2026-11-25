@@ -2324,7 +2324,12 @@ function nowGroup(it){ if (String(it.id).startsWith('supp:')) return '영양제'
 function medIngs(it){ const o = []; try { (it.d ? drugIngs(it.d) : it.pub?.ingr ? String(it.pub.ingr).split('|').flatMap(t => ingFind(t)) : ingFind(it.name)).forEach(e => { if (e && !o.includes(e)) o.push(e); }); } catch (e) {} return o; }
 const nowName = n => String(n || '').replace(/밀리그램|밀리그람/g, ' mg').replace(/([가-힣])(\d)/, '$1 $2').replace(/\s+/g, ' ').trim();
 const nowSim = it => /^라벨대로$/.test(String(it.simple || '').trim()) ? '' : String(it.simple || '').replace(/\*\*/g, '');
-const nowImg = it => pimg(it.name) || (it.pub ? pillImg(it.pub) : '') || pubImg(it.name);
+/* 11-25 현욱님 「약 사진은 공공데이터로 다 연결했잖아」 — 약통에 담은 처방약은 낱알식별(품목 번호)로 사진·생김새를 찾는다. 자료가 아직이면 받은 뒤 다시 그린다 */
+const nowPill = it => it.pub?.seq ? findPill(it.pub.seq) : null;
+let NOW_PL = false;
+function nowPillsLoad(){ if (NOW_PL || (PUB.pills && PUB.rx)) return; if (!takingItems().some(it => it.pub?.seq)) return; NOW_PL = true; Promise.all([pubPills(), pubPillsRx()]).then(() => { if (/^#\/(now|med)/.test(location.hash)) route(); }).catch(() => {}); }
+const nowLook = p => p ? [[p.c, p.c2].filter(Boolean).join('·'), p.sh, p.fm && !/정$/.test(p.sh || '') ? '' : ''].filter(Boolean).join(' ') + (p.f || p.b ? ` · 새김 ‘${[p.f, p.b].filter(Boolean).map(x => x === '마크' ? '회사 로고' : x).join(' / ')}’` : '') : '';
+const nowImg = it => pimg(it.name) || (nowPill(it) ? pillImg(nowPill(it)) : '') || (it.pub ? pillImg(it.pub) : '') || pubImg(it.name);
 function nowSlot(){
   const taking = takingItems(); if (!taking.length) return null; try { rollDay(); } catch (e) {}
   const taken = takenSet(), now = new Date(), nowMin = now.getHours() * 60 + now.getMinutes(), rows = [];
@@ -2334,7 +2339,7 @@ function nowSlot(){
   return { t: first.t, due: first.min <= nowMin + 30, rows: left.filter(r => r.t === first.t) };
 }
 function vNow(){
-  const S = nowSlot();
+  nowPillsLoad(); const S = nowSlot();
   if (!S) return `${topBar({ back:'뒤로' })}<section class="sec now"><h1 class="now-h">드실 약을 담아 주세요</h1><p class="now-s">약을 담고 시간을 정하면 그때마다 알려 드려요.</p><button class="btn now-done" onclick="go('/schedule')">약 담고 시간 정하기</button></section>`;
   if (!S.rows.length) return `${topBar({ back:'뒤로' })}<section class="sec now"><h1 class="now-h">오늘 약은 다 챙기셨어요</h1><p class="now-s">잘하셨어요. 내일 다시 알려 드릴게요.</p></section>`;
   const G = new Map(); S.rows.forEach(r => { const g = nowGroup(r.d); if (!G.has(g)) G.set(g, []); G.get(g).push(r); });
@@ -2361,13 +2366,13 @@ function medMiss(it){
   return '생각난 때 바로 드세요. 다음 드실 때가 가까우면 건너뛰고, 두 번 한꺼번에 드시지 마세요. 설명서나 약사 말이 다르면 그걸 따르세요.';
 }
 function vMed(id){
-  id = decodeURIComponent(id || ''); const it = takingItems().find(x => x.id === id);
+  nowPillsLoad(); id = decodeURIComponent(id || ''); const it = takingItems().find(x => x.id === id);
   if (!it) return `${topBar({ back:'뒤로' })}<section class="sec"><div class="empty card"><b>약통에 없는 약이에요</b></div></section>`;
   const ings = medIngs(it);
   const u = nowImg(it), S = nowSlot(), due = S && S.due && S.rows.find(r => r.d.id === id);
   return `${topBar({ back:'뒤로' })}<section class="sec med">
     <h1 class="med-n">${esc(nowName(it.name))}</h1><p class="med-k">${esc([nowGroup(it), (it.pub?.ingr ? String(it.pub.ingr).split('|').map(x => x.replace(/(베실산염|말레산염|메실산염|염산염|황산염|칼륨|칼슘|나트륨|마그네슘|수화물|\s)+$/g, '')) : ings.map(e => e.n)).slice(0, 3).join(' + ')].filter(Boolean).join(' · '))}</p>
-    <div class="med-hero">${popPic(u, it.name, 64)}<span>${u ? '<b>이렇게 생긴 약이에요</b><small>사진: 식약처 낱알식별</small>' : '<b>사진이 아직 없어요</b><small>약봉투·상자의 이름과 맞는지 확인하세요</small>'}</span></div>
+    <div class="med-hero">${popPic(u, it.name, 64)}<span>${u ? `<b>이렇게 생긴 약이에요</b>${nowLook(nowPill(it)) ? `<small>${esc(nowLook(nowPill(it)))}</small>` : ''}<small>사진: 식약처 낱알식별</small>` : it.pub?.seq && !(PUB.pills && PUB.rx) ? '<b>사진을 불러오는 중이에요</b>' : '<b>이 약은 낱알 사진이 없어요</b><small>시럽·가루·연고처럼 알약이 아니면 사진이 없어요</small>'}</span></div>
     <div class="med-sec"><h2>이렇게 드세요</h2>${medHow(it).map(x => `<p>${I.check}<span>${fmt(x)}</span></p>`).join('')}</div>
     <div class="med-sec"><h2>깜빡했을 때</h2><p class="med-miss">${fmt(medMiss(it))}</p></div>
     ${it.d && window.erMemoHtml ? erMemoHtml(it.d) : ''}
