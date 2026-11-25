@@ -78,12 +78,15 @@ def tidy(x):
         for a_, b_ in HY: x = x.replace(a_, b_)
         return re.sub(r'(\d)(mg|g|mL|ml|kg|정|시간)\b', r'\1 \2', x)
     return x
-pairs = tidy(pairs); groups = tidy(groups)
+DUP = json.load(open(Y / '중복_주의.json', encoding='utf-8'))['규칙'] if (Y / '중복_주의.json').exists() else []
+dups = [{'id': 'd%02d' % i, 'a': side2(r['성분이름']), 'b': side2(r['같은축이름']), '말투': r.get('말투', ''), '원문': r.get('원문', []), '보임': bool(r.get('보임')), '층': 2, '출처': '확인중'} for i, r in enumerate(DUP)]
+pairs = tidy(pairs); groups = tidy(groups); dups = tidy(dups)
 can = lambda s: bool(s.get('k') or s.get('cls'))
-out = {'meta': {'about': '2층 — 약손(11-25 접음)에서 옮긴 겹침. 출처는 모두 확인중이라 화면에서 단정하지 않는다. 보임 false 는 숨김(데이터는 남김). 1층과 같은 짝은 뺐다.', 'from': 'yozm-health med/약손_앱/_약지도로 (11-25)'}, 'pairs': pairs, 'groups': groups}
+out = {'meta': {'about': '2층 — 약손(11-25 접음)에서 옮긴 겹침. 출처는 모두 확인중이라 화면에서 단정하지 않는다. 보임 false 는 숨김(데이터는 남김). 1층과 같은 짝은 뺐다.', 'from': 'yozm-health med/약손_앱/_약지도로 (11-25)'}, 'pairs': pairs, 'groups': groups, 'dups': dups}
 (ROOT / 'content/interactions.layer2.json').write_text(json.dumps(out, ensure_ascii=False, indent=1), encoding='utf-8')
 P = [p for p in pairs]; G = [g for g in groups]
 print('1층', len(R1))
 print('성분 짝 %d → 1층과 겹쳐 뺌 %d · 2층 %d (걸림 가능 %d · 안 걸림 %d / 보임 %d · 숨김 %d)' % (len(S), drop, len(P), sum(can(p['a']) and can(p['b']) for p in P), sum(not (can(p['a']) and can(p['b'])) for p in P), sum(p['보임'] for p in P), sum(not p['보임'] for p in P)))
 print('  겹친 1층:', hitc.most_common(10))
 print('분류 %d → 1층과 겹쳐 뺌 %d · 새 칸 %d (약 갈래 걸림 가능 %d · 음식 %d · 안 걸림 %d / 보임 %d · 숨김 %d)' % (len(C), gdrop, len(G), sum(g['갈래'] != '음식·기호품' and can(g['a']) and can(g['상대']) for g in G), sum(g['갈래'] == '음식·기호품' for g in G), sum(g['갈래'] != '음식·기호품' and not (can(g['a']) and can(g['상대'])) for g in G), sum(g['보임'] for g in G), sum(not g['보임'] for g in G)))
+print('중복 주의 %d → 따로 칸(겹침 표에 안 넣음): 걸림 가능 %d · 보임 %d' % (len(dups), sum(can(d['a']) and can(d['b']) for d in dups), sum(d['보임'] for d in dups)))
