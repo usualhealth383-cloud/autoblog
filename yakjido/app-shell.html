@@ -6815,7 +6815,7 @@ function vDrugS(d, q){
   <section class="dsb">
     <div class="phead">${popPic(pr ? pimg(pr.name) : '', pr?.name || d.name, 64)}<div class="ph-b"><h1 class="ph-n">${esc(d.name)}</h1>${pr ? `<p class="ph-i">${d.pSel ? '고른 제품' : '대표 제품'} <b>${esc(pr.name)}</b></p>` : ''}<div class="ph-t">${badge(d.rx)}</div></div></div>
     ${(d.for || []).length ? `<div class="dsb-for" aria-label="무엇에 ${oral ? '먹는' : '쓰는'} 약">${(d.for || []).slice(0, 6).map(x => `<span>${esc(x)}</span>`).join('')}</div>` : d.tagline ? `<p class="dsb-tag">${esc(d.tagline)}</p>` : ''}
-    ${d.kidSel ? `<div class="dsb-dose"><small>먹는 양</small><b class="sv-dose">${esc(KIDDOSE)}</b></div>` : how ? `<div class="dsb-dose"><small>한 번에 · 하루에</small><b class="sv-dose">${esc(how1).replace(/(\d) (mg|g|mL|정|번)/g, '$1\u00a0$2')}</b>${how2 ? `<span>${esc(how2).replace(/(\d) (mg|g|mL|정|번)/g, '$1\u00a0$2')}</span>` : ''}</div>` : ''}
+    ${d.kidSel ? `<div class="dsb-dose dose-hero"><small>먹는 양</small><b class="sv-dose">${esc(KIDDOSE)}</b></div>` : how ? `<div class="dsb-dose dose-hero"><small>한 번에 · 하루에</small><b class="sv-dose">${esc(how1).replace(/(\d) (mg|g|mL|정|번)/g, '$1\u00a0$2')}</b>${how2 ? `<span>${esc(how2).replace(/(\d) (mg|g|mL|정|번)/g, '$1\u00a0$2')}</span>` : ''}${(/서방|이알/.test(q.p || '') ? '' : senMaxH(d))}${ME.age === 'child' && d.dose?.child ? `<small>소아: ${fmt(d.dose.child)}</small>` : ''}</div>` : ''}${kidDoseBtn(d)}
   </section>
   ${allergyWarn(d)}${ixLine([d])}
   ${d.useNote ? `<div class="usebar">${I.alert}<span>${fmt(d.useNote)}</span></div>` : ''}
