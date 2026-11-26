@@ -6848,14 +6848,13 @@ window.vScheduleS = function (_, q){
   ${disclaimer('알림은 잊지 않도록 돕는 도구예요. 용량·간격은 약 상자와 약사·의사 지시가 우선이에요.')}`;
 };
 window.erMemoHtml = function (d) { const E = Array.isArray(d.erNote) ? d.erNote : d.erNote ? [{ s: d.erNote }] : []; if (!E.length) return ''; (window.ERX = window.ERX || {})[d.id] = d;   /* 11-26 처방약 길잡이도 쪽지를 쓴다(약 사전에 없는 id) */   /* 11-25 진료실 쪽지 — 약 화면과 약 알림 자세히가 같이 쓴다 */
-    const say = x => fmt(x.s || x.h || x.t), top = E.slice(0, 2), rest = E.slice(2);
-    window.erSpeech = window.erSpeech || (id => { const z = drug(id) || (window.ERX || {})[id]; return z && z.erNote ? '응급실 의사가 드리는 말. ' + [].concat(z.erNote).map(x => (x.s || x.h || x.t || '').replace(/\*\*/g, '')).join(' ') : ''; });
-    return `<section class="ernote" aria-label="응급실 의사가 드리는 말"><div class="ern-h"><b>응급실 의사가 드리는 말</b><span>약 설명서에 덧붙여요</span></div>
-      ${top.map(x => `<p class="ern-s">${say(x)}</p>`).join('')}
-      ${rest.length ? `<details class="ern-more"><summary>더 보기 (${rest.length}가지) ›</summary>${rest.map(x => `<p class="ern-s">${say(x)}</p>`).join('')}</details>` : ''}
-      ${E.some(x => x.t) ? `<details class="ern-more ern-why"><summary>왜 그런지 자세히 ›</summary>${E.filter(x => x.t).map(x => `<p class="ern-t">${fmt(x.t)}</p>`).join('')}</details>` : ''}
-      <div class="ern-sg">— 응급의학과 의사 · 정답이 아니라 경험이에요</div>
-      ${speakBtn(`erSpeech('${d.id}')`, '의사의 말 읽어 주기')}</section>`; };
+    /* 11-26 현욱님 「단순 줄글은 안 된다」 → 시안 ② 번호 쪽지: 번호 · 굵은 제목(h) · 짧은 한 줄(p, 숫자는 형광펜) · 이유(t)는 「자세히」 안 */
+    window.erSpeech = window.erSpeech || (id => { const z = drug(id) || (window.ERX || {})[id]; return z && z.erNote ? '응급실 의사의 쪽지. ' + [].concat(z.erNote).map(x => (x.s || x.h || x.t || '').replace(/\*\*/g, '')).join(' ') : ''; });
+    const W = E.filter(x => x.t);
+    return `<section class="ernote" aria-label="응급실 의사의 쪽지"><div class="ern-h"><span class="ern-av" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg></span><b>응급실 의사의 쪽지</b><span>설명서에 덧붙여요</span></div>
+      <ol class="ern-list">${E.map((x, i) => `<li><em aria-hidden="true">${i + 1}</em><div><b>${esc(x.h || x.s || '')}</b>${x.p ? `<p>${fmt(x.p)}</p>` : (!x.h ? '' : '')}</div></li>`).join('')}</ol>
+      ${W.length ? `<details class="ern-why"><summary><span class="ern-sg">— 응급의학과 의사 · 정답이 아니라 경험이에요</span><span class="ern-go">자세히 ›</span></summary>${W.map(x => `<p class="ern-t"><b>${E.indexOf(x) + 1}.</b> ${fmt(x.t)}</p>`).join('')}</details>` : `<div class="ern-sg">— 응급의학과 의사 · 정답이 아니라 경험이에요</div>`}
+      ${speakBtn(`erSpeech('${d.id}')`, '쪽지 읽어 주기')}</section>`; };
 window.vDrugFull = function (id, q = {}){
   const d0 = drug(id); if (!d0) return vDrugs('', {});
   if (svOn(q)) return vDrugS(d0, q);
