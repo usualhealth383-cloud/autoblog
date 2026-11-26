@@ -493,6 +493,13 @@ a.link.crumb,.drug-hero a.cls,.sec>h2 small a.link{display:inline-flex;align-ite
 .svq-ic.c2{background:#FBF2E2;color:#8A5512}.svq-ic.c3{background:#E9F4EC;color:#2E6B47}.svq-ic.c4{background:#F0EDF8;color:#5B4B8A}.svq-ic.c5{background:#FCEDEB;color:#B4362E}
 .svq-t{flex:1;min-width:0}.svq-t b{display:block;font-size:1.03rem}.svq-t small{display:block;font-size:.86rem;color:var(--muted);margin-top:2px;word-break:keep-all}.svq-me{font-style:normal;font-weight:700;color:#B4362E}
 .svq summary>i{display:flex;color:var(--muted);transition:transform .15s}.svq[open] summary>i{transform:rotate(90deg)}.svq-b{padding:0 16px 14px 68px;font-size:.97rem;line-height:1.6}.svq-b ul{margin:0}
+.svh{display:flex;gap:14px;align-items:center;background:var(--card,#fff);border-radius:22px;padding:18px;margin-top:6px}.svh-ic{width:56px;height:56px;border-radius:50%;background:var(--tint,#DCEFF5);display:grid;place-items:center;flex:none;color:var(--primary)}.svh-ic svg{width:28px;height:28px}
+.svh h1{margin:0;font-size:1.47rem}.svh p{margin:2px 0 0;font-size:.86rem;color:var(--muted)}
+.sv-steps{background:var(--card,#fff);border-radius:22px;padding:18px;margin-top:12px}.sv-steps h2{margin:0 0 10px;font-size:.86rem;color:var(--primary-deep)}
+.sv-steps p{display:flex;gap:12px;margin:0;padding:10px 0;font-size:1rem;line-height:1.55;border-top:1px solid var(--line);word-break:keep-all}.sv-steps p:first-of-type{border-top:0;padding-top:0}
+.sv-steps .n{flex:none;width:28px;height:28px;border-radius:50%;background:var(--primary);color:#fff;font-weight:800;font-size:.88rem;display:grid;place-items:center}
+.sv-steps-go{display:flex;gap:8px;margin-top:10px}.sv-steps-go button{flex:1;background:var(--tint,#DCEFF5);color:var(--primary-deep);border:0;border-radius:12px;min-height:48px;font:inherit;font-weight:700;font-size:.92rem;cursor:pointer}
+body:has(.answer.rf-er) .sv-steps{display:none}
 .ernote{margin-top:14px;background:var(--card,#fff);border-radius:6px 18px 18px 18px;padding:18px 18px 14px;box-shadow:0 1px 0 var(--line,rgba(0,0,0,.06)),0 6px 16px rgba(0,0,0,.05)}
 .ern-h{font-size:0.824rem;color:var(--muted,#6a7176);margin-bottom:10px;display:flex;flex-wrap:wrap;gap:4px 6px}.ern-h b{color:var(--primary-deep)}.ern-h span:before{content:'· '}
 .ern-s{font-size:1.088rem;line-height:1.65;margin:0 0 8px;font-weight:500;word-break:keep-all}.ern-s strong,.ern-s b{font-weight:800}
@@ -4831,6 +4838,15 @@ function svRow(x){
   return `<a class="buy-item sv" href="#${d.lex ? '/ingr/' + d.lexId : '/drug/' + d.id}">${popPic(src, prod || names[0] || ing, 60)}<span class="bi-t"><b>${esc(nbu((d.combo && !prod) || (!d.combo && /복합제/.test(ing)) ? catName(x) : catName(x) + ' — ' + (d.combo ? prod : ing + (amt ? ' ' + amt : ''))))}</b>${svMl(d, askNow)}<small class="sub">${esc(nbu(d.combo ? (other.length ? '이 성분이 든 제품: ' + other.join(' · ') : '') : (prod ? '예: ' + prod : '') + (other.length ? (d.prodMix ? ' · 다른 제품 ' + other.join(' · ') + ' — 제품마다 성분·함량이 달라요. 먹는 법은 고른 상자 설명서대로' : ' · 같은 성분 ' + other.map(n => wAmt(d, n)).join(' · ') + (amtDiff(d, [prod, ...other]) ? ` — 한 알 양이 달라요. 먹는 법은 ${prod} 기준` : '')) : '')))}</small>${ME.age === 'senior' && d.id === 'acetaminophen' && !x.kid && !askNow && !/서방|이알/.test(prod) ? `<span class="sv-how"><b class="dl-m">500 mg 정으로 하루 6정까지</b><span class="dl-i">한 번 1~2정, 4시간 이상 띄워서 — 65세 이상 상담 기준</span><small class="dl-i">식약처 허가 · 확인한 날 ${esc(D.meta?.labelCheck || '')}</small></span>` : how ? `<span class="sv-how">${(() => { const m = String(how).match(/^(.+?[.,])\s+(.+)$/); return m ? `<b class="dl-m">${fmt(m[1].replace(/[,.]$/, ''))}</b><span class="dl-i">${fmt(m[2])}</span>` : `<b class="dl-m">${fmt(how)}</b>`; })()}<small class="dl-i">식약처 허가 · 확인한 날 ${esc(D.meta?.labelCheck || '')}</small></span>` : askNow ? `<span class="sv-how">이 약은 먹기 전에 약사·의사와 먼저 확인하세요.</span>` : ''}${x.kid || askNow || (ME.age === 'senior' && d.id === 'acetaminophen' && !/서방|이알/.test(prod)) ? '' : senMaxH(d)}${ME.age === 'senior' && d.id === 'acetaminophen' && !x.kid ? '<small class="sub">어르신은 이 약이 먼저예요 — 소염제는 위·콩팥에 부담</small>' : ''}${buyBadge(x)}${x.cau ? `<small class="cau">${I.alert}${esc(x.cau)}</small>` : ''}${mixH(x)}</span></a>${ME.age === 'senior' && d.id === 'acetaminophen' && !x.kid && !askNow && !/서방|이알/.test(prod) ? `<details class="sv-max small"><summary>설명서 최대 용량</summary><p>식약처 허가 설명서의 최대는 하루 8정(4,000 mg)이에요. 65세 이상은 진료실에서 3,000 mg 이하를 권해요 — 의사·약사와 상의하세요.</p></details>` : ''}`;
 }
 const svFit = s => { const h = fitChips(s); return !h || activeFlags().length ? h : fold(`${I.user}임신 중이거나 지병이 있으면 눌러 주세요`, h, { cls:'sv-fit' }); };
+/* 11-26 현욱님 증상 ② — 「이렇게 하세요」 1·2·3(먹는 법 앞 세 줄, 내 몸 조건으로 걸린 약 안내는 tipBan 이 뺀다) + 약 바로 가기. 응급 신호에 체크하면 숨긴다 */
+function svSteps(s, main, inf){
+  if (inf) return '';
+  const b = tipBan(s), L = banList(s.how || [], b).map(t => String(yK(t) ?? t).replace(/\*\*/g, '')).map(t => { const f = (t.match(/^[^.!?]*(?:[.!?](?=\s|$)|$)/) || [t])[0]; let ask = /약사와 (확인|상의)|약사·의사와/.test(t.slice(f.length)); const o = f.replace(/\s*\(([^)]*)\)/g, (m, x) => x.length <= 24 ? m : ((ask = ask || /약사|의사/.test(x)), '')).replace(/\s+([.!?])$/, '$1').trim(); return ask ? o.replace(/[.!?]$/, '') + ' — 약사와 확인하세요.' : o; }).filter(Boolean).slice(0, 3);
+  if (!L.length) return '';
+  const M = (main || []).filter(x => x.d && !x.consult).slice(0, 2);
+  return `<section class="sv-steps" aria-label="이렇게 하세요"><h2>이렇게 하세요</h2>${L.map((t, i) => `<p><span class="n">${i + 1}</span><span>${esc(t)}</span></p>`).join('')}
+    ${M.length ? `<div class="sv-steps-go">${M.map(x => `<button type="button" onclick="go('/drug/${x.d.id}')">${esc(ingrName(x.d).split(' ')[0])} 보기</button>`).join('')}</div>` : ''}</section>`;
+}
 function vSymptomS(s){
   SYM_NOW = s.id;
   const bk = basket(s), inf = infStop(s), pick = basketPicked(s, bk);
@@ -4843,7 +4859,8 @@ function vSymptomS(s){
   const optFold = !opt.length ? '' : `<details class="opt-fold" ${OPT_FOLD === s.id || nOpt || opt.some(oix) ? 'open' : ''} ontoggle="OPT_FOLD=this.open?'${s.id}':(OPT_FOLD==='${s.id}'?'':OPT_FOLD)"><summary><span><b>이런 증상도 있으면 더하기</b><small>${nOpt ? nOpt + '가지 넣었어요' : opt.length + '가지'}</small></span>${I.chev}</summary>
     ${opt.map(x => { const on = optPicked(s.id, x.i); return `<div class="opt-one ${on ? 'on' : ''}"><button type="button" class="opt-add sv-opt ${on ? 'on' : ''}" role="checkbox" aria-checked="${on}" onclick="optToggle('${s.id}',${x.i})"><i class="opt-box">${on ? I.check : ''}</i><span><b>${esc(nbu(catName(x) + ' — ' + (prodName(x.product) || ingrName(x.d))))}</b><small>${esc(x.title || x.slot)}</small></span></button>${on ? svRow(x) : ''}${oix(x)}</div>`; }).join('')}</details>`;
   return `${topBar({ back:'증상', nosearch:true, unreviewed:s.reviewed === false })}${entryBand(s)}
-  <div class="${gcls(s.group)}"><div class="eyebrow" style="color:var(--gfg,var(--primary))"><span class="gdot"></span>${esc(s.group)}</div><h1>${esc(s.name)}</h1></div>
+  <section class="svh ${gcls(s.group)}"><span class="svh-ic">${sicon(s)}</span><div><h1>${esc(s.name)}</h1>${s.short ? `<p>${esc(s.short)}</p>` : `<p>${esc(s.group)}</p>`}</div></section>
+  ${svSteps(s, main, inf)}
   <div class="sv-top"><p class="sv-lead">${inf ? '약보다 진료가 먼저예요' : noBuy ? '약국에서 살 약은 없어요' : unrev ? '약국에서 이렇게 상의하세요' : '약국에서 이 성분을 물어보세요'}</p>${viewSeg('simple')}</div>
   ${ext('응급칸')}
   ${svFit(s)}
