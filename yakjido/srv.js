@@ -5286,6 +5286,7 @@ window.vRxS = function(id){
   return `${topBar({ back:'이전', unreviewed:!(g.reviewed ?? RXG?.reviewed) })}
   <div class="eyebrow">처방약 길잡이</div><h1>${esc(g.title)}</h1>
   <p class="lead-p" style="margin-top:6px">${fmt(g.lead)}</p>
+  ${g.erNote ? window.erMemoHtml({ id: 'rx-' + id, erNote: g.erNote }) : ''}
   <section class="sec card"><h2>이렇게 드세요</h2><ol class="steps">${g.do.map(x => `<li>${fmt(x.t)}${x.go ? ` <a class="link" href="#${esc(x.go[0])}">${esc(x.go[1])}</a>` : ''}</li>`).join('')}</ol></section>
   <div class="note alert" style="margin-top:12px">${I.alert}<span><b>이럴 땐 바로</b><br>${g.er.map(x => fmt(x.t)).join('<br>')}</span></div>
   ${fold('깜빡했을 때', `<p>${fmt(g.miss.t)}</p>`, { open:true })}
@@ -6846,9 +6847,9 @@ window.vScheduleS = function (_, q){
   ${fold(`${I.info}약을 깜빡했을 때`, `<p class="why">많은 약의 설명서는 이렇게 적고 있어요 — <b>생각난 즉시 드시고, 다음 드실 때가 가까우면 잊은 것은 건너뛰고 다음 때 한 번 몫만</b> 드세요. <b>두 번 몫을 한꺼번에 드시지 마세요.</b></p><p class="why" style="margin-top:6px">피임약·피 묽게 하는 약(와파린 등)·골다공증 약·당뇨 주사처럼 약마다 따로 정해진 방법이 있는 약이 있어요. 그런 약은 약봉투 설명서와 약사·의사 안내를 따르세요. 자주 잊으시면 알림 시각을 식사·양치 같은 습관에 맞춰 보세요.</p>`, { cls:'miss-fold' })}
   ${disclaimer('알림은 잊지 않도록 돕는 도구예요. 용량·간격은 약 상자와 약사·의사 지시가 우선이에요.')}`;
 };
-window.erMemoHtml = function (d) { const E = Array.isArray(d.erNote) ? d.erNote : d.erNote ? [{ s: d.erNote }] : []; if (!E.length) return '';   /* 11-25 진료실 쪽지 — 약 화면과 약 알림 자세히가 같이 쓴다 */
+window.erMemoHtml = function (d) { const E = Array.isArray(d.erNote) ? d.erNote : d.erNote ? [{ s: d.erNote }] : []; if (!E.length) return ''; (window.ERX = window.ERX || {})[d.id] = d;   /* 11-26 처방약 길잡이도 쪽지를 쓴다(약 사전에 없는 id) */   /* 11-25 진료실 쪽지 — 약 화면과 약 알림 자세히가 같이 쓴다 */
     const say = x => fmt(x.s || x.h || x.t), top = E.slice(0, 2), rest = E.slice(2);
-    window.erSpeech = window.erSpeech || (id => { const z = drug(id); return z && z.erNote ? '응급실 의사가 드리는 말. ' + [].concat(z.erNote).map(x => (x.s || x.h || x.t || '').replace(/\*\*/g, '')).join(' ') : ''; });
+    window.erSpeech = window.erSpeech || (id => { const z = drug(id) || (window.ERX || {})[id]; return z && z.erNote ? '응급실 의사가 드리는 말. ' + [].concat(z.erNote).map(x => (x.s || x.h || x.t || '').replace(/\*\*/g, '')).join(' ') : ''; });
     return `<section class="ernote" aria-label="응급실 의사가 드리는 말"><div class="ern-h"><b>응급실 의사가 드리는 말</b><span>약 설명서에 덧붙여요</span></div>
       ${top.map(x => `<p class="ern-s">${say(x)}</p>`).join('')}
       ${rest.length ? `<details class="ern-more"><summary>더 보기 (${rest.length}가지) ›</summary>${rest.map(x => `<p class="ern-s">${say(x)}</p>`).join('')}</details>` : ''}
