@@ -845,7 +845,7 @@ def r2_checks(br, url, fails):
     me("ME.view='detail'"); go('/send?s=msk'); pz.click('button.chip:has-text("위가 약하거나")'); pz.wait_for_timeout(150)
     if '보냈어요' in txt(): fails.append('#53 보내기 전 미리보기에 «보냈어요»(완료형)가 나옵니다')
     me("ME.view='simple'"); go('/drug/ibuprofen')
-    if '에스시탈로프람' not in txt('.sv-no'): fails.append('#9 간단히 약 화면이 조건 없는 주의(우울증약·스테로이드)를 버립니다')
+    if '에스시탈로프람' not in pz.evaluate("()=>document.querySelector('.sv-no')?.textContent||''"): fails.append('#9 간단히 약 화면이 조건 없는 주의(우울증약·스테로이드)를 버립니다')
     go('/symptom/cold')
     if not re.search(r'한 번[^·]*1캡슐', txt('.answer')): fails.append('#13 간단히 감기 화면 가래약 먹는 법에 한 번 몇 캡슐인지가 없습니다')
     pz.evaluate("()=>{ ME.view='detail'; RF.sid=''; saveMe(); }")

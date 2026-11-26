@@ -437,6 +437,17 @@ a.link.crumb,.drug-hero a.cls,.sec>h2 small a.link{display:inline-flex;align-ite
 .med-sec{background:var(--card,#fff);border-radius:16px;padding:16px;margin-bottom:12px}.med-sec h2{margin:0 0 8px;font-size:0.882rem;color:var(--primary-deep)}
 .med-sec p{display:flex;gap:10px;margin:0;padding:9px 0;font-size:1.029rem;line-height:1.5;border-top:1px solid var(--line);word-break:keep-all}.med-sec p:first-of-type{border-top:0;padding-top:0}.med-sec p svg{flex:none;width:20px;height:20px;color:var(--primary);margin-top:3px}
 .med-sec p.med-miss{display:block}
+.dsb{background:linear-gradient(165deg,#F3F9FB 0%,#E6F2F6 100%);border:1px solid #D9EAF0;border-radius:22px;padding:18px;margin-top:6px}
+[data-theme="dark"] .dsb{background:linear-gradient(165deg,#16262C,#11222A);border-color:#24404A}@media (prefers-color-scheme: dark){html:not([data-theme="light"]) .dsb{background:linear-gradient(165deg,#16262C,#11222A);border-color:#24404A}}
+.dsb .phead{margin:0;padding:0;background:none;border:0;box-shadow:none}.dsb-for{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}.dsb-for span{background:var(--card,#fff);color:var(--primary-deep);border-radius:99px;padding:7px 12px;font-size:.86rem;font-weight:700}
+.dsb-tag{margin:12px 0 0;font-size:.94rem;color:var(--body)}
+.dsb-dose{margin-top:14px;padding:14px 16px;background:var(--card,#fff);border-radius:16px}.dsb-dose small{display:block;font-size:.86rem;font-weight:700;color:var(--primary-deep)}.dsb-dose b{display:block;font-size:1.3rem;line-height:1.35;margin-top:2px;word-break:keep-all}.dsb-dose span{display:block;font-size:.88rem;color:var(--muted);margin-top:4px;line-height:1.5;word-break:keep-all}
+.svqs{margin-top:12px;border-radius:18px;overflow:hidden;background:var(--card,#fff);border:1px solid var(--line)}
+.svq{border-top:1px solid var(--line)}.svq:first-child{border-top:0}.svq summary{display:flex;align-items:center;gap:12px;padding:14px 16px;list-style:none;cursor:pointer;min-height:64px}.svq summary::-webkit-details-marker{display:none}
+.svq-ic{width:40px;height:40px;border-radius:12px;display:grid;place-items:center;flex:none}.svq-ic svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+.svq-ic.c2{background:#FBF2E2;color:#8A5512}.svq-ic.c3{background:#E9F4EC;color:#2E6B47}.svq-ic.c4{background:#F0EDF8;color:#5B4B8A}.svq-ic.c5{background:#FCEDEB;color:#B4362E}
+.svq-t{flex:1;min-width:0}.svq-t b{display:block;font-size:1.03rem}.svq-t small{display:block;font-size:.86rem;color:var(--muted);margin-top:2px;word-break:keep-all}.svq-me{font-style:normal;font-weight:700;color:#B4362E}
+.svq summary>i{display:flex;color:var(--muted);transition:transform .15s}.svq[open] summary>i{transform:rotate(90deg)}.svq-b{padding:0 16px 14px 68px;font-size:.97rem;line-height:1.6}.svq-b ul{margin:0}
 .ernote{margin-top:14px;background:var(--card,#fff);border-radius:6px 18px 18px 18px;padding:18px 18px 14px;box-shadow:0 1px 0 var(--line,rgba(0,0,0,.06)),0 6px 16px rgba(0,0,0,.05)}
 .ern-h{font-size:0.824rem;color:var(--muted,#6a7176);margin-bottom:10px;display:flex;flex-wrap:wrap;gap:4px 6px}.ern-h b{color:var(--primary-deep)}.ern-h span:before{content:'· '}
 .ern-s{font-size:1.088rem;line-height:1.65;margin:0 0 8px;font-weight:500;word-break:keep-all}.ern-s strong,.ern-s b{font-weight:800}
@@ -1858,7 +1869,7 @@ html:not(.ink) .rf-none{display:none}</style>
 <script>
 window.__YAKJIDO_OK__ = true;
 const D = JSON.parse(document.getElementById('data').textContent || '{}');
-const BUILD = '2026-11-26 22:32';
+const BUILD = '2026-11-26 23:01';
 const DATAV = 'a0cd95ab98'.indexOf('__') === 0 ? BUILD : 'a0cd95ab98';
 const BRANDMARK = (typeof window !== 'undefined' && window.__BRANDMARK__) || 'icon-192.png';
 let CORE = 0, CORE_P = null;
@@ -5655,6 +5666,10 @@ const pView = (d, n) => { const p = n && ((d.products || []).find(x => x.name ==
 if (mine && p.dose) return Object.assign(Object.create(d), pAdj(d, false, /8시간/.test(p.dose.interval || '')), { simple: p.simple || d.simple, dose: p.dose, pSel: p });
 if (mine && KIDFORM(p) && isOral(d)) return Object.assign(Object.create(d), pAdj(d, true, false), { simple: KIDDOSE, dose: { adult: KIDDOSE }, pSel: p, kidSel: true });
 return d; };
+const SVQ_IC = { no: '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M5.6 5.6l12.8 12.8"/></svg>', ix: '<svg viewBox="0 0 24 24"><rect x="3" y="9" width="9" height="6" rx="3"/><rect x="12" y="9" width="9" height="6" rx="3"/></svg>',
+se: '<svg viewBox="0 0 24 24"><path d="M12 3v3M12 18v3M3 12h3M18 12h3"/><circle cx="12" cy="12" r="4"/></svg>', er: '<svg viewBox="0 0 24 24"><path d="M12 3l9 16H3z"/><path d="M12 10v4M12 17h0"/></svg>' };
+const svShort = (L, n = 3) => L.slice(0, n).map(x => String(x.text || x).replace(/\*\*/g, '').split(/[(—,.]| — |·/)[0].trim()).filter(Boolean).join(' · ');
+function svQ(k, c, title, sub, body, open, extra){ return `<details class="svq ${extra || ''}"${open ? ' open' : ''}><summary><span class="svq-ic ${c}">${SVQ_IC[k]}</span><span class="svq-t"><b>${title}</b>${sub ? `<small>${sub}</small>` : ''}</span><i aria-hidden="true">${I.chev}</i></summary><div class="svq-b">${body}</div></details>`; }
 function vDrugS(d, q){
 d = pView(d, q.p);
 const f = activeFlags(), pr = d.pSel || (d.products || []).find(x => pimg(x.name)) || (d.products || [])[0];
@@ -5662,18 +5677,27 @@ const mine = a => (a.flags || []).some(x => f.includes(x)), av = (d.avoid || [])
 const all = !f.some(k => !isAgeFlag(k)), hit = av.filter(mine), gen = av.filter(a => !mine(a) && (all || !(a.flags || []).length)), other = all ? [] : av.filter(a => (a.flags || []).length && !mine(a));
 const C = (d.caution || []).filter(Boolean), cau = C.filter(a => a.flags && mine(a)), gc = C.filter(a => !(a.flags || []).length), oc = C.filter(a => (a.flags || []).length && !mine(a)), oral = isOral(d);
 const li = (L, c) => L.map(a => `<li${c ? ` class="${c}"` : ''}>${fmt(a.text || a)}</li>`).join('');
-const how = howS(d);
+const how = howS(d), howT = String(how || '').replace(/\*\*/g, ''), how1 = howT.split(/[.。]/)[0], how2 = howT.slice(how1.length + 1).trim();
+const IX = (d.interactions || []).filter(x => x && x.with), SE = (d.sideEffects || []).filter(Boolean), ST = (d.stop || []).filter(Boolean);
+const noBody = `<ul class="plain x">${li(hit, 'me')}${li(gen)}</ul>${other.length ? fold(`다른 경우 ${other.length}가지 더 보기`, `<ul class="plain x">${li(other)}</ul>`) : ''}
+${cau.length ? `<p class="sv-cau">${esc(flagWords([...new Set(cau.flatMap(a => a.flags.filter(x => f.includes(x))))]))} — 먼저 약사·의사와 상의하세요</p><ul class="plain">${li(cau)}</ul>` : ''}
+${gc.length ? `<p class="sv-cau">누구나 알아 둘 주의</p><ul class="plain">${li(gc)}</ul>` : ''}${oc.length ? fold(`다른 조건의 주의 ${oc.length}가지 보기`, `<ul class="plain">${li(oc)}</ul>`) : ''}`;
 return `${topBar({ back:'약 사전', unreviewed:d.reviewed === false })}${prodTop(d, q.p)}
-<div class="phead">${popPic(pr ? pimg(pr.name) : '', pr?.name || d.name, 72)}<div class="ph-b"><h1 class="ph-n">${esc(d.name)}</h1>${pr ? `<p class="ph-i">${d.pSel ? '고른 제품' : '대표 제품'} <b>${esc(pr.name)}</b></p>` : ''}<div class="ph-t">${badge(d.rx)}</div></div></div>
+<section class="dsb">
+<div class="phead">${popPic(pr ? pimg(pr.name) : '', pr?.name || d.name, 64)}<div class="ph-b"><h1 class="ph-n">${esc(d.name)}</h1>${pr ? `<p class="ph-i">${d.pSel ? '고른 제품' : '대표 제품'} <b>${esc(pr.name)}</b></p>` : ''}<div class="ph-t">${badge(d.rx)}</div></div></div>
+${(d.for || []).length ? `<div class="dsb-for" aria-label="무엇에 ${oral ? '먹는' : '쓰는'} 약">${(d.for || []).slice(0, 6).map(x => `<span>${esc(x)}</span>`).join('')}</div>` : d.tagline ? `<p class="dsb-tag">${esc(d.tagline)}</p>` : ''}
+${d.kidSel ? `<div class="dsb-dose"><small>먹는 양</small><b class="sv-dose">${esc(KIDDOSE)}</b></div>` : how ? `<div class="dsb-dose"><small>한 번에 · 하루에</small><b class="sv-dose">${esc(how1).replace(/(\d) (mg|g|mL|정|번)/g, '$1\u00a0$2')}</b>${how2 ? `<span>${esc(how2).replace(/(\d) (mg|g|mL|정|번)/g, '$1\u00a0$2')}</span>` : ''}</div>` : ''}
+</section>
 ${allergyWarn(d)}${ixLine([d])}
 ${d.useNote ? `<div class="usebar">${I.alert}<span>${fmt(d.useNote)}</span></div>` : ''}
-${(d.for || []).length || d.tagline ? `<div class="kv" style="grid-template-columns:1fr"><div><small>무엇에 ${oral ? '먹는' : '쓰는'} 약</small><b>${esc((d.for || []).join(', ') || d.tagline)}</b></div></div>` : ''}
-${d.kidSel ? `<div class="dose-hero"><small>먹는 양</small><div class="sv-dose">${esc(KIDDOSE)}</div></div>` : how ? `<div class="dose-hero"><small>한 번에 · 하루에</small><div class="big sv-dose">${fmt(how)}</div>${(/서방|이알/.test(q.p || '') ? '' : senMaxH(d))}${ME.age === 'child' && d.dose?.child ? `<small>소아: ${fmt(d.dose.child)}</small>` : ''}</div>` : ''}${kidDoseBtn(d)}
 <div class="sv-take">${takeBtn(d.id)}</div>
-${av.length || C.length ? `<section class="sec card sv-no"><h2>이럴 땐 ${oral ? '먹지' : '쓰지'} 마세요</h2><ul class="plain x">${li(hit, 'me')}${li(gen)}</ul>${other.length ? fold(`다른 경우 ${other.length}가지 더 보기`, `<ul class="plain x">${li(other)}</ul>`) : ''}
-${cau.length ? `<p class="sv-cau">${esc(flagWords([...new Set(cau.flatMap(a => a.flags.filter(x => f.includes(x))))]))} — 먼저 약사·의사와 상의하세요</p><ul class="plain">${li(cau)}</ul>` : ''}
-${gc.length ? `<p class="sv-cau">누구나 알아 둘 주의</p><ul class="plain">${li(gc)}</ul>` : ''}${oc.length ? fold(`다른 조건의 주의 ${oc.length}가지 보기`, `<ul class="plain">${li(oc)}</ul>`) : ''}</section>` : ''}
-${(d.stop || []).length ? fold(`${I.alert}${oral ? '먹다가' : '쓰다가'} 이러면 멈추고 진료`, list(d.stop), { cls:'sv-care', open: d.class === 'nsaid' }) : ''}
+${window.erMemoHtml ? erMemoHtml(d) : ''}
+<section class="svqs" aria-label="궁금한 것">
+${av.length || C.length ? svQ('no', 'c2', `누가 ${oral ? '먹으면' : '쓰면'} 안 돼요?`, hit.length || cau.length ? `<em class="svq-me">내 조건에 해당해요 — 펼쳐 보세요</em>` : esc(svShort([...gen, ...av])), noBody, !!(hit.length || cau.length), 'sv-no') : ''}
+${IX.length ? svQ('ix', 'c3', '다른 약이랑 같이?', esc(svShort(IX.map(x => x.with + (x.level ? ' ' + x.level : '')), 2)), `<ul class="plain">${IX.map(x => `<li><b>${esc(x.with)}</b>${x.level ? ` — ${esc(x.level)}` : ''}${x.note ? `<br>${fmt(x.note)}` : ''}</li>`).join('')}</ul>`) : ''}
+${SE.length ? svQ('se', 'c4', '부작용은요?', esc(svShort(SE, 2)), list(SE)) : ''}
+${ST.length ? svQ('er', 'c5', `언제 ${oral ? '그만 먹고' : '그만 쓰고'} 병원에 가요?`, esc(svShort(ST)), list(ST), false, 'sv-care') : ''}
+</section>
 ${sosRow()}
 <button class="btn ghost sv-more" onclick="go('/drug/${d.id}?${q.p ? 'p=' + encodeURIComponent(q.p) + '&' : ''}full=1');setTimeout(()=>scrollTo(0,0),80)">자세히 보기 — 주의·부작용·제품${I.chev}</button>
 ${disclaimer()}`;
