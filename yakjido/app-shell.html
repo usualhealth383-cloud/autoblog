@@ -3704,9 +3704,9 @@ function homeToday(){
   const pc = all.length ? Math.round(done / all.length * 100) : 0, ring = `<div class="ht-ring" style="--pc:${pc}%"><div>${done}/${all.length}</div></div>`;
   const nm = new Date().getHours() * 60 + new Date().getMinutes(), fam = (() => { try { return famAsk(all.filter(r => !r.done && !r.skip).map(r => Object.assign({ min: +r.t.split(':')[0] * 60 + +r.t.split(':')[1] }, r)), nm); } catch (e) { return ''; } })();
   const lowL = (low.length ? `<p class="ht-low">${I.alert}<span><b>곧 떨어져요</b> — ${low.map(x => esc(x.n) + ' ' + x.days + '일치').join(' · ')}</span></p>` : '') + fam;
-  if (!S.rows.length) return `<section class="sec ht" aria-label="오늘 약"><button class="ht-top" onclick="go('/now/day')">${ring}<span><small>오늘 약</small><b>오늘 약은 다 챙기셨어요</b><em>${stk >= 2 ? `${stk}일째 빠짐없이 드셨어요` : '잘하셨어요'}</em></span></button>${lowL}</section>`;
+  if (!S.rows.length) return `<section class="sec ht ht-ok" aria-label="오늘 약"><button class="ht-top" onclick="go('/now/day')">${ring}<span><small>오늘 약</small><b>오늘 약은 다 챙기셨어요</b><em>${stk >= 2 ? `${stk}일째 빠짐없이 드셨어요` : '잘하셨어요'}</em></span></button>${lowL}</section>`;
   return `<section class="sec ht" aria-label="오늘 약"><button class="ht-top" onclick="go('/now')">${ring}<span><small>${esc(hourWord(S.t))}</small><b>${S.due ? '지금 드실 약' : '다음 약'} ${S.rows.length}가지</b><em>${esc(S.rows.map(r => nowName(r.d.name).split(' ')[0].replace(/정$|캡슐$/, '')).join(' · '))}</em></span></button>
-    ${S.due ? `<button class="btn ht-done" onclick="tickFromNote('${S.rows.map(r => r.d.id + '@' + r.t).join(',')}');toast('잘하셨어요 — 체크했어요');route()">먹었어요</button>` : `<button class="btn line ht-done" onclick="go('/now')">약 하나씩 보기</button>`}${lowL}</section>`;
+    ${S.due ? `<button class="btn ht-done ht-tick" onclick="tickFromNote('${S.rows.map(r => r.d.id + '@' + r.t).join(',')}');toast('잘하셨어요 — 체크했어요');route()">먹었어요</button>` : `<button class="btn line ht-done" onclick="go('/now')">약 하나씩 보기</button>`}${lowL}</section>`;
 }
 function homeAsk(){
   return `<section class="sec ha" aria-label="어디가 불편하세요"><h1 class="ha-h">어디가 불편하세요?</h1><p class="ha-s">증상으로 맞는 약을 찾아 드려요</p>

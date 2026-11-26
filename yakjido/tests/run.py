@@ -1393,13 +1393,14 @@ def main():
         pg.goto(url + '#/home'); ready(); pg.wait_for_timeout(250)
         _h = pg.evaluate("""()=>{
           ME.taking=[]; ME.sched={}; ME.taken={}; route();
-          const none = !document.querySelector('.dh');
+          /* 11-26 홈 「가」 — 오늘 약 카드는 .ht(먹었어요 = .ht-tick · 다 드심 = .ht-ok) */
+          const none = !document.querySelector('.ht');
           /* 앞 검사(단추 전부 누르기)가 아세트아미노펜을 담았다 빼면서 «필요할 때만»으로 표시해 둘 수 있다 — 비우고 본다 */
           ME.prn={}; ME.taking=['acetaminophen']; ME.sched={acetaminophen:['00:01']}; ME.taken={}; route();
-          const card = document.querySelector('.dh');
-          const due = !!(card && card.querySelector('.dh-tick'));
-          if (due) card.querySelector('.dh-tick').click();
-          const ok = !!document.querySelector('.dh-b.ok');
+          const card = document.querySelector('.ht');
+          const due = !!(card && card.querySelector('.ht-tick'));
+          if (due) card.querySelector('.ht-tick').click();
+          const ok = !!document.querySelector('.ht-ok');
           ME.taking=[]; ME.sched={}; ME.taken={}; ME.days={}; saveMe();
           return {none, has:!!card, due, ok};}""")
         if not _h['none']: fails.append('담아 둔 약이 없는데 홈에 「오늘 약」이 뜹니다')
