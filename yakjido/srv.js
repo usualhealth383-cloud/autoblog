@@ -7624,6 +7624,7 @@ window.vMeS = function vMe(_, q){
     ${lrow(I.clock, '복용 시간 알림', '먹었어요 체크·약 떨어지기 전 알림', "go('/schedule')")}
     ${lrow(I.heart, '혈압·혈당 수첩', '2주 흐름·7일 평균', "go('/vitals')")}
     ${lrow(I.cal, '진료 예약', nextVisit() ? esc(visitWord(nextVisit())) : '전날·2시간 전에 알려 드려요', "go('/visits')")}
+    ${lrow(I.shield, '약 관련 지원', '약값·약 관리·남은 약 버리기 — 받을 수 있는 도움', "go('/support')")}
   </div>`;
   else body = `
   <div class="set-list">
@@ -7666,7 +7667,51 @@ ${ext('기내칸')}`, 'sphone')}
   <nav class="tabs metabs" role="tablist" aria-label="내 정보 칸">${TABS.map(([k, n, ic, c]) => `<button class="tab ${tab === k ? 'on' : ''}" role="tab" aria-selected="${tab === k}" data-k="${k}" onclick="go('/me?t=${k}')">${ic}${n}<span class="n">${c}</span></button>`).join('')}</nav>
   ${body}`;
 };
+/* ───────── 약 관련 지원 (11-26 현욱님 「약지도도 약 관련 지원을 잘 정리」, Main 전달) ─────────
+   숫자는 공식 출처를 직접 열어 대조한 것만(확인일 2026-11-26). 원문에서 못 본 값(2026 본인부담상한액 구간·의료급여 약국 금액)은 넣지 않는다.
+   맨 위 「지금 챙기실 만한 것」은 내 약 개수·나이로 고른다: 약 5가지 이상이면 다제약물 관리 먼저. */
+const SUP_DAY = '2026-11-26';
+const SUP = [
+  { id: 'mymed', n: '내가 먹는 약 한눈에', g: '내 약 확인', what: '병원·약국에서 받은 약 기록을 **한 번에** 볼 수 있어요. 진료 때 보여 드리기 좋아요.', who: '누구나(본인 · 14세 미만 자녀는 보호자가 미리 등록)', where: [['심평원 누리집에서 보기', 'https://www.hira.or.kr/ra/medi/form.do'], ['카카오톡에서 「건강보험심사평가원」 채널']], bring: '휴대폰 본인 인증', src: ['hira_mymed', 'sbs_hira_kakao'], pick: n => n >= 1 },
+  { id: 'multi', n: '다제약물 관리(올바른 약물 이용 지원)', g: '약이 많을 때', what: '의사·약사·간호사가 집이나 약국에서 **드시는 약을 함께 점검**하고 상담해 드려요(최대 4번).', who: '만성질환이 있고 늘 드시는 약 성분이 **10가지 이상**인 분(공단 2023년 안내 기준). 병원에서 하는 곳은 65세 이상 위주예요.', where: [['국민건강보험공단 고객센터', 'tel:15771000', '1577-1000']], bring: '드시는 약 봉투나 약 목록', note: '시범사업이라 하는 지역·병원이 정해져 있어요. 사는 곳에서 되는지 먼저 물어보세요.', src: ['nhis_polypharm'], pick: (n, sr) => n >= 5 || (sr && n >= 3) },
+  { id: 'harm', n: '의약품 부작용 피해구제', g: '부작용 피해', what: '정해진 대로 쓴 약 때문에 입원·장애·사망 피해를 입으면 **진료비(최대 3,000만 원)**·장애·사망 보상금·장례비를 받을 수 있어요.', who: '2014년 12월 19일 이후 생긴 피해. 국가예방접종·의료사고 등은 빠져요.', when: '진료비는 진료일부터, 보상금·장례비는 장애·사망일부터 **5년 안**', where: [['한국의약품안전관리원', 'tel:16446223', '1644-6223'], ['의약품안전나라에서 신청', 'https://nedrug.mfds.go.kr']], bring: '먼저 전화로 상담하면 필요한 서류를 알려 줘요', src: ['mfds_harm2024', 'korea_harm'], pick: () => (ME.ae || []).length > 0 },
+  { id: 'cap', n: '본인부담상한제', g: '병원비·약값', what: '1년 동안 낸 건강보험 본인부담금이 소득 구간별 상한을 넘으면 **넘은 만큼 돌려받아요**.', who: '건강보험 가입자 누구나 — 대상이면 공단이 안내문을 보내요', where: [['국민건강보험공단 고객센터', 'tel:15771000', '1577-1000']], bring: '안내문을 받으면 그대로 신청', note: '2026년 구간별 금액은 공단 원문으로 다시 확인 중이에요.', src: ['nhis_cap'], pick: n => n >= 5 },
+  { id: 'special', n: '중증질환·희귀질환 산정특례', g: '병원비·약값', what: '등록하면 건강보험 진료비·약값 가운데 암·중증화상은 **5%**, 희귀·중증난치질환·중증치매는 **10%**만 내요.', who: '해당 병으로 진단받아 등록한 분', where: [['진단받은 병원에서 등록 신청'], ['국민건강보험공단 고객센터', 'tel:15771000', '1577-1000']], bring: '의사가 써 주는 등록 신청서', note: '비급여는 빠져요.', src: ['nhis_special'] },
+  { id: 'tb', n: '결핵 치료비', g: '병원비·약값', what: '결핵으로 등록하면 건강보험 진료비 **본인부담이 없어요**(비급여 제외). 등록 기간은 **2년**(다제내성 결핵 5년)이에요.', who: '결핵으로 진단받아 등록한 분', where: [['진단받은 병원·보건소에서 등록'], ['국민건강보험공단 고객센터', 'tel:15771000', '1577-1000']], bring: '의사가 써 주는 등록 신청서', src: ['nhis_special'] },
+  { id: 'aid', n: '의료급여 · 차상위 본인부담 경감', g: '병원비·약값', what: '의료급여·차상위 경감 대상이면 약국에서 내는 돈이 **크게 줄어요**.', who: '의료급여 수급자, 차상위 본인부담 경감 대상자', where: [['주민센터(행정복지센터)'], ['보건복지상담센터', 'tel:129', '129']], bring: '신분증', note: '2026년 약국 본인부담 금액은 공식 원문으로 다시 확인 중이에요.', src: ['mohw_medaid'] },
+  { id: 'smoke', n: '금연치료 지원', g: '금연', what: '금연치료 병·의원에서 상담과 금연약을 받고, 과정을 마치면(6번 방문 또는 약별 56~84일) **낸 본인부담금을 돌려받아요**. 건강보험료 하위 20%·의료급여는 처음부터 **부담이 없어요**.', who: '담배를 끊고 싶은 분 누구나', where: [['건강보험 누리집·「The건강보험」 앱에서 병원 찾기'], ['국민건강보험공단 고객센터', 'tel:15771000', '1577-1000']], bring: '신분증', src: ['gg_smoke'] },
+  { id: 'night', n: '공공심야약국', g: '약 구하기', what: '밤늦게 문 여는 약국이에요. 서울은 **밤 10시~새벽 1시**, 다른 지역은 시간이 달라요.', who: '누구나', where: [['응급의료포털에서 문 연 약국 찾기', 'https://www.e-gen.or.kr'], ['휴일지킴이약국', 'https://www.pharm114.or.kr']], bring: '드시는 약 이름(약봉투)', src: ['seoul_nightpharm'], all: 1 },
+  { id: 'rare', n: '구하기 힘든 약 — 한국희귀·필수의약품센터', g: '약 구하기', what: '국내에 없거나 공급이 끊긴 약을 **해외에서 들여와** 공급해요(긴급도입·자가치료용).', who: '국내에서 구할 수 없는 약이 필요한 환자', where: [['한국희귀·필수의약품센터', 'https://www.kodc.or.kr']], bring: '자가치료용은 진단서·처방전·구입 동의서·개인정보 동의서', src: ['kodc_supply'] },
+  { id: 'disposal', n: '남은 약 버리기(폐의약품 수거)', g: '남은 약', what: '남은 약·기한 지난 약은 쓰레기통 말고 **약국·보건소·주민센터 수거함**에. 알약은 포장째, 물약은 마개를 닫아서요.', who: '누구나', where: [['가까운 약국·보건소·주민센터']], bring: '건강기능식품은 일반 쓰레기로 버려요', src: ['seoul_disposal'], pick: n => n >= 1, all: 1 },
+];
+const supSay = t => fmt(t);
+function supCard(x, why){
+  const wh = (x.where || []).map(w => w[1] ? `<a class="sup-go" href="${esc(w[1])}"${/^https/.test(w[1]) ? ' target="_blank" rel="noopener"' : ''}>${esc(w[0])}${w[2] ? ` <b>${esc(w[2])}</b>` : ''}</a>` : `<span class="sup-go plain">${esc(w[0])}</span>`).join('');
+  return `<article class="card sup-c" id="sup-${x.id}"><div class="sup-top"><span class="sup-g">${esc(x.g)}</span>${why ? `<span class="sup-why">${esc(why)}</span>` : ''}</div>
+    <h3>${esc(x.n)}</h3><p class="sup-what">${supSay(x.what)}</p>
+    <dl class="sup-dl"><dt>누가</dt><dd>${supSay(x.who)}</dd>${x.when ? `<dt>언제까지</dt><dd>${supSay(x.when)}</dd>` : ''}<dt>준비</dt><dd>${supSay(x.bring)}</dd></dl>
+    ${x.note ? `<p class="sup-note">${supSay(x.note)}</p>` : ''}
+    <div class="sup-where">${wh}</div>
+    <div class="sup-src">${(x.src || []).map(srcChip1).join('')}<span class="sup-day">확인 ${SUP_DAY}</span></div></article>`;
+}
+window.vSupportS = function vSupport(){
+  const n = (ME.taking || []).length, sr = ME.age === 'senior';
+  const why = x => x.id === 'multi' ? `드시는 약 ${n}가지` : x.id === 'harm' ? '부작용 기록이 있어요' : x.id === 'cap' ? '약이 많으면 병원비도 많아요' : x.id === 'mymed' || x.id === 'disposal' ? '약을 드시는 분' : '';
+  let mine = SUP.filter(x => x.pick && x.pick(n, sr));
+  if (n >= 5 || (sr && n >= 3)) mine.sort((a, b) => (b.id === 'multi') - (a.id === 'multi'));
+  const rest = SUP.filter(x => !mine.includes(x)), groups = [...new Set(rest.map(x => x.g))];
+  const hero = mine.length
+    ? `<section class="sup-hero"><p class="sup-k">지금 챙기실 만한 것</p><p class="sup-n"><b>${mine.length}가지</b></p><p class="sup-hs">${n ? `담아 두신 약 ${n}가지${sr ? ' · 65세 이상' : ''}로 골랐어요.` : ''}</p>
+        <div class="sup-jump">${mine.map(x => `<a href="#/support" onclick="event.preventDefault();document.getElementById('sup-${x.id}').scrollIntoView({behavior:'smooth',block:'start'})">${esc(x.n.split(' — ')[0].split('(')[0])}</a>`).join('')}</div></section>`
+    : `<section class="sup-hero"><p class="sup-k">지금 챙기실 만한 것</p><p class="sup-hs">드시는 약을 담아 두시면 맞는 지원을 골라 드려요.</p><button class="btn" onclick="go('/me?t=meds')">${I.pill} 내 약 담기</button></section>`;
+  return `${topBar({ back: '이전' })}
+  <div class="eyebrow">약 관련 지원</div><h1>약값·약 관리, 받을 수 있는 도움</h1>
+  <p style="margin-top:6px">공공 기관이 하는 지원만 모았어요. 숫자는 공식 안내를 직접 확인한 것만 적었어요.</p>
+  ${hero}
+  ${mine.length ? `<section class="sec"><h2>나에게 맞는 것</h2>${mine.map(x => supCard(x, why(x))).join('')}</section>` : ''}
+  ${groups.map(g => `<section class="sec"><h2>${esc(g)}</h2>${rest.filter(x => x.g === g).map(x => supCard(x)).join('')}</section>`).join('')}
+  ${disclaimer('지원 기준과 금액은 바뀔 수 있어요. 신청 전에 해당 기관에 한 번 더 확인하세요.')}`;
+};
 try { if (window.ENTRY && /^#\/(symptom|send)/.test(location.hash)) route(); } catch (e) {}
 try { if (/^(#\/?(home)?)?$/.test(location.hash) && (window.오늘한장 || window.필요약줄)) route(); } catch (e) {}   /* 11-12 홈의 오늘 한 장·필요할 때 약 줄은 srv.js 가 온 뒤 다시 그린다 */
-try { if (/^#\/(hives|kids|bag|pill|show|send|ingr|mix|check|class|kinds|photo|senior|guide|drug\/|schedule|together|od|vitals|pillinfo|pub|supp\/|me|consent|login|notify|sgoal|sstage|doc|hello\/3|supp$|supp\?|sgoal|sstage|rx|about|search|myths|askdoc|talk|p\/|p\?|p$)/.test(location.hash)) route(); } catch (e) {}
-
+try { if (/^#\/(hives|kids|bag|pill|show|send|ingr|mix|check|class|kinds|photo|senior|guide|drug\/|schedule|together|od|vitals|pillinfo|pub|supp\/|me|consent|login|notify|sgoal|sstage|doc|hello\/3|supp$|supp\?|sgoal|sstage|rx|support|about|search|myths|askdoc|talk|p\/|p\?|p$)/.test(location.hash)) route(); } catch (e) {}
