@@ -7363,6 +7363,7 @@ window.vPhotoS = function vPhoto(_, q){
   <p style="margin-top:6px">읽힌 이름과 성분을 상자·약봉투와 확인해 주세요. 확인한 약은 약통에 담아 겹침을 살펴봐요.</p>
   <div class="sec">
     <button type="button" class="big-btn" onclick="photoCam()"><div class="ic">${I.eye}</div><div><b>${R ? '다시 카메라로 찍기' : '카메라로 찍기'}</b><span>${ep ? '약봉투·약 상자·알약을 지금 찍어요' : '지금 찍어요 — 폰 안에서 읽어 드려요'}</span></div></button>
+    <button type="button" class="big-btn soft" onclick="rxOpen()"><div class="ic">${I.pill}</div><div><b>약봉투·처방전 — 여러 약 한 번에</b><span>읽은 약을 확인한 뒤 내 약통에 담아요</span></div></button>
     <button type="button" class="big-btn soft" onclick="document.getElementById('ph-alb').click()"><div class="ic">${I.book}</div><div><b>앨범에서 고르기</b><span>이미 찍어 둔 사진에서 골라요</span></div></button>
     <input id="ph-cam" type="file" accept="image/*" capture="environment" hidden onchange="photoPick(this.files[0]);this.value=''" oncancel="photoNone()"><input id="ph-alb" type="file" accept="image/*" hidden onchange="photoPick(this.files[0]);this.value=''" oncancel="photoNone()">
   </div>

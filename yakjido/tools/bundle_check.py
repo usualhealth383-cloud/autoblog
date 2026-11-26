@@ -26,6 +26,7 @@ def 검사(묶, 조용히=False):
             for m in 길꼴.finditer(s):
                 u = m.group(2)
                 if u.startswith('//') or ':' in u.split('/')[0]: continue
+                if u.startswith('xl/'): continue   # 약지도: 공용 사진읽기 부품이 엑셀(xlsx) 압축 «안» 이름을 부른다(11-26) — 사이트 파일이 아니다
                 앞 = s[max(0, m.start() - 1):m.start()]
                 if 앞 in '+': continue
                 기준 = 묶 if u.startswith('/') else 뿌리
