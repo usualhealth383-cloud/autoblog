@@ -1799,7 +1799,22 @@ window.famToday = function () { if (typeof profOthers !== 'function') return '';
     if (!r) continue; const nx = r.left[0], who = esc(o.id === 'me' ? '나' : profWho(o));
     rows.push(nx ? `<li><span class="ft-n"><b>${who}</b> ${nx.t} · 약 ${nx.its.length}가지${r.left.length > 1 ? ` <small>남은 회차 ${r.left.length}</small>` : ''}</span><button type="button" class="btn line" onclick="profTick({id:'${o.id}',keys:'${nx.its.map(d => d.id + '@' + nx.t).join(',')}'},'${tk}','took');route()">먹었어요</button></li>`
       : `<li><span class="ft-n"><b>${who}</b> 오늘 약 다 챙겼어요</span></li>`); }
-  return rows.length ? `<div class="fam-today"><h2>오늘 가족 약</h2><ul>${rows.join('')}</ul></div>` : ''; };
+  return rows.length ? `<div class="fam-today">${famHero(os)}<h2>오늘 가족 약</h2><ul>${rows.join('')}</ul><p class="fam-chg-l"><a href="#/people">약 바뀜 기록 보기 ›</a></p></div>` : ''; };
+/* 11-27 D3 — 「오늘 드셨나요 N명 중 M명」: 오늘 알림 시간이 있는 분만 센다(필요할 때만 드시는 약만 있으면 빼고) */
+window.famDone = function (m){ return withMe(m, () => { const g = slotGroups(); if (!g.length) return null; const tset = takenSet();
+  return !g.some(({ t, items }) => items.some(d => !tset.includes(d.id + '@' + t) && !isSkipped(d.id + '@' + t))); }); };
+window.famHero = function (os){ const all = [{ me: ME }, ...(os || profOthers())].map(o => famDone(o.me)).filter(v => v !== null); if (all.length < 2) return '';
+  const m = all.filter(Boolean).length, n = all.length;
+  return `<div class="fam-hero" role="status"><span>오늘 드셨나요</span><b>${n}명 중 ${m}명${m === n ? ' 모두' : ''} 다 드셨어요</b></div>`; };
+/* 약 바뀜 기록 — 담은 날·뺀 날(ME.chg)을 사람마다 최근 30일 */
+window.chgName = function (m, id){ return withMe(m, () => { const it = takingItems().find(x => x.id === id); if (it) return String(it.name).split(' (')[0];
+  if (id.startsWith('cls:')) { const q = quickSub(id.slice(4)); if (q) return q.g.n; } if (id.startsWith('supp:')) { const sp = supp(id.slice(5)); if (sp) return sp.name; }
+  const d = drug(id); return d ? d.name : '약 한 가지'; }); };
+window.famChg = function (){ const P = profAll(), cut = dayBefore(29), rows = [];
+  const all = [{ id: P.active, name: profName(), me: ME }, ...profOthers()];
+  for (const o of all) for (const c of (o.me.chg || [])) if (c.d >= cut) rows.push({ d: c.d, who: o.id === 'me' ? '나' : o.name, n: chgName(o.me, c.id), a: c.a });
+  rows.sort((a, b) => b.d.localeCompare(a.d));
+  return `<section class="sec card fam-chg"><h2>최근 약 바뀜 <small class="muted">30일</small></h2>${rows.length ? `<ul>${rows.slice(0, 20).map(r => `<li><span class="fc-d">${r.d.slice(5).replace('-', '/')}</span><span class="fc-t"><b>${esc(r.who)}</b> · ${esc(r.n)}</span><span class="fc-a ${r.a ? 'on' : 'off'}">${r.a ? '새로 시작' : '그만'}</span></li>`).join('')}</ul>` : '<p class="small muted">최근 30일 동안 담거나 뺀 약이 없어요.</p>'}</section>`; };
 /* 11-17 1등 로드맵 3 — 새 약 받았어요 한 흐름: 담자마자 «이 약과 지금 약» 겹침 → 알림 시간 → (가족이면 누구 약통인지) 를 한 카드에.
    예전에는 「담았어요」 토스트 + 10초 뒤 사라지는 시간 묻기 토스트뿐이라, 겹침은 따로 찾아가야 했다. 닫을 때까지 남는다(어르신 읽을 시간) */
 window.afterAdd = function (id) { try {
@@ -1832,6 +1847,7 @@ window.profLink = function () { return profAll().list.length < 2 ? '<p class="jo
 window.문_people = function () { const P = profAll();
   const 이름들 = ['어머니', '아버지', '아이', '배우자', '할머니', '할아버지'], 나이 = [['adult', '성인'], ['senior', '65세 이상'], ['child', '소아·청소년']];
   return topBar({ back: '뒤로' }) + `<section class="sec"><h1>가족 약도 따로 담기</h1><p style="margin-top:8px">한 휴대폰에서 어머니·아이 약을 <b>사람마다 따로</b> 담아요. 같이 먹으면 안 되는 조합은 <b>그분 약끼리</b> 살펴봐요.</p></section>`
+    + famHero() + `${P.list.length > 1 || (ME.chg || []).length ? famChg() : ''}`
     + `<section class="sec card"><h2>담아 둔 분</h2><ul class="prof-list">${P.list.map(p => `<li><span>${esc(p.name)}${p.id === P.active ? ' <small>지금 보는 중</small>' : ''}</span>${p.id === P.active ? '' : `<span class="prof-act"><button type="button" class="btn line" onclick="profSwitch('${p.id}')">보기</button>${p.id === 'me' ? '' : `<button type="button" class="link" onclick="profDel('${p.id}')">지우기</button>`}</span>`}</li>`).join('')}</ul></section>`
     + `<section class="sec card"><h2>새로 더하기</h2><div class="prof-row" role="group" aria-label="누구 약인가요" style="margin-top:12px">${이름들.map(n => `<button type="button" class="prof-chip${PROFQ.name === n ? ' on' : ''}" aria-pressed="${PROFQ.name === n}" onclick="profPick('name','${n}')">${n}</button>`).join('')}</div>
       <label class="small" for="profName" style="display:block;margin-top:12px">이름(바꿔 쓰셔도 돼요)</label><input id="profName" type="text" maxlength="12" autocomplete="off" style="width:100%;min-height:48px;font-size:1.0625rem;margin-top:6px;padding:0 14px;border:1.5px solid var(--ui-line,#C9D3D8);border-radius:12px;background:var(--card,#fff);color:var(--text);box-sizing:border-box" value="${esc(PROFQ.name)}" oninput="PROFQ_set(this.value)" placeholder="예: 큰딸">
