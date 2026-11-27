@@ -6959,6 +6959,7 @@ function undoToast(msg, snap){
 async function toggleTaking(id){ ME.taking = ME.taking || []; const adding = !ME.taking.includes(id);
   if (!adding) { if (!(await confirmRemove(id))) return; const snap = JSON.stringify(ME); ME.taking = ME.taking.filter(x => x !== id); saveMe(); armNotifications(); route(); undoToast('내 약통에서 뺐어요', snap); return; }
   ME.taking = [...ME.taking, id]; const prn = markPrnIfNew(id); saveMe(); route(); toast(prn ? '내 약통에 담았어요 — 아플 때만 드시는 약이라 「필요할 때만」으로 두었어요' : '내 약통에 담았어요'); setTimeout(() => (window.afterAdd ? afterAdd(id) : prn ? 0 : askRemind(id)), 900); }
+  ${window.whenGo ? whenGo(d) : ''}
 /* 알림 글 — 어르신이 읽을 시간이 있게 3.5초 이상(글이 길면 더), 누르면 닫힌다. 화면낭독기는 #sr 로 읽는다(5-07) */
 function toast(t){ document.querySelector('.toast')?.remove(); const el = document.createElement('div'); el.className = 'toast'; el.setAttribute('aria-hidden', 'true'); el.style.pointerEvents = 'none'; el.textContent = t; document.body.appendChild(el);
   const sr = document.getElementById('sr'); if (sr) { sr.textContent = ''; setTimeout(() => { sr.textContent = t; }, 60); }
