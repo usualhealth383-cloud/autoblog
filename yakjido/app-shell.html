@@ -3122,7 +3122,8 @@ const GO_LINK = {
 };
 const goA = k => CC && CC !== 'KR' ? '' : `<a href="${GO_LINK[k][0]}" target="_blank" rel="noopener">${esc(GO_LINK[k][1])}${I.chev || ''}</a>`;
 const careCards = (c, kid) => { if (!c) return ''; kid = kid || ME.age === 'child';
-  const mine = (typeof takingItems === 'function' && takingItems().length) ? `<button onclick="go('/bag')">${I.pill || ''} 내 약 목록 보이기</button>` : '';
+  const vs = (location.hash.match(/symptom\/([\w-]+)/) || [])[1] || '';   /* 11-27 C2 — 진료로 넘기는 한 장 */
+  const mine = `<button onclick="go('/visit${vs ? '?s=' + vs : ''}')">${I.pill || ''} 진료 갈 때 보여 줄 한 장</button>`;
   return `
   ${c.pharmacy?.length ? `<div class="care ok"><div class="hd">${I.check}약국에서 해결해도 괜찮아요</div><div class="bd">${list(c.pharmacy)}<div class="go"><p>밤·주말에도 문 연 약국이 있어요.</p><div class="gl">${goA('open')}${goA('hday')}</div></div></div></div>` : ''}
   ${c.clinic?.length ? `<div class="care clinic"><div class="hd">${I.clock}이럴 땐 병원 진료를 받으세요</div><div class="bd">${list(c.clinic)}${kid ? `<div class="go"><p>밤·휴일이라 소아과가 닫혀 있다면 — 늦게까지 여는 <b>달빛어린이병원</b>이 있고, 갈지 말지 헷갈리면 <b>아이안심톡</b>에 물어볼 수 있어요.</p><div class="gl">${goA('moon')}${goA('kidtalk')}</div></div>` : ''}</div></div>` : ''}
