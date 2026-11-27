@@ -6894,7 +6894,7 @@ window.vDrugFull = function (id, q = {}){
       return `<button class="rep-line" onclick="jumpTab('p3')"><span>${S.length ? `대표 제품 <b>${esc(S[0].name)}</b>${S.length > 1 ? ` · 그 밖에 ${esc(S.slice(1).map(x => x.name).join(', '))}` : ''}` : ''}${M.length ? `${S.length ? ' · ' : ''}이 성분이 든 복합제 ${S.length ? esc(M.map(x => x.name).join(', ')) : `<b>${esc(M.map(x => x.name).join(', '))}</b>`}` : ''}</span>${I.chev}</button>`; })()}
     <div class="en">${rxMix(d) && /^ko/.test(document.documentElement.lang || 'ko') ? `<span class="small">${esc(rxMix(d))}</span>` : badge(d.rx)}${d.ach ? `<span class="badge ${d.ach >= 3 ? 'stop' : d.ach === 2 ? 'warn' : ''}" style="margin-left:4px">항콜린 ${esc(ACH_WORD[d.ach])}</span>` : ''}</div>
     <div class="hero-speak">${speakBtn(`drugSpeech(pView(drug('${d.id}'), ${d.pSel ? `'${esc(d.pSel.name).replace(/'/g, '')}'` : 'null'}))`, (d.pSel?.name || d.name) + ' 읽어 주기')}</div></div>
-  ${allergyWarn(d)}
+  ${allergyWarn(d)}${window.meBand ? meBand(d) : ''}
   ${ixLine([d])}
   ${d.useNote ? `<div class="usebar">${I.alert}<span>${fmt(d.useNote)}</span></div>` : ''}
   ${meSummary(d)}
