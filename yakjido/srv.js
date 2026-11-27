@@ -6878,7 +6878,8 @@ window.myNews = function (compact){
   const hit = items.filter(x => recallNote(x.pub.seq, true, x.pub.full || x.name));
   const href = it => it.pub.seq ? '/pillinfo/' + it.pub.seq : '/me?t=meds';
   if (compact) return hit.length ? lrow(I.alert, `<span class="nw-red">내 약 ${hit.length}가지에 회수 공지</span>`, '일부 제조번호만 — 집에 있는 약을 확인하세요', `go('/news')`) : '';
-  return `<section class="sec"><h2>내 약 소식</h2>
+  const atLine = at ? `<p class="nw-at">식약처 회수 목록 기준일 <b>${esc(at)}</b> — 그 뒤 공지는 식약처에서 확인하세요</p>` : '';
+  return `<section class="sec"><h2>내 약 소식</h2>${atLine}
     ${hit.length ? `<div class="nw-card red"><b>내 약 ${hit.length}가지에 식약처 회수 공지가 있어요</b><p>회수는 일부 제조번호만이에요. 약 상자의 제조번호를 확인해 주세요.</p>
       <ul>${hit.map(it => `<li><a href="#${href(it)}">${esc(it.name)} ›</a></li>`).join('')}</ul></div>`
     : `<div class="nw-card ok"><b>담아 둔 약${items.length ? '' : '(제품)'}에 회수 공지가 없어요</b><p>${items.length ? `제품으로 담은 ${items.length}가지를 봤어요.` : '약을 제품 이름으로 담으시면 회수 공지가 있는지 봐 드려요.'}</p></div>`}
@@ -6980,7 +6981,6 @@ window.vDrugFull = function (id, q = {}){
   ${allergyWarn(d)}${window.meBand ? meBand(d) : ''}
   ${ixLine([d])}
   ${d.useNote ? `<div class="usebar">${I.alert}<span>${fmt(d.useNote)}</span></div>` : ''}
-  ${meSummary(d)}
   ${d.kidSel ? `<div class="dose-hero"><small>먹는 양</small><div class="sv-dose">${esc(KIDDOSE)}</div></div>${kidDoseBtn(d)}` : d.dose ? (() => { const mx = d.dose.max || '설명서의 하루 최대량을 따르세요'; const rule = /세요|따르|달라져|줄이/.test(mx);
     /* 3-3 ③ — 큰 숫자는 알 수(「1~2정」), mg·간격·하루 최대는 그 아래 17 px. 용량 글은 그대로 두고 알 수만 크게 뽑는다(정해진 꼴일 때만) */
     const pc = isOral(d) && String(d.dose.adult || '').match(/^[\d,~.\s]*(?:mg|g|mL)?\s*\(?\s*(?:[\d,.]+\s*(?:mg|g|mL)\s*)?(\d+(?:\s*~\s*\d+)?)\s*(정|캡슐|알|포)\)?$/);
