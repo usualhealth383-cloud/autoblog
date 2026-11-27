@@ -70,3 +70,10 @@ def main():
 
 if __name__ == '__main__':
     main()
+
+# 11-27 C1 내 약 소식 — 받은 날을 meta.json 의 recallsAt 에 남긴다(화면에 「식약처 회수 목록 ○○ 기준」)
+try:
+    import datetime as _dt
+    _m = ROOT / 'content' / 'meta.json'; _j = json.loads(_m.read_text(encoding='utf-8')); _j['recallsAt'] = _dt.date.today().isoformat()
+    _m.write_text(json.dumps(_j, ensure_ascii=False, indent=1) + '\n', encoding='utf-8')
+except Exception as _e: print('recallsAt 못 적음', _e)
