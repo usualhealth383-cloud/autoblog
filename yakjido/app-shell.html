@@ -2072,6 +2072,21 @@ html:not(.ink) .rf-none{display:none}
 .sup-src{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-top:10px}.sup-day{font-size:.875rem;color:var(--muted)}
 @media (prefers-color-scheme:dark){ :root:not([data-theme="light"]) .sup-hero{background:#1F3540;color:#CFE8F1} :root:not([data-theme="light"]) .sup-jump a{background:#16262E;color:#CFE8F1} :root:not([data-theme="light"]) .sup-why{background:#4A3F1A;color:#FFE9A8} }
 :root[data-theme="dark"] .sup-hero{background:#1F3540;color:#CFE8F1} :root[data-theme="dark"] .sup-jump a{background:#16262E;color:#CFE8F1} :root[data-theme="dark"] .sup-why{background:#4A3F1A;color:#FFE9A8}
+
+/* 내 약 전체 지도(11-27 D1) */
+.mm-sum{display:flex;gap:10px;align-items:center;margin-top:14px;border-radius:16px;padding:14px 16px;background:#E3F0E6;color:#1E5B33;font-size:1rem}.mm-sum.has{background:#FDECEA;color:#8A1F11}.mm-sum svg{flex:none;width:1.375rem;height:1.375rem}
+.mm-wrap{position:relative;margin-top:12px;padding-right:22px}
+.mm-svg{position:absolute;left:0;top:0;pointer-events:none;overflow:visible}
+.mm-g{background:var(--card);border-radius:18px;padding:6px 14px 6px;margin-top:10px;border-left:5px solid var(--gc);box-shadow:var(--shadow-card)}
+.mm-g h2{display:flex;align-items:center;gap:8px;font-size:1rem;margin:10px 0 4px}.mm-g h2 i{width:10px;height:10px;border-radius:50%;background:var(--gc)}.mm-g h2 small{color:var(--muted);font-weight:600;font-size:.875rem}
+.mm-row{display:flex;align-items:center;gap:8px;min-height:3.5rem;padding:8px 0;border-top:1px solid var(--line)}
+.mm-tx{flex:1;min-width:0;display:flex;flex-direction:column;justify-content:center}.mm-tx b{font-size:1rem;word-break:keep-all}.mm-tx span{font-size:.875rem;color:var(--muted);word-break:keep-all}
+.mm-x{flex:none;font-size:.875rem;font-weight:800;color:#8A1F11;background:#FDECEA;border-radius:8px;padding:2px 8px}
+.mm-pl{flex:none;min-height:2.5rem;padding:0 10px;border:1px solid var(--line);border-radius:10px;background:none;color:var(--primary-deep);font:inherit;font-size:.875rem;font-weight:700;cursor:pointer}
+.mm-ed{padding:6px 0 12px}.mm-chips{display:flex;flex-wrap:wrap;gap:6px}.mm-in{display:flex;gap:8px;margin-top:8px}.mm-in input{flex:1;min-width:0;min-height:2.75rem;border:1px solid var(--line);border-radius:12px;padding:0 12px;font:inherit;font-size:1rem;background:var(--card);color:var(--text)}.mm-in .btn{flex:none;min-height:2.75rem;padding:0 16px}
+.mm-p{display:flex;flex-direction:column;gap:3px;padding:12px 16px;border-top:1px solid var(--line);border-left:4px solid #D9822B}.mm-p:first-child{border-top:0}.mm-p.stop{border-left-color:#C0392B}.mm-p b{font-size:1rem;word-break:keep-all}.mm-p span{font-size:.941rem;color:var(--body);word-break:keep-all}
+@media (prefers-color-scheme:dark){ :root:not([data-theme="light"]) .mm-sum{background:#1E3326;color:#BFE3C9} :root:not([data-theme="light"]) .mm-sum.has,:root:not([data-theme="light"]) .mm-x{background:#3A2420;color:#F5B5A8} }
+:root[data-theme="dark"] .mm-sum{background:#1E3326;color:#BFE3C9} :root[data-theme="dark"] .mm-sum.has,:root[data-theme="dark"] .mm-x{background:#3A2420;color:#F5B5A8}
 </style>
 
 <div class="app">
@@ -2306,6 +2321,7 @@ function sanitizeMe(m){
   r.noteOff = {}; for (const [k, v] of Object.entries(obj(o.noteOff))) if (/^[a-z]{2,20}$/.test(k) && v) r.noteOff[k] = 1;
   if ([10, 30, 60].includes(o.againMin)) r.againMin = o.againMin;
   r.chg = (Array.isArray(o.chg) ? o.chg : []).filter(c => c && /^\d{4}-\d{2}-\d{2}$/.test(c.d) && SAFE_ID.test(c.id) && (c.a === 0 || c.a === 1)).slice(-60).map(c => ({ d: c.d, id: c.id, a: c.a }));   /* 11-17 로드맵 6 — 약 시작·뺀 날(그래프 표시) */
+  r.where = {}; for (const [k, v] of Object.entries(obj(o.where))) if (SAFE_ID.test(k)) { const t = str(v, 20); if (t) r.where[k] = t; }   /* 11-27 D1 내 약 전체 지도 — 약마다 받은 곳 */
   r.taking = r.taking.filter(id => !id.startsWith('pub:') || r.pub[id]);
   return r;
 }
@@ -2814,7 +2830,7 @@ function route(){
   /* 처음 안내 중에는 아래 탭을 감춘다 — 누르면 안내가 반쯤 끝났다(3-24) */
   document.body.classList.toggle('no-nav', /^(hello|consent|login|doc)$/.test(seg[0])); document.body.classList.toggle('is-door', /^(consent|login)$/.test(seg[0]));
   const q = Object.fromEntries(new URLSearchParams(qs || '')); entryTake(q); try { if (q.all === '1') sessionStorage.setItem('yakjido.all', '1'); else if (q.all === '0') sessionStorage.removeItem('yakjido.all'); } catch (e) {}
-  const tab = { barcode:'home', mhr:'home', people:'home', send:'home', p:'home', show:'home', check:'home', home:'home', symptom:'home', drugs:'drugs', drug:'drugs', class:'drugs', search:'drugs', pub:'drugs', pill:'drugs', guide:'home', kids:'home', tips:'home', myths:'home', schedule:'me', notify:'me', photo:'drugs', rxread:'drugs', support:'drugs', pillinfo:'drugs', supp:'supp', sgoal:'supp', sstage:'supp', compare:'supp', me:'me', about:'me', ingr:'drugs', brand:'drugs', nut:'supp', hello:'home', mix:'drugs', together:'me', kinds:'me', rx:'me', rxout:'drugs', senior:'drugs', askdoc:'home', talk:'home', hives:'home', login:'login' }[seg[0]] || 'home';
+  const tab = { barcode:'home', mhr:'home', people:'home', send:'home', p:'home', show:'home', check:'home', home:'home', symptom:'home', drugs:'drugs', drug:'drugs', class:'drugs', search:'drugs', pub:'drugs', pill:'drugs', guide:'home', kids:'home', tips:'home', myths:'home', schedule:'me', notify:'me', photo:'drugs', rxread:'drugs', support:'drugs', map:'me', pillinfo:'drugs', supp:'supp', sgoal:'supp', sstage:'supp', compare:'supp', me:'me', about:'me', ingr:'drugs', brand:'drugs', nut:'supp', hello:'home', mix:'drugs', together:'me', kinds:'me', rx:'me', rxout:'drugs', senior:'drugs', askdoc:'home', talk:'home', hives:'home', login:'login' }[seg[0]] || 'home';
   /* 지금 탭을 색으로만 보이지 않게 — 화면낭독기가 「현재 페이지」라고 읽는다(5-18) */
   document.querySelectorAll('nav.tabbar button').forEach(b => { const on = b.dataset.tab === tab; b.classList.toggle('on', on); on ? b.setAttribute('aria-current', 'page') : b.removeAttribute('aria-current'); });
   /* 본문 자료가 아직이면 — 첫 화면과 인사만 먼저 그리고, 나머지는 받은 뒤에 다시 그린다.
@@ -2836,7 +2852,7 @@ function route(){
     if (DETAIL === 3) { window.__DETAIL_SKIP__ = true; ensureDetail(); }
     else { view.innerHTML = topBar({ back:'뒤로', nosearch:true }) + `<section class="sec"><p class="loading">자료를 불러오는 중이에요…</p></section>`; ensureDetail().then(route); return; }
   }
-  const R = { now:vNow, med:vMed, od:vOd, send:vSend, p:vParentShare, show:vShow, check:vCheck, home:vHome, symptom:vSymptom, drugs:vDrugs, drug:vDrug, class:vClass, search:vSearch, pub:vPub, pill:vPill, guide:vGuide, kids:vKids, tips:vTips, myths:vMyths, schedule:vSchedule, notify:vDoor, photo:vPhoto, rxread:vRxRead, support:vSupport, pillinfo:vPillInfo, supp:vSupp, sgoal:vDoor, sstage:vDoor, compare:vCompare, me:vMe, about:vAbout, ingr:vIngr, brand:vBrand, nut:vNut, hello:vHello, mix:vMix, together:vTogether, kinds:vKinds, rx:vRx, bag:vBag, rxout:vRxOut, senior:vSenior, askdoc:vAskDoc, talk:vTalk, hives:vHives, vitals:vVitals, visits:vVisits, demo:vDemo, consent:vDoor, login:vDoor, doc:vDoor, people:vDoor, barcode:vDoor, mhr:vDoor };
+  const R = { now:vNow, med:vMed, od:vOd, send:vSend, p:vParentShare, show:vShow, check:vCheck, home:vHome, symptom:vSymptom, drugs:vDrugs, drug:vDrug, class:vClass, search:vSearch, pub:vPub, pill:vPill, guide:vGuide, kids:vKids, tips:vTips, myths:vMyths, schedule:vSchedule, notify:vDoor, photo:vPhoto, rxread:vRxRead, support:vSupport, map:vMap, pillinfo:vPillInfo, supp:vSupp, sgoal:vDoor, sstage:vDoor, compare:vCompare, me:vMe, about:vAbout, ingr:vIngr, brand:vBrand, nut:vNut, hello:vHello, mix:vMix, together:vTogether, kinds:vKinds, rx:vRx, bag:vBag, rxout:vRxOut, senior:vSenior, askdoc:vAskDoc, talk:vTalk, hives:vHives, vitals:vVitals, visits:vVisits, demo:vDemo, consent:vDoor, login:vDoor, doc:vDoor, people:vDoor, barcode:vDoor, mhr:vDoor };
   /* 한 화면이 그리다 터져도 앱 전체가 멈춘 것처럼 보이지 않게 — 자료 한 줄의 흠이 흰 화면이 되지 않도록(2026-10-08 출시 점검) */
   let html;
   /* 익명 이용 통계(공용 이용량 부품 · 기본 꺼짐) — 화면 «종류» 이름만 센다. 약 이름·증상·검색어는 세지 않는다 */
@@ -7374,13 +7390,14 @@ function rxMatch(raw){
   return [];
 }
 async function rxGot(v){
-  RXR.busy = true; RXR.rows = []; RXR.skip = 0; go('/rxread');
+  RXR.busy = true; RXR.rows = []; RXR.skip = 0; RXR.place = ''; go('/rxread');
   try { await Promise.all([lexLoad(true), pubIndex(), pubPills(), pubPillsRx(), rxNames()]); } catch (e) {}
   const seen = new Set();
   for (const cells of (v && v.줄) || []) {
     const raw = cells.filter(Boolean).join(' ').trim(); const bits = rxBits(raw);
     const hits = rxMatch(raw);
     const hit = hits[0] || null; const looks = (raw.match(/[가-힣A-Za-z]/g) || []).length >= 2 && (bits.dose || bits.freq);
+    if (!hit && !RXR.place) { const pm = raw.match(/[가-힣A-Za-z]{2,}(?:의원|병원|내과|외과|소아과|청소년과|이비인후과|피부과|안과|비뇨의학과|산부인과|의학과|한의원|약국)/); if (pm) RXR.place = pm[0]; }
     if (!hit && !looks) { RXR.skip++; continue; }
     if (hit) { if (seen.has(hit.href)) continue; seen.add(hit.href); }
     RXR.rows.push({ raw, hit, alts: hits.slice(1, 3), ...bits, on: !!hit });
@@ -7390,12 +7407,12 @@ async function rxGot(v){
 function rxAddOne(h){
   ME.taking = ME.taking || []; ME.pub = ME.pub || {};
   const [, kind, rest = ''] = h.href.split('/'); const key = decodeURIComponent(rest.split('?')[0]);
-  if (kind === 'drug') { if (!ME.taking.includes(key)) { ME.taking.push(key); markPrnIfNew(key); } return true; }
+  if (kind === 'drug') { if (!ME.taking.includes(key)) { ME.taking.push(key); markPrnIfNew(key); } return key; }
   if (kind === 'pub') { const x = (PUB.index || []).find(q => String(q.id) === key); if (!x) return false; const id = 'pub:' + pubKeyOf(x);
-    if (!ME.taking.includes(id)) { const ingr = (x.i || []).join('|'); const d = pubDrug(ingr, x); ME.taking.push(id); ME.pub[id] = { name: pubShort(x.n), full: x.n, ingr, rx: '', seq: x.seq || '', drugId: d?.id || '' }; markPrnIfNew(id); } return true; }
+    if (!ME.taking.includes(id)) { const ingr = (x.i || []).join('|'); const d = pubDrug(ingr, x); ME.taking.push(id); ME.pub[id] = { name: pubShort(x.n), full: x.n, ingr, rx: '', seq: x.seq || '', drugId: d?.id || '' }; markPrnIfNew(id); } return id; }
   if (kind === 'pillinfo') { const pl = findPill(key), r = (PUB.rxn || []).find(z => z[1] === key), n = pl?.n || r?.[0]; if (!n) return false; const id = 'pub:' + key;
     if (!ME.taking.includes(id)) { const [ingr, est] = pl?.ingr ? [pl.ingr, 0] : pubIngrGuess(key, n); const d = pubDrug(ingr, pl || { n }); ME.taking.push(id);
-      ME.pub[id] = { name: n.replace(/\(.*?\)/g, '').replace(/[()]/g, '').trim(), full: n, ingr, rx: pl ? pl.rx : (r && r[3] !== 0 ? 1 : ''), seq: key, drugId: d?.id || '', ...(est && ingr ? { est: true } : {}) }; markPrnIfNew(id); } return true; }
+      ME.pub[id] = { name: n.replace(/\(.*?\)/g, '').replace(/[()]/g, '').trim(), full: n, ingr, rx: pl ? pl.rx : (r && r[3] !== 0 ? 1 : ''), seq: key, drugId: d?.id || '', ...(est && ingr ? { est: true } : {}) }; markPrnIfNew(id); } return id; }
   return false;
 }
 function rxTog(i){ const r = RXR.rows[+i]; if (r && r.hit) { r.on = !r.on; route(); } }
@@ -7403,7 +7420,8 @@ function rxAlt(i, k){ const r = RXR.rows[+i]; if (!r) return; const a = r.alts[+
 function rxPick(i){ const r = RXR.rows[+i]; PH.q = r ? (r.raw.match(/[가-힣A-Za-z]{2,}/) || [''])[0] : ''; go('/photo'); setTimeout(photoManual, 30); }
 function rxSave(){
   const on = RXR.rows.filter(r => r.on && r.hit); let n = 0;
-  for (const r of on) if (rxAddOne(r.hit)) n++;
+  ME.where = ME.where || {};
+  for (const r of on) { const id = rxAddOne(r.hit); if (id) { n++; if (RXR.place && !ME.where[id]) ME.where[id] = RXR.place; } }
   if (!n) { toast('담을 약을 골라 주세요'); return; }
   saveMe(); RXR.rows = []; toast(`내 약통에 ${n}가지 담았어요`); go('/me?t=meds');
 }
@@ -7426,9 +7444,11 @@ function vRxRead(){
   return `${topBar({ back: '사진으로 찾기', href: '/photo' })}
   <div class="eyebrow">약봉투·처방전 읽기</div><h1>읽은 약을 확인해 주세요</h1>
   <p style="margin-top:6px">봉투와 맞는지 보고, 맞는 약만 담아요. 체크한 약만 내 약통에 들어가요.</p>
+  ${RXR.place && !RXR.busy ? `<p class="small muted" style="margin-top:6px">받은 곳: <b>${esc(RXR.place)}</b> — 내 약 전체 지도에서 이곳으로 묶어요.</p>` : ''}
   <div class="sec">${body}</div>`;
 }
 
+function vMap(...a){ return window.vMapS ? vMapS(...a) : 잠깐(); }
 function vSupport(...a){ return window.vSupportS ? vSupportS(...a) : 잠깐(); }
 function vPhoto(...a){ return window.vPhotoS ? vPhotoS(...a) : 잠깐(); }
 function photoResult(...a){ return window.photoResultS ? photoResultS(...a) : undefined; }

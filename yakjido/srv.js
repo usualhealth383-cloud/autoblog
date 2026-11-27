@@ -7616,6 +7616,7 @@ window.vMeS = function vMe(_, q){
   </section>
   ${items.length ? `<div class="sech"><h2 class="sec-h">담아 두신 약으로</h2></div><div class="rows-l">
     ${lrow(I.shield, '같이 먹어도 되나요', `담아 두신 ${items.length}가지를 성분으로 풀어서 부딪히는 자리를 봐 드려요`, "go('/together')")}
+    ${lrow(I.pill, '내 약 전체 지도', '병원·약국별로 묶고 겹치는 약을 선으로', "go('/map')")}
     ${lrow(I.eye, '내 약 목록 한 장', '진료실·약국에서 큰 글씨로 보여 드리세요', "go('/bag')")}
   </div>` : ''}
   ${achPanel([], { always:true })}
@@ -7712,6 +7713,58 @@ window.vSupportS = function vSupport(){
   ${groups.map(g => `<section class="sec"><h2>${esc(g)}</h2>${rest.filter(x => x.g === g).map(x => supCard(x)).join('')}</section>`).join('')}
   ${disclaimer('지원 기준과 금액은 바뀔 수 있어요. 신청 전에 해당 기관에 한 번 더 확인하세요.')}`;
 };
+/* ───────── 내 약 전체 지도 (11-27 현욱님 「닥터나우 대비 여섯 다 만들기」 D1) ─────────
+   여러 병원·약국 약을 «받은 곳»으로 묶고, 겹치는 짝을 오른쪽 선으로 잇는다.
+   겹침 판정은 「같이 먹어도 되나요」(ixRun)와 같은 자료만 쓴다 — 새 상호작용을 만들지 않는다. 결론은 늘 「약사와 확인」. */
+const MAP_DEF = it => it.supp ? '영양제' : (it.pub?.rx || it.quick || it.d?.rx === '전문') ? '처방받은 약' : '약국에서 산 약';
+window.mapPlace = (id, v) => { ME.where = ME.where || {}; v = String(v || '').trim().slice(0, 20); if (v) ME.where[id] = v; else delete ME.where[id]; saveMe(); route(); };
+window.mapEdit = id => { window.__mapEd = window.__mapEd === id ? '' : id; route(); setTimeout(() => document.getElementById('mapin')?.focus(), 40); };
+function mapPairs(items){
+  const res = ixRun(), L = res.items, out = [], at = it => { const k = L.indexOf(it); return k >= 0 && k < items.length ? k : -1; };
+  const add = (xs, t, lv) => { const ix = [...new Set(xs.map(at).filter(k => k >= 0))]; if (ix.length < 2) return; const key = ix.slice().sort().join(','); if (out.some(o => o.key === key)) return; out.push({ key, ix, t, lv }); };
+  res.hits.filter(h => h.r.lv !== 'info').forEach(h => add(h.items, h.r.t, h.r.lv));
+  res.dupeGroups.forEach(g => add(g.items, `같은 성분이 겹쳐요 — ${g.names.join('·')}`, 'warn'));
+  res.l2.forEach(o => add(o.items, o.r.t || o.r.제목 || '같이 드실 때 주의', 'warn'));
+  return out;
+}
+window.vMapS = function vMap(){
+  const items = takingItems(); const W = ME.where || {};
+  if (!items.length) return `${topBar({ back: '이전' })}<div class="eyebrow">내 약 전체 지도</div><h1>드시는 약을 한 장에</h1>
+    <div class="empty card" style="margin-top:14px"><b>아직 담은 약이 없어요</b>약봉투 사진이나 이름으로 담으시면 병원·약국별로 묶어 보여 드려요.<div class="actions"><button class="btn" onclick="go('/photo')">${I.eye} 약봉투 사진으로 담기</button></div></div>`;
+  const P = mapPairs(items), place = it => W[it.id] || MAP_DEF(it);
+  const groups = [...new Set(items.map(place))];
+  const pal = ['#0B6E8F', '#7A5BB5', '#2E8B57', '#B5651D', '#5B6B8C', '#A0447A'];
+  const mark = i => P.filter(p => p.ix.includes(i)).length;
+  const ed = window.__mapEd || '';
+  const known = [...new Set(Object.values(W))].slice(0, 6);
+  const row = (it, i) => `<div class="mm-row" data-i="${i}"><div class="mm-tx"><b>${esc(it.name)}</b><span>${esc(short(it.simple || '', 34))}</span></div>
+      ${mark(i) ? `<span class="mm-x">겹침 ${mark(i)}</span>` : ''}<button type="button" class="mm-pl" onclick="mapEdit('${esc(it.id)}')" aria-label="${esc(it.name)} 받은 곳 바꾸기">받은 곳</button></div>
+      ${ed === it.id ? `<div class="mm-ed"><div class="mm-chips">${[...known, '처방받은 약', '약국에서 산 약'].filter((v, k, a) => a.indexOf(v) === k).map(v => `<button type="button" class="chip" onclick="mapPlace('${esc(it.id)}','${esc(v)}')">${esc(v)}</button>`).join('')}</div>
+        <div class="mm-in"><input id="mapin" placeholder="예: 튼튼내과, 하나약국" maxlength="20" aria-label="받은 곳 이름" onkeydown="if(event.key==='Enter')mapPlace('${esc(it.id)}',this.value)"><button type="button" class="btn" onclick="mapPlace('${esc(it.id)}',document.getElementById('mapin').value)">저장</button></div></div>` : ''}`;
+  setTimeout(mapLines, 0);
+  return `${topBar({ back: '이전' })}
+  <div class="eyebrow">내 약 전체 지도</div><h1>내 약 ${items.length}가지, 한 장에</h1>
+  <p style="margin-top:6px">받은 곳별로 묶었어요. 겹치는 약은 오른쪽 선으로 이어 보여 드려요.</p>
+  <div class="mm-sum ${P.length ? 'has' : ''}">${P.length ? `${I.alert}<span><b>겹치는 곳 ${P.length}군데</b> — 드시기 전에 약사와 확인하세요.</span>` : `${I.check}<span><b>지금 담은 약끼리 겹치는 곳은 없어요</b></span>`}</div>
+  <div class="mm-wrap" id="mmwrap">${groups.map((g, k) => `<section class="mm-g" style="--gc:${pal[k % pal.length]}"><h2><i></i>${esc(g)} <small>${items.filter(it => place(it) === g).length}가지</small></h2>
+    ${items.map((it, i) => place(it) === g ? row(it, i) : '').join('')}</section>`).join('')}<svg class="mm-svg" aria-hidden="true"></svg></div>
+  ${P.length ? `<section class="sec"><h2>겹치는 곳</h2><div class="card">${P.map(p => `<div class="mm-p ${p.lv === 'stop' ? 'stop' : ''}"><b>${p.ix.map(i => esc(items[i].name)).join(' + ')}</b><span>${esc(p.t)} — 약사와 확인하세요.</span></div>`).join('')}</div>
+    <div class="actions"><button class="btn line" onclick="go('/together')">${I.shield} 왜 겹치는지 자세히</button></div></section>` : ''}
+  <div class="actions"><button class="btn" onclick="go('/photo')">${I.eye} 약봉투 사진으로 더하기</button></div>
+  ${disclaimer('겹침은 성분과 식약처 허가 문구로 본 것이에요. 약을 빼거나 바꾸기 전에 의사·약사와 상의하세요.')}`;
+};
+/* 겹친 짝을 오른쪽 가장자리에 둥근 선으로 — 화면이 그려진 뒤 위치를 재서 긋는다 */
+window.mapLines = function (){
+  const w = document.getElementById('mmwrap'); if (!w) return; const sv = w.querySelector('.mm-svg'); if (!sv) return;
+  const items = takingItems(), P = mapPairs(items), R = w.getBoundingClientRect();
+  sv.setAttribute('width', R.width); sv.setAttribute('height', R.height); sv.setAttribute('viewBox', `0 0 ${R.width} ${R.height}`);
+  const y = i => { const e = w.querySelector(`.mm-row[data-i="${i}"]`); if (!e) return null; const r = e.getBoundingClientRect(); return r.top - R.top + r.height / 2; };
+  let h = ''; P.forEach((p, k) => { const ys = p.ix.map(y).filter(v => v != null).sort((a, b) => a - b); if (ys.length < 2) return;
+    const x = R.width - 4, dx = 10 + (k % 3) * 6, c = p.lv === 'stop' ? '#C0392B' : '#D9822B';
+    for (let j = 1; j < ys.length; j++) h += `<path d="M${x} ${ys[j - 1]} C${x + dx} ${ys[j - 1]} ${x + dx} ${ys[j]} ${x} ${ys[j]}" stroke="${c}" stroke-width="2.5" fill="none" stroke-dasharray="6 4" stroke-linecap="round"/>`; });
+  sv.innerHTML = h;
+};
+addEventListener('resize', () => { if (/^#\/map/.test(location.hash)) mapLines(); });
 try { if (window.ENTRY && /^#\/(symptom|send)/.test(location.hash)) route(); } catch (e) {}
 try { if (/^(#\/?(home)?)?$/.test(location.hash) && (window.오늘한장 || window.필요약줄)) route(); } catch (e) {}   /* 11-12 홈의 오늘 한 장·필요할 때 약 줄은 srv.js 가 온 뒤 다시 그린다 */
-try { if (/^#\/(hives|kids|bag|pill|show|send|ingr|mix|check|class|kinds|photo|senior|guide|drug\/|schedule|together|od|vitals|pillinfo|pub|supp\/|me|consent|login|notify|sgoal|sstage|doc|hello\/3|supp$|supp\?|sgoal|sstage|rx|support|about|search|myths|askdoc|talk|p\/|p\?|p$)/.test(location.hash)) route(); } catch (e) {}
+try { if (/^#\/(hives|kids|bag|pill|show|send|ingr|mix|check|class|kinds|photo|senior|guide|drug\/|schedule|together|od|vitals|pillinfo|pub|supp\/|me|consent|login|notify|sgoal|sstage|doc|hello\/3|supp$|supp\?|sgoal|sstage|rx|support|map|about|search|myths|askdoc|talk|p\/|p\?|p$)/.test(location.hash)) route(); } catch (e) {}
